@@ -43,6 +43,13 @@
  * filtering depending on the size can be devised or so. */
 const GLenum fontFilterMode = /*GL_LINEAR*/GL_NEAREST;
 
+// @@@ A kludge to silence a VC 64bit warning
+#if (CS_PROCESSOR_SIZE == 64)
+#define CONST_SIZET(x)	  CONST_UINT64(x)
+#else
+#define CONST_SIZET(x)	  x
+#endif
+
 //---------------------------------------------------------------------------
 
 csGLFontCache::csGLFontCache (csGraphics2DGLCommon* G2D) : 
@@ -114,7 +121,7 @@ void csGLFontCache::Setup()
   texSize = MIN (texSize, maxtex);
   maxTxts = G2D->config->GetInt ("Video.OpenGL.FontCache.MaxTextureNum", 16);
   maxTxts = MAX (maxTxts, 1);
-  maxTxts = MIN (maxTxts, 32);
+  maxTxts = MIN (maxTxts, sizeof(size_t) * 8);
   maxFloats = G2D->config->GetInt ("Video.OpenGL.FontCache.VertexCache", 128);
   maxFloats = ((maxFloats + 3) / 4) * 4;
   maxFloats = MAX (maxFloats, 4);
@@ -274,10 +281,10 @@ void csGLFontCache::InternalUncacheGlyph (GlyphCacheData* cacheData)
 {
   GLGlyphCacheData* glCacheData = (GLGlyphCacheData*)cacheData;
   const size_t texNum = glCacheData->texNum;
-  if (usedTexs & (1 << texNum))
+  if (usedTexs & (CONST_SIZET(1) << texNum))
   {
     FlushArrays ();
-    usedTexs &= ~(1 << texNum);
+    usedTexs &= ~(CONST_SIZET(1) << texNum);
   }
   textures[texNum].glyphRects->Reclaim (glCacheData->subrect);
   cacheDataAlloc.Free (glCacheData);
@@ -613,7 +620,8 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
 
     const size_t newTexNum = cacheData->texNum;
     const GLuint newHandle = textures[newTexNum].handle;
-    if (!job || (job->texture != newHandle) || !(usedTexs & (1 << newTexNum)))
+    if (!job || (job->texture != newHandle) 
+      || !(usedTexs & (CONST_SIZET(1) << newTexNum)))
     {
       job = &GetJob (fg, bg, newHandle, textures[newTexNum].mirrorHandle, 
         bgVertOffset);
@@ -623,7 +631,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
       bgTcPtr = texcoords.GetArray() + numFloats + bgVertOffset;
       bgVertPtr = verts2d.GetArray() + numFloats + bgVertOffset;
     }
-    usedTexs |= (1 << newTexNum);
+    usedTexs |= (CONST_SIZET(1) << newTexNum);
 
     advance += cacheData->bmetrics.left;
     

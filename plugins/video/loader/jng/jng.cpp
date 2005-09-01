@@ -18,13 +18,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// note: the order is not quite CS standard... However, if changed you'll
-// get a couple of compile errors, mostly due to conflicts in some #defines 
-// and __declspec()s
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/sysfunc.h"
 #include "csgeom/csrect.h"
+#include "csgeom/math.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/packrgb.h"
 #include "csutil/databuf.h"
@@ -717,7 +715,8 @@ mng_bool ImageJngFile::cb_readdata (mng_handle hHandle, mng_ptr pBuf,
   this_ = (ImageJngFile *)mng_get_userdata (hHandle);
 
   // determine amount of data to read; 0 if EOF
-  *pRead = MIN (iBuflen, this_->bufferSize - (this_->bufptr - this_->buffer));
+  *pRead = (mng_uint32)csMin ((size_t)iBuflen, 
+    this_->bufferSize - (this_->bufptr - this_->buffer));
   if (*pRead > 0)
   {
     memcpy (pBuf, this_->bufptr, *pRead);

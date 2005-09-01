@@ -98,7 +98,7 @@ static DWORD STDAPICALLTYPE MyGetLPN (LPCSTR lpszShortPath, LPSTR lpszLongPath,
     }
     nextpos = bs ? bs + 1 : 0;
   }
-  return (cchBuffer - bufRemain);
+  return (cchBuffer - (DWORD)bufRemain);
 #undef BUFCAT
 }
 

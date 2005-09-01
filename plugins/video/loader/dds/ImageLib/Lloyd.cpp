@@ -4,6 +4,7 @@
 
 */
 
+#include "common.h"
 #include <stdio.h>
 #include "Lloyd.h"
 #include <stdlib.h>

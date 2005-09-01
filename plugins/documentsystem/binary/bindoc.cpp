@@ -1528,7 +1528,8 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     csRef<csBinaryDocAttribute> attr;
     for (i = 0; i < attrCount; i++)
     {
-      startsScratch[i] = csLittleEndianLong ((uint32)nodesFile->GetPos() - attrStart);
+      startsScratch[i] = csLittleEndianLong (
+	(uint32)(nodesFile->GetPos() - attrStart));
       attr.AttachNew (doc->GetPoolAttr ());
       attr->SetTo (nodeData->atGetItem (i), this);
       attr->Store (nodesFile);
@@ -1545,7 +1546,8 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     csRef<csBinaryDocNode> node;
     for (i = 0; i < childCount; i++)
     {
-      startsScratch[i] = csLittleEndianLong ((uint32)nodesFile->GetPos() - childStart);
+      startsScratch[i] = csLittleEndianLong (
+	(uint32)(nodesFile->GetPos() - childStart));
       node.AttachNew (doc->GetPoolNode());
       node->SetTo (nodeData->ctGetItem (i), this);
       node->Store (nodesFile);

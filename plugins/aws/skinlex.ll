@@ -24,6 +24,13 @@
 
 %{
 
+/* MSVC 8 complains about deprecated methods in the generated code. Although
+ * inclusion of cssysdef.h as the very first header would enable a workaround
+ * for that, we can't ensure that; hence, just disable the warning here. */
+#if defined(CS_COMPILER_MSVC)
+#pragma warning(disable:4996)
+#endif
+
 #include "cssysdef.h"
 #include "csgeom/csrect.h"
 #include "awsprefs.h"
