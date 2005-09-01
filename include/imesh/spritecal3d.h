@@ -517,6 +517,8 @@ struct iSpriteCal3DState : public iBase
   /**
    * This detaches a mesh with the specified name (from xml) to the instance of
    * the model.
+   * \remarks Note that changes made to the mesh's shader variable context will
+   *  get lost.
    */
   virtual bool DetachCoreMesh(const char *meshname) = 0;
 
@@ -605,7 +607,14 @@ struct iSpriteCal3DState : public iBase
   /// Set user data in the model, for access from the callback later, mostly.
   virtual void SetUserData(void *data) = 0;
   
-  virtual iShaderVariableContext* GetSubmeshSVC (const char* meshName) = 0;
+  /**
+   * Get the shader variable context for the attached mesh identified by
+   * \a name.
+   * \return Shader variable context for the attached mesh \a name, 0 if the
+   *   mesh is not attached.
+   */
+  virtual iShaderVariableContext* GetCoreMeshShaderVarContext (
+    const char* meshName) = 0;
 
   /**\name Direct Cal3d model manipulation
    * You can get access to the internal Cal3d Model class which sprcal3d

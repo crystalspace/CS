@@ -2154,14 +2154,18 @@ float csSpriteCal3DMeshObject::GetTimeFactor()
   return calModel.getMixer()->getTimeFactor();
 }
 
-iShaderVariableContext* csSpriteCal3DMeshObject::GetSubmeshSVC (
+iShaderVariableContext* csSpriteCal3DMeshObject::GetCoreMeshShaderVarContext (
   const char* meshName)
 {
   int idx = factory->FindMeshName(meshName);
   if (idx == -1)
     return 0;
+
+  size_t meshIdx = meshes.FindSortedKey (csArrayCmp<Mesh, int> (idx, 
+    &CompareMeshIndexKey));
+  if (meshIdx == csArrayItemNotFound ) return 0;
           
-  return meshes[idx].svc;
+  return meshes[meshIdx].svc;
 }
 
 //----------------------------------------------------------------------

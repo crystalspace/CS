@@ -975,7 +975,8 @@ public:
 
   void SetAnimTimeUpdateHandler (iAnimTimeUpdateHandler*);
 
-  virtual iShaderVariableContext* GetSubmeshSVC (const char* meshName);
+  virtual iShaderVariableContext* GetCoreMeshShaderVarContext (
+    const char* meshName);
 
   struct SpriteCal3DState : public iSpriteCal3DState
   {
@@ -1144,8 +1145,9 @@ public:
     {
       scfParent->SetAnimTimeUpdateHandler(p);
     }
-    virtual iShaderVariableContext* GetSubmeshSVC (const char* meshName)
-    { return scfParent->GetSubmeshSVC (meshName); }
+    virtual iShaderVariableContext* GetCoreMeshShaderVarContext (
+      const char* meshName)
+    { return scfParent->GetCoreMeshShaderVarContext (meshName); }
   } scfiSpriteCal3DState;
   friend struct SpriteCal3DState;
 

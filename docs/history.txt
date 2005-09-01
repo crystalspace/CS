@@ -19,6 +19,10 @@ chronological order.
 	  on VC7+.
 	- res fixed some VC8 warnings in expparser.cpp.
 	- res fixed(mostly blindly) some 64bit issues reported by Mike Gist.
+	- res renamed iSpriteCal3DState::GetSubmeshSVC() to 
+	  GetCoreMeshShaderVarContext() (to be a bit more consistent with the
+	  remaining methods and to have a bit more vebose name. Also made it
+	  actually work.
 31-Aug-2005
 	- Jorrit added a new system to iObject/csObject so that you can get
 	  notified when an object changes name. To do this you have to
