@@ -7346,6 +7346,30 @@ _cspace.iVFS_swigregister(iVFSPtr)
 
 iVFS_scfGetVersion = _cspace.iVFS_scfGetVersion
 
+class iObjectNameChangeListener(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iObjectNameChangeListener, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iObjectNameChangeListener, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iObjectNameChangeListener instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def NameChanged(*args): return _cspace.iObjectNameChangeListener_NameChanged(*args)
+    def __del__(self, destroy=_cspace.delete_iObjectNameChangeListener):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iObjectNameChangeListenerPtr(iObjectNameChangeListener):
+    def __init__(self, this):
+        _swig_setattr(self, iObjectNameChangeListener, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iObjectNameChangeListener, 'thisown', 0)
+        _swig_setattr(self, iObjectNameChangeListener,self.__class__,iObjectNameChangeListener)
+_cspace.iObjectNameChangeListener_swigregister(iObjectNameChangeListenerPtr)
+
 class iObject(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -7368,6 +7392,8 @@ class iObject(iBase):
     def GetChild(*args): return _cspace.iObject_GetChild(*args)
     def GetIterator(*args): return _cspace.iObject_GetIterator(*args)
     def ObjReleaseOld(*args): return _cspace.iObject_ObjReleaseOld(*args)
+    def AddNameChangeListener(*args): return _cspace.iObject_AddNameChangeListener(*args)
+    def RemoveNameChangeListener(*args): return _cspace.iObject_RemoveNameChangeListener(*args)
     def __del__(self, destroy=_cspace.delete_iObject):
         try:
             if self.thisown: destroy(self)
@@ -11831,6 +11857,8 @@ class csObject(iObject):
     def ObjAddChildren(*args): return _cspace.csObject_ObjAddChildren(*args)
     def GetChild(*args): return _cspace.csObject_GetChild(*args)
     def GetIterator(*args): return _cspace.csObject_GetIterator(*args)
+    def AddNameChangeListener(*args): return _cspace.csObject_AddNameChangeListener(*args)
+    def RemoveNameChangeListener(*args): return _cspace.csObject_RemoveNameChangeListener(*args)
     __swig_setmethods__["scfRefCount"] = _cspace.csObject_scfRefCount_set
     __swig_getmethods__["scfRefCount"] = _cspace.csObject_scfRefCount_get
     if _newclass:scfRefCount = property(_cspace.csObject_scfRefCount_get, _cspace.csObject_scfRefCount_set)
