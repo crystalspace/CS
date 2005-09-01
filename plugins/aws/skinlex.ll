@@ -27,7 +27,7 @@
 /* MSVC 8 complains about deprecated methods in the generated code. Although
  * inclusion of cssysdef.h as the very first header would enable a workaround
  * for that, we can't ensure that; hence, just disable the warning here. */
-#if (_MSC_VER >= 1400)
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
 #pragma warning(disable:4996)
 #endif
 
