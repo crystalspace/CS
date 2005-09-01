@@ -8301,6 +8301,37 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iObjectNameChangeListener ##############
+
+package cspace::iObjectNameChangeListener;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*NameChanged = *cspacec::iObjectNameChangeListener_NameChanged;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iObjectNameChangeListener($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iObject ##############
 
 package cspace::iObject;
@@ -8319,6 +8350,8 @@ package cspace::iObject;
 *GetChild = *cspacec::iObject_GetChild;
 *GetIterator = *cspacec::iObject_GetIterator;
 *ObjReleaseOld = *cspacec::iObject_ObjReleaseOld;
+*AddNameChangeListener = *cspacec::iObject_AddNameChangeListener;
+*RemoveNameChangeListener = *cspacec::iObject_RemoveNameChangeListener;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -13057,6 +13090,8 @@ sub DESTROY {
 *ObjAddChildren = *cspacec::csObject_ObjAddChildren;
 *GetChild = *cspacec::csObject_GetChild;
 *GetIterator = *cspacec::csObject_GetIterator;
+*AddNameChangeListener = *cspacec::csObject_AddNameChangeListener;
+*RemoveNameChangeListener = *cspacec::csObject_RemoveNameChangeListener;
 *swig_scfRefCount_get = *cspacec::csObject_scfRefCount_get;
 *swig_scfRefCount_set = *cspacec::csObject_scfRefCount_set;
 *swig_scfWeakRefOwners_get = *cspacec::csObject_scfWeakRefOwners_get;
