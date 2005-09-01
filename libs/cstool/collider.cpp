@@ -513,10 +513,6 @@ void csColliderActor::InitializeColliders (
   intervalSize.x = MIN(topSize.x, bottomSize.x);
   intervalSize.y = MIN(topSize.y, bottomSize.y);
   intervalSize.z = MIN(topSize.z, bottomSize.z);
-  // Temporary fix for ladder climbing
-  // This MIGHT not be necessary in most cases
-  bottomSize.x = MAX(topSize.x, bottomSize.x);
-  bottomSize.z = MAX(topSize.z, bottomSize.z);
 
   float maxX = MAX(body.x, legs.x)+shift.x;
   float maxZ = MAX(body.z, legs.z)+shift.z;
@@ -699,7 +695,8 @@ int csColliderActor::CollisionDetect (
         }
         if (checkSectors)
         {
-          FindIntersection (temppair, line);
+          if(!FindIntersection (temppair, line))
+            continue;
           // Collided at this line segment. Pick a point in the middle of
           // the segment to test.
           testpos=(line[0]+line[1])/2;
@@ -830,6 +827,7 @@ bool csColliderActor::AdjustForCollisions (
   else current_sector = camera->GetSector ();
 
   csMatrix3 id;
+
   csOrthoTransform transform_oldpos (id, oldpos);
   csOrthoTransform transform_newpos (id, newpos);
   csVector3 maxmove;
@@ -858,6 +856,7 @@ bool csColliderActor::AdjustForCollisions (
   // localvel is smaller because we can partly move the object in that direction
   localvel -= maxmove - oldpos;
   csVector3 vec(0);
+  float new_y = oldpos.y + bottomSize.y + shift.y -0.01f;
   for (i = 0; i < our_cd_contact.Length () ; i++ )
   {
     csCollisionPair& cd = our_cd_contact[i];
@@ -874,11 +873,26 @@ bool csColliderActor::AdjustForCollisions (
     if (tmp.Norm() < SMALL_EPSILON) continue;
     vec += tmp.Unit();
 
+    if(revertCount > 5)
+    {
+      csVector3 line[2];
+
+      // This needs to be done for numerical inaccuracies in this test
+      // versus the collision system test.
+      if(FindIntersection (cd,line))
+        new_y = MAX(MAX(line[0].y, line[1].y), new_y);
+    }
+
   }
   if(!vec.IsZero())
     localvel = (localvel * vec.Unit()) * vec.Unit();
-  
+
   newpos = maxmove + localvel;
+  if(revertCount > 5)
+  {
+    newpos.y = new_y - bottomSize.y - shift.y +0.01f;
+  }
+
   transform_newpos = csOrthoTransform (csMatrix3(), newpos);
 
   // Part2: legs
@@ -947,10 +961,15 @@ bool csColliderActor::AdjustForCollisions (
       if (n.y < 0.7)
         continue;
 
+      csVector3 line[2];
+
+      // This needs to be done for numerical inaccuracies in this test
+      // versus the collision system test.
+      if(!FindIntersection (cd,line))
+        continue;
+
       // Hit a ground polygon so we are not falling
       onground = adjust = true;
-      csVector3 line[2];
-      FindIntersection (cd,line);
       max_y = MAX(MAX(line[0].y, line[1].y)+shift.y,max_y);
       if (max_y > maxJump)
       {
@@ -1004,6 +1023,7 @@ bool csColliderActor::AdjustForCollisions (
       &transform_newpos,&transform_oldpos);
   else
     cd = 0;
+
   if (hits > 0)
   {
     // No move possible without a collision with the torso
@@ -1011,9 +1031,6 @@ bool csColliderActor::AdjustForCollisions (
     if(vel.y < 0)// && fabs(vel.x) < 0.01 && fabs(vel.y) < 0.01)
       revertCount++;
     newpos = oldpos;
-    // If we get 'stuck' on geometry then we should be on some kind of ground
-    if(revertCount > 5)
-      onground = true;
     return false;
   }
 

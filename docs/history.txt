@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Sep-2005
+  - Andrew Dai fixed an infinite loop when moving using csColliderActor,
+    this was caused by the collision system and FindIntersection tests
+    disagreeing with each other.
 31-Aug-2005
 	- Jorrit added a new system to iObject/csObject so that you can get
 	  notified when an object changes name. To do this you have to
