@@ -6174,7 +6174,7 @@ class iSpriteCal3DState(iBase):
     def SetAnimationTime(*args): return _cspace.iSpriteCal3DState_SetAnimationTime(*args)
     def SetAnimTimeUpdateHandler(*args): return _cspace.iSpriteCal3DState_SetAnimTimeUpdateHandler(*args)
     def SetUserData(*args): return _cspace.iSpriteCal3DState_SetUserData(*args)
-    def GetSubmeshSVC(*args): return _cspace.iSpriteCal3DState_GetSubmeshSVC(*args)
+    def GetCoreMeshShaderVarContext(*args): return _cspace.iSpriteCal3DState_GetCoreMeshShaderVarContext(*args)
     def GetCal3DModel(*args): return _cspace.iSpriteCal3DState_GetCal3DModel(*args)
     def __del__(self, destroy=_cspace.delete_iSpriteCal3DState):
         try:
