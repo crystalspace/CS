@@ -1257,18 +1257,8 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
     maxiter--;
     rc |= MoveV (local_max_interval * speed, velBody);
 
-    if (revertMove)
-    {
-      // Revert Rotation for safety
-      //@@@ This need to be revised! You can't change the full transform!
-      //@@@csMatrix3 matrix = (csMatrix3) csYRotMatrix3 (yrot);
-      //@@@pcmesh->GetMesh ()->GetMovable ()->GetFullTransform ().SetO2T (matrix);
-    }
-    else
-    {
-      rc |= RotateV (local_max_interval * speed, angularVelocity);
-      //yrot = Matrix2YRot (transf);
-    }
+    rc |= RotateV (local_max_interval * speed, angularVelocity);
+    //yrot = Matrix2YRot (transf);
 
     if (!rc) return rc;
 

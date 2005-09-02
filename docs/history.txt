@@ -9,6 +9,7 @@ chronological order.
 2-Sep-2005
 	- Jorrit fixed a bug in CS reported by valgrind:
 	  In the GL state cache a few fields were not initialized in some cases.
+	- Jorrit made the csColliderActor a bit more stable at high speed.
 1-Sep-2005
 	- Andrew Dai fixed an infinite loop when moving using csColliderActor,
 	  this was caused by the collision system and FindIntersection tests
