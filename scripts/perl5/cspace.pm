@@ -7018,7 +7018,7 @@ package cspace::iSpriteCal3DState;
 *SetAnimationTime = *cspacec::iSpriteCal3DState_SetAnimationTime;
 *SetAnimTimeUpdateHandler = *cspacec::iSpriteCal3DState_SetAnimTimeUpdateHandler;
 *SetUserData = *cspacec::iSpriteCal3DState_SetUserData;
-*GetSubmeshSVC = *cspacec::iSpriteCal3DState_GetSubmeshSVC;
+*GetCoreMeshShaderVarContext = *cspacec::iSpriteCal3DState_GetCoreMeshShaderVarContext;
 *GetCal3DModel = *cspacec::iSpriteCal3DState_GetCal3DModel;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
