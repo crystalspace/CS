@@ -503,6 +503,10 @@ public:
         enabled_GL_TEXTURE_CUBE_MAP[i] = enabled_GL_TEXTURE_CUBE_MAP[0];
         enabled_GL_TEXTURE_COORD_ARRAY[i] = enabled_GL_TEXTURE_COORD_ARRAY[0];
 	enabled_GL_TEXTURE_RECTANGLE_ARB[i] = enabled_GL_TEXTURE_RECTANGLE_ARB[0];
+	parameter_tsize[i] = parameter_tsize[0];
+	parameter_tstride[i] = parameter_tstride[0];
+	parameter_ttype[i] = parameter_ttype[0];
+	parameter_tpointer[i] = parameter_tpointer[0];
       }
     }
     enabled_GL_SCISSOR_TEST = glIsEnabled (GL_SCISSOR_TEST);
