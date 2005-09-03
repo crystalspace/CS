@@ -1694,6 +1694,18 @@ AS_IF([test $cs_cv_libwx_opengl = yes],
 
 
 
+#----------------------------------------------------------------------------
+# Check for CEGUI.
+#----------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([CEGUI],
+    [AC_LANG_PROGRAM([[#include <CEGUI.h>]],
+    [CEGUI::WindowManager::getSingleton();])], [], [C++])
+
+AS_IF([test $cs_cv_libCEGUI = yes],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libCEGUI], [CEGUI])])
+
+
+
 #------------------------------------------------------------------------------
 # Check if GNU/Linux joystick API is present.
 #------------------------------------------------------------------------------
