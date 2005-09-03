@@ -18,6 +18,13 @@ chronological order.
 	  non-element node.
 	- res fixed a crash when removing meshes from the engine due calling a
 	  method of an possibly already deleted object.
+	- res fixed a circular reference in fatloop.
+	- res changed the shader expressions to take a stack of shader 
+	  variables at evaluation time, as opposed to a shader var context at
+	  parsing time.
+	- res made the shader expression SV accessor use the shader manager's
+	  "rendering shader variable stack". This means that expressions in
+	  SVs can now utilize the variables as at render time.
 2-Sep-2005
 	- Jorrit fixed a bug in CS reported by valgrind:
 	  In the GL state cache a few fields were not initialized in some cases.

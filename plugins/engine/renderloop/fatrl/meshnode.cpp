@@ -50,6 +50,7 @@ void csMeshRenderNode::RenderMeshes (iGraphics3D* g3d,
   if (num == 0) return;
   csRef<csShaderVariable> svO2W = 
     shadervars.GetVariable (factory->string_object2world);
+  iShaderManager* shmgr = factory->shaderManager;
 
   size_t numPasses = shader->GetNumberOfPasses (ticket);
   for (size_t p = 0; p < numPasses; p++)
@@ -63,6 +64,7 @@ void csMeshRenderNode::RenderMeshes (iGraphics3D* g3d,
       svO2W->SetValue (mesh->object2world);
 
       const csShaderVarStack& stacks = Stacks[j];
+      shmgr->GetShaderVariableStack() = stacks;
       csRenderMeshModes modes (*mesh);
       shader->SetupPass (ticket, mesh, modes, stacks);
       g3d->DrawMesh (mesh, modes, stacks);

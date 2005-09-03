@@ -99,7 +99,7 @@ class csFatLoopStep : public iRenderStep
   iObjectRegistry* object_reg;
 
   csWeakRef<iShaderManager> shaderManager;
-  csRef<iEngine> engine;
+  csWeakRef<iEngine> engine;
   csWeakRef<iShader> nullShader;
   csRef<iLightManager> lightmgr;
 

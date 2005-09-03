@@ -950,10 +950,8 @@ csRef<iShaderVariableAccessor> csTextSyntaxService::ParseShaderVarExpr (
     return 0;
   }
 
-  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
   csShaderExpression* expression = new csShaderExpression (object_reg);
-  // @@@ Find a way to allow use of SVs available at shader render time
-  if (!expression->Parse (exprNode, shmgr))
+  if (!expression->Parse (exprNode))
   {
     Report ("crystalspace.syntax.shadervariable.expression",
       CS_REPORTER_SEVERITY_WARNING,

@@ -240,6 +240,7 @@ csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
 
 csFatLoopStep::~csFatLoopStep ()
 {
+  shadervars.Clear();
   SCF_DESTRUCT_IBASE();
 }
 
@@ -452,6 +453,7 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
 	FillStacks (stacks, mesh, mw, hdl, shader);
 
 	csRenderMeshModes modes (*mesh);
+	shaderManager->GetShaderVariableStack() = stacks;
 	size_t ticket = shader->GetTicket (modes, stacks);
 
 	// query max light number the shader groks

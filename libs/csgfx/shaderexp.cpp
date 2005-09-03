@@ -184,7 +184,7 @@ csStringHash csShaderExpression::xmltypes;
 csStringHash csShaderExpression::mnemonics;
 
 csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
-  varContext(NULL), accstack_max(0)
+  accstack_max(0)
 {
   obj_reg = objr;
 
@@ -311,13 +311,16 @@ void csShaderExpression::EvalError (const char* message, ...) const
   va_end (args);
 }
 
-bool csShaderExpression::Parse(iDocumentNode * node, iShaderVariableContext * stab)
+csShaderVariable* csShaderExpression::ResolveVar (csStringID name)
+{
+  if (!stacks) return 0;
+  return csGetShaderVariableFromStack (*stacks, name);
+}
+
+bool csShaderExpression::Parse(iDocumentNode * node)
 {
   errorMsg.Empty();
   cons * head = new cons;
-
-  if (stab)
-    varContext = stab;
 
   strset = CS_QUERY_REGISTRY_TAG_INTERFACE (
     obj_reg, "crystalspace.shared.stringset", iStringSet);
@@ -382,7 +385,8 @@ bool csShaderExpression::Parse(iDocumentNode * node, iShaderVariableContext * st
   return true;
 }
 
-bool csShaderExpression::Evaluate(csShaderVariable * var)
+bool csShaderExpression::Evaluate(csShaderVariable* var, 
+				  csShaderVarStack& stacks)
 {
   errorMsg.Empty();
   if (!opcodes.Length())
@@ -390,6 +394,9 @@ bool csShaderExpression::Evaluate(csShaderVariable * var)
     EvalError ("Empty expression");
     return false;
   }
+
+  bool eval = true;
+  this->stacks = &stacks;
 
   oper_array::Iterator iter = opcodes.GetIterator();
 
@@ -400,24 +407,35 @@ bool csShaderExpression::Evaluate(csShaderVariable * var)
     if (op.arg1.type == TYPE_INVALID)
     {
       if (!eval_oper(op.opcode, accstack.Get(op.acc)))
-	return false;
+      {
+	eval = false;
+	break;
+      }
     } 
     else if (op.arg2.type == TYPE_INVALID)
     {
       if (!eval_oper(op.opcode, op.arg1, accstack.Get(op.acc)))
-	return false;
+      {
+	eval = false;
+	break;
+      }
     } 
     else 
     {
       if (!eval_oper(op.opcode, op.arg1, op.arg2, accstack.Get(op.acc)))
-	return false;
+      {
+	eval = false;
+	break;
+      }
     }
   }
 
-  if (!eval_argument(accstack.Get(0), var))
-    return false;
+  bool ret = false;
+  if (eval) ret = eval_argument(accstack.Get(0), var);
 
-  return true;
+  this->stacks = 0;
+
+  return ret;
 }
 
 bool csShaderExpression::eval_const(cons *& head)
@@ -804,7 +822,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_
 {
   if (arg1.type == TYPE_VARIABLE)
   {
-    csShaderVariable * var = varContext->GetVariable(arg1.var);
+    csShaderVariable* var = ResolveVar (arg1.var);
     if (!var)
     {
       EvalError ("Cannot resolve variable name %s in symbol table.", 
@@ -823,7 +841,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_
 
   if (arg2.type == TYPE_VARIABLE)
   {
-    csShaderVariable * var = varContext->GetVariable(arg2.var);
+    csShaderVariable * var = ResolveVar (arg2.var);
     if (!var)
     {
       EvalError ("Cannot resolve variable name %s in symbol table.", 
@@ -865,7 +883,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output)
 {
   if (arg1.type == TYPE_VARIABLE)
   {
-    csShaderVariable * var = varContext->GetVariable(arg1.var);
+    csShaderVariable * var = ResolveVar (arg1.var);
     if (!var)
     {
       EvalError ("Cannot resolve variable name '%s' in symbol table.", 

@@ -228,8 +228,11 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
       csRef<csShaderVariable> currentPos;
       currentPos.AttachNew (new csShaderVariable (strings->Request ("position")));
       context->AddVariable (currentPos);
+      
+      csShaderVarStack stacks;
+      context->PushVariables (stacks);
 
-      if (expr.Parse (exprNode, context))
+      if (expr.Parse (exprNode))
       {
 	csRef<csShaderVariable> result;
 	result.AttachNew (new csShaderVariable (csInvalidStringID));
@@ -241,7 +244,7 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
 	  for (int x = 0; x < w; x++)
 	  {
 	    currentPos->SetValue (csVector2 ((float)x / (float)w, fY));
-	    if (expr.Evaluate (result))
+	    if (expr.Evaluate (result, stacks))
 	    {
 	      csVector4 v;
 	      result->GetValue (v);

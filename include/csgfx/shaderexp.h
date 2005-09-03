@@ -29,6 +29,7 @@
 #include "csutil/array.h"
 #include "csutil/leakguard.h"
 #include "csgeom/vector4.h"
+#include "ivideo/shader/shader.h"
 
 struct iObjectRegistry;
 class csShaderVariable;
@@ -87,8 +88,8 @@ private:
   static csStringHash xmltypes;
   static csStringHash mnemonics;
   //@}
-  /// Attached iShaderVariableContext
-  iShaderVariableContext * varContext;
+  /// Variables used for evaluation
+  csShaderVarStack* stacks;
   /// String set for producing String IDs
   csRef<iStringSet> strset;
   /// Compiled array of opcodes for evaluation
@@ -198,7 +199,12 @@ private:
   /// Dump the opcode list
   void print_ops(const oper_array &) const;
 
-  inline const char * get_type_name(csStringID) const;
+  inline const char * get_type_name(csStringID id) const
+  {
+    return xmltypes.Request(id);
+  }
+
+  csShaderVariable* ResolveVar (csStringID name);
 
   csString* parseError;
   csString* evalError;
@@ -210,20 +216,15 @@ public:
   ~csShaderExpression();
 
   /// Parse in the XML in the context of a symbol table.
-  bool Parse(iDocumentNode *, iShaderVariableContext *);
+  bool Parse(iDocumentNode *);
   /**
    * Evaluate this expression into a variable.
    * It will use the symbol table it was initialized with.
    */
-  bool Evaluate(csShaderVariable *);
+  bool Evaluate(csShaderVariable *, csShaderVarStack& stacks);
 
   /// Retrieve the error message if the evaluation or parsing failed.
   const char* GetError() const { return errorMsg; }
 };
-
-inline const char * csShaderExpression::get_type_name(csStringID id) const 
-{
-  return xmltypes.Request(id);
-}
 
 #endif

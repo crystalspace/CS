@@ -28,6 +28,7 @@
 
 #include "csgfx/shadervar.h"
 #include "csutil/scf.h"
+#include "csutil/weakref.h"
 
 struct iObjectRegistry;
 
@@ -47,6 +48,7 @@ class CS_CRYSTALSPACE_EXPORT csShaderExpressionAccessor :
 private:
   iObjectRegistry* object_reg;
   csShaderExpression* expression;
+  csWeakRef<iShaderManager> shaderMgr;
 public:
   SCF_DECLARE_IBASE;
 

@@ -36,6 +36,8 @@ csShaderExpressionAccessor::csShaderExpressionAccessor (
   object_reg (object_reg), expression (expression)
 {
   SCF_CONSTRUCT_IBASE(0);
+
+  shaderMgr = csQueryRegistry<iShaderManager> (object_reg);
 }
 
 csShaderExpressionAccessor::~csShaderExpressionAccessor()
@@ -48,7 +50,8 @@ void csShaderExpressionAccessor::PreGetValue (csShaderVariable *variable)
 {
   if (expression)
   {
-    if (!expression->Evaluate (variable))
+    if (!expression->Evaluate (variable, 
+      shaderMgr->GetShaderVariableStack()))
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 	"crystalspace.shader.expressionaccessor",
