@@ -3,7 +3,7 @@
 
 #include <crystalspace.h>
 #include "CEGUI.h"
-#include "cscegui.h"
+#include "ivaria/cegui.h"
 
 struct iSector;
 

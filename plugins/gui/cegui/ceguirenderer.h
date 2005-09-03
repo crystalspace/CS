@@ -15,6 +15,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+
 #ifndef _CS_CEGUI_RENDERER_H
 #define _CS_CEGUI_RENDERER_H
 
@@ -31,10 +32,10 @@
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "iutil/comp.h"
+#include "ivaria/cegui.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
-#include "cscegui.h"
 #include "ceguievthandler.h"
 #include "ceguiresourceprovider.h"
 #include "CEGUI.h"
