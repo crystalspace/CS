@@ -1338,10 +1338,6 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
   queueEntry.attrib = CS_VATTRIB_COLOR;
   changeQueue.Push (queueEntry);
   
-  queueEntry.buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_POSITION]);
-  queueEntry.attrib = CS_VATTRIB_POSITION;
-  changeQueue.Push (queueEntry);
-  
   for (int i = 0; i < 8; i++)
   {
     queueEntry.buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0+i]);
