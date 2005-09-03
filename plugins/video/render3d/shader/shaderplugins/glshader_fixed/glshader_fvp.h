@@ -70,19 +70,13 @@ private:
   csWeakRef<iGraphics3D> g3d;
   csGLShader_FIXED* shaderPlug;
 
-  struct lightingentry
+  struct LightingEntry
   {
-    lightingentry()
-    { 
-      positionvar = csInvalidStringID; 
-      diffusevar = csInvalidStringID; 
-      specularvar = csInvalidStringID; 
-      attenuationvar = csInvalidStringID;
-    }
-    csStringID positionvar;
-    csStringID diffusevar;
-    csStringID specularvar;
-    csStringID attenuationvar;
+    ProgramParam position;
+    ProgramParam diffuse;
+    ProgramParam specular;
+    ProgramParam ambient;
+    ProgramParam attenuation;
     int lightnum;
   };
 
@@ -90,8 +84,11 @@ private:
 
   csStringID ambientvar;
   csStringID string_world2camera;
-  csArray<lightingentry> lights;
+  csArray<LightingEntry> lights;
   bool do_lighting;
+  GLenum colorMaterial;
+  ProgramParam matAmbient;
+  ProgramParam matDiffuse;
 
   struct layerentry
   {
@@ -115,6 +112,7 @@ private:
     TexMatrixOp& op, bool matrix = false);
   bool ParseTexMatrix (iDocumentNode* node, 
     csArray<TexMatrixOp>& matrixOps);
+  bool ParseLight (iDocumentNode* node, LightingEntry& entry);
 public:
   csGLShaderFVP (csGLShader_FIXED* shaderPlug);
   virtual ~csGLShaderFVP ();

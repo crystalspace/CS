@@ -40,7 +40,7 @@
 CS_LEAKGUARD_IMPLEMENT (csGLShaderFVP);
 
 csGLShaderFVP::csGLShaderFVP (csGLShader_FIXED* shaderPlug) :
-  csShaderProgram (shaderPlug->object_reg)
+  csShaderProgram (shaderPlug->object_reg), colorMaterial(0)
 {
   validProgram = true;
   csGLShaderFVP::shaderPlug = shaderPlug;
@@ -68,89 +68,47 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
 
   csRef<csShaderVariable> var;
 
+  if (colorMaterial != 0)
+  {
+    glEnable (GL_COLOR_MATERIAL);
+    glColorMaterial (GL_FRONT, colorMaterial);
+  }
+
   if (do_lighting)
   {
-    statecache->SetMatrixMode (GL_MODELVIEW);
-    glPushMatrix ();
-    glLoadIdentity ();
+    csVector4 v;
 
     for(i = 0; i < lights.Length(); ++i)
     {
+      GLenum glLight = (GLenum)GL_LIGHT0+i;
+      glEnable (glLight);
 
-      //fix vars for this light
-      /*for(j = 0; j < lights[i].dynVars.Length (); j++)
-      {
-        *((csRef<csShaderVariable>*)lights[i].dynVars.Get(j).userData) = 
-          lights[i].dynVars.Get(j).shaderVariable;
-        lights[i].dynVars.Get(j).shaderVariable = 0;
-      }*/
+      const csVector4 null (0);
 
-      int l = lights[i].lightnum;
-      glEnable (GL_LIGHT0+l);
+      v = GetParamVectorVal (stacks, lights[i].position, null);
+      glLightfv (glLight, GL_POSITION, (float*)&v);
 
-      var = csGetShaderVariableFromStack (stacks, lights[i].positionvar);
-      if (var)
-      {
-        csVector4 v;
-        var->GetValue (v);
-        glLightfv (GL_LIGHT0+l, GL_POSITION, (float*)&v);
-      }
-      else
-      {
-        csVector4 v (0);
-        glLightfv (GL_LIGHT0+l, GL_POSITION, (float*)&v);
-      }
+      v = GetParamVectorVal (stacks, lights[i].diffuse, null);
+      glLightfv (glLight, GL_DIFFUSE, (float*)&v);
 
-      var = csGetShaderVariableFromStack (stacks, lights[i].diffusevar);
-      if (var)
-      {
-        csVector4 v;
-        var->GetValue (v);
-        glLightfv (GL_LIGHT0+l, GL_DIFFUSE, (float*)&v);
-      }
-      else
-      {
-        csVector4 v (0);
-        glLightfv (GL_LIGHT0+l, GL_DIFFUSE, (float*)&v);
-      }
+      v = GetParamVectorVal (stacks, lights[i].specular, null);
+      glLightfv (glLight, GL_SPECULAR, (float*)&v);
 
-      var = csGetShaderVariableFromStack (stacks, lights[i].specularvar);
-      if (var)
-      {
-        csVector4 v;
-        var->GetValue (v);
-        glLightfv (GL_LIGHT0+l, GL_SPECULAR, (float*)&v);
-      }
-      else
-      {
-        csVector4 v (0);
-        glLightfv (GL_LIGHT0+l, GL_SPECULAR, (float*)&v);
-      }
+      v = GetParamVectorVal (stacks, lights[i].ambient, null);
+      glLightfv (glLight, GL_AMBIENT, (float*)&v);
 
-      var = csGetShaderVariableFromStack (stacks, lights[i].attenuationvar);
-      if (var)
-      {
-        csVector4 v;
-        var->GetValue (v);
-        glLightf (GL_LIGHT0+l, GL_CONSTANT_ATTENUATION, v.x);
-        glLightf (GL_LIGHT0+l, GL_LINEAR_ATTENUATION, v.y);
-        glLightf (GL_LIGHT0+l, GL_QUADRATIC_ATTENUATION, v.z);
-      }
-      else
-      {
-        csVector4 v (1, 0, 0, 0);
-        glLightf (GL_LIGHT0+l, GL_CONSTANT_ATTENUATION, v.x);
-        glLightf (GL_LIGHT0+l, GL_LINEAR_ATTENUATION, v.y);
-        glLightf (GL_LIGHT0+l, GL_QUADRATIC_ATTENUATION, v.z);
-      }
+      v = GetParamVectorVal (stacks, lights[i].attenuation, 
+	csVector4 (1, 0, 0, 0));
+      glLightf (glLight, GL_CONSTANT_ATTENUATION, v.x);
+      glLightf (glLight, GL_LINEAR_ATTENUATION, v.y);
+      glLightf (glLight, GL_QUADRATIC_ATTENUATION, v.z);
     }
 
-    glPopMatrix ();
-
-    csVector4 v (1);
+    const csVector4 one (1);
+    v = GetParamVectorVal (stacks, matAmbient, one);
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, (float*)&v);
+    v = GetParamVectorVal (stacks, matDiffuse, one);
     glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, (float*)&v);
-
 
     var = csGetShaderVariableFromStack (stacks, ambientvar);
     if (var)
@@ -160,7 +118,6 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
     glLightModelfv (GL_LIGHT_MODEL_AMBIENT, (float*)&v);
 
     statecache->Enable_GL_LIGHTING ();
-    glDisable (GL_COLOR_MATERIAL);
   }
 
   for (i=0; i<layers.Length (); i++)
@@ -448,10 +405,13 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
 void csGLShaderFVP::ResetState ()
 {
   size_t i;
+  if (colorMaterial != 0)
+    glDisable (GL_COLOR_MATERIAL);
+
   if (do_lighting)
   {
     for (i = 0; i < lights.Length(); ++i)
-      glDisable (GL_LIGHT0+lights[i].lightnum);
+      glDisable ((GLenum)GL_LIGHT0+i);
 
     statecache->Disable_GL_LIGHTING ();
   }
@@ -554,6 +514,52 @@ bool csGLShaderFVP::ParseTexMatrix (iDocumentNode* node,
   return true;
 }
 
+bool csGLShaderFVP::ParseLight (iDocumentNode* node, LightingEntry& entry)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while(it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next();
+    if(child->GetType() != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = tokens.Request (value);
+    switch(id)
+    {
+      case XMLTOKEN_POSITION:
+	if (!ParseProgramParam (child, entry.position,
+	  ParamVector3 | ParamVector4 | ParamShaderExp))
+	  return false;
+	break;
+      case XMLTOKEN_DIFFUSE:
+	if (!ParseProgramParam (child, entry.diffuse,
+	  ParamVector3 | ParamVector4 | ParamShaderExp))
+	  return false;
+	break;
+      case XMLTOKEN_AMBIENT:
+	if (!ParseProgramParam (child, entry.ambient,
+	  ParamVector3 | ParamVector4 | ParamShaderExp))
+	  return false;
+	break;
+      case XMLTOKEN_SPECULAR:
+	if (!ParseProgramParam (child, entry.specular,
+	  ParamVector3 | ParamVector4 | ParamShaderExp))
+	  return false;
+	break;
+      case XMLTOKEN_ATTENUATION:
+	if (!ParseProgramParam (child, entry.attenuation,
+	  ParamVector3 | ParamVector4 | ParamShaderExp))
+	  return false;
+	break;
+      default:
+	{
+	  synsrv->ReportBadToken (child);
+	  return false;
+	}
+    }
+  }
+  return true;
+}
+
 static int ParseLayerParam (iDocumentNode* node, iShaderTUResolver* tuResolve)
 {
   const char* layerName = node->GetAttributeValue ("layer");
@@ -593,50 +599,46 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
         case XMLTOKEN_LIGHT:
           {
             do_lighting = true;
-            lights.Push (lightingentry ());
-            size_t i = lights.Length ()-1;
+            size_t i = lights.Length();
+	    LightingEntry& entry = lights.GetExtend (i);
 
-            const char* str;
+            entry.lightnum = child->GetAttributeValueAsInt("num");
 
-            lights[i].lightnum = child->GetAttributeValueAsInt("num");
-
-            if ((str = child->GetAttributeValue("position")))
-              lights[i].positionvar = strings->Request (str);
-            else
-            {
-              csString buf;
+	    if (!ParseLight (child, entry))
+	      return false;
+	    
+            csString buf;
+	    if (!entry.position.valid)
+	    {
               buf.Format ("light %d position world", 
 		lights[i].lightnum);
-              lights[i].positionvar = strings->Request (buf);
-            }
+              entry.position.name = strings->Request (buf);
+	      entry.position.valid = true;
+	    }
 
-            if ((str = child->GetAttributeValue("diffuse")))
-              lights[i].diffusevar = strings->Request (str);
-            else
-            {
-              csString buf;
-              buf.Format ("light %d diffuse", lights[i].lightnum);
-              lights[i].diffusevar = strings->Request (buf);
-            }
+	    if (!entry.diffuse.valid)
+	    {
+              buf.Format ("light %d diffuse", 
+		lights[i].lightnum);
+	      entry.diffuse.name = strings->Request (buf);
+	      entry.diffuse.valid = true;
+	    }
 
-            if ((str = child->GetAttributeValue("specular")))
-              lights[i].specularvar = strings->Request (str);
-            else
-            {
-              csString buf;
-              buf.Format ("light %d specular", lights[i].lightnum);
-              lights[i].specularvar = strings->Request (buf);
-            }
+	    if (!entry.specular.valid)
+	    {
+              buf.Format ("light %d specular", 
+		lights[i].lightnum);
+	      entry.specular.name = strings->Request (buf);
+	      entry.specular.valid = true;
+	    }
 
-            if ((str = child->GetAttributeValue("attenuation")))
-              lights[i].attenuationvar = strings->Request (str);
-            else
-            {
-              csString buf;
-              buf.Format ("light %d attenuation",
-	      	lights[i].lightnum);
-              lights[i].attenuationvar = strings->Request (buf);
-            }
+	    if (!entry.attenuation.valid)
+	    {
+              buf.Format ("light %d attenuation", 
+		lights[i].lightnum);
+	      entry.attenuation.name = strings->Request (buf);
+	      entry.attenuation.valid = true;
+	    }
           }
           break;
         case XMLTOKEN_VERTEXCOLOR:
@@ -744,6 +746,46 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    if (!ParseTexMatrix (child, layers[layer].texMatrixOps))
 	      return false;
 	  }
+	  break;
+	case XMLTOKEN_COLORMATERIAL:
+	  {
+	    csStringID typeID = tokens.Request (child->GetContentsValue());
+
+	    switch (typeID)
+	    {
+	      case XMLTOKEN_AMBIENT:
+		colorMaterial = GL_AMBIENT;
+		break;
+	      case XMLTOKEN_EMISSION:
+		colorMaterial = GL_EMISSION;
+		break;
+	      case XMLTOKEN_DIFFUSE:
+		colorMaterial = GL_DIFFUSE;
+		break;
+	      case XMLTOKEN_SPECULAR:
+		colorMaterial = GL_SPECULAR;
+		break;
+	      case XMLTOKEN_AMBIENT_AND_DIFFUSE:
+		colorMaterial = GL_AMBIENT_AND_DIFFUSE;
+		break;
+	      default:
+		synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+		  child, "invalid colormaterial '%s'",
+		  child->GetContentsValue());
+		colorMaterial = 0;
+		return false;
+	    }
+	  }
+	  break;
+	case XMLTOKEN_MATDIFFUSE:
+	  if (!ParseProgramParam (child, matDiffuse,
+	    ParamVector3 | ParamVector4 | ParamShaderExp))
+	    return false;
+	  break;
+	case XMLTOKEN_MATAMBIENT:
+	  if (!ParseProgramParam (child, matAmbient,
+	    ParamVector3 | ParamVector4 | ParamShaderExp))
+	    return false;
 	  break;
         default:
 	  {
