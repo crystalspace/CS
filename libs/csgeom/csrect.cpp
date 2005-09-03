@@ -166,7 +166,7 @@ void csRect::Subtract (const csRect &rect)
     Set (xmin, rect.ymax, xmax, ymax);                      //area4
 }
 
-void csRect::AddAdjanced (const csRect &rect)
+void csRect::AddAdjacent (const csRect &rect)
 {
   csRect tmp;
   if (xmin == rect.xmax)

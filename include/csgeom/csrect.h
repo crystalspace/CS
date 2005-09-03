@@ -180,8 +180,15 @@ public:
       return Width () * Height ();
   }
 
-  /// Add an adjanced rectangle if resulting rectangle will have larger area.
-  void AddAdjanced (const csRect &rect);
+  /**
+   * Adds an adjacent rectangle if resulting rectangle will have a larger 
+   * area.
+  */
+  void AddAdjacent (const csRect &rect);
+  
+  ///\deprecated Misspelling; use AddAdjacent() instead
+  CS_DEPRECATED_METHOD void AddAdjanced (const csRect &rect)
+  { AddAdjacent (rect); }
 
   /// Test equality of two rectangles.
   inline bool operator == (const csRect& rect) const
