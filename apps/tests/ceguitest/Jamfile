@@ -1,6 +1,10 @@
-SubDir TOP src ceguitest ;
+SubDir TOP apps tests ceguitest ;
 
-Description ceguitest : "CS CEGUI Test Application" ;
+if $(CEGUI.AVAILABLE) = "yes"
+{
+Description ceguitest : "CEGUI Test Application" ;
 Application ceguitest :
   [ Wildcard *.h *.cpp ] ;
-ExternalLibs ceguitest : CRYSTAL CEGUI ;
+LinkWith ceguitest : crystalspace ;
+ExternalLibs ceguitest : CEGUI ;
+}
