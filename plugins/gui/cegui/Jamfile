@@ -4,6 +4,7 @@ if $(CEGUI.AVAILABLE) = "yes"
 {
 Description cegui : "CEGUI Wrapper Plugin" ;
 Plugin cegui : [ Wildcard *.cpp *.h ] ;
+CFlags cegui : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
 LinkWith cegui : crystalspace ;
 ExternalLibs cegui : CEGUI ;
 }
