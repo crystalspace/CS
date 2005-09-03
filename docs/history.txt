@@ -25,6 +25,7 @@ chronological order.
 	- res made the shader expression SV accessor use the shader manager's
 	  "rendering shader variable stack". This means that expressions in
 	  SVs can now utilize the variables as at render time.
+	- res enhanced vproc_std with the ability to disable select lights.
 2-Sep-2005
 	- Jorrit fixed a bug in CS reported by valgrind:
 	  In the GL state cache a few fields were not initialized in some cases.

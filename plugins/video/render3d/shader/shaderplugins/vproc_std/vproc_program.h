@@ -19,6 +19,7 @@
 #ifndef __CS_VPROC_VPROC_PROGRAM_H__
 #define __CS_VPROC_VPROC_PROGRAM_H__
 
+#include "csutil/bitarray.h"
 #include "csplugincommon/shader/shaderplugin.h"
 #include "csplugincommon/shader/shaderprogram.h"
 #include "vproc_std.h"
@@ -101,6 +102,8 @@ private:
   BufferName positionBuffer;
   BufferName normalBuffer;
   BufferName colorBuffer;
+
+  csBitArray disableMask;
 
   bool ParseLightMixMode (iDocumentNode* child, LightMixmode& mixmode);
   bool ParseBufferName (iDocumentNode* child, BufferName& name);

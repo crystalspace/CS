@@ -93,22 +93,33 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
       if (lightMixMode == LIGHTMIXMODE_NONE)
       {
 	//only calculate last, other have no effect
-	csLightProperties light (csMin((size_t)lightsActive, numLights)-1,
-	  shaderPlugin->lsvCache, stacks);
-	iVertexLightCalculator *calc = 
-	  shaderPlugin->GetLightCalculator (light, useAttenuation);
-	calc->CalculateLighting (light, elementCount,
-	  csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),
-	    elementCount, vbuf->GetElementDistance ()),
-	  csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
-	    elementCount, nbuf->GetElementDistance ()), 
-	  tmpColor);
+	const size_t lightNum = csMin((size_t)lightsActive, numLights)-1;
+
+	if ((disableMask.Length() <= lightNum) 
+	  || !disableMask.IsBitSet (lightNum))
+	{
+	  csLightProperties light (lightNum, shaderPlugin->lsvCache, stacks);
+	  iVertexLightCalculator *calc = 
+	    shaderPlugin->GetLightCalculator (light, useAttenuation);
+	  calc->CalculateLighting (light, elementCount,
+	    csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),
+	      elementCount, vbuf->GetElementDistance ()),
+	    csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
+	      elementCount, nbuf->GetElementDistance ()), 
+	    tmpColor);
+	}
       }
       else
       {
 	LightMixmode useMixMode = LIGHTMIXMODE_ADD;
 	for (size_t i = 0; i < (csMin((size_t)lightsActive, numLights)); i++)
 	{
+	  if ((disableMask.Length() > i) && disableMask.IsBitSet (i))
+	  {
+	    useMixMode = lightMixMode;
+	    continue;
+	  }
+
 	  csLightProperties light (i, shaderPlugin->lsvCache, stacks);
 	  iVertexLightCalculator *calc = 
 	    shaderPlugin->GetLightCalculator (light, useAttenuation);
@@ -283,6 +294,20 @@ bool csVProcStandardProgram::Load (iShaderTUResolver* tuResolve, iDocumentNode* 
 	if (!ParseBufferName (child, colorBuffer))
 	  return false;
 	break;
+      case XMLTOKEN_ENABLELIGHT:
+	{
+	  size_t n = (size_t)child->GetAttributeValueAsInt ("num");
+	  bool b;
+	  if (!synsrv->ParseBool (child, b, true))
+	    return false;
+	  if (!b)
+	  {
+	    if (disableMask.GetSize() <= n)
+	      disableMask.SetSize (n+1);
+	    disableMask.SetBit (n);
+	  }
+	  break;
+	}
       default:
         {
           switch (commonTokens.Request (value))
