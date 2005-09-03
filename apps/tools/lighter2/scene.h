@@ -20,14 +20,47 @@
 #define __SCENE_H__
 
 #include "radobject.h"
+#include "kdtree.h"
 
 namespace lighter
 {
+  class KDTree;
+
+  // A lightsource
+  struct Light : public csRefCount
+  {
+    csVector3 position;
+    csColor color;
+
+    csColor  freeEnergy;
+  };
+  typedef csRefArray<Light> LightRefArray;
+
+  // Representation of sector in our local setup
   struct Sector : public csRefCount
   {
-  public:
+    Sector ()
+      : kdTree (0)
+    {}
+
+    ~Sector ()
+    {
+      delete kdTree;
+    }
+
+    // Initialize any extra data in the sector
+    void Initialize ();
+
+    // All objects in sector
     RadObjectHash allObjects;
 
+    // All lightsources
+    LightRefArray allLights;
+
+    // KD-tree of all primitives in sector
+    KDTree *kdTree;
+
+    // Sector-name
     csString sectorName;
   };
   typedef csHash<csRef<Sector>, csString> SectorHash;

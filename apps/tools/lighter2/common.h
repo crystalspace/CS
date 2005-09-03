@@ -50,12 +50,16 @@ namespace lighter
     // Density in u and v direction. u = uTexelPerUnit*x etc.. 
     float uTexelPerUnit, vTexelPerUnit;
     
+    // Element/patch densities
+    uint uPatchResolution, vPatchResolution;
+
     // Max lightmap sizes
-    int maxLightmapU, maxLightmapV;
+    uint maxLightmapU, maxLightmapV;
 
     // Set default settings
     RadSettings ()
-      : uTexelPerUnit (1/(1.0f)), vTexelPerUnit (1/(1.0f)),
+      : uTexelPerUnit (4/(1.0f)), vTexelPerUnit (4/(1.0f)),
+      uPatchResolution (4), vPatchResolution (4),
       maxLightmapU (256), maxLightmapV (256)
     {
     }

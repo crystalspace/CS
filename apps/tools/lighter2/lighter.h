@@ -22,6 +22,10 @@
 namespace lighter
 {
   class Scene;
+  class Sector;
+  class Light;
+  class RadPrimitive;
+  class Raytracer;
 
   class Lighter
   {
@@ -51,6 +55,12 @@ namespace lighter
   protected:
     // Parse the commandline and load any files specified
     bool LoadFiles ();
+
+    // Shoot direct lighting for given sector
+    void ShootDirectLighting (Sector* sector);
+
+    // Shade a rad primitive from a lightsource
+    void ShadeRadPrimitive (Raytracer &tracer, RadPrimitive &prim, Light* light);
 
     Scene *scene;
   };

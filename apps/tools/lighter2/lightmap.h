@@ -38,12 +38,6 @@ namespace lighter
     {
       data.DeleteAll ();
       data.SetSize (width*height, csColor (0.0f,0.0f,0.0f));
-      // Init with gray shades ;)
-      for (uint i = 0; i < data.GetSize (); i++)
-      {
-        csColor &c = data[i];
-        c.red = c.green = c.blue = ((float)i/(float)(data.GetSize ()));
-      }
     }
 
     // Add a general ambient term

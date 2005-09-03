@@ -454,6 +454,7 @@ namespace lighter
     if (maxvDist > 0) uFormVector = (v1_3d - v0_3d) / (v1_2d.x - v0_2d.x);
   }
 
+
   void RadPrimitive::Prepare (uint uResolution, uint vResolution)
   {
     // Reset current data
@@ -494,11 +495,11 @@ namespace lighter
     elementAreas.SetCapacity (uc * vc);
 
     // Create our splitplanes
-    csPlane3 uCut (plane.Normal () % uFormVector);
+    csPlane3 uCut (plane.Normal () % vFormVector);
     csVector3 uCutOrigin = minCoord;
     uCut.SetOrigin (uCutOrigin);
     
-    csPlane3 vCut (plane.Normal () % vFormVector);
+    csPlane3 vCut (plane.Normal () % uFormVector);
     csVector3 vCutOrigin = minCoord;
     vCut.SetOrigin (vCutOrigin);
 
@@ -509,6 +510,7 @@ namespace lighter
 
     // Start slicing
     csPoly3D poly = *this;
+
 
     csPlane3 evCut = vCut;
     for (uint v = 0; v  < vc; v++)
@@ -533,6 +535,8 @@ namespace lighter
       csVector3 euOrigin = uCutOrigin;
       for (uint u = 0; u < uc; u++)
       {
+        //if (elRow.GetVertexCount () == 0) break; //no idea to try to clip it
+
         euOrigin += uFormVector;
         euCut.SetOrigin (euOrigin);
 
@@ -601,11 +605,11 @@ namespace lighter
     elementAreas.SetCapacity (uc * vc);
 
     // Create our splitplanes
-    csPlane3 uCut (plane.Normal () % uFormVector);
+    csPlane3 uCut (plane.Normal () % vFormVector);
     csVector3 uCutOrigin = minCoord;
     uCut.SetOrigin (uCutOrigin);
 
-    csPlane3 vCut (plane.Normal () % vFormVector);
+    csPlane3 vCut (plane.Normal () % uFormVector);
     csVector3 vCutOrigin = minCoord;
     vCut.SetOrigin (vCutOrigin);
 

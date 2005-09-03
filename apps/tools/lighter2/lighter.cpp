@@ -22,9 +22,16 @@
 #include "lighter.h"
 #include "scene.h"
 #include "lightmapuv.h"
+#include "raytracer.h"
+#include "raygenerator.h"
+#include "radprimitive.h"
 
 
 CS_IMPLEMENT_APPLICATION;
+
+// used below
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<lighter::RadPrimitive*> : public csHashComputerIntegral<lighter::RadPrimitive*> {};
 
 namespace lighter
 {
@@ -137,12 +144,15 @@ namespace lighter
     while (sectIt.HasNext ())
     {
       csRef<Sector> sect = sectIt.Next ();
-      RadObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
-      while (objIt.HasNext ())
-      {
-        csRef<RadObject> obj = objIt.Next ();
-        obj->Initialize ();
-      }
+      sect->Initialize ();
+    }
+
+    // Shoot direct lighting
+    sectIt.Reset ();
+    while (sectIt.HasNext ())
+    {
+      csRef<Sector> sect = sectIt.Next ();
+      ShootDirectLighting (sect);
     }
 
     //Save the result
@@ -195,6 +205,130 @@ namespace lighter
     return scene->LoadFiles ();
   }
 
+  void Lighter::ShootDirectLighting (Sector* sector)
+  {
+    RandomRayListGenerator<PsuedoRandomRaygenerator> rayGenerator;
+
+    // Need a raytracer
+    Raytracer rayTracer (sector->kdTree);
+
+    // Iterate all lights
+    LightRefArray::Iterator lightIt = sector->allLights.GetIterator ();
+    while (lightIt.HasNext ())
+    {
+      csRef<Light> radLight = lightIt.Next ();
+      radLight->freeEnergy = radLight->color * 500.0f; //@scale
+
+      // Generate and shoot rays
+      csArray<Ray> rays = rayGenerator (0xFFF, radLight->position);
+
+      typedef csSet<RadPrimitive*> RadPrimSet;
+      RadPrimSet primsToLight;
+      for (unsigned int rayIdx = 0; rayIdx < rays.GetSize (); rayIdx++)
+      {
+        const Ray& ray = rays[rayIdx];
+        HitPoint hit;
+        if (rayTracer.TraceClosestHit (ray, hit))
+        {
+          // YAY! do something with it..
+          //printf("HAVE HIT! %s\n", hit.hitPoint.Description ().GetData ());
+          primsToLight.Add (hit.primitive);
+        }
+      }
+      
+      RadPrimSet::GlobalIterator it = primsToLight.GetIterator ();;
+      while (it.HasNext ())
+      {
+        RadPrimitive *p = it.Next ();
+        ShadeRadPrimitive (rayTracer, *p, radLight);
+      }
+
+      radLight->freeEnergy.Clamp (0,0,0);
+    }
+  }
+
+  float Do5RayVistest (Raytracer &tracer, RadPrimitive &prim, csVector3 elCenter, csVector3 oPoint)
+  {
+    //Radtest midpoint and midpoint +- 0.5*u/vXformfacctor
+
+    float vis = 1.0f;
+
+    // Ec
+#define RAYTEST(rayOrig, visDecr)\
+    {\
+      csVector3 o = (rayOrig), dir = (oPoint-o);\
+      Ray ray; HitPoint hit;\
+      ray.origin = o; ray.minLength = FLT_EPSILON*10; ray.maxLength = dir.Norm ();\
+      ray.direction = dir / ray.maxLength; \
+      if (tracer.TraceAnyHit (ray, hit)) vis -= (visDecr);\
+    }
+
+    csVector3 halfU = prim.GetuFormVector () * 0.5f;
+    csVector3 halfV = prim.GetvFormVector () * 0.5f;
+
+    RAYTEST(elCenter, 0.2f);
+    RAYTEST(elCenter + halfU + halfV, 0.2f);
+    RAYTEST(elCenter - halfU + halfV, 0.2f);
+    RAYTEST(elCenter + halfU - halfV, 0.2f);
+    RAYTEST(elCenter - halfU - halfV, 0.2f);
+
+    return vis;
+  }
+
+  void Lighter::ShadeRadPrimitive (Raytracer &tracer, RadPrimitive &prim, Light* light)
+  {    
+    //@@HACK, assume visible
+    prim.PrepareNoPatches ();
+
+    const float primArea = prim.GetArea ();
+    
+    csVector3 elementCenter = prim.GetMinCoord () + prim.GetuFormVector () * 0.5f + prim.GetvFormVector () * 0.5f;
+
+    int minU, minV, maxU, maxV;
+    prim.ComputeMinMaxUV (minU, maxU, minV, maxV);
+    
+    uint findex = 0;
+
+    for (int v = minV; v <= maxV; v++)
+    {
+      csVector3 ec = elementCenter;
+      for (int u = minU; u <= maxU; u++, findex++, ec += prim.GetuFormVector ())
+      {
+        const float elemArea = prim.GetElementAreas ()[findex];
+        if (elemArea <= 0.0f) continue; //need an area
+
+        csVector3 jiVec = light->position - ec;
+
+        float distSq = jiVec.SquaredNorm ();
+        jiVec.Normalize ();
+
+        float cosTheta_j = - (prim.GetPlane ().GetNormal () * jiVec);
+        
+        if (cosTheta_j <= 0.0f) continue; //backface culling
+
+        // Do a 5 ray visibility test
+        float visFact = Do5RayVistest (tracer, prim, ec, light->position);
+
+        //
+        float Fij = cosTheta_j / (distSq);
+
+        // energy
+        csColor energy = light->freeEnergy * Fij * visFact;
+        csColor reflected = energy;
+        //blah
+        //store stats
+
+        Lightmap * lm = prim.GetRadObject ()->GetLightmaps ()[prim.GetLightmapID ()];
+        lm->GetData ()[v*lm->GetWidth ()+u] = reflected;
+
+        uint patchIndex = (v-minV)/globalSettings.vPatchResolution * prim.GetuPatches ()+(u-minU)/globalSettings.uPatchResolution;
+        RadPatch &patch = prim.GetPatches ()[patchIndex];
+        patch.energy += reflected;
+
+      }
+      elementCenter += prim.GetvFormVector ();
+    }
+  }
 }
 
 int main (int argc, char* argv[])

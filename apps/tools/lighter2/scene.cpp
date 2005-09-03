@@ -20,11 +20,29 @@
 
 #include "scene.h"
 #include "lighter.h"
+#include "kdtree.h"
 
 using namespace CrystalSpace;
 
 namespace lighter
 {
+  void Sector::Initialize ()
+  {
+    // Initialize objects
+    RadObjectHash::GlobalIterator objIt = allObjects.GetIterator ();
+    while (objIt.HasNext ())
+    {
+      csRef<RadObject> obj = objIt.Next ();
+      obj->Initialize ();
+    }
+
+    // Build KD-tree
+    kdTree = new KDTree;
+    objIt.Reset ();
+    kdTree->BuildTree (objIt);
+  }
+
+
   Scene::Scene ()
   {
     
@@ -145,6 +163,18 @@ namespace lighter
       if (!ParseMesh (radSector, meshList->Get (i)))
         globalLighter->Report ("Error parsing mesh in sector '%s'!", 
           radSector->sectorName.GetData ());
+    }
+
+    // Parse all lights (should have selector later!)
+    iLightList *lightList = sector->GetLights ();
+    for (i = 0; i < lightList->GetCount (); i++)
+    {
+      iLight *light = lightList->Get (i);
+      csRef<Light> radLight; radLight.AttachNew (new Light);
+      radLight->position = light->GetMovable ()->GetFullPosition ();
+      radLight->color = light->GetColor ();
+      //add more
+      radSector->allLights.Push (radLight);
     }
   }
 

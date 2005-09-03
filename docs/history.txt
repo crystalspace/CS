@@ -10,6 +10,10 @@ chronological order.
 	- res removed an #include from tokenlist.h which caused compile errors
 	  for some people (since tokenlist.h is intended to be included in
 	  places e.g. inside classes).
+	- Marten added some more documentation to DocumentHelper namespace.
+	- Marten made a few cleanups in csPoly3D.
+	- Marten worked a bit more on the new lighter. It can now produce its
+	  first output.
 2-Sep-2005
 	- Jorrit fixed a bug in CS reported by valgrind:
 	  In the GL state cache a few fields were not initialized in some cases.

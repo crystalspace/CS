@@ -41,7 +41,7 @@ namespace lighter
     csBox3 boundingBox;
 
     // All our primitives (or well, pointers to them)
-    csArray<RadPrimitive*> radPrimitives;
+    RadPrimitivePtrArray radPrimitives;
 
     KDTreeNode ()
       : splitDimension (CS_AXIS_NONE), splitLocation (0.0f),
@@ -72,9 +72,17 @@ namespace lighter
       delete rootNode;
     }
 
-    void BuildTree (const RadObjectHash::Iterator& objectIt);
+    // Build a tree from all the objects returned by iterator
+    void BuildTree (const RadObjectHash::GlobalIterator& objectIt);
 
+    /* Return all primitives on positive side of plane. The returned array is only
+    valid at most until next call to GetPrimitives */
+    RadPrimitivePtrArray& GetPrimitives (const csPlane3 &plane);
+
+    // Root node of the tree
     KDTreeNode *rootNode;
+  private:
+    RadPrimitivePtrArray tempPrimitiveArray;
   };
 
 }

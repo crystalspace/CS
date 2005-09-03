@@ -27,7 +27,10 @@
 
 namespace CrystalSpace
 {
-  /// Namespace to group helpers operating on iDocument*
+  /**
+   * Namespace contains helper functions and classes which operates on
+   * iDocumentNode and iDocumentNodeIterator.
+   */
   namespace DocumentHelper
   {
     namespace Implementation
@@ -92,7 +95,7 @@ namespace CrystalSpace
      * Remove duplicate child-nodes.
      * The functor T is used to determine what should be seen
      * as equal nodes.
-     * This is a O(n^2) operation!
+     * This is potentially an O(n^2) operation!
      */
     template<class T>
     void RemoveDuplicateChildren (iDocumentNode *rootNode, T eq)
@@ -105,7 +108,7 @@ namespace CrystalSpace
      * Remove duplicate child-nodes.
      * The functor T is used to determine what should be seen
      * as equal nodes.
-     * This is a O(n^2) operation!
+     * This is potentially an O(n^2) operation!
      */
     template<class T>
     void RemoveDuplicateChildren (iDocumentNode *rootNode,
@@ -277,7 +280,17 @@ namespace CrystalSpace
     };
     /** @} */
 
-    /// Get a filtering iDocumentNodeIterator
+    /** 
+     * Get a filtering iDocumentNodeIterator
+     * Example usage: 
+     * \code
+     * DocumentHelper::NodeAttributeValueTest test ("name", "Marten");
+     * csRef<iDocumentNodeIterator> it = 
+     *   DocumentHelper::FilterDocumentNodeIterator (node->GetNodes(), test);
+     * while (it->HasNext ())
+     * { ... }
+     * \endcode
+     */
     template<class T>
     csPtr<iDocumentNodeIterator> FilterDocumentNodeIterator(
       csRef<iDocumentNodeIterator> parent, T filter)

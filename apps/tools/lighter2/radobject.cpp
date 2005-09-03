@@ -18,6 +18,7 @@
 
 #include "crystalspace.h"
 
+#include "common.h"
 #include "lighter.h"
 #include "lightmap.h"
 #include "lightmapuv.h"
@@ -86,9 +87,14 @@ namespace lighter
     unsigned int i = 0;
     for (i = 0; i < allPrimitives.GetSize (); i++)
     {
-      allPrimitives[i].Transform (transform);
+      RadPrimitive& prim = allPrimitives[i];
+
+      prim.Transform (transform);
       //recompute the factors
-      allPrimitives[i].ComputeUVTransform ();
+      prim.ComputePlane ();
+      prim.ComputeUVTransform ();
+      prim.SetRadObject (this);
+      prim.Prepare (globalSettings.uPatchResolution, globalSettings.vPatchResolution);
     }
 
     // Create and init lightmaps

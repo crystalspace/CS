@@ -29,6 +29,7 @@ namespace lighter
   struct SplitPositionFinder
   {
     SplitPositionFinder (size_t num)
+      : splitPoolDEL (0), splitPool (0), firstEntry (0)
     {
       //Alloc num entries
       splitPoolDEL = splitPool = new SplitPosition[num*2+8];
@@ -285,7 +286,7 @@ namespace lighter
     KDTreeNode *root;
   };
 
-  void KDTree::BuildTree (const RadObjectHash::Iterator& objectIt)
+  void KDTree::BuildTree (const RadObjectHash::GlobalIterator& objectIt)
   {
     rootNode = new KDTreeNode;
     
@@ -300,5 +301,55 @@ namespace lighter
     rootNode->Subdivide ();
 
     delete splitPositionFinder; splitPositionFinder = 0;
+  }
+
+  RadPrimitivePtrArray& KDTree::GetPrimitives (const csPlane3 &plane)
+  {
+    tempPrimitiveArray.Empty ();
+
+    // Setup for non-recursive traversal
+    csArray<KDTreeNode*> nodesToVisit;
+    csArray<KDTreeNode*> childNodesToTest;
+
+    nodesToVisit.Push (rootNode);
+    while (nodesToVisit.GetSize () > 0)
+    {
+      KDTreeNode *curNode = nodesToVisit.Pop ();
+      // Check side of node
+      const csVector3& m = curNode->boundingBox.GetCenter ();
+      const csVector3 d = curNode->boundingBox.Max ()-m;		// Half-diagonal.
+      float NP = (float)(d.x*fabs(plane.A ())+d.y*fabs(plane.B ())+d.z*fabs(plane.C ()));
+      float MP = plane.Classify (m);
+      if ((MP+NP) > 0.0f && (MP-NP) < 0.0f)
+      {
+        //correct side
+        if (curNode->leftChild)
+        {
+          nodesToVisit.Push (curNode->leftChild);
+          nodesToVisit.Push (curNode->rightChild);
+        }
+        else
+        {
+          childNodesToTest.Push (curNode);
+        }
+      }
+    }
+
+    // Go through and test nodes
+    while (childNodesToTest.GetSize () > 0)
+    {
+      KDTreeNode *curNode = childNodesToTest.Pop ();
+      RadPrimitivePtrArray &primArray = curNode->radPrimitives;
+      for (unsigned int i = 0; i < primArray.GetSize (); i++)
+      {
+        if (primArray[i]->Classify (plane) != CS_POL_BACK)
+        {
+          tempPrimitiveArray.Push (primArray[i]);
+        }
+      }
+    }
+
+    // Now test primitives in our child-nodes
+    return tempPrimitiveArray;
   }
 }

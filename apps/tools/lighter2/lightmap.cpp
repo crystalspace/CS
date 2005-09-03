@@ -47,11 +47,15 @@ namespace lighter
   {
     filename = fname;
     //write it out
+
+    ApplyExposureFunction (1.0f, 1.0f);
+
     // first we downsample to LDR csRGBpixel RGBA
     csRGBpixel *pixelData = new csRGBpixel[width*height];
     for (uint i = 0; i < data.GetSize (); i++)
     {
       csColor &c = data[i];
+      c.Clamp (1.0f,1.0f,1.0f);
       pixelData[i].red = (uint) (c.red * 255.0f);
       pixelData[i].green = (uint) (c.green * 255.0f);
       pixelData[i].blue = (uint) (c.blue * 255.0f);

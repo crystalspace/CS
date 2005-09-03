@@ -1,6 +1,6 @@
 /*
   Crystal Space General Algorithms
-  Copyright (C)2005 by Eric sunshine <sunshine@sunshineco.com>
+  Copyright (C)2005 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -25,6 +25,12 @@ namespace CrystalSpace
   /**
    * Iterate over all elements in the iterator and perform operation
    * given by Func.
+   * \code
+   * csArray<int> anArray;
+   * anArray.Push (1);
+   * anArray.Push (4);
+   * ForEach (anArray.GetIterator (), OurFunctor ());
+   * \endcode
    */
   template <class T, class Fn>
   inline Fn& ForEach (T it, Fn& Func)
@@ -37,9 +43,9 @@ namespace CrystalSpace
   }
 
   template <class T1, class T2>
-  struct ConditionAdd
+  struct ConditionAnd
   {
-    ConditionAdd (T1 op1, T2 op2)
+    ConditionAnd (T1 op1, T2 op2)
     { }
 
     template<class T>

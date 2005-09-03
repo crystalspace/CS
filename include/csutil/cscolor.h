@@ -79,6 +79,9 @@ public:
   /// Multiply another color with this one.
   csColor& operator*= (const csColor& c)
   { red *= c.red; green *= c.green; blue *= c.blue; return *this; }
+  /// Multiply this color by a scalar, return result
+  csColor operator * (const float f)
+  { csColor ret; ret.red = red*f; ret.green = green*f; ret.blue = blue*f; return ret; }
   /// Compare equality of two colors
   bool operator== (const csColor& c) const
   { return red == c.red && green == c.green && blue == c.blue; }

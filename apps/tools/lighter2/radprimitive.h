@@ -31,7 +31,7 @@ namespace lighter
   * Primitive in the radiosity world.
   * Represents a single primitive (face) in the radiosity world.
   */
-  class RadPrimitive : protected csPoly3D
+  class RadPrimitive : public csPoly3D
   {
   public:
     // Constructors
@@ -47,7 +47,7 @@ namespace lighter
     {
       for (unsigned int i = 0; i < vertices.GetSize (); i++)
       {
-        vertices[i] = trans.Other2This (vertices[i]);
+        vertices[i] = trans.This2Other (vertices[i]);
       }
     }
 
@@ -158,12 +158,17 @@ namespace lighter
     inline const csPlane3& GetPlane () const { return plane; }
 
     inline const csVector3& GetuFormVector () const { return uFormVector; }
-    inline const csVector3& GetvFormVector () const { return uFormVector; }
+    inline const csVector3& GetvFormVector () const { return vFormVector; }
 
     inline const csColor& GetIlluminationColor () const { return illuminationColor; }
     inline const csColor& GetReflectanceColor () const { return reflectanceColor; }
 
     inline const FloatDArray& GetElementAreas () const { return elementAreas; }
+
+    inline const RadPatchArray& GetPatches () const { return patches; }
+    inline RadPatchArray& GetPatches () { return patches; }
+    inline uint GetuPatches () const { return uPatches; }
+    inline uint GetvPatches () const { return vPatches; }
 
     inline const csVector3& GetMinCoord () const { return minCoord; }
     inline const csVector2& GetMinUV () const { return minUV; }
