@@ -1354,8 +1354,8 @@ bool csMeshList::Remove (iMeshWrapper *obj)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     meshes_hash.Delete (name, obj);
-  list.Delete (obj);
   obj->QueryObject ()->RemoveNameChangeListener (listener);
+  list.Delete (obj);
   return true;
 }
 
@@ -1366,8 +1366,8 @@ bool csMeshList::Remove (int n)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     meshes_hash.Delete (name, obj);
-  list.DeleteIndex (n);
   obj->QueryObject ()->RemoveNameChangeListener (listener);
+  list.DeleteIndex (n);
   return true;
 }
 
