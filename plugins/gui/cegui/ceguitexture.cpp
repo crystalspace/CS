@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2005 Dan Härdfeldt and Seth Yastrov
+  Copyright (C) 2005 Dan Hardfeldt and Seth Yastrov
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 #include "cssysdef.h"
@@ -25,8 +25,8 @@
 
 #include "ceguitexture.h"
 
-csCEGUITexture::csCEGUITexture (CEGUI::Renderer* owner, iObjectRegistry *reg) :
-CEGUI::Texture (owner)
+csCEGUITexture::csCEGUITexture (CEGUI::Renderer* owner, iObjectRegistry *reg) 
+  : CEGUI::Texture (owner)
 {
   renderer = owner;
   obj_reg = reg;
@@ -60,7 +60,8 @@ CEGUI::ushort csCEGUITexture::getHeight () const
   return h;
 }
 
-void csCEGUITexture::loadFromFile (const CEGUI::String &filename, const CEGUI::String &resourceGroup)
+void csCEGUITexture::loadFromFile (const CEGUI::String &filename, 
+                                   const CEGUI::String &resourceGroup)
 {
   csRef<iLoader> loader = CS_QUERY_REGISTRY(obj_reg, iLoader);
   if (!loader)
@@ -73,14 +74,16 @@ void csCEGUITexture::loadFromFile (const CEGUI::String &filename, const CEGUI::S
   hTxt = txt->GetTextureHandle();
 }
 
-void csCEGUITexture::loadFromMemory (const void *buffPtr, CEGUI::uint buffWidth, CEGUI::uint buffHeight)
+void csCEGUITexture::loadFromMemory (const void *buffPtr, 
+  CEGUI::uint buffWidth, CEGUI::uint buffHeight)
 {
   csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY(obj_reg, iGraphics3D);
   if (!g3d)
     return;
 
   csRef<csImageMemory> image;
-  image.AttachNew(new csImageMemory(buffWidth, buffHeight, buffPtr, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA, new csRGBpixel(255,255,255)));
+  image.AttachNew(new csImageMemory(buffWidth, buffHeight, buffPtr, 
+    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA, new csRGBpixel(255,255,255)));
   iTextureManager* txtmgr = g3d->GetTextureManager();
 
   if (txtmgr)
@@ -94,6 +97,7 @@ CEGUI::Renderer* csCEGUITexture::getRenderer () const
   return renderer;
 }
 
-iTextureHandle* csCEGUITexture::GetTexHandle () {
+iTextureHandle* csCEGUITexture::GetTexHandle () 
+{
   return hTxt;
 }

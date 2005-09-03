@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 Dan Härdfeldt and Seth Yastrov
+    Copyright (C) 2005 Dan Hardfeldt and Seth Yastrov
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -51,13 +51,15 @@ public:
   virtual CEGUI::ushort getHeight (void) const;
 
   /// Load a texture from a file.
-  virtual void loadFromFile (const CEGUI::String &filename, const CEGUI::String &resourceGroup);
+  virtual void loadFromFile (const CEGUI::String &filename, 
+    const CEGUI::String &resourceGroup);
 
   /**
    * Load a texture directly from memory. This is called from CEGUI,
    * for example, when a font should be loaded.
    */
-  virtual void loadFromMemory (const void *buffPtr, CEGUI::uint buffWidth, CEGUI::uint buffHeight);
+  virtual void loadFromMemory (const void *buffPtr, 
+    CEGUI::uint buffWidth, CEGUI::uint buffHeight);
 
   /// Get a handle to the texture.
   iTextureHandle* GetTexHandle();
@@ -71,4 +73,4 @@ private:
 
 };
 
-#endif // _CS_CEGUITEXTURE_H_
+#endif 

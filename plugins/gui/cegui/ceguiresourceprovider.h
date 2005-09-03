@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 Dan Härdfeldt and Seth Yastrov
+    Copyright (C) 2005 Dan Hardfeldt and Seth Yastrov
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,4 +61,4 @@ protected:
   csRef<iVFS> vfs;
 };
 
-#endif // _CS_CEGUIRESOURCEPROVIDER_H_
+#endif

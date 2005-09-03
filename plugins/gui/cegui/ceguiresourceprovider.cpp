@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 Dan Härdfeldt and Seth Yastrov
+    Copyright (C) 2005 Dan Hardfeldt and Seth Yastrov
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #include "CEGUIExceptions.h"
 
 csCEGUIResourceProvider::csCEGUIResourceProvider (iObjectRegistry *reg) :
-CEGUI::ResourceProvider ()
+  CEGUI::ResourceProvider ()
 {
   obj_reg = reg;
   vfs = CS_QUERY_REGISTRY(obj_reg, iVFS);
@@ -43,7 +43,8 @@ void csCEGUIResourceProvider::loadRawDataContainer (const CEGUI::String& filenam
   // Reading failed
   if (!buffer.IsValid ())
   {
-    CEGUI::String msg= (uint8*)"csCEGUIResourceProvider::loadRawDataContainer - Filename supplied for loading must be valid";
+    CEGUI::String msg= (uint8*)"csCEGUIResourceProvider::loadRawDataContainer - "
+      "Filename supplied for loading must be valid";
     msg += (uint8*)" ["+filename+(uint8*)"]";
     throw CEGUI::InvalidRequestException(msg);
   }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 Dan Härdfeldt and Seth Yastrov
+    Copyright (C) 2005 Dan Hardfeldt and Seth Yastrov
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,8 @@
 #include "ceguievthandler.h"
 #include "ceguirenderer.h"
 
-csCEGUIEventHandler::csCEGUIEventHandler (iObjectRegistry *reg, csCEGUIRenderer* owner, CEGUI::System* system) 
+csCEGUIEventHandler::csCEGUIEventHandler (iObjectRegistry *reg, 
+  csCEGUIRenderer* owner, CEGUI::System* system) 
 {
   obj_reg = reg;
   renderer = owner;
@@ -51,7 +52,7 @@ bool csCEGUIEventHandler::OnUnhandledEvent (iEvent &event)
     renderer->setDisplaySize (CEGUI::Size (g2d->GetWidth (), g2d->GetHeight ()));
     return true;
   }
-  if (csCommandEventHelper::GetCode (&event) == cscmdSystemClose)
+  else if (csCommandEventHelper::GetCode (&event) == cscmdSystemClose)
   {
     delete renderer->GetSystem().getSingletonPtr();
     renderer->destroyAllTextures();
@@ -86,7 +87,8 @@ bool csCEGUIEventHandler::OnMouseDown (iEvent &event)
 
 bool csCEGUIEventHandler::OnMouseMove (iEvent &event)
 {
-  ceguisystem->injectMousePosition(csMouseEventHelper::GetX(&event), csMouseEventHelper::GetY(&event));
+  ceguisystem->injectMousePosition(csMouseEventHelper::GetX(&event), 
+    csMouseEventHelper::GetY(&event));
   return true;
 }
 

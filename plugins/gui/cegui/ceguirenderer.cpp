@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 Dan Härdfeldt and Seth Yastrov
+    Copyright (C) 2005 Dan Hardfeldt and Seth Yastrov
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ csCEGUIRenderer::csCEGUIRenderer (iBase *parent) :
 }
 
 // TODO add description
-bool csCEGUIRenderer::Initialize (int width = -1, int height = -1)
+bool csCEGUIRenderer::Initialize (int width, int height)
 {
   g3d = CS_QUERY_REGISTRY (obj_reg, iGraphics3D);
 
@@ -98,7 +98,9 @@ csCEGUIRenderer::~csCEGUIRenderer ()
 }
 
 // TODO add description
-void csCEGUIRenderer::addQuad (const CEGUI::Rect& dest_rect, float z, const CEGUI::Texture* tex, const CEGUI::Rect& texture_rect, const CEGUI::ColourRect& colours, CEGUI::QuadSplitMode quad_split_mode)
+void csCEGUIRenderer::addQuad (const CEGUI::Rect& dest_rect, float z, 
+  const CEGUI::Texture* tex, const CEGUI::Rect& texture_rect,
+  const CEGUI::ColourRect& colours, CEGUI::QuadSplitMode quad_split_mode)
 {
   if (!queueing)
   {
@@ -205,7 +207,8 @@ CEGUI::Texture* csCEGUIRenderer::createTexture(void)
 }
 
 // TODO add description
-CEGUI::Texture* csCEGUIRenderer::createTexture (const CEGUI::String& filename, const CEGUI::String& resourceGroup)
+CEGUI::Texture* csCEGUIRenderer::createTexture (
+  const CEGUI::String& filename, const CEGUI::String& resourceGroup)
 {
   csCEGUITexture* tex = (csCEGUITexture*) createTexture();
   tex->loadFromFile (filename, resourceGroup);
@@ -318,25 +321,31 @@ void csCEGUIRenderer::PrepareQuad (const QuadInfo quad, RenderQuad& rquad) const
     rquad.indices[5] = 2;
   }
 
-  rquad.vertex[0] = csVector3(quad.position.d_left, g2d->GetHeight()-quad.position.d_top, quad.z);
+  rquad.vertex[0] = csVector3(quad.position.d_left, 
+    g2d->GetHeight()-quad.position.d_top, quad.z);
   rquad.color[0] = quad.topLeftColor;
   rquad.tex[0] = csVector2(quad.texPosition.d_left, quad.texPosition.d_top);
 
-  rquad.vertex[1] = csVector3(quad.position.d_left, g2d->GetHeight()-quad.position.d_bottom, quad.z);
+  rquad.vertex[1] = csVector3(quad.position.d_left, 
+    g2d->GetHeight()-quad.position.d_bottom, quad.z);
   rquad.color[1] = quad.bottomLeftColor;
   rquad.tex[1] = csVector2(quad.texPosition.d_left, quad.texPosition.d_bottom);
 
-  rquad.vertex[2] = csVector3(quad.position.d_right, g2d->GetHeight()-quad.position.d_bottom, quad.z);
+  rquad.vertex[2] = csVector3(quad.position.d_right, 
+    g2d->GetHeight()-quad.position.d_bottom, quad.z);
   rquad.color[2] = quad.bottomRightColor;
   rquad.tex[2] = csVector2(quad.texPosition.d_right, quad.texPosition.d_bottom);
 
-  rquad.vertex[3] = csVector3(quad.position.d_right, g2d->GetHeight()-quad.position.d_top, quad.z);
+  rquad.vertex[3] = csVector3(quad.position.d_right, 
+    g2d->GetHeight()-quad.position.d_top, quad.z);
   rquad.color[3] = quad.topRightColor;
   rquad.tex[3] = csVector2(quad.texPosition.d_right, quad.texPosition.d_top);
 }
 
 // TODO add description
-void csCEGUIRenderer::RenderQuadDirect(const CEGUI::Rect& dest_rect, float z, const CEGUI::Texture* tex, const CEGUI::Rect& texture_rect, const CEGUI::ColourRect& colours, CEGUI::QuadSplitMode quad_split_mode)
+void csCEGUIRenderer::RenderQuadDirect(const CEGUI::Rect& dest_rect, 
+  float z, const CEGUI::Texture* tex, const CEGUI::Rect& texture_rect,
+  const CEGUI::ColourRect& colours, CEGUI::QuadSplitMode quad_split_mode)
 {
   QuadInfo quad;
   quad.position = dest_rect;

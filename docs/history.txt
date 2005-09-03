@@ -59,6 +59,7 @@ chronological order.
 	  dir you can also find a short howto. Its currently disabled.
 	- swedishcoder removed the cegui howto doc, it was outdated, instead take
 	  a look at ceguitest app. Thanks iceeey for pointing that out.
+	- Marten made some smaller layout fixes to the CEGUI stuff.
 2-Sep-2005
 	- Jorrit fixed a bug in CS reported by valgrind:
 	  In the GL state cache a few fields were not initialized in some cases.

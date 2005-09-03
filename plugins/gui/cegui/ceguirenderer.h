@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 Dan Härdfeldt and Seth Yastrov
+    Copyright (C) 2005 Dan Hardfeldt and Seth Yastrov
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -66,7 +66,11 @@ public:
   virtual bool Initialize (int width, int height);
 
   /// Initialize with an iObjectRegistry pointer (called by plugin loader).
-  virtual bool Initialize (iObjectRegistry *reg) {obj_reg = reg; return true;}
+  virtual bool Initialize (iObjectRegistry *reg) 
+  {
+    obj_reg = reg; 
+    return true;
+  }
 
   /// Render the GUI.
   virtual void Render () const
@@ -162,7 +166,9 @@ private:
   csRef<iGraphics2D> g2d;
 
   /// Add a quad to the renderer queue.
-  virtual void addQuad (const CEGUI::Rect& dest_rect, float z, const CEGUI::Texture* tex, const CEGUI::Rect& texture_rect, const CEGUI::ColourRect& colours, CEGUI::QuadSplitMode quad_split_mode);
+  virtual void addQuad (const CEGUI::Rect& dest_rect, float z, 
+    const CEGUI::Texture* tex, const CEGUI::Rect& texture_rect, 
+    const CEGUI::ColourRect& colours, CEGUI::QuadSplitMode quad_split_mode);
 
   /// Render the GUI.
   virtual void doRender ();
@@ -209,7 +215,8 @@ private:
   virtual CEGUI::Texture* createTexture ();
 
   /// Create a texture based on a filename, belonging to a special resource group.
-  virtual CEGUI::Texture* createTexture (const CEGUI::String& filename, const CEGUI::String& resourceGroup);
+  virtual CEGUI::Texture* createTexture (const CEGUI::String& filename, 
+    const CEGUI::String& resourceGroup);
 
   /// Create an empty texture, but specify its size (square, and power of 2).
   virtual CEGUI::Texture* createTexture (float size);
@@ -281,7 +288,9 @@ private:
   void PrepareQuad (const QuadInfo quad, RenderQuad& rquad) const;
 
   /// Render a quad directly instead of queueing it.
-  void RenderQuadDirect (const CEGUI::Rect& dest_rect, float z, const CEGUI::Texture* tex, const CEGUI::Rect& texture_rect, const CEGUI::ColourRect& colours, CEGUI::QuadSplitMode quad_split_mode);
+  void RenderQuadDirect (const CEGUI::Rect& dest_rect, float z, 
+    const CEGUI::Texture* tex, const CEGUI::Rect& texture_rect, 
+    const CEGUI::ColourRect& colours, CEGUI::QuadSplitMode quad_split_mode);
 
   /// Convert a CEGUI::colour to a CS csVector4 color
   csVector4 ColorToCS (const CEGUI::colour &color) const;
@@ -309,4 +318,4 @@ private:
   uint m_maxTextureSize;
 };
 
-#endif // _CS_CEGUI_RENDERER_H
+#endif
