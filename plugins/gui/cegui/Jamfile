@@ -1,0 +1,9 @@
+SubDir TOP src cscegui ;
+
+if $(CEGUI.AVAILABLE) = "yes"
+{
+Description cscegui : "CEGUI Renderer Plugin" ;
+Plugin cscegui : [ Wildcard *.cpp *.h ] ;
+#LinkWith cscegui : crystalspace ;
+ExternalLibs cscegui : CEGUI CRYSTAL ;
+}

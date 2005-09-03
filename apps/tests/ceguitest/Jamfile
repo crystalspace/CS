@@ -1,0 +1,6 @@
+SubDir TOP src ceguitest ;
+
+Description ceguitest : "CS CEGUI Test Application" ;
+Application ceguitest :
+  [ Wildcard *.h *.cpp ] ;
+ExternalLibs ceguitest : CRYSTAL CEGUI ;
