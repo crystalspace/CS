@@ -53,6 +53,10 @@ chronological order.
 	- res augmented the vproc_fixed shader to also handle point and spot
 	  lights (the latter are somewhat off, though, due CS/GL spotlight
 	  differences).
+	- swedishcoder added a CEGUI renderer for CS, developed by iceeey and
+	  swedishcoder. The actual plugin is located in plugins/gui/cegui and 
+	  the demonstration application in apps/tests/ceguitest In the ceguitest
+	  dir you can also find a short howto. Its currently disabled.
 2-Sep-2005
 	- Jorrit fixed a bug in CS reported by valgrind:
 	  In the GL state cache a few fields were not initialized in some cases.
