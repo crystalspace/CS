@@ -4,10 +4,12 @@
   <?template IfGLSupportsLight N?>
     <?! GL fixed pipeline can only do: 
 	- unattenuated directional lights
-	- lights that are not attenuated LINEAR
-     ?>
-    <?if (vars."light $N$ type".int == consts.CS_LIGHT_DIRECTIONAL)
-      && (vars."light $N$ attenuation mode".int == consts.CS_ATTN_NONE) ?>
+	- other lights if they are not attenuated LINEAR
+	Further, CS spotlights dont exactly map to GL ones...
+	So for now, GL fixed function spots look slightly off. ?>
+    <?if ((vars."light $N$ type".int == consts.CS_LIGHT_DIRECTIONAL)
+	&& (vars."light $N$ attenuation mode".int == consts.CS_ATTN_NONE)) 
+      || (vars."light $N$ attenuation mode".int != consts.CS_ATTN_LINEAR) ?>
   <?endtemplate?>
 
   <?template IfNotGLSupportsLight N?>
@@ -39,7 +41,24 @@
 		<atom type="num">-1</atom>
 	      </mul>
 	    </position>
-	    <attenuation type="vector3">1,0,0</attenuation>
+	    <!--attenuation type="vector3">1,0,0</attenuation-->
+	  <?elsif (vars."light $N$ type".int == consts.CS_LIGHT_SPOTLIGHT)?>
+	    <?if vars."light $N$ outer falloff".float &gt;= 1 ?>
+	      <!-- bogus falloff -->
+	      <spotcutoff type="float">180</spotcutoff>
+	    <?else?>
+	      <spotcutoff type="expression">
+		<!-- CS falloff is cosine of angle, GL wants angle -->
+		<mul>
+		  <arccos><atom type="var">light $N$ outer falloff</atom></arccos>
+		  <atom type="num">57.295779513082320876798154814105</atom><!-- = 180/PI -->
+		</mul>
+	      </spotcutoff>
+	    <?endif?>
+	  <?endif?>
+	  <?if (vars."light $N$ type".int != consts.CS_LIGHT_SPOTLIGHT)?>
+	    <!-- Override any falloff of the light -->
+	    <spotcutoff type="float">180</spotcutoff>
 	  <?endif?>
 	</light>
       <?endif?>
@@ -48,9 +67,9 @@
   
   <?template HandleLightVProc LightCount N?>
     <?if $LightCount$ &gt; $N$ ?>
-      <?IfGLSupportsLight $N$ ?>
+      <?!IfGLSupportsLight $N$ ?>
 	<enablelight num="$N$">no</enablelight>
-      <?endif?>
+      <?!endif?>
     <?endif?>
   <?endtemplate?>
 
@@ -77,7 +96,7 @@
 	      <?HandleLightFVP $N$ 0 ?>
 	      <?HandleLightFVP $N$ 1 ?>
 	      <?HandleLightFVP $N$ 2 ?>
-	      <?HandleLightFVP $N$ 3 ?>
+	      <?!HandleLightFVP $N$ 3 ?>
 	      <?!HandleLightFVP $N$ 4 ?>
 	      <?!HandleLightFVP $N$ 5 ?>
 	      <?!HandleLightFVP $N$ 6 ?>
@@ -102,7 +121,7 @@
 	      <?HandleLightVProc $N$ 0 ?>
 	      <?HandleLightVProc $N$ 1 ?>
 	      <?HandleLightVProc $N$ 2 ?>
-	      <?HandleLightVProc $N$ 3 ?>
+	      <?!HandleLightVProc $N$ 3 ?>
 	      <?!HandleLightVProc $N$ 4 ?>
 	      <?!HandleLightVProc $N$ 5 ?>
 	      <?!HandleLightVProc $N$ 6 ?>
@@ -135,7 +154,7 @@
   <?!GenerateLights 7 ?>
   <?!GenerateLights 6 ?>
   <?!GenerateLights 5 ?>
-  <?GenerateLights 4 ?>
+  <?!GenerateLights 4 ?>
   <?GenerateLights 3 ?>
   <?GenerateLights 2 ?>
   <?GenerateLights 1 ?>

@@ -45,6 +45,14 @@ chronological order.
 	- res started to work on a shader to mix GL fixed pipeline lighting 
 	  and SW lighting through vproc_std. Currently supports GL directional
 	  lights.
+	- res fixed a variable flippage in the spotlight lighting calculator.
+	- res augmented FVP for spotlight-related parameters.
+	- res changed the engine lights to compute a proper attenuation vector
+	  on attenuation changes.
+	- res added arcsin, arccos, arctan to shader expressions.
+	- res augmented the vproc_fixed shader to also handle point and spot
+	  lights (the latter are somewhat off, though, due CS/GL spotlight
+	  differences).
 2-Sep-2005
 	- Jorrit fixed a bug in CS reported by valgrind:
 	  In the GL state cache a few fields were not initialized in some cases.

@@ -104,10 +104,12 @@ protected:
   const char* GenerateUniqueID ();
 
   /**
-   * Calculate the influenceradius from the attenuation vector.
+   * Calculate the cutoff from the attenuation vector.
    */
-  void CalculateInfluenceRadius ();
+  void CalculateCutoffRadius ();
 
+  /// Compute attenuation vector from current attenuation mode.
+  void CalculateAttenuationVector ();
 public:
   /// Set of flags
   csFlags flags;

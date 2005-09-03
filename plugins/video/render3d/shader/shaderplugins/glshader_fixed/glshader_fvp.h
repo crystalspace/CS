@@ -70,14 +70,23 @@ private:
   csWeakRef<iGraphics3D> g3d;
   csGLShader_FIXED* shaderPlug;
 
+  enum GlLightParam
+  {
+    gllpPosition = 0,
+    gllpDiffuse,
+    gllpSpecular,
+    gllpAmbient,
+    gllpAttenuation,
+    gllpDirection,
+    gllpSpotCutoff,
+
+    gllpCount
+  };
+
   struct LightingEntry
   {
-    ProgramParam position;
-    ProgramParam diffuse;
-    ProgramParam specular;
-    ProgramParam ambient;
-    ProgramParam attenuation;
-    int lightnum;
+    ProgramParam params[gllpCount];
+    size_t lightnum;
   };
 
   csGLStateCache* statecache;  

@@ -161,6 +161,11 @@ private:
   bool eval_cos(const oper_arg & arg1, oper_arg & output) const;
   /// Tangent operator
   bool eval_tan(const oper_arg & arg1, oper_arg & output) const;
+
+  bool eval_arcsin(const oper_arg & arg1, oper_arg & output) const;
+  bool eval_arccos(const oper_arg & arg1, oper_arg & output) const;
+  bool eval_arctan(const oper_arg & arg1, oper_arg & output) const;
+
   bool eval_dot(const oper_arg & arg1, const oper_arg & arg2,
   	oper_arg & output) const;
   bool eval_cross(const oper_arg & arg1, const oper_arg & arg2,

@@ -311,7 +311,7 @@ public:
     if (dp > blackLimit)
     {
       float cosfact =
-	csSmoothStep (-(direction*lightDir), falloffOuter, falloffInner);
+	csSmoothStep (-(direction*lightDir), falloffInner, falloffOuter);
       float distance = csQsqrt(direction.SquaredNorm ());
       if (cosfact > 0)
       {

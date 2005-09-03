@@ -69,6 +69,10 @@ enum
   OP_FUNC_VEC_LEN, 
   OP_FUNC_NORMAL,
 
+  OP_FUNC_ARCSIN,
+  OP_FUNC_ARCCOS,
+  OP_FUNC_ARCTAN,
+
   OP_FUNC_POW,
   OP_FUNC_MIN,
   OP_FUNC_MAX,
@@ -159,6 +163,10 @@ static op_args_info optimize_arg_table[] =
   { 1, 1, false }, // OP_FUNC_VEC_LEN
   { 1, 1, false }, // OP_FUNC_NORMAL
 
+  { 1, 1, false }, //  OP_FUNC_ARCSIN
+  { 1, 1, false }, //  OP_FUNC_ARCCOS
+  { 1, 1, false }, //  OP_FUNC_ARCTAN
+
   { 2, 2, false }, // OP_FUNC_POW
   { 2, -1, true }, // OP_FUNC_MIN
   { 2, -1, true }, // OP_FUNC_MAX
@@ -213,6 +221,10 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
     xmltokens.Register("cross", OP_FUNC_CROSS);
     xmltokens.Register("vec-len", OP_FUNC_VEC_LEN);
     xmltokens.Register("norm", OP_FUNC_NORMAL);
+
+    xmltokens.Register("arcsin", OP_FUNC_ARCSIN);
+    xmltokens.Register("arccos", OP_FUNC_ARCCOS);
+    xmltokens.Register("arctan", OP_FUNC_ARCTAN);
     
     xmltokens.Register("pow", OP_FUNC_POW);
     xmltokens.Register("min", OP_FUNC_MIN);
@@ -250,6 +262,10 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
     sexptokens.Register("vec-len", OP_FUNC_VEC_LEN);
     sexptokens.Register("norm", OP_FUNC_NORMAL);
 
+    xmltokens.Register("arcsin", OP_FUNC_ARCSIN);
+    xmltokens.Register("arccos", OP_FUNC_ARCCOS);
+    xmltokens.Register("arctan", OP_FUNC_ARCTAN);
+    
     sexptokens.Register("pow", OP_FUNC_POW);
     sexptokens.Register("min", OP_FUNC_MIN);
     sexptokens.Register("max", OP_FUNC_MAX);
@@ -902,13 +918,16 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output)
 
   switch (oper)
   {
-    case OP_VEC_ELT1:  return eval_elt1(arg1, output);
-    case OP_VEC_ELT2:  return eval_elt2(arg1, output);
-    case OP_VEC_ELT3:  return eval_elt3(arg1, output);
-    case OP_VEC_ELT4:  return eval_elt4(arg1, output);
-    case OP_FUNC_SIN:  return eval_sin(arg1, output);
-    case OP_FUNC_COS:  return eval_cos(arg1, output);
-    case OP_FUNC_TAN:  return eval_tan(arg1, output);
+    case OP_VEC_ELT1:	  return eval_elt1(arg1, output);
+    case OP_VEC_ELT2:	  return eval_elt2(arg1, output);
+    case OP_VEC_ELT3:	  return eval_elt3(arg1, output);
+    case OP_VEC_ELT4:	  return eval_elt4(arg1, output);
+    case OP_FUNC_SIN:	  return eval_sin(arg1, output);
+    case OP_FUNC_COS:	  return eval_cos(arg1, output);
+    case OP_FUNC_TAN:	  return eval_tan(arg1, output);
+    case OP_FUNC_ARCSIN:  return eval_arcsin(arg1, output);
+    case OP_FUNC_ARCCOS:  return eval_arccos(arg1, output);
+    case OP_FUNC_ARCTAN:  return eval_arctan(arg1, output);
     case OP_FUNC_VEC_LEN: return eval_vec_len(arg1, output);
     case OP_FUNC_NORMAL: return eval_normal(arg1, output);
 
@@ -1164,6 +1183,51 @@ bool csShaderExpression::eval_tan(const oper_arg & arg1, oper_arg & output) cons
 
   output.type = TYPE_NUMBER;
   output.num = tan(arg1.num);
+
+  return true;  
+}
+
+bool csShaderExpression::eval_arcsin(const oper_arg & arg1, oper_arg & output) const 
+{
+  if (arg1.type != TYPE_NUMBER)
+  {
+    EvalError ("Invalid type for first argument to arcsin, %s.", get_type_name(arg1.type));
+
+    return false;
+  }
+
+  output.type = TYPE_NUMBER;
+  output.num = asin(arg1.num);
+
+  return true;  
+}
+
+bool csShaderExpression::eval_arccos(const oper_arg & arg1, oper_arg & output) const 
+{
+  if (arg1.type != TYPE_NUMBER)
+  {
+    EvalError ("Invalid type for first argument to arccos, %s.", get_type_name(arg1.type));
+
+    return false;
+  }
+
+  output.type = TYPE_NUMBER;
+  output.num = acos(arg1.num);
+
+  return true;  
+}
+
+bool csShaderExpression::eval_arctan(const oper_arg & arg1, oper_arg & output) const 
+{
+  if (arg1.type != TYPE_NUMBER)
+  {
+    EvalError ("Invalid type for first argument to arctan, %s.", get_type_name(arg1.type));
+
+    return false;
+  }
+
+  output.type = TYPE_NUMBER;
+  output.num = atan(arg1.num);
 
   return true;  
 }

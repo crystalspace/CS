@@ -52,7 +52,7 @@ csLight::csLight (
   csLightDynamicType dyntype) :
     csObject(), light_id (0), color (red, green, blue), specularColor (0,0,0),
     halo (0), dynamicType (dyntype), type (CS_LIGHT_POINTLIGHT), 
-    attenuation (CS_ATTN_LINEAR), attenuationConstants (d, 0, 0), cutoffDistance (d),
+    attenuation (CS_ATTN_LINEAR), cutoffDistance (d),
     directionalCutoffRadius (d), direction (1,0,0), spotlightFalloffInner (0),
     spotlightFalloffOuter (1), lightnr (0)
 {
@@ -70,6 +70,7 @@ csLight::csLight (
 
   //if (ABS (cutoffDistance) < SMALL_EPSILON)
   //  CalculateInfluenceRadius ();
+  CalculateAttenuationVector();
 }
 
 csLight::~csLight ()
@@ -181,6 +182,31 @@ float csLight::GetBrightnessAtDistance (float d)
   return 0;
 }
 
+void csLight::CalculateAttenuationVector ()
+{
+  switch (attenuation)
+  {
+    case CS_ATTN_NONE:
+      attenuationConstants.Set (1, 0, 0);
+      break;
+    case CS_ATTN_LINEAR:    
+      // @@@ FIXME: cutoff distance != radius, really
+      attenuationConstants.Set (cutoffDistance, 0, 0);
+      break;
+    case CS_ATTN_INVERSE:
+      attenuationConstants.Set (0, 1, 0);
+      break;
+    case CS_ATTN_REALISTIC:
+      attenuationConstants.Set (0, 0, 1);
+      break;
+    case CS_ATTN_CLQ:
+      /* Nothing to do */
+      break;
+    default:
+      ;
+  }
+}
+
 void csLight::OnSetPosition ()
 {
   csVector3 pos = GetCenter ();
@@ -242,6 +268,7 @@ void csLight::SetAttenuationMode (csLightAttenuationMode a)
   }*/
 
   attenuation = a;
+  CalculateAttenuationVector();
 
   size_t i = light_cb_vector.Length ();
   while (i-- > 0)

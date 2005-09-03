@@ -160,6 +160,10 @@ void csGLShader_FIXED::Open()
       texUnits = useTextureUnits;
     }
   }
+  
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
+  lsvCache.SetStrings (strings);
 
   isOpen = true;
 }
@@ -182,5 +186,6 @@ bool csGLShader_FIXED::Initialize(iObjectRegistry* reg)
 
   ext = 0;
   r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
+
   return true;
 }

@@ -20,10 +20,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __GLSHADER_FIXED_H__
 #define __GLSHADER_FIXED_H__
 
-#include "ivideo/shader/shader.h"
+#include "csgfx/lightsvcache.h"
 #include "csplugincommon/shader/shaderplugin.h"
-#include "iutil/comp.h"
 #include "csutil/leakguard.h"
+#include "iutil/comp.h"
+#include "ivideo/shader/shader.h"
 
 class csGLShader_FIXED : public iShaderProgramPlugin
 {
@@ -37,6 +38,8 @@ public:
   bool enable;
   bool enableCombine;
   GLint texUnits;
+
+  csLightShaderVarCache lsvCache;
 
   void Report (int severity, const char* msg, ...);
 public:

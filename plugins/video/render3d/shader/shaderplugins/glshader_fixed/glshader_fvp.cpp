@@ -83,25 +83,34 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
       GLenum glLight = (GLenum)GL_LIGHT0+i;
       glEnable (glLight);
 
+      LightingEntry& entry = lights[i];
+
       const csVector4 null (0);
 
-      v = GetParamVectorVal (stacks, lights[i].position, null);
+      v = GetParamVectorVal (stacks, entry.params[gllpPosition], null);
       glLightfv (glLight, GL_POSITION, (float*)&v);
 
-      v = GetParamVectorVal (stacks, lights[i].diffuse, null);
+      v = GetParamVectorVal (stacks, entry.params[gllpDiffuse], null);
       glLightfv (glLight, GL_DIFFUSE, (float*)&v);
 
-      v = GetParamVectorVal (stacks, lights[i].specular, null);
+      v = GetParamVectorVal (stacks, entry.params[gllpSpecular], null);
       glLightfv (glLight, GL_SPECULAR, (float*)&v);
 
-      v = GetParamVectorVal (stacks, lights[i].ambient, null);
+      v = GetParamVectorVal (stacks, entry.params[gllpAmbient], null);
       glLightfv (glLight, GL_AMBIENT, (float*)&v);
 
-      v = GetParamVectorVal (stacks, lights[i].attenuation, 
+      v = GetParamVectorVal (stacks, entry.params[gllpAttenuation], 
 	csVector4 (1, 0, 0, 0));
       glLightf (glLight, GL_CONSTANT_ATTENUATION, v.x);
       glLightf (glLight, GL_LINEAR_ATTENUATION, v.y);
       glLightf (glLight, GL_QUADRATIC_ATTENUATION, v.z);
+
+      float f = GetParamFloatVal (stacks, entry.params[gllpSpotCutoff],
+	1.0f);
+      glLightf (glLight, GL_SPOT_CUTOFF, f);
+
+      v = GetParamVectorVal (stacks, entry.params[gllpDirection], null);
+      glLightfv (glLight, GL_SPOT_DIRECTION, (float*)&v);
     }
 
     const csVector4 one (1);
@@ -525,31 +534,29 @@ bool csGLShaderFVP::ParseLight (iDocumentNode* node, LightingEntry& entry)
     csStringID id = tokens.Request (value);
     switch(id)
     {
-      case XMLTOKEN_POSITION:
-	if (!ParseProgramParam (child, entry.position,
-	  ParamVector3 | ParamVector4 | ParamShaderExp))
-	  return false;
-	break;
-      case XMLTOKEN_DIFFUSE:
-	if (!ParseProgramParam (child, entry.diffuse,
-	  ParamVector3 | ParamVector4 | ParamShaderExp))
-	  return false;
-	break;
-      case XMLTOKEN_AMBIENT:
-	if (!ParseProgramParam (child, entry.ambient,
-	  ParamVector3 | ParamVector4 | ParamShaderExp))
-	  return false;
-	break;
-      case XMLTOKEN_SPECULAR:
-	if (!ParseProgramParam (child, entry.specular,
-	  ParamVector3 | ParamVector4 | ParamShaderExp))
-	  return false;
-	break;
-      case XMLTOKEN_ATTENUATION:
-	if (!ParseProgramParam (child, entry.attenuation,
-	  ParamVector3 | ParamVector4 | ParamShaderExp))
-	  return false;
-	break;
+#define LIGHT_PARAM(Token, GLLP, Type)			    \
+      case XMLTOKEN_ ## Token:				    \
+	if (!ParseProgramParam (child, entry.params[GLLP],  \
+	  Type))					    \
+	  return false;					    \
+	break
+#define LIGHT_PARAM_V(Token, GLLP)			    \
+      LIGHT_PARAM(Token, GLLP,				    \
+	ParamVector3 | ParamVector4 | ParamShaderExp)
+#define LIGHT_PARAM_F(Token, GLLP)			    \
+      LIGHT_PARAM(Token, GLLP,				    \
+	ParamFloat | ParamShaderExp)
+
+      LIGHT_PARAM_V(POSITION, gllpPosition);
+      LIGHT_PARAM_V(DIFFUSE, gllpDiffuse);
+      LIGHT_PARAM_V(SPECULAR, gllpSpecular);
+      LIGHT_PARAM_V(AMBIENT, gllpAmbient);
+      LIGHT_PARAM_V(ATTENUATION, gllpAttenuation);
+      LIGHT_PARAM_V(DIRECTION, gllpDirection);
+      LIGHT_PARAM_F(SPOTCUTOFF, gllpSpotCutoff);
+
+#undef LIGHT_PARAM
+
       default:
 	{
 	  synsrv->ReportBadToken (child);
@@ -573,6 +580,18 @@ static int ParseLayerParam (iDocumentNode* node, iShaderTUResolver* tuResolve)
 
 bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 {
+  const csLightShaderVarCache::LightProperty propNone = 
+    (csLightShaderVarCache::LightProperty)-1;
+  static const csLightShaderVarCache::LightProperty defaultParamNames[gllpCount] =
+    {csLightShaderVarCache::lightPositionWorld,
+     csLightShaderVarCache::lightDiffuse,
+     csLightShaderVarCache::lightSpecular,
+     propNone,
+     csLightShaderVarCache::lightAttenuation,
+     csLightShaderVarCache::lightDirectionWorld,
+     csLightShaderVarCache::lightOuterFalloff
+    };
+
   if (!program)
     return false;
 
@@ -599,45 +618,22 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
         case XMLTOKEN_LIGHT:
           {
             do_lighting = true;
-            size_t i = lights.Length();
-	    LightingEntry& entry = lights.GetExtend (i);
+	    LightingEntry& entry = lights.GetExtend (lights.Length());
 
             entry.lightnum = child->GetAttributeValueAsInt("num");
 
 	    if (!ParseLight (child, entry))
 	      return false;
 	    
-            csString buf;
-	    if (!entry.position.valid)
+	    for (int i = 0; i < gllpCount; i++)
 	    {
-              buf.Format ("light %d position world", 
-		lights[i].lightnum);
-              entry.position.name = strings->Request (buf);
-	      entry.position.valid = true;
-	    }
-
-	    if (!entry.diffuse.valid)
-	    {
-              buf.Format ("light %d diffuse", 
-		lights[i].lightnum);
-	      entry.diffuse.name = strings->Request (buf);
-	      entry.diffuse.valid = true;
-	    }
-
-	    if (!entry.specular.valid)
-	    {
-              buf.Format ("light %d specular", 
-		lights[i].lightnum);
-	      entry.specular.name = strings->Request (buf);
-	      entry.specular.valid = true;
-	    }
-
-	    if (!entry.attenuation.valid)
-	    {
-              buf.Format ("light %d attenuation", 
-		lights[i].lightnum);
-	      entry.attenuation.name = strings->Request (buf);
-	      entry.attenuation.valid = true;
+	      if (!entry.params[i].valid && (defaultParamNames[i] != propNone))
+	      {
+		entry.params[i].name = 
+		  shaderPlug->lsvCache.GetLightSVId (entry.lightnum,
+		  defaultParamNames[i]);
+		entry.params[i].valid = true;
+	      }
 	    }
           }
           break;
