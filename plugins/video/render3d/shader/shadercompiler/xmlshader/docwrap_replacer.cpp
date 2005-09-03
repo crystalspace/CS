@@ -48,12 +48,12 @@ csReplacerDocumentNode::~csReplacerDocumentNode ()
 void csReplacerDocumentNode::Set (iDocumentNode* wrappedNode, 
 				  csReplacerDocumentNode* parent, 
 				  csReplacerDocumentNodeFactory* shared, 
-				  const Substitutions& subst)
+				  Substitutions* subst)
 {
   this->wrappedNode = wrappedNode;
   this->parent = parent;
   this->shared = shared;
-  this->subst = &subst;
+  this->subst = subst;
 
   shared->Substitute (wrappedNode->GetValue(), value, *this->subst);
 }
@@ -90,12 +90,16 @@ csReplacerDocumentNode::GetAttributes ()
 csRef<iDocumentAttribute> csReplacerDocumentNode::GetAttribute (
   const char* name)
 {
-  csRef<iDocumentAttribute> wrappedAttr = 
-    wrappedNode->GetAttribute (name);
+  csRef<iDocumentAttribute> wrappedAttr = attrCache.Get (name, 0);
+  if (wrappedAttr.IsValid()) return wrappedAttr;
+
+  wrappedAttr = wrappedNode->GetAttribute (name);
   if (!wrappedAttr.IsValid()) return 0;
   csReplacerDocumentAttribute* attr = shared->attrPool.Alloc();
   attr->Set (this, wrappedAttr);
-  return csPtr<iDocumentAttribute> (attr);
+  wrappedAttr.AttachNew (attr);
+  attrCache.Put (name, wrappedAttr);
+  return wrappedAttr;
 }
 
 //---------------------------------------------------------------------------
@@ -202,7 +206,9 @@ csRef<iDocumentNode> csReplacerDocumentNodeFactory::CreateWrapper (
   const Substitutions& subst)
 {
   csReplacerDocumentNode* newNode = nodePool.Alloc ();
-  newNode->Set (wrappedNode, parent, this, subst);
+  csRef<Substitutions> newSubst;
+  newSubst.AttachNew (new Substitutions (subst));
+  newNode->Set (wrappedNode, parent, this, newSubst);
   return csPtr<iDocumentNode> (newNode);
 }
 

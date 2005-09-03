@@ -36,7 +36,11 @@
 
 class csReplacerDocumentNodeFactory;
 
-typedef csHash<csString, csString> Substitutions;
+class Substitutions : public csHash<csString, csString>,
+		      public csRefCount
+{
+public:
+};
 
 /**
  * Wrapper around a document node, supporting conditionals.
@@ -51,8 +55,12 @@ class csReplacerDocumentNode : public csDocumentNodeReadOnly
   csWeakRef<csReplacerDocumentNode> parent;
   csString value;
   csReplacerDocumentNodeFactory* shared;
+  /* Need to ensure attributes stay the same over lifetime of node.
+   * The reason is subtle: actually, the values returned by 
+   * GetAttribute() need to fulfill that requirement. */
+  csHash<csRef<iDocumentAttribute>, csString> attrCache;
 
-  const Substitutions* subst;
+  csRef<Substitutions> subst;
 public:
   CS_LEAKGUARD_DECLARE(csReplacerDocumentNode);
   SCF_DECLARE_IBASE_POOLED(csReplacerDocumentNode);
@@ -60,7 +68,7 @@ public:
   csReplacerDocumentNode (Pool* pool);
   virtual ~csReplacerDocumentNode ();
   void Set (iDocumentNode* wrappedNode, csReplacerDocumentNode* parent, 
-    csReplacerDocumentNodeFactory* shared, const Substitutions& subst);
+    csReplacerDocumentNodeFactory* shared, Substitutions* subst);
 
   virtual csDocumentNodeType GetType ()
   { return wrappedNode->GetType(); }

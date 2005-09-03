@@ -40,7 +40,7 @@ bool csConditionConstants::AddConstant (const char* name, int value)
 
   CondOperand op;
   op.type = operandInt;
-  op.floatVal = value;
+  op.intVal = value;
 
   constants.Put (name, op);
   return true;
@@ -52,7 +52,7 @@ bool csConditionConstants::AddConstant (const char* name, bool value)
 
   CondOperand op;
   op.type = operandBoolean;
-  op.floatVal = value;
+  op.boolVal = value;
 
   constants.Put (name, op);
   return true;

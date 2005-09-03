@@ -26,6 +26,13 @@ chronological order.
 	  "rendering shader variable stack". This means that expressions in
 	  SVs can now utilize the variables as at render time.
 	- res enhanced vproc_std with the ability to disable select lights.
+	- res fixed non-float shader conditional constants to actually work.
+	- res changed the shader conditional parser to use isspace() for
+	  whitespace checks instead of just a comparison with ' '.
+	- res changed xmlshader to also add normals to the default mappings.
+	- res changed the replacer document nodes to use refcounting on the
+	  given substitutions and also ensure that the attribute pointers 
+	  don't change over the lifetime of a node.
 2-Sep-2005
 	- Jorrit fixed a bug in CS reported by valgrind:
 	  In the GL state cache a few fields were not initialized in some cases.

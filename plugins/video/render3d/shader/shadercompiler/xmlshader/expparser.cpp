@@ -78,7 +78,7 @@ const char* csExpressionTokenizer::Tokenize (const char* string, size_t len,
     switch (state)
     {
       case tSkipWhitespace:
-	if (*string == ' ')
+	if (isspace (*string))
 	  string++;
 	else
 	  state = tNewToken;
