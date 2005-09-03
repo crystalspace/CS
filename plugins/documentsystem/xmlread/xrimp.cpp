@@ -335,7 +335,9 @@ csRef<iDocumentAttributeIterator> csXmlReadNode::GetAttributes ()
 TrDocumentAttribute* csXmlReadNode::GetAttributeInternal (const char* name)
 {
   if (use_contents_value) return 0;
-  size_t count = node->ToElement ()->GetAttributeCount ();
+  const TrXmlElement* elem = node->ToElement ();
+  if (!elem) return 0;
+  size_t count = elem->GetAttributeCount ();
   size_t i;
   for (i = 0 ; i < count ; i++)
   {

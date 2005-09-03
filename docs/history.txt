@@ -14,6 +14,8 @@ chronological order.
 	- Marten made a few cleanups in csPoly3D.
 	- Marten worked a bit more on the new lighter. It can now produce its
 	  first output.
+	- res fixed xmlread to not crash when an attribute is queried from a
+	  non-element node.
 2-Sep-2005
 	- Jorrit fixed a bug in CS reported by valgrind:
 	  In the GL state cache a few fields were not initialized in some cases.
