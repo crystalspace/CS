@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<shader compiler="xmlshader" name="vproc_lighting">
+<shader compiler="xmlshader" name="lighting_vproc">
 
+    <!-- Compute all lights with vproc_std (ie software per-vertex) -->
     <technique priority="200" lights="2147483647">
       <pass>
 	<?if vars."tex diffuse".texture ?>

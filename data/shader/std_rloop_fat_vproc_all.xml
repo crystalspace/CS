@@ -6,8 +6,8 @@
       <pass>
 	<shadertype>standard</shadertype>
 	<basepass />
-	<defaultshader name="lighting_vproc_fixed" 
-	    file="/shader/lighting/vproc_fixed.xml" />
+	<defaultshader name="lighting_vproc" 
+	    file="/shader/lighting/vproc.xml" />
       </pass>
     </step>
   </steps>

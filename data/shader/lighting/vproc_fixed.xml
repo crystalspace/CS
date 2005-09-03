@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<shader compiler="xmlshader" name="lighting_vproc_fixed">
+
+  <?template IfGLSupportsLight N?>
+    <?! GL fixed pipeline can only do: 
+	- unattenuated directional lights
+	- lights that are not attenuated LINEAR
+     ?>
+    <?if (vars."light $N$ type".int == consts.CS_LIGHT_DIRECTIONAL)
+      && (vars."light $N$ attenuation mode".int == consts.CS_ATTN_NONE) ?>
+  <?endtemplate?>
+
+  <?template IfNotGLSupportsLight N?>
+    <?IfGLSupportsLight $N$?>
+    <?else?>
+  <?endtemplate?>
+  
+  <?template HandleLightFVP LightCount N?>
+    <?if $LightCount$ &gt; $N$ ?>
+      <?IfGLSupportsLight $N$ ?>
+	<light num="$N$">
+	  <?if (vars."light $N$ type".int == consts.CS_LIGHT_DIRECTIONAL)?>
+	    <?! Generate position for directional light ?>
+	    <position type="expression">
+	      <mul>
+		<make-vector>
+		  <!-- small subtlety: GL spec says light coordinates are in
+		    -- object space, yet here they are world space - at the 
+		    -- time lighting parameters will be set, the GL object 
+		    -- space is CS world space actually. This is due the way
+		    -- CS sets up transforms. -->
+		  <elt1><atom type="var">light $N$ direction world</atom></elt1>
+		  <elt2><atom type="var">light $N$ direction world</atom></elt2>
+		  <elt3><atom type="var">light $N$ direction world</atom></elt3>
+		  <atom type="num">0</atom>
+		</make-vector>
+		<!-- Also, GL directional lights shine *from* the direction
+		  -- specified, while CS lights shine *along* -->
+		<atom type="num">-1</atom>
+	      </mul>
+	    </position>
+	    <attenuation type="vector3">1,0,0</attenuation>
+	  <?endif?>
+	</light>
+      <?endif?>
+    <?endif?>
+  <?endtemplate?>
+  
+  <?template HandleLightVProc LightCount N?>
+    <?if $LightCount$ &gt; $N$ ?>
+      <?IfGLSupportsLight $N$ ?>
+	<enablelight num="$N$">no</enablelight>
+      <?endif?>
+    <?endif?>
+  <?endtemplate?>
+
+  <?template GenerateLights N?>
+    <?if vars."light count".int &gt;= $N$ ?>
+      <technique priority="$N$00" lights="$N$">
+	<pass>
+	  <?if vars."tex diffuse".texture ?>
+	    <texture name="tex diffuse" destination="diffuse" />
+	  <?else?>
+	    <!-- need to bind at least some texture -->
+	    <texture name="standardtex white" destination="diffuse" />
+	  <?endif?>
+	  <vp plugin="glfixed">
+	    <fixedvp>
+	      <?if !vars."tex diffuse".texture ?>
+		<constantcolor layer="diffuse" type="shadervar">mat flatcolor</constantcolor>
+	      <?endif?>
+	      <!-- have GL light added on top of SW-computed light -->
+	      <colormaterial>emission</colormaterial>
+	      <!-- scale down colors, since FP will scale them up again -->
+	      <matambient type="vector3">0.5,0.5,0.5</matambient>
+	      <matdiffuse type="vector3">0.5,0.5,0.5</matdiffuse>
+	      <?HandleLightFVP $N$ 0 ?>
+	      <?HandleLightFVP $N$ 1 ?>
+	      <?HandleLightFVP $N$ 2 ?>
+	      <?HandleLightFVP $N$ 3 ?>
+	      <?!HandleLightFVP $N$ 4 ?>
+	      <?!HandleLightFVP $N$ 5 ?>
+	      <?!HandleLightFVP $N$ 6 ?>
+	      <?!HandleLightFVP $N$ 7 ?>
+	    </fixedvp>
+	  </vp>
+	  <vproc plugin="vproc_std">
+	    <vproc_std>
+	      <lightmixmode>add</lightmixmode>
+	      <!--
+	      <?if buffers."color lit"?>
+		<colormixmode>add</colormixmode>
+		<colorbuffer>color lit</colorbuffer>
+	      <?else?>
+		<colormixmode>mul</colormixmode>
+		<colorbuffer>color unlit</colorbuffer>
+	      <?endif?>
+	      -->
+	      <colormixmode>none</colormixmode>
+	      <finalfactor type="float">0.5</finalfactor>
+	      <lights>$N$</lights>
+	      <?HandleLightVProc $N$ 0 ?>
+	      <?HandleLightVProc $N$ 1 ?>
+	      <?HandleLightVProc $N$ 2 ?>
+	      <?HandleLightVProc $N$ 3 ?>
+	      <?!HandleLightVProc $N$ 4 ?>
+	      <?!HandleLightVProc $N$ 5 ?>
+	      <?!HandleLightVProc $N$ 6 ?>
+	      <?!HandleLightVProc $N$ 7 ?>
+	    </vproc_std>
+	  </vproc>
+	  <fp plugin="glfixed">
+	    <fixedfp>
+	      <layer name="diffuse">
+		<?if vars."tex diffuse".texture ?>
+		  <colorsource num="0" source="texture" modifier="color"/>
+		  <alphasource num="0" source="texture" modifier="alpha"/>
+		<?else?>
+		  <colorsource num="0" source="constant color" modifier="color"/>
+		  <alphasource num="0" source="constant color" modifier="alpha"/>
+		<?endif?>
+		<colorsource num="1" source="primary color" modifier="color"/>
+		<coloroperation operation="modulate" scale="2" />
+		<alphasource num="1" source="primary color" modifier="alpha"/>
+		<alphaoperation operation="modulate" />
+	      </layer>
+	    </fixedfp>
+	  </fp>
+	</pass>
+      </technique>
+    <?endif?>
+  <?endtemplate?>
+  
+  <?!GenerateLights 8 ?>
+  <?!GenerateLights 7 ?>
+  <?!GenerateLights 6 ?>
+  <?!GenerateLights 5 ?>
+  <?GenerateLights 4 ?>
+  <?GenerateLights 3 ?>
+  <?GenerateLights 2 ?>
+  <?GenerateLights 1 ?>
+  
+  <fallbackshader name="lighting_vproc" file="/shader/lighting/vproc.xml" />
+</shader>

@@ -42,6 +42,9 @@ chronological order.
 	- res added a number of other FFP light parameters that can be 
 	  controlled through FVP shader programs.
 	- res removed a redundant buffer change from gl3d.
+	- res started to work on a shader to mix GL fixed pipeline lighting 
+	  and SW lighting through vproc_std. Currently supports GL directional
+	  lights.
 2-Sep-2005
 	- Jorrit fixed a bug in CS reported by valgrind:
 	  In the GL state cache a few fields were not initialized in some cases.
