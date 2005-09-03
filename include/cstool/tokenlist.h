@@ -21,7 +21,10 @@
  * Token list helper macros.
  */
 
-#include "csutil/strhash.h"
+/* ATTENTION: Do! Not! #Include! Anything!
+ * Read below on how this header is intended to be used, and you'll see why
+ * including something is a really bad idea.
+ */
 
 /**
  * \addtogroup util
