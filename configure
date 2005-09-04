@@ -44737,9 +44737,7 @@ fi
 
 
     cs_cv_with_CEGUI="$with_CEGUI"
-
-
-if test $cs_cv_libCEGUI = yes; then
+    if test "$cs_cv_libCEGUI" = yes; then
   if test "$cs_cv_libCEGUI" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`

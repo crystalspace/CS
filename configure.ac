@@ -1699,9 +1699,7 @@ AS_IF([test $cs_cv_libwx_opengl = yes],
 #----------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([CEGUI],
     [AC_LANG_PROGRAM([[#include <CEGUI.h>]],
-    [CEGUI::WindowManager::getSingleton();])], [], [C++])
-
-AS_IF([test $cs_cv_libCEGUI = yes],
+    [CEGUI::WindowManager::getSingleton();])], [], [C++],
     [CS_EMIT_BUILD_RESULT([cs_cv_libCEGUI], [CEGUI])])
 
 
