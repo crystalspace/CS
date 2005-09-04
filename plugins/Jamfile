@@ -15,6 +15,7 @@ SubInclude TOP plugins engine ;
 SubInclude TOP plugins engseq ;
 SubInclude TOP plugins filesys ;
 SubInclude TOP plugins font ;
+SubInclude TOP plugins gui ;
 SubInclude TOP plugins mesh ;
 SubInclude TOP plugins movierecorder ;
 SubInclude TOP plugins net ;
