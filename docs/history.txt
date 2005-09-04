@@ -14,6 +14,16 @@ chronological order.
 	- Piotr Obrzut fixed bug in colliders surface paramters setting (reported by Pablo)
 	- Piotr Obrzut fixed bug in trimesh colliders  (reported by Pablo)
 	- iceeey activated the CEGUI plugin and ceguitest targets.
+	- caedes corrected some issues in the odedynam plugin:
+	    - corrected segfault on cleanup: odecolliders ibase was not 
+	      initialized in constructor and destructor.
+	    - added global templates for cs to ode and backrotation matrix 
+	      assignment, please use them instead of ad-hoc assignments.
+	    - moved dGeomTransformSetGeom function to csODECollider::AddTransformToSpace 
+	      as geoms should not both be added to a transform and to a space.
+	    - changed triangle indices order in CreateMeshGeometry (c,b,a to a,b,c).
+	    - added transposition to world box colliders as somehow this 
+	      special case seems to fail. this must be looked into.
 3-Sep-2005
 	- res removed an #include from tokenlist.h which caused compile errors
 	  for some people (since tokenlist.h is intended to be included in
