@@ -182,6 +182,14 @@
   INTERFACE_APPLY(iImage)
   INTERFACE_APPLY(iImageIO)
   INTERFACE_APPLY(iJoint)
+  INTERFACE_APPLY(iODEDynamicState)
+  INTERFACE_APPLY(iODEDynamicSystemState)
+  INTERFACE_APPLY(iODEJointState)
+  INTERFACE_APPLY(iODESliderJoint)
+  INTERFACE_APPLY(iODEUniversalJoint)
+  INTERFACE_APPLY(iODEAMotorJoint)
+  INTERFACE_APPLY(iODEHingeJoint)
+  INTERFACE_APPLY(iODEBallJoint)
   INTERFACE_APPLY(iKeyboardDriver)
   INTERFACE_APPLY(iLight)
   INTERFACE_APPLY(iLightList)
@@ -1059,6 +1067,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "ivaria/view.h"
 %include "ivaria/collider.h"
 %include "ivaria/dynamics.h"
+%include "ivaria/ode.h"
 %include "ivaria/engseq.h"
 
 %rename(IntCall) *::Call(const char*, int&, const char*, ...);
