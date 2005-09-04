@@ -24,6 +24,12 @@ chronological order.
 	    - changed triangle indices order in CreateMeshGeometry (c,b,a to a,b,c).
 	    - added transposition to world box colliders as somehow this 
 	      special case seems to fail. this must be looked into.
+	- caedes added some tokens to physldr plugin:
+	    - <simulationmode> in <system>, options: worldstep,quickstep,stepfast
+	    - <autodisable> in <system>, bool.
+	    - 'cfm' and 'erp' attributes in <system>, float, only for 
+	      csODEDynamicSystems
+	    - 'enabled' attribute in <body>, bool.
 3-Sep-2005
 	- res removed an #include from tokenlist.h which caused compile errors
 	  for some people (since tokenlist.h is intended to be included in
