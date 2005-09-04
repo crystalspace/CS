@@ -2077,6 +2077,7 @@ sub DESTROY {
 *Equal = *cspacec::csRect_Equal;
 *Normalize = *cspacec::csRect_Normalize;
 *Area = *cspacec::csRect_Area;
+*AddAdjacent = *cspacec::csRect_AddAdjacent;
 *AddAdjanced = *cspacec::csRect_AddAdjanced;
 *__eq__ = *cspacec::csRect___eq__;
 *__ne__ = *cspacec::csRect___ne__;
