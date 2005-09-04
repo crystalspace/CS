@@ -25,6 +25,8 @@
 * \addtogroup CEGUI
 * @{ */
 
+#include "CEGUI.h"
+
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"
@@ -38,7 +40,6 @@
 
 #include "ceguievthandler.h"
 #include "ceguiresourceprovider.h"
-#include "CEGUI.h"
 
 struct iObjectRegistry;
 

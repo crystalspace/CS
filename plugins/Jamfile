@@ -33,7 +33,7 @@ if [ Property build : projgen_version ] != 6
   # Assemble big static plugins lib
   if [ Property build : projgen ] = msvc
   {
-    StaticPluginLibrary crystalspace_staticplugins : wxgl ;
+    StaticPluginLibrary crystalspace_staticplugins : wxgl csvosa3dl ;
   }
   else
   {

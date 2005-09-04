@@ -95,13 +95,15 @@ class csHashComputer<long> : public csHashComputerIntegral<long> {};
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<unsigned long> : 
   public csHashComputerIntegral<unsigned long> {}; 
-    
+
+#if (CS_LONG_SIZE < 8)    
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<longlong> : 
   public csHashComputerIntegral<longlong> {}; 
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<ulonglong> : 
   public csHashComputerIntegral<ulonglong> {}; 
+#endif
     
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<float>

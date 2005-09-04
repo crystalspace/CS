@@ -74,3 +74,7 @@ WX.LIBS = wxmsw26.lib opengl32.lib ;
 WX.DEFINES.DEBUG = wxUSE_GUI=1 WXUSINGDLL=1 WXDEBUG=1 ;
 WX.LIBS.DEBUG = wxmsw26d.lib opengl32.lib ;
 STL.AVAILABLE = yes ;
+VOS.AVAILABLE = yes ;
+VOS.LIBS = metaobject_a3dl.lib metaobject_misc.lib ;
+CEGUI.AVAILABLE = yes ;
+CEGUI.LIBS = CEGUIBase.lib ;

@@ -51,6 +51,7 @@ CS_MASTER_HEADER_REJECTS +=
 {
   local CSWIN32LIBS_REJECTS =
     caca.h
+    CEGUI*.h
     d3d.h
     d3dcaps.h
     d3dtypes.h
@@ -63,28 +64,7 @@ CS_MASTER_HEADER_REJECTS +=
     jinclude.h
     jmorecfg.h
     jpeglib.h
-    libmng.h
-    libmng_chunk_descr.h
-    libmng_chunk_io.h
-    libmng_chunk_prc.h
-    libmng_chunks.h
-    libmng_cms.h
-    libmng_conf.h
-    libmng_data.h
-    libmng_display.h
-    libmng_dither.h
-    libmng_error.h
-    libmng_filter.h
-    libmng_jpeg.h
-    libmng_memory.h
-    libmng_object_prc.h
-    libmng_objects.h
-    libmng_pixels.h
-    libmng_read.h
-    libmng_trace.h
-    libmng_types.h
-    libmng_write.h
-    libmng_zlib.h
+    libmng*.h
     mikmod.h
     png.h
     pngconf.h
@@ -94,7 +74,8 @@ CS_MASTER_HEADER_REJECTS +=
   local h ;
   for h in $(CSWIN32LIBS_REJECTS)
   {
-    CS_MASTER_HEADER_REJECTS += [ ConcatDirs csutil win32 $(h) ] ;
+    CS_MASTER_HEADER_REJECTS += 
+      [ Wildcard [ ConcatDirs csutil win32 ] : $(h) ] ;
   }
 }
 

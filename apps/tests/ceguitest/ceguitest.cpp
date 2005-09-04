@@ -163,7 +163,7 @@ bool CEGUITest::Application()
   // Set the logging level
   cegui->GetLogger ().setLoggingLevel(CEGUI::Informative);
 
-  vfs->Mount ("/ceguitest/", "data$/ceguitest$/");
+  vfs->Mount ("/ceguitest/", "$@data$/ceguitest$/");
 
   vfs->ChDir ("/ceguitest/");
 

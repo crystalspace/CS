@@ -33,6 +33,11 @@ chronological order.
 	- iceeey added a recent check for CEGUI to the configure script: You must have
 	  the latest CEGUI CVS to use the plugin.
 	- caedes added ode.h reference and csODE* interfaces to cspace.i.
+	- res enabled VC7 project generation for CEGUI (since it will be in
+	  next cs-win32libs).
+	- res enabled VC project generation for the VOS projects as a 
+	  convenience - they are not added to any workspace, though.
+	- res fixed a csHash<> compile problem on 64bit systems.
 3-Sep-2005
 	- res removed an #include from tokenlist.h which caused compile errors
 	  for some people (since tokenlist.h is intended to be included in

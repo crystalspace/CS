@@ -22,11 +22,23 @@
 # Everything.
 # MsvcGenWorkspace all : : "grp.+_(?!all$)" ;
 
+# List of filters for "convenience projects" - that is, VC projects which are
+# generated but don't appear in any workspaces (since e.g. required libraries 
+# are relatively uncommon and/or not shipped with cs-win32libs).
+MSVC_CONVENIENCE_PROJECTS = vos ;
+if [ Property build : projgen_version ] = 6
+{
+  MSVC_CONVENIENCE_PROJECTS += cegui ;
+}
+
 # What the typical user will need. Presently, everything but wxWidgets.
-MsvcGenWorkspace typical : : "grp.+_(?!typical$)" wx static ;
+MsvcGenWorkspace typical : : 
+  "grp.+_(?!typical$)" wx static $(MSVC_CONVENIENCE_PROJECTS) ;
 
 # Similar to "typical", but with wxWidgets.
-MsvcGenWorkspace wxtypical : : "grp.+_(?!wxtypical$)" static ;
+MsvcGenWorkspace wxtypical : : 
+  "grp.+_(?!wxtypical$)" static $(MSVC_CONVENIENCE_PROJECTS) ;
 
 # Workspace for static variants of plugins and apps.
-MsvcGenWorkspace static : static ^lib.* : "grp.+_(?!static$)" wx ;
+MsvcGenWorkspace static : static ^lib.* : 
+  "grp.+_(?!static$)" wx $(MSVC_CONVENIENCE_PROJECTS) ;
