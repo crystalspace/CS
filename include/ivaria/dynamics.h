@@ -616,6 +616,29 @@ enum csColliderGeometryType
   SPHERE_COLLIDER_GEOMETRY
 };
 
+
+SCF_VERSION (iDynamicsColliderCollisionCallback, 0, 0, 1);
+
+/**
+ * This is the interface for attaching a collider callback to the body
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>application specific
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iDynamicSystem
+ *   </ul>
+ */
+struct iDynamicsColliderCollisionCallback : public iBase
+{
+  virtual void Execute (iDynamicsSystemCollider *thiscollider, 
+    iDynamicsSystemCollider *othercollider) = 0;
+  virtual void Execute (iDynamicsSystemCollider *thiscollider, 
+    iRigidBody *otherbody) = 0;
+};
+
 SCF_VERSION (iDynamicsSystemCollider, 0, 0, 1);
 
 struct iGeneralFactoryState;
@@ -666,7 +689,7 @@ struct iDynamicsSystemCollider : public iBase
 
   //FIXME: This should be implememented, but it is not so obvious - it
   //should be valid also for static colliders.
-  //virtual void SetCollisionCallback (iDynamicsCollisionCallback* cb) = 0;
+  virtual void SetCollisionCallback (iDynamicsColliderCollisionCallback* cb) = 0;
 
   /// Set friction of collider surface
   virtual void SetFriction (float friction) = 0;

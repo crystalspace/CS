@@ -573,7 +573,6 @@ public:
   void RemoveBody (iRigidBody *body);
   bool BodyInGroup (iRigidBody *body);
 };
-
 class csODECollider : public iDynamicsSystemCollider
 {
   csColliderGeometryType geom_type;
@@ -581,7 +580,7 @@ class csODECollider : public iDynamicsSystemCollider
   dGeomID transformID;
   dSpaceID spaceID; 
   float density;
-  csRef<iDynamicsCollisionCallback> coll_cb;
+  csRef<iDynamicsColliderCollisionCallback> coll_cb;
   float surfacedata[3];
 
 public:
@@ -597,10 +596,12 @@ public:
   bool CreateBoxGeometry (const csVector3& box_size);
   bool CreateCCylinderGeometry (float length, float radius);
 
-  void SetCollisionCallback (iDynamicsCollisionCallback* cb) {coll_cb = cb;};
+  void SetCollisionCallback (iDynamicsColliderCollisionCallback* cb);
+  void Collision (csODECollider* other);
+  void Collision (iRigidBody* other);
   void SetFriction (float friction) {surfacedata[0] = friction;};
-  void SetSoftness (float softness) {surfacedata[1] = softness;};
-  void SetElasticity (float elasticity) {surfacedata[2] = elasticity;};
+  void SetSoftness (float softness) {surfacedata[2] = softness;};
+  void SetElasticity (float elasticity) {surfacedata[1] = elasticity;};
   void SetDensity (float density) {csODECollider::density = density;}
   
   float GetFriction () {return surfacedata[0];};
@@ -627,6 +628,13 @@ private:
   void ClearContents ();
   void KillGeoms ();
 
+};
+struct GeomData 
+{
+  float *surfacedata;
+  csODECollider *collider;
+  ~GeomData () 
+  {if (surfacedata) delete [] surfacedata; if (collider) collider->DecRef ();}
 };
 
 /**

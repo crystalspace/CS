@@ -273,6 +273,19 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
     b2 = (csODERigidBody *)dBodyGetData (dGeomGetBody(o2));
   }
 
+  if (!b1 && !b2)
+  {
+    dContact contact[1];
+    int a = dCollide (o1, o2, 1, &(contact[0].geom), sizeof (dContact));
+    if (a > 0)
+    {
+      csODECollider* c1 = ((GeomData *)dGeomGetData (o1))->collider;
+      csODECollider* c2 = ((GeomData *)dGeomGetData (o2))->collider;
+      c1->Collision (c2);
+      c2->Collision (c1);
+    }
+  }
+    
   if ((!b1 || b1->IsStatic()) && (!b2 || b2->IsStatic())) return;
   if (b1 && b2 && b1->GetGroup() != 0 && b1->GetGroup() == b2->GetGroup())
     return;
@@ -285,20 +298,24 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
     if (b1)
     {
       b1->Collision ((b2) ? &b2->scfiRigidBody : 0);
+      if (!b2)
+        ((GeomData *)dGeomGetData (o2))->collider->Collision (&b1->scfiRigidBody);
     }
     if (b2)
     {
       b2->Collision ((b1) ? &b1->scfiRigidBody : 0);
+      if (!b1)
+        ((GeomData *)dGeomGetData (o1))->collider->Collision (&b2->scfiRigidBody);
     }
 
     for( int i=0; i<a; i++ )
     {
-      float *f1 = (float *)dGeomGetData (contact[i].geom.g1);
-      float *f2 = (float *)dGeomGetData (contact[i].geom.g2);
+      float *f1 = ((GeomData *)dGeomGetData (contact[i].geom.g1))->surfacedata;
+      float *f2 = ((GeomData *)dGeomGetData (contact[i].geom.g2))->surfacedata;
 
       contact[i].surface.mode = dContactBounce | dContactSoftCFM
         | dContactSlip1 | dContactSlip2 | dContactApprox1;
-      contact[i].surface.mu = f1[0]*f2[0];
+      contact[i].surface.mu = f1[0]*f1[0];
       contact[i].surface.bounce = f1[1]*f2[1];
       contact[i].surface.bounce_vel = 0.1f;
       contact[i].surface.slip1 = SMALL_EPSILON;
@@ -882,6 +899,12 @@ csODECollider::csODECollider ()
   dGeomTransformSetCleanup (transformID, 1);
   geom_type = (csColliderGeometryType) 0;
 }
+void csODECollider::SetCollisionCallback (iDynamicsColliderCollisionCallback* cb)
+{
+  if (cb) cb->IncRef ();
+  if (coll_cb) coll_cb->DecRef();
+  coll_cb = cb;
+}
 void csODECollider::KillGeoms ()
 {
   if (transformID)
@@ -898,8 +921,16 @@ void csODECollider::KillGeoms ()
 csODECollider::~csODECollider ()
 {
   KillGeoms ();
+  if (coll_cb) coll_cb->DecRef ();
 }
-
+void csODECollider::Collision (csODECollider* other)
+{
+  if (coll_cb) coll_cb->Execute (this, other);
+}
+void csODECollider::Collision (iRigidBody* other)
+{
+  if (coll_cb) coll_cb->Execute (this, other);
+}
 void csODECollider::ClearContents ()
 {
   KillGeoms ();
@@ -1022,6 +1053,15 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
     p->GetVertexCount(), indeces, 3*tr_num, 3*sizeof(int));
 
   geomID = dCreateTriMesh(0, TriData, 0, 0, 0);
+  dGeomTransformSetGeom (transformID, geomID);
+
+  if (dGeomGetBody (transformID))
+    MassCorrection ();
+
+  GeomData *gd = new GeomData ();
+  gd->surfacedata = surfacedata;
+  gd->collider = this;
+  dGeomSetData (geomID, (void*)gd);
 
   if (spaceID) AddToSpace (spaceID);
 
@@ -1039,8 +1079,11 @@ bool csODECollider::CreateCCylinderGeometry (float length, float radius)
   if (dGeomGetBody (transformID))
     MassCorrection ();
   
-  dGeomSetData (geomID, (void*)surfacedata);
-
+  GeomData *gd = new GeomData ();
+  gd->surfacedata = surfacedata;
+  gd->collider = this;
+  dGeomSetData (geomID, (void*)gd);
+  
   if (spaceID) AddToSpace (spaceID);
 
   return true;
@@ -1053,7 +1096,10 @@ bool csODECollider::CreatePlaneGeometry (const csPlane3& plane)
   
   geomID = dCreatePlane (0, -plane.A(), -plane.B(), -plane.C(), plane.D());
 
-  dGeomSetData (geomID, (void*)surfacedata);
+  GeomData *gd = new GeomData ();
+  gd->surfacedata = surfacedata;
+  gd->collider = this;
+  dGeomSetData (geomID, (void*)gd);
 
   if (spaceID) AddToSpace (spaceID);
 
@@ -1074,7 +1120,10 @@ bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
   if (dGeomGetBody (transformID))
     MassCorrection ();
 
-  dGeomSetData (geomID, (void*)surfacedata);
+  GeomData *gd = new GeomData ();
+  gd->surfacedata = surfacedata;
+  gd->collider = this;
+  dGeomSetData (geomID, (void*)gd);
 
   if (spaceID) AddToSpace (spaceID);
 
@@ -1093,7 +1142,10 @@ bool csODECollider::CreateBoxGeometry (const csVector3& size)
   if (dGeomGetBody (transformID))
     MassCorrection ();
 
-  dGeomSetData (geomID, (void*)surfacedata);
+  GeomData *gd = new GeomData ();
+  gd->surfacedata = surfacedata;
+  gd->collider = this;
+  dGeomSetData (geomID, (void*)gd);
 
   if (spaceID) AddToSpace (spaceID);
 
@@ -1160,9 +1212,12 @@ void csODECollider::AddTransformToSpace (dSpaceID spaceID)
 }
 void csODECollider::AddToSpace (dSpaceID spaceID) 
 {
-  dSpaceID prev = dGeomGetSpace (geomID);
-  if (prev)dSpaceRemove (prev, geomID);
-  if (geomID) dSpaceAdd (spaceID, geomID); 
+  if (geomID)
+  {
+    dSpaceID prev = dGeomGetSpace (geomID);
+    if (prev)dSpaceRemove (prev, geomID);
+    dSpaceAdd (spaceID, geomID); 
+  }
   csODECollider::spaceID = spaceID;
 }
 void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmesh_fact)
@@ -1209,7 +1264,7 @@ void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmes
         vertices[i*3] = csVector3 (v0[0], v0[1], v0[2]);
         vertices[i*3+1] = csVector3 (v1[0], v1[1], v1[2]);
         vertices[i*3+2] = csVector3 (v2[0], v2[1], v2[2]);
-        triangles[i].a = i*3; triangles[i].b = i*3+1; triangles[i].c = i*3+2; 
+        triangles[i].c = i*3; triangles[i].b = i*3+1; triangles[i].a = i*3+2; 
       }
       genmesh_fact->CalculateNormals ();
     }
@@ -1259,8 +1314,8 @@ void DestroyGeoms( csGeomList & geoms )
     if (dGeomGetClass (geoms[i]) == dGeomTransformClass)
       tempID = dGeomTransformGetGeom (geoms[i]);
 
-    float *properties = (float *)dGeomGetData (tempID);
-    delete [] properties;
+    GeomData *gd = (GeomData *)dGeomGetData (tempID);
+    delete  gd;
 
     if( dGeomGetClass (tempID) == csODEDynamics::GetGeomClassNum() )
     {
@@ -1336,6 +1391,7 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   odec->SetTransform (trans);
   odec->AttachBody (bodyID);
   odec->AddTransformToSpace (groupID);
+  odec->IncRef ();
   colliders.Push (odec);
 
   return true;
@@ -1354,6 +1410,7 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
   odec->SetTransform (trans);
   odec->AttachBody (bodyID);
   odec->AddTransformToSpace (groupID);
+  odec->IncRef ();
   colliders.Push (odec);
 
   return true;
@@ -1371,6 +1428,7 @@ bool csODERigidBody::AttachColliderBox (const csVector3 &size,
   odec->AttachBody (bodyID);
   odec->SetTransform (trans);
   odec->AddTransformToSpace (groupID);
+  odec->IncRef ();
   colliders.Push (odec);
 
   return true;
@@ -1385,8 +1443,9 @@ bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset
   odec->SetSoftness (softness);
   odec->SetDensity (density);
   odec->CreateSphereGeometry (csSphere (offset, radius));
-  odec->AddTransformToSpace (groupID);
   odec->AttachBody (bodyID);
+  odec->AddTransformToSpace (groupID);
+  odec->IncRef ();
   colliders.Push (odec);
 
   return true;
@@ -1404,6 +1463,7 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
   colliders.Push (odec);
   //causes non placeable geom run-time error w/debug build of ode.
   //odec->AttachBody (bodyID);   
+  odec->IncRef ();
   odec->AddToSpace (dynsys->GetSpaceID());
 
   return true;
