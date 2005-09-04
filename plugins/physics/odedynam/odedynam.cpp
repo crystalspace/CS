@@ -43,6 +43,21 @@
 
 #include "odedynam.h"
 
+// Some macros for passing matrix from cs to ode and back
+#define CS2ODEMATRIX(csmat, odemat)  \
+{  \
+  odemat[0] = csmat.m11; odemat[4] = csmat.m12; odemat[8] = csmat.m13; odemat[3] = 0; \
+  odemat[1] = csmat.m21; odemat[5] = csmat.m22; odemat[9] = csmat.m23; odemat[7] = 0; \
+  odemat[2] = csmat.m31; odemat[6] = csmat.m32; odemat[10] = csmat.m33; odemat[11] = 0; \
+}
+
+#define ODE2CSMATRIX(odemat, csmat) \
+{   \
+  csmat.m11 = odemat[0]; csmat.m12 = odemat[4]; csmat.m13 = odemat[8]; \
+  csmat.m21 = odemat[1]; csmat.m22 = odemat[5]; csmat.m23 = odemat[9]; \
+  csmat.m31 = odemat[2]; csmat.m32 = odemat[6]; csmat.m33 = odemat[10]; \
+}
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csODEDynamics)
@@ -335,9 +350,7 @@ csReversibleTransform GetGeomTransform (dGeomID id)
   const dReal* mat = dGeomGetRotation (id);
   /* Need to use the inverse in this case */
   csMatrix3 rot;
-  rot.m11 = mat[0]; rot.m12 = mat[4];   rot.m13 = mat[8];
-  rot.m21 = mat[1]; rot.m22 = mat[5];   rot.m23 = mat[9];
-  rot.m31 = mat[2]; rot.m32 = mat[6];   rot.m33 = mat[10];
+  ODE2CSMATRIX(mat,rot);
   return csReversibleTransform (rot, csVector3 (pos[0], pos[1], pos[2]));
 }
 
@@ -764,7 +777,8 @@ bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
   odec->CreateBoxGeometry (size);
-  odec->SetTransform (trans);
+  odec->SetTransform (csOrthoTransform(trans.GetO2T().GetTranspose(),trans.GetOrigin()));
+  //odec->SetTransform (trans);
   odec->AddToSpace (spaceID);
   colliders.Push (odec);
 
@@ -888,6 +902,7 @@ bool csODEBodyGroup::BodyInGroup (iRigidBody *body)
 //--------------------------csODECollider-------------------------------------
 csODECollider::csODECollider ()
 {
+  SCF_CONSTRUCT_IBASE (0);
   surfacedata[0] = 0;
   surfacedata[1] = 0;
   surfacedata[2] = 0;
@@ -922,6 +937,7 @@ csODECollider::~csODECollider ()
 {
   KillGeoms ();
   if (coll_cb) coll_cb->DecRef ();
+  SCF_DESTRUCT_IBASE();
 }
 void csODECollider::Collision (csODECollider* other)
 {
@@ -1042,9 +1058,9 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
   }
   for (i=0, j=0; i < tr_num; i++)
   {
-    indeces[j++] = c_triangle[i].c;
-    indeces[j++] = c_triangle[i].b;
     indeces[j++] = c_triangle[i].a;
+    indeces[j++] = c_triangle[i].b;
+    indeces[j++] = c_triangle[i].c;
     //csFPrintf(stderr, "triangle %d -> a=%d, b=%d, c=%d\n", i,c_triangle[i].a, c_triangle[i].b, c_triangle[i].c);
   }
   dTriMeshDataID TriData = dGeomTriMeshDataCreate();
@@ -1053,7 +1069,6 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
     p->GetVertexCount(), indeces, 3*tr_num, 3*sizeof(int));
 
   geomID = dCreateTriMesh(0, TriData, 0, 0, 0);
-  dGeomTransformSetGeom (transformID, geomID);
 
   if (dGeomGetBody (transformID))
     MassCorrection ();
@@ -1074,7 +1089,6 @@ bool csODECollider::CreateCCylinderGeometry (float length, float radius)
   geom_type = CYLINDER_COLLIDER_GEOMETRY;
 
   geomID = dCreateCCylinder (0, radius, length);
-  dGeomTransformSetGeom (transformID, geomID);
 
   if (dGeomGetBody (transformID))
     MassCorrection ();
@@ -1112,7 +1126,6 @@ bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
   geom_type = SPHERE_COLLIDER_GEOMETRY;
 
   geomID = dCreateSphere (0, sphere.GetRadius ());
-  dGeomTransformSetGeom (transformID, geomID);
   
   csVector3 offset = sphere.GetCenter ();
   dGeomSetPosition (transformID, offset.x, offset.y, offset.z);
@@ -1137,8 +1150,6 @@ bool csODECollider::CreateBoxGeometry (const csVector3& size)
 
   geomID = dCreateBox (0, size.x, size.y, size.z);
 
-  dGeomTransformSetGeom (transformID, geomID);
-
   if (dGeomGetBody (transformID))
     MassCorrection ();
 
@@ -1153,16 +1164,12 @@ bool csODECollider::CreateBoxGeometry (const csVector3& size)
 }
 
 void csODECollider::CS2ODEMatrix (const csMatrix3& csmat, dMatrix3& odemat)
-{  
-  odemat[0] = csmat.m11; odemat[1] = csmat.m21; odemat[2] = csmat.m31; odemat[3] = 0;
-  odemat[4] = csmat.m12; odemat[5] = csmat.m22; odemat[6] = csmat.m32; odemat[7] = 0;
-  odemat[8] = csmat.m13; odemat[9] = csmat.m23; odemat[10] = csmat.m33; odemat[11] = 0;
+{ 
+  CS2ODEMATRIX(csmat,odemat);
 }
 void csODECollider::ODE2CSMatrix (const dReal* odemat, csMatrix3& csmat)
 {  
-  csmat.m11 = odemat[0]; csmat.m12 = odemat[4]; csmat.m13 = odemat[8];
-  csmat.m21 = odemat[1]; csmat.m22 = odemat[5]; csmat.m23 = odemat[9];
-  csmat.m31 = odemat[2]; csmat.m32 = odemat[6]; csmat.m33 = odemat[10];
+  ODE2CSMATRIX(odemat,csmat);
 }
 void csODECollider::SetTransform (const csOrthoTransform& transform)
 {
@@ -1206,6 +1213,8 @@ csOrthoTransform csODECollider::GetTransform ()
 }
 void csODECollider::AddTransformToSpace (dSpaceID spaceID)
 {
+  if (geomID && !dGeomTransformGetGeom(transformID))
+  	dGeomTransformSetGeom (transformID, geomID);
   dSpaceID prev = dGeomGetSpace (transformID);
   if (prev)dSpaceRemove (prev, transformID);
   if (geomID) dSpaceAdd (spaceID, transformID); 
@@ -1489,9 +1498,7 @@ const csVector3 csODERigidBody::GetPosition () const
 void csODERigidBody::SetOrientation (const csMatrix3& rot)
 {
   dMatrix3 mat;
-  mat[0] = rot.m11; mat[1] = rot.m21; mat[2] = rot.m31; mat[3] = 0;
-  mat[4] = rot.m12; mat[5] = rot.m22; mat[6] = rot.m32; mat[7] = 0;
-  mat[8] = rot.m13; mat[9] = rot.m23; mat[10] = rot.m33; mat[11] = 0;
+  CS2ODEMATRIX(rot,mat);
   dBodySetRotation (bodyID, mat);
 }
 
@@ -1499,9 +1506,7 @@ const csMatrix3 csODERigidBody::GetOrientation () const
 {
   const dReal* mat = dBodyGetRotation (bodyID);
   csMatrix3 rot;
-  rot.m11 = mat[0]; rot.m12 = mat[4]; rot.m13 = mat[8];
-  rot.m21 = mat[1]; rot.m22 = mat[5]; rot.m23 = mat[9];
-  rot.m31 = mat[2]; rot.m32 = mat[6]; rot.m33 = mat[10];
+  ODE2CSMATRIX(mat,rot);
   return rot;
 }
 
@@ -1509,11 +1514,9 @@ void csODERigidBody::SetTransform (const csOrthoTransform& trans)
 {
   csVector3 pos = trans.GetOrigin ();
   dBodySetPosition (bodyID, pos.x, pos.y, pos.z);
-  csMatrix3 rot = trans.GetT2O ();
+  csMatrix3 rot = trans.GetO2T ();
   dMatrix3 mat;
-  mat[0] = rot.m11; mat[1] = rot.m12; mat[2] = rot.m13; mat[3]  = 0;
-  mat[4] = rot.m21; mat[5] = rot.m22; mat[6] = rot.m23; mat[7]  = 0;
-  mat[8] = rot.m31; mat[9] = rot.m32; mat[10] = rot.m33; mat[11] = 0;
+  CS2ODEMATRIX(rot,mat);
   dBodySetRotation (bodyID, mat);
 }
 
@@ -1522,9 +1525,7 @@ const csOrthoTransform csODERigidBody::GetTransform () const
   const dReal* pos = dBodyGetPosition (bodyID);
   const dReal* mat = dBodyGetRotation (bodyID);
   csMatrix3 rot;
-  rot.m11 = mat[0]; rot.m12 = mat[4]; rot.m13 = mat[8];
-  rot.m21 = mat[1]; rot.m22 = mat[5]; rot.m23 = mat[9];
-  rot.m31 = mat[2]; rot.m32 = mat[6]; rot.m33 = mat[10];
+  ODE2CSMATRIX(mat,rot);
   return csOrthoTransform (rot, csVector3 (pos[0], pos[1], pos[2]));
 }
 
