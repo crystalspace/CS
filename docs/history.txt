@@ -32,6 +32,7 @@ chronological order.
 	    - 'enabled' attribute in <body>, bool.
 	- iceeey added a recent check for CEGUI to the configure script: You must have
 	  the latest CEGUI CVS to use the plugin.
+	- caedes added ode.h reference and csODE* interfaces to cspace.i.
 3-Sep-2005
 	- res removed an #include from tokenlist.h which caused compile errors
 	  for some people (since tokenlist.h is intended to be included in
