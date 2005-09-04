@@ -31,7 +31,7 @@
 #include "iutil/objreg.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/reporter.h"
-
+#include "ivaria/ode.h"
 #include "physldr.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -69,7 +69,12 @@ enum
   XMLTOKEN_CONSTRAINED,
   XMLTOKEN_FREE,
   XMLTOKEN_MIN,
-  XMLTOKEN_MAX
+  XMLTOKEN_MAX,
+  XMLTOKEN_SIMULATIONMODE,
+  XMLTOKEN_AUTODISABLE,
+  XMLTOKEN_WORLDSTEP,
+  XMLTOKEN_STEPFAST,
+  XMLTOKEN_QUICKSTEP
 };
 
 SCF_IMPLEMENT_IBASE (csPhysicsLoader)
@@ -132,6 +137,12 @@ bool csPhysicsLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("angle", XMLTOKEN_ANGLE);
   xmltokens.Register ("min", XMLTOKEN_MIN);
   xmltokens.Register ("max", XMLTOKEN_MAX);
+  // csODE* related tokens
+  xmltokens.Register ("simulationmode", XMLTOKEN_SIMULATIONMODE);
+  xmltokens.Register ("autodisable", XMLTOKEN_AUTODISABLE);
+  xmltokens.Register ("worldstep", XMLTOKEN_WORLDSTEP);
+  xmltokens.Register ("stepfast", XMLTOKEN_STEPFAST);
+  xmltokens.Register ("quickstep", XMLTOKEN_QUICKSTEP);
   return true;
 }
 
@@ -168,8 +179,26 @@ csPtr<iBase> csPhysicsLoader::Parse (iDocumentNode* node,
 
 bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
 {
+  // Get name for system
   const char *name = node->GetAttributeValue ("name");
   system->QueryObject()->SetName (name);
+  // Look for ODE specific properties
+  csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
+			system, iODEDynamicSystemState);
+  if (osys)
+  {
+    if (node->GetAttribute("cfm"))
+    {
+	  float cfm = node->GetAttributeValueAsFloat ("cfm");
+	  osys->SetCFM(cfm);
+    }
+    if (node->GetAttribute("erp"))
+    {
+	  float erp = node->GetAttributeValueAsFloat ("erp");
+	  osys->SetERP(erp);
+    }
+  }
+  // Get all tokens
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -199,7 +228,7 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
         break;
       }
       case XMLTOKEN_GROUP:
-	  {
+      {
         csRef<iBodyGroup> group = system->CreateGroup ();
         csRef<iDocumentNodeIterator> git = child->GetNodes ();
         while (git->HasNext ())
@@ -221,34 +250,88 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
         break;
       }
       case XMLTOKEN_COLLIDERMESH:
-	    if (!ParseSystemColliderMesh (child, system)) return false;
-		break;
+      {
+	if (!ParseSystemColliderMesh (child, system)) return false;
+	break;
+      }
       case XMLTOKEN_COLLIDERSPHERE:
-	    if (!ParseSystemColliderSphere (child, system)) return false;
-		break;
+      {
+	if (!ParseSystemColliderSphere (child, system)) return false;
+	break;
+      }
       case XMLTOKEN_COLLIDERPLANE:
+      {
         if (!ParseSystemColliderPlane (child, system)) return false;
-    break;
+    	break;
+      }
       case XMLTOKEN_COLLIDERCYLINDER:
-	    if (!ParseSystemColliderCylinder (child, system)) return false;
-		break;
+      {
+	if (!ParseSystemColliderCylinder (child, system)) return false;
+	break;
+      }
       case XMLTOKEN_COLLIDERBOX:
-	    if (!ParseSystemColliderBox (child, system)) return false;
-		break;
+      {
+	if (!ParseSystemColliderBox (child, system)) return false;
+	break;
+      }
       case XMLTOKEN_BODY:
       {
         csRef<iRigidBody> body = system->CreateBody ();
-        if (!ParseBody (child, body)) {
-		  return false;
-		}
+        if (!ParseBody (child, body)) return false;
         break;
       }
       case XMLTOKEN_JOINT:
       {
         csRef<iJoint> joint = system->CreateJoint ();
-        if (!ParseJoint (child, joint, system)) {
-		  return false;
+        if (!ParseJoint (child, joint, system)) return false;
+        break;
+      }
+      case XMLTOKEN_AUTODISABLE:
+      {
+	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
+			system, iODEDynamicSystemState);
+	if (osys)
+	{
+		bool autodisable;
+		if (!synldr->ParseBool (child, autodisable, false))
+		{
+			synldr->ReportError ("crystalspace.dynamics.loader",
+				child, "Error processing autodisable token");
+			return false;
 		}
+		osys->EnableAutoDisable(autodisable);
+	}
+	break;
+
+      }
+      case XMLTOKEN_SIMULATIONMODE:
+      {
+    	const char* sm = child->GetContentsValue ();
+	csStringID sm_id = xmltokens.Request (sm);
+
+	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
+			system, iODEDynamicSystemState);
+	if (osys)
+	{
+	  switch (sm_id)
+	  {
+	    case XMLTOKEN_WORLDSTEP:
+		  osys->EnableQuickStep(false);
+		  osys->EnableStepFast(false);
+		  break;
+	    case XMLTOKEN_STEPFAST:
+		  osys->EnableStepFast(true);
+		  break;
+	    case XMLTOKEN_QUICKSTEP:
+		  osys->EnableQuickStep(true);
+		  break;
+	    default:
+          	synldr->ReportBadToken (child);
+        	return false;
+	  }
+	}
+	// if there is no iODEDynamicSystemState simply
+	// ignore the property so maps can still be loaded.
         break;
       }
       default:
@@ -264,6 +347,11 @@ bool csPhysicsLoader::ParseBody (iDocumentNode* node, iRigidBody* body)
   const char *name = node->GetAttributeValue ("name");
   body->QueryObject()->SetName (name);
   float mass = node->GetAttributeValueAsFloat ("mass");
+  bool enabled=true;
+  if (node->GetAttribute ("enabled"))
+	  enabled=node->GetAttributeValueAsBool("enabled");
+  if (!enabled)
+  	body->Disable();
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
