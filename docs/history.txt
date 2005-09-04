@@ -63,6 +63,7 @@ chronological order.
 	- iceeey added the missing iCEGUI include file and fixed some Jamfiles.
 	- iceeey moved the ceguitest data files into CS/data.
 	- iceeey added ceguitest and cegui to Jamfiles, but left them commented.
+	- iceeey fixed a bug in ceguitest where it would crash when resized.
 2-Sep-2005
 	- Jorrit fixed a bug in CS reported by valgrind:
 	  In the GL state cache a few fields were not initialized in some cases.

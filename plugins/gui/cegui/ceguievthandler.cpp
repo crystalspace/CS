@@ -48,7 +48,7 @@ bool csCEGUIEventHandler::OnUnhandledEvent (iEvent &event)
 {
   if (csCommandEventHelper::GetCode (&event) == cscmdContextResize)
   {
-    iGraphics2D* g2d = (iGraphics2D*) csCommandEventHelper::GetInfo (&event);
+    csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (obj_reg, iGraphics2D);
     renderer->setDisplaySize (CEGUI::Size (g2d->GetWidth (), g2d->GetHeight ()));
     return true;
   }
