@@ -20,23 +20,11 @@
 #define __CS_IVARIA_CEGUI_H__
 
 #include "csutil/scf.h"
+#include "CEGUI.h"
 
 SCF_VERSION (iCEGUI, 0, 0, 1);
 
 struct iObjectRegistry;
-
-namespace CEGUI
-{
-  class System;
-  class FontManager;
-  class GlobalEventSet;
-  class ImagesetManager;
-  class Logger;
-  class MouseCursor;
-  class SchemeManager;
-  class WindowFactoryManager;
-  class WindowManager;
-}
 
 /**
  * Interface for the CS CEGUI wrapper.
