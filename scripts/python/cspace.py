@@ -1799,6 +1799,7 @@ class csRect(_object):
     def Equal(*args): return _cspace.csRect_Equal(*args)
     def Normalize(*args): return _cspace.csRect_Normalize(*args)
     def Area(*args): return _cspace.csRect_Area(*args)
+    def AddAdjacent(*args): return _cspace.csRect_AddAdjacent(*args)
     def AddAdjanced(*args): return _cspace.csRect_AddAdjanced(*args)
     def __eq__(*args): return _cspace.csRect___eq__(*args)
     def __ne__(*args): return _cspace.csRect___ne__(*args)
