@@ -8,6 +8,10 @@ chronological order.
 
 4-Sep-2005
 	- Marten fixed master header problem after cegui addition.
+	- Eric Sunshine reverted the master header change and instead fixed
+	  ivaria/cegui.h so that it doesn't #include <CEGUI.h>, since that
+	  header may not be available in all installations. This fixes breakage
+	  of <crystalspace.h> and <ivaria.h>.
 3-Sep-2005
 	- res removed an #include from tokenlist.h which caused compile errors
 	  for some people (since tokenlist.h is intended to be included in

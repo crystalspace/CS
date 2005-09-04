@@ -23,6 +23,7 @@
  */
 #include "cssysdef.h"
 #include "ivaria/bugplug.h"
+#include "ivaria/cegui.h"
 #include "ivaria/collider.h"
 #include "ivaria/conin.h"
 #include "ivaria/conout.h"
