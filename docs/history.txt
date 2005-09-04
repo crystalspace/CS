@@ -13,6 +13,7 @@ chronological order.
 	- Piotr Obrzut added dynamics system collision callback
 	- Piotr Obrzut fixed bug in colliders surface paramters setting (reported by Pablo)
 	- Piotr Obrzut fixed bug in trimesh colliders  (reported by Pablo)
+	- iceeey activated the CEGUI plugin and ceguitest targets.
 3-Sep-2005
 	- res removed an #include from tokenlist.h which caused compile errors
 	  for some people (since tokenlist.h is intended to be included in
