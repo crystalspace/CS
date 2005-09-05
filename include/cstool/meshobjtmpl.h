@@ -72,7 +72,7 @@ protected:
   csRef<iMeshObjectDrawCallback> VisCallback;
 
   /// logical parent (usually the wrapper object from the engine)
-  iBase *LogParent;
+  iMeshWrapper *LogParent;
 
   /// pointer to the engine if available (@@@ temporary)
   iEngine *Engine;
@@ -174,13 +174,13 @@ public:
    * See imesh/object.h for specification. This function is handled
    * completely in csMeshObject.
    */
-  virtual void SetLogicalParent (iBase* logparent);
+  virtual void SetMeshWrapper (iMeshWrapper* logparent);
 
   /**
    * See imesh/object.h for specification. This function is handled
    * completely in csMeshObject.
    */
-  virtual iBase* GetLogicalParent () const;
+  virtual iMeshWrapper* GetMeshWrapper () const;
 
   /**
    * See imesh/object.h for specification.
@@ -269,7 +269,7 @@ class CS_CRYSTALSPACE_EXPORT csMeshFactory : public iMeshObjectFactory
 {
 protected:
   /// Logical parent (usually the wrapper object from the engine)
-  iBase *LogParent;
+  iMeshFactoryWrapper *LogParent;
 
   /// Pointer to the MeshObjectType
   iMeshObjectType* mesh_type;
@@ -323,13 +323,13 @@ public:
    * See imesh/object.h for specification. This function is handled
    * completely in csMeshObject.
    */
-  virtual void SetLogicalParent (iBase* logparent);
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* logparent);
 
   /**
    * See imesh/object.h for specification. This function is handled
    * completely in csMeshObject.
    */
-  virtual iBase* GetLogicalParent () const;
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const;
 
   /**
    * Get the ObjectType for this mesh factory.

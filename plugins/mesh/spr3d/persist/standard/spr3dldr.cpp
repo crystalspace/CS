@@ -731,9 +731,7 @@ bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     if (!mesh) return false;
 
     //Writedown Factory tag
-    csRef<iMeshFactoryWrapper> fact = 
-      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), 
-        iMeshFactoryWrapper);
+    iMeshFactoryWrapper* fact = mesh->GetFactory()->GetMeshFactoryWrapper ();
     if (fact)
     {
       const char* factname = fact->QueryObject()->GetName();

@@ -95,12 +95,12 @@ bool csMeshObject::HitBeamObject (const csVector3&, const csVector3&,
   return false;
 }
 
-void csMeshObject::SetLogicalParent (iBase* p)
+void csMeshObject::SetMeshWrapper (iMeshWrapper* p)
 {
   LogParent = p;
 }
 
-iBase* csMeshObject::GetLogicalParent () const
+iMeshWrapper* csMeshObject::GetMeshWrapper () const
 {
   return LogParent;
 }
@@ -170,12 +170,12 @@ bool csMeshFactory::SupportsHardTransform () const
   return false;
 }
 
-void csMeshFactory::SetLogicalParent (iBase* p)
+void csMeshFactory::SetMeshFactoryWrapper (iMeshFactoryWrapper* p)
 {
   LogParent = p;
 }
 
-iBase* csMeshFactory::GetLogicalParent () const
+iMeshFactoryWrapper* csMeshFactory::GetMeshFactoryWrapper () const
 {
   return LogParent;
 }

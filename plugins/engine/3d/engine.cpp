@@ -2958,7 +2958,7 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
   GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
-  fact->SetLogicalParent ((iObject*)mfactwrap);
+  fact->SetMeshFactoryWrapper ((iMeshFactoryWrapper*)mfactwrap);
   return csPtr<iMeshFactoryWrapper> (&mfactwrap->scfiMeshFactoryWrapper);
 }
 
@@ -3158,7 +3158,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   }
 
   fact->SetMeshObjectFactory (mof2);
-  mof2->SetLogicalParent (fact);
+  mof2->SetMeshFactoryWrapper (fact);
 
   return csPtr<iMeshFactoryWrapper> (fact);
 }
@@ -3308,7 +3308,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
     mesh->GetMovable ()->UpdateMove ();
   }
 
-  mesh->GetMeshObject ()->SetLogicalParent (mesh);
+  mesh->GetMeshObject ()->SetMeshWrapper (mesh);
   return csPtr<iMeshWrapper> (mesh);
 }
 
@@ -3328,7 +3328,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
     (meshwrap->GetCsMovable ()).csMovable::UpdateMove ();
   }
 
-  mesh->SetLogicalParent ((iMeshWrapper*)meshwrap);
+  mesh->SetMeshWrapper ((iMeshWrapper*)meshwrap);
   return csPtr<iMeshWrapper> ((iMeshWrapper*)meshwrap);
 }
 

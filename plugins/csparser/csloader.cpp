@@ -1910,7 +1910,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  }
 	  csRef<iMeshObjectFactory> fact = type->NewFactory ();
 	  stemp->SetMeshObjectFactory (fact);
-	  fact->SetLogicalParent (stemp);
+	  fact->SetMeshFactoryWrapper (stemp);
 	  csBox3 b;
 	  if (!SyntaxService->ParseBox (child, b))
 	    return false;
@@ -1952,7 +1952,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	      return false;
 	    }
 	    stemp->SetMeshObjectFactory (mof2);
-	    mof2->SetLogicalParent (stemp);
+	    mof2->SetMeshFactoryWrapper (stemp);
 	  }
 	}
         break;
@@ -2008,7 +2008,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	      return false;
 	    }
 	    stemp->SetMeshObjectFactory (mof2);
-	    mof2->SetLogicalParent (stemp);
+	    mof2->SetMeshFactoryWrapper (stemp);
 	  }
         }
         break;
@@ -3047,12 +3047,10 @@ bool csLoader::HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
     return false;
   }
   mesh->SetMeshObject (mo2);
-  mo2->SetLogicalParent (mesh);
-  if (mo2->GetFactory () && mo2->GetFactory ()->GetLogicalParent ())
+  mo2->SetMeshWrapper (mesh);
+  if (mo2->GetFactory () && mo2->GetFactory ()->GetMeshFactoryWrapper ())
   {
-    iBase* lp = mo2->GetFactory ()->GetLogicalParent ();
-    csRef<iMeshFactoryWrapper> mfw = SCF_QUERY_INTERFACE (lp,
-	      	iMeshFactoryWrapper);
+    iMeshFactoryWrapper* mfw = mo2->GetFactory ()->GetMeshFactoryWrapper ();
     if (mfw)
     {
       mesh->SetFactory (mfw);
@@ -3187,7 +3185,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  csRef<iMeshObjectFactory> fact = type->NewFactory ();
 	  csRef<iMeshObject> mo = fact->NewInstance ();
 	  mesh->SetMeshObject (mo);
-	  mo->SetLogicalParent (mesh);
+	  mo->SetMeshWrapper (mesh);
 	  csBox3 b;
 	  if (!SyntaxService->ParseBox (child, b))
 	    goto error;

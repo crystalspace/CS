@@ -109,7 +109,7 @@ protected:
 
 private:
   csRef<iMeshObjectFactory> ifactory;
-  iBase* logparent;
+  iMeshWrapper* logparent;
   csSprite2DMeshObjectFactory* factory;
 
   csRef<iMaterialWrapper> material;
@@ -205,8 +205,8 @@ public:
     if (polygon_idx) *polygon_idx = -1;
     return HitBeamOutline(start, end, isect, pr);
   }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public csObjectModel
@@ -337,7 +337,7 @@ protected:
 
 private:
   csRef<iMaterialWrapper> material;
-  iBase* logparent;
+  iMeshFactoryWrapper* logparent;
   iMeshObjectType* spr2d_type;
   uint MixMode;
   /**
@@ -402,8 +402,10 @@ public:
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
+  { logparent = lp; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+  { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return spr2d_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 

@@ -291,7 +291,7 @@ private:
 
   /// Material handle as returned by iTextureManager.
   csRef<iMaterialWrapper> cstxt;
-  iBase* logparent;
+  iMeshFactoryWrapper* logparent;
   iMeshObjectType* spr3d_type;
 
   /**
@@ -619,8 +619,10 @@ public:
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
+  { logparent = lp; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+  { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return spr3d_type; }
 
   //------------------ iPolygonMesh interface implementation ----------------//
@@ -974,7 +976,7 @@ class csSprite3DMeshObject : public iMeshObject
 private:
   /// Set the size of internally used tables
   static void UpdateWorkTables (int max_size);
-  iBase* logparent;
+  iMeshWrapper* logparent;
 
 public:
   /**
@@ -1665,8 +1667,8 @@ public:
     csVector3& intersect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
     csVector3& intersect, float* pr, int* polygon_idx = 0);
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh

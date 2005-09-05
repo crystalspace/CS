@@ -49,7 +49,7 @@ struct iCamera;
 class csShadow : public iMeshObject
 {
 private:
-  iBase* logparent;
+  iMeshWrapper* logparent;
   iMeshWrapper* wrap;
   bool do_bbox;	// Show bounding box.
   bool do_rad;	// Show bounding sphere.
@@ -128,8 +128,8 @@ public:
   { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*, int* = 0) { return false; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public iObjectModel

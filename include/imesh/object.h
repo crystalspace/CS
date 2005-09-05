@@ -31,6 +31,8 @@
 
 struct iLight;
 struct iMaterialWrapper;
+struct iMeshWrapper;
+struct iMeshFactoryWrapper;
 struct iMeshObject;
 struct iMeshObjectFactory;
 struct iMeshObjectType;
@@ -197,21 +199,18 @@ struct iMeshObject : public iBase
   	csVector3& isect, float* pr, int* polygon_idx = 0) = 0;
 
   /**
-   * Set a reference to some logical parent in the context that holds
-   * the mesh objects. When a mesh object is used in the context of the
-   * 3D engine then this will be an iMeshWrapper. In case it is used
-   * in the context of the isometric engine this will be an iIsoMeshSprite.
+   * Set a reference to the mesh wrapper holding the mesh objects.
    * Note that this function should NOT increase the ref-count of the
    * given logical parent because this would cause a circular reference
    * (since the logical parent already holds a reference to this mesh object).
    */
-  virtual void SetLogicalParent (iBase* logparent) = 0;
+  virtual void SetMeshWrapper (iMeshWrapper* logparent) = 0;
 
   /**
-   * Get the logical parent for this mesh object. See SetLogicalParent()
+   * Get the logical parent for this mesh object. See SetMeshWrapper()
    * for more information.
    */
-  virtual iBase* GetLogicalParent () const = 0;
+  virtual iMeshWrapper* GetMeshWrapper () const = 0;
 
   /**
    * Get the generic interface describing the geometry of this mesh.
@@ -326,21 +325,19 @@ struct iMeshObjectFactory : public iBase
   virtual bool SupportsHardTransform () const = 0;
 
   /**
-   * Set a reference to some logical parent in the context that holds
-   * the mesh factories. When a mesh factory is used in the context of the
-   * 3D engine then this will be an iMeshFactoryWrapper. Similarly for
-   * the isometric engine. Note that this function should NOT increase the
+   * Set a reference to the mesh factory wrapper parent.
+   * Note that this function should NOT increase the
    * ref-count of the given logical parent because this would cause a
    * circular reference (since the logical parent already holds a reference
    * to this mesh factory).
    */
-  virtual void SetLogicalParent (iBase* logparent) = 0;
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* logparent) = 0;
 
   /**
-   * Get the logical parent for this mesh factory. See SetLogicalParent()
+   * Get the logical parent for this mesh factory. See SetMeshFactoryWrapper()
    * for more information.
    */
-  virtual iBase* GetLogicalParent () const = 0;
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const = 0;
 
   /**
    * Get the ObjectType for this mesh factory.

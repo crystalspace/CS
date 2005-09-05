@@ -268,7 +268,7 @@ private:
   iObjectRegistry* object_reg;
   bool verbose;
   csWeakRef<iGraphics3D> g3d;
-  iBase* logparent;
+  iMeshWrapper* logparent;
   csTerrainFactory* pFactory;
   csRef<iMeshObjectDrawCallback> vis_cb;
   
@@ -439,8 +439,8 @@ public:
 
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
   bool HitBeam (csTerrBlock* block,
 	const csSegment3& seg,
@@ -669,7 +669,7 @@ public:
 class csTerrainFactory : public iMeshObjectFactory
 {
 private:
-  iBase* logparent;
+  iMeshFactoryWrapper* logparent;
 
   iMeshObjectType* brute_type;
 
@@ -702,8 +702,10 @@ public:
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
+  { logparent = lp; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+  { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return brute_type; }
 
   void SetTerraFormer (iTerraFormer* form);

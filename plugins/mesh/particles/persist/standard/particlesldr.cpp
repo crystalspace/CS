@@ -1460,7 +1460,7 @@ bool csParticlesObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     paramsNode->SetValue("params");
 
     //Writedown factory tag
-    csRef<iMeshWrapper> meshwrap = SCF_QUERY_INTERFACE(mesh->GetLogicalParent(), iMeshWrapper);
+    iMeshWrapper* meshwrap = mesh->GetMeshWrapper ();
     iMeshFactoryWrapper* factwrap = meshwrap->GetFactory();
     if (factwrap)
     {

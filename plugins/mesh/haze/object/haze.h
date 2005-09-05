@@ -188,7 +188,7 @@ class csHazeMeshObject : public iMeshObject
 {
 private:
   csRef<iMeshObjectFactory> ifactory;
-  iBase* logparent;
+  iMeshWrapper* logparent;
   csHazeMeshObjectFactory* factory;
 
   csRef<iMaterialWrapper> material;
@@ -322,8 +322,8 @@ public:
   { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*, int* = 0) { return false; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public csObjectModel
@@ -406,7 +406,7 @@ private:
   csVector3 origin, directional;
   /// vector of csHazeLayer
   csPDelArray<csHazeLayer> layers;
-  iBase* logparent;
+  iMeshFactoryWrapper* logparent;
   iMeshObjectType* haze_type;
   csFlags flags;
 public:
@@ -437,8 +437,10 @@ public:
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
+  { logparent = lp; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+  { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return haze_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 

@@ -292,7 +292,8 @@ void csParticleSystem::Update (csTicks elapsed_time)
     Rotate (anglepersecond * elapsed_seconds);
 }
 
-bool csParticleSystem::PreGetRenderMeshes (iRenderView*, iMovable* movable, uint32)
+bool csParticleSystem::PreGetRenderMeshes (iRenderView*, iMovable* movable,
+	uint32)
 {
   SetupObject ();
 

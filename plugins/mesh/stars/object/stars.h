@@ -42,7 +42,7 @@ class csStarsMeshObject : public iMeshObject
 {
 private:
   iMeshObjectFactory* factory;
-  iBase* logparent;
+  iMeshWrapper* logparent;
   csBox3 box;
   iMeshObjectDrawCallback* vis_cb;
   csColor color;
@@ -152,8 +152,8 @@ public:
   { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*, int* = 0) { return false; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public csObjectModel
@@ -246,7 +246,7 @@ public:
 class csStarsMeshObjectFactory : public iMeshObjectFactory
 {
 private:
-  iBase* logparent;
+  iMeshFactoryWrapper* logparent;
   iMeshObjectType* stars_type;
   csFlags flags;
 
@@ -265,8 +265,10 @@ public:
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
+  { logparent = lp; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+  { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return stars_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 };

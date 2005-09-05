@@ -62,7 +62,7 @@ class CS_CRYSTALSPACE_EXPORT csParticleSystem : public iMeshObject
 protected:
   iObjectRegistry* object_reg;
   iMeshObjectFactory* factory;
-  iBase* logparent;
+  iMeshWrapper* logparent;
   iEngine* engine;
   csRef<iLightManager> light_mgr;
   /// Object space radius.
@@ -328,8 +328,8 @@ public:
   { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*, int* = 0) { return false; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public csObjectModel

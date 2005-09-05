@@ -177,7 +177,7 @@ public:
   
   csRef<csThingObjectType> thing_type;
   /// Pointer to logical parent.
-  iBase* logparent;
+  iMeshFactoryWrapper* logparent;
   iMeshObjectType* thingmesh_type;
   /// Set of flags
   csFlags flags;
@@ -528,9 +528,11 @@ public:
   virtual csPtr<iMeshObjectFactory> Clone ();
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
+  { logparent = lp; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+  { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return thingmesh_type; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
 
   //-------------------- iPolygonMesh interface implementation ----------------
   PolyMeshHelper scfiPolygonMesh;
@@ -648,7 +650,7 @@ private:
   uint32 light_version;
 
   /// Pointer to logical parent.
-  iBase* logparent;
+  iMeshWrapper* logparent;
 
   /**
    * This number is compared with the static_data_nr in the static data to
@@ -1028,8 +1030,8 @@ public:
   { return 0; }
   virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/)
   { }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
   virtual iObjectModel* GetObjectModel ()
   {
     return static_data->GetObjectModel ();

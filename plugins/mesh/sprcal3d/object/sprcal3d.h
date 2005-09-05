@@ -201,7 +201,7 @@ private:
   friend class csSpriteCal3DMeshObject;
 
   /// Material handle as returned by iTextureManager.
-  iBase* logparent;
+  iMeshFactoryWrapper* logparent;
   
   csSpriteCal3DMeshObjectType* sprcal3d_type;
 
@@ -309,8 +309,10 @@ public:
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
+  { logparent = lp; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+  { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const 
   { return (iMeshObjectType*)sprcal3d_type; }
 
@@ -592,7 +594,7 @@ private:
   iObjectRegistry* object_reg;
   iMeshObjectDrawCallback* vis_cb;
   uint32 current_features;  // LOD Control thing
-  iBase* logparent;
+  iMeshWrapper* logparent;
   CalModel calModel;
   float last_update_time;
   csArray<ActiveAnim> active_anims;
@@ -848,8 +850,8 @@ public:
   }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
   void SetUserData(void *data);
 
   //------------------ iPolygonMesh interface implementation -----------------

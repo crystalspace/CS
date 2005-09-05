@@ -126,7 +126,7 @@ private:
   csArray<csStringID> user_buffer_names;
 
   csGenmeshMeshObjectFactory* factory;
-  iBase* logparent;
+  iMeshWrapper* logparent;
   csRef<iMaterialWrapper> material;
   bool material_needs_visit;
   uint MixMode;
@@ -315,12 +315,12 @@ public:
     csVector3& isect, float *pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0);
-  virtual void SetLogicalParent (iBase* lp)
+  virtual void SetMeshWrapper (iMeshWrapper* lp)
   {
     logparent = lp;
     CS_ASSERT (logparent != 0);
   }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
 
   virtual iObjectModel* GetObjectModel ();
@@ -642,7 +642,7 @@ public:
   csBSPTree* back2front_tree;
 
   iObjectRegistry* object_reg;
-  iBase* logparent;
+  iMeshFactoryWrapper* logparent;
   iMeshObjectType* genmesh_type;
   csRef<iLightManager> light_mgr;
   csFlags flags;
@@ -789,12 +789,13 @@ public:
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
-  virtual void SetLogicalParent (iBase* lp)
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
   {
     logparent = lp;
     CS_ASSERT (logparent != 0);
   }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+  { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return genmesh_type; }
 
   //----------------------- iGeneralFactoryState implementation -------------

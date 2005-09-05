@@ -28,6 +28,7 @@
 #include "csutil/scf.h"
 
 struct iLight;
+struct iMeshWrapper;
 
 SCF_VERSION (iLightManager, 0, 0, 1);
 
@@ -51,8 +52,7 @@ struct iLightManager : public iBase
    * mean a list of all lights that affect the object or
    * it can be a list of the N most relevant lights (with N a
    * parameter set by the user on that object).
-   * \param logObject logObject is the logical parent for the mesh object as set
-   * by the mesh object creator.
+   * \param logObject logObject is the mesh wrapper.
    * \param maxLights maxLights is the maximum number of lights that you (as
    * the caller of this function) are interested in. Even with this set the
    * light manager may still return an array containing more lights. You just
@@ -63,7 +63,7 @@ struct iLightManager : public iBase
    * and intensity. If you don't need sorting then don't set this as it will
    * decrease performance somewhat.
    */
-  virtual const csArray<iLight*>& GetRelevantLights (iBase* logObject,
+  virtual const csArray<iLight*>& GetRelevantLights (iMeshWrapper* logObject,
   	int maxLights, bool desireSorting) = 0;
 };
 

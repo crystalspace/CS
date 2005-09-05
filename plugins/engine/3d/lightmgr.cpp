@@ -36,10 +36,10 @@ csLightManager::~csLightManager ()
   SCF_DESTRUCT_IBASE ();
 }
 
-const csArray<iLight*>& csLightManager::GetRelevantLights (iBase* logObject,
+const csArray<iLight*>& csLightManager::GetRelevantLights (
+	iMeshWrapper* mw,
 	int maxLights, bool desireSorting)
 {
-  iMeshWrapper* mw = (iMeshWrapper*)logObject;
   if (!mw) return nolights;
   csMeshWrapper* cmw = (csMeshWrapper*)mw;
   return cmw->GetRelevantLights (maxLights, desireSorting);

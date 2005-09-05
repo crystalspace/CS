@@ -75,7 +75,7 @@ class csParticlesFactory : public iMeshObjectFactory
 {
   friend class csParticlesObject;
 private:
-  iBase* parent;
+  iMeshFactoryWrapper* parent;
   csParticlesType* particles_type;
   iObjectRegistry *object_reg;
 
@@ -143,8 +143,8 @@ public:
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform&) {}
   virtual bool SupportsHardTransform () const { return false; }
-  virtual void SetLogicalParent (iBase* lp) { parent = lp; }
-  virtual iBase* GetLogicalParent () const { return parent; }
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp) { parent = lp; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const { return parent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return particles_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 
@@ -478,7 +478,7 @@ public:
 class csParticlesObject : public iMeshObject
 {
 private:
-  iBase* logparent;
+  iMeshWrapper* logparent;
   csParticlesFactory* pFactory;
   iMeshObjectDrawCallback* vis_cb;
   csRef<csShaderVariableContext> svcontext;
@@ -620,8 +620,8 @@ public:
 	csVector3& isect, float* pr, int* polygon_idx = 0);
 
   /// Set/Get logical parent
-  void SetLogicalParent (iBase* lp) { logparent = lp; }
-  iBase* GetLogicalParent () const { return logparent; }
+  void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
+  iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
   /// Gets the object model
   iObjectModel *GetObjectModel () { return &scfiObjectModel; }

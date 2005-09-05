@@ -427,15 +427,17 @@ bool csBezierSaver::WriteDown (iBase* obj, iDocumentNode* parent)
 
   if (!mesh) return false;
 
-  csRef<iMeshWrapper> objwrap = 
-    SCF_QUERY_INTERFACE (mesh->GetLogicalParent(), iMeshWrapper);
+  iMeshWrapper* objwrap = mesh->GetMeshWrapper ();
 
   if (objwrap) return WriteObject(obj, paramsNode);
 
-  csRef<iMeshFactoryWrapper> factwrap = 
-    SCF_QUERY_INTERFACE (mesh->GetLogicalParent(), iMeshFactoryWrapper);
-
-  if (factwrap) return WriteFactory(obj, paramsNode);
+  csRef<iMeshObjectFactory> fact = SCF_QUERY_INTERFACE (obj,
+  	iMeshObjectFactory);
+  if (fact)
+  {
+    iMeshFactoryWrapper* factwrap = fact->GetMeshFactoryWrapper ();
+    if (factwrap) return WriteFactory(obj, paramsNode);
+  }
 
   return false;
 }
@@ -452,9 +454,7 @@ bool csBezierSaver::WriteObject (iBase* obj, iDocumentNode* parent)
   if (mesh && state)
   {
     //Writedown Factory tag
-    csRef<iMeshFactoryWrapper> fact = 
-      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), 
-        iMeshFactoryWrapper);
+    iMeshFactoryWrapper* fact = mesh->GetFactory()->GetMeshFactoryWrapper();
     if (fact)
     {
       const char* factname = fact->QueryObject()->GetName();

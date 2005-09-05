@@ -1386,7 +1386,7 @@ bool csThingSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     if (!thing) return false;
     if (!mesh) return false;
 
-    csRef<iMeshWrapper> meshwrap = SCF_QUERY_INTERFACE(mesh->GetLogicalParent(), iMeshWrapper);
+    iMeshWrapper* meshwrap = mesh->GetMeshWrapper ();
     iMeshFactoryWrapper* factwrap = meshwrap->GetFactory();
     if (factwrap)
     {

@@ -194,6 +194,7 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   last_thing_id++;
   thing_id = last_thing_id;
   logparent = 0;
+  logparent_factory = 0;
   beziermsh_type = thing_type;
 
   dynamic_ambient.Set (0,0,0);
@@ -264,17 +265,14 @@ char* csBezierMesh::GenerateCacheName ()
 
   if (logparent)
   {
-    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
-    if (mw)
-    {
-      if (mw->QueryObject ()->GetName ())
-        mf.Write (mw->QueryObject ()->GetName (),
+    iMeshWrapper* mw = logparent;
+    if (mw->QueryObject ()->GetName ())
+      mf.Write (mw->QueryObject ()->GetName (),
 		strlen (mw->QueryObject ()->GetName ()));
-      iSector* sect = mw->GetMovable ()->GetSectors ()->Get (0);
-      if (sect && sect->QueryObject ()->GetName ())
-        mf.Write (sect->QueryObject ()->GetName (),
+    iSector* sect = mw->GetMovable ()->GetSectors ()->Get (0);
+    if (sect && sect->QueryObject ()->GetName ())
+      mf.Write (sect->QueryObject ()->GetName (),
 		strlen (sect->QueryObject ()->GetName ()));
-    }
   }
 
   l = csConvertEndian ((int32)csQint ((b.MinX () * 1000)+.5));
@@ -1017,8 +1015,7 @@ bool csBezierMesh::ReadFromCache (iCacheManager* cache_mgr)
   const char* thing_name = 0;
   if (static_data->thing_type->do_verbose && logparent)
   {
-    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
-    if (mw) thing_name = mw->QueryObject ()->GetName ();
+    thing_name = logparent->QueryObject ()->GetName ();
   }
 
   bool rc = true;

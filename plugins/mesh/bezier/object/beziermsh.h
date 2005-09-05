@@ -321,7 +321,9 @@ private:
   /// Pointer to the Thing Template which it derived from.
   csBezierMesh* ParentTemplate;
   /// Pointer to logical parent.
-  iBase* logparent;
+  iMeshWrapper* logparent;
+  /// Pointer to logical parent.
+  iMeshFactoryWrapper* logparent_factory;
   /// Pointer to meshobjecttype.
   iMeshObjectType* beziermsh_type;
 
@@ -814,8 +816,10 @@ public:
     {
       return false;
     }
-    virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
-    virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
+    virtual void SetMeshWrapper (iMeshWrapper* lp)
+    { scfParent->logparent = lp; }
+    virtual iMeshWrapper* GetMeshWrapper () const
+    { return scfParent->logparent; }
     virtual iObjectModel* GetObjectModel ()
     {
       return &(scfParent->scfiObjectModel);
@@ -845,8 +849,10 @@ public:
       scfParent->HardTransform (t);
     }
     virtual bool SupportsHardTransform () const { return true; }
-    virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
-    virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
+    virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
+    { scfParent->logparent_factory = lp; }
+    virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+    { return scfParent->logparent_factory; }
     virtual iMeshObjectType* GetMeshObjectType () const
     { return scfParent->beziermsh_type; }
     virtual iObjectModel* GetObjectModel () { return 0; }

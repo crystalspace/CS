@@ -41,7 +41,8 @@ class csNullmeshMeshObject : public iMeshObject
 {
 private:
   iMeshObjectFactory* factory;
-  iBase* logparent;
+  iMeshWrapper* logparent;
+  iMeshFactoryWrapper* logparent_factory;
   iMeshObjectType* nullmesh_type;
   iMeshObjectDrawCallback* vis_cb;
   float radius;
@@ -94,8 +95,8 @@ public:
     csVector3& isect, float *pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0);
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
   virtual csRenderMesh **GetRenderMeshes (int &num, iRenderView*, 
     iMovable*, uint32)
@@ -135,7 +136,7 @@ public:
    */
   virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
 
-  //------------------------- iGeneralMeshState implementation ----------------
+  //------------------------- iNullMeshState implementation ----------------
   class NullMeshState : public iNullMeshState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csNullmeshMeshObject);
@@ -191,9 +192,12 @@ public:
     virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
     virtual void HardTransform (const csReversibleTransform&) {}
     virtual bool SupportsHardTransform () const { return false; }
-    virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
-    virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
-    virtual iMeshObjectType* GetMeshObjectType () const { return scfParent->nullmesh_type; }
+    virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
+    { scfParent->logparent_factory = lp; }
+    virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+    { return scfParent->logparent_factory; }
+    virtual iMeshObjectType* GetMeshObjectType () const
+    { return scfParent->nullmesh_type; }
     virtual iObjectModel* GetObjectModel () { return 0; }
   } scfiMeshObjectFactory;
   friend struct MeshObjectFactory;

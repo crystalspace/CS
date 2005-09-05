@@ -70,7 +70,7 @@ private:
   // Admin stuff.
   csWeakRef<iGraphics3D> g3d;
   csProtoMeshObjectFactory* factory;
-  iBase* logparent;
+  iMeshWrapper* logparent;
 
   // Callback when object is rendered (in GetRenderMeshes()).
   csRef<iMeshObjectDrawCallback> vis_cb;
@@ -154,12 +154,12 @@ public:
     csVector3& isect, float *pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0);
-  virtual void SetLogicalParent (iBase* lp)
+  virtual void SetMeshWrapper (iMeshWrapper* lp)
   {
     logparent = lp;
     CS_ASSERT (logparent != 0);
   }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
   virtual iObjectModel* GetObjectModel ();
   virtual bool SetColor (const csColor& col)
@@ -301,7 +301,7 @@ public:
     index_name, string_object2world;
 
   iObjectRegistry* object_reg;
-  iBase* logparent;
+  iMeshFactoryWrapper* logparent;
   iMeshObjectType* proto_type;
   csFlags flags;
 
@@ -336,12 +336,13 @@ public:
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
-  virtual void SetLogicalParent (iBase* lp)
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
   {
     logparent = lp;
     CS_ASSERT (logparent != 0);
   }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+  { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return proto_type; }
 
   //----------------------- iProtoFactoryState implementation -------------

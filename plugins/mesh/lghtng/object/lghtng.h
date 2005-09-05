@@ -48,7 +48,7 @@ class csLightningMeshObject : public iMeshObject
   csRef<iMeshObject> GenMesh;
   csRef<iGeneralMeshState> GenState;
   csRef<iMeshObjectFactory> ifactory;
-  iBase* logparent;
+  iMeshWrapper* logparent;
   csLightningMeshObjectFactory* factory;
   csFlags flags;
 
@@ -108,8 +108,8 @@ public:
   { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*, int* = 0) { return false; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public csObjectModel
@@ -249,7 +249,7 @@ private:
   /// Lightning state info
   csVector3 origin;
   csVector3 directional;  
-  iBase* logparent;  
+  iMeshFactoryWrapper* logparent;  
   iMeshObjectType* lghtng_type;
   csFlags flags;
 
@@ -291,8 +291,10 @@ public:
   virtual iObjectModel* GetObjectModel () { return 0; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
+  { logparent = lp; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+  { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return lghtng_type; }
   virtual void NextFrame (csTicks CurrentTime);
   virtual void Invalidate ()
