@@ -11338,6 +11338,30 @@ PLANE_COLLIDER_GEOMETRY = _cspace.PLANE_COLLIDER_GEOMETRY
 TRIMESH_COLLIDER_GEOMETRY = _cspace.TRIMESH_COLLIDER_GEOMETRY
 CYLINDER_COLLIDER_GEOMETRY = _cspace.CYLINDER_COLLIDER_GEOMETRY
 SPHERE_COLLIDER_GEOMETRY = _cspace.SPHERE_COLLIDER_GEOMETRY
+class iDynamicsColliderCollisionCallback(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamicsColliderCollisionCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsColliderCollisionCallback, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iDynamicsColliderCollisionCallback instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def Execute(*args): return _cspace.iDynamicsColliderCollisionCallback_Execute(*args)
+    def __del__(self, destroy=_cspace.delete_iDynamicsColliderCollisionCallback):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iDynamicsColliderCollisionCallbackPtr(iDynamicsColliderCollisionCallback):
+    def __init__(self, this):
+        _swig_setattr(self, iDynamicsColliderCollisionCallback, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iDynamicsColliderCollisionCallback, 'thisown', 0)
+        _swig_setattr(self, iDynamicsColliderCollisionCallback,self.__class__,iDynamicsColliderCollisionCallback)
+_cspace.iDynamicsColliderCollisionCallback_swigregister(iDynamicsColliderCollisionCallbackPtr)
+
 class iDynamicsSystemCollider(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -11353,6 +11377,7 @@ class iDynamicsSystemCollider(iBase):
     def CreateMeshGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateMeshGeometry(*args)
     def CreateBoxGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateBoxGeometry(*args)
     def CreateCCylinderGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateCCylinderGeometry(*args)
+    def SetCollisionCallback(*args): return _cspace.iDynamicsSystemCollider_SetCollisionCallback(*args)
     def SetFriction(*args): return _cspace.iDynamicsSystemCollider_SetFriction(*args)
     def SetSoftness(*args): return _cspace.iDynamicsSystemCollider_SetSoftness(*args)
     def SetDensity(*args): return _cspace.iDynamicsSystemCollider_SetDensity(*args)
@@ -11430,6 +11455,478 @@ class iJointPtr(iJoint):
 _cspace.iJoint_swigregister(iJointPtr)
 
 iJoint_scfGetVersion = _cspace.iJoint_scfGetVersion
+
+class iODEFrameUpdateCallback(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEFrameUpdateCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iODEFrameUpdateCallback, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iODEFrameUpdateCallback instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def Execute(*args): return _cspace.iODEFrameUpdateCallback_Execute(*args)
+    def __del__(self, destroy=_cspace.delete_iODEFrameUpdateCallback):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iODEFrameUpdateCallbackPtr(iODEFrameUpdateCallback):
+    def __init__(self, this):
+        _swig_setattr(self, iODEFrameUpdateCallback, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iODEFrameUpdateCallback, 'thisown', 0)
+        _swig_setattr(self, iODEFrameUpdateCallback,self.__class__,iODEFrameUpdateCallback)
+_cspace.iODEFrameUpdateCallback_swigregister(iODEFrameUpdateCallbackPtr)
+
+class iODEDynamicState(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEDynamicState, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iODEDynamicState, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iODEDynamicState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetGlobalERP(*args): return _cspace.iODEDynamicState_SetGlobalERP(*args)
+    def GlobalERP(*args): return _cspace.iODEDynamicState_GlobalERP(*args)
+    def SetGlobalCFM(*args): return _cspace.iODEDynamicState_SetGlobalCFM(*args)
+    def GlobalCFM(*args): return _cspace.iODEDynamicState_GlobalCFM(*args)
+    def EnableStepFast(*args): return _cspace.iODEDynamicState_EnableStepFast(*args)
+    def StepFastEnabled(*args): return _cspace.iODEDynamicState_StepFastEnabled(*args)
+    def SetStepFastIterations(*args): return _cspace.iODEDynamicState_SetStepFastIterations(*args)
+    def StepFastIterations(*args): return _cspace.iODEDynamicState_StepFastIterations(*args)
+    def EnableQuickStep(*args): return _cspace.iODEDynamicState_EnableQuickStep(*args)
+    def QuickStepEnabled(*args): return _cspace.iODEDynamicState_QuickStepEnabled(*args)
+    def SetQuickStepIterations(*args): return _cspace.iODEDynamicState_SetQuickStepIterations(*args)
+    def QuickStepIterations(*args): return _cspace.iODEDynamicState_QuickStepIterations(*args)
+    def EnableFrameRate(*args): return _cspace.iODEDynamicState_EnableFrameRate(*args)
+    def FrameRateEnabled(*args): return _cspace.iODEDynamicState_FrameRateEnabled(*args)
+    def SetFrameRate(*args): return _cspace.iODEDynamicState_SetFrameRate(*args)
+    def FrameRate(*args): return _cspace.iODEDynamicState_FrameRate(*args)
+    def SetFrameLimit(*args): return _cspace.iODEDynamicState_SetFrameLimit(*args)
+    def FrameLimit(*args): return _cspace.iODEDynamicState_FrameLimit(*args)
+    def AddFrameUpdateCallback(*args): return _cspace.iODEDynamicState_AddFrameUpdateCallback(*args)
+    def RemoveFrameUpdateCallback(*args): return _cspace.iODEDynamicState_RemoveFrameUpdateCallback(*args)
+    def EnableEventProcessing(*args): return _cspace.iODEDynamicState_EnableEventProcessing(*args)
+    def EventProcessingEnabled(*args): return _cspace.iODEDynamicState_EventProcessingEnabled(*args)
+    def EnableFastObjects(*args): return _cspace.iODEDynamicState_EnableFastObjects(*args)
+    def FastObjectsEnabled(*args): return _cspace.iODEDynamicState_FastObjectsEnabled(*args)
+    def __del__(self, destroy=_cspace.delete_iODEDynamicState):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEDynamicState_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iODEDynamicState_scfGetVersion)
+
+class iODEDynamicStatePtr(iODEDynamicState):
+    def __init__(self, this):
+        _swig_setattr(self, iODEDynamicState, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iODEDynamicState, 'thisown', 0)
+        _swig_setattr(self, iODEDynamicState,self.__class__,iODEDynamicState)
+_cspace.iODEDynamicState_swigregister(iODEDynamicStatePtr)
+
+iODEDynamicState_scfGetVersion = _cspace.iODEDynamicState_scfGetVersion
+
+class iODEDynamicSystemState(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEDynamicSystemState, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iODEDynamicSystemState, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iODEDynamicSystemState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetERP(*args): return _cspace.iODEDynamicSystemState_SetERP(*args)
+    def ERP(*args): return _cspace.iODEDynamicSystemState_ERP(*args)
+    def SetCFM(*args): return _cspace.iODEDynamicSystemState_SetCFM(*args)
+    def CFM(*args): return _cspace.iODEDynamicSystemState_CFM(*args)
+    def EnableStepFast(*args): return _cspace.iODEDynamicSystemState_EnableStepFast(*args)
+    def StepFastEnabled(*args): return _cspace.iODEDynamicSystemState_StepFastEnabled(*args)
+    def SetStepFastIterations(*args): return _cspace.iODEDynamicSystemState_SetStepFastIterations(*args)
+    def StepFastIterations(*args): return _cspace.iODEDynamicSystemState_StepFastIterations(*args)
+    def EnableQuickStep(*args): return _cspace.iODEDynamicSystemState_EnableQuickStep(*args)
+    def QuickStepEnabled(*args): return _cspace.iODEDynamicSystemState_QuickStepEnabled(*args)
+    def SetQuickStepIterations(*args): return _cspace.iODEDynamicSystemState_SetQuickStepIterations(*args)
+    def QuickStepIterations(*args): return _cspace.iODEDynamicSystemState_QuickStepIterations(*args)
+    def EnableAutoDisable(*args): return _cspace.iODEDynamicSystemState_EnableAutoDisable(*args)
+    def AutoDisableEnabled(*args): return _cspace.iODEDynamicSystemState_AutoDisableEnabled(*args)
+    def SetAutoDisableParams(*args): return _cspace.iODEDynamicSystemState_SetAutoDisableParams(*args)
+    def EnableFrameRate(*args): return _cspace.iODEDynamicSystemState_EnableFrameRate(*args)
+    def FrameRateEnabled(*args): return _cspace.iODEDynamicSystemState_FrameRateEnabled(*args)
+    def SetFrameRate(*args): return _cspace.iODEDynamicSystemState_SetFrameRate(*args)
+    def FrameRate(*args): return _cspace.iODEDynamicSystemState_FrameRate(*args)
+    def SetFrameLimit(*args): return _cspace.iODEDynamicSystemState_SetFrameLimit(*args)
+    def FrameLimit(*args): return _cspace.iODEDynamicSystemState_FrameLimit(*args)
+    def AddFrameUpdateCallback(*args): return _cspace.iODEDynamicSystemState_AddFrameUpdateCallback(*args)
+    def RemoveFrameUpdateCallback(*args): return _cspace.iODEDynamicSystemState_RemoveFrameUpdateCallback(*args)
+    def EnableFastObjects(*args): return _cspace.iODEDynamicSystemState_EnableFastObjects(*args)
+    def FastObjectsEnabled(*args): return _cspace.iODEDynamicSystemState_FastObjectsEnabled(*args)
+    def CreateBallJoint(*args): return _cspace.iODEDynamicSystemState_CreateBallJoint(*args)
+    def CreateHingeJoint(*args): return _cspace.iODEDynamicSystemState_CreateHingeJoint(*args)
+    def CreateAMotorJoint(*args): return _cspace.iODEDynamicSystemState_CreateAMotorJoint(*args)
+    def CreateUniversalJoint(*args): return _cspace.iODEDynamicSystemState_CreateUniversalJoint(*args)
+    def CreateSliderJoint(*args): return _cspace.iODEDynamicSystemState_CreateSliderJoint(*args)
+    def RemoveJoint(*args): return _cspace.iODEDynamicSystemState_RemoveJoint(*args)
+    def SetContactMaxCorrectingVel(*args): return _cspace.iODEDynamicSystemState_SetContactMaxCorrectingVel(*args)
+    def GetContactMaxCorrectingVel(*args): return _cspace.iODEDynamicSystemState_GetContactMaxCorrectingVel(*args)
+    def SetContactSurfaceLayer(*args): return _cspace.iODEDynamicSystemState_SetContactSurfaceLayer(*args)
+    def GetContactSurfaceLayer(*args): return _cspace.iODEDynamicSystemState_GetContactSurfaceLayer(*args)
+    def __del__(self, destroy=_cspace.delete_iODEDynamicSystemState):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEDynamicSystemState_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iODEDynamicSystemState_scfGetVersion)
+
+class iODEDynamicSystemStatePtr(iODEDynamicSystemState):
+    def __init__(self, this):
+        _swig_setattr(self, iODEDynamicSystemState, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iODEDynamicSystemState, 'thisown', 0)
+        _swig_setattr(self, iODEDynamicSystemState,self.__class__,iODEDynamicSystemState)
+_cspace.iODEDynamicSystemState_swigregister(iODEDynamicSystemStatePtr)
+
+iODEDynamicSystemState_scfGetVersion = _cspace.iODEDynamicSystemState_scfGetVersion
+
+CS_ODE_JOINT_TYPE_UNKNOWN = _cspace.CS_ODE_JOINT_TYPE_UNKNOWN
+CS_ODE_JOINT_TYPE_BALL = _cspace.CS_ODE_JOINT_TYPE_BALL
+CS_ODE_JOINT_TYPE_HINGE = _cspace.CS_ODE_JOINT_TYPE_HINGE
+CS_ODE_JOINT_TYPE_SLIDER = _cspace.CS_ODE_JOINT_TYPE_SLIDER
+CS_ODE_JOINT_TYPE_CONTACT = _cspace.CS_ODE_JOINT_TYPE_CONTACT
+CS_ODE_JOINT_TYPE_UNIVERSAL = _cspace.CS_ODE_JOINT_TYPE_UNIVERSAL
+CS_ODE_JOINT_TYPE_HINGE2 = _cspace.CS_ODE_JOINT_TYPE_HINGE2
+CS_ODE_JOINT_TYPE_FIXED = _cspace.CS_ODE_JOINT_TYPE_FIXED
+CS_ODE_JOINT_TYPE_AMOTOR = _cspace.CS_ODE_JOINT_TYPE_AMOTOR
+class iODEJointState(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEJointState, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iODEJointState, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iODEJointState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def GetType(*args): return _cspace.iODEJointState_GetType(*args)
+    def SetLoStop(*args): return _cspace.iODEJointState_SetLoStop(*args)
+    def SetHiStop(*args): return _cspace.iODEJointState_SetHiStop(*args)
+    def SetVel(*args): return _cspace.iODEJointState_SetVel(*args)
+    def SetFMax(*args): return _cspace.iODEJointState_SetFMax(*args)
+    def SetFudgeFactor(*args): return _cspace.iODEJointState_SetFudgeFactor(*args)
+    def SetBounce(*args): return _cspace.iODEJointState_SetBounce(*args)
+    def SetCFM(*args): return _cspace.iODEJointState_SetCFM(*args)
+    def SetStopERP(*args): return _cspace.iODEJointState_SetStopERP(*args)
+    def SetStopCFM(*args): return _cspace.iODEJointState_SetStopCFM(*args)
+    def SetSuspensionERP(*args): return _cspace.iODEJointState_SetSuspensionERP(*args)
+    def SetSuspensionCFM(*args): return _cspace.iODEJointState_SetSuspensionCFM(*args)
+    def SetLoStop2(*args): return _cspace.iODEJointState_SetLoStop2(*args)
+    def SetHiStop2(*args): return _cspace.iODEJointState_SetHiStop2(*args)
+    def SetVel2(*args): return _cspace.iODEJointState_SetVel2(*args)
+    def SetFMax2(*args): return _cspace.iODEJointState_SetFMax2(*args)
+    def SetFudgeFactor2(*args): return _cspace.iODEJointState_SetFudgeFactor2(*args)
+    def SetBounce2(*args): return _cspace.iODEJointState_SetBounce2(*args)
+    def SetCFM2(*args): return _cspace.iODEJointState_SetCFM2(*args)
+    def SetStopERP2(*args): return _cspace.iODEJointState_SetStopERP2(*args)
+    def SetStopCFM2(*args): return _cspace.iODEJointState_SetStopCFM2(*args)
+    def SetSuspensionERP2(*args): return _cspace.iODEJointState_SetSuspensionERP2(*args)
+    def SetSuspensionCFM2(*args): return _cspace.iODEJointState_SetSuspensionCFM2(*args)
+    def SetLoStop3(*args): return _cspace.iODEJointState_SetLoStop3(*args)
+    def SetHiStop3(*args): return _cspace.iODEJointState_SetHiStop3(*args)
+    def SetVel3(*args): return _cspace.iODEJointState_SetVel3(*args)
+    def SetFMax3(*args): return _cspace.iODEJointState_SetFMax3(*args)
+    def SetFudgeFactor3(*args): return _cspace.iODEJointState_SetFudgeFactor3(*args)
+    def SetBounce3(*args): return _cspace.iODEJointState_SetBounce3(*args)
+    def SetCFM3(*args): return _cspace.iODEJointState_SetCFM3(*args)
+    def SetStopERP3(*args): return _cspace.iODEJointState_SetStopERP3(*args)
+    def SetStopCFM3(*args): return _cspace.iODEJointState_SetStopCFM3(*args)
+    def SetSuspensionERP3(*args): return _cspace.iODEJointState_SetSuspensionERP3(*args)
+    def SetSuspensionCFM3(*args): return _cspace.iODEJointState_SetSuspensionCFM3(*args)
+    def GetLoStop(*args): return _cspace.iODEJointState_GetLoStop(*args)
+    def GetHiStop(*args): return _cspace.iODEJointState_GetHiStop(*args)
+    def GetVel(*args): return _cspace.iODEJointState_GetVel(*args)
+    def GetFMax(*args): return _cspace.iODEJointState_GetFMax(*args)
+    def GetFudgeFactor(*args): return _cspace.iODEJointState_GetFudgeFactor(*args)
+    def GetBounce(*args): return _cspace.iODEJointState_GetBounce(*args)
+    def GetCFM(*args): return _cspace.iODEJointState_GetCFM(*args)
+    def GetStopERP(*args): return _cspace.iODEJointState_GetStopERP(*args)
+    def GetStopCFM(*args): return _cspace.iODEJointState_GetStopCFM(*args)
+    def GetSuspensionERP(*args): return _cspace.iODEJointState_GetSuspensionERP(*args)
+    def GetSuspensionCFM(*args): return _cspace.iODEJointState_GetSuspensionCFM(*args)
+    def GetLoStop2(*args): return _cspace.iODEJointState_GetLoStop2(*args)
+    def GetHiStop2(*args): return _cspace.iODEJointState_GetHiStop2(*args)
+    def GetVel2(*args): return _cspace.iODEJointState_GetVel2(*args)
+    def GetFMax2(*args): return _cspace.iODEJointState_GetFMax2(*args)
+    def GetFudgeFactor2(*args): return _cspace.iODEJointState_GetFudgeFactor2(*args)
+    def GetBounce2(*args): return _cspace.iODEJointState_GetBounce2(*args)
+    def GetCFM2(*args): return _cspace.iODEJointState_GetCFM2(*args)
+    def GetStopERP2(*args): return _cspace.iODEJointState_GetStopERP2(*args)
+    def GetStopCFM2(*args): return _cspace.iODEJointState_GetStopCFM2(*args)
+    def GetSuspensionERP2(*args): return _cspace.iODEJointState_GetSuspensionERP2(*args)
+    def GetSuspensionCFM2(*args): return _cspace.iODEJointState_GetSuspensionCFM2(*args)
+    def GetLoStop3(*args): return _cspace.iODEJointState_GetLoStop3(*args)
+    def GetHiStop3(*args): return _cspace.iODEJointState_GetHiStop3(*args)
+    def GetVel3(*args): return _cspace.iODEJointState_GetVel3(*args)
+    def GetFMax3(*args): return _cspace.iODEJointState_GetFMax3(*args)
+    def GetFudgeFactor3(*args): return _cspace.iODEJointState_GetFudgeFactor3(*args)
+    def GetBounce3(*args): return _cspace.iODEJointState_GetBounce3(*args)
+    def GetCFM3(*args): return _cspace.iODEJointState_GetCFM3(*args)
+    def GetStopERP3(*args): return _cspace.iODEJointState_GetStopERP3(*args)
+    def GetStopCFM3(*args): return _cspace.iODEJointState_GetStopCFM3(*args)
+    def GetSuspensionERP3(*args): return _cspace.iODEJointState_GetSuspensionERP3(*args)
+    def GetSuspensionCFM3(*args): return _cspace.iODEJointState_GetSuspensionCFM3(*args)
+    def SetHinge2Axis1(*args): return _cspace.iODEJointState_SetHinge2Axis1(*args)
+    def SetHinge2Axis2(*args): return _cspace.iODEJointState_SetHinge2Axis2(*args)
+    def SetHinge2Anchor(*args): return _cspace.iODEJointState_SetHinge2Anchor(*args)
+    def __del__(self, destroy=_cspace.delete_iODEJointState):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEJointState_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iODEJointState_scfGetVersion)
+
+class iODEJointStatePtr(iODEJointState):
+    def __init__(self, this):
+        _swig_setattr(self, iODEJointState, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iODEJointState, 'thisown', 0)
+        _swig_setattr(self, iODEJointState,self.__class__,iODEJointState)
+_cspace.iODEJointState_swigregister(iODEJointStatePtr)
+
+iODEJointState_scfGetVersion = _cspace.iODEJointState_scfGetVersion
+
+class iODEGeneralJointState(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEGeneralJointState, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iODEGeneralJointState, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iODEGeneralJointState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetLoStop(*args): return _cspace.iODEGeneralJointState_SetLoStop(*args)
+    def SetHiStop(*args): return _cspace.iODEGeneralJointState_SetHiStop(*args)
+    def SetVel(*args): return _cspace.iODEGeneralJointState_SetVel(*args)
+    def SetFMax(*args): return _cspace.iODEGeneralJointState_SetFMax(*args)
+    def SetFudgeFactor(*args): return _cspace.iODEGeneralJointState_SetFudgeFactor(*args)
+    def SetBounce(*args): return _cspace.iODEGeneralJointState_SetBounce(*args)
+    def SetCFM(*args): return _cspace.iODEGeneralJointState_SetCFM(*args)
+    def SetStopERP(*args): return _cspace.iODEGeneralJointState_SetStopERP(*args)
+    def SetStopCFM(*args): return _cspace.iODEGeneralJointState_SetStopCFM(*args)
+    def SetSuspensionERP(*args): return _cspace.iODEGeneralJointState_SetSuspensionERP(*args)
+    def SetSuspensionCFM(*args): return _cspace.iODEGeneralJointState_SetSuspensionCFM(*args)
+    def GetLoStop(*args): return _cspace.iODEGeneralJointState_GetLoStop(*args)
+    def GetHiStop(*args): return _cspace.iODEGeneralJointState_GetHiStop(*args)
+    def GetVel(*args): return _cspace.iODEGeneralJointState_GetVel(*args)
+    def GetFMax(*args): return _cspace.iODEGeneralJointState_GetFMax(*args)
+    def GetFudgeFactor(*args): return _cspace.iODEGeneralJointState_GetFudgeFactor(*args)
+    def GetBounce(*args): return _cspace.iODEGeneralJointState_GetBounce(*args)
+    def GetCFM(*args): return _cspace.iODEGeneralJointState_GetCFM(*args)
+    def GetStopERP(*args): return _cspace.iODEGeneralJointState_GetStopERP(*args)
+    def GetStopCFM(*args): return _cspace.iODEGeneralJointState_GetStopCFM(*args)
+    def GetSuspensionERP(*args): return _cspace.iODEGeneralJointState_GetSuspensionERP(*args)
+    def GetSuspensionCFM(*args): return _cspace.iODEGeneralJointState_GetSuspensionCFM(*args)
+    def Attach(*args): return _cspace.iODEGeneralJointState_Attach(*args)
+    def GetAttachedBody(*args): return _cspace.iODEGeneralJointState_GetAttachedBody(*args)
+    def GetFeedbackForce1(*args): return _cspace.iODEGeneralJointState_GetFeedbackForce1(*args)
+    def GetFeedbackTorque1(*args): return _cspace.iODEGeneralJointState_GetFeedbackTorque1(*args)
+    def GetFeedbackForce2(*args): return _cspace.iODEGeneralJointState_GetFeedbackForce2(*args)
+    def GetFeedbackTorque2(*args): return _cspace.iODEGeneralJointState_GetFeedbackTorque2(*args)
+    def __del__(self, destroy=_cspace.delete_iODEGeneralJointState):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iODEGeneralJointStatePtr(iODEGeneralJointState):
+    def __init__(self, this):
+        _swig_setattr(self, iODEGeneralJointState, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iODEGeneralJointState, 'thisown', 0)
+        _swig_setattr(self, iODEGeneralJointState,self.__class__,iODEGeneralJointState)
+_cspace.iODEGeneralJointState_swigregister(iODEGeneralJointStatePtr)
+
+class iODESliderJoint(iODEGeneralJointState):
+    __swig_setmethods__ = {}
+    for _s in [iODEGeneralJointState]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iODESliderJoint, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iODEGeneralJointState]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iODESliderJoint, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iODESliderJoint instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetSliderAxis(*args): return _cspace.iODESliderJoint_SetSliderAxis(*args)
+    def GetSliderAxis(*args): return _cspace.iODESliderJoint_GetSliderAxis(*args)
+    def GetSliderPosition(*args): return _cspace.iODESliderJoint_GetSliderPosition(*args)
+    def GetSliderPositionRate(*args): return _cspace.iODESliderJoint_GetSliderPositionRate(*args)
+    def __del__(self, destroy=_cspace.delete_iODESliderJoint):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODESliderJoint_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iODESliderJoint_scfGetVersion)
+
+class iODESliderJointPtr(iODESliderJoint):
+    def __init__(self, this):
+        _swig_setattr(self, iODESliderJoint, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iODESliderJoint, 'thisown', 0)
+        _swig_setattr(self, iODESliderJoint,self.__class__,iODESliderJoint)
+_cspace.iODESliderJoint_swigregister(iODESliderJointPtr)
+
+iODESliderJoint_scfGetVersion = _cspace.iODESliderJoint_scfGetVersion
+
+class iODEUniversalJoint(iODEGeneralJointState):
+    __swig_setmethods__ = {}
+    for _s in [iODEGeneralJointState]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEUniversalJoint, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iODEGeneralJointState]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iODEUniversalJoint, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iODEUniversalJoint instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetUniversalAnchor(*args): return _cspace.iODEUniversalJoint_SetUniversalAnchor(*args)
+    def SetUniversalAxis1(*args): return _cspace.iODEUniversalJoint_SetUniversalAxis1(*args)
+    def SetUniversalAxis2(*args): return _cspace.iODEUniversalJoint_SetUniversalAxis2(*args)
+    def GetUniversalAnchor1(*args): return _cspace.iODEUniversalJoint_GetUniversalAnchor1(*args)
+    def GetUniversalAnchor2(*args): return _cspace.iODEUniversalJoint_GetUniversalAnchor2(*args)
+    def GetUniversalAxis1(*args): return _cspace.iODEUniversalJoint_GetUniversalAxis1(*args)
+    def GetUniversalAxis2(*args): return _cspace.iODEUniversalJoint_GetUniversalAxis2(*args)
+    def __del__(self, destroy=_cspace.delete_iODEUniversalJoint):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEUniversalJoint_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iODEUniversalJoint_scfGetVersion)
+
+class iODEUniversalJointPtr(iODEUniversalJoint):
+    def __init__(self, this):
+        _swig_setattr(self, iODEUniversalJoint, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iODEUniversalJoint, 'thisown', 0)
+        _swig_setattr(self, iODEUniversalJoint,self.__class__,iODEUniversalJoint)
+_cspace.iODEUniversalJoint_swigregister(iODEUniversalJointPtr)
+
+iODEUniversalJoint_scfGetVersion = _cspace.iODEUniversalJoint_scfGetVersion
+
+CS_ODE_AMOTOR_MODE_UNKNOWN = _cspace.CS_ODE_AMOTOR_MODE_UNKNOWN
+CS_ODE_AMOTOR_MODE_USER = _cspace.CS_ODE_AMOTOR_MODE_USER
+CS_ODE_AMOTOR_MODE_EULER = _cspace.CS_ODE_AMOTOR_MODE_EULER
+CS_ODE_AMOTOR_MODE_LAST = _cspace.CS_ODE_AMOTOR_MODE_LAST
+class iODEAMotorJoint(iODEGeneralJointState):
+    __swig_setmethods__ = {}
+    for _s in [iODEGeneralJointState]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEAMotorJoint, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iODEGeneralJointState]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iODEAMotorJoint, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iODEAMotorJoint instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetAMotorMode(*args): return _cspace.iODEAMotorJoint_SetAMotorMode(*args)
+    def GetAMotorMode(*args): return _cspace.iODEAMotorJoint_GetAMotorMode(*args)
+    def SetAMotorNumAxes(*args): return _cspace.iODEAMotorJoint_SetAMotorNumAxes(*args)
+    def GetAMotorNumAxes(*args): return _cspace.iODEAMotorJoint_GetAMotorNumAxes(*args)
+    def SetAMotorAxis(*args): return _cspace.iODEAMotorJoint_SetAMotorAxis(*args)
+    def GetAMotorAxis(*args): return _cspace.iODEAMotorJoint_GetAMotorAxis(*args)
+    def GetAMotorAxisRelOrientation(*args): return _cspace.iODEAMotorJoint_GetAMotorAxisRelOrientation(*args)
+    def SetAMotorAngle(*args): return _cspace.iODEAMotorJoint_SetAMotorAngle(*args)
+    def GetAMotorAngle(*args): return _cspace.iODEAMotorJoint_GetAMotorAngle(*args)
+    def GetAMotorAngleRate(*args): return _cspace.iODEAMotorJoint_GetAMotorAngleRate(*args)
+    def __del__(self, destroy=_cspace.delete_iODEAMotorJoint):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEAMotorJoint_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iODEAMotorJoint_scfGetVersion)
+
+class iODEAMotorJointPtr(iODEAMotorJoint):
+    def __init__(self, this):
+        _swig_setattr(self, iODEAMotorJoint, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iODEAMotorJoint, 'thisown', 0)
+        _swig_setattr(self, iODEAMotorJoint,self.__class__,iODEAMotorJoint)
+_cspace.iODEAMotorJoint_swigregister(iODEAMotorJointPtr)
+
+iODEAMotorJoint_scfGetVersion = _cspace.iODEAMotorJoint_scfGetVersion
+
+class iODEHingeJoint(iODEGeneralJointState):
+    __swig_setmethods__ = {}
+    for _s in [iODEGeneralJointState]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEHingeJoint, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iODEGeneralJointState]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iODEHingeJoint, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iODEHingeJoint instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetHingeAnchor(*args): return _cspace.iODEHingeJoint_SetHingeAnchor(*args)
+    def SetHingeAxis(*args): return _cspace.iODEHingeJoint_SetHingeAxis(*args)
+    def GetHingeAnchor1(*args): return _cspace.iODEHingeJoint_GetHingeAnchor1(*args)
+    def GetHingeAnchor2(*args): return _cspace.iODEHingeJoint_GetHingeAnchor2(*args)
+    def GetHingeAxis(*args): return _cspace.iODEHingeJoint_GetHingeAxis(*args)
+    def GetHingeAngle(*args): return _cspace.iODEHingeJoint_GetHingeAngle(*args)
+    def GetHingeAngleRate(*args): return _cspace.iODEHingeJoint_GetHingeAngleRate(*args)
+    def GetAnchorError(*args): return _cspace.iODEHingeJoint_GetAnchorError(*args)
+    def __del__(self, destroy=_cspace.delete_iODEHingeJoint):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEHingeJoint_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iODEHingeJoint_scfGetVersion)
+
+class iODEHingeJointPtr(iODEHingeJoint):
+    def __init__(self, this):
+        _swig_setattr(self, iODEHingeJoint, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iODEHingeJoint, 'thisown', 0)
+        _swig_setattr(self, iODEHingeJoint,self.__class__,iODEHingeJoint)
+_cspace.iODEHingeJoint_swigregister(iODEHingeJointPtr)
+
+iODEHingeJoint_scfGetVersion = _cspace.iODEHingeJoint_scfGetVersion
+
+class iODEBallJoint(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEBallJoint, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iODEBallJoint, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iODEBallJoint instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetBallAnchor(*args): return _cspace.iODEBallJoint_SetBallAnchor(*args)
+    def GetBallAnchor1(*args): return _cspace.iODEBallJoint_GetBallAnchor1(*args)
+    def GetBallAnchor2(*args): return _cspace.iODEBallJoint_GetBallAnchor2(*args)
+    def GetAnchorError(*args): return _cspace.iODEBallJoint_GetAnchorError(*args)
+    def Attach(*args): return _cspace.iODEBallJoint_Attach(*args)
+    def GetAttachedBody(*args): return _cspace.iODEBallJoint_GetAttachedBody(*args)
+    def GetFeedbackForce1(*args): return _cspace.iODEBallJoint_GetFeedbackForce1(*args)
+    def GetFeedbackTorque1(*args): return _cspace.iODEBallJoint_GetFeedbackTorque1(*args)
+    def GetFeedbackForce2(*args): return _cspace.iODEBallJoint_GetFeedbackForce2(*args)
+    def GetFeedbackTorque2(*args): return _cspace.iODEBallJoint_GetFeedbackTorque2(*args)
+    def __del__(self, destroy=_cspace.delete_iODEBallJoint):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEBallJoint_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iODEBallJoint_scfGetVersion)
+
+class iODEBallJointPtr(iODEBallJoint):
+    def __init__(self, this):
+        _swig_setattr(self, iODEBallJoint, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iODEBallJoint, 'thisown', 0)
+        _swig_setattr(self, iODEBallJoint,self.__class__,iODEBallJoint)
+_cspace.iODEBallJoint_swigregister(iODEBallJointPtr)
+
+iODEBallJoint_scfGetVersion = _cspace.iODEBallJoint_scfGetVersion
 
 CS_SEQUENCE_LIGHTCHANGE_NONE = _cspace.CS_SEQUENCE_LIGHTCHANGE_NONE
 CS_SEQUENCE_LIGHTCHANGE_LESS = _cspace.CS_SEQUENCE_LIGHTCHANGE_LESS
