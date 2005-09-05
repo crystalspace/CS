@@ -76,16 +76,16 @@ public:
   /// Render the GUI.
   virtual void Render () const
   {
-    ceguisystem->renderGUI();
+    CEGUI::System::getSingletonPtr()->renderGUI();
   }
 
   /// Get a reference to the CEGUI system.
   virtual CEGUI::System& GetSystem () const
-  {return *ceguisystem;}
+  {return CEGUI::System::getSingleton();}
 
   /// Get a pointer to the CEGUI system.
   virtual CEGUI::System* GetSystemPtr () const
-  {return ceguisystem;}
+  {return CEGUI::System::getSingletonPtr();}
 
   /// Get a reference to the CEGUI font manager.
   virtual CEGUI::FontManager& GetFontManager () const
@@ -161,7 +161,6 @@ private:
   iObjectRegistry* obj_reg;
   csCEGUIEventHandler* events;
   csCEGUIResourceProvider* resourceProvider;
-  CEGUI::System* ceguisystem;
 
   csRef<iGraphics3D> g3d;
   csRef<iGraphics2D> g2d;

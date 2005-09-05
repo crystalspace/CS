@@ -27,8 +27,6 @@
 
 #include "csutil/csbaseeventh.h"
 
-#include "CEGUI.h"
-
 struct iObjectRegistry;
 class csMouseDriver;
 
@@ -39,7 +37,7 @@ class csCEGUIEventHandler : public csBaseEventHandler
 {
 public:
   /// Constructor.
-  csCEGUIEventHandler (iObjectRegistry*, csCEGUIRenderer*, CEGUI::System* system);
+  csCEGUIEventHandler (iObjectRegistry*, csCEGUIRenderer*);
 
   /// Destructor.
   ~csCEGUIEventHandler ();
@@ -66,6 +64,5 @@ private:
   iObjectRegistry *obj_reg;
   csCEGUIRenderer* renderer;
   csMouseDriver *md;
-  CEGUI::System* ceguisystem;
 };
 #endif // _CS_CEGUI_EVENTHANDLER_H_

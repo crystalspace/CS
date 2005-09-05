@@ -82,10 +82,10 @@ bool csCEGUIRenderer::Initialize (int width, int height)
   if (!g2d)
     return false;
 
-  ceguisystem = new CEGUI::System (this);
+  new CEGUI::System (this);
 
   g2d->SetMouseCursor (csmcNone);
-  events = new csCEGUIEventHandler (obj_reg, this, ceguisystem);
+  events = new csCEGUIEventHandler (obj_reg, this);
   events->Initialize ();
 
   return true;
@@ -94,6 +94,9 @@ bool csCEGUIRenderer::Initialize (int width, int height)
 // TODO add description
 csCEGUIRenderer::~csCEGUIRenderer ()
 {
+  delete CEGUI::System::getSingletonPtr();
+  delete events;
+  delete resourceProvider;
   SCF_DESTRUCT_IBASE ();
 }
 

@@ -22,19 +22,22 @@
 #include "csutil/event.h"
 #include "csutil/csinput.h"
 
+#include "CEGUI.h"
+
 #include "ceguievthandler.h"
 #include "ceguirenderer.h"
 
 csCEGUIEventHandler::csCEGUIEventHandler (iObjectRegistry *reg, 
-  csCEGUIRenderer* owner, CEGUI::System* system) 
+  csCEGUIRenderer* owner) 
 {
   obj_reg = reg;
   renderer = owner;
   md = new csMouseDriver (reg);
-  ceguisystem = system;
 }
+
 csCEGUIEventHandler::~csCEGUIEventHandler()
 {
+  delete md;
 }
 
 bool csCEGUIEventHandler::Initialize ()
@@ -67,19 +70,19 @@ bool csCEGUIEventHandler::OnMouseDown (iEvent &event)
   switch (csMouseEventHelper::GetButton (&event))
   {
     case csmbLeft:
-      ceguisystem->injectMouseButtonDown(CEGUI::LeftButton);
+      CEGUI::System::getSingletonPtr()->injectMouseButtonDown(CEGUI::LeftButton);
       break;
     case csmbMiddle:
-      ceguisystem->injectMouseButtonDown(CEGUI::MiddleButton);
+      CEGUI::System::getSingletonPtr()->injectMouseButtonDown(CEGUI::MiddleButton);
       break;
     case csmbRight:
-      ceguisystem->injectMouseButtonDown(CEGUI::RightButton);
+      CEGUI::System::getSingletonPtr()->injectMouseButtonDown(CEGUI::RightButton);
       break;
     case csmbWheelUp:
-      ceguisystem->injectMouseWheelChange (1.0f);
+      CEGUI::System::getSingletonPtr()->injectMouseWheelChange (1.0f);
       break;
     case csmbWheelDown:
-      ceguisystem->injectMouseWheelChange (-1.0f);
+      CEGUI::System::getSingletonPtr()->injectMouseWheelChange (-1.0f);
       break;
   }
   return true;
@@ -87,7 +90,7 @@ bool csCEGUIEventHandler::OnMouseDown (iEvent &event)
 
 bool csCEGUIEventHandler::OnMouseMove (iEvent &event)
 {
-  ceguisystem->injectMousePosition(csMouseEventHelper::GetX(&event), 
+  CEGUI::System::getSingletonPtr()->injectMousePosition(csMouseEventHelper::GetX(&event), 
     csMouseEventHelper::GetY(&event));
   return true;
 }
@@ -97,13 +100,13 @@ bool csCEGUIEventHandler::OnMouseUp (iEvent &event)
   switch (csMouseEventHelper::GetButton (&event))
   {
     case csmbLeft:
-      ceguisystem->injectMouseButtonUp(CEGUI::LeftButton);
+      CEGUI::System::getSingletonPtr()->injectMouseButtonUp(CEGUI::LeftButton);
       break;
     case csmbMiddle:
-      ceguisystem->injectMouseButtonUp(CEGUI::MiddleButton);
+      CEGUI::System::getSingletonPtr()->injectMouseButtonUp(CEGUI::MiddleButton);
       break;
     case csmbRight:
-      ceguisystem->injectMouseButtonUp(CEGUI::RightButton);
+      CEGUI::System::getSingletonPtr()->injectMouseButtonUp(CEGUI::RightButton);
       break;
   }
   return true;
@@ -119,44 +122,44 @@ bool csCEGUIEventHandler::OnKeyboard (iEvent &event)
     switch (code)
     {
       case CSKEY_ESC:
-        ceguisystem->injectKeyDown(CEGUI::Key::Escape);
+        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::Escape);
         return true;
       case CSKEY_BACKSPACE:
-        ceguisystem->injectKeyDown(CEGUI::Key::Backspace);
+        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::Backspace);
         return true;
       case CSKEY_DEL:
-        ceguisystem->injectKeyDown(CEGUI::Key::Delete);
+        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::Delete);
         return true;
       case CSKEY_ENTER:
-        ceguisystem->injectKeyDown(CEGUI::Key::Return);
+        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::Return);
         return true;
       case CSKEY_DOWN:
-        ceguisystem->injectKeyDown(CEGUI::Key::ArrowDown);
+        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::ArrowDown);
         return true;
       case CSKEY_UP:
-        ceguisystem->injectKeyDown(CEGUI::Key::ArrowUp);
+        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::ArrowUp);
         return true;
       case CSKEY_LEFT:
-        ceguisystem->injectKeyDown(CEGUI::Key::ArrowLeft);
+        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::ArrowLeft);
         return true;
       case CSKEY_RIGHT:
-        ceguisystem->injectKeyDown(CEGUI::Key::ArrowRight);
+        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::ArrowRight);
         return true;
       case CSKEY_PGUP:
-        ceguisystem->injectKeyDown(CEGUI::Key::PageDown);
+        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::PageDown);
         return true;
       case CSKEY_PGDN:
-        ceguisystem->injectKeyDown(CEGUI::Key::PageUp);
+        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::PageUp);
         return true;
       case CSKEY_HOME:
-        ceguisystem->injectKeyDown(CEGUI::Key::Home);
+        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::Home);
         return true;
       case CSKEY_END:
-        ceguisystem->injectKeyDown(CEGUI::Key::End);
+        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::End);
         return true;
     }
 
-    ceguisystem->injectChar(static_cast<CEGUI::utf32>(code));
+    CEGUI::System::getSingletonPtr()->injectChar(static_cast<CEGUI::utf32>(code));
     return true;
   }
 

@@ -5,7 +5,8 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
-
+5-Sep-2005
+	- iceeey fixed memory leak in CEGUI plugin as reported by Eric.
 4-Sep-2005
 	- Marten fixed master header problem after cegui addition.
 	- Piotr Obrzut fixed bug in ODE dynamic system collider when user 
