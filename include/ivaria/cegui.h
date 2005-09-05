@@ -37,56 +37,29 @@ struct iCEGUI : public virtual iBase
   /// Render the GUI.
   virtual void Render () const = 0;
 
-  /// Get the CEGUI::System singleton.
-  virtual CEGUI::System& GetSystem () const = 0;
-
   /// Get a pointer to the CEGUI::System singleton.
   virtual CEGUI::System* GetSystemPtr () const = 0;
-
-  /// Get the CEGUI::FontManager singleton.
-  virtual CEGUI::FontManager& GetFontManager () const = 0;
 
   /// Get a pointer to the CEGUI::FontManager singleton.
   virtual CEGUI::FontManager* GetFontManagerPtr () const = 0;
 
-  /// Get the CEGUI::GlobalEventSet singleton.
-  virtual CEGUI::GlobalEventSet& GetGlobalEventSet () const = 0;
-
   /// Get a pointer to the CEGUI::GlobalEventSet singleton.
   virtual CEGUI::GlobalEventSet* GetGlobalEventSetPtr () const = 0;
-
-  /// Get the CEGUI::ImagesetManager singleton.
-  virtual CEGUI::ImagesetManager& GetImagesetManager () const = 0;
 
   /// Get a pointer to the CEGUI::ImagesetManager singleton.
   virtual CEGUI::ImagesetManager* GetImagesetManagerPtr () const = 0;
 
-  /// Get the CEGUI::Logger singleton.
-  virtual CEGUI::Logger& GetLogger () const = 0;
-
   /// Get a pointer to the CEGUI::Logger singleton.
   virtual CEGUI::Logger* GetLoggerPtr () const = 0;
-
-  /// Get the CEGUI::MouseCursor singleton.
-  virtual CEGUI::MouseCursor& GetMouseCursor () const = 0;
 
   /// Get a pointer to the CEGUI::MouseCursor singleton.
   virtual CEGUI::MouseCursor* GetMouseCursorPtr () const = 0;
 
-  /// Get the CEGUI::SchemeManager singleton.
-  virtual CEGUI::SchemeManager& GetSchemeManager () const = 0;
-
   /// Get a pointer to the CEGUI::SchemeManager singleton.
   virtual CEGUI::SchemeManager* GetSchemeManagerPtr () const = 0;
 
-  /// Get the CEGUI::WindowFactoryManager singleton.
-  virtual CEGUI::WindowFactoryManager& GetWindowFactoryManager () const = 0;
-
   /// Get a pointer to the CEGUI::WindowFactoryManager singleton.
   virtual CEGUI::WindowFactoryManager* GetWindowFactoryManagerPtr () const = 0;
-
-  /// Get the CEGUI::WindowManager singleton.
-  virtual CEGUI::WindowManager& GetWindowManager () const = 0;
 
   /// Get a pointer to the CEGUI::WindowManager singleton.
   virtual CEGUI::WindowManager* GetWindowManagerPtr () const = 0;

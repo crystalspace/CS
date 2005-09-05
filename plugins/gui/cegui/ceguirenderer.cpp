@@ -94,6 +94,8 @@ bool csCEGUIRenderer::Initialize (int width, int height)
 // TODO add description
 csCEGUIRenderer::~csCEGUIRenderer ()
 {
+  destroyAllTextures();
+  clearRenderList();
   delete CEGUI::System::getSingletonPtr();
   delete events;
   delete resourceProvider;

@@ -7,6 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 5-Sep-2005
 	- iceeey fixed memory leak in CEGUI plugin as reported by Eric.
+	- iceeey cleaned iCEGUI interface by removing all Get functions returning
+	  a reference, as recommended by Eric.
+	- iceeey completed CEGUI memory leak fix by making sure all quads were
+	  freed in the render list. Also removed duplicate deletion of CEGUI::System
+	  singleton in csCEGUIEventHandler::OnUnhandledEvent().
 4-Sep-2005
 	- Marten fixed master header problem after cegui addition.
 	- Piotr Obrzut fixed bug in ODE dynamic system collider when user 

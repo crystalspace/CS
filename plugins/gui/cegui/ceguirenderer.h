@@ -79,73 +79,37 @@ public:
     CEGUI::System::getSingletonPtr()->renderGUI();
   }
 
-  /// Get a reference to the CEGUI system.
-  virtual CEGUI::System& GetSystem () const
-  {return CEGUI::System::getSingleton();}
-
   /// Get a pointer to the CEGUI system.
   virtual CEGUI::System* GetSystemPtr () const
   {return CEGUI::System::getSingletonPtr();}
-
-  /// Get a reference to the CEGUI font manager.
-  virtual CEGUI::FontManager& GetFontManager () const
-  {return CEGUI::FontManager::getSingleton();}
 
   /// Get a pointer to the CEGUI font manager.
   virtual CEGUI::FontManager* GetFontManagerPtr () const
   {return CEGUI::FontManager::getSingletonPtr();}
 
-  /// Get a reference to the CEGUI global event set.
-  virtual CEGUI::GlobalEventSet& GetGlobalEventSet () const
-  {return CEGUI::GlobalEventSet::getSingleton();}
-
   /// Get a pointer to the CEGUI global event set.
   virtual CEGUI::GlobalEventSet* GetGlobalEventSetPtr () const
   {return CEGUI::GlobalEventSet::getSingletonPtr();}
-
-  /// Get a reference to the CEGUI imageset manager.
-  virtual CEGUI::ImagesetManager& GetImagesetManager () const
-  {return CEGUI::ImagesetManager::getSingleton();}
 
   /// Get a pointer to the CEGUI imageset manager.
   virtual CEGUI::ImagesetManager* GetImagesetManagerPtr () const
   {return CEGUI::ImagesetManager::getSingletonPtr();}
 
-  /// Get a reference to the CEGUI logger.
-  virtual CEGUI::Logger& GetLogger () const
-  {return CEGUI::Logger::getSingleton();}
-
   /// Get a pointer to the CEGUI logger.
   virtual CEGUI::Logger* GetLoggerPtr () const
   {return CEGUI::Logger::getSingletonPtr();}
-
-  /// Get a reference to the CEGUI mouse cursor.
-  virtual CEGUI::MouseCursor& GetMouseCursor () const
-  {return CEGUI::MouseCursor::getSingleton();}
 
   /// Get a pointer to the CEGUI mouse cursor.
   virtual CEGUI::MouseCursor* GetMouseCursorPtr () const
   {return CEGUI::MouseCursor::getSingletonPtr();}
 
-  /// Get a reference to the CEGUI scheme manager.
-  virtual CEGUI::SchemeManager& GetSchemeManager () const
-  {return CEGUI::SchemeManager::getSingleton();}
-
   /// Get a pointer to the CEGUI scheme manager.
   virtual CEGUI::SchemeManager* GetSchemeManagerPtr () const
   {return CEGUI::SchemeManager::getSingletonPtr();}
 
-  /// Get a reference to the CEGUI window factory manager.
-  virtual CEGUI::WindowFactoryManager& GetWindowFactoryManager () const
-  {return CEGUI::WindowFactoryManager::getSingleton();}
-
   /// Get a pointer to the CEGUI window factory manager.
   virtual CEGUI::WindowFactoryManager* GetWindowFactoryManagerPtr () const
   {return CEGUI::WindowFactoryManager::getSingletonPtr();}
-
-  /// Get a reference to the CEGUI window manager.
-  virtual CEGUI::WindowManager& GetWindowManager () const
-  {return CEGUI::WindowManager::getSingleton();}
 
   /// Get a pointer to the CEGUI window manager.
   virtual CEGUI::WindowManager* GetWindowManagerPtr () const

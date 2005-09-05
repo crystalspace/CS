@@ -55,12 +55,6 @@ bool csCEGUIEventHandler::OnUnhandledEvent (iEvent &event)
     renderer->setDisplaySize (CEGUI::Size (g2d->GetWidth (), g2d->GetHeight ()));
     return true;
   }
-  else if (csCommandEventHelper::GetCode (&event) == cscmdSystemClose)
-  {
-    delete renderer->GetSystem().getSingletonPtr();
-    renderer->destroyAllTextures();
-    return true;
-  }
 
   return false;
 }

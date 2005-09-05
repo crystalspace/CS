@@ -161,22 +161,22 @@ bool CEGUITest::Application()
   cegui->Initialize ();
 
   // Set the logging level
-  cegui->GetLogger ().setLoggingLevel(CEGUI::Informative);
+  cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
 
   vfs->Mount ("/ceguitest/", "$@data$/ceguitest$/");
 
   vfs->ChDir ("/ceguitest/");
 
   // Load the ice skin (which uses Falagard skinning system)
-  cegui->GetSchemeManager ().loadScheme("ice.scheme");
+  cegui->GetSchemeManagerPtr ()->loadScheme("ice.scheme");
 
-  cegui->GetSystem ().setDefaultMouseCursor("ice", "MouseArrow");
-  cegui->GetFontManager ().createFont("Vera", "/fonts/ttf/Vera.ttf", 10, 
+  cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
+  cegui->GetFontManagerPtr ()->createFont("Vera", "/fonts/ttf/Vera.ttf", 10, 
     CEGUI::Default);
-  CEGUI::WindowManager& winMgr = cegui->GetWindowManager ();
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
   // Load layout and set as root
-  cegui->GetSystem ().setGUISheet(winMgr.loadWindowLayout("ice.layout"));
+  cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("ice.layout"));
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
