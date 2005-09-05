@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 
 #include "iutil/objreg.h"
+#include "ivaria/script.h"
 #include "ivideo/txtmgr.h"
 
 #include "ceguirenderer.h"
@@ -47,7 +48,7 @@ csCEGUIRenderer::csCEGUIRenderer (iBase *parent) :
 }
 
 // TODO add description
-bool csCEGUIRenderer::Initialize (int width, int height)
+bool csCEGUIRenderer::Initialize (iScript* script, int width, int height)
 {
   g3d = CS_QUERY_REGISTRY (obj_reg, iGraphics3D);
 
@@ -82,7 +83,15 @@ bool csCEGUIRenderer::Initialize (int width, int height)
   if (!g2d)
     return false;
 
-  new CEGUI::System (this);
+  if (script)
+  {
+    scriptModule = new csCEGUIScriptModule (script, obj_reg);
+    new CEGUI::System (this, scriptModule);
+  }
+  else
+  {
+    new CEGUI::System (this);
+  }
 
   g2d->SetMouseCursor (csmcNone);
   events = new csCEGUIEventHandler (obj_reg, this);
@@ -97,6 +106,7 @@ csCEGUIRenderer::~csCEGUIRenderer ()
   destroyAllTextures();
   clearRenderList();
   delete CEGUI::System::getSingletonPtr();
+  delete scriptModule;
   delete events;
   delete resourceProvider;
   SCF_DESTRUCT_IBASE ();

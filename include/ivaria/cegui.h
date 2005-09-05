@@ -25,14 +25,18 @@
 SCF_VERSION (iCEGUI, 0, 0, 1);
 
 struct iObjectRegistry;
+struct iScript;
 
 /**
  * Interface for the CS CEGUI wrapper.
  */
 struct iCEGUI : public virtual iBase
 {
-  /// Initialize the plugin.
-  virtual bool Initialize (int width=-1, int height=-1) = 0;
+  /**
+   * Initialize the plugin.
+   * \param script iScript plugin to use as a scripting module.
+   */
+  virtual bool Initialize (iScript* script=0, int width=-1, int height=-1) = 0;
 
   /// Render the GUI.
   virtual void Render () const = 0;

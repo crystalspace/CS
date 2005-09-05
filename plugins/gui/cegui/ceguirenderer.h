@@ -40,6 +40,7 @@
 
 #include "ceguievthandler.h"
 #include "ceguiresourceprovider.h"
+#include "ceguiscriptmodule.h"
 
 struct iObjectRegistry;
 
@@ -61,10 +62,10 @@ public:
   virtual ~csCEGUIRenderer ();
 
   /**
-   * Initialize CEGUI plugin, optionally specifying the width and height
-   * of the CEGUI display size.
+   * Initialize the plugin.
+   * \param script iScript plugin to use as a scripting module.
    */
-  virtual bool Initialize (int width, int height);
+  virtual bool Initialize (iScript* script=0, int width=-1, int height=-1);
 
   /// Initialize with an iObjectRegistry pointer (called by plugin loader).
   virtual bool Initialize (iObjectRegistry *reg) 
@@ -125,6 +126,7 @@ private:
   iObjectRegistry* obj_reg;
   csCEGUIEventHandler* events;
   csCEGUIResourceProvider* resourceProvider;
+  csCEGUIScriptModule* scriptModule;
 
   csRef<iGraphics3D> g3d;
   csRef<iGraphics2D> g2d;
