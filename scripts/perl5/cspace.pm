@@ -12497,6 +12497,37 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iDynamicsColliderCollisionCallback ##############
+
+package cspace::iDynamicsColliderCollisionCallback;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*Execute = *cspacec::iDynamicsColliderCollisionCallback_Execute;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iDynamicsColliderCollisionCallback($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iDynamicsSystemCollider ##############
 
 package cspace::iDynamicsSystemCollider;
@@ -12508,6 +12539,7 @@ package cspace::iDynamicsSystemCollider;
 *CreateMeshGeometry = *cspacec::iDynamicsSystemCollider_CreateMeshGeometry;
 *CreateBoxGeometry = *cspacec::iDynamicsSystemCollider_CreateBoxGeometry;
 *CreateCCylinderGeometry = *cspacec::iDynamicsSystemCollider_CreateCCylinderGeometry;
+*SetCollisionCallback = *cspacec::iDynamicsSystemCollider_SetCollisionCallback;
 *SetFriction = *cspacec::iDynamicsSystemCollider_SetFriction;
 *SetSoftness = *cspacec::iDynamicsSystemCollider_SetSoftness;
 *SetDensity = *cspacec::iDynamicsSystemCollider_SetDensity;
@@ -12588,6 +12620,511 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iJoint_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iODEFrameUpdateCallback ##############
+
+package cspace::iODEFrameUpdateCallback;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*Execute = *cspacec::iODEFrameUpdateCallback_Execute;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iODEFrameUpdateCallback($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iODEDynamicState ##############
+
+package cspace::iODEDynamicState;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetGlobalERP = *cspacec::iODEDynamicState_SetGlobalERP;
+*GlobalERP = *cspacec::iODEDynamicState_GlobalERP;
+*SetGlobalCFM = *cspacec::iODEDynamicState_SetGlobalCFM;
+*GlobalCFM = *cspacec::iODEDynamicState_GlobalCFM;
+*EnableStepFast = *cspacec::iODEDynamicState_EnableStepFast;
+*StepFastEnabled = *cspacec::iODEDynamicState_StepFastEnabled;
+*SetStepFastIterations = *cspacec::iODEDynamicState_SetStepFastIterations;
+*StepFastIterations = *cspacec::iODEDynamicState_StepFastIterations;
+*EnableQuickStep = *cspacec::iODEDynamicState_EnableQuickStep;
+*QuickStepEnabled = *cspacec::iODEDynamicState_QuickStepEnabled;
+*SetQuickStepIterations = *cspacec::iODEDynamicState_SetQuickStepIterations;
+*QuickStepIterations = *cspacec::iODEDynamicState_QuickStepIterations;
+*EnableFrameRate = *cspacec::iODEDynamicState_EnableFrameRate;
+*FrameRateEnabled = *cspacec::iODEDynamicState_FrameRateEnabled;
+*SetFrameRate = *cspacec::iODEDynamicState_SetFrameRate;
+*FrameRate = *cspacec::iODEDynamicState_FrameRate;
+*SetFrameLimit = *cspacec::iODEDynamicState_SetFrameLimit;
+*FrameLimit = *cspacec::iODEDynamicState_FrameLimit;
+*AddFrameUpdateCallback = *cspacec::iODEDynamicState_AddFrameUpdateCallback;
+*RemoveFrameUpdateCallback = *cspacec::iODEDynamicState_RemoveFrameUpdateCallback;
+*EnableEventProcessing = *cspacec::iODEDynamicState_EnableEventProcessing;
+*EventProcessingEnabled = *cspacec::iODEDynamicState_EventProcessingEnabled;
+*EnableFastObjects = *cspacec::iODEDynamicState_EnableFastObjects;
+*FastObjectsEnabled = *cspacec::iODEDynamicState_FastObjectsEnabled;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iODEDynamicState($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iODEDynamicState_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iODEDynamicSystemState ##############
+
+package cspace::iODEDynamicSystemState;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetERP = *cspacec::iODEDynamicSystemState_SetERP;
+*ERP = *cspacec::iODEDynamicSystemState_ERP;
+*SetCFM = *cspacec::iODEDynamicSystemState_SetCFM;
+*CFM = *cspacec::iODEDynamicSystemState_CFM;
+*EnableStepFast = *cspacec::iODEDynamicSystemState_EnableStepFast;
+*StepFastEnabled = *cspacec::iODEDynamicSystemState_StepFastEnabled;
+*SetStepFastIterations = *cspacec::iODEDynamicSystemState_SetStepFastIterations;
+*StepFastIterations = *cspacec::iODEDynamicSystemState_StepFastIterations;
+*EnableQuickStep = *cspacec::iODEDynamicSystemState_EnableQuickStep;
+*QuickStepEnabled = *cspacec::iODEDynamicSystemState_QuickStepEnabled;
+*SetQuickStepIterations = *cspacec::iODEDynamicSystemState_SetQuickStepIterations;
+*QuickStepIterations = *cspacec::iODEDynamicSystemState_QuickStepIterations;
+*EnableAutoDisable = *cspacec::iODEDynamicSystemState_EnableAutoDisable;
+*AutoDisableEnabled = *cspacec::iODEDynamicSystemState_AutoDisableEnabled;
+*SetAutoDisableParams = *cspacec::iODEDynamicSystemState_SetAutoDisableParams;
+*EnableFrameRate = *cspacec::iODEDynamicSystemState_EnableFrameRate;
+*FrameRateEnabled = *cspacec::iODEDynamicSystemState_FrameRateEnabled;
+*SetFrameRate = *cspacec::iODEDynamicSystemState_SetFrameRate;
+*FrameRate = *cspacec::iODEDynamicSystemState_FrameRate;
+*SetFrameLimit = *cspacec::iODEDynamicSystemState_SetFrameLimit;
+*FrameLimit = *cspacec::iODEDynamicSystemState_FrameLimit;
+*AddFrameUpdateCallback = *cspacec::iODEDynamicSystemState_AddFrameUpdateCallback;
+*RemoveFrameUpdateCallback = *cspacec::iODEDynamicSystemState_RemoveFrameUpdateCallback;
+*EnableFastObjects = *cspacec::iODEDynamicSystemState_EnableFastObjects;
+*FastObjectsEnabled = *cspacec::iODEDynamicSystemState_FastObjectsEnabled;
+*CreateBallJoint = *cspacec::iODEDynamicSystemState_CreateBallJoint;
+*CreateHingeJoint = *cspacec::iODEDynamicSystemState_CreateHingeJoint;
+*CreateAMotorJoint = *cspacec::iODEDynamicSystemState_CreateAMotorJoint;
+*CreateUniversalJoint = *cspacec::iODEDynamicSystemState_CreateUniversalJoint;
+*CreateSliderJoint = *cspacec::iODEDynamicSystemState_CreateSliderJoint;
+*RemoveJoint = *cspacec::iODEDynamicSystemState_RemoveJoint;
+*SetContactMaxCorrectingVel = *cspacec::iODEDynamicSystemState_SetContactMaxCorrectingVel;
+*GetContactMaxCorrectingVel = *cspacec::iODEDynamicSystemState_GetContactMaxCorrectingVel;
+*SetContactSurfaceLayer = *cspacec::iODEDynamicSystemState_SetContactSurfaceLayer;
+*GetContactSurfaceLayer = *cspacec::iODEDynamicSystemState_GetContactSurfaceLayer;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iODEDynamicSystemState($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iODEDynamicSystemState_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iODEJointState ##############
+
+package cspace::iODEJointState;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*GetType = *cspacec::iODEJointState_GetType;
+*SetLoStop = *cspacec::iODEJointState_SetLoStop;
+*SetHiStop = *cspacec::iODEJointState_SetHiStop;
+*SetVel = *cspacec::iODEJointState_SetVel;
+*SetFMax = *cspacec::iODEJointState_SetFMax;
+*SetFudgeFactor = *cspacec::iODEJointState_SetFudgeFactor;
+*SetBounce = *cspacec::iODEJointState_SetBounce;
+*SetCFM = *cspacec::iODEJointState_SetCFM;
+*SetStopERP = *cspacec::iODEJointState_SetStopERP;
+*SetStopCFM = *cspacec::iODEJointState_SetStopCFM;
+*SetSuspensionERP = *cspacec::iODEJointState_SetSuspensionERP;
+*SetSuspensionCFM = *cspacec::iODEJointState_SetSuspensionCFM;
+*SetLoStop2 = *cspacec::iODEJointState_SetLoStop2;
+*SetHiStop2 = *cspacec::iODEJointState_SetHiStop2;
+*SetVel2 = *cspacec::iODEJointState_SetVel2;
+*SetFMax2 = *cspacec::iODEJointState_SetFMax2;
+*SetFudgeFactor2 = *cspacec::iODEJointState_SetFudgeFactor2;
+*SetBounce2 = *cspacec::iODEJointState_SetBounce2;
+*SetCFM2 = *cspacec::iODEJointState_SetCFM2;
+*SetStopERP2 = *cspacec::iODEJointState_SetStopERP2;
+*SetStopCFM2 = *cspacec::iODEJointState_SetStopCFM2;
+*SetSuspensionERP2 = *cspacec::iODEJointState_SetSuspensionERP2;
+*SetSuspensionCFM2 = *cspacec::iODEJointState_SetSuspensionCFM2;
+*SetLoStop3 = *cspacec::iODEJointState_SetLoStop3;
+*SetHiStop3 = *cspacec::iODEJointState_SetHiStop3;
+*SetVel3 = *cspacec::iODEJointState_SetVel3;
+*SetFMax3 = *cspacec::iODEJointState_SetFMax3;
+*SetFudgeFactor3 = *cspacec::iODEJointState_SetFudgeFactor3;
+*SetBounce3 = *cspacec::iODEJointState_SetBounce3;
+*SetCFM3 = *cspacec::iODEJointState_SetCFM3;
+*SetStopERP3 = *cspacec::iODEJointState_SetStopERP3;
+*SetStopCFM3 = *cspacec::iODEJointState_SetStopCFM3;
+*SetSuspensionERP3 = *cspacec::iODEJointState_SetSuspensionERP3;
+*SetSuspensionCFM3 = *cspacec::iODEJointState_SetSuspensionCFM3;
+*GetLoStop = *cspacec::iODEJointState_GetLoStop;
+*GetHiStop = *cspacec::iODEJointState_GetHiStop;
+*GetVel = *cspacec::iODEJointState_GetVel;
+*GetFMax = *cspacec::iODEJointState_GetFMax;
+*GetFudgeFactor = *cspacec::iODEJointState_GetFudgeFactor;
+*GetBounce = *cspacec::iODEJointState_GetBounce;
+*GetCFM = *cspacec::iODEJointState_GetCFM;
+*GetStopERP = *cspacec::iODEJointState_GetStopERP;
+*GetStopCFM = *cspacec::iODEJointState_GetStopCFM;
+*GetSuspensionERP = *cspacec::iODEJointState_GetSuspensionERP;
+*GetSuspensionCFM = *cspacec::iODEJointState_GetSuspensionCFM;
+*GetLoStop2 = *cspacec::iODEJointState_GetLoStop2;
+*GetHiStop2 = *cspacec::iODEJointState_GetHiStop2;
+*GetVel2 = *cspacec::iODEJointState_GetVel2;
+*GetFMax2 = *cspacec::iODEJointState_GetFMax2;
+*GetFudgeFactor2 = *cspacec::iODEJointState_GetFudgeFactor2;
+*GetBounce2 = *cspacec::iODEJointState_GetBounce2;
+*GetCFM2 = *cspacec::iODEJointState_GetCFM2;
+*GetStopERP2 = *cspacec::iODEJointState_GetStopERP2;
+*GetStopCFM2 = *cspacec::iODEJointState_GetStopCFM2;
+*GetSuspensionERP2 = *cspacec::iODEJointState_GetSuspensionERP2;
+*GetSuspensionCFM2 = *cspacec::iODEJointState_GetSuspensionCFM2;
+*GetLoStop3 = *cspacec::iODEJointState_GetLoStop3;
+*GetHiStop3 = *cspacec::iODEJointState_GetHiStop3;
+*GetVel3 = *cspacec::iODEJointState_GetVel3;
+*GetFMax3 = *cspacec::iODEJointState_GetFMax3;
+*GetFudgeFactor3 = *cspacec::iODEJointState_GetFudgeFactor3;
+*GetBounce3 = *cspacec::iODEJointState_GetBounce3;
+*GetCFM3 = *cspacec::iODEJointState_GetCFM3;
+*GetStopERP3 = *cspacec::iODEJointState_GetStopERP3;
+*GetStopCFM3 = *cspacec::iODEJointState_GetStopCFM3;
+*GetSuspensionERP3 = *cspacec::iODEJointState_GetSuspensionERP3;
+*GetSuspensionCFM3 = *cspacec::iODEJointState_GetSuspensionCFM3;
+*SetHinge2Axis1 = *cspacec::iODEJointState_SetHinge2Axis1;
+*SetHinge2Axis2 = *cspacec::iODEJointState_SetHinge2Axis2;
+*SetHinge2Anchor = *cspacec::iODEJointState_SetHinge2Anchor;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iODEJointState($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iODEJointState_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iODEGeneralJointState ##############
+
+package cspace::iODEGeneralJointState;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetLoStop = *cspacec::iODEGeneralJointState_SetLoStop;
+*SetHiStop = *cspacec::iODEGeneralJointState_SetHiStop;
+*SetVel = *cspacec::iODEGeneralJointState_SetVel;
+*SetFMax = *cspacec::iODEGeneralJointState_SetFMax;
+*SetFudgeFactor = *cspacec::iODEGeneralJointState_SetFudgeFactor;
+*SetBounce = *cspacec::iODEGeneralJointState_SetBounce;
+*SetCFM = *cspacec::iODEGeneralJointState_SetCFM;
+*SetStopERP = *cspacec::iODEGeneralJointState_SetStopERP;
+*SetStopCFM = *cspacec::iODEGeneralJointState_SetStopCFM;
+*SetSuspensionERP = *cspacec::iODEGeneralJointState_SetSuspensionERP;
+*SetSuspensionCFM = *cspacec::iODEGeneralJointState_SetSuspensionCFM;
+*GetLoStop = *cspacec::iODEGeneralJointState_GetLoStop;
+*GetHiStop = *cspacec::iODEGeneralJointState_GetHiStop;
+*GetVel = *cspacec::iODEGeneralJointState_GetVel;
+*GetFMax = *cspacec::iODEGeneralJointState_GetFMax;
+*GetFudgeFactor = *cspacec::iODEGeneralJointState_GetFudgeFactor;
+*GetBounce = *cspacec::iODEGeneralJointState_GetBounce;
+*GetCFM = *cspacec::iODEGeneralJointState_GetCFM;
+*GetStopERP = *cspacec::iODEGeneralJointState_GetStopERP;
+*GetStopCFM = *cspacec::iODEGeneralJointState_GetStopCFM;
+*GetSuspensionERP = *cspacec::iODEGeneralJointState_GetSuspensionERP;
+*GetSuspensionCFM = *cspacec::iODEGeneralJointState_GetSuspensionCFM;
+*Attach = *cspacec::iODEGeneralJointState_Attach;
+*GetAttachedBody = *cspacec::iODEGeneralJointState_GetAttachedBody;
+*GetFeedbackForce1 = *cspacec::iODEGeneralJointState_GetFeedbackForce1;
+*GetFeedbackTorque1 = *cspacec::iODEGeneralJointState_GetFeedbackTorque1;
+*GetFeedbackForce2 = *cspacec::iODEGeneralJointState_GetFeedbackForce2;
+*GetFeedbackTorque2 = *cspacec::iODEGeneralJointState_GetFeedbackTorque2;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iODEGeneralJointState($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iODESliderJoint ##############
+
+package cspace::iODESliderJoint;
+@ISA = qw( cspace cspace::iODEGeneralJointState );
+%OWNER = ();
+%ITERATORS = ();
+*SetSliderAxis = *cspacec::iODESliderJoint_SetSliderAxis;
+*GetSliderAxis = *cspacec::iODESliderJoint_GetSliderAxis;
+*GetSliderPosition = *cspacec::iODESliderJoint_GetSliderPosition;
+*GetSliderPositionRate = *cspacec::iODESliderJoint_GetSliderPositionRate;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iODESliderJoint($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iODESliderJoint_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iODEUniversalJoint ##############
+
+package cspace::iODEUniversalJoint;
+@ISA = qw( cspace cspace::iODEGeneralJointState );
+%OWNER = ();
+%ITERATORS = ();
+*SetUniversalAnchor = *cspacec::iODEUniversalJoint_SetUniversalAnchor;
+*SetUniversalAxis1 = *cspacec::iODEUniversalJoint_SetUniversalAxis1;
+*SetUniversalAxis2 = *cspacec::iODEUniversalJoint_SetUniversalAxis2;
+*GetUniversalAnchor1 = *cspacec::iODEUniversalJoint_GetUniversalAnchor1;
+*GetUniversalAnchor2 = *cspacec::iODEUniversalJoint_GetUniversalAnchor2;
+*GetUniversalAxis1 = *cspacec::iODEUniversalJoint_GetUniversalAxis1;
+*GetUniversalAxis2 = *cspacec::iODEUniversalJoint_GetUniversalAxis2;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iODEUniversalJoint($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iODEUniversalJoint_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iODEAMotorJoint ##############
+
+package cspace::iODEAMotorJoint;
+@ISA = qw( cspace cspace::iODEGeneralJointState );
+%OWNER = ();
+%ITERATORS = ();
+*SetAMotorMode = *cspacec::iODEAMotorJoint_SetAMotorMode;
+*GetAMotorMode = *cspacec::iODEAMotorJoint_GetAMotorMode;
+*SetAMotorNumAxes = *cspacec::iODEAMotorJoint_SetAMotorNumAxes;
+*GetAMotorNumAxes = *cspacec::iODEAMotorJoint_GetAMotorNumAxes;
+*SetAMotorAxis = *cspacec::iODEAMotorJoint_SetAMotorAxis;
+*GetAMotorAxis = *cspacec::iODEAMotorJoint_GetAMotorAxis;
+*GetAMotorAxisRelOrientation = *cspacec::iODEAMotorJoint_GetAMotorAxisRelOrientation;
+*SetAMotorAngle = *cspacec::iODEAMotorJoint_SetAMotorAngle;
+*GetAMotorAngle = *cspacec::iODEAMotorJoint_GetAMotorAngle;
+*GetAMotorAngleRate = *cspacec::iODEAMotorJoint_GetAMotorAngleRate;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iODEAMotorJoint($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iODEAMotorJoint_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iODEHingeJoint ##############
+
+package cspace::iODEHingeJoint;
+@ISA = qw( cspace cspace::iODEGeneralJointState );
+%OWNER = ();
+%ITERATORS = ();
+*SetHingeAnchor = *cspacec::iODEHingeJoint_SetHingeAnchor;
+*SetHingeAxis = *cspacec::iODEHingeJoint_SetHingeAxis;
+*GetHingeAnchor1 = *cspacec::iODEHingeJoint_GetHingeAnchor1;
+*GetHingeAnchor2 = *cspacec::iODEHingeJoint_GetHingeAnchor2;
+*GetHingeAxis = *cspacec::iODEHingeJoint_GetHingeAxis;
+*GetHingeAngle = *cspacec::iODEHingeJoint_GetHingeAngle;
+*GetHingeAngleRate = *cspacec::iODEHingeJoint_GetHingeAngleRate;
+*GetAnchorError = *cspacec::iODEHingeJoint_GetAnchorError;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iODEHingeJoint($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iODEHingeJoint_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iODEBallJoint ##############
+
+package cspace::iODEBallJoint;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetBallAnchor = *cspacec::iODEBallJoint_SetBallAnchor;
+*GetBallAnchor1 = *cspacec::iODEBallJoint_GetBallAnchor1;
+*GetBallAnchor2 = *cspacec::iODEBallJoint_GetBallAnchor2;
+*GetAnchorError = *cspacec::iODEBallJoint_GetAnchorError;
+*Attach = *cspacec::iODEBallJoint_Attach;
+*GetAttachedBody = *cspacec::iODEBallJoint_GetAttachedBody;
+*GetFeedbackForce1 = *cspacec::iODEBallJoint_GetFeedbackForce1;
+*GetFeedbackTorque1 = *cspacec::iODEBallJoint_GetFeedbackTorque1;
+*GetFeedbackForce2 = *cspacec::iODEBallJoint_GetFeedbackForce2;
+*GetFeedbackTorque2 = *cspacec::iODEBallJoint_GetFeedbackTorque2;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iODEBallJoint($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iODEBallJoint_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -13938,6 +14475,19 @@ sub PLANE_COLLIDER_GEOMETRY () { $cspacec::PLANE_COLLIDER_GEOMETRY }
 sub TRIMESH_COLLIDER_GEOMETRY () { $cspacec::TRIMESH_COLLIDER_GEOMETRY }
 sub CYLINDER_COLLIDER_GEOMETRY () { $cspacec::CYLINDER_COLLIDER_GEOMETRY }
 sub SPHERE_COLLIDER_GEOMETRY () { $cspacec::SPHERE_COLLIDER_GEOMETRY }
+sub CS_ODE_JOINT_TYPE_UNKNOWN () { $cspacec::CS_ODE_JOINT_TYPE_UNKNOWN }
+sub CS_ODE_JOINT_TYPE_BALL () { $cspacec::CS_ODE_JOINT_TYPE_BALL }
+sub CS_ODE_JOINT_TYPE_HINGE () { $cspacec::CS_ODE_JOINT_TYPE_HINGE }
+sub CS_ODE_JOINT_TYPE_SLIDER () { $cspacec::CS_ODE_JOINT_TYPE_SLIDER }
+sub CS_ODE_JOINT_TYPE_CONTACT () { $cspacec::CS_ODE_JOINT_TYPE_CONTACT }
+sub CS_ODE_JOINT_TYPE_UNIVERSAL () { $cspacec::CS_ODE_JOINT_TYPE_UNIVERSAL }
+sub CS_ODE_JOINT_TYPE_HINGE2 () { $cspacec::CS_ODE_JOINT_TYPE_HINGE2 }
+sub CS_ODE_JOINT_TYPE_FIXED () { $cspacec::CS_ODE_JOINT_TYPE_FIXED }
+sub CS_ODE_JOINT_TYPE_AMOTOR () { $cspacec::CS_ODE_JOINT_TYPE_AMOTOR }
+sub CS_ODE_AMOTOR_MODE_UNKNOWN () { $cspacec::CS_ODE_AMOTOR_MODE_UNKNOWN }
+sub CS_ODE_AMOTOR_MODE_USER () { $cspacec::CS_ODE_AMOTOR_MODE_USER }
+sub CS_ODE_AMOTOR_MODE_EULER () { $cspacec::CS_ODE_AMOTOR_MODE_EULER }
+sub CS_ODE_AMOTOR_MODE_LAST () { $cspacec::CS_ODE_AMOTOR_MODE_LAST }
 sub CS_SEQUENCE_LIGHTCHANGE_NONE () { $cspacec::CS_SEQUENCE_LIGHTCHANGE_NONE }
 sub CS_SEQUENCE_LIGHTCHANGE_LESS () { $cspacec::CS_SEQUENCE_LIGHTCHANGE_LESS }
 sub CS_SEQUENCE_LIGHTCHANGE_GREATER () { $cspacec::CS_SEQUENCE_LIGHTCHANGE_GREATER }
