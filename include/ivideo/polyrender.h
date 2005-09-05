@@ -229,20 +229,6 @@ struct csPolygonRenderData
   csVector3** objNormals;
 };
 
-
-
-SCF_VERSION (iPolygonRenderer, 0, 1, 0);
-
-// @@@ Document me.
-struct iPolygonRenderer : public iBase
-{
-  virtual void PrepareRenderMesh (csRenderMesh& mesh) = 0;
-  
-  virtual void Clear () = 0;
-  virtual void AddPolygon (csPolygonRenderData* poly, 
-    iUserRenderBufferIterator* extraBuffers) = 0;
-};
-
 /** @} */
 
 #endif // __CS_IVIDEO_POLYRENDER_H__

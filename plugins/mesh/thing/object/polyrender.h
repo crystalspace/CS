@@ -18,21 +18,22 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_GL_POLYRENDER_H__
-#define __CS_GL_POLYRENDER_H__
+#ifndef __CS_POLYRENDER_H__
+#define __CS_POLYRENDER_H__
 
 #include "csutil/array.h"
 #include "csutil/leakguard.h"
+#include "csutil/refcount.h"
 #include "ivideo/polyrender.h"
 #include "cstool/userrndbuf.h"
 
-class csGLGraphics3D;
 class csShaderVariableContext;
+class csThingObjectType;
 
-class csGLPolygonRenderer : public iPolygonRenderer
+class csPolygonRenderer : public csRefCount
 {
 private:
-  csGLGraphics3D* parent;
+  csThingObjectType* parent;
   uint renderBufferNum;
   uint polysNum;
 
@@ -55,7 +56,7 @@ private:
   class BufferAccessor : public iRenderBufferAccessor
   {
   private: 
-    csGLPolygonRenderer *renderer;
+    csPolygonRenderer *renderer;
     csRef<iRenderBuffer> normal_buffer;
     csRef<iRenderBuffer> binormal_buffer;
     csRef<iRenderBuffer> tangent_buffer;
@@ -67,7 +68,7 @@ private:
     CS_LEAKGUARD_DECLARE (BufferAccessor);
     SCF_DECLARE_IBASE;
 
-    BufferAccessor (csGLPolygonRenderer *renderer)
+    BufferAccessor (csPolygonRenderer *renderer)
       : renderer(renderer), normalVerticesNum (0), binormalVerticesNum (0),
         tangentVerticesNum (0)
     {
@@ -89,12 +90,10 @@ private:
   csRef<BufferAccessor> buffer_accessor;
 
 public:
-  CS_LEAKGUARD_DECLARE (csGLPolygonRenderer);
+  CS_LEAKGUARD_DECLARE (csPolygonRenderer);
 
-  SCF_DECLARE_IBASE;
-
-  csGLPolygonRenderer (csGLGraphics3D* parent);
-  virtual ~csGLPolygonRenderer ();
+  csPolygonRenderer (csThingObjectType* parent);
+  virtual ~csPolygonRenderer ();
 
   // ---- iPolygonRenderer ----
   virtual void PrepareRenderMesh (csRenderMesh& mesh);
@@ -105,4 +104,4 @@ public:
 
 };
 
-#endif // __CS_GL_POLYRENDER_H__
+#endif // __CS_POLYRENDER_H__

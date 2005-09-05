@@ -24,26 +24,21 @@
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
 #include "csgfx/renderbuffer.h"
+#include "csgfx/shadervarcontext.h"
 
-#include "gl_polyrender.h"
-#include "gl_render3d.h"
+#include "polyrender.h"
+#include "thing.h"
 
-CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer);
-CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::BufferAccessor);
+CS_LEAKGUARD_IMPLEMENT (csPolygonRenderer);
+CS_LEAKGUARD_IMPLEMENT (csPolygonRenderer::BufferAccessor);
 
-SCF_IMPLEMENT_IBASE(csGLPolygonRenderer)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)
-SCF_IMPLEMENT_IBASE_END
-
-
-SCF_IMPLEMENT_IBASE(csGLPolygonRenderer::BufferAccessor)
+SCF_IMPLEMENT_IBASE(csPolygonRenderer::BufferAccessor)
   SCF_IMPLEMENTS_INTERFACE(iRenderBufferAccessor)
 SCF_IMPLEMENT_IBASE_END
 
-csGLPolygonRenderer::csGLPolygonRenderer (csGLGraphics3D* parent)
+csPolygonRenderer::csPolygonRenderer (csThingObjectType* parent) : csRefCount()
 {
-  SCF_CONSTRUCT_IBASE(0);
-  csGLPolygonRenderer::parent = parent;
+  csPolygonRenderer::parent = parent;
   renderBufferNum = (uint)~0;
   polysNum = 0;
   buffer_accessor.AttachNew (new BufferAccessor(this));
@@ -51,12 +46,11 @@ csGLPolygonRenderer::csGLPolygonRenderer (csGLGraphics3D* parent)
   bufferHolder.AttachNew (new csRenderBufferHolder);
 }
 
-csGLPolygonRenderer::~csGLPolygonRenderer ()
+csPolygonRenderer::~csPolygonRenderer ()
 {
-  SCF_DESTRUCT_IBASE()
 }
 
-void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
+void csPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 {
   csRef<iRenderBuffer> masterBuffer;
   if (renderBufferNum != polysNum)
@@ -75,7 +69,8 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       max_vc = MAX (max_vc, pvc);
     }
 
-#define INTERLEAVE 1
+// @@@ FIXME: soft3d can't grok interleaved!
+#define INTERLEAVE 0
 #if INTERLEAVE
     static const csInterleavedSubBufferOptions interleavedElements[3] =
       {{CS_BUFCOMP_FLOAT, 3}, {CS_BUFCOMP_FLOAT, 2}, {CS_BUFCOMP_FLOAT, 2}};
@@ -260,7 +255,7 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       csStringID name;
       csRef<iRenderBuffer> buf = userBufIt.Next (name);
       csRenderBufferName bufName = 
-	csRenderBuffer::GetBufferNameFromDescr (parent->strings->Request (name));
+	csRenderBuffer::GetBufferNameFromDescr (parent->stringset->Request (name));
       if (bufName >= CS_BUFFER_POSITION)
       {
 	accessorMask &= ~(1 << bufName);
@@ -285,7 +280,7 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 }
 
 
-void csGLPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
+void csPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
 {
   PrepareBuffers (mesh.indexstart, mesh.indexend);
   mesh.geometryInstance = this;
@@ -307,13 +302,13 @@ void csGLPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
   }
 }
 
-void csGLPolygonRenderer::Clear ()
+void csPolygonRenderer::Clear ()
 {
   polys.DeleteAll ();
   polysNum++;
 }
 
-void csGLPolygonRenderer::AddPolygon (csPolygonRenderData* poly,
+void csPolygonRenderer::AddPolygon (csPolygonRenderData* poly,
 				      iUserRenderBufferIterator* extraBuffers)
 {
   polys.Push (poly);
@@ -321,7 +316,7 @@ void csGLPolygonRenderer::AddPolygon (csPolygonRenderData* poly,
   polysNum++;
 }
 
-void csGLPolygonRenderer::BufferAccessor::PreGetBuffer (
+void csPolygonRenderer::BufferAccessor::PreGetBuffer (
   csRenderBufferHolder* holder, csRenderBufferName buffer)
 {
   if (!holder) return;
@@ -345,7 +340,7 @@ void csGLPolygonRenderer::BufferAccessor::PreGetBuffer (
   }
 }
 
-bool csGLPolygonRenderer::BufferAccessor::UpdateNormals ()
+bool csPolygonRenderer::BufferAccessor::UpdateNormals ()
 {
   if (normalVerticesNum != renderer->polysNum)
   {
@@ -398,7 +393,7 @@ bool csGLPolygonRenderer::BufferAccessor::UpdateNormals ()
   return true;
 }
 
-bool csGLPolygonRenderer::BufferAccessor::UpdateBinormals ()
+bool csPolygonRenderer::BufferAccessor::UpdateBinormals ()
 {
   if (binormalVerticesNum != renderer->polysNum)
   {
@@ -474,7 +469,7 @@ bool csGLPolygonRenderer::BufferAccessor::UpdateBinormals ()
   return true;
 }
 
-bool csGLPolygonRenderer::BufferAccessor::UpdateTangents ()
+bool csPolygonRenderer::BufferAccessor::UpdateTangents ()
 {
   if (tangentVerticesNum != renderer->polysNum)
   {

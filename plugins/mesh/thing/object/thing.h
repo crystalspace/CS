@@ -54,6 +54,7 @@
 #include "lghtmap.h"
 #include "parrays.h"
 #include "polygon.h"
+#include "polyrender.h"
 
 class csThing;
 class csThingStatic;
@@ -310,7 +311,7 @@ public:
 
   csWeakRef<iGraphics3D> r3d;
 
-  csRefArray<iPolygonRenderer> polyRenderers;
+  csRefArray<csPolygonRenderer> polyRenderers;
 
   static csStringID texLightmapName;
 
@@ -1076,6 +1077,7 @@ public:
   /// An object pool for lightpatches.
   csLightPatchPool* lightpatch_pool;
   csRef<iStringSet> stringset;
+  csRef<iShaderManager> shadermgr;
 
   /**
    * Block allocators for various types of objects in thing.

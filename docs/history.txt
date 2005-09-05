@@ -21,6 +21,7 @@ chronological order.
 	  SetMeshFactoryWrapper (similar for GetLogicalParent).
 	- iceeey added script support to CEGUI for any language through iScript
 	  interface. Some parts are missing.
+        - res moved the "polygon renderer" into Thing. 
 4-Sep-2005
 	- Marten fixed master header problem after cegui addition.
 	- Piotr Obrzut fixed bug in ODE dynamic system collider when user 

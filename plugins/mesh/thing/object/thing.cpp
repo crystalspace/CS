@@ -1041,10 +1041,10 @@ void csThingStatic::FillRenderMeshes (
         *(unlitPolys[i - litPolys.Length ()]) ;
     csRenderMesh* rm = thing_type->blk_rendermesh.Alloc();
 
-    csRef<iPolygonRenderer> polyRenderer;
+    csRef<csPolygonRenderer> polyRenderer;
     if (polyRenderers.Length () <= i)
     {
-      polyRenderer = r3d->CreatePolygonRenderer ();
+      polyRenderer.AttachNew (new csPolygonRenderer (thing_type));
       polyRenderers.Push (polyRenderer);
 
       size_t j;
@@ -1069,7 +1069,7 @@ void csThingStatic::FillRenderMeshes (
     }
     rm->material = material;
     CS_ASSERT (material != 0);
-    rm->meshtype = CS_MESHTYPE_POLYGON;
+    rm->meshtype = CS_MESHTYPE_TRIANGLES;
     rm->variablecontext.AttachNew (new csShaderVariableContext ());
     csRef<csShaderVariable> sv (
       csPtr<csShaderVariable> (new csShaderVariable (texLightmapName)));
@@ -2859,6 +2859,8 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
 
   stringset = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
+
+  shadermgr = csQueryRegistry<iShaderManager> (object_reg);
 
   return true;
 }

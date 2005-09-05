@@ -48,7 +48,6 @@
 
 #include "scan.h"
 #include "sft3dcom.h"
-#include "soft_polyrender.h"
 #include "soft_txt.h"
 #include "tcache.h"
 
@@ -1938,6 +1937,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonZFill (G3DPolygonDFP& poly)
 
 void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
 {
+#if 0
   if (z_buf_mode == CS_ZBUF_FILLONLY)
   {
     DrawPolygonZFill (poly);
@@ -2598,6 +2598,7 @@ texr_done:
 
 finish:
   ;
+#endif
 }
 
 #if 0
@@ -4010,6 +4011,7 @@ static void DrawTriangle (csSoftwareGraphics3DCommon* g3d,
   g3d->DrawPolygonFX (poly);
 }
 
+#if 0
 static void DoAddPerspective (csPoly2D& dest, const csVector3& v, 
 			      float aspect, float shift_x, float shift_y)
 {
@@ -4325,6 +4327,7 @@ static bool DoPolyPerspective (csVector3* verts, int num_verts,
   return true;
 
 }
+#endif
 
 void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
 						 uint flags)
@@ -4472,6 +4475,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   DrawMesh (&rmesh, rmesh, stacks);
 }
 
+#if 0
 void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
     const csArray<csShaderVariable*> &stacks)
@@ -4619,7 +4623,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
     }
   }
 
-/*  int indexPos = mesh->indexstart;
+/*  int indexPos = mesh->indexstart
   int polyIdx = 0;
   while (indexPos < mesh->indexend)
   {
@@ -4639,16 +4643,19 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
       activebuffers[i]->Release ();
   }*/
 }
+#endif
 
 void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
     const csArray<csShaderVariable*> &stacks)
 {
+#if 0
   if (mesh->meshtype == CS_MESHTYPE_POLYGON)
   {
     DrawPolysMesh (mesh, modes, stacks);
     return;
   }
+#endif
 
   unsigned int i;
 
@@ -5093,7 +5100,3 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   }
 }
 
-csPtr<iPolygonRenderer> csSoftwareGraphics3DCommon::CreatePolygonRenderer ()
-{
-  return csPtr<iPolygonRenderer> (new csSoftPolygonRenderer (this));
-}

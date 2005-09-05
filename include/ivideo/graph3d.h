@@ -39,7 +39,6 @@
 struct iClipper2D;
 struct iGraphics2D;
 struct iHalo;
-struct iPolygonRenderer;
 struct iRenderBuffer;
 struct iRendererLightmap;
 struct iShader;
@@ -443,14 +442,7 @@ enum csRenderMeshType
    * Line strip.
    * A line is defined from the prebviously and recently added vertex.
    */
-  CS_MESHTYPE_LINESTRIP,
-  /**
-   * Render polygons. Note that you <b>*must*</b> supply geometry with the
-   * help of an iPolygonRenderer. In the common case, if you want to draw a
-   * polygon, you probably want to use CS_MESHTYPE_TRIANGLES or 
-   * CS_MESHTYPE_TRIANGLEFAN and triangulate the poly yourself. 
-   */
-  CS_MESHTYPE_POLYGON
+  CS_MESHTYPE_LINESTRIP
 };
 
 /**
@@ -537,7 +529,7 @@ struct csSimpleRenderMesh
   };
 };
 
-SCF_VERSION (iGraphics3D, 5, 5, 1);
+SCF_VERSION (iGraphics3D, 5, 6, 0);
 
 /**
  * This is the standard 3D graphics interface.
@@ -819,8 +811,6 @@ struct iGraphics3D : public iBase
    * (csPolygon3D destructor will do that).
    */
   virtual void RemoveFromCache (iRendererLightmap* rlm) = 0;
-    
-  virtual csPtr<iPolygonRenderer> CreatePolygonRenderer () = 0;
 
   /**
    * Set the world to camera transform.

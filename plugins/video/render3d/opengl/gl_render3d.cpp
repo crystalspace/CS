@@ -56,7 +56,6 @@
 #include "ivideo/shader/shader.h"
 #include "ivideo/txtmgr.h"
 
-#include "gl_polyrender.h"
 #include "gl_r2t_framebuf.h"
 #include "gl_render3d.h"
 #include "gl_renderbuffer.h"
@@ -1649,7 +1648,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       num_tri = (mymesh->indexend-mymesh->indexstart)-1;
       primitivetype = GL_LINE_STRIP;
       break;
-    case CS_MESHTYPE_POLYGON:
     case CS_MESHTYPE_TRIANGLES:
     default:
       num_tri = (mymesh->indexend-mymesh->indexstart)/3;
@@ -2623,11 +2621,6 @@ bool csGLGraphics3D::SetOption (const char* name, const char* value)
     return true;
   }
   return false;
-}
-
-csPtr<iPolygonRenderer> csGLGraphics3D::CreatePolygonRenderer ()
-{
-  return csPtr<iPolygonRenderer> (new csGLPolygonRenderer (this));
 }
 
 void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh, 

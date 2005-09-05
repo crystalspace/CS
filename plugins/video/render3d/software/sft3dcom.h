@@ -974,8 +974,6 @@ public:
     return false;
   }
 
-  virtual csPtr<iPolygonRenderer> CreatePolygonRenderer ();
-
   virtual void OpenPortal (size_t, const csVector2*, const csPlane3&, bool);
   virtual void ClosePortal (bool use_zfill_portal);
   void DrawPolygonZFill (G3DPolygonDFP&);

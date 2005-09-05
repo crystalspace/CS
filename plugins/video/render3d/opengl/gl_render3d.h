@@ -62,7 +62,6 @@
 
 class csGLTextureHandle;
 class csGLTextureManager;
-class csGLPolygonRenderer;
 class csGLExtensionManager;
 class csGLVBOBufferManager;
 class csGLRenderBuffer;
@@ -184,7 +183,6 @@ private:
   friend class csGLTextureHandle;
   friend class csGLTextureManager;
   friend class eiShaderRenderInterface;
-  friend class csGLPolygonRenderer;
 
   iObjectRegistry* object_reg;
   csRef<iGraphics2D> G2D;
@@ -639,7 +637,6 @@ public:
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const;
   virtual bool SetOption (const char*, const char*);
 
-  virtual csPtr<iPolygonRenderer> CreatePolygonRenderer ();
   virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
     uint flags = 0);
 
