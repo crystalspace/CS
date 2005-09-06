@@ -12,6 +12,10 @@ chronological order.
 	- res fixed compile errors in particles.
 	- res made a small iDocument documentation enhancement.
 	- res applied some Opcode VC6 compile fixes from Raymond.
+	- Jorrit fixed the documentation about efficient textures so that
+	  you can actually read the subsections easily.
+	- Jorrit added a note to the api docs about the rename of
+	  SetLogicalParent().
 5-Sep-2005
 	- iceeey fixed memory leak in CEGUI plugin as reported by Eric.
 	- iceeey cleaned iCEGUI interface by removing all Get functions

@@ -1801,3 +1801,15 @@ case: to use a pointer of type @samp{Foo*} as a hash key, employ
 The @code{iConfig} interface has been renamed to the more fitting 
 @code{iPluginConfig}, and the containing header from @file{iutil/config.h} to
 @code{iutil/pluginconfig.h}. Other changes have not been made.
+
+@subheading Changes for Mesh Object Writers
+
+@code{iMeshObject::SetLogicalParent()} has been renamed to
+@code{iMeshObject::SetMeshWrapper()}. Same for @code{GetLogicalParent()}.
+It also uses a @code{iMeshWrapper} instead of @code{iBase} as the type
+of the parameter.
+@code{iMeshObjectFactory::SetLogicalParent()} has been renamed to
+@code{iMeshObjectFactory::SetMeshFactoryWrapper()}.
+Same for @code{GetLogicalParent()}. It also uses a @code{iMeshFactoryWrapper}
+instead of @code{iBase} as the type of the parameter.
+
