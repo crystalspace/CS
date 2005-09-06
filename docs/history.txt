@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Sep-2005
+	- res fixed a bug in glshader_fixed were the constant color was not set
+	  to black when the SV was not found.
+	- res fixed compile errors in particles.
+	- res made a small iDocument documentation enhancement.
 5-Sep-2005
 	- iceeey fixed memory leak in CEGUI plugin as reported by Eric.
 	- iceeey cleaned iCEGUI interface by removing all Get functions

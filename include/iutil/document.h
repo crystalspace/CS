@@ -322,7 +322,10 @@ struct iDocument : public iBase
   /// Create a root node. This will clear the previous root node if any.
   virtual csRef<iDocumentNode> CreateRoot () = 0;
 
-  /// Get the current root node.
+  /**
+   * Get the current root node.
+   * \remarks Never returns 0.
+   */
   virtual csRef<iDocumentNode> GetRoot () = 0;
 
   /**

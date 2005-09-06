@@ -382,20 +382,11 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
 
     if (layers[i].constcolor.valid)
     {
-      csRef<csShaderVariable> var;
-
-      var = csGetShaderVariableFromStack (stacks, layers[i].constcolor.name);
-      if (!var.IsValid ())
-        var = layers[i].constcolor.var;
-
-      if (!var.IsValid ())
-        continue;
-
-      csVector4 vectorVal;
-      var->GetValue (vectorVal);
+      csVector4 v = GetParamVectorVal (stacks, layers[i].constcolor, 
+	csVector4 (0));
 
       glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, 
-	&vectorVal.x);
+	&v.x);
     }
   }
 

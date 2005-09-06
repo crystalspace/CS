@@ -75,7 +75,7 @@ class csParticlesFactory : public iMeshObjectFactory
 {
   friend class csParticlesObject;
 private:
-  iMeshFactoryWrapper* parent;
+  iMeshFactoryWrapper* logparent;
   csParticlesType* particles_type;
   iObjectRegistry *object_reg;
 
@@ -143,8 +143,8 @@ public:
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform&) {}
   virtual bool SupportsHardTransform () const { return false; }
-  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp) { parent = lp; }
-  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const { return parent; }
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp) { logparent = lp; }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return particles_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 
