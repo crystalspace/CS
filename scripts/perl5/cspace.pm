@@ -7171,8 +7171,8 @@ package cspace::iMeshObject;
 *SupportsHardTransform = *cspacec::iMeshObject_SupportsHardTransform;
 *HitBeamOutline = *cspacec::iMeshObject_HitBeamOutline;
 *HitBeamObject = *cspacec::iMeshObject_HitBeamObject;
-*SetLogicalParent = *cspacec::iMeshObject_SetLogicalParent;
-*GetLogicalParent = *cspacec::iMeshObject_GetLogicalParent;
+*SetMeshWrapper = *cspacec::iMeshObject_SetMeshWrapper;
+*GetMeshWrapper = *cspacec::iMeshObject_GetMeshWrapper;
 *GetObjectModel = *cspacec::iMeshObject_GetObjectModel;
 *SetColor = *cspacec::iMeshObject_SetColor;
 *GetColor = *cspacec::iMeshObject_GetColor;
@@ -7216,8 +7216,8 @@ package cspace::iMeshObjectFactory;
 *Clone = *cspacec::iMeshObjectFactory_Clone;
 *HardTransform = *cspacec::iMeshObjectFactory_HardTransform;
 *SupportsHardTransform = *cspacec::iMeshObjectFactory_SupportsHardTransform;
-*SetLogicalParent = *cspacec::iMeshObjectFactory_SetLogicalParent;
-*GetLogicalParent = *cspacec::iMeshObjectFactory_GetLogicalParent;
+*SetMeshFactoryWrapper = *cspacec::iMeshObjectFactory_SetMeshFactoryWrapper;
+*GetMeshFactoryWrapper = *cspacec::iMeshObjectFactory_GetMeshFactoryWrapper;
 *GetMeshObjectType = *cspacec::iMeshObjectFactory_GetMeshObjectType;
 *GetObjectModel = *cspacec::iMeshObjectFactory_GetObjectModel;
 sub DESTROY {
@@ -10484,7 +10484,6 @@ package cspace::iGraphics3D;
 *ClosePortal = *cspacec::iGraphics3D_ClosePortal;
 *CreateHalo = *cspacec::iGraphics3D_CreateHalo;
 *RemoveFromCache = *cspacec::iGraphics3D_RemoveFromCache;
-*CreatePolygonRenderer = *cspacec::iGraphics3D_CreatePolygonRenderer;
 *SetWorldToCamera = *cspacec::iGraphics3D_SetWorldToCamera;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -14392,7 +14391,6 @@ sub CS_MESHTYPE_POINTS () { $cspacec::CS_MESHTYPE_POINTS }
 sub CS_MESHTYPE_POINT_SPRITES () { $cspacec::CS_MESHTYPE_POINT_SPRITES }
 sub CS_MESHTYPE_LINES () { $cspacec::CS_MESHTYPE_LINES }
 sub CS_MESHTYPE_LINESTRIP () { $cspacec::CS_MESHTYPE_LINESTRIP }
-sub CS_MESHTYPE_POLYGON () { $cspacec::CS_MESHTYPE_POLYGON }
 sub csSimpleMeshScreenspace () { $cspacec::csSimpleMeshScreenspace }
 sub csmcNone () { $cspacec::csmcNone }
 sub csmcArrow () { $cspacec::csmcArrow }
