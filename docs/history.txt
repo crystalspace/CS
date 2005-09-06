@@ -18,6 +18,8 @@ chronological order.
 	  SetLogicalParent().
 	- mdmkolbe eliminated some inheritance ambiguity warnings due to
 	  inconsistent virtual inheritance from iBase.
+	- Eric Sunshine patched cstypes.h so that it looks for int64_t and
+	  cousins in <inttypes.h> on platforms which do not have <stdint.h>
 5-Sep-2005
 	- iceeey fixed memory leak in CEGUI plugin as reported by Eric.
 	- iceeey cleaned iCEGUI interface by removing all Get functions

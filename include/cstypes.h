@@ -52,7 +52,7 @@
  * types. Use the explicitly-sized types sparingly.
  * @{ */
 
-#ifndef CS_HAVE_STDINT_H
+#if !defined(CS_HAVE_STDINT_H) && !defined(CS_HAVE_INTTYPES_H)
 /// unsigned 8-bit integer (0..255)
 typedef unsigned char uint8;
 /// signed 8-bit integer (-128..127)
@@ -66,10 +66,12 @@ typedef unsigned int uint32;
 /// signed 32-bit integer (-2 147 483 648..2 147 483 647)
 typedef int int32;
 #if defined(CS_COMPILER_GCC)
+#ifndef __STRICT_ANSI__
 /// unsigned 64-bit integer
 typedef unsigned long long uint64;
 /// signed 64-bit integer
 typedef long long int64;
+#endif
 #elif defined(CS_COMPILER_MSVC) || defined(CS_COMPILER_BCC)
 /// unsigned 64 bit integer
 typedef unsigned __int64 uint64;
@@ -79,7 +81,7 @@ typedef __int64 int64;
 #error Do not know how to declare 64-bit integers
 #endif // CS_COMPILER_GCC
 
-#else // CS_HAVE_STDINT_H
+#else // CS_HAVE_STDINT_H || CS_HAVE_INTTYPES_H
 
 typedef uint8_t uint8;
 typedef int8_t int8;
