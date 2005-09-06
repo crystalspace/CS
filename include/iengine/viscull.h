@@ -239,8 +239,6 @@ struct iVisibilityCuller : public virtual iBase
 
 /** @} */
 
-SCF_VERSION (iVisibilityObject, 0, 2, 1);
-
 /**
  * An object that wants to know if it is visible or not
  * for some visibility culler needs to implement this interface.
@@ -258,8 +256,10 @@ SCF_VERSION (iVisibilityObject, 0, 2, 1);
  *   <li>Visibility culler plugins (iVisibilityCuller).
  *   </ul>
  */
-struct iVisibilityObject : public iBase
+struct iVisibilityObject : public virtual iBase
 {
+  SCF_INTERFACE(iVisibiliityObject, 2, 0, 0);
+
   /// Get the reference to the movable from this object.
   virtual iMovable* GetMovable () const = 0;
   /// Get the reference to the mesh wrapper from this object.

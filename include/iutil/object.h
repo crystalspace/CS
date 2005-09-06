@@ -94,6 +94,7 @@ struct iObjectNameChangeListener : public virtual iBase
 struct iObject : public virtual iBase
 {
   SCF_INTERFACE(iObject,2,0,1);
+
   /// Set object name
   virtual void SetName (const char *iName) = 0;
 

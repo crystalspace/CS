@@ -208,8 +208,6 @@ struct csScreenBoxResult
   float distance;
 };
 
-SCF_VERSION (iMeshWrapper, 0, 8, 1);
-
 /**
  * A mesh wrapper is an engine-level object that wraps around an actual
  * mesh object (iMeshObject). Every mesh object in the engine is represented
@@ -245,8 +243,10 @@ SCF_VERSION (iMeshWrapper, 0, 8, 1);
  *   <li>iEngine
  *   </ul>
  */
-struct iMeshWrapper : public iBase
+struct iMeshWrapper : public virtual iBase
 {
+  SCF_INTERFACE(iMeshWrapper, 2, 0, 0);
+
   /**
    * Get the iObject for this mesh object. This can be used to get the
    * name of the mesh wrapper and also to attach other user objects

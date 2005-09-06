@@ -31,14 +31,14 @@
 struct iSharedVariable;
 class csReversibleTransform;
 
-SCF_VERSION (iImposter, 0, 0, 2);
-
 /**
  * iImposter defines the interface a mesh (or other) class must
  * implement to be used as imposter mesh by the engine.
  */
-struct iImposter : public iBase
+struct iImposter : public virtual iBase
 {
+  SCF_INTERFACE(iImposter, 2, 0, 0);
+
   /// Self explanatory
   virtual void SetImposterActive (bool flag)=0;
   virtual bool GetImposterActive () const =0;

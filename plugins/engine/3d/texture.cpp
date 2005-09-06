@@ -72,6 +72,7 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) : csObject()
 }
 
 csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
+  iBase(),
   csObject(t),
   flags(CS_TEXTURE_3D)
 {

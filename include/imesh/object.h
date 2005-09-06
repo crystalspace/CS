@@ -261,8 +261,6 @@ struct iMeshObject : public iBase
   virtual void PositionChild (iMeshObject* child,csTicks current_time) = 0;
 };
 
-SCF_VERSION (iMeshObjectFactory, 0, 0, 6);
-
 /**
  * This object is a factory which can generate
  * mesh objects of a certain type. For example, if you want to have
@@ -288,8 +286,10 @@ SCF_VERSION (iMeshObjectFactory, 0, 0, 6);
  *   <li>The 3D engine plugin (crystalspace.engine.3d).
  *   </ul>
  */
-struct iMeshObjectFactory : public iBase
+struct iMeshObjectFactory : public virtual iBase
 {
+  SCF_INTERFACE(iMeshObjectFactory, 2, 0, 0);
+
   /**
    * Get flags for this factory. The following flags are at least supported:
    * <ul>

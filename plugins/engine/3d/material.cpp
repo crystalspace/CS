@@ -301,7 +301,8 @@ csMaterialWrapper::csMaterialWrapper (iMaterial *m) : csObject()
   matEngine = SCF_QUERY_INTERFACE (material, iMaterialEngine);
 }
 
-csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) : csObject(w)
+csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) :
+  iBase(), csObject(w)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
 

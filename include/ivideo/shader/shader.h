@@ -65,14 +65,14 @@ static inline csShaderVariable* csGetShaderVariableFromStack
   return 0;
 }
 
-SCF_VERSION (iShaderVariableContext, 0, 0, 2);
-
 /**
  * This is a baseclass for all interfaces which provides shadervariables
  * both dynamically and static
  */
-struct iShaderVariableContext : public iBase
+struct iShaderVariableContext : public virtual iBase
 {
+  SCF_INTERFACE(iShaderVariableContext, 2, 0, 0);
+
   /**
    * Add a variable to this context
    * \remarks If a variable of the same name exists in the current context,
@@ -240,14 +240,14 @@ struct csShaderMetadata
   {}
 };
 
-SCF_VERSION (iShader, 0, 3, 0);
-
 /**
  * Specific shader. Can/will be either render-specific or general
  * The shader in this form is "compiled" and cannot be modified.
  */
 struct iShader : public iShaderVariableContext
 {
+  SCF_INTERFACE(iShader, 2, 0, 0);
+
   /// Query the object.
   virtual iObject* QueryObject () = 0;
 

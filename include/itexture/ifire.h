@@ -32,14 +32,14 @@
 
 class csGradient;
 
-SCF_VERSION (iFireTexture, 0, 0, 1);
-
 /**
  * Interface to the 'fire' procedural texture.
  * \todo 'GetPalette()' maybe.
  */
-struct iFireTexture : public iBase
+struct iFireTexture : public virtual iBase
 {
+  SCF_INTERFACE(iFireTexture, 2, 0, 0);
+
   /**
    * Set animation parameter: possible burn (0..)
    * Try possburn 3=wood,90=oil,255=max.

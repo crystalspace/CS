@@ -24,8 +24,6 @@
 struct iObject;
 struct iSector;
 
-SCF_VERSION (iKeyValuePair, 0, 0, 3);
-
 /**
  * A Key Value pair. This object contains a 'key' string and one or more
  * 'value' strings.  Typically key value pairs are specified in map files
@@ -43,8 +41,10 @@ SCF_VERSION (iKeyValuePair, 0, 0, 3);
  *       get from CS objects (typically using QueryObject()).
  *   </ul>
  */
-struct iKeyValuePair : public iBase
+struct iKeyValuePair : public virtual iBase
 {
+  SCF_INTERFACE(iKeyValuePair, 2, 0, 0);
+
   /// Get the iObject.
   virtual iObject *QueryObject() = 0;
 

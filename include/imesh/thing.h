@@ -185,8 +185,6 @@ struct iPolygonHandle : public iBase
 };
 
 
-SCF_VERSION (iThingFactoryState, 0, 2, 1);
-
 /**
  * This is the state interface to access the internals of a thing
  * mesh factory.
@@ -206,8 +204,10 @@ SCF_VERSION (iThingFactoryState, 0, 2, 1);
  *   <li>Thing Factory Loader plugin (crystalspace.mesh.loader.factory.thing)
  *   </ul>
  */
-struct iThingFactoryState : public iBase
+struct iThingFactoryState : public virtual iBase
 {
+  SCF_INTERFACE(iThingFactoryState, 2, 0, 0);
+
   /**
    * Compress the vertex table so that all nearly identical vertices
    * are compressed. The polygons in the set are automatically adapted.

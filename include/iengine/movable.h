@@ -35,14 +35,14 @@ struct iMovable;
 struct iSector;
 struct iSectorList;
 
-SCF_VERSION (iMovableListener, 0, 0, 1);
-
 /**
  * Implement this class if you're interested in hearing about
  * movable changes.
  */
-struct iMovableListener : public iBase
+struct iMovableListener : public virtual iBase
 {
+  SCF_INTERFACE(iMovableListener, 2, 0, 0);
+
   /**
    * The movable has changed. This is called whenever something does
    * UpdateMove() on the movable.

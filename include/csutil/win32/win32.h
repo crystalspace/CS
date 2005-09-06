@@ -34,8 +34,6 @@
 /// CrystalSpace window class (Unicode version)
 #define CS_WIN32_WINDOW_CLASS_NAMEW L"CrystalSpaceWin32"
 
-SCF_VERSION (iWin32Assistant, 0, 2, 0);
-
 /**
  * This interface describes actions specific to the Windows platform.
  * \remarks As the name suggests, this interface provides functionality
@@ -46,8 +44,10 @@ SCF_VERSION (iWin32Assistant, 0, 2, 0);
  *  header file should be surrounded by appropriate 
  *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
-struct iWin32Assistant : public iBase
+struct iWin32Assistant : public virtual iBase
 {
+  SCF_INTERFACE(iWin32Assistant, 2, 0, 0);
+
   /// Returns the HINSTANCE of the program
   virtual HINSTANCE GetInstance () const = 0;
   /// Returns true if the program is 'active', false otherwise.
