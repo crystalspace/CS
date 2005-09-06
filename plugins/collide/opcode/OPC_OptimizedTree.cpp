@@ -479,7 +479,7 @@ bool AABBNoLeafTree::Walk(GenericWalkingCallback callback, void* user_data) cons
 	/* Get max values */																		\
 	Point CMax(MIN_FLOAT, MIN_FLOAT, MIN_FLOAT);												\
 	Point EMax(MIN_FLOAT, MIN_FLOAT, MIN_FLOAT);												\
-	for(udword i=0;i<mNbNodes;i++)																\
+	for(i=0;i<mNbNodes;i++)																\
 	{																							\
 		if(fabsf(Nodes[i].mAABB.mCenter.x)>CMax.x)	CMax.x = fabsf(Nodes[i].mAABB.mCenter.x);	\
 		if(fabsf(Nodes[i].mAABB.mCenter.y)>CMax.y)	CMax.y = fabsf(Nodes[i].mAABB.mCenter.y);	\
@@ -607,6 +607,7 @@ bool AABBQuantizedTree::Build(AABBTree* tree)
 		mNodes = new AABBQuantizedNode[mNbNodes];
 		CHECKALLOC(mNodes);
 
+		udword i;
 		// Get max values
 		FIND_MAX_VALUES
 
@@ -615,7 +616,7 @@ bool AABBQuantizedTree::Build(AABBTree* tree)
 
 		// Quantize
 		uintptr_t Data;
-		for(udword i=0;i<mNbNodes;i++)
+		for(i=0;i<mNbNodes;i++)
 		{
 			PERFORM_QUANTIZATION
 			REMAP_DATA(mData)
@@ -722,6 +723,7 @@ bool AABBQuantizedNoLeafTree::Build(AABBTree* tree)
 		mNodes = new AABBQuantizedNoLeafNode[mNbNodes];
 		CHECKALLOC(mNodes);
 
+		udword i;
 		// Get max values
 		FIND_MAX_VALUES
 
@@ -730,7 +732,7 @@ bool AABBQuantizedNoLeafTree::Build(AABBTree* tree)
 
 		// Quantize
 		uintptr_t Data;
-		for(udword i=0;i<mNbNodes;i++)
+		for(i=0;i<mNbNodes;i++)
 		{
 			PERFORM_QUANTIZATION
 			REMAP_DATA(mPosData)

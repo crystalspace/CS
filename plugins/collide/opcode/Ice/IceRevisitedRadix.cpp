@@ -297,17 +297,18 @@ RadixSort& RadixSort::Sort(const udword* input, udword nb, RadixHint hint)
 			{
 				// This is a special case to correctly handle negative integers. They're sorted in the right order but at the wrong place.
 
+				udword i;
 				// Create biased offsets, in order for negative numbers to be sorted as well
 //				mOffset[0] = NbNegativeValues;												// First positive number takes place after the negative ones
 				mLink[0] = &mRanks2[NbNegativeValues];										// First positive number takes place after the negative ones
 //				for(udword i=1;i<128;i++)		mOffset[i] = mOffset[i-1] + CurCount[i-1];	// 1 to 128 for positive numbers
-				for(udword i=1;i<128;i++)		mLink[i] = mLink[i-1] + CurCount[i-1];		// 1 to 128 for positive numbers
+				for(i=1;i<128;i++)		mLink[i] = mLink[i-1] + CurCount[i-1];		// 1 to 128 for positive numbers
 
 				// Fixing the wrong place for negative values
 //				mOffset[128] = 0;
 				mLink[128] = mRanks2;
 //				for(i=129;i<256;i++)			mOffset[i] = mOffset[i-1] + CurCount[i-1];
-				for(udword i=129;i<256;i++)		mLink[i] = mLink[i-1] + CurCount[i-1];
+				for(i=129;i<256;i++)		mLink[i] = mLink[i-1] + CurCount[i-1];
 			}
 
 			// Perform Radix Sort
@@ -384,7 +385,8 @@ RadixSort& RadixSort::Sort(const float* input2, udword nb)
 	// last values of the last histogram. Last histogram because that's the one for the Most Significant Byte,
 	// responsible for the sign. 128 last values because the 128 first ones are related to positive numbers.
 	udword* h3= &mHistogram[768];
-	for(udword i=128;i<256;i++)	NbNegativeValues += h3[i];	// 768 for last histogram, 128 for negative part
+	udword i;
+	for(i=128;i<256;i++)	NbNegativeValues += h3[i];	// 768 for last histogram, 128 for negative part
 
 	// Radix sort, j is the pass number (0=LSB, 3=MSB)
 	for(udword j=0;j<4;j++)
@@ -439,15 +441,15 @@ RadixSort& RadixSort::Sort(const float* input2, udword nb)
 //				mOffset[0] = NbNegativeValues;												// First positive number takes place after the negative ones
 				mLink[0] = &mRanks2[NbNegativeValues];										// First positive number takes place after the negative ones
 //				for(udword i=1;i<128;i++)		mOffset[i] = mOffset[i-1] + CurCount[i-1];	// 1 to 128 for positive numbers
-				for(udword i=1;i<128;i++)		mLink[i] = mLink[i-1] + CurCount[i-1];		// 1 to 128 for positive numbers
+				for(i=1;i<128;i++)		mLink[i] = mLink[i-1] + CurCount[i-1];		// 1 to 128 for positive numbers
 
 				// We must reverse the sorting order for negative numbers!
 //				mOffset[255] = 0;
 				mLink[255] = mRanks2;
 //				for(i=0;i<127;i++)		mOffset[254-i] = mOffset[255-i] + CurCount[255-i];	// Fixing the wrong order for negative values
-				for(udword i=0;i<127;i++)	mLink[254-i] = mLink[255-i] + CurCount[255-i];		// Fixing the wrong order for negative values
+				for(i=0;i<127;i++)	mLink[254-i] = mLink[255-i] + CurCount[255-i];		// Fixing the wrong order for negative values
 //				for(i=128;i<256;i++)	mOffset[i] += CurCount[i];							// Fixing the wrong place for negative values
-				for(udword i=128;i<256;i++)	mLink[i] += CurCount[i];							// Fixing the wrong place for negative values
+				for(i=128;i<256;i++)	mLink[i] += CurCount[i];							// Fixing the wrong place for negative values
 
 				// Perform Radix Sort
 				if(INVALID_RANKS)

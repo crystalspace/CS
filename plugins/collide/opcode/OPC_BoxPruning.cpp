@@ -106,9 +106,10 @@ bool Opcode::BipartiteBoxPruning(udword nb0, const AABB** array0, udword nb1, co
 	float* MinPosList0 = new float[nb0];
 	float* MinPosList1 = new float[nb1];
 
+	udword i;
 	// 1) Build main lists using the primary axis
-	for(udword i=0;i<nb0;i++)	MinPosList0[i] = array0[i]->GetMin(Axis0);
-	for(udword i=0;i<nb1;i++)	MinPosList1[i] = array1[i]->GetMin(Axis0);
+	for(i=0;i<nb0;i++)	MinPosList0[i] = array0[i]->GetMin(Axis0);
+	for(i=0;i<nb1;i++)	MinPosList1[i] = array1[i]->GetMin(Axis0);
 
 	// 2) Sort the lists
 	PRUNING_SORTER* RS0 = GetBipartitePruningSorter0();

@@ -389,8 +389,9 @@ float AABB::ComputeBoxArea(const Point& eye, const Matrix4x4& mat, float width, 
 	Point vertexBox[8], dst[8];
 	ComputePoints(vertexBox);
 
+	sdword i;
 	// Transform all outline corners into 2D screen space
-	for(sdword i=0;i<num;i++)
+	for(i=0;i<num;i++)
 	{
 		HPoint Projected;
 		vertexBox[Outline[i]].ProjectToScreen(width, height, mat, Projected);
@@ -399,7 +400,7 @@ float AABB::ComputeBoxArea(const Point& eye, const Matrix4x4& mat, float width, 
 
 	float Sum = (dst[num-1][0] - dst[0][0]) * (dst[num-1][1] + dst[0][1]);
 
-	for(int i=0; i<num-1; i++)
+	for(i=0; i<num-1; i++)
 		Sum += (dst[i][0] - dst[i+1][0]) * (dst[i][1] + dst[i+1][1]);
 
 	return Sum * 0.5f;	//return computed value corrected by 0.5

@@ -203,8 +203,9 @@ SAP_Element* SAP_PairData::GetFreeElem(udword id, SAP_Element* next, udword* rem
 			{
 				udword Delta = uintptr_t(NewElems) - uintptr_t(mElementPool);
 
-				for(udword i=0;i<mNbUsedElements;i++)	Remap(NewElems[i].mNext, Delta);
-				for(udword i=0;i<mNbObjects;i++)		Remap(mArray[i], Delta);
+				udword i;
+				for(i=0;i<mNbUsedElements;i++)	Remap(NewElems[i].mNext, Delta);
+				for(i=0;i<mNbObjects;i++)		Remap(mArray[i], Delta);
 
 				Remap(mFirstFree, Delta);
 				Remap(next, Delta);
@@ -424,7 +425,8 @@ bool SweepAndPrune::Init(udword nb_objects, const AABB** boxes)
 	{
 		mList[Axis] = new SAP_EndPoint[nb_objects*2];
 
-		for(udword i=0;i<nb_objects;i++)
+		udword i;
+		for(i=0;i<nb_objects;i++)
 		{
 			Data[i*2+0] = boxes[i]->GetMin(Axis);
 			Data[i*2+1] = boxes[i]->GetMax(Axis);
@@ -434,7 +436,7 @@ bool SweepAndPrune::Init(udword nb_objects, const AABB** boxes)
 
 		SAP_EndPoint* PreviousEndPoint = null;
 
-		for(udword i=0;i<nb_objects*2;i++)
+		for(i=0;i<nb_objects*2;i++)
 		{
 			udword SortedIndex	= *Sorted++;
 			float SortedCoord	= Data[SortedIndex];
