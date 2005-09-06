@@ -6305,8 +6305,8 @@ class iMeshObject(iBase):
     def SupportsHardTransform(*args): return _cspace.iMeshObject_SupportsHardTransform(*args)
     def HitBeamOutline(*args): return _cspace.iMeshObject_HitBeamOutline(*args)
     def HitBeamObject(*args): return _cspace.iMeshObject_HitBeamObject(*args)
-    def SetLogicalParent(*args): return _cspace.iMeshObject_SetLogicalParent(*args)
-    def GetLogicalParent(*args): return _cspace.iMeshObject_GetLogicalParent(*args)
+    def SetMeshWrapper(*args): return _cspace.iMeshObject_SetMeshWrapper(*args)
+    def GetMeshWrapper(*args): return _cspace.iMeshObject_GetMeshWrapper(*args)
     def GetObjectModel(*args): return _cspace.iMeshObject_GetObjectModel(*args)
     def SetColor(*args): return _cspace.iMeshObject_SetColor(*args)
     def GetColor(*args): return _cspace.iMeshObject_GetColor(*args)
@@ -6346,8 +6346,8 @@ class iMeshObjectFactory(iBase):
     def Clone(*args): return _cspace.iMeshObjectFactory_Clone(*args)
     def HardTransform(*args): return _cspace.iMeshObjectFactory_HardTransform(*args)
     def SupportsHardTransform(*args): return _cspace.iMeshObjectFactory_SupportsHardTransform(*args)
-    def SetLogicalParent(*args): return _cspace.iMeshObjectFactory_SetLogicalParent(*args)
-    def GetLogicalParent(*args): return _cspace.iMeshObjectFactory_GetLogicalParent(*args)
+    def SetMeshFactoryWrapper(*args): return _cspace.iMeshObjectFactory_SetMeshFactoryWrapper(*args)
+    def GetMeshFactoryWrapper(*args): return _cspace.iMeshObjectFactory_GetMeshFactoryWrapper(*args)
     def GetMeshObjectType(*args): return _cspace.iMeshObjectFactory_GetMeshObjectType(*args)
     def GetObjectModel(*args): return _cspace.iMeshObjectFactory_GetObjectModel(*args)
     def __del__(self, destroy=_cspace.delete_iMeshObjectFactory):
@@ -9419,7 +9419,6 @@ CS_MESHTYPE_POINTS = _cspace.CS_MESHTYPE_POINTS
 CS_MESHTYPE_POINT_SPRITES = _cspace.CS_MESHTYPE_POINT_SPRITES
 CS_MESHTYPE_LINES = _cspace.CS_MESHTYPE_LINES
 CS_MESHTYPE_LINESTRIP = _cspace.CS_MESHTYPE_LINESTRIP
-CS_MESHTYPE_POLYGON = _cspace.CS_MESHTYPE_POLYGON
 csSimpleMeshScreenspace = _cspace.csSimpleMeshScreenspace
 class csSimpleRenderMesh(_object):
     __swig_setmethods__ = {}
@@ -9542,7 +9541,6 @@ class iGraphics3D(iBase):
     def ClosePortal(*args): return _cspace.iGraphics3D_ClosePortal(*args)
     def CreateHalo(*args): return _cspace.iGraphics3D_CreateHalo(*args)
     def RemoveFromCache(*args): return _cspace.iGraphics3D_RemoveFromCache(*args)
-    def CreatePolygonRenderer(*args): return _cspace.iGraphics3D_CreatePolygonRenderer(*args)
     def SetWorldToCamera(*args): return _cspace.iGraphics3D_SetWorldToCamera(*args)
     def __del__(self, destroy=_cspace.delete_iGraphics3D):
         try:
