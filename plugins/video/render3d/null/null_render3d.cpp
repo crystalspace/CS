@@ -63,10 +63,6 @@ SCF_IMPLEMENT_IBASE (csNullGraphics3D::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csNullPolygonRenderer)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonRenderer)
-SCF_IMPLEMENT_IBASE_END
-
 csNullGraphics3D::csNullGraphics3D (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
@@ -169,11 +165,6 @@ bool csNullGraphics3D::HandleEvent (iEvent& e)
     }
   }
   return false;
-}
-
-csPtr<iPolygonRenderer> csNullGraphics3D::CreatePolygonRenderer ()
-{
-  return csPtr<iPolygonRenderer> (new csNullPolygonRenderer ());
 }
 
 bool csNullGraphics3D::Open ()
@@ -409,7 +400,6 @@ void csNullGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       case CS_MESHTYPE_QUADS:
         num_tri /= 2;
         break;
-      case CS_MESHTYPE_POLYGON:
       case CS_MESHTYPE_TRIANGLES:
         num_tri /= 3;
         break;

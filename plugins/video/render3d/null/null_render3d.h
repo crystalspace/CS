@@ -34,25 +34,6 @@ struct iGraphics2D;
 struct iShaderManager;
 struct iBugPlug;
 
-class csNullPolygonRenderer : public iPolygonRenderer
-{
-public:
-  csNullPolygonRenderer ()
-  {
-    SCF_CONSTRUCT_IBASE (0);
-  }
-  virtual ~csNullPolygonRenderer ()
-  {
-    SCF_DESTRUCT_IBASE ();
-  }
-  SCF_DECLARE_IBASE;
-
-  virtual void PrepareRenderMesh (csRenderMesh&) { }
-  virtual void Clear () { }
-  virtual void AddPolygon (csPolygonRenderData*, 
-    iUserRenderBufferIterator*) { }
-};
-
 class csNullGraphics3D : public iGraphics3D
 {
 public:
@@ -163,7 +144,6 @@ public:
     int iWidth, int iHeight) { return 0; }
 
   void RemoveFromCache (iRendererLightmap* rlm) { }
-  csPtr<iPolygonRenderer> CreatePolygonRenderer ();
   void SetWorldToCamera (const csReversibleTransform& w2c) { }
   void DrawSimpleMesh (const csSimpleRenderMesh& mesh, uint flags = 0) { }
 private:
