@@ -24,7 +24,7 @@
 #include "csutil/sysfunc.h"
 #include "csutil/timemeasure.h"
 #include "csutil/util.h"
-#include "callstack.h"
+#include "callstack-dbghelp.h"
 #include "csutil/win32/callstack.h"
 #include "csutil/win32/wintools.h"
 

@@ -28,7 +28,7 @@ CS_IMPLEMENT_STATIC_VAR(csnrBacktrace, csCallStackNameResolverBacktrace, ());
 #endif
 
 #ifdef CS_PLATFORM_WIN32
-#include "win32/callstack.h"
+#include "win32/callstack-dbghelp.h"
 CS_IMPLEMENT_STATIC_VAR(cscDbgHelp, csCallStackCreatorDbgHelp, ());
 CS_IMPLEMENT_STATIC_VAR(csnrDbgHelp, csCallStackNameResolverDbgHelp, ());
 #endif
