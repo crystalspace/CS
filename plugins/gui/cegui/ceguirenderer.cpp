@@ -41,7 +41,8 @@ csCEGUIRenderer::csCEGUIRenderer (iBase *parent) :
   resourceProvider(0),
   queueing(true),
   m_bufferPos(0),
-  texture(0)
+  texture(0),
+  scriptModule(0)
 {
   newQuadAdded = false;
   SCF_CONSTRUCT_IBASE (parent);
