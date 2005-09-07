@@ -855,8 +855,7 @@ bool csColliderActor::AdjustForCollisions (
 
   // localvel is smaller because we can partly move the object in that direction
   localvel -= maxmove - oldpos;
-  csVector3 vec(0);
-  float new_y = oldpos.y + bottomSize.y + shift.y -0.01f;
+
   for (i = 0; i < our_cd_contact.Length () ; i++ )
   {
     csCollisionPair& cd = our_cd_contact[i];
@@ -869,32 +868,14 @@ bool csColliderActor::AdjustForCollisions (
 
     if (unit * localvel > 0) continue;
 
-    csVector3 tmp = (-(localvel % unit) % unit);
-    if (tmp.Norm() < SMALL_EPSILON) continue;
-    vec += tmp.Unit();
-
-    if(revertCount > 5)
-    {
-      csVector3 line[2];
-
-      // This needs to be done for numerical inaccuracies in this test
-      // versus the collision system test.
-      if(FindIntersection (cd,line))
-        new_y = MAX(MAX(line[0].y, line[1].y), new_y);
-    }
-
+    // Bounce back
+    localvel -= unit * (unit * localvel)*1.1; //(-(localvel % unit) % unit);
   }
-  if(!vec.IsZero())
-    localvel = (localvel * vec.Unit()) * vec.Unit();
-
+ 
   newpos = maxmove + localvel;
-  if(revertCount > 5)
-  {
-    newpos.y = new_y - bottomSize.y - shift.y +0.01f;
-  }
 
   transform_newpos = csOrthoTransform (csMatrix3(), newpos);
-
+ 
   // Part2: legs
 
   our_cd_contact.Empty ();
@@ -1024,6 +1005,21 @@ bool csColliderActor::AdjustForCollisions (
   else
     cd = 0;
 
+  hits = 0;
+  for (i = 0; i < our_cd_contact.Length () ; i++ )
+  {
+    csCollisionPair& cd = our_cd_contact[i];
+    csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
+    csVector3 normal = obstacle.Normal ();
+
+    float norm = normal.Norm ();
+    if (fabs (norm) < SMALL_EPSILON) continue;
+    csVector3 unit = normal / norm;
+
+    if (unit * (newpos - oldpos) > 0) continue;
+    hits++;
+  }
+
   if (hits > 0)
   {
     // No move possible without a collision with the torso
@@ -1082,7 +1078,7 @@ bool csColliderActor::RotateV (float delta,
   if (movable)
   {
     csYRotMatrix3 rotMat (angle.y);
-    movable->Transform (rotMat);
+    movable->SetTransform (movable->GetTransform().GetT2O() * rotMat);
   }
   else
   {
