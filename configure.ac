@@ -1905,6 +1905,19 @@ CS_CHECK_BUILD([for setenv], [cs_cv_setenv],
 
 
 #------------------------------------------------------------------------------
+# Check if cxxabi.h is available and if the abi::__cxa_demangle() function is 
+# available.
+#------------------------------------------------------------------------------
+AC_CHECK_HEADERS([cxxabi.h],
+    [CS_CHECK_BUILD([for abi::__cxa_demangle], [cs_cv_abi_cxa_demangle],
+        [AC_LANG_PROGRAM(
+            [[#include <cxxabi.h>]],
+            [abi::__cxa_demangle(0, 0, 0, 0)])],
+        [], [C++], [CS_HEADER_PROPERTY([CS_HAVE_ABI_CXA_DEMANGLE])])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if TemplateToolkit2 is installed (needed for MSVC project generation).
 #------------------------------------------------------------------------------
 CS_CHECK_TEMPLATE_TOOLKIT2([emit])

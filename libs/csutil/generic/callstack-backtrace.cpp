@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csutil/callstack.h"
 
+#include "../demangle.h"
 #include "callstack-backtrace.h"
 
 #include <execinfo.h>
@@ -45,8 +46,26 @@ bool csCallStackNameResolverBacktrace::GetAddressSymbol (void* addr,
 {
   char** s = backtrace_symbols (&addr, 1);
   if (!s) return false;
-  sym.Replace (s[0]);
+  sym = s[0];
   free(s);
+  // Try demangling... for this, try to extract the symbol name from the line
+  {
+    size_t symStart = sym.FindFirst ('(');
+    if (symStart != (size_t)-1)
+    {
+      symStart++;
+      size_t symEnd = sym.FindFirst ("+)", symStart);
+      if (symEnd != (size_t)-1)
+      {
+        csString tmp;
+        sym.SubString (tmp, symStart, symEnd - symStart);
+        // ...and replace with the demangled one
+        CrystalSpace::Debug::Demangle (tmp, tmp);
+        sym.DeleteAt (symStart, symEnd - symStart);
+        sym.Insert (symStart, tmp);
+      }
+    }
+  }
   return true;
 }
 

@@ -22,6 +22,7 @@ chronological order.
 	- res changed the docs to point to cs-win32libs 016.
 	- res made some small tweaks to the callstack stuff.
 	- res made an object registry warning more colorful.
+        - res added demangling to the backtrace symbol name resolver. 
 6-Sep-2005
 	- res fixed a bug in glshader_fixed were the constant color was not set
 	  to black when the SV was not found.
