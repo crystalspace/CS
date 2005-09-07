@@ -20,10 +20,6 @@ if $(TARGET.OS) != "WIN32"
   {
     CSUTIL.GENERIC += callstack-backtrace.cpp ;
   }
-  else
-  {
-    CSUTIL.GENERIC += callstack-dummy.cpp ;
-  }
 }
 
 if $(REGEX.AVAILABLE) != "yes"
