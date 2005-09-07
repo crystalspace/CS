@@ -49,6 +49,7 @@ public:
   };
 
   StackEntry* entries;
+  bool fastStack;
   static BOOL CALLBACK EnumSymCallback (SYMBOL_INFO* pSymInfo, 
     ULONG SymbolSize, PVOID UserContext);
 

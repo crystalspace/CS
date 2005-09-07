@@ -81,6 +81,26 @@ struct SYMBOL_INFO
 };
 typedef SYMBOL_INFO* PSYMBOL_INFO;
 
+struct SYMBOL_INFOW
+{  
+  ULONG SizeOfStruct;  
+  ULONG TypeIndex;  
+  uint64 Reserved[2];  
+  ULONG Reserved2;  
+  ULONG Size;  
+  uint64 ModBase;  
+  ULONG Flags;  
+  uint64 Value;  
+  uint64 Address;  
+  ULONG Register;  
+  ULONG Scope;  
+  ULONG Tag;  
+  ULONG NameLen;  
+  ULONG MaxNameLen;  
+  WCHAR Name[1];
+};
+typedef SYMBOL_INFOW* PSYMBOL_INFOW;
+
 #define SYMFLAG_PARAMETER        0x00000040
 
 #define SYMOPT_UNDNAME                  0x00000002
@@ -112,13 +132,13 @@ struct IMAGEHLP_MODULE64
   DWORD NumSyms;  
   SYM_TYPE SymType;  
   CHAR ModuleName[32];  
-  CHAR ImageName[256];  
+  CHAR ImageName[256];
   CHAR LoadedImageName[256];  
   /*
     The following fields are only supported on newer versions of dbghelp.dll,
     but the versions shipped with W2k resp. WXP lack them.
    */
-  /*CHAR LoadedPdbName[256];  
+  CHAR LoadedPdbName[256];  
   DWORD CVSig;  
   CHAR CVData[MAX_PATH*3];  
   DWORD PdbSig;  
@@ -128,9 +148,35 @@ struct IMAGEHLP_MODULE64
   BOOL DbgUnmatched;  
   BOOL LineNumbers;  
   BOOL GlobalSymbols;  
-  BOOL TypeInfo;*/
+  BOOL TypeInfo;
 };
 typedef IMAGEHLP_MODULE64* PIMAGEHLP_MODULE64;
+
+struct IMAGEHLP_MODULEW64
+{  
+  DWORD SizeOfStruct;  
+  uint64 BaseOfImage;  
+  DWORD ImageSize;  
+  DWORD TimeDateStamp;  
+  DWORD CheckSum;  
+  DWORD NumSyms;  
+  SYM_TYPE SymType;  
+  WCHAR ModuleName[32];  
+  WCHAR ImageName[256];  
+  WCHAR LoadedImageName[256];
+  WCHAR LoadedPdbName[256];  
+  DWORD CVSig;  
+  WCHAR CVData[MAX_PATH*3];  
+  DWORD PdbSig;  
+  GUID PdbSig70;  
+  DWORD PdbAge;  
+  BOOL PdbUnmatched;  
+  BOOL DbgUnmatched;  
+  BOOL LineNumbers;  
+  BOOL GlobalSymbols;  
+  BOOL TypeInfo;
+};
+typedef IMAGEHLP_MODULEW64* PIMAGEHLP_MODULEW64;
 
 struct IMAGEHLP_LINE64
 {  
@@ -142,9 +188,23 @@ struct IMAGEHLP_LINE64
 };
 typedef IMAGEHLP_LINE64* PIMAGEHLP_LINE64;
 
+struct IMAGEHLP_LINE64W
+{  
+  DWORD SizeOfStruct;  
+  PVOID Key;  
+  DWORD LineNumber;  
+  PWCHAR FileName;  
+  uint64 Address;
+};
+typedef IMAGEHLP_LINE64W* PIMAGEHLP_LINE64W;
+
 typedef BOOL (CALLBACK* PSYM_ENUMERATESYMBOLS_CALLBACK) (PSYMBOL_INFO pSymInfo,
   ULONG SymbolSize, PVOID UserContext);
+typedef BOOL (CALLBACK* PSYM_ENUMERATESYMBOLS_CALLBACKW) (PSYMBOL_INFOW pSymInfo,
+  ULONG SymbolSize, PVOID UserContext);
 typedef BOOL (CALLBACK* PSYM_ENUMMODULES_CALLBACK64) (PSTR ModuleName,
+  uint64 BaseOfDll, PVOID UserContext);
+typedef BOOL (CALLBACK* PSYM_ENUMMODULES_CALLBACKW64) (PWSTR ModuleName,
   uint64 BaseOfDll, PVOID UserContext);
 
 struct IMAGEHLP_STACK_FRAME 

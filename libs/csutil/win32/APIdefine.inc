@@ -17,6 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */	
 
+#include "csutil/sysfunc.h"
 #include "cachedll.h"
 
 cswinCacheDLL* CS_API_NAME::dll = 0;
@@ -58,13 +59,34 @@ bool CS_API_NAME::Available ()
     dll = new cswinCacheDLL (CS_API_DLL);
     if ((dll != 0) && (*dll != 0))
     {
+#define STRINGIZE2(x)   #x
+#define STRINGIZE(x)    STRINGIZE2(x)
+      
+#ifdef CS_DEBUG
+      bool* flag;
+      #define FUNC_GROUP_BEGIN(name)					    \
+        name ## _avail = true;						    \
+	flag = &name ## _avail;
+      #define FUNC_GROUP_END
+      #define FUNC(ret, name, args)					    \
+        *flag &= ((name = (PFN ## name)GetProcAddress (*dll, #name)) != 0); \
+        if (!name) csPrintf ("%s: Could not obtain %s\n", 		    \
+	  STRINGIZE (CS_API_NAME), #name);
+      #include CS_API_FUNCTIONS
+#else      
       #define FUNC_GROUP_BEGIN(name)	    \
         name ## _avail = true
       #define FUNC_GROUP_END		    ;
       #define FUNC(ret, name, args)		    \
         && (name = (PFN ## name)GetProcAddress (*dll, #name))
       #include CS_API_FUNCTIONS
+#endif
     }
+#ifdef CS_DEBUG
+    if (!dll || !*dll)
+      csPrintf ("%s: Could not load %s\n", STRINGIZE (CS_API_NAME), 
+	CS_API_DLL);
+#endif
   }
   return dll != 0;
 }

@@ -59,7 +59,7 @@ public:
   }
 };
 
-csCallStack* csCallStackHelper::CreateCallStack (int skip)
+csCallStack* csCallStackHelper::CreateCallStack (int skip, bool /*fast*/)
 {
   void* traceBuffer[200];
   int count = backtrace (traceBuffer, sizeof (traceBuffer) / sizeof (void*));

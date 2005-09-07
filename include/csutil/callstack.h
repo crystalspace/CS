@@ -70,9 +70,11 @@ public:
    *  the returned call stack. This can be used if e.g. the call stack is
    *  created from some helper function and the helper function itself should
    *  not appear in the stack.
+   * \param fast Flag whether a fast call stacj creation should be preferred 
+   *  (usually at the expense of retrieved information).
    * \return A call stack object.
    */
-  static csCallStack* CreateCallStack (int skip = 0);
+  static csCallStack* CreateCallStack (int skip = 0, bool fast = false);
 };
 
 #endif // __CS_UTIL_CALLSTACK_H__

@@ -26,6 +26,7 @@
 #include "cstool/csview.h"
 #include "cstool/keyval.h"
 #include "cstool/mdltool.h"
+#include "csutil/callstack.h"
 #include "csutil/csendian.h"
 #include "csutil/cspmeter.h" 
 #include "csutil/csstring.h"
@@ -2491,6 +2492,32 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     
     Sys->myG2D->SetClipRect (cMinX, cMinY, cMaxX, xMaxY);
+  }
+  else if (!csStrCaseCmp (cmd, "callstack"))
+  {
+    csCallStack* stack = csCallStackHelper::CreateCallStack();
+    if (stack == 0)
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+        "callstack not available");
+    }
+    else
+    {
+      for (size_t i = 0; i < stack->GetEntryCount(); i++)
+      {
+	csString line;
+	csString s;
+	bool hasFunc = stack->GetFunctionName (i, s);
+	line << (hasFunc ? (const char*)s : "<unknown>");
+	if (stack->GetLineNumber (i, s))
+	  line << " @" << s;
+	if (stack->GetParameters (i, s))
+	  line << " (" << s << ")";
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "%s", line.GetData());
+      }
+      stack->Free();
+    }
   }
   else
     return false;

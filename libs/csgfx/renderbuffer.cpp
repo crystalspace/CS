@@ -18,10 +18,15 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/callstack.h"
 #include "csutil/scf.h"
+#include "csutil/sysfunc.h"
 #include "csgeom/math.h"
 
 #include "csgfx/renderbuffer.h"
+
+// Define if you want to debug locking/unlocking mismatch issues
+//#define DEBUG_LOCKING
 
 CS_LEAKGUARD_IMPLEMENT (csRenderBuffer);
 SCF_IMPLEMENT_IBASE (csRenderBuffer)
@@ -45,10 +50,20 @@ csRenderBuffer::csRenderBuffer (size_t size, csRenderBufferType type,
     buffer = new unsigned char[size];
     doDelete = true;
   }
+#if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
+  lockStack = 0;
+#endif
 }
 
 csRenderBuffer::~csRenderBuffer ()
 {
+#if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
+  if (lockStack != 0)
+  {
+    lockStack->Print();
+    lockStack->Free();
+  }
+#endif
   if (doDelete) delete[] buffer;
   buffer = 0;
   SCF_DESTRUCT_IBASE ();
@@ -60,7 +75,16 @@ void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
   {
     if ((lockType > CS_BUF_LOCK_READ) || (lastLock > CS_BUF_LOCK_READ)
       || (lockType != lastLock))
+    {
+#if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
+      if (lockStack)
+      {
+	csPrintf ("Renderbuffer %p Lock() while locked:\n", this);
+	lockStack->Print ();
+      }
+#endif
       return (void*)-1;
+    }
   }
 
   lastLock = lockType;
@@ -74,6 +98,12 @@ void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
     rb = buffer;
 
   CS_ASSERT(rb != 0);
+
+#if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
+  if (lockStack == 0) 
+    lockStack = csCallStackHelper::CreateCallStack (0, true);
+#endif
+
   return (void*)rb;
 }
 
@@ -87,6 +117,13 @@ void csRenderBuffer::Release ()
     version++;
   }
   isLocked = false;
+#if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
+  if (lockStack != 0)
+  {
+    lockStack->Free();
+    lockStack = 0;
+  }
+#endif
 }
 
 void csRenderBuffer::CopyInto (const void *data, size_t elementCount, 

@@ -18,16 +18,28 @@
 */	
 
 #include "cssysdef.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csutil/util.h"
-#include "csutil/sysfunc.h"
 #include "csutil/csstring.h"
+#include "csutil/csuctransform.h"
+#include "csutil/dirtyaccessarray.h"
+#include "csutil/sysfunc.h"
+#include "csutil/timemeasure.h"
+#include "csutil/util.h"
 #include "callstack.h"
 #include "csutil/win32/callstack.h"
 #include "csutil/win32/wintools.h"
 
 #include <windows.h>
 #include <tlhelp32.h>
+
+//#define CALLSTACK_PROFILE
+
+#ifdef CALLSTACK_PROFILE
+#define MEASURE_FUNCTION csMeasureTime measureLocal ("%s", CS_FUNCTION_NAME)
+#define MEASURE_INTERMEDIATE measureLocal.PrintIntermediate (" %d", __LINE__)
+#else
+#define MEASURE_FUNCTION
+#define MEASURE_INTERMEDIATE
+#endif
 
 static void PrintError (const char* format, ...)
 {
@@ -156,9 +168,12 @@ BOOL CALLBACK cswinCallStack::EnumSymCallback (SYMBOL_INFO* pSymInfo,
 void cswinCallStack::AddFrame (const STACKFRAME64& frame, 
 			       csDirtyAccessArray<StackEntry>& entries)
 {
+  MEASURE_FUNCTION;
   StackEntry& entry = entries.GetExtend (entries.Length ());
 
   entry.instrPtr = frame.AddrPC.Offset;
+
+  if (fastStack) return;
 
   IMAGEHLP_STACK_FRAME stackFrame;
   memset (&stackFrame, 0, sizeof (IMAGEHLP_STACK_FRAME));
@@ -224,7 +239,8 @@ bool cswinCallStack::GetFunctionName (size_t num, csString& str)
   str.Clear();
 
   static const int MaxSymbolLen = 512;
-  static const int symbolInfoSize = sizeof (SYMBOL_INFO) + MaxSymbolLen - 1;
+  static const int symbolInfoSize = 
+    sizeof (SYMBOL_INFO) + (MaxSymbolLen - 1) * sizeof(char);
   static uint8 _symbolInfo[symbolInfoSize];
   static PSYMBOL_INFO symbolInfo = (PSYMBOL_INFO)&_symbolInfo;
 
@@ -242,23 +258,28 @@ bool cswinCallStack::GetFunctionName (size_t num, csString& str)
       entries[num].instrPtr, &displace, symbolInfo);
   }
 
-  IMAGEHLP_MODULE64 module;
-  memset (&module, 0, sizeof (IMAGEHLP_MODULE64));
-  module.SizeOfStruct = sizeof (IMAGEHLP_MODULE64);
-  DbgHelp::SymGetModuleInfo64 (symInit.GetSymProcessHandle (),
+  IMAGEHLP_MODULEW64 module;
+  memset (&module, 0, sizeof (IMAGEHLP_MODULEW64));
+  /* Oddity/bug?: newer dbghelp versions seem to always fill the 
+   * IMAGEHLP_MODULE64 structure completely, even if a smaller size
+   * was specified. However, we still set the size to that of an older,
+   * smaller IMAGEHLP_MODULE64 with the hope for some backwards compatibility.
+   */
+  module.SizeOfStruct = ((uint8*)module.LoadedImageName) - ((uint8*)&module);
+  DbgHelp::SymGetModuleInfoW64 (symInit.GetSymProcessHandle (),
     entries[num].instrPtr, &module);
 
   if (symbolInfo->Name[0] != 0)
   {
-    str.Format ("[%p] (%s)%s+0x%" CS_PRIx64,
+    str.Format ("[%p] (%ls)%s+0x%" CS_PRIx64,
       (void*)entries[num].instrPtr,
-      (module.ImageName[0] != 0) ? module.ImageName : "<unknown>",
+      (module.ImageName[0] != 0) ? module.ImageName : L"<unknown>",
       symbolInfo->Name, displace);
   }
   else
   {
-    str.Format ("[%p] (%s)<unknown>", (void*)entries[num].instrPtr,
-      (module.ImageName[0] != 0) ? module.ImageName : "<unknown>");
+    str.Format ("[%p] (%ls)<unknown>", (void*)entries[num].instrPtr,
+      (module.ImageName[0] != 0) ? module.ImageName : L"<unknown>");
   }
 
   return true;
@@ -394,7 +415,7 @@ DWORD CurrentThreadContextHelper::ContextThread (LPVOID lpParameter)
 
 static CurrentThreadContextHelper contextHelper;
 
-csCallStack* cswinCallStackHelper::CreateCallStackThreaded (int skip)
+csCallStack* cswinCallStackHelper::CreateCallStackThreaded (int skip, bool fast)
 {
   const int currentContextSkip = 
 #ifdef AVOID_CONTEXT_IN_KERNEL
@@ -480,7 +501,8 @@ csCallStack* cswinCallStackHelper::CreateCallStackThreaded (int skip)
     ReleaseMutex (contextHelper.mutex);
   }
 
-  return CreateCallStack (hProc, hThread, context, skip + currentContextSkip); 
+  return CreateCallStack (hProc, hThread, context, skip + currentContextSkip,
+    fast); 
 }
 
 class CriticalSectionWrapper
@@ -516,7 +538,7 @@ static LONG WINAPI ExceptionFilter (struct _EXCEPTION_POINTERS* ExceptionInfo)
 /* A slightly odd method to get a thread context, deliberately raising an
  * exception to get to the exception handler... but a bit quicker than the "use
  * 2nd thread" method. */
-csCallStack* cswinCallStackHelper::CreateCallStackExcept (int skip)
+csCallStack* cswinCallStackHelper::CreateCallStackExcept (int skip, bool fast)
 {
   ExceptStackSection.Enter();
     
@@ -529,18 +551,26 @@ csCallStack* cswinCallStackHelper::CreateCallStackExcept (int skip)
   ULONG_PTR contextPtr = (ULONG_PTR)&context;
 
   RaiseException (0, 0, 1, &contextPtr);
+  /* HACK: At this point we have the CONTEXT of the backtrace, however, we
+   * subsequently call a couple of functions, with the risk that those
+   * clobber the stack space where precious return addresses from
+   * RaiseException() lie. To avoid losing those addresses, "protect" that
+   * space on the stack by allocating a small block of memory that hopefully
+   * covers the area in question.
+   */
+  alloca (sizeof(ULONG_PTR) * 16);
   SetUnhandledExceptionFilter (oldFilter);
 
   ExceptStackSection.Leave();
 
   HANDLE hProc = symInit.GetSymProcessHandle ();
   HANDLE hThread = GetCurrentThread ();
-  return CreateCallStack (hProc, hThread, context, skip + 3); 
+  return CreateCallStack (hProc, hThread, context, skip + 3, fast); 
 }
 
 typedef BOOL (WINAPI* PFNISDEBUGGERPRESENT)();
 
-csCallStack* csCallStackHelper::CreateCallStack (int skip)
+csCallStack* csCallStackHelper::CreateCallStack (int skip, bool fast)
 {
   static PFNISDEBUGGERPRESENT IsDebuggerPresent = 0;
   static HMODULE hKernel32 = 0;
@@ -553,16 +583,17 @@ csCallStack* csCallStackHelper::CreateCallStack (int skip)
   }
 
   if (!IsDebuggerPresent || IsDebuggerPresent())
-    return cswinCallStackHelper::CreateCallStackThreaded (skip);
+    return cswinCallStackHelper::CreateCallStackThreaded (skip, fast);
   else
-    return cswinCallStackHelper::CreateCallStackExcept (skip);
+    return cswinCallStackHelper::CreateCallStackExcept (skip, fast);
 }
 
 csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc, 
 						    HANDLE hThread,
 						    CONTEXT& context, 
-						    int skip)
+						    int skip, bool fast)
 {
+  MEASURE_FUNCTION;
   if (!DbgHelp::SymSupportAvailable()) return 0;
 
   symInit.Init ();
@@ -607,6 +638,7 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
   int count = 0;
   csDirtyAccessArray<cswinCallStack::StackEntry> entries;
   cswinCallStack* stack = csAlloc.Alloc();
+  stack->fastStack = fast;
   while (DbgHelp::StackWalk64 (machineType, hProc,
     hThread, &frame, &context, 0, DbgHelp::SymFunctionTableAccess64, 
     DbgHelp::SymGetModuleBase64, 0))

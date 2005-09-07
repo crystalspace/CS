@@ -45,6 +45,10 @@ struct csInterleavedSubBufferOptions
   uint componentCount;
 };
 
+#ifdef CS_DEBUG
+class csCallStack;
+#endif
+
 /**
  * Basic renderbuffer for OpenGL renderer.
  */
@@ -260,6 +264,9 @@ protected:
   csRenderBufferLockType lastLock; 
   
   csRef<iRenderBuffer> masterBuffer;
+#ifdef CS_DEBUG
+  csCallStack* lockStack;
+#endif
 };
 
 /** @} */

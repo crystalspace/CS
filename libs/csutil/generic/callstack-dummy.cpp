@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "csutil/callstack.h"
 
-csCallStack* csCallStackHelper::CreateCallStack (int skip)
+csCallStack* csCallStackHelper::CreateCallStack (int, bool)
 {
   return 0;
 }

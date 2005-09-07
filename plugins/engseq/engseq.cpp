@@ -1951,6 +1951,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
       csVector3 vw = camera->GetTransform ().This2Other (v);
 
       iSector* sector = camera->GetSector ();
+      if (!sector) return false;
       csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
       csVector3 isect, end = origin + (vw - origin) * 120;
 

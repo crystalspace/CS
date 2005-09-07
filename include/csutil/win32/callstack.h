@@ -39,9 +39,9 @@ class CS_CRYSTALSPACE_EXPORT cswinCallStackHelper
 {
   friend class csCallStackHelper;
   /// Create a callstack by obtaining the context via a 2nd thread
-  static csCallStack* CreateCallStackThreaded (int skip);
+  static csCallStack* CreateCallStackThreaded (int skip, bool fast);
   /// Create a callstack by obtaining the context via the exception handler
-  static csCallStack* CreateCallStackExcept (int skip);
+  static csCallStack* CreateCallStackExcept (int skip, bool fast);
 public:
   /**
    * Create a call stack.
@@ -57,7 +57,7 @@ public:
    * \return A call stack object.
    */
   static csCallStack* CreateCallStack (HANDLE hProc, HANDLE hThread,
-    CONTEXT& context, int skip = 0);
+    CONTEXT& context, int skip = 0, bool fast = false);
 };
 
 #endif // __CS_UTIL_WIN32_CALLSTACK_H__

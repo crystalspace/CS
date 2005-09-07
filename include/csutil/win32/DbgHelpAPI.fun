@@ -16,6 +16,8 @@ FUNC_GROUP_BEGIN(SymSupport)
   FUNC(uint64, SymGetModuleBase64, (HANDLE hProcess, uint64 dwAddr))
   FUNC(BOOL, SymGetModuleInfo64, (HANDLE hProcess, uint64 dwAddr,
     PIMAGEHLP_MODULE64 ModuleInfo))
+  FUNC(BOOL, SymGetModuleInfoW64, (HANDLE hProcess, uint64 dwAddr,
+    PIMAGEHLP_MODULEW64 ModuleInfo))
   FUNC(BOOL, SymGetLineFromAddr64, (HANDLE hProcess, uint64 dwAddr,
     PDWORD pdwDisplacement, PIMAGEHLP_LINE64 Line))
   FUNC(BOOL, SymEnumSymbols, (HANDLE hProcess, uint64 BaseOfDll,  

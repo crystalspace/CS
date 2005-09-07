@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Sep-2005
+	- res added a "callstack" command to walktest. Mainly useful to check
+	  whether the callstack facility is working.
+	- res fixed a texture waste in the Thing poly renderer were the normal
+	  buffer was recomputed every time needed. This change also works
+	  around recent crashes in that module.
+	- res fixed a possible crash in engseq.
+	- res improved Win32 call stack generation.
+	- res added a small helper to measure the time the execution of a 
+	  block takes.
 6-Sep-2005
 	- res fixed a bug in glshader_fixed were the constant color was not set
 	  to black when the SV was not found.
