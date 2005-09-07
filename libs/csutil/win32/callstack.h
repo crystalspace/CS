@@ -26,45 +26,23 @@
 #include "csutil/callstack.h"
 #include "csutil/strset.h"
 
+#include "../callstack.h"
+
 #include "csutil/win32/DbgHelpAPI.h"
 
-class CS_CRYSTALSPACE_EXPORT cswinCallStack : public csCallStack
+class csCallStackCreatorDbgHelp : public iCallStackCreator
 {
-public:
-  static csStringSet strings;
+  virtual bool CreateCallStack (csDirtyAccessArray<CallStackEntry>& entries,
+    csDirtyAccessArray<uintptr_t>& params, bool fast);
+};
 
-  struct CS_CRYSTALSPACE_EXPORT StackEntry
-  {
-    uintptr_t instrPtr;
-
-    struct Param
-    {
-      csStringID name;
-      uintptr_t value;
-    };
-    Param* params;
-
-    StackEntry() : instrPtr (~0), params(0) {}
-    ~StackEntry() { delete[] params; }
-  };
-
-  StackEntry* entries;
-  bool fastStack;
-  static BOOL CALLBACK EnumSymCallback (SYMBOL_INFO* pSymInfo, 
-    ULONG SymbolSize, PVOID UserContext);
-
-  void AddFrame (const STACKFRAME64& frame, 
-    csDirtyAccessArray<StackEntry>& entries);
-
-  cswinCallStack() : csCallStack(), entries(0) {}
-  virtual ~cswinCallStack() { delete[] entries; }
-
-  virtual void Free();
-
-  virtual size_t GetEntryCount ();
-  virtual bool GetFunctionName (size_t num, csString& str);
-  virtual bool GetLineNumber (size_t num, csString& str);
-  virtual bool GetParameters (size_t num, csString& str);
+class csCallStackNameResolverDbgHelp : public iCallStackNameResolver
+{
+  virtual bool GetAddressSymbol (void* addr, csString& sym);
+  virtual void* OpenParamSymbols (void* addr);
+  virtual bool GetParamName (void* handle, size_t paramNum, csString& sym);
+  virtual void FreeParamSymbols (void* handle);
+  virtual bool GetLineNumber (void* addr, csString& lineAndFile);
 };
 
 #endif // __CS_LIBS_UTIL_WIN32_CALLSTACK_H__

@@ -20,48 +20,51 @@
 #include "cssysdef.h"
 #include "csutil/callstack.h"
 
+#include "callstack-backtrace.h"
+
 #include <execinfo.h>
 
-class csBacktraceCallStack : public csCallStack
-{
-  char** traceData;
-  int traceCount;
-protected:
-  virtual ~csBacktraceCallStack() 
-  {
-    if (traceData != 0) free (traceData);
-  }
-public:
-  csBacktraceCallStack (void** data, int count)
-  {
-    traceData = backtrace_symbols (data, count);
-    traceCount = count;
-  }
-  
-  virtual void Free() { delete this; }
-  
-  virtual size_t GetEntryCount ()
-  {
-    return (traceData != 0) ? traceCount : 0;
-  }
-  virtual bool GetFunctionName (size_t num, csString& str)
-  {
-    str.Replace (traceData[num]);
-    return true;
-  }
-  virtual bool GetLineNumber (size_t num, csString& str)
-  {
-    return false;
-  }
-  virtual bool GetParameters (size_t num, csString& str)
-  {
-    return false;
-  }
-};
-
-csCallStack* csCallStackHelper::CreateCallStack (int skip, bool /*fast*/)
+bool csCallStackCreatorBacktrace::CreateCallStack (
+  csDirtyAccessArray<CallStackEntry>& entries, 
+  csDirtyAccessArray<uintptr_t>& params, bool fast)
 {
   void* traceBuffer[200];
   int count = backtrace (traceBuffer, sizeof (traceBuffer) / sizeof (void*));
-  return new csBacktraceCallStack (traceBuffer, count);
+  for (int i = 1; i < count; i++)
+  {
+    CallStackEntry entry;
+    entry.address = traceBuffer[i];
+    entry.paramNum = csParamUnknown;
+    entries.Push (entry);
+  }
+  return true;
+}
+
+bool csCallStackNameResolverBacktrace::GetAddressSymbol (void* addr, 
+  csString& sym)
+{
+  char** s = backtrace_symbols (&addr, 1);
+  if (!s) return false;
+  sym.Replace (s[0]);
+  free(s);
+  return true;
+}
+
+void* csCallStackNameResolverBacktrace::OpenParamSymbols (void* addr)
+{
+  return 0;
+}
+
+bool csCallStackNameResolverBacktrace::GetParamName (void*, size_t, csString&)
+{
+  return false;
+}
+
+void csCallStackNameResolverBacktrace::FreeParamSymbols (void* handle)
+{
+}
+
+bool csCallStackNameResolverBacktrace::GetLineNumber (void*, csString&)
+{
+  return false;
 }

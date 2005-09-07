@@ -131,49 +131,32 @@ static void RescanModules ()
   CloseHandle (hSnap);
 }
 
-struct SymCallbackInfo
+struct SymCallbackCountInfo
 {
-  csDirtyAccessArray<cswinCallStack::StackEntry::Param>* params;
+  csDirtyAccessArray<uintptr_t>* params;
   uint8* paramOffset;
+  size_t count;
 };
 
-/* @@@ Can't use CS_IMPLEMENT_STATIC_VAR as it's needed beyond the call to
- * CS_STATIC_VARIABLE_CLEANUP */
-static csBlockAllocator<cswinCallStack> csAlloc ((32*1024) / sizeof(cswinCallStack));
-
-void cswinCallStack::Free()
-{
-  csAlloc.Free (this);
-}
-
-csStringSet cswinCallStack::strings;
-
-BOOL CALLBACK cswinCallStack::EnumSymCallback (SYMBOL_INFO* pSymInfo,
+static BOOL CALLBACK EnumSymCallbackCount (SYMBOL_INFO* pSymInfo,
   ULONG SymbolSize, PVOID UserContext)
 {
   if ((pSymInfo->Flags & SYMFLAG_PARAMETER) != 0)
   {
-    SymCallbackInfo* info = (SymCallbackInfo*)UserContext;
+    SymCallbackCountInfo* info = (SymCallbackCountInfo*)UserContext;
 
     uintptr_t data = *((uintptr_t*)(info->paramOffset + pSymInfo->Address));
-    StackEntry::Param& param =
-      info->params->GetExtend(info->params->Length ());
-    param.name = strings.Request (pSymInfo->Name);
-    param.value = data;
+    info->params->Push (data);
+    info->count++;
   }
 
   return TRUE;
 }
 
-void cswinCallStack::AddFrame (const STACKFRAME64& frame, 
-			       csDirtyAccessArray<StackEntry>& entries)
+static size_t GetParams (const STACKFRAME64& frame, 
+                         csDirtyAccessArray<uintptr_t>& params)
 {
   MEASURE_FUNCTION;
-  StackEntry& entry = entries.GetExtend (entries.Length ());
-
-  entry.instrPtr = frame.AddrPC.Offset;
-
-  if (fastStack) return;
 
   IMAGEHLP_STACK_FRAME stackFrame;
   memset (&stackFrame, 0, sizeof (IMAGEHLP_STACK_FRAME));
@@ -203,20 +186,15 @@ void cswinCallStack::AddFrame (const STACKFRAME64& frame,
   }
   if (result)
   {
-    SymCallbackInfo callbackInfo;
-    csDirtyAccessArray<StackEntry::Param> params;
+    SymCallbackCountInfo callbackInfo;
     callbackInfo.params = &params;
     callbackInfo.paramOffset = (uint8*)(LONG_PTR)(frame.AddrStack.Offset - 8);
+    callbackInfo.count = 0;
     if (DbgHelp::SymEnumSymbols (symInit.GetSymProcessHandle (), 
       0
       /*DbgHelp::SymGetModuleBase64(GetCurrentProcess(),frame.AddrPC.Offset)*/,
-      "*", &EnumSymCallback, &callbackInfo))
-    {
-      const size_t n = params.Length();
-      entry.params = new StackEntry::Param[n + 1];
-      memcpy (entry.params, params.GetArray(), n * sizeof (StackEntry::Param));
-      entry.params[n].name = csInvalidStringID;
-    }
+      "*", &EnumSymCallbackCount, &callbackInfo))
+      return callbackInfo.count;
   }
   else
   {
@@ -224,101 +202,70 @@ void cswinCallStack::AddFrame (const STACKFRAME64& frame,
     if (err != ERROR_SUCCESS)
       PrintError ("SymSetContext: %s", cswinGetErrorMessage (err));
   }
+  return csParamUnknown;
 }
 
-size_t cswinCallStack::GetEntryCount ()
+static bool CreateCallStack (HANDLE hProc, HANDLE hThread, CONTEXT& context,
+                             int skip, bool fast,
+                             csDirtyAccessArray<CallStackEntry>& entries, 
+                             csDirtyAccessArray<uintptr_t>& params)
 {
-  if (entries == 0) return 0;
-  size_t n = 0;
-  while (entries[n].instrPtr != (uintptr_t)~0) n++;
-  return n;
-}
+  MEASURE_FUNCTION;
+  if (!DbgHelp::SymSupportAvailable()) return false;
 
-bool cswinCallStack::GetFunctionName (size_t num, csString& str)
-{
-  str.Clear();
+  symInit.Init ();
 
-  static const int MaxSymbolLen = 512;
-  static const int symbolInfoSize = 
-    sizeof (SYMBOL_INFO) + (MaxSymbolLen - 1) * sizeof(char);
-  static uint8 _symbolInfo[symbolInfoSize];
-  static PSYMBOL_INFO symbolInfo = (PSYMBOL_INFO)&_symbolInfo;
+  DWORD machineType;
+  STACKFRAME64 frame;
+  memset (&frame, 0, sizeof (frame));
+#if defined(CS_PROCESSOR_X86)
+#if (CS_PROCESSOR_SIZE == 32)
+  machineType = IMAGE_FILE_MACHINE_I386;
+  frame.AddrPC.Offset = context.Eip;
+  frame.AddrPC.Mode = AddrModeFlat;
+  frame.AddrStack.Offset = context.Esp;
+  frame.AddrStack.Mode = AddrModeFlat;
+  frame.AddrFrame.Offset = context.Ebp;
+  frame.AddrFrame.Mode = AddrModeFlat;
+#elif (CS_PROCESSOR_SIZE == 64)
+  machineType = IMAGE_FILE_MACHINE_AMD64;
+  frame.AddrPC.Offset = context.Rip;
+  frame.AddrPC.Mode = AddrModeFlat;
+  frame.AddrStack.Offset = context.Rsp;
+  frame.AddrStack.Mode = AddrModeFlat;
+  frame.AddrFrame.Offset = context.Rbp;
+  frame.AddrFrame.Mode = AddrModeFlat;
+  /* @@@ Code below is for IA64.
+  // Reference: http://www.mcse.ms/archive108-2003-11-97141.html
+  machineType = IMAGE_FILE_MACHINE_IA64;
+  frame.AddrPC.Offset = context.StIIP;
+  frame.AddrPC.Mode = AddrModeFlat;
+  frame.AddrStack.Offset = context.IntSp;
+  frame.AddrStack.Mode = AddrModeFlat;
+  frame.AddrBStore.Offset = context.RsBSP;
+  frame.AddrBStore.Mode = AddrModeFlat;
+  */
+#else // CS_PROCESSOR_SIZE
+#error Do not know how to stack walk for your processor word size.
+#endif // CS_PROCESSOR_SIZE
+#else // CS_PROCESSOR_FOO
+#error Do not know how to stack walk for your platform.
+#endif // CS_PROCESSOR_FOO
 
-  memset (symbolInfo, 0, symbolInfoSize);
-  symbolInfo->SizeOfStruct = sizeof (SYMBOL_INFO);
-  symbolInfo->MaxNameLen = MaxSymbolLen;
-  uint64 displace;
-  if (!DbgHelp::SymFromAddr (symInit.GetSymProcessHandle (),
-    entries[num].instrPtr, &displace, symbolInfo))
+  int count = 0;
+  while (DbgHelp::StackWalk64 (machineType, hProc,
+    hThread, &frame, &context, 0, DbgHelp::SymFunctionTableAccess64, 
+    DbgHelp::SymGetModuleBase64, 0))
   {
-    // Bit hackish: if SymFromAddr() failed, scan the loaded DLLs
-    // and try to load their debug info.
-    RescanModules ();
-    DbgHelp::SymFromAddr (symInit.GetSymProcessHandle (),
-      entries[num].instrPtr, &displace, symbolInfo);
-  }
-
-  IMAGEHLP_MODULEW64 module;
-  memset (&module, 0, sizeof (IMAGEHLP_MODULEW64));
-  /* Oddity/bug?: newer dbghelp versions seem to always fill the 
-   * IMAGEHLP_MODULE64 structure completely, even if a smaller size
-   * was specified. However, we still set the size to that of an older,
-   * smaller IMAGEHLP_MODULE64 with the hope for some backwards compatibility.
-   */
-  module.SizeOfStruct = ((uint8*)module.LoadedImageName) - ((uint8*)&module);
-  DbgHelp::SymGetModuleInfoW64 (symInit.GetSymProcessHandle (),
-    entries[num].instrPtr, &module);
-
-  if (symbolInfo->Name[0] != 0)
-  {
-    str.Format ("[%p] (%ls)%s+0x%" CS_PRIx64,
-      (void*)entries[num].instrPtr,
-      (module.ImageName[0] != 0) ? module.ImageName : L"<unknown>",
-      symbolInfo->Name, displace);
-  }
-  else
-  {
-    str.Format ("[%p] (%ls)<unknown>", (void*)entries[num].instrPtr,
-      (module.ImageName[0] != 0) ? module.ImageName : L"<unknown>");
-  }
-
-  return true;
-}
-
-bool cswinCallStack::GetLineNumber (size_t num, csString& str)
-{
-  str.Clear();
-
-  IMAGEHLP_LINE64 line;
-  memset (&line, 0, sizeof (IMAGEHLP_LINE64));
-  line.SizeOfStruct = sizeof (IMAGEHLP_LINE64);
-  DWORD displacement;
-  if (DbgHelp::SymGetLineFromAddr64 (symInit.GetSymProcessHandle (), 
-    entries[num].instrPtr, &displacement, &line))
-  {
-    str.Format ("%s:%" PRIu32, line.FileName, (uint32)line.LineNumber);
-    return true;
-  }
-  return false;
-}
-
-bool cswinCallStack::GetParameters (size_t num, csString& str)
-{
-  if (entries[num].params == 0) return false;
-
-  str.Clear();
-  StackEntry::Param* param = entries[num].params;
-  bool first = true;
-  while (param->name != csInvalidStringID)
-  {
-    if (!first) { str << ", "; } else { first = false; }
-    str << strings.Request (param->name);
-    str << " = ";
-    csString tmp;
-    uintptr_t data = param->value;
-    tmp.Format ("%" PRIuPTR "(0x%" PRIxPTR ")", data, data);
-    str << tmp;
-    param++;
+    count++;
+    if (count > skip)
+    {
+      CallStackEntry entry;
+      entry.address = (void*)(uintptr_t)frame.AddrPC.Offset;
+      entry.paramOffs = params.Length();
+      entry.paramNum = fast ? csParamUnknown : GetParams (frame, params) ;
+      entries.Push (entry);
+    }
   }
   return true;
 }
@@ -415,13 +362,15 @@ DWORD CurrentThreadContextHelper::ContextThread (LPVOID lpParameter)
 
 static CurrentThreadContextHelper contextHelper;
 
-csCallStack* cswinCallStackHelper::CreateCallStackThreaded (int skip, bool fast)
+static bool CreateCallStackThreaded (int skip, bool fast,
+                                     csDirtyAccessArray<CallStackEntry>& entries, 
+                                     csDirtyAccessArray<uintptr_t>& params)
 {
   const int currentContextSkip = 
 #ifdef AVOID_CONTEXT_IN_KERNEL
-    1;	// Skip CreateCallStack()
+    1;  // Skip CreateCallStack()
 #else
-    2;	// Skip one more to also hide SuspendThread()
+    2;  // Skip one more to also hide SuspendThread()
 #endif
   HANDLE hProc = symInit.GetSymProcessHandle ();
   HANDLE hThread = GetCurrentThread ();
@@ -441,14 +390,14 @@ csCallStack* cswinCallStackHelper::CreateCallStackThreaded (int skip, bool fast)
       contextHelper.evStartWork = CreateEvent (0, false, false, 0);
       if (contextHelper.evStartWork == 0)
       {
-	ReleaseMutex (contextHelper.mutex);
-	return 0;
+        ReleaseMutex (contextHelper.mutex);
+        return 0;
       }
       contextHelper.evFinishedWork = CreateEvent (0, false, false, 0);
       if (contextHelper.evFinishedWork == 0)
       {
-	ReleaseMutex (contextHelper.mutex);
-	return 0;
+        ReleaseMutex (contextHelper.mutex);
+        return 0;
       }
 
       contextHelper.params.evStartWork = contextHelper.evStartWork;
@@ -456,11 +405,11 @@ csCallStack* cswinCallStackHelper::CreateCallStackThreaded (int skip, bool fast)
 
       DWORD ThreadID;
       contextHelper.hThread = CreateThread (0, 0, contextHelper.ContextThread, 
-	&contextHelper.params, 0, &ThreadID);
+        &contextHelper.params, 0, &ThreadID);
       if (contextHelper.hThread == 0)
       {
-	ReleaseMutex (contextHelper.mutex);
-	return 0;
+        ReleaseMutex (contextHelper.mutex);
+        return 0;
       }
     }
 
@@ -502,7 +451,7 @@ csCallStack* cswinCallStackHelper::CreateCallStackThreaded (int skip, bool fast)
   }
 
   return CreateCallStack (hProc, hThread, context, skip + currentContextSkip,
-    fast); 
+    fast, entries, params); 
 }
 
 class CriticalSectionWrapper
@@ -538,7 +487,9 @@ static LONG WINAPI ExceptionFilter (struct _EXCEPTION_POINTERS* ExceptionInfo)
 /* A slightly odd method to get a thread context, deliberately raising an
  * exception to get to the exception handler... but a bit quicker than the "use
  * 2nd thread" method. */
-csCallStack* cswinCallStackHelper::CreateCallStackExcept (int skip, bool fast)
+static bool CreateCallStackExcept (int skip, bool fast,
+                                   csDirtyAccessArray<CallStackEntry>& entries,
+                                   csDirtyAccessArray<uintptr_t>& params)
 {
   ExceptStackSection.Enter();
     
@@ -565,12 +516,28 @@ csCallStack* cswinCallStackHelper::CreateCallStackExcept (int skip, bool fast)
 
   HANDLE hProc = symInit.GetSymProcessHandle ();
   HANDLE hThread = GetCurrentThread ();
-  return CreateCallStack (hProc, hThread, context, skip + 3, fast); 
+  return CreateCallStack (hProc, hThread, context, skip + 3, fast, entries, params); 
+}
+
+csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc, 
+                                                    HANDLE hThread, 
+                                                    CONTEXT& context,
+                                                    int skip, bool fast)
+{
+  skip += 1; /* Adjust for this function */
+  csCallStackImpl* stack = new csCallStackImpl();
+  if (::CreateCallStack (hProc, hThread, context, skip, fast, stack->entries,
+    stack->params))
+    return stack;
+  delete stack;
+  return 0;
 }
 
 typedef BOOL (WINAPI* PFNISDEBUGGERPRESENT)();
 
-csCallStack* csCallStackHelper::CreateCallStack (int skip, bool fast)
+bool csCallStackCreatorDbgHelp::CreateCallStack (
+  csDirtyAccessArray<CallStackEntry>& entries, 
+  csDirtyAccessArray<uintptr_t>& params, bool fast)
 {
   static PFNISDEBUGGERPRESENT IsDebuggerPresent = 0;
   static HMODULE hKernel32 = 0;
@@ -583,78 +550,137 @@ csCallStack* csCallStackHelper::CreateCallStack (int skip, bool fast)
   }
 
   if (!IsDebuggerPresent || IsDebuggerPresent())
-    return cswinCallStackHelper::CreateCallStackThreaded (skip, fast);
+    return ::CreateCallStackThreaded (0, fast, entries, params);
   else
-    return cswinCallStackHelper::CreateCallStackExcept (skip, fast);
+    return ::CreateCallStackExcept (0, fast, entries, params);
 }
 
-csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc, 
-						    HANDLE hThread,
-						    CONTEXT& context, 
-						    int skip, bool fast)
+bool csCallStackNameResolverDbgHelp::GetAddressSymbol (void* addr, 
+  csString& str)
 {
-  MEASURE_FUNCTION;
-  if (!DbgHelp::SymSupportAvailable()) return 0;
+  static const int MaxSymbolLen = 512;
+  static const int symbolInfoSize = 
+    sizeof (SYMBOL_INFO) + (MaxSymbolLen - 1) * sizeof(char);
+  static uint8 _symbolInfo[symbolInfoSize];
+  static PSYMBOL_INFO symbolInfo = (PSYMBOL_INFO)&_symbolInfo;
 
-  symInit.Init ();
-
-  DWORD machineType;
-  STACKFRAME64 frame;
-  memset (&frame, 0, sizeof (frame));
-#if defined(CS_PROCESSOR_X86)
-#if (CS_PROCESSOR_SIZE == 32)
-  machineType = IMAGE_FILE_MACHINE_I386;
-  frame.AddrPC.Offset = context.Eip;
-  frame.AddrPC.Mode = AddrModeFlat;
-  frame.AddrStack.Offset = context.Esp;
-  frame.AddrStack.Mode = AddrModeFlat;
-  frame.AddrFrame.Offset = context.Ebp;
-  frame.AddrFrame.Mode = AddrModeFlat;
-#elif (CS_PROCESSOR_SIZE == 64)
-  machineType = IMAGE_FILE_MACHINE_AMD64;
-  frame.AddrPC.Offset = context.Rip;
-  frame.AddrPC.Mode = AddrModeFlat;
-  frame.AddrStack.Offset = context.Rsp;
-  frame.AddrStack.Mode = AddrModeFlat;
-  frame.AddrFrame.Offset = context.Rbp;
-  frame.AddrFrame.Mode = AddrModeFlat;
-  /* @@@ Code below is for IA64.
-  // Reference: http://www.mcse.ms/archive108-2003-11-97141.html
-  machineType = IMAGE_FILE_MACHINE_IA64;
-  frame.AddrPC.Offset = context.StIIP;
-  frame.AddrPC.Mode = AddrModeFlat;
-  frame.AddrStack.Offset = context.IntSp;
-  frame.AddrStack.Mode = AddrModeFlat;
-  frame.AddrBStore.Offset = context.RsBSP;
-  frame.AddrBStore.Mode = AddrModeFlat;
-  */
-#else // CS_PROCESSOR_SIZE
-#error Do not know how to stack walk for your processor word size.
-#endif // CS_PROCESSOR_SIZE
-#else // CS_PROCESSOR_FOO
-#error Do not know how to stack walk for your platform.
-#endif // CS_PROCESSOR_FOO
-
-  int count = 0;
-  csDirtyAccessArray<cswinCallStack::StackEntry> entries;
-  cswinCallStack* stack = csAlloc.Alloc();
-  stack->fastStack = fast;
-  while (DbgHelp::StackWalk64 (machineType, hProc,
-    hThread, &frame, &context, 0, DbgHelp::SymFunctionTableAccess64, 
-    DbgHelp::SymGetModuleBase64, 0))
+  memset (symbolInfo, 0, symbolInfoSize);
+  symbolInfo->SizeOfStruct = sizeof (SYMBOL_INFO);
+  symbolInfo->MaxNameLen = MaxSymbolLen;
+  uint64 displace;
+  if (!DbgHelp::SymFromAddr (symInit.GetSymProcessHandle (),
+    (uintptr_t)addr, &displace, symbolInfo))
   {
-    count++;
-    if (count > skip) stack->AddFrame (frame, entries);
-  }
-  const size_t n = entries.Length();
-  if (n > 0)
-  {
-    stack->entries = new cswinCallStack::StackEntry[n + 1];
-    memcpy (stack->entries, entries.GetArray(), 
-      sizeof (cswinCallStack::StackEntry) * n);
-    // Actually just the 'params' members need to be 0 but wth...
-    memset (entries.GetArray(), 0, sizeof (cswinCallStack::StackEntry) * n);
+    // Bit hackish: if SymFromAddr() failed, scan the loaded DLLs
+    // and try to load their debug info.
+    RescanModules ();
+    DbgHelp::SymFromAddr (symInit.GetSymProcessHandle (),
+      (uintptr_t)addr, &displace, symbolInfo);
   }
 
-  return stack;
+  IMAGEHLP_MODULEW64 module;
+  memset (&module, 0, sizeof (IMAGEHLP_MODULEW64));
+  /* Oddity/bug?: newer dbghelp versions seem to always fill the 
+   * IMAGEHLP_MODULE64 structure completely, even if a smaller size
+   * was specified. However, we still set the size to that of an older,
+   * smaller IMAGEHLP_MODULE64 with the hope for some backwards compatibility.
+   */
+  module.SizeOfStruct = ((uint8*)module.LoadedImageName) - ((uint8*)&module);
+  DbgHelp::SymGetModuleInfoW64 (symInit.GetSymProcessHandle (),
+    (uintptr_t)addr, &module);
+
+  if (symbolInfo->Name[0] != 0)
+  {
+    str.Format ("[%p] (%ls)%s+0x%" CS_PRIx64,
+      addr,
+      (module.ImageName[0] != 0) ? module.ImageName : L"<unknown>",
+      symbolInfo->Name, displace);
+  }
+  else
+  {
+    str.Format ("[%p] (%ls)<unknown>", addr,
+      (module.ImageName[0] != 0) ? module.ImageName : L"<unknown>");
+  }
+
+  return true;
+}
+
+static BOOL CALLBACK EnumSymCallbackNames (SYMBOL_INFO* pSymInfo,
+  ULONG SymbolSize, PVOID UserContext)
+{
+  if ((pSymInfo->Flags & SYMFLAG_PARAMETER) != 0)
+  {
+    csArray<csString>* info = (csArray<csString>*)UserContext;
+
+    info->Push (pSymInfo->Name);
+  }
+
+  return TRUE;
+}
+
+void* csCallStackNameResolverDbgHelp::OpenParamSymbols (void* addr)
+{
+  IMAGEHLP_STACK_FRAME stackFrame;
+  memset (&stackFrame, 0, sizeof (IMAGEHLP_STACK_FRAME));
+  stackFrame.InstructionOffset = (uintptr_t)addr;
+
+  SetLastError (ERROR_SUCCESS);
+  bool result = DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
+    &stackFrame, 0);
+  if (!result)
+  {
+    // Bit hackish: if SymSetContext() failed, scan the loaded DLLs
+    // and try to load their debug info.
+    RescanModules ();
+    SetLastError (ERROR_SUCCESS);
+    result = DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
+      &stackFrame, 0);
+  }
+  if (result)
+  {
+    csArray<csString>* names = new csArray<csString>;
+    if (DbgHelp::SymEnumSymbols (symInit.GetSymProcessHandle (), 
+      0
+      /*DbgHelp::SymGetModuleBase64(GetCurrentProcess(),frame.AddrPC.Offset)*/,
+      "*", &EnumSymCallbackNames, names))
+      return names;
+    else
+      delete names;
+  }
+  else
+  {
+    DWORD err = GetLastError ();
+    if (err != ERROR_SUCCESS)
+      PrintError ("SymSetContext: %s", cswinGetErrorMessage (err));
+  }
+  return 0;
+}
+
+bool csCallStackNameResolverDbgHelp::GetParamName (void* h, size_t n, csString& str)
+{
+  csArray<csString>* names = (csArray<csString>*)h;
+  if (n >=  names->Length()) return false;
+  str = names->Get (n);
+  return true;
+}
+
+void csCallStackNameResolverDbgHelp::FreeParamSymbols (void* h)
+{
+  csArray<csString>* names = (csArray<csString>*)h;
+  delete names;
+}
+
+bool csCallStackNameResolverDbgHelp::GetLineNumber (void* addr, csString& str)
+{
+  IMAGEHLP_LINE64 line;
+  memset (&line, 0, sizeof (IMAGEHLP_LINE64));
+  line.SizeOfStruct = sizeof (IMAGEHLP_LINE64);
+  DWORD displacement;
+  if (DbgHelp::SymGetLineFromAddr64 (symInit.GetSymProcessHandle (), 
+    (uintptr_t)addr, &displacement, &line))
+  {
+    str.Format ("%s:%" PRIu32, line.FileName, (uint32)line.LineNumber);
+    return true;
+  }
+  return false;
 }

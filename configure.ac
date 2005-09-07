@@ -1884,7 +1884,8 @@ CS_CHECK_BUILD([for backtrace], [cs_cv_backtrace],
 	[void* foo; int x; x = backtrace (&foo, 0); 
 	backtrace_symbols (&foo, x);])],
     [], [],
-    [CS_EMIT_BUILD_PROPERTY([BACKTRACE.AVAILABLE], [yes])])
+    [CS_HEADER_PROPERTY([CS_HAVE_BACKTRACE])
+    CS_EMIT_BUILD_PROPERTY([BACKTRACE.AVAILABLE], [yes])])
 
 
 

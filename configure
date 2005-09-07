@@ -54345,7 +54345,9 @@ echo "${ECHO_T}$cs_cv_backtrace" >&6
 fi
 
     if test $cs_cv_backtrace = yes; then
-  cs_build_prop_val="yes"
+  cs_header_text="${cs_header_text}#define CS_HAVE_BACKTRACE
+"
+    cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}BACKTRACE.AVAILABLE ?= \"$cs_build_prop_val\" ;

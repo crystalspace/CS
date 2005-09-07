@@ -16,6 +16,7 @@ chronological order.
 	- res improved Win32 call stack generation.
 	- res added a small helper to measure the time the execution of a 
 	  block takes.
+        - res modularized the implementation of callstack creation. 
 6-Sep-2005
 	- res fixed a bug in glshader_fixed were the constant color was not set
 	  to black when the SV was not found.
