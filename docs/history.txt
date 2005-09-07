@@ -6,9 +6,6 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-8-Sep-2005
-	- Andrew Dai changed the sliding algorithm to be bounceback based in
-	  actor collisions.
 7-Sep-2005
 	- res added a "callstack" command to walktest. Mainly useful to check
 	  whether the callstack facility is working.
@@ -19,7 +16,12 @@ chronological order.
 	- res improved Win32 call stack generation.
 	- res added a small helper to measure the time the execution of a 
 	  block takes.
-        - res modularized the implementation of callstack creation. 
+        - res modularized the implementation of callstack creation.
+	- Andrew Dai changed the sliding algorithm to be bounceback based in
+	  actor collisions.
+	- res changed the docs to point to cs-win32libs 016.
+	- res made some small tweaks to the callstack stuff.
+	- res made an object registry warning more colorful.
 6-Sep-2005
 	- res fixed a bug in glshader_fixed were the constant color was not set
 	  to black when the SV was not found.

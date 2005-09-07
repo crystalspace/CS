@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "csutil/ansicolor.h"
 #include "csutil/objreg.h"
 #include "csutil/refarr.h"
 #include "csutil/scopedmutexlock.h"
@@ -238,8 +239,9 @@ iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
       void* interf = b->QueryInterface (id, version);
       if (!interf)
       {
-        csPrintf ("WARNING! Suspicious: object with tag '%s' does not implement "
-	        "interface '%s'!\n", t, iSCF::SCF->GetInterfaceName(id));
+        csPrintf (CS_ANSI_FY CS_ANSI_FI "WARNING! Suspicious: object with "
+	  "tag '%s' does not implement interface '%s'!\n" CS_ANSI_RST, t, 
+	  iSCF::SCF->GetInterfaceName(id));
 	fflush (stdout);
 	return 0;
       }

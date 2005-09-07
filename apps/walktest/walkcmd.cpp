@@ -2505,16 +2505,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       for (size_t i = 0; i < stack->GetEntryCount(); i++)
       {
-	csString line;
-	csString s;
-	bool hasFunc = stack->GetFunctionName (i, s);
-	line << (hasFunc ? (const char*)s : "<unknown>");
-	if (stack->GetLineNumber (i, s))
-	  line << " @" << s;
-	if (stack->GetParameters (i, s))
-	  line << " (" << s << ")";
 	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "%s", line.GetData());
+	  "%s", stack->GetEntryAll (i).GetData());
       }
       stack->Free();
     }

@@ -672,15 +672,31 @@ void csCallStackNameResolverDbgHelp::FreeParamSymbols (void* h)
 
 bool csCallStackNameResolverDbgHelp::GetLineNumber (void* addr, csString& str)
 {
-  IMAGEHLP_LINE64 line;
-  memset (&line, 0, sizeof (IMAGEHLP_LINE64));
-  line.SizeOfStruct = sizeof (IMAGEHLP_LINE64);
-  DWORD displacement;
-  if (DbgHelp::SymGetLineFromAddr64 (symInit.GetSymProcessHandle (), 
-    (uintptr_t)addr, &displacement, &line))
+  if (DbgHelp::SymGetLineFromAddrW64)
   {
-    str.Format ("%s:%" PRIu32, line.FileName, (uint32)line.LineNumber);
-    return true;
+    IMAGEHLP_LINEW64 line;
+    memset (&line, 0, sizeof (IMAGEHLP_LINEW64));
+    line.SizeOfStruct = sizeof (IMAGEHLP_LINEW64);
+    DWORD displacement;
+    if (DbgHelp::SymGetLineFromAddrW64 (symInit.GetSymProcessHandle (), 
+      (uintptr_t)addr, &displacement, &line))
+    {
+      str.Format ("%ls:%" PRIu32, line.FileName, (uint32)line.LineNumber);
+      return true;
+    }
+  }
+  else
+  {
+    IMAGEHLP_LINE64 line;
+    memset (&line, 0, sizeof (IMAGEHLP_LINE64));
+    line.SizeOfStruct = sizeof (IMAGEHLP_LINE64);
+    DWORD displacement;
+    if (DbgHelp::SymGetLineFromAddr64 (symInit.GetSymProcessHandle (), 
+      (uintptr_t)addr, &displacement, &line))
+    {
+      str.Format ("%s:%" PRIu32, line.FileName, (uint32)line.LineNumber);
+      return true;
+    }
   }
   return false;
 }

@@ -48,13 +48,23 @@ public:
   #define FUNC_GROUP_END
   #define FUNC(ret, name, args)		    \
     typedef ret (WINAPI* PFN ## name) args;
+  #define FUNC_OPT(ret, name, args)	FUNC(ret, name, args)
   #include CS_API_FUNCTIONS
+  #undef FUNC_GROUP_BEGIN
+  #undef FUNC_GROUP_END
+  #undef FUNC_OPT
+  #undef FUNC
 
   #define FUNC_GROUP_BEGIN(name)	    
   #define FUNC_GROUP_END
   #define FUNC(ret, name, args)		    \
     static PFN ## name name;
+  #define FUNC_OPT(ret, name, args)	FUNC(ret, name, args)
   #include CS_API_FUNCTIONS
+  #undef FUNC_GROUP_BEGIN
+  #undef FUNC_GROUP_END
+  #undef FUNC_OPT
+  #undef FUNC
 };
 
 #ifdef CS_API_EXPORT_UNDEF

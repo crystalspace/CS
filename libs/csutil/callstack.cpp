@@ -105,15 +105,15 @@ bool csCallStackImpl::GetParameters (size_t num, csString& str)
     iCallStackNameResolver* res = ((NameResolveGetter)*resGetter)();
     if ((h = res->OpenParamSymbols (entries[num].address)))
     {
+      str.Clear();
       csString parm;
-      str << '(';
       for (size_t i = 0; i < entries[num].paramNum; i++)
       {
         parm.Clear();
         if (!res->GetParamName (h, i, parm)) 
           parm.Format ("unk%zu", i);
         if (i > 0) str << ", ";
-        str << parm;
+        str << parm << " = ";
         str.AppendFmt ("%" PRIdPTR "(0x%" PRIxPTR ")",
           params[entries[num].paramOffs + i],
           params[entries[num].paramOffs + i]);
@@ -138,15 +138,8 @@ csCallStack* csCallStackHelper::CreateCallStack (int skip, bool fast)
     iCallStackCreator* csc = ((CreatorGetter)*cscGetter)();
     if (csc->CreateCallStack (stack->entries, stack->params, fast))
     {
-      while (skip-- > 0)
-      {
-        if ((stack->entries[0].paramNum > 0) 
-          && (stack->entries[0].paramNum != csParamUnknown))
-        {
-          stack->params.DeleteRange (0, stack->entries[0].paramNum-1);
-        }
-        stack->entries.DeleteIndex (0);
-      }
+      if (skip > 0)
+	stack->entries.DeleteRange (0, (size_t)(skip-1));
       stack->entries.ShrinkBestFit();
       stack->params.ShrinkBestFit();
       return stack;

@@ -28,7 +28,12 @@ int CS_API_NAME::refCount = 0;
 #define FUNC_GROUP_END
 #define FUNC(ret, name, args)		    \
   CS_API_NAME::PFN ## name CS_API_NAME::name = 0;
+#define FUNC_OPT(ret, name, args)     FUNC(ret, name, args)
 #include CS_API_FUNCTIONS
+#undef FUNC_GROUP_BEGIN
+#undef FUNC_GROUP_END
+#undef FUNC_OPT
+#undef FUNC
 
 void CS_API_NAME::IncRef()
 {
@@ -72,6 +77,8 @@ bool CS_API_NAME::Available ()
         *flag &= ((name = (PFN ## name)GetProcAddress (*dll, #name)) != 0); \
         if (!name) csPrintf ("%s: Could not obtain %s\n", 		    \
 	  STRINGIZE (CS_API_NAME), #name);
+      #define FUNC_OPT(ret, name, args)					    \
+        name = (PFN ## name)GetProcAddress (*dll, #name);
       #include CS_API_FUNCTIONS
 #else      
       #define FUNC_GROUP_BEGIN(name)	    \
@@ -79,8 +86,14 @@ bool CS_API_NAME::Available ()
       #define FUNC_GROUP_END		    ;
       #define FUNC(ret, name, args)		    \
         && (name = (PFN ## name)GetProcAddress (*dll, #name))
+      #define FUNC_OPT(ret, name, args)					    \
+        && ((name = (PFN ## name)GetProcAddress (*dll, #name)) || true)
       #include CS_API_FUNCTIONS
 #endif
+#undef FUNC_GROUP_BEGIN
+#undef FUNC_GROUP_END
+#undef FUNC_OPT
+#undef FUNC
     }
 #ifdef CS_DEBUG
     if (!dll || !*dll)

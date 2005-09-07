@@ -58,6 +58,18 @@ public:
     }
     fflush (f);
   }
+  csString GetEntryAll (size_t i, bool Short = false)
+  {
+    csString line;
+    csString s;
+    bool hasFunc = GetFunctionName (i, s);
+    line << (hasFunc ? (const char*)s : "<unknown>");
+    if (GetLineNumber (i, s))
+      line << " @" << s;
+    if (GetParameters (i, s))
+      line << " (" << s << ")";
+    return line;
+  }
 };
 
 // @@@ Document me

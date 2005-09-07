@@ -20,6 +20,8 @@ FUNC_GROUP_BEGIN(SymSupport)
     PIMAGEHLP_MODULEW64 ModuleInfo))
   FUNC(BOOL, SymGetLineFromAddr64, (HANDLE hProcess, uint64 dwAddr,
     PDWORD pdwDisplacement, PIMAGEHLP_LINE64 Line))
+  FUNC_OPT(BOOL, SymGetLineFromAddrW64, (HANDLE hProcess, uint64 dwAddr,
+    PDWORD pdwDisplacement, PIMAGEHLP_LINEW64 Line))
   FUNC(BOOL, SymEnumSymbols, (HANDLE hProcess, uint64 BaseOfDll,  
     PCSTR Mask, PSYM_ENUMERATESYMBOLS_CALLBACK EnumSymbolsCallback, 
     PVOID UserContext))
@@ -36,7 +38,3 @@ FUNC_GROUP_BEGIN(Minidump)
     PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam, 
     PMINIDUMP_CALLBACK_INFORMATION CallbackParam))
 FUNC_GROUP_END
-
-#undef FUNC_GROUP_BEGIN
-#undef FUNC_GROUP_END
-#undef FUNC
