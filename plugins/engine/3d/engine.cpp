@@ -752,13 +752,16 @@ csEngine::csEngine (iBase *iParent) :
   scfImplementationType (this, iParent),
   textures (new csTextureList), materials (new csMaterialList),
   sharedVariables (new csSharedVariableList),
-  sectorItPool (0), renderLoopManager (0), topLevelClipper (0), resize (0),
+  sectorItPool (0), renderLoopManager (0), topLevelClipper (0), resize (false),
   worldSaveable (false), maxAspectRatio (0), nextframePending (0),
   currentFrameNumber (0), clearZBuf (false), defaultClearZBuf (false),
   clearScreen (false), defaultClearScreen (false), 
-  defaultMaxLightmapWidth (256), defaultMaxLightmapHeight (256),currentRenderContext (0)
+  defaultMaxLightmapWidth (256), defaultMaxLightmapHeight (256),
+  currentRenderContext (0)
 {
   DG_TYPE (this, "csEngine");
+
+  scfiEventHandler = new eiEventHandler (this);
 
   currentEngine = this;
   currentiEngine = (iEngine*)this;
@@ -769,9 +772,13 @@ csEngine::csEngine (iBase *iParent) :
 
 csEngine::~csEngine ()
 {
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (objectRegistry, iEventQueue));
-  if (q != 0)
-    q->RemoveListener (this);
+  if (scfiEventHandler)
+  {
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (objectRegistry, iEventQueue));
+    if (q != 0)
+      q->RemoveListener (scfiEventHandler);
+    scfiEventHandler->DecRef ();
+  }
 
   DeleteAll ();
 
@@ -832,7 +839,7 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
   // Tell event queue that we want to handle broadcast events
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectRegistry, iEventQueue);
   if (q)
-    q->RegisterListener (this, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
 
   csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
   ReadConfig (cfg);

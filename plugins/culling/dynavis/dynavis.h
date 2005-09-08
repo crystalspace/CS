@@ -29,6 +29,7 @@
 #include "csutil/scf.h"
 #include "csutil/set.h"
 #include "csutil/leakguard.h"
+#include "csutil/weakref.h"
 #include "igeom/objmodel.h"
 #include "iengine/movable.h"
 #include "csgeom/plane3.h"
@@ -354,6 +355,28 @@ public:
   csTicks Debug_Benchmark (int num_iterations);
   bool Debug_DebugCommand (const char* cmd);
   csKDTree* GetKDTree () { return kdtree; }
+
+  bool HandleEvent (iEvent& ev);
+
+  struct eiEventHandler : public iEventHandler
+  {
+    csWeakRef<csDynaVis> parent;
+    SCF_DECLARE_IBASE;
+    eiEventHandler (csDynaVis* parent)
+    {
+      SCF_CONSTRUCT_IBASE (0);
+      eiEventHandler::parent = parent;
+    }
+    virtual ~eiEventHandler ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
+    virtual bool HandleEvent (iEvent& ev)
+    {
+      if (parent) return parent->HandleEvent (ev);
+      else return false;
+    }
+  } * scfiEventHandler;
 
   struct eiComponent : public iComponent
   {

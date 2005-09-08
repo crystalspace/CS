@@ -192,10 +192,9 @@ public:
  * This class manages all components which comprise a 3D world including
  * sectors, polygons, curves, mesh objects, etc.
  */
-class csEngine : public scfImplementationExt5<csEngine,
+class csEngine : public scfImplementationExt4<csEngine,
                                               csObject,
                                               iEngine,
-                                              iEventHandler,
                                               iComponent,
                                               iPluginConfig,
                                               iDebugHelper>
@@ -595,9 +594,26 @@ public:
 
   virtual bool GetOption (int id, csVariant* value);
 
-  // -- iEventHandler
+  bool HandleEvent (iEvent &Event);
 
-  virtual bool HandleEvent (iEvent &Event);
+  // -- iEventHandler
+  struct eiEventHandler : public scfImplementation1<
+  	eiEventHandler,iEventHandler>
+  {
+    csWeakRef<csEngine> parent;
+    eiEventHandler (csEngine* parent) : scfImplementationType (this)
+    {
+      eiEventHandler::parent = parent;
+    }
+    virtual ~eiEventHandler ()
+    {
+    }
+    virtual bool HandleEvent (iEvent& ev)
+    {
+      if (parent) return parent->HandleEvent (ev);
+      else return false;
+    }
+  } * scfiEventHandler;
 
   // -- iDebugHelper
   

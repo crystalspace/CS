@@ -14,6 +14,18 @@ chronological order.
 	  the user about the fact that bfd is used.
 	- res added a (mostly working) libbfd symbol name resolver for Win32. 
 	  This means that callstacks on MinGW are now actually useful.
+	- Jorrit fixed dynavis and frustvis so that they update their internal
+	  data structures when the screen is resized. This doesn't fix the
+	  culling problems however so there most likely is another place
+	  somewhere in the engine where the original size is remembered.
+	- Jorrit made the event handler in the engine an internal class
+	  of csEngine. This prevents the engine leaking when the engine
+	  plugin is going to be removed before the entire system is removed.
+	  The reason for the leak is that the engine registered itself in
+	  the event queue. This caused an additional ref to it. The leak
+	  was not present in normal system shutdown since then the event
+	  queue will also be emptied. General rule: ALWAYS make event handlers
+	  a separate object.
 7-Sep-2005
 	- res added a "callstack" command to walktest. Mainly useful to check
 	  whether the callstack facility is working.

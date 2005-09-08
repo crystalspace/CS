@@ -23,6 +23,9 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
+#include "csutil/event.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "csgeom/frustum.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/math3d.h"
@@ -63,6 +66,10 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_EMBEDDED_IBASE (csFrustumVis::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_IBASE (csFrustumVis::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
 
 //----------------------------------------------------------------------
 
@@ -153,10 +160,20 @@ csFrustumVis::csFrustumVis (iBase *iParent)
   current_vistest_nr = 1;
   vistest_objects_inuse = false;
   updating = false;
+
+  scfiEventHandler = new eiEventHandler (this);
 }
 
 csFrustumVis::~csFrustumVis ()
 {
+  if (scfiEventHandler)
+  {
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+      q->RemoveListener (scfiEventHandler);
+    scfiEventHandler->DecRef ();
+  }
+
   while (visobj_vector.Length () > 0)
   {
     csFrustVisObjectWrapper* visobj_wrap = visobj_vector.Pop ();
@@ -173,13 +190,32 @@ csFrustumVis::~csFrustumVis ()
   SCF_DESTRUCT_IBASE ();
 }
 
+bool csFrustumVis::HandleEvent (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast)
+  {
+    switch (csCommandEventHelper::GetCode (&ev))
+    {
+      case cscmdContextResize:
+        {
+	  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+	  scr_width = g3d->GetWidth ();
+	  scr_height = g3d->GetHeight ();
+	  printf ("Got resize %dx%d!\n", scr_width, scr_height);fflush (stdout);
+	}
+	break;
+    }
+  }
+  return false;
+}
+
 bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
 {
   csFrustumVis::object_reg = object_reg;
 
   delete kdtree;
 
-  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
+  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
@@ -193,6 +229,10 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   }
 
   kdtree = new csKDTree ();
+
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  if (q)
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
 
   return true;
 }

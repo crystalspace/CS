@@ -26,6 +26,9 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/array.h"
 #include "csutil/cfgacc.h"
+#include "csutil/event.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "csgeom/frustum.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/math3d.h"
@@ -79,6 +82,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_EMBEDDED_IBASE (csDynaVis::DebugHelper)
   SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_IBASE (csDynaVis::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
 
 //----------------------------------------------------------------------
 
@@ -221,10 +228,20 @@ csDynaVis::csDynaVis (iBase *iParent) : visobj_wrappers (1000)
   cfg_view_mode = VIEWMODE_STATS;
   do_state_dump = false;
   debug_origin_z = 50;
+
+  scfiEventHandler = new eiEventHandler (this);
 }
 
 csDynaVis::~csDynaVis ()
 {
+  if (scfiEventHandler)
+  {
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+      q->RemoveListener (scfiEventHandler);
+    scfiEventHandler->DecRef ();
+  }
+
   while (visobj_vector.Length () > 0)
   {
     csVisibilityObjectWrapper* visobj_wrap = visobj_vector.Pop ();
@@ -273,6 +290,10 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
     scr_height = 480;
   }
 
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  if (q)
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
+
   csConfigAccess config;
   config.AddConfig(object_reg, "/config/dynavis.cfg");
   reduce_buf = config->GetInt ("Culling.Dynavis.ReduceCoverageBuffer", 0);
@@ -315,6 +336,27 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   tcovbuf->bugplug = bugplug;
 
   return true;
+}
+
+bool csDynaVis::HandleEvent (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast)
+  {
+    switch (csCommandEventHelper::GetCode (&ev))
+    {
+      case cscmdContextResize:
+        {
+	  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+	  scr_width = g3d->GetWidth ();
+	  scr_height = g3d->GetHeight ();
+	  printf ("Got resize %dx%d!\n", scr_width, scr_height);fflush (stdout);
+	  delete tcovbuf;
+	  tcovbuf = new csTiledCoverageBuffer (scr_width, scr_height);
+	}
+	break;
+    }
+  }
+  return false;
 }
 
 void csDynaVis::Setup (const char* /*name*/)

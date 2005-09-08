@@ -27,6 +27,7 @@
 #include "csutil/scf.h"
 #include "csutil/hash.h"
 #include "csutil/set.h"
+#include "csutil/weakref.h"
 #include "csgeom/plane3.h"
 #include "igeom/objmodel.h"
 #include "iengine/viscull.h"
@@ -175,6 +176,28 @@ public:
     bool accurate = true);
   virtual void CastShadows (iFrustumView* fview);
   virtual const char* ParseCullerParameters (iDocumentNode*) { return 0; }
+
+  bool HandleEvent (iEvent& ev);
+
+  struct eiEventHandler : public iEventHandler
+  {
+    csWeakRef<csFrustumVis> parent;
+    SCF_DECLARE_IBASE;
+    eiEventHandler (csFrustumVis* parent)
+    {
+      SCF_CONSTRUCT_IBASE (0);
+      eiEventHandler::parent = parent;
+    }
+    virtual ~eiEventHandler ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
+    virtual bool HandleEvent (iEvent& ev)
+    {
+      if (parent) return parent->HandleEvent (ev);
+      else return false;
+    }
+  } * scfiEventHandler;
 
   struct eiComponent : public iComponent
   {
