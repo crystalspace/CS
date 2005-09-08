@@ -26,6 +26,11 @@ chronological order.
 	  was not present in normal system shutdown since then the event
 	  queue will also be emptied. General rule: ALWAYS make event handlers
 	  a separate object.
+	- Jorrit fixed a bug in the engine handling of cscmdContextResize.
+	  It was only setting 'resize' to true in case the event data was
+	  equal to G2D but that didn't appear to be the case. I don't know
+	  why that test is there so I simply removed it and now things are
+	  working properly.
 7-Sep-2005
 	- res added a "callstack" command to walktest. Mainly useful to check
 	  whether the callstack facility is working.

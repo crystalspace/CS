@@ -978,8 +978,7 @@ bool csEngine::HandleEvent (iEvent &Event)
 
       case cscmdContextResize:
         {
-          if (((iGraphics2D *)csCommandEventHelper::GetInfo(&Event)) == G2D)
-            resize = true;
+          resize = true;
           return false;
         }
 
