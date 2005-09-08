@@ -42,6 +42,8 @@ chronological order.
 	  don't know what object is causing it.
 	- res fixed the bfd/win32 symbol resolver to properly support relocated
 	  modules.
+	- Jorrit changed CS_ASSERT so that it will now show a callstack
+	  if available.
 7-Sep-2005
 	- res added a "callstack" command to walktest. Mainly useful to check
 	  whether the callstack facility is working.

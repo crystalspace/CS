@@ -618,6 +618,8 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #endif
 
 #ifdef CS_DEBUG
+extern void csDumpCallStack ();
+
 #  if !defined (CS_DEBUG_BREAK)
 #    if defined (CS_PLATFORM_WIN32)
 #      define CS_DEBUG_BREAK ::DebugBreak()
@@ -633,7 +635,12 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  endif
 #  if !defined (CS_ASSERT)
 #    if defined (CS_COMPILER_MSVC)
-#      define CS_ASSERT(x) assert(x)
+#      define CS_ASSERT(x) \
+         if (!(x)) \
+         { \
+	   csDumpCallStack (); \
+	   assert(x); \
+         }
 #    else
 #      include <stdio.h>
 #      define CS_ASSERT(x) \
@@ -641,6 +648,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
          { \
            fprintf (stderr, __FILE__ ":%d: failed assertion '%s'\n", \
              int(__LINE__), #x); \
+	   csDumpCallStack (); \
            CS_DEBUG_BREAK; \
          }
 #    endif

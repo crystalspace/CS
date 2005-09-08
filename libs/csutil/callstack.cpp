@@ -171,3 +171,14 @@ csCallStack* csCallStackHelper::CreateCallStack (int skip, bool fast)
   return 0;
 }
 
+void csDumpCallStack ()
+{
+  csCallStack* stack = csCallStackHelper::CreateCallStack();
+  if (stack != 0)
+  {
+    stack->Print (stderr);
+    fflush (stderr);
+    stack->Free();
+  }
+}
+
