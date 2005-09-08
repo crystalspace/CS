@@ -149,6 +149,26 @@ void csFrustVisObjectWrapper::MovableChanged (iMovable* /*movable*/)
   frustvis->AddObjectToUpdateQueue (this);
 }
 
+class csFrustVisObjectDescriptor : public scfImplementation1<
+	csFrustVisObjectDescriptor, iKDTreeObjectDescriptor>
+{
+public:
+  csFrustVisObjectDescriptor () : scfImplementationType (this) { }
+  ~csFrustVisObjectDescriptor () { }
+  virtual csPtr<iString> DescribeObject (csKDTreeChild* child)
+  {
+    scfString* str = new scfString ();
+    const csBox3& b = child->GetBBox ();
+    csFrustVisObjectWrapper* obj = (csFrustVisObjectWrapper*)(
+    	child->GetObject ());
+    str->Format ("'%s' (%g,%g,%g)-(%g,%g,%g)",
+    	obj->mesh->QueryObject ()->GetName (),
+	b.MinX (), b.MinY (), b.MinZ (),
+	b.MaxX (), b.MaxY (), b.MaxZ ());
+    return str;
+  }
+};
+
 //----------------------------------------------------------------------
 
 csFrustumVis::csFrustumVis (iBase *iParent)
@@ -229,6 +249,9 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   }
 
   kdtree = new csKDTree ();
+  csFrustVisObjectDescriptor* desc = new csFrustVisObjectDescriptor ();
+  kdtree->SetObjectDescriptor (desc);
+  desc->DecRef ();
 
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q)

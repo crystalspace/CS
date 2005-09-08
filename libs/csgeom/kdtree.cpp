@@ -82,7 +82,10 @@ void csKDTreeChild::RemoveLeaf (csKDTree* leaf)
       return;
     }
   }
-  CS_ASSERT (false);
+  // We shouldn't be able to come here.
+  fprintf (stderr, "Something bad happened in csKDTreeChild::RemoveLeaf!\n");
+  if (leaf) leaf->DumpObject (this, "  Trying to remove leaf for: %s!\n");
+  leaf->DebugExit ();
 }
 
 void csKDTreeChild::ReplaceLeaf (csKDTree* old_leaf, csKDTree* new_leaf)
@@ -96,7 +99,11 @@ void csKDTreeChild::ReplaceLeaf (csKDTree* old_leaf, csKDTree* new_leaf)
       return;
     }
   }
-  CS_ASSERT (false);
+  // We shouldn't be able to come here.
+  fprintf (stderr, "Something bad happened in csKDTreeChild::ReplaceLeaf!\n");
+  if (old_leaf) old_leaf->DumpObject (this,
+  	"  Trying to replace leaf for: %s!\n");
+  old_leaf->DebugExit ();
 }
 
 int csKDTreeChild::FindLeaf (csKDTree* leaf)
@@ -176,7 +183,13 @@ void csKDTree::Clear ()
 
 void csKDTree::AddObject (csKDTreeChild* obj)
 {
-  CS_ASSERT ((max_objects == 0) == (objects == 0));
+  if (!((max_objects == 0) == (objects == 0)))
+  {
+    fprintf (stderr, "AddObject failed!\n");
+    DumpObject (obj, "  Trying to add object: %s!\n");
+    DebugExit ();
+  }
+
   if (num_objects >= max_objects)
   {
     max_objects += MIN (max_objects+2, 80);
@@ -191,9 +204,56 @@ void csKDTree::AddObject (csKDTreeChild* obj)
   estimate_total_objects++;
 }
 
+void csKDTree::DebugExit ()
+{
+  fflush (stdout);
+  fflush (stderr);
+#ifdef CS_DEBUG
+  CS_ASSERT (false);
+#else
+  exit (-1);
+#endif
+}
+
+void csKDTree::DumpObject (csKDTreeChild* object, const char* msg)
+{
+  if (descriptor)
+  {
+    csRef<iString> d = descriptor->DescribeObject (object);
+    if (d)
+      fprintf (stderr, msg, d->GetData ());
+  }
+}
+
+void csKDTree::DumpNode ()
+{
+  if (descriptor)
+  {
+    fprintf (stderr, "  This node contains the following objects:\n");
+    size_t i;
+    for (i = 0 ; i < size_t (num_objects) ; i++)
+      if (objects[i])
+      {
+        csRef<iString> d = descriptor->DescribeObject (objects[i]);
+        if (d)
+          fprintf (stderr, "    %d: %s\n", i, d->GetData ());
+      }
+  }
+}
+
+void csKDTree::DumpNode (const char* msg)
+{
+  fprintf (stderr, msg);
+  DumpNode ();
+}
+
 void csKDTree::RemoveObject (int idx)
 {
-  CS_ASSERT (idx >= 0 && idx < num_objects);
+  if (idx < 0 && idx >= num_objects)
+  {
+    DumpNode ("Something bad happened in csKDTree::RemoveObject!\n");
+    DebugExit ();
+  }
   estimate_total_objects--;
   if (num_objects == 1)
   {
@@ -234,8 +294,22 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
     if (max0 < min1-.01)	// Small threshold to avoid bad split location.
     {
       split_loc = max0 + (min1-max0) * 0.5;
-      CS_ASSERT (split_loc > max0);
-      CS_ASSERT (split_loc < min1);
+      if (split_loc <= max0)
+      {
+	fprintf (stderr,
+	  "FindBestSplitLocation failed: split_loc(%g) <= max0(%g)\n",
+	  split_loc, max0);
+        DumpNode ();
+	DebugExit ();
+      }
+      if (split_loc >= min1)
+      {
+	fprintf (stderr,
+	  "FindBestSplitLocation failed: split_loc(%g) >= min1(%g)\n",
+	  split_loc, min1);
+        DumpNode ();
+	DebugExit ();
+      }
       return 10.0;	// Good quality split.
     }
     float min0 = bbox0.Min (axis);
@@ -243,8 +317,22 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
     if (max1 < min0-.01)
     {
       split_loc = max1 + (min0-max1) * 0.5;
-      CS_ASSERT (split_loc > max1);
-      CS_ASSERT (split_loc < min0);
+      if (split_loc <= max1)
+      {
+	fprintf (stderr,
+	  "FindBestSplitLocation failed: split_loc(%g) <= max1(%g)\n",
+	  split_loc, max1);
+        DumpNode ();
+	DebugExit ();
+      }
+      if (split_loc >= min0)
+      {
+	fprintf (stderr,
+	  "FindBestSplitLocation failed: split_loc(%g) >= min0(%g)\n",
+	  split_loc, min0);
+        DumpNode ();
+	DebugExit ();
+      }
       return 10.0;	// Good quality split.
     }
     return -1.0;		// Very bad quality split.
@@ -316,7 +404,14 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
 
 void csKDTree::DistributeLeafObjects ()
 {
-  CS_ASSERT (split_axis >= CS_KDTREE_AXISX && split_axis <= CS_KDTREE_AXISZ);
+  if (split_axis < CS_KDTREE_AXISX || split_axis > CS_KDTREE_AXISZ)
+  {
+    fprintf (stderr,
+	  "DistributeLeafObjects failed: split_axis=%d\n",
+	  split_axis);
+    DumpNode ();
+    DebugExit ();
+  }
   int i;
   for (i = 0 ; i < num_objects ; i++)
   {
@@ -348,7 +443,11 @@ void csKDTree::DistributeLeafObjects ()
       }
       child2->AddObject (objects[i]);
     }
-    CS_ASSERT (leaf_replaced);
+    if (!leaf_replaced)
+    {
+      DumpNode ("DistributeLeafObjects failed: !leaf_replaced\n");
+      DebugExit ();
+    }
   }
 
   num_objects = 0;
@@ -381,7 +480,13 @@ void csKDTree::UnlinkObject (csKDTreeChild* object)
   {
     csKDTree* leaf = object->leafs[i];
     int idx = leaf->FindObject (object);
-    CS_ASSERT (idx != -1);
+    if (idx == -1)
+    {
+      fprintf (stderr, "UnlinkObject failed: idx == -1!\n");
+      DumpObject (object, "  Trying to unlink object: %s!\n");
+      DumpNode ();
+      DebugExit ();
+    }
     leaf->RemoveObject (idx);
     leaf->disallow_distribute = false;	// Give distribute a new chance.
   }
@@ -460,7 +565,11 @@ void csKDTree::Distribute ()
     // This node has children. So we have to see to what child (or both)
     // we distribute the objects in the this node.
     DistributeLeafObjects ();
-    CS_ASSERT (num_objects == 0);
+    if (num_objects != 0)
+    {
+      DumpNode ("Distribute failed(1): distributing leaf objects!\n");
+      DebugExit ();
+    }
 
     // Update the bounding box of this node.
     estimate_total_objects = child1->GetEstimatedObjectCount ()
@@ -505,10 +614,16 @@ void csKDTree::Distribute ()
     {
       child1 = tree_nodes.Alloc ();
       child1->SetParent (this);
+      child1->SetObjectDescriptor (descriptor);
       child2 = tree_nodes.Alloc ();
       child2->SetParent (this);
+      child2->SetObjectDescriptor (descriptor);
       DistributeLeafObjects ();
-      CS_ASSERT (num_objects == 0);
+      if (num_objects != 0)
+      {
+	DumpNode ("Distribute failed(2): distributing leaf objects!\n");
+	DebugExit ();
+      }
       // Update the bounding box of this node.
       child1->node_bbox = GetNodeBBox ();
       child1->node_bbox.SetMax (split_axis, split_location);
@@ -553,7 +668,13 @@ void csKDTree::FlattenTo (csKDTree* node)
     csKDTreeChild* obj = c1->objects[i];
     if (obj->num_leafs == 1)
     {
-      CS_ASSERT (obj->leafs[0] == c1);
+      if (obj->leafs[0] != c1)
+      {
+        fprintf (stderr, "FlattenTo failed(1)!\n");
+        DumpObject (obj, "  Processing object: %s!\n");
+	DumpNode ();
+	DebugExit ();
+      }
       obj->leafs[0] = node;
       node->AddObject (obj);
     }
@@ -575,7 +696,13 @@ void csKDTree::FlattenTo (csKDTree* node)
     csKDTreeChild* obj = c2->objects[i];
     if (obj->num_leafs == 1)
     {
-      CS_ASSERT (obj->leafs[0] == c2);
+      if (obj->leafs[0] != c2)
+      {
+        fprintf (stderr, "FlattenTo failed(2)!\n");
+        DumpObject (obj, "  Processing object: %s!\n");
+	DumpNode ();
+	DebugExit ();
+      }
       obj->leafs[0] = node;
       node->AddObject (obj);
     }

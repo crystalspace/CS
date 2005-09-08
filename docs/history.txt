@@ -31,6 +31,15 @@ chronological order.
 	  equal to G2D but that didn't appear to be the case. I don't know
 	  why that test is there so I simply removed it and now things are
 	  working properly.
+	- Jorrit added a new method to csKDTree so that the kdtree can ask
+	  the user of the kdtree a description of the object. This is used
+	  to improve diagnostics when weird things occur in the KDTree.
+	  Both in debug and in optimize mode the KDTree will now dump
+	  information about what object it is trying to process when something
+	  goes wrong. Nearly all CS_ASSERT's have been replaced with custom
+	  code that uses the new descriptor. This change should help people
+	  who have problems with mysterious asserts in the KDTree code and
+	  don't know what object is causing it.
 7-Sep-2005
 	- res added a "callstack" command to walktest. Mainly useful to check
 	  whether the callstack facility is working.

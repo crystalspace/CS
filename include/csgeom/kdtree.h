@@ -31,7 +31,22 @@
 #include "iutil/dbghelp.h"
 
 struct iGraphics3D;
+struct iString;
 class csKDTree;
+class csKDTreeChild;
+
+/**
+ * If you implement this interface then you can give that to the
+ * KDtree. The KDtree can then use this to find the description of an object.
+ * This can be used for debugging as the KDtree will print out that description
+ * if it finds something is wrong.
+ */
+struct iKDTreeObjectDescriptor : public virtual iBase
+{
+  SCF_INTERFACE (iKDTreeObjectDescriptor, 0, 0, 1);
+
+  virtual csPtr<iString> DescribeObject (csKDTreeChild* child) = 0;
+};
 
 /**
  * A callback function for visiting a KD-tree node. If this function
@@ -136,6 +151,14 @@ enum
 class CS_CRYSTALSPACE_EXPORT csKDTree :
   public scfImplementation1<csKDTree, iDebugHelper>
 {
+public:
+  // This is used for debugging.
+  csRef<iKDTreeObjectDescriptor> descriptor;
+  void DumpObject (csKDTreeChild* object, const char* msg);
+  void DumpNode ();
+  void DumpNode (const char* msg);
+  void DebugExit ();
+
 private:
   static csBlockAllocator<csKDTree> tree_nodes;
   static csBlockAllocator<csKDTreeChild> tree_children;
@@ -240,6 +263,12 @@ public:
   virtual ~csKDTree ();
   /// Set the parent.
   void SetParent (csKDTree* p) { parent = p; }
+
+  /// For debugging: set the object descriptor.
+  void SetObjectDescriptor (iKDTreeObjectDescriptor* descriptor)
+  {
+    csKDTree::descriptor = descriptor;
+  }
 
   /// Make the tree empty.
   void Clear ();

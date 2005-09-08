@@ -163,6 +163,26 @@ void csVisibilityObjectWrapper::MovableChanged (iMovable* /*movable*/)
   dynavis->AddObjectToUpdateQueue (this);
 }
 
+class csDynaVisObjectDescriptor : public scfImplementation1<
+	csDynaVisObjectDescriptor, iKDTreeObjectDescriptor>
+{
+public:
+  csDynaVisObjectDescriptor () : scfImplementationType (this) { }
+  ~csDynaVisObjectDescriptor () { }
+  virtual csPtr<iString> DescribeObject (csKDTreeChild* child)
+  {
+    scfString* str = new scfString ();
+    const csBox3& b = child->GetBBox ();
+    csVisibilityObjectWrapper* obj = (csVisibilityObjectWrapper*)(
+    	child->GetObject ());
+    str->Format ("'%s' (%g,%g,%g)-(%g,%g,%g)",
+    	obj->mesh->QueryObject ()->GetName (),
+	b.MinX (), b.MinY (), b.MinZ (),
+	b.MaxX (), b.MaxY (), b.MaxZ ());
+    return str;
+  }
+};
+
 //----------------------------------------------------------------------
 
 // Fast random generator. Only the 16 least significant
@@ -330,6 +350,9 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   	"Culling.Dynavis.BadOccluderThresshold", 10);
 
   kdtree = new csKDTree ();
+  csDynaVisObjectDescriptor* desc = new csDynaVisObjectDescriptor ();
+  kdtree->SetObjectDescriptor (desc);
+  desc->DecRef ();
 
   tcovbuf = new csTiledCoverageBuffer (scr_width, scr_height);
   csRef<iBugPlug> bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
