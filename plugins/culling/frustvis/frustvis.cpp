@@ -221,7 +221,7 @@ bool csFrustumVis::HandleEvent (iEvent& ev)
 	  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 	  scr_width = g3d->GetWidth ();
 	  scr_height = g3d->GetHeight ();
-	  printf ("Got resize %dx%d!\n", scr_width, scr_height);fflush (stdout);
+//	  printf ("Got resize %dx%d!\n", scr_width, scr_height);fflush (stdout);
 	}
 	break;
     }
