@@ -6,6 +6,10 @@ SubDir TOP libs csutil ;
   {
     rejects += bfdsymbols.cpp bfdsymbols.h ;
   }
+  else
+  {
+    CSLIB.EXTERNAL_LIBS += LIBBFD ;
+  }
 
   CsLibAddModule $(rejects) ;
 }
