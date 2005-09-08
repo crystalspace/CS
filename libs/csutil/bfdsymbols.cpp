@@ -26,7 +26,8 @@ namespace CrystalSpace
   namespace Debug
   {
     
-    BfdSymbols::BfdSymbols (const char* filename, uintptr_t base) : syms(0)
+    BfdSymbols::BfdSymbols (const char* filename, uintptr_t addrOffs) : 
+      syms(0), addrOffs(addrOffs)
     {
       this->filename = filename;
       abfd = bfd_openr (filename, 0);
@@ -36,8 +37,6 @@ namespace CrystalSpace
 	bfd_close (abfd);
 	abfd = 0;
       }
-      //if (base != (uintptr_t)~0)
-	//bfd_set_start_address (abfd, base);
     }
     
     BfdSymbols::~BfdSymbols ()
@@ -66,6 +65,8 @@ namespace CrystalSpace
     bool BfdSymbols::FindSymbol (uintptr_t addr, const char*& filename, 
 				  const char*& function, uint& line)
     {
+      addr += addrOffs;
+      
       asection* sect;
       for (sect = abfd->sections; sect != 0; sect = sect->next)
       {

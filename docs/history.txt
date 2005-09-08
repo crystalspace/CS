@@ -40,6 +40,8 @@ chronological order.
 	  code that uses the new descriptor. This change should help people
 	  who have problems with mysterious asserts in the KDTree code and
 	  don't know what object is causing it.
+	- res fixed the bfd/win32 symbol resolver to properly support relocated
+	  modules.
 7-Sep-2005
 	- res added a "callstack" command to walktest. Mainly useful to check
 	  whether the callstack facility is working.

@@ -64,7 +64,18 @@ namespace CrystalSpace
 	  sizeof(moduleFN)/sizeof(moduleFN[0])) == 0)
 	  return false;
 	
-	bfd = new BfdSymbols (moduleFN, base);
+	/* Compute relocation offset */
+	uintptr_t addrOffs = 0;
+	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)(uintptr_t)base;
+	PIMAGE_NT_HEADERS NTheader = 
+	  (PIMAGE_NT_HEADERS)((uint8*)dosHeader + dosHeader->e_lfanew);
+	if (NTheader->Signature == 0x00004550) // check for PE sig
+	{
+	  uintptr_t imageBase = NTheader->OptionalHeader.ImageBase;
+	  addrOffs = imageBase - (uintptr_t)base;
+	}
+	
+	bfd = new BfdSymbols (moduleFN, addrOffs);
 	moduleBfds.Put (base, bfd);
       }
       if (!bfd->Ok()) return 0;

@@ -29,21 +29,37 @@ namespace CrystalSpace
   namespace Debug
   {
     
+    /// Class to obtain symbols from an object file via libbfd.
     class BfdSymbols
     {
       bfd* abfd;
       asymbol** syms;
       csString filename;
+      uintptr_t addrOffs;
       
+      /// Check if everything is sane
       bool CheckValid();
+      /// Read canonicalized bfd symbol
       bool GrabSymbols();
     public:
-      BfdSymbols (const char* filename, uintptr_t base = (uintptr_t)~0);
+      /**
+       * Initialize. Try to obtain symbols from \a filename. \a addrOffs is 
+       * is an offset added to the sections in the object to adjust for e.g.
+       * relocation.
+       */
+      BfdSymbols (const char* filename, uintptr_t addrOffs = 0);
       ~BfdSymbols ();
+      /**
+       * Returns whether the file could be read and contains symbols.
+       * No further operations(save deletion) should be done on the instance
+       * if this returns false.
+       */
       bool Ok() { return abfd != 0; }
       
+      /// Find function, file name and line for an instruction address
       bool FindSymbol (uintptr_t addr, const char*& filename, 
 	const char*& function, uint& line);
+      /// Get file name of object file
       const char* GetFileName () { return filename; }
     };
     
