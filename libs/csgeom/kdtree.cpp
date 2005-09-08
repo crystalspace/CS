@@ -83,7 +83,7 @@ void csKDTreeChild::RemoveLeaf (csKDTree* leaf)
     }
   }
   // We shouldn't be able to come here.
-  fprintf (stderr, "Something bad happened in csKDTreeChild::RemoveLeaf!\n");
+  csPrintfErr ("Something bad happened in csKDTreeChild::RemoveLeaf!\n");
   if (leaf) leaf->DumpObject (this, "  Trying to remove leaf for: %s!\n");
   leaf->DebugExit ();
 }
@@ -100,7 +100,7 @@ void csKDTreeChild::ReplaceLeaf (csKDTree* old_leaf, csKDTree* new_leaf)
     }
   }
   // We shouldn't be able to come here.
-  fprintf (stderr, "Something bad happened in csKDTreeChild::ReplaceLeaf!\n");
+  csPrintfErr ("Something bad happened in csKDTreeChild::ReplaceLeaf!\n");
   if (old_leaf) old_leaf->DumpObject (this,
   	"  Trying to replace leaf for: %s!\n");
   old_leaf->DebugExit ();
@@ -185,7 +185,7 @@ void csKDTree::AddObject (csKDTreeChild* obj)
 {
   if (!((max_objects == 0) == (objects == 0)))
   {
-    fprintf (stderr, "AddObject failed!\n");
+    csPrintfErr ("AddObject failed!\n");
     DumpObject (obj, "  Trying to add object: %s!\n");
     DebugExit ();
   }
@@ -221,7 +221,7 @@ void csKDTree::DumpObject (csKDTreeChild* object, const char* msg)
   {
     csRef<iString> d = descriptor->DescribeObject (object);
     if (d)
-      fprintf (stderr, msg, d->GetData ());
+      csPrintfErr (msg, d->GetData ());
   }
 }
 
@@ -229,21 +229,21 @@ void csKDTree::DumpNode ()
 {
   if (descriptor)
   {
-    fprintf (stderr, "  This node contains the following objects:\n");
+    csPrintfErr ("  This node contains the following objects:\n");
     size_t i;
     for (i = 0 ; i < size_t (num_objects) ; i++)
       if (objects[i])
       {
         csRef<iString> d = descriptor->DescribeObject (objects[i]);
         if (d)
-          fprintf (stderr, "    %d: %s\n", i, d->GetData ());
+          csPrintfErr ("    %d: %s\n", i, d->GetData ());
       }
   }
 }
 
 void csKDTree::DumpNode (const char* msg)
 {
-  fprintf (stderr, msg);
+  csPrintfErr (msg);
   DumpNode ();
 }
 
@@ -482,7 +482,7 @@ void csKDTree::UnlinkObject (csKDTreeChild* object)
     int idx = leaf->FindObject (object);
     if (idx == -1)
     {
-      fprintf (stderr, "UnlinkObject failed: idx == -1!\n");
+      csPrintfErr ("UnlinkObject failed: idx == -1!\n");
       DumpObject (object, "  Trying to unlink object: %s!\n");
       DumpNode ();
       DebugExit ();
@@ -670,7 +670,7 @@ void csKDTree::FlattenTo (csKDTree* node)
     {
       if (obj->leafs[0] != c1)
       {
-        fprintf (stderr, "FlattenTo failed(1)!\n");
+        csPrintfErr ("FlattenTo failed(1)!\n");
         DumpObject (obj, "  Processing object: %s!\n");
 	DumpNode ();
 	DebugExit ();
@@ -698,7 +698,7 @@ void csKDTree::FlattenTo (csKDTree* node)
     {
       if (obj->leafs[0] != c2)
       {
-        fprintf (stderr, "FlattenTo failed(2)!\n");
+        csPrintfErr ("FlattenTo failed(2)!\n");
         DumpObject (obj, "  Processing object: %s!\n");
 	DumpNode ();
 	DebugExit ();
