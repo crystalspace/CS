@@ -22,6 +22,11 @@
 
 #include "csutil/dirtyaccessarray.h"
 
+namespace CrystalSpace
+{
+namespace Debug
+{
+
 /**
  * Parameter count signaling that the number and values of the parameters
  * for a callstack entry are unknown.
@@ -68,14 +73,12 @@ struct iCallStackNameResolver
   virtual bool GetLineNumber (void* addr, csString& lineAndFile) = 0;
 };
 
-class csCallStackImpl : public csCallStack
+class CallStackImpl : public csCallStack
 {
 public:
   csDirtyAccessArray<CallStackEntry> entries;
   csDirtyAccessArray<uintptr_t> params;
   
-  virtual ~csCallStackImpl();
-  csCallStackImpl ();
   virtual void Free();
   
   virtual size_t GetEntryCount ();
@@ -83,5 +86,8 @@ public:
   virtual bool GetLineNumber (size_t num, csString& str);
   virtual bool GetParameters (size_t num, csString& str);
 };
+
+} // namespace Debug
+} // namespace CrystalSpace
 
 #endif // __CS_LIBS_CSUTIL_CALLSTACK_H__

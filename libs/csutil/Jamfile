@@ -1,6 +1,14 @@
 SubDir TOP libs csutil ;
 
-CsLibAddModule ;
+{
+  local rejects ;
+  if $(LIBBFD.AVAILABLE) != "yes"
+  {
+    rejects += bfdsymbols.cpp bfdsymbols.h ;
+  }
+
+  CsLibAddModule $(rejects) ;
+}
 
 CSUTIL.GENERIC = ;
 

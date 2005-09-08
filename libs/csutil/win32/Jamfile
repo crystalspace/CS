@@ -1,6 +1,18 @@
 SubDir TOP libs csutil win32 ;
 
-CsLibAddModule ;
+{
+  local rejects ;
+  if $(LIBBFD.AVAILABLE) != "yes"
+  {
+    rejects += callstack-bfd.cpp callstack-bfd.h ;
+  }
+  else
+  {
+    CSLIB.EXTERNAL_LIBS += LIBBFD ;
+  }
+
+  CsLibAddModule $(rejects) ;
+}
 
 CSUTIL.GENERIC +=
   appdir.cpp

@@ -1908,12 +1908,14 @@ CS_CHECK_BUILD([for setenv], [cs_cv_setenv],
 # Check if cxxabi.h is available and if the abi::__cxa_demangle() function is 
 # available.
 #------------------------------------------------------------------------------
+AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([cxxabi.h],
     [CS_CHECK_BUILD([for abi::__cxa_demangle], [cs_cv_abi_cxa_demangle],
         [AC_LANG_PROGRAM(
             [[#include <cxxabi.h>]],
             [abi::__cxa_demangle(0, 0, 0, 0)])],
         [], [C++], [CS_HEADER_PROPERTY([CS_HAVE_ABI_CXA_DEMANGLE])])])
+AC_LANG_POP([C++])
 
 
 
@@ -2399,6 +2401,21 @@ CS_EMIT_BUILD_PROPERTY([MODE], [$cs_build_mode])
 
 
 #------------------------------------------------------------------------------
+# Check for libbfd in debug mode
+#------------------------------------------------------------------------------
+AS_IF([test $cs_build_mode = debug],
+    [CS_CHECK_LIB_WITH([bfd],
+	[AC_LANG_PROGRAM([[#include <bfd.h>]], [bfd_init();])],
+	[], [], 
+	[cs_debug_libbfd=yes
+	CS_EMIT_BUILD_RESULT([cs_cv_libbfd], [LIBBFD])
+	CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])], 
+	[cs_debug_libbfd=no], [], [], [-liberty])],
+    [cs_debug_libbfd=no])
+
+
+
+#------------------------------------------------------------------------------
 # Determine if extensive memory debugger should be enabled.
 #------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to use extensive memory debugger])
@@ -2471,6 +2488,28 @@ AC_ARG_ENABLE([make-emulation],
 	addition to `jam' (default YES)])],
     [], [enable_make_emulation=yes])
 AC_MSG_RESULT([$enable_make_emulation])
+
+
+
+#------------------------------------------------------------------------------
+# In case libbfd is used for debugging, emit a message about that fact, and 
+# that libbfd is GPL and the consequences of shipping such a build with libbfd
+# enabled.
+#------------------------------------------------------------------------------
+AS_IF([test $cs_debug_libbfd = yes],
+    [AC_MSG_NOTICE([
+***
+*** This debug build is linked against libbfd, a GPL-licensed library.
+***
+libbfd is used for non-critical development and debugging aids and is thus by 
+default enabled in debug, but not optimize or release builds.
+However, be aware of licensing issues from linking against a GPL library;
+usually, for development work this is not problematic, however, you should not 
+ship this build or any binary statically linked against a CrystalSpace library
+if you are not using a GPL-compatible license.
+To avoid licensing issues, disable the use of libbfd with the "--without-bfd"
+command line switch.
+])])
 
 
 

@@ -25,7 +25,12 @@
 
 #include <execinfo.h>
 
-bool csCallStackCreatorBacktrace::CreateCallStack (
+namespace CrystalSpace
+{
+namespace Debug
+{
+
+bool CallStackCreatorBacktrace::CreateCallStack (
   csDirtyAccessArray<CallStackEntry>& entries, 
   csDirtyAccessArray<uintptr_t>& params, bool fast)
 {
@@ -41,7 +46,7 @@ bool csCallStackCreatorBacktrace::CreateCallStack (
   return true;
 }
 
-bool csCallStackNameResolverBacktrace::GetAddressSymbol (void* addr, 
+bool CallStackNameResolverBacktrace::GetAddressSymbol (void* addr, 
   csString& sym)
 {
   char** s = backtrace_symbols (&addr, 1);
@@ -69,21 +74,25 @@ bool csCallStackNameResolverBacktrace::GetAddressSymbol (void* addr,
   return true;
 }
 
-void* csCallStackNameResolverBacktrace::OpenParamSymbols (void* addr)
+void* CallStackNameResolverBacktrace::OpenParamSymbols (void* addr)
 {
   return 0;
 }
 
-bool csCallStackNameResolverBacktrace::GetParamName (void*, size_t, csString&)
+bool CallStackNameResolverBacktrace::GetParamName (void*, size_t, csString&)
 {
   return false;
 }
 
-void csCallStackNameResolverBacktrace::FreeParamSymbols (void* handle)
+void CallStackNameResolverBacktrace::FreeParamSymbols (void* handle)
 {
 }
 
-bool csCallStackNameResolverBacktrace::GetLineNumber (void*, csString&)
+bool CallStackNameResolverBacktrace::GetLineNumber (void*, csString&)
 {
   return false;
 }
+
+} // namespace Debug
+} // namespace CrystalSpace
+

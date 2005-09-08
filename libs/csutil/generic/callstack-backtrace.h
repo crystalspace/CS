@@ -22,15 +22,20 @@
 
 #include "../callstack.h"
 
+namespace CrystalSpace
+{
+namespace Debug
+{
+
 /// Call stack creator utilizing backtrace()
-class csCallStackCreatorBacktrace : public iCallStackCreator
+class CallStackCreatorBacktrace : public iCallStackCreator
 {
   virtual bool CreateCallStack (csDirtyAccessArray<CallStackEntry>& entries,
     csDirtyAccessArray<uintptr_t>& params, bool fast);
 };
 
 /// Call stack name resolver utilizing backtrace_symbols()
-class csCallStackNameResolverBacktrace : public iCallStackNameResolver
+class CallStackNameResolverBacktrace : public iCallStackNameResolver
 {
   virtual bool GetAddressSymbol (void* addr, csString& sym);
   virtual void* OpenParamSymbols (void* addr);
@@ -38,5 +43,8 @@ class csCallStackNameResolverBacktrace : public iCallStackNameResolver
   virtual void FreeParamSymbols (void* handle);
   virtual bool GetLineNumber (void* addr, csString& lineAndFile);
 };
+
+} // namespace Debug
+} // namespace CrystalSpace
 
 #endif // __CS_CSUTIL_GENERIC_CALLSTACK_BACKTRACE_H__

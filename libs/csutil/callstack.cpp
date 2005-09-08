@@ -22,16 +22,31 @@
 #include "callstack.h"
 
 #ifdef CS_HAVE_BACKTRACE
-#include "generic/callstack-backtrace.h"
-CS_IMPLEMENT_STATIC_VAR(cscBacktrace, csCallStackCreatorBacktrace, ());
-CS_IMPLEMENT_STATIC_VAR(csnrBacktrace, csCallStackNameResolverBacktrace, ());
+  #include "generic/callstack-backtrace.h"
+  CS_IMPLEMENT_STATIC_VAR(cscBacktrace, 
+			  CrystalSpace::Debug::CallStackCreatorBacktrace, ());
+  CS_IMPLEMENT_STATIC_VAR(csnrBacktrace, 
+			  CrystalSpace::Debug::CallStackNameResolverBacktrace, ());
 #endif
 
 #ifdef CS_PLATFORM_WIN32
-#include "win32/callstack-dbghelp.h"
-CS_IMPLEMENT_STATIC_VAR(cscDbgHelp, csCallStackCreatorDbgHelp, ());
-CS_IMPLEMENT_STATIC_VAR(csnrDbgHelp, csCallStackNameResolverDbgHelp, ());
+  #include "win32/callstack-dbghelp.h"
+  CS_IMPLEMENT_STATIC_VAR(cscDbgHelp, 
+			  CrystalSpace::Debug::CallStackCreatorDbgHelp, ());
+  CS_IMPLEMENT_STATIC_VAR(csnrDbgHelp, 
+			  CrystalSpace::Debug::CallStackNameResolverDbgHelp, ());
+
+  #ifdef CS_HAVE_LIBBFD
+    #include "win32/callstack-bfd.h"
+    CS_IMPLEMENT_STATIC_VAR(csnrBfd, 
+			    CrystalSpace::Debug::CallStackNameResolverBfd, ());
+  #endif
 #endif
+
+namespace CrystalSpace
+{
+namespace Debug
+{
 
 static const void* callStackCreators[] =
 {
@@ -47,6 +62,9 @@ static const void* callStackCreators[] =
 static const void* callStackNameResolvers[] =
 {
 #ifdef CS_PLATFORM_WIN32
+  #ifdef CS_HAVE_LIBBFD
+    (void*)&csnrBfd,
+  #endif
   (void*)&csnrDbgHelp,
 #endif
 #ifdef CS_HAVE_BACKTRACE
@@ -55,18 +73,16 @@ static const void* callStackNameResolvers[] =
   0
 };
 
-csCallStackImpl::~csCallStackImpl() {}
-csCallStackImpl::csCallStackImpl () {}
-void csCallStackImpl::Free() { delete this; }
+void CallStackImpl::Free() { delete this; }
 
-size_t csCallStackImpl::GetEntryCount ()
+size_t CallStackImpl::GetEntryCount ()
 {
   return entries.Length();
 }
 
 typedef iCallStackNameResolver* (*NameResolveGetter)();
 
-bool csCallStackImpl::GetFunctionName (size_t num, csString& str)
+bool CallStackImpl::GetFunctionName (size_t num, csString& str)
 {
   csString sym, mod;
   const void** resGetter = callStackNameResolvers;
@@ -82,7 +98,7 @@ bool csCallStackImpl::GetFunctionName (size_t num, csString& str)
   return false;
 }
 
-bool csCallStackImpl::GetLineNumber (size_t num, csString& str)
+bool CallStackImpl::GetLineNumber (size_t num, csString& str)
 {
   const void** resGetter = callStackNameResolvers;
   while (*resGetter != 0)
@@ -95,7 +111,7 @@ bool csCallStackImpl::GetLineNumber (size_t num, csString& str)
   return false;
 }
 
-bool csCallStackImpl::GetParameters (size_t num, csString& str)
+bool CallStackImpl::GetParameters (size_t num, csString& str)
 {
   if (entries[num].paramNum == csParamUnknown) return false;
   const void** resGetter = callStackNameResolvers;
@@ -126,12 +142,17 @@ bool csCallStackImpl::GetParameters (size_t num, csString& str)
   return false;
 }
 
+} // namespace Debug
+} // namespace CrystalSpace
+
+using namespace CrystalSpace::Debug;
+
 typedef iCallStackCreator* (*CreatorGetter)();
 
 csCallStack* csCallStackHelper::CreateCallStack (int skip, bool fast)
 {
   skip += 1; /* Adjust for this function */
-  csCallStackImpl* stack = new csCallStackImpl();
+  CallStackImpl* stack = new CallStackImpl();
   const void** cscGetter = callStackCreators;
   while (*cscGetter != 0)
   {

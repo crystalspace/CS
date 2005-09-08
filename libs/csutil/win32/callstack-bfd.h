@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2004 by Jorrit Tyberghein
-	      (C) 2004 by Frank Richter
+    Copyright (C) 2005 by Jorrit Tyberghein
+	      (C) 2005 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */	
 
-#ifndef __CS_LIBS_UTIL_WIN32_CALLSTACK_DBGHELP_H__
-#define __CS_LIBS_UTIL_WIN32_CALLSTACK_DBGHELP_H__
+#ifndef __CS_LIBS_UTIL_WIN32_CALLSTACK_BFD_H__
+#define __CS_LIBS_UTIL_WIN32_CALLSTACK_BFD_H__
 
 #include "csextern.h"
 #include "csutil/array.h"
@@ -27,28 +27,29 @@
 #include "csutil/strset.h"
 
 #include "../callstack.h"
+#include "../bfdsymbols.h"
 
 namespace CrystalSpace
 {
-namespace Debug
-{
-
-class CallStackCreatorDbgHelp : public iCallStackCreator
-{
-  virtual bool CreateCallStack (csDirtyAccessArray<CallStackEntry>& entries,
-    csDirtyAccessArray<uintptr_t>& params, bool fast);
-};
-
-class CallStackNameResolverDbgHelp : public iCallStackNameResolver
-{
-  virtual bool GetAddressSymbol (void* addr, csString& sym);
-  virtual void* OpenParamSymbols (void* addr);
-  virtual bool GetParamName (void* handle, size_t paramNum, csString& sym);
-  virtual void FreeParamSymbols (void* handle);
-  virtual bool GetLineNumber (void* addr, csString& lineAndFile);
-};
-
-} // namespace Debug
+  namespace Debug
+  {
+  
+    class CallStackNameResolverBfd : public iCallStackNameResolver
+    {
+      csHash<BfdSymbols*, uint64> moduleBfds;
+      
+      BfdSymbols* BfdForAddress (void* addr);
+    public:
+      virtual ~CallStackNameResolverBfd();
+    
+      virtual bool GetAddressSymbol (void* addr, csString& sym);
+      virtual void* OpenParamSymbols (void* addr);
+      virtual bool GetParamName (void* handle, size_t paramNum, csString& sym);
+      virtual void FreeParamSymbols (void* handle);
+      virtual bool GetLineNumber (void* addr, csString& lineAndFile);
+    };
+  
+  } // namespace Debug
 } // namespace CrystalSpace
 
-#endif // __CS_LIBS_UTIL_WIN32_CALLSTACK_DBGHELP_H__
+#endif // __CS_LIBS_UTIL_WIN32_CALLSTACK_BFD_H__

@@ -24,55 +24,79 @@
  * Call stack creation helper
  */
 
-/*
- @@@ Not implemented on all platforms yet!
- */
- 
 #include "csextern.h"
 #include "csutil/csstring.h"
 
-// @@@ Document me
+/// Call stack.
 class CS_CRYSTALSPACE_EXPORT csCallStack
 {
 protected:
   virtual ~csCallStack() {}
 public:
+  /**
+   * Release the memory for this call stack.
+   */
   virtual void Free() = 0;
   
+  /// Get number of entries in the stack.
   virtual size_t GetEntryCount () = 0;
+  /**
+   * Get the function for an entry.
+   * Contains usually raw address, function name and module name.
+   * Returns false if an error occured or a name is not available.
+   */
   virtual bool GetFunctionName (size_t num, csString& str) = 0;
+  /**
+   * Get file and line number for an entry.
+   * Returns false if an error occured or a line number is not
+   * available.
+   */
   virtual bool GetLineNumber (size_t num, csString& str) = 0;
+  /**
+   * Get function parameter names and values.
+   * Returns false if an error occured or if parameters are not available.
+   */
   virtual bool GetParameters (size_t num, csString& str) = 0;
-  void Print (FILE* f = stdout, bool Short = false)
+  /**
+   * Print the complete stack.
+   * \param f File handle to print to.
+   * \param brief Brief output - line number and parameters are omitted.
+   */
+  void Print (FILE* f = stdout, bool brief = false)
   {
     for (size_t i = 0; i < GetEntryCount(); i++)
     {
       csString s;
       bool hasFunc = GetFunctionName (i, s);
       fprintf (f, "%s", hasFunc ? (const char*)s : "<unknown>");
-      if (!Short && (GetLineNumber (i, s)))
+      if (!brief && (GetLineNumber (i, s)))
 	fprintf (f, " @%s", (const char*)s);
-      if (!Short && (GetParameters (i, s)))
+      if (!brief && (GetParameters (i, s)))
 	fprintf (f, " (%s)", (const char*)s);
       fprintf (f, "\n");
     }
     fflush (f);
   }
-  csString GetEntryAll (size_t i, bool Short = false)
+  /**
+   * Obtain complete text for an entry.
+   * \param i Index of the entry.
+   * \param brief Brief - line number and parameters are omitted.
+   */
+  csString GetEntryAll (size_t i, bool brief = false)
   {
     csString line;
     csString s;
     bool hasFunc = GetFunctionName (i, s);
     line << (hasFunc ? (const char*)s : "<unknown>");
-    if (GetLineNumber (i, s))
+    if (!brief && GetLineNumber (i, s))
       line << " @" << s;
-    if (GetParameters (i, s))
+    if (!brief && GetParameters (i, s))
       line << " (" << s << ")";
     return line;
   }
 };
 
-// @@@ Document me
+/// Helper to create a call stack.
 class CS_CRYSTALSPACE_EXPORT csCallStackHelper
 {
 public:
@@ -82,9 +106,10 @@ public:
    *  the returned call stack. This can be used if e.g. the call stack is
    *  created from some helper function and the helper function itself should
    *  not appear in the stack.
-   * \param fast Flag whether a fast call stacj creation should be preferred 
+   * \param fast Flag whether a fast call stack creation should be preferred 
    *  (usually at the expense of retrieved information).
    * \return A call stack object.
+   * \remarks Free the returned object with its Free() method.
    */
   static csCallStack* CreateCallStack (int skip = 0, bool fast = false);
 };

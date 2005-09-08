@@ -29,9 +29,16 @@
 #include "csutil/win32/wintools.h"
 
 #include <windows.h>
-#include <tlhelp32.h>
+
+#include "csutil/win32/DbgHelpAPI.h"
+#include "syminit.h"
 
 //#define CALLSTACK_PROFILE
+
+namespace CrystalSpace
+{
+namespace Debug
+{
 
 #ifdef CALLSTACK_PROFILE
 #define MEASURE_FUNCTION csMeasureTime measureLocal ("%s", CS_FUNCTION_NAME)
@@ -49,86 +56,6 @@ static void PrintError (const char* format, ...)
   csPrintfErrV (format, args);
   va_end (args);
   csPrintfErr ("\n");
-}
-
-static void RescanModules ();
-
-class SymInitializer
-{
-  bool inited;
-  HANDLE hProc;
-public:
-  SymInitializer ()
-  {
-    inited = false;
-    hProc = INVALID_HANDLE_VALUE;
-  }
-  ~SymInitializer ()
-  {
-    if (inited)
-    {
-      DbgHelp::SymCleanup (GetSymProcessHandle ());
-      DbgHelp::DecRef();
-    }
-    if (hProc != INVALID_HANDLE_VALUE)
-      CloseHandle (hProc);
-  }
-  void Init ()
-  {
-    if (inited) return;
-    inited = true;
-
-    DbgHelp::IncRef();
-    if (!DbgHelp::SymInitialize (GetSymProcessHandle (), 0, true))
-      PrintError ("SymInitialize : %s", 
-      cswinGetErrorMessage (GetLastError ()));
-    DbgHelp::SymSetOptions (SYMOPT_DEFERRED_LOADS |
-      SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
-  }
-  HANDLE GetSymProcessHandle ()
-  {
-    if (hProc == INVALID_HANDLE_VALUE)
-    {
-      if (!DuplicateHandle (GetCurrentProcess (), 
-	GetCurrentProcess (), GetCurrentProcess (), &hProc,
-	0, false, DUPLICATE_SAME_ACCESS))
-	hProc = GetCurrentProcess ();
-    }
-    return hProc;
-  }
-};
-
-static SymInitializer symInit;
-
-static void RescanModules ()
-{
-  /*
-   If "deferred symbol loads" are enabled, for some reason the first 
-   attempt to get symbol info after a rescan fails. So turn it off.
-   */
-  DbgHelp::SymSetOptions (SYMOPT_FAIL_CRITICAL_ERRORS |
-    SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
-
-  HANDLE hSnap = CreateToolhelp32Snapshot (TH32CS_SNAPMODULE,
-    GetCurrentProcessId ());
-  MODULEENTRY32 me;
-  memset (&me, 0, sizeof (me));
-  me.dwSize = sizeof (me);
-  bool res = Module32First (hSnap, &me);
-  while (res)
-  {
-    SetLastError (ERROR_SUCCESS);
-    if (DbgHelp::SymLoadModule64 (symInit.GetSymProcessHandle (), 0,
-      me.szExePath, /*me.szExePath*/0, (LONG_PTR)me.modBaseAddr, 0) == 0)
-    {
-      DWORD err = GetLastError ();
-      if (err != ERROR_SUCCESS)
-	PrintError ("SymLoadModule64 %s: %s", me.szModule, 
-	  cswinGetErrorMessage (err));
-    }
-    res = Module32Next (hSnap, &me);
-  }
-  CloseHandle (hSnap);
 }
 
 struct SymCallbackCountInfo
@@ -179,7 +106,7 @@ static size_t GetParams (const STACKFRAME64& frame,
   {
     // Bit hackish: if SymSetContext() failed, scan the loaded DLLs
     // and try to load their debug info.
-    RescanModules ();
+    symInit.RescanModules ();
     SetLastError (ERROR_SUCCESS);
     result = DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
       &stackFrame, 0);
@@ -519,23 +446,9 @@ static bool CreateCallStackExcept (int skip, bool fast,
   return CreateCallStack (hProc, hThread, context, skip + 3, fast, entries, params); 
 }
 
-csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc, 
-                                                    HANDLE hThread, 
-                                                    CONTEXT& context,
-                                                    int skip, bool fast)
-{
-  skip += 1; /* Adjust for this function */
-  csCallStackImpl* stack = new csCallStackImpl();
-  if (::CreateCallStack (hProc, hThread, context, skip, fast, stack->entries,
-    stack->params))
-    return stack;
-  delete stack;
-  return 0;
-}
-
 typedef BOOL (WINAPI* PFNISDEBUGGERPRESENT)();
 
-bool csCallStackCreatorDbgHelp::CreateCallStack (
+bool CallStackCreatorDbgHelp::CreateCallStack (
   csDirtyAccessArray<CallStackEntry>& entries, 
   csDirtyAccessArray<uintptr_t>& params, bool fast)
 {
@@ -550,12 +463,12 @@ bool csCallStackCreatorDbgHelp::CreateCallStack (
   }
 
   if (!IsDebuggerPresent || IsDebuggerPresent())
-    return ::CreateCallStackThreaded (0, fast, entries, params);
+    return CreateCallStackThreaded (0, fast, entries, params);
   else
-    return ::CreateCallStackExcept (0, fast, entries, params);
+    return CreateCallStackExcept (0, fast, entries, params);
 }
 
-bool csCallStackNameResolverDbgHelp::GetAddressSymbol (void* addr, 
+bool CallStackNameResolverDbgHelp::GetAddressSymbol (void* addr, 
   csString& str)
 {
   static const int MaxSymbolLen = 512;
@@ -573,7 +486,7 @@ bool csCallStackNameResolverDbgHelp::GetAddressSymbol (void* addr,
   {
     // Bit hackish: if SymFromAddr() failed, scan the loaded DLLs
     // and try to load their debug info.
-    RescanModules ();
+    symInit.RescanModules ();
     DbgHelp::SymFromAddr (symInit.GetSymProcessHandle (),
       (uintptr_t)addr, &displace, symbolInfo);
   }
@@ -618,7 +531,7 @@ static BOOL CALLBACK EnumSymCallbackNames (SYMBOL_INFO* pSymInfo,
   return TRUE;
 }
 
-void* csCallStackNameResolverDbgHelp::OpenParamSymbols (void* addr)
+void* CallStackNameResolverDbgHelp::OpenParamSymbols (void* addr)
 {
   IMAGEHLP_STACK_FRAME stackFrame;
   memset (&stackFrame, 0, sizeof (IMAGEHLP_STACK_FRAME));
@@ -631,7 +544,7 @@ void* csCallStackNameResolverDbgHelp::OpenParamSymbols (void* addr)
   {
     // Bit hackish: if SymSetContext() failed, scan the loaded DLLs
     // and try to load their debug info.
-    RescanModules ();
+    symInit.RescanModules ();
     SetLastError (ERROR_SUCCESS);
     result = DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
       &stackFrame, 0);
@@ -656,7 +569,7 @@ void* csCallStackNameResolverDbgHelp::OpenParamSymbols (void* addr)
   return 0;
 }
 
-bool csCallStackNameResolverDbgHelp::GetParamName (void* h, size_t n, csString& str)
+bool CallStackNameResolverDbgHelp::GetParamName (void* h, size_t n, csString& str)
 {
   csArray<csString>* names = (csArray<csString>*)h;
   if (n >=  names->Length()) return false;
@@ -664,13 +577,13 @@ bool csCallStackNameResolverDbgHelp::GetParamName (void* h, size_t n, csString& 
   return true;
 }
 
-void csCallStackNameResolverDbgHelp::FreeParamSymbols (void* h)
+void CallStackNameResolverDbgHelp::FreeParamSymbols (void* h)
 {
   csArray<csString>* names = (csArray<csString>*)h;
   delete names;
 }
 
-bool csCallStackNameResolverDbgHelp::GetLineNumber (void* addr, csString& str)
+bool CallStackNameResolverDbgHelp::GetLineNumber (void* addr, csString& str)
 {
   if (DbgHelp::SymGetLineFromAddrW64)
   {
@@ -700,3 +613,23 @@ bool csCallStackNameResolverDbgHelp::GetLineNumber (void* addr, csString& str)
   }
   return false;
 }
+
+} // namespace Debug
+} // namespace CrystalSpace
+
+using namespace CrystalSpace::Debug;
+
+csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc, 
+                                                    HANDLE hThread, 
+                                                    CONTEXT& context,
+                                                    int skip, bool fast)
+{
+  skip += 1; /* Adjust for this function */
+  CallStackImpl* stack = new CallStackImpl();
+  if (CrystalSpace::Debug::CreateCallStack (hProc, hThread, context, skip, 
+    fast, stack->entries, stack->params))
+    return stack;
+  delete stack;
+  return 0;
+}
+
