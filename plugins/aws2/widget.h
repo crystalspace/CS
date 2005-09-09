@@ -22,6 +22,7 @@
 #include "frame.h"
 #include "registrar.h"
 #include "property.h"
+#include "preferences.h"
 
 #include "csutil/scfstr.h"
 
@@ -35,6 +36,8 @@ namespace aws
     
     
   public:
+    /// Updates the skin preferences.
+    virtual void UpdateSkin(preferences &prefs)=0;
     
   protected:
      /// Sets up whatever automation is necessary.

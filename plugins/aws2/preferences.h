@@ -21,6 +21,7 @@
 
 #include "registry.h"
 #include "iutil/objreg.h"
+#include "cstool/pen.h"
 
 /**\file
  * Defines the preferences object, which is used as a key tree where settings for window creation are stored.  Other information may also be
@@ -60,7 +61,7 @@ namespace aws
 	  /** The root registry.  All important registries (i.e. for windows or skins) hang off this registry. */
 	  registry root;
 
-          int sys_colors[AC_COLOR_COUNT];
+          csPenColor sys_colors[AC_COLOR_COUNT];
 
   public:
     preferences():root("root") {}
@@ -83,20 +84,20 @@ namespace aws
   /////////////////////////////////////////////
 
   /// Sets the value of a color in the global AWS palette.
-  virtual void setColor (int index, int color)
+  virtual void setColor (int index, csPenColor &color)
   {
     if (index<AC_COLOR_COUNT)
       sys_colors[index]=color;
   }
 
   /// Gets the value of a color from the global AWS palette.
-  virtual int getColor (int index)
+  virtual csPenColor getColor (int index)
   { 
   if (index<AC_COLOR_COUNT)
     return sys_colors[index];
 
   else
-    return 0;
+    return csPenColor();
   }
  };
 

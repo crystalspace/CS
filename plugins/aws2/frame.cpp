@@ -51,6 +51,8 @@ namespace aws
 
     pen->PushTransform();
     pen->Translate(csVector3(tx, ty, 0));
+
+    OnDraw(pen);
   }
   
 }

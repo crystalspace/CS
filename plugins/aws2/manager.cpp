@@ -118,9 +118,9 @@ void awsManager2::Redraw()
   
   angle+=0.001F;
   
-  //pen.Translate(tv);  
-  //FIXME pen.SetOrigin(tv);
-  //FIXME pen.Rotate(angle);  
+  pen.Translate(tv);  
+  pen.SetOrigin(tv);
+  pen.Rotate(angle);  
 
   tv.Set(350,350,0);
   pen.Translate(tv);  
@@ -128,13 +128,15 @@ void awsManager2::Redraw()
   g2d->Write(default_font, 90, 90, g2d->FindRGB(128,128,128,128), -1, "AWS Redrawing");
 
   pen.SetColor(0.25,0.25,0.25,1);
-  pen.DrawRoundedRect(0,0,500,500,0.5,true); 
-  pen.SetColor(0.5,0.5,0.5,1);
-  pen.DrawRect(50,50,450,450, true);  
+  pen.SwapColors();
   pen.SetColor(0.75,0.75,0.75,1);
-  pen.DrawMiteredRect(100,100,400,400,0.5,true);  
+  pen.DrawRoundedRect(0,0,500,500,0.5,false,true); 
+  pen.SetColor(0.5,0.5,0.5,1);
+  pen.DrawRect(50,50,450,450,false,true);  
+  pen.SetColor(0.75,0.75,0.75,1);
+  pen.DrawMiteredRect(100,100,400,400,0.5,false,true);  
   pen.SetColor(0.85f,0.85f,0.85f,1);
-  pen.DrawArc(150,150,350,350,0.14F,2.23F,true); 
+  pen.DrawArc(150,150,350,350,0.14F,2.23F,false,true); 
   
   pen.SetColor(1,1,1,1);
 
@@ -143,10 +145,10 @@ void awsManager2::Redraw()
   pen.WriteBoxed(default_font, 0,0,500,500, CS_PEN_TA_LEFT, CS_PEN_TA_BOT, "Test Boxed Text - Left, Bot");
   
   pen.DrawPoint(0,0);
-  pen.DrawRoundedRect(0,0,500,500,0.5,false); 
-  pen.DrawRect(50,50,450,450, false);  
-  pen.DrawMiteredRect(100,100,400,400,0.5,false);  
-  pen.DrawArc(150,150,350,350,0.14F,2.23F,false); 
+  pen.DrawRoundedRect(0,0,500,500,0.5,true); 
+  pen.DrawRect(50,50,450,450,true);  
+  pen.DrawMiteredRect(100,100,400,400,0.5,true);  
+  pen.DrawArc(150,150,350,350,0.14F,2.23F,true); 
   
   
 }
