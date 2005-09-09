@@ -393,6 +393,7 @@ void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
   Bot* bot = new Bot (Sys->view->GetEngine(), botWrapper);
   bot->set_bot_move (pos);
   bot->set_bot_sector (where);
+  bot->light = dyn;
   bots.Push (bot);
 }
 
