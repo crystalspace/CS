@@ -22,6 +22,9 @@ chronological order.
 	  to toggle keyboard/movement between the two views.
 	- Jorrit fixed the explosion particles in walktest so that they
 	  are visible again.
+	- Jorrit fixed a crash in the engine with some object right on top
+	  of a light. This would cause GetBrightnessAtDistance() to be
+	  called with distance equal to 0 -> divide by zero!
 	- res fixed consoletest to use CS_IMPLEMENT_APPLICATION instead of
 	  CS_IMPLEMENT_PLATFORM_APPLICATION(which is really just a subset of
 	  what CS_IMPLEMENT_APPLICATION does).

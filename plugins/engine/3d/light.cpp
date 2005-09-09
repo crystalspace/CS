@@ -173,10 +173,14 @@ float csLight::GetBrightnessAtDistance (float d)
   {
     case CS_ATTN_NONE:      return 1;
     case CS_ATTN_LINEAR:    return 1 - d / attenuationConstants.x;
-    case CS_ATTN_INVERSE:   return 1 / d;
-    case CS_ATTN_REALISTIC: return 1 / (d * d);
+    case CS_ATTN_INVERSE:
+      if (d < SMALL_EPSILON) d = SMALL_EPSILON;
+      return 1 / d;
+    case CS_ATTN_REALISTIC:
+      if (d < SMALL_EPSILON) d = SMALL_EPSILON;
+      return 1 / (d * d);
     case CS_ATTN_CLQ:
-	return (attenuationConstants * csVector3 (1, d, d*d));
+      return (attenuationConstants * csVector3 (1, d, d*d));
   }
 
   return 0;
