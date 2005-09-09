@@ -31,6 +31,45 @@
 namespace aws
 {
 
+static char *color_names[] = 
+{
+ "HighlightColor",
+ "HighlightColor2",
+ "ShadowColor",
+ "ShadowColor2",
+ "FillColor",
+ "DarkFill",
+ "BackFill",
+ "TextForeColor",
+ "TextBackColor",
+ "SelectedTextForeColor",
+ "SelectedTextBackColor",
+ "TextDisabledColor",
+ "ButtonTextColor",
+ "TransparentColor",
+ "BlackColor",
+ "WhiteColor",
+ "RedColor",
+ "GreenColor",
+ "BlueColor" 
+};
+
+void preferences::init_default_colors()
+{
+  sys_colors[AC_HIGHLIGHT] = csPenColor(0.75f, 0.75f, 0.75f, 1);
+  sys_colors[AC_HIGHLIGHT2] = csPenColor(0.65f, 0.65f, 0.65f, 1);
+  sys_colors[AC_SHADOW] = csPenColor(0.25f, 0.25f, 0.25f, 1);
+  sys_colors[AC_SHADOW2] = csPenColor(0.35f, 0.35f, 0.35f, 1);
+  sys_colors[AC_FILL] = csPenColor(0.5f, 0.5f, 0.5f, 1);
+  sys_colors[AC_DARKFILL] = csPenColor(0.4f, 0.4f, 0.4f, 1);
+  sys_colors[AC_BACKFILL] = csPenColor(0.5f, 0.5f, 0.5f, 1);
+  sys_colors[AC_BLACK] = csPenColor(0, 0, 0, 1);
+  sys_colors[AC_WHITE] = csPenColor(1, 1, 1, 1);
+  sys_colors[AC_RED] = csPenColor(1, 0, 0, 1);
+  sys_colors[AC_GREEN] = csPenColor(0, 1, 0, 1);
+  sys_colors[AC_BLUE] = csPenColor(0, 0, 1, 1);
+}
+
 bool preferences::load(iObjectRegistry* objreg, const scfString& filename)
 {
 	csPrintf("aws: Loading definitions file \"%s\"...\n", filename.GetData());

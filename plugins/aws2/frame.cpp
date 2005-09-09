@@ -32,15 +32,15 @@ namespace aws
     y+=bounds.ymin;
   }
 
-  void frame::Transform(iPen *pen, float angle, float x, float y, const csRect &box)
+  void frame::Transform(iPen *pen, float angle, float x, float y)
   {
     pen->ClearTransform();
-    pen->SetOrigin(csVector3(box.Width()*-0.5, box.Height()*-0.5, 0));
+    pen->SetOrigin(csVector3(bounds.Width()*-0.5, bounds.Height()*-0.5, 0));
     pen->Rotate(angle);
 
     // Adjust the translation x and y to get the absolute translation.
     GetScreenPos(x,y);
-    pen->Translate(csVector3((box.Width()*0.5)+x, (box.Height()*0.5)+y,0));
+    pen->Translate(csVector3((bounds.Width()*0.5)+x, (bounds.Height()*0.5)+y,0));
   }
 
   void frame::Draw(iPen *pen)

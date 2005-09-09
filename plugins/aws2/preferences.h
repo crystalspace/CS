@@ -61,10 +61,15 @@ namespace aws
 	  /** The root registry.  All important registries (i.e. for windows or skins) hang off this registry. */
 	  registry root;
 
+	  /** System colors.  These are automatically initialized with some nice defaults,
+	   * but in order for them to be what you want, a skin has to be applied. */
           csPenColor sys_colors[AC_COLOR_COUNT];
 
+  protected:
+      void init_default_colors();
+
   public:
-    preferences():root("root") {}
+    preferences():root("root") { init_default_colors(); }
     virtual ~preferences() {}
 
     /** Loads an xml-based definitions file into this preferences object.  Multiple files may be loaded, one after the other.  The contents are essentially merged. */

@@ -43,6 +43,12 @@ namespace aws
     /// Accessor for the frame's bounds.
     const csRect& Bounds() { return bounds; }
 
+    /// Sets the size of the frame.
+    void SetSize(int width, int height)
+    {
+      bounds.SetSize(width, height);
+    }
+
     /// Gets the screen absolute x and y coordinates of this frame. The 'x' and 'y' variables should be initialized to zero before the call.
     void GetScreenPos(float &x, float &y);
 
@@ -51,10 +57,10 @@ namespace aws
 
     /** Makes transforming a shape very easy.  It first rotates the object around it's axis by the
      * number of radians specified in 'angle'.  Next, it translates the object to the position specified
-     * by 'x' and 'y'.  Note that this position is relative to the frame that this object lives in. 'box'
-     * is the bounding box for the object. Note that Transform CLEARS the current transform, and sets it
+     * by 'x' and 'y'.  Note that this position is relative to the frame that this object lives in. 
+     * Note that Transform CLEARS the current transform, and sets it
      * to the transform you specify here. */
-    void Transform(iPen *pen, float angle, float x, float y, const csRect &box);
+    void Transform(iPen *pen, float angle, float x, float y);
 
     /** Override this function in the widget in order to draw it.  The drawing space is 0,0 to bounds.width, bounds.height. */     
     virtual void OnDraw(iPen *pen) {}

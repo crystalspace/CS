@@ -40,6 +40,12 @@ namespace aws
 
     virtual ~border() {}
 
+    /// Set the style of the border.
+    void SetBorderStyle(unsigned int _style) { border_style=_style; }
+
+    /// Set the shape of the border.
+    void SetBorderShape(unsigned int _shape) { border_shape=_shape; }
+
     /// If this border uses ROUND_RECT or MITERED_RECT, then this sets the roundness or miter size.
     void SetEdgeLevel(float e)
     {
