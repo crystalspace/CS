@@ -2370,6 +2370,7 @@ bool CommandHandler (const char *cmd, const char *arg)
         Sys->view->GetCamera()->SetPerspectiveCenter(bbox1.MinX() + (width / 2), 
                                                     bbox2.MinY() + (height / 2));
         Sys->split = -1;
+	Sys->collider_actor.SetCamera (Sys->view->GetCamera ());
         Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Unsplitting view");
     }
   }
@@ -2379,6 +2380,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
         Sys->split = (Sys->split + 1) % 2;
         Sys->view = Sys->views[Sys->split];
+	Sys->collider_actor.SetCamera (Sys->view->GetCamera ());
         Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Switching to view %d", Sys->split);
     }
   }

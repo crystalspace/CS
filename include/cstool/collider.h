@@ -457,6 +457,11 @@ public:
   	const csVector3& body, const csVector3& shift);
 
   /**
+   * Change the current camera.
+   */
+  void SetCamera (iCamera* camera) { csColliderActor::camera = camera; }
+
+  /**
    * Set gravity. Default 9.806.
    */
   void SetGravity (float g)
