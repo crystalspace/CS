@@ -421,7 +421,11 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
 void csNewParticleSystem::NextFrame (csTicks current, const csVector3&)
 {
   if (PrevTime != 0)
-    Update (current - PrevTime);
+  {
+    csTicks elapsed = current - PrevTime;
+    if (elapsed > 200) elapsed = 200;
+    Update (elapsed);
+  }
   PrevTime = current;
 }
 

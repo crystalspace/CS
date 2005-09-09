@@ -317,6 +317,7 @@ public:
   {
     csTicks elaps = 0;
     if (prev_time != 0) elaps = current_time-prev_time;
+    if (elaps > 200) elaps = 200;
     prev_time = current_time;
     Update (elaps);
   }

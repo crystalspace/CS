@@ -418,7 +418,8 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
   scfiObjectModel.ShapeChanged ();
 }
 
-void csSprite2DMeshObject::NextFrame (csTicks current_time, const csVector3& /*pos*/)
+void csSprite2DMeshObject::NextFrame (csTicks current_time,
+	const csVector3& /*pos*/)
 {
   if (uvani && !uvani->halted)
   {
@@ -428,8 +429,9 @@ void csSprite2DMeshObject::NextFrame (csTicks current_time, const csVector3& /*p
   }
 }
 
-void csSprite2DMeshObject::Particle::UpdateLighting (const csArray<iLight*>& lights,
-    const csReversibleTransform& transform)
+void csSprite2DMeshObject::Particle::UpdateLighting (
+	const csArray<iLight*>& lights,
+	const csReversibleTransform& transform)
 {
   csVector3 new_pos = transform.This2Other (part_pos);
   scfParent->UpdateLighting (lights, new_pos);

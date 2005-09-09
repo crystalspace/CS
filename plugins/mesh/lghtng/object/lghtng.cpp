@@ -144,7 +144,8 @@ void csLightningMeshObject::HardTransform (const csReversibleTransform& t)
   (void)t;
 }
 
-void csLightningMeshObject::NextFrame (csTicks current_time, const csVector3& /*pos*/)
+void csLightningMeshObject::NextFrame (csTicks current_time,
+	const csVector3& /*pos*/)
 {
   factory->NextFrame(current_time);
 }
@@ -256,7 +257,8 @@ void csLightningMeshObjectFactory::CalculateFractal()
 
 void csLightningMeshObjectFactory::NextFrame (csTicks CurrentTime)
 {
-  if (update_counter == (csTicks)-1 || CurrentTime - update_counter > update_interval)
+  if (update_counter == (csTicks)-1
+  	|| CurrentTime - update_counter > update_interval)
   {
     update_counter = CurrentTime;      
     CalculateFractal();

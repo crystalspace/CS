@@ -94,9 +94,11 @@ void csParticlesPhysicsSimple::RemoveParticles (
 {
   particles_object *temp;
   int end = (int)partobjects.Length () - 1;
-  for (int i=end;i>=0;--i) {
+  for (int i=end;i>=0;--i)
+  {
     temp = partobjects[i];
-    if (temp->particles == particles) {
+    if (temp->particles == particles)
+    {
       partobjects[i] = partobjects[end];
       partobjects[end] = temp;
       temp = partobjects.Pop ();
@@ -144,9 +146,11 @@ void csParticlesPhysicsSimple::Stop (iParticlesObjectState *particles)
 
 bool csParticlesPhysicsSimple::HandleEvent (iEvent &event)
 {
-  if (event.Type == csevBroadcast && csCommandEventHelper::GetCode(&event) == cscmdPreProcess)
+  if (event.Type == csevBroadcast && csCommandEventHelper::GetCode(&event)
+  	== cscmdPreProcess)
   {
     csTicks elapsed = vclock->GetElapsedTicks ();
+    if (elapsed > 200) elapsed = 200;
     int updates = (elapsed + leftover_time) / 20;
     leftover_time = (elapsed + leftover_time) - (updates * 20);
 

@@ -83,7 +83,8 @@ csSkelBone::csSkelBone (csGenmeshSkelAnimationControl *animation_control)
   rot.axis.x = rot.axis.y = rot.axis.z = 0;
   anim_control = animation_control;
   bone_mode = BM_SCRIPT;
-  cb = csPtr<iGenMeshSkeletonBoneUpdateCallback>(new csSkelBoneDefaultUpdateCallback());
+  cb = csPtr<iGenMeshSkeletonBoneUpdateCallback>(
+  	new csSkelBoneDefaultUpdateCallback());
 }
 
 csSkelBone::~csSkelBone ()
@@ -125,73 +126,77 @@ void csSkelBone::SetAxisAngle (int axis, float angle)
 
 void csSkelBone::UpdateRotation()
 {
-	size_t scripts_len = anim_control->GetRunningScripts ().Length ();
-	if (!scripts_len)
-	{
-		return;
-	}
+  size_t scripts_len = anim_control->GetRunningScripts ().Length ();
+  if (!scripts_len)
+  {
+    return;
+  }
 
-	if (scripts_len == 1)
-	{
-		csQuaternion q;
-		csSkelAnimControlRunnable *script = anim_control->GetRunningScripts ().Get (0);
-		csSkelAnimControlRunnable::TransformHash& rotations = script->GetRotations ();
-		bone_transform_data *b_rot = rotations.Get(this, 0);
-		if (b_rot)
-		{
-			q = b_rot->quat;
-			rot.quat = q;
-			next_transform.SetO2T (csMatrix3(rot.quat));
-		}
-	}
-	else
-	{
-		csQuaternion q;
-		float min = 0;
-		float max = 0;
-		float script_factors_total = 0;
-		bool slerp = false;
-		bool updated = false;
+  if (scripts_len == 1)
+  {
+    csQuaternion q;
+    csSkelAnimControlRunnable *script = anim_control->GetRunningScripts ().
+    	Get (0);
+    csSkelAnimControlRunnable::TransformHash& rotations =
+    	script->GetRotations ();
+    bone_transform_data *b_rot = rotations.Get(this, 0);
+    if (b_rot)
+    {
+      q = b_rot->quat;
+      rot.quat = q;
+      next_transform.SetO2T (csMatrix3(rot.quat));
+    }
+  }
+  else
+  {
+    csQuaternion q;
+    float min = 0;
+    float max = 0;
+    float script_factors_total = 0;
+    bool slerp = false;
+    bool updated = false;
 
-		for (size_t i = 0; i < scripts_len; i++)
-		{
-			csSkelAnimControlRunnable *script = anim_control->GetRunningScripts ().Get (i);
-			csSkelAnimControlRunnable::TransformHash& rotations = script->GetRotations ();
-			bone_transform_data *b_rot = rotations.Get(this, 0);
-			if (b_rot &&(script->GetFactor() > 0))
-			{
-				script_factors_total += script->GetFactor();
-				if (slerp)
-				{
-					float max_over_factor = max/script_factors_total;
-					if (script->GetFactor() >= min)
-					{
-						max = script->GetFactor();
-						q = q.Slerp(b_rot->quat, max_over_factor);
-					}
-					else
-					{
-						min = script->GetFactor();
-						q = b_rot->quat.Slerp(q, max_over_factor);
-					}
-					script_factors_total = min + max_over_factor;
-				}
-				else
-				{
-					slerp = true;
-					min = max = script->GetFactor();
-					q = b_rot->quat;
-				}
-				updated = true; 
-			}
-		}
+    for (size_t i = 0; i < scripts_len; i++)
+    {
+      csSkelAnimControlRunnable *script = anim_control->GetRunningScripts ().
+      	Get (i);
+      csSkelAnimControlRunnable::TransformHash& rotations =
+      	script->GetRotations ();
+      bone_transform_data *b_rot = rotations.Get(this, 0);
+      if (b_rot &&(script->GetFactor() > 0))
+      {
+        script_factors_total += script->GetFactor();
+        if (slerp)
+        {
+          float max_over_factor = max/script_factors_total;
+          if (script->GetFactor() >= min)
+          {
+            max = script->GetFactor();
+            q = q.Slerp(b_rot->quat, max_over_factor);
+          }
+          else
+          {
+            min = script->GetFactor();
+            q = b_rot->quat.Slerp(q, max_over_factor);
+          }
+          script_factors_total = min + max_over_factor;
+        }
+        else
+        {
+          slerp = true;
+          min = max = script->GetFactor();
+          q = b_rot->quat;
+        }
+        updated = true; 
+      }
+    }
 
-		if (updated)
-		{
-			rot.quat = q;
-			next_transform.SetO2T (csMatrix3(rot.quat));
-		}
-	}
+    if (updated)
+    {
+      rot.quat = q;
+      next_transform.SetO2T (csMatrix3(rot.quat));
+    }
+  }
 }
 
 void csSkelBone::UpdatePosition()
@@ -204,16 +209,18 @@ void csSkelBone::UpdatePosition()
 
   for (size_t i = 0; i < anim_control->GetRunningScripts ().Length (); i++)
   {
-    csSkelAnimControlRunnable *script = anim_control->GetRunningScripts ().Get(i);
-    csSkelAnimControlRunnable::TransformHash& positions = script->GetPositions ();
+    csSkelAnimControlRunnable *script = anim_control->GetRunningScripts ().
+    	Get(i);
+    csSkelAnimControlRunnable::TransformHash& positions =
+    	script->GetPositions ();
     bone_transform_data *b_pos = positions.Get(this, 0);
     if (b_pos)
     {
-		updated = true;
-		final_pos_x += b_pos->axis.x*script->GetFactor();
-		final_pos_y += b_pos->axis.y*script->GetFactor();
-		final_pos_z += b_pos->axis.z*script->GetFactor();
-		script_factors_total += script->GetFactor();
+      updated = true;
+      final_pos_x += b_pos->axis.x*script->GetFactor();
+      final_pos_y += b_pos->axis.y*script->GetFactor();
+      final_pos_z += b_pos->axis.z*script->GetFactor();
+      script_factors_total += script->GetFactor();
     }
   }
 
@@ -226,7 +233,7 @@ void csSkelBone::UpdatePosition()
       final_pos_z /= script_factors_total;
     }
     next_transform.SetOrigin (
-		csVector3(final_pos_x, final_pos_y, final_pos_z));
+    csVector3(final_pos_x, final_pos_y, final_pos_z));
   }
 }
 
@@ -277,9 +284,10 @@ void csSkelBone::GetSkinBox (csBox3 &box, csVector3 &center)
     for (size_t i = 1; i < vertices.Length (); i++)
     {
       box.AddBoundingVertexSmart (vertices[i].pos);
-      tmp_box.AddBoundingVertexSmart (full_transform.This2Other (vertices[i].pos));
+      tmp_box.AddBoundingVertexSmart (full_transform.This2Other (
+      	vertices[i].pos));
     }
-	center = tmp_box.GetCenter ();
+    center = tmp_box.GetCenter ();
   }
 }
 
@@ -309,14 +317,10 @@ void csSkelBone::UpdateBones (csSkelBone* parent_bone)
 {
   if (!parent) 
   {
-	if (bone_mode == BM_PHYSICS && rigid_body)
-	{
-		full_transform = offset_body_transform;
-	}
-	else
-	{
-		full_transform = transform;
-	}
+    if (bone_mode == BM_PHYSICS && rigid_body)
+      full_transform = offset_body_transform;
+    else
+      full_transform = transform;
   }
   csRefArray<csSkelBone>::Iterator it = bones.GetIterator ();
   while (it.HasNext ())
@@ -326,19 +330,20 @@ void csSkelBone::UpdateBones (csSkelBone* parent_bone)
     {
       case BM_NONE:
       case BM_SCRIPT:
-          bone->GetFullTransform () = bone->GetTransform ()*full_transform;
+        bone->GetFullTransform () = bone->GetTransform ()*full_transform;
         break;
       case BM_PHYSICS:
-          if (bone->GetRigidBody ())
-		  {
-            bone->GetFullTransform () = 
-				(bone->GetOffsetTransform ()*bone->GetRigidBody ()->GetTransform ())/
-				(parent_bone->GetRigidBody()->GetTransform ());
-		  }
-          else
-		  {
-            bone->GetFullTransform () = bone->GetTransform ()*full_transform;
-		  }
+        if (bone->GetRigidBody ())
+        {
+          bone->GetFullTransform () = 
+            (bone->GetOffsetTransform ()*bone->GetRigidBody ()
+	    	->GetTransform ())/
+            (parent_bone->GetRigidBody()->GetTransform ());
+        }
+        else
+        {
+          bone->GetFullTransform () = bone->GetTransform ()*full_transform;
+        }
         break;
     }
     bone->UpdateBones (parent_bone);
@@ -355,7 +360,8 @@ csSkelAnimControlScript::csSkelAnimControlScript (const char* name)
   loop_times = -1;
 }
 
-sac_instruction& csSkelAnimControlScript::AddInstruction (sac_frame & frame, sac_opcode opcode)
+sac_instruction& csSkelAnimControlScript::AddInstruction (sac_frame & frame,
+	sac_opcode opcode)
 {
   sac_instruction instr;
   size_t idx = frame.instructions.Push (instr);
@@ -365,17 +371,18 @@ sac_instruction& csSkelAnimControlScript::AddInstruction (sac_frame & frame, sac
 
 sac_frame& csSkelAnimControlScript::AddFrame (csTicks duration)
 {
-	sac_frame frame;
-	size_t idx = frames.Push (frame);
-	frames[idx].duration = duration;
-	return frames[idx];
+  sac_frame frame;
+  size_t idx = frames.Push (frame);
+  frames[idx].duration = duration;
+  return frames[idx];
 }
 
 
 //-------------------------------------------------------------------------
 
-csSkelAnimControlRunnable::csSkelAnimControlRunnable (csSkelAnimControlScript* script,
-  csGenmeshSkelAnimationControl* anim_control)
+csSkelAnimControlRunnable::csSkelAnimControlRunnable (
+	csSkelAnimControlScript* script,
+	csGenmeshSkelAnimationControl* anim_control)
 {
   SCF_CONSTRUCT_IBASE (0);
   csSkelAnimControlRunnable::script = script;
@@ -407,7 +414,8 @@ void csSkelAnimControlRunnable::release_tranform_data(TransformHash& h)
   h.Empty();
 }
 
-bone_transform_data *csSkelAnimControlRunnable::GetBoneRotation(csSkelBone *bone)
+bone_transform_data *csSkelAnimControlRunnable::GetBoneRotation(
+	csSkelBone *bone)
 {
   bone_transform_data *b_rot = rotations.Get(bone, 0);
   if (!b_rot) 
@@ -419,7 +427,8 @@ bone_transform_data *csSkelAnimControlRunnable::GetBoneRotation(csSkelBone *bone
   return b_rot;
 }
 
-bone_transform_data *csSkelAnimControlRunnable::GetBonePosition(csSkelBone *bone)
+bone_transform_data *csSkelAnimControlRunnable::GetBonePosition(
+	csSkelBone *bone)
 {
   bone_transform_data *b_pos = positions.Get(bone, 0);
   if (!b_pos) 
@@ -435,272 +444,277 @@ bone_transform_data *csSkelAnimControlRunnable::GetBonePosition(csSkelBone *bone
 
 bool csSkelAnimControlRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
 {
-	stop = false;
-	bool mod = false;
-	size_t i;
-	
-	delay.diff += elapsed;
-	if (parse_key_frame)
-	{
-		sac_frame & frame = NextFrame();
-		delay.final = (csTicks)((float)frame.duration*time_factor);
-		ParseFrame(frame);
-		parse_key_frame = false;
-	}
-	
-	if (delay.diff > delay.final)
-	{
-		delay.current = delay.final;
-		left = delay.diff - delay.final;
-		delay.diff = 0;
-		parse_key_frame = true;
-	}
-	else
-	{
-		delay.current = delay.diff;
-		left = 0;
-	}
-	
-	i = absolute_moves.Length ();
-	while (i > 0)
-	{
-		i--;
-		sac_move_execution& m = absolute_moves[i];
-		if (delay.current < delay.final)
-		{
-			csVector3 current_pos = 
-				m.final_position - ((float) (delay.final - delay.current))*m.delta_per_tick;
-			m.bone_position->axis.x = current_pos.x;
-			m.bone_position->axis.y = current_pos.y;
-			m.bone_position->axis.z = current_pos.z;
-		}
-		else
-		{
-			m.bone_position->axis.x = m.final_position.x;
-			m.bone_position->axis.y = m.final_position.y;
-			m.bone_position->axis.z = m.final_position.z;
-			absolute_moves.DeleteIndexFast (i);
-		}
-		mod = true;
-	}
+  stop = false;
+  bool mod = false;
+  size_t i;
+  
+  delay.diff += elapsed;
+  if (parse_key_frame)
+  {
+    sac_frame & frame = NextFrame();
+    delay.final = (csTicks)((float)frame.duration*time_factor);
+    ParseFrame(frame);
+    parse_key_frame = false;
+  }
+  
+  if (delay.diff > delay.final)
+  {
+    delay.current = delay.final;
+    left = delay.diff - delay.final;
+    delay.diff = 0;
+    parse_key_frame = true;
+  }
+  else
+  {
+    delay.current = delay.diff;
+    left = 0;
+  }
+  
+  i = absolute_moves.Length ();
+  while (i > 0)
+  {
+    i--;
+    sac_move_execution& m = absolute_moves[i];
+    if (delay.current < delay.final)
+    {
+      csVector3 current_pos = 
+        m.final_position - ((float) (delay.final - delay.current))
+	*m.delta_per_tick;
+      m.bone_position->axis.x = current_pos.x;
+      m.bone_position->axis.y = current_pos.y;
+      m.bone_position->axis.z = current_pos.z;
+    }
+    else
+    {
+      m.bone_position->axis.x = m.final_position.x;
+      m.bone_position->axis.y = m.final_position.y;
+      m.bone_position->axis.z = m.final_position.z;
+      absolute_moves.DeleteIndexFast (i);
+    }
+    mod = true;
+  }
 
-	i = relative_moves.Length ();
-	while (i > 0)
-	{
-		i--;
-		sac_move_execution& m = relative_moves[i];
-		if (delay.current <  delay.final)
-		{
-			csVector3 current_pos = (float)(delay.current - m.elapsed_ticks)*m.delta_per_tick;
-			m.bone_position->axis.x += current_pos.x;
-			m.bone_position->axis.y += current_pos.y;
-			m.bone_position->axis.z += current_pos.z;
-			m.elapsed_ticks = delay.current;
-		}
-		else
-		{
-			csVector3 current_pos = (float)(delay.final - m.elapsed_ticks)*m.delta_per_tick;
-			m.bone_position->axis.x += current_pos.x;
-			m.bone_position->axis.y += current_pos.y;
-			m.bone_position->axis.z += current_pos.z;
-			relative_moves.DeleteIndexFast (i);
-		}
-		mod = true;
-	}
+  i = relative_moves.Length ();
+  while (i > 0)
+  {
+    i--;
+    sac_move_execution& m = relative_moves[i];
+    if (delay.current <  delay.final)
+    {
+      csVector3 current_pos = (float)(delay.current - m.elapsed_ticks)
+      	*m.delta_per_tick;
+      m.bone_position->axis.x += current_pos.x;
+      m.bone_position->axis.y += current_pos.y;
+      m.bone_position->axis.z += current_pos.z;
+      m.elapsed_ticks = delay.current;
+    }
+    else
+    {
+      csVector3 current_pos = (float)(delay.final - m.elapsed_ticks)
+      	*m.delta_per_tick;
+      m.bone_position->axis.x += current_pos.x;
+      m.bone_position->axis.y += current_pos.y;
+      m.bone_position->axis.z += current_pos.z;
+      relative_moves.DeleteIndexFast (i);
+    }
+    mod = true;
+  }
 
-	i = absolute_rotates.Length ();
-	while (i > 0)
-	{
-		i--;
-		sac_rotate_execution& m = absolute_rotates[i];
-		if (delay.current < delay.final)
-		{
-			float slerp = 
-				(float)delay.current/(float)delay.final;
-			m.bone_rotation->quat = m.curr_quat.Slerp(m.quat, slerp);
-		}
-		else
-		{
-			m.bone_rotation->quat = m.quat;
-			absolute_rotates.DeleteIndexFast (i);
-		}
-		mod = true;
-	}
+  i = absolute_rotates.Length ();
+  while (i > 0)
+  {
+    i--;
+    sac_rotate_execution& m = absolute_rotates[i];
+    if (delay.current < delay.final)
+    {
+      float slerp = 
+        (float)delay.current/(float)delay.final;
+      m.bone_rotation->quat = m.curr_quat.Slerp(m.quat, slerp);
+    }
+    else
+    {
+      m.bone_rotation->quat = m.quat;
+      absolute_rotates.DeleteIndexFast (i);
+    }
+    mod = true;
+  }
 
-	i = relative_rotates.Length ();
-	while (i > 0)
-	{
-		i--;
-		sac_rotate_execution& m = relative_rotates[i];
-		if (delay.current < delay.final)
-		{
-			float slerp = ((float)(delay.current - m.elapsed_ticks)/(float)delay.final);
-			m.quat = zero_quat.Slerp(m.curr_quat, slerp);
-			m.bone_rotation->quat = m.quat*m.bone_rotation->quat;
-			m.elapsed_ticks = delay.current;
-		}
-		else
-		{
-			float slerp = ((float)(delay.final - m.elapsed_ticks)/(float)delay.final);
-			m.quat = zero_quat.Slerp(m.curr_quat, slerp);
-			m.bone_rotation->quat = m.quat*m.bone_rotation->quat;
-			relative_rotates.DeleteIndexFast (i);
-		}
-		mod = true;
-	}
+  i = relative_rotates.Length ();
+  while (i > 0)
+  {
+    i--;
+    sac_rotate_execution& m = relative_rotates[i];
+    if (delay.current < delay.final)
+    {
+      float slerp = ((float)(delay.current - m.elapsed_ticks)
+      	/(float)delay.final);
+      m.quat = zero_quat.Slerp(m.curr_quat, slerp);
+      m.bone_rotation->quat = m.quat*m.bone_rotation->quat;
+      m.elapsed_ticks = delay.current;
+    }
+    else
+    {
+      float slerp = ((float)(delay.final - m.elapsed_ticks)/(float)delay.final);
+      m.quat = zero_quat.Slerp(m.curr_quat, slerp);
+      m.bone_rotation->quat = m.quat*m.bone_rotation->quat;
+      relative_rotates.DeleteIndexFast (i);
+    }
+    mod = true;
+  }
 
-	return mod;
+  return mod;
 }
 
 void csSkelAnimControlRunnable::ParseFrame(const sac_frame & frame)
 {
-	csRefArray<csSkelBone> & bones = anim_control->GetBones ();
-	size_t num_instructions = frame.instructions.Length();
-	
-	size_t i;
-	for (i = 0; i < num_instructions ; i++)
-	{
-		const sac_instruction& inst = frame.instructions[i];
-		switch (inst.opcode)
-		{
-			case AC_ROT:
-				if (bones[inst.rotate.bone_id]->GetMode () != BM_NONE)
-				{
-					if (!frame.duration)
-					{
-						bone_transform_data *bone_rot = GetBoneRotation(bones[inst.rotate.bone_id]);
-						switch (inst.tr_mode)
-						{
-							case AC_TRANSFORM_ABSOLUTE:
-								bone_rot->quat.x = inst.rotate.quat_x;
-								bone_rot->quat.y = inst.rotate.quat_y;
-								bone_rot->quat.z = inst.rotate.quat_z;
-								bone_rot->quat.r = inst.rotate.quat_r;
-							break;
-							case AC_TRANSFORM_RELATIVE:
-								csQuaternion q;
-								q.x = inst.rotate.quat_x;
-								q.y = inst.rotate.quat_y;
-								q.z = inst.rotate.quat_z;
-								q.r = inst.rotate.quat_r;
-								bone_rot->quat = q*bone_rot->quat;
-							break;
-						}
-					}
-					else
-					{
-						sac_rotate_execution m;
-						m.bone = bones[inst.rotate.bone_id];
-						m.bone_rotation = GetBoneRotation(bones[inst.rotate.bone_id]);
-						m.elapsed_ticks = 0;
+  csRefArray<csSkelBone> & bones = anim_control->GetBones ();
+  size_t num_instructions = frame.instructions.Length();
+  
+  size_t i;
+  for (i = 0; i < num_instructions ; i++)
+  {
+    const sac_instruction& inst = frame.instructions[i];
+    switch (inst.opcode)
+    {
+      case AC_ROT:
+        if (bones[inst.rotate.bone_id]->GetMode () != BM_NONE)
+        {
+          if (!frame.duration)
+          {
+            bone_transform_data *bone_rot = GetBoneRotation(
+	    	bones[inst.rotate.bone_id]);
+            switch (inst.tr_mode)
+            {
+              case AC_TRANSFORM_ABSOLUTE:
+                bone_rot->quat.x = inst.rotate.quat_x;
+                bone_rot->quat.y = inst.rotate.quat_y;
+                bone_rot->quat.z = inst.rotate.quat_z;
+                bone_rot->quat.r = inst.rotate.quat_r;
+                break;
+              case AC_TRANSFORM_RELATIVE:
+                csQuaternion q;
+                q.x = inst.rotate.quat_x;
+                q.y = inst.rotate.quat_y;
+                q.z = inst.rotate.quat_z;
+                q.r = inst.rotate.quat_r;
+                bone_rot->quat = q*bone_rot->quat;
+                break;
+            }
+          }
+          else
+          {
+            sac_rotate_execution m;
+            m.bone = bones[inst.rotate.bone_id];
+            m.bone_rotation = GetBoneRotation(bones[inst.rotate.bone_id]);
+            m.elapsed_ticks = 0;
 
-						switch (inst.tr_mode)
-						{
-							case AC_TRANSFORM_ABSOLUTE:
-								m.curr_quat = m.bone_rotation->quat;
-								m.quat.x = inst.rotate.quat_x;
-								m.quat.y = inst.rotate.quat_y;
-								m.quat.z = inst.rotate.quat_z;
-								m.quat.r = inst.rotate.quat_r;
-								absolute_rotates.Push (m);
-							break;
-							case AC_TRANSFORM_RELATIVE:
-							{
-								m.quat = m.bone_rotation->quat;
-								m.curr_quat.x = inst.rotate.quat_x;
-								m.curr_quat.y = inst.rotate.quat_y;
-								m.curr_quat.z = inst.rotate.quat_z;
-								m.curr_quat.r = inst.rotate.quat_r;
-								relative_rotates.Push (m);
-							}
-							break;
-						}
-					}
-				}
-			break;
-			case AC_MOVE:
-			{
-				if (bones[inst.movement.bone_id]->GetMode () != BM_NONE)
-				{
-					if (!frame.duration)
-					{
-						bone_transform_data *bone_pos = GetBonePosition(bones[inst.movement.bone_id]);
-						switch (inst.tr_mode)
-						{
-							case AC_TRANSFORM_ABSOLUTE:
-								bone_pos->axis.x = inst.movement.posx;
-								bone_pos->axis.y = inst.movement.posy;
-								bone_pos->axis.z = inst.movement.posz;
-							break;
-							case AC_TRANSFORM_RELATIVE:
-								bone_pos->axis.x += inst.movement.posx;
-								bone_pos->axis.y += inst.movement.posy;
-								bone_pos->axis.z += inst.movement.posz;
-							break;
-						}
-					}
-					else
-					{
-						sac_move_execution m;
-						m.bone = bones[inst.movement.bone_id];
-						m.final_position.x = inst.movement.posx;
-						m.final_position.y = inst.movement.posy;
-						m.final_position.z = inst.movement.posz;
-						m.bone_position = GetBonePosition(m.bone);
-						m.elapsed_ticks = 0;
+            switch (inst.tr_mode)
+            {
+              case AC_TRANSFORM_ABSOLUTE:
+                m.curr_quat = m.bone_rotation->quat;
+                m.quat.x = inst.rotate.quat_x;
+                m.quat.y = inst.rotate.quat_y;
+                m.quat.z = inst.rotate.quat_z;
+                m.quat.r = inst.rotate.quat_r;
+                absolute_rotates.Push (m);
+                break;
+              case AC_TRANSFORM_RELATIVE:
+                m.quat = m.bone_rotation->quat;
+                m.curr_quat.x = inst.rotate.quat_x;
+                m.curr_quat.y = inst.rotate.quat_y;
+                m.curr_quat.z = inst.rotate.quat_z;
+                m.curr_quat.r = inst.rotate.quat_r;
+                relative_rotates.Push (m);
+                break;
+            }
+          }
+        }
+      break;
+      case AC_MOVE:
+      {
+        if (bones[inst.movement.bone_id]->GetMode () != BM_NONE)
+        {
+          if (!frame.duration)
+          {
+            bone_transform_data *bone_pos = GetBonePosition(
+	    	bones[inst.movement.bone_id]);
+            switch (inst.tr_mode)
+            {
+              case AC_TRANSFORM_ABSOLUTE:
+                bone_pos->axis.x = inst.movement.posx;
+                bone_pos->axis.y = inst.movement.posy;
+                bone_pos->axis.z = inst.movement.posz;
+                break;
+              case AC_TRANSFORM_RELATIVE:
+                bone_pos->axis.x += inst.movement.posx;
+                bone_pos->axis.y += inst.movement.posy;
+                bone_pos->axis.z += inst.movement.posz;
+                break;
+            }
+          }
+          else
+          {
+            sac_move_execution m;
+            m.bone = bones[inst.movement.bone_id];
+            m.final_position.x = inst.movement.posx;
+            m.final_position.y = inst.movement.posy;
+            m.final_position.z = inst.movement.posz;
+            m.bone_position = GetBonePosition(m.bone);
+            m.elapsed_ticks = 0;
 
-						switch (inst.tr_mode)
-						{
-							case AC_TRANSFORM_ABSOLUTE:
-							{
-								csVector3 current_position = 
-									csVector3 (m.bone_position->axis.x, m.bone_position->axis.y, m.bone_position->axis.z);
-								csVector3 delta = m.final_position - current_position;
-								m.delta_per_tick = delta/(float)(delay.final);
-								absolute_moves.Push (m);
-							}
-							break;
-							case AC_TRANSFORM_RELATIVE:
-								m.delta_per_tick = m.final_position/(float)(delay.final);
-								relative_moves.Push (m);
-							break;
-						}
-					}
-				}
-			}
-			break;
-		}
-	}
+            switch (inst.tr_mode)
+            {
+              case AC_TRANSFORM_ABSOLUTE:
+                {
+                  csVector3 current_position = 
+                    csVector3 (m.bone_position->axis.x, m.bone_position->axis.y,
+		  	  m.bone_position->axis.z);
+                  csVector3 delta = m.final_position - current_position;
+                  m.delta_per_tick = delta/(float)(delay.final);
+                  absolute_moves.Push (m);
+                }
+                break;
+              case AC_TRANSFORM_RELATIVE:
+                m.delta_per_tick = m.final_position/(float)(delay.final);
+                relative_moves.Push (m);
+                break;
+            }
+          }
+        }
+      }
+      break;
+    }
+  }
 }
 
 sac_frame & csSkelAnimControlRunnable::NextFrame()
 {
-	csArray<sac_frame>& frames = script->GetFrames();
-	size_t frames_count = frames.Length();
-	current_frame++;
-	if (current_frame >= frames_count) 
-	{
-		current_frame = 0;
-	}
-	
-	while (!frames[current_frame].active)
-	{
-		current_frame++;
-		if (current_frame >= frames_count) 
-		{
-			current_frame = 0;
-		}
-	}
-	
-	if (frames[current_frame].repeat_times > 0) 
-	{
-		frames[current_frame].repeat_times--;
-		if (!frames[current_frame].repeat_times)
-		{
-			frames[current_frame].active = false;
-		}
-	}
-	return frames[current_frame];
+  csArray<sac_frame>& frames = script->GetFrames();
+  size_t frames_count = frames.Length();
+  current_frame++;
+  if (current_frame >= frames_count) 
+  {
+    current_frame = 0;
+  }
+  
+  while (!frames[current_frame].active)
+  {
+    current_frame++;
+    if (current_frame >= frames_count) 
+    {
+      current_frame = 0;
+    }
+  }
+  
+  if (frames[current_frame].repeat_times > 0) 
+  {
+    frames[current_frame].repeat_times--;
+    if (!frames[current_frame].repeat_times)
+    {
+      frames[current_frame].active = false;
+    }
+  }
+  return frames[current_frame];
 }
 
 
@@ -751,69 +765,70 @@ csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()
 //  int num_verts, uint32 version_id)
 bool csGenmeshSkelAnimationControl::UpdateAnimation (csTicks current)
 {
-	if (!vertices_mapped) 
-	{
-		return false;
-	}
+  if (!vertices_mapped) 
+  {
+    return false;
+  }
 
-	bool mod = false;
+  bool mod = false;
 
-	if (!last_update_time) 
-	{
-		last_update_time = current;
-	}
-	elapsed = current - last_update_time;
-	last_update_time = current;
+  if (!last_update_time) 
+  {
+    last_update_time = current;
+  }
+  elapsed = current - last_update_time;
+  last_update_time = current;
 
-	if (elapsed)
-	{
-		last_update_time = current;
-		size_t i = running_scripts.Length ();
-		while (i > 0)
-		{
-			i--;
-			bool stop = false;
-			csTicks left;
-			if (running_scripts[i]->Do (elapsed, stop, left))
-			{
-				mod = true;
-				while (left)
-				{
-					running_scripts[i]->Do (left, stop, left);
-				}
-			}
-		}
-	}
+  if (elapsed)
+  {
+    last_update_time = current;
+    size_t i = running_scripts.Length ();
+    while (i > 0)
+    {
+      i--;
+      bool stop = false;
+      csTicks left;
+      if (running_scripts[i]->Do (elapsed, stop, left))
+      {
+        mod = true;
+        while (left)
+        {
+          running_scripts[i]->Do (left, stop, left);
+        }
+      }
+    }
+  }
 
-	if (mod || force_bone_update)
-	{
-		dirty_vertices = true;
-		dirty_texels = true;
-		dirty_colors = true;
-		dirty_normals = true;
-		
-		bones_updated = false;
-		vertices_updated = false;
-		force_bone_update = false;
+  if (mod || force_bone_update)
+  {
+    dirty_vertices = true;
+    dirty_texels = true;
+    dirty_colors = true;
+    dirty_normals = true;
+    
+    bones_updated = false;
+    vertices_updated = false;
+    force_bone_update = false;
 
-		if (factory->GetFlags().Check(SKEL_ANIMATION_ALWAYS_UPDATE))
-		{
-			if (factory->GetFlags().Check(
-				SKEL_ANIMATION_ALWAYS_UPDATE_BONES|SKEL_ANIMATION_ALWAYS_UPDATE_VERTICES))
-			{
-				UpdateBones();
-			}
+    if (factory->GetFlags().Check(SKEL_ANIMATION_ALWAYS_UPDATE))
+    {
+      if (factory->GetFlags().Check(
+        SKEL_ANIMATION_ALWAYS_UPDATE_BONES
+	|SKEL_ANIMATION_ALWAYS_UPDATE_VERTICES))
+      {
+        UpdateBones();
+      }
 
-			if (factory->GetFlags().Check(SKEL_ANIMATION_ALWAYS_UPDATE_VERTICES))
-			{
-				UpdateAnimatedVertices(current, animated_verts, num_animated_verts);
-			}
-		}
+      if (factory->GetFlags().Check(SKEL_ANIMATION_ALWAYS_UPDATE_VERTICES))
+      {
+        UpdateAnimatedVertices(current, animated_verts, num_animated_verts);
+      }
+    }
 
-		return true;
-	}
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 void csGenmeshSkelAnimationControl::UpdateArrays (int num_verts)
@@ -837,7 +852,8 @@ void csGenmeshSkelAnimationControl::UpdateArrays (int num_verts)
 
 csArray<csReversibleTransform> csGenmeshSkelAnimationControl::bone_transforms;
 
-void csGenmeshSkelAnimationControl::TransformVerticesToBones (const csVector3* verts, int num_verts)
+void csGenmeshSkelAnimationControl::TransformVerticesToBones (
+	const csVector3* verts, int num_verts)
 {
   csRefArray<csSkelBone>& f_bones = factory->GetBones ();
   csArray<size_t>& f_parent_bones = factory->GetParentBones ();
@@ -874,7 +890,8 @@ void csGenmeshSkelAnimationControl::TransformVerticesToBones (const csVector3* v
   for (i = 0 ; i < parent_bones.Length () ; i++)
     bones[parent_bones[i]]->UpdateBones ();
 
-  csArray<csArray<sac_bone_data> >& bones_vertices = factory->GetBonesVerticesMapping ();
+  csArray<csArray<sac_bone_data> >& bones_vertices =
+  	factory->GetBonesVerticesMapping ();
   for (i = 0 ; i < (size_t)num_verts ; i++)
   {
     if (i >= bones_vertices.Length ())
@@ -903,46 +920,47 @@ void csGenmeshSkelAnimationControl::TransformVerticesToBones (const csVector3* v
 
 void csGenmeshSkelAnimationControl::UpdateBones ()
 {
-	size_t i;
-	for (i = 0 ; i < bones.Length () ; i++)
-	{
-		bones[i]->UpdateRotation();
-		bones[i]->UpdatePosition();
-		bones[i]->FireCallback();
-	}
+  size_t i;
+  for (i = 0 ; i < bones.Length () ; i++)
+  {
+    bones[i]->UpdateRotation();
+    bones[i]->UpdatePosition();
+    bones[i]->FireCallback();
+  }
 
-	for (i = 0 ; i < parent_bones.Length () ; i++)
-	{
-		csRef<csSkelBone> parent_bone = bones[parent_bones[i]];
-		switch (parent_bone->GetMode ())
-		{
-			case BM_NONE:
-			case BM_SCRIPT:
-				parent_bone->UpdateBones ();
-			break;
-			case BM_PHYSICS:
-				if (parent_bone->GetRigidBody ())
-				{
-					parent_bone->UpdateBones (parent_bone);
-					force_bone_update = true;
-				}
-				else
-				{
-					parent_bone->UpdateBones ();
-				}
-			break;
-		}
-	}
-	bones_updated = true;
+  for (i = 0 ; i < parent_bones.Length () ; i++)
+  {
+    csRef<csSkelBone> parent_bone = bones[parent_bones[i]];
+    switch (parent_bone->GetMode ())
+    {
+      case BM_NONE:
+      case BM_SCRIPT:
+        parent_bone->UpdateBones ();
+        break;
+      case BM_PHYSICS:
+        if (parent_bone->GetRigidBody ())
+        {
+          parent_bone->UpdateBones (parent_bone);
+          force_bone_update = true;
+        }
+        else
+        {
+          parent_bone->UpdateBones ();
+        }
+        break;
+    }
+  }
+  bones_updated = true;
 }
 
 void csGenmeshSkelAnimationControl::UpdateAnimatedVertices (csTicks current, 
-	const csVector3* verts, int num_verts)
+  const csVector3* verts, int num_verts)
 {
   if (dirty_vertices)
   {
     size_t i;
-    csArray<csArray<sac_bone_data> >& bones_vertices = factory->GetBonesVerticesMapping ();
+    csArray<csArray<sac_bone_data> >& bones_vertices =
+    	factory->GetBonesVerticesMapping ();
     for (i = 0 ; i < (size_t)num_verts ; i++)
     {
       if (i >= bones_vertices.Length ())
@@ -976,34 +994,34 @@ void csGenmeshSkelAnimationControl::UpdateAnimatedVertices (csTicks current,
 }
 
 const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
-	const csVector3* verts, int num_verts, uint32 version_id)
+  const csVector3* verts, int num_verts, uint32 version_id)
 {
-	if (!animates_vertices) return verts;
+  if (!animates_vertices) return verts;
 
-	if (!vertices_mapped)
-	{
-		TransformVerticesToBones (verts, num_verts);
-		vertices_mapped = true;
-	}
+  if (!vertices_mapped)
+  {
+    TransformVerticesToBones (verts, num_verts);
+    vertices_mapped = true;
+  }
 
-	UpdateArrays (num_verts);
+  UpdateArrays (num_verts);
 
-	if (!factory->GetFlags().Check(SKEL_ANIMATION_ALWAYS_UPDATE))
-	{
-		if (UpdateAnimation (current))
-		{
-			if (!bones_updated) 
-			{
-				UpdateBones();
-			}
-			
-			if (!vertices_updated) 
-			{
-				UpdateAnimatedVertices(current, verts, num_verts);
-			}
-		}
-	}
-	
+  if (!factory->GetFlags().Check(SKEL_ANIMATION_ALWAYS_UPDATE))
+  {
+    if (UpdateAnimation (current))
+    {
+      if (!bones_updated) 
+      {
+        UpdateBones();
+      }
+      
+      if (!vertices_updated) 
+      {
+        UpdateAnimatedVertices(current, verts, num_verts);
+      }
+    }
+  }
+  
   return animated_verts;
 }
 
@@ -1028,12 +1046,14 @@ const csColor4* csGenmeshSkelAnimationControl::UpdateColors (csTicks current,
   return colors;
 }
 
-iGenMeshSkeletonScript* csGenmeshSkelAnimationControl::Execute (const char* scriptname)
+iGenMeshSkeletonScript* csGenmeshSkelAnimationControl::Execute (
+	const char* scriptname)
 {
   csSkelAnimControlScript* script = factory->FindScript (scriptname);
   if (!script) return 0;
   csRef<csSkelAnimControlRunnable> runnable = 
-    csPtr<csSkelAnimControlRunnable> (new csSkelAnimControlRunnable (script, this));
+    csPtr<csSkelAnimControlRunnable> (new csSkelAnimControlRunnable (
+    	script, this));
   running_scripts.Push (runnable);
   return runnable;
 }
@@ -1074,7 +1094,8 @@ iGenMeshSkeletonScript* csGenmeshSkelAnimationControl::GetScript (size_t i)
   return 0;
 }
 
-iGenMeshSkeletonScript* csGenmeshSkelAnimationControl::FindScript (const char *scriptname)
+iGenMeshSkeletonScript* csGenmeshSkelAnimationControl::FindScript (
+	const char *scriptname)
 {
   size_t i;
   for (i = 0 ; i < running_scripts.Length () ; i++)
@@ -1083,7 +1104,8 @@ iGenMeshSkeletonScript* csGenmeshSkelAnimationControl::FindScript (const char *s
   return 0;
 }
 
-iGenMeshSkeletonBone *csGenmeshSkelAnimationControl::FindBone (const char *name)
+iGenMeshSkeletonBone *csGenmeshSkelAnimationControl::FindBone (
+	const char *name)
 {
   size_t i;
   for (i = 0 ; i < bones.Length () ; i++)
@@ -1118,16 +1140,17 @@ csGenmeshSkelAnimationControlFactory::~csGenmeshSkelAnimationControlFactory ()
 csPtr<iGenMeshAnimationControl> csGenmeshSkelAnimationControlFactory::
   CreateAnimationControl ()
 {
-  csGenmeshSkelAnimationControl* ctrl = new csGenmeshSkelAnimationControl (this, object_reg);
+  csGenmeshSkelAnimationControl* ctrl = new csGenmeshSkelAnimationControl (
+  	this, object_reg);
   size_t i;
   for (i = 0 ; i < autorun_scripts.Length () ; i++)
-	ctrl->Execute (autorun_scripts[i]);
+  ctrl->Execute (autorun_scripts[i]);
 
-	if (flags.Check(SKEL_ANIMATION_ALWAYS_UPDATE))
-	{
-		RegisterAUAnimation(ctrl);
-	}
-	
+  if (flags.Check(SKEL_ANIMATION_ALWAYS_UPDATE))
+  {
+    RegisterAUAnimation(ctrl);
+  }
+  
   return csPtr<iGenMeshAnimationControl> (ctrl);
 }
 
@@ -1143,7 +1166,8 @@ void csGenmeshSkelAnimationControlFactory::UpdateBonesMapping ()
     {
       if (vtdata[j].weight > SMALL_EPSILON)
       {
-        csArray<sac_bone_data>& vertices = bones_vertices.GetExtend (vtdata[j].idx);
+        csArray<sac_bone_data>& vertices = bones_vertices.GetExtend (
+		vtdata[j].idx);
         sac_bone_data gd;
         gd.idx = (int)i;
         gd.v_idx = (int)j;
@@ -1163,20 +1187,21 @@ csSkelAnimControlScript* csGenmeshSkelAnimationControlFactory::FindScript (
   return 0;
 }
 
-const char* csGenmeshSkelAnimationControlFactory::LoadScriptFile(const char *filename)
+const char* csGenmeshSkelAnimationControlFactory::LoadScriptFile(
+	const char *filename)
 {
-	//TODO
-	return 0;
+  //TODO
+  return 0;
 }
 
 void csGenmeshSkelAnimationControlFactory::DeleteScript(const char *script_name)
 {
-	//TODO
+  //TODO
 }
 
 void csGenmeshSkelAnimationControlFactory::DeleteAllScripts()
 {
-	//TODO
+  //TODO
 }
 
 csSkelBone* csGenmeshSkelAnimationControlFactory::FindBone (
@@ -1199,8 +1224,8 @@ size_t csGenmeshSkelAnimationControlFactory::FindBoneIndex (
   return (size_t)~0;
 }
 
-const char* csGenmeshSkelAnimationControlFactory::ParseBone (iDocumentNode* node,
-  csSkelBone* parent)
+const char* csGenmeshSkelAnimationControlFactory::ParseBone (
+	iDocumentNode* node, csSkelBone* parent)
 {
   const char* bonename = node->GetAttributeValue ("name");
 
@@ -1224,16 +1249,16 @@ const char* csGenmeshSkelAnimationControlFactory::ParseBone (iDocumentNode* node
           int from_idx = child->GetAttributeValueAsInt ("from");
           int to_idx = child->GetAttributeValueAsInt ("to");
           if (to_idx < from_idx)
-		{
+	  {
             return "Bad range in bone definition!";
-		}
+          }
           float weight = child->GetAttributeValueAsFloat ("weight");
           float col_weight = child->GetAttributeValueAsFloat ("col_weight");
           int i;
           for (i = from_idx ; i <= to_idx ; i++)
-			{
-				bone->AddVertex (i, weight, col_weight);
-			}
+	  {
+	    bone->AddVertex (i, weight, col_weight);
+	  }
         }
         break;
       case XMLTOKEN_VERTEX:
@@ -1246,7 +1271,8 @@ const char* csGenmeshSkelAnimationControlFactory::ParseBone (iDocumentNode* node
         break;
       case XMLTOKEN_MOVE:
         {
-          csRef<iSyntaxService> SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+          csRef<iSyntaxService> SyntaxService = CS_QUERY_REGISTRY (object_reg,
+	  	iSyntaxService);
           csRef<iDocumentNode> vector_node = child->GetNode ("v");
           if (vector_node)
           {
@@ -1313,177 +1339,179 @@ const char* csGenmeshSkelAnimationControlFactory::ParseBone (iDocumentNode* node
   return 0;
 }
 
-const char* csGenmeshSkelAnimationControlFactory::ParseScript (iDocumentNode* node)
+const char* csGenmeshSkelAnimationControlFactory::ParseScript (
+	iDocumentNode* node)
 {
-	const char* scriptname = node->GetAttributeValue ("name");
-	if (!scriptname)
-	return "Name of the script is missing!";
+  const char* scriptname = node->GetAttributeValue ("name");
+  if (!scriptname)
+  return "Name of the script is missing!";
 
-	// Small class to make sure script gets deleted in case of error.
-	struct AutoDelete
-	{
-		csSkelAnimControlScript* script;
-		~AutoDelete () { delete script; }
-	} ad;
-	ad.script = new csSkelAnimControlScript (scriptname);
+  // Small class to make sure script gets deleted in case of error.
+  struct AutoDelete
+  {
+    csSkelAnimControlScript* script;
+    ~AutoDelete () { delete script; }
+  } ad;
+  ad.script = new csSkelAnimControlScript (scriptname);
 
-	csRef<iDocumentNodeIterator> it = node->GetNodes ();
-	while (it->HasNext ())
-	{
-		csRef<iDocumentNode> child = it->Next ();
-		if (child->GetType () != CS_NODE_ELEMENT) continue;
-		const char* value = child->GetValue ();
-		csStringID id = xmltokens.Request (value);
-		switch (id)
-		{
-			case XMLTOKEN_FRAME:
-			{
-				csTicks duration = child->GetAttributeValueAsInt ("duration");
-				sac_frame& frame = ad.script->AddFrame(duration);
-				csRef< iDocumentAttribute > attr = child->GetAttribute ("repeat");
-				if (attr)
-				{
-					frame.repeat_times = attr->GetValueAsInt();
-				}
-				else
-				{
-					frame.repeat_times = -1;
-				}
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_FRAME:
+      {
+        csTicks duration = child->GetAttributeValueAsInt ("duration");
+        sac_frame& frame = ad.script->AddFrame(duration);
+        csRef< iDocumentAttribute > attr = child->GetAttribute ("repeat");
+        if (attr)
+        {
+          frame.repeat_times = attr->GetValueAsInt();
+        }
+        else
+        {
+          frame.repeat_times = -1;
+        }
 
-				frame.active = (frame.repeat_times != 0);
+        frame.active = (frame.repeat_times != 0);
 
-				csRef<iDocumentNodeIterator> it = child->GetNodes ();
-				while (it->HasNext ())
-				{
-					csRef<iDocumentNode> child = it->Next ();
-					if (child->GetType () != CS_NODE_ELEMENT) continue;
-					const char* value = child->GetValue ();
-					csStringID id = xmltokens.Request (value);
-					switch (id)
-					{
-						case XMLTOKEN_MOVE:
-						{
-							const char* bonename = child->GetAttributeValue ("bone");
-							if (!bonename) return "Missing bone name for <move>!";
-							size_t bone_id = FindBoneIndex (bonename);
-							if (bone_id == (size_t)~0) return "Can't find bone for <move>!";
-							sac_instruction& instr = ad.script->AddInstruction (frame, AC_MOVE);
-							instr.movement.bone_id = bone_id;
+        csRef<iDocumentNodeIterator> it = child->GetNodes ();
+        while (it->HasNext ())
+        {
+          csRef<iDocumentNode> child = it->Next ();
+          if (child->GetType () != CS_NODE_ELEMENT) continue;
+          const char* value = child->GetValue ();
+          csStringID id = xmltokens.Request (value);
+          switch (id)
+          {
+            case XMLTOKEN_MOVE:
+            {
+              const char* bonename = child->GetAttributeValue ("bone");
+              if (!bonename) return "Missing bone name for <move>!";
+              size_t bone_id = FindBoneIndex (bonename);
+              if (bone_id == (size_t)~0) return "Can't find bone for <move>!";
+              sac_instruction& instr = ad.script->AddInstruction (
+	      	frame, AC_MOVE);
+              instr.movement.bone_id = bone_id;
 
-							instr.tr_mode = AC_TRANSFORM_ABSOLUTE;
-							const char *transform_mode = child->GetAttributeValue ("type");
-							if (transform_mode)
-							{
-								if (!strcmp(transform_mode, "abs"))
-								{
-									instr.tr_mode = AC_TRANSFORM_ABSOLUTE;
-								}
-								else
-								if (!strcmp(transform_mode, "rel"))
-								{
-									instr.tr_mode = AC_TRANSFORM_RELATIVE;
-								}
-							}
+              instr.tr_mode = AC_TRANSFORM_ABSOLUTE;
+              const char *transform_mode = child->GetAttributeValue ("type");
+              if (transform_mode)
+              {
+                if (!strcmp(transform_mode, "abs"))
+                {
+                  instr.tr_mode = AC_TRANSFORM_ABSOLUTE;
+                }
+                else
+                if (!strcmp(transform_mode, "rel"))
+                {
+                  instr.tr_mode = AC_TRANSFORM_RELATIVE;
+                }
+              }
 
-							instr.movement.posx = child->GetAttributeValueAsFloat ("x");
-							instr.movement.posy = child->GetAttributeValueAsFloat ("y");
-							instr.movement.posz = child->GetAttributeValueAsFloat ("z");
-							animates_vertices = true;
-						}
-						break;
-						case XMLTOKEN_ROT:
-						{
-							const char* bonename = child->GetAttributeValue ("bone");
-							if (!bonename) return "Missing bone name for <rotx>!";
-							size_t bone_id = FindBoneIndex (bonename);
-							if (bone_id == (size_t)~0) return "Can't find bone for <rot>!";
-							sac_instruction& instr = ad.script->AddInstruction (frame, AC_ROT);
-							instr.rotate.bone_id = bone_id;
+              instr.movement.posx = child->GetAttributeValueAsFloat ("x");
+              instr.movement.posy = child->GetAttributeValueAsFloat ("y");
+              instr.movement.posz = child->GetAttributeValueAsFloat ("z");
+              animates_vertices = true;
+            }
+            break;
+            case XMLTOKEN_ROT:
+            {
+              const char* bonename = child->GetAttributeValue ("bone");
+              if (!bonename) return "Missing bone name for <rotx>!";
+              size_t bone_id = FindBoneIndex (bonename);
+              if (bone_id == (size_t)~0) return "Can't find bone for <rot>!";
+              sac_instruction& instr = ad.script->AddInstruction (frame, AC_ROT);
+              instr.rotate.bone_id = bone_id;
 
-							instr.tr_mode = AC_TRANSFORM_ABSOLUTE;
-							const char *transform_mode = child->GetAttributeValue ("type");
-							if (transform_mode)
-							{
-								if (!strcmp(transform_mode, "abs"))
-								{
-									instr.tr_mode = AC_TRANSFORM_ABSOLUTE;
-								}
-								else
-								if (!strcmp(transform_mode, "rel"))
-								{
-									instr.tr_mode = AC_TRANSFORM_RELATIVE;
-								}
-							}
+              instr.tr_mode = AC_TRANSFORM_ABSOLUTE;
+              const char *transform_mode = child->GetAttributeValue ("type");
+              if (transform_mode)
+              {
+                if (!strcmp(transform_mode, "abs"))
+                {
+                  instr.tr_mode = AC_TRANSFORM_ABSOLUTE;
+                }
+                else
+                if (!strcmp(transform_mode, "rel"))
+                {
+                  instr.tr_mode = AC_TRANSFORM_RELATIVE;
+                }
+              }
 
-							csVector3 v (0);
-							float x_val = child->GetAttributeValueAsFloat ("x");
-							if (x_val)
-							{
-								v.x = (x_val*180)/PI;
-							}
+              csVector3 v (0);
+              float x_val = child->GetAttributeValueAsFloat ("x");
+              if (x_val)
+              {
+                v.x = (x_val*180)/PI;
+              }
 
-							float y_val = child->GetAttributeValueAsFloat ("y");
-							if (y_val)
-							{
-								v.y = (y_val*180)/PI;
-							}
+              float y_val = child->GetAttributeValueAsFloat ("y");
+              if (y_val)
+              {
+                v.y = (y_val*180)/PI;
+              }
 
-							float z_val = child->GetAttributeValueAsFloat ("z");
-							if (z_val)
-							{
-								v.z = (z_val*180)/PI;
-							}
+              float z_val = child->GetAttributeValueAsFloat ("z");
+              if (z_val)
+              {
+                v.z = (z_val*180)/PI;
+              }
 
-							csQuaternion q;
-							q.SetWithEuler(v);
+              csQuaternion q;
+              q.SetWithEuler(v);
 
-							instr.rotate.quat_x = q.x;
+              instr.rotate.quat_x = q.x;
 
-							//Why?
-							instr.rotate.quat_y = -q.y;
+              //Why?
+              instr.rotate.quat_y = -q.y;
 
-							instr.rotate.quat_z = q.z;
-							instr.rotate.quat_r = q.r;
+              instr.rotate.quat_z = q.z;
+              instr.rotate.quat_r = q.r;
 
-							/*
-							csMatrix3 m = csXRotMatrix3(child->GetAttributeValueAsFloat ("x"))*
-								csYRotMatrix3(child->GetAttributeValueAsFloat ("y"))*
-								csZRotMatrix3(child->GetAttributeValueAsFloat ("z"));
-							q = csQuaternion(m);
-							csPrintf("%s x %.3f y %.3f z %.3f r %.3f\n\n", bones[bone_id]->GetName(), q.axis.x, q.axis.y, q.axis.z, q.r);
-							instr.rotate.quat_x = q.x;
-							instr.rotate.quat_y = q.y;
-							instr.rotate.quat_z = q.z;
-							instr.rotate.quat_r = q.r;
-							*/
+              /*
+              csMatrix3 m = csXRotMatrix3(child->GetAttributeValueAsFloat ("x"))*
+                csYRotMatrix3(child->GetAttributeValueAsFloat ("y"))*
+                csZRotMatrix3(child->GetAttributeValueAsFloat ("z"));
+              q = csQuaternion(m);
+              csPrintf("%s x %.3f y %.3f z %.3f r %.3f\n\n", bones[bone_id]->GetName(), q.axis.x, q.axis.y, q.axis.z, q.r);
+              instr.rotate.quat_x = q.x;
+              instr.rotate.quat_y = q.y;
+              instr.rotate.quat_z = q.z;
+              instr.rotate.quat_r = q.r;
+              */
 
-							animates_vertices = true;
-						}
-						break;
-						default:
-							error_buf.Format (
-							"Don't recognize token '%s' in anim control script!",
-							value);
-						return error_buf;
-					}
-				}
-			}
-			break;
-			case XMLTOKEN_LOOP:
-			{
-				ad.script->SetLoop(true);
-				csRef< iDocumentAttribute > attr = child->GetAttribute ("times");
-				if (attr)
-				{
-					ad.script->SetLoopTimes(attr->GetValueAsInt());
-				}
-			}
-			break;
-		}
-	}
-	scripts.Push (ad.script);
-	ad.script = 0;  // Prevent DeleteScript instance from deleting script.
-	return 0;
+              animates_vertices = true;
+            }
+            break;
+            default:
+              error_buf.Format (
+              "Don't recognize token '%s' in anim control script!",
+              value);
+            return error_buf;
+          }
+        }
+      }
+      break;
+      case XMLTOKEN_LOOP:
+      {
+        ad.script->SetLoop(true);
+        csRef< iDocumentAttribute > attr = child->GetAttribute ("times");
+        if (attr)
+        {
+          ad.script->SetLoopTimes(attr->GetValueAsInt());
+        }
+      }
+      break;
+    }
+  }
+  scripts.Push (ad.script);
+  ad.script = 0;  // Prevent DeleteScript instance from deleting script.
+  return 0;
 }
 
 const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
@@ -1519,30 +1547,29 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
         break;
       case XMLTOKEN_ALWAYS_UPDATE:
         {
-			flags.SetBool(SKEL_ANIMATION_ALWAYS_UPDATE, true);
-			csRef<iDocumentNodeIterator> it = child->GetNodes ();
-			while (it->HasNext ())
-			{
-				csRef<iDocumentNode> child = it->Next ();
-				if (child->GetType () != CS_NODE_ELEMENT) continue;
-				const char* value = child->GetValue ();
-				csStringID id = xmltokens.Request (value);
-				switch (id)
-				{
-					case XMLTOKEN_BONES:
-						flags.SetBool(SKEL_ANIMATION_ALWAYS_UPDATE_BONES, true);
-					break;
-					case XMLTOKEN_VERTICES:
-						flags.SetBool(SKEL_ANIMATION_ALWAYS_UPDATE_VERTICES, true);
-					break;
-				}
-			}
+          flags.SetBool(SKEL_ANIMATION_ALWAYS_UPDATE, true);
+          csRef<iDocumentNodeIterator> it = child->GetNodes ();
+          while (it->HasNext ())
+          {
+            csRef<iDocumentNode> child = it->Next ();
+            if (child->GetType () != CS_NODE_ELEMENT) continue;
+            const char* value = child->GetValue ();
+            csStringID id = xmltokens.Request (value);
+            switch (id)
+            {
+              case XMLTOKEN_BONES:
+                flags.SetBool(SKEL_ANIMATION_ALWAYS_UPDATE_BONES, true);
+                break;
+              case XMLTOKEN_VERTICES:
+                flags.SetBool(SKEL_ANIMATION_ALWAYS_UPDATE_VERTICES, true);
+                break;
+            }
+          }
         }
         break;
       default:
-        error_buf.Format (
-        "Don't recognize token '%s' in anim control!",
-        value);
+        error_buf.Format ("Don't recognize token '%s' in anim control!",
+          value);
         return error_buf;
     }
   }
@@ -1570,12 +1597,14 @@ void csGenmeshSkelAnimationControlFactory::UpdateParentBones ()
   }
 }
 
-void csGenmeshSkelAnimationControlFactory::RegisterAUAnimation(csGenmeshSkelAnimationControl *anim)
+void csGenmeshSkelAnimationControlFactory::RegisterAUAnimation(
+	csGenmeshSkelAnimationControl *anim)
 {
   type->RegisterAUAnimation(anim);
 }
 
-void csGenmeshSkelAnimationControlFactory::UnregisterAUAnimation(csGenmeshSkelAnimationControl *anim)
+void csGenmeshSkelAnimationControlFactory::UnregisterAUAnimation(
+	csGenmeshSkelAnimationControl *anim)
 {
   type->UnregisterAUAnimation(anim);
 }
@@ -1617,14 +1646,15 @@ bool csGenmeshSkelAnimationControlType::Initialize (iObjectRegistry* object_reg)
 csPtr<iGenMeshAnimationControlFactory> csGenmeshSkelAnimationControlType::
   CreateAnimationControlFactory ()
 {
-  csGenmeshSkelAnimationControlFactory* ctrl = new csGenmeshSkelAnimationControlFactory
-     (this, object_reg);
+  csGenmeshSkelAnimationControlFactory* ctrl =
+  	new csGenmeshSkelAnimationControlFactory (this, object_reg);
   return csPtr<iGenMeshAnimationControlFactory> (ctrl);
 }
 
 bool csGenmeshSkelAnimationControlType::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdPreProcess)
+  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev)
+  	== cscmdPreProcess)
   {
       UpdateAUAnimations(vc->GetCurrentTicks());
     return true;
