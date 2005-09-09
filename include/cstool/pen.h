@@ -38,6 +38,20 @@ struct csPenColor
 {
   /** The components of the color. */ 
   float r, g, b, a;
+
+  csPenColor() {}
+  csPenColor(float _r, float _g, float _b, float _a):r(_r), g(_g), b(_b), a(_a) {}
+  csPenColor(const csPenColor &c):r(c.r), g(c.g), b(c.b), a(c.a) {}
+
+  csPenColor & operator=(const csPenColor &c)
+  {
+    r=c.r;
+    g=c.g;
+    b=c.b;
+    a=c.a;
+
+    return *this;
+  }
 };
 
 /** 
