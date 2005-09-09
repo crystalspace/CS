@@ -293,7 +293,7 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
   csRef<iParticleState> partstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
   partstate->SetMaterialWrapper (mat);
-  partstate->SetMixMode (CS_FX_SETALPHA (0.50));
+  //partstate->SetMixMode (CS_FX_SETALPHA (0.50));
   partstate->SetColor (csColor (1, 1, 0));
   partstate->SetChangeRotation (5.0);
   partstate->SetChangeSize (1.25);
