@@ -33,6 +33,25 @@ chronological order.
 	  libs/csutil/win32/Jamfile (since the Win32 part does not really
 	  use bfd directly itself).
         - res worked around GCC4 breakage in movierecorder plugin. 
+	- Eric Sunshine fixed some icky-poo brokeness in embed.m4 which was
+	  introduced along with the elf.h handling. It was accessing
+	  non-existent shell variables and generally behaving badly.
+	- Eric Sunshine removed CS-specific goop from embed.m4 which was
+	  introduced with the elf.h handling. In particular,
+	  CS_META_INFO_EMBED() had been changed to emit header properties
+	  despite the fact that it was not documented as doing so, and had no
+	  way of doing so generically. This broke the generality of
+	  CS_META_INFO_EMBED() for external projects which do not necessarily
+	  need to generate a project header at configuration time.
+	- Eric Sunshine refactored embed.m4 a bit so that the exhaustive libbfd
+	  check can be re-used by other modules rather than being specific to
+	  embedding. It is now named CS_CHECK_LIBBFD().
+	- Eric Sunshine removed the recently added libbfd check from
+	  configure.ac and replaced it with an invocation of the much more
+	  exhaustive and capable CS_CHECK_LIBBFD().
+	- Eric Sunshine relocated the user-presented libbfd GPL warning so that
+	  it appears after all other output from the configure script in order
+	  to ensure that it does not get lost amidst all the other verbosity.
 8-Sep-2005
 	- res added a libbfd test to configure. bfd is used for some
 	  development and debugging aids. Since bfd is GPLed, which can be

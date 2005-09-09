@@ -2361,7 +2361,10 @@ AS_IF([test $enable_meta_info_embedding = yes],
     CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
 	[AS_ESCAPE([$(EMBED_META.CFLAGS)])], [+])
     CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS],
-	[AS_ESCAPE([$(EMBED_META.LFLAGS)])], [+])])
+	[AS_ESCAPE([$(EMBED_META.LFLAGS)])], [+])
+    AC_CHECK_HEADERS([elf.h], [CS_HEADER_PROPERTY([CS_HAVE_ELF_H])])
+    AS_IF([test "$cs_cv_libbfd_ok" = yes],
+	[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])])])
 
 
 
@@ -2401,16 +2404,21 @@ CS_EMIT_BUILD_PROPERTY([MODE], [$cs_build_mode])
 
 
 #------------------------------------------------------------------------------
-# Check for libbfd in debug mode
+# Check for libbfd in debug mode so that CS_ASSERT() can dump a meaningful
+# traceback in addition to emitting the failed condition.
+#
+# ***WARNING***
+#
+# libbfd caries a GPL license which is incompatible with Crystal Space's LGPL
+# license. We only enable this feature in debug mode as a diagnostic aid during
+# the development cycle. When a project is ready for release, it should be
+# built in optimize mode.
 #------------------------------------------------------------------------------
 AS_IF([test $cs_build_mode = debug],
-    [CS_CHECK_LIB_WITH([bfd],
-	[AC_LANG_PROGRAM([[#include <bfd.h>]], [bfd_init();])],
-	[], [], 
-	[cs_debug_libbfd=yes
-	CS_EMIT_BUILD_RESULT([cs_cv_libbfd], [LIBBFD])
-	CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])], 
-	[cs_debug_libbfd=no], [], [], [-liberty])],
+    [CS_CHECK_LIBBFD([emit], [],
+	[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])
+	cs_debug_libbfd=yes],
+	[cs_debug_libbfd=no])],
     [cs_debug_libbfd=no])
 
 
@@ -2488,28 +2496,6 @@ AC_ARG_ENABLE([make-emulation],
 	addition to `jam' (default YES)])],
     [], [enable_make_emulation=yes])
 AC_MSG_RESULT([$enable_make_emulation])
-
-
-
-#------------------------------------------------------------------------------
-# In case libbfd is used for debugging, emit a message about that fact, and 
-# that libbfd is GPL and the consequences of shipping such a build with libbfd
-# enabled.
-#------------------------------------------------------------------------------
-AS_IF([test $cs_debug_libbfd = yes],
-    [AC_MSG_NOTICE([
-***
-*** This debug build is linked against libbfd, a GPL-licensed library.
-***
-libbfd is used for non-critical development and debugging aids and is thus by 
-default enabled in debug, but not optimize or release builds.
-However, be aware of licensing issues from linking against a GPL library;
-usually, for development work this is not problematic, however, you should not 
-ship this build or any binary statically linked against a CrystalSpace library
-if you are not using a GPL-compatible license.
-To avoid licensing issues, disable the use of libbfd with the "--without-bfd"
-command line switch.
-])])
 
 
 
@@ -2649,3 +2635,24 @@ AS_IF([test $enable_make_emulation = yes],
 # Finalization.
 #------------------------------------------------------------------------------
 AC_OUTPUT
+
+
+
+#------------------------------------------------------------------------------
+# In case libbfd is used for debugging, emit a message notifying developers
+# that libbfd is GPL, along with its inherent consequences.
+#------------------------------------------------------------------------------
+AS_IF([test $cs_debug_libbfd = yes],
+    [AC_MSG_NOTICE([
+***
+*** This debug build is linked against libbfd, a GPL-licensed library.
+***
+libbfd is used for non-critical development and debugging aids and is thus, by
+default, enabled in debug, but not optimize or release builds.  Be aware of
+licensing issues from linking against a GPL library: usually, for development
+work this is not problematic, however, you should not ship this build or any
+binary statically linked against a Crystal Space library if you are not using a
+GPL-compatible license.  If you really must ship a debug build of Crystal Space
+(as opposed to a release build), you can avoid licensing issues by disabling
+use of libbfd with the --without-bfd configure option.
+])])
