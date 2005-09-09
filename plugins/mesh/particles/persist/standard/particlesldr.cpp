@@ -174,6 +174,7 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "Unknown autostart parameter '%s'!", autostart);
+	  return 0;
         }
         break;
       }
@@ -186,6 +187,7 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "Unknown transform mode parameter '%s'!", mode);
+	  return 0;
         }
         break;
       }
@@ -224,11 +226,13 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "You cannot specify callback color method in loader!");
+	  return 0;
         }
         else
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "Unknown color method '%s'!", str);
+	  return 0;
         }
         break;
       }
@@ -238,9 +242,11 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
 	  if (!synldr->ParseMixmode (child, mixmode)) return 0;
 	  state->SetMixMode (mixmode);
 	}
+	break;
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
           child, "Unknown token '%s'!", value);
+        return 0;
     }
   }
 
@@ -251,7 +257,8 @@ bool csParticlesFactoryLoader::ParseEmitter (iDocumentNode *node,
   iParticlesFactoryState *state)
 {
   const char *type = node->GetAttributeValue ("type");
-  if (!type) {
+  if (!type)
+  {
     synldr->ReportError ("crystalspace.particles.factory.loader",
       node, "No type specified for emitter!");
     return false;
@@ -288,6 +295,7 @@ bool csParticlesFactoryLoader::ParseEmitter (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
           child, "Unknown token '%s'!", value);
+        return false;
     }
   }
 
@@ -324,7 +332,8 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
   iParticlesFactoryState *state)
 {
   const char *type = node->GetAttributeValue ("type");
-  if (!type) {
+  if (!type)
+  {
     synldr->ReportError ("crystalspace.particles.factory.loader",
       node, "No type specified for force!");
     return false;
@@ -354,7 +363,7 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "No falloff type specified!");
-          return 0;
+          return false;
         }
         if (!strcmp (str, "constant"))
 	        falloff = CS_PART_FALLOFF_CONSTANT;
@@ -366,6 +375,7 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "Unknown falloff type '%s'!", str);
+	  return false;
         }
         break;
       }
@@ -395,6 +405,7 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "Unknown cone falloff type '%s'!", str);
+	  return false;
         }
         break;
       }
@@ -404,6 +415,7 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
           child, "Unknown token '%s'!", value);
+        return false;
     }
   }
 
@@ -452,12 +464,14 @@ bool csParticlesFactoryLoader::ParseColorConstant (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
           child, "Unknown token '%s'!", value);
+        return false;
     }
   }
   if(!method_set)
   {
-     synldr->ReportError ("crystalspace.particles.factory.loader",
+    synldr->ReportError ("crystalspace.particles.factory.loader",
           node, "No constant color specified!");
+    return false;
   }
   return true;
 }
@@ -485,12 +499,14 @@ bool csParticlesFactoryLoader::ParseColorLinear (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
           child, "Unknown token '%s'!", value);
+        return false;
     }
   }
   if(!method_set)
   {
-     synldr->ReportError ("crystalspace.particles.factory.loader",
+    synldr->ReportError ("crystalspace.particles.factory.loader",
           node, "No gradient specified!");
+    return false;
   }
   return true;
 }
@@ -524,12 +540,14 @@ bool csParticlesFactoryLoader::ParseColorLooping (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
           child, "Unknown token '%s'!", value);
+        return false;
     }
   }
   if(actions != 3)
   {
-     synldr->ReportError ("crystalspace.particles.factory.loader",
+    synldr->ReportError ("crystalspace.particles.factory.loader",
           node, "You must specify a gradient and loop time!");
+    return false;
   }
   return true;
 }
@@ -557,12 +575,14 @@ bool csParticlesFactoryLoader::ParseColorHeat (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
           child, "Unknown token '%s'!", value);
+        return false;
     }
   }
   if(!method_set)
   {
-     synldr->ReportError ("crystalspace.particles.factory.loader",
+    synldr->ReportError ("crystalspace.particles.factory.loader",
           node, "You must specify a base heat (temp)!");
+    return false;
   }
   return true;
 }
@@ -591,6 +611,7 @@ bool csParticlesFactoryLoader::ParseGradient (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
           child, "Unknown token '%s'!", value);
+        return false;
     }
   }
   return true;
@@ -1001,6 +1022,7 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "Unknown transform mode parameter '%s'!", mode);
+	  return 0;
         }
         break;
       }
@@ -1039,11 +1061,13 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "You cannot specify callback color method in loader!");
+	  return 0;
         }
         else
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "Unknown color method '%s'!", str);
+	  return 0;
         }
         break;
       }
@@ -1053,9 +1077,11 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
 	  if (!synldr->ParseMixmode (child, mixmode)) return 0;
 	  state->SetMixMode (mixmode);
 	}
+	break;
       default:
         synldr->ReportError ("crystalspace.particles.object.loader",
           child, "Unknown token '%s'!", value);
+        return 0;
     }
   }
 
@@ -1104,6 +1130,7 @@ bool csParticlesObjectLoader::ParseEmitter (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
           child, "Unknown token '%s'!", value);
+        return false;
     }
   }
 
@@ -1183,6 +1210,7 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
         {
           synldr->ReportError ("crystalspace.particles.object.loader",
             child, "Unknown falloff type '%s'!", str);
+	  return false;
         }
         break;
       }
@@ -1212,6 +1240,7 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
         {
           synldr->ReportError ("crystalspace.particles.object.loader",
             child, "Unknown cone falloff type '%s'!", str);
+	  return false;
         }
         break;
       }
@@ -1221,6 +1250,7 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.object.loader",
           child, "Unknown token '%s'!", value);
+	return false;
     }
   }
 
@@ -1270,12 +1300,14 @@ bool csParticlesObjectLoader::ParseColorConstant (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.object.loader",
           child, "Unknown token '%s'!", value);
+        return false;
     }
   }
   if(!method_set)
   {
-     synldr->ReportError ("crystalspace.particles.object.loader",
+    synldr->ReportError ("crystalspace.particles.object.loader",
           node, "No constant color specified!");
+    return false;
   }
   return true;
 }
@@ -1303,12 +1335,14 @@ bool csParticlesObjectLoader::ParseColorLinear (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.object.loader",
           child, "Unknown token '%s'!", value);
+        return false;
     }
   }
   if(!method_set)
   {
-     synldr->ReportError ("crystalspace.particles.object.loader",
+    synldr->ReportError ("crystalspace.particles.object.loader",
           node, "No gradient specified!");
+    return false;
   }
   return true;
 }
@@ -1342,12 +1376,14 @@ bool csParticlesObjectLoader::ParseColorLooping (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.object.loader",
           child, "Unknown token '%s'!", value);
+        return false;
     }
   }
   if(actions != 3)
   {
      synldr->ReportError ("crystalspace.particles.object.loader",
           node, "You must specify a gradient and loop time!");
+      return false;
   }
   return true;
 }
@@ -1375,12 +1411,14 @@ bool csParticlesObjectLoader::ParseColorHeat (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.object.loader",
           child, "Unknown token '%s'!", value);
+        return false;
     }
   }
   if(!method_set)
   {
-     synldr->ReportError ("crystalspace.particles.object.loader",
+    synldr->ReportError ("crystalspace.particles.object.loader",
           node, "You must specify a base heat (temp)!");
+    return false;
   }
   return true;
 }
@@ -1409,6 +1447,7 @@ bool csParticlesObjectLoader::ParseGradient (iDocumentNode *node,
       default:
         synldr->ReportError ("crystalspace.particles.object.loader",
           child, "Unknown token '%s'!", value);
+        return false;
     }
   }
   return true;
