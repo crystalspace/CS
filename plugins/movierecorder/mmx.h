@@ -356,9 +356,10 @@ mmx_ok(void)
 			      : "X" (imm) )
 
 #define	mmx_m2r(op, mem, reg) \
+        { mmx_t v = mem; /* @@@ GCC4 workaround */  \
 	__asm__ __volatile__ (#op " %0, %%" #reg \
 			      : /* nothing */ \
-			      : "X" (mem))
+			      : "X" (v)); }
 
 #define	mmx_r2m(op, reg, mem) \
 	__asm__ __volatile__ (#op " %%" #reg ", %0" \

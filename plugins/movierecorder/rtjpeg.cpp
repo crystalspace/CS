@@ -766,7 +766,7 @@ void RTjpeg_dctY(uint8 *idata, int16 *odata, int rskip)
     wsptr++;
   }
 #else
-  volatile mmx_t tmp6, tmp7;
+  mmx_t tmp6, tmp7;
   register mmx_t *dataptr = (mmx_t *)odata;
   mmx_t *idata2 = (mmx_t *)idata;
 
