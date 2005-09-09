@@ -6,9 +6,9 @@
 
 namespace aws
 {
-  enum { AWS_BORDER_RECT, AWS_BORDER_ROUND_RECT, AWS_BORDER_MITERED_RECT, AWS_BORDER_CIRCLE };
+  enum { AWS_BORDER_RECT, AWS_BORDER_ROUNDED_RECT, AWS_BORDER_MITERED_RECT, AWS_BORDER_CIRCLE };
 
-  enum { AWS_BORDER_FLAT, AWS_BORDER_RIDGED, AWS_BORDER_SUNKEN, AWS_BORDER_BEVELED }
+  enum { AWS_BORDER_FLAT, AWS_BORDER_RIDGED, AWS_BORDER_SUNKEN, AWS_BORDER_BEVELED };
 
   class border : public frame
   {
@@ -19,8 +19,24 @@ namespace aws
 
     float edge;
 
+  protected:
+    void draw_shape(iPen *pen, bool swap_colors, int inset)
+    {
+      csRect r(Bounds());
+
+      r.Inset(inset);
+
+      switch(border_shape)
+      {
+	case AWS_BORDER_RECT:	    pen->DrawRect(r.xmin, r.ymin, r.xmax, r.ymax, swap_colors); break;
+	case AWS_BORDER_ROUNDED_RECT: pen->DrawRoundedRect(r.xmin, r.ymin, r.xmax, r.ymax, edge, swap_colors); break;
+	case AWS_BORDER_MITERED_RECT: pen->DrawMiteredRect(r.xmin, r.ymin, r.xmax, r.ymax, edge, swap_colors); break;
+	case AWS_BORDER_CIRCLE:	    pen->DrawArc(r.xmin, r.ymin, r.xmax, r.ymax, 0, 2*PI, swap_colors); break;
+      }
+    }
+
   public:
-    border():border_shape(AWS_BORDER_RECT), border_style(AWS_BORDER_PLAIN), edge(0.25) {}
+    border():border_shape(AWS_BORDER_RECT), border_style(AWS_BORDER_FLAT), edge(0.25) {}
 
     virtual ~border() {}
 
@@ -44,26 +60,32 @@ namespace aws
 				 h2 = prefs.getColor(AC_HIGHLIGHT2); s2 = prefs.getColor(AC_SHADOW2); break;
       }
     }
+  
+
 
     /// Draws a border around something
     virtual void OnDraw(iPen *pen)
-    {
-      switch(border_style)
-      {	
-	case AWS_BORDER_RIDGED: 
-	case AWS_BORDER_SUNKEN:  
-	case AWS_BORDER_BEVELED: 
-
-      }
-
-      pen->setColor(black);
-      switch(border_shape)
+    { 
+      if (border_style!=AWS_BORDER_FLAT)
       {
-	case AWS_BORDER_RECT:	    pen->DrawRect(Bounds().x1, Bounds().y1, Bounds().x2, Bounds().y2); break;
-	case AWS_BORDER_ROUND_RECT: pen->DrawRoundRect(Bounds().x1, Bounds().y1, Bounds().x2, Bounds().y2, edge); break;
-	case AWS_BORDER_MITER_RECT: pen->DrawMiteredRect(Bounds().x1, Bounds().y1, Bounds().x2, Bounds().y2, edge); break;
-	case AWS_BORDER_CIRCLE:	    pen->DrawArc(Bounds().x1, Bounds().y1, Bounds().x2, Bounds().y2); break;
+	pen->SetColor(s1);
+	pen->SwapColors();
+	pen->SetColor(h1);
+
+	draw_shape(pen, true, 1);
       }
+
+      if (border_style==AWS_BORDER_BEVELED)
+      {
+	pen->SetColor(s2);
+	pen->SwapColors();
+	pen->SetColor(h2);
+
+	draw_shape(pen, true, 2);
+      }
+
+      pen->SetColor(black);
+      draw_shape(pen, false, 0);
     }
   };
 

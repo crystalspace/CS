@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "manager.h"
 #include "frame.h"
+#include "border.h"
 
 #include "csutil/csevent.h"
 #include "iengine/engine.h"
