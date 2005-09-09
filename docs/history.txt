@@ -22,6 +22,13 @@ chronological order.
 	  to toggle keyboard/movement between the two views.
 	- Jorrit fixed the explosion particles in walktest so that they
 	  are visible again.
+	- res fixed consoletest to use CS_IMPLEMENT_APPLICATION instead of
+	  CS_IMPLEMENT_PLATFORM_APPLICATION(which is really just a subset of
+	  what CS_IMPLEMENT_APPLICATION does).
+	- res updated include/csutil/win32/.cvsignore.
+	- res removed th BFD external lib addition from 
+	  libs/csutil/win32/Jamfile (since the Win32 part does not really
+	  use bfd directly itself).
 8-Sep-2005
 	- res added a libbfd test to configure. bfd is used for some
 	  development and debugging aids. Since bfd is GPLed, which can be

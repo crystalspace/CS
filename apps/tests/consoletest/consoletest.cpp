@@ -24,7 +24,7 @@
 
 #include "teststrings.h"
 
-CS_IMPLEMENT_PLATFORM_APPLICATION
+CS_IMPLEMENT_APPLICATION
 
 /* The csUnicodeTransform::MapToSomething are somewhat spammy, so they are
  * disabled by default. Uncomment to enable. */

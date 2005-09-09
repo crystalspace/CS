@@ -1,6 +1,7 @@
 AL
 caca.h
 cal3d
+CEGUI*.*
 Cg
 d3d.h
 d3dcaps.h
@@ -8,6 +9,8 @@ d3dtypes.h
 ddraw.h
 dinput.h
 dsound.h
+elements
+falagard
 freetype
 ft2build.h
 iconv.h
