@@ -33,6 +33,13 @@ struct iGraphics3D;
 
 enum CS_PEN_TEXT_ALIGN { CS_PEN_TA_TOP, CS_PEN_TA_BOT, CS_PEN_TA_LEFT, CS_PEN_TA_RIGHT, CS_PEN_TA_CENTER };
 
+/** The pen color is used to pass colors to the pen, around the application more easily. */
+struct csPenColor
+{
+  /** The components of the color. */ 
+  float r, g, b, a;
+};
+
 /** 
  * A pen is used to draw vector shapes. 
  */
@@ -42,6 +49,16 @@ struct iPen
    * Sets the current color. 
    */
   virtual void SetColor (float r, float g, float b, float a) = 0;
+
+  /** 
+   * Sets the current color. 
+   */
+  virtual void SetColor(const csPenColor &color) = 0;
+
+  /**
+   * Swaps the current color and the alternate color. 
+   */
+  virtual void SwapColors()=0;
 
   /**    
    * Clears the current transform, resets to identity.
@@ -86,21 +103,21 @@ struct iPen
   /** 
    * Draws a rectangle. 
    */
-  virtual void DrawRect (uint x1, uint y1, uint x2, uint y2, bool fill = false) = 0;
+  virtual void DrawRect (uint x1, uint y1, uint x2, uint y2, bool swap_colors = false, bool fill = false) = 0;
   
   /** 
    * Draws a mitered rectangle. The miter value should be between 0.0 and 1.0, 
    * and determines how much of the corner is mitered off and beveled. 
    */
   virtual void DrawMiteredRect (uint x1, uint y1, uint x2, uint y2, 
-    float miter, bool fill = false) = 0;
+    float miter, bool swap_colors = false, bool fill = false) = 0;
 
   /** 
    * Draws a rounded rectangle. The roundness value should be between 0.0 and 1.0, 
    * and determines how much of the corner is rounded off. 
    */
   virtual void DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
-    float roundness, bool fill = false) = 0; 
+    float roundness, bool swap_colors = false, bool fill = false) = 0; 
 
   /** 
    * Draws an elliptical arc from start angle to end angle.  Angle must be specified in radians.
@@ -108,7 +125,7 @@ struct iPen
    * a square.  If you want a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
    * angle.
    */
-  virtual void DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool fill=false) = 0;
+  virtual void DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool swap_colors = false, bool fill=false) = 0;
 
   /**
    * Writes text in the given font at the given location.
@@ -143,6 +160,9 @@ class csPen : public iPen
 
   /** The color we use. */
   csVector4 color;
+
+  /** The alternate color we might use. */
+  csVector4 alt_color;
 
   /** The translation we keep for text. */
   csVector3 tt;
@@ -182,6 +202,16 @@ public:
    * Sets the current color. 
    */
   virtual void SetColor (float r, float g, float b, float a);
+
+  /** 
+   * Sets the current color. 
+   */
+  virtual void SetColor(const csPenColor &color);  
+
+  /**
+   * Swaps the current color and the alternate color. 
+   */
+  virtual void SwapColors();
 
   /**    
    * Clears the current transform, resets to identity.
@@ -226,21 +256,21 @@ public:
   /** 
    * Draws a rectangle. 
    */
-  virtual void DrawRect (uint x1, uint y1, uint x2, uint y2, bool fill = false);
+  virtual void DrawRect (uint x1, uint y1, uint x2, uint y2, bool swap_colors = false, bool fill = false);
 
   /** 
    * Draws a mitered rectangle. The miter value should be between 0.0 and 1.0, 
    * and determines how much of the corner is mitered off and beveled. 
    */
   virtual void DrawMiteredRect (uint x1, uint y1, uint x2, uint y2, 
-    float miter, bool fill = false);
+    float miter, bool swap_colors = false, bool fill = false);
 
   /** 
    * Draws a rounded rectangle. The roundness value should be between 0.0 and 1.0, 
    * and determines how much of the corner is rounded off. 
    */
   virtual void DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
-    float roundness, bool fill = false);
+    float roundness, bool swap_colors = false, bool fill = false);
 
   /** 
    * Draws an elliptical arc from start angle to end angle.  Angle must be specified in radians.
@@ -248,7 +278,8 @@ public:
    * a square.  If you want a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
    * angle.
    */
-  virtual void DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool fill=false);
+  virtual void DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle=0, float end_angle=6.2831853, 
+    bool swap_colors = false, bool fill=false);
 
   /**
    * Writes text in the given font at the given location.

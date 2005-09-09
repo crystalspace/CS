@@ -73,6 +73,23 @@ void csPen::SetColor (float r, float g, float b, float a)
   color.w=a;
 }
 
+void csPen::SetColor(const csPenColor &c)
+{
+  color.x=c.r;
+  color.y=c.g;
+  color.z=c.b;
+  color.w=c.a;
+}
+
+void csPen::SwapColors()
+{
+  csVector4 tmp;
+
+  tmp=color;
+  color=alt_color;
+  alt_color=tmp;
+}
+
 void csPen::ClearTransform()
 {
   mesh.object2world.Identity();
@@ -138,16 +155,23 @@ void csPen::DrawPoint (uint x1, uint y1)
 }
 
 /** Draws a rectangle. */
-void csPen::DrawRect (uint x1, uint y1, uint x2, uint y2, bool fill)
+void csPen::DrawRect (uint x1, uint y1, uint x2, uint y2, bool swap_colors, bool fill)
 {
   Start ();
 
   AddVertex (x1, y1);
   AddVertex (x2, y1);
+
+  if (swap_colors) SwapColors();
+
   AddVertex (x2, y2);
   AddVertex (x1, y2);
 
+  if (swap_colors) SwapColors();
+
   if (!fill) AddVertex (x1, y1);
+
+  
 
   SetupMesh ();
   DrawMesh (fill ? CS_MESHTYPE_QUADS : CS_MESHTYPE_LINESTRIP);
@@ -156,7 +180,7 @@ void csPen::DrawRect (uint x1, uint y1, uint x2, uint y2, bool fill)
 /** Draws a mitered rectangle. The miter value should be between 0.0 and 1.0, and determines how
 * much of the corner is mitered off and beveled. */    
 void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2, 
-                             float miter, bool fill)
+                             float miter, bool swap_colors, bool fill)
 {
   if (miter == 0.0f) 
   { 
@@ -182,11 +206,15 @@ void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
   AddVertex (x1+x_miter, y1);
   AddVertex (x2-x_miter, y1);  
   AddVertex (x2, y1+y_miter);
+
+  if (swap_colors) SwapColors();
+
   AddVertex (x2, y2-y_miter);
   AddVertex (x2-x_miter, y2);
   AddVertex (x1+x_miter, y2);
   AddVertex (x1, y2-y_miter);
 
+  if (swap_colors) SwapColors();
 
   SetupMesh ();
   DrawMesh (fill ? CS_MESHTYPE_TRIANGLEFAN: CS_MESHTYPE_LINESTRIP);
@@ -195,7 +223,7 @@ void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
 /** Draws a rounded rectangle. The roundness value should be between 0.0 and 1.0, and determines how
   * much of the corner is rounded off. */
 void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
-                             float roundness, bool fill)
+                             float roundness, bool swap_colors, bool fill)
 {
   if (roundness == 0.0f) 
   { 
@@ -235,6 +263,8 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
   
   AddVertex (x1+x_round, y1);
   AddVertex (x2-x_round, y1);
+
+  if (swap_colors) SwapColors();
   
   for(angle=HALF_PI; angle>0; angle-=delta)
   {
@@ -250,7 +280,9 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
   }
   
   AddVertex (x2-x_round, y2);
-  AddVertex (x1+x_round, y2);				
+  AddVertex (x1+x_round, y2);		
+
+  if (swap_colors) SwapColors();
 
   SetupMesh ();
   DrawMesh (fill ? CS_MESHTYPE_TRIANGLEFAN : CS_MESHTYPE_LINESTRIP);
@@ -262,7 +294,7 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
    * a square.  If you want a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
    * angle.
    */
-void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool fill)
+void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool swap_colors, bool fill)
 {
   float width = x2-x1;
   float height = y2-y1;
