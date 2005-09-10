@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Sep-2005
+	- Philip Wyett fixed some returns in non-void functions.
 9-Sep-2005
 	- Jorrit fixed a missing 'break' in the particles loader. This caused
 	  using 'mixmode' to give an error even though it worked fine.

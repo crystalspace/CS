@@ -300,8 +300,7 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
     else
       return false;
   }
-  else
-    return false;
+  return false;
 }
 
 int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
@@ -379,8 +378,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMesh (
     else
       return -1;
   }
-  else
-    return -1;
+  return -1;
 }
 
 int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
