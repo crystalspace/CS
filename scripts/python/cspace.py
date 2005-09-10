@@ -12509,6 +12509,7 @@ class csColliderActor(_object):
     def SetCollideSystem(*args): return _cspace.csColliderActor_SetCollideSystem(*args)
     def SetEngine(*args): return _cspace.csColliderActor_SetEngine(*args)
     def InitializeColliders(*args): return _cspace.csColliderActor_InitializeColliders(*args)
+    def SetCamera(*args): return _cspace.csColliderActor_SetCamera(*args)
     def SetGravity(*args): return _cspace.csColliderActor_SetGravity(*args)
     def GetGravity(*args): return _cspace.csColliderActor_GetGravity(*args)
     def IsOnGround(*args): return _cspace.csColliderActor_IsOnGround(*args)
