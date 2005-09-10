@@ -10,6 +10,8 @@ chronological order.
 	- Philip Wyett fixed some returns in non-void functions.
 	- res added file+line numbers for MinGW call stacks.
 	- res moved the custom assert into its own source file.
+	- Philip Wyett added some experimental gcc 3 and 4 mmx compilation
+	   problems fixes for the movierecorder plugin.
 9-Sep-2005
 	- Jorrit fixed a missing 'break' in the particles loader. This caused
 	  using 'mixmode' to give an error even though it worked fine.

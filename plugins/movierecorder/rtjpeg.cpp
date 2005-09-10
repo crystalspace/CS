@@ -766,7 +766,7 @@ void RTjpeg_dctY(uint8 *idata, int16 *odata, int rskip)
     wsptr++;
   }
 #else
-  mmx_t tmp6, tmp7;
+  volatile mmx_t tmp6, tmp7;
   register mmx_t *dataptr = (mmx_t *)odata;
   mmx_t *idata2 = (mmx_t *)idata;
 
@@ -1558,7 +1558,7 @@ void RTjpeg_dctY(uint8 *idata, int16 *odata, int rskip)
 	paddw_r2r(mm4, mm3);						// y5
 
    movq_r2m(mm5, *(dataptr+7)); 			//save y3
-	psubw_r2r(mm2, mm0);						// yè=z11 - z4
+	psubw_r2r(mm2, mm0);						// yÃ¨=z11 - z4
 
    movq_r2m(mm3, *(dataptr+11)); 		//save y5
 
@@ -3824,4 +3824,3 @@ void RTjpeg_yuvrgb8(uint8 *buf, uint8 *rgb, int stride)
  //bcopy(buf, rgb, RTjpeg_width*RTjpeg_height);
   memcpy (rgb, buf, RTjpeg_width*RTjpeg_height);
 }
-
