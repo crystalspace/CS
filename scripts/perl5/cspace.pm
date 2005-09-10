@@ -13802,6 +13802,7 @@ sub new {
 *SetCollideSystem = *cspacec::csColliderActor_SetCollideSystem;
 *SetEngine = *cspacec::csColliderActor_SetEngine;
 *InitializeColliders = *cspacec::csColliderActor_InitializeColliders;
+*SetCamera = *cspacec::csColliderActor_SetCamera;
 *SetGravity = *cspacec::csColliderActor_SetGravity;
 *GetGravity = *cspacec::csColliderActor_GetGravity;
 *IsOnGround = *cspacec::csColliderActor_IsOnGround;
