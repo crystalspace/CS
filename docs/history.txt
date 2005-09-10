@@ -8,6 +8,8 @@ chronological order.
 
 10-Sep-2005
 	- Philip Wyett fixed some returns in non-void functions.
+	- res added file+line numbers for MinGW call stacks.
+	- res moved the custom assert into its own source file.
 9-Sep-2005
 	- Jorrit fixed a missing 'break' in the particles loader. This caused
 	  using 'mixmode' to give an error even though it worked fine.

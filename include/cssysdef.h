@@ -618,8 +618,6 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #endif
 
 #ifdef CS_DEBUG
-extern void csDumpCallStack ();
-
 #  if !defined (CS_DEBUG_BREAK)
 #    if defined (CS_PLATFORM_WIN32)
 #      define CS_DEBUG_BREAK ::DebugBreak()
@@ -633,28 +631,20 @@ extern void csDumpCallStack ();
 #      define CS_DEBUG_BREAK { static int x = 0; x /= x; }
 #    endif
 #  endif
-#  if !defined (CS_ASSERT)
-#    if defined (CS_COMPILER_MSVC)
-#      define CS_ASSERT(x) \
-         if (!(x)) \
-         { \
-	   csDumpCallStack (); \
-	   assert(x); \
-         }
-#    else
-#      include <stdio.h>
-#      define CS_ASSERT(x) \
-         if (!(x)) \
-         { \
-           fprintf (stderr, __FILE__ ":%d: failed assertion '%s'\n", \
-             int(__LINE__), #x); \
-	   csDumpCallStack (); \
-           CS_DEBUG_BREAK; \
-         }
-#    endif
-#  endif
 #  if !defined (CS_ASSERT_MSG)
-#      define CS_ASSERT_MSG(msg,x) CS_ASSERT(((msg) && (x)))
+    namespace CrystalSpace
+    {
+      namespace Debug
+      {
+	extern void AssertMessage (const char* expr, const char* filename, 
+	  int line, const char* msg = 0);
+      } // namespace Debug
+    } // namespace CrystalSpace
+#   define CS_ASSERT_MSG(msg,x) 					\
+      if (!(x)) CrystalSpace::Debug::AssertMessage (#x, __FILE__, __LINE__, msg);
+#  endif
+#  if !defined (CS_ASSERT)
+#    define CS_ASSERT(x)	CS_ASSERT_MSG(0, x)
 #  endif
 #else
 #  undef  CS_DEBUG_BREAK
@@ -665,6 +655,16 @@ extern void csDumpCallStack ();
 #  define CS_ASSERT_MSG(m,x)
 #endif
 
+/**\def CS_ASSERT(expr)
+ * Assertion. If \a expr is false, a message containing the failing expression
+ * as well as c call stack is printed and program execution breaks.
+ * \remarks Breaking execution can be avoided at runtime setting the 
+ *   environment variable "CS_ASSERT_IGNORE" to a value other than 0.
+ */
+/**\def CS_ASSERT_MSG(msg, expr)
+ * Like #CS_ASSERT(expr), additionally prints \a msg.
+ */
+    
 /**\def CS_DEPRECATED_METHOD
  * Use the CS_DEPRECATED_METHOD macro in front of method declarations to
  * indicate that they are deprecated. Example:

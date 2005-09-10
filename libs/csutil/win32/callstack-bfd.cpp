@@ -120,8 +120,23 @@ namespace CrystalSpace
     {
     }
     
-    bool CallStackNameResolverBfd::GetLineNumber (void*, csString&)
+    bool CallStackNameResolverBfd::GetLineNumber (void* addr, csString& str)
     {
+      BfdSymbols* bfd = BfdForAddress (addr);
+      if (!bfd) return false;
+	
+      const char* filename;
+      const char* function;
+      uint line;
+      
+      if (bfd->FindSymbol ((uintptr_t)addr, filename, function, line))
+      {
+	if (!function) return false;
+	str.Format ("%s", filename);
+	if (line > 0) str << ':' << line;
+	return true;
+      }
+      
       return false;
     }
 
