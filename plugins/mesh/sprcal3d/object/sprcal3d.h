@@ -698,7 +698,7 @@ private:
     csRef<iRenderBuffer> vertex_buffer;
     uint vertexVersion;
 
-    Mesh() : vertexVersion(~0) {}
+    Mesh() : vertexVersion((uint)~0) {}
   };
   csArray<Mesh> meshes;
   csArray<csRenderMesh> renderMeshTemplates;
