@@ -68,20 +68,25 @@ AC_PREREQ([2.56])
 #	test on Windows.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_META_INFO_EMBED],
-    [_CS_META_INFO_EMBED_ENABLE([$1], [$2])
+    [AC_REQUIRE([AC_CANONICAL_HOST])
+    _CS_META_INFO_EMBED_ENABLE([$1], [$2])
     AS_IF([test $enable_meta_info_embedding = yes],
         [_CS_META_INFO_EMBED_TOOLS([$1])
         AS_IF([test $cs_header_elf_h = yes],
 	    [CS_EMIT_BUILD_PROPERTY([ELF.AVAILABLE], [yes], [], [],
 		CS_EMITTER_OPTIONAL([$1]))],
-            [CS_CHECK_LIBBFD([$1],
-		[CS_EMIT_BUILD_PROPERTY([EMBED_META.CFLAGS],
-		    [$cs_cv_libbfd_ok_cflags], [+], [],
-		    CS_EMITTER_OPTIONAL([$1]))
-		CS_EMIT_BUILD_PROPERTY([EMBED_META.LFLAGS],
-		    [$cs_cv_libbfd_ok_lflags $cs_cv_libbfd_ok_libs],[+], [],
-		    CS_EMITTER_OPTIONAL([$1]))])])],
-	[cs_embed_meta_info=no])])
+            [case $host_os in
+	        mingw*|cygwin*) ;;
+		*)
+		    CS_CHECK_LIBBFD([$1],
+			[CS_EMIT_BUILD_PROPERTY([EMBED_META.CFLAGS],
+			    [$cs_cv_libbfd_ok_cflags], [+], [],
+			    CS_EMITTER_OPTIONAL([$1]))
+			CS_EMIT_BUILD_PROPERTY([EMBED_META.LFLAGS],
+			    [$cs_cv_libbfd_ok_lflags $cs_cv_libbfd_ok_libs],
+			    [+], [], CS_EMITTER_OPTIONAL([$1]))])
+		    ;;
+	    esac])])])
 
 
 #------------------------------------------------------------------------------

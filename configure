@@ -62765,6 +62765,7 @@ fi
 #------------------------------------------------------------------------------
 
 
+
 for ac_header in elf.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
@@ -63164,6 +63165,9 @@ fi
 fi
 
 else
+  case $host_os in
+	        mingw*|cygwin*) ;;
+		*)
 
 # Check whether --with-bfd or --without-bfd was given.
 if test "${with_bfd+set}" = set; then
@@ -64277,7 +64281,7 @@ fi
 "
 fi
 
-		cs_build_prop_val="$cs_cv_libbfd_ok_lflags $cs_cv_libbfd_ok_libs"
+			cs_build_prop_val="$cs_cv_libbfd_ok_lflags $cs_cv_libbfd_ok_libs"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}EMBED_META.LFLAGS += \"$cs_build_prop_val\" ;
@@ -64286,10 +64290,10 @@ fi
 
 fi
 
+		    ;;
+	    esac
 fi
 
-else
-  cs_embed_meta_info=no
 fi
 
 if test $enable_meta_info_embedding = yes; then
