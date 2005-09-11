@@ -63,8 +63,11 @@ struct iDynamics : public iBase
   /// Create a rigid body and add it to the simulation
   virtual csPtr<iDynamicSystem> CreateSystem () = 0;
 
-  /// Create a rigid body and add it to the simulation
+  /// Remove dynamic system from the simulation
   virtual void RemoveSystem (iDynamicSystem* system) = 0;
+
+  /// Remove all dynamic systems from the simulation
+  virtual void RemoveSystems () = 0;
 
   /// Finds a system by name
   virtual iDynamicSystem* FindSystem (const char *name) = 0;

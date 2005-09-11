@@ -224,7 +224,10 @@ void csODEDynamics::RemoveSystem (iDynamicSystem* system)
 {
   systems.Delete (system);
 }
-
+void csODEDynamics::RemoveSystems ()
+{
+  systems.DeleteAll ();
+}
 iDynamicSystem *csODEDynamics::FindSystem (const char *name)
 {
   return systems.FindByName (name);
@@ -241,12 +244,12 @@ void csODEDynamics::Step (float elapsed_time)
   }
   if (rateenabled)
   {
-        stepsize = steptime;
-        if (elapsed_time > limittime) elapsed_time = limittime;
+    stepsize = steptime;
+    if (elapsed_time > limittime) elapsed_time = limittime;
   }
   else
   {
-        stepsize = elapsed_time;
+    stepsize = elapsed_time;
   }
   total_elapsed += elapsed_time;
 
@@ -330,7 +333,7 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
 
       contact[i].surface.mode = dContactBounce | dContactSoftCFM
         | dContactSlip1 | dContactSlip2 | dContactApprox1;
-      contact[i].surface.mu = f1[0]*f1[0];
+      contact[i].surface.mu = f1[0]*f2[0];
       contact[i].surface.bounce = f1[1]*f2[1];
       contact[i].surface.bounce_vel = 0.1f;
       contact[i].surface.slip1 = SMALL_EPSILON;

@@ -136,6 +136,7 @@ public:
   virtual csPtr<iDynamicSystem> CreateSystem ();
   virtual void RemoveSystem (iDynamicSystem* system);
   virtual iDynamicSystem* FindSystem (const char *name);
+  virtual void RemoveSystems ();
 
   virtual void Step (float stepsize);
 
