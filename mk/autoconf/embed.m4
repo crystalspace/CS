@@ -42,6 +42,7 @@ AC_PREREQ([2.56])
 #	LIBBFD.AVAILABLE := yes or no
 #	LIBBFD.CFLAGS := libbfd compiler flags
 #	LIBBFD.LFLAGS := libbfd linker flags
+#	ELF.AVAILABLE := yes or no
 #
 #	In general, clients need only concern themselves with the various
 #	EMBED_META-related variables. For building plugin modules, utilize
@@ -70,7 +71,9 @@ AC_DEFUN([CS_META_INFO_EMBED],
     [_CS_META_INFO_EMBED_ENABLE([$1], [$2])
     AS_IF([test $enable_meta_info_embedding = yes],
         [_CS_META_INFO_EMBED_TOOLS([$1])
-        AS_IF([test $cs_header_elf_h != yes],
+        AS_IF([test $cs_header_elf_h = yes],
+	    [CS_EMIT_BUILD_PROPERTY([ELF.AVAILABLE], [yes], [], [],
+		CS_EMITTER_OPTIONAL([$1]))],
             [CS_CHECK_LIBBFD([$1], [mingw*|cygwin*],
 		[CS_EMIT_BUILD_PROPERTY([EMBED_META.CFLAGS],
 		    [$cs_cv_libbfd_ok_cflags], [+], [],

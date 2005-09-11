@@ -63155,7 +63155,15 @@ fi
 
 fi
 
-        if test $cs_header_elf_h != yes; then
+        if test $cs_header_elf_h = yes; then
+  cs_build_prop_val="yes"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ELF.AVAILABLE ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+else
 
     case $host_os in
 	mingw*|cygwin*) cs_check_libbfd=no ;;

@@ -4,16 +4,19 @@ SubDir TOP libs csutil unix ;
   local rejects ;
   if $(EMBED_META) != "yes"
   {
-    rejects += embedplugins.cpp ;
+    rejects += embedplugins.cpp elfplugins.cpp bfdplugins.cpp ;
     CSUTIL.GENERIC += scanplugins.cpp ;
   }
-  if $(LIBBFD.AVAILABLE) != "yes"
+  else
   {
-    rejects += bfdplugins.cpp ;
-  }
-  if $(ELF_H.AVAILABLE) != "yes"
-  {
-    rejects += elfplugins.cpp ;
+    if $(ELF.AVAILABLE) = "yes"
+    {
+      rejects += bfdplugins.cpp ;
+    }
+    else if $(LIBBFD.AVAILABLE) = "yes"
+    {
+      rejects += elfplugins.cpp ;
+    }
   }
   CsLibAddModule $(rejects) ;
 }
