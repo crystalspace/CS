@@ -655,14 +655,19 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  define CS_ASSERT_MSG(m,x)
 #endif
 
+/**\def CS_DEBUG_BREAK
+ * Stops program execution and break into debugger, if present - otherwise,
+ * probably just throws an exception/signal (ie crashes).
+ */
 /**\def CS_ASSERT(expr)
  * Assertion. If \a expr is false, a message containing the failing expression
- * as well as c call stack is printed and program execution breaks.
- * \remarks Breaking execution can be avoided at runtime setting the 
- *   environment variable "CS_ASSERT_IGNORE" to a value other than 0.
+ * as well as a call stack is printed to <tt>stderr</tt> and a debug break is
+ * performed
+ * \remarks Breaking execution can be avoided at runtime by setting the 
+ *   environment variable "<tt>CS_ASSERT_IGNORE</tt>" to a value other than 0.
  */
 /**\def CS_ASSERT_MSG(msg, expr)
- * Like #CS_ASSERT(expr), additionally prints \a msg.
+ * Same as #CS_ASSERT(expr), but additionally prints \a msg to <tt>stderr</tt>.
  */
     
 /**\def CS_DEPRECATED_METHOD
