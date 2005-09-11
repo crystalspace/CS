@@ -19,7 +19,9 @@ chronological order.
 	  results.  This fixes problem where libbfd was not considered usable
 	  on Windows for backtraces.
 	- Vincent Knecht fixed csbench so that shader snippets inclusions
-	  work. 
+	  work.
+	- Vincent Knecht corrected filename extension for python module in
+	  python.txi.
 10-Sep-2005
 	- Philip Wyett fixed some returns in non-void functions.
 	- res added file+line numbers for MinGW call stacks.

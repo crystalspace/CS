@@ -21,8 +21,8 @@ appropriate Crystal Space resources. Follow these instructions:
 
 @enumerate
 @item
-Tell Python where to find @file{cspace.pm} by setting your @samp{PYTHONPATH}
-environment variable to mention the directory where @file{cspace.pm}
+Tell Python where to find @file{cspace.py} by setting your @samp{PYTHONPATH}
+environment variable to mention the directory where @file{cspace.py}
 resides. If you installed Crystal Space, then it will reside at:
 
 @noindent
@@ -30,7 +30,7 @@ resides. If you installed Crystal Space, then it will reside at:
 
 @noindent
 where $@{prefix@} is the installation path (typically, @file{/usr/local}). If
-you did not install Crystal space, then @file{cspace.pm} will be in the
+you did not install Crystal space, then @file{cspace.py} will be in the
 top-level build directory (this will be the @file{CS} directory if you
 configured and built in the @file{CS} directory).
 
