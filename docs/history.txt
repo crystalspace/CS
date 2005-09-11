@@ -14,6 +14,10 @@ chronological order.
 	  traceback-related libbfd check on Windows since it is only need on
 	  that platform for tracebacks. (On Linux, the backtrace() function is
 	  used instead.)
+	- Eric Sunshine fixed problem where results of multiple invocations of
+	  CS_CHECK_LIBBFD() with different contexts could have undefined
+	  results.  This fixes problem where libbfd was not considered usable
+	  on Windows for backtraces.
 10-Sep-2005
 	- Philip Wyett fixed some returns in non-void functions.
 	- res added file+line numbers for MinGW call stacks.

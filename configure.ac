@@ -2418,7 +2418,7 @@ CS_EMIT_BUILD_PROPERTY([MODE], [$cs_build_mode])
 AS_IF([test $cs_build_mode = debug],
     [case $host_os in
 	mingw*|cygwin*)
-	    CS_CHECK_LIBBFD([emit], [],
+	    CS_CHECK_LIBBFD([emit],
 		[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])
 		cs_debug_libbfd=yes],
 		[cs_debug_libbfd=no])

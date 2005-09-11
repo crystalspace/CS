@@ -63165,13 +63165,6 @@ fi
 
 else
 
-    case $host_os in
-	mingw*|cygwin*) cs_check_libbfd=no ;;
-	*) cs_check_libbfd=yes ;;
-    esac
-
-    if test $cs_check_libbfd = yes; then
-
 # Check whether --with-bfd or --without-bfd was given.
 if test "${with_bfd+set}" = set; then
   withval="$with_bfd"
@@ -63913,10 +63906,6 @@ fi
 
 
     cs_cv_with_bfd="$with_bfd"
-
-else
-  cs_cv_libbfd=no
-fi
 
 
     if test $cs_cv_libbfd = yes; then
@@ -64605,13 +64594,6 @@ if test $cs_build_mode = debug; then
   case $host_os in
 	mingw*|cygwin*)
 
-    case $host_os in
-
-	*) cs_check_libbfd=yes ;;
-    esac
-
-    if test $cs_check_libbfd = yes; then
-
 # Check whether --with-bfd or --without-bfd was given.
 if test "${with_bfd+set}" = set; then
   withval="$with_bfd"
@@ -65353,10 +65335,6 @@ fi
 
 
     cs_cv_with_bfd="$with_bfd"
-
-else
-  cs_cv_libbfd=no
-fi
 
 
     if test $cs_cv_libbfd = yes; then

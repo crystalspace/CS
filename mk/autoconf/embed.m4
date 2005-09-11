@@ -74,7 +74,7 @@ AC_DEFUN([CS_META_INFO_EMBED],
         AS_IF([test $cs_header_elf_h = yes],
 	    [CS_EMIT_BUILD_PROPERTY([ELF.AVAILABLE], [yes], [], [],
 		CS_EMITTER_OPTIONAL([$1]))],
-            [CS_CHECK_LIBBFD([$1], [mingw*|cygwin*],
+            [CS_CHECK_LIBBFD([$1],
 		[CS_EMIT_BUILD_PROPERTY([EMBED_META.CFLAGS],
 		    [$cs_cv_libbfd_ok_cflags], [+], [],
 		    CS_EMITTER_OPTIONAL([$1]))
@@ -147,22 +147,18 @@ AC_DEFUN([_CS_META_INFO_EMBED_TOOLS],
 
 
 #------------------------------------------------------------------------------
-# CS_CHECK_LIBBFD([EMITTER], [REJECTS], [ACTION-IF-FOUND],
-#                 [ACTION-IF-NOT-FOUND])
+# CS_CHECK_LIBBFD([EMITTER], [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #	Exhaustive check for a usable GPL-licensed libbfd, the Binary File
 #	Descriptor library, a component of binutils, which allows low-level
 #	manipulation of executable and object files.  If EMITTER is provided,
 #	then the following variables are recorded by invoking
-#	CS_EMIT_BUILD_PROPERTY() with EMITTER.
+#	CS_EMIT_BUILD_PROPERTY() with EMITTER.  As a convenience, if EMITTER is
+#	the literal value "emit" or "yes", then CS_EMIT_BUILD_RESULT()'s
+#	default emitter will be used.
 #
 #	LIBBFD.AVAILABLE := yes or no
 #	LIBBFD.CFLAGS := libbfd compiler flags
 #	LIBBFD.LFLAGS := libbfd linker flags
-#
-#	As a convenience, if EMITTER is the literal value "emit" or "yes", then
-#	CS_EMIT_BUILD_RESULT()'s default emitter will be used. If REJECTS is
-#	provided, it is a shell `case'-style expression indicating platforms
-#	for which the libbfd test should not be run. Example: `mingw*|cygwin*'
 #
 #	The shell variable cs_cv_libbfd_ok is set to yes if a usable libbfd was
 #	discovered, else no. If found, the additional shell variables
@@ -190,17 +186,9 @@ AC_DEFUN([_CS_META_INFO_EMBED_TOOLS],
 #	effort to resolve this unfortunate issue.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_LIBBFD],
-    [AC_REQUIRE([AC_CANONICAL_HOST])
-    case $host_os in
-	m4_ifval([$2],[$2) cs_check_libbfd=no ;;])
-	*) cs_check_libbfd=yes ;;
-    esac
-
-    AS_IF([test $cs_check_libbfd = yes],
-	[CS_CHECK_LIB_WITH([bfd],
-	    [AC_LANG_PROGRAM([[#include <bfd.h>]], [bfd_init();])],
-	    [], [], [], [], [], [], [-liberty])],
-	[cs_cv_libbfd=no])
+    [CS_CHECK_LIB_WITH([bfd],
+	[AC_LANG_PROGRAM([[#include <bfd.h>]], [bfd_init();])],
+	[], [], [], [], [], [], [-liberty])
 
     AS_IF([test $cs_cv_libbfd = yes],
 	[CS_CHECK_BUILD([if libbfd is usable], [cs_cv_libbfd_ok],
@@ -224,5 +212,5 @@ AC_DEFUN([CS_CHECK_LIBBFD],
     AS_IF([test $cs_cv_libbfd_ok = yes],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libbfd_ok], [LIBBFD],
 	    CS_EMITTER_OPTIONAL([$1]))
-	$3],
-	[$4])])
+	$2],
+	[$3])])
