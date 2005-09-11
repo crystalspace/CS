@@ -949,8 +949,6 @@ struct iMeshList : public iBase
   virtual iMeshWrapper *FindByName (const char *Name) const = 0;
 };
 
-SCF_VERSION (iMeshFactoryList, 0, 0, 1);
-
 /**
  * A list of mesh factories.
  * <p>
@@ -964,8 +962,9 @@ SCF_VERSION (iMeshFactoryList, 0, 0, 1);
  *   <li>iEngine
  *   </ul>
  */
-struct iMeshFactoryList : public iBase
+struct iMeshFactoryList : public virtual iBase
 {
+  SCF_INTERFACE(iMeshFactoryList,2,0,0);
   /// Return the number of mesh factory wrappers in this list.
   virtual int GetCount () const = 0;
 
@@ -991,8 +990,6 @@ struct iMeshFactoryList : public iBase
   virtual iMeshFactoryWrapper *FindByName (const char *Name) const = 0;
 };
 
-SCF_VERSION (iMeshWrapperIterator, 0, 1, 0);
-
 /**
  * This is an iterator mesh wrappers.
  * <p>
@@ -1002,8 +999,9 @@ SCF_VERSION (iMeshWrapperIterator, 0, 1, 0);
  *   <li>iEngine::GetVisibleMeshes()
  *   </ul>
  */
-struct iMeshWrapperIterator : public iBase
+struct iMeshWrapperIterator : public virtual iBase
 {
+  SCF_INTERFACE(iMeshWrapperIterator,2,0,0);
   /// Move forward.
   virtual iMeshWrapper* Next () = 0;
 

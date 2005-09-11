@@ -21,8 +21,8 @@
 #define __CS_HALO_H__
 
 #include "csgeom/math3d.h"
-#include "ivideo/halo.h"
 #include "iengine/halo.h"
+#include "ivideo/halo.h"
 
 class csLight;
 class csEngine;

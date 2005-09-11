@@ -892,7 +892,7 @@ private:
   csSet<csPtrKey<iMeshWrapper> > wantToDieSet;
 
   // Sector iterator pool
-  csSectorIt* sectorItPool;
+  csSectorIt* sectorItPool; //TOOD: REWORK THIS! UGLY
 
   /// The list of all named render priorities.
   csStringArray renderPriorities;

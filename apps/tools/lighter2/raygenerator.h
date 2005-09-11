@@ -25,11 +25,11 @@ namespace lighter
 {
 
   /**
-   * Generate psuedo-random rays.
+   * Generate pseudo-random rays.
    */
-  struct PsuedoRandomRaygenerator
+  struct PseudoRandomRaygenerator
   {
-    PsuedoRandomRaygenerator ()
+    PseudoRandomRaygenerator ()
     {
       randGen.Initialize ();
     }

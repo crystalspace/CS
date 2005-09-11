@@ -25,6 +25,8 @@ chronological order.
 	- Piotr Obrzut added method for removing all systems in iDynamics
 	- res changed the call stack to at least print the hex address if no
 	  symbol name could be resolved for an instruction.
+	- Marten converted a few more bits of plgengine to use new SCF syntax.
+	- Marten fixed a few typos in applighter2.
 10-Sep-2005
 	- Philip Wyett fixed some returns in non-void functions.
 	- res added file+line numbers for MinGW call stacks.

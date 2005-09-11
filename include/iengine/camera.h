@@ -62,8 +62,6 @@ struct iCameraSectorListener : public iBase
   virtual void NewSector (iCamera* camera, iSector* sector) = 0;
 };
 
-SCF_VERSION (iCamera, 0, 2, 0);
-
 /**
  * Camera class. This class represents camera objects which can be used to
  * render a world in the engine. A camera has the following properties:
@@ -100,8 +98,9 @@ SCF_VERSION (iCamera, 0, 2, 0);
  *   <li>csView and iView
  *   </ul>
  */
-struct iCamera : public iBase
+struct iCamera : public virtual iBase
 {
+  SCF_INTERFACE(iCamera, 2,0,0);
   /**
    * Create a clone of this camera. Note that the array of listeners
    * is not cloned.

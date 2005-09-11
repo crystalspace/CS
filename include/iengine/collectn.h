@@ -27,8 +27,6 @@
 
 struct iObject;
 
-SCF_VERSION (iCollection, 0, 0, 3);
-
 /**
  * A collection object is for convenience of the script language.
  * It is simply a collection of other objects.
@@ -48,8 +46,9 @@ SCF_VERSION (iCollection, 0, 0, 3);
  *   <li>Application uses them.
  *   </ul>
  */
-struct iCollection : public iBase
+struct iCollection : public virtual iBase
 {
+  SCF_INTERFACE(iCollection, 2,0,0);
   /// Query the iObject for this collection
   virtual iObject *QueryObject() = 0;
 

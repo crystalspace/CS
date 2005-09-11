@@ -18,9 +18,9 @@
 */
 
 #include "cssysdef.h"
-#include "csgeom/kdtree.h"
 #include "csqint.h"
 #include "csqsqrt.h"
+#include "csgeom/kdtree.h"
 #include "csutil/csppulse.h"
 #include "csutil/csstring.h"
 #include "csutil/debug.h"
@@ -38,6 +38,7 @@
 #include "ivideo/rendermesh.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
+
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/material.h"

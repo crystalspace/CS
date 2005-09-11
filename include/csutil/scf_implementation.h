@@ -224,6 +224,10 @@ public:
 // Instead of duplicating the code for every scfImplementationN and
 // scfImplementationExtN, the code is factored out into an include file
 // that we include multiple times.
+#define SCF_IMPL_N 0
+#include "scf_impl.h"
+#undef SCF_IMPL_N
+
 #define SCF_IMPL_N 1
 #include "scf_impl.h"
 #undef SCF_IMPL_N

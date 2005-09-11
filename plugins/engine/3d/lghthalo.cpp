@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
 #include "csqint.h"
+#include "csutil/sysfunc.h"
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/engine.h"
 #include "csgeom/polyclip.h"

@@ -34,8 +34,6 @@ struct iTextureWrapper;
 struct iLight;
 struct iShader;
 
-SCF_VERSION (iLoaderContext, 0, 2, 0);
-
 /**
  * This interface gives the context for the loader.
  * It basically gives loading plugins a way to find materials,
@@ -49,8 +47,9 @@ SCF_VERSION (iLoaderContext, 0, 2, 0);
  * still need the original contents in the context. So a loader
  * that creates a context should create a new one every time.
  */
-struct iLoaderContext : public iBase
+struct iLoaderContext : public virtual iBase
 {
+  SCF_INTERFACE(iLoaderContext,2,0,0);
   /// Find a sector.
   virtual iSector* FindSector (const char* name) = 0;
   

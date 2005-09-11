@@ -19,10 +19,11 @@
 #ifndef __CS_CAMERA_H__
 #define __CS_CAMERA_H__
 
-#include "csutil/scf.h"
 #include "csgeom/transfrm.h"
 #include "csutil/refarr.h"
+#include "csutil/scf.h"
 #include "iengine/camera.h"
+
 #include "plugins/engine/3d/sector.h"
 
 class csEngine;
@@ -30,7 +31,8 @@ class csEngine;
 /**
  * A camera positioned in the 3D world.
  */
-class csCamera : public csOrthoTransform, public iCamera
+class csCamera : public csOrthoTransform, 
+                 public scfImplementation1<csCamera, iCamera>
 {
 private:
   /// The sector the camera is in.
@@ -363,8 +365,6 @@ public:
   }
 
   void FireCameraSectorListeners (iSector* sector);
-
-  SCF_DECLARE_IBASE;
 
   virtual iCamera* Clone () const
   {

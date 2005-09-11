@@ -163,8 +163,6 @@ struct iObject : public virtual iBase
 };
 
 
-SCF_VERSION (iObjectIterator, 0, 1, 0);
-
 /**
  * This is an iterator for child objects of a csObject. Note that this
  * iterator only contains type-independent functionality and is therefore
@@ -177,8 +175,9 @@ SCF_VERSION (iObjectIterator, 0, 1, 0);
  *   <li>iObject::GetIterator()
  *   </ul>
  */
-struct iObjectIterator : public iBase
+struct iObjectIterator : public virtual iBase
 {
+  SCF_INTERFACE(iObjectIterator,2,0,0);
   /// Move forward
   virtual iObject* Next () = 0;
 

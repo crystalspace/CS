@@ -36,75 +36,79 @@
 #else /* SCF_IMPL_EXT */
 #  define SCF_IMPL_NAME SCF_IMPL_CAT(scfImplementationExt,SCF_IMPL_N)
 #  define SCF_IMPL_SUPER Super
-#  define SCF_IMPL_PRE_TYPES class Super,
-#  define SCF_IMPL_PRE_ARGS Super,
+#  define SCF_IMPL_PRE_TYPES ,class Super
+#  define SCF_IMPL_PRE_ARGS ,Super
 #endif
 
-#if SCF_IMPL_N == 1
-#  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES class I1
-#  define SCF_IMPL_INTERFACES public I1
-#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS I1
+#if SCF_IMPL_N == 0
+#  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES
+#  define SCF_IMPL_INTERFACES
+#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS
+#elif SCF_IMPL_N == 1
+#  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES ,class I1
+#  define SCF_IMPL_INTERFACES ,public I1
+#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS ,I1
 #elif SCF_IMPL_N == 2
-#  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES class I1, class I2
-#  define SCF_IMPL_INTERFACES public I1, public I2
-#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS I1, I2
+#  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES ,class I1, class I2
+#  define SCF_IMPL_INTERFACES ,public I1, public I2
+#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS ,I1, I2
 #elif SCF_IMPL_N == 3
-#  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES class I1, class I2, class I3
-#  define SCF_IMPL_INTERFACES public I1, public I2, public I3
-#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS I1, I2, I3
+#  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES ,class I1, class I2, class I3
+#  define SCF_IMPL_INTERFACES ,public I1, public I2, public I3
+#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS ,I1, I2, I3
 #elif SCF_IMPL_N == 4
 #  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES \
-    class I1, class I2, class I3, class I4
+    ,class I1, class I2, class I3, class I4
 #  define SCF_IMPL_INTERFACES \
-    public I1, public I2, public I3, public I4
-#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS I1, I2, I3, I4
+    ,public I1, public I2, public I3, public I4
+#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS ,I1, I2, I3, I4
 #elif SCF_IMPL_N == 5
 #  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES \
-    class I1, class I2, class I3, class I4, class I5
+    ,class I1, class I2, class I3, class I4, class I5
 #  define SCF_IMPL_INTERFACES \
-    public I1, public I2, public I3, public I4, public I5
-#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS I1, I2, I3, I4, I5
+    ,public I1, public I2, public I3, public I4, public I5
+#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS ,I1, I2, I3, I4, I5
 #elif SCF_IMPL_N == 6
 #  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES \
-    class I1, class I2, class I3, class I4, class I5, \
+    ,class I1, class I2, class I3, class I4, class I5, \
     class I6
 #  define SCF_IMPL_INTERFACES \
-    public I1, public I2, public I3, public I4, public I5, \
+    ,public I1, public I2, public I3, public I4, public I5, \
     public I6
-#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS I1, I2, I3, I4, I5, I6
+#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS ,I1, I2, I3, I4, I5, I6
 #elif SCF_IMPL_N == 7
 #  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES \
-    class I1, class I2, class I3, class I4, class I5, \
+    ,class I1, class I2, class I3, class I4, class I5, \
     class I6, class I7
 #  define SCF_IMPL_INTERFACES \
-    public I1, public I2, public I3, public I4, public I5, \
+    ,public I1, public I2, public I3, public I4, public I5, \
     public I6, public I7
-#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS I1, I2, I3, I4, I5, I6, I7
+#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS ,I1, I2, I3, I4, I5, I6, I7
 #elif SCF_IMPL_N == 8
 #  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES \
-    class I1, class I2, class I3, class I4, class I5, \
+    ,class I1, class I2, class I3, class I4, class I5, \
     class I6, class I7, class I8
 #  define SCF_IMPL_INTERFACES \
-    public I1, public I2, public I3, public I4, public I5, \
+    ,public I1, public I2, public I3, public I4, public I5, \
     public I6, public I7, public I8
-#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS I1, I2, I3, I4, I5, I6, I7, I8
+#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS ,I1, I2, I3, I4, I5, I6, I7, I8
 #elif SCF_IMPL_N == 9
 #  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES \
-    class I1, class I2, class I3, class I4, class I5, \
+    ,class I1, class I2, class I3, class I4, class I5, \
     class I6, class I7, class I8, class I9
 #  define SCF_IMPL_INTERFACES \
-    public I1, public I2, public I3, public I4, public I5, \
+    ,public I1, public I2, public I3, public I4, public I5, \
     public I6, public I7, public I8, public I9
-#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS I1, I2, I3, I4, I5, I6, I7, I8, I9
+#  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS ,I1, I2, I3, I4, I5, I6, I7, I8, I9
 #elif SCF_IMPL_N == 10
 #  define SCF_IMPL_TYPES SCF_IMPL_PRE_TYPES \
-    class I1, class I2, class I3, class I4, class I5, \
+    ,class I1, class I2, class I3, class I4, class I5, \
     class I6, class I7, class I8, class I9, class I10
 #  define SCF_IMPL_INTERFACES \
-    public I1, public I2, public I3, public I4, public I5, \
+    ,public I1, public I2, public I3, public I4, public I5, \
     public I6, public I7, public I8, public I9, public I10
 #  define SCF_IMPL_ARGS SCF_IMPL_PRE_ARGS \
-    I1, I2, I3, I4, I5, I6, I7, I8, I9, I10
+    ,I1, I2, I3, I4, I5, I6, I7, I8, I9, I10
 #else
 #  error Unsuported value of SCF_IMPL_N
 #endif
@@ -114,16 +118,16 @@
 #define SCF_IMPL_CAT_I(a, b) SCF_IMPL_CAT_II(a ## b)
 #define SCF_IMPL_CAT_II(res) res
 
-template<class Class, SCF_IMPL_TYPES>
+template<class Class SCF_IMPL_TYPES>
 class SCF_IMPL_NAME :
-  public SCF_IMPL_SUPER,
+  public SCF_IMPL_SUPER
   SCF_IMPL_INTERFACES
 {
 public:
   inline void *QueryInterface(scfInterfaceID id, scfInterfaceVersion version)
   {
-    void *x;
 #if SCF_IMPL_N >= 1
+    void *x;
     if((x = VC6Workaround<I1>::GetInterface(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 2
@@ -191,7 +195,7 @@ protected:
 
   virtual ~SCF_IMPL_NAME() {}
 
-  typedef SCF_IMPL_NAME<Class, SCF_IMPL_ARGS> scfImplementationType;
+  typedef SCF_IMPL_NAME<Class SCF_IMPL_ARGS> scfImplementationType;
 
 private:
   template<class I>

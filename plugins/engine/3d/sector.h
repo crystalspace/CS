@@ -55,10 +55,6 @@ struct iFrustumView;
 /// A list of lights for a sector.
 class csSectorLightList : public csLightList
 {
-private:
-  csSector* sector;
-  csKDTree* kdtree; // kdtree to help find lights faster.
-
 public:
   /// constructor
   csSectorLightList ();
@@ -74,14 +70,15 @@ public:
 
   /// Get the kdtree for this light list.
   csKDTree* GetLightKDTree () const { return kdtree; }
+
+private:
+  csSector* sector;
+  csKDTree* kdtree; // kdtree to help find lights faster.
 };
 
 /// A list of meshes for a sector.
 class csSectorMeshList : public csMeshList
 {
-private:
-  csSector* sector;
-
 public:
   /// constructor
   csSectorMeshList ();
@@ -94,6 +91,9 @@ public:
   virtual void PrepareMesh (iMeshWrapper* item);
   /// Override FreeMesh
   virtual void FreeMesh (iMeshWrapper* item);
+
+private:
+  csSector* sector;
 };
 
 //?? SCF_VERSION (csSector, 0, 0, 2);

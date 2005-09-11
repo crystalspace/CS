@@ -17,36 +17,18 @@
 */
 #include "cssysdef.h"
 #include "plugins/engine/3d/cscoll.h"
-#include "plugins/engine/3d/engine.h"
-#include "plugins/engine/3d/sector.h"
 
-SCF_IMPLEMENT_IBASE(csCollection)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iCollection)
-  SCF_IMPLEMENTS_INTERFACE(csCollection)
-SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csCollection::Collection)
-  SCF_IMPLEMENTS_INTERFACE(iCollection)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csCollection::csCollection (
-  csEngine *engine) :
-    csObject(),
-    objects(8, 8)
+csCollection::csCollection ()
+  : scfImplementationType (this), objects (8, 8)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCollection);
-
-  csCollection::engine = engine;
 }
 
 csCollection::~csCollection ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiCollection);
-  SCF_DESTRUCT_IBASE ();
 }
 
-iObject *csCollection::FindObject (char *name)
+iObject *csCollection::FindObject (char *name) const
 {
   size_t i;
   for (i = 0; i < objects.Length (); i++)

@@ -20,8 +20,9 @@
 #define __CS_CSCOLL_H__
 
 #include "csgeom/matrix3.h"
-#include "csutil/refarr.h"
 #include "csutil/csobject.h"
+#include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "iengine/collectn.h"
 
 class csSector;
@@ -33,61 +34,48 @@ SCF_VERSION (csCollection, 0, 0, 1);
  * A collection object is for convenience of the script language.
  * It simply groups objects which are related in some way.
  */
-class csCollection : public csObject
+class csCollection : public scfImplementationExt1<csCollection,
+                                                  csObject,
+                                                  iCollection>
 {
-private:
-  /// The list of objects contained in this csCollection.
-  csRefArray<iObject> objects;
+public:
+  /**
+   * Create a new csCollection with the given name.
+   */
+  csCollection ();
 
-  /// Handle to the engine plug-in.
-  csEngine* engine;
+  //------------------------- iCollection interface --------------------------
+  virtual iObject *QueryObject()
+  { return this; }
+
+  /**
+   * Find an object with the given name inside this collection.
+   */
+  virtual iObject* FindObject (char* name) const;
+
+  /**
+   * Get the number of objects in this collection.
+   */
+  virtual int GetObjectCount () const 
+  { return (int)objects.Length(); }
+
+  /// Add an object to the collection.
+  virtual void AddObject (iObject* obj) { objects.Push (obj); }
+
+  ///
+  virtual iObject* operator[] (int i) const
+  { return objects[i]; }
+
+  virtual iObject* GetObject (int i) const
+  { return (*this)[i]; }
 
 private:
   ///
   virtual ~csCollection ();
 
-public:
-  /**
-   * Create a new csCollection with the given name.
-   */
-  csCollection (csEngine* engine);
-
-  /**
-   * Find an object with the given name inside this collection.
-   */
-  iObject* FindObject (char* name);
-
-  /**
-   * Get the number of objects in this collection.
-   */
-  int GetObjectCount () const { return (int)objects.Length(); }
-
-  /// Add an object to the collection.
-  void AddObject (iObject* obj) { objects.Push (obj); }
-
-  ///
-  iObject* operator[] (int i) { return objects[i]; }
-
-  SCF_DECLARE_IBASE;
-
-  //------------------------- iCollection interface --------------------------
-  struct Collection : public iCollection
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csCollection);
-    virtual iObject *QueryObject()
-      { return scfParent; }
-    virtual iObject* FindObject (char* name) const
-      { return scfParent->FindObject(name); }
-    virtual int GetObjectCount () const
-      { return scfParent->GetObjectCount(); }
-    virtual void AddObject (iObject* obj)
-      { scfParent->AddObject(obj); }
-    virtual iObject* operator[] (int i) const
-      { return (*scfParent)[i]; }
-    virtual iObject* GetObject (int i) const
-      { return (*scfParent)[i]; }
-  } scfiCollection;
-  friend struct Collection;
+private:
+  /// The list of objects contained in this csCollection.
+  csRefArray<iObject> objects;
 };
 
 #endif // __CS_CSCOLL_H__

@@ -23,9 +23,6 @@
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/engine.h"
 
-SCF_IMPLEMENT_IBASE(csCamera)
-  SCF_IMPLEMENTS_INTERFACE(iCamera)
-SCF_IMPLEMENT_IBASE_END
 
 int csCamera:: default_aspect = 0;
 float csCamera:: default_inv_aspect = 0;
@@ -33,9 +30,8 @@ float csCamera:: default_fov_angle = 90;
 long csCamera:: cur_cameranr = 0;
 
 csCamera::csCamera () :
-  csOrthoTransform()
+  csOrthoTransform(), scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   mirror = false;
   sector = 0;
   aspect = default_aspect;
@@ -49,7 +45,7 @@ csCamera::csCamera () :
 }
 
 csCamera::csCamera (csCamera *c) :
-  csOrthoTransform()
+  csOrthoTransform(), scfImplementationType (this)
 {
   *this = *c;
   if (fp)
@@ -58,12 +54,11 @@ csCamera::csCamera (csCamera *c) :
     fp = new csPlane3 (*fp);
   }
 
-  SCF_CONSTRUCT_IBASE (0);
   cameranr = cur_cameranr++;
 }
 
 csCamera::csCamera (const csCamera &c) :
-  csOrthoTransform(), iCamera()
+  csOrthoTransform(), scfImplementationType (this)
 {
   *this = c;
   if (fp)
@@ -72,14 +67,12 @@ csCamera::csCamera (const csCamera &c) :
     fp = new csPlane3 (*fp);
   }
 
-  SCF_CONSTRUCT_IBASE (0);
   cameranr = cur_cameranr++;
 }
 
 csCamera::~csCamera ()
 {
   delete fp;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csCamera::FireCameraSectorListeners (iSector* sector)

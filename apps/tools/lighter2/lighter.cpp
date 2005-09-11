@@ -207,7 +207,7 @@ namespace lighter
 
   void Lighter::ShootDirectLighting (Sector* sector)
   {
-    RandomRayListGenerator<PsuedoRandomRaygenerator> rayGenerator;
+    RandomRayListGenerator<PseudoRandomRaygenerator> rayGenerator;
 
     // Need a raytracer
     Raytracer rayTracer (sector->kdTree);
@@ -256,7 +256,7 @@ namespace lighter
     // Ec
 #define RAYTEST(rayOrig, visDecr)\
     {\
-      csVector3 o = (rayOrig), dir = (oPoint-o);\
+      const csVector3 o = (rayOrig), dir = (oPoint-o);\
       Ray ray; HitPoint hit;\
       ray.origin = o; ray.minLength = FLT_EPSILON*10; ray.maxLength = dir.Norm ();\
       ray.direction = dir / ray.maxLength; \
@@ -272,6 +272,7 @@ namespace lighter
     RAYTEST(elCenter + halfU - halfV, 0.2f);
     RAYTEST(elCenter - halfU - halfV, 0.2f);
 
+#undef RAYTEST
     return vis;
   }
 

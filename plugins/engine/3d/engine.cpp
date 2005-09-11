@@ -253,11 +253,11 @@ csCollectionList::~csCollectionList ()
 
 iCollection *csCollectionList::NewCollection (const char *name)
 {
-  csCollection *c = new csCollection (csEngine::currentEngine);
+  csCollection *c = new csCollection ();
   c->SetName (name);
-  collections.Push (&(c->scfiCollection));
+  collections.Push (c);
   c->DecRef ();
-  return &(c->scfiCollection);
+  return c;
 }
 
 int csCollectionList::GetCount () const
@@ -320,35 +320,9 @@ void csEngineMeshList::FreeMesh (iMeshWrapper* mesh)
  * in the engine while it is being used.
  * If changes to the engine happen the results are unpredictable.
  */
-class csSectorIt : public iSectorIterator
+class csSectorIt : public scfImplementation1<csSectorIt, iSectorIterator>
 {
-private:
-  csEngine* engine;
-  // The position and radius.
-  iSector *sector;
-  csVector3 pos;
-  float radius;
-
-  // Polygon index (to loop over all portals).
-  // If -1 then we return current sector first.
-  int cur_poly;
-
-  // If not null then this is a recursive sector iterator
-  // that we are currently using.
-  csSectorIt *recursive_it;
-
-  // If true then this iterator has ended.
-  bool has_ended;
-
-  // Last position (from Fetch).
-  csVector3 last_pos;
-
-  // Current sector.
-  iSector* current_sector;
-
-  /// Get sector from iterator. Return 0 at end.
-  iSector *FetchNext ();
-
+  //TODO: Recode
 public:
   csSectorIt* nextPooledIt;
 
@@ -358,8 +332,6 @@ public:
 
   /// Destructor.
   virtual ~csSectorIt ();
-
-  SCF_DECLARE_IBASE;
 
   /// Restart iterator.
   virtual void Reset ();
@@ -374,59 +346,75 @@ public:
    * Get last position that was used from Fetch. This can be
    * different from 'pos' because of space warping.
    */
-  virtual const csVector3 &GetLastPosition () { return last_pos; }
+  virtual const csVector3 &GetLastPosition () 
+  { return lastPosition; }
+
+  virtual void IncRef ();
+  virtual void DecRef ();
+private:
+  csEngine* engine;
+  // The position and radius.
+  iSector *sector;
+  csVector3 pos;
+  float radius;
+
+  // Polygon index (to loop over all portals).
+  // If -1 then we return current sector first.
+  int curPoly;
+
+  // If not null then this is a recursive sector iterator
+  // that we are currently using.
+  csSectorIt *recursiveIt;
+
+  // If true then this iterator has ended.
+  bool hasEnded;
+
+  // Last position (from Fetch).
+  csVector3 lastPosition;
+
+  // Current sector.
+  iSector* currentSector;
+
+  /// Get sector from iterator. Return 0 at end.
+  iSector *FetchNext ();
 };
 
 /**
  * Iterator to iterate over meshes in the given list.
  */
-class csMeshListIt : public iMeshWrapperIterator
+class csMeshListIt : public scfImplementation1<csMeshListIt, 
+                                               iMeshWrapperIterator>
 {
-  friend class csEngine;
+public:
+  /// Construct an iterator and initialize to start.
+  csMeshListIt (csArray<iMeshWrapper*>* list);
+
+  /// Destructor.
+  virtual ~csMeshListIt ();
+
+  virtual void Reset ();
+  virtual iMeshWrapper* Next ();
+  virtual bool HasNext () const;
+
 private:
   csArray<iMeshWrapper*>* list;
   int num_objects;
 
   // Current index.
   int cur_idx;
-
-private:
-  /// Construct an iterator and initialize to start.
-  csMeshListIt (csArray<iMeshWrapper*>* list);
-
-public:
-  /// Destructor.
-  virtual ~csMeshListIt ();
-
-  SCF_DECLARE_IBASE;
-
-  virtual void Reset ();
-  virtual iMeshWrapper* Next ();
-  virtual bool HasNext () const;
 };
 
 /**
  * Iterator to iterate over objects in the given list.
  */
-class csObjectListIt : public iObjectIterator
+class csObjectListIt : public scfImplementation1<csObjectListIt, iObjectIterator>
 {
-  friend class csEngine;
-private:
-  csArray<iObject*>* list;
-  int num_objects;
-
-  // Current index.
-  int cur_idx;
-
-private:
+public:
   /// Construct an iterator and initialize to start.
   csObjectListIt (csArray<iObject*>* list);
 
-public:
   /// Destructor.
   virtual ~csObjectListIt ();
-
-  SCF_DECLARE_IBASE;
 
   virtual void Reset ();
   virtual iObject* Next ();
@@ -437,6 +425,13 @@ public:
   }
 
   virtual iObject* FindName (const char *name)  { (void)name; return 0; }
+
+private:
+  csArray<iObject*>* list;
+  int num_objects;
+
+  // Current index.
+  int cur_idx;
 };
 
 //---------------------------------------------------------------------------
@@ -572,18 +567,9 @@ void csSectorIt::DecRef ()
   scfRefCount--;
 }
 
-SCF_IMPLEMENT_IBASE_GETREFCOUNT(csSectorIt)
-SCF_IMPLEMENT_IBASE_REFOWNER(csSectorIt)
-SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csSectorIt)
-SCF_IMPLEMENT_IBASE_QUERY(csSectorIt)
-  SCF_IMPLEMENTS_INTERFACE(iSectorIterator)
-SCF_IMPLEMENT_IBASE_END
-
 csSectorIt::csSectorIt (csEngine* engine)
+  : scfImplementationType (this), engine (engine), nextPooledIt (0)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csSectorIt::engine = engine;
-  nextPooledIt = 0;
 }
 
 void csSectorIt::Init (iSector *sector, const csVector3 &pos,
@@ -593,93 +579,87 @@ void csSectorIt::Init (iSector *sector, const csVector3 &pos,
   csSectorIt::sector = sector;
   csSectorIt::pos = pos;
   csSectorIt::radius = radius;
-  recursive_it = 0;
+  recursiveIt = 0;
 
   Reset ();
 }
 
 csSectorIt::~csSectorIt ()
 {
-  engine->RecycleSectorIterator (recursive_it);
-  SCF_DESTRUCT_IBASE ();
+  engine->RecycleSectorIterator (recursiveIt);
 }
 
 void csSectorIt::Reset ()
 {
-  cur_poly = -1;
-  engine->RecycleSectorIterator (recursive_it);
-  recursive_it = 0;
-  has_ended = false;
-  current_sector = 0;
+  curPoly = -1;
+  engine->RecycleSectorIterator (recursiveIt);
+  recursiveIt = 0;
+  hasEnded = false;
+  currentSector = 0;
 }
 
 iSector *csSectorIt::FetchNext ()
 {
-  if (has_ended) return 0;
+  if (hasEnded) return 0;
 
-  if (recursive_it)
+  if (recursiveIt)
   {
-    iSector *rc = recursive_it->FetchNext ();
+    iSector *rc = recursiveIt->FetchNext ();
     if (rc)
     {
-      last_pos = recursive_it->GetLastPosition ();
+      lastPosition = recursiveIt->GetLastPosition ();
       return rc;
     }
 
-    engine->RecycleSectorIterator (recursive_it);
-    recursive_it = 0;
+    engine->RecycleSectorIterator (recursiveIt);
+    recursiveIt = 0;
   }
 
-  if (cur_poly == -1)
+  if (curPoly == -1)
   {
-    cur_poly = 0;
-    last_pos = pos;
+    curPoly = 0;
+    lastPosition = pos;
     return sector;
   }
 
   // End search.
-  has_ended = true;
+  hasEnded = true;
   return 0;
 }
 
 bool csSectorIt::HasNext ()
 {
-  if (current_sector != 0) return true;
-  current_sector = FetchNext ();
-  return current_sector != 0;
+  if (currentSector != 0) return true;
+  currentSector = FetchNext ();
+  return currentSector != 0;
 }
 
 iSector *csSectorIt::Next ()
 {
-  if (current_sector == 0)
+  if (currentSector == 0)
   {
-    current_sector = FetchNext ();
+    currentSector = FetchNext ();
   }
 
-  iSector* s = current_sector;
-  current_sector = 0;
+  iSector* s = currentSector;
+  currentSector = 0;
   return s;
 }
 
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csObjectListIt)
-  SCF_IMPLEMENTS_INTERFACE(iObjectIterator)
-SCF_IMPLEMENT_IBASE_END
 
 csObjectListIt::csObjectListIt (csArray<iObject*>* list)
+  : scfImplementationType (this), list (list), 
+  num_objects ((int)list->GetSize ())
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csObjectListIt::list = list;
-  num_objects = (int)list->Length ();
   Reset ();
 }
 
 csObjectListIt::~csObjectListIt ()
 {
   delete list;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csObjectListIt::Reset ()
@@ -701,22 +681,16 @@ bool csObjectListIt::HasNext () const
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csMeshListIt)
-  SCF_IMPLEMENTS_INTERFACE(iMeshWrapperIterator)
-SCF_IMPLEMENT_IBASE_END
-
 csMeshListIt::csMeshListIt (csArray<iMeshWrapper*>* list)
+  : scfImplementationType (this), list (list),
+   num_objects ((int)list->GetSize ())
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csMeshListIt::list = list;
-  num_objects = (int)list->Length ();
   Reset ();
 }
 
 csMeshListIt::~csMeshListIt ()
 {
   delete list;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csMeshListIt::Reset ()
@@ -2098,26 +2072,23 @@ struct LightAndDist
 
 // csLightArray is a subclass of csCleanable which is registered
 // to csEngine.cleanup.
-class csLightArray : public iBase
+class csLightArray : public scfImplementation0<csLightArray>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   LightAndDist *array;
 
   // Size is the physical size of the array. num_lights is the number of
   // lights in it.
   int size, num_lights;
 
-  csLightArray () : array(0), size(0), num_lights(0)
+  csLightArray () 
+    : scfImplementationType (this), array(0), size(0), num_lights(0)
   {
-    SCF_CONSTRUCT_IBASE (0);
   }
 
   virtual ~csLightArray ()
   { 
     delete[] array;
-    SCF_DESTRUCT_IBASE ();
   }
 
   void Reset ()             { num_lights = 0; }
@@ -2143,9 +2114,6 @@ public:
   iLight *GetLight (int i)  { return array[i].light; }
 };
 
-SCF_IMPLEMENT_IBASE(csLightArray)
-  SCF_IMPLEMENTS_INTERFACE(iBase)
-SCF_IMPLEMENT_IBASE_END
 
 static int compare_light (const void *p1, const void *p2)
 {
@@ -2987,7 +2955,8 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (const char *name)
 /*
  * Loader context class for the engine.
  */
-class EngineLoaderContext : public iLoaderContext
+class EngineLoaderContext : public scfImplementation1<EngineLoaderContext,
+                                                     iLoaderContext>
 {
 private:
   iEngine* Engine;
@@ -2997,8 +2966,6 @@ private:
 public:
   EngineLoaderContext (iEngine* Engine, iRegion* region, bool curRegOnly);
   virtual ~EngineLoaderContext ();
-
-  SCF_DECLARE_IBASE;
 
   virtual iSector* FindSector (const char* name);
   virtual iMaterialWrapper* FindMaterial (const char* name);
@@ -3016,22 +2983,16 @@ public:
   virtual bool CurrentRegionOnly () const { return curRegOnly; }
 };
 
-SCF_IMPLEMENT_IBASE(EngineLoaderContext);
-  SCF_IMPLEMENTS_INTERFACE(iLoaderContext);
-SCF_IMPLEMENT_IBASE_END
 
 EngineLoaderContext::EngineLoaderContext (iEngine* Engine,
 	iRegion* region, bool curRegOnly)
+  : scfImplementationType (this), Engine (Engine), region (region),
+  curRegOnly (curRegOnly)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  EngineLoaderContext::Engine = Engine;
-  EngineLoaderContext::region = region;
-  EngineLoaderContext::curRegOnly = curRegOnly;
 }
 
 EngineLoaderContext::~EngineLoaderContext ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 iSector* EngineLoaderContext::FindSector (const char* name)

@@ -383,7 +383,6 @@ struct iSectorList : public iBase
   virtual iSector *FindByName (const char *Name) const = 0;
 };
 
-SCF_VERSION (iSectorIterator, 0, 1, 0);
 
 /**
  * An iterator to iterate over sectors. Some functions in CS
@@ -394,8 +393,9 @@ SCF_VERSION (iSectorIterator, 0, 1, 0);
  *   <li>iEngine::GetNearbySectors()
  *   </ul>
  */
-struct iSectorIterator : public iBase
+struct iSectorIterator : public virtual iBase
 {
+  SCF_INTERFACE(iSectorIterator,2,0,0);
   /// Return true if there are more elements.
   virtual bool HasNext () = 0;
 
