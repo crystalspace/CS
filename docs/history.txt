@@ -19,7 +19,7 @@ chronological order.
 	- res added file+line numbers for MinGW call stacks.
 	- res moved the custom assert into its own source file.
 	- Philip Wyett added some experimental gcc 3 and 4 mmx compilation
-	   problems fixes for the movierecorder plugin.
+	  problems fixes for the movierecorder plugin.
 9-Sep-2005
 	- Jorrit fixed a missing 'break' in the particles loader. This caused
 	  using 'mixmode' to give an error even though it worked fine.
@@ -239,19 +239,21 @@ chronological order.
 	  lights (the latter are somewhat off, though, due CS/GL spotlight
 	  differences).
 	- swedishcoder added a CEGUI renderer for CS, developed by iceeey and
-	  swedishcoder. The actual plugin is located in plugins/gui/cegui and 
-	  the demonstration application in apps/tests/ceguitest In the ceguitest
-	  dir you can also find a short howto. Its currently disabled.
+	  swedishcoder. The actual plugin is located in plugins/gui/cegui and
+	  the demonstration application in apps/tests/ceguitest In the
+	  ceguitest dir you can also find a short howto. Its currently
+	  disabled.
 	- swedishcoder removed the cegui howto doc, it was outdated, instead
 	  take a look at ceguitest app. Thanks iceeey for pointing that out.
 	- Marten made some smaller layout fixes to the CEGUI stuff.
 	- iceeey added the missing iCEGUI include file and fixed some Jamfiles.
 	- iceeey moved the ceguitest data files into CS/data.
-	- iceeey added ceguitest and cegui to Jamfiles, but left them commented.
+	- iceeey added ceguitest and cegui to Jamfiles, but left them
+	  commented.
 	- iceeey fixed a bug in ceguitest where it would crash when resized.
 2-Sep-2005
-	- Jorrit fixed a bug in CS reported by valgrind:
-	  In the GL state cache a few fields were not initialized in some cases.
+	- Jorrit fixed a bug in CS reported by valgrind: In the GL state cache
+	  a few fields were not initialized in some cases.
 	- Jorrit made the csColliderActor a bit more stable at high speed.
 1-Sep-2005
 	- Andrew Dai fixed an infinite loop when moving using csColliderActor,
