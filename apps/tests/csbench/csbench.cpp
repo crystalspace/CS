@@ -553,7 +553,6 @@ void CsBench::PerformTests ()
   }
 
   view->GetCamera ()->SetSector (room_single);
-  // @@@add
   vfs->PushDir("/shader");
   PerformShaderTest ("/shader/std_lighting.xml", "standard", 0, 0, gmSingle);
 
@@ -563,7 +562,6 @@ void CsBench::PerformTests ()
 
   PerformShaderTest ("/shader/light_bumpmap.xml", "diffuse", 
     "/shader/ambient.xml", "ambient", gmSingle);
-  // @@@add
   vfs->PopDir ();
 }
 
