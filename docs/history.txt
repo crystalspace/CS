@@ -116,9 +116,9 @@ chronological order.
 7-Sep-2005
 	- res added a "callstack" command to walktest. Mainly useful to check
 	  whether the callstack facility is working.
-	- res fixed a texture waste in the Thing poly renderer were the normal
-	  buffer was recomputed every time needed. This change also works
-	  around recent crashes in that module.
+	- res fixed a ressource waste in the Thing poly renderer were the 
+	  normal buffer was recomputed every time needed. This change also 
+	  works around recent crashes in that module.
 	- res fixed a possible crash in engseq.
 	- res improved Win32 call stack generation.
 	- res added a small helper to measure the time the execution of a 
