@@ -2404,8 +2404,9 @@ CS_EMIT_BUILD_PROPERTY([MODE], [$cs_build_mode])
 
 
 #------------------------------------------------------------------------------
-# Check for libbfd in debug mode so that CS_ASSERT() can dump a meaningful
-# traceback in addition to emitting the failed condition.
+# Check for libbfd in debug mode on Windows so that CS_ASSERT() can dump a
+# meaningful traceback in addition to emitting the failed condition. (On Linux,
+# backtrace() is used instead.)
 #
 # ***WARNING***
 #
@@ -2415,10 +2416,15 @@ CS_EMIT_BUILD_PROPERTY([MODE], [$cs_build_mode])
 # built in optimize mode.
 #------------------------------------------------------------------------------
 AS_IF([test $cs_build_mode = debug],
-    [CS_CHECK_LIBBFD([emit], [],
-	[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])
-	cs_debug_libbfd=yes],
-	[cs_debug_libbfd=no])],
+    [case $host_os in
+	mingw*|cygwin*)
+	    CS_CHECK_LIBBFD([emit], [],
+		[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])
+		cs_debug_libbfd=yes],
+		[cs_debug_libbfd=no])
+	    ;;
+	*) cs_debug_libbfd=no ;;
+    esac],
     [cs_debug_libbfd=no])
 
 

@@ -64590,8 +64590,9 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check for libbfd in debug mode so that CS_ASSERT() can dump a meaningful
-# traceback in addition to emitting the failed condition.
+# Check for libbfd in debug mode on Windows so that CS_ASSERT() can dump a
+# meaningful traceback in addition to emitting the failed condition. (On Linux,
+# backtrace() is used instead.)
 #
 # ***WARNING***
 #
@@ -64601,6 +64602,8 @@ fi
 # built in optimize mode.
 #------------------------------------------------------------------------------
 if test $cs_build_mode = debug; then
+  case $host_os in
+	mingw*|cygwin*)
 
     case $host_os in
 
@@ -65720,11 +65723,14 @@ fi
 
 	cs_header_text="${cs_header_text}#define CS_HAVE_LIBBFD
 "
-	cs_debug_libbfd=yes
+		cs_debug_libbfd=yes
 else
   cs_debug_libbfd=no
 fi
 
+	    ;;
+	*) cs_debug_libbfd=no ;;
+    esac
 else
   cs_debug_libbfd=no
 fi

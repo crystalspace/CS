@@ -10,6 +10,10 @@ chronological order.
 	- Eric Sunshine fixed problem introduced with recent configure script
 	  changes where ELF plugin meta-data reader was not being linked into
 	  targets on Unix.
+	- Eric Sunshine changed configure.ac so that it only runs the
+	  traceback-related libbfd check on Windows since it is only need on
+	  that platform for tracebacks. (On Linux, the backtrace() function is
+	  used instead.)
 10-Sep-2005
 	- Philip Wyett fixed some returns in non-void functions.
 	- res added file+line numbers for MinGW call stacks.
