@@ -95,7 +95,10 @@ bool CallStackImpl::GetFunctionName (size_t num, csString& str)
     }
     resGetter++;
   }
-  return false;
+  
+  // Return at least the address...
+  str.Format ("[%p]", entries[num].address);
+  return true;
 }
 
 bool CallStackImpl::GetLineNumber (size_t num, csString& str)
