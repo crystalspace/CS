@@ -144,7 +144,7 @@ bool PicView::Application()
   if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
   vfs = CS_QUERY_REGISTRY(GetObjectRegistry(), iVFS);
-  if (!vfs) return ReportError("Failed to locate Image Loader!");
+  if (!vfs) return ReportError("Failed to locate Virtual FileSystem!");
 
   imgloader = CS_QUERY_REGISTRY(GetObjectRegistry(), iImageIO);
   if (!imgloader) return ReportError("Failed to locate Image Loader!");
