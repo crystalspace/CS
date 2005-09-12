@@ -15,6 +15,8 @@ chronological order.
 	- Philip Wyett allowed access to /cache/tmp for lightmap precalc data
 	  to be stored and eliminating warning dialog.
 	- Philip Wyett updated his email address.
+	- Vincent Knecht fixed vfs.cfg.template so that /lev/isomap mount is
+	  valid when CS is installed.
 11-Sep-2005
 	- Eric Sunshine fixed problem introduced with recent configure script
 	  changes where ELF plugin meta-data reader was not being linked into
