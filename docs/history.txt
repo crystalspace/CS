@@ -17,6 +17,9 @@ chronological order.
 	- Philip Wyett updated his email address.
 	- Vincent Knecht fixed vfs.cfg.template so that /lev/isomap mount is
 	  valid when CS is installed.
+	- iceeey fixed a problem with the configure check for embedding of
+	  meta information. If elf.h was detected, then the libbfd check would
+	  be skipped due to an extra comma in embed.m4.
 11-Sep-2005
 	- Eric Sunshine fixed problem introduced with recent configure script
 	  changes where ELF plugin meta-data reader was not being linked into

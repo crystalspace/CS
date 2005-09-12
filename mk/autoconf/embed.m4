@@ -74,7 +74,7 @@ AC_DEFUN([CS_META_INFO_EMBED],
         [_CS_META_INFO_EMBED_TOOLS([$1])
         AS_IF([test $cs_header_elf_h = yes],
 	    [CS_EMIT_BUILD_PROPERTY([ELF.AVAILABLE], [yes], [], [],
-		CS_EMITTER_OPTIONAL([$1]))],
+		CS_EMITTER_OPTIONAL([$1]))]
             [case $host_os in
 	        mingw*|cygwin*) ;;
 		*)

@@ -63164,8 +63164,7 @@ fi
 "
 fi
 
-else
-  case $host_os in
+            case $host_os in
 	        mingw*|cygwin*) ;;
 		*)
 
