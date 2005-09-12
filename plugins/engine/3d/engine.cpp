@@ -568,7 +568,7 @@ void csSectorIt::DecRef ()
 }
 
 csSectorIt::csSectorIt (csEngine* engine)
-  : scfImplementationType (this), engine (engine), nextPooledIt (0)
+  : scfImplementationType (this), nextPooledIt (0), engine (engine)
 {
 }
 
