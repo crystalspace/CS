@@ -13,7 +13,7 @@ chronological order.
 	  iSpriteSocket now.
 	- mdmkolbe fixed a build failure in the Perl Swig bindings.
 	- Philip Wyett allowed access to /cache/tmp for lightmap precalc data
-	   to be stored and eliminating warning dialog.
+	  to be stored and eliminating warning dialog.
 11-Sep-2005
 	- Eric Sunshine fixed problem introduced with recent configure script
 	  changes where ELF plugin meta-data reader was not being linked into
