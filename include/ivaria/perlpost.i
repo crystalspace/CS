@@ -535,7 +535,7 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
   {
     return self->GetData ();
   }
-  void __av__ (char *&__chars__, int &__len__)
+  void __av__ (const char *&__chars__, int &__len__)
   {
     __chars__ = self->GetData ();
     __len__ = self->Length ();
@@ -597,7 +597,7 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
   {
     return self->GetData ();
   }
-  void __av__ (char *&__chars__, int &__len__)
+  void __av__ (const char *&__chars__, int &__len__)
   {
     __chars__ = self->GetData ();
     __len__ = self->Length ();
