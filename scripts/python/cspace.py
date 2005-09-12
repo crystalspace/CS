@@ -11102,6 +11102,7 @@ class iDynamics(iBase):
         return "<%s.%s; proxy of C++ iDynamics instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def CreateSystem(*args): return _cspace.iDynamics_CreateSystem(*args)
     def RemoveSystem(*args): return _cspace.iDynamics_RemoveSystem(*args)
+    def RemoveSystems(*args): return _cspace.iDynamics_RemoveSystems(*args)
     def FindSystem(*args): return _cspace.iDynamics_FindSystem(*args)
     def Step(*args): return _cspace.iDynamics_Step(*args)
     def __del__(self, destroy=_cspace.delete_iDynamics):
