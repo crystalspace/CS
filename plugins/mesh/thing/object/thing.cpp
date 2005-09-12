@@ -16,8 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-//#define __USE_MATERIALS_REPLACEMENT__
-
 #include "cssysdef.h"
 #include <limits.h>
 #include "csgeom/frustum.h"
@@ -1315,9 +1313,6 @@ void csThingStatic::SetPolygonMaterial (const csPolygonRange& range,
   GetRealRange (range, start, end);
   for (i = start ; i <= end ; i++)
     static_polygons[i]->SetMaterial (material);
-#ifdef __USE_MATERIALS_REPLACEMENT__
-  UnprepareLMLayout ();
-#endif // __USE_MATERIALS_REPLACEMENT__
 }
 
 iMaterialWrapper* csThingStatic::GetPolygonMaterial (int polygon_idx)
@@ -1886,46 +1881,12 @@ iMaterialWrapper* csThing::FindRealMaterial (iMaterialWrapper* old_mat)
   return 0;
 }
 
-#ifdef __USE_MATERIALS_REPLACEMENT__
-
-void csThing::ReplaceMaterial (iMaterialWrapper* oldmat,
-        iMaterialWrapper* newmat)
-{
-  //
-  //Remove the binding of oldmat, if it exists.
-  size_t i;
-  for (i = 0 ; i < replace_materials.Length () ; i++)
-  {
-    if (replace_materials[i].old_mat == oldmat)
-    {
-      replace_materials.DeleteIndex (i);
-      break;
-    }//if
-  }//for
-
-  //
-  //If newmat == 0 then it means the caller want to use the standard
-  //material given by the factory mesh object. Otherwise the caller
-  //want to create a new binding.
-  if (newmat != 0)
-  {
-    //Create the binding of the 'oldmat' material with a new one.
-    replace_materials.Push (RepMaterial (oldmat, newmat));
-  }//if
-
-  SetReplaceMaterialChanged (true);
-}
-
-#else
-
 void csThing::ReplaceMaterial (iMaterialWrapper* oldmat,
         iMaterialWrapper* newmat)
 {
   replace_materials.Push (RepMaterial (oldmat, newmat));
   SetPrepared (false);
 }
-
-#endif // __USE_MATERIALS_REPLACEMENT__
 
 
 void csThing::ClearReplacedMaterials ()
