@@ -215,6 +215,12 @@ csThingStatic::~csThingStatic ()
   SCF_DESTRUCT_IBASE ();
 }
 
+void csThingStatic::InvalidateShape ()
+{
+  ShapeChanged ();
+  polyRenderers.Empty ();
+}
+
 void csThingStatic::Prepare (iBase* thing_logparent)
 {
   if (!IsPrepared())
@@ -672,7 +678,7 @@ int csThingStatic::AddVertex (float x, float y, float z)
 
   obj_verts[num_vertices].Set (x, y, z);
   num_vertices++;
-  ShapeChanged ();
+  InvalidateShape ();
   return num_vertices - 1;
 }
 
@@ -680,7 +686,7 @@ void csThingStatic::SetVertex (int idx, const csVector3 &vt)
 {
   CS_ASSERT (idx >= 0 && idx < num_vertices);
   obj_verts[idx] = vt;
-  ShapeChanged ();
+  InvalidateShape ();
 }
 
 void csThingStatic::DeleteVertex (int idx)
@@ -689,7 +695,7 @@ void csThingStatic::DeleteVertex (int idx)
 
   int copysize = sizeof (csVector3) * (num_vertices - idx - 1);
   memmove (obj_verts + idx, obj_verts + idx + 1, copysize);
-  ShapeChanged ();
+  InvalidateShape ();
 }
 
 void csThingStatic::DeleteVertices (int from, int to)
@@ -713,7 +719,7 @@ void csThingStatic::DeleteVertices (int from, int to)
     num_vertices -= rangelen;
   }
 
-  ShapeChanged ();
+  InvalidateShape ();
 }
 
 void csThingStatic::CompressVertices ()
@@ -740,7 +746,7 @@ void csThingStatic::CompressVertices ()
   }
 
   delete[] vt;
-  ShapeChanged ();
+  InvalidateShape ();
 }
 
 void csThingStatic::RemoveUnusedVertices ()
@@ -809,7 +815,7 @@ void csThingStatic::RemoveUnusedVertices ()
   delete[] used;
 
   SetObjBboxValid (false);
-  ShapeChanged ();
+  InvalidateShape ();
 }
 
 struct PolygonsForVertex
@@ -850,7 +856,7 @@ int csThingStatic::AddPolygon (csPolygon3DStatic* spoly)
   spoly->SetParent (this);
   spoly->EnableTextureMapping (true);
   int idx = (int)static_polygons.Push (spoly);
-  ShapeChanged ();
+  InvalidateShape ();
   UnprepareLMLayout ();
   return idx;
 }
@@ -859,14 +865,14 @@ void csThingStatic::RemovePolygon (int idx)
 {
   static_polygons.FreeItem (static_polygons.Get (idx));
   static_polygons.DeleteIndex (idx);
-  ShapeChanged ();
+  InvalidateShape ();
   UnprepareLMLayout ();
 }
 
 void csThingStatic::RemovePolygons ()
 {
   static_polygons.FreeAll ();
-  ShapeChanged ();
+  InvalidateShape ();
   UnprepareLMLayout ();
 }
 
@@ -968,7 +974,7 @@ void csThingStatic::HardTransform (const csReversibleTransform &t)
     p->HardTransform (t);
   }
 
-  ShapeChanged ();
+  InvalidateShape ();
   SetObjBboxValid (false);
 }
 
@@ -1971,7 +1977,7 @@ void csThing::InvalidateThing ()
   static_data->SetObjBboxValid (false);
 
   delete [] static_data->obj_normals; static_data->obj_normals = 0;
-  static_data->ShapeChanged ();
+  static_data->InvalidateShape ();
 }
 
 iPolygonMesh* csThing::GetWriteObject ()

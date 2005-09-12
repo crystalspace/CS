@@ -350,6 +350,11 @@ public:
     return GetShapeNumber ();
   }
 
+  /**
+   * Invalidate this shape (called after doing a modification).
+   */
+  void InvalidateShape ();
+
   /// Get the specified polygon from this set.
   csPolygon3DStatic *GetPolygon3DStatic (int idx)
   { return static_polygons.Get (idx); }

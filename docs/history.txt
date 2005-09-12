@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Sep-2005
+	- Jorrit fixed the thing plugin so that modification of a thing
+	  factory will now immediatelly affect the instances.
 11-Sep-2005
 	- Eric Sunshine fixed problem introduced with recent configure script
 	  changes where ELF plugin meta-data reader was not being linked into
