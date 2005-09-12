@@ -39,10 +39,10 @@ SCF_IMPLEMENT_FACTORY (csCEGUIRenderer)
 csCEGUIRenderer::csCEGUIRenderer (iBase *parent) :
   obj_reg(0),
   resourceProvider(0),
+  scriptModule(0),
   queueing(true),
   m_bufferPos(0),
-  texture(0),
-  scriptModule(0)
+  texture(0)
 {
   newQuadAdded = false;
   SCF_CONSTRUCT_IBASE (parent);
