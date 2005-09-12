@@ -386,6 +386,7 @@ bool csWaterDemo::Initialize ()
     return false;
   }
 
+  vfs->ChDir ("/tmp");
   
   console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
 
@@ -771,4 +772,3 @@ int main (int argc, char* argv[])
   csInitializer::DestroyApplication (object_reg);
   return 0;
 }
-
