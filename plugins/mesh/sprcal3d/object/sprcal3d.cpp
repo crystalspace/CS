@@ -96,6 +96,7 @@ static void ReportCalError (iObjectRegistry* objreg, const char* msgId,
 //--------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csSpriteCal3DSocket)
+  SCF_IMPLEMENTS_INTERFACE (iSpriteSocket)
   SCF_IMPLEMENTS_INTERFACE (iSpriteCal3DSocket)
 SCF_IMPLEMENT_IBASE_END
 

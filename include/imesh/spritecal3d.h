@@ -20,6 +20,7 @@
 #define __CS_IMESH_SPRITECAL3D_H__
 
 #include "csutil/scf.h"
+#include "imesh/sprite3d.h"
 
 struct iMaterialWrapper;
 struct iMeshObject;
@@ -42,23 +43,8 @@ SCF_VERSION (iSpriteCal3DSocket, 0, 0, 2);
 /**
  * A socket for specifying where sprites can plug into other sprites.
  */
-struct iSpriteCal3DSocket : public iBase
+struct iSpriteCal3DSocket : public iSpriteSocket
 {
-  /// Set the name.
-  virtual void SetName (char const*) = 0;
-  /// Get the name.
-  virtual char const* GetName () const = 0;
-
-  /// Set the attached sprite.
-  virtual void SetMeshWrapper (iMeshWrapper* mesh) = 0;
-  /// Get the attached sprite.
-  virtual iMeshWrapper* GetMeshWrapper () const = 0;
-
-  /// Set the index of the triangle for the socket.
-  virtual void SetTriangleIndex (int tri_index) = 0;
-  /// Get the index of the triangle for the socket.
-  virtual int GetTriangleIndex () const = 0;
-
   /// Set the index of the submesh for the socket.
   virtual void SetSubmeshIndex (int subm_index) = 0;
   /// Get the index of the submesh for the socket.

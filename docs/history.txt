@@ -9,6 +9,8 @@ chronological order.
 12-Sep-2005
 	- Jorrit fixed the thing plugin so that modification of a thing
 	  factory will now immediatelly affect the instances.
+	- Jorrit changed cal3d so that iSpriteCal3DSocket inherits from
+	  iSpriteSocket now.
 11-Sep-2005
 	- Eric Sunshine fixed problem introduced with recent configure script
 	  changes where ELF plugin meta-data reader was not being linked into
