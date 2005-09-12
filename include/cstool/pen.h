@@ -22,6 +22,7 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/polyidx.h"
 #include "csgeom/vector4.h"
+#include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/ref.h"
 
@@ -34,25 +35,25 @@ struct iGraphics3D;
 enum CS_PEN_TEXT_ALIGN { CS_PEN_TA_TOP, CS_PEN_TA_BOT, CS_PEN_TA_LEFT, CS_PEN_TA_RIGHT, CS_PEN_TA_CENTER };
 
 /** The pen color is used to pass colors to the pen, around the application more easily. */
-struct csPenColor
-{
-  /** The components of the color. */ 
-  float r, g, b, a;
-
-  csPenColor() {}
-  csPenColor(float _r, float _g, float _b, float _a):r(_r), g(_g), b(_b), a(_a) {}
-  csPenColor(const csPenColor &c):r(c.r), g(c.g), b(c.b), a(c.a) {}
-
-  csPenColor & operator=(const csPenColor &c)
-  {
-    r=c.r;
-    g=c.g;
-    b=c.b;
-    a=c.a;
-
-    return *this;
-  }
-};
+//structcsColor4
+//{
+//  /** The components of the color. */ 
+//  float r, g, b, a;
+//
+// csColor4() {}
+// csColor4(float _r, float _g, float _b, float _a):r(_r), g(_g), b(_b), a(_a) {}
+// csColor4(constcsColor4 &c):r(c.r), g(c.g), b(c.b), a(c.a) {}
+//
+// csColor4 & operator=(constcsColor4 &c)
+//  {
+//    r=c.r;
+//    g=c.g;
+//    b=c.b;
+//    a=c.a;
+//
+//    return *this;
+//  }
+//};
 
 /** 
  * A pen is used to draw vector shapes. 
@@ -67,7 +68,7 @@ struct iPen
   /** 
    * Sets the current color. 
    */
-  virtual void SetColor(const csPenColor &color) = 0;
+  virtual void SetColor(const csColor4 &color) = 0;
 
   /**
    * Swaps the current color and the alternate color. 
@@ -220,7 +221,7 @@ public:
   /** 
    * Sets the current color. 
    */
-  virtual void SetColor(const csPenColor &color);  
+  virtual void SetColor(const csColor4 &color);  
 
   /**
    * Swaps the current color and the alternate color. 

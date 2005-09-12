@@ -73,12 +73,12 @@ void csPen::SetColor (float r, float g, float b, float a)
   color.w=a;
 }
 
-void csPen::SetColor(const csPenColor &c)
+void csPen::SetColor(const csColor4 &c)
 {
-  color.x=c.r;
-  color.y=c.g;
-  color.z=c.b;
-  color.w=c.a;
+  color.x=c.red;
+  color.y=c.green;
+  color.z=c.blue;
+  color.w=c.alpha;
 }
 
 void csPen::SwapColors()

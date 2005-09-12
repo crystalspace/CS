@@ -63,7 +63,7 @@ namespace aws
 
 	  /** System colors.  These are automatically initialized with some nice defaults,
 	   * but in order for them to be what you want, a skin has to be applied. */
-          csPenColor sys_colors[AC_COLOR_COUNT];
+          csColor4 sys_colors[AC_COLOR_COUNT];
 
   protected:
       void init_default_colors();
@@ -89,20 +89,20 @@ namespace aws
   /////////////////////////////////////////////
 
   /// Sets the value of a color in the global AWS palette.
-  virtual void setColor (int index, csPenColor &color)
+  virtual void setColor (int index, csColor4 &color)
   {
     if (index<AC_COLOR_COUNT)
       sys_colors[index]=color;
   }
 
   /// Gets the value of a color from the global AWS palette.
-  virtual csPenColor getColor (int index)
+  virtual csColor4 getColor (int index)
   { 
   if (index<AC_COLOR_COUNT)
     return sys_colors[index];
 
   else
-    return csPenColor();
+    return csColor4();
   }
  };
 

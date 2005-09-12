@@ -15,7 +15,7 @@ namespace aws
     unsigned int border_shape;
     unsigned int border_style;
 
-    csPenColor h1, h2, s1, s2, black;
+    csColor4 h1, h2, s1, s2, black;
 
     float edge;
 
