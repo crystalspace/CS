@@ -12230,6 +12230,7 @@ package cspace::iDynamics;
 %ITERATORS = ();
 *CreateSystem = *cspacec::iDynamics_CreateSystem;
 *RemoveSystem = *cspacec::iDynamics_RemoveSystem;
+*RemoveSystems = *cspacec::iDynamics_RemoveSystems;
 *FindSystem = *cspacec::iDynamics_FindSystem;
 *Step = *cspacec::iDynamics_Step;
 sub DESTROY {
