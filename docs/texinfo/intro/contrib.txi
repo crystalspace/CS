@@ -1036,7 +1036,7 @@ Philip Walls (@email{malverian@@lockless.dyndns.org})
 Philip added software cursor drawing to the @sc{svgalib} canvas.
 
 @item
-Philip Wyett (@email{philipwyett@@dsl.pipex.com})
+Philip Wyett (@email{philip.wyett@@w-tech.co.uk})
 
 Philip acted as general maintainer of the Window port for quite a while (and
 performed some general maintenance), wrote build instructions for @sc{msvc},

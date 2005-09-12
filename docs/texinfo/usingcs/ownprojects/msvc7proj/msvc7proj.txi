@@ -3,7 +3,7 @@
 @subsection Creating an External @sc{msvc} 7 Application
 
 @noindent
-@emph{Written by Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
+@emph{Written by Philip Wyett @email{philip.wyett@@w-tech.co.uk}.}
 @noindent
 @emph{Last updated 2 June 2003.}
 

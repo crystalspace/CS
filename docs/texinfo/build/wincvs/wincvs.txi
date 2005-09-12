@@ -5,7 +5,7 @@
 @cindex WinCVS, Tutorial
 
 @noindent
-@emph{Written by Philip Wyett @email{philipwyett@@dsl.pipex.com}.
+@emph{Written by Philip Wyett @email{philip.wyett@@w-tech.co.uk}.
 Last updated 23 April 2001.}
 
 The guide you are about to begin, will direct you to all the necessary software

@@ -4,7 +4,7 @@
 @cindex Windows, Building
 
 @noindent
-@emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
+@emph{Philip Wyett @email{philip.wyett@@w-tech.co.uk}.}
 @noindent
 @emph{Last updated 18 May 2005.}
 

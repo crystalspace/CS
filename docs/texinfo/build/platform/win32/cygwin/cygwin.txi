@@ -3,7 +3,7 @@
 @subsection Windows using Cygwin
 
 @noindent
-@emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
+@emph{Philip Wyett @email{philip.wyett@@w-tech.co.uk}.}
 @noindent
 @emph{Last updated 13 Dec 2004.}
 

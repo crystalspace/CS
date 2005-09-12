@@ -6,7 +6,7 @@
 
 @noindent
 @emph{Originally written by Thomas Hieber, @email{thieber@@gmx.net}.
-Updated by Philip Wyett, @email{philipwyett@@redeye-entertainment.co.uk}.
+Updated by Philip Wyett, @email{philip.wyett@@w-tech.co.uk}.
 12 February, 2001.
 Updated by Leandro Ezequiel Lovisolo, @email{lovisolo@@datafull.com}.
 Last updated 22 February, 2003.}

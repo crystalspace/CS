@@ -4,7 +4,7 @@
 
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Originally
-written by Philip Wyett, @email{philipwyett@@dsl.pipex.com}.  Last updated 13
+written by Philip Wyett, @email{philip.wyett@@w-tech.co.uk}.  Last updated 13
 Dec 2004.}
 
 These instructions are for building Crystal Space with MinGW, the
