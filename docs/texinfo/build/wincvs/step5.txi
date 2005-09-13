@@ -4,3 +4,6 @@
 
 @ifnotinfo
 @picturess{build,wincvs,wincvs05}
+
+@ifnotinfo
+@picturess{build,wincvs,wincvs06}
