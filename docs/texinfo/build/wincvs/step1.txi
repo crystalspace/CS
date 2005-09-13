@@ -6,13 +6,34 @@ Developers with write-access to the Crystal Space @sc{cvs} repository will
 require two separate software packages, the @sc{cvs} client and the secure
 shell.  Other users only require the @sc{cvs} client.
 
+@subsubheading Prerequisites
+
+The WinCVS client uses Python and TCL for extended features that make using
+the client far easier and throws in some pleasant time savers for those
+mundane CVS tasks.
+
+@subsubheading Python
+
+The recommended Pyhton 2.2 or later can be obtained from:
+
+@uref{http://www.python.org/} or @uref{http://www.activestate.com/}
+
+@subsubheading TCL
+
+The recommended TCL 8.4 or later can be obtained from:
+
+@uref{http://tcl.sourceforge.net/} or @uref{http://www.activestate.com/}
+
 @subsubheading WinCVS Client
 
 The WinCVS client is as Crystal Space, open source and presently is an under
 development piece of software.  A latest stable release of the WinCVS client
 can be obtained from the WinCVS website:
 
-@uref{http://cvsgui.sourceforge.net/}
+@uref{http://www.wincvs.org/}
+
+The Crystal Space development team recommends you download the latest
+recommeded release from the WinCVS website.
 
 @subsubheading Secure Shell (@sc{ssh})
 
@@ -30,3 +51,9 @@ open source @sc{ssh} projects.  SSH for Windows can be obtained via the
 following website.
 
 @uref{http://www.openssh.org}
+
+@emph{Note}: The downloading of software including cryptography capabilities
+is outlawed in some countries. Please be sure to research if downloading
+such software is legal in your country. Neither the Crystal Space development
+team or individuals therein can be held accountable for the software any
+individual downloads knowingly or unknowingly.
