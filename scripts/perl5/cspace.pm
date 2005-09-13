@@ -6802,15 +6802,9 @@ sub ACQUIRE {
 ############# Class : cspace::iSpriteCal3DSocket ##############
 
 package cspace::iSpriteCal3DSocket;
-@ISA = qw( cspace cspace::iBase );
+@ISA = qw( cspace cspace::iSpriteSocket );
 %OWNER = ();
 %ITERATORS = ();
-*SetName = *cspacec::iSpriteCal3DSocket_SetName;
-*GetName = *cspacec::iSpriteCal3DSocket_GetName;
-*SetMeshWrapper = *cspacec::iSpriteCal3DSocket_SetMeshWrapper;
-*GetMeshWrapper = *cspacec::iSpriteCal3DSocket_GetMeshWrapper;
-*SetTriangleIndex = *cspacec::iSpriteCal3DSocket_SetTriangleIndex;
-*GetTriangleIndex = *cspacec::iSpriteCal3DSocket_GetTriangleIndex;
 *SetSubmeshIndex = *cspacec::iSpriteCal3DSocket_SetSubmeshIndex;
 *GetSubmeshIndex = *cspacec::iSpriteCal3DSocket_GetSubmeshIndex;
 *SetMeshIndex = *cspacec::iSpriteCal3DSocket_SetMeshIndex;
