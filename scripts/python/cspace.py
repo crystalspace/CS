@@ -5983,22 +5983,16 @@ _cspace.iSprite3DState_swigregister(iSprite3DStatePtr)
 
 iSprite3DState_scfGetVersion = _cspace.iSprite3DState_scfGetVersion
 
-class iSpriteCal3DSocket(iBase):
+class iSpriteCal3DSocket(iSpriteSocket):
     __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    for _s in [iSpriteSocket]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, iSpriteCal3DSocket, name, value)
     __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    for _s in [iSpriteSocket]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, iSpriteCal3DSocket, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iSpriteCal3DSocket instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def SetName(*args): return _cspace.iSpriteCal3DSocket_SetName(*args)
-    def GetName(*args): return _cspace.iSpriteCal3DSocket_GetName(*args)
-    def SetMeshWrapper(*args): return _cspace.iSpriteCal3DSocket_SetMeshWrapper(*args)
-    def GetMeshWrapper(*args): return _cspace.iSpriteCal3DSocket_GetMeshWrapper(*args)
-    def SetTriangleIndex(*args): return _cspace.iSpriteCal3DSocket_SetTriangleIndex(*args)
-    def GetTriangleIndex(*args): return _cspace.iSpriteCal3DSocket_GetTriangleIndex(*args)
     def SetSubmeshIndex(*args): return _cspace.iSpriteCal3DSocket_SetSubmeshIndex(*args)
     def GetSubmeshIndex(*args): return _cspace.iSpriteCal3DSocket_GetSubmeshIndex(*args)
     def SetMeshIndex(*args): return _cspace.iSpriteCal3DSocket_SetMeshIndex(*args)
