@@ -19,9 +19,10 @@ source code repository kindly hosted by SourceForge
 * WinCVS Tutorial Step 2:: Step 2: Installing the Software
 * WinCVS Tutorial Step 3:: Step 3: Creating a Home Directory
 * WinCVS Tutorial Step 4:: Step 4: Setting WinCVS Preferences
-* WinCVS Tutorial Step 5:: Step 5: Setting Location to Checkout Crystal Space
-* WinCVS Tutorial Step 6:: Step 6: Checking out Crystal Space
-* WinCVS Tutorial Step 7:: Step 7: Updating Crystal Space
+* WinCVS Tutorial Step 5:: Step 5: Setting WinCVS Login Settings
+* WinCVS Tutorial Step 6:: Step 6: Setting Location to Checkout Crystal Space
+* WinCVS Tutorial Step 7:: Step 7: Checking out Crystal Space
+* WinCVS Tutorial Step 8:: Step 8: Updating Crystal Space
 @end menu
 
 @importss{build,wincvs,step1.txi}
@@ -31,3 +32,4 @@ source code repository kindly hosted by SourceForge
 @importss{build,wincvs,step5.txi}
 @importss{build,wincvs,step6.txi}
 @importss{build,wincvs,step7.txi}
+@importss{build,wincvs,step8.txi}

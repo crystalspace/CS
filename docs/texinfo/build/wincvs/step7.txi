@@ -1,17 +1,13 @@
 @c -*-texinfo-*-
-@node WinCVS Tutorial Step 7, , WinCVS Tutorial Step 6, WinCVS Tutorial
-@subsection Step 7: Updating Crystal Space
+@node WinCVS Tutorial Step 7, WinCVS Tutorial Step 8, WinCVS Tutorial Step 6, WinCVS Tutorial
+@subsection Step 7: Checking out Crystal Space
 
-@subsubheading Updating Crystal Space with WinCVS --- @sc{pserver}
+@subsubheading Checking Out Crystal Space with WinCVS --- @sc{pserver}
 
-Once you've successfully checked out the complete source code tree and changes
-have been made, you can update your local copy to mirror the latest code on the
-@sc{cvs} server.  The steps in this section must be completed every time you do
-an update.
-
-Before updating you must login to the server.  From the WinCVS file menu click
-on @emph{Admin} then @emph{Login}.  The @emph{Password authentication} dialog
-prompt will appear, just click on @sc{ok}.
+Before checking out the Crystal Space code you must login to the server.
+From the WinCVS file menu click on @emph{Admin} then @emph{Login}.  The
+@emph{Password authentication} dialog prompt will appear.  Just click on the
+@file{OK} button without entering a password.
 
 @ifnotinfo
 @picturess{build,wincvs,wincvs06}
@@ -26,102 +22,93 @@ cvs -z4 -q login
 *****CVS exited normally with code 0*****
 @end example
 
-If the login was successful, then you can proceed to update.  In the left hand
-@emph{Workspace} window, where you can see the directory @file{crystal_space}.
-Well now you have a ticked subdirectory @file{CS}.  Right click on that
-directory and then click on @emph{Update selection} and the following dialog
-box will appear:
+If the login was successful, then you can proceed and checkout the Crystal
+Space code.  In the left hand @emph{Workspace} window, where you can see the
+directory @file{crystal_space} right-click on that directory and then click on
+the @emph{Checkout module} menu item and you will be presented with the
+following dialog box.
+
+In the edit field @emph{Enter the module name and path on the server}, enter
+the word @samp{crystal}.
 
 @ifnotinfo
-@picturess{build,wincvs,wincvs10}
+@picturess{build,wincvs,wincvs07}
 
 @end ifnotinfo
-On the @emph{Update settings} property sheet, edit as shown in the screenshot
-below.
+Next click on the property sheet tab @emph{Checkout options} and edit as shown
+in the screenshot below.
 
 @ifnotinfo
-@picturess{build,wincvs,wincvs11}
-
-@end ifnotinfo
-Next click on the property sheet tab @emph{Sticky options} and edit as shown in
-the screenshot below.
-
-@ifnotinfo
-@picturess{build,wincvs,wincvs12}
+@picturess{build,wincvs,wincvs08}
 
 @end ifnotinfo
 Next click on the property sheet tab @emph{Globals} and edit as shown in the
 screenshot below.
 
 @ifnotinfo
-@picturess{build,wincvs,wincvs13}
+@picturess{build,wincvs,wincvs09}
 
 @end ifnotinfo
-Now just click on the @sc{ok} button and after several seconds you should start
-to see the files being updated the server and start appearing in the bottom
-@emph{Output} window.
+Now just click on the @sc{ok} button and after several seconds you should begin
+seeing messages that files are being checked out from the @sc{cvs} server.
+These messages will appear in the bottom @emph{Output} window.
 
-The end of a successful update will be indicated by the line:
+The end of a successful checkout will be indicated by the line:
 
 @example
 *****CVS exited normally with code 0*****
 @end example
 
-If the checkout ends with the following line, then the update has failed and
-you must repeat the update steps in this section.
+If the checkout fails, then you will see the following line and must
+repeat the checkout steps in this section.
 
 @example
 *****CVS exited normally with code 1*****
 @end example
 
-@subsubheading Updating Crystal Space with WinCVS --- @sc{ssh}
+@subsubheading Checking Out Crystal Space with WinCVS --- @sc{ssh}
 
 In the left hand @emph{Workspace} window of the WinCVS client, where you can
-see the directory @file{crystal_space}.  Well now you have a ticked
-subdirectory @file{CS}.  Right click on that directory and then click on
-@emph{Update selection} and the following dialog box will appear:
+see the directory @file{crystal_space} right-click on that directory and then
+click on @emph{Checkout module}.  The following dialog box will appear.
+
+In the edit field @emph{Enter the module name and path on the server}, enter
+the word @samp{crystal}.
 
 @ifnotinfo
-@picturess{build,wincvs,wincvs10}
+@picturess{build,wincvs,wincvs07}
 
 @end ifnotinfo
-On the @emph{Update settings} property sheet, edit as shown in the screenshot
-below.
+Next click on the property sheet tab @emph{Checkout options} and edit as shown
+in the screenshot below.
 
 @ifnotinfo
-@picturess{build,wincvs,wincvs11}
+@picturess{build,wincvs,wincvs08}
 
 @end ifnotinfo
-Next click on the property sheet tab @emph{Sticky options} and edit as shown in
-the screenshot below.
-
-@ifnotinfo
-@picturess{build,wincvs,wincvs12}
-
-@end ifnotinfo
-Next click on the property sheet tab @file{Globals} and edit as shown in the
+Next click on the property sheet tab @emph{Globals} and edit as shown in the
 screenshot below.
 
 @ifnotinfo
-@picturess{build,wincvs,wincvs13}
+@picturess{build,wincvs,wincvs09}
 
 @end ifnotinfo
-Now just click on the @sc{ok}
+Now just click on the @sc{ok} button.
 
-This is where an @sc{ssh} update differs from @sc{pserver}.  A blank
+This is where an @sc{ssh} checkout differs from @sc{pserver}.  A blank
 @sc{dos}/Command window should have now appeared.  Enter your SourceForge
 password or @sc{ssh} key and hit the @kbd{@key{ENTER}} key.  After several
-seconds you should start to see the files being updated appearing in the bottom
-@emph{Output} window.
+seconds you should start to see the files being checked out.  This information
+will appear in the bottom @emph{Output} window.
 
-The end of a successful update will be indicated by the line:
+The end of a successful checkout will be indicated by the line:
 
 @example
 *****CVS exited normally with code 0*****
 @end example
 
-If the checkout ends with the following line, then the update has failed and
-you must repeat the update steps in this section.
+If the checkout fails, then you will see the following line and must
+repeat the checkout steps in this section.
 
 @example
 *****CVS exited normally with code 1*****

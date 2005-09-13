@@ -1,13 +1,3 @@
 @c -*-texinfo-*-
 @node WinCVS Tutorial Step 5, WinCVS Tutorial Step 6, WinCVS Tutorial Step 4, WinCVS Tutorial
-@subsection Step 5: Setting Location to Checkout Crystal Space
-
-This section is all about personal preference, however the actions remain the
-same wherever you choose to checkout the Crystal Space source code too on your
-system --- so here is an example.  First, create a directory on your @file{C:\}
-drive called @file{crystal_space}.  Now from the file menu of WinCVS click on
-@emph{View} then @emph{Browse Location} and finally @emph{Change}.  You will be
-presented with a browse dialog.  Just point it to the @file{crystal_space}
-directory on @file{C:\} which you just created and then click on the @sc{ok}
-button.  If all is well, the directory @file{crystal_space} should appear at
-the top of the left hand @emph{Workspace} window of the WinCVS client.
+@subsection Step 5: Setting WinCVS Login Settings
