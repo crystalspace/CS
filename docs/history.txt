@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Sep-2005
+	- res made the software renderer support interleaved arrays.
 13-Sep-2005
         - res reverted the embed.m4 comma removal since it was likely not 
           correct.

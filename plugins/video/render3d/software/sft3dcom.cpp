@@ -51,6 +51,9 @@
 #include "soft_txt.h"
 #include "tcache.h"
 
+#include "clipper.h"
+#include "clip_znear.h"
+
 #if defined (CS_HAVE_MMX)
 #  include "plugins/video/render3d/software/i386/cpuid.h"
 #endif
@@ -4678,8 +4681,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   }
   CS_ASSERT(indexbuf);
 
-  uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_NORMAL);
-  indexbuf->Release ();
+  uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_READ);
 
   csReversibleTransform object2camera = w2c / mesh->object2world;
 
@@ -4795,14 +4797,14 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
   const unsigned int numBuffers =
     sizeof (activebuffers) / sizeof (iRenderBuffer*);
-  void* locks[numBuffers];
+  /*void* locks[numBuffers];
   for (i=0; i<numBuffers; ++i)
   {
     if (activebuffers[i] != 0)
-      locks[i] = activebuffers[i]->Lock (CS_BUF_LOCK_NORMAL);
+      locks[i] = activebuffers[i]->Lock (CS_BUF_LOCK_READ);
     else
       locks[i] = 0;
-  }
+  }*/
 
   // Update work tables.
   if (num_vertices > (unsigned int)tr_verts->Capacity ())
@@ -4817,21 +4819,16 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   // Do vertex tweening and/or transformation to camera space
   // if any of those are needed. When this is done 'verts' will
   // point to an array of camera vertices.
-  csVector3* f1 = (csVector3*)locks[CS_VATTRIB_POSITION - 
-    CS_VATTRIB_SPECIFIC_FIRST];
+  csRenderBufferLock<csVector3> f1 
+    (activebuffers[VATTR_SPEC(POSITION)], CS_BUF_LOCK_READ);
   if (!f1) return; // @@@ FIXME
-  csVector2* uv1 = (csVector2*)locks[CS_VATTRIB_TEXCOORD - 
-    CS_VATTRIB_SPECIFIC_FIRST];
+  csRenderBufferLock<csVector2> uv1 
+    (activebuffers[VATTR_SPEC(TEXCOORD)], CS_BUF_LOCK_READ);
   if (!uv1) return; // @@@ FIXME
   csVector3* work_verts;
-  csVector2* work_uv_verts;
-  csColor* work_col;
-  csColor* col1 = 0;
+  csRenderBufferLock<csColor> col1 
+    (activebuffers[VATTR_SPEC(COLOR)], CS_BUF_LOCK_READ);
   
-  //if (mesh.use_vertex_color)
-    col1 = (csColor*)locks[CS_VATTRIB_COLOR - 
-    CS_VATTRIB_SPECIFIC_FIRST];
-
   //if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
   {
     tr_verts->SetLength (num_vertices);
@@ -4841,8 +4838,6 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   }
   /*else
     work_verts = f1;*/
-  work_uv_verts = uv1;
-  work_col = col1;
 
   z_verts->SetLength (num_vertices);
   persp->SetLength (num_vertices);
@@ -4863,7 +4858,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   memset (&poly, 0, sizeof(poly));
   poly.tex_handle = activeTex;
   poly.mixmode = modes.mixmode | CS_FX_TILING |
-    (!work_col ? CS_FX_FLAT : 0);
+    (!col1.IsValid() ? CS_FX_FLAT : 0);
 
   // Fill flat color if renderer decide to paint it flat-shaded
   {
@@ -4884,219 +4879,76 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
   poly.use_fog = false;
 
+  csVector3 pos[4];
+  float zv[4];
+  csVector2 uv[4];
+  csColor col[4];
+  csVector2 workPersp[4];
+  G3DFogInfo fog[3];
+
+  ClipBuffer clipBuf[32];
+  uint buffersMask = 0;
+  buffersMask |= 1 << VATTR_SPEC(POSITION);
+  clipBuf[VATTR_CLIPINDEX(POSITION)].source = (uint8*)work_verts;
+  clipBuf[VATTR_CLIPINDEX(POSITION)].sourceComp = 3;
+  clipBuf[VATTR_CLIPINDEX(POSITION)].sourceStride = sizeof(float)*3;
+  clipBuf[VATTR_CLIPINDEX(POSITION)].dest = (float*)workPersp;
+  clipBuf[VATTR_CLIPINDEX(POSITION)].destComp = 2;
+
+  buffersMask |= 1 << VATTR_SPEC(TEXCOORD);
+  clipBuf[VATTR_CLIPINDEX(TEXCOORD)].source = (uint8*)uv1.Lock();
+  clipBuf[VATTR_CLIPINDEX(TEXCOORD)].sourceComp = 
+    activebuffers[VATTR_SPEC(TEXCOORD)]->GetComponentCount();
+  clipBuf[VATTR_CLIPINDEX(TEXCOORD)].sourceStride = 
+    activebuffers[VATTR_SPEC(TEXCOORD)]->GetElementDistance();
+  clipBuf[VATTR_CLIPINDEX(TEXCOORD)].dest = (float*)uv;
+  clipBuf[VATTR_CLIPINDEX(TEXCOORD)].destComp = 2;
+
+  /*buffersMask |= 1 << VATTR_SPEC(COLOR);
+  clipBuf[VATTR_CLIPINDEX(COLOR)].source = (uint8*)locks[VATTR_SPEC(COLOR)];
+  clipBuf[VATTR_CLIPINDEX(COLOR)].sourceComp = 
+    activebuffers[VATTR_SPEC(COLOR)]->GetComponentCount();
+  clipBuf[VATTR_CLIPINDEX(COLOR)].sourceStride = 
+    activebuffers[VATTR_SPEC(COLOR)]->GetElementDistance();
+  clipBuf[VATTR_CLIPINDEX(COLOR)].dest = (float*)col;
+  clipBuf[VATTR_CLIPINDEX(COLOR)].destComp = 3;*/
+
+  ClipMeatZNear clipMeat (persp->GetArray(), width2, height2, aspect);
+  BuffersClipper<ClipMeatZNear> bclipper;
+
   // Draw all triangles.
   csTriangle* triangles = (csTriangle*)workIndices;
   for (i = indexstart/3 ; i < (unsigned int)(indexend/3) ; i++)
   {
-    int a = triangles[i].a;
-    int b = triangles[i].b;
-    int c = triangles[i].c;
-    int cnt_vis = int (work_verts[a].z >= SMALL_Z) +
-    		  int (work_verts[b].z >= SMALL_Z) +
-    		  int (work_verts[c].z >= SMALL_Z);
-    if (cnt_vis == 0)
+    size_t n = bclipper.DoClip (clipMeat, triangles[i], clipBuf, buffersMask);
+    if (n == 0) continue;
+    CS_ASSERT((n>= 3) && (n <= 4));
+    
+    for (size_t i = 0; i < n; i++)
     {
-      //=====
-      // Easy case: the triangle is completely not visible.
-      //=====
-      continue;
+      col[i].Set (1.0f, 1.0f, 1.0f);
     }
-    else if (cnt_vis == 3 || lazyclip)
+    
+    int trivert1[3] = { 0, 1, 2 };
+    DrawTriangle (this, clipper, mesh, poly,
+      workPersp[0], workPersp[1], workPersp[2], trivert1,
+      zv, uv, 0, fog);
+    if (n == 4)
     {
-      //=====
-      // Another easy case: all vertices are visible or we are using
-      // lazy clipping in which case we draw the triangle completely.
-      //=====
-      int trivert [3] = { a, b, c };
-      DrawTriangle (this, clipper, mesh, poly,
-      	(*persp)[a], (*persp)[b], (*persp)[c], trivert,
-	z_verts->GetArray (), work_uv_verts, work_col, 0);
-    }
-    else if (cnt_vis == 1)
-    {
-      //=====
-      // A reasonably complex case: one vertex is visible. We need
-      // to clip to the Z-plane but fortunatelly this will result in
-      // another triangle.
-      //=====
-
-      // The following com_iz is valid for all points on Z-plane.
-      float com_zv = 1.0f / (SMALL_Z*10);
-      float com_iz = aspect * (1.0f / (SMALL_Z*10));
-
-      csVector3 va = work_verts[a];
-      csVector3 vb = work_verts[b];
-      csVector3 vc = work_verts[c];
-      csVector3 v;
-      csVector2 pa, pb, pc;
-      float zv[3];
-      csVector2 uv[3];
-      csColor col[3];
-      G3DFogInfo fog[3];
-#undef COPYVT
-#define COPYVT(id,idl,i) \
-	p##idl = (*persp)[i]; zv[id] = (*z_verts)[i]; uv[id] = work_uv_verts[i]; \
-	if (work_col) col[id] = work_col[i];
-#undef INTERPOL
-#define INTERPOL(id,idl,i1,i2) \
-	uv[id] = work_uv_verts[i1] + r*(work_uv_verts[i2]-work_uv_verts[i1]); \
-	zv[id] = com_zv; \
-	p##idl.x = v.x * com_iz + width2; p##idl.y = v.y * com_iz + width2; \
-	if (work_col) \
-	{ \
-	  col[id].red = work_col[i1].red+r*(work_col[i2].red-work_col[i1].red); \
-	  col[id].green = work_col[i1].green+r*(work_col[i2].green-work_col[i1].green); \
-	  col[id].blue = work_col[i1].blue+r*(work_col[i2].blue-work_col[i1].blue); \
-	}
-
-      if (va.z >= SMALL_Z)
-      {
-	// Point a is visible.
-	COPYVT(0,a,a)
-
-	// Calculate intersection between a-b and Z=SMALL_Z*10.
-	// p = a + r * (b-a) (parametric line equation between a and b).
-	float r = (SMALL_Z*10-va.z)/(vb.z-va.z);
-	v.Set (va.x + r * (vb.x-va.x), va.y + r * (vb.y-va.y), SMALL_Z*10);
-	INTERPOL(1,b,a,b)
-	// Calculate intersection between a-c and Z=SMALL_Z*10.
-	r = (SMALL_Z*10-va.z)/(vc.z-va.z);
-	v.Set (va.x + r * (vc.x-va.x), va.y + r * (vc.y-va.y), SMALL_Z*10);
-	INTERPOL(2,c,a,c)
-      }
-      else if (vb.z >= SMALL_Z)
-      {
-	// Point b is visible.
-	COPYVT(1,b,b)
-
-	// Calculate intersection between b-a and Z=SMALL_Z*10.
-	float r = (SMALL_Z*10-vb.z)/(va.z-vb.z);
-	v.Set (vb.x + r * (va.x-vb.x), vb.y + r * (va.y-vb.y), SMALL_Z*10);
-	INTERPOL(0,a,b,a)
-	// Calculate intersection between b-c and Z=SMALL_Z*10.
-	r = (SMALL_Z*10-vb.z)/(vc.z-vb.z);
-	v.Set (vb.x + r * (vc.x-vb.x), vb.y + r * (vc.y-vb.y), SMALL_Z*10);
-	INTERPOL(2,c,b,c)
-      }
-      else
-      {
-	// Point c is visible.
-	COPYVT(2,c,c)
-
-	// Calculate intersection between c-a and Z=SMALL_Z*10.
-	float r = (SMALL_Z*10-vc.z)/(va.z-vc.z);
-	v.Set (vc.x + r * (va.x-vc.x), vc.y + r * (va.y-vc.y), SMALL_Z*10);
-	INTERPOL(0,a,c,a)
-	// Calculate intersection between c-b and Z=SMALL_Z*10.
-	r = (SMALL_Z*10-vc.z)/(vb.z-vc.z);
-	v.Set (vc.x + r * (vb.x-vc.x), vc.y + r * (vb.y-vc.y), SMALL_Z*10);
-	INTERPOL(1,b,c,b)
-      }
-
-      // Now pa, pb, pc will be a triangle that is completely visible.
-      // uv[0..2] contains the texture coordinates.
-      // zv[0..2] contains 1/z
-      // col[0..2] contains color information
-      // fog[0..2] contains fog information
-
-      int trivert [3] = { 0, 1, 2 };
-      DrawTriangle (this, clipper, mesh, poly,
-      	pa, pb, pc, trivert,
-	zv, uv, work_col ? col : 0, fog);
-    }
-    else
-    {
-      //=====
-      // The most complicated case: two vertices are visible. In this
-      // case clipping to the Z-plane does not result in a triangle.
-      // So we have to triangulate.
-      // We will triangulate to triangles a,b,c, and a,c,d.
-      //=====
-
-      // The following com_iz is valid for all points on Z-plane.
-      float com_zv = 1.0f / (SMALL_Z*10);
-      float com_iz = aspect * (1.0f / (SMALL_Z*10));
-
-      csVector3 va = work_verts[a];
-      csVector3 vb = work_verts[b];
-      csVector3 vc = work_verts[c];
-      csVector3 v;
-      csVector2 pa, pb, pc, pd;
-      float zv[4];
-      csVector2 uv[4];
-      csColor col[4];
-      G3DFogInfo fog[4];
-      if (va.z < SMALL_Z)
-      {
-	// Point a is not visible.
-	COPYVT(1,b,b)
-	COPYVT(2,c,c)
-
-	// Calculate intersection between a-b and Z=SMALL_Z*10.
-	// p = a + r * (b-a) (parametric line equation between a and b).
-	float r = (SMALL_Z*10-va.z)/(vb.z-va.z);
-	v.Set (va.x + r * (vb.x-va.x), va.y + r * (vb.y-va.y), SMALL_Z*10);
-	INTERPOL(0,a,a,b)
-	// Calculate intersection between a-c and Z=SMALL_Z*10.
-	r = (SMALL_Z*10-va.z)/(vc.z-va.z);
-	v.Set (va.x + r * (vc.x-va.x), va.y + r * (vc.y-va.y), SMALL_Z*10);
-	INTERPOL(3,d,a,c)
-      }
-      else if (vb.z < SMALL_Z)
-      {
-	// Point b is not visible.
-	COPYVT(0,a,a)
-	COPYVT(3,d,c)
-
-	// Calculate intersection between b-a and Z=SMALL_Z*10.
-	float r = (SMALL_Z*10-vb.z)/(va.z-vb.z);
-	v.Set (vb.x + r * (va.x-vb.x), vb.y + r * (va.y-vb.y), SMALL_Z*10);
-	INTERPOL(1,b,b,a)
-	// Calculate intersection between b-c and Z=SMALL_Z*10.
-	r = (SMALL_Z*10-vb.z)/(vc.z-vb.z);
-	v.Set (vb.x + r * (vc.x-vb.x), vb.y + r * (vc.y-vb.y), SMALL_Z*10);
-	INTERPOL(2,c,b,c)
-      }
-      else
-      {
-	// Point c is not visible.
-	COPYVT(0,a,a)
-	COPYVT(1,b,b)
-
-	// Calculate intersection between c-a and Z=SMALL_Z*10.
-	float r = (SMALL_Z*10-vc.z)/(va.z-vc.z);
-	v.Set (vc.x + r * (va.x-vc.x), vc.y + r * (va.y-vc.y), SMALL_Z*10);
-	INTERPOL(3,d,c,a)
-	// Calculate intersection between c-b and Z=SMALL_Z*10.
-	r = (SMALL_Z*10-vc.z)/(vb.z-vc.z);
-	v.Set (vc.x + r * (vb.x-vc.x), vc.y + r * (vb.y-vc.y), SMALL_Z*10);
-	INTERPOL(2,c,c,b)
-      }
-
-      // Now pa,pb,pc and pa,pc,pd will be triangles that are visible.
-      // uv[0..3] contains the texture coordinates.
-      // zv[0..3] contains 1/z
-      // col[0..3] contains color information
-      // fog[0..3] contains fog information
-
-      int trivert1[3] = { 0, 1, 2 };
-      DrawTriangle (this, clipper, mesh, poly,
-      	pa, pb, pc, trivert1,
-	zv, uv, work_col ? col : 0, fog);
       int trivert2[3] = { 0, 2, 3 };
       DrawTriangle (this, clipper, mesh, poly,
-      	pa, pc, pd, trivert2,
-	zv, uv, work_col ? col : 0, fog);
+      workPersp[0], workPersp[2], workPersp[3], trivert2,
+      zv, uv, 0, fog);
     }
   }
 
   if(deleteIndices) delete[] workIndices;
 
   indexbuf->Release ();
-  for (i=0; i<numBuffers; ++i)
+  /*for (i=0; i<numBuffers; ++i)
   {
     if (activebuffers[i] != 0)
       activebuffers[i]->Release ();
-  }
+  }*/
 }
 

@@ -333,6 +333,10 @@ public:
   csVector3* v_cam2tex;
 };
 
+#define VATTR_SPEC(x)           (CS_VATTRIB_ ## x - CS_VATTRIB_SPECIFIC_FIRST)
+#define VATTR_GEN(x)							      \
+  ((CS_VATTRIB_ ## x - CS_VATTRIB_GENERIC_FIRST) + CS_VATTRIB_SPECIFIC_LAST + 1)
+
 /**
  * The basic software renderer class.
  */

@@ -39,7 +39,7 @@ class csRenderBufferLock
   csRenderBufferLockType lockType;
   bool isLocked;
   T* lockBuf;
-  size_t bufOfs, bufStride;
+  size_t bufStride;
   
   csRenderBufferLock() {}
 public:
@@ -48,8 +48,8 @@ public:
    */
   csRenderBufferLock (iRenderBuffer* buf, 
     csRenderBufferLockType lock = CS_BUF_LOCK_NORMAL) : buffer(buf),
-    lockType(lock), isLocked(false), lockBuf(0), bufOfs(buf->GetOffset()),
-    bufStride(buf->GetElementDistance())
+    lockType(lock), isLocked(false), lockBuf(0), 
+    bufStride(buf ? buf->GetElementDistance() : 0)
   {
   }
   
@@ -69,7 +69,8 @@ public:
   {
     if (!isLocked)
     {
-      lockBuf = (T*)((uint8*)buffer->Lock (lockType) + bufOfs);
+      lockBuf = 
+	buffer ? ((T*)((uint8*)buffer->Lock (lockType))) : (T*)-1;
       isLocked = true;
     }
     return lockBuf;
@@ -80,7 +81,7 @@ public:
   {
     if (isLocked)
     {
-      buffer->Release();
+      if (buffer) buffer->Release();
       isLocked = false;
     }
   }
@@ -109,8 +110,11 @@ public:
   /// Retrieve number of items in buffer.
   size_t GetSize() const
   {
-    return buffer->GetElementCount();
+    return buf ? buffer->GetElementCount() : 0;
   }
+
+  /// Returns whether the buffer is valid (ie not null).
+  bool IsValid() const { return buffer.IsValid(); }
 };
 
 #endif // __CS_CSTOOL_RBUFLOCK_H__

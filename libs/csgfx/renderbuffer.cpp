@@ -93,7 +93,11 @@ void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
   void *rb = 0;
 
   if (masterBuffer.IsValid ())
-    rb = ((uint8*)masterBuffer->Lock (lockType)) + offset;
+  {
+    rb = masterBuffer->Lock (lockType);
+    if (rb == (void*)-1) return rb;
+    rb = (uint8*)rb + offset;
+  }
   else
     rb = buffer;
 
@@ -104,7 +108,7 @@ void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
     lockStack = csCallStackHelper::CreateCallStack (0, true);
 #endif
 
-  return (void*)rb;
+  return rb;
 }
 
 void csRenderBuffer::Release ()

@@ -69,8 +69,7 @@ void csPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       max_vc = MAX (max_vc, pvc);
     }
 
-// @@@ FIXME: soft3d can't grok interleaved!
-#define INTERLEAVE 0
+#define INTERLEAVE 1
 #if INTERLEAVE
     static const csInterleavedSubBufferOptions interleavedElements[3] =
       {{CS_BUFCOMP_FLOAT, 3}, {CS_BUFCOMP_FLOAT, 2}, {CS_BUFCOMP_FLOAT, 2}};

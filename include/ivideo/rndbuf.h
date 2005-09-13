@@ -110,7 +110,8 @@ SCF_VERSION (iRenderBuffer, 0, 1, 0);
 struct iRenderBuffer : public iBase
 {
   /**
-   * Lock the buffer to allow writing and give us a pointer to the data.
+   * Lock the buffer to allow writing and return a pointer to the first 
+   * element.
    * The pointer will be (void*)-1 if there was some error.
    * \param lockType The type of lock desired.
    */
