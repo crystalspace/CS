@@ -39,38 +39,3 @@ Now fill in this dialog box to match the screenshot below.
 @samp{:pserver:} with @samp{:ext:} and @samp{anonymous} with their SourceForge
 username.  Developers also need to change the @emph{Authentication} field to
 @emph{@sc{ssh} Server}.
-
-Next, click on the property sheet tab @emph{Globals} and edit to match the
-screenshot below.
-
-@ifnotinfo
-@picturess{build,wincvs,wincvs04}
-
-@end ifnotinfo
-Next click on the WinCVS property sheet tab and you'll realize why earlier you
-created a home directory.  With the browse button to the right of the @sc{home}
-edit box, browse and point it to your home directory.  If you created your home
-directory on your @file{c:\} drive, it should look as the screenshot below.
-
-@ifnotinfo
-@picturess{build,wincvs,wincvs05}
-
-@end ifnotinfo
-Now click on the @sc{ok} button to apply the changes made.
-
-In the bottom @emph{Output} window of the client you should see the following
-appear.
-
-@example
-NEW CVSROOT:
-:pserver:anonymous@@cvs.sourceforge.net:/cvsroot/crystal
-(password authentication)
-@end example
-
-Developers with write access to the server, will see something similar:
-
-@example
-NEW CVSROOT:
-:ext:myusername@@cvs.sourceforge.net:/cvsroot/crystal
-(ssh authentication)
-@end example

@@ -1,3 +1,6 @@
 @c -*-texinfo-*-
 @node WinCVS Tutorial Step 5, WinCVS Tutorial Step 6, WinCVS Tutorial Step 4, WinCVS Tutorial
 @subsection Step 5: Setting WinCVS Login Settings
+
+@ifnotinfo
+@picturess{build,wincvs,wincvs05}
