@@ -35,6 +35,8 @@ chronological order.
 		dynamic lights
 	  This also fixes a bug with genmesh->SetColor() which was not
 	  correctly forcing an update of the lighting.
+	- Jorrit fixed genmesh so that the color array in the factory is now
+	  also initialized to zero (black).
 13-Sep-2005
         - res reverted the embed.m4 comma removal since it was likely not 
           correct.

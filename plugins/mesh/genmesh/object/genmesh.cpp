@@ -1789,6 +1789,7 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
   memset (mesh_normals, 0, sizeof (csVector3)*num_mesh_vertices);
   mesh_vertices = new csVector3 [num_mesh_vertices];
   mesh_colors = new csColor4 [num_mesh_vertices];
+  memset (mesh_colors, 0, sizeof (csColor4)*num_mesh_vertices);
   mesh_texels = new csVector2 [num_mesh_vertices];
 
   vertex_buffer = 0;
