@@ -39,6 +39,8 @@ chronological order.
 	  also initialized to zero (black).
 	- Jorrit added a new startme app that is a tool to guide the new
 	  CS user through all the demos we have.
+	- Jorrit added a binding for 'esc' to walktest so that esc now
+	  quits walktest too.
 13-Sep-2005
         - res reverted the embed.m4 comma removal since it was likely not 
           correct.
