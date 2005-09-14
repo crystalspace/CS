@@ -43,6 +43,7 @@ VFS.Mount.lib/std      = $(CS_DATADIR)$/standard.zip
 VFS.Mount.lib/stdtex   = $(CS_DATADIR)$/stdtex.zip
 VFS.Mount.lib/cubemap  = $(CS_DATADIR)$/cube$/
 VFS.Mount.lib/teapot   = $(CS_DATADIR)$/teapot.zip
+VFS.Mount.lib/startme  = $(CS_DATADIR)$/startme.zip
 
 ; Mount for AWS
 VFS.Mount.aws = $(CS_DATADIR)$/awsdef.zip, $(CS_DATADIR)$/aws$/
