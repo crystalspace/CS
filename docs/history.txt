@@ -37,6 +37,8 @@ chronological order.
 	  correctly forcing an update of the lighting.
 	- Jorrit fixed genmesh so that the color array in the factory is now
 	  also initialized to zero (black).
+	- Jorrit added a new startme app that is a tool to guide the new
+	  CS user through all the demos we have.
 13-Sep-2005
         - res reverted the embed.m4 comma removal since it was likely not 
           correct.

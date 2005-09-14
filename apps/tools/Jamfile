@@ -10,6 +10,7 @@ SubInclude TOP apps tools lighter2 ;
 SubInclude TOP apps tools partedit ;
 SubInclude TOP apps tools picview ;
 SubInclude TOP apps tools pvscalc ;
+SubInclude TOP apps tools startme ;
 SubInclude TOP apps tools viewmesh ;
 SubInclude TOP apps tools vsh ;
 
