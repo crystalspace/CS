@@ -4,6 +4,8 @@
 
 @ifnotinfo
 @picturess{build,wincvs,wincvs05}
+@end ifnotinfo
 
 @ifnotinfo
 @picturess{build,wincvs,wincvs06}
+@end ifnotinfo
