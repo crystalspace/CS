@@ -125,6 +125,8 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   buf.Format ("r%d_%d_%d", x, y, z);
   iSector* room = engine->CreateSector (buf);
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
+  walls->SetZBufMode (CS_ZBUF_USE);
+  walls->SetRenderPriority (engine->GetObjectRenderPriority ());
   csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState));
   csRef<iThingFactoryState> walls_fact_state = walls_state->GetFactory ();
@@ -262,6 +264,7 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
   }
   else
   {
+printf ("Trav!\n"); fflush (stdout);
     extern WalkTest* Sys;
     InfiniteMaze* infinite_maze = Sys->infinite_maze;
     InfRoomData* ird = infinite_maze->create_six_room (Sys->Engine,
@@ -310,11 +313,7 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
     }
     csRef<iPolygonMesh> mesh = 
       ird->walls->GetMeshObject ()->GetObjectModel()->GetPolygonMeshColldet();
-    csRef<iObject> io (SCF_QUERY_INTERFACE (ird->walls, iObject));
-    csColliderWrapper *cw = new csColliderWrapper (
-    	io, Sys->collide_system, mesh);
-    cw->SetName ("inf maze");
-    cw->DecRef ();
+    csColliderHelper::InitializeCollisionWrapper (Sys->collide_system, ird->walls);
     return true;
   }
   return false;
