@@ -110,7 +110,7 @@ public:
   /// Retrieve number of items in buffer.
   size_t GetSize() const
   {
-    return buf ? buffer->GetElementCount() : 0;
+    return buffer ? buffer->GetElementCount() : 0;
   }
 
   /// Returns whether the buffer is valid (ie not null).
