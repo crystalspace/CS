@@ -264,7 +264,6 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
   }
   else
   {
-printf ("Trav!\n"); fflush (stdout);
     extern WalkTest* Sys;
     InfiniteMaze* infinite_maze = Sys->infinite_maze;
     InfRoomData* ird = infinite_maze->create_six_room (Sys->Engine,
