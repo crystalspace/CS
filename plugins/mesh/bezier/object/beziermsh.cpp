@@ -197,7 +197,6 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   logparent_factory = 0;
   beziermsh_type = thing_type;
 
-  dynamic_ambient.Set (0,0,0);
   light_version = 1;
 
   ParentTemplate = 0;
@@ -876,9 +875,8 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     listCreated, currentFrame);
   meshes.SetLength (GetCurveCount(), 0);
 
-  csColor ambient = dynamic_ambient;
   iSector* s = movable->GetSectors ()->Get (0);
-  ambient += s->GetDynamicAmbientLight ();
+  csColor ambient = s->GetDynamicAmbientLight ();
   bool update_ambient = false;
   if (dynamic_ambient_version != s->GetDynamicAmbientVersion ())
   {

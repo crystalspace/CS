@@ -328,11 +328,9 @@ private:
   int lmres;
   uint colorVersion;
   uint last_colorVersion;
-  csColor dynamic_ambient;
 
   /**
-   * Global sector wide dynamic ambient version. Unrelated to dynamic_ambient 
-   * above!
+   * Global sector wide dynamic ambient version.
    */
   uint dynamic_ambient_version;
 
@@ -463,8 +461,6 @@ public:
   bool ReadFromCache (iCacheManager* cache_mgr);
   bool WriteToCache (iCacheManager* cache_mgr);
   void PrepareLighting ();
-  void SetDynamicAmbientLight (const csColor& color);
-  const csColor& GetDynamicAmbientLight ();
   void LightChanged (iLight* light);
   void LightDisconnect (iLight* light);
   char* GenerateCacheName ();
@@ -556,14 +552,6 @@ public:
     virtual void PrepareLighting ()
     {
       scfParent->PrepareLighting ();
-    }
-    virtual void SetDynamicAmbientLight (const csColor& color)
-    {
-      scfParent->SetDynamicAmbientLight (color);
-    }
-    virtual const csColor& GetDynamicAmbientLight ()
-    {
-      return scfParent->dynamic_ambient;
     }
     virtual void LightChanged (iLight* light)
     {

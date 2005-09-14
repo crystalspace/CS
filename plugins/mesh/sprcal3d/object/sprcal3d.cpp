@@ -862,8 +862,6 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   default_idle_anim = -1;
   last_locked_anim = -1;
 
-  dynamic_ambient.Set (0, 0, 0);
-
   do_update = -1;
   updateanim_sqdistance1 = 10*10;
   updateanim_skip1 = 5;		// Skip every 5 frames.
@@ -1119,7 +1117,6 @@ void csSpriteCal3DMeshObject::InitSubmeshLighting (int mesh, int submesh,
   {
     ((csSpriteCal3DMeshObjectFactory*)factory)->engine->GetAmbientLight (col);
     //    col += color;  // no inherent color in cal3d sprites
-    col += dynamic_ambient;
     iSector* sect = movable->GetSectors ()->Get (0);
     if (sect)
       col += sect->GetDynamicAmbientLight ();
@@ -1127,7 +1124,7 @@ void csSpriteCal3DMeshObject::InitSubmeshLighting (int mesh, int submesh,
   else
   {
     //    col = color;
-    col = dynamic_ambient;
+    col.Set (0, 0, 0);
   }
   for (int i = 0 ; i < vertCount ; i++)
     colors[i] = col;

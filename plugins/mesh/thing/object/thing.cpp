@@ -1574,7 +1574,6 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
 
   wor_verts = 0;
 
-  dynamic_ambient.Set (0, 0, 0);
   dynamic_ambient_version = 0;
   light_version = 1;
 
@@ -2640,7 +2639,7 @@ void csThing::ClearLMs ()
 
 void csThing::UpdateDirtyLMs ()
 {
-  csColor amb = dynamic_ambient;
+  csColor amb (0, 0, 0);
   if (cached_movable)
   {
     // First check if dynamic ambient has changed.

@@ -11,6 +11,30 @@ chronological order.
 	- mdmkolbe fixed missing CS_REQUEST_PLUGIN in Python Swig bindings
 	  reported by Vincent Knecht.
 	- mdmkolbe converted CS/plugins/filesys to new SCF.
+	- Jorrit removed the obsolete SetDynamicAmbientLight() method in
+	  iLightingInfo.
+	- Jorrit sanitized the confusing lighting options in genmesh.
+	  It is now better documented how exactly the lighting calculation
+	  is supposed to take place and it now actually works as documented.
+	  The behaviour has changed slightly as compared to before.
+	  Here is how it now works:
+	    - In all cases the color array from the factory will be added
+	      to the colors calculated below.
+	    - If manualcolors is enabled then only the optional animation
+	      control still matters. No other lighting values are processed.
+	    - Otherwise if lighting is disabled then the base color of the
+	      mesh will be added to the factory colors.
+	    - If lighting is enabled and localshadows is disabled then
+	      lighting is calculated as follows:
+	        factory colors + base color + static ambient + dynamic
+		ambient + lighting as calculated from nearby/relevant lights.
+	    - If both lighting and localshadows are enabled then
+	      lighting is calculated as follows:
+	        factory colors + base color + static ambient + dynamic
+		ambient + lighting as precalculated during static lighting +
+		dynamic lights
+	  This also fixes a bug with genmesh->SetColor() which was not
+	  correctly forcing an update of the lighting.
 13-Sep-2005
         - res reverted the embed.m4 comma removal since it was likely not 
           correct.

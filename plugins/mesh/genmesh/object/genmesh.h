@@ -145,11 +145,8 @@ private:
   int num_lit_mesh_colors;	// Should be equal to factory number.
   csColor4* static_mesh_colors;
 
-  /// Dynamic ambient light assigned to this genmesh.
-  csColor dynamic_ambient;
   /**
-   * Global sector wide dynamic ambient version. Unrelated to dynamic_ambient 
-   * above!
+   * Global sector wide dynamic ambient version.
    */
   uint32 dynamic_ambient_version;
 
@@ -211,9 +208,8 @@ private:
   /**
    * Update lighting using the iLightingInfo system.
    */
-  void UpdateLighting2 (iMovable* movable);
-
   void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);
+
 public:
   /// Constructor.
   csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory);
@@ -272,17 +268,9 @@ public:
   bool WriteToCache (iCacheManager* cache_mgr);
   void PrepareLighting ();
 
-  void SetDynamicAmbientLight (const csColor& color)
-  {
-    dynamic_ambient = color;
-    lighting_dirty = true;
-  }
-
   void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
     	const csVector3& origin);
   void CastShadows (iMovable* movable, iFrustumView* fview);
-  void FinalizeLighting (iMovable* movable, iLight* light,
-    const csArray<bool>& influences);
   void LightChanged (iLight* light);
   void LightDisconnect (iLight* light);
 
@@ -322,12 +310,11 @@ public:
   }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
-
   virtual iObjectModel* GetObjectModel ();
   virtual bool SetColor (const csColor& col)
   {
     base_color.Set (col);
-    initialized = false;
+    lighting_dirty = true;
     return true;
   }
   virtual bool GetColor (csColor& col) const { col = base_color; return true; }
@@ -359,14 +346,6 @@ public:
     virtual void PrepareLighting ()
     {
       scfParent->PrepareLighting ();
-    }
-    virtual void SetDynamicAmbientLight (const csColor& color)
-    {
-      scfParent->SetDynamicAmbientLight (color);
-    }
-    virtual const csColor& GetDynamicAmbientLight ()
-    {
-      return scfParent->dynamic_ambient;
     }
     virtual void LightChanged (iLight* light)
     {

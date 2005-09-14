@@ -153,7 +153,6 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   lighting_dirty = true;
   shadow_caps = false;
 
-  dynamic_ambient.Set (0,0,0);
   dynamic_ambient_version = 0;
 
   anim_ctrl_verts = false;
@@ -323,12 +322,12 @@ void csGenmeshMeshObject::InitializeDefault (bool clear)
   CheckLitColors ();
   if (clear)
   {
-    csColor amb;
-    factory->engine->GetAmbientLight (amb);
+    //csColor amb;
+    //factory->engine->GetAmbientLight (amb);
     for (i = 0 ; i < num_lit_mesh_colors ; i++)
     {
       lit_mesh_colors[i].Set (0, 0, 0);
-      static_mesh_colors[i].Set (amb);
+      static_mesh_colors[i].Set (0, 0, 0);
     }
   }
   lighting_dirty = true;
@@ -696,10 +695,11 @@ void csGenmeshMeshObject::SetupObject ()
       lit_mesh_colors = new csColor4 [num_lit_mesh_colors];
       int i;
       for (i = 0 ; i <  num_lit_mesh_colors; i++)
-        lit_mesh_colors[i].Set (0.2f, 0.2f, 0.2f);  // @@@ ???
+        lit_mesh_colors[i].Set (0, 0, 0);
       static_mesh_colors = new csColor4 [num_lit_mesh_colors];
       for (i = 0 ; i <  num_lit_mesh_colors; i++)
-        static_mesh_colors[i] = base_color;	// Initialize to base color.
+        //static_mesh_colors[i] = base_color;	// Initialize to base color.
+        static_mesh_colors[i].Set (0, 0, 0);
     }
     iMaterialWrapper* mater = material;
     if (!mater) mater = factory->GetMaterialWrapper ();
@@ -855,11 +855,6 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   }
 }
 
-void csGenmeshMeshObject::FinalizeLighting (iMovable* movable, iLight* light,
-                        const csArray<bool>& influences)
-{
-}
-
 void csGenmeshMeshObject::UpdateLightingOne (
   const csReversibleTransform& trans, iLight* li)
 {
@@ -900,150 +895,127 @@ void csGenmeshMeshObject::UpdateLightingOne (
   }
 }
 
-void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
-{
-  SetupObject ();
-  CheckLitColors ();
+/*
+Rules for color calculation:
+  EAmb = Static Engine Ambient
+  SAmb = Dynamic Sector Ambient
+  BC   = Base Color (base_color)
+  FC   = Color Array from factory
+  SC   = Static Color Array (static_mesh_colors)
+  LC   = Colors calculated from all relevant lights
+  LDC  = Colors calculated from dynamic lights only
+  C    = Final Color Array (lit_mesh_colors)
 
-  if (do_manual_colors) return;
+  sr   = do_shadow_rec flag
+  l    = lighting flag
+  mc   = manual colors flag
 
-  iSector* sect = movable->GetSectors ()->Get (0);
-  if (dynamic_ambient_version != sect->GetDynamicAmbientVersion ())
-  {
-    dynamic_ambient_version = sect->GetDynamicAmbientVersion ();
-    lighting_dirty = true;
-  }
-
-  if (!lighting_dirty) return;
-  lighting_dirty = false;
-
-  int i;
-  csColor4* colors = lit_mesh_colors;
-
-  if (do_shadow_rec)
-  {
-    memcpy (colors, static_mesh_colors,
-      num_lit_mesh_colors * sizeof (csColor4));
-
-    csColor col (dynamic_ambient);
-    if (sect) col += sect->GetDynamicAmbientLight ();
-    if (col.red > EPSILON || col.green > EPSILON || col.blue > EPSILON)
-      for (i = 0 ; i < factory->GetVertexCount () ; i++)
-	colors[i] += col;
-  }
-  else
-  {
-    csColor col;
-    // Set all colors to ambient light.
-    if (factory->engine)
-    {
-      factory->engine->GetAmbientLight (col);
-      col += base_color;
-      if (sect)
-	col += sect->GetDynamicAmbientLight ();
-    }
-    else
-    {
-      col = base_color;
-    }
-    col += dynamic_ambient;
-    for (i = 0 ; i < factory->GetVertexCount () ; i++)
-      colors[i].Set (col);
-  }
-
-  csReversibleTransform trans = movable->GetFullTransform ();
-  csSet<csPtrKey<iLight> >::GlobalIterator it = affecting_lights.GetIterator ();
-  while (it.HasNext ())
-  {
-    iLight* l = (iLight*)it.Next ();
-    UpdateLightingOne (trans, l);
-  }
-  csHash<csShadowArray*, csPtrKey<iLight> >::GlobalIterator pdlIt =
-    pseudoDynInfo.GetIterator ();
-  while (pdlIt.HasNext ())
-  {
-    csPtrKey<iLight> l;
-    csShadowArray* shadowArr = pdlIt.Next (l);
-    csColor c = l->GetColor ();
-    if (c.red > EPSILON || c.green > EPSILON || c.blue > EPSILON)
-    {
-      c = c * (256. / CS_NORMAL_LIGHT_LEVEL);
-      float* intensities = shadowArr->shadowmap;
-      for (int i = 0; i < num_lit_mesh_colors; i++)
-      {
-        colors[i] += c * intensities[i];
-      }
-    }
-  }
-
-  // @@@ Try to avoid this loop!
-  // Clamp all vertex colors to 2.
-  for (i = 0 ; i < factory->GetVertexCount () ; i++)
-    colors[i].Clamp (2., 2., 2.);
-
-  mesh_colors_dirty_flag = true;
-}
+  sr   mc   l    formula
+  ----------------------
+  *    1    *    C[i] = FC[i]
+  *    0    0    C[i] = BC+FC[i]
+  1    0    1    C[i] = BC+SC[i]+EAmb+SAmb+FC[i]+LDC[i]
+  0    0    1    C[i] = BC+LC[i]+EAmb+SAmb+FC[i]
+*/
 
 void csGenmeshMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     iMovable* movable)
 {
   if (do_manual_colors) return;
-  if (do_shadow_rec) return;
 
-  if (!lighting_dirty)
+  int i;
+  csColor4* factory_colors = factory->GetColors ();
+
+  if (do_lighting)
   {
-    iSector* sect = movable->GetSectors ()->Get (0);
-    if (dynamic_ambient_version == sect->GetDynamicAmbientVersion ())
-      return;
-    dynamic_ambient_version = sect->GetDynamicAmbientVersion ();
-  }
+    if (!lighting_dirty)
+    {
+      iSector* sect = movable->GetSectors ()->Get (0);
+      if (dynamic_ambient_version == sect->GetDynamicAmbientVersion ())
+        return;
+      dynamic_ambient_version = sect->GetDynamicAmbientVersion ();
+    }
+    lighting_dirty = false;
+    mesh_colors_dirty_flag = true;
 
-  lighting_dirty = false;
-
-  int i, l;
-  csColor4* colors = lit_mesh_colors;
-
-  // Set all colors to ambient light.
-  csColor col;
-  if (factory->engine)
-  {
-    factory->engine->GetAmbientLight (col);
-    col += base_color;
-    iSector* sect = movable->GetSectors ()->Get (0);
-    if (sect)
-      col += sect->GetDynamicAmbientLight ();
+    csColor col;
+    if (factory->engine)
+    {
+      factory->engine->GetAmbientLight (col);
+      col += base_color;
+      iSector* sect = movable->GetSectors ()->Get (0);
+      if (sect)
+        col += sect->GetDynamicAmbientLight ();
+    }
+    else
+    {
+      col = base_color;
+    }
+    for (i = 0 ; i < factory->GetVertexCount () ; i++)
+    {
+      lit_mesh_colors[i] = col + static_mesh_colors[i] + factory_colors[i];
+    }
+    if (do_shadow_rec)
+    {
+      csReversibleTransform trans = movable->GetFullTransform ();
+      csSet<csPtrKey<iLight> >::GlobalIterator it = affecting_lights.
+      	GetIterator ();
+      while (it.HasNext ())
+      {
+        iLight* l = (iLight*)it.Next ();
+        UpdateLightingOne (trans, l);
+      }
+      csHash<csShadowArray*, csPtrKey<iLight> >::GlobalIterator pdlIt =
+        pseudoDynInfo.GetIterator ();
+      while (pdlIt.HasNext ())
+      {
+        csPtrKey<iLight> l;
+        csShadowArray* shadowArr = pdlIt.Next (l);
+        csColor c = l->GetColor ();
+        if (c.red > EPSILON || c.green > EPSILON || c.blue > EPSILON)
+        {
+          c = c * (256. / CS_NORMAL_LIGHT_LEVEL);
+          float* intensities = shadowArr->shadowmap;
+          for (int i = 0; i < num_lit_mesh_colors; i++)
+          {
+            lit_mesh_colors[i] += c * intensities[i];
+          }
+        }
+      }
+    }
+    else
+    {
+      // Do the lighting.
+      csReversibleTransform trans = movable->GetFullTransform ();
+      // the object center in world coordinates. "0" because the object
+      // center in object space is obviously at (0,0,0).
+      int num_lights = (int)lights.Length ();
+      for (int l = 0 ; l < num_lights ; l++)
+      {
+        iLight* li = lights[l];
+        li->AddAffectedLightingInfo (&scfiLightingInfo);
+        affecting_lights.Add (li);
+        UpdateLightingOne (trans, li);
+      }
+    }
+    // @@@ Try to avoid this loop!
+    // Clamp all vertex colors to 2.
+    for (i = 0 ; i < factory->GetVertexCount () ; i++)
+      lit_mesh_colors[i].Clamp (2., 2., 2.);
   }
   else
   {
-    col = base_color;
+    if (!lighting_dirty)
+      return;
+    lighting_dirty = false;
+    mesh_colors_dirty_flag = true;
+
+    for (i = 0 ; i < factory->GetVertexCount () ; i++)
+    {
+      lit_mesh_colors[i] = base_color + factory_colors[i];
+      lit_mesh_colors[i].Clamp (2., 2., 2.);
+    }
   }
-  col += dynamic_ambient;
-  for (i = 0 ; i < factory->GetVertexCount () ; i++)
-    colors[i] = col;
-
-  if (!do_lighting) return;
-    // @@@ it is not efficient to do this all the time.
-
-
-  // Do the lighting.
-  csReversibleTransform trans = movable->GetFullTransform ();
-  // the object center in world coordinates. "0" because the object
-  // center in object space is obviously at (0,0,0).
-  int num_lights = (int)lights.Length ();
-  for (l = 0 ; l < num_lights ; l++)
-  {
-    iLight* li = lights[l];
-    li->AddAffectedLightingInfo (&scfiLightingInfo);
-    affecting_lights.Add (li);
-    UpdateLightingOne (trans, li);
-  }
-
-  // @@@ Try to avoid this loop!
-  // Clamp all vertex colors to 2.
-  for (i = 0 ; i < factory->GetVertexCount () ; i++)
-    colors[i].Clamp (2., 2., 2.);
-
-  mesh_colors_dirty_flag = true;
 }
 
 csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
@@ -1382,13 +1354,9 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
 
   if (buffer == CS_BUFFER_COLOR)
   {
-    if (!do_manual_colors && !do_shadow_rec && factory->light_mgr)
+    if (!do_manual_colors)
     {
       UpdateLighting (relevant_lights, lighting_movable);
-    }
-    else
-    {
-      UpdateLighting2 (lighting_movable);
     }
     if (mesh_colors_dirty_flag || anim_ctrl_colors)
     {
@@ -1408,10 +1376,9 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
         mesh_colors_dirty_flag = false;
         const csColor4* mesh_colors = 0;
         if (anim_ctrl_colors)
-          mesh_colors = AnimControlGetColors (
-          do_lighting ? lit_mesh_colors : static_mesh_colors);
+          mesh_colors = AnimControlGetColors (lit_mesh_colors);
         else
-          mesh_colors = do_lighting ? lit_mesh_colors : static_mesh_colors;
+          mesh_colors = lit_mesh_colors;
         color_buffer->CopyInto (mesh_colors, num_lit_mesh_colors);
       }
       else

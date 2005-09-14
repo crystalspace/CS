@@ -686,7 +686,6 @@ private:
   csBox3 object_bbox;
   uint bboxVersion;
   bool lighting_dirty;
-  csColor dynamic_ambient;
 
   struct Mesh
   {
@@ -770,14 +769,6 @@ public:
     }
     virtual void PrepareLighting ()
     {
-    }
-    virtual void SetDynamicAmbientLight (const csColor& color)
-    {
-      scfParent->dynamic_ambient = color;
-    }
-    virtual const csColor& GetDynamicAmbientLight ()
-    {
-      return scfParent->dynamic_ambient;;
     }
     virtual void LightChanged (iLight* light)
     {

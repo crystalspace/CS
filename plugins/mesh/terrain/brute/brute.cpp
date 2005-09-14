@@ -1162,7 +1162,6 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
 
   colorVersion = 0;
   last_colorVersion = (uint)~0;
-  dynamic_ambient.Set (0.0f, 0.0f, 0.0f);
   dynamic_ambient_version = 0;
 
   baseContext = new csShaderVariableContext();
@@ -1531,17 +1530,6 @@ void csTerrainObject::PrepareLighting ()
   }
 }
 
-void csTerrainObject::SetDynamicAmbientLight (const csColor& color)
-{
-  dynamic_ambient = color;
-  colorVersion++;
-}
-
-const csColor& csTerrainObject::GetDynamicAmbientLight ()
-{
-  return dynamic_ambient;
-}
-
 void csTerrainObject::LightChanged (iLight* light)
 {
   colorVersion++;
@@ -1558,10 +1546,8 @@ void csTerrainObject::UpdateColors (iMovable* movable)
   if (!staticlighting) return;
 
   // First check if dynamic ambient has changed.
-  csColor baseColor (dynamic_ambient);
-
   iSector* s = movable->GetSectors ()->Get (0);
-  baseColor += s->GetDynamicAmbientLight ();
+  csColor baseColor = s->GetDynamicAmbientLight ();
   if (dynamic_ambient_version != s->GetDynamicAmbientVersion ())
   {
     dynamic_ambient_version = s->GetDynamicAmbientVersion ();

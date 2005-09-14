@@ -78,16 +78,6 @@ struct iLightingInfo : public iBase
   virtual void PrepareLighting () = 0;
 
   /**
-   * Sets dynamic ambient light for this object.
-   */
-  virtual void SetDynamicAmbientLight (const csColor& color) = 0;
-
-  /**
-   * Get dynamic ambient light.
-   */
-  virtual const csColor& GetDynamicAmbientLight () = 0;
-
-  /**
    * Indicate that some light has changed. This function will
    * be called by the lighting system whenever a light that
    * affects this mesh is changed in some way.
