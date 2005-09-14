@@ -8,6 +8,8 @@ chronological order.
 
 14-Sep-2005
 	- res made the software renderer support interleaved arrays.
+	- mdmkolbe fixed missing CS_REQUEST_PLUGIN in Python Swig bindings
+	  reported by Vincent Knecht.
 13-Sep-2005
         - res reverted the embed.m4 comma removal since it was likely not 
           correct.
