@@ -5,7 +5,7 @@
 Some portions of CrystalSpace are @emph{not} covered by @sc{lgpl} license. You
 might have to consider this, depending on how you intend to distribute your
 finished product. However, this is usually not problematic, as the modular 
-design of CrystalSpace allows to simply exclude the plugins in question.
+design of CrystalSpace allows to simply exclude the components in question.
 
 @itemize @bullet
 @item 
@@ -21,10 +21,30 @@ Licensed under the @sc{gnu} General Public License. @xref{Copying}.
 
 @end itemize
 
-In addition, some plugins may need to link to external libraries covered 
+In addition, some components may need to link to external libraries covered 
 under a license other than the @sc{lgpl}.
 
 @itemize @bullet
 @item
-@emph{None yet.}
+Debugging/developing aids on MinGW
+
+CrystalSpace contains facilities to aid in the debugging and developing of 
+both the engine and client products; one of those is the ability to create
+call stacks. On MinGW, in order to obtain meaningful symbol names for call
+stacks, the @sc{bfd} library is used, which is licensed under the @sc{gnu} 
+General Public License (@pxref{Copying}).
+
+Call stacks are provided by the very core of CrystalSpace, this means that any
+plugin or application linking against CrystalSpace also links against @sc{bfd}.
+However, since this facility is only sensible for debug builds, @sc{bfd} is
+only used by ``debug'' builds, not ``profile'' or ``optimize'' builds.
+
+As linking against @sc{bfd} ``infects'' a project with the @sc{gpl}, you need 
+to be careful when shipping debug builds compiled on MinGW if you use a license 
+that is not @sc{gpl}-compatible. You can avert such problems by disabling the
+use of @sc{bfd}; this is done by passing @code{--without-bfd} as a parameter
+to @code{configure}. Again, note that this only affects debug builds on MinGW; 
+optimize builds or builds on any other platform are by default ``safe'' as 
+they won't use @sc{bfd}.
+
 @end itemize
