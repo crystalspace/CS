@@ -271,6 +271,10 @@ public:
 // Now all the scfImplementationExt are defined
 #define SCF_IMPL_EXT
 
+#define SCF_IMPL_N 0
+#include "scf_impl.h"
+#undef SCF_IMPL_N
+
 #define SCF_IMPL_N 1
 #include "scf_impl.h"
 #undef SCF_IMPL_N

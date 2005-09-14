@@ -29,6 +29,7 @@
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
 #include "csutil/parray.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/strset.h"
 #include "csutil/sysfunc.h"
@@ -54,7 +55,7 @@ CS_IMPLEMENT_PLUGIN
 #define VFS_KEEP_UNUSED_ARCHIVE_TIME	10000
 
 // This is a version of csFile which "lives" on plain filesystem
-class DiskFile : public csFile
+class DiskFile : public scfImplementationExt0<DiskFile, csFile>
 {
   friend class VfsNode;
 
@@ -79,8 +80,6 @@ class DiskFile : public csFile
   // attempt to create a file mapping buffer from this file
   iDataBuffer* TryCreateMapping ();
 public:
-  SCF_DECLARE_IBASE;
-
   // destructor
   virtual ~DiskFile ();
   // read a block of data
@@ -108,7 +107,7 @@ private:
 class VfsArchive;
 
 // This is a version of csFile which "lives" in archives
-class ArchiveFile : public csFile
+class ArchiveFile : public scfImplementationExt0<ArchiveFile, csFile>
 {
 private:
   friend class VfsNode;
@@ -128,8 +127,6 @@ private:
     const char *NameSuffix, VfsArchive *ParentArchive, unsigned int verbosity);
 
 public:
-  SCF_DECLARE_IBASE;
-
   // destructor
   virtual ~ArchiveFile ();
   // read a block of data
@@ -350,10 +347,10 @@ static VfsArchiveCache *ArchiveCache = 0;
 
 // -------------------------------------------------------------- csFile --- //
 
-csFile::csFile (int Mode, VfsNode *ParentNode, size_t RIndex,
-		const char *NameSuffix, unsigned int verbosity)
+csFile::csFile (int /*Mode*/, VfsNode *ParentNode, size_t RIndex,
+		const char *NameSuffix, unsigned int verbosity) :
+  scfImplementationType(this, 0)
 {
-  (void)Mode;
   Node = ParentNode;
   Index = RIndex;
   Size = 0;
@@ -386,13 +383,12 @@ int csFile::GetStatus ()
 bool csMemoryMapFile(csMemMapInfo*, char const* filename);
 void csUnMemoryMapFile(csMemMapInfo*);
 
-class csMMapDataBuffer : public iDataBuffer
+class csMMapDataBuffer :
+  public scfImplementation1<csMMapDataBuffer, iDataBuffer>
 {
   csMemMapInfo mapping;
   bool status;
 public:
-  SCF_DECLARE_IBASE;
-
   csMMapDataBuffer (const char* filename);
   virtual ~csMMapDataBuffer ();
 
@@ -402,14 +398,9 @@ public:
   virtual char* GetData () const { return (char*)mapping.data; };
 };
 
-SCF_IMPLEMENT_IBASE (csMMapDataBuffer)
-  SCF_IMPLEMENTS_INTERFACE (iDataBuffer);
-SCF_IMPLEMENT_IBASE_END
-
-csMMapDataBuffer::csMMapDataBuffer (const char* filename)
+csMMapDataBuffer::csMMapDataBuffer (const char* filename) :
+  scfImplementationType(this, 0)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   status = csMemoryMapFile (&mapping, filename);
   if (!status)
   {
@@ -424,14 +415,9 @@ csMMapDataBuffer::~csMMapDataBuffer ()
   {
     csUnMemoryMapFile (&mapping);
   }
-  SCF_DESTRUCT_IBASE();
 }
 
 #endif
-
-SCF_IMPLEMENT_IBASE (DiskFile)
-  SCF_IMPLEMENTS_INTERFACE (iFile)
-SCF_IMPLEMENT_IBASE_END
 
 #ifndef O_BINARY
 #  define O_BINARY 0
@@ -450,9 +436,8 @@ SCF_IMPLEMENT_IBASE_END
 
 DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
 		    const char *NameSuffix, unsigned int verbosity) :
-  csFile (Mode, ParentNode, RIndex, NameSuffix, verbosity)
+  scfImplementationType(this, Mode, ParentNode, RIndex, NameSuffix, verbosity)
 {
-  SCF_CONSTRUCT_IBASE (0);
   bool const debug = IsVerbose(csVFS::VERBOSITY_DEBUG);
   char *rp = (char *)Node->RPathV [Index];
   size_t rpl = strlen (rp);
@@ -551,8 +536,6 @@ DiskFile::~DiskFile ()
   if (file)
     fclose (file);
   delete [] fName;
-
-  SCF_DESTRUCT_IBASE();
 }
 
 void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
@@ -831,15 +814,10 @@ iDataBuffer* DiskFile::TryCreateMapping ()
 
 // --------------------------------------------------------- ArchiveFile --- //
 
-SCF_IMPLEMENT_IBASE (ArchiveFile)
-  SCF_IMPLEMENTS_INTERFACE (iFile)
-SCF_IMPLEMENT_IBASE_END
-
 ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   const char *NameSuffix, VfsArchive *ParentArchive, unsigned int verbosity) :
-  csFile (Mode, ParentNode, RIndex, NameSuffix, verbosity)
+  scfImplementationType(this, Mode, ParentNode, RIndex, NameSuffix, verbosity)
 {
-  SCF_CONSTRUCT_IBASE (0);
   Archive = ParentArchive;
   Error = VFS_STATUS_OTHER;
   Size = 0;
@@ -888,8 +866,6 @@ ArchiveFile::~ArchiveFile ()
   if (fh)
     Archive->Writing--;
   Archive->DecRef ();
-
-  SCF_DESTRUCT_IBASE();
 }
 
 size_t ArchiveFile::Read (char *Data, size_t DataSize)
@@ -1484,19 +1460,11 @@ int csVFS::VfsVector::Compare (VfsNode* const& Item1, VfsNode* const& Item2)
 
 // --------------------------------------------------------------- csVFS --- //
 
-SCF_IMPLEMENT_IBASE (csVFS)
-  SCF_IMPLEMENTS_INTERFACE (iVFS)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csVFS::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csVFS)
 
 
 csVFS::csVFS (iBase *iParent) :
+  scfImplementationType(this, iParent),
   basedir(0),
   resdir(0),
   appdir(0),
@@ -1505,8 +1473,6 @@ csVFS::csVFS (iBase *iParent) :
   auto_name_counter(0),
   verbosity(VERBOSITY_NONE)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   cwd = new char [2];
   cwd [0] = VFS_PATH_SEPARATOR;
   cwd [1] = 0;
@@ -1523,8 +1489,6 @@ csVFS::~csVFS ()
   CS_ASSERT (ArchiveCache);
   delete ArchiveCache;
   ArchiveCache = 0;
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 static void add_final_delimiter(csString& s)

@@ -22,6 +22,7 @@
 
 #include "csutil/cfgfile.h"
 #include "csutil/parray.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/scopedmutexlock.h"
 #include "csutil/stringarray.h"
 #include "iutil/vfs.h"
@@ -33,7 +34,7 @@ class csVFS;
 struct iConfigFile;
 
 /// A replacement for standard-C FILE type in the virtual file space
-class csFile : public iFile
+class csFile : public scfImplementation1<csFile, iFile>
 {
 protected:
   // Index into parent node RPath
@@ -108,7 +109,7 @@ protected:
  * only a list of file names; no fancy things like file size, time etc
  * (file size can be determined after opening it for reading).
  */
-class csVFS : public iVFS
+class csVFS : public scfImplementation2<csVFS, iVFS, iComponent>
 {
 private:
   friend class VfsNode;
@@ -156,8 +157,6 @@ public:
   };
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Initialize VFS by reading contents of given INI file
   csVFS (iBase *iParent);
   /// Virtual File System destructor
@@ -252,13 +251,6 @@ public:
 
   /// Get the real paths associated with a mount
   virtual csRef<iStringArray> GetRealMountPaths (const char *VirtualPath);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csVFS);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 
 private:
   /// Same as ExpandPath() but with less overhead

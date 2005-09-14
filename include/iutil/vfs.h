@@ -101,8 +101,6 @@ struct csFileTime
 #define VFS_STATUS_IOERROR	5
 /** @} */
 
-SCF_VERSION (iFile, 1, 0, 0);
-
 /**
  * A replacement for FILE type in the virtual file space.
  * <p>
@@ -111,8 +109,10 @@ SCF_VERSION (iFile, 1, 0, 0);
  *   <li>iVFS::Open()
  *   </ul>
  */
-struct iFile : public iBase
+struct iFile : public virtual iBase
 {
+  SCF_INTERFACE(iFile, 2, 0, 0);
+
   /// Query file name (in VFS)
   virtual const char *GetName () = 0;
 
@@ -175,8 +175,6 @@ struct iFile : public iBase
 };
 
 
-SCF_VERSION (iVFS, 1, 0, 2);
-
 /**
  * The Virtual Filesystem Class is intended to be the only way for Crystal
  * Space engine to access the files. This gives unified control over the
@@ -210,8 +208,10 @@ SCF_VERSION (iVFS, 1, 0, 2);
  *   <li>CS_QUERY_REGISTRY()
  *   </ul>
  */
-struct iVFS : public iBase
+struct iVFS : public virtual iBase
 {
+  SCF_INTERFACE(iVFS, 2, 0, 0);
+
   /// Set current working directory
   virtual bool ChDir (const char *Path) = 0;
 
