@@ -70,9 +70,12 @@ typedef int scfInterfaceVersion;
 */
 #define SCF_INTERFACE(Name,Major,Minor,Micro)             \
 struct InterfaceTraits {                                  \
-  static CS_FORCEINLINE scfInterfaceVersion GetVersion()          \
+  static CS_FORCEINLINE scfInterfaceVersion GetVersion()  \
   { return SCF_CONSTRUCT_VERSION(Major, Minor, Micro); }  \
   static CS_FORCEINLINE char const * GetName() { return #Name; }  \
+private:                                                  \
+  /* Check that Name is really a type to catch typos. */  \
+  typedef Name Type;                                      \
 }
 
 

@@ -36,7 +36,8 @@
  * Wrapper class to create a volume aka 3D texture from a number of 2D images
  * as the volume slices. 
  */
-class CS_CRYSTALSPACE_EXPORT csImageVolumeMaker : public csImageBase
+class CS_CRYSTALSPACE_EXPORT csImageVolumeMaker :
+  public scfImplementationExt0<csImageVolumeMaker, csImageBase>
 {
 protected:
   /**
@@ -68,7 +69,6 @@ protected:
   /// Convert all added images to the right format and update \a data.
   void AppendPending ();
 public:
-  SCF_DECLARE_IBASE;
   CS_LEAKGUARD_DECLARE (csImageVolumeMaker);
 
   /**

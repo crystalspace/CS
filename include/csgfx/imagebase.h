@@ -31,22 +31,24 @@
 #include "csextern.h"
 
 #include "csutil/databuf.h"
+#include "csutil/scf_implementation.h"
 
 #include "igraphic/image.h"
 
 
 /**
  * Base class for iImage implementations. Cannot be instantiated itself.
- * \remark SCF_CONSTRUCT_IBASE() / SCF_DESTRUCT_IBASE() invocation has to
- *  be done by descending classes!
  */
-class csImageBase : public iImage
+class csImageBase :
+  public scfImplementation1<csImageBase, iImage>
 {
 protected:
   /// Name of the image file.
   char* fName;
   /// Create new instance.
-  csImageBase() : fName(0) { }
+  csImageBase() :
+    scfImplementationType(this, 0), fName(0)
+  { }
 public:
   virtual ~csImageBase() { delete[] fName; }
 

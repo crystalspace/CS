@@ -19,21 +19,15 @@
 #include "cssysdef.h"
 #include "csgfx/csimgvec.h"
 
-SCF_IMPLEMENT_IBASE(csImageVector);
-  SCF_IMPLEMENTS_INTERFACE (iImageVector);
-SCF_IMPLEMENT_IBASE_END
-
 CS_LEAKGUARD_IMPLEMENT (csImageVector);
 
-csImageVector::csImageVector()
-{
-  SCF_CONSTRUCT_IBASE(0);
-}
+csImageVector::csImageVector() :
+  scfImplementationType(this, 0)
+{}
 
 csImageVector::~csImageVector()
 {
   // image references are 0'd in ~csRefArray
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csImageVector::AddImage(iImage* img)

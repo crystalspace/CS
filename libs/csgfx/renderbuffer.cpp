@@ -29,21 +29,17 @@
 //#define DEBUG_LOCKING
 
 CS_LEAKGUARD_IMPLEMENT (csRenderBuffer);
-SCF_IMPLEMENT_IBASE (csRenderBuffer)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBuffer)
-SCF_IMPLEMENT_IBASE_END
 
 csRenderBuffer::csRenderBuffer (size_t size, csRenderBufferType type, 
 				csRenderBufferComponentType componentType, 
 				uint componentCount, size_t rangeStart, 
-				size_t rangeEnd, bool copy)
-  : bufferType (type), comptype (componentType), compCount (componentCount), 
+				size_t rangeEnd, bool copy) :
+  scfImplementationType(this, 0),
+  bufferType (type), comptype (componentType), compCount (componentCount), 
   stride(0), offset (0), rangeStart (rangeStart), rangeEnd (rangeEnd), 
   version (0), doCopy (copy), doDelete (false), isLocked (false), 
   isIndex (false), buffer (0)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   bufferSize = size;
   if (doCopy) 
   {
@@ -66,7 +62,6 @@ csRenderBuffer::~csRenderBuffer ()
 #endif
   if (doDelete) delete[] buffer;
   buffer = 0;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void* csRenderBuffer::Lock (csRenderBufferLockType lockType)

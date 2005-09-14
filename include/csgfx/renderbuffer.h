@@ -25,13 +25,12 @@
 
 #include "csextern.h"
 #include "csutil/leakguard.h"
+#include "csutil/scf_implementation.h"
 #include "ivideo/rndbuf.h"
 
 /**\addtogroup gfx
  * @{ 
  */
-
-SCF_VERSION (csRenderBuffer, 0, 2, 0);
 
 /**
  * Structure describing the properties of the individual buffers to be 
@@ -52,7 +51,8 @@ class csCallStack;
 /**
  * Basic renderbuffer for OpenGL renderer.
  */
-class CS_CRYSTALSPACE_EXPORT csRenderBuffer : public iRenderBuffer
+class CS_CRYSTALSPACE_EXPORT csRenderBuffer :
+  public scfImplementation1<csRenderBuffer, iRenderBuffer>
 {
 protected:
   /**
@@ -62,7 +62,6 @@ protected:
     csRenderBufferComponentType componentType, uint componentCount, 
     size_t rangeStart, size_t rangeEnd, bool copy);
 public:
-  SCF_DECLARE_IBASE;
   CS_LEAKGUARD_DECLARE (csRenderBuffer);
 
   /**

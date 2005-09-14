@@ -94,8 +94,6 @@ static const size_t csRenderBufferComponentSizes[CS_BUFCOMP_TYPECOUNT] =
   sizeof (double)
 };
 
-SCF_VERSION (iRenderBuffer, 0, 1, 0);
-
 /**
  * This is a general buffer.
  * <p>
@@ -107,8 +105,10 @@ SCF_VERSION (iRenderBuffer, 0, 1, 0);
  *   </ul>
  * \sa csRenderBuffer
  */
-struct iRenderBuffer : public iBase
+struct iRenderBuffer : public virtual iBase
 {
+  SCF_INTERFACE (iRenderBuffer, 2, 0, 0);
+
   /**
    * Lock the buffer to allow writing and return a pointer to the first 
    * element.

@@ -28,6 +28,7 @@
 
 #include "csgfx/shadervar.h"
 #include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/weakref.h"
 
 struct iObjectRegistry;
@@ -43,15 +44,13 @@ class csShaderExpression;
  * value is queried.
  */
 class CS_CRYSTALSPACE_EXPORT csShaderExpressionAccessor : 
-  public iShaderVariableAccessor
+  public scfImplementation1<csShaderExpressionAccessor, iShaderVariableAccessor>
 {
 private:
   iObjectRegistry* object_reg;
   csShaderExpression* expression;
   csWeakRef<iShaderManager> shaderMgr;
 public:
-  SCF_DECLARE_IBASE;
-
   /**
    * Construct accessor. 
    * \remarks The accessor object will take ownership of \a expression. You

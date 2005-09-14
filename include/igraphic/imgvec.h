@@ -28,9 +28,10 @@
 
 struct iImage;
 
-SCF_VERSION (iImageVector, 0, 2, 0);
-struct iImageVector : public iBase
+struct iImageVector : public virtual iBase
 {
+  SCF_INTERFACE (iImageVector, 2, 0, 0);
+
   /**
    * Add an Image to the Vector
    */

@@ -22,6 +22,7 @@
 
 #include "csextern.h"
 #include "csutil/leakguard.h"
+#include "csutil/scf_implementation.h"
 
 #include "csgfx/imagebase.h"
 #include "csgfx/imagetools.h"
@@ -30,7 +31,8 @@
 /**
  * Memory image.
  */
-class CS_CRYSTALSPACE_EXPORT csImageMemory : public csImageBase
+class CS_CRYSTALSPACE_EXPORT csImageMemory :
+  public scfImplementationExt0<csImageMemory, csImageBase>
 {
 private:
   /// Common code shared by constructors.
@@ -102,7 +104,6 @@ protected:
    */
   void FreeImage ();
 public:
-  SCF_DECLARE_IBASE;
   CS_LEAKGUARD_DECLARE (csImageMemory);
 
   /**

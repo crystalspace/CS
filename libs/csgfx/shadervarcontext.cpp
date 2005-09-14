@@ -22,19 +22,12 @@
 
 CS_LEAKGUARD_IMPLEMENT (csShaderVariableContext);
 
-SCF_IMPLEMENT_IBASE(csShaderVariableContext)
-  SCF_IMPLEMENTS_INTERFACE(iShaderVariableContext)
-SCF_IMPLEMENT_IBASE_END
-
-csShaderVariableContext::csShaderVariableContext ()
-{
-  SCF_CONSTRUCT_IBASE(0);
-}
+csShaderVariableContext::csShaderVariableContext () :
+  scfImplementationType(this, 0)
+{}
 
 csShaderVariableContext::~csShaderVariableContext ()
-{
-  SCF_DESTRUCT_IBASE ();
-}
+{}
 
 class SvVarArrayCmp : public csArrayCmp<csShaderVariable*, csStringID>
 {

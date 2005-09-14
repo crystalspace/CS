@@ -22,15 +22,15 @@
 #include "csextern.h"
 
 #include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"
 
 #include "igraphic/image.h"
 #include "igraphic/imgvec.h"
 
-SCF_VERSION (csImageVector, 0, 0, 1);
-
-struct CS_CRYSTALSPACE_EXPORT csImageVector : public iImageVector
+struct CS_CRYSTALSPACE_EXPORT csImageVector :
+  public scfImplementation1<csImageVector, iImageVector>
 {
 private:
   csRefArray<iImage> image;
@@ -40,7 +40,6 @@ public:
   csImageVector();
   virtual ~csImageVector();
 
-  SCF_DECLARE_IBASE;
   /**
   * Add an Image to the Vector
   */
@@ -75,6 +74,5 @@ public:
   virtual void RemoveAll();
 
 };
-
 
 #endif // __CS_IGRAPHIC_IMGLIST_H__

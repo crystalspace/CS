@@ -26,24 +26,17 @@
 
 #include "ivaria/reporter.h"
 
-
-SCF_IMPLEMENT_IBASE(csShaderExpressionAccessor)
-  SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
-SCF_IMPLEMENT_IBASE_END
-
 csShaderExpressionAccessor::csShaderExpressionAccessor (
   iObjectRegistry* object_reg, csShaderExpression* expression) : 
+  scfImplementationType(this, 0),
   object_reg (object_reg), expression (expression)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   shaderMgr = csQueryRegistry<iShaderManager> (object_reg);
 }
 
 csShaderExpressionAccessor::~csShaderExpressionAccessor()
 {
   delete expression;
-  SCF_DESTRUCT_IBASE();
 }
 
 void csShaderExpressionAccessor::PreGetValue (csShaderVariable *variable)

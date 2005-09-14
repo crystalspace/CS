@@ -36,7 +36,8 @@
  * faces. Ensures that all faces are available when requested, if necessary
  * by creating a new image (the famous and popular image-no-found-checkerboard).
  */
-class CS_CRYSTALSPACE_EXPORT csImageCubeMapMaker : public csImageBase
+class CS_CRYSTALSPACE_EXPORT csImageCubeMapMaker :
+  public scfImplementationExt0<csImageCubeMapMaker, csImageBase>
 {
 protected:
   enum { NUM_FACES = 6 };
@@ -53,7 +54,6 @@ protected:
   /// Update the image name from the contained images.
   void UpdateName ();
 public:
-  SCF_DECLARE_IBASE;
   CS_LEAKGUARD_DECLARE (csImageCubeMapMaker);
 
   /// Create a new map without faces set.

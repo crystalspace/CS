@@ -22,6 +22,8 @@
 
 #include "csextern.h"
 
+#include "csutil/scf_implementation.h"
+
 #include "ivideo/shader/shader.h"
 #include "shadervar.h"
 
@@ -32,15 +34,14 @@
 /**
  * Simple implementation for iShaderVariableContext.
  */
-class CS_CRYSTALSPACE_EXPORT csShaderVariableContext : public iShaderVariableContext
+class CS_CRYSTALSPACE_EXPORT csShaderVariableContext :
+  public scfImplementation1<csShaderVariableContext, iShaderVariableContext>
 {
 private:
   csRefArray<csShaderVariable> variables;
 
 public:
   CS_LEAKGUARD_DECLARE (csShaderVariableContext);
-  
-  SCF_DECLARE_IBASE;
 
   csShaderVariableContext ();
   virtual ~csShaderVariableContext ();

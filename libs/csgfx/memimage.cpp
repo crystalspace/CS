@@ -27,13 +27,8 @@
 
 CS_LEAKGUARD_IMPLEMENT (csImageMemory);
 
-SCF_IMPLEMENT_IBASE (csImageMemory)
-  SCF_IMPLEMENTS_INTERFACE (iImage)
-SCF_IMPLEMENT_IBASE_END
-
 void csImageMemory::ConstructCommon()
 {
-  SCF_CONSTRUCT_IBASE (0);
   DG_ADDI (this, 0);
   DG_TYPE (this, "csImageMemory");
 
@@ -81,27 +76,29 @@ void csImageMemory::ConstructBuffers (int width, int height, void* buffer,
   destroy_image = destroy;
 }
 
-csImageMemory::csImageMemory (int width, int height, int format) : csImageBase()
+csImageMemory::csImageMemory (int width, int height, int format) :
+  scfImplementationType(this)
 {
   ConstructWHDF (width, height, 1, format);
 }
 
-csImageMemory::csImageMemory (int width, int height, int depth, int format) : csImageBase()
+csImageMemory::csImageMemory (int width, int height, int depth, int format) :
+  scfImplementationType(this)
 {
   ConstructWHDF (width, height, depth, format);
   if (depth > 1) imageType = csimg3D;
 }
 
 csImageMemory::csImageMemory (int width, int height, void* buffer,
-                              bool destroy, int format, csRGBpixel *palette)
-  : csImageBase()
+                              bool destroy, int format, csRGBpixel *palette) :
+  scfImplementationType(this)
 {
   ConstructBuffers (width, height, buffer, destroy, format, palette);
 }
 
 csImageMemory::csImageMemory (int width, int height, const void* buffer,
-                              int format, const csRGBpixel *palette)
- : csImageBase()
+                              int format, const csRGBpixel *palette) :
+  scfImplementationType(this)
 {
   ConstructWHDF (width, height, 1, format);
   AllocImage();
@@ -110,18 +107,21 @@ csImageMemory::csImageMemory (int width, int height, const void* buffer,
     memcpy (Palette, palette, sizeof (csRGBpixel) * 256);
 }
 
-csImageMemory::csImageMemory (iImage* source) : csImageBase()
+csImageMemory::csImageMemory (iImage* source) :
+  scfImplementationType(this)
 {
   ConstructSource (source);
 }
 
-csImageMemory::csImageMemory (iImage* source, int newFormat) : csImageBase()
+csImageMemory::csImageMemory (iImage* source, int newFormat) :
+  scfImplementationType(this)
 {
   ConstructSource (source);
   SetFormat (newFormat);
 }
 
-csImageMemory::csImageMemory (int iFormat) : csImageBase()
+csImageMemory::csImageMemory (int iFormat) :
+  scfImplementationType(this)
 {
   ConstructWHDF (0, 0, 1, iFormat);
 }
@@ -198,7 +198,6 @@ csImageMemory::~csImageMemory ()
   }
   FreeImage();
   DG_REM (this);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void* csImageMemory::GetImagePtr ()

@@ -258,7 +258,7 @@ struct iVisibilityCuller : public virtual iBase
  */
 struct iVisibilityObject : public virtual iBase
 {
-  SCF_INTERFACE(iVisibiliityObject, 2, 0, 0);
+  SCF_INTERFACE(iVisibilityObject, 2, 0, 0);
 
   /// Get the reference to the movable from this object.
   virtual iMovable* GetMovable () const = 0;

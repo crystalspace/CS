@@ -27,22 +27,15 @@
 
 CS_LEAKGUARD_IMPLEMENT (csImageVolumeMaker);
 
-SCF_IMPLEMENT_IBASE (csImageVolumeMaker)
-  SCF_IMPLEMENTS_INTERFACE (iImage)
-SCF_IMPLEMENT_IBASE_END
-
-csImageVolumeMaker::csImageVolumeMaker (int format, int width, int height)
-  : csImageBase(), manualName (false), Width (width), Height (height), Depth (0),
+csImageVolumeMaker::csImageVolumeMaker (int format, int width, int height) :
+  scfImplementationType(this),
+  manualName (false), Width (width), Height (height), Depth (0),
   Format (format), data (0), palette (0), alpha (0)
-{
-  SCF_CONSTRUCT_IBASE(0);
-}
+{ }
 
-csImageVolumeMaker::csImageVolumeMaker (iImage* source)
-  : csImageBase(), manualName (false)
+csImageVolumeMaker::csImageVolumeMaker (iImage* source) :
+  scfImplementationType(this), manualName (false)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   Format = source->GetFormat();
   Width = source->GetWidth();
   Height = source->GetHeight();
@@ -93,8 +86,6 @@ csImageVolumeMaker::~csImageVolumeMaker()
   }
   delete[] palette;
   delete[] alpha;
-
-  SCF_DESTRUCT_IBASE();
 }
 
 void csImageVolumeMaker::AppendPending ()

@@ -78,8 +78,6 @@ enum csImageType
   csimgCube
 };
 
-SCF_VERSION (iImage, 2, 0, 1);
-
 /**
  * The iImage interface is used to work with image objects.
  * <p>
@@ -95,8 +93,10 @@ SCF_VERSION (iImage, 2, 0, 1);
  * \sa csImageMemory, csImageManipulate, csImageTools, csImageCubeMapMaker,
  *   csImageVolumeMaker
  */
-struct iImage : public iBase
+struct iImage : public virtual iBase
 {
+  SCF_INTERFACE (iImage, 3, 0, 0);
+
   /**
    * Get image data: returns either (csRGBpixel *) or (unsigned char *)
    * depending on format. Note that for RGBA images the csRGBpixel structure

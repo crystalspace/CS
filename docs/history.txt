@@ -41,6 +41,10 @@ chronological order.
 	  CS user through all the demos we have.
 	- Jorrit added a binding for 'esc' to walktest so that esc now
 	  quits walktest too.
+	- mdmkolbe converted libs/csgfx to the new SCF.
+	- mdmkolbe added in SCF_INTERFACE a check that the interface name is
+	  really a type to help catch typos
+	- mdmkolbe fixed some arguments to SCF_INTERFACE that weren't types.
 13-Sep-2005
         - res reverted the embed.m4 comma removal since it was likely not 
           correct.

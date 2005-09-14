@@ -43,15 +43,15 @@ struct csShaderVariableWrapper;
 
 class csShaderVariable;
 
-SCF_VERSION (iShaderVariableAccessor, 0, 0, 1);
-
 /**
  * Interface to an accessorcallback for shadervariables.
  * This is used when we know the object providing the value of a single
  * variable, but the exact value cannot be predetermined.
  */
-struct iShaderVariableAccessor : public iBase
+struct iShaderVariableAccessor : public virtual iBase
 {
+  SCF_INTERFACE (iShaderVariableAccessor, 2, 0, 0);
+
   /// Called before the value of the attached SV is returned
   virtual void PreGetValue (csShaderVariable *variable) = 0;
 };
