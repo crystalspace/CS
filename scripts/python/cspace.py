@@ -12791,6 +12791,10 @@ csInitializer.RequestPlugins = staticmethod(_csInitializer_RequestPlugins)
 
 csReport = csReporterHelper.Report
 
+def CS_REQUEST_PLUGIN (name, intf):
+  return (name, intf.__name__, cvar.iSCF_SCF.GetInterfaceID(intf.__name__),
+    eval('%s_scfGetVersion()' % intf.__name__, locals(), globals()))
+
 def CS_REQUEST_VFS ():
   return CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
 
