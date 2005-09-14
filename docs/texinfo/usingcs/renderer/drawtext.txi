@@ -17,8 +17,7 @@ iFontServer* fontserver = g2d->GetFontServer ();
 iFont* font = fontserver->LoadFont (CSFONT_COURIER);
 @end example
 
-@xref{HOWTO Use custom font} for more information on what fonts are
-possible.
+A number of fonts are available for use. @xref{HOWTO Use custom font}.
 
 @subsubheading Actually Drawing the Text
 
