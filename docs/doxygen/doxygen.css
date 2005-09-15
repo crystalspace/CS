@@ -269,6 +269,16 @@ A.qindexHL:visited { text-decoration: none; background-color: #000080; color: #f
 	font-size: 12px;
 }
 
+.search     { color: #003399;
+  font-family: Verdana, sans-serif;
+  font-size: 10pt;
+			  clear: none;
+}
+FORM.search {
+              margin-bottom: 0px;
+              margin-top: 0px;
+			  display: inline;
+}
 
 @media print 
 {

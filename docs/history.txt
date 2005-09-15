@@ -14,7 +14,8 @@ chronological order.
 	  as it should be.
 	- Piotr Obrzut added getters for dynamics system colliders geometry 
 	- Piotr Obrzut fixed attaching dynamics system colliders to bodies to 
-	work better with planes
+	  work better with planes.
+	- res added a "Search" field to the online API docs.
 14-Sep-2005
 	- res made the software renderer support interleaved arrays.
 	- mdmkolbe fixed missing CS_REQUEST_PLUGIN in Python Swig bindings
