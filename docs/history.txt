@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Sep-2005
+	- Jorrit made the infinite maze rooms a bit bigger. That makes
+	  collision detection works again so you can walk to the next
+	  room. The only thing that remains broken for now is the
+	  actual infinite maze generation. The maze is not infinite
+	  as it should be.
 14-Sep-2005
 	- res made the software renderer support interleaved arrays.
 	- mdmkolbe fixed missing CS_REQUEST_PLUGIN in Python Swig bindings

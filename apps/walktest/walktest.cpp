@@ -1213,6 +1213,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       infinite_maze->connect_infinite (0, 1, 3, 0, 2, 3);
       infinite_maze->create_loose_portal (-2, 0, 4, -2, 1, 4);
       view->GetCamera ()->SetSector(room);
+      printf ("Done creation of infinite maze!\n"); fflush (stdout);
     }
 
     // Prepare the engine. This will calculate all lighting and

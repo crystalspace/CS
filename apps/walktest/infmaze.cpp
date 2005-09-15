@@ -44,6 +44,9 @@ InfiniteMaze::~InfiniteMaze ()
   delete infinite_world;
 }
 
+#define ROOM_SIZE 3.0f
+#define LEDGE_OFFSET 0.1f
+
 void InfiniteMaze::create_one_side (iThingFactoryState* walls_state,
 	char* pname,
 	iMaterialWrapper* tm, iMaterialWrapper* tm2,
@@ -62,9 +65,10 @@ void InfiniteMaze::create_one_side (iThingFactoryState* walls_state,
   x3 -= cx; y3 -= cy; z3 -= cz;
   x4 -= cx; y4 -= cy; z4 -= cz;
   float sx, sy, sz;
-  if (dx) { sy = sz = 0.9f; sx = 0; }
-  else if (dy) { sx = sz = 0.9f; sy = 0; }
-  else { sx = sy = 0.9f; sz = 0; }
+# define L_FACTOR ((ROOM_SIZE/2.0f-LEDGE_OFFSET)/(ROOM_SIZE/2.0f))
+  if (dx) { sy = sz = L_FACTOR; sx = 0; }
+  else if (dy) { sx = sz = L_FACTOR; sy = 0; }
+  else { sx = sy = L_FACTOR; sz = 0; }
 
   walls_state->AddQuad (
     csVector3 (cx+sx*x1, cy+sy*y1, cz+sz*z1),
@@ -131,29 +135,29 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   	iThingState));
   csRef<iThingFactoryState> walls_fact_state = walls_state->GetFactory ();
   float dx, dy, dz;
-  dx = 2.0*(float)x;
-  dy = 2.0*(float)y;
-  dz = 2.0*(float)z;
+  dx = ROOM_SIZE*(float)x;
+  dy = ROOM_SIZE*(float)y;
+  dz = ROOM_SIZE*(float)z;
   iMaterialWrapper* t = engine->GetMaterialList ()->FindByName ("txt");
   iMaterialWrapper* t2 = engine->GetMaterialList ()->FindByName ("txt2");
-  float s = 1;
+  float s = (ROOM_SIZE/2.0f);
 
   create_one_side (walls_fact_state, "n", t, t2, dx-s,dy+s,dz+s,
-  		dx+s,dy+s,dz+s, dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-0.1f);
+  		dx+s,dy+s,dz+s, dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-LEDGE_OFFSET);
   create_one_side (walls_fact_state, "e", t, t2, dx+s,dy+s,dz+s,
-  		dx+s,dy+s,dz-s, dx+s,dy-s,dz-s,  dx+s,dy-s,dz+s, -0.1f,0,0);
+  		dx+s,dy+s,dz-s, dx+s,dy-s,dz-s,  dx+s,dy-s,dz+s, -LEDGE_OFFSET,0,0);
   create_one_side (walls_fact_state, "w", t, t2, dx-s,dy+s,dz+s,
-  		dx-s,dy-s,dz+s, dx-s,dy-s,dz-s,  dx-s,dy+s,dz-s, 0.1f,0,0);
+  		dx-s,dy-s,dz+s, dx-s,dy-s,dz-s,  dx-s,dy+s,dz-s, LEDGE_OFFSET,0,0);
   create_one_side (walls_fact_state, "s", t, t2, dx+s,dy+s,dz-s,
-  		dx-s,dy+s,dz-s, dx-s,dy-s,dz-s,  dx+s,dy-s,dz-s, 0,0,0.1f);
+  		dx-s,dy+s,dz-s, dx-s,dy-s,dz-s,  dx+s,dy-s,dz-s, 0,0,LEDGE_OFFSET);
   create_one_side (walls_fact_state, "f", t, t2, dx-s,dy-s,dz+s,
-  		dx+s,dy-s,dz+s, dx+s,dy-s,dz-s,  dx-s,dy-s,dz-s, 0,0.1f,0);
+  		dx+s,dy-s,dz+s, dx+s,dy-s,dz-s,  dx-s,dy-s,dz-s, 0,LEDGE_OFFSET,0);
   create_one_side (walls_fact_state, "c", t, t2, dx-s,dy+s,dz-s,
-  		dx+s,dy+s,dz-s, dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-0.1f,0);
+  		dx+s,dy+s,dz-s, dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-LEDGE_OFFSET,0);
 
   csRef<iLight> light (engine->CreateLight ("",
   	csVector3 (dx+rand2 (.9*s), dy+rand2 (.9*s), dz+rand2 (.9*s)),
-	1+rand1 (3),
+	1+rand1 (ROOM_SIZE * 1.5f),
   	csColor (rand1 (1), rand1 (1), rand1 (1))));
   room->GetLights ()->Add (light);
 
