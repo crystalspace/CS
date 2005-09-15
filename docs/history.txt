@@ -12,6 +12,9 @@ chronological order.
 	  room. The only thing that remains broken for now is the
 	  actual infinite maze generation. The maze is not infinite
 	  as it should be.
+	- Piotr Obrzut added getters for dynamics system colliders geometry 
+	- Piotr Obrzut fixed attaching dynamics system colliders to bodies to 
+	work better with planes
 14-Sep-2005
 	- res made the software renderer support interleaved arrays.
 	- mdmkolbe fixed missing CS_REQUEST_PLUGIN in Python Swig bindings

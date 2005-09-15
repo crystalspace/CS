@@ -612,7 +612,8 @@ struct iRigidBody : public iBase
 
 enum csColliderGeometryType
 {
-  BOX_COLLIDER_GEOMETRY = 1,
+  NO_GEOMETRY,
+  BOX_COLLIDER_GEOMETRY,
   PLANE_COLLIDER_GEOMETRY,
   TRIMESH_COLLIDER_GEOMETRY,
   CYLINDER_COLLIDER_GEOMETRY,
@@ -736,6 +737,31 @@ struct iDynamicsSystemCollider : public iBase
    * will be in world space, otherwise it will be in attached rigid body space.
    */ 
   virtual void SetTransform (const csOrthoTransform& trans) = 0;
+
+  /**
+   * If collider has box geometry method will return true and size of
+   * box, otherwise it will return false.
+   */
+  virtual bool GetBoxGeometry (csVector3& size) = 0; 
+
+  /**
+   * If collider has sphere geometry method will return true and sphere, 
+   * otherwise it will return false.
+   */
+  virtual bool GetSphereGeometry (csSphere& sphere) = 0;
+
+  /**
+   * If collider has plane geometry method will return true and plane, 
+   * otherwise it will return false.
+   */
+  virtual bool GetPlaneGeometry (csPlane3& plane) = 0; 
+
+  /**
+   * If collider has plane geometry method will return true and cylinder's
+   * length and radius, otherwise it will return false.
+   */
+  virtual bool GetCylinderGeometry (float& length, float& radius) = 0; 
+
 };
 
 SCF_VERSION (iJoint, 0, 0, 1);

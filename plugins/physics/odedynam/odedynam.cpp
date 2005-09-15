@@ -1,20 +1,20 @@
 /*
-    Copyright (C) 2002 Anders Stenberg
-    Copyright (C) 2003 Leandro Motta Barros
+Copyright (C) 2002 Anders Stenberg
+Copyright (C) 2003 Leandro Motta Barros
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -61,83 +61,83 @@
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csODEDynamics)
-  SCF_IMPLEMENTS_INTERFACE (iDynamics)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iODEDynamicState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+SCF_IMPLEMENTS_INTERFACE (iDynamics)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iODEDynamicState)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csODEDynamics::ODEDynamicState)
-  SCF_IMPLEMENTS_INTERFACE (iODEDynamicState)
+SCF_IMPLEMENTS_INTERFACE (iODEDynamicState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csODEDynamics::Component)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csODEDynamics::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE_EXT (csODEDynamicSystem)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDynamicSystem)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iODEDynamicSystemState);
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDynamicSystem)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iODEDynamicSystemState);
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csODEDynamicSystem::DynamicSystem)
-  SCF_IMPLEMENTS_INTERFACE (iDynamicSystem)
+SCF_IMPLEMENTS_INTERFACE (iDynamicSystem)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csODEDynamicSystem::ODEDynamicSystemState)
-  SCF_IMPLEMENTS_INTERFACE (iODEDynamicSystemState)
+SCF_IMPLEMENTS_INTERFACE (iODEDynamicSystemState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csODEBodyGroup)
-  SCF_IMPLEMENTS_INTERFACE (iBodyGroup)
+SCF_IMPLEMENTS_INTERFACE (iBodyGroup)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE_EXT (csODERigidBody)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRigidBody)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRigidBody)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_IBASE (csODECollider)
-  SCF_IMPLEMENTS_INTERFACE (iDynamicsSystemCollider)
+SCF_IMPLEMENTS_INTERFACE (iDynamicsSystemCollider)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csODERigidBody::RigidBody)
-  SCF_IMPLEMENTS_INTERFACE (iRigidBody)
+SCF_IMPLEMENTS_INTERFACE (iRigidBody)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csODEJoint)
-  SCF_IMPLEMENTS_INTERFACE (iJoint)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iODEJointState)
+SCF_IMPLEMENTS_INTERFACE (iJoint)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iODEJointState)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csODEJoint::ODEJointState)
-  SCF_IMPLEMENTS_INTERFACE (iODEJointState)
+SCF_IMPLEMENTS_INTERFACE (iODEJointState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (ODEBallJoint)
-  SCF_IMPLEMENTS_INTERFACE (iODEBallJoint)
+SCF_IMPLEMENTS_INTERFACE (iODEBallJoint)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (ODESliderJoint)
-  SCF_IMPLEMENTS_INTERFACE (iODESliderJoint)
+SCF_IMPLEMENTS_INTERFACE (iODESliderJoint)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (ODEHingeJoint)
-  SCF_IMPLEMENTS_INTERFACE (iODEHingeJoint)
+SCF_IMPLEMENTS_INTERFACE (iODEHingeJoint)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (ODEAMotorJoint)
-  SCF_IMPLEMENTS_INTERFACE (iODEAMotorJoint)
+SCF_IMPLEMENTS_INTERFACE (iODEAMotorJoint)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (ODEUniversalJoint)
-  SCF_IMPLEMENTS_INTERFACE (iODEUniversalJoint)
+SCF_IMPLEMENTS_INTERFACE (iODEUniversalJoint)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csODEDefaultMoveCallback)
-  SCF_IMPLEMENTS_INTERFACE (iDynamicsMoveCallback)
+SCF_IMPLEMENTS_INTERFACE (iDynamicsMoveCallback)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csODEDynamics)
@@ -303,7 +303,7 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
       c2->Collision (c1);
     }
   }
-    
+
   if ((!b1 || b1->IsStatic()) && (!b2 || b2->IsStatic())) return;
   if (b1 && b2 && b1->GetGroup() != 0 && b1->GetGroup() == b2->GetGroup())
     return;
@@ -341,7 +341,7 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
       contact[i].surface.soft_cfm = f1[2]*f2[2];
 
       dJointID c = dJointCreateContact ( ((csODEDynamicSystem*)data)
-          ->GetWorldID(), contactjoints,contact+i );
+        ->GetWorldID(), contactjoints,contact+i );
       dJointAttach (c, dGeomGetBody(o1), dGeomGetBody(o2));
     }
   }
@@ -358,12 +358,12 @@ csReversibleTransform GetGeomTransform (dGeomID id)
 }
 
 /*
-  The ODE version contained in the win32libs package defines the dCollide*
-  functions as extern "C" (otherwise the DLL couldn't be shared by different
-  compilers). For other platforms, it's not the case. For Mingw and Cygwin
-  users, this setting will be detected automatically by the CS configure
-  script.
- */
+The ODE version contained in the win32libs package defines the dCollide*
+functions as extern "C" (otherwise the DLL couldn't be shared by different
+compilers). For other platforms, it's not the case. For Mingw and Cygwin
+users, this setting will be detected automatically by the CS configure
+script.
+*/
 #if defined(CS_USE_ODE_EXTERN_C)
 #define ODE_EXTERN  extern "C"
 #else
@@ -404,8 +404,8 @@ void csODEDynamics::SetGlobalERP (float erp)
   for (size_t i = 0; i < systems.Length(); i ++)
   {
     csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-           iODEDynamicSystemState);
-         sys->SetERP (erp);
+      iODEDynamicSystemState);
+    sys->SetERP (erp);
   }
 }
 
@@ -428,8 +428,8 @@ void csODEDynamics::EnableStepFast (bool enable)
   for (size_t i = 0; i < systems.Length(); i ++)
   {
     csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-           iODEDynamicSystemState);
-         sys->EnableStepFast (enable);
+      iODEDynamicSystemState);
+    sys->EnableStepFast (enable);
   }
 }
 
@@ -453,8 +453,8 @@ void csODEDynamics::EnableQuickStep (bool enable)
   for (size_t i = 0; i < systems.Length(); i ++)
   {
     csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-           iODEDynamicSystemState);
-         sys->EnableQuickStep (enable);
+      iODEDynamicSystemState);
+    sys->EnableQuickStep (enable);
   }
 }
 
@@ -691,12 +691,12 @@ void csODEDynamicSystem::Step (float elapsed_time)
   float stepsize;
   if (rateenabled)
   {
-        stepsize = steptime;
-        if (elapsed_time > limittime) { elapsed_time = limittime; }
+    stepsize = steptime;
+    if (elapsed_time > limittime) { elapsed_time = limittime; }
   }
   else
   {
-        stepsize = elapsed_time;
+    stepsize = elapsed_time;
   }
   total_elapsed += elapsed_time;
 
@@ -721,13 +721,13 @@ void csODEDynamicSystem::Step (float elapsed_time)
     }
     for (size_t i = 0; i < bodies.Length(); i ++)
     {
-        iRigidBody *b = bodies.Get(i);
-        // only do this if the body is enabled
-        if (b->IsEnabled())
-        {
-          b->SetAngularVelocity (b->GetAngularVelocity () * roll_damp);
-          b->SetLinearVelocity (b->GetLinearVelocity () * lin_damp);
-        }
+      iRigidBody *b = bodies.Get(i);
+      // only do this if the body is enabled
+      if (b->IsEnabled())
+      {
+        b->SetAngularVelocity (b->GetAngularVelocity () * roll_damp);
+        b->SetLinearVelocity (b->GetLinearVelocity () * lin_damp);
+      }
     }
     for (size_t j = 0; j < updates.Length(); j ++)
     {
@@ -743,7 +743,7 @@ void csODEDynamicSystem::Step (float elapsed_time)
 }
 
 bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
-        const csOrthoTransform& trans, float friction, float elasticity, float softness)
+                                             const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider ();
   odec->SetElasticity (elasticity);
@@ -758,7 +758,7 @@ bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
 }
 
 bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
-        const csOrthoTransform& trans, float friction, float elasticity, float softness)
+                                                 const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider ();
   odec->SetElasticity (elasticity);
@@ -773,7 +773,7 @@ bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
 }
 
 bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
-        const csOrthoTransform& trans, float friction, float elasticity, float softness)
+                                            const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider ();
   odec->SetElasticity (elasticity);
@@ -789,7 +789,7 @@ bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
 }
 
 bool csODEDynamicSystem::AttachColliderSphere (float radius,
-    const csVector3 &offset, float friction, float elasticity, float softness)
+                                               const csVector3 &offset, float friction, float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider ();
   odec->SetElasticity (elasticity);
@@ -802,7 +802,7 @@ bool csODEDynamicSystem::AttachColliderSphere (float radius,
   return true;
 }
 bool csODEDynamicSystem::AttachColliderPlane (const csPlane3 &plane,
-    float friction, float elasticity, float softness)
+                                              float friction, float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider ();
   odec->SetElasticity (elasticity);
@@ -840,7 +840,7 @@ void csODEDynamicSystem::EnableAutoDisable (bool enable)
 }
 
 void csODEDynamicSystem::SetAutoDisableParams (float linear, float angular,
-    int steps, float time)
+                                               int steps, float time)
 {
   if(linear!=0.0f) dWorldSetAutoDisableLinearThreshold (worldID, linear);
   if(angular!=0.0f) dWorldSetAutoDisableAngularThreshold (worldID, angular);
@@ -850,22 +850,22 @@ void csODEDynamicSystem::SetAutoDisableParams (float linear, float angular,
 
 void csODEDynamicSystem::SetContactMaxCorrectingVel (float v)
 {
-    dWorldSetContactMaxCorrectingVel (worldID, v);
+  dWorldSetContactMaxCorrectingVel (worldID, v);
 }
 
 float csODEDynamicSystem::GetContactMaxCorrectingVel ()
 {
-    return dWorldGetContactMaxCorrectingVel (worldID);
+  return dWorldGetContactMaxCorrectingVel (worldID);
 }
 
 void csODEDynamicSystem::SetContactSurfaceLayer (float depth)
 {
-    dWorldSetContactSurfaceLayer(worldID, depth);
+  dWorldSetContactSurfaceLayer(worldID, depth);
 }
 
 float csODEDynamicSystem::GetContactSurfaceLayer ()
 {
-    return dWorldGetContactSurfaceLayer(worldID);
+  return dWorldGetContactSurfaceLayer(worldID);
 }
 
 
@@ -915,7 +915,7 @@ csODECollider::csODECollider ()
   coll_cb = 0;
   transformID = dCreateGeomTransform (0);
   dGeomTransformSetCleanup (transformID, 1);
-  geom_type = (csColliderGeometryType) 0;
+  geom_type =  NO_GEOMETRY;
 }
 void csODECollider::SetCollisionCallback (iDynamicsColliderCollisionCallback* cb)
 {
@@ -968,7 +968,7 @@ void csODECollider::MassCorrection ()
 {
   dMass m, om;
   dMassSetZero (&m);
-  
+
   switch (geom_type)
   {
   case BOX_COLLIDER_GEOMETRY:
@@ -1020,10 +1020,13 @@ void csODECollider::MassCorrection ()
 }
 void csODECollider::AttachBody (dBodyID bodyID)
 {
-  dGeomSetBody (transformID, bodyID);
-  if (geomID)
+  if (geom_type != PLANE_COLLIDER_GEOMETRY)
   {
-    MassCorrection ();
+    dGeomSetBody (transformID, bodyID);
+    if (geomID)
+    {
+      MassCorrection ();
+    }
   }
 }
 bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
@@ -1035,7 +1038,7 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
   // From Eroroman & Marc Rochel with modifications by Mike Handverger and Piotr Obrzut
 
   iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
-  
+
   if (p->GetVertexCount () == 0 || p->GetTriangleCount () == 0)
     return false;
 
@@ -1095,12 +1098,12 @@ bool csODECollider::CreateCCylinderGeometry (float length, float radius)
 
   if (dGeomGetBody (transformID))
     MassCorrection ();
-  
+
   GeomData *gd = new GeomData ();
   gd->surfacedata = surfacedata;
   gd->collider = this;
   dGeomSetData (geomID, (void*)gd);
-  
+
   if (spaceID) AddToSpace (spaceID);
 
   return true;
@@ -1110,7 +1113,7 @@ bool csODECollider::CreatePlaneGeometry (const csPlane3& plane)
   if (geomID) ClearContents ();
 
   geom_type = PLANE_COLLIDER_GEOMETRY;
-  
+
   geomID = dCreatePlane (0, -plane.A(), -plane.B(), -plane.C(), plane.D());
 
   GeomData *gd = new GeomData ();
@@ -1129,7 +1132,7 @@ bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
   geom_type = SPHERE_COLLIDER_GEOMETRY;
 
   geomID = dCreateSphere (0, sphere.GetRadius ());
-  
+
   csVector3 offset = sphere.GetCenter ();
   dGeomSetPosition (transformID, offset.x, offset.y, offset.z);
 
@@ -1217,7 +1220,7 @@ csOrthoTransform csODECollider::GetTransform ()
 void csODECollider::AddTransformToSpace (dSpaceID spaceID)
 {
   if (geomID && !dGeomTransformGetGeom(transformID))
-  	dGeomTransformSetGeom (transformID, geomID);
+    dGeomTransformSetGeom (transformID, geomID);
   dSpaceID prev = dGeomGetSpace (transformID);
   if (prev)dSpaceRemove (prev, transformID);
   if (geomID) dSpaceAdd (spaceID, transformID); 
@@ -1231,6 +1234,48 @@ void csODECollider::AddToSpace (dSpaceID spaceID)
     dSpaceAdd (spaceID, geomID); 
   }
   csODECollider::spaceID = spaceID;
+}
+bool csODECollider::GetBoxGeometry (csVector3& size)
+{
+  if (geom_type == BOX_COLLIDER_GEOMETRY)
+  {
+    dVector3 s;
+    dGeomBoxGetLengths (geomID, s);
+    size.x = s[0];
+    size.y = s[1];
+    size.z = s[2];
+    return true;
+  }
+  return false;
+}
+bool csODECollider::GetSphereGeometry (csSphere& sphere)
+{
+  if (geom_type == SPHERE_COLLIDER_GEOMETRY)
+  {
+    sphere = csSphere (csVector3 (0), dGeomSphereGetRadius (geomID));
+    return true;
+  }
+  return false;
+}
+bool csODECollider::GetPlaneGeometry (csPlane3& plane)
+{
+  if (geom_type == PLANE_COLLIDER_GEOMETRY)
+  {
+    dVector4 p;
+    dGeomPlaneGetParams (geomID, p);
+    plane = csPlane3 (-p[0], -p[1], -p[2], p[3]);
+    return true;
+  }
+  return false;
+}
+bool csODECollider::GetCylinderGeometry (float& length, float& radius)
+{
+  if (geom_type == CYLINDER_COLLIDER_GEOMETRY)
+  {
+    dGeomCCylinderGetParams (geomID, &radius, &length);
+    return true;
+  }
+  return false;
 }
 void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmesh_fact)
 {
@@ -1268,7 +1313,7 @@ void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmes
       genmesh_fact->SetTriangleCount (tri_count);
       csVector3* vertices = genmesh_fact->GetVertices ();
       csTriangle* triangles = genmesh_fact->GetTriangles ();
-      
+
       for (int i = 0; i < tri_count; i++)
       {
         dVector3 v0, v1, v2;
@@ -1310,7 +1355,7 @@ csODERigidBody::~csODERigidBody ()
   colliders.DeleteAll ();
   dSpaceDestroy (groupID);
   dBodyDestroy (bodyID);
-  
+
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiRigidBody);
 }
 
@@ -1391,8 +1436,8 @@ void csODERigidBody::SetGroup(iBodyGroup *group)
 }
 
 bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
-    const csOrthoTransform &trans, float friction, float density,
-    float elasticity, float softness)
+                                         const csOrthoTransform &trans, float friction, float density,
+                                         float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider ();
   odec->SetElasticity (elasticity);
@@ -1410,8 +1455,8 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
 }
 
 bool csODERigidBody::AttachColliderCylinder (float length, float radius,
-    const csOrthoTransform& trans, float friction, float density,
-    float elasticity, float softness)
+                                             const csOrthoTransform& trans, float friction, float density,
+                                             float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider ();
   odec->SetElasticity (elasticity);
@@ -1428,8 +1473,8 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
   return true;
 }
 bool csODERigidBody::AttachColliderBox (const csVector3 &size,
-    const csOrthoTransform& trans, float friction, float density,
-    float elasticity, float softness)
+                                        const csOrthoTransform& trans, float friction, float density,
+                                        float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider ();
   odec->SetElasticity (elasticity);
@@ -1447,7 +1492,7 @@ bool csODERigidBody::AttachColliderBox (const csVector3 &size,
 }
 
 bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset,
-    float friction, float density, float elasticity, float softness)
+                                           float friction, float density, float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider ();
   odec->SetElasticity (elasticity);
@@ -1464,7 +1509,7 @@ bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset
 }
 
 bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
-  float friction, float density, float elasticity, float softness)
+                                          float friction, float density, float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider (); 
   odec->SetElasticity (elasticity);
@@ -1483,6 +1528,11 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
 void csODERigidBody::AttachCollider (iDynamicsSystemCollider* collider)
 {
   dynsys->DestroyCollider (collider);
+  if (collider->GetGeometryType () == PLANE_COLLIDER_GEOMETRY)
+    ((csODECollider*) collider)->AddToSpace (dynsys->GetSpaceID());
+  else 
+    ((csODECollider*) collider)->AddTransformToSpace (groupID);
+
   ((csODECollider*) collider)->AttachBody (bodyID);
   colliders.Push (collider);
 }
@@ -1555,7 +1605,7 @@ const csVector3 csODERigidBody::GetAngularVelocity () const
 }
 
 void csODERigidBody::SetProperties (float mass,
-    const csVector3& center, const csMatrix3& inertia)
+                                    const csVector3& center, const csMatrix3& inertia)
 {
   dMass* m = new dMass;
   m->mass = mass;
@@ -1567,7 +1617,7 @@ void csODERigidBody::SetProperties (float mass,
 }
 
 void csODERigidBody::GetProperties (float* mass,
-  csVector3* center, csMatrix3* inertia)
+                                    csVector3* center, csMatrix3* inertia)
 {
   dMass m;
   dBodyGetMass (bodyID, &m);
@@ -1576,8 +1626,8 @@ void csODERigidBody::GetProperties (float* mass,
   if (inertia != 0)
   {
     inertia->Set (m.I[0], m.I[1], m.I[2],
-     m.I[4], m.I[5], m.I[6],
-     m.I[8], m.I[9], m.I[10]);
+      m.I[4], m.I[5], m.I[6],
+      m.I[8], m.I[9], m.I[10]);
   }
 }
 float csODERigidBody::GetMass ()
@@ -1597,8 +1647,8 @@ csMatrix3 csODERigidBody::GetInertia ()
   dMass m;
   dBodyGetMass (bodyID, &m);
   return csMatrix3 (m.I[0], m.I[1], m.I[2],
-                    m.I[4], m.I[5], m.I[6],
-                    m.I[8], m.I[9], m.I[10]);
+    m.I[4], m.I[5], m.I[6],
+    m.I[8], m.I[9], m.I[10]);
 }
 void csODERigidBody::AdjustTotalMass (float targetmass)
 {
@@ -1629,27 +1679,27 @@ void csODERigidBody::AddRelTorque (const csVector3& force)
 }
 
 void csODERigidBody::AddForceAtPos (const csVector3& force,
-    const csVector3& pos)
+                                    const csVector3& pos)
 {
   dBodyAddForceAtPos (bodyID, force.x, force.y, force.z, pos.x, pos.y, pos.z);
 }
 
 void csODERigidBody::AddForceAtRelPos (const csVector3& force,
-    const csVector3& pos)
+                                       const csVector3& pos)
 {
   dBodyAddForceAtRelPos (bodyID, force.x, force.y, force.z,
     pos.x, pos.y, pos.z);
 }
 
 void csODERigidBody::AddRelForceAtPos (const csVector3& force,
-    const csVector3& pos)
+                                       const csVector3& pos)
 {
   dBodyAddRelForceAtPos (bodyID, force.x, force.y, force.z,
     pos.x, pos.y, pos.z);
 }
 
 void csODERigidBody::AddRelForceAtRelPos (const csVector3& force,
-    const csVector3& pos)
+                                          const csVector3& pos)
 {
   dBodyAddRelForceAtRelPos (bodyID, force.x, force.y, force.z,
     pos.x, pos.y, pos.z);
@@ -1744,106 +1794,106 @@ void  csStrictODEJoint::SetParam (int joint_type, int parameter, int axis, float
 
   switch (axis)
   {
-    case 1:
-      switch (param)
-      {
-      case dParamLoStop:
-        param = dParamLoStop2;
+  case 1:
+    switch (param)
+    {
+    case dParamLoStop:
+      param = dParamLoStop2;
       break;
-      case dParamHiStop:
-        param = dParamHiStop2;
+    case dParamHiStop:
+      param = dParamHiStop2;
       break;
-      case dParamVel:
-        param = dParamVel2;
+    case dParamVel:
+      param = dParamVel2;
       break;
-      case dParamFMax:
-        param = dParamFMax2;
+    case dParamFMax:
+      param = dParamFMax2;
       break;
-      case dParamFudgeFactor:
-        param = dParamFudgeFactor2;
+    case dParamFudgeFactor:
+      param = dParamFudgeFactor2;
       break;
-      case dParamBounce:
-        param = dParamBounce2;
+    case dParamBounce:
+      param = dParamBounce2;
       break;
-      case dParamCFM:
-        param = dParamCFM2;
+    case dParamCFM:
+      param = dParamCFM2;
       break;
-      case dParamStopERP:
-        param = dParamStopERP2;
+    case dParamStopERP:
+      param = dParamStopERP2;
       break;
-      case dParamStopCFM:
-        param = dParamStopCFM2;
+    case dParamStopCFM:
+      param = dParamStopCFM2;
       break;
-      case dParamSuspensionERP:
-        param = dParamSuspensionERP2;
+    case dParamSuspensionERP:
+      param = dParamSuspensionERP2;
       break;
-      case dParamSuspensionCFM:
-        param = dParamSuspensionCFM2;
+    case dParamSuspensionCFM:
+      param = dParamSuspensionCFM2;
       break;
-      }
-      break;
+    }
+    break;
 
-    case 2:
-      switch (param)
-      {
-      case dParamLoStop:
-        param = dParamLoStop3;
+  case 2:
+    switch (param)
+    {
+    case dParamLoStop:
+      param = dParamLoStop3;
       break;
-      case dParamHiStop:
-        param = dParamHiStop3;
+    case dParamHiStop:
+      param = dParamHiStop3;
       break;
-      case dParamVel:
-        param = dParamVel3;
+    case dParamVel:
+      param = dParamVel3;
       break;
-      case dParamFMax:
-        param = dParamFMax3;
+    case dParamFMax:
+      param = dParamFMax3;
       break;
-      case dParamFudgeFactor:
-        param = dParamFudgeFactor3;
+    case dParamFudgeFactor:
+      param = dParamFudgeFactor3;
       break;
-      case dParamBounce:
-        param = dParamBounce3;
+    case dParamBounce:
+      param = dParamBounce3;
       break;
-      case dParamCFM:
-        param = dParamCFM3;
+    case dParamCFM:
+      param = dParamCFM3;
       break;
-      case dParamStopERP:
-        param = dParamStopERP3;
+    case dParamStopERP:
+      param = dParamStopERP3;
       break;
-      case dParamStopCFM:
-        param = dParamStopCFM3;
+    case dParamStopCFM:
+      param = dParamStopCFM3;
       break;
-      case dParamSuspensionERP:
-        param = dParamSuspensionERP3;
+    case dParamSuspensionERP:
+      param = dParamSuspensionERP3;
       break;
-      case dParamSuspensionCFM:
-        param = dParamSuspensionCFM3;
+    case dParamSuspensionCFM:
+      param = dParamSuspensionCFM3;
       break;
-      }
-      break;
-    default:
-      ; // do nothing
+    }
+    break;
+  default:
+    ; // do nothing
   }
 
   switch (joint_type)
   {
-    case CS_ODE_JOINT_TYPE_HINGE:
-      dJointSetHingeParam (jointID, param, value);
-      break;
-    case CS_ODE_JOINT_TYPE_SLIDER:
-      dJointSetSliderParam (jointID, param, value);
-      break;
-    case CS_ODE_JOINT_TYPE_HINGE2:
-      dJointSetHinge2Param (jointID, param, value);
-      break;
-    case CS_ODE_JOINT_TYPE_AMOTOR:
-      dJointSetAMotorParam (jointID, param, value);
-      break;
-    case CS_ODE_JOINT_TYPE_UNIVERSAL:
-      dJointSetUniversalParam (jointID, param, value);
-      break;
-    default:
-      ; // do nothing
+  case CS_ODE_JOINT_TYPE_HINGE:
+    dJointSetHingeParam (jointID, param, value);
+    break;
+  case CS_ODE_JOINT_TYPE_SLIDER:
+    dJointSetSliderParam (jointID, param, value);
+    break;
+  case CS_ODE_JOINT_TYPE_HINGE2:
+    dJointSetHinge2Param (jointID, param, value);
+    break;
+  case CS_ODE_JOINT_TYPE_AMOTOR:
+    dJointSetAMotorParam (jointID, param, value);
+    break;
+  case CS_ODE_JOINT_TYPE_UNIVERSAL:
+    dJointSetUniversalParam (jointID, param, value);
+    break;
+  default:
+    ; // do nothing
   }
 }
 
@@ -1853,130 +1903,130 @@ float csStrictODEJoint::GetParam (int joint_type, int parameter, int axis)
 
   switch (axis)
   {
-    case 1:
-      switch (param)
-      {
-      case dParamLoStop:
-        param = dParamLoStop2;
+  case 1:
+    switch (param)
+    {
+    case dParamLoStop:
+      param = dParamLoStop2;
       break;
-      case dParamHiStop:
-        param = dParamHiStop2;
+    case dParamHiStop:
+      param = dParamHiStop2;
       break;
-      case dParamVel:
-        param = dParamVel2;
+    case dParamVel:
+      param = dParamVel2;
       break;
-      case dParamFMax:
-        param = dParamFMax2;
+    case dParamFMax:
+      param = dParamFMax2;
       break;
-      case dParamFudgeFactor:
-        param = dParamFudgeFactor2;
+    case dParamFudgeFactor:
+      param = dParamFudgeFactor2;
       break;
-      case dParamBounce:
-        param = dParamBounce2;
+    case dParamBounce:
+      param = dParamBounce2;
       break;
-      case dParamCFM:
-        param = dParamCFM2;
+    case dParamCFM:
+      param = dParamCFM2;
       break;
-      case dParamStopERP:
-        param = dParamStopERP2;
+    case dParamStopERP:
+      param = dParamStopERP2;
       break;
-      case dParamStopCFM:
-        param = dParamStopCFM2;
+    case dParamStopCFM:
+      param = dParamStopCFM2;
       break;
-      case dParamSuspensionERP:
-        param = dParamSuspensionERP2;
+    case dParamSuspensionERP:
+      param = dParamSuspensionERP2;
       break;
-      case dParamSuspensionCFM:
-        param = dParamSuspensionCFM2;
+    case dParamSuspensionCFM:
+      param = dParamSuspensionCFM2;
       break;
-      }
-      break;
+    }
+    break;
 
-    case 2:
-      switch (param)
-      {
-      case dParamLoStop:
-        param = dParamLoStop3;
+  case 2:
+    switch (param)
+    {
+    case dParamLoStop:
+      param = dParamLoStop3;
       break;
-      case dParamHiStop:
-        param = dParamHiStop3;
+    case dParamHiStop:
+      param = dParamHiStop3;
       break;
-      case dParamVel:
-        param = dParamVel3;
+    case dParamVel:
+      param = dParamVel3;
       break;
-      case dParamFMax:
-        param = dParamFMax3;
+    case dParamFMax:
+      param = dParamFMax3;
       break;
-      case dParamFudgeFactor:
-        param = dParamFudgeFactor3;
+    case dParamFudgeFactor:
+      param = dParamFudgeFactor3;
       break;
-      case dParamBounce:
-        param = dParamBounce3;
+    case dParamBounce:
+      param = dParamBounce3;
       break;
-      case dParamCFM:
-        param = dParamCFM3;
+    case dParamCFM:
+      param = dParamCFM3;
       break;
-      case dParamStopERP:
-        param = dParamStopERP3;
+    case dParamStopERP:
+      param = dParamStopERP3;
       break;
-      case dParamStopCFM:
-        param = dParamStopCFM3;
+    case dParamStopCFM:
+      param = dParamStopCFM3;
       break;
-      case dParamSuspensionERP:
-        param = dParamSuspensionERP3;
+    case dParamSuspensionERP:
+      param = dParamSuspensionERP3;
       break;
-      case dParamSuspensionCFM:
-        param = dParamSuspensionCFM3;
+    case dParamSuspensionCFM:
+      param = dParamSuspensionCFM3;
       break;
-      }
-      break;
-    default:
-      ; // do nothing
+    }
+    break;
+  default:
+    ; // do nothing
   }
 
   switch (joint_type)
   {
-    case CS_ODE_JOINT_TYPE_HINGE:
-      return dJointGetHingeParam (jointID, param);
-      break;
-    case CS_ODE_JOINT_TYPE_SLIDER:
-      return dJointGetSliderParam (jointID, param);
-      break;
-    case CS_ODE_JOINT_TYPE_HINGE2:
-      return dJointGetHinge2Param (jointID, param);
-      break;
-    case CS_ODE_JOINT_TYPE_AMOTOR:
-      return dJointGetAMotorParam (jointID, param);
-      break;
-    case CS_ODE_JOINT_TYPE_UNIVERSAL:
-      return dJointGetUniversalParam (jointID, param);
-      break;
-    default:
-      return 0.0;
+  case CS_ODE_JOINT_TYPE_HINGE:
+    return dJointGetHingeParam (jointID, param);
+    break;
+  case CS_ODE_JOINT_TYPE_SLIDER:
+    return dJointGetSliderParam (jointID, param);
+    break;
+  case CS_ODE_JOINT_TYPE_HINGE2:
+    return dJointGetHinge2Param (jointID, param);
+    break;
+  case CS_ODE_JOINT_TYPE_AMOTOR:
+    return dJointGetAMotorParam (jointID, param);
+    break;
+  case CS_ODE_JOINT_TYPE_UNIVERSAL:
+    return dJointGetUniversalParam (jointID, param);
+    break;
+  default:
+    return 0.0;
   }
 }
 
 void csStrictODEJoint::CreateFeedback ()
 {
-    feedback = new dJointFeedback ();
+  feedback = new dJointFeedback ();
 
-    feedback->f1[0] = 0;
-    feedback->f1[1] = 0;
-    feedback->f1[2] = 0;
+  feedback->f1[0] = 0;
+  feedback->f1[1] = 0;
+  feedback->f1[2] = 0;
 
-    feedback->f2[0] = 0;
-    feedback->f2[1] = 0;
-    feedback->f2[2] = 0;
+  feedback->f2[0] = 0;
+  feedback->f2[1] = 0;
+  feedback->f2[2] = 0;
 
-    feedback->t1[0] = 0;
-    feedback->t1[1] = 0;
-    feedback->t1[2] = 0;
+  feedback->t1[0] = 0;
+  feedback->t1[1] = 0;
+  feedback->t1[2] = 0;
 
-    feedback->t2[0] = 0;
-    feedback->t2[1] = 0;
-    feedback->t2[2] = 0;
+  feedback->t2[0] = 0;
+  feedback->t2[1] = 0;
+  feedback->t2[2] = 0;
 
-    dJointSetFeedback (jointID, feedback);
+  dJointSetFeedback (jointID, feedback);
 }
 
 csVector3 csStrictODEJoint::GetFeedbackForce1 ()
@@ -2085,8 +2135,8 @@ ODEAMotorMode ODEAMotorJoint::GetAMotorMode ()
 { 
   switch (dJointGetAMotorMode (jointID))
   {
-    case dAMotorUser: return CS_ODE_AMOTOR_MODE_USER;
-    case dAMotorEuler: return CS_ODE_AMOTOR_MODE_EULER;
+  case dAMotorUser: return CS_ODE_AMOTOR_MODE_USER;
+  case dAMotorEuler: return CS_ODE_AMOTOR_MODE_EULER;
   }
   return CS_ODE_AMOTOR_MODE_UNKNOWN;
 }
@@ -2328,7 +2378,7 @@ void csODEJoint::BuildHinge (const csVector3 &axis, float min, float max)
 }
 
 void csODEJoint::BuildHinge2 (const csVector3 &axis1, float min1, float max1,
-    const csVector3 &axis2, float min2, float max2)
+                              const csVector3 &axis2, float min2, float max2)
 {
   dJointSetHinge2Axis1 (jointID, axis1.x, axis1.y, axis1.z);
   dJointSetHinge2Axis2 (jointID, axis2.x, axis2.y, axis2.z);
@@ -2389,28 +2439,28 @@ void csODEJoint::ApplyJointProperty (int parameter, csVector3 & values)
   int jointType = dJointGetType (jointID);
   switch(jointType)
   {
-    case dJointTypeHinge:
-      dJointSetHingeParam (jointID, parameter, values.x);
-      break;
-    case dJointTypeSlider:
-      if (transConstraint[0])
-        dJointSetSliderParam (jointID, parameter, values.x);
-      else if (transConstraint[1])
-        dJointSetSliderParam (jointID, parameter, values.y);
-      else
-        dJointSetSliderParam (jointID, parameter, values.z);
-      break;
-    case dJointTypeHinge2:
-        //looks like axis 2 is meant to be axle,
-        //axis 1 is steering, I may need to check that later though.
-        dJointSetHinge2Param (jointID, parameter, values.x);
-        dJointSetHinge2Param (jointID, parameter + dParamGroup, values.y);
-                                   //dParamXi = dParamX + dParamGroup * (i-1)
-    default:
+  case dJointTypeHinge:
+    dJointSetHingeParam (jointID, parameter, values.x);
+    break;
+  case dJointTypeSlider:
+    if (transConstraint[0])
+      dJointSetSliderParam (jointID, parameter, values.x);
+    else if (transConstraint[1])
+      dJointSetSliderParam (jointID, parameter, values.y);
+    else
+      dJointSetSliderParam (jointID, parameter, values.z);
+    break;
+  case dJointTypeHinge2:
+    //looks like axis 2 is meant to be axle,
+    //axis 1 is steering, I may need to check that later though.
+    dJointSetHinge2Param (jointID, parameter, values.x);
+    dJointSetHinge2Param (jointID, parameter + dParamGroup, values.y);
+    //dParamXi = dParamX + dParamGroup * (i-1)
+  default:
     //case dJointTypeBall:       // maybe supported later via AMotor
     //case dJointTypeAMotor:     // not supported here
     //case dJointTypeUniversal:  // not sure if that's supported in here
-      break;
+    break;
   }
 }
 
@@ -2460,63 +2510,63 @@ void csODEJoint::BuildJoint ()
   {
     switch (rotcount)
     {
-      case 0:
-        jointID = dJointCreateFixed (dynsys->GetWorldID(), 0);
-        dJointAttach (jointID, bodyID[0], bodyID[1]);
-        dJointSetFixed (jointID);
-        break;
-      case 1:
-        jointID = dJointCreateHinge (dynsys->GetWorldID(), 0);
-        dJointAttach (jointID, bodyID[0], bodyID[1]);
-        pos = transform.GetOrigin();
-        dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
-        rot = transform.GetO2T();
-        if (rotConstraint[0])
-        {
-          BuildHinge (rot.Col1(), minAngle.x, maxAngle.x);
-        }
-        else if (rotConstraint[1])
-        {
-          BuildHinge (rot.Col2(), minAngle.y, maxAngle.y);
-        }
-        else if (rotConstraint[2])
-        {
-          BuildHinge (rot.Col3(), minAngle.z, maxAngle.z);
-        }
-        // TODO: insert some mechanism for bounce, erp and cfm
-        break;
-      case 2:
-        jointID = dJointCreateHinge2 (dynsys->GetWorldID(), 0);
-        dJointAttach (jointID, bodyID[0], bodyID[1]);
-        pos = transform.GetOrigin();
-        dJointSetHinge2Anchor (jointID, pos.x, pos.y, pos.z);
-        rot = transform.GetO2T();
+    case 0:
+      jointID = dJointCreateFixed (dynsys->GetWorldID(), 0);
+      dJointAttach (jointID, bodyID[0], bodyID[1]);
+      dJointSetFixed (jointID);
+      break;
+    case 1:
+      jointID = dJointCreateHinge (dynsys->GetWorldID(), 0);
+      dJointAttach (jointID, bodyID[0], bodyID[1]);
+      pos = transform.GetOrigin();
+      dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
+      rot = transform.GetO2T();
+      if (rotConstraint[0])
+      {
+        BuildHinge (rot.Col1(), minAngle.x, maxAngle.x);
+      }
+      else if (rotConstraint[1])
+      {
+        BuildHinge (rot.Col2(), minAngle.y, maxAngle.y);
+      }
+      else if (rotConstraint[2])
+      {
+        BuildHinge (rot.Col3(), minAngle.z, maxAngle.z);
+      }
+      // TODO: insert some mechanism for bounce, erp and cfm
+      break;
+    case 2:
+      jointID = dJointCreateHinge2 (dynsys->GetWorldID(), 0);
+      dJointAttach (jointID, bodyID[0], bodyID[1]);
+      pos = transform.GetOrigin();
+      dJointSetHinge2Anchor (jointID, pos.x, pos.y, pos.z);
+      rot = transform.GetO2T();
 
-        if (rotConstraint[0])
+      if (rotConstraint[0])
+      {
+        if (rotConstraint[1])
         {
-          if (rotConstraint[1])
-          {
-            BuildHinge2 (rot.Col2(), minAngle.y, maxAngle.y,
-              rot.Col1(), minAngle.x, maxAngle.x);
-          }
-          else
-          {
-            BuildHinge2 (rot.Col3(), minAngle.z, maxAngle.z,
-              rot.Col1(), minAngle.x, maxAngle.x);
-          }
+          BuildHinge2 (rot.Col2(), minAngle.y, maxAngle.y,
+            rot.Col1(), minAngle.x, maxAngle.x);
         }
         else
         {
-          BuildHinge2 (rot.Col2(), minAngle.y, maxAngle.y,
-            rot.Col3(), minAngle.z, maxAngle.z);
+          BuildHinge2 (rot.Col3(), minAngle.z, maxAngle.z,
+            rot.Col1(), minAngle.x, maxAngle.x);
         }
-        break;
-      case 3:
-        jointID = dJointCreateBall (dynsys->GetWorldID(), 0);
-          dJointAttach (jointID, bodyID[0], bodyID[1]);
-        pos = transform.GetOrigin();
-        dJointSetBallAnchor (jointID, pos.x, pos.y, pos.z);
-        break;
+      }
+      else
+      {
+        BuildHinge2 (rot.Col2(), minAngle.y, maxAngle.y,
+          rot.Col3(), minAngle.z, maxAngle.z);
+      }
+      break;
+    case 3:
+      jointID = dJointCreateBall (dynsys->GetWorldID(), 0);
+      dJointAttach (jointID, bodyID[0], bodyID[1]);
+      pos = transform.GetOrigin();
+      dJointSetBallAnchor (jointID, pos.x, pos.y, pos.z);
+      break;
     }
   }
   else if (rotcount == 0)
@@ -2524,29 +2574,29 @@ void csODEJoint::BuildJoint ()
     switch (transcount)
     {
       /* 0 is accounted for in the previous condition */
-      case 1:
-        jointID = dJointCreateSlider (dynsys->GetWorldID(), 0);
-          dJointAttach (jointID, bodyID[0], bodyID[1]);
-        rot = transform.GetO2T();
-        if (transConstraint[0])
-        {
-          BuildSlider (rot.Col1(), minTrans.x, maxTrans.x);
-        }
-        else if (transConstraint[1])
-        {
-          BuildSlider (rot.Col2(), minTrans.y, maxTrans.y);
-        }
-        else
-        {
-          BuildSlider (rot.Col3(), minTrans.z, maxTrans.z);
-        }
-        break;
-      case 2:
-// TODO fill this in with a contact joint
-        break;
-      case 3:
-/* doesn't exist */
-        break;
+    case 1:
+      jointID = dJointCreateSlider (dynsys->GetWorldID(), 0);
+      dJointAttach (jointID, bodyID[0], bodyID[1]);
+      rot = transform.GetO2T();
+      if (transConstraint[0])
+      {
+        BuildSlider (rot.Col1(), minTrans.x, maxTrans.x);
+      }
+      else if (transConstraint[1])
+      {
+        BuildSlider (rot.Col2(), minTrans.y, maxTrans.y);
+      }
+      else
+      {
+        BuildSlider (rot.Col3(), minTrans.z, maxTrans.z);
+      }
+      break;
+    case 2:
+      // TODO fill this in with a contact joint
+      break;
+    case 3:
+      /* doesn't exist */
+      break;
     }
   } else {
     /* too unconstrained, don't create joint */
@@ -2557,14 +2607,14 @@ ODEJointType csODEJoint::ODEJointState::GetType()
 {
   switch (dJointGetType (scfParent->jointID))
   {
-    case dJointTypeBall: return CS_ODE_JOINT_TYPE_BALL;
-    case dJointTypeHinge: return CS_ODE_JOINT_TYPE_HINGE;
-    case dJointTypeSlider: return CS_ODE_JOINT_TYPE_SLIDER;
-    case dJointTypeContact: return CS_ODE_JOINT_TYPE_CONTACT;
-    case dJointTypeUniversal: return CS_ODE_JOINT_TYPE_UNIVERSAL;
-    case dJointTypeHinge2: return CS_ODE_JOINT_TYPE_HINGE2;
-    case dJointTypeFixed: return CS_ODE_JOINT_TYPE_FIXED;
-    case dJointTypeAMotor: return CS_ODE_JOINT_TYPE_AMOTOR;
+  case dJointTypeBall: return CS_ODE_JOINT_TYPE_BALL;
+  case dJointTypeHinge: return CS_ODE_JOINT_TYPE_HINGE;
+  case dJointTypeSlider: return CS_ODE_JOINT_TYPE_SLIDER;
+  case dJointTypeContact: return CS_ODE_JOINT_TYPE_CONTACT;
+  case dJointTypeUniversal: return CS_ODE_JOINT_TYPE_UNIVERSAL;
+  case dJointTypeHinge2: return CS_ODE_JOINT_TYPE_HINGE2;
+  case dJointTypeFixed: return CS_ODE_JOINT_TYPE_FIXED;
+  case dJointTypeAMotor: return CS_ODE_JOINT_TYPE_AMOTOR;
   }
   return CS_ODE_JOINT_TYPE_UNKNOWN;
 }
@@ -2573,36 +2623,36 @@ void csODEJoint::ODEJointState::SetParam (int parameter, float value)
 {
   switch(GetType())
   {
-    case CS_ODE_JOINT_TYPE_HINGE:
-      dJointSetHingeParam (scfParent->jointID, parameter, value);
-      break;
-    case CS_ODE_JOINT_TYPE_SLIDER:
-      dJointSetSliderParam (scfParent->jointID, parameter, value);
-      break;
-    case CS_ODE_JOINT_TYPE_HINGE2:
-      dJointSetHinge2Param (scfParent->jointID, parameter, value);
-      break;
-    case CS_ODE_JOINT_TYPE_AMOTOR:
-      dJointSetAMotorParam (scfParent->jointID, parameter, value);
-      break;
-    default:
-      ; // do nothing
+  case CS_ODE_JOINT_TYPE_HINGE:
+    dJointSetHingeParam (scfParent->jointID, parameter, value);
+    break;
+  case CS_ODE_JOINT_TYPE_SLIDER:
+    dJointSetSliderParam (scfParent->jointID, parameter, value);
+    break;
+  case CS_ODE_JOINT_TYPE_HINGE2:
+    dJointSetHinge2Param (scfParent->jointID, parameter, value);
+    break;
+  case CS_ODE_JOINT_TYPE_AMOTOR:
+    dJointSetAMotorParam (scfParent->jointID, parameter, value);
+    break;
+  default:
+    ; // do nothing
   }
 }
 float csODEJoint::ODEJointState::GetParam (int parameter)
 {
   switch(GetType())
   {
-    case CS_ODE_JOINT_TYPE_HINGE:
-      return dJointGetHingeParam (scfParent->jointID, parameter);
-    case CS_ODE_JOINT_TYPE_SLIDER:
-      return dJointGetSliderParam (scfParent->jointID, parameter);
-    case CS_ODE_JOINT_TYPE_HINGE2:
-      return dJointGetHinge2Param (scfParent->jointID, parameter);
-    case CS_ODE_JOINT_TYPE_AMOTOR:
-      return dJointGetAMotorParam (scfParent->jointID, parameter);
-    default:
-      return 0.0; // this is not a good... the error is ignored silently...
+  case CS_ODE_JOINT_TYPE_HINGE:
+    return dJointGetHingeParam (scfParent->jointID, parameter);
+  case CS_ODE_JOINT_TYPE_SLIDER:
+    return dJointGetSliderParam (scfParent->jointID, parameter);
+  case CS_ODE_JOINT_TYPE_HINGE2:
+    return dJointGetHinge2Param (scfParent->jointID, parameter);
+  case CS_ODE_JOINT_TYPE_AMOTOR:
+    return dJointGetAMotorParam (scfParent->jointID, parameter);
+  default:
+    return 0.0; // this is not a good... the error is ignored silently...
   }
 }
 
@@ -2641,12 +2691,12 @@ csODEDefaultMoveCallback::~csODEDefaultMoveCallback ()
 }
 
 void csODEDefaultMoveCallback::Execute (iMeshWrapper* mesh,
- csOrthoTransform& t)
+                                        csOrthoTransform& t)
 {
   // Dont do anything if nothing has changed
   if (mesh->GetMovable()->GetPosition() == t.GetOrigin() &&
-          mesh->GetMovable()->GetTransform().GetT2O() == t.GetT2O())
-        return;
+    mesh->GetMovable()->GetTransform().GetT2O() == t.GetT2O())
+    return;
 
   // Update movable
   mesh->GetMovable ()->SetPosition (t.GetOrigin ());
