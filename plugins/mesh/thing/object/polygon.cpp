@@ -699,7 +699,14 @@ bool csPolygon3DStatic::SetTextureSpace (
       thing_static->thing_type->Warn (
         "Warning: bad UV coordinates for poly '%s'!", GetName ());
     }
-    SetTextureSpace (p1, p2, 1);
+    if (!((p1-p2) < SMALL_EPSILON))
+      SetTextureSpace (p1, p2, 1);
+    else if (!((p1-p3) < SMALL_EPSILON))
+      SetTextureSpace (p1, p3, 1);
+    else
+    {
+      // @@@ Nothing sensible to do?
+    }
     return false;
   }
   else
