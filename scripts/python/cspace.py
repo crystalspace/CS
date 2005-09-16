@@ -6653,6 +6653,7 @@ class iTerrainObjectState(iBase):
     def SetMaterialPalette(*args): return _cspace.iTerrainObjectState_SetMaterialPalette(*args)
     def GetMaterialPalette(*args): return _cspace.iTerrainObjectState_GetMaterialPalette(*args)
     def SetMaterialMap(*args): return _cspace.iTerrainObjectState_SetMaterialMap(*args)
+    def SetMaterialAlphaMaps(*args): return _cspace.iTerrainObjectState_SetMaterialAlphaMaps(*args)
     def SetLODValue(*args): return _cspace.iTerrainObjectState_SetLODValue(*args)
     def GetLODValue(*args): return _cspace.iTerrainObjectState_GetLODValue(*args)
     def SaveState(*args): return _cspace.iTerrainObjectState_SaveState(*args)
