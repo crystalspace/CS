@@ -7564,6 +7564,7 @@ package cspace::iTerrainObjectState;
 *SetMaterialPalette = *cspacec::iTerrainObjectState_SetMaterialPalette;
 *GetMaterialPalette = *cspacec::iTerrainObjectState_GetMaterialPalette;
 *SetMaterialMap = *cspacec::iTerrainObjectState_SetMaterialMap;
+*SetMaterialAlphaMaps = *cspacec::iTerrainObjectState_SetMaterialAlphaMaps;
 *SetLODValue = *cspacec::iTerrainObjectState_SetLODValue;
 *GetLODValue = *cspacec::iTerrainObjectState_GetLODValue;
 *SaveState = *cspacec::iTerrainObjectState_SaveState;
