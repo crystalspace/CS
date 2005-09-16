@@ -20,6 +20,7 @@ chronological order.
 	  terrain engine a bit more robust and optimal.
 	- Jorrit made thing a bit more robust in pathological polygon
 	  cases.
+	- res added a "Search" field to the online manual.
 15-Sep-2005
 	- Jorrit made the infinite maze rooms a bit bigger. That makes
 	  collision detection works again so you can walk to the next

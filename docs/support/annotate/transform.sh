@@ -17,6 +17,11 @@ for d in $DIRS; do
 \$1 | Search: <form class=\"search\" action=\"/cgi-bin/htsearch\" method=\"get\">\
 <input class=\"search\" type=\"text\" name=\"words\" value=\"\" size=\"20\"/>\
 </form>!i" \
+      -e "s!( \? </a>]</td>)!\$1
+<td align=\"left\" valign=\"middle\">[ Search: \
+<form style=\"display:inline;\" class=\"search\" action=\"/cgi-bin/htsearch\" method=\"get\">\
+<input class=\"search\" type=\"text\" name=\"words\" value=\"\" size=\"20\"/>\
+</form> ]</td>!i" \
       $d
     cp docs/support/annotate/*.php $d
   fi
