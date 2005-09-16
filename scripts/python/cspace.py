@@ -11326,6 +11326,7 @@ class iRigidBodyPtr(iRigidBody):
         _swig_setattr(self, iRigidBody,self.__class__,iRigidBody)
 _cspace.iRigidBody_swigregister(iRigidBodyPtr)
 
+NO_GEOMETRY = _cspace.NO_GEOMETRY
 BOX_COLLIDER_GEOMETRY = _cspace.BOX_COLLIDER_GEOMETRY
 PLANE_COLLIDER_GEOMETRY = _cspace.PLANE_COLLIDER_GEOMETRY
 TRIMESH_COLLIDER_GEOMETRY = _cspace.TRIMESH_COLLIDER_GEOMETRY
@@ -11383,6 +11384,10 @@ class iDynamicsSystemCollider(iBase):
     def GetGeometryType(*args): return _cspace.iDynamicsSystemCollider_GetGeometryType(*args)
     def GetTransform(*args): return _cspace.iDynamicsSystemCollider_GetTransform(*args)
     def SetTransform(*args): return _cspace.iDynamicsSystemCollider_SetTransform(*args)
+    def GetBoxGeometry(*args): return _cspace.iDynamicsSystemCollider_GetBoxGeometry(*args)
+    def GetSphereGeometry(*args): return _cspace.iDynamicsSystemCollider_GetSphereGeometry(*args)
+    def GetPlaneGeometry(*args): return _cspace.iDynamicsSystemCollider_GetPlaneGeometry(*args)
+    def GetCylinderGeometry(*args): return _cspace.iDynamicsSystemCollider_GetCylinderGeometry(*args)
     def __del__(self, destroy=_cspace.delete_iDynamicsSystemCollider):
         try:
             if self.thisown: destroy(self)
