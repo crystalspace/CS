@@ -617,12 +617,15 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
 
 bool csTerrBlock::IsMaterialUsed (int index)
 {
-  if ((materialsChecked.Length() <= (size_t)index) || 
-    (!materialsChecked[index]))
+  if (size_t (index) >= materialsChecked.GetSize ())
   {
-    materialsChecked.SetLength (index + 1);
+    materialsChecked.SetSize (index+1);
+    materialsUsed.SetSize (index+1);
+  }
+
+  if (!materialsChecked[index])
+  {
     materialsChecked[index] = true;
-    materialsUsed.SetLength (index + 1);
 
     // Slightly overexagerate the heightmap Space so that
     // we don't miss materials due to just being at the border
@@ -657,19 +660,21 @@ bool csTerrBlock::IsMaterialUsed (int index)
 
     bool matUsed = false;
     const csBitArray& bits = terr->globalMaterialsUsed[index];
+    int y_ofs = mmTop * terr->materialMapW;
     for (int y = mmTop; y <= mmBottom; y++)
     {
-      int ofs = y * terr->materialMapW;
+      int ofs = mmLeft + y_ofs;
       for (int x = mmLeft; x <= mmRight; x++)
       {
-	//if (terr->materialMap[ofs + x] == index)
-	if (bits[ofs + x])
+	if (bits[ofs])
 	{
 	  matUsed = true;
 	  break;
 	}
+	ofs++;
       }
       if (matUsed) break;
+      y_ofs += terr->materialMapW;
     }
 
     materialsUsed[index] = matUsed;
