@@ -12546,6 +12546,10 @@ package cspace::iDynamicsSystemCollider;
 *GetGeometryType = *cspacec::iDynamicsSystemCollider_GetGeometryType;
 *GetTransform = *cspacec::iDynamicsSystemCollider_GetTransform;
 *SetTransform = *cspacec::iDynamicsSystemCollider_SetTransform;
+*GetBoxGeometry = *cspacec::iDynamicsSystemCollider_GetBoxGeometry;
+*GetSphereGeometry = *cspacec::iDynamicsSystemCollider_GetSphereGeometry;
+*GetPlaneGeometry = *cspacec::iDynamicsSystemCollider_GetPlaneGeometry;
+*GetCylinderGeometry = *cspacec::iDynamicsSystemCollider_GetCylinderGeometry;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -14464,6 +14468,7 @@ sub csConVeryBottom () { $cspacec::csConVeryBottom }
 sub csConNoCursor () { $cspacec::csConNoCursor }
 sub csConNormalCursor () { $cspacec::csConNormalCursor }
 sub csConInsertCursor () { $cspacec::csConInsertCursor }
+sub NO_GEOMETRY () { $cspacec::NO_GEOMETRY }
 sub BOX_COLLIDER_GEOMETRY () { $cspacec::BOX_COLLIDER_GEOMETRY }
 sub PLANE_COLLIDER_GEOMETRY () { $cspacec::PLANE_COLLIDER_GEOMETRY }
 sub TRIMESH_COLLIDER_GEOMETRY () { $cspacec::TRIMESH_COLLIDER_GEOMETRY }
