@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<world>
+  <variables>
+    <variable name="LodM" value="-0.00666667" />
+    <variable name="LodA" value="1.33333" />
+  </variables>
+
+  <plugins>
+    <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
+    <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
+    <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
+    <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain</plugin>
+    <plugin name="terrain">crystalspace.mesh.loader.terrain</plugin>
+    <plugin name="ballFact">crystalspace.mesh.loader.factory.ball</plugin>
+    <plugin name="ball">crystalspace.mesh.loader.ball</plugin>
+    <plugin name="foliageFact">crystalspace.mesh.loader.factory.foliage</plugin>
+    <plugin name="foliage">crystalspace.mesh.loader.foliage</plugin>
+  </plugins>
+
+  <textures>
+    <texture name="andrew_marble4.jpg">
+      <file>/lib/stdtex/andrew_marble4.jpg</file>
+    </texture>
+    <texture name="stone4.gif">
+      <file>/lib/std/stone4.gif</file>
+    </texture>
+    <texture name="grass.png">
+      <file>/lev/terrain/grass.png</file>
+    </texture>
+    <texture name="materialmap_base.png">
+      <!--<file>/lev/terrain/materialmap_base.png</file>-->
+      <file>/lib/stdtex/green.jpg</file>
+    </texture>
+  </textures>
+
+  <shaders>
+    <shader><file>/shader/terrain_fixed_base.xml</file></shader>
+    <shader><file>/shader/terrain_fixed_splatting.xml</file></shader>
+  </shaders>
+
+  <materials>
+    <material name="ScatterSky">
+      <color red="0" green="0" blue="0" /> 
+    </material>
+    <material name="Base">
+      <texture>materialmap_base.png</texture>
+      <shader type="ambient">terrain_fixed_base</shader>
+    </material>
+    <material name="Marble">
+      <texture>andrew_marble4.jpg</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+    <material name="Stone">
+      <texture>stone4.gif</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+    <material name="Grass">
+      <texture>grass.png</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+  </materials>
+
+  <renderpriorities>
+    <priority name="sky">
+      <level>1</level>
+      <sort>NONE</sort>
+    </priority>
+    <priority name="mirror">
+      <level>2</level>
+      <sort>FRONT2BACK</sort>
+    </priority>
+    <priority name="wall">
+      <level>3</level>
+      <sort>NONE</sort>
+    </priority>
+    <priority name="object">
+      <level>4</level>
+      <sort>NONE</sort>
+    </priority>
+    <priority name="alpha">
+      <level>5</level>
+      <sort>BACK2FRONT</sort>
+    </priority>
+  </renderpriorities>
+
+  <addon>
+    <plugin>crystalspace.renderloop.loop.loader</plugin>
+    <paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>
+  </addon>
+    
+  <settings>
+    <clearzbuf>yes</clearzbuf>
+    <lightmapcellsize>16</lightmapcellsize>
+    <renderloop>std_rloop_terrainfixed</renderloop>
+  </settings>
+
+  <start>
+    <sector>room</sector>
+    <position x="0" y="30" z="0" />
+    <forward x="0" y="0" z="1" />
+    <up x="0" y="1" z="0" />
+  </start>
+
+  <meshfact name="skydome">
+    <plugin>ballFact</plugin>
+    <params />
+  </meshfact>
+
+  <addon plugin="crystalspace.terraformer.simple.loader">
+      <name>simple</name>
+      <heightmap>/lev/terrain/heightmap_257x257.png</heightmap>
+      <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
+      <scale x="256" y="32" z="256" />
+  </addon>
+
+  <meshfact name="TerrainFact">
+    <plugin>terrainFact</plugin>
+    <params>
+      <plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>
+      <terraformer>simple</terraformer>
+      <sampleregion>
+        <min x="-256" y="-256" />
+        <max x="256" y="256" />
+      </sampleregion>
+    </params>
+  </meshfact>
+
+  <!--
+  <meshfact name="FoliageFact">
+    <plugin>foliageFact</plugin>
+    <params>
+      <terraformer>simple</terraformer>
+      <sampleregion>
+        <min x="-256" y="-256" />
+        <max x="256" y="256" />
+      </sampleregion>
+      <object name="oak">
+	<loddistance varm="LodM" vora="LodA" />
+	<geometry lod="0">
+	  <v x="0" y="0" z="0" u="0" v="u" nx="0" ny="0" nz="0" red="0" green="0" blue="0" />
+	  ...
+	  <t v1="0" v2="1" v3="2" />
+	  ...
+	  <material>xxx</material>
+	</geometry>
+	<geometry lod="1">
+	  <v x="0" y="0" z="0" u="0" v="u" nx="0" ny="0" nz="0" red="0" green="0" blue="0" />
+	  ...
+	  <t v1="0" v2="1" v3="2" />
+	  ...
+	  <material>xxx</material>
+	</geometry>
+      </object>
+      <foliagepalette>
+	<palette index="0">
+	  <foliage name="oak" density="1" />
+	  <foliage name="grass" density="10" />
+	</palette>
+	<palette index="1">
+	  <foliage name="grass" density="10" />
+	</palette>
+	<palette index="2">
+	  <foliage name="oak" density="1" />
+	  <foliage name="pine" density="1" />
+	  <foliage name="grass" density="4" />
+	</palette>
+      </foliagepalette>
+    </params>
+  </meshfact>
+  -->
+
+  <sector name="room">
+     <light name="sun">
+       <center x="-50000" y="86030" z="0" />
+       <color red="0.85903" green="0.80995" blue="0.70420" />
+       <radius>1000000</radius>
+     </light>
+
+    <meshobj name="sky">
+      <plugin>ball</plugin>
+      <params>
+        <factory>skydome</factory>
+        <radius x="500000" y="500000" z="500000" />
+        <numrim>8</numrim>
+        <reversed>yes</reversed>
+        <material>ScatterSky</material>
+        <color red="0" green="0" blue="0" />
+      </params>
+      <zfill />
+      <priority>sky</priority>
+      <camera />
+      <polymesh> <colldet/> </polymesh>
+    </meshobj>
+
+    <meshobj name="Terrain">
+      <plugin>terrain</plugin>
+      <params>
+        <factory>TerrainFact</factory>
+        <material>Base</material>
+	<materialpalette>
+	  <material>Marble</material>
+	  <material>Stone</material>
+	  <material>Grass</material>
+	</materialpalette>
+	<lodvalue name="splatting distance">400</lodvalue>
+  	<lodvalue name="block resolution">16</lodvalue>
+  	<lodvalue name="block split distance">8</lodvalue>
+  	<lodvalue name="minimum block size">32</lodvalue>
+  	<lodvalue name="cd resolution">256</lodvalue>
+	<!--<materialmap image="/lev/terrain/materialmap.png" />-->
+	<materialalphamap image="/lev/terraina/alpha_marble.png" />
+	<materialalphamap image="/lev/terraina/alpha_stone.png" />
+	<staticlighting>yes</staticlighting>
+	<castshadows>yes</castshadows>
+      </params>
+      <move> 
+        <v x="0" y="0" z="0" /> 
+      </move>
+    </meshobj>
+
+    <!-- Uncomment for ...fog: -->
+    <!--fog red=".3" green=".27" blue=".27" density="0.002" /-->
+  </sector>
+</world>

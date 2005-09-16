@@ -58,6 +58,24 @@ struct iTerrainObjectState : public iBase
   virtual bool SetMaterialMap (iImage* map) = 0;
 
   /**
+   * In short, the materialmap paints the palette onto the terrain like
+   * an indexed image format paints a color palette onto the screen
+   * It sets the materials per pixel in the material map.  If x and y are not
+   * equal to the heightmap the materialmap will scale accordingly.  If they
+   * are equal than the material map will map a single material to a single
+   * high level quad in the final terrain.
+   * Note x and y must be 2^n and usually they must be equal
+   * This version expects an array of alpha maps (typically gray scale images).
+   * For every material in the palette except for the last one(!) there will
+   * be an alpha map so this array should have one element less compared to the
+   * palette. The alpha map for the last palette entry will be calculated so that
+   * the alpha values add up to 100%.
+   */
+  virtual bool SetMaterialAlphaMaps (const csArray<csArray<char> >& data,
+  	int x, int y) = 0;
+  virtual bool SetMaterialAlphaMaps (const csArray<iImage*>& maps) = 0;
+
+  /**
    * Set a LOD parameter.
    * 
    * The following parameters can be used:

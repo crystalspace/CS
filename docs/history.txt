@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Sep-2005
+	- Jorrit added a new feature to the terrain engine. Instead of
+	  specifying one materialmap to tell the engine what material
+	  from the palette to use on a specific spot in the terrain you
+	  can now also specify n-1 alpha maps with n equal to the size
+	  of the palette. The last alpha map will be automatically
+	  calculated so that the alpha's add up to 100%. This technique
+	  is a bit more flexible because you can now mix textures
+	  on the same spot. Added a new 'terraina' level in CS which
+	  demonstrates this feature.
 15-Sep-2005
 	- Jorrit made the infinite maze rooms a bit bigger. That makes
 	  collision detection works again so you can walk to the next

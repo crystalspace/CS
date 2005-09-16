@@ -656,12 +656,14 @@ bool csTerrBlock::IsMaterialUsed (int index)
     if (mmTop < 0) mmTop = 0;
 
     bool matUsed = false;
+    const csBitArray& bits = terr->globalMaterialsUsed[index];
     for (int y = mmTop; y <= mmBottom; y++)
     {
       int ofs = y * terr->materialMapW;
       for (int x = mmLeft; x <= mmRight; x++)
       {
-	if (terr->materialMap[ofs + x] == index)
+	//if (terr->materialMap[ofs + x] == index)
+	if (bits[ofs + x])
 	{
 	  matUsed = true;
 	  break;
@@ -1751,9 +1753,19 @@ csArray<iMaterialWrapper*> csTerrainObject::GetMaterialPalette ()
   return palette;
 }
 
-bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
+bool csTerrainObject::SetMaterialAlphaMaps (
+	const csArray<csArray<char> >& data, int w, int h)
 {
-  materialMap = data;
+  if (data.Length () != palette.Length ()-1)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	  "crystalspace.mesh.bruteblock",
+	  "There are %d palette entries. That means there must be %d alpha maps!",
+	  	palette.Length (), palette.Length ()-1);
+    return false;
+  }
+  //use_singlemap = false;
+  //materialMaps = data;
   materialMapW = w;
   materialMapH = h;
 
@@ -1770,21 +1782,167 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
   lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
   baseContext->AddVariable (lod_var);
 
+  csArray<char> total;
+  total.SetLength (w * h);
+  size_t i;
+  for (i = 0 ; i < size_t (w * h) ; i++) total[i] = 0;
+
+  int count_overflow = 0;
+  globalMaterialsUsed.SetLength (0);
+  for (i = 0 ; i < palette.Length () ; i++)
+  {
+    csRef<iImage> alpha = csPtr<iImage> (new csImageMemory (w, h, 
+      CS_IMGFMT_ALPHA | CS_IMGFMT_TRUECOLOR));
+
+    csRGBpixel *map = (csRGBpixel *)alpha->GetImageData ();
+    csBitArray matused;
+    matused.SetSize (w * h);
+    int y, x;
+    size_t idx = 0;
+    for (y = 0; y < h; y ++) 
+      for (x = 0; x < w; x ++) 
+      {
+	int v;
+        if (i < palette.Length ()-1)
+	{
+          v = (unsigned char)data[i][idx];
+	  int vv = total[idx];
+	  vv += v;
+	  if (vv > 255)
+	  {
+	    count_overflow++;
+	    v -= vv-255;
+	    vv = 255;
+	  }
+	  total[idx] = vv;
+	}
+	else
+	{
+          v = 255 - (unsigned char)total[idx];
+	}
+        map[idx].Set (v, v, v, v);
+	matused[idx] = bool (v);
+	idx++;
+      }
+    globalMaterialsUsed.Push (matused);
+
+    csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
+      CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
+    csRef<csShaderVariable> var = 
+      new csShaderVariable (strings->Request ("splat alpha map"));
+    var->SetType (csShaderVariable::TEXTURE);
+    var->SetValue (hdl);
+    paletteContexts[i]->AddVariable (var);
+
+    csRef<csShaderVariable> lod_var = 
+      new csShaderVariable (strings->Request ("texture lod distance"));
+    lod_var->SetType (csShaderVariable::VECTOR3);
+    lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
+    paletteContexts[i]->AddVariable (lod_var);
+  }
+  if (count_overflow > 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	  "crystalspace.mesh.bruteblock",
+	  "There were %d overflows in the alpha maps!", count_overflow);
+  }
+  return true;
+}
+
+bool csTerrainObject::SetMaterialAlphaMaps (const csArray<iImage*>& maps)
+{
+  if (maps.Length () != palette.Length ()-1)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	  "crystalspace.mesh.bruteblock",
+	  "There are %d palette entries. That means there must be %d alpha maps!",
+	  	palette.Length (), palette.Length ()-1);
+    return false;
+  }
+  size_t idx;
+  csArray<csArray<char> > image_datas;
+  int w = -1, h = -1;
+  for (idx = 0 ; idx < palette.Length ()-1 ; idx++)
+  {
+    iImage* map = maps[idx];
+    int mw = map->GetWidth ();
+    int mh = map->GetHeight ();
+    if (w == -1) w = mw;
+    else if (w != mw)
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	  "crystalspace.mesh.bruteblock",
+	  "All alpha maps must have the same size!");
+      return false;
+    }
+    if (h == -1) h = mh;
+    else if (h != mh)
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	  "crystalspace.mesh.bruteblock",
+	  "All alpha maps must have the same size!");
+      return false;
+    }
+    const size_t mapSize = w * h;
+    csArray<char> image_data;
+    image_data.SetLength (mapSize);
+    if (map->GetFormat () & CS_IMGFMT_PALETTED8)
+    {
+      uint8 *data = (uint8 *)map->GetImageData ();
+      for (size_t i = 0; i < mapSize; i ++)
+        image_data[i] = data[i];
+    }
+    else
+    {
+      csRGBpixel *data = (csRGBpixel *)map->GetImageData ();
+      for (size_t i = 0; i < mapSize; i ++)
+        image_data[i] = data[i].Intensity();
+    }
+    image_datas.Push (image_data);
+  }
+  return SetMaterialAlphaMaps (image_datas, w, h);
+}
+
+bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
+{
+  //use_singlemap = true;
+  //materialMaps.Push (data);
+  materialMapW = w;
+  materialMapH = h;
+
+  csRef<iGraphics3D> g3d = 
+    CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+    "crystalspace.shared.stringset", iStringSet);
+  iTextureManager* mgr = g3d->GetTextureManager ();
+
+  csRef<csShaderVariable> lod_var = 
+    new csShaderVariable (strings->Request ("texture lod distance"));
+  lod_var->SetType (csShaderVariable::VECTOR3);
+  lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
+  baseContext->AddVariable (lod_var);
+
+  globalMaterialsUsed.SetLength (0);
   for (size_t i = 0; i < palette.Length(); i ++) 
   {
     csRef<iImage> alpha = csPtr<iImage> (new csImageMemory (w, h, 
       CS_IMGFMT_ALPHA | CS_IMGFMT_TRUECOLOR));
 
     csRGBpixel *map = (csRGBpixel *)alpha->GetImageData ();
+    csBitArray matused;
+    matused.SetSize (w * h);
     int y, x;
+    size_t idx = 0;
     for (y = 0; y < h; y ++) 
-    {
       for (x = 0; x < w; x ++) 
       {
-        int v = ((unsigned char)data[x + y * w] == i) ? 255 : 0;
-        map[x + y * w].Set (v, v, v, v);
+        int v = ((unsigned char)data[idx] == i) ? 255 : 0;
+        map[idx].Set (v, v, v, v);
+	matused[idx] = bool (v);
+	idx++;
       }
-    }
+    globalMaterialsUsed.Push (matused);
 
     csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
       CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
@@ -1825,11 +1983,6 @@ bool csTerrainObject::SetMaterialMap (iImage* map)
     }
   }
   return SetMaterialMap (image_data, map->GetWidth(), map->GetHeight());
-}
-
-csArray<char> csTerrainObject::GetMaterialMap ()
-{
-  return 0;
 }
 
 bool csTerrainObject::SetLODValue (const char* parameter, float value)

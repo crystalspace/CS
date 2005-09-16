@@ -83,7 +83,7 @@ public:
 
   csTerrainObject *terr;
 
-  //          0        
+  //          0
   //      ---------
   //      | 0 | 1 |
   //    2 |-------| 1
@@ -129,7 +129,7 @@ public:
   { return children[0] == 0; }
 
   void UpdateStaticLighting ();
-  void DrawTest (iGraphics3D* g3d, iRenderView *rview, uint32 frustum_mask, 
+  void DrawTest (iGraphics3D* g3d, iRenderView *rview, uint32 frustum_mask,
                  csReversibleTransform &transform, iMovable *movable);
 
   bool detach;
@@ -160,19 +160,19 @@ private:
       {
         if (pendingbuilds.IsEmpty ())
           break;
-        
+
         block = pendingbuilds.Last ();
         pendingbuilds.PopBack ();
         listlock->Release ();
       }
-      
+
       if (block->GetRefCount ()>1)
         block->SetupMesh ();
     }
   }
 
 public:
-  
+
   csBlockBuilder::csBlockBuilder (csTerrainObject *t)
   {
     processlock = csCondition::Create ();
@@ -271,7 +271,7 @@ private:
   iMeshWrapper* logparent;
   csTerrainFactory* pFactory;
   csRef<iMeshObjectDrawCallback> vis_cb;
-  
+
   float lod_lcoeff;
   float lod_qcoeff;
   float block_maxsize;
@@ -283,7 +283,9 @@ private:
 
   csRef<iTerraFormer> terraformer;
 
-  csArray<char> materialMap;
+  //bool use_singlemap;
+  //csArray<csArray<char> > materialMaps;
+  csArray<csBitArray> globalMaterialsUsed;
   int materialMapW, materialMapH;
 
   csDirtyAccessArray<csRenderMesh*>* returnMeshes;
@@ -356,10 +358,10 @@ public:
 
   bool SetColor (const csColor &color) { return false; }
   bool GetColor (csColor &color) const { return false; }
-  bool SetMaterialWrapper (iMaterialWrapper *material) 
-  { 
+  bool SetMaterialWrapper (iMaterialWrapper *material)
+  {
     matwrap = material;
-    return true; 
+    return true;
   }
   iMaterialWrapper *GetMaterialWrapper () const { return matwrap; }
 
@@ -415,7 +417,7 @@ public:
 
   virtual iMeshObjectFactory* GetFactory () const;
 
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable, 
+  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
     uint32 frustum_mask);
 
   virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview,
@@ -568,9 +570,10 @@ public:
 
   bool SetMaterialPalette (const csArray<iMaterialWrapper*>& pal);
   csArray<iMaterialWrapper*> GetMaterialPalette ();
+  bool SetMaterialAlphaMaps (const csArray<csArray<char> >& data, int w, int h);
+  bool SetMaterialAlphaMaps (const csArray<iImage*>& maps);
   bool SetMaterialMap (const csArray<char>& data, int x, int y);
   bool SetMaterialMap (iImage* map);
-  csArray<char> GetMaterialMap ();
   bool SetLODValue (const char* parameter, float value);
   float GetLODValue (const char* parameter);
 
@@ -591,15 +594,21 @@ public:
     {
       return scfParent->SetMaterialMap (data, x, y);
     }
-    
+
     virtual bool SetMaterialMap (iImage* map)
     {
       return scfParent->SetMaterialMap (map);
     }
-    
-    virtual csArray<char> GetMaterialMap ()
+
+    virtual bool SetMaterialAlphaMaps (const csArray<csArray<char> >& data,
+    	int w, int h)
     {
-      return scfParent->GetMaterialMap ();
+      return scfParent->SetMaterialAlphaMaps (data, w, h);
+    }
+
+    virtual bool SetMaterialAlphaMaps (const csArray<iImage*>& maps)
+    {
+      return scfParent->SetMaterialAlphaMaps (maps);
     }
 
     virtual bool SetLODValue (const char* parameter, float value)
@@ -628,22 +637,22 @@ public:
     }
 
     virtual void SetStaticLighting (bool enable)
-    { 
+    {
       scfParent->SetStaticLighting (enable);
     }
-    
+
     virtual bool GetStaticLighting ()
-    { 
-      return scfParent->staticlighting; 
+    {
+      return scfParent->staticlighting;
     }
-    
+
     virtual void SetCastShadows (bool enable)
-    { 
-      scfParent->castshadows = enable; 
+    {
+      scfParent->castshadows = enable;
     }
-    
+
     virtual bool GetCastShadows ()
-    { 
+    {
       return scfParent->castshadows;
     }
 
@@ -707,23 +716,23 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csTerrainFactory);
     virtual void SetTerraFormer (iTerraFormer* form)
-    { 
-      scfParent->SetTerraFormer (form); 
+    {
+      scfParent->SetTerraFormer (form);
     }
-    
+
     virtual iTerraFormer* GetTerraFormer ()
-    { 
-      return scfParent->GetTerraFormer (); 
+    {
+      return scfParent->GetTerraFormer ();
     }
-    
+
     virtual void SetSamplerRegion (const csBox2& region)
-    { 
-      scfParent->SetSamplerRegion (region); 
+    {
+      scfParent->SetSamplerRegion (region);
     }
-    
+
     virtual const csBox2& GetSamplerRegion ()
-    { 
-      return scfParent->GetSamplerRegion (); 
+    {
+      return scfParent->GetSamplerRegion ();
     }
 
     virtual bool SaveState (const char *filename)
