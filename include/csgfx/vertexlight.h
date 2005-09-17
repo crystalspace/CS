@@ -344,7 +344,7 @@ public:
    * \param numvert Number of vertices and normals.
    * \param vb Vertices.
    * \param nb Normals.
-   * \param litcolor Destination colors.
+   * \param litColor Destination colors.
    */
   virtual void CalculateLighting (const csLightProperties& light, 
     size_t numvert, csVertexListWalker<csVector3> vb, 
