@@ -62,6 +62,7 @@ namespace lighter
     // Shade a rad primitive from a lightsource
     void ShadeRadPrimitive (Raytracer &tracer, RadPrimitive &prim, Light* light);
 
+    
     Scene *scene;
   };
 

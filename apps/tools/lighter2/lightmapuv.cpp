@@ -45,7 +45,7 @@ namespace lighter
 
         // Compute uv-size  
         prim.ComputeMinMaxUV (minuv, maxuv);
-        uvSize = maxuv-minuv;
+        uvSize = (maxuv-minuv)+csVector2(2.0f,2.0f);
         if (uvSize.x < globalSettings.maxLightmapU &&
             uvSize.y < globalSettings.maxLightmapV)
         {
@@ -67,7 +67,7 @@ namespace lighter
         lightmaps[lmID]->SetMaxUsedUV (lmArea.xmax, lmArea.ymax);
 
         // Ok, now remap our coords
-        csVector2 uvRemap = csVector2(lmArea.xmin, lmArea.ymin) - minuv;
+        csVector2 uvRemap = csVector2(lmArea.xmin, lmArea.ymin) - minuv + csVector2(1.0f,1.0f);
         prim.RemapUVs (uvRemap);
 
         prim.SetLightmapID (lmID);

@@ -58,6 +58,10 @@ namespace lighter
     // Size of the required lightmaps
     LightmapPtrDelArray lightmapTemplates;
 
+    // Lightmap masks
+    LightmapMaskArray lightmapMasks;
+    bool lightmapMaskArrayValid;
+
     // Factory created from
     iMeshFactoryWrapper *factoryWrapper;
 
@@ -91,6 +95,8 @@ namespace lighter
     // Write out the data again
     virtual void SaveMesh (iDocumentNode *node);
 
+    // Fixup the lightmap borders
+    virtual void FixupLightmaps ();
 
     // Accessor 
     const LightmapPtrDelArray& GetLightmaps () const 

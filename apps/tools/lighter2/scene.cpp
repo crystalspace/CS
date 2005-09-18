@@ -268,6 +268,14 @@ namespace lighter
       textureNode->SetValue ("texture");
       textureNode->SetAttribute ("name", textureName.GetData ());
       
+      csRef<iDocumentNode> classNode = 
+        textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      classNode->SetValue ("class");
+      csRef<iDocumentNode> classContNode = 
+        classNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      classContNode->SetValue ("lightmap");
+
+
       csRef<iDocumentNode> fileNode = 
         textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
       fileNode->SetValue ("file");

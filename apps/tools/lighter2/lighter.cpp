@@ -155,6 +155,21 @@ namespace lighter
       ShootDirectLighting (sect);
     }
 
+    //@@ DO OTHER LIGHTING
+
+    // De-antialias the lightmaps
+    sectIt.Reset ();
+    while (sectIt.HasNext ())
+    {
+      csRef<Sector> sect = sectIt.Next ();
+      RadObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
+      while (objIt.HasNext ())
+      {
+        csRef<RadObject> obj = objIt.Next ();
+        obj->FixupLightmaps ();
+      }
+    }
+
     //Save the result
     if (!scene->SaveFiles ()) return false;
     
@@ -217,7 +232,7 @@ namespace lighter
     while (lightIt.HasNext ())
     {
       csRef<Light> radLight = lightIt.Next ();
-      radLight->freeEnergy = radLight->color * 500.0f; //@scale
+      radLight->freeEnergy = radLight->color * 8000.0f; //@scale
 
       // Generate and shoot rays
       csArray<Ray> rays = rayGenerator (0xFFF, radLight->position);
@@ -254,9 +269,12 @@ namespace lighter
     float vis = 1.0f;
 
     // Ec
+
+     //@@ THIS NEEDS INVESTIGATION. WHY -? .. 
 #define RAYTEST(rayOrig, visDecr)\
     {\
-      const csVector3 o = (rayOrig), dir = (oPoint-o);\
+      const csVector3 o = (rayOrig)-prim.GetPlane ().GetNormal ()*0.01f;\
+      const csVector3 dir = (oPoint-o);\
       Ray ray; HitPoint hit;\
       ray.origin = o; ray.minLength = FLT_EPSILON*10; ray.maxLength = dir.Norm ();\
       ray.direction = dir / ray.maxLength; \
@@ -282,7 +300,8 @@ namespace lighter
     prim.PrepareNoPatches ();
 
     const float primArea = prim.GetArea ();
-    
+    const float totalArea = (prim.GetuFormVector () % prim.GetvFormVector ()).Norm ();
+
     csVector3 elementCenter = prim.GetMinCoord () + prim.GetuFormVector () * 0.5f + prim.GetvFormVector () * 0.5f;
 
     int minU, minV, maxU, maxV;
@@ -311,7 +330,9 @@ namespace lighter
         float visFact = Do5RayVistest (tracer, prim, ec, light->position);
 
         //
-        float Fij = cosTheta_j / (distSq);
+        float Hij = elemArea / totalArea;
+        float dAj = totalArea;
+        float Fij = cosTheta_j / (distSq) * Hij * dAj;
 
         // energy
         csColor energy = light->freeEnergy * Fij * visFact;
@@ -320,7 +341,7 @@ namespace lighter
         //store stats
 
         Lightmap * lm = prim.GetRadObject ()->GetLightmaps ()[prim.GetLightmapID ()];
-        lm->GetData ()[v*lm->GetWidth ()+u] = reflected;
+        lm->GetData ()[v*lm->GetWidth ()+u] += reflected;
 
         uint patchIndex = (v-minV)/globalSettings.vPatchResolution * prim.GetuPatches ()+(u-minU)/globalSettings.uPatchResolution;
         RadPatch &patch = prim.GetPatches ()[patchIndex];

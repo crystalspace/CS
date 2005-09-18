@@ -71,8 +71,8 @@ namespace lighter
     void SaveLightmap (const csString& file);
 
     // Data getters
-    inline ColorArray& GetData () { return data; }
-    inline const ColorArray& GetData () const { return data; }
+    inline ColorDArray& GetData () { return data; }
+    inline const ColorDArray& GetData () const { return data; }
 
     inline uint GetWidth () const {return width; }
     inline uint GetHeight () const {return height; }
@@ -87,7 +87,7 @@ namespace lighter
 
   protected:
     // The color data itself
-    ColorArray data;
+    ColorDArray data;
 
     // Size
     uint width, height;
@@ -103,6 +103,22 @@ namespace lighter
   };
   typedef csArray<Lightmap> LightmapArray;
   typedef csPDelArray<Lightmap> LightmapPtrDelArray;
+
+  //Used as a mask for lightmap during un-antialiasing
+  class LightmapMask
+  {
+  public:
+    LightmapMask (const Lightmap &lm)
+      : width (lm.GetWidth ()), height (lm.GetHeight ())
+    {
+      // Copy over the size from the lightmap
+      maskData.SetSize (lm.GetWidth ()*lm.GetHeight (), 0);
+    }
+    
+    csDirtyAccessArray<float> maskData;
+    uint width, height;
+  };
+  typedef csArray<LightmapMask> LightmapMaskArray;
 }
 
 #endif

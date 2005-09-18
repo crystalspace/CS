@@ -11,6 +11,7 @@ chronological order.
 	  sharpening.
 	- res fixed the cswinCallStackHelper docs to document 'fast'.
 	- res shuffled some more code around in the software renderer.
+	- Marten made some more enhancements in the new lighter.
 16-Sep-2005
 	- Jorrit added a new feature to the terrain engine. Instead of
 	  specifying one materialmap to tell the engine what material

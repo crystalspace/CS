@@ -55,7 +55,7 @@ namespace lighter
     bool Split (const csPlane3& plane, RadPrimitive &back);
 
     // Calculate min-max UV-coords
-    inline void ComputeMinMaxUV (csVector2 &min, csVector2 &max)
+    inline void ComputeMinMaxUV (csVector2 &min, csVector2 &max) const
     {
       min = lightmapUVs[0];
       max = lightmapUVs[0];
@@ -71,7 +71,7 @@ namespace lighter
     }
 
     // Calculate min-max UV-coords as integers
-    inline void ComputeMinMaxUV (int &minU, int &maxU, int &minV, int &maxV)
+    inline void ComputeMinMaxUV (int &minU, int &maxU, int &minV, int &maxV) const
     {
       csVector2 min, max;
       ComputeMinMaxUV (min, max);

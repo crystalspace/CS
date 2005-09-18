@@ -28,6 +28,7 @@ namespace lighter
 {
 
   RadObjectFactory::RadObjectFactory ()
+    : lightmapMaskArrayValid (false), factoryWrapper (0)
   {
   }
 
@@ -115,6 +116,148 @@ namespace lighter
   void RadObject::SaveMesh (iDocumentNode *node)
   {
 
+  }
+
+  void RadObject::FixupLightmaps ()
+  {
+    //Create one
+    LightmapMaskArray masks;
+    LightmapPtrDelArray::Iterator lmIt = lightmaps.GetIterator ();
+    while (lmIt.HasNext ())
+    {
+      masks.Push (LightmapMask (*(lmIt.Next ())));
+    }
+
+    float totalArea = 0;
+
+    // And fill it with data
+    RadPrimitiveArray::Iterator primIt = allPrimitives.GetIterator ();
+    while (primIt.HasNext ())
+    {
+      const RadPrimitive &prim = primIt.Next ();
+      LightmapMask &mask = masks[prim.GetLightmapID ()];
+      totalArea = (prim.GetuFormVector ()%prim.GetvFormVector ()).Norm ();
+
+      int minu,maxu,minv,maxv;
+      prim.ComputeMinMaxUV (minu,maxu,minv,maxv);
+      uint findex = 0;
+
+      // Go through all lightmap cells and add their element areas to the mask
+      for (uint v = minv; v <= (uint)maxv;v++)
+      {
+        uint vindex = v * mask.width;
+        for (uint u = minu; u <= (uint)maxu; u++, findex++)
+        {
+          if (prim.GetElementAreas ()[findex] < FLT_EPSILON) continue; // No area, skip
+
+          mask.maskData[vindex+u] += prim.GetElementAreas ()[findex]; //Accumulate
+        }
+
+      }
+    }
+
+    // Ok, here we are sure to have a mask
+    
+    // Un-antialis
+    uint i;
+    for (i = 0; i < lightmaps.GetSize (); i++)
+    {
+      csColor* lmData = lightmaps[i]->GetData ().GetArray ();
+      float* mmData = masks[i].maskData.GetArray ();
+      const size_t size = lightmaps[i]->GetData ().GetSize ();
+
+      for (uint j = 0; j < size; j++, lmData++, mmData++)
+      {
+        if (*mmData < FLT_EPSILON || *mmData > totalArea) continue;
+
+        *lmData *= (totalArea / *mmData);
+      }
+    }
+
+    // Do the filtering
+    for (i = 0; i < lightmaps.GetSize (); i++)
+    {
+      csColor* lmData = lightmaps[i]->GetData ().GetArray ();
+      float* mmData = masks[i].maskData.GetArray ();
+            
+      uint lmw = lightmaps[i]->GetWidth ();
+      uint lmh = lightmaps[i]->GetHeight ();
+      
+      for (uint v = 0; v < lmh; v++)
+      {
+        // now scan over the row
+        for (uint u = 0; u < lmw; u++)
+        {
+          const uint idx = v*lmw+u;
+          
+          // Only try to fix non-masked
+          if (mmData[idx]>FLT_EPSILON) continue;
+
+          uint count = 0;
+          csColor newColor (0.0f,0.0f,0.0f);
+
+          // We have a row above to use
+          if (v > 0)
+          {
+            // We have a column to the left
+            if (u > 0 && mmData[(v-1)*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u-1)], count++;
+            if (mmData[(v-1)*lmw+(u)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u)], count++;
+            if (u < lmw-1 && mmData[(v-1)*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u+1)], count++;
+          }
+
+          //current row
+          if (u > 0 && mmData[v*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[v*lmw+(u-1)], count++;
+          if (u < lmw-1 && mmData[v*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[v*lmw+(u+1)], count++;
+
+          // We have a row below
+          if (v < (lmh-1))
+          {
+            if (u > 0 && mmData[(v+1)*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u-1)], count++;
+            if (mmData[(v+1)*lmw+(u)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u)], count++;
+            if (u < lmw-1 && mmData[(v+1)*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u+1)], count++;
+          }
+
+          if (count > 0) newColor *= (1.0f/count);
+          else newColor.Set (0.0f, 0.0f, 0.0f);
+          lmData[idx] = newColor;
+
+ /*         if (curMmRow[u] > FLT_EPSILON) continue; //only fix non-masked
+
+          // Average 8 neighbours
+          uint count = 0;
+          csColor newColor (0.0f, 0.0f, 0.0f);
+          
+          // Top row
+          if (topMmRow)
+          {
+            if (u > 0 && topMmRow[u-1] > FLT_EPSILON) newColor += topLmRow[u-1], count++;
+            if (topMmRow[u] > FLT_EPSILON) newColor += topLmRow[u], count++;
+            if (u < (lmw-1) && topMmRow[u+1] > FLT_EPSILON) newColor += topLmRow[u+1], count++;
+          }
+
+          // current row
+          if (u > 0 && curMmRow[u-1] > FLT_EPSILON) newColor += curLmRow[u-1], count++;
+          if (u < (lmw-1) && curMmRow[u+1] > FLT_EPSILON) newColor += curLmRow[u+1], count++;
+
+          // bottom row
+          if (bottomMmRow)
+          {
+            if (u > 0 && bottomMmRow[u-1] > FLT_EPSILON) newColor += bottomLmRow[u-1], count++;
+            if (bottomMmRow[u] > FLT_EPSILON) newColor += bottomLmRow[u], count++;
+            if (u < (lmw-1) && bottomMmRow[u+1] > FLT_EPSILON) newColor += bottomLmRow[u+1], count++;
+          }
+
+          if (count > 0)
+          {
+            curLmRow[u] = newColor * (1.0f/count);
+          }
+          else
+          {
+            curLmRow[u].Set (0.0f,0.0f,0.0f);
+          }*/
+        }
+      }
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
