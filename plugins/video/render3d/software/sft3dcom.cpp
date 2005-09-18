@@ -22,6 +22,7 @@
 
 #include "csqint.h"
 
+#include "csgeom/math.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/plane3.h"
@@ -53,6 +54,7 @@
 
 #include "clipper.h"
 #include "clip_znear.h"
+#include "clip_iclipper.h"
 
 #if defined (CS_HAVE_MMX)
 #  include "plugins/video/render3d/software/i386/cpuid.h"
@@ -60,177 +62,7 @@
 
 int csSoftwareGraphics3DCommon::filter_bf = 1;
 
-//-------------------------- The indices into arrays of scanline routines ------
-
-/*
- *  The rules for scanproc index name building:
- *  Curly brackets means optional name components
- *  Square brackets denote enforced name components
- *  Everything outside brackets is a must
- *
- *  SCANPROC_{Persp_}{Source_}{Effects_}{Zmode}
- *
- *  Persp       = PI for perspective-incorrect routines
- *  Source      = TEX for non-lightmapped textures
- *                MAP for lightmapped textures
- *                FLAT for flat-shaded
- *                FOG for drawing fog
- *  Effects     = GOU for Gouraud-shading applied to the texture
- *                KEY for "key-color" source pixel removal
- *                FX if routine supports table-driven effects
- *                FXKEY for both FX and KEY effects
- *                ALPHA for alpha-mapped textures
- *  Zmode       = ZUSE for polys that are tested against Z-buffer (and fills)
- *                ZFIL for polys that just fills Z-buffer without testing
- *
- *  Example:
- *      SCANPROC_TEX_ZFIL
- *              scanline procedure for drawing a non-lightmapped
- *              texture with Z-fill
- *  Note:
- *      For easier runtime decisions odd indices use Z buffer
- *      while even indices fills Z-buffer (if appropiate)
- */
-#define SCANPROC_FLAT_ZNONE             0x00
-#define SCANPROC_FLAT_ZFIL              0x01
-#define SCANPROC_FLAT_ZUSE              0x02
-#define SCANPROC_FLAT_ZTEST             0x03
-#define SCANPROC_MAP_ZNONE              0x04
-#define SCANPROC_MAP_ZFIL               0x05
-#define SCANPROC_MAP_ZUSE               0x06
-#define SCANPROC_MAP_ZTEST              0x07
-#define SCANPROC_MAP_KEY_ZNONE          0x08
-#define SCANPROC_MAP_KEY_ZFIL           0x09
-#define SCANPROC_MAP_KEY_ZUSE           0x0a
-#define SCANPROC_MAP_KEY_ZTEST          0x0b
-#define SCANPROC_TEX_ZNONE              0x0c
-#define SCANPROC_TEX_ZFIL               0x0d
-#define SCANPROC_TEX_ZUSE               0x0e
-#define SCANPROC_TEX_ZTEST              0x0f
-#define SCANPROC_TEX_KEY_ZNONE          0x10
-#define SCANPROC_TEX_KEY_ZFIL           0x11
-#define SCANPROC_TEX_KEY_ZUSE           0x12
-#define SCANPROC_TEX_KEY_ZTEST          0x13
-#define SCANPROC_TEX_ALPHA_ZNONE        0x14
-#define SCANPROC_TEX_ALPHA_ZFIL         0x15
-#define SCANPROC_TEX_ALPHA_ZUSE         0x16
-#define SCANPROC_TEX_ALPHA_ZTEST        0x17
-#define SCANPROC_MAP_ALPHA_ZNONE        0x18
-#define SCANPROC_MAP_ALPHA_ZFIL         0x19
-#define SCANPROC_MAP_ALPHA_ZUSE         0x1a
-#define SCANPROC_MAP_ALPHA_ZTEST        0x1b
-#define SCANPROC_TEX_FX_ZNONE           0x1c
-#define SCANPROC_TEX_FX_ZFIL            0x1d
-#define SCANPROC_TEX_FX_ZUSE            0x1e
-#define SCANPROC_TEX_FX_ZTEST           0x1f
-#define SCANPROC_MAP_FX_ZNONE           0x20
-#define SCANPROC_MAP_FX_ZFIL            0x21
-#define SCANPROC_MAP_FX_ZUSE            0x22
-#define SCANPROC_MAP_FX_ZTEST           0x23
-// these do not have "zuse" counterparts
-#define SCANPROC_ZFIL                   0x24
-#define SCANPROC_FOG                    0x25
-#define SCANPROC_FOG_VIEW               0x26
-
-// The following routines have a different prototype
-
-// Flat-shaded perspective-incorrect routines
-#define SCANPROC_PI_FLAT_ZNONE          0x00
-#define SCANPROC_PI_FLAT_ZFIL           0x01
-#define SCANPROC_PI_FLAT_ZUSE           0x02
-#define SCANPROC_PI_FLAT_ZTEST          0x03
-// Textured flat-shaded polygons
-#define SCANPROC_PI_TEX_ZNONE           0x04
-#define SCANPROC_PI_TEX_ZFIL            0x05
-#define SCANPROC_PI_TEX_ZUSE            0x06
-#define SCANPROC_PI_TEX_ZTEST           0x07
-#define SCANPROC_PI_TEX_KEY_ZNONE       0x08
-#define SCANPROC_PI_TEX_KEY_ZFIL        0x09
-#define SCANPROC_PI_TEX_KEY_ZUSE        0x0a
-#define SCANPROC_PI_TEX_KEY_ZTEST       0x0b
-// Textured flat-shaded polygons with tiling
-#define SCANPROC_PI_TILE_TEX_ZNONE      0x0c
-#define SCANPROC_PI_TILE_TEX_ZFIL       0x0d
-#define SCANPROC_PI_TILE_TEX_ZUSE       0x0e
-#define SCANPROC_PI_TILE_TEX_ZTEST      0x0f
-#define SCANPROC_PI_TILE_TEX_KEY_ZNONE  0x10
-#define SCANPROC_PI_TILE_TEX_KEY_ZFIL   0x11
-#define SCANPROC_PI_TILE_TEX_KEY_ZUSE   0x12
-#define SCANPROC_PI_TILE_TEX_KEY_ZTEST  0x13
-// Scanline drawing routines with flat shading + effects.
-#define SCANPROC_PI_FLAT_FX_ZNONE       0x14
-#define SCANPROC_PI_FLAT_FX_ZFIL        0x15
-#define SCANPROC_PI_FLAT_FX_ZUSE        0x16
-#define SCANPROC_PI_FLAT_FX_ZTEST       0x17
-#define SCANPROC_PI_TEX_FX_ZNONE        0x18
-#define SCANPROC_PI_TEX_FX_ZFIL         0x19
-#define SCANPROC_PI_TEX_FX_ZUSE         0x1a
-#define SCANPROC_PI_TEX_FX_ZTEST        0x1b
-#define SCANPROC_PI_TEX_FXKEY_ZNONE     0x1c
-#define SCANPROC_PI_TEX_FXKEY_ZFIL      0x1d
-#define SCANPROC_PI_TEX_FXKEY_ZUSE      0x1e
-#define SCANPROC_PI_TEX_FXKEY_ZTEST     0x1f
-#define SCANPROC_PI_TILE_TEX_FX_ZNONE   0x20
-#define SCANPROC_PI_TILE_TEX_FX_ZFIL    0x21
-#define SCANPROC_PI_TILE_TEX_FX_ZUSE    0x22
-#define SCANPROC_PI_TILE_TEX_FX_ZTEST   0x23
-#define SCANPROC_PI_TILE_TEX_FXKEY_ZNONE 0x24
-#define SCANPROC_PI_TILE_TEX_FXKEY_ZFIL 0x25
-#define SCANPROC_PI_TILE_TEX_FXKEY_ZUSE 0x26
-#define SCANPROC_PI_TILE_TEX_FXKEY_ZTEST 0x27
-// Perspective-incorrect flat-shaded alpha-mapped texture
-#define SCANPROC_PI_TEX_ALPHA_ZNONE     0x28
-#define SCANPROC_PI_TEX_ALPHA_ZFIL      0x29
-#define SCANPROC_PI_TEX_ALPHA_ZUSE      0x2a
-#define SCANPROC_PI_TEX_ALPHA_ZTEST     0x2b
-
-// Gouraud-shaded PI routines should have same indices
-// as their non-Gouraud counterparts. Every routine except
-// flat-shaded ones have two versions: without table-driven
-// effects (FX) and one with them.
-#define SCANPROC_PI_FLAT_GOU_ZNONE           0x00
-#define SCANPROC_PI_FLAT_GOU_ZFIL            0x01
-#define SCANPROC_PI_FLAT_GOU_ZUSE            0x02
-#define SCANPROC_PI_FLAT_GOU_ZTEST           0x03
-// Textured Gouraud-shaded polygons
-#define SCANPROC_PI_TEX_GOU_ZNONE            0x04
-#define SCANPROC_PI_TEX_GOU_ZFIL             0x05
-#define SCANPROC_PI_TEX_GOU_ZUSE             0x06
-#define SCANPROC_PI_TEX_GOU_ZTEST            0x07
-#define SCANPROC_PI_TEX_GOUKEY_ZNONE         0x08
-#define SCANPROC_PI_TEX_GOUKEY_ZFIL          0x09
-#define SCANPROC_PI_TEX_GOUKEY_ZUSE          0x0a
-#define SCANPROC_PI_TEX_GOUKEY_ZTEST         0x0b
-// Textured Gouraud-shaded polygons with tiling
-#define SCANPROC_PI_TILE_TEX_GOU_ZNONE       0x0c
-#define SCANPROC_PI_TILE_TEX_GOU_ZFIL        0x0d
-#define SCANPROC_PI_TILE_TEX_GOU_ZUSE        0x0e
-#define SCANPROC_PI_TILE_TEX_GOU_ZTEST       0x0f
-#define SCANPROC_PI_TILE_TEX_GOUKEY_ZNONE    0x10
-#define SCANPROC_PI_TILE_TEX_GOUKEY_ZFIL     0x11
-#define SCANPROC_PI_TILE_TEX_GOUKEY_ZUSE     0x12
-#define SCANPROC_PI_TILE_TEX_GOUKEY_ZTEST    0x13
-// Scanline drawing routines with Gouraud shading + effects.
-#define SCANPROC_PI_FLAT_GOUFX_ZNONE         0x14
-#define SCANPROC_PI_FLAT_GOUFX_ZFIL          0x15
-#define SCANPROC_PI_FLAT_GOUFX_ZUSE          0x16
-#define SCANPROC_PI_FLAT_GOUFX_ZTEST         0x17
-#define SCANPROC_PI_TEX_GOUFX_ZNONE          0x18
-#define SCANPROC_PI_TEX_GOUFX_ZFIL           0x19
-#define SCANPROC_PI_TEX_GOUFX_ZUSE           0x1a
-#define SCANPROC_PI_TEX_GOUFX_ZTEST          0x1b
-#define SCANPROC_PI_TEX_GOUFXKEY_ZNONE       0x1c
-#define SCANPROC_PI_TEX_GOUFXKEY_ZFIL        0x1d
-#define SCANPROC_PI_TEX_GOUFXKEY_ZUSE        0x1e
-#define SCANPROC_PI_TEX_GOUFXKEY_ZTEST       0x1f
-#define SCANPROC_PI_TILE_TEX_GOUFX_ZNONE     0x20
-#define SCANPROC_PI_TILE_TEX_GOUFX_ZFIL      0x21
-#define SCANPROC_PI_TILE_TEX_GOUFX_ZUSE      0x22
-#define SCANPROC_PI_TILE_TEX_GOUFX_ZTEST     0x23
-#define SCANPROC_PI_TILE_TEX_GOUFXKEY_ZNONE  0x24
-#define SCANPROC_PI_TILE_TEX_GOUFXKEY_ZFIL   0x25
-#define SCANPROC_PI_TILE_TEX_GOUFXKEY_ZUSE   0x26
-#define SCANPROC_PI_TILE_TEX_GOUFXKEY_ZTEST  0x27
+#include "scanindex.h"
 
 ///---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csSoftwareGraphics3DCommon)
@@ -502,6 +334,9 @@ bool csSoftwareGraphics3DCommon::NewOpen ()
   ScanSetup ();
 
   //SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
+
+  polyrast.Init (pfmt, ScanProcPI, ScanProcPIG, texman, width, height,
+    z_buffer, line_table);
 
   return true;
 }
@@ -3746,273 +3581,12 @@ void csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
   }
 }*/
 
-/// Static vertex array.
-typedef csDirtyAccessArray<csVector3> dtmesh_tr_verts;
-CS_IMPLEMENT_STATIC_VAR (Get_tr_verts, dtmesh_tr_verts, ())
-/// Static z array.
-typedef csDirtyAccessArray<float> dtmesh_z_verts;
-CS_IMPLEMENT_STATIC_VAR (Get_z_verts, dtmesh_z_verts, ())
-/// Static uv array.
-typedef csDirtyAccessArray<csVector2> dtmesh_uv_verts;
-CS_IMPLEMENT_STATIC_VAR (Get_uv_verts, dtmesh_uv_verts, ())
 /// The perspective corrected vertices.
-typedef csDirtyAccessArray<csVector2> dtmesh_persp;
+typedef csDirtyAccessArray<csVector3> dtmesh_persp;
 CS_IMPLEMENT_STATIC_VAR (Get_persp, dtmesh_persp, ())
-/// Array with colors.
-typedef csDirtyAccessArray<csColor> dtmesh_color_verts;
-CS_IMPLEMENT_STATIC_VAR (Get_color_verts, dtmesh_color_verts, ())
 
 
-static dtmesh_tr_verts *tr_verts = 0;
-static dtmesh_z_verts *z_verts = 0;
-static dtmesh_uv_verts *uv_verts = 0;
 static dtmesh_persp *persp = 0;
-static dtmesh_color_verts *color_verts = 0;
-
-#define INTERPOLATE1_S(var) \
-  g3dpoly->var [i] = tritexcoords_##var [vt]+ \
-  t * (tritexcoords_##var [vt2] - tritexcoords_##var [vt]);
-
-#define INTERPOLATE1(var,component) \
-  g3dpoly->var [i].component = tritexcoords_##var [vt].component + \
-  t * (tritexcoords_##var [vt2].component - tritexcoords_##var [vt].component);
-
-#define INTERPOLATE1_FOG(component) \
-  g3dpoly->fog_info [i].component = trifoginfo [vt].component + \
-  t * (trifoginfo [vt2].component - trifoginfo [vt].component);
-
-#define INTERPOLATE_S(var) \
-{ \
-  float v1 = tritexcoords_##var [edge1 [0]] + \
-  t1 * (tritexcoords_##var [edge1 [1]] - \
-  tritexcoords_##var [edge1 [0]]); \
-  float v2 = tritexcoords_##var [edge2 [0]] + \
-  t2 * (tritexcoords_##var [edge2 [1]] - \
-  tritexcoords_##var [edge2 [0]]); \
-  g3dpoly->var [i] = v1 + t * (v2 - v1); \
-}
-#define INTERPOLATE(var,component) \
-{ \
-  float v1 = tritexcoords_##var [edge1 [0]].component + \
-  t1 * (tritexcoords_##var [edge1 [1]].component - \
-  tritexcoords_##var [edge1 [0]].component); \
-  float v2 = tritexcoords_##var [edge2 [0]].component + \
-  t2 * (tritexcoords_##var [edge2 [1]].component - \
-  tritexcoords_##var [edge2 [0]].component); \
-  g3dpoly->var [i].component = v1 + t * (v2 - v1); \
-}
-#define INTERPOLATE_FOG(component) \
-{ \
-  float v1 = trifoginfo [edge1 [0]].component + \
-  t1 * (trifoginfo [edge1 [1]].component - \
-  trifoginfo [edge1 [0]].component); \
-  float v2 = trifoginfo [edge2 [0]].component + \
-  t2 * (trifoginfo [edge2 [1]].component - \
-  trifoginfo [edge2 [0]].component); \
-  g3dpoly->fog_info [i].component = v1 + t * (v2 - v1); \
-}
-
-static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly,
-                                 csVector2* clipped_verts, size_t num_vertices,
-                                 csVertexStatus* clipped_vtstats, csVector2* orig_triangle,
-                                 bool use_fog, bool gouraud)
-{
-  // first we copy the first three texture coordinates to a local buffer
-  // to avoid that they are overwritten when interpolating.
-  csVector2 tritexcoords_vertices[3];
-  csVector2 tritexcoords_texels[3];
-  csColor tritexcoords_colors[3];
-  float tritexcoords_z[3];
-  G3DFogInfo trifoginfo [3];
-  size_t i;
-  memcpy (tritexcoords_vertices, g3dpoly->vertices, 3 * sizeof (csVector2));
-  memcpy (tritexcoords_texels, g3dpoly->texels, 3 * sizeof (csVector2));
-  memcpy (tritexcoords_colors, g3dpoly->colors, 3 * sizeof (csColor));
-  memcpy (tritexcoords_z, g3dpoly->z, 3 * sizeof (float));
-
-  size_t vt, vt2;
-  float t;
-  for (i = 0 ; i < num_vertices ; i++)
-  {
-    g3dpoly->vertices[i] = clipped_verts[i];
-    switch (clipped_vtstats[i].Type)
-    {
-    case CS_VERTEX_ORIGINAL:
-      vt = clipped_vtstats[i].Vertex;
-      g3dpoly->z[i] = tritexcoords_z[vt];
-      g3dpoly->texels[i] = tritexcoords_texels[vt];
-      if (gouraud)
-        g3dpoly->colors[i] = tritexcoords_colors[vt];
-      if (use_fog) g3dpoly->fog_info[i] = trifoginfo[vt];
-      break;
-    case CS_VERTEX_ONEDGE:
-      vt = clipped_vtstats[i].Vertex;
-      vt2 = vt + 1; if (vt2 >= 3) vt2 = 0;
-      t = clipped_vtstats[i].Pos;
-      INTERPOLATE1_S (z);
-      INTERPOLATE1 (texels,x);
-      INTERPOLATE1 (texels,y);
-      if (gouraud)
-      {
-        INTERPOLATE1 (colors,red);
-        INTERPOLATE1 (colors,green);
-        INTERPOLATE1 (colors,blue);
-      }
-      if (use_fog)
-      {
-        INTERPOLATE1_FOG (r);
-        INTERPOLATE1_FOG (g);
-        INTERPOLATE1_FOG (b);
-        INTERPOLATE1_FOG (intensity);
-      }
-      break;
-    case CS_VERTEX_INSIDE:
-      float x = clipped_verts [i].x;
-      float y = clipped_verts [i].y;
-      int edge1 [2], edge2 [2];
-      if ((y >= orig_triangle [0].y && y <= orig_triangle [1].y) ||
-        (y <= orig_triangle [0].y && y >= orig_triangle [1].y))
-      {
-        edge1[0] = 0;
-        edge1[1] = 1;
-        if ((y >= orig_triangle [1].y && y <= orig_triangle [2].y) ||
-          (y <= orig_triangle [1].y && y >= orig_triangle [2].y))
-        {
-          edge2[0] = 1;
-          edge2[1] = 2;
-        }
-        else
-        {
-          edge2[0] = 0;
-          edge2[1] = 2;
-        }
-      }
-      else
-      {
-        edge1[0] = 1;
-        edge1[1] = 2;
-        edge2[0] = 0;
-        edge2[1] = 2;
-      }
-      csVector2& A = orig_triangle [edge1 [0]];
-      csVector2& B = orig_triangle [edge1 [1]];
-      csVector2& C = orig_triangle [edge2 [0]];
-      csVector2& D = orig_triangle [edge2 [1]];
-      float t1 = (y - A.y) / (B.y - A.y);
-      float t2 = (y - C.y) / (D.y - C.y);
-      float x1 = A.x + t1 * (B.x - A.x);
-      float x2 = C.x + t2 * (D.x - C.x);
-      t = (x - x1) / (x2 - x1);
-      INTERPOLATE_S (z);
-      INTERPOLATE (texels,x);
-      INTERPOLATE (texels,y);
-      if (gouraud)
-      {
-        INTERPOLATE (colors,red);
-        INTERPOLATE (colors,green);
-        INTERPOLATE (colors,blue);
-      }
-      if (use_fog)
-      {
-        INTERPOLATE_FOG (r);
-        INTERPOLATE_FOG (g);
-        INTERPOLATE_FOG (b);
-        INTERPOLATE_FOG (intensity);
-      }
-      break;
-    }
-  }
-}
-
-static void DrawTriangle (csSoftwareGraphics3DCommon* g3d,
-                          iClipper2D* clipper,
-                          const csCoreRenderMesh* mesh,
-                          G3DPolygonDPFX& poly,
-                          const csVector2& pa, const csVector2& pb, const csVector2& pc,
-                          int* trivert,
-                          float* z_verts,
-                          csVector2* uv_verts,
-                          csColor* colors,
-                          G3DFogInfo* fog)
-{
-  // The triangle in question
-  csVector2 triangle[3];
-  csVector2 clipped_triangle[MAX_OUTPUT_VERTICES];	//@@@BAD HARCODED!
-  csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
-  uint8 clip_result;
-
-  if (!tr_verts)
-  {
-    tr_verts = Get_tr_verts ();
-    persp= Get_persp();
-    color_verts = Get_color_verts ();
-  }
-
-  //-----
-  // Do backface culling. Note that this depends on the
-  // mirroring of the current view.
-  //-----
-  float area = csMath2::Area2 (pa, pb, pc);
-  int j, idx, dir;
-  if (!area) return;
-  if (mesh->do_mirror)
-  {
-    if (area <= -SMALL_EPSILON) return;
-    triangle[2] = pa; triangle[1] = pb; triangle[0] = pc;
-    // Setup loop variables for later.
-    idx = 2; dir = -1;
-  }
-  else
-  {
-    if (area >= SMALL_EPSILON) return;
-    triangle[0] = pa; triangle[1] = pb; triangle[2] = pc;
-    // Setup loop variables for later.
-    idx = 0; dir = 1;
-  }
-
-  // Clip triangle. Note that the clipper doesn't care about the
-  // orientation of the triangle vertices. It works just as well in
-  // mirrored mode.
-  size_t rescount = 0;
-  if (clipper)
-  {
-    clip_result = clipper->Clip (triangle, 3, clipped_triangle, rescount,
-      clipped_vtstats);
-    if (clip_result == CS_CLIP_OUTSIDE) return;
-    poly.num = rescount;
-  }
-  else
-  {
-    clip_result = CS_CLIP_INSIDE;
-    poly.num = 3;
-  }
-
-  // If mirroring we store the vertices in the other direction.
-  for (j = 0; j < 3; j++)
-  {
-    poly.z [idx] = z_verts[trivert [j]];
-    poly.texels [idx] = uv_verts[trivert [j]];
-    if (colors)
-    {
-      poly.colors [idx] = colors[trivert[j]];
-    }
-    if (poly.use_fog) poly.fog_info [idx] = fog[trivert[j]];
-    idx += dir;
-  }
-  if (clip_result != CS_CLIP_INSIDE)
-    G3DPreparePolygonFX (&poly, clipped_triangle, rescount, clipped_vtstats,
-    (csVector2 *)triangle, poly.use_fog, colors != 0);
-  else
-  {
-    poly.vertices [0].x = triangle [0].x;
-    poly.vertices [0].y = triangle [0].y;
-    poly.vertices [1].x = triangle [1].x;
-    poly.vertices [1].y = triangle [1].y;
-    poly.vertices [2].x = triangle [2].x;
-    poly.vertices [2].y = triangle [2].y;
-  }
-  g3d->DrawPolygonFX (poly);
-}
 
 #if 0
 static void DoAddPerspective (csPoly2D& dest, const csVector3& v, 
@@ -4648,6 +4222,214 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
 }
 #endif
 
+static const int clipDestComps[] = 
+{
+  3, // CS_VATTRIB_POSITION
+  4, // CS_VATTRIB_WEIGHT
+  3, // CS_VATTRIB_NORMAL
+  4, // CS_VATTRIB_PRIMARY_COLOR
+  4, // CS_VATTRIB_SECONDARY_COLOR
+  2, // CS_VATTRIB_FOGCOORD
+  4, // 6
+  4, // 7
+  2, // CS_VATTRIB_TEXCOORD0
+  2, // CS_VATTRIB_TEXCOORD1
+  2, // CS_VATTRIB_TEXCOORD2
+  2, // CS_VATTRIB_TEXCOORD3
+  2, // CS_VATTRIB_TEXCOORD4
+  2, // CS_VATTRIB_TEXCOORD5
+  2, // CS_VATTRIB_TEXCOORD6
+  2, // CS_VATTRIB_TEXCOORD7
+};
+
+class TriangleDrawer
+{
+  csSoftwareGraphics3DCommon& g3d;
+  ClipBuffer clipBuf[clipMaxBuffers];
+  iRenderBuffer** activebuffers;
+  ClipBuffersMask buffersMask;
+  const csCoreRenderMesh* mesh;
+  G3DPolygonDPFX poly;
+
+  static const int outFloatsPerBuf = 16;
+  float clipOut[clipMaxBuffers * outFloatsPerBuf];
+  ClipMeatZNear clipZNear;
+  BuffersClipper<ClipMeatZNear> bclipperZNear;
+
+  CS_FORCEINLINE
+  const float* ClipOutVert (size_t b, size_t v)
+  { return &clipOut[b*outFloatsPerBuf + v*clipDestComps[b]]; }
+  CS_FORCEINLINE
+  const csVector3& ClipOutPos (size_t v)
+  { return *(csVector3*)ClipOutVert (VATTR_SPEC(POSITION), v); }
+  CS_FORCEINLINE
+  const csVector2& ClipOutTC (size_t v)
+  { return *(csVector2*)ClipOutVert (VATTR_SPEC(TEXCOORD), v); }
+
+  void ProjectVertices (size_t rangeStart, size_t rangeEnd)
+  {
+    size_t num_vertices = rangeEnd + 1;
+
+    persp->SetLength (num_vertices);
+    const int width2 = g3d.width2;
+    const int height2 = g3d.height2;
+    const int aspect = g3d.aspect;
+    csRenderBufferLock<csVector3, iRenderBuffer*> work_verts 
+      (activebuffers[VATTR_SPEC(POSITION)], CS_BUF_LOCK_READ);
+    // Perspective project.
+    for (size_t i = rangeStart; i <= rangeEnd; i++)
+    {
+      if (work_verts[i].z >= SMALL_Z)
+      {
+	(*persp)[i].z = 1. / work_verts[i].z;
+	float iz = aspect * (*persp)[i].z;
+	(*persp)[i].x = work_verts[i].x * iz + width2;
+	(*persp)[i].y = work_verts[i].y * iz + height2;
+      }
+    }
+  }
+  void ClipAndDrawTriangle (const size_t* trivert)
+  {
+    //-----
+    // Do backface culling. Note that this depends on the
+    // mirroring of the current view.
+    //-----
+    const csVector2& pa = *(csVector2*)&ClipOutPos (trivert[0]);
+    const csVector2& pb = *(csVector2*)&ClipOutPos (trivert[1]);
+    const csVector2& pc = *(csVector2*)&ClipOutPos (trivert[2]);
+    float area = csMath2::Area2 (pa, pb, pc);
+    int dir;
+    if (!area) return;
+    if (mesh->do_mirror)
+    {
+      if (area <= -SMALL_EPSILON) return;
+      // Setup loop variables for later.
+      dir = -1;
+    }
+    else
+    {
+      if (area >= SMALL_EPSILON) return;
+      // Setup loop variables for later.
+      dir = 1;
+    }
+
+    // Clip triangle. Note that the clipper doesn't care about the
+    // orientation of the triangle vertices. It works just as well in
+    // mirrored mode.
+
+    /* You can only have as much clipped vertices as the sum of vertices in 
+     * the original poly and those in the clipping poly... I think. */
+    const size_t maxClipVertices = g3d.clipper->GetVertexCount() + 3;
+    const size_t floatsPerBufPerVert = 4;
+    ClipMeatiClipper meat;
+    meat.Init (g3d.clipper, maxClipVertices);
+    CS_ALLOC_STACK_ARRAY(float, out, 
+      floatsPerBufPerVert * clipMaxBuffers * maxClipVertices);
+    ClipBuffer clipBuf[clipMaxBuffers];
+    for (size_t i = 0; i < clipMaxBuffers; i++)
+    {
+      clipBuf[i].source = (uint8*)this->clipBuf[i].dest;
+      clipBuf[i].sourceComp = this->clipBuf[i].destComp;
+      clipBuf[i].sourceStride = this->clipBuf[i].destComp * sizeof(float);
+      clipBuf[i].dest = &out[i * floatsPerBufPerVert * maxClipVertices];
+      clipBuf[i].destComp = clipBuf[i].sourceComp;
+    }
+
+    BuffersClipper<ClipMeatiClipper> clip (meat);
+    clip.Init (clipBuf, buffersMask);
+    csTriangle tri;
+    tri.a = (int)trivert[0];
+    tri.b = (int)trivert[1];
+    tri.c = (int)trivert[2];
+    size_t rescount = clip.DoClip (tri);
+    if (rescount == 0) return;
+
+    size_t idx = (dir > 0) ? 0 : (rescount-1);
+    for (size_t j = 0; j < rescount; j++)
+    {
+      const csVector3& v = *(csVector3*)
+	&out[VATTR_SPEC(POSITION) * floatsPerBufPerVert * maxClipVertices + 
+	j*clipBuf[VATTR_SPEC(POSITION)].destComp];
+      poly.vertices[idx].Set (v.x, v.y);
+      poly.z[idx] = v.z;
+      poly.texels [idx] = *(csVector2*)
+	&out[VATTR_SPEC(TEXCOORD) * floatsPerBufPerVert * maxClipVertices + 
+	j*clipBuf[VATTR_SPEC(TEXCOORD)].destComp];
+      // If mirroring we store the vertices in the other direction.
+      idx += dir;
+    }
+    poly.num = rescount;
+    g3d.polyrast.DrawPolygonFX (poly);
+  }
+
+public:
+  TriangleDrawer (csSoftwareGraphics3DCommon& g3d,
+    iRenderBuffer* activebuffers[], size_t rangeStart, 
+    size_t rangeEnd, const csCoreRenderMesh* mesh,
+    const csRenderMeshModes& modes) : g3d(g3d), 
+    activebuffers(activebuffers), mesh(mesh), 
+    bclipperZNear(clipZNear)
+  {
+    const size_t bufNum = csMin (
+      csSoftwareGraphics3DCommon::activeBufferCount, clipMaxBuffers);
+
+    buffersMask = 0;
+    for (size_t b = 0; b < bufNum; b++)
+    {
+      if (activebuffers[b] == 0) continue;
+
+      iRenderBuffer* buf = activebuffers[b];
+      buffersMask |= 1 << b;
+      clipBuf[b].source = (uint8*)buf->Lock (CS_BUF_LOCK_READ);
+      clipBuf[b].sourceComp = buf->GetComponentCount();
+      clipBuf[b].sourceStride = buf->GetElementDistance();
+      clipBuf[b].dest = &clipOut[b * outFloatsPerBuf];
+      clipBuf[b].destComp = clipDestComps[b];
+    }
+
+    ProjectVertices (rangeStart, rangeEnd);
+
+    memset (&poly, 0, sizeof(poly));
+    poly.tex_handle = g3d.activeTex;
+    poly.mixmode = modes.mixmode | CS_FX_TILING |
+      (/*!col1.IsValid() ? */CS_FX_FLAT/* : 0*/);
+    clipZNear.Init (persp->GetArray(), g3d.width2, g3d.height2, 
+      g3d.aspect);
+    bclipperZNear.Init (clipBuf, buffersMask);
+  }
+
+  ~TriangleDrawer()
+  {
+    const size_t bufNum = csMin (
+      csSoftwareGraphics3DCommon::activeBufferCount, clipMaxBuffers);
+
+    for (size_t b = 0; b < bufNum; b++)
+    {
+      if (activebuffers[b] != 0) activebuffers[b]->Release();
+    }
+  }
+
+  void DrawTriangle (uint a, uint b, uint c)
+  {
+    csTriangle tri;
+    tri.a = a;
+    tri.b = b;
+    tri.c = c;
+    // Small Z clipping
+    size_t n = bclipperZNear.DoClip (tri);
+    if (n == 0) return;
+    CS_ASSERT((n>= 3) && (n <= 4));
+
+    static const size_t trivert1[3] = { 0, 1, 2 };
+    ClipAndDrawTriangle (trivert1);
+    if (n == 4)
+    {
+      static const size_t trivert2[3] = { 0, 2, 3 };
+      ClipAndDrawTriangle (trivert2);
+    }
+  }
+};
+
 void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
     const csArray<csShaderVariable*> &stacks)
@@ -4660,18 +4442,13 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   }
 #endif
 
-  unsigned int i;
-
-  if (!z_verts)
+  if (!persp)
   {
-    tr_verts = Get_tr_verts ();
-    z_verts = Get_z_verts ();
-    uv_verts = Get_uv_verts ();
     persp= Get_persp();
-    color_verts = Get_color_verts ();
   }
 
-  iRenderBuffer* indexbuf = (modes.buffers ? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
+  iRenderBuffer* indexbuf = 
+    (modes.buffers ? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
 
   if (!indexbuf)
   {
@@ -4690,265 +4467,122 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
   //z_buf_mode = CS_ZBUF_USE;
   z_buf_mode = modes.z_buf_mode;
+  polyrast.SetZBufMode (z_buf_mode);
 
 
   // @@@ Currently we don't implement multi-texture
   // in the generic implementation. This is a todo...
   
   // Make sure we don't process too many vertices;
-  unsigned int num_vertices = 0;
-  for (i = mesh->indexstart; i<mesh->indexend; ++i)
-  {
-    if (indices[i]+1>num_vertices)
-      num_vertices = indices[i]+1;
-  }
-
-  //see if we need triangulation of strips/fans
-  uint32 *workIndices = 0;
-  bool deleteIndices = false;
-
-  int indexstart = mesh->indexstart;
-  int indexend = mesh->indexend;
-
-  switch (mesh->meshtype)
-  {
-  case CS_MESHTYPE_TRIANGLESTRIP:
-    {
-      //triangulate
-      int numInd = mesh->indexend - mesh->indexstart;
-      if (mesh->indexend - mesh->indexstart == 0) return;
-
-      int numTri = 1+(numInd-3);
-      workIndices = new uint32 [numTri * 3];
-      deleteIndices = true;
-
-      int triIdx = 0, indIdx = mesh->indexstart;
-      int old2, old1;
-      old2 = indices[indIdx++];
-      old1 = indices[indIdx++];
-      
-      for(int i = 0; i < numTri; i++)
-      {
-        workIndices[triIdx++] = old2;
-        old2 = old1;
-        workIndices[triIdx++] = old1;
-        old1 = workIndices[triIdx++] = indices[indIdx++];   
-      }
-
-      indexstart = 0;
-      indexend = triIdx;
-      break;
-    }
-  case CS_MESHTYPE_TRIANGLEFAN:
-    {
-      int numInd = mesh->indexend - mesh->indexstart;
-      if (mesh->indexend - mesh->indexstart == 0) return;
-
-      int numTri = 1+(numInd-3);
-      workIndices = new uint32 [numTri * 3];
-      deleteIndices = true;
-
-
-      int triIdx = 0, indIdx = mesh->indexstart;;
-      int first, old1;
-      first = indices[indIdx++];
-      old1 = indices[indIdx++];
-
-      for(int i = 0; i < numTri; i++)
-      {
-        workIndices[triIdx++] = first;
-        workIndices[triIdx++] = old1;
-        old1 = workIndices[triIdx++] = indices[indIdx++];   
-      }
-      
-      indexstart = 0;
-      indexend = triIdx;
-      break;
-    }
-  case CS_MESHTYPE_QUADS:
-    {
-      //triangulate
-      int numInd = mesh->indexend - mesh->indexstart;
-      if (mesh->indexend - mesh->indexstart == 0) return;
-
-      int numTri = (numInd / 2);
-      workIndices = new uint32 [numTri * 3];
-      deleteIndices = true;
-
-      int triIdx = 0;
-      
-      for(uint indIdx = mesh->indexstart; indIdx < mesh->indexend; indIdx += 4)
-      {
-        workIndices[triIdx++] = indices[indIdx+0];
-        workIndices[triIdx++] = indices[indIdx+1];
-        workIndices[triIdx++] = indices[indIdx+2];
-        workIndices[triIdx++] = indices[indIdx+0];
-        workIndices[triIdx++] = indices[indIdx+2];
-        workIndices[triIdx++] = indices[indIdx+3];
-      }
-
-      indexstart = 0;
-      indexend = triIdx;
-      break;
-    }
-  default:
-    workIndices = indices;
-  }
-
-  const unsigned int numBuffers =
-    sizeof (activebuffers) / sizeof (iRenderBuffer*);
-  /*void* locks[numBuffers];
-  for (i=0; i<numBuffers; ++i)
-  {
-    if (activebuffers[i] != 0)
-      locks[i] = activebuffers[i]->Lock (CS_BUF_LOCK_READ);
-    else
-      locks[i] = 0;
-  }*/
+  size_t num_vertices = indexbuf->GetRangeEnd()+1;
 
   // Update work tables.
-  if (num_vertices > (unsigned int)tr_verts->Capacity ())
+  if (num_vertices > persp->Capacity ())
   {
-    tr_verts->SetCapacity (num_vertices);
-    z_verts->SetCapacity (num_vertices);
-    uv_verts->SetCapacity (num_vertices);
     persp->SetCapacity (num_vertices);
-    color_verts->SetCapacity (num_vertices);
   }
-
-  // Do vertex tweening and/or transformation to camera space
-  // if any of those are needed. When this is done 'verts' will
-  // point to an array of camera vertices.
-  csRenderBufferLock<csVector3> f1 
-    (activebuffers[VATTR_SPEC(POSITION)], CS_BUF_LOCK_READ);
-  if (!f1) return; // @@@ FIXME
-  csRenderBufferLock<csVector2> uv1 
-    (activebuffers[VATTR_SPEC(TEXCOORD)], CS_BUF_LOCK_READ);
-  if (!uv1) return; // @@@ FIXME
-  csVector3* work_verts;
-  csRenderBufferLock<csColor> col1 
-    (activebuffers[VATTR_SPEC(COLOR)], CS_BUF_LOCK_READ);
-  
-  //if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
-  {
-    tr_verts->SetLength (num_vertices);
-    for (i = 0 ; i < num_vertices ; i++)
-      (*tr_verts)[i] = object2camera * f1[i];
-    work_verts = tr_verts->GetArray ();
-  }
-  /*else
-    work_verts = f1;*/
-
-  z_verts->SetLength (num_vertices);
   persp->SetLength (num_vertices);
-  // Perspective project.
-  for (i = 0 ; i < num_vertices ; i++)
+
+  const size_t rangeStart = indexbuf->GetRangeStart();
+  const size_t rangeEnd = indexbuf->GetRangeEnd();
+
+  if (!object2camera.IsIdentity())
   {
-    if (work_verts[i].z >= SMALL_Z)
+    if (!translatedVerts.IsValid()
+      || (translatedVerts->GetElementCount() <= rangeEnd))
     {
-      (*z_verts)[i] = 1. / work_verts[i].z;
-      float iz = aspect * (*z_verts)[i];
-      (*persp)[i].x = work_verts[i].x * iz + width2;
-      (*persp)[i].y = work_verts[i].y * iz + height2;
+      translatedVerts = csRenderBuffer::CreateRenderBuffer (
+	rangeEnd + 1, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
     }
+
+    csRenderBufferLock<csVector3, iRenderBuffer*> f1 
+      (activebuffers[VATTR_SPEC(POSITION)], CS_BUF_LOCK_READ);
+    if (!f1) return; 
+    csVector3* tr_verts = 
+      (csVector3*)translatedVerts->Lock (CS_BUF_LOCK_NORMAL);
+
+    size_t i;
+    for (i = rangeStart; i <= rangeEnd; i++)
+      tr_verts[i] = object2camera * f1[i];
+
+    translatedVerts->Release();
+
+    activebuffers[VATTR_SPEC(POSITION)] = translatedVerts;
   }
 
-  // Clipped polygon (assume it cannot have more than 64 vertices)
-  G3DPolygonDPFX poly;
-  memset (&poly, 0, sizeof(poly));
-  poly.tex_handle = activeTex;
-  poly.mixmode = modes.mixmode | CS_FX_TILING |
-    (!col1.IsValid() ? CS_FX_FLAT : 0);
-
-  // Fill flat color if renderer decide to paint it flat-shaded
+  const csRenderMeshType meshtype = mesh->meshtype;
+  if ((meshtype >= CS_MESHTYPE_TRIANGLES) 
+    && (meshtype <= CS_MESHTYPE_TRIANGLEFAN))
   {
-    csShaderVariable* flatcolSV = csGetShaderVariableFromStack (stacks, string_material_flatcolor);
-    if (flatcolSV)
+    TriangleDrawer triDraw (*this, activebuffers, 
+      rangeStart, rangeEnd, mesh, modes);
+
+    //see if we need triangulation of strips/fans
+    uint32 *workIndices = 0;
+    bool deleteIndices = false;
+
+    uint indexstart = mesh->indexstart;
+    uint indexend = mesh->indexend;
+
+    switch (meshtype)
     {
-      csRGBpixel flatcol;
-      flatcolSV->GetValue (flatcol);
-      poly.flat_color_r = flatcol.red;
-      poly.flat_color_g = flatcol.green;
-      poly.flat_color_b = flatcol.blue;
-    }
-    else 
-    {
-      poly.flat_color_r = poly.flat_color_g = poly.flat_color_b = 255;
+    case CS_MESHTYPE_TRIANGLES:
+      {
+	uint32* tri = indices + indexstart;
+	const uint32* triEnd = indices + indexend;
+	while (tri < triEnd)
+	{
+	  triDraw.DrawTriangle (tri[0], tri[1], tri[2]);
+	  tri += 3;
+	}
+      }
+      break;
+    case CS_MESHTYPE_TRIANGLESTRIP:
+      {
+	//triangulate
+	uint32* tri = indices + indexstart;
+	const uint32* triEnd = indices + indexend;
+	uint32 old2 = *tri++;
+	uint32 old1 = *tri++;
+	while (tri < triEnd)
+	{
+	  const uint32 cur = *tri++;
+	  triDraw.DrawTriangle (old2, old1, cur);
+	  old2 = old1;
+	  old1 = cur;
+	}
+	break;
+      }
+    case CS_MESHTYPE_TRIANGLEFAN:
+      {
+	//triangulate
+	uint32* tri = indices + indexstart;
+	const uint32* triEnd = indices + indexend;
+	uint32 first = *tri++;
+	uint32 old1 = *tri++;
+	while (tri < triEnd)
+	{
+	  const uint32 cur = *tri++;
+	  triDraw.DrawTriangle (first, old1, cur);
+	  old1 = cur;
+	}
+	break;
+      }
+    case CS_MESHTYPE_QUADS:
+      {
+	//triangulate
+	uint32* quad = indices + indexstart;
+	const uint32* quadEnd = indices + indexend;
+	while (quad < quadEnd)
+	{
+	  triDraw.DrawTriangle (quad[0], quad[1], quad[2]);
+	  triDraw.DrawTriangle (quad[0], quad[2], quad[3]);
+	  quad += 4;
+	}
+	break;
+      }
+    default:
+      ;
     }
   }
-
-  poly.use_fog = false;
-
-  csVector3 pos[4];
-  float zv[4];
-  csVector2 uv[4];
-  csColor col[4];
-  csVector2 workPersp[4];
-  G3DFogInfo fog[3];
-
-  ClipBuffer clipBuf[32];
-  uint buffersMask = 0;
-  buffersMask |= 1 << VATTR_SPEC(POSITION);
-  clipBuf[VATTR_CLIPINDEX(POSITION)].source = (uint8*)work_verts;
-  clipBuf[VATTR_CLIPINDEX(POSITION)].sourceComp = 3;
-  clipBuf[VATTR_CLIPINDEX(POSITION)].sourceStride = sizeof(float)*3;
-  clipBuf[VATTR_CLIPINDEX(POSITION)].dest = (float*)workPersp;
-  clipBuf[VATTR_CLIPINDEX(POSITION)].destComp = 2;
-
-  buffersMask |= 1 << VATTR_SPEC(TEXCOORD);
-  clipBuf[VATTR_CLIPINDEX(TEXCOORD)].source = (uint8*)uv1.Lock();
-  clipBuf[VATTR_CLIPINDEX(TEXCOORD)].sourceComp = 
-    activebuffers[VATTR_SPEC(TEXCOORD)]->GetComponentCount();
-  clipBuf[VATTR_CLIPINDEX(TEXCOORD)].sourceStride = 
-    activebuffers[VATTR_SPEC(TEXCOORD)]->GetElementDistance();
-  clipBuf[VATTR_CLIPINDEX(TEXCOORD)].dest = (float*)uv;
-  clipBuf[VATTR_CLIPINDEX(TEXCOORD)].destComp = 2;
-
-  /*buffersMask |= 1 << VATTR_SPEC(COLOR);
-  clipBuf[VATTR_CLIPINDEX(COLOR)].source = (uint8*)locks[VATTR_SPEC(COLOR)];
-  clipBuf[VATTR_CLIPINDEX(COLOR)].sourceComp = 
-    activebuffers[VATTR_SPEC(COLOR)]->GetComponentCount();
-  clipBuf[VATTR_CLIPINDEX(COLOR)].sourceStride = 
-    activebuffers[VATTR_SPEC(COLOR)]->GetElementDistance();
-  clipBuf[VATTR_CLIPINDEX(COLOR)].dest = (float*)col;
-  clipBuf[VATTR_CLIPINDEX(COLOR)].destComp = 3;*/
-
-  ClipMeatZNear clipMeat (persp->GetArray(), width2, height2, aspect);
-  BuffersClipper<ClipMeatZNear> bclipper;
-
-  // Draw all triangles.
-  csTriangle* triangles = (csTriangle*)workIndices;
-  for (i = indexstart/3 ; i < (unsigned int)(indexend/3) ; i++)
-  {
-    size_t n = bclipper.DoClip (clipMeat, triangles[i], clipBuf, buffersMask);
-    if (n == 0) continue;
-    CS_ASSERT((n>= 3) && (n <= 4));
-    
-    for (size_t i = 0; i < n; i++)
-    {
-      col[i].Set (1.0f, 1.0f, 1.0f);
-    }
-    
-    int trivert1[3] = { 0, 1, 2 };
-    DrawTriangle (this, clipper, mesh, poly,
-      workPersp[0], workPersp[1], workPersp[2], trivert1,
-      zv, uv, 0, fog);
-    if (n == 4)
-    {
-      int trivert2[3] = { 0, 2, 3 };
-      DrawTriangle (this, clipper, mesh, poly,
-      workPersp[0], workPersp[2], workPersp[3], trivert2,
-      zv, uv, 0, fog);
-    }
-  }
-
-  if(deleteIndices) delete[] workIndices;
-
-  indexbuf->Release ();
-  /*for (i=0; i<numBuffers; ++i)
-  {
-    if (activebuffers[i] != 0)
-      activebuffers[i]->Release ();
-  }*/
 }
-

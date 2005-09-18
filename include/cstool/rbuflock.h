@@ -31,11 +31,15 @@
  * Helper class for convenient locking/unlocking of an iRenderBuffer.
  * The contents can be accessed either directly or array-style in typed
  * way.
+ * \remarks The TbufferKeeper template argument can be used to have the
+ *  lock store the buffer in a simple iRenderBuffer* (instead a csRef<>)
+ *  to avoid an IncRef() and DecRef() if it is known that the buffer will
+ *  not be destroyed as long as the lock exists.
  */
-template <class T>
+template <class T, class TbufferKeeper = csRef<iRenderBuffer> >
 class csRenderBufferLock
 {
-  csRef<iRenderBuffer> buffer;
+  TbufferKeeper buffer;
   csRenderBufferLockType lockType;
   bool isLocked;
   T* lockBuf;

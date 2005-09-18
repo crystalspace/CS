@@ -22,20 +22,30 @@
 
 #include "clipper.h"
 
+namespace cspluginSoft3d
+{
+
 class ClipMeatZNear
 {
   int width2;
   int height2;
   int aspect;
-  const csVector2* persp;
+  const csVector3* persp;
 
-  CS_FORCEINLINE void Project (csVector2& v, const float com_iz)
+  CS_FORCEINLINE void Project (csVector3& v, const float com_iz)
   {
-    v.Set (v.x * com_iz + width2, v.y * com_iz + height2);
+    const float clipPos = SMALL_Z*10;
+    const float com_zv = 1.0f / clipPos;
+    v.Set (v.x * com_iz + width2, v.y * com_iz + height2, com_zv);
   }
 public:
-  ClipMeatZNear (const csVector2* persp, int w2, int h2, float a) : 
-    width2(w2), height2(h2), aspect (a), persp(persp) {}
+  void Init (const csVector3* persp, int w2, int h2, float a)
+  {
+    width2 = w2;
+    height2 = h2;
+    aspect = a;
+    this->persp = persp;
+  }
 
   size_t DoClip (const csTriangle& tri, const ClipBuffer* buffers, 
     ClipBuffersMask buffersMask, VertexOutputBase* vout)
@@ -43,7 +53,7 @@ public:
     const float clipPos = SMALL_Z*10;
     const float com_zv = 1.0f / clipPos;
     const float com_iz = aspect * com_zv;
-    csVector2 v;
+    csVector3 v;
 
     const ClipBuffer& bPos = buffers[VATTR_CLIPINDEX(POSITION)];
     const csVector3& va = *(csVector3*)(bPos.source + tri.a * bPos.sourceStride);
@@ -341,5 +351,7 @@ public:
     return 0;
   }
 };
+
+} // namespace cspluginSoft3d
 
 #endif // __CS_SOFT3D_CLIP_ZNEAR_H__

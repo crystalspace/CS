@@ -333,9 +333,16 @@ public:
   csVector3* v_cam2tex;
 };
 
+// @@@ Needs G3DPolygonDPFX
+#include "polyrast.h"
+
+using namespace cspluginSoft3d;
+
 #define VATTR_SPEC(x)           (CS_VATTRIB_ ## x - CS_VATTRIB_SPECIFIC_FIRST)
 #define VATTR_GEN(x)							      \
   ((CS_VATTRIB_ ## x - CS_VATTRIB_GENERIC_FIRST) + CS_VATTRIB_SPECIFIC_LAST + 1)
+
+class TriangleDrawer;
 
 /**
  * The basic software renderer class.
@@ -344,6 +351,7 @@ class csSoftwareGraphics3DCommon : public iGraphics3D
 {
 protected:
   //friend class csSoftHalo;
+  friend class TriangleDrawer;
 
   /// Driver this driver is sharing info with (if any)
   csSoftwareGraphics3DCommon *partner;
@@ -510,9 +518,11 @@ protected:
 
   csRef<iShaderManager> shadermgr;
 
-  iRenderBuffer* activebuffers[CS_VATTRIB_SPECIFIC_LAST - 
-    CS_VATTRIB_SPECIFIC_FIRST + 1];
+  static const size_t activeBufferCount = CS_VATTRIB_SPECIFIC_LAST - 
+    CS_VATTRIB_SPECIFIC_FIRST + 1;
+  iRenderBuffer* activebuffers[activeBufferCount];
   iTextureHandle* activeTex;
+  csRef<iRenderBuffer> translatedVerts;
 
   // Structure used for maintaining a stack of clipper portals.
   struct csClipPortal
@@ -526,7 +536,6 @@ protected:
   csPDelArray<csClipPortal> clipportal_stack;
   bool clipportal_dirty;
   int clipportal_floating;
-
 public:
   SCF_DECLARE_IBASE;
 
@@ -577,6 +586,8 @@ public:
 
   // An experimental filter feature.
   static int filter_bf;
+
+  PolygonRasterizer polyrast;
 
   /// Setup scanline drawing routines according to current bpp and setup flags
   csSoftwareGraphics3DCommon (iBase* parent);

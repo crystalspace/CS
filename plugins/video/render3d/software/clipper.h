@@ -20,20 +20,31 @@
 #ifndef __CS_SOFT3D_CLIPPER_H__
 #define __CS_SOFT3D_CLIPPER_H__
 
+namespace cspluginSoft3d
+{
+
 class VertexOutputBase
 {
 protected:
   uint8* in;
   float* out;
+  float* startOut;
   size_t inStride;
 public:
   VertexOutputBase () {}
   VertexOutputBase (uint8* in, size_t inStride, float* out) :
-    in(in), out(out), inStride(inStride) {}
-  
+    in(in), startOut(out), inStride(inStride) {}
+
+  void Reset() { out = startOut; }
   virtual void Copy (size_t idx) {}
   virtual void LerpTo (float* dst, size_t idx1, size_t idx2, float p) {}
   virtual void Lerp (size_t idx1, size_t idx2, float p) {}
+  virtual void Lerp3 (size_t idx1, size_t idx2, float p1,
+    size_t idx3, size_t idx4, float p2,
+    float p) {}
+  virtual void Lerp3To (float* dst, size_t idx1, size_t idx2, float p1,
+    size_t idx3, size_t idx4, float p2,
+    float p) {}
   virtual void Write (float* what) {}
 };
 
@@ -53,6 +64,29 @@ class VertexOutput : public VertexOutputBase
         *dst = f1 + p * (f2-f1);
         I1 += sizeof(float);
         I2 += sizeof(float);
+      }
+      else
+        *dst = (i == 3) ? 1.0f : 0.0;
+      dst++;
+    }
+  }
+  virtual void Lerp3 (float*& dst, size_t idx1, size_t idx2, float p1,
+		      size_t idx3, size_t idx4, float p2,
+		      float p)
+  {
+    float v1[4];
+    float v2[4];
+    float* d1 = v1;
+    float* d2 = v2;
+    Lerp (d1, idx1, idx2, p1);
+    Lerp (d2, idx3, idx4, p2);
+    for (int i = 0; i < No; i++)
+    {
+      if (i < Ni)
+      {
+        const float f1 = v1[i];
+        const float f2 = v2[i];
+        *dst = f1 + p * (f2-f1);
       }
       else
         *dst = (i == 3) ? 1.0f : 0.0;
@@ -86,6 +120,18 @@ public:
   {
     Lerp (out, idx1, idx2, p);
   }
+  virtual void Lerp3 (size_t idx1, size_t idx2, float p1,
+		      size_t idx3, size_t idx4, float p2,
+		      float p)
+  {
+    Lerp3 (out, idx1, idx2, p1, idx3, idx4, p2, p);
+  }
+  virtual void Lerp3To (float* dst, size_t idx1, size_t idx2, float p1,
+			size_t idx3, size_t idx4, float p2,
+			float p)
+  {
+    Lerp3 (dst, idx1, idx2, p1, idx3, idx4, p2, p);
+  }
   virtual void Write (float* what)
   {
     memcpy (out, what, No * sizeof (float));
@@ -102,13 +148,16 @@ struct ClipBuffer
   size_t destComp;
 };
 
-const int ClipMaxBuffers = 16;
+const size_t clipMaxBuffers = 16;
 typedef uint ClipBuffersMask;
 
 template<class Meat>
 class BuffersClipper
 {
-  VertexOutputBase vout[ClipMaxBuffers];
+  VertexOutputBase vout[clipMaxBuffers];
+  const ClipBuffer* buffers;
+  Meat& meat;
+  ClipBuffersMask buffersMask;
   
   template<int Ni, int No>
   void SetupVOut2 (int i, const ClipBuffer& clipBuf)
@@ -158,17 +207,30 @@ class BuffersClipper
     }
   }
 public:
-  size_t DoClip (Meat& meat, const csTriangle& tri, const ClipBuffer* buffers, 
-    ClipBuffersMask buffersMask)
+  BuffersClipper (Meat& meat) :  meat(meat) { }
+  void Init (const ClipBuffer* buffers, ClipBuffersMask buffersMask)
   {
-    for (int i = 0; i < ClipMaxBuffers; i++)
+    this->buffers = buffers;
+    this->buffersMask = buffersMask;
+    for (int i = 0; i < clipMaxBuffers; i++)
     {
       if (!(buffersMask & (1 << i))) continue;
       SetupVOut (i, buffers[i]);
     }
+  }
+
+  size_t DoClip (const csTriangle& tri)
+  {
+    for (int i = 0; i < clipMaxBuffers; i++)
+    {
+      if (!(buffersMask & (1 << i))) continue;
+      vout[i].Reset();
+    }
     return meat.DoClip (tri, buffers, buffersMask, vout);
   }
 };
+
+} // namespace cspluginSoft3d
 
 #define VATTR_CLIPINDEX(x)                                               \
   (CS_VATTRIB_ ## x - (CS_VATTRIB_ ## x >=  CS_VATTRIB_GENERIC_FIRST ?        \
