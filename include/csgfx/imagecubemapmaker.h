@@ -34,13 +34,18 @@
 /**
  * Wrapper class to create a cube map from a number of 2D images as the cube
  * faces. Ensures that all faces are available when requested, if necessary
- * by creating a new image (the famous and popular image-no-found-checkerboard).
+ * by creating a new image (the famous and popular image-not-found 
+ * checkerboard).
  */
 class CS_CRYSTALSPACE_EXPORT csImageCubeMapMaker :
   public scfImplementationExt0<csImageCubeMapMaker, csImageBase>
 {
 protected:
-  enum { NUM_FACES = 6 };
+  enum 
+  { 
+    /// Symbolic name for number of faces of a cube map
+    NUM_FACES = 6 
+  };
   /// The cube face images
   csRef<iImage> cubeImages[NUM_FACES];
   /**
