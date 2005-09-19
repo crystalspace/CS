@@ -93,6 +93,8 @@ namespace lighter
 
       sceneFiles[i].document = doc;
       sceneFiles[i].rootNode = doc->GetRoot ();
+      // ChDirAuto() may have created an automount, use that...
+      sceneFiles[i].directory = globalLighter->vfs->GetCwd ();
 
       // Pass it to the loader
       iBase *res;
@@ -272,7 +274,7 @@ namespace lighter
         textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
       classNode->SetValue ("class");
       csRef<iDocumentNode> classContNode = 
-        classNode->CreateNodeBefore (CS_NODE_ELEMENT);
+        classNode->CreateNodeBefore (CS_NODE_TEXT);
       classContNode->SetValue ("lightmap");
 
 
@@ -348,17 +350,18 @@ namespace lighter
         csString textureFilename;
         // Save the lightmap
         {
-          csRef<iDataBuffer> buf =  globalLighter->vfs->ExpandPath (
-            fileInfo->directory.GetData (), true);
-          textureFilename = buf->GetData ();
-          textureFilename += "lm_";
+          textureFilename = "lm_";
           textureFilename += radObj->meshName;
           textureFilename += "_";
           textureFilename += i;
           textureFilename += ".png";
         }
-        lightmaps[i]->SaveLightmap (textureFilename);
-
+	{
+	  // Texture file name is relative to world file
+	  csVfsDirectoryChanger chdir (globalLighter->vfs);
+	  chdir.ChangeTo (fileInfo->directory);
+	  lightmaps[i]->SaveLightmap (textureFilename);
+	}
         texturesToSave.Push (textureFilename);
 
         //add a sv to the meshnode

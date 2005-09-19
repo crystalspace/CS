@@ -31,7 +31,8 @@ CS_IMPLEMENT_APPLICATION;
 
 // used below
 CS_SPECIALIZE_TEMPLATE
-class csHashComputer<lighter::RadPrimitive*> : public csHashComputerIntegral<lighter::RadPrimitive*> {};
+class csHashComputer<lighter::RadPrimitive*> : 
+  public csHashComputerIntegral<lighter::RadPrimitive*> {};
 
 namespace lighter
 {

@@ -9,6 +9,8 @@ chronological order.
 19-Sep-2005
 	- Rhad added initial files for new sound system (SndSys).
 	  Jamfiles will be committed this evening.
+	- res made a few tweaks to lighter2 to have it work nicely when invoked
+	  with .zip files from the command line.
 19-Sep-2005
 	- Jorrit added iStreamSource interface. This will be used as
 	  a generic way to provide faster methods for getting buffers for
