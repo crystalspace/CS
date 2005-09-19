@@ -569,7 +569,7 @@ bool csLoader::LoadStructuredDoc (const char* file, iFile* buf,
 
 csPtr<iBase> csLoader::LoadStructuredMap (iLoaderContext* ldr_context,
 	iLoaderPlugin* plug, iFile* buf,
-  	iBase* context, const char* fname)
+  	iBase* context, const char* fname, iStreamSource* ssource)
 {
   csRef<iDocument> doc;
   csString filename (fname);
@@ -596,7 +596,7 @@ csPtr<iBase> csLoader::LoadStructuredMap (iLoaderContext* ldr_context,
       }
       else
       {
-        ret = plug->Parse (paramsnode, 0/**ssource*/, ldr_context, context);
+        ret = plug->Parse (paramsnode, ssource, ldr_context, context);
       }
     }
     else
@@ -617,7 +617,7 @@ csPtr<iLoaderStatus> csLoader::ThreadedLoadMapFile (const char* filename,
 }
 
 bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes)
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource)
 {
   result = 0;
 
@@ -638,7 +638,7 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
   if (doc)
   {
     csRef<iDocumentNode> node = doc->GetRoot ();
-    return Load (node, result, region, curRegOnly, checkDupes);
+    return Load (node, result, region, curRegOnly, checkDupes, ssource);
   }
   else
   {
@@ -649,7 +649,7 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
 }
 
 bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes)
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource)
 {
   result = 0;
 
@@ -668,7 +668,7 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
 
     csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
         meshfactname);
-    if (LoadMeshObjectFactory (ldr_context, t, 0, meshfactnode))
+    if (LoadMeshObjectFactory (ldr_context, t, 0, meshfactnode, 0, ssource))
     {
       AddToRegion (ldr_context, t->QueryObject ());
       result = t;
@@ -693,7 +693,7 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
       if (t) { result = t; return true; }
     }
     csRef<iMeshWrapper> t = Engine->CreateMeshWrapper (meshobjname);
-    if (LoadMeshObject (ldr_context, t, 0, meshobjnode))
+    if (LoadMeshObject (ldr_context, t, 0, meshobjnode, ssource))
     {
       AddToRegion (ldr_context, t->QueryObject ());
       result = t;
@@ -712,14 +712,14 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
   if (worldnode)
   {
     result = Engine;
-    return LoadMap (ldr_context, worldnode);
+    return LoadMap (ldr_context, worldnode, ssource);
   }
 
   csRef<iDocumentNode> libnode = node->GetNode ("library");
   if (libnode)
   {
     result = 0;
-    return LoadLibrary (ldr_context, libnode);
+    return LoadLibrary (ldr_context, libnode, ssource);
   }
 
   ReportError ("crystalspace.maploader.parse",
@@ -729,7 +729,7 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
 }
 
 bool csLoader::LoadMapFile (const char* file, bool clearEngine,
-  iRegion* region, bool curRegOnly, bool checkdupes)
+  iRegion* region, bool curRegOnly, bool checkdupes, iStreamSource* ssource)
 {
   csRef<iFile> buf = VFS->Open (file, VFS_FILE_READ);
 
@@ -755,7 +755,8 @@ bool csLoader::LoadMapFile (const char* file, bool clearEngine,
         world_node, "Expected 'world' token!");
       return false;
     }
-    return LoadMap (world_node, clearEngine, region, curRegOnly, checkdupes);
+    return LoadMap (world_node, clearEngine, region, curRegOnly, checkdupes,
+    	ssource);
   }
   else
   {
@@ -768,7 +769,7 @@ bool csLoader::LoadMapFile (const char* file, bool clearEngine,
 }
 
 bool csLoader::LoadMap (iDocumentNode* world_node, bool clearEngine,
-  iRegion* region, bool curRegOnly, bool checkdupes)
+  iRegion* region, bool curRegOnly, bool checkdupes, iStreamSource* ssource)
 {
   if (clearEngine)
   {
@@ -778,13 +779,13 @@ bool csLoader::LoadMap (iDocumentNode* world_node, bool clearEngine,
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
 	new StdLoaderContext (Engine, region, curRegOnly, this, checkdupes));
 
-  return LoadMap (ldr_context, world_node);
+  return LoadMap (ldr_context, world_node, ssource);
 }
 
 //---------------------------------------------------------------------------
 
 bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
-	bool curRegOnly, bool checkDupes)
+	bool curRegOnly, bool checkDupes, iStreamSource* ssource)
 {
   csRef<iFile> buf = VFS->Open (fname, VFS_FILE_READ);
 
@@ -812,7 +813,7 @@ bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
         lib_node, "Expected 'library' token!");
       return false;
     }
-    return LoadLibrary (ldr_context, lib_node);
+    return LoadLibrary (ldr_context, lib_node, ssource);
   }
   else
   {
@@ -823,12 +824,12 @@ bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
 }
 
 bool csLoader::LoadLibrary (iDocumentNode* lib_node, iRegion* region,
-	bool curRegOnly, bool checkDupes)
+	bool curRegOnly, bool checkDupes, iStreamSource* ssource)
 {
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
 	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes));
 
-  return LoadLibrary (ldr_context, lib_node);
+  return LoadLibrary (ldr_context, lib_node, ssource);
 }
 
 //---------------------------------------------------------------------------
@@ -841,7 +842,8 @@ void csLoader::AddToRegion (iLoaderContext* ldr_context, iObject* obj)
 
 //---------------------------------------------------------------------------
 
-csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
+csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname,
+	iStreamSource* ssource)
 {
   if (!Engine) return 0;
 
@@ -873,7 +875,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
     }
     csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
       	meshfactnode->GetAttributeValue ("name"));
-    if (LoadMeshObjectFactory (ldr_context, t, 0, meshfactnode))
+    if (LoadMeshObjectFactory (ldr_context, t, 0, meshfactnode, 0, ssource))
     {
       AddToRegion (ldr_context, t->QueryObject ());
       return csPtr<iMeshFactoryWrapper> (t);
@@ -896,7 +898,8 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
 
 //---------------------------------------------------------------------------
 
-csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
+csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname,
+	iStreamSource* ssource)
 {
   if (!Engine) return 0;
 
@@ -928,7 +931,7 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
     }
     mesh = Engine->CreateMeshWrapper (
     	meshobjnode->GetAttributeValue ("name"));
-    if (LoadMeshObject (ldr_context, mesh, 0, meshobjnode))
+    if (LoadMeshObject (ldr_context, mesh, 0, meshobjnode, ssource))
     {
       AddToRegion (ldr_context, mesh->QueryObject ());
     }
@@ -1049,7 +1052,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
 //--- Parsing of Engine Objects ---------------------------------------------
 
-bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode)
+bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
+	iStreamSource* ssource)
 {
   if (!Engine)
   {
@@ -1084,11 +1088,11 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode)
 	  return false;
 	break;
       case XMLTOKEN_ADDON:
-	if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, false))
+	if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, false, ssource))
 	  return false;
       	break;
       case XMLTOKEN_META:
-	if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, true))
+	if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, true, ssource))
 	  return false;
       	break;
       case XMLTOKEN_MESHFACT:
@@ -1100,7 +1104,8 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode)
 	    if (t) break;
 	  }
           csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (name);
-	  if (!t || !LoadMeshObjectFactory (ldr_context, t, 0, child))
+	  if (!t || !LoadMeshObjectFactory (ldr_context, t, 0, child, 0,
+	  	ssource))
 	  {
 	    // Error is already reported.
 	    return false;
@@ -1117,7 +1122,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode)
 		worldnode, "<region> is no longer supported!");
 	break;
       case XMLTOKEN_SECTOR:
-        if (!ParseSector (ldr_context, child))
+        if (!ParseSector (ldr_context, child, ssource))
 	  return false;
         break;
       case XMLTOKEN_COLLECTION:
@@ -1154,7 +1159,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode)
         break;
       case XMLTOKEN_LIBRARY:
       {
-	if (!LoadLibraryFromNode (ldr_context, child))
+	if (!LoadLibraryFromNode (ldr_context, child, ssource))
 	  return false;
 	break;
       }
@@ -1204,7 +1209,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode)
 }
 
 bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
-	iDocumentNode* child)
+	iDocumentNode* child, iStreamSource* ssource)
 {
   csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
   const char* name = child->GetAttributeValue ("checkdupes");
@@ -1228,7 +1233,7 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
     }
     bool rc = LoadLibraryFile (file,
 	  	  ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
-		  dupes);
+		  dupes, ssource);
     if (path)
     {
       vfs->PopDir ();
@@ -1240,13 +1245,14 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
   {
     if (!LoadLibraryFile (child->GetContentsValue (),
 	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
-		ldr_context->CheckDupes ()))
+		ldr_context->CheckDupes (), ssource))
     return false;
   }
   return true;
 }
 
-bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode)
+bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode,
+	iStreamSource* ssource)
 {
   if (!Engine)
   {
@@ -1270,16 +1276,16 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode)
     {
       case XMLTOKEN_LIBRARY:
       {
-	if (!LoadLibraryFromNode (ldr_context, child))
+	if (!LoadLibraryFromNode (ldr_context, child, ssource))
 	  return false;
 	break;
       }
       case XMLTOKEN_ADDON:
-	if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, false))
+	if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, false, ssource))
 	  return false;
       	break;
       case XMLTOKEN_META:
-	if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, true))
+	if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, true, ssource))
 	  return false;
       	break;
       case XMLTOKEN_SEQUENCES:
@@ -1313,7 +1319,8 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode)
         break;
       case XMLTOKEN_MESHREF:
         {
-          iMeshWrapper* mesh = LoadMeshObjectFromFactory (ldr_context, child);
+          iMeshWrapper* mesh = LoadMeshObjectFromFactory (ldr_context, child,
+	  	ssource);
           if (!mesh)
 	  {
 	    // Error is already reported.
@@ -1328,7 +1335,7 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode)
         {
 	  csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
 			    child->GetAttributeValue ("name"));
-          if (!LoadMeshObject (ldr_context, mesh, 0, child))
+          if (!LoadMeshObject (ldr_context, mesh, 0, child, ssource))
 	  {
 	    // Error is already reported.
 	    return false;
@@ -1345,7 +1352,7 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode)
 	    child->GetAttributeValue ("name"));
 	  if (t)
 	  {
-	    if (!LoadMeshObjectFactory (ldr_context, t, 0, child))
+	    if (!LoadMeshObjectFactory (ldr_context, t, 0, child, 0, ssource))
 	    {
 	      // Error is already reported.
 	      return false;
@@ -1784,7 +1791,8 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
 
 bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	iMeshFactoryWrapper* stemp, iMeshFactoryWrapper* parent,
-	iDocumentNode* node, csReversibleTransform* transf)
+	iDocumentNode* node, csReversibleTransform* transf,
+	iStreamSource* ssource)
 {
   iLoaderPlugin* plug = 0;
   iBinaryLoaderPlugin* binplug = 0;
@@ -1846,11 +1854,11 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         }
         break;
       case XMLTOKEN_ADDON:
-	if (!LoadAddOn (ldr_context, child, stemp, false))
+	if (!LoadAddOn (ldr_context, child, stemp, false, ssource))
 	  return false;
       	break;
       case XMLTOKEN_META:
-	if (!LoadAddOn (ldr_context, child, stemp, true))
+	if (!LoadAddOn (ldr_context, child, stemp, true, ssource))
 	  return false;
       	break;
       case XMLTOKEN_LODLEVEL:
@@ -1932,7 +1940,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  // We give here the iMeshObjectFactory as the context. If this
 	  // is a new factory this will be 0. Otherwise it is possible
 	  // to append information to the already loaded factory.
-	  csRef<iBase> mof = plug->Parse (child, 0/*ssource*/, ldr_context,
+	  csRef<iBase> mof = plug->Parse (child, ssource, ldr_context,
 	  	stemp->GetMeshObjectFactory ());
 	  if (!mof)
 	  {
@@ -1982,13 +1990,13 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  if (plug)
 	    mof = LoadStructuredMap (ldr_context,
 	    	plug, buf, stemp->GetMeshObjectFactory (),
-	    	child->GetContentsValue ());
+	    	child->GetContentsValue (), ssource);
 	  else
 	  {
 	    csRef<iDataBuffer> dbuf = VFS->ReadFile (
 	    	child->GetContentsValue ());
 	    mof = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	0/*ssource*/, ldr_context, stemp->GetMeshObjectFactory ());
+	  	ssource, ldr_context, stemp->GetMeshObjectFactory ());
 	  }
 	  if (!mof)
 	  {
@@ -2194,7 +2202,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  	child->GetAttributeValue ("name"));
 	  csReversibleTransform child_transf;
           if (!LoadMeshObjectFactory (ldr_context, t, stemp, child,
-	  	&child_transf))
+	  	&child_transf, ssource))
 	  {
 	    // Error is already reported above.
 	    return false;
@@ -2343,7 +2351,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	csStringID id, bool& handled, char*& priority,
 	bool do_portal_container, bool& staticpos, bool& staticshape,
 	bool& zmodeChanged, bool& prioChanged,
-	bool recursive)
+	bool recursive, iStreamSource* ssource)
 {
 #undef TEST_MISSING_MESH
 #define TEST_MISSING_MESH \
@@ -2492,12 +2500,12 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_ADDON:
       TEST_MISSING_MESH
-      if (!LoadAddOn (ldr_context, child, mesh, false))
+      if (!LoadAddOn (ldr_context, child, mesh, false, ssource))
 	return false;
       break;
     case XMLTOKEN_META:
       TEST_MISSING_MESH
-      if (!LoadAddOn (ldr_context, child, mesh, true))
+      if (!LoadAddOn (ldr_context, child, mesh, true, ssource))
 	return false;
       break;
     case XMLTOKEN_NOLIGHTING:
@@ -2826,7 +2834,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 }
 
 iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
-	iDocumentNode* node)
+	iDocumentNode* node, iStreamSource* ssource)
 {
   if (!Engine) return 0;
 
@@ -2848,7 +2856,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
     bool handled;
     if (!HandleMeshParameter (ldr_context, mesh, 0, child, id,
     	handled, priority, false, staticpos, staticshape, zbufSet,
-	prioSet, true))
+	prioSet, true, ssource))
       goto error;
     if (!handled) switch (id)
     {
@@ -2920,7 +2928,7 @@ error:
 }
 
 bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
-	iMeshWrapper* mesh, iDocumentNode* node)
+	iMeshWrapper* mesh, iDocumentNode* node, iStreamSource* ssource)
 {
   iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
   csRef<iPolygonMesh> polymesh;
@@ -2938,11 +2946,11 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
     switch (id)
     {
       case XMLTOKEN_ADDON:
-        if (!LoadAddOn (ldr_context, child, mesh, false))
+        if (!LoadAddOn (ldr_context, child, mesh, false, ssource))
 	  return false;
         break;
       case XMLTOKEN_META:
-        if (!LoadAddOn (ldr_context, child, mesh, true))
+        if (!LoadAddOn (ldr_context, child, mesh, true, ssource))
 	  return false;
         break;
       case XMLTOKEN_MOVE:
@@ -3062,7 +3070,8 @@ bool csLoader::HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
 }
 
 bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
-	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* node)
+	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* node,
+	iStreamSource* ssource)
 {
   if (!Engine) return false;
 
@@ -3095,7 +3104,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     bool handled;
     if (!HandleMeshParameter (ldr_context, mesh, parent, child, id,
-      handled, priority, false, staticpos, staticshape, zbufSet, prioSet))
+        handled, priority, false, staticpos, staticshape, zbufSet, prioSet,
+        false, ssource))
       goto error;
     if (!handled) switch (id)
     {
@@ -3107,12 +3117,13 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	}
         break;
       case XMLTOKEN_PORTALS:
-        if (!ParsePortals (ldr_context, child, 0, mesh))
+        if (!ParsePortals (ldr_context, child, 0, mesh, ssource))
 	  return 0;
         break;
       case XMLTOKEN_MESHREF:
         {
-          iMeshWrapper* sp = LoadMeshObjectFromFactory (ldr_context, child);
+          iMeshWrapper* sp = LoadMeshObjectFromFactory (ldr_context, child,
+	  	ssource);
           if (!sp)
 	  {
 	    // Error is already reported.
@@ -3127,7 +3138,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
         {
 	  csRef<iMeshWrapper> sp = Engine->CreateMeshWrapper (
 			  child->GetAttributeValue ("name"));
-          if (!LoadMeshObject (ldr_context, sp, mesh, child))
+          if (!LoadMeshObject (ldr_context, sp, mesh, child, ssource))
 	  {
 	    // Error is already reported.
 	    goto error;
@@ -3206,7 +3217,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	}
 	else
 	{
-	  csRef<iBase> mo = plug->Parse (child, 0/*ssource*/, ldr_context,
+	  csRef<iBase> mo = plug->Parse (child, ssource, ldr_context,
 	  	mesh);
           if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh, zbufSet, 
 	    prioSet))
@@ -3253,12 +3264,12 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	    }
 	    csRef<iBase> mo;
 	    if (plug)
-	      mo = plug->Parse (paramsnode, 0/*ssource*/, ldr_context, mesh);
+	      mo = plug->Parse (paramsnode, ssource, ldr_context, mesh);
 	    else
 	    {
 	      csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
 	      mo = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	  0/*ssource*/, ldr_context, mesh);
+	  	  ssource, ldr_context, mesh);
 	    }
             if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
 	      zbufSet, prioSet))
@@ -3269,7 +3280,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  	"meshobj");
 	  if (meshobjnode)
 	  {
-	    if (!LoadMeshObject (ldr_context, mesh, parent, meshobjnode))
+	    if (!LoadMeshObject (ldr_context, mesh, parent, meshobjnode,
+	    	ssource))
 	      goto error;
 	    break;
 	  }
@@ -3285,7 +3297,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	    {
               t = Engine->CreateMeshFactory (meshfactname);
 	      if (!t || !LoadMeshObjectFactory (ldr_context, t, 0,
-	      	meshfactnode))
+	      	meshfactnode, 0, ssource))
 	      {
 	        // Error is already reported.
 	        goto error;
@@ -3333,12 +3345,13 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  }
 	  csRef<iBase> mo;
 	  if (plug)
-	    mo = LoadStructuredMap (ldr_context, plug, buf, mesh, fname);
+	    mo = LoadStructuredMap (ldr_context, plug, buf, mesh, fname,
+	    	ssource);
 	  else
 	  {
 	    csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
 	    mo = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	0/*ssource*/, ldr_context, mesh);
+	  	ssource, ldr_context, mesh);
 	  }
           if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
 	      zbufSet, prioSet))
@@ -3471,7 +3484,8 @@ bool csLoader::ParseImposterSettings (iMeshWrapper* mesh, iDocumentNode *node)
 }
 
 bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
-	iDocumentNode* node, iBase* context, bool is_meta)
+	iDocumentNode* node, iBase* context, bool is_meta,
+	iStreamSource* ssource)
 {
   iLoaderPlugin* plug = 0;
   iBinaryLoaderPlugin* binplug = 0;
@@ -3504,7 +3518,7 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	        "crystalspace.maploader.load.plugin",
                 node, "'defaults' section is ignored for addons!");
     }
-    csRef<iBase> rc = plug->Parse (node, 0/*ssource*/, ldr_context, context);
+    csRef<iBase> rc = plug->Parse (node, ssource, ldr_context, context);
     if (!rc) return false;
     return true;
   }
@@ -3531,7 +3545,7 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	  }
 	  else
 	  {
-	    csRef<iBase> rc = plug->Parse (child, 0/*ssource*/, ldr_context,
+	    csRef<iBase> rc = plug->Parse (child, ssource, ldr_context,
 	    	context);
 	    if (!rc) return false;
 	  }
@@ -3568,14 +3582,14 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	    if (plug)
 	    {
 	      csRef<iBase> ret (LoadStructuredMap (ldr_context,
-	    	  plug, buf, 0, fname));
+	    	  plug, buf, 0, fname, ssource));
 	      rc = (ret != 0);
 	    }
 	    else
 	    {
 	      csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
 	      csRef<iBase> ret = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	  0/*ssource*/, ldr_context, 0);
+	  	  ssource, ldr_context, 0);
 	      rc = (ret != 0);
 	    }
 	    if (!rc)
@@ -4649,7 +4663,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
 
 bool csLoader::ParsePortals (iLoaderContext* ldr_context,
 	iDocumentNode* node, iSector* sourceSector,
-	iMeshWrapper* parent)
+	iMeshWrapper* parent, iStreamSource* ssource)
 {
   const char* container_name = node->GetAttributeValue ("name");
   iMeshWrapper* container_mesh = 0;
@@ -4667,7 +4681,8 @@ bool csLoader::ParsePortals (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     bool handled;
     if (!HandleMeshParameter (ldr_context, container_mesh, parent, child, id,
-    	handled, priority, true, staticpos, staticshape, zbufSet, prioSet))
+    	handled, priority, true, staticpos, staticshape, zbufSet, prioSet,
+	false, ssource))
       goto error;
     if (!handled) switch (id)
     {
@@ -4698,7 +4713,7 @@ error:
 }
 
 iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
-	iDocumentNode* node)
+	iDocumentNode* node, iStreamSource* ssource)
 {
   const char* secname = node->GetAttributeValue ("name");
 
@@ -4756,11 +4771,11 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	}
 	break;
       case XMLTOKEN_ADDON:
-	if (!LoadAddOn (ldr_context, child, sector, false))
+	if (!LoadAddOn (ldr_context, child, sector, false, ssource))
 	  goto error;
       	break;
       case XMLTOKEN_META:
-	if (!LoadAddOn (ldr_context, child, sector, true))
+	if (!LoadAddOn (ldr_context, child, sector, true, ssource))
 	  goto error;
       	break;
       case XMLTOKEN_PORTAL:
@@ -4771,7 +4786,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	}
         break;
       case XMLTOKEN_PORTALS:
-        if (!ParsePortals (ldr_context, child, sector, 0))
+        if (!ParsePortals (ldr_context, child, sector, 0, ssource))
 	  goto error;
         break;
       case XMLTOKEN_CULLER:
@@ -4820,7 +4835,8 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 		secname ? secname : "<noname>");
 	    goto error;
 	  }
-          iMeshWrapper* mesh = LoadMeshObjectFromFactory (ldr_context, child);
+          iMeshWrapper* mesh = LoadMeshObjectFromFactory (ldr_context, child,
+	  	ssource);
           if (!mesh)
 	  {
 	    // Error is already reported.
@@ -4846,7 +4862,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	  }
 	  csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
 	  	"crystalspace.mesh.object.null", meshname);
-          if (!LoadPolyMeshInSector (ldr_context, mesh, child))
+          if (!LoadPolyMeshInSector (ldr_context, mesh, child, ssource))
 	  {
 	    // Error is already reported.
 	    goto error;
@@ -4871,7 +4887,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	    goto error;
 	  }
 	  csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (meshname);
-          if (!LoadMeshObject (ldr_context, mesh, 0, child))
+          if (!LoadMeshObject (ldr_context, mesh, 0, child, ssource))
 	  {
 	    // Error is already reported.
 	    goto error;
@@ -4905,7 +4921,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 		meshname, secname ? secname : "<noname>");
 	    goto error;
 	  }
-          if (!LoadMeshObject (ldr_context, mesh, 0, child))
+          if (!LoadMeshObject (ldr_context, mesh, 0, child, ssource))
 	  {
 	    // Error is already reported.
 	    goto error;

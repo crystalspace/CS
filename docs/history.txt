@@ -13,6 +13,10 @@ chronological order.
 	- Jorrit extended iLoaderPlugin, iBinaryLoaderPlugin, iSaverPlugin,
 	  and iBinarySaverPlugin with a parameter for the iStreamSource.
 	  None of the mesh loaders currently implement this.
+	- Jorrit extended various functions in iLoader with the possibility
+	  to give an iStreamSource as a parameter.
+	- Jorrit changed iStreamSource to use a callback system for getting
+	  the data. This allows for asynchronious reading.
 19-Sep-2005
 	- Eric Sunshine fixed compilation error in startme.cpp. (bug# 1294906)
 	- Adam Bradley added partialorder.h, a generic partial-order graph

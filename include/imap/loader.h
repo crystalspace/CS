@@ -29,6 +29,7 @@
 
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
+#include "imap/streamsource.h"
 
 struct iDocumentNode;
 struct iImage;
@@ -176,16 +177,25 @@ struct iLoader : public iBase
    * then objects (materials, factories, ...) will only be found in the
    * given region.
    * <p>
-   * If you use 'checkDupes' == true then materials, textures,
+   * \param filename is a VFS filename for the XML file.
+   * \param clearEngine is true by default which means that the previous
+   * contents of the engine is cleared (all objects/sectors/... are removed).
+   * \param region is 0 by default which means that all loaded objects are not
+   * added to any region. If you give a region here then all loaded objects
+   * will be added to that region.
+   * \param curRegOnly is true by default which means that it will only
+   * find materials/factories/... from current region if that is given.
+   * \param checkDupes if true then materials, textures,
    * and mesh factories will only be loaded if they don't already exist
    * in the entire engine (ignoring regions). By default this is false because
    * it is very legal for different world files to have different objects
    * with the same name. Only use checkDupes == true if you know that your
    * objects have unique names accross all world files.
+   * \param ssource is an optional stream source for faster loading.
    */
   virtual bool LoadMapFile (const char* filename, bool clearEngine = true,
 	iRegion* region = 0, bool curRegOnly = true,
-	bool checkDupes = false) = 0;
+	bool checkDupes = false, iStreamSource* ssource = 0) = 0;
 
   /**
    * Load a map from the given 'world' node. If 'clearEngine' is true then
@@ -197,33 +207,81 @@ struct iLoader : public iBase
    * then objects (materials, factories, ...) will only be found in the
    * given region.
    * <p>
-   * If you use 'checkDupes' == true then materials, textures,
+   * \param world_node is the 'world' node from an XML document.
+   * \param clearEngine is true by default which means that the previous
+   * contents of the engine is cleared (all objects/sectors/... are removed).
+   * \param region is 0 by default which means that all loaded objects are not
+   * added to any region. If you give a region here then all loaded objects
+   * will be added to that region.
+   * \param curRegOnly is true by default which means that it will only
+   * find materials/factories/... from current region if that is given.
+   * \param checkDupes if true then materials, textures,
    * and mesh factories will only be loaded if they don't already exist
    * in the entire engine (ignoring regions). By default this is false because
    * it is very legal for different world files to have different objects
    * with the same name. Only use checkDupes == true if you know that your
    * objects have unique names accross all world files.
+   * \param ssource is an optional stream source for faster loading.
    */
   virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine = true,
 	iRegion* region = 0, bool curRegOnly = true,
-	bool checkDupes = false) = 0;
+	bool checkDupes = false, iStreamSource* ssource = 0) = 0;
 
-  /// Load library from a VFS file
+  /**
+   * Load library from a VFS file
+   * \param filename is a VFS filename for the XML file.
+   * \param region is 0 by default which means that all loaded objects are not
+   * added to any region. If you give a region here then all loaded objects
+   * will be added to that region.
+   * \param curRegOnly is true by default which means that it will only
+   * find materials/factories/... from current region if that is given.
+   * \param checkDupes if true then materials, textures,
+   * and mesh factories will only be loaded if they don't already exist
+   * in the entire engine (ignoring regions). By default this is false because
+   * it is very legal for different world files to have different objects
+   * with the same name. Only use checkDupes == true if you know that your
+   * objects have unique names accross all world files.
+   * \param ssource is an optional stream source for faster loading.
+   */
   virtual bool LoadLibraryFile (const char* filename, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false) = 0;
+  	bool curRegOnly = true, bool checkDupes = false,
+	iStreamSource* ssource = 0) = 0;
 
-  /// Load library from a 'library' node.
+  /**
+   * Load library from a 'library' node.
+   * \param lib_node is the 'library' node from an XML document.
+   * \param region is 0 by default which means that all loaded objects are not
+   * added to any region. If you give a region here then all loaded objects
+   * will be added to that region.
+   * \param curRegOnly is true by default which means that it will only
+   * find materials/factories/... from current region if that is given.
+   * \param checkDupes if true then materials, textures,
+   * and mesh factories will only be loaded if they don't already exist
+   * in the entire engine (ignoring regions). By default this is false because
+   * it is very legal for different world files to have different objects
+   * with the same name. Only use checkDupes == true if you know that your
+   * objects have unique names accross all world files.
+   * \param ssource is an optional stream source for faster loading.
+   */
   virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false) = 0;
+  	bool curRegOnly = true, bool checkDupes = false,
+	iStreamSource* ssource) = 0;
 
-  /// Load a Mesh Object Factory from the map file.
+  /**
+   * Load a Mesh Object Factory from a file.
+   * \param fname is the VFS name of the file.
+   * \param ssource is an optional stream source for faster loading.
+   */
   virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (
-  	const char* fname) = 0;
+  	const char* fname, iStreamSource* ssource = 0) = 0;
   /**
    * Load a mesh object from a file.
    * The mesh object is not automatically added to any sector.
+   * \param fname is the VFS name of the file.
+   * \param ssource is an optional stream source for faster loading.
    */
-  virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname) = 0;
+  virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname,
+  	iStreamSource* ssource = 0) = 0;
 
   /**
    * Load a file. This is a smart function that will try to recognize
@@ -246,9 +304,24 @@ struct iLoader : public iBase
    * still return true in that case and set 'result' to the correct object.
    * <br>
    * Note! Use SCF_QUERY_INTERFACE on 'result' to detect what type was loaded.
+   * \param fname is a VFS filename for the XML file.
+   * \param result will be set to the loaded result (see above).
+   * \param region is 0 by default which means that all loaded objects are not
+   * added to any region. If you give a region here then all loaded objects
+   * will be added to that region.
+   * \param curRegOnly is true by default which means that it will only
+   * find materials/factories/... from current region if that is given.
+   * \param checkDupes if true then materials, textures,
+   * and mesh factories will only be loaded if they don't already exist
+   * in the entire engine (ignoring regions). By default this is false because
+   * it is very legal for different world files to have different objects
+   * with the same name. Only use checkDupes == true if you know that your
+   * objects have unique names accross all world files.
+   * \param ssource is an optional stream source for faster loading.
    */
   virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false) = 0;
+  	bool curRegOnly = true, bool checkDupes = false,
+	iStreamSource* ssource = 0) = 0;
 
   /**
    * Load a node. This is a smart function that will try to recognize
@@ -271,9 +344,24 @@ struct iLoader : public iBase
    * still return true in that case and set 'result' to the correct object.
    * <br>
    * Note! Use SCF_QUERY_INTERFACE on 'result' to detect what type was loaded.
+   * \param node is the node from which to read.
+   * \param result will be set to the loaded result (see above).
+   * \param region is 0 by default which means that all loaded objects are not
+   * added to any region. If you give a region here then all loaded objects
+   * will be added to that region.
+   * \param curRegOnly is true by default which means that it will only
+   * find materials/factories/... from current region if that is given.
+   * \param checkDupes if true then materials, textures,
+   * and mesh factories will only be loaded if they don't already exist
+   * in the entire engine (ignoring regions). By default this is false because
+   * it is very legal for different world files to have different objects
+   * with the same name. Only use checkDupes == true if you know that your
+   * objects have unique names accross all world files.
+   * \param ssource is an optional stream source for faster loading.
    */
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region = 0,
-  	bool curRegOnly = true, bool checkDupes = false) = 0;
+  	bool curRegOnly = true, bool checkDupes = false,
+	iStreamSource* ssource = 0) = 0;
 };
 
 /** @} */

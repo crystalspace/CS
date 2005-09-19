@@ -28,6 +28,19 @@
  * @{ */
 
 /**
+ * This callback will be fired when the data is ready.
+ */
+struct iStreamDataCallback : public virtual iBase
+{
+  SCF_INTERFACE (iStreamDataCallback, 0, 0, 1);
+
+  /**
+   * The buffer is ready. The buffer will be endian correct for this system.
+   */
+  virtual void DataReady (iDataBuffer* data) = 0;
+};
+
+/**
  * This interface represents a stream source. This can be implemented
  * by the application to implement faster loading of data. Basically the
  * idea is to have some kind of 'id' that represents a buffer for a mesh.
@@ -39,12 +52,14 @@ struct iStreamSource : public virtual iBase
   SCF_INTERFACE (iStreamSource, 0, 0, 1);
 
   /**
-   * Load a buffer given an id. Returns 0 if the buffer couldn't be loaded
-   * for some reason. The error should be reported on the reporter by this
-   * function. This function should make sure the buffer is endian
-   * correct for the current system.
+   * Load a buffer given an id. This will fire the callback as soon as
+   * the buffer is ready. Note that some implementations that don't support
+   * asynchronious loading may call the callback immediatelly from within
+   * this function.
+   * \return false if we can't find the buffer (early error). The error
+   * should be placed on the reporter.
    */
-  virtual csPtr<iDataBuffer> LoadBuffer (const char* id) = 0;
+  virtual bool QueryBuffer (const char* id, iStreamDataCallback* callback) = 0;
 
   /**
    * Save a buffer with some id. Returns false if the buffer couldn't be

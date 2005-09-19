@@ -336,9 +336,10 @@ private:
   /// Parse a portals definition.
   bool ParsePortals (iLoaderContext* ldr_context,
 	iDocumentNode* node, iSector* sourceSector,
-	iMeshWrapper* parent);
+	iMeshWrapper* parent, iStreamSource* ssource);
   /// Parse a sector definition and add the sector to the engine
-  iSector* ParseSector (iLoaderContext* ldr_context, iDocumentNode* node);
+  iSector* ParseSector (iLoaderContext* ldr_context, iDocumentNode* node,
+  	iStreamSource* ssource);
   /// Find the named shared variable and verify its type if specified
   iSharedVariable *FindSharedVariable(const char *colvar,
 				      int verify_type );
@@ -377,7 +378,8 @@ private:
   bool LoadMeshObjectFactory (
   	iLoaderContext* ldr_context, iMeshFactoryWrapper* meshFact,
 	iMeshFactoryWrapper* parent,
-  	iDocumentNode* node, csReversibleTransform* transf = 0);
+  	iDocumentNode* node, csReversibleTransform* transf = 0,
+	iStreamSource* ssource = 0);
 
   /**
    * Handle various common mesh object parameters.
@@ -387,19 +389,20 @@ private:
 	csStringID id, bool& handled, char*& priority,
 	bool do_portal_container, bool& staticpos, bool& staticshape,
 	bool& zmodeChanged, bool& prioChanged,
-	bool recursive = false);
+	bool recursive, iStreamSource* ssource);
   /**
    * Load the mesh object from the map file.
    * The parent is not 0 if this mesh is going to be part of a hierarchical
    * mesh.
    */
   bool LoadMeshObject (iLoaderContext* ldr_context,
-  	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* node);
+  	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* node,
+	iStreamSource* ssource);
   /**
    * Load the polymesh object from the map file.
    */
   bool LoadPolyMeshInSector (iLoaderContext* ldr_context,
-  	iMeshWrapper* mesh, iDocumentNode* node);
+  	iMeshWrapper* mesh, iDocumentNode* node, iStreamSource* ssource);
 
   /**
    * Load the mesh object from the map file.
@@ -407,13 +410,14 @@ private:
    * a mesh from a factory.
    */
   iMeshWrapper* LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
-  	iDocumentNode* node);
+  	iDocumentNode* node, iStreamSource* ssource);
 
   /**
    * Load a plugin in general.
    */
   bool LoadAddOn (iLoaderContext* ldr_context,
-  	iDocumentNode* node, iBase* context, bool is_meta);
+  	iDocumentNode* node, iBase* context, bool is_meta,
+	iStreamSource* ssource);
 
   /**
    * Load the render priority section.
@@ -443,10 +447,12 @@ private:
    * A library is just a map file that contains just mesh factories,
    * thing templates, sounds and textures.
    */
-  bool LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node);
+  bool LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node,
+  	iStreamSource* ssource);
 
   /// Load map from a memory buffer
-  bool LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node);
+  bool LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
+  	iStreamSource* ssource);
 
   /// Get the engine sequence manager (load it if not already present).
   iEngineSequenceManager* GetEngineSequenceManager ();
@@ -467,7 +473,7 @@ private:
    */
   csPtr<iBase> LoadStructuredMap (iLoaderContext* ldr_context,
   	iLoaderPlugin* plug, iFile* buf,
-  	iBase* context, const char* fname);
+  	iBase* context, const char* fname, iStreamSource* ssource);
 
   /**
    * Handle the result of a mesh object plugin loader.
@@ -563,23 +569,30 @@ public:
   virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
 	iRegion* region, bool curRegOnly, bool checkDupes);
   virtual bool LoadMapFile (const char* filename, bool clearEngine,
-	iRegion* region, bool curRegOnly, bool checkDupes);
+	iRegion* region, bool curRegOnly, bool checkDupes,
+	iStreamSource* ssource);
   virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine,
-	iRegion* region, bool curRegOnly, bool checkDupes);
+	iRegion* region, bool curRegOnly, bool checkDupes,
+	iStreamSource* ssource);
   virtual bool LoadLibraryFile (const char* filename, iRegion* region,
-  	bool curRegOnly, bool checkDupes);
+  	bool curRegOnly, bool checkDupes,
+	iStreamSource* ssource);
   virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region,
-  	bool curRegOnly, bool checkDupes);
+  	bool curRegOnly, bool checkDupes,
+	iStreamSource* ssource);
   bool LoadLibraryFromNode (iLoaderContext* ldr_context,
-	iDocumentNode* child);
+	iDocumentNode* child,
+	iStreamSource* ssource);
 
   virtual bool Load (const char* fname, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes);
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource);
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes);
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource);
 
-  virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname);
-  virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname);
+  virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname,
+  	iStreamSource* ssource);
+  virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname,
+  	iStreamSource* ssource);
 
   struct eiComponent : public iComponent
   {
