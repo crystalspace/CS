@@ -54,9 +54,9 @@ void StartMe::ProcessFrame ()
   {
     star_ticks -= STAR_NEWSTAR_TIMEOUT;
     csVector3 sv = star_v;
-    star_v.x += (float (float (rand ()) / float (RAND_MAX)) - .5f) / 4.0f;
-    star_v.y += (float (float (rand ()) / float (RAND_MAX)) - .5f) / 4.0f;
-    star_v.z += (float (float (rand ()) / float (RAND_MAX)) - .5f) / 4.0f;
+    star_v.x += ((float)rand() / (float)RAND_MAX - 0.5f) / 4.0f;
+    star_v.y += ((float)rand() / (float)RAND_MAX - 0.5f) / 4.0f;
+    star_v.z += ((float)rand() / (float)RAND_MAX - 0.5f) / 4.0f;
     int max = STAR_COUNT;
     while (stars[cur_star].inqueue)
     {
