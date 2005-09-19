@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- sndsyscoreaudio.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sndsys.software.driver.coreaudio</name>
+        <implementation>SndSysDriverCoreAudio</implementation>
+        <description>Sound System Core Audio Software Driver (OS X)</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+

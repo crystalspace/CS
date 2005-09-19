@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- sndsyssoft.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sndsys.renderer.software</name>
+        <implementation>SndSysRendererSoftware</implementation>
+        <description>Sound System Software Renderer</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+
