@@ -8,6 +8,9 @@ chronological order.
 
 19-Sep-2005
 	- Eric Sunshine fixed compilation error in startme.cpp. (bug# 1294906)
+	- Adam Bradley added partialorder.h, a generic partial-order graph
+	  implementation.  This will be used by the new event scheduler.
+	- Adam Bradley re-introduced tree.h.
 18-Sep-2005
 	- res tweaked "lightmap" & "lookup" texture classes to not do mip 
 	  sharpening.
