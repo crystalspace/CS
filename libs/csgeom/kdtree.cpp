@@ -236,7 +236,7 @@ void csKDTree::DumpNode ()
       {
         csRef<iString> d = descriptor->DescribeObject (objects[i]);
         if (d)
-          csPrintfErr ("    %d: %s\n", i, d->GetData ());
+          csPrintfErr ("    %zd: %s\n", i, d->GetData ());
       }
   }
 }
