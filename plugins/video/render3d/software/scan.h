@@ -22,13 +22,17 @@
 #include "csutil/scf.h"
 #include "csgfx/rgbpixel.h"
 
+struct csPolyTextureMapping;
+  
+namespace cspluginSoft3d
+{
+
 //---//---//---//---//---//---//---//---//---//---/ Forward declarations //---//
 
 class csSoftwareTexture;
 class csSoftwareTextureHandle;
 class csSoftwareGraphics3DCommon;
 class csSoftRendererLightmap;
-struct csPolyTextureMapping;
 
 //---//---//---//---//---//---//---//---//---//---//---//---// Constants //---//
 
@@ -528,5 +532,7 @@ csDrawScanline csScan_32_mmx_scan_tex_zfil;
 #endif
 
 } // extern "C"
+
+} // namespace cspluginSoft3d
 
 #endif // __CS_SCAN_H__

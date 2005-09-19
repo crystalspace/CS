@@ -60,6 +60,9 @@
 #  include "plugins/video/render3d/software/i386/cpuid.h"
 #endif
 
+namespace cspluginSoft3d
+{
+
 int csSoftwareGraphics3DCommon::filter_bf = 1;
 
 #include "scanindex.h"
@@ -4273,7 +4276,7 @@ class TriangleDrawer
     persp->SetLength (num_vertices);
     const int width2 = g3d.width2;
     const int height2 = g3d.height2;
-    const int aspect = g3d.aspect;
+    const float aspect = g3d.aspect;
     csRenderBufferLock<csVector3, iRenderBuffer*> work_verts 
       (activebuffers[VATTR_SPEC(POSITION)], CS_BUF_LOCK_READ);
     // Perspective project.
@@ -4370,8 +4373,7 @@ public:
     activebuffers(activebuffers), mesh(mesh), 
     bclipperZNear(clipZNear)
   {
-    const size_t bufNum = csMin (
-      csSoftwareGraphics3DCommon::activeBufferCount, clipMaxBuffers);
+    const size_t bufNum = csMin (activeBufferCount, clipMaxBuffers);
 
     buffersMask = 0;
     for (size_t b = 0; b < bufNum; b++)
@@ -4400,8 +4402,7 @@ public:
 
   ~TriangleDrawer()
   {
-    const size_t bufNum = csMin (
-      csSoftwareGraphics3DCommon::activeBufferCount, clipMaxBuffers);
+    const size_t bufNum = csMin (activeBufferCount, clipMaxBuffers);
 
     for (size_t b = 0; b < bufNum; b++)
     {
@@ -4462,9 +4463,6 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
   csReversibleTransform object2camera = w2c / mesh->object2world;
 
-  //do_lighting = false;
-  bool lazyclip = false;
-
   //z_buf_mode = CS_ZBUF_USE;
   z_buf_mode = modes.z_buf_mode;
   polyrast.SetZBufMode (z_buf_mode);
@@ -4516,10 +4514,6 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   {
     TriangleDrawer triDraw (*this, activebuffers, 
       rangeStart, rangeEnd, mesh, modes);
-
-    //see if we need triangulation of strips/fans
-    uint32 *workIndices = 0;
-    bool deleteIndices = false;
 
     uint indexstart = mesh->indexstart;
     uint indexend = mesh->indexend;
@@ -4586,3 +4580,5 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     }
   }
 }
+
+} // namespace cspluginSoft3d

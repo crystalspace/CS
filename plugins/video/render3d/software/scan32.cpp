@@ -22,6 +22,9 @@
 
 #include "sttest.h"
 
+namespace cspluginSoft3d
+{
+
 #define SCAN32
 #define COLORMAP	((uint32 *)Scan.PaletteTable)
 
@@ -1355,3 +1358,5 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #endif // NO_scan_pi_tex_goufxkey_ztest
 
 //------------------------------------------------------------------
+
+} // namespace cspluginSoft3d

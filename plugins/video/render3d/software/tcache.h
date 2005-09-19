@@ -23,13 +23,17 @@
 #include "csutil/scf.h"
 #include "soft_txt.h"
 
+struct csPixelFormat;
+struct iTextureHandle;
+struct iRendererLightmap;
+  
+namespace cspluginSoft3d
+{
+
 class csSoftwareGraphics3DCommon;
 class csSoftwareTextureManager;
 class csSoftwareTextureHandle;
 class csSoftRendererLightmap;
-struct csPixelFormat;
-struct iTextureHandle;
-struct iRendererLightmap;
 
 /// The default texture cache size.
 #define DEFAULT_CACHE_SIZE	8*1024*1024
@@ -233,5 +237,7 @@ public:
    */
   void dump (csSoftwareGraphics3DCommon *iG3D);
 };
+
+} // namespace cspluginSoft3d
 
 #endif // __CS_TCACHE_H__

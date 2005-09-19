@@ -33,6 +33,9 @@
 #include "csgfx/xorpat.h"
 #include "soft_g3d.h"
 
+namespace cspluginSoft3d
+{
+
 //----------------------------------------------- csSoftwareTextureHandle ---//
 
 csSoftwareTextureHandle::csSoftwareTextureHandle (
@@ -626,3 +629,5 @@ void csSoftwareTextureManager::GetLightmapRendererCoords (
   lm_u1 = lm_x1;
   lm_v1 =*/ lm_u2 = lm_v2 = 0.0f;
 }
+
+} // namespace cspluginSoft3d

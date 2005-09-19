@@ -29,7 +29,7 @@ class ClipMeatZNear
 {
   int width2;
   int height2;
-  int aspect;
+  float aspect;
   const csVector3* persp;
 
   CS_FORCEINLINE void Project (csVector3& v, const float com_iz)

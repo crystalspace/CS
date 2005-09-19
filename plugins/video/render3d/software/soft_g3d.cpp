@@ -31,6 +31,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+namespace cspluginSoft3d
+{
+
 SCF_IMPLEMENT_FACTORY (csSoftwareGraphics3D)
 
 
@@ -170,3 +173,5 @@ bool csSoftwareGraphics3D::eiSoftConfig::GetOptionDescription
   *option = config_options[idx];
   return true;
 }
+
+} // namespace cspluginSoft3d

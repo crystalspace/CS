@@ -30,6 +30,9 @@
 #include "tcache.h"
 #include "sttest.h"
 
+namespace cspluginSoft3d
+{
+
 /// The only instance of this structure lives here
 csScanSetup Scan;
 
@@ -243,3 +246,4 @@ void csScan_InitDrawFX (csSoftwareTextureHandle* texture,
   Scan.AlphaMap = untxt->get_alphamap ();
 }
 
+} // namespace cspluginSoft3d

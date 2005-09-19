@@ -58,6 +58,9 @@ struct csTriangle;
 // Maximum size of a single lightmap, in pixels
 #define MAX_LIGHTMAP_SIZE	1500000
 
+namespace cspluginSoft3d
+{
+
 /// This structure is used to hold references to all current fog objects.
 /*struct FogBuffer
 {
@@ -333,16 +336,22 @@ public:
   csVector3* v_cam2tex;
 };
 
+} // namespace cspluginSoft3d
+
 // @@@ Needs G3DPolygonDPFX
 #include "polyrast.h"
 
-using namespace cspluginSoft3d;
+namespace cspluginSoft3d
+{
 
 #define VATTR_SPEC(x)           (CS_VATTRIB_ ## x - CS_VATTRIB_SPECIFIC_FIRST)
 #define VATTR_GEN(x)							      \
   ((CS_VATTRIB_ ## x - CS_VATTRIB_GENERIC_FIRST) + CS_VATTRIB_SPECIFIC_LAST + 1)
 
 class TriangleDrawer;
+
+static const size_t activeBufferCount = CS_VATTRIB_SPECIFIC_LAST - 
+  CS_VATTRIB_SPECIFIC_FIRST + 1;
 
 /**
  * The basic software renderer class.
@@ -518,8 +527,6 @@ protected:
 
   csRef<iShaderManager> shadermgr;
 
-  static const size_t activeBufferCount = CS_VATTRIB_SPECIFIC_LAST - 
-    CS_VATTRIB_SPECIFIC_FIRST + 1;
   iRenderBuffer* activebuffers[activeBufferCount];
   iTextureHandle* activeTex;
   csRef<iRenderBuffer> translatedVerts;
@@ -1030,5 +1037,7 @@ public:
     }
   } * scfiEventHandler;
 };
+
+} // namespace cspluginSoft3d
 
 #endif // __CS_SFTR3DCOM_H__

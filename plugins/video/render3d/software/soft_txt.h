@@ -28,6 +28,9 @@
 #include "igraphic/image.h"
 #include "ivideo/graph2d.h"
 
+namespace cspluginSoft3d
+{
+
 class csSoftwareGraphics3DCommon;
 class csSoftwareTextureManager;
 class csSoftwareTextureHandle;
@@ -345,5 +348,7 @@ public:
     int lm_x1, int lm_y1, int lm_x2, int lm_y2,
     float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2);
 };
+
+} // namespace cspluginSoft3d
 
 #endif // __CS_SOFT_TXT_H__

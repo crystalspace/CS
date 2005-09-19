@@ -20,6 +20,9 @@
 #include "sft3dcom.h"
 #include "soft_txt.h"
 
+namespace cspluginSoft3d
+{
+
 #define DP_NAME DrawPixmap16_555
 #define DP_PIXTYPE uint16
 #define DP_PIXFORM_R5G5B5
@@ -50,3 +53,4 @@ void csSoftwareGraphics3DCommon::DrawPixmap (iTextureHandle *hTex,
     DrawPixmap32 (G2D, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
 }
 
+} // namespace cspluginSoft3d

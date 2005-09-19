@@ -212,7 +212,7 @@ public:
   {
     this->buffers = buffers;
     this->buffersMask = buffersMask;
-    for (int i = 0; i < clipMaxBuffers; i++)
+    for (size_t i = 0; i < clipMaxBuffers; i++)
     {
       if (!(buffersMask & (1 << i))) continue;
       SetupVOut (i, buffers[i]);
@@ -221,7 +221,7 @@ public:
 
   size_t DoClip (const csTriangle& tri)
   {
-    for (int i = 0; i < clipMaxBuffers; i++)
+    for (size_t i = 0; i < clipMaxBuffers; i++)
     {
       if (!(buffersMask & (1 << i))) continue;
       vout[i].Reset();

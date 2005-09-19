@@ -25,6 +25,9 @@
 #include "iutil/pluginconfig.h"
 #include "sft3dcom.h"
 
+namespace cspluginSoft3d
+{
+
 /// Software 3D renderer
 class csSoftwareGraphics3D : public csSoftwareGraphics3DCommon
 {
@@ -48,5 +51,7 @@ public:
   } scfiPluginConfig;
   friend struct eiSoftConfig;
 };
+
+} // namespace cspluginSoft3d
 
 #endif // __CS_SOFT_RENDER3D_H__

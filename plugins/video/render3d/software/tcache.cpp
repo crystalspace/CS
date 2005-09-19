@@ -27,6 +27,8 @@
 #include "tcache.h"
 #include "soft_txt.h"
 
+namespace cspluginSoft3d
+{
 
 static int hash_table [384];
 
@@ -310,3 +312,5 @@ void csSoftwareTextureCache::dump (csSoftwareGraphics3DCommon *iG3D)
   int mean = (total_textures == 0) ? 0 : total_size / total_textures;
   iG3D->Report (CS_REPORTER_SEVERITY_NOTIFY, "Bytes per texture: %d", mean);
 }
+
+} // namespace cspluginSoft3d
