@@ -265,7 +265,7 @@ struct iLoader : public iBase
    */
   virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false,
-	iStreamSource* ssource) = 0;
+	iStreamSource* ssource = 0) = 0;
 
   /**
    * Load a Mesh Object Factory from a file.
