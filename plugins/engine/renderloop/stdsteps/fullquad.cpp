@@ -66,6 +66,7 @@ csFullScreenQuadRSLoader::csFullScreenQuadRSLoader (iBase* p)
 }
 
 csPtr<iBase> csFullScreenQuadRSLoader::Parse (iDocumentNode* node, 
+				       iStreamSource*,
 				       iLoaderContext* ldr_context,      
 				       iBase* context)
 {

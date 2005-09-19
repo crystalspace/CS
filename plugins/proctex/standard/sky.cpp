@@ -81,7 +81,7 @@ csPtSkyLoader::csPtSkyLoader(iBase *p) : csBaseProctexLoader(p)
 }
 
 csPtr<iBase> csPtSkyLoader::Parse (iDocumentNode* node, 
-				    iLoaderContext* ldr_context,
+				    iStreamSource*, iLoaderContext* ldr_context,
   				    iBase* context)
 {
   /*
@@ -137,7 +137,8 @@ csPtSkySaver::csPtSkySaver (iBase* p) : csBaseProctexSaver(p)
 {
 }
 
-bool csPtSkySaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csPtSkySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   return true;
 }

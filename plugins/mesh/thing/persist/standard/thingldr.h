@@ -141,7 +141,7 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
   {
@@ -165,7 +165,7 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 };
 
 /**
@@ -189,7 +189,8 @@ public:
   bool Initialize (iObjectRegistry* p);
 
   /// Write down given object and add to iDocumentNode.
-  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
+  	iStreamSource*);
   virtual bool WriteFactory (iBase *obj, iDocumentNode* parent);
 
   struct eiComponent : public iComponent
@@ -213,7 +214,8 @@ public:
   virtual ~csThingFactorySaver () {}
 
   /// Write down given factory and add to iDocumentNode.
-  virtual bool WriteDown (iBase *obj, iDocumentNode* parent)
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
+  	iStreamSource*)
   {
     csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     paramsNode->SetValue("params");

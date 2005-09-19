@@ -122,7 +122,7 @@ bool csProtoFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csProtoFactoryLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase* /* context */)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
 {
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
   	iPluginManager);
@@ -245,7 +245,8 @@ bool csProtoFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csProtoFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csProtoFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   
@@ -329,7 +330,7 @@ bool csProtoMeshLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase*)
+	iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iProtoMeshState> meshstate;
@@ -428,7 +429,8 @@ bool csProtoMeshSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csProtoMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csProtoMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   

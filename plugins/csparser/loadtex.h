@@ -79,7 +79,8 @@ public:
 
   virtual bool Initialize(iObjectRegistry *object_reg);
 
-  virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
+  	iStreamSource*, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 };  
 
@@ -89,7 +90,8 @@ class csImageTextureLoader : public csBaseTextureLoader
 public:
   csImageTextureLoader (iBase *p);
 
-  virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
+  	iStreamSource*, iLoaderContext* ldr_context,
   	iBase* context);
 };
 
@@ -99,7 +101,8 @@ class csCheckerTextureLoader : public csBaseTextureLoader
 public:
   csCheckerTextureLoader (iBase *p);
 
-  virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
+  	iStreamSource*, iLoaderContext* ldr_context,
   	iBase* context);
 };
 
@@ -113,8 +116,9 @@ class csCubemapTextureLoader : public csBaseTextureLoader
 public:
   csCubemapTextureLoader (iBase *p);
 
-  virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
-    iBase* context);
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
+  	iStreamSource*, iLoaderContext* ldr_context,
+    	iBase* context);
 };
 
 /// 3D texture loader pseudo-plugin
@@ -127,8 +131,9 @@ class csTexture3DLoader : public csBaseTextureLoader
 public:
   csTexture3DLoader (iBase *p);
 
-  virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
-    iBase* context);
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
+  	iStreamSource*, iLoaderContext* ldr_context,
+	iBase* context);
 };
 
 #endif

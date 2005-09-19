@@ -596,7 +596,7 @@ csPtr<iBase> csLoader::LoadStructuredMap (iLoaderContext* ldr_context,
       }
       else
       {
-        ret = plug->Parse (paramsnode, ldr_context, context);
+        ret = plug->Parse (paramsnode, 0/**ssource*/, ldr_context, context);
       }
     }
     else
@@ -1932,8 +1932,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  // We give here the iMeshObjectFactory as the context. If this
 	  // is a new factory this will be 0. Otherwise it is possible
 	  // to append information to the already loaded factory.
-	  csRef<iBase> mof (plug->Parse (child, ldr_context,
-	  	stemp->GetMeshObjectFactory ()));
+	  csRef<iBase> mof = plug->Parse (child, 0/*ssource*/, ldr_context,
+	  	stemp->GetMeshObjectFactory ());
 	  if (!mof)
 	  {
 	    // Error is reported by plug->Parse().
@@ -1988,7 +1988,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	    csRef<iDataBuffer> dbuf = VFS->ReadFile (
 	    	child->GetContentsValue ());
 	    mof = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	ldr_context, stemp->GetMeshObjectFactory ());
+	  	0/*ssource*/, ldr_context, stemp->GetMeshObjectFactory ());
 	  }
 	  if (!mof)
 	  {
@@ -3206,7 +3206,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	}
 	else
 	{
-	  csRef<iBase> mo = plug->Parse (child, ldr_context, mesh);
+	  csRef<iBase> mo = plug->Parse (child, 0/*ssource*/, ldr_context,
+	  	mesh);
           if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh, zbufSet, 
 	    prioSet))
 	    goto error;	// Error already reported.
@@ -3252,12 +3253,12 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	    }
 	    csRef<iBase> mo;
 	    if (plug)
-	      mo = plug->Parse (paramsnode, ldr_context, mesh);
+	      mo = plug->Parse (paramsnode, 0/*ssource*/, ldr_context, mesh);
 	    else
 	    {
 	      csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
 	      mo = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	  ldr_context, mesh);
+	  	  0/*ssource*/, ldr_context, mesh);
 	    }
             if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
 	      zbufSet, prioSet))
@@ -3337,7 +3338,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  {
 	    csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
 	    mo = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	ldr_context, mesh);
+	  	0/*ssource*/, ldr_context, mesh);
 	  }
           if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
 	      zbufSet, prioSet))
@@ -3503,7 +3504,7 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	        "crystalspace.maploader.load.plugin",
                 node, "'defaults' section is ignored for addons!");
     }
-    csRef<iBase> rc = plug->Parse (node, ldr_context, context);
+    csRef<iBase> rc = plug->Parse (node, 0/*ssource*/, ldr_context, context);
     if (!rc) return false;
     return true;
   }
@@ -3530,7 +3531,8 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	  }
 	  else
 	  {
-	    csRef<iBase> rc = plug->Parse (child, ldr_context, context);
+	    csRef<iBase> rc = plug->Parse (child, 0/*ssource*/, ldr_context,
+	    	context);
 	    if (!rc) return false;
 	  }
           break;
@@ -3573,7 +3575,7 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	    {
 	      csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
 	      csRef<iBase> ret = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	  	  ldr_context, 0);
+	  	  0/*ssource*/, ldr_context, 0);
 	      rc = (ret != 0);
 	    }
 	    if (!rc)

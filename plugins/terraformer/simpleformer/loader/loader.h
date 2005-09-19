@@ -40,7 +40,7 @@ public:
   bool Initialize (iObjectRegistry*);
 
   virtual csPtr<iBase> Parse (iDocumentNode *node,
-    iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
   {

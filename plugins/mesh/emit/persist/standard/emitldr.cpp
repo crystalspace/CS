@@ -136,7 +136,7 @@ bool csEmitFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
-	iLoaderContext*, iBase* /* context */)
+	iStreamSource*, iLoaderContext*, iBase* /* context */)
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
 		iPluginManager));
@@ -176,7 +176,8 @@ bool csEmitFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-bool csEmitFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent)
+bool csEmitFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
+	iStreamSource*)
 {
   //Nothing gets parsed in the loader, so nothing gets saved here!
   csRef<iDocumentNode> paramsNode =
@@ -397,7 +398,8 @@ csRef<iEmitGen3D> csEmitLoader::ParseEmit (iDocumentNode* node,
 }
 
 csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
-			    iLoaderContext* ldr_context, iBase*)
+			    iStreamSource*, iLoaderContext* ldr_context,
+			    iBase*)
 {
   csRef<iEmitGen3D> emit;
   csRef<iMeshObject> mesh;
@@ -619,7 +621,8 @@ bool csEmitSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent || !obj) return false; //you never know...
   

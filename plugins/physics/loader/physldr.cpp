@@ -147,7 +147,7 @@ bool csPhysicsLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csPhysicsLoader::Parse (iDocumentNode* node,
-		iLoaderContext* /*ldr_context*/,
+		iStreamSource*, iLoaderContext* /*ldr_context*/,
 		iBase* /*context*/)
 {
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);

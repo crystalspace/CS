@@ -316,7 +316,7 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       if (!saver) 
 	saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
       if (saver)
-	saver->WriteDown(proctex, child);
+	saver->WriteDown(proctex, child, 0/**ssource*/);
 
       synldr->WriteBool (child, "alwaysanimate", proctex->GetAlwaysAnimate (), false);
     }
@@ -675,7 +675,7 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
     if (!saver) 
       saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
     if (saver) 
-      saver->WriteDown(meshfact, factNode);
+      saver->WriteDown(meshfact, factNode, 0/**ssource*/);
 
     //Save some factory params...
     if (!SaveKeys (factNode, meshfactwrap->QueryObject ())) return false;
@@ -841,7 +841,8 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
           saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
           
         if (saver)
-          saver->WriteDown(meshwrapper->GetMeshObject(), meshNode);
+          saver->WriteDown(meshwrapper->GetMeshObject(), meshNode,
+	  	0/**ssource*/);
       }
 
     }

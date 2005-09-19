@@ -57,7 +57,7 @@ public:
   csGenericRSLoader (iBase* p);
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, 
-    iLoaderContext* ldr_context, 	
+    iStreamSource*, iLoaderContext* ldr_context, 	
     iBase* context);
 };
 

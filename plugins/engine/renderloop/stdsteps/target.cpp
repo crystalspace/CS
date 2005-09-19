@@ -71,6 +71,7 @@ bool csTargetRSLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node, 
+				       iStreamSource*,
 				       iLoaderContext* ldr_context,      
 				       iBase* context)
 {

@@ -101,7 +101,7 @@ PVSMetaLoader::~PVSMetaLoader ()
 }
 
 csPtr<iBase> PVSMetaLoader::Parse (iDocumentNode* node,
-	iLoaderContext* /*ldr_context*/, iBase* context)
+	iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* context)
 {
   csRef<iSector> sector;
   if (context)

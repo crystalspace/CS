@@ -86,10 +86,9 @@ bool csRenderLoopLoader::ParseRenderSteps (iRenderLoop* loop,
 }
 
 csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node, 
-  iLoaderContext* ldr_context, iBase* context)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
-  csRef<iEngine> engine =
-    CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     if (synldr)
@@ -99,8 +98,7 @@ csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node,
     return 0;
   }
 
-  csRef<iRenderLoopManager> loopmgr =
-    engine->GetRenderLoopManager ();
+  iRenderLoopManager* loopmgr = engine->GetRenderLoopManager ();
   if (!loopmgr)
   {
     if (synldr)

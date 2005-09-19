@@ -46,7 +46,8 @@ public:
 
   virtual bool Initialize(iObjectRegistry *object_reg);
 
-  virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
+  	iStreamSource* ssource, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 };  
 

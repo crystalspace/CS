@@ -1225,6 +1225,7 @@ Nag to Jorrit about this feature if you want it.");
 }
 
 csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
+			     iStreamSource*,
 			     iLoaderContext* ldr_context, iBase* context)
 {
   ThingLoadInfo info;
@@ -1304,6 +1305,7 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 }
 
 csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
+			     iStreamSource*,
 			     iLoaderContext* ldr_context, iBase*)
 {
   ThingLoadInfo info;
@@ -1373,7 +1375,8 @@ bool csThingSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 //TBD
-bool csThingSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csThingSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   

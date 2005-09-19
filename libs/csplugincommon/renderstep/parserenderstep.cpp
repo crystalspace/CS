@@ -83,7 +83,7 @@ csPtr<iRenderStep> csRenderStepParser::Parse (
     return 0;
   }
 
-  csRef<iBase> b = loader->Parse (node, 0, 0);
+  csRef<iBase> b = loader->Parse (node, 0/*ssource*/, 0, 0);
   if (!b)
   {
     return 0;

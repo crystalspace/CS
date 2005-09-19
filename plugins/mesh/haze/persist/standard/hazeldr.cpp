@@ -189,7 +189,7 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter*,
 }
 
 csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context,
+	iStreamSource*, iLoaderContext* ldr_context,
 	iBase* /* context */)
 {
   csVector3 a;
@@ -289,7 +289,8 @@ bool csHazeFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj) return false; //you never know...
@@ -408,7 +409,8 @@ bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
-			    iLoaderContext* ldr_context, iBase*)
+			    iStreamSource*, iLoaderContext* ldr_context,
+			    iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iHazeFactoryState> hazefactorystate;
@@ -520,7 +522,8 @@ bool csHazeSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj) return false; //you never know...

@@ -55,8 +55,8 @@ public:
   bool Initialize (iObjectRegistry *objreg);
 
   /// Parse the given node block and build the particles factory
-  csPtr<iBase> Parse (iDocumentNode *node, iLoaderContext *ldr_context,
-    iBase* context);
+  csPtr<iBase> Parse (iDocumentNode *node,
+  	iStreamSource*, iLoaderContext *ldr_context, iBase* context);
 
   /// Parse the emitter block
   bool ParseEmitter (iDocumentNode *node, iParticlesFactoryState *state);
@@ -109,7 +109,8 @@ public:
   bool Initialize (iObjectRegistry *objreg);
 
   /// Write down given object and add to iDocumentNode.
-  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
+  	iStreamSource*);
 
   /// Write down the emitter block.
   virtual bool WriteEmitter (iParticlesFactoryState *obj, iDocumentNode* parent);
@@ -152,7 +153,8 @@ public:
   bool Initialize (iObjectRegistry *objreg);
 
   /// Parse the given block to create a new particles object
-  csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+  csPtr<iBase> Parse (iDocumentNode* node,
+    iStreamSource*, iLoaderContext* ldr_context,
     iBase *context);
 
   /// Parse the emitter block
@@ -206,7 +208,8 @@ public:
   bool Initialize (iObjectRegistry *objreg);
 
   /// Write down given object and add to iDocumentNode.
-  bool WriteDown (iBase *obj, iDocumentNode* parent);
+  bool WriteDown (iBase *obj, iDocumentNode* parent,
+  	iStreamSource*);
 
   /// Write the emitter block
   bool WriteEmitter (iParticlesObjectState *state, iDocumentNode *node);

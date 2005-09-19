@@ -149,6 +149,7 @@ bool csSpriteCal3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 
 csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
+						iStreamSource*,
 						iLoaderContext* ldr_context, 
 						iBase* context)
 {
@@ -555,7 +556,8 @@ bool csSpriteCal3DFactorySaver::Initialize (iObjectRegistry* object_reg)
 #define MAXLINE 100 /* max number of chars per line... */
 
 //TBD
-bool csSpriteCal3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csSpriteCal3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent || !obj)
     return false;
@@ -748,6 +750,7 @@ bool csSpriteCal3DLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
+					 iStreamSource*,
 					 iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
@@ -864,7 +867,8 @@ bool csSpriteCal3DSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csSpriteCal3DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csSpriteCal3DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent)
     return false;

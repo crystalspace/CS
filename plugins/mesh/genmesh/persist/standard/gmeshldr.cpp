@@ -274,7 +274,7 @@ bool csGeneralFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
 }
 
 csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase* /* context */)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));
@@ -565,7 +565,8 @@ bool csGeneralFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   
@@ -881,7 +882,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
 }
 
 csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase*)
+	iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iGeneralMeshState> meshstate;
@@ -1024,7 +1025,8 @@ bool csGeneralMeshSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   

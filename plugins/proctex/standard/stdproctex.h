@@ -57,7 +57,8 @@ public:
 
   virtual bool Initialize(iObjectRegistry *object_reg);
 
-  virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
+  	iStreamSource*, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 
   struct eiComponent : public iComponent
@@ -83,7 +84,8 @@ public:
 
   bool Initialize (iObjectRegistry* p);
 
-  virtual bool WriteDown (iBase *obj, iDocumentNode* parent) = 0;
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
+  	iStreamSource*) = 0;
 
   struct eiComponent : public iComponent
   {

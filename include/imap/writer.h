@@ -27,6 +27,7 @@
 /**\addtogroup loadsave	
  * @{ */
 struct iFile;
+struct iStreamSource;
 
 SCF_VERSION (iSaverPlugin, 0, 2, 0);
 
@@ -38,7 +39,8 @@ struct iSaverPlugin : public iBase
   /**
    * Take a given object and push description onto the given file.
    */
-  virtual bool WriteDown (iBase* obj, iDocumentNode* parent) = 0;
+  virtual bool WriteDown (iBase* obj, iDocumentNode* parent,
+  	iStreamSource* ssource) = 0;
 };
 
 /** } */
@@ -53,7 +55,7 @@ struct iBinarySaverPlugin : public iBase
 /**
 * Take a given object and push description onto the given file.
 */
-  virtual bool WriteDown (iBase* obj, iFile *file) = 0;
+  virtual bool WriteDown (iBase* obj, iFile *file, iStreamSource* ssource) = 0;
 };
 
 /** @} */

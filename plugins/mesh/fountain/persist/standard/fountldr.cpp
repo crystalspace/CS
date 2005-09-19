@@ -123,7 +123,7 @@ bool csFountainFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csFountainFactoryLoader::Parse (iDocumentNode* /*node*/,
-	iLoaderContext*, iBase* /* context */)
+	iStreamSource*, iLoaderContext*, iBase* /* context */)
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));
@@ -158,7 +158,8 @@ bool csFountainFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csFountainFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent)
+bool csFountainFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
+	iStreamSource*)
 {
   //Nothing gets parsed in the loader, so nothing gets saved here!
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
@@ -204,7 +205,7 @@ bool csFountainLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase*)
+	iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iParticleState> partstate;
@@ -356,7 +357,8 @@ bool csFountainSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csFountainSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csFountainSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj)    return false; //you never know...

@@ -92,7 +92,7 @@ bool csSimpleFormerLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
-		iLoaderContext* /*ldr_context*/,
+		iStreamSource*, iLoaderContext* /*ldr_context*/,
 		iBase* /*context*/)
 {
   csRef<iTerraFormer> former = CS_LOAD_PLUGIN (pluginmgr, 

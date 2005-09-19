@@ -64,6 +64,7 @@ csGenericRSLoader::csGenericRSLoader (iBase* p) : csBaseRenderStepLoader (p)
 }
 
 csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node, 
+				       iStreamSource*,
 				       iLoaderContext* ldr_context,      
 				       iBase* context)
 {

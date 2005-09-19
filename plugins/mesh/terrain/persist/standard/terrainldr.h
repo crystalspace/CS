@@ -51,7 +51,8 @@ public:
   bool Initialize (iObjectRegistry *objreg);
 
   /// Parse the given node block and build the terrain factory
-  csPtr<iBase> Parse (iDocumentNode *node, iLoaderContext *ldr_context,
+  csPtr<iBase> Parse (iDocumentNode *node,
+    iStreamSource*, iLoaderContext *ldr_context,
     iBase* context);	
 
   struct eiComponent : public iComponent
@@ -83,7 +84,8 @@ public:
   bool Initialize (iObjectRegistry *objreg);
 
   /// Write down given object and add to iDocumentNode.
-  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
+  	iStreamSource*);
 
   struct eiComponent : public iComponent
   {
@@ -120,7 +122,8 @@ public:
   bool Initialize (iObjectRegistry *objreg);
 
   /// Parse the given block to create a new Terrain object
-  csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+  csPtr<iBase> Parse (iDocumentNode* node,
+    iStreamSource*, iLoaderContext* ldr_context,
     iBase *context);
 
   struct eiComponent : public iComponent
@@ -152,7 +155,8 @@ public:
   bool Initialize (iObjectRegistry *objreg);
 
   /// Write down given object and add to iDocumentNode.
-  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
+  	iStreamSource*);
 
   struct eiComponent : public iComponent
   {

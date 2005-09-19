@@ -105,6 +105,7 @@ static void CrudeDocumentFlattener (iDocumentNode* node, csString& str)
 }
 
 csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node, 
+				     iStreamSource*,
 				     iLoaderContext* ldr_context,
 				     iBase* context)
 {

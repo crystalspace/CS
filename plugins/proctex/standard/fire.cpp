@@ -80,7 +80,7 @@ csPtFireLoader::csPtFireLoader(iBase *p) : csBaseProctexLoader(p)
 }
 
 csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node, 
-				    iLoaderContext* ldr_context,
+				    iStreamSource*, iLoaderContext* ldr_context,
   				    iBase* context)
 {
   /*
@@ -192,7 +192,8 @@ csPtFireSaver::csPtFireSaver (iBase* p) : csBaseProctexSaver(p)
 {
 }
 
-bool csPtFireSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csPtFireSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   return true;
 }

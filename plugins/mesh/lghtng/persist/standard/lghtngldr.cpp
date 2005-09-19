@@ -134,7 +134,7 @@ bool csLightningFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 
 csPtr<iBase> csLightningFactoryLoader::Parse (iDocumentNode* node,
-        iLoaderContext* ldr_context,
+        iStreamSource*, iLoaderContext* ldr_context,
         iBase* /* context */)
 {
   csVector3 a;
@@ -265,7 +265,8 @@ bool csLightningFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csLightningFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csLightningFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj) return false; //you never know...
@@ -369,7 +370,7 @@ bool csLightningLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csLightningLoader::Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase*)
+    iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iLightningFactoryState> LightningFactoryState;
@@ -441,7 +442,8 @@ bool csLightningSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csLightningSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csLightningSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj)    return false; //you never know...

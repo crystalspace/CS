@@ -119,7 +119,7 @@ bool csRainFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csRainFactoryLoader::Parse (iDocumentNode* /*node*/,
-	iLoaderContext*, iBase* /* context */)
+	iStreamSource*, iLoaderContext*, iBase* /* context */)
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));
@@ -153,7 +153,8 @@ bool csRainFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csRainFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent)
+bool csRainFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
+	iStreamSource*)
 {
   //Nothing gets parsed in the loader, so nothing gets saved here!
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
@@ -194,7 +195,7 @@ bool csRainLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase*)
+	iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iRainState> rainstate;
@@ -334,7 +335,8 @@ bool csRainSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csRainSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csRainSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj)    return false; //you never know...

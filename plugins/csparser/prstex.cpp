@@ -426,7 +426,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   if (plugin)
   {
     csRef<iBase> b = plugin->Parse (ParamsNode,
-      ldr_context, CS_STATIC_CAST(iBase*, &context));
+      0/*ssource*/, ldr_context, CS_STATIC_CAST(iBase*, &context));
     if (b) tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
   }
 
@@ -444,7 +444,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       BuiltinCheckerTexLoader.AttachNew (ctl);
     }
     csRef<iBase> b = BuiltinCheckerTexLoader->Parse (ParamsNode,
-      ldr_context, CS_STATIC_CAST(iBase*, &context));
+      0/*ssource*/, ldr_context, CS_STATIC_CAST(iBase*, &context));
     CS_ASSERT(b);
     tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
     CS_ASSERT(tex);
@@ -699,7 +699,7 @@ iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
   const char* txtname = node->GetAttributeValue ("name");
   context.AttachNew (new TextureLoaderContext (txtname));
 
-  csRef<iBase> b = plugin->Parse (node, ldr_context, context);
+  csRef<iBase> b = plugin->Parse (node, 0/*ssource*/, ldr_context, context);
   csRef<iTextureWrapper> tex;
   if (b) tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
 
@@ -735,7 +735,7 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
   const char* txtname = node->GetAttributeValue ("name");
   context.AttachNew (new TextureLoaderContext (txtname));
 
-  csRef<iBase> b = plugin->Parse (node, ldr_context, context);
+  csRef<iBase> b = plugin->Parse (node, 0/*ssource*/, ldr_context, context);
   csRef<iTextureWrapper> tex;
   if (b) tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
 

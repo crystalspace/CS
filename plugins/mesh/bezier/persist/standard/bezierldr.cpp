@@ -354,7 +354,8 @@ Nag to Jorrit about this feature if you want it.");
 }
 
 csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
-			     iLoaderContext* ldr_context, iBase*)
+			     iStreamSource*, iLoaderContext* ldr_context,
+			     iBase*)
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));
@@ -415,7 +416,8 @@ bool csBezierSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 //TBD
-bool csBezierSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csBezierSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   

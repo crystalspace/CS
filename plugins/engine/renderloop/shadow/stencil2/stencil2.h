@@ -222,7 +222,7 @@ public:
   virtual bool Initialize (iObjectRegistry* object_reg);
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
-    iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 };
 
 #endif // __CS_STENCILEN_H

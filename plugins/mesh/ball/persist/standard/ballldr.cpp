@@ -128,7 +128,7 @@ bool csBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csBallFactoryLoader::Parse (iDocumentNode*,
-			     iLoaderContext*, iBase*)
+			     iStreamSource*, iLoaderContext*, iBase*)
 {
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
@@ -172,7 +172,8 @@ bool csBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-bool csBallFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csBallFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   //Nothing gets parsed in the loader, so nothing gets saved here!
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
@@ -214,7 +215,8 @@ bool csBallLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
-			     iLoaderContext* ldr_context, iBase*)
+			     iStreamSource*, iLoaderContext* ldr_context,
+			     iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iBallState> ballstate;
@@ -364,7 +366,8 @@ bool csBallSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csBallSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csBallSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   

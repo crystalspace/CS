@@ -950,7 +950,8 @@ bool csStencil2ShadowLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csStencil2ShadowLoader::Parse (iDocumentNode* node,
-                                            iLoaderContext* ldr_context,
+                                            iStreamSource*,
+					    iLoaderContext* ldr_context,
                                             iBase* context)
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,

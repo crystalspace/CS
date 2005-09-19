@@ -122,7 +122,7 @@ bool csFireFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csFireFactoryLoader::Parse (iDocumentNode* /*node*/,
-	iLoaderContext*, iBase* /* context */)
+	iStreamSource*, iLoaderContext*, iBase* /* context */)
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));
@@ -157,7 +157,8 @@ bool csFireFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csFireFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent)
+bool csFireFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
+	iStreamSource*)
 {
   //Nothing gets parsed in the loader, so nothing gets saved here!
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
@@ -202,7 +203,8 @@ bool csFireLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
-			    iLoaderContext* ldr_context, iBase*)
+			    iStreamSource*, iLoaderContext* ldr_context,
+			    iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iParticleState> partstate;
@@ -353,7 +355,8 @@ bool csFireSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csFireSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csFireSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj)    return false; //you never know...

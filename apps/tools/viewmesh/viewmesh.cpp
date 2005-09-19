@@ -719,7 +719,7 @@ void ViewMesh::SaveSprite (const char* path, const char* filename, bool binary)
     if (!saver)
       saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iBinarySaverPlugin);
     if (saver)
-      saver->WriteDown(meshfact, file);
+      saver->WriteDown(meshfact, file, 0/*ssource*/);
   }
   else
   {
@@ -728,7 +728,7 @@ void ViewMesh::SaveSprite (const char* path, const char* filename, bool binary)
     if (!saver) 
       saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
     if (saver) 
-      saver->WriteDown(meshfact, factNode);
+      saver->WriteDown(meshfact, factNode, 0/*ssource*/);
   }
   scfString str;
   doc->Write(&str);

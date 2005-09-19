@@ -71,7 +71,7 @@ bool csParticlesFactoryLoader::Initialize (iObjectRegistry* objreg)
 }
 
 csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
-  iLoaderContext* ldr_context, iBase* context)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
     iPluginManager);
@@ -645,7 +645,8 @@ bool csParticlesFactorySaver::Initialize (iObjectRegistry* objreg)
   return true;
 }
 
-bool csParticlesFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csParticlesFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj)    return false; //you never know...
@@ -923,7 +924,7 @@ bool csParticlesObjectLoader::Initialize (iObjectRegistry* objreg)
 }
 
 csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
-  iLoaderContext* ldr_context, iBase* context)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
   csRef<iMeshObject> mesh;
   csRef<iParticlesObjectState> state;
@@ -1482,7 +1483,8 @@ bool csParticlesObjectSaver::Initialize (iObjectRegistry *objreg)
 }
 
 
-bool csParticlesObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csParticlesObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj)    return false; //you never know...

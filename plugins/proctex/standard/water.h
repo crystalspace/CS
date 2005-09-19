@@ -47,7 +47,7 @@ public:
   csPtWaterLoader(iBase *p);
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, 
-    iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 };
 
 class csPtWaterSaver : public csBaseProctexSaver
@@ -55,7 +55,8 @@ class csPtWaterSaver : public csBaseProctexSaver
 public:
   csPtWaterSaver(iBase *p);
 
-  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
+  	iStreamSource*);
 };
 
 #endif 

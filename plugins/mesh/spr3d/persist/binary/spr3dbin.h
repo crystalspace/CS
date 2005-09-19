@@ -54,7 +54,7 @@ public:
 
   /// Parse data  and return a new object for it.
   virtual csPtr<iBase> Parse (void* data, 
-    iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
   {
@@ -86,7 +86,8 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Write down given object and add to iDocumentNode.
-  virtual bool WriteDown (iBase *obj, iFile* file);
+  virtual bool WriteDown (iBase *obj, iFile* file,
+  	iStreamSource*);
 
   struct eiComponent : public iComponent
   {

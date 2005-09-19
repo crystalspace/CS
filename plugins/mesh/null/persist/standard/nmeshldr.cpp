@@ -255,7 +255,7 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
 }
 
 csPtr<iBase> csNullFactoryLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase* context)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));
@@ -332,7 +332,8 @@ bool csNullFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csNullFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csNullFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj)    return false; //you never know...
@@ -390,7 +391,7 @@ bool csNullMeshLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csNullMeshLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase*)
+	iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iNullMeshState> state;
@@ -469,7 +470,8 @@ bool csNullMeshSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csNullMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csNullMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj)    return false; //you never know...

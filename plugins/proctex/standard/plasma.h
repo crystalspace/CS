@@ -47,7 +47,7 @@ public:
   csPtPlasmaLoader(iBase *p);
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, 
-    iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 };
 
 class csPtPlasmaSaver : public csBaseProctexSaver
@@ -55,7 +55,8 @@ class csPtPlasmaSaver : public csBaseProctexSaver
 public:
   csPtPlasmaSaver(iBase *p);
 
-  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
+  	iStreamSource*);
 };
 
 #endif 

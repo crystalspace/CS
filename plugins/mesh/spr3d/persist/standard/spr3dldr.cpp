@@ -153,6 +153,7 @@ bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
+				       iStreamSource*,
 				       iLoaderContext* ldr_context, 
 				       iBase* context)
 {
@@ -404,7 +405,8 @@ bool csSprite3DFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   
@@ -545,7 +547,7 @@ bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase*)
+	iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iSprite3DState> spr3dLook;
@@ -715,7 +717,8 @@ bool csSprite3DSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   

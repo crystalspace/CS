@@ -78,7 +78,7 @@ csPtDotsLoader::csPtDotsLoader(iBase *p) : csBaseProctexLoader(p)
 }
 
 csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* node, 
-				    iLoaderContext* ldr_context,
+				    iStreamSource*, iLoaderContext* ldr_context,
   				    iBase* context)
 {
   /*
@@ -134,7 +134,8 @@ csPtDotsSaver::csPtDotsSaver (iBase* p) : csBaseProctexSaver(p)
 {
 }
 
-bool csPtDotsSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csPtDotsSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   return true;
 }

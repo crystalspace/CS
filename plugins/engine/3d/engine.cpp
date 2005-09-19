@@ -3107,8 +3107,8 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   if (!fact) return 0;
 
   csRef<iLoaderContext> elctxt (CreateLoaderContext (0, true));
-  csRef<iBase> mof (plug->Parse (
-      doc->GetRoot (), elctxt, fact->GetMeshObjectFactory ()));
+  csRef<iBase> mof = plug->Parse (doc->GetRoot (),
+  	0/*ssource*/, elctxt, fact->GetMeshObjectFactory ());
   if (!mof)
   {
     GetMeshFactories ()->Remove (fact);
@@ -3172,7 +3172,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   }
 
   csRef<iLoaderContext> elctxt (CreateLoaderContext (0, true));
-  csRef<iBase> mof (plug->Parse (doc->GetRoot (), elctxt, imw));
+  csRef<iBase> mof = plug->Parse (doc->GetRoot (), 0/*ssource*/, elctxt, imw);
   if (!mof)
   {
     GetMeshes ()->Remove (imw);

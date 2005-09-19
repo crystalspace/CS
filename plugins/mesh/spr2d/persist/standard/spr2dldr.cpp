@@ -199,7 +199,7 @@ bool csSprite2DFactoryLoader::ParseAnim (iDocumentNode* node,
 }
 
 csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase* /* context */)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));
@@ -295,7 +295,8 @@ bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csSprite2DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csSprite2DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj) return false; //you never know...
@@ -392,7 +393,8 @@ bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
-				iLoaderContext* ldr_context, iBase*)
+				iStreamSource*, iLoaderContext* ldr_context,
+				iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iSprite2DState> spr2dLook;
@@ -553,7 +555,8 @@ bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj) return false; //you never know...

@@ -68,7 +68,8 @@ namespace lighter
       // Make sure to remove old params node
       csRef<iDocumentNode> paramChild = node->GetNode ("params");
       if (paramChild) node->RemoveNode (paramChild);
-      saver->WriteDown(factoryWrapper->GetMeshObjectFactory (), node);
+      saver->WriteDown(factoryWrapper->GetMeshObjectFactory (), node,
+      	0/*ssource*/);
     }
   }
 

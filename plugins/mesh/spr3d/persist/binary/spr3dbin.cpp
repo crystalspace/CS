@@ -123,6 +123,7 @@ const char binsprMagic[4] = {'5','1', '5','0'};
  * Loads a csSprite3DBinFactoryLoader
  */
 csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
+				       iStreamSource*,
 				       iLoaderContext* ldr_context,
 				       iBase* context)
 {
@@ -389,7 +390,8 @@ bool csSprite3DBinFactorySaver::Initialize (iObjectRegistry* object_reg)
 /**
  * Saves a csSprite3DBinFactorySaver
  */
-bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file)
+bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file,
+	iStreamSource*)
 {
   const char * name = 0;
 

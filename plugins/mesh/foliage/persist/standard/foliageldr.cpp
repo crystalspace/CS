@@ -320,7 +320,7 @@ bool csFoliageFactoryLoader::ParseFoliagePalette (iDocumentNode* node,
 }
 
 csPtr<iBase> csFoliageFactoryLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase* /* context */)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
 {
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
   	iPluginManager);
@@ -422,7 +422,8 @@ bool csFoliageFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csFoliageFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csFoliageFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   
@@ -469,7 +470,7 @@ bool csFoliageMeshLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csFoliageMeshLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase*)
+	iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iFoliageMeshState> meshstate;
@@ -538,7 +539,8 @@ bool csFoliageMeshSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csFoliageMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csFoliageMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   

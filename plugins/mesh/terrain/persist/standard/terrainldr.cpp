@@ -92,7 +92,7 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
 }
 
 csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
-  iLoaderContext* ldr_context, iBase* context)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
     iPluginManager);
@@ -263,7 +263,8 @@ bool csTerrainFactorySaver::Initialize (iObjectRegistry* objreg)
   return true;
 }
 //TBD
-bool csTerrainFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csTerrainFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   
@@ -318,7 +319,7 @@ bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
 }
 
 csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node, 
-  iLoaderContext* ldr_context, iBase* context)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
   csRef<iMeshObject> mesh;
   csRef<iTerrainObjectState> state;
@@ -609,7 +610,8 @@ bool csTerrainObjectSaver::Initialize (iObjectRegistry *objreg)
   return true;
 }
 //TBD
-bool csTerrainObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csTerrainObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   

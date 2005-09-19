@@ -47,7 +47,7 @@ public:
   csPtSkyLoader(iBase *p);
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, 
-    iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 };
 
 class csPtSkySaver : public csBaseProctexSaver
@@ -55,7 +55,8 @@ class csPtSkySaver : public csBaseProctexSaver
 public:
   csPtSkySaver(iBase *p);
 
-  virtual bool WriteDown (iBase *obj, iDocumentNode* parent);
+  virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
+  	iStreamSource*);
 };
 
 #endif 

@@ -78,7 +78,7 @@ csPtPlasmaLoader::csPtPlasmaLoader(iBase *p) : csBaseProctexLoader(p)
 }
 
 csPtr<iBase> csPtPlasmaLoader::Parse (iDocumentNode* node, 
-				    iLoaderContext* ldr_context,
+				    iStreamSource*, iLoaderContext* ldr_context,
   				    iBase* context)
 {
   /*
@@ -134,7 +134,8 @@ csPtPlasmaSaver::csPtPlasmaSaver (iBase* p) : csBaseProctexSaver(p)
 {
 }
 
-bool csPtPlasmaSaver::WriteDown (iBase* obj, iDocumentNode* parent)
+bool csPtPlasmaSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+	iStreamSource*)
 {
   return true;
 }

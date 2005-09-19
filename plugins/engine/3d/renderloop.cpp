@@ -221,7 +221,7 @@ csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
     return 0;
   }
 
-  csRef<iBase> b = rlLoader->Parse (rlNode, 0, 0);
+  csRef<iBase> b = rlLoader->Parse (rlNode, 0/*ssource*/, 0, 0);
   if (!b)
   {
     // Error already reported.

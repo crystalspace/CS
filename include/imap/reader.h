@@ -27,6 +27,7 @@
  * @{ */
 struct iLoaderContext;
 struct iDocumentNode;
+struct iStreamSource;
 
 SCF_VERSION (iLoaderPlugin, 0, 2, 1);
 
@@ -35,8 +36,18 @@ SCF_VERSION (iLoaderPlugin, 0, 2, 1);
  */
 struct iLoaderPlugin : public virtual iBase
 {
-  /// Parse a given document node and return a new object for it.
-  virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+  /**
+   * Parse a given document node and return a new object for it.
+   * \param node is the node to parse.
+   * \param ssource is an optional stream source where we can get buffers
+   * from in a fast way.
+   * \param ldr_context can be used to get the context for the loading.
+   * You can use this to find meshes/materials/...
+   * \param context is the context in which we are loading (can be the mesh
+   * wrapper for meshes for example).
+   */
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
+  	iStreamSource* ssource, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 };
 
@@ -47,8 +58,18 @@ SCF_VERSION (iBinaryLoaderPlugin, 0, 0, 1);
  */
 struct iBinaryLoaderPlugin : public iBase
 {
-  /// Parse given data and return a new object for it.
-  virtual csPtr<iBase> Parse (void* data, iLoaderContext* ldr_context,
+  /**
+   * Parse given data and return a new object for it.
+   * \param data is the data to parse.
+   * \param ssource is an optional stream source where we can get buffers
+   * from in a fast way.
+   * \param ldr_context can be used to get the context for the loading.
+   * You can use this to find meshes/materials/...
+   * \param context is the context in which we are loading (can be the mesh
+   * wrapper for meshes for example).
+   */
+  virtual csPtr<iBase> Parse (void* data,
+  	iStreamSource* ssource, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 };
 
