@@ -58,7 +58,7 @@ Description softcanvas   : "canvas for the software renderer" ;
 Description proctexes    : "procedural texture plugins" ;
 Description renderall    : "modules related to rendering" ;
 Description shaders      : "shaders and related modules" ;
-RegisterCompileGroups sounddrivers soundloaders snssys imageloaders fontservers
+RegisterCompileGroups sounddrivers soundloaders sndsys imageloaders fontservers
 		      canvases renderers meshes meshimpexp walkall
                       openglcanvas softcanvas proctexes renderall shaders ;
 
