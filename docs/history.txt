@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Sep-2005
+	- Eric Sunshine resolved a few build-system glitches related to the
+	  new sound system (sndsys).
 19-Sep-2005
 	- Rhad added initial files for new sound system (SndSys).
 	  Jamfiles will be committed this evening.
