@@ -47,6 +47,8 @@
 #include "csplugincommon/renderstep/parserenderstep.h"
 #include "csplugincommon/shader/shaderplugin.h"
 #include "csplugincommon/shader/shaderprogram.h"
+#include "csplugincommon/sndsys/convert.h"
+#include "csplugincommon/sndsys/cyclicbuf.h"
 #include "csplugincommon/soundloader/sndload.h"
 #include "csplugincommon/soundloader/soundraw.h"
 #include "csplugincommon/soundrenderer/shdl.h"

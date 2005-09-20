@@ -27,6 +27,7 @@
 #include "imap/reader.h"
 #include "imap/saver.h"
 #include "imap/services.h"
+#include "imap/streamsource.h"
 #include "imap/writer.h"
 #endif /* __IMAP_H__ */
 
