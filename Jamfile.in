@@ -45,6 +45,7 @@ SubInclude TOP mk ;
 # Define our compile groups
 Description sounddrivers : "sound drivers" ;
 Description soundloaders : "sound loaders" ;
+Description sndsys       : "sound system" ;
 Description imageloaders : "image loaders" ;
 Description fontservers  : "font servers" ;
 Description canvases	 : "2D canvases" ;
@@ -57,7 +58,7 @@ Description softcanvas   : "canvas for the software renderer" ;
 Description proctexes    : "procedural texture plugins" ;
 Description renderall    : "modules related to rendering" ;
 Description shaders      : "shaders and related modules" ;
-RegisterCompileGroups sounddrivers soundloaders imageloaders fontservers
+RegisterCompileGroups sounddrivers soundloaders snssys imageloaders fontservers
 		      canvases renderers meshes meshimpexp walkall
                       openglcanvas softcanvas proctexes renderall shaders ;
 
