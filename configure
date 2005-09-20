@@ -23635,6 +23635,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if !HAVE_TYPE_INT32
 	    typedef long int32;
 	    #endif
+	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
 	    #include <ddraw.h>
 	    #include <dsound.h>
@@ -23795,6 +23796,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if !HAVE_TYPE_INT32
 	    typedef long int32;
 	    #endif
+	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
 	    #include <ddraw.h>
 	    #include <dsound.h>
@@ -23991,6 +23993,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if !HAVE_TYPE_INT32
 	    typedef long int32;
 	    #endif
+	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
 	    #include <ddraw.h>
 	    #include <dsound.h>
@@ -24151,6 +24154,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if !HAVE_TYPE_INT32
 	    typedef long int32;
 	    #endif
+	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
 	    #include <ddraw.h>
 	    #include <dsound.h>
