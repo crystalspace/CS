@@ -1,0 +1,6 @@
+SubDir TOP plugins sndsys renderer software drivers ;
+
+SubInclude TOP plugins sndsys renderer software drivers coreaudio ;
+SubInclude TOP plugins sndsys renderer software drivers directsound ;
+SubInclude TOP plugins sndsys renderer software drivers oss ;
+

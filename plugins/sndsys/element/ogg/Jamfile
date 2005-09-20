@@ -1,0 +1,9 @@
+SubDir TOP plugins sndsys element ogg ;
+
+Plugin sndsysogg :
+	[ Wildcard *.cpp *.h ]
+;
+Description sndsysogg : "Ogg Vorbis sound element for sndsys" ;
+LinkWith sndsysogg : crystalspace ;
+CompileGroups sndsysogg : sndsys ;
+

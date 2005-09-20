@@ -1,0 +1,5 @@
+SubDir TOP plugins sndsys ;
+
+SubInclude TOP plugins sndsys element ;
+SubInclude TOP plugins sndsys renderer ;
+

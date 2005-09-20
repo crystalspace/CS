@@ -1,0 +1,6 @@
+SubDir TOP plugins sndsys element ;
+
+SubInclude TOP plugins sndsys element loader ;
+SubInclude TOP plugins sndsys element ogg ;
+SubInclude TOP plugins sndsys element wav ;
+

@@ -1,0 +1,11 @@
+SubDir TOP plugins sndsys renderer software drivers directsound ;
+
+if $(DIRECTX.AVAILABLE) = "yes"
+{
+Description sndsysdirectsound : "Windows DirectSound driver for the software sound renderer for sndsys" ;
+Plugin sndsysdirectsound : [ Wildcard *.cpp *.h ] ;
+LinkWith sndsysdirectsound : crystalspace ;
+ExternalLibs sndsysdirectsound : DIRECTX ;
+CompileGroups sndsysdirectsound : sndsys ;
+}
+

@@ -1,0 +1,11 @@
+SubDir TOP plugins sndsys renderer software drivers coreaudio ;
+
+if $(COREAUDIO.AVAILABLE) = "yes"
+{
+Description sndsyscoreaudio : "MacOS/X CoreAudio sound driver for the software sound renderer for sndsys" ;
+Plugin sndsyscoreaudio : [ Wildcard *.cpp *.h ] ;
+LinkWith sndsyscoreaudio : crystalspace ;
+ExternalLibs sndsyscoreaudio : COREAUDIO ;
+CompileGroups sndsyscoreaudio : sndsys ;
+}
+
