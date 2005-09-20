@@ -1637,7 +1637,7 @@ void G2DTestSystemDriver::BlitTest ()
   WriteCentered (0,-16*7, black, dsteel, "This will test whether iGraphics2D->Blit() works correctly");
   WriteCentered (0,-16*6, black, dsteel, "on this canvas.");
 
-  WriteCentered (0,-16*4, black, dsteel, "You should an image of an arrow and the word \"up\".");
+  WriteCentered (0,-16*4, black, dsteel, "You should see an image of an arrow and the word \"up\".");
   WriteCentered (0,-16*3, black, dsteel, "It is surrounded by a green rectangle, and the image");
   WriteCentered (0,-16*2, black, dsteel, "itself has a black border. No red should be visible");
   WriteCentered (0,-16*1, black, dsteel, "and the border has to be complete, too.");
