@@ -139,13 +139,11 @@ public:
   }
 };
 
-struct ClipBuffer
+// @@@ Move elsewhere?
+struct VertexBuffer
 {
-  uint8* source;
-  size_t sourceComp;
-  size_t sourceStride;
-  float* dest;
-  size_t destComp;
+  uint8* data;
+  size_t comp;
 };
 
 const size_t clipMaxBuffers = 16;
@@ -155,52 +153,57 @@ template<class Meat>
 class BuffersClipper
 {
   VertexOutputBase vout[clipMaxBuffers];
-  const ClipBuffer* buffers;
+  const VertexBuffer* inBuffers;
+  const size_t* inStrides;
+  const VertexBuffer* outBuffers;
   Meat& meat;
   ClipBuffersMask buffersMask;
   
   template<int Ni, int No>
-  void SetupVOut2 (int i, const ClipBuffer& clipBuf)
+  void SetupVOut2 (size_t i, const VertexBuffer& inBuffer, 
+    const size_t inStride, const VertexBuffer& outBuffer)
   {
-    new (&vout[i]) VertexOutput<Ni, No> (clipBuf.source, clipBuf.sourceStride,
-      clipBuf.dest);
+    new (&vout[i]) VertexOutput<Ni, No> (inBuffer.data, inStride,
+      (float*)outBuffer.data);
   }
   template<int Ni>
-  void SetupVOut1 (int i, const ClipBuffer& clipBuf)
+  void SetupVOut1 (size_t i, const VertexBuffer& inBuffer, 
+    const size_t inStride, const VertexBuffer& outBuffer)
   {
-    switch (clipBuf.destComp)
+    switch (inBuffer.comp)
     {
       case 1:
-        SetupVOut2<Ni, 1> (i, clipBuf);
+        SetupVOut2<Ni, 1> (i, inBuffer, inStride, outBuffer);
         break;
       case 2:
-        SetupVOut2<Ni, 2> (i, clipBuf);
+        SetupVOut2<Ni, 2> (i, inBuffer, inStride, outBuffer);
         break;
       case 3:
-        SetupVOut2<Ni, 3> (i, clipBuf);
+        SetupVOut2<Ni, 3> (i, inBuffer, inStride, outBuffer);
         break;
       case 4:
-        SetupVOut2<Ni, 4> (i, clipBuf);
+        SetupVOut2<Ni, 4> (i, inBuffer, inStride, outBuffer);
         break;
       default:
         CS_ASSERT_MSG("Unsupported component count", false);
     }
   }
-  void SetupVOut (int i, const ClipBuffer& clipBuf)
+  void SetupVOut (size_t i, const VertexBuffer& inBuffer, 
+    const size_t inStride, const VertexBuffer& outBuffer)
   {
-    switch (clipBuf.sourceComp)
+    switch (inBuffer.comp)
     {
       case 1:
-        SetupVOut1<1> (i, clipBuf);
+        SetupVOut1<1> (i, inBuffer, inStride, outBuffer);
         break;
       case 2:
-        SetupVOut1<2> (i, clipBuf);
+        SetupVOut1<2> (i, inBuffer, inStride, outBuffer);
         break;
       case 3:
-        SetupVOut1<3> (i, clipBuf);
+        SetupVOut1<3> (i, inBuffer, inStride, outBuffer);
         break;
       case 4:
-        SetupVOut1<4> (i, clipBuf);
+        SetupVOut1<4> (i, inBuffer, inStride, outBuffer);
         break;
       default:
         CS_ASSERT_MSG("Unsupported component count", false);
@@ -208,14 +211,17 @@ class BuffersClipper
   }
 public:
   BuffersClipper (Meat& meat) :  meat(meat) { }
-  void Init (const ClipBuffer* buffers, ClipBuffersMask buffersMask)
+  void Init (const VertexBuffer* inBuffers, const size_t* inStrides, 
+    const VertexBuffer* outBuffers, ClipBuffersMask buffersMask)
   {
-    this->buffers = buffers;
+    this->inBuffers = inBuffers;
+    this->inStrides = inStrides;
+    this->outBuffers = outBuffers;
     this->buffersMask = buffersMask;
     for (size_t i = 0; i < clipMaxBuffers; i++)
     {
       if (!(buffersMask & (1 << i))) continue;
-      SetupVOut (i, buffers[i]);
+      SetupVOut (i, inBuffers[i], inStrides[i], outBuffers[i]);
     }
   }
 
@@ -226,7 +232,7 @@ public:
       if (!(buffersMask & (1 << i))) continue;
       vout[i].Reset();
     }
-    return meat.DoClip (tri, buffers, buffersMask, vout);
+    return meat.DoClip (tri, inBuffers, inStrides, buffersMask, vout);
   }
 };
 

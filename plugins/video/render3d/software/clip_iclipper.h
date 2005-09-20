@@ -53,18 +53,20 @@ public:
     this->maxClipVertices = maxClipVertices;
   }
 
-  size_t DoClip (const csTriangle& tri, const ClipBuffer* buffers, 
-    ClipBuffersMask buffersMask, VertexOutputBase* vout)
+  size_t DoClip (const csTriangle& tri, const VertexBuffer* inBuffers, 
+    const size_t* inStrides, ClipBuffersMask buffersMask, 
+    VertexOutputBase* vout)
   {
     if (!clipper)
       return CopyTri (tri, buffersMask, vout);
 
-    const ClipBuffer& bPos = buffers[VATTR_CLIPINDEX(POSITION)];
+    const VertexBuffer& bPos = inBuffers[VATTR_CLIPINDEX(POSITION)];
+    const size_t bPosStride = inStrides[VATTR_CLIPINDEX(POSITION)];
     const csVector3 v[3] = 
     {
-      *(csVector3*)(bPos.source + tri.a * bPos.sourceStride),
-      *(csVector3*)(bPos.source + tri.b * bPos.sourceStride),
-      *(csVector3*)(bPos.source + tri.c * bPos.sourceStride),
+      *(csVector3*)(bPos.data + tri.a * bPosStride),
+      *(csVector3*)(bPos.data + tri.b * bPosStride),
+      *(csVector3*)(bPos.data + tri.c * bPosStride),
     };
 
     csVector2 inpoly[3];

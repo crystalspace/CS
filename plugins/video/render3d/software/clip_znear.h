@@ -47,18 +47,20 @@ public:
     this->persp = persp;
   }
 
-  size_t DoClip (const csTriangle& tri, const ClipBuffer* buffers, 
-    ClipBuffersMask buffersMask, VertexOutputBase* vout)
+  size_t DoClip (const csTriangle& tri, const VertexBuffer* inBuffers, 
+    const size_t* inStrides, ClipBuffersMask buffersMask, 
+    VertexOutputBase* vout)
   {
     const float clipPos = SMALL_Z*10;
     const float com_zv = 1.0f / clipPos;
     const float com_iz = aspect * com_zv;
     csVector3 v;
 
-    const ClipBuffer& bPos = buffers[VATTR_CLIPINDEX(POSITION)];
-    const csVector3& va = *(csVector3*)(bPos.source + tri.a * bPos.sourceStride);
-    const csVector3& vb = *(csVector3*)(bPos.source + tri.b * bPos.sourceStride);
-    const csVector3& vc = *(csVector3*)(bPos.source + tri.c * bPos.sourceStride);
+    const VertexBuffer& bPos = inBuffers[VATTR_CLIPINDEX(POSITION)];
+    const size_t bPosStride = inStrides[VATTR_CLIPINDEX(POSITION)];
+    const csVector3& va = *(csVector3*)(bPos.data + tri.a * bPosStride);
+    const csVector3& vb = *(csVector3*)(bPos.data + tri.b * bPosStride);
+    const csVector3& vc = *(csVector3*)(bPos.data + tri.c * bPosStride);
     int cnt_vis = int (va.z >= SMALL_Z) +
                   int (vb.z >= SMALL_Z) +
                   int (vc.z >= SMALL_Z);

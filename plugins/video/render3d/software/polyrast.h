@@ -22,8 +22,9 @@
 
 #include "csqint.h"
 
-#include "sft3dcom.h"
+#include "clipper.h" //@@@ for VertexBuffer
 #include "scanindex.h"
+#include "sft3dcom.h"
 
 namespace cspluginSoft3d
 {
@@ -31,7 +32,6 @@ namespace cspluginSoft3d
   class PolygonRasterizer
   {
     bool dpfx_valid;
-    bool dpfx_use_fog;
     iTextureHandle* dpfx_tex_handle;
     uint dpfx_mixmode;
     csZBufMode dpfx_z_buf_mode;
@@ -87,16 +87,14 @@ namespace cspluginSoft3d
     } pqinfo;
     
     void RealStartPolygonFX (iTextureHandle* handle,
-      uint mode, bool use_fog)
+      uint mode)
     {
       if (!dpfx_valid ||
-	    use_fog != dpfx_use_fog ||
 	    handle != dpfx_tex_handle ||
 	    z_buf_mode != dpfx_z_buf_mode ||
 	    mode != dpfx_mixmode)
       {
 	dpfx_valid = true;
-	dpfx_use_fog = use_fog;
 	dpfx_tex_handle = handle;
 	dpfx_z_buf_mode = z_buf_mode;
 	dpfx_mixmode = mode;
@@ -216,21 +214,22 @@ namespace cspluginSoft3d
       pqinfo.max_b = (1 << (pfmt.BlueBits  + shift_amount + 8)) - 1;
     }
 
-    void DrawPolygonFX (G3DPolygonDPFX& poly)
+    void DrawPolygonFX (size_t vertNum, const VertexBuffer* inBuffers, 
+      ClipBuffersMask buffersMask, iTextureHandle* tex_handle, uint mixmode)
     {
-      RealStartPolygonFX (poly.tex_handle, poly.mixmode, poly.use_fog);
+      RealStartPolygonFX (tex_handle, mixmode);
     
       if (!pqinfo.drawline && !pqinfo.drawline_gouraud)
 	return;
     
-      // Determine the R/G/B of the polygon's flat color
-      if (pqinfo.textured)
-	Scan.FlatRGB.Set (255, 255, 255);
-      else
-      {
-	Scan.FlatRGB.Set (
-	  poly.flat_color_r, poly.flat_color_g, poly.flat_color_b);
-      }
+      const csVector3* vertices = 
+	(csVector3*)inBuffers[VATTR_CLIPINDEX(POSITION)].data;
+      const csVector2* texcoords = 
+	(csVector2*)inBuffers[VATTR_CLIPINDEX(TEXCOORD)].data;
+      const csVector4* colors = (buffersMask & (1 << VATTR_CLIPINDEX(COLOR))) ?
+	(csVector4*)inBuffers[VATTR_CLIPINDEX(COLOR)].data : 0;
+
+      Scan.FlatRGB.Set (255, 255, 255);
     
       // Get the same value as a pixel-format-encoded value
       Scan.FlatColor = texman->encode_rgb (Scan.FlatRGB.red, Scan.FlatRGB.green,
@@ -247,24 +246,33 @@ namespace cspluginSoft3d
       float bot_y = 99999;
       top = bot = 0;                        // avoid GCC complains
       size_t i;
-      for (i = 0 ; i < poly.num ; i++)
+      for (i = 0 ; i < vertNum ; i++)
       {
-	uu[i] = pqinfo.tw * poly.texels [i].x;
-	vv[i] = pqinfo.th * poly.texels [i].y;
-	iz[i] = poly.z [i];
-	if (poly.colors [i].red > 2.0) poly.colors [i].red = 2.0;
-	if (poly.colors [i].red < 0.0) poly.colors [i].red = 0.0;
-	rr[i] = poly.colors [i].red * pqinfo.redFact   * Scan.FlatRGB.red;
-	if (poly.colors [i].green > 2.0) poly.colors [i].green = 2.0;
-	if (poly.colors [i].green < 0.0) poly.colors [i].green = 0.0;
-	gg[i] = poly.colors [i].green * pqinfo.greenFact * Scan.FlatRGB.green;
-	if (poly.colors [i].blue > 2.0) poly.colors [i].blue = 2.0;
-	if (poly.colors [i].blue < 0.0) poly.colors [i].blue = 0.0;
-	bb[i] = poly.colors [i].blue * pqinfo.blueFact  * Scan.FlatRGB.blue;
-	if (poly.vertices [i].y > top_y)
-	  top_y = poly.vertices [top = i].y;
-	if (poly.vertices [i].y < bot_y)
-	  bot_y = poly.vertices [bot = i].y;
+	uu[i] = pqinfo.tw * texcoords[i].x;
+	vv[i] = pqinfo.th * texcoords[i].y;
+	iz[i] = vertices[i].z;
+	/*if (poly.colors [i].red > 2.0) poly.colors [i].red = 2.0;
+	if (poly.colors [i].red < 0.0) poly.colors [i].red = 0.0;*/
+	/*if (poly.colors [i].green > 2.0) poly.colors [i].green = 2.0;
+	if (poly.colors [i].green < 0.0) poly.colors [i].green = 0.0;*/
+	/*if (poly.colors [i].blue > 2.0) poly.colors [i].blue = 2.0;
+	if (poly.colors [i].blue < 0.0) poly.colors [i].blue = 0.0;*/
+	if (colors)
+	{
+	  rr[i] = colors[i].x * pqinfo.redFact   * Scan.FlatRGB.red;
+	  gg[i] = colors[i].y * pqinfo.greenFact * Scan.FlatRGB.green;
+	  bb[i] = colors[i].z * pqinfo.blueFact  * Scan.FlatRGB.blue;
+	}
+	else
+	{
+	  rr[i] = pqinfo.redFact   * Scan.FlatRGB.red;
+	  gg[i] = pqinfo.greenFact * Scan.FlatRGB.green;
+	  bb[i] = pqinfo.blueFact  * Scan.FlatRGB.blue;
+	}
+	if (vertices[i].y > top_y)
+	  top_y = vertices[top = i].y;
+	if (vertices[i].y < bot_y)
+	  bot_y = vertices[bot = i].y;
       }
     
       // If the polygon exceeds the screen, it is an engine failure
@@ -296,7 +304,7 @@ namespace cspluginSoft3d
     // Start of code to stop MSVC bitching about uninitialized variables
       L.sv = R.sv = (signed char)top;
       L.fv = R.fv = (signed char)top;
-      int sy = L.fy = R.fy = csQround (poly.vertices [top].y);
+      int sy = L.fy = R.fy = csQround (vertices[top].y);
     
       L.x = R.x = 0;
       L.dxdy = R.dxdy = 0;
@@ -338,21 +346,21 @@ namespace cspluginSoft3d
 	    if (R.fv == (int)bot)
 	      return;
 	    R.sv = R.fv;
-	    if (++R.fv >= (int)poly.num)
+	    if (++R.fv >= (int)vertNum)
 	      R.fv = 0;
     
 	    leave = false;
-	    R.fy = csQround (poly.vertices [(int)R.fv].y);
+	    R.fy = csQround (vertices[(int)R.fv].y);
 	    if (sy <= R.fy)
 	      continue;
     
-	    float dyR = poly.vertices [(int)R.sv].y - poly.vertices [(int)R.fv].y;
+	    float dyR = vertices[(int)R.sv].y - vertices[(int)R.fv].y;
 	    if (dyR)
 	    {
 	      float inv_dyR = 1 / dyR;
-	      R.x = csQfixed16 (poly.vertices [(int)R.sv].x);
+	      R.x = csQfixed16 (vertices[(int)R.sv].x);
 	      R.dxdy = csQfixed16 (
-		(poly.vertices [(int)R.fv].x - poly.vertices [(int)R.sv].x) * inv_dyR);
+		(vertices[(int)R.fv].x - vertices[(int)R.sv].x) * inv_dyR);
 	      R.dzdy = csQfixed24 ((iz [(int)R.fv] - iz [(int)R.sv]) * inv_dyR);
 	      if (pqinfo.textured)
 	      {
@@ -368,13 +376,13 @@ namespace cspluginSoft3d
     
 	      // horizontal pixel correction
 	      float deltaX = (R.dxdy * 1/65536.) *
-		(poly.vertices [(int)R.sv].y - (float (sy) - 0.5));
+		(vertices[(int)R.sv].y - (float (sy) - 0.5));
 	      R.x += csQfixed16 (deltaX);
     
 	      // apply sub-pixel accuracy factor
 	      float Factor;
-	      if (poly.vertices [(int)R.fv].x != poly.vertices [(int)R.sv].x)
-		Factor = deltaX / (poly.vertices [(int)R.fv].x - poly.vertices [(int)R.sv].x);
+	      if (vertices[(int)R.fv].x != vertices[(int)R.sv].x)
+		Factor = deltaX / (vertices[(int)R.fv].x - vertices[(int)R.sv].x);
 	      else
 		Factor = 0;
 	      if (pqinfo.textured)
@@ -397,20 +405,20 @@ namespace cspluginSoft3d
 	      return;
 	    L.sv = L.fv;
 	    if (--L.fv < 0)
-	      L.fv = (int)poly.num - 1;
+	      L.fv = (int)vertNum - 1;
     
 	    leave = false;
-	    L.fy = csQround (poly.vertices [(int)L.fv].y);
+	    L.fy = csQround (vertices[(int)L.fv].y);
 	    if (sy <= L.fy)
 	      continue;
     
-	    float dyL = poly.vertices [(int)L.sv].y - poly.vertices [(int)L.fv].y;
+	    float dyL = vertices[(int)L.sv].y - vertices[(int)L.fv].y;
 	    if (dyL)
 	    {
 	      float inv_dyL = 1 / dyL;
-	      L.x = csQfixed16 (poly.vertices [(int)L.sv].x);
+	      L.x = csQfixed16 (vertices[(int)L.sv].x);
 	      L.dxdy = csQfixed16 (
-		(poly.vertices [(int)L.fv].x - poly.vertices [(int)L.sv].x) * inv_dyL);
+		(vertices[(int)L.fv].x - vertices[(int)L.sv].x) * inv_dyL);
 	      L.dzdy = csQfixed24 ((iz [(int)L.fv] - iz [(int)L.sv]) * inv_dyL);
 	      if (pqinfo.textured)
 	      {
@@ -426,13 +434,13 @@ namespace cspluginSoft3d
     
 	      // horizontal pixel correction
 	      float deltaX = (L.dxdy * 1/65536.) *
-		(poly.vertices [(int)L.sv].y - (float (sy) - 0.5));
+		(vertices[(int)L.sv].y - (float (sy) - 0.5));
 	      L.x += csQfixed16 (deltaX);
     
 	      // apply sub-pixel accuracy factor
 	      float Factor;
-	      if (poly.vertices [(int)L.fv].x != poly.vertices [(int)L.sv].x)
-		Factor = deltaX / (poly.vertices [(int)L.fv].x - poly.vertices [(int)L.sv].x);
+	      if (vertices[(int)L.fv].x != vertices[(int)L.sv].x)
+		Factor = deltaX / (vertices[(int)L.fv].x - vertices[(int)L.sv].x);
 	      else
 		Factor = 0;
 	      if (pqinfo.textured)

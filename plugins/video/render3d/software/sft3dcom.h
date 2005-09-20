@@ -55,6 +55,8 @@ struct iPolygonBuffer;
 
 struct csTriangle;
 
+#include "polyrast.h"
+
 // Maximum size of a single lightmap, in pixels
 #define MAX_LIGHTMAP_SIZE	1500000
 
@@ -125,43 +127,6 @@ public:
   csMatrix3* m_cam2tex;
   /// Transformation from camera space to texture space.
   csVector3* v_cam2tex;
-};
-
-/// Structure containing all info needed by DrawPolygonFX (DPFX)
-struct G3DPolygonDPFX
-{
-  /// Current number of vertices.
-  size_t num;
-  /// Vertices that form the polygon.
-  csVector2 vertices[100];
-  /// 1/z for every vertex.
-  float z[100];
-  /// Texels per vertex.
-  csVector2 texels[100];
-  /// Lighting info per vertex.
-  csColor colors[100];
-
-  /// Extra optional fog information.
-  G3DFogInfo fog_info[100];
-  /// Use fog info?
-  bool use_fog;
-
-  iTextureHandle* tex_handle;
-
-  /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
-  uint mixmode;
-
-  //@{
-  /// Use this color for drawing (if txt_handle == 0) instead of a material.
-  uint8 flat_color_r;
-  uint8 flat_color_g;
-  uint8 flat_color_b;
-  //@}
-
-  // A dummy constructor to appease NextStep compiler which otherwise
-  // complains that it is unable to create this object.  This happens when
-  // a subcomponent such as csVector2 has a constructor.
-  G3DPolygonDPFX() {}
 };
 
 /// Structure containing all info needed by DrawFogPolygon (DFP)
@@ -336,14 +301,6 @@ public:
   csVector3* v_cam2tex;
 };
 
-} // namespace cspluginSoft3d
-
-// @@@ Needs G3DPolygonDPFX
-#include "polyrast.h"
-
-namespace cspluginSoft3d
-{
-
 #define VATTR_SPEC(x)           (CS_VATTRIB_ ## x - CS_VATTRIB_SPECIFIC_FIRST)
 #define VATTR_GEN(x)							      \
   ((CS_VATTRIB_ ## x - CS_VATTRIB_GENERIC_FIRST) + CS_VATTRIB_SPECIFIC_LAST + 1)
@@ -508,11 +465,6 @@ protected:
    * (Flat drawing).
    */
   void DrawPolygonFlat (G3DPolygonDPF& poly);
-
-  /// Start a series of DrawPolygonFX
-  void RealStartPolygonFX (iTextureHandle* handle, uint mode,
-  	bool use_fog);
-
 
   csRef<iStringSet> strings;
   csStringID string_vertices;
@@ -690,9 +642,6 @@ public:
   /// Draw a line in camera space.
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,
     float fov, int color);
-
-  /// Draw a polygon with special effects.
-  virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
   /// Get address of Z-buffer at specific point
   virtual uint32 *GetZBuffAt (int x, int y)
