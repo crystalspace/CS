@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 #include "iutil/comp.h"
-#include "ss_loader.h"
+#include "isndsys/ss_loader.h"
 #include "oggdata2.h"
 
 #include "oggloader2.h"

@@ -24,9 +24,8 @@
  * iSndSysData implementation for waveform PCM audio
  */
 
-#include "ss_structs.h"
-
-#include "ss_data.h"
+#include "isndsys/ss_structs.h"
+#include "isndsys/ss_data.h"
 
 
 // header of the RIFF-chunk

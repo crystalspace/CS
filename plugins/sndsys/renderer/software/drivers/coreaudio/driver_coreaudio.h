@@ -47,8 +47,8 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
-#include "ss_structs.h"
-#include "ss_driver.h"
+#include "isndsys/ss_structs.h"
+#include "isndsys/ss_driver.h"
 
 
 

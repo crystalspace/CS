@@ -24,8 +24,8 @@
  * iSndSysData implementation for ogg bitdata.
  */
 
-#include "ss_structs.h"
-#include "ss_data.h"
+#include "isndsys/ss_structs.h"
+#include "isndsys/ss_data.h"
 
 
 

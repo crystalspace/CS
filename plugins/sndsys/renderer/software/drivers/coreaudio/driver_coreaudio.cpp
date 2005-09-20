@@ -42,8 +42,8 @@
 #include "ivaria/reporter.h"
 
 #include "renderer.h"
-#include "ss_driver.h"
-#include "ss_renderer.h"
+#include "isndsys/ss_driver.h"
+#include "isndsys/ss_renderer.h"
 #include "driver_oss.h"
 
 

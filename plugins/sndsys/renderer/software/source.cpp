@@ -21,14 +21,14 @@
 #include "csgeom.h"
 #include "iutil/objreg.h"
 
-#include "ss_structs.h"
+#include "isndsys/ss_structs.h"
 
-#include "ss_data.h"
-#include "ss_stream.h"
-#include "ss_filter.h"
-#include "ss_source.h"
-#include "ss_listener.h"
-#include "ss_renderer.h"
+#include "isndsys/ss_data.h"
+#include "isndsys/ss_stream.h"
+#include "isndsys/ss_filter.h"
+#include "isndsys/ss_source.h"
+#include "isndsys/ss_listener.h"
+#include "isndsys/ss_renderer.h"
 
 #include "ivaria/reporter.h"
 
@@ -375,8 +375,6 @@ SndSysSourceSoftware3D::SndSysSourceSoftware3D(csRef<iSndSysStream> stream, SndS
 
   queued_parameters.Copy(&active_parameters);
   queued_updates=false;
-
-  debug_cycle=0;
 }
 
 SndSysSourceSoftware3D::~SndSysSourceSoftware3D()

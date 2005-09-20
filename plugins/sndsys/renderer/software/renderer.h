@@ -25,8 +25,8 @@
 #include "iutil/comp.h"
 #include "csgeom/vector3.h"
 
-#include "ss_structs.h"
-#include "ss_renderer.h"
+#include "isndsys/ss_structs.h"
+#include "isndsys/ss_renderer.h"
 
 #include "queue.h"
 

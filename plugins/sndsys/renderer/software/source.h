@@ -21,8 +21,8 @@
 #define SNDSYS_RENDERER_SOFTWARE_SOURCE_H
 
 
-#include "ss_filter.h"
-#include "ss_source.h"
+#include "isndsys/ss_filter.h"
+#include "isndsys/ss_source.h"
 
 #include "queue.h"
 

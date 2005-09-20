@@ -40,9 +40,9 @@
 #include "iutil/cmdline.h"
 #include "ivaria/reporter.h"
 
-#include "renderer.h"
-#include "ss_driver.h"
-#include "ss_renderer.h"
+#include "../../renderer.h"
+#include "isndsys/ss_driver.h"
+#include "isndsys/ss_renderer.h"
 #include "driver_oss.h"
 
 
@@ -68,7 +68,7 @@ csRef<iReporter> SndSysDriverOSS::reporter;
 
 
 SndSysDriverOSS::SndSysDriverOSS(iBase* piBase) :
- running(false), oss_buffer(NULL), output_fd(-1)
+ oss_buffer(NULL), output_fd(-1), running(false)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);

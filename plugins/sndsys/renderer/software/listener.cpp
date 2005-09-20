@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "iutil/objreg.h"
-#include "ss_listener.h"
+#include "isndsys/ss_listener.h"
 
 #include "listener.h"
 

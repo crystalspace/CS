@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 #include "iutil/comp.h"
-#include "ss_loader.h"
+#include "isndsys/ss_loader.h"
 #include "wavstream2.h"
 #include "wavdata2.h"
 

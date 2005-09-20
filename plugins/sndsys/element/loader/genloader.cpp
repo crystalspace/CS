@@ -20,9 +20,9 @@
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
-#include "ss_structs.h"
-#include "ss_data.h"
-#include "ss_loader.h"
+#include "isndsys/ss_structs.h"
+#include "isndsys/ss_data.h"
+#include "isndsys/ss_loader.h"
 
 
 #include "genloader.h"

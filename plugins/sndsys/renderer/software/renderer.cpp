@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 
-#include "ss_structs.h"
+#include "isndsys/ss_structs.h"
 
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
@@ -30,11 +30,11 @@
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "ss_driver.h"
-#include "ss_data.h"
-#include "ss_stream.h"
-#include "ss_listener.h"
-#include "ss_renderer.h"
+#include "isndsys/ss_driver.h"
+#include "isndsys/ss_data.h"
+#include "isndsys/ss_stream.h"
+#include "isndsys/ss_listener.h"
+#include "isndsys/ss_renderer.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"

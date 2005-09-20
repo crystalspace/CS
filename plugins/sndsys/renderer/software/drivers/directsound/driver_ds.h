@@ -24,7 +24,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/win32/win32.h"
-#include "../../../../../interface/ss_structs.h"
+#include "isndsys/ss_structs.h"
 
 #include "dsound.h"
 

@@ -19,9 +19,9 @@
 
 #include "cssysdef.h"
 #include "iutil/comp.h"
-#include "ss_stream.h"
-#include "../lib/convert.h"
-#include "../lib/cyclicbuf.h"
+#include "isndsys/ss_stream.h"
+#include "csplugincommon/sndsys/convert.h"
+#include "csplugincommon/sndsys/cyclicbuf.h"
 #include "oggdata2.h"
 #include "oggstream2.h"
 

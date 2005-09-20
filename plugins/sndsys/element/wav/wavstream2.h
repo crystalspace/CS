@@ -21,7 +21,7 @@
 #define SNDSYS_STREAM_WAV_H
 
 
-#include "ss_stream.h"
+#include "isndsys/ss_stream.h"
 #include "wavdata2.h"
 
 class PCMSampleConverter;

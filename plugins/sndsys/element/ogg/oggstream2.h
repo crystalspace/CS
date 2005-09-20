@@ -21,7 +21,7 @@
 #define SNDSYS_STREAM_OGG_H
 
 
-#include "ss_stream.h"
+#include "isndsys/ss_stream.h"
 #include "oggdata2.h"
 
 class PCMSampleConverter;
