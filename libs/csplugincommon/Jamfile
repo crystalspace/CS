@@ -11,7 +11,6 @@ SubInclude TOP libs csplugincommon shader ;
 SubInclude TOP libs csplugincommon sndsys ;
 SubInclude TOP libs csplugincommon soundloader  ;
 SubInclude TOP libs csplugincommon soundrenderer ;
-SubInclude TOP libs csplugincommon soundrenderer ;
 }
 else
 {
