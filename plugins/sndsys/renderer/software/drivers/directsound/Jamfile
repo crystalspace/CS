@@ -1,11 +1,11 @@
 SubDir TOP plugins sndsys renderer software drivers directsound ;
 
-if $(DIRECTX.AVAILABLE) = "yes"
+if $(DIRECTX8.AVAILABLE) = "yes"
 {
 Description sndsyswin : "Windows (DirectSound based) driver for the software sound renderer for sndsys" ;
 Plugin sndsyswin : [ Wildcard *.cpp *.h ] ;
 LinkWith sndsyswin : crystalspace ;
-ExternalLibs sndsyswin : DIRECTX ;
+ExternalLibs sndsyswin : DIRECTX8 ;
 CompileGroups sndsyswin : sndsys ;
 }
 

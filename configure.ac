@@ -1237,7 +1237,7 @@ AS_IF([test $cs_cv_libgl = yes],
 		    [$cs_cv_libglx_cflags],
 		    [$cs_cv_libglx_lflags],
 		    [$cs_cv_libglx_libs])],
-		[], [], [CS_HEADER_PROPERTY([CSGL_EXT_STATIC_ASSERTION])])])])])
+		[],[], [CS_HEADER_PROPERTY([CSGL_EXT_STATIC_ASSERTION])])])])])
 
 
 
@@ -1247,9 +1247,9 @@ AS_IF([test $cs_cv_libgl = yes],
 # must take this into account.  With Cygwin, we must check for the DirectX
 # headers in /usr/include/directx.
 #------------------------------------------------------------------------------
-AS_IF([test $cs_host_family = windows],
-    [AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
-    CS_CHECK_BUILD([for DirectX], [cs_cv_libdirectx],
+# CS_CHECK_DIRECTX([DSOUND-VERSION])
+AC_DEFUN([CS_CHECK_DIRECTX],
+    [CS_CHECK_BUILD([for DirectX$1], [cs_cv_libdirectx$1],
 	[AC_LANG_PROGRAM(
 	    [[#if !HAVE_TYPE_INT32
 	    typedef long int32;
@@ -1259,11 +1259,17 @@ AS_IF([test $cs_host_family = windows],
 	    #include <dsound.h>
 	    #include <dinput.h>]],
 	    [DirectDrawCreate(0,0,0); 
-	     DirectSoundCreate(0,0,0); 
+	     DirectSoundCreate$1(0,0,0); 
 	     DirectInputCreate(0,0,0,0)])],
 	[CS_CREATE_TUPLE([],[],[-lddraw -ldsound -ldinput]) \
-	CS_CREATE_TUPLE([-I/usr/include/directx],[],[-lddraw -ldsound -ldinput])], 
-	[], [CS_EMIT_BUILD_RESULT([cs_cv_libdirectx], [DIRECTX])])])    
+	CS_CREATE_TUPLE([-I/usr/include/directx],[],
+	    [-lddraw -ldsound -ldinput])], 
+	[], [CS_EMIT_BUILD_RESULT([cs_cv_libdirectx$1], [DIRECTX$1])])])
+
+AS_IF([test $cs_host_family = windows],
+    [AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
+    CS_CHECK_DIRECTX([])
+    CS_CHECK_DIRECTX([8])])
 
 
 

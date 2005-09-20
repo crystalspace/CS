@@ -23481,6 +23481,9 @@ fi
 # must take this into account.  With Cygwin, we must check for the DirectX
 # headers in /usr/include/directx.
 #------------------------------------------------------------------------------
+# CS_CHECK_DIRECTX([DSOUND-VERSION])
+
+
 if test $cs_host_family = windows; then
   echo "$as_me:$LINENO: checking for int32" >&5
 echo $ECHO_N "checking for int32... $ECHO_C" >&6
@@ -23898,6 +23901,362 @@ else
   cs_cv_libdirectx_cflags=''
 	cs_cv_libdirectx_lflags=''
 	cs_cv_libdirectx_libs=''
+
+fi
+
+    if test "" != yes; then
+  echo "$as_me:$LINENO: checking for DirectX8" >&5
+echo $ECHO_N "checking for DirectX8... $ECHO_C" >&6
+if test "${cs_cv_libdirectx8+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
+	`echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#if !HAVE_TYPE_INT32
+	    typedef long int32;
+	    #endif
+	    #include <windows.h>
+	    #include <ddraw.h>
+	    #include <dsound.h>
+	    #include <dinput.h>
+int
+main ()
+{
+DirectDrawCreate(0,0,0);
+	     DirectSoundCreate8(0,0,0);
+	     DirectInputCreate(0,0,0,0)
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libdirectx8=yes
+		cs_cv_libdirectx8_cflags=$cs_build_cflags
+		cs_cv_libdirectx8_lflags=$cs_build_lflags
+		cs_cv_libdirectx8_libs=$cs_build_libs
+else
+  cs_cv_libdirectx8=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_libdirectx8" >&5
+echo "${ECHO_T}$cs_cv_libdirectx8" >&6
+else
+  echo "$as_me:$LINENO: checking for DirectX8" >&5
+echo $ECHO_N "checking for DirectX8... $ECHO_C" >&6
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@-lddraw -ldsound -ldinput | sed 'y% %#%'` \
+	`echo @-I/usr/include/directx@@-lddraw -ldsound -ldinput | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#if !HAVE_TYPE_INT32
+	    typedef long int32;
+	    #endif
+	    #include <windows.h>
+	    #include <ddraw.h>
+	    #include <dsound.h>
+	    #include <dinput.h>
+int
+main ()
+{
+DirectDrawCreate(0,0,0);
+	     DirectSoundCreate8(0,0,0);
+	     DirectInputCreate(0,0,0,0)
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libdirectx8=yes
+		cs_cv_libdirectx8_cflags=$cs_build_cflags
+		cs_cv_libdirectx8_lflags=$cs_build_lflags
+		cs_cv_libdirectx8_libs=$cs_build_libs
+else
+  cs_cv_libdirectx8=no
+fi
+
+	    echo "$as_me:$LINENO: result: $cs_cv_libdirectx8" >&5
+echo "${ECHO_T}$cs_cv_libdirectx8" >&6
+fi
+
+    if test $cs_cv_libdirectx8 = yes; then
+  if test "$cs_cv_libdirectx8" = yes; then
+  cs_build_prop_val="yes"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX8.AVAILABLE ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val="$cs_cv_libdirectx8_cflags"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX8.CFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val="$cs_cv_libdirectx8_lflags $cs_cv_libdirectx8_libs"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}DIRECTX8.LFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
+else
+  cs_cv_libdirectx8_cflags=''
+	cs_cv_libdirectx8_lflags=''
+	cs_cv_libdirectx8_libs=''
 
 fi
 

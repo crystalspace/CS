@@ -9,6 +9,7 @@ chronological order.
 20-Sep-2005
 	- Eric Sunshine resolved a few build-system glitches related to the
 	  new sound system (sndsys).
+	- Eric Sunshine added a DirectX v8 check to configure.ac.
 19-Sep-2005
 	- Rhad added initial files for new sound system (SndSys).
 	  Jamfiles will be committed this evening.
