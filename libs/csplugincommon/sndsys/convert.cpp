@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "convert.h"
+#include "csplugincommon/sndsys/convert.h"
 
 
 #define SWAP16(x) ((x)<<8 | (x)>>8)

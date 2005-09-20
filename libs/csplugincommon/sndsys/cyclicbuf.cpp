@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cyclicbuf.h"
+#include "csplugincommon/sndsys/cyclicbuf.h"
 
 
 SoundCyclicBuffer::SoundCyclicBuffer(size_t buffer_size)
