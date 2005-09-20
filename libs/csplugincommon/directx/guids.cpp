@@ -25,3 +25,5 @@
 #include <ddraw.h>
 #include <d3d.h>
 #include <dsound.h>
+
+DEFINE_GUID(GUID_NULL,0,0,0,0,0,0,0,0,0,0,0);

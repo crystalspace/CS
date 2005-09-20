@@ -10,6 +10,9 @@ chronological order.
 	- Eric Sunshine resolved a few build-system glitches related to the
 	  new sound system (sndsys).
 	- Eric Sunshine added a DirectX v8 check to configure.ac.
+	- res made some tweaks to configure to detect DirectX 9 properly.
+	- res made sndsyswin depend on crystalspace_directx.
+	- res fixed odedynam to also support ODE compiled in "double" mode.
 19-Sep-2005
 	- Rhad added initial files for new sound system (SndSys).
 	  Jamfiles will be committed this evening.

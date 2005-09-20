@@ -26,7 +26,7 @@
 #include "csutil/win32/win32.h"
 #include "isndsys/ss_structs.h"
 
-#include "dsound.h"
+#include <dsound.h>
 
 
 

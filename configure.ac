@@ -1264,7 +1264,7 @@ AC_DEFUN([CS_CHECK_DIRECTX],
 	[CS_CREATE_TUPLE([],[],[-lddraw -ldsound -ldinput]) \
 	CS_CREATE_TUPLE([-I/usr/include/directx],[],
 	    [-lddraw -ldsound -ldinput])], 
-	[], [CS_EMIT_BUILD_RESULT([cs_cv_libdirectx$1], [DIRECTX$1])])])
+	[C++], [CS_EMIT_BUILD_RESULT([cs_cv_libdirectx$1], [DIRECTX$1])])])
 
 AS_IF([test $cs_host_family = windows],
     [AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])

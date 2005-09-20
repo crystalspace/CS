@@ -1272,7 +1272,10 @@ bool csODECollider::GetCylinderGeometry (float& length, float& radius)
 {
   if (geom_type == CYLINDER_COLLIDER_GEOMETRY)
   {
-    dGeomCCylinderGetParams (geomID, &radius, &length);
+    dReal odeR, odeL;
+    dGeomCCylinderGetParams (geomID, &odeR, &odeL);
+    radius = odeR;
+    length = odeL;
     return true;
   }
   return false;

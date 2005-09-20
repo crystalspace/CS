@@ -4,7 +4,7 @@ if $(DIRECTX8.AVAILABLE) = "yes"
 {
 Description sndsyswin : "Windows (DirectSound based) driver for the software sound renderer for sndsys" ;
 Plugin sndsyswin : [ Wildcard *.cpp *.h ] ;
-LinkWith sndsyswin : crystalspace ;
+LinkWith sndsyswin : crystalspace crystalspace_directx ;
 ExternalLibs sndsyswin : DIRECTX8 ;
 CompileGroups sndsyswin : sndsys ;
 }
