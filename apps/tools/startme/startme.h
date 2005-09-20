@@ -21,23 +21,23 @@
 
 #include <crystalspace.h>
 
-#define DEMO_MESH_Z 14.0f
-#define DEMO_MESH_MINX -6.0f
-#define DEMO_MESH_MAXX  6.0f
-#define DEMO_MESH_MINY -5.0f
-#define DEMO_MESH_MAXY  5.0f
-#define DEMO_COUNT 12
+#define DEMO_MESH_Z	      14.0f
+#define DEMO_MESH_MINX	      -6.0f
+#define DEMO_MESH_MAXX	      6.0f
+#define DEMO_MESH_MINY	      -5.0f
+#define DEMO_MESH_MAXY	      5.0f
+#define DEMO_COUNT	      12
 
-#define STAR_COUNT 100	// Maximum number of stars.
-#define STAR_NEWSTAR_TIMEOUT 10	// Milliseconds before a new star is born.
-#define STAR_MAXAGE 0.5	// Maximum age of a star in seconds.
-#define STAR_FADE_1 .2	// Value at which we stop fading in.
-#define STAR_FADE_2 .4	// Value at which we start fading out again.
+#define STAR_COUNT	      100	// Maximum number of stars.
+#define STAR_NEWSTAR_TIMEOUT  10	// Milliseconds before a new star is born.
+#define STAR_MAXAGE	      0.5	// Maximum age of a star in seconds.
+#define STAR_FADE_1	      .2	// Value at which we stop fading in.
+#define STAR_FADE_2	      .4	// Value at which we start fading out again.
 
-#define MAIN_LIGHT_ON csColor (.3, .3, .3)
-#define MAIN_LIGHT_OFF csColor (.05, .05, .05)
-#define POINTER_LIGHT_ON csColor (.5, 1, .4)
-#define POINTER_LIGHT_OFF csColor (0, 0, 0)
+#define MAIN_LIGHT_ON	      csColor (.3f, .3f, .3f)
+#define MAIN_LIGHT_OFF	      csColor (.05f, .05f, .05f)
+#define POINTER_LIGHT_ON      csColor (.5f, 1, .4f)
+#define POINTER_LIGHT_OFF     csColor (0, 0, 0)
 
 struct DemoData
 {

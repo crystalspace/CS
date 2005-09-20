@@ -1254,6 +1254,7 @@ AC_DEFUN([CS_CHECK_DIRECTX],
 	    [[#if !HAVE_TYPE_INT32
 	    typedef long int32;
 	    #endif
+	    #define DIRECTINPUT_VERSION 0x0500
 	    #include <windows.h>
 	    #include <ddraw.h>
 	    #include <dsound.h>

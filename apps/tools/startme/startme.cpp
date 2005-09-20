@@ -405,10 +405,10 @@ void StartMe::CreateRoom ()
   csRef<iGeneralFactoryState> spark_state = SCF_QUERY_INTERFACE (
   	spark_fact->GetMeshObjectFactory (), iGeneralFactoryState);
   spark_state->SetVertexCount (4);
-  spark_state->GetVertices ()[0].Set (-.1, -.1, 0);
-  spark_state->GetVertices ()[1].Set (.1, -.1, 0);
-  spark_state->GetVertices ()[2].Set (.1, .1, 0);
-  spark_state->GetVertices ()[3].Set (-.1, .1, 0);
+  spark_state->GetVertices ()[0].Set (-.1f, -.1f, 0);
+  spark_state->GetVertices ()[1].Set (.1f, -.1f, 0);
+  spark_state->GetVertices ()[2].Set (.1f, .1f, 0);
+  spark_state->GetVertices ()[3].Set (-.1f, .1f, 0);
   spark_state->GetTexels ()[0].Set (0, 0);
   spark_state->GetTexels ()[1].Set (1, 0);
   spark_state->GetTexels ()[2].Set (1, 1);

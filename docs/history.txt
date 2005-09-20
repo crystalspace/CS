@@ -13,6 +13,8 @@ chronological order.
 	- res made some tweaks to configure to detect DirectX 9 properly.
 	- res made sndsyswin depend on crystalspace_directx.
 	- res fixed odedynam to also support ODE compiled in "double" mode.
+	- res fixed some VC double truncation warnings in startme.
+	- res further tweaked the configure DirectX check.
 19-Sep-2005
 	- Rhad added initial files for new sound system (SndSys).
 	  Jamfiles will be committed this evening.
