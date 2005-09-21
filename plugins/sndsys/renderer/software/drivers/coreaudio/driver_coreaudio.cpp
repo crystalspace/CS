@@ -19,38 +19,28 @@
 
 #include "cssysdef.h"
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <sys/soundcard.h>
-
-#include "csutil/sysfunc.h"
 #include "csutil/event.h"
-
-#include "iutil/plugin.h"
+#include "csutil/sysfunc.h"
 #include "iutil/cfgfile.h"
+#include "iutil/cmdline.h"
+#include "iutil/comp.h"
 #include "iutil/event.h"
+#include "iutil/eventh.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
+#include "iutil/plugin.h"
 #include "iutil/virtclk.h"
-#include "iutil/cmdline.h"
 #include "ivaria/reporter.h"
 
-#include "renderer.h"
+#include "../../renderer.h"
 #include "isndsys/ss_driver.h"
 #include "isndsys/ss_renderer.h"
-#include "driver_oss.h"
-
+#include "driver_coreaudio.h"
 
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (SndSysDriverCoreAudio)
-
 
 SCF_IMPLEMENT_IBASE(SndSysDriverCoreAudio)
 SCF_IMPLEMENTS_INTERFACE(iSndSysSoftwareDriver)
@@ -62,36 +52,36 @@ SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 // The system driver.
-iObjectRegistry *SndSysDriverCoreAudio::object_reg=0;
+iObjectRegistry *SndSysDriverCoreAudio::object_reg = 0;
 
 // The loaded CS reporter
 csRef<iReporter> SndSysDriverCoreAudio::reporter;
 
 
 // CoreAudio static IO procedure wrapper
-static OSStatus StaticAudioProc(AudioDeviceID inDevice, const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
-                          const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
-                          const AudioTimeStamp *inOutputTime, void *inClientData)
+static OSStatus StaticAudioProc(AudioDeviceID inDevice,
+				const AudioTimeStamp *inNow,
+				const AudioBufferList *inInputData,
+				const AudioTimeStamp *inInputTime,
+				AudioBufferList *outOutputData,
+				const AudioTimeStamp *inOutputTime,
+				void *inClientData)
 {
   SndSysDriverCoreAudio *p_audio=(SndSysDriverCoreAudio *)inClientData;
-  return p_audio->AudioProc(inDevice, inNow, inInputData, inInputTime, outOutputData, inOutputTime);
+  return p_audio->AudioProc(inDevice, inNow, inInputData, inInputTime,
+			    outOutputData, inOutputTime);
 }
 
-
-
-SndSysDriverCoreAudio::SndSysDriverCoreAudio(iBase* piBase)
+SndSysDriverCoreAudio::SndSysDriverCoreAudio(iBase* piBase) :
+  attached_renderer(0), running(false)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
-//  scfiEventHandler = 0;
   object_reg = 0;
 }
 
-
 SndSysDriverCoreAudio::~SndSysDriverCoreAudio()
 {
-
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_DESTRUCT_IBASE();
 }
@@ -105,7 +95,10 @@ void SndSysDriverCoreAudio::Report(int severity, const char* msg, ...)
     reporter = CS_QUERY_REGISTRY(object_reg, iReporter);
 
   if (reporter)
-    reporter->ReportV (severity, "crystalspace.SndSys.driver.software.coreaudio", msg, arg);
+  {
+    reporter->ReportV (severity,
+      "crystalspace.sndsys.driver.software.coreaudio", msg, arg);
+  }
   else
   {
     csPrintfV (msg, arg);
@@ -114,100 +107,104 @@ void SndSysDriverCoreAudio::Report(int severity, const char* msg, ...)
   va_end (arg);
 }
 
-
-
-bool SndSysDriverCoreAudio::Initialize (iObjectRegistry *obj_reg)
+bool SndSysDriverCoreAudio::Initialize (iObjectRegistry* r)
 {
-  // copy the system pointer
-  object_reg=obj_reg;
-
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: CoreAudio driver for software sound renderer initialized.");
-
-  // read the config file
-//  Config.AddConfig(object_reg, "/config/sound.cfg");
-
- 
+  object_reg = r;
+  Report (CS_REPORTER_SEVERITY_DEBUG,
+    "Sound System: CoreAudio driver for software sound renderer initialized.");
   return true;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// 
-//  
-//
-//
-//
-//
-//////////////////////////////////////////////////////////////////////////
-bool SndSysDriverCoreAudio::Open (SndSysRendererSoftware *renderer,SndSysSoundFormat *requested_format)
+bool SndSysDriverCoreAudio::Open (SndSysRendererSoftware *renderer,
+				  SndSysSoundFormat *requested_format)
 {
   uint32 propertysize, buffersize;
   AudioStreamBasicDescription outStreamDesc;
   OSStatus status;
 
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: CoreAudio Driver: Open()");
-//  CS_ASSERT (Config != 0);
+  Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: CoreAudio Driver: Open()");
 
-  attached_renderer=renderer;
+  attached_renderer = renderer;
 
-
-  // Retrieve the output device ID - this is almost verbatim from the available sample code
+  // Retrieve the output device ID - this is almost verbatim from the available
+  // sample code
   propertysize = sizeof(outputDeviceID);
-  status = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice, &propertySize, &outputDeviceID);
+  status = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice,
+				    (UInt32*)&propertysize, &outputDeviceID);
   if (status) 
   {
-    Report(CS_REPORTER_SEVERITY_ERROR, "Failed to obtain default CoreAudio output device.  Return of %d.", (int)status);
+    Report(CS_REPORTER_SEVERITY_ERROR,
+	   "Failed to obtain default CoreAudio output device.  Return of %d.",
+	   (int)status);
     return false;
   }
   if (outputDeviceID == kAudioDeviceUnknown) 
   {
-    Report(CS_REPORTER_SEVERITY_ERROR, "Failed to obtain default CoreAudio output device.  Resulting ID is kAudioDeviceUnknown.");
+    Report(CS_REPORTER_SEVERITY_ERROR,
+	   "Failed to obtain default CoreAudio output device.  "
+	   "Resulting ID is kAudioDeviceUnknown.");
     return false;
   }
 
-  // Set buffer size - attempting to use signed 16 bit samples here
-  // Using 1/20th of a second buffer size
+  // Set buffer size - attempting to use signed 16 bit samples here using
+  // 1/20th of a second buffer size
   propertysize = sizeof(buffersize);
-  buffersize = requested_format->Freq * (requested_format->Bits/8) * requested_format->Channels / 20;
-  status = AudioDeviceSetProperty(outputDeviceID, 0, 0, false, kAudioDevicePropertyBufferSize, propertySize, &bufferSize);
+  buffersize = requested_format->Freq * (requested_format->Bits/8) *
+    requested_format->Channels / 20;
+  status = AudioDeviceSetProperty(outputDeviceID, 0, 0, false,
+    kAudioDevicePropertyBufferSize, propertysize, &buffersize);
   if (status)
   {
-    Report(CS_REPORTER_SEVERITY_ERROR, "Failed to set buffersize to %d bytes for CoreAudio output device.  Return of %d.", buffersize, (int)status);
+    Report(CS_REPORTER_SEVERITY_ERROR,
+	   "Failed to set buffersize to %d bytes for CoreAudio output device. "
+	   "Return of %d.", buffersize, (int)status);
     return false;
   }
 
   // Get stream information
   propertysize = sizeof(outStreamDesc);
-  status = AudioDeviceGetProperty(outputDeviceID, 0, false, kAudioDevicePropertyStreamFormat, &propertySize, &outStreamDesc);
+  status = AudioDeviceGetProperty(outputDeviceID, 0, false,
+    kAudioDevicePropertyStreamFormat, (UInt32*)&propertysize, &outStreamDesc);
   if (status != 0)
   {
-    Report(CS_REPORTER_SEVERITY_ERROR, "Failed to retrieve output stream description from CoreAudio output device.  Return of %d.", (int)status);
+    Report(CS_REPORTER_SEVERITY_ERROR,
+	   "Failed to retrieve output stream description from CoreAudio "
+	   "output device.  Return of %d.", (int)status);
     return false;
   }
 
   // Modify stream information to our desired format
   outStreamDesc.mSampleRate=requested_format->Freq;
   outStreamDesc.mFormatID=kAudioFormatLinearPCM;
-  // This is where we set the output to signed integer output (not float), little endian
-  outStreamDesc.mFormatFlags=kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
+  // This is where we set the output to signed integer output (not float),
+  // little endian
+  outStreamDesc.mFormatFlags =
+    kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
   outStreamDesc.mChannelsPerFrame=requested_format->Channels;
   outStreamDesc.mBitsPerChannel=requested_format->Bits;
-  // Frames per packet are the number of full sets of sound samples (one for each channel)
-  //  encoded in a single logical unit of the source data.  In compressed formats there may be 
-  //  many frames encoded in each logical packet.  In uncompressed formats (like linear PCM)
-  //  this is always 1.
+  // Frames per packet are the number of full sets of sound samples (one for
+  // each channel) encoded in a single logical unit of the source data.  In
+  // compressed formats there may be many frames encoded in each logical
+  // packet.  In uncompressed formats (like linear PCM) this is always 1.
   outStreamDesc.mFramesPerPacket=1;
-  // The bytes per frame of a packed data stream will be channels * bits per sample / 8
-  outStreamDesc.mBytesPerFrame=requested_format->Channels * requested_format->Bits/8;
-  // The bytes per packet is purely a product of bytes per frame and frames per packet
-  //  since we don't have any padding in a packet here
-  outStreamDesc.mBytesPerPacket=outStreamDesc.mFramesPerPacket * outStreamDesc.mBytesPerFrame;
+  // The bytes per frame of a packed data stream will be channels * bits per
+  // sample / 8
+  outStreamDesc.mBytesPerFrame = 
+    requested_format->Channels * requested_format->Bits/8;
+  // The bytes per packet is purely a product of bytes per frame and frames per
+  // packet since we don't have any padding in a packet here
+  outStreamDesc.mBytesPerPacket =
+    outStreamDesc.mFramesPerPacket * outStreamDesc.mBytesPerFrame;
 
   propertysize = sizeof(outStreamDesc);
-  status = AudioDeviceSetProperty(outputDeviceID, 0, 0, false, kAudioDevicePropertyStreamFormat, &propertySize, &outStreamDesc);
+  status = AudioDeviceSetProperty(outputDeviceID, 0, 0, false,
+    kAudioDevicePropertyStreamFormat, propertysize, &outStreamDesc);
   if (status != 0)
   {
-    Report(CS_REPORTER_SEVERITY_ERROR, "Failed to set output stream properties to Freq=%d Channels=%d Bits=%d .  Return of %d.", 
-           requested_format->Freq, requested_format->Channels, requested_format->Bits, (int)status);
+    Report(CS_REPORTER_SEVERITY_ERROR,
+	   "Failed to set output stream properties to Freq=%d Channels=%d "
+	   "Bits=%d .  Return of %d.", requested_format->Freq,
+	   requested_format->Channels, requested_format->Bits, (int)status);
     return false;
   }
 
@@ -218,7 +215,8 @@ bool SndSysDriverCoreAudio::Open (SndSysRendererSoftware *renderer,SndSysSoundFo
   status = AudioDeviceAddIOProc(outputDeviceID, StaticAudioProc, this);
   if (status != 0)
   {
-    Report(CS_REPORTER_SEVERITY_ERROR, "Failed to add audio device IO proc.  Return of %d.", (int)status);
+    Report(CS_REPORTER_SEVERITY_ERROR,
+	   "Failed to add audio device IO proc.  Return of %d.", (int)status);
     return false;
   }
 
@@ -228,37 +226,40 @@ bool SndSysDriverCoreAudio::Open (SndSysRendererSoftware *renderer,SndSysSoundFo
 void SndSysDriverCoreAudio::Close ()
 {
   StopThread();
-
   AudioDeviceRemoveIOProc(outputDeviceID, StaticAudioProc);
 }
 
 bool SndSysDriverCoreAudio::StartThread()
 {
   OSStatus status;
-  // Since the Core Audio API is callback driven, we don't actually start a thread here ourselves.
-  //  Instead we start the audio device pulling from the audio procedure.  This runs in its own
-  //  thread that we don't see.
+  // Since the Core Audio API is callback driven, we don't actually start a
+  // thread here ourselves.  Instead we start the audio device pulling from the
+  // audio procedure.  This runs in its own thread that we don't see.
   status = AudioDeviceStart(outputDeviceID, StaticAudioProc);
   if (status != 0)
   {
-    Report(CS_REPORTER_SEVERITY_ERROR, "Failed to start audio device IO proc.  Return of %d.", (int)status);
+    Report(CS_REPORTER_SEVERITY_ERROR, "Failed to start audio device IO proc. "
+	   "Return of %d.", (int)status);
     return false;
   }
+  running = true;
   return true;
 }
 
-
 void SndSysDriverCoreAudio::StopThread()
 {
+  running = false;
   AudioDeviceStop(outputDeviceID, StaticAudioProc);
-
   csSleep(100);
 }
 
 
-OSStatus SndSysDriverCoreAudio::AudioProc(AudioDeviceID inDevice, const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
-                   const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
-                   const AudioTimeStamp *inOutputTime)
+OSStatus SndSysDriverCoreAudio::AudioProc(AudioDeviceID inDevice,
+					  const AudioTimeStamp *inNow,
+					  const AudioBufferList *inInputData,
+					  const AudioTimeStamp *inInputTime,
+					  AudioBufferList *outOutputData,
+					  const AudioTimeStamp *inOutputTime)
 {
   if (!running)
   {
@@ -266,10 +267,10 @@ OSStatus SndSysDriverCoreAudio::AudioProc(AudioDeviceID inDevice, const AudioTim
     return 0;
   }
 
-  // Fill the provided buffer with as many samples as possible and return the number of bytes provided
-  outOutputData->mBuffers[0].mDataByteSize=attached_renderer->FillDriverBuffer(outOutputData->mBuffers[0].mData, outOutputData->mBuffers[0].mDataByteSize, 0, 0);
+  // Fill the provided buffer with as many samples as possible and return the
+  // number of bytes provided
+  outOutputData->mBuffers[0].mDataByteSize=attached_renderer->FillDriverBuffer(
+    outOutputData->mBuffers[0].mData,
+    outOutputData->mBuffers[0].mDataByteSize,0, 0);
   return 0;
 }
-
-
-
