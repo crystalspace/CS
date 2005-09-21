@@ -48,13 +48,13 @@ extern cs_ov_callbacks *GetCallbacks();
 
 SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data, 
 					    OggDataStore *datastore, 
-					    SndSysSoundFormat *renderformat, 
+					    csSndSysSoundFormat *renderformat, 
 					    int mode3d)
 {
   SCF_CONSTRUCT_IBASE(0);
 
   // Copy render format information
-  memcpy(&render_format,renderformat,sizeof(SndSysSoundFormat));
+  memcpy(&render_format,renderformat,sizeof(csSndSysSoundFormat));
 
   // Initialize the stream data
   stream_data.datastore=datastore;
@@ -134,7 +134,7 @@ SndSysOggSoundStream::~SndSysOggSoundStream ()
   SCF_DESTRUCT_IBASE();
 }
 
-const SndSysSoundFormat *SndSysOggSoundStream::GetRenderedFormat()
+const csSndSysSoundFormat *SndSysOggSoundStream::GetRenderedFormat()
 {
   return &render_format;
 }
@@ -147,7 +147,7 @@ int SndSysOggSoundStream::Get3dMode()
 
 long SndSysOggSoundStream::GetSampleCount()
 {
-  const SndSysSoundFormat *data_format=sound_data->GetFormat();
+  const csSndSysSoundFormat *data_format=sound_data->GetFormat();
 
   uint64 samplecount=sound_data->GetSampleCount();
   samplecount*=(render_format.Channels * render_format.Freq);
@@ -196,18 +196,18 @@ bool SndSysOggSoundStream::Unpause()
 int SndSysOggSoundStream::GetPauseState()
 {
   if (paused)
-    return ISNDSYS_STREAM_PAUSED;
-  return ISNDSYS_STREAM_UNPAUSED;
+    return CS_SNDSYS_STREAM_PAUSED;
+  return CS_SNDSYS_STREAM_UNPAUSED;
 }
 
 bool SndSysOggSoundStream::SetLoopState(int loopstate)
 {
   switch (loopstate)
   {
-    case ISNDSYS_STREAM_DONTLOOP:
+    case CS_SNDSYS_STREAM_DONTLOOP:
       looping=false;
       break;
-    case ISNDSYS_STREAM_LOOP:
+    case CS_SNDSYS_STREAM_LOOP:
       looping=true;
       break;
     default:
@@ -218,13 +218,13 @@ bool SndSysOggSoundStream::SetLoopState(int loopstate)
 
 /** 
  * Retrieves the loop state of the stream.  Current possible returns are 
- * ISNDSYS_STREAM_DONTLOOP and ISNDSYS_STREAM_LOOP
+ * CS_SNDSYS_STREAM_DONTLOOP and CS_SNDSYS_STREAM_LOOP
  */
 int SndSysOggSoundStream::GetLoopState()
 {
   if (looping)
-    return ISNDSYS_STREAM_LOOP;
-  return ISNDSYS_STREAM_DONTLOOP;
+    return CS_SNDSYS_STREAM_LOOP;
+  return CS_SNDSYS_STREAM_DONTLOOP;
 }
 
 void SndSysOggSoundStream::SetPlayRatePercent(int percent)

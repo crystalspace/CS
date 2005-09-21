@@ -16,22 +16,22 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SNDSYS_DRIVER_H
-#define SNDSYS_DRIVER_H
+#ifndef __CS_SNDSYS_DRIVER_H__
+#define __CS_SNDSYS_DRIVER_H__
 
 #include "csutil/scf.h"
 
-class SndSysRendererSoftware;
-struct SndSysSoundFormat;
+// @@@ FIXME: This should really be an interface
+class csSndSysRendererSoftware; 
+struct csSndSysSoundFormat;
 
 SCF_VERSION (iSndSysSoftwareDriver, 0, 1, 0);
 
-
-
-// TODO:  Define a csSoundDevice structure that can be used to return information about playback devices available
-//        for use by this driver.
-//        Add interface functionality for enumerating and selecting particular playback devices.
-
+/* TODO:  Define a csSoundDevice structure that can be used to return 
+ *        information about playback devices available for use by this driver.
+ *        Add interface functionality for enumerating and selecting particular 
+ *	  playback devices.
+ */
 
 /**
  * This is the interface for the low-level, system-dependent sound driver
@@ -45,8 +45,8 @@ struct iSndSysSoftwareDriver : public iBase
    *
    * The requested_format parameter may be modified during this function.
    */
-  virtual bool Open(SndSysRendererSoftware *renderer,
-  	SndSysSoundFormat *requested_format) = 0;
+  virtual bool Open(csSndSysRendererSoftware *renderer,
+  	csSndSysSoundFormat *requested_format) = 0;
 
   /// Close the sound driver
   virtual void Close () = 0;
@@ -88,7 +88,4 @@ struct iSndSysSoftwareDriver : public iBase
   //virtual bool ThreadAware (){ return false; }
 };
 
-#endif // #ifndef SNDSYS_DRIVER_H
-
-
-
+#endif // __CS_SNDSYS_DRIVER_H__

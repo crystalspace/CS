@@ -41,7 +41,8 @@ public:
   virtual ~SndSysDriverOSS();
 
   /// Called to initialize the driver
-  bool Open (SndSysRendererSoftware *renderer,SndSysSoundFormat *requested_format);
+  bool Open (csSndSysRendererSoftware*renderer,
+    csSndSysSoundFormat *requested_format);
 
   /// Called to shutdown the driver
   void Close ();
@@ -66,8 +67,8 @@ public:
 
 protected:
   uint8 *oss_buffer;
-  SndSysRendererSoftware *attached_renderer;
-  SndSysSoundFormat playback_format;
+  csSndSysRendererSoftware *attached_renderer;
+  csSndSysSoundFormat playback_format;
 
   char output_device[128];
   int output_fd;

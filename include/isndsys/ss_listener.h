@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SNDSYS_LISTENER_H
-#define SNDSYS_LISTENER_H
+#ifndef __CS_SNDSYS_LISTENER_H__
+#define __CS_SNDSYS_LISTENER_H__
 
 #include "csutil/scf.h"
 #include "csgeom/vector3.h"
@@ -58,6 +58,4 @@ struct iSndSysListener : public iBase
 
 };
 
-#endif // #ifndef SNDSYS_LISTENER_H
-
-
+#endif // __CS_SNDSYS_LISTENER_H__

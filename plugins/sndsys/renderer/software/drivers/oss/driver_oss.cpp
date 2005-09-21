@@ -134,7 +134,8 @@ bool SndSysDriverOSS::Initialize (iObjectRegistry *obj_reg)
 //
 //
 //////////////////////////////////////////////////////////////////////////
-bool SndSysDriverOSS::Open (SndSysRendererSoftware *renderer,SndSysSoundFormat *requested_format)
+bool SndSysDriverOSS::Open (csSndSysRendererSoftware*renderer,
+			     csSndSysSoundFormat *requested_format)
 {
   int result, param;
 
@@ -146,7 +147,9 @@ bool SndSysDriverOSS::Open (SndSysRendererSoftware *renderer,SndSysSoundFormat *
   output_fd=open(output_device, O_WRONLY, 0);
   if (output_fd==-1)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: OSS Driver: Failed to open output device [%s].", output_device);
+    Report (CS_REPORTER_SEVERITY_ERROR, 
+      "Sound System: OSS Driver: Failed to open output device [%s].", 
+      output_device);
     return false;
   }
 

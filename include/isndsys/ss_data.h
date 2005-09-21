@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SNDSYS_DATA_H
-#define SNDSYS_DATA_H
+#ifndef __CS_SNDSYS_DATA_H__
+#define __CS_SNDSYS_DATA_H__
 
 #include "csutil/scf.h"
 
@@ -26,7 +26,7 @@ struct iSndSysStream;
 
 SCF_VERSION (iSndSysData, 0, 1, 0);
 
-#define ISNDSYS_DATA_UNKNOWN_SIZE -1
+#define CS_SNDSYS_DATA_UNKNOWN_SIZE -1
 
 /**
  * The sound data is an interface to the container object controlling raw
@@ -35,14 +35,11 @@ SCF_VERSION (iSndSysData, 0, 1, 0);
  * file) at least one iSound2Stream must be obtained.
  *
  * This interface is implemented at least once per Sound Element.
- *
- * TODO:  
- * Open issues:
  */
 struct iSndSysData : public iBase
 {
   /// Get the format of the sound data.
-  virtual const SndSysSoundFormat *GetFormat() = 0;
+  virtual const csSndSysSoundFormat *GetFormat() = 0;
 
   /// Get size of this sound in samples.
   virtual long GetSampleCount() = 0;
@@ -58,15 +55,17 @@ struct iSndSysData : public iBase
   virtual long GetDataSize() = 0;
 
   /**
-   * NOT AN APPLICATION CALLABLE FUNCTION!   This function should be called
-   * from the Renderer where a proper renderformat can be provided.
+   * This function should be called from the Renderer where a proper 
+   * renderformat can be provided.
    * Creates a stream associated with this sound data positioned at the
    * beginning of the sound data and initially paused if possible.
+   *
+   * \remarks Not intended to be called by an application.
    */
-  virtual iSndSysStream *CreateStream(SndSysSoundFormat *renderformat,
+  virtual iSndSysStream *CreateStream (csSndSysSoundFormat *renderformat,
   	int mode3d) = 0;
 
 };
 
-#endif // #ifndef SNDSYS_DATA_H
+#endif // __CS_SNDSYS_DATA_H__
 

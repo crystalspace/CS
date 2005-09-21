@@ -22,14 +22,14 @@
 
 #include "csgeom/transfrm.h"
 
-class ListenerProperties
+class csListenerProperties
 {
 public:
-  ListenerProperties() {}
-  ListenerProperties(ListenerProperties *copy_from) { Copy(copy_from); }
-  ~ListenerProperties() {}
+  csListenerProperties() {}
+  csListenerProperties(csListenerProperties *copy_from) { Copy(copy_from); }
+  ~csListenerProperties() {}
 
-  void Copy(ListenerProperties *copy_from)
+  void Copy(csListenerProperties *copy_from)
   {
     front.Set(copy_from->front);
     top.Set(copy_from->top);
@@ -89,7 +89,7 @@ public:
   void UpdateQueuedProperties();
 
 public:
-  ListenerProperties active_properties,queued_properties;
+  csListenerProperties active_properties,queued_properties;
   bool queued_update;
 };
 

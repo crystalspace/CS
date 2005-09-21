@@ -36,14 +36,14 @@ class SndSysWavSoundStream : public iSndSysStream
   SCF_DECLARE_IBASE;
 
   SndSysWavSoundStream(csRef<SndSysWavSoundData> data, char *WavData, 
-    size_t WavDataLen, SndSysSoundFormat *renderformat, int mode3d);
+    size_t WavDataLen, csSndSysSoundFormat *renderformat, int mode3d);
   virtual ~SndSysWavSoundStream();
 
   /**
    * Get the format of the rendered sound data.  This is for informational 
    * purposes only.
    */
-  virtual const SndSysSoundFormat *GetRenderedFormat();
+  virtual const csSndSysSoundFormat *GetRenderedFormat();
 
   /// Retrieve the 3D Mode the sound stream was created for
   virtual int Get3dMode();
@@ -220,7 +220,7 @@ class SndSysWavSoundStream : public iSndSysStream
    long CopyBufferBytes(long max_dest_bytes);
 
  protected:
-  SndSysSoundFormat render_format;
+  csSndSysSoundFormat render_format;
   csRef<SndSysWavSoundData> sound_data;
 
   CrystalSpace::SoundCyclicBuffer *p_cyclicbuffer;

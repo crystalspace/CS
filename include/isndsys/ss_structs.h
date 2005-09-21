@@ -16,8 +16,8 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SNDSYS_COMMON_STRUCTS_H
-#define SNDSYS_COMMON_STRUCTS_H
+#ifndef __CS_SNDSYS_COMMON_STRUCTS_H__
+#define __CS_SNDSYS_COMMON_STRUCTS_H__
 
 #include "csutil/scf.h"
 
@@ -25,7 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * The sound format. This keeps information about the frequency, bits and
  * channels of a sound data object.
  */
-struct SndSysSoundFormat
+struct csSndSysSoundFormat
 {
   /// Frequency of the sound (hz)
   int Freq;
@@ -36,9 +36,6 @@ struct SndSysSoundFormat
 };
 
 // A single sound sample will be stored as a signed int
-typedef int32 SoundSample;
+typedef int32 csSoundSample;
 
-
-
-#endif // #ifndef SNDSYS_COMMON_STRUCTS_H
-
+#endif // __CS_SNDSYS_COMMON_STRUCTS_H__

@@ -58,8 +58,9 @@ SCF_IMPLEMENT_IBASE_END;
 //  SndSysSourceSoftwareBasic
 //
 //////////////////////////////////////////////////////////////////////////
-SndSysSourceSoftwareBasic::SndSysSourceSoftwareBasic(csRef<iSndSysStream> stream, SndSysRendererSoftware *rend)
-: renderer(rend), sound_stream(stream)
+SndSysSourceSoftwareBasic::SndSysSourceSoftwareBasic(
+  csRef<iSndSysStream> stream, csSndSysRendererSoftware *rend) : 
+  renderer(rend), sound_stream(stream)
 {
   SCF_CONSTRUCT_IBASE(0);
 
@@ -111,7 +112,8 @@ void SndSysSourceSoftwareBasic::UpdateQueuedParameters()
   }
 }
 
-size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(SoundSample *channel_buffer, size_t buffer_samples)
+size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer, 
+						  size_t buffer_samples)
 {
   float source_volume;
   void *buf1,*buf2;
@@ -134,7 +136,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(SoundSample *channel_buffer, s
   }
 
   // If the stream associated with the source is paused, the source generates no audio
-  if ((sound_stream->GetPauseState() == ISNDSYS_STREAM_PAUSED) && 
+  if ((sound_stream->GetPauseState() == CS_SNDSYS_STREAM_PAUSED) && 
       (sound_stream->GetPosition() == stream_position))
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Stream is paused.");
@@ -205,7 +207,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(SoundSample *channel_buffer, s
   if (renderer->render_format.Bits==8)
   {
     int i, buffer_idx;
-    SoundSample mix;
+    csSoundSample mix;
     unsigned char *src_ptr;
     size_t second_half_offset=buffer_samples/2;
 
@@ -269,7 +271,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(SoundSample *channel_buffer, s
   {
     // 16 bit samples
     int i, buffer_idx;
-    SoundSample mix;
+    csSoundSample mix;
     short *src_ptr;
     size_t second_half_offset=buffer_samples/2;
 
@@ -352,13 +354,13 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(SoundSample *channel_buffer, s
 //  SndSysSourceSoftware3D
 //
 //////////////////////////////////////////////////////////////////////////
-SndSysSourceSoftware3D::SndSysSourceSoftware3D(csRef<iSndSysStream> stream, SndSysRendererSoftware *rend)
+SndSysSourceSoftware3D::SndSysSourceSoftware3D(csRef<iSndSysStream> stream, csSndSysRendererSoftware *rend)
 : renderer(rend), sound_stream(stream), clean_buffer(0), clean_buffer_samples(0), working_buffer(0), working_buffer_samples(0),
   filters_setup(false)
 {
   SCF_CONSTRUCT_IBASE(0);
 
-  active_parameters.maximum_distance=ISNDSYS_SOURCE_DISTANCE_INFINITE;
+  active_parameters.maximum_distance=CS_SNDSYS_SOURCE_DISTANCE_INFINITE;
   active_parameters.minimum_distance=1.0;
   active_parameters.position.Set(0,0,0);
 
@@ -369,7 +371,7 @@ SndSysSourceSoftware3D::SndSysSourceSoftware3D(csRef<iSndSysStream> stream, SndS
   //const SndSysSoundFormat *fmt=stream->GetRenderedFormat();
   // Allocate the history buffer
  // historic_buffer_samples=(fmt->Freq * SOURCE_3D_BUFFER_TIME_MS) / 1000;
- // historic_buffer=new SoundSample[historic_buffer_samples];
+ // historic_buffer=new csSoundSample[historic_buffer_samples];
 
  // ClearBuffer(historic_buffer,historic_buffer_samples);
 
@@ -455,7 +457,7 @@ void SndSysSourceSoftware3D::SetMinimumDistance (float distance)
 
 void SndSysSourceSoftware3D::SetMaximumDistance (float distance) 
 {
-  if (distance != ISNDSYS_SOURCE_DISTANCE_INFINITE && 
+  if (distance != CS_SNDSYS_SOURCE_DISTANCE_INFINITE && 
     distance < 0.000001f)
     distance=0.0f; // Don't play at all
 
@@ -552,7 +554,7 @@ void SndSysSourceSoftware3D::SetupFilters()
 }
 
 
-size_t SndSysSourceSoftware3D::MergeIntoBuffer(SoundSample *channel_buffer, size_t buffer_samples)
+size_t SndSysSourceSoftware3D::MergeIntoBuffer(csSoundSample *channel_buffer, size_t buffer_samples)
 {
   void *buf1,*buf2;
   long buf1_len,buf2_len;
@@ -578,7 +580,7 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer(SoundSample *channel_buffer, size
   }
 
   // If the stream associated with the source is paused, the source generates no audio
-  if ((sound_stream->GetPauseState() == ISNDSYS_STREAM_PAUSED) && 
+  if ((sound_stream->GetPauseState() == CS_SNDSYS_STREAM_PAUSED) && 
     (sound_stream->GetPosition() == stream_position))
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Stream is paused.");
@@ -629,7 +631,7 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer(SoundSample *channel_buffer, size
   if (renderer->render_format.Bits==8)
   {
     int i, buffer_idx;
-    SoundSample mix;
+    csSoundSample mix;
     unsigned char *src_ptr;
 
     buffer_idx=0;
@@ -698,7 +700,7 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer(SoundSample *channel_buffer, size
   total_channels=renderer->render_format.Channels;
   csVector3 listener_to_source;
   
-  if (sound_stream->Get3dMode() == SND3D_RELATIVE)
+  if (sound_stream->Get3dMode() == CS_SND3D_RELATIVE)
     listener_to_source=active_parameters.position;
   else
   {
@@ -726,7 +728,7 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer(SoundSample *channel_buffer, size
     float distance=speaker_to_source.Norm();
 
     // Clamp the distance at the max
-    if (active_parameters.maximum_distance != ISNDSYS_SOURCE_DISTANCE_INFINITE)
+    if (active_parameters.maximum_distance != CS_SNDSYS_SOURCE_DISTANCE_INFINITE)
     {
       if (distance > active_parameters.maximum_distance)
         distance=active_parameters.maximum_distance;
@@ -755,7 +757,7 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer(SoundSample *channel_buffer, size
     if (ProcessSoundChain(channel, per_channel_samples))
     {
       // If ProcessSoundChain returns true, merge the samples into the renderer buffer
-      SoundSample *channel_base=&(channel_buffer[channel * per_channel_samples]);
+      csSoundSample *channel_base=&(channel_buffer[channel * per_channel_samples]);
       for (size_t i=0;i<per_channel_samples;i++)
         channel_base[i]+=working_buffer[i];
     }
@@ -765,11 +767,11 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer(SoundSample *channel_buffer, size
   // Update the historic buffer
   /*
   if (per_channel_samples > historic_buffer_samples)
-    memcpy(historic_buffer,&(clean_buffer[per_channel_samples-historic_buffer_samples]), sizeof(SoundSample) * historic_buffer_samples);
+    memcpy(historic_buffer,&(clean_buffer[per_channel_samples-historic_buffer_samples]), sizeof(csSoundSample) * historic_buffer_samples);
   else
   {
-    memcpy(historic_buffer,&(historic_buffer[per_channel_samples]), sizeof(SoundSample) * per_channel_samples);
-    memcpy(&(historic_buffer[historic_buffer_samples-per_channel_samples]), clean_buffer, sizeof(SoundSample) * per_channel_samples);
+    memcpy(historic_buffer,&(historic_buffer[per_channel_samples]), sizeof(csSoundSample) * per_channel_samples);
+    memcpy(&(historic_buffer[historic_buffer_samples-per_channel_samples]), clean_buffer, sizeof(csSoundSample) * per_channel_samples);
   }
   */
 
@@ -876,7 +878,7 @@ bool SndSysSourceSoftware3D::ProcessSoundChain(int channel, size_t buffer_sample
   filter_props.speaker_direction_cos=speaker_direction_cos;
   filter_props.reporter=renderer->reporter;
 
-  memcpy(working_buffer, clean_buffer, sizeof(SoundSample) * buffer_samples);
+  memcpy(working_buffer, clean_buffer, sizeof(csSoundSample) * buffer_samples);
 
 
   speaker_filter_chains[channel]->Apply(filter_props);
@@ -887,12 +889,12 @@ bool SndSysSourceSoftware3D::ProcessSoundChain(int channel, size_t buffer_sample
 
 
 
-inline bool SndSysSourceSoftware3D::PrepareBuffer(SoundSample **p_buf, size_t *p_buf_len, size_t required)
+inline bool SndSysSourceSoftware3D::PrepareBuffer(csSoundSample **p_buf, size_t *p_buf_len, size_t required)
 {
   if (*p_buf_len < required)
   {
     delete[] (*p_buf);
-    *p_buf=new SoundSample[required];
+    *p_buf=new csSoundSample[required];
     if (!*p_buf)
     {
       *p_buf_len=0;
@@ -900,13 +902,13 @@ inline bool SndSysSourceSoftware3D::PrepareBuffer(SoundSample **p_buf, size_t *p
     }
     *p_buf_len=required;
   }
-  //memset(*p_buf, 0, sizeof(SoundSample) * required);
+  //memset(*p_buf, 0, sizeof(csSoundSample) * required);
   return true;
 }
 
-inline void SndSysSourceSoftware3D::ClearBuffer(SoundSample *p_buf, size_t p_buf_len)
+inline void SndSysSourceSoftware3D::ClearBuffer(csSoundSample *p_buf, size_t p_buf_len)
 {
-  memset(p_buf,0, sizeof(SoundSample) * p_buf_len);
+  memset(p_buf,0, sizeof(csSoundSample) * p_buf_len);
 }
 
 

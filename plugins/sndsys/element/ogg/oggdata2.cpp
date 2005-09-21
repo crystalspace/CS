@@ -120,7 +120,7 @@ SndSysOggSoundData::~SndSysOggSoundData ()
   SCF_DESTRUCT_IBASE();
 }
 
-const SndSysSoundFormat *SndSysOggSoundData::GetFormat()
+const csSndSysSoundFormat *SndSysOggSoundData::GetFormat()
 {
   if (!data_ready)
     Initialize();
@@ -139,7 +139,8 @@ long SndSysOggSoundData::GetDataSize()
   return (long)(ds->length & 0x7FFFFFFF);
 }
 
-iSndSysStream *SndSysOggSoundData::CreateStream(SndSysSoundFormat *renderformat, int mode3d)
+iSndSysStream *SndSysOggSoundData::CreateStream (
+  csSndSysSoundFormat *renderformat, int mode3d)
 {
   SndSysOggSoundStream *stream=new SndSysOggSoundStream(this, ds, renderformat, mode3d);
 

@@ -42,7 +42,8 @@ public:
   virtual ~SndSysDriverDirectSound();
 
   /// Called to initialize the driver
-  bool Open (SndSysRendererSoftware *renderer,SndSysSoundFormat *requested_format);
+  bool Open (csSndSysRendererSoftware *renderer, 
+    csSndSysSoundFormat *requested_format);
 
   /// Called to shutdown the driver
   void Close ();
@@ -75,8 +76,8 @@ public:
   */
 
 protected:
-  SndSysRendererSoftware *attached_renderer;
-  SndSysSoundFormat playback_format;
+  csSndSysRendererSoftware *attached_renderer;
+  csSndSysSoundFormat playback_format;
 
   LPDIRECTSOUND8 ds_device;
   LPDIRECTSOUNDBUFFER ds_buffer;
@@ -122,7 +123,3 @@ public:
 };
 
 #endif // #ifndef SNDSYS_SOFTWARE_DRIVER_DIRECTSOUND_H
-
-
-
-

@@ -69,11 +69,6 @@ struct st_speaker_properties
   float min_factor,max_factor;
 };
 
-
-
-
-
-
 struct iSndSysSoftwareDriver;
 struct iConfigFile;
 class SndSysListenerSoftware;
@@ -81,13 +76,13 @@ class SndSysSourceSoftware;
 struct iSndSysSourceSoftware;
 struct iReporter;
 
-class SndSysRendererSoftware : public iSndSysRenderer
+class csSndSysRendererSoftware : public iSndSysRenderer
 {
 public:
   SCF_DECLARE_IBASE;
 
-  SndSysRendererSoftware(iBase *piBase);
-  virtual ~SndSysRendererSoftware();
+  csSndSysRendererSoftware(iBase *piBase);
+  virtual ~csSndSysRendererSoftware();
 
   // Called when the renderer plugin is opened
   bool Open ();
@@ -134,7 +129,7 @@ public:
   csRef<SndSysListenerSoftware> Listener;
 
 
-  SndSysSoundFormat render_format;
+  csSndSysSoundFormat render_format;
 
   // TODO: Move to listener
   struct st_speaker_properties Speakers[MAX_CHANNELS];
@@ -161,7 +156,7 @@ protected:
   csTicks last_ticks;
 
   // Pointer to a buffer of sound samples used to mix data prior to sending to the driver
-  SoundSample *sample_buffer;
+  csSoundSample *sample_buffer;
   size_t sample_buffer_samples;
 
   uint32 last_intensity_multiplier;
@@ -172,9 +167,11 @@ protected:
   void ProcessPendingSources();
   void ProcessPendingStreams();
   void NormalizeSampleBuffer(size_t used_samples);
-  void CopySampleBufferToDriverBuffer(void *drvbuf1,size_t drvbuf1_len,void *drvbuf2, size_t drvbuf2_len, uint32 samples_per_channel);
+  void CopySampleBufferToDriverBuffer(void *drvbuf1,size_t drvbuf1_len,
+    void *drvbuf2, size_t drvbuf2_len, uint32 samples_per_channel);
   /// This copies to a single buffer, called up to twice
-  SoundSample *CopySampleBufferToDriverBuffer(void *drvbuf,size_t drvbuf_len, SoundSample *src, uint32 samples_per_channel);
+  csSoundSample *CopySampleBufferToDriverBuffer(void *drvbuf, 
+    size_t drvbuf_len, csSoundSample *src, uint32 samples_per_channel);
   
 public:
   ////
@@ -191,7 +188,7 @@ public:
 
   struct eiComponent : public iComponent
   {
-    SCF_DECLARE_EMBEDDED_IBASE(SndSysRendererSoftware);
+    SCF_DECLARE_EMBEDDED_IBASE(csSndSysRendererSoftware);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
@@ -200,10 +197,10 @@ public:
   struct EventHandler : public iEventHandler
   {
   private:
-    SndSysRendererSoftware* parent;
+    csSndSysRendererSoftware* parent;
   public:
     SCF_DECLARE_IBASE;
-    EventHandler (SndSysRendererSoftware* parent)
+    EventHandler (csSndSysRendererSoftware* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;

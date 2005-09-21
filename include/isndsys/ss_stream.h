@@ -17,35 +17,34 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SNDSYS_STREAM_H
-#define SNDSYS_STREAM_H
+#ifndef __CS_SNDSYS_STREAM_H__
+#define __CS_SNDSYS_STREAM_H__
 
 #include "csutil/scf.h"
 
-
-struct SndSysSoundFormat;
+struct csSndSysSoundFormat;
 struct iSndSysData;
 
-SCF_VERSION (iSndSysStream, 0, 1, 0);
+#define CS_SNDSYS_STREAM_UNKNOWN_LENGTH -1
 
-#define ISNDSYS_STREAM_UNKNOWN_LENGTH -1
+#define CS_SNDSYS_STREAM_PAUSED     0
+#define CS_SNDSYS_STREAM_UNPAUSED   1
 
-#define ISNDSYS_STREAM_PAUSED     0
-#define ISNDSYS_STREAM_UNPAUSED   1
-
-#define ISNDSYS_STREAM_DONTLOOP   0
-#define ISNDSYS_STREAM_LOOP       1
+#define CS_SNDSYS_STREAM_DONTLOOP   0
+#define CS_SNDSYS_STREAM_LOOP       1
 
 /// Every sound stream must be created with one of these 3d modes.
 enum
 {
   /// Disable 3d effect.
-  SND3D_DISABLE=0,
+  CS_SND3D_DISABLE=0,
   /// Position of the sound is relative to the listener.
-  SND3D_RELATIVE,
+  CS_SND3D_RELATIVE,
   /// Position of the sound is absolute.
-  SND3D_ABSOLUTE
+  CS_SND3D_ABSOLUTE
 };
+
+SCF_VERSION (iSndSysStream, 0, 1, 0);
 
 /**
  * @@@ Document me!
@@ -56,23 +55,23 @@ struct iSndSysStream : public iBase
    * Get the format of the rendered sound data.  This is for informational
    * purposes only.
    */
-  virtual const SndSysSoundFormat *GetRenderedFormat() = 0;
+  virtual const csSndSysSoundFormat *GetRenderedFormat() = 0;
 
   /// Retrieve the 3D Mode the sound stream was created for.
   virtual int Get3dMode() = 0;
 
   /**
    * Get length of this stream in rendered samples.
-   * May return ISOUND_STREAM_UNKNOWN_LENGTH if the stream is of unknown length.
-   * For example, sound data being streamed from a remote host may not have
-   * a pre-determinable length.
+   * May return CS_SNDSYS_STREAM_UNKNOWN_LENGTH if the stream is of unknown 
+   * length. For example, sound data being streamed from a remote host may not 
+   * have a pre-determinable length.
    */
   virtual long GetSampleCount() = 0;
 
   /**
    * Returns the current position of this sound in rendered samples. 
    * This should return a valid value even if GetSampleCount() returns
-   * ISOUND_STREAM_UNKNOWN_LENGTH since an object implementing
+   * CS_SNDSYS_STREAM_UNKNOWN_LENGTH since an object implementing
    * this interface should know its position relative to the begining of the
    * data.  In the case where the begining may be ambiguous
    * it should be considered to be at the point where the stream first
@@ -118,8 +117,8 @@ struct iSndSysStream : public iBase
   /**
    * Returns the PAUSE state of the stream:
    * <ul>
-   * <li>ISNDSYS_STREAM_PAUSED - The stream is paused.
-   * <li>ISNDSYS_STREAM_UNPAUSED - The stream is not paused.  AdvancePosition
+   * <li>CS_SNDSYS_STREAM_PAUSED - The stream is paused.
+   * <li>CS_SNDSYS_STREAM_UNPAUSED - The stream is not paused.  AdvancePosition
    *     is moving the stream position.
    * </ul>
    */
@@ -127,14 +126,14 @@ struct iSndSysStream : public iBase
 
   /**
    * Sets the loop state of the stream. Current acceptable values are
-   * ISNDSYS_STREAM_DONTLOOP and ISNDSYS_STREAM_LOOP
+   * CS_SNDSYS_STREAM_DONTLOOP and CS_SNDSYS_STREAM_LOOP
    * May return FALSE if looping is not supported
    */
   virtual bool SetLoopState(int loopstate) = 0;
 
   /**
    * Retrieves the loop state of the stream.  Current possible returns are
-   * ISNDSYS_STREAM_DONTLOOP and ISNDSYS_STREAM_LOOP.
+   * CS_SNDSYS_STREAM_DONTLOOP and CS_SNDSYS_STREAM_LOOP.
    */
   virtual int GetLoopState() = 0;
 
@@ -185,8 +184,7 @@ struct iSndSysStream : public iBase
   virtual void AdvancePosition(csTicks current_time) = 0;
 
   /**
-   * NOT AN APPLICATION CALLABLE FUNCTION!  This function is used to retrieve
-   * pointers to properly formatted sound data.  
+   * Used to retrieve pointers to properly formatted sound data.  
    *
    * Since a Stream may be attached to multiple Sources, it will be most
    * optimal to perform any decoded-data buffering at the stream level.
@@ -216,17 +214,18 @@ struct iSndSysStream : public iBase
    *        second chunk is needed.
    * @param buffer2_length should point to a long that will be filled with the
    *        length of valid data in the buffer pointed to by *buffer1 on return.
+   *
+   * \remarks Not intended to be called by an application.
    */
   virtual void GetDataPointers(long *position_marker,long max_requested_length,
   	void **buffer1,long *buffer1_length,void **buffer2,
 	long *buffer2_length) = 0;
 
-
-
   /**
-   * NOT AN APPLICATION CALLABLE FUNCTION!  This function fills a long value
-   * that will be used to track a Source's position through calls to
-   * GetDataPointers().
+   * Fill a long value that will be used to track a Source's position through 
+   * calls to GetDataPointers().
+   *
+   * \remarks Not intended to be called by an application.
    */
   virtual void InitializeSourcePositionMarker(long *position_marker) = 0;
 
@@ -234,6 +233,4 @@ struct iSndSysStream : public iBase
   virtual iSndSysStream *GetPtr() = 0;
 };
 
-#endif // #ifndef SNDSYS_STREAM_H
-
-
+#endif // __CS_SNDSYS_STREAM_H__

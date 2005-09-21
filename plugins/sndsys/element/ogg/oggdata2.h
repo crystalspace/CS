@@ -96,7 +96,7 @@ class SndSysOggSoundData : public iSndSysData
 
 
   /// Get the format of the sound data.
-  virtual const SndSysSoundFormat *GetFormat();
+  virtual const csSndSysSoundFormat *GetFormat();
 
   /// Get size of this sound in samples.
   virtual long GetSampleCount();
@@ -108,7 +108,8 @@ class SndSysOggSoundData : public iSndSysData
   virtual long GetDataSize();
 
   /// Creates a stream associated with this sound data positioned at the begining of the sound data and initially paused if possible.
-  virtual iSndSysStream *CreateStream(SndSysSoundFormat *renderformat, int mode3d);
+  virtual iSndSysStream *CreateStream (csSndSysSoundFormat *renderformat, 
+    int mode3d);
 
   void Initialize();
 
@@ -118,7 +119,7 @@ class SndSysOggSoundData : public iSndSysData
   OggDataStore *ds;
   int endian;
   bool data_ready;
-  SndSysSoundFormat fmt;
+  csSndSysSoundFormat fmt;
   long sample_count;
 
 };

@@ -115,8 +115,8 @@ bool SndSysDriverCoreAudio::Initialize (iObjectRegistry* r)
   return true;
 }
 
-bool SndSysDriverCoreAudio::Open (SndSysRendererSoftware *renderer,
-				  SndSysSoundFormat *requested_format)
+bool SndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
+				   csSndSysSoundFormat *requested_format)
 {
   uint32 propertysize, buffersize;
   AudioStreamBasicDescription outStreamDesc;

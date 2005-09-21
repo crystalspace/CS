@@ -101,30 +101,36 @@ class SndSysWavSoundData : public iSndSysData
 
 
   /// Get the format of the sound data.
-  virtual const SndSysSoundFormat *GetFormat();
+  virtual const csSndSysSoundFormat *GetFormat();
 
   /// Get size of this sound in samples.
   virtual long GetSampleCount();
 
-  /** Return the size of the data stored in bytes.  This is informational only and is not guaranteed to be a number usable for sound calculations.
-   *  For example, an audio file compressed with variable rate compression may result in a situation where FILE_SIZE is not equal to
-   *   SAMPLE_COUNT * SAMPLE_SIZE since SAMPLE_SIZE may vary throughout the audio data.
+  /** 
+   * Return the size of the data stored in bytes.  This is informational only 
+   * and is not guaranteed to be a number usable for sound calculations.
+   * For example, an audio file compressed with variable rate compression may 
+   * result in a situation where FILE_SIZE is not equal to 
+   * SAMPLE_COUNT * SAMPLE_SIZE since SAMPLE_SIZE may vary throughout the 
+   * audio data.
    */
   virtual long GetDataSize();
 
   /// Creates a stream associated with this sound data positioned at the beginning of the sound data and initially paused if possible.
-  virtual iSndSysStream *CreateStream(SndSysSoundFormat *renderformat, int mode3d);
+  virtual iSndSysStream *CreateStream(csSndSysSoundFormat *renderformat, int mode3d);
 
   void Initialize();
 
   static bool IsWav (void *Buffer, size_t len);
 
-  static bool ReadHeaders(void *Buffer, size_t len, _RIFFchk *p_riffchk, _FMTchk *p_fmtchk, _WAVchk *p_wavchk, void **data_start, size_t *data_len);
+  static bool ReadHeaders(void *Buffer, size_t len, _RIFFchk *p_riffchk, 
+    _FMTchk *p_fmtchk, _WAVchk *p_wavchk, void **data_start, 
+    size_t *data_len);
 
  protected:
   WavDataStore *ds;
   bool data_ready;
-  SndSysSoundFormat fmt;
+  csSndSysSoundFormat fmt;
   long sample_count;
 
   _RIFFchk riffhdr;

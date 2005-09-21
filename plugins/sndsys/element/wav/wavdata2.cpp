@@ -147,7 +147,7 @@ SndSysWavSoundData::~SndSysWavSoundData ()
   SCF_DESTRUCT_IBASE();
 }
 
-const SndSysSoundFormat *SndSysWavSoundData::GetFormat()
+const csSndSysSoundFormat *SndSysWavSoundData::GetFormat()
 {
   if (!data_ready)
     Initialize();
@@ -166,12 +166,14 @@ long SndSysWavSoundData::GetDataSize()
   return (long)(wavedata_len & 0x7FFFFFFF);
 }
 
-iSndSysStream *SndSysWavSoundData::CreateStream(SndSysSoundFormat *renderformat, int mode3d)
+iSndSysStream *SndSysWavSoundData::CreateStream (
+  csSndSysSoundFormat *renderformat, int mode3d)
 {
   if (!data_ready)
     Initialize();
 
-  SndSysWavSoundStream *stream=new SndSysWavSoundStream(this, (char *)wavedata, wavedata_len, renderformat, mode3d);
+  SndSysWavSoundStream *stream=new SndSysWavSoundStream(this, 
+    (char *)wavedata, wavedata_len, renderformat, mode3d);
 
   return (stream);
 }

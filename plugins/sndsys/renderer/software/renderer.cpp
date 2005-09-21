@@ -48,31 +48,31 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_FACTORY (SndSysRendererSoftware)
+SCF_IMPLEMENT_FACTORY (csSndSysRendererSoftware)
 
 
-SCF_IMPLEMENT_IBASE(SndSysRendererSoftware)
+SCF_IMPLEMENT_IBASE(csSndSysRendererSoftware)
 	SCF_IMPLEMENTS_INTERFACE(iSndSysRenderer)
 	SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END;
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (SndSysRendererSoftware::eiComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSndSysRendererSoftware::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (SndSysRendererSoftware::EventHandler)
+SCF_IMPLEMENT_IBASE (csSndSysRendererSoftware::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 // The system driver.
-iObjectRegistry *SndSysRendererSoftware::object_reg=0;
+iObjectRegistry *csSndSysRendererSoftware::object_reg=0;
 
 // The loaded CS reporter
-csRef<iReporter> SndSysRendererSoftware::reporter;
+csRef<iReporter> csSndSysRendererSoftware::reporter;
 
 
-SndSysRendererSoftware::SndSysRendererSoftware(iBase* piBase) :
-sample_buffer(0), sample_buffer_samples(0), last_intensity_multiplier(0)
+csSndSysRendererSoftware::csSndSysRendererSoftware(iBase* piBase) :
+  sample_buffer(0), sample_buffer_samples(0), last_intensity_multiplier(0)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -94,7 +94,7 @@ sample_buffer(0), sample_buffer_samples(0), last_intensity_multiplier(0)
 }
 
 
-SndSysRendererSoftware::~SndSysRendererSoftware()
+csSndSysRendererSoftware::~csSndSysRendererSoftware()
 {
   delete[] sample_buffer;
 
@@ -102,7 +102,7 @@ SndSysRendererSoftware::~SndSysRendererSoftware()
   SCF_DESTRUCT_IBASE();
 }
 
-void SndSysRendererSoftware::Report(int severity, const char* msg, ...)
+void csSndSysRendererSoftware::Report(int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
@@ -121,7 +121,7 @@ void SndSysRendererSoftware::Report(int severity, const char* msg, ...)
 }
 
 
-bool SndSysRendererSoftware::HandleEvent (iEvent &e)
+bool csSndSysRendererSoftware::HandleEvent (iEvent &e)
 {
   if (e.Type == csevCommand || e.Type == csevBroadcast) {
     switch (csCommandEventHelper::GetCode(&e)) {
@@ -136,7 +136,7 @@ bool SndSysRendererSoftware::HandleEvent (iEvent &e)
   return false;
 }
 
-bool SndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
+bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
 {
   // copy the system pointer
   object_reg=obj_reg;
@@ -189,7 +189,7 @@ bool SndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
 //
 //
 //////////////////////////////////////////////////////////////////////////
-bool SndSysRendererSoftware::Open ()
+bool csSndSysRendererSoftware::Open ()
 {
   Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Open()");
   CS_ASSERT (Config != 0);
@@ -200,7 +200,8 @@ bool SndSysRendererSoftware::Open ()
   render_format.Bits = Config->GetInt("SndSys.Bits", 16);
   render_format.Channels = Config->GetInt("SndSys.Channels", 2);
 
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Initializing driver with Freq=%d Channels=%d Bits=%d",
+  Report (CS_REPORTER_SEVERITY_DEBUG, 
+    "Sound System: Initializing driver with Freq=%d Channels=%d Bits=%d",
     render_format.Freq, render_format.Channels, render_format.Bits);
 
   if (!SoundDriver->Open(this, &render_format))
@@ -221,7 +222,7 @@ bool SndSysRendererSoftware::Open ()
   return SoundDriver->StartThread();
 }
 
-void SndSysRendererSoftware::Close ()
+void csSndSysRendererSoftware::Close ()
 {
   if (!SoundDriver) return;
 
@@ -230,26 +231,26 @@ void SndSysRendererSoftware::Close ()
 }
 
 
-void SndSysRendererSoftware::SetVolume (float vol)
+void csSndSysRendererSoftware::SetVolume (float vol)
 {
   Volume=vol;
 }
 
-float SndSysRendererSoftware::GetVolume ()
+float csSndSysRendererSoftware::GetVolume ()
 {
   return Volume;
 }
 
-csPtr<iSndSysStream> SndSysRendererSoftware::CreateStream(csRef<iSndSysData> data, int mode3d)
+csPtr<iSndSysStream> csSndSysRendererSoftware::CreateStream(csRef<iSndSysData> data, int mode3d)
 {
-  SndSysSoundFormat stream_format;
+  csSndSysSoundFormat stream_format;
   iSndSysStream *stream;
 
   // Determine the desired format based on the 3d mode
   stream_format.Bits=render_format.Bits;
   stream_format.Freq=render_format.Freq;
 
-  if (mode3d == SND3D_DISABLE)
+  if (mode3d == CS_SND3D_DISABLE)
     stream_format.Channels=render_format.Channels;
   else
     stream_format.Channels=1; // positional sounds are rendered to mono format
@@ -269,11 +270,11 @@ csPtr<iSndSysStream> SndSysRendererSoftware::CreateStream(csRef<iSndSysData> dat
 }
 
 
-csPtr<iSndSysSource> SndSysRendererSoftware::CreateSource(csRef<iSndSysStream> stream)
+csPtr<iSndSysSource> csSndSysRendererSoftware::CreateSource(csRef<iSndSysStream> stream)
 {
   iSndSysSourceSoftware *source=0;
   // Needs to be threadsafe with the background thread
-  if (stream->Get3dMode() == SND3D_DISABLE)
+  if (stream->Get3dMode() == CS_SND3D_DISABLE)
   {
     SndSysSourceSoftwareBasic *s =new SndSysSourceSoftwareBasic(stream, this);
     source=s;
@@ -295,7 +296,7 @@ csPtr<iSndSysSource> SndSysRendererSoftware::CreateSource(csRef<iSndSysStream> s
 }
 
 /// Remove a stream from the sound renderer's list of streams
-bool SndSysRendererSoftware::RemoveStream(csRef<iSndSysStream> stream)
+bool csSndSysRendererSoftware::RemoveStream(csRef<iSndSysStream> stream)
 {
   iSndSysStream *streamptr=stream->GetPtr();
 
@@ -311,7 +312,7 @@ bool SndSysRendererSoftware::RemoveStream(csRef<iSndSysStream> stream)
 }
 
 /// Remove a source from the sound renderer's list of sources
-bool SndSysRendererSoftware::RemoveSource(csRef<iSndSysSource> source)
+bool csSndSysRendererSoftware::RemoveSource(csRef<iSndSysSource> source)
 {
   iSndSysSource *sourceptr=source->GetPtr();
 
@@ -328,12 +329,12 @@ bool SndSysRendererSoftware::RemoveSource(csRef<iSndSysSource> source)
 
 
 
-csRef<iSndSysListener> SndSysRendererSoftware::GetListener()
+csRef<iSndSysListener> csSndSysRendererSoftware::GetListener()
 {
   return Listener;
 }
 
-uint32 SndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,
+uint32 csSndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,
 						void *buf2, uint32 buf2_len)
 {
   csTicks current_ticks;
@@ -354,13 +355,13 @@ uint32 SndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,
   if ((sample_buffer==0) || (needed_samples > (long)sample_buffer_samples))
   {
     delete[] sample_buffer;
-    sample_buffer=new SoundSample[needed_samples];
+    sample_buffer=new csSoundSample[needed_samples];
     //Report(CS_REPORTER_SEVERITY_DEBUG, "Allocated a new sample buffer at %08x of %08x samples", sample_buffer, needed_samples);
     sample_buffer_samples = needed_samples;
   }
 
   // Clear as much of the buffer as we need
-  memset(sample_buffer,0,sizeof(SoundSample) * needed_samples);
+  memset(sample_buffer,0,sizeof(csSoundSample) * needed_samples);
 
   size_t maxidx,currentidx;
 
@@ -370,7 +371,8 @@ uint32 SndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,
   {
     // Search for any streams that have an unregister requested and are paused and mark them for removal in the next cycle
     iSndSysStream *str=streams.Get(currentidx);
-    if ((str->GetPauseState() == ISNDSYS_STREAM_PAUSED) && (str->GetAutoUnregisterRequested() == true))
+    if ((str->GetPauseState() == CS_SNDSYS_STREAM_PAUSED) 
+      && (str->GetAutoUnregisterRequested() == true))
     {
       int currentsource,maxsource;
       maxsource=sources.GetSize();
@@ -428,7 +430,7 @@ uint32 SndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,
 }
 
 
-uint32 SndSysRendererSoftware::CalculateMaxSamples(size_t bytes)
+uint32 csSndSysRendererSoftware::CalculateMaxSamples(size_t bytes)
 {
   uint32 samples;
   
@@ -438,7 +440,7 @@ uint32 SndSysRendererSoftware::CalculateMaxSamples(size_t bytes)
   return samples;
 }
 
-void SndSysRendererSoftware::CalculateMaxBuffers(size_t samples, uint32 *buf1_len, uint32 *buf2_len)
+void csSndSysRendererSoftware::CalculateMaxBuffers(size_t samples, uint32 *buf1_len, uint32 *buf2_len)
 {
   uint32 bytes;
 
@@ -457,7 +459,7 @@ void SndSysRendererSoftware::CalculateMaxBuffers(size_t samples, uint32 *buf1_le
 }
 
 
-void SndSysRendererSoftware::ProcessPendingSources()
+void csSndSysRendererSoftware::ProcessPendingSources()
 {
   iSndSysSourceSoftware *src;
 
@@ -476,7 +478,7 @@ void SndSysRendererSoftware::ProcessPendingSources()
   }
 }
 
-void SndSysRendererSoftware::ProcessPendingStreams()
+void csSndSysRendererSoftware::ProcessPendingStreams()
 {
   iSndSysStream *stream;
   while (stream=stream_add_queue.DequeueEntry())
@@ -491,12 +493,12 @@ void SndSysRendererSoftware::ProcessPendingStreams()
 }
 
 
-void SndSysRendererSoftware::NormalizeSampleBuffer(size_t used_samples)
+void csSndSysRendererSoftware::NormalizeSampleBuffer(size_t used_samples)
 {
   size_t sample_idx;
-  SoundSample maxintensity=0;
-  SoundSample desiredintensity = (SoundSample)(0x7FFF * Volume);
-  SoundSample low_threshold;
+  csSoundSample maxintensity=0;
+  csSoundSample desiredintensity = (csSoundSample)(0x7FFF * Volume);
+  csSoundSample low_threshold;
   uint32 multiplier;
 
   if (desiredintensity> 0x7FFF) 
@@ -506,7 +508,7 @@ void SndSysRendererSoftware::NormalizeSampleBuffer(size_t used_samples)
   // First scan, find the max abs sample value
   for (sample_idx=0;sample_idx<used_samples;sample_idx++)
   {
-    SoundSample abssamp=sample_buffer[sample_idx];
+    csSoundSample abssamp=sample_buffer[sample_idx];
     if (abssamp<0) abssamp=-abssamp;
     if (abssamp > maxintensity) maxintensity=abssamp;
   }
@@ -563,17 +565,21 @@ void SndSysRendererSoftware::NormalizeSampleBuffer(size_t used_samples)
 }
 
 
-void SndSysRendererSoftware::CopySampleBufferToDriverBuffer(void *drvbuf1,size_t drvbuf1_len,void *drvbuf2, size_t drvbuf2_len, uint32 samples_per_channel)
+void csSndSysRendererSoftware::CopySampleBufferToDriverBuffer(void *drvbuf1,size_t drvbuf1_len,void *drvbuf2, size_t drvbuf2_len, uint32 samples_per_channel)
 {
-  SoundSample *ptr=sample_buffer;
+  csSoundSample *ptr=sample_buffer;
 
   if (drvbuf1)
-    ptr=CopySampleBufferToDriverBuffer(drvbuf1,drvbuf1_len, ptr, samples_per_channel);
+    ptr=CopySampleBufferToDriverBuffer(drvbuf1,drvbuf1_len, ptr, 
+      samples_per_channel);
   if (drvbuf2)
-    ptr=CopySampleBufferToDriverBuffer(drvbuf2,drvbuf2_len, ptr, samples_per_channel);
+    ptr=CopySampleBufferToDriverBuffer(drvbuf2,drvbuf2_len, ptr, 
+      samples_per_channel);
 }
 
-SoundSample *SndSysRendererSoftware::CopySampleBufferToDriverBuffer(void *drvbuf,size_t drvbuf_len, SoundSample *src, uint32 samples_per_channel)
+csSoundSample *csSndSysRendererSoftware::CopySampleBufferToDriverBuffer (
+  void *drvbuf, size_t drvbuf_len, csSoundSample *src, 
+  uint32 samples_per_channel)
 {
   if (render_format.Bits==8)
   {

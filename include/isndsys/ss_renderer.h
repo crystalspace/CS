@@ -17,12 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SNDSYS_RENDERER_H
-#define SNDSYS_RENDERER_H
+#ifndef __CS_SNDSYS_RENDERER_H__
+#define __CS_SNDSYS_RENDERER_H__
 
 #include "csutil/scf.h"
 
-struct SndSysSoundFormat;
+struct csSndSysSoundFormat;
 struct iSndSysData;
 struct iSndSysStream;
 struct iSndSysSource;
@@ -31,19 +31,18 @@ struct iSndSysListener;
 SCF_VERSION (iSndSysRenderer, 0, 1, 0);
 
 
-#define ISNDSYS_SOURCE_DISTANCE_INFINITE -1.0f
+#define CS_SNDSYS_SOURCE_DISTANCE_INFINITE -1.0f
 
 
-#define ISNDSYS_SOURCE_STOPPED    0
-#define ISNDSYS_SOURCE_PLAYING    1
+#define CS_SNDSYS_SOURCE_STOPPED    0
+#define CS_SNDSYS_SOURCE_PLAYING    1
 
 
 /**
- * 
- *
- *  TODO:  Should Sound Streams get processing time even if no Sound Sources are attached?
- *
- *
+ * @@@ Document me!
+ * \todo
+ *   Should Sound Streams get processing time even if no Sound Sources are 
+ *   attached?
  */
 struct iSndSysRenderer : public iBase
 {
@@ -71,10 +70,6 @@ struct iSndSysRenderer : public iBase
 
   /// Get the global Listener object
   virtual csRef<iSndSysListener> GetListener () = 0;
-
-  /// 
 };
 
-#endif // #ifndef SNDSYS_RENDERER_H
-
-
+#endif // __CS_SNDSYS_RENDERER_H__

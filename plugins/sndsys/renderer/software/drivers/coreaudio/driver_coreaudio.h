@@ -63,7 +63,7 @@ public:
   virtual ~SndSysDriverCoreAudio();
 
   /// Called to initialize the driver.
-  bool Open (SndSysRendererSoftware*, SndSysSoundFormat* requested_format);
+  bool Open (csSndSysRendererSoftware*, csSndSysSoundFormat* requested_format);
 
   /// Called to shutdown the driver.
   void Close ();
@@ -92,8 +92,8 @@ public:
   static csRef<iReporter> reporter;
 
 protected:
-  SndSysRendererSoftware *attached_renderer;
-  SndSysSoundFormat playback_format;
+  sSndSysRendererSoftware *attached_renderer;
+  csSndSysSoundFormat playback_format;
   bool running;
 
   // The output device

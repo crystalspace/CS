@@ -40,13 +40,13 @@ SCF_IMPLEMENT_IBASE_END
 
 
 SndSysWavSoundStream::SndSysWavSoundStream (csRef<SndSysWavSoundData> data, 
-  char *WavData, size_t WavDataLen, SndSysSoundFormat *renderformat, 
+  char *WavData, size_t WavDataLen, csSndSysSoundFormat *renderformat, 
   int mode3d)
 {
   SCF_CONSTRUCT_IBASE(0);
 
   // Copy render format information
-  memcpy(&render_format,renderformat,sizeof(SndSysSoundFormat));
+  memcpy(&render_format,renderformat,sizeof(csSndSysSoundFormat));
 
   // Copy the wav data buffer start and length
   wav_data_start=WavData;
@@ -124,7 +124,7 @@ SndSysWavSoundStream::~SndSysWavSoundStream ()
   SCF_DESTRUCT_IBASE();
 }
 
-const SndSysSoundFormat *SndSysWavSoundStream::GetRenderedFormat()
+const csSndSysSoundFormat *SndSysWavSoundStream::GetRenderedFormat()
 {
   return &render_format;
 }
@@ -137,7 +137,7 @@ int SndSysWavSoundStream::Get3dMode()
 
 long SndSysWavSoundStream::GetSampleCount()
 {
-  const SndSysSoundFormat *data_format=sound_data->GetFormat();
+  const csSndSysSoundFormat *data_format=sound_data->GetFormat();
 
   uint64 samplecount=sound_data->GetSampleCount();
   samplecount*=(render_format.Channels * render_format.Freq);
@@ -186,18 +186,18 @@ bool SndSysWavSoundStream::Unpause()
 int SndSysWavSoundStream::GetPauseState()
 {
   if (paused)
-    return ISNDSYS_STREAM_PAUSED;
-  return ISNDSYS_STREAM_UNPAUSED;
+    return CS_SNDSYS_STREAM_PAUSED;
+  return CS_SNDSYS_STREAM_UNPAUSED;
 }
 
 bool SndSysWavSoundStream::SetLoopState(int loopstate)
 {
   switch (loopstate)
   {
-    case ISNDSYS_STREAM_DONTLOOP:
+    case CS_SNDSYS_STREAM_DONTLOOP:
       looping=false;
       break;
-    case ISNDSYS_STREAM_LOOP:
+    case CS_SNDSYS_STREAM_LOOP:
       looping=true;
       break;
     default:
@@ -208,13 +208,13 @@ bool SndSysWavSoundStream::SetLoopState(int loopstate)
 
 /** 
  * Retrieves the loop state of the stream.  Current possible returns are 
- * ISNDSYS_STREAM_DONTLOOP and ISNDSYS_STREAM_LOOP
+ * CS_SNDSYS_STREAM_DONTLOOP and CS_SNDSYS_STREAM_LOOP
  */
 int SndSysWavSoundStream::GetLoopState()
 {
   if (looping)
-    return ISNDSYS_STREAM_LOOP;
-  return ISNDSYS_STREAM_DONTLOOP;
+    return CS_SNDSYS_STREAM_LOOP;
+  return CS_SNDSYS_STREAM_DONTLOOP;
 }
 
 void SndSysWavSoundStream::SetPlayRatePercent(int percent)
@@ -335,7 +335,7 @@ void SndSysWavSoundStream::AdvancePosition(csTicks current_time)
     if (new_output_frequency != output_frequency)
     {
       int needed_buffer,source_sample_size;
-      const SndSysSoundFormat *data_format=sound_data->GetFormat();
+      const csSndSysSoundFormat *data_format=sound_data->GetFormat();
 
       output_frequency=new_output_frequency;
 

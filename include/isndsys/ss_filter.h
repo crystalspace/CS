@@ -16,30 +16,23 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SNDSYS_FILTER_H
-#define SNDSYS_FILTER_H
+#ifndef __CS_SNDSYS_FILTER_H__
+#define __CS_SNDSYS_FILTER_H__
 
 #include "csutil/scf.h"
 
-
-SCF_VERSION (iSndSysSoftwareFilter3D, 0, 1, 0);
-SCF_VERSION (iSndSysSoftwareFilterOutput, 0, 1, 0);
-
-
-class SourceParameters3D;
-class ListenerProperties;
+class csSourceParameters3D;
+class csListenerProperties;
 class iReporter;
-
-
 
 struct iSndSysSoftwareFilter3DProperties
 {
-  SoundSample *clean_buffer;
-  SoundSample *work_buffer;
+  csSoundSample *clean_buffer;
+  csSoundSample *work_buffer;
   size_t buffer_samples;
-  SourceParameters3D *source_parameters;
-  ListenerProperties *listener_parameters;
-  SndSysSoundFormat *sound_format;
+  csSourceParameters3D *source_parameters;
+  csListenerProperties *listener_parameters;
+  csSndSysSoundFormat *sound_format;
 
   float closest_speaker_distance;
   float *speaker_distance;
@@ -49,6 +42,7 @@ struct iSndSysSoftwareFilter3DProperties
   iReporter *reporter;
 };
 
+SCF_VERSION (iSndSysSoftwareFilter3D, 0, 1, 0);
 
 /**
  * A sound filter is an interface to an object that modifies sequences of
@@ -80,6 +74,8 @@ struct iSndSysSoftwareFilter3D : public iBase
   virtual iSndSysSoftwareFilter3D *GetPtr() = 0;
 };
 
+SCF_VERSION (iSndSysSoftwareFilterOutput, 0, 1, 0);
+
 /**
  * An output sound filter receives 
  */
@@ -110,6 +106,4 @@ struct iSndSysSoftwareFilterOutput : public iBase
 };
 
 
-#endif // #ifndef SNDSYS_FILTER_H
-
-
+#endif // __CS_SNDSYS_FILTER_H__

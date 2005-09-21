@@ -20,6 +20,7 @@ chronological order.
 	- Eric Sunshine fixed build errors in the new CoreAudio sndsys driver.
 	- res templatized csQint() and csQround().
 	- res generasimplifilized SR a wee bit more.
+	- res did more namespace pollution reduction of the sndsys stuff.
 20-Sep-2005
 	- Eric Sunshine resolved a few build-system glitches related to the
 	  new sound system (sndsys).

@@ -60,15 +60,15 @@ class SndSysOggSoundStream : public iSndSysStream
  public:
   SCF_DECLARE_IBASE;
 
-  SndSysOggSoundStream(csRef<SndSysOggSoundData> data, OggDataStore *datastore, 
-    SndSysSoundFormat *renderformat, int mode3d);
+  SndSysOggSoundStream (csRef<SndSysOggSoundData> data, OggDataStore *datastore, 
+    csSndSysSoundFormat *renderformat, int mode3d);
   virtual ~SndSysOggSoundStream ();
 
   /**
    * Get the format of the rendered sound data.  This is for informational 
    * purposes only.
    */
-  virtual const SndSysSoundFormat *GetRenderedFormat();
+  virtual const csSndSysSoundFormat *GetRenderedFormat();
 
   /// Retrieve the 3D Mode the sound stream was created for
   virtual int Get3dMode();
@@ -246,7 +246,7 @@ class SndSysOggSoundStream : public iSndSysStream
 
  protected:
   OggVorbis_File vorbis_file;
-  SndSysSoundFormat render_format;
+  csSndSysSoundFormat render_format;
   OggStreamData stream_data;
   csRef<SndSysOggSoundData> sound_data;
 

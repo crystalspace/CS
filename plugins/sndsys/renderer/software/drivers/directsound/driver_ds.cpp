@@ -60,7 +60,7 @@ csRef<iReporter> SndSysDriverDirectSound::reporter;
 
 
 SndSysDriverDirectSound::SndSysDriverDirectSound(iBase* piBase) :
- ds_buffer_writecursor(0), running(false), ds_buffer(0), ds_device(0)
+ ds_device(0), ds_buffer(0), ds_buffer_writecursor(0), running(false)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -131,28 +131,34 @@ bool SndSysDriverDirectSound::Initialize (iObjectRegistry *obj_reg)
 //
 //
 //////////////////////////////////////////////////////////////////////////
-bool SndSysDriverDirectSound::Open (SndSysRendererSoftware *renderer,SndSysSoundFormat *requested_format)
+bool SndSysDriverDirectSound::Open (csSndSysRendererSoftware *renderer,
+  csSndSysSoundFormat *requested_format)
 {
   HRESULT hr;
 
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Direct Sound Driver: Open()");
+  Report (CS_REPORTER_SEVERITY_DEBUG, 
+    "Sound System: Direct Sound Driver: Open()");
 //  CS_ASSERT (Config != 0);
 
   attached_renderer=renderer;
-  memcpy(&playback_format, requested_format, sizeof(SndSysSoundFormat));
+  memcpy (&playback_format, requested_format, sizeof(csSndSysSoundFormat));
 
 
   hr = DirectSoundCreate8(0, &ds_device, 0);
   if (FAILED(hr))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: Direct Sound Driver: DirectSoundCreate8 failed.");
+    Report (CS_REPORTER_SEVERITY_ERROR, 
+      "Sound System: Direct Sound Driver: DirectSoundCreate8 failed.");
     return false;
   }
 
-  hr = ds_device->SetCooperativeLevel(win32Assistant->GetApplicationWindow(),DSSCL_PRIORITY);
+  hr = ds_device->SetCooperativeLevel (win32Assistant->GetApplicationWindow(),
+    DSSCL_PRIORITY);
   if (FAILED(hr))
   {
-    Report(CS_REPORTER_SEVERITY_ERROR, "Sound System: Direct Sound Driver: Failed to set cooperative level to DSSCL_PRIORITY! Error %08x :'%s'", hr, GetDSError(hr));
+    Report(CS_REPORTER_SEVERITY_ERROR, 
+      "Sound System: Direct Sound Driver: Failed to set cooperative level to "
+      "DSSCL_PRIORITY! Error %08x :'%s'", hr, GetDSError(hr));
     return false;
   }
 
@@ -167,8 +173,10 @@ bool SndSysDriverDirectSound::Open (SndSysRendererSoftware *renderer,SndSysSound
   ds_wavformat.nChannels=requested_format->Channels;
   ds_wavformat.nSamplesPerSec=requested_format->Freq;
   ds_wavformat.wBitsPerSample=requested_format->Bits;
-  ds_wavformat.nBlockAlign = (requested_format->Channels * requested_format->Bits) / 8;
-  ds_wavformat.nAvgBytesPerSec = requested_format->Freq * ds_wavformat.nBlockAlign;
+  ds_wavformat.nBlockAlign = 
+    (requested_format->Channels * requested_format->Bits) / 8;
+  ds_wavformat.nAvgBytesPerSec = 
+    requested_format->Freq * ds_wavformat.nBlockAlign;
   ds_wavformat.cbSize=0;
 
 
@@ -176,7 +184,8 @@ bool SndSysDriverDirectSound::Open (SndSysRendererSoftware *renderer,SndSysSound
 
   memset(&ds_bufferdesc, 0, sizeof(DSBUFFERDESC));
   ds_bufferdesc.dwSize=sizeof(DSBUFFERDESC);
-  ds_bufferdesc.dwFlags=DSBCAPS_CTRLPAN | DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_GLOBALFOCUS | DSBCAPS_LOCDEFER  ;
+  ds_bufferdesc.dwFlags=DSBCAPS_CTRLPAN | DSBCAPS_GETCURRENTPOSITION2 
+    | DSBCAPS_GLOBALFOCUS | DSBCAPS_LOCDEFER  ;
   ds_bufferdesc.dwBufferBytes=ds_buffer_bytes;
   ds_bufferdesc.lpwfxFormat=&ds_wavformat;
   ds_bufferdesc.guid3DAlgorithm=GUID_NULL;
@@ -184,7 +193,8 @@ bool SndSysDriverDirectSound::Open (SndSysRendererSoftware *renderer,SndSysSound
   hr = ds_device->CreateSoundBuffer(&ds_bufferdesc,&ds_buffer,0);
   if (FAILED(hr))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: Direct Sound Driver: Failed to create sound buffer.");
+    Report (CS_REPORTER_SEVERITY_ERROR, 
+      "Sound System: Direct Sound Driver: Failed to create sound buffer.");
     return false;
   }
 

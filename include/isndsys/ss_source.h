@@ -17,21 +17,17 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SNDSYS_ISNDSYS_SOURCE_H
-#define SNDSYS_ISNDSYS_SOURCE_H
+#ifndef __CS_SNDSYS_ISNDSYS_SOURCE_H__
+#define __CS_SNDSYS_ISNDSYS_SOURCE_H__
 
 #include "csutil/scf.h"
-
-
 
 SCF_VERSION (iSndSysSource, 0, 1, 0);
 
 struct iSndSysFilter;
 struct iSndSysStream;
 
-
-#define ISNDSYS_SOURCE_DISTANCE_INFINITE -1.0f
-
+#define CS_SNDSYS_SOURCE_DISTANCE_INFINITE -1.0f
 
 /**
  * @@@ Document me.
@@ -59,7 +55,7 @@ struct iSndSysSourceSoftware : public iSndSysSource
    * Renderer convenience interface - requests the source to fill the
    * supplied buffers
    */
-  virtual size_t MergeIntoBuffer(SoundSample *channel_buffer,
+  virtual size_t MergeIntoBuffer(csSoundSample *channel_buffer,
   	size_t buffer_samples) = 0;
 };
 
@@ -129,7 +125,7 @@ struct iSndSysSourceSoftware3D : public iSndSysSourceSoftware
 
 
 
-#endif // #ifndef SNDSYS_ISNDSYS_SOURCE_H
+#endif // __CS_SNDSYS_ISNDSYS_SOURCE_H__
 
 
 

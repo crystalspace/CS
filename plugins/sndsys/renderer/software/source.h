@@ -40,15 +40,15 @@ struct iSndSysStream;
 //class SndSysSourceSoftware;
 
 
-class SourceParametersBasic
+class csSourceParametersBasic
 {
 public:
-  SourceParametersBasic() {}
-  SourceParametersBasic(const SourceParametersBasic *copyfrom) { Copy(copyfrom); }
+  csSourceParametersBasic() {}
+  csSourceParametersBasic(const csSourceParametersBasic *copyfrom) { Copy(copyfrom); }
 
-  ~SourceParametersBasic() {}
+  ~csSourceParametersBasic() {}
 
-  void Copy(const SourceParametersBasic *copyfrom)
+  void Copy(const csSourceParametersBasic *copyfrom)
   {
     volume=copyfrom->volume;
   }
@@ -58,15 +58,15 @@ public:
 };
 
 
-class SourceParameters3D
+class csSourceParameters3D
 {
 public:
-  SourceParameters3D() {}
-  SourceParameters3D(const SourceParameters3D *copyfrom) { Copy(copyfrom); }
+  csSourceParameters3D() {}
+  csSourceParameters3D(const csSourceParameters3D *copyfrom) { Copy(copyfrom); }
 
-  ~SourceParameters3D() {}
+  ~csSourceParameters3D() {}
 
-  void Copy(const SourceParameters3D *copyfrom)
+  void Copy(const csSourceParameters3D *copyfrom)
   {
     volume=copyfrom->volume;
     minimum_distance=copyfrom->minimum_distance;
@@ -166,7 +166,7 @@ public:
   {
   }
 
-  void PrimeFilter(SoundSample *buffer, size_t sample_count)
+  void PrimeFilter(csSoundSample *buffer, size_t sample_count)
   {
     size_t i;
     if (sample_count < LOWPASS_SAMPLES)
@@ -234,8 +234,8 @@ public:
   }
 
 protected:
-  SoundSample history[LOWPASS_SAMPLES];
-  SoundSample sum;
+  csSoundSample history[LOWPASS_SAMPLES];
+  csSoundSample sum;
   size_t idx;
   bool primed;
 
@@ -262,17 +262,17 @@ public:
     if (!second_buffer || second_buffersize<properties.buffer_samples)
     {
       delete[] second_buffer;
-      second_buffer=new SoundSample[properties.buffer_samples];
+      second_buffer=new csSoundSample[properties.buffer_samples];
       second_buffersize=properties.buffer_samples;
     }
     // Copy to the second buffer
     if (second_filter)
-      memcpy(second_buffer,properties.work_buffer, properties.buffer_samples * sizeof(SoundSample));
+      memcpy(second_buffer,properties.work_buffer, properties.buffer_samples * sizeof(csSoundSample));
 
     if (second_filter)
     {
       memcpy(&second_props, &properties, sizeof(iSndSysSoftwareFilter3DProperties));
-      memcpy(second_buffer, properties.work_buffer, properties.buffer_samples * sizeof(SoundSample));
+      memcpy(second_buffer, properties.work_buffer, properties.buffer_samples * sizeof(csSoundSample));
       second_props.work_buffer=second_buffer;
     }
 
@@ -322,7 +322,7 @@ public:
   }
 
 protected:
-  SoundSample *second_buffer;
+  csSoundSample *second_buffer;
   size_t second_buffersize;
   iSndSysSoftwareFilter3D *second_filter;
 };
@@ -342,13 +342,13 @@ public:
   {
     delete[] history_buffer;
     history_samples=frequency;
-    history_buffer=new SoundSample[history_samples];
+    history_buffer=new csSoundSample[history_samples];
     if (!history_buffer)
     {
       history_samples=0;
       return false;
     }
-    memset(history_buffer,0,sizeof(SoundSample) * history_samples);
+    memset(history_buffer,0,sizeof(csSoundSample) * history_samples);
     return true;
   }
 
@@ -367,9 +367,9 @@ public:
       //"History shift is %u", history_shift);
 
     memcpy(history_buffer, &(history_buffer[history_shift]), 
-      sizeof(SoundSample) * (history_samples - history_shift));
+      sizeof(csSoundSample) * (history_samples - history_shift));
     memcpy(&(history_buffer[history_samples-history_shift]), 
-      properties.work_buffer, sizeof(SoundSample) * history_shift);
+      properties.work_buffer, sizeof(csSoundSample) * history_shift);
 
     /* Calculate the delay for this channel, this is based off difference in 
      * distance between the closest channel and this channel */
@@ -401,18 +401,18 @@ public:
           properties.work_buffer[idx]=properties.work_buffer[idx-delay_samples];
         //memcpy(&(properties.work_buffer[delay_samples]), 
 	  //properties.work_buffer, 
-	  //(properties.buffer_samples- delay_samples) * sizeof(SoundSample));
+	  //(properties.buffer_samples- delay_samples) * sizeof(csSoundSample));
       }
       memcpy(properties.work_buffer, 
 	&(history_buffer[history_samples-(history_shift + delay_samples)]), 
-	delay_samples * sizeof(SoundSample));
+	delay_samples * sizeof(csSoundSample));
     }
 
     if (next_filter)
       next_filter->Apply(properties);
   }
 protected:
-  SoundSample *history_buffer;
+  csSoundSample *history_buffer;
   size_t history_samples;
 };
 
@@ -436,13 +436,13 @@ public:
   {
     delete[] history_buffer;
     history_samples=frequency;
-    history_buffer=new SoundSample[history_samples];
+    history_buffer=new csSoundSample[history_samples];
     if (!history_buffer)
     {
       history_samples=0;
       return false;
     }
-    memset(history_buffer,0,sizeof(SoundSample) * history_samples);
+    memset(history_buffer,0,sizeof(csSoundSample) * history_samples);
     return true;
   }
 
@@ -461,9 +461,9 @@ public:
       //"History shift is %u", history_shift);
 
     memcpy(history_buffer, &(history_buffer[history_shift]), 
-      sizeof(SoundSample) * (history_samples - history_shift));
+      sizeof(csSoundSample) * (history_samples - history_shift));
     memcpy(&(history_buffer[history_samples-history_shift]), 
-      properties.work_buffer, sizeof(SoundSample) * history_shift);
+      properties.work_buffer, sizeof(csSoundSample) * history_shift);
 
     // Calculate the delay for this channel
     float fsamples = delay_time * properties.sound_format->Freq;
@@ -490,18 +490,18 @@ public:
           properties.work_buffer[idx]=properties.work_buffer[idx-delay_samples];
         //memcpy(&(properties.work_buffer[delay_samples]), 
 	  //properties.work_buffer, 
-	  //(properties.buffer_samples- delay_samples) * sizeof(SoundSample));
+	  //(properties.buffer_samples- delay_samples) * sizeof(csSoundSample));
       }
       memcpy(properties.work_buffer, 
 	&(history_buffer[history_samples-(history_shift + delay_samples)]), 
-	delay_samples * sizeof(SoundSample));
+	delay_samples * sizeof(csSoundSample));
     }
 
     if (next_filter)
       next_filter->Apply(properties);
   }
 protected:
-  SoundSample *history_buffer;
+  csSoundSample *history_buffer;
   size_t history_samples;
   float delay_time;
 };
@@ -521,13 +521,13 @@ public:
   {
     delete[] history_buffer;
     history_samples=frequency;
-    history_buffer=new SoundSample[history_samples];
+    history_buffer=new csSoundSample[history_samples];
     if (!history_buffer)
     {
       history_samples=0;
       return false;
     }
-    memset(history_buffer,0,sizeof(SoundSample) * history_samples);
+    memset(history_buffer,0,sizeof(csSoundSample) * history_samples);
     return true;
   }
 
@@ -546,9 +546,9 @@ public:
       //"History shift is %u", history_shift);
 
     memcpy(history_buffer, &(history_buffer[history_shift]), 
-      sizeof(SoundSample) * (history_samples - history_shift));
+      sizeof(csSoundSample) * (history_samples - history_shift));
     memcpy(&(history_buffer[history_samples-history_shift]), 
-      properties.work_buffer, sizeof(SoundSample) * history_shift);
+      properties.work_buffer, sizeof(csSoundSample) * history_shift);
 
     // Calculate the delay for this channel
     float delay_time=0.01f;
@@ -585,11 +585,11 @@ public:
           }
           //memcpy(&(properties.work_buffer[delay_samples]), 
 	    //properties.work_buffer, 
-	    //(properties.buffer_samples- delay_samples) * sizeof(SoundSample));
+	    //(properties.buffer_samples- delay_samples) * sizeof(csSoundSample));
         }
         //memcpy(properties.work_buffer, 
 	  //&(history_buffer[history_samples-(history_shift + delay_samples)]), 
-	  //delay_samples * sizeof(SoundSample));
+	  //delay_samples * sizeof(csSoundSample));
       }
       delay_time=delay_time*2.0f;
       delay_intensity_factor=delay_intensity_factor/2.0f;
@@ -599,7 +599,7 @@ public:
       next_filter->Apply(properties);
   }
 protected:
-  SoundSample *history_buffer;
+  csSoundSample *history_buffer;
   size_t history_samples;
 };
 
@@ -692,7 +692,7 @@ public:
     {
       // Not a direct sound, clip, do not call further chains
       memset(properties.work_buffer, 0, 
-	sizeof(SoundSample) * properties.buffer_samples);
+	sizeof(csSoundSample) * properties.buffer_samples);
       return;
     }
     if (properties.speaker_direction_cos[properties.channel] <=cos_near)
@@ -721,7 +721,7 @@ public:
   SCF_DECLARE_IBASE;
 
   SndSysSourceSoftwareBasic(csRef<iSndSysStream> stream, 
-    SndSysRendererSoftware *rend);
+    csSndSysRendererSoftware *rend);
   virtual ~SndSysSourceSoftwareBasic();
 
   /// Set volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
@@ -741,18 +741,18 @@ public:
   /// Retrieve a direct pointer to this object
   virtual iSndSysSource *GetPtr() { return this; }
 
-  virtual size_t MergeIntoBuffer(SoundSample *channel_buffer, 
+  virtual size_t MergeIntoBuffer(csSoundSample *channel_buffer, 
     size_t buffer_samples);
 
 protected:
   void UpdateQueuedParameters();
 
 protected:
-  SndSysRendererSoftware *renderer;
+  csSndSysRendererSoftware *renderer;
   csRef<iSndSysStream> sound_stream;
   long stream_position;
 
-  SourceParametersBasic active_parameters,queued_parameters;
+  csSourceParametersBasic active_parameters,queued_parameters;
   bool queued_updates;
 
 };
@@ -763,7 +763,7 @@ public:
   SCF_DECLARE_IBASE;
 
   SndSysSourceSoftware3D(csRef<iSndSysStream> stream, 
-    SndSysRendererSoftware *rend);
+    csSndSysRendererSoftware *rend);
   virtual ~SndSysSourceSoftware3D();
 
   /// Set volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
@@ -830,7 +830,7 @@ public:
   /// Retrieve a direct pointer to this object
   virtual iSndSysSource *GetPtr() { return this; }
 
-  virtual size_t MergeIntoBuffer(SoundSample *channel_buffer, 
+  virtual size_t MergeIntoBuffer(csSoundSample *channel_buffer, 
     size_t buffer_samples);
 
 
@@ -845,32 +845,32 @@ protected:
 
   //void ProcessFilterQueues();
 
-  inline bool PrepareBuffer(SoundSample **p_buf, size_t *p_buf_len, size_t required);
-  inline void ClearBuffer(SoundSample *p_buf, size_t p_buf_len);
+  inline bool PrepareBuffer(csSoundSample **p_buf, size_t *p_buf_len, size_t required);
+  inline void ClearBuffer(csSoundSample *p_buf, size_t p_buf_len);
   bool ProcessSoundChain(int channel, size_t buffer_samples);
 
 
   void SetupFilters();
 
 protected:
-  SndSysRendererSoftware *renderer;
+  csSndSysRendererSoftware *renderer;
 
   csRef<iSndSysStream> sound_stream;
   long stream_position;
 
-  SourceParameters3D active_parameters,queued_parameters;
+  csSourceParameters3D active_parameters,queued_parameters;
   bool queued_updates;
 
   /// The working buffer is where the samples from one channel at a time are manipulated
-  SoundSample *clean_buffer;
+  csSoundSample *clean_buffer;
   size_t clean_buffer_samples;
 
   /// The working buffer is where the samples from one channel at a time are manipulated
-  SoundSample *working_buffer;
+  csSoundSample *working_buffer;
   size_t working_buffer_samples;
 
   /// The historic buffer contains samples that were previously delivered for use in effects
-  //SoundSample *historic_buffer;
+  //csSoundSample *historic_buffer;
   //size_t historic_buffer_samples;
 
   /// The distance from the closest channel position to the source
