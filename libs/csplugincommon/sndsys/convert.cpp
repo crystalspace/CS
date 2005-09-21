@@ -141,13 +141,13 @@ bool PCMSampleConverter::ReadFullSample16(const void **source,
   // Read the channels
   if(swap_16)
   {
-    for (channel=0;channel<max_channels;channel++)
-      sample_buffer[channel]=SWAP16(*(src++));
+    for (channel = 0; channel < max_channels; channel++, src++)
+      sample_buffer[channel]=SWAP16(*src);
   }
   else
   {
-    for (channel=0;channel<max_channels;channel++)
-      sample_buffer[channel]=*(src++);
+    for (channel = 0; channel < max_channels; channel++, src++)
+      sample_buffer[channel]=*src;
   }
 
   // Merge mono into stereo if source is mono

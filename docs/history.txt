@@ -10,6 +10,9 @@ chronological order.
 	- res fixed a few warnings in the new sndsys stuff, did some 
 	  reformatting to better follow the CS coding guidelines (reading
 	  recommended) and reduced namespace pollution.
+	- Eric Sunshine fixed bug in PCMSampleConverter::ReadFullSample16()
+	  caused by unintended multiple evaluation of macro argument during
+	  macro expansion.
 20-Sep-2005
 	- Eric Sunshine resolved a few build-system glitches related to the
 	  new sound system (sndsys).
