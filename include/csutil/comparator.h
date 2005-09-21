@@ -102,7 +102,7 @@ class csComparator<csStringBase, csStringBase> :
  * data) types. It uses memcmp() to compare the raw memory representing the two
  * items.  Example:
  * \code
- * CS_SPECIALIZE_TEMPLATE csHashComputer<MyStruct> : 
+ * CS_SPECIALIZE_TEMPLATE csComparator<MyStruct> : 
  *   public csComparatorStruct<MyStruct> {};
  * \endcode
  */
