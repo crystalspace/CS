@@ -233,11 +233,11 @@ typedef void (csDrawScanline)
 /// The interface definition for all scan_pi_XXX routines
 typedef void (csDrawPIScanline)
   (void *dest, int len, uint32 *zbuff, int32 u, int32 du, int32 v, int32 dv,
-   uint32 z, int32 dz, unsigned char *bitmap, int bitmap_log2w);
+   float z, float dz, unsigned char *bitmap, int bitmap_log2w);
 /// The interface definition for all scan_pi_XXX_gou_XXX routines
 typedef void (csDrawPIScanlineGouraud)
   (void *dest, int len, uint32 *zbuff, int32 u, int32 du, int32 v, int32 dv,
-   uint32 z, int32 dz, unsigned char *bitmap, int bitmap_log2w,
+   float z, float dz, unsigned char *bitmap, int bitmap_log2w,
    uint32 r, uint32 g, uint32 b, int32 dr, int32 dg, int32 db, bool clamp);
 
 //---//---//---//---//---//---//---//---//---//---//---//---//- Routines //---//

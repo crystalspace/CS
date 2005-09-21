@@ -274,7 +274,7 @@ bool csSoftwareGraphics3DCommon::Open ()
 
 bool csSoftwareGraphics3DCommon::NewOpen ()
 {
-#if defined (CS_HAVE_MMX)
+#if 0//defined (CS_HAVE_MMX)
   int family, features;
   char vendor [13];
   csDetectCPU (&family, vendor, &features);
@@ -370,7 +370,7 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
   ScanProc_Alpha = 0;
 
 #ifdef CS_HAVE_MMX
-  bool UseMMX = (cpu_mmx && do_mmx);
+  //bool UseMMX = (cpu_mmx && do_mmx);
 #endif
 
   // Bits-per-pixel independent routine
@@ -388,9 +388,9 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
 
       ScanProc [SCANPROC_TEX_ZNONE] = csScan_16_scan_tex_znone;
       ScanProc [SCANPROC_TEX_ZFIL] =
-#ifdef CS_HAVE_MMX
+/*#ifdef CS_HAVE_MMX
         UseMMX ? csScan_16_mmx_scan_tex_zfil :
-#endif
+#endif*/
         csScan_16_scan_tex_zfil;
       ScanProc [SCANPROC_TEX_ZUSE] = csScan_16_scan_tex_zuse;
       ScanProc [SCANPROC_TEX_ZTEST] = csScan_16_scan_tex_ztest;
@@ -408,9 +408,9 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
           csScan_16_555_scan_map_filt2_zfil :
           csScan_16_565_scan_map_filt2_zfil) :
         bilinear_filter == 1 ? csScan_16_scan_map_filt_zfil :
-#ifdef CS_HAVE_MMX
+/*#ifdef CS_HAVE_MMX
         UseMMX ? csScan_16_mmx_scan_map_zfil :
-#endif
+#endif*/
         csScan_16_scan_map_zfil;
       ScanProc [SCANPROC_MAP_ZUSE] =
         bilinear_filter == 2 ?
@@ -498,9 +498,9 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
       ScanProcPI [SCANPROC_PI_TEX_ZNONE] = csScan_16_scan_pi_tex_znone;
       ScanProcPI [SCANPROC_PI_TEX_ZFIL] = csScan_16_scan_pi_tex_zfil;
       ScanProcPI [SCANPROC_PI_TEX_ZUSE] =
-#ifdef CS_HAVE_MMX
+/*#ifdef CS_HAVE_MMX
         UseMMX ? csScan_16_mmx_scan_pi_tex_zuse :
-#endif
+#endif*/
         csScan_16_scan_pi_tex_zuse;
       ScanProcPI [SCANPROC_PI_TEX_ZTEST] = csScan_16_scan_pi_tex_ztest;
       ScanProcPI [SCANPROC_PI_TEX_KEY_ZNONE] = csScan_16_scan_pi_tex_key_znone;
@@ -721,9 +721,9 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
 
       ScanProc [SCANPROC_TEX_ZNONE] = csScan_32_scan_tex_znone;
       ScanProc [SCANPROC_TEX_ZFIL] =
-#if defined (CS_HAVE_MMX)
+/*#if defined (CS_HAVE_MMX)
         UseMMX ? csScan_32_mmx_scan_tex_zfil :
-#endif
+#endif*/
         csScan_32_scan_tex_zfil;
       ScanProc [SCANPROC_TEX_ZUSE] = csScan_32_scan_tex_zuse;
       ScanProc [SCANPROC_TEX_ZTEST] = csScan_32_scan_tex_ztest;
@@ -732,9 +732,9 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
         csScan_32_scan_map_znone;
       ScanProc [SCANPROC_MAP_ZFIL] =
         bilinear_filter == 2 ? csScan_32_scan_map_filt2_zfil :
-#if defined (CS_HAVE_MMX)
+/*#if defined (CS_HAVE_MMX)
         UseMMX ? csScan_32_mmx_scan_map_zfil :
-#endif
+#endif*/
         csScan_32_scan_map_zfil;
       ScanProc [SCANPROC_MAP_ZUSE] =
         bilinear_filter == 2 ? csScan_32_scan_map_filt2_zuse :
@@ -3720,26 +3720,6 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
 }
 #endif
 
-static const int clipDestComps[] = 
-{
-  3, // CS_VATTRIB_POSITION
-  4, // CS_VATTRIB_WEIGHT
-  3, // CS_VATTRIB_NORMAL
-  4, // CS_VATTRIB_PRIMARY_COLOR
-  4, // CS_VATTRIB_SECONDARY_COLOR
-  2, // CS_VATTRIB_FOGCOORD
-  4, // 6
-  4, // 7
-  2, // CS_VATTRIB_TEXCOORD0
-  2, // CS_VATTRIB_TEXCOORD1
-  2, // CS_VATTRIB_TEXCOORD2
-  2, // CS_VATTRIB_TEXCOORD3
-  2, // CS_VATTRIB_TEXCOORD4
-  2, // CS_VATTRIB_TEXCOORD5
-  2, // CS_VATTRIB_TEXCOORD6
-  2, // CS_VATTRIB_TEXCOORD7
-};
-
 class TriangleDrawer
 {
   csSoftwareGraphics3DCommon& g3d;
@@ -3755,16 +3735,7 @@ class TriangleDrawer
   float clipOut[clipMaxBuffers * outFloatsPerBuf];
   ClipMeatZNear clipZNear;
   BuffersClipper<ClipMeatZNear> bclipperZNear;
-
-  CS_FORCEINLINE
-  const float* ClipOutVert (size_t b, size_t v)
-  { return &clipOut[b*outFloatsPerBuf + v*clipDestComps[b]]; }
-  CS_FORCEINLINE
-  const csVector3& ClipOutPos (size_t v)
-  { return *(csVector3*)ClipOutVert (VATTR_SPEC(POSITION), v); }
-  CS_FORCEINLINE
-  const csVector2& ClipOutTC (size_t v)
-  { return *(csVector2*)ClipOutVert (VATTR_SPEC(TEXCOORD), v); }
+  csVector3 outPersp[4];
 
   void ProjectVertices (size_t rangeStart, size_t rangeEnd)
   {
@@ -3781,11 +3752,13 @@ class TriangleDrawer
     {
       if (work_verts[i].z >= SMALL_Z)
       {
-	(*persp)[i].z = 1. / work_verts[i].z;
-	float iz = aspect * (*persp)[i].z;
+	(*persp)[i].z = work_verts[i].z;
+	float iz = aspect / (*persp)[i].z;
 	(*persp)[i].x = work_verts[i].x * iz + width2;
 	(*persp)[i].y = work_verts[i].y * iz + height2;
       }
+      else
+	(*persp)[i] = work_verts[i];
     }
   }
   void ClipAndDrawTriangle (const size_t* trivert)
@@ -3794,9 +3767,9 @@ class TriangleDrawer
     // Do backface culling. Note that this depends on the
     // mirroring of the current view.
     //-----
-    const csVector2& pa = *(csVector2*)&ClipOutPos (trivert[0]);
-    const csVector2& pb = *(csVector2*)&ClipOutPos (trivert[1]);
-    const csVector2& pc = *(csVector2*)&ClipOutPos (trivert[2]);
+    const csVector2& pa = *(csVector2*)&outPersp[trivert[0]];
+    const csVector2& pb = *(csVector2*)&outPersp[trivert[1]];
+    const csVector2& pc = *(csVector2*)&outPersp[trivert[2]];
     float area = csMath2::Area2 (pa, pb, pc);
     if (!area) return;
     if (mesh->do_mirror)
@@ -3820,6 +3793,7 @@ class TriangleDrawer
     meat.Init (g3d.clipper, maxClipVertices);
     CS_ALLOC_STACK_ARRAY(float, out, 
       floatsPerBufPerVert * clipMaxBuffers * maxClipVertices);
+    CS_ALLOC_STACK_ARRAY(csVector3, clippedPersp, maxClipVertices);
     VertexBuffer clipOutBuf[clipMaxBuffers];
     for (size_t i = 0; i < clipMaxBuffers; i++)
     {
@@ -3830,7 +3804,8 @@ class TriangleDrawer
     }
 
     BuffersClipper<ClipMeatiClipper> clip (meat);
-    clip.Init (this->clipOutBuf, clipInStride, clipOutBuf, buffersMask);
+    clip.Init (outPersp, clippedPersp,
+      this->clipOutBuf, clipInStride, clipOutBuf, buffersMask);
     csTriangle tri;
     if (mesh->do_mirror)
     {
@@ -3847,8 +3822,8 @@ class TriangleDrawer
     size_t rescount = clip.DoClip (tri);
     if (rescount == 0) return;
 
-    g3d.polyrast.DrawPolygonFX (rescount, clipOutBuf, buffersMask,
-      g3d.activeTex, modes.mixmode | CS_FX_TILING | CS_FX_FLAT);
+    g3d.polyrast.DrawPolygonFX (rescount, clippedPersp, clipOutBuf, 
+      buffersMask, g3d.activeTex, modes.mixmode | CS_FX_TILING | CS_FX_FLAT);
   }
 
 public:
@@ -3872,14 +3847,14 @@ public:
       clipInBuf[b].comp = buf->GetComponentCount();
       clipInStride[b] = buf->GetElementDistance();
       clipOutBuf[b].data = (uint8*)&clipOut[b * outFloatsPerBuf];
-      clipOutBuf[b].comp = clipDestComps[b];
+      clipOutBuf[b].comp = 4;
     }
 
     ProjectVertices (rangeStart, rangeEnd);
 
-    clipZNear.Init (persp->GetArray(), g3d.width2, g3d.height2, 
-      g3d.aspect);
-    bclipperZNear.Init (clipInBuf, clipInStride, clipOutBuf, buffersMask);
+    clipZNear.Init (g3d.width2, g3d.height2, g3d.aspect);
+    bclipperZNear.Init (persp->GetArray(), outPersp,
+      clipInBuf, clipInStride, clipOutBuf, buffersMask);
   }
 
   ~TriangleDrawer()
@@ -3898,7 +3873,9 @@ public:
     tri.a = a;
     tri.b = b;
     tri.c = c;
-    // Small Z clipping
+    /* Small Z clipping. Also projects unprojected vertices (skipped in
+     * ProjectVertices() due a Z coord too small) and will invert the Z
+     * of the pespective verts. */
     size_t n = bclipperZNear.DoClip (tri);
     if (n == 0) return;
     CS_ASSERT((n>= 3) && (n <= 4));

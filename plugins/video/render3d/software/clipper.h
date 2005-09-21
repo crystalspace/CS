@@ -23,6 +23,8 @@
 namespace cspluginSoft3d
 {
 
+//#define VOUT_DEBUG
+
 class VertexOutputBase
 {
 protected:
@@ -33,7 +35,11 @@ protected:
 public:
   VertexOutputBase () {}
   VertexOutputBase (uint8* in, size_t inStride, float* out) :
-    in(in), startOut(out), inStride(inStride) {}
+    in(in), 
+#ifdef CS_DEBUG
+    out(0),
+#endif
+    startOut(out), inStride(inStride) {}
 
   void Reset() { out = startOut; }
   virtual void Copy (size_t idx) {}
@@ -51,6 +57,12 @@ public:
 template<int Ni, int No>
 class VertexOutput : public VertexOutputBase
 {
+  inline void SanityCheck()
+  {
+#ifdef VOUT_DEBUG
+    CS_ASSERT_MSG("Reset() not called", out != 0);
+#endif
+  }
   void Lerp (float*& dst, size_t idx1, size_t idx2, float p) 
   {
     const uint8* I1 = (uint8*)in + idx1*inStride;
@@ -99,6 +111,7 @@ public:
 
   virtual void Copy (size_t idx)
   {
+    SanityCheck();
     const uint8* I = in + idx*inStride;
     for (int i = 0; i < No; i++)
     {
@@ -114,26 +127,31 @@ public:
   }
   virtual void LerpTo (float* dst, size_t idx1, size_t idx2, float p) 
   {
+    SanityCheck();
     Lerp (dst, idx1, idx2, p);
   }
   virtual void Lerp (size_t idx1, size_t idx2, float p) 
   {
+    SanityCheck();
     Lerp (out, idx1, idx2, p);
   }
   virtual void Lerp3 (size_t idx1, size_t idx2, float p1,
 		      size_t idx3, size_t idx4, float p2,
 		      float p)
   {
+    SanityCheck();
     Lerp3 (out, idx1, idx2, p1, idx3, idx4, p2, p);
   }
   virtual void Lerp3To (float* dst, size_t idx1, size_t idx2, float p1,
 			size_t idx3, size_t idx4, float p2,
 			float p)
   {
+    SanityCheck();
     Lerp3 (dst, idx1, idx2, p1, idx3, idx4, p2, p);
   }
   virtual void Write (float* what)
   {
+    SanityCheck();
     memcpy (out, what, No * sizeof (float));
     out += No;
   }
@@ -153,6 +171,8 @@ template<class Meat>
 class BuffersClipper
 {
   VertexOutputBase vout[clipMaxBuffers];
+  VertexOutputBase voutPersp;
+  const csVector3* inPersp;
   const VertexBuffer* inBuffers;
   const size_t* inStrides;
   const VertexBuffer* outBuffers;
@@ -211,9 +231,11 @@ class BuffersClipper
   }
 public:
   BuffersClipper (Meat& meat) :  meat(meat) { }
-  void Init (const VertexBuffer* inBuffers, const size_t* inStrides, 
+  void Init (const csVector3* inPersp, csVector3* outPersp,
+    const VertexBuffer* inBuffers, const size_t* inStrides, 
     const VertexBuffer* outBuffers, ClipBuffersMask buffersMask)
   {
+    this->inPersp = inPersp;
     this->inBuffers = inBuffers;
     this->inStrides = inStrides;
     this->outBuffers = outBuffers;
@@ -223,6 +245,8 @@ public:
       if (!(buffersMask & (1 << i))) continue;
       SetupVOut (i, inBuffers[i], inStrides[i], outBuffers[i]);
     }
+    new (&voutPersp) VertexOutput<3, 3> ((uint8*)inPersp, sizeof (csVector3),
+      (float*)outPersp);
   }
 
   size_t DoClip (const csTriangle& tri)
@@ -232,13 +256,15 @@ public:
       if (!(buffersMask & (1 << i))) continue;
       vout[i].Reset();
     }
-    return meat.DoClip (tri, inBuffers, inStrides, buffersMask, vout);
+    voutPersp.Reset();
+    return meat.DoClip (tri, inPersp, voutPersp, inBuffers, inStrides, 
+      buffersMask, vout);
   }
 };
 
 } // namespace cspluginSoft3d
 
-#define VATTR_CLIPINDEX(x)                                               \
+#define VATTR_BUFINDEX(x)                                               \
   (CS_VATTRIB_ ## x - (CS_VATTRIB_ ## x >=  CS_VATTRIB_GENERIC_FIRST ?        \
   CS_VATTRIB_GENERIC_FIRST : CS_VATTRIB_SPECIFIC_FIRST))
 

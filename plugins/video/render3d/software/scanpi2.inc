@@ -27,8 +27,11 @@
 
   while (_dest < _destend)
   {
+#if defined (PI_ZUSE) || defined (PI_ZTEST) || defined (PI_ZFILL)
+    const uint32 zFixed = csQfixed24 (z);
+#endif
 #if defined (PI_ZUSE) || defined (PI_ZTEST)
-    if (z > *zbuff)
+    if (zFixed > *zbuff)
 #endif
     {
 #ifndef PI_FLAT
@@ -45,7 +48,7 @@
 #endif
       {
 #if defined (PI_ZUSE) || defined (PI_ZFILL)
-        *zbuff = z;
+        *zbuff = zFixed;
 #endif
 #if defined (PI_GOURAUD) || defined (PI_BLEND)
   #if defined (PI_FLAT)

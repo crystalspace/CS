@@ -27,19 +27,21 @@
     Quick floating point to integer conversions.
 */
 
-/**\fn static inline long csQint (double)
+/**
  * Quickly truncate the fractional part of a floating-point value and convert
  * it to a long integer using processor and/or number format quirks if
  * available.
  */
-static inline long csQint(double n) { return (long)n; }
+template<typename T>
+static inline long csQint(T n) { return (long)n; }
 
-/**\fn static inline long csQround (double)
+/**
  * Quickly round a floating-point value and convert it to a long integer using
  * processor and/or number format quirks if available.
  */
-static inline long csQround (double n)
-{ return (long)(n + (n < 0 ? -0.5 : 0.5)); }
+template<typename T>
+static inline long csQround (T n)
+{ return (long)(n + (n < 0 ? (T)-0.5 : (T)0.5)); }
 
 /**\fn static inline long csQfixed8 (float)
  * Quickly convert a floating-point number to 24.8 fixed-point value.

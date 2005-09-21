@@ -62,7 +62,7 @@ void csScan_scan_zfil (int xx, unsigned char* d,
 //------------------------------------------------------------------
 
 void csScan_scan_pi_zfil (void *dest, int len, uint32 *zbuff,
-  int32 u, int32 du, int32 v, int32 dv, uint32 z, int32 dz,
+  int32 u, int32 du, int32 v, int32 dv, float z, float dz,
   unsigned char *bitmap, int bitmap_log2w)
 {
   (void)u; (void)du; (void)v; (void)dv;
@@ -71,7 +71,7 @@ void csScan_scan_pi_zfil (void *dest, int len, uint32 *zbuff,
 
   do
   {
-    *zbuff++ = z;
+    *zbuff++ = csQfixed24 (z);
     z += dz;
   }
   while (zbuff <= lastZbuf);

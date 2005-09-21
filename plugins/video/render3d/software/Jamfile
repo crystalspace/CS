@@ -2,15 +2,15 @@ SubDir TOP plugins video render3d software ;
 
 Description soft3d : "3D software renderer" ;
 
-if $(CMD.NASM) && $(TARGET.PROCESSOR) = "X86" &&
-   $(TARGET.PROCESSORSIZE) = "32" && ! [ Property build : projgen ]
-{
-  SOFT3D_ASMFILES = [ Wildcard i386 : *.asm *.cpp *.h ] ;
-}
-else
-{
-  SOFT3D_ASMFILES = ;
-}
+#if $(CMD.NASM) && $(TARGET.PROCESSOR) = "X86" &&
+   #$(TARGET.PROCESSORSIZE) = "32" && ! [ Property build : projgen ]
+#{
+  #SOFT3D_ASMFILES = [ Wildcard i386 : *.asm *.cpp *.h ] ;
+#}
+#else
+#{
+  #SOFT3D_ASMFILES = ;
+#}
 
 Plugin soft3d : [ Wildcard *.cpp *.h ] $(SOFT3D_ASMFILES) ;
 LinkWith soft3d : crystalspace ;

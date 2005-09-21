@@ -58,7 +58,7 @@
     has 5 bits then 1.0 == 0x2000, 1/32 == 0x100 and so on)
 */
 void PI_SCANFUNC (void *dest, int len, uint32 *zbuff,
-  int32 u, int32 du, int32 v, int32 dv, uint32 z, int32 dz,
+  int32 u, int32 du, int32 v, int32 dv, float z, float dz,
   unsigned char *bitmap, int bitmap_log2w
 #ifdef PI_GOURAUD
   ,uint32 r, uint32 g, uint32 b, int32 dr, int32 dg, int32 db, bool clamp

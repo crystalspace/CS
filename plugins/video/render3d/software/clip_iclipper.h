@@ -33,8 +33,12 @@ class ClipMeatiClipper
   size_t maxClipVertices;
 
   CS_FORCEINLINE size_t CopyTri (const csTriangle& tri, 
-    ClipBuffersMask buffersMask, VertexOutputBase* vout)
+    ClipBuffersMask buffersMask, VertexOutputBase& voutPersp, 
+    VertexOutputBase* vout)
   {
+    voutPersp.Copy (tri.a);
+    voutPersp.Copy (tri.b);
+    voutPersp.Copy (tri.c);
     int n = 0;
     while (buffersMask != 0)
     {
@@ -53,20 +57,19 @@ public:
     this->maxClipVertices = maxClipVertices;
   }
 
-  size_t DoClip (const csTriangle& tri, const VertexBuffer* inBuffers, 
+  size_t DoClip (const csTriangle& tri, const csVector3* inPersp,
+    VertexOutputBase& voutPersp, const VertexBuffer* inBuffers, 
     const size_t* inStrides, ClipBuffersMask buffersMask, 
     VertexOutputBase* vout)
   {
     if (!clipper)
-      return CopyTri (tri, buffersMask, vout);
+      return CopyTri (tri, buffersMask, voutPersp, vout);
 
-    const VertexBuffer& bPos = inBuffers[VATTR_CLIPINDEX(POSITION)];
-    const size_t bPosStride = inStrides[VATTR_CLIPINDEX(POSITION)];
     const csVector3 v[3] = 
     {
-      *(csVector3*)(bPos.data + tri.a * bPosStride),
-      *(csVector3*)(bPos.data + tri.b * bPosStride),
-      *(csVector3*)(bPos.data + tri.c * bPosStride),
+      inPersp[tri.a],
+      inPersp[tri.b],
+      inPersp[tri.c],
     };
 
     csVector2 inpoly[3];
@@ -81,7 +84,7 @@ public:
 
     if (clip_result == CS_CLIP_OUTSIDE) return 0;
     if (clip_result == CS_CLIP_INSIDE)
-      return CopyTri (tri, buffersMask, vout);
+      return CopyTri (tri, buffersMask, voutPersp, vout);
 
     for (size_t i = 0 ; i < outNum; i++)
     {
@@ -89,18 +92,14 @@ public:
       {
 	case CS_VERTEX_ORIGINAL:
 	  {
+	    csVector3 vn (outPoly[i].x, outPoly[i].y,
+	      v[outStatus[i].Vertex].z);
+	    voutPersp.Write ((float*)&vn);
 	    for (size_t n = 0; n < clipMaxBuffers; n++)
 	    {
 	      if (buffersMask & (1 << n))
 	      {
-		if (n == VATTR_CLIPINDEX(POSITION))
-		{
-		  csVector3 vn (outPoly[i].x, outPoly[i].y,
-		    v[outStatus[i].Vertex].z);
-		  vout[n].Write ((float*)&vn);
-		}
-		else
-		  vout[n].Copy (outStatus[i].Vertex);
+		vout[n].Copy (outStatus[i].Vertex);
 	      }
 	    }
 	  }
@@ -110,20 +109,18 @@ public:
 	    const size_t vt = outStatus[i].Vertex;
 	    const size_t vt2 = (vt >= 2) ? 0 : vt + 1;
 	    const float t = outStatus[i].Pos;
+
+	    csVector3 vn;
+	    voutPersp.LerpTo ((float*)&vn, vt, vt2, t);
+	    vn.x = outPoly[i].x;
+	    vn.y = outPoly[i].y;
+	    voutPersp.Write ((float*)&vn);
+
 	    for (size_t n = 0; n < clipMaxBuffers; n++)
 	    {
 	      if (buffersMask & (1 << n))
 	      {
-		if (n == VATTR_CLIPINDEX(POSITION))
-		{
-		  csVector3 vn;
-		  vout[n].LerpTo ((float*)&vn, vt, vt2, t);
-		  vn.x = outPoly[i].x;
-		  vn.y = outPoly[i].y;
-		  vout[n].Write ((float*)&vn);
-		}
-		else
-		  vout[n].Lerp (vt, vt2, t);
+		vout[n].Lerp (vt, vt2, t);
 	      }
 	    }
 	  }
@@ -168,22 +165,20 @@ public:
 	    const float x1 = A.x + t1 * (B.x - A.x);
 	    const float x2 = C.x + t2 * (D.x - C.x);
 	    const float t = (x - x1) / (x2 - x1);
+
+	    csVector3 vn;
+	    voutPersp.Lerp3To ((float*)&vn, edge1[0], edge1[1], t1,
+	      edge2[0], edge2[1], t2, t);
+	    vn.x = x;
+	    vn.y = y;
+	    voutPersp.Write ((float*)&vn);
+
 	    for (size_t n = 0; n < clipMaxBuffers; n++)
 	    {
 	      if (buffersMask & (1 << n))
 	      {
-		if (n == VATTR_CLIPINDEX(POSITION))
-		{
-		  csVector3 vn;
-		  vout[n].Lerp3To ((float*)&vn, edge1[0], edge1[1], t1,
-		    edge2[0], edge2[1], t2, t);
-		  vn.x = x;
-		  vn.y = y;
-		  vout[n].Write ((float*)&vn);
-		}
-		else
-		  vout[n].Lerp3 (edge1[0], edge1[1], t1,
-		    edge2[0], edge2[1], t2, t);
+		vout[n].Lerp3 (edge1[0], edge1[1], t1,
+		  edge2[0], edge2[1], t2, t);
 	      }
 	    }
 	  }

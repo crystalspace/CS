@@ -150,7 +150,7 @@
 #else // A_PI
 
 void A_SCANFUNC (void *dest, int len, uint32 *zbuff,
-  int32 u, int32 du, int32 v, int32 dv, uint32 z, int32 dz,
+  int32 u, int32 du, int32 v, int32 dv, float z, float dz,
   unsigned char *bitmap, int bitmap_log2w)
 {
   A_PIXTYPE *_dest = (A_PIXTYPE *)dest;
@@ -161,12 +161,13 @@ void A_SCANFUNC (void *dest, int len, uint32 *zbuff,
 #endif
   while (_dest < _destend)
   {
+    const uint32 zFixed = csQfixed24 (z);
 #if defined (A_ZUSE)
-    if (z > *zbuff)
+    if (zFixed > *zbuff)
 #endif
     {
 #if defined (A_ZUSE) || defined (A_ZFIL)
-      *zbuff = z;
+      *zbuff = zFixed;
 #endif
       unsigned srcaddr = ((v >> 16) << bitmap_log2w) + (u >> 16);
       uint8 alpha = Scan.AlphaMap [srcaddr];

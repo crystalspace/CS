@@ -28,6 +28,10 @@
 
 namespace cspluginSoft3d
 {
+  struct InterpolateLine
+  {
+    float dcdx[4];
+  };
 
   class PolygonRasterizer
   {
@@ -62,8 +66,74 @@ namespace cspluginSoft3d
     {
       return (f + 0x8000) >> 16;
     }
+
+    template <typename T>
+    static inline T Lerp (const T& a, const T& b, float f)
+    { return a + (b-a) * f; }
+    struct InterpolateEdge
+    {
+      // The X coordinates and its per-scanline delta
+      float x, dxdy;
+      // The Z coordinates and its per-scanline delta
+      float z, dzdy;
+      // Buffer values and per-scanline delta
+      csVector4 c[clipMaxBuffers];
+      csVector4 dcdy[clipMaxBuffers];
+
+      void Setup (const csVector3* vertices, const VertexBuffer* buffers, 
+	ClipBuffersMask buffersMask, size_t sv, size_t fv, int sy)
+      {
+	const csVector3 vsv (vertices[sv]);
+	const csVector3 vfv (vertices[fv]);
+
+	float dy = vsv.y - vfv.y;
+	if (dy)
+	{
+	  float inv_dy = 1 / dy;
+	  x = vsv.x;
+	  dxdy = (vfv.x - x) * inv_dy;
+	  dzdy = (vfv.z - vsv.z) * inv_dy;
+
+	  // horizontal pixel correction
+	  float deltaX = dxdy *
+	    (vsv.y - (float (sy) - 0.5));
+	  x += deltaX;
+
+	  // apply sub-pixel accuracy factor
+	  float Factor;
+	  if (vfv.x != vsv.x)
+	    Factor = deltaX / (vfv.x - vsv.x);
+	  else
+	    Factor = 0;
+
+	  z = Lerp (vsv.z, vfv.z, Factor);
+
+	  for (size_t b = 0; b < clipMaxBuffers; b++)
+	  {
+	    if (!(buffersMask & (1 << b))) continue;
+
+	    const csVector4 csv (((csVector4*)buffers[b].data)[sv]);
+	    const csVector4 cfv (((csVector4*)buffers[b].data)[fv]);
+
+	    c[b] = Lerp (csv, cfv, Factor);
+	    dcdy[b] = (cfv - csv) * inv_dy;
+	  }
+	} /* endif */
+      }
+      void Advance (ClipBuffersMask buffersMask)
+      {
+	x += dxdy;
+	z += dzdy;
+
+	for (size_t b = 0; b < clipMaxBuffers; b++)
+	{
+	  if (!(buffersMask & (1 << b))) continue;
+	  c[b] += dcdy[b];
+	}
+      }
+    };
   public:
-    PolygonRasterizer() : dpfx_valid(false), do_gouraud(true),
+    PolygonRasterizer() : dpfx_valid(false), do_gouraud(false),
       do_lighting(true), do_textured(true), 
       is_for_procedural_textures(false), do_interlaced(-1)
     {
@@ -214,20 +284,19 @@ namespace cspluginSoft3d
       pqinfo.max_b = (1 << (pfmt.BlueBits  + shift_amount + 8)) - 1;
     }
 
-    void DrawPolygonFX (size_t vertNum, const VertexBuffer* inBuffers, 
-      ClipBuffersMask buffersMask, iTextureHandle* tex_handle, uint mixmode)
+    void DrawPolygonFX (size_t vertNum, const csVector3* vertices,
+      const VertexBuffer* inBuffers, ClipBuffersMask buffersMask, 
+      iTextureHandle* tex_handle, uint mixmode)
     {
       RealStartPolygonFX (tex_handle, mixmode);
     
       if (!pqinfo.drawline && !pqinfo.drawline_gouraud)
 	return;
     
-      const csVector3* vertices = 
-	(csVector3*)inBuffers[VATTR_CLIPINDEX(POSITION)].data;
-      const csVector2* texcoords = 
-	(csVector2*)inBuffers[VATTR_CLIPINDEX(TEXCOORD)].data;
-      const csVector4* colors = (buffersMask & (1 << VATTR_CLIPINDEX(COLOR))) ?
-	(csVector4*)inBuffers[VATTR_CLIPINDEX(COLOR)].data : 0;
+      const csVector4* texcoords = 
+	(csVector4*)inBuffers[VATTR_BUFINDEX(TEXCOORD)].data;
+      const csVector4* colors = (buffersMask & (1 << VATTR_BUFINDEX(COLOR))) ?
+	(csVector4*)inBuffers[VATTR_BUFINDEX(COLOR)].data : 0;
 
       Scan.FlatRGB.Set (255, 255, 255);
     
@@ -239,8 +308,6 @@ namespace cspluginSoft3d
       // Get the values from the polygon for more convenient local access.
       // Also look for the top-most and bottom-most vertices.
       //-----
-      float uu[64], vv[64], iz[64];
-      float rr[64], gg[64], bb[64];
       size_t top, bot;
       float top_y = -99999;
       float bot_y = 99999;
@@ -248,31 +315,48 @@ namespace cspluginSoft3d
       size_t i;
       for (i = 0 ; i < vertNum ; i++)
       {
-	uu[i] = pqinfo.tw * texcoords[i].x;
-	vv[i] = pqinfo.th * texcoords[i].y;
-	iz[i] = vertices[i].z;
-	/*if (poly.colors [i].red > 2.0) poly.colors [i].red = 2.0;
-	if (poly.colors [i].red < 0.0) poly.colors [i].red = 0.0;*/
-	/*if (poly.colors [i].green > 2.0) poly.colors [i].green = 2.0;
-	if (poly.colors [i].green < 0.0) poly.colors [i].green = 0.0;*/
-	/*if (poly.colors [i].blue > 2.0) poly.colors [i].blue = 2.0;
-	if (poly.colors [i].blue < 0.0) poly.colors [i].blue = 0.0;*/
-	if (colors)
-	{
-	  rr[i] = colors[i].x * pqinfo.redFact   * Scan.FlatRGB.red;
-	  gg[i] = colors[i].y * pqinfo.greenFact * Scan.FlatRGB.green;
-	  bb[i] = colors[i].z * pqinfo.blueFact  * Scan.FlatRGB.blue;
-	}
-	else
-	{
-	  rr[i] = pqinfo.redFact   * Scan.FlatRGB.red;
-	  gg[i] = pqinfo.greenFact * Scan.FlatRGB.green;
-	  bb[i] = pqinfo.blueFact  * Scan.FlatRGB.blue;
-	}
 	if (vertices[i].y > top_y)
 	  top_y = vertices[top = i].y;
 	if (vertices[i].y < bot_y)
 	  bot_y = vertices[bot = i].y;
+      }
+
+      /* "Denormalize" some known buffers (currently colors and TCs) since
+       * doing it anywhere further down is rather wasterful. */
+      VertexBuffer actualBuffers[clipMaxBuffers];
+      CS_ALLOC_STACK_ARRAY(csVector4, denormTC, vertNum);
+      CS_ALLOC_STACK_ARRAY(csVector4, denormColor, vertNum);
+      for (size_t b = 0; b < clipMaxBuffers; b++)
+      {
+	if (!(buffersMask & (1 << b))) continue;
+
+	VertexBuffer& actualBuffer = actualBuffers[b];
+	switch (b)
+	{
+	  case VATTR_BUFINDEX(TEXCOORD):
+	    actualBuffer.data = (uint8*)denormTC;
+	    actualBuffer.comp = 4;
+	    for (i = 0 ; i < vertNum ; i++)
+	    {
+	      denormTC[i].Set (pqinfo.tw * texcoords[i].x,
+		pqinfo.th * texcoords[i].y, 0.0f, 1.0f);
+	    }
+	    break;
+	  case VATTR_BUFINDEX(COLOR):
+	    actualBuffer.data = (uint8*)denormColor;
+	    actualBuffer.comp = 4;
+	    for (i = 0 ; i < vertNum ; i++)
+	    {
+	      denormColor[i].Set (
+		colors[i].x * pqinfo.redFact,
+		colors[i].y * pqinfo.greenFact,
+		colors[i].z * pqinfo.blueFact,
+		colors[i].w * 0xff0000);
+	    }
+	    break;
+	  default:
+	    actualBuffer = inBuffers[b];
+	}
       }
     
       // If the polygon exceeds the screen, it is an engine failure
@@ -292,41 +376,23 @@ namespace cspluginSoft3d
       struct
       {
 	// Start and final vertex number
-	signed char sv, fv;
-	// The X coordinates and its per-scanline delta; also the final Y coordinate
-	int x, dxdy, fy;
-	// The `U/V/Z' texture coordinates and their per-scanline delta
-	int u, dudy, v, dvdy, z, dzdy;
-	// The `R/G/B' colors and their per-scanline delta
-	int r, drdy, g, dgdy, b, dbdy;
+	int sv, fv;
+	// The final Y coordinate
+	int fy;
+	
+	// Edge interpolater; contains values as well as deltas
+	InterpolateEdge edge;
       } L,R;
     
     // Start of code to stop MSVC bitching about uninitialized variables
-      L.sv = R.sv = (signed char)top;
-      L.fv = R.fv = (signed char)top;
+      L.sv = R.sv = (int)top;
+      L.fv = R.fv = (int)top;
       int sy = L.fy = R.fy = csQround (vertices[top].y);
-    
-      L.x = R.x = 0;
-      L.dxdy = R.dxdy = 0;
-    
-      L.u = R.u = 0;
-      L.dudy = R.dudy = 0;
-      L.v = R.v = 0;
-      L.dvdy = R.dvdy = 0;
-      L.z = R.z = 0;
-      L.dzdy = R.dzdy = 0;
-    
-      L.r = R.r = 0;
-      L.drdy = R.drdy = 0;
-      L.g = R.g = 0;
-      L.dgdy = R.dgdy = 0;
-      L.b = R.b = 0;
-      L.dbdy = R.dbdy = 0;
     // End of MSVC specific code
     
       // Decide whenever we should use Gouraud or flat (faster) routines
-      bool do_gouraud = (pqinfo.drawline_gouraud != 0)
-	&& (!(pqinfo.mixmode & CS_FX_FLAT));
+      /*bool do_gouraud = (pqinfo.drawline_gouraud != 0)
+	&& (!(pqinfo.mixmode & CS_FX_FLAT));*/
     
       //-----
       // Main scanline loop.
@@ -350,54 +416,11 @@ namespace cspluginSoft3d
 	      R.fv = 0;
     
 	    leave = false;
-	    R.fy = csQround (vertices[(int)R.fv].y);
+	    R.fy = csQround (vertices[R.fv].y);
 	    if (sy <= R.fy)
 	      continue;
     
-	    float dyR = vertices[(int)R.sv].y - vertices[(int)R.fv].y;
-	    if (dyR)
-	    {
-	      float inv_dyR = 1 / dyR;
-	      R.x = csQfixed16 (vertices[(int)R.sv].x);
-	      R.dxdy = csQfixed16 (
-		(vertices[(int)R.fv].x - vertices[(int)R.sv].x) * inv_dyR);
-	      R.dzdy = csQfixed24 ((iz [(int)R.fv] - iz [(int)R.sv]) * inv_dyR);
-	      if (pqinfo.textured)
-	      {
-		R.dudy = csQfixed16 ((uu [(int)R.fv] - uu [(int)R.sv]) * inv_dyR);
-		R.dvdy = csQfixed16 ((vv [(int)R.fv] - vv [(int)R.sv]) * inv_dyR);
-	      }
-	      if (!(pqinfo.mixmode & CS_FX_FLAT))
-	      {
-		R.drdy = csQround ((rr [(int)R.fv] - rr [(int)R.sv]) * inv_dyR);
-		R.dgdy = csQround ((gg [(int)R.fv] - gg [(int)R.sv]) * inv_dyR);
-		R.dbdy = csQround ((bb [(int)R.fv] - bb [(int)R.sv]) * inv_dyR);
-	      }
-    
-	      // horizontal pixel correction
-	      float deltaX = (R.dxdy * 1/65536.) *
-		(vertices[(int)R.sv].y - (float (sy) - 0.5));
-	      R.x += csQfixed16 (deltaX);
-    
-	      // apply sub-pixel accuracy factor
-	      float Factor;
-	      if (vertices[(int)R.fv].x != vertices[(int)R.sv].x)
-		Factor = deltaX / (vertices[(int)R.fv].x - vertices[(int)R.sv].x);
-	      else
-		Factor = 0;
-	      if (pqinfo.textured)
-	      {
-		R.u = csQfixed16 (uu [(int)R.sv] + (uu [(int)R.fv] - uu [(int)R.sv]) * Factor);
-		R.v = csQfixed16 (vv [(int)R.sv] + (vv [(int)R.fv] - vv [(int)R.sv]) * Factor);
-	      }
-	      R.z = csQfixed24 (iz [(int)R.sv] + (iz [(int)R.fv] - iz [(int)R.sv]) * Factor);
-	      if (!(pqinfo.mixmode & CS_FX_FLAT))
-	      {
-		R.r = csQround (rr [(int)R.sv] + (rr [(int)R.fv] - rr [(int)R.sv]) * Factor);
-		R.g = csQround (gg [(int)R.sv] + (gg [(int)R.fv] - gg [(int)R.sv]) * Factor);
-		R.b = csQround (bb [(int)R.sv] + (bb [(int)R.fv] - bb [(int)R.sv]) * Factor);
-	      }
-	    } /* endif */
+	    R.edge.Setup (vertices, actualBuffers, buffersMask, R.sv, R.fv, sy);
 	  } /* endif */
 	  if (sy <= L.fy)
 	  {
@@ -408,54 +431,11 @@ namespace cspluginSoft3d
 	      L.fv = (int)vertNum - 1;
     
 	    leave = false;
-	    L.fy = csQround (vertices[(int)L.fv].y);
+	    L.fy = csQround (vertices[L.fv].y);
 	    if (sy <= L.fy)
 	      continue;
     
-	    float dyL = vertices[(int)L.sv].y - vertices[(int)L.fv].y;
-	    if (dyL)
-	    {
-	      float inv_dyL = 1 / dyL;
-	      L.x = csQfixed16 (vertices[(int)L.sv].x);
-	      L.dxdy = csQfixed16 (
-		(vertices[(int)L.fv].x - vertices[(int)L.sv].x) * inv_dyL);
-	      L.dzdy = csQfixed24 ((iz [(int)L.fv] - iz [(int)L.sv]) * inv_dyL);
-	      if (pqinfo.textured)
-	      {
-		L.dudy = csQfixed16 ((uu [(int)L.fv] - uu [(int)L.sv]) * inv_dyL);
-		L.dvdy = csQfixed16 ((vv [(int)L.fv] - vv [(int)L.sv]) * inv_dyL);
-	      }
-	      if (!(pqinfo.mixmode & CS_FX_FLAT))
-	      {
-		L.drdy = csQround ((rr [(int)L.fv] - rr [(int)L.sv]) * inv_dyL);
-		L.dgdy = csQround ((gg [(int)L.fv] - gg [(int)L.sv]) * inv_dyL);
-		L.dbdy = csQround ((bb [(int)L.fv] - bb [(int)L.sv]) * inv_dyL);
-	      }
-    
-	      // horizontal pixel correction
-	      float deltaX = (L.dxdy * 1/65536.) *
-		(vertices[(int)L.sv].y - (float (sy) - 0.5));
-	      L.x += csQfixed16 (deltaX);
-    
-	      // apply sub-pixel accuracy factor
-	      float Factor;
-	      if (vertices[(int)L.fv].x != vertices[(int)L.sv].x)
-		Factor = deltaX / (vertices[(int)L.fv].x - vertices[(int)L.sv].x);
-	      else
-		Factor = 0;
-	      if (pqinfo.textured)
-	      {
-		L.u = csQfixed16 (uu [(int)L.sv] + (uu [(int)L.fv] - uu [(int)L.sv]) * Factor);
-		L.v = csQfixed16 (vv [(int)L.sv] + (vv [(int)L.fv] - vv [(int)L.sv]) * Factor);
-	      }
-	      L.z = csQfixed24 (iz [(int)L.sv] + (iz [(int)L.fv] - iz [(int)L.sv]) * Factor);
-	      if (!(pqinfo.mixmode & CS_FX_FLAT))
-	      {
-		L.r = csQround (rr [(int)L.sv] + (rr [(int)L.fv] - rr [(int)L.sv]) * Factor);
-		L.g = csQround (gg [(int)L.sv] + (gg [(int)L.fv] - gg [(int)L.sv]) * Factor);
-		L.b = csQround (bb [(int)L.sv] + (bb [(int)L.fv] - bb [(int)L.sv]) * Factor);
-	      }
-	    } /* endif */
+	    L.edge.Setup (vertices, actualBuffers, buffersMask, L.sv, L.fv, sy);
 	  } /* endif */
 	} while (!leave); /* enddo */
     
@@ -476,23 +456,26 @@ namespace cspluginSoft3d
 	    //-----
 	    // Draw one scanline.
 	    //-----
-	    int xl = round16 (L.x);
-	    int xr = round16 (R.x);
+	    int xl = csQround (L.edge.x);
+	    int xr = csQround (R.edge.x);
     
 	    if (xr > xl)
 	    {
 	      int l = xr - xl;
 	      float inv_l = 1. / l;
     
-	      int dzz = csQround ((R.z - L.z) * inv_l);
+	      float dzz = (R.edge.z - L.edge.z) * inv_l;
 	      int uu = 0, duu = 0, vv = 0, dvv = 0;
 	      if (pqinfo.textured)
 	      {
-		int span_u = R.u - L.u;
-		int span_v = R.v - L.v;
-		uu = L.u; duu = csQint (span_u * inv_l);
-		vv = L.v; dvv = csQint (span_v * inv_l);
+		const csVector4 tcL (L.edge.c[VATTR_BUFINDEX(TEXCOORD)]);
+		const csVector4 tcR (R.edge.c[VATTR_BUFINDEX(TEXCOORD)]);
+		int span_u = csQfixed16 (tcR.x - tcL.x);
+		int span_v = csQfixed16 (tcR.y - tcL.y);
+		uu = csQfixed16 (tcL.x); duu = csQint (span_u * inv_l);
+		vv = csQfixed16 (tcL.y); dvv = csQint (span_v * inv_l);
     
+		/*
 		if (!pqinfo.tiling)
 		{
 		  // Check for texture overflows
@@ -514,11 +497,13 @@ namespace cspluginSoft3d
 		    dvv = csQint ((tmpv - vv) * inv_l);
 		  }
 		}
+		*/
 	      }
     
 	      // R,G,B brightness can underflow due to subpixel correction
 	      // Underflow will cause visual artifacts while small overflows
 	      // will be neutralized by our "clamp to 1.0" circuit.
+	      /*
 	      int rr = 0, drr = 0, gg = 0, dgg = 0, bb = 0, dbb = 0;
 	      bool clamp = false;
 	      if (!(pqinfo.mixmode & CS_FX_FLAT))
@@ -544,28 +529,25 @@ namespace cspluginSoft3d
 		if (tmp < 0) dbb = - csQint (bb * inv_l);
 		clamp |= (bb > pqinfo.max_b) || (tmp > pqinfo.max_b);
 	      }
+	      */
     
 	      uint32 *zbuff = z_buffer + width * screenY + xl;
 	      unsigned char *dest = line_table [screenY] + (xl << pixel_shift);
     
+	      /*
 	      if (do_gouraud)
 		pqinfo.drawline_gouraud (dest, l, zbuff, uu, duu, vv, dvv,
 		  L.z, dzz, pqinfo.bm, pqinfo.shf_w, rr, gg, bb, drr, dgg,
 		  dbb, clamp);
 	      else
+	      */
 		pqinfo.drawline (dest, l, zbuff, uu, duu, vv, dvv,
-		  L.z, dzz, pqinfo.bm, pqinfo.shf_w);
+		  L.edge.z, dzz, pqinfo.bm, pqinfo.shf_w);
 	    }
 	  }
     
-	  L.x += L.dxdy; R.x += R.dxdy;
-	  L.z += L.dzdy; R.z += R.dzdy;
-	  if (pqinfo.textured)
-	    L.u += L.dudy, L.v += L.dvdy,
-	    R.u += R.dudy, R.v += R.dvdy;
-	  if (!(pqinfo.mixmode & CS_FX_FLAT))
-	    L.r += L.drdy, L.g += L.dgdy, L.b += L.dbdy,
-	    R.r += R.drdy, R.g += R.dgdy, R.b += R.dbdy;
+	  L.edge.Advance (buffersMask);
+	  R.edge.Advance (buffersMask);
     
 	  sy--;
 	  screenY++;

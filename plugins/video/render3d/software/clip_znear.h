@@ -30,7 +30,6 @@ class ClipMeatZNear
   int width2;
   int height2;
   float aspect;
-  const csVector3* persp;
 
   CS_FORCEINLINE void Project (csVector3& v, const float com_iz)
   {
@@ -39,15 +38,15 @@ class ClipMeatZNear
     v.Set (v.x * com_iz + width2, v.y * com_iz + height2, com_zv);
   }
 public:
-  void Init (const csVector3* persp, int w2, int h2, float a)
+  void Init (int w2, int h2, float a)
   {
     width2 = w2;
     height2 = h2;
     aspect = a;
-    this->persp = persp;
   }
 
-  size_t DoClip (const csTriangle& tri, const VertexBuffer* inBuffers, 
+  size_t DoClip (const csTriangle& tri, const csVector3* inPersp,
+    VertexOutputBase& voutPersp, const VertexBuffer* inBuffers, 
     const size_t* inStrides, ClipBuffersMask buffersMask, 
     VertexOutputBase* vout)
   {
@@ -56,8 +55,9 @@ public:
     const float com_iz = aspect * com_zv;
     csVector3 v;
 
-    const VertexBuffer& bPos = inBuffers[VATTR_CLIPINDEX(POSITION)];
-    const size_t bPosStride = inStrides[VATTR_CLIPINDEX(POSITION)];
+    const VertexBuffer& bPos = inBuffers[VATTR_BUFINDEX(POSITION)];
+    const size_t bPosStride = inStrides[VATTR_BUFINDEX(POSITION)];
+    VertexOutputBase& voutPos = vout[VATTR_BUFINDEX(POSITION)];
     const csVector3& va = *(csVector3*)(bPos.data + tri.a * bPosStride);
     const csVector3& vb = *(csVector3*)(bPos.data + tri.b * bPosStride);
     const csVector3& vc = *(csVector3*)(bPos.data + tri.c * bPosStride);
@@ -77,23 +77,17 @@ public:
       // Another easy case: all vertices are visible or we are using
       // lazy clipping in which case we draw the triangle completely.
       //=====
+      voutPersp.Write ((float*)&inPersp[tri.a]);
+      voutPersp.Write ((float*)&inPersp[tri.b]);
+      voutPersp.Write ((float*)&inPersp[tri.c]);
       int n = 0;
       while (buffersMask != 0)
       {
         if (buffersMask & 1)
         {
-	  if (n == VATTR_CLIPINDEX(POSITION))
-	  {
-	    vout[n].Write ((float*)&persp[tri.a]);
-	    vout[n].Write ((float*)&persp[tri.b]);
-	    vout[n].Write ((float*)&persp[tri.c]);
-	  }
-	  else
-	  {
-	    vout[n].Copy (tri.a);
-	    vout[n].Copy (tri.b);
-	    vout[n].Copy (tri.c);
-	  }
+	  vout[n].Copy (tri.a);
+	  vout[n].Copy (tri.b);
+	  vout[n].Copy (tri.c);
         }
         buffersMask >>= 1;
         n++;
@@ -116,30 +110,25 @@ public:
         // Calculate intersection between a-c and Z=clipPos.
         const float r2 = (clipPos-va.z)/(vc.z-va.z);
 
+	voutPersp.Write ((float*)&inPersp[tri.a]);
+
+	voutPos.LerpTo ((float*)&v, tri.b, tri.a, r1);
+	Project (v, com_iz);
+	voutPersp.Write ((float*)&v);
+
+	voutPos.LerpTo ((float*)&v, tri.c, tri.a, r2);
+	Project (v, com_iz);
+	voutPersp.Write ((float*)&v);
+
         int n = 0;
         while (buffersMask != 0)
         {
           if (buffersMask & 1)
           {
-	    if (n == VATTR_CLIPINDEX(POSITION))
-	    {
-	      vout[n].Write ((float*)&persp[tri.a]);
-
-	      vout[n].LerpTo ((float*)&v, tri.b, tri.a, r1);
-	      Project (v, com_iz);
-	      vout[n].Write ((float*)&v);
-
-	      vout[n].LerpTo ((float*)&v, tri.c, tri.a, r2);
-	      Project (v, com_iz);
-	      vout[n].Write ((float*)&v);
-	    }
-	    else
-	    {
-	      // Point a is visible.
-	      vout[n].Copy (tri.a);
-	      vout[n].Lerp (tri.b, tri.a, r1);
-	      vout[n].Lerp (tri.c, tri.a, r2);
-	    }
+	    // Point a is visible.
+	    vout[n].Copy (tri.a);
+	    vout[n].Lerp (tri.b, tri.a, r1);
+	    vout[n].Lerp (tri.c, tri.a, r2);
           }
           buffersMask >>= 1;
           n++;
@@ -152,30 +141,25 @@ public:
         // Calculate intersection between b-c and Z=clipPos.
         const float r2 = (clipPos-vb.z)/(vc.z-vb.z);
 
+	voutPos.LerpTo ((float*)&v, tri.a, tri.b, r1);
+	Project (v, com_iz);
+	voutPersp.Write ((float*)&v);
+
+	voutPersp.Write ((float*)&inPersp[tri.b]);
+
+	voutPos.LerpTo ((float*)&v, tri.c, tri.b, r2);
+	Project (v, com_iz);
+	voutPersp.Write ((float*)&v);
+
         int n = 0;
         while (buffersMask != 0)
         {
           if (buffersMask & 1)
           {
-	    if (n == VATTR_CLIPINDEX(POSITION))
-	    {
-	      vout[n].LerpTo ((float*)&v, tri.a, tri.b, r1);
-	      Project (v, com_iz);
-	      vout[n].Write ((float*)&v);
-
-	      vout[n].Write ((float*)&persp[tri.b]);
-
-	      vout[n].LerpTo ((float*)&v, tri.c, tri.b, r2);
-	      Project (v, com_iz);
-	      vout[n].Write ((float*)&v);
-	    }
-	    else
-	    {
-	      vout[n].Lerp (tri.a, tri.b, r1);
-	      // Point b is visible
-	      vout[n].Copy (tri.b);
-	      vout[n].Lerp (tri.c, tri.b, r2);
-	    }
+	    vout[n].Lerp (tri.a, tri.b, r1);
+	    // Point b is visible
+	    vout[n].Copy (tri.b);
+	    vout[n].Lerp (tri.c, tri.b, r2);
           }
           buffersMask >>= 1;
           n++;
@@ -188,30 +172,25 @@ public:
         // Calculate intersection between c-b and Z=clipPos.
         const float r2 = (clipPos-vc.z)/(vb.z-vc.z);
 
+	voutPos.LerpTo ((float*)&v, tri.a, tri.c, r1);
+	Project (v, com_iz);
+	voutPersp.Write ((float*)&v);
+
+	voutPos.LerpTo ((float*)&v, tri.b, tri.c, r2);
+	Project (v, com_iz);
+	voutPersp.Write ((float*)&v);
+
+	voutPersp.Write ((float*)&inPersp[tri.c]);
+
         int n = 0;
         while (buffersMask != 0)
         {
           if (buffersMask & 1)
           {
-	    if (n == VATTR_CLIPINDEX(POSITION))
-	    {
-	      vout[n].LerpTo ((float*)&v, tri.a, tri.c, r1);
-	      Project (v, com_iz);
-	      vout[n].Write ((float*)&v);
-
-	      vout[n].LerpTo ((float*)&v, tri.b, tri.c, r2);
-	      Project (v, com_iz);
-	      vout[n].Write ((float*)&v);
-
-	      vout[n].Write ((float*)&persp[tri.c]);
-	    }
-	    else
-	    {
-	      vout[n].Lerp (tri.a, tri.c, r1);
-	      vout[n].Lerp (tri.b, tri.c, r2);
-	      // Point c is visible
-	      vout[n].Copy (tri.c);
-	    }
+	    vout[n].Lerp (tri.a, tri.c, r1);
+	    vout[n].Lerp (tri.b, tri.c, r2);
+	    // Point c is visible
+	    vout[n].Copy (tri.c);
           }
           buffersMask >>= 1;
           n++;
@@ -236,32 +215,27 @@ public:
         // Calculate intersection between a-c and Z=.
         const float r2 = (clipPos-va.z)/(vc.z-va.z);
 
+	voutPos.LerpTo ((float*)&v, tri.a, tri.b, r1);
+	Project (v, com_iz);
+	voutPersp.Write ((float*)&v);
+
+	voutPersp.Write ((float*)&inPersp[tri.b]);
+	voutPersp.Write ((float*)&inPersp[tri.c]);
+
+	voutPos.LerpTo ((float*)&v, tri.a, tri.c, r2);
+	Project (v, com_iz);
+	voutPersp.Write ((float*)&v);
+
         int n = 0;
         while (buffersMask != 0)
         {
           if (buffersMask & 1)
           {
-	    if (n == VATTR_CLIPINDEX(POSITION))
-	    {
-	      vout[n].LerpTo ((float*)&v, tri.a, tri.b, r1);
-	      Project (v, com_iz);
-	      vout[n].Write ((float*)&v);
-
-	      vout[n].Write ((float*)&persp[tri.b]);
-	      vout[n].Write ((float*)&persp[tri.c]);
-
-	      vout[n].LerpTo ((float*)&v, tri.a, tri.c, r2);
-	      Project (v, com_iz);
-	      vout[n].Write ((float*)&v);
-	    }
-	    else
-	    {
-	      vout[n].Lerp (tri.a, tri.b, r1);
-	      // Point a is not visible.
-	      vout[n].Copy (tri.b);
-	      vout[n].Copy (tri.c);
-	      vout[n].Lerp (tri.a, tri.c, r2);
-	    }
+	    vout[n].Lerp (tri.a, tri.b, r1);
+	    // Point a is not visible.
+	    vout[n].Copy (tri.b);
+	    vout[n].Copy (tri.c);
+	    vout[n].Lerp (tri.a, tri.c, r2);
           }
           buffersMask >>= 1;
           n++;
@@ -274,35 +248,30 @@ public:
         // Calculate intersection between b-c and Z=clipPos.
         const float r2 = (clipPos-vb.z)/(vc.z-vb.z);
 
+	voutPersp.Write ((float*)&inPersp[tri.a]);
+
+	voutPos.LerpTo ((float*)&v, tri.b, tri.a, r1);
+	Project (v, com_iz);
+	voutPersp.Write ((float*)&v);
+
+	voutPos.LerpTo ((float*)&v, tri.b, tri.c, r2);
+	Project (v, com_iz);
+	voutPersp.Write ((float*)&v);
+
+	voutPersp.Write ((float*)&inPersp[tri.c]);
+
         int n = 0;
         while (buffersMask != 0)
         {
           if (buffersMask & 1)
           {
-	    if (n == VATTR_CLIPINDEX(POSITION))
-	    {
-	      vout[n].Write ((float*)&persp[tri.a]);
-
-	      vout[n].LerpTo ((float*)&v, tri.b, tri.a, r1);
-	      Project (v, com_iz);
-	      vout[n].Write ((float*)&v);
-
-	      vout[n].LerpTo ((float*)&v, tri.b, tri.c, r2);
-	      Project (v, com_iz);
-	      vout[n].Write ((float*)&v);
-
-	      vout[n].Write ((float*)&persp[tri.c]);
-	    }
-	    else
-	    {
-	      // Point b is not visible.
-	      vout[n].Copy (tri.a);
-              
-	      vout[n].Lerp (tri.b, tri.a, r1);
-	      vout[n].Lerp (tri.b, tri.c, r2);
-              
-	      vout[n].Copy (tri.c);
-	    }
+	    // Point b is not visible.
+	    vout[n].Copy (tri.a);
+            
+	    vout[n].Lerp (tri.b, tri.a, r1);
+	    vout[n].Lerp (tri.b, tri.c, r2);
+            
+	    vout[n].Copy (tri.c);
           }
           buffersMask >>= 1;
           n++;
@@ -315,33 +284,28 @@ public:
         // Calculate intersection between c-b and Z=clipPos.
         const float r2 = (clipPos-vc.z)/(vb.z-vc.z);
 
+	voutPersp.Write ((float*)&inPersp[tri.a]);
+	voutPersp.Write ((float*)&inPersp[tri.b]);
+
+	voutPos.LerpTo ((float*)&v, tri.c, tri.a, r1);
+	Project (v, com_iz);
+	voutPersp.Write ((float*)&v);
+
+	voutPos.LerpTo ((float*)&v, tri.c, tri.b, r2);
+	Project (v, com_iz);
+	voutPersp.Write ((float*)&v);
+
         int n = 0;
         while (buffersMask != 0)
         {
           if (buffersMask & 1)
           {
-	    if (n == VATTR_CLIPINDEX(POSITION))
-	    {
-	      vout[n].Write ((float*)&persp[tri.a]);
-	      vout[n].Write ((float*)&persp[tri.b]);
-
-	      vout[n].LerpTo ((float*)&v, tri.c, tri.a, r1);
-	      Project (v, com_iz);
-	      vout[n].Write ((float*)&v);
-
-	      vout[n].LerpTo ((float*)&v, tri.c, tri.b, r2);
-	      Project (v, com_iz);
-	      vout[n].Write ((float*)&v);
-	    }
-	    else
-	    {
-	      // Point c is not visible.
-	      vout[n].Copy (tri.a);
-	      vout[n].Copy (tri.b);
-              
-	      vout[n].Lerp (tri.c, tri.a, r1);
-	      vout[n].Lerp (tri.c, tri.b, r2);
-	    }
+	    // Point c is not visible.
+	    vout[n].Copy (tri.a);
+	    vout[n].Copy (tri.b);
+            
+	    vout[n].Lerp (tri.c, tri.a, r1);
+	    vout[n].Lerp (tri.c, tri.b, r2);
           }
           buffersMask >>= 1;
           n++;
