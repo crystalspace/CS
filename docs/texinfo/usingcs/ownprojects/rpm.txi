@@ -5,6 +5,11 @@
 @cindex Package, @sc{rpm} 
 @cindex @file{cs.spec}
 
+@noindent
+@emph{Written by Vincent Knecht @email{vknecht@@club-internet.fr}.}
+@noindent
+@emph{Last updated 21 September 2005.}
+
 @subsubheading Creating Crystal Space @sc{rpm} Packages
 
 It is possible to build Crystal Space @sc{rpm}'s. This is useful if you want to
@@ -19,7 +24,7 @@ Building @sc{rpm} packages involves a few settings, which are covered at
 the following page:
 
 @noindent
-@uref{http://qa.mandrakesoft.com/twiki/bin/view/Main/RpmHowTo#Preliminary_tasks}
+@uref{http://qa.mandriva.com/twiki/bin/view/Main/RpmHowTo#Preliminary_tasks}
 
 @subsubheading Building Your Own @sc{rpm}'s From Source Archive 
 
@@ -36,7 +41,9 @@ Go into your @file{rpm/SPECS} directory.
 
 @item
 Extract the @file{CS/scripts/rpm/cs.spec} file, and put it in your
-@file{rpm/SPECS/} directory.
+@file{rpm/SPECS/} directory. You can also get the latest @file{cs.spec} file
+at
+@uref{http://cvs.sourceforge.net/viewcvs.py/*checkout*/crystal/CS/scripts/rpm/cs.spec}
 
 @example
 cd /home/user/rpm/SPECS
@@ -56,9 +63,9 @@ Build the @sc{rpm}'s.
 
 @itemize @bullet
 @item
-To build binary @sc{rpm}'s only, issue @command{rpm -bb cs.spec}
+To build binary @sc{rpm}'s only, issue @command{rpmbuild -bb cs.spec}
 @item
-To build source @sc{rpm}'s as well, issue @command{rpm -ba cs.spec}
+To build source @sc{rpm}'s as well, issue @command{rpmbuild -ba cs.spec}
 @end itemize
 @end enumerate
 
@@ -76,7 +83,7 @@ this option may be useless since @command{rpm} strips files before packaging.
 So, to build all packages, with Perl support, use:
 
 @example
-rpm -ba cs.spec --with perl
+rpmbuild -ba cs.spec --with perl
 @end example
 
 The binary @sc{rpm}'s should be under @file{rpm/RPMS/}, and the source @sc{rpm}
