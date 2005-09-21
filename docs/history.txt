@@ -17,6 +17,7 @@ chronological order.
 	- Jorrit cleaned up formatting in the new sound system api docs.
 	- Eric Sunshine fixed some additional Jamfile issues in the sndsys
 	  hierarchy.
+	- Eric Sunshine fixed build errors in the new CoreAudio sndsys driver.
 20-Sep-2005
 	- Eric Sunshine resolved a few build-system glitches related to the
 	  new sound system (sndsys).
