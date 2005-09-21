@@ -363,16 +363,22 @@ public:
     if (history_shift > history_samples)
       history_shift=history_samples;
 
-    //Report(properties.reporter, CS_REPORTER_SEVERITY_DEBUG, "History shift is %u", history_shift);
+    //Report(properties.reporter, CS_REPORTER_SEVERITY_DEBUG, 
+      //"History shift is %u", history_shift);
 
-    memcpy(history_buffer, &(history_buffer[history_shift]), sizeof(SoundSample) * (history_samples - history_shift));
-    memcpy(&(history_buffer[history_samples-history_shift]), properties.work_buffer, sizeof(SoundSample) * history_shift);
+    memcpy(history_buffer, &(history_buffer[history_shift]), 
+      sizeof(SoundSample) * (history_samples - history_shift));
+    memcpy(&(history_buffer[history_samples-history_shift]), 
+      properties.work_buffer, sizeof(SoundSample) * history_shift);
 
-    // Calculate the delay for this channel, this is based off difference in distance between the closest channel and this channel
-    float delay_dist=properties.speaker_distance[properties.channel]-properties.closest_speaker_distance;
-    float time=delay_dist / 331.4f;
-    float fsamples=time * properties.sound_format->Freq;
-    size_t delay_samples = fsamples;
+    /* Calculate the delay for this channel, this is based off difference in 
+     * distance between the closest channel and this channel */
+    float delay_dist = 
+      properties.speaker_distance[properties.channel] -
+      properties.closest_speaker_distance;
+    float time = delay_dist / 331.4f;
+    float fsamples = time * properties.sound_format->Freq;
+    size_t delay_samples = (size_t)fsamples;
 
     if (delay_samples<1)
       delay_samples=0;
@@ -381,7 +387,8 @@ public:
     if (delay_samples>properties.buffer_samples)
       delay_samples=properties.buffer_samples;
 
-    //Report(properties.reporter, CS_REPORTER_SEVERITY_DEBUG, "Delay_samples is %u", delay_samples);
+    //Report(properties.reporter, CS_REPORTER_SEVERITY_DEBUG, 
+      //"Delay_samples is %u", delay_samples);
 
     if (delay_samples>0)
     {
@@ -392,9 +399,13 @@ public:
         size_t idx;
         for (idx=properties.buffer_samples-1;idx>=delay_samples;idx--)
           properties.work_buffer[idx]=properties.work_buffer[idx-delay_samples];
-        //memcpy(&(properties.work_buffer[delay_samples]), properties.work_buffer, (properties.buffer_samples- delay_samples) * sizeof(SoundSample));
+        //memcpy(&(properties.work_buffer[delay_samples]), 
+	  //properties.work_buffer, 
+	  //(properties.buffer_samples- delay_samples) * sizeof(SoundSample));
       }
-      memcpy(properties.work_buffer, &(history_buffer[history_samples-(history_shift + delay_samples)]), delay_samples * sizeof(SoundSample));
+      memcpy(properties.work_buffer, 
+	&(history_buffer[history_samples-(history_shift + delay_samples)]), 
+	delay_samples * sizeof(SoundSample));
     }
 
     if (next_filter)
@@ -408,7 +419,8 @@ protected:
 class SndSysSourceSoftwareFilter_Delay : public SndSysSourceSoftwareFilter_Base
 {
 public:
-  SndSysSourceSoftwareFilter_Delay() : SndSysSourceSoftwareFilter_Base(), history_buffer(NULL), history_samples(0)
+  SndSysSourceSoftwareFilter_Delay() : SndSysSourceSoftwareFilter_Base(), 
+    history_buffer(NULL), history_samples(0)
   {
   }
   virtual ~SndSysSourceSoftwareFilter_Delay()
@@ -445,14 +457,17 @@ public:
     if (history_shift > history_samples)
       history_shift=history_samples;
 
-    //Report(properties.reporter, CS_REPORTER_SEVERITY_DEBUG, "History shift is %u", history_shift);
+    //Report(properties.reporter, CS_REPORTER_SEVERITY_DEBUG, 
+      //"History shift is %u", history_shift);
 
-    memcpy(history_buffer, &(history_buffer[history_shift]), sizeof(SoundSample) * (history_samples - history_shift));
-    memcpy(&(history_buffer[history_samples-history_shift]), properties.work_buffer, sizeof(SoundSample) * history_shift);
+    memcpy(history_buffer, &(history_buffer[history_shift]), 
+      sizeof(SoundSample) * (history_samples - history_shift));
+    memcpy(&(history_buffer[history_samples-history_shift]), 
+      properties.work_buffer, sizeof(SoundSample) * history_shift);
 
     // Calculate the delay for this channel
-    float fsamples=delay_time * properties.sound_format->Freq;
-    size_t delay_samples = fsamples;
+    float fsamples = delay_time * properties.sound_format->Freq;
+    size_t delay_samples = (size_t)fsamples;
 
     if (delay_samples<1)
       delay_samples=0;
@@ -461,7 +476,8 @@ public:
     if (delay_samples>properties.buffer_samples)
       delay_samples=properties.buffer_samples;
 
-    //Report(properties.reporter, CS_REPORTER_SEVERITY_DEBUG, "Delay_samples is %u", delay_samples);
+    //Report(properties.reporter, CS_REPORTER_SEVERITY_DEBUG, 
+      //"Delay_samples is %u", delay_samples);
 
     if (delay_samples>0)
     {
@@ -472,9 +488,13 @@ public:
         size_t idx;
         for (idx=properties.buffer_samples-1;idx>=delay_samples;idx--)
           properties.work_buffer[idx]=properties.work_buffer[idx-delay_samples];
-        //memcpy(&(properties.work_buffer[delay_samples]), properties.work_buffer, (properties.buffer_samples- delay_samples) * sizeof(SoundSample));
+        //memcpy(&(properties.work_buffer[delay_samples]), 
+	  //properties.work_buffer, 
+	  //(properties.buffer_samples- delay_samples) * sizeof(SoundSample));
       }
-      memcpy(properties.work_buffer, &(history_buffer[history_samples-(history_shift + delay_samples)]), delay_samples * sizeof(SoundSample));
+      memcpy(properties.work_buffer, 
+	&(history_buffer[history_samples-(history_shift + delay_samples)]), 
+	delay_samples * sizeof(SoundSample));
     }
 
     if (next_filter)
@@ -489,7 +509,8 @@ protected:
 class SndSysSourceSoftwareFilter_Reverb : public SndSysSourceSoftwareFilter_Base
 {
 public:
-  SndSysSourceSoftwareFilter_Reverb() : SndSysSourceSoftwareFilter_Base(), history_buffer(NULL), history_samples(0)
+  SndSysSourceSoftwareFilter_Reverb() : SndSysSourceSoftwareFilter_Base(), 
+    history_buffer(NULL), history_samples(0)
   {
   }
   virtual ~SndSysSourceSoftwareFilter_Reverb()
@@ -521,10 +542,13 @@ public:
     if (history_shift > history_samples)
       history_shift=history_samples;
 
-    //Report(properties.reporter, CS_REPORTER_SEVERITY_DEBUG, "History shift is %u", history_shift);
+    //Report(properties.reporter, CS_REPORTER_SEVERITY_DEBUG, 
+      //"History shift is %u", history_shift);
 
-    memcpy(history_buffer, &(history_buffer[history_shift]), sizeof(SoundSample) * (history_samples - history_shift));
-    memcpy(&(history_buffer[history_samples-history_shift]), properties.work_buffer, sizeof(SoundSample) * history_shift);
+    memcpy(history_buffer, &(history_buffer[history_shift]), 
+      sizeof(SoundSample) * (history_samples - history_shift));
+    memcpy(&(history_buffer[history_samples-history_shift]), 
+      properties.work_buffer, sizeof(SoundSample) * history_shift);
 
     // Calculate the delay for this channel
     float delay_time=0.01f;
@@ -533,7 +557,7 @@ public:
     while (delay_time<0.1f)
     {
       float fsamples=delay_time * properties.sound_format->Freq;
-      size_t delay_samples = fsamples;
+      size_t delay_samples = (size_t)fsamples;
 
       if (delay_samples<1)
         delay_samples=0;
@@ -542,7 +566,8 @@ public:
       if (delay_samples>properties.buffer_samples)
         delay_samples=properties.buffer_samples;
 
-      //Report(properties.reporter, CS_REPORTER_SEVERITY_DEBUG, "Delay_samples is %u", delay_samples);
+      //Report(properties.reporter, CS_REPORTER_SEVERITY_DEBUG, 
+	//"Delay_samples is %u", delay_samples);
 
       if (delay_samples>0)
       {
@@ -553,13 +578,18 @@ public:
           size_t idx;
           for (idx=1;idx<properties.buffer_samples;idx++)
           {
-            float samp_vol=history_buffer[history_samples-(delay_samples + history_shift)];
+            float samp_vol = 
+	      history_buffer[history_samples-(delay_samples + history_shift)];
             samp_vol*=delay_intensity_factor;
-            properties.work_buffer[idx]+=samp_vol;
+            properties.work_buffer[idx] += (int)samp_vol;
           }
-          //memcpy(&(properties.work_buffer[delay_samples]), properties.work_buffer, (properties.buffer_samples- delay_samples) * sizeof(SoundSample));
+          //memcpy(&(properties.work_buffer[delay_samples]), 
+	    //properties.work_buffer, 
+	    //(properties.buffer_samples- delay_samples) * sizeof(SoundSample));
         }
-        //memcpy(properties.work_buffer, &(history_buffer[history_samples-(history_shift + delay_samples)]), delay_samples * sizeof(SoundSample));
+        //memcpy(properties.work_buffer, 
+	  //&(history_buffer[history_samples-(history_shift + delay_samples)]), 
+	  //delay_samples * sizeof(SoundSample));
       }
       delay_time=delay_time*2.0f;
       delay_intensity_factor=delay_intensity_factor/2.0f;
@@ -596,15 +626,17 @@ public:
     float minimum_distance=properties.source_parameters->minimum_distance;
     if (minimum_distance < 0.000001f)
       minimum_distance=0.000001f;
-    float iid_distance=properties.speaker_distance[properties.channel]/minimum_distance;
+    float iid_distance = 
+      properties.speaker_distance[properties.channel]/minimum_distance;
 
     // The minimum distance is 1 minimum distance unit
     if (iid_distance < 1.0f) iid_distance=1.0f;
 
     // The rolloff factor is applied as a factor to the natural rolloff power
-    float rollofffactor=properties.listener_parameters->rolloff_factor;
+    float rollofffactor = properties.listener_parameters->rolloff_factor;
 
-    // Adjustments based on the direction the sound is coming in compared to the direction of the receiving speaker
+    // Adjustments based on the direction the sound is coming in compared to 
+    // the direction of the receiving speaker
     // Temporary - no adjustment
     vol =  properties.source_parameters->volume;
 
@@ -614,12 +646,14 @@ public:
     else
       vol/=iid_distance;
 
-    int_vol=(SOURCE_INTEGER_VOLUME_MULTIPLE * vol);
+    int_vol = (int)(SOURCE_INTEGER_VOLUME_MULTIPLE * vol);
 
     /*
     if (debug_cycle[properties.channel]++ >=20)
     {
-      properties.reporter->Report(CS_REPORTER_SEVERITY_DEBUG, "crystalspace.SndSys.renderer.software", "Channel %d has integer volume factor %d", 
+      properties.reporter->Report(CS_REPORTER_SEVERITY_DEBUG, 
+				  "crystalspace.SndSys.renderer.software", 
+				  "Channel %d has integer volume factor %d", 
                                   properties.channel, int_vol);
       debug_cycle[properties.channel]=0;
     }
@@ -657,16 +691,19 @@ public:
     if (properties.speaker_direction_cos[properties.channel] <=cos_far)
     {
       // Not a direct sound, clip, do not call further chains
-      memset(properties.work_buffer, 0, sizeof(SoundSample) * properties.buffer_samples);
+      memset(properties.work_buffer, 0, 
+	sizeof(SoundSample) * properties.buffer_samples);
       return;
     }
     if (properties.speaker_direction_cos[properties.channel] <=cos_near)
     {
-      float vol=(properties.speaker_direction_cos[properties.channel]-cos_far) / range;
+      float vol = 
+	(properties.speaker_direction_cos[properties.channel]-cos_far) / range;
 
       size_t i;
       for (i=0;i<properties.buffer_samples;i++)
-        properties.work_buffer[i]*=vol;
+        properties.work_buffer[i] = 
+	  (int)((float)properties.work_buffer[i] * vol);
     }
 
     if (next_filter)
@@ -683,7 +720,8 @@ class SndSysSourceSoftwareBasic : public iSndSysSourceSoftware
 public:
   SCF_DECLARE_IBASE;
 
-  SndSysSourceSoftwareBasic(csRef<iSndSysStream> stream, SndSysRendererSoftware *rend);
+  SndSysSourceSoftwareBasic(csRef<iSndSysStream> stream, 
+    SndSysRendererSoftware *rend);
   virtual ~SndSysSourceSoftwareBasic();
 
   /// Set volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
@@ -703,7 +741,8 @@ public:
   /// Retrieve a direct pointer to this object
   virtual iSndSysSource *GetPtr() { return this; }
 
-  virtual size_t MergeIntoBuffer(SoundSample *channel_buffer, size_t buffer_samples);
+  virtual size_t MergeIntoBuffer(SoundSample *channel_buffer, 
+    size_t buffer_samples);
 
 protected:
   void UpdateQueuedParameters();
@@ -723,7 +762,8 @@ class SndSysSourceSoftware3D : public iSndSysSourceSoftware3D
 public:
   SCF_DECLARE_IBASE;
 
-  SndSysSourceSoftware3D(csRef<iSndSysStream> stream, SndSysRendererSoftware *rend);
+  SndSysSourceSoftware3D(csRef<iSndSysStream> stream, 
+    SndSysRendererSoftware *rend);
   virtual ~SndSysSourceSoftware3D();
 
   /// Set volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
@@ -745,38 +785,53 @@ public:
   /// get position of this source
   virtual csVector3 GetDirection();
 
-  /// The directional radiation applies to sound that are oriented in a particular direction.
-  //   This value is expressed in radians and describes the half-angle of a cone spreading from the position of the source and opening
-  //   in the direction of the source.
-  //  Set this value to 0.0f for an omni-directional sound. 
+  /**
+   * The directional radiation applies to sound that are oriented in a 
+   * particular direction.
+   * This value is expressed in radians and describes the half-angle of a cone 
+   * spreading from the position of the source and opening in the direction of 
+   * the source.
+   * Set this value to 0.0f for an omni-directional sound. 
+   */
   virtual void SetDirectionalRadiation(float rad);
 
   // Retrieves the current directional radiation 
   virtual float GetDirectionalRadiation();
 
 
-  /** Set the greatest distance from a sound at which the sound plays at full amplitude. 
-  *   When a listener is closer than this distance, the amplitude is the volume of the sound.
-  *   When a listener is further than this distance, the amplitude follows the formula V = (volume / ((distance/minimum_distance) ^ rolloff_factor))
-  */
+  /** 
+   * Set the greatest distance from a sound at which the sound plays at full 
+   * amplitude. 
+   * When a listener is closer than this distance, the amplitude is the volume 
+   * of the sound.
+   * When a listener is further than this distance, the amplitude follows the 
+   * formula V = (volume / ((distance/minimum_distance) ^ rolloff_factor))
+   */
   virtual void SetMinimumDistance (float distance);
 
   /** Set the greatest distance from a sound at which the sound can be heard.
-  *   If the distance to a listener is above this threshold, it will not be mixed into the output buffer at all.  This saves a tiny bit of processing.
-  */
+   * If the distance to a listener is above this threshold, it will not be 
+   * mixed into the output buffer at all.  This saves a tiny bit of processing.
+   */
   virtual void SetMaximumDistance (float distance);
 
-  /// Retrieve the maximum distance for which a sound is heard at full volume.  See SetMaximumDistance and SetMinimumDistance for distance notes.
+  /**
+   * Retrieve the maximum distance for which a sound is heard at full volume.  
+   * See SetMaximumDistance and SetMinimumDistance for distance notes.
+   */
   virtual float GetMinimumDistance();
 
-  /// Retrieve the maximum distance for which a sound can be heard.  See SetMaximumDistance and SetMinimumDistance for distance notes.
+  /** Retrieve the maximum distance for which a sound can be heard.  
+   * See SetMaximumDistance and SetMinimumDistance for distance notes.
+   */
   virtual float GetMaximumDistance();
 
 
   /// Retrieve a direct pointer to this object
   virtual iSndSysSource *GetPtr() { return this; }
 
-  virtual size_t MergeIntoBuffer(SoundSample *channel_buffer, size_t buffer_samples);
+  virtual size_t MergeIntoBuffer(SoundSample *channel_buffer, 
+    size_t buffer_samples);
 
 
 protected:
@@ -831,15 +886,4 @@ protected:
   //csArray<iSndSysFilter *> filters;
 };
 
-
-
-
-
-
-
-
 #endif // #ifndef SNDSYS_RENDERER_SOFTWARE_SOURCE_H
-
-
-
-

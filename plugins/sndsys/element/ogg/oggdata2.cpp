@@ -157,7 +157,8 @@ void SndSysOggSoundData::Initialize()
 
   OggVorbis_File f;
   memset (&f, 0, sizeof(OggVorbis_File));
-  bool ok = ov_open_callbacks(streamdata, &f, 0, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
+  /*bool ok = */ov_open_callbacks(streamdata, &f, 0, 0, 
+    *(ov_callbacks*)GetCallbacks ()) /*== 0*/;
 
   pcm_count=ov_pcm_total(&f, -1);
   sample_count=(long)(pcm_count & 0x7FFFFFFF);

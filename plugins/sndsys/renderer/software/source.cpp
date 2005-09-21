@@ -119,8 +119,8 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(SoundSample *channel_buffer, s
   int int_volume;
   long request_bytes;
   int bytes_per_sample;
-  size_t original_buffer_samples=buffer_samples;
-  bool fake_full_return=false;
+  //size_t original_buffer_samples=buffer_samples;
+  //bool fake_full_return=false;
 
   UpdateQueuedParameters();
 
@@ -176,7 +176,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(SoundSample *channel_buffer, s
   //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Source merge beginning.");
 
   // Calculate integer volume factor for faster calculations below
-  int_volume=(SOURCE_INTEGER_VOLUME_MULTIPLE * source_volume);
+  int_volume = (int)(SOURCE_INTEGER_VOLUME_MULTIPLE * source_volume);
 
   /*
   if (HaveFilters())
@@ -366,7 +366,7 @@ SndSysSourceSoftware3D::SndSysSourceSoftware3D(csRef<iSndSysStream> stream, SndS
   queued_parameters.volume=1.0f;
 
 
-  const SndSysSoundFormat *fmt=stream->GetRenderedFormat();
+  //const SndSysSoundFormat *fmt=stream->GetRenderedFormat();
   // Allocate the history buffer
  // historic_buffer_samples=(fmt->Freq * SOURCE_3D_BUFFER_TIME_MS) / 1000;
  // historic_buffer=new SoundSample[historic_buffer_samples];

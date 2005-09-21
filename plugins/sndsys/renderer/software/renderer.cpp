@@ -333,7 +333,8 @@ csRef<iSndSysListener> SndSysRendererSoftware::GetListener()
   return Listener;
 }
 
-uint32 SndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,void *buf2, uint32 buf2_len)
+uint32 SndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,
+						void *buf2, uint32 buf2_len)
 {
   csTicks current_ticks;
 
@@ -348,9 +349,9 @@ uint32 SndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,void
   current_ticks=csGetTicks();
 
   // Resize the samplebuffer if needed
-  uint32 needed_samples=CalculateMaxSamples(buf1_len+buf2_len);
+  long needed_samples = CalculateMaxSamples (buf1_len+buf2_len);
 
-  if ((sample_buffer==NULL) || (needed_samples > sample_buffer_samples))
+  if ((sample_buffer==NULL) || (needed_samples > (long)sample_buffer_samples))
   {
     delete[] sample_buffer;
     sample_buffer=new SoundSample[needed_samples];
@@ -390,10 +391,12 @@ uint32 SndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,void
   for (currentidx=0;currentidx<maxidx;currentidx++)
   {
     long provided_samples;
-    //Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Requesting %d samples from source.", needed_samples);
+    //Report (CS_REPORTER_SEVERITY_DEBUG, 
+      //"Sound System: Requesting %d samples from source.", needed_samples);
 
     // The return from this function is this number of samples actually available 
-    provided_samples=sources.Get(currentidx)->MergeIntoBuffer(sample_buffer,needed_samples);
+    provided_samples = sources.Get(currentidx)->MergeIntoBuffer(sample_buffer,
+      needed_samples);
 
     if (provided_samples==0)
     {
@@ -401,7 +404,7 @@ uint32 SndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,void
     }
     else
     {
-      CS_ASSERT(provided_samples <= needed_samples);
+      CS_ASSERT (provided_samples <= needed_samples);
       // Reduce the number of samples we request from future sources, as well as the number we provide to the driver
       needed_samples=provided_samples; 
     }
@@ -417,7 +420,7 @@ uint32 SndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,void
   // Copy normalized data to the driver
   CopySampleBufferToDriverBuffer(buf1,buf1_len,buf2,buf2_len, needed_samples/2);
 
-  csTicks end_ticks=csGetTicks();
+  //csTicks end_ticks=csGetTicks();
 //  Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Processing time: %u ticks.", end_ticks-current_ticks);
 
 
@@ -492,7 +495,7 @@ void SndSysRendererSoftware::NormalizeSampleBuffer(size_t used_samples)
 {
   size_t sample_idx;
   SoundSample maxintensity=0;
-  SoundSample desiredintensity = 0x7FFF * Volume;
+  SoundSample desiredintensity = (SoundSample)(0x7FFF * Volume);
   SoundSample low_threshold;
   uint32 multiplier;
 

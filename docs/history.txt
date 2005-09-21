@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Sep-2005
+	- res fixed a few warnings in the new sndsys stuff, did some 
+	  reformatting to better follow the CS coding guidelines (reading
+	  recommended) and reduced namespace pollution.
 20-Sep-2005
 	- Eric Sunshine resolved a few build-system glitches related to the
 	  new sound system (sndsys).

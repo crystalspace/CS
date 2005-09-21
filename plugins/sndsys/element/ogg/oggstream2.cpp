@@ -27,12 +27,16 @@
 
 #include "ivaria/reporter.h"
 
-// Keep these as integer values or the stream may feed portions of a sample to the higher layer which may cause problems
-// 1 , 1 will decode 1/1 or 1 second of audio in advance
+/* Keep these as integer values or the stream may feed portions of a sample to 
+ * the higher layer which may cause problems
+ * 1 , 1 will decode 1/1 or 1 second of audio in advance */
 #define OGG_BUFFER_LENGTH_MULTIPLIER  1
 #define OGG_BUFFER_LENGTH_DIVISOR     5
 
-/// The size in bytes of the buffer in which decoded ogg data is stored before copying/conversion
+/**
+ * The size in bytes of the buffer in which decoded ogg data is stored before 
+ * copying/conversion
+ */
 #define OGG_DECODE_BUFFER_SIZE 4096
 
 SCF_IMPLEMENT_IBASE (SndSysOggSoundStream)
@@ -42,7 +46,10 @@ SCF_IMPLEMENT_IBASE_END
 extern cs_ov_callbacks *GetCallbacks();
 
 
-SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data, OggDataStore *datastore, SndSysSoundFormat *renderformat, int mode3d)
+SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data, 
+					    OggDataStore *datastore, 
+					    SndSysSoundFormat *renderformat, 
+					    int mode3d)
 {
   SCF_CONSTRUCT_IBASE(NULL);
 
@@ -56,12 +63,16 @@ SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data, OggD
   sound_data=data;
 
   // Allocate an advance buffer
-  p_cyclicbuffer = new SoundCyclicBuffer((render_format.Bits/8 * render_format.Channels) * (render_format.Freq * OGG_BUFFER_LENGTH_MULTIPLIER / OGG_BUFFER_LENGTH_DIVISOR));
+  p_cyclicbuffer = new CrystalSpace:: SoundCyclicBuffer (
+    (render_format.Bits/8 * render_format.Channels) * 
+      (render_format.Freq * OGG_BUFFER_LENGTH_MULTIPLIER / 
+	OGG_BUFFER_LENGTH_DIVISOR));
   CS_ASSERT(p_cyclicbuffer!=NULL);
 
   // Initialize ogg file
   memset(&vorbis_file,0,sizeof(OggVorbis_File));
-  ov_open_callbacks(&stream_data,&vorbis_file,NULL,0,*(ov_callbacks*)GetCallbacks());
+  ov_open_callbacks (&stream_data,&vorbis_file,NULL,0,
+    *(ov_callbacks*)GetCallbacks());
 
   // Start the most advanced read pointer at offset 0
   most_advanced_read_pointer=0;
@@ -85,7 +96,8 @@ SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data, OggD
   // Playback rate is initially 100% (normal)
   playback_percent=100;
 
-  // Forces the output buffer to be resized and the converter to be created on the first pass
+  /* Forces the output buffer to be resized and the converter to be created on 
+   * the first pass */
   output_frequency=0;
 
   // Output frequency is initially the same as the render frequency
@@ -204,7 +216,10 @@ bool SndSysOggSoundStream::SetLoopState(int loopstate)
   return true;
 }
 
-/// Retrieves the loop state of the stream.  Current possible returns are ISNDSYS_STREAM_DONTLOOP and ISNDSYS_STREAM_LOOP
+/** 
+ * Retrieves the loop state of the stream.  Current possible returns are 
+ * ISNDSYS_STREAM_DONTLOOP and ISNDSYS_STREAM_LOOP
+ */
 int SndSysOggSoundStream::GetLoopState()
 {
   if (looping)
@@ -223,13 +238,19 @@ int SndSysOggSoundStream::GetPlayRatePercent()
   return playback_percent;
 }
 
-/// If AutoUnregister is set, when the stream is paused it, and all sources attached to it are removed from the sound engine
+/** 
+ * If AutoUnregister is set, when the stream is paused it, and all sources 
+ * attached to it are removed from the sound engine
+ */
 void SndSysOggSoundStream::SetAutoUnregister(bool autounreg)
 {
   auto_unregister=autounreg;
 }
 
-/// If AutoUnregister is set, when the stream is paused it, and all sources attached to it are removed from the sound engine
+/** 
+ * If AutoUnregister is set, when the stream is paused it, and all sources 
+ * attached to it are removed from the sound engine
+ */
 bool SndSysOggSoundStream::GetAutoUnregister()
 {
   return auto_unregister;
@@ -282,15 +303,19 @@ void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
       return;
 
     // Figure out how many bytes we need to fill for this advancement
-    needed_bytes=((elapsed_ms * render_format.Freq) / 1000) * (render_format.Bits/8) * render_format.Channels ;
+    needed_bytes=((elapsed_ms * render_format.Freq) / 1000) * 
+      (render_format.Bits/8) * render_format.Channels ;
 
-    // If we need more space than is available in the whole cyclic buffer, then we already underbuffered, reduce to just 1 cycle full
+    /* If we need more space than is available in the whole cyclic buffer, 
+     * then we already underbuffered, reduce to just 1 cycle full
+     */
     if ((size_t)needed_bytes > p_cyclicbuffer->GetLength())
       needed_bytes=(long)(p_cyclicbuffer->GetLength() & 0x7FFFFFFF);
   }
   // Free space in the cyclic buffer if necessary
   if ((size_t)needed_bytes > p_cyclicbuffer->GetFreeBytes())
-    p_cyclicbuffer->AdvanceStartValue(needed_bytes - (long)(p_cyclicbuffer->GetFreeBytes() & 0x7FFFFFFF));
+    p_cyclicbuffer->AdvanceStartValue(needed_bytes - 
+      (long)(p_cyclicbuffer->GetFreeBytes() & 0x7FFFFFFF));
 
   // Fill in leftover decoded data if needed
   if (prepared_buffer_usage > 0)
@@ -307,7 +332,10 @@ void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
 
     while (bytes_read==0)
     {
-      bytes_read = ov_read(&vorbis_file,ogg_decode_buffer,OGG_DECODE_BUFFER_SIZE,OGG_ENDIAN,(render_format.Bits==8)?1:2,(render_format.Bits==8)?0:1,&current_ogg_stream);
+      bytes_read = ov_read (&vorbis_file, ogg_decode_buffer,
+	OGG_DECODE_BUFFER_SIZE, OGG_ENDIAN,
+	(render_format.Bits==8)?1:2, (render_format.Bits==8)?0:1,
+	&current_ogg_stream);
    
       // Assert on error
       CS_ASSERT(bytes_read >=0);
@@ -331,7 +359,8 @@ void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
     
 
     // If streams changed, the format may have changed as well
-    if ((new_output_frequency != output_frequency) || (last_ogg_stream != current_ogg_stream))
+    if ((new_output_frequency != output_frequency) 
+      || (last_ogg_stream != current_ogg_stream))
     {
       int needed_buffer,source_sample_size;
 
@@ -341,13 +370,17 @@ void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
 
       // Create the pcm sample converter if it's not yet created
       if (pcm_convert == NULL)
-        pcm_convert=new PCMSampleConverter(current_ogg_format_info->channels,render_format.Bits,current_ogg_format_info->rate);
+        pcm_convert = new CrystalSpace::PCMSampleConverter (
+	  current_ogg_format_info->channels, render_format.Bits,
+	  current_ogg_format_info->rate);
 
       // Calculate the size of one source sample
       source_sample_size=current_ogg_format_info->channels * render_format.Bits;
 
       // Calculate the needed buffer size for this conversion
-      needed_buffer=(pcm_convert->GetRequiredOutputBufferMultiple(render_format.Channels,render_format.Bits,output_frequency) * (OGG_DECODE_BUFFER_SIZE + source_sample_size))/1024;
+      needed_buffer = (pcm_convert->GetRequiredOutputBufferMultiple (
+	render_format.Channels,render_format.Bits,output_frequency) * 
+	  (OGG_DECODE_BUFFER_SIZE + source_sample_size))/1024;
 
       // Allocate a new buffer if needed - this will only happen if the source rate changes
       if (prepared_data_buffer_length < needed_buffer)
@@ -368,7 +401,9 @@ void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
     }
     else
     {
-      prepared_buffer_usage=pcm_convert->ConvertBuffer(ogg_decode_buffer,bytes_read,prepared_data_buffer,render_format.Channels,render_format.Bits,output_frequency);
+      prepared_buffer_usage = pcm_convert->ConvertBuffer (ogg_decode_buffer,
+	bytes_read, prepared_data_buffer, render_format.Channels,
+	render_format.Bits,output_frequency);
     }
 
     if (prepared_buffer_usage > 0)
@@ -400,12 +435,21 @@ long SndSysOggSoundStream::CopyBufferBytes(long max_dest_bytes)
 
 
 
-void SndSysOggSoundStream::GetDataPointers(long *position_marker,long max_requested_length,void **buffer1,long *buffer1_length,void **buffer2,long *buffer2_length)
+void SndSysOggSoundStream::GetDataPointers(long *position_marker, 
+					    long max_requested_length,
+					    void **buffer1, 
+					    long *buffer1_length,
+					    void **buffer2,
+					    long *buffer2_length)
 {
-  p_cyclicbuffer->GetDataPointersFromPosition(position_marker,max_requested_length,(uint8 **)buffer1,buffer1_length,(uint8 **)buffer2,buffer2_length);
+  p_cyclicbuffer->GetDataPointersFromPosition (position_marker,
+    max_requested_length, (uint8 **)buffer1, buffer1_length, 
+    (uint8 **)buffer2,buffer2_length);
 
-  // If read is finished and we've underbuffered here, then we can mark the stream as paused so no further advancement takes place
-  if ((!paused) && (playback_read_complete) && ((*buffer1_length + *buffer2_length) < max_requested_length))
+  /* If read is finished and we've underbuffered here, then we can mark the 
+   * stream as paused so no further advancement takes place */
+  if ((!paused) && (playback_read_complete) 
+      && ((*buffer1_length + *buffer2_length) < max_requested_length))
   {
     paused=true;
     if (auto_unregister)
@@ -419,15 +463,8 @@ void SndSysOggSoundStream::GetDataPointers(long *position_marker,long max_reques
 
 
 
-void SndSysOggSoundStream::InitializeSourcePositionMarker(long *position_marker)
+void SndSysOggSoundStream::InitializeSourcePositionMarker (
+  long *position_marker)
 {
   *position_marker=most_advanced_read_pointer;
 }
-
-
-
-
-
-
-
-

@@ -19,6 +19,8 @@
 #include "cssysdef.h"
 #include "csplugincommon/sndsys/cyclicbuf.h"
 
+namespace CrystalSpace
+{
 
 SoundCyclicBuffer::SoundCyclicBuffer(size_t buffer_size)
 {
@@ -92,19 +94,27 @@ void SoundCyclicBuffer::AdvanceStartValue(long advance_amount)
 {
   start_value+=advance_amount;
 
-  // end_value must always be greater than or equal to start value.
-  // If start value is advanced past the end, the buffer still cannot get any more empty than empty.
+  /* end_value must always be greater than or equal to start value.
+   * If start value is advanced past the end, the buffer still cannot get any 
+   * more empty than empty. */
   if (end_value < start_value)
     end_value=start_value;
 }
 
-void SoundCyclicBuffer::GetDataPointersFromPosition(long *position_value, long max_length, uint8 **buffer1, long *buffer1_length, uint8 **buffer2, long *buffer2_length)
+void SoundCyclicBuffer::GetDataPointersFromPosition(long *position_value, 
+						     long max_length, 
+						     uint8 **buffer1, 
+						     long *buffer1_length, 
+						     uint8 **buffer2, 
+						     long *buffer2_length)
 {
   uint8 *read_ptr, *end_ptr;
   long filled_length, copy_length, available_length;
 
   if (*position_value < start_value)
-    *position_value=start_value; // Cannot read data we don't have.  This likely means a source isn't keeping up
+    *position_value=start_value; /* Cannot read data we don't have.  
+                                  * This likely means a source isn't keeping 
+				  * up */
 
   filled_length=end_value-start_value;
   end_ptr=(buffer_base+length);
@@ -152,4 +162,4 @@ void SoundCyclicBuffer::GetDataPointersFromPosition(long *position_value, long m
   *buffer2_length=max_length-copy_length;
 }
 
-
+} // namespace CrystalSpace
