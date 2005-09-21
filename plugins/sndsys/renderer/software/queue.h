@@ -67,7 +67,7 @@ class Queue
 {     
 public:
   Queue() :
-      head(NULL), tail(NULL), count(0), closed(false), dupecheck(false)
+      head(0), tail(0), count(0), closed(false), dupecheck(false)
       { 
         // A recursive mutex is used so that the duplicate entry check can hold a lock count of 2
         queue_mutex = csMutex::Create(true);
@@ -89,7 +89,7 @@ public:
           head=head->next;
           delete del;
         }
-        tail=NULL;
+        tail=0;
 
         // Wake all waiting threads, queue is cleared
         queue_condition->Signal(true);
@@ -116,7 +116,7 @@ public:
         }
         entry->data=data;
         entry->prev=tail;
-        entry->next=NULL;
+        entry->next=0;
 
 
         if (!tail)
@@ -133,14 +133,14 @@ public:
         return QUEUE_SUCCESS;
       }
 
-      // Note that even if wait==true, this function may return NULL
+      // Note that even if wait==true, this function may return 0
       //  Such a situation is possible if:
       //  1) The Queue is cleared by destruction or a call to Clear()
       //  2) The condition wait is interrupted - possibly by signal arrival
       T * DequeueEntry(bool wait=false)
       {
         QEntry<T> *removed;
-        T * ret=NULL;
+        T * ret=0;
 
         Lock();
 
@@ -158,9 +158,9 @@ public:
           removed=head;
           head=head->next;
           if (head)
-            head->prev=NULL;
+            head->prev=0;
           else
-            tail=NULL;
+            tail=0;
           ret=removed->data;
           delete removed;
         }
@@ -257,7 +257,7 @@ public:
   QueueIterator(Queue<T> *queue)
   {
     q=queue;
-    current=NULL;
+    current=0;
     q->Lock();
   }
 

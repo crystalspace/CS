@@ -322,7 +322,7 @@ void csEmitMix::AddEmitter (float weight, iEmitGen3D* emit)
 void csEmitMix::RemoveEmitter(int num)
 {
   int i;
-  struct part *p = list,*pp=NULL;
+  struct part *p = list,*pp=0;
   if(num >= nr) return;
 
   // Find the entry to remove and the previous entry in the linked list
@@ -340,7 +340,7 @@ void csEmitMix::RemoveEmitter(int num)
                       // adjusting linkage
 
   // Drop our reference
-  p->emit=NULL;
+  p->emit=0;
   // Remove the weight from the mix total
   totalweight-=p->weight;
   // Decrease the count of total mix elements by 1

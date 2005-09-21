@@ -304,13 +304,13 @@ bool awsComponent::Setup (iAws *_wmgr, iAwsComponentNode *settings)
       }
     }
 
-    iString *setStr = NULL;
+    iString *setStr = 0;
     const csStringArray &cusProps = pm->GetCustomStringProperties();
     for( size_t i = 0; i < cusProps.Length(); ++i )
     {
       const char *tp = cusProps[ i ];
       pm->GetString( settings, tp, setStr );
-      if( NULL != setStr )
+      if( 0 != setStr )
       {
         csRef< iString > tr( setStr );
         _customStringProps.Put( pm->NameToId( tp ), tr );

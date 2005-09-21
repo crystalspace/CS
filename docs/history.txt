@@ -10,6 +10,8 @@ chronological order.
 	- res fixed a few warnings in the new sndsys stuff, did some 
 	  reformatting to better follow the CS coding guidelines (reading
 	  recommended) and reduced namespace pollution.
+	- Jorrit replaced a number of 'NULL' usages with '0'.
+	- Jorrit cleaned up formatting in the new sound system api docs.
 	- Eric Sunshine fixed bug in PCMSampleConverter::ReadFullSample16()
 	  caused by unintended multiple evaluation of macro argument during
 	  macro expansion.

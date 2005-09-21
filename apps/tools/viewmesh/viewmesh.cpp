@@ -743,7 +743,7 @@ void ViewMesh::AttachMesh (const char* path, const char* file)
     if ( meshWrapOld )
     {
       spritewrapper->GetChildren()->Remove( meshWrapOld );
-      selectedSocket->SetMeshWrapper( NULL );    
+      selectedSocket->SetMeshWrapper( 0 );    
     }
   }
   else if (selectedCal3dSocket)
@@ -752,7 +752,7 @@ void ViewMesh::AttachMesh (const char* path, const char* file)
     if ( meshWrapOld )
     {
       spritewrapper->GetChildren()->Remove( meshWrapOld );
-      selectedCal3dSocket->SetMeshWrapper( NULL );    
+      selectedCal3dSocket->SetMeshWrapper( 0 );    
     }
   }
 

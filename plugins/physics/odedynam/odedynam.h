@@ -874,8 +874,8 @@ struct csStrictODEJoint : public iBase
   dBodyID bodyID[2];
   dJointFeedback *feedback;
 
-  csStrictODEJoint () {feedback = NULL;};
-  virtual ~csStrictODEJoint () {;};
+  csStrictODEJoint () {feedback = 0;}
+  virtual ~csStrictODEJoint () {}
 
   void Attach (iRigidBody *body1, iRigidBody *body2);
   csRef<iRigidBody> GetAttachedBody (int body);

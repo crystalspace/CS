@@ -61,14 +61,14 @@ SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 // The system driver.
-iObjectRegistry *SndSysDriverOSS::object_reg=NULL;
+iObjectRegistry *SndSysDriverOSS::object_reg=0;
 
 // The loaded CS reporter
 csRef<iReporter> SndSysDriverOSS::reporter;
 
 
 SndSysDriverOSS::SndSysDriverOSS(iBase* piBase) :
- oss_buffer(NULL), output_fd(-1), running(false)
+ oss_buffer(0), output_fd(-1), running(false)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -255,7 +255,7 @@ void SndSysDriverOSS::Run()
     current_ticks=csGetTicks();
     if (last_write + tick_difference <= current_ticks)
     {
-      uint32 bytes_used=attached_renderer->FillDriverBuffer(oss_buffer, oss_buffer_bytes, NULL, 0);
+      uint32 bytes_used=attached_renderer->FillDriverBuffer(oss_buffer, oss_buffer_bytes, 0, 0);
       if (bytes_used > 0)
       {
         WriteBuffer(bytes_used);

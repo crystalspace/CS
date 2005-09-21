@@ -279,7 +279,7 @@ bool PartEdit::InitEmitterList(EmitterList *elist)
   elist->cylindertangent=EmitFactoryState->CreateCylinderTangent();
   elist->mix=EmitFactoryState->CreateMix();
   elist->current_type=EMITTER_NONE;
-  elist->current=NULL;
+  elist->current=0;
   elist->point_used=false;
   elist->line_used=false;
   elist->box_used=false;
@@ -300,7 +300,7 @@ bool PartEdit::ClearGen3D(EmitterList *elist)
     had_old_value=true;
 
   elist->current_type=EMITTER_NONE;
-  elist->current=NULL;
+  elist->current=0;
   elist->point_used=false;
   elist->line_used=false;
   elist->box_used=false;
@@ -754,7 +754,7 @@ bool PartEdit::UpdateParticleSystem()
   {
     if (ClearGen3D(&attractor))
     {
-      emitState->SetAttractorEmit(NULL);    
+      emitState->SetAttractorEmit(0);    
       emitState->SetAttractorForce(0.0f);
     }
   }
@@ -767,7 +767,7 @@ bool PartEdit::UpdateParticleSystem()
   else
   {
     if (ClearGen3D(&fieldspeed))
-      emitState->SetFieldSpeedEmit(NULL);
+      emitState->SetFieldSpeedEmit(0);
   }
 
   if (state_field_accel.active)
@@ -778,7 +778,7 @@ bool PartEdit::UpdateParticleSystem()
   else
   {
     if (ClearGen3D(&fieldaccel))
-      emitState->SetFieldAccelEmit(NULL);
+      emitState->SetFieldAccelEmit(0);
   }
 
   if (force_emitter_setup || state_emitter_new.particle_count != state_emitter.particle_count)
@@ -1023,7 +1023,7 @@ bool PartEdit::Initialize ()
 
   // awsCanvas = csPtr<iAwsCanvas> (aws->CreateCustomCanvas (g2d, g3d));
   aws->SetFlag (AWSF_AlwaysRedrawWindows);
-  aws->SetupCanvas (NULL,g2d,g3d);
+  aws->SetupCanvas (0,g2d,g3d);
 
   // Setup sink.  
   s = new PartEditSink();

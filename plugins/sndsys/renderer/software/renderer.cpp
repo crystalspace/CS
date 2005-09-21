@@ -65,14 +65,14 @@ SCF_IMPLEMENT_IBASE (SndSysRendererSoftware::EventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 // The system driver.
-iObjectRegistry *SndSysRendererSoftware::object_reg=NULL;
+iObjectRegistry *SndSysRendererSoftware::object_reg=0;
 
 // The loaded CS reporter
 csRef<iReporter> SndSysRendererSoftware::reporter;
 
 
 SndSysRendererSoftware::SndSysRendererSoftware(iBase* piBase) :
-sample_buffer(NULL), sample_buffer_samples(0), last_intensity_multiplier(0)
+sample_buffer(0), sample_buffer_samples(0), last_intensity_multiplier(0)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -271,7 +271,7 @@ csPtr<iSndSysStream> SndSysRendererSoftware::CreateStream(csRef<iSndSysData> dat
 
 csPtr<iSndSysSource> SndSysRendererSoftware::CreateSource(csRef<iSndSysStream> stream)
 {
-  iSndSysSourceSoftware *source=NULL;
+  iSndSysSourceSoftware *source=0;
   // Needs to be threadsafe with the background thread
   if (stream->Get3dMode() == SND3D_DISABLE)
   {
@@ -351,7 +351,7 @@ uint32 SndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,
   // Resize the samplebuffer if needed
   long needed_samples = CalculateMaxSamples (buf1_len+buf2_len);
 
-  if ((sample_buffer==NULL) || (needed_samples > (long)sample_buffer_samples))
+  if ((sample_buffer==0) || (needed_samples > (long)sample_buffer_samples))
   {
     delete[] sample_buffer;
     sample_buffer=new SoundSample[needed_samples];
@@ -472,7 +472,7 @@ void SndSysRendererSoftware::ProcessPendingSources()
     if (sources.Delete(src))
       source_clear_queue.QueueEntry(src);
     else
-      source_clear_queue.QueueEntry(NULL);
+      source_clear_queue.QueueEntry(0);
   }
 }
 
@@ -486,7 +486,7 @@ void SndSysRendererSoftware::ProcessPendingStreams()
     if (streams.Delete(stream))
       stream_clear_queue.QueueEntry(stream);
     else
-      stream_clear_queue.QueueEntry(NULL);
+      stream_clear_queue.QueueEntry(0);
   }
 }
 

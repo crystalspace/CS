@@ -68,7 +68,7 @@ make_queryform(Widget parent,	    /* into whom widget should be placed */
 
     form = XtVaCreateManagedWidget ("form", formWidgetClass, parent, 
 				    XtNtitle, button,
-				    NULL);
+				    0);
 
     text = XtVaCreateManagedWidget
 	("message", asciiTextWidgetClass, form,
@@ -79,14 +79,15 @@ make_queryform(Widget parent,	    /* into whom widget should be placed */
 	 XtNdisplayCaret, False,
 	 XtNlength, strlen (msgstr),
 	 XtNstring, msgstr,
-	 NULL);
+	 0);
     /*
      * Did the user specify our geometry?
      * If so, don't bother computing it ourselves, since we will be overridden.
      */
-    XtVaGetValues(parent, XtNgeometry, &shell_geom, NULL);
+    XtVaGetValues(parent, XtNgeometry, &shell_geom, 0);
     geom_flags = XParseGeometry(shell_geom, &x, &y, &shell_w, &shell_h);
-    if (!(geom_flags & WidthValue && geom_flags & HeightValue)) {
+    if (!(geom_flags & WidthValue && geom_flags & HeightValue))
+    {
 	Dimension width, height, height_addons = 0;
 	Dimension scroll_size, border_width;
 	Widget label, scroll;
@@ -99,24 +100,25 @@ make_queryform(Widget parent,	    /* into whom widget should be placed */
 	 * This widget is never visible.
 	 */
 	XtVaGetValues(text, XtNtopMargin, &top, XtNbottomMargin, &bottom,
-		      XtNleftMargin, &left, XtNrightMargin, &right, NULL);
+		      XtNleftMargin, &left, XtNrightMargin, &right, 0);
 	label = XtVaCreateWidget("message", labelWidgetClass, form,
 				 XtNlabel, msgstr,
 				 XtNinternalWidth, (left+right+1)/2,
 				 XtNinternalHeight, (top+bottom+1)/2,
-				 NULL);
-	XtVaGetValues(label, XtNwidth, &width, XtNheight, &height, NULL);
+				 0);
+	XtVaGetValues(label, XtNwidth, &width, XtNheight, &height, 0);
 	XtDestroyWidget(label);
 	max_width = .7 * WidthOfScreen(XtScreen(text));
 	max_height = .7 * HeightOfScreen(XtScreen(text));
-	if (width > max_width) {
+	if (width > max_width)
+	{
 	    width = max_width;
 	    /* add in the height of any horizontal scroll bar */
 	    scroll = XtVaCreateWidget("hScrollbar", scrollbarWidgetClass, text,
 				      XtNorientation, XtorientHorizontal,
-				      NULL);
+				      0);
 	    XtVaGetValues(scroll, XtNheight, &scroll_size,
-			  XtNborderWidth, &border_width, NULL);
+			  XtNborderWidth, &border_width, 0);
 	    XtDestroyWidget(scroll);
 	    height_addons = scroll_size + border_width;
 	}
@@ -127,24 +129,26 @@ make_queryform(Widget parent,	    /* into whom widget should be placed */
 	 * Xmessage is not internationalized, so the code bellow is harmless.
 	 */
 	tmp = msgstr;
-	while (tmp != NULL && *tmp) {
+	while (tmp != 0 && *tmp)
+	{
 	    ++tmp;
 	    ++height;
 	    tmp = strchr(tmp, '\n');
 	}
 
-	if (height > max_height) {
+	if (height > max_height)
+	{
 	    height = max_height;
 	    /* add in the width of any vertical scroll bar */
 	    scroll = XtVaCreateWidget("vScrollbar", scrollbarWidgetClass, text,
-				      XtNorientation, XtorientVertical, NULL);
+				      XtNorientation, XtorientVertical, 0);
 	    XtVaGetValues(scroll, XtNwidth, &scroll_size,
-			  XtNborderWidth, &border_width, NULL);
+			  XtNborderWidth, &border_width, 0);
 	    XtDestroyWidget(scroll);
 	    width += scroll_size + border_width;
 	}
 	height += height_addons;
-	XtVaSetValues(text, XtNwidth, width, XtNheight, height, NULL);
+	XtVaSetValues(text, XtNwidth, width, XtNheight, height, 0);
     }
     /*
      * Create the buttons
@@ -157,15 +161,15 @@ make_queryform(Widget parent,	    /* into whom widget should be placed */
     XtSetArg (args[n], XtNfromVert, text); n++;
     XtSetArg (args[n], XtNvertDistance, 5); n++;
 
-    prev = NULL;
+    prev = 0;
     XtSetArg (args[n], XtNfromHoriz, prev); 
     prev = XtCreateManagedWidget (button, commandWidgetClass,
 				      form, args, n);
     XtAddCallback (prev, XtNcallback, handle_button, 0);
     Dimension border;
 
-    XtVaGetValues(prev, XtNborderWidth, &border, NULL);
+    XtVaGetValues(prev, XtNborderWidth, &border, 0);
     border *= 2;
-    XtVaSetValues(prev, XtNborderWidth, border, NULL);
+    XtVaSetValues(prev, XtNborderWidth, border, 0);
     return form;
 }

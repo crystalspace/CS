@@ -34,9 +34,7 @@ struct iSndSysStream;
 
 
 /**
- * 
- *
- *
+ * @@@ Document me.
  */
 struct iSndSysSource : public iBase
 {
@@ -52,12 +50,22 @@ struct iSndSysSource : public iBase
   virtual iSndSysSource *GetPtr() = 0;
 };
 
+/**
+ * @@@ Document me.
+ */
 struct iSndSysSourceSoftware : public iSndSysSource
 {
-  /// Renderer convenience interface - requests the source to fill the supplied buffers
-  virtual size_t MergeIntoBuffer(SoundSample *channel_buffer, size_t buffer_samples) = 0;
+  /**
+   * Renderer convenience interface - requests the source to fill the
+   * supplied buffers
+   */
+  virtual size_t MergeIntoBuffer(SoundSample *channel_buffer,
+  	size_t buffer_samples) = 0;
 };
 
+/**
+ * @@@ Document me.
+ */
 struct iSndSysSourceSoftware3D : public iSndSysSourceSoftware
 {
   /// set position of this source
@@ -70,30 +78,46 @@ struct iSndSysSourceSoftware3D : public iSndSysSourceSoftware
   /// get position of this source
   virtual csVector3 GetDirection() = 0;
 
-  /// The directional radiation applies to sound that are oriented in a particular direction.
-  //   This value is expressed in radians and describes the half-angle of a cone spreading from the position of the source and opening
-  //   in the direction of the source.
-  //  Set this value to 0.0f for an omni-directional sound. 
+  /**
+   * The directional radiation applies to sound that are oriented in a
+   * particular direction.
+   * This value is expressed in radians and describes the half-angle of a
+   * cone spreading from the position of the source and opening
+   * in the direction of the source.
+   * Set this value to 0.0f for an omni-directional sound. 
+   */
   virtual void SetDirectionalRadiation(float rad) = 0;
 
-  // Retrieves the current directional radiation 
+  /// Retrieves the current directional radiation 
   virtual float GetDirectionalRadiation() = 0;
 
-  /** Set the greatest distance from a sound at which the sound plays at full amplitude. 
-  *   When a listener is closer than this distance, the amplitude is the volume of the sound.
-  *   When a listener is further than this distance, the amplitude follows the formula V = (volume / ((distance/minimum_distance) ^ rolloff_factor))
-  */
+  /**
+   * Set the greatest distance from a sound at which the sound plays at full
+   * amplitude. 
+   * When a listener is closer than this distance, the amplitude is the volume
+   * of the sound.
+   * When a listener is further than this distance, the amplitude follows the
+   * formula V = (volume / ((distance/minimum_distance) ^ rolloff_factor))
+   */
   virtual void SetMinimumDistance (float distance) = 0;
 
-  /** Set the greatest distance from a sound at which the sound can be heard.
-  *   If the distance to a listener is above this threshold, it will not be mixed into the output buffer at all.  This saves a tiny bit of processing.
-  */
+  /**
+   * Set the greatest distance from a sound at which the sound can be heard.
+   * If the distance to a listener is above this threshold, it will not be
+   * mixed into the output buffer at all.  This saves a tiny bit of processing.
+   */
   virtual void SetMaximumDistance (float distance) = 0;
 
-  /// Retrieve the maximum distance for which a sound is heard at full volume.  See SetMaximumDistance and SetMinimumDistance for distance notes.
+  /**
+   * Retrieve the maximum distance for which a sound is heard at full volume.
+   * See SetMaximumDistance and SetMinimumDistance for distance notes.
+   */
   virtual float GetMinimumDistance () = 0;
 
-  /// Retrieve the maximum distance for which a sound can be heard.  See SetMaximumDistance and SetMinimumDistance for distance notes.
+  /**
+   * Retrieve the maximum distance for which a sound can be heard.  See
+   * SetMaximumDistance and SetMinimumDistance for distance notes.
+   */
   virtual float GetMaximumDistance () = 0;
 
   /// Attach a filter to this source

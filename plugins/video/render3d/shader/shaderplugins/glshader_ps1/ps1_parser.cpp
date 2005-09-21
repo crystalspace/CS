@@ -315,7 +315,7 @@ bool csPixelShaderParser::GetInstruction (const char *str,
     // Get source register(s)
     for(int j = 0; j < PS_Instructions[inst_id].arguments - 1; j++)
     {
-      const char *reg = NULL;
+      const char *reg = 0;
       switch(j)
       {
 	default:
@@ -323,7 +323,7 @@ bool csPixelShaderParser::GetInstruction (const char *str,
 	case 1: reg = src2.GetData (); break;
 	case 2: reg = src3.GetData (); break;
       }
-      if(reg==NULL) break;
+      if(reg==0) break;
 
       const char *p = reg;
       while(p[0] != 'c' && p[0] != 'v' && p[0] != 't' && p[0] != 'r'

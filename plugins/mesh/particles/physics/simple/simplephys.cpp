@@ -442,7 +442,7 @@ csParticlesPhysicsSimple::particles_object*
       return partobjects[i];
     }
   }
-  return NULL;
+  return 0;
 }
 
 int csParticlesPhysicsSimple::ZSort (csParticlesData const& i1,

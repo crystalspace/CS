@@ -101,10 +101,10 @@ bool csSoundDriverWaveOut::Initialize (iObjectRegistry *r)
 
   SECURITY_ATTRIBUTES event_sec;
   event_sec.nLength=sizeof(SECURITY_ATTRIBUTES);
-  event_sec.lpSecurityDescriptor=NULL;
+  event_sec.lpSecurityDescriptor=0;
   event_sec.bInheritHandle=true;
 
-  hevent_EmptyBlocksReady = CreateEvent(&event_sec,true,false,NULL);
+  hevent_EmptyBlocksReady = CreateEvent(&event_sec,true,false,0);
 
   return true;
 }

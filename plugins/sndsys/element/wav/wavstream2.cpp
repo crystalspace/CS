@@ -43,7 +43,7 @@ SndSysWavSoundStream::SndSysWavSoundStream (csRef<SndSysWavSoundData> data,
   char *WavData, size_t WavDataLen, SndSysSoundFormat *renderformat, 
   int mode3d)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
 
   // Copy render format information
   memcpy(&render_format,renderformat,sizeof(SndSysSoundFormat));
@@ -64,7 +64,7 @@ SndSysWavSoundStream::SndSysWavSoundStream (csRef<SndSysWavSoundData> data,
     (render_format.Bits/8 * render_format.Channels) * 
     (render_format.Freq * WAV_BUFFER_LENGTH_MULTIPLIER / 
       WAV_BUFFER_LENGTH_DIVISOR));
-  CS_ASSERT(p_cyclicbuffer!=NULL);
+  CS_ASSERT(p_cyclicbuffer!=0);
 
   // Start the most advanced read pointer at offset 0
   most_advanced_read_pointer=0;
@@ -79,7 +79,7 @@ SndSysWavSoundStream::SndSysWavSoundStream (csRef<SndSysWavSoundData> data,
 
 
   // The prepared data buffer will be initialized on first use
-  prepared_data_buffer=NULL;
+  prepared_data_buffer=0;
   prepared_data_buffer_length=0;
   prepared_buffer_start=0;
 
@@ -97,7 +97,7 @@ SndSysWavSoundStream::SndSysWavSoundStream (csRef<SndSysWavSoundData> data,
   new_output_frequency=renderformat->Freq;
 
   // Let the pcm converter get created on the first pass
-  pcm_convert=NULL;
+  pcm_convert=0;
 
   // No new position 
   new_position=-1;
@@ -340,7 +340,7 @@ void SndSysWavSoundStream::AdvancePosition(csTicks current_time)
       output_frequency=new_output_frequency;
 
       // Create the pcm sample converter if it's not yet created
-      if (pcm_convert == NULL)
+      if (pcm_convert == 0)
       {
 #ifdef CS_LITTLE_ENDIAN
         pcm_convert = new CrystalSpace::PCMSampleConverter (

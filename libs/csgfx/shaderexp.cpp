@@ -473,7 +473,7 @@ bool csShaderExpression::eval_const(cons *& head)
   have limited error-checking for the above, and will produce incorrect
   results if they're not resolved. */
 
-  cons * cell = head, * last = NULL;
+  cons * cell = head, * last = 0;
   int oper;
 
   if (cell->car.type <= TYPE_LIMIT) return true;
@@ -580,7 +580,7 @@ bool csShaderExpression::eval_const(cons *& head)
         if (!eval_oper(oper, cell->car, head->car))
           return false;
 
-        head->cdr = NULL;
+        head->cdr = 0;
         destruct_cons(cell);
       } 
       break;
@@ -617,7 +617,7 @@ bool csShaderExpression::eval_const(cons *& head)
             if (subcell->car.type == TYPE_OPER)
             {
               cell = cell->cdr;
-              last = NULL;
+              last = 0;
             } 
             else 
             {
@@ -635,7 +635,7 @@ bool csShaderExpression::eval_const(cons *& head)
                 last->car.type == TYPE_VARIABLE ||
                 last->car.type == TYPE_CONS)
               {
-                last = NULL;
+                last = 0;
               } 
             }
           } 
@@ -668,7 +668,7 @@ bool csShaderExpression::eval_const(cons *& head)
 
           cons * cptr = cell;
           cell = cell->cdr;
-          cptr->cdr = NULL;
+          cptr->cdr = 0;
           destruct_cons(cptr);
           if (cell)
             cell->cdr_rev = last;
@@ -678,7 +678,7 @@ bool csShaderExpression::eval_const(cons *& head)
         break;
 
       case TYPE_VARIABLE:
-        last = NULL;
+        last = 0;
         cell = cell->cdr;
 
         break;
@@ -736,7 +736,7 @@ bool csShaderExpression::eval_const(cons *& head)
   { // operator + single argument
     head->car = head->cdr->car;
     destruct_cons(head->cdr);
-    head->cdr = NULL;
+    head->cdr = 0;
   }
 
   return true;
@@ -1464,7 +1464,7 @@ bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node)
       return false;
     }
 
-    cptr->cdr = NULL;
+    cptr->cdr = 0;
   }
   else if (tok == OP_XML_SEXP)
   {
@@ -1553,10 +1553,12 @@ bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
       return false;
 
     text = tmp;
-  } else if (*text == '#' && text[1] == '(') {   /* TYPE_VECTOR* */ 
+  }
+  else if (*text == '#' && text[1] == '(')
+  {   /* TYPE_VECTOR* */ 
     int args = 0;
     float arg[4];
-    char * tmp = NULL;
+    char * tmp = 0;
 
     text += 2;
 
@@ -1627,7 +1629,7 @@ bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
     text = tmp;
   }
 
-  head->cdr = NULL;
+  head->cdr = 0;
   CS_ASSERT(head->car.type != TYPE_INVALID);
 
   return true;
@@ -1635,7 +1637,7 @@ bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
 
 bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const char * type_str, const char * val_str)
 {
-  char * tmp = NULL;
+  char * tmp = 0;
 
   arg.type = type;
 

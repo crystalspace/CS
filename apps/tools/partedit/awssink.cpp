@@ -84,7 +84,7 @@ void PartEditSink::function(intptr_t sk, iAwsSource *source) \
   iString *textvalue; \
   if (source->GetComponent()->GetProperty("Text",(intptr_t*)&textvalue) && textvalue->Length()) \
   { \
-    asink->intvar=strtol(textvalue->GetData(),NULL,10); \
+    asink->intvar=strtol(textvalue->GetData(),0,10); \
     asink->invalidate_flag=true; \
   } \
   else \
@@ -140,7 +140,7 @@ void PartEditSink::function(intptr_t sk, iAwsSource *source) \
   component->SetProperty("State",(intptr_t)&bvalue);
 
 
-PartEditSink * PartEditSink::asink = NULL;
+PartEditSink * PartEditSink::asink = 0;
 
 PartEditSink::PartEditSink() : wmgr(0) 
 {
@@ -946,7 +946,7 @@ void PartEditSink::SetSink(iAwsSink *s)
     sink->RegisterTrigger("RegisterAgingMoments",&RegisterAgingMoments);
     sink->RegisterTrigger("RegisterLoadSaveSelection",&RegisterLoadSave);
   }
-  FreeScrollData.iawscomponent_AssociatedTextBox=NULL;
+  FreeScrollData.iawscomponent_AssociatedTextBox=0;
 }
 
 void PartEditSink::SetWindowManager(iAws *_wmgr)
@@ -3751,7 +3751,7 @@ void PartEditSink::AwsSetFSScrollBar(intptr_t sk, iAwsSource *source)
 {
   csRef<iString> value;
   float *value_as_float;
-  if (asink->FreeScrollData.iawscomponent_AssociatedTextBox==NULL)
+  if (asink->FreeScrollData.iawscomponent_AssociatedTextBox==0)
     return;
 
   if (source->GetComponent()->GetProperty("Value",(intptr_t*)&value_as_float))
@@ -3780,7 +3780,7 @@ void PartEditSink::AwsSetFSTextBox(intptr_t sk, iAwsSource *source)
   iString *textvalue;
   csRef<iString> value;
   float value_as_float;
-  if (asink->FreeScrollData.iawscomponent_AssociatedTextBox==NULL)
+  if (asink->FreeScrollData.iawscomponent_AssociatedTextBox==0)
     return;
 
   if (source->GetComponent()->GetProperty("Text",(intptr_t*)&textvalue) && textvalue->Length())
@@ -3795,7 +3795,7 @@ void PartEditSink::AwsSetFSTextBox(intptr_t sk, iAwsSource *source)
     else
     {
       // This is an int
-      *((int *)(asink->FreeScrollData.value_pointer))=strtol(textvalue->GetData(),NULL,10);
+      *((int *)(asink->FreeScrollData.value_pointer))=strtol(textvalue->GetData(),0,10);
       value_as_float=(float)(*((int *)(asink->FreeScrollData.value_pointer)));
       SET_TEXTBOX_INT(asink->FreeScrollData.iawscomponent_AssociatedTextBox,(int)value_as_float);
     }

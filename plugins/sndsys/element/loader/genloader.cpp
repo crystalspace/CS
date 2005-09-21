@@ -59,7 +59,7 @@ csPtr<iSndSysData> SndSysLoader::LoadSound (void *Buffer, uint32 Size)
     if (data.IsValid())
       return csPtr<iSndSysData> (data);
   }
-  return NULL;
+  return 0;
 }
 
 

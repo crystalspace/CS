@@ -316,7 +316,7 @@ bool SndSysWavSoundData::ReadHeaders(void *Buffer, size_t len, _RIFFchk *p_riffc
 
 bool SndSysWavSoundData::IsWav (void *Buffer, size_t len)
 {
-  return ReadHeaders(Buffer,len,NULL,NULL,NULL,NULL,NULL);
+  return ReadHeaders(Buffer,len,0,0,0,0,0);
 }
 
 

@@ -47,49 +47,65 @@ struct iSndSysSoftwareFilter3DProperties
   size_t channel;
 
   iReporter *reporter;
-
 };
 
 
 /**
- * A sound filter is an interface to an object that modifies sequences of sound samples.
- *
+ * A sound filter is an interface to an object that modifies sequences of
+ * sound samples.
  */
 struct iSndSysSoftwareFilter3D : public iBase
 {
 
-  /// Apply this filter to the mutable buffer passed.  The unmutable main buffer is also passed, although this is not likely to be
-  //   very useful, since the main buffer has an unknown number of sources previously mixed in (possibly none).
-  //  The sample_count is the number of samples available in both the mutable buffer and the main buffer.
-  //  The format is the format of the audio.
+  /**
+   * Apply this filter to the mutable buffer passed.  The unmutable main
+   * buffer is also passed, although this is not likely to be
+   * very useful, since the main buffer has an unknown number of sources
+   * previously mixed in (possibly none).
+   * The sample_count is the number of samples available in both the mutable
+   * buffer and the main buffer.
+   * The format is the format of the audio.
+   */
   virtual void Apply(iSndSysSoftwareFilter3DProperties &properties) = 0;
 
-  virtual bool AddSubFilter(iSndSysSoftwareFilter3D *filter, int chain_idx=0) = 0;
+  virtual bool AddSubFilter(iSndSysSoftwareFilter3D *filter,
+  	int chain_idx=0) = 0;
 
   virtual iSndSysSoftwareFilter3D *GetSubFilter(int chain_idx=0) = 0;
 
-  /// Retrieve the base pointer for this filter.  Used internally by the sound system.
+  /**
+   * Retrieve the base pointer for this filter.  Used internally by the
+   * sound system.
+   */
   virtual iSndSysSoftwareFilter3D *GetPtr() = 0;
 };
 
 /**
-* An output sound filter receives 
-*
-*/
+ * An output sound filter receives 
+ */
 struct iSndSysSoftwareFilterOutput : public iBase
 {
 
-  /// Apply this filter to the mutable buffer passed.  The unmutable main buffer is also passed, although this is not likely to be
-  //   very useful, since the main buffer has an unknown number of sources previously mixed in (possibly none).
-  //  The sample_count is the number of samples available in both the mutable buffer and the main buffer.
-  //  The format is the format of the audio.
+  /**
+   * Apply this filter to the mutable buffer passed.  The unmutable main
+   * buffer is also passed, although this is not likely to be
+   * very useful, since the main buffer has an unknown number of sources
+   * previously mixed in (possibly none).
+   * The sample_count is the number of samples available in both the mutable
+   * buffer and the main buffer.
+   * The format is the format of the audio.
+   */
   virtual void Apply(iSndSysSoftwareFilter3DProperties &properties) = 0;
 
-  virtual bool AddSubFilter(iSndSysSoftwareFilter3D *filter, int chain_idx=0) = 0;
+  virtual bool AddSubFilter(iSndSysSoftwareFilter3D *filter,
+  	int chain_idx=0) = 0;
 
   virtual iSndSysSoftwareFilter3D *GetSubFilter(int chain_idx=0) = 0;
 
-  /// Retrieve the base pointer for this filter.  Used internally by the sound system.
+  /**
+   * Retrieve the base pointer for this filter.  Used internally by the
+   * sound system.
+   */
   virtual iSndSysSoftwareFilter3D *GetPtr() = 0;
 };
 

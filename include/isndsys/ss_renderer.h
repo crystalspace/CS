@@ -53,8 +53,12 @@ struct iSndSysRenderer : public iBase
   /// Get Volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
   virtual float GetVolume () = 0;
 
-  /// Uses the provided iSound2Data to create a sound stream with the given 3D rendering mode
-  virtual csPtr<iSndSysStream> CreateStream(csRef<iSndSysData> data, int mode3d) = 0;
+  /**
+   * Uses the provided iSound2Data to create a sound stream with the given
+   * 3D rendering mode
+   */
+  virtual csPtr<iSndSysStream> CreateStream(csRef<iSndSysData> data,
+  	int mode3d) = 0;
 
   /// Creates a source when provided with a Sound Stream
   virtual csPtr<iSndSysSource> CreateSource(csRef<iSndSysStream> stream) = 0;

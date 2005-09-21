@@ -1181,7 +1181,7 @@ bool awsManager::HandleEvent (iEvent &Event)
 
 void awsManager::DeleteMarkedComponentsRecursively(iAwsComponent *&c)
 {
-  if( NULL != c )
+  if( 0 != c )
   {
     if( c->GetMarkToDelete() )
     {
@@ -1214,7 +1214,7 @@ void awsManager::MarkToDeleteRecursively( iAwsComponent *c )
 
 void awsManager::MarkChildToDeleteRecursively( iAwsComponent *c )
 {
-  while( NULL != c )
+  while( 0 != c )
   {
     c->MarkToDelete();
     MarkChildToDeleteRecursively(c->GetTopChild());

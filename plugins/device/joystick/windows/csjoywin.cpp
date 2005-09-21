@@ -195,7 +195,7 @@ bool csWindowsJoystick::Init ()
 {
   csRef<iWin32Assistant> win32 = CS_QUERY_REGISTRY(object_reg, iWin32Assistant);
   HRESULT hr = DirectInputCreate (win32->GetInstance (), DIRECTINPUT_VERSION, 
-    &lpdin, NULL);
+    &lpdin, 0);
   if (SUCCEEDED (hr))
   {
     HWND window = win32->GetApplicationWindow ();

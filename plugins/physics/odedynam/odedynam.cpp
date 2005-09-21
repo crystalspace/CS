@@ -586,7 +586,7 @@ iRigidBody *csODEDynamicSystem::GetBody (unsigned int index)
 {
   if ((unsigned)index < bodies.GetSize ())
     return bodies[index];
-  else return NULL;
+  else return 0;
 }
 iRigidBody *csODEDynamicSystem::FindBody (const char *name)
 {
@@ -814,11 +814,12 @@ bool csODEDynamicSystem::AttachColliderPlane (const csPlane3 &plane,
 
   return true;
 }
-csRef<iDynamicsSystemCollider> csODEDynamicSystem::GetCollider (unsigned int index)
+csRef<iDynamicsSystemCollider> csODEDynamicSystem::GetCollider (
+	unsigned int index)
 {
   if (index < colliders.GetSize ())
     return colliders[index];
-  else return NULL;
+  else return 0;
 }
 csRef<iDynamicsSystemCollider> csODEDynamicSystem::CreateCollider ()
 {
@@ -910,8 +911,8 @@ csODECollider::csODECollider ()
   surfacedata[1] = 0;
   surfacedata[2] = 0;
   density = 0;
-  geomID = NULL;
-  spaceID = NULL;
+  geomID = 0;
+  spaceID = 0;
   coll_cb = 0;
   transformID = dCreateGeomTransform (0);
   dGeomTransformSetCleanup (transformID, 1);
@@ -928,13 +929,13 @@ void csODECollider::KillGeoms ()
   if (transformID)
   {
     if (dGeomTransformGetGeom (transformID))
-      geomID = NULL;
+      geomID = 0;
 
     dGeomDestroy (transformID);
   }
   if (geomID) dGeomDestroy (geomID); 
 
-  geomID = transformID = NULL;
+  geomID = transformID = 0;
 }
 csODECollider::~csODECollider ()
 {
@@ -958,7 +959,7 @@ void csODECollider::ClearContents ()
   surfacedata[1] = 0;
   surfacedata[2] = 0;
   density = 0;
-  spaceID = NULL;
+  spaceID = 0;
   transformID = dCreateGeomTransform (0);
   dGeomTransformSetCleanup (transformID, 1);
   geom_type = (csColliderGeometryType) 0;
@@ -1761,9 +1762,9 @@ csRef<iDynamicsSystemCollider> csODERigidBody::GetCollider (unsigned int index)
 {
   if (index < colliders.GetSize ())
     return colliders[index];
-  else return NULL;
+  else return 0;
 }
-//--------------------------csStrictODEJoint-----------------------------------------------
+//-----------------------csStrictODEJoint-------------------------------------
 void csStrictODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
 {
   if (b1)
@@ -2034,25 +2035,25 @@ void csStrictODEJoint::CreateFeedback ()
 
 csVector3 csStrictODEJoint::GetFeedbackForce1 ()
 {
-  if (feedback == NULL) CreateFeedback ();
+  if (feedback == 0) CreateFeedback ();
   return csVector3(feedback->f1[0], feedback->f1[1], feedback->f1[2]);
 }
 
 csVector3 csStrictODEJoint::GetFeedbackTorque1 ()
 {
-  if (feedback == NULL) CreateFeedback ();
+  if (feedback == 0) CreateFeedback ();
   return csVector3(feedback->f2[0], feedback->f2[1], feedback->f2[2]);
 }
 
 csVector3 csStrictODEJoint::GetFeedbackForce2 ()
 {
-  if (feedback == NULL) CreateFeedback ();
+  if (feedback == 0) CreateFeedback ();
   return csVector3(feedback->t1[0], feedback->t1[1], feedback->t1[2]);
 }
 
 csVector3 csStrictODEJoint::GetFeedbackTorque2 ()
 {
-  if (feedback == NULL) CreateFeedback ();
+  if (feedback == 0) CreateFeedback ();
   return csVector3(feedback->t2[0], feedback->t2[1], feedback->t2[2]);
 }
 

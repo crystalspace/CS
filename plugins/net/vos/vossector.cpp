@@ -229,7 +229,7 @@ void LoadObjectTask::doTask()
     else
     {
       LOG("LoadObjectTask", 3, "Setting up object3D")
-        if (obj3d->GetCSinterface() == NULL)
+        if (obj3d->GetCSinterface() == 0)
           LOG("NEIL-LOG", 1, "Uh oh");
 
       sector->addObject3D (obj3d->GetCSinterface());

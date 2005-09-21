@@ -53,14 +53,14 @@ SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 // The system driver.
-iObjectRegistry *SndSysDriverDirectSound::object_reg=NULL;
+iObjectRegistry *SndSysDriverDirectSound::object_reg=0;
 
 // The loaded CS reporter
 csRef<iReporter> SndSysDriverDirectSound::reporter;
 
 
 SndSysDriverDirectSound::SndSysDriverDirectSound(iBase* piBase) :
- ds_buffer_writecursor(0), running(false), ds_buffer(NULL), ds_device(NULL)
+ ds_buffer_writecursor(0), running(false), ds_buffer(0), ds_device(0)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -68,8 +68,8 @@ SndSysDriverDirectSound::SndSysDriverDirectSound(iBase* piBase) :
 //  scfiEventHandler = 0;
   object_reg = 0;
 
-  ds_device=NULL;
-  ds_buffer=NULL;
+  ds_device=0;
+  ds_buffer=0;
 }
 
 
@@ -142,7 +142,7 @@ bool SndSysDriverDirectSound::Open (SndSysRendererSoftware *renderer,SndSysSound
   memcpy(&playback_format, requested_format, sizeof(SndSysSoundFormat));
 
 
-  hr = DirectSoundCreate8(NULL, &ds_device, NULL);
+  hr = DirectSoundCreate8(0, &ds_device, 0);
   if (FAILED(hr))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: Direct Sound Driver: DirectSoundCreate8 failed.");
@@ -181,7 +181,7 @@ bool SndSysDriverDirectSound::Open (SndSysRendererSoftware *renderer,SndSysSound
   ds_bufferdesc.lpwfxFormat=&ds_wavformat;
   ds_bufferdesc.guid3DAlgorithm=GUID_NULL;
   
-  hr = ds_device->CreateSoundBuffer(&ds_bufferdesc,&ds_buffer,NULL);
+  hr = ds_device->CreateSoundBuffer(&ds_bufferdesc,&ds_buffer,0);
   if (FAILED(hr))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: Direct Sound Driver: Failed to create sound buffer.");

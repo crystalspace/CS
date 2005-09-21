@@ -51,7 +51,7 @@ SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data,
 					    SndSysSoundFormat *renderformat, 
 					    int mode3d)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
 
   // Copy render format information
   memcpy(&render_format,renderformat,sizeof(SndSysSoundFormat));
@@ -67,11 +67,11 @@ SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data,
     (render_format.Bits/8 * render_format.Channels) * 
       (render_format.Freq * OGG_BUFFER_LENGTH_MULTIPLIER / 
 	OGG_BUFFER_LENGTH_DIVISOR));
-  CS_ASSERT(p_cyclicbuffer!=NULL);
+  CS_ASSERT(p_cyclicbuffer!=0);
 
   // Initialize ogg file
   memset(&vorbis_file,0,sizeof(OggVorbis_File));
-  ov_open_callbacks (&stream_data,&vorbis_file,NULL,0,
+  ov_open_callbacks (&stream_data,&vorbis_file,0,0,
     *(ov_callbacks*)GetCallbacks());
 
   // Start the most advanced read pointer at offset 0
@@ -83,7 +83,7 @@ SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data,
   looping=false;
 
   // A prepared data buffer will be allocated when we know the size needed
-  prepared_data_buffer=NULL;
+  prepared_data_buffer=0;
   prepared_data_buffer_length=0;
   prepared_buffer_start=0;
 
@@ -107,7 +107,7 @@ SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data,
   current_ogg_stream=-1;
 
   // Let the pcm converter get created on the first pass
-  pcm_convert=NULL;
+  pcm_convert=0;
 
   // No new position 
   new_position=-1;
@@ -369,7 +369,7 @@ void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
       current_ogg_format_info=ov_info(&vorbis_file,current_ogg_stream);
 
       // Create the pcm sample converter if it's not yet created
-      if (pcm_convert == NULL)
+      if (pcm_convert == 0)
         pcm_convert = new CrystalSpace::PCMSampleConverter (
 	  current_ogg_format_info->channels, render_format.Bits,
 	  current_ogg_format_info->rate);

@@ -32,7 +32,7 @@ SCF_IMPLEMENT_IBASE_END;
 
 SndSysListenerSoftware::SndSysListenerSoftware()
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
 
   active_properties.front.Set(0,0,1.0f);
   active_properties.top.Set(0.0f,1.0f,0.0f);

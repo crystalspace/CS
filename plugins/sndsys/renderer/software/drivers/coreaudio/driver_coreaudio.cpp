@@ -62,7 +62,7 @@ SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 // The system driver.
-iObjectRegistry *SndSysDriverCoreAudio::object_reg=NULL;
+iObjectRegistry *SndSysDriverCoreAudio::object_reg=0;
 
 // The loaded CS reporter
 csRef<iReporter> SndSysDriverCoreAudio::reporter;
@@ -267,7 +267,7 @@ OSStatus SndSysDriverCoreAudio::AudioProc(AudioDeviceID inDevice, const AudioTim
   }
 
   // Fill the provided buffer with as many samples as possible and return the number of bytes provided
-  outOutputData->mBuffers[0].mDataByteSize=attached_renderer->FillDriverBuffer(outOutputData->mBuffers[0].mData, outOutputData->mBuffers[0].mDataByteSize, NULL, 0);
+  outOutputData->mBuffers[0].mDataByteSize=attached_renderer->FillDriverBuffer(outOutputData->mBuffers[0].mData, outOutputData->mBuffers[0].mDataByteSize, 0, 0);
   return 0;
 }
 

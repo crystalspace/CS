@@ -22,9 +22,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/scf.h"
 
 /**
-* The sound format. This keeps information about the frequency, bits and
-* channels of a sound data object.
-*/
+ * The sound format. This keeps information about the frequency, bits and
+ * channels of a sound data object.
+ */
 struct SndSysSoundFormat
 {
   /// Frequency of the sound (hz)

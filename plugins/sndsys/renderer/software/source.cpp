@@ -61,7 +61,7 @@ SCF_IMPLEMENT_IBASE_END;
 SndSysSourceSoftwareBasic::SndSysSourceSoftwareBasic(csRef<iSndSysStream> stream, SndSysRendererSoftware *rend)
 : renderer(rend), sound_stream(stream)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
 
   active_parameters.volume=0.0f;
   queued_parameters.volume=1.0f;
@@ -353,10 +353,10 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(SoundSample *channel_buffer, s
 //
 //////////////////////////////////////////////////////////////////////////
 SndSysSourceSoftware3D::SndSysSourceSoftware3D(csRef<iSndSysStream> stream, SndSysRendererSoftware *rend)
-: renderer(rend), sound_stream(stream), clean_buffer(NULL), clean_buffer_samples(0), working_buffer(NULL), working_buffer_samples(0),
+: renderer(rend), sound_stream(stream), clean_buffer(0), clean_buffer_samples(0), working_buffer(0), working_buffer_samples(0),
   filters_setup(false)
 {
-  SCF_CONSTRUCT_IBASE(NULL);
+  SCF_CONSTRUCT_IBASE(0);
 
   active_parameters.maximum_distance=ISNDSYS_SOURCE_DISTANCE_INFINITE;
   active_parameters.minimum_distance=1.0;

@@ -233,7 +233,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
   transform_mode = p->transform_mode;
 
-  point_data = NULL; // This gets created by the physics plugin
+  point_data = 0; // This gets created by the physics plugin
 
   emitter = csVector3(0.0f, 0.0f, 0.0f);
   radius = 1.0f;

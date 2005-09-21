@@ -90,7 +90,7 @@ END_EVENT_TABLE()
 Simple* simple = 0;
 
 Simple::Simple (iObjectRegistry* object_reg)
-  : wxFrame(NULL, -1, wxT("Crystal Space WxWidget Canvas test"), wxDefaultPosition, wxSize(500, 500))
+  : wxFrame(0, -1, wxT("Crystal Space WxWidget Canvas test"), wxDefaultPosition, wxSize(500, 500))
 {
   Simple::object_reg = object_reg;
 }

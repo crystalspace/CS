@@ -89,7 +89,7 @@ class SndSysSourceSoftwareFilter_Base : public iSndSysSoftwareFilter3D
 public:
   SCF_DECLARE_IBASE;
 
-  SndSysSourceSoftwareFilter_Base() : next_filter(NULL) {};
+  SndSysSourceSoftwareFilter_Base() : next_filter(0) {};
   virtual ~SndSysSourceSoftwareFilter_Base() {};
 
   virtual void Apply(iSndSysSoftwareFilter3DProperties &properties)
@@ -104,7 +104,7 @@ public:
     if (next_filter)
     {
       iSndSysSoftwareFilter3D *deepest_filter=filter;
-      while (deepest_filter->GetSubFilter() != NULL)
+      while (deepest_filter->GetSubFilter() != 0)
         deepest_filter=deepest_filter->GetSubFilter();
 
       deepest_filter->AddSubFilter(next_filter);
@@ -213,7 +213,7 @@ public:
     if (next_filter)
     {
       iSndSysSoftwareFilter3D *deepest_filter=filter;
-      while (deepest_filter->GetSubFilter() != NULL)
+      while (deepest_filter->GetSubFilter() != 0)
         deepest_filter=deepest_filter->GetSubFilter();
 
       deepest_filter->AddSubFilter(next_filter);
@@ -247,7 +247,7 @@ class SndSysSourceSoftwareFilter_SplitPath : public SndSysSourceSoftwareFilter_B
 {
 public:
   SndSysSourceSoftwareFilter_SplitPath() : SndSysSourceSoftwareFilter_Base(), 
-    second_buffer(NULL), second_buffersize(0), second_filter(NULL)
+    second_buffer(0), second_buffersize(0), second_filter(0)
   {
   }
   virtual ~SndSysSourceSoftwareFilter_SplitPath() 
@@ -294,7 +294,7 @@ public:
     if (*spot)
     {
       iSndSysSoftwareFilter3D *deepest_filter=add;
-      while (deepest_filter->GetSubFilter() != NULL)
+      while (deepest_filter->GetSubFilter() != 0)
         deepest_filter=deepest_filter->GetSubFilter();
 
       deepest_filter->AddSubFilter(*spot);
@@ -318,7 +318,7 @@ public:
       return next_filter;
     if (chain_idx==1)
       return second_filter;
-    return NULL;
+    return 0;
   }
 
 protected:
@@ -331,7 +331,7 @@ protected:
 class SndSysSourceSoftwareFilter_ITDDelay : public SndSysSourceSoftwareFilter_Base
 {
 public:
-  SndSysSourceSoftwareFilter_ITDDelay() : SndSysSourceSoftwareFilter_Base(), history_buffer(NULL), history_samples(0)
+  SndSysSourceSoftwareFilter_ITDDelay() : SndSysSourceSoftwareFilter_Base(), history_buffer(0), history_samples(0)
   {
   }
   virtual ~SndSysSourceSoftwareFilter_ITDDelay()
@@ -420,7 +420,7 @@ class SndSysSourceSoftwareFilter_Delay : public SndSysSourceSoftwareFilter_Base
 {
 public:
   SndSysSourceSoftwareFilter_Delay() : SndSysSourceSoftwareFilter_Base(), 
-    history_buffer(NULL), history_samples(0)
+    history_buffer(0), history_samples(0)
   {
   }
   virtual ~SndSysSourceSoftwareFilter_Delay()
@@ -510,7 +510,7 @@ class SndSysSourceSoftwareFilter_Reverb : public SndSysSourceSoftwareFilter_Base
 {
 public:
   SndSysSourceSoftwareFilter_Reverb() : SndSysSourceSoftwareFilter_Base(), 
-    history_buffer(NULL), history_samples(0)
+    history_buffer(0), history_samples(0)
   {
   }
   virtual ~SndSysSourceSoftwareFilter_Reverb()

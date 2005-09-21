@@ -24,6 +24,7 @@ SubInclude TOP plugins proctex ;
 SubInclude TOP plugins reporter ;
 SubInclude TOP plugins sequence ;
 SubInclude TOP plugins sound ;
+SubInclude TOP plugins sndsys ;
 SubInclude TOP plugins stdrep ;
 SubInclude TOP plugins terraformer ;
 SubInclude TOP plugins video ;

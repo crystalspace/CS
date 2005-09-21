@@ -37,7 +37,7 @@ extern "C"
 static String fallback_resources[] = {
     "*baseTranslations: #override :<Key>Return: default-exit()",
     "*message.Scroll: whenNeeded",
-    NULL};
+    0};
 
 /*
  * Action to implement ICCCM delete_window and other translations.
@@ -85,12 +85,12 @@ bool csXWindow::AlertV (int type, const char* title, const char* okMsg,
     const char* fake_argv[] = {title}; 
     // mild hack to get the desired form title.
 
-    XtSetLanguageProc(NULL, (XtLanguageProc) NULL, NULL);
+    XtSetLanguageProc(0, (XtLanguageProc) 0, 0);
 
     top = XtAppInitialize (&app_con, "Xmessage-color",
 			   0, 0, &fake_argc, 
 			   CS_CONST_CAST(char**, fake_argv), // @@@ Urgh.
-			   fallback_resources, NULL, 0);
+			   fallback_resources, 0, 0);
 
     wm_delete_window = XInternAtom(XtDisplay(top), "WM_DELETE_WINDOW", False);
     XtAppAddActions(app_con, actions_list, XtNumber(actions_list));

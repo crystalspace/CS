@@ -49,22 +49,24 @@ SCF_IMPLEMENT_IBASE_END
 
 csVosObject3D::csVosObject3D(csMetaObject3D* obj3d, VUtil::RefCounted* rc)
 {
-  if(rc) {
+  if(rc)
+  {
     rc->acquire();
     object3d.assign(obj3d, false);
-  } else object3d.assign(obj3d, true);
+  }
+  else object3d.assign(obj3d, true);
 
   SCF_CONSTRUCT_IBASE (0);
-  meshwrapper = NULL;
-  collider = NULL;
+  meshwrapper = 0;
+  collider = 0;
 }
 
 csVosObject3D::~csVosObject3D()
 {
   if (meshwrapper.IsValid())
   {
-    csRef<iEngine> engine = CS_QUERY_REGISTRY (object3d->getVosA3DL()->GetObjectRegistry(),
-                                               iEngine);
+    csRef<iEngine> engine = CS_QUERY_REGISTRY (
+    	object3d->getVosA3DL()->GetObjectRegistry(), iEngine);
     meshwrapper->QueryObject()->ObjRemove(this);
     engine->GetMeshes()->Remove(meshwrapper);
   }

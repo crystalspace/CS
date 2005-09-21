@@ -55,7 +55,7 @@ public:
   */
   scfImplementation (Class *object, iBase *parent = 0) :
       scfObject (object), scfRefCount (1), scfParent (parent), 
-        scfWeakRefOwners (NULL)
+        scfWeakRefOwners (0)
   {
     if (scfParent) scfParent->IncRef ();
   }
@@ -130,10 +130,10 @@ protected:
     for (size_t i = 0; i < scfWeakRefOwners->Length (); i++)
     {
       iBase** p = (*scfWeakRefOwners)[i];
-      *p = NULL;
+      *p = 0;
     }
     delete scfWeakRefOwners;
-    scfWeakRefOwners = NULL;
+    scfWeakRefOwners = 0;
   }
 
   /**
@@ -154,7 +154,7 @@ protected:
     if (scfParent)
       return scfParent->QueryInterface (iInterfaceID, iVersion);
 
-    return NULL;
+    return 0;
   }
 
   /**
@@ -173,7 +173,7 @@ protected:
     }
     else
     {
-      return NULL;
+      return 0;
     }
   }
 };

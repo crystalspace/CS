@@ -40,17 +40,20 @@ SCF_VERSION (iSndSysSoftwareDriver, 0, 1, 0);
  */
 struct iSndSysSoftwareDriver : public iBase
 {
-  /** Initialize the sound driver.
+  /**
+   * Initialize the sound driver.
    *
-   *  The requested_format parameter may be modified during this function.
+   * The requested_format parameter may be modified during this function.
    */
-  virtual bool Open(SndSysRendererSoftware *renderer,SndSysSoundFormat *requested_format) = 0;
+  virtual bool Open(SndSysRendererSoftware *renderer,
+  	SndSysSoundFormat *requested_format) = 0;
 
   /// Close the sound driver
   virtual void Close () = 0;
 
 
-  /** This function is called to start the driver thread.  
+  /**
+   * This function is called to start the driver thread.  
    */
   virtual bool StartThread() = 0;
 
