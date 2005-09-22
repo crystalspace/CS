@@ -23,7 +23,7 @@
  * Some helper functions for sound elements
  */
 
-/**\def SOUND_ELEMENT_MAX_CHANNELS
+/**
  * This is the maximum number of channels we'll mix.
  * Mono sound is 1 channel
  * Stereo is 2 channels
@@ -31,7 +31,7 @@
  */
 #define CS_SOUND_ELEMENT_MAX_CHANNELS 8
 
-/**\def CS_SOUND_INTERNAL_FREQUENCY_DIVISOR
+/**
  * This setting controls how many steps are used internally between source 
  * samples.
  *
