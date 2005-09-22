@@ -82,13 +82,13 @@ int PCMSampleConverter::GetRequiredOutputBufferMultiple(int dest_channels,
 }
 
 bool PCMSampleConverter::ReadFullSample8 (const void **source, 
-					   int *source_len, 
-					   int *sample_buffer)
+					  size_t *source_len, 
+					  int *sample_buffer)
 {
   int channel,max_channels;
   const unsigned char *src=(const unsigned char *)(*source);
 
-  if (src_channels > (*source_len))
+  if ((size_t)src_channels > (*source_len))
     return false;
 
   // Fill the sample buffer with no sound, which is 128 for 8 bit samples
@@ -119,13 +119,13 @@ bool PCMSampleConverter::ReadFullSample8 (const void **source,
 }
   
 bool PCMSampleConverter::ReadFullSample16(const void **source, 
-					   int *source_len, 
-					   int *sample_buffer)
+					  size_t *source_len, 
+					  int *sample_buffer)
 {
   int channel,max_channels;
   const short *src=(const short *)(*source);
 
-  if ((src_channels*2) > (*source_len))
+  if ((size_t)(src_channels*2) > (*source_len))
     return false;
 
   // Fill the sample buffer with no sound, which is 0 for 16 bit samples
@@ -164,7 +164,8 @@ bool PCMSampleConverter::ReadFullSample16(const void **source,
 
 
 bool PCMSampleConverter::ReadFullSample(const void **source, 
-					 int *source_len, int *sample_buffer)
+					size_t *source_len, 
+					int *sample_buffer)
 {
   if (src_bytes==1)
     return ReadFullSample8(source,source_len,sample_buffer);
@@ -301,13 +302,13 @@ int PCMSampleConverter::WriteSample(int *sample_buffer, void **dest,
   return WriteSample16(sample_buffer,dest,dest_channels);
 }
 
-int PCMSampleConverter::AdvanceSourceSamples(const void **source, 
-					      int *source_len, 
-					      int samples_to_advance, 
-					      int *sample_buffer)
+size_t PCMSampleConverter::AdvanceSourceSamples(const void **source, 
+						size_t *source_len, 
+						size_t samples_to_advance, 
+						int *sample_buffer)
 {
   samples_to_advance--;
-  int advance_bytes=src_channels*src_bytes*samples_to_advance;
+  size_t advance_bytes=src_channels*src_bytes*samples_to_advance;
 
   /* Recalculate the number of samples we can advance if there's not enough 
    * space */
@@ -326,7 +327,7 @@ int PCMSampleConverter::AdvanceSourceSamples(const void **source,
 }
 
 
-int PCMSampleConverter::ConvertBuffer(const void *source, int source_len, 
+int PCMSampleConverter::ConvertBuffer(const void *source, size_t source_len, 
 				       void *dest, int dest_channels, 
 				       int dest_bitspersample, 
 				       int dest_frequency)
@@ -346,9 +347,9 @@ int PCMSampleConverter::ConvertBuffer(const void *source, int source_len,
   else
   {
     // Advance through any whole samples we need to beforehand
-    int advanced = AdvanceSourceSamples (&source, &source_len,
+    size_t advanced = AdvanceSourceSamples (&source, &source_len,
       (position_offset-1)/CS_SOUND_INTERNAL_FREQUENCY_DIVISOR, last_sample);
-    position_offset -= CS_SOUND_INTERNAL_FREQUENCY_DIVISOR*advanced;
+    position_offset -= (int)(CS_SOUND_INTERNAL_FREQUENCY_DIVISOR*advanced);
     if (position_offset > CS_SOUND_INTERNAL_FREQUENCY_DIVISOR)
       return dest_bytes_written;
     // Read next sample if available
@@ -367,10 +368,10 @@ int PCMSampleConverter::ConvertBuffer(const void *source, int source_len,
       // Need to advance at least 2 full samples
       if (position_offset > CS_SOUND_INTERNAL_FREQUENCY_DIVISOR)
       {
-        int advanced=AdvanceSourceSamples (&source, &source_len,
+        size_t advanced = AdvanceSourceSamples (&source, &source_len,
 	  (position_offset-1)/CS_SOUND_INTERNAL_FREQUENCY_DIVISOR, 
 	  last_sample);
-        position_offset -= CS_SOUND_INTERNAL_FREQUENCY_DIVISOR*advanced;
+        position_offset -= (int)(CS_SOUND_INTERNAL_FREQUENCY_DIVISOR*advanced);
         if (position_offset > CS_SOUND_INTERNAL_FREQUENCY_DIVISOR)
           return dest_bytes_written;
       }

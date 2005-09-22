@@ -24,6 +24,7 @@
 #include "csutil/cseventq.h"
 #include "csutil/csinput.h"
 #include "csutil/csshlib.h"
+#include "csutil/csstring.h"
 #include "csutil/objreg.h"
 #include "csutil/plugldr.h"
 #include "csutil/plugmgr.h"
@@ -41,6 +42,8 @@
 
 static bool config_done = false;
 static iEventHandler* installed_event_handler = 0;
+
+CS_IMPLEMENT_STATIC_VAR(GetDefaultAppID, csString, ());
 
 csPluginRequest::csPluginRequest(
   csString cname, csString iname, scfInterfaceID iid, int iver) :
@@ -76,6 +79,28 @@ iObjectRegistry* csInitializer::CreateEnvironment (
 {
   CS_INITIALIZE_PLATFORM_APPLICATION;
 
+  if (argc > 0)
+  {
+    csString appName (argv[0]);
+    size_t slashPos = appName.FindLast (CS_PATH_SEPARATOR);
+    if (slashPos != (size_t)-1) appName.DeleteAt (0, slashPos + 1);
+#ifdef CS_PLATFORM_WIN32
+    // Strip .EXE or .DLL extension
+    if (appName.Length() >= 4)
+    {
+      const size_t extPos = appName.Length() - 4;
+      const char* ext = appName.GetData() + extPos;
+      if ((strcasecmp (ext, ".exe") == 0) || (strcasecmp (ext, ".dll") == 0))
+	appName.DeleteAt (extPos, 4);
+    }
+#endif
+    if (!appName.IsEmpty())
+    {
+      ::GetDefaultAppID()->Replace ("CrystalApp.");
+      ::GetDefaultAppID()->Append (appName);
+    }
+  }
+  
   iObjectRegistry* reg = 0;
   if (InitializeSCF (argc, argv))
   {
@@ -260,6 +285,9 @@ bool csInitializer::SetupConfigManager (
   SetupPluginLoadErrVerbosity(r);
 
   if (config_done) return true;
+  
+  if (AppID == 0)
+    AppID = GetDefaultAppID();
 
   // @@@ Is this ugly? Do we need a better, more generalized way of doing this?
   // The reason that the VFS plugin is required
@@ -462,4 +490,10 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
 
   config_done = false;
   installed_event_handler = 0;
+}
+
+const char* csInitializer::GetDefaultAppID()
+{
+  csString* defAppID = ::GetDefaultAppID();
+  return defAppID ? defAppID->GetData() : "CrystalApp.Noname";
 }

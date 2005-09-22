@@ -65,6 +65,17 @@ documentation is generated from them.
 @strong{Warning}: Always use Doxygen comments for a class. If you fail to do so
 then Doxygen will ignore comments for methods within the class itself.
 
+However, it is not required to document (re)implementations of methods (such
+as for implementations of the virtual abstract methods of interfaces) since
+Doxygen will automatically copy the documentation from the superclass.
+Additionally, in practice, the documentation for the subclass is often only
+copied from the superclass anyway, and most likely those two will get out of
+sync over time; hence, save the effort of copying the Doxygen documentation
+for a subclass, as the inherited documentation will likely also be more 
+accurate in the long run. Obvious exceptions are when a subclass method has
+significant or important differences in functionality to the superclass method.
+In this case, investigate Doxygen commands such as @samp{\copydoc}.
+
 A one line Doxygen comment uses three slashes (@samp{///}) rather than two as
 is typical for normal C++ comments.  Multi-line Doxygen comments are specified
 with @samp{/** @dots{} */} rather than @samp{/* @dots{} */}.  Here is an

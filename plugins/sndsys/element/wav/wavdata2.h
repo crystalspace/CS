@@ -104,7 +104,7 @@ class SndSysWavSoundData : public iSndSysData
   virtual const csSndSysSoundFormat *GetFormat();
 
   /// Get size of this sound in samples.
-  virtual long GetSampleCount();
+  virtual size_t GetSampleCount();
 
   /** 
    * Return the size of the data stored in bytes.  This is informational only 
@@ -114,7 +114,7 @@ class SndSysWavSoundData : public iSndSysData
    * SAMPLE_COUNT * SAMPLE_SIZE since SAMPLE_SIZE may vary throughout the 
    * audio data.
    */
-  virtual long GetDataSize();
+  virtual size_t GetDataSize();
 
   /// Creates a stream associated with this sound data positioned at the beginning of the sound data and initially paused if possible.
   virtual iSndSysStream *CreateStream(csSndSysSoundFormat *renderformat, int mode3d);
@@ -131,7 +131,7 @@ class SndSysWavSoundData : public iSndSysData
   WavDataStore *ds;
   bool data_ready;
   csSndSysSoundFormat fmt;
-  long sample_count;
+  size_t sample_count;
 
   _RIFFchk riffhdr;
   _FMTchk fmthdr;

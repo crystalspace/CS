@@ -52,13 +52,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (SndSysDriverDirectSound::eiComponent)
 SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-// The system driver.
-iObjectRegistry *SndSysDriverDirectSound::object_reg=0;
-
-// The loaded CS reporter
-csRef<iReporter> SndSysDriverDirectSound::reporter;
-
-
 SndSysDriverDirectSound::SndSysDriverDirectSound(iBase* piBase) :
  ds_device(0), ds_buffer(0), ds_buffer_writecursor(0), running(false)
 {
@@ -83,21 +76,10 @@ void SndSysDriverDirectSound::Report(int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-
-  if (!reporter)
-    reporter = CS_QUERY_REGISTRY(object_reg, iReporter);
-
-  if (reporter)
-    reporter->ReportV (severity, "crystalspace.SndSys.driver.software.directsound", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, severity, 
+    "crystalspace.sndsys.driver.software.directsound", msg, arg);
   va_end (arg);
 }
-
-
 
 bool SndSysDriverDirectSound::Initialize (iObjectRegistry *obj_reg)
 {
@@ -319,17 +301,20 @@ void SndSysDriverDirectSound::Run()
       if (writablebytes >= ds_buffer_minimum_fill_bytes)
       {
         LPVOID buf1,buf2;
-        uint32 buf1_len,buf2_len;
-        uint32 bytes_used;
+        DWORD buf1_len,buf2_len;
+        size_t bytes_used;
 
-        hr=ds_buffer->Lock(ds_buffer_writecursor, writablebytes,&buf1,(LPDWORD)&buf1_len,&buf2,(LPDWORD)&buf2_len,0);
+        hr=ds_buffer->Lock (ds_buffer_writecursor, writablebytes,
+	  &buf1, &buf1_len, &buf2, &buf2_len, 0);
         if (FAILED(hr))
         {
-          //Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Direct Sound Driver: Failed to lock %d bytes for write.", writablebytes);
+          //Report(CS_REPORTER_SEVERITY_DEBUG, 
+	    //"Sound System: Direct Sound Driver: Failed to lock %d bytes for write.", 
+	    //writablebytes);
           continue;
         }
 
-        bytes_used=attached_renderer->FillDriverBuffer(buf1, buf1_len, buf2, buf2_len);
+        bytes_used = attached_renderer->FillDriverBuffer (buf1, buf1_len, buf2, buf2_len);
 
         // Unlock the buffer
         ds_buffer->Unlock(buf1,buf1_len,buf2,buf2_len);
@@ -388,9 +373,9 @@ uint32 SndSysDriverDirectSound::GetWritableBytes(uint32 real_play_cursor)
   return (real_play_cursor-ds_buffer_writecursor);
 }
 
-void SndSysDriverDirectSound::AdvanceWriteBuffer(uint32 bytes)
+void SndSysDriverDirectSound::AdvanceWriteBuffer (size_t bytes)
 {
-  ds_buffer_writecursor+=bytes;
+  ds_buffer_writecursor += (DWORD)bytes;
   if (ds_buffer_writecursor >= ds_buffer_bytes)
     ds_buffer_writecursor-=ds_buffer_bytes;
 }

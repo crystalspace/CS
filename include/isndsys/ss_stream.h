@@ -25,7 +25,7 @@
 struct csSndSysSoundFormat;
 struct iSndSysData;
 
-#define CS_SNDSYS_STREAM_UNKNOWN_LENGTH -1
+const size_t CS_SNDSYS_STREAM_UNKNOWN_LENGTH = (size_t)-1;
 
 #define CS_SNDSYS_STREAM_PAUSED     0
 #define CS_SNDSYS_STREAM_UNPAUSED   1
@@ -66,7 +66,7 @@ struct iSndSysStream : public iBase
    * length. For example, sound data being streamed from a remote host may not 
    * have a pre-determinable length.
    */
-  virtual long GetSampleCount() = 0;
+  virtual size_t GetSampleCount() = 0;
 
   /**
    * Returns the current position of this sound in rendered samples. 
@@ -78,7 +78,7 @@ struct iSndSysStream : public iBase
    * started.  In other words, where there is doubt, the position
    * should start at 0 and advance as the position advances.
    */
-  virtual long GetPosition() = 0;
+  virtual size_t GetPosition() = 0;
 
   /**
    * Resets the position of the stream to the begining if possible.
@@ -92,7 +92,7 @@ struct iSndSysStream : public iBase
    * FALSE may be returned if a set position operation is not permitted or
    * not possible.
    */
-  virtual bool SetPosition(long newposition) = 0;
+  virtual bool SetPosition (size_t newposition) = 0;
 
   /**
    * Pauses the stream at the current position.  
@@ -217,9 +217,10 @@ struct iSndSysStream : public iBase
    *
    * \remarks Not intended to be called by an application.
    */
-  virtual void GetDataPointers(long *position_marker,long max_requested_length,
-  	void **buffer1,long *buffer1_length,void **buffer2,
-	long *buffer2_length) = 0;
+  virtual void GetDataPointers(size_t* position_marker,
+	size_t max_requested_length,
+  	void **buffer1, size_t *buffer1_length,
+	void **buffer2,	size_t *buffer2_length) = 0;
 
   /**
    * Fill a long value that will be used to track a Source's position through 
@@ -227,7 +228,7 @@ struct iSndSysStream : public iBase
    *
    * \remarks Not intended to be called by an application.
    */
-  virtual void InitializeSourcePositionMarker(long *position_marker) = 0;
+  virtual void InitializeSourcePositionMarker (size_t* position_marker) = 0;
 
   /// Retrieve a direct pointer to this object
   virtual iSndSysStream *GetPtr() = 0;

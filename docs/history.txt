@@ -15,6 +15,12 @@ chronological order.
 	  but this is a bit clumsy and there was also no proper region support.
 	  This is all work in progress.
 	- Jorrit added support for the new sound wrappers in regions.
+	- res fixed some 64bit warnings in sndsys.
+	- res added a paragraph about documentation for inherited members to
+	  the coding guidelines.
+	- res augmented csInitializer to generate a default app ID from the
+	  executable name (if possible). Also made csApplicationFramework use
+	  this default ID when the user did not set one.
 21-Sep-2005
 	- res fixed a few warnings in the new sndsys stuff, did some 
 	  reformatting to better follow the CS coding guidelines (reading

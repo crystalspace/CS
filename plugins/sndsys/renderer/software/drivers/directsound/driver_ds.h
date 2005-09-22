@@ -58,15 +58,11 @@ public:
   void Run ();
 
   // The system driver.
-  static iObjectRegistry *object_reg;
+  iObjectRegistry *object_reg;
 
   const char *GetDSError(HRESULT hr);
 
   void Report (int severity, const char* msg, ...);
-
-
-  // The loaded CS reporter
-  static csRef<iReporter> reporter;
 
   /*
   csSoundFormat render_format;
@@ -81,9 +77,9 @@ protected:
 
   LPDIRECTSOUND8 ds_device;
   LPDIRECTSOUNDBUFFER ds_buffer;
-  uint32 ds_buffer_bytes;
-  uint32 ds_buffer_minimum_fill_bytes;
-  uint32 ds_buffer_writecursor;
+  DWORD ds_buffer_bytes;
+  DWORD ds_buffer_minimum_fill_bytes;
+  DWORD ds_buffer_writecursor;
 
   csRef<iWin32Assistant> win32Assistant;
 
@@ -97,7 +93,7 @@ protected:
   // Helper function to determine if the Direct Sound 'write' cursor has passed where we've written
   int GetWriteGap(uint32 real_play_cursor, uint32 real_write_cursor);
   uint32 GetWritableBytes(uint32 real_play_cursor);
-  void AdvanceWriteBuffer(uint32 bytes);
+  void AdvanceWriteBuffer (size_t bytes);
 
   void ClearBuffer();
 

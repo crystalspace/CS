@@ -43,7 +43,7 @@ size_t SoundCyclicBuffer::GetFreeBytes()
 
 void SoundCyclicBuffer::AddBytes(void *bytes_ptr,size_t bytes_length)
 {
-  long pass_bytes;
+  size_t pass_bytes;
   uint8 *end_ptr, *read_ptr;
   CS_ASSERT(bytes_length <= (length - (end_value-start_value)));
 
@@ -73,12 +73,12 @@ void SoundCyclicBuffer::AddBytes(void *bytes_ptr,size_t bytes_length)
   }
 }
 
-long SoundCyclicBuffer::GetStartValue()
+size_t SoundCyclicBuffer::GetStartValue()
 {
   return start_value;
 }
 
-long SoundCyclicBuffer::GetEndValue()
+size_t SoundCyclicBuffer::GetEndValue()
 {
   return end_value;
 }
@@ -90,7 +90,7 @@ void SoundCyclicBuffer::Clear(long value)
   write_ptr=buffer_base;
 }
 
-void SoundCyclicBuffer::AdvanceStartValue(long advance_amount)
+void SoundCyclicBuffer::AdvanceStartValue (size_t advance_amount)
 {
   start_value+=advance_amount;
 
@@ -101,15 +101,15 @@ void SoundCyclicBuffer::AdvanceStartValue(long advance_amount)
     end_value=start_value;
 }
 
-void SoundCyclicBuffer::GetDataPointersFromPosition(long *position_value, 
-						     long max_length, 
-						     uint8 **buffer1, 
-						     long *buffer1_length, 
-						     uint8 **buffer2, 
-						     long *buffer2_length)
+void SoundCyclicBuffer::GetDataPointersFromPosition(size_t *position_value, 
+						    size_t max_length, 
+						    uint8 **buffer1, 
+						    size_t *buffer1_length, 
+						    uint8 **buffer2, 
+						    size_t *buffer2_length)
 {
   uint8 *read_ptr, *end_ptr;
-  long filled_length, copy_length, available_length;
+  size_t filled_length, copy_length, available_length;
 
   if (*position_value < start_value)
     *position_value=start_value; /* Cannot read data we don't have.  

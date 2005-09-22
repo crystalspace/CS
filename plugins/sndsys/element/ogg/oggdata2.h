@@ -73,7 +73,7 @@ struct OggDataStore
 struct OggStreamData
 {
   OggDataStore *datastore;
-  long position;
+  size_t position;
 };
 
 struct cs_ov_callbacks
@@ -99,13 +99,13 @@ class SndSysOggSoundData : public iSndSysData
   virtual const csSndSysSoundFormat *GetFormat();
 
   /// Get size of this sound in samples.
-  virtual long GetSampleCount();
+  virtual size_t GetSampleCount();
 
   /** Return the size of the data stored in bytes.  This is informational only and is not guaranteed to be a number usable for sound calculations.
    *  For example, an audio file compressed with variable rate compression may result in a situation where FILE_SIZE is not equal to
    *   SAMPLE_COUNT * SAMPLE_SIZE since SAMPLE_SIZE may vary throughout the audio data.
    */
-  virtual long GetDataSize();
+  virtual size_t GetDataSize();
 
   /// Creates a stream associated with this sound data positioned at the begining of the sound data and initially paused if possible.
   virtual iSndSysStream *CreateStream (csSndSysSoundFormat *renderformat, 

@@ -45,6 +45,7 @@ SCF_IMPLEMENT_IBASE_END
 
 extern cs_ov_callbacks *GetCallbacks();
 
+const size_t positionInvalid = (size_t)~0;
 
 SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data, 
 					    OggDataStore *datastore, 
@@ -110,7 +111,7 @@ SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data,
   pcm_convert=0;
 
   // No new position 
-  new_position=-1;
+  new_position = positionInvalid;
 
   // Store the 3d mode
   mode_3d=mode3d;
@@ -145,7 +146,7 @@ int SndSysOggSoundStream::Get3dMode()
 }
 
 
-long SndSysOggSoundStream::GetSampleCount()
+size_t SndSysOggSoundStream::GetSampleCount()
 {
   const csSndSysSoundFormat *data_format=sound_data->GetFormat();
 
@@ -153,11 +154,11 @@ long SndSysOggSoundStream::GetSampleCount()
   samplecount*=(render_format.Channels * render_format.Freq);
   samplecount/=(data_format->Channels * data_format->Freq);
 
-  return (long)(samplecount & 0x7FFFFFFF);
+  return samplecount;
 }
 
 
-long SndSysOggSoundStream::GetPosition()
+size_t SndSysOggSoundStream::GetPosition()
 {
   return most_advanced_read_pointer;
 
@@ -172,7 +173,7 @@ bool SndSysOggSoundStream::ResetPosition()
   return true;
 }
 
-bool SndSysOggSoundStream::SetPosition(long newposition)
+bool SndSysOggSoundStream::SetPosition (size_t newposition)
 {
   new_position=newposition;
   //p_cyclicbuffer->Clear(newposition);
@@ -265,7 +266,7 @@ bool SndSysOggSoundStream::GetAutoUnregisterRequested()
 
 void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
 {
-  if (new_position>=0)
+  if (new_position != positionInvalid)
   {
     // Signal a full cyclic buffer flush
     last_time=0;
@@ -277,7 +278,7 @@ void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
     // Seek the ogg stream to the requested position
     ov_raw_seek(&vorbis_file,new_position);
 
-    new_position=-1;
+    new_position = positionInvalid;
     playback_read_complete=false;
   }
   if (paused || playback_read_complete)
@@ -288,7 +289,7 @@ void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
 
  
   long bytes_read=0;
-  long needed_bytes;
+  size_t needed_bytes;
   long elapsed_ms;
   
   if (last_time==0)
@@ -313,13 +314,13 @@ void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
       needed_bytes=(long)(p_cyclicbuffer->GetLength() & 0x7FFFFFFF);
   }
   // Free space in the cyclic buffer if necessary
-  if ((size_t)needed_bytes > p_cyclicbuffer->GetFreeBytes())
-    p_cyclicbuffer->AdvanceStartValue(needed_bytes - 
-      (long)(p_cyclicbuffer->GetFreeBytes() & 0x7FFFFFFF));
+  if (needed_bytes > p_cyclicbuffer->GetFreeBytes())
+    p_cyclicbuffer->AdvanceStartValue (needed_bytes - 
+      p_cyclicbuffer->GetFreeBytes());
 
   // Fill in leftover decoded data if needed
   if (prepared_buffer_usage > 0)
-    needed_bytes-=CopyBufferBytes(needed_bytes);
+    needed_bytes -= CopyBufferBytes (needed_bytes);
 
   last_time=current_time;
 
@@ -407,26 +408,28 @@ void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
     }
 
     if (prepared_buffer_usage > 0)
-      needed_bytes-=CopyBufferBytes(needed_bytes);
+      needed_bytes -= CopyBufferBytes (needed_bytes);
 
   }
       
 }
 
 
-long SndSysOggSoundStream::CopyBufferBytes(long max_dest_bytes)
+size_t SndSysOggSoundStream::CopyBufferBytes(size_t max_dest_bytes)
 {
   if (max_dest_bytes >= prepared_buffer_usage)
   {
     max_dest_bytes=prepared_buffer_usage;
-    p_cyclicbuffer->AddBytes(&(prepared_data_buffer[prepared_buffer_start]),max_dest_bytes);
+    p_cyclicbuffer->AddBytes (&(prepared_data_buffer[prepared_buffer_start]),
+      max_dest_bytes);
     prepared_buffer_usage=0;
     prepared_buffer_start=0;
     return max_dest_bytes;
   }
 
 
-  p_cyclicbuffer->AddBytes(&(prepared_data_buffer[prepared_buffer_start]),max_dest_bytes);
+  p_cyclicbuffer->AddBytes (&(prepared_data_buffer[prepared_buffer_start]),
+    max_dest_bytes);
   prepared_buffer_usage-=max_dest_bytes;
   prepared_buffer_start+=max_dest_bytes;
   return max_dest_bytes;
@@ -435,12 +438,12 @@ long SndSysOggSoundStream::CopyBufferBytes(long max_dest_bytes)
 
 
 
-void SndSysOggSoundStream::GetDataPointers(long *position_marker, 
-					    long max_requested_length,
+void SndSysOggSoundStream::GetDataPointers (size_t* position_marker, 
+					    size_t max_requested_length,
 					    void **buffer1, 
-					    long *buffer1_length,
+					    size_t *buffer1_length,
 					    void **buffer2,
-					    long *buffer2_length)
+					    size_t *buffer2_length)
 {
   p_cyclicbuffer->GetDataPointersFromPosition (position_marker,
     max_requested_length, (uint8 **)buffer1, buffer1_length, 
@@ -464,7 +467,7 @@ void SndSysOggSoundStream::GetDataPointers(long *position_marker,
 
 
 void SndSysOggSoundStream::InitializeSourcePositionMarker (
-  long *position_marker)
+  size_t *position_marker)
 {
   *position_marker=most_advanced_read_pointer;
 }

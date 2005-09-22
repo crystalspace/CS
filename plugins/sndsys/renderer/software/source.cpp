@@ -117,9 +117,9 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
 {
   float source_volume;
   void *buf1,*buf2;
-  long buf1_len,buf2_len;
+  size_t buf1_len, buf2_len;
   int int_volume;
-  long request_bytes;
+  size_t request_bytes;
   int bytes_per_sample;
   //size_t original_buffer_samples=buffer_samples;
   //bool fake_full_return=false;
@@ -149,13 +149,17 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
   buf1_len=0;
   buf2_len=0;
 
-  //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Stream position is %u.", stream_position);
+  //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, 
+    //"Stream position is %u.", stream_position);
 
-  sound_stream->GetDataPointers(&stream_position,request_bytes,&buf1,&buf1_len,&buf2,&buf2_len);
+  sound_stream->GetDataPointers (&stream_position, request_bytes,
+    &buf1, &buf1_len, &buf2, &buf2_len);
 
   CS_ASSERT((buf1_len + buf2_len) <= request_bytes);
 
-  //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Read %d bytes from stream of length %d samples.", buf1_len + buf2_len, sound_stream->GetSampleCount());
+  //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, 
+    //"Read %zd bytes from stream of length %zd samples.", 
+    //buf1_len + buf2_len, sound_stream->GetSampleCount());
 
   // Update the number of samples to those actually used
   buffer_samples=(buf1_len+buf2_len)/bytes_per_sample;
@@ -206,7 +210,8 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
   */
   if (renderer->render_format.Bits==8)
   {
-    int i, buffer_idx;
+    size_t i;
+    int buffer_idx;
     csSoundSample mix;
     unsigned char *src_ptr;
     size_t second_half_offset=buffer_samples/2;
@@ -270,7 +275,8 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
   else
   {
     // 16 bit samples
-    int i, buffer_idx;
+    size_t i;
+    int buffer_idx;
     csSoundSample mix;
     short *src_ptr;
     size_t second_half_offset=buffer_samples/2;
@@ -554,11 +560,12 @@ void SndSysSourceSoftware3D::SetupFilters()
 }
 
 
-size_t SndSysSourceSoftware3D::MergeIntoBuffer(csSoundSample *channel_buffer, size_t buffer_samples)
+size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer, 
+						size_t buffer_samples)
 {
   void *buf1,*buf2;
-  long buf1_len,buf2_len;
-  long request_bytes;
+  size_t buf1_len,buf2_len;
+  size_t request_bytes;
   int bytes_per_sample;
   size_t per_channel_samples;
 
@@ -600,7 +607,8 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer(csSoundSample *channel_buffer, si
   // Translate samples into bytes for the stream
   bytes_per_sample=renderer->render_format.Bits/8;
   request_bytes=per_channel_samples * bytes_per_sample;
-  sound_stream->GetDataPointers(&stream_position,request_bytes,&buf1,&buf1_len,&buf2,&buf2_len);
+  sound_stream->GetDataPointers (&stream_position,
+    request_bytes, &buf1, &buf1_len, &buf2, &buf2_len);
 
   CS_ASSERT((buf1_len + buf2_len) <= request_bytes);
   //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Read %d bytes from stream of length %d samples.", buf1_len + buf2_len, sound_stream->GetSampleCount());
@@ -630,7 +638,8 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer(csSoundSample *channel_buffer, si
   // Convert the read samples into the clean buffer
   if (renderer->render_format.Bits==8)
   {
-    int i, buffer_idx;
+    size_t i;
+    int buffer_idx;
     csSoundSample mix;
     unsigned char *src_ptr;
 
@@ -670,7 +679,8 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer(csSoundSample *channel_buffer, si
   else
   {
     // 16 bit samples
-    int i, buffer_idx;
+    size_t i;
+    int buffer_idx;
     short *src_ptr;
 
     buffer_idx=0;
@@ -876,7 +886,6 @@ bool SndSysSourceSoftware3D::ProcessSoundChain(int channel, size_t buffer_sample
   filter_props.work_buffer=working_buffer;
   filter_props.speaker_distance=speaker_distance;
   filter_props.speaker_direction_cos=speaker_direction_cos;
-  filter_props.reporter=renderer->reporter;
 
   memcpy(working_buffer, clean_buffer, sizeof(csSoundSample) * buffer_samples);
 

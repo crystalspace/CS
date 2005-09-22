@@ -38,6 +38,7 @@ SCF_IMPLEMENT_IBASE (SndSysWavSoundStream)
   SCF_IMPLEMENTS_INTERFACE (iSndSysStream)
 SCF_IMPLEMENT_IBASE_END
 
+static const size_t positionInvalid = (size_t)~0;
 
 SndSysWavSoundStream::SndSysWavSoundStream (csRef<SndSysWavSoundData> data, 
   char *WavData, size_t WavDataLen, csSndSysSoundFormat *renderformat, 
@@ -100,7 +101,7 @@ SndSysWavSoundStream::SndSysWavSoundStream (csRef<SndSysWavSoundData> data,
   pcm_convert=0;
 
   // No new position 
-  new_position=-1;
+  new_position = positionInvalid;
 
   // Store the 3d mode
   mode_3d=mode3d;
@@ -135,7 +136,7 @@ int SndSysWavSoundStream::Get3dMode()
 }
 
 
-long SndSysWavSoundStream::GetSampleCount()
+size_t SndSysWavSoundStream::GetSampleCount()
 {
   const csSndSysSoundFormat *data_format=sound_data->GetFormat();
 
@@ -147,10 +148,9 @@ long SndSysWavSoundStream::GetSampleCount()
 }
 
 
-long SndSysWavSoundStream::GetPosition()
+size_t SndSysWavSoundStream::GetPosition()
 {
   return most_advanced_read_pointer;
-
 }
 
 bool SndSysWavSoundStream::ResetPosition()
@@ -162,7 +162,7 @@ bool SndSysWavSoundStream::ResetPosition()
   return true;
 }
 
-bool SndSysWavSoundStream::SetPosition(long newposition)
+bool SndSysWavSoundStream::SetPosition (size_t newposition)
 {
   new_position=newposition;
 //  p_cyclicbuffer->Clear(newposition);
@@ -260,7 +260,7 @@ bool SndSysWavSoundStream::GetAutoUnregisterRequested()
 void SndSysWavSoundStream::AdvancePosition(csTicks current_time)
 {
 
-  if (new_position>=0)
+  if (new_position != positionInvalid)
   {
     // Signal a full cyclic buffer flush
     last_time=0;
@@ -270,12 +270,12 @@ void SndSysWavSoundStream::AdvancePosition(csTicks current_time)
     prepared_buffer_start=0;
 
     // Move the wav read position to the requested position
-    if ((size_t)new_position >= wav_bytes_total)
+    if (new_position >= wav_bytes_total)
       new_position=wav_bytes_total-1;
     wav_data=wav_data_start+new_position;
     wav_bytes_left=wav_bytes_total-new_position;
 
-    new_position=-1;
+    new_position = positionInvalid;
     playback_read_complete=false;
   }
   if (paused || playback_read_complete)
@@ -285,7 +285,7 @@ void SndSysWavSoundStream::AdvancePosition(csTicks current_time)
   }
 
 
-  long needed_bytes;
+  size_t needed_bytes;
   long elapsed_ms;
   
   if (last_time==0)
@@ -434,7 +434,7 @@ void SndSysWavSoundStream::AdvancePosition(csTicks current_time)
 }
 
 
-long SndSysWavSoundStream::CopyBufferBytes(long max_dest_bytes)
+size_t SndSysWavSoundStream::CopyBufferBytes (size_t max_dest_bytes)
 {
   if (max_dest_bytes >= prepared_buffer_usage)
   {
@@ -455,12 +455,12 @@ long SndSysWavSoundStream::CopyBufferBytes(long max_dest_bytes)
 
 
 
-void SndSysWavSoundStream::GetDataPointers(long *position_marker,
-					    long max_requested_length,
+void SndSysWavSoundStream::GetDataPointers (size_t* position_marker,
+					    size_t max_requested_length,
 					    void **buffer1,
-					    long *buffer1_length,
+					    size_t *buffer1_length,
 					    void **buffer2,
-					    long *buffer2_length)
+					    size_t *buffer2_length)
 {
   p_cyclicbuffer->GetDataPointersFromPosition (position_marker,
     max_requested_length, (uint8 **)buffer1, buffer1_length, 
@@ -481,7 +481,8 @@ void SndSysWavSoundStream::GetDataPointers(long *position_marker,
     most_advanced_read_pointer=*position_marker;
 }
 
-void SndSysWavSoundStream::InitializeSourcePositionMarker(long *position_marker)
+void SndSysWavSoundStream::InitializeSourcePositionMarker (
+  size_t* position_marker)
 {
   *position_marker=most_advanced_read_pointer;
 }

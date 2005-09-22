@@ -38,8 +38,6 @@ struct iSndSysSoftwareFilter3DProperties
   float *speaker_distance;
   float *speaker_direction_cos;
   size_t channel;
-
-  iReporter *reporter;
 };
 
 SCF_VERSION (iSndSysSoftwareFilter3D, 0, 1, 0);

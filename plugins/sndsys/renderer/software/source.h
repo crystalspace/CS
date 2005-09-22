@@ -156,7 +156,8 @@ protected:
 class SndSysSourceSoftwareFilter_LowPass : public SndSysSourceSoftwareFilter_Base
 {
 public:
-  SndSysSourceSoftwareFilter_LowPass() : SndSysSourceSoftwareFilter_Base(), sum(0), idx(0), primed(false)
+  SndSysSourceSoftwareFilter_LowPass() : SndSysSourceSoftwareFilter_Base(), 
+sum(0), idx(0), primed(false)
   {
     int i;
     for (i=0;i<LOWPASS_SAMPLES;i++)
@@ -750,7 +751,7 @@ protected:
 protected:
   csSndSysRendererSoftware *renderer;
   csRef<iSndSysStream> sound_stream;
-  long stream_position;
+  size_t stream_position;
 
   csSourceParametersBasic active_parameters,queued_parameters;
   bool queued_updates;
@@ -856,7 +857,7 @@ protected:
   csSndSysRendererSoftware *renderer;
 
   csRef<iSndSysStream> sound_stream;
-  long stream_position;
+  size_t stream_position;
 
   csSourceParameters3D active_parameters,queued_parameters;
   bool queued_updates;

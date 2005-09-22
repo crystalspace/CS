@@ -44,34 +44,34 @@ public:
    * Use GetFreeBytes() to check for available space and AdvanceStartValue() 
    * to make more space available.
    */
-  void AddBytes(void *bytes_ptr,size_t bytes_length);
+  void AddBytes(void *bytes_ptr, size_t bytes_length);
 
   /**
    * The positional value associated with the first byte of data in the buffer.
    */
-  long GetStartValue();
+  size_t GetStartValue();
   /**
    * The positional value associated with one byte beyond the last byte in the 
    * buffer.
    */
-  long GetEndValue();
+  size_t GetEndValue();
   /**
    * Advance the first byte pointer of the cyclic buffer so that data below 
    * this value can be overwritten.
    */
-  void AdvanceStartValue(long advance_amount);
+  void AdvanceStartValue (size_t advance_amount);
 
   /** 
    * Clear the buffer and reset the start and end values to the provided value.
    */
-  void Clear(long value=0);
+  void Clear (long value=0);
 
   /**
    * Get data pointers to copy data out of the cyclic buffer.
    */
-  void GetDataPointersFromPosition(long *position_value, long max_length, 
-    uint8 **buffer1, long *buffer1_length, uint8 **buffer2, 
-    long *buffer2_length);
+  void GetDataPointersFromPosition (size_t* position_value, size_t max_length, 
+    uint8 **buffer1, size_t* buffer1_length, uint8 **buffer2, 
+    size_t* buffer2_length);
 
   /**
    * Get the buffer length of the cyclic buffer in bytes.
@@ -81,17 +81,23 @@ public:
 private:
   /// Length of the buffer in bytes
   size_t length;
+  //@{
   /** 
    * Values associated with the start and end of the buffer.  
    * end_value - start_value = size of valid data in buffer.
    */
-  long start_value,end_value;
+  size_t start_value;
+  size_t end_value;
+  //@}
 
+  //@{
   /**
    * Pointers to the base of the buffer and the write pointer into the buffer 
    * respectively.
    */
-  uint8 *buffer_base,*write_ptr;
+  uint8 *buffer_base;
+  uint8 *write_ptr;
+  //@}
 };
 
 } // namespace CrystalSpace

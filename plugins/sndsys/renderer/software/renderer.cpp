@@ -64,15 +64,9 @@ SCF_IMPLEMENT_IBASE (csSndSysRendererSoftware::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-// The system driver.
-iObjectRegistry *csSndSysRendererSoftware::object_reg=0;
-
-// The loaded CS reporter
-csRef<iReporter> csSndSysRendererSoftware::reporter;
-
-
 csSndSysRendererSoftware::csSndSysRendererSoftware(iBase* piBase) :
-  sample_buffer(0), sample_buffer_samples(0), last_intensity_multiplier(0)
+  object_reg(0), sample_buffer(0), sample_buffer_samples(0), 
+  last_intensity_multiplier(0)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -106,20 +100,10 @@ void csSndSysRendererSoftware::Report(int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-
-  if (!reporter)
-    reporter = CS_QUERY_REGISTRY(object_reg, iReporter);
-
-  if (reporter)
-    reporter->ReportV (severity, "crystalspace.SndSys.renderer.software", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, severity, 
+    "crystalspace.sndsys.renderer.software", msg, arg);
   va_end (arg);
 }
-
 
 bool csSndSysRendererSoftware::HandleEvent (iEvent &e)
 {
@@ -334,8 +318,8 @@ csRef<iSndSysListener> csSndSysRendererSoftware::GetListener()
   return Listener;
 }
 
-uint32 csSndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,
-						void *buf2, uint32 buf2_len)
+size_t csSndSysRendererSoftware::FillDriverBuffer(void *buf1, size_t buf1_len,
+						  void *buf2, size_t buf2_len)
 {
   csTicks current_ticks;
 
@@ -350,9 +334,9 @@ uint32 csSndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,
   current_ticks=csGetTicks();
 
   // Resize the samplebuffer if needed
-  long needed_samples = CalculateMaxSamples (buf1_len+buf2_len);
+  size_t needed_samples = CalculateMaxSamples (buf1_len+buf2_len);
 
-  if ((sample_buffer==0) || (needed_samples > (long)sample_buffer_samples))
+  if ((sample_buffer==0) || (needed_samples > sample_buffer_samples))
   {
     delete[] sample_buffer;
     sample_buffer=new csSoundSample[needed_samples];
@@ -374,12 +358,12 @@ uint32 csSndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,
     if ((str->GetPauseState() == CS_SNDSYS_STREAM_PAUSED) 
       && (str->GetAutoUnregisterRequested() == true))
     {
-      int currentsource,maxsource;
-      maxsource=sources.GetSize();
-      for (currentsource=0;currentsource<maxsource;currentsource++)
+      size_t currentsource, maxsource;
+      maxsource = sources.GetSize();
+      for (currentsource = 0; currentsource < maxsource; currentsource++)
       {
         if (sources.Get(currentsource)->GetStream() == str)
-          source_remove_queue.QueueEntry(sources.Get(currentsource));
+          source_remove_queue.QueueEntry (sources.Get(currentsource));
       }
       stream_remove_queue.QueueEntry(str);
     }
@@ -392,12 +376,12 @@ uint32 csSndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,
   maxidx=sources.GetSize();
   for (currentidx=0;currentidx<maxidx;currentidx++)
   {
-    long provided_samples;
+    size_t provided_samples;
     //Report (CS_REPORTER_SEVERITY_DEBUG, 
       //"Sound System: Requesting %d samples from source.", needed_samples);
 
     // The return from this function is this number of samples actually available 
-    provided_samples = sources.Get(currentidx)->MergeIntoBuffer(sample_buffer,
+    provided_samples = sources.Get(currentidx)->MergeIntoBuffer (sample_buffer,
       needed_samples);
 
     if (provided_samples==0)
@@ -420,7 +404,7 @@ uint32 csSndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,
   CalculateMaxBuffers(needed_samples,&buf1_len,&buf2_len);
 
   // Copy normalized data to the driver
-  CopySampleBufferToDriverBuffer(buf1,buf1_len,buf2,buf2_len, needed_samples/2);
+  CopySampleBufferToDriverBuffer (buf1,buf1_len,buf2,buf2_len, needed_samples/2);
 
   //csTicks end_ticks=csGetTicks();
 //  Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Processing time: %u ticks.", end_ticks-current_ticks);
@@ -430,9 +414,9 @@ uint32 csSndSysRendererSoftware::FillDriverBuffer(void *buf1, uint32 buf1_len,
 }
 
 
-uint32 csSndSysRendererSoftware::CalculateMaxSamples(size_t bytes)
+size_t csSndSysRendererSoftware::CalculateMaxSamples(size_t bytes)
 {
-  uint32 samples;
+  size_t samples;
   
   // Divide the bytes available by the number of bytes per sample
   samples=bytes / (render_format.Bits/8);
@@ -440,9 +424,11 @@ uint32 csSndSysRendererSoftware::CalculateMaxSamples(size_t bytes)
   return samples;
 }
 
-void csSndSysRendererSoftware::CalculateMaxBuffers(size_t samples, uint32 *buf1_len, uint32 *buf2_len)
+void csSndSysRendererSoftware::CalculateMaxBuffers(size_t samples, 
+						   size_t *buf1_len, 
+						   size_t *buf2_len)
 {
-  uint32 bytes;
+  size_t bytes;
 
   bytes=samples * (render_format.Bits/8);
 
@@ -565,7 +551,11 @@ void csSndSysRendererSoftware::NormalizeSampleBuffer(size_t used_samples)
 }
 
 
-void csSndSysRendererSoftware::CopySampleBufferToDriverBuffer(void *drvbuf1,size_t drvbuf1_len,void *drvbuf2, size_t drvbuf2_len, uint32 samples_per_channel)
+void csSndSysRendererSoftware::CopySampleBufferToDriverBuffer (void *drvbuf1,
+							       size_t drvbuf1_len,
+							       void *drvbuf2, 
+							       size_t drvbuf2_len, 
+							       size_t samples_per_channel)
 {
   csSoundSample *ptr=sample_buffer;
 
@@ -579,7 +569,7 @@ void csSndSysRendererSoftware::CopySampleBufferToDriverBuffer(void *drvbuf1,size
 
 csSoundSample *csSndSysRendererSoftware::CopySampleBufferToDriverBuffer (
   void *drvbuf, size_t drvbuf_len, csSoundSample *src, 
-  uint32 samples_per_channel)
+  size_t samples_per_channel)
 {
   if (render_format.Bits==8)
   {

@@ -57,9 +57,9 @@ static int cs_ogg_seek (void *datasource, ogg_int64_t offset, int whence)
   if (whence == SEEK_SET)
     np = offset;
   else if (whence == SEEK_CUR)
-    np = streamdata->position + offset;
+    np = (size_t)(streamdata->position + offset);
   else if (whence == SEEK_END)
-    np = ds->length + offset;
+    np = (size_t)(ds->length + offset);
   else
     return -1;
 
@@ -80,7 +80,7 @@ static int cs_ogg_close (void *)
 static long cs_ogg_tell (void *datasource)
 {
   OggStreamData *streamdata = (OggStreamData *)datasource;
-  return streamdata->position;
+  return (long)streamdata->position;
 }
 
 cs_ov_callbacks::cs_ov_callbacks ()
@@ -127,16 +127,16 @@ const csSndSysSoundFormat *SndSysOggSoundData::GetFormat()
   return &fmt;
 }
 
-long SndSysOggSoundData::GetSampleCount()
+size_t SndSysOggSoundData::GetSampleCount()
 {
   if (!data_ready)
     Initialize();
   return sample_count;
 }
 
-long SndSysOggSoundData::GetDataSize()
+size_t SndSysOggSoundData::GetDataSize()
 {
-  return (long)(ds->length & 0x7FFFFFFF);
+  return ds->length;
 }
 
 iSndSysStream *SndSysOggSoundData::CreateStream (

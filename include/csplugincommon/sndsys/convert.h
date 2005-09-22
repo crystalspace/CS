@@ -131,7 +131,7 @@ public:
    * @param dest_bitspersample
    * @param dest_frequency
    */
-  int ConvertBuffer(const void *source, int source_len, void *dest, 
+  int ConvertBuffer(const void *source, size_t source_len, void *dest, 
     int dest_channels, int dest_bitspersample, int dest_frequency);
 
   /** 
@@ -152,13 +152,18 @@ public:
     int source_frequency);
 
 protected:
-  bool ReadFullSample8(const void **source, int *source_len, int *sample_buffer);
-  bool ReadFullSample16(const void **source, int *source_len, int *sample_buffer);
-  bool ReadFullSample(const void **source, int *source_len, int *sample_buffer);
+  bool ReadFullSample8(const void **source, size_t *source_len, 
+    int *sample_buffer);
+  bool ReadFullSample16(const void **source, size_t *source_len, 
+    int *sample_buffer);
+  bool ReadFullSample(const void **source, size_t  *source_len, 
+    int *sample_buffer);
   int WriteSample8(int *sample_buffer, void **dest, int dest_channels);
   int WriteSample16(int *sample_buffer, void **dest, int dest_channels);
-  int WriteSample(int *sample_buffer, void **dest, int dest_channels, int dest_bitspersample);
-  int AdvanceSourceSamples(const void **source, int *source_len, int samples_to_advance, int *sample_buffer);
+  int WriteSample(int *sample_buffer, void **dest, int dest_channels, 
+    int dest_bitspersample);
+  size_t AdvanceSourceSamples(const void **source, size_t *source_len, 
+    size_t samples_to_advance, int *sample_buffer);
 
 protected:
   int last_sample[CS_SOUND_ELEMENT_MAX_CHANNELS];

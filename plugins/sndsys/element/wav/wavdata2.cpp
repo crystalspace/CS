@@ -154,16 +154,16 @@ const csSndSysSoundFormat *SndSysWavSoundData::GetFormat()
   return &fmt;
 }
 
-long SndSysWavSoundData::GetSampleCount()
+size_t SndSysWavSoundData::GetSampleCount()
 {
   if (!data_ready)
     Initialize();
   return sample_count;
 }
 
-long SndSysWavSoundData::GetDataSize()
+size_t SndSysWavSoundData::GetDataSize()
 {
-  return (long)(wavedata_len & 0x7FFFFFFF);
+  return wavedata_len;
 }
 
 iSndSysStream *SndSysWavSoundData::CreateStream (

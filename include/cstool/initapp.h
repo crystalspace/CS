@@ -267,14 +267,15 @@ public:
    * call this routine using a 0 parameter. If you don't call this then
    * either RequestPlugins() or Initialize() will call this routine with
    * 0 parameter. The 'ApplicationID' parameter is used to determine the
-   * correct user-specific domain. It is possibly overriden by the application
-   * config file option "System.ApplicationID".
+   * correct user-specific domain; if 0, the return value of GetDefaultAppID()
+   * is used. It is possibly overriden by the application config file option 
+   * "System.ApplicationID".
    *
    * This method will load the VFS plugin if not already present in the given
    * object registry.
    */
   static bool SetupConfigManager (iObjectRegistry*, const char* configName,
-    const char *ApplicationID = "CrystalSpace.Noname");
+    const char *ApplicationID = 0);
 
   /**
    * Find or load the VFS plugin, add it to the given object registry, and
@@ -402,6 +403,14 @@ public:
    * application.)
    */
   static void DestroyApplication (iObjectRegistry*);
+  
+  /**
+   * The default application string name; computed from the executable name
+   * as passed in argv[0] to CreateEnvironment(). If the latter was not called
+   * or argv[0] did not contain a sensible name, a default string is used.
+   */
+  static const char* GetDefaultAppID();
+protected:
 };
 
 /** @} */

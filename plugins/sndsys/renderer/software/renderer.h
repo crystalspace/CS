@@ -117,13 +117,11 @@ public:
   void Report (int severity, const char* msg, ...);
 
   /// Called by the driver thread to request sound data
-  virtual uint32 FillDriverBuffer(void *buf1, uint32 buf1_len,void *buf2, uint32 buf2_len);
+  virtual size_t FillDriverBuffer(void *buf1, size_t buf1_len,
+    void *buf2, size_t buf2_len);
 
-  // The system driver.
-  static iObjectRegistry *object_reg;
-
-  // The loaded CS reporter
-  static csRef<iReporter> reporter;
+  // The object registry
+  iObjectRegistry *object_reg;
 
   // the global listener object
   csRef<SndSysListenerSoftware> Listener;
@@ -162,16 +160,16 @@ protected:
   uint32 last_intensity_multiplier;
 
 protected:
-  uint32 CalculateMaxSamples(size_t bytes);
-  void CalculateMaxBuffers(size_t samples, uint32 *buf1_len, uint32 *buf2_len);
+  size_t CalculateMaxSamples(size_t bytes);
+  void CalculateMaxBuffers(size_t samples, size_t *buf1_len, size_t *buf2_len);
   void ProcessPendingSources();
   void ProcessPendingStreams();
   void NormalizeSampleBuffer(size_t used_samples);
   void CopySampleBufferToDriverBuffer(void *drvbuf1,size_t drvbuf1_len,
-    void *drvbuf2, size_t drvbuf2_len, uint32 samples_per_channel);
+    void *drvbuf2, size_t drvbuf2_len, size_t samples_per_channel);
   /// This copies to a single buffer, called up to twice
   csSoundSample *CopySampleBufferToDriverBuffer(void *drvbuf, 
-    size_t drvbuf_len, csSoundSample *src, uint32 samples_per_channel);
+    size_t drvbuf_len, csSoundSample *src, size_t samples_per_channel);
   
 public:
   ////

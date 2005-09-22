@@ -27,7 +27,7 @@
 // Static 
 iObjectRegistry* csApplicationFramework::object_reg = 0;
 csApplicationFramework* csApplicationFramework::m_Ptr = 0;
-char* csApplicationFramework::m_ApplicationStringName = "user app";
+char* csApplicationFramework::m_ApplicationStringName = 0;
 const char* csApplicationFramework::m_FoundationStringName =
   "crystalspace.libcsappframe";
 
@@ -60,7 +60,7 @@ csApplicationFramework::~csApplicationFramework ()
   object_reg = 0;
   m_Ptr = 0;
   // reset static vars
-  m_ApplicationStringName = "user app";
+  m_ApplicationStringName = 0;
   m_FoundationStringName = "crystalspace.libcsappframe";
 }
 

@@ -42,7 +42,7 @@ struct iSndSysData : public iBase
   virtual const csSndSysSoundFormat *GetFormat() = 0;
 
   /// Get size of this sound in samples.
-  virtual long GetSampleCount() = 0;
+  virtual size_t GetSampleCount() = 0;
 
   /**
    * Return the size of the data stored in bytes.  This is informational only
@@ -52,7 +52,7 @@ struct iSndSysData : public iBase
    * SAMPLE_COUNT * SAMPLE_SIZE since SAMPLE_SIZE may vary throughout the
    * audio data.
    */
-  virtual long GetDataSize() = 0;
+  virtual size_t GetDataSize() = 0;
 
   /**
    * This function should be called from the Renderer where a proper 

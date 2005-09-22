@@ -245,6 +245,19 @@ protected:
    * support.
    */
   virtual void OnExit ();
+
+  /**
+   * Setup the config manager.
+   * This does exactly the same as csInitializer::SetupConfigManager(), with 
+   * the difference that the \a ApplicationID parameter defaults to the value
+   * returned by GetApplicationName().
+   */
+  static bool SetupConfigManager (iObjectRegistry* object_reg, 
+    const char* configName)
+  { 
+    return csInitializer::SetupConfigManager (object_reg, configName, 
+      GetApplicationName());
+  }
 public:
   // Inline Helper Functions
   /**
@@ -295,7 +308,8 @@ public:
    */
   static const char* GetApplicationName ()
   {
-    return m_ApplicationStringName;
+    return m_ApplicationStringName ? m_ApplicationStringName : 
+      GetDefaultAppID();
   }
 
   /**
@@ -346,7 +360,7 @@ public:
     va_list args;
     va_start (args, description);
     csReportV (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      m_ApplicationStringName,
+      GetApplicationName(),
       description, args);
     va_end (args);
     return false;
@@ -364,7 +378,7 @@ public:
     va_list args;
     va_start (args, description);
     csReportV (object_reg, CS_REPORTER_SEVERITY_WARNING,
-      m_ApplicationStringName,
+      GetApplicationName(),
       description, args);
     va_end (args);
   }
@@ -381,7 +395,7 @@ public:
     va_list args;
     va_start (args, description);
     csReportV (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-      m_ApplicationStringName,
+      GetApplicationName(),
       description, args);
     va_end (args);
   }
