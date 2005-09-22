@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
-<!-- bugplug.csplugin -->
+<!-- sndmanager.csplugin -->
 <plugin>
   <scf>
     <classes>
       <class>
-        <name>crystalspace.utilities.bugplug</name>
-        <implementation>csBugPlug</implementation>
-        <description>Debugging utility</description>
+        <name>crystalspace.sndsys.manager</name>
+        <implementation>csSndSysManager</implementation>
+        <description>Sound Manager</description>
       </class>
     </classes>
   </scf>
