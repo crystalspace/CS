@@ -14,6 +14,7 @@ chronological order.
 	  this was done by making the sounds children of the engine object
 	  but this is a bit clumsy and there was also no proper region support.
 	  This is all work in progress.
+	- Jorrit added support for the new sound wrappers in regions.
 21-Sep-2005
 	- res fixed a few warnings in the new sndsys stuff, did some 
 	  reformatting to better follow the CS coding guidelines (reading

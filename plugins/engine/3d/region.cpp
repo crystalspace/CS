@@ -32,6 +32,7 @@
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
 #include "ivaria/engseq.h"
+#include "isndsys/ss_manager.h"
 
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csRegion)
@@ -79,6 +80,25 @@ void csRegion::DeleteAll ()
   // is important. i.e. we should first delete all meshes and things
   // and only then delete the sectors.
   size_t i;
+
+  for (i = 0; i < copy.Length (); i++)
+  {
+    if (copy[i])
+    {
+      iObject *obj = copy[i];
+      csRef<iSndSysWrapper> o = SCF_QUERY_INTERFACE (obj, iSndSysWrapper);
+      if (!o) continue;
+
+      if (!snd_manager)
+      {
+	snd_manager = CS_QUERY_REGISTRY (
+  	  csEngine::currentEngine->objectRegistry, iSndSysManager);
+      }
+      if (snd_manager) snd_manager->RemoveSound (o);
+      ObjRemove (obj);
+      copy[i] = 0;
+    }
+  }
 
   for (i = 0; i < copy.Length (); i++)
   {

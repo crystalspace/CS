@@ -22,6 +22,7 @@
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "iengine/region.h"
+#include "isndsys/ss_manager.h"
 
 class csEngine;
 
@@ -33,6 +34,7 @@ class csRegion : public csObject
 {
 private:
   csEngine* engine;
+  csRef<iSndSysManager> snd_manager;
 
 public:
   /**
