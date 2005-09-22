@@ -26,7 +26,7 @@
 /**\addtogroup util
  * @{ */
 
-#include <cssysdef.h>
+#include "cssysdef.h"
 
 #if !defined(CS_WCHAR_T_SIZE)
 #  error Unknown wchar_t size.
