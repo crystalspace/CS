@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Sep-2005
+	- Jorrit started working on better integration of the new sound
+	  stuff into CS. First the loader now also optionally loads the new
+	  sound loaders. Secondly there is a new sound manager which will
+	  be responsible for keeping track of the sounds. In the old system
+	  this was done by making the sounds children of the engine object
+	  but this is a bit clumsy and there was also no proper region support.
+	  This is all work in progress.
 21-Sep-2005
 	- res fixed a few warnings in the new sndsys stuff, did some 
 	  reformatting to better follow the CS coding guidelines (reading

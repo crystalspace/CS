@@ -1,0 +1,9 @@
+SubDir TOP plugins sndsys manager ;
+
+Plugin sndmanager :
+	[ Wildcard *.cpp *.h ]
+;
+Description sndmanager : "Sound manager for sndsys" ;
+LinkWith sndmanager : crystalspace ;
+CompileGroups sndmanager : sndsys ;
+

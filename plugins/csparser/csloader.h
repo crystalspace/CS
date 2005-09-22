@@ -47,6 +47,7 @@ struct iImageIO;
 struct iRegion;
 struct iObjectModel;
 struct iSoundLoader;
+struct iSndSysLoader;
 struct iEngine;
 struct iVFS;
 struct iGraphics3D;
@@ -526,6 +527,8 @@ public:
   csRef<iImageIO> ImageLoader;
   // sound loader
   csRef<iSoundLoader> SoundLoader;
+  // sound loader
+  csRef<iSndSysLoader> SndSysLoader;
   // engine
   csRef<iEngine> Engine;
   // graphics renderer

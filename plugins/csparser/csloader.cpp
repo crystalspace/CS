@@ -61,6 +61,7 @@
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "igraphic/imageio.h"
+#include "isndsys/ss_loader.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
 #include "iutil/vfs.h"
@@ -1036,6 +1037,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   // Get all optional plugins.
   GET_PLUGIN (ImageLoader, iImageIO, "image loader");
   GET_PLUGIN (SoundLoader, iSoundLoader, "sound loader");
+  GET_PLUGIN (SndSysLoader, iSndSysLoader, "sound loader (v2)");
   GET_PLUGIN (Engine, iEngine, "engine");
   GET_PLUGIN (G3D, iGraphics3D, "video driver");
   GET_PLUGIN (SoundRender, iSoundRender, "sound driver");
