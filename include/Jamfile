@@ -158,6 +158,7 @@ CS_MASTER_HEADERS =
       imap
       imesh
       inetwork
+      isndsys
       isound
       itexture
       iutil
