@@ -20,6 +20,7 @@
 #define __CS_SNDSYS_FILTER_H__
 
 #include "csutil/scf.h"
+#include "isndsys/ss_structs.h"
 
 class csSourceParameters3D;
 class csListenerProperties;

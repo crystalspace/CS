@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 
-
+struct csSndSysSoundFormat;
 struct iSndSysStream;
 
 SCF_VERSION (iSndSysData, 0, 1, 0);
@@ -68,4 +68,3 @@ struct iSndSysData : public iBase
 };
 
 #endif // __CS_SNDSYS_DATA_H__
-
