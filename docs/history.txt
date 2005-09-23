@@ -32,8 +32,6 @@ chronological order.
 	  be notified when a light is visible. To enable this you need to call
 	  iSector->SetLightCulling(true). Note that this is completely and
 	  utterly untested!
-	- Jorrit added a few functions to iLoader to support the new sound
-	  system.
 	- Eric Sunshine fixed numerous Texinfo mark-up problems in the new
 	  cegui.txi.
 	- res fixed some CEGUI blurriness; in screen space mode, 
@@ -42,6 +40,12 @@ chronological order.
 	  made it use the iKeyComposer for character input.
 	- res tweaked the CEGUI texture parameters a bit. 
 	- res improved PAD key handling in the Win32 composer.
+	- Jorrit added a few functions to iLoader to support the new sound
+	  system.
+	- res made the SCF implementation class generation macro magic header
+	  being filtered by the C++ preprocessor. This way, scfImplementationN
+	  and scfImplementationExtN are now documented, and implementation
+	  classes utilizing those helpers show unherited documentation again.
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
 	  stuff into CS. First the loader now also optionally loads the new

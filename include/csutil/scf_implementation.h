@@ -33,12 +33,38 @@
 
 /**\file
  * Crystal Space Shared Class Facility (SCF) - implementation creation 
- * support
+ * support.
  */
 
 /**
  * \addtogroup scf
  * @{ */
+ 
+/**\page SCFExamples Some examples
+ * \code
+ * struct iFoo : virtual public iBase {
+ *   SCF_INTERFACE(iFoo,0,0,1);
+ * };
+ * 
+ * struct iBar : virtual public iBase {
+ *   SCF_INTERFACE(iFoo,0,0,1);
+ * };
+ * 
+ * class Foo : public scfImplementation1<Foo,iFoo>
+ * {
+ * public:
+ *   Foo() : scfImplementationType(this) {}
+ *   Foo(int, int) : scfImplementationType(0,0) {}
+ * };
+ * 
+ * class Bar : public scfImplementationExt1<Bar,Foo,iBar>
+ * {
+ * public:
+ *   Bar() : scfImplementationType(0) {}
+ *   Bar(int x, int y) : scfImplementationType(0,x,y) {}
+ * };
+ * \endcode
+*/
 
 /**
  * Baseclass for the SCF implementation templates.
@@ -66,9 +92,6 @@ public:
     scfRemoveRefOwners ();
   }
 
-  /**
-   * Decrease reference count, and when it runs out delete the object 
-   */
   void DecRef ()
   {
     scfRefCount--;
@@ -80,17 +103,11 @@ public:
     }
   }
 
-  /**
-   * Increase reference count. 
-   */
   void IncRef ()
   {
     scfRefCount++;
   }
 
-  /**
-   * Get the reference count. Just for debugging. 
-   */
   int GetRefCount ()
   {
     return scfRefCount;
@@ -136,9 +153,6 @@ protected:
     scfWeakRefOwners = 0;
   }
 
-  /**
-   * Query this implementation for a specific interface 
-   */
   void *QueryInterface (scfInterfaceID iInterfaceID,
                         scfInterfaceVersion iVersion)
   {
@@ -220,131 +234,13 @@ public:
   };
 };
 
+/* Here the magic happens: generate scfImplementationN and 
+ * scfImplementationExtN classed */
 #define SCF_IN_IMPLEMENTATION_H 1
-// Instead of duplicating the code for every scfImplementationN and
-// scfImplementationExtN, the code is factored out into an include file
-// that we include multiple times.
-#define SCF_IMPL_N 0
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 1
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 2
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 3
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 4
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 5
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 6
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-/*
-#define SCF_IMPL_N 7
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 8
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 9
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 10
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-*/
-// Now all the scfImplementationExt are defined
-#define SCF_IMPL_EXT
-
-#define SCF_IMPL_N 0
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 1
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 2
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 3
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 4
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 5
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-/*
-#define SCF_IMPL_N 6
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 7
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 8
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 9
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-
-#define SCF_IMPL_N 10
-#include "scf_impl.h"
-#undef SCF_IMPL_N
-*/
-#undef SCF_IMPL_EXT
+// Generation is in separate file mostly for documentation generation purposes.
+#include "scf_implgen.h"
 #undef SCF_IN_IMPLEMENTATION_H
 
 /** @} */
 
-
-
-/* Some examples:
-struct iFoo : virtual public iBase {
-  SCF_INTERFACE(iFoo,0,0,1);
-};
-
-struct iBar : virtual public iBase {
-  SCF_INTERFACE(iFoo,0,0,1);
-};
-
-class Foo : public scfImplementation1<Foo,iFoo>
-{
-public:
-  Foo() : scfImplementationType(this) {}
-  Foo(int, int) : scfImplementationType(0,0) {}
-};
-
-class Bar : public scfImplementationExt1<Bar,Foo,iBar>
-{
-public:
-  Bar() : scfImplementationType(0) {}
-  Bar(int x, int y) : scfImplementationType(0,x,y) {}
-};
-*/
-
 #endif
-

@@ -261,6 +261,45 @@ actions RepairNodes
 
 if $(CMD.DOXYGEN)
 {
+
+actions WriteCppWrapper
+{
+  echo "$(DOXYCPP_COMMAND)" > "$(1)"
+}
+
+rule GenerateDoxygenCppWrapper
+{
+  local target = $(1) ;
+  local cxxcpp = $(2) ;
+  
+  local outfile cmdpath command ;
+  if $(TARGET.OS) = WIN32
+  {
+    # On Win32, MSYS is not used but the "native" process running, so we can't
+    # launch the preprocessor with sh.
+    outfile = "cpp.cmd" ;
+    local p = [ SplitToList $(LOCATE.DOCS) : "/" ] $(outfile) ;
+    cmdpath = $(p:J=\\\\) ;
+    command = "$(cxxcpp)" %1 ;
+  }
+  else
+  {
+    outfile = "cpp.sh" ;
+    local p = $(LOCATE.DOCS) $(outfile) ;
+    cmdpath = $(p:J=/) ;
+    command = "$(cxxcpp)" $1 ;
+  }
+  MakeLocate $(outfile) : $(LOCATE.DOCS) ;
+  DOXYCPP_COMMAND on $(outfile) = $(command) ;
+  WriteCppWrapper $(outfile) ;
+    
+  Always $(outfile) ;
+  Depends $(target) : $(outfile) ;
+  Clean $(target)clean : $(outfile) ;
+  
+  return $(cmdpath) ;
+}
+
 ##  Doxygen targetname : doxyprofile-and-resources [ : subdir [ : outfile
 ##          [ : options ]]]
 ##    Invoke the Doxygen utility to generate API documentation based upon
@@ -308,8 +347,16 @@ rule Doxygen
     Clean $(target)clean : $(dst) ;
   }
 
+  local doxycpp ;
+  if $(CMD.C++CPP)
+  {
+    doxycpp = [ GenerateDoxygenCppWrapper $(outfile) : 
+      $(CMD.C++CPP) [ FDefines DOXYGEN_RUN ] ] ;
+  }
+
   SEARCH on $(doxyfile) = $(SUBDIR) ;
-  OPTIONS on $(outfile) = $(options) ;
+  OPTIONS on $(target) = $(options) ;
+  DOXYCPP on $(target) = $(doxycpp) ;
   MakeLocate $(outfile) : $(outdir) ;
   Depends $(outfile) : $(doxyfile) ;
   Depends $(target) : $(outfile) ;
@@ -605,7 +652,7 @@ actions RunDVIPDF
 
 actions RunDoxygen
 {
-  TOP=$(TOP) $(CMD.DOXYGEN) $(OPTIONS) $(FLAGS.DOXYGEN) $(>)
+  TOP=$(TOP) DOXYCPP=$(DOXYCPP) $(CMD.DOXYGEN) $(OPTIONS) $(FLAGS.DOXYGEN) $(>)
 }
 
 #----------------------------------------------------------------------------

@@ -326,13 +326,17 @@ EXCLUDE                =
 # certain files from those directories. 
 
 EXCLUDE_PATTERNS       = \
+	*/include/csutil/scf_impl.h \
 	*/include/csutil/win32/AL/* \
 	*/include/csutil/win32/Cg/* \
+	*/include/csutil/win32/CEGUI* \
 	*/include/csutil/win32/cal3d/* \
 	*/include/csutil/win32/d3* \
 	*/include/csutil/win32/ddraw.h \
 	*/include/csutil/win32/dinput.h \
 	*/include/csutil/win32/dsound.h \
+	*/include/csutil/win32/elements/* \
+	*/include/csutil/win32/falagard/* \
 	*/include/csutil/win32/freetype/* \
 	*/include/csutil/win32/ft2build.h \
 	*/include/csutil/win32/j* \
@@ -372,6 +376,15 @@ IMAGE_PATH             =
 # to standard output. 
 
 INPUT_FILTER           = 
+
+# The FILTER_PATTERNS tag can be used to specify filters on a per file pattern 
+# basis. Doxygen will compare the file name with each pattern and apply the 
+# filter if there is a match. The filters are a list of the form: 
+# pattern=filter (like *.cpp=my_cpp_filter). See INPUT_FILTER for further info 
+# on how filters are used. If FILTER_PATTERNS is empty, INPUT_FILTER is 
+# applied to all files.
+
+FILTER_PATTERNS        = "*/include/csutil/scf_implgen.h=$(DOXYCPP)"
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using 
 # INPUT_FILTER) will be used to filter the input files when producing source 
@@ -639,21 +652,21 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = DOXYGEN_RUN \
 			 CS_COMPILER_GCC \
-			 CS_HAVE_INT64_C \
-			 "CS_GNUC_PRINTF(a,b)=" \
-			 "CS_GNUC_SCANF(a,b)=" \
-			 CS_IEEE_DOUBLE_FORMAT \
-			 CS_HAVE_MEMORY_MAPPED_IO \
-			 "CS_STRUCT_ALIGN_4BYTE_BEGIN=" \
-			 "CS_STRUCT_ALIGN_4BYTE_END=" \
+			 "CS_CONST_METHOD=" \
+			 "CS_CRYSTALSPACE_EXPORT=" \
 			 "CS_DEPRECATED_METHOD=" \
 			 "CS_DEPRECATED_TYPE=" \
-			 "CS_PURE_METHOD=" \
-			 "CS_CONST_METHOD=" \
-			 CS_USE_FAKE_WCHAR_TYPE \
 			 "CS_EXPORT_SYM=" \
+			 "CS_FORCEINLINE=" \
+			 "CS_GNUC_PRINTF(a,b)=" \
+			 "CS_GNUC_SCANF(a,b)=" \
+			 CS_HAVE_INT64_C \
+			 CS_IEEE_DOUBLE_FORMAT \
 			 "CS_IMPORT_SYM=" \
-			 "CS_CRYSTALSPACE_EXPORT=" \
+			 "CS_PURE_METHOD=" \
+			 "CS_STRUCT_ALIGN_4BYTE_BEGIN=" \
+			 "CS_STRUCT_ALIGN_4BYTE_END=" \
+			 CS_USE_FAKE_WCHAR_TYPE \
 			 "SCF_VERSION(a,b,c,d)=" \
 			 "csArrayTemplate(K)=template <class K>" \
 			 "csArrayCmpDecl(T1,T2)=csArrayCmp<T1,T2>" \

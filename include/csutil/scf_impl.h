@@ -17,15 +17,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**
+/*
  * This header is intended to be included from scf_new.h multiple times.
  * Each time either an scfImplementationN or an scfImplementationExtN class
  * will be declared depending on the value of SCF_IMPL_N and whether
  * SCF_IMPL_EXT is defined.
  */
 
-#ifndef SCF_IN_IMPLEMENTATION_H
-#error Do not include this file directly. Included from scf_implementation.h
+#ifndef SCF_IN_IMPLGEN_H
+#error Do not include this file directly. Included from scf_implgen.h
 #endif
 
 #ifndef SCF_IMPL_EXT
