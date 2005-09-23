@@ -195,7 +195,7 @@ bool SndSysDriverOSS::Open (csSndSysRendererSoftware*renderer,
   }
 
   // Copy the final format into local storage
-  memcpy(&playback_format, requested_format, sizeof(SndSysSoundFormat));
+  memcpy(&playback_format, requested_format, sizeof(csSndSysSoundFormat));
 
 
   // Setup a playback buffer
