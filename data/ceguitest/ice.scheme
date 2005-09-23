@@ -13,6 +13,7 @@
 	<FalagardMapping WindowType="ice/FrameWindow" TargetType="Falagard/FrameWindow" LookNFeel="ice/FrameWindow" />
 	<FalagardMapping WindowType="ice/HorizontalScrollbar" TargetType="Falagard/Scrollbar" LookNFeel="ice/HorizontalScrollbar" />
 	<FalagardMapping WindowType="ice/HorizontalScrollbarThumb" TargetType="Falagard/Thumb" LookNFeel="ice/HorizontalScrollbarThumb" />
+    <FalagardMapping WindowType="ice/ImageButton" TargetType="Falagard/Button" LookNFeel="ice/ImageButton" />
 	<FalagardMapping WindowType="ice/LargeVerticalScrollbar" TargetType="Falagard/Scrollbar" LookNFeel="ice/LargeVerticalScrollbar" />
 	<FalagardMapping WindowType="ice/LargeVerticalScrollbarThumb" TargetType="Falagard/Thumb" LookNFeel="ice/LargeVerticalScrollbarThumb" />
 	<FalagardMapping WindowType="ice/ListHeader" TargetType="Falagard/ListHeader" LookNFeel="ice/ListHeader" />
@@ -31,7 +32,7 @@
 	<FalagardMapping WindowType="ice/Spinner" TargetType="Falagard/Spinner" LookNFeel="ice/Spinner" />
 	<FalagardMapping WindowType="ice/StaticImage" TargetType="Falagard/StaticImage" LookNFeel="ice/StaticImage" />
 	<FalagardMapping WindowType="ice/StaticText" TargetType="Falagard/StaticText" LookNFeel="ice/StaticText" />
-	<FalagardMapping WindowType="ice/SystemButton" TargetType="Falagard/SystemButton" LookNFeel="ice/Button" />
+	<FalagardMapping WindowType="ice/SystemButton" TargetType="Falagard/SystemButton" LookNFeel="ice/ImageButton" />
 	<FalagardMapping WindowType="ice/TabButton" TargetType="Falagard/TabButton" LookNFeel="ice/TabButton" />
 	<FalagardMapping WindowType="ice/TabControl" TargetType="Falagard/TabControl" LookNFeel="ice/TabControl" />
 	<FalagardMapping WindowType="ice/TabPane" TargetType="Falagard/TabPane" LookNFeel="ice/TabPane" />

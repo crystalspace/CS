@@ -1,155 +1,120 @@
 <?xml version="1.0" ?>
 <GUILayout>
-    <Window Type="DefaultWindow" Name="root">
+<Window Type="DefaultGUISheet" Name="root">
+	<Window Type="DefaultGUISheet" Name="Demo8">
+		<Property Name="UnifiedMaxSize" Value="{{1,0},{2,0}}" />
+		<Property Name="UnifiedSize" Value="{{1,0},{2,0}}" />
 
-        <Window Type="ice/FrameWindow" Name="Demo7/Window1">
-            <Property Name="RelativeMinSize" Value="w:0.2 h:0.2" />
-            <Property Name="RelativeMaxSize" Value="w:0.8 h:0.8" />
-            <Property Name="Position" Value="x:0.2 y:0.2" />
-            <Property Name="Size" Value="w:0.5 h:0.5" />
-            <Property Name="Text" Value="Demo 7 - Window 1" />
-            <Property Name="CloseButtonEnabled" Value="False" />
+		<Window Type="ice/LargeVerticalScrollbar" Name="Demo8/ViewScroll">
+			<Property Name="UnifiedPosition" Value="{{0,0},{0,0}}" />
+			<Property Name="UnifiedSize" Value="{{0.03,0},{0.75,0}}" />
+			<Property Name="DocumentSize" Value="2" />
+			<Property Name="PageSize" Value="1" />
+			<Property Name="StepSize" Value="0.01" />
+			<Property Name="OverlapSize" Value="0.5" />
+		</Window>
 
-            <Window Type="ice/Button" Name="Demo7/Window1/Quit">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.05 y:0.1" />
-                <Property Name="Size" Value="w:0.25 h:0.1" />
-                <Property Name="Text" Value="Exit Demo" />
-            </Window>
+		<Window Type="ice/FrameWindow" Name="Demo8/Window1">
+			<Property Name="UnifiedPosition" Value="{{0.05,0},{0.1,0}}" />
+			<Property Name="UnifiedMaxSize" Value="{{0.5,0},{1,0}}" />
+			<Property Name="UnifiedMinSize" Value="{{0,128},{0,128}}" />
+			<Property Name="UnifiedSize" Value="{{0.4,0},{0.3,0}}" />
+			<Property Name="Text" Value="Demo 8 - Listbox Demo" />
 
-            <Window Type="ice/RadioButton" Name="Demo7/Window1/Radio1">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.05 y:0.23" />
-                <Property Name="Size" Value="w:0.25 h:0.075" />
-                <Property Name="Text" Value="Option 1" />
-                <Property Name="ID" Value="0" />
-            </Window>
+			<Window Type="ice/Listbox" Name="Demo8/Window1/Listbox">
+				<Property Name="UnifiedPosition" Value="{{0.05,0},{0.1,0}}" />
+				<Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+				<Property Name="UnifiedSize" Value="{{0.9,0},{0.33,0}}" />
+			</Window>
 
-            <Window Type="ice/RadioButton" Name="Demo7/Window1/Radio2">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.05 y:0.306" />
-                <Property Name="Size" Value="w:0.25 h:0.075" />
-                <Property Name="Text" Value="Option 2" />
-                <Property Name="ID" Value="1" />
-            </Window>
+			<Window Type="ice/StaticText" Name="Demo8/Window1/Controls">
+				<Property Name="UnifiedPosition" Value="{{0.05,0},{0.45,0}}" />
+                <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+				<Property Name="UnifiedSize" Value="{{0.9,0},{0.5,0}}" />
 
-            <Window Type="ice/RadioButton" Name="Demo7/Window1/Radio3">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.05 y:0.382" />
-                <Property Name="Size" Value="w:0.25 h:0.075" />
-                <Property Name="Text" Value="Option 3" />
-                <Property Name="ID" Value="2" />
-            </Window>
+				<Window Type="ice/HorizontalScrollbar" Name="Demo8/Window1/Controls/Red">
+					<Property Name="UnifiedPosition" Value="{{0.05,0},{0.05,0}}" />
+                    <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+                    <Property Name="UnifiedSize" Value="{{0.9,0},{0.06,0}}" />
+					<Property Name="DocumentSize" Value="1" />
+					<Property Name="PageSize" Value="0.0625" />
+					<Property Name="StepSize" Value="0.00392" />
+					<Property Name="OverlapSize" Value="0.00392" />
+				</Window>
 
-            <Window Type="ice/Checkbox" Name="Demo7/Window1/Checkbox">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.05 y:0.48" />
-                <Property Name="Size" Value="w:0.45 h:0.075" />
-                <Property Name="Text" Value="Enable some option" />
-                <Property Name="Selected" Value="True" />
-            </Window>
+				<Window Type="ice/HorizontalScrollbar" Name="Demo8/Window1/Controls/Green">
+					<Property Name="UnifiedPosition" Value="{{0.05,0},{0.12,0}}" />
+                    <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+                    <Property Name="UnifiedSize" Value="{{0.9,0},{0.06,0}}" />
+					<Property Name="DocumentSize" Value="1" />
+					<Property Name="PageSize" Value="0.0625" />
+					<Property Name="StepSize" Value="0.00392" />
+					<Property Name="OverlapSize" Value="0.00392" />
+				</Window>
 
-            <Window Type="ice/StaticText" Name="Demo7/Window1/Text1">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.5 y:0.1" />
-                <Property Name="Size" Value="w:0.45 h:0.5" />
-                <Property Name="Text" Value="This is a static text widget.  More examples of this, and the static image, can be seen in the frame-rate / debug overlay." />
-                <Property Name="FrameEnabled" Value="False" />
-                <Property Name="BackgroundEnabled" Value="False" />
-                <Property Name="HorzFormatting" Value="WordWrapCentred" />
-            </Window>
+				<Window Type="ice/HorizontalScrollbar" Name="Demo8/Window1/Controls/Blue">
+					<Property Name="UnifiedPosition" Value="{{0.05,0},{0.19,0}}" />
+                    <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+                    <Property Name="UnifiedSize" Value="{{0.9,0},{0.06,0}}" />
+					<Property Name="DocumentSize" Value="1" />
+					<Property Name="PageSize" Value="0.0625" />
+					<Property Name="StepSize" Value="0.00392" />
+					<Property Name="OverlapSize" Value="0.00392" />
+				</Window>
 
-            <Window Type="ice/Editbox" Name="Demo7/Window1/Editbox">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.2 y:0.6" />
-                <Property Name="Size" Value="w:0.6 h:0.1" />
-                <Property Name="Text" Value="Single-line editbox" />
-            </Window>
+				<Window Type="ice/StaticImage" Name="Demo8/Window1/Controls/ColourSample">
+					<Property Name="UnifiedPosition" Value="{{0.05,0},{0.26,0}}" />
+					<Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+					<Property Name="UnifiedSize" Value="{{0.9,0},{0.1,0}}" />
+					<Property Name="Image" Value="set:ice image:MultiListSelectionBrush" />
+					<Property Name="ImageColours" Value="tl:0 tr:0 bl:0 br:0" />
+				</Window>
 
-            <Window Type="ice/LargeVerticalScrollbar" Name="Demo7/Window1/Scrollbar1">
-                <Property Name="RelativeMinSize" Value="w:0.01 h:0.1" />
-                <Property Name="RelativeMaxSize" Value="w:0.03 h:1.0" />
-                <Property Name="Position" Value="x:0.06 y:0.6" />
-                <Property Name="Size" Value="w:0.06 h:0.38" />
-            </Window>
+				<Window Type="ice/Editbox" Name="Demo8/Window1/Controls/Editbox">
+					<Property Name="UnifiedPosition" Value="{{0.05,0},{0.38,0}}" />
+					<Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+					<Property Name="UnifiedSize" Value="{{0.6,0},{0.15,0}}" />
+				</Window>
 
-            <Window Type="ice/Slider" Name="Demo7/Window1/Slider1">
-                <Property Name="RelativeMinSize" Value="w:0.01 h:0.1" />
-                <Property Name="RelativeMaxSize" Value="w:0.03 h:1.0" />
-                <Property Name="Position" Value="x:0.9 y:0.625" />
-                <Property Name="Size" Value="w:0.03 h:0.28" />
-                <Property Name="CurrentValue" Value="1.0" />
-            </Window>
-        </Window>
+				<Window Type="ice/Button" Name="Demo8/Window1/Controls/Add">
+					<Property Name="UnifiedPosition" Value="{{0.68,0},{0.38,0}}" />
+					<Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+					<Property Name="UnifiedSize" Value="{{0.3,0},{0.15,0}}" />
+					<Property Name="Text" Value="Add" />
+				</Window>
 
-        <Window Type="ice/FrameWindow" Name="Demo7/Window2">
-            <Property Name="RelativeMinSize" Value="w:0.2 h:0.2" />
-            <Property Name="RelativeMaxSize" Value="w:0.8 h:0.8" />
-            <Property Name="Position" Value="x:0.4 y:0.1" />
-            <Property Name="Size" Value="w:0.5 h:0.5" />
-            <Property Name="Text" Value="Demo 7 - Window 2" />
-            <Property Name="CloseButtonEnabled" Value="False" />
+				<Window Type="ice/StaticText" Name="Demo8/Window1/Controls/ins1">
+					<Property Name="UnifiedPosition" Value="{{0.05,0},{0.55,0}}" />
+					<Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+					<Property Name="UnifiedSize" Value="{{0.9,0},{0.4,0}}" />
+					<Property Name="HorzFormatting" Value="WordWrapCentred" />
+					<Property Name="Text" Value="Use this panel to add items.  The scrollbars change the selection colour." />
+				</Window>
+			</Window>
+		</Window>
 
-            <Window Type="ice/ProgressBar" Name="Demo7/Window2/Progbar1">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.04 y:0.1" />
-                <Property Name="Size" Value="w:0.94 h:0.05" />
-                <Property Name="CurrentProgress" Value="0.33" />
-            </Window>
+		<Window Type="ice/FrameWindow" Name="Demo8/Window2">
+			<Property Name="UnifiedPosition" Value="{{0.55,0},{0.1,0}}" />
+			<Property Name="UnifiedMaxSize" Value="{{0.5,0},{1,0}}" />
+			<Property Name="UnifiedMinSize" Value="{{0,128},{0,128}}" />
+			<Property Name="UnifiedSize" Value="{{0.4,0},{0.3,0}}" />
+			<Property Name="Text" Value="Demo 8 - Information Window" />
 
-            <Window Type="ice/AlternateProgressBar" Name="Demo7/Window2/Progbar2">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.04 y:0.16" />
-                <Property Name="Size" Value="w:0.94 h:0.05" />
-                <Property Name="CurrentProgress" Value="0.7" />
-            </Window>
-
-            <Window Type="ice/Listbox" Name="Demo7/Window2/Listbox">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.04 y:0.25" />
-                <Property Name="Size" Value="w:0.42 h:0.3" />
-            </Window>
-
-            <Window Type="ice/Combobox" Name="Demo7/Window2/Combobox">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.5 y:0.25" />
-                <Property Name="Size" Value="w:0.42 h:0.45" />
-            </Window>
-
-            <Window Type="ice/MultiColumnList" Name="Demo7/Window2/MultiColumnList">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.05 y:0.6" />
-                <Property Name="Size" Value="w:0.9 h:0.38" />
-                <Property Name="SelectionMode" Value="RowSingle" />
-                <Property Name="ColumnHeader" Value="text:Server Name width:0.33 id:0" />
-                <Property Name="ColumnHeader" Value="text:Address width:0.5 id:1" />
-                <Property Name="ColumnHeader" Value="text:Ping width:0.2 id:2" />
-            </Window>
-
-            <Window Type="ice/StaticImage" Name="Demo7/Window2/Image1">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.56 y:0.35" />
-                <Property Name="Size" Value="w:0.3 h:0.2" />
-                <Property Name="FrameEnabled" Value="False" />
-                <Property Name="BackgroundEnabled" Value="False" />
-            </Window>
-        </Window>
-
-        <Window Type="ice/FrameWindow" Name="Demo7/Window3">
-            <Property Name="RelativeMinSize" Value="w:0.2 h:0.2" />
-            <Property Name="RelativeMaxSize" Value="w:0.8 h:0.8" />
-            <Property Name="Position" Value="x:0.25 y:0.4" />
-            <Property Name="Size" Value="w:0.5 h:0.5" />
-            <Property Name="Text" Value="Demo 7 - Window 3" />
-            <Property Name="CloseButtonEnabled" Value="False" />
-
-            <Window Type="ice/MultiLineEditbox" Name="Demo7/Window3/MLEditbox">
-                <Property Name="RelativeMaxSize" Value="w:1.0 h:1.0" />
-                <Property Name="Position" Value="x:0.02 y:0.1" />
-                <Property Name="Size" Value="w:0.96 h:0.85" />
-                <Property Name="Text" Value="Multi-line edit box.  Edit me!" />
-            </Window>
-        </Window>
-
-    </Window>
+			<Window Type="ice/StaticText" Name="Demo8/Window2/Info">
+				<Property Name="UnifiedPosition" Value="{{0.05,0},{0.1,0}}" />
+				<Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+				<Property Name="UnifiedSize" Value="{{0.9,0},{0.3,0}}" />
+				<Property Name="HorzFormatting" Value="WordWrapCentred" />
+				<Property Name="Text" Value="The panel below gives some information about the item under the mouse." />
+			</Window>
+	
+			<Window Type="ice/StaticText" Name="Demo8/Window2/Tips">
+				<Property Name="UnifiedPosition" Value="{{0.05,0},{0.5,0}}" />
+				<Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+				<Property Name="UnifiedSize" Value="{{0.9,0},{0.4,0}}" />
+				<Property Name="HorzFormatting" Value="WordWrapCentred" />
+			</Window>
+		</Window>
+	</Window>
+</Window>
 </GUILayout>

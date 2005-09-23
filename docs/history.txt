@@ -59,6 +59,7 @@ chronological order.
 	- res did some more misc tweaks of the recently changed doxygen stuff.
 	- iceeey fixed constructor, and removed deletion of resource provider in
 	  CEGUI to match CVS changes. Also added renderer identification.
+	- iceeey updated CEGUI skin and layout files for CEGUI CVS changes.
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
 	  stuff into CS. First the loader now also optionally loads the new
