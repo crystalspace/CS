@@ -63,10 +63,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 // The system driver.
 iObjectRegistry *SndSysDriverOSS::object_reg=0;
 
-// The loaded CS reporter
-csRef<iReporter> SndSysDriverOSS::reporter;
-
-
 SndSysDriverOSS::SndSysDriverOSS(iBase* piBase) :
  oss_buffer(0), output_fd(-1), running(false)
 {
@@ -95,8 +91,7 @@ void SndSysDriverOSS::Report(int severity, const char* msg, ...)
   va_list arg;
   va_start (arg, msg);
 
-  if (!reporter)
-    reporter = CS_QUERY_REGISTRY(object_reg, iReporter);
+  csRef<iReporter> reporter = CS_QUERY_REGISTRY(object_reg, iReporter);
 
   if (reporter)
     reporter->ReportV (severity, "crystalspace.SndSys.driver.software.oss", msg, arg);

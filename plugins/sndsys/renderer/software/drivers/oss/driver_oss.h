@@ -62,9 +62,6 @@ public:
   void Report (int severity, const char* msg, ...);
 
 
-  // The loaded CS reporter
-  static csRef<iReporter> reporter;
-
 protected:
   uint8 *oss_buffer;
   csSndSysRendererSoftware *attached_renderer;
