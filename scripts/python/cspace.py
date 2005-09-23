@@ -2453,6 +2453,8 @@ class csInitializer(_object):
     if _newclass:SetupEventHandler = staticmethod(_cspace.csInitializer_SetupEventHandler)
     __swig_getmethods__["DestroyApplication"] = lambda x: _cspace.csInitializer_DestroyApplication
     if _newclass:DestroyApplication = staticmethod(_cspace.csInitializer_DestroyApplication)
+    __swig_getmethods__["GetDefaultAppID"] = lambda x: _cspace.csInitializer_GetDefaultAppID
+    if _newclass:GetDefaultAppID = staticmethod(_cspace.csInitializer_GetDefaultAppID)
     def __init__(self, *args):
         _swig_setattr(self, csInitializer, 'this', _cspace.new_csInitializer(*args))
         _swig_setattr(self, csInitializer, 'thisown', 1)
@@ -2506,6 +2508,8 @@ csInitializer__SetupEventHandler = _cspace.csInitializer__SetupEventHandler
 csInitializer_SetupEventHandler = _cspace.csInitializer_SetupEventHandler
 
 csInitializer_DestroyApplication = _cspace.csInitializer_DestroyApplication
+
+csInitializer_GetDefaultAppID = _cspace.csInitializer_GetDefaultAppID
 
 class csPluginRequestArray(_object):
     __swig_setmethods__ = {}
