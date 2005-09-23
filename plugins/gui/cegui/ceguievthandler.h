@@ -25,10 +25,10 @@
 * \addtogroup CEGUI
 * @{ */
 
+#include "iutil/csinput.h"
 #include "csutil/csbaseeventh.h"
 
 struct iObjectRegistry;
-class csMouseDriver;
 
 class csCEGUIRenderer;
 
@@ -63,6 +63,8 @@ public:
 private:
   iObjectRegistry *obj_reg;
   csCEGUIRenderer* renderer;
-  csMouseDriver *md;
+  csRef<iKeyComposer> compose;
+
+  static CEGUI::MouseButton CSMBtoCEMB (uint button);
 };
 #endif // _CS_CEGUI_EVENTHANDLER_H_

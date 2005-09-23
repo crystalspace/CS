@@ -34,6 +34,12 @@ chronological order.
 	  utterly untested!
 	- Eric Sunshine fixed numerous Texinfo mark-up problems in the new
 	  cegui.txi.
+	- res fixed some CEGUI blurriness; in screen space mode, 
+	  DrawSimpleMesh() does not like vertices with Z != 0.
+	- res extended the CEGUI event handling to support more CS keys. Also
+	  made it use the iKeyComposer for character input.
+	- res tweaked the CEGUI texture parameters a bit. 
+	- res improved PAD key handling in the Win32 composer.
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
 	  stuff into CS. First the loader now also optionally loads the new

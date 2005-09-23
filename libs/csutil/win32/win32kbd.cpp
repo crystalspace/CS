@@ -156,7 +156,9 @@ csKeyComposeResult csWin32KeyComposer::HandleKey (
       RETURN1(ret, b);	      \
   }
 
-  if (CSKEY_IS_SPECIAL (keyEventData.codeRaw))
+  if (CSKEY_IS_SPECIAL (keyEventData.codeRaw)
+    && (!CSKEY_IS_PAD_KEY (keyEventData.codeRaw)))
+	 // PAD keys may result in characters
     RETURN0(csComposeNoChar)
 
   if (lastDeadVk != 0)
@@ -226,6 +228,10 @@ csKeyComposeResult csWin32KeyComposer::HandleKey (
     }
     else
     {
+      // Since we allow PAD keys above, the cooked code may be special
+      if (CSKEY_IS_SPECIAL (keyEventData.codeCooked))
+	RETURN0(csComposeNoChar);
+
       RETURN1(csComposeNormalChar, keyEventData.codeCooked);
     }
   }

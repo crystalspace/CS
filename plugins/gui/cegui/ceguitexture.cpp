@@ -72,6 +72,7 @@ void csCEGUITexture::loadFromFile (const CEGUI::String &filename,
     return;
 
   hTxt = txt->GetTextureHandle();
+  hTxt->SetTextureClass ("nocompress");
 }
 
 void csCEGUITexture::loadFromMemory (const void *buffPtr, 
@@ -82,13 +83,16 @@ void csCEGUITexture::loadFromMemory (const void *buffPtr,
     return;
 
   csRef<csImageMemory> image;
-  image.AttachNew(new csImageMemory(buffWidth, buffHeight, buffPtr, 
-    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA, new csRGBpixel(255,255,255)));
+  image.AttachNew(new csImageMemory (buffWidth, buffHeight, buffPtr, 
+    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
   iTextureManager* txtmgr = g3d->GetTextureManager();
 
   if (txtmgr)
   {
-    hTxt = txtmgr->RegisterTexture (image, CS_TEXTURE_2D);
+    /* Hack: assume memory textures are for fonts only; disable filtering
+     * to have them look a bit crisper */
+    hTxt = txtmgr->RegisterTexture (image, CS_TEXTURE_2D | CS_TEXTURE_NOFILTER);
+    hTxt->SetTextureClass ("nocompress");
   }
 }
 

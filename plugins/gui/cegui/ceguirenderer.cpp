@@ -338,22 +338,22 @@ void csCEGUIRenderer::PrepareQuad (const QuadInfo quad, RenderQuad& rquad) const
   }
 
   rquad.vertex[0] = csVector3(quad.position.d_left, 
-    g2d->GetHeight()-quad.position.d_top, quad.z);
+    g2d->GetHeight()-quad.position.d_top, 0/*quad.z*/);
   rquad.color[0] = quad.topLeftColor;
   rquad.tex[0] = csVector2(quad.texPosition.d_left, quad.texPosition.d_top);
 
   rquad.vertex[1] = csVector3(quad.position.d_left, 
-    g2d->GetHeight()-quad.position.d_bottom, quad.z);
+    g2d->GetHeight()-quad.position.d_bottom, 0/*quad.z*/);
   rquad.color[1] = quad.bottomLeftColor;
   rquad.tex[1] = csVector2(quad.texPosition.d_left, quad.texPosition.d_bottom);
 
   rquad.vertex[2] = csVector3(quad.position.d_right, 
-    g2d->GetHeight()-quad.position.d_bottom, quad.z);
+    g2d->GetHeight()-quad.position.d_bottom, 0/*quad.z*/);
   rquad.color[2] = quad.bottomRightColor;
   rquad.tex[2] = csVector2(quad.texPosition.d_right, quad.texPosition.d_bottom);
 
   rquad.vertex[3] = csVector3(quad.position.d_right, 
-    g2d->GetHeight()-quad.position.d_top, quad.z);
+    g2d->GetHeight()-quad.position.d_top, 0/*quad.z*/);
   rquad.color[3] = quad.topRightColor;
   rquad.tex[3] = csVector2(quad.texPosition.d_right, quad.texPosition.d_top);
 }
@@ -395,7 +395,7 @@ void csCEGUIRenderer::RenderQuadDirect(const CEGUI::Rect& dest_rect,
   mesh.texcoords = texcoords;
   mesh.meshtype = CS_MESHTYPE_TRIANGLES;
   mesh.texture = ((csCEGUITexture*)tex)->GetTexHandle();
-
+  
   csAlphaMode mode;
   mode.autoAlphaMode = false;
   mode.alphaType = mesh.texture->GetAlphaType ();

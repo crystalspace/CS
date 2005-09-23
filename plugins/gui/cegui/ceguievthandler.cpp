@@ -32,12 +32,12 @@ csCEGUIEventHandler::csCEGUIEventHandler (iObjectRegistry *reg,
 {
   obj_reg = reg;
   renderer = owner;
-  md = new csMouseDriver (reg);
+  csRef<iKeyboardDriver> kbd = csQueryRegistry<iKeyboardDriver> (reg);
+  compose = kbd->CreateKeyComposer ();
 }
 
 csCEGUIEventHandler::~csCEGUIEventHandler()
 {
-  delete md;
 }
 
 bool csCEGUIEventHandler::Initialize ()
@@ -59,101 +59,174 @@ bool csCEGUIEventHandler::OnUnhandledEvent (iEvent &event)
   return false;
 }
 
-bool csCEGUIEventHandler::OnMouseDown (iEvent &event)
+CEGUI::MouseButton csCEGUIEventHandler::CSMBtoCEMB (uint button)
 {
-  switch (csMouseEventHelper::GetButton (&event))
+  CEGUI::MouseButton cemb = CEGUI::NoButton;
+  switch (button)
   {
     case csmbLeft:
-      CEGUI::System::getSingletonPtr()->injectMouseButtonDown(CEGUI::LeftButton);
+      cemb = CEGUI::LeftButton;
       break;
     case csmbMiddle:
-      CEGUI::System::getSingletonPtr()->injectMouseButtonDown(CEGUI::MiddleButton);
+      cemb = CEGUI::MiddleButton;
       break;
     case csmbRight:
-      CEGUI::System::getSingletonPtr()->injectMouseButtonDown(CEGUI::RightButton);
+      cemb = CEGUI::RightButton;
       break;
-    case csmbWheelUp:
-      CEGUI::System::getSingletonPtr()->injectMouseWheelChange (1.0f);
+    case csmbExtra1:
+      cemb = CEGUI::X1Button;
       break;
-    case csmbWheelDown:
-      CEGUI::System::getSingletonPtr()->injectMouseWheelChange (-1.0f);
+    case csmbExtra2:
+      cemb = CEGUI::X2Button;
       break;
   }
-  return true;
+  return cemb;
+}
+
+bool csCEGUIEventHandler::OnMouseDown (iEvent &event)
+{
+  const uint csmb = csMouseEventHelper::GetButton (&event);
+  CEGUI::MouseButton cemb = CSMBtoCEMB (csmb);
+  if (cemb != CEGUI::NoButton)
+    return CEGUI::System::getSingletonPtr()->injectMouseButtonDown (cemb);
+  else
+  {
+    switch (csMouseEventHelper::GetButton (&event))
+    {
+      case csmbWheelUp:
+	return CEGUI::System::getSingletonPtr()->injectMouseWheelChange (1.0f);
+      case csmbWheelDown:
+	return CEGUI::System::getSingletonPtr()->injectMouseWheelChange (-1.0f);
+    }
+  }
+  return false;
 }
 
 bool csCEGUIEventHandler::OnMouseMove (iEvent &event)
 {
-  CEGUI::System::getSingletonPtr()->injectMousePosition(csMouseEventHelper::GetX(&event), 
+  return CEGUI::System::getSingletonPtr()->injectMousePosition (
+    csMouseEventHelper::GetX(&event), 
     csMouseEventHelper::GetY(&event));
-  return true;
 }
 
 bool csCEGUIEventHandler::OnMouseUp (iEvent &event)
 {
-  switch (csMouseEventHelper::GetButton (&event))
-  {
-    case csmbLeft:
-      CEGUI::System::getSingletonPtr()->injectMouseButtonUp(CEGUI::LeftButton);
-      break;
-    case csmbMiddle:
-      CEGUI::System::getSingletonPtr()->injectMouseButtonUp(CEGUI::MiddleButton);
-      break;
-    case csmbRight:
-      CEGUI::System::getSingletonPtr()->injectMouseButtonUp(CEGUI::RightButton);
-      break;
-  }
-  return true;
+  CEGUI::MouseButton cemb = CSMBtoCEMB (
+    csMouseEventHelper::GetButton (&event));
+  if (cemb != CEGUI::NoButton)
+    return CEGUI::System::getSingletonPtr()->injectMouseButtonUp (cemb);
+  return false;
 }
 
 bool csCEGUIEventHandler::OnKeyboard (iEvent &event) 
 {
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&event);
   
-  if (eventtype == csKeyEventTypeDown)
-  {
-    utf32_char code = csKeyEventHelper::GetCookedCode(&event);
-    switch (code)
-    {
-      case CSKEY_ESC:
-        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::Escape);
-        return true;
-      case CSKEY_BACKSPACE:
-        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::Backspace);
-        return true;
-      case CSKEY_DEL:
-        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::Delete);
-        return true;
-      case CSKEY_ENTER:
-        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::Return);
-        return true;
-      case CSKEY_DOWN:
-        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::ArrowDown);
-        return true;
-      case CSKEY_UP:
-        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::ArrowUp);
-        return true;
-      case CSKEY_LEFT:
-        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::ArrowLeft);
-        return true;
-      case CSKEY_RIGHT:
-        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::ArrowRight);
-        return true;
-      case CSKEY_PGUP:
-        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::PageDown);
-        return true;
-      case CSKEY_PGDN:
-        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::PageUp);
-        return true;
-      case CSKEY_HOME:
-        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::Home);
-        return true;
-      case CSKEY_END:
-        CEGUI::System::getSingletonPtr()->injectKeyDown(CEGUI::Key::End);
-        return true;
-    }
+  utf32_char code = csKeyEventHelper::GetRawCode (&event);
+  if (CSKEY_IS_PAD_KEY (code))
+    /* CEGUI seems to ignore Numpad* keys for e.g. textinput, so chew
+     * those keys for it. */
+    code = csKeyEventHelper::GetCookedCode (&event);
+  uint ceCode = 0;
+#define TRANSLATE(CScode, CEcode) \
+  case CSKEY_ ## CScode: ceCode = CEGUI::Key:: CEcode; break
 
-    CEGUI::System::getSingletonPtr()->injectChar(static_cast<CEGUI::utf32>(code));
+  switch (code)
+  {
+    TRANSLATE(ESC,		Escape);
+    TRANSLATE(BACKSPACE,	Backspace);
+    TRANSLATE(TAB,		Tab);
+    TRANSLATE(SPACE,		Space);
+    TRANSLATE(INS,		Insert);
+    TRANSLATE(DEL,		Delete);
+    TRANSLATE(ENTER,		Return);
+    TRANSLATE(DOWN,		ArrowDown);
+    TRANSLATE(UP,		ArrowUp);
+    TRANSLATE(LEFT,		ArrowLeft);
+    TRANSLATE(RIGHT,		ArrowRight);
+    TRANSLATE(PGUP,		PageUp);
+    TRANSLATE(PGDN,		PageDown);
+    TRANSLATE(HOME,		Home);
+    TRANSLATE(END,		End);
+    TRANSLATE(CONTEXT,		AppMenu);
+    TRANSLATE(PRINTSCREEN,	SysRq);
+    TRANSLATE(PAUSE,		Pause);
+    TRANSLATE(F1,		F1);
+    TRANSLATE(F2,		F2);
+    TRANSLATE(F3,		F3);
+    TRANSLATE(F4,		F4);
+    TRANSLATE(F5,		F5);
+    TRANSLATE(F6,		F6);
+    TRANSLATE(F7,		F7);
+    TRANSLATE(F8,		F8);
+    TRANSLATE(F9,		F9);
+    TRANSLATE(F10,		F10);
+    TRANSLATE(F11,		F11);
+    TRANSLATE(F12,		F12);
+    TRANSLATE(PAD0,		Numpad0);
+    TRANSLATE(PAD1,		Numpad1);
+    TRANSLATE(PAD2,		Numpad2);
+    TRANSLATE(PAD3,		Numpad3);
+    TRANSLATE(PAD4,		Numpad4);
+    TRANSLATE(PAD5,		Numpad5);
+    TRANSLATE(PAD6,		Numpad6);
+    TRANSLATE(PAD7,		Numpad7);
+    TRANSLATE(PAD8,		Numpad8);
+    TRANSLATE(PAD9,		Numpad9);
+    TRANSLATE(PADDECIMAL,	Decimal);
+    TRANSLATE(PADDIV,		Divide);
+    TRANSLATE(PADMULT,		Multiply);
+    TRANSLATE(PADMINUS,		Subtract);
+    TRANSLATE(PADPLUS,		Add);
+    TRANSLATE(PADENTER,		NumpadEnter);
+    TRANSLATE(PADNUM,		NumLock);
+    TRANSLATE(CAPSLOCK,		Capital);
+    TRANSLATE(SCROLLLOCK,	ScrollLock);
+    TRANSLATE(SHIFT_LEFT,	LeftShift);
+    TRANSLATE(SHIFT_RIGHT,	RightShift);
+    TRANSLATE(CTRL_LEFT,	LeftControl);
+    TRANSLATE(CTRL_RIGHT,	RightControl);
+    TRANSLATE(ALT_LEFT,		LeftAlt);
+    TRANSLATE(ALT_RIGHT,	RightAlt);
+    default:
+      {
+	if (CSKEY_IS_MODIFIER(code))
+	{
+	  if (CSKEY_MODIFIER_TYPE(code) == csKeyModifierTypeShift)
+	    ceCode = CEGUI::Key::LeftShift;
+	  else if (CSKEY_MODIFIER_TYPE(code) == csKeyModifierTypeCtrl)
+	    ceCode = CEGUI::Key::LeftControl;
+	  else if (CSKEY_MODIFIER_TYPE(code) == csKeyModifierTypeAlt)
+	    ceCode = CEGUI::Key::LeftAlt;
+	}
+      }
+  }
+#undef TRANSLATE
+
+  if (ceCode != 0)
+  {
+    if (eventtype == csKeyEventTypeDown)
+      return CEGUI::System::getSingletonPtr()->injectKeyDown (ceCode);
+    else
+      return CEGUI::System::getSingletonPtr()->injectKeyUp (ceCode);
+  }
+  else
+  {
+    if (eventtype == csKeyEventTypeDown)
+    {
+      // Only send chars on down event to avoid double characters
+      csKeyEventData keyData;
+      csKeyEventHelper::GetEventData (&event, keyData);
+      utf32_char buf[2];
+      int num;
+      if (compose->HandleKey (keyData, buf, sizeof (buf) / sizeof (utf32_char),
+	&num) != csComposeNoChar)
+      {
+	for (int i = 0; i < num; i++)
+	  CEGUI::System::getSingletonPtr()->injectChar (
+	    static_cast<CEGUI::utf32> (buf[i]));
+      }
+    }
     return true;
   }
 
