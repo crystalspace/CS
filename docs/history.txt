@@ -11,14 +11,14 @@ chronological order.
 	  again.
 	- Jorrit fixed the general sound loader plugin so it no longer tries
 	  to load the wav and ogg loaders with the 'planeshift' prefix.
-	- Jorrit changed the iSndSysRenderer prototypes to accept normal pointer
-	  arguments instead of csRef's.
+	- Jorrit changed the iSndSysRenderer prototypes to accept normal
+	  pointer arguments instead of csRef's.
 	- Jorrit finished the sndtest app. It now plays a sound and constantly
-	  rotates it around the camera. The position of the sound is represented
-	  by a simple mesh as well.
+	  rotates it around the camera. The position of the sound is
+	  represented by a simple mesh as well.
 	- Jorrit fixed a leak to the reporter in the OSS driver for the new
 	  sound system.
-	- Jorrit fixed a leak to the reporter in the coreaudio driver for
+	- Jorrit fixed a leak to the reporter in the CoreAudio driver for
 	  the new sound system.
 	- Jorrit fixed a circular reference in the windows directsound driver.
 	  It was holding a ref to a csThread that in turn held a ref to the
@@ -32,6 +32,8 @@ chronological order.
 	  be notified when a light is visible. To enable this you need to call
 	  iSector->SetLightCulling(true). Note that this is completely and
 	  utterly untested!
+	- Eric Sunshine fixed numerous Texinfo mark-up problems in the new
+	  cegui.txi.
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
 	  stuff into CS. First the loader now also optionally loads the new

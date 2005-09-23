@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Making Own Projects, HOWTO, AWS, Using Crystal Space
+@node Making Own Projects, HOWTO, CEGUI, Using Crystal Space
 @section Making Projects Using Crystal Space
 @cindex external projects
 
