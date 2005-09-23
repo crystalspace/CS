@@ -9,6 +9,8 @@ chronological order.
 23-Sep-2005
 	- Jorrit fixed the sound renderer csplugin file so that it works
 	  again.
+	- Jorrit fixed the general sound loader plugin so it no longer tries
+	  to load the wav and ogg loaders with the 'planeshift' prefix.
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
 	  stuff into CS. First the loader now also optionally loads the new

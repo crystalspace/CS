@@ -66,8 +66,8 @@ csPtr<iSndSysData> SndSysLoader::LoadSound (void *Buffer, uint32 Size)
 bool SndSysLoader::Initialize (iObjectRegistry *reg)
 {
   csRef<iPluginManager> mgr=CS_QUERY_REGISTRY(reg, iPluginManager);
-  wavloader=CS_LOAD_PLUGIN(mgr, "planeshift.sndsys.element.wav", iSndSysLoader);
-  oggloader=CS_LOAD_PLUGIN(mgr, "planeshift.sndsys.element.ogg", iSndSysLoader);
+  wavloader=CS_LOAD_PLUGIN(mgr, "crystalspace.sndsys.element.wav", iSndSysLoader);
+  oggloader=CS_LOAD_PLUGIN(mgr, "crystalspace.sndsys.element.ogg", iSndSysLoader);
   return true;
 }
 
