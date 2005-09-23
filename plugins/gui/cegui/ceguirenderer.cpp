@@ -40,11 +40,12 @@ csCEGUIRenderer::csCEGUIRenderer (iBase *parent) :
   obj_reg(0),
   resourceProvider(0),
   scriptModule(0),
+  newQuadAdded(false),
   queueing(true),
   m_bufferPos(0),
   texture(0)
 {
-  newQuadAdded = false;
+  d_identifierString = "Crystal Space Renderer";
   SCF_CONSTRUCT_IBASE (parent);
 }
 
@@ -87,7 +88,7 @@ bool csCEGUIRenderer::Initialize (iScript* script, int width, int height)
   if (script)
   {
     scriptModule = new csCEGUIScriptModule (script, obj_reg);
-    new CEGUI::System (this, scriptModule);
+    new CEGUI::System (this, 0, 0, scriptModule);
   }
   else
   {
@@ -109,7 +110,6 @@ csCEGUIRenderer::~csCEGUIRenderer ()
   delete CEGUI::System::getSingletonPtr();
   delete scriptModule;
   delete events;
-  delete resourceProvider;
   SCF_DESTRUCT_IBASE ();
 }
 
