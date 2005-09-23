@@ -4614,6 +4614,37 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iLightVisibleCallback ##############
+
+package cspace::iLightVisibleCallback;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*LightVisible = *cspacec::iLightVisibleCallback_LightVisible;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iLightVisibleCallback($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iSector ##############
 
 package cspace::iSector;
@@ -4656,6 +4687,10 @@ package cspace::iSector;
 *RemoveSectorCallback = *cspacec::iSector_RemoveSectorCallback;
 *GetSectorCallbackCount = *cspacec::iSector_GetSectorCallbackCount;
 *GetSectorCallback = *cspacec::iSector_GetSectorCallback;
+*SetLightCulling = *cspacec::iSector_SetLightCulling;
+*IsLightCullingEnabled = *cspacec::iSector_IsLightCullingEnabled;
+*AddLightVisibleCallback = *cspacec::iSector_AddLightVisibleCallback;
+*RemoveLightVisibleCallback = *cspacec::iSector_RemoveLightVisibleCallback;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -7679,6 +7714,9 @@ package cspace::iLoader;
 *LoadTexture = *cspacec::iLoader_LoadTexture;
 *LoadSoundData = *cspacec::iLoader_LoadSoundData;
 *LoadSound = *cspacec::iLoader_LoadSound;
+*LoadSoundSysData = *cspacec::iLoader_LoadSoundSysData;
+*LoadSoundStream = *cspacec::iLoader_LoadSoundStream;
+*LoadSoundWrapper = *cspacec::iLoader_LoadSoundWrapper;
 *ThreadedLoadMapFile = *cspacec::iLoader_ThreadedLoadMapFile;
 *LoadMapFile = *cspacec::iLoader_LoadMapFile;
 *LoadMap = *cspacec::iLoader_LoadMap;
