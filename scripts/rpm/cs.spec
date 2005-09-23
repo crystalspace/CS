@@ -1,6 +1,6 @@
 %define name     crystalspace
 %define version  0.99
-%define release  0.cvs20050424.1
+%define release  0.cvs20050924.1
 %define prefix   /usr
 %define csprefix crystalspace
 
@@ -80,7 +80,7 @@ make all
 DESTDIR=%{buildroot} make install
 
 %post -n %{name}-utils
-for map in flarge partsys terrain terrainf ;            \
+for map in flarge partsys terrain terrainf ; \
   do %{_bindir}/cslight -canvas=null -video=null $map ; \
   done ;
 
@@ -98,6 +98,7 @@ for map in flarge partsys terrain terrainf ;            \
 %exclude %{_sysconfdir}/%{csprefix}/heightmapgen.cfg
 %exclude %{_sysconfdir}/%{csprefix}/lighter.xml
 %exclude %{_sysconfdir}/%{csprefix}/map2cs.cfg
+%exclude %{_sysconfdir}/%{csprefix}/startme.cfg
 %exclude %{_sysconfdir}/%{csprefix}/walktest.cfg
 %exclude %{_sysconfdir}/%{csprefix}/waterdemo.cfg
 
@@ -105,6 +106,7 @@ for map in flarge partsys terrain terrainf ;            \
 
 %{_datadir}/%{csprefix}/data/*
 %exclude %{_datadir}/%{csprefix}/data/maps/*
+%exclude %{_datadir}/%{csprefix}/data/startme.zip
 
 %files -n %{name}-utils
 %defattr(-,root,root)
@@ -114,6 +116,7 @@ for map in flarge partsys terrain terrainf ;            \
 %exclude %{_bindir}/*.cex
 
 %{_datadir}/%{csprefix}/data/maps/*
+%{_datadir}/%{csprefix}/data/startme.zip
 %{_datadir}/%{csprefix}/conversion/*
 
 %{_sysconfdir}/%{csprefix}/awstest.cfg
@@ -123,6 +126,7 @@ for map in flarge partsys terrain terrainf ;            \
 %{_sysconfdir}/%{csprefix}/heightmapgen.cfg
 %{_sysconfdir}/%{csprefix}/lighter.xml
 %{_sysconfdir}/%{csprefix}/map2cs.cfg
+%{_sysconfdir}/%{csprefix}/startme.cfg
 %{_sysconfdir}/%{csprefix}/walktest.cfg
 %{_sysconfdir}/%{csprefix}/waterdemo.cfg
 
@@ -147,6 +151,9 @@ for map in flarge partsys terrain terrainf ;            \
 %{_includedir}/%{csprefix}/*
 
 %changelog
+* Fri Sep 23 2005 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-0.cvs20050924.1
+- Added 'startme' stuff.
+
 * Sun Apr 24 2005 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-0.cvs20050424.1
 - Removed csbumptest.cfg occurences.
 - Changed release numbering scheme so one knows the date of tested snapshot.
