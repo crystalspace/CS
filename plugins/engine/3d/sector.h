@@ -111,6 +111,7 @@ class csSector : public scfImplementationExt1<csSector,
   friend class csMeshMeshList;
   friend class csMeshWrapper;
   friend class csSectorMeshList;
+
 public:
   /**
    * Construct a sector. This sector will be completely empty.
@@ -238,6 +239,24 @@ public:
   virtual iSectorCallback* GetSectorCallback (int idx) const
   { return sectorCallbackList.Get (idx); }
 
+  virtual void SetLightCulling (bool enable);
+  virtual bool IsLightCullingEnabled () const { return use_lightculling; }
+  virtual void AddLightVisibleCallback (iLightVisibleCallback* cb);
+  virtual void RemoveLightVisibleCallback (iLightVisibleCallback* cb);
+  void FireLightVisibleCallbacks (iLight* light);
+  /// If true we use light culling.
+  bool use_lightculling;
+  /**
+   * Register a light to the visibility culler.
+   */
+  void RegisterLightToCuller (csLight* light);
+
+  /**
+   * Unregister a light from the visibility culler.
+   */
+  void UnregisterLightToCuller (csLight* light);
+
+
 private:
   // -- PRIVATE METHODS
 
@@ -349,7 +368,6 @@ private:
    */
   csSet<csPtrKey<iMeshWrapper> > portalMeshes;
 
-
   /**
    * List of sector callbacks.
    */
@@ -359,6 +377,11 @@ private:
    * List of sector mesh callbacks.
    */
   csRefArray<iSectorMeshCallback> sectorMeshCallbackList;
+
+  /**
+   * List of light visible callbacks.
+   */
+  csRefArray<iLightVisibleCallback> lightVisibleCallbackList;
 
   /**
    * All static and pseudo-dynamic lights in this sector.
@@ -411,8 +434,8 @@ private:
   csPDelArray<csRenderMeshList> usedMeshLists;
 
   /**
-  * Visibilty number for last VisTest call
-  */
+   * Visibilty number for last VisTest call
+   */
   uint32 currentVisibilityNumber;
 
   /**

@@ -59,23 +59,31 @@ csSectorLightList::~csSectorLightList ()
 
 void csSectorLightList::PrepareLight (iLight* item)
 {
+  csLight* clight = ((csLight::Light*)item)->GetPrivateObject ();
   csLightList::PrepareLight (item);
-  ((csLight::Light*)item)->GetPrivateObject ()
-  	->SetSector ((iSector*)sector);
+  clight->SetSector ((iSector*)sector);
 
   const csVector3& center = item->GetCenter ();
   float radius = item->GetCutoffDistance ();
   csBox3 lightbox (center - csVector3 (radius), center + csVector3 (radius));
   csKDTreeChild* childnode = kdtree->AddObject (lightbox, (void*)item);
-  ((csLight::Light*)item)->GetPrivateObject ()->SetChildNode (childnode);
+  clight->SetChildNode (childnode);
+  if (sector->use_lightculling)
+  {
+    sector->RegisterLightToCuller (clight);
+  }
 }
 
 void csSectorLightList::FreeLight (iLight* item)
 {
-  ((csLight::Light*)item)->GetPrivateObject ()->SetSector (0);
-  kdtree->RemoveObject (((csLight::Light*)item)->GetPrivateObject ()
-  	->GetChildNode ());
+  csLight* clight = ((csLight::Light*)item)->GetPrivateObject ();
+  clight->SetSector (0);
+  kdtree->RemoveObject (clight->GetChildNode ());
   csLightList::FreeLight (item);
+  if (sector->use_lightculling)
+  {
+    sector->UnregisterLightToCuller (clight);
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -115,11 +123,73 @@ csSector::csSector (csEngine *engine) :
   lights.SetSector (this);
   currentVisibilityNumber = 0;
   renderloop = 0;
+  use_lightculling = false;
 }
 
 csSector::~csSector ()
 {
   lights.RemoveAll ();
+}
+
+void csSector::RegisterLightToCuller (csLight* light)
+{
+  light->UseAsCullingObject ();
+  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (light,
+        iVisibilityObject);
+  culler->RegisterVisObject (vo);
+}
+
+void csSector::UnregisterLightToCuller (csLight* light)
+{
+  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (light,
+        iVisibilityObject);
+  culler->UnregisterVisObject (vo);
+  light->StopUsingAsCullingObject ();
+}
+
+void csSector::SetLightCulling (bool enable)
+{
+  if (enable == use_lightculling) return;
+  use_lightculling = enable;
+  int i;
+  if (use_lightculling)
+  {
+    for (i = 0; i < lights.GetCount (); i++)
+    {
+      iLight* l = lights.Get (i);
+      csLight* clight = ((csLight::Light*)l)->GetPrivateObject ();
+      RegisterLightToCuller (clight);
+    }
+  }
+  else
+  {
+    for (i = 0; i < lights.GetCount (); i++)
+    {
+      iLight* l = lights.Get (i);
+      csLight* clight = ((csLight::Light*)l)->GetPrivateObject ();
+      UnregisterLightToCuller (clight);
+    }
+  }
+}
+
+void csSector::AddLightVisibleCallback (iLightVisibleCallback* cb)
+{
+  lightVisibleCallbackList.Push (cb);
+}
+
+void csSector::RemoveLightVisibleCallback (iLightVisibleCallback* cb)
+{
+  lightVisibleCallbackList.Delete (cb);
+}
+
+void csSector::FireLightVisibleCallbacks (iLight* light)
+{
+  size_t i = lightVisibleCallbackList.Length ();
+  while (i > 0)
+  {
+    i--;
+    lightVisibleCallbackList[i]->LightVisible ((iSector*)this, light);
+  }
 }
 
 void csSector::UnlinkObjects ()
@@ -228,6 +298,17 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
 bool csSector::SetVisibilityCullerPlugin (const char *plugname,
 	iDocumentNode* culler_params)
 {
+  if (use_lightculling)
+  {
+    int i;
+    for (i = 0; i < lights.GetCount (); i++)
+    {
+      iLight* l = lights.Get (i);
+      csLight* clight = ((csLight::Light*)l)->GetPrivateObject ();
+      UnregisterLightToCuller (clight);
+    }
+  }
+
   culler = 0;
 
   // Load the culler plugin.
@@ -261,6 +342,15 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
     m->GetMovable ()->UpdateMove ();
     RegisterEntireMeshToCuller (m);
   }
+  if (use_lightculling)
+  {
+    for (i = 0; i < lights.GetCount (); i++)
+    {
+      iLight* l = lights.Get (i);
+      csLight* clight = ((csLight::Light*)l)->GetPrivateObject ();
+      RegisterLightToCuller (clight);
+    }
+  }
   return true;
 }
 
@@ -288,10 +378,11 @@ public:
   }
 
   // NR version
-  void Setup (csRenderMeshList *meshlist, iRenderView *rview)
+  void Setup (csRenderMeshList *meshlist, iRenderView *rview, iSector* sector)
   {
     privMeshlist = meshlist;
     csSectorVisibleMeshCallback::rview = rview;
+    csSectorVisibleMeshCallback::sector = sector;
   }
 
   void MarkMeshAndChildrenVisible (iMeshWrapper* mesh, uint32 frustum_mask)
@@ -351,16 +442,26 @@ public:
   virtual void ObjectVisible (iVisibilityObject* visobj, iMeshWrapper *mesh,
   	uint32 frustum_mask)
   {
-    if (privMeshlist == 0)
-      return;
-
-    csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
-    ObjectVisible (cmesh, frustum_mask);
+    if (mesh)
+    {
+      csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
+      ObjectVisible (cmesh, frustum_mask);
+    }
+    else
+    {
+      csRef<iLight> light = SCF_QUERY_INTERFACE (visobj, iLight);
+      if (light)
+      {
+        csSector* csector = (csSector*)sector;
+        csector->FireLightVisibleCallbacks (light);
+      }
+    }
   }
 
 private:
-  csRenderMeshList *privMeshlist;	// NR only
+  csRenderMeshList *privMeshlist;
   iRenderView *rview;
+  iSector* sector;
 };
 
 SCF_IMPLEMENT_IBASE(csSectorVisibleMeshCallback)
@@ -412,7 +513,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
     {
       //use this slot
       entry.meshList->Empty ();
-      GetVisMeshCb ()->Setup (entry.meshList, rview);
+      GetVisMeshCb ()->Setup (entry.meshList, rview, (iSector*)this);
       GetVisibilityCuller()->VisTest (rview, GetVisMeshCb ());
 
       entry.cachedFrameNumber = cur_framenr;
@@ -427,7 +528,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   holder.cached_context_id = cur_context_id;
   holder.meshList = new csRenderMeshList (engine);
   usedMeshLists.Push (holder.meshList);
-  GetVisMeshCb ()->Setup (holder.meshList, rview);
+  GetVisMeshCb ()->Setup (holder.meshList, rview, (iSector*)this);
   GetVisibilityCuller()->VisTest (rview, GetVisMeshCb ());
   visibleMeshCache.Push (holder);
   return holder.meshList;

@@ -88,6 +88,17 @@ struct iSectorMeshCallback : public iBase
 };
 
 /**
+ * A callback that is fired whenever a light is visible.
+ */
+struct iLightVisibleCallback : public virtual iBase
+{
+  SCF_INTERFACE (iLightVisibleCallback, 0, 0, 1);
+
+  /// The light is visible.
+  virtual void LightVisible (iSector* sector, iLight* light) = 0;
+};
+
+/**
  * The iSector interface is used to work with "sectors". A "sector"
  * is an empty region of space that can contain other objects (mesh
  * objects). A sector itself does not represent geometry but only
@@ -338,6 +349,27 @@ struct iSector : public virtual iBase
 
   /// Get the specified sector callback.
   virtual iSectorCallback* GetSectorCallback (int idx) const = 0;
+
+  /**
+   * Set/reset culling objects for all lights in the sector.
+   * This can be used for hardware accelerated lighting techniques that
+   * want to know what lights (influence object) are visible for camera.
+   * With this enabled every light will be registered to the culler of
+   * this sector and a callback (see AddLightVisibleCallback) will be
+   * called.
+   */
+  virtual void SetLightCulling (bool enable) = 0;
+  /// Return true if light culling objects are enabled.
+  virtual bool IsLightCullingEnabled () const = 0;
+  /**
+   * Add a callback that is called whenever a light is visible.
+   * This only works if SetLightCulling() is enabled.
+   */
+  virtual void AddLightVisibleCallback (iLightVisibleCallback* cb) = 0;
+  /**
+   * Remove a light visible callback.
+   */
+  virtual void RemoveLightVisibleCallback (iLightVisibleCallback* cb) = 0;
 };
 
 

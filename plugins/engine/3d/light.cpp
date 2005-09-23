@@ -20,6 +20,7 @@
 #include "csqint.h"
 
 #include "csgeom/frustum.h"
+#include "csgeom/polymesh.h"
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/debug.h"
@@ -37,13 +38,50 @@ int csLight::ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
 //float csLight::influenceIntensityFraction = 256;
 #define HUGE_RADIUS 100000000
 
+SCF_IMPLEMENT_IBASE (csLightObjectModel)
+  SCF_IMPLEMENTS_INTERFACE(iObjectModel)
+SCF_IMPLEMENT_IBASE_END
+
 SCF_IMPLEMENT_IBASE_EXT(csLight)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLight)
+  SCF_IMPLEMENTS_INTERFACE(iVisibilityObject)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csLight::Light)
   SCF_IMPLEMENTS_INTERFACE(iLight)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+void csLight::UpdateViscullMesh ()
+{
+  if (!object_model) return;
+
+  // Update the 'viscull_mesh' data so that it roughly
+  // represents a shape that corresponds with the shape of the 'influence-object'.
+  // The influence-object is a sphere in case of a point light (with the influence
+  // radius as the radius) and a capped cone in case of a spot light.
+  // The geometry specified here should be at least as big as that shape (for
+  // example, a box in case of a point light would be fine).
+  csRef<iPolygonMesh> m;
+  switch (type)
+  {
+    case CS_LIGHT_POINTLIGHT:
+      {
+        object_model->box.Set (-cutoffDistance, -cutoffDistance, -cutoffDistance,
+		cutoffDistance, cutoffDistance, cutoffDistance);
+        m.AttachNew (new csPolygonMeshBox (object_model->box));
+	object_model->radius.Set (cutoffDistance, cutoffDistance, cutoffDistance);
+      }
+      break;
+    case CS_LIGHT_DIRECTIONAL:
+      // @@@ TODO
+      break;
+    case CS_LIGHT_SPOTLIGHT:
+      // @@@ TODO
+      break;
+  }
+  object_model->SetPolygonMeshViscull (m);
+  object_model->ShapeChanged ();
+}
 
 csLight::csLight (
   float x, float y, float z,
@@ -71,6 +109,8 @@ csLight::csLight (
   //if (ABS (cutoffDistance) < SMALL_EPSILON)
   //  CalculateInfluenceRadius ();
   CalculateAttenuationVector();
+
+  sectors_wanting_visculling = 0;
 }
 
 csLight::~csLight ()
@@ -97,6 +137,26 @@ csLight::~csLight ()
   lightinginfos.DeleteAll ();
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLight);
+}
+
+void csLight::UseAsCullingObject ()
+{
+  sectors_wanting_visculling++;
+  if (!object_model)
+  {
+    object_model.AttachNew (new csLightObjectModel ());
+    UpdateViscullMesh ();
+  }
+}
+
+void csLight::StopUsingAsCullingObject ()
+{
+  CS_ASSERT (sectors_wanting_visculling > 0);
+  sectors_wanting_visculling--;
+  if (sectors_wanting_visculling <= 0)
+  {
+    object_model = 0;
+  }
 }
 
 void csLight::AddAffectedLightingInfo (iLightingInfo* li)
@@ -308,7 +368,8 @@ void csLight::SetCutoffDistance (float radius)
     cb->OnRadiusChange (&scfiLight, radius);
   }
   lightnr++;
-  cutoffDistance = radius;  
+  cutoffDistance = radius;
+  UpdateViscullMesh ();
 }
 
 iCrossHalo *csLight::Light::CreateCrossHalo (float intensity, float cross)

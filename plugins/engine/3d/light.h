@@ -20,6 +20,7 @@
 #define __CS_LIGHT_H__
 
 #include "csgeom/transfrm.h"
+#include "csgeom/objmodel.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/csobject.h"
 #include "csutil/cscolor.h"
@@ -41,12 +42,44 @@ struct iMeshWrapper;
 struct iLightingInfo;
 struct iSector;
 
+class csLightObjectModel : public csObjectModel
+{
+public:
+  csBox3 box;
+  csVector3 radius;
+
+  csLightObjectModel ()
+  {
+    SCF_CONSTRUCT_IBASE (0);
+  }
+  virtual ~csLightObjectModel ()
+  {
+    SCF_DESTRUCT_IBASE ();
+  }
+
+  SCF_DECLARE_IBASE;
+
+  virtual void GetObjectBoundingBox (csBox3& bbox)
+  {
+    bbox = box;
+  }
+  virtual void SetObjectBoundingBox (const csBox3& bbox)
+  {
+    box = bbox;
+  }
+  virtual void GetRadius (csVector3& rad, csVector3& cent)
+  {
+    rad = radius;
+    cent.Set (0, 0, 0);
+  }
+};
+
 /**
  * Superclass of all positional lights.
  * A light subclassing from this has a color, a position
  * and a radius.
  */
-class csLight : public csObject
+class csLight : public csObject, public iVisibilityObject
 {
 private:
   /// ID for this light (16-byte MD5).
@@ -110,6 +143,16 @@ protected:
 
   /// Compute attenuation vector from current attenuation mode.
   void CalculateAttenuationVector ();
+
+  /// For the culler.
+  csFlags culler_flags;
+  csRef<csLightObjectModel> object_model;
+  // The following counter keeps track of how many sectors would like to have
+  // this light as a vis culling object.
+  int sectors_wanting_visculling;
+
+  void UpdateViscullMesh ();
+
 public:
   /// Set of flags
   csFlags flags;
@@ -146,6 +189,15 @@ public:
   virtual ~csLight ();
 
   csLightDynamicType GetDynamicType () const { return dynamicType; }
+
+  /**
+   * Another sector wants to use this light as a culling object.
+   */
+  void UseAsCullingObject ();
+  /**
+   * A sector no longer wants to use this light as a culling object.
+   */
+  void StopUsingAsCullingObject ();
 
   /**
    * Shine this light on all polygons visible from the light.
@@ -225,7 +277,7 @@ public:
   /**
    * Get the movable 
    */
-  iMovable *GetMovable ()
+  virtual iMovable *GetMovable ()
   {
     return &movable;
   }
@@ -320,6 +372,7 @@ public:
   {
     directionalCutoffRadius = radius;
     lightnr++;
+    UpdateViscullMesh ();
   }
 
   /**
@@ -351,14 +404,21 @@ public:
   { return type; }
   /// Set the light type of this light.
   void SetType (csLightType type)
-  { this->type = type; }
+  {
+    this->type = type;
+    UpdateViscullMesh ();
+  }
 
   /// Get the light direction. Used for directional and spotlight.
   const csVector3& GetDirection () const
   { return direction; }
   /// Set the light direction. Used for directional and spotlight.
   void SetDirection (const csVector3& v)
-  { if (v.IsZero()) return; direction = v.Unit (); }
+  {
+    if (v.IsZero()) return;
+    direction = v.Unit ();
+    UpdateViscullMesh ();
+  }
 
 
   //----------------------------------------------------------------------
@@ -412,6 +472,12 @@ public:
    * Called by the movable when position changes 
    */
   void OnSetPosition ();
+
+  //------------------- iVisibilityObject interface -----------------------
+  virtual iMovable *GetMovable () const { return (iMovable*)&movable; }
+  virtual iMeshWrapper* GetMeshWrapper () const { return 0; }
+  virtual iObjectModel* GetObjectModel () { return object_model; }
+  virtual csFlags& GetCullerFlags () { return culler_flags; }
 
   //------------------------ iLight interface -----------------------------
   SCF_DECLARE_IBASE_EXT (csObject);

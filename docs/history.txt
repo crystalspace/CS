@@ -26,6 +26,12 @@ chronological order.
 	  by making the csRunnable a separate class.
 	- Jorrit did a similar circular-leak fix to the OSS driver (untested).
 	- swedishcoder added some CEGUI documentation.
+	- Jorrit added a new system to the engine so that you can optionally
+	  include lights in the culling system as well. This can be useful
+	  for shadow plugins (like the stencil plugins) so that they can
+	  be notified when a light is visible. To enable this you need to call
+	  iSector->SetLightCulling(true). Note that this is completely and
+	  utterly untested!
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
 	  stuff into CS. First the loader now also optionally loads the new
