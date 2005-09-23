@@ -63,6 +63,7 @@
 #include "igraphic/imageio.h"
 #include "isndsys/ss_loader.h"
 #include "isndsys/ss_manager.h"
+#include "isndsys/ss_renderer.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
 #include "iutil/vfs.h"
@@ -1042,6 +1043,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   GET_PLUGIN (Engine, iEngine, "engine");
   GET_PLUGIN (G3D, iGraphics3D, "video driver");
   GET_PLUGIN (SoundRender, iSoundRender, "sound driver");
+  GET_PLUGIN (SndSysRender, iSndSysRenderer, "sound driver (v2)");
   GET_PLUGIN (ModelConverter, iModelConverter, "model converter");
   GET_PLUGIN (CrossBuilder, iCrossBuilder, "model crossbuilder");
 

@@ -44,6 +44,9 @@ struct iSoundWrapper;
 struct iTextureHandle;
 struct iTextureManager;
 struct iTextureWrapper;
+struct iSndSysData;
+struct iSndSysWrapper;
+struct iSndSysStream;
 
 SCF_VERSION (iLoaderStatus, 0, 1, 0);
 
@@ -134,13 +137,36 @@ struct iLoader : public iBase
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
 	bool reg = false, bool create_material = true) = 0;
 
-  /// Load a sound file and return an iSoundData object
+  /// Old Sound System: Load a sound file and return an iSoundData object
   virtual csPtr<iSoundData> LoadSoundData (const char *fname) = 0;
-  /// Load a sound file and register the sound
+  /// Old Sound System: Load a sound file and register the sound
   virtual csPtr<iSoundHandle> LoadSound (const char *fname) = 0;
-  /// Load a sound file, register the sound and create a wrapper object for it
+  /**
+   * Old Sound System: Load a sound file, register the sound and create a wrapper
+   * object for it.
+   */
   virtual csPtr<iSoundWrapper> LoadSound (const char *name,
   	const char *fname) = 0;
+
+  /// New Sound System: Load a sound file and return an iSndSysData object
+  virtual csPtr<iSndSysData> LoadSoundSysData (const char *fname) = 0;
+  /**
+   * New Sound System: Load a sound file and create a stream from it.
+   * \param fname is the VFS filename.
+   * \param mode3d is one of CS_SND3D_DISABLE, CS_SND3D_RELATIVE, or
+   * CS_SND3D_ABSOLUTE.
+   */
+  virtual csPtr<iSndSysStream> LoadSoundStream (const char *fname, int mode3d) = 0;
+  /**
+   * New Sound System: Load a sound file, create a stream and create a
+   * wrapper object for it.
+   * \param name of the sound.
+   * \param fname is the VFS filename.
+   * \param mode3d is one of CS_SND3D_DISABLE, CS_SND3D_RELATIVE, or
+   * CS_SND3D_ABSOLUTE.
+   */
+  virtual iSndSysWrapper* LoadSoundWrapper (const char *name,
+  	const char *fname, int mode3d) = 0;
 
   /**
    * Load a map file in a thread.

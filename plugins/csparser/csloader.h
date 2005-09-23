@@ -36,6 +36,7 @@
 #include "imap/services.h"
 #include "imap/ldrctxt.h"
 #include "ivaria/engseq.h"
+#include "isndsys/ss_renderer.h"
 
 class csGenerateImageTexture;
 class csGenerateImageValue;
@@ -437,7 +438,6 @@ private:
    */
   bool LoadSounds (iDocumentNode* node);
 
-
   /**
    * Load all the plugin descriptions from the map file
    * (the plugins are not actually loaded yet).
@@ -538,6 +538,8 @@ public:
   csRef<iGraphics3D> G3D;
   // sound renderer
   csRef<iSoundRender> SoundRender;
+  // sound renderer
+  csRef<iSndSysRenderer> SndSysRender;
   // model converter
   csRef<iModelConverter> ModelConverter;
   // crossbuilder
@@ -571,6 +573,11 @@ public:
   virtual csPtr<iSoundData> LoadSoundData (const char *fname);
   virtual csPtr<iSoundHandle> LoadSound (const char *fname);
   virtual csPtr<iSoundWrapper> LoadSound (const char *name, const char *fname);
+  virtual csPtr<iSndSysData> LoadSoundSysData (const char *fname);
+  virtual csPtr<iSndSysStream> LoadSoundStream (const char *fname,
+  	int mode3d);
+  virtual iSndSysWrapper* LoadSoundWrapper (const char *name, const char *fname,
+  	int mode3d);
 
   virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
 	iRegion* region, bool curRegOnly, bool checkDupes);

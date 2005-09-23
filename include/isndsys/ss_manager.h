@@ -23,6 +23,7 @@
 #include "csutil/scf_implementation.h"
 
 struct iObject;
+struct iSndSysStream;
 
 /**
  * A wrapper/holder for a loaded sound.
@@ -33,6 +34,12 @@ struct iSndSysWrapper : public virtual iBase
 
   /// Get the iObject which represents this wrapper.
   virtual iObject* QueryObject () = 0;
+
+  /// Get the sound stream associated with this object.
+  virtual iSndSysStream* GetStream () = 0;
+
+  /// Set the sound stream associated with this object.
+  virtual void SetStream (iSndSysStream* stream) = 0;
 };
 
 /**

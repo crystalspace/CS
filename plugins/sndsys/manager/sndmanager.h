@@ -38,6 +38,9 @@
 class csSndSysWrapper : public scfImplementationExt1<csSndSysWrapper,
 	csObject, iSndSysWrapper>
 {
+private:
+  csRef<iSndSysStream> stream;
+
 public:
   csSndSysWrapper (const char* name) : scfImplementationType (this)
   {
@@ -46,6 +49,11 @@ public:
   virtual ~csSndSysWrapper () { }
 
   virtual iObject* QueryObject () { return (iObject*)this; }
+  virtual iSndSysStream* GetStream () { return stream; }
+  virtual void SetStream (iSndSysStream* stream)
+  {
+    csSndSysWrapper::stream = stream;
+  }
 };
 
 /**
