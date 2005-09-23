@@ -1,0 +1,5 @@
+SubDir TOP apps tests sndtest ;
+
+Description sndtest : "Sound test" ;
+Application sndtest : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith sndtest : crystalspace ;

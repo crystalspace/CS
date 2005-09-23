@@ -293,6 +293,7 @@
 
 // The sound driver
 #define CS_SOUND_DRIVER "crystalspace.sound.driver.waveout"
+#define CS_SNDSYS_DRIVER "crystalspace.sndsys.software.driver.directsound"
 
 // SCF symbol export facility.
 #ifndef CS_STATIC_LINKED

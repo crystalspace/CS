@@ -42,4 +42,7 @@
 #undef  CS_SOUND_DRIVER
 #define CS_SOUND_DRIVER "crystalspace.sound.driver.coreaudio"
 
+#undef  CS_SNDSYS_DRIVER
+#define CS_SNDSYS_DRIVER "crystalspace.sndsys.software.driver.coreaudio"
+
 #endif // __OSX_csosdefs_h

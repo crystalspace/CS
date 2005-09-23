@@ -132,12 +132,18 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
   Config.AddConfig(object_reg, "/config/sound.cfg");
 
   // check for optional sound driver from the commandline
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg, iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
   const char *drv = cmdline->GetOption ("sounddriver");
   if (!drv)
   {
     // Read the configuration value for the sound driver if one is set
-    drv = Config->GetStr ("SndSys.Driver", "crystalspace.SndSys.driver.null");
+#ifdef CS_SNDSYS_DRIVER
+    drv = CS_SNDSYS_DRIVER;   // "crystalspace.sndsys.software.driver.xxx"
+#else
+    drv = "crystalspace.sndsys.driver.null";
+#endif
+    drv = Config->GetStr ("SndSys.Driver", drv);
   }
 
   Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Configured for driver [%s]", drv);

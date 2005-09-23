@@ -15,6 +15,12 @@ chronological order.
 	  but this is a bit clumsy and there was also no proper region support.
 	  This is all work in progress.
 	- Jorrit added support for the new sound wrappers in regions.
+	- Jorrit changed the loader so that it tries to find the sound manager.
+	  If not present the loader will load the sound manager plugin.
+	- Jorrit fixed the new sound renderer to use the correct sound driver
+	  for the OS by default.
+	- Jorrit added a test app for the sound system. Still not functional
+	  (work in progress).
 	- res fixed some 64bit warnings in sndsys.
 	- res added a paragraph about documentation for inherited members to
 	  the coding guidelines.

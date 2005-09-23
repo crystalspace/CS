@@ -62,6 +62,7 @@
 #include "ivideo/texture.h"
 #include "igraphic/imageio.h"
 #include "isndsys/ss_loader.h"
+#include "isndsys/ss_manager.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
 #include "iutil/vfs.h"
@@ -1044,6 +1045,21 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   GET_PLUGIN (ModelConverter, iModelConverter, "model converter");
   GET_PLUGIN (CrossBuilder, iCrossBuilder, "model crossbuilder");
 
+  SndSysManager = CS_QUERY_REGISTRY (object_reg, iSndSysManager);			\
+  if (!SndSysManager)
+  {
+    SndSysManager = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.sndsys.manager",
+    	iSndSysManager);
+    if (SndSysManager)
+    {
+      object_reg->Register (SndSysManager, "iSndSysManager");
+    }
+    else
+    {
+      if (do_verbose) ReportNotify ("Could not get sound manager!");
+    }
+  }
+
   InitTokenTable (xmltokens);
 
   stringSet = CS_QUERY_REGISTRY_TAG_INTERFACE (
@@ -1453,7 +1469,8 @@ bool csLoader::LoadSounds (iDocumentNode* node)
                     {
                       snd->QueryObject ()->ObjAdd (kvp->QueryObject ());
                       kvp->DecRef ();
-                    } else
+                    }
+		    else
                       return false;
                   }
                   break;
