@@ -287,11 +287,13 @@ rule GenerateDoxygenCppWrapper
     outfile = "cpp.sh" ;
     local p = $(LOCATE.DOCS) $(outfile) ;
     cmdpath = $(p:J=/) ;
-    command = "$(cxxcpp)" $1 ;
+    command = "$(cxxcpp)" \\$1 ;
   }
   MakeLocate $(outfile) : $(LOCATE.DOCS) ;
   DOXYCPP_COMMAND on $(outfile) = $(command) ;
   WriteCppWrapper $(outfile) ;
+  MODE on $(outfile) = "+x" ;
+  Chmod $(outfile) ;
     
   Always $(outfile) ;
   Depends $(target) : $(outfile) ;
