@@ -25,7 +25,7 @@
 #error Do not include this file directly. Included from scf_implementation.h
 #endif
 
-#ifdef DOXYGEN_RUN
+#if 0
 /* WTF... seems without a class here doxygen will ignore all the stuff 
  * generated below. Whatever, take it, keep it. */
 class __Doxygen_Workaround__ {};
