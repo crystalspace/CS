@@ -40,21 +40,21 @@ class OpenGLTextureCache;
 class GLFontCache;
 
 /**
- * Basic OpenGL version of the 2D driver class
- * You can look at the openGLX graphics class as an example
+ * Basic OpenGL version of the 2D driver class.
+ * You can look at one of the OpenGL canvas classes as an example
  * of how to inherit and use this class.  In short,
  * inherit from this common class instead of from csGraphics2D,
  * and override all the functions you normally would except for
  * the 2D drawing functions, which are supplied for you here.
  * That way all OpenGL drawing functions are unified over platforms,
  * so that a fix or improvement will be inherited by all platforms
- * instead of percolating via people copying code over. -GJH
+ * instead of percolating via people copying code over. 
  */
 class CS_CSPLUGINCOMMON_GL_EXPORT csGraphics2DGLCommon : 
   public scfImplementationExt2<csGraphics2DGLCommon, 
 	  csGraphics2D, 
 	  iEventPlug,
-	  iGLDriverDatabase>
+	  iOpenGLDriverDatabase>
 {
 public:
   enum GLPixelFormatValue

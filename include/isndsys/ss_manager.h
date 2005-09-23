@@ -19,11 +19,12 @@
 #ifndef __CS_SNDSYS_MANAGER_H__
 #define __CS_SNDSYS_MANAGER_H__
 
+#include "isndsys/ss_stream.h"
+
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 
 struct iObject;
-struct iSndSysStream;
 
 /**
  * A wrapper/holder for a loaded sound.

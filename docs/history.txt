@@ -54,6 +54,9 @@ chronological order.
 	  addition to the old syntax of using a <file> child node.
 	- Jorrit allowed texture filename to be specified with 'file' attribute in
 	  addition to the old syntax of using a <file> child node.
+	- res renamed iGLDriverDatabase to iOpenGLDriverDatabase for 
+	  consistency.
+	- res did some more misc tweaks of the recently changed doxygen stuff.
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
 	  stuff into CS. First the loader now also optionally loads the new

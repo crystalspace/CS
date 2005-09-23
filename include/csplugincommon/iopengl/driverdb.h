@@ -44,8 +44,8 @@ struct iDocumentNode;
  * If you wanted to load CS' own driver database with this interface, the
  * following code fragment will give you a rough idea on how to achieve that:
  * \code
- * csRef<iGLDriverDatabase> driverDB = 
- *  scfQueryInterface<iGLDriverDatabase> (graphics2D);
+ * csRef<iOpenGLDriverDatabase> driverDB = 
+ *  scfQueryInterface<iOpenGLDriverDatabase> (graphics2D);
  * if (driverDB.IsValid())
  * {
  *   csRef<iFile> dbFile = VFS->Open ("/config/gldrivers.xml", VFS_FILE_READ);
@@ -56,9 +56,9 @@ struct iDocumentNode;
  * }
  * \endcode
  */
-struct iGLDriverDatabase : public virtual iBase
+struct iOpenGLDriverDatabase : public virtual iBase
 {
-  SCF_INTERFACE(iGLDriverDatabase, 0, 0, 1);
+  SCF_INTERFACE(iOpenGLDriverDatabase, 0, 0, 1);
   
   /**
    * Read a custom driver database.
