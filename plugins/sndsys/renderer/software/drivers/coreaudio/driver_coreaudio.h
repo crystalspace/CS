@@ -88,9 +88,6 @@ public:
 		     AudioBufferList* outOutputData,
                      const AudioTimeStamp* inOutputTime);
 
-  /// The reporter.
-  static csRef<iReporter> reporter;
-
 protected:
   sSndSysRendererSoftware *attached_renderer;
   csSndSysSoundFormat playback_format;

@@ -18,6 +18,8 @@ chronological order.
 	  by a simple mesh as well.
 	- Jorrit fixed a leak to the reporter in the OSS driver for the new
 	  sound system.
+	- Jorrit fixed a leak to the reporter in the coreaudio driver for
+	  the new sound system.
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
 	  stuff into CS. First the loader now also optionally loads the new

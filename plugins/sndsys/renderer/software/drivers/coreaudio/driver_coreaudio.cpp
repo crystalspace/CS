@@ -54,10 +54,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 // The system driver.
 iObjectRegistry *SndSysDriverCoreAudio::object_reg = 0;
 
-// The loaded CS reporter
-csRef<iReporter> SndSysDriverCoreAudio::reporter;
-
-
 // CoreAudio static IO procedure wrapper
 static OSStatus StaticAudioProc(AudioDeviceID inDevice,
 				const AudioTimeStamp *inNow,
@@ -91,8 +87,7 @@ void SndSysDriverCoreAudio::Report(int severity, const char* msg, ...)
   va_list arg;
   va_start (arg, msg);
 
-  if (!reporter)
-    reporter = CS_QUERY_REGISTRY(object_reg, iReporter);
+  csRef<iReporter> reporter = CS_QUERY_REGISTRY(object_reg, iReporter);
 
   if (reporter)
   {
