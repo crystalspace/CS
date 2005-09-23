@@ -56,17 +56,17 @@ struct iSndSysRenderer : public iBase
    * Uses the provided iSound2Data to create a sound stream with the given
    * 3D rendering mode
    */
-  virtual csPtr<iSndSysStream> CreateStream(csRef<iSndSysData> data,
+  virtual csPtr<iSndSysStream> CreateStream(iSndSysData* data,
   	int mode3d) = 0;
 
   /// Creates a source when provided with a Sound Stream
-  virtual csPtr<iSndSysSource> CreateSource(csRef<iSndSysStream> stream) = 0;
+  virtual csPtr<iSndSysSource> CreateSource(iSndSysStream* stream) = 0;
 
   /// Remove a stream from the sound renderer's list of streams
-  virtual bool RemoveStream(csRef<iSndSysStream> stream) = 0;
+  virtual bool RemoveStream(iSndSysStream* stream) = 0;
 
   /// Remove a source from the sound renderer's list of sources
-  virtual bool RemoveSource(csRef<iSndSysSource> source) = 0;
+  virtual bool RemoveSource(iSndSysSource* source) = 0;
 
   /// Get the global Listener object
   virtual csRef<iSndSysListener> GetListener () = 0;

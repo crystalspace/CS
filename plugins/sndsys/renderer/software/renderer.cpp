@@ -231,7 +231,7 @@ float csSndSysRendererSoftware::GetVolume ()
   return Volume;
 }
 
-csPtr<iSndSysStream> csSndSysRendererSoftware::CreateStream(csRef<iSndSysData> data, int mode3d)
+csPtr<iSndSysStream> csSndSysRendererSoftware::CreateStream(iSndSysData* data, int mode3d)
 {
   csSndSysSoundFormat stream_format;
   iSndSysStream *stream;
@@ -260,7 +260,7 @@ csPtr<iSndSysStream> csSndSysRendererSoftware::CreateStream(csRef<iSndSysData> d
 }
 
 
-csPtr<iSndSysSource> csSndSysRendererSoftware::CreateSource(csRef<iSndSysStream> stream)
+csPtr<iSndSysSource> csSndSysRendererSoftware::CreateSource(iSndSysStream* stream)
 {
   iSndSysSourceSoftware *source=0;
   // Needs to be threadsafe with the background thread
@@ -286,7 +286,7 @@ csPtr<iSndSysSource> csSndSysRendererSoftware::CreateSource(csRef<iSndSysStream>
 }
 
 /// Remove a stream from the sound renderer's list of streams
-bool csSndSysRendererSoftware::RemoveStream(csRef<iSndSysStream> stream)
+bool csSndSysRendererSoftware::RemoveStream(iSndSysStream* stream)
 {
   iSndSysStream *streamptr=stream->GetPtr();
 
@@ -302,7 +302,7 @@ bool csSndSysRendererSoftware::RemoveStream(csRef<iSndSysStream> stream)
 }
 
 /// Remove a source from the sound renderer's list of sources
-bool csSndSysRendererSoftware::RemoveSource(csRef<iSndSysSource> source)
+bool csSndSysRendererSoftware::RemoveSource(iSndSysSource* source)
 {
   iSndSysSource *sourceptr=source->GetPtr();
 

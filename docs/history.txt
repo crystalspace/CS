@@ -11,6 +11,8 @@ chronological order.
 	  again.
 	- Jorrit fixed the general sound loader plugin so it no longer tries
 	  to load the wav and ogg loaders with the 'planeshift' prefix.
+	- Jorrit changed the iSndSysRenderer prototypes to accept normal pointer
+	  arguments instead of csRef's.
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
 	  stuff into CS. First the loader now also optionally loads the new
