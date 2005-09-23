@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.sndsys.renderer.software</name>
-        <implementation>SndSysRendererSoftware</implementation>
+        <implementation>csSndSysRendererSoftware</implementation>
         <description>Sound System Software Renderer</description>
       </class>
     </classes>
