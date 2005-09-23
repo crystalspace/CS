@@ -21,7 +21,6 @@
 #define SNDSYS_SOFTWARE_DRIVER_DIRECTSOUND_H
 
 #include "csutil/cfgacc.h"
-#include "csutil/refcount.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/win32/win32.h"

@@ -221,7 +221,9 @@ bool SndSysDriverOSS::StartThread()
   if (running) return false;
 
   running=true;
-  bgthread = csThread::Create(this);
+  SndSysDriverRunnable* runnable = new SndSysDriverRunnable (this);
+  bgthread = csThread::Create(runnable);
+  runnable->DecRef ();
 
   bgthread->Start();
   
@@ -233,6 +235,11 @@ void SndSysDriverOSS::StopThread()
 {
   running=false;
   csSleep(100);
+}
+
+void SndSysDriverRunnable::Run ()
+{
+  parent->Run ();
 }
 
 void SndSysDriverOSS::Run()
