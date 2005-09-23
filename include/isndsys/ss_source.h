@@ -21,6 +21,7 @@
 #define __CS_SNDSYS_ISNDSYS_SOURCE_H__
 
 #include "csutil/scf.h"
+#include "isndsys/ss_structs.h"
 
 SCF_VERSION (iSndSysSource, 0, 1, 0);
 

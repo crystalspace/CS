@@ -22,6 +22,10 @@
 #include <crystalspace.h>
 #include <isndsys/ss_renderer.h>
 #include <isndsys/ss_loader.h>
+#include <isndsys/ss_source.h>
+#include <isndsys/ss_stream.h>
+#include <isndsys/ss_data.h>
+#include <isndsys/ss_listener.h>
 
 /**
  * The main class for the sound test.
@@ -54,8 +58,18 @@ private:
   /// The sound loader.
   csRef<iSndSysLoader> sndloader;
 
+  /// The sound source.
+  csRef<iSndSysSource> sndsource;
+  csRef<iSndSysSourceSoftware3D> sndsource3d;
+
+  /// The model that moves with the sound.
+  csRef<iMeshWrapper> sprite;
+
   /// A pointer to the sector the camera will be in.
   iSector* room;
+
+  /// Current angle.
+  float cur_angle;
 
   /**
    * Handle keyboard events - ie key presses and releases.
@@ -78,7 +92,13 @@ private:
   void FinishFrame ();
 
   /// Here we will create our little, simple world.
-  void CreateRoom ();
+  bool CreateRoom ();
+
+  /// Load a sound.
+  bool LoadSound ();
+
+  /// Here we will create our sprites.
+  bool CreateSprites();
 
 public:
 

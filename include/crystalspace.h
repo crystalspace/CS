@@ -39,7 +39,6 @@
 #include "imap.h"
 #include "imesh.h"
 #include "inetwork.h"
-#include "isndsys.h"
 #include "isound.h"
 #include "itexture.h"
 #include "iutil.h"

@@ -31,12 +31,25 @@ SndTest::~SndTest ()
 {
 }
 
+static csVector3 GetSoundPos (float angle)
+{
+  float x = cos (angle) * 3.0f;
+  float y = sin (angle) * 3.0f;
+  return csVector3 (x, 5.0, y);
+}
+
 void SndTest::ProcessFrame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
+
+  cur_angle += speed;
+  csVector3 sndpos = GetSoundPos (cur_angle);
+  sndsource3d->SetPosition (sndpos);
+  sprite->GetMovable ()->GetTransform ().SetOrigin (sndpos);
+  sprite->GetMovable ()->UpdateMove ();
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -106,6 +119,67 @@ bool SndTest::OnInitialize(int argc, char* argv[])
   return true;
 }
 
+bool SndTest::CreateSprites ()
+{
+  // Load a texture for our sprite.
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
+  iTextureWrapper* txt = loader->LoadTexture ("spark",
+    "/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
+  if (txt == 0)
+    return ReportError("Error loading texture!");
+
+  // Load a sprite template from disk.
+  csRef<iMeshFactoryWrapper> imeshfact (
+    loader->LoadMeshObjectFactory ("/lib/std/sprite1"));
+  if (imeshfact == 0)
+    return ReportError("Error loading mesh object factory!");
+
+  // Create the sprite and add it to the engine.
+  sprite = engine->CreateMeshWrapper (imeshfact, "MySprite", room,
+    GetSoundPos (0));
+  csMatrix3 m; m.Identity ();
+  sprite->GetMovable ()->SetTransform (m);
+  sprite->GetMovable ()->UpdateMove ();
+  csRef<iSprite3DState> spstate (
+    SCF_QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState));
+  spstate->SetAction ("default");
+
+  return true;
+}
+
+bool SndTest::LoadSound ()
+{
+  const char* fname = "/lib/std/loopbzzt.wav";
+  csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+
+  csRef<iDataBuffer> soundbuf = vfs->ReadFile (fname);
+  if (!soundbuf)
+    return ReportError ("Can't load file '%s'!", fname);
+
+  csRef<iSndSysData> snddata = sndloader->LoadSound (soundbuf->GetData (),
+  	soundbuf->GetSize ());
+  if (!snddata)
+    return ReportError ("Can't load sound '%s'!", fname);
+
+  csRef<iSndSysStream> sndstream = sndrenderer->CreateStream (snddata,
+  	CS_SND3D_ABSOLUTE);
+  if (!sndstream)
+    return ReportError ("Can't create stream for '%s'!", fname);
+
+  sndsource = sndrenderer->CreateSource (sndstream);
+  if (!sndsource)
+    return ReportError ("Can't create source for '%s'!", fname);
+  sndsource3d = SCF_QUERY_INTERFACE (sndsource, iSndSysSourceSoftware3D);
+
+  sndsource3d->SetPosition (GetSoundPos (0));
+  sndsource3d->SetVolume (1.0f);
+
+  sndstream->SetLoopState (CS_SNDSYS_STREAM_LOOP);
+  sndstream->Unpause ();
+
+  return true;
+}
+
 void SndTest::OnExit()
 {
 }
@@ -152,7 +226,8 @@ bool SndTest::Application()
   engine->SetLightingCacheMode (0);
 
   // Here we create our world.
-  CreateRoom();
+  if (!CreateRoom())
+    return false;
 
   // Let the engine prepare all lightmaps for use and also free all images 
   // that were loaded for the texture manager.
@@ -160,7 +235,18 @@ bool SndTest::Application()
 
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, 0));
+
+  // Create the model.
+  if (!CreateSprites ())
+    return false;
+
+  // Load a sound.
+  if (!LoadSound ())
+    return false;
+
+  cur_angle = 0;
+  sndrenderer->GetListener ()->SetPosition (csVector3 (0, 0, 0));
 
   // This calls the default runloop. This will basically just keep
   // broadcasting process events to keep the game going.
@@ -169,13 +255,13 @@ bool SndTest::Application()
   return true;
 }
 
-void SndTest::CreateRoom ()
+bool SndTest::CreateRoom ()
 {
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError("Error loading 'stone4' texture!");
+    return ReportError("Error loading 'stone4' texture!");
 
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
@@ -203,6 +289,7 @@ void SndTest::CreateRoom ()
 
   light = engine->CreateLight(0, csVector3(0, 5, -3), 10, csColor(0, 1, 0));
   ll->Add (light);
+  return true;
 }
 
 /*-------------------------------------------------------------------------*

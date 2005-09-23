@@ -13,6 +13,9 @@ chronological order.
 	  to load the wav and ogg loaders with the 'planeshift' prefix.
 	- Jorrit changed the iSndSysRenderer prototypes to accept normal pointer
 	  arguments instead of csRef's.
+	- Jorrit finished the sndtest app. It now plays a sound and constantly
+	  rotates it around the camera. The position of the sound is represented
+	  by a simple mesh as well.
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
 	  stuff into CS. First the loader now also optionally loads the new
