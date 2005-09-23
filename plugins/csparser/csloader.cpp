@@ -64,6 +64,7 @@
 #include "isndsys/ss_loader.h"
 #include "isndsys/ss_manager.h"
 #include "isndsys/ss_renderer.h"
+#include "isndsys/ss_stream.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
 #include "iutil/vfs.h"
@@ -1450,35 +1451,110 @@ bool csLoader::LoadSounds (iDocumentNode* node)
           {
             filename = filenode->GetContentsValue ();
           }
-          csRef<iSoundWrapper> snd = CS_GET_NAMED_CHILD_OBJECT (
+	  else
+	  {
+	    const char* fname = child->GetAttributeValue ("file");
+	    if (fname) filename = fname;
+	  }
+	  int mode3d = -1;
+	  csRef<iDocumentAttribute> at = child->GetAttribute ("mode3d");
+	  if (at)
+	  {
+	    const char* v = at->GetValue ();
+	    if (!strcasecmp ("disable", v))
+	      mode3d = CS_SND3D_DISABLE;
+	    else if (!strcasecmp ("relative", v))
+	      mode3d = CS_SND3D_RELATIVE;
+	    else if (!strcasecmp ("absolute", v))
+	      mode3d = CS_SND3D_ABSOLUTE;
+	    else
+	    {
+	      SyntaxService->ReportError (
+	        "crystalspace.maploader.parse.sound", child,
+	        "Use either 'disable', 'relative', or 'absolute' for mode3d attribute!");
+	      return false;
+	    }
+	  }
+
+	  if (mode3d == -1)
+	  {
+	    if (!SoundLoader)
+	    {
+	      SyntaxService->ReportError (
+	        "crystalspace.maploader.parse.sound", child,
+	        "Old sound loader not loaded!");
+	      return false;
+	    }
+	    // Old style sounds!
+            csRef<iSoundWrapper> snd = CS_GET_NAMED_CHILD_OBJECT (
                 Engine->QueryObject (), iSoundWrapper, name);
-          if (!snd)
-            snd = LoadSound (name, filename);
-          if (snd)
-          {
-            csRef<iDocumentNodeIterator> it2 (child->GetNodes ());
-            while (it2->HasNext ())
+            if (!snd)
+              snd = LoadSound (name, filename);
+            if (snd)
             {
-              csRef<iDocumentNode> child2 = it2->Next ();
-              if (child2->GetType () != CS_NODE_ELEMENT) continue;
-              switch (xmltokens.Request (child2->GetValue ()))
+              csRef<iDocumentNodeIterator> it2 (child->GetNodes ());
+              while (it2->HasNext ())
               {
-                case XMLTOKEN_KEY:
-                  {
-                    iKeyValuePair *kvp = 0;
-                    SyntaxService->ParseKey (child2, kvp);
-                    if (kvp)
+                csRef<iDocumentNode> child2 = it2->Next ();
+                if (child2->GetType () != CS_NODE_ELEMENT) continue;
+                switch (xmltokens.Request (child2->GetValue ()))
+                {
+                  case XMLTOKEN_KEY:
                     {
-                      snd->QueryObject ()->ObjAdd (kvp->QueryObject ());
-                      kvp->DecRef ();
+                      iKeyValuePair *kvp = 0;
+                      SyntaxService->ParseKey (child2, kvp);
+                      if (kvp)
+                      {
+                        snd->QueryObject ()->ObjAdd (kvp->QueryObject ());
+                        kvp->DecRef ();
+                      }
+		      else
+                        return false;
                     }
-		    else
-                      return false;
-                  }
-                  break;
+                    break;
+                }
               }
             }
-          }
+	  }
+	  else
+	  {
+	    // New sound system.
+	    if (!SndSysLoader)
+	    {
+	      SyntaxService->ReportError (
+	        "crystalspace.maploader.parse.sound", child,
+	        "New sound loader not loaded!");
+	      return false;
+	    }
+            iSndSysWrapper* snd = SndSysManager->FindSoundByName (name);
+            if (!snd)
+              snd = LoadSoundWrapper (name, filename, mode3d);
+            if (snd)
+            {
+              csRef<iDocumentNodeIterator> it2 (child->GetNodes ());
+              while (it2->HasNext ())
+              {
+                csRef<iDocumentNode> child2 = it2->Next ();
+                if (child2->GetType () != CS_NODE_ELEMENT) continue;
+                switch (xmltokens.Request (child2->GetValue ()))
+                {
+                  case XMLTOKEN_KEY:
+                    {
+                      iKeyValuePair *kvp = 0;
+                      SyntaxService->ParseKey (child2, kvp);
+                      if (kvp)
+                      {
+                        snd->QueryObject ()->ObjAdd (kvp->QueryObject ());
+                        kvp->DecRef ();
+                      }
+		      else
+                        return false;
+                    }
+                    break;
+                }
+              }
+            }
+	  }
         }
         break;
       default:
@@ -1504,8 +1580,7 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
     {
       case XMLTOKEN_DISTANCE:
 	{
-	  csRef<iDocumentAttribute> at;
-	  at = child->GetAttribute ("varm");
+	  csRef<iDocumentAttribute> at = child->GetAttribute ("varm");
 	  if (at)
 	  {
 	    // We use variables.

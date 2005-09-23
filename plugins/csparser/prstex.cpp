@@ -151,7 +151,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   csRef<iTextureWrapper> tex;
   csRef<iLoaderPlugin> plugin;
 
-  csString filename;
+  csString filename = node->GetAttributeValue ("file");
   csColor transp (0, 0, 0);
   bool do_transp = false;
   bool keep_image = false;

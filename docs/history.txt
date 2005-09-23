@@ -46,6 +46,14 @@ chronological order.
 	  being filtered by the C++ preprocessor. This way, scfImplementationN
 	  and scfImplementationExtN are now documented, and implementation
 	  classes utilizing those helpers show unherited documentation again.
+	- Jorrit added support for loading sounds for the new sound system
+	  through world and library files. To use this you just have to add
+	  the 'mode3d' attribute for the <sound> keyword with one of the values
+	  'disable', 'relative', 'or 'absolute'.
+	- Jorrit allowed sound filename to be specified with 'file' attribute in
+	  addition to the old syntax of using a <file> child node.
+	- Jorrit allowed texture filename to be specified with 'file' attribute in
+	  addition to the old syntax of using a <file> child node.
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
 	  stuff into CS. First the loader now also optionally loads the new

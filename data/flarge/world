@@ -99,9 +99,7 @@
         <texture name="flare_spark5">
             <file>/lib/stdtex/flare_pink.jpg</file>
         </texture>
-        <texture name="blobby.jpg">
-            <file>/lib/stdtex/blobby.jpg</file>
-        </texture>
+        <texture name="blobby.jpg" file="/lib/stdtex/blobby.jpg" />
         <texture name="fire">
             <type>fireTxt</type>
         </texture>
@@ -114,12 +112,8 @@
         <texture name="plasma">
             <type>crystalspace.texture.loader.plasma</type>
         </texture>
-        <texture name="billboard">
-            <file>/lib/std/cslogods.png</file>
-        </texture>
-        <texture name="seagull">
-            <file>/lib/std/seagull.gif</file>
-        </texture>
+        <texture name="billboard" file="/lib/std/cslogods.png" />
+        <texture name="seagull" file="/lib/std/seagull.gif" />
         <texture name="flickernote">
             <file>/lib/stdtex/flicker-note1.png</file>
         </texture>
