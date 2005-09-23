@@ -4039,6 +4039,30 @@ class iSectorMeshCallbackPtr(iSectorMeshCallback):
         _swig_setattr(self, iSectorMeshCallback,self.__class__,iSectorMeshCallback)
 _cspace.iSectorMeshCallback_swigregister(iSectorMeshCallbackPtr)
 
+class iLightVisibleCallback(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iLightVisibleCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iLightVisibleCallback, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iLightVisibleCallback instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def LightVisible(*args): return _cspace.iLightVisibleCallback_LightVisible(*args)
+    def __del__(self, destroy=_cspace.delete_iLightVisibleCallback):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iLightVisibleCallbackPtr(iLightVisibleCallback):
+    def __init__(self, this):
+        _swig_setattr(self, iLightVisibleCallback, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iLightVisibleCallback, 'thisown', 0)
+        _swig_setattr(self, iLightVisibleCallback,self.__class__,iLightVisibleCallback)
+_cspace.iLightVisibleCallback_swigregister(iLightVisibleCallbackPtr)
+
 class iSector(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -4085,6 +4109,10 @@ class iSector(iBase):
     def RemoveSectorCallback(*args): return _cspace.iSector_RemoveSectorCallback(*args)
     def GetSectorCallbackCount(*args): return _cspace.iSector_GetSectorCallbackCount(*args)
     def GetSectorCallback(*args): return _cspace.iSector_GetSectorCallback(*args)
+    def SetLightCulling(*args): return _cspace.iSector_SetLightCulling(*args)
+    def IsLightCullingEnabled(*args): return _cspace.iSector_IsLightCullingEnabled(*args)
+    def AddLightVisibleCallback(*args): return _cspace.iSector_AddLightVisibleCallback(*args)
+    def RemoveLightVisibleCallback(*args): return _cspace.iSector_RemoveLightVisibleCallback(*args)
     def __del__(self, destroy=_cspace.delete_iSector):
         try:
             if self.thisown: destroy(self)
@@ -6756,6 +6784,9 @@ class iLoader(iBase):
     def LoadTexture(*args): return _cspace.iLoader_LoadTexture(*args)
     def LoadSoundData(*args): return _cspace.iLoader_LoadSoundData(*args)
     def LoadSound(*args): return _cspace.iLoader_LoadSound(*args)
+    def LoadSoundSysData(*args): return _cspace.iLoader_LoadSoundSysData(*args)
+    def LoadSoundStream(*args): return _cspace.iLoader_LoadSoundStream(*args)
+    def LoadSoundWrapper(*args): return _cspace.iLoader_LoadSoundWrapper(*args)
     def ThreadedLoadMapFile(*args): return _cspace.iLoader_ThreadedLoadMapFile(*args)
     def LoadMapFile(*args): return _cspace.iLoader_LoadMapFile(*args)
     def LoadMap(*args): return _cspace.iLoader_LoadMap(*args)
