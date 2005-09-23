@@ -2780,6 +2780,7 @@ package cspace::csInitializer;
 *_SetupEventHandler = *cspacec::csInitializer__SetupEventHandler;
 *SetupEventHandler = *cspacec::csInitializer_SetupEventHandler;
 *DestroyApplication = *cspacec::csInitializer_DestroyApplication;
+*GetDefaultAppID = *cspacec::csInitializer_GetDefaultAppID;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csInitializer(@_);
