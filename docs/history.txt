@@ -25,6 +25,7 @@ chronological order.
 	  csRunnable (which was implemented by the driver itself). Solved this
 	  by making the csRunnable a separate class.
 	- Jorrit did a similar circular-leak fix to the OSS driver (untested).
+	- swedishcoder added some CEGUI documentation.
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
 	  stuff into CS. First the loader now also optionally loads the new

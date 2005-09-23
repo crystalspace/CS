@@ -1,0 +1,55 @@
+@c -*-texinfo-*-
+@node CEGUI, Making Own Projects, AWS, Using Crystal Space
+@section CEGUI Introduction
+@noindent
+@emph{Originally written by Seth Yastrov, @email{syastrov@@users.sourceforge.net} and Dan Hardfeldt,
+@email{swedishcoder@@users.sourceforge.net}.
+
+@subheading The CEGUI Plugin
+
+The CEGUI plugin is a wrapper around the CEGUI library (http://www.cegui.org.uk/)
+so it can be easily used from within Crystal Space applications. The plugin
+provides a renderer, a VFS resource provider, and an event handler for CEGUI.
+
+@subheading Initialization
+
+All components of the CEGUI plugin are setup when the application calls
+iCEGUI::Initialize(). This function will initialize CEGUI and tell it to use
+the CEGUI plugin renderer and event handler. It is not necessary to create a
+new CEGUI::System() in your application as this is performed automatically.
+
+@subheading Renderer
+
+To render the GUI, there is a convenience function, iCEGUI::Render().
+This function may be called from anywhere in the application to allow
+the ability to render to an alternate render target (like procedural textures).
+Typically, it is called in ProcessFrame(), in between
+BeginDraw() and FinishDraw() calls.
+
+@subheading Singletons
+
+It is important that applications using CEGUI from Crystal Space do not use
+any of the CEGUI getSingleton() or getSingletonPtr() calls, such as
+CEGUI::Singleton<T>::getSingleton() or CEGUI::System::getSingleton().
+The reason for this is that global and static variables (declared in methods,
+classes, namespaces or globally) are not normally shared between modules.
+Calling getSingleton() from the Crystal Space application will not give the
+same instance as calling getSingleton() from the CEGUI plugin.
+
+To remedy this, there are Get* functions in the iCEGUI interface that
+return a reference or pointer to the CEGUI singletons so that they may be
+used safely from a Crystal Space application. GetSystem() and GetSystemPtr()
+are the most commonly used ones.
+
+@subheading Resource Provider
+
+The CEGUI plugin provides a VFS implementation of the CEGUI resource provider.
+This means that all paths passed to CEGUI functions should be VFS paths.
+Textures, scheme files, layout files, etc, will all be loaded through the VFS.
+Paths within these files should be VFS paths as well.
+
+@subheading Event Handler
+
+Keyboard and mouse input is automatically injected into the CEGUI event system
+by the CEGUI plugin event handler. The CEGUI display area is automatically
+resized when the Crystal Space canvas is resized.
