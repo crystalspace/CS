@@ -20,6 +20,10 @@ chronological order.
 	  sound system.
 	- Jorrit fixed a leak to the reporter in the coreaudio driver for
 	  the new sound system.
+	- Jorrit fixed a circular reference in the windows directsound driver.
+	  It was holding a ref to a csThread that in turn held a ref to the
+	  csRunnable (which was implemented by the driver itself). Solved this
+	  by making the csRunnable a separate class.
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
 	  stuff into CS. First the loader now also optionally loads the new

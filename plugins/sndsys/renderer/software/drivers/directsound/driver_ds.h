@@ -21,6 +21,7 @@
 #define SNDSYS_SOFTWARE_DRIVER_DIRECTSOUND_H
 
 #include "csutil/cfgacc.h"
+#include "csutil/refcount.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/win32/win32.h"
@@ -29,11 +30,37 @@
 #include <dsound.h>
 
 
+class SndSysDriverDirectSound;
+
+class SndSysDriverRunnable : public csRunnable
+{
+private:
+  SndSysDriverDirectSound* parent;
+  int ref_count;
+
+public:
+  SndSysDriverRunnable (SndSysDriverDirectSound* parent) :
+  	parent (parent), ref_count (1) { }
+  virtual ~SndSysDriverRunnable () { }
+
+  virtual void Run ();
+  virtual void IncRef() { ++ref_count; }
+  /// Decrement reference count.
+  virtual void DecRef()
+  {
+    --ref_count;
+    if (ref_count <= 0)
+      delete this;
+  }
+
+  /// Get reference count.
+  virtual int GetRefCount() { return ref_count; }
+};
 
 struct iConfigFile;
 struct iReporter;
 
-class SndSysDriverDirectSound : public iSndSysSoftwareDriver, public csRunnable
+class SndSysDriverDirectSound : public iSndSysSoftwareDriver
 {
 public:
   SCF_DECLARE_IBASE;
