@@ -21,6 +21,7 @@
 #define __CS_CSGFX_RENDERBUFFER_H__
 
 /**\file
+ * Render buffer.
  */
 
 #include "csextern.h"
@@ -49,7 +50,7 @@ class csCallStack;
 #endif
 
 /**
- * Basic renderbuffer for OpenGL renderer.
+ * Render buffer - basic container for mesh geometry data.
  */
 class CS_CRYSTALSPACE_EXPORT csRenderBuffer :
   public scfImplementation1<csRenderBuffer, iRenderBuffer>

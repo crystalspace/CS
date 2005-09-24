@@ -22,6 +22,7 @@
 #define __CS_CSPLUGINCOMMON_CANVAS_SCANCODE_H__
 
 /**\file
+ * Scan code to character conversion table.
  */
 
 /**

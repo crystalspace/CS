@@ -21,6 +21,7 @@
 #define __CS_CSPLUGINCOMMON_CANVAS_GRAPH2D_H__
 
 /**\file
+ * Base class for 2D canvases.
  */
 
 #include "csextern.h"

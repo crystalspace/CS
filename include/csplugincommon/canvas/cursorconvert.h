@@ -25,11 +25,10 @@
  * @{ */
 
 /**\file
+ * Convert images into data formats suitable for native mouse cursor creation.
  */
 
 #include "csextern.h"
-//#include "csgfx/rgbpixel.h"
-//#include "csgfx/quantize.h"
 
 struct iImage;
 

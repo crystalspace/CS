@@ -27,11 +27,13 @@
 #include "shadervarblockalloc.h"
 
 /**\file
+ * Frame data holder for shader variables.
  */
 
 /**
  * Helper class to obtain a shader variable that was guaranteedly not used
  * in a frame yet.
+ * \sa csFrameDataHolder
  */
 class CS_CRYSTALSPACE_EXPORT csShaderVariableFrameHolder
 {

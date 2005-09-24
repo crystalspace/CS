@@ -18,6 +18,7 @@
 */
 
 /**\file
+ * RGB colors.
  */
 /**\addtogroup gfx
  * @{
@@ -55,6 +56,7 @@
 #define __CS_RGBPIXEL_H__
 
 #include "csextern.h"
+#include "csutil/comparator.h"
 
 
 /**

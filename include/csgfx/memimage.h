@@ -28,6 +28,12 @@
 #include "csgfx/imagetools.h"
 #include "csgfx/rgbpixel.h"
 
+/**\file
+ * Memory image.
+ */
+/**\addtogroup gfx
+ * @{ */
+ 
 /**
  * Memory image.
  */
@@ -293,5 +299,7 @@ public:
   void ConvertFromPal8 (uint8* iImage, uint8* alpha, 
     const csRGBcolor* iPalette, int nPalColors = 256);
 };
+
+/** @} */
 
 #endif // __CS_CSGFX_MEMIMAGE_H__

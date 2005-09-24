@@ -21,16 +21,14 @@
 
 #include "csextern_dx.h"
 
-#if WINVER >= 0x0500
-  #define DIRECTINPUT_VERSION 0x0800
-#else
-  #define DIRECTINPUT_VERSION 0x0300
-#endif
-
 #include <windows.h>
 #include <ddraw.h>
-#include <d3d.h>
-#include <d3dcaps.h>
+
+/**\file
+ * DirectDraw device enumeration.
+ */
+/**\addtogroup plugincommon
+ * @{ */
 
 /// Description of DirectDraw device
 class CS_CSPLUGINCOMMON_DX_EXPORT DirectDetectionDevice
@@ -54,14 +52,19 @@ public:
     delete[] DeviceDescription2D;
   }
 
-  GUID Guid2D;                // Guid for DirectDraw device
-  bool Windowed;              // Can enable windowed mode for graphics ?
-  bool IsPrimary2D;           // Is a primary ddraw device ?
-  char * DeviceName2D;        // Name of device
-  char * DeviceDescription2D; // Description of device
+  /// Guid for DirectDraw device
+  GUID Guid2D;
+  /// Can enable windowed mode for graphics ?
+  bool Windowed;
+  /// Is a primary ddraw device ?
+  bool IsPrimary2D;
+  /// Name of device
+  char * DeviceName2D;
+  /// Description of device
+  char * DeviceDescription2D; 
 };
 
-// master class of the device detection of direct3d and directdraw
+/// Master class of the device detection of direct3d and directdraw
 class CS_CSPLUGINCOMMON_DX_EXPORT DirectDetection
 {
 public:
@@ -76,8 +79,11 @@ public:
   void ReportResult (int severity, char *str, HRESULT hRes);
   void SystemFatalError (char *str, HRESULT hRes);
 
-  csArray<DirectDetectionDevice> Devices; // list of devices
+  /// List of devices
+  csArray<DirectDetectionDevice> Devices; 
   iObjectRegistry* object_reg;
 };
+
+/** @} */
 
 #endif // __CS_DIRECTDETECTION_H__

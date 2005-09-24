@@ -28,6 +28,9 @@
 
 struct iImage;
 
+/**
+ * Image List 
+ */
 struct iImageVector : public virtual iBase
 {
   SCF_INTERFACE (iImageVector, 2, 0, 0);

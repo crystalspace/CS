@@ -20,6 +20,10 @@
 #ifndef __CS_GFX_SHADERVAR_H__
 #define __CS_GFX_SHADERVAR_H__
 
+/**\file
+ * Shader variable.
+ */
+ 
 #include "csextern.h"
 
 #include "csgeom/transfrm.h"
@@ -42,6 +46,9 @@ struct iTextureWrapper;
 struct csShaderVariableWrapper;
 
 class csShaderVariable;
+
+/**\addtogroup gfx3d
+ * @{ */
 
 /**
  * Interface to an accessorcallback for shadervariables.
@@ -431,5 +438,7 @@ public:
     array->Put (element, variable);
   }
 };
+
+/** @} */
 
 #endif

@@ -18,6 +18,7 @@
 */
 
 /**\file
+ * Create cube map image.
  */
  
 /**\addtogroup gfx

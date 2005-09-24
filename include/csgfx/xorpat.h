@@ -18,6 +18,7 @@
 */
 
 /**\file
+ * Create an XOR pattern.
  */
  
 /**\addtogroup gfx

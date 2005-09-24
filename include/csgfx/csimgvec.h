@@ -29,6 +29,13 @@
 #include "igraphic/image.h"
 #include "igraphic/imgvec.h"
 
+/**\file
+ * Implementation of iImageVector.
+ */
+
+/**
+ * Implementation of iImageVector.
+ */
 struct CS_CRYSTALSPACE_EXPORT csImageVector :
   public scfImplementation1<csImageVector, iImageVector>
 {
@@ -40,39 +47,14 @@ public:
   csImageVector();
   virtual ~csImageVector();
 
-  /**
-  * Add an Image to the Vector
-  */
   virtual void AddImage (iImage* img);
-  /**
-  * Insert an Image into the Vector at specified index
-  */
   virtual void InsertImage (iImage* img, size_t index);
-  /**
-  * Add an Image to the End of the Vector
-  */
   virtual void operator += (iImage* img);
-  /**
-  * Get Image at specified index
-  */
   virtual csRef<iImage> GetImage(size_t index);
-  /**
-  * Get Image operator[]
-  */
   virtual void SetImage (size_t index, iImage* img);
-  /**
-  * Get Image Count
-  */
   virtual size_t Length();
-  /**
-   * Remove a specific index
-   */
   virtual void DeleteIndex(size_t index);
-  /**
-  * Remove All Images
-  */
   virtual void RemoveAll();
-
 };
 
 #endif // __CS_IGRAPHIC_IMGLIST_H__

@@ -18,6 +18,7 @@
 */
 
 /**\file
+ * Create volume image.
  */
  
 /**\addtogroup gfx

@@ -19,6 +19,10 @@
 #ifndef __CS_CSGFX_VERTEXLISTWALKER_H__
 #define __CS_CSGFX_VERTEXLISTWALKER_H__
 
+/**\file
+ * Helper to access elements from renderbuffers.
+ */
+
 /**
  * Helper class to make it easier to access single elements from
  * renderbuffers (with stride)

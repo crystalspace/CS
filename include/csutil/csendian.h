@@ -31,6 +31,26 @@
 
 #define csQroundSure(x) (int ((x) + ((x < 0) ? -0.5 : +0.5)))
 
+/// Convert a machine float to a 32 bit IEEE float
+static inline uint32 csFloatToIEEE (float f)
+{
+#ifdef CS_IEEE_DOUBLE_FORMAT
+  return *(uint32*)&f;
+#else
+  #error Do not know how to convert to IEEE floats
+#endif
+}
+
+/// Convert a 32 bit IEEE float to a machine float
+static inline float csIEEEToFloat (uint32 f)
+{
+#ifdef CS_IEEE_DOUBLE_FORMAT
+  return *(float*)&f;
+#else
+  #error Do not know how to convert from IEEE floats
+#endif
+}
+
 struct csEndianSwap4
 {
   unsigned char b1, b2, b3, b4;
