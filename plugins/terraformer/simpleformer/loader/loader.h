@@ -29,6 +29,12 @@ struct iSyntaxService;
 struct iPluginManager;
 struct iEngine;
 
+namespace cspluginSimpleFormerLoader
+{
+
+template<typename Tgetter>
+class RawHeightmapReader;
+
 class csSimpleFormerLoader : public iLoaderPlugin
 {
 public:
@@ -56,6 +62,20 @@ private:
   csRef<iPluginManager> pluginmgr;
   csRef<iEngine> engine;
   csStringHash xmltokens;
+
+  friend class RawHeightmapReader;
+
+  csRef<iDataBuffer> GetDataBuffer (iDocumentNode* child);
+
+  bool LoadHeightmap32 (iDocumentNode* child, iSimpleFormerState* state);
+  bool LoadHeightmapRaw16LE (iDocumentNode* child, iSimpleFormerState* state);
+  bool LoadHeightmapRaw16BE (iDocumentNode* child, iSimpleFormerState* state);
+  bool LoadHeightmapRaw32LE (iDocumentNode* child, iSimpleFormerState* state);
+  bool LoadHeightmapRaw32BE (iDocumentNode* child, iSimpleFormerState* state);
+  bool LoadHeightmapRawFloatLE (iDocumentNode* child, iSimpleFormerState* state);
+  bool LoadHeightmapRawFloatBE (iDocumentNode* child, iSimpleFormerState* state);
 };
+
+} // namespace cspluginSimpleFormerLoader
 
 #endif /* __LOADER_H__ */

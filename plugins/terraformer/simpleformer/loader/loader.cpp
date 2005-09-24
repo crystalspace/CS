@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 
 #include "csutil/csendian.h"
+#include "csutil/dirtyaccessarray.h"
 
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
@@ -40,6 +41,9 @@
 #include "loader.h"
 
 CS_IMPLEMENT_PLUGIN
+
+namespace cspluginSimpleFormerLoader
+{
 
 enum
 {
@@ -123,58 +127,67 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
       }
       case XMLTOKEN_HEIGHTMAP: 
       {
-        const char *image = child->GetContentsValue ();
-	csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
-	csRef<iImage> map = loader->LoadImage (image, CS_IMGFMT_ANY);
-        if (map == 0) 
-        {
-          synldr->ReportError ("crystalspace.terraformer.simple.loader",
-            child, "Error reading in image file '%s' for heightmap", image);
-          return 0;
-        }
-        state->SetHeightmap (map);
+	const char *format = child->GetAttributeValue ("format");
+	if ((format == 0) || (strcmp (format, "image") == 0))
+	{
+	  const char *image = child->GetContentsValue ();
+	  csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+	  csRef<iImage> map = loader->LoadImage (image, CS_IMGFMT_ANY);
+	  if (map == 0) 
+	  {
+	    synldr->ReportError ("crystalspace.terraformer.simple.loader",
+	      child, "Error reading in image file '%s' for heightmap", image);
+	    return 0;
+	  }
+	  state->SetHeightmap (map);
+	}
+	else if (strcmp (format, "heightmap32") == 0)
+	{
+	  if (!LoadHeightmap32 (child, state))
+	    return 0;
+	}
+	else if (strcmp (format, "raw16le") == 0)
+	{
+	  if (!LoadHeightmapRaw16LE (child, state))
+	    return 0;
+	}
+	else if (strcmp (format, "raw16be") == 0)
+	{
+	  if (!LoadHeightmapRaw16BE (child, state))
+	    return 0;
+	}
+	else if (strcmp (format, "raw32le") == 0)
+	{
+	  if (!LoadHeightmapRaw32LE (child, state))
+	    return 0;
+	}
+	else if (strcmp (format, "raw32be") == 0)
+	{
+	  if (!LoadHeightmapRaw32BE (child, state))
+	    return 0;
+	}
+	else if (strcmp (format, "rawfloatle") == 0)
+	{
+	  if (!LoadHeightmapRawFloatLE (child, state))
+	    return 0;
+	}
+	else if (strcmp (format, "rawfloatbe") == 0)
+	{
+	  if (!LoadHeightmapRawFloatBE (child, state))
+	    return 0;
+	}
+	else
+	{
+	  synldr->ReportError ("crystalspace.terraformer.simple.loader",
+	    child, "Unknown heightmap format '%s'", format);
+	  return 0;
+	}
         break;
       }
       case XMLTOKEN_HEIGHTMAP32: 
       {
-        const char *filename = child->GetContentsValue ();
-	csRef<iVFS> vfs = CS_QUERY_REGISTRY (objreg, iVFS);
-	csRef<iDataBuffer> buf = vfs->ReadFile (filename, false);
-        if (buf == 0) 
-        {
-          synldr->ReportError ("crystalspace.terraformer.simple.loader",
-            child, "Error reading in file '%s' for heightmap", filename);
-          return 0;
-        }
-	char* data = buf->GetData ();
-	char c1 = *data++;
-	char c2 = *data++;
-	char c3 = *data++;
-	char c4 = *data++;
-	if (c1 != 'H' || c2 != 'M' || c3 != '3' || c4 != '2')
-	{
-          synldr->ReportError ("crystalspace.terraformer.simple.loader",
-            child, "File '%s' is not a heightmap32 file", filename);
-          return 0;
-	}
-	uint32 width = csGetLittleEndianLong (data); data += 4;
-	uint32 height = csGetLittleEndianLong (data); data += 4;
-	if (buf->GetSize () != (4+4+4+ width*height*4))
-	{
-          synldr->ReportError ("crystalspace.terraformer.simple.loader",
-            child, "File '%s' is not a valid heightmap32 file: size mismatch",
-	    	filename);
-          return 0;
-	}
-	float* fdata = new float[width*height];
-	uint32 i;
-	for (i = 0 ; i < width * height ; i++)
-	{
-	  long d = csGetLittleEndianLong (data); data += 4;
-	  fdata[i] = float (d) / 4294967296.0f;
-	}
-        state->SetHeightmap (fdata, width, height);
-	delete[] fdata;
+	if (!LoadHeightmap32 (child, state))
+	  return 0;
         break;
       }
       case XMLTOKEN_INTMAP: 
@@ -248,3 +261,213 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
   }
   return csPtr<iBase> (former);
 }
+
+struct EndianBig
+{
+  static inline uint16 GetUI16 (void* buf)
+  { return csGetBigEndianShort (buf); }
+  static inline uint32 GetUI32 (void* buf)
+  { return csGetBigEndianLong (buf); }
+};
+
+struct EndianLittle
+{
+  static inline uint16 GetUI16 (void* buf)
+  { return csGetLittleEndianShort (buf); }
+  static inline uint32 GetUI32 (void* buf)
+  { return csGetLittleEndianLong (buf); }
+};
+
+template<typename Endianness>
+struct GetterFloat
+{
+  static inline void Get (char*& buf, float&f)
+  {
+    f = csIEEEToFloat (Endianness::GetUI32 (buf)); 
+    buf += sizeof(uint32);
+  }
+  static inline size_t ItemSize()
+  { return sizeof(uint32); }
+};
+
+template<typename Endianness>
+struct GetterUint16
+{
+  static inline void Get (char*& buf, float&f)
+  {
+    uint16 v = Endianness::GetUI16 (buf);
+    buf += sizeof (uint16);
+    f = (float)v / (float)((uint16)~0);
+  }
+  static inline size_t ItemSize()
+  { return sizeof(uint16); }
+};
+
+template<typename Endianness>
+struct GetterUint32
+{
+  static inline void Get (char*& buf, float&f)
+  {
+    uint32 v = Endianness::GetUI32 (buf);
+    buf += sizeof (uint32);
+    f = (float)v / (float)((uint32)~0);
+  }
+  static inline size_t ItemSize()
+  { return sizeof(uint32); }
+};
+
+template<typename Tgetter>
+class RawHeightmapReader
+{
+  csSimpleFormerLoader* loader;
+  iSimpleFormerState* state;
+public:
+  RawHeightmapReader (csSimpleFormerLoader* loader, 
+    iSimpleFormerState* state) : loader(loader), state(state) {}
+
+  bool ReadData (char* buf, uint w, uint h)
+  {
+    const size_t num = w * h;
+    csDirtyAccessArray<float> fdata;
+    fdata.SetLength (num);
+    for (size_t i = 0; i < num; i++)
+    {
+      Tgetter::Get (buf, fdata[i]);
+    }
+    state->SetHeightmap (fdata.GetArray(), w, h);
+    return true;
+  }
+
+  bool ReadRawMap (iDocumentNode* child)
+  {
+    csRef<iDataBuffer> buf;
+    if (!(buf = loader->GetDataBuffer (child)))
+      return false;
+
+    int w = child->GetAttributeValueAsInt ("width");
+    int h = child->GetAttributeValueAsInt ("height");
+    if (w <= 0)
+    {
+      loader->synldr->ReportError (
+	"crystalspace.terraformer.simple.loader",
+	child, "Bogus raw map width %d", w);
+      return false;
+    }
+    if (h <= 0)
+    {
+      loader->synldr->ReportError (
+	"crystalspace.terraformer.simple.loader",
+	child, "Bogus raw map height %d", h);
+      return false;
+    }
+
+    if (buf->GetSize() < (w * h * Tgetter::ItemSize()))
+    {
+      const char *filename = child->GetContentsValue ();
+      loader->synldr->ReportError (
+	"crystalspace.terraformer.simple.loader",
+	child, "File '%s' is not a valid raw heightmap file: size mismatch",
+	    filename);
+      return false;
+    }
+
+    if (!ReadData (buf->GetData(), w, h))
+      return false;
+
+    return true;
+  }
+};
+
+csRef<iDataBuffer> csSimpleFormerLoader::GetDataBuffer (iDocumentNode* child)
+{
+  const char *filename = child->GetContentsValue ();
+  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objreg, iVFS);
+  csRef<iDataBuffer> buf = vfs->ReadFile (filename, false);
+  if (buf == 0) 
+  {
+    synldr->ReportError ("crystalspace.terraformer.simple.loader",
+      child, "Error reading in file '%s' for heightmap", filename);
+  }
+
+  return buf;
+}
+
+bool csSimpleFormerLoader::LoadHeightmap32 (iDocumentNode* child, 
+					    iSimpleFormerState* state)
+{
+  csRef<iDataBuffer> buf;
+  if (!(buf = GetDataBuffer (child)))
+    return false;
+
+  char* data = buf->GetData ();
+  char c1 = *data++;
+  char c2 = *data++;
+  char c3 = *data++;
+  char c4 = *data++;
+  if (c1 != 'H' || c2 != 'M' || c3 != '3' || c4 != '2')
+  {
+    const char *filename = child->GetContentsValue ();
+    synldr->ReportError ("crystalspace.terraformer.simple.loader",
+      child, "File '%s' is not a heightmap32 file", filename);
+    return false;
+  }
+  uint32 width = csGetLittleEndianLong (data); data += 4;
+  uint32 height = csGetLittleEndianLong (data); data += 4;
+  if (buf->GetSize () != (4+4+4+ width*height*4))
+  {
+    const char *filename = child->GetContentsValue ();
+    synldr->ReportError ("crystalspace.terraformer.simple.loader",
+      child, "File '%s' is not a valid heightmap32 file: size mismatch",
+	  filename);
+    return false;
+  }
+  RawHeightmapReader<GetterFloat<EndianLittle> > reader (this, state);
+  if (!reader.ReadData (data, width, height))
+    return false;
+
+  return true;
+}
+
+bool csSimpleFormerLoader::LoadHeightmapRaw16LE (iDocumentNode* child, 
+						 iSimpleFormerState* state)
+{
+  RawHeightmapReader<GetterUint16<EndianLittle> > reader (this, state);
+  return reader.ReadRawMap (child);
+}
+
+bool csSimpleFormerLoader::LoadHeightmapRaw16BE (iDocumentNode* child, 
+						 iSimpleFormerState* state)
+{
+  RawHeightmapReader<GetterUint16<EndianBig> > reader (this, state);
+  return reader.ReadRawMap (child);
+}
+
+bool csSimpleFormerLoader::LoadHeightmapRaw32LE (iDocumentNode* child, 
+						 iSimpleFormerState* state)
+{
+  RawHeightmapReader<GetterUint32<EndianLittle> > reader (this, state);
+  return reader.ReadRawMap (child);
+}
+
+bool csSimpleFormerLoader::LoadHeightmapRaw32BE (iDocumentNode* child, 
+						 iSimpleFormerState* state)
+{
+  RawHeightmapReader<GetterUint32<EndianBig> > reader (this, state);
+  return reader.ReadRawMap (child);
+}
+
+bool csSimpleFormerLoader::LoadHeightmapRawFloatLE (iDocumentNode* child, 
+						    iSimpleFormerState* state)
+{
+  RawHeightmapReader<GetterFloat<EndianLittle> > reader (this, state);
+  return reader.ReadRawMap (child);
+}
+
+bool csSimpleFormerLoader::LoadHeightmapRawFloatBE (iDocumentNode* child, 
+						    iSimpleFormerState* state)
+{
+  RawHeightmapReader<GetterFloat<EndianBig> > reader (this, state);
+  return reader.ReadRawMap (child);
+}
+
+} // namespace cspluginSimpleFormerLoader

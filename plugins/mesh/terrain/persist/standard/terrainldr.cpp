@@ -166,65 +166,6 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
 		                        box.MaxX(), box.MaxY()));
         break;
       }
-      /*
-      case XMLTOKEN_SCALE:
-      {
-        csVector3 v;
-        if (!synldr->ParseVector (child, v)) 
-        {
-          synldr->ReportError ("crystalspace.terrain.factory.loader",
-            child, "Error processing terrain scale");
-          return 0;
-        }
-	state->SetScale (v);
-        break;
-      }
-      case XMLTOKEN_HEIGHTMAP:
-      {
-        const char* imagefile = child->GetAttributeValue ("image");
-        const char *arrayfile = child->GetAttributeValue ("raw");
-        int width = child->GetAttributeValueAsInt ("width");
-        int height = child->GetAttributeValueAsInt ("height");
-        if (imagefile != 0)
-        {
-	  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-          csRef<iImage> map = loader->LoadImage (imagefile);
-          if (map == 0) 
-          {
-            synldr->ReportError ("crystalspace.terrain.factory.loader",
-              child, "Error reading in image file for heightmap '%s'", 
-              imagefile);
-            return 0;
-          }
-          state->SetHeightMap (map);
-        }
-        else if (arrayfile != 0 && width != 0 && height != 0) 
-        {
-          csRef<iFile> file = vfs->Open (arrayfile, VFS_FILE_READ);
-          if (file == 0) 
-          {
-            synldr->ReportError ("crystalspace.terrain.factory.loader",
-              child, "Error reading in raw file for heightmap '%s'", 
-              arrayfile);
-            return 0;
-          }
-          csArray<float> array;
-          int index = 0;
-          while (!file->AtEOF())
-          {
-            file->Read ((char *)&array.GetExtend (index++), sizeof (float));
-          }
-          state->SetHeightMap (array, width, height);
-        }
-        else
-        {
-          synldr->ReportError ("crystalpace.terrain.factory.loader",
-            child, "No image or raw file specified for heightmap");
-          return 0;
-        }
-        break;
-      }
-      */
       default:
         synldr->ReportError ("crystalspace.terrain.factory.loader",
           child, "Unknown token!");
