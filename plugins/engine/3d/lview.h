@@ -82,7 +82,8 @@ class csShadowBlock;
  * This iterator can work in two directions and also supports
  * deleting the current element in the iterator.
  */
-class csShadowIterator : public iShadowIterator
+class csShadowIterator : public scfImplementation1<csShadowIterator,
+                                                   iShadowIterator>
 {
   friend class csShadowBlockList;
   friend class csShadowBlock;
@@ -98,7 +99,6 @@ private:
   csShadowIterator (csShadowBlock* cur, bool onlycur, int dir);
   csShadowIterator (const csBox3& bbox, csShadowBlock* cur,
     bool onlycur, int dir);
-  virtual ~csShadowIterator();
   csShadowFrustum* cur_shad;
 
 public:
@@ -124,8 +124,7 @@ public:
   csShadowBlock* GetCsCurrentShadowBlock ();
   /// Return the shadow list for the 'next' element.
   csShadowBlock* GetCsNextShadowBlock () { return cur; }
-
-  SCF_DECLARE_IBASE;
+  virtual ~csShadowIterator();
 };
 
 /**
@@ -133,7 +132,8 @@ public:
  * on the shadow frustums so that it is possible and legal to put a single
  * shadow in several blocks.
  */
-class csShadowBlock : public iShadowBlock
+class csShadowBlock : public scfImplementation1<csShadowBlock,
+                                                iShadowBlock>
 {
   friend class csShadowBlockList;
   friend class csShadowIterator;
@@ -278,13 +278,13 @@ public:
   /// Get the region for this shadow block.
   uint32 GetShadowRegion () const { return shadow_region; }
 
-  SCF_DECLARE_IBASE;
 };
 
 /**
  * A list of shadow blocks.
  */
-class csShadowBlockList : public iShadowBlockList
+class csShadowBlockList : public scfImplementation1<csShadowBlockList,
+                                                    iShadowBlockList>
 {
 private:
   csShadowBlock* first;
@@ -415,15 +415,14 @@ public:
   {
     return ((csShadowBlock*)block)->GetShadowRegion () == cur_shadow_region;
   }
-
-  SCF_DECLARE_IBASE;
 };
 
 /**
  * This structure represents all information needed for the frustum
  * visibility calculator.
  */
-class csFrustumView : public iFrustumView
+class csFrustumView : public scfImplementation1<csFrustumView,
+                                                iFrustumView>
 {
 private:
   /// A function that is called for every node that is visited.
@@ -538,7 +537,6 @@ public:
   {
     return csPtr<iShadowBlock> (new csShadowBlock ());
   }
-  SCF_DECLARE_IBASE;
 };
 
 #endif // __CS_LVIEW_H__

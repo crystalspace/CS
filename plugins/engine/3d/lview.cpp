@@ -17,33 +17,25 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "plugins/engine/3d/lview.h"
-#include "plugins/engine/3d/engine.h"
 #include "csgeom/polyclip.h"
-#include "igeom/clip2d.h"
 #include "iengine/camera.h"
+#include "igeom/clip2d.h"
 #include "ivideo/graph3d.h"
+#include "plugins/engine/3d/engine.h"
+#include "plugins/engine/3d/lview.h"
 
 
-SCF_IMPLEMENT_IBASE(csFrustumView)
-  SCF_IMPLEMENTS_INTERFACE(iFrustumView)
-SCF_IMPLEMENT_IBASE_END
-
-csFrustumView::csFrustumView () :
-  object_func (0),
-  things_shadow (false),
-  ctxt (0)
+csFrustumView::csFrustumView () 
+  : scfImplementationType (this),
+  object_func (0), things_shadow (false), ctxt (0)
 {
-  SCF_CONSTRUCT_IBASE (0);
   ctxt = new csFrustumContext ();
-
   ctxt->SetNewShadows (new csShadowBlockList ());
 }
 
 csFrustumView::~csFrustumView ()
 {
   delete ctxt;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csFrustumView::StartNewShadowBlock ()
@@ -85,16 +77,11 @@ void csFrustumView::RestoreFrustumContext (csFrustumContext *original)
 }
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csShadowBlock)
-  SCF_IMPLEMENTS_INTERFACE(iShadowBlock)
-SCF_IMPLEMENT_IBASE_END
 
-csShadowBlock::csShadowBlock (uint32 region, int max_shadows, int delta) :
-    next(0), prev(0), shadows(max_shadows, delta)
+csShadowBlock::csShadowBlock (uint32 region, int max_shadows, int delta) 
+  : scfImplementationType (this), next(0), prev(0), shadows(max_shadows, delta), 
+  shadow_region (region), bbox_valid (false)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  shadow_region = region;
-  bbox_valid = false;
 }
 
 csShadowBlock::~csShadowBlock ()
@@ -247,22 +234,15 @@ const csBox3& csShadowBlock::GetBoundingBox ()
 }
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csShadowBlockList)
-  SCF_IMPLEMENTS_INTERFACE(iShadowBlockList)
-SCF_IMPLEMENT_IBASE_END
-
-csShadowBlockList::csShadowBlockList () :
-  first(0),
-  last(0)
-{
-  SCF_CONSTRUCT_IBASE (0);
-  cur_shadow_region = 0;
+csShadowBlockList::csShadowBlockList () 
+  : scfImplementationType (this),
+  first(0), last(0),cur_shadow_region (0)
+{  
 }
 
 csShadowBlockList::~csShadowBlockList ()
 {
   DeleteAllShadows ();
-  SCF_DESTRUCT_IBASE ();
 }
 
 iShadowBlock *csShadowBlockList::NewShadowBlock (
@@ -282,43 +262,23 @@ csShadowFrustum::csShadowFrustum (const csShadowFrustum &orig) :
 }
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csShadowIterator)
-  SCF_IMPLEMENTS_INTERFACE(iShadowIterator)
-SCF_IMPLEMENT_IBASE_END
-
-csShadowIterator::csShadowIterator (
-  csShadowBlock *cur,
-  bool onlycur,
-  int dir)
+csShadowIterator::csShadowIterator (csShadowBlock *cur, bool onlycur,int dir)
+  : scfImplementationType (this), cur (cur), onlycur (onlycur), dir (dir),
+  first_cur (cur), use_bbox (false)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csShadowIterator::cur = cur;
-  csShadowIterator::onlycur = onlycur;
-  csShadowIterator::dir = dir;
-  first_cur = cur;
-  use_bbox = false;
   Reset ();
 }
 
-csShadowIterator::csShadowIterator (
-  const csBox3& bbox,
-  csShadowBlock *cur,
-  bool onlycur,
-  int dir)
+csShadowIterator::csShadowIterator (const csBox3& bbox, csShadowBlock *cur,
+  bool onlycur, int dir)
+  : scfImplementationType (this), cur (cur), onlycur (onlycur), dir (dir),
+  first_cur (cur), bbox (bbox), use_bbox (true)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csShadowIterator::cur = cur;
-  csShadowIterator::onlycur = onlycur;
-  csShadowIterator::dir = dir;
-  first_cur = cur;
-  csShadowIterator::bbox = bbox;
-  use_bbox = true;
   Reset ();
 }
 
 csShadowIterator::~csShadowIterator()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csShadowIterator::Reset ()

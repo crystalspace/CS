@@ -192,8 +192,7 @@ csCameraPositionList::~csCameraPositionList ()
 iCameraPosition *csCameraPositionList::NewCameraPosition (const char *name)
 {
   csVector3 v (0);
-  csCameraPosition *newcp = new csCameraPosition (name, "", v, v, v);
-  iCameraPosition *cp = &(newcp->scfiCameraPosition);
+  csCameraPosition *cp = new csCameraPosition (name, "", v, v, v);
   positions.Push (cp);
   cp->DecRef ();
   return cp;
@@ -1019,7 +1018,7 @@ void csEngine::DeleteAll ()
   currentRenderContext = 0;
 
   // Clear all regions.
-  regions.DeleteAll ();
+  regions.RemoveAll ();
 
   // Clear all render priorities.
   ClearRenderPriorities ();
@@ -1211,7 +1210,7 @@ void csEngine::ForceRelight (iLight* light, iRegion* region)
     }
   }
 
-  ((csLight::Light*)light)->GetPrivateObject ()->CalculateLighting ();
+  ((csLight*)light)->GetPrivateObject ()->CalculateLighting ();
 
   iCacheManager* cm = GetCacheManager ();
   for (sn = 0 ; sn < num_meshes ; sn++)
@@ -1518,7 +1517,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
       }
       lit_cnt++;
       l = lit->Next ();
-      ((csLight::Light*)l)->GetPrivateObject ()->CalculateLighting ();
+      ((csLight*)l)->GetPrivateObject ()->CalculateLighting ();
       if (meter) meter->Step ();
     }
 
@@ -1803,7 +1802,7 @@ void csEngine::AddHalo (iCamera* camera, csLight *Light)
   // Halo size is 1/4 of the screen height; also we make sure its odd
   int hs = (frameHeight / 4) | 1;
 
-  if (Light->GetHalo ()->Type == cshtFlare)
+  if (((csHalo*)Light->GetHalo ())->Type == cshtFlare)
   {
     // put a new light flare into the queue
     // the cast is safe because of the type check above
@@ -1813,7 +1812,7 @@ void csEngine::AddHalo (iCamera* camera, csLight *Light)
   }
 
   // Okay, put the light into the queue: first we generate the alphamap
-  unsigned char *Alpha = Light->GetHalo ()->Generate (hs);
+  unsigned char *Alpha = ((csHalo*)Light->GetHalo ())->Generate (hs);
   iHalo *handle = G3D->CreateHalo (
       Light->GetColor ().red,
       Light->GetColor ().green,
@@ -2680,9 +2679,9 @@ iRegion* csEngine::CreateRegion (const char *name)
   if (!region)
   {
     csRegion *r = new csRegion (this);
-    region = &r->scfiRegion;
+    region = r;
     r->SetName (name);
-    regions.Push (region);
+    regions.Add (region);
     r->DecRef ();
   }
   return region;
@@ -2861,13 +2860,13 @@ iMaterialList *csEngine::GetMaterialList () const
 
 iSharedVariableList *csEngine::GetVariableList () const
 {
-  return &(GetVariables()->scfiSharedVariableList);
+  return GetVariables();
 }
 
 
 iRegionList *csEngine::GetRegions ()
 {
-  return &(regions.scfiRegionList);
+  return &regions;
 }
 
 csPtr<iCamera> csEngine::CreateCamera ()
@@ -2889,7 +2888,7 @@ csPtr<iLight> csEngine::CreateLight (
       dyntype);
   if (name) light->SetName (name);
 
-  return csPtr<iLight> (&(light->scfiLight));
+  return csPtr<iLight> (light);
 }
 
 csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
@@ -2931,9 +2930,9 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   // name are still allowed.
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
-  GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
+  GetMeshFactories ()->Add (mfactwrap);
   fact->SetMeshFactoryWrapper ((iMeshFactoryWrapper*)mfactwrap);
-  return csPtr<iMeshFactoryWrapper> (&mfactwrap->scfiMeshFactoryWrapper);
+  return csPtr<iMeshFactoryWrapper> (mfactwrap);
 }
 
 csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (const char *name)
@@ -2946,8 +2945,8 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (const char *name)
   // name are still allowed.
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper ();
   if (name) mfactwrap->SetName (name);
-  GetMeshFactories ()->Add (&(mfactwrap->scfiMeshFactoryWrapper));
-  return csPtr<iMeshFactoryWrapper> (&mfactwrap->scfiMeshFactoryWrapper);
+  GetMeshFactories ()->Add (mfactwrap);
+  return csPtr<iMeshFactoryWrapper> (mfactwrap);
 }
 
 //------------------------------------------------------------------------

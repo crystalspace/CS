@@ -133,8 +133,6 @@ struct iPortalCallback : public iBase
   virtual bool Traverse (iPortal* portal, iBase* context) = 0;
 };
 
-SCF_VERSION (iPortal, 0, 6, 0);
-
 /**
  * This is the interface to the Portal objects. Polygons that are
  * really `openings' to different areas have a portal associated
@@ -155,8 +153,9 @@ SCF_VERSION (iPortal, 0, 6, 0);
  *   <li>iEngine
  *   </ul>
  */
-struct iPortal : public iBase
+struct iPortal : public virtual iBase
 {
+  SCF_INTERFACE(iPortal, 2,0,0);
   /// Get the iObject for this portal. @@@ OBSOLETE!!!
   virtual iObject *QueryObject () = 0;
 

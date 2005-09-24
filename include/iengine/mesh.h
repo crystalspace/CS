@@ -718,8 +718,6 @@ struct iMeshWrapper : public virtual iBase
   virtual iShaderVariableContext* GetSVContext() = 0;
 };
 
-SCF_VERSION (iMeshFactoryWrapper, 0, 1, 7);
-
 /**
  * A mesh factory wrapper is an engine-level object that wraps around a
  * mesh object factory (iMeshObjectFactory). Every mesh object factory in
@@ -749,8 +747,9 @@ SCF_VERSION (iMeshFactoryWrapper, 0, 1, 7);
  *   <li>iEngine
  *   </ul>
  */
-struct iMeshFactoryWrapper : public iBase
+struct iMeshFactoryWrapper : public virtual iBase
 {
+  SCF_INTERFACE(iMeshFactoryWrapper, 2,0,0);
   /// Get the iObject for this mesh factory.
   virtual iObject *QueryObject () = 0;
   /// Get the iMeshObjectFactory.
@@ -902,8 +901,6 @@ struct iMeshFactoryWrapper : public iBase
   virtual iShaderVariableContext* GetSVContext() = 0;
 };
 
-SCF_VERSION (iMeshList, 0, 0, 1);
-
 /**
  * A list of meshes.
  * <p>
@@ -918,8 +915,9 @@ SCF_VERSION (iMeshList, 0, 0, 1);
  *   <li>iEngine
  *   </ul>
  */
-struct iMeshList : public iBase
+struct iMeshList : public virtual iBase
 {
+  SCF_INTERFACE(iMeshList, 2,0,0);
   /// Return the number of meshes in this list
   virtual int GetCount () const = 0;
 

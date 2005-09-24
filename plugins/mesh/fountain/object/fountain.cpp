@@ -154,7 +154,7 @@ void csFountainMeshObject::Update (csTicks elapsed_time)
 
   if (bounds_modified)
   {
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
 }
 
@@ -162,7 +162,7 @@ void csFountainMeshObject::HardTransform (const csReversibleTransform& t)
 {
   origin = t.This2Other (origin);
   initialized = false;
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 //----------------------------------------------------------------------

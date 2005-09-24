@@ -16,19 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "plugins/engine/3d/campos.h"
-#include "plugins/engine/3d/engine.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/plane3.h"
 #include "csutil/util.h"
+#include "plugins/engine/3d/campos.h"
+#include "plugins/engine/3d/engine.h"
 
-SCF_IMPLEMENT_IBASE_EXT(csCameraPosition)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iCameraPosition)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csCameraPosition::CameraPosition)
-  SCF_IMPLEMENTS_INTERFACE(iCameraPosition)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csCameraPosition::csCameraPosition (
   const char *name,
@@ -36,21 +29,25 @@ csCameraPosition::csCameraPosition (
   const csVector3 &position,
   const csVector3 &forward,
   const csVector3 &upward)
+  : scfImplementationType (this),
+  sector (csStrNew (sector)), position (position), forward (forward),
+  upward (upward), far_plane (0)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCameraPosition);
   SetName (name);
-  csCameraPosition::sector = csStrNew (sector);
-  csCameraPosition::position = position;
-  csCameraPosition::forward = forward;
-  csCameraPosition::upward = upward;
-  far_plane = 0;
+}
+
+csCameraPosition::csCameraPosition (const csCameraPosition& other)
+  : scfImplementationType (this),
+  sector (csStrNew (other.sector)), position (other.position), forward (other.forward),
+  upward (other.upward), far_plane (0)
+{
+  SetName (other.GetName ());
 }
 
 csCameraPosition::~csCameraPosition ()
 {
   delete[] sector;
   delete[] far_plane;
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiCameraPosition);
 }
 
 void csCameraPosition::Set (
@@ -102,66 +99,53 @@ void csCameraPosition::ClearFarPlane ()
   far_plane = 0;
 }
 
-iObject *csCameraPosition::CameraPosition::QueryObject ()
+iObject *csCameraPosition::QueryObject ()
 {
-  return scfParent;
+  return this;
 }
 
-iCameraPosition *csCameraPosition::CameraPosition::Clone () const
+iCameraPosition *csCameraPosition::Clone () const
 {
-  return &((new csCameraPosition (*scfParent))->scfiCameraPosition);
+  return new csCameraPosition (*this);
 }
 
-const char *csCameraPosition::CameraPosition::GetSector ()
+const char *csCameraPosition::GetSector ()
 {
-  return scfParent->sector;
+  return sector;
 }
 
-void csCameraPosition::CameraPosition::SetSector (const char *Name)
+void csCameraPosition::SetSector (const char *Name)
 {
-  scfParent->sector = csStrNew (Name);
+  sector = csStrNew (Name);
 }
 
-const csVector3 &csCameraPosition::CameraPosition::GetPosition ()
+const csVector3 &csCameraPosition::GetPosition ()
 {
-  return scfParent->position;
+  return position;
 }
 
-void csCameraPosition::CameraPosition::SetPosition (const csVector3 &v)
+void csCameraPosition::SetPosition (const csVector3 &v)
 {
-  scfParent->position = v;
+  position = v;
 }
 
-const csVector3 &csCameraPosition::CameraPosition::GetUpwardVector ()
+const csVector3 &csCameraPosition::GetUpwardVector ()
 {
-  return scfParent->upward;
+  return upward;
 }
 
-void csCameraPosition::CameraPosition::SetUpwardVector (const csVector3 &v)
+void csCameraPosition::SetUpwardVector (const csVector3 &v)
 {
-  scfParent->upward = v;
+  upward = v;
 }
 
-const csVector3 &csCameraPosition::CameraPosition::GetForwardVector ()
+const csVector3 &csCameraPosition::GetForwardVector ()
 {
-  return scfParent->forward;
+  return forward;
 }
 
-void csCameraPosition::CameraPosition::SetForwardVector (const csVector3 &v)
+void csCameraPosition::SetForwardVector (const csVector3 &v)
 {
-  scfParent->forward = v;
+  forward = v;
 }
 
-void csCameraPosition::CameraPosition::Set (
-  const char *sector,
-  const csVector3 &pos,
-  const csVector3 &forward,
-  const csVector3 &upward)
-{
-  scfParent->Set (sector, pos, forward, upward);
-}
-
-bool csCameraPosition::CameraPosition::Load (iCamera *c, iEngine *e)
-{
-  return scfParent->Load (c, e);
-}

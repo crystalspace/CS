@@ -44,8 +44,6 @@ struct iRenderView;
  */
 #define CS_DEFAULT_RENDERLOOP_NAME	"*default"
 
-SCF_VERSION (iRenderLoop, 0, 0, 3);
-
 /**
  * Render loop.
  * \remark A render loop also exhibits an iRenderStepContainer interface.
@@ -53,10 +51,10 @@ SCF_VERSION (iRenderLoop, 0, 0, 3);
  */
 struct iRenderLoop : public iRenderStepContainer
 {
+  SCF_INTERFACE(iRenderLoop, 2,0,0);
   virtual void Draw (iRenderView *rview, iSector *s) = 0;
 };
 
-SCF_VERSION (iRenderLoopManager, 0, 0, 3);
 
 /**
  * Render loop manager.
@@ -64,8 +62,9 @@ SCF_VERSION (iRenderLoopManager, 0, 0, 3);
  * \remark It's not recommended to unregister the loop with the name of
  * #CS_DEFAULT_RENDERLOOP_NAME.
  */
-struct iRenderLoopManager : public iBase
+struct iRenderLoopManager : public virtual iBase
 {
+  SCF_INTERFACE(iRenderLoopManager, 2,0,0);
   /**
    * Create a new render loop.
    * \remark This render loop is "unnamed". To name it, use Register().

@@ -31,7 +31,7 @@
 #include "csextern.h"
 
 #include "csutil/refarr.h"
-
+#include "csutil/scf_implementation.h"
 #include "igeom/objmodel.h"
 #include "igeom/polymesh.h"
 
@@ -43,7 +43,7 @@
  * functions. Note: this class is meant to be used as an embedded
  * class of a mesh object. That's why it doesn't do any of the SCF stuff.
  */
-class csObjectModel : public iObjectModel
+class csObjectModel : public scfImplementation1<csObjectModel,iObjectModel>
 {
 private:
   long shapenr;
@@ -59,6 +59,7 @@ public:
    * SetPolygonMesh<xxx>()!
    */
   csObjectModel ()
+    : scfImplementationType (this)
   {
     shapenr = -1;
     polymesh_base = 0;

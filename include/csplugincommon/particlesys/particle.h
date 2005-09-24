@@ -231,7 +231,7 @@ public:
   virtual void SetObjectBoundingBox (const csBox3& bbox)
   {
     Bounds = bbox;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
 
   /// Set selfdestruct mode on, and msec to live.

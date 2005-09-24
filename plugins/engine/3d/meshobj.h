@@ -53,7 +53,7 @@ class csLight;
 /**
  * General list of meshes.
  */
-class csMeshList : public iMeshList
+class csMeshList : public scfImplementation1<csMeshList, iMeshList>
 {
 private:
   csRefArrayObject<iMeshWrapper> list;
@@ -82,7 +82,6 @@ private:
   csRef<NameChangeListener> listener;
 
 public:
-  SCF_DECLARE_IBASE;
 
   void NameChanged (iObject* object, const char* oldname,
   	const char* newname);
@@ -128,7 +127,7 @@ public:
 /**
  * A list of mesh factories.
  */
-class csMeshFactoryList : public iMeshFactoryList
+class csMeshFactoryList : public scfImplementation1<csMeshFactoryList, iMeshFactoryList>
 {
 private:
   csRefArrayObject<iMeshFactoryWrapper> list;
@@ -159,7 +158,6 @@ private:
 
 
 public:
-  SCF_DECLARE_IBASE;
 
   void NameChanged (iObject* object, const char* oldname,
   	const char* newname);
@@ -196,14 +194,16 @@ public:
   virtual void FreeFactory (iMeshFactoryWrapper* item);
 };
 
-SCF_VERSION (csMeshWrapper, 0, 0, 1);
 
 /**
  * The holder class for all implementations of iMeshObject.
  */
-class csMeshWrapper : public csObject, public iVisibilityObject, 
-		      public iShaderVariableContext, public iMeshWrapper,
-		      public iImposter
+class csMeshWrapper : public scfImplementationExt4<csMeshWrapper,
+                                                   csObject,
+                                                   iMeshWrapper,
+                                                   iShaderVariableContext,
+                                                   iVisibilityObject,
+                                                   iImposter>
 {
   friend class csMovable;
   friend class csMovableSectorList;
@@ -651,8 +651,6 @@ public:
   }
 
   //--------------------- SCF stuff follows ------------------------------//
-  SCF_DECLARE_IBASE_EXT (csObject);
-
   //=================== iShaderVariableContext ================//
 
   /// Add a variable to this context
@@ -739,12 +737,13 @@ public:
   }
 };
 
-SCF_VERSION (csMeshFactoryWrapper, 0, 0, 3);
-
 /**
  * The holder class for all implementations of iMeshObjectFactory.
  */
-class csMeshFactoryWrapper : public csObject, public iShaderVariableContext
+class csMeshFactoryWrapper : public scfImplementationExt2<csMeshFactoryWrapper,
+                                                          csObject, 
+                                                          iMeshFactoryWrapper,
+                                                          iShaderVariableContext>
 {
 private:
   /// Mesh object factory corresponding with this csMeshFactoryWrapper.
@@ -795,7 +794,7 @@ public:
   /**
    * Create a new mesh object for this template.
    */
-  iMeshWrapper* NewMeshObject ();
+  iMeshWrapper* CreateMeshWrapper ();
 
   /**
    * Do a hard transform of this factory.
@@ -823,6 +822,15 @@ public:
    */
   void SetTransform (const csReversibleTransform& tr) { transform = tr; }
 
+  virtual iMeshFactoryWrapper* GetParentContainer () const { return parent; }
+  virtual void SetParentContainer (iMeshFactoryWrapper *p) { parent = p; }
+  virtual iMeshFactoryList* GetChildren (){ return &children; }
+
+  virtual iObject* QueryObject () { return this; }
+
+  virtual iShaderVariableContext* GetSVContext()
+  { return CS_STATIC_CAST(iShaderVariableContext*, this); }
+
   // Static LOD methods.
   iLODControl* CreateStaticLOD ();
   void DestroyStaticLOD ();
@@ -843,7 +851,6 @@ public:
   }
   void SetRenderPriorityRecursive (long rp);
 
-  SCF_DECLARE_IBASE_EXT (csObject);
 
   //=================== iShaderVariableContext ================//
 
@@ -873,86 +880,6 @@ public:
   { svcontext.ReplaceVariable (variable); }
   void Clear () { svcontext.Clear(); }
 
-  //----------------- iMeshFactoryWrapper implementation --------------------//
-  struct MeshFactoryWrapper : public iMeshFactoryWrapper
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csMeshFactoryWrapper);
-    virtual iMeshObjectFactory* GetMeshObjectFactory () const
-      { return scfParent->GetMeshObjectFactory (); }
-    virtual void SetMeshObjectFactory (iMeshObjectFactory* fact)
-      { scfParent->SetMeshObjectFactory (fact); }
-    virtual iObject *QueryObject ()
-      { return scfParent; }
-    virtual void HardTransform (const csReversibleTransform& t)
-      { scfParent->HardTransform (t); }
-    virtual iMeshWrapper* CreateMeshWrapper ()
-      { return scfParent->NewMeshObject (); }
-    virtual iMeshFactoryWrapper* GetParentContainer () const
-      { return scfParent->parent; }
-    virtual void SetParentContainer (iMeshFactoryWrapper *p)
-      { scfParent->parent = p; }
-    virtual iMeshFactoryList* GetChildren ()
-      { return &scfParent->children; }
-    virtual csReversibleTransform& GetTransform ()
-      { return scfParent->GetTransform (); }
-    virtual void SetTransform (const csReversibleTransform& tr)
-      { scfParent->SetTransform (tr); }
-    virtual iLODControl* CreateStaticLOD ()
-    {
-      return scfParent->CreateStaticLOD ();
-    }
-    virtual void DestroyStaticLOD ()
-    {
-      scfParent->DestroyStaticLOD ();
-    }
-    virtual iLODControl* GetStaticLOD ()
-    {
-      return scfParent->GetStaticLOD ();
-    }
-    virtual void SetStaticLOD (float m, float a)
-    {
-      scfParent->SetStaticLOD (m, a);
-    }
-    virtual void GetStaticLOD (float& m, float& a) const
-    {
-      scfParent->GetStaticLOD (m, a);
-    }
-    virtual void RemoveFactoryFromStaticLOD (iMeshFactoryWrapper* fact)
-    {
-      scfParent->RemoveFactoryFromStaticLOD (fact);
-    }
-    virtual void AddFactoryToStaticLOD (int lod, iMeshFactoryWrapper* fact)
-    {
-      scfParent->AddFactoryToStaticLOD (lod, fact);
-    }
-    virtual void SetZBufMode (csZBufMode mode)
-    {
-      scfParent->SetZBufMode (mode);
-    }
-    virtual csZBufMode GetZBufMode () const
-    {
-      return scfParent->GetZBufMode ();
-    }
-    virtual void SetZBufModeRecursive (csZBufMode mode)
-    {
-      scfParent->SetZBufModeRecursive (mode);
-    }
-    virtual void SetRenderPriority (long rp)
-    {
-      scfParent->SetRenderPriority (rp);
-    }
-    virtual long GetRenderPriority () const
-    {
-      return scfParent->GetRenderPriority ();
-    }
-    virtual void SetRenderPriorityRecursive (long rp)
-    {
-      scfParent->SetRenderPriorityRecursive (rp);
-    }
-    virtual iShaderVariableContext* GetSVContext()
-    { return CS_STATIC_CAST(iShaderVariableContext*, scfParent); }
-  } scfiMeshFactoryWrapper;
-  friend struct MeshFactoryWrapper;
 };
 
 #endif // __CS_MESHOBJ_H__

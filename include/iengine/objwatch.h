@@ -70,7 +70,6 @@ struct iObjectWatcherListener : public iBase
   virtual void ObjectChanged (int op, iMovable* movable, iLight* light) = 0;
 };
 
-SCF_VERSION (iObjectWatcher, 0, 0, 1);
 
 /**
  * This is a generic object watcher. Currently it can watch on light
@@ -80,8 +79,9 @@ SCF_VERSION (iObjectWatcher, 0, 0, 1);
  * not keep real references to the objects it is watching but it will
  * clean up the watcher for some object if that object is removed.
  */
-struct iObjectWatcher : public iBase
+struct iObjectWatcher : public virtual iBase
 {
+  SCF_INTERFACE(iObjectWatcher, 2,0,0);
   /// Add a light to watch.
   virtual void WatchLight (iLight* light) = 0;
   /// Remove a light to watch.

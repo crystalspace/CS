@@ -41,7 +41,8 @@ CS_LEAKGUARD_IMPLEMENT (csMeshFactoryWrapper);
 
 // Static shadow caster will cast shadows from the least detailed object
 // that actually has a shadow caster.
-class csStaticShadowCaster : public iShadowCaster
+class csStaticShadowCaster : public scfImplementation1<csStaticShadowCaster,
+                                                       iShadowCaster>
 {
 private:
   // Pointer back to the mesh with static lod.
@@ -49,17 +50,14 @@ private:
 
 public:
   csStaticShadowCaster (csMeshWrapper* m)
+    : scfImplementationType (this), static_lod_mesh (m)
   {
-    SCF_CONSTRUCT_IBASE (0);
     static_lod_mesh = m;
   }
 
   virtual ~csStaticShadowCaster ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
-
-  SCF_DECLARE_IBASE;
 
   virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
   	const csVector3& origin)
@@ -80,13 +78,11 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE(csStaticShadowCaster)
-  SCF_IMPLEMENTS_INTERFACE(iShadowCaster)
-SCF_IMPLEMENT_IBASE_END
 
 // Static shadow receiver will send the received shadows to all children
 // of the static lod mesh.
-class csStaticShadowReceiver : public iShadowReceiver
+class csStaticShadowReceiver : public scfImplementation1<csStaticShadowReceiver,
+                                                         iShadowReceiver>
 {
 private:
   // Pointer back to the mesh with static lod.
@@ -94,17 +90,13 @@ private:
 
 public:
   csStaticShadowReceiver (csMeshWrapper* m)
+    : scfImplementationType (this), static_lod_mesh (m)
   {
-    SCF_CONSTRUCT_IBASE (0);
-    static_lod_mesh = m;
   }
 
   virtual ~csStaticShadowReceiver ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
-
-  SCF_DECLARE_IBASE;
 
   virtual void CastShadows (iMovable* movable, iFrustumView* fview)
   {
@@ -120,29 +112,17 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE(csStaticShadowReceiver)
-  SCF_IMPLEMENTS_INTERFACE(iShadowReceiver)
-SCF_IMPLEMENT_IBASE_END
-
 
 // ---------------------------------------------------------------------------
 // csMeshWrapper
 // ---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_EXT(csMeshWrapper)
-  SCF_IMPLEMENTS_INTERFACE(iMeshWrapper)
-  SCF_IMPLEMENTS_INTERFACE(iImposter)
-  SCF_IMPLEMENTS_INTERFACE(csMeshWrapper)
-  SCF_IMPLEMENTS_INTERFACE(iVisibilityObject)
-  SCF_IMPLEMENTS_INTERFACE(iShaderVariableContext)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
-    csObject ()
+csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) 
+  : scfImplementationType (this)
 {
   DG_TYPE (this, "csMeshWrapper");
 
-  movable.scfParent = (iBase*)(csObject*)this;
+//  movable.scfParent = this; //@TODO: CHECK THIS
   wor_bbox_movablenr = -1;
   movable.SetMeshWrapper (this);
   Parent = theParent;
@@ -1106,35 +1086,22 @@ float csMeshWrapper::GetScreenBoundingBox (
 // ---------------------------------------------------------------------------
 // csMeshFactoryWrapper
 // ---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE_EXT(csMeshFactoryWrapper)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshFactoryWrapper)
-  SCF_IMPLEMENTS_INTERFACE(iShaderVariableContext)
-  SCF_IMPLEMENTS_INTERFACE(csMeshFactoryWrapper)
-SCF_IMPLEMENT_IBASE_EXT_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshFactoryWrapper::MeshFactoryWrapper)
-  SCF_IMPLEMENTS_INTERFACE(iMeshFactoryWrapper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csMeshFactoryWrapper::csMeshFactoryWrapper (
-  iMeshObjectFactory *meshFact)
+csMeshFactoryWrapper::csMeshFactoryWrapper (iMeshObjectFactory *meshFact)
+  : scfImplementationType (this), meshFact (meshFact), parent (0),
+  zbufMode (CS_ZBUF_USE)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
-  csMeshFactoryWrapper::meshFact = meshFact;
-  parent = 0;
   children.SetMeshFactory (this);
 
-  zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::currentEngine->GetObjectRenderPriority ();
 }
 
 csMeshFactoryWrapper::csMeshFactoryWrapper ()
+  : scfImplementationType (this), parent (0), zbufMode (CS_ZBUF_USE)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
-  parent = 0;
   children.SetMeshFactory (this);
 
-  zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::currentEngine->GetObjectRenderPriority ();
 }
 
@@ -1143,7 +1110,6 @@ csMeshFactoryWrapper::~csMeshFactoryWrapper ()
   // This line MUST be here to ensure that the children are not
   // removed after the destructor has already finished.
   children.RemoveAll ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
 }
 
 void csMeshFactoryWrapper::SetZBufModeRecursive (csZBufMode mode)
@@ -1176,14 +1142,14 @@ void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)
   csMeshFactoryWrapper::meshFact = meshFact;
 }
 
-iMeshWrapper *csMeshFactoryWrapper::NewMeshObject ()
+iMeshWrapper *csMeshFactoryWrapper::CreateMeshWrapper ()
 {
   csRef<iMeshObject> basemesh = meshFact->NewInstance ();
   iMeshWrapper *mesh = (iMeshWrapper*)(new csMeshWrapper (0, basemesh));
   basemesh->SetMeshWrapper (mesh);
 
   if (GetName ()) mesh->QueryObject ()->SetName (GetName ());
-  mesh->SetFactory (&scfiMeshFactoryWrapper);
+  mesh->SetFactory (this);
   mesh->SetRenderPriority (render_priority);
   mesh->SetZBufMode (zbufMode);
 
@@ -1299,20 +1265,16 @@ void csMeshFactoryWrapper::AddFactoryToStaticLOD (int lod,
 //--------------------------------------------------------------------------
 // csMeshList
 //--------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csMeshList)
-  SCF_IMPLEMENTS_INTERFACE(iMeshList)
-SCF_IMPLEMENT_IBASE_END
 
 csMeshList::csMeshList ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   listener.AttachNew (new NameChangeListener (this));
 }
 
 csMeshList::~csMeshList ()
 {
   RemoveAll ();
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csMeshList::NameChanged (iObject* object, const char* oldname,
@@ -1463,20 +1425,15 @@ void csMeshMeshList::FreeMesh (iMeshWrapper* item)
 //--------------------------------------------------------------------------
 // csMeshFactoryList
 //--------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csMeshFactoryList)
-  SCF_IMPLEMENTS_INTERFACE(iMeshFactoryList)
-SCF_IMPLEMENT_IBASE_END
-
 csMeshFactoryList::csMeshFactoryList ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   listener.AttachNew (new NameChangeListener (this));
 }
 
 csMeshFactoryList::~csMeshFactoryList ()
 {
   RemoveAll ();
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csMeshFactoryList::NameChanged (iObject* object, const char* oldname,
@@ -1551,7 +1508,7 @@ void csMeshFactoryFactoryList::PrepareFactory (iMeshFactoryWrapper* child)
   if (child->GetParentContainer ())
     child->GetParentContainer ()->GetChildren ()->Remove (child);
 
-  child->SetParentContainer (&meshfact->scfiMeshFactoryWrapper);
+  child->SetParentContainer (meshfact);
 }
 
 void csMeshFactoryFactoryList::FreeFactory (iMeshFactoryWrapper* item)

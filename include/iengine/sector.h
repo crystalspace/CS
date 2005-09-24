@@ -373,8 +373,6 @@ struct iSector : public virtual iBase
 };
 
 
-SCF_VERSION (iSectorList, 0, 0, 2);
-
 /**
  * A list of sectors.
  * <p>
@@ -388,8 +386,9 @@ SCF_VERSION (iSectorList, 0, 0, 2);
  *   <li>iEngine
  *   </ul>
  */
-struct iSectorList : public iBase
+struct iSectorList : public virtual iBase
 {
+  SCF_INTERFACE(iSectorList, 2,0,0);
   /// Return the number of sectors in this list.
   virtual int GetCount () const = 0;
 

@@ -37,14 +37,14 @@ struct iObject;
 struct iSector;
 struct iTextureWrapper;
 
-SCF_VERSION (iRegion, 0, 1, 7);
 
 /**
  * A region. A region is basically a collection of objects in the
  * 3D engine that can be treated as a unit.
  */
-struct iRegion : public iBase
+struct iRegion : public virtual iBase
 {
+  SCF_INTERFACE(iRegion, 2,0,0);
   /// Get the iObject for this region.
   virtual iObject *QueryObject() = 0;
 
@@ -110,14 +110,12 @@ struct iRegion : public iBase
   virtual bool IsInRegion (iObject* obj) = 0;
 };
 
-
-SCF_VERSION (iRegionList, 0, 0, 1);
-
 /**
  * A list of region objects.
  */
-struct iRegionList : public iBase
+struct iRegionList : public virtual iBase
 {
+  SCF_INTERFACE(iRegionList, 2,0,0);
   /// Return the number of regions in this list.
   virtual int GetCount () const = 0;
 

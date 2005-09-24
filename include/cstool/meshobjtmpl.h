@@ -25,6 +25,7 @@
 #include "csgeom/objmodel.h"
 #include "csutil/flags.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 
 #include "imesh/object.h"
 #include "iutil/comp.h"
@@ -65,7 +66,8 @@ struct iEngine;
  * <li> Default implementation of most methods
  * </ul>
  */
-class CS_CRYSTALSPACE_EXPORT csMeshObject : public iMeshObject
+class CS_CRYSTALSPACE_EXPORT csMeshObject : 
+  public scfImplementationExt1<csMeshObject, csObjectModel, iMeshObject>
 {
 protected:
   /// the drawing callback
@@ -87,7 +89,6 @@ protected:
   csBox3 boundingbox;
 
 public:
-  SCF_DECLARE_IBASE;
 
   /// Constructor
   csMeshObject (iEngine *engine);
@@ -185,7 +186,7 @@ public:
   /**
    * See imesh/object.h for specification.
    */
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual iObjectModel* GetObjectModel () { return this; }
 
   /**
    * See imesh/object.h for specification. The default implementation
@@ -241,24 +242,6 @@ public:
    */
   virtual void GetRadius (csVector3& radius, csVector3& center);
 
-  // implementation of iObjectModel
-  struct CS_CRYSTALSPACE_EXPORT eiObjectModel : public csObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csMeshObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetObjectBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (csVector3& radius, csVector3& center)
-    {
-      scfParent->GetRadius (radius, center);
-    }
-  } scfiObjectModel;
-  friend struct eiObjectModel;
 };
 
 /**

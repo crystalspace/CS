@@ -27,20 +27,11 @@
 CS_LEAKGUARD_IMPLEMENT (csTextureWrapper);
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE_EXT(csTextureWrapper)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iTextureWrapper)
-  SCF_IMPLEMENTS_INTERFACE(csTextureWrapper)
-SCF_IMPLEMENT_IBASE_EXT_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csTextureWrapper::TextureWrapper)
-  SCF_IMPLEMENTS_INTERFACE(iTextureWrapper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csTextureWrapper::csTextureWrapper (iImage *Image) :
-    csObject(),
-    flags(CS_TEXTURE_3D)
+csTextureWrapper::csTextureWrapper (iImage *Image)
+  : scfImplementationType (this),
+  flags(CS_TEXTURE_3D)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
   image = Image;
   keep_image = false;
@@ -49,9 +40,9 @@ csTextureWrapper::csTextureWrapper (iImage *Image) :
   UpdateKeyColorFromImage ();
 }
 
-csTextureWrapper::csTextureWrapper (iTextureHandle *ith) : csObject()
+csTextureWrapper::csTextureWrapper (iTextureHandle *ith) 
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
 
   keep_image = false;
@@ -71,12 +62,10 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) : csObject()
   UpdateKeyColorFromHandle ();
 }
 
-csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
-  iBase(),
-  csObject(t),
+csTextureWrapper::csTextureWrapper (const csTextureWrapper &t) :
+  scfImplementationType (this),
   flags(CS_TEXTURE_3D)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
   handle = t.handle;
   DG_LINK (this, handle);
@@ -98,7 +87,6 @@ csTextureWrapper::~csTextureWrapper ()
   if (image)
     DG_UNLINK (this, image);
   delete[] texClass;
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
 }
 
 void csTextureWrapper::SetImageFile (iImage *Image)
@@ -209,68 +197,6 @@ const char* csTextureWrapper::GetTextureClass ()
     return texClass;
 }
 
-iObject *csTextureWrapper::TextureWrapper::QueryObject ()
-{
-  return scfParent;
-}
-
-void csTextureWrapper::TextureWrapper::SetImageFile (iImage *Image)
-{
-  scfParent->SetImageFile (Image);
-}
-
-iImage *csTextureWrapper::TextureWrapper::GetImageFile ()
-{
-  return scfParent->GetImageFile ();
-}
-
-void csTextureWrapper::TextureWrapper::SetTextureHandle (iTextureHandle *tex)
-{
-  scfParent->SetTextureHandle (tex);
-}
-
-void csTextureWrapper::TextureWrapper::SetKeyColor (
-  int red,
-  int green,
-  int blue)
-{
-  scfParent->SetKeyColor (red, green, blue);
-}
-
-void csTextureWrapper::TextureWrapper::GetKeyColor (
-  int &red,
-  int &green,
-  int &blue) const
-{
-  scfParent->GetKeyColor (red, green, blue);
-}
-
-void csTextureWrapper::TextureWrapper::SetFlags (int flags)
-{
-  scfParent->SetFlags (flags);
-}
-
-int csTextureWrapper::TextureWrapper::GetFlags () const
-{
-  return scfParent->GetFlags ();
-}
-
-void csTextureWrapper::TextureWrapper::Register (iTextureManager *txtmng)
-{
-  scfParent->Register (txtmng);
-}
-
-void csTextureWrapper::TextureWrapper::SetUseCallback (
-  iTextureCallback *callback)
-{
-  scfParent->SetUseCallback (callback);
-}
-
-iTextureCallback *csTextureWrapper::TextureWrapper::GetUseCallback () const
-{
-  return scfParent->GetUseCallback ();
-}
-
 //------------------------------------------------------- csTextureList -----//
 SCF_IMPLEMENT_IBASE(csTextureList)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iTextureList)
@@ -295,7 +221,7 @@ csTextureList::~csTextureList()
 
 iTextureWrapper *csTextureList::NewTexture (iImage *image)
 {
-  iTextureWrapper *tm = &(new csTextureWrapper (image))->scfiTextureWrapper;
+  iTextureWrapper *tm = new csTextureWrapper (image);
   Push (tm);
   tm->DecRef ();
   return tm;
@@ -303,7 +229,7 @@ iTextureWrapper *csTextureList::NewTexture (iImage *image)
 
 iTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
 {
-  iTextureWrapper *tm = &(new csTextureWrapper (ith))->scfiTextureWrapper;
+  iTextureWrapper *tm = new csTextureWrapper (ith);
   Push (tm);
   tm->DecRef ();
   return tm;

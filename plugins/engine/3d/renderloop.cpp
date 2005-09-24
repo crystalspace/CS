@@ -41,20 +41,14 @@
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csRenderLoop)
-  SCF_IMPLEMENTS_INTERFACE(iRenderLoop)
-  SCF_IMPLEMENTS_INTERFACE(iRenderStepContainer)
-SCF_IMPLEMENT_IBASE_END
 
 csRenderLoop::csRenderLoop (csEngine* engine)
+  : scfImplementationType (this), engine (engine)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csRenderLoop::engine = engine;
 }
 
 csRenderLoop::~csRenderLoop ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csRenderLoop::Draw (iRenderView *rview, iSector *s)
@@ -89,7 +83,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
     for (i = lights->GetCount (); i-- > 0;)
       // Tell the engine to try to add this light into the halo queue
       engine->AddHalo (rview->GetCamera(), 
-        ((csLight::Light*)lights->Get ((int)i))->GetPrivateObject ());
+        ((csLight*)lights->Get ((int)i))->GetPrivateObject ());
   }
 }
 
@@ -120,15 +114,10 @@ size_t csRenderLoop::GetStepCount () const
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csRenderLoopManager)
-  SCF_IMPLEMENTS_INTERFACE(iRenderLoopManager)
-SCF_IMPLEMENT_IBASE_END
 
 csRenderLoopManager::csRenderLoopManager(csEngine* engine)
+  : scfImplementationType (this), engine (engine)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
-  csRenderLoopManager::engine = engine;
 }
 
 csRenderLoopManager::~csRenderLoopManager()
@@ -142,7 +131,6 @@ csRenderLoopManager::~csRenderLoopManager()
     loop->DecRef ();
   }
 #endif
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iRenderLoop> csRenderLoopManager::Create ()

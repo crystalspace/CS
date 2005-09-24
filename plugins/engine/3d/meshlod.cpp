@@ -21,24 +21,14 @@
 #include "iengine/sharevar.h"
 
 
-SCF_IMPLEMENT_IBASE(csStaticLODMesh)
-  SCF_IMPLEMENTS_INTERFACE(iLODControl)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE(csLODListener)
-  SCF_IMPLEMENTS_INTERFACE(iSharedVariableListener)
-SCF_IMPLEMENT_IBASE_END
 
 csStaticLODMesh::csStaticLODMesh ()
+  : scfImplementationType (this), lod_m (0), lod_a (1)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  lod_m = 0;
-  lod_a = 1;
 }
 
 csStaticLODMesh::~csStaticLODMesh ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csStaticLODMesh::ClearLODListeners ()
@@ -91,20 +81,14 @@ int csStaticLODMesh::GetLODPolygonCount (float lod) const
 
 //----------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csStaticLODFactoryMesh)
-  SCF_IMPLEMENTS_INTERFACE(iLODControl)
-SCF_IMPLEMENT_IBASE_END
 
 csStaticLODFactoryMesh::csStaticLODFactoryMesh ()
+  : scfImplementationType (this), lod_m (0), lod_a (1)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  lod_m = 0;
-  lod_a = 1;
 }
 
 csStaticLODFactoryMesh::~csStaticLODFactoryMesh ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csStaticLODFactoryMesh::SetLOD (float m, float a)

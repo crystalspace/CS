@@ -19,9 +19,9 @@
 #ifndef __CS_MESHLOD_H__
 #define __CS_MESHLOD_H__
 
-#include "csutil/scf.h"
 #include "csutil/array.h"
 #include "csutil/refcount.h"
+#include "csutil/scf_implementation.h"
 #include "iengine/lod.h"
 #include "iengine/mesh.h"
 #include "iengine/sharevar.h"
@@ -32,31 +32,31 @@ struct iMeshFactoryWrapper;
 /**
  * A listener to listen to the variables.
  */
-class csLODListener : public iSharedVariableListener
+class csLODListener : public scfImplementation1<csLODListener,
+                                                iSharedVariableListener>
 {
-private:
-  float* variable;
 public:
-  SCF_DECLARE_IBASE;
   csLODListener (float* variable)
+    : scfImplementationType (this), variable (variable)
   {
-    SCF_CONSTRUCT_IBASE (0);
-    csLODListener::variable = variable;
   }
 
-  virtual ~csLODListener() { SCF_DESTRUCT_IBASE(); }
+  virtual ~csLODListener() {}
 
   virtual void VariableChanged (iSharedVariable* var)
   {
     *variable = var->Get ();
   }
+private:
+  float* variable;
 };
 
 /**
  * This class is used to represent the static lod levels of a
  * hierarchical mesh.
  */
-class csStaticLODMesh : public iLODControl
+class csStaticLODMesh : public scfImplementation1<csStaticLODMesh,
+                                                  iLODControl>
 {
 private:
   /// All static lod levels.
@@ -73,8 +73,6 @@ private:
   void ClearLODListeners ();
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// constructor
   csStaticLODMesh ();
   virtual ~csStaticLODMesh ();
@@ -126,7 +124,8 @@ public:
  * hierarchical mesh factory. It is used as a template to create
  * a csStaticLODMesh instance.
  */
-class csStaticLODFactoryMesh : public iLODControl
+class csStaticLODFactoryMesh : public scfImplementation1<csStaticLODFactoryMesh,
+                                                         iLODControl>
 {
 private:
   /// All static lod levels.
@@ -141,8 +140,6 @@ private:
   csRef<csLODListener> lod_vara_listener;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// constructor
   csStaticLODFactoryMesh ();
   virtual ~csStaticLODFactoryMesh ();

@@ -28,29 +28,25 @@
 #include "ivideo/graph3d.h"
 
 
-SCF_IMPLEMENT_IBASE(csRenderView)
-  SCF_IMPLEMENTS_INTERFACE(iRenderView)
-SCF_IMPLEMENT_IBASE_END
-
 csRenderView::csRenderView () :
+  scfImplementationType (this),
   engine(0),
   g3d(0),
   g2d(0),
   original_camera(0)
 {
-  SCF_CONSTRUCT_IBASE (0);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
   context_id = 0;
 }
 
 csRenderView::csRenderView (iCamera *c) :
+  scfImplementationType (this),
   engine(0),
   g3d(0),
   g2d(0),
   original_camera(0)
 {
-  SCF_CONSTRUCT_IBASE (0);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
   c->IncRef ();
@@ -60,12 +56,12 @@ csRenderView::csRenderView (iCamera *c) :
 
 csRenderView::csRenderView (
   iCamera *c, iClipper2D *v, iGraphics3D *ig3d, iGraphics2D *ig2d) :
+    scfImplementationType (this),
     engine(0),
     g3d(ig3d),
     g2d(ig2d),
     original_camera(0)
 {
-  SCF_CONSTRUCT_IBASE (0);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
   c->IncRef ();
@@ -82,7 +78,6 @@ csRenderView::csRenderView (
 csRenderView::~csRenderView ()
 {
   delete ctxt;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csRenderView::SetCamera (iCamera *icam)

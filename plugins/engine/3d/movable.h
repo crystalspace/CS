@@ -23,6 +23,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
 
@@ -34,13 +35,13 @@ class csLight;
 class csCamera;
 
 /// A list of sectors as the movable uses it
-class csMovableSectorList : public iSectorList, public csRefArrayObject<iSector>
+class csMovableSectorList : public scfImplementation1<csMovableSectorList, iSectorList>,
+                            public csRefArrayObject<iSector>
 {
 private:
   csMovable* movable;
 
 public:
-  SCF_DECLARE_IBASE;
 
   csMovableSectorList ();
   virtual ~csMovableSectorList ();
@@ -65,7 +66,7 @@ public:
  * through portals). This class itself does not have geometry.
  * It is only responsible for managing movement.
  */
-class csMovable : public iMovable
+class csMovable : public scfImplementation1<csMovable, iMovable>
 {
 private:
   /// World to object transformation.
@@ -307,8 +308,6 @@ public:
   {
     obj.Identity ();
   }
-
-  SCF_DECLARE_IBASE;
 };
 
 #endif // __CS_MOVABLE_H__

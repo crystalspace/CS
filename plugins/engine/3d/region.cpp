@@ -35,25 +35,16 @@
 #include "isndsys/ss_manager.h"
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE_EXT(csRegion)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iRegion)
-SCF_IMPLEMENT_IBASE_EXT_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csRegion::Region)
-  SCF_IMPLEMENTS_INTERFACE(iRegion)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csRegion::csRegion (csEngine *e) :
-  csObject()
+csRegion::csRegion (csEngine *e) 
+  : scfImplementationType (this), engine (e)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRegion);
-  engine = e;
 }
 
 csRegion::~csRegion ()
 {
-  scfiRegion.Clear ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiRegion);
+  Clear ();
 }
 
 void csRegion::DeleteAll ()
@@ -316,7 +307,7 @@ bool csRegion::PrepareTextures ()
 
 bool csRegion::ShineLights ()
 {
-  engine->ShineLights (&scfiRegion);
+  engine->ShineLights (this);
   return true;
 }
 
@@ -327,44 +318,25 @@ bool csRegion::Prepare ()
   return true;
 }
 
-iObject *csRegion::Region::QueryObject ()
+iObject *csRegion::QueryObject ()
 {
-  return scfParent;
+  return this;
 }
 
-void csRegion::Region::Clear ()
+void csRegion::Clear ()
 {
-  scfParent->ObjRemoveAll ();
+  ObjRemoveAll ();
 }
 
-void csRegion::Region::DeleteAll ()
-{
-  scfParent->DeleteAll ();
-}
 
-bool csRegion::Region::PrepareTextures ()
-{
-  return scfParent->PrepareTextures ();
-}
-
-bool csRegion::Region::ShineLights ()
-{
-  return scfParent->ShineLights ();
-}
-
-bool csRegion::Region::Prepare ()
-{
-  return scfParent->Prepare ();
-}
-
-iSector *csRegion::Region::FindSector (const char *iName)
+iSector *csRegion::FindSector (const char *iName)
 {
   csRef<iSector> sector (CS_GET_NAMED_CHILD_OBJECT (
-      scfParent, iSector, iName));
+      this, iSector, iName));
   return sector;	// DecRef is ok here.
 }
 
-iMeshWrapper *csRegion::Region::FindMeshObject (const char *Name)
+iMeshWrapper *csRegion::FindMeshObject (const char *Name)
 {
   char const* p = strchr (Name, ':');
   if (p)
@@ -373,7 +345,7 @@ iMeshWrapper *csRegion::Region::FindMeshObject (const char *Name)
     char* p2 = strchr (cname, ':');
     *p2 = 0;
     csRef<iMeshWrapper> m (CS_GET_NAMED_CHILD_OBJECT (
-        scfParent, iMeshWrapper, cname));
+        this, iMeshWrapper, cname));
     delete[] cname;
     if (m)
     {
@@ -384,43 +356,43 @@ iMeshWrapper *csRegion::Region::FindMeshObject (const char *Name)
   else
   {
     csRef<iMeshWrapper> m (CS_GET_NAMED_CHILD_OBJECT (
-        scfParent, iMeshWrapper, Name));
+        this, iMeshWrapper, Name));
     return m;	// DecRef is ok here.
   }
 }
 
-iMeshFactoryWrapper *csRegion::Region::FindMeshFactory (const char *iName)
+iMeshFactoryWrapper *csRegion::FindMeshFactory (const char *iName)
 {
   csRef<iMeshFactoryWrapper> mf (CS_GET_NAMED_CHILD_OBJECT (
-      scfParent, iMeshFactoryWrapper, iName));
+      this, iMeshFactoryWrapper, iName));
   return mf;	// DecRef is ok here.
 }
 
-iTextureWrapper *csRegion::Region::FindTexture (const char *iName)
+iTextureWrapper *csRegion::FindTexture (const char *iName)
 {
   csRef<iTextureWrapper> t (CS_GET_NAMED_CHILD_OBJECT (
-      scfParent, iTextureWrapper, iName));
+      this, iTextureWrapper, iName));
   return t;	// DecRef is ok here.
 }
 
-iMaterialWrapper *csRegion::Region::FindMaterial (const char *iName)
+iMaterialWrapper *csRegion::FindMaterial (const char *iName)
 {
   csRef<iMaterialWrapper> m (CS_GET_NAMED_CHILD_OBJECT (
-      scfParent, iMaterialWrapper, iName));
+      this, iMaterialWrapper, iName));
   return m;	// DecRef is ok here.
 }
 
-iCameraPosition *csRegion::Region::FindCameraPosition (const char *iName)
+iCameraPosition *csRegion::FindCameraPosition (const char *iName)
 {
   csRef<iCameraPosition> cp (CS_GET_NAMED_CHILD_OBJECT (
-      scfParent, iCameraPosition, iName));
+      this, iCameraPosition, iName));
   return cp;	// DecRef is ok here.
 }
 
-iCollection *csRegion::Region::FindCollection (const char *iName)
+iCollection *csRegion::FindCollection (const char *iName)
 {
   csRef<iCollection> col (CS_GET_NAMED_CHILD_OBJECT (
-      scfParent, iCollection, iName));
+      this, iCollection, iName));
   return col;	// DecRef is ok here.
 }
 
@@ -429,69 +401,55 @@ bool csRegion::IsInRegion (iObject *iobj)
   return iobj->GetObjectParent () == this;
 }
 
-bool csRegion::Region::IsInRegion (iObject *iobj)
-{
-  return scfParent->IsInRegion (iobj);
-}
 
 // ---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csRegionList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iRegionList)
-SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csRegionList::RegionList)
-  SCF_IMPLEMENTS_INTERFACE(iRegionList)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csRegionList::csRegionList () :
-  csRefArrayObject<iRegion> (16, 16)
+csRegionList::csRegionList () 
+  : scfImplementationType (this),
+  regionList (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRegionList);
 }
 
 csRegionList::~csRegionList()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiRegionList);
-  SCF_DESTRUCT_IBASE ();
 }
 
-int csRegionList::RegionList::GetCount () const
+int csRegionList::GetCount () const
 {
-  return (int)scfParent->Length ();
+  return (int)regionList.Length ();
 }
 
-iRegion *csRegionList::RegionList::Get (int n) const
+iRegion *csRegionList::Get (int n) const
 {
-  return scfParent->Get (n);
+  return regionList.Get (n);
 }
 
-int csRegionList::RegionList::Add (iRegion *obj)
+int csRegionList::Add (iRegion *obj)
 {
-  return (int)scfParent->Push (obj);
+  return (int)regionList.Push (obj);
 }
 
-bool csRegionList::RegionList::Remove (iRegion *obj)
+bool csRegionList::Remove (iRegion *obj)
 {
-  return scfParent->Delete (obj);
+  return regionList.Delete (obj);
 }
 
-bool csRegionList::RegionList::Remove (int n)
+bool csRegionList::Remove (int n)
 {
-  return scfParent->DeleteIndex (n);
+  return regionList.DeleteIndex (n);
 }
 
-void csRegionList::RegionList::RemoveAll ()
+void csRegionList::RemoveAll ()
 {
-  scfParent->DeleteAll ();
+  regionList.DeleteAll ();
 }
 
-int csRegionList::RegionList::Find (iRegion *obj) const
+int csRegionList::Find (iRegion *obj) const
 {
-  return (int)scfParent->Find (obj);
+  return (int)regionList.Find (obj);
 }
 
-iRegion *csRegionList::RegionList::FindByName (const char *Name) const
+iRegion *csRegionList::FindByName (const char *Name) const
 {
-  return scfParent->FindByName (Name);
+  return regionList.FindByName (Name);
 }

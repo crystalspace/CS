@@ -151,8 +151,6 @@ enum csLightType
   CS_LIGHT_SPOTLIGHT
 };
 
-SCF_VERSION (iLightCallback, 0, 2, 1);
-
 /**
  * Set a callback which is called when this light color is changed.
  * The given context will be either an instance of iRenderView, iFrustumView,
@@ -167,8 +165,9 @@ SCF_VERSION (iLightCallback, 0, 2, 1);
  *   <li>iLight
  *   </ul>
  */
-struct iLightCallback : public iBase
+struct iLightCallback : public virtual iBase
 {
+  SCF_INTERFACE(iLightCallback,2,0,0);
   /**
    * Light color will be changed. It is safe to delete this callback
    * in this function.
@@ -206,8 +205,6 @@ struct iLightCallback : public iBase
   virtual void OnAttenuationChange (iLight* light, int newatt) = 0;
 };
 
-
-SCF_VERSION (iLight, 0, 1, 0);
 
 /**
  * The iLight interface is the SCF interface for the csLight class.
@@ -250,8 +247,9 @@ SCF_VERSION (iLight, 0, 1, 0);
  *   <li>iEngine
  *   </ul>
  */
-struct iLight : public iBase
+struct iLight : public virtual iBase
 {
+  SCF_INTERFACE(iLight,2,0,0);
   /// Get the id of this light. This is a 16-byte MD5.
   virtual const char* GetLightID () = 0;
 
@@ -428,8 +426,6 @@ struct iLight : public iBase
   virtual void Setup () = 0;
 };
 
-SCF_VERSION (iLightList, 0, 0, 2);
-
 /**
  * This structure represents a list of lights.
  * <p>
@@ -442,8 +438,9 @@ SCF_VERSION (iLightList, 0, 0, 2);
  *   <li>iEngine
  *   </ul>
  */
-struct iLightList : public iBase
+struct iLightList : public virtual iBase
 {
+  SCF_INTERFACE(iLightList,2,0,0);
   /// Return the number of lights in this list.
   virtual int GetCount () const = 0;
 
@@ -488,8 +485,6 @@ struct iLightingProcessData : public iBase
   virtual void FinalizeLighting () = 0;
 };
 
-SCF_VERSION (iLightingProcessInfo, 0, 0, 2);
-
 /**
  * The iLightingProcessInfo interface holds information for the lighting
  * system. You can query the userdata from iFrustumView for this interface
@@ -498,6 +493,7 @@ SCF_VERSION (iLightingProcessInfo, 0, 0, 2);
  */
 struct iLightingProcessInfo : public iFrustumViewUserdata
 {
+  SCF_INTERFACE(iLightingProcessInfo,2,0,0);
   /// Get the light.
   virtual iLight* GetLight () const = 0;
 

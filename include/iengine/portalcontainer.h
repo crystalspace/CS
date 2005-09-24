@@ -32,7 +32,6 @@
 struct iPortal;
 struct iRenderView;
 
-SCF_VERSION (iPortalContainer, 0, 0, 1);
 
 /**
  * A container for portals.
@@ -51,8 +50,9 @@ SCF_VERSION (iPortalContainer, 0, 0, 1);
  *   <li>iEngine
  *   </ul>
  */
-struct iPortalContainer : public iBase
+struct iPortalContainer : public virtual iBase
 {
+  SCF_INTERFACE(iPortalContainer, 2,0,0);
   /// Get the number of portals in this contain.
   virtual int GetPortalCount () const = 0;
 

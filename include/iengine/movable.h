@@ -52,8 +52,6 @@ struct iMovableListener : public virtual iBase
   virtual void MovableDestroyed (iMovable* movable) = 0;
 };
 
-SCF_VERSION (iMovable, 0, 1, 2);
-
 /**
  * This interface represents the position and orientation of an object
  * relative to its parent (this is the transformation between local object
@@ -82,8 +80,9 @@ SCF_VERSION (iMovable, 0, 1, 2);
  *   <li>iEngine
  *   </ul>
  */
-struct iMovable : public iBase
+struct iMovable : public virtual iBase
 {
+  SCF_INTERFACE(iMovable, 2,0,0);
   /**
    * Get the parent movable. This is relevant in case the object belonging
    * to this movable is part of a hierarchical transformation.

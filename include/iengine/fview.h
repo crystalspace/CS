@@ -38,14 +38,12 @@ struct iMeshWrapper;
 class csFrustum;
 class csFrustumContext;
 
-
-SCF_VERSION (iFrustumViewUserdata, 0, 0, 1);
-
 /**
  * User data which can be attached to iFrustumView.
  */
-struct iFrustumViewUserdata : public iBase
+struct iFrustumViewUserdata : public virtual iBase
 {
+  SCF_INTERFACE(iFrustumViewUserdata,2,0,0);
 };
 
 /**
@@ -134,14 +132,15 @@ public:
   bool IsMirrored () { return mirror; }
 };
 
-SCF_VERSION (iFrustumView, 0, 4, 1);
 
 /**
  * This structure represents all information needed for the frustum
  * visibility calculator.
  */
-struct iFrustumView : public iBase
+struct iFrustumView : public virtual iBase
 {
+  SCF_INTERFACE(iFrustumView,2,0,0);
+
   /// Get the current frustum context.
   virtual csFrustumContext* GetFrustumContext () const = 0;
   /**

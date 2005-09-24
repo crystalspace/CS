@@ -167,14 +167,13 @@ public:
   uint32 context_id;
 };
 
-SCF_VERSION (iRenderView, 0, 5, 1);
-
 /**
  * This interface represents all information needed to render
  * some object in a current draw context.
  */
-struct iRenderView : public iBase
+struct iRenderView : public virtual iBase
 {
+  SCF_INTERFACE(iRenderView, 2,0,0);
   /// Get the current render context.
   virtual csRenderContext* GetRenderContext () = 0;
 

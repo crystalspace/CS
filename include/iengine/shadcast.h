@@ -34,15 +34,14 @@ struct iShadowBlockList;
 
 class csVector3;
 
-SCF_VERSION (iShadowCaster, 0, 0, 3);
-
 /**
  * An object that can cast shadows. An object implementing this interface
  * also implements iVisibilityObject so that it can be registered with
  * a visibility culler.
  */
-struct iShadowCaster : public iBase
+struct iShadowCaster : public virtual iBase
 {
+  SCF_INTERFACE(iShadowCaster, 2,0,0);
   /**
    * Append a list of shadow frustums which extend from
    * this shadow caster. The origin is the position of the light.
@@ -51,13 +50,12 @@ struct iShadowCaster : public iBase
   	const csVector3& origin) = 0;
 };
 
-SCF_VERSION (iShadowReceiver, 0, 0, 2);
-
 /**
  * An object that is interested in getting shadow information.
  */
-struct iShadowReceiver : public iBase
+struct iShadowReceiver : public virtual iBase
 {
+  SCF_INTERFACE(iShadowReceiver, 2,0,0);
   /// Cast shadows on this receiver.
   virtual void CastShadows (iMovable* movable, iFrustumView* fview) = 0;
 };

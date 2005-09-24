@@ -26,6 +26,7 @@
 #include "csutil/leakguard.h"
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "iengine/sharevar.h"
 
 
@@ -34,7 +35,9 @@ SCF_VERSION (csSharedVariable, 0, 0, 2);
 /**
  * A SharedVariable is a refcounted floating point value.
  */
-class csSharedVariable : public csObject
+class csSharedVariable : public scfImplementationExt1<csSharedVariable, 
+                                                      csObject,
+                                                      iSharedVariable>
 {
 private:
   int   type;
@@ -48,22 +51,19 @@ private:
 public:
   CS_LEAKGUARD_DECLARE (csSharedVariable);
 
-  SCF_DECLARE_IBASE_EXT (csObject);
 
   /**
    * Construct a SharedVariable. This SharedVariable will be initialized to
    * zero and unnamed.
    */
-  csSharedVariable () : csObject()
+  csSharedVariable () : scfImplementationType (this)
   { 
-    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSharedVariable);
     value = 0;
     type = iSharedVariable::SV_UNKNOWN;
   }
 
   virtual ~csSharedVariable()
   {
-    SCF_DESTRUCT_EMBEDDED_IBASE (scfiSharedVariable);
   }
 
   void Set (float val)
@@ -120,47 +120,20 @@ public:
   }
 
   //---------------------- iSharedVariable interface --------------------------
-  struct eiSharedVariable : public iSharedVariable
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSharedVariable);
-
-    virtual iObject* QueryObject () { return scfParent; }
-    virtual void Set(float val)
-    { scfParent->Set(val); }
-    virtual float Get() const
-    { return scfParent->Get(); }
-    virtual void SetName (const char *iName)
-    { scfParent->SetName(iName); }
-    virtual const char *GetName () const
-    { return scfParent->GetName(); }
-    virtual void SetColor (const csColor& color)
-    { scfParent->SetColor (color); }
-    virtual const csColor& GetColor() const
-    { return scfParent->GetColor(); }
-    virtual void SetVector (const csVector3& v)
-    { scfParent->SetVector (v); }
-    virtual const csVector3& GetVector () const
-    { return scfParent->GetVector (); }
-    int GetType () const
-    { return scfParent->GetType (); }
-    virtual void AddListener (iSharedVariableListener* listener)
-    {
-      scfParent->AddListener (listener);
-    }
-    virtual void RemoveListener (iSharedVariableListener* listener)
-    {
-      scfParent->RemoveListener (listener);
-    }
-  } scfiSharedVariable;
-  friend struct eiSharedVariable;
+  virtual iObject* QueryObject () { return this; }
+ 
+  virtual void SetName (const char *iName)
+  { csObject::SetName (iName); }
+  virtual const char *GetName () const
+  { return csObject::GetName (); }
 };
 
 /// List of 3D engine SharedVariables.
-class csSharedVariableList : public csRefArrayObject<iSharedVariable>
+class csSharedVariableList : public scfImplementation1<csSharedVariableList,
+                                                       iSharedVariableList>
 {
 public:
-  SCF_DECLARE_IBASE;
-
+  
   /// constructor
   csSharedVariableList ();
   /// destructor
@@ -169,22 +142,17 @@ public:
   /// iSharedVariable Factory method. This does not add the new var to the list.
   csPtr<iSharedVariable> New() const;
 
-  class SharedVariableList : public iSharedVariableList
-  {
-  public:
-    SCF_DECLARE_EMBEDDED_IBASE (csSharedVariableList);
-
-    virtual int GetCount () const;
-    virtual iSharedVariable *Get (int n) const;
-    virtual int Add (iSharedVariable *obj);
-    virtual bool Remove (iSharedVariable *obj);
-    virtual bool Remove (int n);
-    virtual void RemoveAll ();
-    virtual int Find (iSharedVariable *obj) const;
-    virtual iSharedVariable *FindByName (const char *Name) const;
-    virtual csPtr<iSharedVariable> New() const
-    { return scfParent->New(); }
-  } scfiSharedVariableList;
+  virtual int GetCount () const;
+  virtual iSharedVariable *Get (int n) const;
+  virtual int Add (iSharedVariable *obj);
+  virtual bool Remove (iSharedVariable *obj);
+  virtual bool Remove (int n);
+  virtual void RemoveAll ();
+  virtual int Find (iSharedVariable *obj) const;
+  virtual iSharedVariable *FindByName (const char *Name) const;
+private:
+  csRefArrayObject<iSharedVariable> list;
+   
 };
 
 #endif // __CS_SHAREVAR_H__

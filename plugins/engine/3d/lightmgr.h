@@ -19,12 +19,14 @@
 #ifndef __CS_CSENGINE_LIGHTMGR_H__
 #define __CS_CSENGINE_LIGHTMGR_H__
 
+#include "csutil/scf_implementation.h"
 #include "iengine/lightmgr.h"
 
 /**
  * Engine implementation of the light manager.
  */
-class csLightManager : public iLightManager
+class csLightManager : public scfImplementation1<csLightManager,
+                                                 iLightManager>
 {
 private:
   // A dummy empty list used in cases where there is no logObject.
@@ -33,8 +35,6 @@ private:
 public:
   csLightManager ();
   virtual ~csLightManager ();
-
-  SCF_DECLARE_IBASE;
 
   virtual const csArray<iLight*>& GetRelevantLights (iMeshWrapper* logObject,
   	int maxLights, bool desireSorting);

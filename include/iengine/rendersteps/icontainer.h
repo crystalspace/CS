@@ -32,13 +32,13 @@
 
 struct iRenderStep;
 
-SCF_VERSION (iRenderStepContainer, 0, 1, 0);
 
 /**
  * Container for render steps.
  */
-struct iRenderStepContainer : public iBase
+struct iRenderStepContainer : public virtual iBase
 {
+  SCF_INTERFACE(iRenderStepContainer, 2,0,0);
   /// Add a step
   virtual size_t AddStep (iRenderStep* step) = 0;
   /// Remove a given step

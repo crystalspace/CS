@@ -38,19 +38,11 @@ CS_IMPLEMENT_STATIC_VAR (GetStaticVectorArray, portal_VectorArray,())
 
 static portal_VectorArray *VectorArray = 0;
 
-SCF_IMPLEMENT_IBASE(csPortal)
-  SCF_IMPLEMENTS_INTERFACE(iPortal)
-SCF_IMPLEMENT_IBASE_END
 
 csPortal::csPortal (csPortalContainer* parent)
+  : scfImplementationType (this), filter_r (0), filter_g (1), filter_b (1),
+  max_sector_visit (5), parent (parent), name (0)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  filter_r = 1;
-  filter_g = 1;
-  filter_b = 1;
-  max_sector_visit = 5;
-  csPortal::parent = parent;
-  name = 0;
   flags.Set (CS_PORTAL_VISCULL);
 
   VectorArray = GetStaticVectorArray ();
@@ -59,7 +51,6 @@ csPortal::csPortal (csPortalContainer* parent)
 csPortal::~csPortal ()
 {
   delete[] name;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csPortal::SetSector (iSector *s)

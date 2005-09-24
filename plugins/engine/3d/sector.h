@@ -448,7 +448,7 @@ private:
 };
 
 /// List of 3D engine sectors.
-class csSectorList : public iSectorList
+class csSectorList : public scfImplementation1<csSectorList, iSectorList>
 {
 private:
   csRefArrayObject<iSector> list;
@@ -478,7 +478,6 @@ private:
 
 
 public:
-  SCF_DECLARE_IBASE;
 
   void NameChanged (iObject* object, const char* oldname,
   	const char* newname);

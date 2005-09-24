@@ -33,7 +33,6 @@ struct iObject;
 struct iEngine;
 struct iCamera;
 
-SCF_VERSION (iCameraPosition, 0, 1, 0);
 
 /**
  * A camera position. This object can be used to initialize a camera object to
@@ -63,8 +62,9 @@ SCF_VERSION (iCameraPosition, 0, 1, 0);
  *   <li>Application uses them.
  *   </ul>
  */
-struct iCameraPosition : public iBase
+struct iCameraPosition : public virtual iBase
 {
+  SCF_INTERFACE(iCameraPosition,2,0,0);
   /// Get the iObject for this camera position.
   virtual iObject *QueryObject() = 0;
 

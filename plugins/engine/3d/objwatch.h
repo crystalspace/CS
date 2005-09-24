@@ -19,8 +19,9 @@
 #ifndef __CS_OBJWATCH_H__
 #define __CS_OBJWATCH_H__
 
-#include "csutil/refarr.h"
 #include "csutil/array.h"
+#include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "iengine/objwatch.h"
 
 struct iLight;
@@ -32,7 +33,8 @@ class csMovableListener;
  * This class implements iObjectWatcher and is capable of keeping
  * track of lights and movables.
  */
-class csObjectWatcher : public iObjectWatcher
+class csObjectWatcher : public scfImplementation1<csObjectWatcher,
+                                                  iObjectWatcher>
 {
 private:
   // Lights we are watching.
@@ -66,8 +68,6 @@ public:
   virtual ~csObjectWatcher ();
 
   void ReportOperation (int op, iMovable* movable, iLight* light);
-
-  SCF_DECLARE_IBASE;
 
   virtual void WatchLight (iLight* light);
   virtual void RemoveLight (iLight* light);

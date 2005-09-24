@@ -21,6 +21,7 @@
 
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
+#include "csutil/scf_implementation.h"
 #include "iengine/region.h"
 #include "isndsys/ss_manager.h"
 
@@ -30,7 +31,9 @@ class csEngine;
  * A region. A region is basically a collection of objects in the
  * 3D engine that can be treated as a unit.
  */
-class csRegion : public csObject
+class csRegion : public scfImplementationExt1<csRegion,
+                                              csObject,
+                                              iRegion>
 {
 private:
   csEngine* engine;
@@ -90,100 +93,54 @@ public:
    */
   virtual bool Prepare ();
 
-  SCF_DECLARE_IBASE_EXT (csObject);
+  /// Query the iObject.
+  virtual iObject *QueryObject();
 
-  //--------------------- iRegion implementation ---------------------
-  struct Region : public iRegion
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csRegion);
 
-    /// Query the iObject.
-    virtual iObject *QueryObject();
+  /**
+  * Clear this region without removing the entities in it. The entities
+  * will simply get unconnected from this region.
+  */
+  virtual void Clear ();
 
-    virtual void Add (iObject *obj)
-    { scfParent->Add(obj); }
-    virtual void Remove (iObject *obj)
-    { scfParent->Remove (obj); }
+  /// Find a sector in this region by name.
+  virtual iSector *FindSector (const char *iName);
+  /// Find a mesh in this region by name
+  virtual iMeshWrapper *FindMeshObject (const char *iName);
+  /// Find a mesh factory in this region by name
+  virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName);
+  /// Find a texture in this region by name
+  virtual iTextureWrapper *FindTexture (const char *iName);
+  /// Find a material in this region by name
+  virtual iMaterialWrapper *FindMaterial (const char *iName);
+  /// Find a camera position in this region by name
+  virtual iCameraPosition *FindCameraPosition (const char *iName);
+  /// Find a collection in this region by name
+  virtual iCollection *FindCollection (const char *iName);
 
-    /**
-     * Clear this region without removing the entities in it. The entities
-     * will simply get unconnected from this region.
-     */
-    virtual void Clear ();
 
-    /**
-     * Delete all entities in this region.
-     */
-    virtual void DeleteAll ();
-
-    /**
-     * Prepare all textures and materials in this region.
-     */
-    virtual bool PrepareTextures ();
-
-    /**
-     * Do lighting calculations (or read from cache).
-     */
-    virtual bool ShineLights ();
-
-    /**
-     * Prepare all objects in this region. This has to be called
-     * directly after loading new objects.
-     * This function is equivalent to calling PrepareTextures(),
-     * followed by ShineLights().
-     */
-    virtual bool Prepare ();
-
-    /// Find a sector in this region by name.
-    virtual iSector *FindSector (const char *iName);
-    /// Find a mesh in this region by name
-    virtual iMeshWrapper *FindMeshObject (const char *iName);
-    /// Find a mesh factory in this region by name
-    virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName);
-    /// Find a texture in this region by name
-    virtual iTextureWrapper *FindTexture (const char *iName);
-    /// Find a material in this region by name
-    virtual iMaterialWrapper *FindMaterial (const char *iName);
-    /// Find a camera position in this region by name
-    virtual iCameraPosition *FindCameraPosition (const char *iName);
-    /// Find a collection in this region by name
-    virtual iCollection *FindCollection (const char *iName);
-
-    /**
-     * Check if some object is in this region.
-     * The speed of this function is independent of the number of
-     * objects in this region (i.e. very fast).
-     */
-    virtual bool IsInRegion (iObject* obj);
-  } scfiRegion;
-  friend struct Region;
 };
 
 
 /// List of 3D engine regions.
-class csRegionList : public csRefArrayObject<iRegion>
+class csRegionList : public scfImplementation1<csRegionList, iRegionList>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   /// constructor
   csRegionList ();
   virtual ~csRegionList ();
 
-  class RegionList : public iRegionList
-  {
-  public:
-    SCF_DECLARE_EMBEDDED_IBASE (csRegionList);
+  virtual int GetCount () const;
+  virtual iRegion *Get (int n) const;
+  virtual int Add (iRegion *obj);
+  virtual bool Remove (iRegion *obj);
+  virtual bool Remove (int n);
+  virtual void RemoveAll ();
+  virtual int Find (iRegion *obj) const;
+  virtual iRegion *FindByName (const char *Name) const;
 
-    virtual int GetCount () const;
-    virtual iRegion *Get (int n) const;
-    virtual int Add (iRegion *obj);
-    virtual bool Remove (iRegion *obj);
-    virtual bool Remove (int n);
-    virtual void RemoveAll ();
-    virtual int Find (iRegion *obj) const;
-    virtual iRegion *FindByName (const char *Name) const;
-  } scfiRegionList;
+private:
+  csRefArrayObject<iRegion> regionList;
 };
 
 #endif // __CS_REGION_H__

@@ -20,16 +20,17 @@
 #ifndef __CS_PORTALCONTAINER_H__
 #define __CS_PORTALCONTAINER_H__
 
-#include "iengine/portalcontainer.h"
-#include "csutil/refarr.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csgeom/vector3.h"
 #include "csgeom/pmtools.h"
-#include "plugins/engine/3d/portal.h"
+#include "csgeom/vector3.h"
 #include "cstool/meshobjtmpl.h"
 #include "cstool/rendermeshholder.h"
+#include "csutil/dirtyaccessarray.h"
+#include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
+#include "iengine/portalcontainer.h"
 #include "iengine/shadcast.h"
 #include "ivideo/rendermesh.h"
+#include "plugins/engine/3d/portal.h"
 
 class csMeshWrapper;
 class csMovable;
@@ -37,24 +38,24 @@ class csMovable;
 /**
  * A helper class for iPolygonMesh implementations used by csPortalContainer.
  */
-class csPortalContainerPolyMeshHelper : public iPolygonMesh
+class csPortalContainerPolyMeshHelper : 
+  public scfImplementation1<csPortalContainerPolyMeshHelper,
+                            iPolygonMesh>
 {
 public:
-  SCF_DECLARE_IBASE;
 
   /**
    * Make a polygon mesh helper which will accept polygons which match
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
-  csPortalContainerPolyMeshHelper (uint32 flag) :
-  	polygons (0), vertices (0), poly_flag (flag), triangles (0)
+  csPortalContainerPolyMeshHelper (uint32 flag) 
+    : scfImplementationType (this), polygons (0), vertices (0), poly_flag (flag), 
+    triangles (0)
   {
-    SCF_CONSTRUCT_IBASE (0);
   }
   virtual ~csPortalContainerPolyMeshHelper ()
   {
     Cleanup ();
-    SCF_DESTRUCT_IBASE ();
   }
 
   void Setup ();
@@ -120,8 +121,10 @@ private:
 /**
  * This is a container class for portals.
  */
-class csPortalContainer : public csMeshObject, public iPortalContainer,
-	public iShadowReceiver
+class csPortalContainer : public scfImplementationExt2<csPortalContainer,
+                                                       csMeshObject, 
+                                                       iPortalContainer,
+	                                               iShadowReceiver>
 {
 private:
   csRefArray<csPortal> portals;
@@ -199,7 +202,6 @@ public:
   void WorldToCamera (iCamera* camera, const csReversibleTransform& camtrans);
   bool Draw (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
 
-  SCF_DECLARE_IBASE_EXT (csMeshObject);
 
   //-------------------- iPolygonMesh interface implementation ---------------
   csPortalContainerPolyMeshHelper scfiPolygonMesh;
@@ -244,7 +246,7 @@ public:
   virtual void SetObjectBoundingBox (const csBox3& bbox)
   {
     object_bbox = bbox;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   virtual void GetRadius (csVector3& radius, csVector3& center);
 };

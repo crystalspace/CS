@@ -21,6 +21,7 @@
 #define __CS_HALO_H__
 
 #include "csgeom/math3d.h"
+#include "csutil/scf_implementation.h"
 #include "iengine/halo.h"
 #include "ivideo/halo.h"
 
@@ -33,7 +34,8 @@ struct iMaterialWrapper;
  * This is the basic class for all types of halos.
  * The csLight class contains a pointer to a object derived from this class.
  */
-class csHalo : public iBaseHalo
+class csHalo : public scfImplementation1<csHalo,
+                                         iBaseHalo>
 {
   /// the current intensity of the attached halo; if >0 halo is in halo queue.
   float Intensity;
@@ -56,14 +58,14 @@ public:
   virtual void SetIntensity (float iInt) { Intensity = iInt; }
   /// Get halo type.
   virtual csHaloType GetType () { return Type; }
-
-  SCF_DECLARE_IBASE;
 };
 
 /**
  * This is a halo which resembles a cross.
  */
-class csCrossHalo : public csHalo
+class csCrossHalo : public scfImplementationExt1<csCrossHalo,
+                                                 csHalo,
+                                                 iCrossHalo>
 {
 public:
   /// Halo intensity factor
@@ -81,25 +83,21 @@ public:
   virtual unsigned char *Generate (int Size);
 
   //------------------------ iCrossHalo ------------------------------------
-  SCF_DECLARE_IBASE_EXT (csHalo);
-  /// iCrossHalo implementation.
-  struct CrossHalo : public iCrossHalo
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csCrossHalo);
-    virtual void SetIntensityFactor (float i)
-    { scfParent->IntensityFactor = i; }
-    virtual float GetIntensityFactor ()
-    { return scfParent->IntensityFactor; }
-    virtual void SetCrossFactor (float i)
-    { scfParent->CrossFactor = i; }
-    virtual float GetCrossFactor ()
-    { return scfParent->CrossFactor; }
-  } scfiCrossHalo;
-  friend struct CrossHalo;
+  virtual void SetIntensityFactor (float i)
+  { IntensityFactor = i; }
+  virtual float GetIntensityFactor ()
+  { return IntensityFactor; }
+  virtual void SetCrossFactor (float i)
+  { CrossFactor = i; }
+  virtual float GetCrossFactor ()
+  { return CrossFactor; }
+
 };
 
 /** This halo has a center with a number of spokes */
-class csNovaHalo : public csHalo
+class csNovaHalo : public scfImplementationExt1<csNovaHalo,
+                                                csHalo,
+                                                iNovaHalo>
 {
 public:
   /// Random seed for generating halo
@@ -119,25 +117,18 @@ public:
   virtual unsigned char *Generate (int Size);
 
   //------------------------ iNovaHalo ------------------------------------
-  SCF_DECLARE_IBASE_EXT (csHalo);
-  /// iNovaHalo implementation.
-  struct NovaHalo : public iNovaHalo
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csNovaHalo);
-    virtual void SetRandomSeed (int s)
-    { scfParent->Seed = s; }
-    virtual int GetRandomSeed ()
-    { return scfParent->Seed; }
-    virtual void SetSpokeCount (int s)
-    { scfParent->NumSpokes = s; }
-    virtual int GetSpokeCount ()
-    { return scfParent->NumSpokes; }
-    virtual void SetRoundnessFactor (float r)
-    { scfParent->Roundness = r; }
-    virtual float GetRoundnessFactor ()
-    { return scfParent->Roundness; }
-  } scfiNovaHalo;
-  friend struct NovaHalo;
+  virtual void SetRandomSeed (int s)
+  { Seed = s; }
+  virtual int GetRandomSeed ()
+  { return Seed; }
+  virtual void SetSpokeCount (int s)
+  { NumSpokes = s; }
+  virtual int GetSpokeCount ()
+  { return NumSpokes; }
+  virtual void SetRoundnessFactor (float r)
+  { Roundness = r; }
+  virtual float GetRoundnessFactor ()
+  { return Roundness; }
 };
 
 
@@ -159,7 +150,9 @@ struct csFlareComponent
 /**
  * This halo is used for (solar)flares
  */
-class csFlareHalo : public csHalo
+class csFlareHalo : public scfImplementationExt1<csFlareHalo,
+                                                 csHalo,
+                                                 iFlareHalo>
 {
 private:
   /// List of the flare components. in drawing order.
@@ -171,13 +164,7 @@ public:
   csFlareHalo();
   /// Destructor.
   ~csFlareHalo();
-  /**
-   * Add a visual component to the flare.
-   * give position, size, image and mixmode.
-   * The component is added at the end of the list - to be displayed last.
-   */
-  void AddComponent(float pos, float w, float h, uint mode,
-    iMaterialWrapper *image);
+
   /// Get the list of component
   csFlareComponent *GetComponents() const {return components;}
   /**
@@ -188,18 +175,13 @@ public:
   virtual unsigned char *Generate (int Size);
 
   //------------------------ iFlareHalo ------------------------------------
-  SCF_DECLARE_IBASE_EXT (csHalo);
-  /// iFlareHalo implementation.
-  struct FlareHalo : public iFlareHalo
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csFlareHalo);
-    virtual void AddComponent (float pos, float w, float h, uint mode,
-      iMaterialWrapper *image)
-    {
-      scfParent->AddComponent (pos, w, h, mode, image);
-    }
-  } scfiFlareHalo;
-  friend struct FlareHalo;
+  /**
+  * Add a visual component to the flare.
+  * give position, size, image and mixmode.
+  * The component is added at the end of the list - to be displayed last.
+  */
+  void AddComponent(float pos, float w, float h, uint mode,
+    iMaterialWrapper *image);
 };
 
 /**

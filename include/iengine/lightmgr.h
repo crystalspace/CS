@@ -30,8 +30,6 @@
 struct iLight;
 struct iMeshWrapper;
 
-SCF_VERSION (iLightManager, 0, 0, 1);
-
 /**
  * An engine (3D or iso) can implement this interface for the benefit
  * of mesh objects so that they can request lighting information from
@@ -44,8 +42,9 @@ SCF_VERSION (iLightManager, 0, 0, 1);
  * The engine registers an implementation of this object in the object
  * registry with the "iLightManager" name.
  */
-struct iLightManager : public iBase
+struct iLightManager : public virtual iBase
 {
+  SCF_INTERFACE(iLightManager,2,0,0);
   /**
    * Return all 'relevant' lights that hit this object.
    * Depending on implementation in the engine this can simply

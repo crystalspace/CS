@@ -19,11 +19,12 @@
 #ifndef __CS_RVIEW_H__
 #define __CS_RVIEW_H__
 
-#include "csgeom/math3d.h"
 #include "csgeom/frustum.h"
-#include "plugins/engine/3d/camera.h"
-#include "iengine/rview.h"
+#include "csgeom/math3d.h"
+#include "csutil/scf_implementation.h"
 #include "iengine/engine.h"
+#include "iengine/rview.h"
+#include "plugins/engine/3d/camera.h"
 
 class csMatrix3;
 class csVector3;
@@ -39,7 +40,7 @@ struct iClipper2D;
  * a scene. It is modified while rendering according to
  * portals/warping portals and such.
  */
-class csRenderView : public iRenderView
+class csRenderView : public scfImplementation1<csRenderView, iRenderView>
 {
 private:
   /**
@@ -229,8 +230,6 @@ public:
 	const csSphere &cam_sphere,
 	const csSphere &world_sphere,
 	int& clip_portal, int& clip_plane, int& clip_z_plane);
-
-  SCF_DECLARE_IBASE;
 
   /// Get the current render context.
   virtual csRenderContext* GetRenderContext () { return ctxt; }

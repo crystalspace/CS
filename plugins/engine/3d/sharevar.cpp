@@ -22,88 +22,71 @@
 
 CS_LEAKGUARD_IMPLEMENT (csSharedVariable);
 
-SCF_IMPLEMENT_IBASE_EXT(csSharedVariable)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSharedVariable)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSharedVariable::eiSharedVariable)
-  SCF_IMPLEMENTS_INTERFACE(iSharedVariable)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 void csSharedVariable::FireListeners ()
 {
   size_t i;
   for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->VariableChanged (&scfiSharedVariable);
+    listeners[i]->VariableChanged (this);
 }
 
 //-----------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csSharedVariableList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSharedVariableList)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSharedVariableList::SharedVariableList)
-  SCF_IMPLEMENTS_INTERFACE(iSharedVariableList)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csSharedVariableList::csSharedVariableList ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSharedVariableList);
+  
 }
 
 csSharedVariableList::~csSharedVariableList ()
 {
-  DeleteAll ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSharedVariableList);
-  SCF_DESTRUCT_IBASE ();
+  list.DeleteAll ();
 }
 
-int csSharedVariableList::SharedVariableList::GetCount () const
+int csSharedVariableList::GetCount () const
 {
-  return (int)scfParent->Length ();
+  return (int)list.GetSize ();
 }
 
-iSharedVariable *csSharedVariableList::SharedVariableList::Get (int n) const
+iSharedVariable *csSharedVariableList::Get (int n) const
 {
-  return scfParent->Get (n);
+  return list.Get (n);
 }
 
-int csSharedVariableList::SharedVariableList::Add (iSharedVariable *obj)
+int csSharedVariableList::Add (iSharedVariable *obj)
 {
-  return (int)scfParent->Push (obj);
+  return (int)list.Push (obj);
 }
 
-bool csSharedVariableList::SharedVariableList::Remove (iSharedVariable *obj)
+bool csSharedVariableList::Remove (iSharedVariable *obj)
 {
-  return scfParent->Delete (obj);
+  return list.Delete (obj);
 }
 
-bool csSharedVariableList::SharedVariableList::Remove (int n)
+bool csSharedVariableList::Remove (int n)
 {
-  return scfParent->DeleteIndex (n);
+  return list.DeleteIndex (n);
 }
 
-void csSharedVariableList::SharedVariableList::RemoveAll ()
+void csSharedVariableList::RemoveAll ()
 {
-  scfParent->DeleteAll ();
+  list.DeleteAll ();
 }
 
-int csSharedVariableList::SharedVariableList::Find (iSharedVariable *obj) const
+int csSharedVariableList::Find (iSharedVariable *obj) const
 {
-  return (int)scfParent->Find (obj);
+  return (int)list.Find (obj);
 }
 
-iSharedVariable *csSharedVariableList::SharedVariableList::FindByName (
+iSharedVariable *csSharedVariableList::FindByName (
 	const char *Name) const
 {
-  return scfParent->FindByName (Name);
+  return list.FindByName (Name);
 }
 
 csPtr<iSharedVariable> csSharedVariableList::New() const
 {
   csSharedVariable *New = new csSharedVariable;
-  return csPtr<iSharedVariable> (&New->scfiSharedVariable);
+  return csPtr<iSharedVariable> (New);
 }
 

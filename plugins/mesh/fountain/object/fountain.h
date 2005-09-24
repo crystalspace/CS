@@ -80,7 +80,7 @@ public:
   void SetParticleCount (int num)
   {
     SetCount (num);
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get the number of particles used.
   int GetParticleCount () const { return ParticleCount; }
@@ -89,7 +89,7 @@ public:
   {
     initialized = false;
     Scale.Set (dropwidth, dropheight);
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get the size of the particles.
   void GetDropSize (float& dropwidth, float& dropheight) const
@@ -102,7 +102,7 @@ public:
   {
     initialized = false;
     csFountainMeshObject::origin = origin;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get origin of the fountain.
   const csVector3& GetOrigin () const { return origin; }
@@ -111,7 +111,7 @@ public:
   {
     initialized = false;
     csFountainMeshObject::accel = accel;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get acceleration.
   const csVector3& GetAcceleration () const { return accel; }
@@ -120,7 +120,7 @@ public:
   {
     initialized = false;
     elevation = elev;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get elevation.
   float GetElevation () const { return elevation; }
@@ -129,7 +129,7 @@ public:
   {
     initialized = false;
     azimuth = azi;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get azimuth.
   float GetAzimuth () const { return azimuth; }
@@ -138,7 +138,7 @@ public:
   {
     initialized = false;
     opening = open;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get opening.
   float GetOpening () const { return opening; }
@@ -147,7 +147,7 @@ public:
   {
     initialized = false;
     speed = spd;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get speed.
   float GetSpeed () const { return speed; }
@@ -156,7 +156,7 @@ public:
   {
     initialized = false;
     fall_time = ftime;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get fall time.
   float GetFallTime () const { return fall_time; }

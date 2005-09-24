@@ -19,6 +19,7 @@
 #ifndef __CS_LIGHT_H__
 #define __CS_LIGHT_H__
 
+#include "csutil/scf_implementation.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
 #include "csutil/scf_implementation.h"
@@ -42,22 +43,22 @@ struct iMeshWrapper;
 struct iLightingInfo;
 struct iSector;
 
-class csLightObjectModel : public csObjectModel
+class csLightObjectModel : public scfImplementationExt0<csLightObjectModel,
+                                                        csObjectModel>
 {
 public:
   csBox3 box;
   csVector3 radius;
 
   csLightObjectModel ()
+    : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
+    
   }
   virtual ~csLightObjectModel ()
   {
-    SCF_DESTRUCT_IBASE ();
+   
   }
-
-  SCF_DECLARE_IBASE;
 
   virtual void GetObjectBoundingBox (csBox3& bbox)
   {
@@ -79,7 +80,10 @@ public:
  * A light subclassing from this has a color, a position
  * and a radius.
  */
-class csLight : public csObject, public iVisibilityObject
+class csLight : public scfImplementationExt2<csLight,
+                                             csObject,
+                                             iLight,
+                                             iVisibilityObject>
 {
 private:
   /// ID for this light (16-byte MD5).
@@ -90,7 +94,7 @@ private:
 
 protected:
   /// Movable for the light
-  csMovable movable;
+  csMovable movable; //@@MS: BAAAD 
   /// Color.
   csColor color;
   /// Specular color
@@ -306,7 +310,7 @@ public:
   /**
    * Return the associated halo
    */
-  csHalo *GetHalo () { return halo; }
+  iBaseHalo* GetHalo () const { return halo; }
 
   /**
    * Set the halo associated with this light.
@@ -316,7 +320,7 @@ public:
   /**
    * Get the light's attenuation type
    */
-  csLightAttenuationMode GetAttenuationMode () 
+  csLightAttenuationMode GetAttenuationMode () const
   {
     return attenuation;
   }
@@ -397,7 +401,7 @@ public:
   /**
    * Get the brightness of a light at a given distance.
    */
-  float GetBrightnessAtDistance (float d);
+  float GetBrightnessAtDistance (float d) const;
 
   /// Get the light type of this light.
   csLightType GetType () const
@@ -473,6 +477,8 @@ public:
    */
   void OnSetPosition ();
 
+  virtual iObject *QueryObject() { return (iObject*)this; }
+  csLight* GetPrivateObject () { return this; }
   //------------------- iVisibilityObject interface -----------------------
   virtual iMovable *GetMovable () const { return (iMovable*)&movable; }
   virtual iMeshWrapper* GetMeshWrapper () const { return 0; }
@@ -480,114 +486,31 @@ public:
   virtual csFlags& GetCullerFlags () { return culler_flags; }
 
   //------------------------ iLight interface -----------------------------
-  SCF_DECLARE_IBASE_EXT (csObject);
-
+  
   /// iLight implementation
-  struct Light : public iLight
+  virtual iCrossHalo* CreateCrossHalo (float intensity, float cross);
+  virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,
+    float roundness);
+  virtual iFlareHalo* CreateFlareHalo ();
+
+  virtual csFlags& GetFlags ()
+  { return flags; }
+
+  virtual uint32 GetLightNumber () const
+  { return lightnr; }
+
+  virtual void Setup ()
   {
-    csLight* GetPrivateObject () { return scfParent; }
+    CalculateLighting ();
+  }
 
-    SCF_DECLARE_EMBEDDED_IBASE (csLight);
-    virtual const char* GetLightID () { return scfParent->GetLightID (); }
-    virtual iObject *QueryObject() { return (iObject*)scfParent; }
-    virtual csLightDynamicType GetDynamicType () const 
-    { return scfParent->GetDynamicType (); }
-
-    virtual const csVector3& GetCenter () const 
-    { return scfParent->GetCenter (); }
-    virtual void SetCenter (const csVector3& pos)
-    { scfParent->SetCenter (pos); }
-
-    virtual iSector *GetSector ()
-    { return scfParent->GetSector (); }
-
-    virtual iMovable *GetMovable () 
-    { return scfParent->GetMovable (); }
-
-    virtual const csColor& GetColor () const 
-    { return scfParent->GetColor (); }
-    virtual void SetColor (const csColor& col)
-    { scfParent->SetColor (col); }
-
-    virtual const csColor& GetSpecularColor () const 
-    { return scfParent->GetSpecularColor (); }
-    virtual void SetSpecularColor (const csColor& col) 
-    { scfParent->SetSpecularColor (col);} 
-
-    virtual csLightType GetType () const
-    { return scfParent->GetType (); }
-    virtual void SetType (csLightType type)
-    { scfParent->SetType (type); }
-
-    virtual const csVector3& GetDirection () const 
-    { return scfParent->GetDirection (); }
-    virtual void SetDirection (const csVector3& v)
-    { scfParent->SetDirection (v); }
-
-    virtual csLightAttenuationMode GetAttenuationMode () const
-    { return scfParent->GetAttenuationMode (); }
-    virtual void SetAttenuationMode (csLightAttenuationMode a)
-    { scfParent->SetAttenuationMode (a); }
-    
-    virtual void SetAttenuationConstants (const csVector3& constants)
-    { scfParent->SetAttenuationConstants (constants); }
-    virtual const csVector3 &GetAttenuationConstants () const 
-    { return scfParent->GetAttenuationConstants (); }
-
-    virtual float GetCutoffDistance () const
-    { return scfParent->GetCutoffDistance (); }
-    virtual void SetCutoffDistance (float distance)
-    { scfParent->SetCutoffDistance (distance); }
-
-    virtual float GetDirectionalCutoffRadius () const
-    { return scfParent->GetDirectionalCutoffRadius (); }
-    virtual void SetDirectionalCutoffRadius (float radius) 
-    { scfParent->SetDirectionalCutoffRadius (radius); }
-    
-    virtual void SetSpotLightFalloff (float inner, float outer)
-    { scfParent->SetSpotLightFalloff (inner, outer); }
-    virtual void GetSpotLightFalloff (float& inner, float& outer) const
-    { scfParent->GetSpotLightFalloff (inner, outer); }
-
-    virtual iCrossHalo* CreateCrossHalo (float intensity, float cross);
-    virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,
-      float roundness);
-    virtual iFlareHalo* CreateFlareHalo ();
-    virtual iBaseHalo* GetHalo () const 
-    { return scfParent->GetHalo (); }
-
-    virtual float GetBrightnessAtDistance (float d) const
-    { return scfParent->GetBrightnessAtDistance (d); }
-
-    virtual csFlags& GetFlags ()
-    { return scfParent->flags; }
-
-    virtual void SetLightCallback (iLightCallback* cb)
-    { scfParent->SetLightCallback (cb); }
-    virtual void RemoveLightCallback (iLightCallback* cb) 
-    { scfParent->RemoveLightCallback (cb); }
-    virtual int GetLightCallbackCount () const
-    { return scfParent->GetLightCallbackCount (); }
-    virtual iLightCallback* GetLightCallback (int idx) const 
-    { return scfParent->GetLightCallback (idx); }
-
-    virtual uint32 GetLightNumber () const
-    { return scfParent->lightnr; }
-
-    virtual void AddAffectedLightingInfo (iLightingInfo* li) 
-    { scfParent->AddAffectedLightingInfo (li); }    
-    virtual void RemoveAffectedLightingInfo (iLightingInfo* li) 
-    { scfParent->RemoveAffectedLightingInfo (li); }
-    virtual void Setup ()
-    { scfParent->CalculateLighting (); }
-  } scfiLight;
-  friend struct Light;
 };
 
 /**
  * List of lights for a sector. This class implements iLightList.
  */
-class csLightList : public iLightList
+class csLightList : public scfImplementation1<csLightList,
+                                              iLightList>
 {
 private:
   csRefArrayObject<iLight> list;
@@ -616,7 +539,6 @@ private:
   csRef<NameChangeListener> listener;
 
 public:
-  SCF_DECLARE_IBASE;
 
   void NameChanged (iObject* object, const char* oldname,
   	const char* newname);
@@ -644,7 +566,8 @@ public:
 /**
  * This is user-data for iFrustumView for the lighting process.
  */
-struct csLightingProcessInfo : public iLightingProcessInfo
+struct csLightingProcessInfo : public scfImplementation1<csLightingProcessInfo,
+                                                         iLightingProcessInfo>
 {
 private:
   // Light.
@@ -664,7 +587,7 @@ public:
    * Get the light.
    */
   csLight* GetCsLight () const { return light; }
-  virtual iLight* GetLight () const { return &(light->scfiLight); }
+  virtual iLight* GetLight () const { return light; }
 
   /**
    * Return true if dynamic.
@@ -690,8 +613,6 @@ public:
 
   /// Finalize lighting.
   virtual void FinalizeLighting ();
-
-  SCF_DECLARE_IBASE;
 };
 
 #endif // __CS_LIGHT_H__

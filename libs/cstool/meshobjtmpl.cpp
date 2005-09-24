@@ -24,20 +24,9 @@
 #include "iengine/mesh.h"
 #include "iutil/objreg.h"
 
-SCF_IMPLEMENT_IBASE (csMeshObject)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshObject::eiObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csMeshObject::csMeshObject (iEngine *eng)
-  : VisCallback (0), LogParent (0), Engine (eng)
+  : scfImplementationType (this), VisCallback (0), LogParent (0), Engine (eng)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
 
   boundingbox.SetCenter (csVector3 (0, 0, 0));
   boundingbox.SetSize (csVector3 (CS_BOUNDINGBOX_MAXVALUE,
@@ -46,8 +35,6 @@ csMeshObject::csMeshObject (iEngine *eng)
 
 csMeshObject::~csMeshObject ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csMeshObject::WantToDie ()

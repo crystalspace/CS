@@ -37,14 +37,13 @@ class csPlane3;
 class csTransform;
 class csVector3;
 
-SCF_VERSION (iShadowIterator, 0, 0, 1);
-
 /**
  * A shadow iterator allows someone to iterate over all shadows
  * in a iShadowBlock or iShadowBlockList.
  */
-struct iShadowIterator : public iBase
+struct iShadowIterator : public virtual iBase
 {
+  SCF_INTERFACE(iShadowIterator, 2,0,0);
   /// Reset the iterator to start again.
   virtual void Reset () = 0;
   /// Is there still an element in this iterator?
@@ -65,14 +64,13 @@ struct iShadowIterator : public iBase
   virtual iShadowBlock* GetNextShadowBlock () = 0;
 };
 
-SCF_VERSION (iShadowBlock, 0, 0, 3);
-
 /**
  * A block of shadows represent the shadows that are casted by
  * one iShadowCaster object.
  */
-struct iShadowBlock : public iBase
+struct iShadowBlock : public virtual iBase
 {
+  SCF_INTERFACE(iShadowBlock,2,0,0);
   /// Get an iterator to iterate over all shadows in this block.
   virtual iShadowIterator* GetShadowIterator (bool reverse = false) = 0;
   /// Dereference all shadows in the list.
@@ -134,14 +132,13 @@ struct iShadowBlock : public iBase
   virtual const csBox3& GetBoundingBox () = 0;
 };
 
-SCF_VERSION (iShadowBlockList, 0, 0, 5);
-
 /**
  * This is a list of shadow blocks. An iShadowReceiver will get
  * such a list.
  */
-struct iShadowBlockList : public iBase
+struct iShadowBlockList : public virtual iBase
 {
+  SCF_INTERFACE(iShadowBlockList,2,0,0);
   /// Get an iterator to iterate over all shadows in this list.
   virtual iShadowIterator* GetShadowIterator (bool reverse = false) = 0;
   /**

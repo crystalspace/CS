@@ -42,13 +42,12 @@ enum csHaloType
   cshtFlare
 };
 
-SCF_VERSION (iBaseHalo, 0, 0, 1);
-
 /**
  * This is the basic interface for all types of halos.
  */
-struct iBaseHalo : public iBase
+struct iBaseHalo : public virtual iBase
 {
+  SCF_INTERFACE(iBaseHalo,2,0,0);
   /// Set intensity.
   virtual void SetIntensity (float i) = 0;
   /// Get intensity.
@@ -57,13 +56,12 @@ struct iBaseHalo : public iBase
   virtual csHaloType GetType () = 0;
 };
 
-SCF_VERSION (iCrossHalo, 0, 0, 1);
-
 /**
  * This is a halo which resembles a cross.
  */
-struct iCrossHalo : public iBase
+struct iCrossHalo : public virtual iBase
 {
+  SCF_INTERFACE(iCrossHalo,2,0,0);
   /// Set intensity factor.
   virtual void SetIntensityFactor (float i) = 0;
   /// Get intensity factor.
@@ -74,13 +72,12 @@ struct iCrossHalo : public iBase
   virtual float GetCrossFactor () = 0;
 };
 
-SCF_VERSION (iNovaHalo, 0, 0, 1);
-
 /**
  * This is a halo which resembles a nova.
  */
-struct iNovaHalo : public iBase
+struct iNovaHalo : public virtual iBase
 {
+  SCF_INTERFACE(iNovaHalo,2,0,0);
   /// Set random seed for generating the halo.
   virtual void SetRandomSeed (int s) = 0;
   /// Get random seed.
@@ -95,13 +92,12 @@ struct iNovaHalo : public iBase
   virtual float GetRoundnessFactor () = 0;
 };
 
-SCF_VERSION (iFlareHalo, 0, 0, 1);
-
 /**
  * This is a halo which resembles a (solar) flare.
  */
-struct iFlareHalo : public iBase
+struct iFlareHalo : public virtual iBase
 {
+  SCF_INTERFACE(iFlareHalo,2,0,0);
   /**
    * Add a visual component to the flare.
    * give position, size, image and mixmode.

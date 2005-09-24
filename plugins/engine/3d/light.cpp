@@ -38,18 +38,6 @@ int csLight::ambient_blue = CS_DEFAULT_LIGHT_LEVEL;
 //float csLight::influenceIntensityFraction = 256;
 #define HUGE_RADIUS 100000000
 
-SCF_IMPLEMENT_IBASE (csLightObjectModel)
-  SCF_IMPLEMENTS_INTERFACE(iObjectModel)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE_EXT(csLight)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLight)
-  SCF_IMPLEMENTS_INTERFACE(iVisibilityObject)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLight::Light)
-  SCF_IMPLEMENTS_INTERFACE(iLight)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 void csLight::UpdateViscullMesh ()
 {
@@ -88,14 +76,13 @@ csLight::csLight (
   float d,
   float red, float green, float blue,
   csLightDynamicType dyntype) :
-    csObject(), light_id (0), color (red, green, blue), specularColor (0,0,0),
+    scfImplementationType (this), light_id (0), color (red, green, blue), specularColor (0,0,0),
     halo (0), dynamicType (dyntype), type (CS_LIGHT_POINTLIGHT), 
     attenuation (CS_ATTN_LINEAR), cutoffDistance (d),
     directionalCutoffRadius (d), direction (1,0,0), spotlightFalloffInner (0),
     spotlightFalloffOuter (1), lightnr (0)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLight);
-  movable.scfParent = (iBase*)(csObject*)this;
+  //movable.scfParent = (iBase*)(csObject*)this; //@@MS: Look at this?
   movable.SetLight (this);
   movable.SetPosition (csVector3 (x,y,z));
 
@@ -119,7 +106,7 @@ csLight::~csLight ()
   while (i >= 0)
   {
     iLightCallback* cb = light_cb_vector[i];
-    cb->OnDestroy (&scfiLight);
+    cb->OnDestroy (this);
     i--;
   }
 
@@ -132,11 +119,9 @@ csLight::~csLight ()
   while (it.HasNext ())
   {
     csRef<iLightingInfo> linfo = it.Next ();
-    linfo->LightDisconnect (&scfiLight);
+    linfo->LightDisconnect (this);
   }
   lightinginfos.DeleteAll ();
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLight);
 }
 
 void csLight::UseAsCullingObject ()
@@ -227,7 +212,7 @@ void csLight::SetHalo (csHalo *Halo)
   halo = Halo;
 }
 
-float csLight::GetBrightnessAtDistance (float d)
+float csLight::GetBrightnessAtDistance (float d) const
 {
   switch (attenuation)
   {
@@ -278,7 +263,7 @@ void csLight::OnSetPosition ()
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
-    cb->OnPositionChange (&scfiLight, pos);
+    cb->OnPositionChange (this, pos);
   }
 
   lightnr++;
@@ -290,7 +275,7 @@ void csLight::OnSetSector (iSector *sector)
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
-    cb->OnSectorChange (&scfiLight, sector);
+    cb->OnSectorChange (this, sector);
   }
 
   lightnr++;
@@ -302,7 +287,7 @@ void csLight::SetColor (const csColor& col)
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
-    cb->OnColorChange (&scfiLight, col);
+    cb->OnColorChange (this, col);
   }
 
   color = col; 
@@ -312,7 +297,7 @@ void csLight::SetColor (const csColor& col)
   while (it.HasNext ())
   {
     csRef<iLightingInfo> linfo = it.Next ();
-    linfo->LightChanged (&scfiLight);
+    linfo->LightChanged (this);
   }
 }
 
@@ -338,7 +323,7 @@ void csLight::SetAttenuationMode (csLightAttenuationMode a)
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
-    cb->OnAttenuationChange (&scfiLight, a);
+    cb->OnAttenuationChange (this, a);
   }
 }
 
@@ -354,7 +339,7 @@ void csLight::SetAttenuationConstants (const csVector3& attenv)
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
-    cb->OnAttenuationChange (&scfiLight, attenuation);
+    cb->OnAttenuationChange (this, attenuation);
   }
 }
 
@@ -365,38 +350,38 @@ void csLight::SetCutoffDistance (float radius)
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
-    cb->OnRadiusChange (&scfiLight, radius);
+    cb->OnRadiusChange (this, radius);
   }
   lightnr++;
   cutoffDistance = radius;
   UpdateViscullMesh ();
 }
 
-iCrossHalo *csLight::Light::CreateCrossHalo (float intensity, float cross)
+iCrossHalo *csLight::CreateCrossHalo (float intensity, float cross)
 {
   csCrossHalo *halo = new csCrossHalo (intensity, cross);
-  scfParent->SetHalo (halo);
+  SetHalo (halo);
 
   csRef<iCrossHalo> ihalo (SCF_QUERY_INTERFACE (halo, iCrossHalo));
   return ihalo; // DecRef is ok here.
 }
 
-iNovaHalo *csLight::Light::CreateNovaHalo (
+iNovaHalo *csLight::CreateNovaHalo (
   int seed,
   int num_spokes,
   float roundness)
 {
   csNovaHalo *halo = new csNovaHalo (seed, num_spokes, roundness);
-  scfParent->SetHalo (halo);
+  SetHalo (halo);
 
   csRef<iNovaHalo> ihalo (SCF_QUERY_INTERFACE (halo, iNovaHalo));
   return ihalo; // DecRef is ok here.
 }
 
-iFlareHalo *csLight::Light::CreateFlareHalo ()
+iFlareHalo *csLight::CreateFlareHalo ()
 {
   csFlareHalo *halo = new csFlareHalo ();
-  scfParent->SetHalo (halo);
+  SetHalo (halo);
 
   csRef<iFlareHalo> ihalo (SCF_QUERY_INTERFACE (halo, iFlareHalo));
   return ihalo; // DecRef is ok here.
@@ -429,7 +414,7 @@ void csLight::CalculateLighting ()
   while (it.HasNext ())
   {
     csRef<iLightingInfo> linfo = it.Next ();
-    linfo->LightDisconnect (&scfiLight);
+    linfo->LightDisconnect (this);
   }
   lightinginfos.DeleteAll ();
 
@@ -496,20 +481,15 @@ void csLight::CalculateLighting (iMeshWrapper *th)
 //---------------------------------------------------------------------------
 
 // --- csLightList -----------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csLightList)
-  SCF_IMPLEMENTS_INTERFACE(iLightList)
-SCF_IMPLEMENT_IBASE_END
-
 csLightList::csLightList ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   listener.AttachNew (new NameChangeListener (this));
 }
 
 csLightList::~csLightList ()
 {
   RemoveAll ();
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csLightList::NameChanged (iObject* object, const char* oldname,
@@ -588,21 +568,14 @@ iLight *csLightList::FindByName (const char *Name) const
 
 // --- csLightingProcessInfo --------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csLightingProcessInfo)
-  SCF_IMPLEMENTS_INTERFACE(iLightingProcessInfo)
-SCF_IMPLEMENT_IBASE_END
-
 csLightingProcessInfo::csLightingProcessInfo (csLight* light, bool dynamic)
+  : scfImplementationType (this),
+  light (light), dynamic (dynamic), color (light->GetColor ())
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csLightingProcessInfo::light = light;
-  csLightingProcessInfo::dynamic = dynamic;
-  csLightingProcessInfo::color = light->GetColor ();
 }
 
 csLightingProcessInfo::~csLightingProcessInfo()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csLightingProcessInfo::AttachUserdata (iLightingProcessData* userdata)

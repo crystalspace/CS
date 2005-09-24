@@ -1,4 +1,4 @@
-/*
+  /*
     Copyright (C) 2000-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
@@ -24,20 +24,15 @@
 #include "plugins/engine/3d/engine.h"
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csMovableSectorList)
-  SCF_IMPLEMENTS_INTERFACE(iSectorList)
-SCF_IMPLEMENT_IBASE_END
-
 csMovableSectorList::csMovableSectorList ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   movable = 0;
 }
 
 csMovableSectorList::~csMovableSectorList ()
 {
   DeleteAll ();
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csMovableSectorList::PrepareSector (iSector* sector)
@@ -97,21 +92,12 @@ iSector *csMovableSectorList::FindByName (const char *Name) const
 }
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csMovable)
-  SCF_IMPLEMENTS_INTERFACE(iBase)
-  SCF_IMPLEMENTS_INTERFACE(iMovable)
-SCF_IMPLEMENT_IBASE_END
 
 csMovable::csMovable ()
+  : scfImplementationType (this), parent (0), meshobject (0), lightobject (0),
+  cameraobject (0), updatenr (0), is_identity (true)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  parent = 0;
-  meshobject = 0;
-  lightobject = 0;
-  cameraobject = 0;
-  updatenr = 0;
   sectors.SetMovable (this);
-  is_identity = true;
 }
 
 csMovable::~csMovable ()
@@ -123,7 +109,6 @@ csMovable::~csMovable ()
     iMovableListener *ml = listeners[i];
     ml->MovableDestroyed (this);
   }
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csMovable::SetPosition (iSector *home, const csVector3 &pos)

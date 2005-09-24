@@ -17,28 +17,26 @@
 */
 #include "cssysdef.h"
 #include "csqint.h"
-#include "plugins/engine/3d/objwatch.h"
+#include "csutil/scf_implementation.h"
 #include "iengine/light.h"
 #include "iengine/movable.h"
+#include "plugins/engine/3d/objwatch.h"
 
 //---------------------------------------------------------------------------
 
-class csMovableListener : public iMovableListener
+class csMovableListener : public scfImplementation1<csMovableListener,
+                                                    iMovableListener>
 {
 public:
   csObjectWatcher* watcher;
 
   csMovableListener (csObjectWatcher* watcher)
+    : scfImplementationType (this), watcher (watcher)
   {
-    SCF_CONSTRUCT_IBASE (0);
-    csMovableListener::watcher = watcher;
   }
   virtual ~csMovableListener ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
-
-  SCF_DECLARE_IBASE;
 
   virtual void MovableChanged (iMovable* movable)
   {
@@ -52,26 +50,20 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE(csMovableListener)
-  SCF_IMPLEMENTS_INTERFACE(iMovableListener)
-SCF_IMPLEMENT_IBASE_END
 
-class csLightCallback : public iLightCallback
+class csLightCallback : public scfImplementation1<csLightCallback,
+                                                  iLightCallback>
 {
 public:
   csObjectWatcher* watcher;
 
   csLightCallback (csObjectWatcher* watcher)
+    : scfImplementationType (this), watcher (watcher)
   {
-    SCF_CONSTRUCT_IBASE (0);
-    csLightCallback::watcher = watcher;
   }
   virtual ~csLightCallback ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
-
-  SCF_DECLARE_IBASE;
 
   virtual void OnColorChange (iLight* light, const csColor& newcolor)
   {
@@ -105,23 +97,14 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE(csLightCallback)
-  SCF_IMPLEMENTS_INTERFACE(iLightCallback)
-SCF_IMPLEMENT_IBASE_END
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csObjectWatcher)
-  SCF_IMPLEMENTS_INTERFACE(iObjectWatcher)
-SCF_IMPLEMENT_IBASE_END
 
 csObjectWatcher::csObjectWatcher ()
+  : scfImplementationType (this), updatenr (0), last_op (CS_WATCH_NONE), 
+  last_light (0), last_movable (0)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  updatenr = 0;
-  last_op = CS_WATCH_NONE;
-  last_light = 0;
-  last_movable = 0;
   light_callback = new csLightCallback (this);
   movable_listener = new csMovableListener (this);
 }
@@ -131,7 +114,6 @@ csObjectWatcher::~csObjectWatcher ()
   Reset ();
   light_callback->DecRef ();
   movable_listener->DecRef ();
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csObjectWatcher::Reset ()

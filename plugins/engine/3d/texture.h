@@ -22,6 +22,7 @@
 #include "cstypes.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/leakguard.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/texture.h"
@@ -33,14 +34,13 @@ struct iTextureManager;
 struct iTextureHandle;
 struct iImage;
 
-
-SCF_VERSION (csTextureWrapper, 0, 0, 1);
-
 /**
  * csTextureWrapper represents a texture and its link
  * to the iTextureHandle as returned by iTextureManager.
  */
-class csTextureWrapper : public csObject
+class csTextureWrapper : public scfImplementationExt1<csTextureWrapper, 
+                                                      csObject,
+                                                      iTextureWrapper>
 {
 private:
   /// The corresponding iImage.
@@ -85,10 +85,6 @@ private:
       key_col_r = -1;
   }
 
-private:
-  /// Release texture handle
-  virtual ~csTextureWrapper ();
-
 public:
   CS_LEAKGUARD_DECLARE (csTextureWrapper);
   
@@ -97,7 +93,11 @@ public:
   /// Construct a csTextureWrapper from a pre-registered texture
   csTextureWrapper (iTextureHandle *ith);
   /// Copy constructor
-  csTextureWrapper (csTextureWrapper &);
+  csTextureWrapper (const csTextureWrapper &c);
+
+  /// Release texture handle
+  virtual ~csTextureWrapper ();
+
 
   /**
    * Change the base iImage. The changes will not be visible until the
@@ -157,7 +157,7 @@ public:
   void Visit ()
   {
     if (use_callback)
-      use_callback->UseTexture (&scfiTextureWrapper);
+      use_callback->UseTexture (this);
   }
 
   bool IsVisitRequired () const
@@ -168,46 +168,19 @@ public:
   void SetTextureClass (const char* className);
   const char* GetTextureClass ();
 
-  SCF_DECLARE_IBASE_EXT (csObject);
+  
 
   //-------------------- iTextureWrapper implementation -----------------------
-  struct TextureWrapper : public iTextureWrapper
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csTextureWrapper);
+  virtual iObject *QueryObject() {return this; }
+  virtual iTextureWrapper *Clone () const
+  { 
+    return new csTextureWrapper (*this); 
+  }
+  
 
-    virtual iObject *QueryObject();
-    virtual iTextureWrapper *Clone () const
-    { return &(new csTextureWrapper (*scfParent))->scfiTextureWrapper; }
-    virtual void SetImageFile (iImage *Image);
-    virtual iImage* GetImageFile ();
-    virtual void SetTextureHandle (iTextureHandle *tex);
-    virtual iTextureHandle* GetTextureHandle ()
-    {
-      return scfParent->GetTextureHandle ();
-    }
-    virtual void SetKeyColor (int red, int green, int blue);
-    virtual void GetKeyColor (int &red, int &green, int &blue) const;
-    virtual void SetFlags (int flags);
-    virtual int GetFlags () const;
-    virtual void Register (iTextureManager *txtmng);
-    virtual void SetUseCallback (iTextureCallback* callback);
-    virtual iTextureCallback* GetUseCallback () const;
-    virtual void Visit ()
-    {
-      scfParent->Visit ();
-    }
-    virtual bool IsVisitRequired () const
-    {
-      return scfParent->IsVisitRequired ();
-    }
-    virtual void SetKeepImage (bool k) { scfParent->keep_image = k; }
-    virtual bool KeepImage () const { return scfParent->keep_image; }
-    virtual void SetTextureClass (const char* className)
-    { scfParent->SetTextureClass (className); }
-    virtual const char* GetTextureClass () 
-    { return scfParent->GetTextureClass(); }
-  } scfiTextureWrapper;
-  friend struct TextureWrapper;
+  virtual void SetKeepImage (bool k) { keep_image = k; }
+  virtual bool KeepImage () const { return keep_image; }
+
 };
 
 /**

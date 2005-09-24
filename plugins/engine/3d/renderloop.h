@@ -24,17 +24,21 @@
 
 #include "csutil/hashr.h"
 #include "csutil/refarr.h"
+#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "iengine/renderloop.h"
+#include "iengine/rendersteps/irenderstep.h"
 #include "iutil/strset.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
-#include "iengine/rendersteps/irenderstep.h"
 
 class csEngine;
 class csRenderView;
 class csRenderLoop;
 
-class csRenderLoop : public iRenderLoop
+class csRenderLoop : public scfImplementation2<csRenderLoop,
+                                               iRenderLoop,
+                                               scfFakeInterface<iRenderStepContainer> >
 {
 protected:
   friend class csLightIteratorRenderStep;
@@ -45,7 +49,6 @@ protected:
   csRefArray<iRenderStep> steps;
   csRef<iShaderManager> shadermanager;
 public:
-  SCF_DECLARE_IBASE;
 
   csRenderLoop (csEngine* engine);
   virtual ~csRenderLoop();
@@ -59,14 +62,14 @@ public:
   virtual size_t GetStepCount () const;
 };
 
-class csRenderLoopManager : public iRenderLoopManager
+class csRenderLoopManager : public scfImplementation1<csRenderLoopManager,
+                                                      iRenderLoopManager>
 {
   csHashReversible<csRef<iRenderLoop>, const char*> loops;
   csStringSet strings;
 
   csEngine* engine;
 public:
-  SCF_DECLARE_IBASE;
 
   csRenderLoopManager(csEngine* engine);
   virtual ~csRenderLoopManager();

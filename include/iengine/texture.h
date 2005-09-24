@@ -44,8 +44,6 @@ struct iTextureCallback : public iBase
   virtual void UseTexture (iTextureWrapper* wrap) = 0;
 };
 
-SCF_VERSION (iTextureWrapper, 0, 1, 1);
-
 /**
  * A texture wrapper is an engine-level object that wraps around an actual
  * texture (iTextureHandle). Every texture in the engine is represented
@@ -73,8 +71,9 @@ SCF_VERSION (iTextureWrapper, 0, 1, 1);
  *   <li>iEngine
  *   </ul>
  */
-struct iTextureWrapper : public iBase
+struct iTextureWrapper : public virtual iBase
 {
+  SCF_INTERFACE(iTextureWrapper, 2,0,0);
   /// Get the iObject for this texture
   virtual iObject *QueryObject() = 0;
 

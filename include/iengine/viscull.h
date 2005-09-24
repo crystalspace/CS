@@ -60,14 +60,13 @@ struct iVisibilityObjectIterator : public iBase
 };
 
 
-SCF_VERSION (iVisibilityCullerListener, 0, 0, 1);
-
 /**
  * Implement this interface when you want to get notified about visible
  * objects detected by the visibility cullers.
  */
-struct iVisibilityCullerListener : public iBase
+struct iVisibilityCullerListener : public virtual iBase
 {
+  SCF_INTERFACE(iVisibilityCullerListener, 2,0,0);
   /**
    * This function is called whenever the visibilty culler discovers a new
    * visible mesh.  The frustum_mask is a mask that is compatible with

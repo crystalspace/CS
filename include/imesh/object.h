@@ -87,8 +87,6 @@ struct iMeshObjectDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshObject, 0, 3, 0);
-
 /**
  * This is a general mesh object that the engine can interact with. The mesh
  * object only manages its shape, texture etc. but *not* its position, sector
@@ -110,8 +108,9 @@ SCF_VERSION (iMeshObject, 0, 3, 0);
  *   <li>The 3D engine plugin (crystalspace.engine.3d).
  *   </ul>
  */
-struct iMeshObject : public iBase
+struct iMeshObject : public virtual iBase
 {
+  SCF_INTERFACE(iMeshObject, 2,0,0);
   /**
    * Get the reference to the factory that created this mesh object.
    */

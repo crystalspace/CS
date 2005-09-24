@@ -26,6 +26,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 #include "csgeom/transfrm.h"
+#include "csutil/scf_implementation.h"
 #include "iengine/sector.h"
 #include "iengine/portal.h"
 #include "ivideo/texture.h"
@@ -35,7 +36,8 @@ class csPortalContainer;
 /**
  * This class represents a portal to another sector.
  */
-class csPortal : public iPortal
+class csPortal : public scfImplementation1<csPortal,
+                                           iPortal>
 {
   friend class csPortalContainer;
 
@@ -292,8 +294,6 @@ public:
    */
   virtual void CheckFrustum (iFrustumView* lview,
   	const csReversibleTransform& t, int alpha);
-
-  SCF_DECLARE_IBASE;
 
   //------------------- iPortal implementation -----------------------
   virtual iObject *QueryObject () { return 0; } /*@@@ REMOVE */

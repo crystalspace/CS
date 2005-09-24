@@ -35,10 +35,6 @@
 // csPortalContainerPolyMeshHelper
 // ---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csPortalContainerPolyMeshHelper)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
-
 void csPortalContainerPolyMeshHelper::SetPortalContainer (csPortalContainer* pc)
 {
   parent = pc;
@@ -97,21 +93,17 @@ void csPortalContainerPolyMeshHelper::Cleanup ()
 // csPortalContainer
 // ---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_EXT(csPortalContainer)
-  SCF_IMPLEMENTS_INTERFACE (iPortalContainer)
-  SCF_IMPLEMENTS_INTERFACE (iShadowReceiver)
-SCF_IMPLEMENT_IBASE_EXT_END
 
 csPortalContainer::csPortalContainer (iEngine* engine, iObjectRegistry *object_reg) :
-	csMeshObject (engine),
+	scfImplementationType (this, engine),
 	scfiPolygonMesh (0),
 	scfiPolygonMeshCD (CS_PORTAL_COLLDET),
 	scfiPolygonMeshLOD (CS_PORTAL_VISCULL)
 {
-  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMeshCD);
-  scfiObjectModel.SetPolygonMeshViscull (&scfiPolygonMeshLOD);
-  scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMeshLOD);
+  SetPolygonMeshBase (&scfiPolygonMesh);
+  SetPolygonMeshColldet (&scfiPolygonMeshCD);
+  SetPolygonMeshViscull (&scfiPolygonMeshLOD);
+  SetPolygonMeshShadows (&scfiPolygonMeshLOD);
 
   prepared = false;
   data_nr = 0;

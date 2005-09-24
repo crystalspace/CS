@@ -34,14 +34,14 @@ struct iSharedVariableListener;
 class csColor;
 class csVector3;
 
-SCF_VERSION (iSharedVariable, 0, 1, 0);
 
 /**
  * iSharedVariable implements a refcounted value which can
  * be shared across many objects and updated efficiently.
  */
-struct iSharedVariable : public iBase
+struct iSharedVariable : public virtual iBase
 {
+  SCF_INTERFACE(iSharedVariable, 2,0,0);
   /// Get the private object interface
   virtual iObject* QueryObject () = 0;
 
@@ -88,27 +88,27 @@ struct iSharedVariable : public iBase
   virtual void RemoveListener (iSharedVariableListener* listener) = 0;
 };
 
-SCF_VERSION (iSharedVariableListener, 0, 0, 1);
 
 /**
  * A listener so that you can get notified when a variable is
  * changed.
  */
-struct iSharedVariableListener : public iBase
+struct iSharedVariableListener : public virtual iBase
 {
+  SCF_INTERFACE(iSharedVariableListener,2,0,0);
   /**
    * A variable has changed.
    */
   virtual void VariableChanged (iSharedVariable* var) = 0;
 };
 
-SCF_VERSION (iSharedVariableList, 0, 0, 2);
 
 /**
  * A list of shared variables.
  */
-struct iSharedVariableList : public iBase
+struct iSharedVariableList : public virtual iBase
 {
+  SCF_INTERFACE(iSharedVariableList, 2,0,0);
   /// Return the number of Shared Variables in this list.
   virtual int GetCount () const = 0;
 

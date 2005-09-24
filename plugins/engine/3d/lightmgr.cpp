@@ -22,18 +22,13 @@
 
 // ---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csLightManager)
-  SCF_IMPLEMENTS_INTERFACE(iLightManager)
-SCF_IMPLEMENT_IBASE_END
-
 csLightManager::csLightManager ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
 }
 
 csLightManager::~csLightManager ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 const csArray<iLight*>& csLightManager::GetRelevantLights (

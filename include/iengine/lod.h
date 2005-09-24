@@ -29,14 +29,13 @@
 
 struct iSharedVariable;
 
-SCF_VERSION (iLODControl, 0, 2, 0);
-
 /**
  * The iLODControl interface represents an object that has controllable
  * LOD features. The LOD manager can work with this.
  */
-struct iLODControl : public iBase
+struct iLODControl : public virtual iBase
 {
+  SCF_INTERFACE(iLODControl, 2,0,0);
   /**
    * Set a parameters for a function to compute LOD for the given
    * LOD control. The function is as follows:

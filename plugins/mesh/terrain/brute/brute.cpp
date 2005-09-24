@@ -1610,7 +1610,7 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
 {
   SetupObject ();
   iBase* b = (iBase *)fview->GetUserdata ();
-  iLightingProcessInfo* lpi = (iLightingProcessInfo*)b;
+  csRef<iLightingProcessInfo> lpi = SCF_QUERY_INTERFACE(b,iLightingProcessInfo);
   CS_ASSERT (lpi != 0);
 
   iLight* li = lpi->GetLight ();

@@ -59,26 +59,31 @@ csSectorLightList::~csSectorLightList ()
 
 void csSectorLightList::PrepareLight (iLight* item)
 {
-  csLight* clight = ((csLight::Light*)item)->GetPrivateObject ();
+  csLight* clight = ((csLight*)item)->GetPrivateObject ();
   csLightList::PrepareLight (item);
+
   clight->SetSector ((iSector*)sector);
 
   const csVector3& center = item->GetCenter ();
   float radius = item->GetCutoffDistance ();
   csBox3 lightbox (center - csVector3 (radius), center + csVector3 (radius));
   csKDTreeChild* childnode = kdtree->AddObject (lightbox, (void*)item);
+
   clight->SetChildNode (childnode);
   if (sector->use_lightculling)
   {
     sector->RegisterLightToCuller (clight);
   }
+
 }
 
 void csSectorLightList::FreeLight (iLight* item)
 {
-  csLight* clight = ((csLight::Light*)item)->GetPrivateObject ();
+
+  csLight* clight = ((csLight*)item)->GetPrivateObject ();
   clight->SetSector (0);
   kdtree->RemoveObject (clight->GetChildNode ());
+
   csLightList::FreeLight (item);
   if (sector->use_lightculling)
   {
@@ -157,7 +162,7 @@ void csSector::SetLightCulling (bool enable)
     for (i = 0; i < lights.GetCount (); i++)
     {
       iLight* l = lights.Get (i);
-      csLight* clight = ((csLight::Light*)l)->GetPrivateObject ();
+      csLight* clight = ((csLight*)l)->GetPrivateObject ();
       RegisterLightToCuller (clight);
     }
   }
@@ -166,7 +171,7 @@ void csSector::SetLightCulling (bool enable)
     for (i = 0; i < lights.GetCount (); i++)
     {
       iLight* l = lights.Get (i);
-      csLight* clight = ((csLight::Light*)l)->GetPrivateObject ();
+      csLight* clight = ((csLight*)l)->GetPrivateObject ();
       UnregisterLightToCuller (clight);
     }
   }
@@ -304,7 +309,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
     for (i = 0; i < lights.GetCount (); i++)
     {
       iLight* l = lights.Get (i);
-      csLight* clight = ((csLight::Light*)l)->GetPrivateObject ();
+      csLight* clight = ((csLight*)l)->GetPrivateObject ();
       UnregisterLightToCuller (clight);
     }
   }
@@ -347,7 +352,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
     for (i = 0; i < lights.GetCount (); i++)
     {
       iLight* l = lights.Get (i);
-      csLight* clight = ((csLight::Light*)l)->GetPrivateObject ();
+      csLight* clight = ((csLight*)l)->GetPrivateObject ();
       RegisterLightToCuller (clight);
     }
   }
@@ -361,20 +366,18 @@ iVisibilityCuller* csSector::GetVisibilityCuller ()
   return culler;
 }
 
-class csSectorVisibleMeshCallback : public iVisibilityCullerListener
+class csSectorVisibleMeshCallback : public scfImplementation1<csSectorVisibleMeshCallback,
+                                                              iVisibilityCullerListener>
 {
 public:
-  SCF_DECLARE_IBASE;
 
   csSectorVisibleMeshCallback ()
+    : scfImplementationType (this), privMeshlist (0)
   {
-    SCF_CONSTRUCT_IBASE(0);
-    privMeshlist = 0;
   }
 
   virtual ~csSectorVisibleMeshCallback()
   {
-    SCF_DESTRUCT_IBASE();
   }
 
   // NR version
@@ -463,10 +466,6 @@ private:
   iRenderView *rview;
   iSector* sector;
 };
-
-SCF_IMPLEMENT_IBASE(csSectorVisibleMeshCallback)
-  SCF_IMPLEMENTS_INTERFACE(iVisibilityCullerListener)
-SCF_IMPLEMENT_IBASE_END
 
 CS_IMPLEMENT_STATIC_VAR (GetVisMeshCb, csSectorVisibleMeshCallback, ())
 
@@ -949,7 +948,7 @@ void csSector::ShineLightsInt (csProgressPulse *pulse)
   {
     if (pulse != 0) pulse->Step ();
 
-    csLight *cl = ((csLight::Light*)lights.Get (i))->GetPrivateObject ();
+    csLight *cl = ((csLight*)lights.Get (i))->GetPrivateObject ();
     cl->CalculateLighting ();
   }
 }
@@ -961,7 +960,7 @@ void csSector::ShineLightsInt (iMeshWrapper *mesh, csProgressPulse *pulse)
   {
     if (pulse != 0) pulse->Step ();
 
-    csLight *cl = ((csLight::Light*)lights.Get (i))->GetPrivateObject ();
+    csLight *cl = ((csLight*)lights.Get (i))->GetPrivateObject ();
     cl->CalculateLighting (mesh);
   }
 }
@@ -1005,20 +1004,16 @@ void csSector::UnregisterPortalMesh (iMeshWrapper* mesh)
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csSectorList)
-  SCF_IMPLEMENTS_INTERFACE(iSectorList)
-SCF_IMPLEMENT_IBASE_END
 
 csSectorList::csSectorList ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   listener.AttachNew (new NameChangeListener (this));
 }
 
 csSectorList::~csSectorList ()
 {
   RemoveAll ();
-  SCF_DESTRUCT_IBASE();
 }
 
 void csSectorList::NameChanged (iObject* object, const char* oldname,

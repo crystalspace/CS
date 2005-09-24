@@ -18,16 +18,16 @@
 */
 #include "cssysdef.h"
 #include "csqint.h"
-#include "csutil/sysfunc.h"
-#include "plugins/engine/3d/halo.h"
-#include "plugins/engine/3d/engine.h"
 #include "csgeom/polyclip.h"
-#include "plugins/engine/3d/halogen.h"
-#include "ivideo/texture.h"
-#include "iengine/texture.h"
-#include "ivideo/material.h"
+#include "csutil/sysfunc.h"
 #include "iengine/material.h"
+#include "iengine/texture.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/material.h"
+#include "ivideo/texture.h"
+#include "plugins/engine/3d/engine.h"
+#include "plugins/engine/3d/halo.h"
+#include "plugins/engine/3d/halogen.h"
 
 
 
@@ -38,44 +38,28 @@
 #define HALO_INTENSITY_STEP 0.05f
 
 //--------------------------------------------------------------+ csHalo +---//
-SCF_IMPLEMENT_IBASE(csHalo)
-  SCF_IMPLEMENTS_INTERFACE(iBaseHalo)
-SCF_IMPLEMENT_IBASE_END
 
 csHalo::csHalo (csHaloType iType)
+  : scfImplementationType (this), Intensity (0), Type (iType)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  Intensity = 0;
-  Type = iType;
 }
 
 csHalo::~csHalo ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 //---------------------------------------------------------+ csCrossHalo +---//
-SCF_IMPLEMENT_IBASE_EXT(csCrossHalo)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iCrossHalo)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csCrossHalo::CrossHalo)
-  SCF_IMPLEMENTS_INTERFACE(iCrossHalo)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csCrossHalo::csCrossHalo (
   float intensity_factor,
-  float cross_factor) :
-    csHalo(cshtCross)
+  float cross_factor) 
+  : scfImplementationType (this, cshtCross), IntensityFactor (intensity_factor),
+  CrossFactor (cross_factor)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCrossHalo);
-  IntensityFactor = intensity_factor;
-  CrossFactor = cross_factor;
 }
 
 csCrossHalo::~csCrossHalo()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiCrossHalo);
 }
 
 uint8 *csCrossHalo::Generate (int Size)
@@ -84,29 +68,17 @@ uint8 *csCrossHalo::Generate (int Size)
 }
 
 //----------------------------------------------------------+ csNovaHalo +---//
-SCF_IMPLEMENT_IBASE_EXT(csNovaHalo)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iNovaHalo)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNovaHalo::NovaHalo)
-  SCF_IMPLEMENTS_INTERFACE(iNovaHalo)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csNovaHalo::csNovaHalo (
   int seed,
   int num_spokes,
-  float roundness) :
-    csHalo(cshtNova)
+  float roundness) 
+  : scfImplementationType (this, cshtNova), Seed (seed), NumSpokes (num_spokes), Roundness (roundness)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNovaHalo);
-  Seed = seed;
-  NumSpokes = num_spokes;
-  Roundness = roundness;
 }
 
 csNovaHalo::~csNovaHalo()
-{
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiNovaHalo);
+{  
 }
 
 uint8 *csNovaHalo::Generate (int Size)
@@ -115,20 +87,11 @@ uint8 *csNovaHalo::Generate (int Size)
 }
 
 //---------------------------------------------------------+ csFlareHalo +---//
-SCF_IMPLEMENT_IBASE_EXT(csFlareHalo)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iFlareHalo)
-SCF_IMPLEMENT_IBASE_EXT_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFlareHalo::FlareHalo)
-  SCF_IMPLEMENTS_INTERFACE(iFlareHalo)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csFlareHalo::csFlareHalo () :
-  csHalo(cshtFlare)
+csFlareHalo::csFlareHalo () 
+  : scfImplementationType (this, cshtFlare), components (0), last (0)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFlareHalo);
-  components = 0;
-  last = 0;
 }
 
 csFlareHalo::~csFlareHalo ()
@@ -141,7 +104,6 @@ csFlareHalo::~csFlareHalo ()
     delete p;
     p = np;
   }
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiFlareHalo);
 }
 
 void csFlareHalo::AddComponent (
@@ -167,9 +129,7 @@ void csFlareHalo::AddComponent (
   if (comp->image) comp->image->IncRef ();
 }
 
-uint8 *csFlareHalo::Generate (int
-
-/*Size*/ )
+uint8 *csFlareHalo::Generate (int /*Size*/ )
 {
   // Not implemented for flares. (consist of multiple images)
   return 0;
