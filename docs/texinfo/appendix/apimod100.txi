@@ -1813,3 +1813,8 @@ of the parameter.
 Same for @code{GetLogicalParent()}. It also uses a @code{iMeshFactoryWrapper}
 instead of @code{iBase} as the type of the parameter.
 
+@subheading @code{csRGBVector} Removed
+
+The @code{csRGBVector} class has been removed. A @code{csComparator<>} 
+specialization has been provided, so equivalent functionality can be achieved
+by simply using @code{csArray<csRGBcolor*>}.

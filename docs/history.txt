@@ -17,6 +17,7 @@ chronological order.
 	  and discussion.
 	- res augmented the simple former loader to also support heightmaps in
 	  a selection of raw formats.
+	- res removed the unused csRGBVector.
 23-Sep-2005
 	- Jorrit fixed the sound renderer csplugin file so that it works
 	  again.

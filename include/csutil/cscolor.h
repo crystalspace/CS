@@ -20,6 +20,7 @@
 #define __CS_CSCOLOR_H__
 
 #include "csextern.h"
+#include "comparator.h"
 
 /**
  * A class used to represent a color in RGB space.

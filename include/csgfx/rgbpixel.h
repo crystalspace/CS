@@ -90,6 +90,38 @@ struct csRGBcolor
 
 
 /**
+ * csComparator<> specialization for csRGBcolor.
+ */
+CS_SPECIALIZE_TEMPLATE
+class csComparator<csRGBcolor, csRGBcolor>
+{
+public:
+  static int Compare (csRGBcolor const& r1, csRGBcolor const& r2)
+  {
+    if (r1 == r2)
+      return 0;
+    else if(r1.red < r2.red &&
+	    r1.green < r2.green &&
+	    r1.blue < r2.blue)
+      return -1;
+    else
+      return 1;
+  }
+};
+
+/**
+ * csComparator<> specialization for csColor*. Mostly for compatibility with
+ * now-defunct csRGBVector class.
+ */
+CS_SPECIALIZE_TEMPLATE
+class csComparator<csRGBcolor*, csRGBcolor*> 
+{
+public:
+  static int Compare (csRGBcolor* const& r1, csRGBcolor* const& r2)
+  { return csComparator<csRGBcolor, csRGBcolor>::Compare (*r1, *r2); }
+};
+
+/**
  * An RGB pixel. In addition to R,G,B color components this structure also
  * contains the Alpha channel component, which is used in images
  * (that potentially have an alpha channel).
