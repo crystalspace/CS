@@ -355,10 +355,29 @@ rule Doxygen
     doxycpp = [ GenerateDoxygenCppWrapper $(outfile) : 
       $(CMD.C++CPP) [ FDefines DOXYGEN_RUN ] ] ;
   }
+  
+  local have_dot = "NO" ;
+  local dot_path ;
+  if $(CMD.DOT)
+  {
+    local dotpath = [ Reverse [ SplitToList $(CMD.DOT) : / ] ] ;
+    if $(dotpath[1]) != "dot"
+    {
+      Echo "doxygen expects the dot binary to be named 'dot' exactly" ;
+    }
+    else
+    {
+      dot_path = [ Reverse $(dotpath[2-]) ] ;
+      dot_path = $(dot_path:J=/) ;
+      have_dot = "YES" ;
+    }
+  }
 
   SEARCH on $(doxyfile) = $(SUBDIR) ;
   OPTIONS on $(target) = $(options) ;
   DOXYCPP on $(target) = $(doxycpp) ;
+  HAVE_DOT on $(target) = $(have_dot) ;
+  DOT_PATH on $(target) = $(dot_path) ;
   MakeLocate $(outfile) : $(outdir) ;
   Depends $(outfile) : $(doxyfile) ;
   Depends $(target) : $(outfile) ;
@@ -654,7 +673,7 @@ actions RunDVIPDF
 
 actions RunDoxygen
 {
-  TOP=$(TOP) DOXYCPP=$(DOXYCPP) $(CMD.DOXYGEN) $(OPTIONS) $(FLAGS.DOXYGEN) $(>)
+  TOP=$(TOP) DOXYCPP=$(DOXYCPP) HAVE_DOT=$(HAVE_DOT) DOT_PATH=$(DOT_PATH) $(CMD.DOXYGEN) $(OPTIONS) $(FLAGS.DOXYGEN) $(>)
 }
 
 #----------------------------------------------------------------------------

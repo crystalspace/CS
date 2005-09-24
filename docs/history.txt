@@ -11,6 +11,7 @@ chronological order.
 	  new sound loader and renderer.
 	- Jorrit fixed the sound manager so that it actually compiles.
 	- iceeey updated the CEGUI recent check to require CEGUI CVS.
+        - res changed the API documentation generation to use dot, if present.
 23-Sep-2005
 	- Jorrit fixed the sound renderer csplugin file so that it works
 	  again.

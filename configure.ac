@@ -130,6 +130,9 @@ CS_CHECK_MKDIR
 CS_EMIT_BUILD_PROPERTY([CMD.MKDIR], [$MKDIR])
 CS_EMIT_BUILD_PROPERTY([CMD.MKDIRS], [$MKDIRS])
 
+CS_CHECK_TOOLS([DOT], [dot])
+CS_EMIT_BUILD_PROPERTY([CMD.DOT], [$DOT])
+
 
 
 #------------------------------------------------------------------------------
