@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Sep-2005
+	- Jorrit fixed dependencies in the loader. It now also depends on
+	  new sound loader and renderer.
 23-Sep-2005
 	- Jorrit fixed the sound renderer csplugin file so that it works
 	  again.

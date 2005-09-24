@@ -1048,7 +1048,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   GET_PLUGIN (ModelConverter, iModelConverter, "model converter");
   GET_PLUGIN (CrossBuilder, iCrossBuilder, "model crossbuilder");
 
-  SndSysManager = CS_QUERY_REGISTRY (object_reg, iSndSysManager);			\
+  SndSysManager = CS_QUERY_REGISTRY (object_reg, iSndSysManager);
   if (!SndSysManager)
   {
     SndSysManager = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.sndsys.manager",

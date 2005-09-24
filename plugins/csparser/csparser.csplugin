@@ -10,11 +10,13 @@
         <requires>
           <class>crystalspace.kernel.</class>
           <class>crystalspace.sound.loader.</class>
+          <class>crystalspace.sndsys.element.loader</class>
           <class>crystalspace.image.loader</class>
           <class>crystalspace.mesh.loader.</class>
           <class>crystalspace.engine.3d</class>
           <class>crystalspace.graphics3d.</class>
           <class>crystalspace.sound.render.</class>
+          <class>crystalspace.sndsys.renderer.</class>
           <class>crystalspace.mesh.crossbuilder</class>
           <class>crystalspace.modelconverter.</class>
           <class>crystalspace.documentsystem.</class>
