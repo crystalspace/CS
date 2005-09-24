@@ -20,10 +20,11 @@
 #define __CS_MATH_H__
 
 /**\file 
-*/
+ * Generic mathematic utility functions.
+ */
 /**
-* \addtogroup geom_utils
-* @{ */
+ * \addtogroup geom_utils
+ * @{ */
 
 /**
  * Returns bigger of a and b. If they are equal, a or b can be returned.

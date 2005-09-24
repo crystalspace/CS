@@ -20,6 +20,7 @@
 #define __CS_POLYEDGE_H__
 
 /**\file 
+ * General 2D polygon, represented by edges.
  */
 /**
  * \addtogroup geom_utils

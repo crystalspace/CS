@@ -21,6 +21,7 @@
 #define __CS_MATH3D_H__
 
 /**\file 
+ * 3D mathematic utility functions.
  */
 /**
  * \addtogroup geom_utils

@@ -20,6 +20,7 @@
 #define __CS_SPLINE_H__
 
 /**\file 
+ * Splines.
  */
 /**
  * \addtogroup geom_utils

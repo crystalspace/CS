@@ -30,6 +30,12 @@
 
 #include "iutil/dbghelp.h"
 
+/**\file
+ * KD-tree implementation.
+ */
+/**\addtogroup geom_utils
+ * @{ */
+
 struct iGraphics3D;
 struct iString;
 class csKDTree;
@@ -434,6 +440,8 @@ public:
   virtual void Dump (iGraphics3D* /*g3d*/) { }
   virtual bool DebugCommand (const char*) { return false; }
 };
+
+/** @} */
 
 #endif // __CS_KDTREE_H__
 

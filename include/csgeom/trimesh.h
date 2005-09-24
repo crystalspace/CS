@@ -27,6 +27,12 @@
 #include "csutil/array.h"
 #include "csutil/dirtyaccessarray.h"
 
+/**\file
+ * Triangle mesh.
+ */
+/**\addtogroup geom_utils
+ * @{ */
+
 /**
  * A mesh of triangles. Note that a mesh of triangles is only valid
  * if used in combination with a vertex or edge table. Every triangle is then
@@ -120,6 +126,8 @@ public:
   ///
   csTriangleVertex& GetVertex (int idx) { return vertices[idx]; }
 };
+
+/** @} */
 
 #endif // __CS_TRIMESH_H__
 

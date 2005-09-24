@@ -23,6 +23,7 @@
 
 #include "csgeom/vector2.h"
 /**\file 
+ * General 2D polygon.
  */
 /**
  * \addtogroup geom_utils

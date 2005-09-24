@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_BSPTREE_H__
-#define __CS_BSPTREE_H__
+#ifndef __CS_CSGEOM_BSPTREE_H__
+#define __CS_CSGEOM_BSPTREE_H__
 
 #include "csextern.h"
 
@@ -25,6 +25,12 @@
 #include "csutil/array.h"
 #include "csutil/blockallocator.h"
 #include "csutil/dirtyaccessarray.h"
+
+/**\file
+ * BSP tree implementation.
+ */
+/**\addtogroup geom_utils
+ * @{ */
 
 struct iGraphics3D;
 
@@ -80,5 +86,7 @@ public:
   const csDirtyAccessArray<int>& Back2Front (const csVector3& pos);
 };
 
-#endif // __CS_BSPTREE_H__
+/** @} */
+
+#endif // __CS_CSGEOM_BSPTREE_H__
 

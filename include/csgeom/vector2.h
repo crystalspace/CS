@@ -22,7 +22,8 @@
 
 #include "csextern.h"
 
-/**\file 
+/**\file
+ * 2D vector.
  */
 /**
  * \addtogroup geom_utils

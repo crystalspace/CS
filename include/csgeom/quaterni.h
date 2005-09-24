@@ -20,6 +20,7 @@
 #define __CS_QUATERNION_H__
 
 /**\file 
+ * Quaternions.
  */
 /**
  * \addtogroup geom_utils

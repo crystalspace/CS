@@ -22,7 +22,8 @@
 #ifndef __CS_VECTOR4_H__
 #define __CS_VECTOR4_H__
 
-/**\file 
+/**\file
+ * 4D vector.
  */
 /**
  * \addtogroup geom_utils

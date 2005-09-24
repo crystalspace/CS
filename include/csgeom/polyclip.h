@@ -34,6 +34,7 @@
 class csPoly2DPool;
 
 /**\file 
+ * Polygon clipping routines
  */
 /**
  * \addtogroup geom_utils

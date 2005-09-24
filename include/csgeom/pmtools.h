@@ -28,6 +28,7 @@
 struct csTriangle;
 
 /**\file 
+ * Set of tools to work with iPolygonMesh instances.
  */
 /**
  * \addtogroup geom_utils

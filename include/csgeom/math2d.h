@@ -21,6 +21,7 @@
 #define __CS_MATH2D_H__
 
 /**\file 
+ * 2D mathematic utility functions.
  */
 /**
  * \addtogroup geom_utils

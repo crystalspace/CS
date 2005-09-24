@@ -20,6 +20,7 @@
 #define __CS_POLY3D_H__
 
 /**\file 
+ * General 3D polygon.
  */
 /**
  * \addtogroup geom_utils
@@ -33,12 +34,16 @@
 
 class csPoly2D;
 
-// Values returned by classify.
+/// Values returned by csPoly3D::Classify.
 enum
 {
+  /// Poly is on same plane
   CS_POL_SAME_PLANE = 0,
+  /// Poly is completely in front of the given plane
   CS_POL_FRONT = 1,
+  /// Poly is completely back of the given plane
   CS_POL_BACK = 2,
+  /// Poly intersects with plane
   CS_POL_SPLIT_NEEDED = 3
 };
 

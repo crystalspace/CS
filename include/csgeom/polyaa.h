@@ -26,6 +26,7 @@
 #include "csgeom/csrect.h"
 
 /**\file 
+ * Antialiased polygon filling.
  */
 /**
  * \addtogroup geom_utils

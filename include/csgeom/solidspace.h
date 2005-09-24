@@ -23,6 +23,12 @@
 #include "csgeom/box.h"
 #include "csgeom/pmtools.h"
 
+/**\file
+ * 3D solid space.
+ */
+/**\addtogroup geom_utils
+ * @{ */
+
 class csSolidSpaceNode;
 struct iPolygonMesh;
 
@@ -57,6 +63,8 @@ public:
    */
   void AddClosedObject (iPolygonMesh* object);
 };
+
+/** @} */
 
 #endif // __CS_SOLIDSPACE_H__
 

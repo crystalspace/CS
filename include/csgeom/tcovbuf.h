@@ -25,6 +25,12 @@
 #include "iutil/dbghelp.h"
 #include "csutil/ref.h"
 
+/**\file
+ * Tiled coverage buffer.
+ */
+/**\addtogroup geom_utils
+ * @{ */
+
 struct iGraphics2D;
 struct iGraphics3D;
 struct iBugPlug;
@@ -726,6 +732,8 @@ public:
     return false;
   }
 };
+
+/** @} */
 
 #endif // __CS_CSGEOM_TCOVBUF_H__
 

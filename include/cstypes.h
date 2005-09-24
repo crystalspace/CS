@@ -20,6 +20,7 @@
 #define __CS_CSTYPES_H__
 
 /**\file
+ * Commonly used types and macros.
  */
 /**\addtogroup util
  * @{

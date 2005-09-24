@@ -24,6 +24,12 @@
 #include "csgeom/trimesh.h"
 #include "csutil/list.h"
 
+/**\file
+ * Triangle mesh collapsing.
+ */
+/**\addtogroup geom_utils
+ * @{ */
+
 class csTriangleVerticesCost;
 
 /**
@@ -168,8 +174,8 @@ public:
 };
 
 /**
- * A static class which performs the calculation
- * of the best order to do the collapsing.
+ * A static class which performs the calculation of the best order to do the 
+ * collapsing of a triangle mesh.
  */
 class CS_CRYSTALSPACE_EXPORT csTriangleMeshLOD
 {
@@ -236,5 +242,7 @@ public:
   	csTriangleVerticesCost* verts, float max_cost, int& num_triangles,
 	csTriangleLODAlgo* lodalgo);
 };
+
+/** @} */
 
 #endif // __CS_TRIMESHLOD_H__

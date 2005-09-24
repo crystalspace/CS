@@ -20,7 +20,8 @@
 #ifndef __CS_VECTOR3_H__
 #define __CS_VECTOR3_H__
 
-/**\file 
+/**\file
+ * 3D vector.
  */
 /**
  * \addtogroup geom_utils

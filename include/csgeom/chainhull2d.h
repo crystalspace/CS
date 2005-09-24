@@ -32,6 +32,12 @@
 
 #include "csextern.h"
 
+/**\file
+ * Monotone chain 2D convex hull.
+ */
+/**\addtogroup geom_utils
+ * @{ */
+
 class csVector2;
 
 /**
@@ -60,6 +66,8 @@ public:
   static size_t CalculatePresorted (csVector2* points, size_t n,
 				    csVector2* hull);
 };
+
+/** @} */
 
 #endif // __CS_CHAINHULL2D_H__
 

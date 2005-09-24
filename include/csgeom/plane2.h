@@ -27,6 +27,7 @@
 #include "csgeom/vector2.h"
 
 /**\file 
+ * 2D space plane.
  */
 /**
  * \addtogroup geom_utils
@@ -41,8 +42,8 @@ enum
 
 /**
  * A plane in 2D space.
- * The plane is given by the equation AAx + BBy + CCz + DD = 0,
- * Where (AA,BB,CC) is given by the vector 'norm'.
+ * The plane is given by the equation AAx + BBy + CC = 0,
+ * Where (AA,BB) is given by the vector 'norm'.
  */
 class csPlane2
 {

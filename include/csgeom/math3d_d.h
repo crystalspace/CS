@@ -26,6 +26,7 @@
 #include "cstypes.h"
 
 /**\file 
+ * 3D mathematic utility functions (double precision variants).
  */
 /**
  * \addtogroup geom_utils

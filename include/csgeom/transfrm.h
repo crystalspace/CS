@@ -20,7 +20,8 @@
 #ifndef __CS_TRANSFORM_H__
 #define __CS_TRANSFORM_H__
 
-/**\file 
+/**\file
+ * Transformation from one coordinate system to another.
  */
 /**
  * \addtogroup geom_utils

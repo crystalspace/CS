@@ -20,6 +20,7 @@
 #define __CS_FRUSTRUM_H__
 
 /**\file 
+ * General frustum.
  */
 /**
  * \addtogroup geom_utils

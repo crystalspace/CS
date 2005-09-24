@@ -21,6 +21,7 @@
 #define __CS_MATRIX3_H__
 
 /**\file 
+ * 3x3 matrix.
  */
 /**
  * \addtogroup geom_utils

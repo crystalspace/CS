@@ -20,6 +20,7 @@
 #define __CS_TRIANGLE_H__
 
 /**\file 
+ * Triangle.
  */
 /**
  * \addtogroup geom_utils

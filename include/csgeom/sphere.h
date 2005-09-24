@@ -20,6 +20,7 @@
 #define __CS_SPHERE_H__
 
 /**\file 
+ * Sphere.
  */
 /**
  * \addtogroup geom_utils

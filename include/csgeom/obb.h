@@ -21,6 +21,7 @@
 #define __CS_OBB_H__
 
 /**\file 
+ * Oriented bounding box.
  */
 /**
  * \addtogroup geom_utils

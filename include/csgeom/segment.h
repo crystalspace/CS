@@ -20,6 +20,7 @@
 #define __CS_SEGMENT_H__
 
 /**\file 
+ * 2D line segment.
  */
 /**
  * \addtogroup geom_utils

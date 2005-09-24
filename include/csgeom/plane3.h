@@ -21,6 +21,7 @@
 #define __CS_PLANE3_H__
 
 /**\file 
+ * 3D space plane.
  */
 /**
  * \addtogroup geom_utils

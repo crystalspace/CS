@@ -21,6 +21,7 @@
 
 
 /**\file 
+ * 3D space path.
  */
 /**
  * \addtogroup geom_utils

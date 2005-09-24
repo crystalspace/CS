@@ -25,6 +25,7 @@
 #include "csgeom/vector2.h"
 
 /**\file 
+ * 2x2 matrix.
  */
 /**
  * \addtogroup geom_utils

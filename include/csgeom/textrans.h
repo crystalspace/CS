@@ -20,6 +20,7 @@
 #define __CS_TEXTRANS_H__
 
 /**\file 
+ * Transform texture information into a texture matrix/vector.
  */
 /**
  * \addtogroup geom_utils

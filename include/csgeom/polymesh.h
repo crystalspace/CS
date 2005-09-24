@@ -32,7 +32,9 @@
 
 struct csTriangle;
 
-
+/**\file
+ * iPolygonMesh implementation.
+ */
 /**
  * \addtogroup geom_utils
  * @{ */
@@ -43,7 +45,7 @@ struct csTriangle;
  * calculate the triangles if requested.
  */
 class CS_CRYSTALSPACE_EXPORT csPolygonMesh :
-  public scfImplementation1<csPolygonMesh,iPolygonMesh>
+  public scfImplementation1<csPolygonMesh, iPolygonMesh>
 {
 private:
   uint32 change_nr;

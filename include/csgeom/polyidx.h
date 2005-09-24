@@ -20,6 +20,7 @@
 #define __CS_POLYIDX_H__
 
 /**\file 
+ * General polygon (space-agnostic).
  */
 /**
  * \addtogroup geom_utils

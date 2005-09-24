@@ -20,6 +20,7 @@
 #define __CS_POLYPOOL_H__
 
 /**\file 
+ * Object pool for csPoly2D.
  */
 /**
  * \addtogroup geom_utils

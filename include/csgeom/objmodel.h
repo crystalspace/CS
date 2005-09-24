@@ -21,6 +21,7 @@
 #define __CS_CSGEOM_OBJMODEL_H__
 
 /**\file
+ * iObjectModel implementation.
  */
 
 /**
