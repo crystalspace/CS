@@ -455,13 +455,13 @@ void csSndSysRendererSoftware::ProcessPendingSources()
 {
   iSndSysSourceSoftware *src;
 
-  while (src=source_add_queue.DequeueEntry())
+  while ((src=source_add_queue.DequeueEntry()))
   {
 //    Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Found a queued source to add to the active list.");
     sources.Push(src);
   }
 
-  while (src=(iSndSysSourceSoftware *)source_remove_queue.DequeueEntry())
+  while ((src=(iSndSysSourceSoftware *)source_remove_queue.DequeueEntry()))
   {
     if (sources.Delete(src))
       source_clear_queue.QueueEntry(src);
@@ -473,9 +473,9 @@ void csSndSysRendererSoftware::ProcessPendingSources()
 void csSndSysRendererSoftware::ProcessPendingStreams()
 {
   iSndSysStream *stream;
-  while (stream=stream_add_queue.DequeueEntry())
+  while ((stream=stream_add_queue.DequeueEntry()))
     streams.Push(stream);
-  while (stream=stream_remove_queue.DequeueEntry())
+  while ((stream=stream_remove_queue.DequeueEntry()))
   {
     if (streams.Delete(stream))
       stream_clear_queue.QueueEntry(stream);
