@@ -45196,11 +45196,11 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <falagard/CEGUIFalWidgetLookManager.h>
+#include <CEGUI.h>
 int
 main ()
 {
-CEGUI::WidgetLookManager::getSingleton();
+CEGUI::CoordConverter* c = 0;
   ;
   return 0;
 }
@@ -45347,11 +45347,11 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <falagard/CEGUIFalWidgetLookManager.h>
+#include <CEGUI.h>
 int
 main ()
 {
-CEGUI::WidgetLookManager::getSingleton();
+CEGUI::CoordConverter* c = 0;
   ;
   return 0;
 }
