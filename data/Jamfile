@@ -30,6 +30,7 @@ for map in $(maps)
 }
 
 SubInclude TOP data aws ;
+SubInclude TOP data ceguitest ;
 SubInclude TOP data config ;
 SubInclude TOP data cube ;
 SubInclude TOP data shader ;
