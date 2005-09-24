@@ -991,7 +991,7 @@ Oriol Esteve
 Oriol fixed an OpenGL lightmap alignment bug.
 
 @item
-Patrick McFarland (@email{pmcfarland@@downeast.net})
+Patrick McFarland (@email{diablod3@@gmail.com})
 
 Patrick is co-author of the Autoconf @code{CS_PATH_CRYSTAL()} macro which
 foreign projects can employ to determine if Crystal Space is installed.
