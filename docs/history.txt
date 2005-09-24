@@ -9,6 +9,7 @@ chronological order.
 24-Sep-2005
 	- Jorrit fixed dependencies in the loader. It now also depends on
 	  new sound loader and renderer.
+	- Jorrit fixed the sound manager so that it actually compiles.
 23-Sep-2005
 	- Jorrit fixed the sound renderer csplugin file so that it works
 	  again.

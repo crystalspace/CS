@@ -31,6 +31,7 @@
 #include "iutil/eventh.h"
 #include "iutil/plugin.h"
 #include "isndsys/ss_manager.h"
+#include "isndsys/ss_stream.h"
 
 /**
  * Sound wrapper.
