@@ -33,7 +33,7 @@
 struct csTriangle;
 
 /**\file
- * iPolygonMesh implementation.
+ * Implementation of iPolygonMesh.
  */
 /**
  * \addtogroup geom_utils
