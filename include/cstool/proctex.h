@@ -20,6 +20,10 @@
 #ifndef __CS_PROCTEX_H__
 #define __CS_PROCTEX_H__
 
+/**\file
+ * Superclass for procedural textures. 
+ */
+
 #include "csextern.h"
 
 #include "csutil/csobject.h"

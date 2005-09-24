@@ -19,6 +19,10 @@
 #ifndef __CS_COLLIDER_H__
 #define __CS_COLLIDER_H__
 
+/**\file
+ * Collision helper.
+ */
+
 #include "csextern.h"
 
 #include "csgeom/box.h"

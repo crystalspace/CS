@@ -19,6 +19,10 @@
 #ifndef __CS_KEYVAL_H__
 #define __CS_KEYVAL_H__
 
+/**\file
+ * Key/Value pair
+ */
+
 #include "csextern.h"
 
 #include "csutil/csobject.h"

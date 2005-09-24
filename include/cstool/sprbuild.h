@@ -19,6 +19,10 @@
 #ifndef __CS_SPRBUILD_H__
 #define __CS_SPRBUILD_H__
 
+/**\file
+ * Generic sprite builder interface. 
+ */
+
 #include "csextern.h"
 
 #include "csutil/csstring.h"

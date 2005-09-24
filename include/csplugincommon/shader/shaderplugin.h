@@ -19,14 +19,24 @@
 #ifndef __CS_SHADERPLUGIN_H__
 #define __CS_SHADERPLUGIN_H__
 
+/**\file
+ * Shader plugin related interfaces.
+ */
+
 #include "csutil/scf.h"
 #include "csutil/strhash.h"
 
 #include "ivideo/shader/shader.h"
 
+/**\addtogroup plugincommon
+ * @{ */
+
+/// Mapping of a shader variable to some shader-specific destination
 struct csShaderVarMapping
 {
+  /// Shader variable name
   csStringID name;
+  /// Destination
   csString destination;
   csShaderVarMapping (csStringID n, const char* d)
     : name(n), destination(d) {}
@@ -88,6 +98,8 @@ struct iShaderProgramPlugin : public iBase
   virtual csPtr<iShaderProgram> CreateProgram(const char* type) = 0;
   virtual bool SupportType(const char* type) = 0;
 };
+
+/** @} */
 
 #endif
 

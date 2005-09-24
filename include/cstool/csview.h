@@ -20,6 +20,10 @@
 #ifndef __CS_CSVIEW_H__
 #define __CS_CSVIEW_H__
 
+/**\file
+ * CrystalSpace 3D renderer view
+ */
+
 #include "csextern.h"
 
 #include "ivaria/view.h"

@@ -20,6 +20,10 @@
 #ifndef __CS_GLSTATES_H__
 #define __CS_GLSTATES_H__
 
+/**\file
+ * OpenGL state cache.
+ */
+
 #if defined(CS_OPENGL_PATH)
 #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
 #else
@@ -28,6 +32,9 @@
 
 #include "csextern_gl.h"
 #include "glextmanager.h"
+
+/**\addtogroup plugincommon
+ * @{ */
 
 // Set to 'true' to force state changing commands. For debugging.
 #define FORCE_STATE_CHANGE			  false/*true*/
@@ -543,6 +550,10 @@ public:
 
 
 /**
+ * OpenGL state cache.
+ * All state changes that are made often (possibly with the same value, ie
+ * actually no change) or across plugins should be done through the cache.
+ * \remarks
  * Since this class is passed directly between plugins the
  * code in this class cannot do memory allocations or
  * deallocations. The functions in this class will only
@@ -717,5 +728,7 @@ public:
 #undef DECLARE_CACHED_CLIENT_STATE_LAYER
 
 #undef FORCE_STATE_CHANGE
+
+/** @} */
 
 #endif // __CS_GLSTATES_H__

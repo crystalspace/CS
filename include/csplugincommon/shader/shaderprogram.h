@@ -20,6 +20,10 @@
 #ifndef __CS_SHADERPLUGINS_COMMON_SHADERPROGRAM_H__
 #define __CS_SHADERPLUGINS_COMMON_SHADERPROGRAM_H__
 
+/**\file
+ * Base class for iShaderProgram plugins.
+ */
+
 #include "csextern.h"
 #include "csutil/array.h"
 #include "csutil/ref.h"
@@ -35,8 +39,10 @@ struct iFile;
 struct iSyntaxService;
 struct iObjectRegistry;
 
+/**\addtogroup plugincommon
+ * @{ */
 /**
- * Baseclass for iShaderProgram plugins.
+ * Base class for iShaderProgram plugins.
  * Provides basic services such as holding and of parameter mapping
  * information, basic program data and data dumping.
  */
@@ -115,7 +121,7 @@ protected:
       mappingParam.valid = true;
     }
   };
-  // Variable mappings
+  /// Variable mappings
   csArray<VariableMapEntry> variablemap;
 
   /// Program description
@@ -198,5 +204,7 @@ public:
   virtual int ResolveTextureBinding (const char* /*binding*/)
   { return -1; }
 };
+
+/** @} */
 
 #endif // __CS_SHADERPLUGINS_COMMON_SHADERPROGRAM_H__

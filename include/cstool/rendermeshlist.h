@@ -19,6 +19,10 @@
 #ifndef __CS_RENDERMESHLIST_H__
 #define __CS_RENDERMESHLIST_H__
 
+/**\file
+ * List of render meshes.
+ */
+
 #include "csextern.h"
 
 #include "csgeom/vector3.h"

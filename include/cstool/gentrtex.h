@@ -19,6 +19,10 @@
 #ifndef __CS_GENTERTEX_H__
 #define __CS_GENTERTEX_H__
 
+/**\file
+ * Terrain texture image generation
+ */
+
 #include "csextern.h"
 
 #include "csgeom/vector2.h"

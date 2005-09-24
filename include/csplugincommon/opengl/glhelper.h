@@ -20,10 +20,18 @@
 #ifndef __CS_CSPLUGINCOMMON_OPENGL_GLHELPER_H__
 #define __CS_CSPLUGINCOMMON_OPENGL_GLHELPER_H__
 
+/**\file
+ * OpenGL utilities
+ */
+
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 
+/**\addtogroup plugincommon
+ * @{ */
+
+/// Make an OpenGL matrix from a CS transform
 static inline void makeGLMatrix (const csReversibleTransform& t, 
   float matrix[16])
 {
@@ -51,6 +59,7 @@ static inline void makeGLMatrix (const csReversibleTransform& t,
   matrix[15] = 1.0f;
 }
 
+/// Make an OpenGL matrix from a CS matrix
 static inline void makeGLMatrix (const csMatrix3& m, float matrix[16])
 {
   matrix[0] = m.m11;
@@ -73,5 +82,7 @@ static inline void makeGLMatrix (const csMatrix3& m, float matrix[16])
   matrix[14] = 0.0f;
   matrix[15] = 1.0f;
 }
+
+/** @} */
 
 #endif

@@ -19,6 +19,10 @@
 #ifndef __CS_GLCOMMON2D_H__
 #define __CS_GLCOMMON2D_H__
 
+/**\file
+ * Common OpenGL canvas superclass.
+ */
+
 #if defined(CS_OPENGL_PATH)
 #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
 #else
@@ -39,6 +43,8 @@
 class OpenGLTextureCache;
 class GLFontCache;
 
+/**\addtogroup plugincommon
+ * @{ */
 /**
  * Basic OpenGL version of the 2D driver class.
  * You can look at one of the OpenGL canvas classes as an example
@@ -294,5 +300,7 @@ public:
   }
   /** @} */
 };
+
+/** @} */
 
 #endif // __CS_GLCOMMON2D_H__

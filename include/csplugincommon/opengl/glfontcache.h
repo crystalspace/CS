@@ -20,6 +20,10 @@
 #ifndef __CS_CANVAS_OPENGLCOMMON_GLFONTCACHE_H__
 #define __CS_CANVAS_OPENGLCOMMON_GLFONTCACHE_H__
 
+/**\file
+ * OpenGL font cache.
+ */
+ 
 #include "csextern_gl.h"
 #include "csgeom/subrec.h"
 #include "csgeom/vector2.h"
@@ -31,6 +35,12 @@ class csGLStateCache;
 
 class csGraphics2DGLCommon;
 
+/**\addtogroup plugincommon
+ * @{ */
+
+/**
+ * OpenGL font cache.
+ */
 class CS_CSPLUGINCOMMON_GL_EXPORT csGLFontCache : public csFontCache
 {
   struct GLGlyphCacheData : public csFontCache::GlyphCacheData
@@ -148,5 +158,7 @@ public:
    */
   void DumpFontCache (csRefArray<iImage>& pages);
 };
+
+/** @} */
 
 #endif // __CS_CANVAS_OPENGLCOMMON_GLFONTCACHE_H__

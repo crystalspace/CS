@@ -19,6 +19,10 @@
 #ifndef __CS_VIDPREFS_H__
 #define __CS_VIDPREFS_H__
 
+/**\file
+ * Video preferences dialog.
+ */
+
 #include "csextern.h"
 
 #include "cstypes.h"

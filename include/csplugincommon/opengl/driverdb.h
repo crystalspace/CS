@@ -20,6 +20,10 @@
 #ifndef __CS_CANVAS_OPENGLCOMMON_DRIVERDB_H__
 #define __CS_CANVAS_OPENGLCOMMON_DRIVERDB_H__
 
+/**\file
+ * OpenGL driver database.
+ */
+
 #include "csextern_gl.h"
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"
@@ -29,6 +33,11 @@ struct iConfigDocument;
 struct iDocumentNode;
 class csGraphics2DGLCommon;
 
+/**\addtogroup plugincommon
+ * @{ */
+/**
+ * OpenGL driver database
+ */
 class CS_CSPLUGINCOMMON_GL_EXPORT csGLDriverDatabase
 {
 public:
@@ -51,5 +60,7 @@ public:
     const char* phase, int configPriority);
   void Close ();
 };
+
+/** @} */
 
 #endif // __CS_CANVAS_OPENGLCOMMON_DRIVERDB_H__

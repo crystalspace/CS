@@ -20,6 +20,10 @@
 #ifndef __CS_CSANIM2D_H__
 #define __CS_CSANIM2D_H__
 
+/**\file
+ * Animated pixmap.
+ */
+
 #include "csextern.h"
 
 #include "cstool/cspixmap.h"

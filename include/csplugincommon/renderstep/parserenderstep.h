@@ -20,6 +20,10 @@
 #ifndef __CS_PARSERENDERSTEP_H__
 #define __CS_PARSERENDERSTEP_H__
 
+/**\file
+ * Base class for render step loaders.
+ */
+
 #include "csextern.h"
 #include "csutil/strhash.h"
 #include "csutil/weakref.h"
@@ -31,6 +35,11 @@
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 
+/**\addtogroup plugincommon
+ * @{ */
+/**
+ * Parser for render steps and render step lists.
+ */
 class CS_CRYSTALSPACE_EXPORT csRenderStepParser
 {
 private:
@@ -54,5 +63,6 @@ public:
   bool ParseRenderSteps (iRenderStepContainer* container, 
     iDocumentNode* node);
 };
+/** @} */
 
 #endif

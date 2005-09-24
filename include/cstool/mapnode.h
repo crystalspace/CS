@@ -20,6 +20,10 @@
 #ifndef __CS_MAPNODE_H__
 #define __CS_MAPNODE_H__
 
+/**\file
+ * Map node
+ */
+
 #include "csextern.h"
 
 #include "csgeom/vector3.h"

@@ -20,6 +20,13 @@
 #ifndef __CS_CSPLUGINCOMMON_OPENGL_GLENUM_IDENTSTRS_H__
 #define __CS_CSPLUGINCOMMON_OPENGL_GLENUM_IDENTSTRS_H__
 
+/**\file
+ * Convert OpenGL constants to strings.
+ * csOpenGLEnums is an implementation of csIdentStrings that obtains strings
+ * for OpenGL-related constants (GL_xxx) to a string.
+ * \sa csIdentStrings
+ */
+
 #include "cstool/identstrings.h"
 
 CS_IDENT_STRING_LIST(csOpenGLEnums)

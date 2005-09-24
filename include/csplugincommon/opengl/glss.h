@@ -20,11 +20,21 @@
 #ifndef __CS_CANVAS_OPENGLCOMMON_GLSS_H__
 #define __CS_CANVAS_OPENGLCOMMON_GLSS_H__
 
+/**\file
+ * OpenGL screen shot.
+ */
+
 #include "csextern_gl.h"
 #include "csplugincommon/canvas/scrshot.h"
 
 class csGraphics2DGLCommon;
 
+/**\addtogroup plugincommon
+ * @{ */
+
+/**
+ * OpenGL screen shot.
+ */
 class CS_CSPLUGINCOMMON_GL_EXPORT csGLScreenShot : public csImageBase
 {
   csGraphics2DGLCommon* G2D;
@@ -52,5 +62,7 @@ public:
   void SetData (void*);
 };
 
-#endif
+/** @} */
+
+#endif // __CS_CANVAS_OPENGLCOMMON_GLSS_H__
 

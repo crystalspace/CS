@@ -27,7 +27,7 @@ class csColor;
 struct iGraphics2D;
 struct iTextureManager;
 
-/*
+/**\file
  * Some full screen special effects.
  * Most need to be called, either during 2d drawing phase - between
  * the g2d->BeginDraw and FinishDraw calls, or they need to be called

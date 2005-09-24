@@ -20,12 +20,21 @@
 #ifndef __CS_BASESTEPTYPE_H__
 #define __CS_BASESTEPTYPE_H__
 
+/**\file
+ * Base class for render step types.
+ */
+
 #include "csextern.h"
 #include "csutil/scf.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "iengine/rendersteps/irsfact.h"
 
+/**\addtogroup plugincommon
+ * @{ */
+/**
+ * Base class for render step loaders.
+ */
 class CS_CRYSTALSPACE_EXPORT csBaseRenderStepType : public iComponent, 
 						    public iRenderStepType
 {
@@ -40,5 +49,7 @@ public:
 
   virtual bool Initialize(iObjectRegistry *object_reg);
 };  
+
+/** @} */
 
 #endif

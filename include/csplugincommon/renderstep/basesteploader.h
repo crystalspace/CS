@@ -20,6 +20,10 @@
 #ifndef __CS_BASESTEPLOADER_H__
 #define __CS_BASESTEPLOADER_H__
 
+/**\file
+ * Base class for render step loaders.
+ */
+
 #include "csextern.h"
 #include "csutil/scf.h"
 #include "iutil/comp.h"
@@ -29,6 +33,11 @@
 #include "csutil/ref.h"
 #include "csutil/leakguard.h"
 
+/**\addtogroup plugincommon
+ * @{ */
+/**
+ * Base class for render step loaders.
+ */
 class CS_CRYSTALSPACE_EXPORT csBaseRenderStepLoader : public iLoaderPlugin, 
 							 public iComponent
 {
@@ -50,6 +59,8 @@ public:
   	iStreamSource* ssource, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 };  
+
+/** @} */
 
 #endif
 

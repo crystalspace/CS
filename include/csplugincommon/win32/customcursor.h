@@ -20,10 +20,20 @@
 #ifndef __CS_CANVAS_WIN32CANVASCOMMON_CUSTOMCURSOR_H__
 #define __CS_CANVAS_WIN32CANVASCOMMON_CUSTOMCURSOR_H__
 
+/**\file
+ * Create native Win32 mouse cursors.
+ */
+
 #include "csextern_win.h"
 #include "csutil/hash.h"
 #include "csgfx/rgbpixel.h"
 
+/**\addtogroup plugincommon
+ * @{ */
+
+/**
+ * Class to create native Win32 mouse cursors from images.
+ */
 class CS_CSPLUGINCOMMON_WIN_EXPORT csWin32CustomCursors
 {
   struct CachedCursor
@@ -53,6 +63,8 @@ private:
   CachedCursor CreateCursor (iImage* image, const csRGBcolor* keycolor,
     int hotspot_x, int hotspot_y);
 };
+
+/** @} */
 
 #endif // __CS_CANVAS_WIN32CANVASCOMMON_CUSTOMCURSOR_H__
 

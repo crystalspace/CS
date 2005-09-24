@@ -21,6 +21,7 @@
 #define __CS_CSPLUGINCOMMON_PARTICLESYS_PARTGEN_H__
 
 /**\file
+ * Particle system
  */
 
 #include "csextern.h"

@@ -20,19 +20,16 @@
 #ifndef __CS_CSPIXMAP_H__
 #define __CS_CSPIXMAP_H__
 
+/**\file
+ * 2D pixmaps
+ */
+
 #include "csextern.h"
 
 #include "csutil/ref.h"
 
 struct iGraphics3D;
 struct iTextureHandle;
-
-/// alignment settings for drawing pixmaps
-#define PIXMAP_TOP      0
-#define PIXMAP_LEFT     0
-#define PIXMAP_CENTER   1
-#define PIXMAP_BOTTOM   2
-#define PIXMAP_RIGHT    2
 
 /**
  * This class is an simple set of inline routines good as an abstraction

@@ -19,6 +19,10 @@
 #ifndef __CS_MESHOBJTMPL_H__
 #define __CS_MESHOBJTMPL_H__
 
+/**\file
+ * Base implementation of iMeshObject.
+ */
+
 #include "csextern.h"
 
 #include "csgeom/box.h"

@@ -19,6 +19,10 @@
 #ifndef __CS_CSTOOL_PEN_H__
 #define __CS_CSTOOL_PEN_H__
 
+/**\file
+ * Vector shape drawing.
+ */
+
 #include "csgeom/poly3d.h"
 #include "csgeom/polyidx.h"
 #include "csgeom/vector4.h"
@@ -32,7 +36,14 @@ struct iFont;
 struct iGraphics2D;
 struct iGraphics3D;
 
-enum CS_PEN_TEXT_ALIGN { CS_PEN_TA_TOP, CS_PEN_TA_BOT, CS_PEN_TA_LEFT, CS_PEN_TA_RIGHT, CS_PEN_TA_CENTER };
+enum CS_PEN_TEXT_ALIGN 
+{ 
+  CS_PEN_TA_TOP, 
+  CS_PEN_TA_BOT, 
+  CS_PEN_TA_LEFT, 
+  CS_PEN_TA_RIGHT, 
+  CS_PEN_TA_CENTER 
+};
 
 /** The pen color is used to pass colors to the pen, around the application more easily. */
 //structcsColor4

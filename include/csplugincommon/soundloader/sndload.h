@@ -19,9 +19,15 @@
 #ifndef __CS_SNDLOAD_H__
 #define __CS_SNDLOAD_H__
 
+/**\file
+ * Helper functions for the sound loaders
+ */
+
 #include "csextern.h"
 
-// Some helper functions for the sound loaders
+/**\addtogroup plugincommon
+ * @{ */
+/// Helper functions for the sound loaders
 class CS_CRYSTALSPACE_EXPORT csSndFunc 
 {
 public:
@@ -33,5 +39,7 @@ public:
 
   static short int ulaw2linear(unsigned char ulawbyte);
 };
+
+/** @} */
 
 #endif // __CS_SNDLOAD_H__

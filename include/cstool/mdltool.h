@@ -19,6 +19,10 @@
 #ifndef __CS_MDLTOOL_H__
 #define __CS_MDLTOOL_H__
 
+/**\file
+ * Model data tools.
+ */
+
 #include "csextern.h"
 
 #include "csutil/dirtyaccessarray.h"

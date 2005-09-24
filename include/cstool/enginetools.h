@@ -18,6 +18,10 @@
 #ifndef __CS_ENGINETOOLS_H__
 #define __CS_ENGINETOOLS_H__
 
+/**\file
+ * Helper functions for working on engine data.
+ */
+
 #include "csextern.h"
 
 #include "csutil/array.h"

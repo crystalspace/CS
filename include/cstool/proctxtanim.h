@@ -20,13 +20,17 @@
 #ifndef __CS_PROCTXTANIM_H__
 #define __CS_PROCTXTANIM_H__
 
+/**\file
+ * Procedural texture for animated images.
+ */
+
 #include "cstool/proctex.h"
 #include "csutil/scf.h"
 
 #include "igraphic/animimg.h"
 
 /**
- * A procedural texture for animated images.
+ * Procedural texture for animated images.
  */
 class CS_CRYSTALSPACE_EXPORT csProcAnimated : public csProcTexture
 {
