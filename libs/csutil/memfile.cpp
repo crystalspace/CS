@@ -18,8 +18,9 @@
 
 #include "cssysdef.h"
 #include <stdlib.h>
-#include "csutil/memfile.h"
 #include "csutil/databuf.h"
+#include "csutil/memfile.h"
+#include "csutil/parasiticdatabuffer.h"
 #include "csgeom/math.h"
 
 class csFreeDataBuffer : public csDataBuffer
@@ -145,8 +146,18 @@ csPtr<iDataBuffer> csMemFile::GetAllData (bool nullterm)
   }
   else
   {
+    if (!buffer) return 0;
     copyOnWrite = true;
-    return csPtr<iDataBuffer> (buffer);
+    if (buffer->GetSize() == size)
+    {
+      return csPtr<iDataBuffer> (buffer);
+    }
+    else
+    {
+      iDataBuffer *db = new csParasiticDataBuffer (buffer,
+	0, size);
+      return csPtr<iDataBuffer> (db);
+    }
   }
 }
 
