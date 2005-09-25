@@ -20,6 +20,7 @@
 #define __SIMPVS_H__
 
 #include <crystalspace.h>
+#include "vidprefs.h"
 
 class Simple : public csApplicationFramework, public csBaseEventHandler
 {

@@ -35,6 +35,7 @@ chronological order.
 	  to make things work again until Marten can take a look.
 	- res removed csDataStream since it overlapped with csMemFile; the
 	  conveniance functions have been moved to csFileReadHelper.
+	- res moved csVideoPreferences into the simpvs app.
 24-Sep-2005
 	- Jorrit fixed dependencies in the loader. It now also depends on
 	  new sound loader and renderer.

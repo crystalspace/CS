@@ -17,14 +17,12 @@
 */
 
 #include "cssysdef.h"
-#include "cstool/vidprefs.h"
 #include "cstool/initapp.h"
 #include "csutil/objreg.h"
 #include "csutil/csevent.h"
 #include "csutil/event.h"
 
 #include "iaws/aws.h"
-//#include "iaws/awscnvs.h"
 #include "iutil/plugin.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -37,6 +35,8 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/txtmgr.h"
+
+#include "vidprefs.h"
 
 csVideoPreferences::csVideoPreferences ()
 {

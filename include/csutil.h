@@ -56,7 +56,6 @@
 #include "csutil/csuctransform.h"
 #include "csutil/csunicode.h"
 #include "csutil/databuf.h"
-#include "csutil/datastrm.h"
 #include "csutil/debug.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/documentcommon.h"

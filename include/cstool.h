@@ -53,6 +53,5 @@
 #include "cstool/sprbuild.h"
 #include "cstool/userrndbuf.h"
 #include "cstool/vfsdirchange.h"
-#include "cstool/vidprefs.h"
 #endif /* __CSTOOL_H__ */
 
