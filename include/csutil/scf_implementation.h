@@ -218,7 +218,7 @@ protected:
  * to another. USE WITH CARE!
  */
 template<class If>
-class scfFakeInterface
+class scfFakeInterface : public If
 {
 public:
   struct InterfaceTraits 

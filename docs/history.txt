@@ -30,6 +30,9 @@ chronological order.
 	  second" was reported.
 	- res removed iImageVector and csImageVector.
 	- res merged csVertexListWalker<> into csRenderBufferLock<>.
+	- res worked around breakage due bogus pointers when casting to
+	  scfFakeInterface<If> by having scfFakeInterface<> inherit from If, 
+	  to make things work again until Marten can take a look.
 24-Sep-2005
 	- Jorrit fixed dependencies in the loader. It now also depends on
 	  new sound loader and renderer.

@@ -72,7 +72,7 @@ bool csRenderLoopLoader::ParseRenderSteps (iRenderLoop* loop,
 					   iDocumentNode* node)
 {
   csRef<iRenderStepContainer> cont =
-    SCF_QUERY_INTERFACE (loop, iRenderStepContainer);
+    scfQueryInterface<iRenderStepContainer> (loop);
   if (!cont)
   {
     if (synldr)
