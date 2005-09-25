@@ -349,7 +349,7 @@ private:
   void FireRemoveMesh (iMeshWrapper* mesh);
 
 private:
-  // PRIVATE MEMEBERS
+  // PRIVATE MEMBERS
 
   /**
    * List of meshes in this sector. Note that meshes also

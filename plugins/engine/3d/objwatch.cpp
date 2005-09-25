@@ -20,6 +20,7 @@
 #include "csutil/scf_implementation.h"
 #include "iengine/light.h"
 #include "iengine/movable.h"
+#include "iengine/sector.h"
 #include "plugins/engine/3d/objwatch.h"
 
 //---------------------------------------------------------------------------
@@ -40,12 +41,12 @@ public:
 
   virtual void MovableChanged (iMovable* movable)
   {
-    watcher->ReportOperation (CS_WATCH_MOVABLE_CHANGED, movable, 0);
+    watcher->ReportOperation (CS_WATCH_MOVABLE_CHANGED, movable);
   }
 
   virtual void MovableDestroyed (iMovable* movable)
   {
-    watcher->ReportOperation (CS_WATCH_MOVABLE_DESTROY, movable, 0);
+    watcher->ReportOperation (CS_WATCH_MOVABLE_DESTROY, movable);
     watcher->RemoveMovable (movable);
   }
 };
@@ -67,33 +68,58 @@ public:
 
   virtual void OnColorChange (iLight* light, const csColor& newcolor)
   {
-    watcher->ReportOperation (CS_WATCH_LIGHT_COLOR, 0, light);
+    watcher->ReportOperation (CS_WATCH_LIGHT_COLOR, light);
   }
 
   virtual void OnPositionChange (iLight* light, const csVector3& newpos)
   {
-    watcher->ReportOperation (CS_WATCH_LIGHT_MOVE, 0, light);
+    watcher->ReportOperation (CS_WATCH_LIGHT_MOVE, light);
   }
 
   virtual void OnSectorChange (iLight* light, iSector* newsector)
   {
-    watcher->ReportOperation (CS_WATCH_LIGHT_SECTOR, 0, light);
+    watcher->ReportOperation (CS_WATCH_LIGHT_SECTOR, light);
   }
 
   virtual void OnRadiusChange (iLight* light, float newradius)
   {
-    watcher->ReportOperation (CS_WATCH_LIGHT_RADIUS, 0, light);
+    watcher->ReportOperation (CS_WATCH_LIGHT_RADIUS, light);
   }
 
   virtual void OnDestroy (iLight* light)
   {
-    watcher->ReportOperation (CS_WATCH_LIGHT_DESTROY, 0, light);
+    watcher->ReportOperation (CS_WATCH_LIGHT_DESTROY, light);
     watcher->RemoveLight (light);
   }
 
   virtual void OnAttenuationChange (iLight* light, int newatt)
   {
-    watcher->ReportOperation (CS_WATCH_LIGHT_ATTENUATION, 0, light);
+    watcher->ReportOperation (CS_WATCH_LIGHT_ATTENUATION, light);
+  }
+};
+
+class csSectorListener : public scfImplementation1<csSectorListener,
+                                                  iSectorMeshCallback>
+{
+public:
+  csObjectWatcher* watcher;
+
+  csSectorListener (csObjectWatcher* watcher)
+    : scfImplementationType (this), watcher (watcher)
+  {
+  }
+  virtual ~csSectorListener ()
+  {
+  }
+
+  virtual void NewMesh (iSector* sector, iMeshWrapper* mesh)
+  {
+    watcher->ReportOperation (CS_WATCH_SECTOR_NEWMESH, sector, mesh);
+  }
+
+  virtual void RemoveMesh (iSector* sector, iMeshWrapper* mesh)
+  {
+    watcher->ReportOperation (CS_WATCH_SECTOR_REMOVEMESH, sector, mesh);
   }
 };
 
@@ -103,10 +129,11 @@ public:
 
 csObjectWatcher::csObjectWatcher ()
   : scfImplementationType (this), updatenr (0), last_op (CS_WATCH_NONE), 
-  last_light (0), last_movable (0)
+  last_light (0), last_movable (0), last_sector (0), last_mesh (0)
 {
   light_callback = new csLightCallback (this);
   movable_listener = new csMovableListener (this);
+  sector_listener = new csSectorListener (this);
 }
 
 csObjectWatcher::~csObjectWatcher ()
@@ -114,6 +141,7 @@ csObjectWatcher::~csObjectWatcher ()
   Reset ();
   light_callback->DecRef ();
   movable_listener->DecRef ();
+  sector_listener->DecRef ();
 }
 
 void csObjectWatcher::Reset ()
@@ -127,22 +155,62 @@ void csObjectWatcher::Reset ()
   {
     lights[i]->RemoveLightCallback (light_callback);
   }
+  for (i = 0 ; i < sectors.Length () ; i++)
+  {
+    if (sectors[i])
+      sectors[i]->RemoveSectorMeshCallback (sector_listener);
+  }
 
   movables.DeleteAll ();
   lights.DeleteAll ();
+  sectors.DeleteAll ();
 }
 
-void csObjectWatcher::ReportOperation (int op, iMovable* movable, iLight* light)
+void csObjectWatcher::ReportOperation (int op, iMovable* movable)
 {
   last_op = op;
   last_movable = movable;
-  last_light = light;
+  last_light = 0;
+  last_sector = 0;
+  last_mesh = 0;
   updatenr++;
   size_t i = listeners.Length ();
   while (i-- > 0)
   {
     iObjectWatcherListener* l = listeners[i];
-    l->ObjectChanged (op, movable, light);
+    l->ObjectChanged (op, movable);
+  }
+}
+
+void csObjectWatcher::ReportOperation (int op, iLight* light)
+{
+  last_op = op;
+  last_movable = 0;
+  last_light = light;
+  last_sector = 0;
+  last_mesh = 0;
+  updatenr++;
+  size_t i = listeners.Length ();
+  while (i-- > 0)
+  {
+    iObjectWatcherListener* l = listeners[i];
+    l->ObjectChanged (op, light);
+  }
+}
+
+void csObjectWatcher::ReportOperation (int op, iSector* sector, iMeshWrapper* mesh)
+{
+  last_op = op;
+  last_movable = 0;
+  last_light = 0;
+  last_sector = sector;
+  last_mesh = mesh;
+  updatenr++;
+  size_t i = listeners.Length ();
+  while (i-- > 0)
+  {
+    iObjectWatcherListener* l = listeners[i];
+    l->ObjectChanged (op, sector, mesh);
   }
 }
 
@@ -196,5 +264,35 @@ iMovable* csObjectWatcher::GetMovable (int idx)
 {
   CS_ASSERT (idx >= 0 && (size_t)idx < movables.Length ());
   return movables[idx];
+}
+
+void csObjectWatcher::WatchSector (iSector* sector)
+{
+  sector->AddSectorMeshCallback (sector_listener);
+  sectors.Push (sector);
+}
+
+void csObjectWatcher::RemoveSector (iSector* sector)
+{
+  size_t i = sectors.Length ();
+  while (i > 0)
+  {
+    i--;
+    if (sectors[i] == sector)
+    {
+      sector->RemoveSectorMeshCallback (sector_listener);
+      sectors.DeleteIndex (i);
+    }
+    else if (sectors[i] == 0)
+    {
+      sectors.DeleteIndex (i);
+    }
+  }
+}
+
+iSector* csObjectWatcher::GetSector (int idx)
+{
+  CS_ASSERT (idx >= 0 && (size_t)idx < sectors.Length ());
+  return sectors[idx];
 }
 

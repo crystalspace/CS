@@ -30,6 +30,8 @@
 
 struct iMovable;
 struct iLight;
+struct iSector;
+struct iMeshWrapper;
 
 /** \name Operations
  * Operations indicate what has changed in one of the objects that
@@ -53,22 +55,38 @@ struct iLight;
 #define CS_WATCH_MOVABLE_CHANGED 7
 /// Light has changed attenuation.
 #define CS_WATCH_LIGHT_ATTENUATION 8
+/// Sector has a new mesh.
+#define CS_WATCH_SECTOR_NEWMESH 9
+/// Sector has a removed mesh.
+#define CS_WATCH_SECTOR_REMOVEMESH 10
 /** @} */
 
-
-SCF_VERSION (iObjectWatcherListener, 0, 0, 1);
 
 /**
  * Implement this class if you're interested in hearing about
  * object watcher events.
  */
-struct iObjectWatcherListener : public iBase
+struct iObjectWatcherListener : public virtual iBase
 {
+  SCF_INTERFACE (iObjectWatcherListener, 0, 0, 1);
+
   /**
    * A change has occured. You can use the operation to examine what
    * kind of change it is.
    */
-  virtual void ObjectChanged (int op, iMovable* movable, iLight* light) = 0;
+  virtual void ObjectChanged (int op, iMovable* movable) = 0;
+
+  /**
+   * A change has occured. You can use the operation to examine what
+   * kind of change it is.
+   */
+  virtual void ObjectChanged (int op, iLight* light) = 0;
+
+  /**
+   * A change has occured. You can use the operation to examine what
+   * kind of change it is.
+   */
+  virtual void ObjectChanged (int op, iSector* sector, iMeshWrapper* mesh) = 0;
 };
 
 
@@ -101,6 +119,15 @@ struct iObjectWatcher : public virtual iBase
   /// Get the specified watched movable.
   virtual iMovable* GetMovable (int idx) = 0;
 
+  /// Add a sector to watch for meshes.
+  virtual void WatchSector (iSector* sector) = 0;
+  /// Remove a sector to watch.
+  virtual void RemoveSector (iSector* sector) = 0;
+  /// Get the number of watched sectors.
+  virtual int GetWatchedSectorCount () const = 0;
+  /// Get the specified watched sector.
+  virtual iSector* GetSector (int idx) = 0;
+
   /// Reset. Remove all watched objects from this watcher.
   virtual void Reset () = 0;
 
@@ -126,8 +153,11 @@ struct iObjectWatcher : public virtual iBase
    * <li>#CS_WATCH_LIGHT_COLOR: light has changed color.
    * <li>#CS_WATCH_LIGHT_SECTOR: light has changed sector.
    * <li>#CS_WATCH_LIGHT_RADIUS: light has changed radius.
+   * <li>#CS_WATCH_LIGHT_ATTENUATION: light has changed radius.
    * <li>#CS_WATCH_MOVABLE_DESTROY: movable is destroyed.
    * <li>#CS_WATCH_MOVABLE_CHANGED: movable is changed.
+   * <li>#CS_WATCH_SECTOR_NEWMESH: sector has a new mesh.
+   * <li>#CS_WATCH_SECTOR_REMOVEMESH: a mesh got removed from the sector.
    * </ul>
    */
   virtual int GetLastOperation () const = 0;
@@ -143,6 +173,18 @@ struct iObjectWatcher : public virtual iBase
    * is one of CS_WATCH_MOVABLE_....
    */
   virtual iMovable* GetLastMovable () const = 0;
+
+  /**
+   * Get the last sector. Only valid if the last operation (GetLastOperation())
+   * is one of CS_WATCH_SECTOR_....
+   */
+  virtual iSector* GetLastSector () const = 0;
+
+  /**
+   * Get the last mesh. Only valid if the last operation (GetLastOperation())
+   * is one of CS_WATCH_SECTOR_....
+   */
+  virtual iMeshWrapper* GetLastMeshWrapper () const = 0;
 
   /**
    * Add a listener to this object watcher. This will call IncRef() on

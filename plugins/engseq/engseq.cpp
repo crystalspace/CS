@@ -24,6 +24,7 @@
 #include "csgeom/sphere.h"
 #include "csgeom/math3d.h"
 #include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/cscolor.h"
 #include "csutil/randomgen.h"
 #include "csutil/weakref.h"
@@ -1414,7 +1415,8 @@ void csSequenceWrapper::OverrideTimings (OpStandard *afterop, int ticks)
 /**
  * Callback that will activate trigger when sector is visible.
  */
-class csTriggerSectorCallback : public iSectorCallback
+class csTriggerSectorCallback : public scfImplementation1<
+	csTriggerSectorCallback, iSectorCallback>
 {
 private:
   csSequenceTrigger* trigger;
@@ -1426,14 +1428,10 @@ private:
   uint32 framenr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csTriggerSectorCallback (csSequenceTrigger* trigger,
-	bool insideonly, const csBox3* box, const csSphere* sphere)
+	bool insideonly, const csBox3* box, const csSphere* sphere) :
+    scfImplementationType (this), trigger (trigger), insideonly (insideonly)
   {
-    SCF_CONSTRUCT_IBASE (0);
-    csTriggerSectorCallback::trigger = trigger;
-    csTriggerSectorCallback::insideonly = insideonly;
     if (box)
     {
       do_box = true;
@@ -1456,7 +1454,6 @@ public:
   }
   virtual ~csTriggerSectorCallback ()
   {
-    SCF_DESTRUCT_IBASE();
   }
 
   virtual void Traverse (iSector* /*sector*/, iBase* context)
@@ -1494,10 +1491,6 @@ public:
     }
   }
 };
-
-SCF_IMPLEMENT_IBASE (csTriggerSectorCallback)
-  SCF_IMPLEMENTS_INTERFACE (iSectorCallback)
-SCF_IMPLEMENT_IBASE_END
 
 //---------------------------------------------------------------------------
 

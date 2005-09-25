@@ -21,6 +21,7 @@
 
 #include "csutil/array.h"
 #include "csutil/refarr.h"
+#include "csutil/weakrefarr.h"
 #include "csutil/scf_implementation.h"
 #include "iengine/objwatch.h"
 
@@ -28,6 +29,7 @@ struct iLight;
 struct iMovable;
 class csLightCallback;
 class csMovableListener;
+class csSectorListener;
 
 /**
  * This class implements iObjectWatcher and is capable of keeping
@@ -41,10 +43,14 @@ private:
   csArray<iLight*> lights;
   // Movables we are watching.
   csArray<iMovable*> movables;
+  // Sectors we are watching.
+  csWeakRefArray<iSector> sectors;
   // Our light listener.
   csLightCallback* light_callback;
   // Our movable listener.
   csMovableListener* movable_listener;
+  // Our sector listener.
+  csSectorListener* sector_listener;
   // Listeners that are listening to this object watcher.
   csRefArray<iObjectWatcherListener> listeners;
 
@@ -57,6 +63,10 @@ private:
   iLight* last_light;
   // Last movable (or 0 if last operation has nothing to do with movables).
   iMovable* last_movable;
+  // Last sector (or 0 if last operation has nothing to do with sectors).
+  iSector* last_sector;
+  // Last mesh (or 0 if last operation has nothing to do with meshes).
+  iMeshWrapper* last_mesh;
 
 public:
   /**
@@ -67,7 +77,9 @@ public:
   /// Destructor.
   virtual ~csObjectWatcher ();
 
-  void ReportOperation (int op, iMovable* movable, iLight* light);
+  void ReportOperation (int op, iMovable* movable);
+  void ReportOperation (int op, iLight* light);
+  void ReportOperation (int op, iSector* sector, iMeshWrapper* mesh);
 
   virtual void WatchLight (iLight* light);
   virtual void RemoveLight (iLight* light);
@@ -79,12 +91,19 @@ public:
   virtual int GetWatchedMovableCount () const { return (int)movables.Length (); }
   virtual iMovable* GetMovable (int idx);
 
+  virtual void WatchSector (iSector* sector);
+  virtual void RemoveSector (iSector* sector);
+  virtual int GetWatchedSectorCount () const { return (int)sectors.Length (); }
+  virtual iSector* GetSector (int idx);
+
   virtual void Reset ();
 
   virtual uint32 GetWatchNumber () const { return updatenr; }
   virtual int GetLastOperation () const { return last_op; }
   virtual iLight* GetLastLight () const { return last_light; }
   virtual iMovable* GetLastMovable () const { return last_movable; }
+  virtual iSector* GetLastSector () const { return last_sector; }
+  virtual iMeshWrapper* GetLastMeshWrapper () const { return last_mesh; }
 
   virtual void AddListener (iObjectWatcherListener* cb)
   {

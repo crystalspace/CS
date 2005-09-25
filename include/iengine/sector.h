@@ -52,15 +52,15 @@ class csRenderMeshList;
 class csReversibleTransform;
 class csVector3;
 
-SCF_VERSION (iSectorCallback, 0, 0, 1);
-
 /**
  * Set a callback which is called when this sector is traversed.
  * The given context will be either an instance of iRenderView, iFrustumView,
  * or else 0.
  */
-struct iSectorCallback : public iBase
+struct iSectorCallback : public virtual iBase
 {
+  SCF_INTERFACE (iSectorCallback, 0, 0, 1);
+
   /**
    * Sector will be traversed. It is safe to delete this callback
    * in this function.
@@ -68,14 +68,14 @@ struct iSectorCallback : public iBase
   virtual void Traverse (iSector* sector, iBase* context) = 0;
 };
 
-SCF_VERSION (iSectorMeshCallback, 0, 0, 1);
-
 /**
  * Set a callback which is called when a mesh is added or removed
  * from this sector.
  */
-struct iSectorMeshCallback : public iBase
+struct iSectorMeshCallback : public virtual iBase
 {
+  SCF_INTERFACE (iSectorMeshCallback, 0, 0, 1);
+
   /**
    * New mesh. Note that this is also called if the mesh is added as child
    * of another mesh that is in the sector.

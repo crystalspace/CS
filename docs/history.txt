@@ -12,6 +12,10 @@ chronological order.
 	- res merged ivideo/polyrender.h into Thing.
 	- iceeey removed the width and height parameters from
 	  iCEGUI::Initialize() as doxygen complains and they are not needed.
+	- Jorrit extended the iObjectWatcher with the possibility to watch
+	  arrival/removal of new meshes in sectors in addition to light
+	  and movable changes in general.
+	- Jorrit changed a few more engine interfaces to new SCF.
 24-Sep-2005
 	- Jorrit fixed dependencies in the loader. It now also depends on
 	  new sound loader and renderer.
