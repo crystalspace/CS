@@ -20,6 +20,7 @@
 #define __CS_IUTIL_CMDLINE_H__
 
 /**\file
+ * Command line parsing utility
  */
 /**\addtogroup util
  * @{ */
@@ -30,16 +31,13 @@ SCF_VERSION (iCommandLineParser, 0, 0, 3);
 
 /**
  * A utility class that makes it easier to parse the command line.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>csInitializer::CreateEnvironment()
- *   <li>csInitializer::CreateCommandLineParser()
- *   </ul>
+ * - csInitializer::CreateEnvironment()
+ * - csInitializer::CreateCommandLineParser()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - csQueryRegistry()
  */
 struct iCommandLineParser : public iBase
 {

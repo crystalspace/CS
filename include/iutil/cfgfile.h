@@ -20,6 +20,7 @@
 #define __CS_IUTIL_CFGFILE_H__
 
 /**\file
+ * Configuration file interface.
  */
 /**\addtogroup util
  * @{ */

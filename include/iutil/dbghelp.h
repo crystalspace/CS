@@ -20,6 +20,7 @@
 #define __CS_IUTIL_DBGHELP_H__
 
 /**\file
+ * Debugging helper interface
  */
 /**\addtogroup util
  * @{ */

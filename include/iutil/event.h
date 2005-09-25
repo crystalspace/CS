@@ -75,7 +75,7 @@ SCF_VERSION (iEvent, 0, 2, 0);
  * Keyboard events are emitted when the user does something with the keyboard -
  * presses down a key ("key down" events), holds it down (more "key down" 
  * events in a specific interval - "auto-repeat") and releases it ("key up").
- * <p>
+ *
  * Every keyboard event has a bunch of data associated with it. First, there
  * is a code to identify the key: the 'raw' code. It uniquely identifies the 
  * key, and every key has a distinct code, independent from any pressed 
@@ -87,15 +87,13 @@ SCF_VERSION (iEvent, 0, 2, 0);
  * result in either CSKEY_PGUP or '9', depending on the NumLock state.
  * So, the same key can result in different 'cooked' codes, and the same 
  * 'cooked' code can be caused by different keys.
- * <p>
+ *
  * Other data contained in a keyboard event is:
- * <ul>
- * <li>Whether it is a key up or down event</li>
- * <li>Whether it is an autorepeat of an earlier keypress</li>
- * <li>Modifiers at the time of the keypress</li>
- * <li>When it is a character, whether it is a normal or dead character</li>
- * </ul>
- * <p>
+ * - Whether it is a key up or down event</li>
+ * - Whether it is an autorepeat of an earlier keypress</li>
+ * - Modifiers at the time of the keypress</li>
+ * - When it is a character, whether it is a normal or dead character</li>
+ * 
  * Keyboard event data is stored as properties of iEvent, accessible thorugh
  * iEvent->Find() and iEvent->Add().
  * <table>
@@ -111,10 +109,10 @@ SCF_VERSION (iEvent, 0, 2, 0);
  * <tr><td>keyCharType</td><td>csKeyCharType (stored as uint8)</td>
  *  <td>Character type</td></tr>
  * </table>
- * <p>
+ *
  * A way to retrieve an keyboard event's data without requiring a plethora
  * of iEvent->Find() invocations provides the csKeyEventHelper class.
- * <p>
+ *
  * Also see iKeyComposer for informations about composing accented etc.
  * characters from dead and normal keys.
  */

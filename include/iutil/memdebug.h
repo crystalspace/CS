@@ -21,6 +21,10 @@
 
 #include "csutil/scf.h"
 
+/**\file
+ * Memory tracker interface
+ */
+
 SCF_VERSION (iMemoryTracker, 0, 0, 1);
 
 /**

@@ -20,6 +20,7 @@
 #define __CS_IOBJECT_OBJECT_H__
 
 /**\file
+ * Generic object interface
  */
 /**\addtogroup util
  * @{ */
@@ -75,21 +76,18 @@ struct iObjectNameChangeListener : public virtual iBase
 
 /**
  * This interface is an SCF interface for encapsulating csObject.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Many objects implement this (especially objects in the
- *       3D engine like meshes, lights, sectors, materials, ...)
- *   </ul>
+ * - Many objects implement this (especially objects in the
+ *   3D engine like meshes, lights, sectors, materials, ...)
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>Many objects have a QueryObject() method that you can use.
- *   <li>SCF_QUERY_INTERFACE() on the object.
- *   <li>iObject::GetObjectParent()
- *   <li>iObject::GetChild()
- *   <li>iObjectIterator::Next()
- *   <li>iObjectIterator::GetParentObj()
- *   </ul>
+ * - Many objects have a QueryObject() method that you can use.
+ * - scfQueryInterface() on the object.
+ * - iObject::GetObjectParent()
+ * - iObject::GetChild()
+ * - iObjectIterator::Next()
+ * - iObjectIterator::GetParentObj()
  */
 struct iObject : public virtual iBase
 {
@@ -169,11 +167,9 @@ struct iObject : public virtual iBase
  * a bit complicated to use (i.e. you'll have to do a lot of
  * SCF_QUERY_INTERFACE_CALLS if you use it directly). Check out typed object
  * iterators instead.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iObject::GetIterator()
- *   </ul>
+ * - iObject::GetIterator()
  */
 struct iObjectIterator : public virtual iBase
 {

@@ -19,6 +19,10 @@
 #ifndef __CS_IUTIL_TIMER_H__
 #define __CS_IUTIL_TIMER_H__
 
+/**\file
+ * Timer event interfaces
+ */
+
 #include "csutil/scf.h"
 
 

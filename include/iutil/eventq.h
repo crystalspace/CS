@@ -21,6 +21,7 @@
 #define __CS_IUTIL_EVENTQ_H__
 
 /**\file
+ * General event queue
  */
 /**
  * \addtogroup event_handling
@@ -37,21 +38,18 @@ SCF_VERSION(iEventQueue, 0, 0, 1);
 
 /**
  * This interface represents a general event queue.
- * <p>
+ *
  * Events may be posted to the queue by various sources.  Listeners
  * (implementing iEventHandler) can register to receive notification when
  * various events are processed.  Typically, one instance of this object is
  * available from the shared-object registry (iObjectRegistry).
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>csInitializer::CreateEnvironment()
- *   <li>csInitializer::CreateEventQueue()
- *   </ul>
+ * - csInitializer::CreateEnvironment()
+ * - csInitializer::CreateEventQueue()
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - csQueryRegistry()
  */
 struct iEventQueue : public iBase
 {

@@ -19,6 +19,10 @@
 #ifndef __CS_IUTIL_BINDER_H__
 #define __CS_IUTIL_BINDER_H__
 
+/**\file
+ * Input binder interface
+ */
+
 #include <csutil/scf.h>
 
 struct iEvent;

@@ -20,6 +20,7 @@
 #define __CS_IUTIL_CFGMGR_H__
 
 /**\file
+ * Configuration manager interface,
  */
 /**\addtogroup util
  * @{ */
@@ -40,44 +41,39 @@ SCF_VERSION(iConfigManager, 0, 0, 3);
  * you access the lower priority iConfigFile directly you will still find their
  * real values. If two iConfigFile objects use the same priority value, then
  * one will shadow the other (but it is not possible to predict which will be
- * the victor).<p>
+ * the victor).
  *
  * One iConfigFile object is the so-called 'dynamic' domain.  When you alter a
  * setting in the configuration manager, the change is applied to the dynamic
  * iConfigFile object.  As a side-effect, the changed key is also removed from
  * all objects with higher priority.  The dynamic domain has always priority 0
- * (medium).<p>
+ * (medium).
  *
  * Differences in behaviour compared to a normal configuration object are:
- * <ul>
- * <li> Deleting a key will not always remove the key from the configuration
- *      completely. It will only remove the key from the dyamic iConfigFile
- *      object and all higher-priority objects; and will thus reveal a value in
- *      a lower priority domain, if present.  This also applies to the Clear()
- *      method.
- * <li> The Load() and Save() methods will load or save the configuration of
- *      the dynamic domain. The other domains are not affected by Load(); and
- *      Save() will not write any keys from other domains.  (In the unlikely
- *      event that you need to load or save one of the other domains, simply
- *      access the iConfigFile object for that domain directly and invoke its
- *      Load() and Save() methods rather than the methods of iConfigManager.)
- * <li> Iterators: If you change an option after an iterator has passed the
- *      option, it may appear again, this time with the new value. If you
- *      change the option while the iterator looks at it, you may even read
- *      it twice after this change, once with the old and once with the new
- *      value. In general it is a bad idea to change something while an
- *      iterator exists.
- * </ul>
- * <p>
+ * - Deleting a key will not always remove the key from the configuration
+ *   completely. It will only remove the key from the dyamic iConfigFile
+ *   object and all higher-priority objects; and will thus reveal a value in
+ *   a lower priority domain, if present.  This also applies to the Clear()
+ *   method.
+ * - The Load() and Save() methods will load or save the configuration of
+ *   the dynamic domain. The other domains are not affected by Load(); and
+ *   Save() will not write any keys from other domains.  (In the unlikely
+ *   event that you need to load or save one of the other domains, simply
+ *   access the iConfigFile object for that domain directly and invoke its
+ *   Load() and Save() methods rather than the methods of iConfigManager.)
+ * - Iterators: If you change an option after an iterator has passed the
+ *   option, it may appear again, this time with the new value. If you
+ *   change the option while the iterator looks at it, you may even read
+ *   it twice after this change, once with the old and once with the new
+ *   value. In general it is a bad idea to change something while an
+ *   iterator exists.
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>csInitializer::CreateEnvironment()
- *   <li>csInitializer::CreateConfigManager()
- *   </ul>
+ * - csInitializer::CreateEnvironment()
+ * - csInitializer::CreateConfigManager()
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - csQueryRegistry()
  */
 struct iConfigManager : public iConfigFile
 {

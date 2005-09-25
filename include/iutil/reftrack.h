@@ -20,6 +20,10 @@
 #ifndef __CS_IUTIL_REFTRACK_H__
 #define __CS_IUTIL_REFTRACK_H__
 
+/**\file
+ * Reference tracker interface
+ */
+
 SCF_VERSION (iRefTracker, 0, 3, 0); 
 
 /**

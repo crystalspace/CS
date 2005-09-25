@@ -20,6 +20,7 @@
 #define __CS_IUTIL_PLUGINCONFIG_H__
 
 /**\file
+ * Configurator interface
  */
 /**\addtogroup util
  * @{ */
@@ -138,25 +139,20 @@ struct csOptionDescription
   csVariantType type;	
 };
 
-//SCF_VERSION (iPluginConfig, 1, 0, 0);
 /**
  * Interface to a configurator object. If a SCF module
  * has an object implementing this interface then this can
  * be used to query/set configuration options.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Some plugins implement this.
- *   </ul>
+ * - Some plugins implement this.
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() from a plugin instance.
- *   </ul>
+ * - scgQueryInterface() from a plugin instance.
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>csCommandLineHelper
- *   <li>csPluginManager
- *   </ul>
+ * - csCommandLineHelper
+ * - csPluginManager
  */
 struct iPluginConfig : public virtual iBase
 {
