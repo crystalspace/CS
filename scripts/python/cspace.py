@@ -12645,11 +12645,6 @@ csfxWhiteOut = _cspace.csfxWhiteOut
 csfxScreenDPFX = _cspace.csfxScreenDPFX
 
 csfxScreenDPFXPartial = _cspace.csfxScreenDPFXPartial
-PIXMAP_TOP = _cspace.PIXMAP_TOP
-PIXMAP_LEFT = _cspace.PIXMAP_LEFT
-PIXMAP_CENTER = _cspace.PIXMAP_CENTER
-PIXMAP_BOTTOM = _cspace.PIXMAP_BOTTOM
-PIXMAP_RIGHT = _cspace.PIXMAP_RIGHT
 class csPixmap(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPixmap, name, value)
