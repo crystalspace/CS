@@ -27,7 +27,7 @@
 #include <ApplicationServices/ApplicationServices.h>
 
 
-// Table for storing gamma values
+/// Table for storing gamma values
 struct GammaTable
 {
   float r[256];
@@ -40,38 +40,38 @@ CS_CSPLUGINCOMMON_OSX_EXPORT
 class OSXDriver2D
 {
 public:
-  // Constructor
+  /// Constructor
   OSXDriver2D(csGraphics2D *inCanvas);
 
-  // Destructor
+  /// Destructor
   virtual ~OSXDriver2D();
 
-  // Initialize 2D plugin
+  /// Initialize 2D plugin
   virtual bool Initialize(iObjectRegistry *reg);
 
-  // Open graphics system (set mode, open window, etc)
+  /// Open graphics system (set mode, open window, etc)
   virtual bool Open();
 
-  // Close graphics system
+  /// Close graphics system
   virtual void Close();
 
-  // Flip video page (or dump to framebuffer) - pure virtual
+  /// Flip video page (or dump to framebuffer) - pure virtual
   virtual void Print(csRect const* area = 0) = 0;
 
-  // Pure virtual function - the driver must invlude code to handle resizing
+  /// Pure virtual function - the driver must invlude code to handle resizing
   virtual bool Resize(int w, int h) = 0;
 
-  // Handle an event
+  /// Handle an event
   virtual bool HandleEvent(iEvent &ev);
 
-  // Dispatch an event to the assistant
+  /// Dispatch an event to the assistant
   void DispatchEvent(OSXEvent ev, OSXView view);
 
-  // Show/Hide the mouse
+  /// Show/Hide the mouse
   virtual void HideMouse();
   virtual void ShowMouse();
 
-  // Event handler
+  /// Event handler
   struct EventHandler : public iEventHandler
   {
   private:
@@ -91,47 +91,56 @@ public:
   } *scfiEventHandler;
 
 protected:
-  // Initialize pixel format for 16 bit depth
+  /// Initialize pixel format for 16 bit depth
   void Initialize16();
 
-  // Initialize pixel format for 32 bit depth
+  /// Initialize pixel format for 32 bit depth
   void Initialize32();
 
-  // Switch to fullscreen mode
+  /// Switch to fullscreen mode
   bool EnterFullscreenMode();
 
-  // Switch out of fullscreen mode, to mode stored in originalMode
+  /// Switch out of fullscreen mode, to mode stored in originalMode
   void ExitFullscreenMode();
 
-  // Toggle current state of fullscreen
+  /// Toggle current state of fullscreen
   virtual bool ToggleFullscreen();
 
-  // Uses CoreGraphics to fade to a given color 
+  /// Uses CoreGraphics to fade to a given color 
   void FadeToRGB(CGDirectDisplayID disp, float r, float g, float b);
   
-  // Fade to a given gamma table
+  /// Fade to a given gamma table
   void FadeToGammaTable(CGDirectDisplayID disp, GammaTable table);
   
-  // Save the current gamma values to the given table
+  /// Save the current gamma values to the given table
   void SaveGamma(CGDirectDisplayID disp, GammaTable &table);
 
-  // Choose which display to use
+  /// Choose which display to use
   void ChooseDisplay();
 
-  CFDictionaryRef originalMode;		// Original display mode
-  GammaTable originalGamma;		// Original gamma values
-  bool inFullscreenMode;		// In full-screen mode
-  CGDirectDisplayID display;		// Screen to display on
-  unsigned int screen;			// Screen number to display on
+  /// Original display mode
+  CFDictionaryRef originalMode;	
+  /// Original gamma values
+  GammaTable originalGamma;
+  /// In full-screen mode
+  bool inFullscreenMode;
+  /// Screen to display on
+  CGDirectDisplayID display;
+  /// Screen number to display on
+  unsigned int screen;
   
-  int origWidth, origHeight;		// Original dimensions kept so they can
-					// be restored when switching modes
+  /// Original dimensions. jept so they can be restored when switching modes
+  int origWidth, origHeight;
 
-  OSXDelegate2D delegate;		// Delegate for ObjC stuff
-  csGraphics2D *canvas;			// Canvas (parent class)
+  /// Delegate for ObjC stuff
+  OSXDelegate2D delegate;
+  /// Canvas (parent class)
+  csGraphics2D *canvas;
 
-  csRef<iOSXAssistant> assistant;	// Assistant for dispatching events
-  iObjectRegistry *objectReg;		// Object registry
+  /// Assistant for dispatching events
+  csRef<iOSXAssistant> assistant;
+  /// Object registry
+  iObjectRegistry *objectReg;
 };
 
 #else // __cplusplus

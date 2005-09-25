@@ -13,23 +13,23 @@
 
 @interface OSXView : NSView
 {
-  // Delegate passes along events
+  /// Delegate passes along events
   OSXDelegate2D *delegate;
 }
 
-// Initialize object
+/// Initialize object
 - (id) initWithFrame:(NSRect) frame;
 
-// Deallocate object
+/// Deallocate object
 - (void) dealloc;
 
-// Set the delegate
+/// Set the delegate
 - (void) setDelegate:(OSXDelegate2D *) inDelegate;
 
-// Returns YES to indicate that it will become the first responder
+/// Returns YES to indicate that it will become the first responder
 - (BOOL) acceptsFirstResponder;
 
-// Events - passed to driver
+/// Events - passed to driver
 - (void) keyDown:(NSEvent *) ev;
 - (void) keyUp:(NSEvent *) ev;
 - (void) flagsChanged:(NSEvent *) ev;

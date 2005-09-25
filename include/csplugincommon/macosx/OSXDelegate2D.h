@@ -23,59 +23,62 @@
 
 @interface OSXDelegate2D : NSObject
 {
-  // Keep track of mouse tracking state
+  /// Keep track of mouse tracking state
   NSTrackingRectTag trackingMouseTag;
   BOOL trackingMouse;
-  BOOL hideMouse; // YES if mouse is not visible
+  /// YES if mouse is not visible
+  BOOL hideMouse; 
 
-  // Window - created even in fullscreen mode to get events (but with a
-  // different style) Window can have one of two titles - Paused or active
+  /**
+   * Window - created even in fullscreen mode to get events (but with a
+   * different style) Window can have one of two titles - Paused or active
+   */
   NSWindow *window;
   int style;
   NSString *title, *pausedTitle;
 
-  // Is window paused (out of focus, etc)
+  /// Is window paused (out of focus, etc)
   BOOL isPaused;
 
-  // Driver that this object works with
+  /// Driver that this object works with
   OSXDriver2D driver;
 
-  // Last processed event type.
+  /// Last processed event type.
   int lastEventType;
 }
 
-// Initialize with driver
+/// Initialize with driver
 - (id) initWithDriver:(OSXDriver2D) drv;
 
-// Deallocate object
+/// Deallocate object
 - (void) dealloc;
 
-// Open a window if none open
+/// Open a window if none open
 - (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h
   depth:(int) d fullscreen:(BOOL) fs onDisplay:(CGDirectDisplayID)
   display onScreen:(unsigned int) screen;
 
-// Set the window's title
+/// Set the window's title
 - (void) setTitle:(char *) newTitle;
 
-// Set the mouse cursor
+/// Set the mouse cursor
 - (BOOL) setMouseCursor:(csMouseCursorID) cursor;
 
-// Start/Stop tracking mouse position
+/// Start/Stop tracking mouse position
 - (void) startTrackingMouse;
 - (void) stopTrackingMouse;
 
-// Handle mouse entering or leaving the tracking area
+/// Handle mouse entering or leaving the tracking area
 - (void) mouseEntered:(NSEvent *) ev;
 - (void) mouseExited:(NSEvent *) ev;
 
-// Close window (destroys OpenGL context as well)
+/// Close window (destroys OpenGL context as well)
 - (void) closeWindow;
 
-// Change focus of window and adjust title
+/// Change focus of window and adjust title
 - (void) focusChanged:(BOOL) focused shouldPause:(BOOL) pause;
 
-// Dispatch an event to the driver
+/// Dispatch an event to the driver
 - (void) dispatchEvent:(NSEvent *) ev forView:(NSView *) view;
 
 @end
