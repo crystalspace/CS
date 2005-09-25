@@ -45,17 +45,6 @@ CS_IMPLEMENT_PLUGIN
 namespace cspluginSimpleFormerLoader
 {
 
-enum
-{
-  XMLTOKEN_NAME,
-  XMLTOKEN_HEIGHTMAP,
-  XMLTOKEN_HEIGHTMAP32,
-  XMLTOKEN_INTMAP,
-  XMLTOKEN_FLOATMAP,
-  XMLTOKEN_SCALE,
-  XMLTOKEN_OFFSET
-};
-
 SCF_IMPLEMENT_IBASE (csSimpleFormerLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
@@ -85,13 +74,7 @@ bool csSimpleFormerLoader::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (objreg, iSyntaxService);
   pluginmgr = CS_QUERY_REGISTRY (objreg, iPluginManager);
 
-  xmltokens.Register ("name", XMLTOKEN_NAME);
-  xmltokens.Register ("heightmap", XMLTOKEN_HEIGHTMAP);
-  xmltokens.Register ("heightmap32", XMLTOKEN_HEIGHTMAP32);
-  xmltokens.Register ("intmap", XMLTOKEN_INTMAP);
-  xmltokens.Register ("floatmap", XMLTOKEN_FLOATMAP);
-  xmltokens.Register ("scale", XMLTOKEN_SCALE);
-  xmltokens.Register ("offset", XMLTOKEN_OFFSET);
+  InitTokenTable (xmltokens);
   return true;
 }
 
@@ -421,7 +404,7 @@ bool csSimpleFormerLoader::LoadHeightmap32 (iDocumentNode* child,
 	  filename);
     return false;
   }
-  RawHeightmapReader<GetterFloat<EndianLittle> > reader (this, state);
+  RawHeightmapReader<GetterUint32<EndianLittle> > reader (this, state);
   if (!reader.ReadData (data, width, height))
     return false;
 

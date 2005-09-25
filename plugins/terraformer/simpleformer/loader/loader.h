@@ -56,16 +56,16 @@ public:
   } scfiComponent;
   friend struct eiComponent;
 
+  csRef<iSyntaxService> synldr;
+  csRef<iDataBuffer> GetDataBuffer (iDocumentNode* child);
 private:
   iObjectRegistry* objreg;
-  csRef<iSyntaxService> synldr;
   csRef<iPluginManager> pluginmgr;
   csRef<iEngine> engine;
   csStringHash xmltokens;
-
-  friend class RawHeightmapReader;
-
-  csRef<iDataBuffer> GetDataBuffer (iDocumentNode* child);
+#define CS_TOKEN_ITEM_FILE "plugins/terraformer/simpleformer/loader/loader.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE 
 
   bool LoadHeightmap32 (iDocumentNode* child, iSimpleFormerState* state);
   bool LoadHeightmapRaw16LE (iDocumentNode* child, iSimpleFormerState* state);

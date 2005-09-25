@@ -16,6 +16,9 @@ chronological order.
 	  arrival/removal of new meshes in sectors in addition to light
 	  and movable changes in general.
 	- Jorrit changed a few more engine interfaces to new SCF.
+	- res fixed the simple former loader to properly read heightmap32
+	  again after the recent raw format additions. Also compiles on gcc
+	  again.
 24-Sep-2005
 	- Jorrit fixed dependencies in the loader. It now also depends on
 	  new sound loader and renderer.
