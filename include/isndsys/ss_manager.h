@@ -19,10 +19,17 @@
 #ifndef __CS_SNDSYS_MANAGER_H__
 #define __CS_SNDSYS_MANAGER_H__
 
+/**\file
+ * Sound system: manager
+ */
+
 #include "isndsys/ss_stream.h"
 
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
+
+/**\addtogroup sndsys
+ * @{ */
 
 struct iObject;
 
@@ -73,5 +80,6 @@ struct iSndSysManager : public virtual iBase
   virtual iSndSysWrapper* FindSoundByName (const char* name) = 0;
 };
 
-#endif // __CS_SNDSYS_MANAGER_H__
+/** @} */
 
+#endif // __CS_SNDSYS_MANAGER_H__

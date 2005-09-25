@@ -20,8 +20,15 @@
 #ifndef __CS_SNDSYS_ISNDSYS_SOURCE_H__
 #define __CS_SNDSYS_ISNDSYS_SOURCE_H__
 
+/**\file
+ * Sound system: source
+ */
+
 #include "csutil/scf.h"
 #include "isndsys/ss_structs.h"
+
+/**\addtogroup sndsys
+ * @{ */
 
 SCF_VERSION (iSndSysSource, 0, 1, 0);
 
@@ -124,9 +131,6 @@ struct iSndSysSourceSoftware3D : public iSndSysSourceSoftware
 //  virtual bool RemoveFilter(csRef<iSound2Filter> filter)= 0;
 };
 
-
+/** @} */
 
 #endif // __CS_SNDSYS_ISNDSYS_SOURCE_H__
-
-
-

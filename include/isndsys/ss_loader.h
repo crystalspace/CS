@@ -19,8 +19,15 @@
 #ifndef __CS_SNDSYS_LOADER_H__
 #define __CS_SNDSYS_LOADER_H__
 
+/**\file
+ * Sound system: loader
+ */
+
 #include "csutil/scf.h"
 #include "csutil/ref.h"
+
+/**\addtogroup sndsys
+ * @{ */
 
 struct iSndSysData;
 
@@ -34,5 +41,7 @@ struct iSndSysLoader : public iBase
   /// Create a sound object from raw input data.
   virtual csPtr<iSndSysData> LoadSound(void *Data, uint32 Size) = 0;
 };
+
+/** @} */
 
 #endif // __CS_SNDSYS_LOADER_H__

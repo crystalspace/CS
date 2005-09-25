@@ -19,7 +19,14 @@
 #ifndef __CS_SNDSYS_DATA_H__
 #define __CS_SNDSYS_DATA_H__
 
+/**\file
+ * Sound system: data container
+ */
+
 #include "csutil/scf.h"
+
+/**\addtogroup sndsys
+ * @{ */
 
 struct csSndSysSoundFormat;
 struct iSndSysStream;
@@ -66,5 +73,7 @@ struct iSndSysData : public iBase
   	int mode3d) = 0;
 
 };
+
+/** @} */
 
 #endif // __CS_SNDSYS_DATA_H__

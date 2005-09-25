@@ -19,7 +19,14 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __CS_SNDSYS_COMMON_STRUCTS_H__
 #define __CS_SNDSYS_COMMON_STRUCTS_H__
 
+/**\file
+ * Sound system: types
+ */
+
 #include "csutil/scf.h"
+
+/**\addtogroup sndsys
+ * @{ */
 
 /**
  * The sound format. This keeps information about the frequency, bits and

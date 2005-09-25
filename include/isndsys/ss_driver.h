@@ -19,7 +19,14 @@
 #ifndef __CS_SNDSYS_DRIVER_H__
 #define __CS_SNDSYS_DRIVER_H__
 
+/**\file
+ * Sound system: software driver
+ */
+
 #include "csutil/scf.h"
+
+/**\addtogroup sndsys
+ * @{ */
 
 // @@@ FIXME: This should really be an interface
 class csSndSysRendererSoftware; 
@@ -87,5 +94,7 @@ struct iSndSysSoftwareDriver : public iBase
   // @@@ temporary
   //virtual bool ThreadAware (){ return false; }
 };
+
+/** @} */
 
 #endif // __CS_SNDSYS_DRIVER_H__

@@ -20,7 +20,14 @@
 #ifndef __CS_SNDSYS_STREAM_H__
 #define __CS_SNDSYS_STREAM_H__
 
+/**\file
+ * Sound system: stream
+ */
+
 #include "csutil/scf.h"
+
+/**\addtogroup sndsys
+ * @{ */
 
 struct csSndSysSoundFormat;
 struct iSndSysData;
@@ -233,5 +240,7 @@ struct iSndSysStream : public iBase
   /// Retrieve a direct pointer to this object
   virtual iSndSysStream *GetPtr() = 0;
 };
+
+/** @} */
 
 #endif // __CS_SNDSYS_STREAM_H__

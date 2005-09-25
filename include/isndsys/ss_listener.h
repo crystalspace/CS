@@ -19,9 +19,15 @@
 #ifndef __CS_SNDSYS_LISTENER_H__
 #define __CS_SNDSYS_LISTENER_H__
 
+/**\file
+ * Sound system: listener object
+ */
+
 #include "csutil/scf.h"
 #include "csgeom/vector3.h"
 
+/**\addtogroup sndsys
+ * @{ */
 
 SCF_VERSION (iSndSysListener, 0, 0, 1);
 
@@ -57,5 +63,7 @@ struct iSndSysListener : public iBase
 
 
 };
+
+/** @} */
 
 #endif // __CS_SNDSYS_LISTENER_H__

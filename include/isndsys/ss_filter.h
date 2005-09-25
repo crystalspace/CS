@@ -19,8 +19,15 @@
 #ifndef __CS_SNDSYS_FILTER_H__
 #define __CS_SNDSYS_FILTER_H__
 
+/**\file
+ * Sound system: software filters
+ */
+
 #include "csutil/scf.h"
 #include "isndsys/ss_structs.h"
+
+/**\addtogroup sndsys
+ * @{ */
 
 class csSourceParameters3D;
 class csListenerProperties;
@@ -104,5 +111,6 @@ struct iSndSysSoftwareFilterOutput : public iBase
   virtual iSndSysSoftwareFilter3D *GetPtr() = 0;
 };
 
+/** @} */
 
 #endif // __CS_SNDSYS_FILTER_H__

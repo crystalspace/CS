@@ -20,7 +20,14 @@
 #ifndef __CS_SNDSYS_RENDERER_H__
 #define __CS_SNDSYS_RENDERER_H__
 
+/**\file
+ * Sound system: renderer
+ */
+
 #include "csutil/scf.h"
+
+/**\addtogroup sndsys
+ * @{ */
 
 struct csSndSysSoundFormat;
 struct iSndSysData;
@@ -71,5 +78,7 @@ struct iSndSysRenderer : public iBase
   /// Get the global Listener object
   virtual csRef<iSndSysListener> GetListener () = 0;
 };
+
+/** @} */
 
 #endif // __CS_SNDSYS_RENDERER_H__
