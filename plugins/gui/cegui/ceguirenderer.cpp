@@ -50,7 +50,7 @@ csCEGUIRenderer::csCEGUIRenderer (iBase *parent) :
 }
 
 // TODO add description
-bool csCEGUIRenderer::Initialize (iScript* script, int width, int height)
+bool csCEGUIRenderer::Initialize (iScript* script)
 {
   g3d = CS_QUERY_REGISTRY (obj_reg, iGraphics3D);
 
@@ -70,15 +70,8 @@ bool csCEGUIRenderer::Initialize (iScript* script, int width, int height)
 
   m_displayArea.d_left = 0;
   m_displayArea.d_top = 0;
-
-  if (width < 1)
-    width = g3d->GetWidth ();
-
-  if (height < 1) 
-    height = g3d->GetHeight ();
-
-  m_displayArea.d_right = width;
-  m_displayArea.d_bottom = height;
+  m_displayArea.d_right = g3d->GetWidth ();
+  m_displayArea.d_bottom = g3d->GetHeight ();
 
   g2d = g3d->GetDriver2D ();
 

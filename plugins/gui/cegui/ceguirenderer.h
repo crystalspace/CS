@@ -65,7 +65,7 @@ public:
    * Initialize the plugin.
    * \param script iScript plugin to use as a scripting module.
    */
-  virtual bool Initialize (iScript* script=0, int width=-1, int height=-1);
+  virtual bool Initialize (iScript* script=0);
 
   /// Initialize with an iObjectRegistry pointer (called by plugin loader).
   virtual bool Initialize (iObjectRegistry *reg) 

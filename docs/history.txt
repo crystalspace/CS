@@ -10,6 +10,8 @@ chronological order.
 	- res did a couple of doxygen fixes. Mostly adding \file to files.
 	- res did some more SR code shuffling.
 	- res merged ivideo/polyrender.h into Thing.
+	- iceeey removed the width and height parameters from
+	  iCEGUI::Initialize() as doxygen complains and they are not needed.
 24-Sep-2005
 	- Jorrit fixed dependencies in the loader. It now also depends on
 	  new sound loader and renderer.
