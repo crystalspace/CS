@@ -29,6 +29,7 @@ chronological order.
 	  when comparing a, b and b, a in both cases "first greater than 
 	  second" was reported.
 	- res removed iImageVector and csImageVector.
+	- res merged csVertexListWalker<> into csRenderBufferLock<>.
 24-Sep-2005
 	- Jorrit fixed dependencies in the loader. It now also depends on
 	  new sound loader and renderer.

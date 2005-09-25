@@ -29,8 +29,8 @@
 
 /**
  * Helper class for convenient locking/unlocking of an iRenderBuffer.
- * The contents can be accessed either directly or array-style in typed
- * way.
+ * The contents can be accessed either directly, array-style or iterator-style 
+ * in a typed way.
  * \remarks The TbufferKeeper template argument can be used to have the
  *  lock store the buffer in a simple iRenderBuffer* (instead a csRef<>)
  *  to avoid an IncRef() and DecRef() if it is known that the buffer will
@@ -39,11 +39,27 @@
 template <class T, class TbufferKeeper = csRef<iRenderBuffer> >
 class csRenderBufferLock
 {
+  /// Buffer that is being locked
   TbufferKeeper buffer;
-  csRenderBufferLockType lockType;
-  bool isLocked;
+  /// State of locking (type and whether this buffer is locked)
+  uint lockState;
+  /// Buffer data
   T* lockBuf;
+  /// Distance between two elements
   size_t bufStride;
+#ifdef CS_DEBUG
+  /// Number of elements
+  size_t elements;
+#endif
+  /// Index of current element
+  size_t currElement;
+  
+  enum { LockedFlag = 0x10000, LockTypeMask = 0xffff };
+  inline bool IsLocked() { return lockState & LockedFlag; }
+  inline void SetLocked (bool b) 
+  { lockState = b ? (lockState | LockedFlag) : (lockState & ~LockedFlag); }
+  inline csRenderBufferLockType LockType() 
+  { return (csRenderBufferLockType)(lockState & LockTypeMask); }
   
   csRenderBufferLock() {}
 public:
@@ -52,9 +68,13 @@ public:
    */
   csRenderBufferLock (iRenderBuffer* buf, 
     csRenderBufferLockType lock = CS_BUF_LOCK_NORMAL) : buffer(buf),
-    lockType(lock), isLocked(false), lockBuf(0), 
-    bufStride(buf ? buf->GetElementDistance() : 0)
+    lockState(lock), lockBuf(0), 
+    bufStride(buf ? buf->GetElementDistance() : 0),
+    currElement(0)
   {
+#ifdef CS_DEBUG
+    elements = buf->GetElementCount();
+#endif
   }
   
   /**
@@ -71,11 +91,11 @@ public:
    */
   T* Lock ()
   {
-    if (!isLocked)
+    if (!IsLocked())
     {
       lockBuf = 
-	buffer ? ((T*)((uint8*)buffer->Lock (lockType))) : (T*)-1;
-      isLocked = true;
+	buffer ? ((T*)((uint8*)buffer->Lock (LockType()))) : (T*)-1;
+      SetLocked (true);
     }
     return lockBuf;
   }
@@ -83,10 +103,10 @@ public:
   /// Unlock the renderbuffer.
   void Unlock ()
   {
-    if (isLocked)
+    if (IsLocked ())
     {
       if (buffer) buffer->Release();
-      isLocked = false;
+      SetLocked (false);
     }
   }
   
@@ -99,6 +119,19 @@ public:
     return Lock();
   }
 
+  /// Get current element.
+  T& operator*()
+  {
+    return Get (currElement);
+  }
+
+  /// Set current element to the next.
+  void operator++ ()
+  {
+    currElement++;
+    CS_ASSERT(currElement<elements);
+  }
+
   /// Retrieve an item in the render buffer.
   T& operator [] (size_t n)
   {
@@ -108,6 +141,7 @@ public:
   /// Retrieve an item in the render buffer.
   T& Get (size_t n)
   {
+    CS_ASSERT (n < elements);
     return *((T*)((uint8*)Lock() + n * bufStride));
   }
   

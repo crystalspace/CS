@@ -24,8 +24,8 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "csgfx/lightsvcache.h"
-#include "csgfx/vertexlistwalker.h"
 #include "csutil/cscolor.h"
+#include "cstool/rbuflock.h"
 
 #include "iengine/light.h"
 #include "iengine/movable.h"
@@ -342,29 +342,29 @@ public:
    * Compute lighting, overwrite the destination colors.
    * \param light Properties of the light to compute.
    * \param numvert Number of vertices and normals.
-   * \param vb Vertices.
-   * \param nb Normals.
+   * \param vb Vertices. Buffer should contain (at least) 3 component vectors.
+   * \param nb Normals. Buffer should contain (at least) 3 component vectors.
    * \param litColor Destination colors.
    */
   virtual void CalculateLighting (const csLightProperties& light, 
-    size_t numvert, csVertexListWalker<csVector3> vb, 
-    csVertexListWalker<csVector3> nb, csColor *litColor) const = 0;
+    size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
+    csColor *litColor) const = 0;
 
   /**
    * Compute lighting, add lit colors to the destination colors.
    * \copydoc CalculateLighting 
    */
   virtual void CalculateLightingAdd (const csLightProperties& light, 
-    size_t numvert, csVertexListWalker<csVector3> vb, 
-    csVertexListWalker<csVector3> nb, csColor *litColor) const = 0;
+    size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
+    csColor *litColor) const = 0;
 
   /**
    * Compute lighting, multiply lit colors with destination colors.
    * \copydoc CalculateLighting 
    */
   virtual void CalculateLightingMul (const csLightProperties& light, 
-    size_t numvert, csVertexListWalker<csVector3> vb, 
-    csVertexListWalker<csVector3> nb, csColor *litColor) const = 0;
+    size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
+    csColor *litColor) const = 0;
 };
 
 /**
@@ -377,41 +377,49 @@ class csVertexLightCalculator : public iVertexLightCalculator
 {
 public:
   virtual void CalculateLighting (const csLightProperties& light, 
-    size_t numvert, csVertexListWalker<csVector3> vb, 
-    csVertexListWalker<csVector3> nb, csColor *litColor) const
+    size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
+    csColor *litColor) const
   {
     // setup the light calculator
     LightProc lighter (light);
+    csRenderBufferLock<csVector3, iRenderBuffer*> vbLock (vb);
+    csRenderBufferLock<csVector3, iRenderBuffer*> nbLock (nb);
 
     for (size_t n = 0; n < numvert; n++)
     {
-      litColor[n] = lighter.ProcessVertex (vb[n], nb[n]);
+      litColor[n] = lighter.ProcessVertex (vbLock[n], nbLock[n]);
     }
   }
 
   virtual void CalculateLightingAdd (const csLightProperties& light, 
-    size_t numvert, csVertexListWalker<csVector3> vb, 
-    csVertexListWalker<csVector3> nb, csColor *litColor) const
+    size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
+    csColor *litColor) const
   {
     // setup the light calculator
     LightProc lighter (light);
+    csRenderBufferLock<csVector3, iRenderBuffer*> vbLock (vb);
+    csRenderBufferLock<csVector3, iRenderBuffer*> nbLock (nb);
+
 
     for (size_t n = 0; n < numvert; n++)
     {
-      litColor[n] += lighter.ProcessVertex (vb[n], nb[n]);
+      litColor[n] += lighter.ProcessVertex (vbLock[n], nbLock[n]);
     }
   }
 
   virtual void CalculateLightingMul (const csLightProperties& light, 
-    size_t numvert, csVertexListWalker<csVector3> vb, 
-    csVertexListWalker<csVector3> nb, csColor *litColor) const
+    size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
+    csColor *litColor) const
   {
     // setup the light calculator
     LightProc lighter (light);
+    csRenderBufferLock<csVector3, iRenderBuffer*> vbLock (vb);
+    csRenderBufferLock<csVector3, iRenderBuffer*> nbLock (nb);
+
 
     for (size_t n = 0; n < numvert; n++)
     {
-      litColor[n] *= lighter.ProcessVertex (vb[n], nb[n]);
+      litColor[n] *= lighter.ProcessVertex (vbLock[n], nbLock[n]);
     }
   }
 };

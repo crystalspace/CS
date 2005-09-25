@@ -83,10 +83,10 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
       CS_BUFCOMP_FLOAT, 3, true);
 
     // tempdata
-    csColor *tmpColor = (csColor*) clbuf->Lock (CS_BUF_LOCK_NORMAL);
+    csRenderBufferLock<csColor, iRenderBuffer*> tmpColor (clbuf);
 
     size_t elementCount = vbuf->GetElementCount ();
-    memset (tmpColor, 0, sizeof(csColor) * elementCount);
+    memset (tmpColor.Lock(), 0, sizeof(csColor) * elementCount);
 
     if (lightsActive > 0)
     {
@@ -101,12 +101,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	  csLightProperties light (lightNum, shaderPlugin->lsvCache, stacks);
 	  iVertexLightCalculator *calc = 
 	    shaderPlugin->GetLightCalculator (light, useAttenuation);
-	  calc->CalculateLighting (light, elementCount,
-	    csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),
-	      elementCount, vbuf->GetElementDistance ()),
-	    csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
-	      elementCount, nbuf->GetElementDistance ()), 
-	    tmpColor);
+	  calc->CalculateLighting (light, elementCount, vbuf, nbuf, tmpColor);
 	}
       }
       else
@@ -128,21 +123,13 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	  {
 	  case LIGHTMIXMODE_ADD:
 	    {
-	      calc->CalculateLightingAdd (light, elementCount,
-		csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ), 
-		  elementCount, vbuf->GetElementDistance ()),
-		csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
-		  elementCount, nbuf->GetElementDistance ()), 
+	      calc->CalculateLightingAdd (light, elementCount, vbuf, nbuf, 
 		tmpColor);
 	      break;
 	    }
 	  case LIGHTMIXMODE_MUL:
 	    {
-	      calc->CalculateLightingMul (light, elementCount,
-		csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),
-		  elementCount, vbuf->GetElementDistance ()),
-		csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
-		  elementCount, nbuf->GetElementDistance ()), 
+	      calc->CalculateLightingMul (light, elementCount, vbuf, nbuf, 
 		tmpColor);
 	      break;
 	    }
@@ -157,8 +144,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 
     if (cbuf && (colorMixMode != LIGHTMIXMODE_NONE))
     {
-      csVertexListWalker<csColor> cbufWalker (cbuf->Lock (CS_BUF_LOCK_READ),
-	elementCount, vbuf->GetStride ());
+      csRenderBufferLock<csColor, iRenderBuffer*> cbufWalker (cbuf);
       
       if (colorMixMode == LIGHTMIXMODE_ADD)
       {
@@ -170,8 +156,6 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	for (size_t i = 0; i < elementCount; i++)
 	  tmpColor[i] *= cbufWalker[i];
       }
-
-      cbuf->Release ();
     }
 
     float finalLightFactorReal = GetParamFloatVal (stacks, finalLightFactor,
@@ -179,9 +163,6 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
     for (size_t i = 0; i < elementCount; i++)
       tmpColor[i] *= finalLightFactorReal;
 
-    vbuf->Release ();
-    nbuf->Release ();
-    clbuf->Release ();
     modes.buffers->SetAccessor (modes.buffers->GetAccessor(),
       modes.buffers->GetAccessorMask() & ~CS_BUFFER_COLOR_MASK);
     modes.buffers->SetRenderBuffer (CS_BUFFER_COLOR, clbuf);
