@@ -19,6 +19,10 @@
 #ifndef __CSUTIL_SCOPEDMUTEX_H__
 #define __CSUTIL_SCOPEDMUTEX_H__
 
+/**\file
+ * Scoped mutex locking
+ */
+
 #include "csextern.h"
 #include "csutil/thread.h"
 

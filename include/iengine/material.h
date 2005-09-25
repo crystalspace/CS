@@ -23,6 +23,7 @@
 #include "iutil/strset.h"
 
 /**\file
+ * Material interfaces
  */
 /**
  * \addtogroup engine3d_textures

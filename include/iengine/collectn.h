@@ -21,6 +21,7 @@
 #define __CS_IENGINE_COLLECTN_H__
 
 /**\file
+ * Collection object
  */
 
 #include "csutil/scf.h"
@@ -30,21 +31,17 @@ struct iObject;
 /**
  * A collection object is for convenience of the script language.
  * It is simply a collection of other objects.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iCollectionList::NewCollection()
- *   </ul>
+ * - iCollectionList::NewCollection()
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iCollectionList::Get()
- *   <li>iCollectionList::FindByName()
- *   </ul>
+ * - iCollectionList::Get()
+ * - iCollectionList::FindByName()
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>Engine stores them.
- *   <li>Application uses them.
- *   </ul>
+ * - Engine stores them.
+ * - Application uses them.
  */
 struct iCollection : public virtual iBase
 {

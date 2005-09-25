@@ -20,6 +20,10 @@
 #ifndef __CS_UTIL_EVOUTLET_H__
 #define __CS_UTIL_EVOUTLET_H__
 
+/**\file
+ * Implementation for iEventOutlet
+ */
+
 #include "csextern.h"
 #include "csutil/csunicode.h"
 #include "iutil/event.h"

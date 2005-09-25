@@ -19,6 +19,10 @@
 #ifndef __CS_UTIL_BINTREE_H__
 #define __CS_UTIL_BINTREE_H__
 
+/**\file
+ * Generic binary search tree.
+ */
+
 #include "blockallocator.h"
 
 /**

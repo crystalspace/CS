@@ -20,6 +20,10 @@
 #ifndef __CSUTIL_RADIX_SORT_H__
 #define __CSUTIL_RADIX_SORT_H__
 
+/**\file
+ * 32-bit unsigned integer in-place radix-sorter
+ */
+
 #include "csextern.h"
 
 /**

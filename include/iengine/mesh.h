@@ -20,6 +20,7 @@
 #define __CS_IENGINE_MESH_H__
 
 /**\file
+ * Mesh interfaces
  */
 /**
  * \addtogroup engine3d_meshes

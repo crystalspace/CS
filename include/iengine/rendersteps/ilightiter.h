@@ -26,7 +26,7 @@
 #include "ivideo/shader/shader.h"
 
 /**\file
- * Generic render step.
+ * Light iterating render step.
  */
 
 struct iLight;

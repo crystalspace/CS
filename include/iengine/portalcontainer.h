@@ -21,6 +21,7 @@
 #define __CS_IENGINE_PORTALCONTAINER_H__
 
 /**\file
+ * Portal container
  */
 
 #include "csutil/scf.h"
@@ -35,20 +36,16 @@ struct iRenderView;
 
 /**
  * A container for portals.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iEngine::CreatePortalContainer()
- *   <li>iEngine::CreatePortal()
- *   </ul>
+ * - iEngine::CreatePortalContainer()
+ * - iEngine::CreatePortal()
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() on iMeshObject from a portal container mesh.
- *   </ul>
+ * - scfQueryInterface() on iMeshObject from a portal container mesh.
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ * - iEngine
  */
 struct iPortalContainer : public virtual iBase
 {

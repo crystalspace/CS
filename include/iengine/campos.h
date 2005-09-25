@@ -20,6 +20,7 @@
 #define __CS_IENGINE_CAMPOS_H__
 
 /**\file
+ * Camera position
  */
 /**
  * \addtogroup engine3d_views
@@ -37,30 +38,24 @@ struct iCamera;
 /**
  * A camera position. This object can be used to initialize a camera object to
  * a certain state. It has the following properties:
- * <ul>
- * <li> Home sector name: This name is used to find the home sector of the
- *      camera in the engine when the camera position is applied.
- * <li> Position: Position of the camera
- * <li> Upward and forward vectors: These vectors define the orientation of the
- *      camera. More exactly, they are used to compute the transformation of
- *      the camera.
- * <li> A far plane used to clip geometry which is too far away.
- * </ul>
- * <p>
+ * - Home sector name: This name is used to find the home sector of the
+ *   camera in the engine when the camera position is applied.
+ * - Position: Position of the camera
+ * - Upward and forward vectors: These vectors define the orientation of the
+ *   camera. More exactly, they are used to compute the transformation of
+ *   the camera.
+ * - A far plane used to clip geometry which is too far away.
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iCameraPositionList::NewCameraPosition()
- *   </ul>
+ * - iCameraPositionList::NewCameraPosition()
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iCameraPositionList::Get()
- *   <li>iCameraPositionList::FindByName()
- *   </ul>
+ * - iCameraPositionList::Get()
+ * - iCameraPositionList::FindByName()
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>Engine stores them.
- *   <li>Application uses them.
- *   </ul>
+ * - Engine stores them.
+ * - Application uses them.
  */
 struct iCameraPosition : public virtual iBase
 {

@@ -19,6 +19,10 @@
 #ifndef __CS_PLUGLDR_H__
 #define __CS_PLUGLDR_H__
 
+/**\file
+ * Plugin loader
+ */
+
 #include "csextern.h"
 #include "csutil/parray.h"
 #include "csutil/ref.h"

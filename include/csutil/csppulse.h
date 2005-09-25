@@ -20,6 +20,10 @@
 #ifndef __CS_CSPPULSE_H__
 #define __CS_CSPPULSE_H__
 
+/**\file
+ * Pulsing progress indicator
+ */
+
 #include "csextern.h"
 
 struct iConsoleOutput;

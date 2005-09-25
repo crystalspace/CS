@@ -19,6 +19,10 @@
 #ifndef __CS_TIMER_H__
 #define __CS_TIMER_H__
 
+/**\file
+ * Timer - perform actions at a certain time.
+ */
+
 #include <stdarg.h>
 #include <stdio.h>
 #include "csextern.h"

@@ -20,6 +20,10 @@
 #ifndef __CS_CSUTIL_VFSPLAT_H__
 #define __CS_CSUTIL_VFSPLAT_H__
 
+/**\file
+ * VFS platform specifica
+ */
+
 #include "csextern.h"
 
 /// Hook to resolve certain VFS vars on some platforms. (E.g. HOME on Win32)

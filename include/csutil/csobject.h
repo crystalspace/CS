@@ -20,6 +20,10 @@
 #ifndef __CS_CSOBJECT_H__
 #define __CS_CSOBJECT_H__
 
+/**\file
+ * Implementation for iObject
+ */
+
 #include "csextern.h"
 
 #include "csutil/leakguard.h"

@@ -22,6 +22,7 @@
 #define __CS_IENGINE_SECTOR_H__
 
 /**\file
+ * Sector
  */
 /**
  * \addtogroup engine3d

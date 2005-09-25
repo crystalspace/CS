@@ -20,6 +20,10 @@
 #ifndef __CS_CSEVCORD_H__
 #define __CS_CSEVCORD_H__
 
+/**\file
+ * Event cord.
+ */
+ 
 #include "csextern.h"
 #include "csutil/scf.h"
 #include "iutil/event.h"

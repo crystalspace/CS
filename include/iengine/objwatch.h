@@ -20,6 +20,7 @@
 #define __CS_IENGINE_OBJWATCH_H__
 
 /**\file
+ * Object change watcher
  */
 /**
  * \addtogroup engine3d

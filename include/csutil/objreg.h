@@ -19,6 +19,10 @@
 #ifndef __CS_OBJREG_H__
 #define __CS_OBJREG_H__
 
+/**\file
+ * Implementation of iObjectRegistry.
+ */
+
 #include "csextern.h"
 #include "iutil/objreg.h"
 #include "csutil/array.h"

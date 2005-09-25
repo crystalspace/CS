@@ -21,6 +21,7 @@
 #define __CS_IENGINE_SHADCAST_H__
 
 /**\file
+ * Shadow casting
  */
 /**
  * \addtogroup engine3d_light

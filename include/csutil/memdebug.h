@@ -19,6 +19,10 @@
 #ifndef __CS_MEMDEBUG_H__
 #define __CS_MEMDEBUG_H__
 
+/**\file
+ * Memory debugging support
+ */
+
 #if defined(CS_MEMORY_TRACKER) || defined(CS_MEMORY_TRACKER_IMPLEMENT)
 
 #include "csextern.h"

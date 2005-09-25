@@ -21,7 +21,8 @@
 #ifndef __CS_CSINPUT_H__
 #define __CS_CSINPUT_H__
 
-/*
+/**\file
+ * Input drivers.
  * These are the low-level implementations of generic classes of input devices
  * like keyboard, mouse, and joystick.
  */

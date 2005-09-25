@@ -21,6 +21,10 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+/**\file
+ * SCF implementation base classes
+ */
+
 #if !defined(SCF_IN_IMPLEMENTATION_H) && !defined(DOXYGEN_RUN)
 #error Do not include this file directly. Included from scf_implementation.h
 #endif

@@ -22,6 +22,7 @@
 #include "csextern.h"
 
 /**\file
+ * String scanning (sscanf() flavor).
  */
 
 /**

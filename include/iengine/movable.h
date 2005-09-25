@@ -20,6 +20,7 @@
 #define __CS_IENGINE_MOVABLE_H__
 
 /**\file
+ * Movable - position and orientation of an object
  */
 /**
  * \addtogroup engine3d
@@ -58,27 +59,24 @@ struct iMovableListener : public virtual iBase
  * space of the model and world space (i.e. where it is in the world)).
  * Movables are attached to objects (like meshes). For example, use
  * iMeshWrapper->GetMovable()) to get the movable belonging to some mesh.
- * <p>
+ * 
  * The parent of an object can be null in which case it is positioned
  * relative to world space coordinates. The parent of an object can also
  * be another object in which case the transformation is relative to that
  * other object (and possible other objects from which that parent is itself
  * a child).
- * <p>
+ * 
  * Usually models are defined with the local origin (0,0,0) somewhere in
  * the model. Sometimes in the center or the center-bottom depending on what
  * is easiest. It is important to realize that all position setting routines
  * below operate relative to the local origin of the object.
- * <p>
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iMeshWrapper::GetMovable()
- *   <li>iLight::GetMovable()
- *   </ul>
+ * - iMeshWrapper::GetMovable()
+ * - iLight::GetMovable()
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ * - iEngine
  */
 struct iMovable : public virtual iBase
 {

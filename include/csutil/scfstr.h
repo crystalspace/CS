@@ -20,6 +20,10 @@
 #ifndef __CS_SCFSTR_H__
 #define __CS_SCFSTR_H__
 
+/**\file
+ * Implementation for iString
+ */
+
 #include "csextern.h"
 #include "iutil/string.h"
 #include "csutil/csstring.h"

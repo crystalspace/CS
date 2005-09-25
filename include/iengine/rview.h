@@ -20,6 +20,7 @@
 #define __CS_IENGINE_RVIEW_H__
 
 /**\file
+ * Render view
  */
 /**
  * \addtogroup engine3d_views

@@ -20,6 +20,10 @@
 #ifndef __CS_UTIL_REFTRACKERACCESS_H__
 #define __CS_UTIL_REFTRACKERACCESS_H__
 
+/**\file
+ * Reference tracker access.
+ */
+
 #include "csextern.h"
 
 #ifndef CS_REF_TRACKER

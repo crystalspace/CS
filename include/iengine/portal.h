@@ -20,6 +20,7 @@
 #define __CS_IENGINE_PORTAL_H__
 
 /**\file
+ * Portal interfaces
  */
 /**
  * \addtogroup engine3d

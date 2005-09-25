@@ -19,6 +19,10 @@
 #ifndef __CS_CSTREENODE_H__
 #define __CS_CSTREENODE_H__
 
+/**\file
+ * Generic tree class
+ */
+
 #include "csextern.h"
 #include "array.h"
 

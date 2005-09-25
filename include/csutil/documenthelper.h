@@ -19,6 +19,11 @@
 #ifndef __CSUTIL_DOCUMENTHELPER_H__
 #define __CSUTIL_DOCUMENTHELPER_H__
 
+/**\file
+ * Helper functions and classes which operate on iDocumentNode and 
+ * iDocumentNodeIterator.
+ */
+
 #include "csutil/refarr.h"
 #include "csutil/regexp.h"
 #include "csutil/scf_implementation.h"
@@ -28,7 +33,7 @@
 namespace CrystalSpace
 {
   /**
-   * Namespace contains helper functions and classes which operates on
+   * Namespace contains helper functions and classes which operate on
    * iDocumentNode and iDocumentNodeIterator.
    */
   namespace DocumentHelper

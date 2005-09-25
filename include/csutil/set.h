@@ -22,7 +22,7 @@
 #include "csutil/hash.h"
 
 /**\file
- * A basic set for objects.
+ * Basic set for objects.
  */
 
 /**\addtogroup util_containers

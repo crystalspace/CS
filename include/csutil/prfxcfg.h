@@ -19,6 +19,10 @@
 #ifndef __CS_PRFXCFG_H__
 #define __CS_PRFXCFG_H__
 
+/**\file
+ * Implementation of iConfigFile prepending a string to all key names.
+ */
+
 #include "csextern.h"
 #include "csutil/cfgfile.h"
 

@@ -20,6 +20,10 @@
 #ifndef __CS_UTIL_LIST_H__
 #define __CS_UTIL_LIST_H__
 
+/**\file
+ * Double-linked list
+ */
+
 #include "csextern.h"
 
 /**

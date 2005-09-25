@@ -19,6 +19,10 @@
 #ifndef __CS_UTIL_DEBUG_H__
 #define __CS_UTIL_DEBUG_H__
 
+/**\file
+ * Debugging graph
+ */
+
 #include "csextern.h"
 
 // Enable the following define to have the DG_... macros.

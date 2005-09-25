@@ -18,7 +18,7 @@
 */
 
 /**\file
- * A databuffer pointing into another databuffer.
+ * Databuffer pointing into another databuffer.
  */
  
 #ifndef __CS_CSUTIL_PARASITICDATABUFFER_H__
@@ -28,6 +28,9 @@
 #include "csutil/pooledscfclass.h"
 #include "iutil/databuff.h"
 
+/**
+ * Base class for pooled and unpooled parasitic data buffer.
+ */
 class csParasiticDataBufferBase : public iDataBuffer
 {
 protected:

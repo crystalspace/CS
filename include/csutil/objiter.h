@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**
- * \file
+/**\file
+ * Typed iObject iterator.
  */
 
 #ifndef __CS_OBJITER_H__
@@ -34,8 +34,6 @@ template<typename T>
 class csTypedObjectIterator
 {
 protected:
-  scfInterfaceID scf_id;
-  int scf_ver;
   csRef<iObjectIterator> iter;
   csRef<T> CurrentTypedObject;
 
@@ -44,8 +42,7 @@ protected:
     CurrentTypedObject.Invalidate();
     while (iter->HasNext())
     {
-      CurrentTypedObject =
-	csPtr<T>((T*)(iter->Next()->QueryInterface(scf_id, scf_ver)));
+      CurrentTypedObject = scfQueryInterface<T> (iter->Next());
       if (CurrentTypedObject.IsValid())
 	return;
     }
@@ -55,8 +52,6 @@ public:
   /// Constructor.
   csTypedObjectIterator(iObject* parent)
   {
-    scf_id = scfInterfaceTraits<T>::GetID();
-    scf_ver = scfInterfaceTraits<T>::GetVersion();
     iter = parent->GetIterator();
     FetchObject();
   }
@@ -86,8 +81,7 @@ public:
   {
     iObject* obj = iter->FindName(name);
     if (obj != 0)
-      CurrentTypedObject.AttachNew(
-  	(T*)(obj->QueryInterface(scf_id, scf_ver)));
+      CurrentTypedObject = scfQueryInterface<T> (obj);
     else
       CurrentTypedObject.Invalidate();
     return (T*)CurrentTypedObject;

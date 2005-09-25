@@ -24,7 +24,7 @@
 #include "csutil/comparator.h"
 
 /**\file
- * An implementation of red-black-trees.
+ * Implementation of a red-black-tree.
  */
 
 /**\addtogroup util_containers

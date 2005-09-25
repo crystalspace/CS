@@ -19,6 +19,10 @@
 #ifndef __CS_DATASTRM_H__
 #define __CS_DATASTRM_H__
 
+/**\file
+ * Data buffer wrapper for stream-like access
+ */
+
 #include "csextern.h"
 
 struct iDataBuffer;

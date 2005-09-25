@@ -19,6 +19,10 @@
 #ifndef __CS_VIRTCLK_H__
 #define __CS_VIRTCLK_H__
 
+/**\file
+ * Implementation of iVirtualClock
+ */
+
 #include "csextern.h"
 #include "csutil/scf.h"
 #include "iutil/virtclk.h"

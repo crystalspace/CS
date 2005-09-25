@@ -20,6 +20,7 @@
 #define __CS_IENGINE_FVIEW_H__
 
 /**\file
+ * Frustum view
  */
 /**
  * \addtogroup engine3d_vis

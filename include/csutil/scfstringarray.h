@@ -20,6 +20,10 @@
 #ifndef __CS_SCFSTRINGARRAY_H__
 #define __CS_SCFSTRINGARRAY_H__
 
+/**\file
+ * Implementation for iStringArray
+ */
+
 #include "csextern.h"
 #include "csutil/stringarray.h"
 #include "iutil/stringarray.h"

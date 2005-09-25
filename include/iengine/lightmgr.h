@@ -20,6 +20,7 @@
 #define __CS_IENGINE_LIGHTMGR_H__
 
 /**\file
+ * Light manager
  */
 /**
  * \addtogroup engine3d_light

@@ -20,6 +20,10 @@
 #ifndef __CSUTIL_ALGORITHMS_H__
 #define __CSUTIL_ALGORITHMS_H__
 
+/**\file
+ * General Algorithms
+ */
+
 namespace CrystalSpace
 {
   /**
@@ -42,6 +46,7 @@ namespace CrystalSpace
     return Func;
   }
 
+  /// @@@ Document me
   template <class T1, class T2>
   struct ConditionAnd
   {

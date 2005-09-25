@@ -20,6 +20,10 @@
 #ifndef __CS_STRINGARRAY_H__
 #define __CS_STRINGARRAY_H__
 
+/**\file
+ * Array of strings
+ */
+
 #include <stdarg.h>
 #include "csextern.h"
 #include "csutil/array.h"

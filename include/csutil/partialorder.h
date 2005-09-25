@@ -20,7 +20,7 @@
 #define __CS_UTIL_PO_H__
 
 /**\file
- * A generic finite partial order
+ * Generic finite partial order
  */
 
 #include "csextern.h"

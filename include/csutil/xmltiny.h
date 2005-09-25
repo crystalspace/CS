@@ -19,6 +19,10 @@
 #ifndef __CS_UTIL_XMLTINY_H__
 #define __CS_UTIL_XMLTINY_H__
 
+/**\file
+ * TinyXML iDocumentSystem implementation
+ */
+
 #include "csextern.h"
 #include "iutil/document.h"
 

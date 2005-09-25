@@ -19,6 +19,10 @@
 #ifndef __CS_PLUGMGR_H__
 #define __CS_PLUGMGR_H__
 
+/**\file
+ * Standard iPluginManager implementation.
+ */
+
 #include "csextern.h"
 #include "csutil/parray.h"
 #include "csutil/scf.h"

@@ -19,6 +19,10 @@
 #ifndef __CS_CSCOLOR_H__
 #define __CS_CSCOLOR_H__
 
+/**\file
+ * Floating-point color
+ */
+
 #include "csextern.h"
 
 /**

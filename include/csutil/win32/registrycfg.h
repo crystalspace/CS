@@ -21,7 +21,7 @@
 #define __CS_CSSYS_WIN32_REGISTRYCFG_H__
 
 /**\file
- * iConfigFile implementation using the registry.
+ * Implementation for iConfigFile using the registry.
  */
 
 #include "csextern.h"

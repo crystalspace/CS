@@ -19,6 +19,10 @@
 #ifndef __CS_CSSYS_THREAD_H__
 #define __CS_CSSYS_THREAD_H__
 
+/**\file
+ * Threading and synchronization support
+ */
+
 #include "csutil/ref.h"
 #include "csutil/refcount.h"
 

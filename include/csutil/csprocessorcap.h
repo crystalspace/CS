@@ -19,6 +19,10 @@
 #ifndef __CS_PROCESSORCAP_H__
 #define __CS_PROCESSORCAP_H__
 
+/**\file
+ * Processor capability identification
+ */
+
 #include "csextern.h"
 
 /**

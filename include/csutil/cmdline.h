@@ -20,7 +20,7 @@
 #define __CS_CMDLINE_H__
 
 /**\file
- * iCommandLineParser implementation
+ * Implementation for iCommandLineParser
  */
 
 #include "csextern.h"

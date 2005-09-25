@@ -22,6 +22,7 @@
 #include "csextern.h"
 
 /**\file
+ * Base implementation of a generic event handler.
  */
 /**
  * \addtogroup event_handling

@@ -19,6 +19,10 @@
 #ifndef __CS_UTIL_PROFILE_H__
 #define __CS_UTIL_PROFILE_H__
 
+/**\file
+ * Profiling utilities.
+ */
+
 #include "csextern.h"
 #include "csutil/csstring.h"
 #include "csutil/array.h"

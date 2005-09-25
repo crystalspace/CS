@@ -19,6 +19,10 @@
 #ifndef __CS_PHYSFILE_H__
 #define __CS_PHYSFILE_H__
 
+/**\file
+ * Implementation of iFile for physical files.
+ */
+
 #include <stdio.h>
 
 #include "csextern.h"

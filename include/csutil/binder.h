@@ -19,6 +19,10 @@
 #ifndef __CS_UTIL_BINDER_H__
 #define __CS_UTIL_BINDER_H__
 
+/**\file
+ * Input even binder
+ */
+
 #include "csextern.h"
 #include "iutil/binder.h"
 #include "iutil/event.h"

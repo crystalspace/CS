@@ -20,6 +20,7 @@
 #define __CS_IENGINE_LOD_H__
 
 /**\file
+ * Level of detail interfaces
  */
 /**
  * \addtogroup engine3d_meshes

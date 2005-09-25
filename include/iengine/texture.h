@@ -20,6 +20,7 @@
 #define __CS_IENGINE_TEXTURE_H__
 
 /**\file
+ * Texture interfaces
  */
 /**
  * \addtogroup engine3d_textures

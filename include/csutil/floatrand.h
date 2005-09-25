@@ -20,10 +20,14 @@
 #ifndef __CS_CSUTIL_FLOATRAND_H__
 #define __CS_CSUTIL_FLOATRAND_H__
 
+/**\file
+ * Random number generator for floating point values
+ */
+
 #include "csextern.h"
 
 /**
- * Fast simple random number generator for a floating point values.
+ * Fast simple random number generator for floating point values.
  */
 class CS_CRYSTALSPACE_EXPORT csRandomFloatGen
 {

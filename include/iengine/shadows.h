@@ -21,6 +21,7 @@
 #define __CS_IENGINE_SHADOWS_H__
 
 /**\file
+ * Shadow interfaces
  */
 /**
  * \addtogroup engine3d_light

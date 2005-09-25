@@ -20,6 +20,10 @@
 #ifndef __CS_SPARSE3D_H__
 #define __CS_SPARSE3D_H__
 
+/**\file
+ * 3D sparse matrix 
+ */
+
 #include "csextern.h"
 
 /**

@@ -24,7 +24,7 @@
 #include "csutil/scf.h"
 
 /**\file
- * Generic render step.
+ * Render step cointainer
  */
 
 /**\addtogroup engine3d_rloop

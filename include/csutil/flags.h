@@ -19,6 +19,10 @@
 #ifndef __CS_FLAGS_H__
 #define __CS_FLAGS_H__
 
+/**\file
+ * Set of flags
+ */
+
 #include "csextern.h"
 
 /**

@@ -19,6 +19,10 @@
 #ifndef __CS_SCHEDULE_H__
 #define __CS_SCHEDULE_H__
 
+/**\file
+ * Timer support
+ */
+
 #include "csextern.h"
 
 class csSchedulePart;
@@ -27,31 +31,32 @@ class csSchedulePart;
  * The csSchedule class provides an easy way to get timers in applications.
  * It can handle both repeating and single-shot callbacks. It is useful
  * for handling time in 3D virtual worlds.
- * <p>
+ * 
  * Use it like this:
- * <PRE>
- * class myEntity {
+ * \code
+ * class myEntity 
+ * {
  *   public:
  *   virtual void Update();
  * };
- * </PRE>
- * <p>
+ * \endcode
+ * 
  * Suppose you have an object of class myEntity, which looks like a button
  * in your virtual world, and you want the button to blink. Calling Update
  * every NextFrame would look bad, and handling the timing yourself is
  * a hassle (and can be lots slower then mass-handling by csSchedule). So
  * you can use the csSchedule to call the myEntity::Update method every
  * second.
- * <p>
+ * 
  * You can do it this way:
- * <PRE>
+ * \code
  * void call_entity_update(void *arg)
  * {
  *   myEntity *mp = (myEntity*)arg;
  *   mp->Update();
  * }
- * </PRE>
- * <p>
+ * \endcode
+ * 
  * You would then use the csSchedule method
  *   AddCallback(call_entity_update, (void*)my_entity, 1000);
  * to have it call the function with the object pointer as argument after
@@ -59,11 +64,11 @@ class csSchedulePart;
  * or you can use:
  *   AddRepeatCallback(call_entity_update, (void*)my_entity, 1000);
  * to have the function called repeatedly, every 1000 msec (= second).
- * <p>
+ * 
  * To notify the schedule that time has passed, each frame, for example
  * in the NextFrame() method, you must call the TimePassed(elapsed_time)
  * function.
- * <p>
+ * 
  * This class is useful for callbacks in 3D virtual worlds, but the callbacks
  * can have some jitter due to framerates.  For mission-critical hardware IO
  * calls (like controlling a floppy drive or controlling the UART) this jitter

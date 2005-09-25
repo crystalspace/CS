@@ -19,6 +19,10 @@
 #ifndef __CS_STRINGREADER_H__
 #define __CS_STRINGREADER_H__
 
+/**\file
+ * Line-by-line reader
+ */
+
 #include "csutil/csstring.h"
 
 /**

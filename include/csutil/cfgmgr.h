@@ -20,7 +20,7 @@
 #define __CS_CFGMGR_H__
 
 /**\file
- * iConfigManager implementation
+ * Implementation for iConfigManager 
  */
 
 #include "csextern.h"

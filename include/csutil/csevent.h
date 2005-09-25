@@ -32,7 +32,7 @@
 class csEventQueue;
 
 /**\file
- * iEvent implementation
+ * Implementation for iEvent
  */
 
 class csEventAttributeIterator;

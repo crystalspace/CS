@@ -20,6 +20,7 @@
 #define __CS_IENGINE_SHAREVAR_H__
 
 /**\file
+ * Shared variables
  */
 /**
  * \addtogroup engine3d

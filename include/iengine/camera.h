@@ -20,6 +20,7 @@
 #define __CS_IENGINE_CAMERA_H__
 
 /** \file
+ * Camera object
  */
 
 /**
@@ -65,38 +66,33 @@ struct iCameraSectorListener : public iBase
 /**
  * Camera class. This class represents camera objects which can be used to
  * render a world in the engine. A camera has the following properties:
- * <ul>
- * <li> Home sector: The sector in which rendering starts.
- * <li> Transformation: This is an orthonormal transformation which is applied
- *      to all rendered objects to move them from world space to camera space.
- *      It is the mathematical representation of position and direction of the
- *      camera. The position should be inside the home sector.
- * <li> Field of View: Controls the size on screen of the rendered objects and
- *      can be used for zooming effects. The FOV can be given either in pixels
- *      or as an angle in degrees.
- * <li> Shift amount: The projection center in screen coordinates.
- * <li> Mirrored Flag: Should be set to true if the transformation is mirrored.
- * <li> Far Plane: A distant plane that is orthogonal to the view direction. It
- *      is used to clip away all objects that are farther away than a certain
- *      distance, usually to improve rendering speed.
- * <li> Camera number: An identifier for a camera transformation, used
- *      internally in the engine to detect outdated vertex buffers.
- * <li> Only Portals Flag: If this is true then no collisions are detected for
- *      camera movement except for portals.
- * </ul>
- * <p>
+ * - Home sector: The sector in which rendering starts.
+ * - Transformation: This is an orthonormal transformation which is applied
+ *   to all rendered objects to move them from world space to camera space.
+ *   It is the mathematical representation of position and direction of the
+ *   camera. The position should be inside the home sector.
+ * - Field of View: Controls the size on screen of the rendered objects and
+ *   can be used for zooming effects. The FOV can be given either in pixels
+ *   or as an angle in degrees.
+ * - Shift amount: The projection center in screen coordinates.
+ * - Mirrored Flag: Should be set to true if the transformation is mirrored.
+ * - Far Plane: A distant plane that is orthogonal to the view direction. It
+ *   is used to clip away all objects that are farther away than a certain
+ *   distance, usually to improve rendering speed.
+ * - Camera number: An identifier for a camera transformation, used
+ *   internally in the engine to detect outdated vertex buffers.
+ * - Only Portals Flag: If this is true then no collisions are detected for
+ *   camera movement except for portals.
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iEngine::CreateCamera()
- *   </ul>
+ * - iEngine::CreateCamera()
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iView::GetCamera()
- *   </ul>
+ * - iView::GetCamera()
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>csView and iView
- *   </ul>
+ * - csView
+ * - iView
  */
 struct iCamera : public virtual iBase
 {

@@ -24,7 +24,7 @@
 #include "ivideo/shader/shader.h"
 
 /**\file
- * Generic render step.
+ * Render step base interface.
  */
 
 /**\addtogroup engine3d_rloop

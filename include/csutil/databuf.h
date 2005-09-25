@@ -20,6 +20,10 @@
 #ifndef __CS_DATABUF_H__
 #define __CS_DATABUF_H__
 
+/**\file
+ * Implementation for iDataBuffer
+ */
+
 #include "csextern.h"
 #include "iutil/databuff.h"
 

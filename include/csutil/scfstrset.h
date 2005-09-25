@@ -19,6 +19,10 @@
 #ifndef __CS_SCFSTRSET_H__
 #define __CS_SCFSTRSET_H__
 
+/**\file
+ * Implementation for iStringSet
+ */
+
 #include "csextern.h"
 #include "iutil/strset.h"
 #include "strset.h"

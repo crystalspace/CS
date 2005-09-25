@@ -20,6 +20,10 @@
 #ifndef __CS_ZIP_H__
 #define __CS_ZIP_H__
 
+/**\file
+ * ZIP file format
+ */
+
 #if defined(__cplusplus) && !defined(CS_COMPILER_BCC)
 extern "C" {
 #endif

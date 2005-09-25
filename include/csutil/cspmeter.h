@@ -20,6 +20,10 @@
 #ifndef __CS_CSPMETER_H__
 #define __CS_CSPMETER_H__
 
+/**\file
+ * Text progress meter
+ */
+
 #include "csextern.h"
 #include "ivaria/pmeter.h"
 

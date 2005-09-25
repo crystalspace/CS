@@ -21,7 +21,7 @@
 #define __CS_UTIL_CFGDOC_H__
 
 /**\file
- * iConfigFile implementation for configurations stored in documents.
+ * Implementation for iConfigFile with configurations stored in iDocuments.
  */
 
 #include "csextern.h"

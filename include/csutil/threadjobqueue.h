@@ -21,7 +21,7 @@
 #define __CS_CSUTIL_THREADJOBQUEUE_H__
 
 /**\file
- * iJobQueue implementation that lets the jobs run in a thread.
+ * Implementation of iJobQueue that lets the jobs run in a thread.
  */
 
 #include "csextern.h"

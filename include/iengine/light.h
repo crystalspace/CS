@@ -21,6 +21,7 @@
 #define __CS_IENGINE_LIGHT_H__
 
 /**\file
+ * Light interfaces
  */
 /**
  * \addtogroup engine3d_light

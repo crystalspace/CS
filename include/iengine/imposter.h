@@ -21,6 +21,7 @@
 
 
 /**\file
+ * Imposter interface
  */
 /**
  * \addtogroup engine3d

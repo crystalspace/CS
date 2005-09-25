@@ -21,7 +21,7 @@
 #define __CS_CSUTIL_FIFO_H__
 
 /**\file
- * A FIFO.
+ * FIFO
  */
 
 #include "csutil/array.h"

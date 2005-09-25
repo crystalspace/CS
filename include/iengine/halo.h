@@ -20,6 +20,7 @@
 #define __CS_IENGINE_HALO_H__
 
 /**\file
+ * Halo interfaces
  */
 /**
  * \addtogroup engine3d_light

@@ -24,6 +24,7 @@
 #include "csutil/csunicode.h"
 
 /**\file
+ * Miscellaneous utilities
  */
 
 /**\addtogroup util

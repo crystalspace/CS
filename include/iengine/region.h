@@ -21,6 +21,7 @@
 #define __CS_IENGINE_REGION_H__
 
 /**\file
+ * Engine regions
  */
 /**
  * \addtogroup engine3d

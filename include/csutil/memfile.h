@@ -19,6 +19,10 @@
 #ifndef __CS_MEMFILE_H__
 #define __CS_MEMFILE_H__
 
+/**\file
+ * File interface to memory buffer
+ */
+
 #include "csextern.h"
 #include "iutil/vfs.h"
 

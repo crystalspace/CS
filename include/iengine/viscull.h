@@ -21,6 +21,7 @@
 #define __CS_IENGINE_VISCULL_H__
 
 /**\file
+ * Visibility culling
  */
 /**
  * \addtogroup engine3d_vis
