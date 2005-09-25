@@ -36,6 +36,8 @@ chronological order.
 	- res removed csDataStream since it overlapped with csMemFile; the
 	  conveniance functions have been moved to csFileReadHelper.
 	- res moved csVideoPreferences into the simpvs app.
+	- mdmkolbe fixed some inheritance ambiguity warnings due to virtual
+	  inheritance from iBase.
 24-Sep-2005
 	- Jorrit fixed dependencies in the loader. It now also depends on
 	  new sound loader and renderer.

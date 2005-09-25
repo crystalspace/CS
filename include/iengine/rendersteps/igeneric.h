@@ -33,13 +33,13 @@
 
 struct iShader;
 
-SCF_VERSION (iGenericRenderStep, 0, 0, 3);
-
 /**
  * A generic render step.
  */
-struct iGenericRenderStep : public iBase
+struct iGenericRenderStep : public virtual iBase
 {
+  SCF_INTERFACE (iGenericRenderStep, 2, 0, 0);
+
   /// Set shader type.
   virtual void SetShaderType (const char* type) = 0;
   /// Get shader type.

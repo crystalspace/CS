@@ -33,11 +33,11 @@
 struct iRenderView;
 struct iSector;
 
-SCF_VERSION (iRenderStep, 0, 0, 1);
-
 /// Document me!@@@
-struct iRenderStep : public iBase
+struct iRenderStep : public virtual iBase
 {
+  SCF_INTERFACE (iRenderStep, 2, 0, 0);
+
   virtual void Perform (iRenderView* rview, iSector* sector,
     csShaderVarStack &stacks) = 0;
 };

@@ -36,18 +36,17 @@ struct iSector;
 /**\addtogroup engine3d_rloop
  * @{ */
 
-SCF_VERSION (iLightIterRenderStep, 0, 0, 1);
-
 /// Document me!@@@
-struct iLightIterRenderStep : public iBase
+struct iLightIterRenderStep : public virtual iBase
 {
+  SCF_INTERFACE (iLightIterRenderStep, 2, 0, 0);
 };
 
-SCF_VERSION (iLightRenderStep, 0, 0, 1);
-
 /// Document me!@@@
-struct iLightRenderStep : public iBase
+struct iLightRenderStep : public virtual iBase
 {
+  SCF_INTERFACE (iLightRenderStep, 2, 0, 0);
+
   virtual void Perform (iRenderView* rview, iSector* sector,
     iLight* light, csShaderVarStack &stacks) = 0;
 };

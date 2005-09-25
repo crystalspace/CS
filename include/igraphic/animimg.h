@@ -33,13 +33,13 @@
 
 class csRect;
 
-SCF_VERSION (iAnimatedImage, 0, 0, 1);
-
 /**
  * If an image file has animation capabilities, this interface is exhibited.
  */
-struct iAnimatedImage : public iBase
+struct iAnimatedImage : public virtual iBase
 {
+  SCF_INTERFACE (iAnimatedImage, 2, 0, 0);
+
   /**
    * Update the image data.
    * \param time Time that passed since the last call to Animate().

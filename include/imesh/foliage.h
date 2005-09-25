@@ -84,15 +84,15 @@ struct iFoliageGeometry : public iBase
   virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
 };
 
-SCF_VERSION (iFoliageObject, 0, 0, 1);
-
 /**
  * A representation of an object in the foliage mesh.
  * An object represents geometry at different LOD levels (using
  * iFoliageGeometry).
  */
-struct iFoliageObject : public iBase
+struct iFoliageObject : public virtual iBase
 {
+  SCF_INTERFACE (iFoliageObject, 2, 0, 0);
+
   /**
    * Get the name of this object.
    */

@@ -26,8 +26,6 @@ struct iLight;
 
 class csColor;
 
-SCF_VERSION (iLightingInfo, 0, 3, 0);
-
 /**
  * This interface is implemented by mesh objects that have some kind
  * of lighting system. It has features to initialize lighting, to read
@@ -46,8 +44,10 @@ SCF_VERSION (iLightingInfo, 0, 3, 0);
  *   <li>The 3D engine plugin (crystalspace.engine.3d).
  *   </ul>
  */
-struct iLightingInfo : public iBase
+struct iLightingInfo : public virtual iBase
 {
+  SCF_INTERFACE (iLightingInfo, 2, 0, 0);
+
   /**
    * Initialize the lighting information to some default (mostly black).
    * If clear is true then the lighting is really cleared to black. Otherwise
