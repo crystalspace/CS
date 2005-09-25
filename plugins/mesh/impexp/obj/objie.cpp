@@ -23,7 +23,8 @@
 #include "cstool/mdldata.h"
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
-#include "csutil/datastrm.h"
+#include "csutil/filereadhelper.h"
+#include "csutil/memfile.h"
 #include "csutil/objiter.h"
 #include "imesh/mdlconv.h"
 #include "iutil/comp.h"
@@ -108,7 +109,9 @@ const csModelConverterFormat *csModelConverterOBJ::GetFormat (size_t idx)
 csPtr<iModelData> csModelConverterOBJ::Load (uint8 *Buffer, size_t Size)
 {
   // prepare input buffer
-  csDataStream in (Buffer, Size, false);
+  csRef<iFile> file;
+  file.AttachNew (new csMemFile ((const char*)Buffer, Size));
+  csFileReadHelper in (file);
   char line [2048], token [64], *params;
   int tokenlen;
 
@@ -119,7 +122,7 @@ csPtr<iModelData> csModelConverterOBJ::Load (uint8 *Buffer, size_t Size)
   iModelDataVertices *Vertices = new csModelDataVertices ();
   Object->SetDefaultVertices (Vertices);
 
-  while (!in.Finished ())
+  while (!in.GetFile()->AtEOF())
   {
     // read a line
     in.GetString (line, 2048);
@@ -232,9 +235,11 @@ csPtr<iModelData> csModelConverterOBJ::Load (uint8 *Buffer, size_t Size)
     else if (!strcasecmp (token, "F"))
     {
       iModelDataPolygon *poly = new csModelDataPolygon ();
-      csDataStream Params (params, (int)strlen (params), false);
+      csRef<iFile> file;
+      file.AttachNew (new csMemFile ((const char*)params, strlen (params)));
+      csFileReadHelper Params (file);
 
-      while (!Params.Finished ())
+      while (!Params.GetFile()->AtEOF())
       {
 	char sep;
         int vidx = Params.ReadTextInt (), nidx = 0, tidx = 0;

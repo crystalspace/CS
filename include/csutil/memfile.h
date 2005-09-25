@@ -49,8 +49,22 @@ public:
   csMemFile();
   /// Construct a memory file from an existing memory buffer but do not free.
   csMemFile(const char*, size_t);
-  /// Construct a memory file from an existing memory buffer and free later.
+  /**
+   * Construct a memory file from an existing memory buffer and free later.
+   * Note that when writing to the buffer, the original buffer may be 
+   * discarded and a new one created due required resizing.
+   */
   csMemFile(char*, size_t, Disposition = DISPOSITION_DELETE);
+  /**
+   * Construct a memory file from an existing data buffer.
+   * \param buf The data buffer to use.
+   * \param readOnly Whether to treat the buffer as read-only. If \p true,
+   *  writing to the memory file will create a copy of the buffer. If 
+   *  \p false, changes will affect the buffer. Note that when writing to the
+   *  buffer, the original buffer may be discarded and a new one created due
+   *  required resizing.
+   */
+  csMemFile(iDataBuffer* buf, bool readOnly);
   /// Destructor
   virtual ~csMemFile();
 
@@ -76,10 +90,9 @@ public:
 
   /**
    * Get entire file data in one go.
-   * Creates a copy of the data, so changing the file won't affect any
-   * buffers previously returned by this function. 
+   * Changing the file won't affect buffers returned by this function. 
    */
-  virtual csPtr<iDataBuffer> GetAllData(bool nullterm = false);
+  virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
   /**
    * Returns a pointer to the memory buffer.  May return 0 if memory file
    * is empty.  Use GetSize() for size info.
@@ -89,12 +102,10 @@ public:
   SCF_DECLARE_IBASE;
 
 protected:
-  Disposition disposition;
-  char* buffer;
-  size_t capacity;
+  csRef<iDataBuffer> buffer;
   size_t size;
   size_t cursor;
-  virtual void FreeBuffer();
+  bool copyOnWrite;
 };
 
 #endif // __CS_MEMFILE_H__

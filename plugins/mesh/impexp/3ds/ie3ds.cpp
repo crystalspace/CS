@@ -26,8 +26,8 @@
 #include "csgeom/vector2.h"
 #include "cstool/mdldata.h"
 #include "csutil/csstring.h"
-#include "csutil/datastrm.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/memfile.h"
 #include "csutil/parray.h"
 #include "imesh/mdldata.h"
 #include "iutil/comp.h"
@@ -71,7 +71,7 @@ static Lib3dsBool DataErrorFunc( void * )
 
 static long DataSeekFunc( void *self, long offset, Lib3dsIoSeek origin )
 {
-  csDataStream *pData = (csDataStream*)self;
+  iFile *pData = (iFile*)self;
 
   size_t newOffs = offset;
   switch (origin)
@@ -79,37 +79,37 @@ static long DataSeekFunc( void *self, long offset, Lib3dsIoSeek origin )
     case LIB3DS_SEEK_SET:
       break;
     case LIB3DS_SEEK_CUR:
-      newOffs += pData->GetPosition();
+      newOffs += pData->GetPos();
       break;
     case LIB3DS_SEEK_END:
-      newOffs = pData->GetLength();
+      newOffs = pData->GetSize();
       break;
     default:
       return 1;
   }
-  pData->SetPosition (newOffs);
+  pData->SetPos (newOffs);
   return 0;
 }
 
 
 static long DataTellFunc( void *self )
 {
-  csDataStream *pData = (csDataStream*)self;
-  return (long)pData->GetPosition();
+  iFile* pData = (iFile*)self;
+  return (long)pData->GetPos();
 }
 
 
 static int DataReadFunc( void *self, Lib3dsByte *buffer, int size )
 {
-  csDataStream *pData = (csDataStream*)self;
-  return (int)pData->Read( buffer, size );
+  iFile* pData = (iFile*)self;
+  return (int)pData->Read ((char*)buffer, size );
 }
 
 
 static int DataWriteFunc( void* /*self*/, const Lib3dsByte* /*buffer*/,
 	int /*size*/ )
 {
-  //  csDataStream *pData = (csDataStream*)self;
+  //  iFile* pData = (iFile*)self;
 
   // not yet implemented
   return 0;
@@ -583,14 +583,14 @@ Lib3dsFile *csModelConverter3ds::LoadFileData( uint8* pBuffer, size_t size )
   // This code is pulled from lib3ds
   Lib3dsFile *pFile;
   Lib3dsIo *pLibIO;
-  csDataStream *pData;
+  csRef<iFile> pData;
 
   pFile = lib3ds_file_new();
   if( !pFile )
     return 0;
 
   // create a data stream from the buffer and don't delete it
-  pData = new csDataStream( pBuffer, size, false );
+  pData.AttachNew (new csMemFile ((const char*)pBuffer, size));
 
   pLibIO = lib3ds_io_new(
     pData,

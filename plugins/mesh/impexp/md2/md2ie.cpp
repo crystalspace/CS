@@ -22,7 +22,8 @@
 #include "cstool/mdldata.h"
 #include "csutil/csendian.h"
 #include "csutil/csstring.h"
-#include "csutil/datastrm.h"
+#include "csutil/filereadhelper.h"
+#include "csutil/memfile.h"
 #include "csutil/nobjvec.h"
 #include "csutil/parray.h"
 #include "csutil/util.h"
@@ -166,7 +167,7 @@ const csModelConverterFormat *csModelConverterMD2::GetFormat (size_t idx)
   Modified by Martin Geisse to work with the new converter system.
 */
 
-static bool CheckMD2Version (csDataStream &in)
+static bool CheckMD2Version (csFileReadHelper& in)
 {
   // Read in header and check for a correct file.  The
   // header consists of two longs, containing
@@ -190,10 +191,10 @@ static bool CheckMD2Version (csDataStream &in)
 #define CS_MD2_READ(num,name)						\
   hdr->name = csGetLittleEndianLong (buf + num * SIZEOF_MD2LONG);
 
-static void ReadMD2Header (csMD2Header *hdr, csDataStream *in)
+static void ReadMD2Header (csMD2Header *hdr, csFileReadHelper* in)
 {
   char buf [SIZEOF_MD2HEADER];
-  in->Read (buf, SIZEOF_MD2HEADER);
+  in->GetFile()->Read (buf, SIZEOF_MD2HEADER);
 
   CS_MD2_READ (0, SkinWidth);
   CS_MD2_READ (1, SkinHeight);
@@ -225,7 +226,9 @@ static void extractActionName (const char * str, char * act)
 csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, size_t Size)
 {
   // prepare input buffer
-  csDataStream in (Buffer, Size, false);
+  csRef<iFile> file;
+  file.AttachNew (new csMemFile ((const char*)Buffer, Size));
+  csFileReadHelper in (file);
   uint8 readbuffer[MAX_DATAELEMENT_SIZE];
   int i,j;
 
@@ -245,11 +248,11 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, size_t Size)
   // read in texmap (skin) names - skin names are 64 bytes long
   // Unused
   csStringVector SkinNames;
-  in.SetPosition (Header.SkinOffset);
+  in.GetFile()->SetPos (Header.SkinOffset);
   for (i = 0; i < Header.SkinCount; i++)
   {
     char name[SIZEOF_MD2SKINNAME];
-    in.Read (name, SIZEOF_MD2SKINNAME);
+    in.GetFile()->Read (name, SIZEOF_MD2SKINNAME);
     csString *s = new csString (name);
     SkinNames.Push (s);
   }
@@ -260,10 +263,10 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, size_t Size)
   // The only data we read here
   // are the static texture map (uv) locations for each vertex!
   csVector2 *Texels = new csVector2 [Header.TexelCount];
-  in.SetPosition (Header.TexelOffset);
+  in.GetFile()->SetPos (Header.TexelOffset);
   for (i = 0; i < Header.TexelCount; i++)
   {
-    in.Read (readbuffer, SIZEOF_MD2SHORT*2);
+    in.GetFile()->Read ((char*)readbuffer, SIZEOF_MD2SHORT*2);
     Texels [i].Set (csGetLittleEndianShort(readbuffer)/(float)Header.SkinWidth,
                     csGetLittleEndianShort(readbuffer+2)/(float)Header.SkinHeight);
   }
@@ -274,13 +277,13 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, size_t Size)
   // There are actually two set of indices in the original quake file;
   // one indexes into the xyz coordinate table, the other indexes into
   // the uv texture coordinate table.
-  in.SetPosition (Header.TriangleOffset);
+  in.GetFile()->SetPos (Header.TriangleOffset);
   for (i = 0; i < Header.TriangleCount; i++)
   {
     iModelDataPolygon *Polygon = new csModelDataPolygon ();
     Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
 
-    in.Read (readbuffer, SIZEOF_MD2SHORT*6);
+    in.GetFile()->Read ((char*)readbuffer, SIZEOF_MD2SHORT*6);
     for (j = 0; j < 3; j++)
     {
       short xyzindex = csGetLittleEndianShort (readbuffer + j * SIZEOF_MD2SHORT);
@@ -304,8 +307,8 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, size_t Size)
   {
     csVector3 scale, translate;
     // read in scale and translate info
-    in.Read (&scale, SIZEOF_MD2FLOAT*3);
-    in.Read (&translate, SIZEOF_MD2FLOAT*3);
+    in.GetFile()->Read ((char*)&scale, SIZEOF_MD2FLOAT*3);
+    in.GetFile()->Read ((char*)&translate, SIZEOF_MD2FLOAT*3);
     for (j = 0; j < 3; j++)
     {
       scale[j] = csConvertEndian (scale[j]);
@@ -317,7 +320,7 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, size_t Size)
     // name of this frame
     char FrameName [SIZEOF_MD2FRAMENAME+1];
     char ActionName [SIZEOF_MD2FRAMENAME+1];
-    in.Read (FrameName, SIZEOF_MD2FRAMENAME);
+    in.GetFile()->Read (FrameName, SIZEOF_MD2FRAMENAME);
     FrameName [SIZEOF_MD2FRAMENAME] = 0;
     extractActionName (FrameName, ActionName);
     if (strcmp (ActionName, currAction))
@@ -330,7 +333,7 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, size_t Size)
     }
 
     // read in vertex coordinate data for the frame
-    in.Read (readbuffer, 4*Header.VertexCount);
+    in.GetFile()->Read ((char*)readbuffer, 4*Header.VertexCount);
 
     iModelDataVertices *VertexFrame = new csModelDataVertices ();
     action->AddFrame (time, VertexFrame->QueryObject ());

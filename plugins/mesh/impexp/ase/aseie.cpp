@@ -26,16 +26,17 @@
 #include "cstool/mdldata.h"
 #include "cstool/mdltool.h"
 #include "csutil/csstring.h"
-#include "csutil/objiter.h"
 #include "csutil/databuf.h"
-#include "csutil/datastrm.h"
+#include "csutil/filereadhelper.h"
+#include "csutil/memfile.h"
 #include "csutil/nobjvec.h"
+#include "csutil/objiter.h"
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
 
 typedef bool (csASEInterpreter) (class csModelConverterASE *conv,
-				 csDataStream &in, const char *Token);
+				 csFileReadHelper &in, const char *Token);
 
 class csModelConverterASE : public iModelConverter
 {
@@ -133,13 +134,13 @@ const csModelConverterFormat *csModelConverterASE::GetFormat (size_t idx)
 }
 
 // Load a single word from the stream
-static bool csASEReadWord (csDataStream &str, char *buf, int max)
+static bool csASEReadWord (csFileReadHelper &str, char *buf, int max)
 {
   int count = 0;
   bool quoted = false;
   str.SkipWhitespace ();
 
-  if (str.Finished ()) return false;
+  if (str.GetFile()->AtEOF ()) return false;
 
   // look if this word is enclosed in double quotes
   if (str.LookChar () == '"') {
@@ -201,7 +202,7 @@ csASEInterpreter csASEInterpreter_MESH_CVERTLIST;
 csASEInterpreter csASEInterpreter_MESH_TFACELIST;
 csASEInterpreter csASEInterpreter_MESH_TVERTLIST;
 
-bool csASEInterpreter_MAIN (csModelConverterASE *conv, csDataStream &in,
+bool csASEInterpreter_MAIN (csModelConverterASE *conv, csFileReadHelper& in,
   const char *Token)
 {
   CS_ASE_READ_IGNORE ("*3DSMAX_ASCIIEXPORT");
@@ -225,7 +226,7 @@ bool csASEInterpreter_MAIN (csModelConverterASE *conv, csDataStream &in,
   return false;
 }
 
-bool csASEInterpreter_SCENE (csModelConverterASE *conv, csDataStream &/*in*/,
+bool csASEInterpreter_SCENE (csModelConverterASE *conv, csFileReadHelper&/*in*/,
   const char *Token)
 {
   CS_ASE_READ_IGNORE ("*SCENE_AMBIENT_STATIC");
@@ -240,7 +241,7 @@ bool csASEInterpreter_SCENE (csModelConverterASE *conv, csDataStream &/*in*/,
   return false;
 }
 
-bool csASEInterpreter_GEOMOBJECT (csModelConverterASE *conv, csDataStream &in,
+bool csASEInterpreter_GEOMOBJECT (csModelConverterASE *conv, csFileReadHelper& in,
   const char *Token)
 {
   CS_ASE_READ_IGNORE ("*NODE_NAME");
@@ -273,7 +274,7 @@ bool csASEInterpreter_GEOMOBJECT (csModelConverterASE *conv, csDataStream &in,
   return false;
 }
 
-bool csASEInterpreter_MESH (csModelConverterASE *conv, csDataStream &in,
+bool csASEInterpreter_MESH (csModelConverterASE *conv, csFileReadHelper& in,
   const char *Token)
 {
   CS_ASE_SUBSECTION ("*MESH_CFACELIST", csASEInterpreter_MESH_CFACELIST);
@@ -296,7 +297,7 @@ bool csASEInterpreter_MESH (csModelConverterASE *conv, csDataStream &in,
   return false;
 }
 
-bool csASEInterpreter_NODE_TM (csModelConverterASE *conv, csDataStream &in,
+bool csASEInterpreter_NODE_TM (csModelConverterASE *conv, csFileReadHelper& in,
   const char *Token)
 {
   CS_ASE_READ_IGNORE ("*INHERIT_POS");
@@ -340,7 +341,7 @@ bool csASEInterpreter_NODE_TM (csModelConverterASE *conv, csDataStream &in,
 }
 
 bool csASEInterpreter_MESH_VERTEX_LIST (csModelConverterASE *conv,
-					csDataStream &in, const char *Token)
+					csFileReadHelper& in, const char *Token)
 {
   if (CS_ASE_CHECK_TOKEN ("*MESH_VERTEX"))
   {
@@ -358,7 +359,7 @@ bool csASEInterpreter_MESH_VERTEX_LIST (csModelConverterASE *conv,
 }
 
 bool csASEInterpreter_MESH_FACE_LIST (csModelConverterASE *conv,
-				      csDataStream &in, const char *Token)
+				      csFileReadHelper& in, const char *Token)
 {
   if (CS_ASE_CHECK_TOKEN ("*MESH_FACE"))
   {
@@ -369,7 +370,7 @@ bool csASEInterpreter_MESH_FACE_LIST (csModelConverterASE *conv,
     csASEReadWord (in, Token2, 256);
 
     // loop through the remaining words
-    while (!in.Finished ()) {
+    while (!in.GetFile()->AtEOF ()) {
       csASEReadWord (in, Token2, 256);
       int Param = in.ReadTextInt ();
 
@@ -400,7 +401,7 @@ bool csASEInterpreter_MESH_FACE_LIST (csModelConverterASE *conv,
 }
 
 bool csASEInterpreter_MESH_NORMALS (csModelConverterASE *conv,
-				    csDataStream &in, const char *Token)
+				    csFileReadHelper& in, const char *Token)
 {
   if (CS_ASE_CHECK_TOKEN ("*MESH_FACENORMAL"))
   {
@@ -432,7 +433,7 @@ bool csASEInterpreter_MESH_NORMALS (csModelConverterASE *conv,
 }
 
 bool csASEInterpreter_MESH_CFACELIST (csModelConverterASE *conv,
-  csDataStream &/*in*/, const char *Token)
+  csFileReadHelper&/*in*/, const char *Token)
 {
   CS_ASE_READ_IGNORE ("*MESH_CFACE");
 
@@ -441,7 +442,7 @@ bool csASEInterpreter_MESH_CFACELIST (csModelConverterASE *conv,
 }
 
 bool csASEInterpreter_MESH_CVERTLIST (csModelConverterASE *conv,
-				      csDataStream &in, const char *Token)
+				      csFileReadHelper& in, const char *Token)
 {
   if (CS_ASE_CHECK_TOKEN ("*MESH_VERTCOL"))
   {
@@ -459,7 +460,7 @@ bool csASEInterpreter_MESH_CVERTLIST (csModelConverterASE *conv,
 }
 
 bool csASEInterpreter_MESH_TFACELIST (csModelConverterASE *conv,
-				      csDataStream &/*in*/, const char *Token)
+				      csFileReadHelper&/*in*/, const char *Token)
 {
   CS_ASE_READ_IGNORE ("*MESH_TFACE");
 
@@ -468,7 +469,7 @@ bool csASEInterpreter_MESH_TFACELIST (csModelConverterASE *conv,
 }
 
 bool csASEInterpreter_MESH_TVERTLIST (csModelConverterASE *conv,
-				      csDataStream &in, const char *Token)
+				      csFileReadHelper&in, const char *Token)
 {
   if (CS_ASE_CHECK_TOKEN ("*MESH_TVERT"))
   {
@@ -486,14 +487,16 @@ bool csASEInterpreter_MESH_TVERTLIST (csModelConverterASE *conv,
 
 csPtr<iModelData> csModelConverterASE::Load (uint8 *Buffer, size_t Size)
 {
-  csDataStream in (Buffer, Size, false);
+  csRef<iFile> file;
+  file.AttachNew (new csMemFile ((const char*)Buffer, Size));
+  csFileReadHelper in (file);
   interp = &csASEInterpreter_MAIN;
   Scene = new csModelData ();
   Object = 0;
   Vertices = 0;
   CurrentPolygon = 0;
 
-  while (!in.Finished ())
+  while (!file->AtEOF ())
   {
     // read a line of text
     char line [2048];
@@ -507,7 +510,9 @@ csPtr<iModelData> csModelConverterASE::Load (uint8 *Buffer, size_t Size)
     line [linelen] = 0;
 
     // create a separate stream for the line
-    csDataStream Line (line, linelen, false);
+    csRef<iFile> linefile;
+    linefile.AttachNew (new csMemFile ((const char*)line, linelen));
+    csFileReadHelper Line (linefile);
 
     // read the first word
     char Token [256];

@@ -21,8 +21,9 @@
 #include "csgeom/vector2.h"
 #include "cstool/mdldata.h"
 #include "csutil/csstring.h"
-#include "csutil/datastrm.h"
+#include "csutil/filereadhelper.h"
 #include "csutil/nobjvec.h"
+#include "csutil/memfile.h"
 #include "imesh/mdlconv.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
@@ -158,7 +159,7 @@ const csModelConverterFormat *csModelConverterMDL::GetFormat (size_t idx)
   Modified by Martin Geisse to work with the new converter system.
 */
 
-static bool CheckMDLVersion (csDataStream &in)
+static bool CheckMDLVersion (csFileReadHelper &in)
 {
   // Read in header and check for a correct file.  The
   // header consists of two longs, containing
@@ -187,10 +188,10 @@ static bool CheckMDLVersion (csDataStream &in)
   hdr->name = csConvertEndian(*((float*)(buf + Position)));		\
   Position += SIZEOF_MDLFLOAT;
 
-static void ReadMDLHeader (csMDLHeader *hdr, csDataStream *in)
+static void ReadMDLHeader (csMDLHeader *hdr, csFileReadHelper *in)
 {
   char buf [SIZEOF_MDLHEADER];
-  in->Read (buf, SIZEOF_MDLHEADER);
+  in->GetFile()->Read (buf, SIZEOF_MDLHEADER);
   int Position = 0;
 
   CS_MDL_READ_FLOAT (Scale.x);
@@ -219,7 +220,9 @@ static void ReadMDLHeader (csMDLHeader *hdr, csDataStream *in)
 csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, size_t Size)
 {
   // prepare input buffer
-  csDataStream in (Buffer, Size, false);
+  csRef<iFile> file;
+  file.AttachNew (new csMemFile ((const char*)Buffer, Size));
+  csFileReadHelper in (file);
   unsigned char Readbuffer[MAX_DATAELEMENT_SIZE];
   int i,j,k;
 
@@ -239,13 +242,13 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, size_t Size)
   // skip skin data
   for (i=0; i<Header.SkinCount; i++)
   {
-    in.Read (Readbuffer, SIZEOF_MDLLONG);
+    in.GetFile()->Read ((char*)Readbuffer, SIZEOF_MDLLONG);
     int Type = csGetLittleEndianLong (Readbuffer);
     if (Type == 0) {
       // single skin
       in.Skip (Header.SkinWidth * Header.SkinHeight);
     } else if (Type == 1) {
-      in.Read (Readbuffer, SIZEOF_MDLLONG);
+      in.GetFile()->Read ((char*)Readbuffer, SIZEOF_MDLLONG);
       int MultiskinCount = csGetLittleEndianLong (Readbuffer);
       for (j=0; j<MultiskinCount; j++)
         in.Skip (Header.SkinWidth * Header.SkinHeight);
@@ -271,7 +274,7 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, size_t Size)
 
   for (i=0; i<Header.VertexCount; i++)
   {
-    in.Read (Readbuffer, SIZEOF_MDLLONG * 3);
+    in.GetFile()->Read ((char*)Readbuffer, SIZEOF_MDLLONG * 3);
     int IsSeamVertex = csGetLittleEndianLong (Readbuffer);
     Texels [i].Set (
       csGetLittleEndianLong(Readbuffer + SIZEOF_MDLLONG) / (float)Header.SkinWidth,
@@ -288,7 +291,7 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, size_t Size)
     iModelDataPolygon *Polygon = new csModelDataPolygon ();
     Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
 
-    in.Read (Readbuffer, SIZEOF_MDLLONG * 4);
+    in.GetFile()->Read ((char*)Readbuffer, SIZEOF_MDLLONG * 4);
     int FrontPolygon = csGetLittleEndianLong (Readbuffer);
 
     for (j=2; j>=0; j--) {
@@ -309,13 +312,13 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, size_t Size)
   for (i=0; i<Header.ActionCount; i++)
   {
     int FrameCount;
-    in.Read (Readbuffer, SIZEOF_MDLLONG);
+    in.GetFile()->Read ((char*)Readbuffer, SIZEOF_MDLLONG);
     int ActionType = csGetLittleEndianLong (Readbuffer);
     if (ActionType == 0)
       FrameCount = 1;
     else
     {
-      in.Read (Readbuffer, SIZEOF_MDLLONG);
+      in.GetFile()->Read ((char*)Readbuffer, SIZEOF_MDLLONG);
       FrameCount = csGetLittleEndianLong (Readbuffer);
 
       // skip some stuff--general min/max, frame timings
@@ -343,12 +346,12 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, size_t Size)
 
       char framename[17];
       // get frame name
-      in.Read (framename, 16);
+      in.GetFile()->Read ((char*)framename, 16);
       framename[16] = 0;
       Vertices->QueryObject ()->SetName (framename);
 
       // read vertex positions
-      in.Read (Readbuffer, 4 * Header.VertexCount);
+      in.GetFile()->Read ((char*)Readbuffer, 4 * Header.VertexCount);
 
       // store vertex positions
       for (k=0; k<Header.VertexCount; k++) {

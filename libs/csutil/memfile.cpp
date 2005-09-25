@@ -17,16 +17,29 @@
 */
 
 #include "cssysdef.h"
+#include <stdlib.h>
 #include "csutil/memfile.h"
 #include "csutil/databuf.h"
-#include <stdlib.h>
+#include "csgeom/math.h"
+
+class csFreeDataBuffer : public csDataBuffer
+{
+public:
+  csFreeDataBuffer (char* data, size_t size) : 
+    csDataBuffer (data, size, false) { }
+  virtual ~csFreeDataBuffer()
+  {
+    free (csDataBuffer::GetData ());
+  }
+};
 
 SCF_IMPLEMENT_IBASE (csMemFile)
   SCF_IMPLEMENTS_INTERFACE (iFile)
 SCF_IMPLEMENT_IBASE_END
 
 const char* csMemFile::GetName() { return "#csMemFile"; }
-const char* csMemFile::GetData() const { return buffer; }
+const char* csMemFile::GetData() const 
+{ return buffer ? buffer->GetData() : 0; }
 size_t csMemFile::GetSize() { return size; }
 int csMemFile::GetStatus() { return VFS_STATUS_OK; }
 void csMemFile::Flush() {}
@@ -35,32 +48,40 @@ size_t csMemFile::GetPos() { return cursor; }
 bool csMemFile::SetPos(size_t p) { cursor = p < size ? p : size; return true; }
 
 csMemFile::csMemFile() :
-  disposition(DISPOSITION_FREE), buffer(0), capacity(0), size(0), cursor(0)
-  { SCF_CONSTRUCT_IBASE(0); }
+  size(0), cursor(0), copyOnWrite (true)
+{ 
+  SCF_CONSTRUCT_IBASE(0); 
+}
 
 csMemFile::csMemFile(const char* p, size_t s) :
-  disposition(DISPOSITION_IGNORE), buffer((char*)p), capacity(s), size(s),
-  cursor(0) { SCF_CONSTRUCT_IBASE(0); }
+  size(s), cursor(0), copyOnWrite (true)
+{ 
+  SCF_CONSTRUCT_IBASE(0); 
+  buffer.AttachNew (new csDataBuffer ((char*)p, s, false));
+}
 
 csMemFile::csMemFile(char* p, size_t s, Disposition d) :
-  disposition(d), buffer(p), capacity(s), size(s), cursor(0)
-  { SCF_CONSTRUCT_IBASE(0); }
+  size(s), cursor(0)
+{ 
+  SCF_CONSTRUCT_IBASE(0); 
+
+  if (d == DISPOSITION_FREE)
+    buffer.AttachNew (new csFreeDataBuffer (p, s));
+  else
+    buffer.AttachNew (new csDataBuffer ((char*)p, s, 
+      d == DISPOSITION_DELETE));
+}
+
+csMemFile::csMemFile(iDataBuffer* buf, bool readOnly) :
+  buffer(buf), size(buf ? buf->GetSize() : 0), cursor(0), 
+  copyOnWrite (readOnly)
+{
+  SCF_CONSTRUCT_IBASE(0); 
+}
 
 csMemFile::~csMemFile()
 {
-  FreeBuffer();
   SCF_DESTRUCT_IBASE ();
-}
-
-void csMemFile::FreeBuffer()
-{
-  if (buffer != 0)
-  {
-    if (disposition == DISPOSITION_DELETE)
-      delete[] buffer;
-    else if (disposition == DISPOSITION_FREE)
-      free(buffer);
-  }
 }
 
 size_t csMemFile::Read(char* Data, size_t DataSize)
@@ -68,7 +89,7 @@ size_t csMemFile::Read(char* Data, size_t DataSize)
   const size_t remaining = cursor < size ? size - cursor : 0;
   const size_t nbytes = DataSize < remaining ? DataSize : remaining;
   if (nbytes != 0)
-    memcpy(Data, buffer + cursor, nbytes);
+    memcpy (Data, buffer->GetData() + cursor, nbytes);
   cursor += nbytes;
   return nbytes;
 }
@@ -79,58 +100,53 @@ size_t csMemFile::Write(const char* Data, size_t DataSize)
   if (DataSize != 0 && Data != 0)
   {
     size_t new_cursor = cursor + DataSize;
+    size_t capacity = buffer ? buffer->GetSize() : 0;
     if (capacity < new_cursor)
     {
+      const size_t maxCapInc = 1024*1024;
+
       if (capacity == 0)
         capacity = 1024;
       while (capacity < new_cursor)
-        capacity <<= 1;
+        capacity += csMin (capacity, maxCapInc);
 
-      // make buffer bigger
-      char * new_buffer;
-      if (disposition == DISPOSITION_FREE)
-      {
-	//new_buffer = (char*) realloc((void*) buffer, capacity);
-	/*
-	  @@@ This lead to problems with relative large files (several MB)
-	  on VC. Using malloc()/free() instead of realloc() solved the
-	  problems.
-	 */
-
-	new_buffer = (char*) malloc(capacity);
-	if (!new_buffer)
-	    return 0;
-        if (buffer != 0)
-          memcpy(new_buffer, buffer, size);
-	free (buffer);
-      }
-      else
-      {
-	new_buffer = (char*) malloc(capacity);
-        if (buffer != 0)
-          memcpy(new_buffer, buffer, size);
-	else
-	  return 0;
-	FreeBuffer();
-      }  
-      buffer = new_buffer;
-      disposition = DISPOSITION_FREE;
+      copyOnWrite = true;
     }
-    memcpy(buffer + cursor, Data, DataSize);
+    if (copyOnWrite)
+    {
+      csRef<iDataBuffer> newBuf;
+      newBuf.AttachNew (new csDataBuffer (capacity));
+      if (buffer)
+	memcpy (newBuf->GetData(), buffer->GetData(), buffer->GetSize());
+      buffer = newBuf;
+    }
+
+    memcpy(buffer->GetData() + cursor, Data, DataSize);
     cursor = new_cursor;
     if (new_cursor > size)
       size = new_cursor;
     written = DataSize;
+
+    copyOnWrite = false;
   }
   return written;
 }
 
-csPtr<iDataBuffer> csMemFile::GetAllData(bool nullterm)
+csPtr<iDataBuffer> csMemFile::GetAllData (bool nullterm)
 {
-  char* data = new char [size + 1];
-  memcpy (data, buffer, size);
-  *(data + size) = 0;
-  iDataBuffer *db = new csDataBuffer (data, size);
-  return csPtr<iDataBuffer> (db);
+  if (nullterm)
+  {
+    char* data = new char [size + 1];
+    if (buffer)
+      memcpy (data, buffer->GetData(), size);
+    *(data + size) = 0;
+    iDataBuffer *db = new csDataBuffer (data, size);
+    return csPtr<iDataBuffer> (db);
+  }
+  else
+  {
+    copyOnWrite = true;
+    return csPtr<iDataBuffer> (buffer);
+  }
 }
 

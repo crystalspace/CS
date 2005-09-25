@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 2001 by Martin Geisse <mgeisse@gmx.net>
+    Copyright (C) 2001-2005 by Jorrit Tyberghein
+	      (C) 2001 by Martin Geisse
+	      (C) 2005 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,71 +18,64 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_DATASTRM_H__
-#define __CS_DATASTRM_H__
+#ifndef __CS_CSUTIL_FILEREADHELPER_H__
+#define __CS_CSUTIL_FILEREADHELPER_H__
 
 /**\file
- * Data buffer wrapper for stream-like access
+ * Convenience class for simple file element reading.
  */
-
+ 
 #include "csextern.h"
-
-struct iDataBuffer;
+#include "csutil/ref.h"
+#include "iutil/vfs.h"
 
 /**
- * This class can be used as a wrapper around a data buffer for easy
- * stream-like access.
+ * Convenience class for simple file element reading.
  */
-class CS_CRYSTALSPACE_EXPORT csDataStream
+class CS_CRYSTALSPACE_EXPORT csFileReadHelper
 {
-private:
-  /// Pointer to data.
-  uint8 *Data;
-  /// Current position
-  size_t Position;
-  /// Data size
-  size_t Size;
-  /// Free the buffer when destroying?
-  bool DeleteBuffer;
-
+  csRef<iFile> file;
 public:
-  /// constructor
-  csDataStream (void *buf, size_t Size, bool DeleteBuffer = true);
-  /// destructor
-  ~csDataStream ();
-
-  /// Return the current position
-  size_t GetPosition ();
-  /// Set the current position
-  void SetPosition (size_t pos);
-  /// Return the length of the stream
-  size_t GetLength ();
-  /// Returns true if the stream has finished
-  bool Finished ();
-  /// Skip the given amount of bytes
-  void Skip (size_t num);
-
-  /// Read a buffer of data. Returns the number of bytes actually read.
-  size_t Read (void *buf, size_t NumBytes);
-
-  /// Read a one-byte value. Returns false on EOF.
+  /**
+   * Initialize reader.
+   * \param file The file to subsequently read from.
+   */
+  csFileReadHelper (iFile* file) : file (file) {}
+    
+  /// Get the wrapped file
+  iFile* GetFile() { return file; }
+  
+  /// Skip a given amount of bytes
+  void Skip (size_t num) { file->SetPos (file->GetPos() + num); }
+  
+  /**\name Sized type reading
+   * \remarks No endian conversion is done.
+   * @{ */
+  //@{
+  /**
+   * Read a specifically sized data value from the file.
+   * \param val The variable to read to.
+   * \return False on EOF.
+   */
   bool ReadInt8 (int8 &val);
-  /// Read an unsigned one-byte value. Returns false on EOF.
   bool ReadUInt8 (uint8 &val);
-  /// Read a two-byte value
   bool ReadInt16 (int16 &val);
-  /// Read an unsigned two-byte value. Returns false on EOF.
   bool ReadUInt16 (uint16 &val);
-  /// Read a four-byte value
   bool ReadInt32 (int32 &val);
-  /// Read an unsigned four-byte value. Returns false on EOF.
   bool ReadUInt32 (uint32 &val);
+  //@}
+  /** @} */
 
+  /**\name Character reading
+   * @{ */
   /// Read a single character. Returns EOF if the stream has finished.
   int GetChar ();
   /// Return the next character (or EOF), but don't move forward
   int LookChar ();
+  /** @} */
 
+  /**\name String reading
+   * @{ */
   /**
    * Read a line of text. Returns false if the stream has finished. If
    * 'OmitNewline' is true then the newline character will be thrown away.
@@ -98,6 +93,7 @@ public:
    * Skip any whitespace characters.
    */
   void SkipWhitespace ();
+  /** @} */
 };
 
-#endif // __CS_DATASTRM_H__
+#endif // __CS_CSUTIL_FILEREADHELPER_H__
