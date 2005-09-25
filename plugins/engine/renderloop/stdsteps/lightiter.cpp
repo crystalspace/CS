@@ -22,7 +22,6 @@
 #include "csqint.h"
 
 #include "csgeom/sphere.h"
-#include "csgfx/csimgvec.h"
 #include "csgfx/memimage.h"
 #include "csutil/cscolor.h"
 #include "iengine/camera.h"

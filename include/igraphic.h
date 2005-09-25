@@ -25,6 +25,5 @@
 #include "igraphic/animimg.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
-#include "igraphic/imgvec.h"
 #endif /* __IGRAPHIC_H__ */
 

@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 
-#include "csgfx/csimgvec.h"
 #include "csgfx/imagecubemapmaker.h"
 #include "csgfx/memimage.h"
 

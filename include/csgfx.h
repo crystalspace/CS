@@ -23,7 +23,6 @@
  */
 #include "cssysdef.h"
 #include "csgfx/bakekeycolor.h"
-#include "csgfx/csimgvec.h"
 #include "csgfx/gradient.h"
 #include "csgfx/imagebase.h"
 #include "csgfx/imagecubemapmaker.h"

@@ -24,7 +24,6 @@
 #include "csutil/debug.h"
 #include "csutil/util.h"
 #include "csgfx/bakekeycolor.h"
-#include "csgfx/csimgvec.h"
 #include "csgfx/imagecubemapmaker.h"
 #include "csgfx/imagemanipulate.h"
 #include "csgfx/memimage.h"
@@ -1591,8 +1590,6 @@ void csGLSuperLightmap::DeleteTexture ()
 {
   if (texHandle != (GLuint)~0)
   {
-    /*csGLGraphics3D::statecache->SetTexture (
-      GL_TEXTURE_2D, 0);*/
     csGLTextureManager::UnsetTexture (GL_TEXTURE_2D, texHandle);
 
     glDeleteTextures (1, &texHandle);

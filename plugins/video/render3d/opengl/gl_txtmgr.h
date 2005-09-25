@@ -26,7 +26,6 @@
 #include "ivideo/material.h"
 #include "ivideo/txtmgr.h"
 #include "iengine/texture.h"
-#include "igraphic/imgvec.h"
 #include "csutil/blockallocator.h"
 #include "csutil/flags.h"
 #include "csutil/scf.h"

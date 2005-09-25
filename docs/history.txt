@@ -28,6 +28,7 @@ chronological order.
 	- res fixed csRGBcolor comparison. Previously, it could happen that
 	  when comparing a, b and b, a in both cases "first greater than 
 	  second" was reported.
+	- res removed iImageVector and csImageVector.
 24-Sep-2005
 	- Jorrit fixed dependencies in the loader. It now also depends on
 	  new sound loader and renderer.

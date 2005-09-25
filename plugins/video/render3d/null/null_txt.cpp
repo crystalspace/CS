@@ -27,7 +27,6 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "igraphic/image.h"
-#include "igraphic/imgvec.h"
 
 //--------------------------------------------------- csTextureHandleNull ---//
 

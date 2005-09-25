@@ -30,7 +30,6 @@
 #include "csplugincommon/canvas/scrshot.h"
 #include "csplugincommon/opengl/glcommon2d.h"
 #include "csplugincommon/opengl/glstates.h"
-#include "csutil/csendian.h"
 #include "csutil/xmltiny.h"
 
 // This header should be moved

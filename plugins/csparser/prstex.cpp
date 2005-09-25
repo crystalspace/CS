@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "csqint.h"
 
-#include "csgfx/csimgvec.h"
 #include "csgfx/imagecubemapmaker.h"
 #include "csgfx/rgbpixel.h"
 #include "cstool/proctex.h"
