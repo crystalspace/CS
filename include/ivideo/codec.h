@@ -20,9 +20,7 @@
 #define __CS_IVIDEO_CODEC_H__
 
 /**\file
- */
-/*
- * This is an interface for playing video.
+ * Interface for playing video.
  */
 
 #include "csutil/scf.h"

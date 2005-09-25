@@ -22,11 +22,13 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
-#include "ivideo/polyrender.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
+
 #include "csutil/cfgacc.h"
 #include "csutil/weakref.h"
+#include "csgeom/plane3.h"
+
 #include "null_txt.h"
 
 struct iObjectRegistry;

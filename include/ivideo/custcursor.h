@@ -19,6 +19,10 @@
 #ifndef __CS_IVIDEO_CUSTCURSOR_H__
 #define __CS_IVIDEO_CUSTCURSOR_H__
 
+/**\file
+ * Custom mouse cursors interface
+ */
+
 #include "csutil/scf.h"
 
 #include "csgfx/rgbpixel.h"

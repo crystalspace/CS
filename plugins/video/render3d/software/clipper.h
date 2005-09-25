@@ -157,27 +157,17 @@ public:
   }
 };
 
-// @@@ Move elsewhere?
-struct VertexBuffer
-{
-  uint8* data;
-  size_t comp;
-};
-
-const size_t clipMaxBuffers = 16;
-typedef uint ClipBuffersMask;
-
 template<class Meat>
 class BuffersClipper
 {
-  VertexOutputBase vout[clipMaxBuffers];
+  VertexOutputBase vout[maxBuffers];
   VertexOutputBase voutPersp;
   const csVector3* inPersp;
   const VertexBuffer* inBuffers;
   const size_t* inStrides;
   const VertexBuffer* outBuffers;
   Meat& meat;
-  ClipBuffersMask buffersMask;
+  BuffersMask buffersMask;
   
   template<int Ni, int No>
   void SetupVOut2 (size_t i, const VertexBuffer& inBuffer, 
@@ -233,14 +223,14 @@ public:
   BuffersClipper (Meat& meat) :  meat(meat) { }
   void Init (const csVector3* inPersp, csVector3* outPersp,
     const VertexBuffer* inBuffers, const size_t* inStrides, 
-    const VertexBuffer* outBuffers, ClipBuffersMask buffersMask)
+    const VertexBuffer* outBuffers, BuffersMask buffersMask)
   {
     this->inPersp = inPersp;
     this->inBuffers = inBuffers;
     this->inStrides = inStrides;
     this->outBuffers = outBuffers;
     this->buffersMask = buffersMask;
-    for (size_t i = 0; i < clipMaxBuffers; i++)
+    for (size_t i = 0; i < maxBuffers; i++)
     {
       if (!(buffersMask & (1 << i))) continue;
       SetupVOut (i, inBuffers[i], inStrides[i], outBuffers[i]);
@@ -251,7 +241,7 @@ public:
 
   size_t DoClip (const csTriangle& tri)
   {
-    for (size_t i = 0; i < clipMaxBuffers; i++)
+    for (size_t i = 0; i < maxBuffers; i++)
     {
       if (!(buffersMask & (1 << i))) continue;
       vout[i].Reset();
@@ -263,9 +253,5 @@ public:
 };
 
 } // namespace cspluginSoft3d
-
-#define VATTR_BUFINDEX(x)                                               \
-  (CS_VATTRIB_ ## x - (CS_VATTRIB_ ## x >=  CS_VATTRIB_GENERIC_FIRST ?        \
-  CS_VATTRIB_GENERIC_FIRST : CS_VATTRIB_SPECIFIC_FIRST))
 
 #endif // __CS_SOFT3D_CLIPPER_H__

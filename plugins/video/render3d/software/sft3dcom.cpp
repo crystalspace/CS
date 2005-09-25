@@ -86,7 +86,7 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent)
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
-  tcache = 0;
+  //tcache = 0;
   scfiEventHandler = 0;
   texman = 0;
   //vbufmgr = 0;
@@ -306,7 +306,7 @@ bool csSoftwareGraphics3DCommon::NewOpen ()
   // Create the vertex buffer manager.
   //vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 
-  tcache = new csSoftwareTextureCache (texman);
+  /*tcache = new csSoftwareTextureCache (texman);
   const char *cache_size = config->GetStr
         ("Video.Software.TextureManager.Cache", 0);
   int csize = DEFAULT_CACHE_SIZE;
@@ -332,7 +332,7 @@ bool csSoftwareGraphics3DCommon::NewOpen ()
       csize = DEFAULT_CACHE_SIZE;
     }
   }
-  tcache->set_cache_size (csize);
+  tcache->set_cache_size (csize);*/
 
   ScanSetup ();
 
@@ -355,7 +355,7 @@ bool csSoftwareGraphics3DCommon::SharedOpen ()
 #endif
   texman = partner->texman;
   //vbufmgr = partner->vbufmgr;
-  tcache = partner->tcache;
+  //tcache = partner->tcache;
   ScanSetup ();
   //SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
   return true;
@@ -379,6 +379,7 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
   switch (pfmt.PixelBytes)
   {
     case 2:
+#if 0
       if (do_alpha) ScanProc_Alpha = ScanProc_16_Alpha;
 
       ScanProc [SCANPROC_FLAT_ZNONE] = csScan_16_scan_flat_znone;
@@ -490,6 +491,7 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
       ScanProc [SCANPROC_FOG_VIEW] = (pfmt.GreenBits == 5) ?
         csScan_16_555_scan_fog_view :
         csScan_16_565_scan_fog_view;
+#endif
 
       ScanProcPI [SCANPROC_PI_FLAT_ZNONE] = csScan_16_scan_pi_flat_znone;
       ScanProcPI [SCANPROC_PI_FLAT_ZFIL] = csScan_16_scan_pi_flat_zfil;
@@ -712,6 +714,7 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
       break;
 
     case 4:
+#if 0
       if (do_alpha) ScanProc_Alpha = ScanProc_32_Alpha;
 
       ScanProc [SCANPROC_FLAT_ZNONE] = csScan_32_scan_flat_znone;
@@ -772,6 +775,7 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
 
       ScanProc [SCANPROC_FOG] = csScan_32_scan_fog;
       ScanProc [SCANPROC_FOG_VIEW] = csScan_32_scan_fog_view;
+#endif
 
       ScanProcPI [SCANPROC_PI_FLAT_ZNONE] = csScan_32_scan_pi_flat_znone;
       ScanProcPI [SCANPROC_PI_FLAT_ZFIL] = csScan_32_scan_pi_flat_zfil;
@@ -956,8 +960,8 @@ void csSoftwareGraphics3DCommon::Close ()
   }*/
   if (!partner)
   {
-    delete tcache;
-    tcache = 0;
+    //delete tcache;
+    //tcache = 0;
     texman->Clear();
     texman->DecRef(); texman = 0;
     //vbufmgr->DecRef (); vbufmgr = 0;
@@ -1177,8 +1181,8 @@ void csSoftwareGraphics3DCommon::Print (csRect const* area)
   G2D->Print (area);
   if (do_interlaced != -1)
     do_interlaced ^= 1;
-  if (tcache)
-    tcache->frameno++;
+  //if (tcache)
+    //tcache->frameno++;
 }
 
 
@@ -2229,8 +2233,8 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
 #undef CHECK
     }
 texr_done:
-    tcache->fill_texture (mipmap, tmapping, srlm, 
-      /*tex, */tex_mm, u_min, v_min, u_max, v_max);   
+    //tcache->fill_texture (mipmap, tmapping, srlm, 
+    //  /*tex, */tex_mm, u_min, v_min, u_max, v_max);   
   }
   csScan_InitDraw (mipmap, this, tmapping, srlm, tex_mm, txt_unl);
 
@@ -2931,13 +2935,13 @@ long csSoftwareGraphics3DCommon::GetRenderState(G3D_RENDERSTATEOPTION op)
 
 void csSoftwareGraphics3DCommon::ClearCache()
 {
-  if (tcache) tcache->Clear ();
+  //if (tcache) tcache->Clear ();
 }
 
 void csSoftwareGraphics3DCommon::RemoveFromCache (
 	      iRendererLightmap* rlm)
 {
-  if (tcache)
+  /*if (tcache)
   {
     csSoftRendererLightmap* srlm = 
       (csSoftRendererLightmap*)rlm;
@@ -2945,12 +2949,12 @@ void csSoftwareGraphics3DCommon::RemoveFromCache (
     tcache->uncache_texture (1, srlm);
     tcache->uncache_texture (2, srlm);
     tcache->uncache_texture (3, srlm);
-  }
+  }*/
 }
 
 void csSoftwareGraphics3DCommon::DumpCache()
 {
-  if (tcache) tcache->dump (this);
+  //if (tcache) tcache->dump (this);
 }
 
 void csSoftwareGraphics3DCommon::DrawLine (const csVector3& v1,
@@ -3723,16 +3727,16 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
 class TriangleDrawer
 {
   csSoftwareGraphics3DCommon& g3d;
-  VertexBuffer clipInBuf[clipMaxBuffers];
-  size_t clipInStride[clipMaxBuffers];
-  VertexBuffer clipOutBuf[clipMaxBuffers];
+  VertexBuffer clipInBuf[maxBuffers];
+  size_t clipInStride[maxBuffers];
+  VertexBuffer clipOutBuf[maxBuffers];
   iRenderBuffer** activebuffers;
-  ClipBuffersMask buffersMask;
+  BuffersMask buffersMask;
   const csCoreRenderMesh* mesh;
   const csRenderMeshModes& modes;
 
   static const int outFloatsPerBuf = 16;
-  float clipOut[clipMaxBuffers * outFloatsPerBuf];
+  float clipOut[maxBuffers * outFloatsPerBuf];
   ClipMeatZNear clipZNear;
   BuffersClipper<ClipMeatZNear> bclipperZNear;
   csVector3 outPersp[4];
@@ -3792,10 +3796,10 @@ class TriangleDrawer
     ClipMeatiClipper meat;
     meat.Init (g3d.clipper, maxClipVertices);
     CS_ALLOC_STACK_ARRAY(float, out, 
-      floatsPerBufPerVert * clipMaxBuffers * maxClipVertices);
+      floatsPerBufPerVert * maxBuffers * maxClipVertices);
     CS_ALLOC_STACK_ARRAY(csVector3, clippedPersp, maxClipVertices);
-    VertexBuffer clipOutBuf[clipMaxBuffers];
-    for (size_t i = 0; i < clipMaxBuffers; i++)
+    VertexBuffer clipOutBuf[maxBuffers];
+    for (size_t i = 0; i < maxBuffers; i++)
     {
       clipOutBuf[i].data = (uint8*)&out[i * floatsPerBufPerVert * maxClipVertices];
       const size_t c = clipInBuf[i].comp;
@@ -3834,7 +3838,7 @@ public:
     activebuffers(activebuffers), mesh(mesh), modes(modes),
     bclipperZNear(clipZNear)
   {
-    const size_t bufNum = csMin (activeBufferCount, clipMaxBuffers);
+    const size_t bufNum = csMin (activeBufferCount, maxBuffers);
 
     buffersMask = 0;
     for (size_t b = 0; b < bufNum; b++)
@@ -3859,7 +3863,7 @@ public:
 
   ~TriangleDrawer()
   {
-    const size_t bufNum = csMin (activeBufferCount, clipMaxBuffers);
+    const size_t bufNum = csMin (activeBufferCount, maxBuffers);
 
     for (size_t b = 0; b < bufNum; b++)
     {

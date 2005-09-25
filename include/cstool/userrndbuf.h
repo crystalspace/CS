@@ -20,6 +20,7 @@
 #define __CS_CSTOOL_USERRNDBUF_H__
 
 /**\file
+ * Class to manage multiple render buffers
  */
 
 #include "csextern.h"

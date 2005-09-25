@@ -21,12 +21,12 @@
 
 #include "csutil/util.h"
 #include "ivaria/reporter.h"
-#include "ivideo/polyrender.h"
 
 #include "soft_g3d.h"
 #include "tcache.h"
 #include "soft_txt.h"
 
+#if 0
 namespace cspluginSoft3d
 {
 
@@ -314,3 +314,4 @@ void csSoftwareTextureCache::dump (csSoftwareGraphics3DCommon *iG3D)
 }
 
 } // namespace cspluginSoft3d
+#endif

@@ -18,6 +18,7 @@
 */
 
 /**\file
+ * Class to revert VFS directory changes upon leaving a scope.
  */
 
 #include "iutil/vfs.h"

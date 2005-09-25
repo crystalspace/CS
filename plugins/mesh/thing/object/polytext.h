@@ -23,10 +23,10 @@
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
 #include "iengine/light.h"
-#include "ivideo/polyrender.h"
 #include "ivideo/txtmgr.h"
 
 #include "lghtmap.h"
+#include "polyrender.h"
 
 struct iFrustumView;
 struct iMaterialHandle;

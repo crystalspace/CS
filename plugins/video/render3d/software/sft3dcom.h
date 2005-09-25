@@ -47,7 +47,7 @@
 #include "scan.h"
 #include "soft_txt.h"
 
-class csSoftwareTextureCache;
+//class csSoftwareTextureCache;
 class csPolArrayVertexBufferManager;
 
 struct iConfigFile;
@@ -516,7 +516,7 @@ public:
   //csPolArrayVertexBufferManager* vbufmgr;
 
   /// The texture cache.
-  csSoftwareTextureCache *tcache;
+  //csSoftwareTextureCache *tcache;
 
   /// The System interface.
   iObjectRegistry* object_reg;

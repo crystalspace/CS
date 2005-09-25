@@ -33,7 +33,7 @@ class ClipMeatiClipper
   size_t maxClipVertices;
 
   CS_FORCEINLINE size_t CopyTri (const csTriangle& tri, 
-    ClipBuffersMask buffersMask, VertexOutputBase& voutPersp, 
+    BuffersMask buffersMask, VertexOutputBase& voutPersp, 
     VertexOutputBase* vout)
   {
     voutPersp.Copy (tri.a);
@@ -59,7 +59,7 @@ public:
 
   size_t DoClip (const csTriangle& tri, const csVector3* inPersp,
     VertexOutputBase& voutPersp, const VertexBuffer* inBuffers, 
-    const size_t* inStrides, ClipBuffersMask buffersMask, 
+    const size_t* inStrides, BuffersMask buffersMask, 
     VertexOutputBase* vout)
   {
     if (!clipper)
@@ -95,7 +95,7 @@ public:
 	    csVector3 vn (outPoly[i].x, outPoly[i].y,
 	      v[outStatus[i].Vertex].z);
 	    voutPersp.Write ((float*)&vn);
-	    for (size_t n = 0; n < clipMaxBuffers; n++)
+	    for (size_t n = 0; n < maxBuffers; n++)
 	    {
 	      if (buffersMask & (1 << n))
 	      {
@@ -116,7 +116,7 @@ public:
 	    vn.y = outPoly[i].y;
 	    voutPersp.Write ((float*)&vn);
 
-	    for (size_t n = 0; n < clipMaxBuffers; n++)
+	    for (size_t n = 0; n < maxBuffers; n++)
 	    {
 	      if (buffersMask & (1 << n))
 	      {
@@ -173,7 +173,7 @@ public:
 	    vn.y = y;
 	    voutPersp.Write ((float*)&vn);
 
-	    for (size_t n = 0; n < clipMaxBuffers; n++)
+	    for (size_t n = 0; n < maxBuffers; n++)
 	    {
 	      if (buffersMask & (1 << n))
 	      {

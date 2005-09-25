@@ -60,12 +60,12 @@
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/polyrender.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 #include "lppool.h"
 #include "polygon.h"
+#include "polyrender.h"
 #include "polytext.h"
 #include "thing.h"
 

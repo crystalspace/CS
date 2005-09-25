@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2004 by Peter Amstutz
+    Copyright (C) 2005 by Jorrit Tyberghein
+              (C) 2005 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,32 +17,35 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CS_IVIDEO_WXWIN_H_
-#define _CS_IVIDEO_WXWIN_H_
+#ifndef __CS_SOFT3D_SCANLINE_H__
+#define __CS_SOFT3D_SCANLINE_H__
 
-/**\file
- * wxWidgets specific interfaces
- */
+#include "types.h"
 
-#include "csutil/scf.h"
-
-// wxWidgets boilerplate.
-#ifndef _WX_WXH__
-#include <wx/wxprec.h>
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
-#endif
-
-SCF_VERSION(iWxWindow, 0, 0, 0);
-
-struct iWxWindow : public virtual iBase
+namespace cspluginSoft3d
 {
-  virtual void SetParent(wxWindow* parent) = 0;
-  virtual wxWindow* GetWindow() = 0;
-};
 
-#endif
+  class ScanlineRendererBase
+  {
+  public:
+    typedef void (ScanlineRendererBase::*ScanlineProc) (
+      InterpolateScanline& ipol);
+
+    virtual ScanlineProc Init () = 0;
+  };
+
+  class ScanlineRenderer : public ScanlineRendererBase
+  {
+    void Scan (InterpolateScanline& ipol)
+    {
+    }
+  public:
+    ScanlineProc Init ()
+    {
+      return (ScanlineProc)&ScanlineRenderer::Scan;
+    }
+  };
+
+} // namespace cspluginSoft3d
+
+#endif // __CS_SOFT3D_SCANLINE_H__

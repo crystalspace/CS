@@ -22,17 +22,14 @@
 
 #include "csqint.h"
 
-#include "clipper.h" //@@@ for VertexBuffer
+#include "types.h"
 #include "scanindex.h"
 #include "sft3dcom.h"
 
+#include "scanline.h"
+
 namespace cspluginSoft3d
 {
-  struct InterpolateLine
-  {
-    float dcdx[4];
-  };
-
   class PolygonRasterizer
   {
     bool dpfx_valid;
@@ -59,79 +56,6 @@ namespace cspluginSoft3d
     uint32* z_buffer;
     uint8** line_table;
     int pixel_shift;
-
-    // Calculate round (f) of a 16:16 fixed pointer number
-    // and return a long integer.
-    inline long round16 (long f)
-    {
-      return (f + 0x8000) >> 16;
-    }
-
-    template <typename T>
-    static inline T Lerp (const T& a, const T& b, float f)
-    { return a + (b-a) * f; }
-    struct InterpolateEdge
-    {
-      // The X coordinates and its per-scanline delta
-      float x, dxdy;
-      // The Z coordinates and its per-scanline delta
-      float z, dzdy;
-      // Buffer values and per-scanline delta
-      csVector4 c[clipMaxBuffers];
-      csVector4 dcdy[clipMaxBuffers];
-
-      void Setup (const csVector3* vertices, const VertexBuffer* buffers, 
-	ClipBuffersMask buffersMask, size_t sv, size_t fv, int sy)
-      {
-	const csVector3 vsv (vertices[sv]);
-	const csVector3 vfv (vertices[fv]);
-
-	float dy = vsv.y - vfv.y;
-	if (dy)
-	{
-	  float inv_dy = 1 / dy;
-	  x = vsv.x;
-	  dxdy = (vfv.x - x) * inv_dy;
-	  dzdy = (vfv.z - vsv.z) * inv_dy;
-
-	  // horizontal pixel correction
-	  float deltaX = dxdy *
-	    (vsv.y - (float (sy) - 0.5));
-	  x += deltaX;
-
-	  // apply sub-pixel accuracy factor
-	  float Factor;
-	  if (vfv.x != vsv.x)
-	    Factor = deltaX / (vfv.x - vsv.x);
-	  else
-	    Factor = 0;
-
-	  z = Lerp (vsv.z, vfv.z, Factor);
-
-	  for (size_t b = 0; b < clipMaxBuffers; b++)
-	  {
-	    if (!(buffersMask & (1 << b))) continue;
-
-	    const csVector4 csv (((csVector4*)buffers[b].data)[sv]);
-	    const csVector4 cfv (((csVector4*)buffers[b].data)[fv]);
-
-	    c[b] = Lerp (csv, cfv, Factor);
-	    dcdy[b] = (cfv - csv) * inv_dy;
-	  }
-	} /* endif */
-      }
-      void Advance (ClipBuffersMask buffersMask)
-      {
-	x += dxdy;
-	z += dzdy;
-
-	for (size_t b = 0; b < clipMaxBuffers; b++)
-	{
-	  if (!(buffersMask & (1 << b))) continue;
-	  c[b] += dcdy[b];
-	}
-      }
-    };
   public:
     PolygonRasterizer() : dpfx_valid(false), do_gouraud(false),
       do_lighting(true), do_textured(true), 
@@ -285,10 +209,12 @@ namespace cspluginSoft3d
     }
 
     void DrawPolygonFX (size_t vertNum, const csVector3* vertices,
-      const VertexBuffer* inBuffers, ClipBuffersMask buffersMask, 
+      const VertexBuffer* inBuffers, BuffersMask buffersMask, 
       iTextureHandle* tex_handle, uint mixmode)
     {
       RealStartPolygonFX (tex_handle, mixmode);
+      ScanlineRenderer slr;
+      ScanlineRendererBase::ScanlineProc slp = slr.Init ();
     
       if (!pqinfo.drawline && !pqinfo.drawline_gouraud)
 	return;
@@ -323,10 +249,11 @@ namespace cspluginSoft3d
 
       /* "Denormalize" some known buffers (currently colors and TCs) since
        * doing it anywhere further down is rather wasterful. */
-      VertexBuffer actualBuffers[clipMaxBuffers];
+      VertexBuffer actualBuffers[maxBuffers];
       CS_ALLOC_STACK_ARRAY(csVector4, denormTC, vertNum);
       CS_ALLOC_STACK_ARRAY(csVector4, denormColor, vertNum);
-      for (size_t b = 0; b < clipMaxBuffers; b++)
+
+      for (size_t b = 0; b < maxBuffers; b++)
       {
 	if (!(buffersMask & (1 << b))) continue;
 
@@ -463,6 +390,9 @@ namespace cspluginSoft3d
 	    {
 	      int l = xr - xl;
 	      float inv_l = 1. / l;
+
+	      InterpolateScanline scanline;
+	      scanline.Setup (L.edge, R.edge, buffersMask, inv_l);
     
 	      float dzz = (R.edge.z - L.edge.z) * inv_l;
 	      int uu = 0, duu = 0, vv = 0, dvv = 0;
@@ -543,6 +473,8 @@ namespace cspluginSoft3d
 	      */
 		pqinfo.drawline (dest, l, zbuff, uu, duu, vv, dvv,
 		  L.edge.z, dzz, pqinfo.bm, pqinfo.shf_w);
+
+	      (slr.*slp) (scanline);
 	    }
 	  }
     

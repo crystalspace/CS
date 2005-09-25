@@ -33,7 +33,6 @@
 #include "ivideo/lighting.h"
 #include "ivideo/material.h"
 #include "ivideo/natwin.h"
-#include "ivideo/polyrender.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"

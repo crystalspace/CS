@@ -30,7 +30,8 @@
 #include "polytext.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
-#include "ivideo/polyrender.h"
+
+#include "polyrender.h"
 
 class csFrustumView;
 class csFrustumContext;

@@ -2759,11 +2759,11 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
       const float vhf = (float)(viewheight);
 
       camtrans.SetO2T (
-      csMatrix3 (1.0f, 0.0f, 0.0f,
-                 0.0f, -1.0f, 0.0f,
-                 0.0f, 0.0f, 1.0f));
+	csMatrix3 (1.0f, 0.0f, 0.0f,
+		   0.0f, -1.0f, 0.0f,
+		   0.0f, 0.0f, 1.0f));
       camtrans.SetO2TTranslation (csVector3 (
-      vwf / 2.0f, vhf / 2.0f, -aspect));
+	vwf / 2.0f, vhf / 2.0f, -aspect));
     }
     SetWorldToCamera (camtrans.GetInverse ());
   }

@@ -22,8 +22,6 @@
 
 #include "csutil/cscolor.h"
 
-#include "ivideo/polyrender.h"
-
 #include "scan.h"
 #include "sft3dcom.h"
 #include "soft_txt.h"
@@ -182,6 +180,7 @@ void csScan_Finalize ()
   delete [] Scan.one_div_z;
 }
 
+#if 0
 void csScan_InitDraw (int MipMap, csSoftwareGraphics3DCommon* g3d,
   csPolyTextureMapping* tmapping,
   csSoftRendererLightmap* rlm, csSoftwareTextureHandle* texture,
@@ -232,6 +231,7 @@ void csScan_InitDraw (int MipMap, csSoftwareGraphics3DCommon* g3d,
   Scan.and_h <<= Scan.shf_w;
   Scan.shf_h = 16 - Scan.shf_w;
 }
+#endif
 
 void csScan_InitDrawFX (csSoftwareTextureHandle* texture,
         csSoftwareTexture *untxt)
