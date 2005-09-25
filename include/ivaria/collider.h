@@ -20,6 +20,10 @@
 #ifndef __CS_IVARIA_COLLIDER_H__
 #define __CS_IVARIA_COLLIDER_H__
 
+/**\file
+ * Mesh collider interfaces
+ */
+
 #include "csutil/scf.h"
 #include "csgeom/vector3.h"
 #include "csutil/array.h"
@@ -34,8 +38,14 @@ class csReversibleTransform;
  */
 struct csCollisionPair
 {
-  csVector3 a1, b1, c1;	// First triangle
-  csVector3 a2, b2, c2;	// Second triangle
+  //@{
+  /// First triangle
+  csVector3 a1, b1, c1;	
+  //@}
+  //@{
+  // Second triangle
+  csVector3 a2, b2, c2;	
+  //@}
 };
 
 /**
@@ -50,19 +60,15 @@ SCF_VERSION (iCollider, 0, 2, 0);
 
 /**
  * A mesh collider.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iCollideSystem::CreateCollider()
- *   </ul>
+ * - iCollideSystem::CreateCollider()
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>csColliderWrapper::GetCollider()
- *   </ul>
+ * - csColliderWrapper::GetCollider()
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>csColliderWrapper
- *   </ul>
+ * - csColliderWrapper
  */
 struct iCollider : public iBase
 {
@@ -75,20 +81,16 @@ SCF_VERSION (iCollideSystem, 0, 0, 4);
  * iCollider entities. A collider represents an entity in the
  * collision detection world. It uses the geometry data as given by
  * iPolygonMesh.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>OPCODE plugin (crystalspace.collisiondetection.opcode)
- *   </ul>
+ * - OPCODE plugin (crystalspace.collisiondetection.opcode)
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - csQueryRegistry()
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>csColliderWrapper
- *   <li>csColliderHelper
- *   </ul>
+ * - csColliderWrapper
+ * - csColliderHelper
  */
 struct iCollideSystem : public iBase
 {

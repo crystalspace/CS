@@ -19,6 +19,10 @@
 #ifndef __CS_IVARIA_PMETER_H__
 #define __CS_IVARIA_PMETER_H__
 
+/**\file
+ * General progress meter interface
+ */
+
 #include "csutil/scf.h"
 
 SCF_VERSION (iProgressMeter, 0, 1, 0);

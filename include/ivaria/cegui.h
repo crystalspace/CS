@@ -19,6 +19,10 @@
 #ifndef __CS_IVARIA_CEGUI_H__
 #define __CS_IVARIA_CEGUI_H__
 
+/**\file
+ * CEGUI wrapper interface
+ */
+
 #include "csutil/scf.h"
 #include "CEGUI.h"
 

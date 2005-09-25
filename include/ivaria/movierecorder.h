@@ -24,6 +24,10 @@
 #ifndef __CS_IVARIA_MOVIERECORDER_H__
 #define __CS_IVARIA_MOVIERECORDER_H__
 
+/**\file
+ * Movie recorder plugin interface
+ */
+
 #include "csutil/scf.h"
 
 SCF_VERSION (iMovieRecorder, 0, 0, 1);
@@ -32,6 +36,7 @@ SCF_VERSION (iMovieRecorder, 0, 0, 1);
  * Using this interface you can communicate with the MovieRecorder plugin.
  * This allows changing or disabling the hotkey bindings, changing the
  * video parameters, and programmatically starting and stopping the recorder.
+ * \remarks The plugin is GPL, not LGPL.
  */
 struct iMovieRecorder : public virtual iBase
 {

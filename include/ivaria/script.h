@@ -20,6 +20,10 @@
 #ifndef __CS_IVARIA_SCRIPT_H__
 #define __CS_IVARIA_SCRIPT_H__
 
+/**\file
+ * General scripting interfaces
+ */
+
 #include "csutil/scf.h"
 
 struct iString;
@@ -29,7 +33,7 @@ SCF_VERSION (iScriptObject, 0, 0, 1);
 /**
  * This provides the interface to an object in an object-oriented scripting
  * language.
- * <p>
+ * 
  * Several functions here take a variable-length argument list with a
  * printf-style format string supporting all the argument types supported by
  * printf, except width and precision specifiers, as they have no meaning here.
@@ -189,7 +193,7 @@ SCF_VERSION (iScript, 0, 0, 2);
 
 /**
  * This provides the interface to a scripting language interpreter.
- * <p>
+ * 
  * Several functions here take a variable-length argument list with a
  * printf-style format string supporting all the argument types supported by
  * printf, except width and precision specifiers, as they have no meaning here.

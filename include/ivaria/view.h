@@ -20,6 +20,10 @@
 #ifndef __CS_IVARIA_VIEW_H__
 #define __CS_IVARIA_VIEW_H__
 
+/**\file
+ * Renderer view interface
+ */
+
 #include "csutil/scf.h"
 
 SCF_VERSION (iView, 0, 1, 0);
@@ -32,19 +36,16 @@ struct iClipper2D;
 /**
  * The iView class encapsulates the top-level Crystal Space
  * renderer interface. It is basically a camera and a clipper.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Applications using csView.
- *   </ul>
+ * - Applications using csView.
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>Application stores it.
- *   </ul>
+ * - Application stores it.
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>Application uses it.
- *   </ul>
+ * - Application uses it.
+ *   
  */
 struct iView : public iBase
 {

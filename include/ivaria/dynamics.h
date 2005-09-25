@@ -20,6 +20,10 @@
 #ifndef __CS_IVARIA_DYNAMICS_H__
 #define __CS_IVARIA_DYNAMICS_H__
 
+/**\file
+ * Physics interfaces
+ */
+
 #include "csutil/scf.h"
 
 
@@ -44,19 +48,15 @@ SCF_VERSION (iDynamics, 0, 0, 2);
 /**
  * This is the interface for the actual plugin.
  * It is responsible for creating iDynamicSystem.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>ODE Physics plugin (crystalspace.dynamics.ode)
- *   </ul>
+ * - ODE Physics plugin (crystalspace.dynamics.ode)
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - csQueryRegistry()
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>Dynamics loader plugin (crystalspace.dynamics.loader)
- *   </ul>
+ * - Dynamics loader plugin (crystalspace.dynamics.loader)
  */
 struct iDynamics : public iBase
 {
@@ -85,15 +85,12 @@ struct iDynamicsSystemCollider;
  * It handles all bookkeeping for rigid bodies and joints.
  * It also handles collision response.
  * Collision detection is done in another plugin.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iDynamicSystem::CreateSystem()
- *   </ul>
+ * - iDynamicSystem::CreateSystem()
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iDynamicSystem::FindSystem()
- *   </ul>
+ * - iDynamicSystem::FindSystem()
  */
 struct iDynamicSystem : public iBase
 {
@@ -272,16 +269,13 @@ SCF_VERSION (iDynamicsMoveCallback, 0, 0, 1);
 /**
  * This is the interface for a dynamics move callback.
  * Set on iRigidBody, it can update attachments after each step.
- * <p>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>application specific
- *   <li>iDynamicSystem::GetDefaultMoveCallback()
- *   </ul>
+ * - application specific
+ * - iDynamicSystem::GetDefaultMoveCallback()
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>iDynamicSystem
- *   </ul>
+ * - iDynamicSystem
  */
 struct iDynamicsMoveCallback : public iBase
 {
@@ -293,15 +287,13 @@ SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 1);
 
 /**
  * This is the interface for attaching a collider callback to the body
- * <p>
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>application specific
- *   </ul>
+ * - application specific
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>iDynamicSystem
- *   </ul>
+ * - iDynamicSystem
+ *   
  */
 struct iDynamicsCollisionCallback : public iBase
 {
@@ -316,19 +308,15 @@ SCF_VERSION (iBodyGroup, 0, 0, 1);
  * certain collisions.  For instance if you have a car built of
  * many different bodies.  The bodies can be collected into a group
  * and the car will be treated as a single object.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iDynamicSystem::CreateGroup()
- *   </ul>
+ * - iDynamicSystem::CreateGroup()
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iRigidBody::GetGroup()
- *   </ul>
+ * - iRigidBody::GetGroup()
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>iDynamicSystem
- *   </ul>
+ * - iDynamicSystem
  */
 struct iBodyGroup : public iBase
 {
@@ -347,19 +335,15 @@ SCF_VERSION (iRigidBody, 0, 0, 2);
  * It keeps all properties for the body.
  * It can also be attached to a movable or a bone,
  * to automatically update it.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iDynamicSystem::CreateBody()
- *   </ul>
+ * - iDynamicSystem::CreateBody()
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iDynamicSystem::FindBody()
- *   </ul>
+ * - iDynamicSystem::FindBody()
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>iDynamicSystem
- *   </ul>
+ * - iDynamicSystem
  */
 struct iRigidBody : public iBase
 {
@@ -625,15 +609,12 @@ SCF_VERSION (iDynamicsColliderCollisionCallback, 0, 0, 1);
 
 /**
  * This is the interface for attaching a collider callback to the body
- * <p>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>application specific
- *   </ul>
+ * - application specific
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>iDynamicSystem
- *   </ul>
+ * - iDynamicSystem
  */
 struct iDynamicsColliderCollisionCallback : public iBase
 {
@@ -657,22 +638,18 @@ struct csReversibleTransform;
  * properties, collider geometry). It can be placed into 
  * dynamic system (then this will be "static" collider) or 
  * attached to body.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iDynamicSystem::CreateCollider()
- *   </ul>
+ * - iDynamicSystem::CreateCollider()
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iDynamicSystem::FindBody()
- *   <li>iDynamicSystem::GetCollider()
- *   <li>iRigidBody::GetCollider()
- *   </ul>
+ * - iDynamicSystem::FindBody()
+ * - iDynamicSystem::GetCollider()
+ * - iRigidBody::GetCollider()
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>iDynamicSystem
- *   <li>iRigidBody
- *   </ul>
+ * - iDynamicSystem
+ * - iRigidBody
  */
 struct iDynamicsSystemCollider : public iBase
 {
@@ -772,15 +749,12 @@ SCF_VERSION (iJoint, 0, 0, 1);
  * instance if all motion in along the local X axis is constrained
  * then the bodies will stay motionless relative to each other
  * along an x axis rotated and positioned by the Joint's transform.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iDynamicSystem::CreateJoint()
- *   </ul>
+ * - iDynamicSystem::CreateJoint()
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>iDynamicSystem
- *   </ul>
+ * - iDynamicSystem
  */
 struct iJoint : public iBase
 {

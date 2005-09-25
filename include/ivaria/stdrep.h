@@ -19,6 +19,10 @@
 #ifndef __CS_IVARIA_STDREP_H__
 #define __CS_IVARIA_STDREP_H__
 
+/**\file
+ * Standard reporter listener interface
+ */
+
 #include "csutil/scf.h"
 
 struct iConsoleOutput;
@@ -29,15 +33,12 @@ SCF_VERSION (iStandardReporterListener, 0, 0, 3);
 
 /**
  * Interface to control the settings of the reporter listener plugin.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Standard Reporter Listener plugin (crystalspace.utilities.stdrep)
- *   </ul>
+ * - Standard Reporter Listener plugin (crystalspace.utilities.stdrep)
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - csQueryRegistry()
  */
 struct iStandardReporterListener : public iBase
 {

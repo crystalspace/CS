@@ -19,6 +19,10 @@
 #ifndef __CS_IVARIA_BUGPLUG_H__
 #define __CS_IVARIA_BUGPLUG_H__
 
+/**\file
+ * BugPlug debugging utility plugin interface
+ */
+
 #include "csutil/scf.h"
 #include "ivideo/graph3d.h"
 

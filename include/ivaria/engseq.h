@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 
 /**\file
+ * Engine sequence interfaces
  */
 
 
@@ -65,26 +66,22 @@ SCF_VERSION (iParameterESM, 0, 0, 1);
  * to get the required object (mesh, light, material, ...).
  * The engine sequence manager itself currently provides two ready-made
  * implementations of this resolver:
- * <ul>
- * <li>iEngineSequenceParameters->CreateParameterESM() which will create
- *     a resolver that gets the requested parameter from the given
- *     iEngineSequenceParameters instance. This is useful for sequences
- *     where you don't know in advance on what objects you will use it.
- * <li>iEngineSequenceManager->CreateParameterESM() which will give
- *     a resolver that returns a constant value. This is useful for
- *     operations where the object to operate on is known in advance.
- * </ul>
- * <p>
+ * - iEngineSequenceParameters->CreateParameterESM() which will create
+ *   a resolver that gets the requested parameter from the given
+ *   iEngineSequenceParameters instance. This is useful for sequences
+ *   where you don't know in advance on what objects you will use it.
+ * - iEngineSequenceManager->CreateParameterESM() which will give
+ *   a resolver that returns a constant value. This is useful for
+ *   operations where the object to operate on is known in advance.
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Own implementions
- *   <li>iEngineSequenceParameters::CreateParameterESM()
- *   <li>iEngineSequenceManager::CreateParameterESM()
- *   </ul>
+ * - Own implementions
+ * - iEngineSequenceParameters::CreateParameterESM()
+ * - iEngineSequenceManager::CreateParameterESM()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>iSequenceWrapper
- *   </ul>
+ * - iSequenceWrapper
+ *   
  */
 struct iParameterESM : public iBase
 {
@@ -119,21 +116,18 @@ SCF_VERSION (iEngineSequenceParameters, 0, 0, 2);
  * base parameter block and then fill in the values.<br>
  * To use a value from this parameter block you can call CreateParameterESM()
  * which will return a parameter that you can give to an operation.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iSequenceWrapper::CreateBaseParameterBlock()
- *   <li>iSequenceWrapper::CreateParameterBlock ()
- *   </ul>
+ * - iSequenceWrapper::CreateBaseParameterBlock()
+ * - iSequenceWrapper::CreateParameterBlock ()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iSequenceWrapper::GetBaseParameterBlock ()
- *   <li>iSequenceTrigger::GetParameters ()
- *   </ul>
+ * - iSequenceWrapper::GetBaseParameterBlock ()
+ * - iSequenceTrigger::GetParameters ()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>iSequenceWrapper
- *   </ul>
+ * - iSequenceWrapper
+ *   
  */
 struct iEngineSequenceParameters : public iBase
 {
@@ -197,23 +191,20 @@ SCF_VERSION (iSequenceWrapper, 0, 3, 0);
  * that are time based and can be scheduled on the sequence manager.
  * This class enhances iSequence with support for custom operations
  * and parameter blocks.
- * <p>
+ * 
  * Note that many parameters given to the AddOperation functions
  * are of type iParameterESM.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iEngineSequenceManager::CreateSequence ()
- *   </ul>
+ * - iEngineSequenceManager::CreateSequence ()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngineSequenceManager::GetSequence()
- *   <li>iEngineSequenceManager::FindSequenceByName()
- *   </ul>
+ * - iEngineSequenceManager::GetSequence()
+ * - iEngineSequenceManager::FindSequenceByName()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>iEngineSequenceManager
- *   </ul>
+ * - iEngineSequenceManager
+ *   
  */
 struct iSequenceWrapper : public iBase
 {
@@ -518,20 +509,17 @@ SCF_VERSION (iSequenceTrigger, 0, 0, 3);
  * A sequence trigger. When all conditions in a trigger are
  * true it will run a sequence. Note that after the succesfull firing
  * of a trigger it will automatically be disabled.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iEngineSequenceManager::CreateTrigger ()
- *   </ul>
+ * - iEngineSequenceManager::CreateTrigger ()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngineSequenceManager::GetTrigger()
- *   <li>iEngineSequenceManager::FindTriggerByName()
- *   </ul>
+ * - iEngineSequenceManager::GetTrigger()
+ * - iEngineSequenceManager::FindTriggerByName()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>iEngineSequenceManager
- *   </ul>
+ * - iEngineSequenceManager
+ *   
  */
 struct iSequenceTrigger : public iBase
 {
@@ -652,13 +640,13 @@ struct iSequenceTrigger : public iBase
    * Force the sequence of this trigger to be fired right now.
    * Note that this will even fire if the trigger is disabled and
    * conditions are completely ignored.
-   * <p>
+   * 
    * Also calling ForceFire() will NOT cause the trigger to become disabled
    * (as opposed to when a trigger normally fires). So if you want to make
    * sure the trigger does not accidently fire again right after firing it
    * you should disable the trigger (and possibly let the sequence enable
    * it again).
-   * <p>
+   * 
    * Note that ForceFire() still respects the fire delay with which the
    * sequence was registered. If you use 'now' == true then this delay
    * will be ignored and the sequence will be started immediatelly.
@@ -676,16 +664,14 @@ SCF_VERSION (iSequenceTimedOperation, 0, 0, 1);
  * 1) then the operation will be deleted automatically.
  * Timed operations are usually fired from within a sequence operation
  * (iSequenceOperation).
- * <p>
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>Application specific. Instances of this are also created
+ * - Application specific. Instances of this are also created
  *       internally by the engine sequence manager plugin.
- *   </ul>
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>iEngineSequenceManager::FireTimedOperation()
- *   </ul>
+ * - iEngineSequenceManager::FireTimedOperation()
+ *   
  */
 struct iSequenceTimedOperation : public iBase
 {
@@ -700,15 +686,13 @@ SCF_VERSION (iEngineSequenceManager, 0, 0, 3);
 /**
  * Sequence manager specifically designed for working on
  * the engine.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Engine Sequence Manager plugin (crystalspace.utilities.sequence.engine)
- *   </ul>
+ * - Engine Sequence Manager plugin (crystalspace.utilities.sequence.engine)
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - CS_QUERY_REGISTRY()
+ *   
  */
 struct iEngineSequenceManager : public iBase
 {

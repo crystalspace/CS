@@ -19,6 +19,10 @@
 #ifndef __CS_IVARIA_PVSTREE_H__
 #define __CS_IVARIA_PVSTREE_H__
 
+/**\file
+ * PVS culler interfaces
+ */
+
 #include "csutil/scf.h"
 
 class csBox3;

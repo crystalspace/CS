@@ -19,6 +19,10 @@
 #ifndef __CS_IVARIA_KEYVAL_H__
 #define __CS_IVARIA_KEYVAL_H__
 
+/**\file
+ * Key/Value pair interface
+ */
+
 #include "csutil/scf.h"
 
 struct iObject;
@@ -29,17 +33,14 @@ struct iSector;
  * 'value' strings.  Typically key value pairs are specified in map files
  * (using the \<key\> tag).  They allow a game developer to tag game specific
  * information to any Crystal Space object.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>The main loader creates instances of this internally.
- *   </ul>
+ * - The main loader creates instances of this internally.
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() from iObject instances you get by
- *       calling iObject::GetIterator() on iObject instances you
- *       get from CS objects (typically using QueryObject()).
- *   </ul>
+ * - scfQueryInterface() from iObject instances you get by
+ *   calling iObject::GetIterator() on iObject instances you
+ *   get from CS objects (typically using QueryObject()).
  */
 struct iKeyValuePair : public virtual iBase
 {

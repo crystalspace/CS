@@ -19,6 +19,10 @@
 #ifndef __CS_IVARIA_TERRAFORM_H__
 #define __CS_IVARIA_TERRAFORM_H__
 
+/**\file
+ * Terraformer interface
+ */
+
 #include "csutil/scf.h"
 #include "csutil/strset.h"
 

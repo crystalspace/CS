@@ -19,6 +19,9 @@
 #ifndef __CS_IVARIA_SIMPLEFORMER_H__
 #define __CS_IVARIA_SIMPLEFORMER_H__
 
+/**\file
+ * Simple terraformer interfaces
+ */
 
 #include "csutil/scf.h"
 #include "csutil/strset.h"

@@ -19,6 +19,10 @@
 #ifndef __CS_IVARIA_MAPNODE_H__
 #define __CS_IVARIA_MAPNODE_H__
 
+/**\file
+ * Map node interface
+ */
+
 #include "csutil/scf.h"
 
 struct iObject;
@@ -28,17 +32,14 @@ struct iSector;
  * A node. This is an iObject that is bound to a position and a sector in
  * the world. Nodes are typically created from a map file using the \<node\>
  * attribute.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>The main loader creates instances of this internally.
- *   </ul>
+ * - The main loader creates instances of this internally.
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() from iObject instances you get by
- *       calling iObject::GetIterator() on iObject instances you
- *       get from iSector::QueryObject().
- *   </ul>
+ * - scfQueryInterface() from iObject instances you get by
+ *   calling iObject::GetIterator() on iObject instances you
+ *   get from iSector::QueryObject().
  */
 struct iMapNode : public virtual iBase
 {

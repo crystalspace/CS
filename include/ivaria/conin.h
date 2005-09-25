@@ -20,6 +20,10 @@
 #ifndef __CS_IVARIA_CONIN_H__
 #define __CS_IVARIA_CONIN_H__
 
+/**\file
+ * Graphical console input
+ */
+
 #include "csutil/scf.h"
 
 struct iEvent;
@@ -44,20 +48,17 @@ SCF_VERSION (iConsoleInput, 1, 0, 1);
  * it on an associated console. The plugin has a command history
  * and when user presses 'Enter' can call some callback function
  * to execute the entered command.
- * <p>
+ * 
  * <b>WARNING</b> Do NOT use the event handler
  * that may (or may not) be implemented by the console and register
  * that to the event queue. This doesn't work properly. Instead register
  * your own event handler and call HandleEvent() from that.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Standard input console plugin (crystalspace.console.input.standard)
- *   </ul>
+ * - Standard input console plugin (crystalspace.console.input.standard)
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - csQueryRegistry()
  */
 struct iConsoleInput : public iBase
 {

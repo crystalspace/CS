@@ -20,6 +20,10 @@
 #ifndef __CS_IVARIA_CONOUT_H__
 #define __CS_IVARIA_CONOUT_H__
 
+/**\file
+ * Graphical console output
+ */
+
 #include "csutil/scf.h"
 
 
@@ -63,22 +67,18 @@ SCF_VERSION (iConsoleOutput, 2, 1, 0);
  * This is the Crystal Space Console interface.  It is an output only system.
  * It can be used in conjunction with the iConsoleInput interface to form an
  * interactive console.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Simple output console plugin (crystalspace.console.output.simple)
- *   <li>Standard output console plugin (crystalspace.console.output.standard)
- *   <li>Fancy output console plugin (crystalspace.console.output.fancy)
- *   </ul>
+ * - Simple output console plugin (crystalspace.console.output.simple)
+ * - Standard output console plugin (crystalspace.console.output.standard)
+ * - Fancy output console plugin (crystalspace.console.output.fancy)
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - csQueryRegistry()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iConsoleInput
- *   <li>iStandardReporterListener
- *   </ul>
+ * - iConsoleInput
+ * - iStandardReporterListener
  */
 struct iConsoleOutput : public iBase
 {
@@ -183,7 +183,7 @@ struct iConsoleOutput : public iBase
    * calls BeginDraw/Console->Draw methods on every PutText call.
    * Otherwise it is your responsability to call Draw() at appropiate
    * times. Initially this mode is enabled.
-   * <p>
+   * 
    * Note that some implementations of the output consoles may be thread-safe.
    * But in that case you MUST use AutoUpdate(false) because access to
    * graphics is not thread-safe.

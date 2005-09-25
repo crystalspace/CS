@@ -20,6 +20,10 @@
 #ifndef __CS_IVARIA_ODE_H__
 #define __CS_IVARIA_ODE_H__
 
+/**\file
+ * ODE-specific interfaces
+ */
+
 #include "csutil/scf.h"
 
 SCF_VERSION (iODEFrameUpdateCallback, 0, 0, 1);
