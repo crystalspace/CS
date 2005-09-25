@@ -19,7 +19,7 @@
 
 /**\file 
  * Directory master header. This header file includes all headers in a
- * subdirectory of the top CrystalSpace include directory.
+ * subdirectory of the top Crystal Space include directory.
  */
 #include "cssysdef.h"
 #include "csplugincommon/canvas/cursorconvert.h"

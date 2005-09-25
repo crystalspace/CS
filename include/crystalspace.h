@@ -18,10 +18,10 @@
 */
 
 /**\file 
- * CrystalSpace master header. This header file essentially causes most of the 
- * CrystalSpace header files to be included, providing a  convenient way to 
- * use any feature of CrystalSpace without having to worry about including the 
- * right header file(s).
+ * Crystal Space master header. This header file essentially causes most of 
+ * the Crystal Space header files to be included, providing a convenient way 
+ * to use any feature of Crystal Space without having to worry about including 
+ * the exact right header file(s).
  */
 #include "cssysdef.h"
 #include "csgeom.h"

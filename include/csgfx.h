@@ -19,12 +19,11 @@
 
 /**\file 
  * Directory master header. This header file includes all headers in a
- * subdirectory of the top CrystalSpace include directory.
+ * subdirectory of the top Crystal Space include directory.
  */
 #include "cssysdef.h"
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/csimgvec.h"
-#include "csgfx/csrgbvct.h"
 #include "csgfx/gradient.h"
 #include "csgfx/imagebase.h"
 #include "csgfx/imagecubemapmaker.h"
