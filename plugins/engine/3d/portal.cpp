@@ -40,8 +40,8 @@ static portal_VectorArray *VectorArray = 0;
 
 
 csPortal::csPortal (csPortalContainer* parent)
-  : scfImplementationType (this), filter_r (0), filter_g (1), filter_b (1),
-  max_sector_visit (5), parent (parent), name (0)
+  : scfImplementationType (this), parent (parent), name (0),
+  max_sector_visit (5), filter_r (0), filter_g (1), filter_b (1)
 {
   flags.Set (CS_PORTAL_VISCULL);
 

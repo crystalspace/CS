@@ -63,7 +63,7 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith)
 }
 
 csTextureWrapper::csTextureWrapper (const csTextureWrapper &t) :
-  scfImplementationType (this),
+  iBase(), scfImplementationType (this),
   flags(CS_TEXTURE_3D)
 {
   DG_TYPE (this, "csTextureWrapper");

@@ -263,16 +263,18 @@ csShadowFrustum::csShadowFrustum (const csShadowFrustum &orig) :
 
 //---------------------------------------------------------------------------
 csShadowIterator::csShadowIterator (csShadowBlock *cur, bool onlycur,int dir)
-  : scfImplementationType (this), cur (cur), onlycur (onlycur), dir (dir),
-  first_cur (cur), use_bbox (false)
+  : scfImplementationType (this),
+  first_cur (cur), cur (cur), onlycur (onlycur),
+  dir (dir), use_bbox (false)
 {
   Reset ();
 }
 
 csShadowIterator::csShadowIterator (const csBox3& bbox, csShadowBlock *cur,
   bool onlycur, int dir)
-  : scfImplementationType (this), cur (cur), onlycur (onlycur), dir (dir),
-  first_cur (cur), bbox (bbox), use_bbox (true)
+  : scfImplementationType (this),
+  first_cur (cur), cur (cur), onlycur (onlycur),
+  dir (dir), bbox (bbox), use_bbox (true)
 {
   Reset ();
 }

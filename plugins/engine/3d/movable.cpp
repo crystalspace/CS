@@ -94,8 +94,8 @@ iSector *csMovableSectorList::FindByName (const char *Name) const
 //---------------------------------------------------------------------------
 
 csMovable::csMovable ()
-  : scfImplementationType (this), parent (0), meshobject (0), lightobject (0),
-  cameraobject (0), updatenr (0), is_identity (true)
+  : scfImplementationType (this), is_identity (true), parent (0),
+  meshobject (0), lightobject (0), cameraobject (0), updatenr (0)
 {
   sectors.SetMovable (this);
 }

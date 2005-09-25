@@ -58,7 +58,7 @@ csCamera::csCamera (csCamera *c) :
 }
 
 csCamera::csCamera (const csCamera &c) :
-  csOrthoTransform(), scfImplementationType (this)
+  iBase(), csOrthoTransform(), scfImplementationType (this)
 {
   *this = c;
   if (fp)

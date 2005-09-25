@@ -19,6 +19,7 @@ chronological order.
 	- res fixed the simple former loader to properly read heightmap32
 	  again after the recent raw format additions. Also compiles on gcc
 	  again.
+	- mdmkolbe fixed some initializer order warnings.
 24-Sep-2005
 	- Jorrit fixed dependencies in the loader. It now also depends on
 	  new sound loader and renderer.
