@@ -30,24 +30,24 @@ struct iRigidBody;
 struct iSector;
 
 /** @file
-    This defines the plugin interface for the Crystal Space
-    Virtual Object System (VOS) Abstract 3D Layer plugin (A3DL).  VOS
-    is an object-oriented distributed network architechture; A3DL is a
-    set of extensions to VOS to describe 3D scenes.  This plugin makes
-    it easy to access 3D virtual worlds described using A3DL with the
-    VOS protocol and loads those worlds into the Crystal Space engine.
-    For more information about VOS, see http://interreality.org.  You
-    will need the download the VOS software from in order to use this
-    plugin.
-
-    @note This is very much a work in progress.  You can access the
-    underlying VOS API using QUERY_INTERFACE to get iVosApi (defined
-    in ivosapi.h).  Something that we'd like to do (but this does not
-    currently support) is to be able to take the current CS engine
-    state and export to remote clients using VOS, and generally wrap
-    VOS enough that you could take a Crystal Space app that doesn't
-    know anything about networking and sprinkle it with the magic VOS
-    plugin powder and make it multiuser... :-)
+ * Plugin interface for the Crystal Space Virtual Object System (VOS) 
+ * Abstract 3D Layer plugin (A3DL).  
+ * VOS is an object-oriented distributed network architechture; A3DL is a
+ * set of extensions to VOS to describe 3D scenes.  This plugin makes
+ * it easy to access 3D virtual worlds described using A3DL with the
+ * VOS protocol and loads those worlds into the Crystal Space engine.
+ * For more information about VOS, see http://interreality.org.  You
+ * will need the download the VOS software from in order to use this
+ * plugin.
+ * 
+ * @note This is very much a work in progress.  You can access the
+ * underlying VOS API using scfQueryInterface to get iVosApi (defined
+ * in ivosapi.h).  Something that we'd like to do (but this does not
+ * currently support) is to be able to take the current CS engine
+ * state and export to remote clients using VOS, and generally wrap
+ * VOS enough that you could take a Crystal Space app that doesn't
+ * know anything about networking and sprinkle it with the magic VOS
+ * plugin powder and make it multiuser... :-)
 */
 
 

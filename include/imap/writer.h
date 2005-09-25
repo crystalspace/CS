@@ -23,6 +23,7 @@
 #include "csutil/scf.h"
 
 /**\file
+ * Saver plugins
  */
 /**\addtogroup loadsave	
  * @{ */

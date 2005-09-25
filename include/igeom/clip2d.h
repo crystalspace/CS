@@ -20,6 +20,7 @@
 #define __CS_IGEOM_CLIP2D_H__
 
 /**\file
+ * 2D clipping interface
  */
 
 /**

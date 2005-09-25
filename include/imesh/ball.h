@@ -19,6 +19,10 @@
 #ifndef __CS_IMESH_BALL_H__
 #define __CS_IMESH_BALL_H__
 
+/**\file
+ * Ball mesh object
+ */
+
 #include "csutil/scf.h"
 
 class csVector3;
@@ -33,21 +37,17 @@ SCF_VERSION (iBallState, 0, 0, 4);
  * Using this you can set up the ball to whatever (ball) shape you
  * want it to have and the appearance. The ball plugin implements
  * this interface in addition to iMeshObject.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Ball mesh object plugin (crystalspace.mesh.object.ball)
- *   <li>iMeshObjectFactory::NewInstance()
- *   </ul>
+ * - Ball mesh object plugin (crystalspace.mesh.object.ball)
+ * - iMeshObjectFactory::NewInstance()
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() on iMeshWrapper::GetMeshObject()
- *   </ul>
+ * - scfQueryInterface() on iMeshWrapper::GetMeshObject()
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>Ball Loader plugin (crystalspace.mesh.loader.ball)
- *   <li>Ball Loader plugin (crystalspace.mesh.loader.factory.ball)
- *   </ul>
+ * - Ball Loader plugin (crystalspace.mesh.loader.ball)
+ * - Ball Loader plugin (crystalspace.mesh.loader.factory.ball)
  */
 struct iBallState : public iBase
 {

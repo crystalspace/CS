@@ -20,6 +20,7 @@
 #define __CS_IMAP_LDRCTXT_H__
 
 /**\file
+ * Loader context
  */
 #include "csutil/scf.h"
 

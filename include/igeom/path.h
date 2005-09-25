@@ -22,6 +22,7 @@
 #include "csutil/scf_interface.h"
 
 /**\file 
+ * 3D path interfaces
  */
 /**
  * \addtogroup geom_utils

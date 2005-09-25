@@ -19,6 +19,10 @@
 #ifndef __CS_IMAP_SAVER_H__
 #define __CS_IMAP_SAVER_H__
 
+/**\file
+ * Engine contents saving
+ */
+
 #include "csutil/scf.h"
 
 struct iDocumentNode;

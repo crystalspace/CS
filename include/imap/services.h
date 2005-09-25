@@ -20,6 +20,7 @@
 #define __CS_IMAP_SYNTAXSERVICE_H__
 
 /**\file
+ * Loader services for standard syntax elements
  */
 /**\addtogroup loadsave
  * @{ */

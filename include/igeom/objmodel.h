@@ -21,6 +21,7 @@
 #define __CS_IGEOM_OBJMODEL_H__
 
 /**\file
+ * Mesh object models
  */
 
 /**
@@ -52,16 +53,13 @@ struct iObjectModelListener : public virtual iBase
  * space. It is a generic way to describe meshes in the engine. By using
  * this interface you can make sure your code works on all engine geometry.
  * The data returned by this class is in local object space.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>All mesh objects implement this interface.
- *   </ul>
+ * - All mesh objects implement this interface.
+ * 
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iMeshObject::GetObjectModel()
- *   <li>iMeshObjectFactory::GetObjectModel()
- *   </ul>
+ * - iMeshObject::GetObjectModel()
+ * - iMeshObjectFactory::GetObjectModel()
  */
 struct iObjectModel : public virtual iBase
 {

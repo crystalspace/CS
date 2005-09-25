@@ -23,6 +23,7 @@
 #include "csutil/scf_implementation.h"
 
 /**\file
+ * Streaming data source
  */
 /**\addtogroup loadsave
  * @{ */
