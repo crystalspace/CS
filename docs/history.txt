@@ -20,6 +20,14 @@ chronological order.
 	  again after the recent raw format additions. Also compiles on gcc
 	  again.
 	- mdmkolbe fixed some initializer order warnings.
+	- res reorganized the endian conversion stuff a bit; the routines are
+	  now wrapped into classes. Also, they are now named to reflect that
+	  specifically sized types are converted. Last but not least, 
+	  encourage use of IEEE floats instead of a custom floating-point
+	  representation.
+	- res fixed csRGBcolor comparison. Previously, it could happen that
+	  when comparing a, b and b, a in both cases "first greater than 
+	  second" was reported.
 24-Sep-2005
 	- Jorrit fixed dependencies in the loader. It now also depends on
 	  new sound loader and renderer.

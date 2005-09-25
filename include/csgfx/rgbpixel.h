@@ -100,14 +100,13 @@ class csComparator<csRGBcolor, csRGBcolor>
 public:
   static int Compare (csRGBcolor const& r1, csRGBcolor const& r2)
   {
-    if (r1 == r2)
-      return 0;
-    else if(r1.red < r2.red &&
-	    r1.green < r2.green &&
-	    r1.blue < r2.blue)
-      return -1;
-    else
-      return 1;
+    if (r1.red != r2.red)
+      return (int)r1.red - (int)r2.red;
+    if (r1.green != r2.green)
+      return (int)r1.green - (int)r2.green;
+    if (r1.blue != r2.blue)
+      return (int)r1.blue - (int)r2.blue;
+    return 0;
   }
 };
 
