@@ -26,14 +26,11 @@
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
 
-
-
 /**\file
  * Particle System Interface
  */
 
-/**
- * \addtogroup gfx3d
+/**\addtogroup meshplugins
  * @{ */
 
 struct iMaterialWrapper;

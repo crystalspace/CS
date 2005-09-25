@@ -20,7 +20,14 @@
 #ifndef __CS_IMESH_SNOW_H__
 #define __CS_IMESH_SNOW_H__
 
+/**\file
+ * Snow particle mesh object
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 class csColor;
 class csVector3;
@@ -57,6 +64,8 @@ struct iSnowState : public iBase
   /// Get swirl.
   virtual float GetSwirl () const = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_SNOW_H__
 

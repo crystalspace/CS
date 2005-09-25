@@ -20,7 +20,14 @@
 #ifndef __CS_IMESH_FIRE_H__
 #define __CS_IMESH_FIRE_H__
 
+/**\file
+ * Fire particle mesh object
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 class csBox3;
 class csColor;
@@ -66,6 +73,8 @@ struct iFireState : public iBase
   /// Get total time.
   virtual float GetTotalTime () const = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_FIRE_H__
 

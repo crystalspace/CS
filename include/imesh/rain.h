@@ -20,7 +20,14 @@
 #ifndef __CS_IMESH_RAIN_H__
 #define __CS_IMESH_RAIN_H__
 
+/**\file
+ * Rain particle mesh object
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 struct iMaterialWrapper;
 
@@ -71,6 +78,8 @@ struct iRainState : public iBase
   /// Get particle color.
   virtual const csColor& GetColor () const = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_RAIN_H__
 

@@ -21,6 +21,13 @@
 
 #include "csutil/scf.h"
 
+/**\file
+ * Lightning mesh object
+ */ 
+
+/**\addtogroup meshplugins
+ * @{ */
+
 struct iMaterialWrapper;
 
 class csVector3;
@@ -80,6 +87,8 @@ SCF_VERSION (iLightningState, 0, 0, 1);
 struct iLightningState : public iLightningFactoryState
 {
 };
+
+/** @} */
 
 #endif // __CS_IMESH_LGHTNG_H__
 

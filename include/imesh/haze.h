@@ -19,7 +19,14 @@
 #ifndef __CS_IMESH_HAZE_H__
 #define __CS_IMESH_HAZE_H__
 
+/**\file
+ * Haze mesh object
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 struct iMaterialWrapper;
 
@@ -116,7 +123,7 @@ SCF_VERSION (iHazeFactoryState, 0, 0, 1);
  * This interface describes the API for the sprite factory mesh object.
  * When multiple hulls are used, they must have the same number of
  * vertices, vertices are taken to be numbered in the same ordering.
- * <p>
+ * 
  * The factory also implements the iHazeHullCreation interface
  */
 struct iHazeFactoryState : public iBase
@@ -163,6 +170,8 @@ SCF_VERSION (iHazeState, 0, 0, 1);
 struct iHazeState : public iHazeFactoryState
 {
 };
+
+/** @} */
 
 #endif // __CS_IMESH_HAZE_H__
 

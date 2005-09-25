@@ -34,6 +34,9 @@ class csVector3;
 struct iMaterialWrapper;
 struct iObject;
 
+/**\addtogroup meshplugins
+ * @{ */
+
 /**
  * This is the interface for a curve.
  * 
@@ -174,6 +177,8 @@ struct iBezierState : public iBase
 };
 
 SCF_VERSION (iCurve, 0, 1, 0);
+
+/** @} */
 
 #endif // __CS_IMESH_BEZIER_H__
 

@@ -19,8 +19,15 @@
 #ifndef __CS_IMESH_PARTICLE_H__
 #define __CS_IMESH_PARTICLE_H__
 
+/**\file
+ * Particle interface
+ */ 
+
 #include "csutil/scf.h"
 #include "csutil/array.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 struct iLight;
 struct iMovable;
@@ -77,5 +84,7 @@ struct iParticle : public iBase
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask) = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_PARTICLE_H__

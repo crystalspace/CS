@@ -19,7 +19,14 @@
 #ifndef __CS_IMESH_MDLCONV_H__
 #define __CS_IMESH_MDLCONV_H__
 
+/**\file
+ * Mesh model converter
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 struct iDataBuffer;
 struct iModelData;
@@ -60,6 +67,8 @@ struct iModelConverter : public iBase
   /// Write data to a file
   virtual csPtr<iDataBuffer> Save (iModelData*, const char *Format) = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_MDLCONV_H__
 

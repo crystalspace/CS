@@ -20,7 +20,14 @@
 #ifndef __CS_IMESH_FOUNTAIN_H__
 #define __CS_IMESH_FOUNTAIN_H__
 
+/**\file
+ * Fountain mesh object
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 class csColor;
 class csVector3;
@@ -73,6 +80,8 @@ struct iFountainState : public iBase
   /// Get fall time.
   virtual float GetFallTime () const = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_FOUNTAIN_H__
 

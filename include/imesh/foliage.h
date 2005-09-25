@@ -19,6 +19,10 @@
 #ifndef __CS_IMESH_FOLIAGEMESH_H__
 #define __CS_IMESH_FOLIAGEMESH_H__
 
+/**\file
+ * Foliage mesh object
+ */ 
+
 #include "csutil/scf.h"
 
 #include "csgeom/vector2.h"
@@ -26,6 +30,9 @@
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/refarr.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 struct iMaterialWrapper;
 struct iTerraFormer;
@@ -148,21 +155,18 @@ SCF_VERSION (iFoliageFactoryState, 0, 0, 1);
  * fits nicely with a terrain.
  * The general API for the foliage factory. Here you define the
  * actual geometry which is shared between all foliage mesh instances.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Foliage mesh object plugin (crystalspace.mesh.object.foliage)
- *   <li>iMeshObjectType::NewFactory()
- *   </ul>
+ * - Foliage mesh object plugin (crystalspace.mesh.object.foliage)
+ * - iMeshObjectType::NewFactory()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() on iMeshFactoryWrapper::GetMeshObjectFactory()
- *   </ul>
+ * - scfQueryInterface() on iMeshFactoryWrapper::GetMeshObjectFactory()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>Foliage Factory Loader plugin
+ * - Foliage Factory Loader plugin
  *      (crystalspace.mesh.loader.factory.foliage)
- *   </ul>
+ *   
  */
 struct iFoliageFactoryState : public iBase
 {
@@ -224,8 +228,7 @@ struct iFoliageFactoryState : public iBase
   /**
    * The terraformer defines various properties for this foliage mesh.
    * The terraformer needs to support the following properties:
-   * <ul>
-   * <li>'heights': this basically comes directly from the heightmap
+     * <li>'heights': this basically comes directly from the heightmap
    *     and is returned as an array of floats. The normal simpleformer
    *     (as is used by the landscape engine) supports this automatically.
    * <li>'vertices': this basically comes directly from the heightmap
@@ -242,7 +245,7 @@ struct iFoliageFactoryState : public iBase
    *     palette indices that are not defined then no foliage will
    *     be generated on that spot.
    *     This map must have same resolution as the heightmap.
-   * </ul>
+   * 
    */
   virtual void SetTerraFormer (iTerraFormer* form) = 0;
   /**
@@ -265,24 +268,23 @@ SCF_VERSION (iFoliageMeshState, 0, 0, 1);
 
 /**
  * This interface describes the API for the foliage mesh object.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Foliage mesh object plugin (crystalspace.mesh.object.foliage)
- *   <li>iMeshObjectFactory::NewInstance()
- *   </ul>
+ * - Foliage mesh object plugin (crystalspace.mesh.object.foliage)
+ * - iMeshObjectFactory::NewInstance()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() on iMeshWrapper::GetMeshObject()
- *   </ul>
+ * - scfQueryInterface() on iMeshWrapper::GetMeshObject()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>Foliage Loader plugin (crystalspace.mesh.loader.foliage)
- *   </ul>
+ * - Foliage Loader plugin (crystalspace.mesh.loader.foliage)
+ *   
  */
 struct iFoliageMeshState : public iBase
 {
 };
+
+/** @} */
 
 #endif // __CS_IMESH_FOLIAGEMESH_H__
 

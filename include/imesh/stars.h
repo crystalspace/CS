@@ -19,11 +19,18 @@
 #ifndef __CS_IMESH_STARS_H__
 #define __CS_IMESH_STARS_H__
 
+/**\file
+ * Stars particle mesh object
+ */ 
+
 #include "csutil/scf.h"
 
 class csBox3;
 class csColor;
 class csVector3;
+
+/**\addtogroup meshplugins
+ * @{ */
 
 SCF_VERSION (iStarsState, 0, 0, 2);
 
@@ -61,6 +68,8 @@ struct iStarsState : public iBase
   /// Get max distance at which stars are visible.
   virtual float GetMaxDistance () const = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_STARS_H__
 

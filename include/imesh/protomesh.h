@@ -19,7 +19,14 @@
 #ifndef __CS_IMESH_PROTOMESH_H__
 #define __CS_IMESH_PROTOMESH_H__
 
+/**\file
+ * Tutorial mesh object
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 class csVector3;
 class csVector2;
@@ -35,36 +42,31 @@ SCF_VERSION (iProtoFactoryState, 0, 0, 1);
  * very simple and really unusable in games but it is a very good
  * start to make a new mesh object. It supports only the new renderer
  * but should compile with old renderer too (just not visible then).
- * <p>
+ * 
  * The proto mesh supports:
- * <ul>
- * <li>Primitive geometry (8 vertices, 12 triangles, just enough for a box).
- * <li>Setting of base color and per vertex color.
- * <li>Setting of vertices, texels, and normals.
- * <li>Material per mesh object.
- * <li>Sharing geometry in the factory.
- * <li>Collision detection.
- * <li>Direct creation of render buffers.
- * <li>Delayed creation of render buffers.
- * </ul>
- * <p>
+ * - Primitive geometry (8 vertices, 12 triangles, just enough for a box).
+ * - Setting of base color and per vertex color.
+ * - Setting of vertices, texels, and normals.
+ * - Material per mesh object.
+ * - Sharing geometry in the factory.
+ * - Collision detection.
+ * - Direct creation of render buffers.
+ * - Delayed creation of render buffers.
+ * 
  * The general API for the proto factory. Here you define the
  * actual geometry which is shared between all proto mesh instances.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Protomesh mesh object plugin (crystalspace.mesh.object.protomesh)
- *   <li>iMeshObjectType::NewFactory()
- *   </ul>
+ * - Protomesh mesh object plugin (crystalspace.mesh.object.protomesh)
+ * - iMeshObjectType::NewFactory()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() on iMeshFactoryWrapper::GetMeshObjectFactory()
- *   </ul>
+ * - scfQueryInterface() on iMeshFactoryWrapper::GetMeshObjectFactory()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>Protomesh Factory Loader plugin
+ * - Protomesh Factory Loader plugin
         (crystalspace.mesh.loader.factory.protomesh)
- *   </ul>
+ *   
  */
 struct iProtoFactoryState : public iBase
 {
@@ -112,20 +114,17 @@ SCF_VERSION (iProtoMeshState, 0, 0, 1);
 
 /**
  * This interface describes the API for the proto mesh object.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Proto mesh object plugin (crystalspace.mesh.object.protomesh)
- *   <li>iMeshObjectFactory::NewInstance()
- *   </ul>
+ * - Proto mesh object plugin (crystalspace.mesh.object.protomesh)
+ * - iMeshObjectFactory::NewInstance()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() on iMeshWrapper::GetMeshObject()
- *   </ul>
+ * - scfQueryInterface() on iMeshWrapper::GetMeshObject()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>Protomesh Loader plugin (crystalspace.mesh.loader.protomesh)
- *   </ul>
+ * - Protomesh Loader plugin (crystalspace.mesh.loader.protomesh)
+ *   
  */
 struct iProtoMeshState : public iBase
 {
@@ -143,6 +142,8 @@ struct iProtoMeshState : public iBase
   /// Get the color.
   virtual const csColor& GetColor () const = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_PROTOMESH_H__
 

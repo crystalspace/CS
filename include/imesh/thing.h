@@ -140,17 +140,15 @@ SCF_VERSION (iPolygonHandle, 0, 0, 1);
  * iThingState->CreatePolygonHandle(). Note that this handle will make
  * sure that the returned pointers are cleared if the thing or thing
  * factory happens to be removed.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iThingState::CreatePolygonHandle()
- *   <li>iThingFactoryState::CreatePolygonHandle()
- *   </ul>
+ * - iThingState::CreatePolygonHandle()
+ * - iThingFactoryState::CreatePolygonHandle()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>iThingState
- *   <li>iThingFactoryState
- *   </ul>
+ * - iThingState
+ * - iThingFactoryState
+ *   
  */
 struct iPolygonHandle : public iBase
 {
@@ -188,21 +186,18 @@ struct iPolygonHandle : public iBase
 /**
  * This is the state interface to access the internals of a thing
  * mesh factory.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Thing mesh object plugin (crystalspace.mesh.object.thing)
- *   <li>iMeshObjectType::NewFactory()
- *   </ul>
+ * - Thing mesh object plugin (crystalspace.mesh.object.thing)
+ * - iMeshObjectType::NewFactory()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() on iMeshFactoryWrapper::GetMeshObjectFactory()
- *   <li>iThingState::GetFactory()
- *   </ul>
+ * - scfQueryInterface() on iMeshFactoryWrapper::GetMeshObjectFactory()
+ * - iThingState::GetFactory()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>Thing Factory Loader plugin (crystalspace.mesh.loader.factory.thing)
- *   </ul>
+ * - Thing Factory Loader plugin (crystalspace.mesh.loader.factory.thing)
+ *   
  */
 struct iThingFactoryState : public virtual iBase
 {
@@ -236,7 +231,7 @@ struct iThingFactoryState : public virtual iBase
 
   /**
    * Add a triangle.
-   * <p>
+   * 
    * By default the texture mapping is set so that the texture
    * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set
    * so that the texture tiles once for every unit (i.e. if you have the
@@ -249,7 +244,7 @@ struct iThingFactoryState : public virtual iBase
   /**
    * Add a quad. Note that quads are the most optimal kind of polygon
    * for a thing so you should try to use these as much as possible.
-   * <p>
+   * 
    * By default the texture mapping is set so that the texture
    * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set
    * so that the texture tiles once for every unit (i.e. if you have the
@@ -262,7 +257,7 @@ struct iThingFactoryState : public virtual iBase
 
   /**
    * Add a general polygon.
-   * <p>
+   * 
    * By default the texture mapping is set so that the texture
    * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set
    * so that the texture tiles once for every unit (i.e. if you have the
@@ -274,7 +269,7 @@ struct iThingFactoryState : public virtual iBase
 
   /**
    * Add a general polygon using vertex indices.
-   * <p>
+   * 
    * By default the texture mapping is set so that the texture
    * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set
    * so that the texture tiles once for every unit (i.e. if you have the
@@ -286,7 +281,7 @@ struct iThingFactoryState : public virtual iBase
 
   /**
    * Add a box that can be seen from the outside. This will add six polygons.
-   * <p>
+   * 
    * By default the texture mapping is set so that the texture
    * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set
    * so that the texture tiles once for every unit (i.e. if you have the
@@ -298,7 +293,7 @@ struct iThingFactoryState : public virtual iBase
 
   /**
    * Add a box that can be seen from the inside. This will add six polygons.
-   * <p>
+   * 
    * By default the texture mapping is set so that the texture
    * is aligned on the u-axis with the 'v1'-'v2' vector and the scale is set
    * so that the texture tiles once for every unit (i.e. if you have the
@@ -462,7 +457,7 @@ struct iThingFactoryState : public virtual iBase
    * texture space coordinate system. The v-axis is calculated on the plane
    * of the polygons and orthogonal to the given u-axis. The length of the
    * u-axis and the v-axis is given as the 'len' parameter.
-   * <p>
+   * 
    * For example, if 'len' is equal to 2 this means that texture will be
    * tiled exactly two times between vertex 'v_orig' and 'v'.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
@@ -483,7 +478,7 @@ struct iThingFactoryState : public virtual iBase
    * texture space coordinate system, and the third as the v-axis.
    * The length of the u-axis and the v-axis is given with the 'len1' and
    * 'len2' parameters.
-   * <p>
+   * 
    * For example, if 'len1' is equal to 2 this means that texture will be
    * tiled exactly two times between vertex 'v_orig' and 'v1'.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
@@ -508,7 +503,7 @@ struct iThingFactoryState : public virtual iBase
    * texture space coordinate system. The v-axis is calculated on the plane
    * of the polygons and orthogonal to the given u-axis. The length of the
    * u-axis and the v-axis is given as the 'len' parameter.
-   * <p>
+   * 
    * For example, if 'len1' is equal to 2 this means that texture will be
    * tiled exactly two times between the two first vertices.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
@@ -675,20 +670,17 @@ SCF_VERSION (iThingState, 0, 7, 0);
 /**
  * This is the state interface to access the internals of a thing
  * mesh object.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Thing mesh object plugin (crystalspace.mesh.object.thing)
- *   <li>iMeshObjectFactory::NewInstance()
- *   </ul>
+ * - Thing mesh object plugin (crystalspace.mesh.object.thing)
+ * - iMeshObjectFactory::NewInstance()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() on iMeshWrapper::GetMeshObject()
- *   </ul>
+ * - scfQueryInterface() on iMeshWrapper::GetMeshObject()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>Thing Loader plugin (crystalspace.mesh.loader.thing)
- *   </ul>
+ * - Thing Loader plugin (crystalspace.mesh.loader.thing)
+ *   
  */
 struct iThingState : public iBase
 {
@@ -708,8 +700,7 @@ struct iThingState : public iBase
   /**
    * Control how this thing will be moved.
    * There are currently two options.
-   * <ul>
-   *   <li>CS_THING_MOVE_NEVER: this option is set for a thing that cannot
+   * - CS_THING_MOVE_NEVER: this option is set for a thing that cannot
    *       move at all. In this case the movable will be ignored and only
    *       hard transforms can be used to move a thing with this flag. This
    *       setting is both efficient for memory (object space coordinates are
@@ -717,7 +708,7 @@ struct iThingState : public iBase
    *       render speed (only the camera transform is needed). This option
    *       is very useful for static geometry like walls.
    *       This option is default.
-   *   <li>CS_THING_MOVE_OCCASIONAL: this option is set for a thing that
+   * - CS_THING_MOVE_OCCASIONAL: this option is set for a thing that
    *       is movable but doesn't move all the time usually. Setting this
    *       option means that the world space vertices will be cached (taking
    *       up more memory that way) but the coordinates will be recalculated
@@ -726,8 +717,7 @@ struct iThingState : public iBase
    *       move but more memory is used as all the vertices are duplicated.
    *       Use this option for geometry that is not too big (in number of
    *       vertices) and only moves occasionally like doors of elevators.
-   * </ul>
-   * <p>
+   * 
    * Note: it is no longer needed to manually set this option. By default
    * things will use CS_THING_MOVE_NEVER and they will automatically switch
    * to the slightly less efficient CS_THING_MOVE_OCCASIONAL if needed.
@@ -795,15 +785,13 @@ SCF_VERSION (iThingEnvironment, 0, 3, 0);
 /**
  * This interface is implemented by the iObjectType for things.
  * Using this interface you can access some global information for things.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Thing mesh plugin.
- *   </ul>
+ * - Thing mesh plugin.
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE on thing mesh plugin (iMeshObjectType).
- *   </ul>
+ * - scfQueryInterface on thing mesh plugin (iMeshObjectType).
+ *   
  */
 struct iThingEnvironment : public iBase
 {

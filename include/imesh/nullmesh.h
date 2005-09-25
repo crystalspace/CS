@@ -19,7 +19,14 @@
 #ifndef __CS_IMESH_NULLMESH_H__
 #define __CS_IMESH_NULLMESH_H__
 
+/**\file
+ * Null mesh object
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 class csVector3;
 class csBox3;
@@ -57,6 +64,8 @@ SCF_VERSION (iNullFactoryState, 0, 0, 1);
 struct iNullFactoryState : public iNullMeshState
 {
 };
+
+/** @} */
 
 #endif // __CS_IMESH_NULLMESH_H__
 

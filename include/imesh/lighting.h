@@ -19,7 +19,14 @@
 #ifndef __CS_IMESH_LIGHTING_H__
 #define __CS_IMESH_LIGHTING_H__
 
+/**\file
+ * Mesh object lighting
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 struct iCacheManager;
 struct iLight;
@@ -30,19 +37,16 @@ class csColor;
  * This interface is implemented by mesh objects that have some kind
  * of lighting system. It has features to initialize lighting, to read
  * it from a cache, ...
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Several mesh objects implement this.
- *   </ul>
+ * - Several mesh objects implement this.
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() on iMeshObject.
- *   </ul>
+ * - scfQueryInterface() on iMeshObject.
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>The 3D engine plugin (crystalspace.engine.3d).
- *   </ul>
+ * - The 3D engine plugin (crystalspace.engine.3d).
+ *   
  */
 struct iLightingInfo : public virtual iBase
 {
@@ -89,6 +93,8 @@ struct iLightingInfo : public virtual iBase
    */
   virtual void LightDisconnect (iLight* light) = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_LIGHTING_H__
 

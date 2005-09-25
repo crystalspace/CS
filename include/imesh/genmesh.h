@@ -19,6 +19,10 @@
 #ifndef __CS_IMESH_GENMESH_H__
 #define __CS_IMESH_GENMESH_H__
 
+/**\file
+ * General mesh object
+ */ 
+
 #include "csutil/scf.h"
 
 struct iDocumentNode;
@@ -26,6 +30,9 @@ struct iGenMeshAnimationControl;
 struct iGenMeshAnimationControlFactory;
 struct iMaterialWrapper;
 struct iRenderBuffer;
+
+/**\addtogroup meshplugins
+ * @{ */
 
 class csBox3;
 class csColor;
@@ -139,20 +146,17 @@ SCF_VERSION (iGeneralMeshState, 0, 1, 0);
 
 /**
  * This interface describes the API for the general mesh object.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Genmesh mesh object plugin (crystalspace.mesh.object.genmesh)
- *   <li>iMeshObjectFactory::NewInstance()
- *   </ul>
+ * - Genmesh mesh object plugin (crystalspace.mesh.object.genmesh)
+ * - iMeshObjectFactory::NewInstance()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() on iMeshWrapper::GetMeshObject()
- *   </ul>
+ * - scfQueryInterface() on iMeshWrapper::GetMeshObject()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>Genmesh Loader plugin (crystalspace.mesh.loader.genmesh)
- *   </ul>
+ * - Genmesh Loader plugin (crystalspace.mesh.loader.genmesh)
+ *   
  */
 struct iGeneralMeshState : public iGeneralMeshCommonState
 {
@@ -181,20 +185,17 @@ struct csSphere;
  * exception to this rule. Setting that on the factory will have an
  * effect immediatelly on all mesh objects created from that factory
  * except for those mesh objects that have their own material set.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Genmesh mesh object plugin (crystalspace.mesh.object.genmesh)
- *   <li>iMeshObjectType::NewFactory()
- *   </ul>
+ * - Genmesh mesh object plugin (crystalspace.mesh.object.genmesh)
+ * - iMeshObjectType::NewFactory()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() on iMeshFactoryWrapper::GetMeshObjectFactory()
- *   </ul>
+ * - scfQueryInterface() on iMeshFactoryWrapper::GetMeshObjectFactory()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>Genmesh Factory Loader plugin (crystalspace.mesh.loader.factory.genmesh)
- *   </ul>
+ * - Genmesh Factory Loader plugin (crystalspace.mesh.loader.factory.genmesh)
+ *   
  */
 struct iGeneralFactoryState : public iGeneralMeshCommonState
 {
@@ -310,19 +311,16 @@ SCF_VERSION (iGenMeshAnimationControl, 0, 0, 1);
  * animating vertex that it is prefered that the bounding box of the
  * object doesn't change too dramatically because this animation is
  * called AFTER visibility culling!
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iGenMeshAnimationControlFactory::CreateAnimationControl()
- *   </ul>
+ * - iGenMeshAnimationControlFactory::CreateAnimationControl()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iGeneralMeshState::GetAnimationControl()
- *   </ul>
+ * - iGeneralMeshState::GetAnimationControl()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>Genmesh plugin (crystalspace.mesh.object.genmesh)
- *   </ul>
+ * - Genmesh plugin (crystalspace.mesh.object.genmesh)
+ *   
  */
 struct iGenMeshAnimationControl : public iBase
 {
@@ -389,19 +387,16 @@ SCF_VERSION (iGenMeshAnimationControlFactory, 0, 0, 1);
 struct iDocumentNode;
 /**
  * This class is a factory for creating animation controls.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iGenMeshAnimationControlType::CreateAnimationControlFactory()
- *   </ul>
+ * - iGenMeshAnimationControlType::CreateAnimationControlFactory()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iGeneralFactoryState::GetAnimationControlFactory()
- *   </ul>
+ * - iGeneralFactoryState::GetAnimationControlFactory()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>Genmesh plugin (crystalspace.mesh.object.genmesh)
- *   </ul>
+ * - Genmesh plugin (crystalspace.mesh.object.genmesh)
+ *   
  */
 struct iGenMeshAnimationControlFactory : public iBase
 {
@@ -427,20 +422,17 @@ SCF_VERSION (iGenMeshAnimationControlType, 0, 0, 1);
 
 /**
  * This class is the animation control type.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Genmesh animation control plugin (crystalspace.mesh.anim.genmesh)
- *   </ul>
+ * - Genmesh animation control plugin (crystalspace.mesh.anim.genmesh)
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_PLUGIN_CLASS()
- *   <li>CS_LOAD_PLUGIN()
- *   </ul>
+ * - csQueryPluginClass()
+ * - csLoadPlugin()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>Genmesh plugin (crystalspace.mesh.object.genmesh)
- *   </ul>
+ * - Genmesh plugin (crystalspace.mesh.object.genmesh)
+ *   
  */
 struct iGenMeshAnimationControlType : public iBase
 {
@@ -451,6 +443,8 @@ struct iGenMeshAnimationControlType : public iBase
   	() = 0;
 
 };
+
+/** @} */
 
 #endif // __CS_IMESH_GENMESH_H__
 

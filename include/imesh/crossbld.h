@@ -19,6 +19,10 @@
 #ifndef __CS_IMESH_CROSSBLD_H__
 #define __CS_IMESH_CROSSBLD_H__
 
+/**\file
+ * Mesh cross builder
+ */ 
+
 #include "csutil/scf.h"
 
 struct iModelData;
@@ -28,6 +32,9 @@ struct iSprite3DFactoryState;
 struct iMaterialWrapper;
 struct iEngine;
 struct iMeshFactoryWrapper;
+
+/**\addtogroup meshplugins
+ * @{ */
 
 SCF_VERSION (iCrossBuilder, 0, 1, 0);
 
@@ -52,5 +59,7 @@ struct iCrossBuilder : public iBase
   virtual iMeshFactoryWrapper *BuildSpriteFactoryHierarchy (iModelData *Scene,
 	iEngine *Engine, iMaterialWrapper *DefaultMaterial) const = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_CROSSBLD_H__

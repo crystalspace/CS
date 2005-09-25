@@ -19,7 +19,14 @@
 #ifndef __CS_IMESH_MDLDATA_H__
 #define __CS_IMESH_MDLDATA_H__
 
+/**\file
+ * Mesh model data
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 struct iImage;
 struct iImageIO;
@@ -39,12 +46,12 @@ SCF_VERSION (iModelDataTexture, 0, 0, 1);
 
 /**
  * This structure contains the information about a texture for an
- * imported model. <p>
+ * imported model. 
  *
  * There are three possible types of representation for a texture: As a file
  * name, as an iImage or as a texture wrapper. The model data
  * structures will not convert between them automatically, but some
- * convenience functions are included to make conversion easier. <p>
+ * convenience functions are included to make conversion easier. 
  *
  * As an example, exporting to a model file which does not contain the
  * textures themselves but only their file name will require that the
@@ -99,7 +106,7 @@ SCF_VERSION (iModelDataMaterial, 0, 0, 1);
  * This structure contains the information about a material for an imported
  * model. This information can be stored in two different way: Either as a
  * base iMaterial, or as a material wrapper. Conversion between the two is
- * usually possible, but does not happen automatically. <p>
+ * usually possible, but does not happen automatically. 
  *
  * Whatever you use the model data for determines which representation is
  * used. As an example, exporting to a model file uses the base material.
@@ -212,22 +219,22 @@ SCF_VERSION (iModelDataAction, 0, 0, 1);
  * An action. This is mainly a list of key frames. Note that the key frames
  * are not added as sub-objects, but instead they are added directly through
  * the iModelDataAction interface. The reason is that together with every
- * frame a time value has to be stored. <p>
+ * frame a time value has to be stored. 
  *
  * The idea of time values is the following: Every frame comes with the point
  * in time when the frame *ends*, measured in seconds. For example, if your
  * frames last 100msec, 200msec, 50msec and 250msec, the time values are: 0.1,
  * 0.3, 0.35, 0.6. As this is the ending time for each frame, the last time
  * value has three meanings:
- * <ul><li> It is the end of the whole action
- * <li> It is the length of the action
- * <li> It wraps around to the time value 0.0
- * </ul>
+ * - It is the end of the whole action
+ * - It is the length of the action
+ * - It wraps around to the time value 0.0
+ * 
  * Another effect of this is that when you start playing an animation cycle,
  * the animation begins at the *last* frame and moves on to the first frame
- * within the time that is stored with the first frame. <p>
+ * within the time that is stored with the first frame. 
  *
- * Note that the frames are automatically sorted by time. <p>
+ * Note that the frames are automatically sorted by time. 
  *
  * There are different types of frames. One could imagine vertex states,
  * skeleton states and transformation states (or other types?). Currently
@@ -307,7 +314,7 @@ SCF_VERSION (iModelDataObject, 0, 1, 0);
 
 /**
  * One object in the scene. This structure is intended for solid objects, i.e.
- * not for lights or cameras. Children should be polygons, curves etc. <p>
+ * not for lights or cameras. Children should be polygons, curves etc. 
  *
  * Every object contains a list of vertices. These vertices are shared between
  * polygons (and curves if possible).
@@ -415,5 +422,7 @@ struct iModelData : public iBase
   /// Register all materials using the given material list
   virtual void RegisterMaterials (iMaterialList *ml) = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_MDLDATA_H__

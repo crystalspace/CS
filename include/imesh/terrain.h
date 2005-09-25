@@ -19,9 +19,16 @@
 #ifndef __CS_IMESH_TERRAIN_H__
 #define __CS_IMESH_TERRAIN_H__
 
+/**\file
+ * Terrain mesh object
+ */ 
+
 #include "csutil/scf.h"
 
 #include "csutil/array.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 struct iImage;
 struct iMaterialWrapper;
@@ -79,13 +86,12 @@ struct iTerrainObjectState : public iBase
    * Set a LOD parameter.
    * 
    * The following parameters can be used:
-   * <ul>
-   * <li><i>"lod distance"</i> - The distance at which splatting is no longer 
+     * <li><i>"lod distance"</i> - The distance at which splatting is no longer 
    *  in effect and the base texture is the only layer.</li>
    * <li><i>"error tolerance"</i>  - The screenspace error tolerance in 
    *  numbers of pixels. Error will be less than the given tolerance so 
    *  setting the tolerance to values less than 1 is worthless.</li>
-   * </ul>
+   * 
    * \return Whether the value was accepted by the terrain object.
    */
   virtual bool SetLODValue (const char* parameter, float value) = 0;
@@ -165,5 +171,7 @@ struct iTerrainFactoryState : public iBase
   virtual bool SaveState (const char *filename) = 0;
   virtual bool RestoreState (const char *filename) = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_TERRAIN_H__

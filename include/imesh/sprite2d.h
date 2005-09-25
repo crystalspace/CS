@@ -19,10 +19,17 @@
 #ifndef __CS_IMESH_SPRITE2D_H__
 #define __CS_IMESH_SPRITE2D_H__
 
+/**\file
+ * 2D sprite (billboard) mesh object
+ */ 
+
 #include "csutil/scf.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/cscolor.h"
 #include "csgeom/vector2.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 struct iMaterialWrapper;
 
@@ -270,6 +277,8 @@ struct iSprite2DState : public iSprite2DFactoryState
    */
   virtual void PlayUVAnimation (int idx, int style, bool loop) = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_SPRITE2D_H__
 

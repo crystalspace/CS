@@ -19,8 +19,15 @@
 #ifndef __CS_IMESH_SPRITECAL3D_H__
 #define __CS_IMESH_SPRITECAL3D_H__
 
+/**\file
+ * 3D Cal3d (skeletal animation) sprite mesh object
+ */ 
+
 #include "csutil/scf.h"
 #include "imesh/sprite3d.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 struct iMaterialWrapper;
 struct iMeshObject;
@@ -613,5 +620,7 @@ struct iSpriteCal3DState : public iBase
   virtual CalModel *GetCal3DModel() = 0;
   /** @} */
 };
+
+/** @} */
 
 #endif// __CS_IMESH_SPRITECAL3D_H__

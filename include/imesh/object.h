@@ -93,20 +93,17 @@ struct iMeshObjectDrawCallback : public iBase
  * or similar information. For this reason, a mesh object can only be used
  * in the engine if a hook object is created for it in the engine that does
  * the required management. The hook object is called mesh wrapper.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>All mesh objects implement this.
- *   <li>iMeshObjectFactory::NewInstance()
- *   </ul>
+ * - All mesh objects implement this.
+ * - iMeshObjectFactory::NewInstance()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iMeshWrapper::GetMeshObject()
- *   </ul>
+ * - iMeshWrapper::GetMeshObject()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>The 3D engine plugin (crystalspace.engine.3d).
- *   </ul>
+ * - The 3D engine plugin (crystalspace.engine.3d).
+ *   
  */
 struct iMeshObject : public virtual iBase
 {
@@ -118,10 +115,9 @@ struct iMeshObject : public virtual iBase
 
   /**
    * Get flags for this object. The following flags are at least supported:
-   * <ul>
-   * <li>#CS_MESH_STATICPOS: mesh will never move.
+     * <li>#CS_MESH_STATICPOS: mesh will never move.
    * <li>#CS_MESH_STATICSHAPE: mesh will never animate.
-   * </ul>
+   * 
    * Mesh objects may implement additional flags. These mesh object specific
    * flags must be equal to at least 0x00010000.
    */
@@ -266,24 +262,21 @@ struct iMeshObject : public virtual iBase
  * multiple sets of sprites from the same sprite template then
  * you should have an instance of iMeshObjectFactory for evey sprite
  * template and an instance of iMeshObject for every sprite.
- * <p>
+ * 
  * To use a mesh factory in the engine, you have to create a mesh factory
  * wrapper for it.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>All mesh objects implement this.
- *   <li>iMeshObjectType::NewFactory()
- *   </ul>
+ * - All mesh objects implement this.
+ * - iMeshObjectType::NewFactory()
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iMeshFactoryWrapper::GetMeshObjectFactory()
- *   <li>iMeshObject::GetFactory()
- *   </ul>
+ * - iMeshFactoryWrapper::GetMeshObjectFactory()
+ * - iMeshObject::GetFactory()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>The 3D engine plugin (crystalspace.engine.3d).
- *   </ul>
+ * - The 3D engine plugin (crystalspace.engine.3d).
+ *   
  */
 struct iMeshObjectFactory : public virtual iBase
 {
@@ -291,9 +284,8 @@ struct iMeshObjectFactory : public virtual iBase
 
   /**
    * Get flags for this factory. The following flags are at least supported:
-   * <ul>
-   * <li>#CS_FACTORY_STATICSHAPE: factory will never animate.
-   * </ul>
+   * - #CS_FACTORY_STATICSHAPE: factory will never animate.
+   * 
    * Mesh factories may implement additional flags. These mesh factory specific
    * flags must be equal to at least 0x00010000.
    */
@@ -360,20 +352,17 @@ SCF_VERSION (iMeshObjectType, 0, 0, 2);
  * This plugin describes a specific type of mesh objects. Through
  * this plugin the user can create instances of mesh object factories
  * which can then be used to create instances of mesh objects.
- * <p>
+ * 
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>All mesh object plugins implement this interface.
- *   </ul>
+ * - All mesh object plugins implement this interface.
+ *   
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_PLUGIN_CLASS()
- *   <li>CS_LOAD_PLUGIN()
- *   </ul>
+ * - csQueryPluginClass()
+ * - csLoadPlugin()
+ *   
  * Main users of this interface:
- *   <ul>
- *   <li>The 3D engine plugin (crystalspace.engine.3d).
- *   </ul>
+ * - The 3D engine plugin (crystalspace.engine.3d).
+ *   
  */
 struct iMeshObjectType : public iBase
 {

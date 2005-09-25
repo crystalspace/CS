@@ -19,7 +19,14 @@
 #ifndef __CS_IMESH_PARTSYS_H__
 #define __CS_IMESH_PARTSYS_H__
 
+/**\file
+ * Particle system interface
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 struct iMaterialWrapper;
 class csColor;
@@ -77,6 +84,8 @@ struct iParticleState : public iBase
   virtual void UnSetSelfDestruct () = 0;
 
 };
+
+/** @} */
 
 #endif // __CS_IMESH_PARTSYS_H__
 

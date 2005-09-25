@@ -30,6 +30,9 @@ class csColor;
 
 struct iMaterialWrapper;
 
+/**\addtogroup meshplugins
+ * @{ */
+
 SCF_VERSION (iBallState, 0, 0, 4);
 
 /**
@@ -133,6 +136,8 @@ struct iBallState : public iBase
     float **topsun, float **sunset) = 0;
 
 };
+
+/** @} */
 
 #endif // __CS_IMESH_BALL_H__
 

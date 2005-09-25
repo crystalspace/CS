@@ -20,7 +20,14 @@
 #ifndef __CS_IMESH_SPIRAL_H__
 #define __CS_IMESH_SPIRAL_H__
 
+/**\file
+ * Spiral particle mesh object
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 class csColor;
 class csVector3;
@@ -62,6 +69,8 @@ struct iSpiralState : public iBase
   virtual float GetClimbSpeed () const = 0;
     
 };
+
+/** @} */
 
 #endif // __CS_IMESH_SPIRAL_H__
 

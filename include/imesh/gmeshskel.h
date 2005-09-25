@@ -19,9 +19,16 @@
 #ifndef __CS_IMESH_GMESHSKEL_H__
 #define __CS_IMESH_GMESHSKEL_H__
 
+/**\file
+ * General mesh object skeletal animation
+ */ 
+
 #include "csutil/scf.h"
 
 #include "imesh/genmesh.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 struct iRigidBody;
 struct iGenMeshSkeletonBone;
@@ -301,5 +308,7 @@ struct iGenMeshSkeletonScript : public iBase
    */
   virtual float GetFactor () = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_GMESHSKEL_H__

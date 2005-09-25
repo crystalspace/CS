@@ -19,10 +19,17 @@
 #ifndef __CS_IMESH_EXPLODE_H__
 #define __CS_IMESH_EXPLODE_H__
 
+/**\file
+ * Explosion particle mesh object
+ */ 
+
 #include "csutil/scf.h"
 
 class csColor;
 class csVector3;
+
+/**\addtogroup meshplugins
+ * @{ */
 
 SCF_VERSION (iExplosionState, 0, 0, 2);
 
@@ -75,6 +82,8 @@ struct iExplosionState : public iBase
   /// See if particles are faded (returns true), and returns fade time too.
   virtual bool GetFadeSprites (csTicks& fade_time) const = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_EXPLODE_H__
 

@@ -19,7 +19,14 @@
 #ifndef __CS_IMESH_GMESHANIM_H__
 #define __CS_IMESH_GMESHANIM_H__
 
+/**\file
+ * General mesh object animation control
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 SCF_VERSION (iGenMeshAnimationControlState, 0, 0, 3);
 
@@ -47,6 +54,8 @@ struct iGenMeshAnimationControlState : public iBase
    */
   virtual void Stop (const char* scriptname) = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_GMESHANIM_H__
 

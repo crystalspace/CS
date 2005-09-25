@@ -19,7 +19,14 @@
 #ifndef __CS_IMESH_SPRITE3D_H__
 #define __CS_IMESH_SPRITE3D_H__
 
+/**\file
+ * 3D keyframe animated sprite mesh object
+ */ 
+
 #include "csutil/scf.h"
+
+/**\addtogroup meshplugins
+ * @{ */
 
 struct iMaterialWrapper;
 struct iMeshObject;
@@ -161,7 +168,7 @@ struct iSprite3DFactoryState : public iBase
   /**
    * Reserve space for the given number of vertices. A vertex includes
    * information about its position, normal and texel. This function will
-   * not write any information into the reserved space. <p>
+   * not write any information into the reserved space. 
    *
    * Note that this function requires that at least one frame exists in
    * the sprite factory, otherwise this function will fail!
@@ -265,11 +272,9 @@ struct iSprite3DFactoryState : public iBase
    * Sets which lighting config variable that all new sprites created
    * from this template will use.
    * The options are:
-   * <ul>
-   * <li>CS_SPR_LIGHT_GLOBAL (default)
-   * <li>CS_SPR_LIGHT_TEMPLATE
-   * <li>CS_SPR_LIGHT_LOCAL
-   * </ul>
+   * - CS_SPR_LIGHT_GLOBAL (default)
+   * - CS_SPR_LIGHT_TEMPLATE
+   * - CS_SPR_LIGHT_LOCAL
    */
   virtual void SetLightingQualityConfig (int qual) = 0;
   /// Get the lighting quality config.
@@ -279,11 +284,9 @@ struct iSprite3DFactoryState : public iBase
    * Sets which lod config variable that all new sprites created
    * from this template will use.
    * The options are:
-   * <ul>
-   * <li>CS_SPR_LOD_GLOBAL (default)
-   * <li>CS_SPR_LOD_TEMPLATE
-   * <li>CS_SPR_LOD_LOCAL
-   * </ul>
+   * - CS_SPR_LOD_GLOBAL (default)
+   * - CS_SPR_LOD_TEMPLATE
+   * - CS_SPR_LOD_LOCAL
    */
   virtual void SetLodLevelConfig (int config_flag) = 0;
 
@@ -415,11 +418,9 @@ struct iSprite3DState : public iBase
   /**
    * Sets which lighting config variable this sprite will use.
    * The options are:
-   * <ul>
-   * <li>CS_SPR_LIGHT_GLOBAL (default)
-   * <li>CS_SPR_LIGHT_TEMPLATE
-   * <li>CS_SPR_LIGHT_LOCAL
-   * </ul>
+   * - CS_SPR_LIGHT_GLOBAL (default)
+   * - CS_SPR_LIGHT_TEMPLATE
+   * - CS_SPR_LIGHT_LOCAL
    */
   virtual void SetLightingQualityConfig (int config_flag) = 0;
 
@@ -431,11 +432,9 @@ struct iSprite3DState : public iBase
   /**
    * Sets which lighting config variable this sprite will use.
    * The options are:
-   * <ul>
-   *   <li>CS_SPR_LOD_GLOBAL (default)
-   *   <li>CS_SPR_LOD_TEMPLATE
-   *   <li>CS_SPR_LOD_LOCAL
-   * </ul>
+   * - CS_SPR_LOD_GLOBAL (default)
+   * - CS_SPR_LOD_TEMPLATE
+   * - CS_SPR_LOD_LOCAL
    */
   virtual void SetLodLevelConfig (int config_flag) = 0;
 
@@ -467,6 +466,8 @@ struct iSprite3DState : public iBase
   /// find a named socket into the sprite.
   virtual iSpriteSocket* FindSocket (const char * name) const = 0;
 };
+
+/** @} */
 
 #endif // __CS_IMESH_SPRITE3D_H__
 
