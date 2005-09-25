@@ -22,7 +22,6 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
-#include "csgfx/csimgvec.h"
 #include "csgfx/imagecubemapmaker.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
