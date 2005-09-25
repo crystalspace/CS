@@ -224,7 +224,7 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   bmpHeader hdr;
   hdr.bfTypeLo = 'B';
   hdr.bfTypeHi = 'M';
-  hdr.bfSize = (uint32)csLittleEndianLong (len);
+  hdr.bfSize = (uint32)csLittleEndianLong ((uint32)len);
   hdr.bfRes1 = 0;
   hdr.bfRes2 = 0;
   hdr.bfOffBits = csLittleEndianLong (sizeof (bmpHeader)-2 + 256*(palette?4:0));

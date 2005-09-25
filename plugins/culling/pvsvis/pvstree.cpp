@@ -237,20 +237,28 @@ size_t csStaticPVSTree::CalculateSize (csStaticPVSNode* node)
 void csStaticPVSTree::WriteOut (char*& data, csStaticPVSNode* node)
 {
   if (!node) return;
-  csSetLittleEndianLong (data, node->id); data += 4;
+  csSetToAddress::UInt32 (data, csLittleEndian::Convert (node->id));
+  data += 4;
   *data++ = node->axis;
-  csSetLittleEndianFloat32 (data, node->where); data += 4;
-  csSetLittleEndianLong (data, (uint32)node->invisible_nodes.Length ()); data += 4;
+  csSetToAddress::UInt32 (data, 
+    csLittleEndian::Convert (csIEEEfloat::FromNative (node->where)));
+  data += 4;
+  csSetToAddress::UInt32 (data, 
+    csLittleEndian::Convert ((uint32)node->invisible_nodes.Length ()));
+  data += 4;
   size_t i;
   for (i = 0 ; i < node->invisible_nodes.Length () ; i++)
   {
-    csSetLittleEndianLong (data, node->invisible_nodes[i]->id); data += 4;
+    csSetToAddress::UInt32 (data, 
+      csLittleEndian::Convert (node->invisible_nodes[i]->id));
   }
   *data++ = node->child1 ? 1 : 0;
   WriteOut (data, node->child1);
   *data++ = node->child2 ? 1 : 0;
   WriteOut (data, node->child2);
 }
+
+static const char PVSmagic[4] = {'P', 'V', 'S', '3'};
 
 bool csStaticPVSTree::WriteOut ()
 {
@@ -261,17 +269,29 @@ bool csStaticPVSTree::WriteOut ()
   csDataBuffer* buf = new csDataBuffer (total_len);
 
   char* data = buf->GetData ();
-  *data++ = 'P';
-  *data++ = 'V';
-  *data++ = 'S';
-  *data++ = '2';
+  *data++ = PVSmagic[0];
+  *data++ = PVSmagic[1];
+  *data++ = PVSmagic[2];
+  *data++ = PVSmagic[3];
 
-  csSetLittleEndianFloat32 (data, root_box.MinX ()); data += 4;
-  csSetLittleEndianFloat32 (data, root_box.MinY ()); data += 4;
-  csSetLittleEndianFloat32 (data, root_box.MinZ ()); data += 4;
-  csSetLittleEndianFloat32 (data, root_box.MaxX ()); data += 4;
-  csSetLittleEndianFloat32 (data, root_box.MaxY ()); data += 4;
-  csSetLittleEndianFloat32 (data, root_box.MaxZ ()); data += 4;
+  csSetToAddress::UInt32 (data, 
+    csLittleEndian::Convert (csIEEEfloat::FromNative (root_box.MinX ())));
+  data += 4;
+  csSetToAddress::UInt32 (data, 
+    csLittleEndian::Convert (csIEEEfloat::FromNative (root_box.MinY ())));
+  data += 4;
+  csSetToAddress::UInt32 (data, 
+    csLittleEndian::Convert (csIEEEfloat::FromNative (root_box.MinZ ())));
+  data += 4;
+  csSetToAddress::UInt32 (data, 
+    csLittleEndian::Convert (csIEEEfloat::FromNative (root_box.MaxX ())));
+  data += 4;
+  csSetToAddress::UInt32 (data, 
+    csLittleEndian::Convert (csIEEEfloat::FromNative (root_box.MaxY ())));
+  data += 4;
+  csSetToAddress::UInt32 (data, 
+    csLittleEndian::Convert (csIEEEfloat::FromNative (root_box.MaxZ ())));
+  data += 4;
 
   WriteOut (data, root);
 
@@ -285,18 +305,24 @@ bool csStaticPVSTree::WriteOut ()
 
 const char* csStaticPVSTree::ReadPVS (char*& data, csStaticPVSNode*& node)
 {
-  uint32 id = csGetLittleEndianLong (data); data += 4;
+  uint32 id = csLittleEndian::Convert (csGetFromAddress::UInt32 (data));
+  data += 4;
   node = CheckOrCreateNode (id);
   node->axis = *data++;
-  node->where = csGetLittleEndianFloat32 (data); data += 4;
-  size_t inv_nodes = csGetLittleEndianLong (data); data += 4;
+  node->where = csIEEEfloat::ToNative (
+    csLittleEndian::Convert (csGetFromAddress::UInt32 (data)));
+  data += 4;
+  size_t inv_nodes = csLittleEndian::Convert (csGetFromAddress::UInt32 (data));
+  data += 4;
   if (inv_nodes)
   {
     node->invisible_nodes.SetLength (inv_nodes);
     size_t i;
     for (i = 0 ; i < inv_nodes ; i++)
     {
-      uint32 node_id = csGetLittleEndianLong (data); data += 4;
+      uint32 node_id = 
+	csLittleEndian::Convert (csGetFromAddress::UInt32 (data));
+      data += 4;
       node->invisible_nodes[i] = CheckOrCreateNode (node_id);
     }
   }
@@ -334,22 +360,31 @@ const char* csStaticPVSTree::ReadPVS (iDataBuffer* buf)
 {
   Clear ();
   char* data = buf->GetData ();
-  if (*data++ != 'P')
-    return "File marker invalid! Probably not a PVS file!";
-  if (*data++ != 'V')
-    return "File marker invalid! Probably not a PVS file!";
-  if (*data++ != 'S')
-    return "File marker invalid! Probably not a PVS file!";
-  if (*data++ != '2')
+  if ((*data++ != PVSmagic[0])
+    || (*data++ != PVSmagic[1])
+    || (*data++ != PVSmagic[2])
+    || (*data++ != PVSmagic[3]))
     return "File marker invalid! Could be wrong version of PVS file!";
 
   csVector3 bmin, bmax;
-  bmin.x = csGetLittleEndianFloat32 (data); data += 4;
-  bmin.y = csGetLittleEndianFloat32 (data); data += 4;
-  bmin.z = csGetLittleEndianFloat32 (data); data += 4;
-  bmax.x = csGetLittleEndianFloat32 (data); data += 4;
-  bmax.y = csGetLittleEndianFloat32 (data); data += 4;
-  bmax.z = csGetLittleEndianFloat32 (data); data += 4;
+  bmin.x = csIEEEfloat::ToNative (
+    csLittleEndian::Convert (csGetFromAddress::UInt32 (data)));
+  data += 4;
+  bmin.y = csIEEEfloat::ToNative (
+    csLittleEndian::Convert (csGetFromAddress::UInt32 (data)));
+  data += 4;
+  bmin.z = csIEEEfloat::ToNative (
+    csLittleEndian::Convert (csGetFromAddress::UInt32 (data)));
+  data += 4;
+  bmax.x = csIEEEfloat::ToNative (
+    csLittleEndian::Convert (csGetFromAddress::UInt32 (data)));
+  data += 4;
+  bmax.y = csIEEEfloat::ToNative (
+    csLittleEndian::Convert (csGetFromAddress::UInt32 (data)));
+  data += 4;
+  bmax.z = csIEEEfloat::ToNative (
+    csLittleEndian::Convert (csGetFromAddress::UInt32 (data)));
+  data += 4;
   root_box.Set (bmin, bmax);
 
   const char* err = ReadPVS (data, root);

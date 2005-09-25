@@ -31,23 +31,15 @@
 
 #include <elf.h>
 
-struct EndiannessBig
+template<typename E>
+struct ElfEndianness
 {
-  static uint32 ConvertOff (Elf32_Off u) { return csBigEndianLong ((uint32)u); }
-  static uint64 ConvertOff (Elf64_Off u) { return csBigEndianLongLong ((uint64)u); }
-  static uint32 ConvertSize (uint32_t u) { return csBigEndianLong ((uint32)u); }
-  static uint64 ConvertSize (uint64_t u) { return csBigEndianLongLong ((uint64)u); }
-  static uint16 ConvertUI16 (uint16 u) { return csBigEndianShort (u); }
-  static uint32 ConvertUI32 (uint32 u) { return csBigEndianLong (u); }
-};
-struct EndiannessLittle
-{
-  static uint32 ConvertOff (Elf32_Off u) { return csLittleEndianLong ((uint32)u); }
-  static uint64 ConvertOff (Elf64_Off u) { return csLittleEndianLongLong ((uint64)u); }
-  static uint32 ConvertSize (uint32_t u) { return csLittleEndianLong ((uint32)u); }
-  static uint64 ConvertSize (uint64_t u) { return csLittleEndianLongLong ((uint64)u); }
-  static uint16 ConvertUI16 (uint16 u) { return csLittleEndianShort (u); }
-  static uint32 ConvertUI32 (uint32 u) { return csLittleEndianLong (u); }
+  static uint32 ConvertOff (Elf32_Off u) { return E::UInt32 (u); }
+  static uint64 ConvertOff (Elf64_Off u) { return E::UInt64 (u); }
+  static uint32 ConvertSize (uint32_t u) { return E::UInt32 (u); }
+  static uint64 ConvertSize (uint64_t u) { return E::UInt64 (u); }
+  static uint16 ConvertUI16 (uint16 u) { return E::UInt16 (u); }
+  static uint32 ConvertUI32 (uint32 u) { return E::UInt32 (u); }
 };
 
 template <typename Endianness, typename Ehdr, typename Shdr>
@@ -144,12 +136,12 @@ char* csExtractMetadata (const char* fullPath, const char*& errMsg)
   {
     if (hdr->e_ident[EI_DATA] == ELFDATA2LSB)
     {
-      return ElfReader<EndiannessLittle, Elf32_Ehdr, Elf32_Shdr>::
+      return ElfReader<ElfEndianness<csLittleEndian>, Elf32_Ehdr, Elf32_Shdr>::
         GetMetadata (mmio, (Elf32_Ehdr*)hdr, errMsg);
     }
     else if (hdr->e_ident[EI_DATA] == ELFDATA2MSB)
     {
-      return ElfReader<EndiannessBig, Elf32_Ehdr, Elf32_Shdr>::
+      return ElfReader<ElfEndianness<csBigEndian>, Elf32_Ehdr, Elf32_Shdr>::
         GetMetadata (mmio, (Elf32_Ehdr*)hdr, errMsg);
     }
     else
@@ -159,12 +151,12 @@ char* csExtractMetadata (const char* fullPath, const char*& errMsg)
   {
     if (hdr->e_ident[EI_DATA] == ELFDATA2LSB)
     {
-      return ElfReader<EndiannessLittle, Elf64_Ehdr, Elf64_Shdr>::
+      return ElfReader<ElfEndianness<csLittleEndian>, Elf64_Ehdr, Elf64_Shdr>::
         GetMetadata (mmio, (Elf64_Ehdr*)hdr, errMsg);
     }
     else if (hdr->e_ident[EI_DATA] == ELFDATA2MSB)
     {
-      return ElfReader<EndiannessBig, Elf64_Ehdr, Elf64_Shdr>::
+      return ElfReader<ElfEndianness<csBigEndian>, Elf64_Ehdr, Elf64_Shdr>::
         GetMetadata (mmio, (Elf64_Ehdr*)hdr, errMsg);
     }
     else

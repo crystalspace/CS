@@ -31,126 +31,271 @@
 
 #define csQroundSure(x) (int ((x) + ((x < 0) ? -0.5 : +0.5)))
 
-/// Convert a machine float to a 32 bit IEEE float
-static inline uint32 csFloatToIEEE (float f)
+/**
+ * Methods to unconditionally swap the byte order of specifically sized types.
+ */
+struct csSwapBytes
 {
-#ifdef CS_IEEE_DOUBLE_FORMAT
-  return *(uint32*)&f;
-#else
-  #error Do not know how to convert to IEEE floats
-#endif
-}
-
-/// Convert a 32 bit IEEE float to a machine float
-static inline float csIEEEToFloat (uint32 f)
-{
-#ifdef CS_IEEE_DOUBLE_FORMAT
-  return *(float*)&f;
-#else
-  #error Do not know how to convert from IEEE floats
-#endif
-}
-
-struct csEndianSwap4
-{
-  unsigned char b1, b2, b3, b4;
-};
-
-struct csEndianSwap8
-{
-  unsigned char b1, b2, b3, b4,
-                b5, b6, b7, b8;
+private:
+  struct Swap8
+  {
+    uint8 b1, b2, b3, b4, b5, b6, b7, b8;
+  };
+public:
+  //@{
+  /// Swap byte order
+  static CS_FORCEINLINE uint16 Swap (uint16 s) 
+  { return (s >> 8) | (s << 8); }
+  static CS_FORCEINLINE int16  Swap (int16 s)
+  { return (int16)Swap ((uint16)s); }
+  static CS_FORCEINLINE uint32 Swap (uint32 l)
+  { return (l >> 24) | ((l >> 8) & 0xff00) | ((l << 8) & 0xff0000) | (l << 24); }
+  static CS_FORCEINLINE int32  Swap (int32 l)
+  { return (int32)Swap ((uint32)l); }
+  static CS_FORCEINLINE uint64 Swap (uint64 l)
+  {
+    uint64 r;
+    Swap8 *p1 = (Swap8 *)&l;
+    Swap8 *p2 = (Swap8 *)&r;
+    p2->b1 = p1->b8;
+    p2->b2 = p1->b7;
+    p2->b3 = p1->b6;
+    p2->b4 = p1->b5;
+    p2->b5 = p1->b4;
+    p2->b6 = p1->b3;
+    p2->b7 = p1->b2;
+    p2->b8 = p1->b1;
+    return r;
+  }
+  static CS_FORCEINLINE int64  Swap (int64 l)
+  { return (int64)Swap ((uint64)l); }
+  
+  static CS_FORCEINLINE uint16 UInt16 (uint16 x) { return Swap (x); }
+  static CS_FORCEINLINE int16  Int16  (int16 x)  { return Swap (x); }
+  static CS_FORCEINLINE uint32 UInt32 (uint32 x) { return Swap (x); }
+  static CS_FORCEINLINE int32  Int32  (int32 x)  { return Swap (x); }
+  static CS_FORCEINLINE uint64 UInt64 (uint64 x) { return Swap (x); }
+  static CS_FORCEINLINE int64  Int64  (int64 x)  { return Swap (x); }
+  //@}
 };
 
 #ifdef CS_BIG_ENDIAN
-#  define csBigEndianLongLong(x) x
-#  define csBigEndianLong(x)  x
-#  define csBigEndianShort(x) x
-#  define csBigEndianFloat(x) x
+struct csBigEndian
 #else
+/**
+ * Little endian to native conversion routines.
+ * \remarks Since conversion from and to native representation is the same
+ *  operation, all methods can be used for either direction.
+ */
+struct csLittleEndian
+#endif
+{
+  //@{
+  /// Convert specifically sized type from or to little endian.
+  static CS_FORCEINLINE uint16 Convert (uint16 x) { return x; }
+  static CS_FORCEINLINE int16  Convert (int16 x)  { return x; }
+  static CS_FORCEINLINE uint32 Convert (uint32 x) { return x; }
+  static CS_FORCEINLINE int32  Convert (int32 x)  { return x; }
+  static CS_FORCEINLINE uint64 Convert (uint64 x) { return x; }
+  static CS_FORCEINLINE int64  Convert (int64 x)  { return x; }
+  
+  static CS_FORCEINLINE uint16 UInt16 (uint16 x) { return Convert (x); }
+  static CS_FORCEINLINE int16  Int16  (int16 x)  { return Convert (x); }
+  static CS_FORCEINLINE uint32 UInt32 (uint32 x) { return Convert (x); }
+  static CS_FORCEINLINE int32  Int32  (int32 x)  { return Convert (x); }
+  static CS_FORCEINLINE uint64 UInt64 (uint64 x) { return Convert (x); }
+  static CS_FORCEINLINE int64  Int64  (int64 x)  { return Convert (x); }
+  //@}
+};
+
+#ifdef CS_LITTLE_ENDIAN
+/**
+ * Big endian to native conversion routines.
+ * \remarks Since conversion from and to native representation is the same
+ *  operation, all methods can be used for either direction.
+ */
+struct csBigEndian
+#else
+struct csLittleEndian
+#endif
+{
+public:
+  //@{
+  /// Convert specifically sized type from or to big endian.
+  static CS_FORCEINLINE uint16 Convert (uint16 s) 
+  { return csSwapBytes::Swap (s); }
+  static CS_FORCEINLINE int16  Convert (int16 s)
+  { return csSwapBytes::Swap (s); }
+  static CS_FORCEINLINE uint32 Convert (uint32 l)
+  { return csSwapBytes::Swap (l); }
+  static CS_FORCEINLINE int32  Convert (int32 l)
+  { return csSwapBytes::Swap (l); }
+  static CS_FORCEINLINE uint64 Convert (uint64 l)
+  { return csSwapBytes::Swap (l); }
+  static CS_FORCEINLINE int64  Convert (int64 l)
+  { return csSwapBytes::Swap (l); }
+  
+  static CS_FORCEINLINE uint16 UInt16 (uint16 x) { return Convert (x); }
+  static CS_FORCEINLINE int16  Int16  (int16 x)  { return Convert (x); }
+  static CS_FORCEINLINE uint32 UInt32 (uint32 x) { return Convert (x); }
+  static CS_FORCEINLINE int32  Int32  (int32 x)  { return Convert (x); }
+  static CS_FORCEINLINE uint64 UInt64 (uint64 x) { return Convert (x); }
+  static CS_FORCEINLINE int64  Int64  (int64 x)  { return Convert (x); }
+  //@}
+};
+
+/**
+ * Convert IEEE 32-bit floats from or to native machine floats.
+ */
+struct csIEEEfloat
+{
+#ifdef CS_IEEE_DOUBLE_FORMAT
+  /// Convert native to IEEE
+  static CS_FORCEINLINE uint32 FromNative (float f)
+  { return *(uint32*)&f; }
+  /// Convert IEEE to native
+  static CS_FORCEINLINE float ToNative (uint32 f)
+  { return *(float*)&f; }
+#else
+  #error Do not know how to convert to IEEE floats
+#endif
+};
+
+/**
+ * Sized data type access helpers.
+ * On some platforms, certain data types can only be accessed when correctly 
+ * aligned (e.g. uint32 can only be read from addresses aligned to 4 bytes).
+ * This routines assist accessing sized types from arbitrary memory positions
+ * (e.g. when parsing files from memory) by working around the alignment
+ * requirements on platforms that have such.
+ */
+struct csGetFromAddress
+{
+  //@{
+  /// Get specifically sized type from unaligned memory address
+  static CS_FORCEINLINE uint16 UInt16 (const void *buff)
+  {
+  #ifdef CS_STRICT_ALIGNMENT
+    uint16 s; memcpy (&s, buff, sizeof (s));
+    return s;
+  #else
+    return *(uint16 *)buff;
+  #endif
+  }
+  static CS_FORCEINLINE int16  Int16 (const void *buff)
+  { return (int16)UInt16 (buff); }
+  static CS_FORCEINLINE uint32 UInt32 (const void *buff)
+  {
+  #ifdef CS_STRICT_ALIGNMENT
+    uint32 s; memcpy (&s, buff, sizeof (s));
+    return s;
+  #else
+    return *(uint32 *)buff;
+  #endif
+  }
+  static CS_FORCEINLINE int32  Int32 (const void *buff)
+  { return (int32)UInt32 (buff); }
+  static CS_FORCEINLINE uint64 UInt64 (const void *buff)
+  {
+  #ifdef CS_STRICT_ALIGNMENT
+    uint64 s; memcpy (&s, buff, sizeof (s));
+    return s;
+  #else
+    return *(uint64 *)buff;
+  #endif
+  }
+  static CS_FORCEINLINE int64  Int64 (const void *buff)
+  { return (int64)UInt64 (buff); }
+  //@}
+};
+
+/**
+ * Sized data type access helpers.
+ * On some platforms, certain data types can only be manipulated when correctly 
+ * aligned (e.g. uint32 can only be Written to addresses aligned to 4 bytes).
+ * This routines assist manipulating sized types at arbitrary memory positions
+ * (e.g. when constructing files in memory) by working around the alignment
+ * requirements on platforms that have such.
+ */
+struct csSetToAddress
+{
+  //@{
+  /// Set specifically sized type at unaligned memory address
+  static CS_FORCEINLINE void UInt16 (void *buff, uint16 s)
+  {
+  #ifdef CS_STRICT_ALIGNMENT
+    memcpy (buff, &s, sizeof (s));
+  #else
+    *((uint16 *)buff) = s;
+  #endif
+  }
+  static CS_FORCEINLINE void Int16  (void *buff, int16 s)
+  { UInt16 (buff, (uint16)s); }
+  static CS_FORCEINLINE void UInt32 (void *buff, uint32 s)
+  {
+  #ifdef CS_STRICT_ALIGNMENT
+    memcpy (buff, &s, sizeof (s));
+  #else
+    *((uint32 *)buff) = s;
+  #endif
+  }
+  static CS_FORCEINLINE void Int32  (void *buff, int32 s)
+  { UInt32 (buff, (uint32)s); }
+  static CS_FORCEINLINE void UInt64 (void *buff, uint64 s)
+  {
+  #ifdef CS_STRICT_ALIGNMENT
+    memcpy (buff, &s, sizeof (s));
+  #else
+    *((uint64 *)buff) = s;
+  #endif
+  }
+  static CS_FORCEINLINE void Int64  (void *buff, int64 s)
+  { UInt64 (buff, (uint64)s); }
+  //@}
+};
+
+/**\name Deprecated endian conversion routines.
+ * It is recommended to use csLittleEndian, csBigEndian, csIEEEfloat, 
+ * csGetFromAddress or csSetToAddress for the tasks below.
+ * @{ */
 
 /// Convert a longlong from big-endian to machine format
 static inline uint64 csBigEndianLongLong (uint64 l)
-{
-  uint64 r;
-  csEndianSwap8 *p1 = (csEndianSwap8 *)&l;
-  csEndianSwap8 *p2 = (csEndianSwap8 *)&r;
-  p2->b1 = p1->b8;
-  p2->b2 = p1->b7;
-  p2->b3 = p1->b6;
-  p2->b4 = p1->b5;
-  p2->b5 = p1->b4;
-  p2->b6 = p1->b3;
-  p2->b7 = p1->b2;
-  p2->b8 = p1->b1;
-  return r;
-}
-
+{ return csBigEndian::Convert (l); }
 
 /// Convert a long from big-endian to machine format
 static inline uint32 csBigEndianLong (uint32 l)
-{ return (l >> 24) | ((l >> 8) & 0xff00) | ((l << 8) & 0xff0000) | (l << 24); }
+{ return csBigEndian::Convert (l); }
 
 /// Convert a short from big-endian to machine format
 static inline uint16 csBigEndianShort (uint16 s)
-{ return uint16((s >> 8) | (s << 8)); }
+{ return csBigEndian::Convert (s); }
 
 /// Convert a big-endian floating-point number to machine format
 static inline float csBigEndianFloat (float f)
-{
-  //@@WARNING: Should be removed -- use csFloatToLong instead
-  unsigned char tmp;
-  csEndianSwap4 *pf = (csEndianSwap4 *)&f;
-  tmp = pf->b1; pf->b1 = pf->b4; pf->b4 = tmp;
-  tmp = pf->b2; pf->b2 = pf->b3; pf->b3 = tmp;
-  return f;
+{ 
+  uint32 u = csBigEndian::Convert (*(uint32*)&f); 
+  return *(float*)&u;
 }
-
-#endif // CS_BIG_ENDIAN
-
-#ifdef CS_LITTLE_ENDIAN
-#  define csLittleEndianLongLong(x) x
-#  define csLittleEndianLong(x)  x
-#  define csLittleEndianShort(x) x
-#  define csLittleEndianFloat(x) x
-#else
 
 /// Convert a longlong from little-endian to machine format
 static inline uint64 csLittleEndianLongLong (uint64 l)
-{
-  uint64 r;
-  csEndianSwap8 *p1 = (csEndianSwap8 *)&l;
-  csEndianSwap8 *p2 = (csEndianSwap8 *)&r;
-  p2->b1 = p1->b8;
-  p2->b2 = p1->b7;
-  p2->b3 = p1->b6;
-  p2->b4 = p1->b5;
-  p2->b5 = p1->b4;
-  p2->b6 = p1->b3;
-  p2->b7 = p1->b2;
-  p2->b8 = p1->b1;
-  return r;
-}
+{ return csLittleEndian::Convert (l); }
 
 /// Convert a long from little-endian to machine format
 static inline uint32 csLittleEndianLong (uint32 l)
-{ return (l >> 24) | ((l >> 8) & 0xff00) | ((l << 8) & 0xff0000) | (l << 24); }
+{ return csLittleEndian::Convert (l); }
 
 /// Convert a short from little-endian to machine format
 static inline uint16 csLittleEndianShort (uint16 s)
-{ return (s >> 8) | (s << 8); }
+{ return csLittleEndian::Convert (s); }
 
 /// Convert a little-endian floating-point number to machine format
 static inline float csLittleEndianFloat (float f)
 {
-  unsigned char tmp;
-  csEndianSwap4 *pf = (csEndianSwap4 *)&f;
-  tmp = pf->b1; pf->b1 = pf->b4; pf->b4 = tmp;
-  tmp = pf->b2; pf->b2 = pf->b3; pf->b3 = tmp;
-  return f;
+  uint32 u = csLittleEndian::Convert (*(uint32*)&f); 
+  return *(float*)&u;
 }
-
-#endif // CS_LITTLE_ENDIAN
 
 /*
     To be able to painlessly transfer files betwen platforms, we should
@@ -223,7 +368,7 @@ static inline double csLongLongToDouble (int64 i)
   return ldexp (mant, exp);
 }
 
-/**\name Floating point conversions
+/* *\name Floating point conversions
  * The following routines are used for converting floating-point numbers
  * into 16-bit shorts and back. This is useful for low-precision data.
  * They use the 1.4.12 format. The range of numbers that can be represented
@@ -252,7 +397,7 @@ static inline float csShortToFloat (short s)
   return (float) ldexp (mant, exp);
 }
 
-/** @} */
+/* * @} */
 
 /// Swap the bytes in a uint64 value.
 static inline uint64 csConvertEndian (uint64 l)
@@ -285,23 +430,13 @@ static inline float csConvertEndian (float f)
 /// Read a little-endian short from address
 inline uint16 csGetLittleEndianShort (const void *buff)
 {
-#ifdef CS_STRICT_ALIGNMENT
-  uint16 s; memcpy (&s, buff, sizeof (s));
-  return csLittleEndianShort (s);
-#else
-  return csLittleEndianShort (*(uint16 *)buff);
-#endif
+  return csGetFromAddress::UInt16 (buff);
 }
 
 /// Read a little-endian long from address
 inline uint32 csGetLittleEndianLong (const void *buff)
 {
-#ifdef CS_STRICT_ALIGNMENT
-  uint32 l; memcpy (&l, buff, sizeof (l));
-  return csLittleEndianLong (l);
-#else
-  return csLittleEndianLong (*(uint32 *)buff);
-#endif
+  return csGetFromAddress::UInt32 (buff);
 }
 
 /// Read a little-endian 32-bit float from address
@@ -312,96 +447,7 @@ inline float csGetLittleEndianFloat32 (const void *buff)
 inline float csGetLittleEndianFloat16 (const void *buff)
 { uint16 s = csGetLittleEndianShort (buff); return csShortToFloat (s); }
 
-/// Set a little-endian short on a address
-inline void csSetLittleEndianShort (void *buff, uint16 s)
-{
-#ifdef CS_STRICT_ALIGNMENT
-  s = csLittleEndianShort (s);
-  memcpy (buff, &s, sizeof (s));
-#else
-  *((uint16 *)buff) = csLittleEndianShort (s);
-#endif
-}
-
-/// Set a little-endian long on a address
-inline void csSetLittleEndianLong (void *buff, uint32 l)
-{
-#ifdef CS_STRICT_ALIGNMENT
-  l = csLittleEndianLong (l);
-  memcpy (buff, &l, sizeof (l));
-#else
-  *((uint32 *)buff) = csLittleEndianLong (l);
-#endif
-}
-
-/// Set a little-endian 32-bit float on a address
-inline void csSetLittleEndianFloat32 (void *buff, float f)
-{ csSetLittleEndianLong (buff, csFloatToLong (f)); }
-
-/// Set a little-endian 16-bit float on a address
-inline void csSetLittleEndianFloat16 (void *buff, float f)
-{ csSetLittleEndianShort (buff, csFloatToShort (f)); }
-
-
-/// Read a big-endian short from address
-inline uint16 csGetBigEndianShort (const void *buff)
-{
-#ifdef CS_STRICT_ALIGNMENT
-  uint16 s; memcpy (&s, buff, sizeof (s));
-  return csBigEndianShort (s);
-#else
-  return csBigEndianShort (*(uint16 *)buff);
-#endif
-}
-
-/// Read a big-endian long from address
-inline uint32 csGetBigEndianLong (const void *buff)
-{
-#ifdef CS_STRICT_ALIGNMENT
-  uint32 l; memcpy (&l, buff, sizeof (l));
-  return csBigEndianLong (l);
-#else
-  return csBigEndianLong (*(uint32 *)buff);
-#endif
-}
-
-/// Read a big-endian 32-bit float from address
-inline float csGetBigEndianFloat32 (const void *buff)
-{ uint32 l = csGetBigEndianLong (buff); return csLongToFloat (l); }
-
-/// Read a big-endian 16-bit float from address
-inline float csGetBigEndianFloat16 (const void *buff)
-{ uint16 s = csGetBigEndianShort (buff); return csShortToFloat (s); }
-
-/// Set a big-endian short on a address
-inline void csSetBigEndianShort (void *buff, uint16 s)
-{
-#ifdef CS_STRICT_ALIGNMENT
-  s = csBigEndianShort (s);
-  memcpy (buff, &s, sizeof (s));
-#else
-  *((uint16 *)buff) = csBigEndianShort (s);
-#endif
-}
-
-/// Set a big-endian long on a address
-inline void csSetBigEndianLong (void *buff, uint32 l)
-{
-#ifdef CS_STRICT_ALIGNMENT
-  l = csBigEndianLong (l);
-  memcpy (buff, &l, sizeof (l));
-#else
-  *((uint32 *)buff) = csBigEndianLong (l);
-#endif
-}
-
-/// Set a big-endian 32-bit float on a address
-inline void csSetBigEndianFloat32 (void *buff, float f)
-{ csSetBigEndianLong (buff, csFloatToLong (f)); }
-
-/// Set a big-endian 16-bit float on a address
-inline void csSetBigEndianFloat16 (void *buff, float f)
-{ csSetBigEndianShort (buff, csFloatToShort (f)); }
+/** @} */
 
 /** @} */
 

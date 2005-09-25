@@ -59,10 +59,15 @@ char csArchive::hdr_extlocal[4] = {'P', 'K', EXTD_LOCAL_SIG};
 
 //-- Endianess handling -----------------------------------------------------
 
-#define BUFF_GET_SHORT(ofs)     csGetLittleEndianShort ((uint8 *)&buff[ofs])
-#define BUFF_GET_LONG(ofs)      csGetLittleEndianLong  ((uint8 *)&buff[ofs])
-#define BUFF_SET_SHORT(ofs,val) csSetLittleEndianShort ((uint8 *)&buff[ofs], val)
-#define BUFF_SET_LONG(ofs,val)  csSetLittleEndianLong  ((uint8 *)&buff[ofs], val)
+#define BUFF_GET_(ofs, Type) \
+  csLittleEndian::Convert (csGetFromAddress::Type ((uint8 *)&buff[ofs]))
+#define BUFF_GET_SHORT(ofs)     BUFF_GET_(ofs, UInt16)
+#define BUFF_GET_LONG(ofs)      BUFF_GET_(ofs, UInt32)
+
+#define BUFF_SET_(ofs, val, Type) \
+  csSetToAddress::Type ((uint8 *)&buff[ofs], csLittleEndian::Convert (val))
+#define BUFF_SET_SHORT(ofs,val) BUFF_SET_(ofs, val, UInt16)
+#define BUFF_SET_LONG(ofs,val)  BUFF_SET_(ofs, val, UInt32)
 
 //-- Archive class implementation -------------------------------------------
 

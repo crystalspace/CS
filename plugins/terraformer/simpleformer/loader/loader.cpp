@@ -245,28 +245,12 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (former);
 }
 
-struct EndianBig
-{
-  static inline uint16 GetUI16 (void* buf)
-  { return csGetBigEndianShort (buf); }
-  static inline uint32 GetUI32 (void* buf)
-  { return csGetBigEndianLong (buf); }
-};
-
-struct EndianLittle
-{
-  static inline uint16 GetUI16 (void* buf)
-  { return csGetLittleEndianShort (buf); }
-  static inline uint32 GetUI32 (void* buf)
-  { return csGetLittleEndianLong (buf); }
-};
-
 template<typename Endianness>
 struct GetterFloat
 {
   static inline void Get (char*& buf, float&f)
   {
-    f = csIEEEToFloat (Endianness::GetUI32 (buf)); 
+    f = csIEEEfloat::ToNative (Endianness::Convert (csGetFromAddress::UInt32 (buf))); 
     buf += sizeof(uint32);
   }
   static inline size_t ItemSize()
@@ -278,7 +262,7 @@ struct GetterUint16
 {
   static inline void Get (char*& buf, float&f)
   {
-    uint16 v = Endianness::GetUI16 (buf);
+    uint16 v = Endianness::Convert (csGetFromAddress::UInt16 (buf));
     buf += sizeof (uint16);
     f = (float)v / (float)((uint16)~0);
   }
@@ -291,7 +275,7 @@ struct GetterUint32
 {
   static inline void Get (char*& buf, float&f)
   {
-    uint32 v = Endianness::GetUI32 (buf);
+    uint32 v = Endianness::Convert (csGetFromAddress::UInt32 (buf));
     buf += sizeof (uint32);
     f = (float)v / (float)((uint32)~0);
   }
@@ -404,7 +388,7 @@ bool csSimpleFormerLoader::LoadHeightmap32 (iDocumentNode* child,
 	  filename);
     return false;
   }
-  RawHeightmapReader<GetterUint32<EndianLittle> > reader (this, state);
+  RawHeightmapReader<GetterUint32<csLittleEndian> > reader (this, state);
   if (!reader.ReadData (data, width, height))
     return false;
 
@@ -414,42 +398,42 @@ bool csSimpleFormerLoader::LoadHeightmap32 (iDocumentNode* child,
 bool csSimpleFormerLoader::LoadHeightmapRaw16LE (iDocumentNode* child, 
 						 iSimpleFormerState* state)
 {
-  RawHeightmapReader<GetterUint16<EndianLittle> > reader (this, state);
+  RawHeightmapReader<GetterUint16<csLittleEndian> > reader (this, state);
   return reader.ReadRawMap (child);
 }
 
 bool csSimpleFormerLoader::LoadHeightmapRaw16BE (iDocumentNode* child, 
 						 iSimpleFormerState* state)
 {
-  RawHeightmapReader<GetterUint16<EndianBig> > reader (this, state);
+  RawHeightmapReader<GetterUint16<csBigEndian> > reader (this, state);
   return reader.ReadRawMap (child);
 }
 
 bool csSimpleFormerLoader::LoadHeightmapRaw32LE (iDocumentNode* child, 
 						 iSimpleFormerState* state)
 {
-  RawHeightmapReader<GetterUint32<EndianLittle> > reader (this, state);
+  RawHeightmapReader<GetterUint32<csLittleEndian> > reader (this, state);
   return reader.ReadRawMap (child);
 }
 
 bool csSimpleFormerLoader::LoadHeightmapRaw32BE (iDocumentNode* child, 
 						 iSimpleFormerState* state)
 {
-  RawHeightmapReader<GetterUint32<EndianBig> > reader (this, state);
+  RawHeightmapReader<GetterUint32<csBigEndian> > reader (this, state);
   return reader.ReadRawMap (child);
 }
 
 bool csSimpleFormerLoader::LoadHeightmapRawFloatLE (iDocumentNode* child, 
 						    iSimpleFormerState* state)
 {
-  RawHeightmapReader<GetterFloat<EndianLittle> > reader (this, state);
+  RawHeightmapReader<GetterFloat<csLittleEndian> > reader (this, state);
   return reader.ReadRawMap (child);
 }
 
 bool csSimpleFormerLoader::LoadHeightmapRawFloatBE (iDocumentNode* child, 
 						    iSimpleFormerState* state)
 {
-  RawHeightmapReader<GetterFloat<EndianBig> > reader (this, state);
+  RawHeightmapReader<GetterFloat<csBigEndian> > reader (this, state);
   return reader.ReadRawMap (child);
 }
 

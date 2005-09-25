@@ -55,13 +55,13 @@ void WriteByte(char*& p, unsigned char c)
 
 void WriteWord(char*& p, unsigned short s)
 {
-  csSetLittleEndianShort ((void*)p, s);
+  csSetToAddress::UInt16 (p, csLittleEndian::UInt16 (s));
   p+=2;
 }
 
 void WriteDword(char*& p, unsigned long l)
 {
-  csSetLittleEndianLong ((void*)p, l);
+  csSetToAddress::UInt32 (p, csLittleEndian::UInt32 (l));
   p+=4;
 }
 
