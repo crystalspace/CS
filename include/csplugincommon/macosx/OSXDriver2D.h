@@ -58,7 +58,7 @@ public:
   /// Flip video page (or dump to framebuffer) - pure virtual
   virtual void Print(csRect const* area = 0) = 0;
 
-  /// Pure virtual function - the driver must invlude code to handle resizing
+  /// Pure virtual function - the driver must include code to handle resizing
   virtual bool Resize(int w, int h) = 0;
 
   /// Handle an event
@@ -129,7 +129,7 @@ protected:
   /// Screen number to display on
   unsigned int screen;
   
-  /// Original dimensions. jept so they can be restored when switching modes
+  /// Original dimensions; kept so they can be restored when switching modes
   int origWidth, origHeight;
 
   /// Delegate for ObjC stuff
