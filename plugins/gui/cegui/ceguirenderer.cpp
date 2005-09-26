@@ -81,7 +81,7 @@ bool csCEGUIRenderer::Initialize (iScript* script)
   if (script)
   {
     scriptModule = new csCEGUIScriptModule (script, obj_reg);
-    new CEGUI::System (this, 0, 0, scriptModule);
+    new CEGUI::System (this, scriptModule);
   }
   else
   {
