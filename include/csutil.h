@@ -63,6 +63,7 @@
 #include "csutil/event.h"
 #include "csutil/evoutlet.h"
 #include "csutil/fifo.h"
+#include "csutil/filereadhelper.h"
 #include "csutil/flags.h"
 #include "csutil/floatrand.h"
 #include "csutil/formatter.h"
