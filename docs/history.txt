@@ -17,6 +17,9 @@ chronological order.
 	  and not a pointer and size.
 	- iceeey reverted the CEGUI updates requiring CEGUI CVS. The 0.4.0
 	  CEGUI release is now required instead.
+	- res tweaked the CEGUI plugin to be less greedy about character 
+	  events.
+	- res made a computation in simpleformerldr a bit clearer.
 25-Sep-2005
 	- res did a couple of Doxygen fixes. Mostly adding \file to files.
 	- res did some more SR code shuffling.

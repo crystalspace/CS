@@ -264,7 +264,7 @@ struct GetterUint16
   {
     uint16 v = Endianness::Convert (csGetFromAddress::UInt16 (buf));
     buf += sizeof (uint16);
-    f = (float)v / (float)((uint16)~0);
+    f = float(v) / 65535.0f;
   }
   static inline size_t ItemSize()
   { return sizeof(uint16); }
@@ -277,7 +277,7 @@ struct GetterUint32
   {
     uint32 v = Endianness::Convert (csGetFromAddress::UInt32 (buf));
     buf += sizeof (uint32);
-    f = (float)v / (float)((uint32)~0);
+    f = float(v) / 4294967295.0f;
   }
   static inline size_t ItemSize()
   { return sizeof(uint32); }

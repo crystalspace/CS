@@ -219,15 +219,32 @@ bool csCEGUIEventHandler::OnKeyboard (iEvent &event)
       csKeyEventHelper::GetEventData (&event, keyData);
       utf32_char buf[2];
       int num;
-      if (compose->HandleKey (keyData, buf, sizeof (buf) / sizeof (utf32_char),
-	&num) != csComposeNoChar)
+      csKeyComposeResult compRes =
+	compose->HandleKey (keyData, buf, sizeof (buf) / sizeof (utf32_char),
+	  &num);
+      bool handle = false;
+      if (compRes != csComposeNoChar)
       {
 	for (int i = 0; i < num; i++)
-	  CEGUI::System::getSingletonPtr()->injectChar (
+	  handle |= CEGUI::System::getSingletonPtr()->injectChar (
 	    static_cast<CEGUI::utf32> (buf[i]));
       }
+      else
+	// Bit of a hack :P
+	handle = CEGUI::System::getSingletonPtr()->injectChar (
+	  static_cast<CEGUI::utf32> (0));
+      if (handle)
+	/* If CEGUI handled a character event, remember the key so we can
+         * properly catch the corresponding key up event */
+	caughtCharKeys.Add (code);
+      return handle;
     }
-    return true;
+    else if (caughtCharKeys.In (code))
+    {
+      // Catch "up" event for character down events we caught.
+      caughtCharKeys.Delete (code);
+      return true;
+    }
   }
 
   return false;

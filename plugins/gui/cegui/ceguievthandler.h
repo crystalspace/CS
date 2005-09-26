@@ -27,6 +27,7 @@
 
 #include "iutil/csinput.h"
 #include "csutil/csbaseeventh.h"
+#include "csutil/set.h"
 
 struct iObjectRegistry;
 
@@ -64,6 +65,7 @@ private:
   iObjectRegistry *obj_reg;
   csCEGUIRenderer* renderer;
   csRef<iKeyComposer> compose;
+  csSet<utf32_char> caughtCharKeys;
 
   static CEGUI::MouseButton CSMBtoCEMB (uint button);
 };
