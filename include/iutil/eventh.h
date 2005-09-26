@@ -20,6 +20,7 @@
 #define __CS_IUTIL_EVENTH_H__
 
 /**\file
+ * Event handler interface
  */
 /**
  * \addtogroup event_handling
