@@ -44,18 +44,18 @@ SCF_IMPLEMENT_FACTORY (SndSysLoader);
 
 
 
-csPtr<iSndSysData> SndSysLoader::LoadSound (void *Buffer, uint32 Size)
+csPtr<iSndSysData> SndSysLoader::LoadSound (iDataBuffer* Buffer)
 {
   csRef<iSndSysData> data;
   if (wavloader)
   {
-    data=wavloader->LoadSound(Buffer, Size);
+    data=wavloader->LoadSound(Buffer);
     if (data.IsValid())
       return csPtr<iSndSysData> (data);
   }
   if (oggloader)
   {
-    data=oggloader->LoadSound(Buffer, Size);
+    data=oggloader->LoadSound(Buffer);
     if (data.IsValid())
       return csPtr<iSndSysData> (data);
   }

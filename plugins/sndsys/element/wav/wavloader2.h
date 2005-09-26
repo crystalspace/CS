@@ -47,12 +47,12 @@ public:
     SCF_DESTRUCT_IBASE();
   }
 
-  virtual csPtr<iSndSysData> LoadSound (void *Buffer, uint32 Size)
+  virtual csPtr<iSndSysData> LoadSound (iDataBuffer* Buffer)
   {
     SndSysWavSoundData *sd=0;
-    if (SndSysWavSoundData::IsWav (Buffer, Size))
-      sd = new SndSysWavSoundData ((iBase*)this, (uint8*)Buffer, (size_t) Size);
-
+    if (SndSysWavSoundData::IsWav (Buffer))
+      sd = new SndSysWavSoundData ((iBase*)this, Buffer);
+				      
     return csPtr<iSndSysData> (sd);
   }
 };

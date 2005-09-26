@@ -131,11 +131,11 @@ static inline void csByteSwap32bitBuffer (uint32* ptr, size_t count)
 }
 
 
-SndSysWavSoundData::SndSysWavSoundData (iBase *parent, uint8 *data, size_t len)
+SndSysWavSoundData::SndSysWavSoundData (iBase *parent, iDataBuffer* data)
 {
   SCF_CONSTRUCT_IBASE (parent);
 
-  ds = new WavDataStore (data, len, true);
+  ds = new WavDataStore (data);
   fmt.Bits = 16;
   fmt.Channels = 2;
   data_ready = false;
@@ -316,10 +316,7 @@ bool SndSysWavSoundData::ReadHeaders(void *Buffer, size_t len, _RIFFchk *p_riffc
 }
 
 
-bool SndSysWavSoundData::IsWav (void *Buffer, size_t len)
+bool SndSysWavSoundData::IsWav (iDataBuffer* Buffer)
 {
-  return ReadHeaders(Buffer,len,0,0,0,0,0);
+  return ReadHeaders (Buffer->GetData(), Buffer->GetSize(), 0, 0, 0, 0, 0);
 }
-
-
-

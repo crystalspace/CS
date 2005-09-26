@@ -156,8 +156,7 @@ bool SndTest::LoadSound ()
   if (!soundbuf)
     return ReportError ("Can't load file '%s'!", fname);
 
-  csRef<iSndSysData> snddata = sndloader->LoadSound (soundbuf->GetData (),
-  	soundbuf->GetSize ());
+  csRef<iSndSysData> snddata = sndloader->LoadSound (soundbuf);
   if (!snddata)
     return ReportError ("Can't load sound '%s'!", fname);
 

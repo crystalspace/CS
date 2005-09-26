@@ -51,7 +51,7 @@ public:
 
 
   virtual bool Initialize (iObjectRegistry *reg);
-  virtual csPtr<iSndSysData> LoadSound (void *Buffer, uint32 Size);
+  virtual csPtr<iSndSysData> LoadSound (iDataBuffer* Buffer);
 
 protected:
   csRef<iSndSysLoader> wavloader;

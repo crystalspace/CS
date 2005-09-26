@@ -83,8 +83,7 @@ csPtr<iSndSysData> csLoader::LoadSoundSysData (const char* filename)
   }
 
   // load the sound
-  csRef<iSndSysData> Sound =
-    SndSysLoader->LoadSound (buf->GetData (), buf->GetSize ());
+  csRef<iSndSysData> Sound = SndSysLoader->LoadSound (buf);
 
   // check for valid sound data
   if (!Sound)

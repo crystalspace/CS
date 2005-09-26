@@ -68,30 +68,18 @@ public:
   /// Destructor
   virtual ~csMemFile();
 
-  /// Returns "#csMemFile";
+  /// Returns "#csMemFile"
   virtual const char* GetName();
-  /// Query buffer size
   virtual size_t GetSize();
-  /// Check (and clear) file last error status
   virtual int GetStatus();
 
-  /// Read data from buffer
   virtual size_t Read(char* Data, size_t DataSize);
-  /// Write data to buffer
   virtual size_t Write(const char* Data, size_t DataSize);
-  /// Flush the stream.
   virtual void Flush();
-  /// Return true if at end of buffer
   virtual bool AtEOF();
-  /// Query current cursor position
   virtual size_t GetPos();
-  /// Set current cursor position
   virtual bool SetPos(size_t);
 
-  /**
-   * Get entire file data in one go.
-   * Changing the file won't affect buffers returned by this function. 
-   */
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
   /**
    * Returns a pointer to the memory buffer.  May return 0 if memory file

@@ -24,6 +24,8 @@
  * iSndSysData implementation for ogg bitdata.
  */
 
+#include "iutil/databuff.h"
+
 #include "isndsys/ss_structs.h"
 #include "isndsys/ss_data.h"
 
@@ -45,27 +47,14 @@
 
 struct OggDataStore
 {
+  csRef<iDataBuffer> buf;
   unsigned char *data;
   size_t length;
-  bool local_data;
 
-  OggDataStore (uint8 *d, size_t l, bool copy_data)
+  OggDataStore (iDataBuffer* buf) : buf(buf)
   {
-    if (copy_data)
-    {
-      data=new unsigned char[l];
-      memcpy (data, d, l);
-    }
-    else
-      data = d;
-
-    length = l;
-    local_data=copy_data;
-  }
-  ~OggDataStore()
-  {
-    if (local_data)
-      delete[] data;
+    data = buf->GetUint8();
+    length = buf->GetSize();
   }
 };
 
@@ -91,7 +80,7 @@ class SndSysOggSoundData : public iSndSysData
  public:
   SCF_DECLARE_IBASE;
 
-  SndSysOggSoundData (iBase *parent, uint8 *data, size_t len);
+  SndSysOggSoundData (iBase *parent, iDataBuffer* data);
   virtual ~SndSysOggSoundData ();
 
 
@@ -113,7 +102,7 @@ class SndSysOggSoundData : public iSndSysData
 
   void Initialize();
 
-  static bool IsOgg (void *Buffer, size_t len);
+  static bool IsOgg (iDataBuffer* Buffer);
 
  protected:
   OggDataStore *ds;

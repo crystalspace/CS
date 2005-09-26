@@ -29,9 +29,10 @@
 /**\addtogroup sndsys
  * @{ */
 
+struct iDataBuffer;
 struct iSndSysData;
 
-SCF_VERSION (iSndSysLoader, 0, 1, 0);
+SCF_VERSION (iSndSysLoader, 0, 2, 0);
 
 /**
  * The sound loader is used to load sound files given a raw input data stream.
@@ -39,7 +40,7 @@ SCF_VERSION (iSndSysLoader, 0, 1, 0);
 struct iSndSysLoader : public iBase
 {
   /// Create a sound object from raw input data.
-  virtual csPtr<iSndSysData> LoadSound(void *Data, uint32 Size) = 0;
+  virtual csPtr<iSndSysData> LoadSound (iDataBuffer* buffer) = 0;
 };
 
 /** @} */

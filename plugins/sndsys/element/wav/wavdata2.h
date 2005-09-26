@@ -24,6 +24,7 @@
  * iSndSysData implementation for waveform PCM audio
  */
 
+#include "iutil/databuff.h"
 #include "isndsys/ss_structs.h"
 #include "isndsys/ss_data.h"
 
@@ -59,27 +60,14 @@ struct _WAVchk
 
 struct WavDataStore
 {
+  csRef<iDataBuffer> buf;
   unsigned char *data;
   size_t length;
-  bool local_data;
 
-  WavDataStore (uint8 *d, size_t l, bool copy_data)
+  WavDataStore (iDataBuffer* buf) : buf(buf)
   {
-    if (copy_data)
-    {
-      data=new unsigned char[l];
-      memcpy (data, d, l);
-    }
-    else
-      data = d;
-
-    length = l;
-    local_data=copy_data;
-  }
-  ~WavDataStore()
-  {
-    if (local_data)
-      delete[] data;
+    data = buf->GetUint8();
+    length = buf->GetSize();
   }
 };
 
@@ -96,7 +84,7 @@ class SndSysWavSoundData : public iSndSysData
  public:
   SCF_DECLARE_IBASE;
 
-  SndSysWavSoundData (iBase *parent, uint8 *data, size_t len);
+  SndSysWavSoundData (iBase *parent, iDataBuffer* data);
   virtual ~SndSysWavSoundData();
 
 
@@ -121,7 +109,7 @@ class SndSysWavSoundData : public iSndSysData
 
   void Initialize();
 
-  static bool IsWav (void *Buffer, size_t len);
+  static bool IsWav (iDataBuffer* Buffer);
 
   static bool ReadHeaders(void *Buffer, size_t len, _RIFFchk *p_riffchk, 
     _FMTchk *p_fmtchk, _WAVchk *p_wavchk, void **data_start, 

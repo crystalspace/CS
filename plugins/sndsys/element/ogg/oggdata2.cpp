@@ -99,7 +99,7 @@ cs_ov_callbacks *GetCallbacks()
   return &ogg_callbacks;
 }
 
-SndSysOggSoundData::SndSysOggSoundData (iBase *parent, uint8 *data, size_t len)
+SndSysOggSoundData::SndSysOggSoundData (iBase *parent, iDataBuffer* data)
 {
   SCF_CONSTRUCT_IBASE (parent);
 #ifdef CS_LITTLE_ENDIAN
@@ -108,7 +108,7 @@ SndSysOggSoundData::SndSysOggSoundData (iBase *parent, uint8 *data, size_t len)
   endian = 1;
 #endif
 
-  ds = new OggDataStore (data, len, true);
+  ds = new OggDataStore (data);
   fmt.Bits = 16;
   fmt.Channels = 2;
   data_ready = false;
@@ -177,9 +177,9 @@ void SndSysOggSoundData::Initialize()
   data_ready=true;
 }
 
-bool SndSysOggSoundData::IsOgg (void *Buffer, size_t len)
+bool SndSysOggSoundData::IsOgg (iDataBuffer* Buffer)
 {
-  OggDataStore *dd = new OggDataStore ((uint8*)Buffer, len, false);
+  OggDataStore *dd = new OggDataStore (Buffer);
   OggStreamData *streamdata = new OggStreamData;
 
   streamdata->datastore=dd;
