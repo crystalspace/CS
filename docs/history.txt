@@ -6,12 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Sep-2005
+	- Eric Sunshine resolved some additional Doxygen warnings.
 25-Sep-2005
-	- res did a couple of doxygen fixes. Mostly adding \file to files.
+	- res did a couple of Doxygen fixes. Mostly adding \file to files.
 	- res did some more SR code shuffling.
 	- res merged ivideo/polyrender.h into Thing.
 	- iceeey removed the width and height parameters from
-	  iCEGUI::Initialize() as doxygen complains and they are not needed.
+	  iCEGUI::Initialize() as Doxygen complains and they are not needed.
 	- Jorrit extended the iObjectWatcher with the possibility to watch
 	  arrival/removal of new meshes in sectors in addition to light
 	  and movable changes in general.
@@ -94,15 +96,15 @@ chronological order.
 	  through world and library files. To use this you just have to add
 	  the 'mode3d' attribute for the <sound> keyword with one of the values
 	  'disable', 'relative', 'or 'absolute'.
-	- Jorrit allowed sound filename to be specified with 'file' attribute in
-	  addition to the old syntax of using a <file> child node.
-	- Jorrit allowed texture filename to be specified with 'file' attribute in
-	  addition to the old syntax of using a <file> child node.
+	- Jorrit allowed sound filename to be specified with 'file' attribute
+	  in addition to the old syntax of using a <file> child node.
+	- Jorrit allowed texture filename to be specified with 'file' attribute
+	  in addition to the old syntax of using a <file> child node.
 	- res renamed iGLDriverDatabase to iOpenGLDriverDatabase for 
 	  consistency.
-	- res did some more misc tweaks of the recently changed doxygen stuff.
-	- iceeey fixed constructor, and removed deletion of resource provider in
-	  CEGUI to match CVS changes. Also added renderer identification.
+	- res did some more misc tweaks of the recently changed Doxygen stuff.
+	- iceeey fixed constructor, and removed deletion of resource provider
+	  in CEGUI to match CVS changes. Also added renderer identification.
 	- iceeey updated CEGUI skin and layout files for CEGUI CVS changes.
 22-Sep-2005
 	- Jorrit started working on better integration of the new sound
@@ -721,9 +723,9 @@ chronological order.
 	- Eric Sunshine fixed csutil and csgeom unit tests so that they compile
 	  successfully again following recent SCF re-engineering.
 16-Aug-2005
-	- res made some more doxygen fixes and also expanded the doxygen info
+	- res made some more Doxygen fixes and also expanded the Doxygen info
 	  in the coding guidelines a bit.
-	- res added doxygen documentation for the master headers.
+	- res added Doxygen documentation for the master headers.
 	- Vincent Knecht applied mdmkolbe's fix to perlpre.i. This resolves
 	  swig errors about _wrap_* functions.
 	- res augmented the fat renderloop with the ability to basically render
@@ -734,14 +736,14 @@ chronological order.
 	- res added csShaderVariableContext::Clear() and ReplaceVariable().
 	- res made csBitArray::SetSize() public.
 	- res added csBitArray::GetSize().
-	- res changed some more doxygen comments.
+	- res changed some more Doxygen comments.
 15-Aug-2005
 	- res added a hopefully helpful message that is written to the console 
 	  when csInitializer cannot load the VFS plugin.
 	- res dropped "WARNING: " from a couple of messages reported by the
 	  plugin manager, as csReport() can add that, too.
-	- res made some misc doxygen fixes.
-	- res enabled sorting for doxygen brief docs.
+	- res made some misc Doxygen fixes.
+	- res enabled sorting for Doxygen brief docs.
 	- res fixed some GCC complaints in the lighter apps and the document
 	  helpers.
 	- res made some VC6 compile fixes.
@@ -752,7 +754,7 @@ chronological order.
 14-Aug-2005
 	- mdmkolbe fixed a divide by zero error in the collider.
 	- mdmkolbe removed redundant statements in the python tutorial1.
-	- res fixed a couple of doxygen warnings.
+	- res fixed a couple of Doxygen warnings.
 	- res added a "local" flag to csGetPlatformConfigPath.
 	- res changed clarified the csUnicodeTransform docs a bit by using
 	  'code point' or 'code unit' instead of 'character' where appropriate.
@@ -1883,7 +1885,7 @@ chronological order.
 	- Wouter updated the cspace.i for EventHelpers.
 	- Vincent Knecht fixed vostest and csvosa3dl.cpp for EventHelpers.
 	- Wouter made an untested fix to vossector.cpp to help Vincent.
-	- Adam Bradley let doxygen know about the CS_PURE_METHOD and
+	- Adam Bradley let Doxygen know about the CS_PURE_METHOD and
 	  CS_CONST_METHOD macros
 	- res fixed the font plexer to correctly parse font list entries with 
 	  scaling.
@@ -2431,7 +2433,7 @@ chronological order.
 	  iRigidBody->GetTransform().
 	- Piotr Obrzut moved creating/delating strict ode joints functions .
 	  from iDynamicSystem to iODEDynamicSystemState.
-	- res made a few doxygen fixes.
+	- res made a few Doxygen fixes.
 	- res fixed a small bug in the engine where engine.cfg wasn't used when
 	  the "Engine.RenderLoop.Default" setting was checked.
 	- res added small helper templates for simple string comparator and 
@@ -3591,7 +3593,7 @@ chronological order.
 	  PVS visibility culler. Currently empty.
 	- Luca applied a very small fix to the sprite2d plugin so that it is
 	  possible to change its material on the fly at any time by calling
-	  SetMaterialWrapper. He also added a little doxygen note to the
+	  SetMaterialWrapper. He also added a little Doxygen note to the
 	  csRenderMesh::indexend about its usage.
 20-Mar-2005
 	- Jorrit changed pvsvis so that the required bounding box is now
@@ -4181,7 +4183,7 @@ chronological order.
 	- res fixed a dumb oversight in csGLVBOBufferManager::ParseByteSize()
 	  that caused it to bark if no suffix is present at all.
 	- res changed the generic csPrintf() to better deal with surrogates.
-	- res made a couple of small doxygen changes/improvements.
+	- res made a couple of small Doxygen changes/improvements.
 	- res applied a patch from Michael D. Adams 
 	  <mdmkolbe@users.sourceforge.net> to fix a crash on exit in Cygwin
 	  (patch #1154478).
@@ -4333,7 +4335,7 @@ chronological order.
 	  automatically-added item).
 	- res added STRIP_FROM_INC_PATH to the *.dox files (to get correct
 	  include paths to show up in the docs, at last) and merged some styles
-	  from newer doxygen stylesheets into CS' own API doc stylesheet.
+	  from newer Doxygen stylesheets into CS' own API doc stylesheet.
 24-Feb-2005
 	- Jorrit fixed edge drawing by the OpenGL renderer by using
 	  glPolygonMode(GL_BACK,GL_LINE) instead of the way it was currently

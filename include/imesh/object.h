@@ -115,8 +115,8 @@ struct iMeshObject : public virtual iBase
 
   /**
    * Get flags for this object. The following flags are at least supported:
-     * <li>#CS_MESH_STATICPOS: mesh will never move.
-   * <li>#CS_MESH_STATICSHAPE: mesh will never animate.
+   * \li #CS_MESH_STATICPOS: mesh will never move.
+   * \li #CS_MESH_STATICSHAPE: mesh will never animate.
    * 
    * Mesh objects may implement additional flags. These mesh object specific
    * flags must be equal to at least 0x00010000.

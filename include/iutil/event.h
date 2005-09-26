@@ -76,23 +76,23 @@ SCF_VERSION (iEvent, 0, 2, 0);
  * presses down a key ("key down" events), holds it down (more "key down" 
  * events in a specific interval - "auto-repeat") and releases it ("key up").
  *
- * Every keyboard event has a bunch of data associated with it. First, there
- * is a code to identify the key: the 'raw' code. It uniquely identifies the 
- * key, and every key has a distinct code, independent from any pressed 
- * modifiers: For example, pressing the "A" key will always result in the raw 
- * code 'a', holding shift or any other modifier down won't change it. However, 
- * the 'cooked' code contains such additional information: If Shift+A is 
- * pressed, the cooked code will be 'A', while the raw code is still 'a'.
- * Other keys are also normalized; for example keypad keys: pressing "9" will
- * result in either CSKEY_PGUP or '9', depending on the NumLock state.
- * So, the same key can result in different 'cooked' codes, and the same 
- * 'cooked' code can be caused by different keys.
+ * Every keyboard event has a bunch of data associated with it. First, there is
+ * a code to identify the key: the 'raw' code. It uniquely identifies the key,
+ * and every key has a distinct code, independent from any pressed modifiers:
+ * For example, pressing the "A" key will always result in the raw code 'a',
+ * holding shift or any other modifier down won't change it. However, the
+ * 'cooked' code contains such additional information: If Shift+A is pressed,
+ * the cooked code will be 'A', while the raw code is still 'a'.  Other keys
+ * are also normalized; for example keypad keys: pressing "9" will result in
+ * either CSKEY_PGUP or '9', depending on the NumLock state.  So, the same key
+ * can result in different 'cooked' codes, and the same 'cooked' code can be
+ * caused by different keys.
  *
  * Other data contained in a keyboard event is:
- * - Whether it is a key up or down event</li>
- * - Whether it is an autorepeat of an earlier keypress</li>
- * - Modifiers at the time of the keypress</li>
- * - When it is a character, whether it is a normal or dead character</li>
+ * \li Whether it is a key up or down event
+ * \li Whether it is an autorepeat of an earlier keypress
+ * \li Modifiers at the time of the keypress
+ * \li When it is a character, whether it is a normal or dead character
  * 
  * Keyboard event data is stored as properties of iEvent, accessible thorugh
  * iEvent->Find() and iEvent->Add().

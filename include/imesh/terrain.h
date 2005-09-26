@@ -73,10 +73,10 @@ struct iTerrainObjectState : public iBase
    * high level quad in the final terrain.
    * Note x and y must be 2^n and usually they must be equal
    * This version expects an array of alpha maps (typically gray scale images).
-   * For every material in the palette except for the last one(!) there will
-   * be an alpha map so this array should have one element less compared to the
-   * palette. The alpha map for the last palette entry will be calculated so that
-   * the alpha values add up to 100%.
+   * For every material in the palette except for the last one(!) there will be
+   * an alpha map so this array should have one element less compared to the
+   * palette. The alpha map for the last palette entry will be calculated so
+   * that the alpha values add up to 100%.
    */
   virtual bool SetMaterialAlphaMaps (const csArray<csArray<char> >& data,
   	int x, int y) = 0;
@@ -86,11 +86,11 @@ struct iTerrainObjectState : public iBase
    * Set a LOD parameter.
    * 
    * The following parameters can be used:
-     * <li><i>"lod distance"</i> - The distance at which splatting is no longer 
-   *  in effect and the base texture is the only layer.</li>
-   * <li><i>"error tolerance"</i>  - The screenspace error tolerance in 
+   * \li <i>"lod distance"</i> - The distance at which splatting is no longer 
+   *  in effect and the base texture is the only layer.
+   * \li <i>"error tolerance"</i>  - The screenspace error tolerance in 
    *  numbers of pixels. Error will be less than the given tolerance so 
-   *  setting the tolerance to values less than 1 is worthless.</li>
+   *  setting the tolerance to values less than 1 is worthless.
    * 
    * \return Whether the value was accepted by the terrain object.
    */

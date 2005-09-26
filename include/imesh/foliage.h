@@ -228,18 +228,18 @@ struct iFoliageFactoryState : public iBase
   /**
    * The terraformer defines various properties for this foliage mesh.
    * The terraformer needs to support the following properties:
-     * <li>'heights': this basically comes directly from the heightmap
+   * \li 'heights': this basically comes directly from the heightmap
    *     and is returned as an array of floats. The normal simpleformer
    *     (as is used by the landscape engine) supports this automatically.
-   * <li>'vertices': this basically comes directly from the heightmap
+   * \li 'vertices': this basically comes directly from the heightmap
    *     and is returned as an array of csVector3's. The normal simpleformer
    *     (as is used by the landscape engine) supports this automatically.
-   * <li>'foliage_density': this is another float map which represents the
+   * \li 'foliage_density': this is another float map which represents the
    *     density of foliage at that point. The number represents the
    *     number of foliage objects in one 1x1 unit. So using a uniform
    *     density of 1 will place one object in every 1x1 square.
    *     This map must have same resolution as the heightmap.
-   * <li>'foliage_types': this is an int map which indicates the types
+   * \li 'foliage_types': this is an int map which indicates the types
    *     of foliage to use for every block in the heightmap. These numbers
    *     correspond with the foliage palette numbers. If this map contains
    *     palette indices that are not defined then no foliage will

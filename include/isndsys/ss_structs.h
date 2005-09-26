@@ -45,4 +45,6 @@ struct csSndSysSoundFormat
 // A single sound sample will be stored as a signed int
 typedef int32 csSoundSample;
 
+/** @} */
+
 #endif // __CS_SNDSYS_COMMON_STRUCTS_H__
