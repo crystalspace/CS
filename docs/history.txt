@@ -33,6 +33,8 @@ chronological order.
 	      animation to run differently on different frame rates.
 	    - passed iMeshObject to the animation plugins for future
 	      sharing of skeleton between parent and child object.
+	- Jorrit added an error to the sprite mesh loader in case the action
+	  couldn't be set.
 26-Sep-2005
 	- Eric Sunshine resolved some additional Doxygen warnings.
 	- Eric Sunshine improved the robustness of jobber.pl's run_command()

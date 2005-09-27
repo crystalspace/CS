@@ -593,7 +593,18 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 		"No Factory! Please define 'factory' before 'action'!");
 	  return 0;
 	}
-	spr3dLook->SetAction (child->GetContentsValue ());
+	else
+	{
+	  const char* action = child->GetContentsValue ();
+	  if (!spr3dLook->SetAction (action))
+	  {
+      	    synldr->ReportError (
+		  "crystalspace.sprite3dloader.parse.action",
+		  child,
+		  "Action '%s' failed to start!", action);
+	    return 0;
+	  }
+	}
         break;
       case XMLTOKEN_BASECOLOR:
 	if (!spr3dLook)
