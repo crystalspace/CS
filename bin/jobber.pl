@@ -283,7 +283,7 @@ use warnings;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '33';
+my $PROG_VERSION = '34';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2005 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -496,7 +496,7 @@ sub conversion_dir {
 #------------------------------------------------------------------------------
 sub run_command {
     my $cmd = shift;
-    my $output = `{ $cmd ; } 2>&1`;
+    my $output = `( $cmd ) 2>&1`;
     $CAPTURED_OUTPUT .= "==> $cmd\n$output\n";
     expire("run_command($cmd)") if $?;
     return $output;

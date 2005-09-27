@@ -35,6 +35,9 @@ chronological order.
 	      sharing of skeleton between parent and child object.
 	- Jorrit added an error to the sprite mesh loader in case the action
 	  couldn't be set.
+	- Eric Sunshine made run_command() in jobber.pl even more robust for
+	  some of the complex expressions passed to it, such as the $configure
+	  commands in CS's jobber.cfg.
 26-Sep-2005
 	- Eric Sunshine resolved some additional Doxygen warnings.
 	- Eric Sunshine improved the robustness of jobber.pl's run_command()
