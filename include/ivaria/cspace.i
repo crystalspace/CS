@@ -531,7 +531,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "iutil/cmdline.h"
 
 %ignore operator* (const csColor &, float);
-%ignore operator* (float , const csColor &);
+%ignore operator* (float, const csColor &);
 %ignore operator* (const csColor &, const csColor &);
 %ignore operator/ (const csColor &, float);
 %ignore operator+ (const csColor &, const csColor &);
@@ -539,6 +539,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "csutil/cscolor.h"
 
 %include "csutil/cmdhelp.h"
+%include "csutil/comparator.h"
 
 %ignore csStringSet::GlobalIterator;
 %ignore csStringSet::GetIterator;
@@ -1365,7 +1366,6 @@ uint _CS_FX_SETALPHA_INT (uint);
 {
   csColor operator + (const csColor & c) const { return *self + c; }
   csColor operator - (const csColor & c) const { return *self - c; }
-  csColor operator * (float f) const { return *self * f; }
 }
 
 // csgeom/quaterni.h

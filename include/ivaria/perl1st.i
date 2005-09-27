@@ -14,6 +14,7 @@
   #undef New
   #undef Newc
   #undef Newz
+  #undef Pause
   #undef Renew
   #undef Renewc
   #undef Safefree

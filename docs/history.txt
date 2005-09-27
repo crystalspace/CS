@@ -14,24 +14,25 @@ chronological order.
 	  sound loader is not present. Sounds will simply be ignored then.
 	- Marten fixed the handling of casting for scfFakeInterface.
 	- Erroroman made a lot of bug fixes in genmesh skeleton animation:
-	    - all euler angles operations are replace with quaternions.
-	    - added offset transform when rigid body is attached to the
+	    - All euler angles operations are replace with quaternions.
+	    - Added offset transform when rigid body is attached to the
 	      bone and that fixed lots of problems in ragdoll.
-	    - added 3 methods for faces/verts normals recalculating:
-	        - disabled method - nothing recalculates.
-	        - fast method - fast, but not accurate.
-	        - accurate method - accurate, but slower than fast method.
-	       (<calcnorms>fast</calcnorms> can be defined in animation xml).
-	    - added methods to get normals and their count.
-	    - fixed problems arround animation looping and frames that have
+	    - Added 3 methods for faces/verts normals recalculating:
+	        - Disabled method - nothing recalculates.
+	        - Fast method - fast, but not accurate.
+	        - Accurate method - accurate, but slower than fast method.
+	          (<calcnorms>fast</calcnorms> can be defined in animation
+	          xml).
+	    - Added methods to get normals and their count.
+	    - Fixed problems arround animation looping and frames that have
 	      limited loops.
-	    - added "duration" attrib in frame tag, that can force animation
+	    - Added "duration" attrib in frame tag, that can force animation
 	      duration.
-	    - added SetSpeed, GetSpeed functions in animation script, that
+	    - Added SetSpeed, GetSpeed functions in animation script, that
 	      can control animation duration (similar to SetTime/GetTime).
-	    - fixed lots of problems in time related operations, that makes
+	    - Fixed lots of problems in time related operations, that makes
 	      animation to run differently on different frame rates.
-	    - passed iMeshObject to the animation plugins for future
+	    - Passed iMeshObject to the animation plugins for future
 	      sharing of skeleton between parent and child object.
 	- Jorrit added an error to the sprite mesh loader in case the action
 	  couldn't be set.
@@ -41,10 +42,13 @@ chronological order.
 	- Erroroman added light transform in lightsvcache
 	- caedes added iMapNode and iMovieRecorder interfaces to cspace.i.
 	- Erroroman added light transform shader var in ligtiter step plugin.
-	- Christopher added csTriangulate2, a 2-dimensional arbitrary polygon 
-	triangulation algorithm.  This triangulator does NOT handle holes, but
-	it should handle concavities.  I haven't tested the code yet, but it does
-	compile fine.
+	- Christopher added csTriangulate2, a 2-dimensional arbitrary polygon
+	  triangulation algorithm.  This triangulator does NOT handle holes,
+	  but it should handle concavities.  I haven't tested the code yet, but
+	  it does compile fine.
+	- Eric Sunshine eliminated some Swig warnings.
+	- Eric Sunshine worked around problem where <perl.h> #defines Pause,
+	  thus borking the output of Swig for iMovieRecorder::Pause().
 26-Sep-2005
 	- Eric Sunshine resolved some additional Doxygen warnings.
 	- Eric Sunshine improved the robustness of jobber.pl's run_command()
