@@ -361,15 +361,6 @@ private:
   /**
    * Performs the collision detection for the provided csColliderWrapper vs
    * all nearby objects.
-   * <p>
-   * @param cw  	Pointer to a csColliderWrapper that is to be tested for
-   *			collisions with nearby objects
-   * @param sect	Pointer to the iSector interface of the sector that
-   *			this Wrapper is currently in.
-   * @param cdt		Pointer to a reversible transform of the "new"
-   *			position of the object to test.
-   * @param cdstart	Pointer to a reversible transform of the original
-   *			position of the object to test (before any movements).
    *<p>
    * This function gets all nearby objects, crossing sector bounds. It compares
    * for collisions. If a collision is found, it follows a line segment from
@@ -378,7 +369,7 @@ private:
    * crossing into the same sector that the mesh we collided with is in, then
    * the collision is valid.
    * <p>
-   * This catches the case where a peice of world geometry extends into
+   * This catches the case where a piece of world geometry extends into
    * coordinates of another sector, but does not actually exist in that sector.
    */
   int CollisionDetect (
@@ -390,18 +381,6 @@ private:
   /**
    * Performs the collision detection for the provided csColliderWrapper vs
    * all nearby objects and gives the furthest point that will not collide.
-   * <p>
-   * @param cw  	Pointer to a csColliderWrapper that is to be tested for
-   *			collisions with nearby objects
-   * @param sect	Pointer to the iSector interface of the sector that
-   *			this Wrapper is currently in.
-   * @param cdt		Pointer to a reversible transform of the "new"
-   *			position of the object to test.
-   * @param cdstart	Pointer to a reversible transform of the original
-   *			position of the object to test (before any movements).
-   * @param maxmove	A vector that holds the maximum point to which the
-   *			object can move.
-   *
    *<p>
    * This function calls CollisionDetect each time splitting the range
    * between the 'new' position and the original position of the object and
