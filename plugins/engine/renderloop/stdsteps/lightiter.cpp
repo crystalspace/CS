@@ -30,6 +30,7 @@
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
+#include "iengine/movable.h"
 #include "igraphic/image.h"
 #include "iutil/document.h"
 #include "ivideo/rndbuf.h"
@@ -177,6 +178,8 @@ void csLightIterRenderStep::Init ()
 
     csStringID posname = strings->Request ("light 0 position");
     csStringID poswname = strings->Request ("light 0 position world");
+    csStringID trname = strings->Request ("light 0 transform");
+    csStringID trwname = strings->Request ("light 0 transform world");
     csStringID difname = strings->Request ("light 0 diffuse");
     csStringID spcname = strings->Request ("light 0 specular");
     csStringID attname = strings->Request ("light 0 attenuation");
@@ -199,6 +202,22 @@ void csLightIterRenderStep::Init ()
       shvar_light_0_position_world = new csShaderVariable (poswname);
       shvar_light_0_position_world->SetType (csShaderVariable::VECTOR4);
       shadermgr->AddVariable (shvar_light_0_position_world);
+    }
+
+    shvar_light_0_transform = shadermgr->GetVariable (trname);
+    if (!shvar_light_0_transform)
+    {
+      shvar_light_0_transform = new csShaderVariable (trname);
+      shvar_light_0_transform->SetType (csShaderVariable::TRANSFORM);
+      shadermgr->AddVariable (shvar_light_0_transform);
+    }
+
+    shvar_light_0_transform_world = shadermgr->GetVariable (trwname);
+    if (!shvar_light_0_transform_world)
+    {
+      shvar_light_0_transform_world = new csShaderVariable (trwname);
+      shvar_light_0_transform_world->SetType (csShaderVariable::TRANSFORM);
+      shadermgr->AddVariable (shvar_light_0_transform_world);
     }
 
     shvar_light_0_diffuse = shadermgr->GetVariable (difname);
@@ -289,6 +308,8 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
     }
     shvar_light_0_position->SetValue (lightPos * camTransR);
     shvar_light_0_position_world->SetValue (lightPos);
+    shvar_light_0_transform->SetValue (light->GetMovable()->GetFullTransform() * camTransR);
+    shvar_light_0_transform_world->SetValue (light->GetMovable()->GetFullTransform());
 
     shvar_light_0_attenuationtex->SetAccessor (GetLightAccessor (light));
 

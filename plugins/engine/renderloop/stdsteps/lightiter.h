@@ -91,6 +91,8 @@ private:
   iObjectRegistry* object_reg;
   csRef<csShaderVariable> shvar_light_0_position;
   csRef<csShaderVariable> shvar_light_0_position_world;
+  csRef<csShaderVariable> shvar_light_0_transform;
+  csRef<csShaderVariable> shvar_light_0_transform_world;
   csRef<csShaderVariable> shvar_light_0_diffuse;
   csRef<csShaderVariable> shvar_light_0_specular;
   csRef<csShaderVariable> shvar_light_0_attenuation;
