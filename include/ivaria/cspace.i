@@ -195,6 +195,7 @@
   INTERFACE_APPLY(iLightList)
   INTERFACE_APPLY(iLoader)
   INTERFACE_APPLY(iLoaderPlugin)
+  INTERFACE_APPLY(iMapNode)
   INTERFACE_APPLY(iMaterial)
   INTERFACE_APPLY(iMaterialWrapper)
   INTERFACE_APPLY(iMeshFactoryWrapper)
@@ -207,6 +208,7 @@
   INTERFACE_APPLY(iMouseDriver)
   INTERFACE_APPLY(iMovable)
   INTERFACE_APPLY(iMovableListener)
+  INTERFACE_APPLY(iMovieRecorder)
   INTERFACE_APPLY(iObject)
   INTERFACE_APPLY(iObjectModel)
   INTERFACE_APPLY(iObjectModelListener)
@@ -1069,6 +1071,8 @@ TYPEMAP_OUT_csWrapPtr
 %include "ivaria/dynamics.h"
 %include "ivaria/ode.h"
 %include "ivaria/engseq.h"
+%include "ivaria/movierecorder.h"
+%include "ivaria/mapnode.h"
 
 %rename(IntCall) *::Call(const char*, int&, const char*, ...);
 %rename(FloatCall) *::Call(const char*, float&, const char*, ...);
