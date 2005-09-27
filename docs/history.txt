@@ -11,6 +11,27 @@ chronological order.
 	  These three conveniance functions get the up, front, and right
 	  vectors in 'other' space. They are very efficient.
 	- Marten fixed the handling of casting for scfFakeInterface.
+	- Erroroman made a lot of bug fixes in genmesh skeleton animation:
+	    - all euler angles operations are replace with quaternions.
+	    - added offset transform when rigid body is attached to the
+	      bone and that fixed lots of problems in ragdoll.
+	    - added 3 methods for faces/verts normals recalculating:
+	        - disabled method - nothing recalculates.
+	        - fast method - fast, but not accurate.
+	        - accurate method - accurate, but slower than fast method.
+	       (<calcnorms>fast</calcnorms> can be defined in animation xml).
+	    - added methods to get normals and their count.
+	    - fixed problems arround animation looping and frames that have
+	      limited loops.
+	    - added "duration" attrib in frame tag, that can force animation
+	      duration.
+	    - added SetSpeed, GetSpeed functions in animation script, that
+	      can control animation duration (similar to SetTime/GetTime).
+	    - fixed lots of problems in time related operations, that makes
+	      animation to run differently on different frame rates.
+	    - passed iMeshObject to the animation plugins for future
+	      sharing of skeleton between parent and child object.
+
 26-Sep-2005
 	- Eric Sunshine resolved some additional Doxygen warnings.
 	- Eric Sunshine improved the robustness of jobber.pl's run_command()

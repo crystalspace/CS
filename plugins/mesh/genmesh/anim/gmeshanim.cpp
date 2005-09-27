@@ -607,7 +607,7 @@ csGenmeshAnimationControlFactory::~csGenmeshAnimationControlFactory ()
 }
 
 csPtr<iGenMeshAnimationControl> csGenmeshAnimationControlFactory::
-	CreateAnimationControl ()
+	CreateAnimationControl (iMeshObject *mesh)
 {
   csGenmeshAnimationControl* ctrl = new csGenmeshAnimationControl (this);
   size_t i;

@@ -129,6 +129,26 @@ struct iGenMeshSkeletonControlState : public iBase
    * Get animated vertices count
    */
   virtual int GetAnimatedVerticesCount() = 0;
+
+  /**
+   * Get animated face normals
+   */
+  virtual csVector3 *GetAnimatedFaceNormals() = 0;
+
+  /**
+   * Get animated face normals count
+   */
+  virtual int GetAnimatedFaceNormalsCount() = 0;
+
+  /**
+   * Get animated vertices normals
+   */
+  virtual csVector3 *GetAnimatedVertNormals() = 0;
+
+  /**
+   * Get animated vertices normals count
+   */
+  virtual int GetAnimatedVertNormalsCount() = 0;
 };
 
 SCF_VERSION  (iGenMeshSkeletonControlFactory, 0, 0, 1);
@@ -300,6 +320,20 @@ struct iGenMeshSkeletonScript : public iBase
    *
    * 500ms walk.time =  500 walk.factor = 0 //or just remove "walk" script
    *       run.time  =  500 run.factor  = 1
+   */
+
+  /**
+   * Get speed factor (similar to GetTime).
+   */
+  virtual float GetSpeed () = 0;
+
+  /**
+   * Set speed factor(similar to SetTime).
+   */
+  virtual void SetSpeed (float speed) = 0;
+
+  /**
+   * Set script infuence factor.
    */
   virtual void SetFactor (float factor) = 0;
 

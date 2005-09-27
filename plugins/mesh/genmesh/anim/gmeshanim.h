@@ -35,6 +35,7 @@
 struct iEvent;
 class csGenmeshAnimationControlFactory;
 class csGenmeshAnimationControlType;
+struct iMeshObject;
 
 /**
  * Vertex information for a group.
@@ -386,7 +387,7 @@ public:
   /// Destructor.
   virtual ~csGenmeshAnimationControlFactory ();
 
-  virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl ();
+  virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl (iMeshObject *mesh);
 
   csGenmeshAnimationControlType* GetType () { return type; }
   csAnimControlScript* FindScript (const char* scriptname) const;

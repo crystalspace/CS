@@ -2487,7 +2487,7 @@ csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
   if (anim_ctrl_fact)
   {
     csRef<iGenMeshAnimationControl> anim_ctrl = anim_ctrl_fact
-    	->CreateAnimationControl ();
+    	->CreateAnimationControl (cm);
     cm->SetAnimationControl (anim_ctrl);
   }
 

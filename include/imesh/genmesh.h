@@ -30,6 +30,7 @@ struct iGenMeshAnimationControl;
 struct iGenMeshAnimationControlFactory;
 struct iMaterialWrapper;
 struct iRenderBuffer;
+struct iMeshObject;
 
 /**\addtogroup meshplugins
  * @{ */
@@ -403,7 +404,7 @@ struct iGenMeshAnimationControlFactory : public iBase
   /**
    * Create a new animation control.
    */
-  virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl () = 0;
+  virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl (iMeshObject *mesh) = 0;
 
   /**
    * Setup this animation control from a document node.
