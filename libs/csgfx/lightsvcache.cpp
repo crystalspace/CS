@@ -41,6 +41,8 @@ csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
     "position object",
     "position",
     "position world",
+    "transform",
+    "transform world",
     "attenuation",
     "attenuationtex",
     "direction object",

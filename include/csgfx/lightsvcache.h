@@ -47,6 +47,10 @@ public:
     lightPositionCamera,
     /// Position (world space)
     lightPositionWorld,
+    /// Transform (camera space)
+    lightTransformCamera,
+    /// Transform (world space)
+    lightTransformWorld,
     /// Attenuation vector
     lightAttenuation,
     /// Attenuation texture
