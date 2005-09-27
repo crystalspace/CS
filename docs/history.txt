@@ -41,6 +41,10 @@ chronological order.
 	- Erroroman added light transform in lightsvcache
 	- caedes added iMapNode and iMovieRecorder interfaces to cspace.i.
 	- Erroroman added light transform shader var in ligtiter step plugin.
+	- Christopher added csTriangulate2, a 2-dimensional arbitrary polygon 
+	triangulation algorithm.  This triangulator does NOT handle holes, but
+	it should handle concavities.  I haven't tested the code yet, but it does
+	compile fine.
 26-Sep-2005
 	- Eric Sunshine resolved some additional Doxygen warnings.
 	- Eric Sunshine improved the robustness of jobber.pl's run_command()
