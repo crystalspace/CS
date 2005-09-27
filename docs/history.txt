@@ -10,6 +10,8 @@ chronological order.
 	- Jorrit added csTransform::GetUp(), GetFront(), and GetRight().
 	  These three conveniance functions get the up, front, and right
 	  vectors in 'other' space. They are very efficient.
+	- Jorrit fixed the loader so it is no longer an error if the
+	  sound loader is not present. Sounds will simply be ignored then.
 	- Marten fixed the handling of casting for scfFakeInterface.
 	- Erroroman made a lot of bug fixes in genmesh skeleton animation:
 	    - all euler angles operations are replace with quaternions.
@@ -31,7 +33,6 @@ chronological order.
 	      animation to run differently on different frame rates.
 	    - passed iMeshObject to the animation plugins for future
 	      sharing of skeleton between parent and child object.
-
 26-Sep-2005
 	- Eric Sunshine resolved some additional Doxygen warnings.
 	- Eric Sunshine improved the robustness of jobber.pl's run_command()

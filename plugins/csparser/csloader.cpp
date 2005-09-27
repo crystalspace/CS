@@ -1480,10 +1480,10 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 	  {
 	    if (!SoundLoader)
 	    {
-	      SyntaxService->ReportError (
-	        "crystalspace.maploader.parse.sound", child,
-	        "Old sound loader not loaded!");
-	      return false;
+	      //ReportNotify (
+	        //"crystalspace.maploader.parse.sound", child,
+	        //"Old sound loader not loaded!");
+	      return true;
 	    }
 	    // Old style sounds!
             csRef<iSoundWrapper> snd = CS_GET_NAMED_CHILD_OBJECT (
@@ -1521,10 +1521,10 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 	    // New sound system.
 	    if (!SndSysLoader)
 	    {
-	      SyntaxService->ReportError (
-	        "crystalspace.maploader.parse.sound", child,
-	        "New sound loader not loaded!");
-	      return false;
+	      //SyntaxService->ReportError (
+	        //"crystalspace.maploader.parse.sound", child,
+	        //"New sound loader not loaded!");
+	      return true;
 	    }
             iSndSysWrapper* snd = SndSysManager->FindSoundByName (name);
             if (!snd)
