@@ -70,9 +70,9 @@ typedef int scfInterfaceVersion;
 */
 #define SCF_INTERFACE(Name,Major,Minor,Micro)             \
 struct InterfaceTraits {                                  \
-  static CS_FORCEINLINE scfInterfaceVersion GetVersion()  \
+  CS_FORCEINLINE static scfInterfaceVersion GetVersion() \
   { return SCF_CONSTRUCT_VERSION(Major, Minor, Micro); }  \
-  static CS_FORCEINLINE char const * GetName() { return #Name; }  \
+  CS_FORCEINLINE static char const * GetName() { return #Name; }  \
 private:                                                  \
   /* Check that Name is really a type to catch typos. */  \
   typedef Name Type;                                      \
@@ -372,7 +372,7 @@ public:
   /**
    * Retrieve the interface's current version number.
    */
-  static scfInterfaceVersion GetVersion ()
+  CS_FORCEINLINE static scfInterfaceVersion GetVersion ()
   {
     return Interface::InterfaceTraits::GetVersion ();
   }
@@ -384,7 +384,7 @@ public:
    * performance reasons, by scfInterfaceID, which is typically a small
    * integer.
    */
-  static scfInterfaceID GetID ()
+  CS_FORCEINLINE static scfInterfaceID GetID ()
   {
     scfInterfaceID& ID = GetMyID ();
     if (ID == (scfInterfaceID)(-1))
@@ -398,13 +398,14 @@ public:
   /**
    * Retrieve the interface's name as a string.
    */
-  static CS_FORCEINLINE char const* GetName ()
+  CS_FORCEINLINE static char const* GetName ()
   { 
     return Interface::InterfaceTraits::GetName ();
   }
+
 private:
   // This idiom is a Meyers singleton
-  static CS_FORCEINLINE scfInterfaceID& GetMyID ()
+  CS_FORCEINLINE static scfInterfaceID& GetMyID ()
   {
     static scfInterfaceID ID = (scfInterfaceID)-1;
     return ID;

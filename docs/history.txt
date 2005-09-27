@@ -10,6 +10,7 @@ chronological order.
 	- Jorrit added csTransform::GetUp(), GetFront(), and GetRight().
 	  These three conveniance functions get the up, front, and right
 	  vectors in 'other' space. They are very efficient.
+	- Marten fixed the handling of casting for scfFakeInterface.
 26-Sep-2005
 	- Eric Sunshine resolved some additional Doxygen warnings.
 	- Eric Sunshine improved the robustness of jobber.pl's run_command()

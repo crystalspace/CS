@@ -66,6 +66,39 @@
  * \endcode
 */
 
+
+/**
+* Fugly helper to resolve some bad situations. ;)
+* Basically, it adds a new entry to QueryInterface() without adding another 
+* class to inheritance.
+*
+* Consider the following case:
+*
+* \code
+* struct iA : public virtual iBase {};
+* struct iB : public iA {};
+*
+* class myB : public scfImplementation1<myB, iB> {..}.
+* \endcode
+*
+* Querying iA from myB will then fail even though myB inherits from iA
+* (through iB). By changing the declaration to
+*
+* \code
+* class myB : public scfImplementation2<myB, iB, scfFakeInterface<iA> > {..}
+* \endcode
+*
+* you make sure you can query iA from myB.
+* \warning This is potentially dangerous as you can add whatever interface
+* to another. USE WITH CARE!
+*/
+template<class If>
+class scfFakeInterface
+{
+public:
+  typedef If RealIf;
+};
+
 /**
  * Baseclass for the SCF implementation templates.
  * Provides common methods such as reference counting and handling of
@@ -170,69 +203,8 @@ protected:
 
     return 0;
   }
-
-  /**
-   * Helper function to get a given interface. Used in the implementation
-   * of child-classes
-   */
-  template<class I>
-  CS_FORCEINLINE void* GetInterface(scfInterfaceID iInterfaceID, 
-                                    scfInterfaceVersion iVersion)
-  {
-    if (iInterfaceID == scfInterfaceTraits<I>::GetID () &&
-      scfCompatibleVersion (iVersion, scfInterfaceTraits<I>::GetVersion ()))
-    {
-      scfObject->IncRef ();
-      return CS_STATIC_CAST(I*, scfObject);
-    }
-    else
-    {
-      return 0;
-    }
-  }
 };
 
-/**
- * Fugly helper to resolve some bad situations. ;)
- * Basically, it adds a new entry to QueryInterface() without adding another 
- * class to inheritance.
- *
- * Consider the following case:
- *
- * \code
- * struct iA : public virtual iBase {};
- * struct iB : public iA {};
- *
- * class myB : public scfImplementation1<myB, iB> {..}.
- * \endcode
- *
- * Querying iA from myB will then fail even though myB inherits from iA
- * (through iB). By changing the declaration to
- *
- * \code
- * class myB : public scfImplementation2<myB, iB, scfFakeInterface<iA> > {..}
- * \endcode
- *
- * you make sure you can query iA from myB.
- * \warning This is potentially dangerous as you can add whatever interface
- * to another. USE WITH CARE!
- */
-template<class If>
-class scfFakeInterface : public If
-{
-public:
-  struct InterfaceTraits 
-  {
-    static CS_FORCEINLINE scfInterfaceVersion GetVersion()
-    { 
-      return If::InterfaceTraits::GetVersion ();
-    }
-    static CS_FORCEINLINE char const * GetName() 
-    { 
-      return If::InterfaceTraits::GetName ();
-    }
-  };
-};
 
 /* Here the magic happens: generate scfImplementationN and 
  * scfImplementationExtN classed */
