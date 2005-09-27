@@ -299,6 +299,27 @@ public:
    * across the plane pl.
    */
   static csTransform GetReflect (const csPlane3& pl);
+
+  /**
+   * Get the front vector in 'other' space. This is basically equivalent
+   * to doing: tr.This2OtherRelative (csVector3 (0, 0, 1)) but it is
+   * more efficient.
+   */
+  csVector3 GetFront () { return csVector3 (m_o2t.m31, m_o2t.m32, m_o2t.m33); }
+
+  /**
+   * Get the up vector in 'other' space. This is basically equivalent
+   * to doing: tr.This2OtherRelative (csVector3 (0, 1, 0)) but it is
+   * more efficient.
+   */
+  csVector3 GetUp () { return csVector3 (m_o2t.m21, m_o2t.m22, m_o2t.m23); }
+
+  /**
+   * Get the right vector in 'other' space. This is basically equivalent
+   * to doing: tr.This2OtherRelative (csVector3 (1, 0, 0)) but it is
+   * more efficient.
+   */
+  csVector3 GetRight () { return csVector3 (m_o2t.m11, m_o2t.m12, m_o2t.m13); }
 };
 
 /**

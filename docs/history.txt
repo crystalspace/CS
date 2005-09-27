@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Sep-2005
+	- Jorrit added csTransform::GetUp(), GetFront(), and GetRight().
+	  These three conveniance functions get the up, front, and right
+	  vectors in 'other' space. They are very efficient.
 26-Sep-2005
 	- Eric Sunshine resolved some additional Doxygen warnings.
 	- Eric Sunshine improved the robustness of jobber.pl's run_command()
