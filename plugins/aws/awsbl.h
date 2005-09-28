@@ -26,7 +26,6 @@ struct iAwsComponent;
 /**
  * Lays out a class according to the Java AWT/Swing BorderLayout defintion.
  */
-
 class awsBorderLayout : public awsLayoutManager
 {
   /// Contains all components, there may be one or more missing.

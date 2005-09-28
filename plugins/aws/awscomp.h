@@ -33,24 +33,23 @@ class awsCanvas;
 
 /**
  * The general idea for a component's initialization stage is like this:
- *<p>
- *   1. Construction - any internal structures should be created and
- *      intialized.
- *   2. Setup - the window manager calls Setup() on the component being
- *      created when it is added into the window manager's hierarchy.  During
- *      setup the component should get a handle to the preference manager
- *      (via GetPrefMgr()) and ask the preference manager about things like
- *      it's default texture, colors, etc; using the Lookup* functions. The
- *      component can then get texture handles from the preference manager
- *      using the values of the keys that it has looked up.
- *<p>
- *      e.g.
- *<p>
+ * - 1. Construction - any internal structures should be created and
+ *   intialized.
+ * - 2. Setup - the window manager calls Setup() on the component being
+ *   created when it is added into the window manager's hierarchy.  During
+ *   setup the component should get a handle to the preference manager
+ *   (via GetPrefMgr()) and ask the preference manager about things like
+ *   it's default texture, colors, etc; using the Lookup* functions. The
+ *   component can then get texture handles from the preference manager
+ *   using the values of the keys that it has looked up.
+ *
+ * e.g.
+ * <code>
  *        iAwsPrefManager *pm = wmgr->GetPrefMgr ();
  *        pm->LookupStringKey ("Texture", texturename);
  *        SetTexture(pm->GetPixmapFor (texturename));
+ * </code>
  */
-
 class awsComponent : public iAwsComponent
 {
 protected:
@@ -183,9 +182,9 @@ public:
    */
   virtual bool HandleEvent (iEvent &Event);
 
-  //////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////// Properties ////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
+  ////////////////////////////// Properties ////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////
 
   /** The type of the component. */
   awsProperty CompType;
@@ -207,14 +206,14 @@ public:
    */
   virtual bool GetProperty (const std::string &name, int _value)
   {
-	  autom::keeper k;
+    autom::keeper k;
 
-	  bool result=GetProperty(name, k);
-	  if (result==false) return false;
+    bool result=GetProperty(name, k);
+    if (result==false) return false;
 
-	  _value=k->toInt().Value();
+    _value=k->toInt().Value();
 
-	  return true;
+    return true;
   }
 
   /**
@@ -224,14 +223,14 @@ public:
    */
   virtual bool GetProperty (const std::string &name, float _value)
   {
-	  autom::keeper k;
+    autom::keeper k;
 
-	  bool result=GetProperty(name, k);
-	  if (result==false) return false;
+    bool result=GetProperty(name, k);
+    if (result==false) return false;
 
-	  _value=k->toFloat().Value();
+    _value=k->toFloat().Value();
 
-	  return true;
+    return true;
   }
 
   /**
@@ -241,14 +240,14 @@ public:
    */
   virtual bool GetProperty (const std::string &name, std::string &_value)
   {
-	  autom::keeper k;
+    autom::keeper k;
 
-	  bool result=GetProperty(name, k);
-	  if (result==false) return false;
+    bool result=GetProperty(name, k);
+    if (result==false) return false;
 
-	  _value=k->toString().Value();
+    _value=k->toString().Value();
 
-	  return true;
+    return true;
   }
 
   /**
@@ -270,8 +269,8 @@ public:
 #endif
 
   /**
-   * Sets the property specified, setting the property to whatever is in @_value.
-   * Returns false if there's no such property, or if the property is
+   * Sets the property specified, setting the property to whatever is in
+   * @_value. Returns false if there's no such property, or if the property is
    * read-only.
    */
   virtual bool SetProperty (const std::string &name, autom::keeper &_value);
@@ -283,8 +282,8 @@ public:
    */
   virtual bool SetProperty (const std::string &name, int _value)
   {
-	  autom::keeper k(new autom::integer(_value));
-	  return SetProperty(name, k);
+    autom::keeper k(new autom::integer(_value));
+    return SetProperty(name, k);
   }
 
   /**
@@ -294,8 +293,8 @@ public:
    */
   virtual bool SetProperty (const std::string &name, float _value)
   {
-	  autom::keeper k(new autom::floating(_value));
-	  return SetProperty(name, k);
+    autom::keeper k(new autom::floating(_value));
+    return SetProperty(name, k);
   }
 
   /**
@@ -305,8 +304,8 @@ public:
    */
   virtual bool SetProperty (const std::string &name, const std::string &_value)
   {
-	  autom::keeper k(new autom::string(_value));
-	  return SetProperty(name, k);
+    autom::keeper k(new autom::string(_value));
+    return SetProperty(name, k);
   }
   
   /**

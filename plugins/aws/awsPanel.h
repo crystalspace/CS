@@ -28,7 +28,6 @@
  * graphic options that components use such as background drawing and frame
  * styles. It also clips to children so that drawing is optimized.
  */
-
 class awsPanel : public awsComponent  
 {
 protected:

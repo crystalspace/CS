@@ -6,9 +6,11 @@
 
 namespace aws
 {
-  enum { AWS_BORDER_RECT, AWS_BORDER_ROUNDED_RECT, AWS_BORDER_MITERED_RECT, AWS_BORDER_CIRCLE };
+  enum { AWS_BORDER_RECT, AWS_BORDER_ROUNDED_RECT, AWS_BORDER_MITERED_RECT,
+  	AWS_BORDER_CIRCLE };
 
-  enum { AWS_BORDER_FLAT, AWS_BORDER_RIDGED, AWS_BORDER_SUNKEN, AWS_BORDER_BEVELED };
+  enum { AWS_BORDER_FLAT, AWS_BORDER_RIDGED, AWS_BORDER_SUNKEN,
+  	AWS_BORDER_BEVELED };
 
   class border : public frame
   {
@@ -28,15 +30,26 @@ namespace aws
 
       switch(border_shape)
       {
-	case AWS_BORDER_RECT:	      pen->DrawRect(r.xmin, r.ymin, r.xmax, r.ymax, swap_colors); break;
-	case AWS_BORDER_ROUNDED_RECT: pen->DrawRoundedRect(r.xmin, r.ymin, r.xmax, r.ymax, edge, swap_colors); break;
-	case AWS_BORDER_MITERED_RECT: pen->DrawMiteredRect(r.xmin, r.ymin, r.xmax, r.ymax, edge, swap_colors); break;
-	case AWS_BORDER_CIRCLE:	      pen->DrawArc(r.xmin, r.ymin, r.xmax, r.ymax, 0, 2*PI, swap_colors); break;
+	case AWS_BORDER_RECT:
+	  pen->DrawRect(r.xmin, r.ymin, r.xmax, r.ymax, swap_colors);
+	  break;
+	case AWS_BORDER_ROUNDED_RECT:
+	  pen->DrawRoundedRect(r.xmin, r.ymin, r.xmax, r.ymax, edge,
+	  	swap_colors);
+	  break;
+	case AWS_BORDER_MITERED_RECT:
+	  pen->DrawMiteredRect(r.xmin, r.ymin, r.xmax, r.ymax, edge,
+	  	swap_colors);
+	  break;
+	case AWS_BORDER_CIRCLE:
+	  pen->DrawArc(r.xmin, r.ymin, r.xmax, r.ymax, 0, 2*PI, swap_colors);
+	  break;
       }
     }
 
   public:
-    border():border_shape(AWS_BORDER_RECT), border_style(AWS_BORDER_FLAT), edge(0.25) {}
+    border():border_shape(AWS_BORDER_RECT), border_style(AWS_BORDER_FLAT),
+    	edge(0.25) {}
 
     virtual ~border() {}
 
@@ -46,7 +59,10 @@ namespace aws
     /// Set the shape of the border.
     void SetBorderShape(unsigned int _shape) { border_shape=_shape; }
 
-    /// If this border uses ROUND_RECT or MITERED_RECT, then this sets the roundness or miter size.
+    /**
+     * If this border uses ROUND_RECT or MITERED_RECT, then this sets the
+     * roundness or miter size.
+     */
     void SetEdgeLevel(float e)
     {
       edge = e;
@@ -60,10 +76,20 @@ namespace aws
       switch(border_style)
       {
 	case AWS_BORDER_FLAT: break;
-	case AWS_BORDER_RIDGED: h1 = prefs.getColor(AC_HIGHLIGHT); s1 = prefs.getColor(AC_SHADOW); break;
-	case AWS_BORDER_SUNKEN: h1 = prefs.getColor(AC_SHADOW); s1 = prefs.getColor(AC_HIGHLIGHT); break;
-	case AWS_BORDER_BEVELED: h1 = prefs.getColor(AC_HIGHLIGHT); s1 = prefs.getColor(AC_SHADOW); 
-				 h2 = prefs.getColor(AC_HIGHLIGHT2); s2 = prefs.getColor(AC_SHADOW2); break;
+	case AWS_BORDER_RIDGED:
+	  h1 = prefs.getColor(AC_HIGHLIGHT);
+	  s1 = prefs.getColor(AC_SHADOW);
+	  break;
+	case AWS_BORDER_SUNKEN:
+	  h1 = prefs.getColor(AC_SHADOW);
+	  s1 = prefs.getColor(AC_HIGHLIGHT);
+	  break;
+	case AWS_BORDER_BEVELED:
+	  h1 = prefs.getColor(AC_HIGHLIGHT);
+	  s1 = prefs.getColor(AC_SHADOW); 
+	  h2 = prefs.getColor(AC_HIGHLIGHT2);
+	  s2 = prefs.getColor(AC_SHADOW2);
+	  break;
       }
     }
   

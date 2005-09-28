@@ -29,7 +29,6 @@
  * is not encouraged, since it may make assumptions based on the internal
  * architecture of AWS that other components and sinks may not be privy to.
  */
-
 class awsStandardSink : public awsSink
 {
 private:

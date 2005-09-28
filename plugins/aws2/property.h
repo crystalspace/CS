@@ -27,8 +27,11 @@
 
 namespace aws
 {
-  /** A property is a value which is maintained by some object.  That property can be read or written by
-   * external agents ONLY if the requisite permissions are available. */
+  /**
+   * A property is a value which is maintained by some object.  That property
+   * can be read or written by external agents ONLY if the requisite
+   * permissions are available.
+   */
   class property
   {
     autom::keeper value;
@@ -41,17 +44,20 @@ namespace aws
     property():value(autom::Nil()), readable(true), writeable(true) {}
 
     /// Initialize an empty property.
-    property(bool _readable, bool _writeable):value(autom::Nil()), readable(_readable), writeable(_writeable) {}
+    property(bool _readable, bool _writeable):value(autom::Nil()),
+    	readable(_readable), writeable(_writeable) {}
 
     /// Initialize a property.
-    property(const autom::keeper &_value, bool _readable, bool _writeable):value(_value), readable(_readable), writeable(_writeable) {}
+    property(const autom::keeper &_value, bool _readable, bool _writeable)
+    	: value(_value), readable(_readable), writeable(_writeable) {}
 
     /// Copy property
-    property(const property &p):value(p.value), readable(p.readable), writeable(p.writeable) {}
+    property(const property &p):value(p.value), readable(p.readable),
+    	writeable(p.writeable) {}
 
     ~property() {}
 
-    /// Sets the value of the property. Returns true on sucess, false on failure.
+    /// Sets the value of the property. Returns true on success.
     bool Set(autom::keeper new_value)
     {
       if (writeable) { value=new_value; return true; }
@@ -59,7 +65,7 @@ namespace aws
       return false;
     }
 
-    /// Gets the value of the property.  Returns true on sucess, false on failure.
+    /// Gets the value of the property.  Returns true on success.
     bool Get(autom::keeper &_value)
     {
       if (readable) { _value=value; return true; }
@@ -67,7 +73,10 @@ namespace aws
     }
   };
 
-  /** Maintains a "bag" of properties.  These can be set through the automation interface, or through the native accessors. */
+  /**
+   * Maintains a "bag" of properties.  These can be set through the automation
+   * interface, or through the native accessors.
+   */
   class property_bag : public autom::function::slot
   {
     /// The type of the property map.
@@ -83,13 +92,18 @@ namespace aws
     property_bag():allow_automation_create(true) { };
     ~property_bag() {};
     
-    /// Creates a new property mapping with the given property. Returns true on sucess, false on failure.
+    /**
+     * Creates a new property mapping with the given property. Returns true
+     * on success.
+     */
     bool CreateProperty(const csString &name,  const property& p);
 
-    /// Gets the value of the named property. Returns true on sucess, false on failure.
+    /**
+     * Gets the value of the named property. Returns true on success.
+     */
     bool Set(const csString &name, const autom::keeper &value);
 
-    /// Gets the value of the named property.  Returns true on sucess, false on failure.
+    /// Gets the value of the named property.  Returns true on success.
     bool Get(const csString &name, autom::keeper &value);
 
     /// Determines whether or not automation calls can create new properties.
@@ -104,10 +118,16 @@ namespace aws
     /// Performs GetProperty via automation
     autom::func_parm _get(autom::function &fn);
 
-    /// Performs CreateProperty via automation, NOTE: this will fail if allow_automation_create is set to false!
+    /**
+     * Performs CreateProperty via automation, NOTE: this will fail if
+     * allow_automation_create is set to false!
+     */
     autom::func_parm _create(autom::function &fn);
 
-    /// Initializes the automation functions above with the registry.  'oname' must be the name of the object we're registering as.
+    /**
+     * Initializes the automation functions above with the registry.  'oname'
+     * must be the name of the object we're registering as.
+     */
     void SetupAutomation(const csString &oname);
   };
 }

@@ -55,31 +55,47 @@ namespace aws
     AC_COLOR_COUNT
   };
 
-  /** This maintains a set of preferences.  Generally only one of these exists at a time, but there's no reason why there couldn't be more. */
+  /**
+   * This maintains a set of preferences.  Generally only one of these
+   * exists at a time, but there's no reason why there couldn't be more.
+   */
   class preferences
   {
-	  /** The root registry.  All important registries (i.e. for windows or skins) hang off this registry. */
-	  registry root;
+    /**
+     * The root registry.  All important registries (i.e. for windows or
+     * skins) hang off this registry.
+     */
+    registry root;
 
-	  /** System colors.  These are automatically initialized with some nice defaults,
-	   * but in order for them to be what you want, a skin has to be applied. */
-          csColor4 sys_colors[AC_COLOR_COUNT];
+    /**
+     * System colors.  These are automatically initialized with some nice
+     * defaults, but in order for them to be what you want, a skin has to be
+     * applied.
+     */
+    csColor4 sys_colors[AC_COLOR_COUNT];
 
   protected:
-      void init_default_colors();
+    void init_default_colors();
 
   public:
     preferences():root("root") { init_default_colors(); }
     virtual ~preferences() {}
 
-    /** Loads an xml-based definitions file into this preferences object.  Multiple files may be loaded, one after the other.  The contents are essentially merged. */
+    /**
+     * Loads an xml-based definitions file into this preferences object.
+     * Multiple files may be loaded, one after the other.  The contents are
+     * essentially merged.
+     */
     bool load(iObjectRegistry* objreg, const scfString& filename);		
 
     /** Clears all definitions for this preferences object. */
     void clear() { root.clear(); }
 
-    /** Finds a registry in the given category. If the reference is invalid, then the given registry doesn't exist. */
-    csRef< registry > findReg(const csString &category, const csString &name)
+    /**
+     * Finds a registry in the given category. If the reference is invalid,
+     * then the given registry doesn't exist.
+     */
+    csRef<registry> findReg(const csString &category, const csString &name)
     {
       return root.findChild(category, name);			
     }
@@ -97,14 +113,13 @@ namespace aws
 
   /// Gets the value of a color from the global AWS palette.
   virtual csColor4 getColor (int index)
-  { 
-  if (index<AC_COLOR_COUNT)
-    return sys_colors[index];
-
-  else
-    return csColor4();
+  {
+    if (index<AC_COLOR_COUNT)
+      return sys_colors[index];
+    else
+      return csColor4();
   }
- };
+};
 
 } // end namespace
 

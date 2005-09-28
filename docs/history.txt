@@ -21,6 +21,8 @@ chronological order.
 	   rotation. Also every light must hold projection/attenuation texture 
 	   (now i can't add another spot light with different projection 
 	   texture).
+	- Jorrit did more cleanups. People try to keep to the 78 char per line
+	  limit and follow the indent=2 space rule.
 27-Sep-2005
 	- Jorrit added csTransform::GetUp(), GetFront(), and GetRight().
 	  These three conveniance functions get the up, front, and right

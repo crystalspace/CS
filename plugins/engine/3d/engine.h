@@ -64,7 +64,6 @@ class csLight;
 class csLightPatchPool;
 class csMaterialList;
 class csMeshWrapper;
-class csPoly2DPool;
 class csPolygon3D;
 class csRegion;
 class csRenderView;

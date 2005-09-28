@@ -39,7 +39,6 @@
  * being peers, also have a depth ordering that is implicit in their
  * hierarchy.
  */
-
 class awsWindow : public awsPanel
 {
 private:

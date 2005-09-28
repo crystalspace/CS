@@ -43,12 +43,10 @@ struct iMeshWrapper;
  * curse is death!
  * <p>
  * For the more technically minded:
- * <ul>
- * <li>Spider: mesh object
- * <li>Mountains and fields: sectors
- * <li>Bugs: bugs :-)
- * <li>Wanderer: camera
- * </ul>
+ * - Spider: mesh object
+ * - Mountains and fields: sectors
+ * - Bugs: bugs :-)
+ * - Wanderer: camera
  */
 class csSpider : public iMeshObject
 {

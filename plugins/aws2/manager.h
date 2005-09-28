@@ -29,7 +29,10 @@
 
 #include "ivideo/fontserv.h"
 
-/** The management object for AWS: creates windows, destroys windows, keeps track of all the windows, etc. */
+/**
+ * The management object for AWS: creates windows, destroys windows, keeps
+ * track of all the windows, etc.
+ */
 class awsManager2 : public iAws
 {
   /** Contains all loaded preferences, skins, etc. */
@@ -47,7 +50,7 @@ class awsManager2 : public iAws
   /** Store a reference to the default font so that it's quick and easy. */  
   csRef<iFont> default_font;
 
-   /**
+  /**
    * This is the dirty region.  All clean/dirty code now utilizes the
    * update region facility for non-contiguous rectangular spaces.  This
    * buffer holds an infinite amount of optimal rectangular regions.
@@ -97,7 +100,7 @@ public:
   virtual bool Load(const scfString &_filename);
 
 public:
- //////////////////////// Event Handling ////////////////////////
+  //////////////////////// Event Handling ////////////////////////
 
   /// Dispatches events to the proper components.
   virtual bool HandleEvent (iEvent &);

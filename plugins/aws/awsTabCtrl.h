@@ -26,7 +26,6 @@
 /**
  * This class implements a basic tab button on a tab control.
  */
- 
 class awsTab : public awsComponent
 {
 protected:
@@ -83,7 +82,8 @@ public:
   void SetFirst (bool what) { is_first = what; }
   void SetTop (bool what) { is_top = what; }
 
-  enum  {
+  enum
+  {
     signalActivateTab = 1,
     signalDeactivateTab = 2,
     iconLeft = 0,
@@ -95,7 +95,7 @@ public:
 
 /**
  * This class implements a simple tab control.
- *<p>
+ * <p>
  * Basic usage is to insert tabs using the Add action, supplying a caption
  * and optional parameter. Add will return an iAwsSource* which you would
  * then connect however you like. When a tab is selcted/deselected a
@@ -107,7 +107,6 @@ public:
  * is your responsibilty to ensure the user_param is unique if you desire
  * to use it.
  */
-
 class awsTabCtrl : public awsComponent  
 {
 protected:

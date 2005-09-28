@@ -29,7 +29,6 @@ struct iMeshWrapper;
 struct iCamera;
 
 
-
 /**
  * BugPlug is the hiding place for many dark creatures. While Spider only
  * places a curse on the country and any unsuspecting wanderer that might

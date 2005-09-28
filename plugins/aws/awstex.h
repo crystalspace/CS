@@ -35,7 +35,6 @@ struct iObjectRegistry;
  * skin textures currently being used.  Then it is ready to demand-load
  * new ones.
  */
- 
 class awsTextureManager
 {
 private:

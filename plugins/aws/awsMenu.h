@@ -29,8 +29,9 @@ class awsPopupMenu;
 /**
  * You should be able to write your own class for menu entries as well if you
  * don't like these simple ones. A menu entry should support the following:
- *<p>
+ * <p>
  * Properties:
+ * <pre>
  *         Selected -- Determines if the menu entry is the selected one. 
  *        PopupMenu -- Optional, but if present the popup it refers to will
  *                     be shown when the menu entry is selected.
@@ -40,16 +41,18 @@ class awsPopupMenu;
  *      CloseSignal -- A constant that should be the value of the close signal
  *   SelectedSignal -- A constant that should be the value of the selected
  *                     signal.
- *<p>
+ * </pre>
+ * <p>
  * Signals:
+ * <pre>
  *            close -- This should fire when te user has made some sort of
  *                     choice from the menu and the menu should now close.
  *         selected -- This should fire when the user selects/deselects a
  *                     given entry usually by putting the mouse over it.
  *                     Which will be determined by querying the selected
  *                     property.
+ * </pre>
  */
-
 class awsMenuEntry : public awsPanel
 {
 private:

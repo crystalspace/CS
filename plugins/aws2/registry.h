@@ -60,7 +60,8 @@ namespace aws
     /** Sets the parent of this registry. */
     void setParent (csRef<registry> _parent) { parent=_parent; }
     
-    /** Adds a child registry under a certain category.  
+    /**
+     * Adds a child registry under a certain category.  
      * We can lookup children given those categories. 
      */
     void addChild (const csString &category, csRef<registry> _child);

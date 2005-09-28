@@ -204,14 +204,14 @@ public:
   virtual void Broadcast (unsigned long signal);
 };
 
-/**                                                                                                                    *
+/**
  * This implements the slot architecture.  Slots are conduits for signals.
  * Signals always have a source.  Slots may be a conduit for multiple
  * signals from multiple sources. It is up to the user to determine how
  * to use his slots. Slots do not care, other than they route based on
  * signal, NOT source.  Therefore, if a slot is hooked up to two different
  * sources that emit the same signal, then any trigger registered for
- * that signal will recieve the signal from EVERY source that emits it.                                                                                   *
+ * that signal will recieve the signal from EVERY source that emits it.
  */
 class awsSlot : public iAwsSlot
 {

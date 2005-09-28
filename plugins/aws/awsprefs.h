@@ -53,7 +53,8 @@
  */
 
 /// Keys.
-enum {
+enum
+{
   KEY_INT = 0,
   KEY_STR = 1,
   KEY_RECT = 2,
@@ -292,7 +293,8 @@ public:
   awsPointKey(iAws* a, iString *name, csVector2 v) : awsKey(a,name), val(v) {}
 
   /// Constructs an integer key with the given name.
-  awsPointKey(iAws* a, const char* name, csVector2 v) : awsKey(a,name), val(v) {}
+  awsPointKey(iAws* a, const char* name, csVector2 v) : awsKey(a,name), val(v)
+  {}
 
   /// Destructor does nothing.
   virtual ~awsPointKey () { }

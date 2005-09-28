@@ -27,7 +27,6 @@
  * control bar is just a simple component that has any number of any type
  * of component in it, layed out in a row.
  */
- 
 class awsControlBar : public awsPanel
 {
 private:
@@ -66,6 +65,7 @@ private:
 
   /// Layout the child components and resize this component if necessary.
   void DoLayout ();
+
 public:
   awsControlBar ();
   virtual ~awsControlBar ();

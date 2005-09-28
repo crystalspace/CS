@@ -32,453 +32,453 @@ class awsPropertyBase;
 /** A bag of properties.  This lets us search for them.  The actual properties are automatically registered when they're created. */
 class awsPropertyBag
 {
-	typedef std::map<std::string, awsPropertyBase *> property_map;
+  typedef std::map<std::string, awsPropertyBase *> property_map;
 
-	/** The map of properties. */
-	property_map props;
+  /** The map of properties. */
+  property_map props;
 
 public:
-	awsPropertyBag() {}
-	~awsPropertyBag() {}
+  awsPropertyBag() {}
+  ~awsPropertyBag() {}
 
-	/** Registers a given property. */
-	void Register(const std::string &name, awsPropertyBase *p)
-	{
-		props.insert(std::make_pair(name, p));
-	}
+  /** Registers a given property. */
+  void Register(const std::string &name, awsPropertyBase *p)
+  {
+    props.insert(std::make_pair(name, p));
+  }
 
-	/** Unregisters a property. */
-	void Unregister(const std::string &name)
-	{
-		props.erase(name);
-	}
+  /** Unregisters a property. */
+  void Unregister(const std::string &name)
+  {
+    props.erase(name);
+  }
 
-	/** Finds the pointer to some property. It returns a raw pointer because it is not expected that
-	 * you will ever create properties on new.  */
-	awsPropertyBase *Find(const std::string &name)
-	{
-		property_map::iterator pos = props.find(name);
+  /** Finds the pointer to some property. It returns a raw pointer because it is not expected that
+   * you will ever create properties on new.  */
+  awsPropertyBase *Find(const std::string &name)
+  {
+    property_map::iterator pos = props.find(name);
 
-		if (pos==props.end()) return 0;
-		else return pos->second;
-	}
+    if (pos==props.end()) return 0;
+    else return pos->second;
+  }
 };
 
 class awsPropertyBase
 {
 protected:
-	/** True if it is possible to read this property. */
-	bool readable;
+  /** True if it is possible to read this property. */
+  bool readable;
 
-	/** True if it is possible to write this property. */
-	bool writeable;
+  /** True if it is possible to write this property. */
+  bool writeable;
 
-	/** The name of the proeprty. */
-	std::string name;
+  /** The name of the proeprty. */
+  std::string name;
 
 public:
-	awsPropertyBase(bool _writeable=true, bool _readable=true):readable(_readable), writeable(_writeable) {}
+  awsPropertyBase(bool _writeable=true, bool _readable=true):readable(_readable), writeable(_writeable) {}
 
-	virtual ~awsPropertyBase()
-	{	
-	}
+  virtual ~awsPropertyBase()
+  {  
+  }
 
-	/** This signal is fired whenever the property is changed. */
-	autom::signal2<const std::string &, awsPropertyBase *> Changed;
+  /** This signal is fired whenever the property is changed. */
+  autom::signal2<const std::string &, awsPropertyBase *> Changed;
 
-	/** This signal is fired whenever the property is being bound.  Occurs BEFORE the binding is registered. */
-	autom::signal3<const std::string &, const std::string &, awsPropertyBase *> Binding;
+  /** This signal is fired whenever the property is being bound.  Occurs BEFORE the binding is registered. */
+  autom::signal3<const std::string &, const std::string &, awsPropertyBase *> Binding;
 
-	/** Sets the value of this property (if allowed.) Returns true on success, else false. */
-	virtual bool Set(autom::keeper &_value)=0;
+  /** Sets the value of this property (if allowed.) Returns true on success, else false. */
+  virtual bool Set(autom::keeper &_value)=0;
 
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)=0;
+  /** Gets the value of this property if allowed, returns false if not allowed. */
+  virtual bool Get(autom::keeper &_value)=0;
 
-	/** Binds this property to the property bag. */
-	virtual void Bind(const std::string &_name, awsPropertyBag &bag)
-	{	
-		Binding(name, _name, this);
+  /** Binds this property to the property bag. */
+  virtual void Bind(const std::string &_name, awsPropertyBag &bag)
+  {  
+    Binding(name, _name, this);
 
-		bag.Unregister(name);
+    bag.Unregister(name);
 
-		name=_name;
-		bag.Register(_name, this);
-	}
+    name=_name;
+    bag.Register(_name, this);
+  }
 };
 
 
 /** A property is intended to be a class member.  You should never create a property via new.  It maintains a value of some type, either string, int, float, or list. */
 class awsProperty : virtual public awsPropertyBase
 {
-	/** This is the value of the property. */
-	autom::keeper value;		
-	
+  /** This is the value of the property. */
+  autom::keeper value;    
+  
 public:
-	/** Creates a new property, registers it with a bag, and optionally sets it's access. */
-	awsProperty(bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable)
-	{	
-	}
+  /** Creates a new property, registers it with a bag, and optionally sets it's access. */
+  awsProperty(bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable)
+  {  
+  }
 
-	virtual ~awsProperty() 
-	{
-	}
+  virtual ~awsProperty() 
+  {
+  }
 
-	/** Sets the value of this property (if allowed.) Returns true on success, else false. */
-	virtual bool Set(autom::keeper &_value)
-	{
-		if (writeable) 
-		{ 
-			value=_value; 
-			Changed(name, this);
-			return true; 
-		}
-		else return false;
-	}
+  /** Sets the value of this property (if allowed.) Returns true on success, else false. */
+  virtual bool Set(autom::keeper &_value)
+  {
+    if (writeable) 
+    { 
+      value=_value; 
+      Changed(name, this);
+      return true; 
+    }
+    else return false;
+  }
 
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)
-	{
-		if (readable)
-		{
-			_value=value;
-			return true;
-		}
-		else return false;
-	}	
+  /** Gets the value of this property if allowed, returns false if not allowed. */
+  virtual bool Get(autom::keeper &_value)
+  {
+    if (readable)
+    {
+      _value=value;
+      return true;
+    }
+    else return false;
+  }  
 };
 
 /**  A bound property.  This property is bound to some csRect. */
 class awsRectProperty : virtual public awsPropertyBase
 {
-	/** The rect we store. */
-	csRect &value;
+  /** The rect we store. */
+  csRect &value;
 
 public:
-	awsRectProperty(csRect &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
-	{
-	}
+  awsRectProperty(csRect &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
+  {
+  }
 
-	virtual ~awsRectProperty()
-	{
-	}
+  virtual ~awsRectProperty()
+  {
+  }
 
-	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
-	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a float, int, or list 
-	 * cannot be successfully converted to a rect.  */
-	virtual bool Set(autom::keeper &_value)
-	{
-		if (writeable)
-		{
-			std::string s(_value->toString().Value());
-			if (csScanStr(s.c_str(), "(%d, %d)-(%d, %d)", &value.xmin, &value.ymin, &value.xmax, &value.ymax)!=-1) 
-			{
-				Changed(name, this);
-				return true;
-			}
-			else return false;
-		}
-		else return false;
-	}
+  /** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
+   * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a float, int, or list 
+   * cannot be successfully converted to a rect.  */
+  virtual bool Set(autom::keeper &_value)
+  {
+    if (writeable)
+    {
+      std::string s(_value->toString().Value());
+      if (csScanStr(s.c_str(), "(%d, %d)-(%d, %d)", &value.xmin, &value.ymin, &value.xmax, &value.ymax)!=-1) 
+      {
+        Changed(name, this);
+        return true;
+      }
+      else return false;
+    }
+    else return false;
+  }
 
-	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
-	virtual bool Set(const csRect &_value)
-	{
-		if (writeable)
-		{
-			value = _value;
-			Changed(name, this);
+  /** Sets the value of the rect directly. Returns true on sucess, false on failure. */
+  virtual bool Set(const csRect &_value)
+  {
+    if (writeable)
+    {
+      value = _value;
+      Changed(name, this);
             return true;
-		}
-		else return false;		
-	}
-	
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)
-	{
-		char buf[128];
+    }
+    else return false;    
+  }
+  
+  /** Gets the value of this property if allowed, returns false if not allowed. */
+  virtual bool Get(autom::keeper &_value)
+  {
+    char buf[128];
 
         if (readable)
-		{
-			cs_snprintf(buf, sizeof(buf), "(%d, %d)-(%d, %d)", value.xmin, value.ymin, value.xmax, value.ymax);
-			
-			_value.AttachNew(new autom::string(buf));
+    {
+      cs_snprintf(buf, sizeof(buf), "(%d, %d)-(%d, %d)", value.xmin, value.ymin, value.xmax, value.ymax);
+      
+      _value.AttachNew(new autom::string(buf));
 
-			return true;
-		}       
-		else return false;
-	}
+      return true;
+    }       
+    else return false;
+  }
 
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(csRect &_value)
-	{
-		if (readable)
-		{
-			value = _value;
+  /** Gets the value of this property if allowed, returns false if not allowed. */
+  virtual bool Get(csRect &_value)
+  {
+    if (readable)
+    {
+      value = _value;
             return true;
-		}
-		else return false;		
-	}
+    }
+    else return false;    
+  }
 
 };
 
 /**  A bound property.  This property is bound to some int. */
 class awsIntProperty : virtual public awsPropertyBase
 {
-	/** The int we store. */
-	int &value;
+  /** The int we store. */
+  int &value;
 
 public:
-	awsIntProperty(int &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
-	{
-	}
+  awsIntProperty(int &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
+  {
+  }
 
-	virtual ~awsIntProperty()
-	{
-	}
+  virtual ~awsIntProperty()
+  {
+  }
 
-	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
-	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a float, int, or list 
-	 * cannot be successfully converted to a rect.  */
-	virtual bool Set(autom::keeper &_value)
-	{
-		if (writeable)
-		{
-			value = (int)_value->toInt().Value();
-			Changed(name, this);
-			return true;
-		}
-		else return false;
-	}
+  /** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
+   * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a float, int, or list 
+   * cannot be successfully converted to a rect.  */
+  virtual bool Set(autom::keeper &_value)
+  {
+    if (writeable)
+    {
+      value = (int)_value->toInt().Value();
+      Changed(name, this);
+      return true;
+    }
+    else return false;
+  }
 
-	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
-	virtual bool Set(const int &_value)
-	{
-		if (writeable)
-		{
-			value = _value;
-			Changed(name, this);
+  /** Sets the value of the rect directly. Returns true on sucess, false on failure. */
+  virtual bool Set(const int &_value)
+  {
+    if (writeable)
+    {
+      value = _value;
+      Changed(name, this);
             return true;
-		}
-		else return false;		
-	}
-	
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)
-	{
+    }
+    else return false;    
+  }
+  
+  /** Gets the value of this property if allowed, returns false if not allowed. */
+  virtual bool Get(autom::keeper &_value)
+  {
         if (readable)
-		{			
-			_value.AttachNew(new autom::integer(value));
-			return true;
-		}       
-		else return false;
-	}
+    {      
+      _value.AttachNew(new autom::integer(value));
+      return true;
+    }       
+    else return false;
+  }
 
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(int &_value)
-	{
-		if (readable)
-		{
-			value = _value;
+  /** Gets the value of this property if allowed, returns false if not allowed. */
+  virtual bool Get(int &_value)
+  {
+    if (readable)
+    {
+      value = _value;
             return true;
-		}
-		else return false;		
-	}
+    }
+    else return false;    
+  }
 
 };
 
 /**  A bound property.  This property is bound to some float. */
 class awsFloatProperty : virtual public awsPropertyBase
 {
-	/** The float we store. */
-	float &value;
+  /** The float we store. */
+  float &value;
 
 public:
-	awsFloatProperty(float &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
-	{
-	}
+  awsFloatProperty(float &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
+  {
+  }
 
-	virtual ~awsFloatProperty()
-	{
-	}
+  virtual ~awsFloatProperty()
+  {
+  }
 
-	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
-	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a float, int, or list 
-	 * cannot be successfully converted to a rect.  */
-	virtual bool Set(autom::keeper &_value)
-	{
-		if (writeable)
-		{
-			value = (float)_value->toFloat().Value();
-			Changed(name, this);
-			return true;
-		}
-		else return false;
-	}
+  /** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
+   * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a float, int, or list 
+   * cannot be successfully converted to a rect.  */
+  virtual bool Set(autom::keeper &_value)
+  {
+    if (writeable)
+    {
+      value = (float)_value->toFloat().Value();
+      Changed(name, this);
+      return true;
+    }
+    else return false;
+  }
 
-	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
-	virtual bool Set(const float &_value)
-	{
-		if (writeable)
-		{
-			value = _value;
-			Changed(name, this);
+  /** Sets the value of the rect directly. Returns true on sucess, false on failure. */
+  virtual bool Set(const float &_value)
+  {
+    if (writeable)
+    {
+      value = _value;
+      Changed(name, this);
             return true;
-		}
-		else return false;		
-	}
-	
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)
-	{
+    }
+    else return false;    
+  }
+  
+  /** Gets the value of this property if allowed, returns false if not allowed. */
+  virtual bool Get(autom::keeper &_value)
+  {
         if (readable)
-		{			
-			_value.AttachNew(new autom::floating(value));
-			return true;
-		}       
-		else return false;
-	}
+    {      
+      _value.AttachNew(new autom::floating(value));
+      return true;
+    }       
+    else return false;
+  }
 
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(float &_value)
-	{
-		if (readable)
-		{
-			value = _value;
+  /** Gets the value of this property if allowed, returns false if not allowed. */
+  virtual bool Get(float &_value)
+  {
+    if (readable)
+    {
+      value = _value;
             return true;
-		}
-		else return false;		
-	}
+    }
+    else return false;    
+  }
 
 };
 
 /**  A bound property.  This property is bound to some bool. */
 class awsBoolProperty : virtual public awsPropertyBase
 {
-	/** The bool we store. */
-	bool &value;
+  /** The bool we store. */
+  bool &value;
 
 public:
-	awsBoolProperty(bool &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
-	{
-	}
+  awsBoolProperty(bool &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
+  {
+  }
 
-	virtual ~awsBoolProperty()
-	{
-	}
+  virtual ~awsBoolProperty()
+  {
+  }
 
-	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
-	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a bool, int, or list 
-	 * cannot be successfully converted to a rect.  */
-	virtual bool Set(autom::keeper &_value)
-	{
-		if (writeable)
-		{
-			value = (bool)_value->toInt().Value();
-			Changed(name, this);
-			return true;
-		}
-		else return false;
-	}
+  /** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
+   * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a bool, int, or list 
+   * cannot be successfully converted to a rect.  */
+  virtual bool Set(autom::keeper &_value)
+  {
+    if (writeable)
+    {
+      value = (bool)_value->toInt().Value();
+      Changed(name, this);
+      return true;
+    }
+    else return false;
+  }
 
-	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
-	virtual bool Set(const bool &_value)
-	{
-		if (writeable)
-		{
-			value = _value;
-			Changed(name, this);
+  /** Sets the value of the rect directly. Returns true on sucess, false on failure. */
+  virtual bool Set(const bool &_value)
+  {
+    if (writeable)
+    {
+      value = _value;
+      Changed(name, this);
             return true;
-		}
-		else return false;		
-	}
-	
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)
-	{
+    }
+    else return false;    
+  }
+  
+  /** Gets the value of this property if allowed, returns false if not allowed. */
+  virtual bool Get(autom::keeper &_value)
+  {
         if (readable)
-		{			
-			_value.AttachNew(new autom::integer(value));
-			return true;
-		}       
-		else return false;
-	}
+    {      
+      _value.AttachNew(new autom::integer(value));
+      return true;
+    }       
+    else return false;
+  }
 
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(bool &_value)
-	{
-		if (readable)
-		{
-			value = _value;
+  /** Gets the value of this property if allowed, returns false if not allowed. */
+  virtual bool Get(bool &_value)
+  {
+    if (readable)
+    {
+      value = _value;
             return true;
-		}
-		else return false;		
-	}
+    }
+    else return false;    
+  }
 
 };
 
 /**  A bound property.  This property is bound to some std::string. */
 class awsStringProperty : virtual public awsPropertyBase
 {
-	/** The std::string we store. */
-	std::string &value;
+  /** The std::string we store. */
+  std::string &value;
 
 public:
-	awsStringProperty(std::string &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
-	{
-	}
+  awsStringProperty(std::string &_value, bool _writeable=true, bool _readable=true):awsPropertyBase(_writeable, _readable), value(_value)
+  {
+  }
 
-	virtual ~awsStringProperty()
-	{
-	}
+  virtual ~awsStringProperty()
+  {
+  }
 
-	/** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
-	 * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a std::string, int, or list 
-	 * cannot be successfully converted to a rect.  */
-	virtual bool Set(autom::keeper &_value)
-	{
-		if (writeable)
-		{
-			value = _value->toString().Value();
-			Changed(name, this);
-			return true;
-		}
-		else return false;
-	}
+  /** Sets the value of this property (if allowed.) Returns true on success, false on failure.  Particularly, it may return
+   * false if the rectangle string is not in the format (0, 0)-(100, 100).  It should be obvious that a std::string, int, or list 
+   * cannot be successfully converted to a rect.  */
+  virtual bool Set(autom::keeper &_value)
+  {
+    if (writeable)
+    {
+      value = _value->toString().Value();
+      Changed(name, this);
+      return true;
+    }
+    else return false;
+  }
 
-	/** Sets the value of the rect directly. Returns true on sucess, false on failure. */
-	virtual bool Set(const std::string &_value)
-	{
-		if (writeable)
-		{
-			value = _value;
-			Changed(name, this);
+  /** Sets the value of the rect directly. Returns true on sucess, false on failure. */
+  virtual bool Set(const std::string &_value)
+  {
+    if (writeable)
+    {
+      value = _value;
+      Changed(name, this);
             return true;
-		}
-		else return false;		
-	}
-	
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(autom::keeper &_value)
-	{
-        if (readable)
-		{			
-			_value.AttachNew(new autom::string(value));
-			return true;
-		}       
-		else return false;
-	}
+    }
+    else return false;    
+  }
+  
+  /** Gets the value of this property if allowed, returns false if not allowed. */
+  virtual bool Get(autom::keeper &_value)
+  {
+    if (readable)
+    {      
+      _value.AttachNew(new autom::string(value));
+      return true;
+    }       
+    else return false;
+  }
 
-	/** Gets the value of this property if allowed, returns false if not allowed. */
-	virtual bool Get(std::string &_value)
-	{
-		if (readable)
-		{
-			value = _value;
-            return true;
-		}
-		else return false;		
-	}
+  /** Gets the value of this property if allowed, returns false if not allowed. */
+  virtual bool Get(std::string &_value)
+  {
+    if (readable)
+    {
+      value = _value;
+      return true;
+    }
+    else return false;    
+  }
 
 };
 

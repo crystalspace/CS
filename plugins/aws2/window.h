@@ -28,7 +28,10 @@ namespace aws
     /// The name of the window.
     csString name;
 
-    /// The template name of the window (the definition template that it was taken from.)
+    /**
+     * The template name of the window (the definition template that it was
+     * taken from.)
+     */
     csString template_name;
     
   public:

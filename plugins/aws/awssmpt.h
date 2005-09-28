@@ -39,7 +39,10 @@ class awsSimpleCanvas : public csProcTexture
     /// Destroy this texture
     virtual ~awsSimpleCanvas () {}
 
-    /// This is actually not used ever.  The window manager doesn't "animate", and only refreshes the canvas when needed.
+    /**
+     * This is actually not used ever.  The window manager doesn't "animate",
+     * and only refreshes the canvas when needed.
+     */
     virtual void Animate (csTicks current_time);
 
     /// Get the iGraphics2D interface so that components can use it.
@@ -65,7 +68,8 @@ public:
   iGraphics2D *rG2D;
   iGraphics3D *rG3D;
 
-  awsSingleProctexCanvas (int w, int h, iObjectRegistry* object_reg, iEngine* engine,
+  awsSingleProctexCanvas (int w, int h, iObjectRegistry* object_reg,
+  	iEngine* engine,
       	iTextureManager* txtmgr, const char *name);
   virtual ~awsSingleProctexCanvas ();
 

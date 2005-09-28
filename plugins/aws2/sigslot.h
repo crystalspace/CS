@@ -313,7 +313,8 @@ namespace awsAutom
     virtual has_slots<mt_policy>* getdest() const = 0;
     virtual void emit(arg1_type) = 0;
     virtual _connection_base1<arg1_type, mt_policy>* clone() = 0;
-    virtual _connection_base1<arg1_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest) = 0;
+    virtual _connection_base1<arg1_type, mt_policy>* duplicate(
+    	has_slots<mt_policy>* pnewdest) = 0;
   };
 
   template<class arg1_type, class arg2_type, class mt_policy>
@@ -323,7 +324,8 @@ namespace awsAutom
     virtual has_slots<mt_policy>* getdest() const = 0;
     virtual void emit(arg1_type, arg2_type) = 0;
     virtual _connection_base2<arg1_type, arg2_type, mt_policy>* clone() = 0;
-    virtual _connection_base2<arg1_type, arg2_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest) = 0;
+    virtual _connection_base2<arg1_type, arg2_type, mt_policy>* duplicate(
+    	has_slots<mt_policy>* pnewdest) = 0;
   };
 
   template<class arg1_type, class arg2_type, class arg3_type, class mt_policy>
@@ -332,18 +334,23 @@ namespace awsAutom
   public:
     virtual has_slots<mt_policy>* getdest() const = 0;
     virtual void emit(arg1_type, arg2_type, arg3_type) = 0;
-    virtual _connection_base3<arg1_type, arg2_type, arg3_type, mt_policy>* clone() = 0;
-    virtual _connection_base3<arg1_type, arg2_type, arg3_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest) = 0;
+    virtual _connection_base3<arg1_type, arg2_type, arg3_type, mt_policy>*
+    	clone() = 0;
+    virtual _connection_base3<arg1_type, arg2_type, arg3_type, mt_policy>*
+    	duplicate(has_slots<mt_policy>* pnewdest) = 0;
   };
 
-  template<class arg1_type, class arg2_type, class arg3_type, class arg4_type, class mt_policy>
+  template<class arg1_type, class arg2_type, class arg3_type, class arg4_type,
+  	class mt_policy>
   class _connection_base4
   {
   public:
     virtual has_slots<mt_policy>* getdest() const = 0;
     virtual void emit(arg1_type, arg2_type, arg3_type, arg4_type) = 0;
-    virtual _connection_base4<arg1_type, arg2_type, arg3_type, arg4_type, mt_policy>* clone() = 0;
-    virtual _connection_base4<arg1_type, arg2_type, arg3_type, arg4_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest) = 0;
+    virtual _connection_base4<arg1_type, arg2_type, arg3_type, arg4_type,
+    	mt_policy>* clone() = 0;
+    virtual _connection_base4<arg1_type, arg2_type, arg3_type, arg4_type,
+    	mt_policy>* duplicate(has_slots<mt_policy>* pnewdest) = 0;
   };
 
   template<class arg1_type, class arg2_type, class arg3_type, class arg4_type,
@@ -371,7 +378,8 @@ namespace awsAutom
     virtual _connection_base6<arg1_type, arg2_type, arg3_type, arg4_type,
       arg5_type, arg6_type, mt_policy>* clone() = 0;
     virtual _connection_base6<arg1_type, arg2_type, arg3_type, arg4_type,
-      arg5_type, arg6_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest) = 0;
+      arg5_type, arg6_type, mt_policy>* duplicate(has_slots<mt_policy>*
+      pnewdest) = 0;
   };
 
   template<class arg1_type, class arg2_type, class arg3_type, class arg4_type,
@@ -385,11 +393,13 @@ namespace awsAutom
     virtual _connection_base7<arg1_type, arg2_type, arg3_type, arg4_type,
       arg5_type, arg6_type, arg7_type, mt_policy>* clone() = 0;
     virtual _connection_base7<arg1_type, arg2_type, arg3_type, arg4_type,
-      arg5_type, arg6_type, arg7_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest) = 0;
+      arg5_type, arg6_type, arg7_type, mt_policy>* duplicate(
+      	has_slots<mt_policy>* pnewdest) = 0;
   };
 
   template<class arg1_type, class arg2_type, class arg3_type, class arg4_type,
-  class arg5_type, class arg6_type, class arg7_type, class arg8_type, class mt_policy>
+  class arg5_type, class arg6_type, class arg7_type, class arg8_type,
+  	class mt_policy>
   class _connection_base8
   {
   public:
@@ -399,7 +409,8 @@ namespace awsAutom
     virtual _connection_base8<arg1_type, arg2_type, arg3_type, arg4_type,
       arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>* clone() = 0;
     virtual _connection_base8<arg1_type, arg2_type, arg3_type, arg4_type,
-      arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest) = 0;
+      arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>* duplicate(
+      has_slots<mt_policy>* pnewdest) = 0;
   };
 
   template<class mt_policy>
@@ -407,7 +418,8 @@ namespace awsAutom
   {
   public:
     virtual void slot_disconnect(has_slots<mt_policy>* pslot) = 0;
-    virtual void slot_duplicate(const has_slots<mt_policy>* poldslot, has_slots<mt_policy>* pnewslot) = 0;
+    virtual void slot_duplicate(const has_slots<mt_policy>* poldslot,
+    	has_slots<mt_policy>* pnewslot) = 0;
   };
 
   template<class  mt_policy = SIGSLOT_DEFAULT_MT_POLICY>
@@ -478,7 +490,7 @@ namespace awsAutom
   class _signal_base0 : public _signal_base<mt_policy>
   {
   public:
-    typedef typename std::list<_connection_base0<mt_policy> *>  connections_list;
+    typedef typename std::list<_connection_base0<mt_policy> *> connections_list;
     typedef typename connections_list::const_iterator const_iterator;
     typedef typename connections_list::iterator iterator;
 
@@ -522,7 +534,8 @@ namespace awsAutom
         ++it;
       }
 
-      m_connected_slots.erase(m_connected_slots.begin(), m_connected_slots.end());
+      m_connected_slots.erase(m_connected_slots.begin(),
+      	m_connected_slots.end());
     }
 
     void disconnect(has_slots<mt_policy>* pclass)
@@ -566,7 +579,8 @@ namespace awsAutom
       }
     }
 
-    void slot_duplicate(const has_slots<mt_policy>* oldtarget, has_slots<mt_policy>* newtarget)
+    void slot_duplicate(const has_slots<mt_policy>* oldtarget,
+    	has_slots<mt_policy>* newtarget)
     {
       lock_block<mt_policy> lock(this);
       iterator it = m_connected_slots.begin();
@@ -591,7 +605,8 @@ namespace awsAutom
   class _signal_base1 : public _signal_base<mt_policy>
   {
   public:
-    typedef typename std::list<_connection_base1<arg1_type, mt_policy> *>  connections_list;
+    typedef typename std::list<_connection_base1<arg1_type, mt_policy> *>
+    	connections_list;
     typedef typename connections_list::const_iterator const_iterator;
     typedef typename connections_list::iterator iterator;
 
@@ -616,7 +631,8 @@ namespace awsAutom
       }
     }
 
-    void slot_duplicate(const has_slots<mt_policy>* oldtarget, has_slots<mt_policy>* newtarget)
+    void slot_duplicate(const has_slots<mt_policy>* oldtarget,
+    	has_slots<mt_policy>* newtarget)
     {
       lock_block<mt_policy> lock(this);
       iterator it = m_connected_slots.begin();
@@ -652,7 +668,8 @@ namespace awsAutom
         ++it;
       }
 
-      m_connected_slots.erase(m_connected_slots.begin(), m_connected_slots.end());
+      m_connected_slots.erase(m_connected_slots.begin(),
+      	m_connected_slots.end());
     }
 
     void disconnect(has_slots<mt_policy>* pclass)
@@ -705,7 +722,8 @@ namespace awsAutom
   class _signal_base2 : public _signal_base<mt_policy>
   {
   public:
-    typedef typename std::list<_connection_base2<arg1_type, arg2_type, mt_policy> *>
+    typedef typename std::list<_connection_base2<arg1_type, arg2_type,
+    	mt_policy> *>
       connections_list;
         typedef typename connections_list::const_iterator const_iterator;
         typedef typename connections_list::iterator iterator;
@@ -731,7 +749,8 @@ namespace awsAutom
       }
     }
 
-    void slot_duplicate(const has_slots<mt_policy>* oldtarget, has_slots<mt_policy>* newtarget)
+    void slot_duplicate(const has_slots<mt_policy>* oldtarget,
+    	has_slots<mt_policy>* newtarget)
     {
       lock_block<mt_policy> lock(this);
       iterator it = m_connected_slots.begin();
@@ -767,7 +786,8 @@ namespace awsAutom
         ++it;
       }
 
-      m_connected_slots.erase(m_connected_slots.begin(), m_connected_slots.end());
+      m_connected_slots.erase(m_connected_slots.begin(),
+      	m_connected_slots.end());
     }
 
     void disconnect(has_slots<mt_policy>* pclass)
@@ -819,7 +839,8 @@ namespace awsAutom
   class _signal_base3 : public _signal_base<mt_policy>
   {
   public:
-    typedef std::list<_connection_base3<arg1_type, arg2_type, arg3_type, mt_policy> *>
+    typedef std::list<_connection_base3<arg1_type, arg2_type, arg3_type,
+    	mt_policy> *>
       connections_list;
 
         typedef typename connections_list::const_iterator const_iterator;
@@ -829,7 +850,8 @@ namespace awsAutom
       ;
     }
 
-    _signal_base3(const _signal_base3<arg1_type, arg2_type, arg3_type, mt_policy>& s)
+    _signal_base3(const _signal_base3<arg1_type, arg2_type, arg3_type,
+    	mt_policy>& s)
       : _signal_base<mt_policy>(s)
     {
       lock_block<mt_policy> lock(this);
@@ -845,7 +867,8 @@ namespace awsAutom
       }
     }
 
-    void slot_duplicate(const has_slots<mt_policy>* oldtarget, has_slots<mt_policy>* newtarget)
+    void slot_duplicate(const has_slots<mt_policy>* oldtarget,
+    	has_slots<mt_policy>* newtarget)
     {
       lock_block<mt_policy> lock(this);
       iterator it = m_connected_slots.begin();
@@ -881,7 +904,8 @@ namespace awsAutom
         ++it;
       }
 
-      m_connected_slots.erase(m_connected_slots.begin(), m_connected_slots.end());
+      m_connected_slots.erase(m_connected_slots.begin(),
+      	m_connected_slots.end());
     }
 
     void disconnect(has_slots<mt_policy>* pclass)
@@ -929,7 +953,8 @@ namespace awsAutom
     connections_list m_connected_slots;   
   };
 
-  template<class arg1_type, class arg2_type, class arg3_type, class arg4_type, class mt_policy>
+  template<class arg1_type, class arg2_type, class arg3_type, class arg4_type,
+  	class mt_policy>
   class _signal_base4 : public _signal_base<mt_policy>
   {
   public:
@@ -943,7 +968,8 @@ namespace awsAutom
       ;
     }
 
-    _signal_base4(const _signal_base4<arg1_type, arg2_type, arg3_type, arg4_type, mt_policy>& s)
+    _signal_base4(const _signal_base4<arg1_type, arg2_type, arg3_type,
+    	arg4_type, mt_policy>& s)
       : _signal_base<mt_policy>(s)
     {
       lock_block<mt_policy> lock(this);
@@ -959,7 +985,8 @@ namespace awsAutom
       }
     }
 
-    void slot_duplicate(const has_slots<mt_policy>* oldtarget, has_slots<mt_policy>* newtarget)
+    void slot_duplicate(const has_slots<mt_policy>* oldtarget,
+    	has_slots<mt_policy>* newtarget)
     {
       lock_block<mt_policy> lock(this);
       iterator it = m_connected_slots.begin();
@@ -995,7 +1022,8 @@ namespace awsAutom
         ++it;
       }
 
-      m_connected_slots.erase(m_connected_slots.begin(), m_connected_slots.end());
+      m_connected_slots.erase(m_connected_slots.begin(),
+      	m_connected_slots.end());
     }
 
     void disconnect(has_slots<mt_policy>* pclass)
@@ -1058,8 +1086,8 @@ namespace awsAutom
       ;
     }
 
-    _signal_base5(const _signal_base5<arg1_type, arg2_type, arg3_type, arg4_type,
-      arg5_type, mt_policy>& s)
+    _signal_base5(const _signal_base5<arg1_type, arg2_type, arg3_type,
+    	arg4_type, arg5_type, mt_policy>& s)
       : _signal_base<mt_policy>(s)
     {
       lock_block<mt_policy> lock(this);
@@ -1075,7 +1103,8 @@ namespace awsAutom
       }
     }
 
-    void slot_duplicate(const has_slots<mt_policy>* oldtarget, has_slots<mt_policy>* newtarget)
+    void slot_duplicate(const has_slots<mt_policy>* oldtarget,
+    	has_slots<mt_policy>* newtarget)
     {
       lock_block<mt_policy> lock(this);
       iterator it = m_connected_slots.begin();
@@ -1111,7 +1140,8 @@ namespace awsAutom
         ++it;
       }
 
-      m_connected_slots.erase(m_connected_slots.begin(), m_connected_slots.end());
+      m_connected_slots.erase(m_connected_slots.begin(),
+      	m_connected_slots.end());
     }
 
     void disconnect(has_slots<mt_policy>* pclass)
@@ -1174,8 +1204,8 @@ namespace awsAutom
       ;
     }
 
-    _signal_base6(const _signal_base6<arg1_type, arg2_type, arg3_type, arg4_type,
-      arg5_type, arg6_type, mt_policy>& s)
+    _signal_base6(const _signal_base6<arg1_type, arg2_type, arg3_type,
+    	arg4_type, arg5_type, arg6_type, mt_policy>& s)
       : _signal_base<mt_policy>(s)
     {
       lock_block<mt_policy> lock(this);
@@ -1191,7 +1221,8 @@ namespace awsAutom
       }
     }
 
-    void slot_duplicate(const has_slots<mt_policy>* oldtarget, has_slots<mt_policy>* newtarget)
+    void slot_duplicate(const has_slots<mt_policy>* oldtarget,
+    	has_slots<mt_policy>* newtarget)
     {
       lock_block<mt_policy> lock(this);
       iterator it = m_connected_slots.begin();
@@ -1227,7 +1258,8 @@ namespace awsAutom
         ++it;
       }
 
-      m_connected_slots.erase(m_connected_slots.begin(), m_connected_slots.end());
+      m_connected_slots.erase(m_connected_slots.begin(),
+      	m_connected_slots.end());
     }
 
     void disconnect(has_slots<mt_policy>* pclass)
@@ -1281,17 +1313,18 @@ namespace awsAutom
   {
   public:
     typedef std::list<_connection_base7<arg1_type, arg2_type, arg3_type, 
-      arg4_type, arg5_type, arg6_type, arg7_type, mt_policy> *>  connections_list;
-        typedef typename connections_list::const_iterator const_iterator;
-        typedef typename connections_list::iterator iterator;
+      arg4_type, arg5_type, arg6_type, arg7_type, mt_policy> *>
+      	connections_list;
+    typedef typename connections_list::const_iterator const_iterator;
+    typedef typename connections_list::iterator iterator;
 
     _signal_base7()
     {
       ;
     }
 
-    _signal_base7(const _signal_base7<arg1_type, arg2_type, arg3_type, arg4_type,
-      arg5_type, arg6_type, arg7_type, mt_policy>& s)
+    _signal_base7(const _signal_base7<arg1_type, arg2_type, arg3_type,
+    	arg4_type, arg5_type, arg6_type, arg7_type, mt_policy>& s)
       : _signal_base<mt_policy>(s)
     {
       lock_block<mt_policy> lock(this);
@@ -1307,7 +1340,8 @@ namespace awsAutom
       }
     }
 
-    void slot_duplicate(const has_slots<mt_policy>* oldtarget, has_slots<mt_policy>* newtarget)
+    void slot_duplicate(const has_slots<mt_policy>* oldtarget,
+    	has_slots<mt_policy>* newtarget)
     {
       lock_block<mt_policy> lock(this);
       iterator it = m_connected_slots.begin();
@@ -1343,7 +1377,8 @@ namespace awsAutom
         ++it;
       }
 
-      m_connected_slots.erase(m_connected_slots.begin(), m_connected_slots.end());
+      m_connected_slots.erase(m_connected_slots.begin(),
+      	m_connected_slots.end());
     }
 
     void disconnect(has_slots<mt_policy>* pclass)
@@ -1392,7 +1427,8 @@ namespace awsAutom
   };
 
   template<class arg1_type, class arg2_type, class arg3_type, class arg4_type,
-  class arg5_type, class arg6_type, class arg7_type, class arg8_type, class mt_policy>
+  class arg5_type, class arg6_type, class arg7_type, class arg8_type,
+  	class mt_policy>
   class _signal_base8 : public _signal_base<mt_policy>
   {
   public:
@@ -1407,8 +1443,8 @@ namespace awsAutom
       ;
     }
 
-    _signal_base8(const _signal_base8<arg1_type, arg2_type, arg3_type, arg4_type,
-      arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>& s)
+    _signal_base8(const _signal_base8<arg1_type, arg2_type, arg3_type,
+    	arg4_type, arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>& s)
       : _signal_base<mt_policy>(s)
     {
       lock_block<mt_policy> lock(this);
@@ -1424,7 +1460,8 @@ namespace awsAutom
       }
     }
 
-    void slot_duplicate(const has_slots<mt_policy>* oldtarget, has_slots<mt_policy>* newtarget)
+    void slot_duplicate(const has_slots<mt_policy>* oldtarget,
+    	has_slots<mt_policy>* newtarget)
     {
       lock_block<mt_policy> lock(this);
       iterator it = m_connected_slots.begin();
@@ -1460,7 +1497,8 @@ namespace awsAutom
         ++it;
       }
 
-      m_connected_slots.erase(m_connected_slots.begin(), m_connected_slots.end());
+      m_connected_slots.erase(m_connected_slots.begin(),
+      	m_connected_slots.end());
     }
 
     void disconnect(has_slots<mt_policy>* pclass)
@@ -1530,9 +1568,11 @@ namespace awsAutom
       return new _connection0<dest_type, mt_policy>(*this);
     }
 
-    virtual _connection_base0<mt_policy>* duplicate(has_slots<mt_policy>* pnewdest)
+    virtual _connection_base0<mt_policy>* duplicate(has_slots<mt_policy>*
+    	pnewdest)
     {
-      return new _connection0<dest_type, mt_policy>((dest_type *)pnewdest, m_pmemfun);
+      return new _connection0<dest_type, mt_policy>((dest_type *)pnewdest,
+      	m_pmemfun);
     }
 
     virtual void emit()
@@ -1571,9 +1611,11 @@ namespace awsAutom
       return new _connection1<dest_type, arg1_type, mt_policy>(*this);
     }
 
-    virtual _connection_base1<arg1_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest)
+    virtual _connection_base1<arg1_type, mt_policy>* duplicate(
+    	has_slots<mt_policy>* pnewdest)
     {
-      return new _connection1<dest_type, arg1_type, mt_policy>((dest_type *)pnewdest, m_pmemfun);
+      return new _connection1<dest_type, arg1_type, mt_policy>(
+      	(dest_type *)pnewdest, m_pmemfun);
     }
 
     virtual void emit(arg1_type a1)
@@ -1610,12 +1652,15 @@ namespace awsAutom
 
     virtual _connection_base2<arg1_type, arg2_type, mt_policy>* clone()
     {
-      return new _connection2<dest_type, arg1_type, arg2_type, mt_policy>(*this);
+      return new _connection2<dest_type, arg1_type, arg2_type, mt_policy>(
+      	*this);
     }
 
-    virtual _connection_base2<arg1_type, arg2_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest)
+    virtual _connection_base2<arg1_type, arg2_type, mt_policy>* duplicate(
+    	has_slots<mt_policy>* pnewdest)
     {
-      return new _connection2<dest_type, arg1_type, arg2_type, mt_policy>((dest_type *)pnewdest, m_pmemfun);
+      return new _connection2<dest_type, arg1_type, arg2_type, mt_policy>(
+      	(dest_type *)pnewdest, m_pmemfun);
     }
 
     virtual void emit(arg1_type a1, arg2_type a2)
@@ -1633,8 +1678,10 @@ namespace awsAutom
     void (dest_type::* m_pmemfun)(arg1_type, arg2_type);
   };
 
-  template<class dest_type, class arg1_type, class arg2_type, class arg3_type, class mt_policy>
-  class _connection3 : public _connection_base3<arg1_type, arg2_type, arg3_type, mt_policy>
+  template<class dest_type, class arg1_type, class arg2_type, class arg3_type,
+  	class mt_policy>
+  class _connection3 : public _connection_base3<arg1_type, arg2_type,
+  	arg3_type, mt_policy>
   {
   public:
     _connection3()
@@ -1650,14 +1697,18 @@ namespace awsAutom
       m_pmemfun = pmemfun;
     }
 
-    virtual _connection_base3<arg1_type, arg2_type, arg3_type, mt_policy>* clone()
+    virtual _connection_base3<arg1_type, arg2_type, arg3_type, mt_policy>*
+    	clone()
     {
-      return new _connection3<dest_type, arg1_type, arg2_type, arg3_type, mt_policy>(*this);
+      return new _connection3<dest_type, arg1_type, arg2_type, arg3_type,
+      	mt_policy>(*this);
     }
 
-    virtual _connection_base3<arg1_type, arg2_type, arg3_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest)
+    virtual _connection_base3<arg1_type, arg2_type, arg3_type, mt_policy>*
+    	duplicate(has_slots<mt_policy>* pnewdest)
     {
-      return new _connection3<dest_type, arg1_type, arg2_type, arg3_type, mt_policy>((dest_type *)pnewdest, m_pmemfun);
+      return new _connection3<dest_type, arg1_type, arg2_type, arg3_type,
+      	mt_policy>((dest_type *)pnewdest, m_pmemfun);
     }
 
     virtual void emit(arg1_type a1, arg2_type a2, arg3_type a3)
@@ -1694,14 +1745,18 @@ namespace awsAutom
       m_pmemfun = pmemfun;
     }
 
-    virtual _connection_base4<arg1_type, arg2_type, arg3_type, arg4_type, mt_policy>* clone()
+    virtual _connection_base4<arg1_type, arg2_type, arg3_type, arg4_type,
+    	mt_policy>* clone()
     {
-      return new _connection4<dest_type, arg1_type, arg2_type, arg3_type, arg4_type, mt_policy>(*this);
+      return new _connection4<dest_type, arg1_type, arg2_type, arg3_type,
+      	arg4_type, mt_policy>(*this);
     }
 
-    virtual _connection_base4<arg1_type, arg2_type, arg3_type, arg4_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest)
+    virtual _connection_base4<arg1_type, arg2_type, arg3_type, arg4_type,
+    	mt_policy>* duplicate(has_slots<mt_policy>* pnewdest)
     {
-      return new _connection4<dest_type, arg1_type, arg2_type, arg3_type, arg4_type, mt_policy>((dest_type *)pnewdest, m_pmemfun);
+      return new _connection4<dest_type, arg1_type, arg2_type, arg3_type,
+      	arg4_type, mt_policy>((dest_type *)pnewdest, m_pmemfun);
     }
 
     virtual void emit(arg1_type a1, arg2_type a2, arg3_type a3, 
@@ -1743,15 +1798,15 @@ namespace awsAutom
     virtual _connection_base5<arg1_type, arg2_type, arg3_type, arg4_type, 
       arg5_type, mt_policy>* clone()
     {
-      return new _connection5<dest_type, arg1_type, arg2_type, arg3_type, arg4_type, 
-        arg5_type, mt_policy>(*this);
+      return new _connection5<dest_type, arg1_type, arg2_type, arg3_type,
+      	arg4_type, arg5_type, mt_policy>(*this);
     }
 
     virtual _connection_base5<arg1_type, arg2_type, arg3_type, arg4_type, 
       arg5_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest)
     {
-      return new _connection5<dest_type, arg1_type, arg2_type, arg3_type, arg4_type, 
-        arg5_type, mt_policy>((dest_type *)pnewdest, m_pmemfun);
+      return new _connection5<dest_type, arg1_type, arg2_type, arg3_type,
+      	arg4_type, arg5_type, mt_policy>((dest_type *)pnewdest, m_pmemfun);
     }
 
     virtual void emit(arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4,
@@ -1793,15 +1848,17 @@ namespace awsAutom
     virtual _connection_base6<arg1_type, arg2_type, arg3_type, arg4_type, 
       arg5_type, arg6_type, mt_policy>* clone()
     {
-      return new _connection6<dest_type, arg1_type, arg2_type, arg3_type, arg4_type, 
-        arg5_type, arg6_type, mt_policy>(*this);
+      return new _connection6<dest_type, arg1_type, arg2_type, arg3_type,
+      	arg4_type, arg5_type, arg6_type, mt_policy>(*this);
     }
 
     virtual _connection_base6<arg1_type, arg2_type, arg3_type, arg4_type, 
-      arg5_type, arg6_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest)
+      arg5_type, arg6_type, mt_policy>* duplicate(has_slots<mt_policy>*
+      pnewdest)
     {
-      return new _connection6<dest_type, arg1_type, arg2_type, arg3_type, arg4_type, 
-        arg5_type, arg6_type, mt_policy>((dest_type *)pnewdest, m_pmemfun);
+      return new _connection6<dest_type, arg1_type, arg2_type, arg3_type,
+      	arg4_type, arg5_type, arg6_type, mt_policy>((dest_type *)pnewdest,
+	m_pmemfun);
     }
 
     virtual void emit(arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4,
@@ -1822,7 +1879,8 @@ namespace awsAutom
   };
 
   template<class dest_type, class arg1_type, class arg2_type, class arg3_type,
-  class arg4_type, class arg5_type, class arg6_type, class arg7_type, class mt_policy>
+  class arg4_type, class arg5_type, class arg6_type, class arg7_type,
+  class mt_policy>
   class _connection7 : public _connection_base7<arg1_type, arg2_type,
     arg3_type, arg4_type, arg5_type, arg6_type, arg7_type, mt_policy>
   {
@@ -1843,15 +1901,17 @@ namespace awsAutom
     virtual _connection_base7<arg1_type, arg2_type, arg3_type, arg4_type, 
       arg5_type, arg6_type, arg7_type, mt_policy>* clone()
     {
-      return new _connection7<dest_type, arg1_type, arg2_type, arg3_type, arg4_type, 
-        arg5_type, arg6_type, arg7_type, mt_policy>(*this);
+      return new _connection7<dest_type, arg1_type, arg2_type, arg3_type,
+      	arg4_type, arg5_type, arg6_type, arg7_type, mt_policy>(*this);
     }
 
     virtual _connection_base7<arg1_type, arg2_type, arg3_type, arg4_type, 
-      arg5_type, arg6_type, arg7_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest)
+      arg5_type, arg6_type, arg7_type, mt_policy>* duplicate(
+      has_slots<mt_policy>* pnewdest)
     {
-      return new _connection7<dest_type, arg1_type, arg2_type, arg3_type, arg4_type, 
-        arg5_type, arg6_type, arg7_type, mt_policy>((dest_type *)pnewdest, m_pmemfun);
+      return new _connection7<dest_type, arg1_type, arg2_type, arg3_type,
+      	arg4_type, arg5_type, arg6_type, arg7_type, mt_policy>(
+	(dest_type *)pnewdest, m_pmemfun);
     }
 
     virtual void emit(arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4,
@@ -1895,15 +1955,18 @@ namespace awsAutom
     virtual _connection_base8<arg1_type, arg2_type, arg3_type, arg4_type, 
       arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>* clone()
     {
-      return new _connection8<dest_type, arg1_type, arg2_type, arg3_type, arg4_type, 
-        arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>(*this);
+      return new _connection8<dest_type, arg1_type, arg2_type, arg3_type,
+      	arg4_type, arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>(
+	*this);
     }
 
     virtual _connection_base8<arg1_type, arg2_type, arg3_type, arg4_type, 
-      arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>* duplicate(has_slots<mt_policy>* pnewdest)
+      arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>* duplicate(
+      has_slots<mt_policy>* pnewdest)
     {
-      return new _connection8<dest_type, arg1_type, arg2_type, arg3_type, arg4_type, 
-        arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>((dest_type *)pnewdest, m_pmemfun);
+      return new _connection8<dest_type, arg1_type, arg2_type, arg3_type,
+      	arg4_type, arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>(
+	(dest_type *)pnewdest, m_pmemfun);
     }
 
     virtual void emit(arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4,
@@ -1927,7 +1990,8 @@ namespace awsAutom
   class signal0 : public _signal_base0<mt_policy>
   {
   public:
-      typedef typename _signal_base0<mt_policy>::connections_list::const_iterator const_iterator;
+    typedef typename _signal_base0<mt_policy>::connections_list::
+      const_iterator const_iterator;
     signal0()
     {
       ;
@@ -1988,7 +2052,8 @@ namespace awsAutom
   class signal1 : public _signal_base1<arg1_type, mt_policy>
   {
   public:
-      typedef typename _signal_base1<arg1_type, mt_policy>::connections_list::const_iterator const_iterator;
+    typedef typename _signal_base1<arg1_type, mt_policy>::connections_list::
+      	const_iterator const_iterator;
     signal1()
     {
       ;
@@ -2045,11 +2110,13 @@ namespace awsAutom
     }
   };
 
-  template<class arg1_type, typename arg2_type, typename mt_policy = SIGSLOT_DEFAULT_MT_POLICY>
+  template<class arg1_type, typename arg2_type,
+  	typename mt_policy = SIGSLOT_DEFAULT_MT_POLICY>
   class signal2 : public _signal_base2<arg1_type, arg2_type, mt_policy>
   {
   public:
-      typedef typename _signal_base2<arg1_type, arg2_type, mt_policy>::connections_list::const_iterator const_iterator;
+    typedef typename _signal_base2<arg1_type, arg2_type, mt_policy>::
+      	connections_list::const_iterator const_iterator;
     signal2()
     {
       ;
@@ -2067,7 +2134,8 @@ namespace awsAutom
     {
       lock_block<mt_policy> lock(this);
       _connection2<desttype, arg1_type, arg2_type, mt_policy>* conn = new
-        _connection2<desttype, arg1_type, arg2_type, mt_policy>(pclass, pmemfun);
+        _connection2<desttype, arg1_type, arg2_type, mt_policy>(
+	pclass, pmemfun);
       this->m_connected_slots.push_back(conn);
       pclass->signal_connect(this);
     }
@@ -2107,11 +2175,14 @@ namespace awsAutom
     }
   };
 
-  template<class arg1_type, typename arg2_type, typename arg3_type, typename mt_policy = SIGSLOT_DEFAULT_MT_POLICY>
-  class signal3 : public _signal_base3<arg1_type, arg2_type, arg3_type, mt_policy>
+  template<class arg1_type, typename arg2_type, typename arg3_type,
+  	typename mt_policy = SIGSLOT_DEFAULT_MT_POLICY>
+  class signal3 : public _signal_base3<arg1_type, arg2_type, arg3_type,
+  	mt_policy>
   {
   public:
-      typedef typename _signal_base3<arg1_type, arg2_type, arg3_type, mt_policy>::connections_list::const_iterator const_iterator;
+      typedef typename _signal_base3<arg1_type, arg2_type, arg3_type,
+      	mt_policy>::connections_list::const_iterator const_iterator;
     signal3()
     {
       ;
@@ -2128,9 +2199,9 @@ namespace awsAutom
       arg2_type, arg3_type))
     {
       lock_block<mt_policy> lock(this);
-      _connection3<desttype, arg1_type, arg2_type, arg3_type, mt_policy>* conn = 
-        new _connection3<desttype, arg1_type, arg2_type, arg3_type, mt_policy>(pclass,
-        pmemfun);
+      _connection3<desttype, arg1_type, arg2_type, arg3_type, mt_policy>* conn =
+        new _connection3<desttype, arg1_type, arg2_type, arg3_type, mt_policy>(
+		pclass, pmemfun);
       this->m_connected_slots.push_back(conn);
       pclass->signal_connect(this);
     }
@@ -2170,19 +2241,22 @@ namespace awsAutom
     }
   };
 
-  template<class arg1_type, class arg2_type, class arg3_type, class arg4_type, class mt_policy = SIGSLOT_DEFAULT_MT_POLICY>
+  template<class arg1_type, class arg2_type, class arg3_type, class arg4_type,
+  	class mt_policy = SIGSLOT_DEFAULT_MT_POLICY>
   class signal4 : public _signal_base4<arg1_type, arg2_type, arg3_type,
     arg4_type, mt_policy>
   {
   public:
-      typedef typename _signal_base4<arg1_type, arg2_type, arg3_type, arg4_type, mt_policy>::connections_list::const_iterator const_iterator;
+      typedef typename _signal_base4<arg1_type, arg2_type, arg3_type,
+      	arg4_type, mt_policy>::connections_list::const_iterator const_iterator;
     signal4()
     {
       ;
     }
 
-    signal4(const signal4<arg1_type, arg2_type, arg3_type, arg4_type, mt_policy>& s)
-      : _signal_base4<arg1_type, arg2_type, arg3_type, arg4_type, mt_policy>(s)
+    signal4(const signal4<arg1_type, arg2_type, arg3_type, arg4_type,
+    	mt_policy>& s) : _signal_base4<arg1_type, arg2_type, arg3_type,
+	arg4_type, mt_policy>(s)
     {
       ;
     }
@@ -2192,9 +2266,9 @@ namespace awsAutom
       arg2_type, arg3_type, arg4_type))
     {
       lock_block<mt_policy> lock(this);
-      _connection4<desttype, arg1_type, arg2_type, arg3_type, arg4_type, mt_policy>*
-        conn = new _connection4<desttype, arg1_type, arg2_type, arg3_type,
-        arg4_type, mt_policy>(pclass, pmemfun);
+      _connection4<desttype, arg1_type, arg2_type, arg3_type, arg4_type,
+      	mt_policy>* conn = new _connection4<desttype, arg1_type, arg2_type,
+		arg3_type, arg4_type, mt_policy>(pclass, pmemfun);
       this->m_connected_slots.push_back(conn);
       pclass->signal_connect(this);
     }
@@ -2240,7 +2314,9 @@ namespace awsAutom
     arg4_type, arg5_type, mt_policy>
   {
   public:
-      typedef typename _signal_base5<arg1_type, arg2_type, arg3_type, arg4_type, arg5_type, mt_policy>::connections_list::const_iterator const_iterator;
+    typedef typename _signal_base5<arg1_type, arg2_type, arg3_type,
+      	arg4_type, arg5_type, mt_policy>::connections_list::const_iterator
+	const_iterator;
     signal5()
     {
       ;
@@ -2260,8 +2336,8 @@ namespace awsAutom
     {
       lock_block<mt_policy> lock(this);
       _connection5<desttype, arg1_type, arg2_type, arg3_type, arg4_type,
-        arg5_type, mt_policy>* conn = new _connection5<desttype, arg1_type, arg2_type,
-        arg3_type, arg4_type, arg5_type, mt_policy>(pclass, pmemfun);
+        arg5_type, mt_policy>* conn = new _connection5<desttype, arg1_type,
+	arg2_type, arg3_type, arg4_type, arg5_type, mt_policy>(pclass, pmemfun);
       this->m_connected_slots.push_back(conn);
       pclass->signal_connect(this);
     }
@@ -2311,7 +2387,8 @@ namespace awsAutom
   {
   public:
       typedef typename _signal_base6<arg1_type, arg2_type, arg3_type,
-    arg4_type, arg5_type, arg6_type, mt_policy>::connections_list::const_iterator const_iterator;
+    arg4_type, arg5_type, arg6_type, mt_policy>::connections_list::
+    	const_iterator const_iterator;
     signal6()
     {
       ;
@@ -2376,13 +2453,15 @@ namespace awsAutom
   };
 
   template<class arg1_type, class arg2_type, class arg3_type, class arg4_type,
-  class arg5_type, class arg6_type, class arg7_type, class mt_policy = SIGSLOT_DEFAULT_MT_POLICY>
+  class arg5_type, class arg6_type, class arg7_type,
+  class mt_policy = SIGSLOT_DEFAULT_MT_POLICY>
   class signal7 : public _signal_base7<arg1_type, arg2_type, arg3_type,
     arg4_type, arg5_type, arg6_type, arg7_type, mt_policy>
   {
   public:
-      typedef typename _signal_base7<arg1_type, arg2_type, arg3_type,
-    arg4_type, arg5_type, arg6_type, arg7_type, mt_policy>::connections_list::const_iterator const_iterator;
+    typedef typename _signal_base7<arg1_type, arg2_type, arg3_type,
+    arg4_type, arg5_type, arg6_type, arg7_type, mt_policy>::connections_list::
+    const_iterator const_iterator;
     signal7()
     {
       ;
@@ -2448,13 +2527,15 @@ namespace awsAutom
   };
 
   template<class arg1_type, class arg2_type, class arg3_type, class arg4_type,
-  class arg5_type, class arg6_type, class arg7_type, class arg8_type, class mt_policy = SIGSLOT_DEFAULT_MT_POLICY>
+  class arg5_type, class arg6_type, class arg7_type, class arg8_type,
+  class mt_policy = SIGSLOT_DEFAULT_MT_POLICY>
   class signal8 : public _signal_base8<arg1_type, arg2_type, arg3_type,
     arg4_type, arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>
   {
   public:
-      typedef typename _signal_base8<arg1_type, arg2_type, arg3_type,
-    arg4_type, arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>::connections_list::const_iterator const_iterator;
+    typedef typename _signal_base8<arg1_type, arg2_type, arg3_type,
+    arg4_type, arg5_type, arg6_type, arg7_type, arg8_type, mt_policy>::
+    connections_list::const_iterator const_iterator;
     signal8()
     {
       ;

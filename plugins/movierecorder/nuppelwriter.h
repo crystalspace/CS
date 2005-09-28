@@ -33,8 +33,9 @@
 #define _H_NUPPELWRITER
 
 
-class NuppelWriter {
- public:
+class NuppelWriter
+{
+public:
   typedef void (*outputCallback_t)(void const *data, long bytes, void *extra);
 
   /* Note: The 'rgb' flag uses an nonstandard RGB NuppelVideo frame format.
@@ -51,7 +52,8 @@ class NuppelWriter {
    * depending on the compression type selected, it may be reused as a
    * temporary buffer during compression.
    */
-  void writeFrame(unsigned char *frameBuffer, csTicks& encodeTime, csTicks& writeTime);
+  void writeFrame(unsigned char *frameBuffer, csTicks& encodeTime,
+  	csTicks& writeTime);
 
   /* Expected size of the framebuffer */
   unsigned long bufferSize;
@@ -59,7 +61,7 @@ class NuppelWriter {
   int width, height;
   float frameRate;
 
- private:
+private:
   outputCallback_t outputCallback;
   void *callbackExtra;
   unsigned char *compressBuffer, *yuvBuffer, *rgbBuffer;
