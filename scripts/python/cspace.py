@@ -296,13 +296,13 @@ class csColor(_object):
     def __iadd__(*args): return _cspace.csColor___iadd__(*args)
     def __isub__(*args): return _cspace.csColor___isub__(*args)
     def __imul__(*args): return _cspace.csColor___imul__(*args)
+    def __mul__(*args): return _cspace.csColor___mul__(*args)
     def __eq__(*args): return _cspace.csColor___eq__(*args)
     def __ne__(*args): return _cspace.csColor___ne__(*args)
     def Add(*args): return _cspace.csColor_Add(*args)
     def Subtract(*args): return _cspace.csColor_Subtract(*args)
     def __add__(*args): return _cspace.csColor___add__(*args)
     def __sub__(*args): return _cspace.csColor___sub__(*args)
-    def __mul__(*args): return _cspace.csColor___mul__(*args)
     def __rmul__(*args): return _cspace.csColor___rmul__(*args)
     def __del__(self, destroy=_cspace.delete_csColor):
         try:
@@ -900,6 +900,9 @@ class csTransform(_object):
     def Other2This(*args): return _cspace.csTransform_Other2This(*args)
     __swig_getmethods__["GetReflect"] = lambda x: _cspace.csTransform_GetReflect
     if _newclass:GetReflect = staticmethod(_cspace.csTransform_GetReflect)
+    def GetFront(*args): return _cspace.csTransform_GetFront(*args)
+    def GetUp(*args): return _cspace.csTransform_GetUp(*args)
+    def GetRight(*args): return _cspace.csTransform_GetRight(*args)
     def __mul__(*args): return _cspace.csTransform___mul__(*args)
     def __rmul__(*args): return _cspace.csTransform___rmul__(*args)
 
@@ -12170,6 +12173,77 @@ class iEngineSequenceManagerPtr(iEngineSequenceManager):
         if not hasattr(self,"thisown"): _swig_setattr(self, iEngineSequenceManager, 'thisown', 0)
         _swig_setattr(self, iEngineSequenceManager,self.__class__,iEngineSequenceManager)
 _cspace.iEngineSequenceManager_swigregister(iEngineSequenceManagerPtr)
+
+class iMovieRecorder(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iMovieRecorder, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iMovieRecorder, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iMovieRecorder instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def Start(*args): return _cspace.iMovieRecorder_Start(*args)
+    def Stop(*args): return _cspace.iMovieRecorder_Stop(*args)
+    def IsRecording(*args): return _cspace.iMovieRecorder_IsRecording(*args)
+    def Pause(*args): return _cspace.iMovieRecorder_Pause(*args)
+    def UnPause(*args): return _cspace.iMovieRecorder_UnPause(*args)
+    def IsPaused(*args): return _cspace.iMovieRecorder_IsPaused(*args)
+    def __del__(self, destroy=_cspace.delete_iMovieRecorder):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMovieRecorder_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iMovieRecorder_scfGetVersion)
+
+class iMovieRecorderPtr(iMovieRecorder):
+    def __init__(self, this):
+        _swig_setattr(self, iMovieRecorder, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iMovieRecorder, 'thisown', 0)
+        _swig_setattr(self, iMovieRecorder,self.__class__,iMovieRecorder)
+_cspace.iMovieRecorder_swigregister(iMovieRecorderPtr)
+
+iMovieRecorder_scfGetVersion = _cspace.iMovieRecorder_scfGetVersion
+
+class iMapNode(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iMapNode, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iMapNode, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iMapNode instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def QueryObject(*args): return _cspace.iMapNode_QueryObject(*args)
+    def SetPosition(*args): return _cspace.iMapNode_SetPosition(*args)
+    def GetPosition(*args): return _cspace.iMapNode_GetPosition(*args)
+    def SetXVector(*args): return _cspace.iMapNode_SetXVector(*args)
+    def GetXVector(*args): return _cspace.iMapNode_GetXVector(*args)
+    def SetYVector(*args): return _cspace.iMapNode_SetYVector(*args)
+    def GetYVector(*args): return _cspace.iMapNode_GetYVector(*args)
+    def SetZVector(*args): return _cspace.iMapNode_SetZVector(*args)
+    def GetZVector(*args): return _cspace.iMapNode_GetZVector(*args)
+    def SetSector(*args): return _cspace.iMapNode_SetSector(*args)
+    def GetSector(*args): return _cspace.iMapNode_GetSector(*args)
+    def __del__(self, destroy=_cspace.delete_iMapNode):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMapNode_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iMapNode_scfGetVersion)
+
+class iMapNodePtr(iMapNode):
+    def __init__(self, this):
+        _swig_setattr(self, iMapNode, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iMapNode, 'thisown', 0)
+        _swig_setattr(self, iMapNode,self.__class__,iMapNode)
+_cspace.iMapNode_swigregister(iMapNodePtr)
+
+iMapNode_scfGetVersion = _cspace.iMapNode_scfGetVersion
 
 class iScriptObject(iBase):
     __swig_setmethods__ = {}
