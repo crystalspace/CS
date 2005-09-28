@@ -52,19 +52,37 @@ GlobalScope()
 nil*
 Nil()
 {
-	return	&_global_nil_object;
+  return &_global_nil_object;
 }
 
 void 
 registrar::assign(const csString &name, func_ptr func)
-{
-  lobby[name]=func;	
-}						
+{  
+  lobby[getId(name)]=func;	
+}	
+
+std::pair<bool, registrar::func_ptr> 
+registrar::lookup(const csString& name)
+{      
+    func_map_type::iterator func = lobby.find(getId(name));
+  
+    if (func!=lobby.end()) return std::make_pair(true, func->second);
+    else return std::make_pair(false, func_ptr(0,0));      
+}
 
 keeper 
 scope::get(const csString &name)
 {
-  variable_map_type::iterator pos = vars.find(name);
+  variable_map_type::iterator pos = vars.find(Registrar()->getId(name));
+
+  if (pos==vars.end()) return keeper(Nil());
+  else return pos->second;
+}
+
+keeper 
+scope::get(uint id)
+{
+  variable_map_type::iterator pos = vars.find(id);
 
   if (pos==vars.end()) return keeper(Nil());
   else return pos->second;
@@ -73,7 +91,13 @@ scope::get(const csString &name)
 void 
 scope::set(const csString &name, keeper &val)
 {
-  vars[name]=val;
+  vars[Registrar()->getId(name)]=val;
+}
+
+void 
+scope::set(uint id, keeper &val)
+{
+  vars[id]=val;
 }
 
 static object *

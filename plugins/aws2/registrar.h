@@ -34,7 +34,7 @@ namespace autom
   class scope
   {
     /** The type of map between a variable name and the object it maps. */
-    typedef std::map<csString, keeper> variable_map_type;
+    typedef std::map<uint, keeper> variable_map_type;
 
     /** The map of variable names. */
     variable_map_type vars;
@@ -43,11 +43,19 @@ namespace autom
     scope() {}
     ~scope() {}
 
-    /// Return a keeper to the value. Will be nil if the value does not exist.
-    keeper get(const csString &name);   
+    /** Return a keeper to the value. 
+     * Will be nil if the value does not exist. */
+    keeper get(const csString &name);  
+
+    /** Return a keeper to the value. 
+     * Will be nil if the value does not exist. */
+    keeper get(uint id);      
 
     /** Set the value of a variable. */
     void set(const csString &name, keeper &val);   
+
+    /** Set the value of a variable. */
+    void set(uint id, keeper &val);   
   };
 
 
@@ -67,16 +75,24 @@ namespace autom
     typedef std::pair<function::slot_ptr, function::slot_mem_ptr> func_ptr;
 
     /** The type for mapping functions to names. */
-    typedef std::map <csString, func_ptr> func_map_type;
-      
+    typedef std::map <uint, func_ptr> func_map_type;
+
+    /** The type for mapping strings to numbers. */
+    typedef std::map <csString, uint> string_num_map_type;      
     
   private:    
     /** The container is called the lobby. */
     func_map_type lobby;    
+
+    /** The string to integer mapping facility. */
+    string_num_map_type str_map;
+
+    /** Used for incrementing the strings ids we have mapped. */
+    uint str_id;
     
   public:
   
-    registrar():lobby() 
+    registrar():lobby(), str_id(0) 
     {
     }
     
@@ -89,14 +105,8 @@ namespace autom
      * work deeper. The function returns a pair: result, pointer.  If result
      * is true, the pointer is valid, otherwise the pointer is invalid.
      */
-    std::pair<bool, func_ptr> lookup(const csString& name)
-    {  
-       func_map_type::iterator func = lobby.find(name);
-      
-       if (func!=lobby.end()) return std::make_pair(true, func->second);
-       else return std::make_pair(false, func_ptr(0,0));      
-    }
-    
+    std::pair<bool, func_ptr> lookup(const csString& name);
+        
     /**
      * Register a function name with a function object.  It will create all
      * the needed containers in line to the function.  For example:
@@ -107,6 +117,25 @@ namespace autom
      * inside the usage container. 
      */
     void assign(const csString &name, func_ptr func);
+
+    /** 
+     * Get's the id of the given string. 
+     */
+    uint getId(const csString &s)
+    {
+      string_num_map_type::iterator pos = str_map.find(s);
+
+      if (pos == str_map.end())
+      {
+	str_map[s] = str_id;
+	return str_id++;
+      }
+      else
+      {
+        return pos->second;
+      }
+    }
+
   };
   
   
