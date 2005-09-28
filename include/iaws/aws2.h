@@ -54,7 +54,7 @@ namespace autom
   {    
     SCF_INTERFACE(autom::iObject,0,0,1);
     enum TYPE { T_STRING, T_INT, T_FLOAT, T_LIST, T_MAP, T_FUNCTION,
-      	T_REFERENCE, T_BLOB, T_NIL };
+      	T_REFERENCE, T_BLOB, T_VAR, T_NIL };
 
     /**
      * Returns the type of the object, a member of the object::TYPE
