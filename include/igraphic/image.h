@@ -80,16 +80,15 @@ enum csImageType
 
 /**
  * The iImage interface is used to work with image objects.
- * <p>
+ *
  * You cannot manipulate the pixel data of iImage objects directly. 
  * To do this, you need to instantiate a your own copy of the image, e.g.
  * by creating a csImageMemory instance (which allows access to the
  * pixel data).
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iImageIO::Load()
- *   </ul>
+ * - iImageIO::Load()
+ * 
  * \sa csImageMemory, csImageManipulate, csImageTools, csImageCubeMapMaker,
  *   csImageVolumeMaker
  */
@@ -145,7 +144,8 @@ struct iImage : public virtual iBase
    * Get the keycolour stored with the image.
    * \deprecated Use GetKeyColor() instead.
    */
-  CS_DEPRECATED_METHOD virtual void GetKeycolor (int &r, int &g, int &b) const = 0;
+  CS_DEPRECATED_METHOD virtual void GetKeycolor (int &r, int &g, int &b)
+  	const = 0;
 
   /**
    * Returns the number of mipmaps contained in the image (in case there exist

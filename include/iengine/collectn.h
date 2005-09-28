@@ -67,16 +67,13 @@ struct iCollection : public virtual iBase
 
 /**
  * iCollection list.
- * <p>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::GetCollections()
- *   </ul>
+ *   - iEngine::GetCollections()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>Engine stores them.
- *   <li>Application uses them.
- *   </ul>
+ *   - Engine stores them.
+ *   - Application uses them.
  */
 struct iCollectionList : public virtual iBase
 {

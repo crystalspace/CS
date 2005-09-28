@@ -44,17 +44,23 @@ struct iPolygonMesh;
  */
 struct CS_CRYSTALSPACE_EXPORT csPolygonMeshEdge
 {
-  // Indices of the two vertices forming the edge.
-  // vt1 < vt2.
+  /**
+   * Indices of the two vertices forming the edge.
+   * vt1 < vt2.
+   */
   int vt1, vt2;
-  // Indices of the two polygons sharing this edge.
-  // If poly2 == -1 then this is an edge with only one polygon attached.
+  /**
+   * Indices of the two polygons sharing this edge.
+   * If poly2 == -1 then this is an edge with only one polygon attached.
+   */
   int poly1, poly2;
 
-  // Active or not. If this flag is true the edge is active in the sense
-  // that it actually connects two non-coplanar polygons (or is only
-  // connected to one polygon). Edges that are not active are not relevant
-  // for outline calculation.
+  /**
+   * Active or not. If this flag is true the edge is active in the sense
+   * that it actually connects two non-coplanar polygons (or is only
+   * connected to one polygon). Edges that are not active are not relevant
+   * for outline calculation.
+   */
   bool active;
 };
 

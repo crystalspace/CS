@@ -33,11 +33,10 @@
 /**
  * A generic finite partial order class.
  * A finite partial order is a graph with the following properties:
- * <ul>
- * <li>A finite number of nodes (of type T).
- * <li>A finite number of reflexive tuple relations T1 <= T2.
- * <li>An absense of any non-trivial cycles, e.g., T1 < T2 < T1 where T1!=T2.
- * </ul>
+ * - A finite number of nodes (of type T).
+ * - A finite number of reflexive tuple relations T1 <= T2.
+ * - An absense of any non-trivial cycles, e.g., T1 < T2 < T1 where T1!=T2.
+ *
  * An insert of an edge which violates the third constraint will fail
  * (return false and have no effect).
  * <p>
@@ -177,7 +176,8 @@ public:
    * Produce a valid "solution" to the partial order graph, 
    * i.e., a sequence of nodes that violates no constraints.
    */
-  void Solve (csList<const T> & result) {
+  void Solve (csList<const T> & result)
+  {
     for (size_t iter=0 ; iter<Nodes.Length() ; iter++) 
     {
       Nodes[iter].output = false;
@@ -213,7 +213,6 @@ public:
       }
     } 
     while (!done);
-    return;
   }
   
   /**

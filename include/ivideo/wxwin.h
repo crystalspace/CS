@@ -38,6 +38,7 @@
 
 SCF_VERSION(iWxWindow, 0, 0, 0);
 
+/// @@@ Document me
 struct iWxWindow : public virtual iBase
 {
   virtual void SetParent(wxWindow* parent) = 0;

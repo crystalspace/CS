@@ -45,27 +45,6 @@ enum CS_PEN_TEXT_ALIGN
   CS_PEN_TA_CENTER 
 };
 
-/** The pen color is used to pass colors to the pen, around the application more easily. */
-//structcsColor4
-//{
-//  /** The components of the color. */ 
-//  float r, g, b, a;
-//
-// csColor4() {}
-// csColor4(float _r, float _g, float _b, float _a):r(_r), g(_g), b(_b), a(_a) {}
-// csColor4(constcsColor4 &c):r(c.r), g(c.g), b(c.b), a(c.a) {}
-//
-// csColor4 & operator=(constcsColor4 &c)
-//  {
-//    r=c.r;
-//    g=c.g;
-//    b=c.b;
-//    a=c.a;
-//
-//    return *this;
-//  }
-//};
-
 /** 
  * A pen is used to draw vector shapes. 
  */
@@ -84,37 +63,38 @@ struct iPen
   /**
    * Swaps the current color and the alternate color. 
    */
-  virtual void SwapColors()=0;
+  virtual void SwapColors() = 0;
 
   /**    
    * Clears the current transform, resets to identity.
    */
-  virtual void ClearTransform()=0;
+  virtual void ClearTransform() = 0;
 
   /** 
    * Pushes the current transform onto the stack. *
    */
-  virtual void PushTransform()=0;
+  virtual void PushTransform() = 0;
 
   /**
-   * Pops the transform stack. The top of the stack becomes the current transform. 
+   * Pops the transform stack. The top of the stack becomes the current
+   * transform. 
    */
-  virtual void PopTransform()=0;
+  virtual void PopTransform() = 0;
 
   /** 
    * Sets the origin of the coordinate system. 
    */
-  virtual void SetOrigin(const csVector3 &o)=0;
+  virtual void SetOrigin(const csVector3 &o) = 0;
 
   /** 
    * Translates by the given vector
    */
-  virtual void Translate(const csVector3 &t)=0;
+  virtual void Translate(const csVector3 &t) = 0;
 
   /**
    * Rotates by the given angle.
    */
-  virtual void Rotate(const float &a)=0;
+  virtual void Rotate(const float &a) = 0;
 
   /** 
    * Draws a single line. 
@@ -129,7 +109,8 @@ struct iPen
   /** 
    * Draws a rectangle. 
    */
-  virtual void DrawRect (uint x1, uint y1, uint x2, uint y2, bool swap_colors = false, bool fill = false) = 0;
+  virtual void DrawRect (uint x1, uint y1, uint x2, uint y2,
+  	bool swap_colors = false, bool fill = false) = 0;
   
   /** 
    * Draws a mitered rectangle. The miter value should be between 0.0 and 1.0, 
@@ -139,31 +120,33 @@ struct iPen
     float miter, bool swap_colors = false, bool fill = false) = 0;
 
   /** 
-   * Draws a rounded rectangle. The roundness value should be between 0.0 and 1.0, 
-   * and determines how much of the corner is rounded off. 
+   * Draws a rounded rectangle. The roundness value should be between
+   * 0.0 and 1.0, and determines how much of the corner is rounded off. 
    */
   virtual void DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
     float roundness, bool swap_colors = false, bool fill = false) = 0; 
 
   /** 
-   * Draws an elliptical arc from start angle to end angle.  Angle must be specified in radians.
-   * The arc will be made to fit in the given box.  If you want a circular arc, make sure the box is
-   * a square.  If you want a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
+   * Draws an elliptical arc from start angle to end angle.  Angle must be
+   * specified in radians. The arc will be made to fit in the given box.
+   * If you want a circular arc, make sure the box is a square.  If you want
+   * a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
    * angle.
    */
-  virtual void DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool swap_colors = false, bool fill=false) = 0;
+  virtual void DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle,
+  	float end_angle, bool swap_colors = false, bool fill=false) = 0;
 
   /**
    * Writes text in the given font at the given location.
    */
-  virtual void Write(iFont *font, uint x1, uint y1, char *text)=0;
+  virtual void Write(iFont *font, uint x1, uint y1, char *text) = 0;
 
   /**
-   * Writes text in the given font, in the given box.  The alignment specified in h_align 
-   * and v_align determine how it should be aligned.  
+   * Writes text in the given font, in the given box.  The alignment
+   * specified in h_align and v_align determine how it should be aligned.  
    */
   virtual void WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, 
-    uint h_align, uint v_align, char *text)=0;
+    uint h_align, uint v_align, char *text) = 0;
 };
 
 /** A pen specialized for CS. */
@@ -250,7 +233,8 @@ public:
   virtual void PushTransform();
 
   /**
-   * Pops the transform stack. The top of the stack becomes the current transform. 
+   * Pops the transform stack. The top of the stack becomes the current
+   * transform. 
    */
   virtual void PopTransform();
 
@@ -282,7 +266,8 @@ public:
   /** 
    * Draws a rectangle. 
    */
-  virtual void DrawRect (uint x1, uint y1, uint x2, uint y2, bool swap_colors = false, bool fill = false);
+  virtual void DrawRect (uint x1, uint y1, uint x2, uint y2,
+  	bool swap_colors = false, bool fill = false);
 
   /** 
    * Draws a mitered rectangle. The miter value should be between 0.0 and 1.0, 
@@ -292,19 +277,21 @@ public:
     float miter, bool swap_colors = false, bool fill = false);
 
   /** 
-   * Draws a rounded rectangle. The roundness value should be between 0.0 and 1.0, 
-   * and determines how much of the corner is rounded off. 
+   * Draws a rounded rectangle. The roundness value should be between
+   * 0.0 and 1.0, and determines how much of the corner is rounded off. 
    */
   virtual void DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
     float roundness, bool swap_colors = false, bool fill = false);
 
   /** 
-   * Draws an elliptical arc from start angle to end angle.  Angle must be specified in radians.
-   * The arc will be made to fit in the given box.  If you want a circular arc, make sure the box is
-   * a square.  If you want a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
+   * Draws an elliptical arc from start angle to end angle.  Angle must be
+   * specified in radians. The arc will be made to fit in the given box.
+   * If you want a circular arc, make sure the box is a square.  If you want
+   * a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
    * angle.
    */
-  virtual void DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle=0, float end_angle=6.2831853, 
+  virtual void DrawArc(uint x1, uint y1, uint x2, uint y2,
+  	float start_angle=0, float end_angle=6.2831853, 
     bool swap_colors = false, bool fill=false);
 
   /**
@@ -313,8 +300,8 @@ public:
   virtual void Write(iFont *font, uint x1, uint y1, char *text);
 
   /**
-   * Writes text in the given font, in the given box.  The alignment specified in h_align 
-   * and v_align determine how it should be aligned.  
+   * Writes text in the given font, in the given box.  The alignment
+   * specified in h_align and v_align determine how it should be aligned.  
    */
   virtual void WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, 
     uint h_align, uint v_align, char *text);

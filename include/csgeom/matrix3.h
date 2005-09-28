@@ -183,11 +183,14 @@ public:
   }
 
   /// Multiply a matrix and a scalar.
-  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator* (const csMatrix3& m, float f);
+  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator* (const csMatrix3& m,
+  	float f);
   /// Multiply a matrix and a scalar.
-  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator* (float f, const csMatrix3& m);
+  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator* (float f,
+  	const csMatrix3& m);
   /// Divide a matrix by a scalar.
-  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator/ (const csMatrix3& m, float f);
+  friend CS_CRYSTALSPACE_EXPORT csMatrix3 operator/ (const csMatrix3& m,
+  	float f);
   /// Check if two matricies are equal.
   friend CS_CRYSTALSPACE_EXPORT bool operator== (const csMatrix3& m1, 
     const csMatrix3& m2);
@@ -197,7 +200,8 @@ public:
   /// Test if each component of a matrix is less than a small epsilon value.
   friend CS_CRYSTALSPACE_EXPORT bool operator< (const csMatrix3& m, float f);
   /// Test if each component of a matrix is greater than a small epsilon value.
-  friend CS_CRYSTALSPACE_EXPORT bool operator> (float f, const csMatrix3& m);
+  friend CS_CRYSTALSPACE_EXPORT bool operator> (float f,
+  	const csMatrix3& m);
 };
 
 /// An instance of csMatrix3 that is initialized as a rotation about X

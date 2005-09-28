@@ -122,6 +122,8 @@ struct csAudioStreamDescription : public csStreamDescription
 };
 
 SCF_VERSION (iStreamIterator, 0, 0, 1);
+
+/// @@@ Document me.
 struct iStreamIterator : public iBase
 {
   virtual bool HasNext () = 0;

@@ -134,7 +134,6 @@ struct iBallState : public iBase
    */
   virtual void PaintSky(float time, float **dayvert, float **nightvert,
     float **topsun, float **sunset) = 0;
-
 };
 
 /** @} */

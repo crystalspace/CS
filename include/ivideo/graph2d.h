@@ -94,11 +94,9 @@ struct csPixelFormat
   /**
    * Number of bytes for every pixel.
    * The only supported values currently are:<p>
-   * <ul>
-   * <li>1: for palette mode (256 palette entries)
-   * <li>2: for truecolor 15/16-bit mode (no palette entries)
-   * <li>4: for truecolor 32-bit mode (no palette entries)
-   * </ul>
+   * - 1: for palette mode (256 palette entries)
+   * - 2: for truecolor 15/16-bit mode (no palette entries)
+   * - 4: for truecolor 32-bit mode (no palette entries)
    */
   int PixelBytes;
 
@@ -153,28 +151,24 @@ struct iOffscreenCanvasCallback : public iBase
  * This is the interface for 2D renderer. The 2D renderer is responsible
  * for all 2D operations such as creating the window, switching pages,
  * returning pixel format and so on.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>OpenGL/Windows canvas plugin (crystalspace.graphics2d.glwin32)
- *   <li>OpenGL/X11 canvas plugin (crystalspace.graphics2d.glx)
- *   <li>DirectDraw canvas plugin (crystalspace.graphics2d.directdraw)
- *   <li>X11 canvas plugin (crystalspace.graphics2d.x2d)
- *   <li>Memory canvas plugin (crystalspace.graphics2d.memory)
- *   <li>Null 2D canvas plugin (crystalspace.graphics2d.null)
- *   <li>Some others.
- *   <li>Note that it is the 3D renderer that will automatically create
+ * - OpenGL/Windows canvas plugin (crystalspace.graphics2d.glwin32)
+ * - OpenGL/X11 canvas plugin (crystalspace.graphics2d.glx)
+ * - DirectDraw canvas plugin (crystalspace.graphics2d.directdraw)
+ * - X11 canvas plugin (crystalspace.graphics2d.x2d)
+ * - Memory canvas plugin (crystalspace.graphics2d.memory)
+ * - Null 2D canvas plugin (crystalspace.graphics2d.null)
+ * - Some others.
+ * - Note that it is the 3D renderer that will automatically create
  *       the right instance of the canvas that it requires.
- *   </ul>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   <li>iGraphics3D::GetDriver2D()
- *   </ul>
+ * - CS_QUERY_REGISTRY()
+ * - iGraphics3D::GetDriver2D()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>3D renderers (iGraphics3D implementations)
- *   </ul>
+ * - 3D renderers (iGraphics3D implementations)
  */
 struct iGraphics2D : public virtual iBase
 {
@@ -309,7 +303,8 @@ struct iGraphics2D : public virtual iBase
   /// Query pixel R,G,B at given screen location
   virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB) = 0;
   /// As GetPixel() above, but with alpha
-  virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB, uint8 &oA) = 0;
+  virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB,
+  	uint8 &oA) = 0;
 
   /**
    * Save a subarea of screen and return a handle to saved buffer.

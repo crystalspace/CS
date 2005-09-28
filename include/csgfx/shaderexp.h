@@ -186,9 +186,11 @@ private:
   bool eval_frame(oper_arg & output) const;
 
   /// Internal set vector element 1 and 2
-  bool eval_selt12(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
+  bool eval_selt12(const oper_arg & arg1, const oper_arg & arg2,
+  	oper_arg & output) const;
   /// Internal set vector element 3 and 4
-  bool eval_selt34(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
+  bool eval_selt34(const oper_arg & arg1, const oper_arg & arg2,
+  	oper_arg & output) const;
   /// Internal load operator
   bool eval_load(const oper_arg & arg1, oper_arg & output) const;
 

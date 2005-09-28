@@ -95,16 +95,14 @@ SCF_VERSION(iKeyboardDriver, 0, 0, 2);
  * such as when a character is "composed".  Typically, one instance of this
  * object is available from the shared-object registry (iObjectRegistry) under
  * the name "crystalspace.driver.input.generic.keyboard".
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>csInitializer::CreateEnvironment()
- *   <li>csInitializer::CreateInputDrivers()
- *   </ul>
+ * - csInitializer::CreateEnvironment()
+ * - csInitializer::CreateInputDrivers()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - CS_QUERY_REGISTRY()
+ *
  * 
  * \todo Need a simple way to query all currently-set modifiers for event 
  *   construction.
@@ -172,16 +170,13 @@ SCF_VERSION(iMouseDriver, 0, 0, 1);
  * middle 3, and so on.  Typically, one instance of this object is available
  * from the shared-object registry (iObjectRegistry) under the name
  * "crystalspace.driver.input.generic.mouse".
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>csInitializer::CreateEnvironment()
- *   <li>csInitializer::CreateInputDrivers()
- *   </ul>
+ * - csInitializer::CreateEnvironment()
+ * - csInitializer::CreateInputDrivers()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - CS_QUERY_REGISTRY()
  */
 struct iMouseDriver : public iBase
 {
@@ -228,16 +223,13 @@ SCF_VERSION(iJoystickDriver, 0, 0, 1);
  * start at one.  Typically, a single instance of this object is available from
  * the shared-object registry (iObjectRegistry) under the name
  * "crystalspace.driver.input.generic.joystick".
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>csInitializer::CreateEnvironment()
- *   <li>csInitializer::CreateInputDrivers()
- *   </ul>
+ * - csInitializer::CreateEnvironment()
+ * - csInitializer::CreateInputDrivers()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - CS_QUERY_REGISTRY()
  */
 struct iJoystickDriver : public iBase
 {

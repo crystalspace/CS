@@ -41,10 +41,10 @@ struct iObject;
  * This is the interface for a curve.
  * 
  * Main creators of instances implementing this interface:
- *   - iBezierFactoryState::CreateCurve()
+ * - iBezierFactoryState::CreateCurve()
  *   
  * Main ways to get pointers to this interface:
- *   - iBezierFactoryState::GetCurve()
+ * - iBezierFactoryState::GetCurve()
  *   
  */
 struct iCurve : public iBase
@@ -75,15 +75,15 @@ SCF_VERSION (iBezierFactoryState, 0, 0, 1);
  * mesh factory.
  * 
  * Main creators of instances implementing this interface:
- *   - Bezier mesh object plugin (crystalspace.mesh.object.bezier)
- *   - iMeshObjectType::NewFactory()
+ * - Bezier mesh object plugin (crystalspace.mesh.object.bezier)
+ * - iMeshObjectType::NewFactory()
  *   
  * Main ways to get pointers to this interface:
- *   - scfQueryInterface() on iMeshFactoryWrapper::GetMeshObjectFactory()
- *   - iBezierState::GetFactory()
+ * - scfQueryInterface() on iMeshFactoryWrapper::GetMeshObjectFactory()
+ * - iBezierState::GetFactory()
  *   
  * Main users of this interface:
- *   - Bezier Factory Loader plugin (crystalspace.mesh.loader.factory.bezier)
+ * - Bezier Factory Loader plugin (crystalspace.mesh.loader.factory.bezier)
  */
 struct iBezierFactoryState : public iBase
 {
@@ -161,14 +161,14 @@ SCF_VERSION (iBezierState, 0, 0, 1);
  * mesh object.
  * 
  * Main creators of instances implementing this interface:
- *   - Bezier mesh object plugin (crystalspace.mesh.object.bezier)
- *   - iMeshObjectFactory::NewInstance()
+ * - Bezier mesh object plugin (crystalspace.mesh.object.bezier)
+ * - iMeshObjectFactory::NewInstance()
  *   
  * Main ways to get pointers to this interface:
- *   - scfQueryInterface() on iMeshWrapper::GetMeshObject()
+ * - scfQueryInterface() on iMeshWrapper::GetMeshObject()
  *   
  * Main users of this interface:
- *   - Bezier Loader plugin (crystalspace.mesh.loader.bezier)
+ * - Bezier Loader plugin (crystalspace.mesh.loader.bezier)
  */
 struct iBezierState : public iBase
 {

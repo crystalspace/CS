@@ -214,35 +214,31 @@ struct csScreenBoxResult
  * mesh object (iMeshObject). Every mesh object in the engine is represented
  * by a mesh wrapper, which keeps the pointer to the mesh object, its position,
  * its name, etc.
- * <p>
+ *
  * Think of the mesh wrapper as the hook that holds the mesh object in the
  * engine. An effect of this is that the i???State interfaces (e.g.
  * iSprite3DState) must be queried from the mesh *objects*, not the wrappers!
- * <p>
+ *
  * Note that a mesh object should never be contained in more than one wrapper.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iEngine::CreateSectorWallsMesh()
- *   <li>iEngine::CreateThingMesh()
- *   <li>iEngine::CreateMeshWrapper()
- *   <li>iEngine::LoadMeshWrapper()
- *   <li>iEngine::CreatePortalContainer()
- *   <li>iEngine::CreatePortal()
- *   <li>iLoader::LoadMeshObject()
- *   </ul>
+ * - iEngine::CreateSectorWallsMesh()
+ * - iEngine::CreateThingMesh()
+ * - iEngine::CreateMeshWrapper()
+ * - iEngine::LoadMeshWrapper()
+ * - iEngine::CreatePortalContainer()
+ * - iEngine::CreatePortal()
+ * - iLoader::LoadMeshObject()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::FindMeshObject()
- *   <li>iMeshList::Get()
- *   <li>iMeshList::FindByName()
- *   <li>iMeshWrapperIterator::Next()
- *   <li>iLoaderContext::FindMeshObject()
- *   </ul>
+ * - iEngine::FindMeshObject()
+ * - iMeshList::Get()
+ * - iMeshList::FindByName()
+ * - iMeshWrapperIterator::Next()
+ * - iLoaderContext::FindMeshObject()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ * - iEngine
  */
 struct iMeshWrapper : public virtual iBase
 {
@@ -308,10 +304,9 @@ struct iMeshWrapper : public virtual iBase
    * 'num_lights' is the number of lights that will be given to the
    * mesh object at maximum (default is 8). 'flags' can be a combination
    * of one of the following:
-   * <ul>
-   * <li>#CS_LIGHTINGUPDATE_SORTRELEVANCE (default on).
-   * <li>#CS_LIGHTINGUPDATE_ALWAYSUPDATE (default off).
-   * </ul>
+   * - #CS_LIGHTINGUPDATE_SORTRELEVANCE (default on).
+   * - #CS_LIGHTINGUPDATE_ALWAYSUPDATE (default off).
+   *
    * Note that this function has no effect on thing
    * mesh objects as they use another lighting system (lightmaps).
    * Also some genmesh objects can optionally also use the other lighting
@@ -449,17 +444,15 @@ struct iMeshWrapper : public virtual iBase
    * The renderer will render all objects in a sector based on this
    * number. Low numbers get rendered first. High numbers get rendered
    * later. There are a few often used slots:
-   * <ul>
-   * <li>1. Sky objects are rendered before
-   *     everything else. Usually they are rendered using ZFILL (or ZNONE).
-   * <li>2. Walls are rendered after that. They
-   *     usually use ZFILL.
-   * <li>3. After that normal objects are
-   *     rendered using the Z-buffer (ZUSE).
-   * <li>4. Alpha transparent objects or objects
-   *     using some other transparency system are rendered after that. They
-   *     are usually rendered using ZTEST.
-   * </ul>
+   * - 1. Sky objects are rendered before
+   *   everything else. Usually they are rendered using ZFILL (or ZNONE).
+   * - 2. Walls are rendered after that. They
+   *   usually use ZFILL.
+   * - 3. After that normal objects are
+   *   rendered using the Z-buffer (ZUSE).
+   * - 4. Alpha transparent objects or objects
+   *   using some other transparency system are rendered after that. They
+   *   are usually rendered using ZTEST.
    */
   virtual void SetRenderPriority (long rp) = 0;
   /**
@@ -475,19 +468,18 @@ struct iMeshWrapper : public virtual iBase
 
   /**
    * Get flags for this meshwrapper. The following flags are supported:
-   * <ul>
-   * <li>#CS_ENTITY_DETAIL: this is a detail object. Again this is a hint
-   *     for the engine to render this object differently. Currently not used.
-   * <li>#CS_ENTITY_CAMERA: entity will always be centered around the camera.
-   * <li>#CS_ENTITY_INVISIBLEMESH: entity is not rendered. 
-   * <li>#CS_ENTITY_NOHITBEAM: this entity will not be considered by HitBeam() 
-   *     calls.
-   * <li>#CS_ENTITY_INVISIBLE: means that either CS_ENTITY_INVISIBLEMESH and 
-   *     CS_ENTITY_NOHITBEAM are set.
-   * <li>#CS_ENTITY_NOSHADOWS: cast no shadows.
-   * <li>#CS_ENTITY_NOLIGHTING: do not light this object.
-   * <li>#CS_ENTITY_NOCLIP: do not clip this object.
-   * </ul>
+   * - #CS_ENTITY_DETAIL: this is a detail object. Again this is a hint
+   *   for the engine to render this object differently. Currently not used.
+   * - #CS_ENTITY_CAMERA: entity will always be centered around the camera.
+   * - #CS_ENTITY_INVISIBLEMESH: entity is not rendered. 
+   * - #CS_ENTITY_NOHITBEAM: this entity will not be considered by HitBeam() 
+   *   calls.
+   * - #CS_ENTITY_INVISIBLE: means that either CS_ENTITY_INVISIBLEMESH and 
+   *   CS_ENTITY_NOHITBEAM are set.
+   * - #CS_ENTITY_NOSHADOWS: cast no shadows.
+   * - #CS_ENTITY_NOLIGHTING: do not light this object.
+   * - #CS_ENTITY_NOCLIP: do not clip this object.
+   *
    * \remarks Despite the name, this method does not only provide read access
    *   to the mesh flags, as the returned reference to a csFlags object also 
    *   provides write access.
@@ -517,12 +509,10 @@ struct iMeshWrapper : public virtual iBase
   /**
    * Set the Z-buf drawing mode to use for this object.
    * Possible values are:
-   * <ul>
-   * <li>#CS_ZBUF_NONE: do not read nor write the Z-buffer.
-   * <li>#CS_ZBUF_FILL: only write the Z-buffer but do not read.
-   * <li>#CS_ZBUF_USE: write and read the Z-buffer.
-   * <li>#CS_ZBUF_TEST: only read the Z-buffer but do not write.
-   * </ul>
+   * - #CS_ZBUF_NONE: do not read nor write the Z-buffer.
+   * - #CS_ZBUF_FILL: only write the Z-buffer but do not read.
+   * - #CS_ZBUF_USE: write and read the Z-buffer.
+   * - #CS_ZBUF_TEST: only read the Z-buffer but do not write.
    */
   virtual void SetZBufMode (csZBufMode mode) = 0;
   /**
@@ -724,29 +714,25 @@ struct iMeshWrapper : public virtual iBase
  * mesh object factory (iMeshObjectFactory). Every mesh object factory in
  * the engine is represented by a mesh factory wrapper, which keeps the
  * pointer to the mesh factory, its name, etc.
- * <p>
+ *
  * Think of the mesh factory wrapper as the hook that holds the mesh
  * factory in the engine. An effect of this is that the i???FactoryState
  * interfaces (e.g. iSprite3DFactoryState) must be queried from the mesh
  * *factories*, not the wrappers!
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iEngine::CreateMeshFactory()
- *   <li>iEngine::LoadMeshFactory()
- *   <li>iLoader::LoadMeshObjectFactory()
- *   </ul>
+ * - iEngine::CreateMeshFactory()
+ * - iEngine::LoadMeshFactory()
+ * - iLoader::LoadMeshObjectFactory()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::FindMeshFactory()
- *   <li>iMeshFactoryList::Get()
- *   <li>iMeshFactoryList::FindByName()
- *   <li>iLoaderContext::FindMeshFactory()
- *   </ul>
+ * - iEngine::FindMeshFactory()
+ * - iMeshFactoryList::Get()
+ * - iMeshFactoryList::FindByName()
+ * - iLoaderContext::FindMeshFactory()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ * - iEngine
  */
 struct iMeshFactoryWrapper : public virtual iBase
 {
@@ -849,12 +835,10 @@ struct iMeshFactoryWrapper : public virtual iBase
    * Set the Z-buf drawing mode to use for this factory. All objects created
    * from this factory will have this mode as default.
    * Possible values are:
-   * <ul>
-   * <li>#CS_ZBUF_NONE: do not read nor write the Z-buffer.
-   * <li>#CS_ZBUF_FILL: only write the Z-buffer but do not read.
-   * <li>#CS_ZBUF_USE: write and read the Z-buffer.
-   * <li>#CS_ZBUF_TEST: only read the Z-buffer but do not write.
-   * </ul>
+   * - #CS_ZBUF_NONE: do not read nor write the Z-buffer.
+   * - #CS_ZBUF_FILL: only write the Z-buffer but do not read.
+   * - #CS_ZBUF_USE: write and read the Z-buffer.
+   * - #CS_ZBUF_TEST: only read the Z-buffer but do not write.
    */
   virtual void SetZBufMode (csZBufMode mode) = 0;
   /**
@@ -872,17 +856,15 @@ struct iMeshFactoryWrapper : public virtual iBase
    * number. Low numbers get rendered first. High numbers get rendered
    * later. The value for the factory is used as a default for objects
    * created from that factory. There are a few often used slots:
-   * <ul>
-   * <li>1. Sky objects are rendered before
-   *     everything else. Usually they are rendered using ZFILL (or ZNONE).
-   * <li>2. Walls are rendered after that. They
-   *     usually use ZFILL.
-   * <li>3. After that normal objects are
-   *     rendered using the Z-buffer (ZUSE).
-   * <li>4. Alpha transparent objects or objects
-   *     using some other transparency system are rendered after that. They
-   *     are usually rendered using ZTEST.
-   * </ul>
+   * - 1. Sky objects are rendered before
+   *   everything else. Usually they are rendered using ZFILL (or ZNONE).
+   * - 2. Walls are rendered after that. They
+   *   usually use ZFILL.
+   * - 3. After that normal objects are
+   *   rendered using the Z-buffer (ZUSE).
+   * - 4. Alpha transparent objects or objects
+   *   using some other transparency system are rendered after that. They
+   *   are usually rendered using ZTEST.
    */
   virtual void SetRenderPriority (long rp) = 0;
   /**
@@ -904,17 +886,14 @@ struct iMeshFactoryWrapper : public virtual iBase
 
 /**
  * A list of meshes.
- * <p>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::GetMeshes()
- *   <li>iSector::GetMeshes()
- *   <li>iMeshWrapper::GetChildren()
- *   </ul>
+ *   - iEngine::GetMeshes()
+ *   - iSector::GetMeshes()
+ *   - iMeshWrapper::GetChildren()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ *   - iEngine
  */
 struct iMeshList : public virtual iBase
 {
@@ -950,16 +929,13 @@ struct iMeshList : public virtual iBase
 
 /**
  * A list of mesh factories.
- * <p>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::GetMeshFactories()
- *   <li>iMeshFactoryWrapper::GetChildren()
- *   </ul>
+ *   - iEngine::GetMeshFactories()
+ *   - iMeshFactoryWrapper::GetChildren()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ *   - iEngine
  */
 struct iMeshFactoryList : public virtual iBase
 {
@@ -991,12 +967,10 @@ struct iMeshFactoryList : public virtual iBase
 
 /**
  * This is an iterator mesh wrappers.
- * <p>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::GetNearbyMeshes()
- *   <li>iEngine::GetVisibleMeshes()
- *   </ul>
+ *   - iEngine::GetNearbyMeshes()
+ *   - iEngine::GetVisibleMeshes()
  */
 struct iMeshWrapperIterator : public virtual iBase
 {

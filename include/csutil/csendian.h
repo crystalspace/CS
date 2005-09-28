@@ -327,7 +327,10 @@ static inline int32 csFloatToLong (float f)
   return sign | ((exp & 0x7f) << 24) | (mant & 0xffffff);
 }
 
-/// Convert a 32-bit cross-platform float to native format (no endianess adjustments!)
+/**
+ * Convert a 32-bit cross-platform float to native format (no endianess
+ * adjustments!)
+ */
 static inline float csLongToFloat (int32 l)
 {
   int exp = (l >> 24) & 0x7f;
@@ -345,7 +348,10 @@ static inline float csLongToFloat (int32 l)
  * << 59), and construct `mask' manually.
  */
 
-/// Convert a double to a cross-platform 64-bit format (no endianess adjustments!)
+/**
+ * Convert a double to a cross-platform 64-bit format (no endianess
+ * adjustments!)
+ */
 static inline int64 csDoubleToLongLong (double d)
 {
   int exp;
@@ -357,7 +363,10 @@ static inline int64 csDoubleToLongLong (double d)
   return sign | ((int64 (exp) & 0x7fff) << 48) | (mant & mask);
 }
 
-/// Convert a 64-bit cross-platform double to native format (no endianess adjustments!)
+/**
+ * Convert a 64-bit cross-platform double to native format (no endianess
+ * adjustments!)
+ */
 static inline double csLongLongToDouble (int64 i)
 {
   int exp = (i >> 48) & 0x7fff;
@@ -376,7 +385,10 @@ static inline double csLongLongToDouble (int64 i)
  * 2^-8 (0.00390625) is near 0.000001, for numbers near 2^7 (128) is near 0.03.
  * @{ */
 
-/// Convert a float to a cross-platform 16-bit format (no endianess adjustments!)
+/**
+ * Convert a float to a cross-platform 16-bit format (no endianess
+ * adjustments!)
+ */
 static inline short csFloatToShort (float f)
 {
   int exp;
@@ -387,7 +399,10 @@ static inline short csFloatToShort (float f)
   return short(sign | ((exp & 0xf) << 11) | (mant & 0x7ff));
 }
 
-/// Convert a 16-bit cross-platform float to native format (no endianess adjustments!)
+/**
+ * Convert a 16-bit cross-platform float to native format (no endianess
+ * adjustments!)
+ */
 static inline float csShortToFloat (short s)
 {
   int exp = (s >> 11) & 0xf;

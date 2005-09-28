@@ -20,7 +20,7 @@
 #define __CS_UTIL_BINDER_H__
 
 /**\file
- * Input even binder
+ * Input event binder
  */
 
 #include "csextern.h"

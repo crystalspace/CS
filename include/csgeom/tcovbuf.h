@@ -572,7 +572,8 @@ public:
   /**
    * Insert an inverted polygon in the coverage buffer.
    */
-  void InsertPolygonInverted (csVector2* verts, size_t num_verts, float max_depth);
+  void InsertPolygonInverted (csVector2* verts, size_t num_verts,
+  	float max_depth);
 
   /**
    * Insert an inverted polygon in the coverage buffer.

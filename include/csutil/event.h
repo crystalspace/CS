@@ -72,7 +72,7 @@ public:
   /**
    * Convert a bitmask returned by GetModifiersBits back to a csKeyModifiers
    * struct.
-   *
+   * <p>
    * Also works for the Modifiers members of the csMouseEventData and
    * csJoystickEventData structs, if you cast them to uint32.
    */

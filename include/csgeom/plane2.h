@@ -58,7 +58,8 @@ public:
   csPlane2 () : norm (0,1), CC (0) {}
 
   /// Initialize the plane.
-  csPlane2 (const csVector2& plane_norm, float c=0) : norm (plane_norm), CC (c) {}
+  csPlane2 (const csVector2& plane_norm, float c=0)
+  	: norm (plane_norm), CC (c) {}
 
   /// Initialize the plane.
   csPlane2 (float a, float b, float c=0) : norm (a,b), CC (c) {}

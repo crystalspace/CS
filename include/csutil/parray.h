@@ -110,8 +110,10 @@ public:
     return ret;
   }
 
-  /// Variant of SetLength() which copies the pointed-to object instead of
-  /// the actual pointer.
+  /**
+   * Variant of SetLength() which copies the pointed-to object instead of
+   * the actual pointer.
+   */
   void SetLength (size_t n, T const &what)
   {
     if (n <= this->Length ()) // see *1*

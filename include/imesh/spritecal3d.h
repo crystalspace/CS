@@ -132,31 +132,31 @@ struct iSpriteCal3DFactoryState : public iBase
 
   /**
    * This loads the supplied file as one animation action for the sprite.
-   * @param vfs The ref to the vfs plugin used when loading the anim file
-   * @param filename The VFS path to the anim file.
-   * @param name The animation's name.
-   * @param type The type of anim this file represents.
-   * @param base_velocity On movement type anims, this represents the native
+   * \param vfs The ref to the vfs plugin used when loading the anim file
+   * \param filename The VFS path to the anim file.
+   * \param name The animation's name.
+   * \param type The type of anim this file represents.
+   * \param base_velocity On movement type anims, this represents the native
    *   traversal speed of the model implied by this animation.
    *   For example, a "walk" anim might specify 2m/sec.
-   * @param min_velocity  On movement type anims, this represents the minimum
+   * \param min_velocity  On movement type anims, this represents the minimum
    *   velocity for which this animation should be considered
    *   or used.  The anim will be blended with other anims to achieve the
    *   desired exact velocity.
-   * @param max_velocity  Same thing for max velocity for this anim to be
+   * \param max_velocity  Same thing for max velocity for this anim to be
    *   blended in.
-   * @param min_interval  When the anim of type "idle" is playing, the model
+   * \param min_interval  When the anim of type "idle" is playing, the model
    *   will randomly choose override actions to play every so often to enhance
    *   the realism of the idle.  (Thus a "standing" creature might shift his
    *   feet or scratch his nose every 30 seconds or so.)  This param is the
    *   minimum time between these overrides.
-   * @param max_interval  Max interval between these override idle actions.
+   * \param max_interval  Max interval between these override idle actions.
    *   The model will randomly choose a time between min and max.
-   * @param idle_pct For anims of type action, if the model is idling it will
+   * \param idle_pct For anims of type action, if the model is idling it will
    *   randomly choose among these based on the idle_pct weights specified
    *   here.  This param should total 100 across all anims for the model if
    *   used.
-   * @param lock This specifies whether the animation is to be locked on last
+   * \param lock This specifies whether the animation is to be locked on last
    *   frame or not. If not locked, the action will return to the base keyframe
    *   when complete.  If locked, the action will stay in the final keyframe
    *   position until cleared.  (This is usually for anims like "death".)
@@ -191,13 +191,13 @@ struct iSpriteCal3DFactoryState : public iBase
   /**
    * This adds a mesh as a morph target of another mesh.
    *
-   * @param vfs The VFS object where `filename' resides.
-   * @param mesh_index The index of the mesh we are going to add a morph
+   * \param vfs The VFS object where `filename' resides.
+   * \param mesh_index The index of the mesh we are going to add a morph
    *   target to.
-   * @param filename The name of the file of the mesh of the morph tarrget.
-   * @param name The name of the morph target.
+   * \param filename The name of the file of the mesh of the morph tarrget.
+   * \param name The name of the morph target.
    *
-   * @return The index of the morph target.
+   * \return The index of the morph target.
    */
   virtual int LoadCoreMorphTarget(iVFS *vfs, int mesh_index,
   	const char *filename, const char *name) = 0;
@@ -205,20 +205,19 @@ struct iSpriteCal3DFactoryState : public iBase
   /**
    * This adds a new morph animation.
    *
-   * @param name The name of morph animation.
-   *
-   * @return The index of the morph animation.
+   * \param name The name of morph animation.
+   * \return The index of the morph animation.
    */
   virtual int AddMorphAnimation(const char *name) = 0;
   
   /**
    * This adds a mesh and one of its morph target to the given morph animation.
    *
-   * @param morphanimation_index The index of the morph animation.
-   * @param mesh_name The name of the mesh.
-   * @param morphtarget_name The name of the morph target of the mesh.
+   * \param morphanimation_index The index of the morph animation.
+   * \param mesh_name The name of the mesh.
+   * \param morphtarget_name The name of the morph target of the mesh.
    *
-   * @return True if successfull.
+   * \return True if successfull.
    */
   virtual bool AddMorphTarget(int morphanimation_index,
 		              const char *mesh_name,
@@ -253,9 +252,9 @@ struct iSpriteCal3DFactoryState : public iBase
   /**
    * Returns the number of morph targets of a mesh.
    *
-   * @param mesh_id The id of the mesh.
+   * \param mesh_id The id of the mesh.
    *
-   * @return The number of morph targets of a mesh.
+   * \return The number of morph targets of a mesh.
    *         -1 if something went wrong.
    */
   virtual int GetMorphTargetCount(int mesh_id) = 0;
@@ -315,13 +314,15 @@ struct iSpriteCal3DFactoryState : public iBase
    * This function will attach a callback to the Core Anim, to be called
    * whenever the min_interval passes and this animation is active.
    */
-  virtual bool RegisterAnimCallback(const char *anim, CalAnimationCallback *callback,float min_interval) = 0;
+  virtual bool RegisterAnimCallback(const char *anim,
+  	CalAnimationCallback *callback, float min_interval) = 0;
 
   /**
    * This function should be called to remove callbacks when the meshfact is 
    * destroyed.
    */
-  virtual bool RemoveAnimCallback(const char *anim, CalAnimationCallback *callback) = 0;
+  virtual bool RemoveAnimCallback(const char *anim,
+  	CalAnimationCallback *callback) = 0;
 
 };
 
@@ -334,7 +335,7 @@ SCF_VERSION (iAnimTimeUpdateHandler, 0, 0, 1);
  * default behavior by providing your own implementation of the
  * iAnimTimeUpdateHandler interface and registering it with
  * iSpriteCal3DState::SetAnimTimeUpdateHandler().
-*/
+ */
 struct iAnimTimeUpdateHandler : public iBase
 {
   /**
@@ -454,7 +455,8 @@ struct iSpriteCal3DState : public iBase
    * Uses the supplied buffer (created by GetActiveAnims) to recreate an
    * exact mix of animation cycles and weights.
    */
-  virtual void SetActiveAnims(const csSpriteCal3DActiveAnim* buffer, size_t anim_count) = 0;
+  virtual void SetActiveAnims(const csSpriteCal3DActiveAnim* buffer,
+  	size_t anim_count) = 0;
 
   /**
    * This adds a non-looping animation to the blend set for the cal3d Mixer.
@@ -538,11 +540,11 @@ struct iSpriteCal3DState : public iBase
   /**
    * Blends the morph target.
    *
-   * @param morph_animation_id The id of the morph animation we want to blend.
-   * @param weight The weight of the morph target.
-   * @param delay The delay untill the full weight is reached.
+   * \param morph_animation_id The id of the morph animation we want to blend.
+   * \param weight The weight of the morph target.
+   * \param delay The delay untill the full weight is reached.
    *
-   * @return False if something went wrong.
+   * \return False if something went wrong.
    */
   virtual bool BlendMorphTarget(int morph_animation_id, float weight,
   	float delay) = 0;
@@ -550,10 +552,10 @@ struct iSpriteCal3DState : public iBase
   /**
    * Clears the morph target.
    *
-   * @param morph_animation_id The id of the morph animation we want to clear.
-   * @param delay The delay untill the morph target is cleared.
+   * \param morph_animation_id The id of the morph animation we want to clear.
+   * \param delay The delay untill the morph target is cleared.
    *
-   * @return False if something went wrong.
+   * \return False if something went wrong.
    */
   virtual bool ClearMorphTarget(int morph_animation_id, float delay) = 0;
   /** @} */

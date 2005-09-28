@@ -66,13 +66,11 @@ struct iDebugHelper : public virtual iBase
    * Return a bit field indicating what types of functions this specific
    * unit test implementation supports. This will return a combination of
    * the CS_DBGHELP_... flags:
-   * <ul>
-   * <li> #CS_DBGHELP_UNITTEST
-   * <li> #CS_DBGHELP_BENCHMARK
-   * <li> #CS_DBGHELP_TXTDUMP
-   * <li> #CS_DBGHELP_GFXDUMP
-   * <li> #CS_DBGHELP_STATETEST
-   * </ul>
+   * - #CS_DBGHELP_UNITTEST
+   * - #CS_DBGHELP_BENCHMARK
+   * - #CS_DBGHELP_TXTDUMP
+   * - #CS_DBGHELP_GFXDUMP
+   * - #CS_DBGHELP_STATETEST
    */
   virtual int GetSupportedTests () const = 0;
 

@@ -86,22 +86,18 @@ SCF_VERSION (iVisibilityCuller, 0, 7, 0);
  * To use it you first register visibility objects (which are all the
  * objects for which you want to test visibility) to this culler.
  * A visibility culler can usually also support shadow calculation.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Dynavis culler plugin (crystalspace.culling.dynavis)
- *   <li>Frustvis culler plugin (crystalspace.culling.frustvis)
- *   </ul>
+ * - Dynavis culler plugin (crystalspace.culling.dynavis)
+ * - Frustvis culler plugin (crystalspace.culling.frustvis)
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   <li>CS_LOAD_PLUGIN()
- *   <li>iSector::GetVisibilityCuller()
- *   </ul>
+ * - CS_QUERY_REGISTRY()
+ * - CS_LOAD_PLUGIN()
+ * - iSector::GetVisibilityCuller()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ * - iEngine
  */
 struct iVisibilityCuller : public virtual iBase
 {
@@ -242,19 +238,15 @@ struct iVisibilityCuller : public virtual iBase
 /**
  * An object that wants to know if it is visible or not
  * for some visibility culler needs to implement this interface.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Mesh wrapper in the engine implements this.
- *   </ul>
+ * - Mesh wrapper in the engine implements this.
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() from iMeshWrapper.
- *   </ul>
+ * - SCF_QUERY_INTERFACE() from iMeshWrapper.
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>Visibility culler plugins (iVisibilityCuller).
- *   </ul>
+ * - Visibility culler plugins (iVisibilityCuller).
  */
 struct iVisibilityObject : public virtual iBase
 {
@@ -273,10 +265,8 @@ struct iVisibilityObject : public virtual iBase
   /**
    * Get flags for this object. This is a combination of zero or more of the
    * following flags. See the documentation with these flags for more info:
-   * <ul>
-   * <li>#CS_CULLER_HINT_GOODOCCLUDER
-   * <li>#CS_CULLER_HINT_BADOCCLUDER
-   * </ul>
+   * - #CS_CULLER_HINT_GOODOCCLUDER
+   * - #CS_CULLER_HINT_BADOCCLUDER
    */
   virtual csFlags& GetCullerFlags () = 0;
 };

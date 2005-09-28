@@ -70,11 +70,9 @@ SCF_VERSION (iDocumentAttributeIterator, 0, 0, 1);
 
 /**
  * An iterator over iDocumentNode attributes.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iDocumentNode::GetAttributes()
- *   </ul>
+ * - iDocumentNode::GetAttributes()
  */
 struct iDocumentAttributeIterator : public iBase
 {
@@ -90,18 +88,15 @@ SCF_VERSION (iDocumentAttribute, 0, 0, 1);
 
 /**
  * An attribute for an iDocumentNode.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iDocumentNode::SetAttribute()
- *   <li>iDocumentNode::SetAttributeAsInt()
- *   <li>iDocumentNode::SetAttributeAsFloat()
- *   </ul>
+ * - iDocumentNode::SetAttribute()
+ * - iDocumentNode::SetAttributeAsInt()
+ * - iDocumentNode::SetAttributeAsFloat()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iDocumentNode::GetAttribute()
- *   <li>iDocumentAttributeIterator::Next()
- *   </ul>
+ * - iDocumentNode::GetAttribute()
+ * - iDocumentAttributeIterator::Next()
  */
 struct iDocumentAttribute : public iBase
 {
@@ -131,11 +126,9 @@ SCF_VERSION (iDocumentNodeIterator, 0, 0, 1);
 
 /**
  * An iterator over iDocumentNode.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iDocumentNode::GetNodes()
- *   </ul>
+ * - iDocumentNode::GetNodes()
  */
 struct iDocumentNodeIterator : public virtual iBase
 {
@@ -151,19 +144,16 @@ SCF_VERSION (iDocumentNode, 0, 4, 1);
 
 /**
  * Representation of a node in a document.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iDocument::CreateRoot()
- *   <li>iDocumentNode::CreateNodeBefore()
- *   </ul>
+ * - iDocument::CreateRoot()
+ * - iDocumentNode::CreateNodeBefore()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iDocument::GetRoot()
- *   <li>iDocumentNode::GetNode()
- *   <li>iDocumentNode::GetParent()
- *   <li>iDocumentNodeIterator::Next()
- *   </ul>
+ * - iDocument::GetRoot()
+ * - iDocumentNode::GetNode()
+ * - iDocumentNode::GetParent()
+ * - iDocumentNodeIterator::Next()
  */
 struct iDocumentNode : public iBase
 {
@@ -185,27 +175,23 @@ struct iDocumentNode : public iBase
   /**
    * Get the value of this node.
    * What this is depends on the type of the node:
-   * <ul>
-   * <li>#CS_NODE_DOCUMENT: filename of the document file
-   * <li>#CS_NODE_ELEMENT: name of the element
-   * <li>#CS_NODE_COMMENT: comment text
-   * <li>#CS_NODE_UNKNOWN: tag contents
-   * <li>#CS_NODE_TEXT: text string
-   * <li>#CS_NODE_DECLARATION: undefined
-   * </ul>
+   * - #CS_NODE_DOCUMENT: filename of the document file
+   * - #CS_NODE_ELEMENT: name of the element
+   * - #CS_NODE_COMMENT: comment text
+   * - #CS_NODE_UNKNOWN: tag contents
+   * - #CS_NODE_TEXT: text string
+   * - #CS_NODE_DECLARATION: undefined
    */
   virtual const char* GetValue () = 0;
   /**
    * Set the value of this node.
    * What this is depends on the type of the node:
-   * <ul>
-   * <li>#CS_NODE_DOCUMENT: filename of the document file
-   * <li>#CS_NODE_ELEMENT: name of the element
-   * <li>#CS_NODE_COMMENT: comment text
-   * <li>#CS_NODE_UNKNOWN: tag contents
-   * <li>#CS_NODE_TEXT: text string
-   * <li>#CS_NODE_DECLARATION: undefined
-   * </ul>
+   * - #CS_NODE_DOCUMENT: filename of the document file
+   * - #CS_NODE_ELEMENT: name of the element
+   * - #CS_NODE_COMMENT: comment text
+   * - #CS_NODE_UNKNOWN: tag contents
+   * - #CS_NODE_TEXT: text string
+   * - #CS_NODE_DECLARATION: undefined
    */
   virtual void SetValue (const char* value) = 0;
   /// Set value to the string representation of an integer.
@@ -308,11 +294,9 @@ SCF_VERSION (iDocument, 0, 2, 0);
 
 /**
  * Representation of a document containing a hierarchical structure of nodes.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iDocumentSystem::CreateDocument()
- *   </ul>
+ * - iDocumentSystem::CreateDocument()
  */
 struct iDocument : public iBase
 {
@@ -417,19 +401,16 @@ SCF_VERSION (iDocumentSystem, 0, 0, 1);
 
 /**
  * An iDocument factory.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>XmlRead Document System plugin (crystalspace.documentsystem.xmlread)
- *   <li>XmlTiny Document System plugin (crystalspace.documentsystem.tinyxml)
- *   <li>Binary Document System plugin (crystalspace.documentsystem.binary)
- *   <li>Document System Multiplexer plugin
+ * - XmlRead Document System plugin (crystalspace.documentsystem.xmlread)
+ * - XmlTiny Document System plugin (crystalspace.documentsystem.tinyxml)
+ * - Binary Document System plugin (crystalspace.documentsystem.binary)
+ * - Document System Multiplexer plugin
  *       (crystalspace.documentsystem.multiplexer)
- *   </ul>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - CS_QUERY_REGISTRY()
  */
 struct iDocumentSystem : public virtual iBase
 {

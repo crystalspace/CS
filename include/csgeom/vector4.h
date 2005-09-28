@@ -94,7 +94,6 @@ public:
   inline friend csDVector4 operator% (const csDVector4& v1,
   	const csDVector4& v2)
   {
-    
     return csDVector4 (
       (v1.x*v2.y-v1.y*v2.x) + (v1.x*v2.z-v1.z*v2.x) + (v1.y*v2.z-v1.z*v2.y),
       (v1.z*v2.y-v1.y*v2.z) + (v1.y*v2.w-v1.w*v2.y) + (v1.z*v2.w-v1.w*v2.z),

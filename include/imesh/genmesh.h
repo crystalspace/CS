@@ -265,8 +265,8 @@ struct iGeneralFactoryState : public iGeneralMeshCommonState
 
   /**
    * Automatically generate a sphere. This will set the apropriate number 
-   * of vertices and generate vertices, texels, normals, and triangles. The colors
-   * are not initialized here.
+   * of vertices and generate vertices, texels, normals, and triangles.
+   * The colors are not initialized here.
    */
   virtual void GenerateSphere (const csSphere& sphere, int rim_vertices) = 0;
 
@@ -386,6 +386,7 @@ struct iGenMeshAnimationControl : public iBase
 SCF_VERSION (iGenMeshAnimationControlFactory, 0, 0, 1);
 
 struct iDocumentNode;
+
 /**
  * This class is a factory for creating animation controls.
  * 
@@ -397,14 +398,14 @@ struct iDocumentNode;
  *   
  * Main users of this interface:
  * - Genmesh plugin (crystalspace.mesh.object.genmesh)
- *   
  */
 struct iGenMeshAnimationControlFactory : public iBase
 {
   /**
    * Create a new animation control.
    */
-  virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl (iMeshObject *mesh) = 0;
+  virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl (
+  	iMeshObject *mesh) = 0;
 
   /**
    * Setup this animation control from a document node.

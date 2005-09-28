@@ -85,7 +85,8 @@ struct iSprite2DUVAnimationFrame : public iBase
   /**
    * Set all (u,v) coordinates and the name and duration
    */
-  virtual void SetFrameData (const char *name, int duration, int num, float *uv) = 0;
+  virtual void SetFrameData (const char *name, int duration, int num,
+  	float *uv) = 0;
 
   /**
    * Remove the idx'th coordinate.

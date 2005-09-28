@@ -25,9 +25,11 @@
 #include <vos/vos/vos.hh>
 
 SCF_VERSION (iVosApi, 0, 1, 1);
+
+/// @@@ Document me
 struct iVosApi : public virtual iBase
 {
-    virtual VUtil::vRef<VOS::Vobject> GetVobject() = 0;
+  virtual VUtil::vRef<VOS::Vobject> GetVobject() = 0;
 };
 
 #endif

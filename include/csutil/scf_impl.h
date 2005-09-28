@@ -201,8 +201,8 @@ private:
   template<class I>
   struct VC6Workaround
   {
-    CS_FORCEINLINE static void* GetInterface(Class* scfObject, scfInterfaceID id, 
-					     scfInterfaceVersion version)
+    CS_FORCEINLINE static void* GetInterface(
+    	Class* scfObject, scfInterfaceID id, scfInterfaceVersion version)
     {
       if (id == scfInterfaceTraits<I>::GetID() &&
 	  scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))
@@ -220,8 +220,8 @@ private:
   template<class I>
   struct VC6Workaround<scfFakeInterface<I> >
   {
-    CS_FORCEINLINE static void* GetInterface(Class* scfObject, scfInterfaceID id, 
-      scfInterfaceVersion version)
+    CS_FORCEINLINE static void* GetInterface(
+    	Class* scfObject, scfInterfaceID id, scfInterfaceVersion version)
     {
       if (id == scfInterfaceTraits<I>::GetID() &&
         scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))

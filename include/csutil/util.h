@@ -162,7 +162,8 @@ CS_CRYSTALSPACE_EXPORT void csSplitPath (const char *iPathName, char *oPath,
  * \remark If you want case-insensitive comparison, convert \p fName and
  *   \p fMask to upper- or lower-case first.
  */
-CS_CRYSTALSPACE_EXPORT bool csGlobMatches (const char *fName, const char *fMask);
+CS_CRYSTALSPACE_EXPORT bool csGlobMatches (const char *fName,
+	const char *fMask);
 
 /**
  * Finds the smallest number that is a power of two and is larger or

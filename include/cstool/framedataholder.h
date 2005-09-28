@@ -46,7 +46,8 @@ class csFrameDataHolder
   uint nextShrink;
   uint lastFrame, clearReq;
 public:
-  csFrameDataHolder () : lastData(0), nextShrink(0), lastFrame((uint)~0), clearReq((uint)~0)
+  csFrameDataHolder () : lastData(0), nextShrink(0),
+  	lastFrame((uint)~0), clearReq((uint)~0)
   { }
   ~csFrameDataHolder () { }
 

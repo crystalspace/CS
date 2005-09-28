@@ -46,7 +46,6 @@ class csColor;
  *   
  * Main users of this interface:
  * - The 3D engine plugin (crystalspace.engine.3d).
- *   
  */
 struct iLightingInfo : public virtual iBase
 {

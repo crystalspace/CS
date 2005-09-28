@@ -109,20 +109,24 @@ struct iDynamicSystem : public iBase
   /// Get the global rolling dampener setting.
   virtual float GetRollingDampener () const = 0;
 
-  /** Turn on/off AutoDisable functionality.
-      AutoDisable will stop moving objects if they are stable in order
-      to save processing time.
-  */
+  /**
+   * Turn on/off AutoDisable functionality.
+   * AutoDisable will stop moving objects if they are stable in order
+   * to save processing time.
+   */
   virtual void EnableAutoDisable (bool enable) = 0;
   virtual bool AutoDisableEnabled () =0;
   /**
-    Set the parameters for AutoDisable.
-    \param linear Maximum linear movement to disable a body
-    \param angular Maximum angular movement to disable a body
-    \param steps Minimum number of steps the body meets linear and angular requirements before it is disabled.
-    \param time Minimum time the body needs to meet linear and angular movement requirements before it is disabled.
-  */
-  virtual void SetAutoDisableParams (float linear, float angular, int steps, float time)=0;
+   * Set the parameters for AutoDisable.
+   * \param linear Maximum linear movement to disable a body
+   * \param angular Maximum angular movement to disable a body
+   * \param steps Minimum number of steps the body meets linear and angular
+   * requirements before it is disabled.
+   * \param time Minimum time the body needs to meet linear and angular
+   * movement requirements before it is disabled.
+   */
+  virtual void SetAutoDisableParams (float linear, float angular, int steps,
+  	float time)=0;
 
   /// Step the simulation forward by stepsize.
   virtual void Step (float stepsize) = 0;
@@ -251,9 +255,9 @@ struct iDynamicSystem : public iBase
   virtual void AttachCollider (iDynamicsSystemCollider* collider) = 0;
 
   /**
-   * Create static collider and put it into simulation. After collision it will remain 
-   * in the same place, but it will affect collided dynamic colliders (to make 
-   * it dynamic, just attach it to the rigid body).
+   * Create static collider and put it into simulation. After collision it
+   * will remain in the same place, but it will affect collided dynamic
+   * colliders (to make it dynamic, just attach it to the rigid body).
    */
   virtual csRef<iDynamicsSystemCollider> CreateCollider () = 0;
 
@@ -670,7 +674,8 @@ struct iDynamicsSystemCollider : public iBase
 
   //FIXME: This should be implememented, but it is not so obvious - it
   //should be valid also for static colliders.
-  virtual void SetCollisionCallback (iDynamicsColliderCollisionCallback* cb) = 0;
+  virtual void SetCollisionCallback (
+  	iDynamicsColliderCollisionCallback* cb) = 0;
 
   /// Set friction of collider surface
   virtual void SetFriction (float friction) = 0;
@@ -701,7 +706,8 @@ struct iDynamicsSystemCollider : public iBase
   virtual float GetElasticity () = 0;
 
   /// Fills given General Mesh factory with collider geometry 
-  virtual void FillWithColliderGeometry (csRef<iGeneralFactoryState> genmesh_fact) = 0;
+  virtual void FillWithColliderGeometry (
+  	csRef<iGeneralFactoryState> genmesh_fact) = 0;
 
   /// Get geometry type
   virtual csColliderGeometryType GetGeometryType () = 0;
@@ -738,7 +744,6 @@ struct iDynamicsSystemCollider : public iBase
    * length and radius, otherwise it will return false.
    */
   virtual bool GetCylinderGeometry (float& length, float& radius) = 0; 
-
 };
 
 SCF_VERSION (iJoint, 0, 0, 1);

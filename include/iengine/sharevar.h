@@ -73,10 +73,10 @@ struct iSharedVariable : public virtual iBase
   /// Possible types stored by this class.
   enum SharedVariableType
   {
-      SV_UNKNOWN = 0,
-      SV_FLOAT   = 1,
-      SV_COLOR   = 2,
-      SV_VECTOR  = 3
+    SV_UNKNOWN = 0,
+    SV_FLOAT   = 1,
+    SV_COLOR   = 2,
+    SV_VECTOR  = 3
   };
 
   /// Get the type currently stored by this variable.

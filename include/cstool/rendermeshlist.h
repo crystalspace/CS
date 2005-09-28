@@ -106,9 +106,12 @@ private:
   csPDelArray < renderMeshListInfo > renderList;
   iEngine* engine;
 
-  static int SortMeshMaterial (meshListEntry const& me1, meshListEntry const& me2);
-  static int SortMeshBack2Front (meshListEntry const& me1, meshListEntry const& me2);
-  static int SortMeshFront2Back (meshListEntry const& me1, meshListEntry const& me2);
+  static int SortMeshMaterial (meshListEntry const& me1,
+  	meshListEntry const& me2);
+  static int SortMeshBack2Front (meshListEntry const& me1,
+  	meshListEntry const& me2);
+  static int SortMeshFront2Back (meshListEntry const& me1,
+  	meshListEntry const& me2);
   static csVector3 sort_CameraPosition;
 };
 

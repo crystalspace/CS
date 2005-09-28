@@ -76,16 +76,14 @@ struct iSyntaxService : public iBase
   /**
    * Parse the value of this node and return a boolean depending
    * on this value. The following mapping happens (case insensitive):
-   * <ul>
-   * <li>yes -> true
-   * <li>no -> false
-   * <li>true -> true
-   * <li>false -> false
-   * <li>on -> true
-   * <li>off -> false
-   * <li>(empty value) -> (def_result)
-   * <li>(everyting else) -> error
-   * </ul>
+   * - yes -> true
+   * - no -> false
+   * - true -> true
+   * - false -> false
+   * - on -> true
+   * - off -> false
+   * - (empty value) -> (def_result)
+   * - (everyting else) -> error
    */
   virtual bool ParseBool (iDocumentNode* node, bool& result,
   	bool def_result) = 0;

@@ -46,7 +46,7 @@ class CS_CRYSTALSPACE_EXPORT csMath2
 public:
   /**
    * Calculates which side of a line a given point is on.
-   * Returns -1 if point v is left of line segment 's1-s2',
+   * \return -1 if point v is left of line segment 's1-s2',
    *          1 if point v is right of segment 's1-s2'
    *       or 0 if point v lies on segment 's1-s2'.
    */
@@ -62,7 +62,7 @@ public:
 
   /**
    * Calculates which side of a line a given point is on.
-   * Returns -1 if point v is left of line segment 'seg'
+   * \return -1 if point v is left of line segment 'seg'
    *          1 if point v is right of segment 'seg'
    *       or 0 if point v lies on segment 'seg'.
    */
@@ -74,7 +74,7 @@ public:
 
   /**
    * Calculates whether a vector lies inside a given 2D polygon.
-   * Return CS_POLY_IN, CS_POLY_OUT, or CS_POLY_ON for this vector with
+   * \return CS_POLY_IN, CS_POLY_OUT, or CS_POLY_ON for this vector with
    * respect to the given polygon. The polygon is given as an array of 2D
    * vectors with a bounding box.
    * WARNING: does no safety checking for P or bounding_box.
@@ -84,7 +84,7 @@ public:
 
   /**
    * Calculates 2 x the area of a given triangle.
-   * Returns twice the signed area of the triangle determined by a,b,c,
+   * \return twice the signed area of the triangle determined by a,b,c,
    * positive if a,b,c are oriented ccw, and negative if cw.
    */
   static float Area2 (const csVector2& a,
@@ -99,7 +99,7 @@ public:
 
   /**
    * Calculates whether a point lies to the right of a given line.
-   * Returns true iff c is strictly to the right of the directed
+   * \return true iff c is strictly to the right of the directed
    * line through a to b.
    */
   static float Right (const csVector2& a,
@@ -131,7 +131,7 @@ public:
 
   /**
    * Check if two planes are almost equal.
-   * The function returns true iff each component of the plane equation for
+   * \return true iff each component of the plane equation for
    * one plane is within .001 of the corresponding component of the other
    * plane.
    */
@@ -160,14 +160,15 @@ public:
   /**
    * Intersect a plane with a 2D polygon and return
    * the line segment corresponding with this intersection.
-   * Returns true if there is an intersection. If false
+   * \return true if there is an intersection. If false
    * then 'segment' will not be valid.
    */
   static bool PlanePolygon (const csPlane2& plane, csPoly2D* poly,
   	csSegment2& segment);
 
   /**
-   * Compute the intersection of the 2D segments.  Return true if they
+   * Compute the intersection of the 2D segments.
+   * \return true if they
    * intersect, with the intersection point returned in isect,  and the
    * distance from a1 of the intersection in dist.
    */
@@ -176,7 +177,8 @@ public:
     csVector2& isect, float& dist);         // intersection point and distance
 
   /**
-   * Compute the intersection of a 2D segment and a line.  Return true if they
+   * Compute the intersection of a 2D segment and a line.
+   * \return true if they
    * intersect, with the intersection point returned in isect,  and the
    * distance from a1 of the intersection in dist.
    */
@@ -186,7 +188,8 @@ public:
     csVector2& isect, float& dist);     // intersection point and distance
 
   /**
-   * Compute the intersection of 2D lines.  Return true if they
+   * Compute the intersection of 2D lines.
+   * \return true if they
    * intersect, with the intersection point returned in isect.
    */
   static bool LineLine (
@@ -195,7 +198,8 @@ public:
     csVector2& isect);                      // intersection point
 
   /**
-   * Intersect a 2D segment with a plane.  Returns true if there is an
+   * Intersect a 2D segment with a plane.
+   * \return true if there is an
    * intersection, with the intersection point returned in isect.
    * The distance from u to the intersection point is returned in dist.
    * The distance that is returned is a normalized distance with respect
@@ -209,7 +213,8 @@ public:
     float& dist);                       // distance from u to isect
 
   /**
-   * Intersect a 2D segment with a plane.  Returns true if there is an
+   * Intersect a 2D segment with a plane.
+   * \return true if there is an
    * intersection, with the intersection point returned in isect.
    * The distance from u to the intersection point is returned in dist.
    * The distance that is returned is a normalized distance with respect
@@ -251,7 +256,8 @@ public:
 
   /**
    * Intersect 2 planes to get the point that is part of all two
-   * planes. Returns true, if there is a single point that fits.
+   * planes.
+   * \return true if there is a single point that fits.
    * If the planes are parallel, then it will return false.
    */
   static bool PlanePlane (const csPlane2& p1, const csPlane2& p2,

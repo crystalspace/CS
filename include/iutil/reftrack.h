@@ -64,6 +64,7 @@ struct iRefTracker : public iBase
    */
   virtual void RemoveAlias (void* obj, void* mapTo) = 0;
 
+  /// @@@ Document me.
   virtual void SetDescription (void* obj, const char* description) = 0;
 };
 

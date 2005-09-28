@@ -61,14 +61,12 @@ struct iEngine;
  * This is an abstract implementation of iMeshObject. It can be used to
  * write custom mesh object implementations more easily. Currently it
  * supports the following common functions of mesh objects:
- * <ul>
- * <li> Implementation of iMeshObject
- * <li> Implementation of iObjectModel
- * <li> Storing a "visible callback"
- * <li> Storing a logical parent
- * <li> Storing object model properties
- * <li> Default implementation of most methods
- * </ul>
+ * - Implementation of iMeshObject
+ * - Implementation of iObjectModel
+ * - Storing a "visible callback"
+ * - Storing a logical parent
+ * - Storing object model properties
+ * - Default implementation of most methods
  */
 class CS_CRYSTALSPACE_EXPORT csMeshObject : 
   public scfImplementationExt1<csMeshObject, csObjectModel, iMeshObject>
@@ -120,8 +118,6 @@ public:
   /**
    * See imesh/object.h for specification. The default implementation
    * does nothing and always returns 0.
-   * @@@ Note: in future it would be better that the default implementation
-   * does nothing as this function has to be implemented by mesh objects.
    */
   virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView*, iMovable*,
   	uint32)

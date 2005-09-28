@@ -117,16 +117,13 @@ struct iCameraPosition : public virtual iBase
 
 /**
  * A list of camera position objects.
- * <p>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::GetCameraPositions()
- *   </ul>
+ *   - iEngine::GetCameraPositions()
+
  * Main users of this interface:
- *   <ul>
- *   <li>Engine stores them.
- *   <li>Application uses them.
- *   </ul>
+ *   - Engine stores them.
+ *   - Application uses them.
  */
 struct iCameraPositionList : public virtual iBase
 {

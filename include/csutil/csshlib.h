@@ -105,8 +105,8 @@ CS_CRYSTALSPACE_EXPORT csRef<iStringArray> csScanPluginDir (const char* dir,
  * Accepts the same parameters as csScanPluginDir(), with the exception of
  * \p dirs.
  */				
-CS_CRYSTALSPACE_EXPORT csRef<iStringArray> csScanPluginDirs (csPathsList* dirs,   
-  csRef<iStringArray>& plugins);
+CS_CRYSTALSPACE_EXPORT csRef<iStringArray> csScanPluginDirs (
+	csPathsList* dirs, csRef<iStringArray>& plugins);
 
 /**
  * Retrive a plugin's metadata.
@@ -127,8 +127,8 @@ CS_CRYSTALSPACE_EXPORT csRef<iStringArray> csScanPluginDirs (csPathsList* dirs,
  * specified path does not correspond to a Crystal Space plugin module.  This
  * is a valid condition.
  */
-CS_CRYSTALSPACE_EXPORT csRef<iString> csGetPluginMetadata (const char* fullPath, 
-				    csRef<iDocument>& metadata);
+CS_CRYSTALSPACE_EXPORT csRef<iString> csGetPluginMetadata (
+	const char* fullPath, csRef<iDocument>& metadata);
 
 /** @} */
 

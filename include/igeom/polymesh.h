@@ -112,32 +112,28 @@ struct csTriangle;
  * detection plugin.<br>
  * All Crystal Space mesh objects (things, sprites, ...)
  * should implement and/or embed an implementation of this interface.
- * <p>
+ *
  * A polygon mesh has the concept of a vertex buffer and an array of polygons.
  * A triangle mesh is also supported. A mesh object typically only implements
  * either a polygon mesh or a triangle mesh. In that case requesting
  * the other type of mesh will automatically generate the new format.
  * iPolygonMesh can use csPolygonMeshTools::Triangulate() and
  * csPolygonMeshTools::Polygonize() to help with that.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Almost all mesh objects have several implementations of this
- *       interface.
- *   </ul>
+ * - Almost all mesh objects have several implementations of this
+ *   interface.
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iObjectModel::GetPolygonMeshBase()
- *   <li>iObjectModel::GetPolygonMeshColldet()
- *   <li>iObjectModel::GetPolygonMeshViscull()
- *   <li>iObjectModel::GetPolygonMeshShadows()
- *   </ul>
+ * - iObjectModel::GetPolygonMeshBase()
+ * - iObjectModel::GetPolygonMeshColldet()
+ * - iObjectModel::GetPolygonMeshViscull()
+ * - iObjectModel::GetPolygonMeshShadows()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>Collision detection plugins (iCollideSystem)
- *   <li>Visibility culler plugins (iVisibilityCuller)
- *   <li>Shadow stencil plugin
- *   </ul>
+ * - Collision detection plugins (iCollideSystem)
+ * - Visibility culler plugins (iVisibilityCuller)
+ * - Shadow stencil plugin
  */
 struct iPolygonMesh : public virtual iBase
 {
@@ -167,14 +163,13 @@ struct iPolygonMesh : public virtual iBase
   /**
    * Get flags for this polygon mesh. This is zero or a combination of the
    * following flags:
-   * <ul>
-   * <li>#CS_POLYMESH_CLOSED: mesh is closed.
-   * <li>#CS_POLYMESH_NOTCLOSED: mesh is not closed.
-   * <li>#CS_POLYMESH_CONVEX: mesh is convex.
-   * <li>#CS_POLYMESH_NOTCONVEX: mesh is not convex.
-   * <li>#CS_POLYMESH_DEFORMABLE: mesh is deformable.
-   * <li>C#S_POLYMESH_TRIANGLEMESH: mesh prefers triangle mesh.
-   * </ul>
+   * - #CS_POLYMESH_CLOSED: mesh is closed.
+   * - #CS_POLYMESH_NOTCLOSED: mesh is not closed.
+   * - #CS_POLYMESH_CONVEX: mesh is convex.
+   * - #CS_POLYMESH_NOTCONVEX: mesh is not convex.
+   * - #CS_POLYMESH_DEFORMABLE: mesh is deformable.
+   * - C#S_POLYMESH_TRIANGLEMESH: mesh prefers triangle mesh.
+   *
    * Note that if neither #CS_POLYMESH_CLOSED nor #CS_POLYMESH_NOTCLOSED
    * are set then the closed state is not known. Setting both is illegal.
    * Note that if neither #CS_POLYMESH_CONVEX nor #CS_POLYMESH_NOTCONVEX

@@ -94,7 +94,8 @@ static CS_FORCEINLINE bool scfCompatibleVersion (
   scfInterfaceVersion iVersion, scfInterfaceVersion iItfVersion)
 {
   return (((iVersion & 0xff000000) == (iItfVersion & 0xff000000))
-     && ((iVersion & 0x00ffffff) <= (iItfVersion & 0x00ffffff))) || iVersion == 0;
+     && ((iVersion & 0x00ffffff) <= (iItfVersion & 0x00ffffff)))
+     || iVersion == 0;
 }
 
 // -- The main two SCF interfaces, iBase and iSCF

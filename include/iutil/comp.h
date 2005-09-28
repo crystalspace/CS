@@ -33,19 +33,15 @@ struct iObjectRegistry;
 
 /**
  * This interface describes a generic component in Crystal Space.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>All plugins implement this interface.
- *   </ul>
+ * - All plugins implement this interface.
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() from a plugin instance.
- *   </ul>
+ * - SCF_QUERY_INTERFACE() from a plugin instance.
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>csPluginManager
- *   </ul>
+ * - csPluginManager
  */
 struct iComponent : public virtual iBase
 {

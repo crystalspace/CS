@@ -43,8 +43,8 @@ class CS_CRYSTALSPACE_EXPORT csSubRectangles
 {
 public:
   /**
-  * Sub-rectangle
-  */
+   * Sub-rectangle
+   */
   class SubRect
   {
   protected:

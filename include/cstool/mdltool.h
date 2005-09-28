@@ -177,8 +177,10 @@ struct CS_CRYSTALSPACE_EXPORT csModelDataTools
    * this function that vertices with different colors may be merged.
    */
   static void BuildVertexArray (iModelDataPolygon* poly,
-	csDirtyAccessArray<int>* SpriteVertices, csDirtyAccessArray<int>* SpriteNormals,
-	csDirtyAccessArray<int>* SpriteColors, csDirtyAccessArray<int>* SpriteTexels,
+	csDirtyAccessArray<int>* SpriteVertices,
+	csDirtyAccessArray<int>* SpriteNormals,
+	csDirtyAccessArray<int>* SpriteColors,
+	csDirtyAccessArray<int>* SpriteTexels,
 	csDirtyAccessArray<int>* PolyVertices);
 };
 

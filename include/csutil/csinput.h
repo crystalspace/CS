@@ -173,11 +173,11 @@ public:
    * represented.<p>
    * Example: Test if any Alt key is pressed:
    * \code
-   *   bool pressed = (KeyboardDriver->GetModifierState (CSKEY_ALT) != 0);
+   *   bool pressed = (KeyboardDriver->GetModifierState(CSKEY_ALT) != 0);
    * \endcode
    * Example: Test if the right Ctrl key is pressed:
    * \code
-   *   bool pressed = (KeyboardDriver->GetModifierState (CSKEY_CTRL_RIGHT) != 0);
+   *   bool pressed = (KeyboardDriver->GetModifierState(CSKEY_CTRL_RIGHT) != 0);
    * \endcode
    * \param codeRaw Raw code of the modifier key.
    * \return Bit mask with the pressed modifiers.
@@ -241,11 +241,14 @@ public:
   /// Query last mouse Y position for mouse \#n (1, 2, ...)
   CS_PURE_METHOD virtual int GetLastY (uint n) const { return Last[n - 1][1]; }
   /// Query last mouse position on axis ax (1, 2, ...) for mouse n (1, 2, ...)
-  CS_PURE_METHOD virtual int GetLast (uint n, uint axis) const { return Last[n - 1][axis - 1]; }
+  CS_PURE_METHOD virtual int GetLast (uint n, uint axis) const
+  { return Last[n - 1][axis - 1]; }
   /// Query last mouse axis array for mouse n (1, 2, ...)
-  CS_PURE_METHOD virtual const int32 *GetLast (uint n) const { return Last [n - 1]; }
+  CS_PURE_METHOD virtual const int32 *GetLast (uint n) const
+  { return Last [n - 1]; }
   /// Query the last known mouse button state for mouse \#1
-  CS_PURE_METHOD virtual bool GetLastButton (uint button) const { return GetLastButton(1, button); }
+  CS_PURE_METHOD virtual bool GetLastButton (uint button) const
+  { return GetLastButton(1, button); }
   /// Query the last known mouse button state
   CS_PURE_METHOD virtual bool GetLastButton (uint number, uint button) const
   {
@@ -255,8 +258,10 @@ public:
   }
 
   /// Call this to add a 'mouse button down/up' event to queue
-  virtual void DoButton (uint number, uint button, bool down, const int32 *axes, uint numAxes);
-  virtual void DoButton (uint button, bool down, const int32 *axes, uint numAxes) 
+  virtual void DoButton (uint number, uint button, bool down,
+  	const int32 *axes, uint numAxes);
+  virtual void DoButton (uint button, bool down, const int32 *axes,
+  	uint numAxes) 
   { DoButton (1, button, down, axes, numAxes); }
   virtual void DoButton (uint button, bool down, int x, int y)
   { int32 axes[2] = {x, y}; DoButton (1, button, down, axes, 2); }

@@ -56,7 +56,6 @@ SCF_VERSION (iSndSysSoftwareFilter3D, 0, 1, 0);
  */
 struct iSndSysSoftwareFilter3D : public iBase
 {
-
   /**
    * Apply this filter to the mutable buffer passed.  The unmutable main
    * buffer is also passed, although this is not likely to be
@@ -87,7 +86,6 @@ SCF_VERSION (iSndSysSoftwareFilterOutput, 0, 1, 0);
  */
 struct iSndSysSoftwareFilterOutput : public iBase
 {
-
   /**
    * Apply this filter to the mutable buffer passed.  The unmutable main
    * buffer is also passed, although this is not likely to be

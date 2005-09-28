@@ -84,9 +84,9 @@ struct iEventQueue : public iBase
    * cscmdPreProcess before events dispatching, and after events dispatching
    * the listener will receive three csevBroadcast events, in 3 successive 
    * phases, following this ordering: the first broadcasted event has the 
-   * Event.Retrieve("cmdCode") equal to cscmdProcess, then the second broadcasted 
-   * event has a value of cscmdPostProcess and finally the last event 
-   * broadcasted has the cscmdFinalProcess value .
+   * Event.Retrieve("cmdCode") equal to cscmdProcess, then the second
+   * broadcasted event has a value of cscmdPostProcess and finally the last
+   * event broadcasted has the cscmdFinalProcess value .
    */
   virtual void RegisterListener (iEventHandler*, unsigned int trigger) = 0;
 
@@ -115,7 +115,7 @@ struct iEventQueue : public iBase
 
   /**
    * Get a public event outlet for posting just an event.
-   *<p>
+   * <p>
    * In general most modules should create their own private outlet via
    * CreateEventOutlet() and register as a normal event plug.  However, there
    * are cases when you just need to post one event from time to time; in these

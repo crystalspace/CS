@@ -123,11 +123,9 @@ struct iSndSysStream : public iBase
 
   /**
    * Returns the PAUSE state of the stream:
-   * <ul>
-   * <li>CS_SNDSYS_STREAM_PAUSED - The stream is paused.
-   * <li>CS_SNDSYS_STREAM_UNPAUSED - The stream is not paused.  AdvancePosition
-   *     is moving the stream position.
-   * </ul>
+   * - CS_SNDSYS_STREAM_PAUSED - The stream is paused.
+   * - CS_SNDSYS_STREAM_UNPAUSED - The stream is not paused.  AdvancePosition
+   *   is moving the stream position.
    */
   virtual int GetPauseState() = 0;
 
@@ -205,21 +203,21 @@ struct iSndSysStream : public iBase
    * calls AdvancePosition() - specifically the Sound System main processing
    * thread.
    *
-   * @param position_marker Should point to a long initially filled by the
+   * \param position_marker Should point to a long initially filled by the
    *        Sound System internally when a Source is created - through a call
    *        to InitializeSourcePositionMarker().
-   * @param max_requested_length Should contain the maximum number of bytes
+   * \param max_requested_length Should contain the maximum number of bytes
    *        the calling source is interested in receiving.  On return,
    *        *buffer1_length + *buffer2_length must not exceed this value.
-   * @param buffer1 should point to a (void *) that will be filled with a
+   * \param buffer1 should point to a (void *) that will be filled with a
    *        pointer to the first chunk of data on return or NULL (0) if no
    *        data is available
-   * @param buffer1_length should point to a long that will be filled with the
+   * \param buffer1_length should point to a long that will be filled with the
    *        length of valid data in the buffer pointed to by *buffer1 on return.
-   * @param buffer2 should point to a (void *) that will be filled with a
+   * \param buffer2 should point to a (void *) that will be filled with a
    *        pointer to the second chunk of data on return, or NULL (0) if no
    *        second chunk is needed.
-   * @param buffer2_length should point to a long that will be filled with the
+   * \param buffer2_length should point to a long that will be filled with the
    *        length of valid data in the buffer pointed to by *buffer1 on return.
    *
    * \remarks Not intended to be called by an application.

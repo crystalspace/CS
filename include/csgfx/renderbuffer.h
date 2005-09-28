@@ -211,7 +211,8 @@ public:
    *  csRef<iRenderBuffer> texel_buffer = buffers[1];
    * \endcode
    */
-  static csRef<iRenderBuffer> CreateInterleavedRenderBuffers (size_t elementCount, 
+  static csRef<iRenderBuffer> CreateInterleavedRenderBuffers (
+    size_t elementCount, 
     csRenderBufferType type, uint count, 
     const csInterleavedSubBufferOptions* elements, 
     csRef<iRenderBuffer>* buffers);

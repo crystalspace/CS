@@ -183,7 +183,10 @@ public:
   csEvent (csTicks, int type, uint n, int x, int y, uint32 axesChanged, 
     uint button, uint32 modifiers);
 
-  /// Create an enumerated pointer (mouse/joystick) event object (newer interface)
+  /**
+   * Create an enumerated pointer (mouse/joystick) event object (newer
+   * interface)
+   */
   csEvent (csTicks, int type, uint n, const int32 *axes, uint8 numAxes, 
 	   uint32 axesChanged, uint8 button, uint32 modifiers);
 

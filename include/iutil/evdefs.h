@@ -35,8 +35,10 @@
 #ifndef __CS_IUTIL_EVDEFS_H__
 #define __CS_IUTIL_EVDEFS_H__
 
-/// System Events
-// take care not to define more than 32 event types
+/**
+ * System Events
+ * Take care not to define more than 32 event types
+ */
 typedef enum _csEventType
 {
   /// Nothing happened	
@@ -111,8 +113,9 @@ typedef enum _csKeyEventType
 #define CSMASK_Nothing		(1 << csevNothing)
 /**
  * The plugin will be called at the start of every frame and at the
- * end of every frame with an csevBroadcast event with the Event.Retrieve("cmdCode")
- * equal to cscmdPreProcess, csProcess, cscmdPostProcess, or cscmdFinalProcess.
+ * end of every frame with an csevBroadcast event with the Event.Retrieve(
+ * "cmdCode") equal to cscmdPreProcess, csProcess, cscmdPostProcess, or
+ * cscmdFinalProcess.
  */
 #define CSMASK_FrameProcess	CSMASK_Nothing
 /// Keyboard events

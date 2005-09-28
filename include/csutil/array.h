@@ -291,7 +291,7 @@ const size_t csArrayItemNotFound = (size_t)-1;
  * the array is destroyed.
  * \note If you want to store reference-counted object pointers, such as iFoo*,
  * then you should consider csRefArray<>, which is more idiomatic than
- * csArray<csRef<iFoo>>.
+ * csArray<csRef<iFoo> >.
  */
 template <class T,
 	class ElementHandler = csArrayElementHandler<T>,

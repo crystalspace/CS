@@ -33,7 +33,7 @@
 
 /**
  * Compute a hash key for a null-terminated string.
- *
+ * <p>
  * Note that these keys are non-unique; some dissimilar strings may generate
  * the same key. For unique keys, see csStringSet.
  */
@@ -41,7 +41,7 @@ CS_CRYSTALSPACE_EXPORT unsigned int csHashCompute (char const*);
 
 /**
  * Compute a hash key for a string of a given length.
- *
+ * <p>
  * Note that these keys are non-unique; some dissimilar strings may generate
  * the same key. For unique keys, see csStringSet.
  */
@@ -309,15 +309,15 @@ public:
   /**
    * Construct a hash table with an array of the given size,
    * which for optimisation reasons should be a prime number.
-   * 
+   * <p>
    * Grow_rate is the rate at which the hash table grows:
    * Size doubles once there are size/grow_rate collisions.
    * It will not grow after it reaches max_size.
-   *
+   * <p>
    * Here are a few primes: 7, 11, 19, 29, 59, 79, 101, 127, 151, 199, 251,
    * 307, 401, 503, 809, 1009, 1499, 2003, 3001, 5003, 12263, 25247, 36923,
    * 50119, 70951, 90313, 104707.
-   *
+   * <p>
    * For a bigger list go to http://www.utm.edu/research/primes/
    */
   csHash (size_t size = 23, size_t grow_rate = 5, size_t max_size = 20000)

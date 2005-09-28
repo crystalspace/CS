@@ -50,7 +50,8 @@ struct iCommandLineParser : public iBase
   /// Clear all options and names.
   virtual void Reset () = 0;
   /// Query specific commandline option (you can query second etc. such option)
-  virtual const char *GetOption (const char *iName, size_t iIndex = 0) const = 0;
+  virtual const char *GetOption (const char *iName, size_t iIndex = 0)
+  	const = 0;
   /// Query filename specified on commandline (that is, without leading '-')
   virtual const char *GetName (size_t iIndex = 0) const = 0;
   /// Add a command-line option to the command-line option array

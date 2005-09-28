@@ -31,9 +31,9 @@ struct iString;
 SCF_VERSION (iSaver, 0, 0, 3);
 
 /**
-* This interface is used to serialize the engine
-* contents.
-*/ 
+ * This interface is used to serialize the engine
+ * contents.
+ */ 
 struct iSaver : public iBase
 {
   /// Save the current engine contents to the filename.

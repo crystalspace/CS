@@ -49,13 +49,13 @@ struct iSaverPlugin : public iBase
 SCF_VERSION (iBinarySaverPlugin, 0, 0, 1);
 
 /**
-* This is a binary plugin to save with.
-*/
+ * This is a binary plugin to save with.
+ */
 struct iBinarySaverPlugin : public iBase
 {
 /**
-* Take a given object and push description onto the given file.
-*/
+ * Take a given object and push description onto the given file.
+ */
   virtual bool WriteDown (iBase* obj, iFile *file, iStreamSource* ssource) = 0;
 };
 

@@ -101,7 +101,8 @@ public:
   inline csMatrix2 GetInverse () const
   {
     float inv_det = 1 / (m11 * m22 - m12 * m21);
-    return csMatrix2 (m22 * inv_det, -m12 * inv_det, -m21 * inv_det, m11 * inv_det);
+    return csMatrix2 (m22 * inv_det, -m12 * inv_det,
+    		      -m21 * inv_det, m11 * inv_det);
   }
 
   /// Invert this matrix.

@@ -144,15 +144,15 @@ struct iEngineSectorCallback : public virtual iBase
  * This interface is the main interface to the 3D engine.
  * The engine is responsible for creating new engine-specific objects
  * such as sectors, mesh objects, mesh object factories, lights, and so on.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   - 3D Engine plugin (crystalspace.engine.3d)
+ * - 3D Engine plugin (crystalspace.engine.3d)
  *
  * Main ways to get pointers to this interface:
- *   - CS_QUERY_REGISTRY()
+ * - CS_QUERY_REGISTRY()
  *
  * Main users of this interface:
- *   - Application.
+ * - Application.
  */
 struct iEngine : public virtual iBase
 {
@@ -322,13 +322,13 @@ struct iEngine : public virtual iBase
    * render priorities where lower numbers are rendered before higher 
    * numbers.
    * \param rendsort One of the CS_RENDPRI_... flags.
-   * By default this is #CS_RENDPRI_SORT_NONE. The following values are possible:
-   * <ul>
-   * <li>#CS_RENDPRI_SORT_NONE: objects in this render priority are not sorted.
-   * <li>#CS_RENDPRI_SORT_FRONT2BACK: sort objects front to back (as seen from
-   *     camera viewpoint).
-   * <li>#CS_RENDPRI_SORT_BACK2FRONT: sort objects back to front.
-   * </ul>
+   * By default this is #CS_RENDPRI_SORT_NONE. The following values are
+   * possible:
+   * - #CS_RENDPRI_SORT_NONE: objects in this render priority are not sorted.
+   * - #CS_RENDPRI_SORT_FRONT2BACK: sort objects front to back (as seen from
+   *   camera viewpoint).
+   * - #CS_RENDPRI_SORT_BACK2FRONT: sort objects back to front.
+   *
    * \note The default render priorities are 'sky', 'portal', 'wall', 'object' 
    * and 'alpha' (in that priority order, where sky is rendered first and 
    * alpha is rendered last).  Should you wish to add your own render 
@@ -347,9 +347,11 @@ struct iEngine : public virtual iBase
    */
   virtual long GetRenderPriority (const char* name) const = 0;
   /// Get the render priority sorting flag.
-  virtual csRenderPrioritySorting GetRenderPrioritySorting (const char* name) const = 0;
+  virtual csRenderPrioritySorting GetRenderPrioritySorting (
+  	const char* name) const = 0;
   /// Get the render priority sorting flag.
-  virtual csRenderPrioritySorting GetRenderPrioritySorting (long priority) const = 0;
+  virtual csRenderPrioritySorting GetRenderPrioritySorting (
+  	long priority) const = 0;
   /// Get the render priority for sky objects (attached to 'sky' name).
   virtual long GetSkyRenderPriority () = 0;
   /// Get the render priority for portal objects (attached to 'portal' name).
@@ -421,13 +423,12 @@ struct iEngine : public virtual iBase
    * \param transp pixels in the image with this key color will be considered
    * transparent instead of being drawn
    * \param flags One or more texturing flags OR'd together, flag include
-   * <ul>
-   * <li>CS_TEXTURE_2D image will be used only for 2D drawing
-   * <li>CS_TEXTURE_3D image will be textured onto 3D polygon
-   *     (this is almost always the flag you want)
-   * <li>CS_TEXTURE_DITHER texture will be dithered before use
-   * <li>CS_TEXTURE_NOMIPMAPS texture will not be mipmapped before use
-   * </ul>
+   * - CS_TEXTURE_2D image will be used only for 2D drawing
+   * - CS_TEXTURE_3D image will be textured onto 3D polygon
+   *   (this is almost always the flag you want)
+   * - CS_TEXTURE_DITHER texture will be dithered before use
+   * - CS_TEXTURE_NOMIPMAPS texture will not be mipmapped before use
+   *
    * \note You will need to call iTextureWrapper::Register()
    * on you new texture if you load the texture after iEngine::Prepare()
    * has been called.

@@ -194,7 +194,8 @@ struct iGenerateImageFunction : public iBase
  * This class will generate a value using a given function. For heights
  * or slopes.
  */
-class CS_CRYSTALSPACE_EXPORT csGenerateImageValueFunc : public csGenerateImageValue
+class CS_CRYSTALSPACE_EXPORT csGenerateImageValueFunc
+	: public csGenerateImageValue
 {
 private:
   /// Height or slope function.

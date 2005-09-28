@@ -376,7 +376,8 @@ struct iParticlesPhysics : public iBase
   /**
    * Register a particles object with the physics plugin
    */
-  virtual const csArray<csParticlesData> *RegisterParticles (iParticlesObjectState *particles) = 0;
+  virtual const csArray<csParticlesData> *RegisterParticles (
+  	iParticlesObjectState *particles) = 0;
 
   /**
    * Remove a particles object from the physics plugin

@@ -53,28 +53,27 @@ struct iSector;
 
 SCF_VERSION (iVosObject3D, 0, 1, 1);
 
-/** This interface bridges between a VOS 3D object and the Crystal
-    Space mesh wrapper created for that object.
-    @bug presently this isn't very useful since nothing yet returns this
-    interface.  Obviously that will change as the iVosSector interface
-    is fleshed out (or an alternate interface is introduced instead of this...).
-*/
+/**
+ * This interface bridges between a VOS 3D object and the Crystal
+ * Space mesh wrapper created for that object.
+ * @bug presently this isn't very useful since nothing yet returns this
+ * interface.  Obviously that will change as the iVosSector interface
+ * is fleshed out (or an alternate interface is introduced instead of this...).
+ */
 struct iVosObject3D : public virtual iBase
 {
   /** Get the iMeshWrapper for this Object3D. */
   virtual csRef<iMeshWrapper> GetMeshWrapper() = 0;
 
-  /** Get the iRigidBody collider for this Object3D. This can be used to
-   *  control the forces o the object - useful for avatars
+  /**
+   * Get the iRigidBody collider for this Object3D. This can be used to
+   * control the forces o the object - useful for avatars
    *
-   *  This will return no object if there is no iDynamicsSystem registered in
-   *  the object registry
+   * This will return no object if there is no iDynamicsSystem registered in
+   * the object registry
    */
   virtual csRef<iRigidBody> GetCollider() = 0;
 };
-
-
-
 
 SCF_VERSION (iVosSector, 0, 3, 1);
 
@@ -82,21 +81,25 @@ SCF_VERSION (iVosSector, 0, 3, 1);
     sector. */
 struct iVosSector : public virtual iBase
 {
-  /** Begin loading this sector in the background.  Network activity
-      occurs in another thread, so this method returns immediately.
-      An event is posted to the global event queue when the download is complete.
-      @param progress if supplied, this will be called back (in the CS thread)
-      periodically to indicate download progress
-  */
+  /**
+   * Begin loading this sector in the background.  Network activity
+   * occurs in another thread, so this method returns immediately.
+   * An event is posted to the global event queue when the download is complete.
+   * \param progress if supplied, this will be called back (in the CS thread)
+   * periodically to indicate download progress
+   */
   virtual void Load(iProgressMeter* progress = 0) = 0;
 
-  /** Get the Crystal Space iSector for this sector.  This will be
-      empty until Load() is called. */
+  /**
+   * Get the Crystal Space iSector for this sector.  This will be
+   * empty until Load() is called.
+   */
   virtual csRef<iSector> GetSector() = 0;
 
-  /** Get the list of object3ds which have been loaded into this sector. This
-   *  list will change in size as objects are loaded and removed - does not
-   *  represent the list of objects in the A3DL sector
+  /**
+   * Get the list of object3ds which have been loaded into this sector. This
+   * list will change in size as objects are loaded and removed - does not
+   * represent the list of objects in the A3DL sector
    */
   virtual const csSet< csPtrKey<iVosObject3D> > &GetObject3Ds() = 0;
 
@@ -109,39 +112,41 @@ struct iVosSector : public virtual iBase
 
 SCF_VERSION (iVosA3DL, 0, 1, 2);
 
-/** This is the initial component you retrieve from the registry to
-    access the VOS A3DL plugin.  Here's how to get it:
-    @code
-    csInitializer::RequestPlugins (object_reg,
-      ...
-      CS_REQUEST_PLUGIN("crystalspace.network.vos.a3dl", iVosA3DL),
-      ...
-      CS_REQUEST_END)
-
-    ...
-
-    csRef<iVosA3DL> vosa3dl = CS_QUERY_REGISTRY (object_reg, iVosA3DL);
-    @endcode
-
+/**
+ * This is the initial component you retrieve from the registry to
+ * access the VOS A3DL plugin.  Here's how to get it:
+ * @code
+ * csInitializer::RequestPlugins (object_reg,
+ *   ...
+ *   CS_REQUEST_PLUGIN("crystalspace.network.vos.a3dl", iVosA3DL),
+ *   ...
+ *   CS_REQUEST_END)
+ *
+ *  ...
+ *
+ * csRef<iVosA3DL> vosa3dl = CS_QUERY_REGISTRY (object_reg, iVosA3DL);
+ * @endcode
  */
 struct iVosA3DL : public virtual iBase
 {
-  /** Get a VOS sector given a VOS URL (such as
-      "vip://interreality.org/world") for a sector object.  Doesn't
-      load it (call iVosSector::Load() to do that).
-      @param url the VOS url to the sector object 
-      @return the iVosSector wrapper
-      @bug no way (yet) to specify specific failure in accessing sector
-      (just returns an empty csRef)
+  /**
+   * Get a VOS sector given a VOS URL (such as
+   * "vip://interreality.org/world") for a sector object.  Doesn't
+   * load it (call iVosSector::Load() to do that).
+   * \param url the VOS url to the sector object 
+   * \return the iVosSector wrapper
+   * @bug no way (yet) to specify specific failure in accessing sector
+   * (just returns an empty csRef)
    */
   virtual csRef<iVosSector> GetSector(const char* url) = 0;
 
-  /** Takes a URL path for an A3DL::Object3D Vobject and returns
-      the iVosObject3D interface (suitable for fetching the mesh wrapper).
-      As of this writing, it does not load the object into the engine,
-      it must be loaded by loading the sector it is in.
-      @param url the url path to the object to fetch
-      @return the iVosObject3D wrapper
+  /**
+   * Takes a URL path for an A3DL::Object3D Vobject and returns
+   * the iVosObject3D interface (suitable for fetching the mesh wrapper).
+   * As of this writing, it does not load the object into the engine,
+   * it must be loaded by loading the sector it is in.
+   * \param url the url path to the object to fetch
+   * \return the iVosObject3D wrapper
    */
   virtual csRef<iVosObject3D> FindVosObject3D(const char* url) = 0;
 };

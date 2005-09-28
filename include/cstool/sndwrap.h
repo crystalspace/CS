@@ -26,7 +26,10 @@
 #include "csutil/csobject.h"
 #include "isound/wrapper.h"
 
-/// Document me and possible move me to some sound manager! @@@
+/**
+ * Document me and possible move me to some sound manager! @@@
+ * \deprecated
+ */
 class CS_CRYSTALSPACE_EXPORT csSoundWrapper : public csObject
 {
 protected:

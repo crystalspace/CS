@@ -71,9 +71,11 @@ struct iSndSysSoftwareDriver : public iBase
   /// Candidate functions 
 
   // virtual vool DriverProvidesThread() = 0;
-  //  The Sound System always needs its own background thread, but in some instances the low level interface to the OS based sound system
-  //   can provide more accurate buffer fill requests through callbacks or some other mechanism.  Since only the driver code knows about this, and since
-  //   we would like to use the most accurate method possible, 
+  //  The Sound System always needs its own background thread, but in some
+  //  instances the low level interface to the OS based sound system
+  //   can provide more accurate buffer fill requests through callbacks or
+  //   some other mechanism.  Since only the driver code knows about this,
+  //   and since we would like to use the most accurate method possible, 
 
 
   /// Functions below this point are likely to be removed due to redesign

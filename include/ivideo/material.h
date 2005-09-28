@@ -59,19 +59,15 @@ SCF_VERSION (iMaterial, 0, 1, 0);
  * This class represents a material as seen from the engine
  * view. Because it is also a shader variable context it can be used directly 
  * for rendering.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iEngine::CreateBaseMaterial()
- *   </ul>
+ * - iEngine::CreateBaseMaterial()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iMaterialWrapper::GetMaterial()
- *   </ul>
+ * - iMaterialWrapper::GetMaterial()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>3D renderer implementations (iGraphics3D).
- *   </ul>
+ * - 3D renderer implementations (iGraphics3D).
  */
 struct iMaterial : public iShaderVariableContext
 {

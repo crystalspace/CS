@@ -100,8 +100,8 @@ struct iImageIO : public virtual iBase
    * Those options consist of a comma-separated list and can be either 'option' 
    * or 'option=value'. The available options vary from plugin to plugin, some
    * common ones are:<p>
-   * <code>compress=#</code> - Set image compression, from 0..100. Higher values 
-   * give smaller files, but at the expense of quality(e.g. JPEG) or 
+   * <code>compress=#</code> - Set image compression, from 0..100. Higher
+   * values give smaller files, but at the expense of quality(e.g. JPEG) or 
    * speed(e.g. PNG).<br>
    * <code>progressive</code> - Progressive/interlaced encoding.<p>
    * Examples:<br>

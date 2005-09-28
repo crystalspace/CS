@@ -35,20 +35,18 @@
  * `operator char const*()' in calls to functions expecting C strings.  The
  * implicit null terminator is not included in the character count returned by
  * Length().
- *
+ * <p>
  * Like a typical C character string pointer, csStringBase can also represent a
  * null pointer.  This allows a non-string to be distinguished from an empty
  * (zero-length) string.  The csStringBase will represent a null-pointer in the
  * following cases:
- * <ul>
- * <li>When constructed with no arguments (the default constructor).
- * <li>When constructed with an explicit null-pointer.
- * <li>When assigned a null-pointer via operator=((char const*)0).
- * <li>After an invocation of Replace((char const*)0).
- * <li>After invocation of csStringBase::Free() or any method which is
- *     documented as invoking Free() as a side-effect, such as ShrinkBestFit().
- * <li>After invocation of csStringBase::Detach().
- * </ul>
+ * - When constructed with no arguments (the default constructor).
+ * - When constructed with an explicit null-pointer.
+ * - When assigned a null-pointer via operator=((char const*)0).
+ * - After an invocation of Replace((char const*)0).
+ * - After invocation of csStringBase::Free() or any method which is
+ *   documented as invoking Free() as a side-effect, such as ShrinkBestFit().
+ * - After invocation of csStringBase::Detach().
  */
 class CS_CRYSTALSPACE_EXPORT csStringBase
 {
@@ -217,8 +215,8 @@ public:
    * \remarks The newly constructed string will represent a null-pointer if and
    *   only if the input argument is a null-pointer.
    */
-  csStringBase (const char* src, size_t _length) : Data (0), Size (0), MaxSize (0),
-    GrowBy (DEFAULT_GROW_BY)
+  csStringBase (const char* src, size_t _length) : Data (0), Size (0),
+  	MaxSize (0), GrowBy (DEFAULT_GROW_BY)
   { Append (src, _length); }
 
   /// Create a csStringBase object from a single signed character.
@@ -1061,7 +1059,8 @@ public:
   csStringFast (size_t Length) : csStringBase(Length) { }
   csStringFast (const csStringBase& copy) : csStringBase (copy) { }
   csStringFast (const char* src) : csStringBase(src) { }
-  csStringFast (const char* src, size_t _length) : csStringBase(src, _length) { }
+  csStringFast (const char* src, size_t _length) : csStringBase(src, _length)
+  { }
   csStringFast (char c) : csStringBase(c) { }
   csStringFast (unsigned char c) : csStringBase(c) { }
   const csStringFast& operator = (const csStringBase& copy)

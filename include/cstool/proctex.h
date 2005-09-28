@@ -170,11 +170,10 @@ public:
    * Do everything needed to initialize this texture.
    * At this stage only will settings like the key color be used.
    * The correct init sequence is:
-   * <ul>
-   * <li>csProcTexture::Initialize()
-   * <li>iTextureWrapper::Register()
-   * <li>csProcTexture::PrepareAnim()
-   * </ul>
+   * - csProcTexture::Initialize()
+   * - iTextureWrapper::Register()
+   * - csProcTexture::PrepareAnim()
+   *
    * Alternatively you can use Initialize(engine,name) which does all this
    * work for you.
    */

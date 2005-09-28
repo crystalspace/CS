@@ -282,11 +282,10 @@ public:
   /**
    * Combine two transforms, rightmost first. Given the following
    * definitions:
-   * <ul>
-   * <li>'t1' expressed as T=t1.M*(O-t1.V)
-   * <li>'t2' expressed as T=t2.M*(O-t2.V)
-   * <li>t2.Minv is the inverse of t2.M
-   * </ul>
+   * - 't1' expressed as T=t1.M*(O-t1.V)
+   * - 't2' expressed as T=t2.M*(O-t2.V)
+   * - t2.Minv is the inverse of t2.M
+   *
    * Then this will return a new transform
    * T=(t1.M*t2.M)*(O-(t2.V+t2.Minv*t1.V)).
    */
@@ -534,12 +533,11 @@ public:
   /**
    * Combine two transforms, rightmost first. Given the following
    * definitions:
-   * <ul>
-   * <li>'t1' expressed as T=t1.M*(O-t1.V)
-   * <li>'t2' expressed as T=t2.M*(O-t2.V)
-   * <li>t1.Minv is the inverse of t1.M
-   * <li>t2.Minv is the inverse of t2.M
-   * </ul>
+   * - 't1' expressed as T=t1.M*(O-t1.V)
+   * - 't2' expressed as T=t2.M*(O-t2.V)
+   * - t1.Minv is the inverse of t1.M
+   * - t2.Minv is the inverse of t2.M
+   *
    * Then this will calculate a new transformation in 't1' as follows:
    * T=(t1.M*t2.M)*(O-(t2.Minv*t1.V+t2.V)).
    */
@@ -556,12 +554,11 @@ public:
   /**
    * Combine two transforms, rightmost first. Given the following
    * definitions:
-   * <ul>
-   * <li>'t1' expressed as T=t1.M*(O-t1.V)
-   * <li>'t2' expressed as T=t2.M*(O-t2.V)
-   * <li>t1.Minv is the inverse of t1.M
-   * <li>t2.Minv is the inverse of t2.M
-   * </ul>
+   * - 't1' expressed as T=t1.M*(O-t1.V)
+   * - 't2' expressed as T=t2.M*(O-t2.V)
+   * - t1.Minv is the inverse of t1.M
+   * - t2.Minv is the inverse of t2.M
+   *
    * Then this will calculate a new transformation in 't1' as follows:
    * T=(t1.M*t2.M)*(O-(t2.Minv*t1.V+t2.V)).
    */
@@ -576,12 +573,11 @@ public:
   /**
    * Combine two transforms, rightmost first. Given the following
    * definitions:
-   * <ul>
-   * <li>'t1' expressed as T=t1.M*(O-t1.V)
-   * <li>'t2' expressed as T=t2.M*(O-t2.V)
-   * <li>t1.Minv is the inverse of t1.M
-   * <li>t2.Minv is the inverse of t2.M
-   * </ul>
+   * - 't1' expressed as T=t1.M*(O-t1.V)
+   * - 't2' expressed as T=t2.M*(O-t2.V)
+   * - t1.Minv is the inverse of t1.M
+   * - t2.Minv is the inverse of t2.M
+   *
    * Then this will calculate a new transformation in 't1' as follows:
    * T=(t1.M*t2.M)*(O-(t2.Minv*t1.V+t2.V)).
    */
@@ -592,12 +588,11 @@ public:
   /**
    * Combine two transforms, reversing t2 then applying t1.
    * Given the following definitions:
-   * <ul>
-   * <li>'t1' expressed as T=t1.M*(O-t1.V)
-   * <li>'t2' expressed as T=t2.M*(O-t2.V)
-   * <li>t1.Minv is the inverse of t1.M
-   * <li>t2.Minv is the inverse of t2.M
-   * </ul>
+   * - 't1' expressed as T=t1.M*(O-t1.V)
+   * - 't2' expressed as T=t2.M*(O-t2.V)
+   * - t1.Minv is the inverse of t1.M
+   * - t2.Minv is the inverse of t2.M
+   *
    * Then this will calculate a new transformation in 't1' as follows:
    * T=(t1.M*t2.Minv)*(O-(t2.M*(t1.V-t2.V))).
    */
@@ -607,12 +602,11 @@ public:
   /**
    * Combine two transforms, reversing t2 then applying t1.
    * Given the following definitions:
-   * <ul>
-   * <li>'t1' expressed as T=t1.M*(O-t1.V)
-   * <li>'t2' expressed as T=t2.M*(O-t2.V)
-   * <li>t1.Minv is the inverse of t1.M
-   * <li>t2.Minv is the inverse of t2.M
-   * </ul>
+   * - 't1' expressed as T=t1.M*(O-t1.V)
+   * - 't2' expressed as T=t2.M*(O-t2.V)
+   * - t1.Minv is the inverse of t1.M
+   * - t2.Minv is the inverse of t2.M
+   *
    * Then this will calculate a new transformation in 't1' as follows:
    * T=(t1.M*t2.Minv)*(O-(t2.M*(t1.V-t2.V))).
    */

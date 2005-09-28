@@ -74,7 +74,8 @@ public:
 /**
  * A databuffer pointing into another databuffer.
  */
-class CS_CRYSTALSPACE_EXPORT csParasiticDataBuffer : public csParasiticDataBufferBase
+class CS_CRYSTALSPACE_EXPORT csParasiticDataBuffer
+	: public csParasiticDataBufferBase
 {
 public:
     SCF_DECLARE_IBASE;

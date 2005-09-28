@@ -44,14 +44,12 @@ struct csFileTime;
  * these until Flush() will be called.
  * <p>
  * Known quirks:
- * <ul>
- * <li>No CRC check is done on reading, although ZIP file format allows it.
- *     This design 'flaw' was allowed to achieve maximal speed. However, when
- *     a file is added to archive, its CRC is computed and updated correctly.
- * <li>Several methods of the csArchive class requires approximatively 20K of
- *     stack space when invoked.
- * <li>Doesn't like files >4GB.
- * </ul>
+ * - No CRC check is done on reading, although ZIP file format allows it.
+ *   This design 'flaw' was allowed to achieve maximal speed. However, when
+ *   a file is added to archive, its CRC is computed and updated correctly.
+ * - Several methods of the csArchive class requires approximatively 20K of
+ *   stack space when invoked.
+ * - Doesn't like files >4GB.
  */
 class CS_CRYSTALSPACE_EXPORT csArchive
 {
@@ -87,7 +85,8 @@ private:
   friend class ArchiveEntry;
 
   /// A vector of ArchiveEntries
-  class CS_CRYSTALSPACE_EXPORT ArchiveEntryVector : public csPDelArray<ArchiveEntry>
+  class CS_CRYSTALSPACE_EXPORT ArchiveEntryVector
+  	: public csPDelArray<ArchiveEntry>
   {
   public:
     ArchiveEntryVector () : csPDelArray<ArchiveEntry> (256, 256) {}
@@ -224,7 +223,7 @@ inline void csArchive::GetFileTime (void *entry, csFileTime &ztime) const
     UnpackTime (((ArchiveEntry*)entry)->info.last_mod_file_date,
                 ((ArchiveEntry*)entry)->info.last_mod_file_time,
                 ztime);
-  } /* endif */
+  }
 }
 
 inline void csArchive::SetFileTime (void *entry, const csFileTime &ztime)
@@ -234,7 +233,7 @@ inline void csArchive::SetFileTime (void *entry, const csFileTime &ztime)
     PackTime (ztime,
               ((ArchiveEntry*)entry)->info.last_mod_file_date,
               ((ArchiveEntry*)entry)->info.last_mod_file_time);
-  } /* endif */
+  }
 }
 
 #endif // __CS_ARCHIVE_H__

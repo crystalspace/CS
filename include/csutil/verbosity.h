@@ -82,19 +82,18 @@ class csStringArray;
  * in the absence of <tt>--verbose</tt> on the command-line.
  * <p>
  * Examples:
- * <ul>
- * <li><tt>--verbose</tt> Enables verbosity for all modules.</li>
- * <li><tt>--verbose=scf,vfs</tt> Enables verbosity for only `scf' and
+ * - <tt>--verbose</tt> Enables verbosity for all modules.</li>
+ * - <tt>--verbose=scf,vfs</tt> Enables verbosity for only `scf' and
  *     `vfs'.</li>
- * <li><tt>--verbose=-scf,-vfs</tt> Enables verbosity for all modules except
+ * - <tt>--verbose=-scf,-vfs</tt> Enables verbosity for all modules except
  *     `scf' and `vfs'.</li>
- * <li><tt>--verbose=+scf.register.class</tt> Enables verbosity for only
+ * - <tt>--verbose=+scf.register.class</tt> Enables verbosity for only
  *     `scf.register.class'.</li>
- * <li><tt>--verbose=+scf,-scf.register,+scf.register.class</tt> Enables
+ * - <tt>--verbose=+scf,-scf.register,+scf.register.class</tt> Enables
  *     verbosity for only `scf' and its children except `scf.register' or any
  *     of its children other than `scf.register.class which is explicitly
  *     enabled.</li>
- * </ul>
+ *
  * \sa csVerbosityManager
  * \sa csCheckVerbosity
  * \sa csParseVerbosity;

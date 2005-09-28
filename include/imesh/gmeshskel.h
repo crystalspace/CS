@@ -60,7 +60,6 @@ SCF_VERSION  (iGenMeshSkeletonControlState, 0, 0, 1);
  * control as implemented by the 'gmeshskelanim' plugin. The objects that
  * implement iGenMeshSkeletonControlState also implement this interface.
  */
-
 struct iGenMeshSkeletonControlState : public iBase
 {
   /**
@@ -153,6 +152,9 @@ struct iGenMeshSkeletonControlState : public iBase
 
 SCF_VERSION  (iGenMeshSkeletonControlFactory, 0, 0, 1);
 
+/**
+ * @@@ Document me
+ */
 struct iGenMeshSkeletonControlFactory: public iGenMeshAnimationControlFactory 
 {
   /**
@@ -228,7 +230,8 @@ struct iGenMeshSkeletonBone : public iBase
   /**
    * Attach rigid body to bone.
    */
-  virtual void SetRigidBody (iRigidBody *r_body, csReversibleTransform & offset_transform) = 0;
+  virtual void SetRigidBody (iRigidBody *r_body,
+  	csReversibleTransform & offset_transform) = 0;
 
   /**
    * Get attached rigid body.
@@ -253,7 +256,8 @@ struct iGenMeshSkeletonBone : public iBase
   /**
    * Set bone callback fuction.
    */
-  virtual void SetUpdateCallback (iGenMeshSkeletonBoneUpdateCallback *callback) = 0;
+  virtual void SetUpdateCallback (
+  	iGenMeshSkeletonBoneUpdateCallback *callback) = 0;
 
   /**
    * Get bone callback fuction.
@@ -263,13 +267,20 @@ struct iGenMeshSkeletonBone : public iBase
 
 SCF_VERSION  (iGenMeshSkeletonBoneUpdateCallback, 0, 0, 1);
 
+/**
+ * @@@ Document me
+ */
 struct iGenMeshSkeletonBoneUpdateCallback : public iBase
 {
-	virtual void UpdateTransform(iGenMeshSkeletonBone *bone, const csReversibleTransform & transform) = 0;
+  virtual void UpdateTransform(iGenMeshSkeletonBone *bone,
+		const csReversibleTransform & transform) = 0;
 };
 
 SCF_VERSION  (iGenMeshSkeletonScript, 0, 0, 1);
 
+/**
+ * @@@ Document me
+ */
 struct iGenMeshSkeletonScript : public iBase
 {
   /**
@@ -302,7 +313,7 @@ struct iGenMeshSkeletonScript : public iBase
    * Also we have to make time synchronization.
    * 
    * Here are the steps for trnasformation separated by time:
-   *
+   * <pre>
    *   0ms walk.time = 1000 walk.factor = 1
    *       run.time  = 1000 run.factor  = 0
    *
@@ -320,6 +331,7 @@ struct iGenMeshSkeletonScript : public iBase
    *
    * 500ms walk.time =  500 walk.factor = 0 //or just remove "walk" script
    *       run.time  =  500 run.factor  = 1
+   * </pre>
    */
 
   /**

@@ -85,7 +85,13 @@ public:
   { red *= c.red; green *= c.green; blue *= c.blue; return *this; }
   /// Multiply this color by a scalar, return result
   csColor operator * (const float f)
-  { csColor ret; ret.red = red*f; ret.green = green*f; ret.blue = blue*f; return ret; }
+  {
+    csColor ret;
+    ret.red = red*f;
+    ret.green = green*f;
+    ret.blue = blue*f;
+    return ret;
+  }
   /// Compare equality of two colors
   bool operator== (const csColor& c) const
   { return red == c.red && green == c.green && blue == c.blue; }
@@ -156,7 +162,13 @@ public:
   }
   /// Assign one color object to another.
   csColor4& operator= (const csColor4& c)
-  { red = c.red; green = c.green; blue = c.blue; alpha = c.alpha; return *this; }
+  {
+    red = c.red;
+    green = c.green;
+    blue = c.blue;
+    alpha = c.alpha;
+    return *this;
+  }
   /// Assign one color object to another/.
   csColor4& operator= (const csColor& c)
   { red = c.red; green = c.green; blue = c.blue; alpha = 1.0f; return *this; }
@@ -165,22 +177,44 @@ public:
   { red *= f; green *= f; blue *= f; alpha *= f; return *this; }
   /// Add another color to this one.
   csColor4& operator+= (const csColor4& c)
-  { red += c.red; green += c.green; blue += c.blue; alpha += c.alpha; return *this; }
+  {
+    red += c.red;
+    green += c.green;
+    blue += c.blue;
+    alpha += c.alpha;
+    return *this;
+  }
   /// Add another color to this one.
   csColor4& operator+= (const csColor& c)
   { red += c.red; green += c.green; blue += c.blue; return *this; }
   /// Subtract another color to this one.
   csColor4& operator-= (const csColor4& c)
-  { red -= c.red; green -= c.green; blue -= c.blue; alpha -= c.alpha; return *this; }
+  {
+    red -= c.red;
+    green -= c.green;
+    blue -= c.blue;
+    alpha -= c.alpha;
+    return *this;
+  }
   /// Subtract another color to this one.
   csColor& operator-= (const csColor& c)
   { red -= c.red; green -= c.green; blue -= c.blue; return *this; }
   /// Compare equality of two colors
   bool operator== (const csColor4& c) const
-  { return red == c.red && green == c.green && blue == c.blue && alpha == c.alpha; }
+  {
+    return red == c.red &&
+    	   green == c.green &&
+	   blue == c.blue &&
+	   alpha == c.alpha;
+  }
   /// Compare inequality of two colors
   bool operator!= (const csColor4& c) const
-  { return red != c.red || green != c.green || blue != c.blue || alpha != c.alpha; }
+  {
+    return red != c.red ||
+    	   green != c.green ||
+	   blue != c.blue ||
+	   alpha != c.alpha;
+  }
 };
 
 /// Multiply a color by a scalar value.

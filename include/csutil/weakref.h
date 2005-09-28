@@ -39,10 +39,8 @@ struct iBase;
  * <p>
  * Note: this class assumes that the T type implements at least the following
  * functions:
- * <ul>
- * <li>AddRefOwner()
- * <li>RemoveRefOwner()
- * </ul>
+ * - AddRefOwner()
+ * - RemoveRefOwner()
  */
 template <class T>
 class csWeakRef

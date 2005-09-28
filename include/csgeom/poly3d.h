@@ -160,7 +160,10 @@ public:
    * Add a vertex (3D) to the polygon.
    * Return index of added vertex.
    */
-  inline size_t AddVertex (const csVector3& v) { return AddVertex (v.x, v.y, v.z); }
+  inline size_t AddVertex (const csVector3& v)
+  {
+    return AddVertex (v.x, v.y, v.z);
+  }
 
   /**
    * Add a vertex (3D) to the polygon.

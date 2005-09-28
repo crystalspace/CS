@@ -32,13 +32,14 @@
  * again. So locking a mutex can happen by creating a MutexLock object on the
  * stack. The compiler will then take care that the Unlock calls will be done
  * in each case.
- * Example:
+ * \code
  *   void Myfunc() {
  *      csScopedMutexLock lock(mymutex);
  *      do something special
  *
  *      return;
  *  }
+ * \endcode
  */
 class CS_CRYSTALSPACE_EXPORT csScopedMutexLock
 {

@@ -62,7 +62,7 @@ public:
  * Defines a simple memory-mapped IO class that is portable.
  */  
 class CS_CRYSTALSPACE_EXPORT csMemoryMappedIO : public csPlatformMemoryMapping,
-                                                 public csRefCount
+                                                public csRefCount
 {
 private:
   /// Set to true if this object is valid

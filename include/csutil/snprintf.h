@@ -22,7 +22,8 @@ extern CS_CRYSTALSPACE_EXPORT int cs_snprintf (char* buf, size_t bufSize,
  * Portable implementation of vsnprintf()
  * \sa \ref FormatterNotes
  */
-extern CS_CRYSTALSPACE_EXPORT int cs_vsnprintf (char *, size_t, const char *, va_list)
+extern CS_CRYSTALSPACE_EXPORT int cs_vsnprintf (char *, size_t, const char *,
+	va_list)
     CS_GNUC_PRINTF (3, 0);
 /**
  * Portable implementation of asprintf().

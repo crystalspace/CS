@@ -138,11 +138,14 @@ public:
   friend CS_CRYSTALSPACE_EXPORT float operator* (const csVector2& v1, 
     const csVector2& v2);
   /// Multiply a vector and a scalar.
-  friend CS_CRYSTALSPACE_EXPORT csVector2 operator* (const csVector2& v, float f);
+  friend CS_CRYSTALSPACE_EXPORT csVector2 operator* (const csVector2& v,
+  	float f);
   /// Multiply a vector and a scalar.
-  friend CS_CRYSTALSPACE_EXPORT csVector2 operator* (float f, const csVector2& v);
+  friend CS_CRYSTALSPACE_EXPORT csVector2 operator* (float f,
+  	const csVector2& v);
   /// Divide a vector by a scalar.
-  friend CS_CRYSTALSPACE_EXPORT csVector2 operator/ (const csVector2& v, float f);
+  friend CS_CRYSTALSPACE_EXPORT csVector2 operator/ (const csVector2& v,
+  	float f);
   /// Check if two vectors are equal.
   friend CS_CRYSTALSPACE_EXPORT bool operator== (const csVector2& v1, 
     const csVector2& v2);

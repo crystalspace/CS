@@ -236,11 +236,10 @@ public:
    * vector will be modified to reflect the maximum new position that the
    * object could move to without colliding with something. This function
    * will return:
-   * <ul>
-   * <li>-1 if the object could not move at all (i.e. stuck at start position).
-   * <li>0 if the object could not move fully to the desired position.
-   * <li>1 if the object can move unhindered to the end position.
-   * </ul>
+   * - -1 if the object could not move at all (i.e. stuck at start position).
+   * - 0 if the object could not move fully to the desired position.
+   * - 1 if the object can move unhindered to the end position.
+   *
    * <p>
    * This function will reset the collision pair array. If there was a
    * collision along the way the array will contain the information for
@@ -361,7 +360,7 @@ private:
   /**
    * Performs the collision detection for the provided csColliderWrapper vs
    * all nearby objects.
-   *<p>
+   * <p>
    * This function gets all nearby objects, crossing sector bounds. It compares
    * for collisions. If a collision is found, it follows a line segment from
    * the "old" position of the Mesh (described by cdstart) to the position of
@@ -381,7 +380,7 @@ private:
   /**
    * Performs the collision detection for the provided csColliderWrapper vs
    * all nearby objects and gives the furthest point that will not collide.
-   *<p>
+   * <p>
    * This function calls CollisionDetect each time splitting the range
    * between the 'new' position and the original position of the object and
    * testing the point in the middle. This finds the point of first contact to

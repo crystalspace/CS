@@ -21,7 +21,7 @@
 #define __CS_CSUTIL_VFSPLAT_H__
 
 /**\file
- * VFS platform specifica
+ * VFS platform specific
  */
 
 #include "csextern.h"

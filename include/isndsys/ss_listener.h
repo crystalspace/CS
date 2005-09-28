@@ -60,8 +60,6 @@ struct iSndSysListener : public iBase
   virtual float GetRollOffFactor () = 0;
   /// Get type of environment where 'live' listener
   //virtual csSoundEnvironment GetEnvironment () = 0;
-
-
 };
 
 /** @} */

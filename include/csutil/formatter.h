@@ -60,14 +60,13 @@
  * for string formatting, across all platforms supported by CS.
  * The format specifiers supported by csPrintfFormatter<> are basically the
  * same as supported by glibc. Some notable aspects are summed up here.
- *
  * - For \c size_t, \c intmax_t, \c ptrdiff_t and \c longlong arguments, the 
  *   '<tt>z</tt>', '<tt>j</tt>', '<tt>t</tt>' and '<tt>ll</tt>' modifiers are 
  *   supported.
- * - char* strings ("<tt>%s</tt>") are expected to be UTF-8 encoded - likewise,
- *   char* formatting results will usually be encoded in UTF-8.
- * - To format explicitly sized types (like \c uint32) the PRIX99 macros should
- *   be used, e.g.:
+ * - char* strings ("<tt>%s</tt>") are expected to be UTF-8 encoded -
+ *   likewise, char* formatting results will usually be encoded in UTF-8.
+ * - To format explicitly sized types (like \c uint32) the PRIX99 macros
+ *   should be used, e.g.:
  *   \code
  *   uint16 myUI16 = 0xabcd;
  *   csPrintf ("%" PRIu16, myUI16);
@@ -1316,7 +1315,8 @@ public:
 	  }
 	  break;
 	case convGetNum:
-	  *((int*)(params[currentFormat.paramIdx].vPtr)) = (int)writer.GetTotal();
+	  *((int*)(params[currentFormat.paramIdx].vPtr))
+	  	= (int)writer.GetTotal();
 	  break;
 	case convErrno:
 	  OutputString (writer, currentFormat, 

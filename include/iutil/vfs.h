@@ -103,11 +103,9 @@ struct csFileTime
 
 /**
  * A replacement for FILE type in the virtual file space.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iVFS::Open()
- *   </ul>
+ * - iVFS::Open()
  */
 struct iFile : public virtual iBase
 {
@@ -180,15 +178,14 @@ struct iFile : public virtual iBase
  * Space engine to access the files. This gives unified control over the
  * way how files are found, read and written. VFS gives the following
  * goodies over the standard file i/o functions:
- * <ul>
- * <li>Multiple search directories. Several "real" directories can be
- *     collected together into one "virtual" directory.
- * <li>Directories can be mapped to "real" directories as well as to
- *     archives (.zip files). Files are compressed/decompressed
- *     transparently for clients.
- * <li>The Virtual File System is unique across all operating systems
- *     Crystal Space supports, no matter of features of the underlying OS.
- * </ul>
+ * - Multiple search directories. Several "real" directories can be
+ *   collected together into one "virtual" directory.
+ * - Directories can be mapped to "real" directories as well as to
+ *   archives (.zip files). Files are compressed/decompressed
+ *   transparently for clients.
+ * - The Virtual File System is unique across all operating systems
+ *   Crystal Space supports, no matter of features of the underlying OS.
+ *
  * This class has only most basic features of a real filesystem: file
  * reading and writing (no simultaneous read and write mode are allowed
  * because it would be rather complex to implement it for archives).
@@ -198,15 +195,12 @@ struct iFile : public virtual iBase
  * virtual directory is implemented; however the user is presented with
  * only a list of file names; no fancy things like file size, time etc
  * (file size can be determined after opening it for reading).
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>The VFS plugin (crystalspace.kernel.vfs)
- *   </ul>
+ * - The VFS plugin (crystalspace.kernel.vfs)
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>CS_QUERY_REGISTRY()
- *   </ul>
+ * - CS_QUERY_REGISTRY()
  */
 struct iVFS : public virtual iBase
 {
@@ -355,16 +349,15 @@ struct iVFS : public virtual iBase
   /**
    * Convenience function to set the current VFS directory to the given path.
    * The path can be any of the following:
-   * <ul>
-   * <li>A valid VFS path. In that case this is equivalent to calling
-   *     ChDir(path).
-   * <li>A real path (using '/', '\', or '$/' for path delimiter). In this
-   *     case this path will be mounted on the 'vfspath' parameter and a
-   *     ChDir(vfspath) will happen.
-   * <li>A real path to a zip file. In this case the zip file will
-   *     be mounted on the 'vfspath' parameter and a ChDir(vfspath) will
-   *     happen.
-   * </ul>
+   * - A valid VFS path. In that case this is equivalent to calling
+   *   ChDir(path).
+   * - A real path (using '/', '\', or '$/' for path delimiter). In this
+   *   case this path will be mounted on the 'vfspath' parameter and a
+   *   ChDir(vfspath) will happen.
+   * - A real path to a zip file. In this case the zip file will
+   *   be mounted on the 'vfspath' parameter and a ChDir(vfspath) will
+   *   happen.
+   *
    * \param path is the path to mount (VFS, real, zip, ...)
    * \param paths is an array of possible vfs paths to also look in
    *        for the given file. This can an empty array or 0. If not empty

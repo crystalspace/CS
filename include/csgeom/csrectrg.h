@@ -47,7 +47,7 @@ const int FRAGMENT_BUFFER_SIZE=64;
  * the same area.  The idea being that you need to be able to have a number of
  * disparate rectangular regions for updates.  This class uses csRect for
  * nearly all rectangle operations.
- *<p>
+ * <p>
  * To use you can Include and Exclude rectangles from this region.  When
  * finished, this class will have a list of optimal rectangles that occupy a
  * region.  If used properly, it will result in faster overall painting
@@ -73,7 +73,10 @@ protected:
   void deleteRect(int);
 
 
-  /// Controls fragmentContainedRect, used to perform all-side clipping and edge intersection.
+  /**
+   * Controls fragmentContainedRect, used to perform all-side clipping
+   * and edge intersection.
+   */
   void fragmentRect(csRect&, csRect&, int mode);
   void nkSplit(csRect& r1, csRect& r2);
   /// Work method fragments rects properly when they intersect.
@@ -89,7 +92,10 @@ public:
   /// Destructor
   ~csRectRegion();
 
-  /// Add a rect to this region; may cause unions, but will not adjance (see csRect).
+  /**
+   * Add a rect to this region; may cause unions, but will not adjance
+   * (see csRect).
+   */
   void Include(const csRect &rect);
   /// Exclude a rect from this region; may cause splitting.
   void Exclude(const csRect &rect);
@@ -130,7 +136,10 @@ public:
   csRectRegionDebug();
   ~csRectRegionDebug();
 
-  /// Add a rect to this region; may cause unions, but will not adjance (see csRect).
+  /**
+   * Add a rect to this region; may cause unions, but will not adjance
+   * (see csRect).
+   */
   void Include(const csRect &rect);
 
   /// Exclude a rect from this region
@@ -142,8 +151,10 @@ public:
   /// Resets the region count to zero.
   void MakeEmpty();
 
-  /// Checks to see if a csRectRegion contains rectangles which exactly
-  /// represent the area of this region
+  /**
+   * Checks to see if a csRectRegion contains rectangles which exactly
+   * represent the area of this region.
+   */
   void AssertEqual(const csRectRegion &r);
 
   /// Ensures that the contents of a rect are within (0,0)-(size-1,size-1)

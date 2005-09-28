@@ -142,8 +142,8 @@ struct iLoader : public iBase
   /// Old Sound System: Load a sound file and register the sound
   virtual csPtr<iSoundHandle> LoadSound (const char *fname) = 0;
   /**
-   * Old Sound System: Load a sound file, register the sound and create a wrapper
-   * object for it.
+   * Old Sound System: Load a sound file, register the sound and create a
+   * wrapper object for it.
    */
   virtual csPtr<iSoundWrapper> LoadSound (const char *name,
   	const char *fname) = 0;
@@ -156,7 +156,8 @@ struct iLoader : public iBase
    * \param mode3d is one of CS_SND3D_DISABLE, CS_SND3D_RELATIVE, or
    * CS_SND3D_ABSOLUTE.
    */
-  virtual csPtr<iSndSysStream> LoadSoundStream (const char *fname, int mode3d) = 0;
+  virtual csPtr<iSndSysStream> LoadSoundStream (const char *fname,
+  	int mode3d) = 0;
   /**
    * New Sound System: Load a sound file, create a stream and create a
    * wrapper object for it.
@@ -313,12 +314,11 @@ struct iLoader : public iBase
    * Load a file. This is a smart function that will try to recognize
    * what kind of file it is. It recognizes the following types of
    * files:
-   * <ul>
-   * <li>'world' file: in that case 'result' will be set to the engine.
-   * <li>'library' file: 'result' will be 0.
-   * <li>'meshfact' file: 'result' will be the mesh factory wrapper.
-   * <li>'meshobj' file: 'result' will be the mesh wrapper.
-   * </ul>
+   * - 'world' file: in that case 'result' will be set to the engine.
+   * - 'library' file: 'result' will be 0.
+   * - 'meshfact' file: 'result' will be the mesh factory wrapper.
+   * - 'meshobj' file: 'result' will be the mesh wrapper.
+   *
    * Returns false on failure.
    * <br>
    * Note! In case a world file is loaded this function will NOT
@@ -353,12 +353,11 @@ struct iLoader : public iBase
    * Load a node. This is a smart function that will try to recognize
    * what kind of node it is. It recognizes the following types of
    * nodes:
-   * <ul>
-   * <li>'world' node: in that case 'result' will be set to the engine.
-   * <li>'library' node: 'result' will be 0.
-   * <li>'meshfact' node: 'result' will be the mesh factory wrapper.
-   * <li>'meshobj' node: 'result' will be the mesh wrapper.
-   * </ul>
+   * - 'world' node: in that case 'result' will be set to the engine.
+   * - 'library' node: 'result' will be 0.
+   * - 'meshfact' node: 'result' will be the mesh factory wrapper.
+   * - 'meshobj' node: 'result' will be the mesh wrapper.
+   *
    * Returns false on failure.
    * <br>
    * Note! In case a world node is loaded this function will NOT

@@ -232,7 +232,6 @@ public:
 
   /// Clones the spline
   csCatmullRomSpline * Clone();
-
 };
 
 /** @} */

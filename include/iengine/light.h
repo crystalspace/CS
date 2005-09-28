@@ -102,14 +102,12 @@ enum csLightDynamicType
  * which change meaning depending on attenuation mode.
  * There are five attenuation formulas: (distance is distance between
  * point for which lighting is computed and the light)
- * <ul>
- *   <li> no attenuation = light * 1
- *   <li> linear attenuation = light * (1 - distance / constant1)
- *   <li> inverse attenuation = light / distance
- *   <li> realistic attenuation = light / distance^2
- *   <li> CLQ, Constant Linear Quadratic 
- *        = light / (constant1 + constant2*distance + constant3*distance^2)
- * </ul>
+ * - no attenuation = light * 1
+ * - linear attenuation = light * (1 - distance / constant1)
+ * - inverse attenuation = light / distance
+ * - realistic attenuation = light / distance^2
+ * - CLQ, Constant Linear Quadratic 
+ *   = light / (constant1 + constant2*distance + constant3*distance^2)
  * @{ */
 enum csLightAttenuationMode
 {
@@ -132,15 +130,13 @@ enum csLightAttenuationMode
 /**
  * Type of lightsource. 
  * There are currently three types of lightsources:
- * <ul>
- *   <li> Point lights - have a position. Shines in all directions.
- *   <li> Directional lights - have a direction and radius. Shines along it's
+ * - Point lights - have a position. Shines in all directions.
+ * - Directional lights - have a direction and radius. Shines along it's
  *                             major axis.
- *   <li> Spot lights - have both position and direction. Shines with full
+ * - Spot lights - have both position and direction. Shines with full
  *                      strength along major axis and out to the hotspot angle.
  *                      Between hotspot and outer angle it will falloff, outside
  *                      outer angle there shines no light.
- * </ul>
  */
 enum csLightType
 {
@@ -156,15 +152,12 @@ enum csLightType
  * Set a callback which is called when this light color is changed.
  * The given context will be either an instance of iRenderView, iFrustumView,
  * or else 0.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>Application.
- *   </ul>
+ * - Application.
+ * 
  * Main users of this interface:
- *   <ul>
- *   <li>iLight
- *   </ul>
+ * - iLight
  */
 struct iLightCallback : public virtual iBase
 {
@@ -212,41 +205,35 @@ struct iLightCallback : public virtual iBase
  * <p>
  * First some terminology about all the several types of lights
  * that Crystal Space supports:
- * <ul>
- * <li>Static light. This is a normal static light that cannot move
- *     and cannot change intensity/color. All lighting information from
- *     all static lights is collected in one static lightmap.
- * <li>Pseudo-dynamic light. This is a static light that still cannot
- *     move but the intensity/color can change. The shadow information
- *     from every pseudo-dynamic light is kept in a separate shadow-map.
- *     Shadowing is very accurate with pseudo-dynamic lights since they
- *     use the same algorithm as static lights.
- * <li>Dynamic light. This is a light that can move and change
- *     intensity/color. These lights are the most flexible. All lighting
- *     information from all dynamic lights is collected in one dynamic
- *     lightmap (separate from the pseudo-dynamic shadow-maps).
- *     Shadows for dynamic lights will be less accurate because things
- *     will not cast accurate shadows (due to computation speed limitations).
- * </ul>
- * <p>
+ * - Static light. This is a normal static light that cannot move
+ *   and cannot change intensity/color. All lighting information from
+ *   all static lights is collected in one static lightmap.
+ * - Pseudo-dynamic light. This is a static light that still cannot
+ *   move but the intensity/color can change. The shadow information
+ *   from every pseudo-dynamic light is kept in a separate shadow-map.
+ *   Shadowing is very accurate with pseudo-dynamic lights since they
+ *   use the same algorithm as static lights.
+ * - Dynamic light. This is a light that can move and change
+ *   intensity/color. These lights are the most flexible. All lighting
+ *   information from all dynamic lights is collected in one dynamic
+ *   lightmap (separate from the pseudo-dynamic shadow-maps).
+ *   Shadows for dynamic lights will be less accurate because things
+ *   will not cast accurate shadows (due to computation speed limitations).
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iEngine::CreateLight()
- *   </ul>
+ * - iEngine::CreateLight()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::FindLight()
- *   <li>iEngine::FindLightID()
- *   <li>iEngine::GetLightIterator()
- *   <li>iEngine::GetNearbyLights()
- *   <li>iLightList::Get()
- *   <li>iLightList::FindByName()
- *   <li>iLoaderContext::FindLight()
- *   </ul>
+ * - iEngine::FindLight()
+ * - iEngine::FindLightID()
+ * - iEngine::GetLightIterator()
+ * - iEngine::GetNearbyLights()
+ * - iLightList::Get()
+ * - iLightList::FindByName()
+ * - iLoaderContext::FindLight()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ * - iEngine
  */
 struct iLight : public virtual iBase
 {
@@ -260,11 +247,9 @@ struct iLight : public virtual iBase
   /**
    * Get the dynamic type of this light.
    * Supported types:
-   * <ul>
-   * <li>#CS_LIGHT_DYNAMICTYPE_STATIC
-   * <li>#CS_LIGHT_DYNAMICTYPE_PSEUDO
-   * <li>#CS_LIGHT_DYNAMICTYPE_DYNAMIC
-   * </ul>
+   * - #CS_LIGHT_DYNAMICTYPE_STATIC
+   * - #CS_LIGHT_DYNAMICTYPE_PSEUDO
+   * - #CS_LIGHT_DYNAMICTYPE_DYNAMIC
    */
   virtual csLightDynamicType GetDynamicType () const = 0;
 
@@ -378,10 +363,8 @@ struct iLight : public virtual iBase
   /**
    * Get flags for this light.
    * Supported flags:
-   * <ul>
-   * <li>#CS_LIGHT_ACTIVEHALO
-   * <li>#CS_LIGHT_THINGSHADOWS
-   * </ul>
+   * - #CS_LIGHT_ACTIVEHALO
+   * - #CS_LIGHT_THINGSHADOWS
    */
   virtual csFlags& GetFlags () = 0;
 
@@ -429,15 +412,12 @@ struct iLight : public virtual iBase
 
 /**
  * This structure represents a list of lights.
- * <p>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iSector::GetLights()
- *   </ul>
+ * - iSector::GetLights()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ * - iEngine
  */
 struct iLightList : public virtual iBase
 {
@@ -535,15 +515,12 @@ SCF_VERSION (iLightIterator, 0, 1, 0);
  * This iterator assumes there are no fundamental changes
  * in the engine while it is being used.
  * If changes to the engine happen the results are unpredictable.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iEngine::GetLightIterator()
- *   </ul>
+ * - iEngine::GetLightIterator()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>Application.
- *   </ul>
+ * - Application.
  */
 struct iLightIterator : public virtual iBase
 {

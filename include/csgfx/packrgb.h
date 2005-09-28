@@ -154,7 +154,8 @@ struct csPackRGB
   }
   /**
    * Frees memory possibly allocated by UnpackRGBtoRGBcolor().
-   * \param pixels Pointer to csRGBcolor array returned by UnpackRGBtoRGBcolor().
+   * \param pixels Pointer to csRGBcolor array returned by
+   * UnpackRGBtoRGBcolor().
    */
   static void DiscardUnpackedRGBcolor (const csRGBcolor* pixels) 
   {

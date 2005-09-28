@@ -249,7 +249,8 @@ namespace CrystalSpace
       {
         if (!node) return false;
 
-        const char* attributeValue = node->GetAttributeValue (attribute.GetData ());
+        const char* attributeValue = node->GetAttributeValue (
+		attribute.GetData ());
 
         return (value == attributeValue);
       }
@@ -274,9 +275,11 @@ namespace CrystalSpace
       {
         if (!node) return false;
 
-        const char* attributeValue = node->GetAttributeValue (attribute.GetData ());
+        const char* attributeValue = node->GetAttributeValue (
+		attribute.GetData ());
 
-        return (valueMatcher.Match (attributeValue, csrxIgnoreCase) == csrxNoError);
+        return (valueMatcher.Match (attributeValue, csrxIgnoreCase)
+		== csrxNoError);
       }
 
     private:

@@ -146,19 +146,17 @@ struct iObjectWatcher : public virtual iBase
 
   /**
    * Get the last operation that occured. This will be one of:
-   * <ul>
-   * <li>#CS_WATCH_NONE: nothing happened yet.
-   * <li>#CS_WATCH_LIGHT_DESTROY: light is destroyed.
-   * <li>#CS_WATCH_LIGHT_MOVE: light has moved.
-   * <li>#CS_WATCH_LIGHT_COLOR: light has changed color.
-   * <li>#CS_WATCH_LIGHT_SECTOR: light has changed sector.
-   * <li>#CS_WATCH_LIGHT_RADIUS: light has changed radius.
-   * <li>#CS_WATCH_LIGHT_ATTENUATION: light has changed radius.
-   * <li>#CS_WATCH_MOVABLE_DESTROY: movable is destroyed.
-   * <li>#CS_WATCH_MOVABLE_CHANGED: movable is changed.
-   * <li>#CS_WATCH_SECTOR_NEWMESH: sector has a new mesh.
-   * <li>#CS_WATCH_SECTOR_REMOVEMESH: a mesh got removed from the sector.
-   * </ul>
+   * - #CS_WATCH_NONE: nothing happened yet.
+   * - #CS_WATCH_LIGHT_DESTROY: light is destroyed.
+   * - #CS_WATCH_LIGHT_MOVE: light has moved.
+   * - #CS_WATCH_LIGHT_COLOR: light has changed color.
+   * - #CS_WATCH_LIGHT_SECTOR: light has changed sector.
+   * - #CS_WATCH_LIGHT_RADIUS: light has changed radius.
+   * - #CS_WATCH_LIGHT_ATTENUATION: light has changed radius.
+   * - #CS_WATCH_MOVABLE_DESTROY: movable is destroyed.
+   * - #CS_WATCH_MOVABLE_CHANGED: movable is changed.
+   * - #CS_WATCH_SECTOR_NEWMESH: sector has a new mesh.
+   * - #CS_WATCH_SECTOR_REMOVEMESH: a mesh got removed from the sector.
    */
   virtual int GetLastOperation () const = 0;
 

@@ -67,7 +67,6 @@ struct iSpiralState : public iBase
   virtual void SetClimbSpeed (float speed) = 0;
   /// Get particle climb speed in spiral
   virtual float GetClimbSpeed () const = 0;
-    
 };
 
 /** @} */

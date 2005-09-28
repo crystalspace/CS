@@ -140,20 +140,21 @@ public:
 
   /**
    * Copy and return a portion of this string.  The substring runs from `start'
-   * for `len' characters.  If 'start' and 'len' are omitted, a copy of the whole
-   * string is returned.  If 'len' is omitted, a copy of the string containing
-   * all characters after (and including) start is returned.
+   * for `len' characters.  If 'start' and 'len' are omitted, a copy of the
+   * whole string is returned.  If 'len' is omitted, a copy of the string
+   * containing all characters after (and including) start is returned.
    */
   virtual csRef<iString> Slice (size_t start=0, size_t len=(size_t)-1) const;
 
   /**
-   * Copy and return a portion of this string.  This version differs from Slice()
-   * in that the 'start' parameter is counted from the END of the string rather than
-   * the beginning. The substring runs from `start'
+   * Copy and return a portion of this string.  This version differs from
+   * Slice() in that the 'start' parameter is counted from the END of the
+   * string rather than the beginning. The substring runs from `start'
    * for `len' characters. If 'len' is omitted, a copy of the string containing
    * all characters after (and including) start is returned.
    */
-  virtual csRef<iString> ReverseSlice (size_t start, size_t len=(size_t)-1) const;
+  virtual csRef<iString> ReverseSlice (size_t start,
+  	size_t len=(size_t)-1) const;
 
   /**
    * Copy a portion of this string.  The result is placed in 'sub'.  The
@@ -161,7 +162,8 @@ public:
    * If 'len' is omitted, a copy of the string    
    * containing all characters after (and including) 'start' is returned.
    */
-  virtual void SubString (iString* sub, size_t start, size_t len=(size_t)-1) const;
+  virtual void SubString (iString* sub, size_t start,
+  	size_t len=(size_t)-1) const;
 
   /**
    * Copy a portion of this string.  This version differs from SubString()
@@ -172,7 +174,8 @@ public:
    * If 'len' is omitted, a copy of the string    
    * containing all characters after (and including) 'start' is returned.
    */
-  virtual void ReverseSubString (iString* sub, size_t start=0, size_t len=(size_t)-1) const;
+  virtual void ReverseSubString (iString* sub, size_t start=0,
+  	size_t len=(size_t)-1) const;
 
   /**
    * Find first character 'c' from position 'p'.

@@ -96,13 +96,12 @@ static const size_t csRenderBufferComponentSizes[CS_BUFCOMP_TYPECOUNT] =
 
 /**
  * This is a general buffer.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>csRenderBuffer::CreateRenderBuffer()
- *   <li>csRenderBuffer::CreateIndexRenderBuffer()
- *   <li>csRenderBuffer::CreateInterleavedRenderBuffers()
- *   </ul>
+ * - csRenderBuffer::CreateRenderBuffer()
+ * - csRenderBuffer::CreateIndexRenderBuffer()
+ * - csRenderBuffer::CreateInterleavedRenderBuffers()
+ *
  * \sa csRenderBuffer
  */
 struct iRenderBuffer : public virtual iBase
@@ -287,8 +286,8 @@ public:
   csRenderBufferHolder() {accessorMask=0;}
   /**
    * Get buffer by name.
-   * If an accessor is set, it will first be called, after that the buffer will be 
-   * fetched.
+   * If an accessor is set, it will first be called, after that the buffer
+   * will be fetched.
    */
   iRenderBuffer* GetRenderBuffer (csRenderBufferName bufferName)
   {

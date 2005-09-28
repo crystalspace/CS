@@ -46,7 +46,6 @@ SCF_VERSION (iEmitCylinderTangent, 0, 0, 1);
  * 
  * Main users of this interface:
  * - iEmitState
- *   
  */
 struct iEmitGen3D : public iBase
 {
@@ -62,7 +61,6 @@ struct iEmitGen3D : public iBase
  *   
  * Main users of this interface:
  * - iEmitState
- *   
  */
 struct iEmitFixed : public iEmitGen3D
 {
@@ -78,7 +76,6 @@ struct iEmitFixed : public iEmitGen3D
  *   
  * Main users of this interface:
  * - iEmitState
- *   
  */
 struct iEmitSphere : public iEmitGen3D
 {
@@ -96,7 +93,6 @@ struct iEmitSphere : public iEmitGen3D
  *   
  * Main users of this interface:
  * - iEmitState
- *   
  */
 struct iEmitBox : public iEmitGen3D
 {
@@ -114,7 +110,6 @@ struct iEmitBox : public iEmitGen3D
  *   
  * Main users of this interface:
  * - iEmitState
- *   
  */
 struct iEmitCone : public iEmitGen3D
 {
@@ -137,22 +132,25 @@ struct iEmitCone : public iEmitGen3D
  *   
  * Main users of this interface:
  * - iEmitState
- *   
  */
 struct iEmitMix : public iEmitGen3D
 {
   /// add a weighted emitter to the mix
   virtual void AddEmitter(float weight, iEmitGen3D* emit) = 0;
-  /** removes an emitter from the mix given a zero based emitter number.
-   *  Use GetEmitterCount() and GetContent() to enumerate through the mix and find the index of an emitter.
+  /**
+   * Removes an emitter from the mix given a zero based emitter number.
+   * Use GetEmitterCount() and GetContent() to enumerate through the mix
+   * and find the index of an emitter.
    */
   virtual void RemoveEmitter(int num) = 0;
   /// get the total weight in this mix
   virtual float GetTotalWeight() = 0;
   /// get the number of emitters in this mix
   virtual int GetEmitterCount() = 0;
-  /** adjust the weight of an emitter given a zero based emitter number
-   *  Use GetEmitterCount() and GetContent() to enumerate through the mix and find the index of an emitter.
+  /**
+   * Adjust the weight of an emitter given a zero based emitter number
+   * Use GetEmitterCount() and GetContent() to enumerate through the mix
+   * and find the index of an emitter.
    */
   virtual void AdjustEmitterWeight(int num,float weight) = 0;
   /// get content, returns emitters and their weight by a number (0..number-1)
@@ -167,7 +165,6 @@ struct iEmitMix : public iEmitGen3D
  *   
  * Main users of this interface:
  * - iEmitState
- *   
  */
 struct iEmitLine : public iEmitGen3D
 {
@@ -185,7 +182,6 @@ struct iEmitLine : public iEmitGen3D
  *   
  * Main users of this interface:
  * - iEmitState
- *   
  */
 struct iEmitCylinder : public iEmitGen3D
 {
@@ -206,7 +202,6 @@ struct iEmitCylinder : public iEmitGen3D
  *   
  * Main users of this interface:
  * - iEmitState
- *   
  */
 struct iEmitSphereTangent : public iEmitGen3D
 {
@@ -225,7 +220,6 @@ struct iEmitSphereTangent : public iEmitGen3D
  *   
  * Main users of this interface:
  * - iEmitState
- *   
  */
 struct iEmitCylinderTangent : public iEmitGen3D
 {
@@ -251,7 +245,6 @@ SCF_VERSION (iEmitFactoryState, 0, 0, 2);
  *   
  * Main users of this interface:
  * - Emit Factory Loader plugin (crystalspace.mesh.loader.factory.emit)
- *   
  */
 struct iEmitFactoryState : public iBase
 {
@@ -289,7 +282,6 @@ SCF_VERSION (iEmitState, 0, 0, 1);
  *   
  * Main users of this interface:
  * - Emit Loader plugin (crystalspace.mesh.loader.emit)
- *   
  */
 struct iEmitState : public iBase
 {

@@ -82,7 +82,6 @@ struct iParticleState : public iBase
   virtual void SetSelfDestruct (csTicks t) = 0;
   /// System will no longer self destruct.
   virtual void UnSetSelfDestruct () = 0;
-
 };
 
 /** @} */

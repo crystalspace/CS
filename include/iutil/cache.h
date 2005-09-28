@@ -104,12 +104,11 @@ struct iCacheManager : public iBase
   /**
    * Clear items from the cache. There are four ways to call
    * this function:
-   * <ul>
-   * <li>0, 0, 0: clear entire cache.
-   * <li>'type', 0, 0: clear everything of this type.
-   * <li>'type', 'scope', 0: clear everything of this type and scope.
-   * <li>'type', 'scope', id: clear the specific item.
-   * </ul>
+   * - 0, 0, 0: clear entire cache.
+   * - 'type', 0, 0: clear everything of this type.
+   * - 'type', 'scope', 0: clear everything of this type and scope.
+   * - 'type', 'scope', id: clear the specific item.
+   *
    * Returns true if items were deleted. Returns false if item was not
    * found or deletion is not possible.
    */

@@ -42,27 +42,23 @@ SCF_VERSION (iMaterialWrapper, 0, 0, 5);
  * material (iMaterial). Every material in the engine is represented by a 
  * material wrapper, which keeps the pointer to the material and its name, and 
  * possibly the base material object.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iEngine::CreateMaterial()
- *   <li>iMaterialList::NewMaterial()
- *   </ul>
+ * - iEngine::CreateMaterial()
+ * - iMaterialList::NewMaterial()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::FindMaterial()
- *   <li>iMaterialList::Get()
- *   <li>iMaterialList::FindByName()
- *   <li>iLoaderContext::FindMaterial()
- *   <li>iLoaderContext::FindNamedMaterial()
- *   <li>iMeshObject::GetMaterialWrapper()
- *   <li>Various state interfaces for mesh objects.
- *   </ul>
+ * - iEngine::FindMaterial()
+ * - iMaterialList::Get()
+ * - iMaterialList::FindByName()
+ * - iLoaderContext::FindMaterial()
+ * - iLoaderContext::FindNamedMaterial()
+ * - iMeshObject::GetMaterialWrapper()
+ * - Various state interfaces for mesh objects.
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   <li>Mesh objects
- *   </ul>
+ * - iEngine
+ * - Mesh objects
  */
 struct iMaterialWrapper : public iBase
 {
@@ -102,11 +98,9 @@ SCF_VERSION (iMaterialEngine, 0, 0, 2);
  * that implements iMaterial you can query for iMaterialEngine.
  * So this interface basically augments iMaterial with engine specific
  * features.
- * <p>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>SCF_QUERY_INTERFACE() from iMaterial
- *   </ul>
+ *   - SCF_QUERY_INTERFACE() from iMaterial
  */
 struct iMaterialEngine : public iBase
 {
@@ -135,15 +129,12 @@ SCF_VERSION (iMaterialList, 0, 0, 1);
 
 /**
  * This class represents a list of materials.
- * <p>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::GetMaterialList()
- *   </ul>
+ *   - iEngine::GetMaterialList()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ *   - iEngine
  */
 struct iMaterialList : public iBase
 {

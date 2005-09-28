@@ -50,27 +50,23 @@ struct iTextureCallback : public iBase
  * texture (iTextureHandle). Every texture in the engine is represented
  * by a texture wrapper, which keeps the pointer to the texture handle, its
  * name, and possibly the base image object.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iEngine::CreateTexture()
- *   <li>iEngine::CreateBlackTexture()
- *   <li>iTextureList::NewTexture()
- *   <li>iLoader::LoadTexture()
- *   </ul>
+ * - iEngine::CreateTexture()
+ * - iEngine::CreateBlackTexture()
+ * - iTextureList::NewTexture()
+ * - iLoader::LoadTexture()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::FindTexture()
- *   <li>iTextureList::Get()
- *   <li>iTextureList::FindByName()
- *   <li>iLoaderContext::FindTexture()
- *   <li>iLoaderContext::FindNamedTexture()
- *   <li>iMaterialEngine::GetTextureWrapper()
- *   </ul>
+ * - iEngine::FindTexture()
+ * - iTextureList::Get()
+ * - iTextureList::FindByName()
+ * - iLoaderContext::FindTexture()
+ * - iLoaderContext::FindNamedTexture()
+ * - iMaterialEngine::GetTextureWrapper()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ * - iEngine
  */
 struct iTextureWrapper : public virtual iBase
 {
@@ -165,11 +161,9 @@ SCF_VERSION (iTextureList, 0, 0, 1);
 
 /**
  * This class represents a list of texture wrappers.
- * <p>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::GetTextureList()
- *   </ul>
+ *   - iEngine::GetTextureList()
  */
 struct iTextureList : public iBase
 {

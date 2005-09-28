@@ -134,11 +134,9 @@ struct iClipper2D : public virtual iBase
   /**
    * Classify some bounding box against this clipper.
    * This function returns:<p>
-   * <ul>
-   * <li> -1 if box is not visible.
-   * <li> 0 if box is partially visible.
-   * <li> 1 if box is entirely visible.
-   * </ul>
+   * - -1 if box is not visible.
+   * - 0 if box is partially visible.
+   * - 1 if box is entirely visible.
    */
   virtual int ClassifyBox (const csBox2 &box) = 0;
 

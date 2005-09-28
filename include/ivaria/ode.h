@@ -163,21 +163,22 @@ struct iODEDynamicSystemState : public iBase
   virtual void SetQuickStepIterations (int iter) = 0;
   virtual int QuickStepIterations () = 0;
 
-  /** Turn on/off AutoDisable functionality.
-      AutoDisable will stop moving objects if they are stable in order
-      to save processing time.
-  */
+  /**
+   * Turn on/off AutoDisable functionality.
+   * AutoDisable will stop moving objects if they are stable in order
+   * to save processing time.
+   */
   virtual void EnableAutoDisable (bool enable) = 0;
   virtual bool AutoDisableEnabled () =0;
   /**
-    Set the parameters for AutoDisable.
-    /param linear Maximum linear movement to disable a body
-    /param angular Maximum angular movement to disable a body
-    /param steps Minimum number of steps the body meets linear and angular
-           requirements before it is disabled.
-    /param time Minimum time the body needs to meet linear and angular movement
-           requirements before it is disabled.
-  */
+   * Set the parameters for AutoDisable.
+   * /param linear Maximum linear movement to disable a body
+   * /param angular Maximum angular movement to disable a body
+   * /param steps Minimum number of steps the body meets linear and angular
+   *        requirements before it is disabled.
+   * /param time Minimum time the body needs to meet linear and angular movement
+   *        requirements before it is disabled.
+   */
   virtual void SetAutoDisableParams (float linear, float angular, int steps,
     float time)=0;
 
@@ -255,38 +256,42 @@ struct iODEDynamicSystemState : public iBase
   /// Remove a Slider joint from the simulation
   virtual void RemoveJoint (iODESliderJoint* joint) = 0;
 
-  /** Set the maximum correcting velocity that contacts are
-      allowed to generate. The default value is infinity (i.e. no
-      limit). Reducing this value can help prevent "popping" of deeply
-      embedded objects.
-      @param v velocity
-  */
+  /**
+   * Set the maximum correcting velocity that contacts are
+   * allowed to generate. The default value is infinity (i.e. no
+   * limit). Reducing this value can help prevent "popping" of deeply
+   * embedded objects.
+   * \param v velocity
+   */
   virtual void SetContactMaxCorrectingVel (float v) = 0;
 
-  /** Get the maximum correcting velocity that contacts are
-      allowed to generate. The default value is infinity (i.e. no
-      limit). Reducing this value can help prevent "popping" of deeply
-      embedded objects.
-  */
+  /**
+   * Get the maximum correcting velocity that contacts are
+   * allowed to generate. The default value is infinity (i.e. no
+   * limit). Reducing this value can help prevent "popping" of deeply
+   * embedded objects.
+   */
   virtual float GetContactMaxCorrectingVel () = 0;
 
-  /** Set the depth of the surface layer around all geometry
-      objects. Contacts are allowed to sink into the surface layer up
-      to the given depth before coming to rest. The default value is
-      zero. Increasing this to some small value (e.g. 0.001) can help
-      prevent jittering problems due to contacts being repeatedly made
-      and broken.
-      @param depth the distance two bodies are allowed to interpenetrate
+  /**
+   * Set the depth of the surface layer around all geometry
+   * objects. Contacts are allowed to sink into the surface layer up
+   * to the given depth before coming to rest. The default value is
+   * zero. Increasing this to some small value (e.g. 0.001) can help
+   * prevent jittering problems due to contacts being repeatedly made
+   * and broken.
+   * \param depth the distance two bodies are allowed to interpenetrate
    */
   virtual void SetContactSurfaceLayer (float depth) = 0;
 
-  /** Get the depth of the surface layer around all geometry
-      objects. Contacts are allowed to sink into the surface layer up
-      to the given depth before coming to rest. The default value is
-      zero. Increasing this to some small value (e.g. 0.001) can help
-      prevent jittering problems due to contacts being repeatedly made
-      and broken.
-      @return the distance two bodies are allowed to interpenetrate
+  /**
+   * Get the depth of the surface layer around all geometry
+   * objects. Contacts are allowed to sink into the surface layer up
+   * to the given depth before coming to rest. The default value is
+   * zero. Increasing this to some small value (e.g. 0.001) can help
+   * prevent jittering problems due to contacts being repeatedly made
+   * and broken.
+   * \return the distance two bodies are allowed to interpenetrate
    */
   virtual float GetContactSurfaceLayer () = 0;
 };
@@ -419,30 +424,35 @@ struct iODEGeneralJointState : public iBase
   virtual void SetVel (float value, int axis) = 0;
 
   /**
-   * Set the maximum force or torque that the motor will use to achieve the desired
-   * velocity. This must always be greater than or equal to zero. Setting this to zero
-   * turns off the motor.
+   * Set the maximum force or torque that the motor will use to achieve the
+   * desired velocity. This must always be greater than or equal to zero.
+   * Setting this to zero turns off the motor.
    */
   virtual void SetFMax (float value, int axis) = 0;
 
   /**
-   * Set the fudge factor. The current joint stop/motor implementation has a small
-   * problem: when the joint is at one stop and the motor is set to move it away from
-   * the stop, too much force may be applied for one time step, causing a ``jumping''
-   * motion. This fudge factor is used to scale this excess force. It should have a value
-   * between zero and one (the default value). If the jumping motion is too visible in a
-   * joint, the value can be reduced. Making this value too small can prevent the motor
-   * from being able to move the joint away from a stop.
+   * Set the fudge factor. The current joint stop/motor implementation has a
+   * small problem: when the joint is at one stop and the motor is set to move
+   * it away from the stop, too much force may be applied for one time step,
+   * causing a ``jumping'' motion. This fudge factor is used to scale this
+   * excess force. It should have a value between zero and one (the default
+   * value). If the jumping motion is too visible in a
+   * joint, the value can be reduced. Making this value too small can prevent
+   * the motor from being able to move the joint away from a stop.
    */
   virtual void SetFudgeFactor (float value, int axis) = 0;
 
   /**
-   * Set the bouncyness of the stops. This is a restitution parameter in the range 0..1.
-   * 0 means the stops are not bouncy at all, 1 means maximum bouncyness.
+   * Set the bouncyness of the stops. This is a restitution parameter in the
+   * range 0..1. 0 means the stops are not bouncy at all, 1 means maximum
+   * bouncyness.
    */
   virtual void SetBounce (float value, int axis) = 0;
 
-  /// Set the constraint force mixing (CFM) value for joint used when not at a stop.
+  /**
+   * Set the constraint force mixing (CFM) value for joint used when not at a
+   * stop.
+   */
   virtual void SetCFM (float value, int axis) = 0;
 
   /// Set the error reduction parameter (ERP) used by the stops.
@@ -451,8 +461,8 @@ struct iODEGeneralJointState : public iBase
   /**
    * Set the constraint force mixing (CFM) value for joint used by the stops.
    * Together with the ERP value this can be used to get spongy or soft stops.
-   * Note that this is intended for unpowered joints, it does not really work as expected
-   * when a powered joint reaches its limit.
+   * Note that this is intended for unpowered joints, it does not really work
+   * as expected when a powered joint reaches its limit.
    */
   virtual void SetStopCFM (float value, int axis) = 0;
 
@@ -471,16 +481,22 @@ struct iODEGeneralJointState : public iBase
   /// Get desired motor velocity (this will be an angular or linear velocity).
   virtual float GetVel (int axis) = 0;
 
-  /// Get the maximum force or torque that the motor will use to achieve the desired velocity.
+  /**
+   * Get the maximum force or torque that the motor will use to achieve the
+   * desired velocity.
+   */
   virtual float GetFMax (int axis) = 0;
 
-  ///Get the fudge factor.
+  /// Get the fudge factor.
   virtual float GetFudgeFactor (int axis) = 0;
 
   /// Get the bouncyness of the stops.
   virtual float GetBounce (int axis) = 0;
 
-  /// Get the constraint force mixing (CFM) value for joint used when not at a stop.
+  /**
+   * Get the constraint force mixing (CFM) value for joint used when not
+   * at a stop.
+   */
   virtual float GetCFM (int axis) = 0;
 
   /// Get the error reduction parameter (ERP) used by the stops.
@@ -552,13 +568,13 @@ SCF_VERSION (iODEUniversalJoint, 0, 0, 1);
  */
 struct iODEUniversalJoint : public iODEGeneralJointState
 {
-  ///Set universal anchor.
+  /// Set universal anchor.
   virtual void SetUniversalAnchor (float x, float y, float z) = 0;
 
-  ///Set axis on body 1 (should be perpendicular to axis 2)
+  /// Set axis on body 1 (should be perpendicular to axis 2)
   virtual void SetUniversalAxis1 (float x, float y, float z) = 0;
 
-  ///Set axis on body 2 (should be perpendicular to axis 1)
+  /// Set axis on body 2 (should be perpendicular to axis 1)
   virtual void SetUniversalAxis2 (float x, float y, float z) = 0;
 
   /**
@@ -575,10 +591,10 @@ struct iODEUniversalJoint : public iODEGeneralJointState
    */
   virtual csVector3 GetUniversalAnchor2 () = 0;
 
-  ///Get universal axis on body 1.
+  /// Get universal axis on body 1.
   virtual csVector3 GetUniversalAxis1 () = 0;
 
-  ///Get universal axis on body 2.
+  /// Get universal axis on body 2.
   virtual csVector3 GetUniversalAxis2 () = 0;
 
 };
@@ -640,25 +656,27 @@ struct iODEAMotorJoint : public iODEGeneralJointState
   virtual int GetAMotorNumAxes () = 0;
 
   /**
-    Set AMotor axis.
-    /param axis_num - axis number
-    /param rel_orient - ``relative orientation'' mode:
-    0: The axis is anchored to the global frame.
-    1: The axis is anchored to the first body.
-    2: The axis is anchored to the second body.
-    /param x, y, z - axis
+   * Set AMotor axis.
+   * /param axis_num - axis number
+   * /param rel_orient - ``relative orientation'' mode:
+   * 0: The axis is anchored to the global frame.
+   * 1: The axis is anchored to the first body.
+   * 2: The axis is anchored to the second body.
+   * /param x, y, z - axis
    */
-  virtual void SetAMotorAxis (int axis_num, int rel_orient, float x, float y, float z) = 0;
+  virtual void SetAMotorAxis (int axis_num, int rel_orient, float x, float y,
+  	float z) = 0;
 
   /**
-    Set AMotor axis.
-    /param axis_num - axis number
-    /param rel_orient - ``relative orientation'' mode:
-    0: The axis is anchored to the global frame.
-    1: The axis is anchored to the first body.
-    2: The axis is anchored to the second body.
+   * Set AMotor axis.
+   * /param axis_num - axis number
+   * /param rel_orient - ``relative orientation'' mode:
+   * 0: The axis is anchored to the global frame.
+   * 1: The axis is anchored to the first body.
+   * 2: The axis is anchored to the second body.
    */
-  virtual void SetAMotorAxis (int axis_num, int rel_orient, const csVector3 &axis) = 0;
+  virtual void SetAMotorAxis (int axis_num, int rel_orient,
+  	const csVector3 &axis) = 0;
 
   /**
    * Get AMotor axis.
@@ -695,7 +713,6 @@ struct iODEAMotorJoint : public iODEGeneralJointState
    * CS_ODE_AMOTOR_MODE_EULER mode this is the corresponding euler angle rate.
    */
   virtual float GetAMotorAngleRate (int axis_num) = 0;
-
 };
 
 SCF_VERSION (iODEHingeJoint, 0, 0, 1);

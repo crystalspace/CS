@@ -107,24 +107,20 @@ struct iLightVisibleCallback : public virtual iBase
  * The sector is the basic building block for any Crystal Space level.
  * A level can be made from one or more sectors. Using the thing mesh
  * object one can use portals to connect multiple sectors.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iEngine::CreateSector()
- *   </ul>
+ * - iEngine::CreateSector()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::FindSector()
- *   <li>iSectorList::Get()
- *   <li>iSectorList::FindByName()
- *   <li>iLoaderContext::FindSector()
- *   <li>iPortal::GetSector()
- *   <li>iCamera::GetSector()
- *   </ul>
+ * - iEngine::FindSector()
+ * - iSectorList::Get()
+ * - iSectorList::FindByName()
+ * - iLoaderContext::FindSector()
+ * - iPortal::GetSector()
+ * - iCamera::GetSector()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ * - iEngine
  */
 struct iSector : public virtual iBase
 {
@@ -376,16 +372,13 @@ struct iSector : public virtual iBase
 
 /**
  * A list of sectors.
- * <p>
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iEngine::GetSectors()
- *   <li>iMovable::GetSectors()
- *   </ul>
+ *   - iEngine::GetSectors()
+ *   - iMovable::GetSectors()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ *   - iEngine
  */
 struct iSectorList : public virtual iBase
 {
@@ -419,11 +412,9 @@ struct iSectorList : public virtual iBase
 /**
  * An iterator to iterate over sectors. Some functions in CS
  * return this.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iEngine::GetNearbySectors()
- *   </ul>
+ * - iEngine::GetNearbySectors()
  */
 struct iSectorIterator : public virtual iBase
 {

@@ -126,7 +126,8 @@ struct iSpriteAction : public iBase
   /// Get the displacement for the specified frame.
   virtual float GetFrameDisplacement (int f) = 0;
   /// Add a frame to this action.
-  virtual void AddFrame (iSpriteFrame* frame, int delay, float displacement) = 0;
+  virtual void AddFrame (iSpriteFrame* frame, int delay,
+  	float displacement) = 0;
 };
 
 SCF_VERSION (iSpriteSocket, 0, 0, 1);

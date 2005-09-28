@@ -140,19 +140,15 @@ struct iPortalCallback : public iBase
  * with them. The portal object defines where the opening leads,
  * how exactly the geometry behind portal is to be handled and
  * so on.
- * <p>
+ *
  * Main creators of instances implementing this interface:
- *   <ul>
- *   <li>iPortalContainer::CreatePortal()
- *   </ul>
+ * - iPortalContainer::CreatePortal()
+ *
  * Main ways to get pointers to this interface:
- *   <ul>
- *   <li>iPortalContainer::GetPortal()
- *   </ul>
+ * - iPortalContainer::GetPortal()
+ *
  * Main users of this interface:
- *   <ul>
- *   <li>iEngine
- *   </ul>
+ * - iEngine
  */
 struct iPortal : public virtual iBase
 {

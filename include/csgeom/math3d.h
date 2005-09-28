@@ -52,7 +52,7 @@ class CS_CRYSTALSPACE_EXPORT csMath3
 public:
   /**
    * Tests which side of a plane the given 3D point is on.
-   * Return -1 if point p is left of plane '0-v1-v2',
+   * \return -1 if point p is left of plane '0-v1-v2',
    *         1 if point p is right of plane '0-v1-v2',
    *      or 0 if point p lies on plane '0-v1-v2'.
    * Plane '0-v1-v2' is the plane passing through points <0,0,0>, v1, and v2.
@@ -287,7 +287,8 @@ public:
   	csSegment3& seg);
 
   /**
-   * Intersect a 3D segment with a triangle. Returns true if there
+   * Intersect a 3D segment with a triangle.
+   * \return true if there
    * is an intersection. In that case the intersection point will
    * be in 'isect'.
    */
@@ -297,7 +298,8 @@ public:
 	csVector3& isect);
 
   /**
-   * Intersect a 3D segment with a polygon. Returns true if there
+   * Intersect a 3D segment with a polygon.
+   * \return true if there
    * is an intersection. In that case the intersection point will
    * be in 'isect'. Note that this function doesn't do
    * backface culling.
@@ -308,7 +310,7 @@ public:
   /**
    * If a number of planes enclose a convex space (with their normals
    * pointing outwards).
-   * This method returns true if they are intersected by a segment.
+   * \return true if they are intersected by a segment.
    * isect contains the closest intersection point.
    * dist contains the distance to that point (with distance between u and v
    * being 1)
@@ -319,7 +321,8 @@ public:
      csVector3& isect, float& dist);
 
   /**
-   * Intersect a 3D segment with a plane.  Returns true if there is an
+   * Intersect a 3D segment with a plane.
+   * \return true if there is an
    * intersection, with the intersection point returned in isect.
    */
   static bool SegmentPlane (
@@ -335,11 +338,12 @@ public:
    * to the given input vector. i.e. a distance of 0.5 means that the
    * intersection point is halfway u and v.
    * There are two cases in which this method will return false:
-   * -  If the plane and the segment are parallel, then 'dist' will be set equal
-   * to 0, and 'isect' equal to 'v'.
-   * -  If the segment does not cross the plane (i.e. if 'dist'>1+epsilon or
-   * 'dist'<-epsilon, where epsilon is a very small value near to zero) then
-   * 'isect's value is (0, 0, 0).
+   * - If the plane and the segment are parallel, then 'dist' will be set
+   *   equal to 0, and 'isect' equal to 'v'.
+   * - If the segment does not cross the plane (i.e. if 'dist'>1+epsilon or
+   *   'dist'<-epsilon, where epsilon is a very small value near to zero)
+   *   then 'isect's value is (0, 0, 0).
+   *
    * \remarks
    * 'p' is the plane, expressed as: A x + B y + C z + D = 0 , where (A,B,C) is 
    * the normal vector of the plane.
@@ -356,7 +360,8 @@ public:
 
   /**
    * Intersect 3 planes to get the point that is part of all three
-   * planes. Returns true, if there is a single point that fits.
+   * planes.
+   * \return true if there is a single point that fits.
    * If some planes are parallel, then it will return false.
    */
   static bool ThreePlanes (const csPlane3& p1, const csPlane3& p2,
@@ -366,7 +371,7 @@ public:
    * Intersect a regular plane and an axis aligned plane and
    * return the intersection (line) as a 2D plane. This intersection
    * is defined on the axis aligned plane.
-   * Returns false if there is no intersection.
+   * \return false if there is no intersection.
    */
   static bool PlaneXPlane (const csPlane3& p1, float x2, csPlane2& isect);
 
@@ -374,7 +379,7 @@ public:
    * Intersect a regular plane and an axis aligned plane and
    * return the intersection (line) as a 2D plane. This intersection
    * is defined on the axis aligned plane.
-   * Returns false if there is no intersection.
+   * \return false if there is no intersection.
    */
   static bool PlaneYPlane (const csPlane3& p1, float y2, csPlane2& isect);
 
@@ -382,7 +387,7 @@ public:
    * Intersect a regular plane and an axis aligned plane and
    * return the intersection (line) as a 2D plane. This intersection
    * is defined on the axis aligned plane.
-   * Returns false if there is no intersection.
+   * \return false if there is no intersection.
    */
   static bool PlaneZPlane (const csPlane3& p1, float z2, csPlane2& isect);
 
@@ -390,7 +395,7 @@ public:
    * Intersect a regular plane and an axis aligned plane and
    * return the intersection (line) as a 2D plane. This intersection
    * is defined on the axis aligned plane.
-   * Returns false if there is no intersection.
+   * \return false if there is no intersection.
    */
   static bool PlaneAxisPlane (const csPlane3& p1, int nr, float pos,
   	csPlane2& isect)
@@ -555,13 +560,14 @@ public:
   }
 
   /**
-   * Intersect a segment with a box and returns one of CS_BOX_SIDE_... if it
-   * intersects, CS_BOX_INSIDE if inside, or -1 otherwise.
-   * The intersection point is also returned.
-   * If 'pr' is given then a number between 0 and 1 is returned which
+   * Intersect a segment with a box.
+   * \param isect The returned intersection point.
+   * \param pr if not null then a number between 0 and 1 is returned which
    * corresponds to the position on the segment. If we were in the box
    * this this function will return CS_BOX_INSIDE. In this case 'isect' will
    * be set to the start of the segment and *pr to 0.
+   * \return one of CS_BOX_SIDE_... if it intersects, CS_BOX_INSIDE if inside,
+   * or -1 otherwise.
    */
   static int BoxSegment (const csBox3& box, const csSegment3& segment,
   	csVector3& isect, float* pr = 0);
@@ -631,9 +637,9 @@ public:
 
   /**
    * Test intersection between two triangles.
-   * @param tri1 Vertices of triangle 1
-   * @param tri2 Vertices of triangle 2
-   * @return true if the triangles intersect, otherwise false
+   * \param tri1 Vertices of triangle 1
+   * \param tri2 Vertices of triangle 2
+   * \return true if the triangles intersect, otherwise false
    */
   static bool TriangleTriangle (const csVector3 tri1[3],
 			 const csVector3 tri2[3]);
@@ -641,11 +647,11 @@ public:
   /**
    * Calculate intersection between two triangles and return it
    * in isectline.
-   * @param tri1 Vertices of triangle 1
-   * @param tri2 Vertices of triangle 2
-   * @param[out] isectline The line segment where they intersect
-   * @param[out] coplanar Returns whether the triangles are coplanar
-   * @return true if the triangles intersect, otherwise false
+   * \param tri1 Vertices of triangle 1
+   * \param tri2 Vertices of triangle 2
+   * \param[out] isectline The line segment where they intersect
+   * \param[out] coplanar Returns whether the triangles are coplanar
+   * \return true if the triangles intersect, otherwise false
    */
   static bool TriangleTriangle (const csVector3 tri1[3],
 			 const csVector3 tri2[3],
