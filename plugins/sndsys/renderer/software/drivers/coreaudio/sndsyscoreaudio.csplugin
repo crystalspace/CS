@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.sndsys.software.driver.coreaudio</name>
-        <implementation>SndSysDriverCoreAudio</implementation>
+        <implementation>csSndSysDriverCoreAudio</implementation>
         <description>Sound System Core Audio Software Driver (OS X)</description>
       </class>
     </classes>
