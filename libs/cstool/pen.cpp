@@ -318,7 +318,7 @@ void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float
 
   Start();
   
-  if (fill)AddVertex(center_x, center_y);
+  if (fill) AddVertex(center_x, center_y);
 
   for(angle=start_angle; angle<=end_angle; angle+=delta)
   {
@@ -327,6 +327,18 @@ void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float
 
   SetupMesh ();
   DrawMesh (fill ? CS_MESHTYPE_TRIANGLEFAN : CS_MESHTYPE_LINESTRIP);
+}
+
+void csPen::DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint y3, bool fill)
+{
+  Start();
+
+  AddVertex(x1, y1);
+  AddVertex(x2, y2);
+  AddVertex(x3, y3);
+
+  SetupMesh ();
+  DrawMesh (fill ? CS_MESHTYPE_TRIANGLES : CS_MESHTYPE_LINESTRIP);
 }
 
 void 

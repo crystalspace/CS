@@ -46,6 +46,8 @@ typedef csDirtyAccessArray< csVector2 > csContour2;
 class csTriangulate2
 {
 public:
+  csTriangulate2() {}
+  ~csTriangulate2() {}
 
   /** Triangulate a contour/polygon, places results in a triangle mesh, with the resulting vertices in result_vertices. */
   static bool Process(const csContour2 &contour,

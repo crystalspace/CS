@@ -45,6 +45,7 @@ enum CS_PEN_TEXT_ALIGN
   CS_PEN_TA_CENTER 
 };
 
+
 /** 
  * A pen is used to draw vector shapes. 
  */
@@ -135,6 +136,11 @@ struct iPen
    */
   virtual void DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle,
   	float end_angle, bool swap_colors = false, bool fill=false) = 0;
+
+  /**
+   * Draws a triangle around the given vertices. 
+   */
+  virtual void DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint y3, bool fill=false) = 0;
 
   /**
    * Writes text in the given font at the given location.
@@ -293,6 +299,11 @@ public:
   virtual void DrawArc(uint x1, uint y1, uint x2, uint y2,
   	float start_angle=0, float end_angle=6.2831853, 
     bool swap_colors = false, bool fill=false);
+
+  /**
+   * Draws a triangle around the given vertices. 
+   */
+  virtual void DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint y3, bool fill=false);
 
   /**
    * Writes text in the given font at the given location.
