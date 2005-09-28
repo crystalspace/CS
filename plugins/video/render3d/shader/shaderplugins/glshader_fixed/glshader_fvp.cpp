@@ -62,7 +62,7 @@ void csGLShaderFVP::Deactivate()
 
 void csGLShaderFVP::SetupState (const csRenderMesh *mesh, 
                                 csRenderMeshModes& modes,
-                const csShaderVarStack &stacks)
+				const csShaderVarStack &stacks)
 {
   size_t i;
 
@@ -137,7 +137,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
     {
         if (!lights.Length())
         {
-        	continue;
+	  continue;
         }
 
         //????????
@@ -208,7 +208,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
     {
         if (!lights.Length())
         {
-        	continue;
+	  continue;
         }
 
 		//????????
@@ -246,8 +246,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
         csVector3 lp = t.Other2This(csVector3(v.x, v.y, v.z));
         glTranslatef(-lp.x, -lp.y, -lp.z);
     }
-	else
-    if (layers[i].texgen == TEXGEN_REFLECT_CUBE)
+    else if (layers[i].texgen == TEXGEN_REFLECT_CUBE)
     {
 
       csShaderVariable* sv = csGetShaderVariableFromStack (stacks, string_world2camera);
@@ -551,7 +550,7 @@ void csGLShaderFVP::ResetState ()
 }
 
 bool csGLShaderFVP::ParseTexMatrixOp (iDocumentNode* node, 
-                      TexMatrixOp& op, bool matrix)
+				       TexMatrixOp& op, bool matrix)
 {
   const char* type = node->GetAttributeValue ("type");
   if (type == 0)
@@ -571,7 +570,7 @@ bool csGLShaderFVP::ParseTexMatrixOp (iDocumentNode* node,
 }
 
 bool csGLShaderFVP::ParseTexMatrix (iDocumentNode* node, 
-                    csArray<TexMatrixOp>& matrixOps)
+				     csArray<TexMatrixOp>& matrixOps)
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while(it->HasNext())
@@ -640,20 +639,20 @@ bool csGLShaderFVP::ParseLight (iDocumentNode* node, LightingEntry& entry)
     csStringID id = tokens.Request (value);
     switch(id)
     {
-#define LIGHT_PARAM(Token, GLLP, Type)        	    \
-      case XMLTOKEN_ ## Token:                    \
-	if (!ParseProgramParam (child, entry.params[GLLP],  \
-	  Type))                	    \
-	  return false;                	    \
+#define LIGHT_PARAM(Token, GLLP, Type)				\
+      case XMLTOKEN_ ## Token:					\
+	if (!ParseProgramParam (child, entry.params[GLLP],	\
+	  Type))                				\
+	  return false;						\
 	break
-#define LIGHT_PARAM_V(Token, GLLP)        	    \
-      LIGHT_PARAM(Token, GLLP,                    \
+#define LIGHT_PARAM_V(Token, GLLP)				\
+      LIGHT_PARAM(Token, GLLP,					\
 	ParamVector3 | ParamVector4 | ParamShaderExp)
-#define LIGHT_PARAM_F(Token, GLLP)        	    \
-      LIGHT_PARAM(Token, GLLP,                    \
+#define LIGHT_PARAM_F(Token, GLLP)				\
+      LIGHT_PARAM(Token, GLLP,					\
 	ParamFloat | ParamShaderExp)
-#define LIGHT_PARAM_T(Token, GLLP)        	    \
-      LIGHT_PARAM(Token, GLLP,                    \
+#define LIGHT_PARAM_T(Token, GLLP)				\
+      LIGHT_PARAM(Token, GLLP,					\
 	ParamTransform | ParamShaderExp)
 
       LIGHT_PARAM_V(POSITION, gllpPosition);
@@ -741,10 +740,10 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    {
 	      if (!entry.params[i].valid && (defaultParamNames[i] != propNone))
 	      {
-        entry.params[i].name = 
-          shaderPlug->lsvCache.GetLightSVId (entry.lightnum,
-          defaultParamNames[i]);
-        entry.params[i].valid = true;
+		entry.params[i].name = 
+		  shaderPlug->lsvCache.GetLightSVId (entry.lightnum,
+		  defaultParamNames[i]);
+		entry.params[i].valid = true;
 	      }
 	    }
           }
@@ -762,7 +761,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    if (layer < 0)
 	    {
 	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-        variablesnode, "'layer' attribute invalid");
+		variablesnode, "'layer' attribute invalid");
 	      return false;
 	    }
             if (layers.Length ()<= (size_t)layer)
@@ -789,7 +788,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    if (layer < 0)
 	    {
 	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-        variablesnode, "'layer' attribute invalid");
+		variablesnode, "'layer' attribute invalid");
 	      return false;
 	    }
             if (layers.Length () <= (size_t)layer)
@@ -809,22 +808,22 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
                   {
                     layers[layer].texgen = TEXGEN_REFLECT_SPHERE;
                   }
-          else
-          {
-            synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-              variablesnode, "invalid mapping '%s'", str);
-            return false;
-          }
+		  else
+		  {
+		    synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+		      variablesnode, "invalid mapping '%s'", str);
+		    return false;
+		  }
                 }
               }
               else if (!strcasecmp(str, "projection"))
               {
                 layers[layer].texgen = TEXGEN_PROJECTION;
-        	  }
+	      }
               else if (!strcasecmp(str, "texture3d"))
               {
                 layers[layer].texgen = TEXGEN_TEXTURE3D;
-        	  }
+	      }
               else if (!strcasecmp(str, "fog"))
               {
                 layers[layer].texgen = TEXGEN_FOG;
@@ -841,9 +840,9 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
               }
 	      else
 	      {
-        synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-          variablesnode, "invalid type '%s'", str);
-        return false;
+		synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+		  variablesnode, "invalid type '%s'", str);
+		return false;
 	      }
             }
           }
@@ -854,7 +853,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    if (layer < 0)
 	    {
 	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-        variablesnode, "'layer' attribute invalid");
+		variablesnode, "'layer' attribute invalid");
 	      return false;
 	    }
             if (layers.Length () <= (size_t)layer)
@@ -870,26 +869,26 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    switch (typeID)
 	    {
 	      case XMLTOKEN_AMBIENT:
-        colorMaterial = GL_AMBIENT;
-        break;
+		colorMaterial = GL_AMBIENT;
+		break;
 	      case XMLTOKEN_EMISSION:
-        colorMaterial = GL_EMISSION;
-        break;
+		colorMaterial = GL_EMISSION;
+		break;
 	      case XMLTOKEN_DIFFUSE:
-        colorMaterial = GL_DIFFUSE;
-        break;
+		colorMaterial = GL_DIFFUSE;
+		break;
 	      case XMLTOKEN_SPECULAR:
-        colorMaterial = GL_SPECULAR;
-        break;
+		colorMaterial = GL_SPECULAR;
+		break;
 	      case XMLTOKEN_AMBIENT_AND_DIFFUSE:
-        colorMaterial = GL_AMBIENT_AND_DIFFUSE;
-        break;
+		colorMaterial = GL_AMBIENT_AND_DIFFUSE;
+		break;
 	      default:
-        synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-          child, "invalid colormaterial '%s'",
-          child->GetContentsValue());
-        colorMaterial = 0;
-        return false;
+		synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+		  child, "invalid colormaterial '%s'",
+		  child->GetContentsValue());
+		colorMaterial = 0;
+		return false;
 	    }
 	  }
 	  break;
@@ -909,13 +908,13 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    {
 	      case XMLTOKEN_PROGRAM:
 	      case XMLTOKEN_VARIABLEMAP:
-        // Don't want those
-        synsrv->ReportBadToken (child);
-        return false;
-        break;
+		// Don't want those
+		synsrv->ReportBadToken (child);
+		return false;
+		break;
 	      default:
-        if (!ParseCommon (child))
-          return false;
+		if (!ParseCommon (child))
+		  return false;
 	    }
 	  }
       }

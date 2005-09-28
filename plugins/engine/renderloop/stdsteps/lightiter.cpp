@@ -328,10 +328,10 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
     shvar_light_0_position_world->SetValue (lightPos);
     shvar_light_0_transform->SetValue (light->GetMovable()->GetFullTransform() * camTransR);
     shvar_light_0_transform_world->SetValue (light->GetMovable()->GetFullTransform());
-	float falloffInner, falloffOuter;
-	light->GetSpotLightFalloff (falloffInner, falloffOuter);
-	shvar_light_0_inner_falloff->SetValue (falloffInner);
-	shvar_light_0_outer_falloff->SetValue (falloffOuter);
+    float falloffInner, falloffOuter;
+    light->GetSpotLightFalloff (falloffInner, falloffOuter);
+    shvar_light_0_inner_falloff->SetValue (falloffInner);
+    shvar_light_0_outer_falloff->SetValue (falloffOuter);
 
     shvar_light_0_attenuationtex->SetAccessor (GetLightAccessor (light));
 
