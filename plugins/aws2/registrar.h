@@ -27,6 +27,26 @@ namespace aws
 
 namespace autom
 {
+       /** A scope object holds variables.  They are represented by a map from an string to an object pointer.  */
+       class scope
+       {
+	 /** The type of map between a variable name and the object it maps. */
+	 typedef std::map<csString, keeper> variable_map_type;
+
+	 /** The map of variable names. */
+         variable_map_type vars;
+
+       public:
+	 scope() {}
+	 ~scope() {}
+
+	 /** Return a keeper to the value. Will be nil if the value does not exist. */
+         keeper get(const csString &name);	 
+
+	 /** Set the value of a variable. */
+	 void set(const csString &name, keeper &val);	 
+       };
+
 
 	/** The registrar is a manager object, one per process, which keeps track of all the registered
 	 * functions.  It also supports containers that essentially serve as namespaces. */
@@ -82,16 +102,19 @@ namespace autom
 	
 	/** Returns the global registrar instance. */
 	registrar *Registrar();
+
+	/** Returns the global scope instance. */
+	scope *GlobalScope();
 	
 	/** Returns the global nil object. */
 	nil *Nil();
 	
 	/** Returns a fully populated object parsed from the given string, or zero on failure. */
-	object *Parse(std::string::iterator &pos, const std::string::iterator &end);
+	object *Parse(std::string::iterator &pos, const std::string::iterator &end, scope *sc=0);
 	
 	/** Returns a fully populated object parsed from the given string, or zero on failure.  Also performs
 	 * the additional work of setting parent functions when it finds a function. */
-	object *ParseParameter(std::string::iterator &pos, const std::string::iterator &end, function *parent);
+	object *ParseParameter(std::string::iterator &pos, const std::string::iterator &end, function *parent, scope *sc=0);
 	
 	/** Returns a garbage-collected pointer that is safe for application usage. */
 	keeper Compile(std::string &str);

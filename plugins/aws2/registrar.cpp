@@ -26,6 +26,7 @@ namespace autom
 {
 
 static registrar *_reg_object=0;
+static scope      _global_scope;
 static nil	  _global_nil_object;
 
 extern void install_builtin();
@@ -33,13 +34,19 @@ extern void install_builtin();
 registrar *
 Registrar()
 {
-	if (_reg_object==0)
-	{
-		_reg_object = new registrar();	
-		install_builtin();
-	}
-	
-	return _reg_object;	
+      if (_reg_object==0)
+      {
+	      _reg_object = new registrar();	
+	      install_builtin();
+      }
+      
+      return _reg_object;	
+}
+
+scope *
+GlobalScope()
+{
+  return &_global_scope;
 }
 
 nil*
@@ -54,6 +61,20 @@ registrar::assign(const csString &name, func_ptr func)
   lobby[name]=func;	
 }						
 
+keeper 
+scope::get(const csString &name)
+{
+  variable_map_type::iterator pos = vars.find(name);
+
+  if (pos==vars.end()) return keeper(Nil());
+  else return pos->second;
+}
+
+void 
+scope::set(const csString &name, keeper &val)
+{
+  vars[name]=val;
+}
 
 static object *
 parseString(std::string::iterator &pos, const std::string::iterator &end)
@@ -164,10 +185,27 @@ parseBlob(std::string::iterator &pos, const std::string::iterator &end)
 	}		
 }
 
+static object *
+parseVar(std::string::iterator &pos, const std::string::iterator &end, scope *sc)
+{
+  ++pos;
+
+  csString name;
+
+  // Get the name
+  while(pos!=end && isalnum(*pos))
+  {
+    name+=(*pos);
+  }
+
+  return static_cast<object *>(sc->get(name));
+}
+
 object *
-Parse(std::string::iterator &pos, const std::string::iterator &end)
+Parse(std::string::iterator &pos, const std::string::iterator &end, scope *sc)
 {	
 	object *o=0;
+	if (sc==0) sc=GlobalScope();
 	
 	while(pos!=end && isspace(*pos)) { ++pos; }
 	
@@ -181,9 +219,10 @@ Parse(std::string::iterator &pos, const std::string::iterator &end)
 		case '"': return parseString(pos, end);
 		case '[': return parseList(pos, end);
 		case 'n': return parseNil(pos, end);
+		case '*': return parseVar(pos, end, sc);
 		
 		default:		
-			if ((o=parseFloat(pos, end))!=0) 		return o;
+			if ((o=parseFloat(pos, end))!=0) 	return o;
 			else if ((o=parseInt(pos, end))!=0) 	return o;	
 			
 		break;			
@@ -193,9 +232,11 @@ Parse(std::string::iterator &pos, const std::string::iterator &end)
 }
 
 object *
-ParseParameter(std::string::iterator &pos, const std::string::iterator &end, function *parent)
+ParseParameter(std::string::iterator &pos, const std::string::iterator &end, function *parent, scope *sc)
 {
 	object *o=0;
+
+	if (sc==0) sc=GlobalScope();
 	
 	while(pos!=end && isspace(*pos)) { ++pos; }
 	
@@ -210,9 +251,10 @@ ParseParameter(std::string::iterator &pos, const std::string::iterator &end, fun
 		case '"': return parseString(pos, end);
 		case '[': return parseList(pos, end);
 		case 'n': return parseNil(pos, end);
+		case '*': return parseVar(pos, end, sc);
 		
 		default:		
-			if ((o=parseFloat(pos, end))!=0) 		return o;
+			if ((o=parseFloat(pos, end))!=0) 	return o;
 			else if ((o=parseInt(pos, end))!=0) 	return o;	
 			
 		break;			
