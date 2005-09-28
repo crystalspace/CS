@@ -54,13 +54,13 @@
 
 struct iReporter;
 
-class SndSysDriverCoreAudio : public iSndSysSoftwareDriver
+class csSndSysDriverCoreAudio : public iSndSysSoftwareDriver
 {
 public:
   SCF_DECLARE_IBASE;
 
-  SndSysDriverCoreAudio(iBase *piBase);
-  virtual ~SndSysDriverCoreAudio();
+  csSndSysDriverCoreAudio(iBase *piBase);
+  virtual ~csSndSysDriverCoreAudio();
 
   /// Called to initialize the driver.
   bool Open (csSndSysRendererSoftware*, csSndSysSoundFormat* requested_format);
@@ -74,9 +74,6 @@ public:
   /// Stop the background thread.
   void StopThread();
 
-  /// Global object registry.
-  static iObjectRegistry* object_reg;
-
   /// Report a diagnostic.
   void Report (int severity, const char* msg, ...);
 
@@ -89,7 +86,8 @@ public:
                      const AudioTimeStamp* inOutputTime);
 
 protected:
-  sSndSysRendererSoftware *attached_renderer;
+  iObjectRegistry* object_reg;
+  csSndSysRendererSoftware *attached_renderer;
   csSndSysSoundFormat playback_format;
   bool running;
 
@@ -103,7 +101,7 @@ public:
   // iComponent implementation.
   struct eiComponent : public iComponent
   {
-    SCF_DECLARE_EMBEDDED_IBASE(SndSysDriverCoreAudio);
+    SCF_DECLARE_EMBEDDED_IBASE(csSndSysDriverCoreAudio);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;

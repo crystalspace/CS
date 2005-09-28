@@ -40,19 +40,16 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_FACTORY (SndSysDriverCoreAudio)
+SCF_IMPLEMENT_FACTORY (csSndSysDriverCoreAudio)
 
-SCF_IMPLEMENT_IBASE(SndSysDriverCoreAudio)
+SCF_IMPLEMENT_IBASE(csSndSysDriverCoreAudio)
 SCF_IMPLEMENTS_INTERFACE(iSndSysSoftwareDriver)
 SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END;
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (SndSysDriverCoreAudio::eiComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSndSysDriverCoreAudio::eiComponent)
 SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-// The system driver.
-iObjectRegistry *SndSysDriverCoreAudio::object_reg = 0;
 
 // CoreAudio static IO procedure wrapper
 static OSStatus StaticAudioProc(AudioDeviceID inDevice,
@@ -63,26 +60,25 @@ static OSStatus StaticAudioProc(AudioDeviceID inDevice,
 				const AudioTimeStamp *inOutputTime,
 				void *inClientData)
 {
-  SndSysDriverCoreAudio *p_audio=(SndSysDriverCoreAudio *)inClientData;
+  csSndSysDriverCoreAudio *p_audio=(csSndSysDriverCoreAudio *)inClientData;
   return p_audio->AudioProc(inDevice, inNow, inInputData, inInputTime,
 			    outOutputData, inOutputTime);
 }
 
-SndSysDriverCoreAudio::SndSysDriverCoreAudio(iBase* piBase) :
-  attached_renderer(0), running(false)
+csSndSysDriverCoreAudio::csSndSysDriverCoreAudio(iBase* piBase) :
+  object_reg(0), attached_renderer(0), running(false)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  object_reg = 0;
 }
 
-SndSysDriverCoreAudio::~SndSysDriverCoreAudio()
+csSndSysDriverCoreAudio::~csSndSysDriverCoreAudio()
 {
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_DESTRUCT_IBASE();
 }
 
-void SndSysDriverCoreAudio::Report(int severity, const char* msg, ...)
+void csSndSysDriverCoreAudio::Report(int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
@@ -102,7 +98,7 @@ void SndSysDriverCoreAudio::Report(int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool SndSysDriverCoreAudio::Initialize (iObjectRegistry* r)
+bool csSndSysDriverCoreAudio::Initialize (iObjectRegistry* r)
 {
   object_reg = r;
   Report (CS_REPORTER_SEVERITY_DEBUG,
@@ -110,7 +106,7 @@ bool SndSysDriverCoreAudio::Initialize (iObjectRegistry* r)
   return true;
 }
 
-bool SndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
+bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
 				   csSndSysSoundFormat *requested_format)
 {
   uint32 propertysize, buffersize;
@@ -204,7 +200,7 @@ bool SndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
   }
 
   // Copy the final format into local storage
-  memcpy(&playback_format, requested_format, sizeof(SndSysSoundFormat));
+  memcpy(&playback_format, requested_format, sizeof(csSndSysSoundFormat));
 
   // Add a callback and begin playback
   status = AudioDeviceAddIOProc(outputDeviceID, StaticAudioProc, this);
@@ -218,13 +214,13 @@ bool SndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
   return true;
 }
 
-void SndSysDriverCoreAudio::Close ()
+void csSndSysDriverCoreAudio::Close ()
 {
   StopThread();
   AudioDeviceRemoveIOProc(outputDeviceID, StaticAudioProc);
 }
 
-bool SndSysDriverCoreAudio::StartThread()
+bool csSndSysDriverCoreAudio::StartThread()
 {
   OSStatus status;
   // Since the Core Audio API is callback driven, we don't actually start a
@@ -241,7 +237,7 @@ bool SndSysDriverCoreAudio::StartThread()
   return true;
 }
 
-void SndSysDriverCoreAudio::StopThread()
+void csSndSysDriverCoreAudio::StopThread()
 {
   running = false;
   AudioDeviceStop(outputDeviceID, StaticAudioProc);
@@ -249,7 +245,7 @@ void SndSysDriverCoreAudio::StopThread()
 }
 
 
-OSStatus SndSysDriverCoreAudio::AudioProc(AudioDeviceID inDevice,
+OSStatus csSndSysDriverCoreAudio::AudioProc(AudioDeviceID inDevice,
 					  const AudioTimeStamp *inNow,
 					  const AudioBufferList *inInputData,
 					  const AudioTimeStamp *inInputTime,

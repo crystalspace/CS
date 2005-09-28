@@ -25,6 +25,8 @@ chronological order.
 	  limit and follow the indent=2 space rule.
 	- Eric Sunshine fixed numerous compilations warnings and errors in
 	  AWS2.
+	- Eric Sunshine fixed the CoreAudio plugin so that it once again builds
+	  cleanly. Also reduced namespace pollution a bit.
 27-Sep-2005
 	- Jorrit added csTransform::GetUp(), GetFront(), and GetRight().
 	  These three conveniance functions get the up, front, and right
