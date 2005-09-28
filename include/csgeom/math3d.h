@@ -561,8 +561,10 @@ public:
 
   /**
    * Intersect a segment with a box.
+   * \param box The box with which to perform the intersection.
+   * \param segment The intersection candidate.
    * \param isect The returned intersection point.
-   * \param pr if not null then a number between 0 and 1 is returned which
+   * \param pr If not null then a number between 0 and 1 is returned which
    * corresponds to the position on the segment. If we were in the box
    * this this function will return CS_BOX_INSIDE. In this case 'isect' will
    * be set to the start of the segment and *pr to 0.

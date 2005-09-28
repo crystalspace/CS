@@ -158,18 +158,18 @@ public:
   /**
    * Create everything needed to get a CS application operational.
    * This function is completely equivalent to calling:
-   * - #CS_INITIALIZE_PLATFORM_APPLICATION macro</li>
-   * - InitializeSCF()</li>
-   * - CreateObjectRegistry()</li>
-   * - CreatePluginManager()</li>
-   * - CreateEventQueue()</li>
-   * - CreateVirtualClock()</li>
-   * - CreateCommandLineParser()</li>
-   * - CreateVerbosityManager()</li>
-   * - CreateConfigManager()</li>
-   * - CreateInputDrivers()</li>
-   * - CreateStringSet()</li>
-   * - csPlatformStartup()</li>
+   * - #CS_INITIALIZE_PLATFORM_APPLICATION macro
+   * - InitializeSCF()
+   * - CreateObjectRegistry()
+   * - CreatePluginManager()
+   * - CreateEventQueue()
+   * - CreateVirtualClock()
+   * - CreateCommandLineParser()
+   * - CreateVerbosityManager()
+   * - CreateConfigManager()
+   * - CreateInputDrivers()
+   * - CreateStringSet()
+   * - csPlatformStartup()
    *
    * You may want to call all or some of those manually if you don't wish
    * to use this function. It is suggested that 

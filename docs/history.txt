@@ -10,6 +10,7 @@ chronological order.
 	- Jorrit caused much wailing and gnashing of teeth as everyone will
 	  have to rebuild CS and everyone will get a new set of auto-generated
 	  documentation.
+	- Eric Sunshine resolved a bunch of Doxygen warnings.
 27-Sep-2005
 	- Jorrit added csTransform::GetUp(), GetFront(), and GetRight().
 	  These three conveniance functions get the up, front, and right

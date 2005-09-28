@@ -78,7 +78,7 @@ public:
   virtual void Flush();
   virtual bool AtEOF();
   virtual size_t GetPos();
-  virtual bool SetPos(size_t);
+  virtual bool SetPos(size_t newpos);
 
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
   /**

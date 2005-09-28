@@ -168,7 +168,7 @@ struct iPolygonMesh : public virtual iBase
    * - #CS_POLYMESH_CONVEX: mesh is convex.
    * - #CS_POLYMESH_NOTCONVEX: mesh is not convex.
    * - #CS_POLYMESH_DEFORMABLE: mesh is deformable.
-   * - C#S_POLYMESH_TRIANGLEMESH: mesh prefers triangle mesh.
+   * - #CS_POLYMESH_TRIANGLEMESH: mesh prefers triangle mesh.
    *
    * Note that if neither #CS_POLYMESH_CLOSED nor #CS_POLYMESH_NOTCLOSED
    * are set then the closed state is not known. Setting both is illegal.

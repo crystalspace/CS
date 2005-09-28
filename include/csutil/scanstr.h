@@ -32,25 +32,25 @@
  * <p>
  * It supports the following format commands:
  * <p>
- * - %%d -- integer number</li>
- * - %%f -- floating point</li>
- * - %%b -- boolean (0, 1, true, false, yes, no, on, off)</li>
- * - %%s -- string (with or without single quotes)</li>
+ * - %%d -- integer number
+ * - %%f -- floating point
+ * - %%b -- boolean (0, 1, true, false, yes, no, on, off)
+ * - %%s -- string (with or without single quotes)
  * - %%S -- string (delimited with double quotes)<br>
  *              \\n will be converted to a newline<br>
  *              \\t will be converted to a tab<br>
  *              \\\\ produces a \\<br>
  *              \\" produces a "<br>
- *              all other conbinations of \\ are copied.</li>
+ *              all other conbinations of \\ are copied.
  * - %%D -- list of integers, first argument should be a
  *		pointer to an array of integers, second argument
  *		a pointer to an integer which will contain the
- *		number of elements inserted in the list.</li>
- * - %%F -- similarly, a list of floats.</li>
+ *		number of elements inserted in the list.
+ * - %%F -- similarly, a list of floats.
  * - %%n -- this returns the amount of the input string
  *              thats been consumed, in characters. Does NOT
  *              increment the return count and does not read
- *              from the input string.</li>
+ *              from the input string.
  *
  * Returns the number of successfully scanned arguments or -1 if there
  * was a mismatch.
