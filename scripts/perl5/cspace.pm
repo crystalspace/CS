@@ -401,13 +401,13 @@ sub new {
 *__add_ass__ = *cspacec::csColor___add_ass__;
 *__subtr_ass__ = *cspacec::csColor___subtr_ass__;
 *__mult_ass__ = *cspacec::csColor___mult_ass__;
+*__mult__ = *cspacec::csColor___mult__;
 *__eq__ = *cspacec::csColor___eq__;
 *__ne__ = *cspacec::csColor___ne__;
 *Add = *cspacec::csColor_Add;
 *Subtract = *cspacec::csColor_Subtract;
 *__add__ = *cspacec::csColor___add__;
 *__subtr__ = *cspacec::csColor___subtr__;
-*__mult__ = *cspacec::csColor___mult__;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -1165,6 +1165,9 @@ sub new {
 *Other2ThisRelative = *cspacec::csTransform_Other2ThisRelative;
 *Other2This = *cspacec::csTransform_Other2This;
 *GetReflect = *cspacec::csTransform_GetReflect;
+*GetFront = *cspacec::csTransform_GetFront;
+*GetUp = *cspacec::csTransform_GetUp;
+*GetRight = *cspacec::csTransform_GetRight;
 *__mult__ = *cspacec::csTransform___mult__;
 sub DISOWN {
     my $self = shift;
@@ -13411,6 +13414,85 @@ sub DESTROY {
     }
 }
 
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iMovieRecorder ##############
+
+package cspace::iMovieRecorder;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*Start = *cspacec::iMovieRecorder_Start;
+*Stop = *cspacec::iMovieRecorder_Stop;
+*IsRecording = *cspacec::iMovieRecorder_IsRecording;
+*Pause = *cspacec::iMovieRecorder_Pause;
+*UnPause = *cspacec::iMovieRecorder_UnPause;
+*IsPaused = *cspacec::iMovieRecorder_IsPaused;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iMovieRecorder($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iMovieRecorder_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iMapNode ##############
+
+package cspace::iMapNode;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*QueryObject = *cspacec::iMapNode_QueryObject;
+*SetPosition = *cspacec::iMapNode_SetPosition;
+*GetPosition = *cspacec::iMapNode_GetPosition;
+*SetXVector = *cspacec::iMapNode_SetXVector;
+*GetXVector = *cspacec::iMapNode_GetXVector;
+*SetYVector = *cspacec::iMapNode_SetYVector;
+*GetYVector = *cspacec::iMapNode_GetYVector;
+*SetZVector = *cspacec::iMapNode_SetZVector;
+*GetZVector = *cspacec::iMapNode_GetZVector;
+*SetSector = *cspacec::iMapNode_SetSector;
+*GetSector = *cspacec::iMapNode_GetSector;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iMapNode($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iMapNode_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
