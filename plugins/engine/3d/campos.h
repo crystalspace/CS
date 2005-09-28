@@ -46,6 +46,8 @@ public:
 
   csCameraPosition (const csCameraPosition& other);
 
+  virtual ~csCameraPosition ();
+
   //--------------------- iCameraPosition implementation ----------------------
   virtual iObject *QueryObject();
   virtual iCameraPosition *Clone () const;
@@ -66,10 +68,6 @@ public:
   {
     return far_plane;
   }
-
-private:
-  /// Destroy this object and free all associated memory
-  virtual ~csCameraPosition ();
 
 private:
   /// The sector this camera points to

@@ -770,15 +770,14 @@ private:
   csZBufMode zbufMode;
 
   csShaderVariableContext svcontext;
-private:
-  /// Destructor.
-  virtual ~csMeshFactoryWrapper ();
 
 public:
   /// Constructor.
   csMeshFactoryWrapper (iMeshObjectFactory* meshFact);
   /// Constructor.
   csMeshFactoryWrapper ();
+  /// Destructor.
+  virtual ~csMeshFactoryWrapper ();
 
   CS_LEAKGUARD_DECLARE (csMeshFactoryWrapper);
 

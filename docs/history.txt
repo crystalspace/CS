@@ -27,6 +27,12 @@ chronological order.
 	  AWS2.
 	- Eric Sunshine fixed the CoreAudio plugin so that it once again builds
 	  cleanly. Also reduced namespace pollution a bit.
+	- Eric Sunshine worked around complaints from gcc 3.3 in objects which
+	  have been converted to the new SCF design. In particular, the
+	  compiler dislike seeing a private destructor when the class had no
+	  friends.  To fix, made the destructor public. The public destructor
+	  should not be a problem since these implementations are themselves
+	  entirely private to their respective modules.
 27-Sep-2005
 	- Jorrit added csTransform::GetUp(), GetFront(), and GetRight().
 	  These three conveniance functions get the up, front, and right

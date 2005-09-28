@@ -43,6 +43,10 @@ public:
    * Create a new csCollection with the given name.
    */
   csCollection ();
+  /**
+   * Destroy the collection.
+   */
+  virtual ~csCollection ();
 
   //------------------------- iCollection interface --------------------------
   virtual iObject *QueryObject()
@@ -68,10 +72,6 @@ public:
 
   virtual iObject* GetObject (int i) const
   { return (*this)[i]; }
-
-private:
-  ///
-  virtual ~csCollection ();
 
 private:
   /// The list of objects contained in this csCollection.
