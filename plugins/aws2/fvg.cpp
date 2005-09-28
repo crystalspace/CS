@@ -45,14 +45,14 @@ namespace aws
 
     void fvg_parser::ParsePath(object *vo, shape_attr &attr, csString &path)
     {
-      float lx, ly;
+      float lx = 0, ly = 0;
       const char *pos = path.GetData();
 
       polygon *poly=0;
 
       while(pos<path.GetData() + path.Length())
       {      
-	float x, y, r;
+	float x, y;
 
 	// Skip whitespace
 	if (isspace(*pos) || *pos == ',') { ++pos; continue; }
@@ -246,20 +246,17 @@ namespace aws
 
       if (tmp)
       {
-	float tx, ty, ra, sx, sy;
-        	
+	// float tx, ty, ra, sx, sy;
 	// parse the transform stack...	
       }
       
     }
     
-    void fvg_parser::ParseNode(object *vo, csRef< iDocumentNodeIterator> &pos, autom::scope &sc)
+    void fvg_parser::ParseNode(object *vo, csRef<iDocumentNodeIterator> &pos)
     {
       // Walk through all of the nodes and
       while(pos->HasNext())
       {
-	bool had_value=false;
-
 	csRef<iDocumentNode> child = pos->Next ();
 
 	// Don't process comments.
@@ -327,8 +324,9 @@ namespace aws
             x = child->GetAttributeValueAsFloat("cx");
 	    y = child->GetAttributeValueAsFloat("cy");
 	    r = child->GetAttributeValueAsFloat("r");
-	    	    
-	    vo->AddShape(new ellipse(csVector2(x-r,y-r), csVector2(x+r, y+r)));	    
+
+	    csVector2 e1(x-r,y-r), e2(x+r, y+r);
+	    vo->AddShape(new ellipse(e1, e2));
 	  }
 	  else if(name=="ellipse")
 	  {
@@ -339,7 +337,8 @@ namespace aws
 	    rx = child->GetAttributeValueAsFloat("rx");
 	    ry = child->GetAttributeValueAsFloat("ry");
 
-	    vo->AddShape(new ellipse(csVector2(x-rx,y-ry), csVector2(x+rx, y+ry)));	    
+	    csVector2 e1(x-rx,y-ry), e2(x+rx, y+ry);
+	    vo->AddShape(new ellipse(e1, e2));
 	  }
           else if(name=="line")
 	  {
@@ -350,7 +349,8 @@ namespace aws
 	    x2 = child->GetAttributeValueAsFloat("x2");
 	    y2 = child->GetAttributeValueAsFloat("y2");
 
-	    vo->AddShape(new line(csVector2(x1,y1), csVector2(x2, y2)));	    
+	    csVector2 s1(x1,y1), s2(x2, y2);
+	    vo->AddShape(new line(s1, s2));
 	  }
 	}
 

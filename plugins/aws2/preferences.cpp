@@ -31,6 +31,7 @@
 namespace aws
 {
 
+#if 0 /* not presently used */
 static char *color_names[] = 
 {
  "HighlightColor",
@@ -53,6 +54,7 @@ static char *color_names[] =
  "GreenColor",
  "BlueColor" 
 };
+#endif
 
 void preferences::init_default_colors()
 {

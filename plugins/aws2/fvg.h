@@ -81,7 +81,7 @@ namespace aws
       void FillAttribute(shape_attr &attr, csRef<iDocumentNode> &pos);
 
       /** Parses a shape node. */
-      void ParseNode(object *vo, csRef< iDocumentNodeIterator> &pos);
+      void ParseNode(object *vo, csRef<iDocumentNodeIterator> &pos);
 
       /** Parses a path node, generating drawing instructions into the given vector object. */
       void ParsePath(object *vo, shape_attr &attr, csString &path);

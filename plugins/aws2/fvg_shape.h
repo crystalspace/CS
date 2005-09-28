@@ -103,15 +103,15 @@ namespace aws
 	switch(rect_style)
 	{
 	  case RECT_NORMAL:
-	    pen->DrawRect(tl.x, tl.y, br.x, br.y, false, fill);
+	    pen->DrawRect((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, false, fill);
 	  break;
 
 	  case RECT_ROUNDED:
-	    pen->DrawRoundedRect(tl.x, tl.y, br.x, br.y, roundness, false, fill);
+	    pen->DrawRoundedRect((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, roundness, false, fill);
 	  break;
 
 	  case RECT_MITERED:
-	    pen->DrawMiteredRect(tl.x, tl.y, br.x, br.y, roundness, false, fill);
+	    pen->DrawMiteredRect((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, roundness, false, fill);
 	  break;
 	}
       }
@@ -163,13 +163,13 @@ namespace aws
         if (attr.filled)
 	{
 	  pen->SetColor(attr.fill_color);
-	  pen->DrawArc(tl.x, tl.y, br.x, br.y, sa, ea, false, true);
+	  pen->DrawArc((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, sa, ea, false, true);
 	}
 
 	if (attr.stroked)
 	{
 	   pen->SetColor(attr.stroke_color);
-	   pen->DrawArc(tl.x, tl.y, br.x, br.y, sa, ea, false, false);
+	   pen->DrawArc((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, sa, ea, false, false);
 	}
       }
     };
@@ -191,7 +191,7 @@ namespace aws
 	if (attr.stroked)
 	{
 	   pen->SetColor(attr.stroke_color);
-	   pen->DrawLine(tl.x, tl.y, br.x, br.y);
+	   pen->DrawLine((int)tl.x, (int)tl.y, (int)br.x, (int)br.y);
 	}
       }
     };
@@ -252,10 +252,10 @@ namespace aws
 	  for(size_t i=0; i<tri_mesh.GetTriangleCount(); ++i)
 	  {
 	    csTriangle &tri = tri_mesh.GetTriangle((int)i);
-            
-	    pen->DrawTriangle(tri_verts[tri.a].x, tri_verts[tri.a].y,
-			      tri_verts[tri.b].x, tri_verts[tri.b].y,
-			      tri_verts[tri.c].x, tri_verts[tri.c].y, true);
+	    pen->DrawTriangle((int)tri_verts[tri.a].x, (int)tri_verts[tri.a].y,
+			      (int)tri_verts[tri.b].x, (int)tri_verts[tri.b].y,
+			      (int)tri_verts[tri.c].x, (int)tri_verts[tri.c].y,
+			      true);
 	  }
 	}
 
@@ -265,7 +265,7 @@ namespace aws
 
 	   for(size_t i=0; i<poly.Length()-1; ++i)
 	   {
-             pen->DrawLine(poly[i].x, poly[i].y, poly[i+1].x, poly[i+1].y);
+             pen->DrawLine((int)poly[i].x, (int)poly[i].y, (int)poly[i+1].x, (int)poly[i+1].y);
 	   }
 	}
       }
