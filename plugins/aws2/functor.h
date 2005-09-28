@@ -124,10 +124,10 @@ namespace autom
     bool bind();
 
   public:
-    function():object(T_FUNCTION), rv(0), parent(0), scope(0), repr_exec(false) {}
+    function():object(T_FUNCTION), rv(0), parent(0), sc(0), repr_exec(false) {}
 
     function(const std::string &_name, bool _exec_on_represent=false)
-    	: object(T_FUNCTION), rv(0), parent(0), scope(0), repr_exec(_exec_on_represent)
+    	: object(T_FUNCTION), rv(0), parent(0), sc(0), repr_exec(_exec_on_represent)
     {
       scfString s (_name.c_str());
       SetName (&s);
@@ -135,7 +135,7 @@ namespace autom
 
     /** Copy constructor: does NOT copy the return value or the parameters! */
     function(const function& func):iObject(), object(T_FUNCTION), rv(0),
-    	parent(0), scope(0), repr_exec(func.repr_exec), Called(func.Called) {}
+    	parent(0), sc(0), repr_exec(func.repr_exec), Called(func.Called) {}
 
     /** Signal fired when function is called. */
     signal Called;
