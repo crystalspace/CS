@@ -184,6 +184,8 @@ void csLightIterRenderStep::Init ()
     csStringID spcname = strings->Request ("light 0 specular");
     csStringID attname = strings->Request ("light 0 attenuation");
     csStringID atxname = strings->Request ("light 0 attenuationtex");
+    csStringID infallname = strings->Request ("light 0 inner falloff");
+    csStringID ofallname = strings->Request ("light 0 outer falloff");
 
     shadermgr = CS_QUERY_REGISTRY (
     	object_reg, iShaderManager);
@@ -251,6 +253,22 @@ void csLightIterRenderStep::Init ()
       shvar_light_0_attenuationtex->SetType (csShaderVariable::TEXTURE);
       shadermgr->AddVariable (shvar_light_0_attenuationtex);
     }
+
+    shvar_light_0_inner_falloff = shadermgr->GetVariable (infallname);
+    if (!shvar_light_0_inner_falloff)
+    {
+      shvar_light_0_inner_falloff = new csShaderVariable (infallname);
+      shvar_light_0_inner_falloff->SetType (csShaderVariable::FLOAT);
+      shadermgr->AddVariable (shvar_light_0_inner_falloff);
+    }
+
+    shvar_light_0_outer_falloff = shadermgr->GetVariable (ofallname);
+    if (!shvar_light_0_outer_falloff)
+    {
+      shvar_light_0_outer_falloff = new csShaderVariable (ofallname);
+      shvar_light_0_outer_falloff->SetType (csShaderVariable::FLOAT);
+      shadermgr->AddVariable (shvar_light_0_outer_falloff);
+    }
   }
 }
 
@@ -310,6 +328,10 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
     shvar_light_0_position_world->SetValue (lightPos);
     shvar_light_0_transform->SetValue (light->GetMovable()->GetFullTransform() * camTransR);
     shvar_light_0_transform_world->SetValue (light->GetMovable()->GetFullTransform());
+	float falloffInner, falloffOuter;
+	light->GetSpotLightFalloff (falloffInner, falloffOuter);
+	shvar_light_0_inner_falloff->SetValue (falloffInner);
+	shvar_light_0_outer_falloff->SetValue (falloffOuter);
 
     shvar_light_0_attenuationtex->SetAccessor (GetLightAccessor (light));
 

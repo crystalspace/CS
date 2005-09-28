@@ -11,6 +11,16 @@ chronological order.
 	  have to rebuild CS and everyone will get a new set of auto-generated
 	  documentation.
 	- Eric Sunshine resolved a bunch of Doxygen warnings.
+	- Erroroman made the following:
+	   - added light type SV in generic render loop.
+	   - added projection and texture3d mapping in gl fixed shader.
+	   - added projectortest (r3dtest + small changes).
+	   - added light_projection_bumpmap.xml shader.
+	   These things are working with lots of ugly fixes. We need
+	   light transform definition in world xml and trigger for light 
+	   rotation. Also every light must hold projection/attenuation texture 
+	   (now i can't add another spot light with different projection 
+	   texture).
 27-Sep-2005
 	- Jorrit added csTransform::GetUp(), GetFront(), and GetRight().
 	  These three conveniance functions get the up, front, and right

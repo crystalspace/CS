@@ -62,7 +62,7 @@ void csGLShaderFVP::Deactivate()
 
 void csGLShaderFVP::SetupState (const csRenderMesh *mesh, 
                                 csRenderMeshModes& modes,
-				const csShaderVarStack &stacks)
+                const csShaderVarStack &stacks)
 {
   size_t i;
 
@@ -133,6 +133,120 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
   {
     statecache->SetActiveTU ((int)i);
     statecache->ActivateTU ();
+    if (layers[i].texgen == TEXGEN_PROJECTION)
+    {
+        if (!lights.Length())
+        {
+        	continue;
+        }
+
+        //????????
+        LightingEntry& entry = lights[0];
+
+        static float SP[4] = { 1, 0, 0, 0 };
+        static float ST[4] = { 0, 1, 0, 0 };
+        static float SR[4] = { 0, 0, 1, 0 };
+        static float SQ[4] = { 0, 0, 0, 1 };
+
+        // setting up projective texture mapping
+        statecache->SetMatrixMode (GL_TEXTURE);
+        glLoadIdentity ();
+        statecache->Enable_GL_TEXTURE_GEN_S ();
+        statecache->Enable_GL_TEXTURE_GEN_T ();
+        statecache->Enable_GL_TEXTURE_GEN_R ();
+        glEnable(GL_TEXTURE_GEN_Q);
+        glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+        glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+        glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+        glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+        glTexGenfv(GL_S, GL_EYE_PLANE, SP);
+        glTexGenfv(GL_T, GL_EYE_PLANE, ST);
+        glTexGenfv(GL_R, GL_EYE_PLANE, SR);
+        glTexGenfv(GL_Q, GL_EYE_PLANE, SQ);
+
+        float f = GetParamFloatVal (stacks, entry.params[gllpSpotCutoff], 45.0f);
+        float xmin, xmax, ymin, ymax, zNear, zFar, aspect;
+        //???????
+        aspect = 1;
+        zNear = 1.0f;//??
+        zFar = 0.1f;//??
+        ymax = (1 - f)*2;//zNear * tan(acosf(f)*0.5);
+        ymin = -ymax;
+        xmin = ymin * aspect;
+        xmax = ymax * aspect;
+        glFrustum(xmin, xmax, ymin, ymax, zNear, zFar);
+		//????????
+
+        csReversibleTransform def_transform;
+        csReversibleTransform t = GetParamTransformVal (stacks, entry.params[gllpTransform], def_transform);
+        const csMatrix3 &orientation = t.GetT2O();
+
+        static float mAutoTextureMatrix[16];
+        mAutoTextureMatrix[0] = orientation.m11; 
+        mAutoTextureMatrix[1] = orientation.m12; 
+        mAutoTextureMatrix[2] = orientation.m13;
+
+        mAutoTextureMatrix[4] = orientation.m21;
+        mAutoTextureMatrix[5] = orientation.m22;
+        mAutoTextureMatrix[6] = orientation.m23;
+
+        mAutoTextureMatrix[8] = orientation.m31; 
+        mAutoTextureMatrix[9] = orientation.m32; 
+        mAutoTextureMatrix[10] = orientation.m33;
+
+        mAutoTextureMatrix[3] =
+        	mAutoTextureMatrix[7] = mAutoTextureMatrix[11] = 0.0f;
+        mAutoTextureMatrix[12] =
+        	mAutoTextureMatrix[13] = mAutoTextureMatrix[14] = 0.0f;
+        mAutoTextureMatrix[15] = 1.0f;
+        glMultMatrixf (mAutoTextureMatrix);
+
+        const csVector3 & pos = t.GetOrigin();
+        glTranslatef(-pos.x, -pos.y, -pos.z);
+    }
+    else if (layers[i].texgen == TEXGEN_TEXTURE3D)
+    {
+        if (!lights.Length())
+        {
+        	continue;
+        }
+
+		//????????
+        LightingEntry& entry = lights[0];
+        csVector4 v;
+
+        csShaderVariable* sv = csGetShaderVariableFromStack (stacks, string_object2world);
+        if (!sv) continue;
+
+        csReversibleTransform t;
+        sv->GetValue (t);
+
+        statecache->SetMatrixMode (GL_TEXTURE);
+        statecache->Enable_GL_TEXTURE_GEN_S ();
+        statecache->Enable_GL_TEXTURE_GEN_T ();
+        statecache->Enable_GL_TEXTURE_GEN_R ();
+        glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+        glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+        glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+        static float PS[4] = {1, 0, 0, -1};
+        static float PT[4] = {0, 1, 0, -1};
+        static float PR[4] = {0, 0, 1, -1};
+        glTexGenfv(GL_S, GL_OBJECT_PLANE, PS);
+        glTexGenfv(GL_T, GL_OBJECT_PLANE, PT);
+        glTexGenfv(GL_R, GL_OBJECT_PLANE, PR);
+        glTranslatef(0.5f, 0.5f, 0.5f);
+        glScalef(0.5f, 0.5f, 0.5f);
+
+        const csVector4 null (0);
+        v = GetParamVectorVal (stacks, entry.params[gllpAttenuation], null);
+        float one_over_radius = 1/v.x;
+        glScalef(one_over_radius, one_over_radius, one_over_radius);
+
+        v = GetParamVectorVal (stacks, entry.params[gllpPosition], null);
+        csVector3 lp = t.Other2This(csVector3(v.x, v.y, v.z));
+        glTranslatef(-lp.x, -lp.y, -lp.z);
+    }
+	else
     if (layers[i].texgen == TEXGEN_REFLECT_CUBE)
     {
 
@@ -426,6 +540,7 @@ void csGLShaderFVP::ResetState ()
       statecache->Disable_GL_TEXTURE_GEN_S ();
       statecache->Disable_GL_TEXTURE_GEN_T ();
       statecache->Disable_GL_TEXTURE_GEN_R ();
+	  glDisable(GL_TEXTURE_GEN_Q);
 
       statecache->SetMatrixMode (GL_TEXTURE);
       glLoadIdentity ();
@@ -436,7 +551,7 @@ void csGLShaderFVP::ResetState ()
 }
 
 bool csGLShaderFVP::ParseTexMatrixOp (iDocumentNode* node, 
-				      TexMatrixOp& op, bool matrix)
+                      TexMatrixOp& op, bool matrix)
 {
   const char* type = node->GetAttributeValue ("type");
   if (type == 0)
@@ -456,7 +571,7 @@ bool csGLShaderFVP::ParseTexMatrixOp (iDocumentNode* node,
 }
 
 bool csGLShaderFVP::ParseTexMatrix (iDocumentNode* node, 
-				    csArray<TexMatrixOp>& matrixOps)
+                    csArray<TexMatrixOp>& matrixOps)
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while(it->HasNext())
@@ -525,20 +640,24 @@ bool csGLShaderFVP::ParseLight (iDocumentNode* node, LightingEntry& entry)
     csStringID id = tokens.Request (value);
     switch(id)
     {
-#define LIGHT_PARAM(Token, GLLP, Type)			    \
-      case XMLTOKEN_ ## Token:				    \
+#define LIGHT_PARAM(Token, GLLP, Type)        	    \
+      case XMLTOKEN_ ## Token:                    \
 	if (!ParseProgramParam (child, entry.params[GLLP],  \
-	  Type))					    \
-	  return false;					    \
+	  Type))                	    \
+	  return false;                	    \
 	break
-#define LIGHT_PARAM_V(Token, GLLP)			    \
-      LIGHT_PARAM(Token, GLLP,				    \
+#define LIGHT_PARAM_V(Token, GLLP)        	    \
+      LIGHT_PARAM(Token, GLLP,                    \
 	ParamVector3 | ParamVector4 | ParamShaderExp)
-#define LIGHT_PARAM_F(Token, GLLP)			    \
-      LIGHT_PARAM(Token, GLLP,				    \
+#define LIGHT_PARAM_F(Token, GLLP)        	    \
+      LIGHT_PARAM(Token, GLLP,                    \
 	ParamFloat | ParamShaderExp)
+#define LIGHT_PARAM_T(Token, GLLP)        	    \
+      LIGHT_PARAM(Token, GLLP,                    \
+	ParamTransform | ParamShaderExp)
 
       LIGHT_PARAM_V(POSITION, gllpPosition);
+      LIGHT_PARAM_T(TRANSFORM, gllpTransform);
       LIGHT_PARAM_V(DIFFUSE, gllpDiffuse);
       LIGHT_PARAM_V(SPECULAR, gllpSpecular);
       LIGHT_PARAM_V(AMBIENT, gllpAmbient);
@@ -575,6 +694,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
     (csLightShaderVarCache::LightProperty)-1;
   static const csLightShaderVarCache::LightProperty defaultParamNames[gllpCount] =
     {csLightShaderVarCache::lightPositionWorld,
+     csLightShaderVarCache::lightTransformWorld,
      csLightShaderVarCache::lightDiffuse,
      csLightShaderVarCache::lightSpecular,
      propNone,
@@ -590,6 +710,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
   ambientvar = csInvalidStringID;
   primcolvar = csInvalidStringID;
   string_world2camera = strings->Request ("world2camera transform");
+  string_object2world = strings->Request ("object2world transform");
 
   csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
   	objectReg, iShaderManager);
@@ -620,10 +741,10 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    {
 	      if (!entry.params[i].valid && (defaultParamNames[i] != propNone))
 	      {
-		entry.params[i].name = 
-		  shaderPlug->lsvCache.GetLightSVId (entry.lightnum,
-		  defaultParamNames[i]);
-		entry.params[i].valid = true;
+        entry.params[i].name = 
+          shaderPlug->lsvCache.GetLightSVId (entry.lightnum,
+          defaultParamNames[i]);
+        entry.params[i].valid = true;
 	      }
 	    }
           }
@@ -641,7 +762,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    if (layer < 0)
 	    {
 	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-		variablesnode, "'layer' attribute invalid");
+        variablesnode, "'layer' attribute invalid");
 	      return false;
 	    }
             if (layers.Length ()<= (size_t)layer)
@@ -668,7 +789,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    if (layer < 0)
 	    {
 	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-		variablesnode, "'layer' attribute invalid");
+        variablesnode, "'layer' attribute invalid");
 	      return false;
 	    }
             if (layers.Length () <= (size_t)layer)
@@ -688,14 +809,22 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
                   {
                     layers[layer].texgen = TEXGEN_REFLECT_SPHERE;
                   }
-		  else
-		  {
-		    synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-		      variablesnode, "invalid mapping '%s'", str);
-		    return false;
-		  }
+          else
+          {
+            synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+              variablesnode, "invalid mapping '%s'", str);
+            return false;
+          }
                 }
               }
+              else if (!strcasecmp(str, "projection"))
+              {
+                layers[layer].texgen = TEXGEN_PROJECTION;
+        	  }
+              else if (!strcasecmp(str, "texture3d"))
+              {
+                layers[layer].texgen = TEXGEN_TEXTURE3D;
+        	  }
               else if (!strcasecmp(str, "fog"))
               {
                 layers[layer].texgen = TEXGEN_FOG;
@@ -712,9 +841,9 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
               }
 	      else
 	      {
-		synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-		  variablesnode, "invalid type '%s'", str);
-		return false;
+        synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+          variablesnode, "invalid type '%s'", str);
+        return false;
 	      }
             }
           }
@@ -725,7 +854,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    if (layer < 0)
 	    {
 	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-		variablesnode, "'layer' attribute invalid");
+        variablesnode, "'layer' attribute invalid");
 	      return false;
 	    }
             if (layers.Length () <= (size_t)layer)
@@ -741,26 +870,26 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    switch (typeID)
 	    {
 	      case XMLTOKEN_AMBIENT:
-		colorMaterial = GL_AMBIENT;
-		break;
+        colorMaterial = GL_AMBIENT;
+        break;
 	      case XMLTOKEN_EMISSION:
-		colorMaterial = GL_EMISSION;
-		break;
+        colorMaterial = GL_EMISSION;
+        break;
 	      case XMLTOKEN_DIFFUSE:
-		colorMaterial = GL_DIFFUSE;
-		break;
+        colorMaterial = GL_DIFFUSE;
+        break;
 	      case XMLTOKEN_SPECULAR:
-		colorMaterial = GL_SPECULAR;
-		break;
+        colorMaterial = GL_SPECULAR;
+        break;
 	      case XMLTOKEN_AMBIENT_AND_DIFFUSE:
-		colorMaterial = GL_AMBIENT_AND_DIFFUSE;
-		break;
+        colorMaterial = GL_AMBIENT_AND_DIFFUSE;
+        break;
 	      default:
-		synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-		  child, "invalid colormaterial '%s'",
-		  child->GetContentsValue());
-		colorMaterial = 0;
-		return false;
+        synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
+          child, "invalid colormaterial '%s'",
+          child->GetContentsValue());
+        colorMaterial = 0;
+        return false;
 	    }
 	  }
 	  break;
@@ -780,13 +909,13 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 	    {
 	      case XMLTOKEN_PROGRAM:
 	      case XMLTOKEN_VARIABLEMAP:
-		// Don't want those
-		synsrv->ReportBadToken (child);
-		return false;
-		break;
+        // Don't want those
+        synsrv->ReportBadToken (child);
+        return false;
+        break;
 	      default:
-		if (!ParseCommon (child))
-		  return false;
+        if (!ParseCommon (child))
+          return false;
 	    }
 	  }
       }

@@ -40,7 +40,9 @@ public:
     TEXGEN_NONE = 0,
     TEXGEN_REFLECT_SPHERE,
     TEXGEN_REFLECT_CUBE,
-    TEXGEN_FOG
+    TEXGEN_FOG,
+	TEXGEN_TEXTURE3D,
+    TEXGEN_PROJECTION
   };
   enum TexMatrixOpType
   {
@@ -73,6 +75,7 @@ private:
   enum GlLightParam
   {
     gllpPosition = 0,
+    gllpTransform,
     gllpDiffuse,
     gllpSpecular,
     gllpAmbient,
@@ -93,6 +96,7 @@ private:
 
   csStringID ambientvar;
   csStringID string_world2camera;
+  csStringID string_object2world;
   csArray<LightingEntry> lights;
   bool do_lighting;
   GLenum colorMaterial;

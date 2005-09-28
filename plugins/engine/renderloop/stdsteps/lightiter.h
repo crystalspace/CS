@@ -97,6 +97,9 @@ private:
   csRef<csShaderVariable> shvar_light_0_specular;
   csRef<csShaderVariable> shvar_light_0_attenuation;
   csRef<csShaderVariable> shvar_light_0_attenuationtex;
+  csRef<csShaderVariable> shvar_light_0_inner_falloff;
+  csRef<csShaderVariable> shvar_light_0_outer_falloff;
+
   csRef<iShaderManager> shadermgr;
   bool initialized;
 

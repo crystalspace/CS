@@ -175,6 +175,23 @@ protected:
     var->GetValue (v);
     return v;
   }
+  inline csReversibleTransform GetParamTransformVal (const csShaderVarStack &stacks, 
+    const ProgramParam &param, const csReversibleTransform& defVal)
+  {
+    csRef<csShaderVariable> var;
+  
+    var = csGetShaderVariableFromStack (stacks, param.name);
+    if (!var.IsValid ())
+      var = param.var;
+  
+    // If var is null now we have no const nor any passed value, ignore it
+    if (!var.IsValid ())
+      return defVal;
+  
+    csReversibleTransform t;
+    var->GetValue (t);
+    return t;
+  }
   inline float GetParamFloatVal (const csShaderVarStack &stacks, 
     const ProgramParam &param, float defVal)
   {

@@ -157,6 +157,7 @@ csStringID csGenericRenderStep::fogstart_name;
 csStringID csGenericRenderStep::fogend_name;
 csStringID csGenericRenderStep::fogmode_name;
 csStringID csGenericRenderStep::string_object2world;
+csStringID csGenericRenderStep::light_0_type;
 
 SCF_IMPLEMENT_IBASE(csGenericRenderStep)
   SCF_IMPLEMENTS_INTERFACE(iRenderStep)
@@ -187,6 +188,7 @@ csGenericRenderStep::csGenericRenderStep (
   fogend_name = strings->Request ("fog end");
   fogmode_name = strings->Request ("fog mode");
   string_object2world = strings->Request ("object2world transform");
+  light_0_type = strings->Request ("light 0 type");
 
   visible_meshes_index = 0;
 }
@@ -425,6 +427,12 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   shadervars.Top ().GetVariableAdd (string_object2world);
 
   csRef<csShaderVariable> sv;
+  if (light)
+  {
+    sv = shadervars.Top ().GetVariableAdd (light_0_type);
+    sv->SetValue (light->GetType());
+  }
+
   if (sector->HasFog())
   {
     sv = shadervars.Top ().GetVariableAdd (fogdensity_name);
