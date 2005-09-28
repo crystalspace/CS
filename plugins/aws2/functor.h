@@ -27,6 +27,10 @@ namespace aws
 
 namespace autom
 {
+
+  // Predeclaration of scope.
+  class scope;
+
   /**
    * This is an executable function for Keila.  All actual execution is done
    * in native code since Keila doesn't really have a sort of mainline
@@ -109,6 +113,9 @@ namespace autom
     /** Parent function. */
     function *parent;
 
+    /** Scope for variables found in this function's hierarchy. */
+    scope *sc;
+
     /** Set to true if this object should execute on representation. */
     bool repr_exec;
 
@@ -117,10 +124,10 @@ namespace autom
     bool bind();
 
   public:
-    function():object(T_FUNCTION), rv(0), parent(0), repr_exec(false) {}
+    function():object(T_FUNCTION), rv(0), parent(0), scope(0), repr_exec(false) {}
 
     function(const std::string &_name, bool _exec_on_represent=false)
-    	: object(T_FUNCTION), rv(0), parent(0), repr_exec(_exec_on_represent)
+    	: object(T_FUNCTION), rv(0), parent(0), scope(0), repr_exec(_exec_on_represent)
     {
       scfString s (_name.c_str());
       SetName (&s);
@@ -128,7 +135,7 @@ namespace autom
 
     /** Copy constructor: does NOT copy the return value or the parameters! */
     function(const function& func):iObject(), object(T_FUNCTION), rv(0),
-    	parent(0), repr_exec(func.repr_exec), Called(func.Called) {}
+    	parent(0), scope(0), repr_exec(func.repr_exec), Called(func.Called) {}
 
     /** Signal fired when function is called. */
     signal Called;
@@ -141,6 +148,9 @@ namespace autom
 
     /** Sets the parent of the function. */
     void setParent(function *_p) { parent = _p; }
+
+    /** Sets the scope of the function. */
+    void setScope(scope *_sc) { sc = _sc; }
 
     /** Adds the named parameter, compiling the value into a keila object. */
     bool addParm(const scfString &parm_name, std::string &_value);

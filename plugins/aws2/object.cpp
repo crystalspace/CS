@@ -292,7 +292,6 @@ list::parseObject(std::string::iterator &pos, const std::string::iterator &end)
 		if (k.IsValid())
 		{	
 			value.push_back(k);
-			(void)k->ToInt(); /// Why is this necessary?  I don't know.  I wish it wasn't.  It's definitely wierd.
 		}				
 		else
 			value.push_back(keeper(Nil()));
@@ -648,6 +647,51 @@ blob::parseObject(std::string::iterator &pos, const std::string::iterator &end)
 	
 	return true;	
 }		
+
+
+/////////////////////////////////// Variable Object ///////////////////////
+
+string 
+var::ToString()
+{
+  return sc->get(name)->ToString();
+}
+
+integer 
+var::ToInt()
+{
+  return sc->get(name)->ToInt();
+}
+
+floating 
+var::ToFloat()
+{
+  return sc->get(name)->ToFloat();
+}
+
+csRef<iString> 
+var::ReprObject()
+{
+  scfString *s = new scfString("*");
+  s->Append(name);
+
+  return csPtr<iString>(s);
+}
+
+bool 
+var::parseObject(std::string::iterator &pos, const std::string::iterator &end)
+{
+  ++pos;
+  
+  // Get the name
+  while(pos!=end && isalnum(*pos))
+  {
+    name+=(*pos);
+    ++pos;
+  }
+
+  return true;
+}
 
 	
 } // namespace autom

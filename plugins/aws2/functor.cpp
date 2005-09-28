@@ -209,7 +209,7 @@ function::parseObject(std::string::iterator &pos, const std::string::iterator &e
 		for(; pos!=end && (isspace(*pos) || *pos=='='); ++pos) {}
 				
 		// Otherwise
-		object *o = ParseParameter(pos, end, this);
+		object *o = ParseParameter(pos, end, this, sc);
 		
 		// Insert it into our parameter map.
 		if (o) parms.insert(std::make_pair(parm_name.c_str(), o));		

@@ -21,6 +21,7 @@
 
 #include "cstool/pen.h"
 #include "csgeom/csrect.h"
+#include "registrar.h"
 
 
 
@@ -39,6 +40,9 @@ namespace aws
  
     /// The parent bounding box.
     frame *parent;
+
+    /// The automation scope for this frame.
+    autom::scope sc;
 
   public:
     frame();

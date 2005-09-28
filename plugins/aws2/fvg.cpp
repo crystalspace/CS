@@ -253,7 +253,7 @@ namespace aws
       
     }
     
-    void fvg_parser::ParseNode(object *vo, csRef< iDocumentNodeIterator> &pos)
+    void fvg_parser::ParseNode(object *vo, csRef< iDocumentNodeIterator> &pos, autom::scope &sc)
     {
       // Walk through all of the nodes and
       while(pos->HasNext())
@@ -357,7 +357,7 @@ namespace aws
       } // end while more nodes left.
     }
 
-    bool fvg_parser::Parse (const scfString &txt)
+    bool fvg_parser::Parse (const scfString &txt, autom::scope &sc)
     {
       csRef<iDocumentSystem> xml;
       xml.AttachNew (new csTinyDocumentSystem ());

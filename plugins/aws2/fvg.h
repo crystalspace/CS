@@ -25,6 +25,7 @@
 #include "csutil/xmltiny.h"
 #include "csutil/scfstr.h"
 #include "fvg_shape.h"
+#include "registrar.h"
 #include <map>
 
 /** file Flexible Vector Graphics parser
@@ -90,7 +91,7 @@ namespace aws
       virtual ~fvg_parser();
       
       /** Parses the given text into a vector representation of the fvg information. */
-      virtual bool Parse (const scfString &txt);
+      virtual bool Parse (const scfString &txt, autom::scope &sc);
 
       /** Draws a shape. */
       virtual bool Draw(const csString &name, iPen *pen);

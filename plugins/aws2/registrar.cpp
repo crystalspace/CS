@@ -129,13 +129,14 @@ parseList(std::string::iterator &pos, const std::string::iterator &end)
 }
 
 static object *
-parseFunction(std::string::iterator &pos, const std::string::iterator &end, function *parent=0)
+parseFunction(std::string::iterator &pos, const std::string::iterator &end, scope *sc, function *parent=0)
 {
 	function  *o = new function;
 	
 	if (o->parseObject(pos, end)) 
 	{
 		o->setParent(parent);
+		o->setScope(sc);
 		return o;
 	}
 	else
@@ -188,17 +189,16 @@ parseBlob(std::string::iterator &pos, const std::string::iterator &end)
 static object *
 parseVar(std::string::iterator &pos, const std::string::iterator &end, scope *sc)
 {
-  ++pos;
+  var *o = new var;
 
-  csString name;
-
-  // Get the name
-  while(pos!=end && isalnum(*pos))
+  if (o->parseObject(pos, end))
   {
-    name+=(*pos);
+    o->setScope(sc);
+    return o;
   }
 
-  return static_cast<object *>(sc->get(name));
+  delete o;
+  return 0;
 }
 
 object *
@@ -214,7 +214,7 @@ Parse(std::string::iterator &pos, const std::string::iterator &end, scope *sc)
 	switch(*pos)
 	{
 		case ':':
-		case '%': return parseFunction(pos, end);		
+		case '%': return parseFunction(pos, end, sc);		
 		case '/': return parseBlob(pos, end);
 		case '"': return parseString(pos, end);
 		case '[': return parseList(pos, end);
@@ -245,7 +245,7 @@ ParseParameter(std::string::iterator &pos, const std::string::iterator &end, fun
 	switch(*pos)
 	{
 		case ':':
-		case '%': return parseFunction(pos, end, parent);
+		case '%': return parseFunction(pos, end, sc, parent);
 		case '$': return parseReference(pos, end, parent);
 		case '/': return parseBlob(pos, end);
 		case '"': return parseString(pos, end);

@@ -545,6 +545,46 @@ namespace autom
     /** Returns a clone of this object. */
     //virtual keeper execObject();                
   };  
+
+  // Predecleration of scope.
+  class scope;
+
+  /** Encapsulates a variable object. */
+  class var: public object
+  {	
+      /** The name of the variable. */
+      csString name;
+
+      /** The scope where the variable is found. */
+      scope *sc;
+
+  public:	
+	  var():object(T_VAR) {}
+	  virtual ~var() {}
+	  
+	  /** Copy constructor. */
+	  var(const var& s):iObject(), object(s, T_VAR), name(s.name) {}		
+
+	  /** Set the scope for this object. */
+	  void setScope(scope *_sc) { sc=_sc; }
+					  
+	  /** Converts the object into a string object if possible. */
+	  virtual string ToString();
+	  
+	  /** Converts the object into an integer object, if possible. */
+	  virtual integer ToInt();
+	  
+	  /** Converts the object into a float object, if possible. */
+	  virtual floating ToFloat();	
+	  
+	  /** Converts the object into the text representation of it. 
+	   * This is the inverse of parsing. */
+	  virtual csRef<iString> ReprObject();
+			  
+	  /** Parses an object out of a string.  The string is known to 
+	   * hold the whole representation of some object. */
+	  virtual bool parseObject(std::string::iterator &pos, const std::string::iterator &end);										
+  };
   
     
 } // namespace autom
