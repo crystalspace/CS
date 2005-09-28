@@ -401,6 +401,254 @@ nil::parseObject(std::string::iterator &pos, const std::string::iterator &end)
 	return true;	
 }
 
+//////////////////// Blob Object //////////////////////////////////////
+
+static uint pow85[] = {
+	85*85*85*85, 85*85*85, 85*85, 85, 1
+};
+
+/** Encodes a tuple into ascii85 format. */
+void 
+blob::encode_tuple(uint tuple, int count)
+{
+	//filter::console_output out;
+	
+	int i;
+	char buf[5];
+		
+	for(i=0; i<5; ++i)
+	{
+		buf[i] = tuple % 85;
+		tuple /= 85;		
+	}
+	
+	for(i=4; i>=0; --i)	
+	{		
+		char c = buf[i];		
+		encoded+=(c + '!');	
+		
+		//out << "blob: encoded " << c << ":" << (c + '!') << "\n";			
+	} 
+}
+		
+/** Encodes a data buffer into ascii85 format. */
+void 
+blob::encode(unsigned char *data, uint size)
+{
+	encoded.assign("<~", 2);
+			
+	uint tuple=0;
+	uint i;
+	int count=0;
+	
+	for(i=0; i<size; ++i)
+	{
+		unsigned char c = data[i];
+		
+		switch(count++)
+		{
+			case 0: tuple |= (c<<24); break;
+			case 1: tuple |= (c<<16); break;
+			case 2: tuple |= (c<<8); break;
+			case 3:
+					tuple |= c;
+					
+					if (tuple==0) encoded+=('z');
+					else encode_tuple(tuple, count);
+					
+					tuple=0;
+					count=0;
+				break;
+		}		
+	}	
+	
+	if (count>0) encode_tuple(tuple, count);
+	
+	encoded.append("~>", 2);
+}
+
+void
+blob::decode_tuple(uint tuple, int bytes, raw_data_t &output)
+{
+	switch (bytes) 
+	{
+		case 4:
+			output.push_back(tuple >> 24);
+			output.push_back(tuple >> 16);
+			output.push_back(tuple >>  8);
+			output.push_back(tuple);
+			break;
+		case 3:
+			output.push_back(tuple >> 24);
+			output.push_back(tuple >> 16);
+			output.push_back(tuple >>  8);
+			break;
+		case 2:
+			output.push_back(tuple >> 24);
+			output.push_back(tuple >> 16);
+			break;
+		case 1:
+			output.push_back(tuple >> 24);
+			break;
+	}
+	
+}
+
+bool 
+blob::decode(raw_data_t &output)
+{
+	output.clear();
+	
+	uint tuple=0;
+	int count=0;
+	
+	unsigned char c;
+	
+	std::string::iterator pos=encoded.begin();
+	
+	if (encoded.size()<2) return false;
+				
+	// Check for the <~ opening sequence.
+	if (*pos != '<') return false;
+	else ++pos;
+	
+	if (*pos != '~') return false;
+	else ++pos; 	
+			
+	for(; pos!=encoded.end(); ++pos)
+	{
+		c = *pos;
+				
+		switch(c)
+		{			
+			default:
+				// Check to see if the character is in range.  If not, abort.
+				if (c < '!' || c > 'u')
+				{
+		  			//out << "blob: bad character in the stream, char code=" << c << ".\n";
+					return false;					
+				}
+				
+				tuple += (c-'!') * pow85[count++];
+				
+// 				out << "blob: decode tuple: " << tuple << "\n";
+				
+				if (count==5)
+				{
+					decode_tuple(tuple, 4, output);
+					count=0;
+					tuple=0;	
+				}				
+			break;
+			
+			case 'z':
+				// A 'z' should appear only by itself, not inside a 5-tuple.
+				if (count!=0)
+				{
+					//out << "blob: decode error: 'z' occurs inside 5-tuple.\n";
+					return false;	
+				}
+				
+				output.push_back(0);
+				output.push_back(0);
+				output.push_back(0);
+				output.push_back(0);			
+			break;
+			
+			case '~':
+				c= *(++pos);
+				if (c=='>')
+				{
+					if (count>0)
+					{
+						--count;
+						tuple+=pow85[count];
+						decode_tuple(tuple, count, output);
+					}	
+					
+					return true;
+				}
+				else
+				{
+					//out << "blob: decode: invalid terminating sequence. Data may be corrupt.\n";
+					// Invalid terminating sequence.  A '~' must be followed by a '>' or preceded by a '<'
+					// to begin or end an ascii85 sequence.
+					return false;	
+				}				
+			break;
+			
+			// Ignore whitespace or other control characters.
+			case '\n': case '\r': case '\t': case ' ':
+			case '\0': case '\f': case '\b': case 0177:
+			break;			
+			
+		}
+	}	
+			
+	return true;
+}
+
+string 
+blob::ToString()
+{		
+	return string(encoded.c_str());		
+}		
+		
+integer 
+blob::ToInt()
+{
+	return 0;	
+}
+		
+		
+floating 
+blob::ToFloat()
+{
+	return 0.0;	
+}
+		
+		
+csRef<iString>
+blob::ReprObject()
+{
+	char buf[128]={0};
+		
+	std::string tmp("/");
+	tmp.append(std::string(buf, cs_snprintf(buf, sizeof(buf), "%ld", encoded.size())));		
+	tmp.append(encoded);
+	
+	return csPtr<iString>(new scfString(tmp.c_str()));
+}				
+		
+bool 
+blob::parseObject(std::string::iterator &pos, const std::string::iterator &end)
+{
+	uint size;
+	
+	if (pos==end || *pos!='/') return false;
+					
+	++pos;
+	
+	// Get the size of the blob.
+	std::string temp;
+			
+	for(; pos!=end && isdigit(*pos); ++pos)			
+		temp+=(*pos);			
+		
+	// If there is no size, then abort.
+	if (temp.size()==0) return false;
+				
+	size = strtoll(temp.c_str(), 0, 10);
+	
+	// Get the entire encoded string.
+	for(uint i=0; i<size && pos!=end; ++i, ++pos)
+	{
+		encoded+=(*pos);	
+	}
+	
+	return true;	
+}		
+
 	
 } // namespace autom
 

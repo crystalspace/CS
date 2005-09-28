@@ -151,23 +151,45 @@ parseNil(std::string::iterator &pos, const std::string::iterator &end)
 	}	
 }
 
+static object *
+parseBlob(std::string::iterator &pos, const std::string::iterator &end)
+{	
+	blob  *o = new blob;
+	
+	if (o->parseObject(pos, end)) return o;
+	else
+	{
+		delete o;
+		return 0;	
+	}		
+}
+
 object *
 Parse(std::string::iterator &pos, const std::string::iterator &end)
 {	
 	object *o=0;
 	
-	//filter::console_output out;
+	while(pos!=end && isspace(*pos)) { ++pos; }
 	
-	//out << "keila: parsing input\n";
+	if (pos==end) return 0;
 		
-	if ((o=parseString(pos, end))!=0)			return o;
-	else if ((o=parseFloat(pos, end))!=0) 		return o;
-	else if ((o=parseInt(pos, end))!=0) 		return o;	
-	else if ((o=parseNil(pos, end))!=0) 		return o;	
-	else if ((o=parseList(pos, end))!=0) 		return o;	
-	else if ((o=parseFunction(pos, end))!=0)	return o;
+	switch(*pos)
+	{
+		case ':':
+		case '%': return parseFunction(pos, end);		
+		case '/': return parseBlob(pos, end);
+		case '"': return parseString(pos, end);
+		case '[': return parseList(pos, end);
+		case 'n': return parseNil(pos, end);
+		
+		default:		
+			if ((o=parseFloat(pos, end))!=0) 		return o;
+			else if ((o=parseInt(pos, end))!=0) 	return o;	
+			
+		break;			
+	}
 	
-	return o;
+	return 0;
 }
 
 object *
@@ -175,15 +197,28 @@ ParseParameter(std::string::iterator &pos, const std::string::iterator &end, fun
 {
 	object *o=0;
 	
-	if ((o=parseString(pos, end))!=0)					return o;
-	else if ((o=parseFloat(pos, end))!=0) 				return o;
-	else if ((o=parseInt(pos, end))!=0) 				return o;	
-	else if ((o=parseNil(pos, end))!=0) 				return o;	
-	else if ((o=parseReference(pos, end, parent))!=0)	return o;
-	else if ((o=parseList(pos, end))!=0) 				return o;	
-	else if ((o=parseFunction(pos, end, parent))!=0)	return o;
+	while(pos!=end && isspace(*pos)) { ++pos; }
+	
+	if (pos==end) return 0;
 		
-	return o;	
+	switch(*pos)
+	{
+		case ':':
+		case '%': return parseFunction(pos, end, parent);
+		case '$': return parseReference(pos, end, parent);
+		case '/': return parseBlob(pos, end);
+		case '"': return parseString(pos, end);
+		case '[': return parseList(pos, end);
+		case 'n': return parseNil(pos, end);
+		
+		default:		
+			if ((o=parseFloat(pos, end))!=0) 		return o;
+			else if ((o=parseInt(pos, end))!=0) 	return o;	
+			
+		break;			
+	}
+	
+	return 0;	
 }
 
 keeper 

@@ -302,7 +302,7 @@ namespace autom
 	};	
 	
 			
-	/** Encapsulates a string object. */
+	/** Encapsulates a list object. */
 	class list : public object
 	{
 		typedef std::vector<keeper> list_type;
@@ -364,7 +364,7 @@ namespace autom
 	
 	class function;
 	
-	/** Encapsulates a string object. */
+	/** Encapsulates a reference object. */
 	class reference : public object
 	{
 		csString value;
@@ -397,7 +397,7 @@ namespace autom
 		virtual bool parseObject(std::string::iterator &pos, const std::string::iterator &end);								
 	};
 	
-	/** Encapsulates a string object. */
+	/** Encapsulates a nil object. */
 	class nil: public object
 	{		
 	public:	
@@ -422,7 +422,61 @@ namespace autom
 		/** Parses an object out of a string.  The string is known to hold the whole representation of some object. */
 		virtual bool parseObject(std::string::iterator &pos, const std::string::iterator &end);				
 						
+	};
+
+	/** Encapsulates a blob object. */
+	class blob: public object
+	{				
+	public:	
+		/** The return type for raw data. */
+		typedef std::vector<unsigned char> raw_data_t;
+		
+	private:		
+		/** A string object that holds the encoded data. */
+		std::string encoded;
+		
+	protected:
+		/** Encodes a tuple into ascii85 format. */
+		void encode_tuple(uint tuple, int count);
+				
+		/** Decodes a tuple from ascii85 into binary format. */
+		void decode_tuple(uint tuple, int bytes, raw_data_t &output);
+					
+	public:	
+		blob():object(T_BLOB) {}
+		virtual ~blob() {}
+		
+		/** Copy constructor. */
+		blob(const blob& s):object(s, T_BLOB), encoded(s.encoded)
+		{
+			
+		}		
+		
+		/** Encodes a data buffer into ascii85 format. */
+		void encode(unsigned char *data, uint size);
+		
+		/** Decodes the encoded tuple into an output vector. */
+		bool decode(raw_data_t &output);
+						
+		/** Converts the object into a string object if possible. */
+		virtual string ToString();
+		
+		/** Converts the object into an integer object, if possible. */
+		virtual integer ToInt();
+		
+		/** Converts the object into a float object, if possible. */
+		virtual floating ToFloat();	
+		
+		/** Converts the object into the text representation of it. This is the inverse of parsing. */
+		virtual csRef<iString> ReprObject();
+				
+		/** Parses an object out of a string.  The string is known to hold the whole representation of some object. */
+		virtual bool parseObject(std::string::iterator &pos, const std::string::iterator &end);			
+		
+		/** Returns a clone of this object. */
+		//virtual keeper execObject();								
 	};	
+	
 		
 } // namespace autom
 
