@@ -67,6 +67,13 @@ namespace aws
 
   };
 
+  /** This manages frames.  It can find frames within a geometric area. */
+  class frame_manager
+  {
+
+  };
+
+
 }
 
 #endif

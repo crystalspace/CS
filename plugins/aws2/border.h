@@ -28,10 +28,10 @@ namespace aws
 
       switch(border_shape)
       {
-	case AWS_BORDER_RECT:	    pen->DrawRect(r.xmin, r.ymin, r.xmax, r.ymax, swap_colors); break;
+	case AWS_BORDER_RECT:	      pen->DrawRect(r.xmin, r.ymin, r.xmax, r.ymax, swap_colors); break;
 	case AWS_BORDER_ROUNDED_RECT: pen->DrawRoundedRect(r.xmin, r.ymin, r.xmax, r.ymax, edge, swap_colors); break;
 	case AWS_BORDER_MITERED_RECT: pen->DrawMiteredRect(r.xmin, r.ymin, r.xmax, r.ymax, edge, swap_colors); break;
-	case AWS_BORDER_CIRCLE:	    pen->DrawArc(r.xmin, r.ymin, r.xmax, r.ymax, 0, 2*PI, swap_colors); break;
+	case AWS_BORDER_CIRCLE:	      pen->DrawArc(r.xmin, r.ymin, r.xmax, r.ymax, 0, 2*PI, swap_colors); break;
       }
     }
 
