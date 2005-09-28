@@ -29,6 +29,7 @@ VFS.Mount.fonts/ttf   = $(CS_DATADIR)$/ttf$/, $(TTF_PATH:$.$/), $(CS_DATADIR)$/t
 VFS.Mount.lev/flarge   = $(CS_MAPDIR)$/flarge$/
 VFS.Mount.lev/pvstest  = $(CS_MAPDIR)$/pvstest$/
 VFS.Mount.lev/r3dtest  = $(CS_MAPDIR)$/r3dtest$/
+VFS.Mount.lev/projectortest  = $(CS_MAPDIR)$/projectortest$/
 VFS.Mount.lev/parallaxtest = $(CS_MAPDIR)$/parallaxtest$/
 VFS.Mount.lev/stenciltest = $(CS_MAPDIR)$/stenciltest$/
 VFS.Mount.lev/isomap   = $(CS_MAPDIR)$/isomap.zip, $(CS_MAPDIR)$/isomap$/
