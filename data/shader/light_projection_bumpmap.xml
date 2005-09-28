@@ -1,0 +1,79 @@
+<shader compiler="xmlshader" name="light_projection_bumpmap">
+  <technique priority="300" lights="1">
+    <pass>
+      <mixmode>
+        <copy />
+      </mixmode>
+        <writemask r="false" g="false" b="false" a="true" />
+         <?if vars."light 0 type".int == 2 ?>
+          <vp plugin="glfixed">
+            <fixedvp> 
+            <light num="0"/>
+            <texgen layer="0" type="projection"/>
+          </fixedvp>
+        </vp>
+      <?else?>
+        <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
+      <?endif?>
+
+      <?if vars."light 0 type".int == 2 ?>
+        <texture destination="unit 0" name="tex projection" />
+      <?else?>
+        <texture destination="unit 0" name="light 0 attenuationtex" />
+        <texture destination="unit 1" name="light 0 attenuationtex" />
+      <?endif?>
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer>
+            <alphasource num="0" source="texture" modifier="alpha" />
+            <alphaoperation operation="replace" />
+          </layer>
+        <?if vars."light 0 type".int == 2 ?>
+          <layer>
+            <alphasource num="0" source="texture" modifier="alpha" />
+            <alphasource num="1" source="previous layer" modifier="alpha" />
+            <alphaoperation operation="modulate" scale="2" />
+          </layer>
+      <?endif?>
+        </fixedfp>
+      </fp>
+    </pass>
+
+    <pass>
+      <mixmode>
+        <destalphaadd />
+      </mixmode>
+      <buffer source="normal" destination="normal" />
+      <buffer source="tangent" destination="texture coordinate 1" />
+      <buffer source="binormal" destination="texture coordinate 2" />
+      <vp plugin="glarb" file="/shader/bump_ppl_diffuse.avp" />
+      <texture destination="unit 0" name="standardtex normalization map" />
+      <texture destination="unit 1" name="tex normal" />
+      <texture destination="unit 2" name="tex diffuse" />
+      <texture destination="unit 3" name="tex diffuse" />
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer>
+            <colorsource num="0" source="texture" modifier="color" />
+            <coloroperation operation="replace" />
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color" />
+            <colorsource num="1" source="texture" modifier="color" />
+            <coloroperation operation="dot3" />
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color" />
+            <colorsource num="1" source="texture" modifier="color" />
+            <coloroperation operation="modulate" />
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color" />
+            <colorsource num="1" source="primary color" modifier="color" />
+            <coloroperation operation="modulate" />
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>
