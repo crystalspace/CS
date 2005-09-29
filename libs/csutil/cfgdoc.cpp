@@ -282,8 +282,8 @@ void csConfigDocument::SetFileName (const char*, iVFS*)
 {
 }
 
-bool csConfigDocument::Load (const char* iFileName, iVFS*, bool Merge,
-  bool NewWins)
+bool csConfigDocument::Load (const char* /*iFileName*/, iVFS*, bool /*Merge*/,
+  bool /*NewWins*/)
 {
   return false;
 }
@@ -300,7 +300,7 @@ bool csConfigDocument::Save ()
   return false;
 }
 
-bool csConfigDocument::Save (const char *iFileName, iVFS* vfs)
+bool csConfigDocument::Save (const char * /*iFileName*/, iVFS* /*vfs*/)
 {
   return false;
 }
@@ -393,28 +393,28 @@ const char* csConfigDocument::GetComment (const char *Key) const
   return info ? info->cachedComment : 0;
 }
 
-void csConfigDocument::SetStr (const char *Key, const char *Val)
+void csConfigDocument::SetStr (const char * /*Key*/, const char * /*Val*/)
 {
 }
 
-void csConfigDocument::SetInt (const char *Key, int Value)
+void csConfigDocument::SetInt (const char * /*Key*/, int /*Value*/)
 {
 }
 
-void csConfigDocument::SetFloat (const char *Key, float Value)
+void csConfigDocument::SetFloat (const char * /*Key*/, float /*Value*/)
 {
 }
 
-void csConfigDocument::SetBool (const char *Key, bool Value)
+void csConfigDocument::SetBool (const char * /*Key*/, bool /*Value*/)
 {
 }
 
-bool csConfigDocument::SetComment (const char *Key, const char *Text)
+bool csConfigDocument::SetComment (const char * /*Key*/, const char * /*Text*/)
 {
   return false;
 }
 
-void csConfigDocument::DeleteKey (const char *Key)
+void csConfigDocument::DeleteKey (const char * /*Key*/)
 {
 }
 
@@ -423,6 +423,6 @@ const char* csConfigDocument::GetEOFComment () const
   return 0;
 }
 
-void csConfigDocument::SetEOFComment (const char *Text)
+void csConfigDocument::SetEOFComment (const char * /*Text*/)
 {
 }

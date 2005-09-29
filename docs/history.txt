@@ -40,6 +40,7 @@ chronological order.
 	- Piotr Obrzut fixed bug while attaching existing placable collider 
 	  to body.
 	- res templatized csVector4.
+	- mdmkolbe fixed some unused parameter warnings in CS/libs/csutil/.
 28-Sep-2005
 	- Jorrit caused much wailing and gnashing of teeth as everyone will
 	  have to rebuild CS and everyone will get a new set of auto-generated

@@ -200,7 +200,8 @@ void csInputBinder::UnbindAll ()
   btnHash.DeleteAll ();
 }
 
-void csInputBinder::LoadConfig (iConfigFile *cfg, const char *subsection)
+void csInputBinder::LoadConfig (
+  iConfigFile * /*cfg*/, const char * /*subsection*/)
 {
 #if 0
   csRef<iConfigIterator> iter = cfg->Enumerate (subsection);
@@ -217,7 +218,8 @@ void csInputBinder::LoadConfig (iConfigFile *cfg, const char *subsection)
 #endif
 }
 
-void csInputBinder::SaveConfig (iConfigFile *cfg, const char *subsection)
+void csInputBinder::SaveConfig (
+  iConfigFile * /*cfg*/, const char * /*subsection*/)
 {
 #if 0
   AxisHash::GlobalIterator iter (axisHash.GetIterator ());

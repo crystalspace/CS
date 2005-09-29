@@ -674,7 +674,7 @@ void TiXmlComment::Print( iString* cfile, int depth ) const
   StrPrintf ( cfile, "<!--%s-->", value );
 }
 
-TiDocumentNode* TiXmlComment::Clone(TiDocument* document) const
+TiDocumentNode* TiXmlComment::Clone(TiDocument* /*document*/) const
 {
   TiXmlComment* clone = new TiXmlComment();
 
@@ -756,7 +756,7 @@ void TiXmlDeclaration::Print( iString* cfile, int /*depth*/ ) const
   StrPrintf  (cfile, "?>");
 }
 
-TiDocumentNode* TiXmlDeclaration::Clone(TiDocument* document) const
+TiDocumentNode* TiXmlDeclaration::Clone(TiDocument* /*document*/) const
 {  
   TiXmlDeclaration* clone = new TiXmlDeclaration();
 
@@ -778,7 +778,7 @@ void TiXmlUnknown::Print( iString* cfile, int depth ) const
   StrPrintf ( cfile, "<%s>", value.c_str() );
 }
 
-TiDocumentNode* TiXmlUnknown::Clone(TiDocument* document) const
+TiDocumentNode* TiXmlUnknown::Clone(TiDocument* /*document*/) const
 {
   TiXmlUnknown* clone = new TiXmlUnknown();
 

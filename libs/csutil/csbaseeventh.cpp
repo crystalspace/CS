@@ -87,7 +87,7 @@ bool csBaseEventHandler::HandleEvent (iEvent &event)
 }
 
 #define DefaultTrigger(trigger) \
-  bool csBaseEventHandler::trigger (iEvent &event) \
+  bool csBaseEventHandler::trigger (iEvent & /*event*/) \
   { \
     return false;\
   }

@@ -23,7 +23,7 @@
 #include "csutil/util.h"
 #include <ctype.h>
 
-static bool word_p(char c, size_t n) { return c == '_' || isalnum(c); }
+static bool word_p(char c, size_t /*n*/) { return c == '_' || isalnum(c); }
 static bool name_p(char c, size_t n)
 { return (n == 0 && (c == '-' || c == '+')) || c == '.' || word_p(c,n); }
 

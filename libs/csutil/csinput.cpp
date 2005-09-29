@@ -474,17 +474,21 @@ csEventError csKeyboardDriver::SynthesizeCooked (iEvent *ev)
 // crashes on exit if functions have local static variables with complex types
 static csString genName;
 
+#ifdef CS_KEY_DEBUG_ENABLE
 const char* csKeyboardDriver::GetKeycodeString (utf32_char code)
 {
-#ifdef CS_KEY_DEBUG_ENABLE
   const char* str = KeyCodeNames.StringForIdent (code);
   if (str != 0) return str;
 
   genName.Format ("[%" PRIu32 "]", code);
   return genName;
-#endif
+}
+#else
+const char* csKeyboardDriver::GetKeycodeString (utf32_char /*code*/)
+{
   return 0;
 }
+#endif
 
 bool csKeyboardDriver::IsKeyboardDebugging ()
 {

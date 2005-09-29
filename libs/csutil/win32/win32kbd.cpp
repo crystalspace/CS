@@ -840,9 +840,9 @@ bool csWin32KeyboardDriver::Win32KeyToCSKey (LONG vKey, LONG keyFlags,
 static csString genName;
 #endif
 
+#ifdef CS_KEY_DEBUG_ENABLE
 const char* csWin32KeyboardDriver::GetVKName (LONG vKey)
 {
-#ifdef CS_KEY_DEBUG_ENABLE
   const char* vkName = Win32VKeyNames.StringForIdent (vKey);
   if (vkName != 0) return vkName;
 
@@ -855,6 +855,10 @@ const char* csWin32KeyboardDriver::GetVKName (LONG vKey)
     genName.Format ("[%ld]", vKey);
   }
   return genName;
-#endif
+}
+#else
+const char* csWin32KeyboardDriver::GetVKName (LONG /*vKey*/)
+{
   return 0;
 }
+#endif

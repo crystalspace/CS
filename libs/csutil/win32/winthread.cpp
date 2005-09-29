@@ -43,6 +43,10 @@ static inline void ShowError (const char* message, const char* lasterr)
 {
 #ifdef CS_DEBUG
   csPrintf ("'%s' failed: %s\n", message, lasterr);
+#else
+  /* Pacify the compiler warnings */
+  (void)message;
+  (void)lasterr;
 #endif
 }
 

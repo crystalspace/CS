@@ -124,8 +124,8 @@ void csWin32RegistryConfig::SetFileName (const char*, iVFS*)
 {
 }
 
-bool csWin32RegistryConfig::Load (const char* iFileName, iVFS*, bool Merge,
-    bool NewWins)
+bool csWin32RegistryConfig::Load (const char* /*iFileName*/, iVFS*,
+  bool /*Merge*/, bool /*NewWins*/)
 {
   return true;
 }
@@ -135,7 +135,7 @@ bool csWin32RegistryConfig::Save ()
   return true;
 }
 
-bool csWin32RegistryConfig::Save (const char *iFileName, iVFS*)
+bool csWin32RegistryConfig::Save (const char * /*iFileName*/, iVFS*)
 {
   return true;
 }
@@ -403,7 +403,7 @@ bool csWin32RegistryConfig::GetBool (const char *Key, bool Def) const
   }
 }
 
-const char *csWin32RegistryConfig::GetComment (const char *Key) const
+const char *csWin32RegistryConfig::GetComment (const char * /*Key*/) const
 {
   return 0;
 }
@@ -447,7 +447,8 @@ void csWin32RegistryConfig::SetBool (const char *Key, bool Value)
   InternalSetValue (Key, REG_DWORD, &i, sizeof (i));
 }
 
-bool csWin32RegistryConfig::SetComment (const char *Key, const char *Text)
+bool csWin32RegistryConfig::SetComment (
+  const char * /*Key*/, const char * /*Text*/)
 {
   return false;
 }
@@ -464,7 +465,7 @@ const char *csWin32RegistryConfig::GetEOFComment () const
   return 0;
 }
 
-void csWin32RegistryConfig::SetEOFComment (const char *Text)
+void csWin32RegistryConfig::SetEOFComment (const char * /*Text*/)
 {
 }
 

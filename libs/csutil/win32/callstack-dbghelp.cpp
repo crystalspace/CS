@@ -66,7 +66,7 @@ struct SymCallbackCountInfo
 };
 
 static BOOL CALLBACK EnumSymCallbackCount (SYMBOL_INFO* pSymInfo,
-  ULONG SymbolSize, PVOID UserContext)
+  ULONG /*SymbolSize*/, PVOID UserContext)
 {
   if ((pSymInfo->Flags & SYMFLAG_PARAMETER) != 0)
   {
@@ -519,7 +519,7 @@ bool CallStackNameResolverDbgHelp::GetAddressSymbol (void* addr,
 }
 
 static BOOL CALLBACK EnumSymCallbackNames (SYMBOL_INFO* pSymInfo,
-  ULONG SymbolSize, PVOID UserContext)
+  ULONG /*SymbolSize*/, PVOID UserContext)
 {
   if ((pSymInfo->Flags & SYMFLAG_PARAMETER) != 0)
   {
