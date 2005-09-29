@@ -383,7 +383,6 @@ csSkelAnimControlRunnable::csSkelAnimControlRunnable (csSkelAnimControlScript* s
 
 csSkelAnimControlRunnable::~csSkelAnimControlRunnable ()
 {
-  printf ("csSkelAnimControlRunnable::~csSkelAnimControlRunnable ()\n");
   release_tranform_data (positions);
   release_tranform_data (rotations);
   SCF_DESTRUCT_IBASE ();
@@ -738,7 +737,6 @@ csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
 
 csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()
 {
-  printf ("csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()\n");
   factory->UnregisterAUAnimation (this);
   delete[] animated_verts;
   delete[] animated_colors;
