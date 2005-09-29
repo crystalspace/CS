@@ -25,10 +25,10 @@ chronological order.
 	- Eric Sunshine eliminated some additional compilation warnings.
 	- Jorrit did some more cleanups.
 	- Jorrit removed the pvs culler as it is not really useful and would
-	  need further development to make useful. It can be retreived from
+	  need further development to make useful. It can be retrieved from
 	  the attic with the PRE_PVSVIS_REMOVAL tag.
 	- Jorrit removed the foliage mesh as it is not really useful and would
-	  need further development to make useful. It can be retreived from
+	  need further development to make useful. It can be retrieved from
 	  the attic with the PRE_FOLIAGE_REMOVAL tag.
 	- mdmkolbe fixed a build error due to integer-size ambiguity.
 	- res added some protections against IncRef()ing objects from the
@@ -38,7 +38,8 @@ chronological order.
 	- res added initial support (again) for perspective-correct rendering 
 	  to SR.
 	- Piotr Obrzut fixed bug while attaching existing placable collider 
-	  to body
+	  to body.
+	- res templatized csVector4.
 28-Sep-2005
 	- Jorrit caused much wailing and gnashing of teeth as everyone will
 	  have to rebuild CS and everyone will get a new set of auto-generated
