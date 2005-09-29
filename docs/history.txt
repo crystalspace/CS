@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Sep-2005
+	- Eric Sunshine fixed the CoreAudio plugin so that it once again builds
+	  cleanly. Also reduced namespace pollution a bit.
+	- Eric Sunshine worked around complaints from gcc 3.3 in objects which
+	  have been converted to the new SCF design. In particular, the
+	  compiler dislike seeing a private destructor when the class had no
+	  friends.  To fix, made the destructor public. The public destructor
+	  should not be a problem since these implementations are themselves
+	  entirely private to their respective modules.
+	- Eric Sunshine eliminated compilation warnings in the bruteblock
+	  plugin.
 28-Sep-2005
 	- Jorrit caused much wailing and gnashing of teeth as everyone will
 	  have to rebuild CS and everyone will get a new set of auto-generated
@@ -25,14 +36,6 @@ chronological order.
 	  limit and follow the indent=2 space rule.
 	- Eric Sunshine fixed numerous compilations warnings and errors in
 	  AWS2.
-	- Eric Sunshine fixed the CoreAudio plugin so that it once again builds
-	  cleanly. Also reduced namespace pollution a bit.
-	- Eric Sunshine worked around complaints from gcc 3.3 in objects which
-	  have been converted to the new SCF design. In particular, the
-	  compiler dislike seeing a private destructor when the class had no
-	  friends.  To fix, made the destructor public. The public destructor
-	  should not be a problem since these implementations are themselves
-	  entirely private to their respective modules.
 27-Sep-2005
 	- Jorrit added csTransform::GetUp(), GetFront(), and GetRight().
 	  These three conveniance functions get the up, front, and right

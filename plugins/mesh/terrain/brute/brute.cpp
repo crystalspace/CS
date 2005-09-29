@@ -1765,8 +1765,8 @@ bool csTerrainObject::SetMaterialAlphaMaps (
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	  "crystalspace.mesh.bruteblock",
-	  "There are %d palette entries. That means there must be %d alpha maps!",
-	  	palette.Length (), palette.Length ()-1);
+	  "There are %zd palette entries. That means there must be %zd alpha "
+	  "maps!", palette.Length (), palette.Length ()-1);
     return false;
   }
   //use_singlemap = false;
@@ -1860,8 +1860,8 @@ bool csTerrainObject::SetMaterialAlphaMaps (const csArray<iImage*>& maps)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	  "crystalspace.mesh.bruteblock",
-	  "There are %d palette entries. That means there must be %d alpha maps!",
-	  	palette.Length (), palette.Length ()-1);
+	  "There are %zd palette entries. That means there must be %zd alpha "
+	  "maps!", palette.Length (), palette.Length ()-1);
     return false;
   }
   size_t idx;
