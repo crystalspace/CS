@@ -62,7 +62,7 @@ public:
     const char* extraoptions = 0);
 
   bool Initialize (iObjectRegistry* p) 
-    { object_reg = p; return true; }
+  { object_reg = p; return true; }
 
   struct eiComponent : public iComponent
   {

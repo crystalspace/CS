@@ -53,11 +53,9 @@ public:
   csLightObjectModel ()
     : scfImplementationType (this)
   {
-    
   }
   virtual ~csLightObjectModel ()
   {
-   
   }
 
   virtual void GetObjectBoundingBox (csBox3& bbox)

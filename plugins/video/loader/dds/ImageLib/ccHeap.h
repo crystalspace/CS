@@ -1,6 +1,6 @@
 /*
 
-	ccHeap.h - Heap class
+  ccHeap.h - Heap class
 
 */
 
@@ -15,41 +15,42 @@ class ccHeap;
 class ccHeapNode
 {
 private:
-	long	Key;
+  long  Key;
 
 public:
-	ccHeapNode() {Key=0;}
-	ccHeapNode(long NewKey) {Key = NewKey;}
+  ccHeapNode() {Key=0;}
+  ccHeapNode(long NewKey) {Key = NewKey;}
 
-	virtual ~ccHeapNode() {;}
+  virtual ~ccHeapNode() {;}
 
-	inline long GetKey(void) {return Key;}
-	inline void SetKey(long NewKey) {Key = NewKey;}
+  inline long GetKey(void) {return Key;}
+  inline void SetKey(long NewKey) {Key = NewKey;}
 
-	friend class ccHeap;
+  friend class ccHeap;
 };
 
 class ccHeap
 {
 private:
-	long		Size, Allocated;
-	ccHeapNode	**pHeap;
+  long    Size, Allocated;
+  ccHeapNode  **pHeap;
 
-	void SiftUp(void);
+  void SiftUp(void);
 
 public:
-	ccHeap();
-	~ccHeap();
+  ccHeap();
+  ~ccHeap();
 
-	void Allocate(long NumItems);
+  void Allocate(long NumItems);
 
-	void Insert(ccHeapNode *pNode);				// Simply insert a new node
-	ccHeapNode *Extract(void);					// Remove the head and return it
+  void Insert(ccHeapNode *pNode);        // Simply insert a new node
+  ccHeapNode *Extract(void);          // Remove the head and return it
 
-	void ExtractInsert(ccHeapNode *pNode);		// Removes the head, and inserts the new node  (faster)
+  // Removes the head, and inserts the new node  (faster)
+  void ExtractInsert(ccHeapNode *pNode);
 
-	inline long Count(void) {return Size;}
-	inline ccHeapNode *GetNode(long Index) {return pHeap[Index];}
+  inline long Count(void) {return Size;}
+  inline ccHeapNode *GetNode(long Index) {return pHeap[Index];}
 };
 
 

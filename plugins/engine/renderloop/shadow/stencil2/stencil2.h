@@ -106,10 +106,12 @@ public:
 
   bool CalculateEdges();
   void AddEdge(int index_v1, int index_v2, int face_index);
-  bool GetShadow(csVector3 &light_pos, float shadow_length, bool front_cap, bool extrusion,  bool back_cap,
-    csArray<csVector3> & shadow_vertices, csArray<int> & shadow_indeces);
+  bool GetShadow(csVector3 &light_pos, float shadow_length,
+  	bool front_cap, bool extrusion,  bool back_cap,
+    	csArray<csVector3> & shadow_vertices, csArray<int> & shadow_indeces);
 
-  void UpdateRenderBuffers(csArray<csVector3> & shadow_vertices, csArray<int> & shadow_indeces);
+  void UpdateRenderBuffers(csArray<csVector3> & shadow_vertices,
+  	csArray<int> & shadow_indeces);
 };
 
 class csStencil2ShadowStep : public iRenderStep,
@@ -128,11 +130,13 @@ private:
   csRefArray<iLightRenderStep> steps;
 
   csArray<iMeshWrapper*> shadowMeshes;
-  csHash<csRef<csStencil2ShadowCacheEntry>, csPtrKey<iMeshWrapper> > shadowcache;
+  csHash<csRef<csStencil2ShadowCacheEntry>, csPtrKey<iMeshWrapper> >
+  	shadowcache;
 
   void Report (int severity, const char* msg, ...);
 
-  void ModelInFrustum(csVector3 &light_pos, float shadow_length, csPlane3* frustum_planes, 
+  void ModelInFrustum(csVector3 &light_pos, float shadow_length,
+    csPlane3* frustum_planes, 
     uint32& frustum_mask, csBox3 &model_bounding_box,
     bool & front_cap_in_frustum, 
     bool & extrusion_in_frustum,
@@ -141,8 +145,10 @@ private:
   int CalculateShadowMethod(iRenderView *rview, csVector3 &light_pos,
     const csReversibleTransform &t, csBox3 &model_bounding_box);
 
-  void DrawShadow(iRenderView *rview, int method, csStencil2ShadowCacheEntry * cache_entry, 
-    iMeshWrapper *mesh, csArray<csVector3> & shadow_vertices, csArray<int> & shadow_indeces, 
+  void DrawShadow(iRenderView *rview, int method,
+    csStencil2ShadowCacheEntry * cache_entry, 
+    iMeshWrapper *mesh, csArray<csVector3> & shadow_vertices,
+    csArray<int> & shadow_indeces, 
     iShader* shader, size_t shaderTicket, size_t pass);
 
 public:

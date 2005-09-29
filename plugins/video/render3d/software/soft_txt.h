@@ -200,7 +200,10 @@ public:
   {
   }
   
-  virtual int GetTextureTarget () const { return iTextureHandle::CS_TEX_IMG_2D; }
+  virtual int GetTextureTarget () const
+  {
+    return iTextureHandle::CS_TEX_IMG_2D;
+  }
 
   virtual const char* GetImageName () const { return image->GetName (); }
 

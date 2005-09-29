@@ -46,6 +46,7 @@ enum ConditionOp
   opLesser,
   opLesserEq
 };
+
 /// Possible types of operands.
 enum OperandType
 {
@@ -61,6 +62,7 @@ enum OperandType
   operandSVValueTexture,
   operandSVValueBuffer
 };
+
 /// An actual operand.
 struct CondOperand
 {
@@ -76,6 +78,7 @@ struct CondOperand
   CondOperand ()
   { memset (this, 0, sizeof (*this)); }
 };
+
 /// An operation.
 struct CondOperation
 {
@@ -228,6 +231,7 @@ class csConditionEvaluator
   bool EvaluateOperandBConst (const CondOperand& operand, bool& result);
   bool EvaluateOperandIConst (const CondOperand& operand, int& result);
   bool EvaluateOperandFConst (const CondOperand& operand, float& result);
+
 public:
   csConditionEvaluator (iStringSet* strings, 
     const csConditionConstants& constants);

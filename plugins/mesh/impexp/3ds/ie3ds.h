@@ -30,9 +30,9 @@ private:
   iModelData *pModelData;
   csModelConverterFormat FormatInfo;
 
-//  bool LoadCameraData( iCamera *pCSCamera, Lib3dsCamera *p3dsCamera );
-//  bool LoadLightData( iLight *pCSight, Lib3dsLight *p3dsLight );
-//  bool LoadMaterialData( iMaterial *pCSMaterial, Lib3dsMaterial *p3dsMaterial );
+//bool LoadCameraData( iCamera *pCSCamera, Lib3dsCamera *p3dsCamera );
+//bool LoadLightData( iLight *pCSight, Lib3dsLight *p3dsLight );
+//bool LoadMaterialData( iMaterial *pCSMaterial, Lib3dsMaterial *p3dsMaterial );
   bool LoadMeshObjectData( iModelDataObject *pData, Lib3dsMesh *p3dsMesh, Lib3dsMaterial* pCurMaterial );
 
   Lib3dsFile * LoadFileData( uint8* Buffer, size_t size );

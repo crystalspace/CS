@@ -158,8 +158,10 @@ class csWrappedDocumentNode : public csDocumentNodeReadOnly
   const char* ParseTemplateArguments (const char* str, 
     csArray<csString>& strings);
 
-  void ProcessSingleWrappedNode (NodeProcessingState* state, iDocumentNode* wrappedNode);
-  void ProcessWrappedNode (NodeProcessingState* state, iDocumentNode* wrappedNode);
+  void ProcessSingleWrappedNode (NodeProcessingState* state,
+  	iDocumentNode* wrappedNode);
+  void ProcessWrappedNode (NodeProcessingState* state,
+  	iDocumentNode* wrappedNode);
   void ProcessWrappedNode ();
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
   

@@ -90,6 +90,7 @@ private:
   bool GetNVInstructions (csPixelShaderParser& parser,
     const csArray<csPSProgramInstruction> &instrs);
   GLenum GetTexTarget();
+
 public:
   csShaderGLPS1_NV (csGLShader_PS1* shaderPlug)
     : csShaderGLPS1_Common(shaderPlug) 

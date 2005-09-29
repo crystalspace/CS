@@ -42,10 +42,13 @@ public:
   inline int GetTopLine() const { return display_top; }
   inline int GetCurLine() const { return current_line; }
   inline bool IsLineEmpty(int line) const
-    { return (buffer[line]==0||buffer[line]->IsEmpty()||buffer[line]==empty); }
+  {
+    return (buffer[line]==0 ||
+    	    buffer[line]->IsEmpty() ||
+	    buffer[line]==empty);
+  }
 
 private:
-
   int len;
   int page_size;
   int display_top;

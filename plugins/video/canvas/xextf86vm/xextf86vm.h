@@ -81,19 +81,19 @@ public:
 		     XVisualInfo *xvis, Colormap cmap);
   virtual void Close ();
   virtual void SetWindows (Window ctx_win, Window wm_win)
-    { this->ctx_win = ctx_win; this->wm_win = wm_win; }
+  { this->ctx_win = ctx_win; this->wm_win = wm_win; }
   virtual bool SetFullScreen (bool yesno);
   virtual bool IsFullScreen ()
-    { return full_screen; }
+  { return full_screen; }
 
   virtual void IncVideoMode ()
-    { ChangeVideoMode (-1); }
+  { ChangeVideoMode (-1); }
 
   virtual void DecVideoMode ()
-    { ChangeVideoMode (1); }
+  { ChangeVideoMode (1); }
 
   virtual void GetDimensions (int &w, int &h)
-    { w = width; h = height; }
+  { w = width; h = height; }
 
   struct eiComponent : public iComponent
   {

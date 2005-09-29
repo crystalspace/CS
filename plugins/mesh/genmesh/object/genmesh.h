@@ -493,7 +493,8 @@ public:
       SCF_CONSTRUCT_IBASE (0);
       eiRenderBufferAccessor::parent = parent;
     }
-    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
+    virtual void PreGetBuffer (csRenderBufferHolder* holder,
+    	csRenderBufferName buffer)
     {
       parent->PreGetBuffer (holder, buffer);
     }
@@ -891,10 +892,6 @@ public:
     {
       scfParent->GenerateSphere (sphere, rim_vertices);
     }
-    //virtual void GeneratePlane (const csPlane3& plane)
-    //{
-    //  scfParent->GeneratePlane (plane);
-    //}
     virtual void SetBack2Front (bool b2f)
     {
       scfParent->SetBack2Front (b2f);
@@ -1039,7 +1036,8 @@ public:
       SCF_CONSTRUCT_IBASE (0);
       eiRenderBufferAccessor::parent = parent;
     }
-    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
+    virtual void PreGetBuffer (csRenderBufferHolder* holder,
+    	csRenderBufferName buffer)
     {
       parent->PreGetBuffer (holder, buffer);
     }

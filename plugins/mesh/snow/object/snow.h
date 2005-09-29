@@ -183,7 +183,8 @@ private:
 
 public:
   /// Constructor.
-  csSnowMeshObjectFactory (iMeshObjectType* pParent, iObjectRegistry* object_reg);
+  csSnowMeshObjectFactory (iMeshObjectType* pParent,
+  	iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csSnowMeshObjectFactory ();

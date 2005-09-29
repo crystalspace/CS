@@ -1,6 +1,6 @@
 /*
 
-	CodeBook4MMX.h - 4 byte MMX optimized Codebook class
+  CodeBook4MMX.h - 4 byte MMX optimized Codebook class
 
 */
 
@@ -21,98 +21,104 @@ class Color;
 class cbVector
 {
 private:
-	BYTE	pData[CodeSize];
+  BYTE  pData[CodeSize];
 
 public:
-	cbVector() {;}
-	~cbVector() {;}
+  cbVector() {;}
+  ~cbVector() {;}
 
-	inline BYTE *GetPtr(void) {return pData;}
+  inline BYTE *GetPtr(void) {return pData;}
 
-	inline BYTE &operator[](int i) {return pData[i];}
-	cbVector &operator=(cbVector &Vect) {*(long *)pData = *(long *)Vect.pData; return *this;}
-	int operator==(cbVector &Vect) {return *(long *)pData == *(long *)Vect.pData;}
+  inline BYTE &operator[](int i) {return pData[i];}
+  cbVector &operator=(cbVector &Vect)
+  {*(long *)pData = *(long *)Vect.pData; return *this;}
+  int operator==(cbVector &Vect) {return *(long *)pData == *(long *)Vect.pData;}
 
-	void Min(cbVector &Test1);
-	void Max(cbVector &Test1);
-	void MinMax(cbVector &Min, cbVector &Max);
+  void Min(cbVector &Test1);
+  void Max(cbVector &Test1);
+  void MinMax(cbVector &Min, cbVector &Max);
 
-	long Sum(void);			// Summation of the vector componants
-	long Mag(void);			// Magnitude of the vector
-	long InvMag(void);		// Magnitude of the vector ^ ffffffffff...
+  long Sum(void);      // Summation of the vector componants
+  long Mag(void);      // Magnitude of the vector
+  long InvMag(void);    // Magnitude of the vector ^ ffffffffff...
 
-	void Diff(cbVector &Test1, cbVector &Test2);
-	long __fastcall DiffMag(cbVector &Vect);	// Magnitude of the difference between this and Vect (Dist ^ 2)
+  void Diff(cbVector &Test1, cbVector &Test2);
+  // Magnitude of the difference between this and Vect (Dist ^ 2)
+  long __fastcall DiffMag(cbVector &Vect);
 
-	friend class CodeBook;
-	friend class ImgCodeBook;
+  friend class CodeBook;
+  friend class ImgCodeBook;
 };
 
 
 typedef struct
 {
-	long	Origin;
-	long	AntiOrigin;
+  long  Origin;
+  long  AntiOrigin;
 } DualDist;
 
 
 class CodeBook
 {
 private:
-	Table<cbVector>		VectList;
-	Table<long>			usageCount;
+  Table<cbVector>    VectList;
+  Table<long>      usageCount;
 
 public:
-	virtual ~CodeBook() {;}
+  virtual ~CodeBook() {;}
 
-	void AddVector(cbVector &Vect);
-	long FindVectorSlow(cbVector &Vect);
-	long FindVectorSlow(cbVector &Vect, long &Error);
-	long ClosestError(cbVector &Vect);
-	long ClosestError(long UseCount, cbVector &Vect);
+  void AddVector(cbVector &Vect);
+  long FindVectorSlow(cbVector &Vect);
+  long FindVectorSlow(cbVector &Vect, long &Error);
+  long ClosestError(cbVector &Vect);
+  long ClosestError(long UseCount, cbVector &Vect);
 
-	CodeBook &operator=(fCodebook &Src);
-	cbVector &operator[](int i) {return VectList[i];}
-	long UsageCount(int i) {return usageCount[i];}
+  CodeBook &operator=(fCodebook &Src);
+  cbVector &operator[](int i) {return VectList[i];}
+  long UsageCount(int i) {return usageCount[i];}
 
-	inline long NumCodes(void) {return VectList.Count();}
-	inline void SetSize(long Size) {VectList.Resize(Size); usageCount.Resize(Size);}
-	inline void SetCount(long Count) {VectList.SetCount(Count); usageCount.SetCount(Count);}
+  inline long NumCodes(void) {return VectList.Count();}
+  inline void SetSize(long Size)
+  {VectList.Resize(Size); usageCount.Resize(Size);}
+  inline void SetCount(long Count)
+  {VectList.SetCount(Count); usageCount.SetCount(Count);}
 
-	friend class ImgCodeBook;
-	friend class fCodebook;
+  friend class ImgCodeBook;
+  friend class fCodebook;
 };
 
 
 class ImgCodeBook : public CodeBook
 {
 private:
-	Table<long>			HashValues;
-	Table<long>			HashList[HashSize];
-	Table<DualDist>		DistList;
-	Table<long>			BrightList;
+  Table<long>      HashValues;
+  Table<long>      HashList[HashSize];
+  Table<DualDist>    DistList;
+  Table<long>      BrightList;
 
-	void SortCodes(void);
+  void SortCodes(void);
 
 public:
-	ImgCodeBook();
-	~ImgCodeBook();
+  ImgCodeBook();
+  ~ImgCodeBook();
 
-	inline void SetSize(long Size) {VectList.Resize(Size); usageCount.Resize(Size); HashValues.Resize(Size);}
-	void ReleaseAll(void);
+  inline void SetSize(long Size)
+  {VectList.Resize(Size); usageCount.Resize(Size); HashValues.Resize(Size);}
+  void ReleaseAll(void);
 
-	ImgCodeBook &operator=(fCodebook &Src) {CodeBook::operator=(Src); return *this;}
+  ImgCodeBook &operator=(fCodebook &Src)
+  {CodeBook::operator=(Src); return *this;}
 
-	void AddVector(cbVector &Vect);
-	void AddVectorUnique(cbVector &Vect) {AddVector(Vect);}
+  void AddVector(cbVector &Vect);
+  void AddVectorUnique(cbVector &Vect) {AddVector(Vect);}
 
-	void FromImage(Image32 *pImg);
-	void FromImageUnique(Image32 *pImg);
+  void FromImage(Image32 *pImg);
+  void FromImageUnique(Image32 *pImg);
 
-	void GenerateDistanceTables(void);
-	long FindVector(cbVector &Vect);
+  void GenerateDistanceTables(void);
+  long FindVector(cbVector &Vect);
 
-	friend class fCodebook;
+  friend class fCodebook;
 };
 
 #endif

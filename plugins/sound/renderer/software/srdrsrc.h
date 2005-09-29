@@ -101,7 +101,11 @@ public:
   // stored sample offset used between steps  0.0<=SampleOffset<1.0
   float SampleOffset;
 
-  /// Closer than the MinimumDistance the sound is heard at full volume. Futher than the maximum distance it is not heard at all.  Between, the sound is attenuated using the rolloff factor.
+  /**
+   * Closer than the MinimumDistance the sound is heard at full volume.
+   * Further than the maximum distance it is not heard at all.  Between,
+   * the sound is attenuated using the rolloff factor.
+   */
   float MinimumDistance,MaximumDistance;
 
 protected:

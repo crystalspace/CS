@@ -50,7 +50,6 @@ struct iXWindow : public virtual iBase
   virtual void SetTitle (const char* title) = 0;
   virtual void SetCanvas (iGraphics2D *canvas) = 0;
 
-
   // These are X specific
   virtual Display *GetDisplay () = 0;
   virtual int GetScreen () = 0;
@@ -59,7 +58,6 @@ struct iXWindow : public virtual iBase
 
   virtual void SetVisualInfo (XVisualInfo *xvis) = 0;
   virtual void SetColormap (Colormap cmap) = 0;
-
 
   // Should be in the window manager...
   virtual bool SetMousePosition (int x, int y) = 0;

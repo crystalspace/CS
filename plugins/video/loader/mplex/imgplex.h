@@ -61,8 +61,9 @@ class csImageIOMultiplexer : public iImageIO
   virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,
     const char* extraoptions = 0);
-  virtual csPtr<iDataBuffer> Save (iImage *image, iImageIO::FileFormatDescription *format = 0,
-    const char* extraoptions = 0);
+  virtual csPtr<iDataBuffer> Save (iImage *image,
+  	iImageIO::FileFormatDescription *format = 0,
+    	const char* extraoptions = 0);
 
   struct eiComponent : public iComponent
   {

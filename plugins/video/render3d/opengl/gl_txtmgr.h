@@ -117,8 +117,14 @@ private:
 
   //bool has_alpha;
   csAlphaMode::AlphaType alphaType;
-  bool IsTexupdateNeeded() const { return texFlags.Check (flagTexupdateNeeded); }
-  void SetTexupdateNeeded (bool b) { texFlags.SetBool (flagTexupdateNeeded, b); }
+  bool IsTexupdateNeeded() const
+  {
+    return texFlags.Check (flagTexupdateNeeded);
+  }
+  void SetTexupdateNeeded (bool b)
+  {
+    texFlags.SetBool (flagTexupdateNeeded, b);
+  }
   bool IsPrepared() const { return texFlags.Check (flagPrepared); }
   void SetPrepared (bool b) { texFlags.SetBool (flagPrepared, b); }
   bool IsTransp() const { return texFlags.Check (flagTransp); }
@@ -149,8 +155,14 @@ public:
   int target;
   /// Format used for last Blit() call
   TextureBlitDataFormat texFormat;
-  bool IsWasRenderTarget() const { return texFlags.Check (flagWasRenderTarget); }
-  void SetWasRenderTarget (bool b) { texFlags.SetBool (flagWasRenderTarget, b); }
+  bool IsWasRenderTarget() const
+  {
+    return texFlags.Check (flagWasRenderTarget);
+  }
+  void SetWasRenderTarget (bool b)
+  {
+    texFlags.SetBool (flagWasRenderTarget, b);
+  }
   bool IsNeedMips() const { return texFlags.Check (flagNeedMips); }
   void SetNeedMips (bool b) { texFlags.SetBool (flagNeedMips, b); }
 

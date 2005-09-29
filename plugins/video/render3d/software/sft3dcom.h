@@ -177,12 +177,11 @@ typedef G3DPolygonDP G3DPolygonDPF;
 /**
 * Structure containing all info needed by DrawTriangeMesh.
 * This function is capable of:<br>
-* <ul>
-* <li>Object2camera transformation and perspective.
-* <li>Linear interpolation between two sets of vertices.
-* <li>Clipping.
-* <li>Whatever else DrawPolygonFX can do.
-* </ul>
+* - Object2camera transformation and perspective.
+* - Linear interpolation between two sets of vertices.
+* - Clipping.
+* - Whatever else DrawPolygonFX can do.
+*
 * To disable the use of one of the components, set it to 0.
 */
 struct G3DTriangleMesh
@@ -245,11 +244,10 @@ struct G3DTriangleMesh
 /**
 * Structure containing all info needed by DrawPolygonMesh.
 * In theory this function is capable of:<br>
-* <ul>
-* <li>Object2camera transformation and perspective.
-* <li>Clipping.
-* <li>Whatever else DrawPolygon can do.
-* </ul>
+* - Object2camera transformation and perspective.
+* - Clipping.
+* - Whatever else DrawPolygon can do.
+*
 * To disable the use of one of the components, set it to 0.
 */
 struct G3DPolygonMesh
@@ -445,7 +443,8 @@ protected:
   csDrawPIScanlineGouraud* ScanProcPIG [0x28];
 
   /// The routine for getting the address of needed scanline_xxx_alpha
-  csDrawScanline* (*ScanProc_Alpha) (csSoftwareGraphics3DCommon*, int alpha, bool keycolor, bool alphamap);
+  csDrawScanline* (*ScanProc_Alpha) (csSoftwareGraphics3DCommon*, int alpha,
+  	bool keycolor, bool alphamap);
 
   /// ScanProc_Alpha for 8 bpp modes
   static csDrawScanline* ScanProc_8_Alpha (csSoftwareGraphics3DCommon*,
@@ -597,47 +596,6 @@ public:
   virtual void FinishDraw ();
   /// Draw the projected polygon with light and texture.
   virtual void DrawPolygon (G3DPolygonDP& poly);
-
-  /**
-   * Draw the projected polygon with light and texture.  Debugging version.
-   * This one does not actually draw anything but it just prints debug
-   * information about what it would have done.
-   */
-  //virtual void DrawPolygonDebug (G3DPolygonDP& poly);
-
-  /**
-   * Initiate a volumetric fog object.  This function will be called before
-   * front-facing and back-facing fog polygons are added to the object.  The
-   * fog object will be convex but not necesarily closed.  The given CS_ID can
-   * be used to identify multiple fog objects when multiple objects are
-   * started.
-   */
-  //virtual void OpenFogObject (CS_ID id, csFog* fog);
-
-  /**
-   * Add a front or back-facing fog polygon in the current fog object.  Note
-   * that it is guaranteed that all back-facing fog polygons will have been
-   * added before the first front-facing polygon.  fogtype can be:
-   * <ul>
-   *    <li>CS_FOG_FRONT:       a front-facing polygon
-   *    <li>CS_FOG_BACK:        a back-facing polygon
-   *    <li>CS_FOG_VIEW:        the view-plane
-   * </ul>
-   */
-  //virtual void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype);
-
-  /**
-   * Close a volumetric fog object.  After the volumetric object is closed it
-   * should be rendered on screen (whether you do it here or in
-   * DrawFrontFog/DrawBackFog() is not important).
-   */
-  //virtual void CloseFogObject (CS_ID id);
-
-  /// Open a new clipped portal.
-  //virtual void OpenPortal (G3DPolygonDFP* poly);
-
-  /// Close a portal previously opened with OpenPortal().
-  //virtual void ClosePortal ();
 
   /// Draw a line in camera space.
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,
@@ -818,7 +776,8 @@ public:
     return true;
   }
 
-  virtual void SetTextureState (int* units, iTextureHandle** textures, int count)
+  virtual void SetTextureState (int* units, iTextureHandle** textures,
+  	int count)
   {
     int i;
     for (i = 0 ; i < count ; i++)
@@ -879,7 +838,8 @@ public:
   { 
   }
 
-  virtual void GetWriteMask (bool &red, bool &green, bool &blue, bool &alpha) const
+  virtual void GetWriteMask (bool &red, bool &green, bool &blue,
+  	bool &alpha) const
   {
   }
 

@@ -80,7 +80,8 @@ public:
   virtual bool WriteColor (iDocumentNode* node, csColor4* c);
   virtual bool ParseMixmode (iDocumentNode* node, uint &mixmode,
     bool allowFxMesh = false);
-  virtual bool WriteMixmode (iDocumentNode* node, uint mixmode, bool allowFxMesh);
+  virtual bool WriteMixmode (iDocumentNode* node, uint mixmode,
+  	bool allowFxMesh);
   virtual bool HandlePortalParameter (
 	iDocumentNode* child, iLoaderContext* ldr_context,
 	uint32 &flags, bool &mirror, bool &warp, int& msv,

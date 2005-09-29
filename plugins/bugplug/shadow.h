@@ -36,12 +36,11 @@ struct iCamera;
  * to it with all its power. Unless Shadow willingly releases the creature
  * there is nothing that can be done to unbind Shadow.
  * The Shadow slowly devours the poor creature from all its knowledge.
- * <p>
+ *
  * For the more technically minded:
- * <ul>
- * <li>Shadow: mesh object
- * <li>Creature: another mesh object
- * </ul>
+ * - Shadow: mesh object
+ * - Creature: another mesh object
+ *
  * This mesh object follows another mesh object and it will render a bounding
  * box for that object.
  */

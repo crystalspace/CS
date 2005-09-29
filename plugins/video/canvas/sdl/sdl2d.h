@@ -69,10 +69,10 @@ public:
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
   virtual unsigned GetPotentiallyConflictingEvents ()
-    { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
 
   virtual unsigned QueryEventPriority (unsigned /*iType*/)
-    { return 150; }
+  { return 150; }
 };
 
 #endif // __CS_SDL2D_H__

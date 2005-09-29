@@ -100,8 +100,8 @@ protected:
   uint32 oss_buffer_bytes;
 
   /// A flag used to shut down the running background thread.
-  //   We don't really need to synchronize access to this since a delay in recognizing a change
-  //   isn't a big deal.
+  // We don't really need to synchronize access to this since a delay in
+  // recognizing a change isn't a big deal.
   volatile bool running;
   csRef<csThread> bgthread;
 

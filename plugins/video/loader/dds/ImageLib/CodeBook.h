@@ -46,7 +46,8 @@ public:
   long InvMag(void);    // Magnitude of the vector ^ ffffffffff...
 
   void Diff(cbVector &Test1, cbVector &Test2);
-  long DiffMag(cbVector &Vect);  // Magnitude of the difference between this and Vect (Dist ^ 2)
+  // Magnitude of the difference between this and Vect (Dist ^ 2)
+  long DiffMag(cbVector &Vect);
 
   friend class CodeBook;
   friend class ImgCodeBook;
@@ -80,8 +81,10 @@ public:
   long UsageCount(int i) {return usageCount[i];}
 
   inline long NumCodes(void) {return VectList.Count();}
-  inline void SetSize(long Size) {VectList.Resize(Size); usageCount.Resize(Size);}
-  inline void SetCount(long Count) {VectList.SetCount(Count); usageCount.SetCount(Count);}
+  inline void SetSize(long Size)
+  {VectList.Resize(Size); usageCount.Resize(Size);}
+  inline void SetCount(long Count)
+  {VectList.SetCount(Count); usageCount.SetCount(Count);}
 
   friend class ImgCodeBook;
   friend class fCodebook;
@@ -102,10 +105,12 @@ public:
   ImgCodeBook();
   ~ImgCodeBook();
 
-  inline void SetSize(long Size) {VectList.Resize(Size); usageCount.Resize(Size); HashValues.Resize(Size);}
+  inline void SetSize(long Size)
+  {VectList.Resize(Size); usageCount.Resize(Size); HashValues.Resize(Size);}
   void ReleaseAll(void);
 
-  ImgCodeBook &operator=(fCodebook &Src) {CodeBook::operator=(Src); return *this;}
+  ImgCodeBook &operator=(fCodebook &Src)
+  {CodeBook::operator=(Src); return *this;}
 
   void AddVector(cbVector &Vect);
   void AddVectorUnique(cbVector &Vect) {AddVector(Vect);}

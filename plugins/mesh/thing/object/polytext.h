@@ -161,19 +161,17 @@ public:
   /**
    * Take a light and update the lightmap using the information in
    * this shadow-bitmap.
-   * <ul>
-   * <li>lightcell_shift is the shift to scale lightmap space to
-   *     texture space (with texture space meaning 0 to real texture size).
-   * <li>The shf_u, shf_v, mul_u, and mul_v fields define how to translate
-   *     the previous texture space to uv space (where uv goes between
-   *     0 and 1 for a single texture).
-   * <li>m_t2w and v_t2w transform uv space to world space coordinates.
-   * <li>light is the light and lightpos is the position of that light (which
-   *     can be different from the position of the light given by 'light'
-   *     itself because we can have space warping).
-   * <li>lightcolor can also be different from the color of the light because
-   *     it could in principle be modified by portals.
-   * </ul>
+   * - lightcell_shift is the shift to scale lightmap space to
+   *   texture space (with texture space meaning 0 to real texture size).
+   * - The shf_u, shf_v, mul_u, and mul_v fields define how to translate
+   *   the previous texture space to uv space (where uv goes between
+   *   0 and 1 for a single texture).
+   * - m_t2w and v_t2w transform uv space to world space coordinates.
+   * - light is the light and lightpos is the position of that light (which
+   *   can be different from the position of the light given by 'light'
+   *   itself because we can have space warping).
+   * - lightcolor can also be different from the color of the light because
+   *   it could in principle be modified by portals.
    */
   void UpdateLightMap (csRGBpixel* lightmap,
 	int lightcell_shift,
@@ -188,17 +186,16 @@ public:
   /**
    * Take a light and update the shadowmap using the information in
    * this shadow-bitmap.
-   * <ul>
-   * <li>lightcell_shift is the shift to scale lightmap space to
-   *     texture space (with texture space meaning 0 to real texture size).
-   * <li>The shf_u, shf_v, mul_u, and mul_v fields define how to translate
-   *     the previous texture space to uv space (where uv goes between
-   *     0 and 1 for a single texture).
-   * <li>m_t2w and v_t2w transform uv space to world space coordinates.
-   * <li>light is the light and lightpos is the position of that light (which
-   *     can be different from the position of the light given by 'light'
-   *     itself because we can have space warping).
-   * </ul>
+   * - lightcell_shift is the shift to scale lightmap space to
+   *   texture space (with texture space meaning 0 to real texture size).
+   * - The shf_u, shf_v, mul_u, and mul_v fields define how to translate
+   *   the previous texture space to uv space (where uv goes between
+   *   0 and 1 for a single texture).
+   * - m_t2w and v_t2w transform uv space to world space coordinates.
+   * - light is the light and lightpos is the position of that light (which
+   *   can be different from the position of the light given by 'light'
+   *   itself because we can have space warping).
+   *
    * Function returns false if there was no light hitting the polygon.
    */
   bool UpdateShadowMap (unsigned char* shadowmap,

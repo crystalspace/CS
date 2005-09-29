@@ -1,6 +1,6 @@
 /*
 
-	MedianCut.h - Median Cut quantization class
+  MedianCut.h - Median Cut quantization class
 
 */
 
@@ -15,65 +15,67 @@ namespace ImageLib
 
 typedef struct
 {
-	cbVector	*pVect;
-	long		UsageCount;
+  cbVector  *pVect;
+  long    UsageCount;
 } VectPtr;
 
 class TreeNode : public ccDoubleHeapNode
 {
 public:
-	TreeNode();
-	~TreeNode();
+  TreeNode();
+  ~TreeNode();
 
-	long	Index;
-	long	AxisLen;
+  long  Index;
+  long  AxisLen;
 
-	BYTE	SplitPoint, Pad;
-	char	SplitAxis, LongAxis;
+  BYTE  SplitPoint, Pad;
+  char  SplitAxis, LongAxis;
 
-	TreeNode	*pLessEqual;
-	TreeNode	*pGreater;
+  TreeNode  *pLessEqual;
+  TreeNode  *pGreater;
 
-	cbVector	Min, Max, Diff, Center;
+  cbVector  Min, Max, Diff, Center;
 
-	Table<VectPtr>	CodeList;
+  Table<VectPtr>  CodeList;
 
-	void ComputeBounds(void);
-	void ComputeError(void);
+  void ComputeBounds(void);
+  void ComputeError(void);
 
-	char LongestAxis(void);
-	BOOL Encloses(cbVector &Vect);
+  char LongestAxis(void);
+  BOOL Encloses(cbVector &Vect);
 };
 
 
 class MedianCut
 {
 private:
-	TreeNode			*pRoot;
-	ccDoubleHeap		LeafList;
+  TreeNode      *pRoot;
+  ccDoubleHeap    LeafList;
 
-	TreeNode			*TreePool;
-	long				PoolAlloc, PoolUsed;
+  TreeNode      *TreePool;
+  long        PoolAlloc, PoolUsed;
 
-	void ReleaseAll(void);
-	TreeNode *GetNewTreeNode(void);
+  void ReleaseAll(void);
+  TreeNode *GetNewTreeNode(void);
 
-	void BuildRootNode(CodeBook &Codes);
+  void BuildRootNode(CodeBook &Codes);
 
 public:
-	MedianCut();
-	~MedianCut();
+  MedianCut();
+  ~MedianCut();
 
-	inline TreeNode *GetFirstLeaf(void) {return (TreeNode *)LeafList.GetNode(1);}
-	inline TreeNode *GetLeaf(long Index) {return (TreeNode *)LeafList.GetNode(Index+1);}
+  inline TreeNode *GetFirstLeaf(void)
+  {return (TreeNode *)LeafList.GetNode(1);}
+  inline TreeNode *GetLeaf(long Index)
+  {return (TreeNode *)LeafList.GetNode(Index+1);}
 
-	inline long GetCount(void) {return LeafList.Count();}
+  inline long GetCount(void) {return LeafList.Count();}
 
-	void ResetTree(void);
-	void BuildTree(CodeBook &Codes, long TreeSize);
+  void ResetTree(void);
+  void BuildTree(CodeBook &Codes, long TreeSize);
 
-	TreeNode *FindVector(cbVector &Vect);
-	TreeNode *FindVectorBest(cbVector &Vect);
+  TreeNode *FindVector(cbVector &Vect);
+  TreeNode *FindVectorBest(cbVector &Vect);
 };
 
 } // end of namespace ImageLib

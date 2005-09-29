@@ -379,7 +379,8 @@ public:
     {
       SCF_DESTRUCT_IBASE ();
     }
-    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
+    virtual void PreGetBuffer (csRenderBufferHolder* holder,
+    	csRenderBufferName buffer)
     {
       parent->PreGetBuffer (holder, buffer);
     }
@@ -658,7 +659,6 @@ public:
   friend class ObjectModel;
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
-
  
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };

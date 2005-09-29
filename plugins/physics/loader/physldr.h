@@ -53,21 +53,28 @@ public:
   /// Parse the collider specific sub section
   virtual bool ParseCollider (iDocumentNode *node, iRigidBody* body);
   /// Parse an anonymous mesh collider in the system
-  virtual bool ParseSystemColliderMesh (iDocumentNode *node, iDynamicSystem* system);
+  virtual bool ParseSystemColliderMesh (iDocumentNode *node,
+  	iDynamicSystem* system);
   /// Parse an anonymous sphere collider in the system
-  virtual bool ParseSystemColliderSphere (iDocumentNode *node, iDynamicSystem* system);
+  virtual bool ParseSystemColliderSphere (iDocumentNode *node,
+  	iDynamicSystem* system);
   /// Parse an anonymous cylinder collider in the system
-  virtual bool ParseSystemColliderCylinder (iDocumentNode *node, iDynamicSystem* system);
+  virtual bool ParseSystemColliderCylinder (iDocumentNode *node,
+  	iDynamicSystem* system);
   /// Parse an anonymous box collider in the system
-  virtual bool ParseSystemColliderBox (iDocumentNode *node, iDynamicSystem* system);
+  virtual bool ParseSystemColliderBox (iDocumentNode *node,
+  	iDynamicSystem* system);
   /// Parse an anonymous plane collider in the system
-  virtual bool ParseSystemColliderPlane (iDocumentNode *node, iDynamicSystem* system);
+  virtual bool ParseSystemColliderPlane (iDocumentNode *node,
+  	iDynamicSystem* system);
   /// Parse the joint specific sub section
-  virtual bool ParseJoint (iDocumentNode *node, iJoint* joint, iDynamicSystem* system);
+  virtual bool ParseJoint (iDocumentNode *node, iJoint* joint,
+  	iDynamicSystem* system);
   /// Parse a transform
   virtual bool ParseTransform (iDocumentNode *node, csOrthoTransform &t);
   /// Parse a constraint definition
-  virtual bool ParseConstraint (iDocumentNode *node, bool &, bool &, bool &, csVector3 &, csVector3 &);
+  virtual bool ParseConstraint (iDocumentNode *node,
+  	bool &, bool &, bool &, csVector3 &, csVector3 &);
 
   struct eiComponent : public iComponent
   {

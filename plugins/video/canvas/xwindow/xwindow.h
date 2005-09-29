@@ -102,10 +102,10 @@ public:
   virtual void Close ();
 
   virtual bool GetFullScreen ()
-    { return xf86vm ? xf86vm->IsFullScreen () : false; }
+  { return xf86vm ? xf86vm->IsFullScreen () : false; }
 
   virtual void SetFullScreen (bool yesno)
-    { SetVideoMode (yesno, false, false); }
+  { SetVideoMode (yesno, false, false); }
 
   virtual void AllowResize (bool iAllow);
 
@@ -113,18 +113,18 @@ public:
   virtual void SetCanvas (iGraphics2D *canvas);
 
   virtual Display *GetDisplay ()
-    { return dpy; }
+  { return dpy; }
   virtual int GetScreen ()
-    { return screen_num; }
+  { return screen_num; }
   virtual Window GetWindow ()
-    { return ctx_win; }
+  { return ctx_win; }
   virtual GC GetGC ()
-    { return gc; }
+  { return gc; }
 
   virtual void SetVisualInfo (XVisualInfo *vis)
-    { xvis = vis; }
+  { xvis = vis; }
   virtual void SetColormap (Colormap cmap)
-    { this->cmap = cmap; }
+  { this->cmap = cmap; }
 
   // Should be in the window manager
   virtual bool SetMousePosition (int x, int y);

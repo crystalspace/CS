@@ -46,9 +46,11 @@ class csJNGImageIO : public iImageIO
 
   /// write something to our output stream
   static mng_bool MNG_DECL cb_writedata (mng_handle hHandle, mng_ptr pBuf,
-                                         mng_uint32 iBuflen, mng_uint32p pWritten);
+                                         mng_uint32 iBuflen,
+					 mng_uint32p pWritten);
   /// libmng wants a line in the buffer
-  static mng_ptr MNG_DECL cb_getcanvasline(mng_handle hHandle, mng_uint32 iLinenr);
+  static mng_ptr MNG_DECL cb_getcanvasline(mng_handle hHandle,
+  	mng_uint32 iLinenr);
 
  public:
   SCF_DECLARE_IBASE;
@@ -61,11 +63,12 @@ class csJNGImageIO : public iImageIO
   virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,
     const char* extraoptions = 0);
-  virtual csPtr<iDataBuffer> Save (iImage *image, iImageIO::FileFormatDescription *format = 0,
-    const char* extraoptions = 0);
+  virtual csPtr<iDataBuffer> Save (iImage *image,
+  	iImageIO::FileFormatDescription *format = 0,
+    	const char* extraoptions = 0);
 
   virtual bool Initialize (iObjectRegistry* p) 
-    { object_reg = p; return true; }
+  { object_reg = p; return true; }
 
   struct eiComponent : public iComponent
   {
@@ -102,9 +105,11 @@ private:
 			               mng_uint32 iBuflen, mng_uint32 *pRead);
   /// libmng tells us width/height through this
   static mng_bool MNG_DECL cb_processheader(mng_handle hHandle, 
-					    mng_uint32 iWidth, mng_uint32 iHeight);
+					    mng_uint32 iWidth,
+					    mng_uint32 iHeight);
   /// libmng wants a line in the buffer
-  static mng_ptr MNG_DECL cb_getcanvasline(mng_handle hHandle, mng_uint32 iLinenr);
+  static mng_ptr MNG_DECL cb_getcanvasline(mng_handle hHandle,
+  					mng_uint32 iLinenr);
   /// libmng tells us that an area of the image has updated
   static mng_bool MNG_DECL cb_imagerefresh(mng_handle hHandle, mng_uint32 iX, 
 					   mng_uint32 iY, mng_uint32 iWidth, 

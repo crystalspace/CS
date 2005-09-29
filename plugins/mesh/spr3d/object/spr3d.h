@@ -386,7 +386,8 @@ public:
 
 public:
   /// Create the sprite template.
-  csSprite3DMeshObjectFactory (iMeshObjectType* pParent, iObjectRegistry *object_reg);
+  csSprite3DMeshObjectFactory (iMeshObjectType* pParent,
+  	iObjectRegistry *object_reg);
   /// Destroy the template.
   virtual ~csSprite3DMeshObjectFactory ();
 
@@ -411,11 +412,9 @@ public:
    * Sets which lighting config variable that all new sprites created
    * from this template will use.
    * The options are:
-   * <ul>
-   * <li>CS_SPR_LIGHT_GLOBAL (default)
-   * <li>CS_SPR_LIGHT_TEMPLATE
-   * <li>CS_SPR_LIGHT_LOCAL
-   * </ul>
+   * - CS_SPR_LIGHT_GLOBAL (default)
+   * - CS_SPR_LIGHT_TEMPLATE
+   * - CS_SPR_LIGHT_LOCAL
    */
   void SetLightingQualityConfig (int config_flag)
   { lighting_quality_config = config_flag; };
@@ -430,11 +429,9 @@ public:
    * Sets which lod config variable that all new sprites created
    * from this template will use.
    * The options are:
-   * <ul>
-   * <li>CS_SPR_LOD_GLOBAL (default)
-   * <li>CS_SPR_LOD_TEMPLATE
-   * <li>CS_SPR_LOD_LOCAL
-   * </ul>
+   * - CS_SPR_LOD_GLOBAL (default)
+   * - CS_SPR_LOD_TEMPLATE
+   * - CS_SPR_LOD_LOCAL
    */
   void SetLodLevelConfig (int config_flag)
   { lod_level_config = config_flag; };
@@ -467,37 +464,40 @@ public:
   /// Add a vertex, normal, and texel
   void AddVertex () { AddVertices (1); }
   /// Query the number of vertices.
-  int GetVertexCount () const { return (int)vertices.Get (0)->GetVertexCount (); }
+  int GetVertexCount () const
+  {
+    return (int)vertices.Get (0)->GetVertexCount ();
+  }
 
   /// Get a texel.
   csVector2& GetTexel (int frame, int vertex) const
-    { return (*texels.Get(frame)) [vertex]; }
+  { return (*texels.Get(frame)) [vertex]; }
   /// Get array of texels.
   csVector2* GetTexels (int frame) const
-    { return (*texels.Get(frame)).GetVertices (); }
+  { return (*texels.Get(frame)).GetVertices (); }
   /// Set texel array.  The array is copied.
   void SetTexels(csVector2 const* tex, int frame)
-    { (*texels.Get(frame)).SetVertices(tex, GetVertexCount ()); }
+  { (*texels.Get(frame)).SetVertices(tex, GetVertexCount ()); }
 
   /// Get a vertex.
   csVector3& GetVertex (int frame, int vertex) const
-    { return (*vertices.Get(frame)) [vertex]; }
+  { return (*vertices.Get(frame)) [vertex]; }
   /// Get vertex array.
   csVector3* GetVertices (int frame) const
-    { return (*vertices.Get(frame)).GetVertices (); }
+  { return (*vertices.Get(frame)).GetVertices (); }
   /// Set vertex array.  The array is copied.
   void SetVertices(csVector3 const* verts, int frame)
-    { (*vertices.Get(frame)).SetVertices(verts, GetVertexCount ()); }
+  { (*vertices.Get(frame)).SetVertices(verts, GetVertexCount ()); }
 
   /// Get a normal.
   csVector3& GetNormal (int frame, int vertex) const
-    { return (*normals.Get(frame)) [vertex]; }
+  { return (*normals.Get(frame)) [vertex]; }
   /// Get normal array.
   csVector3* GetNormals (int frame) const
-    { return (*normals.Get(frame)).GetVertices (); }
+  { return (*normals.Get(frame)).GetVertices (); }
   /// Set normal array.  The array is copied.
   void SetNormals(csVector3 const* norms, int frame)
-    { (*normals.Get(frame)).SetVertices(norms, GetVertexCount ()); }
+  { (*normals.Get(frame)).SetVertices(norms, GetVertexCount ()); }
 
   /**
    * Add a triangle to the normal, texel, and vertex meshes
@@ -996,11 +996,9 @@ private:
   /**
    * Used to determine where to look for the lod detail level.
    * The possible values are:
-   *   <ul>
-   *     <li>CS_SPR_LOD_GLOBAL (default)
-   *     <li>CS_SPR_LOD_TEMPLATE
-   *     <li>CS_SPR_LOD_LOCAL
-   *   </ul>
+   * - CS_SPR_LOD_GLOBAL (default)
+   * - CS_SPR_LOD_TEMPLATE
+   * - CS_SPR_LOD_LOCAL
    */
   int lod_level_config;
 
@@ -1030,11 +1028,9 @@ private:
   /**
    * Used to determine where to look for the quality setting of the lighting.
    * The possible values are:
-   *   <ul>
-   *     <li>CS_SPR_LIGHT_GLOBAL (default)
-   *     <li>CS_SPR_LIGHT_TEMPLATE
-   *     <li>CS_SPR_LIGHT_LOCAL
-   *   </ul>
+   * - CS_SPR_LIGHT_GLOBAL (default)
+   * - CS_SPR_LIGHT_TEMPLATE
+   * - CS_SPR_LIGHT_LOCAL
    */
   int lighting_quality_config;
 
@@ -1111,11 +1107,9 @@ public:
   /**
    * Sets which lighting config variable this sprite will use.
    * The options are:
-   * <ul>
-   * <li>CS_SPR_LIGHT_GLOBAL (default)
-   * <li>CS_SPR_LIGHT_TEMPLATE
-   * <li>CS_SPR_LIGHT_LOCAL
-   * </ul>
+   * - CS_SPR_LIGHT_GLOBAL (default)
+   * - CS_SPR_LIGHT_TEMPLATE
+   * - CS_SPR_LIGHT_LOCAL
    */
   void SetLightingQualityConfig (int config_flag)
   { lighting_quality_config = config_flag; }
@@ -1169,11 +1163,9 @@ public:
   /**
    * Sets which lighting config variable this sprite will use.
    * The options are:
-   * <ul>
-   *   <li>CS_SPR_LOD_GLOBAL (default)
-   *   <li>CS_SPR_LOD_TEMPLATE
-   *   <li>CS_SPR_LOD_LOCAL
-   * </ul>
+   * - CS_SPR_LOD_GLOBAL (default)
+   * - CS_SPR_LOD_TEMPLATE
+   * - CS_SPR_LOD_LOCAL
    */
   void SetLodLevelConfig (int config_flag)
   { lod_level_config = config_flag; }
@@ -1968,7 +1960,8 @@ public:
       SCF_DESTRUCT_IBASE ();
     }
     SCF_DECLARE_IBASE;
-    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
+    virtual void PreGetBuffer (csRenderBufferHolder* holder,
+    	csRenderBufferName buffer)
     {
       parent->PreGetBuffer (holder, buffer);
     }

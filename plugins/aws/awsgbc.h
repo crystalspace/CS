@@ -202,22 +202,15 @@ struct awsGridBagConstraints
    * This field is used when the component's display area is larger 
    * than the component's requested size. It determines whether to 
    * resize the component, and if so, how. 
-   * <p>
+   *
    * The following values are valid for <code>fill</code>: 
-   * <p>
-   * <ul>
-   * <li>
-   * <code>NONE</code>: Do not resize the component. 
-   * <li>
-   * <code>HORIZONTAL</code>: Make the component wide enough to fill 
-   * its display area horizontally, but do not change its height. 
-   * <li>
-   * <code>VERTICAL</code>: Make the component tall enough to fill its 
-   * display area vertically, but do not change its width. 
-   * <li>
-   * <code>BOTH</code>: Make the component fill its display area entirely. 
-   * </ul>
-   * <p>
+   * - <code>NONE</code>: Do not resize the component. 
+   * - <code>HORIZONTAL</code>: Make the component wide enough to fill 
+   *   its display area horizontally, but do not change its height. 
+   * - <code>VERTICAL</code>: Make the component tall enough to fill its 
+   *   display area vertically, but do not change its width. 
+   * - <code>BOTH</code>: Make the component fill its display area entirely. 
+   *
    * The default value is <code>NONE</code>. 
    */
   int fill;

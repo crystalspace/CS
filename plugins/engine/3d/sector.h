@@ -96,8 +96,6 @@ private:
   csSector* sector;
 };
 
-//?? SCF_VERSION (csSector, 0, 0, 2);
-
 /**
  * A sector is a container for objects. It is one of
  * the base classes for the portal engine.
@@ -135,13 +133,11 @@ public:
   { return portalMeshes; }
 
   virtual void RegisterPortalMesh (iMeshWrapper* mesh);
-
   virtual void UnregisterPortalMesh (iMeshWrapper* mesh);
 
   virtual void UnlinkObjects ();
 
   virtual void AddSectorMeshCallback (iSectorMeshCallback* cb);
-
   virtual void RemoveSectorMeshCallback (iSectorMeshCallback* cb);
 
   // -- Drawing related
@@ -152,16 +148,13 @@ public:
 
   virtual int GetRecLevel () const
   { return drawBusy; }
-
   virtual void IncRecLevel ()
   { drawBusy++; }
-
   virtual void DecRecLevel ()
   { drawBusy--; }
 
   virtual void SetRenderLoop (iRenderLoop* rl)
   { renderloop = rl; }
-
   virtual iRenderLoop* GetRenderLoop ()
   { return renderloop; }
 
@@ -478,7 +471,6 @@ private:
 
 
 public:
-
   void NameChanged (iObject* object, const char* oldname,
   	const char* newname);
 

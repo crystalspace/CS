@@ -31,33 +31,48 @@
 
 #include <mmsystem.h>
 
-/* This driver uses the windows MMSystem wave output functions.  This system has been around forever and it sometimes behaves a bit fickle.
+/*
+ * This driver uses the windows MMSystem wave output functions.  This system
+ * has been around forever and it sometimes behaves a bit fickle.
  *
- * This driver kicks off its own thread to attempt to ensure that data is fed to the underlying system in a timely manner.  Additionally, MMSystem
- *  kicks off its own thread in the process space as well.  This means if you use this driver you get 2 extra threads.  Threads are cheap, don't
- *  sweat it.
+ * This driver kicks off its own thread to attempt to ensure that data is
+ * fed to the underlying system in a timely manner.  Additionally, MMSystem
+ * kicks off its own thread in the process space as well.  This means if you
+ * use this driver you get 2 extra threads.  Threads are cheap, don't
+ * sweat it.
  *
- * The MMSystem thread performs all the callbacks to the application, but it's not safe to do any work inside this callback - you're extremely limited
- *  in what functions you can safely call.  See the note above the definition of waveOutProc in wodrv.cpp for a list.  The callback receives blocks that
- *  the driver is done with.  All we do here is put those into a queue to be refilled and handed back to the driver.
+ * The MMSystem thread performs all the callbacks to the application, but it's
+ * not safe to do any work inside this callback - you're extremely limited
+ * in what functions you can safely call.  See the note above the definition
+ * of waveOutProc in wodrv.cpp for a list.  The callback receives blocks that
+ * the driver is done with.  All we do here is put those into a queue to be
+ * refilled and handed back to the driver.
  *
- * Our own background thread sits in a loop with a sleep(0), waiting for free blocks to become available.  When they are it calls back into the renderer
- *  to have it fill them.  This seems somewhat backwards, having the driver call the renderer, but since the GNU/Linux driver seems to work fine, and this
- *  driver has always done things this way, it's the easiest way to approach this without creating new problems elsewhere.
+ * Our own background thread sits in a loop with a sleep(0), waiting for
+ * free blocks to become available.  When they are it calls back into the
+ * renderer to have it fill them.  This seems somewhat backwards, having the
+ * driver call the renderer, but since the GNU/Linux driver seems to work
+ * fine, and this driver has always done things this way, it's the easiest way
+ * to approach this without creating new problems elsewhere.
  *
- * Note that this means the Software Renderer call path invoked from here should be thread safe (real mutexes should lock all the data that may be accessed
- *  by both the call path from this background thread and the main application thread).
+ * Note that this means the Software Renderer call path invoked from here
+ * should be thread safe (real mutexes should lock all the data that may
+ * be accessed by both the call path from this background thread and the
+ * main application thread).
  *
- * If you alter or create any code that touches EmptyBlocks, make sure you lock mutex_EmptyBlocks while accessing it, and release it (from all exit paths)
- *  afterward.
+ * If you alter or create any code that touches EmptyBlocks, make sure you
+ * lock mutex_EmptyBlocks while accessing it, and release it (from all exit
+ * paths)afterward.
  *
  *
- *  This plugin respects the following configuration options:
- *  Sound.WaveOut.BufferLength - A floating point value specifying the length of buffers (in seconds) created to
- *                                     hold data from the renderer (streaming AND static audio). (default is 0.05 seconds)
- *                               Increasing this value will cause delays in sound actions (button clicks are especially noticable)
- *  Sound.WaveOut.DeviceIndexOverride - An integer value 0 - (Number of devices-1) overriding the default selection of output device.
-*/
+ * This plugin respects the following configuration options:
+ *  Sound.WaveOut.BufferLength - A floating point value specifying the length
+ *    of buffers (in seconds) created to hold data from the renderer (streaming
+ *    AND static audio). (default is 0.05 seconds) Increasing this value will
+ *    cause delays in sound actions (button clicks are especially noticable)
+ *  Sound.WaveOut.DeviceIndexOverride - An integer value 0 - (Number of
+ *    devices-1) overriding the default selection of output device.
+ */
 class csSoundDriverWaveOut : public iSoundDriver
 {
 public:
@@ -119,7 +134,8 @@ protected:
   // this function is called when a sound block is returned by wave-out
   static void CALLBACK waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance,
     DWORD dwParam1, DWORD dwParam2);
-  // This function is called by the above callback to put the returned block into the recycle queue
+  // This function is called by the above callback to put the returned
+  // block into the recycle queue
   void RecycleBlock(SoundBlock *Block);
 
   void EnumerateAvailableDevices();
@@ -135,7 +151,8 @@ protected:
     {
       count++;
     }
-    // If the thread is still running and we're going to delete this object, we are in for a crash
+    // If the thread is still running and we're going to delete this object,
+    // we are in for a crash
     virtual void DecRef () 
     {
       if (--count == 0) 
@@ -198,9 +215,15 @@ protected:
   // old system volume
   DWORD OldVolume;
 
-  /// Critical section wrapping the EmptyBlocks queue which must be accessable by both the background thread and the MMsystem callback.
+  /**
+   * Critical section wrapping the EmptyBlocks queue which must be accessable
+   * by both the background thread and the MMsystem callback.
+   */
   CRITICAL_SECTION critsec_EmptyBlocks;
-  /// An event that is signalled by the callback when empty blocks are ready to be processed
+  /**
+   * An event that is signalled by the callback when empty blocks are ready
+   * to be processed
+   */
   HANDLE hevent_EmptyBlocksReady;
 
   /// CS representation of running background thread

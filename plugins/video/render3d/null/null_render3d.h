@@ -148,6 +148,7 @@ public:
   void RemoveFromCache (iRendererLightmap* rlm) { }
   void SetWorldToCamera (const csReversibleTransform& w2c) { }
   void DrawSimpleMesh (const csSimpleRenderMesh& mesh, uint flags = 0) { }
+
 private:
   iObjectRegistry* object_reg;
   csRef<iGraphics2D> G2D;

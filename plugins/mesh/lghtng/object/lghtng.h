@@ -64,7 +64,6 @@ class csLightningMeshObject : public iMeshObject
   csVector3 directional;
   int points;
 
-  
   void SetupObject ();
 
   /// Get the bounding box in transformed space.
@@ -162,44 +161,35 @@ public:
     {      
       return 0;
     }
-    ///
     virtual float GetLength() const
     {
       return scfParent->length;
     }
-    ///
     virtual void SetLength(float value)
     {
       scfParent->length = value;
     }
-    ///
     virtual void SetPointCount(int n)
     {      
     }    
-    ///
     virtual float GetWildness() const
     {
       return scfParent->wildness;
     }
-    ///
     virtual void SetWildness(float value)
     {
     }
-    ///
     virtual float GetVibration() const
     {
       return scfParent->vibration;
     }
-    ///
     virtual void SetVibration(float value)
     {
     }
-    ///
     virtual void SetDirectional(const csVector3 &pos)
     {
       scfParent->directional = pos;
     }
-    ///
     virtual const csVector3& GetDirectional()
     {      
       return scfParent->directional;
@@ -218,7 +208,6 @@ public:
     }
     virtual void SetBandWidth (float value)
     {
-      ///
     }
   } scfiLightningState;
   friend class LightningState;

@@ -1,6 +1,6 @@
 /*
 
-	LoadImageFrom.h - Image loading functions
+  LoadImageFrom.h - Image loading functions
 
 */
 
@@ -10,13 +10,14 @@
 #include "Image.h"
 #include <StdIO.h>
 
-enum {
-	LI_OK = 0,
-	LI_FileNotFound,
-	LI_UnknownType,
-	LI_UnsupportedFormat,
-	LI_FileError,
-	LI_GenericError,
+enum
+{
+  LI_OK = 0,
+  LI_FileNotFound,
+  LI_UnknownType,
+  LI_UnsupportedFormat,
+  LI_FileError,
+  LI_GenericError,
 };
 
 // Allocates a new Image object and stores the pointer in *pDest

@@ -97,95 +97,95 @@ struct csCal3DMesh
  */
 class csSpriteCal3DSocket : public iSpriteCal3DSocket
 {
-  private:
-    char* name;
-    int triangle_index;
-    int submesh_index;
-    int mesh_index;
+private:
+  char* name;
+  int triangle_index;
+  int submesh_index;
+  int mesh_index;
 
-    // following are for the primary attached mesh
-    iMeshWrapper *attached_mesh;
-    csReversibleTransform attached_mesh_trans;
+  // following are for the primary attached mesh
+  iMeshWrapper *attached_mesh;
+  csReversibleTransform attached_mesh_trans;
 
-    // secondary meshes
-    struct csSpriteCal3DSocketMesh
+  // secondary meshes
+  struct csSpriteCal3DSocketMesh
+  {
+    csSpriteCal3DSocketMesh(iMeshWrapper * m, csReversibleTransform t)
+        : mesh(m), trans(t)
     {
-        csSpriteCal3DSocketMesh(iMeshWrapper * m, csReversibleTransform t)
-            : mesh(m), trans(t)
-        {
-        }
+    }
 
-        csRef<iMeshWrapper> mesh;
-        csReversibleTransform trans;
-    };
-    csArray<csSpriteCal3DSocketMesh> secondary_meshes;
+    csRef<iMeshWrapper> mesh;
+    csReversibleTransform trans;
+  };
+  csArray<csSpriteCal3DSocketMesh> secondary_meshes;
 
-  public:
+public:
 
-    /// Default Constructor
-    csSpriteCal3DSocket();
+  /// Default Constructor
+  csSpriteCal3DSocket();
 
-    virtual ~csSpriteCal3DSocket ();
+  virtual ~csSpriteCal3DSocket ();
 
-    /// Set the name.
-    virtual void SetName (char const*);
-    /// Get the name.
-    virtual char const* GetName () const { return name; }
+  /// Set the name.
+  virtual void SetName (char const*);
+  /// Get the name.
+  virtual char const* GetName () const { return name; }
 
-    /// Set the attached primary mesh.
-    virtual void SetMeshWrapper (iMeshWrapper* mesh);
-    /// Get the attached primary mesh.
-    virtual iMeshWrapper* GetMeshWrapper () const {return attached_mesh;}
+  /// Set the attached primary mesh.
+  virtual void SetMeshWrapper (iMeshWrapper* mesh);
+  /// Get the attached primary mesh.
+  virtual iMeshWrapper* GetMeshWrapper () const {return attached_mesh;}
 
-    /// Set the index of the triangle for the socket.
-    virtual void SetTriangleIndex (int tri_index)
-    { triangle_index = tri_index; }
-    /// Get the index of the triangle for the socket.
-    virtual int GetTriangleIndex () const { return triangle_index; }
+  /// Set the index of the triangle for the socket.
+  virtual void SetTriangleIndex (int tri_index)
+  { triangle_index = tri_index; }
+  /// Get the index of the triangle for the socket.
+  virtual int GetTriangleIndex () const { return triangle_index; }
 
-    /// Set the index of the submesh for the socket.
-    virtual void SetSubmeshIndex (int subm_index)
-    { submesh_index = subm_index;}
-    /// Get the index of the submesh for the socket.
-    virtual int GetSubmeshIndex () const { return submesh_index;}
+  /// Set the index of the submesh for the socket.
+  virtual void SetSubmeshIndex (int subm_index)
+  { submesh_index = subm_index;}
+  /// Get the index of the submesh for the socket.
+  virtual int GetSubmeshIndex () const { return submesh_index;}
 
-    /// Set the index of the mesh for the socket.
-    virtual void SetMeshIndex (int m_index) { mesh_index = m_index;}
-    /// Get the index of the mesh for the socket.
-    virtual int GetMeshIndex () const {return mesh_index;}
+  /// Set the index of the mesh for the socket.
+  virtual void SetMeshIndex (int m_index) { mesh_index = m_index;}
+  /// Get the index of the mesh for the socket.
+  virtual int GetMeshIndex () const {return mesh_index;}
 
-    /// Set the transform of the primary mesh
-    virtual void SetTransform (const csReversibleTransform & trans)
-    { attached_mesh_trans = trans; }
-    /// Get the transform of the primary mesh
-    virtual csReversibleTransform GetTransform () const
-    { return attached_mesh_trans; }
+  /// Set the transform of the primary mesh
+  virtual void SetTransform (const csReversibleTransform & trans)
+  { attached_mesh_trans = trans; }
+  /// Get the transform of the primary mesh
+  virtual csReversibleTransform GetTransform () const
+  { return attached_mesh_trans; }
 
-    /**
-     * Get a count of the secondary attached meshes (this doesn't include the
-     * primary mesh)
-     */
-    virtual size_t GetSecondaryCount () const
-    { return (int)secondary_meshes.Length(); }
-    /// Get the attached secondary mesh at the given index
-    virtual iMeshWrapper * GetSecondaryMesh (size_t index)
-    { return secondary_meshes[index].mesh; }
-    /// Get the transform of the attached secondary mesh at the given index
-    virtual csReversibleTransform GetSecondaryTransform (size_t index)
-    { return secondary_meshes[index].trans; }
-    /// Set the transform of the attached secondary mesh at the given index
-    virtual void SetSecondaryTransform (size_t index,
-      csReversibleTransform trans) { secondary_meshes[index].trans = trans; }
-    /// Attach a secondary mesh
-    virtual size_t AttachSecondary (iMeshWrapper* mesh,
-      csReversibleTransform trans);
-    /// Detach a secondary mesh
-    virtual void DetachSecondary (const char* mesh_name);
-    virtual void DetachSecondary (size_t index);
-    /// Searches for the index of the given attached secondary mesh
-    virtual size_t FindSecondary (const char* mesh_name);
+  /**
+   * Get a count of the secondary attached meshes (this doesn't include the
+   * primary mesh)
+   */
+  virtual size_t GetSecondaryCount () const
+  { return (int)secondary_meshes.Length(); }
+  /// Get the attached secondary mesh at the given index
+  virtual iMeshWrapper * GetSecondaryMesh (size_t index)
+  { return secondary_meshes[index].mesh; }
+  /// Get the transform of the attached secondary mesh at the given index
+  virtual csReversibleTransform GetSecondaryTransform (size_t index)
+  { return secondary_meshes[index].trans; }
+  /// Set the transform of the attached secondary mesh at the given index
+  virtual void SetSecondaryTransform (size_t index,
+    csReversibleTransform trans) { secondary_meshes[index].trans = trans; }
+  /// Attach a secondary mesh
+  virtual size_t AttachSecondary (iMeshWrapper* mesh,
+    csReversibleTransform trans);
+  /// Detach a secondary mesh
+  virtual void DetachSecondary (const char* mesh_name);
+  virtual void DetachSecondary (size_t index);
+  /// Searches for the index of the given attached secondary mesh
+  virtual size_t FindSecondary (const char* mesh_name);
 
-    SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 };
 
 class csSpriteCal3DMeshObject;
@@ -1028,7 +1028,8 @@ public:
     {
       return scfParent->GetActiveAnims(buffer,max_length);
     }
-    virtual void SetActiveAnims(const csSpriteCal3DActiveAnim* buffer, size_t anim_count)
+    virtual void SetActiveAnims(const csSpriteCal3DActiveAnim* buffer,
+    	size_t anim_count)
     {
       scfParent->SetActiveAnims(buffer,anim_count);
     }

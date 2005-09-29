@@ -100,10 +100,17 @@ public:
     csRef<csMutex> mutex_count;
 
   public:
-    OpenALRunnable (csSoundRenderOpenAL *rend): sr(rend),  count(1){ mutex_count=csMutex::Create ();}
+    OpenALRunnable (csSoundRenderOpenAL *rend): sr(rend),  count(1)
+    { mutex_count=csMutex::Create ();}
     virtual ~OpenALRunnable () {}
-    virtual void IncRef () {mutex_count->LockWait(); count++; mutex_count->Release(); }
-    virtual void DecRef () {mutex_count->LockWait(); if (--count == 0) { mutex_count->Release(); delete this; } else mutex_count->Release();}
+    virtual void IncRef ()
+    {mutex_count->LockWait(); count++; mutex_count->Release(); }
+    virtual void DecRef ()
+    {
+      mutex_count->LockWait();
+      if (--count == 0) { mutex_count->Release(); delete this; }
+      else mutex_count->Release();
+    }
     virtual void Run () {sr->ThreadProc();}
     virtual int GetRefCount () { return count; }
   };
@@ -127,58 +134,70 @@ private:
   /// True if the OpenAL library has been initialized
   bool al_open;
 
-  /// Process that performs the main thread loop of the background processing thread (if there is one)
+  /**
+   * Process that performs the main thread loop of the background processing
+   * thread (if there is one)
+   */
   void ThreadProc();
 
   /// Update function
   void Update();
 
 
-  /*  Everything that gets accessed by the background thread needs to be mutexed
-   *
-   *
+  /*
+   * Everything that gets accessed by the background thread needs to be mutexed
    */
   csRef<csMutex> mutex_Listener;
   csRef<csMutex> mutex_ActiveSources;
   csRef<csMutex> mutex_SoundHandles;
   csRef<csMutex> mutex_OpenAL;
 
-  /** Stores the buffer length (in seconds) for streaming audio buffers. 
+  /**
+   * Stores the buffer length (in seconds) for streaming audio buffers. 
    *
-   *  Read from the config file option "Sound.OpenAL.StreamingBufferLength"
-   *  Default: 1.0 seconds (1.0)
+   * Read from the config file option "Sound.OpenAL.StreamingBufferLength"
+   * Default: 1.0 seconds (1.0)
    */
   float BufferLengthSeconds;
 
-  /** If false, each handle will keep an internal sound buffer that is used when a source
-   *   is added to a stream that's already playing.
-   *  If true, a new source added to a playing stream will have an initial period of silence
-   *   roughly equal to BufferLengthSeconds until the buffering catches up.
+  /**
+   * If false, each handle will keep an internal sound buffer that is used
+   * when a source
+   * is added to a stream that's already playing.
+   * If true, a new source added to a playing stream will have an initial
+   * period of silence
+   * roughly equal to BufferLengthSeconds until the buffering catches up.
    *  
-   *  Read from the config file option "Sound.OpenAL.LazySourceSync"
-   *  Default: true (yes)
+   * Read from the config file option "Sound.OpenAL.LazySourceSync"
+   * Default: true (yes)
    */
   bool LazySourceSync;
 
-  /** True if a separate thread should be kicked off to handle sound buffer procesing for streams
-   *  This is not needed for static sounds, but is required for any decent streaming audio.
+  /**
+   * True if a separate thread should be kicked off to handle sound buffer
+   * procesing for streams. This is not needed for static sounds, but is
+   * required for any decent streaming audio.
    *
-   *  Read from the config file option "Sound.OpenAL.BackgroundProcessing"
-   *  Default: true (yes)
+   * Read from the config file option "Sound.OpenAL.BackgroundProcessing"
+   * Default: true (yes)
    */
   bool BackgroundProcessing;
 
-
-  /** Stores the last value of csTicks.
-   *   The elapsed time between updates is calculated using this and passed to the sound handle.
-   *   If the sound handle is an active streaming handle without any playing sources it updates its
-   *   internal buffer, position and advances the associated data stream based on this change.
+  /**
+   * Stores the last value of csTicks.
+   * The elapsed time between updates is calculated using this and passed to
+   * the sound handle.
+   * If the sound handle is an active streaming handle without any playing
+   * sources it updates its
+   * internal buffer, position and advances the associated data stream based
+   * on this change.
    */
   csTicks LastTime;
 
-
-
-  /// Used to stop the background thread if it's running.  We don't care about mutexing this since it's just a bool and syncing is not critical.
+  /**
+   * Used to stop the background thread if it's running.  We don't care
+   * about mutexing this since it's just a bool and syncing is not critical.
+   */
   volatile bool bRunning;
 
   /// Pointer to the background thread
@@ -192,7 +211,6 @@ private:
 
   // List of active sources
   csRefArray<csSoundSourceOpenAL> ActiveSources;
-
 };
 
 

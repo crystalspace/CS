@@ -104,8 +104,12 @@ class SndSysWavSoundData : public iSndSysData
    */
   virtual size_t GetDataSize();
 
-  /// Creates a stream associated with this sound data positioned at the beginning of the sound data and initially paused if possible.
-  virtual iSndSysStream *CreateStream(csSndSysSoundFormat *renderformat, int mode3d);
+  /**
+   * Creates a stream associated with this sound data positioned at the
+   * beginning of the sound data and initially paused if possible.
+   */
+  virtual iSndSysStream *CreateStream(csSndSysSoundFormat *renderformat,
+  	int mode3d);
 
   void Initialize();
 

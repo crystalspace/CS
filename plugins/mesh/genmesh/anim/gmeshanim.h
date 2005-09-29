@@ -387,7 +387,8 @@ public:
   /// Destructor.
   virtual ~csGenmeshAnimationControlFactory ();
 
-  virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl (iMeshObject *mesh);
+  virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl (
+  	iMeshObject *mesh);
 
   csGenmeshAnimationControlType* GetType () { return type; }
   csAnimControlScript* FindScript (const char* scriptname) const;

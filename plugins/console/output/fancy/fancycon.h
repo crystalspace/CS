@@ -103,7 +103,7 @@ public:
   virtual void SetFont (iFont *Font) { base->SetFont(Font); }
   virtual int GetTopLine () const { return base->GetTopLine(); }
   virtual void ScrollTo (int iTopLine, bool iSnap = true)
-    { base->ScrollTo(iTopLine, iSnap); }
+  { base->ScrollTo(iTopLine, iSnap); }
   virtual int GetCursorStyle () const { return base->GetCursorStyle(); }
   virtual void SetCursorStyle (int iStyle) { base->SetCursorStyle(iStyle); }
   virtual void SetVisible (bool b) { visible = b; base->SetVisible(b); }
@@ -112,7 +112,7 @@ public:
   virtual void SetCursorPos (int p) { base->SetCursorPos(p); }
   virtual int GetMaxLineWidth () { return base->GetMaxLineWidth(); }
   virtual void RegisterWatcher (iConsoleWatcher *p)
-    { base->RegisterWatcher(p); }
+  { base->RegisterWatcher(p); }
   virtual bool PerformExtension (const char *command, ...);
   virtual bool PerformExtensionV (const char *iCommand, va_list);
 

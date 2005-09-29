@@ -60,21 +60,21 @@ public:
   virtual void AllowResize (bool iAllow);
 
   virtual void SetTitle (const char* title)
-    { ; }
+  { }
 
   virtual void SetFullScreen (bool yesno);
 
   virtual bool GetFullScreen ()
-    { return false; }
+  { return false; }
   /// Set mouse position.
   // should be the window manager
   virtual bool SetMousePosition (int x, int y)
-    { return false; }
+  { return false; }
 
   /// Set mouse cursor shape
   // should be the window manager
   virtual bool SetMouseCursor (csMouseCursorID iShape)
-    { return false;}
+  { return false;}
 
   virtual void SetParent(wxWindow* wx);
   virtual wxWindow* GetWindow();

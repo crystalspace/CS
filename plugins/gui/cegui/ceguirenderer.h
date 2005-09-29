@@ -180,7 +180,10 @@ private:
   /// Create an empty texture.
   virtual CEGUI::Texture* createTexture ();
 
-  /// Create a texture based on a filename, belonging to a special resource group.
+  /**
+   * Create a texture based on a filename, belonging to a special resource
+   * group.
+   */
   virtual CEGUI::Texture* createTexture (const CEGUI::String& filename, 
     const CEGUI::String& resourceGroup);
 

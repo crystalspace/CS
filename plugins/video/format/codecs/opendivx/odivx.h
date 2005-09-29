@@ -39,7 +39,8 @@ class csOpenDivX : public iAVICodec
   csOpenDivX (iBase *pParent);
   virtual ~csOpenDivX ();
 
-  virtual bool Initialize (csStreamDescription *desc, uint8 *, uint32, uint8 *, uint32);
+  virtual bool Initialize (csStreamDescription *desc, uint8 *, uint32,
+  	uint8 *, uint32);
   virtual void GetCodecDescription (csCodecDescription &desc);
   virtual bool Decode (char *indata, uint32 inlength, void *&outdata);
   virtual bool Encode (void *indata, char *outdata, uint32 &outlength);

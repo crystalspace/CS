@@ -164,7 +164,7 @@ typedef struct
 #define BD_OFFSET_INVALID	    0xffffffff
 
 /// Binary document node
-typedef struct
+struct bdNode
 {
   /**
    * Value of this node
@@ -179,10 +179,10 @@ typedef struct
    * After this struct, the attribute offset table (if the attr flag is set)
    * and child offset table (if the child flag is set) follow.
    */
-} bdNode;
+};
 
 /// Binary document node child table
-typedef struct
+struct bdNodeChildTab
 {
   /// number of children
   uint32 num;
@@ -190,10 +190,10 @@ typedef struct
     uint32 offsets to children 
 	   from beg. of this struct
   */
-} bdNodeChildTab;
+};
 
 /// Binary document node attribute
-typedef struct
+struct bdNodeAttribute
 {
   /// Value, same as in node value
   uint32 value;
@@ -201,15 +201,15 @@ typedef struct
   uint32 nameID;
   /// Attribute flags
   uint32 flags;
-} bdNodeAttribute;
+};
 
 /// Binary document node attribute table
-typedef struct
+struct bdNodeAttrTab
 {
   /// number of attributes
   uint32 num;
   /* uint32 offsets to attributes */
-} bdNodeAttrTab;
+};
 
 struct csBinaryDocument;
 struct csBinaryDocAttribute;

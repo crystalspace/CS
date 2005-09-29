@@ -86,7 +86,6 @@ class csGenericRenderStep : public iRenderStep,
 			    public iLightRenderStep
 {
 private:
-//  csRenderLoop* rl;
   csStringID shadertype;
   bool zOffset;
   bool portalTraversal;

@@ -67,7 +67,6 @@ class csVector2;
 class csBezier2
 {
 private:
-
   // binary coefficients for a 2nd degree polynomial
   static double bincoeff[3];
 
@@ -78,7 +77,6 @@ private:
   static bool initialized;
 
 public:
-
   /// Initialize.
   static void Initialize ();
 
@@ -103,7 +101,8 @@ public:
    * the given resolution
    * <pre>
    * Formula:                      /2\/2\
-   * vtx = sum(j=0->2) sum(k=0->2) \j/\k/ u^j(1-u)^(2-j) v^k(1-v)^(2-k)*P_jk</pre>
+   * vtx = sum(j=0->2) sum(k=0->2) \j/\k/ u^j(1-u)^(2-j) v^k(1-v)^(2-k)*P_jk
+   * </pre>
    */
   static csVector3 GetNormal(double** aControls, int u,
                              int v, int resolution);

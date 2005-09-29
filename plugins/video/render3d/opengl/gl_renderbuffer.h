@@ -98,17 +98,20 @@ struct csGLVBOBufferSlot
 {
 public:
   csGLVBOBufferSlot()
-    : vboTarget (GL_ARRAY_BUFFER_ARB), vboID (0), lastCachedVersion (0), offset (0),
-    listIdx (0), renderBufferPtr(0), next (0), prev (0), inUse (false), locked (false), 
-    indexBuffer (false), separateVBO (false)
+    : vboTarget (GL_ARRAY_BUFFER_ARB), vboID (0), lastCachedVersion (0),
+      offset (0), listIdx (0), renderBufferPtr(0), next (0), prev (0),
+      inUse (false), locked (false), 
+      indexBuffer (false), separateVBO (false)
   {
   }
 
-  GLenum vboTarget;   //opengl type, GL_ARRAY_BUFFER_ARB or GL_ELEMENT_ARRAY_BUFFER_ARB
-  GLuint vboID;       //id of buffer
+  // opengl type, GL_ARRAY_BUFFER_ARB or GL_ELEMENT_ARRAY_BUFFER_ARB
+  GLenum vboTarget;
+  GLuint vboID;       // id of buffer
 
-  unsigned int lastCachedVersion; //last version of the associated buffer we cached
-  size_t offset;                  //offset from start of buffer
+  // last version of the associated buffer we cached
+  unsigned int lastCachedVersion;
+  size_t offset;                  // offset from start of buffer
   unsigned int listIdx; 
 
   csWeakRef<iRenderBuffer> renderBuffer;
@@ -136,8 +139,8 @@ public:
   virtual ~csGLVBOBufferManager ();
 
   /**
-   * Activate a buffer before rendering. Make sure it is cached and the VBObuffer
-   * is activated
+   * Activate a buffer before rendering. Make sure it is cached and the
+   * VBObuffer is activated
    */
   bool ActivateBuffer (iRenderBuffer* buffer);
 
@@ -221,8 +224,9 @@ protected:
 
     csGLVBOBufferManager* bufmgr;
     GLuint vboID;
-    GLenum vboTarget; //opengl type, GL_ARRAY_BUFFER_ARB or GL_ELEMENT_ARRAY_BUFFER_ARB
-    size_t size; //total size (in bytes);
+    // opengl type, GL_ARRAY_BUFFER_ARB or GL_ELEMENT_ARRAY_BUFFER_ARB
+    GLenum vboTarget;
+    size_t size; // total size (in bytes);
 
     // Find an empty slot
     csGLVBOBufferSlot* FindEmptySlot (size_t size, bool splitStarted = false);
@@ -239,11 +243,15 @@ protected:
 
     //helper for listmanagement
     size_t GetSizeFromIndex (uint index) { return max(1<<(index+8), 256); }
-    uint GetIndexFromSize (size_t size) { return max(csLog2 ((int)size-1)-7, 0); }
+    uint GetIndexFromSize (size_t size)
+    {
+      return max(csLog2 ((int)size-1)-7, 0);
+    }
 
     struct slotList
     {
-      slotList () : head (0), tail (0), usedSlots (0), slotsActivatedLastFrame (0),
+      slotList () : head (0), tail (0), usedSlots (0),
+      	slotsActivatedLastFrame (0),
         slotsActivatedThisFrame(0), slotSize (0), totalCount (0),
         slotsReusedLastFrame (0), slotsReusedThisFrame (0)
       {}

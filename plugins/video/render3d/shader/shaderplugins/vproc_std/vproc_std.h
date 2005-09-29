@@ -65,6 +65,7 @@ public:
   csRef<iShaderManager> shaderManager;
   csStringID string_object2world;
   csLightShaderVarCache lsvCache;
+
 private:
   bool isOpen;
 

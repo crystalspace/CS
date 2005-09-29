@@ -224,7 +224,6 @@ public:
    */
   virtual ~csEngine ();
 
-
   // -- INTERFACE IMPLEMENTATIONS
 
   // -- iComponent
@@ -237,22 +236,17 @@ public:
 
   //-- Preparation and relighting methods
   virtual bool Prepare (iProgressMeter* meter = 0);
-
   virtual void PrepareTextures ();
-
   virtual void PrepareMeshes ();
 
   virtual void ForceRelight (iRegion* region = 0,
   	iProgressMeter* meter = 0);
-
   virtual void ForceRelight (iLight* light, iRegion* region = 0);
-
   virtual void ShineLights (iRegion* region = 0, 
     iProgressMeter* meter = 0);
 
   virtual void SetLightingCacheMode (int mode)
   { lightmapCacheMode = mode; }
-
   virtual int GetLightingCacheMode ()
   { return lightmapCacheMode; }
 
@@ -278,12 +272,11 @@ public:
 
   virtual void RegisterRenderPriority (const char* name, long priority,
   	csRenderPrioritySorting rendsort = CS_RENDPRI_SORT_NONE);
-
   virtual long GetRenderPriority (const char* name) const;
-
-  virtual csRenderPrioritySorting GetRenderPrioritySorting (const char* name) const;
-  
-  virtual csRenderPrioritySorting GetRenderPrioritySorting (long priority) const;
+  virtual csRenderPrioritySorting GetRenderPrioritySorting (
+  	const char* name) const;
+  virtual csRenderPrioritySorting GetRenderPrioritySorting (
+  	long priority) const;
 
   virtual long GetSkyRenderPriority ()
   {
@@ -316,20 +309,15 @@ public:
   }
 
   virtual void ClearRenderPriorities ();
-  
   virtual int GetRenderPriorityCount () const;
-
   virtual const char* GetRenderPriorityName (long priority) const;
 
   //-- Material handling
 
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt);
-
   virtual iMaterialWrapper* CreateMaterial (const char *name,
   	iTextureWrapper* texture);
-
   virtual iMaterialList* GetMaterialList () const;
-
   virtual iMaterialWrapper* FindMaterial (const char* name,
   	iRegion* region = 0);
 
@@ -337,14 +325,10 @@ public:
 
   virtual iTextureWrapper* CreateTexture (const char *name,
   	const char *fileName, csColor *transp, int flags);
-
   virtual iTextureWrapper* CreateBlackTexture (const char *name,
 	int w, int h, csColor *transp, int flags);
-
   virtual int GetTextureFormat () const;
-
   virtual iTextureList* GetTextureList () const;
-
   virtual iTextureWrapper* FindTexture (const char* name,
   	iRegion* region = 0);
   
@@ -353,12 +337,9 @@ public:
   virtual csPtr<iLight> CreateLight (const char* name, const csVector3& pos,
   	float radius, const csColor& color,
 	csLightDynamicType dyntype = CS_LIGHT_DYNAMICTYPE_STATIC);
-
   virtual iLight* FindLight (const char *Name, bool RegionOnly = false)
     const;
-
   virtual iLight* FindLightID (const char* light_id) const;
-
   virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = 0)
   {
     return csPtr<iLightIterator> (new csLightIt (this, region));
@@ -367,32 +348,25 @@ public:
   virtual void RemoveLight (iLight* light);
 
   virtual void SetAmbientLight (const csColor &c);
-  
   virtual void GetAmbientLight (csColor &c) const;
-  
   virtual void GetDefaultAmbientLight (csColor &c) const;
 
   virtual int GetNearbyLights (iSector* sector, const csVector3& pos,
   	iLight** lights, int max_num_lights);
-
   virtual int GetNearbyLights (iSector* sector, const csBox3& box,
   	iLight** lights, int max_num_lights);
   
   //-- Sector handling
 
   virtual iSector *CreateSector (const char *name);
-
   virtual iSectorList* GetSectors ()
   { return &sectors; }
-
   virtual iSector* FindSector (const char* name,
   	iRegion* region = 0);
-
   virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius);
 
   virtual void AddEngineSectorCallback (iEngineSectorCallback* cb);
-
   virtual void RemoveEngineSectorCallback (iEngineSectorCallback* cb);
 
   //-- Mesh handling
@@ -496,19 +470,15 @@ public:
 
   virtual void SetClearZBuf (bool yesno)
   { clearZBuf = yesno; }
-
   virtual bool GetClearZBuf () const
   { return clearZBuf;}
-
   virtual bool GetDefaultClearZBuf () const 
   { return defaultClearZBuf; }
 
   virtual void SetClearScreen (bool yesno)
   { clearScreen = yesno; }
-
   virtual bool GetClearScreen () const
   { return clearScreen; }
-
   virtual bool GetDefaultClearScreen () const
   { return defaultClearScreen; }
 
@@ -524,17 +494,13 @@ public:
   { return (iRenderView*)topLevelClipper; }
 
   virtual void PrecacheDraw (iRegion* region = 0);
-
   virtual void Draw (iCamera* c, iClipper2D* clipper);
 
   virtual void SetContext (iTextureHandle* ctxt);
-  
   virtual iTextureHandle *GetContext () const;
 
   virtual iRenderLoopManager* GetRenderLoopManager ();
-  
   virtual iRenderLoop* GetCurrentDefaultRenderloop ();
-
   virtual bool SetCurrentDefaultRenderloop (iRenderLoop* loop);
 
   virtual uint GetCurrentFrameNumber () const
@@ -590,7 +556,6 @@ public:
   virtual bool GetOptionDescription (int idx, csOptionDescription *option);
 
   virtual bool SetOption (int id, csVariant* value);
-
   virtual bool GetOption (int id, csVariant* value);
 
   bool HandleEvent (iEvent &Event);
@@ -956,13 +921,11 @@ private:
   /**
    * The engine knows about the following render priorities and keeps
    * them here:
-   * <ul>
-   * <li>"sky": usually rendered using ZFILL or ZNONE
-   * <li>"portal": usually for portal containers
-   * <li>"wall": usually rendered using ZFILL
-   * <li>"object": usually rendered using ZUSE
-   * <li>"alpha": usually rendered using ZTEST
-   * </ul>
+   * - "sky": usually rendered using ZFILL or ZNONE
+   * - "portal": usually for portal containers
+   * - "wall": usually rendered using ZFILL
+   * - "object": usually rendered using ZUSE
+   * - "alpha": usually rendered using ZTEST
    */
   long renderPrioritySky;
   long renderPriorityPortal;

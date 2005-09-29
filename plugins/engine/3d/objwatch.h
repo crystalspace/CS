@@ -88,7 +88,10 @@ public:
 
   virtual void WatchMovable (iMovable* movable);
   virtual void RemoveMovable (iMovable* movable);
-  virtual int GetWatchedMovableCount () const { return (int)movables.Length (); }
+  virtual int GetWatchedMovableCount () const
+  {
+    return (int)movables.Length ();
+  }
   virtual iMovable* GetMovable (int idx);
 
   virtual void WatchSector (iSector* sector);

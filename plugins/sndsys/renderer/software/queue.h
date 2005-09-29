@@ -26,21 +26,24 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-// csRef<> is not threadsafe, and csPtr<> doesn't let us do anything with the object referenced inside
-//   so this class, which is specifically designed to communicate between threads, has no choice but to
-//   use raw pointers.
-// If this is used to communicate between threads, the 'feeder' thread should incref the object before
-//   passing it into the queue.  The 'eater' thread should NOT touch the refcount unless it's certain
-//   that no other thread will be touching the refcount.  This makes cleanup ... interesting.
-// One possible method for cleanup is for the 'eater' thread which implicitely holds a single reference
-//   (passed from the 'feeder') to wait for the refcount to reach 1 before releasing it's refcount, since
-//   a refcount of 1 means that it should have the only reference and thus should be guaranteed to be the
-//   only thread working with the refcount.
-// Another possibility is for the 'eater' thread to queue this object back to the 'feeder' thread, which
-//   will perform the decref itself.
+// csRef<> is not threadsafe, and csPtr<> doesn't let us do anything with
+// the object referenced inside so this class, which is specifically designed
+// to communicate between threads, has no choice but to use raw pointers.
+// If this is used to communicate between threads, the 'feeder' thread should
+// incref the object before passing it into the queue.  The 'eater' thread
+// should NOT touch the refcount unless it's certain that no other thread will
+// be touching the refcount.  This makes cleanup ... interesting.
+// One possible method for cleanup is for the 'eater' thread which implicitely
+// holds a single reference (passed from the 'feeder') to wait for the
+// refcount to reach 1 before releasing it's refcount, since
+// a refcount of 1 means that it should have the only reference and thus
+// should be guaranteed to be the only thread working with the refcount.
+// Another possibility is for the 'eater' thread to queue this object back to
+// the 'feeder' thread, which will perform the decref itself.
 //
-// Note that if an object passed through this queue is meant to be accessed from multiple threads at once
-//   it must of course contain threadsafe methods itself.
+// Note that if an object passed through this queue is meant to be accessed
+// from multiple threads at once it must of course contain threadsafe methods
+// itself.
 //////////////////////////////////////////////////////////////////////////
 
 #define QUEUE_SUCCESS 0
@@ -68,163 +71,163 @@ class Queue
 public:
   Queue() :
       head(0), tail(0), count(0), closed(false), dupecheck(false)
-      { 
-        // A recursive mutex is used so that the duplicate entry check can hold a lock count of 2
-        queue_mutex = csMutex::Create(true);
-        queue_condition = csCondition::Create();
-      } 
+  { 
+    // A recursive mutex is used so that the duplicate entry check can hold a
+    // lock count of 2
+    queue_mutex = csMutex::Create(true);
+    queue_condition = csCondition::Create();
+  } 
 
-      ~Queue()
-      {
-        Clear(); 
-      }
+  ~Queue()
+  {
+    Clear(); 
+  }
 
-      void Clear()
-      { 
-        QEntry<T> *del;
-        Lock(); 
-        while (head)
-        {
-          del=head; 
-          head=head->next;
-          delete del;
-        }
+  void Clear()
+  { 
+    QEntry<T> *del;
+    Lock(); 
+    while (head)
+    {
+      del=head; 
+      head=head->next;
+      delete del;
+    }
+    tail=0;
+
+    // Wake all waiting threads, queue is cleared
+    queue_condition->Signal(true);
+    Unlock();
+  }
+
+  int QueueEntry(T * data)
+  {
+    Lock();
+
+    if (closed) return QUEUE_ERR_CLOSED;
+
+    if (dupecheck && Find(data))
+    {
+      Unlock();
+      return QUEUE_ERR_DUPE;
+    }
+
+    QEntry<T> *entry= new QEntry<T>();
+    if (!entry)
+    {
+      Unlock();
+      return QUEUE_ERR_NOMEM;
+    }
+    entry->data=data;
+    entry->prev=tail;
+    entry->next=0;
+
+    if (!tail)
+      head=entry;
+    else
+      tail->next=entry;
+    tail=entry;
+
+
+    // Signal one waiting thread to wake up
+    queue_condition->Signal();
+
+    Unlock();
+    return QUEUE_SUCCESS;
+  }
+
+  // Note that even if wait==true, this function may return 0
+  //  Such a situation is possible if:
+  //  1) The Queue is cleared by destruction or a call to Clear()
+  //  2) The condition wait is interrupted - possibly by signal arrival
+  T * DequeueEntry(bool wait=false)
+  {
+    QEntry<T> *removed;
+    T * ret=0;
+
+    Lock();
+
+    // Wait for an entry to be available if specified
+    //  this is ignored if threading support is disabled
+    //  since a single threaded application obviously cant
+    //  add new entries to the queue while the program is stuck
+    //  waiting.
+    if (!head && wait)
+      queue_condition->Wait(queue_mutex,0);
+
+    // Remove the head entry from the queue
+    if (head)
+    {
+      removed=head;
+      head=head->next;
+      if (head)
+        head->prev=0;
+      else
         tail=0;
+      ret=removed->data;
+      delete removed;
+    }
+    Unlock();
+    return ret;
+  }
 
-        // Wake all waiting threads, queue is cleared
-        queue_condition->Signal(true);
-        Unlock();
-      }
+  size_t Length() { return count; }
 
-      int QueueEntry(T * data)
+  /// Compares pointers, and not the objects they point to
+  bool Find(T *data)
+  {
+    Lock();
+    QEntry<T> *cur=head;
+    while (cur)
+    {
+      if (((cur->data)) == (data))
       {
-        Lock();
-
-        if (closed) return QUEUE_ERR_CLOSED;
-
-        if (dupecheck && Find(data))
-        {
-          Unlock();
-          return QUEUE_ERR_DUPE;
-        }
-
-        QEntry<T> *entry= new QEntry<T>();
-        if (!entry)
-        {
-          Unlock();
-          return QUEUE_ERR_NOMEM;
-        }
-        entry->data=data;
-        entry->prev=tail;
-        entry->next=0;
-
-
-        if (!tail)
-          head=entry;
-        else
-          tail->next=entry;
-        tail=entry;
-
-
-        // Signal one waiting thread to wake up
-        queue_condition->Signal();
-
         Unlock();
-        return QUEUE_SUCCESS;
+        return true;
       }
-
-      // Note that even if wait==true, this function may return 0
-      //  Such a situation is possible if:
-      //  1) The Queue is cleared by destruction or a call to Clear()
-      //  2) The condition wait is interrupted - possibly by signal arrival
-      T * DequeueEntry(bool wait=false)
-      {
-        QEntry<T> *removed;
-        T * ret=0;
-
-        Lock();
-
-        // Wait for an entry to be available if specified
-        //  this is ignored if threading support is disabled
-        //  since a single threaded application obviously cant
-        //  add new entries to the queue while the program is stuck
-        //  waiting.
-        if (!head && wait)
-          queue_condition->Wait(queue_mutex,0);
-
-        // Remove the head entry from the queue
-        if (head)
-        {
-          removed=head;
-          head=head->next;
-          if (head)
-            head->prev=0;
-          else
-            tail=0;
-          ret=removed->data;
-          delete removed;
-        }
-        Unlock();
-        return ret;
-      }
-
-      size_t Length() { return count; }
-
-      /// Compares pointers, and not the objects they point to
-      bool Find(T *data)
-      {
-        Lock();
-        QEntry<T> *cur=head;
-        while (cur)
-        {
-          if (((cur->data)) == (data))
-          {
-            Unlock();
-            return true;
-          }
-          cur=cur->next;
-        }
-        Unlock();
-        return false;
-      }
+      cur=cur->next;
+    }
+    Unlock();
+    return false;
+  }
       
 
-      void SetClosed(bool close)
-      {
-        Lock();
-        closed=close;
-        Unlock();
-      }
+  void SetClosed(bool close)
+  {
+    Lock();
+    closed=close;
+    Unlock();
+  }
 
-      bool GetClosed()
-      {
-        bool val;
-        Lock();
-        val=closed;
-        Unlock();
-        return val;
-      }
+  bool GetClosed()
+  {
+    bool val;
+    Lock();
+    val=closed;
+    Unlock();
+    return val;
+  }
 
-      void SetDupecheck(bool check)
-      {
-        Lock();
-        dupecheck=check;
-        Unlock();
-      }
+  void SetDupecheck(bool check)
+  {
+    Lock();
+    dupecheck=check;
+    Unlock();
+  }
 
-      bool GetDupecheck()
-      {
-        bool val;
-        Lock();
-        val=closed;
-        Unlock();
-        return val;
-      }
+  bool GetDupecheck()
+  {
+    bool val;
+    Lock();
+    val=closed;
+    Unlock();
+    return val;
+  }
 
-      QueueIterator<T> GetIterator()
-      {
-        return new QueueIterator<T>(this);
-      }
+  QueueIterator<T> GetIterator()
+  {
+    return new QueueIterator<T>(this);
+  }
 
 protected:
   inline void Lock()

@@ -65,13 +65,17 @@ public:
   void ClearBuffer();
   csSoundHandleDS3D *GetSoundHandle();
 
-  /** Retrieves the number of bytes free in the buffer.  
-   *  This is used to determine how much data should be added to keep the buffer full.
+  /**
+   * Retrieves the number of bytes free in the buffer.  
+   * This is used to determine how much data should be added to keep the
+   * buffer full.
    */
   int32 GetFreeBufferSpace();
 
-  /** Called by a soundhandle to obtain the write cursor position.
-   *   Usefull if the soundhandle has internal buffering and needs to syncronize a new source.
+  /**
+   * Called by a soundhandle to obtain the write cursor position.
+   * Usefull if the soundhandle has internal buffering and needs to
+   * syncronize a new source.
    */
   long GetWriteCursor() { return WriteCursor; };
 
@@ -79,7 +83,11 @@ public:
 
   /// Called by the handle to notify the source that the stream has ended
   void NotifyStreamEnd();
-  /// Called from the handle instead of Write() or WriteMute() when the stream has ended to allow the source to wait for the playback buffer to end.
+  /**
+   * Called from the handle instead of Write() or WriteMute() when the
+   * stream has ended to allow the source to wait for the playback buffer to
+   * end.
+   */
   void WatchBufferEnd();
   /// Fills the output buffer with silence.  Called from ClearBuffer().
   void FillBufferWithSilence();
@@ -90,7 +98,8 @@ private:
   // deferred settings are not yet committed.
   csVector3 Position, Velocity;
 
-  // Minimum and maximum distances of the sound object. Copies of internal values.
+  // Minimum and maximum distances of the sound object. Copies of internal
+  // values.
   float MinimumDistance,MaximumDistance;
 
   // sound buffers
@@ -103,7 +112,10 @@ private:
   // frequency of sound data
   unsigned long BaseFrequency;
 
-  /// If this is false the data is streamed and we must continually pull more data from the data source during playback
+  /**
+   * If this is false the data is streamed and we must continually pull more
+   * data from the data source during playback
+   */
   bool Static;
 
   // the sound handle
@@ -115,15 +127,20 @@ private:
   // true if the sound is looped
   bool Looped;
 
-  /** Current position for writing sound data
+  /**
+   * Current position for writing sound data
    *
-   *  The D3D "write cursor" is not related to "new" or "old" data in the circular buffer.
-   *  It is instead an indicator of the offset into the buffer that it's safe to write without interfering
-   *  with playback.
+   * The D3D "write cursor" is not related to "new" or "old" data in the
+   * circular buffer. It is instead an indicator of the offset into the
+   * buffer that it's safe to write without interfering with playback.
    */
   long WriteCursor;
   
-  /// Last position of the WriteCursor at the time that the stream ended. Only valid for streams.  Only valid when SoundHandle->ActiveStream is false.
+  /**
+   * Last position of the WriteCursor at the time that the stream ended.
+   * Only valid for streams.  Only valid when SoundHandle->ActiveStream is
+   * false.
+   */
   long PlayEnd;
 };
 

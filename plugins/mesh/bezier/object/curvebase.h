@@ -354,7 +354,10 @@ public:
   inline csVector3& GetControlPoint (int i) { return points[i/3][i-(i/3)*3]; }
 
   /// Get the texture coordinate of a curve point.
-  inline csVector2& GetTextureCoord (int i) { return texture_coords[i/3][i-(i/3)*3]; }
+  inline csVector2& GetTextureCoord (int i)
+  {
+    return texture_coords[i/3][i-(i/3)*3];
+  }
 
   virtual bool IsLightable ();
   virtual void PosInSpace (csVector3& vec, double u, double v);

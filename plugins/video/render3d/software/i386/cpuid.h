@@ -23,24 +23,24 @@
 /*
     80x86 processor family feature bits.
 */
-#define CPUx86_FEATURE_FPU	0x00000001	// FPU on Chip
-#define CPUx86_FEATURE_VME	0x00000002	// Virtual Mode Extention
-#define CPUx86_FEATURE_DE	0x00000004	// Debbuging Extentions
-#define CPUx86_FEATURE_PSE	0x00000008	// 4MB size pages
-#define CPUx86_FEATURE_TSC	0x00000010	// RDTSC supported
-#define CPUx86_FEATURE_MSR	0x00000020	// Pentium Compatible MSRs
-#define CPUx86_FEATURE_PAE	0x00000040	// Physical Address Extension (Intel)
-#define CPUx86_FEATURE_PTE	0x00000040	// Support PTE (Cyrix)
-#define CPUx86_FEATURE_MCE	0x00000080	// Machine Check exception
-#define CPUx86_FEATURE_CX8	0x00000100	// CMPXCHG8B supported
-#define CPUx86_FEATURE_APIC	0x00000200	// Local APIC on Chip (Intel)
-#define CPUx86_FEATURE_SEP	0x00000800	// Fast System Call (PPro)
-#define CPUx86_FEATURE_MTRR	0x00001000	// Memory Type Range Register (MTRR)
-#define CPUx86_FEATURE_PGE	0x00002000	// Page Global Feature
-#define CPUx86_FEATURE_MCA	0x00004000	// Machine Check Architecture
-#define CPUx86_FEATURE_CMOV	0x00008000	// CMOV supported
-#define CPUx86_FEATURE_MMX	0x00800000	// MMX supported
-#define CPUx86_FEATURE_SSE	0x02000000	// SSE supported
+#define CPUx86_FEATURE_FPU  0x00000001	// FPU on Chip
+#define CPUx86_FEATURE_VME  0x00000002	// Virtual Mode Extention
+#define CPUx86_FEATURE_DE   0x00000004	// Debbuging Extentions
+#define CPUx86_FEATURE_PSE  0x00000008	// 4MB size pages
+#define CPUx86_FEATURE_TSC  0x00000010	// RDTSC supported
+#define CPUx86_FEATURE_MSR  0x00000020	// Pentium Compatible MSRs
+#define CPUx86_FEATURE_PAE  0x00000040	// Physical Address Extension (Intel)
+#define CPUx86_FEATURE_PTE  0x00000040	// Support PTE (Cyrix)
+#define CPUx86_FEATURE_MCE  0x00000080	// Machine Check exception
+#define CPUx86_FEATURE_CX8  0x00000100	// CMPXCHG8B supported
+#define CPUx86_FEATURE_APIC 0x00000200	// Local APIC on Chip (Intel)
+#define CPUx86_FEATURE_SEP  0x00000800	// Fast System Call (PPro)
+#define CPUx86_FEATURE_MTRR 0x00001000	// Memory Type Range Register (MTRR)
+#define CPUx86_FEATURE_PGE  0x00002000	// Page Global Feature
+#define CPUx86_FEATURE_MCA  0x00004000	// Machine Check Architecture
+#define CPUx86_FEATURE_CMOV 0x00008000	// CMOV supported
+#define CPUx86_FEATURE_MMX  0x00800000	// MMX supported
+#define CPUx86_FEATURE_SSE  0x02000000	// SSE supported
 
 /*
     Detect 80x86 CPU and its feature bits.

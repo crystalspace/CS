@@ -27,10 +27,11 @@ SCF_VERSION (iAVICodec, 0, 0, 1);
 struct iAVICodec : public iBase
 {
   /**
-   * Send either video or audio stream description as input. The codec will cast it.
+   * Send either video or audio stream description as input. The codec
+   * will cast it.
    */
-  virtual bool Initialize (csStreamDescription *desc, uint8 *pInitData, uint32 nInitDataLen,
-			   uint8 *pFormatEx, uint32 nFormatEx )=0;
+  virtual bool Initialize (csStreamDescription *desc, uint8 *pInitData,
+  	uint32 nInitDataLen, uint8 *pFormatEx, uint32 nFormatEx )=0;
   virtual void GetCodecDescription (csCodecDescription &desc) = 0;
   virtual bool Decode (char *indata, uint32 inlength, void *&outdata) = 0;
   virtual bool Encode (void *indata, char *outdata, uint32 &outlength) = 0;

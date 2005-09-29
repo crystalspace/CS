@@ -344,18 +344,33 @@ csDrawScanline csScan_16_565_scan_fog_view;
 
 /// Draw one horizontal scanline (lighting and fixed alpha transparency).
 csDrawScanline csScan_16_scan_map_fixalpha50;
-/// Draw one horizontal scanline (lighting and fixed alpha transparency with alphamap).
+/**
+ * Draw one horizontal scanline (lighting and fixed alpha transparency with
+ * alphamap).
+ */
 csDrawScanline csScan_16_555_scan_map_fixalpha50_alphamap;
 csDrawScanline csScan_16_565_scan_map_fixalpha50_alphamap;
-/// Draw one horizontal scanline (lighting and fixed alpha transparency and keycolor).
+/**
+ * Draw one horizontal scanline (lighting and fixed alpha transparency and
+ * keycolor).
+ */
 csDrawScanline csScan_16_scan_map_fixalpha50_key;
-/// Draw one horizontal scanline (lighting and fixed alpha transparency). General case.
+/**
+ * Draw one horizontal scanline (lighting and fixed alpha transparency).
+ * General case.
+ */
 csDrawScanline csScan_16_555_scan_map_fixalpha;
 csDrawScanline csScan_16_565_scan_map_fixalpha;
-/// Draw one horizontal scanline (lighting and fixed alpha transparency and keycolor). General case.
+/**
+ * Draw one horizontal scanline (lighting and fixed alpha transparency and
+ * keycolor). General case.
+ */
 csDrawScanline csScan_16_555_scan_map_fixalpha_key;
 csDrawScanline csScan_16_565_scan_map_fixalpha_key;
-/// Draw one horizontal scanline (lighting and fixed alpha transparency and alphamap). General case.
+/**
+ * Draw one horizontal scanline (lighting and fixed alpha transparency and
+ * alphamap). General case.
+ */
 csDrawScanline csScan_16_555_scan_map_fixalpha_alphamap;
 csDrawScanline csScan_16_565_scan_map_fixalpha_alphamap;
 
@@ -363,41 +378,67 @@ csDrawScanline csScan_16_565_scan_map_fixalpha_alphamap;
 PI_SCAN_ROUTINE (16, flat)
 /// Draw a perspective-incorrect texture mapped polygon scanline
 PI_SCAN_ROUTINE (16, tex)
-/// Draw a perspective-incorrect texture mapped polygon scanline with color keying
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with color
+ * keying
+ */
 PI_SCAN_ROUTINE (16, tex_key)
 /// Draw a perspective-incorrect texture mapped polygon scanline
 PI_SCAN_ROUTINE (16, tile_tex)
-/// Draw a perspective-incorrect texture mapped polygon scanline with color keying
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with color
+ * keying
+ */
 PI_SCAN_ROUTINE (16, tile_tex_key)
 /// Draw a flat-lighted perspective-incorrect with table-driven effects
 PI_SCAN_ROUTINE (16_555, flat_fx)
 PI_SCAN_ROUTINE (16_565, flat_fx)
-/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with
+ * table-driven effects
+ */
 PI_SCAN_ROUTINE (16_555, tex_fx)
 PI_SCAN_ROUTINE (16_565, tex_fx)
-/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects and color keying
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with
+ * table-driven effects and color keying
+ */
 PI_SCAN_ROUTINE (16_555, tex_fxkey)
 PI_SCAN_ROUTINE (16_565, tex_fxkey)
-/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with
+ * table-driven effects
+ */
 PI_SCAN_ROUTINE (16_555, tile_tex_fx)
 PI_SCAN_ROUTINE (16_565, tile_tex_fx)
-/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects and color keying
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with
+ * table-driven effects and color keying
+ */
 PI_SCAN_ROUTINE (16_555, tile_tex_fxkey)
 PI_SCAN_ROUTINE (16_565, tile_tex_fxkey)
-/// Draw a flat-shaded alpha-mapped texture
+/**
+ * Draw a flat-shaded alpha-mapped texture
+ */
 PI_SCAN_ROUTINE (16_555, tex_alpha)
 PI_SCAN_ROUTINE (16_565, tex_alpha)
 
 /// Draw a single-color Gouraud-shaded polygon
 PIG_SCAN_ROUTINE (16_555, flat_gou)
 PIG_SCAN_ROUTINE (16_565, flat_gou)
-/// Draw a perspective-incorrect texture mapped polygon scanline with Gouraud shading
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with Gouraud
+ * shading
+ */
 PIG_SCAN_ROUTINE (16_555, tex_gou)
 PIG_SCAN_ROUTINE (16_565, tex_gou)
 /// Perspective-incorrect textured polygon with Gouraud shading and color keying
 PIG_SCAN_ROUTINE (16_555, tex_goukey)
 PIG_SCAN_ROUTINE (16_565, tex_goukey)
-/// Draw a perspective-incorrect texture mapped polygon scanline with Gouraud shading
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with
+ * Gouraud shading
+ */
 PIG_SCAN_ROUTINE (16_555, tile_tex_gou)
 PIG_SCAN_ROUTINE (16_565, tile_tex_gou)
 /// Perspective-incorrect textured polygon with Gouraud shading and color keying
@@ -406,16 +447,28 @@ PIG_SCAN_ROUTINE (16_565, tile_tex_goukey)
 /// Draw a single-color Gouraud-shaded polygon with table-driven effects
 PIG_SCAN_ROUTINE (16_555, flat_goufx)
 PIG_SCAN_ROUTINE (16_565, flat_goufx)
-/// Draw a perspective-incorrect textured polygon scanline with table-driven effects
+/**
+ * Draw a perspective-incorrect textured polygon scanline with table-driven
+ * effects
+ */
 PIG_SCAN_ROUTINE (16_555, tex_goufx)
 PIG_SCAN_ROUTINE (16_565, tex_goufx)
-/// Draw a perspective-incorrect polygon scanline with various effects and color keying
+/**
+ * Draw a perspective-incorrect polygon scanline with various effects and
+ * color keying
+ */
 PIG_SCAN_ROUTINE (16_555, tex_goufxkey)
 PIG_SCAN_ROUTINE (16_565, tex_goufxkey)
-/// Draw a perspective-incorrect textured polygon scanline with table-driven effects
+/**
+ * Draw a perspective-incorrect textured polygon scanline with table-driven
+ * effects
+ */
 PIG_SCAN_ROUTINE (16_555, tile_tex_goufx)
 PIG_SCAN_ROUTINE (16_565, tile_tex_goufx)
-/// Draw a perspective-incorrect polygon scanline with various effects and color keying
+/**
+ * Draw a perspective-incorrect polygon scanline with various effects and
+ * color keying
+ */
 PIG_SCAN_ROUTINE (16_555, tile_tex_goufxkey)
 PIG_SCAN_ROUTINE (16_565, tile_tex_goufxkey)
 
@@ -469,59 +522,110 @@ csDrawScanline csScan_32_scan_fog_view;
 
 /// Draw one horizontal scanline (lighting and fixed alpha transparency).
 csDrawScanline csScan_32_scan_map_fixalpha50;
-/// Draw one horizontal scanline (lighting and fixed alpha transparency with keycolor).
+/**
+ * Draw one horizontal scanline (lighting and fixed alpha transparency with
+ * keycolor).
+ */
 csDrawScanline csScan_32_scan_map_fixalpha50_key;
-/// Draw one horizontal scanline (lighting and fixed alpha transparency with alphamap).
+/**
+ * Draw one horizontal scanline (lighting and fixed alpha transparency with
+ * alphamap).
+ */
 csDrawScanline csScan_32_scan_map_fixalpha50_alphamap;
-/// Draw one horizontal scanline (lighting and fixed alpha transparency). General case.
+/**
+ * Draw one horizontal scanline (lighting and fixed alpha transparency).
+ * General case.
+ */
 csDrawScanline csScan_32_scan_map_fixalpha;
-/// Draw one horizontal scanline (lighting and fixed alpha transparency with keycolor). General case.
+/**
+ * Draw one horizontal scanline (lighting and fixed alpha transparency with
+ * keycolor). General case.
+ */
 csDrawScanline csScan_32_scan_map_fixalpha_key;
-/// Draw one horizontal scanline (lighting and fixed alpha transparency with alphamap). General case.
+/**
+ * Draw one horizontal scanline (lighting and fixed alpha transparency with
+ * alphamap). General case.
+ */
 csDrawScanline csScan_32_scan_map_fixalpha_alphamap;
 
 /// Draw a flat-lighted perspective-incorrect line
 PI_SCAN_ROUTINE (32, flat)
 /// Draw a perspective-incorrect texture mapped polygon scanline
 PI_SCAN_ROUTINE (32, tex)
-/// Draw a perspective-incorrect texture mapped polygon scanline with color keying
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with color
+ * keying
+ */
 PI_SCAN_ROUTINE (32, tex_key)
 /// Draw a perspective-incorrect texture mapped polygon scanline
 PI_SCAN_ROUTINE (32, tile_tex)
-/// Draw a perspective-incorrect texture mapped polygon scanline with color keying
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with color
+ * keying
+ */
 PI_SCAN_ROUTINE (32, tile_tex_key)
 /// Draw a flat-lighted perspective-incorrect with table-driven effects
 PI_SCAN_ROUTINE (32, flat_fx)
-/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with
+ * table-driven effects
+ */
 PI_SCAN_ROUTINE (32, tex_fx)
-/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects and color keying
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with
+ * table-driven effects and color keying
+ */
 PI_SCAN_ROUTINE (32, tex_fxkey)
-/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with
+ * table-driven effects
+ */
 PI_SCAN_ROUTINE (32, tile_tex_fx)
-/// Draw a perspective-incorrect texture mapped polygon scanline with table-driven effects and color keying
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with
+ * table-driven effects and color keying
+ */
 PI_SCAN_ROUTINE (32, tile_tex_fxkey)
 /// Draw a flat-shaded alpha-mapped texture
 PI_SCAN_ROUTINE (32, tex_alpha)
 
 /// Draw a single-color Gouraud-shaded polygon
 PIG_SCAN_ROUTINE (32, flat_gou)
-/// Draw a perspective-incorrect texture mapped polygon scanline with Gouraud shading
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with
+ * Gouraud shading
+ */
 PIG_SCAN_ROUTINE (32, tex_gou)
 /// Perspective-incorrect textured polygon with Gouraud shading and color keying
 PIG_SCAN_ROUTINE (32, tex_goukey)
-/// Draw a perspective-incorrect texture mapped polygon scanline with Gouraud shading
+/**
+ * Draw a perspective-incorrect texture mapped polygon scanline with
+ * Gouraud shading
+ */
 PIG_SCAN_ROUTINE (32, tile_tex_gou)
 /// Perspective-incorrect textured polygon with Gouraud shading and color keying
 PIG_SCAN_ROUTINE (32, tile_tex_goukey)
 /// Draw a single-color Gouraud-shaded polygon with table-driven effects
 PIG_SCAN_ROUTINE (32, flat_goufx)
-/// Draw a perspective-incorrect textured polygon scanline with table-driven effects
+/**
+ * Draw a perspective-incorrect textured polygon scanline with table
+ * driven effects
+ */
 PIG_SCAN_ROUTINE (32, tex_goufx)
-/// Draw a perspective-incorrect polygon scanline with various effects and color keying
+/**
+ * Draw a perspective-incorrect polygon scanline with various effects
+ * and color keying
+ */
 PIG_SCAN_ROUTINE (32, tex_goufxkey)
-/// Draw a perspective-incorrect textured polygon scanline with table-driven effects
+/**
+ * Draw a perspective-incorrect textured polygon scanline with table
+ * driven effects
+ */
 PIG_SCAN_ROUTINE (32, tile_tex_goufx)
-/// Draw a perspective-incorrect polygon scanline with various effects and color keying
+/**
+ * Draw a perspective-incorrect polygon scanline with various effects
+ * and color keying
+ */
 PIG_SCAN_ROUTINE (32, tile_tex_goufxkey)
 
 #if defined (CS_HAVE_MMX)

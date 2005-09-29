@@ -9,33 +9,33 @@
 class LightmapCache : public iCacheManager
 {
 private:
-    VUtil::vRef<VOS::Property> property;
+  VUtil::vRef<VOS::Property> property;
 
 public:
-    SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE;
 
-    LightmapCache(VOS::Property* target);
-    virtual ~LightmapCache() { };
-    virtual void SetCurrentType (const char* type);
+  LightmapCache(VOS::Property* target);
+  virtual ~LightmapCache() { };
+  virtual void SetCurrentType (const char* type);
 
-    virtual const char* GetCurrentType () const;
+  virtual const char* GetCurrentType () const;
 
-    virtual void SetCurrentScope (const char* scope);
+  virtual void SetCurrentScope (const char* scope);
 
-    virtual const char* GetCurrentScope () const;
+  virtual const char* GetCurrentScope () const;
 
-    virtual bool CacheData (const void* data, size_t size,
-                            const char* type, const char* scope, uint32 id);
+  virtual bool CacheData (const void* data, size_t size,
+              const char* type, const char* scope, uint32 id);
 
-    virtual csPtr<iDataBuffer> ReadCache (
-        const char* type, const char* scope, uint32 id);
+  virtual csPtr<iDataBuffer> ReadCache (
+    const char* type, const char* scope, uint32 id);
 
-    virtual bool ClearCache (const char* type = 0, const char* scope = 0,
-                             const uint32* id = 0);
+  virtual bool ClearCache (const char* type = 0, const char* scope = 0,
+               const uint32* id = 0);
 
-    virtual void Flush();
-    virtual void SetReadOnly(bool) { }
-    virtual bool IsReadOnly() const { return false; }
+  virtual void Flush();
+  virtual void SetReadOnly(bool) { }
+  virtual bool IsReadOnly() const { return false; }
 };
 
 #endif

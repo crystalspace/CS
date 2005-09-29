@@ -43,15 +43,15 @@ private:
 
   void CalcFaceNormals()
   {
-	Triangulate();
-	face_normals.SetLength(0);
-	int i;
+    Triangulate();
+    face_normals.SetLength(0);
+    int i;
     for (i = 0; i < tri_count; i ++) 
-	{ 
-		csVector3 face_normal = 
-			(verts[triangles[i].b] - verts[triangles[i].a]) % (verts[triangles[i].c] - verts[triangles[i].a]);
-		face_normal.Normalize();
-		face_normals.Push(face_normal);
+    { 
+      csVector3 face_normal = (verts[triangles[i].b] - verts[triangles[i].a]) %
+      			      (verts[triangles[i].c] - verts[triangles[i].a]);
+      face_normal.Normalize();
+      face_normals.Push(face_normal);
     }
   }
 
@@ -79,47 +79,47 @@ public:
       polys.Push (polysToAdd[i]);
     }
 	
-	triangles = 0;
-	CalcFaceNormals();
-	ShapeChanged ();
+    triangles = 0;
+    CalcFaceNormals();
+    ShapeChanged ();
   }
 
-void CopyFrom (iPolygonMesh* polyMesh)
-{
-	delete[] secondary_vertidx;
-	secondary_vertidx = 0;
+  void CopyFrom (iPolygonMesh* polyMesh)
+  {
+    delete[] secondary_vertidx;
+    secondary_vertidx = 0;
 
-	int numVerts = polyMesh->GetVertexCount ();
-	csVector3* oldVerts = polyMesh->GetVertices ();
-	verts.SetLength (numVerts);
-	memcpy (verts.GetArray (), oldVerts, sizeof (csVector3) * numVerts);
+    int numVerts = polyMesh->GetVertexCount ();
+    csVector3* oldVerts = polyMesh->GetVertices ();
+    verts.SetLength (numVerts);
+    memcpy (verts.GetArray (), oldVerts, sizeof (csVector3) * numVerts);
 
-	int numPolys = polyMesh->GetPolygonCount ();
-	csMeshedPolygon* oldPolys = polyMesh->GetPolygons ();
-	polys.SetLength (numPolys);
+    int numPolys = polyMesh->GetPolygonCount ();
+    csMeshedPolygon* oldPolys = polyMesh->GetPolygons ();
+    polys.SetLength (numPolys);
 
-	int i;
-	// First count how many vertex indices we need.
-	int totvertidx = 0;
-	for (i = 0 ; i < numPolys ; i++)
-		totvertidx += oldPolys[i].num_vertices;
-	vertidx.SetLength (totvertidx);
-	int* vertidx_p = vertidx.GetArray ();
+    int i;
+    // First count how many vertex indices we need.
+    int totvertidx = 0;
+    for (i = 0 ; i < numPolys ; i++)
+      totvertidx += oldPolys[i].num_vertices;
+    vertidx.SetLength (totvertidx);
+    int* vertidx_p = vertidx.GetArray ();
 
-	for (i = 0; i < numPolys; i++)
-	{
-		csMeshedPolygon& poly = polys[i];
-		poly.num_vertices = oldPolys[i].num_vertices;
-		poly.vertices = vertidx_p;
-		memcpy (poly.vertices, oldPolys[i].vertices, 
-		poly.num_vertices * sizeof (int));
-		vertidx_p += poly.num_vertices;
-	}
+    for (i = 0; i < numPolys; i++)
+    {
+      csMeshedPolygon& poly = polys[i];
+      poly.num_vertices = oldPolys[i].num_vertices;
+      poly.vertices = vertidx_p;
+      memcpy (poly.vertices, oldPolys[i].vertices, 
+      poly.num_vertices * sizeof (int));
+      vertidx_p += poly.num_vertices;
+    }
 
-	CalcFaceNormals();
+    CalcFaceNormals();
 
-	ShapeChanged ();
-}
+    ShapeChanged ();
+  }
 
   virtual int GetVertexCount () 
   { 

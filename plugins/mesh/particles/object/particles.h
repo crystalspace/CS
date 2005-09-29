@@ -143,8 +143,14 @@ public:
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
   virtual void HardTransform (const csReversibleTransform&) {}
   virtual bool SupportsHardTransform () const { return false; }
-  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp) { logparent = lp; }
-  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const { return logparent; }
+  virtual void SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
+  {
+    logparent = lp;
+  }
+  virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
+  {
+    return logparent;
+  }
   virtual iMeshObjectType* GetMeshObjectType () const { return particles_type; }
   virtual iObjectModel* GetObjectModel () { return 0; }
 
@@ -1013,7 +1019,8 @@ public:
     {
       SCF_DESTRUCT_IBASE ();
     }
-    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
+    virtual void PreGetBuffer (csRenderBufferHolder* holder,
+    	csRenderBufferName buffer)
     {
       parent->PreGetBuffer (holder, buffer);
     }

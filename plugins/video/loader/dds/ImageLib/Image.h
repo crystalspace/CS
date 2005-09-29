@@ -88,8 +88,10 @@ public:
   double  Diff(Image *pComp);
   double  MSE(Image *pComp);
 
-  AlphaType  AlphaUsage(unsigned char *pAlpha1 = 0, unsigned char *pAlpha0 = 0);  // Returns how the alpha channel is used
-  void    AlphaToBinary(unsigned char Threshold = 128);            // Force alpha to be 0x00 / 0xff
+  // Returns how the alpha channel is used
+  AlphaType  AlphaUsage(unsigned char *pAlpha1 = 0, unsigned char *pAlpha0 = 0);
+  // Force alpha to be 0x00 / 0xff
+  void    AlphaToBinary(unsigned char Threshold = 128);
 
   static  QuantMethodType QuantMethod;
   static  bool QuantDiffusion;
@@ -126,7 +128,8 @@ public:
   bool  Crop(long x1, long y1, long x2, long y2);
   bool  SizeCanvas(long NewX, long NewY);
 
-  void  QuantizeFrom(Image32 *pSrcImage, Image32 *pPaletteImage = 0, Color *pForceColor = 0);
+  void  QuantizeFrom(Image32 *pSrcImage, Image32 *pPaletteImage = 0,
+  	Color *pForceColor = 0);
   void  QuantizeFrom(Image32 *pSrcImage, long NumCols);
   Image8  &operator=(Image &Src);
   Image8  &operator=(Image8 &Src) {return this->operator=(*(Image *)&Src);}
@@ -158,11 +161,14 @@ public:
   Image32  &operator=(Image8 &Src) {return this->operator=(*(Image *)&Src);}
   Image32  &operator=(Image32 &Src) {return this->operator=(*(Image *)&Src);}
 
-  long    UniqueColors(void);                          // Unique color count for the image
+  // Unique color count for the image
+  long    UniqueColors(void);
 
-  float  AverageSlope(void);        // Compute the average slope between pixel neighbors
+  // Compute the average slope between pixel neighbors
+  float  AverageSlope(void);
 
-  void  DiffuseError(long aBits, long rBits, long gBits, long bBits);  // # of bits per gun
+  // # of bits per gun
+  void  DiffuseError(long aBits, long rBits, long gBits, long bBits);
   void  DiffuseQuant(Image8 &DestImg);  // DestImg already contains the palette
 
   bool  Crop(long x1, long y1, long x2, long y2);

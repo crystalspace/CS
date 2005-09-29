@@ -275,7 +275,8 @@ private:
 
 public:
   /// Constructor.
-  csExploMeshObjectFactory (iMeshObjectType *pParent, iObjectRegistry* object_reg);
+  csExploMeshObjectFactory (iMeshObjectType *pParent,
+  	iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csExploMeshObjectFactory ();

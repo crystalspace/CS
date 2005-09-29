@@ -194,7 +194,8 @@ private:
 
 public:
   /// Constructor.
-  csSpiralMeshObjectFactory (iMeshObjectType* pParent, iObjectRegistry* object_reg);
+  csSpiralMeshObjectFactory (iMeshObjectType* pParent,
+  	iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csSpiralMeshObjectFactory ();

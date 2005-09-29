@@ -31,7 +31,7 @@
 
 class csModSoundData : public iSoundData
 {
- public:
+public:
   struct datastore
   {
     unsigned char *data;
@@ -54,7 +54,7 @@ class csModSoundData : public iSoundData
   };
 
 
- public:
+public:
   struct cs_mod_reader
   {
     cs_mod_reader (uint8 *d, size_t l, bool own);
@@ -67,7 +67,7 @@ class csModSoundData : public iSoundData
     bool bEof;
   };
 
- protected:
+protected:
   cs_mod_reader *mod_reader;
   MODULE *module;
 
@@ -78,7 +78,7 @@ class csModSoundData : public iSoundData
   uint8 *buf, *pos;
   size_t len, bytes_left;
 
- public:
+public:
   static bool mikmod_init, mikmod_reinit;
 
   SCF_DECLARE_IBASE;

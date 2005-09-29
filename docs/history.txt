@@ -23,6 +23,7 @@ chronological order.
 	- Eric Sunshine added some aliases to bugplug.key for MacOS/X since
 	  bare F9, F10, F11, and F12 are used by OSX itself by default.
 	- Eric Sunshine eliminated some additional compilation warnings.
+	- Jorrit did some more cleanups.
 28-Sep-2005
 	- Jorrit caused much wailing and gnashing of teeth as everyone will
 	  have to rebuild CS and everyone will get a new set of auto-generated

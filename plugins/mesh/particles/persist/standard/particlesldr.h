@@ -113,10 +113,12 @@ public:
   	iStreamSource*);
 
   /// Write down the emitter block.
-  virtual bool WriteEmitter (iParticlesFactoryState *obj, iDocumentNode* parent);
+  virtual bool WriteEmitter (iParticlesFactoryState *obj,
+  	iDocumentNode* parent);
 
   /// Write down colormethode block.
-  virtual bool WriteColorMethode (iParticlesFactoryState *obj, iDocumentNode* parent);
+  virtual bool WriteColorMethode (iParticlesFactoryState *obj,
+  	iDocumentNode* parent);
 
   struct eiComponent : public iComponent
   {

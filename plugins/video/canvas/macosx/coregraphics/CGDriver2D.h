@@ -29,43 +29,42 @@
 class CGDriver2D : public csGraphics2D, public OSXDriver2D
 {
 public:
-    // Constructor
-    CGDriver2D(iBase *p);
+  // Constructor
+  CGDriver2D(iBase *p);
 
-    // Destructor
-    virtual ~CGDriver2D();
+  // Destructor
+  virtual ~CGDriver2D();
 
-    // Initialize 2D plugin
-    virtual bool Initialize(iObjectRegistry *reg);
+  // Initialize 2D plugin
+  virtual bool Initialize(iObjectRegistry *reg);
 
-    // Open graphics system (set mode, open window, etc)
-    virtual bool Open();
+  // Open graphics system (set mode, open window, etc)
+  virtual bool Open();
 
-    // Close graphics system
-    virtual void Close();
+  // Close graphics system
+  virtual void Close();
 
-    // Set window title
-    virtual void SetTitle(char *title);
+  // Set window title
+  virtual void SetTitle(char *title);
 
-    // Flip video page (or dump to framebuffer)
-    virtual void Print(csRect const* area = 0);
+  // Flip video page (or dump to framebuffer)
+  virtual void Print(csRect const* area = 0);
 
-    // Set mouse position
-    virtual bool SetMousePosition(int x, int y);
+  // Set mouse position
+  virtual bool SetMousePosition(int x, int y);
 
-    // Set the mouse cursor
-    virtual bool SetMouseCursor(csMouseCursorID cursor);
+  // Set the mouse cursor
+  virtual bool SetMouseCursor(csMouseCursorID cursor);
 
-    // Enable/disable canvas resize
-    virtual void AllowResize(bool allow);
+  // Enable/disable canvas resize
+  virtual void AllowResize(bool allow);
 
-    // Resize the canvas
-    virtual bool Resize(int w, int h);
+  // Resize the canvas
+  virtual bool Resize(int w, int h);
 
 protected:
-
-    // Set up the function pointers for drawing based on the current Depth
-    virtual void SetupDrawingFunctions();
+  // Set up the function pointers for drawing based on the current Depth
+  virtual void SetupDrawingFunctions();
 };
 
 #endif // __cplusplus

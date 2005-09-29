@@ -30,7 +30,8 @@ class csSoundHandleOpenAL : public csSoundHandle
 
 public:
   // constructor
-  csSoundHandleOpenAL(csSoundRenderOpenAL *srdr, iSoundData *snd,float BufferLengthSeconds,bool LocalBuffer);
+  csSoundHandleOpenAL(csSoundRenderOpenAL *srdr, iSoundData *snd,
+  	float BufferLengthSeconds,bool LocalBuffer);
   // destructor
   ~csSoundHandleOpenAL();
 
@@ -50,10 +51,11 @@ public:
   long NumSamples;
   long buffer_writecursor;
 
-  /// The writecursor needs to be read by new sources to syncronize to the current position and updated by the background thread.
+  /**
+   * The writecursor needs to be read by new sources to syncronize to the
+   * current position and updated by the background thread.
+   */
   csRef<csMutex> mutex_WriteCursor;
-
-  
 };
 
 #endif // __CS_SNDHDLOPENAL_H__

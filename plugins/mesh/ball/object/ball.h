@@ -430,7 +430,8 @@ public:
   csFlags flags;
 
   /// Constructor.
-  csBallMeshObjectFactory (iMeshObjectType* pParent, iObjectRegistry* object_reg);
+  csBallMeshObjectFactory (iMeshObjectType* pParent,
+  	iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csBallMeshObjectFactory ();

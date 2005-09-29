@@ -1,6 +1,6 @@
 /*
 
-	Lloyd.h - Lloyd codebook generator class
+  Lloyd.h - Lloyd codebook generator class
 
 */
 
@@ -16,10 +16,12 @@ namespace ImageLib
 class Lloyd
 {
 private:
-	ccMinList	Codes;	// List of codebooks (the centroid of each will ultimately be our result codes)
+  // List of codebooks (the centroid of each will ultimately be our result
+  // codes)
+  ccMinList  Codes;
 
 public:
-	long Execute(fCodebook &Source, fCodebook &Dest, long Target);
+  long Execute(fCodebook &Source, fCodebook &Dest, long Target);
 };
 
 } // end of namespace ImageLib

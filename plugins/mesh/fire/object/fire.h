@@ -269,7 +269,8 @@ private:
 
 public:
   /// Constructor.
-  csFireMeshObjectFactory (iMeshObjectType *pParent, iObjectRegistry* object_reg);
+  csFireMeshObjectFactory (iMeshObjectType *pParent,
+  	iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csFireMeshObjectFactory ();

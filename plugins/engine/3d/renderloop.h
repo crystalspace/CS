@@ -38,7 +38,8 @@ class csRenderLoop;
 
 class csRenderLoop : public scfImplementation2<csRenderLoop,
                                                iRenderLoop,
-                                               scfFakeInterface<iRenderStepContainer> >
+                                               scfFakeInterface<
+					       		iRenderStepContainer> >
 {
 protected:
   friend class csLightIteratorRenderStep;

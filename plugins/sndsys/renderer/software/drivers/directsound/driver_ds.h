@@ -110,13 +110,14 @@ protected:
   csRef<iWin32Assistant> win32Assistant;
 
   /// A flag used to shut down the running background thread.
-  //   We don't really need to synchronize access to this since a delay in recognizing a change
-  //   isn't a big deal.
+  // We don't really need to synchronize access to this since a delay in
+  // recognizing a change isn't a big deal.
   volatile bool running;
   csRef<csThread> bgthread;
 
 protected:
-  // Helper function to determine if the Direct Sound 'write' cursor has passed where we've written
+  // Helper function to determine if the Direct Sound 'write' cursor has
+  // passed where we've written
   int GetWriteGap(uint32 real_play_cursor, uint32 real_write_cursor);
   uint32 GetWritableBytes(uint32 real_play_cursor);
   void AdvanceWriteBuffer (size_t bytes);

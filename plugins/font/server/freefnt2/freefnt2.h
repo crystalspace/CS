@@ -170,7 +170,6 @@ public:
    * bar/rectangle.
    */
   virtual int GetUnderlineThickness ();
-
 };
 
 /**

@@ -104,7 +104,8 @@ namespace cspluginSoft3d
       {
 	csSoftwareTextureHandle *tex_mm = (csSoftwareTextureHandle*)
 	    pqinfo.tex_handle->GetPrivateObject ();
-	csSoftwareTexture *txt_unl = (csSoftwareTexture *)tex_mm->get_texture (0);
+	csSoftwareTexture *txt_unl = (csSoftwareTexture *)
+		tex_mm->get_texture (0);
 	csScan_InitDrawFX (tex_mm, txt_unl);
 	pqinfo.bm = txt_unl->get_bitmap ();
 	pqinfo.tw = txt_unl->get_width ();
@@ -165,7 +166,7 @@ namespace cspluginSoft3d
 	  break;
 	}
 	case CS_FX_TRANSPARENT:
-    zfill_only:
+	zfill_only:
 	  mode |= CS_FX_FLAT;
 	  pqinfo.drawline = (z_buf_mode == CS_ZBUF_USE)
 	    ? 0
@@ -197,11 +198,13 @@ namespace cspluginSoft3d
       // We use #.16 fixed-point format for R,G,B factors
       // where # is the number of bits per component (with the exception of
       // 32bpp modes/textured where we use (#-2).16 format).
-      int shift_amount =
-	((pfmt.PixelBytes == 4) && (Scan.BlendTable || pqinfo.textured)) ? 6 : 8;
+      int shift_amount = ((pfmt.PixelBytes == 4) &&
+      	(Scan.BlendTable || pqinfo.textured)) ? 6 : 8;
       pqinfo.redFact = (((pfmt.RedMask>>pfmt.RedShift)+1) << shift_amount)-1;
-      pqinfo.greenFact = (((pfmt.GreenMask>>pfmt.GreenShift)+1) << shift_amount)-1;
-      pqinfo.blueFact  = (((pfmt.BlueMask>>pfmt.BlueShift)+1)   << shift_amount)-1;
+      pqinfo.greenFact = (((pfmt.GreenMask>>pfmt.GreenShift)+1)
+      	<< shift_amount)-1;
+      pqinfo.blueFact  = (((pfmt.BlueMask>>pfmt.BlueShift)+1)
+      	<< shift_amount)-1;
     
       pqinfo.max_r = (1 << (pfmt.RedBits   + shift_amount + 8)) - 1;
       pqinfo.max_g = (1 << (pfmt.GreenBits + shift_amount + 8)) - 1;

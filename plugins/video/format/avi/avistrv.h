@@ -54,7 +54,8 @@ class csAVIStreamVideo : public iVideoStream
   void rgba_channel_2_rgba_interleave (char *data[4]);
   void rgba_interleave (char *data);
 
-  bool LoadCodec (uint8 *pInitData, uint32 nInitDataLen, uint8 *pFormatEx, uint32 nFormatEx);
+  bool LoadCodec (uint8 *pInitData, uint32 nInitDataLen, uint8 *pFormatEx,
+  	uint32 nFormatEx);
   void makeTexture ();
   bool NextFrameGetData ();
   void PrepImageArea ();

@@ -40,10 +40,10 @@ private:
   csRef<iVFS> vfs;
 
   iMaterialWrapper * LoadMaterialTag(iSpriteCal3DFactoryState *newspr,
-				     iDocumentNode* node,
-				     iLoaderContext* ldr_context,
-				     const char *file,
-                     const char* matName = 0);
+		iDocumentNode* node,
+		iLoaderContext* ldr_context,
+		const char *file,
+                const char* matName = 0);
 
 public:
   SCF_DECLARE_IBASE;

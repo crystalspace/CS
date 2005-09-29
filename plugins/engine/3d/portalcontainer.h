@@ -49,7 +49,8 @@ public:
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
   csPortalContainerPolyMeshHelper (uint32 flag) 
-    : scfImplementationType (this), polygons (0), vertices (0), poly_flag (flag), 
+    : scfImplementationType (this), polygons (0), vertices (0),
+      poly_flag (flag), 
     triangles (0)
   {
   }

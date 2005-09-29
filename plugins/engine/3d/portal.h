@@ -294,9 +294,6 @@ public:
    */
   virtual void CheckFrustum (iFrustumView* lview,
   	const csReversibleTransform& t, int alpha);
-
-  //------------------- iPortal implementation -----------------------
-  virtual iObject *QueryObject () { return 0; } /*@@@ REMOVE */
 };
 
 #endif // __CS_ENGINE_PORTAL_H__

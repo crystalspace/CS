@@ -35,7 +35,8 @@ class csLight;
 class csCamera;
 
 /// A list of sectors as the movable uses it
-class csMovableSectorList : public scfImplementation1<csMovableSectorList, iSectorList>,
+class csMovableSectorList : public scfImplementation1<csMovableSectorList,
+				iSectorList>,
                             public csRefArrayObject<iSector>
 {
 private:

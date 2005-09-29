@@ -61,7 +61,7 @@ public:
   virtual bool Initialize (iObjectRegistry*);
   void Report (int severity, const char* msg, ...);
   virtual void SetDisplayScreen (Display *dpy, int screen_num)
-    { this->dpy = dpy; this->screen_num = screen_num; }
+  { this->dpy = dpy; this->screen_num = screen_num; }
   virtual unsigned char *CreateMemory (int Width, int Height);
   virtual void DestroyMemory ();
   virtual void Print (Window window, GC gc, csRect const* area);

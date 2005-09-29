@@ -279,7 +279,8 @@ public:
     virtual void RemoveUVAnimation (iSprite2DUVAnimation *anim);
     virtual iSprite2DUVAnimation *GetUVAnimation (const char *name) const;
     virtual iSprite2DUVAnimation *GetUVAnimation (int idx) const;
-    virtual iSprite2DUVAnimation *GetUVAnimation (int idx, int &style, bool &loop) const;
+    virtual iSprite2DUVAnimation *GetUVAnimation (int idx, int &style,
+    	bool &loop) const;
 
   } scfiSprite2DState;
   friend class Sprite2DState;
@@ -317,7 +318,6 @@ public:
 class csSprite2DMeshObjectFactory : public iMeshObjectFactory
 {
 protected:
-
   class animVector : public csArray<csSprite2DUVAnimation*>
   {
   public:

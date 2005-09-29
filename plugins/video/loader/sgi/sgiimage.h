@@ -26,8 +26,9 @@ class csSGIImageIO : public iImageIO
   virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage* image, const char* mime,
     const char* extraoptions);
-  virtual csPtr<iDataBuffer> Save (iImage *image, iImageIO::FileFormatDescription* format,
-    const char* extraoptions);
+  virtual csPtr<iDataBuffer> Save (iImage *image,
+  	iImageIO::FileFormatDescription* format,
+    	const char* extraoptions);
 
   struct eiComponent : public iComponent
   {

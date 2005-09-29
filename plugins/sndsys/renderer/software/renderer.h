@@ -98,7 +98,10 @@ public:
   virtual float GetVolume ();
 
 
-  /// Uses the provided iSndSysData to create a sound stream with the given 3D rendering mode
+  /**
+   * Uses the provided iSndSysData to create a sound stream with the given
+   * 3D rendering mode
+   */
   virtual csPtr<iSndSysStream> CreateStream(iSndSysData* data, int mode3d);
 
   /// Creates a source when provided with a Sound Stream
@@ -153,7 +156,8 @@ protected:
 
   csTicks last_ticks;
 
-  // Pointer to a buffer of sound samples used to mix data prior to sending to the driver
+  // Pointer to a buffer of sound samples used to mix data prior to
+  // sending to the driver
   csSoundSample *sample_buffer;
   size_t sample_buffer_samples;
 

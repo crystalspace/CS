@@ -71,7 +71,8 @@ class csSprite2DUVAnimationFrame : public iSprite2DUVAnimationFrame
   /**
    * Set all (u,v) coordinates and the name and duration
    */
-  virtual void SetFrameData (const char *name, int duration, int num, float *uv);
+  virtual void SetFrameData (const char *name, int duration, int num,
+  	float *uv);
 
   /**
    * Remove the <idx>-th coordinate.

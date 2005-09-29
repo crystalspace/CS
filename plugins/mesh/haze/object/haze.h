@@ -104,26 +104,31 @@ public:
   virtual int GetEdgeCount() const {return total_edge;}
 
   virtual void GetVertex(csVector3& res, int vertex_idx) const
-  { CS_ASSERT( vertex_idx >= 0 && vertex_idx < total_vert);
+  {
+    CS_ASSERT( vertex_idx >= 0 && vertex_idx < total_vert);
     res = verts[vertex_idx];}
   virtual void GetEdge(int edge_num, int& vertex_idx_1, int& vertex_idx_2) const
-  { CS_ASSERT( edge_num >= 0 && edge_num < total_edge);
+  {
+    CS_ASSERT( edge_num >= 0 && edge_num < total_edge);
     vertex_idx_1 = edgept1[edge_num];
     vertex_idx_2 = edgept2[edge_num];
   }
 
   virtual int GetPolVerticeCount(int polygon_num) const
-  { CS_ASSERT( polygon_num >= 0 && polygon_num < total_poly);
+  {
+    CS_ASSERT( polygon_num >= 0 && polygon_num < total_poly);
     return pol_num[polygon_num];
   }
   virtual int GetPolVertex(int polygon_num, int vertex_num) const
-  { CS_ASSERT( polygon_num >= 0 && polygon_num < total_poly);
+  {
+    CS_ASSERT( polygon_num >= 0 && polygon_num < total_poly);
     CS_ASSERT( vertex_num >= 0 && vertex_num < pol_num[polygon_num]);
     return pol_verts[polygon_num][vertex_num];
   }
   virtual int GetPolEdge(int polygon_num, int vertex_num, int& start_idx,
     int& end_idx) const
-  { CS_ASSERT( polygon_num >= 0 && polygon_num < total_poly);
+  {
+    CS_ASSERT( polygon_num >= 0 && polygon_num < total_poly);
     CS_ASSERT( vertex_num >= 0 && vertex_num < pol_num[polygon_num]);
     start_idx = pol_verts[polygon_num][vertex_num];
     int inc = (vertex_num+1)%pol_num[polygon_num];
@@ -174,8 +179,13 @@ public:
     /// get settings
     virtual void GetSettings(int &nr, csVector3& a, csVector3& b, float &ra,
       float &rb)
-    {nr = scfParent->nr_sides; a=scfParent->start; b=scfParent->end;
-     ra = scfParent->start_radius; rb = scfParent->end_radius;}
+    {
+      nr = scfParent->nr_sides;
+      a=scfParent->start;
+      b=scfParent->end;
+      ra = scfParent->start_radius;
+      rb = scfParent->end_radius;
+    }
   } scfiHazeHullCone;
   friend class HazeHullCone;
 };
@@ -376,11 +386,14 @@ public:
     {return scfParent->directional;}
     virtual int GetLayerCount() const {return (int)scfParent->layers.Length();}
     virtual void AddLayer(iHazeHull *hull, float scale)
-    { csHazeLayer *lay = new csHazeLayer(hull, scale);
-      scfParent->layers.Push(lay); }
+    {
+      csHazeLayer *lay = new csHazeLayer(hull, scale);
+      scfParent->layers.Push(lay);
+    }
     virtual void SetLayerHull(int layer, iHazeHull* hull)
-    { if(hull) hull->IncRef();
-      if(scfParent->layers[layer]->hull)
+    {
+      if (hull) hull->IncRef();
+      if (scfParent->layers[layer]->hull)
         scfParent->layers[layer]->hull->DecRef();
       scfParent->layers[layer]->hull = hull;
     }
@@ -464,10 +477,13 @@ public:
     {return scfParent->directional;}
     virtual int GetLayerCount() const {return (int)scfParent->layers.Length();}
     virtual void AddLayer(iHazeHull *hull, float scale)
-    { csHazeLayer *lay = new csHazeLayer(hull, scale);
-      scfParent->layers.Push(lay); }
+    {
+      csHazeLayer *lay = new csHazeLayer(hull, scale);
+      scfParent->layers.Push(lay);
+    }
     virtual void SetLayerHull(int layer, iHazeHull* hull)
-    { if(hull) hull->IncRef();
+    {
+      if(hull) hull->IncRef();
       if(scfParent->layers[layer]->hull)
         scfParent->layers[layer]->hull->DecRef();
       scfParent->layers[layer]->hull = hull;

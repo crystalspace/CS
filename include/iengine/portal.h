@@ -153,8 +153,6 @@ struct iPortalCallback : public iBase
 struct iPortal : public virtual iBase
 {
   SCF_INTERFACE(iPortal, 2,0,0);
-  /// Get the iObject for this portal. @@@ OBSOLETE!!!
-  virtual iObject *QueryObject () = 0;
 
   /// Set the name of this portal.
   virtual void SetName (const char* name) = 0;

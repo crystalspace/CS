@@ -243,7 +243,7 @@ public:
     int t = Type ();
     return ( t == DOCUMENT || t == ELEMENT )
       ? (TrDocumentNodeChildren*) this
-  : 0;
+      : 0;
   }
   TrDocument* ToDocument() const
   { return ( Type () == DOCUMENT ) ? (TrDocument*) this : 0; }
@@ -257,7 +257,7 @@ public:
   {
     int t = Type ();
     return ( t == TEXT || t == CDATA )
-    	? (TrXmlText*)     this : 0;
+    	? (TrXmlText*) this : 0;
   }
   TrXmlDeclaration* ToDeclaration() const
   { return ( Type () == DECLARATION ) ? (TrXmlDeclaration*) this : 0; }

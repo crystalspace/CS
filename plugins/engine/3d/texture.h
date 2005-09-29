@@ -38,7 +38,7 @@ struct iImage;
  * csTextureWrapper represents a texture and its link
  * to the iTextureHandle as returned by iTextureManager.
  */
-class csTextureWrapper : public scfImplementationExt1<csTextureWrapper, 
+class csTextureWrapper : public scfImplementationExt1<csTextureWrapper,
                                                       csObject,
                                                       iTextureWrapper>
 {
@@ -79,7 +79,7 @@ private:
   // update our key color with that from the image
   void UpdateKeyColorFromImage ()
   {
-    if(image->HasKeyColor ())
+    if (image->HasKeyColor ())
       image->GetKeyColor( key_col_r, key_col_g, key_col_b );
     else
       key_col_r = -1;
@@ -87,7 +87,7 @@ private:
 
 public:
   CS_LEAKGUARD_DECLARE (csTextureWrapper);
-  
+
   /// Construct a texture handle given a image file
   csTextureWrapper (iImage* Image);
   /// Construct a csTextureWrapper from a pre-registered texture
@@ -168,15 +168,14 @@ public:
   void SetTextureClass (const char* className);
   const char* GetTextureClass ();
 
-  
+
 
   //-------------------- iTextureWrapper implementation -----------------------
   virtual iObject *QueryObject() {return this; }
   virtual iTextureWrapper *Clone () const
-  { 
-    return new csTextureWrapper (*this); 
+  {
+    return new csTextureWrapper (*this);
   }
-  
 
   virtual void SetKeepImage (bool k) { keep_image = k; }
   virtual bool KeepImage () const { return keep_image; }

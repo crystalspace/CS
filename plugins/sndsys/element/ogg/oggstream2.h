@@ -52,9 +52,6 @@ namespace CrystalSpace
 #endif
 
 
-
-
-
 class SndSysOggSoundStream : public iSndSysStream
 {
  public:

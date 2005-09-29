@@ -90,15 +90,14 @@ protected:
  * Space engine to access the files. This gives unified control over the
  * way how files are found, read and written. VFS gives the following
  * goodies over the standard file i/o functions:
- * <ul>
- * <li>Multiple search directories. Several "real" directories can be
- *     collected together into one "virtual" directory.
- * <li>Directories can be mapped to "real" directories as well as to
- *     archives (.zip files). Files are compressed/decompressed
- *     transparently for clients.
- * <li>The Virtual File System is unique across all operating systems
- *     Crystal Space supports, no matter of features of the underlying OS.
- * </ul>
+ * - Multiple search directories. Several "real" directories can be
+ *   collected together into one "virtual" directory.
+ * - Directories can be mapped to "real" directories as well as to
+ *   archives (.zip files). Files are compressed/decompressed
+ *   transparently for clients.
+ * - The Virtual File System is unique across all operating systems
+ *   Crystal Space supports, no matter of features of the underlying OS.
+ *
  * This class has only most basic features of a real filesystem: file
  * reading and writing (no simultaneous read and write mode are allowed
  * because it would be rather complex to implement it for archives).

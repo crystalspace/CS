@@ -102,8 +102,8 @@ public:
                                int hotspot_x, int hotspot_y,
 			       csRGBcolor fg, csRGBcolor bg)
   { 
-  return xwin->SetMouseCursor (image, keycolor, hotspot_x, hotspot_y,
-    fg, bg);
+    return xwin->SetMouseCursor (image, keycolor, hotspot_x, hotspot_y,
+      fg, bg);
   }
 
   virtual void *GetProcAddress (const char *funcname)

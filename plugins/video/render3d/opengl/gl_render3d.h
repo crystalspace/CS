@@ -354,7 +354,8 @@ private:
 
   csZBufMode GetZModePass2 (csZBufMode mode);
 
-  csRef<iRenderBuffer> spec_renderBuffers[CS_VATTRIB_SPECIFIC_LAST-CS_VATTRIB_SPECIFIC_FIRST+1];
+  csRef<iRenderBuffer> spec_renderBuffers[
+  	CS_VATTRIB_SPECIFIC_LAST-CS_VATTRIB_SPECIFIC_FIRST+1];
   void AssignSpecBuffer (uint attr, iRenderBuffer* buffer)
   {
     if (spec_renderBuffers[attr]) 
@@ -363,7 +364,8 @@ private:
     spec_renderBuffers[attr] = buffer;
   }
 
-  csRef<iRenderBuffer> gen_renderBuffers[CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1];
+  csRef<iRenderBuffer> gen_renderBuffers[
+  	CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1];
   void AssignGenericBuffer (uint attr, iRenderBuffer* buffer)
   {
     if (gen_renderBuffers[attr]) 
@@ -448,11 +450,11 @@ public:
   /// Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
   /// and therefore it shouldn't be decref-ed by caller.
   iGraphics2D* GetDriver2D () 
-    { return G2D; }
+  { return G2D; }
 
   /// Get a pointer to our texture manager
   iTextureManager* GetTextureManager () 
-    { return (iTextureManager*)((csGLTextureManager*)txtmgr); }
+  { return (iTextureManager*)((csGLTextureManager*)txtmgr); }
 
   void SetMixMode (uint mode);
   void SetAlphaType (csAlphaMode::AlphaType alphaType);

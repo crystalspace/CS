@@ -55,7 +55,8 @@ class csAVIFormat : public iStreamFormat
     enum {
       LIST     = 0x00000001, // the chunk is a list
       KEYFRAME = 0x00000010, // frame is a keyframe
-      NOTIME   = 0x00000100, // dont use this frame for time calculations - it takes no time
+      NOTIME   = 0x00000100, // dont use this frame for time calculations
+      			     // it takes no time
                              // (palette change for example)
       COMPUSE  = 0x0fff0000  // masks the bits used for compression
     };

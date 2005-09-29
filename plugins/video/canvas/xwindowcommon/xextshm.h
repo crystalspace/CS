@@ -41,7 +41,6 @@ struct iXExtSHM : public iBase
   virtual void DestroyMemory () = 0;
   /// Print Image
   virtual void Print (Window window, GC gc, csRect const* area) = 0;
-
 };
 
 #endif // __CS_IVIDEO_XEXTSHM_H__

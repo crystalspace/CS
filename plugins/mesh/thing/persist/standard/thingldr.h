@@ -78,23 +78,22 @@ public:
 
   /**
    * Parse a texture mapping specification.
-   * <ul>
-   * <li>vref: is the array containing vertices which can be referenced
-   *     by indices in the description.
-   * <li>texspec: describes the data found for the texture transformation.
-   *     It consists of or'ed CSTEX_.
-   * <li>tx_orig, tx1, tx2, len: texture transformation is given by 3
-   *     points describing a 3d space (third vector is implicitly given to
-   *     be perpendicular on the 2 vectors described by the 3 points),
-   * <li>width and height of the texture.
-   * <li>tx_m and tx_v: if texture transformation is given explicitly by
-   *     matrix/vector.
-   * <li>uv_shift: contains UV_SHIFT value.
-   * <li>idx? and uv?: if texture mapping is given explicitly by defining
-   *     the u,v coordinate that belongs to vertex idx? of the polygon.
-   * <li>polyname: name of polygon to which this texture description belongs.
-   *     This is used to make errormessages more verbose.
-   * </ul>
+   * - vref: is the array containing vertices which can be referenced
+   *   by indices in the description.
+   * - texspec: describes the data found for the texture transformation.
+   *   It consists of or'ed CSTEX_.
+   * - tx_orig, tx1, tx2, len: texture transformation is given by 3
+   *   points describing a 3d space (third vector is implicitly given to
+   *   be perpendicular on the 2 vectors described by the 3 points),
+   * - width and height of the texture.
+   * - tx_m and tx_v: if texture transformation is given explicitly by
+   *   matrix/vector.
+   * - uv_shift: contains UV_SHIFT value.
+   * - idx? and uv?: if texture mapping is given explicitly by defining
+   *   the u,v coordinate that belongs to vertex idx? of the polygon.
+   * - polyname: name of polygon to which this texture description belongs.
+   *   This is used to make errormessages more verbose.
+   *
    * \sa #CSTEX_UV
    */
   bool ParseTextureMapping (iDocumentNode* node,
@@ -217,7 +216,8 @@ public:
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*)
   {
-    csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(
+    	CS_NODE_ELEMENT, 0);
     paramsNode->SetValue("params");
     return WriteFactory (obj, paramsNode);
   };

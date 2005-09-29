@@ -69,7 +69,10 @@ private:
   // the sound handle
   csRef<csSoundHandleOpenAL> SoundHandle;
 
-  /// If this is false the data is streamed and we must continually pull more data from the data source during playback
+  /**
+   * If this is false the data is streamed and we must continually pull more
+   * data from the data source during playback
+   */
   bool Static;
 
   // OpenAL related values
@@ -77,10 +80,12 @@ private:
   ALuint source;
   int frequency;
 
-  /** OpenAL cannot play when there are no buffers to be played, so we use this as our official playing indicator.
+  /**
+   * OpenAL cannot play when there are no buffers to be played, so we use
+   * this as our official playing indicator.
    * 
-   * When the Write() member function is called, if the source is not really playing we should start playback
-   *   and set this to false;
+   * When the Write() member function is called, if the source is not really
+   * playing we should start playback and set this to false;
    */
   bool SourcePlaying; 
 
@@ -92,40 +97,52 @@ private:
 
   int mode;
 
-  /** Called from the handle to notify the source that the underlying stream has reached the end.
+  /**
+   * Called from the handle to notify the source that the underlying stream
+   * has reached the end.
    *
-   *  This function is called when the handler's advanced pointer reaches the end of it's stream data if 
-   *    it was not played in a looping mode.  This does not mean that the source should immediately stop
-   *    since the source will usually have more data buffered to be played.
-   *    Rather, it tells the source that the source's Write() member function has been called for the final
-   *    time, and the source should begin checking for the actual end of playback when WatchBufferEnd() is called.
+   * This function is called when the handler's advanced pointer reaches the
+   * end of it's stream data if was not played in a looping mode.  This does
+   * not mean that the source should immediately stop since the source will
+   * usually have more data buffered to be played.
+   * Rather, it tells the source that the source's Write() member function
+   * has been called for the final time, and the source should begin
+   * checking for the actual end of playback when WatchBufferEnd() is called.
    *
-   *  The OpenAL plugin does not need to perform any processing in this call.
+   * The OpenAL plugin does not need to perform any processing in this call.
    */
   void NotifyStreamEnd();
 
-  /** Called from the handle instead of Write() while the source is still in a playing state but the handle's data stream has ended.
+  /**
+   * Called from the handle instead of Write() while the source is still in
+   * a playing state but the handle's data stream has ended.
    *
-   *  This function should perform any checks necessary to determine wether the underlying sound system has finished playing all buffered
-   *    data in the stream.  It should stop the source (such that IsPlaying() will return false) when this happens.
+   * This function should perform any checks necessary to determine wether
+   * the underlying sound system has finished playing all buffered
+   * data in the stream.  It should stop the source (such that IsPlaying()
+   * will return false) when this happens.
    *
-   *  OpenAL sources automatically stop when they run out of data.  For this reason IsPlaying() cannot directly return the status of the
-   *    OpenAL source.  However, we can check the status of the OpenAL source in this function since we know all remaining data has been
-   *    buffered.
+   * OpenAL sources automatically stop when they run out of data.  For this
+   * reason IsPlaying() cannot directly return the status of the
+   * OpenAL source.  However, we can check the status of the OpenAL source
+   * in this function since we know all remaining data has been
+   * buffered.
    */
   void WatchBufferEnd();
 
-  /** Called from the handle to send a block of data to the sound system for this source.
+  /**
+   * Called from the handle to send a block of data to the sound system for
+   * this source.
    *
-   *  OpenAL uses a rather abstract notion of buffers for the purpose of data passing.  Buffers have no set size.  Buffers are
-   *    generated, data is added, and the buffer is queued.  Some time after the buffer is played it is released to a state
-   *
+   * OpenAL uses a rather abstract notion of buffers for the purpose of data
+   * passing.  Buffers have no set size.  Buffers are
+   * generated, data is added, and the buffer is queued.  Some time after the
+   * buffer is played it is released to a state
    */
   void Write(void *Data, unsigned long NumBytes);
 
   friend class csSoundRenderOpenAL;
   friend class csSoundHandleOpenAL;
-
 };
 
 #endif // __CS_SNDSRCOPENAL_H__

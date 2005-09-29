@@ -229,7 +229,8 @@ public:
     {
       SCF_DESTRUCT_IBASE ();
     }
-    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
+    virtual void PreGetBuffer (csRenderBufferHolder* holder,
+    	csRenderBufferName buffer)
     {
       parent->PreGetBuffer (holder, buffer);
     }

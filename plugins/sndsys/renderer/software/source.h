@@ -44,7 +44,10 @@ class csSourceParametersBasic
 {
 public:
   csSourceParametersBasic() {}
-  csSourceParametersBasic(const csSourceParametersBasic *copyfrom) { Copy(copyfrom); }
+  csSourceParametersBasic(const csSourceParametersBasic *copyfrom)
+  {
+    Copy(copyfrom);
+  }
 
   ~csSourceParametersBasic() {}
 
@@ -127,7 +130,8 @@ public:
     va_start (arg, msg);
 
     if (reporter)
-      reporter->ReportV (severity, "crystalspace.sound2.renderer.software.filter", msg, arg);
+      reporter->ReportV (severity,
+      	"crystalspace.sound2.renderer.software.filter", msg, arg);
     else
     {
       csPrintfV (msg, arg);
@@ -140,12 +144,16 @@ protected:
   iSndSysSoftwareFilter3D *next_filter;
 };
 
-// When used on an FIR floating average low pass filter, the number of samples determines the time over which
-//  the average is applied.  The frequency of the playback stream divided by the samples should yeild the cutoff frequency.
-// One downside of this is that the filter will need to process this many samples before it starts providing an even output.
-// This should be avoidable by 'priming' the filter history with the first LOWPASS_SAMPLES passed in prior to generating the first
-//  output sample.  This presumes the first LOWPASS_SAMPLES*2 are relatively uniform, but the filter itself relies on the relative
-//  uniform distribution of sound waves anyway.
+// When used on an FIR floating average low pass filter, the number of
+// samples determines the time over which the average is applied.  The
+// frequency of the playback stream divided by the samples should yield
+// the cutoff frequency. One downside of this is that the filter will need
+// to process this many samples before it starts providing an even output.
+// This should be avoidable by 'priming' the filter history with the first
+// LOWPASS_SAMPLES passed in prior to generating the first
+// output sample.  This presumes the first LOWPASS_SAMPLES*2 are relatively
+// uniform, but the filter itself relies on the relative uniform
+// distribution of sound waves anyway.
 #define LOWPASS_SAMPLES 8
 
 // 44100/128 = Thick muffle
@@ -153,11 +161,13 @@ protected:
 // 44100/8 = 
 
 
-class SndSysSourceSoftwareFilter_LowPass : public SndSysSourceSoftwareFilter_Base
+class SndSysSourceSoftwareFilter_LowPass :
+	public SndSysSourceSoftwareFilter_Base
 {
 public:
-  SndSysSourceSoftwareFilter_LowPass() : SndSysSourceSoftwareFilter_Base(), 
-sum(0), idx(0), primed(false)
+  SndSysSourceSoftwareFilter_LowPass() :
+  	SndSysSourceSoftwareFilter_Base(), 
+	sum(0), idx(0), primed(false)
   {
     int i;
     for (i=0;i<LOWPASS_SAMPLES;i++)
@@ -239,12 +249,12 @@ protected:
   csSoundSample sum;
   size_t idx;
   bool primed;
-
 };
 
 
 
-class SndSysSourceSoftwareFilter_SplitPath : public SndSysSourceSoftwareFilter_Base
+class SndSysSourceSoftwareFilter_SplitPath :
+	public SndSysSourceSoftwareFilter_Base
 {
 public:
   SndSysSourceSoftwareFilter_SplitPath() : SndSysSourceSoftwareFilter_Base(), 
@@ -268,12 +278,15 @@ public:
     }
     // Copy to the second buffer
     if (second_filter)
-      memcpy(second_buffer,properties.work_buffer, properties.buffer_samples * sizeof(csSoundSample));
+      memcpy(second_buffer,properties.work_buffer,
+      	properties.buffer_samples * sizeof(csSoundSample));
 
     if (second_filter)
     {
-      memcpy(&second_props, &properties, sizeof(iSndSysSoftwareFilter3DProperties));
-      memcpy(second_buffer, properties.work_buffer, properties.buffer_samples * sizeof(csSoundSample));
+      memcpy(&second_props, &properties,
+      	sizeof(iSndSysSoftwareFilter3DProperties));
+      memcpy(second_buffer, properties.work_buffer,
+      	properties.buffer_samples * sizeof(csSoundSample));
       second_props.work_buffer=second_buffer;
     }
 
@@ -290,7 +303,8 @@ public:
     }
   }
 
-  bool AddSubFilterPtr(iSndSysSoftwareFilter3D *add, iSndSysSoftwareFilter3D **spot)
+  bool AddSubFilterPtr(iSndSysSoftwareFilter3D *add,
+  	iSndSysSoftwareFilter3D **spot)
   {
     if (*spot)
     {
@@ -329,10 +343,12 @@ protected:
 };
 
 
-class SndSysSourceSoftwareFilter_ITDDelay : public SndSysSourceSoftwareFilter_Base
+class SndSysSourceSoftwareFilter_ITDDelay :
+	public SndSysSourceSoftwareFilter_Base
 {
 public:
-  SndSysSourceSoftwareFilter_ITDDelay() : SndSysSourceSoftwareFilter_Base(), history_buffer(0), history_samples(0)
+  SndSysSourceSoftwareFilter_ITDDelay() :
+  	SndSysSourceSoftwareFilter_Base(), history_buffer(0), history_samples(0)
   {
   }
   virtual ~SndSysSourceSoftwareFilter_ITDDelay()
@@ -586,7 +602,7 @@ public:
           }
           //memcpy(&(properties.work_buffer[delay_samples]), 
 	    //properties.work_buffer, 
-	    //(properties.buffer_samples- delay_samples) * sizeof(csSoundSample));
+	    //(properties.buffer_samples-delay_samples)*sizeof(csSoundSample));
         }
         //memcpy(properties.work_buffer, 
 	  //&(history_buffer[history_samples-(history_shift + delay_samples)]), 
@@ -661,7 +677,8 @@ public:
     */
 
     for (i=0;i<properties.buffer_samples;i++)
-      properties.work_buffer[i]=(properties.work_buffer[i] * int_vol) / SOURCE_INTEGER_VOLUME_MULTIPLE;
+      properties.work_buffer[i]=(properties.work_buffer[i] * int_vol)
+      	/ SOURCE_INTEGER_VOLUME_MULTIPLE;
   
     if (next_filter)
       next_filter->Apply(properties);
@@ -671,7 +688,8 @@ public:
 };
 
 
-class SndSysSourceSoftwareFilter_DirectFade : public SndSysSourceSoftwareFilter_Base
+class SndSysSourceSoftwareFilter_DirectFade :
+	public SndSysSourceSoftwareFilter_Base
 {
 public:
   SndSysSourceSoftwareFilter_DirectFade() : SndSysSourceSoftwareFilter_Base()
@@ -862,15 +880,24 @@ protected:
   csSourceParameters3D active_parameters,queued_parameters;
   bool queued_updates;
 
-  /// The working buffer is where the samples from one channel at a time are manipulated
+  /**
+   * The working buffer is where the samples from one channel at a time are
+   * manipulated
+   */
   csSoundSample *clean_buffer;
   size_t clean_buffer_samples;
 
-  /// The working buffer is where the samples from one channel at a time are manipulated
+  /**
+   * The working buffer is where the samples from one channel at a time are
+   * manipulated
+   */
   csSoundSample *working_buffer;
   size_t working_buffer_samples;
 
-  /// The historic buffer contains samples that were previously delivered for use in effects
+  /**
+   * The historic buffer contains samples that were previously delivered for
+   * use in effects
+   */
   //csSoundSample *historic_buffer;
   //size_t historic_buffer_samples;
 

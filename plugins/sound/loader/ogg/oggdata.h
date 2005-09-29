@@ -40,7 +40,7 @@
 
 class csOggSoundData : public iSoundData
 {
- public:
+public:
   struct datastore
   {
     unsigned char *data;
@@ -67,7 +67,7 @@ class csOggSoundData : public iSoundData
   };
 
 
- public:
+public:
   struct cs_ov_callbacks
   {
     cs_ov_callbacks ();
@@ -77,7 +77,7 @@ class csOggSoundData : public iSoundData
     long   (*tell_func) (void *datasource);
   };
 
- protected:
+protected:
   OggVorbis_File vf;
   datastore *ds;
   int endian;
@@ -87,7 +87,7 @@ class csOggSoundData : public iSoundData
   uint8 *buf;
   size_t len;
 
- public:
+public:
   SCF_DECLARE_IBASE;
 
   csOggSoundData (iBase *parent, uint8 *data, size_t len);

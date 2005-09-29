@@ -74,29 +74,30 @@ private:
       TEXTUREMAX = 16
     };
 
-    //buffer mappings
-    //default mapping, index is csVertexAttrib (16 first), value is csRenderBufferName
+    // buffer mappings
+    // default mapping, index is csVertexAttrib (16 first), value is
+    // csRenderBufferName
     csRenderBufferName defaultMappings[STREAMMAX];
     csArray<csStringID> custommapping_id;
     csDirtyAccessArray<csVertexAttrib> custommaping_attrib;
     csArray<bool> custommapping_generic;
     csDirtyAccessArray<csRef<csShaderVariable> > custommapping_variables;
 
-    //texture mappings
+    // texture mappings
     csStringID textureID[TEXTUREMAX];
     csRef<csShaderVariable> textureRef[TEXTUREMAX];
     csRef<csShaderVariable> autoAlphaTexRef;
     int textureCount;
 
-    //programs
+    // programs
     csRef<iShaderProgram> vp;
     csRef<iShaderProgram> fp;
     csRef<iShaderProgram> vproc;
 
-    //writemasks
+    // writemasks
     bool wmRed, wmGreen, wmBlue, wmAlpha;
 
-    //variable context
+    // variable context
     csShaderVariableContext svcontext;
 
     csXMLShaderTech* owner;
@@ -139,8 +140,8 @@ private:
   // load a shaderdefinition block
   //bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
   // load a shaderprogram
-  csPtr<iShaderProgram> LoadProgram (iShaderTUResolver* tuResolve, iDocumentNode *node, 
-    shaderPass *pass);
+  csPtr<iShaderProgram> LoadProgram (iShaderTUResolver* tuResolve,
+  	iDocumentNode *node, shaderPass *pass);
   // Set reason for failure.
   void SetFailReason (const char* reason, ...) CS_GNUC_PRINTF (2, 3);
 
