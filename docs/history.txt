@@ -31,6 +31,8 @@ chronological order.
 	  need further development to make useful. It can be retreived from
 	  the attic with the PRE_FOLIAGE_REMOVAL tag.
 	- mdmkolbe fixed a build error due to integer-size ambiguity.
+	- res added some protections against IncRef()ing objects from the
+	  destructor or excess DecRef()ing objects to scfImplementation<>.
 28-Sep-2005
 	- Jorrit caused much wailing and gnashing of teeth as everyone will
 	  have to rebuild CS and everyone will get a new set of auto-generated

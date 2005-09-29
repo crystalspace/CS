@@ -127,6 +127,8 @@ public:
 
   void DecRef ()
   {
+    CS_ASSERT_MSG("Refcount decremented for destroyed object", 
+      scfRefCount != 0);
     scfRefCount--;
     if (scfRefCount == 0)
     {
@@ -138,6 +140,8 @@ public:
 
   void IncRef ()
   {
+    CS_ASSERT_MSG("Refcount incremented from inside dtor", 
+      scfRefCount != 0);
     scfRefCount++;
   }
 
