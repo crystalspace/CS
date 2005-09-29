@@ -22,6 +22,7 @@
 #include "csgeom/triangulate.h"
 #include "csutil/cscolor.h"
 #include "cstool/pen.h"
+#include "registrar.h"
 
 /** file Flexible Vector Graphics shape definitions.
  */
@@ -33,7 +34,7 @@ namespace aws
 
     /** The attributes of any given shape. If the shape is stroked AND filled, it will be filled first,
     * and stroked second. */
-    struct shape_attr
+    struct shape_attr : public csRefCount
     {
       /** The color to stroke the shape in. */
       csColor4 stroke_color;
@@ -49,6 +50,9 @@ namespace aws
 
       /** The scaling vector. */
       csVector2 scale;
+
+      /** The variable scope for this shape. */
+      csRef<autom::scope> sc;
 
       /** True if this shape is stroked. */
       bool stroked;
@@ -71,14 +75,21 @@ namespace aws
     {
     protected:
       /** The attributes of this shape. */
-      shape_attr attr;
+      csRef<shape_attr> attr;
 
     public:
+      shape() {}
+      shape(shape_attr *_attr):attr(_attr) {}
+      virtual ~shape() {}
+
       /** Set the attributes for this shape. */
-      void SetAttr(shape_attr &_attr) { attr = _attr; }
+      void SetAttr(csRef<shape_attr> &_attr) { attr = _attr; }
+
+      /** Set the attributes for this shape. */
+      void SetAttr(shape_attr* _attr) { attr = _attr; }
 
       /** Read the attributes for this shape. */
-      const shape_attr& GetAttr()	{ return attr;  } 
+      const shape_attr& GetAttr()	{ return *attr;  } 
 
       /** Draw this shape. */
       virtual void Draw(iPen *pen)=0;
@@ -117,24 +128,27 @@ namespace aws
       }
 
     public:
-      rect(RECT_STYLE _rect_style, const csVector2 &_tl, const csVector2 &_br, float _roundness_or_miter=0.0):roundness(_roundness_or_miter),
-											 tl(_tl), br(_br),
-											 rect_style(_rect_style) {}
+      rect(RECT_STYLE _rect_style, shape_attr *_attr, 
+	    const csVector2 &_tl, const csVector2 &_br, 
+	    float _roundness_or_miter=0.0):shape(_attr), roundness(_roundness_or_miter),
+					   tl(_tl), br(_br),
+					   rect_style(_rect_style) {}
+
 
       virtual ~rect() {}
 
       /** Draws the rectangle according to the shape and style information present. */
       virtual void Draw(iPen *pen)
       {
-        if (attr.filled)
+        if (attr->filled)
 	{
-	  pen->SetColor(attr.fill_color);
+	  pen->SetColor(attr->fill_color);
 	  draw_rect(pen, true);
 	}
 
-	if (attr.stroked)
+	if (attr->stroked)
 	{
-	   pen->SetColor(attr.stroke_color);
+	   pen->SetColor(attr->stroke_color);
 	   draw_rect(pen, false);
 	}
       }
@@ -153,22 +167,25 @@ namespace aws
       float ea;      
     
     public:
-      ellipse(csVector2 &_tl, csVector2 &_br, float _sa=0.0, float _ea=6.2831853):tl(_tl), br(_br), sa(_sa), ea(_ea) {}
+      ellipse(shape_attr *_attr, csVector2 &_tl, csVector2 &_br, 
+	      float _sa=0.0, float _ea=6.2831853):shape(_attr), 
+						  tl(_tl), br(_br), 
+						  sa(_sa), ea(_ea) {}
 									
       virtual ~ellipse() {}
 
       /** Draws the ellipse according to the shape and style information present. */
       virtual void Draw(iPen *pen)
       {
-        if (attr.filled)
+        if (attr->filled)
 	{
-	  pen->SetColor(attr.fill_color);
+	  pen->SetColor(attr->fill_color);
 	  pen->DrawArc((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, sa, ea, false, true);
 	}
 
-	if (attr.stroked)
+	if (attr->stroked)
 	{
-	   pen->SetColor(attr.stroke_color);
+	   pen->SetColor(attr->stroke_color);
 	   pen->DrawArc((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, sa, ea, false, false);
 	}
       }
@@ -181,16 +198,16 @@ namespace aws
       csVector2 tl, br;
     
     public:
-      line(csVector2 &_tl, csVector2 &_br):tl(_tl), br(_br) {}
+      line(shape_attr *_attr, csVector2 &_tl, csVector2 &_br):shape(_attr), tl(_tl), br(_br) {}
 									
       virtual ~line() {}
 
       /** Draws the ellipse according to the shape and style information present. */
       virtual void Draw(iPen *pen)
       {
-	if (attr.stroked)
+	if (attr->stroked)
 	{
-	   pen->SetColor(attr.stroke_color);
+	   pen->SetColor(attr->stroke_color);
 	   pen->DrawLine((int)tl.x, (int)tl.y, (int)br.x, (int)br.y);
 	}
       }
@@ -244,9 +261,9 @@ namespace aws
       /** Draws the ellipse according to the shape and style information present. */
       virtual void Draw(iPen *pen)
       {
-        if (attr.filled && closed)
+        if (attr->filled && closed)
 	{
-	  pen->SetColor(attr.fill_color);
+	  pen->SetColor(attr->fill_color);
 
 	  // Draw all the triangles generated from the polygon.          
 	  for(size_t i=0; i<tri_mesh.GetTriangleCount(); ++i)
@@ -259,9 +276,9 @@ namespace aws
 	  }
 	}
 
-	if (attr.stroked)
+	if (attr->stroked)
 	{
-	   pen->SetColor(attr.stroke_color);
+	   pen->SetColor(attr->stroke_color);
 
 	   for(size_t i=0; i<poly.Length()-1; ++i)
 	   {

@@ -43,7 +43,7 @@ namespace aws
       return end-base;
     }
 
-    void fvg_parser::ParsePath(object *vo, shape_attr &attr, csString &path, autom::scope &sc)
+    void fvg_parser::ParsePath(object *vo, csString &path, shape_attr *attr)
     {
       float lx = 0, ly = 0;
       const char *pos = path.GetData();
@@ -213,34 +213,47 @@ namespace aws
       return c;
     }
 
-    void fvg_parser::FillAttribute(shape_attr &attr, csRef<iDocumentNode> &pos, autom::scope &sc)
+    shape_attr * fvg_parser::FillAttribute(csRef<iDocumentNode> &pos, shape_attr *parent_attr)
     {
       const char *tmp = pos->GetAttributeValue("fill");
-      
+      bool any_item=false;
+
+      // Create a new shape attribute that inherits from the parent.
+      shape_attr *attr = new shape_attr;
+      memcpy(attr, parent_attr, sizeof(shape_attr));
+            
       if (tmp)
       {
-	attr.filled=true;
-	attr.fill_color = ParseColor(tmp);
+	attr->filled=true;
+	attr->fill_color = ParseColor(tmp);
+	any_item=true;
       }
 
       tmp = pos->GetAttributeValue("stroke");
 
       if (tmp)
       {
-	attr.stroked=true;
-	attr.stroke_color = ParseColor(tmp);
+	attr->stroked=true;
+	attr->stroke_color = ParseColor(tmp);
+	any_item=true;
       }
 
       tmp = pos->GetAttributeValue("stroke-opacity");
 
       if (tmp)      
-	attr.stroke_color.alpha = pos->GetAttributeValueAsFloat("stroke-opacity");
+      {
+	attr->stroke_color.alpha = pos->GetAttributeValueAsFloat("stroke-opacity");
+	any_item=true;
+      }
       
 
       tmp = pos->GetAttributeValue("fill-opacity");
 
       if (tmp)      
-	attr.fill_color.alpha = pos->GetAttributeValueAsFloat("fill-opacity");
+      {
+	attr->fill_color.alpha = pos->GetAttributeValueAsFloat("fill-opacity");
+	any_item=true;
+      }
 
       tmp = pos->GetAttributeValue("transform");
 
@@ -248,11 +261,20 @@ namespace aws
       {
 	// float tx, ty, ra, sx, sy;
 	// parse the transform stack...	
+	any_item=true;
+      }
+
+      // If there were no shape-specific attributes, then just return the parent attribute object.
+      if (!any_item)
+      {
+	delete attr;
+	return parent_attr;
       }
       
+      return attr;
     }
     
-    void fvg_parser::ParseNode(object *vo, csRef<iDocumentNodeIterator> &pos, autom::scope &sc)
+    void fvg_parser::ParseNode(object *vo, csRef<iDocumentNodeIterator> &pos, shape_attr *attr)
     {
       // Walk through all of the nodes and
       while(pos->HasNext())
@@ -273,30 +295,24 @@ namespace aws
 	  object *_vo = new object();
 
 	  // Create an attribute object.
-	  shape_attr attr;
+	  shape_attr *_attr = FillAttribute(child, attr);
     
-	  // Fill the attribute structure.
-	  FillAttribute(attr, child, sc);	  	  
-
 	  // Insert it into the map.
 	  fvg_shapes[child->GetAttributeValue("id")] = _vo;
 	  
 	  // Parse it.
-	  ParseNode(_vo, new_pos, sc);
+	  ParseNode(_vo, new_pos, _attr);
 	}      
 	else if (vo!=0)
 	{
-	   // Create an attribute object.
-	  shape_attr attr;
-    
-	  // Fill the attribute structure.
-	  FillAttribute(attr, child, sc);	
+	  // Create an attribute object.
+	  shape_attr *_attr = FillAttribute(child, attr);	
 
 	  // If we have a graphics object, start interpreting graphics commands.
 	  if (name=="path")
 	  {
 	    csString v(child->GetAttributeValue("d"));
-            ParsePath(vo, attr, v, sc);
+            ParsePath(vo, v, _attr);
 	  }
 	  else if(name=="rect")
 	  {
@@ -311,11 +327,11 @@ namespace aws
 	    miter = child->GetAttributeValueAsFloat("miter");
 
 	    if (roundness>0)	    
-	      vo->AddShape(new rect(RECT_ROUNDED, csVector2(x,y), csVector2(x+width, y+height), roundness));
+	      vo->AddShape(new rect(RECT_ROUNDED, _attr, csVector2(x,y), csVector2(x+width, y+height), roundness));
 	    else if (miter>0)
-	      vo->AddShape(new rect(RECT_MITERED, csVector2(x,y), csVector2(x+width, y+height), miter));
+	      vo->AddShape(new rect(RECT_MITERED, _attr, csVector2(x,y), csVector2(x+width, y+height), miter));
 	    else
-	      vo->AddShape(new rect(RECT_NORMAL, csVector2(x,y), csVector2(x+width, y+height), 0));	    
+	      vo->AddShape(new rect(RECT_NORMAL, _attr, csVector2(x,y), csVector2(x+width, y+height), 0));	    
 	  }
 	  else if(name=="circle")
 	  {
@@ -326,7 +342,7 @@ namespace aws
 	    r = child->GetAttributeValueAsFloat("r");
 
 	    csVector2 e1(x-r,y-r), e2(x+r, y+r);
-	    vo->AddShape(new ellipse(e1, e2));
+	    vo->AddShape(new ellipse(_attr, e1, e2));
 	  }
 	  else if(name=="ellipse")
 	  {
@@ -338,7 +354,7 @@ namespace aws
 	    ry = child->GetAttributeValueAsFloat("ry");
 
 	    csVector2 e1(x-rx,y-ry), e2(x+rx, y+ry);
-	    vo->AddShape(new ellipse(e1, e2));
+	    vo->AddShape(new ellipse(_attr, e1, e2));
 	  }
           else if(name=="line")
 	  {
@@ -350,14 +366,14 @@ namespace aws
 	    y2 = child->GetAttributeValueAsFloat("y2");
 
 	    csVector2 s1(x1,y1), s2(x2, y2);
-	    vo->AddShape(new line(s1, s2));
+	    vo->AddShape(new line(_attr, s1, s2));
 	  }
 	}
 
       } // end while more nodes left.
     }
 
-    bool fvg_parser::Parse (const scfString &txt, autom::scope &sc)
+    bool fvg_parser::Parse (const scfString &txt, autom::scope *sc)
     {
       csRef<iDocumentSystem> xml;
       xml.AttachNew (new csTinyDocumentSystem ());
@@ -368,7 +384,21 @@ namespace aws
       csRef< iDocumentNode > node = doc->GetRoot();
       csRef< iDocumentNodeIterator> pos = node->GetNodes();
 
-      ParseNode(0, pos, sc);
+      // If no attribute is given, create one.
+      
+      shape_attr *attr = new shape_attr;
+
+      attr->stroked=true;
+      attr->stroke_color = csColor4(0,0,0,1);
+
+      attr->filled=false;
+      attr->rotated=false;
+      attr->translated=false;
+      attr->scaled=false;
+
+      attr->sc = sc;
+
+      ParseNode(0, pos, attr);
 
       return true;
     }

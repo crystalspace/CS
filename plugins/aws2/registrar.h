@@ -31,7 +31,7 @@ namespace autom
    * A scope object holds variables.  They are represented by a map from an
    * string to an object pointer.
    */
-  class scope
+  class scope : public csRefCount
   {
     /** The type of map between a variable name and the object it maps. */
     typedef std::map<uint, keeper> variable_map_type;
