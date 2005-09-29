@@ -941,9 +941,11 @@ bool csArchive::ArchiveEntry::WriteLFH (FILE *outfile)
   BUFF_SET_LONG (L_CRC32, info.crc32);
   BUFF_SET_LONG (L_COMPRESSED_SIZE, info.csize);
   BUFF_SET_LONG (L_UNCOMPRESSED_SIZE, info.ucsize);
-  BUFF_SET_SHORT (L_FILENAME_LENGTH, info.filename_length = (ush)strlen (filename));
+  info.filename_length = (ush)strlen (filename);
+  BUFF_SET_SHORT (L_FILENAME_LENGTH, info.filename_length);
+  info.extra_field_length = extrafield ? info.extra_field_length : 0;
   BUFF_SET_SHORT (L_EXTRA_FIELD_LENGTH,
-                  info.extra_field_length = extrafield ? info.extra_field_length : 0);
+                  info.extra_field_length);
 
   if ((fwrite (hdr_local, 1, sizeof (hdr_local), outfile) < sizeof (hdr_local))
       || (fwrite (buff, 1, ZIP_LOCAL_FILE_HEADER_SIZE, outfile) < ZIP_LOCAL_FILE_HEADER_SIZE)
@@ -973,12 +975,15 @@ bool csArchive::ArchiveEntry::WriteCDFH (FILE *outfile)
   BUFF_SET_LONG (C_COMPRESSED_SIZE, info.csize);
   BUFF_SET_LONG (C_UNCOMPRESSED_SIZE, info.ucsize);
 
-  BUFF_SET_SHORT (C_FILENAME_LENGTH, info.filename_length = (ush)strlen (filename));
-  /* We're ignoring extra field for central directory, although InfoZIP puts there a field containing EF_TIME -
-     universal timestamp - but for example DOS pkzip/pkunzip does not put nothing there. */
+  info.filename_length = (ush)strlen (filename);
+  BUFF_SET_SHORT (C_FILENAME_LENGTH, info.filename_length);
+  /* We're ignoring extra field for central directory, although InfoZIP puts 
+   * there a field containing EF_TIME - universal timestamp - but for example
+   * DOS pkzip/pkunzip does not put nothing there. */
   BUFF_SET_SHORT (C_EXTRA_FIELD_LENGTH, 0);
+  info.file_comment_length = comment ? info.file_comment_length : 0;
   BUFF_SET_SHORT (C_FILE_COMMENT_LENGTH,
-                  info.file_comment_length = comment ? info.file_comment_length : 0);
+                  info.file_comment_length);
   BUFF_SET_SHORT (C_DISK_NUMBER_START, info.disk_number_start);
   BUFF_SET_SHORT (C_INTERNAL_FILE_ATTRIBUTES, info.internal_file_attributes);
   BUFF_SET_LONG (C_EXTERNAL_FILE_ATTRIBUTES, info.external_file_attributes);
