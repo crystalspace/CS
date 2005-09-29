@@ -960,6 +960,7 @@ void csODECollider::ClearContents ()
   surfacedata[2] = 0;
   density = 0;
   spaceID = 0;
+ 
   transformID = dCreateGeomTransform (0);
   dGeomTransformSetCleanup (transformID, 1);
   geom_type = (csColliderGeometryType) 0;
@@ -1220,6 +1221,10 @@ csOrthoTransform csODECollider::GetTransform ()
 }
 void csODECollider::AddTransformToSpace (dSpaceID spaceID)
 {
+  dSpaceID gspace = dGeomGetSpace (geomID);
+  if (gspace)
+    dSpaceRemove (gspace, geomID);
+
   if (geomID && !dGeomTransformGetGeom(transformID))
     dGeomTransformSetGeom (transformID, geomID);
   dSpaceID prev = dGeomGetSpace (transformID);
