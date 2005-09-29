@@ -60,14 +60,15 @@ char csArchive::hdr_extlocal[4] = {'P', 'K', EXTD_LOCAL_SIG};
 //-- Endianess handling -----------------------------------------------------
 
 #define BUFF_GET_(ofs, Type) \
-  csLittleEndian::Convert (csGetFromAddress::Type ((uint8 *)&buff[ofs]))
+  csLittleEndian::Type (csGetFromAddress::Type ((uint8 *)&buff[ofs]))
 #define BUFF_GET_SHORT(ofs)     BUFF_GET_(ofs, UInt16)
 #define BUFF_GET_LONG(ofs)      BUFF_GET_(ofs, UInt32)
 
-#define BUFF_SET_(ofs, val, Type) \
-  csSetToAddress::Type ((uint8 *)&buff[ofs], csLittleEndian::Convert (val))
-#define BUFF_SET_SHORT(ofs,val) BUFF_SET_(ofs, val, UInt16)
-#define BUFF_SET_LONG(ofs,val)  BUFF_SET_(ofs, val, UInt32)
+#define BUFF_SET_(ofs, val, Type, Type2)      \
+  csSetToAddress::Type ((uint8 *)&buff[ofs],  \
+    csLittleEndian::Convert ((Type2)val))
+#define BUFF_SET_SHORT(ofs,val) BUFF_SET_(ofs, val, UInt16, uint16)
+#define BUFF_SET_LONG(ofs,val)  BUFF_SET_(ofs, val, UInt32, uint32)
 
 //-- Archive class implementation -------------------------------------------
 
@@ -975,7 +976,7 @@ bool csArchive::ArchiveEntry::WriteCDFH (FILE *outfile)
   BUFF_SET_SHORT (C_FILENAME_LENGTH, info.filename_length = (ush)strlen (filename));
   /* We're ignoring extra field for central directory, although InfoZIP puts there a field containing EF_TIME -
      universal timestamp - but for example DOS pkzip/pkunzip does not put nothing there. */
-  BUFF_SET_SHORT (C_EXTRA_FIELD_LENGTH, (uint16)0);
+  BUFF_SET_SHORT (C_EXTRA_FIELD_LENGTH, 0);
   BUFF_SET_SHORT (C_FILE_COMMENT_LENGTH,
                   info.file_comment_length = comment ? info.file_comment_length : 0);
   BUFF_SET_SHORT (C_DISK_NUMBER_START, info.disk_number_start);
