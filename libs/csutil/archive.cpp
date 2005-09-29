@@ -975,7 +975,7 @@ bool csArchive::ArchiveEntry::WriteCDFH (FILE *outfile)
   BUFF_SET_SHORT (C_FILENAME_LENGTH, info.filename_length = (ush)strlen (filename));
   /* We're ignoring extra field for central directory, although InfoZIP puts there a field containing EF_TIME -
      universal timestamp - but for example DOS pkzip/pkunzip does not put nothing there. */
-  BUFF_SET_SHORT (C_EXTRA_FIELD_LENGTH, 0);
+  BUFF_SET_SHORT (C_EXTRA_FIELD_LENGTH, (uint16)0);
   BUFF_SET_SHORT (C_FILE_COMMENT_LENGTH,
                   info.file_comment_length = comment ? info.file_comment_length : 0);
   BUFF_SET_SHORT (C_DISK_NUMBER_START, info.disk_number_start);
