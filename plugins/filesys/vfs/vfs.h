@@ -179,7 +179,7 @@ public:
 
   /**
    * Expand given virtual path, interpret all "." and ".."'s relative to
-   * 'currend virtual directory'. Return a new iString object.
+   * 'current virtual directory'. Return a new iString object.
    * If IsDir is true, expanded path ends in an '/', otherwise no.
    */
   virtual csPtr<iDataBuffer> ExpandPath (

@@ -233,7 +233,7 @@ struct iVFS : public virtual iBase
 
   /**
    * Expand given virtual path, interpret all "." and ".."'s relative to
-   * 'currend virtual directory'.
+   * 'current virtual directory'.
    * \param Path The path to expand.
    * \param IsDir If true, the expanded path will be terminated with '/'.
    * \return A new iDataBuffer object.
