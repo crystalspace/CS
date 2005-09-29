@@ -108,7 +108,7 @@ public:
 	  {
 	    const size_t vt = outStatus[i].Vertex;
 	    const size_t vt2 = (vt >= 2) ? 0 : vt + 1;
-	    float t = outStatus[i].Pos;
+	    const float t = outStatus[i].Pos;
 
 	    csVector3 vn;
 	    voutPersp.LerpTo ((float*)&vn, vt, vt2, t);
@@ -164,7 +164,8 @@ public:
 	    const float t2 = (y - C.y) / (D.y - C.y);
 	    const float x1 = A.x + t1 * (B.x - A.x);
 	    const float x2 = C.x + t2 * (D.x - C.x);
-	    const float t = (x - x1) / (x2 - x1);
+	    const float dx = (x2 - x1);
+	    const float t = dx ? (x - x1) / dx : 0.0f;
 
 	    csVector3 vn;
 	    voutPersp.Lerp3To ((float*)&vn, edge1[0], edge1[1], t1,

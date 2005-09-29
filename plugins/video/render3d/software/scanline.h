@@ -275,6 +275,7 @@ namespace cspluginSoft3d
     {
       desiredBuffers = 1 << VATTR_BUFINDEX(TEXCOORD);
       csSoftwareTexture* tex = textures[0];
+      if (tex == 0) return 0;      // @@@ Use flat color instead
       bitmap = tex->bitmap;
       bitmap_log2w = tex->get_w_shift();
       and_w = tex->get_w_mask();

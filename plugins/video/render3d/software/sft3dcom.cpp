@@ -4056,6 +4056,19 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   }
 #endif
 
+  csRenderMeshModes usedModes (modes);
+  if (zBufMode == CS_ZBUF_MESH2)
+    usedModes.z_buf_mode = GetZModePass2 (usedModes.z_buf_mode);
+  else if (zBufMode != CS_ZBUF_MESH)
+    usedModes.z_buf_mode = zBufMode;
+
+  ScanlineRenderInfo meowmix;
+  meowmix.renderer = scanlineRenderer;
+  meowmix.proc = scanlineRenderer->Init (activeSoftTex, usedModes,
+    meowmix.desiredBuffers, meowmix.denormFactors, meowmix.denormBuffers);
+  if (!meowmix.proc) // Drat, meowmix can't deliver.
+    return;
+
   if (!persp)
   {
     persp= Get_persp();
@@ -4116,23 +4129,12 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     activebuffers[VATTR_SPEC(POSITION)] = translatedVerts;
   }
 
-  csRenderMeshModes usedModes (modes);
-  if (zBufMode == CS_ZBUF_MESH2)
-    usedModes.z_buf_mode = GetZModePass2 (usedModes.z_buf_mode);
-  else if (zBufMode != CS_ZBUF_MESH)
-    usedModes.z_buf_mode = zBufMode;
-
-  ScanlineRenderInfo sri;
-  sri.renderer = scanlineRenderer;
-  sri.proc = scanlineRenderer->Init (activeSoftTex, usedModes,
-    sri.desiredBuffers, sri.denormFactors, sri.denormBuffers);
-
   const csRenderMeshType meshtype = mesh->meshtype;
   if ((meshtype >= CS_MESHTYPE_TRIANGLES) 
     && (meshtype <= CS_MESHTYPE_TRIANGLEFAN))
   {
     TriangleDrawer triDraw (*this, activebuffers, 
-      rangeStart, rangeEnd, mesh, modes, sri);
+      rangeStart, rangeEnd, mesh, modes, meowmix);
 
     uint indexstart = mesh->indexstart;
     uint indexend = mesh->indexend;
