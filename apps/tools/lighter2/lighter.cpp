@@ -300,7 +300,7 @@ namespace lighter
     //@@HACK, assume visible
     prim.PrepareNoPatches ();
 
-    const float primArea = prim.GetArea ();
+    //const float primArea = prim.GetArea ();
     const float totalArea = (prim.GetuFormVector () % prim.GetvFormVector ()).Norm ();
 
     csVector3 elementCenter = prim.GetMinCoord () + prim.GetuFormVector () * 0.5f + prim.GetvFormVector () * 0.5f;

@@ -44,7 +44,7 @@ namespace lighter
     RadPrimitivePtrArray radPrimitives;
 
     KDTreeNode ()
-      : splitDimension (CS_AXIS_NONE), splitLocation (0.0f),
+      : splitDimension ((uint)CS_AXIS_NONE), splitLocation (0.0f),
       leftChild (0), rightChild (0)
     {}
 
