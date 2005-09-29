@@ -43,7 +43,7 @@ namespace aws
       return end-base;
     }
 
-    void fvg_parser::ParsePath(object *vo, shape_attr &attr, csString &path)
+    void fvg_parser::ParsePath(object *vo, shape_attr &attr, csString &path, autom::scope &sc)
     {
       float lx = 0, ly = 0;
       const char *pos = path.GetData();
@@ -213,7 +213,7 @@ namespace aws
       return c;
     }
 
-    void fvg_parser::FillAttribute(shape_attr &attr, csRef<iDocumentNode> &pos)
+    void fvg_parser::FillAttribute(shape_attr &attr, csRef<iDocumentNode> &pos, autom::scope &sc)
     {
       const char *tmp = pos->GetAttributeValue("fill");
       
@@ -252,7 +252,7 @@ namespace aws
       
     }
     
-    void fvg_parser::ParseNode(object *vo, csRef<iDocumentNodeIterator> &pos)
+    void fvg_parser::ParseNode(object *vo, csRef<iDocumentNodeIterator> &pos, autom::scope &sc)
     {
       // Walk through all of the nodes and
       while(pos->HasNext())
@@ -276,13 +276,13 @@ namespace aws
 	  shape_attr attr;
     
 	  // Fill the attribute structure.
-	  FillAttribute(attr, child);	  	  
+	  FillAttribute(attr, child, sc);	  	  
 
 	  // Insert it into the map.
 	  fvg_shapes[child->GetAttributeValue("id")] = _vo;
 	  
 	  // Parse it.
-	  ParseNode(_vo, new_pos);
+	  ParseNode(_vo, new_pos, sc);
 	}      
 	else if (vo!=0)
 	{
@@ -290,13 +290,13 @@ namespace aws
 	  shape_attr attr;
     
 	  // Fill the attribute structure.
-	  FillAttribute(attr, child);	
+	  FillAttribute(attr, child, sc);	
 
 	  // If we have a graphics object, start interpreting graphics commands.
 	  if (name=="path")
 	  {
 	    csString v(child->GetAttributeValue("d"));
-            ParsePath(vo, attr, v);
+            ParsePath(vo, attr, v, sc);
 	  }
 	  else if(name=="rect")
 	  {
@@ -364,6 +364,11 @@ namespace aws
       csRef<iDocument> doc = xml->CreateDocument ();
 
       doc->Parse(txt.GetData(), true);
+
+      csRef< iDocumentNode > node = doc->GetRoot();
+      csRef< iDocumentNodeIterator> pos = node->GetNodes();
+
+      ParseNode(0, pos, sc);
 
       return true;
     }

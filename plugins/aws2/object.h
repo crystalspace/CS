@@ -552,8 +552,8 @@ namespace autom
   /** Encapsulates a variable object. */
   class var: public object
   {	
-      /** The name of the variable. */
-      csString name;
+      /** The id of the variable. */
+      uint id;
 
       /** The scope where the variable is found. */
       scope *sc;
@@ -563,7 +563,7 @@ namespace autom
 	  virtual ~var() {}
 	  
 	  /** Copy constructor. */
-	  var(const var& s):iObject(), object(s, T_VAR), name(s.name) {}		
+	  var(const var& s):iObject(), object(s, T_VAR), id(0) {}		
 
 	  /** Set the scope for this object. */
 	  void setScope(scope *_sc) { sc=_sc; }

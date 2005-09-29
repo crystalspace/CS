@@ -654,34 +654,33 @@ blob::parseObject(std::string::iterator &pos, const std::string::iterator &end)
 string 
 var::ToString()
 {
-  return sc->get(name)->ToString();
+  return sc->get(id)->ToString();
 }
 
 integer 
 var::ToInt()
 {
-  return sc->get(name)->ToInt();
+  return sc->get(id)->ToInt();
 }
 
 floating 
 var::ToFloat()
 {
-  return sc->get(name)->ToFloat();
+  return sc->get(id)->ToFloat();
 }
 
 csRef<iString> 
 var::ReprObject()
 {
-  scfString *s = new scfString("*");
-  s->Append(name);
-
-  return csPtr<iString>(s);
+  return sc->get(id)->ReprObject();
 }
 
 bool 
 var::parseObject(std::string::iterator &pos, const std::string::iterator &end)
 {
   ++pos;
+
+  csString name;
   
   // Get the name
   while(pos!=end && isalnum(*pos))
@@ -690,6 +689,7 @@ var::parseObject(std::string::iterator &pos, const std::string::iterator &end)
     ++pos;
   }
 
+  id = Registrar()->getId(name);
   return true;
 }
 

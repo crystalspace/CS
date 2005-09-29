@@ -78,13 +78,13 @@ namespace aws
       uint fvg_parser::ParseFloat(const char *base, float &rv);
 
       /** Fills a shape attribute structure from the attributes values in the node. */
-      void FillAttribute(shape_attr &attr, csRef<iDocumentNode> &pos);
+      void FillAttribute(shape_attr &attr, csRef<iDocumentNode> &pos, autom::scope &sc);
 
       /** Parses a shape node. */
-      void ParseNode(object *vo, csRef<iDocumentNodeIterator> &pos);
+      void ParseNode(object *vo, csRef<iDocumentNodeIterator> &pos, autom::scope &sc);
 
       /** Parses a path node, generating drawing instructions into the given vector object. */
-      void ParsePath(object *vo, shape_attr &attr, csString &path);
+      void ParsePath(object *vo, shape_attr &attr, csString &path, autom::scope &sc);
 
     public:
       fvg_parser();
