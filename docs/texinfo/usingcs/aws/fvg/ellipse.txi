@@ -1,0 +1,57 @@
+@c -*-texinfo-*-
+@node AWS, Flexible Vector Graphics Definition
+@subsection FVG ellipse
+
+The ellipse is a generalized circle.  It has separate radi for
+the x and the y coordinates.  You can think of an ellipse as 
+a shape drawn inside a rectangular box, and each edge of the box
+just touching the extremes of the ellipse.
+
+@subsubheading Defining the Shape
+
+Example:
+
+<ellipse cx="100" cy="100" rx="10" ry="30" stroke="#ff0000" fill="#ffffff" />
+
+This creates a flattened ellipse filled with white and bordered by red.
+
+@subsubheading Allowed Parameters
+
+@multitable @columnfractions .25 .40 .35
+@item @emph{Name} @tab @emph{Required} @tab @emph{Example} @tab @emph{Description}
+
+@item @code{cx}
+@tab  yes
+@tab  @code{cx="50"}
+@tab  Sets the center x coordinate of the ellipse.
+
+@item @code{cy}
+@tab  yes
+@tab  @code{cy="50"}
+@tab  Sets the center y coordinate of the ellipse.
+
+@item @code{rx}
+@tab  yes
+@tab  @code{rx="10"}
+@tab  Sets the radius of the x portion of the ellipse.
+
+@item @code{ry}
+@tab  yes
+@tab  @code{ry="40"}
+@tab  Sets the radius of the y portion of the ellipse.
+
+@item @code{stroke}
+@tab  no
+@tab  @code{stroke="#ff0000"}
+@tab  Turns on stroking of the shape, and sets the color.  If this is
+not present, the shape will not be stroked.  This value or fill must
+be present or the shape will be invisible.
+
+@item @code{fill}
+@tab  no
+@tab  @code{fill="#ff0000"}
+@tab  Turns on filling of the shape, and sets the color.  If this is
+not present, the shape will not be filled.  This value or stroke must
+be present or the shape will be invisible.
+
+@end multitable
