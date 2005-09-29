@@ -1,4 +1,0 @@
-SubDir TOP plugins mesh foliage ;
-
-SubInclude TOP plugins mesh foliage object ;
-SubInclude TOP plugins mesh foliage persist ;

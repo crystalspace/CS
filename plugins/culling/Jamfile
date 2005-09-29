@@ -2,4 +2,3 @@ SubDir TOP plugins culling ;
 
 SubInclude TOP plugins culling dynavis ;
 SubInclude TOP plugins culling frustvis ;
-SubInclude TOP plugins culling pvsvis ;

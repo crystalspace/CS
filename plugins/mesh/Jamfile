@@ -6,7 +6,6 @@ SubInclude TOP plugins mesh crossbld ;
 SubInclude TOP plugins mesh emit ;
 SubInclude TOP plugins mesh explo ;
 SubInclude TOP plugins mesh fire ;
-SubInclude TOP plugins mesh foliage ;
 SubInclude TOP plugins mesh fountain ;
 SubInclude TOP plugins mesh genmesh ;
 SubInclude TOP plugins mesh haze ;

@@ -28,7 +28,6 @@
 #include "imesh/emit.h"
 #include "imesh/explode.h"
 #include "imesh/fire.h"
-#include "imesh/foliage.h"
 #include "imesh/fountain.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshanim.h"

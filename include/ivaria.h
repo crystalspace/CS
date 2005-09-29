@@ -33,7 +33,6 @@
 #include "ivaria/movierecorder.h"
 #include "ivaria/ode.h"
 #include "ivaria/pmeter.h"
-#include "ivaria/pvstree.h"
 #include "ivaria/reporter.h"
 #include "ivaria/script.h"
 #include "ivaria/sequence.h"
