@@ -19,9 +19,8 @@
 #include "cssysdef.h"
 #include "soft_txt.h"
 #include "csgfx/inv_cmap.h"
+#include "csgfx/packrgb.h"
 #include "csgfx/quantize.h"
-#include "csutil/scanstr.h"
-#include "csutil/debug.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -36,96 +35,71 @@
 namespace cspluginSoft3d
 {
 
+void csSoftwareTexture::compute_masks ()
+{
+  shf_w = csLog2 (w);
+  and_w = (1 << shf_w) - 1;
+  shf_h = csLog2 (h);
+  and_h = (1 << shf_h) - 1;
+}
+
+void csSoftwareTexture::ImageToBitmap (iImage *Image)
+{
+  size_t pixNum = w * h;
+  bitmap = new uint32[pixNum];
+#ifdef CS_LITTLE_ENDIAN
+  if (csPackRGBA::IsRGBpixelSane())
+  {
+    memcpy (bitmap, Image->GetImageData(), pixNum * sizeof (uint32));
+  }
+  else
+#endif
+  {
+    csRGBpixel* p = (csRGBpixel*)Image->GetImageData();
+    uint32* dst = bitmap;
+    while (pixNum-- > 0)
+    {
+      *dst = p->red
+	  | (p->green <<  8)
+	  | (p->blue  << 16)
+	  | (p->alpha << 24);
+      dst++; p++;
+    }
+  }
+}
+
 //----------------------------------------------- csSoftwareTextureHandle ---//
 
 csSoftwareTextureHandle::csSoftwareTextureHandle (
-	csSoftwareTextureManager *texman, iImage *image, int flags)
-	: csTextureHandle (texman, image, flags)
+	csSoftwareTextureManager *texman, iImage *Image, int flags)
+	: csTextureHandle (texman, flags), image (Image)
 {
-  pal2glob = 0;
   if (flags & CS_TEXTURE_3D)
-    AdjustSizePo2 ();
+  {
+    int newwidth = 0, newheight = 0, newdepth = 0;
+    AdjustSizePo2 (image->GetWidth(), image->GetHeight(), image->GetDepth(),
+      newwidth, newheight, newdepth);
+    if (newwidth != image->GetWidth () || newheight != image->GetHeight ())
+      image = csImageManipulate::Rescale (image, newwidth, newheight, newdepth);
+  }
   this->texman = texman;
-  use_332_palette = false;
-  update_number = (uint32)~0;
-  is_palette_init = false;
   prepared = false;
-  palette_size = 256;
+  memset (tex, 0, sizeof (tex));
+
+  if (image.IsValid() && image->HasKeyColor ())
+  {
+    int r,g,b;
+    image->GetKeyColor (r,g,b);
+    SetKeyColor (r, g, b);
+  }
 }
 
 csSoftwareTextureHandle::~csSoftwareTextureHandle ()
 {
   if (texman) texman->UnregisterTexture (this);
-  delete [] (uint8 *)pal2glob;
 }
 
-void csSoftwareTextureHandle::Setup332Palette ()
-{
-  if (use_332_palette) return;
-
-  use_332_palette = true;
-  // First remap the textures to use standard 3:3:2 palette.
-  int i;
-  for (i = 0 ; i < 4 ; i++)
-  {
-    if (tex [i])
-    {
-      csSoftwareTexture *t = (csSoftwareTexture *)tex [i];
-      if (!t->bitmap) break;
-      int size = t->get_width () * t->get_height ();
-      uint8* bm = t->bitmap;
-      while (size > 0)
-      {
-        const csRGBpixel& p = palette[*bm];
-	*bm++ = ((p.red >> 5) << 5) |
-	        ((p.green >> 5) << 2) |
-	        (p.green >> 6);
-        size--;
-      }
-    }
-  }
-
-  palette_size = 256;
-  delete [] (uint8 *)pal2glob;
-
-  // Remap the pal2glob array.
-  if (texman->pfmt.PixelBytes == 2)
-  {
-    pal2glob = new uint8 [palette_size * sizeof (uint16)];
-    uint16* p2g = (uint16*)pal2glob;
-    for (i = 0 ; i < 256 ; i++)
-    {
-      int r = (i>>5) << 5;
-      int g = ((i>>2) & 0x7) << 5;
-      int b = (i & 0x3) << 6;
-      *p2g++ = texman->encode_rgb (r, g, b);
-    }
-  }
-  else
-  {
-    pal2glob = new uint8 [palette_size * sizeof (uint32)];
-    uint32* p2g = (uint32*)pal2glob;
-    for (i = 0 ; i < 256 ; i++)
-    {
-      int r = (i>>5) << 5;
-      int g = ((i>>2) & 0x7) << 5;
-      int b = (i & 0x3) << 6;
-      *p2g++ = texman->encode_rgb (r, g, b);
-    }
-  }
-  // Remap the palette itself.
-  for (i = 0 ; i < 256 ; i++)
-  {
-    int r = (i>>5) << 5;
-    int g = ((i>>2) & 0x7) << 5;
-    int b = (i & 0x3) << 6;
-    palette[i].red = r;
-    palette[i].green = g;
-    palette[i].blue = b;
-  }
-}
-
-csTexture *csSoftwareTextureHandle::NewTexture (iImage *newImage,
+csSoftwareTexture* csSoftwareTextureHandle::NewTexture (iImage *newImage,
 	bool ismipmap)
 {
   csRef<iImage> Image;
@@ -140,112 +114,39 @@ csTexture *csSoftwareTextureHandle::NewTexture (iImage *newImage,
   return new csSoftwareTexture (this, Image);
 }
 
-void csSoftwareTextureHandle::ComputePalette ()
+void csSoftwareTextureHandle::CreateMipmaps ()
 {
+  if (!image) return;
+
+  csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)0;
+
+  // Delete existing mipmaps, if any
   int i;
-
-  bool destroy_image = true;
-
-  // Compute a common palette for all three mipmaps
-  csColorQuantizer quant;
-  quant.Begin ();
-
-  csRGBpixel *tc = transp ? &transp_color : 0;
-
   for (i = 0; i < 4; i++)
-    if (tex [i])
-    {
-      csSoftwareTexture *t = (csSoftwareTexture *)tex [i];
-      if (!t->image) break;
-      quant.Count ((csRGBpixel *)t->image->GetImageData (),
-        t->get_size (), tc);
-    }
-#if 0
-  // This code makes sure the palette also has sufficient
-  // information to encode a standard 3:3:2 palette.
-  // This is useful when the texture is used as a procedural
-  // texture.
-  csRGBpixel bias[256];
-  for (i = 0 ; i < 256 ; i++)
   {
-    int r = ((i & 0xe0) >> 5) << (8-3);
-    int g = ((i & 0x1c) >> 2) << (8-3);
-    int b = ((i & 0x03) >> 0) << (8-2);
-    bias[i].red = r;
-    bias[i].green = g;
-    bias[i].blue = b;
+    delete tex [i];
   }
-  quant.Count (bias, 256, 0);
+
+  // @@@ Jorrit: removed the following IncRef() because I can really
+  // see no reason for it and it seems to be causing memory leaks.
+#if 0
+  // Increment reference counter on image since NewTexture() expects
+  // a image with an already incremented reference counter
+  image->IncRef ();
 #endif
+  tex [0] = NewTexture (image, false);
 
-  csRGBpixel *pal = palette;
-  palette_size = 256;
-  quant.Palette (pal, palette_size, tc);
-
-  for (i = 0; i < 4; i++)
-    if (tex [i])
-    {
-      csSoftwareTexture *t = (csSoftwareTexture *)tex [i];
-      if (!t->image) break;
-      uint8* bmap = t->bitmap; // Temp assignment to pacify BeOS compiler.
-      if (texman->dither_textures || (flags & CS_TEXTURE_DITHER))
-        quant.RemapDither ((csRGBpixel *)t->image->GetImageData (),
-          t->get_size (), t->get_width (), pal, palette_size, bmap, tc);
-      else
-        quant.Remap ((csRGBpixel *)t->image->GetImageData (),
-          t->get_size (), bmap, tc);
-      t->bitmap = bmap;
-
-      // Get the alpha map for the texture, if present
-      if (t->image->GetFormat () & CS_IMGFMT_ALPHA)
-      {
-        csRGBpixel *srcimg = (csRGBpixel *)t->image->GetImageData ();
-        size_t imgsize = t->get_size ();
-        uint8 *dstalpha = t->alphamap = new uint8 [imgsize];
-        // In 8- and 16-bit modes we limit the alpha to 5 bits (32 values)
-        // This is related to the internal implementation of alphamap
-        // routine and is quite enough for 5-5-5 and 5-6-5 modes.
-        if (texman->pfmt.PixelBytes != 4)
-          while (imgsize--)
-            *dstalpha++ = srcimg++->alpha >> 3;
-        else
-          while (imgsize--)
-            *dstalpha++ = srcimg++->alpha;
-      }
-
-      if (destroy_image)
-      {
-	// Very well, we don't need the iImage anymore, so free it
-	DG_UNLINK (t, t->image);
-	t->image = 0;
-      }
-    }
-
-  quant.End ();
-}
-
-void csSoftwareTextureHandle::remap_texture ()
-{
-  int i;
-  CS_ASSERT (texman);
-  switch (texman->pfmt.PixelBytes)
+  // 2D textures uses just the top-level mipmap
+  if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D)
   {
-    case 2:
-      delete [] (uint16 *)pal2glob;
-      pal2glob = new uint8 [palette_size * sizeof (uint16)];
-      for (i = 0; i < palette_size; i++)
-        ((uint16 *)pal2glob) [i] = texman->encode_rgb (palette [i].red,
-          palette [i].green, palette [i].blue);
-      break;
-    case 4:
-      delete [] (uint32 *)pal2glob;
-      pal2glob = new uint8 [palette_size * sizeof (uint32)];
-      for (i = 0; i < palette_size; i++)
-      {
-        ((uint32 *)pal2glob) [i] = texman->encode_rgb (palette [i].red,
-          palette [i].green, palette [i].blue);
-      }
-      break;
+    // Create each new level by creating a level 2 mipmap from previous level
+    csRef<iImage> i1 = csImageManipulate::Mipmap (image, 1, tc);
+    csRef<iImage> i2 = csImageManipulate::Mipmap (i1, 1, tc);
+    csRef<iImage> i3 = csImageManipulate::Mipmap (i2, 1, tc);
+
+    tex [1] = NewTexture (i1, true);
+    tex [2] = NewTexture (i2, true);
+    tex [3] = NewTexture (i3, true);
   }
 }
 
@@ -254,19 +155,15 @@ void csSoftwareTextureHandle::PrepareInt ()
   if (prepared) return;
   prepared = true;
   CreateMipmaps ();
-  ComputePalette();
-  remap_texture ();
-  FreeImage ();
+  image = 0;
 }
 
 void csSoftwareTextureHandle::Blit (int x, int y, int width, int height,
 				    unsigned char const* data, 
 				    TextureBlitDataFormat format)
 {
-  Setup332Palette ();
-
   csSoftwareTexture *tex0 = (csSoftwareTexture *)tex[0];
-  uint8 *bitmap = tex0->bitmap;
+  uint32* bitmap = tex0->bitmap;
   uint8 *src = (uint8*)data;
 
   int tex_w, tex_h;
@@ -285,73 +182,55 @@ void csSoftwareTextureHandle::Blit (int x, int y, int width, int height,
   int rx, ry;
   for (ry = y; ry < blit_h; ry++)
   {
-    uint8 *linestart = bitmap + (ry*tex_w + x);
-    for (rx = x; rx < blit_w; rx++)
+    uint32* linestart = bitmap + (ry*tex_w + x);
+#ifdef CS_LITTLE_ENDIAN
+    if (format == RGBA8888)
     {
-      
-      uint8 r,g,b,a;
-      if (format == RGBA8888)
+      memcpy (linestart, src, blit_w * sizeof (uint32));
+      src += blit_w * sizeof (uint32);
+    }
+    else
+#endif
+    {
+      for (rx = x; rx < blit_w; rx++)
       {
-	r = *src++;
-	g = *src++;
-	b = *src++;
-	a = *src++;
+        
+	uint8 r,g,b,a;
+#ifndef CS_LITTLE_ENDIAN
+	if (format == RGBA8888)
+	{
+	  r = *src++;
+	  g = *src++;
+	  b = *src++;
+	  a = *src++;
+	}
+	else
+#endif
+	{
+	  b = *src++;
+	  g = *src++;
+	  r = *src++;
+	  a = *src++;
+	}
+	*linestart++ = r
+		    | (g <<  8)
+		    | (b << 16)
+		    | (a << 24);
       }
-      else
-      {
-	b = *src++;
-	g = *src++;
-	r = *src++;
-	a = *src++;
-      }
-
-      //compute palette-index
-      uint8 palIndex;
-      palIndex = ((r) >> 5) << 5;
-      palIndex |= ((g) >> 5) << 2;
-      palIndex |= ((b) >> 6);
-
-      *linestart++ = palIndex;
     }
   }
 
   // We don't generate mipmaps or so...
   flags |= CS_TEXTURE_NOMIPMAPS;
-
-  UpdateTexture ();  
 }
 
-void csSoftwareTextureHandle::ChangePaletteEntry (int idx, int r, int g, int b)
+bool csSoftwareTextureHandle::GetRendererDimensions (int &mw, int &mh)
 {
-  if (is_palette_init) return;
-  if (idx >= palette_size)
-  {
-    void* p2g;
-    if (texman->pfmt.PixelBytes == 2)
-    {
-      p2g = new uint8 [256 * sizeof (uint16)];
-      memcpy (p2g, pal2glob, sizeof (uint16)*palette_size);
-    }
-    else
-    {
-      p2g = new uint8 [256 * sizeof (uint32)];
-      memcpy (p2g, pal2glob, sizeof (uint32)*palette_size);
-    }
-    pal2glob = p2g;
-    palette_size = 256;
-  }
-
-  palette[idx].red = r;
-  palette[idx].green = g;
-  palette[idx].blue = b;
-  if (texman->pfmt.PixelBytes == 2)
-  {
-    ((uint16*)pal2glob)[idx] = texman->encode_rgb (r, g, b);
-  }
-  else
-  {
-    ((uint32*)pal2glob)[idx] = texman->encode_rgb (r, g, b);
-  }
+  PrepareInt ();
+  if (!tex[0]) return false;
+  mw = tex[0]->get_width();
+  mh = tex[0]->get_height();
+  return true;
 }
 
 //----------------------------------------------------------------------------//
@@ -438,7 +317,6 @@ csSoftSuperLightmap::csSoftSuperLightmap (csSoftwareTextureManager* texman,
   w = width;
   h = height;
   tex.AttachNew (new csSoftwareTextureHandle (texman, 0, 0));
-  tex->SetCacheData (this);
 }
 
 csSoftSuperLightmap::~csSoftSuperLightmap ()
@@ -570,6 +448,11 @@ csSoftwareTextureManager::~csSoftwareTextureManager ()
 void csSoftwareTextureManager::Clear ()
 {
   csTextureManager::Clear();
+}
+
+int csSoftwareTextureManager::GetTextureFormat ()
+{
+  return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
 }
 
 uint32 csSoftwareTextureManager::encode_rgb (int r, int g, int b)

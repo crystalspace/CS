@@ -117,8 +117,6 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
 
   if (image->HasKeyColor())
     SetTransp (true);
-
-  cachedata = 0;
 }
 
 csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle, 
@@ -253,16 +251,6 @@ const char* csGLTextureHandle::GetImageName () const
     return origName;
 }
 
-void *csGLTextureHandle::GetCacheData ()
-{
-  return cachedata;
-}
-
-void csGLTextureHandle::SetCacheData (void *d)
-{
-  cachedata = d;
-}
-
 void *csGLTextureHandle::GetPrivateObject ()
 {
   return (csGLTextureHandle *)this;
@@ -273,15 +261,16 @@ bool csGLTextureHandle::GetAlphaMap ()
   return (alphaType != csAlphaMode::alphaNone);
 }
 
-static void ComputeNewPo2ImageSize (int orig_width, int orig_height,
+static void ComputeNewPo2ImageSize (int texFlags,
+				    int orig_width, int orig_height,
 				    int orig_depth,
 				    int& newwidth, int& newheight,
 				    int& newdepth,
 				    int max_tex_size)
 {
-  csTextureHandle::CalculateNextBestPo2Size (orig_width, newwidth);
-  csTextureHandle::CalculateNextBestPo2Size (orig_height, newheight);
-  csTextureHandle::CalculateNextBestPo2Size (orig_depth, newdepth);
+  csTextureHandle::CalculateNextBestPo2Size (texFlags, orig_width, newwidth);
+  csTextureHandle::CalculateNextBestPo2Size (texFlags, orig_height, newheight);
+  csTextureHandle::CalculateNextBestPo2Size (texFlags, orig_depth, newdepth);
 
   // If necessary rescale if bigger than maximum texture size,
   // but only if a dimension has changed. For textures that are
@@ -324,7 +313,8 @@ void csGLTextureHandle::PrepareInt ()
     {
       int newFaceW, newFaceH, newFaceD;
       csRef<iImage> imgFace = image->GetSubImage (i);
-      ComputeNewPo2ImageSize (imgFace->GetWidth(), imgFace->GetHeight(), 1,
+      ComputeNewPo2ImageSize (texFlags.Get(), 
+	imgFace->GetWidth(), imgFace->GetHeight(), 1,
 	newFaceW, newFaceH, newFaceD, txtmgr->max_tex_size);
       csRef<iImage> newFace;
       if (newFaceW != newFaceH) newFaceH = newFaceW;
@@ -420,8 +410,8 @@ void csGLTextureHandle::AdjustSizePo2 ()
 
   int newwidth, newheight, newd;
 
-  ComputeNewPo2ImageSize (orig_width, orig_height, orig_d, newwidth, newheight,
-    newd, txtmgr->max_tex_size);
+  ComputeNewPo2ImageSize (texFlags.Get(), orig_width, orig_height, orig_d, 
+    newwidth, newheight, newd, txtmgr->max_tex_size);
 
   actual_width = newwidth;
   actual_height = newheight;

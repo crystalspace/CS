@@ -87,7 +87,7 @@ void SCANFUNC (int xx, unsigned char* d, uint32* z_buf, float inv_z,
   uint32 shifter = Scan.shf_u;
   PIXTYPE *srcTex = (PIXTYPE *)Scan.bitmap2;
 # else
-  uint8 *srcTex = Scan.bitmap;
+  uint32 *srcTex = Scan.bitmap;
 # endif
 # if !defined(SCANMAP) || defined(TEXCOORDS)
   uint32 shifter_h = Scan.shf_h;

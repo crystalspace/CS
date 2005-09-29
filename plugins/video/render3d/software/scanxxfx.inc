@@ -52,7 +52,7 @@
 
 // The following code is taken from scanpi2.inc. Look there for comments.
 #define DO_BLEND(texel) \
-  csRGBpixel rgbtexel = Scan.TexturePalette [texel];			  \
+  csRGBpixel rgbtexel = *(csRGBpixel*)&texel;			  \
   unsigned rs = (rgbtexel.red   << (PI_RB_BLEND * 2 - 8)) & PI_RM_BLEND;  \
   unsigned gs = (rgbtexel.green << (PI_GB_BLEND * 2 - 8)) & PI_GM_BLEND;  \
   unsigned bs = (rgbtexel.blue  << (PI_BB_BLEND * 2 - 8)) & PI_BM_BLEND;  \
@@ -73,7 +73,7 @@
 #define SCANLOOP \
   do									\
   {									\
-    uint8 texel = srcTex [((uu >> 16) & ander_w) +			\
+    uint32 texel = srcTex [((uu >> 16) & ander_w) +			\
       ((vv >> shifter_h) & ander_h)];					\
     DO_BLEND(texel);							\
     _dest++;								\
@@ -93,7 +93,7 @@
 #define SCANLOOP \
   do									\
   {									\
-    uint8 texel = srcTex [((uu >> 16) & ander_w) +			\
+    uint32 texel = srcTex [((uu >> 16) & ander_w) +			\
       ((vv >> shifter_h) & ander_h)];					\
     DO_BLEND(texel);							\
     _dest++;								\
@@ -123,7 +123,7 @@
     if (izz >= *z_buffer)						\
     {									\
       *z_buffer = izz;							\
-      uint8 texel = srcTex [((uu >> 16) & ander_w) +			\
+      uint32 texel = srcTex [((uu >> 16) & ander_w) +			\
         ((vv >> shifter_h) & ander_h)];					\
       DO_BLEND(texel);							\
     }									\
@@ -148,7 +148,7 @@
   {									\
     if (izz >= *z_buffer)						\
     {									\
-      uint8 texel = srcTex [((uu >> 16) & ander_w) +			\
+      uint32 texel = srcTex [((uu >> 16) & ander_w) +			\
         ((vv >> shifter_h) & ander_h)];					\
       DO_BLEND(texel);							\
     }									\

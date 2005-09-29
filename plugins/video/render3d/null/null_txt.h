@@ -26,28 +26,6 @@
 class csTextureManagerNull;
 
 /**
- * csTextureNull is a class derived from csTexture that implements
- * all the additional functionality required by the software renderer.
- * Every csTextureSoftware is a 8-bit paletted image with a private
- * colormap. The private colormap is common for all mipmapped variants.
- * The colormap is stored inside the parent csTextureHandle object.
- */
-class csTextureNull : public csTexture
-{
-public:
-  /// Create a csTexture object
-  csTextureNull (csTextureHandle *Parent, iImage *Image) : csTexture (Parent)
-  {
-    w = Image->GetWidth ();
-    h = Image->GetHeight ();
-    compute_masks ();
-  }
-  /// Destroy the texture
-  virtual ~csTextureNull ()
-  { }
-};
-
-/**
  * csTextureHandleNull represents a texture and all its mipmapped
  * variants.
  */
@@ -62,12 +40,8 @@ protected:
   /// The texture manager
   csTextureManagerNull *texman;
 
-  /// Create a new texture object
-  csTexture *NewTexture (iImage *Image, bool ismipmap);
-
   int w, h, d;
   int orig_w, orig_h, orig_d;
-
 public:
   /// Create the mipmapped texture object
   csTextureHandleNull (csTextureManagerNull *txtmgr, iImage *image, int flags);
@@ -84,15 +58,20 @@ public:
 
   csAlphaMode::AlphaType GetAlphaType () { return csAlphaMode::alphaNone; }
 
+  void Precache () {}
   bool GetRendererDimensions (int &mw, int &mh)
   { mw = w; mh = h; return true; }
   bool GetRendererDimensions (int &mw, int &mh, int &md)
   { mw = w; mh = h; md = d; return true; }
   void GetOriginalDimensions (int& mw, int& mh, int& md)
   { mw = orig_w; mh = orig_h; md = orig_d; }
+  void GetOriginalDimensions (int& mw, int& mh)
+  { mw = orig_w; mh = orig_h; }
   void SetTextureTarget (int target) { }
   int GetTextureTarget () const { return iTextureHandle::CS_TEX_IMG_2D; }
   const char* GetImageName () const { return imageName; }
+  virtual void Blit (int, int, int, int, unsigned char const*, 
+    TextureBlitDataFormat) {}
 };
 
 /**
@@ -118,14 +97,8 @@ public:
   /// Called from G3D::Open ()
   void SetPixelFormat (csPixelFormat &PixelFormat);
 
-  /// Encode RGB values to a 16-bit word (for 16-bit mode).
-  uint32 encode_rgb (int r, int g, int b);
-
-  /// Read configuration values from config file.
-  virtual void read_config (iConfigFile *config);
-
-  ///
-  virtual void Clear ();
+  int GetTextureFormat ()
+  { return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA; }
 
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);

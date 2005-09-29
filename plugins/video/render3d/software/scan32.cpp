@@ -26,7 +26,6 @@ namespace cspluginSoft3d
 {
 
 #define SCAN32
-#define COLORMAP	((uint32 *)Scan.PaletteTable)
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 

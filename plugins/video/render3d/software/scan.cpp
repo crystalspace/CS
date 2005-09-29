@@ -28,8 +28,11 @@
 #include "tcache.h"
 #include "sttest.h"
 
+extern "C"
+{
 /// The only instance of this structure lives here
 cspluginSoft3d::csScanSetup Scan;
+}
 
 namespace cspluginSoft3d
 {
@@ -240,10 +243,6 @@ void csScan_InitDrawFX (csSoftwareTextureHandle* texture,
   Scan.and_w = untxt->get_w_mask ();
   Scan.shf_h = untxt->get_h_shift ();
   Scan.and_h = untxt->get_h_mask ();
-
-  Scan.PaletteTable = texture->GetPaletteToGlobal ();
-  Scan.TexturePalette = texture->GetColorMap ();
-  Scan.AlphaMap = untxt->get_alphamap ();
 }
 
 } // namespace cspluginSoft3d

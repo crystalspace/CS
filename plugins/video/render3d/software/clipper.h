@@ -180,7 +180,7 @@ class BuffersClipper
   void SetupVOut1 (size_t i, const VertexBuffer& inBuffer, 
     const size_t inStride, const VertexBuffer& outBuffer)
   {
-    switch (inBuffer.comp)
+    switch (outBuffer.comp)
     {
       case 1:
         SetupVOut2<Ni, 1> (i, inBuffer, inStride, outBuffer);

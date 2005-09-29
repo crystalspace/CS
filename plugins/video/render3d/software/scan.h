@@ -128,7 +128,7 @@ struct csScanSetup
   int amap_vofs;
 
   /// The unlighted texture bitmap.
-  unsigned char *bitmap;
+  uint32* bitmap;
   /// Width of unlighted texture.
   int tw;
   /// Height of unlighted texture.
@@ -184,13 +184,6 @@ struct csScanSetup
   int min_u;
   /// V at the origin of the texture
   int min_v;
-
-  /// Actual texture palette
-  csRGBpixel *TexturePalette;
-  /// 8-bit to native pixel format conversion table
-  void *PaletteTable;
-  /// Set up by poly renderer to alpha blending table
-  uint8 *AlphaMap;
 
   /// Current blending table
   unsigned char *BlendTable;

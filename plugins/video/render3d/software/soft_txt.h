@@ -36,48 +36,72 @@ class csSoftwareTextureManager;
 class csSoftwareTextureHandle;
 
 /**
- * csSoftwareTexture is a class derived from csTexture that implements
- * all the additional functionality required by the software renderer.
- * Every csSoftwareTexture is a 8-bit paletted image with a private
- * colormap. The private colormap is common for all mipmapped variants.
- * The colormap is stored inside the parent csTextureHandle object.
+ * A software texture.
+ * Every csSoftwareTextureHandle contains several csSoftwareTexture 
+ * objects.
+ * Every csSoftwareTexture is just a single image and all associated 
+ * parameters - width, height, shifts and so on. For performance reasons 
+ * textures are allowed to be only power-of-two sizes (both horizontal and 
+ * vertical).
+ * This allows us to use simple binary shift/and instead of mul/div.
+ * It is the responsability of csSoftwareTextureHandle  to resize textures 
+ * if they do not fulfil this requirement.
  */
-class csSoftwareTexture : public csTexture
+class csSoftwareTexture
 {
+protected:
+  /// The parent csSoftwareTextureHandle object
+  csSoftwareTextureHandle* parent;
+  /// Width and height
+  int w, h;
+  /// log2(width) and log2(height)
+  int shf_w, shf_h;
+  /// (1 << log2(width)) - 1 and (1 << log2(height)) - 1
+  int and_w, and_h;
+
+  /// Compute shf_x and and_x values
+  void compute_masks ();
+  void ImageToBitmap (iImage *Image);
 public:
   /// The bitmap
-  uint8 *bitmap;
-  /// The alpha map (0 if no alphamap)
-  uint8 *alphamap;
-  /// The image (temporary storage)
-  csRef<iImage> image;
+  uint32* bitmap;
 
   /// Create a csTexture object
-  csSoftwareTexture (csTextureHandle *Parent, iImage *Image)
-	  : csTexture (Parent)
+  csSoftwareTexture (csSoftwareTextureHandle* Parent, iImage *Image) : 
+    parent (Parent)
   {
     bitmap = 0;
-    alphamap = 0;
-    image = Image;
-    DG_LINK (this, image);
     w = Image->GetWidth ();
     h = Image->GetHeight ();
     compute_masks ();
+    ImageToBitmap (Image);
   }
   /// Destroy the texture
   virtual ~csSoftwareTexture ()
   {
     delete [] bitmap;
-    delete [] alphamap;
-    image = 0;
   }
 
+  ///
+  int get_width () { return w; }
+  ///
+  int get_height () { return h; }
+  ///
+  int get_w_shift () { return shf_w; }
+  ///
+  int get_h_shift () { return shf_h; }
+  ///
+  int get_w_mask () { return and_w; }
+  ///
+  int get_h_mask () { return and_h; }
+  /// Query image size (alas we can't do (h << shf_w))
+  int get_size () { return w * h; }
+  ///
+  csSoftwareTextureHandle* get_parent () { return parent; }
+
   /// Return a pointer to texture data
-  uint8 *get_bitmap ()
+  uint32* get_bitmap ()
   { return bitmap; }
-  /// Return a pointer to alpha map data
-  uint8 *get_alphamap () const
-  { return alphamap; }
 };
 
 /**
@@ -89,45 +113,22 @@ class csSoftwareTextureHandle : public csTextureHandle
 protected:
   friend class csSoftwareGraphics3DCommon;
 
-  /**
-   * Private colormap -> global colormap table
-   * For 16- and 32-bit modes this array contains a 256-element array
-   * of either shorts or longs to convert any image pixel from 8-bit
-   * paletted format to the native pixel format.
-   */
-  void *pal2glob;
-
-  /// The private palette.
-  csRGBpixel palette [256];
-
-  /// A number that is incremented if the texture is modified (proc texture).
-  uint32 update_number;
-
   /// If true then PrepareInt() has done its job.
   bool prepared;
 
-  /// If true then the palette of the canvas is being initialized.
-  bool is_palette_init;
-
-  /**
-   * If the following flag is true then this texture uses a uniform
-   * 3:3:2 palette. This is used when the texture has been rendered
-   * on (using SetRenderTarget()).
-   */
-  bool use_332_palette;
-
-  /// Number of used colors in palette
-  int palette_size;
-
   /// Create a new texture object
-  virtual csTexture *NewTexture (iImage *Image, bool ismipmap);
-
-  /// Compute the palette for the just-created texture
-  virtual void ComputePalette ();
+  virtual csSoftwareTexture* NewTexture (iImage *Image, bool ismipmap);
 
   /// the texture manager
   csRef<csSoftwareTextureManager> texman;
 
+  /// Texture for mipmap levels 0..3
+  csSoftwareTexture *tex [4];
+
+  csRef<iImage> image;
+
+  /// Create all mipmapped bitmaps from the first level.
+  void CreateMipmaps ();
 public:
   /// Create the mipmapped texture object
   csSoftwareTextureHandle (csSoftwareTextureManager *texman, iImage *image,
@@ -136,69 +137,35 @@ public:
   virtual ~csSoftwareTextureHandle ();
 
   /**
-   * Create the [Private colormap] -> global colormap table.
-   * In 256-color modes we find the correspondense between private texture
-   * colormap and the global colormap; in truecolor modes we just build
-   * a [color index] -> [truecolor value] conversion table.
-   */
-  void remap_texture ();
-
-  /**
-   * Setup a 332 palette for this texture. This is useful when the
-   * texture is being used as a procedural texture. If the texture
-   * is already a 332 texture then nothing will happen.
-   */
-  void Setup332Palette ();
-
-  /// Query the private texture colormap
-  csRGBpixel *GetColorMap () { return palette; }
-  /// Query the number of colors in the colormap
-  int GetColorMapSize () { return palette_size; }
-
-  /// Query palette -> native format table
-  void *GetPaletteToGlobal () { return pal2glob; }
-
-  /**
    * Query if the texture has an alpha channel.<p>
    * This depends both on whenever the original image had an alpha channel
    * and of the fact whenever the renderer supports alpha maps at all.
    */
   virtual bool GetAlphaMap () 
-  { return !!((const csSoftwareTexture *)get_texture (0))->get_alphamap (); }
+  { return alphaType != csAlphaMode::alphaNone; }
 
   /**
    * Merge this texture into current palette, compute mipmaps and so on.
    */
-  virtual void PrepareInt ();
+  void PrepareInt ();
 
-  /**
-   * Indicate the texture is modified (update update_number).
-   */
-  void UpdateTexture () { update_number++; }
-
-  /**
-   * Change a palette entry. This is called from within the callback
-   * from the canvas associated with this texture.
-   */
-  void ChangePaletteEntry (int idx, int r, int g, int b);
-
-  /**
-   * Get the texture update number.
-   */
-  uint32 GetUpdateNumber () const { return update_number; }
+  /**\name iTextureHandle implementation
+   * @{ */
+  virtual void Precache () {}
 
   virtual bool GetRendererDimensions (int &mw, int &mh, int& md)
-  {
-    return false;
-  }
+  { return false; }
+
+  virtual bool GetRendererDimensions (int &mw, int &mh);
 
   virtual void GetOriginalDimensions (int& mw, int& mh, int &md)
-  {
-  }
+  { }
+
+  virtual void GetOriginalDimensions (int& w, int& h)
+  { GetRendererDimensions (w, h); }
 
   virtual void SetTextureTarget(int target)
-  {
-  }
+  { }
   
   virtual int GetTextureTarget () const
   {
@@ -209,6 +176,14 @@ public:
 
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data, TextureBlitDataFormat format = RGBA8888);
+  /** @} */
+
+  /// Get the texture at the corresponding mipmap level (0..3)
+  csSoftwareTexture* get_texture (int mipmap)
+  {
+    PrepareInt ();
+    return (mipmap >= 0) && (mipmap < 4) ? tex [mipmap] : 0;
+  }
 };
 
 class csSoftSuperLightmap;
@@ -333,6 +308,15 @@ public:
 
   ///
   virtual void Clear ();
+
+  /**
+   * Query the basic format of textures that can be registered with this
+   * texture manager. It is very likely that the texture manager will
+   * reject the texture if it is in an improper format. The alpha channel
+   * is optional; the texture can have it and can not have it. Only the
+   * bits that fit the CS_IMGFMT_MASK mask matters.
+   */
+  virtual int GetTextureFormat ();
 
   ///
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);

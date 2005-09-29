@@ -36,10 +36,10 @@
     {
 #ifndef PI_FLAT
   #ifdef PI_TILE
-      uint8 texel = bitmap [(((v >> 16) & Scan.and_h) << bitmap_log2w)
+      uint32 texel = bitmap [(((v >> 16) & Scan.and_h) << bitmap_log2w)
       	+ ((u >> 16) & Scan.and_w)];
   #else
-      uint8 texel = bitmap [((v >> 16) << bitmap_log2w) + (u >> 16)];
+      uint32 texel = bitmap [((v >> 16) << bitmap_log2w) + (u >> 16)];
   #endif
   #ifdef PI_COLORKEY
       // if colorkeying is enabled, we will ignore texels with the value 0.
@@ -56,7 +56,7 @@
         csRGBpixel rgbtexel = Scan.FlatRGB;
     #endif
   #else
-        csRGBpixel rgbtexel = Scan.TexturePalette [texel];
+        csRGBpixel rgbtexel = *(csRGBpixel)&texel;
   #endif
 #endif
 #if defined (PI_BLEND)
@@ -156,7 +156,7 @@
         unsigned pixel = rs | gs | bs;
   #endif
 #elif !defined (PI_FLAT)
-        unsigned pixel = COLORMAP [texel];
+        unsigned pixel = texel;
 #endif
 
         *_dest = pixel;

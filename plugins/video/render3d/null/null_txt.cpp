@@ -31,31 +31,30 @@
 //--------------------------------------------------- csTextureHandleNull ---//
 
 csTextureHandleNull::csTextureHandleNull (csTextureManagerNull *txtmgr,
-  iImage *image, int flags) : csTextureHandle (txtmgr, image, flags)
+  iImage *image, int flags) : csTextureHandle (txtmgr, flags)
 {
   (texman = txtmgr)->IncRef ();
 
   prepared = true;
-  orig_w = this->image->GetWidth();
-  orig_h = this->image->GetHeight();
-  orig_d = this->image->GetDepth();
+  orig_w = image->GetWidth();
+  orig_h = image->GetHeight();
+  orig_d = image->GetDepth();
   if (flags & CS_TEXTURE_3D)
-    AdjustSizePo2 ();
-  w = this->image->GetWidth();
-  h = this->image->GetHeight();
-  d = this->image->GetDepth();
-  FreeImage(); // Bye bye. Don't need you any more
+  {
+    AdjustSizePo2 (orig_w, orig_h, orig_d, w, h, d);
+  }
+  else
+  {
+    w = orig_w;
+    h = orig_h;
+    d = orig_d;
+  }
 }
 
 csTextureHandleNull::~csTextureHandleNull ()
 {
   texman->UnregisterTexture (this);
   texman->DecRef ();
-}
-
-csTexture *csTextureHandleNull::NewTexture (iImage *Image, bool /*ismipmap*/)
-{
-  return new csTextureNull (this, Image);
 }
 
 //----------------------------------------------- csTextureManagerNull ---//
@@ -75,16 +74,6 @@ csTextureManagerNull::~csTextureManagerNull ()
 void csTextureManagerNull::SetPixelFormat (csPixelFormat &PixelFormat)
 {
   pfmt = PixelFormat;
-}
-
-void csTextureManagerNull::read_config (iConfigFile *config)
-{
-  csTextureManager::read_config (config);
-}
-
-void csTextureManagerNull::Clear ()
-{
-  csTextureManager::Clear ();
 }
 
 csPtr<iTextureHandle> csTextureManagerNull::RegisterTexture (iImage* image,

@@ -30,47 +30,22 @@
 #include "iengine/material.h"
 #include "ivideo/graph2d.h"
 
-csTexture::csTexture (csTextureHandle *Parent)
-{
-  parent = Parent;
-  DG_ADD (this, 0);
-  DG_TYPE (this, "csTexture");
-}
-
-csTexture::~csTexture ()
-{
-  DG_REM (this);
-}
-
 //----------------------------------------------------- csTextureHandle -----//
 
 SCF_IMPLEMENT_IBASE (csTextureHandle)
   SCF_IMPLEMENTS_INTERFACE (iTextureHandle)
 SCF_IMPLEMENT_IBASE_END
 
-csTextureHandle::csTextureHandle (csTextureManager* texman, iImage* Image, 
-				  int Flags)
+csTextureHandle::csTextureHandle (csTextureManager* texman, int Flags)
 {
   SCF_CONSTRUCT_IBASE (0);
   DG_ADDI (this, 0);
   DG_TYPE (this, "csTextureHandle");
 
-  image = Image;
-  DG_LINK (this, image);
   flags = Flags & ~CS_TEXTURE_NPOTS;
-
-  tex [0] = tex [1] = tex [2] = tex [3] = 0;
 
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
-
-  if (image.IsValid() && image->HasKeyColor ())
-  {
-    int r,g,b;
-    image->GetKeyColor (r,g,b);
-    SetKeyColor (r, g, b);
-  }
-  cachedata = 0;
 
   this->texman = texman;
   texClass = texman->texClassIDs.Request ("default");
@@ -78,70 +53,8 @@ csTextureHandle::csTextureHandle (csTextureManager* texman, iImage* Image,
 
 csTextureHandle::~csTextureHandle ()
 {
-  int i;
-  for (i = 0; i < 4; i++)
-  {
-    if (tex[i])
-    {
-      DG_UNLINK (this, tex[i]);
-      delete tex [i];
-    }
-  }
   DG_REM (this);
-  FreeImage ();
   SCF_DESTRUCT_IBASE()
-}
-
-void csTextureHandle::FreeImage ()
-{
-  if (!image) return;
-  PrepareInt ();
-  DG_UNLINK (this, image);
-  image = 0;
-}
-
-void csTextureHandle::CreateMipmaps ()
-{
-  if (!image) return;
-
-  csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)0;
-
-  // Delete existing mipmaps, if any
-  int i;
-  for (i = 0; i < 4; i++)
-  {
-    if (tex[i])
-    {
-      DG_UNLINK (this, tex[i]);
-      delete tex [i];
-    }
-  }
-
-  // @@@ Jorrit: removed the following IncRef() because I can really
-  // see no reason for it and it seems to be causing memory leaks.
-#if 0
-  // Increment reference counter on image since NewTexture() expects
-  // a image with an already incremented reference counter
-  image->IncRef ();
-#endif
-  tex [0] = NewTexture (image);
-  DG_LINK (this, tex[0]);
-
-  // 2D textures uses just the top-level mipmap
-  if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D)
-  {
-    // Create each new level by creating a level 2 mipmap from previous level
-    csRef<iImage> i1 = csImageManipulate::Mipmap (image, 1, tc);
-    csRef<iImage> i2 = csImageManipulate::Mipmap (i1, 1, tc);
-    csRef<iImage> i3 = csImageManipulate::Mipmap (i2, 1, tc);
-
-    tex [1] = NewTexture (i1, true);
-    DG_LINK (this, tex[1]);
-    tex [2] = NewTexture (i2, true);
-    DG_LINK (this, tex[2]);
-    tex [3] = NewTexture (i3, true);
-    DG_LINK (this, tex[3]);
-  }
 }
 
 void csTextureHandle::SetKeyColor (bool Enable)
@@ -171,27 +84,16 @@ bool csTextureHandle::GetKeyColor () const
   return transp;
 }
 
-bool csTextureHandle::GetRendererDimensions (int &mw, int &mh)
+void csTextureHandle::AdjustSizePo2 (int width, int height, int depth, 
+				     int& newwidth, int& newheight, int& newdepth)
 {
-  PrepareInt ();
-  if (!tex[0]) return false;
-  mw = tex[0]->get_width();
-  mh = tex[0]->get_height();
-  return true;
+  CalculateNextBestPo2Size (flags, width, newwidth);
+  CalculateNextBestPo2Size (flags, height, newheight);
+  CalculateNextBestPo2Size (flags, depth, newdepth);
 }
 
-void csTextureHandle::AdjustSizePo2 ()
-{
-  int newwidth, newheight;
-
-  CalculateNextBestPo2Size (image->GetWidth(), newwidth);
-  CalculateNextBestPo2Size (image->GetHeight(), newheight);
-
-  if (newwidth != image->GetWidth () || newheight != image->GetHeight ())
-    image = csImageManipulate::Rescale (image, newwidth, newheight);
-}
-
-void csTextureHandle::CalculateNextBestPo2Size (const int orgDim, int& newDim)
+void csTextureHandle::CalculateNextBestPo2Size (int /*texFlags*/, 
+						const int orgDim, int& newDim)
 {
   newDim = csFindNearestPowerOf2 (orgDim);
   if (newDim != orgDim)
@@ -211,16 +113,6 @@ void csTextureHandle::SetTextureClass (const char* className)
 const char* csTextureHandle::GetTextureClass ()
 {
   return texman->texClassIDs.Request (texClass);
-}
-
-//------------------------------------------------------------ csTexture -----//
-
-void csTexture::compute_masks ()
-{
-  shf_w = csLog2 (w);
-  and_w = (1 << shf_w) - 1;
-  shf_h = csLog2 (h);
-  and_h = (1 << shf_h) - 1;
 }
 
 //----------------------------------------------------- csTextureManager -----//
@@ -252,9 +144,4 @@ csTextureManager::~csTextureManager()
 
 void csTextureManager::read_config (iConfigFile* /*config*/)
 {
-}
-
-int csTextureManager::GetTextureFormat ()
-{
-  return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
 }

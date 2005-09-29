@@ -136,8 +136,6 @@ private:
   bool IsTranspSet() const { return texFlags.Check (flagTranspSet); }
   void SetTranspSet (bool b) { texFlags.SetBool (flagTranspSet, b); }
 
-  void *cachedata;
-
   GLenum DetermineTargetFormat (GLenum defFormat, bool allowCompress,
     const char* rawFormat, bool& compressedTarget);
   bool transform (bool allowCompressed, 
@@ -264,12 +262,6 @@ public:
 
   /// Get the original image name
   virtual const char* GetImageName () const;
-
-  /// Get data associated internally with this texture by texture cache
-  virtual void *GetCacheData ();
-
-  /// Set data associated internally with this texture by texture cache
-  virtual void SetCacheData (void *d);
 
   /**
    * Query the private object associated with this handle.

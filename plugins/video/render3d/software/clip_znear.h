@@ -31,11 +31,11 @@ class ClipMeatZNear
   int height2;
   float aspect;
 
-  CS_FORCEINLINE void Project (csVector3& v, const float com_iz)
+  CS_FORCEINLINE void Project (csVector4& v, const float com_iz)
   {
     const float clipPos = SMALL_Z*10;
     const float com_zv = 1.0f / clipPos;
-    v.Set (v.x * com_iz + width2, v.y * com_iz + height2, com_zv);
+    v.Set (v.x * com_iz + width2, v.y * com_iz + height2, com_zv, 1.0f);
   }
 public:
   void Init (int w2, int h2, float a)
@@ -53,7 +53,7 @@ public:
     const float clipPos = SMALL_Z*10;
     const float com_zv = 1.0f / clipPos;
     const float com_iz = aspect * com_zv;
-    csVector3 v;
+    csVector4 v;
 
     const VertexBuffer& bPos = inBuffers[VATTR_BUFINDEX(POSITION)];
     const size_t bPosStride = inStrides[VATTR_BUFINDEX(POSITION)];

@@ -35,15 +35,17 @@ namespace cspluginSoft3d
   static inline T Lerp (const T& a, const T& b, float f)
   { return a + (b-a) * f; }
 
-  struct InterpolateEdge
+  struct InterpolateEdgePersp
   {
     // The X coordinates and its per-scanline delta
     float x, dxdy;
-    // The Z coordinates and its per-scanline delta
-    float z, dzdy;
-    // Buffer values and per-scanline delta
+    // The inverse Z coordinates and its per-scanline delta
+    float Iz, dIzdy;
+    // Inverse buffer values and per-scanline delta
+    csVector4 Ic[maxBuffers];
+    csVector4 dIcdy[maxBuffers];
+    // Un-inverted buffer values
     csVector4 c[maxBuffers];
-    csVector4 dcdy[maxBuffers];
 
     void Setup (const csVector3* vertices, const VertexBuffer* buffers, 
       BuffersMask buffersMask, size_t sv, size_t fv, int sy)
@@ -57,7 +59,9 @@ namespace cspluginSoft3d
 	float inv_dy = 1 / dy;
 	x = vsv.x;
 	dxdy = (vfv.x - x) * inv_dy;
-	dzdy = (vfv.z - vsv.z) * inv_dy;
+	const float Isz = vsv.z; // Z coord already inverted here
+	const float Ifz = vfv.z;
+	dIzdy = (Ifz - Isz) * inv_dy;
 
 	// horizontal pixel correction
 	float deltaX = dxdy *
@@ -71,59 +75,82 @@ namespace cspluginSoft3d
 	else
 	  Factor = 0;
 
-	z = Lerp (vsv.z, vfv.z, Factor);
+	Iz = Lerp (Isz, Ifz, Factor);
+	const float z = 1.0f/Iz;
 
 	for (size_t b = 0; b < maxBuffers; b++)
 	{
 	  if (!(buffersMask & (1 << b))) continue;
 
-	  const csVector4 csv (((csVector4*)buffers[b].data)[sv]);
-	  const csVector4 cfv (((csVector4*)buffers[b].data)[fv]);
+	  // Z coord already inverted here
+	  const csVector4 Icsv (((csVector4*)buffers[b].data)[sv]);
+	  const csVector4 Icfv (((csVector4*)buffers[b].data)[fv]);
 
-	  c[b] = Lerp (csv, cfv, Factor);
-	  dcdy[b] = (cfv - csv) * inv_dy;
+	  Ic[b] = Lerp (Icsv, Icfv, Factor);
+	  c[b] = Ic[b] * z;
+	  dIcdy[b] = (Icfv - Icsv) * inv_dy;
 	}
       } /* endif */
     }
     void Advance (BuffersMask buffersMask)
     {
-      x += dxdy;
-      z += dzdy;
+      Iz += dIzdy;
+      const float z = 1.0f/Iz;
 
       for (size_t b = 0; b < maxBuffers; b++)
       {
 	if (!(buffersMask & (1 << b))) continue;
-	c[b] += dcdy[b];
+	Ic[b] += dIcdy[b];
+	c[b] = Ic[b] * z;
       }
+      x += dxdy;
     }
   };
-  struct InterpolateScanline
+  struct InterpolateScanlinePersp
   {
     csVector4 c[maxBuffers];
-    csVector4 dcdx[maxBuffers];
+    csVector4 Ic[maxBuffers];
+    csVector4 dIcdx[maxBuffers];
+    float Iz, dIzdx;
+    
+    /// Interpolation step for semi-perspective correct texture mapping
+    //int InterpolStep;
+    /// Interpolation step (shift-value) for semi-perspective correct texture mapping
+    //int InterpolShift;
 
-    void Setup (const InterpolateEdge& L, const InterpolateEdge& R, 
+    void Setup (const InterpolateEdgePersp& L, const InterpolateEdgePersp& R,
       BuffersMask buffersMask, float inv_l)
     {
+      //InterpolStep = 16;
+      //InterpolShift = 4;
+      //inv_l = 1.0f / (R.x - L.x);
+      Iz = L.Iz;
+      dIzdx = (R.Iz - L.Iz) * inv_l;
       for (size_t b = 0; b < maxBuffers; b++)
       {
 	if (!(buffersMask & (1 << b))) continue;
 	const csVector4 cL = L.c[b];
-	const csVector4 cR = R.c[b];
+	const csVector4 IcL = L.Ic[b];
+	const csVector4 IcR = R.Ic[b];
 	c[b] = cL;
-	dcdx[b].Set (
-	  (cR.x - cL.x) * inv_l,
-	  (cR.y - cL.y) * inv_l,
-	  (cR.z - cL.z) * inv_l,
-	  (cR.w - cL.w) * inv_l);
+	Ic[b] = IcL;
+	dIcdx[b].Set (
+	  (IcR.x - IcL.x) * inv_l,
+	  (IcR.y - IcL.y) * inv_l,
+	  (IcR.z - IcL.z) * inv_l,
+	  (IcR.w - IcL.w) * inv_l);
       }
     }
     void Advance (BuffersMask buffersMask)
     {
+      Iz += dIzdx;
+      const float z = 1.0f/Iz;
+
       for (size_t b = 0; b < maxBuffers; b++)
       {
 	if (!(buffersMask & (1 << b))) continue;
-	c[b] += dcdx[b];
+	Ic[b] += dIcdx[b];
+	c[b] = Ic[b] * z;
       }
     }
   };

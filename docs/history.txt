@@ -33,6 +33,10 @@ chronological order.
 	- mdmkolbe fixed a build error due to integer-size ambiguity.
 	- res added some protections against IncRef()ing objects from the
 	  destructor or excess DecRef()ing objects to scfImplementation<>.
+	- res cleaned up the generic csplugincommon/render3d texture-related
+	  classes.
+	- res added initial support (again) for perspective-correct rendering 
+	  to SR.
 28-Sep-2005
 	- Jorrit caused much wailing and gnashing of teeth as everyone will
 	  have to rebuild CS and everyone will get a new set of auto-generated

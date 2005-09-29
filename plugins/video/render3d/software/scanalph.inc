@@ -45,33 +45,18 @@
 #if defined (A_R5G5B5)
 #  define A_MASK_RB   0x00007c1f
 #  define A_MASK_G    0x000003e0
-#  if defined (A_MAP)
-#    define A_COLORMAP(x)     x
-#  else
-#    define A_COLORMAP(x)     COLORMAP [x]
-#  endif
 #  define A_DSTTEX    *_dest
 #  define A_NORMSHIFT 5
 #  define A_PIXTYPE   uint16
 #elif defined (A_R5G6B5)
 #  define A_MASK_RB	0x0000f81f
 #  define A_MASK_G	0x000007e0
-#  if defined (A_MAP)
-#    define A_COLORMAP(x)	x
-#  else
-#    define A_COLORMAP(x)	COLORMAP [x]
-#  endif
 #  define A_DSTTEX	*_dest
 #  define A_NORMSHIFT	5
 #  define A_PIXTYPE	uint16
 #elif defined (A_R8G8B8)
 #  define A_MASK_RB	0x00ff00ff
 #  define A_MASK_G	0x0000ff00
-#  if defined (A_MAP)
-#    define A_COLORMAP(x)	x
-#  else
-#    define A_COLORMAP(x)	COLORMAP [x]
-#  endif
 #  define A_DSTTEX	*_dest
 #  define A_NORMSHIFT	8
 #  define A_PIXTYPE	uint32
@@ -125,7 +110,7 @@
       Z_FILL;								\
       unsigned srcaddr = A_SRCADDR;					\
       uint8 alpha = Scan.AlphaMap [A_ASRCADDR];				\
-      A_IPIXTYPE src = A_PIXEL_PREPROC(A_COLORMAP (srcTex [srcaddr]));	\
+      A_IPIXTYPE src = A_PIXEL_PREPROC(srcTex [srcaddr]);		\
       A_IPIXTYPE dst = A_PIXEL_PREPROC(A_DSTTEX);			\
       unsigned src_rb = src & A_MASK_RB;				\
       unsigned dst_rb = dst & A_MASK_RB;				\

@@ -35,7 +35,7 @@
 struct iGraphics2D;
 struct iGraphics3D;
 
-SCF_VERSION (iTextureHandle, 2, 4, 1);
+SCF_VERSION (iTextureHandle, 2, 5, 0);
 
 /**
  * A texture handle as returned by iTextureManager.
@@ -150,12 +150,6 @@ struct iTextureHandle : public iBase
    * Get the original image name.
    */
   virtual const char* GetImageName () const = 0;
-
-  /// Get data associated internally with this texture by texture cache
-  virtual void *GetCacheData () = 0;
-
-  /// Set data associated internally with this texture by texture cache
-  virtual void SetCacheData (void *d) = 0;
 
   /**
    * Query the private object associated with this handle.

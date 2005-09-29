@@ -12,7 +12,8 @@ Description soft3d : "3D software renderer" ;
   #SOFT3D_ASMFILES = ;
 #}
 
-Plugin soft3d : [ Wildcard *.cpp *.h ] $(SOFT3D_ASMFILES) ;
+Plugin soft3d : [ Filter [ Wildcard *.cpp *.h ] : 
+  scan16.cpp scan32.cpp ] $(SOFT3D_ASMFILES) ;
 LinkWith soft3d : crystalspace ;
 CompileGroups soft3d : renderers ;
 

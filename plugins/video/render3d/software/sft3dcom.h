@@ -307,6 +307,7 @@ class TriangleDrawer;
 
 static const size_t activeBufferCount = CS_VATTRIB_SPECIFIC_LAST - 
   CS_VATTRIB_SPECIFIC_FIRST + 1;
+static const size_t activeTextureCount = 4;
 
 /**
  * The basic software renderer class.
@@ -336,6 +337,7 @@ protected:
   uint32* z_buffer;
   /// Size of Z buffer.
   long z_buf_size;
+  csZBufMode zBufMode;
 
   /**
    * Addresses of all lines for this frame. This table is used to avoid
@@ -361,9 +363,6 @@ protected:
   long dbg_max_polygons_to_draw;
   /// For debugging: the current polygon number.
   long dbg_current_polygon;
-
-  /// Z Buffer mode to use while rendering next polygon.
-  csZBufMode z_buf_mode;
 
   /// Values to check if we have to reinit StartPolygonFX.
   bool dpfx_valid;
@@ -479,8 +478,10 @@ protected:
   csRef<iShaderManager> shadermgr;
 
   iRenderBuffer* activebuffers[activeBufferCount];
-  iTextureHandle* activeTex;
+  iTextureHandle* activeTex[activeTextureCount];
+  csSoftwareTexture* activeSoftTex[activeTextureCount]; 
   csRef<iRenderBuffer> translatedVerts;
+  ScanlineRendererBase* scanlineRenderer;
 
   // Structure used for maintaining a stack of clipper portals.
   struct csClipPortal
@@ -771,8 +772,10 @@ public:
   /// Activate a texture
   bool ActivateTexture (iTextureHandle *txthandle, int unit = 0)
   {
-    if (unit != 0) return false;
-    activeTex = txthandle;
+    if ((unit < 0) || ((uint)unit >= activeTextureCount)) return false;
+    activeTex[unit] = txthandle;
+    activeSoftTex[unit] = 
+      (csSoftwareTexture*)((csSoftwareTextureHandle*)txthandle)->tex[0];
     return true;
   }
 
@@ -794,7 +797,11 @@ public:
   /// Deactivate a texture
   void DeactivateTexture (int unit = 0)
   {
-    if (unit == 0) activeTex = 0;
+    if ((unit >= 0) && ((uint)unit < activeTextureCount))
+    {
+      activeTex[unit] = 0;
+      activeSoftTex[unit] = 0;
+    }
   }
 
   /// Get width of window
@@ -811,12 +818,9 @@ public:
 
   /// Set the z buffer write/test mode
   virtual void SetZMode (csZBufMode mode) 
-  {
-  }
+  { zBufMode = mode; }
   virtual csZBufMode GetZMode ()
-  {
-    return CS_ZBUF_NONE;
-  }
+  { return zBufMode; }
 
   // Enables offsetting of Z values
   void EnableZOffset ()

@@ -108,7 +108,7 @@ public:
 	  {
 	    const size_t vt = outStatus[i].Vertex;
 	    const size_t vt2 = (vt >= 2) ? 0 : vt + 1;
-	    const float t = outStatus[i].Pos;
+	    float t = outStatus[i].Pos;
 
 	    csVector3 vn;
 	    voutPersp.LerpTo ((float*)&vn, vt, vt2, t);

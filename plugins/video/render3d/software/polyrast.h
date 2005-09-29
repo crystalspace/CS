@@ -32,11 +32,9 @@ namespace cspluginSoft3d
 {
   class PolygonRasterizer
   {
-    bool dpfx_valid;
+    /*bool dpfx_valid;
     iTextureHandle* dpfx_tex_handle;
     uint dpfx_mixmode;
-    csZBufMode dpfx_z_buf_mode;
-    csZBufMode z_buf_mode;
     bool do_gouraud;
     bool do_lighting;
     bool do_textured;
@@ -48,7 +46,7 @@ namespace cspluginSoft3d
     csDrawPIScanlineGouraud** ScanProcPIG;
 
     csPixelFormat pfmt;
-    csSoftwareTextureManager* texman;
+    csSoftwareTextureManager* texman;*/
 
     int width, height;
     int do_interlaced;
@@ -57,182 +55,14 @@ namespace cspluginSoft3d
     uint8** line_table;
     int pixel_shift;
   public:
-    PolygonRasterizer() : dpfx_valid(false), do_gouraud(false),
-      do_lighting(true), do_textured(true), 
-      is_for_procedural_textures(false), do_interlaced(-1)
+    PolygonRasterizer() : do_interlaced(-1)
     {
-    }
-
-    struct
-    {
-      iTextureHandle* tex_handle;
-      int redFact, greenFact, blueFact;
-      int max_r, max_g, max_b;
-      int twfp, thfp;
-      float tw, th;
-      unsigned char *bm;
-      int shf_w;
-      bool keycolor;
-      bool textured;
-      bool tiling;
-      uint mixmode;
-      csDrawPIScanline *drawline;
-      csDrawPIScanlineGouraud *drawline_gouraud;
-    } pqinfo;
-    
-    void RealStartPolygonFX (iTextureHandle* handle,
-      uint mode)
-    {
-      if (!dpfx_valid ||
-	    handle != dpfx_tex_handle ||
-	    z_buf_mode != dpfx_z_buf_mode ||
-	    mode != dpfx_mixmode)
-      {
-	dpfx_valid = true;
-	dpfx_tex_handle = handle;
-	dpfx_z_buf_mode = z_buf_mode;
-	dpfx_mixmode = mode;
-      }
-      else return;
-    
-      if (!do_gouraud || !do_lighting)
-	mode |= CS_FX_FLAT;
-    
-      pqinfo.tex_handle = handle;
-    
-      if (pqinfo.tex_handle)
-      {
-	csSoftwareTextureHandle *tex_mm = (csSoftwareTextureHandle*)
-	    pqinfo.tex_handle->GetPrivateObject ();
-	csSoftwareTexture *txt_unl = (csSoftwareTexture *)
-		tex_mm->get_texture (0);
-	csScan_InitDrawFX (tex_mm, txt_unl);
-	pqinfo.bm = txt_unl->get_bitmap ();
-	pqinfo.tw = txt_unl->get_width ();
-	pqinfo.th = txt_unl->get_height ();
-	pqinfo.shf_w = txt_unl->get_w_shift ();
-	pqinfo.twfp = csQfixed16 (pqinfo.tw) - 1;
-	pqinfo.thfp = csQfixed16 (pqinfo.th) - 1;
-	pqinfo.keycolor = tex_mm->GetKeyColor ();
-	pqinfo.textured = do_textured;
-	pqinfo.tiling = !!(mode & CS_FX_TILING);
-      }
-      else
-	pqinfo.textured = false;
-    
-      Scan.AlphaMask = alpha_mask;
-    
-      Scan.BlendTable = 0;
-      // array to select blend tables from
-      unsigned char **BlendingTable = Scan.BlendingTable;
-      if(is_for_procedural_textures) // proc manager uses its own blend tables
-	BlendingTable = Scan.BlendingTableProc;
-      pqinfo.drawline = 0;
-      pqinfo.drawline_gouraud = 0;
-    
-      if (pqinfo.textured && Scan.AlphaMap)
-      {
-	int scan_index =
-	  (z_buf_mode == CS_ZBUF_USE) ? SCANPROC_PI_TEX_ALPHA_ZUSE :
-	  (z_buf_mode == CS_ZBUF_FILL) ? SCANPROC_PI_TEX_ALPHA_ZFIL :
-	  (z_buf_mode == CS_ZBUF_TEST) ? SCANPROC_PI_TEX_ALPHA_ZTEST :
-	  SCANPROC_PI_TEX_ALPHA_ZNONE;
-	pqinfo.drawline = ScanProcPI [scan_index];
-      }
-      switch (mode & CS_FX_MASK_MIXMODE)
-      {
-	case CS_FX_ADD:
-	  Scan.BlendTable = BlendingTable [BLENDTABLE_ADD];
-	  break;
-	case CS_FX_MULTIPLY:
-	  Scan.BlendTable = BlendingTable [BLENDTABLE_MULTIPLY];
-	  break;
-	case CS_FX_MULTIPLY2:
-	  Scan.BlendTable = BlendingTable [BLENDTABLE_MULTIPLY2];
-	  break;
-	case CS_FX_ALPHA:
-	{
-	  int alpha = mode & CS_FX_MASK_ALPHA;
-	  if (alpha < 12)
-	    mode = (mode & ~CS_FX_MASK_MIXMODE) | CS_FX_COPY;
-	  else if (alpha < 96)
-	    Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA25];
-	  else if (alpha < 160)
-	    Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA50];
-	  else if (alpha < 244)
-	    Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA75];
-	  else
-	    goto zfill_only;
-	  break;
-	}
-	case CS_FX_TRANSPARENT:
-	zfill_only:
-	  mode |= CS_FX_FLAT;
-	  pqinfo.drawline = (z_buf_mode == CS_ZBUF_USE)
-	    ? 0
-	    : csScan_scan_pi_zfil;
-	  break;
-	default:
-	  break;
-      }
-    
-      // Select draw scanline routines
-      int scan_index = pqinfo.textured
-	    ? SCANPROC_PI_TEX_ZNONE
-	    : SCANPROC_PI_FLAT_ZNONE;
-      if (z_buf_mode == CS_ZBUF_FILL) scan_index++;
-      else if (z_buf_mode == CS_ZBUF_USE) scan_index += 2;
-      else if (z_buf_mode == CS_ZBUF_TEST) scan_index += 3;
-      if (pqinfo.textured && pqinfo.keycolor)
-	scan_index += 4;
-      if ((mode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
-	scan_index += 20;
-      if (pqinfo.textured && (mode & CS_FX_TILING))
-	scan_index += 8;
-      if (!pqinfo.drawline)
-	pqinfo.drawline = ScanProcPI [scan_index];
-      if (!(mode & CS_FX_FLAT))
-	pqinfo.drawline_gouraud = ScanProcPIG [scan_index];
-    
-      pqinfo.mixmode = mode;
-      // We use #.16 fixed-point format for R,G,B factors
-      // where # is the number of bits per component (with the exception of
-      // 32bpp modes/textured where we use (#-2).16 format).
-      int shift_amount = ((pfmt.PixelBytes == 4) &&
-      	(Scan.BlendTable || pqinfo.textured)) ? 6 : 8;
-      pqinfo.redFact = (((pfmt.RedMask>>pfmt.RedShift)+1) << shift_amount)-1;
-      pqinfo.greenFact = (((pfmt.GreenMask>>pfmt.GreenShift)+1)
-      	<< shift_amount)-1;
-      pqinfo.blueFact  = (((pfmt.BlueMask>>pfmt.BlueShift)+1)
-      	<< shift_amount)-1;
-    
-      pqinfo.max_r = (1 << (pfmt.RedBits   + shift_amount + 8)) - 1;
-      pqinfo.max_g = (1 << (pfmt.GreenBits + shift_amount + 8)) - 1;
-      pqinfo.max_b = (1 << (pfmt.BlueBits  + shift_amount + 8)) - 1;
     }
 
     void DrawPolygonFX (size_t vertNum, const csVector3* vertices,
-      const VertexBuffer* inBuffers, BuffersMask buffersMask, 
-      iTextureHandle* tex_handle, uint mixmode)
+      const VertexBuffer* inBuffers, BuffersMask buffersMask,
+      ScanlineRenderInfo& sri)
     {
-      RealStartPolygonFX (tex_handle, mixmode);
-      ScanlineRenderer slr;
-      ScanlineRendererBase::ScanlineProc slp = slr.Init ();
-    
-      if (!pqinfo.drawline && !pqinfo.drawline_gouraud)
-	return;
-    
-      const csVector4* texcoords = 
-	(csVector4*)inBuffers[VATTR_BUFINDEX(TEXCOORD)].data;
-      const csVector4* colors = (buffersMask & (1 << VATTR_BUFINDEX(COLOR))) ?
-	(csVector4*)inBuffers[VATTR_BUFINDEX(COLOR)].data : 0;
-
-      Scan.FlatRGB.Set (255, 255, 255);
-    
-      // Get the same value as a pixel-format-encoded value
-      Scan.FlatColor = texman->encode_rgb (Scan.FlatRGB.red, Scan.FlatRGB.green,
-	Scan.FlatRGB.blue);
-    
       //-----
       // Get the values from the polygon for more convenient local access.
       // Also look for the top-most and bottom-most vertices.
@@ -248,45 +78,6 @@ namespace cspluginSoft3d
 	  top_y = vertices[top = i].y;
 	if (vertices[i].y < bot_y)
 	  bot_y = vertices[bot = i].y;
-      }
-
-      /* "Denormalize" some known buffers (currently colors and TCs) since
-       * doing it anywhere further down is rather wasterful. */
-      VertexBuffer actualBuffers[maxBuffers];
-      CS_ALLOC_STACK_ARRAY(csVector4, denormTC, vertNum);
-      CS_ALLOC_STACK_ARRAY(csVector4, denormColor, vertNum);
-
-      for (size_t b = 0; b < maxBuffers; b++)
-      {
-	if (!(buffersMask & (1 << b))) continue;
-
-	VertexBuffer& actualBuffer = actualBuffers[b];
-	switch (b)
-	{
-	  case VATTR_BUFINDEX(TEXCOORD):
-	    actualBuffer.data = (uint8*)denormTC;
-	    actualBuffer.comp = 4;
-	    for (i = 0 ; i < vertNum ; i++)
-	    {
-	      denormTC[i].Set (pqinfo.tw * texcoords[i].x,
-		pqinfo.th * texcoords[i].y, 0.0f, 1.0f);
-	    }
-	    break;
-	  case VATTR_BUFINDEX(COLOR):
-	    actualBuffer.data = (uint8*)denormColor;
-	    actualBuffer.comp = 4;
-	    for (i = 0 ; i < vertNum ; i++)
-	    {
-	      denormColor[i].Set (
-		colors[i].x * pqinfo.redFact,
-		colors[i].y * pqinfo.greenFact,
-		colors[i].z * pqinfo.blueFact,
-		colors[i].w * 0xff0000);
-	    }
-	    break;
-	  default:
-	    actualBuffer = inBuffers[b];
-	}
       }
     
       // If the polygon exceeds the screen, it is an engine failure
@@ -311,7 +102,7 @@ namespace cspluginSoft3d
 	int fy;
 	
 	// Edge interpolater; contains values as well as deltas
-	InterpolateEdge edge;
+	InterpolateEdgePersp edge;
       } L,R;
     
     // Start of code to stop MSVC bitching about uninitialized variables
@@ -350,7 +141,7 @@ namespace cspluginSoft3d
 	    if (sy <= R.fy)
 	      continue;
     
-	    R.edge.Setup (vertices, actualBuffers, buffersMask, R.sv, R.fv, sy);
+	    R.edge.Setup (vertices, inBuffers, buffersMask, R.sv, R.fv, sy);
 	  } /* endif */
 	  if (sy <= L.fy)
 	  {
@@ -365,7 +156,7 @@ namespace cspluginSoft3d
 	    if (sy <= L.fy)
 	      continue;
     
-	    L.edge.Setup (vertices, actualBuffers, buffersMask, L.sv, L.fv, sy);
+	    L.edge.Setup (vertices, inBuffers, buffersMask, L.sv, L.fv, sy);
 	  } /* endif */
 	} while (!leave); /* enddo */
     
@@ -394,19 +185,19 @@ namespace cspluginSoft3d
 	      int l = xr - xl;
 	      float inv_l = 1. / l;
 
-	      InterpolateScanline scanline;
+	      InterpolateScanlinePersp scanline;
 	      scanline.Setup (L.edge, R.edge, buffersMask, inv_l);
     
-	      float dzz = (R.edge.z - L.edge.z) * inv_l;
-	      int uu = 0, duu = 0, vv = 0, dvv = 0;
-	      if (pqinfo.textured)
+	      float dzz = (R.edge.Iz - L.edge.Iz) * inv_l;
+	      //int uu = 0, duu = 0, vv = 0, dvv = 0;
+	      //if (pqinfo.textured)
 	      {
-		const csVector4 tcL (L.edge.c[VATTR_BUFINDEX(TEXCOORD)]);
+		/*const csVector4 tcL (L.edge.c[VATTR_BUFINDEX(TEXCOORD)]);
 		const csVector4 tcR (R.edge.c[VATTR_BUFINDEX(TEXCOORD)]);
 		int span_u = csQfixed16 (tcR.x - tcL.x);
 		int span_v = csQfixed16 (tcR.y - tcL.y);
 		uu = csQfixed16 (tcL.x); duu = csQint (span_u * inv_l);
-		vv = csQfixed16 (tcL.y); dvv = csQint (span_v * inv_l);
+		vv = csQfixed16 (tcL.y); dvv = csQint (span_v * inv_l);*/
     
 		/*
 		if (!pqinfo.tiling)
@@ -474,10 +265,11 @@ namespace cspluginSoft3d
 		  dbb, clamp);
 	      else
 	      */
-		pqinfo.drawline (dest, l, zbuff, uu, duu, vv, dvv,
-		  L.edge.z, dzz, pqinfo.bm, pqinfo.shf_w);
+		//pqinfo.drawline (dest, l, zbuff, uu, duu, vv, dvv,
+		  //L.edge.z, dzz, pqinfo.bm, pqinfo.shf_w);
 
-	      (slr.*slp) (scanline);
+	      sri.proc (sri.renderer, scanline, dest, l, zbuff, 
+		L.edge.Iz, dzz);
 	    }
 	  }
     
@@ -490,37 +282,16 @@ namespace cspluginSoft3d
       }
     }
 
-    void SetZBufMode (csZBufMode mode)
-    { z_buf_mode = mode; }
-
-    void Init (const csPixelFormat& pfmt,
-      csDrawPIScanline** ScanProcPI,
-      csDrawPIScanlineGouraud** ScanProcPIG,
-      csSoftwareTextureManager* texman, int w, int h,
+    void Init (const csPixelFormat& pfmt, int w, int h,
       uint32* z_buffer, uint8** line_table)
     {
-      this->pfmt = pfmt;
-
-      alpha_mask = 0;
-      alpha_mask |= 1 << (pfmt.RedShift);
-      alpha_mask |= 1 << (pfmt.GreenShift);
-      alpha_mask |= 1 << (pfmt.BlueShift);
-      alpha_mask = ~alpha_mask;
-
-      this->ScanProcPI = ScanProcPI;
-      this->ScanProcPIG = ScanProcPIG;
-      this->texman = texman;
-
       width = w;
       height = h;
 
       this->z_buffer = z_buffer;
       this->line_table = line_table;
 
-      if (pfmt.PixelBytes == 4)
-	pixel_shift = 2;
-      else if (pfmt.PixelBytes == 2)
-	pixel_shift = 1;
+      pixel_shift = csLog2 (pfmt.PixelBytes);
     }
   };
   

@@ -69,14 +69,16 @@ protected:
   enum ProgramParamType
   {
     ParamInvalid    = 0,
-    ParamFloat	    = 0x01,
-    ParamVector2    = 0x02,
-    ParamVector3    = 0x04,
-    ParamVector4    = 0x08,
-    ParamMatrix	    = 0x10,
-    ParamTransform  = 0x20,
-    ParamArray      = 0x40,
-    ParamShaderExp  = 0x80
+    ParamFloat	    = 0x0001,
+    ParamVector2    = 0x0002,
+    ParamVector3    = 0x0004,
+    ParamVector4    = 0x0008,
+    ParamMatrix	    = 0x0010,
+    ParamTransform  = 0x0020,
+    ParamArray      = 0x0040,
+    ParamShaderExp  = 0x0080,
+    
+    ParamVector     = ParamFloat | ParamVector2 | ParamVector3 | ParamVector4
   };
 
   /**

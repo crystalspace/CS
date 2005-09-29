@@ -135,7 +135,8 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent)
   object_reg = 0;
 
   memset (activebuffers, 0, sizeof (activebuffers));
-  activeTex = 0;
+  memset (activeTex, 0, sizeof (activeTex));
+  scanlineRenderer = 0;
 
   clipportal_dirty = true;
   clipportal_floating = 0;
@@ -162,6 +163,8 @@ csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
     clipper = 0;
     cliptype = CS_CLIPPER_NONE;
   }
+
+  delete scanlineRenderer;
 
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_DESTRUCT_IBASE();
@@ -261,7 +264,6 @@ bool csSoftwareGraphics3DCommon::Open ()
 
   DrawMode = 0;
   SetDimensions (G2D->GetWidth (), G2D->GetHeight ());
-  z_buf_mode = CS_ZBUF_NONE;
 
   csRef<iPluginManager> plugin_mgr (
     CS_QUERY_REGISTRY (object_reg, iPluginManager));
@@ -338,8 +340,7 @@ bool csSoftwareGraphics3DCommon::NewOpen ()
 
   //SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
 
-  polyrast.Init (pfmt, ScanProcPI, ScanProcPIG, texman, width, height,
-    z_buffer, line_table);
+  polyrast.Init (pfmt, width, height, z_buffer, line_table);
 
   return true;
 }
@@ -349,7 +350,6 @@ bool csSoftwareGraphics3DCommon::SharedOpen ()
   pixel_shift = partner->pixel_shift;
   //fog_buffers = partner->fog_buffers;
   alpha_mask = partner->alpha_mask;
-  z_buf_mode = partner->z_buf_mode;
 #if defined (CS_HAVE_MMX)
   cpu_mmx = partner->cpu_mmx;
 #endif
@@ -491,7 +491,6 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
       ScanProc [SCANPROC_FOG_VIEW] = (pfmt.GreenBits == 5) ?
         csScan_16_555_scan_fog_view :
         csScan_16_565_scan_fog_view;
-#endif
 
       ScanProcPI [SCANPROC_PI_FLAT_ZNONE] = csScan_16_scan_pi_flat_znone;
       ScanProcPI [SCANPROC_PI_FLAT_ZFIL] = csScan_16_scan_pi_flat_zfil;
@@ -711,6 +710,7 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
       ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZTEST] = (pfmt.GreenBits == 5) ?
         csScan_16_555_scan_pi_tile_tex_goufxkey_ztest :
         csScan_16_565_scan_pi_tile_tex_goufxkey_ztest;
+#endif
       break;
 
     case 4:
@@ -775,7 +775,6 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
 
       ScanProc [SCANPROC_FOG] = csScan_32_scan_fog;
       ScanProc [SCANPROC_FOG_VIEW] = csScan_32_scan_fog_view;
-#endif
 
       ScanProcPI [SCANPROC_PI_FLAT_ZNONE] = csScan_32_scan_pi_flat_znone;
       ScanProcPI [SCANPROC_PI_FLAT_ZFIL] = csScan_32_scan_pi_flat_zfil;
@@ -862,26 +861,92 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
       ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZFIL] = csScan_32_scan_pi_tile_tex_goufxkey_zfil;
       ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZUSE] = csScan_32_scan_pi_tile_tex_goufxkey_zuse;
       ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZTEST] = csScan_32_scan_pi_tile_tex_goufxkey_ztest;
+#endif
       break;
   } /* endswitch */
 
-  static int o_rbits = -1, o_gbits, o_bbits;
+  if (pfmt.PixelBytes == 4)
+  {
+    if ((pfmt.BlueMask == 0x0000ff)
+      && (pfmt.GreenMask == 0x00ff00)
+      && (pfmt.RedMask == 0xff0000))
+      scanlineRenderer = new ScanlineRenderer<
+	Pix_Fix<uint32, 24, 0, 0xff,
+			16, 0, 0xff,
+			8,  0, 0xff,
+			0,  0, 0xff> > (pfmt);
+    else if ((pfmt.BlueMask == 0xff0000) 
+      && (pfmt.GreenMask == 0x00ff00)
+      && (pfmt.RedMask == 0x0000ff))
+      scanlineRenderer = new ScanlineRenderer<
+	Pix_Fix<uint32, 24, 0, 0xff,
+			0,  0, 0xff,
+			8,  0, 0xff,
+			16, 0, 0xff> > (pfmt);
+    else if (pfmt.RedMask > pfmt.BlueMask)
+      scanlineRenderer = new ScanlineRenderer<Pix_Generic<uint32, 1> > (pfmt);
+    else
+      scanlineRenderer = new ScanlineRenderer<Pix_Generic<uint32, 0> > (pfmt);
+  }
+  else
+  {
+    if ((pfmt.BlueMask == 0xf800)   // BGR 565
+      && (pfmt.GreenMask == 0x07e0)
+      && (pfmt.RedMask == 0x001f))
+      scanlineRenderer = new ScanlineRenderer<
+	Pix_Fix<uint16, 0,  0, 0,
+			0,  3, 0xf8,
+			3,  0, 0xfc,
+			8,  0, 0xf8> > (pfmt);
+    else if ((pfmt.RedMask == 0xf800) // RGB 565
+      && (pfmt.GreenMask == 0x07e0)
+      && (pfmt.BlueMask == 0x001f))
+      scanlineRenderer = new ScanlineRenderer<
+	Pix_Fix<uint16, 0,  0, 0,
+			8,  0, 0xf8,
+			3,  0, 0xfc,
+			0,  3, 0xf8> > (pfmt);
+    else if ((pfmt.BlueMask == 0x7c00) // BGR 555
+      && (pfmt.GreenMask == 0x03e0)
+      && (pfmt.RedMask == 0x001f))
+      scanlineRenderer = new ScanlineRenderer<
+	Pix_Fix<uint16, 0,  0, 0,
+			0,  3, 0xf8,
+			2,  0, 0xf8,
+			7,  0, 0xf8> > (pfmt);
+    else if ((pfmt.RedMask == 0x7c00) // RGB 555
+      && (pfmt.GreenMask == 0x03e0)
+      && (pfmt.BlueMask == 0x001f))
+      scanlineRenderer = new ScanlineRenderer<
+	Pix_Fix<uint16, 0,  0, 0,
+			7,  0, 0xf8,
+			2,  0, 0xf8,
+			0,  3, 0xf8> > (pfmt);
+    else if (pfmt.RedMask > pfmt.BlueMask)
+      scanlineRenderer = new ScanlineRenderer<Pix_Generic<uint16, 1> > (pfmt);
+    else
+      scanlineRenderer = new ScanlineRenderer<Pix_Generic<uint16, 0> > (pfmt);
+  }
+
+  /*static int o_rbits = -1, o_gbits, o_bbits;
   if ((o_rbits != pfmt.RedBits)
    || (o_gbits != pfmt.GreenBits)
    || (o_bbits != pfmt.BlueBits))
     /// make blending tables
     if(!is_for_procedural_textures) /// if this is not procedural manager
     {
-      csScan_CalcBlendTables (Scan.BlendingTable, o_rbits = pfmt.RedBits,
+      csScan_CalcBlendTables (Scan.BlendingTable, 
+	o_rbits = pfmt.RedBits,
         o_gbits = pfmt.GreenBits, o_bbits = pfmt.BlueBits);
     }
     else
     {
       csScan_CalcBlendTables (Scan.BlendingTableProc, o_rbits = pfmt.RedBits,
         o_gbits = pfmt.GreenBits, o_bbits = pfmt.BlueBits);
-    }
+    }*/
 }
 
+#if 0
 csDrawScanline* csSoftwareGraphics3DCommon::ScanProc_16_Alpha
   (csSoftwareGraphics3DCommon *This, int alpha, bool keycolor, bool alphamap)
 {
@@ -946,6 +1011,7 @@ csDrawScanline* csSoftwareGraphics3DCommon::ScanProc_32_Alpha
     scanproc += 8;
   return ScanProcs[scanproc];
 }
+#endif
 
 void csSoftwareGraphics3DCommon::Close ()
 {
@@ -1063,13 +1129,14 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
 
     if (!rt_onscreen)
     {
-      int txt_w, txt_h;
+      /*int txt_w, txt_h;
       render_target->GetRendererDimensions (txt_w, txt_h);
       csSoftwareTextureHandle* tex_mm = (csSoftwareTextureHandle *)
-	    render_target->GetPrivateObject ();
-      csSoftwareTexture *tex_0 = (csSoftwareTexture*)(tex_mm->get_texture (0));
-      int x, y;
-      uint8* bitmap = tex_0->bitmap;
+	    render_target->GetPrivateObject ();*/
+      //csSoftwareTexture *tex_0 = (csSoftwareTexture*)(tex_mm->get_texture (0));
+      //int x, y;
+      //uint32* bitmap = tex_0->bitmap;
+      /* @@@ FIXME
       switch (pfmt.PixelBytes)
       {
 	case 2:
@@ -1100,7 +1167,7 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
 	    }
 	  }
 	  break;
-      }
+      }*/
       rt_onscreen = true;
     }
   }
@@ -1203,15 +1270,15 @@ void csSoftwareGraphics3DCommon::FinishDraw ()
     if (rt_onscreen)
     {
       rt_onscreen = false;
-      int txt_w, txt_h;
+      /*int txt_w, txt_h;
       render_target->GetRendererDimensions (txt_w, txt_h);
       csSoftwareTextureHandle* tex_mm = (csSoftwareTextureHandle *)
-	    render_target->GetPrivateObject ();
+	    render_target->GetPrivateObject ();*/
       //tex_mm->DeleteMipmaps ();
-      tex_mm->UpdateTexture ();
-      csSoftwareTexture *tex_0 = (csSoftwareTexture*)(tex_mm->get_texture (0));
-      int x, y;
-      uint8* bitmap = tex_0->bitmap;
+      //csSoftwareTexture *tex_0 = (csSoftwareTexture*)(tex_mm->get_texture (0));
+      //int x, y;
+      //uint32* bitmap = tex_0->bitmap;
+      /* @@@ FIXME
       switch (pfmt.PixelBytes)
       {
 	case 2:
@@ -1251,7 +1318,7 @@ void csSoftwareGraphics3DCommon::FinishDraw ()
 	    }
 	  }
 	  break;
-      }
+      }*/
     }
   }
   render_target = 0;
@@ -1318,6 +1385,7 @@ inline static void SelectInterpolationStep (float M)
 
 void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 {
+#if 0
   size_t i;
   size_t max_i, min_i;
   float max_y, min_y;
@@ -1450,9 +1518,9 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   if (do_alpha && (alpha || (txt_handle && txt_handle->GetKeyColor ())))
     return;
   int scan_index = SCANPROC_FLAT_ZNONE;
-  if (z_buf_mode == CS_ZBUF_FILL) scan_index++;
+  /*if (z_buf_mode == CS_ZBUF_FILL) scan_index++;
   else if (z_buf_mode == CS_ZBUF_USE) scan_index += 2;
-  else if (z_buf_mode == CS_ZBUF_TEST) scan_index += 3;
+  else if (z_buf_mode == CS_ZBUF_TEST)*/ scan_index += 3;
   csDrawScanline* dscan = ScanProc [scan_index];
   if (!dscan)
     return;				// Nothing to do.
@@ -1577,10 +1645,12 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
       screenY++;
     } /* endwhile */
   } /* endfor */
+#endif
 }
 
 void csSoftwareGraphics3DCommon::DrawPolygonZFill (G3DPolygonDFP& poly)
 {
+#if 0
   size_t i;
   size_t max_i, min_i;
   float max_y, min_y;
@@ -1778,6 +1848,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonZFill (G3DPolygonDFP& poly)
       screenY++;
     } /* endwhile */
   } /* endfor */
+#endif
 }
 
 void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
@@ -3010,7 +3081,6 @@ void csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
   render_target = handle;
   csSoftwareTextureHandle* tex_mm = (csSoftwareTextureHandle *)
 	    render_target->GetPrivateObject ();
-  tex_mm->Setup332Palette ();
   // We don't generate mipmaps or so...
   tex_mm->flags |= CS_TEXTURE_NOMIPMAPS;
 
@@ -3734,6 +3804,7 @@ class TriangleDrawer
   BuffersMask buffersMask;
   const csCoreRenderMesh* mesh;
   const csRenderMeshModes& modes;
+  ScanlineRenderInfo& scanRenderInfo;
 
   static const int outFloatsPerBuf = 16;
   float clipOut[maxBuffers * outFloatsPerBuf];
@@ -3756,13 +3827,52 @@ class TriangleDrawer
     {
       if (work_verts[i].z >= SMALL_Z)
       {
-	(*persp)[i].z = work_verts[i].z;
-	float iz = aspect / (*persp)[i].z;
+	(*persp)[i].z = 1.0f / work_verts[i].z;
+	float iz = aspect * (*persp)[i].z;
 	(*persp)[i].x = work_verts[i].x * iz + width2;
 	(*persp)[i].y = work_verts[i].y * iz + height2;
       }
       else
 	(*persp)[i] = work_verts[i];
+    }
+  }
+  void BufInvZMulAndDenorm (size_t n)
+  {
+    csVector4* denormFact = scanRenderInfo.denormFactors;
+    for (size_t i = 0; i < maxBuffers; i++)
+    {
+      if (!(scanRenderInfo.desiredBuffers & (1 << i))) continue;
+      if (!(buffersMask & (1 << i))) 
+      {
+	if (scanRenderInfo.denormBuffers & (1 << i)) denormFact++;
+	continue;
+      }
+
+      csVector4* bufData = 
+	(csVector4*)clipOutBuf[i].data;
+      if (scanRenderInfo.denormBuffers & (1 << i))
+      {
+	for (size_t v = 0; v < n; v++)
+	{
+	  // Denormalize buffers
+	  const float iz = outPersp[v].z;
+	  bufData->Set (bufData->x * denormFact->x * iz,
+	    bufData->y * denormFact->y * iz,
+	    bufData->z * denormFact->z * iz,
+	    bufData->w * denormFact->w * iz);
+	  bufData++;
+	}
+	denormFact++;
+      }
+      else
+      {
+	for (size_t v = 0; v < n; v++)
+	{
+	  const float iz = outPersp[v].z;
+	  *bufData *= iz;
+	  bufData++;
+	}
+      }
     }
   }
   void ClipAndDrawTriangle (const size_t* trivert)
@@ -3801,15 +3911,31 @@ class TriangleDrawer
     VertexBuffer clipOutBuf[maxBuffers];
     for (size_t i = 0; i < maxBuffers; i++)
     {
-      clipOutBuf[i].data = (uint8*)&out[i * floatsPerBufPerVert * maxClipVertices];
-      const size_t c = clipInBuf[i].comp;
-      clipOutBuf[i].comp = c;
-      clipInStride[i] = c * sizeof(float);
+      if (!(scanRenderInfo.desiredBuffers & (1 << i))) continue;
+
+      if (buffersMask & (1 << i))
+      {
+	clipOutBuf[i].data = (uint8*)&out[i * floatsPerBufPerVert * maxClipVertices];
+	const size_t c = this->clipOutBuf[i].comp;
+	clipOutBuf[i].comp = c;
+	clipInStride[i] = c * sizeof(float);
+      }
+      else
+      {
+	size_t n = maxClipVertices * floatsPerBufPerVert;
+	float* vtx = &out[i * floatsPerBufPerVert * maxClipVertices + n - 1];
+	while (n-- > 0)
+	{
+	  const float iz = outPersp[n / 4].z;
+	  *vtx-- = ((i == VATTR_SPEC(COLOR)) || ((i & 3) == 3)) ? iz : 0.0f;
+	}
+      }
     }
 
     BuffersClipper<ClipMeatiClipper> clip (meat);
     clip.Init (outPersp, clippedPersp,
-      this->clipOutBuf, clipInStride, clipOutBuf, buffersMask);
+      this->clipOutBuf, clipInStride, clipOutBuf, 
+      buffersMask & scanRenderInfo.desiredBuffers);
     csTriangle tri;
     if (mesh->do_mirror)
     {
@@ -3827,16 +3953,17 @@ class TriangleDrawer
     if (rescount == 0) return;
 
     g3d.polyrast.DrawPolygonFX (rescount, clippedPersp, clipOutBuf, 
-      buffersMask, g3d.activeTex, modes.mixmode | CS_FX_TILING | CS_FX_FLAT);
+      buffersMask & scanRenderInfo.desiredBuffers, scanRenderInfo);
   }
 
 public:
   TriangleDrawer (csSoftwareGraphics3DCommon& g3d,
     iRenderBuffer* activebuffers[], size_t rangeStart, 
     size_t rangeEnd, const csCoreRenderMesh* mesh,
-    const csRenderMeshModes& modes) : g3d(g3d), 
-    activebuffers(activebuffers), mesh(mesh), modes(modes),
-    bclipperZNear(clipZNear)
+    const csRenderMeshModes& modes, 
+    ScanlineRenderInfo& scanRenderInfo) : g3d(g3d), 
+    activebuffers(activebuffers), mesh(mesh), modes(modes), 
+    scanRenderInfo(scanRenderInfo), bclipperZNear(clipZNear)
   {
     const size_t bufNum = csMin (activeBufferCount, maxBuffers);
 
@@ -3844,9 +3971,11 @@ public:
     for (size_t b = 0; b < bufNum; b++)
     {
       if (activebuffers[b] == 0) continue;
+      buffersMask |= 1 << b;
+      if ((b != VATTR_BUFINDEX(POSITION)) 
+	&& !(scanRenderInfo.desiredBuffers & (1 << b))) continue;
 
       iRenderBuffer* buf = activebuffers[b];
-      buffersMask |= 1 << b;
       clipInBuf[b].data = (uint8*)buf->Lock (CS_BUF_LOCK_READ);
       clipInBuf[b].comp = buf->GetComponentCount();
       clipInStride[b] = buf->GetElementDistance();
@@ -3858,7 +3987,9 @@ public:
 
     clipZNear.Init (g3d.width2, g3d.height2, g3d.aspect);
     bclipperZNear.Init (persp->GetArray(), outPersp,
-      clipInBuf, clipInStride, clipOutBuf, buffersMask);
+      clipInBuf, clipInStride, clipOutBuf, 
+      (buffersMask & scanRenderInfo.desiredBuffers) 
+	| (1 << VATTR_BUFINDEX(POSITION)));
   }
 
   ~TriangleDrawer()
@@ -3882,7 +4013,9 @@ public:
      * of the pespective verts. */
     size_t n = bclipperZNear.DoClip (tri);
     if (n == 0) return;
-    CS_ASSERT((n>= 3) && (n <= 4));
+    CS_ASSERT((n >= 3) && (n <= 4));
+
+    BufInvZMulAndDenorm (n);
 
     static const size_t trivert1[3] = { 0, 1, 2 };
     ClipAndDrawTriangle (trivert1);
@@ -3893,6 +4026,23 @@ public:
     }
   }
 };
+
+static csZBufMode GetZModePass2 (csZBufMode mode)
+{
+  switch (mode)
+  {
+    case CS_ZBUF_NONE:
+    case CS_ZBUF_TEST:
+    case CS_ZBUF_EQUAL:
+      return mode;
+    case CS_ZBUF_FILL:
+    case CS_ZBUF_FILLONLY:
+    case CS_ZBUF_USE:
+      return CS_ZBUF_EQUAL;
+    default:
+      return CS_ZBUF_NONE;
+  }
+}
 
 void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
@@ -3925,11 +4075,6 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_READ);
 
   csReversibleTransform object2camera = w2c / mesh->object2world;
-
-  //z_buf_mode = CS_ZBUF_USE;
-  z_buf_mode = modes.z_buf_mode;
-  polyrast.SetZBufMode (z_buf_mode);
-
 
   // @@@ Currently we don't implement multi-texture
   // in the generic implementation. This is a todo...
@@ -3971,12 +4116,23 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     activebuffers[VATTR_SPEC(POSITION)] = translatedVerts;
   }
 
+  csRenderMeshModes usedModes (modes);
+  if (zBufMode == CS_ZBUF_MESH2)
+    usedModes.z_buf_mode = GetZModePass2 (usedModes.z_buf_mode);
+  else if (zBufMode != CS_ZBUF_MESH)
+    usedModes.z_buf_mode = zBufMode;
+
+  ScanlineRenderInfo sri;
+  sri.renderer = scanlineRenderer;
+  sri.proc = scanlineRenderer->Init (activeSoftTex, usedModes,
+    sri.desiredBuffers, sri.denormFactors, sri.denormBuffers);
+
   const csRenderMeshType meshtype = mesh->meshtype;
   if ((meshtype >= CS_MESHTYPE_TRIANGLES) 
     && (meshtype <= CS_MESHTYPE_TRIANGLEFAN))
   {
     TriangleDrawer triDraw (*this, activebuffers, 
-      rangeStart, rangeEnd, mesh, modes);
+      rangeStart, rangeEnd, mesh, modes, sri);
 
     uint indexstart = mesh->indexstart;
     uint indexend = mesh->indexend;
