@@ -1,0 +1,32 @@
+@c -*-texinfo-*-
+@node AWS
+@subsection Flexible Vector Graphics Definition
+
+Flexible Vector Graphics is a subset of Scalable Vector Graphics.  It stays as close
+as possible to the SVG 1.1 specification, while omitting some of the more complex
+operations.
+
+Here we will define the functionality of @sc{fvg} and make some notes about particular 
+differences between SVG and @sc{fvg}.  
+
+@subsubheading Defining a Shape
+
+@sc{fvg} should be included directly in AWS's XML definition files.  Just as the normal
+definition files can use automation constructs, fvg can too.
+
+@subsubheading Basic Shapes
+
+FVG includes all the same basic shapes as SVG 1.1.
+
+@menu
+
+* rect
+* ellipse
+* line
+* path
+* polyline
+* polygon
+
+@end menu
+
+

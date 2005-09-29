@@ -31,6 +31,7 @@ easily @dfn{skinned} by non-programmers.  For example code, see
 * AWS Automation:: @sc{aws} Automation: Properties and Scripting
 * AWS Component Scripting:: Automation Objects Available for Components
 * AWS Window Scripting:: Automation Objects Available for Windows
+* AWS Flexible Vector Graphics:: Definition and Differences from Scalable Vector Graphics
 @end menu
 
 @importss{usingcs,aws,quick.txi}
@@ -43,3 +44,4 @@ easily @dfn{skinned} by non-programmers.  For example code, see
 @importss{usingcs,aws,automation.txi}
 @importsss{usingcs,aws,scripting,componentfuncs.txi}
 @importsss{usingcs,aws,scripting,windowfuncs.txi}
+@importsss{usingcs,aws,fvg,definition.txi}
