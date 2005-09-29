@@ -784,6 +784,7 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "csgeom/tri.h"
 
+%ignore csRect::AddAdjanced; // Deprecated misspelling.
 %include "csgeom/csrect.h"
 %include "csgeom/csrectrg.h"
 

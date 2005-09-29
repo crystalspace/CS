@@ -17,6 +17,7 @@ chronological order.
 	  entirely private to their respective modules.
 	- Eric Sunshine eliminated compilation warnings in the bruteblock
 	  plugin.
+	- Eric Sunshine added %ignore to cspace.i for deprecated csRect method.
 28-Sep-2005
 	- Jorrit caused much wailing and gnashing of teeth as everyone will
 	  have to rebuild CS and everyone will get a new set of auto-generated
