@@ -28,11 +28,11 @@
 #include "tcache.h"
 #include "sttest.h"
 
+/// The only instance of this structure lives here
+cspluginSoft3d::csScanSetup Scan;
+
 namespace cspluginSoft3d
 {
-
-/// The only instance of this structure lives here
-csScanSetup Scan;
 
 //---------------------- This routine is pixel-depth independent ---
 

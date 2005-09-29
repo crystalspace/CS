@@ -18,6 +18,8 @@ chronological order.
 	- Eric Sunshine eliminated compilation warnings in the bruteblock
 	  plugin.
 	- Eric Sunshine added %ignore to cspace.i for deprecated csRect method.
+	- Eric Sunshine worked around (possibly gcc 3.3) issue where the
+	  singleton `cspluginSoft3d::Scan' symbol was unresolved at link time.
 28-Sep-2005
 	- Jorrit caused much wailing and gnashing of teeth as everyone will
 	  have to rebuild CS and everyone will get a new set of auto-generated
