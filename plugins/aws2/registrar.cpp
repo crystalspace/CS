@@ -56,6 +56,20 @@ Nil()
 }
 
 void 
+Rescope(object *o, scope *sc)
+{
+  switch(o->ObjectType())
+  {
+  case iObject::T_VAR:
+    static_cast<var *>(o)->setScope(sc);
+    break;
+  case iObject::T_FUNCTION:
+    static_cast<function *>(o)->setScope(sc);
+    break;
+  }
+}
+
+void 
 registrar::assign(const csString &name, func_ptr func)
 {  
   lobby[getId(name)]=func;	

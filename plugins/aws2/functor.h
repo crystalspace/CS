@@ -60,7 +60,7 @@ namespace autom
     private:
       slot *slot_object;
       rc_parm (slot::*memfunc)(function& fn);
-
+      
     public:
       signal():slot_object(0), memfunc(0) {}
       signal(const signal& sig):slot_object(sig.slot_object),
@@ -123,6 +123,10 @@ namespace autom
     /** Binds this function object to some native code. */
     bool bind();
 
+    /** Rescopes all of the variables in this object. */
+     void rescope();
+
+
   public:
     function():object(T_FUNCTION), rv(0), parent(0), sc(0), repr_exec(false) {}
 
@@ -150,7 +154,7 @@ namespace autom
     void setParent(function *_p) { parent = _p; }
 
     /** Sets the scope of the function. */
-    void setScope(scope *_sc) { sc = _sc; }
+    void setScope(scope *_sc) { sc = _sc; rescope(); }
 
     /** Adds the named parameter, compiling the value into a keila object. */
     bool addParm(const scfString &parm_name, std::string &_value);

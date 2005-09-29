@@ -232,6 +232,16 @@ function::parseObject(std::string::iterator &pos, const std::string::iterator &e
 	return true;	
 }
 
+
+void
+function::rescope()
+{
+  for(parm_map_type::iterator pos = parms.begin(); pos!=parms.end(); ++pos)
+  {
+    Rescope(pos->second, sc);
+  }
+}
+
 function::rc_parm 
 function::operator[](const csString &name)
 {

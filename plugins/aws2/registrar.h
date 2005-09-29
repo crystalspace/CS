@@ -147,6 +147,14 @@ namespace autom
   
   /** Returns the global nil object. */
   nil *Nil();
+
+  /** Returns true if the object is Nil. */
+  inline bool IsNil(object *o)
+  { return o==Nil(); }
+
+  /** Changes the scope of the object to the new scope 'sc'.  Only
+   * affects objects which have a scope. (Variables, functions). */
+  void Rescope(object *o, scope *sc);
   
   /**
    * Returns a fully populated object parsed from the given string, or zero
