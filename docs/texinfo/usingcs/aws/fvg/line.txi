@@ -1,0 +1,45 @@
+@c -*-texinfo-*-
+@node AWS, Flexible Vector Graphics Definition
+@subsection FVG line
+
+Draws a line between two points.
+
+@subsubheading Defining the Shape
+
+Example:
+
+<line x1="100" y1="100" x2="110" y2="130" stroke="#ff0000"  />
+
+@subsubheading Allowed Parameters
+
+@multitable @columnfractions .25 .40 .35
+@item @emph{Name} @tab @emph{Required} @tab @emph{Example} @tab @emph{Description}
+
+@item @code{x1}
+@tab  yes
+@tab  @code{x1="50"}
+@tab  Sets the left x coordinate.
+
+@item @code{y1}
+@tab  yes
+@tab  @code{y1="50"}
+@tab  Sets the top y coordinate.
+
+@item @code{x2}
+@tab  yes
+@tab  @code{x2="100"}
+@tab  Sets the right x coordinate.
+
+@item @code{y2}
+@tab  yes
+@tab  @code{y2="400"}
+@tab  Sets the bottom y coordinate.
+
+@item @code{stroke}
+@tab  no
+@tab  @code{stroke="#ff0000"}
+@tab  Turns on stroking of the shape, and sets the color.  If this is
+not present, the shape will not be stroked.  Since lines cannot be filled,
+they must be stroked.
+
+@end multitable

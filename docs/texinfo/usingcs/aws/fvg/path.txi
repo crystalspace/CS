@@ -1,0 +1,94 @@
+@c -*-texinfo-*-
+@node AWS, Flexible Vector Graphics Definition
+@subsection FVG line
+
+Defines a path.  Paths are complex shapes that may or may
+not be filled.  Paths can have multiple contours defined
+in each one, but they cannot currently carve holes in the
+path.
+
+@subsubheading Defining the Shape
+
+Example:
+
+<path d="M 100 100 L 300 100 L 200 300 z"  stroke="#ff0000" fill="#ffffff" />
+
+@subsubheading Differences from SVG
+
+* Each command expects one, and only one, set of parameters.  In SVG many commands
+allow you to specify repeated coordinates for the same command.  This is currently
+not the case in FVG, though that may change.
+
+* SVG supports several curving commands, beziers, arcs, etc.  These are not currently
+supported in FVG, thought that will change.
+
+@subsubheading Allowed Parameters
+
+@multitable @columnfractions .25 .40 .35
+@item @emph{Name} @tab @emph{Required} @tab @emph{Example} @tab @emph{Description}
+
+@item @code{d}
+@tab  yes
+@tab  @code{d="M 100 100 L 300 100 L 200 300 z"}
+@tab  Defines the countour of the path.
+
+@item @code{stroke}
+@tab  no
+@tab  @code{stroke="#ff0000"}
+@tab  Turns on stroking of the shape, and sets the color.  If this is
+not present, the shape will not be stroked.  This value or fill must
+be present or the shape will be invisible.
+
+@item @code{fill}
+@tab  no
+@tab  @code{fill="#ff0000"}
+@tab  Turns on filling of the shape, and sets the color.  If this is
+not present, the shape will not be filled.  This value or stroke must
+be present or the shape will be invisible.  Note that if a path is
+not closed, it will not be filled.  A path's contour is closed by
+using the "z" command.
+
+@end multitable
+
+@subsubheading Path Commands
+
+@multitable @columnfractions .25 .40 .35
+@item @emph{Name} @tab @emph{Example} @tab @emph{Description}
+
+@item @code{M (absolute), m (relative)}
+@tab  @code{M 100 100}
+@tab  Start a new sub-path at the given (x,y) coordinate. M (uppercase) 
+indicates that absolute coordinates will follow; m (lowercase) indicates 
+that relative coordinates will follow. If a relative moveto (m) appears 
+as the first element of the path, then it is treated as a pair of absolute 
+coordinates. If a moveto is followed by multiple pairs of coordinates, 
+the subsequent pairs are treated as implicit lineto commands.
+
+@item @code{Z or z}
+@tab  @code{z}
+@tab  Close the current subpath by drawing a straight line from the current 
+point to current subpath's initial point.  A new contour (subpath) will start after
+this command is encountered.  If this command is present at the end of a
+contour, then that path may be filled.
+
+
+@item @code{L (absolute), l (relative)}
+@tab  @code{L 200 200}
+@tab  Draw a line from the current point to the given (x,y) coordinate which 
+becomes the new current point. L (uppercase) indicates that absolute coordinates 
+will follow; l (lowercase) indicates that relative coordinates will follow. 
+
+@item @code{H (absolute), h (relative)}
+@tab  @code{H 300 }
+@tab  Draws a horizontal line from the current point (cpx, cpy) to (x, cpy). 
+H (uppercase) indicates that absolute coordinates will follow; h  (lowercase) 
+indicates that relative coordinates will follow. At the end of the command, the 
+new current point becomes (x, cpy) for the final value of x.
+
+@item @code{V (absolute), v (relative)}
+@tab  @code{V 300 }
+@tab  Draws a vertical line from the current point (cpx, cpy) to (cpx, y). 
+V (uppercase) indicates that absolute coordinates will follow; v  (lowercase) 
+indicates that relative coordinates will follow. 
+
+@end multitable

@@ -21,6 +21,7 @@ FVG includes all the same basic shapes as SVG 1.1.
 @menu
 
 * rect
+* circle
 * ellipse
 * line
 * path
@@ -28,5 +29,12 @@ FVG includes all the same basic shapes as SVG 1.1.
 * polygon
 
 @end menu
+
+@importss{aws,fvg,rect.txi}
+@importss{aws,fvg,circle.txi}
+@importss{aws,fvg,ellipse.txi}
+@importss{aws,fvg,line.txi}
+@importss{aws,fvg,path.txi}
+
 
 
