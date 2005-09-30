@@ -3952,7 +3952,7 @@ class TriangleDrawer
     size_t rescount = clip.DoClip (tri);
     if (rescount == 0) return;
 
-    g3d.polyrast.DrawPolygonFX (rescount, clippedPersp, clipOutBuf, 
+    g3d.polyrast.DrawPolygon (rescount, clippedPersp, clipOutBuf, 
       buffersMask & scanRenderInfo.desiredBuffers, scanRenderInfo);
   }
 

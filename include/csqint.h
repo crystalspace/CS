@@ -46,17 +46,17 @@ static inline long csQround (T n)
 /**\fn static inline long csQfixed8 (float)
  * Quickly convert a floating-point number to 24.8 fixed-point value.
  */
-static inline long csQfixed8 (float n) { return (int)(n * 256.0); }
+static inline long csQfixed8 (float n) { return (int)(n * 256.0f); }
 
 /**\fn static inline long csQfixed16 (float)
  * Quickly convert a floating-point number to 16.16 fixed-point value.
  */
-static inline long csQfixed16 (float n) { return (int)(n * 65536.0); }
+static inline long csQfixed16 (float n) { return (int)(n * 65536.0f); }
 
 /**\fn static inline long csQfixed24 (float)
  * Quickly convert a floating-point number to 8.24 fixed-point value.
  */
-static inline long csQfixed24 (float n) { return (int)(n * 16777216.0); }
+static inline long csQfixed24 (float n) { return (int)(n * 16777216.0f); }
 
 /** @} */
     

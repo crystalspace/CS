@@ -20,6 +20,8 @@
 #ifndef __CS_SOFT3D_TYPES_H__
 #define __CS_SOFT3D_TYPES_H__
 
+#include "csgeom/fixed.h"
+
 namespace cspluginSoft3d
 {
   struct VertexBuffer
@@ -108,24 +110,29 @@ namespace cspluginSoft3d
   };
   struct InterpolateScanlinePersp
   {
-    csVector4 c[maxBuffers];
+    csVector4T<csFixed16> c[maxBuffers];
+    csVector4T<csFixed16> dcdx[maxBuffers];
     csVector4 Ic[maxBuffers];
     csVector4 dIcdx[maxBuffers];
-    float Iz, dIzdx;
+    csFixed24 Iz, dIzdx;
+    float Iz_f, dIzdx_f;
+    int ipx;
     
-    /// Interpolation step for semi-perspective correct texture mapping
-    //int InterpolStep;
-    /// Interpolation step (shift-value) for semi-perspective correct texture mapping
-    //int InterpolShift;
+    int InterpolStep;
+    int InterpolShift;
 
     void Setup (const InterpolateEdgePersp& L, const InterpolateEdgePersp& R,
-      BuffersMask buffersMask, float inv_l)
+      BuffersMask buffersMask, float inv_l, int ipolStep, int ipolShift)
     {
-      //InterpolStep = 16;
-      //InterpolShift = 4;
-      //inv_l = 1.0f / (R.x - L.x);
-      Iz = L.Iz;
-      dIzdx = (R.Iz - L.Iz) * inv_l;
+      InterpolStep = ipolStep;
+      InterpolShift = ipolShift;
+
+      const float ipf = (float)InterpolStep;
+      ipx = InterpolStep;
+      float fact = inv_l * ipf;
+      Iz = Iz_f = L.Iz;
+      dIzdx = dIzdx_f = (R.Iz - L.Iz) * inv_l;
+      dIzdx_f *= ipf;
       for (size_t b = 0; b < maxBuffers; b++)
       {
 	if (!(buffersMask & (1 << b))) continue;
@@ -133,24 +140,47 @@ namespace cspluginSoft3d
 	const csVector4 IcL = L.Ic[b];
 	const csVector4 IcR = R.Ic[b];
 	c[b] = cL;
-	Ic[b] = IcL;
+	float z2 = 1.0f/(Iz_f + dIzdx_f);
 	dIcdx[b].Set (
-	  (IcR.x - IcL.x) * inv_l,
-	  (IcR.y - IcL.y) * inv_l,
-	  (IcR.z - IcL.z) * inv_l,
-	  (IcR.w - IcL.w) * inv_l);
+	  (IcR.x - IcL.x) * fact,
+	  (IcR.y - IcL.y) * fact,
+	  (IcR.z - IcL.z) * fact,
+	  (IcR.w - IcL.w) * fact);
+	Ic[b] = IcL + dIcdx[b];
+	dcdx[b].Set ((Ic[b].x*z2 - c[b].x) >> InterpolShift,
+	  (Ic[b].y*z2 - c[b].y) >> InterpolShift,
+	  (Ic[b].z*z2 - c[b].z) >> InterpolShift,
+	  (Ic[b].w*z2 - c[b].w) >> InterpolShift);
       }
     }
     void Advance (BuffersMask buffersMask)
     {
-      Iz += dIzdx;
-      const float z = 1.0f/Iz;
-
-      for (size_t b = 0; b < maxBuffers; b++)
+      if (--ipx > 0)
       {
-	if (!(buffersMask & (1 << b))) continue;
-	Ic[b] += dIcdx[b];
-	c[b] = Ic[b] * z;
+	Iz += dIzdx;
+	for (size_t b = 0; b < maxBuffers; b++)
+	{
+	  if (!(buffersMask & (1 << b))) continue;
+	  c[b] += dcdx[b];
+	}
+      }
+      else
+      {
+	const float z = 1.0f/Iz_f;
+	const float Iz_f2 = (Iz_f + dIzdx_f);
+	const float z2 = 1.0f / Iz_f2;
+	ipx = InterpolStep;
+	Iz = Iz_f = Iz_f2;
+	for (size_t b = 0; b < maxBuffers; b++)
+	{
+	  if (!(buffersMask & (1 << b))) continue;
+	  c[b] = Ic[b] * z;
+	  Ic[b] += dIcdx[b];
+	  dcdx[b].Set ((Ic[b].x*z2 - c[b].x) >> InterpolShift,
+	    (Ic[b].y*z2 - c[b].y) >> InterpolShift,
+	    (Ic[b].z*z2 - c[b].z) >> InterpolShift,
+	    (Ic[b].w*z2 - c[b].w) >> InterpolShift);
+	}
       }
     }
   };

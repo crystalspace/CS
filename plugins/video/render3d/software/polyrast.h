@@ -21,6 +21,7 @@
 #define __CS_SOFT3D_POLYRAST_H__
 
 #include "csqint.h"
+#include "csgeom/math.h"
 
 #include "types.h"
 #include "scanindex.h"
@@ -54,15 +55,63 @@ namespace cspluginSoft3d
     uint32* z_buffer;
     uint8** line_table;
     int pixel_shift;
+
+    inline static void SelectInterpolationStep (float M, int InterpolMode,
+      int& InterpolStep, int& InterpolShift)
+    {
+      /*
+      * For the four interpolation modes.
+      */
+      struct csSft3DCom
+      {
+	int step1, shift1;
+	int step2, shift2;
+	int step3, shift3;
+	int step4, shift4;
+      };
+
+      static const csSft3DCom inter_modes[4] =
+      {
+	{ 128, 7, 64, 6, 32, 5, 16, 4 },      // Selective
+	{ 32, 5, 32, 5, 32, 5, 32, 5 },       // 32-steps
+	{ 16, 4, 16, 4, 16, 4, 16, 4 },       // 16-steps
+	{ 8, 3, 8, 3, 8, 3, 8, 3 }            // 8-steps
+      };
+      // Select the right interpolation factor based on the z-slope of our
+      // polygon. This will greatly increase the speed of polygons which are
+      // horizontally constant in z.
+      if (ABS (M) < .000001)
+      {
+	InterpolStep = inter_modes[InterpolMode].step1;
+	InterpolShift = inter_modes[InterpolMode].shift1;
+      }
+      else if (ABS (M) < .00005)
+      {
+	InterpolStep = inter_modes[InterpolMode].step2;
+	InterpolShift = inter_modes[InterpolMode].shift2;
+      }
+      else if (ABS (M) < .001)
+      {
+	InterpolStep = inter_modes[InterpolMode].step3;
+	InterpolShift = inter_modes[InterpolMode].shift3;
+      }
+      else
+      {
+	InterpolStep = inter_modes[InterpolMode].step4;
+	InterpolShift = inter_modes[InterpolMode].shift4;
+      }
+    }
+
   public:
     PolygonRasterizer() : do_interlaced(-1)
     {
     }
 
-    void DrawPolygonFX (size_t vertNum, const csVector3* vertices,
+    void DrawPolygon (size_t vertNum, const csVector3* vertices,
       const VertexBuffer* inBuffers, BuffersMask buffersMask,
       ScanlineRenderInfo& sri)
     {
+      CS_ASSERT_MSG ("Degenerate polygon", vertNum >= 3);
       //-----
       // Get the values from the polygon for more convenient local access.
       // Also look for the top-most and bottom-most vertices.
@@ -72,15 +121,38 @@ namespace cspluginSoft3d
       float bot_y = 99999;
       top = bot = 0;                        // avoid GCC complains
       size_t i;
+      float min_x = 99999;
+      float max_x = -99999;
+      float min_z = 99999;
+      float max_z = -99999;
       for (i = 0 ; i < vertNum ; i++)
       {
-	if (vertices[i].y > top_y)
+	const csVector3& v = vertices[i];
+	if (v.y > top_y)
 	  top_y = vertices[top = i].y;
-	if (vertices[i].y < bot_y)
+	if (v.y < bot_y)
 	  bot_y = vertices[bot = i].y;
+
+	if (v.x > max_x) max_x = v.x;
+	else if (v.x < min_x) min_x = v.x;
+
+	const float z = 1.0f/v.z;
+	if (z > max_z) max_z = z;
+	else if (z < min_z) min_z = z;
       }
     
-      // If the polygon exceeds the screen, it is an engine failure
+      int ipolStep = 16;
+      int ipolShift = 4;
+      // Pick an interpolation step...
+      /* @@@ FIXME: makes that computation sense?
+       * SelectInterpolationStep() is taken verbatim from the old polygon
+       * code, and I'm not certain about the Z slope values... [-res] */
+      float dx = max_x - min_x;
+      float zss = 0.0f;
+      if (ABS(dx) > EPSILON)
+	zss = (max_z - min_z) / dx;
+      SelectInterpolationStep (zss, 0,
+	ipolStep, ipolShift);
     
       // Jorrit: Removed the test below because it causes polygons
       // to disappear.
@@ -159,7 +231,7 @@ namespace cspluginSoft3d
 	    L.edge.Setup (vertices, inBuffers, buffersMask, L.sv, L.fv, sy);
 	  } /* endif */
 	} while (!leave); /* enddo */
-    
+
 	//-----
 	// Now draw a trapezoid.
 	//-----
@@ -183,12 +255,12 @@ namespace cspluginSoft3d
 	    if (xr > xl)
 	    {
 	      int l = xr - xl;
-	      float inv_l = 1. / l;
+	      //float inv_l = 1. / l;
 
-	      InterpolateScanlinePersp scanline;
-	      scanline.Setup (L.edge, R.edge, buffersMask, inv_l);
+	      //InterpolateScanlinePersp scanline;
+	      //scanline.Setup (L.edge, R.edge, buffersMask, inv_l);
     
-	      float dzz = (R.edge.Iz - L.edge.Iz) * inv_l;
+	      //float dzz = (R.edge.Iz - L.edge.Iz) * inv_l;
 	      //int uu = 0, duu = 0, vv = 0, dvv = 0;
 	      //if (pqinfo.textured)
 	      {
@@ -268,8 +340,8 @@ namespace cspluginSoft3d
 		//pqinfo.drawline (dest, l, zbuff, uu, duu, vv, dvv,
 		  //L.edge.z, dzz, pqinfo.bm, pqinfo.shf_w);
 
-	      sri.proc (sri.renderer, scanline, dest, l, zbuff, 
-		L.edge.Iz, dzz);
+	      sri.proc (sri.renderer, L.edge, R.edge, ipolStep, ipolShift, 
+		dest, l, zbuff);
 	    }
 	  }
     

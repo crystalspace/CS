@@ -22,6 +22,7 @@ chronological order.
 	  know to do this.
 	- caedes changed the projectortest map so the spot light now uses the 
 	  rotatelight sequence for real disco effect.
+	- res made the SR scanline interpolation use fixed point maths.
 29-Sep-2005
 	- Eric Sunshine fixed the CoreAudio plugin so that it once again builds
 	  cleanly. Also reduced namespace pollution a bit.

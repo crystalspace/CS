@@ -60,7 +60,11 @@ public:
     T m[4];
   };
 #endif
-
+  /* Note: since T is used in an union above, it cannot have custom ctors.
+   * So be careful when creating new Ts; e.g.: don't use T(x), but something
+   * like T y = x.
+   */
+  
   /**
    * Make a new vector. The vector is not
    * initialized. This makes the code slightly faster.
@@ -84,6 +88,17 @@ public:
 
   /// Convert from a three-component vector. w is set to 1.
   csVector4T (const csVector3 &v) : x(v.x), y(v.y), z(v.z), w(1.0f) {}
+
+  /// Assignment operator.
+  template<typename T2>
+  csVector4T& operator= (const csVector4T<T2>& other)
+  {
+    x = other.x;
+    y = other.y;
+    z = other.z;
+    w = other.w;
+    return *this;
+  }
 
   /// Return a textual representation of the vector in the form "x,y,z,w".
   csString Description() const
@@ -139,11 +154,11 @@ public:
 
   /// Multiply a vector and a scalar int.
   inline friend csVector4T operator* (const csVector4T& v, int f)
-  { return v * T(f); }
+  { T _f = f; return v * _f; }
 
   /// Multiply a vector and a scalar int.
   inline friend csVector4T operator* (int f, const csVector4T& v)
-  { return v * T(f); }
+  { T _f = f; return v * _f; }
 
   /// Divide a vector by a scalar.
   inline friend csVector4T operator/ (const csVector4T& v, T f)
@@ -151,7 +166,7 @@ public:
 
   /// Divide a vector by a scalar int.
   inline friend csVector4T operator/ (const csVector4T& v, int f)
-  { return v / T(f); }
+  { T _f = f; return v / _f; }
 
   /// Check if two vectors are equal.
   inline friend bool operator== (const csVector4T& v1, const csVector4T& v2)

@@ -120,8 +120,9 @@ namespace cspluginSoft3d
   {
   public:
     typedef void (*ScanlineProc) (ScanlineRendererBase* _This,
-      InterpolateScanlinePersp& ipol, void* dest, uint len,
-      uint32 *zbuff, float z, float dz);
+      InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
+      int ipolStep, int ipolShift,
+      void* dest, uint len, uint32 *zbuff);
 
     virtual ScanlineProc Init (csSoftwareTexture** textures,
       const csRenderMeshModes& modes,
@@ -132,7 +133,8 @@ namespace cspluginSoft3d
 
   struct ZBufMode_ZNone
   {
-    ZBufMode_ZNone (float /*z*/, float /*dz*/, uint32* /*zBuff*/) {}
+    ZBufMode_ZNone (const InterpolateScanlinePersp& /*ipol*/, 
+      uint32* /*zBuff*/) {}
 
     bool Test () { return true; }
     void Update () {}
@@ -141,73 +143,67 @@ namespace cspluginSoft3d
 
   struct ZBufMode_ZFill
   {
-    float z;
-    float dz;
+    const uint32 Iz;
     uint32* zBuff;
 
-    ZBufMode_ZFill (float z, float dz, uint32* zBuff) : 
-      z(z), dz(z), zBuff(zBuff) {}
+    ZBufMode_ZFill (const InterpolateScanlinePersp& ipol, uint32* zBuff) : 
+      Iz(ipol.Iz.GetFixed()), zBuff(zBuff) {}
 
     bool Test () { return true; }
-    void Update () { *zBuff = csQfixed24 (z); }
-    void Advance () { z+=dz; zBuff++; }
+    void Update () { *zBuff = Iz; }
+    void Advance () { zBuff++; }
   };
 
   struct ZBufMode_ZTest
   {
-    float z;
-    float dz;
+    const uint32 Iz;
     uint32* zBuff;
 
-    ZBufMode_ZTest (float z, float dz, uint32* zBuff) : 
-      z(z), dz(z), zBuff(zBuff) {}
+    ZBufMode_ZTest (const InterpolateScanlinePersp& ipol, uint32* zBuff) : 
+      Iz(ipol.Iz.GetFixed()), zBuff(zBuff) {}
 
-    bool Test () { return (uint32)csQfixed24 (z) > *zBuff; }
+    bool Test () { return Iz >= *zBuff; }
     void Update () { }
-    void Advance () { z+=dz; zBuff++; }
+    void Advance () { zBuff++; }
   };
 
   struct ZBufMode_ZUse
   {
-    float z;
-    float dz;
+    const uint32 Iz;
     uint32* zBuff;
-    uint32 zFixed;
 
-    ZBufMode_ZUse (float z, float dz, uint32* zBuff) : 
-      z(z), dz(z), zBuff(zBuff) { }
+    ZBufMode_ZUse (const InterpolateScanlinePersp& ipol, uint32* zBuff) : 
+      Iz(ipol.Iz.GetFixed()), zBuff(zBuff) {}
 
-    bool Test () { zFixed = csQfixed24 (z); return zFixed >= *zBuff; }
-    void Update () { *zBuff = zFixed; }
-    void Advance () { z+=dz; zBuff++; }
+    bool Test () { return Iz >= *zBuff; }
+    void Update () { *zBuff = Iz; }
+    void Advance () { zBuff++; }
   };
 
   struct ZBufMode_ZEqual
   {
-    float z;
-    float dz;
+    const uint32 Iz;
     uint32* zBuff;
 
-    ZBufMode_ZEqual (float z, float dz, uint32* zBuff) : 
-      z(z), dz(z), zBuff(zBuff) {}
+    ZBufMode_ZEqual (const InterpolateScanlinePersp& ipol, uint32* zBuff) : 
+      Iz(ipol.Iz.GetFixed()), zBuff(zBuff) {}
 
-    bool Test () { return (uint32)csQfixed24 (z) == *zBuff; }
+    bool Test () { return Iz == *zBuff; }
     void Update () { }
-    void Advance () { z+=dz; zBuff++; }
+    void Advance () { zBuff++; }
   };
 
   struct ZBufMode_ZInvert
   {
-    float z;
-    float dz;
+    const uint32 Iz;
     uint32* zBuff;
 
-    ZBufMode_ZInvert (float z, float dz, uint32* zBuff) : 
-      z(z), dz(z), zBuff(zBuff) {}
+    ZBufMode_ZInvert (const InterpolateScanlinePersp& ipol, uint32* zBuff) : 
+      Iz(ipol.Iz.GetFixed()), zBuff(zBuff) {}
 
-    bool Test () { return (uint32)csQfixed24 (z) < *zBuff; }
+    bool Test () { return Iz < *zBuff; }
     void Update () { }
-    void Advance () { z+=dz; zBuff++; }
+    void Advance () { zBuff++; }
   };
 
   template<typename Pix>
@@ -216,7 +212,7 @@ namespace cspluginSoft3d
   public:
     Pix pix;
     uint32* bitmap;
-    int bitmap_log2w;
+    int v_shift_r;
     int and_w;
     int and_h;
     csVector4 dnTC;
@@ -226,28 +222,32 @@ namespace cspluginSoft3d
     struct ScanlineImpl
     {
       static void Scan (ScanlineRendererBase* _This,
-	InterpolateScanlinePersp& ipol, void* dest, uint len,
-	uint32 *zbuff, float z, float dz)
+	InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
+	int ipolStep, int ipolShift,
+	void* dest, uint len, uint32 *zbuff)
       {
+	static const BuffersMask myBuffers = 1 << VATTR_BUFINDEX(TEXCOORD);
+	InterpolateScanlinePersp ipol;
+	ipol.Setup (L, R, myBuffers, 1.0f / len, ipolStep, ipolShift);
 	ScanlineRenderer<Pix>* This = (ScanlineRenderer<Pix>*)_This;
 	Pix& pix = This->pix;
 	const uint32* bitmap = This->bitmap;
-	const int bitmap_log2w = This->bitmap_log2w;
+	const int v_shift_r = This->v_shift_r;
 	const int and_w = This->and_w;
 	const int and_h = This->and_h;
 
 	typename_qualifier Pix::PixType* _dest = 
 	  (typename_qualifier Pix::PixType*)dest;
 	typename_qualifier Pix::PixType* _destend = _dest + len;
-	Zmode Z (z, dz, zbuff);
+	Zmode Z (ipol, zbuff);
 
 	while (_dest < _destend)
 	{
 	  if (Z.Test())
 	  {
 	    int u = (int)ipol.c[VATTR_BUFINDEX(TEXCOORD)].x;
-	    int v = (int)ipol.c[VATTR_BUFINDEX(TEXCOORD)].y;
-	    uint32 texel = bitmap [((v & and_h) << bitmap_log2w) + (u & and_w)];
+	    int32 v = ipol.c[VATTR_BUFINDEX(TEXCOORD)].y.GetFixed();
+	    uint32 texel = bitmap [((v >> v_shift_r) & and_h) + (u & and_w)];
 	    {
 	      uint8 r = texel & 0xff;
 	      uint8 g = (texel >> 8) & 0xff;
@@ -258,7 +258,7 @@ namespace cspluginSoft3d
 	    }
 	  }
 	  _dest++;
-	  ipol.Advance (1 << VATTR_BUFINDEX(TEXCOORD));
+	  ipol.Advance (myBuffers);
 	  Z.Advance();
 	} /* endwhile */
       }
@@ -277,9 +277,10 @@ namespace cspluginSoft3d
       csSoftwareTexture* tex = textures[0];
       if (tex == 0) return 0;      // @@@ Use flat color instead
       bitmap = tex->bitmap;
-      bitmap_log2w = tex->get_w_shift();
+      v_shift_r = tex->get_w_shift();
       and_w = tex->get_w_mask();
-      and_h = tex->get_h_mask();
+      and_h = tex->get_h_mask() << v_shift_r;
+      v_shift_r = 16 - v_shift_r;
 
       dnTC.Set (tex->get_width(), tex->get_height(), 0.0f, 0.0f);
       denormFactors = &dnTC;
