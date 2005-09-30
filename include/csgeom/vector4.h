@@ -31,7 +31,7 @@
 
 #include "csextern.h"
 #include "csgeom/vector3.h"
-
+#include "csutil/csstring.h"
 
 /**
  * A 4D vector with variable type components.
