@@ -20,6 +20,8 @@ chronological order.
 	  in the configure script to fail unconditionally. Re-installing the
 	  QuickTime SDK should restore the header, however not all developers
 	  know to do this.
+	- caedes changed the projectortest map so the spot light now uses the 
+	  rotatelight sequence for real disco effect.
 29-Sep-2005
 	- Eric Sunshine fixed the CoreAudio plugin so that it once again builds
 	  cleanly. Also reduced namespace pollution a bit.
