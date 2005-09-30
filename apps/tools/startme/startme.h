@@ -50,65 +50,65 @@ struct DemoData
 DemoData demos[DEMO_COUNT] =
 {
   { "awstest",
-  	"awstest.exe -silent",
+  	"awstest -silent",
 	"AwsTest is a test application that demonstrates our built-in#\
 window system. It nicely integrates with the 3D engine. You can see#\
 a 3D view in the background and another 3D view on the same world#\
 in a window.",
   	"startme_awstest.jpg" },
   { "ceguitest",
-  	"ceguitest.exe -silent",
+  	"ceguitest -silent",
 	"CeGUITest is a test application for a window system based on#\
 CeGUI.",
   	"startme_ceguitest.jpg" },
   { "csdemo",
-  	"csdemo.exe -silent -mode=800x600",
+  	"csdemo -silent -mode=800x600",
 	"CsDemo is a generic demo application. We currently have only one#\
 demo file which is 'demodata.zip'. Just let it run and watch.",
   	"startme_csdemo.jpg" },
   { "isotest",
-  	"isotest.exe -silent -mode=800x600",
+  	"isotest -silent -mode=800x600",
 	"Crystal Space is a real 3D engine. However with some tweaking you#\
 can force it into emulating something that resembles isometric#\
 a bit. This example also uses stencil shadows.",
   	"startme_isotest.jpg" },
   { "lightningtest",
-  	"lghtngtest.exe -silent -mode=800x600",
+  	"lghtngtest -silent -mode=800x600",
 	"A small demo showing the lightning mesh",
   	"startme_lightningtest.jpg" },
   { "parallaxtest",
-  	"walktest.exe -silent parallaxtest -mode=800x600",
+  	"walktest -silent parallaxtest -mode=800x600",
 	"This is WalkTest with the parallaxtest map. It shows parallax#\
 mapping in Crystal Space. You need pretty good hardware to see#\
 the effects. If you don't have the needed hardware support you will#\
 see nothing special.",
   	"startme_parallaxtest.jpg" },
   { "particles",
-  	"walktest.exe -silent particles -mode=800x600",
+  	"walktest -silent particles -mode=800x600",
 	"This is WalkTest with the particles map. It is a very simple demo#\
 that shows two particle systems.",
   	"startme_particles.jpg" },
   { "partsys",
-  	"walktest.exe -silent partsys -mode=800x600 -relight",
+  	"walktest -silent partsys -mode=800x600 -relight",
 	"This is WalkTest with the partsys map. It is a very simple demo#\
 that demonstrates several particle systems in Crystal Space.",
   	"startme_partsys.jpg" },
   { "terrain",
-  	"walktest.exe -silent terrain -mode=800x600",
+  	"walktest -silent terrain -mode=800x600",
 	"This is WalkTest with the terrain map. It demonstrates the landscape#\
 engine in Crystal Space. There are two versions of this map. This one#\
 is 'terrain' which looks nice but needs good hardware to run nicely.#\
 'terrainf' is a lot faster.",
   	"startme_terrain.jpg" },
   { "terrainf",
-  	"walktest.exe -silent terrainf -mode=800x600 -relight",
+  	"walktest -silent terrainf -mode=800x600 -relight",
 	"This is WalkTest with the terrainf map. It demonstrates the#\
 landscape engine in Crystal Space. There are two versions of this#\
 map. This one is 'terrainf' which is usually faster then 'terrain'#\
 and doesn't require advanced 3D hardware.",
   	"startme_terrainf.jpg" },
   { "walktest",
-  	"walktest.exe -silent -mode=800x600 -relight",
+  	"walktest -silent -mode=800x600 -relight",
 	"This is WalkTest with the default flarge map. This really is an#\
 ugly map. It was completely created in a text editor. The purpose#\
 of this map is to be a general test environment for the Crystal#\
@@ -116,7 +116,7 @@ Space developers. It contains a lot of objects and it can give you#\
 some ideas on what is possible.",
   	"startme_walktest.jpg" },
   { "waterdemo",
-  	"waterdemo.exe -silent -mode=800x600",
+  	"waterdemo -silent -mode=800x600",
 	"WaterDemo is a small demo of a water effect in Crystal Space.#\
 Just press space bar to see the effect.",
   	"startme_waterdemo.jpg" }
