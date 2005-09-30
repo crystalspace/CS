@@ -188,7 +188,7 @@ static void cmd_help (char *)
 "unmount vpath {rpath}  Remove a virtual path; completely if no rpath is given\n"
 "------------------------\n"
 "The following aliases are also recognized:\n"
-"chdir --> cd        copy --> cp         del --> rm\n"
+"chdir --> cd        copy --> cp         del  --> rm\n"
 "dir   --> ls        quit --> exit       type --> cat\n"
 "------------------------\n"
 "Wildcards are okay in these commands: ls, cp, rm\n"
