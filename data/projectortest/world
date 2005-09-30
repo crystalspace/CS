@@ -1852,11 +1852,10 @@
 	    <enable trigger="animLight" />
 	</sequence>
         <sequence name="moveLight">
-	    <movelight light="bumplight" duration="1000"
-              x="5" y="0" z="0" />
-	    <delay time="1000" />
-	    <movelight light="bumplight" duration="1000"
-              x="-5" y="0" z="0" />
+	    <rotatelight light="bumplight" duration="1000">
+	      <roty>1</roty>
+	      <v x="-3.2" y="-11" z="-1.4" />
+	    </rotatelight>
 	    <delay time="1000" />
 	    <enable trigger="moveLight" />
         </sequence>
