@@ -41,9 +41,9 @@
 #include <windows.h>
 #include <tlhelp32.h>
 
-static void WriteRangeInfo (HANDLE tempFile, HANDLE rangeFile, 
-			    DWORD rangeStart, DWORD rangeSize,
-			    DWORD rangeOffset, int& rangeCount)
+static void WriteRangeInfo (HANDLE rangeFile, DWORD rangeStart, 
+			    DWORD rangeSize,DWORD rangeOffset, 
+			    int& rangeCount)
 {
   if (rangeStart != 0)
   {
@@ -92,7 +92,7 @@ static void CollectHeapInfo (HANDLE snap, HANDLE tempFile,
 	}
 	else
 	{
-	  WriteRangeInfo (tempFile, rangeFile, rangeStart, rangeSize, 
+	  WriteRangeInfo (rangeFile, rangeStart, rangeSize, 
 	    rangeOffset, rangeCount);
 
 	  rangeStart = heapEntry.dwAddress;
@@ -110,7 +110,7 @@ static void CollectHeapInfo (HANDLE snap, HANDLE tempFile,
     hasHeapList = Heap32ListNext (snap, &heapList);
   }
 
-  WriteRangeInfo (tempFile, rangeFile, rangeStart, rangeSize, rangeOffset, 
+  WriteRangeInfo (rangeFile, rangeStart, rangeSize, rangeOffset, 
     rangeCount);
 }
 
@@ -390,7 +390,8 @@ const char* cswinMinidumpWriter::WriteWrappedMinidump (
   csCallStack* stack = cswinCallStackHelper::CreateCallStack (
     GetCurrentProcess(), GetCurrentThread(), context,
     -1);
-  const char* dumpFileName = cswinMinidumpWriter::WriteMinidump (except);
+  const char* dumpFileName = cswinMinidumpWriter::WriteMinidump (except,
+    dumpHeap);
 
   if (dumpFileName != 0)
   {
