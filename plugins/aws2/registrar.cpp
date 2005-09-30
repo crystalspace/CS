@@ -66,6 +66,8 @@ Rescope(object *o, scope *sc)
   case iObject::T_FUNCTION:
     static_cast<function *>(o)->setScope(sc);
     break;
+  default:
+    break;
   }
 }
 
