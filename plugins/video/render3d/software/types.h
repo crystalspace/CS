@@ -167,10 +167,10 @@ namespace cspluginSoft3d
       else
       {
 	const float z = 1.0f/Iz_f;
-	const float Iz_f2 = (Iz_f + dIzdx_f);
-	const float z2 = 1.0f / Iz_f2;
+	Iz_f += dIzdx_f;
+	Iz = Iz_f;
+	const float z2 = 1.0f / Iz_f;
 	ipx = InterpolStep;
-	Iz = Iz_f = Iz_f2;
 	for (size_t b = 0; b < maxBuffers; b++)
 	{
 	  if (!(buffersMask & (1 << b))) continue;
