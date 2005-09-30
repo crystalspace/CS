@@ -830,11 +830,22 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
         }
 	break;
       case XMLTOKEN_ROTATE:
+      case XMLTOKEN_ROTATELIGHT:
         {
-	  csRef<iParameterESM> mesh = ResolveOperationParameter (
+	  csRef<iParameterESM> target;
+	  if (id == XMLTOKEN_ROTATE)
+	  {
+	    target = ResolveOperationParameter (
 	  	ldr_context,
 	  	child, PARTYPE_MESH, "mesh", seqname, base_params);
-	  if (!mesh) return 0;
+	  }
+	  else
+	  {
+	    target = ResolveOperationParameter (
+	  	ldr_context,
+	  	child, PARTYPE_LIGHT, "light", seqname, base_params);
+	  }
+	  if (!target) return 0;
 
 	  int nr = 0;
 	  int axis1 = -1, axis2 = -1, axis3 = -1;
@@ -886,13 +897,21 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 		break;
 	      case XMLTOKEN_AUTOOFFSET:
 		{
-		  csRef<iMeshWrapper> mw = SCF_QUERY_INTERFACE (mesh->GetValue(),
+		  csRef<iMeshWrapper> mw = SCF_QUERY_INTERFACE (target->GetValue(),
 		    iMeshWrapper);
 		  if (mw)
 		  {
 		    csBox3 box;
 		    mw->GetWorldBoundingBox (box);
 		    offset = (box.Min() + box.Max()) / 2.0f;
+		  }
+		  else
+		  {
+		    csRef<iLight> light = SCF_QUERY_INTERFACE (target->GetValue(),iLight);
+		    if (light)
+		    {
+		       offset = light->GetCenter();
+		    }
 		  }
 		}
 		break;
@@ -902,7 +921,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	    }
 	  }
 
-	  sequence->AddOperationRotateDuration (cur_time, mesh,
+	  sequence->AddOperationRotateDuration (cur_time, target,
 	  	axis1, tot_angle1, axis2, tot_angle2,
 	  	axis3, tot_angle3, offset, duration);
 	}

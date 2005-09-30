@@ -674,7 +674,7 @@ public:
 class RotateInfo : public iSequenceTimedOperation
 {
 public:
-  csRef<iMeshWrapper> mesh;
+  csRef<iMovable> movable;
   int axis1, axis2, axis3;
   float tot_angle1, tot_angle2, tot_angle3;
   csVector3 offset;
@@ -734,8 +734,8 @@ public:
 	break;
     }
     trans.Translate (offset);
-    mesh->GetMovable ()->SetTransform (trans);
-    mesh->GetMovable ()->UpdateMove ();
+    movable->SetTransform (trans);
+    movable->UpdateMove ();
   }
 };
 
@@ -751,6 +751,7 @@ class OpRotate : public OpStandard
 private:
   csRef<iParameterESM> meshpar;
   csRef<iMeshWrapper> mesh;
+  csRef<iLight> light;
   int axis1, axis2, axis3;
   float tot_angle1, tot_angle2, tot_angle3;
   csVector3 offset;
@@ -766,7 +767,11 @@ public:
   	csTicks duration, iEngineSequenceManager* eseqmgr)
   {
     if (meshpar->IsConstant ())
+    {
       mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (), iMeshWrapper);
+      if (!mesh)
+        light = SCF_QUERY_INTERFACE (meshpar->GetValue (), iLight);
+    }
     else
       OpRotate::meshpar = meshpar;
     OpRotate::axis1 = axis1;
@@ -783,22 +788,37 @@ public:
   virtual void Do (csTicks dt, iBase* params)
   {
     if (meshpar)
+    {
       mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (params), iMeshWrapper);
-    iMovable* movable = mesh->GetMovable ();
-    RotateInfo* ri = new RotateInfo ();
-    ri->mesh = mesh;
-    ri->start_transform = movable->GetTransform ();
-    ri->axis1 = axis1;
-    ri->axis2 = axis2;
-    ri->axis3 = axis3;
-    ri->tot_angle1 = tot_angle1;
-    ri->tot_angle2 = tot_angle2;
-    ri->tot_angle3 = tot_angle3;
-    ri->offset = offset;
-    eseqmgr->FireTimedOperation (dt, duration, ri);
-    ri->DecRef ();
+      if (!mesh)
+        light = SCF_QUERY_INTERFACE (meshpar->GetValue (), iLight);
+    }
+    iMovable* movable = NULL;
+    if (mesh)
+      movable = mesh->GetMovable ();
+    else if (light)
+      movable = light->GetMovable ();
+    if (movable)
+    {
+      RotateInfo* ri = new RotateInfo ();
+      ri->movable = movable;
+      ri->start_transform = movable->GetTransform ();
+      ri->axis1 = axis1;
+      ri->axis2 = axis2;
+      ri->axis3 = axis3;
+      ri->tot_angle1 = tot_angle1;
+      ri->tot_angle2 = tot_angle2;
+      ri->tot_angle3 = tot_angle3;
+      ri->offset = offset;
+      eseqmgr->FireTimedOperation (dt, duration, ri);
+      ri->DecRef ();
+    }
+
     if (meshpar)
+    {
       mesh = 0;
+      light = 0;
+    }
   }
 };
 
