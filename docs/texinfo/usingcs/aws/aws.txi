@@ -7,7 +7,8 @@
 
 @noindent
 @emph{Written by Christopher Nelson, @email{paradox@@bbhc.org}.
-Conversion to Texinfo by F. Richter, @email{resqu@@gmx.ch}.}
+Original @sc{aws} documentation converted to Texinfo by F. Richter,
+@email{resqu@@gmx.ch}.}
 
 The Alternate Windowing System is a plugin designed to replace
 the old monolithic (and retired) Crystal Space Windowing System (@sc{csws}). 
@@ -31,7 +32,7 @@ easily @dfn{skinned} by non-programmers.  For example code, see
 * AWS Automation:: @sc{aws} Automation: Properties and Scripting
 * AWS Component Scripting:: Automation Objects Available for Components
 * AWS Window Scripting:: Automation Objects Available for Windows
-* AWS Flexible Vector Graphics:: Definition and Differences from Scalable Vector Graphics
+* AWS FVG:: Flexible Vector Graphics
 @end menu
 
 @importss{usingcs,aws,quick.txi}

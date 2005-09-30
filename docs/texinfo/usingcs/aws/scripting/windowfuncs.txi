@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node AWS Window Scripting, , AWS Component Scripting, AWS
+@node AWS Window Scripting, AWS FVG, AWS Component Scripting, AWS
 @subsection Automation Objects Available for Windows
 
 @multitable @columnfractions .25 .40 .35

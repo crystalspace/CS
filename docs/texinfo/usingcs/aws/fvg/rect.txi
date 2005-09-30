@@ -1,29 +1,40 @@
 @c -*-texinfo-*-
-@node AWS, Flexible Vector Graphics Definition
-@subsection FVG rect
+@node AWS FVG Rectangle, AWS FVG Circle, AWS FVG, AWS FVG
+@subsubsection @sc{fvg} Rectangle
 
-The rect is a rectangular vector shape, with some additional options.
+The ``rect'' is a rectangular vector shape, with some additional options.
 
 @subsubheading Defining the Shape
 
-Example:
+Example: This creates a normal rectangle filled with white and bordered by red.
 
-<rect x="0" y="0" width="10" height="10" stroke="#ff0000" fill="#ffffff" />
+@example
+<rect x="0"
+      y="0"
+      width="10"
+      height="10"
+      stroke="#ff0000"
+      fill="#ffffff" />
+@end example
 
-This creates a normal rectangle filled with white and bordered by red.
+@subsubheading Differences from @sc{svg}
 
-@subsubheading Differences from SVG
+The @sc{fvg} rect command differs from its @sc{svg} relative in the following
+ways:
 
-* In SVG you use the parameters rx and ry for the roundess of the corners.  
-FVG supports roundness instead.
+@itemize @bullet
+@item
+In @sc{svg} you use the parameters @samp{rx} and @samp{ry} for the roundess of
+the corners. @sc{fvg} supports @samp{roundness} instead.
 
-* In SVG the miter parameter does not exist.
+@item
+In @sc{svg} the @samp{miter} parameter does not exist.
+@end itemize
 
 @subsubheading Allowed Parameters
 
-@multitable @columnfractions .25 .40 .35
+@multitable @columnfractions .10 .5 .40 .45
 @item @emph{Name} @tab @emph{Required} @tab @emph{Example} @tab @emph{Description}
-
 @item @code{x}
 @tab  yes
 @tab  @code{x="0"}
@@ -47,30 +58,29 @@ FVG supports roundness instead.
 @item @code{roundness}
 @tab  no
 @tab  @code{roundness="0.5"}
-@tab  A value greater than zero, but less than or equal to 1.  If this
+@tab  A value greater than zero, but less than or equal to one.  If this
 is present it means that the rectangle will have rounded corners.  The
 higher this number, the more round the corners will be.
 
 @item @code{miter}
 @tab  no
 @tab  @code{miter="0.25"}
-@tab  A value greater than zero, but less than or equal to 1.  If this
-is present it means that the rectangle will have mitered corners.  The
-higher this number, the more beveled the rectangle will be.  If both miter
-and roundness are present, roundness takes precedence.
+@tab A value greater than zero, but less than or equal to one.  If this is
+present it means that the rectangle will have mitered corners.  The higher this
+number, the more beveled the rectangle will be.  If both @samp{miter} and
+@samp{roundness} are present, @samp{roundness} takes precedence.
 
 @item @code{stroke}
 @tab  no
 @tab  @code{stroke="#ff0000"}
-@tab  Turns on stroking of the shape, and sets the color.  If this is
-not present, the shape will not be stroked.  This value or fill must
+@tab Turns on stroking of the shape, and sets the color.  If this is not
+present, the shape will not be stroked.  Either this value or @samp{fill} must
 be present or the shape will be invisible.
 
 @item @code{fill}
 @tab  no
 @tab  @code{fill="#ff0000"}
-@tab  Turns on filling of the shape, and sets the color.  If this is
-not present, the shape will not be filled.  This value or stroke must
+@tab Turns on filling of the shape, and sets the color.  If this is not
+present, the shape will not be filled.  Either this value or @samp{stroke} must
 be present or the shape will be invisible.
-
 @end multitable

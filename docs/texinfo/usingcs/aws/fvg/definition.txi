@@ -1,40 +1,39 @@
 @c -*-texinfo-*-
-@node AWS
-@subsection Flexible Vector Graphics Definition
+@node AWS FVG, , AWS Window Scripting, AWS
+@subsection Flexible Vector Graphics
 
-Flexible Vector Graphics is a subset of Scalable Vector Graphics.  It stays as close
-as possible to the SVG 1.1 specification, while omitting some of the more complex
-operations.
+Flexible Vector Graphics (@sc{fvg}) is a subset of Scalable Vector Graphics
+(@sc{svg}). @sc{fvg} is the graphics system underlying the @sc{aws2} Crystal
+Space embedded windowing system. It mirrors as closely as possible the @sc{svg}
+1.1 specification, while omitting some of the more complex
+operations. The @sc{svg} 1.1 specification can be found here:
 
-Here we will define the functionality of @sc{fvg} and make some notes about particular 
-differences between SVG and @sc{fvg}.  
+@noindent
+@uref{http://www.w3.org/TR/SVG/}
+
+In this document, we will define the functionality of @sc{fvg} and make some
+notes about particular differences between @sc{svg} and @sc{fvg}.
 
 @subsubheading Defining a Shape
 
-@sc{fvg} should be included directly in AWS's XML definition files.  Just as the normal
-definition files can use automation constructs, fvg can too.
+@sc{fvg} should be included directly in @sc{aws}'s @sc{xml} definition
+files. Just as the normal definition files can use automation constructs, so
+too can @sc{fvg}.
 
 @subsubheading Basic Shapes
 
-FVG includes all the same basic shapes as SVG 1.1.
+@sc{fvg} includes all the same basic shapes as does @sc{svg} 1.1.
 
 @menu
-
-* rect
-* circle
-* ellipse
-* line
-* path
-* polyline
-* polygon
-
+* AWS FVG Rectangle:: @sc{fvg} Rectangle
+* AWS FVG Circle:: @sc{fvg} Circle
+* AWS FVG Ellipse:: @sc{fvg} Ellipse
+* AWS FVG Line:: @sc{fvg} Line
+* AWS FVG Path:: @sc{fvg} Path
 @end menu
 
-@importss{aws,fvg,rect.txi}
-@importss{aws,fvg,circle.txi}
-@importss{aws,fvg,ellipse.txi}
-@importss{aws,fvg,line.txi}
-@importss{aws,fvg,path.txi}
-
-
-
+@importsss{usingcs,aws,fvg,rect.txi}
+@importsss{usingcs,aws,fvg,circle.txi}
+@importsss{usingcs,aws,fvg,ellipse.txi}
+@importsss{usingcs,aws,fvg,line.txi}
+@importsss{usingcs,aws,fvg,path.txi}

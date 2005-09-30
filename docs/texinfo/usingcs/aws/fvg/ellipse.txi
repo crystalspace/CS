@@ -1,25 +1,30 @@
 @c -*-texinfo-*-
-@node AWS, Flexible Vector Graphics Definition
-@subsection FVG ellipse
+@node AWS FVG Ellipse, AWS FVG Line, AWS FVG Circle, AWS FVG
+@subsubsection @sc{fvg} Ellipse
 
-The ellipse is a generalized circle.  It has separate radi for
+The ellipse is a generalized circle.  It has separate radii for
 the x and the y coordinates.  You can think of an ellipse as 
 a shape drawn inside a rectangular box, and each edge of the box
 just touching the extremes of the ellipse.
 
 @subsubheading Defining the Shape
 
-Example:
+Example: This creates a flattened ellipse filled with white and bordered by
+red.
 
-<ellipse cx="100" cy="100" rx="10" ry="30" stroke="#ff0000" fill="#ffffff" />
-
-This creates a flattened ellipse filled with white and bordered by red.
+@example
+<ellipse cx="100"
+         cy="100"
+         rx="10"
+         ry="30"
+         stroke="#ff0000"
+         fill="#ffffff" />
+@end example
 
 @subsubheading Allowed Parameters
 
-@multitable @columnfractions .25 .40 .35
+@multitable @columnfractions .10 .5 .40 .45
 @item @emph{Name} @tab @emph{Required} @tab @emph{Example} @tab @emph{Description}
-
 @item @code{cx}
 @tab  yes
 @tab  @code{cx="50"}
@@ -43,15 +48,14 @@ This creates a flattened ellipse filled with white and bordered by red.
 @item @code{stroke}
 @tab  no
 @tab  @code{stroke="#ff0000"}
-@tab  Turns on stroking of the shape, and sets the color.  If this is
-not present, the shape will not be stroked.  This value or fill must
+@tab Turns on stroking of the shape, and sets the color.  If this is not
+present, the shape will not be stroked.  Either this value or @samp{fill} must
 be present or the shape will be invisible.
 
 @item @code{fill}
 @tab  no
 @tab  @code{fill="#ff0000"}
-@tab  Turns on filling of the shape, and sets the color.  If this is
-not present, the shape will not be filled.  This value or stroke must
+@tab Turns on filling of the shape, and sets the color.  If this is not
+present, the shape will not be filled.  Either this value or @samp{stroke} must
 be present or the shape will be invisible.
-
 @end multitable

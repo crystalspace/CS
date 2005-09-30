@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
-@node AWS, Flexible Vector Graphics Definition
-@subsection FVG line
+@node AWS FVG Path, , AWS FVG Line, AWS FVG
+@subsubsection @sc{fvg} Path
 
 Defines a path.  Paths are complex shapes that may or may
 not be filled.  Paths can have multiple contours defined
@@ -9,86 +9,102 @@ path.
 
 @subsubheading Defining the Shape
 
-Example:
+Example: This defines a path by first moving to a point, drawing a line
+relative to that point, and a second line relative to the end of the first
+line. The area defined by this path is then filled white with its outline
+painted red.
 
-<path d="M 100 100 L 300 100 L 200 300 z"  stroke="#ff0000" fill="#ffffff" />
+@example
+<path d="M 100 100 L 300 100 L 200 300 z"
+      stroke="#ff0000"
+      fill="#ffffff" />
+@end example
 
-@subsubheading Differences from SVG
+@subsubheading Differences from @sc{svg}
 
-* Each command expects one, and only one, set of parameters.  In SVG many commands
-allow you to specify repeated coordinates for the same command.  This is currently
-not the case in FVG, though that may change.
+The @sc{fvg} path command differs from its @sc{svg} relative in the following
+ways:
 
-* SVG supports several curving commands, beziers, arcs, etc.  These are not currently
-supported in FVG, thought that will change.
+@itemize @bullet
+@item
+Each command expects one, and only one, set of parameters.  In @sc{svg} many
+commands allow you to specify repeated coordinates for the same command.  This
+is currently not the case in @sc{fvg}, though this limitation may be lifted in
+the future.
+
+@item
+@sc{svg} supports several curving commands, beziers, arcs, etc.  These are not
+currently supported in @sc{fvg}, though this limitation may be lifted in the
+future.
+@end itemize
 
 @subsubheading Allowed Parameters
 
-@multitable @columnfractions .25 .40 .35
+@multitable @columnfractions .10 .5 .40 .45
 @item @emph{Name} @tab @emph{Required} @tab @emph{Example} @tab @emph{Description}
-
 @item @code{d}
 @tab  yes
 @tab  @code{d="M 100 100 L 300 100 L 200 300 z"}
-@tab  Defines the countour of the path.
+@tab  Defines the countour of the path (see below).
 
 @item @code{stroke}
 @tab  no
 @tab  @code{stroke="#ff0000"}
-@tab  Turns on stroking of the shape, and sets the color.  If this is
-not present, the shape will not be stroked.  This value or fill must
+@tab Turns on stroking of the shape, and sets the color.  If this is not
+present, the shape will not be stroked.  Either this value or @samp{fill} must
 be present or the shape will be invisible.
 
 @item @code{fill}
 @tab  no
 @tab  @code{fill="#ff0000"}
-@tab  Turns on filling of the shape, and sets the color.  If this is
-not present, the shape will not be filled.  This value or stroke must
-be present or the shape will be invisible.  Note that if a path is
-not closed, it will not be filled.  A path's contour is closed by
-using the "z" command.
-
+@tab Turns on filling of the shape, and sets the color.  If this is not
+present, the shape will not be filled.  Either this value or @samp{stroke} must
+be present or the shape will be invisible.  Note that if a path is not closed,
+it will not be filled.  A path's contour is closed by using the @samp{z}
+command.
 @end multitable
 
 @subsubheading Path Commands
 
-@multitable @columnfractions .25 .40 .35
+@multitable @columnfractions .10 .5 .40 .45
 @item @emph{Name} @tab @emph{Example} @tab @emph{Description}
-
-@item @code{M (absolute), m (relative)}
+@item @code{M} or @code{m}
 @tab  @code{M 100 100}
-@tab  Start a new sub-path at the given (x,y) coordinate. M (uppercase) 
-indicates that absolute coordinates will follow; m (lowercase) indicates 
-that relative coordinates will follow. If a relative moveto (m) appears 
-as the first element of the path, then it is treated as a pair of absolute 
-coordinates. If a moveto is followed by multiple pairs of coordinates, 
-the subsequent pairs are treated as implicit lineto commands.
+@tab Start a new sub-path at the given (x,y) coordinate. @samp{M} (uppercase)
+indicates that absolute coordinates will follow; @samp{m} (lowercase) indicates
+that relative coordinates will follow. If a relative moveto (@samp{m}) appears
+as the first element of the path, then it is treated as a pair of absolute
+coordinates. If a moveto is followed by multiple pairs of coordinates, the
+subsequent pairs are treated as implicit lineto commands.
 
-@item @code{Z or z}
+@item @code{Z} or @code{z}
 @tab  @code{z}
-@tab  Close the current subpath by drawing a straight line from the current 
-point to current subpath's initial point.  A new contour (subpath) will start after
-this command is encountered.  If this command is present at the end of a
-contour, then that path may be filled.
+@tab Close the current subpath by drawing a straight line from the current
+point to current subpath's initial point.  A new contour (subpath) will start
+after this command is encountered.  If this command is present at the end of a
+contour, then that path may be filled. @samp{Z} (uppercase) and @samp{z}
+(lowercase) produce the same result.
 
-
-@item @code{L (absolute), l (relative)}
+@item @code{L} or @code{l}
 @tab  @code{L 200 200}
-@tab  Draw a line from the current point to the given (x,y) coordinate which 
-becomes the new current point. L (uppercase) indicates that absolute coordinates 
-will follow; l (lowercase) indicates that relative coordinates will follow. 
+@tab Draw a line from the current point to the given (x,y) coordinate which
+becomes the new current point. @samp{L} (uppercase) indicates that absolute
+coordinates will follow; @samp{l} (lowercase) indicates that relative
+coordinates will follow.
 
-@item @code{H (absolute), h (relative)}
-@tab  @code{H 300 }
-@tab  Draws a horizontal line from the current point (cpx, cpy) to (x, cpy). 
-H (uppercase) indicates that absolute coordinates will follow; h  (lowercase) 
-indicates that relative coordinates will follow. At the end of the command, the 
-new current point becomes (x, cpy) for the final value of x.
+@item @code{H} or @code{h}
+@tab  @code{H 300}
+@tab Draws a horizontal line from the current point (cpx,cpy) to (x,cpy), where
+``x'' is the supplied x coordinate.  @samp{H} (uppercase) indicates that
+absolute coordinates will follow; @samp{h} (lowercase) indicates that relative
+coordinates will follow. At the end of the command, the new current point
+becomes (x,cpy) for the final value of x.
 
-@item @code{V (absolute), v (relative)}
-@tab  @code{V 300 }
-@tab  Draws a vertical line from the current point (cpx, cpy) to (cpx, y). 
-V (uppercase) indicates that absolute coordinates will follow; v  (lowercase) 
-indicates that relative coordinates will follow. 
-
+@item @code{V} or @code{v}
+@tab  @code{V 300}
+@tab Draws a vertical line from the current point (cpx,cpy) to (cpx,y), where
+``y'' is the supplied y coordinate.  @samp{V} (uppercase) indicates that
+absolute coordinates will follow; @samp{v} (lowercase) indicates that relative
+coordinates will follow.  At the end of the command, the new point becomes
+(cpx,y) for the final value of y.
 @end multitable

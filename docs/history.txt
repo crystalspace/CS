@@ -10,6 +10,9 @@ chronological order.
 	- caedes added <rotatelight> sequence to loader, and added support for
 	  lights in sequence manager rotate operations. This works exactly as
 	  the rotate sequence for meshes, but specifying a light instead.
+	- Eric Sunshine fixed a bunch of Texinfo mark-up problems in AWS FVG
+	  documentation and corrected a number of navigation problems. Also
+	  improved some of the actual content.
 29-Sep-2005
 	- Eric Sunshine fixed the CoreAudio plugin so that it once again builds
 	  cleanly. Also reduced namespace pollution a bit.

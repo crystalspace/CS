@@ -1,20 +1,25 @@
 @c -*-texinfo-*-
-@node AWS, Flexible Vector Graphics Definition
-@subsection FVG line
+@node AWS FVG Line, AWS FVG Path, AWS FVG Ellipse, AWS FVG
+@subsubsection @sc{fvg} Line
 
 Draws a line between two points.
 
 @subsubheading Defining the Shape
 
-Example:
+Example: This creates a red line between two points.
 
-<line x1="100" y1="100" x2="110" y2="130" stroke="#ff0000"  />
+@example
+<line x1="100"
+      y1="100"
+      x2="110"
+      y2="130"
+      stroke="#ff0000"  />
+@end example
 
 @subsubheading Allowed Parameters
 
-@multitable @columnfractions .25 .40 .35
+@multitable @columnfractions .10 .5 .40 .45
 @item @emph{Name} @tab @emph{Required} @tab @emph{Example} @tab @emph{Description}
-
 @item @code{x1}
 @tab  yes
 @tab  @code{x1="50"}
@@ -39,7 +44,6 @@ Example:
 @tab  no
 @tab  @code{stroke="#ff0000"}
 @tab  Turns on stroking of the shape, and sets the color.  If this is
-not present, the shape will not be stroked.  Since lines cannot be filled,
+not present, the shape will not be stroked.  Since lines can not be filled,
 they must be stroked.
-
 @end multitable
