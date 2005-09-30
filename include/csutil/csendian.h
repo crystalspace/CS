@@ -378,7 +378,7 @@ static inline double csLongLongToDouble (int64 i)
 }
 
 /* *\name Floating point conversions
- * The following routines are used for converting floating-point numbers
+ * These routines are used for converting floating-point numbers
  * into 16-bit shorts and back. This is useful for low-precision data.
  * They use the 1.4.12 format. The range of numbers that can be represented
  * in this format is from 2^-8 to 2^7. The precision for numbers near to
@@ -412,46 +412,46 @@ static inline float csShortToFloat (short s)
   return (float) ldexp (mant, exp);
 }
 
-/* * @} */
+/** @} */
 
-/// Swap the bytes in a uint64 value.
+/// Convert a uint64 value from host byte order to little-endian.
 static inline uint64 csConvertEndian (uint64 l)
 { return csLittleEndianLongLong (l); }
 
-/// Swap the bytes in a int64 value.
+/// Convert a int64 value from host byte order to little-endian.
 static inline int64 csConvertEndian (int64 l)
 { return csLittleEndianLongLong (l); }
 
-/// Swap the bytes in a uint32 value.
+/// Convert a uint32 value from host byte order to little-endian.
 static inline uint32 csConvertEndian (uint32 l)
 { return csLittleEndianLong (l); }
 
-/// Swap the bytes in a int32 value.
+/// Convert a int32 value from host byte order to little-endian.
 static inline int32 csConvertEndian (int32 l)
 { return csLittleEndianLong (l); }
 
-/// Swap the bytes in a int16 value.
+/// Convert a int16 value from host byte order to little-endian.
 static inline int16 csConvertEndian (int16 s)
 { return csLittleEndianShort (s); }
 
-/// Swap the bytes in a uint16 value.
+/// Convert a uint16 value from host byte order to little-endian.
 static inline uint16 csConvertEndian (uint16 s)
 { return csLittleEndianShort (s); }
 
-/// Swap the bytes in a float value.
+/// Convert bytes in a float value from host byte order to little-endian.
 static inline float csConvertEndian (float f)
 { return csLittleEndianFloat (f); }
 
 /// Read a little-endian short from address
 inline uint16 csGetLittleEndianShort (const void *buff)
 {
-  return csGetFromAddress::UInt16 (buff);
+  return csLittleEndian::Convert (csGetFromAddress::UInt16 (buff));
 }
 
 /// Read a little-endian long from address
 inline uint32 csGetLittleEndianLong (const void *buff)
 {
-  return csGetFromAddress::UInt32 (buff);
+  return csLittleEndian::Convert (csGetFromAddress::UInt32 (buff));
 }
 
 /// Read a little-endian 32-bit float from address

@@ -27,6 +27,10 @@ chronological order.
 	- Eric Sunshine updated the Mingw/Msys instructions to mention the
 	  actual Mingw download location since the download list on the Mingw
 	  site is incomplete, and this incompleteness can confuse new users.
+	- Eric Sunshine fixed bugs in csendian.h following 25-Sep-2005 changes
+	  where csGetLittleEndianShort() and csGetLittleEndianLong() failed to
+	  perform any endian conversion at all. This manifested often as
+	  crashes and other related problems on big-endian hardware.
 29-Sep-2005
 	- Eric Sunshine fixed the CoreAudio plugin so that it once again builds
 	  cleanly. Also reduced namespace pollution a bit.
