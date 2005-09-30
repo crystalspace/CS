@@ -31,6 +31,8 @@ chronological order.
 	  where csGetLittleEndianShort() and csGetLittleEndianLong() failed to
 	  perform any endian conversion at all. This manifested often as
 	  crashes and other related problems on big-endian hardware.
+	- res reordered some data structures in the SR for some performance
+	  improvements.
 29-Sep-2005
 	- Eric Sunshine fixed the CoreAudio plugin so that it once again builds
 	  cleanly. Also reduced namespace pollution a bit.

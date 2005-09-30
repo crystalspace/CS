@@ -50,7 +50,7 @@ namespace cspluginSoft3d
     csVector4 c[maxBuffers];
 
     void Setup (const csVector3* vertices, const VertexBuffer* buffers, 
-      BuffersMask buffersMask, size_t sv, size_t fv, int sy)
+      const size_t bufNum, size_t sv, size_t fv, int sy)
     {
       const csVector3 vsv (vertices[sv]);
       const csVector3 vfv (vertices[fv]);
@@ -80,10 +80,8 @@ namespace cspluginSoft3d
 	Iz = Lerp (Isz, Ifz, Factor);
 	const float z = 1.0f/Iz;
 
-	for (size_t b = 0; b < maxBuffers; b++)
+	for (size_t b = 0; b < bufNum; b++)
 	{
-	  if (!(buffersMask & (1 << b))) continue;
-
 	  // Z coord already inverted here
 	  const csVector4 Icsv (((csVector4*)buffers[b].data)[sv]);
 	  const csVector4 Icfv (((csVector4*)buffers[b].data)[fv]);
@@ -94,14 +92,13 @@ namespace cspluginSoft3d
 	}
       } /* endif */
     }
-    void Advance (BuffersMask buffersMask)
+    void Advance (const size_t bufNum)
     {
       Iz += dIzdy;
       const float z = 1.0f/Iz;
 
-      for (size_t b = 0; b < maxBuffers; b++)
+      for (size_t b = 0; b < bufNum; b++)
       {
-	if (!(buffersMask & (1 << b))) continue;
 	Ic[b] += dIcdy[b];
 	c[b] = Ic[b] * z;
       }
@@ -110,19 +107,21 @@ namespace cspluginSoft3d
   };
   struct InterpolateScanlinePersp
   {
-    csVector4T<csFixed16> c[maxBuffers];
-    csVector4T<csFixed16> dcdx[maxBuffers];
-    csVector4 Ic[maxBuffers];
-    csVector4 dIcdx[maxBuffers];
+    int InterpolStep;
+    int InterpolShift;
     csFixed24 Iz, dIzdx;
     float Iz_f, dIzdx_f;
     int ipx;
-    
-    int InterpolStep;
-    int InterpolShift;
+    struct BufData
+    {
+      csVector4 Ic;
+      csVector4 dIcdx;
+      CS_ALIGNED_MEMBER(csVector4T<csFixed16> c, 16);
+      CS_ALIGNED_MEMBER(csVector4T<csFixed16> dcdx, 16);
+    } bufData[maxBuffers];
 
     void Setup (const InterpolateEdgePersp& L, const InterpolateEdgePersp& R,
-      BuffersMask buffersMask, float inv_l, int ipolStep, int ipolShift)
+      const size_t bufNum, float inv_l, int ipolStep, int ipolShift)
     {
       InterpolStep = ipolStep;
       InterpolShift = ipolShift;
@@ -133,35 +132,34 @@ namespace cspluginSoft3d
       Iz = Iz_f = L.Iz;
       dIzdx = dIzdx_f = (R.Iz - L.Iz) * inv_l;
       dIzdx_f *= ipf;
-      for (size_t b = 0; b < maxBuffers; b++)
+      for (size_t b = 0; b < bufNum; b++)
       {
-	if (!(buffersMask & (1 << b))) continue;
 	const csVector4 cL = L.c[b];
 	const csVector4 IcL = L.Ic[b];
 	const csVector4 IcR = R.Ic[b];
-	c[b] = cL;
+	bufData[b].c = cL;
 	float z2 = 1.0f/(Iz_f + dIzdx_f);
-	dIcdx[b].Set (
+	bufData[b].dIcdx.Set (
 	  (IcR.x - IcL.x) * fact,
 	  (IcR.y - IcL.y) * fact,
 	  (IcR.z - IcL.z) * fact,
 	  (IcR.w - IcL.w) * fact);
-	Ic[b] = IcL + dIcdx[b];
-	dcdx[b].Set ((Ic[b].x*z2 - c[b].x) >> InterpolShift,
-	  (Ic[b].y*z2 - c[b].y) >> InterpolShift,
-	  (Ic[b].z*z2 - c[b].z) >> InterpolShift,
-	  (Ic[b].w*z2 - c[b].w) >> InterpolShift);
+	bufData[b].Ic = IcL + bufData[b].dIcdx;
+	bufData[b].dcdx.Set (
+	  (bufData[b].Ic.x*z2 - bufData[b].c.x) >> InterpolShift,
+	  (bufData[b].Ic.y*z2 - bufData[b].c.y) >> InterpolShift,
+	  (bufData[b].Ic.z*z2 - bufData[b].c.z) >> InterpolShift,
+	  (bufData[b].Ic.w*z2 - bufData[b].c.w) >> InterpolShift);
       }
     }
-    void Advance (BuffersMask buffersMask)
+    void Advance (const size_t bufNum)
     {
       if (--ipx > 0)
       {
 	Iz += dIzdx;
-	for (size_t b = 0; b < maxBuffers; b++)
+	for (size_t b = 0; b < bufNum; b++)
 	{
-	  if (!(buffersMask & (1 << b))) continue;
-	  c[b] += dcdx[b];
+	  bufData[b].c += bufData[b].dcdx;
 	}
       }
       else
@@ -171,15 +169,15 @@ namespace cspluginSoft3d
 	Iz = Iz_f;
 	const float z2 = 1.0f / Iz_f;
 	ipx = InterpolStep;
-	for (size_t b = 0; b < maxBuffers; b++)
+	for (size_t b = 0; b < bufNum; b++)
 	{
-	  if (!(buffersMask & (1 << b))) continue;
-	  c[b] = Ic[b] * z;
-	  Ic[b] += dIcdx[b];
-	  dcdx[b].Set ((Ic[b].x*z2 - c[b].x) >> InterpolShift,
-	    (Ic[b].y*z2 - c[b].y) >> InterpolShift,
-	    (Ic[b].z*z2 - c[b].z) >> InterpolShift,
-	    (Ic[b].w*z2 - c[b].w) >> InterpolShift);
+	  bufData[b].c = bufData[b].Ic * z;
+	  bufData[b].Ic += bufData[b].dIcdx;
+	  bufData[b].dcdx.Set (
+	    (bufData[b].Ic.x*z2 - bufData[b].c.x) >> InterpolShift,
+	    (bufData[b].Ic.y*z2 - bufData[b].c.y) >> InterpolShift,
+	    (bufData[b].Ic.z*z2 - bufData[b].c.z) >> InterpolShift,
+	    (bufData[b].Ic.w*z2 - bufData[b].c.w) >> InterpolShift);
 	}
       }
     }

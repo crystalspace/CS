@@ -226,15 +226,15 @@ namespace cspluginSoft3d
 	int ipolStep, int ipolShift,
 	void* dest, uint len, uint32 *zbuff)
       {
-	static const BuffersMask myBuffers = 1 << VATTR_BUFINDEX(TEXCOORD);
 	InterpolateScanlinePersp ipol;
-	ipol.Setup (L, R, myBuffers, 1.0f / len, ipolStep, ipolShift);
+	ipol.Setup (L, R, 1, 1.0f / len, ipolStep, ipolShift);
 	ScanlineRenderer<Pix>* This = (ScanlineRenderer<Pix>*)_This;
 	Pix& pix = This->pix;
 	const uint32* bitmap = This->bitmap;
 	const int v_shift_r = This->v_shift_r;
 	const int and_w = This->and_w;
 	const int and_h = This->and_h;
+	const csVector4T<csFixed16>& tc = ipol.bufData[0].c;
 
 	typename_qualifier Pix::PixType* _dest = 
 	  (typename_qualifier Pix::PixType*)dest;
@@ -245,8 +245,8 @@ namespace cspluginSoft3d
 	{
 	  if (Z.Test())
 	  {
-	    int u = (int)ipol.c[VATTR_BUFINDEX(TEXCOORD)].x;
-	    int32 v = ipol.c[VATTR_BUFINDEX(TEXCOORD)].y.GetFixed();
+	    int u = (int)tc.x;
+	    int32 v = tc.y.GetFixed();
 	    uint32 texel = bitmap [((v >> v_shift_r) & and_h) + (u & and_w)];
 	    {
 	      uint8 r = texel & 0xff;
@@ -258,7 +258,7 @@ namespace cspluginSoft3d
 	    }
 	  }
 	  _dest++;
-	  ipol.Advance (myBuffers);
+	  ipol.Advance (1);
 	  Z.Advance();
 	} /* endwhile */
       }

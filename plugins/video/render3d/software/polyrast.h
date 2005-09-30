@@ -141,6 +141,14 @@ namespace cspluginSoft3d
 	else if (z < min_z) min_z = z;
       }
     
+      size_t bufNum = 0;
+      VertexBuffer linearBufs[maxBuffers];
+      for (i = 0; i < maxBuffers; i++)
+      {
+	if (!(buffersMask & (1 << i))) continue;
+	linearBufs[bufNum++] = inBuffers[i];
+      }
+
       int ipolStep = 16;
       int ipolShift = 4;
       // Pick an interpolation step...
@@ -213,7 +221,7 @@ namespace cspluginSoft3d
 	    if (sy <= R.fy)
 	      continue;
     
-	    R.edge.Setup (vertices, inBuffers, buffersMask, R.sv, R.fv, sy);
+	    R.edge.Setup (vertices, linearBufs, bufNum, R.sv, R.fv, sy);
 	  } /* endif */
 	  if (sy <= L.fy)
 	  {
@@ -228,7 +236,7 @@ namespace cspluginSoft3d
 	    if (sy <= L.fy)
 	      continue;
     
-	    L.edge.Setup (vertices, inBuffers, buffersMask, L.sv, L.fv, sy);
+	    L.edge.Setup (vertices, linearBufs, bufNum, L.sv, L.fv, sy);
 	  } /* endif */
 	} while (!leave); /* enddo */
 
@@ -345,8 +353,8 @@ namespace cspluginSoft3d
 	    }
 	  }
     
-	  L.edge.Advance (buffersMask);
-	  R.edge.Advance (buffersMask);
+	  L.edge.Advance (bufNum);
+	  R.edge.Advance (bufNum);
     
 	  sy--;
 	  screenY++;

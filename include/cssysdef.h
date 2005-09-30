@@ -801,6 +801,28 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  endif
 #endif
 
+#if defined(CS_COMPILER_MSVC)
+  #define CS_ALIGNED_MEMBER(Member, Align)				\
+    __declspec(align(Align)) Member
+#elif defined(CS_COMPILER_GCC)
+  /**
+   * Macro to align a class member (or local variable) to a specific byte
+   * boundary.
+   *
+   * Example:
+   * \code
+   * struct MyStruct
+   * {
+   *   CS_ALIGNED_MEMBER(int x[4], 16);
+   * };
+   * \endcode
+   */
+  #define CS_ALIGNED_MEMBER(Member, Align)				\
+    Member __attribute((aligned(Align)))
+#else
+  #define CS_ALIGNED_MEMBER(Member, Align)	Member
+#endif
+
 // Macro used to define static implicit pointer conversion function.
 // Only use within a class declaration.
 #ifndef _CS_IMPLICITPTRCAST_NAME
