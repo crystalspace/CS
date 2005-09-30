@@ -13,6 +13,13 @@ chronological order.
 	- Eric Sunshine fixed a bunch of Texinfo mark-up problems in AWS FVG
 	  documentation and corrected a number of navigation problems. Also
 	  improved some of the actual content.
+	- Eric Sunshine worked around a problem where the CS configure script
+	  could mistake a MacOS/X installation for a Darwin-only installation.
+	  In particular, the QuickTime 7.0 installer removes
+	  <CarbonSound/CarbonSound.h>, which causes #include <Carbon/Carbon.h>
+	  in the configure script to fail unconditionally. Re-installing the
+	  QuickTime SDK should restore the header, however not all developers
+	  know to do this.
 29-Sep-2005
 	- Eric Sunshine fixed the CoreAudio plugin so that it once again builds
 	  cleanly. Also reduced namespace pollution a bit.

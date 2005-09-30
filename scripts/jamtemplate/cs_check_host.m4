@@ -95,17 +95,26 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
     # a way to distinguish between the two.  If Carbon.h is present, then
     # assume MacOX/S; if not, assume Darwin.  If --with-x=yes was invoked, and
     # Carbon.h is present, then assume that user wants to cross-build for
-    # Darwin even though build host is MacOS/X.  Implementation note: At least
-    # one MacOS/X user switches between gcc 2.95 and gcc 3.3 with a script
-    # which toggles the values of CC, CXX, and CPP.  Unfortunately, CPP was
-    # being set to run the preprocessor directly ("cpp", for instance) rather
-    # than running it via the compiler ("gcc -E", for instance).  The problem
-    # with running the preprocessor directly is that __APPLE__ and __GNUC__ are
-    # not defined, which causes the Carbon.h check to fail.  We avoid this
-    # problem by supplying a non-empty fourth argument to AC_CHECK_HEADER(),
-    # which causes it to test compile the header only (which is a more robust
-    # test), rather than also testing it via the preprocessor.
+    # Darwin even though build host is MacOS/X.
+    # IMPLEMENTATION NOTE *1*
+    # The QuickTime 7.0 installer removes <CarbonSound/CarbonSound.h>, which
+    # causes #include <Carbon/Carbon.h> to fail unconditionally. Re-installing
+    # the QuickTime SDK should restore the header, however not all developers
+    # know to do this, so we work around the problem of the missing
+    # CarbonSound.h by #defining __CARBONSOUND__ in the test in order to
+    # prevent Carbon.h from attempting to #include the missing header.
+    # IMPLEMENTATION NOTE *2*
+    # At least one MacOS/X user switches between gcc 2.95 and gcc 3.3 with a
+    # script which toggles the values of CC, CXX, and CPP.  Unfortunately, CPP
+    # was being set to run the preprocessor directly ("cpp", for instance)
+    # rather than running it via the compiler ("gcc -E", for instance).  The
+    # problem with running the preprocessor directly is that __APPLE__ and
+    # __GNUC__ are not defined, which causes the Carbon.h check to fail.  We
+    # avoid this problem by supplying a non-empty fourth argument to
+    # AC_CHECK_HEADER(), which causes it to test compile the header only (which
+    # is a more robust test), rather than also testing it via the preprocessor.
 
+    AC_DEFINE([__CARBONSOUND__])
     AC_CHECK_HEADER([Carbon/Carbon.h],
 	[cs_host_macosx=yes], [cs_host_macosx=no], [/* force compile */])
 
