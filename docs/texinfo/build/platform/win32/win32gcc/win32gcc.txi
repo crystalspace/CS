@@ -20,22 +20,34 @@ Download the following packages:
 @itemize @bullet
 @item
 The most recent version of the MinGW compiler and related tools.  This package
-is typically named @file{MinGW-3.?.?-?.exe}, where the question marks stand for
+is typically named @file{MinGW-?.?.?-?.exe}, where the question marks stand for
 the actual version number.
 
 @noindent
-@uref{http://www.mingw.org/}
+@uref{http://prdownloads.sourceforge.net/mingw/}
+
+@noindent
+Or:
+
+@noindent
+@uref{http://www.mingw.org/download.shtml}
 
 @item
 The most recent version of @sc{msys}.  This is an adjunct package for MinGW
 which provides additional useful utilities as well as a convenient shell
 environment.  @sc{msys} provides a more reliable and robust environment for the
 configuration and build phases of Crystal Space.  It is available from the
-MinGW web site.  This package is typically named @file{MSYS-1.?.?.exe}, where
+MinGW web site.  This package is typically named @file{MSYS-?.?.?.exe}, where
 the question marks stand for the actual version number.
 
 @noindent
-@uref{http://www.mingw.org/}
+@uref{http://prdownloads.sourceforge.net/mingw/}
+
+@noindent
+Or:
+
+@noindent
+@uref{http://www.mingw.org/download.shtml}
 
 @item
 The most recent Crystal Space Win32 Libs package.  This package provides a set

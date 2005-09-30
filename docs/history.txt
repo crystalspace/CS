@@ -24,6 +24,9 @@ chronological order.
 	  rotatelight sequence for real disco effect.
 	- res made the SR scanline interpolation use fixed point maths.
 	- Vincent Knecht removed '.exe' occurences in 'startme' app.
+	- Eric Sunshine updated the Mingw/Msys instructions to mention the
+	  actual Mingw download location since the download list on the Mingw
+	  site is incomplete, and this incompleteness can confuse new users.
 29-Sep-2005
 	- Eric Sunshine fixed the CoreAudio plugin so that it once again builds
 	  cleanly. Also reduced namespace pollution a bit.
