@@ -3556,8 +3556,15 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   else if (zBufMode != CS_ZBUF_MESH)
     usedModes.z_buf_mode = zBufMode;
 
+  BuffersMask buffersMask = 0;
+  for (size_t b = 0; b < maxBuffers; b++)
+  {
+    if (activebuffers[b] == 0) continue;
+    buffersMask |= 1 << b;
+  }
+
   ScanlineRenderInfo meowmix;
-  if (!scanlineRenderer->Init (activeSoftTex, usedModes,  meowmix))
+  if (!scanlineRenderer->Init (activeSoftTex, usedModes, buffersMask, meowmix))
     return; // Drat, meowmix can't deliver.
 
   if (!persp)

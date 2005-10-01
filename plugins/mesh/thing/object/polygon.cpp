@@ -566,21 +566,10 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
 //csPrintf ("%d,%d,%d,%d\n", Imin_u, Imin_v, Imax_u, Imax_v); fflush (stdout);
 
   int h = Imax_v - polygon_data.tmapping->GetIMinV ();
-  int w_orig = Imax_u - polygon_data.tmapping->GetIMinU ();
-  int shf_u = 0;
-  int w = 1;
-  while (true)
-  {
-    if (w_orig <= w) break;
-    w <<= 1;
-    shf_u++;
-  }
-  polygon_data.tmapping->SetShiftU (shf_u);
+  int w = Imax_u - polygon_data.tmapping->GetIMinU ();
   polygon_data.tmapping->SetLitWidth (w);
   polygon_data.tmapping->SetLitHeight (h);
-  polygon_data.tmapping->SetLitOriginalWidth (w_orig);
 
-  polygon_data.tmapping->SetFDUV (min_u * ww, min_v * hh);
   return rc;
 }
 
@@ -612,7 +601,7 @@ bool csPolygon3DStatic::Finish (iBase* thing_logparent)
   if (csThing::lightmap_enabled && flags.Check (CS_POLY_LIGHTING))
   {
     int lmw = csLightMap::CalcLightMapWidth (
-        polygon_data.tmapping->GetLitOriginalWidth ());
+        polygon_data.tmapping->GetLitWidth ());
     int lmh = csLightMap::CalcLightMapHeight (
         polygon_data.tmapping->GetLitHeight ());
     int max_lmw, max_lmh;
@@ -1135,7 +1124,7 @@ void csPolygon3D::Finish (csPolygon3DStatic* spoly)
         ->blk_lightmap.Alloc ();
       txt_info.SetLightMap (lm);
 
-      lm->Alloc (spoly->polygon_data.tmapping->GetLitOriginalWidth (),
+      lm->Alloc (spoly->polygon_data.tmapping->GetLitWidth (),
         spoly->polygon_data.tmapping->GetLitHeight ());
       /*lm->InitColor (128, 128, 128);*/
     }
@@ -1195,7 +1184,7 @@ const char* csPolygon3D::ReadFromCache (iFile* file, csPolygon3DStatic* spoly)
   if (txt_info.lm == 0) return 0;
   const char* error = txt_info.lm->ReadFromCache (
           file,
-          spoly->polygon_data.tmapping->GetLitOriginalWidth (),
+          spoly->polygon_data.tmapping->GetLitWidth (),
           spoly->polygon_data.tmapping->GetLitHeight (),
           this, spoly,
           thing->GetStaticData ()->thing_type->engine);

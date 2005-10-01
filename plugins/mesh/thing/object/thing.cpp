@@ -306,7 +306,7 @@ void csThingStatic::PrepareLMLayout ()
     {
       lp->numLitPolys++;
 
-      int lmw = (csLightMap::CalcLightMapWidth (lmi->GetLitOriginalWidth ()));
+      int lmw = (csLightMap::CalcLightMapWidth (lmi->GetLitWidth ()));
       int lmh = (csLightMap::CalcLightMapHeight (lmi->GetLitHeight ()));
       lp->totalLumels += lmw * lmh;
     }
@@ -393,16 +393,16 @@ static int CompareStaticPolys (int const& i1, int const& i2)
   int maxdim1, mindim1, maxdim2, mindim2;
 
   maxdim1 = MAX (
-    csLightMap::CalcLightMapWidth (lm1->GetLitOriginalWidth ()),
+    csLightMap::CalcLightMapWidth (lm1->GetLitWidth ()),
     csLightMap::CalcLightMapHeight (lm1->GetLitHeight ()));
   mindim1 = MIN (
-    csLightMap::CalcLightMapWidth (lm1->GetLitOriginalWidth ()),
+    csLightMap::CalcLightMapWidth (lm1->GetLitWidth ()),
     csLightMap::CalcLightMapHeight (lm1->GetLitHeight ()));
   maxdim2 = MAX (
-    csLightMap::CalcLightMapWidth (lm2->GetLitOriginalWidth ()),
+    csLightMap::CalcLightMapWidth (lm2->GetLitWidth ()),
     csLightMap::CalcLightMapHeight (lm2->GetLitHeight ()));
   mindim2 = MIN (
-    csLightMap::CalcLightMapWidth (lm2->GetLitOriginalWidth ()),
+    csLightMap::CalcLightMapWidth (lm2->GetLitWidth ()),
     csLightMap::CalcLightMapHeight (lm2->GetLitHeight ()));
 
   if (maxdim1 == maxdim2)
@@ -418,7 +418,7 @@ void csThingStatic::DistributePolyLMs (
         csPDelArray<csStaticLitPolyGroup>& outputPolys,
         csStaticPolyGroup* rejectedPolys)
 {
-  struct internalPolyGroup : public csStaticPolyGroup
+  struct InternalPolyGroup : public csStaticPolyGroup
   {
     int totalLumels;
     int maxlmw, maxlmh;
@@ -426,7 +426,7 @@ void csThingStatic::DistributePolyLMs (
   };
 
   // Polys that couldn't be fit onto a SLM are processed again.
-  internalPolyGroup inputQueues[2];
+  InternalPolyGroup inputQueues[2];
   int curQueue = 0;
 
   size_t i;
@@ -455,7 +455,7 @@ void csThingStatic::DistributePolyLMs (
       continue;
     }
 
-    int lmw = (csLightMap::CalcLightMapWidth (lm->GetLitOriginalWidth ())
+    int lmw = (csLightMap::CalcLightMapWidth (lm->GetLitWidth ())
         + LM_BORDER);
     int lmh = (csLightMap::CalcLightMapHeight (lm->GetLitHeight ())
         + LM_BORDER);
@@ -512,7 +512,7 @@ void csThingStatic::DistributePolyLMs (
 
         csPolyTextureMapping* lm = sp->GetTextureMapping ();
 
-        int lmw = (csLightMap::CalcLightMapWidth (lm->GetLitOriginalWidth ())
+        int lmw = (csLightMap::CalcLightMapWidth (lm->GetLitWidth ())
                 + LM_BORDER);
         int lmh = (csLightMap::CalcLightMapHeight (lm->GetLitHeight ())
                 + LM_BORDER);
@@ -1033,7 +1033,7 @@ void csThingStatic::GetRadius (csVector3 &rad, csVector3 &cent)
   cent = b.GetCenter ();
 }
 
-void csThingStatic::FillRenderMeshes (
+void csThingStatic::FillRenderMeshes (csThing* instance,
         csDirtyAccessArray<csRenderMesh*>& rmeshes,
         const csArray<RepMaterial>& repMaterials,
         uint mixmode)
@@ -1054,7 +1054,8 @@ void csThingStatic::FillRenderMeshes (
       size_t j;
       for (j = 0; j< pg.polys.Length(); j++)
       {
-        polyRenderer->AddPolygon (&static_polygons[pg.polys[j]]->polygon_data,
+        polyRenderer->AddPolygon (pg.polys[j],
+	  &static_polygons[pg.polys[j]]->polygon_data,
           static_polygons[pg.polys[j]]->polyBuffers.GetBuffers());
       }
     }
@@ -1079,21 +1080,14 @@ void csThingStatic::FillRenderMeshes (
       csPtr<csShaderVariable> (new csShaderVariable (texLightmapName)));
     rm->variablecontext->AddVariable (sv);
 
-    /*csShaderVariable* sv;
-    sv = dynDomain->GetVariableAdd (index_name);
-    sv->SetValue (factory->GetRenderBuffer (factory->index_name));
-    sv = dynDomain->GetVariableAdd (vertex_name);
-    sv->SetValue (factory->GetRenderBuffer (factory->vertex_name));
-    sv = dynDomain->GetVariableAdd (texel_name);
-    sv->SetValue (factory->GetRenderBuffer (factory->texel_name));
-    sv = dynDomain->GetVariableAdd (normal_name);
-    sv->SetValue (factory->GetRenderBuffer (factory->normal_name));
-    sv = dynDomain->GetVariableAdd (color_name);
-    sv->SetValue (factory->GetRenderBuffer (factory->color_name));*/
-
-    /*rm->buffersource = polyRenderer->GetBufferSource (rm->indexstart,
-      rm->indexend);*/
     polyRenderer->PrepareRenderMesh (*rm);
+  
+    csRef<csRenderBufferHolder> bufferHolder;
+    bufferHolder.AttachNew (new csRenderBufferHolder);
+
+    polyRenderer->SetupBufferHolder (instance, bufferHolder,
+      (i < litPolys.Length ()));
+    rm->buffers = bufferHolder;
 
     rmeshes.Push (rm);
   }
@@ -2417,7 +2411,8 @@ void csThing::PrepareRenderMeshes (
     static_data->thing_type->blk_rendermesh.Free (renderMeshes[i]);
   }
   renderMeshes.DeleteAll ();
-  static_data->FillRenderMeshes (renderMeshes, replace_materials, mixmode);
+  static_data->FillRenderMeshes (this, renderMeshes, replace_materials, 
+    mixmode);
   renderMeshes.ShrinkBestFit ();
   materials_to_visit.DeleteAll ();
   for (i = 0 ; i < renderMeshes.Length () ; i++)

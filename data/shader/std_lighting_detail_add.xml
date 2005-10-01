@@ -8,7 +8,9 @@
       <texture name="tex detail" destination="unit 0" />
       <texture name="tex diffuse" destination="unit 1" />
       <texture name="tex lightmap" destination="unit 2" />
-      <texture name="tex diffuse" destination="unit 3" />
+      <?if !vars."tex lightmap".texture ?>
+	<texture name="tex diffuse" destination="unit 3" />
+      <?endif?>
       <vp plugin="glfixed">
         <fixedvp>
           <texmatrix layer="0">
@@ -29,20 +31,23 @@
             <alphasource num="0" source="texture" modifier="alpha" />
             <alphaoperation operation="replace" />
           </layer>
-          <layer>
-            <colorsource num="0" source="previous layer" modifier="color" />
-            <colorsource num="1" source="texture" modifier="color" />
-            <coloroperation operation="modulate" scale="2" />
-            <alphasource num="0" source="previous layer" modifier="alpha" />
-            <alphaoperation operation="replace" />
-          </layer>
-          <layer>
-            <colorsource num="0" source="primary color" modifier="color" />
-            <colorsource num="1" source="previous layer" modifier="color" />
-            <coloroperation operation="modulate" />
-            <alphasource num="0" source="previous layer" modifier="alpha" />
-            <alphaoperation operation="replace" />
-          </layer>
+	  <?if vars."tex lightmap".texture ?>
+	    <layer>
+	      <colorsource num="0" source="previous layer" modifier="color" />
+	      <colorsource num="1" source="texture" modifier="color" />
+	      <coloroperation operation="modulate" scale="2" />
+	      <alphasource num="0" source="previous layer" modifier="alpha" />
+	      <alphaoperation operation="replace" />
+	    </layer>
+	  <?else?>
+	    <layer>
+	      <colorsource num="0" source="primary color" modifier="color" />
+	      <colorsource num="1" source="previous layer" modifier="color" />
+	      <coloroperation operation="modulate" />
+	      <alphasource num="0" source="previous layer" modifier="alpha" />
+	      <alphaoperation operation="replace" />
+	    </layer>
+	  <?endif?>
         </fixedfp>
       </fp>
     </pass>
@@ -91,11 +96,16 @@
         <fixedfp>
           <layer>
             <colorsource num="0" source="texture" modifier="color" />
-            <colorsource num="1" source="primary color" modifier="color" />
-            <coloroperation operation="modulate" />
             <alphasource num="0" source="texture" modifier="alpha" />
-            <alphasource num="1" source="primary color" modifier="alpha" />
-            <alphaoperation operation="modulate" />
+	    <?if !vars."tex lightmap".texture ?>
+	      <colorsource num="1" source="primary color" modifier="color" />
+	      <coloroperation operation="modulate" />
+	      <alphasource num="1" source="primary color" modifier="alpha" />
+	      <alphaoperation operation="modulate" />
+	    <?else?>
+	      <coloroperation operation="replace" />
+	      <alphaoperation operation="replace" />
+	    <?endif?>
           </layer>
           <layer>
             <colorsource num="0" source="previous layer" modifier="color" />

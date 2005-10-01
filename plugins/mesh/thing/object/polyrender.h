@@ -32,6 +32,7 @@
 
 class csShaderVariableContext;
 class csThingObjectType;
+class csThing;
 
 /**
  * This structure holds mapping information to map the texture and lightmap on
@@ -45,8 +46,6 @@ private:
   /// Translation from object to texture space.
   csVector3 v_obj2tex;
 
-  float fdu, fdv;
-
   /**
    * Bounding box of corresponding polygon in 2D texture space.
    * Note that the u-axis of this bounding box is made a power of 2 for
@@ -57,17 +56,11 @@ private:
   /// fp bounding box (0..1 texture space)
   float Fmin_u, Fmin_v, Fmax_u, Fmax_v;
 
-  ///
-  uint16 shf_u;
+  /// Width of lightmap
+  int w;
 
-  /// Width of lit texture ('w' is a power of 2).
-  int w; //@@@ renderer specific
-
-  /// Height of lit texture.
-  int h; //@@@ renderer specific 
-
-  /// Original width (may not be a power of 2) (w_orig <= w).
-  int w_orig;  //@@@ renderer specific
+  /// Height of lightmap
+  int h;
 
   /**
    * Coordinates of the lightmap on the super lightmap, in renderer coords.
@@ -75,9 +68,9 @@ private:
   float lmu1, lmv1, lmu2, lmv2;
 public:
   csPolyTextureMapping() :
-    fdu(0.0f), fdv(0.0f), Imin_u(0), Imin_v(0),
-    Fmin_u(0.0f), Fmin_v(0.0f), Fmax_u(0.0f), Fmax_v(0.0f), shf_u(0),
-    w(0), h(0), w_orig(0), 
+    Imin_u(0), Imin_v(0),
+    Fmin_u(0.0f), Fmin_v(0.0f), Fmax_u(0.0f), Fmax_v(0.0f), 
+    w(0), h(0),
     lmu1(0.0f), lmv1(0.0f), lmu2(0.0f), lmv2(0.0f)
   {
   }
@@ -93,33 +86,20 @@ public:
   {
     m_obj2tex = other.m_obj2tex;
     v_obj2tex = other.v_obj2tex;
-    fdu = other.fdu;
-    fdv = other.fdv;
     Imin_u = other.Imin_u;
     Imin_v = other.Imin_v;
     Fmin_u = other.Fmin_u;
     Fmin_v = other.Fmin_v;
     Fmax_u = other.Fmax_u;
     Fmax_v = other.Fmax_v;
-    shf_u = other.shf_u;
     w = other.w;
     h = other.h;
-    w_orig = other.w_orig;
     lmu1 = other.lmu1;
     lmv1 = other.lmv1;
     lmu2 = other.lmu2;
     lmv2 = other.lmv2;
     return *this;
   }
-
-  /**
-   * Get the power of the lowest power of 2 that is not smaller than the
-   * texture bounding box' width.
-   * that is: 2^shift_u >= texbbox-width > 2^(shift_u-1)
-   */
-  int GetShiftU () const { return shf_u; }
-  /// Set the shift.
-  void SetShiftU (int su) { shf_u = su; }
 
   /// Get the rounded u-value of the textures bounding box' lower left corner.
   int GetIMinU () const { return Imin_u; }
@@ -149,16 +129,6 @@ public:
     Fmax_v = fMaxV;
   }
 
-  /// Get the u-value of the textures bounding box' lower left corner.
-  float GetFDU () const { return fdu; }
-  /// Get the v-value of the textures bounding box' lower left corner.
-  float GetFDV () const { return fdv; }
-  /**
-   * Set the u and v values of the textures bounding box' lower
-   * left corner.
-   */
-  void SetFDUV (float u, float v) { fdu = u; fdv = v; }
-
   /// Set width of lit texture (power of 2).
   void SetLitWidth (int w)
   {
@@ -169,18 +139,11 @@ public:
   {
     csPolyTextureMapping::h = h;
   }
-  /// Set original width of lit texture.
-  void SetLitOriginalWidth (int w_orig)
-  {
-    csPolyTextureMapping::w_orig = w_orig;
-  }
-  /// Get width of lit texture (power of 2).
+  /// Get width of lit texture.
   int GetLitWidth () const { return w; }
   /// Get height of lit texture.
   int GetLitHeight () const { return h; }
 
-  /// Get original width.
-  int GetLitOriginalWidth () const { return w_orig; }
   /// Get lightmap coordinates (on super lightmap).
   void GetCoordsOnSuperLM (float& lmu1, float& lmv1,
   	float& lmu2, float& lmv2) const
@@ -230,15 +193,15 @@ struct csPolygonRenderData
 class csPolygonRenderer : public csRefCount
 {
 private:
+  friend class csPolygonColorAccessor;
   csThingObjectType* parent;
   uint renderBufferNum;
   uint polysNum;
 
   csArray<csPolygonRenderData*> polys;
+  csArray<int> polyIndices;
   csRefArray<iUserRenderBufferIterator> extraBuffers;
   csRef<iShaderManager> shadermanager;
-
-  csRef<csRenderBufferHolder> bufferHolder;
 
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
@@ -250,24 +213,35 @@ private:
   
   void PrepareBuffers (uint& indexStart, uint& indexEnd);
 
+  csRef<iRenderBuffer> normal_buffer;
+  csRef<iRenderBuffer> binormal_buffer;
+  csRef<iRenderBuffer> tangent_buffer;
+  
+  uint normalVerticesNum;
+  uint binormalVerticesNum;
+  uint tangentVerticesNum;
+
+  void PreGetBuffer (csRenderBufferHolder* holder,
+      csRenderBufferName buffer);
+  
+  bool UpdateNormals ();
+  bool UpdateBinormals ();
+  bool UpdateTangents ();
+
+  csHash<csRef<iRenderBuffer>, csStringID> extraBufferData;
+
   class BufferAccessor : public iRenderBufferAccessor
   {
-  private: 
+    csRef<iRenderBuffer> color_buffer;
+    uint colorVerticesNum;
     csPolygonRenderer *renderer;
-    csRef<iRenderBuffer> normal_buffer;
-    csRef<iRenderBuffer> binormal_buffer;
-    csRef<iRenderBuffer> tangent_buffer;
-    
-    uint normalVerticesNum;
-    uint binormalVerticesNum;
-    uint tangentVerticesNum;
+    csThing* instance;
   public:
     CS_LEAKGUARD_DECLARE (BufferAccessor);
     SCF_DECLARE_IBASE;
 
-    BufferAccessor (csPolygonRenderer *renderer)
-      : renderer(renderer), normalVerticesNum (0), binormalVerticesNum (0),
-        tangentVerticesNum (0)
+    BufferAccessor (csPolygonRenderer *renderer, csThing* instance) : 
+      colorVerticesNum(0), renderer(renderer), instance(instance)
     {
       SCF_CONSTRUCT_IBASE(0);
     }
@@ -276,28 +250,22 @@ private:
     {
       SCF_DESTRUCT_IBASE();
     }
-
     virtual void PreGetBuffer (csRenderBufferHolder* holder,
-    	csRenderBufferName buffer);
-    
-    bool UpdateNormals ();
-    bool UpdateBinormals ();
-    bool UpdateTangents ();
+      csRenderBufferName buffer);
   };
   friend class BufferAccessor;
-  csRef<BufferAccessor> buffer_accessor;
-
 public:
   CS_LEAKGUARD_DECLARE (csPolygonRenderer);
 
   csPolygonRenderer (csThingObjectType* parent);
   virtual ~csPolygonRenderer ();
 
-  // ---- iPolygonRenderer ----
-  virtual void PrepareRenderMesh (csRenderMesh& mesh);
+  void PrepareRenderMesh (csRenderMesh& mesh);
+  void SetupBufferHolder (csThing* instance,
+    csRenderBufferHolder* holder, bool lit);
   
-  virtual void Clear ();
-  virtual void AddPolygon (csPolygonRenderData* poly,
+  void Clear ();
+  void AddPolygon (int polyIndex, csPolygonRenderData* poly,
     iUserRenderBufferIterator* extraBuffers);
 
 };

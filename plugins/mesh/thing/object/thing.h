@@ -557,7 +557,8 @@ public:
     SetBoundingBox (bbox);
   }
 
-  void FillRenderMeshes (csDirtyAccessArray<csRenderMesh*>& rmeshes,
+  void FillRenderMeshes (csThing* instance,
+    csDirtyAccessArray<csRenderMesh*>& rmeshes,
     const csArray<RepMaterial>& repMaterials, uint mixmode);
 
   virtual iObjectModel* GetObjectModel () { return (iObjectModel*)this; }
@@ -583,6 +584,7 @@ class csThing : public iMeshObject, public iShadowReceiver,
 {
   friend class PolyMeshHelper;
   friend class csPolygon3D;
+  friend class csPolygonRenderer::BufferAccessor;
 
 private:
   /// Static data for this thing.

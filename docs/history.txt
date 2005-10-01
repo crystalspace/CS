@@ -15,6 +15,9 @@ chronological order.
 	  since some tools seem to like that more.
 	- res did some more voodoo in the SR which seems to bump up FPS a
 	  notch.
+	- res (re)added initial support for vertex colors to the SR.
+	- res added support for Thing vertex colors (simply by taking the
+	  lumel at the vertex' position).
 30-Sep-2005
 	- caedes added <rotatelight> sequence to loader, and added support for
 	  lights in sequence manager rotate operations. This works exactly as

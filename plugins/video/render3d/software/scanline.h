@@ -40,7 +40,33 @@ namespace cspluginSoft3d
 
     virtual bool Init (csSoftwareTexture** textures,
       const csRenderMeshModes& modes,
+      BuffersMask availableBuffers,
       ScanlineRenderInfo& renderInfo) = 0;
+  };
+
+  struct Color_None
+  {
+    static const size_t compCount = 0;
+
+    CS_FORCEINLINE
+    static void Apply (const csFixed16* /*color*/, 
+      uint8& /*r*/, uint8& /*g*/, uint8& /*b*/, uint8& /*a*/) {}
+  };
+
+  struct Color_Multiply
+  {
+    static const size_t compCount = 4;
+
+    CS_FORCEINLINE
+    static void Apply (const csFixed16* color, 
+      uint8& r, uint8& g, uint8& b, uint8& a) 
+    {
+      // @@@ FIXME: adjustable scale
+      r = (r * csClamp (color[0].GetFixed(), 1 << 16, 0)) >> 15; 
+      g = (g * csClamp (color[1].GetFixed(), 1 << 16, 0)) >> 15;
+      b = (b * csClamp (color[2].GetFixed(), 1 << 16, 0)) >> 15;
+      a = (a * csClamp (color[3].GetFixed(), 1 << 16, 0)) >> 15;
+    }
   };
 
   struct ScanlineRenderInfo
@@ -65,7 +91,7 @@ namespace cspluginSoft3d
     csVector4 dnTC;
 
   private:
-    template <typename Zmode>
+    template <typename Color, typename Zmode>
     struct ScanlineImpl
     {
       static void Scan (ScanlineRendererBase* _This,
@@ -73,10 +99,14 @@ namespace cspluginSoft3d
 	int ipolStep, int ipolShift,
 	void* dest, uint len, uint32 *zbuff)
       {
-	const size_t myIpolFloatNum = 2;
+	const size_t offsetColor = 0;
+	const size_t offsetTC = offsetColor + Color::compCount;
+	const size_t myIpolFloatNum = offsetTC + 2;
+
 	InterpolateScanlinePersp<myIpolFloatNum> ipol;
 	ipol.Setup (L, R, 1.0f / len, ipolStep, ipolShift);
 	ScanlineRenderer<Pix>* This = (ScanlineRenderer<Pix>*)_This;
+
 	Pix& pix = This->pix;
 	const uint32* bitmap = This->bitmap;
 	const int v_shift_r = This->v_shift_r;
@@ -92,14 +122,15 @@ namespace cspluginSoft3d
 	{
 	  if (Z.Test())
 	  {
-	    int u = (int)(ipol.floats[0].c);
-	    int32 v = ipol.floats[1].c.GetFixed();
+	    int u = (int)(ipol.floats[offsetTC+0].c);
+	    int32 v = ipol.floats[offsetTC+1].c.GetFixed();
 	    uint32 texel = bitmap [((v >> v_shift_r) & and_h) + (u & and_w)];
 	    {
 	      uint8 r = texel & 0xff;
 	      uint8 g = (texel >> 8) & 0xff;
 	      uint8 b = (texel >> 16) & 0xff;
 	      uint8 a = (texel >> 24);
+	      Color::Apply (&ipol.floats[offsetColor].c, r, g, b, a);
 	      pix.WritePix (_dest, r, g, b, a);
 	      Z.Update();
 	    }
@@ -110,16 +141,44 @@ namespace cspluginSoft3d
 	} /* endwhile */
       }
     };
+    template<typename Color>
+    static ScanlineProc GetScanlineProcC (csZBufMode zmode)
+    {
+      switch (zmode)
+      {
+	case CS_ZBUF_NONE:
+	  return ScanlineImpl<Color, ZBufMode_ZNone>::Scan;
+	case CS_ZBUF_FILL:
+	case CS_ZBUF_FILLONLY:
+	  return ScanlineImpl<Color, ZBufMode_ZFill>::Scan;
+	case CS_ZBUF_TEST:
+	  return ScanlineImpl<Color, ZBufMode_ZTest>::Scan;
+	case CS_ZBUF_USE:
+	  return ScanlineImpl<Color, ZBufMode_ZUse>::Scan;
+	case CS_ZBUF_EQUAL:
+	  return ScanlineImpl<Color, ZBufMode_ZEqual>::Scan;
+	case CS_ZBUF_INVERT:
+	  return ScanlineImpl<Color, ZBufMode_ZInvert>::Scan;
+	default:
+	  return 0;
+      }
+    }
+    static ScanlineProc GetScanlineProc (bool colorized, csZBufMode zmode)
+    {
+      if (colorized)
+	return GetScanlineProcC<Color_Multiply> (zmode);
+      else
+	return GetScanlineProcC<Color_None> (zmode);
+    }
   public:
     ScanlineRenderer (const csPixelFormat& pfmt) : pix (pfmt) 
     {}
 
     bool Init (csSoftwareTexture** textures,
       const csRenderMeshModes& modes,
+      BuffersMask availableBuffers,
       ScanlineRenderInfo& renderInfo)
     {
-      renderInfo.renderer = this;
-      renderInfo.desiredBuffers = CS_BUFFERFLAG(TEXCOORD);
       csSoftwareTexture* tex = textures[0];
       if (tex == 0) return false;      // @@@ Use flat color instead
       bitmap = tex->bitmap;
@@ -128,37 +187,25 @@ namespace cspluginSoft3d
       and_h = tex->get_h_mask() << v_shift_r;
       v_shift_r = 16 - v_shift_r;
 
+      bool doColor = availableBuffers & CS_BUFFERFLAG(COLOR);
+
+      renderInfo.renderer = this;
+      renderInfo.desiredBuffers = CS_BUFFERFLAG(TEXCOORD);
       dnTC.Set (tex->get_width(), tex->get_height(), 0.0f, 0.0f);
       renderInfo.denormFactors = &dnTC;
       renderInfo.denormBuffers = CS_BUFFERFLAG(TEXCOORD);
-      static const size_t myBufferComps[] = {2};
-      renderInfo.bufferComps = myBufferComps;
-
-      switch (modes.z_buf_mode)
+      static const size_t myBufferComps[] = {4, 2};
+      if (doColor)
       {
-	case CS_ZBUF_NONE:
-	  renderInfo.proc = ScanlineImpl<ZBufMode_ZNone>::Scan;
-	  break;
-	case CS_ZBUF_FILL:
-	case CS_ZBUF_FILLONLY:
-	  renderInfo.proc = ScanlineImpl<ZBufMode_ZFill>::Scan;
-	  break;
-	case CS_ZBUF_TEST:
-	  renderInfo.proc = ScanlineImpl<ZBufMode_ZTest>::Scan;
-	  break;
-	case CS_ZBUF_USE:
-	  renderInfo.proc = ScanlineImpl<ZBufMode_ZUse>::Scan;
-	  break;
-	case CS_ZBUF_EQUAL:
-	  renderInfo.proc = ScanlineImpl<ZBufMode_ZEqual>::Scan;
-	  break;
-	case CS_ZBUF_INVERT:
-	  renderInfo.proc = ScanlineImpl<ZBufMode_ZInvert>::Scan;
-	  break;
-	default:
-	  return false;
+	renderInfo.desiredBuffers |= CS_BUFFERFLAG(COLOR);
+	renderInfo.bufferComps = myBufferComps;
       }
-      return true;
+      else
+	renderInfo.bufferComps = &myBufferComps[1];
+
+      renderInfo.proc = GetScanlineProc (doColor, modes.z_buf_mode);
+
+      return renderInfo.proc != 0;
     }
   };
 } // namespace cspluginSoft3d

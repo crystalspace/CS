@@ -474,7 +474,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   csPolyTextureMapping* tmapping = polygon->GetStaticPoly ()
   	->GetTextureMapping ();
   int lw = 1 +
-    ((tmapping->GetLitOriginalWidth () + csLightMap::lightcell_size - 1) >>
+    ((tmapping->GetLitWidth () + csLightMap::lightcell_size - 1) >>
       csLightMap::lightcell_shift);
   int lh = 1 +
     ((tmapping->GetLitHeight () + csLightMap::lightcell_size - 1) >>

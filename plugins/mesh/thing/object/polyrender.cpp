@@ -25,25 +25,21 @@
 #include "ivideo/rendermesh.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
+#include "csgeom/math.h"
+#include "cstool/rbuflock.h"
 
 #include "polyrender.h"
 #include "thing.h"
 
 CS_LEAKGUARD_IMPLEMENT (csPolygonRenderer);
-CS_LEAKGUARD_IMPLEMENT (csPolygonRenderer::BufferAccessor);
 
-SCF_IMPLEMENT_IBASE(csPolygonRenderer::BufferAccessor)
-  SCF_IMPLEMENTS_INTERFACE(iRenderBufferAccessor)
-SCF_IMPLEMENT_IBASE_END
-
-csPolygonRenderer::csPolygonRenderer (csThingObjectType* parent) : csRefCount()
+csPolygonRenderer::csPolygonRenderer (csThingObjectType* parent) : csRefCount(),
+  normalVerticesNum(0), binormalVerticesNum(0), tangentVerticesNum(0)
 {
   csPolygonRenderer::parent = parent;
   renderBufferNum = (uint)~0;
   polysNum = 0;
-  buffer_accessor.AttachNew (new BufferAccessor(this));
   shadermanager = parent->shadermgr;
-  bufferHolder.AttachNew (new csRenderBufferHolder);
 }
 
 csPolygonRenderer::~csPolygonRenderer ()
@@ -94,17 +90,12 @@ void csPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     csVector2* lmcoords = (csVector2*)lmcoords_buffer->Lock(CS_BUF_LOCK_NORMAL);
 #endif
 
-    csHash<csRef<iRenderBuffer>, csStringID> extraBufferData;
+    extraBufferData.DeleteAll();
 
     index_buffer = csRenderBuffer::CreateIndexRenderBuffer (num_indices, 
       CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, num_verts - 1);
 
     int* indices = (int*)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
-
-    bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
-    bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texel_buffer);
-    bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD_LIGHTMAP, lmcoords_buffer);
-    bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
 
     int vindex = 0, iindex = 0;
     indexStart = rbIndexStart = iindex;
@@ -242,34 +233,6 @@ void csPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
   #else
     masterBuffer->Release ();
   #endif
-
-    // Finally, add custom buffers to accessor
-    uint accessorMask = 
-      CS_BUFFER_NORMAL_MASK | CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK;
-    csHash<csRef<iRenderBuffer>, csStringID>::GlobalIterator userBufIt =
-      extraBufferData.GetIterator();
-
-    while (userBufIt.HasNext())
-    {
-      csStringID name;
-      csRef<iRenderBuffer> buf = userBufIt.Next (name);
-      csRenderBufferName bufName = 
-	csRenderBuffer::GetBufferNameFromDescr (parent->stringset->Request (name));
-      if (bufName >= CS_BUFFER_POSITION)
-      {
-	accessorMask &= ~(1 << bufName);
-	bufferHolder->SetRenderBuffer (bufName, buf);
-      }
-      else
-      {
-	if (svcontext == 0) 
-	  svcontext.AttachNew (new csShaderVariableContext());
-	csShaderVariable* sv = svcontext->GetVariableAdd (name);
-	sv->SetValue (buf);
-      }
-    }
-
-    bufferHolder->SetAccessor (buffer_accessor, accessorMask);
   }
   else
   {
@@ -283,7 +246,6 @@ void csPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
 {
   PrepareBuffers (mesh.indexstart, mesh.indexend);
   mesh.geometryInstance = this;
-  mesh.buffers = bufferHolder;
   
   if (svcontext != 0)
   {
@@ -301,21 +263,65 @@ void csPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
   }
 }
 
+void csPolygonRenderer::SetupBufferHolder (csThing* instance,
+					   csRenderBufferHolder* holder, 
+					   bool lit)
+{
+  csRef<BufferAccessor> buffer_accessor;
+  buffer_accessor.AttachNew (new BufferAccessor (this, instance));
+
+  holder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
+  holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texel_buffer);
+  holder->SetRenderBuffer (CS_BUFFER_TEXCOORD_LIGHTMAP, lmcoords_buffer);
+  holder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
+
+  // Add custom buffers to accessor
+  uint accessorMask = holder->GetAccessorMask();
+  accessorMask |= 
+    CS_BUFFER_NORMAL_MASK | CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK |
+    (lit ? CS_BUFFER_COLOR_MASK : 0);
+
+  csHash<csRef<iRenderBuffer>, csStringID>::GlobalIterator userBufIt =
+    extraBufferData.GetIterator();
+
+  while (userBufIt.HasNext())
+  {
+    csStringID name;
+    csRef<iRenderBuffer> buf = userBufIt.Next (name);
+    csRenderBufferName bufName = 
+      csRenderBuffer::GetBufferNameFromDescr (parent->stringset->Request (name));
+    if (bufName >= CS_BUFFER_POSITION)
+    {
+      accessorMask &= ~(1 << bufName);
+      holder->SetRenderBuffer (bufName, buf);
+    }
+    else
+    {
+      if (svcontext == 0) 
+	svcontext.AttachNew (new csShaderVariableContext());
+      csShaderVariable* sv = svcontext->GetVariableAdd (name);
+      sv->SetValue (buf);
+    }
+  }
+  holder->SetAccessor (buffer_accessor, accessorMask);
+}
+
 void csPolygonRenderer::Clear ()
 {
   polys.DeleteAll ();
   polysNum++;
 }
 
-void csPolygonRenderer::AddPolygon (csPolygonRenderData* poly,
-				      iUserRenderBufferIterator* extraBuffers)
+void csPolygonRenderer::AddPolygon (int polyIndex, csPolygonRenderData* poly,
+				    iUserRenderBufferIterator* extraBuffers)
 {
   polys.Push (poly);
+  polyIndices.Push (polyIndex);
   this->extraBuffers.Push (extraBuffers);
   polysNum++;
 }
 
-void csPolygonRenderer::BufferAccessor::PreGetBuffer (
+void csPolygonRenderer::PreGetBuffer (
   csRenderBufferHolder* holder, csRenderBufferName buffer)
 {
   if (!holder) return;
@@ -325,30 +331,30 @@ void csPolygonRenderer::BufferAccessor::PreGetBuffer (
   case CS_BUFFER_NORMAL:
     UpdateNormals ();
     holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
-    break;
+    return;
   case CS_BUFFER_TANGENT:
     UpdateTangents ();
     holder->SetRenderBuffer (CS_BUFFER_TANGENT, tangent_buffer);
-    break;
+    return;
   case CS_BUFFER_BINORMAL:
     UpdateBinormals ();
     holder->SetRenderBuffer (CS_BUFFER_BINORMAL, binormal_buffer);
-    break;
+    return;
   default:
     break;
   }
 }
 
-bool csPolygonRenderer::BufferAccessor::UpdateNormals ()
+bool csPolygonRenderer::UpdateNormals ()
 {
-  if (normalVerticesNum != renderer->polysNum)
+  if (normalVerticesNum != polysNum)
   {
     int num_verts = 0;
     size_t i;
 
-    for (i = 0; i < renderer->polys.Length(); i++)
+    for (i = 0; i < polys.Length(); i++)
     {
-      csPolygonRenderData* poly = renderer->polys[i];
+      csPolygonRenderData* poly = polys[i];
       num_verts += poly->num_vertices;
     }
 
@@ -359,9 +365,9 @@ bool csPolygonRenderer::BufferAccessor::UpdateNormals ()
 
     csVector3* normals = (csVector3*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
-    for (size_t i = 0; i < renderer->polys.Length(); i++)
+    for (size_t i = 0; i < polys.Length(); i++)
     {
-      csPolygonRenderData* static_data = renderer->polys[i];
+      csPolygonRenderData* static_data = polys[i];
       bool smoothed = static_data->objNormals && *static_data->objNormals;
 
       csVector3 polynormal;
@@ -386,21 +392,21 @@ bool csPolygonRenderer::BufferAccessor::UpdateNormals ()
     }
     normal_buffer->Release ();
 
-    normalVerticesNum = renderer->polysNum;
+    normalVerticesNum = polysNum;
   }
   return true;
 }
 
-bool csPolygonRenderer::BufferAccessor::UpdateBinormals ()
+bool csPolygonRenderer::UpdateBinormals ()
 {
-  if (binormalVerticesNum != renderer->polysNum)
+  if (binormalVerticesNum != polysNum)
   {
     int num_verts = 0;
     size_t i;
 
-    for (i = 0; i < renderer->polys.Length(); i++)
+    for (i = 0; i < polys.Length(); i++)
     {
-      csPolygonRenderData* poly = renderer->polys[i];
+      csPolygonRenderData* poly = polys[i];
       num_verts += poly->num_vertices;
     }
 
@@ -411,9 +417,9 @@ bool csPolygonRenderer::BufferAccessor::UpdateBinormals ()
 
     csVector3* binormals = (csVector3*)binormal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
-    for (size_t i = 0; i < renderer->polys.Length(); i++)
+    for (size_t i = 0; i < polys.Length(); i++)
     {
-      csPolygonRenderData* static_data = renderer->polys[i];
+      csPolygonRenderData* static_data = polys[i];
 
       csMatrix3 t_m;
       csVector3 t_v;
@@ -461,21 +467,21 @@ bool csPolygonRenderer::BufferAccessor::UpdateBinormals ()
     }
 
     binormal_buffer->Release ();
-    binormalVerticesNum = renderer->polysNum;
+    binormalVerticesNum = polysNum;
   }
   return true;
 }
 
-bool csPolygonRenderer::BufferAccessor::UpdateTangents ()
+bool csPolygonRenderer::UpdateTangents ()
 {
-  if (tangentVerticesNum != renderer->polysNum)
+  if (tangentVerticesNum != polysNum)
   {
     int num_verts = 0;
     size_t i;
 
-    for (i = 0; i < renderer->polys.Length(); i++)
+    for (i = 0; i < polys.Length(); i++)
     {
-      csPolygonRenderData* poly = renderer->polys[i];
+      csPolygonRenderData* poly = polys[i];
       num_verts += poly->num_vertices;
     }
 
@@ -486,9 +492,9 @@ bool csPolygonRenderer::BufferAccessor::UpdateTangents ()
 
     csVector3* tangents = (csVector3*)tangent_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
-    for (size_t i = 0; i < renderer->polys.Length(); i++)
+    for (size_t i = 0; i < polys.Length(); i++)
     {
-      csPolygonRenderData* static_data = renderer->polys[i];
+      csPolygonRenderData* static_data = polys[i];
 
       csMatrix3 t_m;
       csVector3 t_v;
@@ -528,7 +534,119 @@ bool csPolygonRenderer::BufferAccessor::UpdateTangents ()
     }
 
     tangent_buffer->Release ();
-    tangentVerticesNum = renderer->polysNum;
+    tangentVerticesNum = polysNum;
   }
   return true;
+}
+
+//---------------------------------------------------------------------------
+
+CS_LEAKGUARD_IMPLEMENT (csPolygonRenderer::BufferAccessor);
+
+SCF_IMPLEMENT_IBASE(csPolygonRenderer::BufferAccessor)
+  SCF_IMPLEMENTS_INTERFACE(iRenderBufferAccessor)
+SCF_IMPLEMENT_IBASE_END
+
+void csPolygonRenderer::BufferAccessor::PreGetBuffer (
+  csRenderBufferHolder* holder, csRenderBufferName buffer)
+{
+  if (!holder) return;
+
+  if (buffer == CS_BUFFER_COLOR)
+  {
+    if (colorVerticesNum != renderer->polysNum)
+    {
+      int num_verts = 0;
+      size_t i;
+
+      for (i = 0; i < renderer->polys.Length(); i++)
+      {
+	csPolygonRenderData* poly = renderer->polys[i];
+	num_verts += poly->num_vertices;
+      }
+
+      if (!color_buffer 
+	|| (color_buffer->GetElementCount() != (size_t)num_verts))
+	color_buffer = csRenderBuffer::CreateRenderBuffer (num_verts, 
+	  CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+
+      csRenderBufferLock<csColor, iRenderBuffer*> colorLock (color_buffer);
+      csColor* colors = colorLock;
+
+      for (size_t i = 0; i < renderer->polys.Length(); i++)
+      {
+	csPolygonRenderData* static_data = renderer->polys[i];
+	const csPolyTextureMapping& tmapping = *static_data->tmapping;
+	csLightMap* lm = instance->polygons[renderer->polyIndices[i]].
+	  GetPolyTexture()->GetLightMap();
+	csRGBpixel* staticMap = lm->GetStaticMap (); 
+	  // @@@ FIXME: PD lights, ambient
+	if (!staticMap)
+	{
+	  memset (colors, 0, sizeof (csColor) * static_data->num_vertices);
+	  colors += static_data->num_vertices;
+	  continue;
+	}
+	int lmW = lm->GetWidth();
+	int lmH = lm->GetHeight();
+
+	csMatrix3 t_m;
+	csVector3 t_v;
+	if (static_data->tmapping)
+	{
+	  t_m = tmapping.GetO2T ();
+	  t_v = tmapping.GetO2TTranslation ();
+	}
+	else
+	{
+	  CS_ASSERT (false);	// @@@ NEED TO SUPPORT FLAT SHADING!!!
+	}
+	csTransform object2texture (t_m, t_v);
+
+	csTransform tex2lm;
+	if (static_data->useLightmap)
+	{
+	  float lm_low_u = 0.0f, lm_low_v = 0.0f;
+	  float lm_high_u = 1.0f, lm_high_v = 1.0f;
+	  tmapping.GetTextureBox (
+	    lm_low_u, lm_low_v, lm_high_u, lm_high_v);
+
+	  float lm_scale_u = ((float)(lmW-1) / (lm_high_u - lm_low_u));
+	  float lm_scale_v = ((float)(lmH-1) / (lm_high_v - lm_low_v));
+
+	  tex2lm.SetO2T (
+	    csMatrix3 (lm_scale_u, 0, 0,
+	      0, lm_scale_v, 0,
+	      0, 0, 1));
+	  tex2lm.SetO2TTranslation (
+	    csVector3 (
+	      (lm_scale_u != 0.0f) ? (lm_low_u / lm_scale_u) : 0,
+	      (lm_scale_v != 0.0f) ? (lm_low_v / lm_scale_v) : 0,
+	      0));
+	}
+
+	// First, fill the normal/texel/vertex buffers.
+	csVector3* obj_verts = *(static_data->p_obj_verts);
+	int j, vc = static_data->num_vertices;
+	for (j = 0; j < vc; j++)
+	{
+	  int vidx = static_data->vertices[j];
+	  const csVector3& vertex = obj_verts[vidx];
+	  csVector3 t = object2texture.Other2This (vertex);
+	  csVector3 l = tex2lm.Other2This (t);
+	  int lmX = (int)l.x;
+	  int lmY = (int)l.y;
+	  csRGBpixel& lmp = staticMap[lmY * lmW + lmX];
+	  colors->Set (
+	    lmp.red / 255.0f, lmp.green / 255.0f, lmp.blue / 255.0f);
+	  colors++;
+	}
+      }
+      colorVerticesNum = renderer->polysNum;
+    }
+
+    holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
+  }
+  else
+    renderer->PreGetBuffer (holder, buffer);
 }
