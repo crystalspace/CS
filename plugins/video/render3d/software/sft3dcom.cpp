@@ -363,508 +363,6 @@ bool csSoftwareGraphics3DCommon::SharedOpen ()
 
 void csSoftwareGraphics3DCommon::ScanSetup ()
 {
-  // Select the right scanline drawing functions
-  memset (&ScanProc, 0, sizeof (ScanProc));
-  memset (&ScanProcPI, 0, sizeof (ScanProcPI));
-  memset (&ScanProcPIG, 0, sizeof (ScanProcPIG));
-  ScanProc_Alpha = 0;
-
-#ifdef CS_HAVE_MMX
-  //bool UseMMX = (cpu_mmx && do_mmx);
-#endif
-
-  // Bits-per-pixel independent routine
-  ScanProc [SCANPROC_ZFIL] = csScan_scan_zfil;
-
-  switch (pfmt.PixelBytes)
-  {
-    case 2:
-#if 0
-      if (do_alpha) ScanProc_Alpha = ScanProc_16_Alpha;
-
-      ScanProc [SCANPROC_FLAT_ZNONE] = csScan_16_scan_flat_znone;
-      ScanProc [SCANPROC_FLAT_ZFIL] = csScan_16_scan_flat_zfil;
-      ScanProc [SCANPROC_FLAT_ZUSE] = csScan_16_scan_flat_zuse;
-      ScanProc [SCANPROC_FLAT_ZTEST] = csScan_16_scan_flat_ztest;
-
-      ScanProc [SCANPROC_TEX_ZNONE] = csScan_16_scan_tex_znone;
-      ScanProc [SCANPROC_TEX_ZFIL] =
-/*#ifdef CS_HAVE_MMX
-        UseMMX ? csScan_16_mmx_scan_tex_zfil :
-#endif*/
-        csScan_16_scan_tex_zfil;
-      ScanProc [SCANPROC_TEX_ZUSE] = csScan_16_scan_tex_zuse;
-      ScanProc [SCANPROC_TEX_ZTEST] = csScan_16_scan_tex_ztest;
-
-      ScanProc [SCANPROC_MAP_ZNONE] =
-        bilinear_filter == 2 ?
-        (pfmt.GreenBits == 5 ?
-          csScan_16_555_scan_map_filt2_znone :
-          csScan_16_565_scan_map_filt2_znone) :
-        bilinear_filter == 1 ? csScan_16_scan_map_filt_znone :
-        csScan_16_scan_map_znone;
-      ScanProc [SCANPROC_MAP_ZFIL] =
-        bilinear_filter == 2 ?
-        (pfmt.GreenBits == 5 ?
-          csScan_16_555_scan_map_filt2_zfil :
-          csScan_16_565_scan_map_filt2_zfil) :
-        bilinear_filter == 1 ? csScan_16_scan_map_filt_zfil :
-/*#ifdef CS_HAVE_MMX
-        UseMMX ? csScan_16_mmx_scan_map_zfil :
-#endif*/
-        csScan_16_scan_map_zfil;
-      ScanProc [SCANPROC_MAP_ZUSE] =
-        bilinear_filter == 2 ?
-        (pfmt.GreenBits == 5 ?
-          csScan_16_555_scan_map_filt2_zuse :
-          csScan_16_565_scan_map_filt2_zuse) :
-        csScan_16_scan_map_zuse;
-      ScanProc [SCANPROC_MAP_ZTEST] =
-        bilinear_filter == 2 ?
-        (pfmt.GreenBits == 5 ?
-          csScan_16_555_scan_map_filt2_ztest :
-          csScan_16_565_scan_map_filt2_ztest) :
-        csScan_16_scan_map_ztest;
-
-      ScanProc [SCANPROC_TEX_KEY_ZNONE] = csScan_16_scan_tex_key_znone;
-      ScanProc [SCANPROC_TEX_KEY_ZFIL] = csScan_16_scan_tex_key_zfil;
-      ScanProc [SCANPROC_TEX_KEY_ZUSE] = csScan_16_scan_tex_key_zuse;
-      ScanProc [SCANPROC_TEX_KEY_ZTEST] = csScan_16_scan_tex_key_ztest;
-      ScanProc [SCANPROC_MAP_KEY_ZNONE] = csScan_16_scan_map_key_znone;
-      ScanProc [SCANPROC_MAP_KEY_ZFIL] = csScan_16_scan_map_key_zfil;
-      ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_16_scan_map_key_zuse;
-      ScanProc [SCANPROC_MAP_KEY_ZTEST] = csScan_16_scan_map_key_ztest;
-
-      ScanProc [SCANPROC_TEX_ALPHA_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_tex_alpha_znone :
-        csScan_16_565_scan_tex_alpha_znone;
-      ScanProc [SCANPROC_TEX_ALPHA_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_tex_alpha_zfil :
-        csScan_16_565_scan_tex_alpha_zfil;
-      ScanProc [SCANPROC_TEX_ALPHA_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_tex_alpha_zuse :
-        csScan_16_565_scan_tex_alpha_zuse;
-      ScanProc [SCANPROC_TEX_ALPHA_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_tex_alpha_ztest :
-        csScan_16_565_scan_tex_alpha_ztest;
-      ScanProc [SCANPROC_MAP_ALPHA_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_map_alpha_znone :
-        csScan_16_565_scan_map_alpha_znone;
-      ScanProc [SCANPROC_MAP_ALPHA_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_map_alpha_zfil :
-        csScan_16_565_scan_map_alpha_zfil;
-      ScanProc [SCANPROC_MAP_ALPHA_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_map_alpha_zuse :
-        csScan_16_565_scan_map_alpha_zuse;
-      ScanProc [SCANPROC_MAP_ALPHA_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_map_alpha_ztest :
-        csScan_16_565_scan_map_alpha_ztest;
-
-      ScanProc [SCANPROC_TEX_FX_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_tex_fx_znone :
-        csScan_16_565_scan_tex_fx_znone;
-      ScanProc [SCANPROC_TEX_FX_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_tex_fx_zfil :
-        csScan_16_565_scan_tex_fx_zfil;
-      ScanProc [SCANPROC_TEX_FX_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_tex_fx_zuse :
-        csScan_16_565_scan_tex_fx_zuse;
-      ScanProc [SCANPROC_TEX_FX_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_tex_fx_ztest :
-        csScan_16_565_scan_tex_fx_ztest;
-      ScanProc [SCANPROC_MAP_FX_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_map_fx_znone :
-        csScan_16_565_scan_map_fx_znone;
-      ScanProc [SCANPROC_MAP_FX_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_map_fx_zfil :
-        csScan_16_565_scan_map_fx_zfil;
-      ScanProc [SCANPROC_MAP_FX_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_map_fx_zuse :
-        csScan_16_565_scan_map_fx_zuse;
-      ScanProc [SCANPROC_MAP_FX_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_map_fx_ztest :
-        csScan_16_565_scan_map_fx_ztest;
-
-      ScanProc [SCANPROC_FOG] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_fog :
-        csScan_16_565_scan_fog;
-      ScanProc [SCANPROC_FOG_VIEW] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_fog_view :
-        csScan_16_565_scan_fog_view;
-
-      ScanProcPI [SCANPROC_PI_FLAT_ZNONE] = csScan_16_scan_pi_flat_znone;
-      ScanProcPI [SCANPROC_PI_FLAT_ZFIL] = csScan_16_scan_pi_flat_zfil;
-      ScanProcPI [SCANPROC_PI_FLAT_ZUSE] = csScan_16_scan_pi_flat_zuse;
-      ScanProcPI [SCANPROC_PI_FLAT_ZTEST] = csScan_16_scan_pi_flat_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_ZNONE] = csScan_16_scan_pi_tex_znone;
-      ScanProcPI [SCANPROC_PI_TEX_ZFIL] = csScan_16_scan_pi_tex_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_ZUSE] =
-/*#ifdef CS_HAVE_MMX
-        UseMMX ? csScan_16_mmx_scan_pi_tex_zuse :
-#endif*/
-        csScan_16_scan_pi_tex_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_ZTEST] = csScan_16_scan_pi_tex_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_KEY_ZNONE] = csScan_16_scan_pi_tex_key_znone;
-      ScanProcPI [SCANPROC_PI_TEX_KEY_ZFIL] = csScan_16_scan_pi_tex_key_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_KEY_ZUSE] = csScan_16_scan_pi_tex_key_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_KEY_ZTEST] = csScan_16_scan_pi_tex_key_ztest;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_ZNONE] = csScan_16_scan_pi_tile_tex_znone;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_ZFIL] = csScan_16_scan_pi_tile_tex_zfil;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_ZUSE] = csScan_16_scan_pi_tile_tex_zuse;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_ZTEST] = csScan_16_scan_pi_tile_tex_ztest;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZNONE] = csScan_16_scan_pi_tile_tex_key_znone;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZFIL] = csScan_16_scan_pi_tile_tex_key_zfil;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZUSE] = csScan_16_scan_pi_tile_tex_key_zuse;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZTEST] = csScan_16_scan_pi_tile_tex_key_ztest;
-
-      ScanProcPI [SCANPROC_PI_FLAT_FX_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_flat_fx_znone :
-        csScan_16_565_scan_pi_flat_fx_znone;
-      ScanProcPI [SCANPROC_PI_FLAT_FX_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_flat_fx_zfil :
-        csScan_16_565_scan_pi_flat_fx_zfil;
-      ScanProcPI [SCANPROC_PI_FLAT_FX_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_flat_fx_zuse :
-        csScan_16_565_scan_pi_flat_fx_zuse;
-      ScanProcPI [SCANPROC_PI_FLAT_FX_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_flat_fx_ztest :
-        csScan_16_565_scan_pi_flat_fx_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_FX_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_fx_znone :
-        csScan_16_565_scan_pi_tex_fx_znone;
-      ScanProcPI [SCANPROC_PI_TEX_FX_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_fx_zfil :
-        csScan_16_565_scan_pi_tex_fx_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_FX_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_fx_zuse :
-        csScan_16_565_scan_pi_tex_fx_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_FX_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_fx_ztest :
-        csScan_16_565_scan_pi_tex_fx_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_fxkey_znone :
-        csScan_16_565_scan_pi_tex_fxkey_znone;
-      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_fxkey_zfil :
-        csScan_16_565_scan_pi_tex_fxkey_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_fxkey_zuse :
-        csScan_16_565_scan_pi_tex_fxkey_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_fxkey_ztest :
-        csScan_16_565_scan_pi_tex_fxkey_ztest;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_fx_znone :
-        csScan_16_565_scan_pi_tile_tex_fx_znone;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_fx_zfil :
-        csScan_16_565_scan_pi_tile_tex_fx_zfil;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_fx_zuse :
-        csScan_16_565_scan_pi_tile_tex_fx_zuse;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_fx_ztest :
-        csScan_16_565_scan_pi_tile_tex_fx_ztest;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_fxkey_znone :
-        csScan_16_565_scan_pi_tile_tex_fxkey_znone;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_fxkey_zfil :
-        csScan_16_565_scan_pi_tile_tex_fxkey_zfil;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_fxkey_zuse :
-        csScan_16_565_scan_pi_tile_tex_fxkey_zuse;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_fxkey_ztest :
-        csScan_16_565_scan_pi_tile_tex_fxkey_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_alpha_znone :
-        csScan_16_565_scan_pi_tex_alpha_znone;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_alpha_zfil :
-        csScan_16_565_scan_pi_tex_alpha_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_alpha_zuse :
-        csScan_16_565_scan_pi_tex_alpha_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_alpha_ztest :
-        csScan_16_565_scan_pi_tex_alpha_ztest;
-
-      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_flat_gou_znone :
-        csScan_16_565_scan_pi_flat_gou_znone;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_flat_gou_zfil :
-        csScan_16_565_scan_pi_flat_gou_zfil;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_flat_gou_zuse :
-        csScan_16_565_scan_pi_flat_gou_zuse;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_flat_gou_ztest :
-        csScan_16_565_scan_pi_flat_gou_ztest;
-      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_gou_znone :
-        csScan_16_565_scan_pi_tex_gou_znone;
-      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_gou_zfil :
-        csScan_16_565_scan_pi_tex_gou_zfil;
-      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_gou_zuse :
-        csScan_16_565_scan_pi_tex_gou_zuse;
-      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_gou_ztest :
-        csScan_16_565_scan_pi_tex_gou_ztest;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_goukey_znone :
-        csScan_16_565_scan_pi_tex_goukey_znone;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_goukey_zfil :
-        csScan_16_565_scan_pi_tex_goukey_zfil;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_goukey_zuse :
-        csScan_16_565_scan_pi_tex_goukey_zuse;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_goukey_ztest :
-        csScan_16_565_scan_pi_tex_goukey_ztest;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_gou_znone :
-        csScan_16_565_scan_pi_tile_tex_gou_znone;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_gou_zfil :
-        csScan_16_565_scan_pi_tile_tex_gou_zfil;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_gou_zuse :
-        csScan_16_565_scan_pi_tile_tex_gou_zuse;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_gou_ztest :
-        csScan_16_565_scan_pi_tile_tex_gou_ztest;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_goukey_znone :
-        csScan_16_565_scan_pi_tile_tex_goukey_znone;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_goukey_zfil :
-        csScan_16_565_scan_pi_tile_tex_goukey_zfil;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_goukey_zuse :
-        csScan_16_565_scan_pi_tile_tex_goukey_zuse;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_goukey_ztest :
-        csScan_16_565_scan_pi_tile_tex_goukey_ztest;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_flat_goufx_znone :
-        csScan_16_565_scan_pi_flat_goufx_znone;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_flat_goufx_zfil :
-        csScan_16_565_scan_pi_flat_goufx_zfil;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_flat_goufx_zuse :
-        csScan_16_565_scan_pi_flat_goufx_zuse;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_flat_goufx_ztest :
-        csScan_16_565_scan_pi_flat_goufx_ztest;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_goufx_znone :
-        csScan_16_565_scan_pi_tex_goufx_znone;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_goufx_zfil :
-        csScan_16_565_scan_pi_tex_goufx_zfil;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_goufx_zuse :
-        csScan_16_565_scan_pi_tex_goufx_zuse;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_goufx_ztest :
-        csScan_16_565_scan_pi_tex_goufx_ztest;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_goufxkey_znone :
-        csScan_16_565_scan_pi_tex_goufxkey_znone;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_goufxkey_zfil :
-        csScan_16_565_scan_pi_tex_goufxkey_zfil;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_goufxkey_zuse :
-        csScan_16_565_scan_pi_tex_goufxkey_zuse;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tex_goufxkey_ztest :
-        csScan_16_565_scan_pi_tex_goufxkey_ztest;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_goufx_znone :
-        csScan_16_565_scan_pi_tile_tex_goufx_znone;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_goufx_zfil :
-        csScan_16_565_scan_pi_tile_tex_goufx_zfil;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_goufx_zuse :
-        csScan_16_565_scan_pi_tile_tex_goufx_zuse;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_goufx_ztest :
-        csScan_16_565_scan_pi_tile_tex_goufx_ztest;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZNONE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_goufxkey_znone :
-        csScan_16_565_scan_pi_tile_tex_goufxkey_znone;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZFIL] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_goufxkey_zfil :
-        csScan_16_565_scan_pi_tile_tex_goufxkey_zfil;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZUSE] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_goufxkey_zuse :
-        csScan_16_565_scan_pi_tile_tex_goufxkey_zuse;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZTEST] = (pfmt.GreenBits == 5) ?
-        csScan_16_555_scan_pi_tile_tex_goufxkey_ztest :
-        csScan_16_565_scan_pi_tile_tex_goufxkey_ztest;
-#endif
-      break;
-
-    case 4:
-#if 0
-      if (do_alpha) ScanProc_Alpha = ScanProc_32_Alpha;
-
-      ScanProc [SCANPROC_FLAT_ZNONE] = csScan_32_scan_flat_znone;
-      ScanProc [SCANPROC_FLAT_ZFIL] = csScan_32_scan_flat_zfil;
-      ScanProc [SCANPROC_FLAT_ZUSE] = csScan_32_scan_flat_zuse;
-      ScanProc [SCANPROC_FLAT_ZTEST] = csScan_32_scan_flat_ztest;
-
-      ScanProc [SCANPROC_TEX_ZNONE] = csScan_32_scan_tex_znone;
-      ScanProc [SCANPROC_TEX_ZFIL] =
-/*#if defined (CS_HAVE_MMX)
-        UseMMX ? csScan_32_mmx_scan_tex_zfil :
-#endif*/
-        csScan_32_scan_tex_zfil;
-      ScanProc [SCANPROC_TEX_ZUSE] = csScan_32_scan_tex_zuse;
-      ScanProc [SCANPROC_TEX_ZTEST] = csScan_32_scan_tex_ztest;
-
-      ScanProc [SCANPROC_MAP_ZNONE] =
-        csScan_32_scan_map_znone;
-      ScanProc [SCANPROC_MAP_ZFIL] =
-        bilinear_filter == 2 ? csScan_32_scan_map_filt2_zfil :
-/*#if defined (CS_HAVE_MMX)
-        UseMMX ? csScan_32_mmx_scan_map_zfil :
-#endif*/
-        csScan_32_scan_map_zfil;
-      ScanProc [SCANPROC_MAP_ZUSE] =
-        bilinear_filter == 2 ? csScan_32_scan_map_filt2_zuse :
-        csScan_32_scan_map_zuse;
-      ScanProc [SCANPROC_MAP_ZTEST] =
-        csScan_32_scan_map_ztest;
-
-      ScanProc [SCANPROC_TEX_KEY_ZNONE] = csScan_32_scan_tex_key_znone;
-      ScanProc [SCANPROC_TEX_KEY_ZFIL] = csScan_32_scan_tex_key_zfil;
-      ScanProc [SCANPROC_TEX_KEY_ZUSE] = csScan_32_scan_tex_key_zuse;
-      ScanProc [SCANPROC_TEX_KEY_ZTEST] = csScan_32_scan_tex_key_ztest;
-      ScanProc [SCANPROC_MAP_KEY_ZNONE] = csScan_32_scan_map_key_znone;
-      ScanProc [SCANPROC_MAP_KEY_ZFIL] = csScan_32_scan_map_key_zfil;
-      ScanProc [SCANPROC_MAP_KEY_ZUSE] = csScan_32_scan_map_key_zuse;
-      ScanProc [SCANPROC_MAP_KEY_ZTEST] = csScan_32_scan_map_key_ztest;
-
-      ScanProc [SCANPROC_TEX_ALPHA_ZNONE] = csScan_32_scan_tex_alpha_znone;
-      ScanProc [SCANPROC_TEX_ALPHA_ZFIL] = csScan_32_scan_tex_alpha_zfil;
-      ScanProc [SCANPROC_TEX_ALPHA_ZUSE] = csScan_32_scan_tex_alpha_zuse;
-      ScanProc [SCANPROC_TEX_ALPHA_ZTEST] = csScan_32_scan_tex_alpha_ztest;
-
-      ScanProc [SCANPROC_MAP_ALPHA_ZNONE] = csScan_32_scan_map_alpha_znone;
-      ScanProc [SCANPROC_MAP_ALPHA_ZFIL] = csScan_32_scan_map_alpha_zfil;
-      ScanProc [SCANPROC_MAP_ALPHA_ZUSE] = csScan_32_scan_map_alpha_zuse;
-      ScanProc [SCANPROC_MAP_ALPHA_ZTEST] = csScan_32_scan_map_alpha_ztest;
-
-      ScanProc [SCANPROC_TEX_FX_ZNONE] = csScan_32_scan_tex_fx_znone;
-      ScanProc [SCANPROC_TEX_FX_ZFIL] = csScan_32_scan_tex_fx_zfil;
-      ScanProc [SCANPROC_TEX_FX_ZUSE] = csScan_32_scan_tex_fx_zuse;
-      ScanProc [SCANPROC_TEX_FX_ZTEST] = csScan_32_scan_tex_fx_ztest;
-      ScanProc [SCANPROC_MAP_FX_ZNONE] = csScan_32_scan_map_fx_znone;
-      ScanProc [SCANPROC_MAP_FX_ZFIL] = csScan_32_scan_map_fx_zfil;
-      ScanProc [SCANPROC_MAP_FX_ZUSE] = csScan_32_scan_map_fx_zuse;
-      ScanProc [SCANPROC_MAP_FX_ZTEST] = csScan_32_scan_map_fx_ztest;
-
-      ScanProc [SCANPROC_FOG] = csScan_32_scan_fog;
-      ScanProc [SCANPROC_FOG_VIEW] = csScan_32_scan_fog_view;
-
-      ScanProcPI [SCANPROC_PI_FLAT_ZNONE] = csScan_32_scan_pi_flat_znone;
-      ScanProcPI [SCANPROC_PI_FLAT_ZFIL] = csScan_32_scan_pi_flat_zfil;
-      ScanProcPI [SCANPROC_PI_FLAT_ZUSE] = csScan_32_scan_pi_flat_zuse;
-      ScanProcPI [SCANPROC_PI_FLAT_ZTEST] = csScan_32_scan_pi_flat_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_ZNONE] = csScan_32_scan_pi_tex_znone;
-      ScanProcPI [SCANPROC_PI_TEX_ZFIL] = csScan_32_scan_pi_tex_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_ZUSE] = csScan_32_scan_pi_tex_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_ZTEST] = csScan_32_scan_pi_tex_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_KEY_ZNONE] = csScan_32_scan_pi_tex_key_znone;
-      ScanProcPI [SCANPROC_PI_TEX_KEY_ZFIL] = csScan_32_scan_pi_tex_key_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_KEY_ZUSE] = csScan_32_scan_pi_tex_key_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_KEY_ZTEST] = csScan_32_scan_pi_tex_key_ztest;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_ZNONE] = csScan_32_scan_pi_tile_tex_znone;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_ZFIL] = csScan_32_scan_pi_tile_tex_zfil;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_ZUSE] = csScan_32_scan_pi_tile_tex_zuse;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_ZTEST] = csScan_32_scan_pi_tile_tex_ztest;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZNONE] = csScan_32_scan_pi_tile_tex_key_znone;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZFIL] = csScan_32_scan_pi_tile_tex_key_zfil;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZUSE] = csScan_32_scan_pi_tile_tex_key_zuse;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_KEY_ZTEST] = csScan_32_scan_pi_tile_tex_key_ztest;
-      ScanProcPI [SCANPROC_PI_FLAT_FX_ZNONE] = csScan_32_scan_pi_flat_fx_znone;
-      ScanProcPI [SCANPROC_PI_FLAT_FX_ZFIL] = csScan_32_scan_pi_flat_fx_zfil;
-      ScanProcPI [SCANPROC_PI_FLAT_FX_ZUSE] = csScan_32_scan_pi_flat_fx_zuse;
-      ScanProcPI [SCANPROC_PI_FLAT_FX_ZTEST] = csScan_32_scan_pi_flat_fx_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_FX_ZNONE] = csScan_32_scan_pi_tex_fx_znone;
-      ScanProcPI [SCANPROC_PI_TEX_FX_ZFIL] = csScan_32_scan_pi_tex_fx_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_FX_ZUSE] = csScan_32_scan_pi_tex_fx_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_FX_ZTEST] = csScan_32_scan_pi_tex_fx_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZNONE] = csScan_32_scan_pi_tex_fxkey_znone;
-      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZFIL] = csScan_32_scan_pi_tex_fxkey_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZUSE] = csScan_32_scan_pi_tex_fxkey_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_FXKEY_ZTEST] = csScan_32_scan_pi_tex_fxkey_ztest;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZNONE] = csScan_32_scan_pi_tile_tex_fx_znone;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZFIL] = csScan_32_scan_pi_tile_tex_fx_zfil;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZUSE] = csScan_32_scan_pi_tile_tex_fx_zuse;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FX_ZTEST] = csScan_32_scan_pi_tile_tex_fx_ztest;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZNONE] = csScan_32_scan_pi_tile_tex_fxkey_znone;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZFIL] = csScan_32_scan_pi_tile_tex_fxkey_zfil;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZUSE] = csScan_32_scan_pi_tile_tex_fxkey_zuse;
-      ScanProcPI [SCANPROC_PI_TILE_TEX_FXKEY_ZTEST] = csScan_32_scan_pi_tile_tex_fxkey_ztest;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZNONE] = csScan_32_scan_pi_tex_alpha_znone;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZFIL] = csScan_32_scan_pi_tex_alpha_zfil;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZUSE] = csScan_32_scan_pi_tex_alpha_zuse;
-      ScanProcPI [SCANPROC_PI_TEX_ALPHA_ZTEST] = csScan_32_scan_pi_tex_alpha_ztest;
-
-      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZNONE] = csScan_32_scan_pi_flat_gou_znone;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZFIL] = csScan_32_scan_pi_flat_gou_zfil;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZUSE] = csScan_32_scan_pi_flat_gou_zuse;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOU_ZTEST] = csScan_32_scan_pi_flat_gou_ztest;
-      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZNONE] = csScan_32_scan_pi_tex_gou_znone;
-      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZFIL] = csScan_32_scan_pi_tex_gou_zfil;
-      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZUSE] = csScan_32_scan_pi_tex_gou_zuse;
-      ScanProcPIG [SCANPROC_PI_TEX_GOU_ZTEST] = csScan_32_scan_pi_tex_gou_ztest;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZNONE] = csScan_32_scan_pi_tex_goukey_znone;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZFIL] = csScan_32_scan_pi_tex_goukey_zfil;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZUSE] = csScan_32_scan_pi_tex_goukey_zuse;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUKEY_ZTEST] = csScan_32_scan_pi_tex_goukey_ztest;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZNONE] = csScan_32_scan_pi_tile_tex_gou_znone;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZFIL] = csScan_32_scan_pi_tile_tex_gou_zfil;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZUSE] = csScan_32_scan_pi_tile_tex_gou_zuse;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOU_ZTEST] = csScan_32_scan_pi_tile_tex_gou_ztest;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZNONE] = csScan_32_scan_pi_tile_tex_goukey_znone;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZFIL] = csScan_32_scan_pi_tile_tex_goukey_zfil;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZUSE] = csScan_32_scan_pi_tile_tex_goukey_zuse;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUKEY_ZTEST] = csScan_32_scan_pi_tile_tex_goukey_ztest;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZNONE] = csScan_32_scan_pi_flat_goufx_znone;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZFIL] = csScan_32_scan_pi_flat_goufx_zfil;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZUSE] = csScan_32_scan_pi_flat_goufx_zuse;
-      ScanProcPIG [SCANPROC_PI_FLAT_GOUFX_ZTEST] = csScan_32_scan_pi_flat_goufx_ztest;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZNONE] = csScan_32_scan_pi_tex_goufx_znone;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZFIL] = csScan_32_scan_pi_tex_goufx_zfil;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZUSE] = csScan_32_scan_pi_tex_goufx_zuse;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFX_ZTEST] = csScan_32_scan_pi_tex_goufx_ztest;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZNONE] = csScan_32_scan_pi_tex_goufxkey_znone;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZFIL] = csScan_32_scan_pi_tex_goufxkey_zfil;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZUSE] = csScan_32_scan_pi_tex_goufxkey_zuse;
-      ScanProcPIG [SCANPROC_PI_TEX_GOUFXKEY_ZTEST] = csScan_32_scan_pi_tex_goufxkey_ztest;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZNONE] = csScan_32_scan_pi_tile_tex_goufx_znone;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZFIL] = csScan_32_scan_pi_tile_tex_goufx_zfil;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZUSE] = csScan_32_scan_pi_tile_tex_goufx_zuse;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFX_ZTEST] = csScan_32_scan_pi_tile_tex_goufx_ztest;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZNONE] = csScan_32_scan_pi_tile_tex_goufxkey_znone;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZFIL] = csScan_32_scan_pi_tile_tex_goufxkey_zfil;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZUSE] = csScan_32_scan_pi_tile_tex_goufxkey_zuse;
-      ScanProcPIG [SCANPROC_PI_TILE_TEX_GOUFXKEY_ZTEST] = csScan_32_scan_pi_tile_tex_goufxkey_ztest;
-#endif
-      break;
-  } /* endswitch */
-
   if (pfmt.PixelBytes == 4)
   {
     if ((pfmt.BlueMask == 0x0000ff)
@@ -927,23 +425,6 @@ void csSoftwareGraphics3DCommon::ScanSetup ()
     else
       scanlineRenderer = new ScanlineRenderer<Pix_Generic<uint16, 0> > (pfmt);
   }
-
-  /*static int o_rbits = -1, o_gbits, o_bbits;
-  if ((o_rbits != pfmt.RedBits)
-   || (o_gbits != pfmt.GreenBits)
-   || (o_bbits != pfmt.BlueBits))
-    /// make blending tables
-    if(!is_for_procedural_textures) /// if this is not procedural manager
-    {
-      csScan_CalcBlendTables (Scan.BlendingTable, 
-	o_rbits = pfmt.RedBits,
-        o_gbits = pfmt.GreenBits, o_bbits = pfmt.BlueBits);
-    }
-    else
-    {
-      csScan_CalcBlendTables (Scan.BlendingTableProc, o_rbits = pfmt.RedBits,
-        o_gbits = pfmt.GreenBits, o_bbits = pfmt.BlueBits);
-    }*/
 }
 
 #if 0
@@ -3805,6 +3286,7 @@ class TriangleDrawer
   const csCoreRenderMesh* mesh;
   const csRenderMeshModes& modes;
   ScanlineRenderInfo& scanRenderInfo;
+  size_t floatsPerVert;
 
   static const int outFloatsPerBuf = 16;
   float clipOut[maxBuffers * outFloatsPerBuf];
@@ -3906,30 +3388,34 @@ class TriangleDrawer
     ClipMeatiClipper meat;
     meat.Init (g3d.clipper, maxClipVertices);
     CS_ALLOC_STACK_ARRAY(float, out, 
-      floatsPerBufPerVert * maxBuffers * maxClipVertices);
+      floatsPerVert * maxClipVertices);
     CS_ALLOC_STACK_ARRAY(csVector3, clippedPersp, maxClipVertices);
     VertexBuffer clipOutBuf[maxBuffers];
+    const size_t* compNum = scanRenderInfo.bufferComps;
+    float* outPos = out;
     for (size_t i = 0; i < maxBuffers; i++)
     {
       if (!(scanRenderInfo.desiredBuffers & (1 << i))) continue;
 
+      const size_t c = *compNum;
       if (buffersMask & (1 << i))
       {
-	clipOutBuf[i].data = (uint8*)&out[i * floatsPerBufPerVert * maxClipVertices];
-	const size_t c = this->clipOutBuf[i].comp;
+	clipOutBuf[i].data = (uint8*)outPos;
 	clipOutBuf[i].comp = c;
-	clipInStride[i] = c * sizeof(float);
+	clipInStride[i] = this->clipOutBuf[i].comp * sizeof(float);
       }
       else
       {
-	size_t n = maxClipVertices * floatsPerBufPerVert;
-	float* vtx = &out[i * floatsPerBufPerVert * maxClipVertices + n - 1];
+	size_t n = maxClipVertices * c;
+	float* vtx = outPos + n - 1;
 	while (n-- > 0)
 	{
-	  const float iz = outPersp[n / 4].z;
-	  *vtx-- = ((i == VATTR_SPEC(COLOR)) || ((i & 3) == 3)) ? iz : 0.0f;
+	  const float iz = outPersp[n / c].z;
+	  *vtx-- = ((i == VATTR_SPEC(COLOR)) || ((i % c) == 3)) ? iz : 0.0f;
 	}
       }
+      outPos += c * maxClipVertices;
+      compNum++;
     }
 
     BuffersClipper<ClipMeatiClipper> clip (meat);
@@ -3953,7 +3439,8 @@ class TriangleDrawer
     if (rescount == 0) return;
 
     g3d.polyrast.DrawPolygon (rescount, clippedPersp, clipOutBuf, 
-      buffersMask & scanRenderInfo.desiredBuffers, scanRenderInfo);
+      buffersMask & scanRenderInfo.desiredBuffers, scanRenderInfo,
+      floatsPerVert);
   }
 
 public:
@@ -3967,9 +3454,17 @@ public:
   {
     const size_t bufNum = csMin (activeBufferCount, maxBuffers);
 
+    floatsPerVert = 0;
+
     buffersMask = 0;
+    const size_t* compNum = scanRenderInfo.bufferComps;
     for (size_t b = 0; b < bufNum; b++)
     {
+      if (scanRenderInfo.desiredBuffers & (1 << b))
+      {
+	floatsPerVert += *compNum;
+	compNum++;
+      }
       if (activebuffers[b] == 0) continue;
       buffersMask |= 1 << b;
       if ((b != VATTR_BUFINDEX(POSITION)) 
@@ -4063,11 +3558,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     usedModes.z_buf_mode = zBufMode;
 
   ScanlineRenderInfo meowmix;
-  meowmix.renderer = scanlineRenderer;
-  meowmix.proc = scanlineRenderer->Init (activeSoftTex, usedModes,
-    meowmix.desiredBuffers, meowmix.denormFactors, meowmix.denormBuffers);
-  if (!meowmix.proc) // Drat, meowmix can't deliver.
-    return;
+  if (!scanlineRenderer->Init (activeSoftTex, usedModes,  meowmix))
+    return; // Drat, meowmix can't deliver.
 
   if (!persp)
   {

@@ -725,7 +725,8 @@ csEngine::csEngine (iBase *iParent) :
   scfImplementationType (this, iParent),
   textures (new csTextureList), materials (new csMaterialList),
   sharedVariables (new csSharedVariableList),
-  sectorItPool (0), renderLoopManager (0), topLevelClipper (0), resize (false),
+  sectorItPool (0), sequenceManagerLoadAttempted(false), 
+  renderLoopManager (0), topLevelClipper (0), resize (false),
   worldSaveable (false), maxAspectRatio (0), nextframePending (0),
   currentFrameNumber (0), clearZBuf (false), defaultClearZBuf (false),
   clearScreen (false), defaultClearScreen (false), 
@@ -1577,7 +1578,7 @@ void csEngine::StartEngine ()
 
 iEngineSequenceManager* csEngine::GetEngineSequenceManager (bool create)
 {
-  if (!sequenceManager && create)
+  if (!sequenceManager && create && !sequenceManagerLoadAttempted)
   {
     csRef<iEngineSequenceManager> es = CS_QUERY_REGISTRY (
     	objectRegistry, iEngineSequenceManager);
@@ -1587,24 +1588,15 @@ iEngineSequenceManager* csEngine::GetEngineSequenceManager (bool create)
   	  CS_QUERY_REGISTRY (objectRegistry, iPluginManager);
       es = CS_LOAD_PLUGIN (plugin_mgr,
     	  "crystalspace.utilities.sequence.engine", iEngineSequenceManager);
+      sequenceManagerLoadAttempted = true;
       if (!es)
       {
-	static bool engSeqLoadWarn = false;
-	if (!engSeqLoadWarn)
-	{
-	  Warn ("Could not load the engine sequence manager!");
-	  engSeqLoadWarn = true;
-	}
+	Warn ("Could not load the engine sequence manager!");
         return 0;
       }
       if (!objectRegistry->Register (es, "iEngineSequenceManager"))
       {
-	static bool engSeqRegWarn = false;
-	if (!engSeqRegWarn)
-	{
-	  Warn ("Could not register the engine sequence manager!");
-	  engSeqRegWarn = true;
-	}
+	Warn ("Could not register the engine sequence manager!");
         return 0;
       }
     }

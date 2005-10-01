@@ -875,6 +875,7 @@ private:
    * Pointer to the engine sequence manager.
    */
   csWeakRef<iEngineSequenceManager> sequenceManager;
+  bool sequenceManagerLoadAttempted;
 
   /// Store virtual clock to speed up time queries.
   csRef<iVirtualClock> virtualClock;

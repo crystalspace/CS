@@ -434,30 +434,6 @@ protected:
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
 
-  /// scan_xxx routines
-  csDrawScanline* ScanProc [0x28];
-  /// scan_pi_xxx routines
-  csDrawPIScanline* ScanProcPI [0x2c];
-  /// scan_pi_xxx routines
-  csDrawPIScanlineGouraud* ScanProcPIG [0x28];
-
-  /// The routine for getting the address of needed scanline_xxx_alpha
-  csDrawScanline* (*ScanProc_Alpha) (csSoftwareGraphics3DCommon*, int alpha,
-  	bool keycolor, bool alphamap);
-
-  /// ScanProc_Alpha for 8 bpp modes
-  static csDrawScanline* ScanProc_8_Alpha (csSoftwareGraphics3DCommon*,
-    int alpha, bool keycolor, bool alphamap);
-  /// ScanProc_Alpha for 16 bpp modes
-  static csDrawScanline* ScanProc_16_Alpha (csSoftwareGraphics3DCommon*,
-    int alpha, bool keycolor, bool alphamap);
-  /// ScanProc_Alpha for 32 bpp modes
-  static csDrawScanline* ScanProc_32_Alpha (csSoftwareGraphics3DCommon*,
-    int alpha, bool keycolor, bool alphamap);
-
-  /// Look for a given fog buffer
-  //FogBuffer* find_fog_buffer (CS_ID id);
-
   /**
    * Same as DrawPolygon but no texture mapping.
    * (Flat drawing).

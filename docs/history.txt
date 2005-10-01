@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Oct-2005
+	- res changed the engine to only try to load the engseq plugin once.
+	- res improved the csFixed* docs somewhat.
+	- res optimized SR interpolation to do less interpolations.
 30-Sep-2005
 	- caedes added <rotatelight> sequence to loader, and added support for
 	  lights in sequence manager rotate operations. This works exactly as

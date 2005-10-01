@@ -109,7 +109,7 @@ namespace cspluginSoft3d
 
     void DrawPolygon (size_t vertNum, const csVector3* vertices,
       const VertexBuffer* inBuffers, BuffersMask buffersMask,
-      ScanlineRenderInfo& sri)
+      ScanlineRenderInfo& sri, size_t floatsPerVert)
     {
       CS_ASSERT_MSG ("Degenerate polygon", vertNum >= 3);
       //-----
@@ -140,13 +140,25 @@ namespace cspluginSoft3d
 	if (z > max_z) max_z = z;
 	else if (z < min_z) min_z = z;
       }
-    
-      size_t bufNum = 0;
-      VertexBuffer linearBufs[maxBuffers];
-      for (i = 0; i < maxBuffers; i++)
+
+      CS_ALLOC_STACK_ARRAY(float, linearBuffers, floatsPerVert * vertNum);
       {
-	if (!(buffersMask & (1 << i))) continue;
-	linearBufs[bufNum++] = inBuffers[i];
+	const size_t* compNum = sri.bufferComps;
+	size_t bufOfs = 0;
+	for (i = 0; i < maxBuffers; i++)
+	{
+	  if (!(buffersMask & (1 << i))) continue;
+	  float* dest = &linearBuffers[bufOfs];
+	  uint8* src = inBuffers[i].data;
+	  for (size_t v = 0; v < vertNum; v++)
+	  {
+	    memcpy (dest, src, *compNum * sizeof (float));
+	    src += inBuffers[i].comp * sizeof (float);
+	    dest += floatsPerVert;
+	  }
+	  bufOfs += *compNum;
+	  compNum++;
+	}
       }
 
       int ipolStep = 16;
@@ -191,10 +203,6 @@ namespace cspluginSoft3d
       int sy = L.fy = R.fy = csQround (vertices[top].y);
     // End of MSVC specific code
     
-      // Decide whenever we should use Gouraud or flat (faster) routines
-      /*bool do_gouraud = (pqinfo.drawline_gouraud != 0)
-	&& (!(pqinfo.mixmode & CS_FX_FLAT));*/
-    
       //-----
       // Main scanline loop.
       //-----
@@ -221,7 +229,8 @@ namespace cspluginSoft3d
 	    if (sy <= R.fy)
 	      continue;
     
-	    R.edge.Setup (vertices, linearBufs, bufNum, R.sv, R.fv, sy);
+	    R.edge.Setup (vertices, linearBuffers, floatsPerVert, 
+	      R.sv, R.fv, sy);
 	  } /* endif */
 	  if (sy <= L.fy)
 	  {
@@ -236,7 +245,8 @@ namespace cspluginSoft3d
 	    if (sy <= L.fy)
 	      continue;
     
-	    L.edge.Setup (vertices, linearBufs, bufNum, L.sv, L.fv, sy);
+	    L.edge.Setup (vertices, linearBuffers, floatsPerVert, 
+	      L.sv, L.fv, sy);
 	  } /* endif */
 	} while (!leave); /* enddo */
 
@@ -263,98 +273,17 @@ namespace cspluginSoft3d
 	    if (xr > xl)
 	    {
 	      int l = xr - xl;
-	      //float inv_l = 1. / l;
-
-	      //InterpolateScanlinePersp scanline;
-	      //scanline.Setup (L.edge, R.edge, buffersMask, inv_l);
-    
-	      //float dzz = (R.edge.Iz - L.edge.Iz) * inv_l;
-	      //int uu = 0, duu = 0, vv = 0, dvv = 0;
-	      //if (pqinfo.textured)
-	      {
-		/*const csVector4 tcL (L.edge.c[VATTR_BUFINDEX(TEXCOORD)]);
-		const csVector4 tcR (R.edge.c[VATTR_BUFINDEX(TEXCOORD)]);
-		int span_u = csQfixed16 (tcR.x - tcL.x);
-		int span_v = csQfixed16 (tcR.y - tcL.y);
-		uu = csQfixed16 (tcL.x); duu = csQint (span_u * inv_l);
-		vv = csQfixed16 (tcL.y); dvv = csQint (span_v * inv_l);*/
-    
-		/*
-		if (!pqinfo.tiling)
-		{
-		  // Check for texture overflows
-		  if (uu < 0) uu = 0; if (uu > pqinfo.twfp) uu = pqinfo.twfp;
-		  if (vv < 0) vv = 0; if (vv > pqinfo.thfp) vv = pqinfo.thfp;
-    
-		  int tmpu = uu + span_u;
-		  if (tmpu < 0 || tmpu > pqinfo.twfp)
-		  {
-		    if (tmpu < 0) tmpu = 0; if (tmpu > pqinfo.twfp)
-		      tmpu = pqinfo.twfp;
-		    duu = csQint ((tmpu - uu) * inv_l);
-		  }
-		  int tmpv = vv + span_v;
-		  if (tmpv < 0 || tmpv > pqinfo.thfp)
-		  {
-		    if (tmpv < 0) tmpv = 0; if (tmpv > pqinfo.thfp)
-		      tmpv = pqinfo.thfp;
-		    dvv = csQint ((tmpv - vv) * inv_l);
-		  }
-		}
-		*/
-	      }
-    
-	      // R,G,B brightness can underflow due to subpixel correction
-	      // Underflow will cause visual artifacts while small overflows
-	      // will be neutralized by our "clamp to 1.0" circuit.
-	      /*
-	      int rr = 0, drr = 0, gg = 0, dgg = 0, bb = 0, dbb = 0;
-	      bool clamp = false;
-	      if (!(pqinfo.mixmode & CS_FX_FLAT))
-	      {
-		int span_r = R.r - L.r;
-		int span_g = R.g - L.g;
-		int span_b = R.b - L.b;
-		rr = L.r, drr = csQint (span_r * inv_l);
-		gg = L.g, dgg = csQint (span_g * inv_l);
-		bb = L.b, dbb = csQint (span_b * inv_l);
-    
-		if (rr < 0) rr = 0;
-		if (gg < 0) gg = 0;
-		if (bb < 0) bb = 0;
-    
-		int tmp = rr + span_r;
-		if (tmp < 0) drr = - csQint (rr * inv_l);
-		clamp |= (rr > pqinfo.max_r) || (tmp > pqinfo.max_r);
-		tmp = gg + span_g;
-		if (tmp < 0) dgg = - csQint (gg * inv_l);
-		clamp |= (gg > pqinfo.max_g) || (tmp > pqinfo.max_g);
-		tmp = bb + span_b;
-		if (tmp < 0) dbb = - csQint (bb * inv_l);
-		clamp |= (bb > pqinfo.max_b) || (tmp > pqinfo.max_b);
-	      }
-	      */
     
 	      uint32 *zbuff = z_buffer + width * screenY + xl;
 	      unsigned char *dest = line_table [screenY] + (xl << pixel_shift);
-    
-	      /*
-	      if (do_gouraud)
-		pqinfo.drawline_gouraud (dest, l, zbuff, uu, duu, vv, dvv,
-		  L.z, dzz, pqinfo.bm, pqinfo.shf_w, rr, gg, bb, drr, dgg,
-		  dbb, clamp);
-	      else
-	      */
-		//pqinfo.drawline (dest, l, zbuff, uu, duu, vv, dvv,
-		  //L.edge.z, dzz, pqinfo.bm, pqinfo.shf_w);
 
 	      sri.proc (sri.renderer, L.edge, R.edge, ipolStep, ipolShift, 
 		dest, l, zbuff);
 	    }
 	  }
     
-	  L.edge.Advance (bufNum);
-	  R.edge.Advance (bufNum);
+	  L.edge.Advance (floatsPerVert);
+	  R.edge.Advance (floatsPerVert);
     
 	  sy--;
 	  screenY++;

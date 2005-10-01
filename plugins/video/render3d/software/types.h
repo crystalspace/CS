@@ -43,14 +43,17 @@ namespace cspluginSoft3d
     float x, dxdy;
     // The inverse Z coordinates and its per-scanline delta
     float Iz, dIzdy;
-    // Inverse buffer values and per-scanline delta
-    csVector4 Ic[maxBuffers];
-    csVector4 dIcdy[maxBuffers];
-    // Un-inverted buffer values
-    csVector4 c[maxBuffers];
+    struct PerFloat
+    {
+      // Inverse buffer values and per-scanline delta
+      float Ic;
+      float dIcdy;
+      // Un-inverted buffer values
+      float c;
+    } Floats[maxBuffers*4];
 
-    void Setup (const csVector3* vertices, const VertexBuffer* buffers, 
-      const size_t bufNum, size_t sv, size_t fv, int sy)
+    void Setup (const csVector3* vertices, const float* floats, 
+      const size_t floatNum, size_t sv, size_t fv, int sy)
     {
       const csVector3 vsv (vertices[sv]);
       const csVector3 vfv (vertices[fv]);
@@ -80,48 +83,56 @@ namespace cspluginSoft3d
 	Iz = Lerp (Isz, Ifz, Factor);
 	const float z = 1.0f/Iz;
 
-	for (size_t b = 0; b < bufNum; b++)
-	{
 	  // Z coord already inverted here
-	  const csVector4 Icsv (((csVector4*)buffers[b].data)[sv]);
-	  const csVector4 Icfv (((csVector4*)buffers[b].data)[fv]);
-
-	  Ic[b] = Lerp (Icsv, Icfv, Factor);
-	  c[b] = Ic[b] * z;
-	  dIcdy[b] = (Icfv - Icsv) * inv_dy;
+	const float* Icsv = floats + sv*floatNum;
+	const float* Icfv = floats + fv*floatNum;
+	for (size_t f = 0; f < floatNum; f++)
+	{
+	  const float fs = *Icsv++; 
+	  const float ff = *Icfv++; 
+	  Floats[f].Ic = Lerp (fs, ff, Factor);
+	  Floats[f].c = Floats[f].Ic * z;
+	  Floats[f].dIcdy = (ff - fs) * inv_dy;
 	}
       } /* endif */
     }
-    void Advance (const size_t bufNum)
+    void Advance (const size_t floatNum)
     {
       Iz += dIzdy;
       const float z = 1.0f/Iz;
 
-      for (size_t b = 0; b < bufNum; b++)
+      for (size_t f = 0; f < floatNum; f++)
       {
-	Ic[b] += dIcdy[b];
-	c[b] = Ic[b] * z;
+	Floats[f].Ic += Floats[f].dIcdy;
+	Floats[f].c = Floats[f].Ic * z;
       }
       x += dxdy;
     }
   };
-  struct InterpolateScanlinePersp
+  struct InterpolateScanlinePerspCommon
+  {
+    csFixed24 Iz, dIzdx;
+    float Iz_f, dIzdx_f;
+  };
+
+  template<int maxFloats>
+  struct InterpolateScanlinePersp : public InterpolateScanlinePerspCommon
   {
     int InterpolStep;
     int InterpolShift;
-    csFixed24 Iz, dIzdx;
-    float Iz_f, dIzdx_f;
     int ipx;
-    struct BufData
+    
+    struct PerFloat
     {
-      csVector4 Ic;
-      csVector4 dIcdx;
-      CS_ALIGNED_MEMBER(csVector4T<csFixed16> c, 16);
-      CS_ALIGNED_MEMBER(csVector4T<csFixed16> dcdx, 16);
-    } bufData[maxBuffers];
+      csFixed16 c;
+      csFixed16 dcdx;
+      float Ic;
+      float dIcdx;
+    };
+    PerFloat floats[maxFloats];
 
     void Setup (const InterpolateEdgePersp& L, const InterpolateEdgePersp& R,
-      const size_t bufNum, float inv_l, int ipolStep, int ipolShift)
+      const size_t floatNum, float inv_l, int ipolStep, int ipolShift)
     {
       InterpolStep = ipolStep;
       InterpolShift = ipolShift;
@@ -132,34 +143,26 @@ namespace cspluginSoft3d
       Iz = Iz_f = L.Iz;
       dIzdx = dIzdx_f = (R.Iz - L.Iz) * inv_l;
       dIzdx_f *= ipf;
-      for (size_t b = 0; b < bufNum; b++)
+      for (size_t f = 0; f < floatNum; f++)
       {
-	const csVector4 cL = L.c[b];
-	const csVector4 IcL = L.Ic[b];
-	const csVector4 IcR = R.Ic[b];
-	bufData[b].c = cL;
+	const float cL = L.Floats[f].c;
+	const float IcL = L.Floats[f].Ic;
+	const float IcR = R.Floats[f].Ic;
+	floats[f].c = cL;
 	float z2 = 1.0f/(Iz_f + dIzdx_f);
-	bufData[b].dIcdx.Set (
-	  (IcR.x - IcL.x) * fact,
-	  (IcR.y - IcL.y) * fact,
-	  (IcR.z - IcL.z) * fact,
-	  (IcR.w - IcL.w) * fact);
-	bufData[b].Ic = IcL + bufData[b].dIcdx;
-	bufData[b].dcdx.Set (
-	  (bufData[b].Ic.x*z2 - bufData[b].c.x) >> InterpolShift,
-	  (bufData[b].Ic.y*z2 - bufData[b].c.y) >> InterpolShift,
-	  (bufData[b].Ic.z*z2 - bufData[b].c.z) >> InterpolShift,
-	  (bufData[b].Ic.w*z2 - bufData[b].c.w) >> InterpolShift);
+	floats[f].dIcdx = (IcR - IcL) * fact;
+	floats[f].Ic = IcL + floats[f].dIcdx;
+	floats[f].dcdx = (floats[f].Ic*z2 - floats[f].c) >> InterpolShift;
       }
     }
-    void Advance (const size_t bufNum)
+    void Advance (const size_t floatNum)
     {
       if (--ipx > 0)
       {
 	Iz += dIzdx;
-	for (size_t b = 0; b < bufNum; b++)
+	for (size_t f = 0; f < floatNum; f++)
 	{
-	  bufData[b].c += bufData[b].dcdx;
+	  floats[f].c += floats[f].dcdx;
 	}
       }
       else
@@ -169,15 +172,11 @@ namespace cspluginSoft3d
 	Iz = Iz_f;
 	const float z2 = 1.0f / Iz_f;
 	ipx = InterpolStep;
-	for (size_t b = 0; b < bufNum; b++)
+	for (size_t f = 0; f < floatNum; f++)
 	{
-	  bufData[b].c = bufData[b].Ic * z;
-	  bufData[b].Ic += bufData[b].dIcdx;
-	  bufData[b].dcdx.Set (
-	    (bufData[b].Ic.x*z2 - bufData[b].c.x) >> InterpolShift,
-	    (bufData[b].Ic.y*z2 - bufData[b].c.y) >> InterpolShift,
-	    (bufData[b].Ic.z*z2 - bufData[b].c.z) >> InterpolShift,
-	    (bufData[b].Ic.w*z2 - bufData[b].c.w) >> InterpolShift);
+	  floats[f].c = floats[f].Ic * z;
+	  floats[f].Ic += floats[f].dIcdx;
+	  floats[f].dcdx = (floats[f].Ic*z2 - floats[f].c) >> InterpolShift;
 	}
       }
     }
