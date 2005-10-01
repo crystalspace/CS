@@ -3384,7 +3384,6 @@ class TriangleDrawer
     /* You can only have as much clipped vertices as the sum of vertices in 
      * the original poly and those in the clipping poly... I think. */
     const size_t maxClipVertices = g3d.clipper->GetVertexCount() + 3;
-    const size_t floatsPerBufPerVert = 4;
     ClipMeatiClipper meat;
     meat.Init (g3d.clipper, maxClipVertices);
     CS_ALLOC_STACK_ARRAY(float, out, 
@@ -3467,7 +3466,7 @@ public:
       }
       if (activebuffers[b] == 0) continue;
       buffersMask |= 1 << b;
-      if ((b != VATTR_BUFINDEX(POSITION)) 
+      if ((b != CS_VATTR_BUFINDEX(POSITION)) 
 	&& !(scanRenderInfo.desiredBuffers & (1 << b))) continue;
 
       iRenderBuffer* buf = activebuffers[b];
@@ -3484,7 +3483,7 @@ public:
     bclipperZNear.Init (persp->GetArray(), outPersp,
       clipInBuf, clipInStride, clipOutBuf, 
       (buffersMask & scanRenderInfo.desiredBuffers) 
-	| (1 << VATTR_BUFINDEX(POSITION)));
+	| (CS_BUFFERFLAG(POSITION)));
   }
 
   ~TriangleDrawer()

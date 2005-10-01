@@ -10,6 +10,11 @@ chronological order.
 	- res changed the engine to only try to load the engseq plugin once.
 	- res improved the csFixed* docs somewhat.
 	- res optimized SR interpolation to do less interpolations.
+	- res changed the VC projects to create .pdb files with the target and
+	  not project name (e.g. now simple1.pdb instead of appsimple1.pdb),
+	  since some tools seem to like that more.
+	- res did some more voodoo in the SR which seems to bump up FPS a
+	  notch.
 30-Sep-2005
 	- caedes added <rotatelight> sequence to loader, and added support for
 	  lights in sequence manager rotate operations. This works exactly as

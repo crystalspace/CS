@@ -118,21 +118,25 @@ namespace cspluginSoft3d
   template<int maxFloats>
   struct InterpolateScanlinePersp : public InterpolateScanlinePerspCommon
   {
-    int InterpolStep;
-    int InterpolShift;
-    int ipx;
-    
-    struct PerFloat
+    struct PerFloat1
     {
       csFixed16 c;
       csFixed16 dcdx;
+    };
+    struct PerFloat2
+    {
       float Ic;
       float dIcdx;
     };
-    PerFloat floats[maxFloats];
+    PerFloat1 floats[maxFloats];
+    PerFloat2 floats_f[maxFloats];
+
+    int InterpolStep;
+    int InterpolShift;
+    int ipx;
 
     void Setup (const InterpolateEdgePersp& L, const InterpolateEdgePersp& R,
-      const size_t floatNum, float inv_l, int ipolStep, int ipolShift)
+      float inv_l, int ipolStep, int ipolShift)
     {
       InterpolStep = ipolStep;
       InterpolShift = ipolShift;
@@ -143,24 +147,24 @@ namespace cspluginSoft3d
       Iz = Iz_f = L.Iz;
       dIzdx = dIzdx_f = (R.Iz - L.Iz) * inv_l;
       dIzdx_f *= ipf;
-      for (size_t f = 0; f < floatNum; f++)
+      for (size_t f = 0; f < maxFloats; f++)
       {
 	const float cL = L.Floats[f].c;
 	const float IcL = L.Floats[f].Ic;
 	const float IcR = R.Floats[f].Ic;
 	floats[f].c = cL;
 	float z2 = 1.0f/(Iz_f + dIzdx_f);
-	floats[f].dIcdx = (IcR - IcL) * fact;
-	floats[f].Ic = IcL + floats[f].dIcdx;
-	floats[f].dcdx = (floats[f].Ic*z2 - floats[f].c) >> InterpolShift;
+	floats_f[f].dIcdx = (IcR - IcL) * fact;
+	floats_f[f].Ic = IcL + floats_f[f].dIcdx;
+	floats[f].dcdx = (floats_f[f].Ic*z2 - floats[f].c) >> InterpolShift;
       }
     }
-    void Advance (const size_t floatNum)
+    void Advance ()
     {
       if (--ipx > 0)
       {
 	Iz += dIzdx;
-	for (size_t f = 0; f < floatNum; f++)
+	for (size_t f = 0; f < maxFloats; f++)
 	{
 	  floats[f].c += floats[f].dcdx;
 	}
@@ -172,11 +176,11 @@ namespace cspluginSoft3d
 	Iz = Iz_f;
 	const float z2 = 1.0f / Iz_f;
 	ipx = InterpolStep;
-	for (size_t f = 0; f < floatNum; f++)
+	for (size_t f = 0; f < maxFloats; f++)
 	{
-	  floats[f].c = floats[f].Ic * z;
-	  floats[f].Ic += floats[f].dIcdx;
-	  floats[f].dcdx = (floats[f].Ic*z2 - floats[f].c) >> InterpolShift;
+	  floats[f].c = floats_f[f].Ic * z;
+	  floats_f[f].Ic += floats_f[f].dIcdx;
+	  floats[f].dcdx = (floats_f[f].Ic*z2 - floats[f].c) >> InterpolShift;
 	}
       }
     }
@@ -184,8 +188,9 @@ namespace cspluginSoft3d
     
 } // namespace cspluginSoft3d
 
-#define VATTR_BUFINDEX(x)                                               \
+#define CS_VATTR_BUFINDEX(x)                                            \
   (CS_VATTRIB_ ## x - (CS_VATTRIB_ ## x >=  CS_VATTRIB_GENERIC_FIRST ?  \
   CS_VATTRIB_GENERIC_FIRST : CS_VATTRIB_SPECIFIC_FIRST))
+#define CS_BUFFERFLAG(x)			(1 << CS_VATTR_BUFINDEX(x))
 
 #endif // __CS_SOFT3D_TYPES_H__

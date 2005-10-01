@@ -74,8 +74,8 @@ namespace cspluginSoft3d
 	void* dest, uint len, uint32 *zbuff)
       {
 	const size_t myIpolFloatNum = 2;
-	InterpolateScanlinePersp<2> ipol;
-	ipol.Setup (L, R, myIpolFloatNum, 1.0f / len, ipolStep, ipolShift);
+	InterpolateScanlinePersp<myIpolFloatNum> ipol;
+	ipol.Setup (L, R, 1.0f / len, ipolStep, ipolShift);
 	ScanlineRenderer<Pix>* This = (ScanlineRenderer<Pix>*)_This;
 	Pix& pix = This->pix;
 	const uint32* bitmap = This->bitmap;
@@ -105,7 +105,7 @@ namespace cspluginSoft3d
 	    }
 	  }
 	  _dest++;
-	  ipol.Advance (myIpolFloatNum);
+	  ipol.Advance();
 	  Z.Advance();
 	} /* endwhile */
       }
@@ -119,7 +119,7 @@ namespace cspluginSoft3d
       ScanlineRenderInfo& renderInfo)
     {
       renderInfo.renderer = this;
-      renderInfo.desiredBuffers = 1 << VATTR_BUFINDEX(TEXCOORD);
+      renderInfo.desiredBuffers = CS_BUFFERFLAG(TEXCOORD);
       csSoftwareTexture* tex = textures[0];
       if (tex == 0) return false;      // @@@ Use flat color instead
       bitmap = tex->bitmap;
@@ -130,7 +130,7 @@ namespace cspluginSoft3d
 
       dnTC.Set (tex->get_width(), tex->get_height(), 0.0f, 0.0f);
       renderInfo.denormFactors = &dnTC;
-      renderInfo.denormBuffers = 1 << VATTR_BUFINDEX(TEXCOORD);
+      renderInfo.denormBuffers = CS_BUFFERFLAG(TEXCOORD);
       static const size_t myBufferComps[] = {2};
       renderInfo.bufferComps = myBufferComps;
 
