@@ -27,6 +27,7 @@
 #include "csgeom/chainhull2d.h"
 #include "csgeom/csrect.h"
 #include "csgeom/csrectrg.h"
+#include "csgeom/fixed.h"
 #include "csgeom/frustum.h"
 #include "csgeom/kdtree.h"
 #include "csgeom/math.h"
