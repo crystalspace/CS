@@ -1803,7 +1803,6 @@ class csRect(_object):
     def Normalize(*args): return _cspace.csRect_Normalize(*args)
     def Area(*args): return _cspace.csRect_Area(*args)
     def AddAdjacent(*args): return _cspace.csRect_AddAdjacent(*args)
-    def AddAdjanced(*args): return _cspace.csRect_AddAdjanced(*args)
     def __eq__(*args): return _cspace.csRect___eq__(*args)
     def __ne__(*args): return _cspace.csRect___ne__(*args)
     def Extend(*args): return _cspace.csRect_Extend(*args)
@@ -5325,7 +5324,6 @@ class iPortal(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iPortal instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def QueryObject(*args): return _cspace.iPortal_QueryObject(*args)
     def SetName(*args): return _cspace.iPortal_SetName(*args)
     def GetName(*args): return _cspace.iPortal_GetName(*args)
     def GetSector(*args): return _cspace.iPortal_GetSector(*args)
@@ -10097,8 +10095,6 @@ class iTextureHandle(iBase):
     BGRA8888 = _cspace.iTextureHandle_BGRA8888
     def Blit(*args): return _cspace.iTextureHandle_Blit(*args)
     def GetImageName(*args): return _cspace.iTextureHandle_GetImageName(*args)
-    def GetCacheData(*args): return _cspace.iTextureHandle_GetCacheData(*args)
-    def SetCacheData(*args): return _cspace.iTextureHandle_SetCacheData(*args)
     def GetPrivateObject(*args): return _cspace.iTextureHandle_GetPrivateObject(*args)
     def GetAlphaMap(*args): return _cspace.iTextureHandle_GetAlphaMap(*args)
     def GetAlphaType(*args): return _cspace.iTextureHandle_GetAlphaType(*args)
