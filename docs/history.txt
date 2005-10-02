@@ -15,6 +15,8 @@ chronological order.
 	  obsoleted by ancient 25-Apr-2002 changes to AWS.
 	- res fixed the VC projects to really create PDBs named like 
 	  "simple1.pdb" instead of "simple1.exe.pdb".
+	- Jorrit changed the default for auto-disable in the ODE dynamics
+	  plugin to true.
 1-Oct-2005
 	- res changed the engine to only try to load the engseq plugin once.
 	- res improved the csFixed* docs somewhat.

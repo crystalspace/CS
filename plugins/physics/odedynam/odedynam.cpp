@@ -548,7 +548,7 @@ csODEDynamicSystem::csODEDynamicSystem (float erp, float cfm)
   quickstep = false;
   qsiter = 10;
   fastobjects = false;
-  autodisable = false;
+  autodisable = true;
 }
 
 csODEDynamicSystem::~csODEDynamicSystem ()

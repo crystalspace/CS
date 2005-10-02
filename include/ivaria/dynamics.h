@@ -112,7 +112,7 @@ struct iDynamicSystem : public iBase
   /**
    * Turn on/off AutoDisable functionality.
    * AutoDisable will stop moving objects if they are stable in order
-   * to save processing time.
+   * to save processing time. By default this is enabled.
    */
   virtual void EnableAutoDisable (bool enable) = 0;
   virtual bool AutoDisableEnabled () =0;
