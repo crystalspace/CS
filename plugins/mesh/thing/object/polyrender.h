@@ -254,6 +254,7 @@ private:
       csRenderBufferName buffer);
   };
   friend class BufferAccessor;
+  friend class csThing;
 public:
   CS_LEAKGUARD_DECLARE (csPolygonRenderer);
 
