@@ -17,6 +17,10 @@ chronological order.
 	  "simple1.pdb" instead of "simple1.exe.pdb".
 	- Jorrit changed the default for auto-disable in the ODE dynamics
 	  plugin to true.
+	- Eric Sunshine upgraded devapi.dox to bring it in line with recent
+	  changes to pubapi.dox.
+	- Eric Sunshine added 'dot' check to jamtemplate/configure.template
+	  since 'dot' is now used by doxygen.jam, if present.
 1-Oct-2005
 	- res changed the engine to only try to load the engseq plugin once.
 	- res improved the csFixed* docs somewhat.
