@@ -8,6 +8,9 @@ chronological order.
 
 2-Oct-2005
 	- Eric Sunshine fixed protection-related compilation errors in csThing.
+	- Eric Sunshine fixed bug in awsImageView::Setup() where its invocation
+	  of iAwsPrefManager::GetSring("Image") would fail every time,
+	  unconditionally. Reported by manolopm@cip.es.
 1-Oct-2005
 	- res changed the engine to only try to load the engseq plugin once.
 	- res improved the csFixed* docs somewhat.
