@@ -640,6 +640,7 @@ rule MsvcProject
     "key|value"
     "projtype|$(type)"
     "project|$(msvcname)"
+    "rawtarget|$(rawname)"
     "target|$(decorated)"
     "sourceroot|$(relpath:J=/)"
     "buildroot|$(relpath:J=/)"
