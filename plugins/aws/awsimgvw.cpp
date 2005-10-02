@@ -60,13 +60,12 @@ bool awsImageView::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->GetInt (settings, "Style", frame_style);
   pm->GetInt (settings, "Alpha", alpha_level); // Local overrides, if present.
 
-  unsigned char r=0,g=0,b=0;
   scfString file;
-  pm->GetString (settings, "Image", &file);
-  pm->GetRGB (settings, "KeyColor", r, g, b);
-  img1 = pm->GetTexture (file.GetData (), file.GetData ());
+  if (pm->GetString (settings, "Image", &file))
+    img1 = pm->GetTexture (file.GetData (), file.GetData ());
   img2 = pm->GetTexture ("Texture");
 
+  unsigned char r=0,g=0,b=0;
   if (pm->GetRGB (settings, "Color", r, g, b))
   {
     draw_color = true;
