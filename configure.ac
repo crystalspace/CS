@@ -1700,7 +1700,7 @@ AS_IF([test $cs_cv_libwx = yes],
 	    #endif
 	    #include "wx/glcanvas.h"
 	    ]],
-	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY); glVertex3f(0,0,0])],
+	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY); glVertex3f(0,0,0)])],
 	[CS_CREATE_TUPLE(
 	    [$cs_cv_libwx_cflags],
 	    [$cs_cv_libwx_lflags],
@@ -1712,7 +1712,7 @@ AS_IF([test $cs_cv_libwx = yes],
 	CS_CREATE_TUPLE(
 	    [$cs_cv_libwx_cflags $cs_cv_libglu_cflags],
 	    [$cs_cv_libwx_lflags $cs_cv_libglu_lflags],
-	    [$cs_cv_libwx_libs   $cs_cv_libwx_gllibs $cs_cv_libglu_libs]])],
+	    [$cs_cv_libwx_libs   $cs_cv_libwx_gllibs $cs_cv_libglu_libs])],
 	[C++])],
     [cs_cv_libwx_opengl=no])
     

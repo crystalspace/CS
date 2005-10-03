@@ -43336,7 +43336,9 @@ fi
 # On Windows, wx-config's --gl-libs options incorrectly emits a reference to a
 # non-existent library (wxmsw_glxxx.lib). To handle this broken case, we first
 # try the result of --libs and --gl-libs together; if that fails, then we try
-# only --libs augmented with the results of our own OpenGL checks.
+# only --libs augmented with the results of our own OpenGL checks. On more
+# recent WX versions it seems that on Win32 both the libraries from --gl-libs
+# and the OpenGL checks are needed - the last case.
 #------------------------------------------------------------------------------
 
 # Check whether --with-wx or --without-wx was given.
@@ -44129,7 +44131,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
     for cs_build_item in `echo @$cs_cv_libwx_cflags@$cs_cv_libwx_lflags@$cs_cv_libwx_libs   $cs_cv_libwx_gllibs | sed 'y% %#%'` \
-	`echo @$cs_cv_libwx_cflags $cs_cv_libglu_cflags@$cs_cv_libwx_lflags $cs_cv_libglu_lflags@$cs_cv_libwx_libs   $cs_cv_libglu_libs | sed 'y% %#%'`
+	`echo @$cs_cv_libwx_cflags $cs_cv_libglu_cflags@$cs_cv_libwx_lflags $cs_cv_libglu_lflags@$cs_cv_libwx_libs   $cs_cv_libglu_libs | sed 'y% %#%'`  \
+	`echo @$cs_cv_libwx_cflags $cs_cv_libglu_cflags@$cs_cv_libwx_lflags $cs_cv_libglu_lflags@$cs_cv_libwx_libs   $cs_cv_libwx_gllibs $cs_cv_libglu_libs | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -44206,7 +44209,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY)
+wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY); glVertex3f(0,0,0)
   ;
   return 0;
 }
@@ -44289,7 +44292,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
     for cs_build_item in `echo @$cs_cv_libwx_cflags@$cs_cv_libwx_lflags@$cs_cv_libwx_libs   $cs_cv_libwx_gllibs | sed 'y% %#%'` \
-	`echo @$cs_cv_libwx_cflags $cs_cv_libglu_cflags@$cs_cv_libwx_lflags $cs_cv_libglu_lflags@$cs_cv_libwx_libs   $cs_cv_libglu_libs | sed 'y% %#%'`
+	`echo @$cs_cv_libwx_cflags $cs_cv_libglu_cflags@$cs_cv_libwx_lflags $cs_cv_libglu_lflags@$cs_cv_libwx_libs   $cs_cv_libglu_libs | sed 'y% %#%'`  \
+	`echo @$cs_cv_libwx_cflags $cs_cv_libglu_cflags@$cs_cv_libwx_lflags $cs_cv_libglu_lflags@$cs_cv_libwx_libs   $cs_cv_libwx_gllibs $cs_cv_libglu_libs | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -44366,7 +44370,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY)
+wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY); glVertex3f(0,0,0)
   ;
   return 0;
 }
