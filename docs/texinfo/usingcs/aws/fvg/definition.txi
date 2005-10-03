@@ -20,6 +20,30 @@ notes about particular differences between @sc{svg} and @sc{fvg}.
 files. Just as the normal definition files can use automation constructs, so
 too can @sc{fvg}.
 
+
+All @sc{fvg} drawing code must be inside a "g" tag.
+
+@code{
+<g id="triangle_rect">
+  <path d="M 100 100 L 300 100 L 200 300 z"
+        fill="#ff0000" stroke="#00ff00" />
+  <rect x="100" y="150" width="200" height="50" stroke="#0000ff" />
+</g>
+}
+
+@subsubheading Differences from SVG
+
+* Does not support clipping and masking.
+* Does not support CSS stylesheets.
+* Does not support color names "red", "green", etc.
+* Does not support filled paths with holes in them.
+* Does not support url values.
+* Does not support different device units (all measurements are in pixels.)
+
+* Supports interfacing into the AWS automation language.
+* Supports relative values and measurements.
+* Supports shape inlining.
+
 @subsubheading Basic Shapes
 
 @sc{fvg} includes all the same basic shapes as does @sc{svg} 1.1.
