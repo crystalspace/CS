@@ -549,6 +549,7 @@ csODEDynamicSystem::csODEDynamicSystem (float erp, float cfm)
   qsiter = 10;
   fastobjects = false;
   autodisable = true;
+  dWorldSetAutoDisableFlag (worldID, autodisable);
 }
 
 csODEDynamicSystem::~csODEDynamicSystem ()
