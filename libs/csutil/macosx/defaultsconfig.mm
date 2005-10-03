@@ -61,15 +61,10 @@ csDefaultsConfig::~csDefaultsConfig()
 {
   if (dict != nil)
     [dict release];
-
-  // Release the name of our domain
   if (domain != nil)
     [domain release];
-
-  // Delete our defaults object.
   if (defaults != nil)
     [defaults release];
-
   SCF_DESTRUCT_IBASE();
 }
 
@@ -78,7 +73,7 @@ bool csDefaultsConfig::Open (const char* Key)
   domain = [[NSString alloc] initWithCString:Key];
   dict = [[defaults persistentDomainForName:domain] mutableCopy];
   if (dict == nil)
-      dict = [[NSMutableDictionary alloc] init];
+    dict = [[NSMutableDictionary alloc] init];
   return true;
 }
 
@@ -131,28 +126,28 @@ csPtr<iConfigIterator> csDefaultsConfig::Enumerate (const char* Subsection)
   return new csDefaultsIterator (this, Subsection);
 }
 
+bool csDefaultsConfig::KeyExists (NSString* Key) const
+{
+  return ([dict objectForKey:Key] != nil);
+}
+
 bool csDefaultsConfig::KeyExists (const char* Key) const
 {
-  NSString* keystring = [NSString stringWithCString:Key];
-  NSObject* obj = [dict objectForKey:keystring];
-  return obj != nil;
+  return KeyExists([NSString stringWithCString:Key]);
 }
 
 // Check if we have permission to write to a key.  For MacOS/X 10.1 and earlier
 // we always have permission.  For 10.2 and later, we have permission if the
 // key does not already exist or if the administrator has not forced a key upon
 // us.
-bool csDefaultsConfig::Writable (const char* Key) const
+bool csDefaultsConfig::Writable (NSString* Key) const
 {
   bool writable;
   if (![defaults respondsToSelector:@selector(objectIsForcedForKey:inDomain:)])
     writable = true;
   else
-  {
-    NSString* keystr = [NSString stringWithCString:Key];
-    writable = !KeyExists(Key) ||
-      ![defaults objectIsForcedForKey:keystr inDomain:domain];
-  }
+    writable =
+      !KeyExists(Key) || ![defaults objectIsForcedForKey:Key inDomain:domain];
   return writable;
 }
 
@@ -168,36 +163,38 @@ bool csDefaultsConfig::SubsectionExists (const char* subsection) const
 int csDefaultsConfig::GetInt (const char* Key, int Def) const
 {
   NSString* keystring = [NSString stringWithCString:Key];
-  id obj = [dict objectForKey:keystring];
-  if (obj != nil && [obj isMemberOfClass:[NSNumber class]])
-    return [obj intValue];
+  if (KeyExists(keystring))
+    return [[[dict objectForKey:keystring] description] intValue];
   return Def;
 }
 
 float csDefaultsConfig::GetFloat (const char* Key, float Def) const
 {
   NSString* keystring = [NSString stringWithCString:Key];
-  id obj = [dict objectForKey:keystring];
-  if (obj != nil && [obj isMemberOfClass:[NSNumber class]])
-    return [obj floatValue];
+  if (KeyExists(keystring))
+    return [[[dict objectForKey:keystring] description] floatValue];
   return Def;
 }
 
 const char* csDefaultsConfig::GetStr (const char* Key, const char* Def) const
 {
   NSString* keystring = [NSString stringWithCString:Key];
-  id obj = [dict objectForKey:keystring];
-  if (obj != nil)
-    return [[obj description] lossyCString];
+  if (KeyExists(keystring))
+    return [[[dict objectForKey:keystring] description] lossyCString];
   return Def;
 }
 
 bool csDefaultsConfig::GetBool (const char* Key, bool Def) const
 {
   NSString* keystring = [NSString stringWithCString:Key];
-  id obj = [dict objectForKey:keystring];
-  if (obj != nil && [obj isMemberOfClass:[NSNumber class]])
-    return (bool)[obj boolValue];
+  if (KeyExists(keystring))
+  {
+    char const* s = [[[dict objectForKey:keystring] description] lossyCString];
+    char const c = tolower(s[0]);
+bool ok = c == 'y' || c == 't' || c == '1';
+NSLog(@"GetBool(%@,%d) -> %d", keystring, (int)Def, (int)ok);
+    return c == 'y' || c == 't' || c == '1';
+  }
   return Def;
 }
 
@@ -210,7 +207,7 @@ void csDefaultsConfig::SetStr (const char* Key, const char* Val)
 {
   NSString* keystr = [NSString stringWithCString:Key];
   NSString* valstr = [NSString stringWithCString:Val];
-  if (Writable(Key))
+  if (Writable(keystr))
     [dict setObject:valstr forKey:keystr];
 }
 
@@ -218,7 +215,7 @@ void csDefaultsConfig::SetInt (const char* Key, int Value)
 {
   NSString* keystr = [NSString stringWithCString:Key];
   NSNumber* val = [NSNumber numberWithInt:Value];
-  if (Writable(Key))
+  if (Writable(keystr))
     [dict setObject:val forKey:keystr];
 }
 
@@ -226,16 +223,16 @@ void csDefaultsConfig::SetFloat (const char* Key, float Value)
 {
   NSString* keystr = [NSString stringWithCString:Key];
   NSNumber* val = [NSNumber numberWithFloat:Value];
-  if (Writable(Key))
+  if (Writable(keystr))
     [dict setObject:val forKey:keystr];
 }
 
 void csDefaultsConfig::SetBool (const char* Key, bool Value)
 {
   NSString* keystr = [NSString stringWithCString:Key];
-  NSNumber* val = [NSNumber numberWithBool:Value];
-  if (Writable(Key))
-    [dict setObject:val forKey:keystr];
+  NSString* valstr = (Value ? @"yes" : @"no");
+  if (Writable(keystr))
+    [dict setObject:valstr forKey:keystr];
 }
 
 bool csDefaultsConfig::SetComment (const char* Key, const char* Text)

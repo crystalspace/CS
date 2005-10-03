@@ -38,7 +38,8 @@ private:
   NSUserDefaults* defaults;
   NSMutableDictionary* dict;
 
-  bool Writable(const char* Key) const;
+  bool KeyExists (NSString* Key) const;
+  bool Writable(NSString* Key) const;
 
 public:
   SCF_DECLARE_IBASE;

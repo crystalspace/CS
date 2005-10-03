@@ -21,6 +21,12 @@ chronological order.
 	  changes to pubapi.dox.
 	- Eric Sunshine added 'dot' check to jamtemplate/configure.template
 	  since 'dot' is now used by doxygen.jam, if present.
+	- Eric Sunshine fixed csDefaultsConfig for MacOS/X to be more robust
+	  when dealing with inputs the user may have entered via the
+	  command-line 'defaults' utility.  In particular, boolean, integers,
+	  and floats should now be interpreted correctly. Also, parsing of
+	  booleans is now more broad: it accepts any first-letter 'y', 't', '1'
+	  (case-insensitive) as meaning true.
 1-Oct-2005
 	- res changed the engine to only try to load the engseq plugin once.
 	- res improved the csFixed* docs somewhat.
