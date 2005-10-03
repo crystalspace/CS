@@ -8,6 +8,9 @@ chronological order.
 
 3-Oct-2005
 	- Jorrit fixed odedynam so the default true is REALLY set.
+	- res slightly tweaked the wxWidgets check to also support a case
+	  where both WX' own GL libs and the standard OpenGL libs are needed
+	  on certain platforms.
 2-Oct-2005
 	- Eric Sunshine fixed protection-related compilation errors in csThing.
 	- Eric Sunshine fixed bug in awsImageView::Setup() where its invocation

@@ -1666,7 +1666,9 @@ AS_IF([test $cs_cv_libmetaobject_misc = yes],
 # On Windows, wx-config's --gl-libs options incorrectly emits a reference to a
 # non-existent library (wxmsw_glxxx.lib). To handle this broken case, we first
 # try the result of --libs and --gl-libs together; if that fails, then we try
-# only --libs augmented with the results of our own OpenGL checks.
+# only --libs augmented with the results of our own OpenGL checks. On more 
+# recent WX versions it seems that on Win32 both the libraries from --gl-libs 
+# and the OpenGL checks are needed - the last case.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([wx],
     [AC_LANG_PROGRAM(
@@ -1698,7 +1700,7 @@ AS_IF([test $cs_cv_libwx = yes],
 	    #endif
 	    #include "wx/glcanvas.h"
 	    ]],
-	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY)])],
+	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY); glVertex3f(0,0,0])],
 	[CS_CREATE_TUPLE(
 	    [$cs_cv_libwx_cflags],
 	    [$cs_cv_libwx_lflags],
@@ -1706,7 +1708,11 @@ AS_IF([test $cs_cv_libwx = yes],
 	CS_CREATE_TUPLE(
 	    [$cs_cv_libwx_cflags $cs_cv_libglu_cflags],
 	    [$cs_cv_libwx_lflags $cs_cv_libglu_lflags],
-	    [$cs_cv_libwx_libs   $cs_cv_libglu_libs])],
+	    [$cs_cv_libwx_libs   $cs_cv_libglu_libs])  \
+	CS_CREATE_TUPLE(
+	    [$cs_cv_libwx_cflags $cs_cv_libglu_cflags],
+	    [$cs_cv_libwx_lflags $cs_cv_libglu_lflags],
+	    [$cs_cv_libwx_libs   $cs_cv_libwx_gllibs $cs_cv_libglu_libs]])],
 	[C++])],
     [cs_cv_libwx_opengl=no])
     
