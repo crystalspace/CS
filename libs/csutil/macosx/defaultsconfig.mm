@@ -191,8 +191,6 @@ bool csDefaultsConfig::GetBool (const char* Key, bool Def) const
   {
     char const* s = [[[dict objectForKey:keystring] description] lossyCString];
     char const c = tolower(s[0]);
-bool ok = c == 'y' || c == 't' || c == '1';
-NSLog(@"GetBool(%@,%d) -> %d", keystring, (int)Def, (int)ok);
     return c == 'y' || c == 't' || c == '1';
   }
   return Def;
