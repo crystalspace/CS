@@ -33,16 +33,20 @@ All @sc{fvg} drawing code must be inside a "g" tag.
 
 @subsubheading Differences from SVG
 
-* Does not support clipping and masking.
-* Does not support CSS stylesheets.
-* Does not support color names "red", "green", etc.
-* Does not support filled paths with holes in them.
-* Does not support url values.
-* Does not support different device units (all measurements are in pixels.)
+@itemize @bullet
+@item Does not support clipping and masking.
+@item Does not support CSS stylesheets.
+@item Does not support color names "red", "green", etc.
+@item Does not support filled paths with holes in them.
+@item Does not support url values.
+@item Does not support different device units (all measurements are in pixels.)
+@end itemize
 
-* Supports interfacing into the AWS automation language.
-* Supports relative values and measurements.
-* Supports shape inlining.
+@itemize @bullet
+@item Supports interfacing into the AWS automation language.
+@item Supports relative values and measurements.
+@item Supports shape inlining.
+@end itemize
 
 @subsubheading Basic Shapes
 
