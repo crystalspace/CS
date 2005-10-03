@@ -11,6 +11,8 @@ chronological order.
 	- res slightly tweaked the wxWidgets check to also support a case
 	  where both WX' own GL libs and the standard OpenGL libs are needed
 	  on certain platforms.
+	- res fixed some SR clipping issues.
+	- res fixed a wrong computation in the Thing vertex color logic.
 2-Oct-2005
 	- Eric Sunshine fixed protection-related compilation errors in csThing.
 	- Eric Sunshine fixed bug in awsImageView::Setup() where its invocation

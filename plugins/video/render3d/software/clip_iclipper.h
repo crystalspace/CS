@@ -71,6 +71,7 @@ public:
       inPersp[tri.b],
       inPersp[tri.c],
     };
+    const int Tri[3] = {tri.a, tri.b, tri.c};
 
     csVector2 inpoly[3];
     for (int j = 0; j < 3; j++)
@@ -92,6 +93,7 @@ public:
       {
 	case CS_VERTEX_ORIGINAL:
 	  {
+	    const size_t vt = Tri[outStatus[i].Vertex];
 	    csVector3 vn (outPoly[i].x, outPoly[i].y,
 	      v[outStatus[i].Vertex].z);
 	    voutPersp.Write ((float*)&vn);
@@ -99,15 +101,16 @@ public:
 	    {
 	      if (buffersMask & (1 << n))
 	      {
-		vout[n].Copy (outStatus[i].Vertex);
+		vout[n].Copy (vt);
 	      }
 	    }
 	  }
 	  break;
 	case CS_VERTEX_ONEDGE:
 	  {
-	    const size_t vt = outStatus[i].Vertex;
-	    const size_t vt2 = (vt >= 2) ? 0 : vt + 1;
+	    const size_t outVt = outStatus[i].Vertex;
+	    const size_t vt = Tri[outVt];
+	    const size_t vt2 = Tri[(outVt >= 2) ? 0 : outVt + 1];
 	    const float t = outStatus[i].Pos;
 
 	    csVector3 vn;
@@ -167,9 +170,14 @@ public:
 	    const float dx = (x2 - x1);
 	    const float t = dx ? (x - x1) / dx : 0.0f;
 
+	    const int vt11 = Tri[edge1[0]];
+	    const int vt12 = Tri[edge1[1]];
+	    const int vt21 = Tri[edge2[0]];
+	    const int vt22 = Tri[edge2[1]];
+
 	    csVector3 vn;
-	    voutPersp.Lerp3To ((float*)&vn, edge1[0], edge1[1], t1,
-	      edge2[0], edge2[1], t2, t);
+	    voutPersp.Lerp3To ((float*)&vn, vt11, vt12, t1,
+	      vt21, vt22, t2, t);
 	    vn.x = x;
 	    vn.y = y;
 	    voutPersp.Write ((float*)&vn);
@@ -178,8 +186,8 @@ public:
 	    {
 	      if (buffersMask & (1 << n))
 	      {
-		vout[n].Lerp3 (edge1[0], edge1[1], t1,
-		  edge2[0], edge2[1], t2, t);
+		vout[n].Lerp3 (vt11, vt12, t1,
+		  vt21, vt22, t2, t);
 	      }
 	    }
 	  }

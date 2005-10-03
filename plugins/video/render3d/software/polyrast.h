@@ -117,28 +117,86 @@ namespace cspluginSoft3d
       // Also look for the top-most and bottom-most vertices.
       //-----
       size_t top, bot;
-      float top_y = -99999;
-      float bot_y = 99999;
-      top = bot = 0;                        // avoid GCC complains
       size_t i;
-      float min_x = 99999;
-      float max_x = -99999;
-      float min_z = 99999;
-      float max_z = -99999;
-      for (i = 0 ; i < vertNum ; i++)
+      float top_y, bot_y, min_x, max_x, min_z, max_z;
+      size_t compareNum;
+      if (vertNum & 1)
       {
-	const csVector3& v = vertices[i];
-	if (v.y > top_y)
-	  top_y = vertices[top = i].y;
-	if (v.y < bot_y)
-	  bot_y = vertices[bot = i].y;
+	const size_t end = vertNum-1;
+	const csVector3& v = vertices[end];
+	top_y = v.y;
+	bot_y = v.y;
+	min_x = v.x;
+	max_x = v.x;
+	min_z = v.z;
+	max_z = v.z;
+	compareNum = top = bot = end;
+      }
+      else
+      {
+	top_y = -99999;
+	bot_y = 99999;
+	min_x = 99999;
+	max_x = -99999;
+	min_z = 99999;
+	max_z = -99999;
+	compareNum = vertNum;
+      }
+      for (i = 0 ; i < compareNum ; i += 2)
+      {
+	const csVector3& v1 = vertices[i];
+	const csVector3& v2 = vertices[i+1];
 
-	if (v.x > max_x) max_x = v.x;
-	else if (v.x < min_x) min_x = v.x;
+	if (v1.y > v2.y)
+	{
+	  if (v1.y > top_y)
+	  {
+	    top_y = v1.y;
+	    top = i;
+	  }
+	  if (v2.y < bot_y)
+	  {
+	    bot_y = v2.y;
+	    bot = i+1;
+	  }
+	}
+	else
+	{
+	  if (v2.y > top_y)
+	  {
+	    top_y = v2.y;
+	    top = i+1;
+	  }
+	  if (v1.y < bot_y)
+	  {
+	    bot_y = v1.y;
+	    bot = i;
+	  }
+	}
 
-	const float z = 1.0f/v.z;
-	if (z > max_z) max_z = z;
-	else if (z < min_z) min_z = z;
+	if (v1.x > v2.x)
+	{
+	  if (v1.x > max_x) max_x = v1.x;
+	  if (v2.x < min_x) min_x = v2.x;
+	}
+	else
+	{
+	  if (v2.x > max_x) max_x = v2.x;
+	  if (v1.x < min_x) min_x = v1.x;
+	}
+
+	const float z1 = 1.0f/v1.z;
+	const float z2 = 1.0f/v2.z;
+	if (z1 > z2)
+	{
+	  if (z1 > max_z) max_z = z1;
+	  if (z2 < min_z) min_z = z2;
+	}
+	else
+	{
+	  if (z2 > max_z) max_z = z2;
+	  if (z1 < min_z) min_z = z1;
+	}
       }
 
       CS_ALLOC_STACK_ARRAY(float, linearBuffers, floatsPerVert * vertNum);

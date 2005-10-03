@@ -49,7 +49,7 @@ namespace cspluginSoft3d
     static const size_t compCount = 0;
 
     CS_FORCEINLINE
-    static void Apply (const csFixed16* /*color*/, 
+    static void Apply (const ScanlineComp* /*color*/, 
       uint8& /*r*/, uint8& /*g*/, uint8& /*b*/, uint8& /*a*/) {}
   };
 
@@ -58,14 +58,21 @@ namespace cspluginSoft3d
     static const size_t compCount = 4;
 
     CS_FORCEINLINE
-    static void Apply (const csFixed16* color, 
+    static uint8 ClampAndShift (int32 x, const int shift)
+    {
+      return (x & 0x80000000) ? 0 : 
+	(((x >> shift) & 0x100) ? 0xff : (x >> shift));
+    }
+
+    CS_FORCEINLINE
+    static void Apply (const ScanlineComp* color, 
       uint8& r, uint8& g, uint8& b, uint8& a) 
     {
       // @@@ FIXME: adjustable scale
-      r = (r * csClamp (color[0].GetFixed(), 1 << 16, 0)) >> 15; 
-      g = (g * csClamp (color[1].GetFixed(), 1 << 16, 0)) >> 15;
-      b = (b * csClamp (color[2].GetFixed(), 1 << 16, 0)) >> 15;
-      a = (a * csClamp (color[3].GetFixed(), 1 << 16, 0)) >> 15;
+      r = ClampAndShift (r * color[0].c.GetFixed(), 15);
+      g = ClampAndShift (g * color[1].c.GetFixed(), 15);
+      b = ClampAndShift (b * color[2].c.GetFixed(), 15);
+      a = ClampAndShift (a * color[3].c.GetFixed(), 15);
     }
   };
 
@@ -130,7 +137,7 @@ namespace cspluginSoft3d
 	      uint8 g = (texel >> 8) & 0xff;
 	      uint8 b = (texel >> 16) & 0xff;
 	      uint8 a = (texel >> 24);
-	      Color::Apply (&ipol.floats[offsetColor].c, r, g, b, a);
+	      Color::Apply (&ipol.floats[offsetColor], r, g, b, a);
 	      pix.WritePix (_dest, r, g, b, a);
 	      Z.Update();
 	    }

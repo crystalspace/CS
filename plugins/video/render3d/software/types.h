@@ -117,25 +117,25 @@ namespace cspluginSoft3d
     float Iz_f, dIzdx_f;
   };
 
+  struct ScanlineComp
+  {
+    /// "Direct" component
+    csFixed16 c;
+    /// "Direct" component delta
+    csFixed16 dcdx;
+  };
+  struct ScanlineCompDivZ
+  {
+    /// 1/component
+    float Ic;
+    /// 1/component delta
+    float dIcdx;
+  };
   template<int maxFloats>
   struct InterpolateScanlinePersp : public InterpolateScanlinePerspCommon
   {
-    struct PerFloat1
-    {
-      /// "Direct" component
-      csFixed16 c;
-      /// "Direct" component delta
-      csFixed16 dcdx;
-    };
-    struct PerFloat2
-    {
-      /// 1/component
-      float Ic;
-      /// 1/component delta
-      float dIcdx;
-    };
-    PerFloat1 floats[maxFloats];
-    PerFloat2 floats_f[maxFloats];
+    ScanlineComp floats[maxFloats];
+    ScanlineCompDivZ floats_f[maxFloats];
 
     int InterpolStep;
     int InterpolShift;

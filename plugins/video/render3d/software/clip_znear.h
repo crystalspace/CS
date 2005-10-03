@@ -25,6 +25,8 @@
 namespace cspluginSoft3d
 {
 
+#define Z_NEAR	    0.1f
+
 class ClipMeatZNear
 {
   int width2;
@@ -33,7 +35,7 @@ class ClipMeatZNear
 
   CS_FORCEINLINE void Project (csVector4& v, const float com_iz)
   {
-    const float clipPos = SMALL_Z*10;
+    const float clipPos = Z_NEAR;
     const float com_zv = 1.0f / clipPos;
     v.Set (v.x * com_iz + width2, v.y * com_iz + height2, com_zv, 1.0f);
   }
@@ -50,7 +52,7 @@ public:
     const size_t* inStrides, BuffersMask buffersMask, 
     VertexOutputBase* vout)
   {
-    const float clipPos = SMALL_Z*10;
+    const float clipPos = Z_NEAR;
     const float com_zv = 1.0f / clipPos;
     const float com_iz = aspect * com_zv;
     csVector4 v;
@@ -61,9 +63,9 @@ public:
     const csVector3& va = *(csVector3*)(bPos.data + tri.a * bPosStride);
     const csVector3& vb = *(csVector3*)(bPos.data + tri.b * bPosStride);
     const csVector3& vc = *(csVector3*)(bPos.data + tri.c * bPosStride);
-    int cnt_vis = int (va.z >= SMALL_Z) +
-                  int (vb.z >= SMALL_Z) +
-                  int (vc.z >= SMALL_Z);
+    int cnt_vis = int (va.z >= Z_NEAR) +
+                  int (vb.z >= Z_NEAR) +
+                  int (vc.z >= Z_NEAR);
     if (cnt_vis == 0)
     {
       //=====
@@ -102,7 +104,7 @@ public:
       // another triangle.
       //=====
 
-      if (va.z >= SMALL_Z)
+      if (va.z >= Z_NEAR)
       {
         // Calculate intersection between a-b and Z=clipPos.
         // p = a + r * (b-a) (parametric line equation between a and b).
@@ -112,11 +114,11 @@ public:
 
 	voutPersp.Write ((float*)&inPersp[tri.a]);
 
-	voutPos.LerpTo ((float*)&v, tri.b, tri.a, r1);
+	voutPos.LerpTo ((float*)&v, tri.a, tri.b, r1);
 	Project (v, com_iz);
 	voutPersp.Write ((float*)&v);
 
-	voutPos.LerpTo ((float*)&v, tri.c, tri.a, r2);
+	voutPos.LerpTo ((float*)&v, tri.a, tri.c, r2);
 	Project (v, com_iz);
 	voutPersp.Write ((float*)&v);
 
@@ -127,27 +129,27 @@ public:
           {
 	    // Point a is visible.
 	    vout[n].Copy (tri.a);
-	    vout[n].Lerp (tri.b, tri.a, r1);
-	    vout[n].Lerp (tri.c, tri.a, r2);
+	    vout[n].Lerp (tri.a, tri.b, r1);
+	    vout[n].Lerp (tri.a, tri.c, r2);
           }
           buffersMask >>= 1;
           n++;
         }
       }
-      else if (vb.z >= SMALL_Z)
+      else if (vb.z >= Z_NEAR)
       {
         // Calculate intersection between b-a and Z=clipPos.
         const float r1 = (clipPos-vb.z)/(va.z-vb.z);
         // Calculate intersection between b-c and Z=clipPos.
         const float r2 = (clipPos-vb.z)/(vc.z-vb.z);
 
-	voutPos.LerpTo ((float*)&v, tri.a, tri.b, r1);
+	voutPos.LerpTo ((float*)&v, tri.b, tri.a, r1);
 	Project (v, com_iz);
 	voutPersp.Write ((float*)&v);
 
 	voutPersp.Write ((float*)&inPersp[tri.b]);
 
-	voutPos.LerpTo ((float*)&v, tri.c, tri.b, r2);
+	voutPos.LerpTo ((float*)&v, tri.b, tri.c, r2);
 	Project (v, com_iz);
 	voutPersp.Write ((float*)&v);
 
@@ -156,10 +158,10 @@ public:
         {
           if (buffersMask & 1)
           {
-	    vout[n].Lerp (tri.a, tri.b, r1);
+	    vout[n].Lerp (tri.b, tri.a, r1);
 	    // Point b is visible
 	    vout[n].Copy (tri.b);
-	    vout[n].Lerp (tri.c, tri.b, r2);
+	    vout[n].Lerp (tri.b, tri.c, r2);
           }
           buffersMask >>= 1;
           n++;
@@ -172,11 +174,11 @@ public:
         // Calculate intersection between c-b and Z=clipPos.
         const float r2 = (clipPos-vc.z)/(vb.z-vc.z);
 
-	voutPos.LerpTo ((float*)&v, tri.a, tri.c, r1);
+	voutPos.LerpTo ((float*)&v, tri.c, tri.a, r1);
 	Project (v, com_iz);
 	voutPersp.Write ((float*)&v);
 
-	voutPos.LerpTo ((float*)&v, tri.b, tri.c, r2);
+	voutPos.LerpTo ((float*)&v, tri.c, tri.b, r2);
 	Project (v, com_iz);
 	voutPersp.Write ((float*)&v);
 
@@ -187,8 +189,8 @@ public:
         {
           if (buffersMask & 1)
           {
-	    vout[n].Lerp (tri.a, tri.c, r1);
-	    vout[n].Lerp (tri.b, tri.c, r2);
+	    vout[n].Lerp (tri.c, tri.a, r1);
+	    vout[n].Lerp (tri.c, tri.b, r2);
 	    // Point c is visible
 	    vout[n].Copy (tri.c);
           }
@@ -207,7 +209,7 @@ public:
       // We will triangulate to triangles a,b,c, and a,c,d.
       //=====
 
-      if (va.z < SMALL_Z)
+      if (va.z < Z_NEAR)
       {
 	// Calculate intersection between a-b and Z=clipPos.
 	// p = a + r * (b-a) (parametric line equation between a and b).
@@ -241,7 +243,7 @@ public:
           n++;
         }
       }
-      else if (vb.z < SMALL_Z)
+      else if (vb.z < Z_NEAR)
       {
         // Calculate intersection between b-a and Z=clipPos.
         const float r1 = (clipPos-vb.z)/(va.z-vb.z);
@@ -287,11 +289,11 @@ public:
 	voutPersp.Write ((float*)&inPersp[tri.a]);
 	voutPersp.Write ((float*)&inPersp[tri.b]);
 
-	voutPos.LerpTo ((float*)&v, tri.c, tri.a, r1);
+	voutPos.LerpTo ((float*)&v, tri.c, tri.b, r2);
 	Project (v, com_iz);
 	voutPersp.Write ((float*)&v);
 
-	voutPos.LerpTo ((float*)&v, tri.c, tri.b, r2);
+	voutPos.LerpTo ((float*)&v, tri.c, tri.a, r1);
 	Project (v, com_iz);
 	voutPersp.Write ((float*)&v);
 
@@ -304,8 +306,8 @@ public:
 	    vout[n].Copy (tri.a);
 	    vout[n].Copy (tri.b);
             
-	    vout[n].Lerp (tri.c, tri.a, r1);
 	    vout[n].Lerp (tri.c, tri.b, r2);
+	    vout[n].Lerp (tri.c, tri.a, r1);
           }
           buffersMask >>= 1;
           n++;

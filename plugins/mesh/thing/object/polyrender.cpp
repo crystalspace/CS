@@ -618,11 +618,7 @@ void csPolygonRenderer::BufferAccessor::PreGetBuffer (
 	    csMatrix3 (lm_scale_u, 0, 0,
 	      0, lm_scale_v, 0,
 	      0, 0, 1));
-	  tex2lm.SetO2TTranslation (
-	    csVector3 (
-	      (lm_scale_u != 0.0f) ? (lm_low_u / lm_scale_u) : 0,
-	      (lm_scale_v != 0.0f) ? (lm_low_v / lm_scale_v) : 0,
-	      0));
+	  tex2lm.SetO2TTranslation (csVector3 (lm_low_u, lm_low_v, 0));
 	}
 
 	// First, fill the normal/texel/vertex buffers.
@@ -635,7 +631,9 @@ void csPolygonRenderer::BufferAccessor::PreGetBuffer (
 	  csVector3 t = object2texture.Other2This (vertex);
 	  csVector3 l = tex2lm.Other2This (t);
 	  int lmX = (int)l.x;
+	  CS_ASSERT((lmX >= 0) && (lmX < lmW));
 	  int lmY = (int)l.y;
+	  CS_ASSERT((lmY >= 0) && (lmY < lmH));
 	  csRGBpixel& lmp = staticMap[lmY * lmW + lmX];
 	  colors->Set (
 	    lmp.red / 255.0f, lmp.green / 255.0f, lmp.blue / 255.0f);
