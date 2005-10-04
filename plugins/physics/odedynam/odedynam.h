@@ -139,7 +139,7 @@ public:
 
   virtual void Step (float stepsize);
 
-  static inline void NearCallback (void *data, dGeomID o1, dGeomID o2);
+  static void NearCallback (void *data, dGeomID o1, dGeomID o2);
   static int CollideMeshMesh (dGeomID mesh1, dGeomID mesh2, int flags,
         dContactGeom *contact, int skip);
   static int CollideMeshBox (dGeomID mesh, dGeomID box, int flags,

@@ -271,7 +271,6 @@ void csODEDynamics::Step (float elapsed_time)
 
 void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
 {
-  int i =0;
   if (dGeomIsSpace(o1) || dGeomIsSpace (o2))
   {
     dSpaceCollide2 (o1, o2, data, &csODEDynamics::NearCallback);
@@ -1166,7 +1165,7 @@ bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
   gd->collider = this;
   dGeomSetData (geomID, (void*)gd);
 
-  //if (spaceID) AddToSpace (spaceID);
+  if (spaceID) AddToSpace (spaceID);
 
   return true;
 }
