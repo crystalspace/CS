@@ -13,6 +13,7 @@ chronological order.
 	  on certain platforms.
 	- res fixed some SR clipping issues.
 	- res fixed a wrong computation in the Thing vertex color logic.
+	- res scraped a few bytes off csRenderBuffer by using bitfields.
 2-Oct-2005
 	- Eric Sunshine fixed protection-related compilation errors in csThing.
 	- Eric Sunshine fixed bug in awsImageView::Setup() where its invocation

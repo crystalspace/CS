@@ -89,19 +89,19 @@ public:
   /// Gets the number of components per element
   virtual int GetComponentCount () const
   {
-    return compCount;
+    return props.compCount;
   }
 
   /// Gets the component type (float, int, etc)
   virtual csRenderBufferComponentType GetComponentType () const 
   {
-    return comptype;
+    return props.comptype;
   }
 
   /// Get type of buffer (static/dynamic)
   virtual csRenderBufferType GetBufferType() const
   {
-    return bufferType;
+    return props.bufferType;
   }
 
   /// Get the size of the buffer (in bytes)
@@ -113,17 +113,17 @@ public:
   /// Get the stride of the buffer (in bytes)
   virtual size_t GetStride() const 
   {
-    return stride;
+    return props.stride;
   }
 
   virtual size_t GetElementDistance() const
   {
-    return stride ? stride :
-      compCount * csRenderBufferComponentSizes[comptype];
+    return props.stride ? props.stride :
+      props.compCount * csRenderBufferComponentSizes[props.comptype];
   }
 
   virtual size_t GetOffset() const
-  { return offset; }
+  { return props.offset; }
 
   /// Get version
   virtual uint GetVersion ()
@@ -142,7 +142,7 @@ public:
   }
 
   virtual bool IsIndexBuffer() const
-  { return isIndex; }
+  { return props.isIndex; }
 
   virtual size_t GetRangeStart() const
   { return rangeStart; }
@@ -228,19 +228,48 @@ public:
    */
   static csRenderBufferName GetBufferNameFromDescr (const char* name);
 protected:
-  /// hint about main usage
-  csRenderBufferType bufferType; 
-  /// datatype for each component
-  csRenderBufferComponentType comptype; 
+  /// Total size of the buffer
+  size_t bufferSize;
+
+  /**
+   * To scrape off a few bytes use bitfields; assumes values are in sane 
+   * limits.
+   */
+  struct Props
+  {
+    /// hint about main usage
+    csRenderBufferType bufferType : 2;
+    /// datatype for each component
+    csRenderBufferComponentType comptype : 4; 
   
-  /// datatype for each component
-  size_t bufferSize; 
-  /// number of components per element
-  uint compCount;
-  /// buffer stride
-  size_t stride;
-  /// offset from buffer start to data
-  size_t offset; 
+    /// number of components per element
+    uint compCount : 8;
+    /// buffer stride
+    size_t stride : 8;
+    /// offset from buffer start to data
+    size_t offset : 8;
+
+    /// should we copy data, or just use supplied buffer
+    bool doCopy : 1; 
+    /// if buffer should be deleted on deallocation
+    bool doDelete : 1;
+    /// currently locked? (to prevent recursive locking)
+    bool isLocked : 1;
+    /// if this is index-buffer  
+    bool isIndex : 1;
+
+    /// last type of lock used
+    csRenderBufferLockType lastLock : 2;
+
+    Props (csRenderBufferType type, csRenderBufferComponentType componentType,
+      uint componentCount, bool copy) : bufferType (type), 
+      comptype (componentType), compCount (componentCount), stride(0), 
+      offset (0), doCopy (copy), doDelete (false), isLocked (false), 
+      isIndex (false) 
+    {
+      CS_ASSERT(componentCount <= 255); // Just to be sure...
+    }
+  } props;
 
   /// range start for index-buffer
   size_t rangeStart; 
@@ -250,19 +279,8 @@ protected:
   /// modification number
   unsigned int version; 
 
-  /// should we copy data, or just use supplied buffer
-  bool doCopy; 
-  /// if buffer should be deleted on deallocation
-  bool doDelete; 
-  /// currently locked? (to prevent recursive locking)
-  bool isLocked;
-  /// if this is index-buffer  
-  bool isIndex; 
-
   /// buffer holding the data
   unsigned char *buffer; 
-  /// last type of lock used
-  csRenderBufferLockType lastLock; 
   
   csRef<iRenderBuffer> masterBuffer;
 #ifdef CS_DEBUG

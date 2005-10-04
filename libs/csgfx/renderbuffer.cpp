@@ -34,17 +34,15 @@ csRenderBuffer::csRenderBuffer (size_t size, csRenderBufferType type,
 				csRenderBufferComponentType componentType, 
 				uint componentCount, size_t rangeStart, 
 				size_t rangeEnd, bool copy) :
-  scfImplementationType(this, 0),
-  bufferType (type), comptype (componentType), compCount (componentCount), 
-  stride(0), offset (0), rangeStart (rangeStart), rangeEnd (rangeEnd), 
-  version (0), doCopy (copy), doDelete (false), isLocked (false), 
-  isIndex (false), buffer (0)
+  scfImplementationType(this, 0), props (type, componentType, componentCount,
+    copy), rangeStart (rangeStart), rangeEnd (rangeEnd), version (0), 
+    buffer (0)
 {
   bufferSize = size;
-  if (doCopy) 
+  if (props.doCopy) 
   {
     buffer = new unsigned char[size];
-    doDelete = true;
+    props.doDelete = true;
   }
 #if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
   lockStack = 0;
@@ -60,16 +58,17 @@ csRenderBuffer::~csRenderBuffer ()
     lockStack->Free();
   }
 #endif
-  if (doDelete) delete[] buffer;
+  if (props.doDelete) delete[] buffer;
   buffer = 0;
 }
 
 void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
 {
-  if (isLocked)
+  if (props.isLocked)
   {
-    if ((lockType > CS_BUF_LOCK_READ) || (lastLock > CS_BUF_LOCK_READ)
-      || (lockType != lastLock))
+    if ((lockType > CS_BUF_LOCK_READ) 
+      || (props.lastLock > CS_BUF_LOCK_READ)
+      || (lockType != props.lastLock))
     {
 #if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
       if (lockStack)
@@ -82,8 +81,8 @@ void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
     }
   }
 
-  lastLock = lockType;
-  isLocked = true;
+  props.lastLock = lockType;
+  props.isLocked = true;
 
   void *rb = 0;
 
@@ -91,7 +90,7 @@ void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
   {
     rb = masterBuffer->Lock (lockType);
     if (rb == (void*)-1) return rb;
-    rb = (uint8*)rb + offset;
+    rb = (uint8*)rb + props.offset;
   }
   else
     rb = buffer;
@@ -111,11 +110,11 @@ void csRenderBuffer::Release ()
   if (masterBuffer.IsValid ())
     masterBuffer->Release ();
 
-  if (lastLock == CS_BUF_LOCK_NORMAL)
+  if (props.lastLock == CS_BUF_LOCK_NORMAL)
   {
     version++;
   }
-  isLocked = false;
+  props.isLocked = false;
 #if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
   if (lockStack != 0)
   {
@@ -129,10 +128,11 @@ void csRenderBuffer::CopyInto (const void *data, size_t elementCount,
 			       size_t elemOffset)
 {
   if (masterBuffer.IsValid()) return;
-  const size_t elemSize = csRenderBufferComponentSizes[comptype] * compCount;
+  const size_t elemSize = 
+    csRenderBufferComponentSizes[props.comptype] * props.compCount;
   const size_t byteOffs = elemSize * elemOffset;
   version++;
-  if (doCopy)
+  if (props.doCopy)
   {
     memcpy (buffer + byteOffs, data, csMin (bufferSize - byteOffs, 
       elementCount * elemSize));
@@ -148,13 +148,16 @@ size_t csRenderBuffer::GetElementCount() const
   if (masterBuffer.IsValid ())
     return masterBuffer->GetElementCount ();
 
-  return bufferSize / (compCount * csRenderBufferComponentSizes[comptype]);
+  return bufferSize / 
+    (props.compCount * csRenderBufferComponentSizes[props.comptype]);
 }
 
 csRef<iRenderBuffer> csRenderBuffer::CreateRenderBuffer (size_t elementCount, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
   uint componentCount, bool copy)
 {
+  if (componentCount > 255) return 0;
+
   size_t size = elementCount * componentCount * 
     csRenderBufferComponentSizes[componentType];
   csRenderBuffer* buf = new csRenderBuffer (size, type, 
@@ -169,7 +172,7 @@ csRef<iRenderBuffer> csRenderBuffer::CreateIndexRenderBuffer (size_t elementCoun
   size_t size = elementCount * csRenderBufferComponentSizes[componentType];
   csRenderBuffer* buf = new csRenderBuffer (size, type, 
     componentType, 1, rangeStart, rangeEnd, copy);
-  buf->isIndex = true;
+  buf->props.isIndex = true;
   return csPtr<iRenderBuffer> (buf);
 }
 
@@ -188,6 +191,7 @@ csRef<iRenderBuffer> csRenderBuffer::CreateInterleavedRenderBuffers (size_t elem
       * csRenderBufferComponentSizes[element.componentType];
   }
   elementSize = offsets[count];
+  if (elementSize > 255) return 0;
   csRef<iRenderBuffer> master;
   master.AttachNew (new csRenderBuffer (elementCount * elementSize,
     type, CS_BUFCOMP_BYTE, (uint)elementSize, 0, 0, true));
@@ -196,8 +200,8 @@ csRef<iRenderBuffer> csRenderBuffer::CreateInterleavedRenderBuffers (size_t elem
     const csInterleavedSubBufferOptions& element = elements[i];
     csRenderBuffer* rbuf = new csRenderBuffer (0, type, 
       element.componentType, element.componentCount, 0, 0, false);
-    rbuf->offset = offsets[i];
-    rbuf->stride = elementSize;
+    rbuf->props.offset = (uint)offsets[i];
+    rbuf->props.stride = (uint)elementSize;
     rbuf->masterBuffer = master;
     (buffers + i)->AttachNew (rbuf);
   }
