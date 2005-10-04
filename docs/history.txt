@@ -13,6 +13,9 @@ chronological order.
 	- res removed a specialization for scfFakeInterface<> which VC7 could
 	  not handle; also, to have scfFakeInterface<> work, the Interface
 	  type to cast to is provided by scfInterfaceTraits<>.
+	- Piotr Obrzut change odedynam collision detection to not check 
+	  collisions between 2 static colliders by default (but allowing user
+	  to decide if he want that collision to be checked) .
 3-Oct-2005
 	- Jorrit fixed odedynam so the default true is REALLY set.
 	- res slightly tweaked the wxWidgets check to also support a case

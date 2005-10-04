@@ -744,6 +744,12 @@ struct iDynamicsSystemCollider : public iBase
    * length and radius, otherwise it will return false.
    */
   virtual bool GetCylinderGeometry (float& length, float& radius) = 0; 
+
+  virtual void MakeStatic () = 0;
+
+  virtual void MakeDynamic () = 0;
+
+  virtual bool IsStatic () = 0;
 };
 
 SCF_VERSION (iJoint, 0, 0, 1);

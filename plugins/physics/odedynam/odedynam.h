@@ -139,7 +139,7 @@ public:
 
   virtual void Step (float stepsize);
 
-  static void NearCallback (void *data, dGeomID o1, dGeomID o2);
+  static inline void NearCallback (void *data, dGeomID o1, dGeomID o2);
   static int CollideMeshMesh (dGeomID mesh1, dGeomID mesh2, int flags,
         dContactGeom *contact, int skip);
   static int CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
@@ -618,6 +618,7 @@ class csODECollider : public iDynamicsSystemCollider
   float density;
   csRef<iDynamicsColliderCollisionCallback> coll_cb;
   float surfacedata[3];
+  bool is_static;
 
 public:
 
@@ -659,6 +660,10 @@ public:
   void AttachBody (dBodyID bodyID);
   void AddTransformToSpace (dSpaceID spaceID);
   void AddToSpace (dSpaceID spaceID);
+
+  void MakeStatic ();
+  void MakeDynamic ();
+  bool IsStatic ();
 
 private:
 

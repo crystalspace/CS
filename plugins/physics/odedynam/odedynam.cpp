@@ -271,6 +271,7 @@ void csODEDynamics::Step (float elapsed_time)
 
 void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
 {
+  int i =0;
   if (dGeomIsSpace(o1) || dGeomIsSpace (o2))
   {
     dSpaceCollide2 (o1, o2, data, &csODEDynamics::NearCallback);
@@ -291,14 +292,19 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
     b2 = (csODERigidBody *)dBodyGetData (dGeomGetBody(o2));
   }
 
+
   if (!b1 && !b2)
   {
+    csODECollider* c1 = ((GeomData *)dGeomGetData (o1))->collider;
+    csODECollider* c2 = ((GeomData *)dGeomGetData (o2))->collider;
+
+    if (c1->IsStatic () && c2->IsStatic ())
+      return;
+
     dContact contact[1];
     int a = dCollide (o1, o2, 1, &(contact[0].geom), sizeof (dContact));
     if (a > 0)
     {
-      csODECollider* c1 = ((GeomData *)dGeomGetData (o1))->collider;
-      csODECollider* c2 = ((GeomData *)dGeomGetData (o2))->collider;
       c1->Collision (c2);
       c2->Collision (c1);
     }
@@ -918,6 +924,7 @@ csODECollider::csODECollider ()
   transformID = dCreateGeomTransform (0);
   dGeomTransformSetCleanup (transformID, 1);
   geom_type =  NO_GEOMETRY;
+  is_static = true;
 }
 void csODECollider::SetCollisionCallback (iDynamicsColliderCollisionCallback* cb)
 {
@@ -944,6 +951,18 @@ csODECollider::~csODECollider ()
   if (coll_cb) coll_cb->DecRef ();
   SCF_DESTRUCT_IBASE();
 }
+void csODECollider::MakeStatic ()
+{
+  is_static = true;
+}
+void csODECollider::MakeDynamic ()
+{
+  is_static = false;
+}
+bool csODECollider::IsStatic ()
+{
+  return is_static;
+}
 void csODECollider::Collision (csODECollider* other)
 {
   if (coll_cb) coll_cb->Execute (this, other);
@@ -964,7 +983,7 @@ void csODECollider::ClearContents ()
  
   transformID = dCreateGeomTransform (0);
   dGeomTransformSetCleanup (transformID, 1);
-  geom_type = (csColliderGeometryType) 0;
+  geom_type =  NO_GEOMETRY;
 }
 
 void csODECollider::MassCorrection ()
@@ -1147,7 +1166,7 @@ bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
   gd->collider = this;
   dGeomSetData (geomID, (void*)gd);
 
-  if (spaceID) AddToSpace (spaceID);
+  //if (spaceID) AddToSpace (spaceID);
 
   return true;
 }
