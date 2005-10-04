@@ -70,12 +70,10 @@ typedef int scfInterfaceVersion;
 */
 #define SCF_INTERFACE(Name,Major,Minor,Micro)             \
 struct InterfaceTraits {                                  \
+  typedef Name InterfaceType;                             \
   CS_FORCEINLINE static scfInterfaceVersion GetVersion() \
   { return SCF_CONSTRUCT_VERSION(Major, Minor, Micro); }  \
   CS_FORCEINLINE static char const * GetName() { return #Name; }  \
-private:                                                  \
-  /* Check that Name is really a type to catch typos. */  \
-  typedef Name Type;                                      \
 }
 
 
@@ -370,6 +368,9 @@ template <class Interface>
 class scfInterfaceTraits
 {
 public:
+  typedef typename_qualifier Interface::InterfaceTraits::InterfaceType 
+    InterfaceType;
+
   /**
    * Retrieve the interface's current version number.
    */
@@ -436,6 +437,7 @@ CS_SPECIALIZE_TEMPLATE                                     \
 class scfInterfaceTraits<Name>                             \
 {                                                          \
 public:                                                    \
+  typedef Name InterfaceType;				   \
   static scfInterfaceVersion GetVersion()                  \
   { return SCF_CONSTRUCT_VERSION(Major, Minor, Micro); }   \
   static char const* GetName ()                            \

@@ -96,7 +96,14 @@ template<class If>
 class scfFakeInterface
 {
 public:
-  typedef If RealIf;
+  struct InterfaceTraits 
+  {
+    typedef If InterfaceType;
+    CS_FORCEINLINE static scfInterfaceVersion GetVersion()
+    { return If::InterfaceTraits::GetVersion(); }
+    CS_FORCEINLINE static char const * GetName() 
+    { return If::InterfaceTraits::GetName(); }
+  };
 };
 
 /**

@@ -198,9 +198,12 @@ protected:
   typedef SCF_IMPL_NAME<Class SCF_IMPL_ARGS> scfImplementationType;
 
 private:
-  template<class I>
+  template<typename I>
   struct VC6Workaround
   {
+    typedef typename_qualifier scfInterfaceTraits<I>::InterfaceType 
+      InterfaceType;
+
     CS_FORCEINLINE static void* GetInterface(
     	Class* scfObject, scfInterfaceID id, scfInterfaceVersion version)
     {
@@ -208,30 +211,11 @@ private:
 	  scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))
       {
 	scfObject->IncRef();
-	return CS_STATIC_CAST(I*, scfObject);
+	return CS_STATIC_CAST(InterfaceType*, scfObject);
       }
       else
       {
 	return 0;
-      }
-    }
-  };
-
-  template<class I>
-  struct VC6Workaround<scfFakeInterface<I> >
-  {
-    CS_FORCEINLINE static void* GetInterface(
-    	Class* scfObject, scfInterfaceID id, scfInterfaceVersion version)
-    {
-      if (id == scfInterfaceTraits<I>::GetID() &&
-        scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))
-      {
-        scfObject->IncRef();
-        return CS_STATIC_CAST(I*, scfObject);
-      }
-      else
-      {
-        return 0;
       }
     }
   };
