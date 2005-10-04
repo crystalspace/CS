@@ -1193,6 +1193,15 @@ csTerrainObject::~csTerrainObject ()
 
 void csTerrainObject::SetStaticLighting (bool enable)
 {
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
+  	object_reg, iCommandLineParser);
+  if (cmdline->GetOption ("fullbright"))
+  {
+    staticlighting = false;
+    staticLights.DeleteAll ();
+    return;
+  }
+
   staticlighting = enable;
   if (staticlighting)
   {

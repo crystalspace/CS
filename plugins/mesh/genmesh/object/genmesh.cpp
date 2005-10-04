@@ -49,6 +49,7 @@
 #include "iutil/objreg.h"
 #include "iutil/strset.h"
 #include "iutil/verbositymanager.h"
+#include "iutil/cmdline.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
@@ -921,9 +922,20 @@ Rules for color calculation:
 void csGenmeshMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     iMovable* movable)
 {
+  int i;
+
+  if (factory->DoFullBright ())
+  {
+    lighting_dirty = false;
+    for (i = 0 ; i < factory->GetVertexCount () ; i++)
+    {
+      lit_mesh_colors[i].Set (1, 1, 1);
+    }
+    return;
+  }
+
   if (do_manual_colors) return;
 
-  int i;
   csColor4* factory_colors = factory->GetColors ();
 
   if (do_lighting)
@@ -1536,6 +1548,10 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   engine = eng; // We don't want a circular reference!
 
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
+  	object_reg, iCommandLineParser);
+  do_fullbright = cmdline->GetOption ("fullbright");
 }
 
 csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
@@ -2531,6 +2547,8 @@ csGenmeshMeshObjectType::csGenmeshMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+
+  do_verbose = false;
 }
 
 csGenmeshMeshObjectType::~csGenmeshMeshObjectType ()

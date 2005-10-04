@@ -2909,7 +2909,7 @@ static const csOptionDescription
 {
   { 0, "cosfact", "Cosinus factor for lighting", CSVAR_FLOAT },
   { 1, "lightqual", "Lighting quality", CSVAR_LONG },
-  { 2, "lightmapping", "Enable/disable lightmapping", CSVAR_BOOL }
+  { 2, "fullbright", "Enable/disable fullbright", CSVAR_BOOL }
 };
 const int NUM_OPTIONS =
   (
@@ -2930,10 +2930,10 @@ bool csThingObjectType::eiPluginConfig::SetOption (int id, csVariant *value)
         scfParent->Notify ("Lightmap quality=%d", csThing::lightmap_quality);
       break;
     case 2:
-      csThing::lightmap_enabled = value->GetBool ();
+      csThing::lightmap_enabled = !value->GetBool ();
       if (csThingObjectType::do_verbose)
-        scfParent->Notify ("Lightmapping enabled=%d",
-                (int)csThing::lightmap_enabled);
+        scfParent->Notify ("Fullbright enabled=%d",
+                (int)!csThing::lightmap_enabled);
       break;
     default:
       return false;
@@ -2948,7 +2948,7 @@ bool csThingObjectType::eiPluginConfig::GetOption (int id, csVariant *value)
   {
     case 0:   value->SetFloat (csPolyTexture::cfg_cosinus_factor); break;
     case 1:   value->SetLong (csThing::lightmap_quality); break;
-    case 2:   value->SetBool (csThing::lightmap_enabled); break;
+    case 2:   value->SetBool (!csThing::lightmap_enabled); break;
     default:  return false;
   }
 

@@ -543,6 +543,7 @@ private:
   csVector3* mesh_tri_normals;
 
   bool autonormals;
+  bool do_fullbright;
 
   bool mesh_vertices_dirty_flag;
   bool mesh_texels_dirty_flag;
@@ -640,6 +641,9 @@ public:
 
   /// Destructor.
   virtual ~csGenmeshMeshObjectFactory ();
+
+  /// Do full bright.
+  bool DoFullBright () const { return do_fullbright; }
 
   void SetMaterialWrapper (iMaterialWrapper* material)
   {

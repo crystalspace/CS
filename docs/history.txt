@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Oct-2005
+	- Jorrit renamed -nolightmapping to -fullbright and also implemented
+	  it in the bruteblock terrain engine and in genmesh (in addition
+	  to thing where it already worked before).
 3-Oct-2005
 	- Jorrit fixed odedynam so the default true is REALLY set.
 	- res slightly tweaked the wxWidgets check to also support a case
