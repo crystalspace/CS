@@ -1476,6 +1476,7 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   odec->SetTransform (trans);
   odec->AttachBody (bodyID);
   odec->AddTransformToSpace (groupID);
+  odec->MakeDynamic ();
   odec->IncRef ();
   colliders.Push (odec);
 
@@ -1495,6 +1496,7 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
   odec->SetTransform (trans);
   odec->AttachBody (bodyID);
   odec->AddTransformToSpace (groupID);
+  odec->MakeDynamic ();
   odec->IncRef ();
   colliders.Push (odec);
 
@@ -1513,6 +1515,7 @@ bool csODERigidBody::AttachColliderBox (const csVector3 &size,
   odec->AttachBody (bodyID);
   odec->SetTransform (trans);
   odec->AddTransformToSpace (groupID);
+  odec->MakeDynamic ();
   odec->IncRef ();
   colliders.Push (odec);
 
@@ -1530,6 +1533,7 @@ bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset
   odec->CreateSphereGeometry (csSphere (offset, radius));
   odec->AttachBody (bodyID);
   odec->AddTransformToSpace (groupID);
+  odec->MakeDynamic ();
   odec->IncRef ();
   colliders.Push (odec);
 
@@ -1548,6 +1552,7 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
   colliders.Push (odec);
   //causes non placeable geom run-time error w/debug build of ode.
   //odec->AttachBody (bodyID);   
+  odec->MakeDynamic ();
   odec->IncRef ();
   odec->AddToSpace (dynsys->GetSpaceID());
 
@@ -1562,6 +1567,7 @@ void csODERigidBody::AttachCollider (iDynamicsSystemCollider* collider)
     ((csODECollider*) collider)->AddTransformToSpace (groupID);
 
   ((csODECollider*) collider)->AttachBody (bodyID);
+  collider->MakeDynamic ();
   colliders.Push (collider);
 }
 void csODERigidBody::SetPosition (const csVector3& pos)

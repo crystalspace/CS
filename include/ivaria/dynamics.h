@@ -640,14 +640,13 @@ struct csReversibleTransform;
  * It keeps all properties that system uses for collision 
  * detection and after collision behaviour (like surface 
  * properties, collider geometry). It can be placed into 
- * dynamic system (then this will be "static" collider) or 
- * attached to body.
+ * dynamic system (then this will be "static" collider by default) 
+ * or attached to body (then it will be "dynamic"). 
  *
  * Main creators of instances implementing this interface:
  * - iDynamicSystem::CreateCollider()
  * 
  * Main ways to get pointers to this interface:
- * - iDynamicSystem::FindBody()
  * - iDynamicSystem::GetCollider()
  * - iRigidBody::GetCollider()
  * 
@@ -745,10 +744,20 @@ struct iDynamicsSystemCollider : public iBase
    */
   virtual bool GetCylinderGeometry (float& length, float& radius) = 0; 
 
+  /**
+   * Make collider static. Static collider acts on dynamic colliders and bodies,
+   * but ignores other static colliders (it won't do precise collision detection 
+   * in that case).
+   */
   virtual void MakeStatic () = 0;
 
+  /**
+   * Make collider dynamic. Dynamic colliders acts (it collision is checked, and 
+   * collision callbacks called) on every other collider and body.
+   */
   virtual void MakeDynamic () = 0;
 
+  /// Check if collider is static. 
   virtual bool IsStatic () = 0;
 };
 
