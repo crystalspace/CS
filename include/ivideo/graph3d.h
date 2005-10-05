@@ -106,66 +106,33 @@ struct csRenderBufferHolder;
 #define CS_CLIP_NEEDED 1
 /** @} */
 
-enum csFogMode
-{
-	CS_FOG_MODE_NONE = 0,
-	CS_FOG_MODE_LINEAR,
-	CS_FOG_MODE_EXP,
-	CS_FOG_MODE_EXP2
-};
-
-/**
- * Fog structure.
- */
-struct csFog
-{
-  /// If true then fog is enabled.
-  bool enabled;
-  /// Density (0 is off).
-  float density;
-  /// Color (red).
-  float red;
-  /// Color (green).
-  float green;
-  /// Color (blue).
-  float blue;
-  /// Fog start.
-  float start;
-  /// Fog end.
-  float end;
-  /// Fog mode.
-  csFogMode mode;
-};
-
 /// Z-buffer modes
 enum csZBufMode
 {
-  // values below are sometimes used as bit masks, so don't change them!
-  /// Don't test/write
+  /// Don't test or write
   CS_ZBUF_NONE     = 0x00000000,
-  /// write
+  /// Write unconditionally
   CS_ZBUF_FILL     = 0x00000001,
-  /// test
+  /// Test only
   CS_ZBUF_TEST     = 0x00000002,
-  /// write/test
+  /// Test, write if successful
   CS_ZBUF_USE      = 0x00000003,
-  /// only write
-  CS_ZBUF_FILLONLY = 0x00000004,
-  /// test if equal
-  CS_ZBUF_EQUAL    = 0x00000005,
-  /// inverted test
-  CS_ZBUF_INVERT   = 0x00000006,
-  /// use the z mode of the mesh (NOTE: NOT VALID AS MESH ZMODE)
-  CS_ZBUF_MESH     = 0x00000007,
+  /// Test if equal
+  CS_ZBUF_EQUAL    = 0x00000004,
+  /// Inverted test
+  CS_ZBUF_INVERT   = 0x00000005,
+  
+  /// Use the z mode of the render mesh (NOTE: NOT VALID AS MESH ZMODE)
+  CS_ZBUF_MESH     = 0x80000000,
   /**
-   * Use a z mode depending on the mesh zmode.
+   * Use a "pass 2" z mode depending on the render mesh zmode.
    * The mesh zmode is used a to choose a zmode that makes sure only pixels
    * that are changed by the mesh zmode can be touched, e.g. if the mesh has a
    * zmode of "zuse", zmesh2 will resolve to "ztest". This is useful for multi-
    * pass stuff.
    * (NOTE: NOT VALID AS MESH ZMODE)
    */
-  CS_ZBUF_MESH2    = 0x00000008
+  CS_ZBUF_MESH2    = 0x80000001
 };
 
 // @@@ Keep in sync with values below
@@ -517,6 +484,8 @@ struct csSimpleRenderMesh
    *  To draw in screen space, supply the \a csSimpleMeshScreenspace
    *  flag to DrawSimpleMesh(). For anything else supply an appropriate
    *  transformation.
+   * \remark Keep in mind that the renderer's world-to-camera transform is in
+   *  effect, too.
    */
   csReversibleTransform object2world;
 
@@ -812,6 +781,7 @@ struct iGraphics3D : public iBase
   /**
    * Set the world to camera transform.
    * This affects rendering in DrawMesh and DrawSimpleMesh.
+   * \remarks 'this' space is world space, 'other' space is camera space
    */
   virtual void SetWorldToCamera (const csReversibleTransform& w2c) = 0;
 };

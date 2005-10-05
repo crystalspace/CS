@@ -38,7 +38,6 @@ struct iLight;
 struct iVisibilityCuller;
 
 struct iObject;
-struct csFog;
 
 struct iRenderView;
 struct iRenderLoop;
@@ -51,6 +50,37 @@ class csColor;
 class csRenderMeshList;
 class csReversibleTransform;
 class csVector3;
+
+enum csFogMode
+{
+  CS_FOG_MODE_NONE = 0,
+  CS_FOG_MODE_LINEAR,
+  CS_FOG_MODE_EXP,
+  CS_FOG_MODE_EXP2
+};
+
+/**
+ * Sector fog structure.
+ */
+struct csFog
+{
+  /// If true then fog is enabled.
+  bool enabled;
+  /// Density (0 is off).
+  float density;
+  /// Color (red).
+  float red;
+  /// Color (green).
+  float green;
+  /// Color (blue).
+  float blue;
+  /// Fog start.
+  float start;
+  /// Fog end.
+  float end;
+  /// Fog mode.
+  csFogMode mode;
+};
 
 /**
  * Set a callback which is called when this sector is traversed.

@@ -2333,7 +2333,7 @@ void csSoftwareGraphics3DCommon::ClosePortal (bool use_zfill_portal)
 
   if (use_zfill_portal)
   {
-    SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILLONLY);
+    SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL);
     static G3DPolygonDP g3dpoly;
     g3dpoly.mixmode = CS_FX_COPY;
     int num_vertices = cp->num_poly;
@@ -3530,7 +3530,6 @@ static csZBufMode GetZModePass2 (csZBufMode mode)
     case CS_ZBUF_EQUAL:
       return mode;
     case CS_ZBUF_FILL:
-    case CS_ZBUF_FILLONLY:
     case CS_ZBUF_USE:
       return CS_ZBUF_EQUAL;
     default:
@@ -3542,14 +3541,6 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
     const csArray<csShaderVariable*> &stacks)
 {
-#if 0
-  if (mesh->meshtype == CS_MESHTYPE_POLYGON)
-  {
-    DrawPolysMesh (mesh, modes, stacks);
-    return;
-  }
-#endif
-
   csRenderMeshModes usedModes (modes);
   if (zBufMode == CS_ZBUF_MESH2)
     usedModes.z_buf_mode = GetZModePass2 (usedModes.z_buf_mode);
@@ -3585,11 +3576,14 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
   uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_READ);
 
-  csReversibleTransform object2camera = w2c / mesh->object2world;
+  const csMatrix3& w2c_m = w2c.GetO2T();
+  const csMatrix3& o2w_m = mesh->object2world.GetO2T();
+  const csVector3& w2c_t = w2c.GetO2TTranslation();
+  const csVector3& o2w_t = mesh->object2world.GetO2TTranslation();
+  csReversibleTransform object2camera (
+    o2w_m * w2c_m,
+    w2c_t + w2c_m.GetTranspose()*o2w_t);
 
-  // @@@ Currently we don't implement multi-texture
-  // in the generic implementation. This is a todo...
-  
   // Make sure we don't process too many vertices;
   size_t num_vertices = indexbuf->GetRangeEnd()+1;
 
@@ -3620,7 +3614,9 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
     size_t i;
     for (i = rangeStart; i <= rangeEnd; i++)
-      tr_verts[i] = object2camera * f1[i];
+    {
+      tr_verts[i] = object2camera.This2Other (f1[i]);
+    }
 
     translatedVerts->Release();
 

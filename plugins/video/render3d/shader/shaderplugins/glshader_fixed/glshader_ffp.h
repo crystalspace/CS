@@ -24,6 +24,7 @@
 #include "csutil/weakref.h"
 #include "csutil/leakguard.h"
 #include "csgfx/shadervar.h"
+#include "iengine/sector.h" // for csFog
 #include "imap/services.h"
 #include "csplugincommon/shader/shaderplugin.h"
 #include "csplugincommon/shader/shaderprogram.h"

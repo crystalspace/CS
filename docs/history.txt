@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Oct-2005
+	- res removed the superfluous CS_ZBUF_FILLONLY Z buffer mode.
+	- res moved csFog out to iengine/sector.h since ivideo/graph3d.h does
+	  not seem appropriate any more.
+	- res fixed wrong coordinate transformations in the SR.
 4-Oct-2005
 	- Jorrit renamed -nolightmapping to -fullbright and also implemented
 	  it in the bruteblock terrain engine and in genmesh (in addition

@@ -156,7 +156,6 @@ namespace cspluginSoft3d
 	case CS_ZBUF_NONE:
 	  return ScanlineImpl<Color, ZBufMode_ZNone>::Scan;
 	case CS_ZBUF_FILL:
-	case CS_ZBUF_FILLONLY:
 	  return ScanlineImpl<Color, ZBufMode_ZFill>::Scan;
 	case CS_ZBUF_TEST:
 	  return ScanlineImpl<Color, ZBufMode_ZTest>::Scan;

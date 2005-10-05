@@ -267,7 +267,6 @@ csZBufMode csGLGraphics3D::GetZModePass2 (csZBufMode mode)
     case CS_ZBUF_EQUAL:
       return mode;
     case CS_ZBUF_FILL:
-    case CS_ZBUF_FILLONLY:
     case CS_ZBUF_USE:
       return CS_ZBUF_EQUAL;
     default:
@@ -283,7 +282,6 @@ void csGLGraphics3D::SetZModeInternal (csZBufMode mode)
       statecache->Disable_GL_DEPTH_TEST ();
       break;
     case CS_ZBUF_FILL:
-    case CS_ZBUF_FILLONLY:
       statecache->Enable_GL_DEPTH_TEST ();
       statecache->SetDepthFunc (GL_ALWAYS);
       statecache->SetDepthMask (GL_TRUE);
@@ -1998,7 +1996,7 @@ void csGLGraphics3D::ClosePortal (bool use_zfill_portal)
     glPushMatrix ();
     glLoadIdentity ();
 
-    SetZModeInternal (CS_ZBUF_FILLONLY);
+    SetZModeInternal (CS_ZBUF_FILL);
     Draw2DPolygon (cp->poly, cp->num_poly, cp->normal);
     SetZModeInternal (current_zmode);
 
@@ -2497,7 +2495,7 @@ void csGLGraphics3D::SetupClipPortals ()
   statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
 
   // First clear the z-buffer here.
-  SetZModeInternal (CS_ZBUF_FILLONLY);
+  SetZModeInternal (CS_ZBUF_FILL);
 
   glBegin (GL_QUADS);
   glVertex3f (-1.0f, 1.0f, -1.0f);
