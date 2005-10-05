@@ -149,6 +149,7 @@ namespace CrystalSpace
       /// 1/component delta
       float dIcdx;
     };
+
     /// Interpolator over a scanline
     template<int maxFloats>
     struct InterpolateScanlinePersp : public InterpolateScanlinePerspCommon
@@ -220,8 +221,58 @@ namespace CrystalSpace
 	  }
 	}
       }
+      
+      /// Return an interpolated component
+      const ScanlineComp* GetFloat (size_t i) const { return &floats[i]; }
     };
 
+    CS_SPECIALIZE_TEMPLATE
+    struct InterpolateScanlinePersp<0> : public InterpolateScanlinePerspCommon
+    {
+      /// Interpolation step
+      int InterpolStep;
+      /// Interpolation shift
+      int InterpolShift;
+      /// Remaining pixels for this interpolation span
+      int ipx;
+  
+      /// Setup interpolation over a scanline, given left and right edge
+      void Setup (const InterpolateEdgePersp& L, const InterpolateEdgePersp& R,
+	float inv_l, int ipolStep, int ipolShift)
+      {
+	InterpolStep = ipolStep;
+	InterpolShift = ipolShift;
+  
+	const float ipf = (float)InterpolStep;
+	ipx = InterpolStep;
+	Iz = Iz_f = L.Iz;
+	dIzdx = dIzdx_f = (R.Iz - L.Iz) * inv_l;
+	dIzdx_f *= ipf;
+	Iz_f += dIzdx_f;
+      }
+      /// Advance a pixel right
+      void Advance ()
+      {
+	if (--ipx > 0)
+	{
+	  Iz += dIzdx;
+	}
+	else
+	{
+	  /* Note: Iz_f is "ahead" one interpolation span, ie when the
+	   * deltas are set up for the next, it has the value from the
+	   * beginning if that span. */
+	  Iz = Iz_f;
+	  Iz_f += dIzdx_f;
+	  ipx = InterpolStep;
+	}
+      }
+      
+      /**
+       * Return an interpolated component. But since we don't interpolate
+       * anything... */
+      const ScanlineComp* GetFloat (size_t i) const { return 0; }
+    };
   } // namespace SoftShader
 } // namespace CrystalSpace
 

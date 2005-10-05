@@ -23,6 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/xmltiny.h"
+#include "imap/services.h"
 #include "iutil/document.h"
 #include "iutil/string.h"
 #include "ivaria/reporter.h"
@@ -35,10 +36,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace cspluginSoftshader
 {
 
-SCF_IMPLEMENT_IBASE(csSoftShader_FP)
-  SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
-SCF_IMPLEMENT_IBASE_END
-
 void csSoftShader_FP::Activate()
 {
   shaderPlug->softSRI->SetScanlineRenderer (shaderPlug->scanlineRenderer);
@@ -49,37 +46,10 @@ void csSoftShader_FP::Deactivate()
   shaderPlug->softSRI->SetScanlineRenderer (0);
 }
 
-void csSoftShader_FP::BuildTokenHash()
-{
-  xmltokens.Register("softfp",XMLTOKEN_SOFTFP);
-
-  xmltokens.Register("integer", 100+csShaderVariable::INT);
-  xmltokens.Register("float", 100+csShaderVariable::FLOAT);
-  xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
-}
-
-bool csSoftShader_FP::Load (iShaderTUResolver* resolve, iDataBuffer* program)
-{
-  csRef<iDocumentSystem> xml (
-    CS_QUERY_REGISTRY (shaderPlug->object_reg, iDocumentSystem));
-  if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
-  csRef<iDocument> doc = xml->CreateDocument ();
-  const char* error = doc->Parse (program, true);
-  if (error != 0)
-  { 
-    csReport (shaderPlug->object_reg, CS_REPORTER_SEVERITY_ERROR, 
-      "crystalspace.graphics3d.shader.software", "XML error '%s'!", error);
-    return false;
-  }
-  return Load (resolve, doc->GetRoot());
-}
-
 bool csSoftShader_FP::Load (iShaderTUResolver*, iDocumentNode* program)
 {
   if(!program)
     return false;
-
-  BuildTokenHash();
 
   csRef<iDocumentNode> variablesnode = program->GetNode("softfp");
   if(variablesnode)
@@ -90,18 +60,44 @@ bool csSoftShader_FP::Load (iShaderTUResolver*, iDocumentNode* program)
       csRef<iDocumentNode> child = it->Next();
       if(child->GetType() != CS_NODE_ELEMENT) continue;
       const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
-      (void)id;
-      // @@@ FIXME: Implement this.
+      csStringID id = tokens.Request (value);
+      switch (id)
+      {
+	case XMLTOKEN_FLATCOLOR:
+	  if (!ParseProgramParam (child, flatColor, ParamVector))
+	    return false;
+	  break;
+        default:
+	  {
+	    switch (commonTokens.Request (value))
+	    {
+	      case XMLTOKEN_PROGRAM:
+	      case XMLTOKEN_VARIABLEMAP:
+		// Don't want those
+		synsrv->ReportBadToken (child);
+		return false;
+		break;
+	      default:
+		if (!ParseCommon (child))
+		  return false;
+	    }
+	  }
+      }
     }
   }
-
   return true;
+}
+
+void csSoftShader_FP::SetupState (const csRenderMesh* mesh,
+				  csRenderMeshModes& modes,
+				  const csShaderVarStack &stacks)
+{
+  csVector4 v = GetParamVectorVal (stacks, flatColor, csVector4 (1));
+  shaderPlug->scanlineRenderer->SetFlatColor (v);
 }
 
 bool csSoftShader_FP::Compile()
 {
-  // @@@ FIXME: Implement this.
   return true;
 }
 

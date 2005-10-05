@@ -24,43 +24,34 @@
 #include "csutil/strhash.h"
 #include "csgfx/shadervarcontext.h"
 #include "csplugincommon/shader/shaderplugin.h"
+#include "csplugincommon/shader/shaderprogram.h"
+
+#include "softshader.h"
 
 namespace cspluginSoftshader
 {
 
-class csSoftShader;
-
-class csSoftShader_FP : public iShaderProgram
+class csSoftShader_FP : public csShaderProgram
 {
 private:
-  enum
-  {
-    XMLTOKEN_SOFTFP = 1
-  };
-
   csSoftShader* shaderPlug;
 
-  csStringHash xmltokens;
+  csStringHash tokens;
+#define CS_TOKEN_ITEM_FILE \
+  "plugins/video/render3d/shader/shaderplugins/softshader/softshader_fp.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
 
-  void BuildTokenHash();
-
-  bool validProgram;
-
-  csShaderVariableContext svContextHelper;
+  ProgramParam flatColor;
 public:
-  SCF_DECLARE_IBASE;
-
-  csSoftShader_FP (csSoftShader* shaderPlug) : shaderPlug(shaderPlug)
+  csSoftShader_FP (csSoftShader* shaderPlug) : 
+    csShaderProgram(shaderPlug->object_reg), shaderPlug(shaderPlug)
   {
-    SCF_CONSTRUCT_IBASE (0);
-    validProgram = true;
+    InitTokenTable (tokens);
   }
   virtual ~csSoftShader_FP ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
-
-  void SetValid(bool val) { validProgram = val; }
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram
@@ -74,16 +65,9 @@ public:
 
   virtual void SetupState (const csRenderMesh* mesh,
     csRenderMeshModes& modes,
-    const csShaderVarStack &stacks) {}
+    const csShaderVarStack &stacks);
 
   virtual void ResetState () {}
-
-
-  /// Check if valid
-  virtual bool IsValid() { return validProgram;} 
-
-  /// Loads shaderprogram from buffer
-  virtual bool Load (iShaderTUResolver*, iDataBuffer* program);
 
   /// Loads from a document-node
   virtual bool Load (iShaderTUResolver*, iDocumentNode* node);

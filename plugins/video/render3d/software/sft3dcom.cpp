@@ -3461,6 +3461,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
     const csArray<csShaderVariable*> &stacks)
 {
+  if (!scanlineRenderer) return;
+
   csRenderMeshModes usedModes (modes);
   if (zBufMode == CS_ZBUF_MESH2)
     usedModes.z_buf_mode = GetZModePass2 (usedModes.z_buf_mode);

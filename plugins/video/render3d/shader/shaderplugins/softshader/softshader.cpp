@@ -47,8 +47,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSoftShader::eiComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
-csSoftShader::csSoftShader(iBase* parent) : object_reg(0), enable(false), 
-  scanlineRenderer(0)
+csSoftShader::csSoftShader(iBase* parent) : object_reg(0), 
+  scanlineRenderer(0), enable(false)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);

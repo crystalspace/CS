@@ -68,12 +68,16 @@
 
     <technique priority="75">
       <pass>
-	<buffer source="normal" destination="normal" />
 	<texture name="tex diffuse" destination="unit 0" />
 	<vp plugin="software" />
-	<fp plugin="software" />
+	<fp plugin="software">
+	  <softfp>
+	    <flatcolor type="shadervar">mat flatcolor</flatcolor>
+	  </softfp>
+	</fp>
       </pass>
     </technique>
+    
     <technique priority="50">
       <pass>     
         <?if !vars."tex diffuse".texture ?>

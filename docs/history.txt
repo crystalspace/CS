@@ -34,6 +34,7 @@ chronological order.
 	- res changed the renderers to use new SCF.
 	- res moved the SR scanline rendering code into the softshader plugin.
 	- res fixed the software techniques of the reflect* shaders.
+	- res added flat shading support for the software shader.
 4-Oct-2005
 	- Jorrit renamed -nolightmapping to -fullbright and also implemented
 	  it in the bruteblock terrain engine and in genmesh (in addition
