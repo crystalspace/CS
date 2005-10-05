@@ -797,15 +797,18 @@ bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
 bool csODEDynamicSystem::AttachColliderSphere (float radius,
                                                const csVector3 &offset, float friction, float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
-  odec->SetElasticity (elasticity);
-  odec->SetFriction (friction);
-  odec->SetSoftness (softness);
-  odec->CreateSphereGeometry (csSphere (offset, radius));
-  odec->AddToSpace (spaceID);
-  colliders.Push (odec);
-
-  return true;
+  if (radius > 0) //otherwise ODE will treat radius as a 'bad argument' 
+  {
+    csODECollider *odec = new csODECollider ();
+    odec->SetElasticity (elasticity);
+    odec->SetFriction (friction);
+    odec->SetSoftness (softness);
+    odec->CreateSphereGeometry (csSphere (offset, radius));
+    odec->AddToSpace (spaceID);
+    colliders.Push (odec);
+    return true;
+  }
+  return false;
 }
 bool csODEDynamicSystem::AttachColliderPlane (const csPlane3 &plane,
                                               float friction, float elasticity, float softness)
@@ -1148,26 +1151,31 @@ bool csODECollider::CreatePlaneGeometry (const csPlane3& plane)
 }
 bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
 {
-  if (geomID) ClearContents ();
+  if (sphere.GetRadius () > 0) //otherwise ODE will treat radius as a 'bad argument' 
+  {
+    if (geomID) ClearContents ();
 
-  geom_type = SPHERE_COLLIDER_GEOMETRY;
+    geom_type = SPHERE_COLLIDER_GEOMETRY;
 
-  geomID = dCreateSphere (0, sphere.GetRadius ());
+    geomID = dCreateSphere (0, sphere.GetRadius ());
 
-  csVector3 offset = sphere.GetCenter ();
-  dGeomSetPosition (transformID, offset.x, offset.y, offset.z);
+    csVector3 offset = sphere.GetCenter ();
+    dGeomSetPosition (transformID, offset.x, offset.y, offset.z);
 
-  if (dGeomGetBody (transformID))
-    MassCorrection ();
+    if (dGeomGetBody (transformID))
+      MassCorrection ();
 
-  GeomData *gd = new GeomData ();
-  gd->surfacedata = surfacedata;
-  gd->collider = this;
-  dGeomSetData (geomID, (void*)gd);
+    GeomData *gd = new GeomData ();
+    gd->surfacedata = surfacedata;
+    gd->collider = this;
+    dGeomSetData (geomID, (void*)gd);
 
-  if (spaceID) AddToSpace (spaceID);
+    if (spaceID) AddToSpace (spaceID);
 
-  return true;
+    return true;
+  }
+  
+  return false;
 }
 bool csODECollider::CreateBoxGeometry (const csVector3& size)
 {
@@ -1525,19 +1533,22 @@ bool csODERigidBody::AttachColliderBox (const csVector3 &size,
 bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset,
                                            float friction, float density, float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
-  odec->SetElasticity (elasticity);
-  odec->SetFriction (friction);
-  odec->SetSoftness (softness);
-  odec->SetDensity (density);
-  odec->CreateSphereGeometry (csSphere (offset, radius));
-  odec->AttachBody (bodyID);
-  odec->AddTransformToSpace (groupID);
-  odec->MakeDynamic ();
-  odec->IncRef ();
-  colliders.Push (odec);
-
-  return true;
+  if (radius > 0) //otherwise ODE will treat radius as a 'bad argument' 
+  {
+    csODECollider *odec = new csODECollider ();
+    odec->SetElasticity (elasticity);
+    odec->SetFriction (friction);
+    odec->SetSoftness (softness);
+    odec->SetDensity (density);
+    odec->CreateSphereGeometry (csSphere (offset, radius));
+    odec->AttachBody (bodyID);
+    odec->AddTransformToSpace (groupID);
+    odec->MakeDynamic ();
+    odec->IncRef ();
+    colliders.Push (odec);
+    return true;
+  }
+  return false;
 }
 
 bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
