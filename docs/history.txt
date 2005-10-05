@@ -28,6 +28,9 @@ chronological order.
 	  prepared.
 	- res fixed the bezier plugin to specify a more correct vertex index
 	  range on index buffer creation.
+	- Piotr Obrzut added check for sphere colliders in odedynam if given 
+	  radius is greater than 0 (if it is lower ODE will send his nasty 'bad 
+	  argument' error notification, stopping all app)
 4-Oct-2005
 	- Jorrit renamed -nolightmapping to -fullbright and also implemented
 	  it in the bruteblock terrain engine and in genmesh (in addition
