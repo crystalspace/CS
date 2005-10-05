@@ -17,6 +17,8 @@ chronological order.
 	- Eric Sunshine added `typename_qualifier' support to cspace.i.  This
 	  fixes problem with Swig bombing on scf_interface.h in which this
 	  CS-specific portability "keyword" now appears.
+	- Piotr Obrzut added comments after his last commit, and change odedynam 
+	  colliders to be dynamic when they will be attached to body.
 4-Oct-2005
 	- Jorrit renamed -nolightmapping to -fullbright and also implemented
 	  it in the bruteblock terrain engine and in genmesh (in addition
