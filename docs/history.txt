@@ -14,6 +14,9 @@ chronological order.
 	- res removed csutil/bintree.h.
 	- Eric Sunshine made some Texinfo mark-up corrections in the AWS/FVG
 	  documentation.
+	- Eric Sunshine added `typename_qualifier' support to cspace.i.  This
+	  fixes problem with Swig bombing on scf_interface.h in which this
+	  CS-specific portability "keyword" now appears.
 4-Oct-2005
 	- Jorrit renamed -nolightmapping to -fullbright and also implemented
 	  it in the bruteblock terrain engine and in genmesh (in addition

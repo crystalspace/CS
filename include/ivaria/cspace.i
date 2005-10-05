@@ -89,7 +89,7 @@
 %module cspace
 #endif
 
-// Ignored macro's.
+// Ignored macros.
 #define CS_STRUCT_ALIGN_4BYTE_BEGIN
 #define CS_STRUCT_ALIGN_4BYTE_END
 #define CS_GNUC_PRINTF(format_idx, arg_idx)
@@ -105,6 +105,9 @@
 #define CS_DEPRECATED_TYPE
 #define CS_PURE_METHOD
 #define CS_CONST_METHOD
+
+// Compatibility macros.
+#define typename_qualifier typename
 
 /* For debugging: If you need to debug the build commands for the scripting
  * modules, or if you need to debug or test certain small portions of the
