@@ -24,6 +24,10 @@ chronological order.
 	  walls in flarge).
 	- res made the detail shaders fall back to std_lighting (instead of
 	  having explicit fallback techniques).
+	- res fixed an issue in the SR where not all textures were properly
+	  prepared.
+	- res fixed the bezier plugin to specify a more correct vertex index
+	  range on index buffer creation.
 4-Oct-2005
 	- Jorrit renamed -nolightmapping to -fullbright and also implemented
 	  it in the bruteblock terrain engine and in genmesh (in addition

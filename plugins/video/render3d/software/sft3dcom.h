@@ -750,8 +750,8 @@ public:
   {
     if ((unit < 0) || ((uint)unit >= activeTextureCount)) return false;
     activeTex[unit] = txthandle;
-    activeSoftTex[unit] = 
-      (csSoftwareTexture*)((csSoftwareTextureHandle*)txthandle)->tex[0];
+    csSoftwareTextureHandle* softtex = (csSoftwareTextureHandle*)txthandle;
+    activeSoftTex[unit] = softtex->GetTexture (0);
     return true;
   }
 

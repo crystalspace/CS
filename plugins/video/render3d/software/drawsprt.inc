@@ -65,7 +65,7 @@ static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
   bool transp = hTex->GetKeyColor ();
 
   csSoftwareTextureHandle *tex_mm = (csSoftwareTextureHandle *)hTex->GetPrivateObject ();
-  csSoftwareTexture *txt_unl = (csSoftwareTexture *)tex_mm->get_texture (0);
+  csSoftwareTexture *txt_unl = (csSoftwareTexture *)tex_mm->GetTexture (0);
 
   int bw = txt_unl->get_width ();
   int bh = txt_unl->get_height ();

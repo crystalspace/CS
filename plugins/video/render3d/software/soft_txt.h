@@ -179,7 +179,7 @@ public:
   /** @} */
 
   /// Get the texture at the corresponding mipmap level (0..3)
-  csSoftwareTexture* get_texture (int mipmap)
+  csSoftwareTexture* GetTexture (int mipmap)
   {
     PrepareInt ();
     return (mipmap >= 0) && (mipmap < 4) ? tex [mipmap] : 0;

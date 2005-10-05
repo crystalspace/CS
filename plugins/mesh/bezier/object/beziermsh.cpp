@@ -943,7 +943,7 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
 	CS_BUFCOMP_FLOAT, 2);
       frameBuffers.indices = csRenderBuffer::CreateIndexRenderBuffer (
 	tess->GetTriangleCount () * 3, CS_BUF_STREAM, 
-	CS_BUFCOMP_UNSIGNED_INT, 0, tess->GetVertexCount ());
+	CS_BUFCOMP_UNSIGNED_INT, 0, tess->GetVertexCount ()-1);
       frameBuffers.vertCount = tess->GetVertexCount ();
     }
 

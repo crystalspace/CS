@@ -61,7 +61,7 @@ namespace cspluginSoft3d
     static uint8 ClampAndShift (int32 x, const int shift)
     {
       return (x & 0x80000000) ? 0 : 
-	(((x >> shift) & 0x100) ? 0xff : (x >> shift));
+	(((x >> shift) & 0x7fffff00) ? 0xff : (x >> shift));
     }
 
     CS_FORCEINLINE
