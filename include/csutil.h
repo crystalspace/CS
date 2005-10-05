@@ -27,7 +27,6 @@
 #include "csutil/ansiparse.h"
 #include "csutil/array.h"
 #include "csutil/binder.h"
-#include "csutil/bintree.h"
 #include "csutil/bitarray.h"
 #include "csutil/blockallocator.h"
 #include "csutil/callstack.h"
