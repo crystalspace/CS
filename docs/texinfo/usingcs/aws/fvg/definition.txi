@@ -5,14 +5,14 @@
 Flexible Vector Graphics (@sc{fvg}) is a subset of Scalable Vector Graphics
 (@sc{svg}). @sc{fvg} is the graphics system underlying the @sc{aws2} Crystal
 Space embedded windowing system. It mirrors as closely as possible the @sc{svg}
-1.1 specification, while omitting some of the more complex
-operations. The @sc{svg} 1.1 specification can be found here:
+1.1 specification, while omitting some of the more complex operations. The
+@sc{svg} 1.1 specification can be found here:
 
 @noindent
 @uref{http://www.w3.org/TR/SVG/}
 
-In this document, we will define the functionality of @sc{fvg} and make some
-notes about particular differences between @sc{svg} and @sc{fvg}.
+This document defines the functionality of @sc{fvg} and provides some notes
+about particular differences between @sc{svg} and @sc{fvg}.
 
 @subsubheading Defining a Shape
 
@@ -20,32 +20,46 @@ notes about particular differences between @sc{svg} and @sc{fvg}.
 files. Just as the normal definition files can use automation constructs, so
 too can @sc{fvg}.
 
-
 All @sc{fvg} drawing code must be inside a "g" tag.
 
-@code{
+@example
 <g id="triangle_rect">
   <path d="M 100 100 L 300 100 L 200 300 z"
         fill="#ff0000" stroke="#00ff00" />
-  <rect x="100" y="150" width="200" height="50" stroke="#0000ff" />
+  <rect x="100" y="150"
+        width="200" height="50"
+        stroke="#0000ff" />
 </g>
-}
+@end example
 
-@subsubheading Differences from SVG
+@subsubheading Differences from @sc{svg}
+
+Limitations of @sc{fvg} as compared to @sc{svg} include:
 
 @itemize @bullet
-@item Does not support clipping and masking.
-@item Does not support CSS stylesheets.
-@item Does not support color names "red", "green", etc.
-@item Does not support filled paths with holes in them.
-@item Does not support url values.
-@item Does not support different device units (all measurements are in pixels.)
+@item
+Does not support clipping and masking.
+@item
+Does not support @sc{css} stylesheets.
+@item
+Does not support color names ``red'', ``green'', etc.
+@item
+Does not support filled paths with holes in them.
+@item
+Does not support @sc{url} values.
+@item
+Does not support different device units (all measurements are in pixels).
 @end itemize
 
+Features not provided by @sc{svg}, but supported by @sc{fvg} include:
+
 @itemize @bullet
-@item Supports interfacing into the AWS automation language.
-@item Supports relative values and measurements.
-@item Supports shape inlining.
+@item
+Supports interfacing into the @sc{aws} automation language.
+@item
+Supports relative values and measurements.
+@item
+Supports shape inlining.
 @end itemize
 
 @subsubheading Basic Shapes

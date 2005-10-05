@@ -12,6 +12,8 @@ chronological order.
 	  not seem appropriate any more.
 	- res fixed wrong coordinate transformations in the SR.
 	- res removed csutil/bintree.h.
+	- Eric Sunshine made some Texinfo mark-up corrections in the AWS/FVG
+	  documentation.
 4-Oct-2005
 	- Jorrit renamed -nolightmapping to -fullbright and also implemented
 	  it in the bruteblock terrain engine and in genmesh (in addition
