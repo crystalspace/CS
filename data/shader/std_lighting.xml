@@ -73,6 +73,9 @@
 	<fp plugin="software">
 	  <softfp>
 	    <flatcolor type="shadervar">mat flatcolor</flatcolor>
+	    <?if vars."tex lightmap".texture ?>
+	      <colorfactor type="float">2</colorfactor>
+	    <?endif?>
 	  </softfp>
 	</fp>
       </pass>

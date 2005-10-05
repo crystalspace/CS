@@ -18,6 +18,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
+#include "csgeom/math.h"
 #include "csgeom/vector3.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
@@ -67,6 +68,10 @@ bool csSoftShader_FP::Load (iShaderTUResolver*, iDocumentNode* program)
 	  if (!ParseProgramParam (child, flatColor, ParamVector))
 	    return false;
 	  break;
+	case XMLTOKEN_COLORFACTOR:
+	  if (!ParseProgramParam (child, factor, ParamFloat))
+	    return false;
+	  break;
         default:
 	  {
 	    switch (commonTokens.Request (value))
@@ -94,6 +99,15 @@ void csSoftShader_FP::SetupState (const csRenderMesh* mesh,
 {
   csVector4 v = GetParamVectorVal (stacks, flatColor, csVector4 (1));
   shaderPlug->scanlineRenderer->SetFlatColor (v);
+
+  float f = csClamp (GetParamFloatVal (stacks, factor, 1.0f), 
+    65536.0f, 1.0f/32768.0f);
+  int shift;
+  if (f >= 1.0)
+    shift = csLog2 (f);
+  else
+    shift = -csLog2 (1.0f/f);
+  shaderPlug->scanlineRenderer->SetShift (shift);
 }
 
 bool csSoftShader_FP::Compile()

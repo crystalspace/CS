@@ -43,6 +43,7 @@ private:
 #undef CS_TOKEN_ITEM_FILE
 
   ProgramParam flatColor;
+  ProgramParam factor;
 public:
   csSoftShader_FP (csSoftShader* shaderPlug) : 
     csShaderProgram(shaderPlug->object_reg), shaderPlug(shaderPlug)

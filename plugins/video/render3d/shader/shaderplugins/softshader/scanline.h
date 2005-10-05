@@ -33,38 +33,6 @@ namespace cspluginSoftshader
 {
   using namespace CrystalSpace::SoftShader;
 
-  struct Color_None
-  {
-    static const size_t compCount = 0;
-
-    CS_FORCEINLINE
-    static void Apply (const ScanlineComp* /*color*/, 
-      uint8& /*r*/, uint8& /*g*/, uint8& /*b*/, uint8& /*a*/) {}
-  };
-
-  struct Color_Multiply
-  {
-    static const size_t compCount = 4;
-
-    CS_FORCEINLINE
-    static uint8 ClampAndShift (int32 x, const int shift)
-    {
-      return (x & 0x80000000) ? 0 : 
-	(((x >> shift) & 0x7fffff00) ? 0xff : (x >> shift));
-    }
-
-    CS_FORCEINLINE
-    static void Apply (const ScanlineComp* color, 
-      uint8& r, uint8& g, uint8& b, uint8& a) 
-    {
-      // @@@ FIXME: adjustable scale
-      r = ClampAndShift (r * color[0].c.GetFixed(), 15);
-      g = ClampAndShift (g * color[1].c.GetFixed(), 15);
-      b = ClampAndShift (b * color[2].c.GetFixed(), 15);
-      a = ClampAndShift (a * color[3].c.GetFixed(), 15);
-    }
-  };
-
   class ScanlineRendererBase : 
     public scfImplementation1<ScanlineRendererBase, iScanlineRenderer>
   {
@@ -74,9 +42,11 @@ namespace cspluginSoftshader
     int v_shift_r;
     int and_w;
     int and_h;
+    int colorShift;
 
     ScanlineRendererBase() : scfImplementationType (this),
-      flat_r(255), flat_g(255), flat_b(255), flat_a(255) {}
+      flat_r(255), flat_g(255), flat_b(255), flat_a(255),
+      colorShift(16) {}
     virtual ~ScanlineRendererBase() {}
 
     void SetFlatColor (const csVector4& v)
@@ -86,8 +56,46 @@ namespace cspluginSoftshader
       flat_b = csClamp ((int)(v.z * 255.99f), 255, 0);
       flat_a = csClamp ((int)(v.w * 255.99f), 255, 0);
     }
+    void SetShift (int x) { colorShift = 16-x; }
   };
   
+  struct Color_None
+  {
+    static const size_t compCount = 0;
+
+    Color_None (ScanlineRendererBase* /*This*/) {}
+
+    CS_FORCEINLINE
+    void Apply (const ScanlineComp* /*color*/, 
+      uint8& /*r*/, uint8& /*g*/, uint8& /*b*/, uint8& /*a*/) {}
+  };
+
+  struct Color_Multiply
+  {
+    static const size_t compCount = 4;
+
+    const int shift;
+
+    Color_Multiply (ScanlineRendererBase* This) : shift(This->colorShift) {}
+
+    CS_FORCEINLINE
+    static uint8 ClampAndShift (int32 x, const int shift)
+    {
+      return (x & 0x80000000) ? 0 : 
+	(((x >> shift) & 0x7fffff00) ? 0xff : (x >> shift));
+    }
+
+    CS_FORCEINLINE
+    void Apply (const ScanlineComp* color, 
+      uint8& r, uint8& g, uint8& b, uint8& a) 
+    {
+      r = ClampAndShift (r * color[0].c.GetFixed(), shift);
+      g = ClampAndShift (g * color[1].c.GetFixed(), shift);
+      b = ClampAndShift (b * color[2].c.GetFixed(), shift);
+      a = ClampAndShift (a * color[3].c.GetFixed(), shift);
+    }
+  };
+
   struct Source_Texture
   {
     static const size_t compCount = 2;
@@ -173,6 +181,7 @@ namespace cspluginSoftshader
 
 	Pix& pix = This->pix;
 	Source src (This);
+	Color col (This);
 
 	typename_qualifier Pix::PixType* _dest = 
 	  (typename_qualifier Pix::PixType*)dest;
@@ -185,7 +194,7 @@ namespace cspluginSoftshader
 	  {
 	    uint8 r, g, b, a;
 	    src.GetColor (ipol.GetFloat (offsetTC), r, g, b, a);
-	    Color::Apply (ipol.GetFloat (offsetColor), r, g, b, a);
+	    col.Apply (ipol.GetFloat (offsetColor), r, g, b, a);
 	    pix.WritePix (_dest, r, g, b, a);
 	    Z.Update();
 	  }
