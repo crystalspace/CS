@@ -19,6 +19,11 @@ chronological order.
 	  CS-specific portability "keyword" now appears.
 	- Piotr Obrzut added comments after his last commit, and change odedynam 
 	  colliders to be dynamic when they will be attached to body.
+	- res fixed the std_detail shader mistakenly utilizing the vertex 
+	  colors as well as lightmap (resulting in a perceived darkness of the
+	  walls in flarge).
+	- res made the detail shaders fall back to std_lighting (instead of
+	  having explicit fallback techniques).
 4-Oct-2005
 	- Jorrit renamed -nolightmapping to -fullbright and also implemented
 	  it in the bruteblock terrain engine and in genmesh (in addition

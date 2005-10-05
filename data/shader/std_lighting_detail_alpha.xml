@@ -107,59 +107,6 @@
     </pass>
     <?include snippets/fog-pass.inc ?>
   </technique>
-  <technique priority="100">
-    <pass>
-      <buffer name="texture coordinate lightmap" destination="texture coordinate 1" />
-      <texture name="tex diffuse" destination="unit 0" />
-      <texture name="tex lightmap" destination="unit 1" />
-      <fp plugin="glfixed">
-        <fixedfp>
-          <layer>
-            <colorsource num="0" source="texture" modifier="color" />
-            <alphasource num="0" source="texture" modifier="alpha" />
-	    <?if !vars."tex lightmap".texture ?>
-	      <colorsource num="1" source="primary color" modifier="color" />
-	      <coloroperation operation="modulate" />
-	      <alphasource num="1" source="primary color" modifier="alpha" />
-	      <alphaoperation operation="modulate" />
-	    <?else?>
-	      <coloroperation operation="replace" />
-	      <alphaoperation operation="replace" />
-	    <?endif?>
-          </layer>
-          <layer>
-            <colorsource num="0" source="previous layer" modifier="color" />
-            <colorsource num="1" source="texture" modifier="color" />
-            <coloroperation operation="modulate" scale="2" />
-            <alphasource num="0" source="previous layer" modifier="alpha" />
-            <alphaoperation operation="replace" />
-          </layer>
-        </fixedfp>
-      </fp>
-    </pass>
-    <?include snippets/fog-pass.inc ?>
-  </technique>
-  <technique priority="75">
-    <pass>
-      <buffer source="normals" destination="normal" />
-      <vp plugin="software" />
-      <fp plugin="software" />
-    </pass>
-  </technique>
-  <technique priority="50">
-    <pass>
-      <texture name="tex diffuse" destination="unit 0" />
-    </pass>
-    <pass>
-      <mixmode>
-        <multiply2 />
-      </mixmode> <!-- @@@ probably not always desired -->
-      <zmode>
-        <zmesh2 />
-      </zmode>
-      <buffer name="texture coordinate lightmap" destination="texture coordinate 0" />
-      <texture name="tex lightmap" destination="unit 0" />
-    </pass>
-    <?include snippets/fog-pass.inc ?>
-  </technique>
+
+  <fallbackshader name="std_lighting" />
 </shader>
