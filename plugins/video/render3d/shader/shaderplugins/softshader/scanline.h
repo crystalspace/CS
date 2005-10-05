@@ -17,32 +17,20 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_SOFT3D_SCANLINE_H__
-#define __CS_SOFT3D_SCANLINE_H__
+#ifndef __CS_SOFTSHADER_SCANLINE_H__
+#define __CS_SOFTSHADER_SCANLINE_H__
 
 #include "ivideo/rendermesh.h"
 
-#include "types.h"
+#include "csplugincommon/softshader/scanline.h"
+#include "csplugincommon/softshader/types.h"
+#include "csutil/scf_implementation.h"
 #include "scan_pix.h"
 #include "scan_z.h"
 
-namespace cspluginSoft3d
+namespace cspluginSoftshader
 {
-  struct ScanlineRenderInfo;
-
-  class ScanlineRendererBase
-  {
-  public:
-    typedef void (*ScanlineProc) (ScanlineRendererBase* _This,
-      InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
-      int ipolStep, int ipolShift,
-      void* dest, uint len, uint32 *zbuff);
-
-    virtual bool Init (csSoftwareTexture** textures,
-      const csRenderMeshModes& modes,
-      BuffersMask availableBuffers,
-      ScanlineRenderInfo& renderInfo) = 0;
-  };
+  using namespace CrystalSpace::SoftShader;
 
   struct Color_None
   {
@@ -76,16 +64,14 @@ namespace cspluginSoft3d
     }
   };
 
-  struct ScanlineRenderInfo
+  class ScanlineRendererBase : 
+    public scfImplementation1<ScanlineRendererBase, iScanlineRenderer>
   {
-    ScanlineRendererBase* renderer;
-    ScanlineRendererBase::ScanlineProc proc;
-    csVector4* denormFactors;
-    BuffersMask denormBuffers;
-    BuffersMask desiredBuffers;
-    const size_t* bufferComps;
+  public:
+    ScanlineRendererBase() : scfImplementationType (this) {}
+    virtual ~ScanlineRendererBase() {}
   };
-
+  
   template<typename Pix>
   class ScanlineRenderer : public ScanlineRendererBase
   {
@@ -101,7 +87,7 @@ namespace cspluginSoft3d
     template <typename Color, typename Zmode>
     struct ScanlineImpl
     {
-      static void Scan (ScanlineRendererBase* _This,
+      static void Scan (iScanlineRenderer* _This,
 	InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
 	int ipolStep, int ipolShift,
 	void* dest, uint len, uint32 *zbuff)
@@ -149,7 +135,7 @@ namespace cspluginSoft3d
       }
     };
     template<typename Color>
-    static ScanlineProc GetScanlineProcC (csZBufMode zmode)
+    static iScanlineRenderer::ScanlineProc GetScanlineProcC (csZBufMode zmode)
     {
       switch (zmode)
       {
@@ -169,7 +155,8 @@ namespace cspluginSoft3d
 	  return 0;
       }
     }
-    static ScanlineProc GetScanlineProc (bool colorized, csZBufMode zmode)
+    static iScanlineRenderer::ScanlineProc GetScanlineProc (bool colorized, 
+							    csZBufMode zmode)
     {
       if (colorized)
 	return GetScanlineProcC<Color_Multiply> (zmode);
@@ -180,30 +167,30 @@ namespace cspluginSoft3d
     ScanlineRenderer (const csPixelFormat& pfmt) : pix (pfmt) 
     {}
 
-    bool Init (csSoftwareTexture** textures,
+    bool Init (SoftwareTexture** textures,
       const csRenderMeshModes& modes,
       BuffersMask availableBuffers,
-      ScanlineRenderInfo& renderInfo)
+      iScanlineRenderer::RenderInfo& renderInfo)
     {
-      csSoftwareTexture* tex = textures[0];
+      SoftwareTexture* tex = textures[0];
       if (tex == 0) return false;      // @@@ Use flat color instead
       bitmap = tex->bitmap;
-      v_shift_r = tex->get_w_shift();
-      and_w = tex->get_w_mask();
-      and_h = tex->get_h_mask() << v_shift_r;
+      v_shift_r = tex->shf_w;
+      and_w = tex->and_w;
+      and_h = tex->and_h << v_shift_r;
       v_shift_r = 16 - v_shift_r;
 
-      bool doColor = availableBuffers & CS_BUFFERFLAG(COLOR);
+      bool doColor = availableBuffers & CS_SOFT3D_BUFFERFLAG(COLOR);
 
       renderInfo.renderer = this;
-      renderInfo.desiredBuffers = CS_BUFFERFLAG(TEXCOORD);
-      dnTC.Set (tex->get_width(), tex->get_height(), 0.0f, 0.0f);
+      renderInfo.desiredBuffers = CS_SOFT3D_BUFFERFLAG(TEXCOORD);
+      dnTC.Set (tex->w, tex->h, 0.0f, 0.0f);
       renderInfo.denormFactors = &dnTC;
-      renderInfo.denormBuffers = CS_BUFFERFLAG(TEXCOORD);
+      renderInfo.denormBuffers = CS_SOFT3D_BUFFERFLAG(TEXCOORD);
       static const size_t myBufferComps[] = {4, 2};
       if (doColor)
       {
-	renderInfo.desiredBuffers |= CS_BUFFERFLAG(COLOR);
+	renderInfo.desiredBuffers |= CS_SOFT3D_BUFFERFLAG(COLOR);
 	renderInfo.bufferComps = myBufferComps;
       }
       else
@@ -214,6 +201,6 @@ namespace cspluginSoft3d
       return renderInfo.proc != 0;
     }
   };
-} // namespace cspluginSoft3d
+} // namespace cspluginSoftshader
 
-#endif // __CS_SOFT3D_SCANLINE_H__
+#endif // __CS_SOFTSHADER_SCANLINE_H__

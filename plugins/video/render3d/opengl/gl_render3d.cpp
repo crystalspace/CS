@@ -81,34 +81,10 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 
-SCF_IMPLEMENT_IBASE(csGLGraphics3D)
-  SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShaderRenderInterface)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLGraphics3D::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLGraphics3D::eiShaderRenderInterface)
-  SCF_IMPLEMENTS_INTERFACE (iShaderRenderInterface)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csGLGraphics3D::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-
-csGLGraphics3D::csGLGraphics3D (iBase *parent) : isOpen (false), 
+csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
+  scfImplementationType (this, parent), isOpen (false), 
   wantToSwap (false), delayClearFlags (0)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiShaderRenderInterface);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiDebugHelper);
-
   verbose = false;
   frustum_valid = false;
 
@@ -168,11 +144,6 @@ csGLGraphics3D::~csGLGraphics3D()
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q)
     q->RemoveListener (scfiEventHandler);
-
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiDebugHelper);
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiShaderRenderInterface);
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 void csGLGraphics3D::OutputMarkerString (const char* function, 
@@ -3068,7 +3039,6 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   if (q)
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
 
-  scfiShaderRenderInterface.Initialize(p);
 
   bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
 
@@ -3108,9 +3078,6 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
 // iEventHandler
 ////////////////////////////////////////////////////////////////////
 
-
-
-
 bool csGLGraphics3D::HandleEvent (iEvent& Event)
 {
   if (Event.Type == csevBroadcast)
@@ -3137,38 +3104,8 @@ bool csGLGraphics3D::HandleEvent (iEvent& Event)
 
 
 ////////////////////////////////////////////////////////////////////
-//                    iShaderRenderInterface
-////////////////////////////////////////////////////////////////////
-
-csGLGraphics3D::eiShaderRenderInterface::eiShaderRenderInterface()
-{
-}
-
-csGLGraphics3D::eiShaderRenderInterface::~eiShaderRenderInterface()
-{
-
-}
-
-void* csGLGraphics3D::eiShaderRenderInterface::GetPrivateObject (
-	const char* name)
-{
-  if (strcasecmp(name, "ext") == 0)
-    return (void*) (scfParent->ext);
-  return 0;
-}
-
-void csGLGraphics3D::eiShaderRenderInterface::Initialize (iObjectRegistry *reg)
-{
-  object_reg = reg;
-}
-
-////////////////////////////////////////////////////////////////////
 //                          iDebugHelper
 ////////////////////////////////////////////////////////////////////
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLGraphics3D::eiDebugHelper)
-  SCF_IMPLEMENTS_INTERFACE (iDebugHelper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 bool csGLGraphics3D::DebugCommand (const char* cmdstr)
 {

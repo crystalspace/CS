@@ -17,17 +17,30 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_SOFT3D_TYPES_H__
-#define __CS_SOFT3D_TYPES_H__
+#ifndef __CS_CSPLUGINCOMMON_SOFTSHADER_TEXTURE_H__
+#define __CS_CSPLUGINCOMMON_SOFTSHADER_TEXTURE_H__
 
-namespace cspluginSoft3d
+/**\addtogroup plugincommon
+ * @{ */
+
+namespace CrystalSpace
 {
-  /// A buffer used to pass vertex data around in the renderer
-  struct VertexBuffer
+  namespace SoftShader
   {
-    uint8* data;
-    size_t comp;
-  };
-} // namespace cspluginSoft3d
+    struct SoftwareTexture
+    {
+      /// Width and height
+      int w, h;
+      /// log2(width) and log2(height)
+      int shf_w, shf_h;
+      /// (1 << log2(width)) - 1 and (1 << log2(height)) - 1
+      int and_w, and_h;
+      /// The bitmap
+      uint32* bitmap;
+    };
+  } // namespace SoftShader
+} // namespace CrystalSpace
 
-#endif // __CS_SOFT3D_TYPES_H__
+/** @} */
+
+#endif // __CS_CSPLUGINCOMMON_SOFTSHADER_TEXTURE_H__

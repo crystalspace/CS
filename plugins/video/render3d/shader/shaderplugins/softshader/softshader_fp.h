@@ -25,6 +25,11 @@
 #include "csgfx/shadervarcontext.h"
 #include "csplugincommon/shader/shaderplugin.h"
 
+namespace cspluginSoftshader
+{
+
+class csSoftShader;
+
 class csSoftShader_FP : public iShaderProgram
 {
 private:
@@ -33,7 +38,7 @@ private:
     XMLTOKEN_SOFTFP = 1
   };
 
-  iObjectRegistry* object_reg;
+  csSoftShader* shaderPlug;
 
   csStringHash xmltokens;
 
@@ -45,11 +50,10 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csSoftShader_FP(iObjectRegistry* objreg)
+  csSoftShader_FP (csSoftShader* shaderPlug) : shaderPlug(shaderPlug)
   {
     SCF_CONSTRUCT_IBASE (0);
     validProgram = true;
-    this->object_reg = objreg;
   }
   virtual ~csSoftShader_FP ()
   {
@@ -93,6 +97,7 @@ public:
   virtual bool Compile();
 };
 
+} // cspluginSoftshader
 
 #endif //__GLSHADER_CGFP_H__
 

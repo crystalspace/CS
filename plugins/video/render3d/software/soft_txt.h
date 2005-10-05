@@ -22,6 +22,7 @@
 
 #include "csgeom/csrect.h"
 #include "csplugincommon/render3d/txtmgr.h"
+#include "csplugincommon/softshader/texture.h"
 #include "csutil/blockallocator.h"
 #include "csutil/debug.h"
 #include "csutil/hashr.h"
@@ -30,6 +31,8 @@
 
 namespace cspluginSoft3d
 {
+  using namespace CrystalSpace::SoftShader;
+
 
 class csSoftwareGraphics3DCommon;
 class csSoftwareTextureManager;
@@ -47,24 +50,16 @@ class csSoftwareTextureHandle;
  * It is the responsability of csSoftwareTextureHandle  to resize textures 
  * if they do not fulfil this requirement.
  */
-class csSoftwareTexture
+class csSoftwareTexture : public SoftwareTexture
 {
 protected:
-  /// The parent csSoftwareTextureHandle object
-  csSoftwareTextureHandle* parent;
-  /// Width and height
-  int w, h;
-  /// log2(width) and log2(height)
-  int shf_w, shf_h;
-  /// (1 << log2(width)) - 1 and (1 << log2(height)) - 1
-  int and_w, and_h;
 
   /// Compute shf_x and and_x values
   void compute_masks ();
   void ImageToBitmap (iImage *Image);
 public:
-  /// The bitmap
-  uint32* bitmap;
+  /// The parent csSoftwareTextureHandle object
+  csSoftwareTextureHandle* parent;
 
   /// Create a csTexture object
   csSoftwareTexture (csSoftwareTextureHandle* Parent, iImage *Image) : 
@@ -81,27 +76,6 @@ public:
   {
     delete [] bitmap;
   }
-
-  ///
-  int get_width () { return w; }
-  ///
-  int get_height () { return h; }
-  ///
-  int get_w_shift () { return shf_w; }
-  ///
-  int get_h_shift () { return shf_h; }
-  ///
-  int get_w_mask () { return and_w; }
-  ///
-  int get_h_mask () { return and_h; }
-  /// Query image size (alas we can't do (h << shf_w))
-  int get_size () { return w * h; }
-  ///
-  csSoftwareTextureHandle* get_parent () { return parent; }
-
-  /// Return a pointer to texture data
-  uint32* get_bitmap ()
-  { return bitmap; }
 };
 
 /**

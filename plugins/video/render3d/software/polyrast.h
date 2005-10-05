@@ -22,15 +22,16 @@
 
 #include "csqint.h"
 #include "csgeom/math.h"
+#include "csplugincommon/softshader/scanline.h"
+#include "csplugincommon/softshader/types.h"
 
-#include "types.h"
-#include "scanindex.h"
 #include "sft3dcom.h"
-
-#include "scanline.h"
+#include "types.h"
 
 namespace cspluginSoft3d
 {
+  using namespace CrystalSpace::SoftShader;
+
   class PolygonRasterizer
   {
     /*bool dpfx_valid;
@@ -109,7 +110,7 @@ namespace cspluginSoft3d
 
     void DrawPolygon (size_t vertNum, const csVector3* vertices,
       const VertexBuffer* inBuffers, BuffersMask buffersMask,
-      ScanlineRenderInfo& sri, size_t floatsPerVert)
+      iScanlineRenderer::RenderInfo& sri, size_t floatsPerVert)
     {
       CS_ASSERT_MSG ("Degenerate polygon", vertNum >= 3);
       //-----

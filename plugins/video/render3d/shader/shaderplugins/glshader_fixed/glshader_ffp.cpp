@@ -512,14 +512,6 @@ bool csGLShaderFFP::Compile ()
   csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (objectReg, iGraphics2D);
   g2d->PerformExtension ("getstatecache", &statecache);
 
-  //get extension-object
-  g3d = CS_QUERY_REGISTRY (objectReg, iGraphics3D);
-  csRef<iShaderRenderInterface> sri = 
-    SCF_QUERY_INTERFACE (g3d, iShaderRenderInterface);
-  if (!sri) return false;
-
-  ext = (csGLExtensionManager*) sri->GetPrivateObject ("ext");
-
   if (texlayers.Length () > (size_t)maxlayers)
     return false;
 

@@ -176,8 +176,6 @@ bool csGLShader_FIXED::Initialize(iObjectRegistry* reg)
   object_reg = reg;
 
   csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg, iGraphics3D);
-  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r,
-    iShaderRenderInterface);
 
   csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
   if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 

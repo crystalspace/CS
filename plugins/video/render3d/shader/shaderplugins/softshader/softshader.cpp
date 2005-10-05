@@ -22,7 +22,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
@@ -31,9 +30,10 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "softshader_fp.h"
 #include "softshader.h"
 
-iObjectRegistry* csSoftShader::object_reg = 0;
-
 CS_IMPLEMENT_PLUGIN
+
+namespace cspluginSoftshader
+{
 
 SCF_IMPLEMENT_FACTORY (csSoftShader)
 
@@ -47,15 +47,16 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSoftShader::eiComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
-csSoftShader::csSoftShader(iBase* parent)
+csSoftShader::csSoftShader(iBase* parent) : object_reg(0), enable(false), 
+  scanlineRenderer(0)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  enable = false;
 }
 
 csSoftShader::~csSoftShader()
 {
+  delete scanlineRenderer;
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_DESTRUCT_IBASE ();
 }
@@ -83,7 +84,7 @@ csPtr<iShaderProgram> csSoftShader::CreateProgram(const char* type)
   if( strcasecmp(type, "vp") == 0)
     return csPtr<iShaderProgram>(new csSoftShader_VP(object_reg));
   else if( strcasecmp(type, "fp") == 0)
-    return csPtr<iShaderProgram>(new csSoftShader_FP(object_reg));
+    return csPtr<iShaderProgram> (new csSoftShader_FP (this));
   else return 0;
 }
 
@@ -97,6 +98,84 @@ void csSoftShader::Open()
   if (f != 0 && strcmp ("crystalspace.graphics3d.software", 
       f->QueryClassID ()) == 0)
     enable = true;
+  
+  if (enable)
+  {
+    softSRI = scfQueryInterface<iSoftShaderRenderInterface> (r);
+    if (!softSRI.IsValid())
+    {
+      enable = false;
+      return;
+    }
+    
+    const csPixelFormat& pfmt = *(r->GetDriver2D()->GetPixelFormat());
+    if (pfmt.PixelBytes == 4)
+    {
+      if ((pfmt.BlueMask == 0x0000ff)
+	&& (pfmt.GreenMask == 0x00ff00)
+	&& (pfmt.RedMask == 0xff0000))
+	scanlineRenderer = (new ScanlineRenderer<
+	  Pix_Fix<uint32, 24, 0, 0xff,
+			  16, 0, 0xff,
+			  8,  0, 0xff,
+			  0,  0, 0xff> > (pfmt));
+      else if ((pfmt.BlueMask == 0xff0000) 
+	&& (pfmt.GreenMask == 0x00ff00)
+	&& (pfmt.RedMask == 0x0000ff))
+	scanlineRenderer = (new ScanlineRenderer<
+	  Pix_Fix<uint32, 24, 0, 0xff,
+			  0,  0, 0xff,
+			  8,  0, 0xff,
+			  16, 0, 0xff> > (pfmt));
+      else if (pfmt.RedMask > pfmt.BlueMask)
+	scanlineRenderer = (
+	  new ScanlineRenderer<Pix_Generic<uint32, 1> > (pfmt));
+      else
+	scanlineRenderer = (
+	  new ScanlineRenderer<Pix_Generic<uint32, 0> > (pfmt));
+    }
+    else
+    {
+      if ((pfmt.BlueMask == 0xf800)   // BGR 565
+	&& (pfmt.GreenMask == 0x07e0)
+	&& (pfmt.RedMask == 0x001f))
+	scanlineRenderer = (new ScanlineRenderer<
+	  Pix_Fix<uint16, 0,  0, 0,
+			  0,  3, 0xf8,
+			  3,  0, 0xfc,
+			  8,  0, 0xf8> > (pfmt));
+      else if ((pfmt.RedMask == 0xf800) // RGB 565
+	&& (pfmt.GreenMask == 0x07e0)
+	&& (pfmt.BlueMask == 0x001f))
+	scanlineRenderer = (new ScanlineRenderer<
+	  Pix_Fix<uint16, 0,  0, 0,
+			  8,  0, 0xf8,
+			  3,  0, 0xfc,
+			  0,  3, 0xf8> > (pfmt));
+      else if ((pfmt.BlueMask == 0x7c00) // BGR 555
+	&& (pfmt.GreenMask == 0x03e0)
+	&& (pfmt.RedMask == 0x001f))
+	scanlineRenderer = (new ScanlineRenderer<
+	  Pix_Fix<uint16, 0,  0, 0,
+			  0,  3, 0xf8,
+			  2,  0, 0xf8,
+			  7,  0, 0xf8> > (pfmt));
+      else if ((pfmt.RedMask == 0x7c00) // RGB 555
+	&& (pfmt.GreenMask == 0x03e0)
+	&& (pfmt.BlueMask == 0x001f))
+	scanlineRenderer = (new ScanlineRenderer<
+	  Pix_Fix<uint16, 0,  0, 0,
+			  7,  0, 0xf8,
+			  2,  0, 0xf8,
+			  0,  3, 0xf8> > (pfmt));
+      else if (pfmt.RedMask > pfmt.BlueMask)
+	scanlineRenderer = (
+	  new ScanlineRenderer<Pix_Generic<uint16, 1> > (pfmt));
+      else
+	scanlineRenderer = (
+	  new ScanlineRenderer<Pix_Generic<uint16, 0> > (pfmt));
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -107,3 +186,5 @@ bool csSoftShader::Initialize(iObjectRegistry* reg)
   object_reg = reg;
   return true;
 }
+
+} // namespace cspluginSoftshader

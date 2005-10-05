@@ -174,7 +174,10 @@ public:
     csVector2 *iVertices, size_t iVertCount);
 };
 
-class csGLGraphics3D : public iGraphics3D
+class csGLGraphics3D : public scfImplementation3<csGLGraphics3D, 
+						 iGraphics3D,
+						 iComponent,
+						 iDebugHelper>
 {
 private:
   //friend declarations
@@ -426,8 +429,6 @@ public:
   static csGLExtensionManager* ext;
   csRef<csGLTextureManager> txtmgr;
 
-  SCF_DECLARE_IBASE;
-
   csGLGraphics3D (iBase *parent);
   virtual ~csGLGraphics3D ();
 
@@ -652,37 +653,10 @@ public:
 
 
   ////////////////////////////////////////////////////////////////////
-  //                         iShaderRenderInterface
-  ////////////////////////////////////////////////////////////////////
-
-  class eiShaderRenderInterface : public iShaderRenderInterface
-  {
-  private:
-    iObjectRegistry* object_reg;
-  public:
-    SCF_DECLARE_EMBEDDED_IBASE(csGLGraphics3D);
-    eiShaderRenderInterface();
-    virtual ~eiShaderRenderInterface();
-
-    virtual void Initialize( iObjectRegistry *reg);
-
-
-    virtual void* GetPrivateObject(const char* name);
-  } scfiShaderRenderInterface;
-  friend class eiShaderRenderInterface;
-
-  ////////////////////////////////////////////////////////////////////
   //                          iComponent
   ////////////////////////////////////////////////////////////////////
 
   bool Initialize (iObjectRegistry* reg);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGLGraphics3D);
-    virtual bool Initialize (iObjectRegistry* reg)
-      { return scfParent->Initialize (reg); }
-  } scfiComponent;
 	
   ////////////////////////////////////////////////////////////////////
   //                         iEventHandler
@@ -690,23 +664,21 @@ public:
   
   bool HandleEvent (iEvent& Event);
 
-  struct EventHandler : public iEventHandler
+  struct EventHandler : public scfImplementation1<EventHandler,
+						  iEventHandler>
   {
   private:
     csGLGraphics3D* parent;
   public:
-    SCF_DECLARE_IBASE;
-    EventHandler (csGLGraphics3D* parent)
+    EventHandler (csGLGraphics3D* parent) : scfImplementationType (this)
     {
-      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     virtual ~EventHandler ()
     {
-      SCF_DESTRUCT_IBASE();
     }
     virtual bool HandleEvent (iEvent& ev) 
-      { return parent->HandleEvent (ev); }
+    { return parent->HandleEvent (ev); }
   };
   csRef<EventHandler> scfiEventHandler;
 
@@ -717,25 +689,18 @@ public:
   virtual bool DebugCommand (const char* cmd);
   void DumpZBuffer (const char* path);
 
-  struct eiDebugHelper : public iDebugHelper
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGLGraphics3D);
-    virtual int GetSupportedTests () const
-    { return 0; }
-    virtual csPtr<iString> UnitTest ()
-    { return 0; }
-    virtual csPtr<iString> StateTest ()
-    { return 0; }
-    virtual csTicks Benchmark (int num_iterations)
-    { return 0; }
-    virtual csPtr<iString> Dump ()
-    { return 0; }
-    virtual void Dump (iGraphics3D* g3d)
-    { }
-    virtual bool DebugCommand (const char* cmd)
-    { return scfParent->DebugCommand (cmd); }
-  } scfiDebugHelper;
-
+  virtual int GetSupportedTests () const
+  { return 0; }
+  virtual csPtr<iString> UnitTest ()
+  { return 0; }
+  virtual csPtr<iString> StateTest ()
+  { return 0; }
+  virtual csTicks Benchmark (int num_iterations)
+  { return 0; }
+  virtual csPtr<iString> Dump ()
+  { return 0; }
+  virtual void Dump (iGraphics3D* g3d)
+  { }
 };
 
 #endif // __CS_GL_RENDER3D_H__

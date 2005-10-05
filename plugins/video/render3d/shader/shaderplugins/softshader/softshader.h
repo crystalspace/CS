@@ -20,13 +20,27 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __SOFTSHADER_H__
 #define __SOFTSHADER_H__
 
+#include "iutil/comp.h"
 #include "ivideo/shader/shader.h"
+
+#include "csplugincommon/softshader/renderinterface.h"
+#include "csplugincommon/shader/shaderplugin.h"
+
+#include "scanline.h"
+
+namespace cspluginSoftshader
+{
+
+using namespace CrystalSpace::SoftShader;
 
 class csSoftShader : public iShaderProgramPlugin
 {
-private:
-  static iObjectRegistry* object_reg;
+public:
+  iObjectRegistry* object_reg;
+  ScanlineRendererBase* scanlineRenderer;
+  csRef<iSoftShaderRenderInterface> softSRI;
 
+private:
   bool enable;
 public:
   SCF_DECLARE_IBASE;
@@ -34,8 +48,6 @@ public:
   csSoftShader (iBase *parent);
   virtual ~csSoftShader ();
 
-
-  
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgramPlugin
   ////////////////////////////////////////////////////////////////////
@@ -59,6 +71,8 @@ public:
       { return scfParent->Initialize (reg); }
   } scfiComponent;
 };
+
+} // namespace cspluginSoftshader
 
 #endif //__SOFTSHADER_H__
 

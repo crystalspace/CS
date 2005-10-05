@@ -28,7 +28,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
+
+#include "softshader.h"
 #include "softshader_fp.h"
+
+namespace cspluginSoftshader
+{
 
 SCF_IMPLEMENT_IBASE(csSoftShader_FP)
   SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
@@ -36,10 +41,12 @@ SCF_IMPLEMENT_IBASE_END
 
 void csSoftShader_FP::Activate()
 {
+  shaderPlug->softSRI->SetScanlineRenderer (shaderPlug->scanlineRenderer);
 }
 
 void csSoftShader_FP::Deactivate()
 {
+  shaderPlug->softSRI->SetScanlineRenderer (0);
 }
 
 void csSoftShader_FP::BuildTokenHash()
@@ -54,13 +61,13 @@ void csSoftShader_FP::BuildTokenHash()
 bool csSoftShader_FP::Load (iShaderTUResolver* resolve, iDataBuffer* program)
 {
   csRef<iDocumentSystem> xml (
-    CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+    CS_QUERY_REGISTRY (shaderPlug->object_reg, iDocumentSystem));
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse (program, true);
   if (error != 0)
   { 
-    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, 
+    csReport (shaderPlug->object_reg, CS_REPORTER_SEVERITY_ERROR, 
       "crystalspace.graphics3d.shader.software", "XML error '%s'!", error);
     return false;
   }
@@ -73,10 +80,6 @@ bool csSoftShader_FP::Load (iShaderTUResolver*, iDocumentNode* program)
     return false;
 
   BuildTokenHash();
-
-  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  csRef<iShaderManager> shadermgr = 
-    CS_QUERY_REGISTRY(object_reg, iShaderManager);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("softfp");
   if(variablesnode)
@@ -101,3 +104,5 @@ bool csSoftShader_FP::Compile()
   // @@@ FIXME: Implement this.
   return true;
 }
+
+} // namespace cspluginSoftshader

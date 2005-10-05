@@ -498,8 +498,6 @@ struct csSimpleRenderMesh
   };
 };
 
-SCF_VERSION (iGraphics3D, 5, 6, 0);
-
 /**
  * This is the standard 3D graphics interface.
  * All 3D graphics rasterizer servers for Crystal Space should implement this
@@ -512,10 +510,12 @@ SCF_VERSION (iGraphics3D, 5, 6, 0);
  * - Null 3D Renderer plugin (crystalspace.graphics3d.null)
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry()
  */
-struct iGraphics3D : public iBase
+struct iGraphics3D : public virtual iBase
 {
+  SCF_INTERFACE(iGraphics3D, 2, 0, 0);
+  
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
   /// Close the 3D graphics display.

@@ -167,8 +167,8 @@ void csSoftwareTextureHandle::Blit (int x, int y, int width, int height,
   uint8 *src = (uint8*)data;
 
   int tex_w, tex_h;
-  tex_w = tex0->get_width ();
-  tex_h = tex0->get_height ();
+  tex_w = tex0->w;
+  tex_h = tex0->h;
 
   int blit_w = x+width;
   int blit_h = y+height;
@@ -228,8 +228,8 @@ bool csSoftwareTextureHandle::GetRendererDimensions (int &mw, int &mh)
 {
   PrepareInt ();
   if (!tex[0]) return false;
-  mw = tex[0]->get_width();
-  mh = tex[0]->get_height();
+  mw = tex[0]->w;
+  mh = tex[0]->h;
   return true;
 }
 

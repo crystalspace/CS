@@ -29,10 +29,12 @@ namespace cspluginSoft3d
 {
 
 /// Software 3D renderer
-class csSoftwareGraphics3D : public csSoftwareGraphics3DCommon
+class csSoftwareGraphics3D : 
+  public scfImplementationExt1<csSoftwareGraphics3D,
+			       csSoftwareGraphics3DCommon,
+			       iPluginConfig>
 {
 public:
-  SCF_DECLARE_IBASE_EXT(csSoftwareGraphics3DCommon);
   /// Constructor
   csSoftwareGraphics3D (iBase*);
   /// Destructor
@@ -42,14 +44,10 @@ public:
   /// Open a canvas.
   virtual bool Open ();
 
-  struct eiSoftConfig : public iPluginConfig
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSoftwareGraphics3D);
-    virtual bool GetOptionDescription (int idx, csOptionDescription*);
-    virtual bool SetOption (int id, csVariant* value);
-    virtual bool GetOption (int id, csVariant* value);
-  } scfiPluginConfig;
-  friend struct eiSoftConfig;
+  // --------------------------- iPluginConfig ------------------------------
+  virtual bool GetOptionDescription (int idx, csOptionDescription*);
+  virtual bool SetOption (int id, csVariant* value);
+  virtual bool GetOption (int id, csVariant* value);
 };
 
 } // namespace cspluginSoft3d

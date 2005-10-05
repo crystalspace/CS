@@ -34,6 +34,7 @@
 #include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
 #include "csgfx/shadervarcontext.h"
+#include "csplugincommon/softshader/renderinterface.h"
 #include "csutil/cfgacc.h"
 #include "csutil/cscolor.h"
 #include "iutil/comp.h"
@@ -312,7 +313,11 @@ static const size_t activeTextureCount = 4;
 /**
  * The basic software renderer class.
  */
-class csSoftwareGraphics3DCommon : public iGraphics3D
+class csSoftwareGraphics3DCommon : 
+  public scfImplementation3<csSoftwareGraphics3DCommon, 
+			    iGraphics3D,
+			    iComponent,
+			    iSoftShaderRenderInterface>
 {
 protected:
   //friend class csSoftHalo;
@@ -457,7 +462,7 @@ protected:
   iTextureHandle* activeTex[activeTextureCount];
   csSoftwareTexture* activeSoftTex[activeTextureCount]; 
   csRef<iRenderBuffer> translatedVerts;
-  ScanlineRendererBase* scanlineRenderer;
+  csRef<iScanlineRenderer> scanlineRenderer;
 
   // Structure used for maintaining a stack of clipper portals.
   struct csClipPortal
@@ -472,8 +477,6 @@ protected:
   bool clipportal_dirty;
   int clipportal_floating;
 public:
-  SCF_DECLARE_IBASE;
-
   /// Report
   void Report (int severity, const char* msg, ...);
 
@@ -899,32 +902,29 @@ public:
     unsigned char *, int, int) { return 0; }
   //=========================================================================
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSoftwareGraphics3DCommon);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
-  struct EventHandler : public iEventHandler
+  struct EventHandler : public scfImplementation1<EventHandler, iEventHandler>
   {
   private:
     csSoftwareGraphics3DCommon* parent;
   public:
-    SCF_DECLARE_IBASE;
-    EventHandler (csSoftwareGraphics3DCommon* parent)
+    EventHandler (csSoftwareGraphics3DCommon* parent) : 
+	scfImplementationType (this)
     {
-      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     virtual ~EventHandler ()
     {
-      SCF_DESTRUCT_IBASE();
     }
     virtual bool HandleEvent (iEvent& ev)
     {
       return parent->HandleEvent (ev);
     }
   } * scfiEventHandler;
+
+  /**\name iSoftShaderRenderInterface implementation
+   * @{ */
+  void SetScanlineRenderer (iScanlineRenderer* sr) { scanlineRenderer = sr; }
+  /** @} */
 };
 
 } // namespace cspluginSoft3d

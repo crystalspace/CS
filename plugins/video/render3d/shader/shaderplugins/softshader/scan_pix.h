@@ -17,10 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_SOFT3D_SCAN_PIX_H__
-#define __CS_SOFT3D_SCAN_PIX_H__
+#ifndef __CS_SOFTSHADER_SCAN_PIX_H__
+#define __CS_SOFTSHADER_SCAN_PIX_H__
 
-namespace cspluginSoft3d
+#include "ivideo/graph2d.h"
+
+namespace cspluginSoftshader
 {
   template<typename Pix, 
     int sal, int sar, int ma,
@@ -110,6 +112,6 @@ namespace cspluginSoft3d
 	  | ((r & rMask) >> rShift); 
     }
   };
-} // namespace cspluginSoft3d
+} // namespace cspluginSoftshader
 
-#endif // __CS_SOFT3D_SCAN_PIX_H__
+#endif // __CS_SOFTSHADER_SCAN_PIX_H__

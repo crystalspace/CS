@@ -27,6 +27,7 @@
 
 #include "csutil/cfgacc.h"
 #include "csutil/weakref.h"
+#include "csutil/scf_implementation.h"
 #include "csgeom/plane3.h"
 
 #include "null_txt.h"
@@ -36,45 +37,29 @@ struct iGraphics2D;
 struct iShaderManager;
 struct iBugPlug;
 
-class csNullGraphics3D : public iGraphics3D
+class csNullGraphics3D : public scfImplementation2<csNullGraphics3D, 
+						   iGraphics3D,
+						   iComponent>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   csNullGraphics3D (iBase *parent);
   virtual ~csNullGraphics3D ();
 
   bool Initialize (iObjectRegistry* objreg);
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csNullGraphics3D);
-    bool Initialize (iObjectRegistry* objreg)
-    { return scfParent->Initialize (objreg); }
-  } scfiComponent;
-
-  struct eiShaderRenderInterface : public iShaderRenderInterface
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csNullGraphics3D);
-    void Initialize (iObjectRegistry*) { }
-    void* GetPrivateObject (const char *)
-    { return 0; }
-  } scfiShaderRenderInterface;
 
   bool HandleEvent (iEvent& Event);
-  struct EventHandler : public iEventHandler
+  struct EventHandler : public scfImplementation1<EventHandler,
+						  iEventHandler>
   {
   private:
     csNullGraphics3D* parent;
   public:
-    SCF_DECLARE_IBASE;
-    EventHandler (csNullGraphics3D* parent)
+    EventHandler (csNullGraphics3D* parent) : scfImplementationType (this)
     {
-      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     virtual ~EventHandler ()
     {
-      SCF_DESTRUCT_IBASE ();
     }
     virtual bool HandleEvent (iEvent& ev)
     { return parent->HandleEvent (ev); }

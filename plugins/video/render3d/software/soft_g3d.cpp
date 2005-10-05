@@ -36,19 +36,9 @@ namespace cspluginSoft3d
 
 SCF_IMPLEMENT_FACTORY (csSoftwareGraphics3D)
 
-
-SCF_IMPLEMENT_IBASE_EXT (csSoftwareGraphics3D)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPluginConfig)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSoftwareGraphics3D::eiSoftConfig)
-  SCF_IMPLEMENTS_INTERFACE (iPluginConfig)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csSoftwareGraphics3D::csSoftwareGraphics3D (iBase *iParent)
-  : csSoftwareGraphics3DCommon (iParent)
+  : scfImplementationType (this, iParent)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
   is_for_procedural_textures = false;
   csScan_Initialize ();
 }
@@ -56,7 +46,6 @@ csSoftwareGraphics3D::csSoftwareGraphics3D (iBase *iParent)
 csSoftwareGraphics3D::~csSoftwareGraphics3D ()
 {
   csScan_Finalize ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
 }
 
 bool csSoftwareGraphics3D::Initialize (iObjectRegistry *object_reg)
@@ -125,47 +114,47 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 6, "smaller", "Smaller rendering", CSVAR_BOOL },
 };
 
-bool csSoftwareGraphics3D::eiSoftConfig::SetOption (int id, csVariant* value)
+bool csSoftwareGraphics3D::SetOption (int id, csVariant* value)
 {
   if (value->GetType () != config_options[id].type)
     return false;
   switch (id)
   {
-    case 0: scfParent->do_interlaced = value->GetBool () ? 0 : -1; break;
-    case 1: scfParent->do_lighting = value->GetBool (); break;
-    case 2: scfParent->do_alpha = value->GetBool (); break;
-    case 3: scfParent->do_textured = value->GetBool (); break;
+    case 0: do_interlaced = value->GetBool () ? 0 : -1; break;
+    case 1: do_lighting = value->GetBool (); break;
+    case 2: do_alpha = value->GetBool (); break;
+    case 3: do_textured = value->GetBool (); break;
 #ifdef CS_HAVE_MMX
-    case 4: scfParent->do_mmx = value->GetBool (); break;
+    case 4: do_mmx = value->GetBool (); break;
 #endif
-    case 5: scfParent->do_gouraud = value->GetBool (); break;
-    case 6: scfParent->do_smaller_rendering = value->GetBool (); break;
+    case 5: do_gouraud = value->GetBool (); break;
+    case 6: do_smaller_rendering = value->GetBool (); break;
     default: return false;
   }
   return true;
 }
 
-bool csSoftwareGraphics3D::eiSoftConfig::GetOption (int id, csVariant* value)
+bool csSoftwareGraphics3D::GetOption (int id, csVariant* value)
 {
   switch (id)
   {
-    case 0: value->SetBool (scfParent->do_interlaced != -1); break;
-    case 1: value->SetBool (scfParent->do_lighting); break;
-    case 2: value->SetBool (scfParent->do_alpha); break;
-    case 3: value->SetBool (scfParent->do_textured); break;
+    case 0: value->SetBool (do_interlaced != -1); break;
+    case 1: value->SetBool (do_lighting); break;
+    case 2: value->SetBool (do_alpha); break;
+    case 3: value->SetBool (do_textured); break;
 #ifdef CS_HAVE_MMX
-    case 4: value->SetBool (scfParent->do_mmx); break;
+    case 4: value->SetBool (do_mmx); break;
 #else
     case 4: value->SetBool (false); break;
 #endif
-    case 5: value->SetBool (scfParent->do_gouraud); break;
-    case 6: value->SetBool (scfParent->do_smaller_rendering); break;
+    case 5: value->SetBool (do_gouraud); break;
+    case 6: value->SetBool (do_smaller_rendering); break;
     default: return false;
   }
   return true;
 }
 
-bool csSoftwareGraphics3D::eiSoftConfig::GetOptionDescription
+bool csSoftwareGraphics3D::GetOptionDescription
   (int idx, csOptionDescription* option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS)

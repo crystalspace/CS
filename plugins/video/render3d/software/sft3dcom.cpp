@@ -63,29 +63,17 @@
 namespace cspluginSoft3d
 {
 
+  using namespace CrystalSpace::SoftShader;
+
 int csSoftwareGraphics3DCommon::filter_bf = 1;
 
 #include "scanindex.h"
 
 ///---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csSoftwareGraphics3DCommon)
-  SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSoftwareGraphics3DCommon::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSoftwareGraphics3DCommon::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent)
+csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent) :
+  scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
   //tcache = 0;
   scfiEventHandler = 0;
   texman = 0;
@@ -136,7 +124,6 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent)
 
   memset (activebuffers, 0, sizeof (activebuffers));
   memset (activeTex, 0, sizeof (activeTex));
-  scanlineRenderer = 0;
 
   clipportal_dirty = true;
   clipportal_floating = 0;
@@ -163,11 +150,6 @@ csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
     clipper = 0;
     cliptype = CS_CLIPPER_NONE;
   }
-
-  delete scanlineRenderer;
-
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)
@@ -363,68 +345,6 @@ bool csSoftwareGraphics3DCommon::SharedOpen ()
 
 void csSoftwareGraphics3DCommon::ScanSetup ()
 {
-  if (pfmt.PixelBytes == 4)
-  {
-    if ((pfmt.BlueMask == 0x0000ff)
-      && (pfmt.GreenMask == 0x00ff00)
-      && (pfmt.RedMask == 0xff0000))
-      scanlineRenderer = new ScanlineRenderer<
-	Pix_Fix<uint32, 24, 0, 0xff,
-			16, 0, 0xff,
-			8,  0, 0xff,
-			0,  0, 0xff> > (pfmt);
-    else if ((pfmt.BlueMask == 0xff0000) 
-      && (pfmt.GreenMask == 0x00ff00)
-      && (pfmt.RedMask == 0x0000ff))
-      scanlineRenderer = new ScanlineRenderer<
-	Pix_Fix<uint32, 24, 0, 0xff,
-			0,  0, 0xff,
-			8,  0, 0xff,
-			16, 0, 0xff> > (pfmt);
-    else if (pfmt.RedMask > pfmt.BlueMask)
-      scanlineRenderer = new ScanlineRenderer<Pix_Generic<uint32, 1> > (pfmt);
-    else
-      scanlineRenderer = new ScanlineRenderer<Pix_Generic<uint32, 0> > (pfmt);
-  }
-  else
-  {
-    if ((pfmt.BlueMask == 0xf800)   // BGR 565
-      && (pfmt.GreenMask == 0x07e0)
-      && (pfmt.RedMask == 0x001f))
-      scanlineRenderer = new ScanlineRenderer<
-	Pix_Fix<uint16, 0,  0, 0,
-			0,  3, 0xf8,
-			3,  0, 0xfc,
-			8,  0, 0xf8> > (pfmt);
-    else if ((pfmt.RedMask == 0xf800) // RGB 565
-      && (pfmt.GreenMask == 0x07e0)
-      && (pfmt.BlueMask == 0x001f))
-      scanlineRenderer = new ScanlineRenderer<
-	Pix_Fix<uint16, 0,  0, 0,
-			8,  0, 0xf8,
-			3,  0, 0xfc,
-			0,  3, 0xf8> > (pfmt);
-    else if ((pfmt.BlueMask == 0x7c00) // BGR 555
-      && (pfmt.GreenMask == 0x03e0)
-      && (pfmt.RedMask == 0x001f))
-      scanlineRenderer = new ScanlineRenderer<
-	Pix_Fix<uint16, 0,  0, 0,
-			0,  3, 0xf8,
-			2,  0, 0xf8,
-			7,  0, 0xf8> > (pfmt);
-    else if ((pfmt.RedMask == 0x7c00) // RGB 555
-      && (pfmt.GreenMask == 0x03e0)
-      && (pfmt.BlueMask == 0x001f))
-      scanlineRenderer = new ScanlineRenderer<
-	Pix_Fix<uint16, 0,  0, 0,
-			7,  0, 0xf8,
-			2,  0, 0xf8,
-			0,  3, 0xf8> > (pfmt);
-    else if (pfmt.RedMask > pfmt.BlueMask)
-      scanlineRenderer = new ScanlineRenderer<Pix_Generic<uint16, 1> > (pfmt);
-    else
-      scanlineRenderer = new ScanlineRenderer<Pix_Generic<uint16, 0> > (pfmt);
-  }
 }
 
 #if 0
@@ -3285,7 +3205,7 @@ class TriangleDrawer
   BuffersMask buffersMask;
   const csCoreRenderMesh* mesh;
   const csRenderMeshModes& modes;
-  ScanlineRenderInfo& scanRenderInfo;
+  iScanlineRenderer::RenderInfo& scanRenderInfo;
   size_t floatsPerVert;
 
   static const int outFloatsPerBuf = 16;
@@ -3447,7 +3367,7 @@ public:
     iRenderBuffer* activebuffers[], size_t rangeStart, 
     size_t rangeEnd, const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes, 
-    ScanlineRenderInfo& scanRenderInfo) : g3d(g3d), 
+    iScanlineRenderer::RenderInfo& scanRenderInfo) : g3d(g3d), 
     activebuffers(activebuffers), mesh(mesh), modes(modes), 
     scanRenderInfo(scanRenderInfo), bclipperZNear(clipZNear)
   {
@@ -3466,7 +3386,7 @@ public:
       }
       if (activebuffers[b] == 0) continue;
       buffersMask |= 1 << b;
-      if ((b != CS_VATTR_BUFINDEX(POSITION)) 
+      if ((b != CS_SOFT3D_VA_BUFINDEX(POSITION)) 
 	&& !(scanRenderInfo.desiredBuffers & (1 << b))) continue;
 
       iRenderBuffer* buf = activebuffers[b];
@@ -3483,7 +3403,7 @@ public:
     bclipperZNear.Init (persp->GetArray(), outPersp,
       clipInBuf, clipInStride, clipOutBuf, 
       (buffersMask & scanRenderInfo.desiredBuffers) 
-	| (CS_BUFFERFLAG(POSITION)));
+	| (CS_SOFT3D_BUFFERFLAG(POSITION)));
   }
 
   ~TriangleDrawer()
@@ -3554,8 +3474,11 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     buffersMask |= 1 << b;
   }
 
-  ScanlineRenderInfo meowmix;
-  if (!scanlineRenderer->Init (activeSoftTex, usedModes, buffersMask, meowmix))
+  iScanlineRenderer::RenderInfo meowmix;
+  SoftwareTexture* softTex[activeTextureCount];
+  for (size_t t = 0; t < activeTextureCount; t++)
+    softTex[t] = activeSoftTex[t];
+  if (!scanlineRenderer->Init (softTex, usedModes, buffersMask, meowmix)) 
     return; // Drat, meowmix can't deliver.
 
   if (!persp)

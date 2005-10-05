@@ -57,9 +57,9 @@ public:
     const float com_iz = aspect * com_zv;
     csVector4 v;
 
-    const VertexBuffer& bPos = inBuffers[CS_VATTR_BUFINDEX(POSITION)];
-    const size_t bPosStride = inStrides[CS_VATTR_BUFINDEX(POSITION)];
-    VertexOutputBase& voutPos = vout[CS_VATTR_BUFINDEX(POSITION)];
+    const VertexBuffer& bPos = inBuffers[CS_SOFT3D_VA_BUFINDEX(POSITION)];
+    const size_t bPosStride = inStrides[CS_SOFT3D_VA_BUFINDEX(POSITION)];
+    VertexOutputBase& voutPos = vout[CS_SOFT3D_VA_BUFINDEX(POSITION)];
     const csVector3& va = *(csVector3*)(bPos.data + tri.a * bPosStride);
     const csVector3& vb = *(csVector3*)(bPos.data + tri.b * bPosStride);
     const csVector3& vc = *(csVector3*)(bPos.data + tri.c * bPosStride);

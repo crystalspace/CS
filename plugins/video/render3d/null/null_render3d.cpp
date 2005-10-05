@@ -44,30 +44,9 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csNullGraphics3D)
 
-SCF_IMPLEMENT_IBASE (csNullGraphics3D)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShaderRenderInterface)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNullGraphics3D::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNullGraphics3D::eiShaderRenderInterface)
-  SCF_IMPLEMENTS_INTERFACE (iShaderRenderInterface)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csNullGraphics3D::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-csNullGraphics3D::csNullGraphics3D (iBase *iParent)
+csNullGraphics3D::csNullGraphics3D (iBase *iParent) : 
+  scfImplementationType (this, iParent)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiShaderRenderInterface);
-
   scfiEventHandler = 0;
   txtmgr = 0;
 
@@ -97,8 +76,6 @@ csNullGraphics3D::~csNullGraphics3D ()
     scfiEventHandler = 0;
   }
   Close ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csNullGraphics3D::Initialize (iObjectRegistry* objreg)

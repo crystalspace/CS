@@ -17,17 +17,37 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_SOFT3D_TYPES_H__
-#define __CS_SOFT3D_TYPES_H__
+#ifndef __CS_CSPLUGINCOMMON_SOFTSHADER_RENDERINTERFACE_H__
+#define __CS_CSPLUGINCOMMON_SOFTSHADER_RENDERINTERFACE_H__
 
-namespace cspluginSoft3d
+/**\file
+ * Software renderer shader interface
+ */
+ 
+/**\addtogroup plugincommon
+ * @{ */
+
+namespace CrystalSpace
 {
-  /// A buffer used to pass vertex data around in the renderer
-  struct VertexBuffer
+  namespace SoftShader
   {
-    uint8* data;
-    size_t comp;
-  };
-} // namespace cspluginSoft3d
+    struct iScanlineRenderer;
+    
+    /**
+     * Interface specific to the software renderer to allow shaders to
+     * communicate with it.
+     */
+    struct iSoftShaderRenderInterface : public virtual iBase
+    {
+    public:
+      SCF_INTERFACE(iSoftShaderRenderInterface, 0, 0, 1);
+    
+      virtual void SetScanlineRenderer (iScanlineRenderer* sr) = 0;
+    };
+   
+  } // namespace SoftShader
+} // namespace CrystalSpace
 
-#endif // __CS_SOFT3D_TYPES_H__
+/** @} */
+
+#endif // __CS_CSPLUGINCOMMON_SOFTSHADER_RENDERINTERFACE_H__

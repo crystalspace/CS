@@ -17,11 +17,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_SOFT3D_SCAN_Z_H__
-#define __CS_SOFT3D_SCAN_Z_H__
+#ifndef __CS_SOFTSHADER_SCAN_Z_H__
+#define __CS_SOFTSHADER_SCAN_Z_H__
 
-namespace cspluginSoft3d
+namespace cspluginSoftshader
 {
+  using namespace CrystalSpace::SoftShader;
+
   struct ZBufMode_ZNone
   {
     ZBufMode_ZNone (const InterpolateScanlinePerspCommon& /*ipol*/, 
@@ -96,6 +98,6 @@ namespace cspluginSoft3d
     void Update () { }
     void Advance () { zBuff++; }
   };
-} // namespace cspluginSoft3d
+} // namespace cspluginSoftshader
 
-#endif // __CS_SOFT3D_SCAN_Z_H__
+#endif // __CS_SOFTSHADER_SCAN_Z_H__

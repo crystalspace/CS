@@ -206,15 +206,6 @@ struct iShaderManager : public iShaderVariableContext
   virtual const csArray<iLight*>& GetActiveLights () const = 0;
 };
 
-SCF_VERSION (iShaderRenderInterface, 0,0,1);
-
-/// Document me!@@@
-struct iShaderRenderInterface : public iBase
-{
-  /// Get a implementationspecific object
-  virtual void* GetPrivateObject(const char* name) = 0;
-};
-
 /**
  * Shader metadata.
  * This struct holds shader metadata such as how many lights per pass

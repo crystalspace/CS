@@ -239,10 +239,10 @@ void csScan_InitDraw (int MipMap, csSoftwareGraphics3DCommon* g3d,
 void csScan_InitDrawFX (csSoftwareTextureHandle* texture,
         csSoftwareTexture *untxt)
 {
-  Scan.shf_w = untxt->get_w_shift ();
-  Scan.and_w = untxt->get_w_mask ();
-  Scan.shf_h = untxt->get_h_shift ();
-  Scan.and_h = untxt->get_h_mask ();
+  Scan.shf_w = untxt->shf_w;
+  Scan.and_w = untxt->and_w;
+  Scan.shf_h = untxt->shf_h;
+  Scan.and_h = untxt->and_h;
 }
 
 } // namespace cspluginSoft3d

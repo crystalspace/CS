@@ -67,10 +67,10 @@ static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
   csSoftwareTextureHandle *tex_mm = (csSoftwareTextureHandle *)hTex->GetPrivateObject ();
   csSoftwareTexture *txt_unl = (csSoftwareTexture *)tex_mm->GetTexture (0);
 
-  int bw = txt_unl->get_width ();
-  int bh = txt_unl->get_height ();
+  int bw = txt_unl->w;
+  int bh = txt_unl->h;
 
-  uint32* bitmap = txt_unl->get_bitmap ();
+  uint32* bitmap = txt_unl->bitmap;
 
   /// Retrieve clipping rectangle
   int ClipX1, ClipY1, ClipX2, ClipY2;

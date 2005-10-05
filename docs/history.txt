@@ -31,6 +31,9 @@ chronological order.
 	- Piotr Obrzut added check for sphere colliders in odedynam if given 
 	  radius is greater than 0 (if it is lower ODE will send his nasty 'bad 
 	  argument' error notification, stopping all app)
+	- res changed the renderers to use new SCF.
+	- res moved the SR scanline rendering code into the softshader plugin.
+	- res fixed the software techniques of the reflect* shaders.
 4-Oct-2005
 	- Jorrit renamed -nolightmapping to -fullbright and also implemented
 	  it in the bruteblock terrain engine and in genmesh (in addition
