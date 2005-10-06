@@ -4553,6 +4553,58 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csFog ##############
+
+package cspace::csFog;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_enabled_get = *cspacec::csFog_enabled_get;
+*swig_enabled_set = *cspacec::csFog_enabled_set;
+*swig_density_get = *cspacec::csFog_density_get;
+*swig_density_set = *cspacec::csFog_density_set;
+*swig_red_get = *cspacec::csFog_red_get;
+*swig_red_set = *cspacec::csFog_red_set;
+*swig_green_get = *cspacec::csFog_green_get;
+*swig_green_set = *cspacec::csFog_green_set;
+*swig_blue_get = *cspacec::csFog_blue_get;
+*swig_blue_set = *cspacec::csFog_blue_set;
+*swig_start_get = *cspacec::csFog_start_get;
+*swig_start_set = *cspacec::csFog_start_set;
+*swig_end_get = *cspacec::csFog_end_get;
+*swig_end_set = *cspacec::csFog_end_set;
+*swig_mode_get = *cspacec::csFog_mode_get;
+*swig_mode_set = *cspacec::csFog_mode_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csFog(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csFog($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iSectorCallback ##############
 
 package cspace::iSectorCallback;
@@ -10254,58 +10306,6 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csFog ##############
-
-package cspace::csFog;
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-*swig_enabled_get = *cspacec::csFog_enabled_get;
-*swig_enabled_set = *cspacec::csFog_enabled_set;
-*swig_density_get = *cspacec::csFog_density_get;
-*swig_density_set = *cspacec::csFog_density_set;
-*swig_red_get = *cspacec::csFog_red_get;
-*swig_red_set = *cspacec::csFog_red_set;
-*swig_green_get = *cspacec::csFog_green_get;
-*swig_green_set = *cspacec::csFog_green_set;
-*swig_blue_get = *cspacec::csFog_blue_get;
-*swig_blue_set = *cspacec::csFog_blue_set;
-*swig_start_get = *cspacec::csFog_start_get;
-*swig_start_set = *cspacec::csFog_start_set;
-*swig_end_get = *cspacec::csFog_end_get;
-*swig_end_set = *cspacec::csFog_end_set;
-*swig_mode_get = *cspacec::csFog_mode_get;
-*swig_mode_set = *cspacec::csFog_mode_set;
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csFog(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csFog($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : cspace::csAlphaMode ##############
 
 package cspace::csAlphaMode;
@@ -10903,37 +10903,6 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iShaderManager_scfGetVersion;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iShaderRenderInterface ##############
-
-package cspace::iShaderRenderInterface;
-@ISA = qw( cspace cspace::iBase );
-%OWNER = ();
-%ITERATORS = ();
-*GetPrivateObject = *cspacec::iShaderRenderInterface_GetPrivateObject;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_iShaderRenderInterface($self);
-        delete $OWNER{$self};
-    }
-}
-
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -12589,6 +12558,9 @@ package cspace::iDynamicsSystemCollider;
 *GetSphereGeometry = *cspacec::iDynamicsSystemCollider_GetSphereGeometry;
 *GetPlaneGeometry = *cspacec::iDynamicsSystemCollider_GetPlaneGeometry;
 *GetCylinderGeometry = *cspacec::iDynamicsSystemCollider_GetCylinderGeometry;
+*MakeStatic = *cspacec::iDynamicsSystemCollider_MakeStatic;
+*MakeDynamic = *cspacec::iDynamicsSystemCollider_MakeDynamic;
+*IsStatic = *cspacec::iDynamicsSystemCollider_IsStatic;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -14180,6 +14152,10 @@ sub CS_ATTN_CLQ () { $cspacec::CS_ATTN_CLQ }
 sub CS_LIGHT_POINTLIGHT () { $cspacec::CS_LIGHT_POINTLIGHT }
 sub CS_LIGHT_DIRECTIONAL () { $cspacec::CS_LIGHT_DIRECTIONAL }
 sub CS_LIGHT_SPOTLIGHT () { $cspacec::CS_LIGHT_SPOTLIGHT }
+sub CS_FOG_MODE_NONE () { $cspacec::CS_FOG_MODE_NONE }
+sub CS_FOG_MODE_LINEAR () { $cspacec::CS_FOG_MODE_LINEAR }
+sub CS_FOG_MODE_EXP () { $cspacec::CS_FOG_MODE_EXP }
+sub CS_FOG_MODE_EXP2 () { $cspacec::CS_FOG_MODE_EXP2 }
 sub CS_ENGINE_CACHE_READ () { $cspacec::CS_ENGINE_CACHE_READ }
 sub CS_ENGINE_CACHE_WRITE () { $cspacec::CS_ENGINE_CACHE_WRITE }
 sub CS_ENGINE_CACHE_NOUPDATE () { $cspacec::CS_ENGINE_CACHE_NOUPDATE }
@@ -14412,15 +14388,10 @@ sub CS_CLIPPER_TOPLEVEL () { $cspacec::CS_CLIPPER_TOPLEVEL }
 sub CS_CLIPPER_REQUIRED () { $cspacec::CS_CLIPPER_REQUIRED }
 sub CS_CLIP_NOT () { $cspacec::CS_CLIP_NOT }
 sub CS_CLIP_NEEDED () { $cspacec::CS_CLIP_NEEDED }
-sub CS_FOG_MODE_NONE () { $cspacec::CS_FOG_MODE_NONE }
-sub CS_FOG_MODE_LINEAR () { $cspacec::CS_FOG_MODE_LINEAR }
-sub CS_FOG_MODE_EXP () { $cspacec::CS_FOG_MODE_EXP }
-sub CS_FOG_MODE_EXP2 () { $cspacec::CS_FOG_MODE_EXP2 }
 sub CS_ZBUF_NONE () { $cspacec::CS_ZBUF_NONE }
 sub CS_ZBUF_FILL () { $cspacec::CS_ZBUF_FILL }
 sub CS_ZBUF_TEST () { $cspacec::CS_ZBUF_TEST }
 sub CS_ZBUF_USE () { $cspacec::CS_ZBUF_USE }
-sub CS_ZBUF_FILLONLY () { $cspacec::CS_ZBUF_FILLONLY }
 sub CS_ZBUF_EQUAL () { $cspacec::CS_ZBUF_EQUAL }
 sub CS_ZBUF_INVERT () { $cspacec::CS_ZBUF_INVERT }
 sub CS_ZBUF_MESH () { $cspacec::CS_ZBUF_MESH }
