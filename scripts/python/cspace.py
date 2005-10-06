@@ -3992,6 +3992,57 @@ class iLightIteratorPtr(iLightIterator):
         _swig_setattr(self, iLightIterator,self.__class__,iLightIterator)
 _cspace.iLightIterator_swigregister(iLightIteratorPtr)
 
+CS_FOG_MODE_NONE = _cspace.CS_FOG_MODE_NONE
+CS_FOG_MODE_LINEAR = _cspace.CS_FOG_MODE_LINEAR
+CS_FOG_MODE_EXP = _cspace.CS_FOG_MODE_EXP
+CS_FOG_MODE_EXP2 = _cspace.CS_FOG_MODE_EXP2
+class csFog(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csFog, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csFog, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csFog instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_setmethods__["enabled"] = _cspace.csFog_enabled_set
+    __swig_getmethods__["enabled"] = _cspace.csFog_enabled_get
+    if _newclass:enabled = property(_cspace.csFog_enabled_get, _cspace.csFog_enabled_set)
+    __swig_setmethods__["density"] = _cspace.csFog_density_set
+    __swig_getmethods__["density"] = _cspace.csFog_density_get
+    if _newclass:density = property(_cspace.csFog_density_get, _cspace.csFog_density_set)
+    __swig_setmethods__["red"] = _cspace.csFog_red_set
+    __swig_getmethods__["red"] = _cspace.csFog_red_get
+    if _newclass:red = property(_cspace.csFog_red_get, _cspace.csFog_red_set)
+    __swig_setmethods__["green"] = _cspace.csFog_green_set
+    __swig_getmethods__["green"] = _cspace.csFog_green_get
+    if _newclass:green = property(_cspace.csFog_green_get, _cspace.csFog_green_set)
+    __swig_setmethods__["blue"] = _cspace.csFog_blue_set
+    __swig_getmethods__["blue"] = _cspace.csFog_blue_get
+    if _newclass:blue = property(_cspace.csFog_blue_get, _cspace.csFog_blue_set)
+    __swig_setmethods__["start"] = _cspace.csFog_start_set
+    __swig_getmethods__["start"] = _cspace.csFog_start_get
+    if _newclass:start = property(_cspace.csFog_start_get, _cspace.csFog_start_set)
+    __swig_setmethods__["end"] = _cspace.csFog_end_set
+    __swig_getmethods__["end"] = _cspace.csFog_end_get
+    if _newclass:end = property(_cspace.csFog_end_get, _cspace.csFog_end_set)
+    __swig_setmethods__["mode"] = _cspace.csFog_mode_set
+    __swig_getmethods__["mode"] = _cspace.csFog_mode_get
+    if _newclass:mode = property(_cspace.csFog_mode_get, _cspace.csFog_mode_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csFog, 'this', _cspace.new_csFog(*args))
+        _swig_setattr(self, csFog, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csFog):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csFogPtr(csFog):
+    def __init__(self, this):
+        _swig_setattr(self, csFog, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csFog, 'thisown', 0)
+        _swig_setattr(self, csFog,self.__class__,csFog)
+_cspace.csFog_swigregister(csFogPtr)
+
 class iSectorCallback(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -9224,62 +9275,10 @@ CS_CLIPPER_TOPLEVEL = _cspace.CS_CLIPPER_TOPLEVEL
 CS_CLIPPER_REQUIRED = _cspace.CS_CLIPPER_REQUIRED
 CS_CLIP_NOT = _cspace.CS_CLIP_NOT
 CS_CLIP_NEEDED = _cspace.CS_CLIP_NEEDED
-CS_FOG_MODE_NONE = _cspace.CS_FOG_MODE_NONE
-CS_FOG_MODE_LINEAR = _cspace.CS_FOG_MODE_LINEAR
-CS_FOG_MODE_EXP = _cspace.CS_FOG_MODE_EXP
-CS_FOG_MODE_EXP2 = _cspace.CS_FOG_MODE_EXP2
-class csFog(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csFog, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csFog, name)
-    def __repr__(self):
-        return "<%s.%s; proxy of C++ csFog instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    __swig_setmethods__["enabled"] = _cspace.csFog_enabled_set
-    __swig_getmethods__["enabled"] = _cspace.csFog_enabled_get
-    if _newclass:enabled = property(_cspace.csFog_enabled_get, _cspace.csFog_enabled_set)
-    __swig_setmethods__["density"] = _cspace.csFog_density_set
-    __swig_getmethods__["density"] = _cspace.csFog_density_get
-    if _newclass:density = property(_cspace.csFog_density_get, _cspace.csFog_density_set)
-    __swig_setmethods__["red"] = _cspace.csFog_red_set
-    __swig_getmethods__["red"] = _cspace.csFog_red_get
-    if _newclass:red = property(_cspace.csFog_red_get, _cspace.csFog_red_set)
-    __swig_setmethods__["green"] = _cspace.csFog_green_set
-    __swig_getmethods__["green"] = _cspace.csFog_green_get
-    if _newclass:green = property(_cspace.csFog_green_get, _cspace.csFog_green_set)
-    __swig_setmethods__["blue"] = _cspace.csFog_blue_set
-    __swig_getmethods__["blue"] = _cspace.csFog_blue_get
-    if _newclass:blue = property(_cspace.csFog_blue_get, _cspace.csFog_blue_set)
-    __swig_setmethods__["start"] = _cspace.csFog_start_set
-    __swig_getmethods__["start"] = _cspace.csFog_start_get
-    if _newclass:start = property(_cspace.csFog_start_get, _cspace.csFog_start_set)
-    __swig_setmethods__["end"] = _cspace.csFog_end_set
-    __swig_getmethods__["end"] = _cspace.csFog_end_get
-    if _newclass:end = property(_cspace.csFog_end_get, _cspace.csFog_end_set)
-    __swig_setmethods__["mode"] = _cspace.csFog_mode_set
-    __swig_getmethods__["mode"] = _cspace.csFog_mode_get
-    if _newclass:mode = property(_cspace.csFog_mode_get, _cspace.csFog_mode_set)
-    def __init__(self, *args):
-        _swig_setattr(self, csFog, 'this', _cspace.new_csFog(*args))
-        _swig_setattr(self, csFog, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_csFog):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-
-class csFogPtr(csFog):
-    def __init__(self, this):
-        _swig_setattr(self, csFog, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, csFog, 'thisown', 0)
-        _swig_setattr(self, csFog,self.__class__,csFog)
-_cspace.csFog_swigregister(csFogPtr)
-
 CS_ZBUF_NONE = _cspace.CS_ZBUF_NONE
 CS_ZBUF_FILL = _cspace.CS_ZBUF_FILL
 CS_ZBUF_TEST = _cspace.CS_ZBUF_TEST
 CS_ZBUF_USE = _cspace.CS_ZBUF_USE
-CS_ZBUF_FILLONLY = _cspace.CS_ZBUF_FILLONLY
 CS_ZBUF_EQUAL = _cspace.CS_ZBUF_EQUAL
 CS_ZBUF_INVERT = _cspace.CS_ZBUF_INVERT
 CS_ZBUF_MESH = _cspace.CS_ZBUF_MESH
@@ -9923,30 +9922,6 @@ class iShaderManagerPtr(iShaderManager):
 _cspace.iShaderManager_swigregister(iShaderManagerPtr)
 
 iShaderManager_scfGetVersion = _cspace.iShaderManager_scfGetVersion
-
-class iShaderRenderInterface(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderRenderInterface, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iShaderRenderInterface, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<%s.%s; proxy of C++ iShaderRenderInterface instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def GetPrivateObject(*args): return _cspace.iShaderRenderInterface_GetPrivateObject(*args)
-    def __del__(self, destroy=_cspace.delete_iShaderRenderInterface):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-
-class iShaderRenderInterfacePtr(iShaderRenderInterface):
-    def __init__(self, this):
-        _swig_setattr(self, iShaderRenderInterface, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iShaderRenderInterface, 'thisown', 0)
-        _swig_setattr(self, iShaderRenderInterface,self.__class__,iShaderRenderInterface)
-_cspace.iShaderRenderInterface_swigregister(iShaderRenderInterfacePtr)
 
 class csShaderMetadata(_object):
     __swig_setmethods__ = {}
@@ -11423,6 +11398,9 @@ class iDynamicsSystemCollider(iBase):
     def GetSphereGeometry(*args): return _cspace.iDynamicsSystemCollider_GetSphereGeometry(*args)
     def GetPlaneGeometry(*args): return _cspace.iDynamicsSystemCollider_GetPlaneGeometry(*args)
     def GetCylinderGeometry(*args): return _cspace.iDynamicsSystemCollider_GetCylinderGeometry(*args)
+    def MakeStatic(*args): return _cspace.iDynamicsSystemCollider_MakeStatic(*args)
+    def MakeDynamic(*args): return _cspace.iDynamicsSystemCollider_MakeDynamic(*args)
+    def IsStatic(*args): return _cspace.iDynamicsSystemCollider_IsStatic(*args)
     def __del__(self, destroy=_cspace.delete_iDynamicsSystemCollider):
         try:
             if self.thisown: destroy(self)
