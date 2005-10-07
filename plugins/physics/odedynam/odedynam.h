@@ -292,7 +292,7 @@ private:
   csRefArray<csODEBodyGroup> groups;
   csRefArray<csODEJoint> joints;
   csRefArray<csStrictODEJoint> strict_joints;
-  //here are all colliders not attached to bodies
+  //here are all colliders
   csRefArray<iDynamicsSystemCollider> colliders;
 
   bool rateenabled;
@@ -595,7 +595,7 @@ class csODERigidBody;
  */
 class csODEBodyGroup : public iBodyGroup
 {
-  csRefArray<iRigidBody> bodies;
+  csRefArrayObject<iRigidBody> bodies;
 
   csODEDynamicSystem* system;
 

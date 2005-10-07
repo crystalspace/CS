@@ -1248,10 +1248,12 @@ csOrthoTransform csODECollider::GetTransform ()
 }
 void csODECollider::AddTransformToSpace (dSpaceID spaceID)
 {
-  dSpaceID gspace = dGeomGetSpace (geomID);
-  if (gspace)
-    dSpaceRemove (gspace, geomID);
-
+  if (geomID)
+  {
+    dSpaceID gspace = dGeomGetSpace (geomID);
+    if (gspace)
+      dSpaceRemove (gspace, geomID);
+  }
   if (geomID && !dGeomTransformGetGeom(transformID))
     dGeomTransformSetGeom (transformID, geomID);
   dSpaceID prev = dGeomGetSpace (transformID);
