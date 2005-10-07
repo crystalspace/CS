@@ -114,7 +114,8 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
     # AC_CHECK_HEADER(), which causes it to test compile the header only (which
     # is a more robust test), rather than also testing it via the preprocessor.
 
-    AC_DEFINE([__CARBONSOUND__])
+    AC_DEFINE([__CARBONSOUND__], [],
+	[Avoid problem caused by missing <Carbon/CarbonSound.h>])
     AC_CHECK_HEADER([Carbon/Carbon.h],
 	[cs_host_macosx=yes], [cs_host_macosx=no], [/* force compile */])
 
