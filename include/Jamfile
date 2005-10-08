@@ -43,6 +43,7 @@ CS_MASTER_HEADER_REJECTS =
 CS_MASTER_HEADER_REJECTS +=
   [ ConcatDirs csgeom cspoint.h      ]
   [ ConcatDirs csgeom fastsqrt.h     ]
+  [ ConcatDirs csgeom quaterni.h     ]
   [ ConcatDirs csgeom subrec2.h      ]
   [ ConcatDirs csutil garray.h       ]
   [ ConcatDirs csutil hashhandlers.h ]

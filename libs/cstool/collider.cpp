@@ -22,6 +22,7 @@
 #include "csqsqrt.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polymesh.h"
+#include "csgeom/quaternion.h"
 #include "csgeom/transfrm.h"
 #include "cstool/collider.h"
 
@@ -562,6 +563,28 @@ void csColliderActor::InitializeColliders (iCamera* camera,
   movable = 0;
   csColliderActor::camera = camera;
   InitializeColliders (legs, body, shift);
+}
+
+void csColliderActor::SetCamera (iCamera* camera, bool adjustRotation)
+{ 
+  this->camera = camera; 
+  if (adjustRotation)
+  {
+    csQuaternion quat (camera->GetTransform().GetT2O());
+    quat.GetEulerAngles (rotation, true);
+    // Angle fixups.
+    /* @@@ FIXME: Are those right in the math sense or do they indicate
+     * csQuaternion bugs? */
+    if ((ABS(rotation.z - PI) < EPSILON)
+      || (ABS(rotation.z + PI) < EPSILON))
+    {
+      rotation.x = PI-rotation.x;
+      rotation.y = PI-rotation.y;
+      rotation.z = 0;
+    }
+    else
+      rotation.x = -rotation.x;
+  }
 }
 
 #if 0

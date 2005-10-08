@@ -344,7 +344,7 @@ private:
   iEngine* engine;
   csVector3 velWorld;
 
-  // For rotation.
+  /// For rotation - Euler angles in radians
   csVector3 rotation;
 
   csRef<iCollider> topCollider;
@@ -440,11 +440,14 @@ public:
 
   /**
    * Change the current camera.
+   * \param camera New current camera
+   * \param adjustRotation Whether to retrieve the current rotation from
+   *  the camera.
    */
-  void SetCamera (iCamera* camera) { csColliderActor::camera = camera; }
+  void SetCamera (iCamera* camera, bool adjustRotation = true);
 
   /**
-   * Set gravity. Default 9.806.
+   * Set gravity. Terran default is 9.806.
    */
   void SetGravity (float g)
   {

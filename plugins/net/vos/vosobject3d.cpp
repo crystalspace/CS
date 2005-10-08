@@ -28,7 +28,7 @@
 #include "imesh/thing.h"
 #include "csgeom/vector3.h"
 #include "csgeom/matrix3.h"
-#include "csgeom/quaterni.h"
+#include "csgeom/quaternion.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 

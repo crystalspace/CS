@@ -20,7 +20,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/sysfunc.h"
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
-#include "csgeom/quaterni.h"
+#include "csgeom/quaternion.h"
 #include "csgeom/transfrm.h"
 #include "csutil/scanstr.h"
 #include "csutil/util.h"

@@ -551,6 +551,12 @@ public:
     float dyn_radius);
   void del_bot ();
   void move_bots (csTicks);
+
+  //@{
+  /// Save/load camera functions
+  void SaveCamera (const char *fName);
+  bool LoadCamera (const char *fName);
+  //@}
 };
 
 extern csVector2 coord_check_vector;
@@ -561,9 +567,6 @@ extern csVector2 coord_check_vector;
 extern void perf_test (int num);
 extern void CaptureScreen ();
 extern void free_keymap ();
-
-extern void SaveCamera (iVFS*, const char *fName);
-extern bool LoadCamera (iVFS*, const char *fName);
 
 // Use a view's clipping rect to calculate a bounding box
 void BoundingBoxForView(iView *view, csBox2 *box);

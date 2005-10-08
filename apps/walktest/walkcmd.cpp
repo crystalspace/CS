@@ -229,10 +229,10 @@ void LoadRecording (iVFS* vfs, const char* fName)
 }
 
 /// Save/load camera functions
-void SaveCamera (iVFS* vfs, const char *fName)
+void WalkTest::SaveCamera (const char *fName)
 {
-  if (!Sys->view) return;
-  iCamera *c = Sys->view->GetCamera ();
+  if (!view) return;
+  iCamera *c = view->GetCamera ();
   csOrthoTransform& camtrans = c->GetTransform ();
   if (!c) return;
   const csMatrix3& m_o2t = camtrans.GetO2T ();
@@ -244,20 +244,20 @@ void SaveCamera (iVFS* vfs, const char *fName)
     << m_o2t.m31 << ' ' << m_o2t.m32 << ' ' << m_o2t.m33 << '\n'
     << '"' << c->GetSector ()->QueryObject ()->GetName () << "\"\n"
     << c->IsMirrored () << '\n';
-  vfs->WriteFile (fName, s.GetData(), s.Length());
+  myVFS->WriteFile (fName, s.GetData(), s.Length());
 }
 
-bool LoadCamera (iVFS* vfs, const char *fName)
+bool WalkTest::LoadCamera (const char *fName)
 {
   bool ok = true;
 #define IFFAIL(x) if (ok && !(ok = (x)))
-  IFFAIL (vfs->Exists (fName))
-    Sys->Report (CS_REPORTER_SEVERITY_ERROR,
-		 "Could not open camera file '%s'!", fName);
+  IFFAIL (myVFS->Exists (fName))
+    Report (CS_REPORTER_SEVERITY_ERROR,
+	    "Could not open camera file '%s'!", fName);
   csRef<iDataBuffer> data;
-  IFFAIL ((data = vfs->ReadFile(fName)) != 0)
-    Sys->Report (CS_REPORTER_SEVERITY_ERROR,
-		 "Could not read camera file '%s'!", fName);
+  IFFAIL ((data = myVFS->ReadFile(fName)) != 0)
+    Report (CS_REPORTER_SEVERITY_ERROR,
+	    "Could not read camera file '%s'!", fName);
   csMatrix3 m;
   csVector3 v;
   int imirror = false;
@@ -278,21 +278,22 @@ bool LoadCamera (iVFS* vfs, const char *fName)
 			   &m.m31, &m.m32, &m.m33,
 			   sector_name,
 			   &imirror))
-    Sys->Report (CS_REPORTER_SEVERITY_ERROR,
-		 "Wrong format for camera file '%s'", fName);
+    Report (CS_REPORTER_SEVERITY_ERROR,
+	    "Wrong format for camera file '%s'", fName);
   iSector* s = 0;
-  IFFAIL ((s = Sys->Engine->GetSectors ()->FindByName (sector_name)) != 0)
-    Sys->Report (CS_REPORTER_SEVERITY_ERROR,
-		 "Sector `%s' in coordinate file does not "
-		 "exist in this map!", sector_name);
+  IFFAIL ((s = Engine->GetSectors ()->FindByName (sector_name)) != 0)
+    Report (CS_REPORTER_SEVERITY_ERROR,
+	    "Sector `%s' in coordinate file does not "
+	    "exist in this map!", sector_name);
   if (ok)
   {
-    iCamera *c = Sys->view->GetCamera ();
+    iCamera *c = view->GetCamera ();
     c->SetSector (s);
     c->SetMirrored ((bool)imirror);
     c->GetTransform ().SetO2T (m);
     c->GetTransform ().SetOrigin (v);
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Camera loaded");
+    collider_actor.SetCamera (c);
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Camera loaded");
   }
   delete[] sector_name;
   return true;
@@ -1071,7 +1072,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Saving camera to /tmp/walktest.cam");
-    SaveCamera (Sys->myVFS, "/tmp/walktest.cam");
+    Sys->SaveCamera ("/tmp/walktest.cam");
   }
   else if (!csStrCaseCmp (cmd, "coordload"))
   {
@@ -1079,7 +1080,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (!Sys->myVFS->Exists(s))
       s = "/varia/walktest.cam";         // Potentially read-only.
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading camera from %s", s);
-    LoadCamera (Sys->myVFS, s);
+    Sys->LoadCamera (s);
   }
   else if (!csStrCaseCmp (cmd, "plugins"))
   {

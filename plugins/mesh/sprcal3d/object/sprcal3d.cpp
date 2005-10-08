@@ -21,7 +21,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "csgeom/math.h"
 #include "csgeom/polyclip.h"
-#include "csgeom/quaterni.h"
+#include "csgeom/quaternion.h"
 #include "csgeom/sphere.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"

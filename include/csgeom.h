@@ -50,7 +50,7 @@
 #include "csgeom/polyidx.h"
 #include "csgeom/polymesh.h"
 #include "csgeom/polypool.h"
-#include "csgeom/quaterni.h"
+#include "csgeom/quaternion.h"
 #include "csgeom/segment.h"
 #include "csgeom/solidspace.h"
 #include "csgeom/sphere.h"

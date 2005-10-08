@@ -23,7 +23,7 @@
 #include "cssysdef.h"
 
 #include "csgeom/math3d.h"
-#include "csgeom/quaterni.h"
+#include "csgeom/quaternion.h"
 #include "csutil/event.h"
 #include "csutil/util.h"
 #include "imap/services.h"

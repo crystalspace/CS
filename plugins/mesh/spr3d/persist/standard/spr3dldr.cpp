@@ -22,7 +22,7 @@
 
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
-#include "csgeom/quaterni.h"
+#include "csgeom/quaternion.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
 #include "csutil/cscolor.h"

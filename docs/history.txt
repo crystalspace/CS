@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Oct-2005
+	- res renamed csgeom/quaterni.h to the more verbose 
+	  csgeom/quaternion.h.
+	- res fixed walktests load camera feature to correctly restore the
+	  rotation of the collider actor.
 7-Oct-2005
 	- Eric Sunshine pacified autoheader by using three-argument form of
 	  AC_DEFINE() for __CARBONSOUND__ work-around in cs_check_host.m4.

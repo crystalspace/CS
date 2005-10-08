@@ -23,7 +23,7 @@
 #ifndef __CS_GENMESHSKELANIM_H__
 #define __CS_GENMESHSKELANIM_H__
 
-#include "csgeom/quaterni.h"
+#include "csgeom/quaternion.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "csutil/array.h"

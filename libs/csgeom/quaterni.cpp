@@ -18,7 +18,7 @@
 #include "cssysdef.h"
 
 #include "csgeom/matrix3.h"
-#include "csgeom/quaterni.h"
+#include "csgeom/quaternion.h"
 
 #define EULERTOQUATCONST      0.0174532925199 // PI*1/(360/2)
 #define QUATTOAXISANGLECONST  114.591559026 \
@@ -244,11 +244,11 @@ void csQuaternion::SetWithAxisAngle(csVector3 axis, float phi)
     z = axis.z * ss;
 }
 
-void csQuaternion::GetEulerAngles (csVector3& angles)
+void csQuaternion::GetEulerAngles (csVector3& angles, bool radians)
 {
-  static float rad2deg = 180.0f / PI;
-  static float case1 = PI / 2.0f * 180.0f / rad2deg;
-  static float case2 = -PI / 2.0f * rad2deg;
+  const float rad2deg = radians ? 1.0f : 180.0f / PI;
+  const float case1 = PI / 2.0f * 180.0f / rad2deg;
+  const float case2 = -PI / 2.0f * rad2deg;
 
   angles.z = atan2 (2.0f * (x*y + r*z), (r*r + x*x - y*y - z*z)) * rad2deg;
   float sine = -2.0f * (x*z - r*y);

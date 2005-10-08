@@ -22,7 +22,7 @@
 #include <float.h>
 #include "csqint.h"
 #include "csgeom/matrix3.h"
-#include "csgeom/quaterni.h"
+#include "csgeom/quaternion.h"
 
 //---------------------------------------------------------------------------
 csMatrix3::csMatrix3 (float x,float y, float z, float angle)

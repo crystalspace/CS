@@ -31,7 +31,7 @@
 #include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "csutil/scopedmutexlock.h"
-#include "csgeom/quaterni.h"
+#include "csgeom/quaternion.h"
 #include "iutil/plugin.h"
 #include "imap/services.h"
 #include "imap/ldrctxt.h"
