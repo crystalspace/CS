@@ -7,6 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 8-Oct-2005
+    - Reed Hedges added a check in plugins/net/vos/vosobject3d.cpp 
+      for the case a mesh does not support collision detection 
+      (such as billboard)... crash otherwise.  Also added some more 
+      diagnostic output and comments to the vostest application.
 	- res renamed csgeom/quaterni.h to the more verbose 
 	  csgeom/quaternion.h.
 	- res fixed walktests load camera feature to correctly restore the

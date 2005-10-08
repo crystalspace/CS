@@ -169,6 +169,10 @@ bool Vostest::VostestEventHandler (iEvent& ev)
 
 bool Vostest::Initialize ()
 {
+  csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, 
+         "crystalspace.application.vostest", 
+         "Initializing...\nRequesting required plugins...");
+
   if (!csInitializer::RequestPlugins (object_reg,
                                       CS_REQUEST_VFS,
                                       CS_REQUEST_OPENGL3D,
@@ -261,10 +265,14 @@ bool Vostest::Initialize ()
 
   csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY(object_reg, iCommandLineParser);
 
-  char* vosWorldURL = "vop://localhost/world";
+  char* vosWorldURL = "vip://localhost/world";
   if(cmdline->GetName()) {
     vosWorldURL = strdup(cmdline->GetName());
   }
+
+  csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, 
+         "crystalspace.application.vostest", 
+         "VOS World URL is %s.", vosWorldURL);
 
   rotY = 0;
   rotX = 0;
@@ -275,6 +283,7 @@ bool Vostest::Initialize ()
 
   engine->Prepare ();
 #if 1
+  // Make the view with a temporary sector first, then load the sector from VOS with a progress bar
   view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (engine->CreateSector("_tmp"));
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
@@ -285,7 +294,17 @@ bool Vostest::Initialize ()
   view->Draw ();
 
   try {
+    csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, 
+            "crystalspace.application.vostest", 
+            "Connecting to VOS world \"%s\" and getting sector object...", vosWorldURL);
+
     csRef<iVosSector> vossector = vosa3dl->GetSector(vosWorldURL);
+    if(!vossector.IsValid())
+        throw std::runtime_error("Could not get sector from VOS object " + std::string(vosWorldURL));
+
+    csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, 
+            "crystalspace.application.vostest", 
+            "Loading sector contents from VOS...");
 
     csRef<iConsoleOutput> console = CS_QUERY_REGISTRY(object_reg, iConsoleOutput);
     if(console.IsValid())
@@ -298,8 +317,14 @@ bool Vostest::Initialize ()
       vossector->Load();
     }
 
+    csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, 
+            "crystalspace.application.vostest", 
+            "Setting view's camera to look at the new sector...");
+
     view->GetCamera()->SetSector(vossector->GetSector());
 #else
+    // Alternative technique, load the VOS sector first, then make the view for
+    // it.
     csRef<iVosSector> vossector = vosa3dl->GetSector(vosWorldURL);
     vossector->Load();
 
@@ -309,6 +334,10 @@ bool Vostest::Initialize ()
     iGraphics2D* g2d = g3d->GetDriver2D ();
     view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 #endif
+
+    csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, 
+            "crystalspace.application.vostest", 
+            "Acquiring a reference to the root Vobject...");
 
     csRef<iVosApi> vosapi = SCF_QUERY_INTERFACE(vosa3dl, iVosApi);
     VUtil::vRef<VOS::Vobject> vobject = vosapi->GetVobject();
@@ -325,6 +354,10 @@ bool Vostest::Initialize ()
         "Error loading world %s: %s\n", vosWorldURL, e.what());
     return false;
   }
+
+  csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, 
+         "crystalspace.application.vostest", 
+         "Initialization done.");
 
   return true;
 }

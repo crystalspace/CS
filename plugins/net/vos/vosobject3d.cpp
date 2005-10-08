@@ -726,6 +726,17 @@ void csMetaObject3D::moveTo(double x, double y, double z, double timestep)
 
 void csMetaObject3D::setupCollider()
 {
+  assert(csvobj3d->GetMeshWrapper());
+  assert(csvobj3d->GetMeshWrapper()->GetMeshObject());
+  assert(csvobj3d->GetMeshWrapper()->GetMeshObject()->GetObjectModel());
+  if(! csvobj3d->GetMeshWrapper()->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet())
+  {
+      csReport(vosa3dl->GetObjectRegistry(), CS_REPORTER_SEVERITY_WARN,
+              "crystalspace.network.vos.a3dl",
+              "Unable to setup collision detection for object \"%s\": Object type must not support collision detection.", csvobj3d->GetVobject()->getURLstr().c_str());
+      return;
+  }
+
   csRef<iEngine> engine = CS_QUERY_REGISTRY(vosa3dl->GetObjectRegistry(), iEngine);
   collider_actor.SetEngine(engine);
   collider_actor.SetCollideSystem(sector->GetCollideSystem());
