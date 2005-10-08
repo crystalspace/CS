@@ -34,7 +34,7 @@
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "iutil/comp.h"
-#include "ivaria/cegui.h"
+#include "ivaria/icegui.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 

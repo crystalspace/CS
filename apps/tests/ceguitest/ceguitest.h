@@ -21,7 +21,7 @@
 
 #include <crystalspace.h>
 #include "CEGUI.h"
-#include "ivaria/cegui.h"
+#include "ivaria/icegui.h"
 
 struct iSector;
 

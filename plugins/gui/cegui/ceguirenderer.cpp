@@ -433,7 +433,7 @@ void csCEGUIRenderer::setDisplaySize (const CEGUI::Size& sz)
     fireEvent(EventDisplaySizeChanged, args, EventNamespace);
   }
 }
-
+  
 CEGUI::ResourceProvider* csCEGUIRenderer::createResourceProvider ()
 {
   if (!resourceProvider) {
