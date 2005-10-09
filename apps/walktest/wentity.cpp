@@ -27,10 +27,6 @@
 
 extern WalkTest* Sys;
 
-SCF_IMPLEMENT_IBASE_EXT (csWalkEntity)
-  SCF_IMPLEMENTS_INTERFACE (csWalkEntity)
-SCF_IMPLEMENT_IBASE_EXT_END
-
 //--------------------------------------------------------------------------
 
 struct AnimPortalCallback : public iPortalCallback

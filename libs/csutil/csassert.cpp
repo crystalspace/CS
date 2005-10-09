@@ -68,7 +68,9 @@ namespace CrystalSpace
       
       const char* ignoreEnv = getenv ("CS_ASSERT_IGNORE");
       if (!ignoreEnv || (atoi (ignoreEnv) == 0))
+      {
 	CS_DEBUG_BREAK;
+      }
     }
     
   } // namespace Debug

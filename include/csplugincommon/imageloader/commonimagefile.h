@@ -32,6 +32,8 @@
 #include "iutil/databuff.h"
 #include "iutil/job.h"
 
+struct iObjectRegistry;
+
 /**
  * \addtogroup plugincommon
  * @{ */

@@ -562,10 +562,6 @@ void WalkTest::DrawFullScreenFX3D (csTicks /*elapsed_time*/,
   }
 }
 
-SCF_IMPLEMENT_IBASE_EXT (WalkDataObject)
-  SCF_IMPLEMENTS_INTERFACE (WalkDataObject)
-SCF_IMPLEMENT_IBASE_EXT_END
-
 void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
 {
   // Tell Gfx3D we're going to display 3D things

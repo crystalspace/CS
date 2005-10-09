@@ -746,7 +746,7 @@ void awsComponent::UnsetFocus ()
 
 void awsComponent::SetDeaf (bool bDeaf)
 {
-  if (!((self->Flags () & AWSF_CMP_DEAF) ^ bDeaf))
+  if (!((self->Flags () & AWSF_CMP_DEAF) ^ (bDeaf ? AWSF_CMP_DEAF : 0)))
     return;
   
   if (bDeaf)

@@ -34,8 +34,7 @@
  * for use in plugins as a mean to transparently exchange
  * abstract data between plugins.
  */
-class CS_CRYSTALSPACE_EXPORT csDataBuffer : 
-  public scfImplementation1<csDataBuffer, iDataBuffer>
+class csDataBuffer : public scfImplementation1<csDataBuffer, iDataBuffer>
 {
   /// The data buffer
   char *Data;

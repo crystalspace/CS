@@ -21,6 +21,9 @@ chronological order.
 	- res changed csBoxClipper and csPolygonClipper to reuse code via
 	  templates instead of macros and #includes.
 	- res fixed some SR clipping issues.
+	- res removed the now-pointless databuf.cpp and scfstringarray.cpp
+	  files.
+	- res made a couple of VC7 warning fixes.
 8-Oct-2005
 	- res renamed csgeom/quaterni.h to the more verbose 
 	  csgeom/quaternion.h.

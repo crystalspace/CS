@@ -43,6 +43,12 @@
 
 #include "skinpars.hpp"
 
+// We have no control over this generated code, so silence some warnings.
+#if defined(CS_COMPILER_MSVC)
+#pragma warning(disable:4065)
+#pragma warning(disable:4102)
+#endif
+
 #ifdef YY_PROTO
 #define YY_DECL int yylex YY_PROTO(( YYSTYPE *awslval ))
 #else

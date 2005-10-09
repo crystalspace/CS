@@ -68,16 +68,19 @@ struct iGraphics2D;
 #define MAP_ON 2
 #define MAP_TXT 3
 
-SCF_VERSION (WalkDataObject, 0, 0, 1);
-class WalkDataObject : public csObject
+class WalkDataObject : public scfImplementationExt1<WalkDataObject,
+						    csObject, 
+						    scfFakeInterface<WalkDataObject> >
 {
 protected:
   /// Pointer to data.
   void* data;
 
 public:
+  SCF_INTERFACE(WalkDataObject, 2, 0, 0);
+
   /// Initialize this object with data pointer initialized to 'd'
-  WalkDataObject (void *d) : csObject (), data (d)
+  WalkDataObject (void *d) : scfImplementationType (this), data (d)
   {
   }
   /// Destroy object.
@@ -96,8 +99,6 @@ public:
     void *res = (d ? d->GetData () : 0);
     return res;
   }
-
-  SCF_DECLARE_IBASE_EXT (csObject);
 };
 
 ///
@@ -107,7 +108,7 @@ struct csKeyMap
   utf32_char key;
   bool shift, alt, ctrl;
   char* cmd;
-  int need_status,is_on;
+  bool need_status,is_on;
 };
 
 /**

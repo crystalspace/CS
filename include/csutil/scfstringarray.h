@@ -30,8 +30,8 @@
 #include "iutil/stringarray.h"
 
 /// This class is a thin wrapper around csStringArray with SCF capability
-class CS_CRYSTALSPACE_EXPORT scfStringArray : 
-  public scfImplementation1<scfStringArray, iStringArray>
+class scfStringArray : public scfImplementation1<scfStringArray, 
+						   iStringArray>
 {
   csStringArray v;
 

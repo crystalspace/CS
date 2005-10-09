@@ -28,22 +28,23 @@ struct iMeshWrapper;
 struct iMovable;
 struct iPortal;
 
-SCF_VERSION (csWalkEntity, 0, 0, 1);
-
 /**
  * A general WalkTest entity.
  */
-class csWalkEntity : public csObject
+class csWalkEntity : public scfImplementationExt1<csWalkEntity,
+						  csObject, 
+						  scfFakeInterface<csWalkEntity> >
 {
 public:
+  SCF_INTERFACE(csWalkEntity, 2, 0, 0);
+
   /// Activate this entity.
   virtual void Activate () = 0;
 
   /// Handle next frame.
   virtual void NextFrame (float elapsed_time) = 0;
 
-  SCF_DECLARE_IBASE_EXT (csObject);
-
+  csWalkEntity() : scfImplementationType (this) {}
   virtual ~csWalkEntity ()
   {}
 };
