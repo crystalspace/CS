@@ -16,6 +16,8 @@ chronological order.
 	  solved.
 	- Marten fixed a few warnings about "x previously seen using class,
 	  now using struct".
+	- Marten fixed a bug introduced in Erics latest fix to his previous
+	  commit.
 8-Oct-2005
 	- res renamed csgeom/quaterni.h to the more verbose 
 	  csgeom/quaternion.h.
