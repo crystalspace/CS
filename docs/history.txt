@@ -7,10 +7,6 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 8-Oct-2005
-    - Reed Hedges added a check in plugins/net/vos/vosobject3d.cpp 
-      for the case a mesh does not support collision detection 
-      (such as billboard)... crash otherwise.  Also added some more 
-      diagnostic output and comments to the vostest application.
 	- res renamed csgeom/quaterni.h to the more verbose 
 	  csgeom/quaternion.h.
 	- res fixed walktests load camera feature to correctly restore the
@@ -19,6 +15,10 @@ chronological order.
 	  CEGUI.h that comes with CEGUI. Also changed ceguitest for this fix.
 	- swedishcoder added a note to the manual, that version 0.4.0 of CEGUI
 	  is needed.
+	- Reed Hedges added a check in plugins/net/vos/vosobject3d.cpp for the
+	  case a mesh does not support collision detection (such as
+	  billboard)... crash otherwise.  Also added some more diagnostic
+	  output and comments to the vostest application.
 7-Oct-2005
 	- Eric Sunshine pacified autoheader by using three-argument form of
 	  AC_DEFINE() for __CARBONSOUND__ work-around in cs_check_host.m4.
@@ -34,8 +34,8 @@ chronological order.
 	- Eric Sunshine added `typename_qualifier' support to cspace.i.  This
 	  fixes problem with Swig bombing on scf_interface.h in which this
 	  CS-specific portability "keyword" now appears.
-	- Piotr Obrzut added comments after his last commit, and change odedynam 
-	  colliders to be dynamic when they will be attached to body.
+	- Piotr Obrzut added comments after his last commit, and change
+	  odedynam colliders to be dynamic when they will be attached to body.
 	- res fixed the std_detail shader mistakenly utilizing the vertex 
 	  colors as well as lightmap (resulting in a perceived darkness of the
 	  walls in flarge).
@@ -45,8 +45,8 @@ chronological order.
 	  prepared.
 	- res fixed the bezier plugin to specify a more correct vertex index
 	  range on index buffer creation.
-	- Piotr Obrzut added check for sphere colliders in odedynam if given 
-	  radius is greater than 0 (if it is lower ODE will send his nasty 'bad 
+	- Piotr Obrzut added check for sphere colliders in odedynam if given
+	  radius is greater than 0 (if it is lower ODE will send his nasty 'bad
 	  argument' error notification, stopping all app)
 	- res changed the renderers to use new SCF.
 	- res moved the SR scanline rendering code into the softshader plugin.
