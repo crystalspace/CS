@@ -10,7 +10,7 @@ Dan Hardfeldt,@email{swedishcoder@@users.sourceforge.net}.}
 The @sc{cegui} plugin is a wrapper around @sc{cegui}, an embeddable widget
 library, so it can be easily used from within Crystal Space applications. The
 plugin provides a renderer, a @sc{vfs} resource provider, and an event handler
-for @sc{cegui}. You will need version 0.4.0 of CEGUI.
+for @sc{cegui}. You will need at least version 0.4.0 of @sc{cegui}.
 
 @noindent
 @uref{http://www.cegui.org.uk/}
