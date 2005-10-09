@@ -28,7 +28,6 @@
 #include "ivaria/conout.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/engseq.h"
-#include "ivaria/icegui.h"
 #include "ivaria/keyval.h"
 #include "ivaria/mapnode.h"
 #include "ivaria/movierecorder.h"
