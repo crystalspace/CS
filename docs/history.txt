@@ -24,6 +24,7 @@ chronological order.
 	- res removed the now-pointless databuf.cpp and scfstringarray.cpp
 	  files.
 	- res made a couple of VC7 warning fixes.
+	- res fixed some more SR clipping issues.
 8-Oct-2005
 	- res renamed csgeom/quaterni.h to the more verbose 
 	  csgeom/quaternion.h.

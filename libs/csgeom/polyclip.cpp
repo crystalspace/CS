@@ -24,6 +24,16 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/polypool.h"
 
+#include "csutil/sysfunc.h"
+
+//#define CLIP_DEBUG
+
+#ifdef CLIP_DEBUG
+#define CLIP_PRINTF csPrintf
+#else
+#define CLIP_PRINTF while(0) csPrintf
+#endif
+
 //---------------------------------------------------------------------------
 CS_IMPLEMENT_STATIC_VAR (GetPolyPool, csPoly2DPool,
 	(csPoly2DFactory::SharedFactory()))
@@ -61,10 +71,11 @@ struct StatusOutputNone
   void Flip() {}
 
   unsigned char GetType (size_t /*vert*/) const { return ~0; }
-  double GetPos (size_t /*vert*/) const { return 0; }
+  float GetPos (size_t /*vert*/) const { return 0; }
+  size_t GetVert (size_t /*vert*/) const { return 0; }
 
   void Copy (size_t /*to*/, size_t /*from*/) {}
-  void OnEdge (size_t /*to*/, size_t /*vertex*/, double /*Pos*/) {}
+  void OnEdge (size_t /*to*/, size_t /*vertex*/, float /*Pos*/) {}
   void Inside (size_t /*to*/) {}
 
   void Copy (size_t /*outOffs*/, size_t /*count*/, size_t /*inOffs*/) {}
@@ -100,8 +111,10 @@ struct StatusOutputDefault
 
   unsigned char GetType (size_t vert) const 
   { return InS[vert].Type; }
-  double GetPos (size_t vert) const 
+  float GetPos (size_t vert) const 
   { return InS[vert].Pos; }
+  size_t GetVert (size_t vert) const 
+  { return InS[vert].Vertex; }
 
   void Copy (size_t to, size_t from) 
   { 
@@ -109,16 +122,19 @@ struct StatusOutputDefault
       || (InS[from].Type == CS_VERTEX_ONEDGE)
       || (InS[from].Type == CS_VERTEX_INSIDE));
     OutS[to] = InS[from];
+    CLIP_PRINTF ("%zu: copy %zu\n", to, from);
   }
-  void OnEdge (size_t to, size_t vertex, double Pos) 
+  void OnEdge (size_t to, size_t vertex, float Pos) 
   {
     OutS[to].Type = CS_VERTEX_ONEDGE;
     OutS[to].Vertex = InS[vertex].Vertex;
     OutS[to].Pos = Pos;
+    CLIP_PRINTF ("%zu: edge %zu(%zu) %g\n", to, vertex, InS[vertex].Vertex, Pos);
   }
   void Inside (size_t to) 
   {
     OutS[to].Type = CS_VERTEX_INSIDE;
+    CLIP_PRINTF ("%zu: inside\n", to);
   }
 
   void Copy (size_t outOffs, size_t count, size_t inOffs)
@@ -127,6 +143,7 @@ struct StatusOutputDefault
     {
       CS_ASSERT ((vs+outOffs) >= 0 && (vs+outOffs) < MAX_OUTPUT_VERTICES);
       OutS [vs + outOffs] = InS [inOffs + vs];
+      CLIP_PRINTF ("%zu: copy %zu\n", vs + outOffs, inOffs + vs);
     }
   }
 };

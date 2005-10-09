@@ -109,6 +109,8 @@ namespace CrystalSpace
 	  float tx, ty;
     
 	  clip.Intersect (px, py, cx, cy, t, tx, ty);
+	  CLIP_PRINTF ("%zu: px,py %g,%g  cx,cy %g,%g  t %g  tx,ty %g,%g\n",
+	    vert, px, py, cx, cy, t, tx, ty);
 
 	  if ((!OutV
 	    || ABS (tx - OutP [OutV - 1].x) > EPSILON
@@ -146,7 +148,7 @@ namespace CrystalSpace
 	      if (statOut.GetType (realvert) == CS_VERTEX_ORIGINAL)
 	      {
 		if ((ABS(tx - px) > EPSILON)
-		  && (ABS(ty - py) > EPSILON))
+		  || (ABS(ty - py) > EPSILON))
 		  statOut.OnEdge (OutV, vert - 1, t);
 		else
 		  statOut.Copy (OutV, vert - 1);
@@ -155,7 +157,11 @@ namespace CrystalSpace
 	      {
 		// Current vertex is on edge, it cannot be CS_VERTEX_INSIDE
 		// because it is connected with at least one CS_VERTEX_ORIGINAL
-		const double newPos = t * statOut.GetPos (realvert);
+		float newPos;
+		if (statOut.GetVert (vert - 1) == statOut.GetVert (realvert))
+		  newPos = t * statOut.GetPos (realvert);
+		else
+		  newPos = t; // @@@ FIXME: correct?
 		statOut.OnEdge (OutV, vert - 1, newPos);
 	      }
 	    }

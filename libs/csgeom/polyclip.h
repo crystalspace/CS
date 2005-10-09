@@ -120,6 +120,8 @@ namespace CrystalSpace
       if (ClipPolyVertices & 1)
 	statOut.Flip();
 
+      CLIP_PRINTF ("*** %s\n", CS_FUNCTION_NAME);
+
       uint8 Clipped = CS_CLIP_INSIDE;
       
       for (size_t edge = 0; edge < ClipPolyVertices; edge++)

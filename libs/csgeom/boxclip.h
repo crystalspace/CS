@@ -155,6 +155,8 @@ namespace CrystalSpace
       if (boxTest.GetClipCount() & 1)
 	statOut.Flip();
 
+      CLIP_PRINTF ("*** %s\n", CS_FUNCTION_NAME);
+
       uint8 Clipped = CS_CLIP_INSIDE;
       if (boxTest.ClipMinX())
       {

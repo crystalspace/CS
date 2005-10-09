@@ -24,6 +24,8 @@
 
 #include "clipper.h"
 
+//#define CLIP_DEBUG
+
 namespace cspluginSoft3d
 {
 
@@ -116,9 +118,11 @@ public:
 	    csVector3 vn;
 	    voutPersp.LerpTo ((float*)&vn, vt, vt2, t);
 
-	    /*if ((ABS(vn.x - outPoly[i].x) > EPSILON)
+#ifdef CLIP_DEBUG
+	    if ((ABS(vn.x - outPoly[i].x) > EPSILON)
 	      || (ABS(vn.y - outPoly[i].y) > EPSILON))
-	      CS_DEBUG_BREAK;*/
+	      CS_DEBUG_BREAK;
+#endif
 
 	    vn.x = outPoly[i].x;
 	    vn.y = outPoly[i].y;

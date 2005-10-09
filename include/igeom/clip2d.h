@@ -65,16 +65,17 @@ enum
 struct csVertexStatus
 {
   /**
-   * The type of vertex<p>
-   * One of CS_VERTEX_*.
+   * The type of vertex.
+   * One of #CS_VERTEX_ORIGINAL, #CS_VERTEX_ONEDGE, #CS_VERTEX_INSIDE.
    */
   unsigned char Type;
   /// Original vertex number (for #CS_VERTEX_ORIGINAL and #CS_VERTEX_ONEDGE)
   size_t Vertex;
   /// Additional information for #CS_VERTEX_ONEDGE (0..1, the 't' parameter)
-  double Pos;
+  float Pos;
 };
 
+/// Clipped vertex type
 enum
 {
   /// The output vertex is one of the input vertices
