@@ -41,8 +41,8 @@ CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
 csWrappedDocumentNode::csWrappedDocumentNode (csWrappedDocumentNodeFactory* shared_fact,
 					      iDocumentNode* wrapped_node,
 					      iConditionResolver* res)
-  : scfImplementationType (this), objreg (shared_fact->objreg), wrappedNode (wrapped_node),
-  resolver (res), shared (shared_fact)
+  : scfImplementationType (this), wrappedNode (wrapped_node), resolver (parent->resolver),
+  objreg (shared_fact->objreg), shared (shared_fact)
 {
   CS_ASSERT (resolver);
   globalState.AttachNew (new GlobalProcessingState);
@@ -54,8 +54,8 @@ csWrappedDocumentNode::csWrappedDocumentNode (iDocumentNode* wrapped_node,
 					      csWrappedDocumentNode* parent,
 					      csWrappedDocumentNodeFactory* shared_fact, 
 					      GlobalProcessingState* global_state)
-  : scfImplementationType (this), objreg (shared_fact->objreg), wrappedNode (wrapped_node),
-  resolver (parent->resolver), shared (shared_fact),  globalState (global_state)
+  : scfImplementationType (this), wrappedNode (wrapped_node), resolver (parent->resolver),
+  objreg (shared_fact->objreg), shared (shared_fact), globalState (global_state)
 {
   ProcessWrappedNode ();
 }
