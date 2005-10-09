@@ -1850,58 +1850,6 @@ class csRectRegionPtr(csRectRegion):
 _cspace.csRectRegion_swigregister(csRectRegionPtr)
 FRAGMENT_BUFFER_SIZE = cvar.FRAGMENT_BUFFER_SIZE
 
-class csQuaternion(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csQuaternion, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csQuaternion, name)
-    def __repr__(self):
-        return "<%s.%s; proxy of C++ csQuaternion instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def Init(*args): return _cspace.csQuaternion_Init(*args)
-    def __init__(self, *args):
-        _swig_setattr(self, csQuaternion, 'this', _cspace.new_csQuaternion(*args))
-        _swig_setattr(self, csQuaternion, 'thisown', 1)
-    def __imul__(*args): return _cspace.csQuaternion___imul__(*args)
-    def Conjugate(*args): return _cspace.csQuaternion_Conjugate(*args)
-    def Negate(*args): return _cspace.csQuaternion_Negate(*args)
-    def Invert(*args): return _cspace.csQuaternion_Invert(*args)
-    def GetAxisAngle(*args): return _cspace.csQuaternion_GetAxisAngle(*args)
-    def SetWithAxisAngle(*args): return _cspace.csQuaternion_SetWithAxisAngle(*args)
-    def PrepRotation(*args): return _cspace.csQuaternion_PrepRotation(*args)
-    def Rotate(*args): return _cspace.csQuaternion_Rotate(*args)
-    def Normalize(*args): return _cspace.csQuaternion_Normalize(*args)
-    def SetWithEuler(*args): return _cspace.csQuaternion_SetWithEuler(*args)
-    def GetEulerAngles(*args): return _cspace.csQuaternion_GetEulerAngles(*args)
-    def ToAxisAngle(*args): return _cspace.csQuaternion_ToAxisAngle(*args)
-    def Slerp(*args): return _cspace.csQuaternion_Slerp(*args)
-    __swig_setmethods__["r"] = _cspace.csQuaternion_r_set
-    __swig_getmethods__["r"] = _cspace.csQuaternion_r_get
-    if _newclass:r = property(_cspace.csQuaternion_r_get, _cspace.csQuaternion_r_set)
-    __swig_setmethods__["x"] = _cspace.csQuaternion_x_set
-    __swig_getmethods__["x"] = _cspace.csQuaternion_x_get
-    if _newclass:x = property(_cspace.csQuaternion_x_get, _cspace.csQuaternion_x_set)
-    __swig_setmethods__["y"] = _cspace.csQuaternion_y_set
-    __swig_getmethods__["y"] = _cspace.csQuaternion_y_get
-    if _newclass:y = property(_cspace.csQuaternion_y_get, _cspace.csQuaternion_y_set)
-    __swig_setmethods__["z"] = _cspace.csQuaternion_z_set
-    __swig_getmethods__["z"] = _cspace.csQuaternion_z_get
-    if _newclass:z = property(_cspace.csQuaternion_z_get, _cspace.csQuaternion_z_set)
-    def __add__(*args): return _cspace.csQuaternion___add__(*args)
-    def __sub__(*args): return _cspace.csQuaternion___sub__(*args)
-    def __mul__(*args): return _cspace.csQuaternion___mul__(*args)
-    def __del__(self, destroy=_cspace.delete_csQuaternion):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-
-class csQuaternionPtr(csQuaternion):
-    def __init__(self, this):
-        _swig_setattr(self, csQuaternion, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, csQuaternion, 'thisown', 0)
-        _swig_setattr(self, csQuaternion,self.__class__,csQuaternion)
-_cspace.csQuaternion_swigregister(csQuaternionPtr)
-
 class csSpline(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSpline, name, value)
