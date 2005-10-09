@@ -51,10 +51,10 @@ package cspace;
 *scfRegisterStaticFactoryFunc = *cspacec::scfRegisterStaticFactoryFunc;
 *__modulo__ = *cspacec::__modulo__;
 *__rshift__ = *cspacec::__rshift__;
+*__subtr__ = *cspacec::__subtr__;
 *__mult_ass__ = *cspacec::__mult_ass__;
 *__divide_ass__ = *cspacec::__divide_ass__;
 *__div__ = *cspacec::__div__;
-*__subtr__ = *cspacec::__subtr__;
 *__add__ = *cspacec::__add__;
 *__mult__ = *cspacec::__mult__;
 *__eq__ = *cspacec::__eq__;
@@ -2132,67 +2132,6 @@ sub DESTROY {
 *Count = *cspacec::csRectRegion_Count;
 *RectAt = *cspacec::csRectRegion_RectAt;
 *makeEmpty = *cspacec::csRectRegion_makeEmpty;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::csQuaternion ##############
-
-package cspace::csQuaternion;
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-*Init = *cspacec::csQuaternion_Init;
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csQuaternion(@_);
-    bless $self, $pkg if defined($self);
-}
-
-*__mult_ass__ = *cspacec::csQuaternion___mult_ass__;
-*Conjugate = *cspacec::csQuaternion_Conjugate;
-*Negate = *cspacec::csQuaternion_Negate;
-*Invert = *cspacec::csQuaternion_Invert;
-*GetAxisAngle = *cspacec::csQuaternion_GetAxisAngle;
-*SetWithAxisAngle = *cspacec::csQuaternion_SetWithAxisAngle;
-*PrepRotation = *cspacec::csQuaternion_PrepRotation;
-*Rotate = *cspacec::csQuaternion_Rotate;
-*Normalize = *cspacec::csQuaternion_Normalize;
-*SetWithEuler = *cspacec::csQuaternion_SetWithEuler;
-*GetEulerAngles = *cspacec::csQuaternion_GetEulerAngles;
-*ToAxisAngle = *cspacec::csQuaternion_ToAxisAngle;
-*Slerp = *cspacec::csQuaternion_Slerp;
-*swig_r_get = *cspacec::csQuaternion_r_get;
-*swig_r_set = *cspacec::csQuaternion_r_set;
-*swig_x_get = *cspacec::csQuaternion_x_get;
-*swig_x_set = *cspacec::csQuaternion_x_set;
-*swig_y_get = *cspacec::csQuaternion_y_get;
-*swig_y_set = *cspacec::csQuaternion_y_set;
-*swig_z_get = *cspacec::csQuaternion_z_get;
-*swig_z_set = *cspacec::csQuaternion_z_set;
-*__add__ = *cspacec::csQuaternion___add__;
-*__subtr__ = *cspacec::csQuaternion___subtr__;
-*__mult__ = *cspacec::csQuaternion___mult__;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csQuaternion($self);
-        delete $OWNER{$self};
-    }
-}
-
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
