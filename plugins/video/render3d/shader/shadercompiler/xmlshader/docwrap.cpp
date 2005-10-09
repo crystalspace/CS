@@ -41,7 +41,7 @@ CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
 csWrappedDocumentNode::csWrappedDocumentNode (csWrappedDocumentNodeFactory* shared_fact,
 					      iDocumentNode* wrapped_node,
 					      iConditionResolver* res)
-  : scfImplementationType (this), wrappedNode (wrapped_node), resolver (parent->resolver),
+  : scfImplementationType (this), wrappedNode (wrapped_node), resolver (res),
   objreg (shared_fact->objreg), shared (shared_fact)
 {
   CS_ASSERT (resolver);
