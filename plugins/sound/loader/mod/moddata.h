@@ -23,6 +23,7 @@
  * iSoundData implementation for mod bitdata using mikmod.
  */
 
+#include "csutil/scf.h"
 #include "isound/data.h"
 #ifndef _DLL
 #define _DLL

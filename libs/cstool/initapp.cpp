@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cstool/initapp.h"
 #include "csutil/cfgacc.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
@@ -28,10 +29,10 @@
 #include "csutil/objreg.h"
 #include "csutil/plugldr.h"
 #include "csutil/plugmgr.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/scfstrset.h"
 #include "csutil/verbosity.h"
 #include "csutil/virtclk.h"
-#include "cstool/initapp.h"
 
 
 #ifdef CS_DEBUG
@@ -395,22 +396,20 @@ bool csInitializer::SetupEventHandler (
   return false;
 }
 
-class csAppEventHandler : public iEventHandler
+class csAppEventHandler : public 
+  scfImplementation1<csAppEventHandler, iEventHandler>
 {
 private:
   csEventHandlerFunc evhdlr;
 public:
-  SCF_DECLARE_IBASE;
-  csAppEventHandler (csEventHandlerFunc h) : evhdlr(h)
-  { SCF_CONSTRUCT_IBASE (0); }
+  csAppEventHandler (csEventHandlerFunc h) 
+    : scfImplementationType (this), evhdlr(h)
+  { }
   virtual ~csAppEventHandler()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
   virtual bool HandleEvent (iEvent& e) { return evhdlr (e); }
 };
 
-SCF_IMPLEMENT_IBASE (csAppEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
 
 bool csInitializer::SetupEventHandler (
   iObjectRegistry* r, csEventHandlerFunc evhdlr_func, unsigned int eventmask)

@@ -20,7 +20,3 @@
 #include "cssysdef.h"
 #include "csutil/scfstringarray.h"
 
-SCF_IMPLEMENT_IBASE (scfStringArray)
-  SCF_IMPLEMENTS_INTERFACE (iStringArray)
-SCF_IMPLEMENT_IBASE_END
-

@@ -22,27 +22,17 @@
 #include "csutil/sysfunc.h"
 #include "csutil/win32/registrycfg.h"
 
-SCF_IMPLEMENT_IBASE (csWin32RegistryConfig)
-  SCF_IMPLEMENTS_INTERFACE (iConfigFile)
-SCF_IMPLEMENT_IBASE_END
 
 csWin32RegistryConfig::csWin32RegistryConfig ()
+  : scfImplementationType (this), hKey (0), hKeyParent (HKEY_CURRENT_USER), 
+  Prefix (0), writeAccess (false), Key (0), status (new rcStatus)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
-  Prefix = 0;
-  hKey = 0;
-  Key = 0;
-  hKeyParent = HKEY_CURRENT_USER;
-  status = new rcStatus ();
-  writeAccess = false;
 }
 
 csWin32RegistryConfig::~csWin32RegistryConfig()
 {
   Close();
   delete status;
-  SCF_DESTRUCT_IBASE();
 }
 
 void csWin32RegistryConfig::ReplaceSeparators (char* key) const
@@ -469,22 +459,11 @@ void csWin32RegistryConfig::SetEOFComment (const char * /*Text*/)
 {
 }
 
-SCF_IMPLEMENT_IBASE (csWin32RegistryIterator)
-  SCF_IMPLEMENTS_INTERFACE (iConfigIterator)
-SCF_IMPLEMENT_IBASE_END
-
 csWin32RegistryIterator::csWin32RegistryIterator (csWin32RegistryConfig* Owner, 
   const char* Subsection)
+  : scfImplementationType (this), owner (Owner), status (new riStatus), EnumIndex (0), 
+  SubsectionName (csStrNew (Subsection))
 {
-  SCF_CONSTRUCT_IBASE (0);
-
-  status = new riStatus();
-
-  owner = Owner;
-  SubsectionName = new char[strlen(Subsection) + 1];
-  strcpy (SubsectionName, Subsection);
-
-  EnumIndex = 0;
 }
 
 csWin32RegistryIterator::~csWin32RegistryIterator()
@@ -492,7 +471,6 @@ csWin32RegistryIterator::~csWin32RegistryIterator()
   owner->iters.Delete (this);
   delete[] SubsectionName;
   delete status;
-  SCF_DESTRUCT_IBASE();
 }
 
 iConfigFile* csWin32RegistryIterator::GetConfigFile () const

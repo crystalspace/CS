@@ -34,7 +34,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif 
 #include <Cg/cgGL.h>
 
-class csGLExtensionManager;
+struct csGLExtensionManager;
 
 class csGLShader_CG : public iShaderProgramPlugin
 {

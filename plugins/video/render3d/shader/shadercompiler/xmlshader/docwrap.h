@@ -28,6 +28,7 @@
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/strhash.h"
 #include "csutil/weakref.h"
 
@@ -77,7 +78,8 @@ struct iConditionResolver
 /**
  * Wrapper around a document node, supporting conditionals.
  */
-class csWrappedDocumentNode : public csDocumentNodeReadOnly
+class csWrappedDocumentNode : 
+  public scfImplementationExt0<csWrappedDocumentNode, csDocumentNodeReadOnly>
 {
   friend class csWrappedDocumentNodeIterator;
   friend struct WrapperStackEntry;
@@ -187,7 +189,6 @@ class csWrappedDocumentNode : public csDocumentNodeReadOnly
     iConditionResolver* resolver);
 public:
   CS_LEAKGUARD_DECLARE(csWrappedDocumentNode);
-  SCF_DECLARE_IBASE;
 
   virtual ~csWrappedDocumentNode ();
 
@@ -213,12 +214,16 @@ public:
     bool defaultvalue = false);
 };
 
-class csTextNodeWrapper : public csDocumentNodeReadOnly
+class csTextNodeWrapper : public scfImplementationExt0<csTextNodeWrapper, 
+                                                       csDocumentNodeReadOnly>
 {
   char* nodeText;
   csRef<iDocumentNode> realMe;
 public:
-  SCF_DECLARE_IBASE_POOLED(csTextNodeWrapper);
+  //SCF_DECLARE_IBASE_POOLED(csTextNodeWrapper); //@@TODO: Make pooled again
+  class Pool
+  {
+  };
 
   csTextNodeWrapper (Pool* pool);
   virtual ~csTextNodeWrapper ();

@@ -57,7 +57,7 @@ public:
     virtual bool Initialize (iObjectRegistry* p) 
     { scfParent->object_reg = p; return true; }
   } scfiComponent;
-  friend class eiComponent;
+  friend struct eiComponent;
 };
 
 /**

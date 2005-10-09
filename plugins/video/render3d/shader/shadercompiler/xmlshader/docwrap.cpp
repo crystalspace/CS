@@ -35,23 +35,16 @@
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csWrappedDocumentNode)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentNode)
-SCF_IMPLEMENT_IBASE_END
 
 CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
 
 csWrappedDocumentNode::csWrappedDocumentNode (csWrappedDocumentNodeFactory* shared,
 					      iDocumentNode* wrappedNode,
 					      iConditionResolver* resolver)
+  : scfImplementationType (this), objreg (shared->objreg), wrappedNode (wrappedNode),
+  resolver (resolver), shared (shared)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
-  csWrappedDocumentNode::objreg = shared->objreg;
-  csWrappedDocumentNode::wrappedNode = wrappedNode;
-  csWrappedDocumentNode::resolver = resolver;
   CS_ASSERT (resolver);
-  csWrappedDocumentNode::shared = shared;
   globalState.AttachNew (new GlobalProcessingState);
 
   ProcessWrappedNode ();
@@ -60,23 +53,15 @@ csWrappedDocumentNode::csWrappedDocumentNode (csWrappedDocumentNodeFactory* shar
 csWrappedDocumentNode::csWrappedDocumentNode (iDocumentNode* wrappedNode,
 					      csWrappedDocumentNode* parent,
 					      csWrappedDocumentNodeFactory* shared, 
-					      GlobalProcessingState* globalState) :
-  globalState (globalState)
+					      GlobalProcessingState* globalState)
+  : scfImplementationType (this), objreg (shared->objreg), wrappedNode (wrappedNode),
+  resolver (parent->resolver), shared (shared),  globalState (globalState)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
-  csWrappedDocumentNode::wrappedNode = wrappedNode;
-  csWrappedDocumentNode::parent = parent;
-  resolver = parent->resolver;
-  objreg = parent->objreg;
-  csWrappedDocumentNode::shared = shared;
-
   ProcessWrappedNode ();
 }
 
 csWrappedDocumentNode::~csWrappedDocumentNode ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 struct ReplacedEntity
@@ -887,19 +872,14 @@ iDocumentNode* csWrappedDocumentNode::WrapperWalker::Next ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_POOLED(csTextNodeWrapper)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentNode)
-SCF_IMPLEMENT_IBASE_END
-
 csTextNodeWrapper::csTextNodeWrapper (Pool* pool)
-{
-  SCF_CONSTRUCT_IBASE_POOLED(pool);
+  : scfImplementationType (this)
+{  
 }
 
 csTextNodeWrapper::~csTextNodeWrapper ()
 {
   delete[] nodeText;
-  SCF_DESTRUCT_IBASE();
 }
 
 void csTextNodeWrapper::SetData (iDocumentNode* realMe, const char* text)
@@ -959,7 +939,8 @@ void csWrappedDocumentNodeIterator::SeekNext()
     csString str;
     str.Append (next->GetValue ());
     csWrappedDocumentNode::AppendNodeText (walker, str);
-    csTextNodeWrapper* textNode = parentNode->shared->textNodePool.Alloc ();
+    //csTextNodeWrapper* textNode = parentNode->shared->textNodePool.Alloc (); //@@FIX
+    csTextNodeWrapper *textNode = new csTextNodeWrapper (0);
     textNode->SetData (next, str);
     next.AttachNew (textNode);
   }

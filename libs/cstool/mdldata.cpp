@@ -58,25 +58,16 @@
 
 /*** csModelDataTexture ***/
 
-SCF_IMPLEMENT_IBASE (csModelDataTexture)
-  SCF_IMPLEMENTS_INTERFACE (iModelDataTexture)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
-SCF_IMPLEMENT_IBASE_END
-
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataTexture)
 
 csModelDataTexture::csModelDataTexture ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   FileName = 0;
 }
 
 csModelDataTexture::~csModelDataTexture ()
 {
   delete[] FileName;
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csModelDataTexture::SetFileName (const char *fn)
@@ -121,23 +112,13 @@ iModelDataTexture *csModelDataTexture::Clone () const
 
 /*** csModelDataMaterial ***/
 
-SCF_IMPLEMENT_IBASE (csModelDataMaterial)
-  SCF_IMPLEMENTS_INTERFACE (iModelDataMaterial)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
-SCF_IMPLEMENT_IBASE_END
-
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataMaterial)
-
 csModelDataMaterial::csModelDataMaterial ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
 csModelDataMaterial::~csModelDataMaterial ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
-  SCF_DESTRUCT_IBASE ();
 }
 
 CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataMaterial, iMaterial*, BaseMaterial)
@@ -159,12 +140,6 @@ iModelDataMaterial *csModelDataMaterial::Clone () const
 
 /*** csModelDataVertices ***/
 
-SCF_IMPLEMENT_IBASE (csModelDataVertices)
-  SCF_IMPLEMENTS_INTERFACE (iModelDataVertices)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
-SCF_IMPLEMENT_IBASE_END
-
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataVertices)
 
 CS_IMPLEMENT_ARRAY_INTERFACE (csModelDataVertices,
 	const csVector3 &, Vertex, Vertices)
@@ -176,24 +151,20 @@ CS_IMPLEMENT_ARRAY_INTERFACE (csModelDataVertices,
 	const csVector2 &, Texel, Texels)
 
 csModelDataVertices::csModelDataVertices ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
 csModelDataVertices::csModelDataVertices (const iModelDataVertices *orig,
   const iModelDataVertices *orig2)
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   CopyFrom (orig);
   CopyFrom (orig2);
 }
 
 csModelDataVertices::~csModelDataVertices()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csModelDataVertices::CopyFrom (const iModelDataVertices *v)
@@ -266,23 +237,13 @@ size_t csModelDataVertices::FindTexel (const csVector2 &v) const
 
 /*** csModelDataAction ***/
 
-SCF_IMPLEMENT_IBASE (csModelDataAction)
-  SCF_IMPLEMENTS_INTERFACE (iModelDataAction)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
-SCF_IMPLEMENT_IBASE_END
-
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataAction)
-
 csModelDataAction::csModelDataAction ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
 csModelDataAction::~csModelDataAction()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
-  SCF_DESTRUCT_IBASE ();
 }
 
 size_t csModelDataAction::GetFrameCount () const
@@ -344,17 +305,10 @@ float csModelDataAction::GetTotalTime () const
 
 /*** csModelDataPolygon ***/
 
-SCF_IMPLEMENT_IBASE (csModelDataPolygon)
-  SCF_IMPLEMENTS_INTERFACE (iModelDataPolygon)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
-SCF_IMPLEMENT_IBASE_END
-
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataPolygon)
 
 csModelDataPolygon::csModelDataPolygon ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   Material = 0;
 }
 
@@ -362,8 +316,6 @@ csModelDataPolygon::~csModelDataPolygon ()
 {
   if (Material)
     Material->DecRef ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
-  SCF_DESTRUCT_IBASE ();
 }
 
 size_t csModelDataPolygon::GetVertexCount () const
@@ -406,36 +358,19 @@ iModelDataPolygon *csModelDataPolygon::Clone () const
 
 /*** csModelDataObject ***/
 
-SCF_IMPLEMENT_IBASE (csModelDataObject)
-  SCF_IMPLEMENTS_INTERFACE (iModelDataObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
-SCF_IMPLEMENT_IBASE_END
-
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataObject)
-
 CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataObject,
 	iModelDataVertices *, DefaultVertices)
 
 csModelDataObject::csModelDataObject ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
 csModelDataObject::~csModelDataObject ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
-  SCF_DESTRUCT_IBASE ();
 }
 
 /*** csModelDataCamera ***/
-
-SCF_IMPLEMENT_IBASE (csModelDataCamera)
-  SCF_IMPLEMENTS_INTERFACE (iModelDataCamera)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
-SCF_IMPLEMENT_IBASE_END
-
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataCamera)
 
 CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, Position)
 CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, UpVector)
@@ -443,15 +378,12 @@ CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, FrontVector)
 CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataCamera, const csVector3 &, RightVector)
 
 csModelDataCamera::csModelDataCamera ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
 csModelDataCamera::~csModelDataCamera()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csModelDataCamera::ComputeUpVector ()
@@ -497,27 +429,18 @@ iModelDataCamera *csModelDataCamera::Clone () const
 
 /*** csModelDataLight ***/
 
-SCF_IMPLEMENT_IBASE (csModelDataLight)
-  SCF_IMPLEMENTS_INTERFACE (iModelDataLight)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
-SCF_IMPLEMENT_IBASE_END
-
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelDataLight)
 
 CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, float, Radius)
 CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, const csColor &, Color)
 CS_IMPLEMENT_ACCESSOR_METHOD (csModelDataLight, const csVector3 &, Position)
 
 csModelDataLight::csModelDataLight ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
 csModelDataLight::~csModelDataLight()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
-  SCF_DESTRUCT_IBASE ();
 }
 
 iModelDataLight *csModelDataLight::Clone () const
@@ -531,28 +454,18 @@ iModelDataLight *csModelDataLight::Clone () const
 
 /*** csModelData ***/
 
-SCF_IMPLEMENT_IBASE (csModelData)
-  SCF_IMPLEMENTS_INTERFACE (iModelData)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
-SCF_IMPLEMENT_IBASE_END
-
-CS_IMPLEMENT_OBJECT_INTERFACE (csModelData)
-
 csModelData::csModelData ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
 }
 
 csModelData::~csModelData()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObject);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csModelData::LoadImages (iVFS *vfs, iImageIO *io, int Format)
 {
-  csTypedObjectIterator<iModelDataTexture> it (&scfiObject);
+  csTypedObjectIterator<iModelDataTexture> it (this);
   while (!it.HasNext ())
   {
     it.Next ()->LoadImage (vfs, io, Format);
@@ -561,7 +474,7 @@ void csModelData::LoadImages (iVFS *vfs, iImageIO *io, int Format)
 
 void csModelData::RegisterTextures (iTextureList *tm)
 {
-  csTypedObjectIterator<iModelDataTexture> it (&scfiObject);
+  csTypedObjectIterator<iModelDataTexture> it (this);
   while (it.HasNext ())
   {
     it.Next ()->Register (tm);
@@ -570,7 +483,7 @@ void csModelData::RegisterTextures (iTextureList *tm)
 
 void csModelData::RegisterMaterials (iMaterialList *ml)
 {
-  csTypedObjectIterator<iModelDataMaterial> it (&scfiObject);
+  csTypedObjectIterator<iModelDataMaterial> it (this);
   while (!it.HasNext ())
   {
     it.Next ()->Register (ml);

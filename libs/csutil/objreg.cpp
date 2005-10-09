@@ -24,11 +24,13 @@
 #include "csutil/ansicolor.h"
 #include "csutil/objreg.h"
 #include "csutil/refarr.h"
+#include "csutil/scf.h"
 #include "csutil/scopedmutexlock.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 
-class csObjectRegistryIterator : public iObjectRegistryIterator
+class csObjectRegistryIterator : 
+  public scfImplementation1<csObjectRegistryIterator, iObjectRegistryIterator>
 {
 private:
   csRefArray<iBase> objects;
@@ -41,21 +43,16 @@ public:
 
   void Add (iBase* obj, char const* tag);
 
-  SCF_DECLARE_IBASE;
   virtual bool Reset ();
   virtual const char* GetCurrentTag ();
   virtual bool HasNext ();
   virtual iBase* Next ();
 };
 
-SCF_IMPLEMENT_IBASE (csObjectRegistryIterator)
-  SCF_IMPLEMENTS_INTERFACE (iObjectRegistryIterator)
-SCF_IMPLEMENT_IBASE_END
 
 csObjectRegistryIterator::csObjectRegistryIterator ()
+  : scfImplementationType (this), cur_idx (0)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  cur_idx = 0;
 }
 
 csObjectRegistryIterator::~csObjectRegistryIterator ()
@@ -68,7 +65,6 @@ csObjectRegistryIterator::~csObjectRegistryIterator ()
     objects.DeleteIndex (i - 1);
     tags.DeleteIndex (i - 1);
   }
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csObjectRegistryIterator::Reset ()
@@ -105,13 +101,9 @@ void csObjectRegistryIterator::Add (iBase* obj, char const* tag)
 
 //-------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csObjectRegistry)
-  SCF_IMPLEMENTS_INTERFACE (iObjectRegistry)
-SCF_IMPLEMENT_IBASE_END
-
-csObjectRegistry::csObjectRegistry () : clearing (false)
+csObjectRegistry::csObjectRegistry () 
+  : scfImplementationType (this), clearing (false)
 {
-  SCF_CONSTRUCT_IBASE (0);
   // We need a recursive mutex.
   mutex = csMutex::Create (true);
 #if defined(CS_DEBUG) || defined (CS_MEMORY_TRACKER)
@@ -126,7 +118,6 @@ csObjectRegistry::~csObjectRegistry ()
   CS_ASSERT (registry.Length () == 0);
   CS_ASSERT (tags.Length () == 0);
   CS_ASSERT (clearing == false);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csObjectRegistry::Clear ()

@@ -501,7 +501,7 @@ public:
     virtual ~PolyMesh ()
     { SCF_DESTRUCT_IBASE (); }
   } scfiPolygonMesh;
-  friend class PolyMesh;
+  friend struct PolyMesh;
 
   //------------------------- iObjectModel implementation ----------------
   class eiObjectModel : public csObjectModel

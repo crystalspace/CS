@@ -29,11 +29,6 @@
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csEvent)
-  SCF_IMPLEMENTS_INTERFACE (iEvent)
-  SCF_IMPLEMENTS_INTERFACE (csEvent)
-SCF_IMPLEMENT_IBASE_END
-
 CS_IMPLEMENT_STATIC_VAR(GetEventStrSet, csStringSet, ())
 
 char const* csEvent::GetTypeName (csEventAttributeType t)
@@ -63,16 +58,15 @@ const char* csEvent::GetKeyName (csStringID id)
 }
 
 csEvent::csEvent ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   count = 0;
 }
 
 csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
-		  uint mButton, uint32 mModifiers) : attributes (53)
+		  uint mButton, uint32 mModifiers) 
+                  : scfImplementationType (this), attributes (53)
 {
-  SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
@@ -89,9 +83,9 @@ csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
 
 csEvent::csEvent (csTicks iTime, int eType, uint n, int x, int y, 
 		  uint32 axesChanged, uint button, uint32 modifiers) : 
-  attributes (53)
+  scfImplementationType (this), attributes (53)
 {
-  SCF_CONSTRUCT_IBASE (0);
+
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
@@ -124,10 +118,9 @@ csEvent::csEvent (csTicks iTime, int eType, uint n, int x, int y,
 
 csEvent::csEvent (csTicks iTime, int eType, uint n, const int32* axes, 
 		  uint8 numAxes, uint32 axesChanged, uint8 button, 
-		  uint32 modifiers) : attributes (53)
+		  uint32 modifiers) 
+                  : scfImplementationType (this), attributes (53)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
@@ -159,9 +152,8 @@ csEvent::csEvent (csTicks iTime, int eType, uint n, const int32* axes,
 }
 
 csEvent::csEvent (csTicks iTime, int eType, uint cCode, intptr_t cInfo) :
-  attributes (53)
+  scfImplementationType (this), attributes (53)
 {
-  SCF_CONSTRUCT_IBASE (0);
   Time = iTime;
   Type = eType;
   Category = SubCategory = Flags = 0;
@@ -173,9 +165,8 @@ csEvent::csEvent (csTicks iTime, int eType, uint cCode, intptr_t cInfo) :
   count = 0;
 }
 
-csEvent::csEvent (csEvent const& e) : iEvent(), attributes (53)
+csEvent::csEvent (csEvent const& e) : scfImplementationType (this), attributes (53)
 {
-  SCF_CONSTRUCT_IBASE (0);
   count = 0;
 
   Type = e.Type;
@@ -189,7 +180,6 @@ csEvent::csEvent (csEvent const& e) : iEvent(), attributes (53)
 csEvent::~csEvent ()
 {
   RemoveAll();
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csEvent::Add (const char *name, float v)
@@ -379,7 +369,8 @@ csEventError csEvent::Retrieve (const char *name, csRef<iEvent> &v) const
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttrEvent)
   {
-    v = (iEvent*)object->ibaseVal;
+    iBase *b = object->ibaseVal;
+    v = SCF_QUERY_INTERFACE(b, iEvent);
     return csEventErrNone;
   }
   else
@@ -517,10 +508,6 @@ csRef<iEvent> csEvent::CreateEvent()
 }
 
 //---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (csEventAttributeIterator)
-  SCF_IMPLEMENTS_INTERFACE (iEventAttributeIterator)
-SCF_IMPLEMENT_IBASE_END
 
 const char* csEventAttributeIterator::Next()
 {

@@ -37,6 +37,7 @@
 // it's important that cssysdef.h is included AFTER the above #ifdef
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
+#include "csutil/scf_implementation.h"
 
 #ifdef CS_MEMORY_TRACKER_IMPLEMENT
 #  define CS_MEMORY_TRACKER
@@ -795,21 +796,20 @@ public:
 
 // The following machinery is needed to try to keep track of memory
 // allocations in different plugins.
-class csMemTrackerRegistry : public iMemoryTracker
+class csMemTrackerRegistry : public scfImplementation1<csMemTrackerRegistry, 
+                                                       iMemoryTracker>
 {
 public:
   csMemTrackerModule* modules[500];     // @@@ Hardcoded!
   int num_modules;
 
-  SCF_DECLARE_IBASE;
   csMemTrackerRegistry ()
+    : scfImplementationType (this), num_modules (0)
   {
-    SCF_CONSTRUCT_IBASE (0);
-    num_modules = 0;
   }
+
   virtual ~csMemTrackerRegistry ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
 
   csMemTrackerModule* NewMemTrackerModule (char* Class)
@@ -830,9 +830,6 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (csMemTrackerRegistry)
-  SCF_IMPLEMENTS_INTERFACE (iMemoryTracker)
-SCF_IMPLEMENT_IBASE_END
 
 static csMemTrackerModule* mti_this_module = 0;
 

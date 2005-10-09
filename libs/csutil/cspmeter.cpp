@@ -22,20 +22,14 @@
 #include "csutil/csstring.h"
 #include "ivaria/conout.h"
 
-SCF_IMPLEMENT_IBASE (csTextProgressMeter)
-  SCF_IMPLEMENTS_INTERFACE (iProgressMeter)
-SCF_IMPLEMENT_IBASE_END
-
 csTextProgressMeter::csTextProgressMeter (iConsoleOutput* cons, int n)
-        : console (cons), granularity(10), tick_scale(2),
-          total(n), current(0), anchor(0)
+  : scfImplementationType (this),
+  console (cons), granularity(10), tick_scale(2),  total(n), current(0), anchor(0)
 {
-  SCF_CONSTRUCT_IBASE (0);
 }
 
 csTextProgressMeter::~csTextProgressMeter()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csTextProgressMeter::Step(unsigned int n)

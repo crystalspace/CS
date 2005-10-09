@@ -34,9 +34,6 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (csMemFile)
-  SCF_IMPLEMENTS_INTERFACE (iFile)
-SCF_IMPLEMENT_IBASE_END
 
 const char* csMemFile::GetName() { return "#csMemFile"; }
 const char* csMemFile::GetData() const 
@@ -48,24 +45,23 @@ bool csMemFile::AtEOF() { return (cursor >= size); }
 size_t csMemFile::GetPos() { return cursor; }
 bool csMemFile::SetPos(size_t p) { cursor = p < size ? p : size; return true; }
 
-csMemFile::csMemFile() :
+csMemFile::csMemFile() 
+  : scfImplementationType (this),
   size(0), cursor(0), copyOnWrite (true)
 { 
-  SCF_CONSTRUCT_IBASE(0); 
 }
 
-csMemFile::csMemFile(const char* p, size_t s) :
+csMemFile::csMemFile(const char* p, size_t s)
+  : scfImplementationType (this),
   size(s), cursor(0), copyOnWrite (true)
 { 
-  SCF_CONSTRUCT_IBASE(0); 
   buffer.AttachNew (new csDataBuffer ((char*)p, s, false));
 }
 
-csMemFile::csMemFile(char* p, size_t s, Disposition d) :
+csMemFile::csMemFile(char* p, size_t s, Disposition d) 
+  : scfImplementationType (this),
   size(s), cursor(0)
 { 
-  SCF_CONSTRUCT_IBASE(0); 
-
   if (d == DISPOSITION_FREE)
     buffer.AttachNew (new csFreeDataBuffer (p, s));
   else
@@ -73,16 +69,15 @@ csMemFile::csMemFile(char* p, size_t s, Disposition d) :
       d == DISPOSITION_DELETE));
 }
 
-csMemFile::csMemFile(iDataBuffer* buf, bool readOnly) :
+csMemFile::csMemFile(iDataBuffer* buf, bool readOnly) 
+  : scfImplementationType (this),
   buffer(buf), size(buf ? buf->GetSize() : 0), cursor(0), 
   copyOnWrite (readOnly)
 {
-  SCF_CONSTRUCT_IBASE(0); 
 }
 
 csMemFile::~csMemFile()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 size_t csMemFile::Read(char* Data, size_t DataSize)

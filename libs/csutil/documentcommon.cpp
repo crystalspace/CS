@@ -1,4 +1,4 @@
-/*
+ /*
     Copyright (C) 2005 by Jorrit Tyberghein
 	      (C) 2005 by Frank Richter
 
@@ -23,34 +23,25 @@
 
 using namespace CrystalSpace;
 
-SCF_IMPLEMENT_IBASE(csEmptyDocumentNodeIterator)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentNodeIterator)
-SCF_IMPLEMENT_IBASE_END
 
 csEmptyDocumentNodeIterator::csEmptyDocumentNodeIterator ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
 }
 
 csEmptyDocumentNodeIterator::~csEmptyDocumentNodeIterator ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csEmptyDocumentAttributeIterator)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentAttributeIterator)
-SCF_IMPLEMENT_IBASE_END
-
 csEmptyDocumentAttributeIterator::csEmptyDocumentAttributeIterator ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
 }
 
 csEmptyDocumentAttributeIterator::~csEmptyDocumentAttributeIterator ()
-{
-  SCF_DESTRUCT_IBASE();
+{  
 }
 
 //---------------------------------------------------------------------------

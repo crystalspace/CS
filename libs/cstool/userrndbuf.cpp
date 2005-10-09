@@ -22,6 +22,7 @@
 #include "cstool/userrndbuf.h"
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
@@ -61,22 +62,19 @@ bool csUserRenderBufferManager::RemoveRenderBuffer (csStringID name)
   return true;
 }
 
-class BufferNameIter : public iUserRenderBufferIterator
+class BufferNameIter : public scfImplementation1<BufferNameIter, 
+                                                 iUserRenderBufferIterator>
 {
   size_t index;
 public:
   csArray<csStringID> names;
   csRefArray<iRenderBuffer> buffers;
 
-  SCF_DECLARE_IBASE;
-
-  BufferNameIter() : index(0) 
+  BufferNameIter() : scfImplementationType (this), index(0) 
   {
-    SCF_CONSTRUCT_IBASE(0);
   }
   virtual ~BufferNameIter() 
   {
-    SCF_DESTRUCT_IBASE();
   }
 
   bool HasNext();
@@ -98,9 +96,6 @@ csRef<iUserRenderBufferIterator> csUserRenderBufferManager::GetBuffers() const
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(BufferNameIter)
-  SCF_IMPLEMENTS_INTERFACE(iUserRenderBufferIterator)
-SCF_IMPLEMENT_IBASE_END
 
 bool BufferNameIter::HasNext()
 {

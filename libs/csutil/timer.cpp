@@ -35,21 +35,19 @@ struct timerevent
 
 //-----------------------------------------------------------------------
 
-class csTimerEventHandler : public iEventHandler
+class csTimerEventHandler : public scfImplementation1<csTimerEventHandler,
+                                                      iEventHandler>
 {
 private:
   csEventTimer* timer;
 
 public:
-  SCF_DECLARE_IBASE;
   csTimerEventHandler (csEventTimer* timer)
+    : scfImplementationType (this), timer (timer)
   {
-    SCF_CONSTRUCT_IBASE (0);
-    csTimerEventHandler::timer = timer;
   }
   virtual ~csTimerEventHandler()
   {
-    SCF_DESTRUCT_IBASE ();
   }
   virtual bool HandleEvent (iEvent& e)
   {
@@ -57,19 +55,13 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (csTimerEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
 
 //-----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csEventTimer)
-  SCF_IMPLEMENTS_INTERFACE (iEventTimer)
-SCF_IMPLEMENT_IBASE_END
 
 csEventTimer::csEventTimer (iObjectRegistry* object_reg)
+  : scfImplementationType (this)  
 {
-  SCF_CONSTRUCT_IBASE (0);
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   CS_ASSERT (q != 0);
   if (q != 0)
@@ -101,7 +93,6 @@ csEventTimer::~csEventTimer ()
     //if (q != 0)
       //q->RemoveListener (handler);
   }
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csEventTimer::HandleEvent (iEvent& event)

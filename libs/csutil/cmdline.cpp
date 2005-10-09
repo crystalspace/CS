@@ -20,25 +20,19 @@
 #include "csutil/syspath.h"
 #include "csutil/cmdline.h"
 
-SCF_IMPLEMENT_IBASE (csCommandLineParser)
-  SCF_IMPLEMENTS_INTERFACE (iCommandLineParser)
-SCF_IMPLEMENT_IBASE_END
-
-csCommandLineParser::csCommandLineParser (iBase *Parent) : Names (16, 16)
+csCommandLineParser::csCommandLineParser (iBase *Parent) 
+  : scfImplementationType (this, Parent), Names (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (Parent);
 }
 
-csCommandLineParser::csCommandLineParser (int argc, const char* const argv[]) :
-  Names (16, 16)
+csCommandLineParser::csCommandLineParser (int argc, const char* const argv[]) 
+  : scfImplementationType (this),  Names (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (0);
   Initialize (argc, argv);
 }
 
 csCommandLineParser::~csCommandLineParser()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csCommandLineParser::Initialize (int argc, const char* const argv[])

@@ -28,7 +28,6 @@
 class csSector;
 class csEngine;
 
-SCF_VERSION (csCollection, 0, 0, 1);
 
 /**
  * A collection object is for convenience of the script language.

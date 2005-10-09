@@ -23,25 +23,15 @@
 #include "cstool/sndwrap.h"
 #include "csutil/csobject.h"
 
-SCF_IMPLEMENT_IBASE (csSoundWrapper);
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSoundWrapper);
-SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundWrapper::SoundWrapper)
-  SCF_IMPLEMENTS_INTERFACE (iSoundWrapper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csSoundWrapper::csSoundWrapper (iSoundHandle *buf) : csObject()
+csSoundWrapper::csSoundWrapper (iSoundHandle *buf) 
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSoundWrapper);
   SoundHandle = buf;
 }
 
 csSoundWrapper::~csSoundWrapper ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSoundWrapper);
-  SCF_DESTRUCT_IBASE ();
 }
 
 iSoundHandle* csSoundWrapper::GetSound ()
@@ -49,12 +39,8 @@ iSoundHandle* csSoundWrapper::GetSound ()
   return SoundHandle;
 }
 
-iSoundHandle *csSoundWrapper::SoundWrapper::GetSound ()
-{
-  return scfParent->GetSound ();
-}
 
-iObject *csSoundWrapper::SoundWrapper::QueryObject ()
+iObject *csSoundWrapper::QueryObject ()
 {
-  return scfParent;
+  return this;
 }

@@ -26,22 +26,20 @@
 CS_LEAKGUARD_IMPLEMENT (csObject);
 
 /*** Object Iterators ***/
-class csObjectIterator : public iObjectIterator
+class csObjectIterator : 
+  public scfImplementation1<csObjectIterator, iObjectIterator>
 {
 public:
-  SCF_DECLARE_IBASE;
   csRef<csObject> object;
   size_t position;
 
   csObjectIterator (csObject *obj) 
-      : object (obj)
+      : scfImplementationType (this), object (obj)
   {
-    SCF_CONSTRUCT_IBASE (0);
     Reset ();
   }
   virtual ~csObjectIterator ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
 
   virtual bool HasNext() const
@@ -80,37 +78,25 @@ public:
     return 0;
   }
 };
-
-SCF_IMPLEMENT_IBASE (csObjectIterator)
-  SCF_IMPLEMENTS_INTERFACE (iObjectIterator)
-SCF_IMPLEMENT_IBASE_END
-
 /*** csObject itself ***/
 
-SCF_IMPLEMENT_IBASE (csObject)
-  SCF_IMPLEMENTS_INTERFACE (iObject)
-SCF_IMPLEMENT_IBASE_END
-
-#include "csutil/debug.h"
 
 void csObject::InitializeObject ()
 {
   static uint id = 0;
   csid = id++;
   ParentObject = 0;
-  DG_ADDI (this, 0);
-  DG_TYPE (this, "csObject");
 }
 
-csObject::csObject (iBase* pParent) : Children (0), Name (0)
+csObject::csObject (iBase* pParent) 
+  : scfImplementationType (this, pParent), Children (0), Name (0)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
   InitializeObject ();
 }
 
-csObject::csObject (csObject &o) : iBase(), iObject(), Children (0), Name (0)
+csObject::csObject (csObject &o) 
+  : scfImplementationType (this),  Children (0), Name (0)
 {
-  SCF_CONSTRUCT_IBASE (0);
   InitializeObject ();
 
   csRef<iObjectIterator> it (o.GetIterator ());
@@ -124,8 +110,6 @@ csObject::csObject (csObject &o) : iBase(), iObject(), Children (0), Name (0)
 csObject::~csObject ()
 {
   ObjRemoveAll ();
-
-  DG_REM (this);
 
   if (Children) { delete Children; Children = 0; }
   delete [] Name; Name = 0;
@@ -142,12 +126,8 @@ csObject::~csObject ()
    */
   if (ParentObject)
   {
-    DG_REMCHILD (ParentObject, this);
-    DG_REMPARENT (this, ParentObject);
     ParentObject->ObjReleaseOld (this);
   }
-
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csObject::SetName (const char* newname)
@@ -156,7 +136,6 @@ void csObject::SetName (const char* newname)
   Name = csStrNew (newname);
   FireNameChangeListeners (oldname, newname);
   delete [] oldname;
-  DG_DESCRIBE1 (this, "%s", Name);
 }
 
 const char *csObject::GetName () const
@@ -188,9 +167,7 @@ void csObject::ObjAdd (iObject *obj)
     Children = new csObjectContainer ();
 
   obj->SetObjectParent (this);
-  DG_ADDPARENT (obj, this);
   Children->Push (obj);
-  DG_ADDCHILD (this, obj);
 }
 
 void csObject::ObjRemove (iObject *obj)
@@ -202,8 +179,6 @@ void csObject::ObjRemove (iObject *obj)
   if (n != (size_t)-1)
   {
     obj->SetObjectParent (0);
-    DG_REMPARENT (obj, this);
-    DG_REMCHILD (this, obj);
     Children->DeleteIndex (n);
   }
 }
@@ -241,8 +216,6 @@ void csObject::ObjRemoveAll ()
     const size_t idx = i - 1;
     iObject* child = Children->Get (idx);
     child->SetObjectParent (0);
-    DG_REMPARENT (child, this);
-    DG_REMCHILD (this, child);
     Children->DeleteIndex (idx);
   }
 }

@@ -23,7 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csplugincommon/shader/shaderplugin.h"
 #include "ivideo/shader/shader.h"
 
-class csGLExtensionManager;
+struct csGLExtensionManager;
 class csGLStateCache;
 
 class csGLShader_PS1 : public iShaderProgramPlugin

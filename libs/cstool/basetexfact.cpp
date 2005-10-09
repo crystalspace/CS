@@ -21,26 +21,15 @@
 
 #include "cstool/basetexfact.h"
 
-SCF_IMPLEMENT_IBASE (csBaseTextureFactory)
-  SCF_IMPLEMENTS_INTERFACE (iTextureFactory)
-SCF_IMPLEMENT_IBASE_END
-
 csBaseTextureFactory::csBaseTextureFactory (iTextureType* parent, 
 					    iObjectRegistry* object_reg)
+  : scfImplementationType (this, parent), object_reg (object_reg), 
+  width (128), height (128), texture_type (parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  
-  csBaseTextureFactory::object_reg = object_reg;
-  
-  texture_type = parent;
-
-  width = 128;
-  height = 128;
 }
 
 csBaseTextureFactory::~csBaseTextureFactory ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csBaseTextureFactory::SetSize (int w, int h)

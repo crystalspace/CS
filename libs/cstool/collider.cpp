@@ -45,13 +45,12 @@
 
 CS_LEAKGUARD_IMPLEMENT (csColliderWrapper);
 
-SCF_IMPLEMENT_IBASE_EXT (csColliderWrapper)
-  SCF_IMPLEMENTS_INTERFACE (csColliderWrapper)
-SCF_IMPLEMENT_IBASE_EXT_END
+
 
 csColliderWrapper::csColliderWrapper (csObject& parent,
 	iCollideSystem* collide_system,
 	iPolygonMesh* mesh)
+  : scfImplementationType (this)
 {
   parent.ObjAdd (this);
   csColliderWrapper::collide_system = collide_system;
@@ -61,6 +60,7 @@ csColliderWrapper::csColliderWrapper (csObject& parent,
 csColliderWrapper::csColliderWrapper (iObject* parent,
 	iCollideSystem* collide_system,
 	iPolygonMesh* mesh)
+  : scfImplementationType (this)
 {
   parent->ObjAdd (this);
   csColliderWrapper::collide_system = collide_system;
@@ -70,6 +70,7 @@ csColliderWrapper::csColliderWrapper (iObject* parent,
 csColliderWrapper::csColliderWrapper (iObject* parent,
 	iCollideSystem* collide_system,
 	iCollider* collider)
+  : scfImplementationType (this)
 {
   parent->ObjAdd (this);
   csColliderWrapper::collide_system = collide_system;

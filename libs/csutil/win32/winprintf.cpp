@@ -18,10 +18,11 @@
 
 #include "cssysdef.h"
 #include "csutil/ansiparse.h"
+#include "csutil/csstring.h"
 #include "csutil/csunicode.h"
-#include "csutil/util.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
+#include "csutil/util.h"
 
 #include <windows.h>
 #include "csutil/win32/wintools.h"

@@ -24,14 +24,9 @@
 
 #include "iutil/eventq.h"
 
-SCF_IMPLEMENT_IBASE (csBaseEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-
 csBaseEventHandler::csBaseEventHandler()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
 }
 
 
@@ -39,7 +34,6 @@ csBaseEventHandler::~csBaseEventHandler()
 {
   if (queue)
     queue->RemoveListener (this);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBaseEventHandler::RegisterQueue (iEventQueue* q, unsigned int trigger)

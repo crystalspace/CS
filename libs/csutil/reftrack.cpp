@@ -25,15 +25,10 @@
 #include "csutil/sysfunc.h"
 #include "reftrack.h"
 
-SCF_IMPLEMENT_IBASE(csRefTracker)
-  SCF_IMPLEMENTS_INTERFACE (iRefTracker)
-SCF_IMPLEMENT_IBASE_END
 
 
-csRefTracker::csRefTracker () : riAlloc(1000)
+csRefTracker::csRefTracker () : scfImplementationType (this), riAlloc(1000)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   (mutex = csMutex::Create ())->IncRef();
 }
 
@@ -43,7 +38,6 @@ csRefTracker::~csRefTracker ()
   mutex = 0; 
     // Set mutex to 0 as mutex DecRef() will cause RefTracker call
   tehMutex->DecRef();
-  SCF_DESTRUCT_IBASE();
 }
 
 csRefTracker::RefInfo& csRefTracker::GetObjRefInfo (void* obj)

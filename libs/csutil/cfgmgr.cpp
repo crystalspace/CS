@@ -19,10 +19,11 @@
 #include "cssysdef.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
-#include "csutil/strhash.h"
 #include "csutil/csstring.h"
-#include "csutil/util.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/strhash.h"
 #include "csutil/sysfunc.h"
+#include "csutil/util.h"
 
 /* helper classes */
 
@@ -75,7 +76,8 @@ public:
 // Note: the iterator starts at the last (highest-priority) domain and loops
 // back to the first one.
 
-class csConfigManagerIterator : public iConfigIterator
+class csConfigManagerIterator : public scfImplementation1<csConfigManagerIterator,
+                                                          iConfigIterator>
 {
 private:
   csRef<csConfigManager> Config;
@@ -84,7 +86,6 @@ private:
   char *Subsection;
   csStringHash Iterated;
 public:
-  SCF_DECLARE_IBASE;
 
   void ClearIterated()
   {
@@ -104,9 +105,8 @@ public:
   }
 
   csConfigManagerIterator(csConfigManager *cfg, const char *sub)
+    : scfImplementationType (this), Config (cfg)
   {
-    SCF_CONSTRUCT_IBASE(0);
-    Config = cfg;
     CurrentDomain = Config->LastDomain;
     Subsection = csStrNew(sub);
   }
@@ -115,7 +115,6 @@ public:
     Config->RemoveIterator(this);
     delete[] Subsection;
     ClearIterated();
-    SCF_DESTRUCT_IBASE ();
   }
   virtual iConfigFile *GetConfigFile() const
   {
@@ -182,20 +181,13 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE(csConfigManagerIterator);
-  SCF_IMPLEMENTS_INTERFACE(iConfigIterator);
-SCF_IMPLEMENT_IBASE_END
 
 /* config manager object */
 
-SCF_IMPLEMENT_IBASE(csConfigManager);
-  SCF_IMPLEMENTS_INTERFACE(iConfigManager);
-  SCF_IMPLEMENTS_INTERFACE(iConfigFile);
-SCF_IMPLEMENT_IBASE_END
 
 csConfigManager::csConfigManager(iConfigFile *dyn, bool opt)
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   Optimize = opt;
   FirstDomain = new csConfigDomain(0, PriorityMin);
   LastDomain = new csConfigDomain(0, PriorityMax);
@@ -215,7 +207,6 @@ csConfigManager::~csConfigManager()
     csPrintf("Error saving configuration '%s'.\n",
 	    DynamicDomain->Cfg->GetFileName());
   CleanUp ();
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csConfigManager::CleanUp ()

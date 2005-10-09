@@ -24,10 +24,10 @@
 #include "csplugincommon/shader/shaderprogram.h"
 #include "vproc_std.h"
 
-class csVProcStandardProgram : public csShaderProgram
+class csVProcStandardProgram : public scfImplementationExt0<csVProcStandardProgram,
+                                                            csShaderProgram>
 {
 public:
-  SCF_DECLARE_IBASE_EXT (csShaderProgram);
   CS_LEAKGUARD_DECLARE (csVProcStandardProgram);
 
   csVProcStandardProgram (csVProc_Std *plug);

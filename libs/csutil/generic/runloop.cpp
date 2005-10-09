@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
@@ -41,14 +42,16 @@
  * run-loop is already provided by the BApplication class.
  */
 
-class csDefaultQuitEventHandler : public iEventHandler
+class csDefaultQuitEventHandler : 
+  public scfImplementation1<csDefaultQuitEventHandler, iEventHandler>
 {
 private:
   bool shutdown;
 public:
-  SCF_DECLARE_IBASE;
-  csDefaultQuitEventHandler() : shutdown(false) { SCF_CONSTRUCT_IBASE(0); }
-  virtual ~csDefaultQuitEventHandler() { SCF_DESTRUCT_IBASE(); }
+  csDefaultQuitEventHandler() 
+    : scfImplementationType (this), shutdown(false) 
+  {}
+  virtual ~csDefaultQuitEventHandler() { }
   bool ShouldShutdown() const { return shutdown; }
   virtual bool HandleEvent(iEvent& e)
   {
@@ -61,9 +64,6 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE(csDefaultQuitEventHandler)
-  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_IBASE_END
 
 bool csDefaultRunLoop (iObjectRegistry* r)
 {

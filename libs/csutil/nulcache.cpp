@@ -22,18 +22,13 @@
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csNullCacheManager)
-  SCF_IMPLEMENTS_INTERFACE (iCacheManager)
-SCF_IMPLEMENT_IBASE_END
-
 csNullCacheManager::csNullCacheManager ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
 }
 
 csNullCacheManager::~csNullCacheManager ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csNullCacheManager::SetCurrentType (const char*)

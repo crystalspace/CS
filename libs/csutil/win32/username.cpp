@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 #include <windows.h>

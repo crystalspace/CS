@@ -21,17 +21,15 @@
 #include "cstool/keyval.h"
 #include "csutil/scfstringarray.h"
 
-SCF_IMPLEMENT_IBASE_EXT (csKeyValuePair)
-  SCF_IMPLEMENTS_INTERFACE (iKeyValuePair)
-SCF_IMPLEMENT_IBASE_EXT_END
-
 csKeyValuePair::csKeyValuePair (const char* Key, const char* Value)
+  : scfImplementationType (this)
 {
   SetName (Key);
   SetValue (Value);
 }
 
 csKeyValuePair::csKeyValuePair (const char* Key)
+  : scfImplementationType (this)
 {
   SetName (Key);
   m_Value = 0;

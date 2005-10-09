@@ -26,14 +26,11 @@
 #include "iutil/csinput.h"
 #include "iutil/objreg.h"
 
-SCF_IMPLEMENT_IBASE (csEventOutlet)
-  SCF_IMPLEMENTS_INTERFACE (iEventOutlet)
-SCF_IMPLEMENT_IBASE_END
 
-csEventOutlet::csEventOutlet(iEventPlug* p,csEventQueue* q,iObjectRegistry* r):
+csEventOutlet::csEventOutlet(iEventPlug* p,csEventQueue* q,iObjectRegistry* r)
+  : scfImplementationType (this), 
   EnableMask((unsigned int)(-1)), Plug(p), Queue(q), Registry(r)
 {
-  SCF_CONSTRUCT_IBASE (0);
 }
 
 csEventOutlet::~csEventOutlet ()
@@ -44,7 +41,6 @@ csEventOutlet::~csEventOutlet ()
     Queue->EventOutlets [idx] = 0;
     Queue->EventOutlets.DeleteIndex (idx);
   }
-  SCF_DESTRUCT_IBASE ();
 }
 
 #define DRIVER_GETTER(X) \

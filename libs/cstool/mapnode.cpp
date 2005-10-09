@@ -24,16 +24,11 @@
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_EXT (csMapNode)
-  SCF_IMPLEMENTS_INTERFACE (iMapNode)
-SCF_IMPLEMENT_IBASE_EXT_END
 
 csMapNode::csMapNode (const char* Name) :
-	sector (0),
-	position (0, 0, 0),
-	xvector (1, 0, 0),
-	yvector (0, 1, 0),
-	zvector (0, 0, 1)
+  scfImplementationType (this),
+  sector (0), position (0, 0, 0), xvector (1, 0, 0), yvector (0, 1, 0),
+  zvector (0, 0, 1)
 {
   SetName (Name);
 }

@@ -190,6 +190,3 @@ bool csVerbosityParser::Enabled(char const* flag, bool fuzzy) const
   return enable;
 }
 
-SCF_IMPLEMENT_IBASE(csVerbosityManager)
-  SCF_IMPLEMENTS_INTERFACE(iVerbosityManager)
-SCF_IMPLEMENT_IBASE_END

@@ -62,7 +62,7 @@
 
 class csGLTextureHandle;
 class csGLTextureManager;
-class csGLExtensionManager;
+struct csGLExtensionManager;
 class csGLVBOBufferManager;
 class csGLRenderBuffer;
 struct iClipper2D;

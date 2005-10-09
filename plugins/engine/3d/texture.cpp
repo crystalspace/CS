@@ -20,7 +20,6 @@
 #include <math.h>
 #include "plugins/engine/3d/texture.h"
 #include "plugins/engine/3d/engine.h"
-#include "csutil/debug.h"
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
 
@@ -32,19 +31,15 @@ csTextureWrapper::csTextureWrapper (iImage *Image)
   : scfImplementationType (this),
   flags(CS_TEXTURE_3D)
 {
-  DG_TYPE (this, "csTextureWrapper");
   image = Image;
   keep_image = false;
   texClass = 0;
-  DG_LINK (this, image);
   UpdateKeyColorFromImage ();
 }
 
 csTextureWrapper::csTextureWrapper (iTextureHandle *ith) 
   : scfImplementationType (this)
 {
-  DG_TYPE (this, "csTextureWrapper");
-
   keep_image = false;
   texClass = 0;
 
@@ -52,7 +47,6 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith)
   if (handle)
   {
     flags = ith->GetFlags ();
-    DG_LINK (this, handle);
   }
   else
   {
@@ -66,11 +60,8 @@ csTextureWrapper::csTextureWrapper (const csTextureWrapper &t) :
   iBase(), scfImplementationType (this),
   flags(CS_TEXTURE_3D)
 {
-  DG_TYPE (this, "csTextureWrapper");
   handle = t.handle;
-  DG_LINK (this, handle);
   image = t.image;
-  DG_LINK (this, image);
   keep_image = t.keep_image;
   if (!handle)
     texClass = csStrNew (t.texClass);
@@ -82,25 +73,12 @@ csTextureWrapper::csTextureWrapper (const csTextureWrapper &t) :
 
 csTextureWrapper::~csTextureWrapper ()
 {
-  if (handle)
-    DG_UNLINK (this, handle);
-  if (image)
-    DG_UNLINK (this, image);
+
   delete[] texClass;
 }
 
 void csTextureWrapper::SetImageFile (iImage *Image)
 {
-  if (Image)
-  {
-    DG_LINK (this, Image);
-  }
-
-  if (image)
-  {
-    DG_UNLINK (this, image);
-  }
-
   image = Image;
 
   if (image)
@@ -109,19 +87,9 @@ void csTextureWrapper::SetImageFile (iImage *Image)
 
 void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
 {
-  if (image)
-  {
-    DG_UNLINK (this, image);
-    image = 0;
-  }
-
-  if (handle)
-  {
-    DG_UNLINK (this, handle);
-  }
+  image = 0;
 
   handle = tex;
-  DG_LINK (this, handle);
 
   flags = handle->GetFlags ();
   UpdateKeyColorFromHandle ();
@@ -168,7 +136,6 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   handle = txtmgr->RegisterTexture (image, flags);
   if (handle)
   {
-    DG_LINK (this, handle);
     SetKeyColor (key_col_r, key_col_g, key_col_b);
     handle->SetTextureClass (texClass);
     delete[] texClass; texClass = 0; 

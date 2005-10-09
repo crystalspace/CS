@@ -28,15 +28,13 @@
 #include "csutil/sysfunc.h"
 #include "iutil/eventh.h"
 
-SCF_IMPLEMENT_IBASE (csEventQueue)
-  SCF_IMPLEMENTS_INTERFACE (iEventQueue)
-SCF_IMPLEMENT_IBASE_END
 
-csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
+
+csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) 
+  : scfImplementationType (this),
   Registry(r), EventQueue(0), evqHead(0), evqTail(0), Length(0),
   busy_looping (0), delete_occured (false), EventPool(0)
 {
-  SCF_CONSTRUCT_IBASE (0);
   Mutex = csMutex::Create();
   Resize (iLength);
   // Create the default event outlet.
@@ -58,7 +56,6 @@ csEventQueue::~csEventQueue ()
     EventPool->Free();
     EventPool = e;
   }
-  SCF_DESTRUCT_IBASE ();
 }
 
 uint32 csEventQueue::CountPool()

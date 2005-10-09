@@ -23,28 +23,17 @@
 #include "csutil/csevent.h"
 #include "iutil/cfgfile.h"
 
-SCF_IMPLEMENT_IBASE (csInputBinder)
-  SCF_IMPLEMENTS_INTERFACE (iInputBinder)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csInputBinder::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csInputBinder::csInputBinder (iBase *parent, int btnSize, int axisSize)
-: axisHash (axisSize), axisArray (axisSize),
-  btnHash (btnSize), btnArray (btnSize)
+  : scfImplementationType (this, parent),
+    axisHash (axisSize), axisArray (axisSize),
+    btnHash (btnSize), btnArray (btnSize)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 }
 
 csInputBinder::~csInputBinder ()
 {
   UnbindAll ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventHandler);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csInputBinder::HandleEvent (iEvent &ev)

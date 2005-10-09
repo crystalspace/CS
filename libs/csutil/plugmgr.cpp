@@ -23,6 +23,7 @@
 
 #include "csutil/array.h"
 #include "csutil/plugmgr.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/scopedmutexlock.h"
 #include "csutil/util.h"
 
@@ -51,7 +52,8 @@ csPluginManager::csPlugin::~csPlugin ()
 /**
  * Implementation of iPluginIterator.
  */
-class csPluginIterator : public iPluginIterator
+class csPluginIterator : public scfImplementation1<csPluginIterator,
+                                                   iPluginIterator>
 {
 public:
   csArray<iBase*> pointers;
@@ -59,16 +61,13 @@ public:
 
 public:
   csPluginIterator ()
+    : scfImplementationType (this), idx (0)
   {
-    SCF_CONSTRUCT_IBASE (0);
-    idx = 0;
   }
   virtual ~csPluginIterator ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
 
-  SCF_DECLARE_IBASE;
 
   virtual bool HasNext ()
   {
@@ -82,21 +81,14 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (csPluginIterator)
-  SCF_IMPLEMENTS_INTERFACE (iPluginIterator)
-SCF_IMPLEMENT_IBASE_END
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csPluginManager)
-  SCF_IMPLEMENTS_INTERFACE (iPluginManager)
-SCF_IMPLEMENT_IBASE_END
 
-csPluginManager::csPluginManager (iObjectRegistry* object_reg) :
+csPluginManager::csPluginManager (iObjectRegistry* object_reg) 
+  : scfImplementationType (this), object_reg (object_reg),
   Plugins (8, 8), OptionList (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csPluginManager::object_reg = object_reg;
   // We need a recursive mutex.
   mutex = csMutex::Create (true);
 }
@@ -104,7 +96,6 @@ csPluginManager::csPluginManager (iObjectRegistry* object_reg) :
 csPluginManager::~csPluginManager ()
 {
   Clear ();
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csPluginManager::Clear ()

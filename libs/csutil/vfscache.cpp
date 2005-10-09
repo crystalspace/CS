@@ -26,20 +26,11 @@
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csVfsCacheManager)
-  SCF_IMPLEMENTS_INTERFACE (iCacheManager)
-SCF_IMPLEMENT_IBASE_END
-
 csVfsCacheManager::csVfsCacheManager (iObjectRegistry* object_reg,
 	const char* vfsdir)
+  : scfImplementationType (this), object_reg (object_reg), vfsdir (csStrNew (vfsdir)),
+  vfs (0), current_type (0), current_scope (0), readonly (false)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csVfsCacheManager::object_reg = object_reg;
-  csVfsCacheManager::vfsdir = csStrNew (vfsdir);
-  vfs = 0;
-  current_type = 0;
-  current_scope = 0;
-  readonly = false;
 }
 
 csVfsCacheManager::~csVfsCacheManager ()
@@ -47,7 +38,6 @@ csVfsCacheManager::~csVfsCacheManager ()
   delete[] vfsdir;
   delete[] current_type;
   delete[] current_scope;
-  SCF_DESTRUCT_IBASE ();
 }
 
 iVFS* csVfsCacheManager::GetVFS ()

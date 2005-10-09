@@ -23,6 +23,7 @@
  * iSoundData implementation for ogg bitdata. Hmm, sounds ogg.
  */
 
+#include "csutil/scf.h"
 #include "isound/data.h"
 
 // This hack works around a build problem with some installations of Ogg/Vorbis

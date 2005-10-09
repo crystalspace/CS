@@ -21,6 +21,3 @@
 #include "cssysdef.h"
 #include "csutil/databuf.h"
 
-SCF_IMPLEMENT_IBASE (csDataBuffer)
-  SCF_IMPLEMENTS_INTERFACE (iDataBuffer);
-SCF_IMPLEMENT_IBASE_END

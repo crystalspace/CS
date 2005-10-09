@@ -147,7 +147,7 @@ csPtr<iSoundWrapper> csLoader::LoadSound (const char* name, const char* fname)
   if (!Sound) return 0;
 
   // build wrapper object
-  iSoundWrapper* Wrapper = &(new csSoundWrapper (Sound))->scfiSoundWrapper;
+  iSoundWrapper* Wrapper = new csSoundWrapper (Sound);
   Wrapper->QueryObject ()->SetName (name);
   if (Engine) Engine->QueryObject ()->ObjAdd(Wrapper->QueryObject ());
 

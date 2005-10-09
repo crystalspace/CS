@@ -22,7 +22,7 @@
 #include "csutil/array.h"
 #include "csutil/parray.h"
 
-struct csMeshWrapper;
+class csMeshWrapper;
 struct iRenderView;
 
 struct csMeshWithMask

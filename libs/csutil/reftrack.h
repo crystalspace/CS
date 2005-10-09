@@ -26,9 +26,11 @@
 #include "csutil/blockallocator.h"
 #include "csutil/callstack.h"
 #include "csutil/hash.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/thread.h"
 
-class CS_CRYSTALSPACE_EXPORT csRefTracker : public iRefTracker
+class CS_CRYSTALSPACE_EXPORT csRefTracker : 
+  public scfImplementation1<csRefTracker, iRefTracker>
 {
   enum RefActionType
   {
@@ -75,8 +77,6 @@ class CS_CRYSTALSPACE_EXPORT csRefTracker : public iRefTracker
 
   void ReportOnObj (void* obj, RefInfo* info);
 public:
-  SCF_DECLARE_IBASE;
-
   csRefTracker ();
   virtual ~csRefTracker ();
 

@@ -30,18 +30,13 @@
 
 #ifdef CS_DO_PROFILING
 
-SCF_IMPLEMENT_IBASE (csProfiler)
-  SCF_IMPLEMENTS_INTERFACE (iProfiler)
-SCF_IMPLEMENT_IBASE_END
-
 csProfiler::csProfiler ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
 }
 
 csProfiler::~csProfiler ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csProfiler::RegisterProfilePoint (const char* token,

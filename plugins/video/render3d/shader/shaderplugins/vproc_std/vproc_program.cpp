@@ -30,12 +30,9 @@
 
 CS_LEAKGUARD_IMPLEMENT (csVProcStandardProgram);
 
-SCF_IMPLEMENT_IBASE_EXT(csVProcStandardProgram)
-SCF_IMPLEMENT_IBASE_EXT_END
-
 
 csVProcStandardProgram::csVProcStandardProgram (csVProc_Std *plug)
-  : csShaderProgram (plug->objreg), shaderPlugin (plug), 
+  : scfImplementationType (this, plug->objreg), shaderPlugin (plug), 
   lightMixMode (LIGHTMIXMODE_NONE), 
   colorMixMode (LIGHTMIXMODE_NONE), 
   numLights (0), useAttenuation (true),

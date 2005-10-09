@@ -105,20 +105,14 @@ static bool CookedCodeToVKey (utf32_char codeCooked, SHORT& vKey,
 
 //-----------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csWin32KeyComposer)
-  SCF_IMPLEMENTS_INTERFACE(iKeyComposer)
-SCF_IMPLEMENT_IBASE_END
 
 csWin32KeyComposer::csWin32KeyComposer ()
+  : scfImplementationType (this), lastDead (0), lastDeadVk (0)
 {
-  SCF_CONSTRUCT_IBASE(0);
-  lastDead = 0;
-  lastDeadVk = 0;
 }
 
 csWin32KeyComposer::~csWin32KeyComposer ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csKeyComposeResult csWin32KeyComposer::HandleKey (

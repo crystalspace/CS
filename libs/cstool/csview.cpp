@@ -26,16 +26,11 @@
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 
-SCF_IMPLEMENT_IBASE (csView)
-  SCF_IMPLEMENTS_INTERFACE (iView)
-SCF_IMPLEMENT_IBASE_END
 
-
-csView::csView (iEngine *e, iGraphics3D* ig3d) :
+csView::csView (iEngine *e, iGraphics3D* ig3d) 
+  : scfImplementationType (this),
   Engine (e), G3D (ig3d), RectView (0), PolyView (0), AutoResize (true)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   Camera = e->CreateCamera ();
 
   OldWidth = G3D->GetWidth ();
@@ -46,7 +41,6 @@ csView::~csView ()
 {
   delete RectView;
   delete PolyView;
-  SCF_DESTRUCT_IBASE();
 }
 
 iEngine* csView::GetEngine ()

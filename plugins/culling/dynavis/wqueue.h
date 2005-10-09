@@ -22,6 +22,7 @@
 #include "csgeom/vector2.h"
 #include "csgeom/math2d.h"
 #include "iutil/dbghelp.h"
+#include "csutil/scf.h"
 
 // @@@ Hack(s) to avoid problems with static linking
 #ifdef DYNAVIS_DEBUG

@@ -20,9 +20,6 @@
 #include "cssysdef.h"
 #include "csutil/parasiticdatabuffer.h"
 
-SCF_IMPLEMENT_IBASE (csParasiticDataBuffer)
-  SCF_IMPLEMENTS_INTERFACE (iDataBuffer);
-SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE_POOLED (csParasiticDataBufferPooled)
   SCF_IMPLEMENTS_INTERFACE (iDataBuffer);

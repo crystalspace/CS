@@ -132,20 +132,16 @@ void csMeshObject::GetRadius (csVector3& radius, csVector3& center)
 
 // ------------------
 
-SCF_IMPLEMENT_IBASE (csMeshFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-SCF_IMPLEMENT_IBASE_END
 
-csMeshFactory::csMeshFactory (
-	iEngine *eng, iObjectRegistry* reg, iMeshObjectType* parent)
-	: LogParent(0), mesh_type(parent), Engine (eng), object_reg (reg)
+csMeshFactory::csMeshFactory (iEngine *eng, iObjectRegistry* reg, 
+                              iMeshObjectType* parent)
+  : scfImplementationType (this), LogParent(0), mesh_type(parent), 
+  Engine (eng), object_reg (reg)
 {
-  SCF_CONSTRUCT_IBASE (0);
 }
 
 csMeshFactory::~csMeshFactory ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csMeshFactory::HardTransform (const csReversibleTransform& t)
@@ -174,26 +170,14 @@ iMeshObjectType* csMeshFactory::GetMeshObjectType () const
 
 // ---------------------
 
-SCF_IMPLEMENT_IBASE (csMeshType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csMeshType::csMeshType (iBase *p)
+  : scfImplementationType (this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   Engine = 0;
 }
 
 csMeshType::~csMeshType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csMeshType::Initialize (iObjectRegistry* reg)

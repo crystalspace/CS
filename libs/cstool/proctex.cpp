@@ -24,6 +24,7 @@
 #include "cstool/proctex.h"
 #include "csutil/hash.h"
 #include "csutil/event.h"
+#include "csutil/scf_implementation.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/texture.h"
@@ -45,7 +46,8 @@
  * Event handler that takes care of updating all procedural
  * textures that were visible last frame.
  */
-class csProcTexEventHandler : public iEventHandler
+class csProcTexEventHandler : 
+  public scfImplementation1<csProcTexEventHandler, iEventHandler>
 {
 private:
   iObjectRegistry* object_reg;
@@ -54,16 +56,14 @@ private:
 
 public:
   csProcTexEventHandler (iObjectRegistry* r)
+    : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     object_reg = r;
   }
   virtual ~csProcTexEventHandler ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
 
-  SCF_DECLARE_IBASE;
   virtual bool HandleEvent (iEvent& event);
 
   void PushTexture (csProcTexture* txt)
@@ -76,9 +76,6 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (csProcTexEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
 
 bool csProcTexEventHandler::HandleEvent (iEvent& event)
 {
@@ -118,16 +115,10 @@ bool csProcTexEventHandler::HandleEvent (iEvent& event)
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_EXT (csProcTexture)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTextureWrapper)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iProcTexture)
-SCF_IMPLEMENT_IBASE_EXT_END
 
 csProcTexture::csProcTexture (iTextureFactory* p, iImage* image)
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiProcTexture);
-
   ptReady = false;
   tex = 0;
   texFlags = 0;
@@ -147,8 +138,6 @@ csProcTexture::~csProcTexture ()
   if (proceh != 0)
     ((csProcTexEventHandler*)(iEventHandler*)(proceh))->PopTexture (this);
 
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiProcTexture);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
 }
 
 iEventHandler* csProcTexture::SetupProcEventHandler (
@@ -167,20 +156,16 @@ iEventHandler* csProcTexture::SetupProcEventHandler (
   return proceh;
 }
 
-struct csProcTexCallback : public iTextureCallback, iProcTexCallback
+struct csProcTexCallback : 
+  public scfImplementation2<csProcTexCallback, iTextureCallback, iProcTexCallback>
 {
   csRef<csProcTexture> pt;
-  SCF_DECLARE_IBASE;
-  csProcTexCallback () { SCF_CONSTRUCT_IBASE (0); }
-  virtual ~csProcTexCallback () { SCF_DESTRUCT_IBASE(); }
+  csProcTexCallback () : scfImplementationType (this) { }
+  virtual ~csProcTexCallback () { }
   virtual void UseTexture (iTextureWrapper*);
   virtual iProcTexture* GetProcTexture() const;
 };
 
-SCF_IMPLEMENT_IBASE (csProcTexCallback)
-  SCF_IMPLEMENTS_INTERFACE (iTextureCallback)
-  SCF_IMPLEMENTS_INTERFACE (iProcTexCallback)
-SCF_IMPLEMENT_IBASE_END
 
 void csProcTexCallback::UseTexture (iTextureWrapper*)
 {
@@ -190,7 +175,7 @@ void csProcTexCallback::UseTexture (iTextureWrapper*)
 }
 iProcTexture* csProcTexCallback::GetProcTexture() const
 {
-  return &pt->scfiProcTexture;
+  return pt;
 }
 
 bool csProcTexture::Initialize (iObjectRegistry* object_reg)
@@ -267,122 +252,101 @@ void csProcTexture::SetAlwaysAnimate (bool enable)
 
 //-----------------------------------------------------------------------------
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csProcTexture::eiTextureWrapper)
-  SCF_IMPLEMENTS_INTERFACE (iTextureWrapper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-iObject* csProcTexture::eiTextureWrapper::QueryObject()
+iObject* csProcTexture::QueryObject()
 {
-  return scfParent->tex->QueryObject();
+  return tex->QueryObject();
 }
 
-iTextureWrapper* csProcTexture::eiTextureWrapper::Clone () const
+iTextureWrapper* csProcTexture::Clone () const
 {
-  return scfParent->tex->Clone();
+  return tex->Clone();
 }
 
-void csProcTexture::eiTextureWrapper::SetImageFile (iImage *Image)
+void csProcTexture::SetImageFile (iImage *Image)
 {
-  scfParent->tex->SetImageFile (Image);
+  tex->SetImageFile (Image);
 }
 
-iImage* csProcTexture::eiTextureWrapper::GetImageFile ()
+iImage* csProcTexture::GetImageFile ()
 {
-  return scfParent->tex->GetImageFile();
+  return tex->GetImageFile();
 }
 
-void csProcTexture::eiTextureWrapper::SetTextureHandle (iTextureHandle *tex)
+void csProcTexture::SetTextureHandle (iTextureHandle *t)
 {
-  scfParent->tex->SetTextureHandle (tex);
+  tex->SetTextureHandle (t);
 }
 
-iTextureHandle* csProcTexture::eiTextureWrapper::GetTextureHandle ()
+iTextureHandle* csProcTexture::GetTextureHandle ()
 {
-  return scfParent->tex->GetTextureHandle();
+  return tex->GetTextureHandle();
 }
 
-void csProcTexture::eiTextureWrapper::SetKeyColor (int red, int green, int blue)
+
+void csProcTexture::GetKeyColor (int &red, int &green, int &blue) const
 {
-  scfParent->tex->SetKeyColor (red, green, blue);
+  tex->GetKeyColor (red, green, blue);
 }
 
-void csProcTexture::eiTextureWrapper::GetKeyColor (int &red, int &green, int &blue) const
+void csProcTexture::SetFlags (int flags)
 {
-  scfParent->tex->GetKeyColor (red, green, blue);
+  tex->SetFlags (flags);
 }
 
-void csProcTexture::eiTextureWrapper::SetFlags (int flags)
+int csProcTexture::GetFlags () const
 {
-  scfParent->tex->SetFlags (flags);
+  return tex->GetFlags();
 }
 
-int csProcTexture::eiTextureWrapper::GetFlags () const
+void csProcTexture::Register (iTextureManager *txtmng)
 {
-  return scfParent->tex->GetFlags();
+  tex->Register (txtmng);
 }
 
-void csProcTexture::eiTextureWrapper::Register (iTextureManager *txtmng)
+void csProcTexture::SetUseCallback (iTextureCallback* callback)
 {
-  scfParent->tex->Register (txtmng);
+  tex->SetUseCallback (callback);
 }
 
-void csProcTexture::eiTextureWrapper::SetUseCallback (iTextureCallback* callback)
+iTextureCallback* csProcTexture::GetUseCallback () const
 {
-  scfParent->tex->SetUseCallback (callback);
+  return tex->GetUseCallback();
 }
 
-iTextureCallback* csProcTexture::eiTextureWrapper::GetUseCallback () const
+void csProcTexture::Visit ()
 {
-  return scfParent->tex->GetUseCallback();
+  tex->Visit();
 }
 
-void csProcTexture::eiTextureWrapper::Visit ()
+bool csProcTexture::IsVisitRequired () const
 {
-  scfParent->tex->Visit();
+  return tex->IsVisitRequired ();
 }
 
-bool csProcTexture::eiTextureWrapper::IsVisitRequired () const
+void csProcTexture::SetKeepImage (bool k)
 {
-  return scfParent->tex->IsVisitRequired ();
+  tex->SetKeepImage (k);
 }
 
-void csProcTexture::eiTextureWrapper::SetKeepImage (bool k)
+bool csProcTexture::KeepImage () const
 {
-  scfParent->tex->SetKeepImage (k);
+  return tex->KeepImage();
 }
 
-bool csProcTexture::eiTextureWrapper::KeepImage () const
+void csProcTexture::SetTextureClass (const char* className)
 {
-  return scfParent->tex->KeepImage();
+  tex->SetTextureClass (className);
 }
 
-void csProcTexture::eiTextureWrapper::SetTextureClass (const char* className)
+const char* csProcTexture::GetTextureClass ()
 {
-  scfParent->tex->SetTextureClass (className);
-}
-
-const char* csProcTexture::eiTextureWrapper::GetTextureClass ()
-{
-  return scfParent->tex->GetTextureClass();
+  return tex->GetTextureClass();
 }
 
 //-----------------------------------------------------------------------------
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csProcTexture::eiProcTexture)
-  SCF_IMPLEMENTS_INTERFACE (iProcTexture)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-bool csProcTexture::eiProcTexture::GetAlwaysAnimate () const
+iTextureFactory* csProcTexture::GetFactory()
 {
-  return scfParent->GetAlwaysAnimate();
-}
-
-void csProcTexture::eiProcTexture::SetAlwaysAnimate (bool enable)
-{
-  scfParent->SetAlwaysAnimate (enable);
-}
-iTextureFactory* csProcTexture::eiProcTexture::GetFactory()
-{
-  return scfParent->parent;
+  return parent;
 }
 

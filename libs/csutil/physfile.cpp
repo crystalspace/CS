@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2003 by Eric Sunshine <sunshine@sunshineco.com>
+  Copyright (C) 2003 by Eric Sunshine <sunshine@sunshineco.com>
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -21,36 +21,32 @@
 #include "csutil/databuf.h"
 #include <stdlib.h>
 
-SCF_IMPLEMENT_IBASE(csPhysicalFile)
-  SCF_IMPLEMENTS_INTERFACE(iFile)
-SCF_IMPLEMENT_IBASE_END
 
 int csPhysicalFile::GetStatus() { return last_error; }
 
-csPhysicalFile::csPhysicalFile(char const* apath, char const* mode) :
-  fp(0), path(apath), owner(true), last_error(VFS_STATUS_OK)
-  {
-  SCF_CONSTRUCT_IBASE(0);
+csPhysicalFile::csPhysicalFile(char const* apath, char const* mode) 
+  : scfImplementationType (this), fp(0), path(apath), owner(true), 
+  last_error(VFS_STATUS_OK)
+{
   fp = fopen(apath, mode);
   if (fp == 0)
     last_error = VFS_STATUS_ACCESSDENIED;
-  }
+}
 
-csPhysicalFile::csPhysicalFile(FILE* f, bool take_ownership, char const* n ) :
-  fp(f), owner(take_ownership), last_error(VFS_STATUS_OK)
-  {
-  SCF_CONSTRUCT_IBASE(0);
+csPhysicalFile::csPhysicalFile(FILE* f, bool take_ownership, char const* n ) 
+  : scfImplementationType (this), fp(f), owner(take_ownership), 
+  last_error(VFS_STATUS_OK)
+{
   if (n != 0)
     path = n;
   if (fp == 0)
     last_error = VFS_STATUS_OTHER;
-  }
+}
 
 csPhysicalFile::~csPhysicalFile()
 {
   if (owner && fp != 0)
     fclose(fp);
-  SCF_DESTRUCT_IBASE ();
 }
 
 size_t csPhysicalFile::Read(char* buff, size_t nbytes)

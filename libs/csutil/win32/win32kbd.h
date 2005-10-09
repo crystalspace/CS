@@ -24,6 +24,7 @@
 #include "iutil/csinput.h"
 #include "csutil/csinput.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/scf_implementation.h"
 
 // Some #defines from newer PSDKs
 #ifndef WM_UNICHAR
@@ -36,7 +37,8 @@
 
 struct iEventOutlet;
 
-class CS_CRYSTALSPACE_EXPORT csWin32KeyComposer : public iKeyComposer
+class CS_CRYSTALSPACE_EXPORT csWin32KeyComposer : 
+  public scfImplementation1<csWin32KeyComposer, iKeyComposer>
 {
 protected:
   utf32_char lastDead;
@@ -44,7 +46,6 @@ protected:
   BYTE lastDeadKbdState[256];
 
 public:
-  SCF_DECLARE_IBASE;
 
   csWin32KeyComposer ();
   virtual ~csWin32KeyComposer ();

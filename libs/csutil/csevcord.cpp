@@ -22,14 +22,10 @@
 #include "csutil/csevcord.h"
 #include "iutil/eventh.h"
 
-SCF_IMPLEMENT_IBASE(csEventCord)
-  SCF_IMPLEMENTS_INTERFACE(iEventCord)
-SCF_IMPLEMENT_IBASE_END
-
-csEventCord::csEventCord(int cat, int subcat) :
+csEventCord::csEventCord(int cat, int subcat) 
+  : scfImplementationType (this),
   category(cat), subcategory(subcat)
 {
-  SCF_CONSTRUCT_IBASE (0);
   plugins = 0;
   // By default, only pass along category 0, subcategory 0 events to the queue.
   pass = (category == 0 && subcategory == 0);
@@ -38,7 +34,6 @@ csEventCord::csEventCord(int cat, int subcat) :
 
 csEventCord::~csEventCord()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 int csEventCord::Insert(iEventHandler *plugin, int priority)

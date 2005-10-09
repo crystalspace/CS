@@ -20,6 +20,7 @@
 #define __CSUTIL_XMLTINYPRIV_H__
 
 #include "csextern.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/document.h"
 #include "tinyxml.h"
 
@@ -29,7 +30,8 @@ class csTinyXmlDocument;
  * This is an SCF compatible wrapper for an attribute iterator.
  */
 struct CS_CRYSTALSPACE_EXPORT csTinyXmlAttributeIterator :
-  public iDocumentAttributeIterator
+  public scfImplementation1<csTinyXmlAttributeIterator,
+                            iDocumentAttributeIterator>
 {
 private:
   size_t current;
@@ -40,8 +42,6 @@ public:
   csTinyXmlAttributeIterator (TiDocumentNode* parent);
   virtual ~csTinyXmlAttributeIterator ();
 
-  SCF_DECLARE_IBASE;
-
   virtual bool HasNext ();
   virtual csRef<iDocumentAttribute> Next ();
 };
@@ -49,30 +49,27 @@ public:
 /**
  * This is an SCF compatible wrapper for an attribute in TinyXml.
  */
-struct CS_CRYSTALSPACE_EXPORT csTinyXmlAttribute : public iDocumentAttribute
+struct CS_CRYSTALSPACE_EXPORT csTinyXmlAttribute : 
+  public scfImplementation1<csTinyXmlAttribute, iDocumentAttribute>
 {
 private:
   TiDocumentAttribute* attr;
 
 public:
   csTinyXmlAttribute ()
+    : scfImplementationType (this), attr (0)
   {
-    SCF_CONSTRUCT_IBASE (0);
-    attr = 0;
   }
 
   csTinyXmlAttribute (TiDocumentAttribute* attr)
+    : scfImplementationType (this), attr (attr)
   {
-    SCF_CONSTRUCT_IBASE (0);
-    csTinyXmlAttribute::attr = attr;
   }
 
   virtual ~csTinyXmlAttribute ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
 
-  SCF_DECLARE_IBASE;
 
   virtual const char* GetName ()
   {
@@ -136,7 +133,8 @@ public:
 /**
  * This is an SCF compatible wrapper for a node iterator.
  */
-struct CS_CRYSTALSPACE_EXPORT csTinyXmlNodeIterator : public iDocumentNodeIterator
+struct CS_CRYSTALSPACE_EXPORT csTinyXmlNodeIterator : 
+  public scfImplementation1<csTinyXmlNodeIterator, iDocumentNodeIterator>
 {
 private:
   csTinyXmlDocument* doc;
@@ -149,8 +147,6 @@ public:
 	TiDocumentNodeChildren* parent, const char* value);
   virtual ~csTinyXmlNodeIterator ();
 
-  SCF_DECLARE_IBASE;
-
   virtual bool HasNext ();
   virtual csRef<iDocumentNode> Next ();
 };
@@ -158,7 +154,8 @@ public:
 /**
  * This is an SCF compatible wrapper for a node in TinyXml.
  */
-struct CS_CRYSTALSPACE_EXPORT csTinyXmlNode : public iDocumentNode
+struct CS_CRYSTALSPACE_EXPORT csTinyXmlNode : 
+  public scfImplementation1<csTinyXmlNode, iDocumentNode>
 {
 private:
   friend class csTinyXmlDocument;
@@ -176,6 +173,8 @@ private:
 public:
   virtual ~csTinyXmlNode ();
 
+  virtual void DecRef ();
+
   TiDocumentNode* GetTiNode () { return node; }
   void SetTiNode (TiDocumentNode* node)
   {
@@ -183,7 +182,7 @@ public:
     node_children = node->ToDocumentNodeChildren ();
   }
 
-  SCF_DECLARE_IBASE;
+  
 
   virtual csDocumentNodeType GetType ();
   virtual bool Equals (iDocumentNode* other);
@@ -224,7 +223,8 @@ public:
 /**
  * This is an SCF compatible wrapper for a document in TinyXml.
  */
-class CS_CRYSTALSPACE_EXPORT csTinyXmlDocument : public iDocument
+class CS_CRYSTALSPACE_EXPORT csTinyXmlDocument : 
+  public scfImplementation1<csTinyXmlDocument, iDocument>
 {
 private:
   TiDocument* root;
@@ -243,8 +243,6 @@ public:
   csTinyXmlNode* Alloc (TiDocumentNode*);
   /// Internal function: don't use!
   void Free (csTinyXmlNode* n);
-
-  SCF_DECLARE_IBASE;
 
   virtual void Clear ();
   virtual csRef<iDocumentNode> CreateRoot ();

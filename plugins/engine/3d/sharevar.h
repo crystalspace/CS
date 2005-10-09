@@ -30,7 +30,6 @@
 #include "iengine/sharevar.h"
 
 
-SCF_VERSION (csSharedVariable, 0, 0, 2);
 
 /**
  * A SharedVariable is a refcounted floating point value.

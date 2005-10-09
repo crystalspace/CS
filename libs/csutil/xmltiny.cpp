@@ -31,18 +31,14 @@
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csTinyDocumentSystem)
-  SCF_IMPLEMENTS_INTERFACE (iDocumentSystem)
-SCF_IMPLEMENT_IBASE_END
 
 csTinyDocumentSystem::csTinyDocumentSystem (iBase* parent)
+  : scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
 }
 
 csTinyDocumentSystem::~csTinyDocumentSystem ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 csRef<iDocument> csTinyDocumentSystem::CreateDocument ()
@@ -53,13 +49,10 @@ csRef<iDocument> csTinyDocumentSystem::CreateDocument ()
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csTinyXmlAttributeIterator)
-  SCF_IMPLEMENTS_INTERFACE (iDocumentAttributeIterator)
-SCF_IMPLEMENT_IBASE_END
 
 csTinyXmlAttributeIterator::csTinyXmlAttributeIterator (TiDocumentNode* parent)
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csTinyXmlAttributeIterator::parent = parent->ToElement ();
   if (csTinyXmlAttributeIterator::parent == 0)
   {
@@ -77,7 +70,6 @@ csTinyXmlAttributeIterator::csTinyXmlAttributeIterator (TiDocumentNode* parent)
 
 csTinyXmlAttributeIterator::~csTinyXmlAttributeIterator()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTinyXmlAttributeIterator::HasNext ()
@@ -101,17 +93,12 @@ csRef<iDocumentAttribute> csTinyXmlAttributeIterator::Next ()
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csTinyXmlNodeIterator)
-  SCF_IMPLEMENTS_INTERFACE (iDocumentNodeIterator)
-SCF_IMPLEMENT_IBASE_END
 
 csTinyXmlNodeIterator::csTinyXmlNodeIterator (
 	csTinyXmlDocument* doc, TiDocumentNodeChildren* parent,
 	const char* value)
+  : scfImplementationType (this), doc (doc), parent (parent)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csTinyXmlNodeIterator::doc = doc;
-  csTinyXmlNodeIterator::parent = parent;
   csTinyXmlNodeIterator::value = value ? csStrNew (value) : 0;
   if (!parent)
     current = 0;
@@ -148,12 +135,9 @@ csRef<iDocumentNode> csTinyXmlNodeIterator::Next ()
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csTinyXmlAttribute)
-  SCF_IMPLEMENTS_INTERFACE (iDocumentAttribute)
-SCF_IMPLEMENT_IBASE_END
 
 //------------------------------------------------------------------------
-
+/*
 SCF_IMPLEMENT_IBASE_INCREF(csTinyXmlNode)
 void csTinyXmlNode::DecRef ()
 {
@@ -170,18 +154,27 @@ SCF_IMPLEMENT_IBASE_REFOWNER(csTinyXmlNode)
 SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csTinyXmlNode)
 SCF_IMPLEMENT_IBASE_QUERY(csTinyXmlNode)
   SCF_IMPLEMENTS_INTERFACE (iDocumentNode)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_END*/
 
-csTinyXmlNode::csTinyXmlNode (csTinyXmlDocument* doc) :
+csTinyXmlNode::csTinyXmlNode (csTinyXmlDocument* doc) 
+  : scfImplementationType (this), doc (doc),
   node(0), node_children(0), next_pool(0)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csTinyXmlNode::doc = doc;	// Increase reference.
 }
 
 csTinyXmlNode::~csTinyXmlNode ()
 {
-  SCF_DESTRUCT_IBASE ();
+}
+
+void csTinyXmlNode::DecRef ()
+{
+  csRefTrackerAccess::TrackDecRef (this, scfRefCount);
+  scfRefCount--;
+  if (scfRefCount <= 0)
+  {
+    if (scfParent) scfParent->DecRef ();
+    doc->Free (this);
+  }
 }
 
 csRef<iDocumentNode> csTinyXmlNode::GetParent ()
@@ -505,16 +498,9 @@ void csTinyXmlNode::SetAttributeAsFloat (const char* name, float value)
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csTinyXmlDocument)
-  SCF_IMPLEMENTS_INTERFACE (iDocument)
-SCF_IMPLEMENT_IBASE_END
-
 csTinyXmlDocument::csTinyXmlDocument (csTinyDocumentSystem* sys)
+  : scfImplementationType (this), sys (sys), pool (0), root (0)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csTinyXmlDocument::sys = sys;	// Increase ref.
-  pool = 0;
-  root = 0;
 }
 
 csTinyXmlDocument::~csTinyXmlDocument ()
@@ -527,7 +513,6 @@ csTinyXmlDocument::~csTinyXmlDocument ()
     delete pool;
     pool = n;
   }
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csTinyXmlDocument::Clear ()

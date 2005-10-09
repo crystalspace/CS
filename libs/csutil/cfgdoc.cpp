@@ -22,11 +22,12 @@
 #include "csutil/physfile.h"
 #include "csutil/util.h"
 #include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/xmltiny.h"
-
 #include "csutil/cfgdoc.h"
 
-class csConfigDocumentIterator : public iConfigIterator
+class csConfigDocumentIterator : public scfImplementation1<csConfigDocumentIterator,
+                                                           iConfigIterator>
 {
   csRef<csConfigDocument> doc;
   csHash<csConfigDocument::KeyInfo, csStrKey>::GlobalIterator* iterator;
@@ -35,7 +36,6 @@ class csConfigDocumentIterator : public iConfigIterator
   const csConfigDocument::KeyInfo* currentKey;
   const char* currentKeyName;
 public:
-  SCF_DECLARE_IBASE;
 
   csConfigDocumentIterator (csConfigDocument* doc, const char* Subsection);
   virtual ~csConfigDocumentIterator();
@@ -53,20 +53,13 @@ public:
   virtual const char *GetComment () const;
 };
 
-SCF_IMPLEMENT_IBASE(csConfigDocumentIterator)
-  SCF_IMPLEMENTS_INTERFACE(iConfigIterator)
-SCF_IMPLEMENT_IBASE_END
 
 csConfigDocumentIterator::csConfigDocumentIterator (csConfigDocument* doc, 
-						    const char* Subsection) :
- currentKeyName(0)
+						    const char* Subsection) 
+  : scfImplementationType (this), doc (doc), currentKey (0), currentKeyName(0)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
-  currentKey = 0;
   subsection = csStrNew (Subsection);
   subsectionLen = subsection ? strlen (subsection) : 0;
-  csConfigDocumentIterator::doc = doc;
   iterator = new csHash<csConfigDocument::KeyInfo, 
     csStrKey>::GlobalIterator (doc->keys.GetIterator ());
 }
@@ -75,7 +68,6 @@ csConfigDocumentIterator::~csConfigDocumentIterator()
 {
   delete[] subsection;
   delete iterator;
-  SCF_DESTRUCT_IBASE()
 }
 
 iConfigFile* csConfigDocumentIterator::GetConfigFile () const
@@ -164,21 +156,14 @@ const char* csConfigDocumentIterator::GetComment () const
 }
 
 //---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE(csConfigDocument)
-  SCF_IMPLEMENTS_INTERFACE(iConfigFile)
-SCF_IMPLEMENT_IBASE_END
-
-csConfigDocument::csConfigDocument () : filename(0)
+csConfigDocument::csConfigDocument () 
+  : scfImplementationType (this), filename(0)
 {
-  SCF_CONSTRUCT_IBASE(0);
 }
 
-csConfigDocument::csConfigDocument (const char *Filename, iVFS* vfs) :
-  filename(0), fileVFS(vfs)
+csConfigDocument::csConfigDocument (const char *Filename, iVFS* vfs) 
+  : scfImplementationType (this), filename(0), fileVFS(vfs)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   filename = csStrNew (Filename);
   csRef<iFile> file;
   if (vfs)
@@ -195,26 +180,21 @@ csConfigDocument::csConfigDocument (const char *Filename, iVFS* vfs) :
   ParseDocument (doc);
 }
 
-csConfigDocument::csConfigDocument (iDocument* doc) : filename(0)
+csConfigDocument::csConfigDocument (iDocument* doc) 
+  : scfImplementationType (this), filename(0), document (doc)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
-  document = doc;
   ParseDocument (doc);
 }
 
-csConfigDocument::csConfigDocument (iDocumentNode* node) : filename(0)
+csConfigDocument::csConfigDocument (iDocumentNode* node) 
+  : scfImplementationType (this), filename(0)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   LoadNode (node);
 }
 
 csConfigDocument::~csConfigDocument()
 {
   delete[] filename;
-
-  SCF_DESTRUCT_IBASE()
 }
 
 void csConfigDocument::ParseDocument (iDocument* doc, bool Merge, bool NewWins)

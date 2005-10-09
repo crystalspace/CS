@@ -18,6 +18,8 @@
 
 #include "cssysdef.h"
 #include <ctype.h>
+#include <stdarg.h>
+#include "csutil/scf_implementation.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 #include "csutil/win32/win32.h"
@@ -30,7 +32,7 @@
 #include "iutil/objreg.h"
 #include "ivideo/natwin.h"
 #include "ivideo/cursor.h"
-#include <stdarg.h>
+
 
 #include "csutil/win32/wintools.h"
 #include "win32kbd.h"
@@ -66,10 +68,10 @@ void SystemFatalError (const char *s)
 
 #define MAX_SCANCODE 0x100
 
-class Win32Assistant :
-  public iWin32Assistant,
-  public iEventPlug,
-  public iEventHandler
+class Win32Assistant : public scfImplementation3<Win32Assistant,
+                                                 iWin32Assistant,
+                                                 iEventPlug,
+                                                 iEventHandler>
 {
 private:
   bool ApplicationActive;
@@ -110,7 +112,6 @@ private:
     WPARAM wParam, LPARAM lParam);
   static LRESULT CALLBACK CBTProc (int nCode, WPARAM wParam, LPARAM lParam);
 public:
-  SCF_DECLARE_IBASE;
   Win32Assistant (iObjectRegistry*);
   virtual ~Win32Assistant ();
   virtual void Shutdown();
@@ -141,11 +142,6 @@ public:
 
 static Win32Assistant* GLOBAL_ASSISTANT = 0;
 
-SCF_IMPLEMENT_IBASE (Win32Assistant)
-  SCF_IMPLEMENTS_INTERFACE (iWin32Assistant)
-  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
 
 static inline void ToLower (char *dst, const char *src) 
 {
@@ -323,7 +319,8 @@ BOOL WINAPI ConsoleHandlerRoutine (DWORD dwCtrlType)
   return FALSE;
 }
 
-Win32Assistant::Win32Assistant (iObjectRegistry* r) :
+Win32Assistant::Win32Assistant (iObjectRegistry* r) 
+  : scfImplementationType (this),
   ApplicationActive (true),
   ModuleHandle (0),
   ApplicationWnd (0),
@@ -333,7 +330,6 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   EventOutlet (0),
   mouseButtons(0)
 {
-  SCF_CONSTRUCT_IBASE(0);
 
   /*
     Load the exception handler DLL. In case of an OS exception

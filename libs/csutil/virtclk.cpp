@@ -21,20 +21,14 @@
 #include "csutil/virtclk.h"
 #include "iutil/virtclk.h"
 
-SCF_IMPLEMENT_IBASE (csVirtualClock)
-  SCF_IMPLEMENTS_INTERFACE (iVirtualClock)
-SCF_IMPLEMENT_IBASE_END
 
 csVirtualClock::csVirtualClock ()
+  : scfImplementationType (this), ElapsedTime (0), CurrentTime (csTicks (-1))
 {
-  SCF_CONSTRUCT_IBASE (0);
-  CurrentTime = csTicks (-1);
-  ElapsedTime = csTicks (0);
 }
 
 csVirtualClock::~csVirtualClock ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csVirtualClock::Advance ()

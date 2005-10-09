@@ -102,7 +102,7 @@ static void CollectHeapInfo (HANDLE snap, HANDLE tempFile,
 	}
       }
       else
-	SetFilePointer (tempFile, -bytesWritten, 0, FILE_CURRENT);
+	SetFilePointer (tempFile, - ((LONG)bytesWritten), 0, FILE_CURRENT);
 
       hasHeapEntry = Heap32Next (&heapEntry);
     }

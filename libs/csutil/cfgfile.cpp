@@ -18,12 +18,13 @@
 
 #include "cssysdef.h"
 #include "csutil/cfgfile.h"
-#include "csutil/databuf.h"
 #include "csutil/csstring.h"
+#include "csutil/databuf.h"
 #include "csutil/physfile.h"
-#include "csutil/util.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
+#include "csutil/util.h"
 #include "iutil/vfs.h"
 #include <ctype.h>
 
@@ -185,10 +186,10 @@ const char *csConfigNode::GetComment() const
 
 /* config iterator */
 
-class csConfigIterator : public iConfigIterator
+class csConfigIterator : public scfImplementation1<csConfigIterator, 
+                                                   iConfigIterator>
 {
 public:
-  SCF_DECLARE_IBASE;
 
   /// Returns the configuration object for this iterator.
   virtual iConfigFile *GetConfigFile() const;
@@ -218,6 +219,11 @@ public:
   /// Get the comment of the given key, or 0 if no comment exists.
   virtual const char *GetComment() const;
 
+  // Create a new iterator.
+  csConfigIterator(csConfigFile *Config, const char *Subsection);
+  // Delete this iterator
+  virtual ~csConfigIterator();
+
 private:
   friend class csConfigFile;
   csConfigFile *Config;
@@ -225,10 +231,6 @@ private:
   char *Subsection;
   size_t SubsectionLength;
 
-  // Create a new iterator.
-  csConfigIterator(csConfigFile *Config, const char *Subsection);
-  // Delete this iterator
-  virtual ~csConfigIterator();
   // Utility function to check if a key meets subsection requirement
   bool CheckSubsection(const char *Key) const;
   // Move to the previous node, ignoring subsection
@@ -239,14 +241,9 @@ private:
   bool Prev ();
 };
 
-SCF_IMPLEMENT_IBASE(csConfigIterator);
-  SCF_IMPLEMENTS_INTERFACE(iConfigIterator);
-SCF_IMPLEMENT_IBASE_END
-
 csConfigIterator::csConfigIterator(csConfigFile *c, const char *sub)
+  : scfImplementationType (this), Config (c)
 {
-  SCF_CONSTRUCT_IBASE(0);
-  Config = c;
   Node = Config->FirstNode;
   Subsection = csStrNew(sub);
   SubsectionLength = (Subsection ? strlen(Subsection) : 0);
@@ -258,7 +255,6 @@ csConfigIterator::~csConfigIterator()
   Config->RemoveIterator(this);
   delete[] Subsection;
   Config->DecRef();
-  SCF_DESTRUCT_IBASE ();
 }
 
 iConfigFile *csConfigIterator::GetConfigFile() const
@@ -350,10 +346,6 @@ const char *csConfigIterator::GetComment() const
 
 /* configuation object */
 
-SCF_IMPLEMENT_IBASE(csConfigFile);
-  SCF_IMPLEMENTS_INTERFACE(iConfigFile);
-SCF_IMPLEMENT_IBASE_END
-
 void csConfigFile::InitializeObject ()
 {
   FirstNode = new csConfigNode(0);
@@ -367,14 +359,14 @@ void csConfigFile::InitializeObject ()
 }
 
 csConfigFile::csConfigFile(iBase *pBase)
+  : scfImplementationType (this, pBase)
 {
-  SCF_CONSTRUCT_IBASE (pBase);
   InitializeObject ();
 }
 
 csConfigFile::csConfigFile(const char *file, iVFS *vfs)
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   InitializeObject ();
   if (file)
     Load(file, vfs);
@@ -390,7 +382,6 @@ csConfigFile::~csConfigFile()
   CS_ASSERT(Iterators->Length() == 0);
   delete Iterators;
   delete[] Filename;
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csConfigFile::IsEmpty() const

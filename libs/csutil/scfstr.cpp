@@ -18,11 +18,8 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/ref.h"
 #include "csutil/scfstr.h"
-
-SCF_IMPLEMENT_IBASE (scfString)
-  SCF_IMPLEMENTS_INTERFACE (iString)
-SCF_IMPLEMENT_IBASE_END
 
 void scfString::SetCapacity (size_t NewSize)
 { s.SetCapacity (NewSize); }

@@ -23,21 +23,12 @@
 #include "csutil/sysfunc.h"
 #include "csutil/threadjobqueue.h"
 
-SCF_IMPLEMENT_IBASE(csThreadJobQueue)
-  SCF_IMPLEMENTS_INTERFACE(iJobQueue)
-SCF_IMPLEMENT_IBASE_END
-
 //#define THREADJOBQUEUE_PRINT_STATS
 
 csThreadJobQueue::csThreadJobQueue()
+  : scfImplementationType (this), jobsAdded (0), jobsPulled (0),
+  jobsWaited (0), jobsUnqueued (0)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
-  jobsAdded = 0;
-  jobsPulled = 0;
-  jobsUnqueued = 0;
-  jobsWaited = 0;
-
   jobFinishMutex = csMutex::Create ();
   sharedData.jobFifo = new JobFifo ();
   sharedData.fifoXS = csMutex::Create ();
@@ -68,7 +59,6 @@ csThreadJobQueue::~csThreadJobQueue()
   csPrintf ("csThreadJobQueue %p: %u added, %u pulled, %u waited, %u unqueued\n",
     this, jobsAdded, jobsPulled, jobsWaited, jobsUnqueued);
 #endif
-  SCF_DESTRUCT_IBASE();
 }
 
 void csThreadJobQueue::Enqueue (iJob* job)

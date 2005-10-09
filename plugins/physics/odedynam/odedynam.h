@@ -270,7 +270,7 @@ public:
 
 class csODEBodyGroup;
 class csODEJoint;
-class csStrictODEJoint;
+struct csStrictODEJoint;
 
 /**
  * This is the implementation for the dynamics core.

@@ -53,7 +53,7 @@ inline_ void Sort(udword& id0, udword& id1)
 				SAP_EndPoint*	Next;		// Next EndPoint whose Value is greater than ours (or null)
 				udword			Data;		// Parent box ID *2 | MinMax flag
 
-		inline_	void			SetData(udword box_id, bool is_max)			{ Data = (box_id<<1)|is_max;	}
+		inline_	void			SetData(udword box_id, bool is_max)			{ Data = (box_id<<1)|(is_max?1:0);	}
 		inline_	bool			IsMax()								const	{ return Data & 1;				}
 		inline_	udword			GetBoxID()							const	{ return Data>>1;				}
 

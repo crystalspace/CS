@@ -112,19 +112,13 @@ bool csInputDriver::HandleEvent(iEvent& e)
 
 //-----------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csKeyComposer)
-  SCF_IMPLEMENTS_INTERFACE(iKeyComposer)
-SCF_IMPLEMENT_IBASE_END
-
 csKeyComposer::csKeyComposer ()
+  : scfImplementationType (this), lastDead (0)
 {
-  SCF_CONSTRUCT_IBASE(0);
-  lastDead = 0;
 }
 
 csKeyComposer::~csKeyComposer ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 /*
@@ -310,33 +304,20 @@ void csKeyComposer::ResetState ()
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--/> Keyboard driver <--//--/
 
-SCF_IMPLEMENT_IBASE(csKeyboardDriver)
-  SCF_IMPLEMENTS_INTERFACE(iKeyboardDriver)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE(csKeyboardDriver::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csKeyboardDriver::csKeyboardDriver (iObjectRegistry* r) :
-  csInputDriver(r)
+  csInputDriver(r), scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-
   memset (&modifiersState, 0, sizeof (modifiersState));
 
   keyDebugChecked = false;
 
-  Listener = &scfiEventHandler;
+  Listener = this;
   StartListening();
 }
 
 csKeyboardDriver::~csKeyboardDriver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  SCF_DESTRUCT_IBASE();
 }
 
 void csKeyboardDriver::Reset ()
@@ -591,21 +572,10 @@ csPtr<iKeyComposer> csKeyboardDriver::CreateKeyComposer ()
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--> Mouse driver <--//--/
 
-SCF_IMPLEMENT_IBASE(csMouseDriver)
-  SCF_IMPLEMENTS_INTERFACE(iMouseDriver)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE(csMouseDriver::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csMouseDriver::csMouseDriver (iObjectRegistry* r) :
-  csInputDriver(r)
+  csInputDriver(r), scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  Listener = &scfiEventHandler;
+  Listener = this;
   StartListening();
   for (int iter=0 ; iter<CS_MAX_MOUSE_COUNT ; iter++) {
     memset (Button[iter], 0, sizeof(bool) * CS_MAX_MOUSE_BUTTONS);
@@ -623,8 +593,6 @@ csMouseDriver::csMouseDriver (iObjectRegistry* r) :
 
 csMouseDriver::~csMouseDriver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  SCF_DESTRUCT_IBASE();
 }
 
 void csMouseDriver::Reset ()
@@ -743,21 +711,10 @@ void csMouseDriver::SetDoubleClickTime (int iTime, size_t iDist)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--/> Joystick driver <--//--/
 
-SCF_IMPLEMENT_IBASE(csJoystickDriver)
-  SCF_IMPLEMENTS_INTERFACE(iJoystickDriver)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csJoystickDriver::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
-  csInputDriver(r)
+  csInputDriver(r), scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  Listener = &scfiEventHandler;
+  Listener = this;
   StartListening();
   for (int iter=0 ; iter<CS_MAX_JOYSTICK_COUNT ; iter++) {
     memset (Button[iter], 0, sizeof(bool) * CS_MAX_JOYSTICK_BUTTONS);
@@ -768,8 +725,6 @@ csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
 
 csJoystickDriver::~csJoystickDriver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  SCF_DESTRUCT_IBASE();
 }
 
 void csJoystickDriver::Reset ()

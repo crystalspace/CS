@@ -19,6 +19,3 @@
 #include "cssysdef.h"
 #include "csutil/scfstrset.h"
 
-SCF_IMPLEMENT_IBASE (csScfStringSet)
-  SCF_IMPLEMENTS_INTERFACE (iStringSet)
-SCF_IMPLEMENT_IBASE_END
