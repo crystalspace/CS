@@ -28,8 +28,9 @@
  * \addtogroup event_handling
  * @{ */
 
-#include <iutil/event.h>
-#include <iutil/eventh.h>
+#include "csutil/scf_implementation.h"
+#include "iutil/event.h"
+#include "iutil/eventh.h"
 
 #include <limits.h>
 
@@ -51,7 +52,8 @@ struct iObjectRegistry;
  * to overload the HandleEvent() method. Always override the specific
  * \c On... trigger function.
  */
-class CS_CRYSTALSPACE_EXPORT csBaseEventHandler : public iEventHandler
+class CS_CRYSTALSPACE_EXPORT csBaseEventHandler : public 
+  scfImplementation1<csBaseEventHandler, iEventHandler>
 {
 private:
   csRef<iEventQueue> queue;
@@ -72,10 +74,6 @@ public:
   /// Destructor.
   virtual ~csBaseEventHandler ();
 
-protected:
-  SCF_DECLARE_IBASE;
-
-public:
   /**
    * Register the event handler with the event queue registered with the
    * object registry.

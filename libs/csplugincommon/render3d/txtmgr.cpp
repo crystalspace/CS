@@ -32,29 +32,20 @@
 
 //----------------------------------------------------- csTextureHandle -----//
 
-SCF_IMPLEMENT_IBASE (csTextureHandle)
-  SCF_IMPLEMENTS_INTERFACE (iTextureHandle)
-SCF_IMPLEMENT_IBASE_END
 
 csTextureHandle::csTextureHandle (csTextureManager* texman, int Flags)
+  : scfImplementationType (this), texman (texman)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  DG_ADDI (this, 0);
-  DG_TYPE (this, "csTextureHandle");
-
   flags = Flags & ~CS_TEXTURE_NPOTS;
 
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
 
-  this->texman = texman;
   texClass = texman->texClassIDs.Request ("default");
 }
 
 csTextureHandle::~csTextureHandle ()
-{
-  DG_REM (this);
-  SCF_DESTRUCT_IBASE()
+{ 
 }
 
 void csTextureHandle::SetKeyColor (bool Enable)
@@ -117,17 +108,11 @@ const char* csTextureHandle::GetTextureClass ()
 
 //----------------------------------------------------- csTextureManager -----//
 
-SCF_IMPLEMENT_IBASE (csTextureManager)
-  SCF_IMPLEMENTS_INTERFACE (iTextureManager)
-SCF_IMPLEMENT_IBASE_END
 
 csTextureManager::csTextureManager (iObjectRegistry* object_reg,
 	iGraphics2D *iG2D)
-	: textures (16, 16)
+  : scfImplementationType (this), textures (16, 16), object_reg (object_reg)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  csTextureManager::object_reg = object_reg;
-
   pfmt = *iG2D->GetPixelFormat ();
 
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
@@ -139,7 +124,6 @@ csTextureManager::csTextureManager (iObjectRegistry* object_reg,
 csTextureManager::~csTextureManager()
 {
   Clear ();
-  SCF_DESTRUCT_IBASE()
 }
 
 void csTextureManager::read_config (iConfigFile* /*config*/)

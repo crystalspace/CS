@@ -34,13 +34,12 @@ struct iTextureHandle;
 struct iTextureManager;
 struct iTextureWrapper;
 
-SCF_VERSION (iTextureCallback, 0, 0, 1);
-
 /**
  * A callback for when a iTextureWrapper is used.
  */
-struct iTextureCallback : public iBase
+struct iTextureCallback : public virtual iBase
 {
+  SCF_INTERFACE(iTextureCallback, 2,0,0);
   /// Get height.
   virtual void UseTexture (iTextureWrapper* wrap) = 0;
 };

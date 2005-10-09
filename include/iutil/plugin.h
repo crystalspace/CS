@@ -85,20 +85,17 @@ do { \
   } \
 } while (0)
 
-SCF_VERSION (iPluginIterator, 0, 0, 1);
-
 /**
  * An iterator to iterate over all plugins in the plugin manager.
  */
-struct iPluginIterator : public iBase
+struct iPluginIterator : public virtual iBase
 {
+  SCF_INTERFACE(iPluginIterator, 2,0,0);
   /// Are there more elements?
   virtual bool HasNext () = 0;
   /// Get next element.
   virtual iBase* Next () = 0;
 };
-
-SCF_VERSION (iPluginManager, 0, 2, 0);
 
 /**
  * This is the plugin manager.
@@ -111,8 +108,9 @@ SCF_VERSION (iPluginManager, 0, 2, 0);
  * Main ways to get pointers to this interface:
  * - csQueryRegistry()
  */
-struct iPluginManager : public iBase
+struct iPluginManager : public virtual iBase
 {
+  SCF_INTERFACE(iPluginManager, 2,0,0);
   /**
    * Load a plugin and (optionally) initialize it.
    * If 'init' is true then the plugin will be initialized and QueryOptions()

@@ -25,29 +25,28 @@
  * work ("jobs").
  */
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
-SCF_VERSION (iJob, 0, 0, 1);
 
 /**
  * A unit of work passed to iJobQueue.
  * \remark A job must be self-contained and thread-safe!
  */
-struct iJob : public iBase
+struct iJob : public virtual iBase
 {
+  SCF_INTERFACE(iJob, 2,0,0);
   /// Do stuff.
   virtual void Run() = 0;
 };
-
-SCF_VERSION (iJobQueue, 0, 0, 1);
 
 /**
  * Interface to simple job management. Jobs are enqueued and run one after
  * another, e.g. in another thread.
  * \sa csThreadJobQueue
  */
-struct iJobQueue : public iBase
+struct iJobQueue : public virtual iBase
 {
+  SCF_INTERFACE(iJobQueue, 2,0,0);
   /// Add a job to the queue.
   virtual void Enqueue (iJob* job) = 0;
   /**

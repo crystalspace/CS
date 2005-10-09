@@ -19,23 +19,15 @@
 #include "cssysdef.h"
 #include "csplugincommon/soundloader/soundraw.h"
 
-SCF_IMPLEMENT_IBASE(csSoundDataRaw);
-  SCF_IMPLEMENTS_INTERFACE(iSoundData);
-SCF_IMPLEMENT_IBASE_END
-
 csSoundDataRaw::csSoundDataRaw(iBase *p, void *d, long n, csSoundFormat f)
+  : scfImplementationType (this), Data (d), NumSamples (n), Format (f)
 {
-  SCF_CONSTRUCT_IBASE(p);
-  Data = d;
-  NumSamples = n;
-  Format = f;
 }
 
 csSoundDataRaw::~csSoundDataRaw()
 {
   unsigned char* const p = (unsigned char*)Data;
   delete[] p;
-  SCF_DESTRUCT_IBASE();
 }
 
 

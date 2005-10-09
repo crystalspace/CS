@@ -24,18 +24,18 @@
  */
 
 #include "csextern.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/document.h"
 
 /**
  * This is an SCF compatible wrapper for the TinyXml parser in csutil.
  */
-class CS_CRYSTALSPACE_EXPORT csTinyDocumentSystem : public iDocumentSystem
+class CS_CRYSTALSPACE_EXPORT csTinyDocumentSystem : 
+  public scfImplementation1<csTinyDocumentSystem, iDocumentSystem>
 {
 public:
   csTinyDocumentSystem (iBase* parent = 0);
   virtual ~csTinyDocumentSystem ();
-
-  SCF_DECLARE_IBASE;
 
   virtual csRef<iDocument> CreateDocument ();
 };

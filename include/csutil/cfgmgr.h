@@ -26,6 +26,7 @@
 #include "csextern.h"
 #include "csutil/array.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/cfgmgr.h"
 
 
@@ -36,10 +37,12 @@ class csConfigManagerIterator;
  * appear to be a single configuration object.  See the description of the
  * iConfigManager interface for full details.
  */
-class CS_CRYSTALSPACE_EXPORT csConfigManager : public iConfigManager
+class CS_CRYSTALSPACE_EXPORT csConfigManager 
+  : public scfImplementation2<csConfigManager, 
+                              iConfigManager,
+                              scfFakeInterface<iConfigFile> >
 {
 public:
-  SCF_DECLARE_IBASE;
 
   /**
    * Create a new config manager object. If 'Optimize' is set to 'true', then

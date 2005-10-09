@@ -20,7 +20,7 @@
 #ifndef __CS_IUTIL_STRINGARRAY_H__
 #define __CS_IUTIL_STRINGARRAY_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 /**\file
  * String Array interface
@@ -28,11 +28,11 @@
 /**\addtogroup util
  * @{ */
 
-SCF_VERSION (iStringArray, 0, 1, 0);
 
 /// This is an SCF-compatible interface for csStringArray.
-struct iStringArray : public iBase
+struct iStringArray : public virtual iBase
 {
+  SCF_INTERFACE(iStringArray, 2,0,0);
   /// Get array length.
   virtual size_t GetSize () const = 0;
 

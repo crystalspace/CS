@@ -19,13 +19,9 @@
 #include "cssysdef.h"
 #include "csplugincommon/soundrenderer/slstn.h"
 
-SCF_IMPLEMENT_IBASE(csSoundListener);
-  SCF_IMPLEMENTS_INTERFACE(iSoundListener);
-SCF_IMPLEMENT_IBASE_END
-
 csSoundListener::csSoundListener()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   SetPosition(csVector3(0,0,0));
   SetVelocity(csVector3(0,0,0));
   SetDirection(csVector3(0,0,1), csVector3(0,1,0));
@@ -38,7 +34,6 @@ csSoundListener::csSoundListener()
 
 csSoundListener::~csSoundListener()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csSoundListener::SetDirection (const csVector3 &f, const csVector3 &t)

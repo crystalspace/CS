@@ -24,13 +24,14 @@
  */
 
 #include "csextern.h"
-#include "iutil/binder.h"
-#include "iutil/event.h"
-#include "iutil/eventh.h"
-#include "iutil/evdefs.h"
-#include "csutil/inputdef.h"
 #include "csutil/array.h"
 #include "csutil/hash.h"
+#include "csutil/inputdef.h"
+#include "csutil/scf_implementation.h"
+#include "iutil/binder.h"
+#include "iutil/evdefs.h"
+#include "iutil/event.h"
+#include "iutil/eventh.h"
 
 /**
  * Use this class to bind input events (keypress, button press, mouse move,
@@ -53,7 +54,8 @@
  * }
  * \endcode
  */
-class CS_CRYSTALSPACE_EXPORT csInputBinder : public iInputBinder
+class CS_CRYSTALSPACE_EXPORT csInputBinder : 
+  public scfImplementation2<csInputBinder, iInputBinder, iEventHandler>
 {
   struct AxisCmd
   {
@@ -82,7 +84,6 @@ protected:
   bool HandleEvent (iEvent&);
 
 public:
-  SCF_DECLARE_IBASE;
 
   /**
    * Create a new binder with an initial bindings hash size.
@@ -91,14 +92,7 @@ public:
   csInputBinder (iBase *parent = 0, int btnSize = 127, int axisSize = 13);
   virtual ~csInputBinder ();
 
-  struct CS_CRYSTALSPACE_EXPORT eiEventHandler : public iEventHandler
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csInputBinder);
-    bool HandleEvent (iEvent &ev) { return scfParent->HandleEvent (ev); }
-  } scfiEventHandler;
-  friend struct eiEventHandler;
-
-  virtual iEventHandler* QueryHandler () { return &scfiEventHandler; }
+  virtual iEventHandler* QueryHandler () { return this; }
 
   virtual int Axis (unsigned cmd);
   virtual bool Button (unsigned cmd);

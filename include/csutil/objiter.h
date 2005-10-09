@@ -24,6 +24,7 @@
 #define __CS_OBJITER_H__
 
 #include "csextern.h"
+#include "csutil/scf.h"
 #include "csutil/ref.h"
 #include "iutil/object.h"
 
@@ -62,7 +63,7 @@ public:
   /// Move forward
   T* Next()
   {
-    iBase* cur = CurrentTypedObject;
+    T* cur = CurrentTypedObject;
     FetchObject();
     return (T*)cur;
   }

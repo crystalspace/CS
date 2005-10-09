@@ -24,10 +24,9 @@
  */
 /**\addtogroup util
  * @{ */
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 
-SCF_VERSION (iCommandLineParser, 0, 0, 3);
 
 /**
  * A utility class that makes it easier to parse the command line.
@@ -39,8 +38,9 @@ SCF_VERSION (iCommandLineParser, 0, 0, 3);
  * Main ways to get pointers to this interface:
  * - csQueryRegistry()
  */
-struct iCommandLineParser : public iBase
+struct iCommandLineParser : public virtual iBase
 {
+  SCF_INTERFACE(iCommandLineParser, 2,0,0);
   /**
    * Initialize for the given command line.  Options from command line are
    * added to any options already present --- i.e. those added via AddName()

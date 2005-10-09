@@ -35,6 +35,7 @@
 
 #include "csutil/ref.h"
 #include "csutil/stringarray.h"
+#include "csutil/syspath.h"
 
 #include "iutil/string.h"
 

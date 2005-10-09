@@ -30,13 +30,12 @@ struct iLoaderContext;
 struct iDocumentNode;
 struct iStreamSource;
 
-SCF_VERSION (iLoaderPlugin, 0, 2, 1);
-
 /**
  * This is a plugin for the loader based on document tree.
  */
 struct iLoaderPlugin : public virtual iBase
 {
+  SCF_INTERFACE(iLoaderPlugin, 2,0,0);
   /**
    * Parse a given document node and return a new object for it.
    * \param node is the node to parse.
@@ -52,13 +51,12 @@ struct iLoaderPlugin : public virtual iBase
   	iBase* context) = 0;
 };
 
-SCF_VERSION (iBinaryLoaderPlugin, 0, 0, 1);
-
 /**
  * This is a binary plugin for the loader.
  */
-struct iBinaryLoaderPlugin : public iBase
+struct iBinaryLoaderPlugin : public virtual iBase
 {
+  SCF_INTERFACE(iBinaryLoaderPlugin, 2,0,0);
   /**
    * Parse given data and return a new object for it.
    * \param data is the data to parse.

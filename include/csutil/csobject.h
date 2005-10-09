@@ -28,7 +28,7 @@
 
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 
 #include "iutil/object.h"
 
@@ -39,7 +39,8 @@ typedef csRefArray<iObject> csObjectContainer;
  * children attached to it. You can use SCF_QUERY_INTERFACE to get interfaces
  * from the child objects.
  */
-class CS_CRYSTALSPACE_EXPORT csObject : public iObject
+class CS_CRYSTALSPACE_EXPORT csObject : 
+  public scfImplementation1<csObject, iObject>
 {
 protected:
   friend class csObjectIterator;
@@ -132,8 +133,6 @@ public:
   	iObjectNameChangeListener* listener);
   virtual void RemoveNameChangeListener (
   	iObjectNameChangeListener* listener);
-
-  SCF_DECLARE_IBASE;
 
   virtual void ObjReleaseOld (iObject *obj);
 };

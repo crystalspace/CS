@@ -78,7 +78,8 @@ class csIntArray;
 //----------------------------------------------------------------------------
 
 /// Document me!@@@
-class CS_CRYSTALSPACE_EXPORT csModelDataTexture : public iModelDataTexture
+class CS_CRYSTALSPACE_EXPORT csModelDataTexture : 
+  public scfImplementationExt1<csModelDataTexture, csObject, iModelDataTexture>
 {
 private:
   char *FileName;
@@ -86,13 +87,16 @@ private:
   csRef<iTextureWrapper> TextureWrapper;
 
 public:
-  SCF_DECLARE_IBASE;
-  CS_DECLARE_OBJECT_INTERFACE;
-
   /// Constructor
   csModelDataTexture ();
   /// Destructor
   virtual ~csModelDataTexture ();
+  
+  /// Query the iObject
+  virtual iObject* QueryObject ()
+  {
+    return this;
+  }
 
   /// Set the file name of the texture
   void SetFileName (const char *fn);
@@ -116,20 +120,25 @@ public:
 };
 
 /// Document me!@@@
-class CS_CRYSTALSPACE_EXPORT csModelDataMaterial : public iModelDataMaterial
+class CS_CRYSTALSPACE_EXPORT csModelDataMaterial : 
+  public scfImplementationExt1<csModelDataMaterial, csObject, iModelDataMaterial>
 {
 private:
   csRef<iMaterial> BaseMaterial;
   csRef<iMaterialWrapper> MaterialWrapper;
 
 public:
-  SCF_DECLARE_IBASE;
-  CS_DECLARE_OBJECT_INTERFACE;
 
   /// Constructor
   csModelDataMaterial ();
   /// Destructor
   virtual ~csModelDataMaterial ();
+
+  /// Query the iObject
+  virtual iObject* QueryObject ()
+  {
+    return this;
+  }
 
   CS_DECLARE_ACCESSOR_METHODS (iMaterial*, BaseMaterial);
   CS_DECLARE_ACCESSOR_METHODS (iMaterialWrapper*, MaterialWrapper);
@@ -141,7 +150,8 @@ public:
 };
 
 /// Document me!@@@
-class CS_CRYSTALSPACE_EXPORT csModelDataVertices : public iModelDataVertices
+class CS_CRYSTALSPACE_EXPORT csModelDataVertices : 
+  public scfImplementationExt1<csModelDataVertices, csObject, iModelDataVertices>
 {
 private:
   csDirtyAccessArray<csVector3> Vertices;
@@ -150,9 +160,6 @@ private:
   csDirtyAccessArray<csVector2> Texels;
 
 public:
-  SCF_DECLARE_IBASE;
-  CS_DECLARE_OBJECT_INTERFACE;
-
   /// constructor
   csModelDataVertices ();
   /// concat constructor
@@ -160,6 +167,12 @@ public:
     const iModelDataVertices *orig2);
   /// Destructor
   virtual ~csModelDataVertices();
+
+  /// Query the iObject
+  virtual iObject* QueryObject ()
+  {
+    return this;
+  }
 
   /// Add all data from another vertex frame to this one
   void CopyFrom (const iModelDataVertices *Other);
@@ -177,20 +190,24 @@ public:
 };
 
 /// Document me!@@@
-class CS_CRYSTALSPACE_EXPORT csModelDataAction : public iModelDataAction
+class CS_CRYSTALSPACE_EXPORT csModelDataAction : 
+  public scfImplementationExt1<csModelDataAction, csObject, iModelDataAction>
 {
 private:
   csDirtyAccessArray<float> Times;
   csObjectVector States;
 
 public:
-  SCF_DECLARE_IBASE;
-  CS_DECLARE_OBJECT_INTERFACE;
-
   /// Constructor
   csModelDataAction ();
   /// Destructor
   virtual ~csModelDataAction ();
+
+  /// Query the iObject
+  virtual iObject* QueryObject ()
+  {
+    return this;
+  }
 
   /// Return the number of key frames
   virtual size_t GetFrameCount () const;
@@ -211,7 +228,8 @@ public:
 };
 
 /// Document me!@@@
-class CS_CRYSTALSPACE_EXPORT csModelDataPolygon : public iModelDataPolygon
+class CS_CRYSTALSPACE_EXPORT csModelDataPolygon : 
+  public scfImplementationExt1<csModelDataPolygon, csObject, iModelDataPolygon>
 {
 private:
   csDirtyAccessArray<int> Vertices;
@@ -221,14 +239,16 @@ private:
   iModelDataMaterial *Material;
 
 public:
-  SCF_DECLARE_IBASE;
-  CS_DECLARE_OBJECT_INTERFACE;
-
   /// constructor
   csModelDataPolygon ();
   /// destructor
   virtual ~csModelDataPolygon ();
-
+  
+  /// Query the iObject
+  virtual iObject* QueryObject ()
+  {
+    return this;
+  }
   /// Add a vertex
   size_t AddVertex (int ver, int nrm, int col, int tex);
   /// Return the number of vertices
@@ -246,37 +266,45 @@ public:
 };
 
 /// Document me!@@@
-class CS_CRYSTALSPACE_EXPORT csModelDataObject : public iModelDataObject
+class CS_CRYSTALSPACE_EXPORT csModelDataObject : 
+  public scfImplementationExt1<csModelDataObject, csObject, iModelDataObject>
 {
 private:
   csRef<iModelDataVertices> DefaultVertices;
 
 public:
-  SCF_DECLARE_IBASE;
-  CS_DECLARE_OBJECT_INTERFACE;
-
   /// Constructor
   csModelDataObject ();
   /// Destructor
   virtual ~csModelDataObject();
 
+  /// Query the iObject
+  virtual iObject* QueryObject ()
+  {
+    return this;
+  }
+
   CS_DECLARE_ACCESSOR_METHODS (iModelDataVertices*, DefaultVertices);
 };
 
 /// Document me!@@@
-class CS_CRYSTALSPACE_EXPORT csModelDataCamera : public iModelDataCamera
+class CS_CRYSTALSPACE_EXPORT csModelDataCamera : 
+  public scfImplementationExt1<csModelDataCamera, csObject, iModelDataCamera>
 {
 private:
   csVector3 Position, UpVector, FrontVector, RightVector;
 
 public:
-  SCF_DECLARE_IBASE;
-  CS_DECLARE_OBJECT_INTERFACE;
-
   /// Constructor
   csModelDataCamera ();
   // Destructor
   virtual ~csModelDataCamera ();
+
+  /// Query the iObject
+  virtual iObject* QueryObject ()
+  {
+    return this;
+  }
 
   CS_DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
   CS_DECLARE_ACCESSOR_METHODS (const csVector3 &, UpVector);
@@ -299,7 +327,8 @@ public:
 };
 
 /// Document me!@@@
-class CS_CRYSTALSPACE_EXPORT csModelDataLight : public iModelDataLight
+class CS_CRYSTALSPACE_EXPORT csModelDataLight : 
+  public scfImplementationExt1<csModelDataLight, csObject, iModelDataLight>
 {
 private:
   float Radius;
@@ -307,13 +336,16 @@ private:
   csVector3 Position;
 
 public:
-  SCF_DECLARE_IBASE;
-  CS_DECLARE_OBJECT_INTERFACE;
-
   /// Constructor
   csModelDataLight ();
   // Destructor
   virtual ~csModelDataLight ();
+
+  /// Query the iObject
+  virtual iObject* QueryObject ()
+  {
+    return this;
+  }
 
   CS_DECLARE_ACCESSOR_METHODS (float, Radius);
   CS_DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
@@ -321,16 +353,20 @@ public:
   iModelDataLight *Clone () const;
 };
 
-class CS_CRYSTALSPACE_EXPORT csModelData : public iModelData
+class CS_CRYSTALSPACE_EXPORT csModelData : 
+  public scfImplementationExt1<csModelData, csObject, iModelData>
 {
 public:
-  SCF_DECLARE_IBASE;
-  CS_DECLARE_OBJECT_INTERFACE;
-
   /// Constructor
   csModelData ();
   /// Destructor
   virtual ~csModelData ();
+
+  /// Query the iObject
+  virtual iObject* QueryObject ()
+  {
+    return this;
+  }
 
   /// Load all texture images from the CWD of the given file system
   void LoadImages (iVFS *VFS, iImageIO *il, int Format);

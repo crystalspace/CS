@@ -21,19 +21,13 @@
 
 #include "csplugincommon/renderstep/basesteptype.h"
 
-SCF_IMPLEMENT_IBASE (csBaseRenderStepType)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_INTERFACE (iRenderStepType)
-SCF_IMPLEMENT_IBASE_END
-
 csBaseRenderStepType:: csBaseRenderStepType (iBase *p)
+  : scfImplementationType (this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
 }
 
 csBaseRenderStepType::~csBaseRenderStepType ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csBaseRenderStepType::Initialize(iObjectRegistry *object_reg)

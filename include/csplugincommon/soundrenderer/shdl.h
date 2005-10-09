@@ -20,13 +20,14 @@
 #define __CS_SHDL_H__
 
 #include "csextern.h"
+#include "csutil/scf_implementation.h"
 #include "isound/handle.h"
 struct iSoundData;
 
-class CS_CRYSTALSPACE_EXPORT csSoundHandle : public iSoundHandle
+class CS_CRYSTALSPACE_EXPORT csSoundHandle : 
+  public scfImplementation1<csSoundHandle, iSoundHandle>
 {
 public:
-  SCF_DECLARE_IBASE;
   // the sound data for this handle
   csRef<iSoundData> Data;
   // is this sound registered?

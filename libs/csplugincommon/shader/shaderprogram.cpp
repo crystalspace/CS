@@ -33,14 +33,10 @@
 
 CS_LEAKGUARD_IMPLEMENT (csShaderProgram);
 
-SCF_IMPLEMENT_IBASE(csShaderProgram)
-  SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
-  SCF_IMPLEMENTS_INTERFACE(iShaderTUResolver)
-SCF_IMPLEMENT_IBASE_END
 
 csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   InitCommonTokens (commonTokens);
 
   csShaderProgram::objectReg = objectReg;
@@ -58,7 +54,6 @@ csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
 
 csShaderProgram::~csShaderProgram ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csShaderProgram::ParseProgramParam (iDocumentNode* node,

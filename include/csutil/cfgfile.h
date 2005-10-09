@@ -25,6 +25,7 @@
 
 #include "csextern.h"
 #include "csutil/array.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/cfgfile.h"
 #include "iutil/vfs.h"
 
@@ -34,11 +35,10 @@ class csConfigIterator;
 /**
  * Configuration file which implements the iConfigFile SCF interface.
  */
-class CS_CRYSTALSPACE_EXPORT csConfigFile : public iConfigFile
+class CS_CRYSTALSPACE_EXPORT csConfigFile : 
+  public scfImplementation1<csConfigFile, iConfigFile>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   /// Create a new configuration object from the given file.
   csConfigFile(const char *Filename = 0, iVFS* = 0);
   /// Create a new empty configuration object.

@@ -19,11 +19,11 @@
 #ifndef __CS_ISOUND_HANDLE_H__
 #define __CS_ISOUND_HANDLE_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
+#include "csutil/ref.h"
 
 struct iSoundSource;
 
-SCF_VERSION (iSoundHandle, 1, 0, 0);
 
 /**
  * The sound handle is a sound in the state that is needed by the sound
@@ -41,8 +41,9 @@ SCF_VERSION (iSoundHandle, 1, 0, 0);
  * quiet mode, but they don't control the position that is currently played.
  * Instead this position is controlled with the sound handle interface.
  */
-struct iSoundHandle : public iBase
+struct iSoundHandle : public virtual iBase
 {
+  SCF_INTERFACE(iSoundHandle, 2,0,0);
   /// is this a static or streamed handle?
   virtual bool IsStatic() = 0;
 

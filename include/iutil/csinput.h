@@ -55,13 +55,12 @@ enum csKeyComposeResult
   csComposeUncomposeable
 };
 
-SCF_VERSION(iKeyComposer, 0, 0, 1);
-
 /**
  * Keyboard input handler.
  */
-struct iKeyComposer : public iBase
+struct iKeyComposer : public virtual iBase
 {
+  SCF_INTERFACE(iKeyComposer, 2,0,0);
   /**
    * Handle keyboard input.
    * Converts the input to characters, if possible. If the key passed in is a 
@@ -86,7 +85,6 @@ struct iKeyComposer : public iBase
   virtual void ResetState () = 0;
 };
 
-SCF_VERSION(iKeyboardDriver, 0, 0, 2);
 
 /**
  * Generic Keyboard Driver.<p>
@@ -111,8 +109,9 @@ SCF_VERSION(iKeyboardDriver, 0, 0, 2);
  * \see csJoystickDriver::DoButton() 
  * \see csJoystickDriver::DoMotion() 
  */
-struct iKeyboardDriver : public iBase
+struct iKeyboardDriver : public virtual iBase
 {
+  SCF_INTERFACE(iKeyboardDriver, 2,0,0);
   /**
    * Call to release all key down flags (when focus switches from application
    * window, for example).
@@ -158,7 +157,6 @@ struct iKeyboardDriver : public iBase
   virtual csEventError SynthesizeCooked (iEvent *) = 0;
 };
 
-SCF_VERSION(iMouseDriver, 0, 0, 1);
 
 /**
  * Generic Mouse Driver.<p>
@@ -178,8 +176,9 @@ SCF_VERSION(iMouseDriver, 0, 0, 1);
  * Main ways to get pointers to this interface:
  * - CS_QUERY_REGISTRY()
  */
-struct iMouseDriver : public iBase
+struct iMouseDriver : public virtual iBase
 {
+  SCF_INTERFACE(iMouseDriver, 2,0,0);
   /// Set double-click mouse parameters.
   virtual void SetDoubleClickTime (int iTime, size_t iDist) = 0;
 
@@ -231,8 +230,9 @@ SCF_VERSION(iJoystickDriver, 0, 0, 1);
  * Main ways to get pointers to this interface:
  * - CS_QUERY_REGISTRY()
  */
-struct iJoystickDriver : public iBase
+struct iJoystickDriver : public virtual iBase
 {
+  SCF_INTERFACE(iJoystickDriver, 2,0,0);
   /**
    * Call to release all joystick buttons (when focus switches from application
    * window, for example).

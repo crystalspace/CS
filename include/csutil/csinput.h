@@ -32,6 +32,7 @@
 #include "csutil/array.h"
 #include "csutil/hash.h"
 #include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 
 #include "iutil/csinput.h"
 #include "iutil/eventh.h"
@@ -63,14 +64,13 @@ protected:
   void StopListening();
 };
 
-class CS_CRYSTALSPACE_EXPORT csKeyComposer : public iKeyComposer
+class CS_CRYSTALSPACE_EXPORT csKeyComposer : 
+  public scfImplementation1<csKeyComposer, iKeyComposer>
 {
 protected:
   utf32_char lastDead;
 
-public:
-  SCF_DECLARE_IBASE;
-
+public:  
   csKeyComposer ();
   virtual ~csKeyComposer ();
 
@@ -95,7 +95,7 @@ public:
  * an event queue. Also it tracks the current state of all keys.
  */
 class CS_CRYSTALSPACE_EXPORT csKeyboardDriver : public csInputDriver,
-  public iKeyboardDriver
+  public scfImplementation2<csKeyboardDriver, iKeyboardDriver, iEventHandler>
 {
 protected:
   /// Key state array.
@@ -124,17 +124,11 @@ protected:
   virtual void LostFocus() { Reset(); }
   virtual void GainFocus() { RestoreKeys(); }
 
-  /// iEventHandler implementation
-  struct CS_CRYSTALSPACE_EXPORT eiEventHandler : public iEventHandler
+  virtual bool HandleEvent (iEvent& e)
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csKeyboardDriver);
-    virtual bool HandleEvent(iEvent& e) 
-    { return scfParent->HandleEvent(e); }
-  } scfiEventHandler;
-  friend struct eiEventHandler;
+    return csInputDriver::HandleEvent (e);
+  }
 public:
-  SCF_DECLARE_IBASE;
-
   /// Initialize keyboard interface.
   csKeyboardDriver (iObjectRegistry*);
   /// Destructor.
@@ -196,13 +190,17 @@ public:
  * it is responsible for generating double-click events. Mouse button numbers
  * are 1-based.
  */
-class CS_CRYSTALSPACE_EXPORT csMouseDriver :
-  public csInputDriver, public iMouseDriver
+class CS_CRYSTALSPACE_EXPORT csMouseDriver : public csInputDriver, 
+  public scfImplementation2<csMouseDriver, iMouseDriver, iEventHandler>
 {
 private:
   // Generic keyboard driver (for checking modifier key states).
   csRef<iKeyboardDriver> Keyboard;
 
+  virtual bool HandleEvent (iEvent& e)
+  {
+    return csInputDriver::HandleEvent (e);
+  }
 protected:
   /// Last "mouse down" event time
   csTicks LastClickTime[CS_MAX_MOUSE_COUNT];
@@ -223,8 +221,6 @@ protected:
   iKeyboardDriver* GetKeyboardDriver();
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Initialize mouse interface.
   csMouseDriver (iObjectRegistry*);
   /// Destructor.
@@ -275,14 +271,7 @@ public:
   virtual void LostFocus() { Reset(); }
   virtual void GainFocus() { }
 
-  /// iEventHandler implementation
-  struct CS_CRYSTALSPACE_EXPORT eiEventHandler : public iEventHandler
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csMouseDriver);
-    virtual bool HandleEvent(iEvent& e) 
-    { return scfParent->HandleEvent(e); }
-  } scfiEventHandler;
-  friend struct eiEventHandler;
+
 };
 
 /**
@@ -292,7 +281,7 @@ public:
  * Joystick numbers and button numbers are 1-based.
  */
 class CS_CRYSTALSPACE_EXPORT csJoystickDriver : public csInputDriver,
-  public iJoystickDriver
+  public scfImplementation2<csJoystickDriver, iJoystickDriver, iEventHandler>
 {
 private:
   // Generic keyboard driver (for checking modifier key states).
@@ -305,9 +294,11 @@ protected:
   uint Axes [CS_MAX_JOYSTICK_COUNT];
   /// Get the generic keyboard driver (for checking modifier states).
   iKeyboardDriver* GetKeyboardDriver();
-
+  virtual bool HandleEvent (iEvent& e)
+  {
+    return csInputDriver::HandleEvent (e);
+  }
 public:
-  SCF_DECLARE_IBASE;
 
   /// Initialize joystick interface.
   csJoystickDriver (iObjectRegistry*);
@@ -345,14 +336,6 @@ public:
   virtual void LostFocus() { Reset(); }
   virtual void GainFocus() { }
 
-  /// iEventHandler implementation
-  struct CS_CRYSTALSPACE_EXPORT eiEventHandler : public iEventHandler
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csJoystickDriver);
-    virtual bool HandleEvent(iEvent& e) 
-    { return scfParent->HandleEvent(e); }
-  } scfiEventHandler;
-  friend struct eiEventHandler;
 };
 
 #endif // __CS_CSINPUT_H__

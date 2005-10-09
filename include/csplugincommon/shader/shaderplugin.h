@@ -42,13 +42,14 @@ struct csShaderVarMapping
     : name(n), destination(d) {}
 };
 
-SCF_VERSION(iShaderTUResolver, 0, 0, 1);
+
 /**
  * Interface to allow resolution of friendly TU names. Passed when a shader
  * program is loaded, used to resolve unknown texture unit names etc.
  */
-struct iShaderTUResolver : public iBase
+struct iShaderTUResolver : public virtual iBase
 {
+  SCF_INTERFACE(iShaderTUResolver, 2,0,0);
   /**
    * When the destination of a texture binding wasn't recognized, the FP
    * is asked whether it can provide a TU number for it.
@@ -56,13 +57,13 @@ struct iShaderTUResolver : public iBase
   virtual int ResolveTextureBinding (const char* binding) = 0;
 };
 
-SCF_VERSION(iShaderProgram, 0, 3, 0);
 /**
  * A helper for shaders that which to use the general plugins.
  * This is the main program plugin interface
  */
-struct iShaderProgram : public iBase
+struct iShaderProgram : public virtual iBase
 {
+  SCF_INTERFACE(iShaderProgram, 2,0,0);
   /// Sets this program to be the one used when rendering
   virtual void Activate() = 0;
 
@@ -88,13 +89,13 @@ struct iShaderProgram : public iBase
   virtual bool Compile () = 0;
 };
 
-SCF_VERSION(iShaderProgramPlugin,0,1,0);
 /**
  * Plugins which provide iShaderProgram should implement this as a factory
  * for iShaderProgram
  */
-struct iShaderProgramPlugin : public iBase
+struct iShaderProgramPlugin : public virtual iBase
 {
+  SCF_INTERFACE(iShaderProgramPlugin,2,0,0);
   virtual csPtr<iShaderProgram> CreateProgram(const char* type) = 0;
   virtual bool SupportType(const char* type) = 0;
 };

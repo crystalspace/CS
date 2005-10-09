@@ -24,7 +24,7 @@
  */
 /**\addtogroup util
  * @{ */
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 #include "iutil/strset.h"
 
@@ -37,8 +37,6 @@ typedef unsigned long csStringID;
 /// An \e invalid csStringID.
 csStringID const csInvalidStringID = (csStringID) ~0;
 
-
-SCF_VERSION (iStringSet, 0, 2, 0);
 
 /**
  * The string set is a collection of unique strings. Each string has an ID
@@ -63,8 +61,9 @@ SCF_VERSION (iStringSet, 0, 2, 0);
  * \sa csStringHash
  * \sa csStringSet
  */
-struct iStringSet : public iBase
+struct iStringSet : public virtual iBase
 {
+  SCF_INTERFACE(iStringSet, 2,0,0);
   /**
    * Request the numeric ID for the given string.
    * \return The ID of the string.

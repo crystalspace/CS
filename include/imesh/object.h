@@ -346,7 +346,6 @@ struct iMeshObjectFactory : public virtual iBase
   virtual iObjectModel* GetObjectModel () = 0;
 };
 
-SCF_VERSION (iMeshObjectType, 0, 0, 2);
 
 /**
  * This plugin describes a specific type of mesh objects. Through
@@ -364,8 +363,9 @@ SCF_VERSION (iMeshObjectType, 0, 0, 2);
  * - The 3D engine plugin (crystalspace.engine.3d).
  *   
  */
-struct iMeshObjectType : public iBase
+struct iMeshObjectType : public virtual iBase
 {
+  SCF_INTERFACE(iMeshObjectType, 2,0,0);
   /// Create an instance of iMeshObjectFactory.
   virtual csPtr<iMeshObjectFactory> NewFactory () = 0;
 };

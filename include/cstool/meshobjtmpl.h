@@ -36,7 +36,7 @@
 
 struct iEngine;
 
-
+//Deprecate these when possible!
 /// Declare a simple mesh factory class
 #define CS_DECLARE_SIMPLE_MESH_FACTORY(name,meshclass)                      \
   class name : public csMeshFactory {                                       \
@@ -248,7 +248,8 @@ public:
  * This is the abstract implementation of iMeshObjectFactory. Like
  * csMeshObject, it stores a pointer to the "logical parent".
  */
-class CS_CRYSTALSPACE_EXPORT csMeshFactory : public iMeshObjectFactory
+class CS_CRYSTALSPACE_EXPORT csMeshFactory : 
+  public scfImplementation1<csMeshFactory, iMeshObjectFactory>
 {
 protected:
   /// Logical parent (usually the wrapper object from the engine)
@@ -267,7 +268,6 @@ protected:
   csFlags flags;
 
 public:
-  SCF_DECLARE_IBASE;
 
   /// Constructor
   csMeshFactory (iEngine *engine, iObjectRegistry* object_reg,
@@ -329,7 +329,8 @@ public:
 /**
  * This is the abstract implementation of iMeshObjectType.
  */
-class CS_CRYSTALSPACE_EXPORT csMeshType : public iMeshObjectType
+class CS_CRYSTALSPACE_EXPORT csMeshType : 
+  public scfImplementation2<csMeshType, iMeshObjectType, iComponent>
 {
 protected:
   /// pointer to the engine if available (@@@ temporary)
@@ -339,7 +340,6 @@ protected:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
 
   /// constructor
   csMeshType (iBase *p);
@@ -358,15 +358,6 @@ public:
    */
   virtual csPtr<iMeshObjectFactory> NewFactory () = 0;
 
-  /**
-   * iComponent implementation.
-   */
-  struct CS_CRYSTALSPACE_EXPORT eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csMeshType);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 #endif // __CS_MESHOBJTMPL_H__

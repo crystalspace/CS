@@ -24,16 +24,17 @@
 */
 
 #include "csextern.h"
+#include "csgfx/rgbpixel.h"
 #include "csutil/parray.h"
-#include "ivideo/txtmgr.h"
-#include "ivideo/material.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/weakrefarr.h"
 #include "iengine/material.h"
-#include "ivideo/texture.h"
-#include "ivideo/shader/shader.h"
 #include "iengine/texture.h"
 #include "ivideo/graph2d.h"
-#include "csgfx/rgbpixel.h"
-#include "csutil/weakrefarr.h"
+#include "ivideo/material.h"
+#include "ivideo/shader/shader.h"
+#include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
 
 class csTexture;
 class csTextureManager;
@@ -56,7 +57,8 @@ struct iObjectRegistry;
  * The texture manager will release its reference to the image when no
  * longer needed.
  */
-class CS_CRYSTALSPACE_EXPORT csTextureHandle : public iTextureHandle
+class CS_CRYSTALSPACE_EXPORT csTextureHandle : 
+  public scfImplementation1<csTextureHandle, iTextureHandle>
 {
 protected:
   /// Parent texture manager
@@ -86,7 +88,6 @@ public:
     int& newwidth, int& newheight, int& newdepth);
 
   ///--------------------- iTextureHandle implementation ----------------------
-  SCF_DECLARE_IBASE;
 
   int GetFlags () const { return flags; }
 
@@ -140,7 +141,8 @@ public:
  * Each 3D driver should derive a texture manager class from this one
  * and implement the missing functionality.
  */
-class CS_CRYSTALSPACE_EXPORT csTextureManager : public iTextureManager
+class CS_CRYSTALSPACE_EXPORT csTextureManager : 
+  public scfImplementation1<csTextureManager, iTextureManager>
 {
 protected:
 
@@ -162,8 +164,6 @@ public:
   csStringID nameDiffuseTexture;
 
   csStringSet texClassIDs;
-
-  SCF_DECLARE_IBASE;
 
   /// Initialize the texture manager
   csTextureManager (iObjectRegistry* object_reg, iGraphics2D *iG2D);

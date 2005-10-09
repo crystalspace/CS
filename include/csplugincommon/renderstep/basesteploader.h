@@ -25,28 +25,29 @@
  */
 
 #include "csextern.h"
-#include "csutil/scf.h"
-#include "iutil/comp.h"
-#include "iutil/objreg.h"
+#include "csutil/leakguard.h"
+#include "csutil/ref.h"
+#include "csutil/scf_implementation.h"
 #include "imap/reader.h"
 #include "imap/services.h"
-#include "csutil/ref.h"
-#include "csutil/leakguard.h"
+#include "iutil/comp.h"
+#include "iutil/objreg.h"
 
 /**\addtogroup plugincommon
  * @{ */
 /**
  * Base class for render step loaders.
  */
-class CS_CRYSTALSPACE_EXPORT csBaseRenderStepLoader : public iLoaderPlugin, 
-							 public iComponent
+class CS_CRYSTALSPACE_EXPORT csBaseRenderStepLoader : 
+  public scfImplementation2<csBaseRenderStepLoader,
+                            iLoaderPlugin, 
+			    iComponent>
 {
 protected:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
 
   CS_LEAKGUARD_DECLARE (csBaseRenderStepLoader);
 

@@ -33,15 +33,14 @@
 struct iTextureWrapper;
 struct iTextureType;
 
-SCF_VERSION (iTextureFactory, 0, 0, 1);
-
 /**
  * Interface to a texture factory.
  * Textures need to know their size at creation time; this information can be
  * taken from an image or explicitly specified.
  */
-struct iTextureFactory : public iBase
+struct iTextureFactory : public virtual iBase
 {
+  SCF_INTERFACE(iTextureFactory, 2,0,0);
   /**
    * Generate a new texture with the selected parameters.
    */

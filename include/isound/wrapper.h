@@ -24,13 +24,12 @@
 struct iSoundHandle;
 struct iObject;
 
-SCF_VERSION (iSoundWrapper, 0, 0, 1);
-
 /**
  * This class is a csObject (iObject) wrapper for sound handles.
  */
-struct iSoundWrapper : public iBase
+struct iSoundWrapper : public virtual iBase
 {
+  SCF_INTERFACE(iSoundWrapper, 2,0,0);
   /// Return the sound handle
   virtual iSoundHandle *GetSound () = 0;
 

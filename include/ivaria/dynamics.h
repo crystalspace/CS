@@ -631,9 +631,9 @@ struct iDynamicsColliderCollisionCallback : public iBase
 SCF_VERSION (iDynamicsSystemCollider, 0, 0, 1);
 
 struct iGeneralFactoryState;
-struct csBox3;
-struct csSphere;
-struct csReversibleTransform;
+class csBox3;
+class csSphere;
+class csReversibleTransform;
 
 /**
  * This is the interface for a dynamics system collider.

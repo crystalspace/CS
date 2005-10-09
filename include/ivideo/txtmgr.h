@@ -132,8 +132,6 @@ struct iSuperLightmap : public iBase
   virtual iTextureHandle* GetTexture () = 0;
 };
 
-SCF_VERSION (iTextureManager, 2, 5, 0);
-
 /**
  * This is the standard texture manager interface.
  * A 3D rasterizer will have to implement a subclass of this one and
@@ -150,8 +148,9 @@ SCF_VERSION (iTextureManager, 2, 5, 0);
  * Main ways to get pointers to this interface:
  * - iGraphics3D::GetTextureManager()
  */
-struct iTextureManager : public iBase
+struct iTextureManager : public virtual iBase
 {
+  SCF_INTERFACE(iTextureManager, 3,0,0);
   /**
    * Register a texture. The given input image is IncRef'd and DecRef'ed
    * later when no longer needed. If you want to keep the input image

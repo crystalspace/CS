@@ -26,6 +26,7 @@
 #include "csextern.h"
 #include "iutil/objreg.h"
 #include "csutil/array.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/stringarray.h"
 #include "csutil/thread.h"
 
@@ -33,7 +34,8 @@
  * This is an implementation of iObjectRegistry.
  * Thread-safe!
  */
-class CS_CRYSTALSPACE_EXPORT csObjectRegistry : public iObjectRegistry
+class CS_CRYSTALSPACE_EXPORT csObjectRegistry : 
+  public scfImplementation1<csObjectRegistry, iObjectRegistry>
 {
 private:
   csRef<csMutex> mutex;
@@ -47,7 +49,6 @@ public:
   /// Client must explicitly call Clear().
   virtual ~csObjectRegistry ();
 
-  SCF_DECLARE_IBASE;
   /**
    * Clear the object registry and release all references.
    */

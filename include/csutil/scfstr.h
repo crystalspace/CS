@@ -25,36 +25,42 @@
  */
 
 #include "csextern.h"
-#include "iutil/string.h"
+
 #include "csutil/csstring.h"
+#include "csutil/scf_implementation.h"
+#include "iutil/string.h"
 
 /// This is a thin SCF wrapper around csString
-class CS_CRYSTALSPACE_EXPORT scfString : public iString
+class CS_CRYSTALSPACE_EXPORT scfString : 
+  public scfImplementation1<scfString, iString>
 {
   csString s;
 
 public:
-  SCF_DECLARE_IBASE;
 
   /// Create an empty scfString object
   scfString ()
-  { SCF_CONSTRUCT_IBASE (0); }
+    : scfImplementationType (this)
+  { }
 
   /// Create an scfString object and reserve space for iLength characters
-  scfString (size_t iLength) : s(iLength)
-  { SCF_CONSTRUCT_IBASE (0); }
+  scfString (size_t iLength) 
+    : scfImplementationType (this), s(iLength)
+  { }
 
   /// Copy constructor
-  scfString (const iString &copy) : s(copy.GetData())
-  { SCF_CONSTRUCT_IBASE (0); }
+  scfString (const iString &copy) 
+    : scfImplementationType (this), s(copy.GetData())
+  { }
 
   /// Yet another copy constructor
-  scfString (const char *copy) : s(copy)
-  { SCF_CONSTRUCT_IBASE (0); }
+  scfString (const char *copy) 
+    : scfImplementationType (this), s(copy)
+  { }
 
   /// Destroy a scfString object
   virtual ~scfString ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   /// Get the pointer to the internal csString.
   const csString& GetCsString () const { return s; }

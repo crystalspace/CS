@@ -21,25 +21,17 @@
 #include "isound/data.h"
 #include "isound/source.h"
 
-SCF_IMPLEMENT_IBASE(csSoundHandle);
-  SCF_IMPLEMENTS_INTERFACE(iSoundHandle);
-SCF_IMPLEMENT_IBASE_END
 
 csSoundHandle::csSoundHandle(iSoundData* s)
+  : scfImplementationType (this), Data (s), Registered (false), 
+  ActiveStream (false), LoopStream (false)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
-  Data = s;
-  Registered = false;
-  ActiveStream = false;
-  LoopStream = false;
 }
 
 csSoundHandle::~csSoundHandle()
 {
   CS_ASSERT(Registered == false);
   ReleaseSoundData();
-  SCF_DESTRUCT_IBASE();
 }
 
 void csSoundHandle::ReleaseSoundData()

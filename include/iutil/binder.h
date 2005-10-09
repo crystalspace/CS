@@ -23,14 +23,12 @@
  * Input binder interface
  */
 
-#include <csutil/scf.h>
+#include "csutil/scf_interface.h"
 
 struct iEvent;
 struct iEventHandler;
 struct iConfigFile;
 class csInputDefinition;
-
-SCF_VERSION (iInputBinder, 0, 1, 0);
 
 /**
  * SCF interface for csInputBinder,
@@ -54,8 +52,9 @@ SCF_VERSION (iInputBinder, 0, 1, 0);
  * }
  * \endcode
  */
-struct iInputBinder : public iBase
+struct iInputBinder : public virtual iBase
 {
+  SCF_INTERFACE(iInputBinder, 2,0,0);
   /**
    * Get a pointer to the embedded iEventHander.
    * \remarks This class has to be registered with the event queue:

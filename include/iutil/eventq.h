@@ -34,7 +34,6 @@ struct iEventOutlet;
 struct iEventPlug;
 struct iEventHandler;
 
-SCF_VERSION(iEventQueue, 0, 0, 1);
 
 /**
  * This interface represents a general event queue.
@@ -51,8 +50,9 @@ SCF_VERSION(iEventQueue, 0, 0, 1);
  * Main ways to get pointers to this interface:
  * - csQueryRegistry()
  */
-struct iEventQueue : public iBase
+struct iEventQueue : public virtual iBase
 {
+  SCF_INTERFACE(iEventQueue, 2,0,0);
   /**
    * Process the event queue.  Calls Dispatch() once for each event in the
    * queue in order to actually dispatch the event.  Typically, this method is

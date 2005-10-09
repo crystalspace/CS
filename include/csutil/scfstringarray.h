@@ -25,24 +25,26 @@
  */
 
 #include "csextern.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/stringarray.h"
 #include "iutil/stringarray.h"
 
 /// This class is a thin wrapper around csStringArray with SCF capability
-class CS_CRYSTALSPACE_EXPORT scfStringArray : public iStringArray
+class CS_CRYSTALSPACE_EXPORT scfStringArray : 
+  public scfImplementation1<scfStringArray, iStringArray>
 {
   csStringArray v;
 
 public:
-  SCF_DECLARE_IBASE;
 
   /// Create a iStringArray from scratch.
-  scfStringArray (int limit = 16, int delta = 16) : v (limit, delta)
-  { SCF_CONSTRUCT_IBASE (0); }
+  scfStringArray (int limit = 16, int delta = 16) 
+    : scfImplementationType (this), v (limit, delta)
+  { }
 
   /// Destructor - nothing to do.
   virtual ~scfStringArray ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   /// Get array length.
   virtual size_t GetSize () const

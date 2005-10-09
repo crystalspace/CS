@@ -26,7 +26,7 @@
 
 #include "csextern.h"
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "itexture/itexfact.h"
 
 struct iObjectRegistry;
@@ -36,7 +36,9 @@ struct iObjectRegistry;
  * \remark Descendants must at least implement Generate(). Adding more 
  * parameters should be done via additional interfaces.
  */
-class CS_CRYSTALSPACE_EXPORT csBaseTextureFactory : public iTextureFactory
+class CS_CRYSTALSPACE_EXPORT csBaseTextureFactory : 
+  public scfImplementation1<csBaseTextureFactory,
+                            iTextureFactory>
 {
 protected:
   /// object registry
@@ -49,7 +51,6 @@ protected:
   iTextureType* texture_type;
 
 public:
-  SCF_DECLARE_IBASE;
 
   csBaseTextureFactory (iTextureType* parent, iObjectRegistry* object_reg);
   virtual ~csBaseTextureFactory();

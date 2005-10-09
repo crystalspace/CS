@@ -26,13 +26,15 @@
 
 #include "csextern.h"
 #include "csutil/fifo.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/thread.h"
 #include "iutil/job.h"
 
 /**
  * iJobQueue implementation that lets the jobs run in a thread.
  */
-class CS_CRYSTALSPACE_EXPORT csThreadJobQueue : public iJobQueue
+class CS_CRYSTALSPACE_EXPORT csThreadJobQueue : 
+  public scfImplementation1<csThreadJobQueue, iJobQueue>
 {
   typedef csFIFO<csRef<iJob> > JobFifo;
   struct QueueAndRunnableShared
@@ -64,7 +66,6 @@ class CS_CRYSTALSPACE_EXPORT csThreadJobQueue : public iJobQueue
   // stats
   uint jobsAdded, jobsPulled, jobsWaited, jobsUnqueued;
 public:
-  SCF_DECLARE_IBASE;
 
   csThreadJobQueue();
   virtual ~csThreadJobQueue();

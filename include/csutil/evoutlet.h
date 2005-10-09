@@ -26,6 +26,7 @@
 
 #include "csextern.h"
 #include "csutil/csunicode.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/event.h"
 #include "iutil/csinput.h"
 
@@ -35,7 +36,8 @@ class csEventQueue;
 /**
  * A class which implements the iEventOutlet interface.
  */
-class CS_CRYSTALSPACE_EXPORT csEventOutlet : public iEventOutlet
+class CS_CRYSTALSPACE_EXPORT csEventOutlet : 
+  public scfImplementation1<csEventOutlet, iEventOutlet>
 {
 private:
   /// The mask of events to allow from this plug
@@ -58,7 +60,6 @@ private:
   iJoystickDriver* GetJoystickDriver();
 
 public:
-  SCF_DECLARE_IBASE;
 
   /// Initialize the outlet
   csEventOutlet (iEventPlug*, csEventQueue*, iObjectRegistry*);

@@ -30,7 +30,6 @@
 
 struct iVFS;
 
-SCF_VERSION(iConfigManager, 0, 0, 3);
 
 /**
  * The configuration manager is used to make a number of iConfigFile object
@@ -77,6 +76,7 @@ SCF_VERSION(iConfigManager, 0, 0, 3);
  */
 struct iConfigManager : public iConfigFile
 {
+  SCF_INTERFACE(iConfigManager, 2,0,0);
   enum
   {
     PriorityMin =       -1000000000,

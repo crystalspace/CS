@@ -25,10 +25,12 @@
  */
 
 #include "csextern.h"
+#include "csgfx/memimage.h"
+#include "csutil/ref.h"
+#include "csutil/scf_interface.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/databuff.h"
 #include "iutil/job.h"
-#include "csutil/ref.h"
-#include "csgfx/memimage.h"
 
 /**
  * \addtogroup plugincommon
@@ -52,14 +54,13 @@ enum csLoaderDataType
 
 class csCommonImageFile;
 
-SCF_VERSION (iImageFileLoader, 0, 0, 2);
-
 /**
  * An image file loader.
  * Handles the decoding of an image.
  */
-struct iImageFileLoader : public iBase
+struct iImageFileLoader : public virtual iBase
 {
+  SCF_INTERFACE(iImageFileLoader, 2,0,0);
   /// Do the loading.
   virtual bool LoadData () = 0;
   /// Return "raw data" (if supported)
@@ -83,7 +84,8 @@ struct iImageFileLoader : public iBase
 /**
  * Base image loader implementation.
  */
-class CS_CRYSTALSPACE_EXPORT csCommonImageFileLoader : public iImageFileLoader
+class CS_CRYSTALSPACE_EXPORT csCommonImageFileLoader : 
+  public scfImplementation1<csCommonImageFileLoader, iImageFileLoader>
 {
 protected:
   /// Format of the image
@@ -109,8 +111,6 @@ protected:
   /// Image dimensions.
   int Width, Height;
 public:
-  SCF_DECLARE_IBASE;
-
   csCommonImageFileLoader (int format);
   virtual ~csCommonImageFileLoader();
 
@@ -134,20 +134,20 @@ public:
 /**
  * A base class for image loader plugin iImage implementations.
  */
-class CS_CRYSTALSPACE_EXPORT csCommonImageFile : public csImageMemory
+class CS_CRYSTALSPACE_EXPORT csCommonImageFile : 
+  public scfImplementationExt0<csCommonImageFile, csImageMemory>
 {
 protected:
   friend class csCommonImageFileLoader;
   
-  class CS_CRYSTALSPACE_EXPORT LoaderJob : public iJob
+  class CS_CRYSTALSPACE_EXPORT LoaderJob : 
+    public scfImplementation1<LoaderJob, iJob>
   {
   public:
     /// The actual image loader.
     csRef<iImageFileLoader> currentLoader;
     /// Result of the iImageFileLoader->LoadData() call.
     bool loadResult;
-    SCF_DECLARE_IBASE;
-
     /// Create new instance with a given image loader.
     LoaderJob (iImageFileLoader* loader);
     virtual ~LoaderJob();

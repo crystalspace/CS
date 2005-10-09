@@ -24,13 +24,15 @@
 #include "csextern.h"
 
 #include "csutil/csobject.h"
+#include "csutil/scf_implementation.h"
 #include "isound/wrapper.h"
 
 /**
  * Document me and possible move me to some sound manager! @@@
  * \deprecated
  */
-class CS_CRYSTALSPACE_EXPORT csSoundWrapper : public csObject
+class CS_CRYSTALSPACE_EXPORT csSoundWrapper : 
+  public scfImplementationExt1<csSoundWrapper, csObject, iSoundWrapper>
 {
 protected:
   ///
@@ -42,18 +44,10 @@ public:
   csSoundWrapper(iSoundHandle* buf);
   ///
   ~csSoundWrapper();
-  ///
-  iSoundHandle* GetSound();
 
-  SCF_DECLARE_IBASE;
+  virtual iSoundHandle *GetSound ();
+  virtual iObject *QueryObject ();
 
-  struct SoundWrapper : public iSoundWrapper
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSoundWrapper);
-
-    virtual iSoundHandle *GetSound ();
-    virtual iObject *QueryObject ();
-  } scfiSoundWrapper;
 };
 
 #endif // __CS_SNDWRAP_H__

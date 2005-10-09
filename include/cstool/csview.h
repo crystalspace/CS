@@ -26,6 +26,8 @@
 
 #include "csextern.h"
 
+#include "csutil/ref.h"
+#include "csutil/scf_implementation.h"
 #include "ivaria/view.h"
 
 class csBox2;
@@ -35,7 +37,8 @@ class csPoly2D;
  * The csView class encapsulates the top-level Crystal Space
  * renderer interface. It is basically a camera and a clipper.
  */
-class CS_CRYSTALSPACE_EXPORT csView : public iView
+class CS_CRYSTALSPACE_EXPORT csView : 
+  public scfImplementation1<csView, iView>
 {
 private:
   /// the engine
@@ -100,8 +103,6 @@ public:
   virtual iClipper2D* GetClipper ();
   /// Draw 3D world as seen from the camera.
   virtual void Draw ();
-
-  SCF_DECLARE_IBASE;
 };
 
 #endif // __CS_CSVIEW_H__

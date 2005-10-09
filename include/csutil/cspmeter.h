@@ -25,6 +25,7 @@
  */
 
 #include "csextern.h"
+#include "csutil/scf_implementation.h"
 #include "ivaria/pmeter.h"
 
 struct iConsoleOutput;
@@ -51,7 +52,8 @@ struct iConsoleOutput;
  * needs a newline printed after 100% has been reached, then it is the
  * client's responsibility to print it.
  */
-class CS_CRYSTALSPACE_EXPORT csTextProgressMeter : public iProgressMeter
+class CS_CRYSTALSPACE_EXPORT csTextProgressMeter : 
+  public scfImplementation1<csTextProgressMeter, iProgressMeter>
 {
 private:
   iConsoleOutput* console;
@@ -76,8 +78,6 @@ public:
   void SetTickScale (int);
   /// Get the tick scale.
   int GetTickScale () const { return tick_scale; }
-
-  SCF_DECLARE_IBASE;
 
   /**
    * Set the id and description of what we are currently monitoring.

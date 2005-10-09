@@ -25,24 +25,23 @@
  */
 
 #include "csextern.h"
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
+#include "iengine/rendersteps/irsfact.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
-#include "iengine/rendersteps/irsfact.h"
 
 /**\addtogroup plugincommon
  * @{ */
 /**
  * Base class for render step loaders.
  */
-class CS_CRYSTALSPACE_EXPORT csBaseRenderStepType : public iComponent, 
-						    public iRenderStepType
+class CS_CRYSTALSPACE_EXPORT csBaseRenderStepType : 
+  public scfImplementation2<csBaseRenderStepType, iRenderStepType, iComponent>
 {
 protected:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
 
   csBaseRenderStepType (iBase *p);
   virtual ~csBaseRenderStepType ();

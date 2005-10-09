@@ -22,14 +22,9 @@
 
 #include "ivideo/graph2d.h"
 
-SCF_IMPLEMENT_IBASE (csScreenShot)
-  SCF_IMPLEMENTS_INTERFACE (iImage)
-SCF_IMPLEMENT_IBASE_END
-
 csScreenShot::csScreenShot (iGraphics2D *G2D)
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   Width = G2D->GetWidth ();
   Height = G2D->GetHeight ();
   csPixelFormat const* pfmt = G2D->GetPixelFormat ();
@@ -100,8 +95,6 @@ csScreenShot::~csScreenShot ()
     delete [] (uint8 *)Data;
   else
     delete [] (csRGBpixel *)Data;
-
-  SCF_DESTRUCT_IBASE();
 }
 
 int csScreenShot::GetClosestIndex (const csRGBpixel& color)

@@ -24,7 +24,7 @@
  */
 
 #include "csextern.h"
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/virtclk.h"
 
 /**
@@ -32,7 +32,8 @@
  * clock you can easily keep track of elapsed and current time
  * in a virtual setting.
  */
-class CS_CRYSTALSPACE_EXPORT csVirtualClock : public iVirtualClock
+class CS_CRYSTALSPACE_EXPORT csVirtualClock : 
+  public scfImplementation1<csVirtualClock, iVirtualClock>
 {
 private:
   /// Elapsed time between last two frames and absolute time in milliseconds
@@ -41,8 +42,6 @@ private:
 public:
   csVirtualClock ();
   virtual ~csVirtualClock ();
-
-  SCF_DECLARE_IBASE;
 
   /**
    * Advance the engine's virtual-time clock.

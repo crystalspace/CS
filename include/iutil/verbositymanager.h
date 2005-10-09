@@ -24,9 +24,7 @@
  * Verbosity management interface
  */
 
-#include "csutil/scf.h"
-
-SCF_VERSION (iVerbosityManager, 0, 0, 2);
+#include "csutil/scf_interface.h"
 
 /**
  * Helper interface which applications and plugins can use to determine whether
@@ -46,8 +44,9 @@ SCF_VERSION (iVerbosityManager, 0, 0, 2);
  * \sa csCheckVerbosity
  * \sa csParseVerbosity
  */
-struct iVerbosityManager : public iBase
+struct iVerbosityManager : public virtual iBase
 {
+  SCF_INTERFACE(iVerbosityManager, 2,0,0);
   /**
    * Parse additional verbosity flags.
    * \remarks See csVerbosityParser::Parse() for detailed information

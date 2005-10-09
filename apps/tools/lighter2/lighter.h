@@ -22,8 +22,8 @@
 namespace lighter
 {
   class Scene;
-  class Sector;
-  class Light;
+  struct Sector;
+  struct Light;
   class RadPrimitive;
   class Raytracer;
 

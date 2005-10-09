@@ -26,10 +26,10 @@
 
 #include "csextern.h"
 #include "csutil/array.h"
-#include "csutil/ref.h"
-#include "csutil/strhash.h"
-
 #include "csutil/leakguard.h"
+#include "csutil/ref.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/strhash.h"
 #include "iutil/strset.h"
 
 #include "csplugincommon/shader/shaderplugin.h"
@@ -46,8 +46,8 @@ struct iObjectRegistry;
  * Provides basic services such as holding and of parameter mapping
  * information, basic program data and data dumping.
  */
-class CS_CRYSTALSPACE_EXPORT csShaderProgram : public iShaderProgram,
-                                               public iShaderTUResolver
+class CS_CRYSTALSPACE_EXPORT csShaderProgram : 
+  public scfImplementation2<csShaderProgram, iShaderProgram, iShaderTUResolver>
 {
 protected:
   csStringHash commonTokens;
@@ -213,8 +213,6 @@ protected:
   }
   //@}
 public:
-  SCF_DECLARE_IBASE;
-
   CS_LEAKGUARD_DECLARE (csShaderProgram);
 
   csShaderProgram (iObjectRegistry* objectReg);

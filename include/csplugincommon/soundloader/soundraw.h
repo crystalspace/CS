@@ -21,13 +21,13 @@
 #define __CS_SOUNDRAW_H__
 
 #include "csextern.h"
+#include "csutil/scf_implementation.h"
 #include "isound/data.h"
 
-class CS_CRYSTALSPACE_EXPORT csSoundDataRaw : public iSoundData 
+class CS_CRYSTALSPACE_EXPORT csSoundDataRaw : 
+  public scfImplementation1<csSoundDataRaw, iSoundData>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   csSoundDataRaw(iBase *iParent, void *Data, long NumSamples,
     csSoundFormat Format);
   virtual ~csSoundDataRaw();

@@ -48,7 +48,7 @@
 #include "imesh/spritecal3d.h"
 #include "imesh/thing.h"
 
-class vmAnimCallback;
+struct vmAnimCallback;
 
 class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 {

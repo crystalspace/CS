@@ -112,7 +112,7 @@ private:
     virtual size_t GetLength() { return length; }
     virtual void* GetData() { return data; }
   };
-  friend class PlatformMapping;
+  friend struct PlatformMapping;
   
   void FreeMapping (PlatformMapping* mapping);
 };

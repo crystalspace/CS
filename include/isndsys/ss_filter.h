@@ -31,7 +31,7 @@
 
 class csSourceParameters3D;
 class csListenerProperties;
-class iReporter;
+struct iReporter;
 
 struct iSndSysSoftwareFilter3DProperties
 {

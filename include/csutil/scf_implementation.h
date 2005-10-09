@@ -112,7 +112,7 @@ public:
  * weak references.
  */
 template<class Class>
-class scfImplementation : public virtual iBase
+class CS_CRYSTALSPACE_EXPORT scfImplementation : public virtual iBase
 {
 public:
   /**
@@ -132,7 +132,7 @@ public:
     scfRemoveRefOwners ();
   }
 
-  void DecRef ()
+  virtual void DecRef ()
   {
     CS_ASSERT_MSG("Refcount decremented for destroyed object", 
       scfRefCount != 0);
@@ -145,26 +145,26 @@ public:
     }
   }
 
-  void IncRef ()
+  virtual void IncRef ()
   {
     CS_ASSERT_MSG("Refcount incremented from inside dtor", 
       scfRefCount != 0);
     scfRefCount++;
   }
 
-  int GetRefCount ()
+  virtual int GetRefCount ()
   {
     return scfRefCount;
   }
 
-  void AddRefOwner (iBase** ref_owner)
+  virtual void AddRefOwner (iBase** ref_owner)
   {
     if (!this->scfWeakRefOwners)
       scfWeakRefOwners = new csArray<iBase**> (0, 4);
     scfWeakRefOwners->InsertSorted (ref_owner);
   }
 
-  void RemoveRefOwner (iBase** ref_owner)
+  virtual void RemoveRefOwner (iBase** ref_owner)
   {
     if (!scfWeakRefOwners)
       return;

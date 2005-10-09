@@ -24,19 +24,14 @@
 
 #include "csplugincommon/canvas/fontcache.h"
 
-SCF_IMPLEMENT_IBASE(csFontCache::FontDeleteNotify)
-  SCF_IMPLEMENTS_INTERFACE(iFontDeleteNotify)
-SCF_IMPLEMENT_IBASE_END
 
 csFontCache::FontDeleteNotify::FontDeleteNotify (csFontCache* cache)
+  : scfImplementationType (this), cache (cache)
 {
-  SCF_CONSTRUCT_IBASE(0);
-  FontDeleteNotify::cache = cache;
 }
 
 csFontCache::FontDeleteNotify::~FontDeleteNotify ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csFontCache::FontDeleteNotify::BeforeDelete (iFont* font)

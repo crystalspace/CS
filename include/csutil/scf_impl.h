@@ -119,7 +119,7 @@
 #define SCF_IMPL_CAT_II(res) res
 
 template<class Class SCF_IMPL_TYPES>
-class SCF_IMPL_NAME :
+class CS_CRYSTALSPACE_EXPORT SCF_IMPL_NAME :
   public SCF_IMPL_SUPER
   SCF_IMPL_INTERFACES
 {

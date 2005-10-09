@@ -24,17 +24,18 @@
  */
 
 #include "csextern.h"
-#include "csutil/csstring.h"
 #include "csutil/array.h"
+#include "csutil/csstring.h"
+#include "csutil/scf_implementation.h"
 
 #ifdef CS_DO_PROFILING
 
 #include <sys/time.h>
 
-SCF_VERSION (iProfiler, 0, 0, 1);
 
-struct iProfiler : public iBase
+struct iProfiler : public virtual iBase
 {
+  SCF_INTERFACE(iProfiler, 2,0,0);
   virtual void RegisterProfilePoint (const char* token,
   	const char* file, int line,
   	uint32* ptr_count, uint32* ptr_time,
@@ -54,7 +55,7 @@ struct csProfileInfo
   uint32* ptr_timemax;
 };
 
-class csProfiler : public iProfiler
+class csProfiler : public scfImplementation1<csProfiler, iProfiler>
 {
 public:
   csArray<csProfileInfo> profile_info;
@@ -63,7 +64,6 @@ public:
   csProfiler ();
   virtual ~csProfiler ();
 
-  SCF_DECLARE_IBASE;
   virtual void RegisterProfilePoint (const char* token,
   	const char* file, int line,
   	uint32* ptr_count, uint32* ptr_time,

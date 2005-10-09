@@ -24,9 +24,7 @@
  * Renderer view interface
  */
 
-#include "csutil/scf.h"
-
-SCF_VERSION (iView, 0, 1, 0);
+#include "csutil/scf_interface.h"
 
 struct iCamera;
 struct iEngine;
@@ -47,8 +45,9 @@ struct iClipper2D;
  * - Application uses it.
  *   
  */
-struct iView : public iBase
+struct iView : public virtual iBase
 {
+  SCF_INTERFACE(iView, 2,0,0);
   /// Get engine handle.
   virtual iEngine* GetEngine () = 0;
   /// Set engine handle.

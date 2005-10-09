@@ -121,8 +121,8 @@ void csWaterDemo::SetupFrame ()
     view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, (y-h) * 0.01);
     view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, (x-w) * 0.01);
     r3d->GetDriver2D ()->SetMousePosition (w, h);
-    moved |= (y-h);
-    moved |= (x-w);
+    moved |= (y-h)!=0;
+    moved |= (x-w)!=0;
   }
 
   if (kbd->GetKeyState (CSKEY_UP))

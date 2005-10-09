@@ -19,15 +19,14 @@
 #ifndef __CS_IUTIL_CACHE_H__
 #define __CS_IUTIL_CACHE_H__
 
-#include "csutil/scf.h"
+#include "csutil/ref.h"
+#include "csutil/scf_interface.h"
 
 struct iDataBuffer;
 
 /**\file
  * Cache manager interface
  */
-
-SCF_VERSION (iCacheManager, 0, 0, 1);
 
 /**
  * A generic cache system. A client can use this to cache data
@@ -50,8 +49,9 @@ SCF_VERSION (iCacheManager, 0, 0, 1);
  * ReadCache(). If you don't use 0 then the given value will
  * override the default values.
  */
-struct iCacheManager : public iBase
+struct iCacheManager : public virtual iBase
 {
+  SCF_INTERFACE(iCacheManager, 2,0,0);
   /**
    * Force the cache manager to be read-only. This will prevent
    * updates of the cache but CacheData() will still return true

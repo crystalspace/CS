@@ -28,17 +28,16 @@
  * \addtogroup gfx3d
  * @{ */
  
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 struct iTextureFactory;
-
-SCF_VERSION (iProcTexture, 0, 0, 1);
 
 /**
  * Interface to a texture factory.
  */
-struct iProcTexture : public iBase
+struct iProcTexture : public virtual iBase
 {
+  SCF_INTERFACE(iProcTexture, 2,0,0);
   /// Get the 'always animate' flag.
   virtual bool GetAlwaysAnimate () const = 0;
   /// Set the 'always animate' flag.

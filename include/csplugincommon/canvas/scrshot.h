@@ -26,6 +26,7 @@
 #include "csextern.h"
 
 #include "csgfx/imagebase.h"
+#include "csutil/scf_implementation.h"
 
 struct iGraphics2D;
 
@@ -34,7 +35,8 @@ struct iGraphics2D;
  * @{ */
 
 /// Simple iImage implementation for canvas screenshots.
-class CS_CRYSTALSPACE_EXPORT csScreenShot : public csImageBase
+class CS_CRYSTALSPACE_EXPORT csScreenShot : 
+  public scfImplementationExt0<csScreenShot, csImageBase>
 {
   int Format;
   void *Data;
@@ -42,7 +44,6 @@ class CS_CRYSTALSPACE_EXPORT csScreenShot : public csImageBase
   int Width, Height;
 
 public:
-  SCF_DECLARE_IBASE;
   /// Initialize the screenshot object
   csScreenShot (iGraphics2D *G2D);
   /// Destroy the screenshot object

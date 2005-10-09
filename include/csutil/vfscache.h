@@ -25,6 +25,7 @@
 #include "csextern.h"
 #include "iutil/cache.h"
 #include "csutil/csstring.h"
+#include "csutil/scf_implementation.h"
 
 struct iObjectRegistry;
 struct iVFS;
@@ -32,14 +33,15 @@ struct iVFS;
 /**
  * This is a general cache that can cache data on VFS.
  */
-class CS_CRYSTALSPACE_EXPORT csVfsCacheManager : public iCacheManager
+class CS_CRYSTALSPACE_EXPORT csVfsCacheManager : 
+  public scfImplementation1<csVfsCacheManager, iCacheManager>
 {
 private:
   iObjectRegistry* object_reg;
   char* vfsdir;
+  csRef<iVFS> vfs;
   char* current_type;
   char* current_scope;
-  csRef<iVFS> vfs;
   bool readonly;
 
   iVFS* GetVFS ();
@@ -56,7 +58,6 @@ public:
 
   virtual ~csVfsCacheManager ();
 
-  SCF_DECLARE_IBASE;
 
   virtual void SetReadOnly (bool ro) { readonly = ro; }
   virtual bool IsReadOnly () const { return readonly; }

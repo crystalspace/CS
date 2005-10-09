@@ -294,7 +294,7 @@ static void MIPMAP_NAME (unsigned int w, unsigned int h, const csRGBpixel *src, 
 	} 
 	else if (x == w1)
 	{
-	  MIPMAP_PROCESS (-1, 0, (int)-w1);
+	  MIPMAP_PROCESS (-1, 0, -((int)w1));
 	}
 	else
 	{

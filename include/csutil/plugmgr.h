@@ -26,6 +26,7 @@
 #include "csextern.h"
 #include "csutil/parray.h"
 #include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/thread.h"
 #include "iutil/plugin.h"
 #include "iutil/pluginconfig.h"
@@ -37,7 +38,8 @@ struct iObjectRegistry;
  * This is the standard implementation of the plugin manager.
  * The plugin manager is thread-safe.
  */
-class CS_CRYSTALSPACE_EXPORT csPluginManager : public iPluginManager
+class CS_CRYSTALSPACE_EXPORT csPluginManager :
+  public scfImplementation1<csPluginManager, iPluginManager>
 {
 private:
   /// Mutex to make the plugin manager thread-safe.
@@ -114,8 +116,6 @@ public:
   csPluginManager (iObjectRegistry* object_reg);
   /// Destruct.
   virtual ~csPluginManager ();
-
-  SCF_DECLARE_IBASE;
 
   /// Load a plugin and (optionally) initialize it.
   virtual iBase *LoadPlugin (const char *iClassID, bool init = true);

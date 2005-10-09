@@ -27,14 +27,15 @@
 
 #include "csextern.h"
 #include "csutil/csstring.h"
-
+#include "csutil/scf_implementation.h"
 #include "iutil/vfs.h"
 
 /**
  * An implementation of the abstract iFile interface for real files within
  * the physical filesystem.
  */
-class CS_CRYSTALSPACE_EXPORT csPhysicalFile : public iFile
+class CS_CRYSTALSPACE_EXPORT csPhysicalFile : 
+  public scfImplementation1<csPhysicalFile, iFile>
 {
 public:
   /**
@@ -95,8 +96,6 @@ public:
    * returned data.
    */
   virtual csPtr<iDataBuffer> GetAllData(bool nullterm = false);
-
-  SCF_DECLARE_IBASE;
 
 protected:
   FILE* fp;

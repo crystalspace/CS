@@ -24,14 +24,13 @@
  * Reference tracker interface
  */
 
-SCF_VERSION (iRefTracker, 0, 3, 0); 
-
 /**
  * The reference tracker interface. Exposed by iSCF::SCF if enabled at
  * compile-time.
  */
-struct iRefTracker : public iBase
+struct iRefTracker : public virtual iBase
 {
+  SCF_INTERFACE(iRefTracker, 2,0,0);
   /// Called by an object if it has been IncRef()ed.
   virtual void TrackIncRef (void* object, int refCount) = 0;
   /// Called by an object if it has been DecRef()ed.

@@ -23,12 +23,14 @@
  * 'Null' Cache Manager
  */
 #include "csextern.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/cache.h"
 
 /**
  * This is a general cache that doesn't cache anything at all.
  */
-class CS_CRYSTALSPACE_EXPORT csNullCacheManager : public iCacheManager
+class CS_CRYSTALSPACE_EXPORT csNullCacheManager : 
+  public scfImplementation1<csNullCacheManager, iCacheManager>
 {
 public:
   /**
@@ -38,7 +40,6 @@ public:
 
   virtual ~csNullCacheManager ();
 
-  SCF_DECLARE_IBASE;
 
   virtual void SetReadOnly (bool) { }
   virtual bool IsReadOnly () const { return true; }

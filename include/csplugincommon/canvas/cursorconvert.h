@@ -34,7 +34,7 @@ struct iImage;
 
 class csColorQuantizer;
 class csImageMemory;
-class csRGBcolor;
+struct csRGBcolor;
 struct csRGBpixel;
 
 /**

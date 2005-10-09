@@ -66,16 +66,15 @@ enum csDocumentNodeType
 
 //===========================================================================
 
-SCF_VERSION (iDocumentAttributeIterator, 0, 0, 1);
-
 /**
  * An iterator over iDocumentNode attributes.
  *
  * Main creators of instances implementing this interface:
  * - iDocumentNode::GetAttributes()
  */
-struct iDocumentAttributeIterator : public iBase
+struct iDocumentAttributeIterator : public virtual iBase
 {
+  SCF_INTERFACE(iDocumentAttributeIterator, 2,0,0);
   /// Are there more elements?
   virtual bool HasNext () = 0;
   /// Get next element.
@@ -84,7 +83,6 @@ struct iDocumentAttributeIterator : public iBase
 
 //===========================================================================
 
-SCF_VERSION (iDocumentAttribute, 0, 0, 1);
 
 /**
  * An attribute for an iDocumentNode.
@@ -98,8 +96,9 @@ SCF_VERSION (iDocumentAttribute, 0, 0, 1);
  * - iDocumentNode::GetAttribute()
  * - iDocumentAttributeIterator::Next()
  */
-struct iDocumentAttribute : public iBase
+struct iDocumentAttribute : public virtual iBase
 {
+  SCF_INTERFACE(iDocumentAttribute, 2,0,0);
   /// Get name of this attribute.
   virtual const char* GetName () = 0;
   /// Get value of this attribute.
@@ -122,8 +121,6 @@ struct iDocumentAttribute : public iBase
 
 //===========================================================================
 
-SCF_VERSION (iDocumentNodeIterator, 0, 0, 1);
-
 /**
  * An iterator over iDocumentNode.
  *
@@ -132,6 +129,7 @@ SCF_VERSION (iDocumentNodeIterator, 0, 0, 1);
  */
 struct iDocumentNodeIterator : public virtual iBase
 {
+  SCF_INTERFACE(iDocumentNodeIterator, 2,0,0);
   /// Are there more elements?
   virtual bool HasNext () = 0;
   /// Get next element.
@@ -140,7 +138,6 @@ struct iDocumentNodeIterator : public virtual iBase
 
 //===========================================================================
 
-SCF_VERSION (iDocumentNode, 0, 4, 1);
 
 /**
  * Representation of a node in a document.
@@ -155,8 +152,9 @@ SCF_VERSION (iDocumentNode, 0, 4, 1);
  * - iDocumentNode::GetParent()
  * - iDocumentNodeIterator::Next()
  */
-struct iDocumentNode : public iBase
+struct iDocumentNode : public virtual iBase
 {
+  SCF_INTERFACE(iDocumentNode, 2,0,0);
   /**
    * Get the type of this node (one of CS_NODE_...).
    */
@@ -290,7 +288,6 @@ struct iDocumentNode : public iBase
 
 //===========================================================================
 
-SCF_VERSION (iDocument, 0, 2, 0);
 
 /**
  * Representation of a document containing a hierarchical structure of nodes.
@@ -298,8 +295,9 @@ SCF_VERSION (iDocument, 0, 2, 0);
  * Main creators of instances implementing this interface:
  * - iDocumentSystem::CreateDocument()
  */
-struct iDocument : public iBase
+struct iDocument : public virtual iBase
 {
+  SCF_INTERFACE(iDocument, 2,0,0);
   /// Clear the document.
   virtual void Clear () = 0;
 
@@ -397,7 +395,6 @@ struct iDocument : public iBase
 
 //===========================================================================
 
-SCF_VERSION (iDocumentSystem, 0, 0, 1);
 
 /**
  * An iDocument factory.
@@ -414,6 +411,7 @@ SCF_VERSION (iDocumentSystem, 0, 0, 1);
  */
 struct iDocumentSystem : public virtual iBase
 {
+  SCF_INTERFACE(iDocumentSystem, 2,0,0);
   /// Create a new empty document.
   virtual csRef<iDocument> CreateDocument () = 0;
 };

@@ -23,13 +23,14 @@
 
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
+#include "csutil/scf_implementation.h"
 
 #include "isound/listener.h"
 
-class CS_CRYSTALSPACE_EXPORT csSoundListener : public iSoundListener
+class CS_CRYSTALSPACE_EXPORT csSoundListener : 
+  public scfImplementation1<csSoundListener, iSoundListener>
 {
 public:
-  SCF_DECLARE_IBASE;
   csSoundListener();
   virtual ~csSoundListener();
 

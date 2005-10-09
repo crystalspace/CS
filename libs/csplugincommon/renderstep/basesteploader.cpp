@@ -26,19 +26,14 @@
 
 CS_LEAKGUARD_IMPLEMENT (csBaseRenderStepLoader);
 
-SCF_IMPLEMENT_IBASE (csBaseRenderStepLoader);
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin);
-  SCF_IMPLEMENTS_INTERFACE (iComponent);
-SCF_IMPLEMENT_IBASE_END
 
 csBaseRenderStepLoader::csBaseRenderStepLoader (iBase *p)
+  : scfImplementationType (this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
 }
 
 csBaseRenderStepLoader::~csBaseRenderStepLoader ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csBaseRenderStepLoader::Initialize(iObjectRegistry *object_reg)

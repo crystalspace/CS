@@ -23,17 +23,16 @@
  * General progress meter interface
  */
 
-#include "csutil/scf.h"
-
-SCF_VERSION (iProgressMeter, 0, 1, 0);
+#include "csutil/scf_interface.h"
 
 /**
  * This is a general interface for a progress meter.
  * The engine needs an implementation of this to be able to report
  * progress on calculating lighting and other stuff.
  */
-struct iProgressMeter : public iBase
+struct iProgressMeter : public virtual iBase
 {
+  SCF_INTERFACE(iProgressMeter, 2,0,0);
   /**
    * Set the id and description of what we are currently monitoring.
    * An id can be something like "crystalspace.engine.lighting.calculation".

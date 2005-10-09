@@ -24,8 +24,9 @@
  */
 
 #include "csextern.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/strset.h"
 #include "iutil/strset.h"
-#include "strset.h"
 
 /**
  * The string set is a collection of unique strings. Each string has an ID
@@ -35,21 +36,21 @@
  * performance characteristics of simple numeric comparisons.  Rather than
  * performing string comparisons, you instead compare the numeric string ID's.
  */
-class CS_CRYSTALSPACE_EXPORT csScfStringSet : public iStringSet
+class CS_CRYSTALSPACE_EXPORT csScfStringSet : 
+  public scfImplementation1<csScfStringSet, iStringSet>
 {
 private:
   csStringSet set;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
-  csScfStringSet (size_t size = 23) : set(size)
-  { SCF_CONSTRUCT_IBASE (0); }
+  csScfStringSet (size_t size = 23) 
+    : scfImplementationType (this), set(size)
+  { }
 
   /// Destructor.
   virtual ~csScfStringSet()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   /**
    * Request the numeric ID for the given string.

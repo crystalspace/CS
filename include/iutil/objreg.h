@@ -27,11 +27,10 @@
  * \addtogroup scf
  * @{ */
 
-#include "csutil/scf.h"
+#include "csutil/ref.h"
+#include "csutil/scf_interface.h"
 
 struct iObjectRegistryIterator;
-
-SCF_VERSION (iObjectRegistry, 0, 0, 4);
 
 /**
  * This interface serves as a registry of other objects.
@@ -46,8 +45,9 @@ SCF_VERSION (iObjectRegistry, 0, 0, 4);
  * Main users of this interface:
  * - Everything.
  */
-struct iObjectRegistry : public iBase
+struct iObjectRegistry : public virtual iBase
 {
+  SCF_INTERFACE(iObjectRegistry, 2,0,0);
   // Allow implicit casts through static function.
   CS_IMPLEMENT_IMPLICIT_PTR_CAST (iObjectRegistry);
 
@@ -122,14 +122,14 @@ struct iObjectRegistry : public iBase
   virtual csPtr<iObjectRegistryIterator> Get () = 0;
 };
 
-SCF_VERSION (iObjectRegistryIterator, 0, 1, 0);
 
 /**
  * Use an instance of this class to iterate over objects in the object
  * registry.
  */
-struct iObjectRegistryIterator : public iBase
+struct iObjectRegistryIterator : public virtual iBase
 {
+  SCF_INTERFACE(iObjectRegistryIterator, 2,0,0);
   /**
    * Restart the iterator. Returns false if there are no ellements
    * in it.

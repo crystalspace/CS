@@ -24,10 +24,6 @@
 
 #include "csplugincommon/render3d/normalizationcube.h"
 
-SCF_IMPLEMENT_IBASE(csNormalizationCubeAccessor)
-  SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
-SCF_IMPLEMENT_IBASE_END
-
 void csNormalizationCubeAccessor::FillNormalizationMapSide (
   unsigned char *normdata, int size, 
   int xx, int xy, int xo,
@@ -56,16 +52,12 @@ void csNormalizationCubeAccessor::FillNormalizationMapSide (
 
 csNormalizationCubeAccessor::csNormalizationCubeAccessor (
   iTextureManager* txtmgr, int sideSize)
+  : scfImplementationType (this), normalizeCubeSize (sideSize), txtmgr (txtmgr)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
-  normalizeCubeSize = sideSize;
-  csNormalizationCubeAccessor::txtmgr = txtmgr;
 }
 
 csNormalizationCubeAccessor::~csNormalizationCubeAccessor ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csNormalizationCubeAccessor::PreGetValue (csShaderVariable *variable)

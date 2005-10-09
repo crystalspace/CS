@@ -25,6 +25,7 @@
 
 #include "csextern.h"
 #include "csutil/parray.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/stringarray.h"
 #include "csutil/util.h"
 #include "iutil/cmdline.h"
@@ -49,7 +50,8 @@ struct CS_CRYSTALSPACE_EXPORT csCommandLineOption
 
 
 /// Utility class that makes it easier to parse the command line.
-class CS_CRYSTALSPACE_EXPORT csCommandLineParser : public iCommandLineParser
+class CS_CRYSTALSPACE_EXPORT csCommandLineParser : 
+  public scfImplementation1<csCommandLineParser, iCommandLineParser>
 {
 private:
   /// A vector of command line options
@@ -70,8 +72,6 @@ private:
   /// Full path of application executable.
   csString appPath;
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csCommandLineParser (iBase *Parent = 0);
   /// Construct with a given command line.

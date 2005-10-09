@@ -27,6 +27,7 @@
 
 #include "csutil/csobject.h"
 #include "csutil/hash.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/set.h"
 #include "ivaria/keyval.h"
 
@@ -38,8 +39,8 @@
  * One way to attach key value pairs to CS objects is to add the following
  * xml to your object: \<key name="somename" value="somevalue" /\>
  */
-class CS_CRYSTALSPACE_EXPORT csKeyValuePair : public csObject,
-	public iKeyValuePair
+class CS_CRYSTALSPACE_EXPORT csKeyValuePair : 
+  public scfImplementationExt1<csKeyValuePair, csObject, iKeyValuePair>
 {
 private:
   const char *m_Value;	// Points to a string in the hash below.
@@ -54,7 +55,6 @@ public:
   /// The destructor as usual
   virtual ~csKeyValuePair ();
 
-  SCF_DECLARE_IBASE_EXT (csObject);
   //----------------------- iKeyValuePair --------------------------
   virtual iObject *QueryObject() { return (csObject*)this; }
   virtual const char *GetKey () const;
@@ -66,7 +66,6 @@ public:
 
   virtual csRef<iStringArray> GetValueNames () const;
 
-  //----------------------- iSaverPlugin ---------------------------
 };
 
 #endif // __CS_KEYVAL_H__

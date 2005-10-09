@@ -22,8 +22,8 @@
 #include "csutil/refcount.h"
 
 struct iMeshObjectFactory;
-struct litLightingMeshFactory;
-class litScene;
+class litLightingMeshFactory;
+struct litScene;
 
 /**
  * Baseclass for geometry extractors 

@@ -23,7 +23,7 @@
  * Mesh model data
  */ 
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 /**\addtogroup meshplugins
  * @{ */
@@ -42,7 +42,6 @@ class csColor;
 class csVector2;
 class csVector3;
 
-SCF_VERSION (iModelDataTexture, 0, 0, 1);
 
 /**
  * This structure contains the information about a texture for an
@@ -59,8 +58,9 @@ SCF_VERSION (iModelDataTexture, 0, 0, 1);
  * directly will contain an iImage to work. Exporting to a mesh object will
  * require a texture wrapper.
  */
-struct iModelDataTexture : public iBase
+struct iModelDataTexture : public virtual iBase
 {
+  SCF_INTERFACE(iModelDataTexture, 2,0,0);
   /// Query the iObject for this texture
   virtual iObject* QueryObject () = 0;
 
@@ -100,8 +100,6 @@ struct iModelDataTexture : public iBase
 };
 
 
-SCF_VERSION (iModelDataMaterial, 0, 0, 1);
-
 /**
  * This structure contains the information about a material for an imported
  * model. This information can be stored in two different way: Either as a
@@ -112,8 +110,9 @@ SCF_VERSION (iModelDataMaterial, 0, 0, 1);
  * used. As an example, exporting to a model file uses the base material.
  * Exporting to a mesh object uses the material wrapper.
  */
-struct iModelDataMaterial : public iBase
+struct iModelDataMaterial : public virtual iBase
 {
+  SCF_INTERFACE(iModelDataMaterial, 2,0,0);
   /// Query the iObject for this material
   virtual iObject* QueryObject () = 0;
 
@@ -140,16 +139,14 @@ struct iModelDataMaterial : public iBase
   virtual iModelDataMaterial *Clone () const = 0;
 };
 
-
-SCF_VERSION (iModelDataVertices, 0, 0, 1);
-
 /**
  * A set of vertices, including position, normal, color and texture
  * coordinates. They are stored in independent lists, i.e. it is for example
  * possible to have different numbers of vertices and normals.
  */
-struct iModelDataVertices : public iBase
+struct iModelDataVertices : public virtual iBase
 {
+  SCF_INTERFACE(iModelDataVertices, 2,0,0);
   /// Query the iObject for this vertex set
   virtual iObject* QueryObject () = 0;
 
@@ -213,8 +210,6 @@ struct iModelDataVertices : public iBase
 };
 
 
-SCF_VERSION (iModelDataAction, 0, 0, 1);
-
 /**
  * An action. This is mainly a list of key frames. Note that the key frames
  * are not added as sub-objects, but instead they are added directly through
@@ -240,8 +235,9 @@ SCF_VERSION (iModelDataAction, 0, 0, 1);
  * skeleton states and transformation states (or other types?). Currently
  * only vertex states (iModelDataVertices) are used.
  */
-struct iModelDataAction : public iBase
+struct iModelDataAction : public virtual iBase
 {
+  SCF_INTERFACE(iModelDataAction, 2,0,0);
   /// Query the iObject for this action
   virtual iObject* QueryObject () = 0;
 
@@ -263,16 +259,14 @@ struct iModelDataAction : public iBase
   virtual float GetTotalTime () const = 0;
 };
 
-
-SCF_VERSION (iModelDataPolygon, 0, 0, 1);
-
 /**
  * One polygon in a model. The vertices, normals, colors and texels are only
  * indices for lists in the parent iModelDataObject. In addition, a polygon
  * contains a material.
  */
-struct iModelDataPolygon : public iBase
+struct iModelDataPolygon : public virtual iBase
 {
+  SCF_INTERFACE(iModelDataPolygon, 2,0,0);
   /// Query the iObject for this material
   virtual iObject* QueryObject () = 0;
 
@@ -309,9 +303,6 @@ struct iModelDataPolygon : public iBase
   virtual iModelDataPolygon *Clone () const = 0;
 };
 
-
-SCF_VERSION (iModelDataObject, 0, 1, 0);
-
 /**
  * One object in the scene. This structure is intended for solid objects, i.e.
  * not for lights or cameras. Children should be polygons, curves etc. 
@@ -319,8 +310,9 @@ SCF_VERSION (iModelDataObject, 0, 1, 0);
  * Every object contains a list of vertices. These vertices are shared between
  * polygons (and curves if possible).
  */
-struct iModelDataObject : public iBase
+struct iModelDataObject : public virtual iBase
 {
+  SCF_INTERFACE(iModelDataObject, 2,0,0);
   /// Query the iObject for the model data
   virtual iObject* QueryObject () = 0;
 
@@ -331,11 +323,10 @@ struct iModelDataObject : public iBase
 };
 
 
-SCF_VERSION (iModelDataCamera, 0, 0, 1);
-
 /// A camera in the scene.
-struct iModelDataCamera : public iBase
+struct iModelDataCamera : public virtual iBase
 {
+  SCF_INTERFACE(iModelDataCamera, 2,0,0);
   /// Query the iObject for this camera
   virtual iObject* QueryObject () = 0;
 
@@ -375,11 +366,11 @@ struct iModelDataCamera : public iBase
 };
 
 
-SCF_VERSION (iModelDataLight, 0, 0, 1);
 
 /// A light source in the scene.
-struct iModelDataLight : public iBase
+struct iModelDataLight : public virtual iBase
 {
+  SCF_INTERFACE(iModelDataLight, 2,0,0);
   /// Query the iObject for this light
   virtual iObject* QueryObject () = 0;
 
@@ -403,15 +394,15 @@ struct iModelDataLight : public iBase
 };
 
 
-SCF_VERSION (iModelData, 0, 0, 1);
 
 /**
  * This structure represents a complete scene with objects, light sources,
  * cameras etc. All these objects are added as children in the iObject
  * hierarchy.
  */
-struct iModelData : public iBase
+struct iModelData : public virtual iBase
 {
+  SCF_INTERFACE(iModelData, 2,0,0);
   /// Query the iObject for the model data
   virtual iObject* QueryObject () = 0;
 

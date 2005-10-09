@@ -30,6 +30,7 @@
 #include "csutil/array.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/thread.h"
 #include "iutil/eventq.h"
 
@@ -50,7 +51,8 @@ class csPoolEvent;
  * iEventQueue for a detailed description of each method.  One instance of this
  * class is usually shared via iObjectRegistry.  Event queues are thread-safe.
  */
-class CS_CRYSTALSPACE_EXPORT csEventQueue : public iEventQueue
+class CS_CRYSTALSPACE_EXPORT csEventQueue : 
+  public scfImplementation1<csEventQueue, iEventQueue>
 {
   friend class csEventOutlet;
   friend class csPoolEvent;
@@ -113,7 +115,6 @@ private:
   void EndLoop ();
 
 public:
-  SCF_DECLARE_IBASE;
 
   /// Initialize the event queue
   csEventQueue (iObjectRegistry*, size_t iLength = DEF_EVENT_QUEUE_LENGTH);

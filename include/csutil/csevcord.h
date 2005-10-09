@@ -25,7 +25,7 @@
  */
  
 #include "csextern.h"
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/event.h"
 
 struct iEventHandler;
@@ -35,7 +35,8 @@ class csEventOutlet;
 /**
  * Event cord.
  */
-class CS_CRYSTALSPACE_EXPORT csEventCord : public iEventCord
+class CS_CRYSTALSPACE_EXPORT csEventCord : 
+  public scfImplementation1<csEventCord, iEventCord>
 {
 protected:
   /// Pass events to the system queue?
@@ -70,8 +71,6 @@ protected:
   bool Post(iEvent*);
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Create an event cord for a given category/subcategory
   csEventCord(int category, int subcategory);
 

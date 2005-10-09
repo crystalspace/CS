@@ -24,17 +24,18 @@
  */
 /**\addtogroup util
  * @{ */
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
+#include "csutil/ref.h"
 struct iConfigIterator;
 struct iVFS;
 
-SCF_VERSION(iConfigFile, 0, 0, 2);
 
 /**
  * Configuration file interface.
  */
-struct iConfigFile : public iBase
+struct iConfigFile : public virtual iBase
 {
+  SCF_INTERFACE(iConfigFile, 2,0,0);
   /// Get configuration file name.
   virtual const char* GetFileName () const = 0;
 
@@ -145,14 +146,13 @@ struct iConfigFile : public iBase
 };
 
 
-SCF_VERSION(iConfigIterator, 0, 0, 1);
-
 /**
  * Iterator which allows sequential access to configuration information
  * contained in an iConfigFile object.
  */
-struct iConfigIterator : public iBase
+struct iConfigIterator : public virtual iBase
 {
+  SCF_INTERFACE(iConfigIterator, 2,0,0);
   /// Returns the configuration object for this iterator.
   virtual iConfigFile *GetConfigFile () const = 0;
   /// Returns the subsection in the configuruation.

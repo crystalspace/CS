@@ -26,6 +26,7 @@
 
 #include "csextern.h"
 #include "csutil/weakref.h"
+#include "csutil/scf_implementation.h"
 #include "csgfx/shadervar.h"
 #include "ivideo/txtmgr.h"
 
@@ -33,7 +34,7 @@
  * Shader variable accessor for a normalization cubemap.
  */
 class CS_CRYSTALSPACE_EXPORT csNormalizationCubeAccessor : 
-  public iShaderVariableAccessor
+  public scfImplementation1<csNormalizationCubeAccessor, iShaderVariableAccessor>
 {
   /// Generate a cube side.
   void FillNormalizationMapSide (unsigned char *normdata, int size,
@@ -45,8 +46,7 @@ class CS_CRYSTALSPACE_EXPORT csNormalizationCubeAccessor :
   csWeakRef<iTextureManager> txtmgr;
   csRef<iTextureHandle> texture;
 public:
-  SCF_DECLARE_IBASE;
-
+  
   /**
    * Create new accessor.
    * \param txtmgr The texture manager to register the texture with.

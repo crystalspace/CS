@@ -19,7 +19,7 @@
 #ifndef __CS_ISOUND_DATA_H__
 #define __CS_ISOUND_DATA_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 /**
  * The sound format. This keeps information about the frequency, bits and
@@ -35,15 +35,15 @@ struct csSoundFormat
   int Channels;
 };
 
-SCF_VERSION (iSoundData, 1, 0, 0);
 
 /**
  * The sound data is a template used to play sounds. It represents a sound
  * file just after it was loaded. To play the sound, you must first prepare
  * it and obtain a sound handle.
  */
-struct iSoundData : public iBase
+struct iSoundData : public virtual iBase
 {
+  SCF_INTERFACE(iSoundData, 2,0,0);
   /// Prepare the sound for output using the given format.
   virtual bool Initialize(const csSoundFormat *fmt) = 0;
   /// Get the format of the sound data.

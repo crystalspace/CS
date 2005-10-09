@@ -25,13 +25,13 @@
  */
 /**\addtogroup util
  * @{ */
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
-SCF_VERSION (iString, 0, 2, 1);
 
 /// This is a SCF-compatible interface for csString.
-struct iString : public iBase
+struct iString : public virtual iBase
 {
+  SCF_INTERFACE(iString, 2,0,0);
   /**
    * Advise the string that it should allocate enough space to hold up to
    * NewSize characters.

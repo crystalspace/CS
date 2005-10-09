@@ -30,13 +30,12 @@
 
 struct iRenderBuffer;
 
-SCF_VERSION(iUserRenderBufferIterator, 0, 0, 1);
-
 /**
  * Interface to iterate over all buffers stored in a csUserRenderBufferManager.
  */
-struct iUserRenderBufferIterator : public iBase
+struct iUserRenderBufferIterator : public virtual iBase
 {
+  SCF_INTERFACE(iUserRenderBufferIterator, 2,0,0);
   /// Whether a next buffer is available.
   virtual bool HasNext() = 0;
   /// Get name of next buffer and optionally the buffer.

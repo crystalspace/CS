@@ -28,14 +28,13 @@
  * \addtogroup gfx3d
  * @{ */
  
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 #include "cstypes.h"
 #include "ivideo/graph3d.h"
 
 struct iGraphics2D;
 struct iGraphics3D;
 
-SCF_VERSION (iTextureHandle, 2, 5, 0);
 
 /**
  * A texture handle as returned by iTextureManager.
@@ -49,8 +48,9 @@ SCF_VERSION (iTextureHandle, 2, 5, 0);
  * Main users of this interface:
  * - 3D renderer implementations (iGraphics3D).
  */
-struct iTextureHandle : public iBase
+struct iTextureHandle : public virtual iBase
 {
+  SCF_INTERFACE(iTextureHandle, 3,0,0);
   /// Retrieve the flags set for this texture
   virtual int GetFlags () const = 0;
 

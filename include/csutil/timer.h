@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include "csextern.h"
 #include "csutil/array.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/timer.h"
 
 struct iEvent;
@@ -39,7 +40,8 @@ struct timerevent;
  * This class implements a timer. You can add operations to it and they
  * will be performed at the dedicated time.
  */
-class CS_CRYSTALSPACE_EXPORT csEventTimer : public iEventTimer
+class CS_CRYSTALSPACE_EXPORT csEventTimer : 
+  public scfImplementation1<csEventTimer, iEventTimer>
 {
 private:
   iObjectRegistry* object_reg;
@@ -60,8 +62,6 @@ public:
   virtual ~csEventTimer ();
 
   bool HandleEvent (iEvent& e);
-
-  SCF_DECLARE_IBASE;
 
   virtual void AddTimerEvent (iTimerEvent* ev, csTicks delay);
   virtual void RemoveTimerEvent (iTimerEvent* ev);

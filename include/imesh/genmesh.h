@@ -175,7 +175,7 @@ struct iGeneralMeshState : public iGeneralMeshCommonState
 
 SCF_VERSION (iGeneralFactoryState, 0, 3, 0);
 
-struct csSphere;
+class csSphere;
 /**
  * This interface describes the API for the general mesh factory.
  * iGeneralFactoryState inherits from iGeneralMeshState. All methods

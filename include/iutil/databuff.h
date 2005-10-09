@@ -25,9 +25,7 @@
  */
 /**\addtogroup util
  * @{ */
-#include "csutil/scf.h"
-
-SCF_VERSION (iDataBuffer, 0, 0, 1);
+#include "csutil/scf_interface.h"
 
 /**
  * The iDataBuffer interface can be used to exchange buffers with
@@ -36,8 +34,9 @@ SCF_VERSION (iDataBuffer, 0, 0, 1);
  * on them. The interface is designed to be light-weight, as an alternative
  * to the heavy iString interface.
  */
-struct iDataBuffer : public iBase
+struct iDataBuffer : public virtual iBase
 {
+  SCF_INTERFACE(iDataBuffer, 2,0,0);
   /// Query the buffer size
   virtual size_t GetSize () const = 0;
   /// Get the buffer as an abstract pointer

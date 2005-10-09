@@ -28,13 +28,15 @@
 
 #include "csgeom/vector3.h"
 #include "csutil/csobject.h"
+#include "csutil/scf_implementation.h"
 #include "ivaria/mapnode.h"
 
 /**
  * A node. This is an iObject that is bound to a position and a sector in
  * the world.
  */
-class CS_CRYSTALSPACE_EXPORT csMapNode : public csObject, public iMapNode
+class CS_CRYSTALSPACE_EXPORT csMapNode : 
+  public scfImplementationExt1<csMapNode, csObject, iMapNode>
 {
 public:
   /// The constructor. Requires the Nodes name!
@@ -46,7 +48,6 @@ public:
   static iMapNode *GetNode (iSector *pSector, const char *name,
     const char *classname = 0);
 
-  SCF_DECLARE_IBASE_EXT (csObject);
   //----------------------- iMapNode --------------------------
   virtual iObject *QueryObject() { return (csObject*)this; }
   virtual void SetPosition (const csVector3& pos) { position = pos; }

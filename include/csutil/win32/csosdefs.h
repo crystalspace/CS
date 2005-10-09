@@ -32,40 +32,40 @@
 #endif // CS_BUILD_SHARED_LIBS
 
 #if defined(CS_COMPILER_MSVC)
-  #pragma warning(disable:4097)   // use of xxx as synonym for a classname
-  #pragma warning(disable:4099)   // type seen as both 'struct' and `class'
-  #pragma warning(disable:4100)   // Use of void* as a formal function parameter
-  #pragma warning(disable:4102)   // 'label' : unreferenced label
-  #pragma warning(disable:4146)   /* unary minus operator applied to unsigned 
-				   * type, result still unsigned */
+  //#pragma warning(disable:4097)   // use of xxx as synonym for a classname
+  //#pragma warning(disable:4099)   // type seen as both 'struct' and `class'
+  //#pragma warning(disable:4100)   // Use of void* as a formal function parameter
+  //#pragma warning(disable:4102)   // 'label' : unreferenced label
+  //#pragma warning(disable:4146)   /* unary minus operator applied to unsigned 
+  //                                 * type, result still unsigned */
   #pragma warning(disable:4201)   // VC6: structure/ union without name.
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
   #pragma warning(disable:4250)   // '...' inherits '..' via dominance
-  #pragma warning(disable:4251)   /* class needs to have dll-interface to be 
-				   * used by clients */
-  #pragma warning(disable:4275)   /* non-DLL-interface used as base for
-                                   * DLL-interface */
-  #pragma warning(disable:4291)   // no matching operator delete found
+  //#pragma warning(disable:4251)   /* class needs to have dll-interface to be 
+  //				   * used by clients */
+  //#pragma warning(disable:4275)   /* non-DLL-interface used as base for
+  //                                 * DLL-interface */
+  //#pragma warning(disable:4291)   // no matching operator delete found
   #pragma warning(disable:4312)	  /* 'variable' : conversion from 'type' to 
 				   * 'type' of greater size */
   #pragma warning(disable:4345)   /* VC7.1: an object of POD type constructed 
 				   * with an initializer of the form () will 
 				   * be default-initialized */
   #pragma warning(disable:4355)   // 'this' used in base member initializer list
-  #pragma warning(disable:4390)   // Empty control statement
-  #pragma warning(disable:4505)   /* 'function' : unreferenced local function 
-				   * has been removed */
-  #pragma warning(disable:4611)   /* interaction between _setjmp and C++ 
-				   * destructors not portable */
-  #pragma warning(disable:4702)   // Unreachable Code
-  #pragma warning(disable:4706)   // Assignment in conditional expression
-  #pragma warning(disable:4710)   // function not inlined
+  //#pragma warning(disable:4390)   // Empty control statement
+  //#pragma warning(disable:4505)   /* 'function' : unreferenced local function 
+  //                                 * has been removed */
+  //#pragma warning(disable:4611)   /* interaction between _setjmp and C++ 
+  //                                 * destructors not portable */
+  //#pragma warning(disable:4702)   // Unreachable Code
+  //#pragma warning(disable:4706)   // Assignment in conditional expression
+  //#pragma warning(disable:4710)   // function not inlined
   #pragma warning(disable:4711)   /* function 'function' selected for inline 
 				   * expansion */
   #pragma warning(disable:4786)   /* VC6: identifier was truncated to '255' 
 				   * characters in the browser information */
   #pragma warning(disable:4800)   // Forcing value to bool
-  #pragma warning(disable:4805)   // unsafe mix of bool and int.
+  //#pragma warning(disable:4805)   // unsafe mix of bool and int.
 
 #if (_MSC_VER < 1300)
   #pragma warning(disable:4248)   /* MSVC6 gives bogus "protected constructor"

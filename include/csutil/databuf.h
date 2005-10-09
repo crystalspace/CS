@@ -25,6 +25,7 @@
  */
 
 #include "csextern.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/databuff.h"
 
 /**
@@ -33,7 +34,8 @@
  * for use in plugins as a mean to transparently exchange
  * abstract data between plugins.
  */
-class CS_CRYSTALSPACE_EXPORT csDataBuffer : public iDataBuffer
+class CS_CRYSTALSPACE_EXPORT csDataBuffer : 
+  public scfImplementation1<csDataBuffer, iDataBuffer>
 {
   /// The data buffer
   char *Data;
@@ -43,12 +45,10 @@ class CS_CRYSTALSPACE_EXPORT csDataBuffer : public iDataBuffer
   bool do_delete;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Construct an preallocated data buffer (filled with garbage initially)
   csDataBuffer (size_t iSize)
+    : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0); 
     Size = iSize;
     Data = new char [Size]; 
     do_delete = true;
@@ -56,8 +56,8 @@ public:
 
   /// Construct an data buffer object given a existing (new char []) pointer
   csDataBuffer (char *iData, size_t iSize, bool should_delete = true)
+    : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0); 
     Data = iData; 
     Size = iSize; 
     do_delete = should_delete;
@@ -65,8 +65,8 @@ public:
 
   /// Duplicate an existing data buffer. Also appends a 0 char.
   csDataBuffer (iDataBuffer *source)
+    : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0); 
     Size = source->GetSize();
     Data = new char [Size + 1];
     memcpy (Data, source->GetData(), Size);
@@ -79,7 +79,6 @@ public:
   {
     if (do_delete)
       delete [] Data;
-    SCF_DESTRUCT_IBASE();
   }
 
   /// Query the buffer size

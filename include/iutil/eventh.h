@@ -29,13 +29,13 @@
 #include "csutil/scf.h"
 struct iEvent;
 
-SCF_VERSION (iEventHandler, 0, 0, 1);
 
 /**
  * This interface describes an entity that can receive events.
  */
 struct iEventHandler : public virtual iBase
 {
+  SCF_INTERFACE(iEventHandler, 2,0,0);
   /**
    * This is the basic event handling function.  To receive events, a component
    * must implement iEventHandler and register with an event queue using

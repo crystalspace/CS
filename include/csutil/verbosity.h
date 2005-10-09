@@ -26,6 +26,7 @@
 #include "iutil/verbositymanager.h"
 #include "csutil/strhash.h"
 #include "csutil/csstring.h"
+#include "csutil/scf_implementation.h"
 class csStringArray;
 
 /**
@@ -254,22 +255,23 @@ CS_CRYSTALSPACE_EXPORT bool csCheckVerbosity (
  * \sa csParseVerbosity;
  * \sa iVerbosityManager
  */
-class CS_CRYSTALSPACE_EXPORT csVerbosityManager : public iVerbosityManager
+class CS_CRYSTALSPACE_EXPORT csVerbosityManager : 
+  public scfImplementation1<csVerbosityManager, iVerbosityManager>
 {
 private:
   csVerbosityParser vp;
 public:
-  SCF_DECLARE_IBASE;
 
   /**
    * Constructor.
    * \remarks See the csVerbosityParser constructor for detailed information
    *   regarding the interpretation of \a flags.
    */
-  csVerbosityManager(char const* flags = 0) : vp(flags)
-  { SCF_CONSTRUCT_IBASE(0); }
+  csVerbosityManager(char const* flags = 0) 
+    : scfImplementationType (this), vp(flags)
+  { }
   /// Destructor.
-  virtual ~csVerbosityManager() { SCF_DESTRUCT_IBASE(); }
+  virtual ~csVerbosityManager() { }
 
   /**
    * Parse additional verbosity flags.

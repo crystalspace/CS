@@ -25,18 +25,17 @@
 #define __CS_CSUTIL_DOCUMENTCOMMON_H__
 
 #include "csextern.h"
-#include "iutil/document.h"
-
 #include "csutil/leakguard.h"
+#include "csutil/scf_implementation.h"
+#include "iutil/document.h"
 
 /**
  * Document node iterator does not return any nodes.
  */
 class CS_CRYSTALSPACE_EXPORT csEmptyDocumentNodeIterator : 
-  public iDocumentNodeIterator
+  public scfImplementation1<csEmptyDocumentNodeIterator, iDocumentNodeIterator>
 {
 public:
-  SCF_DECLARE_IBASE;
   CS_LEAKGUARD_DECLARE(csEmptyDocumentNodeIterator);
 
   csEmptyDocumentNodeIterator ();
@@ -50,10 +49,9 @@ public:
  * Document attribute iterator does not return any attributes.
  */
 class CS_CRYSTALSPACE_EXPORT csEmptyDocumentAttributeIterator : 
-  public iDocumentAttributeIterator
+  public scfImplementation1<csEmptyDocumentAttributeIterator, iDocumentAttributeIterator>
 {
 public:
-  SCF_DECLARE_IBASE;
   CS_LEAKGUARD_DECLARE(csEmptyDocumentAttributeIterator);
 
   csEmptyDocumentAttributeIterator ();
@@ -66,9 +64,11 @@ public:
 /**
  * Partial iDocumentNode implementation with commonly duplicated logic.
  */
-class CS_CRYSTALSPACE_EXPORT csDocumentNodeCommon : public iDocumentNode
+class CS_CRYSTALSPACE_EXPORT csDocumentNodeCommon : 
+  public scfImplementation1<csDocumentNodeCommon, iDocumentNode>
 {
 public:
+  csDocumentNodeCommon () : scfImplementationType (this) {}
   //@{
   /// Converts 'value' to a string and calls SetValue() with it.
   virtual void SetValueAsInt (int value);
@@ -126,9 +126,11 @@ public:
  * Partial iDocumentAttribute implementation with commonly duplicated logic.
  */
 class CS_CRYSTALSPACE_EXPORT csDocumentAttributeCommon : 
-  public iDocumentAttribute
+  public scfImplementation1<csDocumentAttributeCommon, iDocumentAttribute>
 {
 public:
+  csDocumentAttributeCommon () : scfImplementationType (this)
+  {}
   //@{
   /**
    * Returns value. Uses GetValue() and converts the string to the return type.
@@ -150,9 +152,12 @@ public:
  * dummy implementations for manipulation methods.
  */
 class CS_CRYSTALSPACE_EXPORT csDocumentNodeReadOnly : 
-  public csDocumentNodeCommon
+  public scfImplementationExt0<csDocumentNodeReadOnly, csDocumentNodeCommon>
 {
 public:
+  csDocumentNodeReadOnly () 
+    : scfImplementationType (this)
+  {}
   //@{
   /// Dummy implementation for nodes that cannot be changed
   virtual void SetValue (const char* /*value*/) {}

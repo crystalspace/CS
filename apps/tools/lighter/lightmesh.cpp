@@ -356,7 +356,7 @@ csPtr<litLightingMesh> litLightingMeshFactory::CreateMesh (iMeshWrapper *meshwra
     newface->patches.Push (patch);
 
     csVector3 geoNormal;
-    uint faceVertCount = faces[i].indices.Length ();
+    size_t faceVertCount = faces[i].indices.GetSize ();
     csArray<uint> &idxList = faces[i].indices;
 
     if (faceVertCount == 3)

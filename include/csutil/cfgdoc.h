@@ -25,9 +25,10 @@
  */
 
 #include "csextern.h"
+#include "csutil/hash.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/cfgfile.h"
 #include "iutil/document.h"
-#include "csutil/hash.h"
 
 class csConfigDocumentIterator;
 
@@ -35,7 +36,8 @@ class csConfigDocumentIterator;
  * iConfigFile implementation for configurations stored in documents.
  * \todo Write support
  */
-class CS_CRYSTALSPACE_EXPORT csConfigDocument : public iConfigFile
+class CS_CRYSTALSPACE_EXPORT csConfigDocument : 
+  public scfImplementation1<csConfigDocument,iConfigFile>
 {
   friend class csConfigDocumentIterator;
 
@@ -72,7 +74,6 @@ class CS_CRYSTALSPACE_EXPORT csConfigDocument : public iConfigFile
   void ParseNode (const char* parent, iDocumentNode* node, 
     bool NewWins = true);
 public:
-  SCF_DECLARE_IBASE;
   
   csConfigDocument ();
   csConfigDocument (const char *Filename, iVFS* = 0);

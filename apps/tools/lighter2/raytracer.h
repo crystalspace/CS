@@ -22,7 +22,7 @@
 namespace lighter
 {
   class KDTree;
-  class KDTreeNode;
+  struct KDTreeNode;
   class RadPrimitive;
 
   /**

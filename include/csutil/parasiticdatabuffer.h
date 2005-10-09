@@ -26,12 +26,14 @@
 
 #include "csextern.h"
 #include "csutil/pooledscfclass.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/databuff.h"
 
 /**
  * Base class for pooled and unpooled parasitic data buffer.
  */
-class csParasiticDataBufferBase : public iDataBuffer
+class csParasiticDataBufferBase : 
+  public scfImplementation1<csParasiticDataBufferBase, iDataBuffer>
 {
 protected:
   csRef<iDataBuffer> parentBuffer;
@@ -51,11 +53,14 @@ protected:
 
   csParasiticDataBufferBase (iDataBuffer* parent, size_t offs,
     size_t size = (size_t)~0)
+    : scfImplementationType (this)
   {
     SetContents (parent, offs, size);
   }
 
-  csParasiticDataBufferBase () : data(0), size(0) {}
+  csParasiticDataBufferBase () 
+    : scfImplementationType (this), data(0), size(0) 
+  {}
 public:
   virtual ~csParasiticDataBufferBase () { }
 
@@ -75,11 +80,9 @@ public:
  * A databuffer pointing into another databuffer.
  */
 class CS_CRYSTALSPACE_EXPORT csParasiticDataBuffer
-	: public csParasiticDataBufferBase
+  : public scfImplementationExt0<csParasiticDataBuffer, csParasiticDataBufferBase>
 {
 public:
-    SCF_DECLARE_IBASE;
-
   /**
    * Construct this data buffer. 
    * \param parent The buffer to point into.
@@ -89,14 +92,13 @@ public:
    *   \a size == ~0.
    */
   csParasiticDataBuffer (iDataBuffer* parent, size_t offs,
-    size_t size = (size_t)~0) : csParasiticDataBufferBase (parent, offs, size)
+    size_t size = (size_t)~0) 
+    : scfImplementationType (this, parent, offs, size)
   {
-    SCF_CONSTRUCT_IBASE(0);
   }
 
   virtual ~csParasiticDataBuffer ()
   {
-    SCF_DESTRUCT_IBASE();
   }
 };
 

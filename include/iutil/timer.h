@@ -40,14 +40,13 @@ struct iTimerEvent : public iBase
   virtual bool Perform (iTimerEvent* ev) = 0;
 };
 
-SCF_VERSION (iEventTimer, 0, 0, 1);
-
 /**
  * A timer. You can add operations to it and they
  * will be performed at the dedicated time.
  */
-struct iEventTimer : public iBase
+struct iEventTimer : public virtual iBase
 {
+  SCF_INTERFACE (iEventTimer, 2,0,0);
   /// Add a timer event to be scheduled later.
   virtual void AddTimerEvent (iTimerEvent* ev, csTicks delay) = 0;
 

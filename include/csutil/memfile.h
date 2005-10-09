@@ -24,13 +24,15 @@
  */
 
 #include "csextern.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/vfs.h"
 
 /**
  * Essentially a raw memory buffer which implements the abstract iFile
  * interface.
  */
-class CS_CRYSTALSPACE_EXPORT csMemFile : public iFile
+class CS_CRYSTALSPACE_EXPORT csMemFile : 
+  public scfImplementation1<csMemFile, iFile>
 {
 public:
   /// Disposition of memory buffer at destruction time.
@@ -86,8 +88,6 @@ public:
    * is empty.  Use GetSize() for size info.
    */
   virtual const char* GetData() const;
-
-  SCF_DECLARE_IBASE;
 
 protected:
   csRef<iDataBuffer> buffer;

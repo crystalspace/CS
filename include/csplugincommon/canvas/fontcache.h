@@ -28,6 +28,7 @@
 
 #include "csutil/blockallocator.h"
 #include "csutil/csunicode.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/set.h"
 #include "ivideo/fontserv.h"
 
@@ -192,10 +193,10 @@ protected:
   /**
    * Font deletion callback
    */
-  struct FontDeleteNotify : public iFontDeleteNotify
+  struct FontDeleteNotify : public scfImplementation1<FontDeleteNotify, 
+                                                      iFontDeleteNotify>
   {
     csFontCache* cache;
-    SCF_DECLARE_IBASE;
     
     FontDeleteNotify (csFontCache* cache);
     virtual ~FontDeleteNotify ();

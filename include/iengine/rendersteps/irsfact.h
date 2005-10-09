@@ -45,14 +45,13 @@ struct iRenderStepFactory : public iBase
   virtual csPtr<iRenderStep> Create () = 0;
 };
 
-SCF_VERSION (iRenderStepType, 0, 0, 1);
-
 /**
  * Render step type.
  * Interface used to create instances of iRenderStepFactory.
  */
 struct iRenderStepType : public virtual iBase
 {
+  SCF_INTERFACE(iRenderStepType, 2,0,0);
   /**
    * Create a new instance of a render step factory.
    */

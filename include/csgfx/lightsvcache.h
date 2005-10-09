@@ -22,6 +22,8 @@
 
 #include "csextern.h"
 
+#include "csutil/array.h"
+#include "csutil/ref.h"
 #include "iutil/strset.h"
 
 /**\file

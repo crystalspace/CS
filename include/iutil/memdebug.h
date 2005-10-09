@@ -25,15 +25,15 @@
  * Memory tracker interface
  */
 
-SCF_VERSION (iMemoryTracker, 0, 0, 1);
 
 /**
  * This interface is used with CS_MEMORY_TRACKER. In that case there will
  * be an object with tag "crystalspace.utilities.memorytracker" in the object
  * registry that implements this interface.
  */
-struct iMemoryTracker : public iBase
+struct iMemoryTracker : public virtual iBase
 {
+  SCF_INTERFACE(iMemoryTracker, 2,0,0);
   /// Dump all information.
   virtual void Dump (bool summary_only) = 0;
 };

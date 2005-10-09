@@ -55,15 +55,14 @@ enum csSoundEnvironment
   ENVIRONMENT_PSYCHOTIC
 };
 
-SCF_VERSION (iSoundListener, 0, 0, 1);
-
 /**
  * The sound listener is a unique object created by the sound renderer. It
  * can be used to setup 'yourself' (the player) for 3d sound: position,
  * orientation, speed and environment effects.
  */
-struct iSoundListener : public iBase
+struct iSoundListener : public virtual iBase
 {
+  SCF_INTERFACE(iSoundListener, 2,0,0);
   /// Set direction of listener (front and top 3d vectors)
   virtual void SetDirection (const csVector3 &Front, const csVector3 &Top) = 0;
   /// Set position of listener

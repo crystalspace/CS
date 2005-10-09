@@ -22,9 +22,7 @@
 /**\file
  * Virtual clock interface
  */
-#include "csutil/scf.h"
-
-SCF_VERSION (iVirtualClock, 0, 0, 1);
+#include "csutil/scf_interface.h"
 
 /**
  * A virtual game clock.  Normally, a single instance of iVirtualClock is
@@ -37,8 +35,9 @@ SCF_VERSION (iVirtualClock, 0, 0, 1);
  * Main ways to get pointers to this interface:
  * - csQueryRegistry()
  */
-struct iVirtualClock : public iBase
+struct iVirtualClock : public virtual iBase
 {
+  SCF_INTERFACE(iVirtualClock, 2,0,0);
   /**
    * Advance the engine's virtual-time clock.
    */

@@ -28,6 +28,7 @@
 
 #include "csutil/csobject.h"
 #include "csutil/ref.h"
+#include "csutil/scf_implementation.h"
 #include "itexture/iproctex.h"
 #include "iengine/texture.h"
 
@@ -43,13 +44,12 @@ struct iTextureWrapper;
 
 class csProcTexEventHandler;
 
-SCF_VERSION (iProcTexCallback, 0, 0, 1);
-
 /**
  * A callback for when a iTextureWrapper is used.
  */
-struct iProcTexCallback : public iBase
+struct iProcTexCallback : public virtual iBase
 {
+  SCF_INTERFACE(iProcTexCallback, 2,0,0);
   /// Get csProcTexture.
   virtual iProcTexture* GetProcTexture() const = 0;
 };
@@ -58,7 +58,9 @@ struct iProcTexCallback : public iBase
  * Generic superclass for procedural textures. This class
  * takes care of scheduling when a procedural texture needs updating.
  */
-class CS_CRYSTALSPACE_EXPORT csProcTexture : public csObject
+class CS_CRYSTALSPACE_EXPORT csProcTexture : 
+  public scfImplementationExt2<csProcTexture, csObject, iTextureWrapper,
+  iProcTexture>
 {
   friend struct csProcTexCallback;
   friend class csProcTexEventHandler;
@@ -98,43 +100,28 @@ protected:
   // Are we visible? Can be 'false' if animated w/ 'always animate'.
   bool visible;
 
-  bool GetAlwaysAnimate () const;
-  void SetAlwaysAnimate (bool enable);
+  virtual iObject *QueryObject();
+  virtual iTextureWrapper *Clone () const;
+  virtual void SetImageFile (iImage *Image);
+  virtual iImage* GetImageFile ();
+  virtual void SetTextureHandle (iTextureHandle *tex);
+  virtual iTextureHandle* GetTextureHandle ();
+  virtual void GetKeyColor (int &red, int &green, int &blue) const;
+  virtual void SetFlags (int flags);
+  virtual int GetFlags () const;
+  virtual void Register (iTextureManager *txtmng);
+  virtual void SetUseCallback (iTextureCallback* callback);
+  virtual iTextureCallback* GetUseCallback () const;
+  virtual void Visit ();
+  virtual bool IsVisitRequired () const;
+  virtual void SetKeepImage (bool k);
+  virtual bool KeepImage () const;
+  virtual void SetTextureClass (const char* className);
+  virtual const char* GetTextureClass ();
 
-  struct eiTextureWrapper : public iTextureWrapper
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csProcTexture);
-    virtual iObject *QueryObject();
-    virtual iTextureWrapper *Clone () const;
-    virtual void SetImageFile (iImage *Image);
-    virtual iImage* GetImageFile ();
-    virtual void SetTextureHandle (iTextureHandle *tex);
-    virtual iTextureHandle* GetTextureHandle ();
-    virtual void SetKeyColor (int red, int green, int blue);
-    virtual void GetKeyColor (int &red, int &green, int &blue) const;
-    virtual void SetFlags (int flags);
-    virtual int GetFlags () const;
-    virtual void Register (iTextureManager *txtmng);
-    virtual void SetUseCallback (iTextureCallback* callback);
-    virtual iTextureCallback* GetUseCallback () const;
-    virtual void Visit ();
-    virtual bool IsVisitRequired () const;
-    virtual void SetKeepImage (bool k);
-    virtual bool KeepImage () const;
-    virtual void SetTextureClass (const char* className);
-    virtual const char* GetTextureClass ();
-  } scfiTextureWrapper;
-  friend struct eiTextureWrapper;
-
-  struct eiProcTexture : public iProcTexture
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csProcTexture);
-
-    virtual bool GetAlwaysAnimate () const;
-    virtual void SetAlwaysAnimate (bool enable);
-    virtual iTextureFactory* GetFactory();
-  } scfiProcTexture;
-  friend struct eiProcTexture;
+  virtual bool GetAlwaysAnimate () const;
+  virtual void SetAlwaysAnimate (bool enable);
+  virtual iTextureFactory* GetFactory();
 
 public:
   // The current time the previous time the callback was called.
@@ -149,8 +136,6 @@ private:
   csRef<iTextureFactory> parent;
 
 public:
-  SCF_DECLARE_IBASE_EXT (csObject);
-
   csProcTexture (iTextureFactory* p = 0, iImage* image = 0);
   virtual ~csProcTexture ();
 
@@ -202,6 +187,7 @@ public:
     key_red = red;
     key_green = green;
     key_blue = blue;
+    tex->SetKeyColor (red, green, blue);
   }
 
   /**
@@ -221,7 +207,7 @@ public:
 
   /// Get the texture corresponding with this procedural texture.
   iTextureWrapper* GetTextureWrapper ()
-  { return &scfiTextureWrapper; }
+  { return this; }
 
 };
 

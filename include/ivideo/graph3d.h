@@ -56,7 +56,7 @@ class csVector4;
 
 struct csCoreRenderMesh;
 struct csRenderMeshModes;
-struct csRenderBufferHolder;
+class csRenderBufferHolder;
 
 
 /**\name iGraphics3D::BeginDraw() flags

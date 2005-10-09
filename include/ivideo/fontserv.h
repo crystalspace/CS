@@ -20,7 +20,7 @@
 #define __CS_IVIDEO_FONTSERV_H__
 
 #include "csutil/csunicode.h"
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 #include "csutil/ref.h"
 
 /**\file
@@ -58,7 +58,6 @@
 struct iFont;
 struct iDataBuffer;
 
-SCF_VERSION (iFontDeleteNotify, 0, 0, 1);
 
 /**
  * Called before a font is deleted.
@@ -70,8 +69,9 @@ SCF_VERSION (iFontDeleteNotify, 0, 0, 1);
  * some mechanism to be notified when the font is destroyed to free
  * the cache texture associated with the font.
  */
-struct iFontDeleteNotify : public iBase
+struct iFontDeleteNotify : public virtual iBase
 {
+  SCF_INTERFACE(iFontDeleteNotify, 2,0,0);
   /// Before delete.
   virtual void BeforeDelete (iFont* font) = 0;
 };

@@ -26,7 +26,7 @@
 
 #include "csextern.h"
 #include "iutil/cfgfile.h"
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/strhash.h"
 #include "csutil/array.h"
 
@@ -43,7 +43,8 @@ class csWin32RegistryIterator;
  *  header file should be surrounded by appropriate 
  *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
-class CS_CRYSTALSPACE_EXPORT csWin32RegistryConfig : public iConfigFile
+class CS_CRYSTALSPACE_EXPORT csWin32RegistryConfig : 
+  public scfImplementation1<csWin32RegistryConfig, iConfigFile>
 {
 private:
   friend class csWin32RegistryIterator;
@@ -98,7 +99,6 @@ private:
   // Check whether we have registry write access.
   bool WriteAccess();
 public:
-  SCF_DECLARE_IBASE;
 
   csWin32RegistryConfig ();
   virtual ~csWin32RegistryConfig();
@@ -157,7 +157,8 @@ public:
  *  header file should be surrounded by appropriate 
  *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
-class CS_CRYSTALSPACE_EXPORT csWin32RegistryIterator : public iConfigIterator
+class CS_CRYSTALSPACE_EXPORT csWin32RegistryIterator : 
+  public scfImplementation1<csWin32RegistryIterator, iConfigIterator>
 {
   csRef<csWin32RegistryConfig> owner;
 
@@ -175,7 +176,6 @@ class CS_CRYSTALSPACE_EXPORT csWin32RegistryIterator : public iConfigIterator
   bool GetCurrentData (DWORD& type, 
     csWin32RegistryConfig::Block_O_Mem& data) const;
 public:
-  SCF_DECLARE_IBASE;
 
   csWin32RegistryIterator (csWin32RegistryConfig* Owner, 
     const char* Subsection);

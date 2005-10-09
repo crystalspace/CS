@@ -18,21 +18,18 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/threadjobqueue.h"
 #include "csgfx/packrgb.h"
-#include "iutil/objreg.h"
 #include "csplugincommon/imageloader/commonimagefile.h"
+#include "csutil/threadjobqueue.h"
+#include "iutil/objreg.h"
 
-SCF_IMPLEMENT_IBASE(csCommonImageFileLoader)
-  SCF_IMPLEMENTS_INTERFACE(iImageFileLoader)
-SCF_IMPLEMENT_IBASE_END
 
 csCommonImageFileLoader::csCommonImageFileLoader (int format)
-  : Format(format), dataType (rdtInvalid), rgbaData (0), indexData (0),
+  : scfImplementationType (this), 
+  Format(format), dataType (rdtInvalid), rgbaData (0), indexData (0),
   palette (0), paletteCount (0), alpha (0), hasKeycolor (false),
   Width (0), Height (0)
 {
-  SCF_CONSTRUCT_IBASE(0);
 }
 
 csCommonImageFileLoader::~csCommonImageFileLoader()
@@ -40,7 +37,6 @@ csCommonImageFileLoader::~csCommonImageFileLoader()
   delete[] indexData;
   delete[] palette;
   delete[] rgbaData;
-  SCF_DESTRUCT_IBASE();
 }
 
 void csCommonImageFileLoader::ApplyTo (csImageMemory* image)
@@ -81,19 +77,13 @@ void csCommonImageFileLoader::ApplyTo (csImageMemory* image)
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csCommonImageFile::LoaderJob)
-  SCF_IMPLEMENTS_INTERFACE(iJob)
-SCF_IMPLEMENT_IBASE_END
-
 csCommonImageFile::LoaderJob::LoaderJob (iImageFileLoader* loader) 
-  : currentLoader (loader)
+  : scfImplementationType (this), currentLoader (loader)
 {
-  SCF_CONSTRUCT_IBASE(0);
 }
 
 csCommonImageFile::LoaderJob::~LoaderJob()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csCommonImageFile::LoaderJob::Run()
@@ -104,7 +94,7 @@ void csCommonImageFile::LoaderJob::Run()
 //---------------------------------------------------------------------------
 
 csCommonImageFile::csCommonImageFile (iObjectRegistry* object_reg, int format) 
-  : csImageMemory (format), object_reg (object_reg) 
+  : scfImplementationType (this, format), object_reg (object_reg) 
 {
 #ifdef THREADED_LOADING
   static const char queueTag[] = "crystalspace.jobqueue.imageload";
