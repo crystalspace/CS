@@ -115,6 +115,11 @@ public:
 
 	    csVector3 vn;
 	    voutPersp.LerpTo ((float*)&vn, vt, vt2, t);
+
+	    /*if ((ABS(vn.x - outPoly[i].x) > EPSILON)
+	      || (ABS(vn.y - outPoly[i].y) > EPSILON))
+	      CS_DEBUG_BREAK;*/
+
 	    vn.x = outPoly[i].x;
 	    vn.y = outPoly[i].y;
 	    voutPersp.Write ((float*)&vn);
@@ -126,8 +131,8 @@ public:
 		vout[n].Lerp (vt, vt2, t);
 	      }
 	    }
+	    break;
 	  }
-	  break;
 	case CS_VERTEX_INSIDE:
 	  {
 	    float x = outPoly[i].x;
@@ -168,7 +173,7 @@ public:
 	    const float x1 = A.x + t1 * (B.x - A.x);
 	    const float x2 = C.x + t2 * (D.x - C.x);
 	    const float dx = (x2 - x1);
-	    const float t = dx ? (x - x1) / dx : 0.0f;
+	    const float t = dx ? ((x - x1) / dx) : 0.0f;
 
 	    const int vt11 = Tri[edge1[0]];
 	    const int vt12 = Tri[edge1[1]];

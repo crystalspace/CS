@@ -55,6 +55,124 @@ uint8 csClipper::ClipInPlace (
 }
 
 //---------------------------------------------------------------------------
+
+struct StatusOutputNone
+{
+  void Flip() {}
+
+  unsigned char GetType (size_t /*vert*/) const { return ~0; }
+  double GetPos (size_t /*vert*/) const { return 0; }
+
+  void Copy (size_t /*to*/, size_t /*from*/) {}
+  void OnEdge (size_t /*to*/, size_t /*vertex*/, double /*Pos*/) {}
+  void Inside (size_t /*to*/) {}
+
+  void Copy (size_t /*outOffs*/, size_t /*count*/, size_t /*inOffs*/) {}
+};
+
+struct StatusOutputDefault
+{
+  csVertexStatus* TempStatus;
+
+  csVertexStatus* OutStatus;
+  csVertexStatus *InS;
+  csVertexStatus *OutS;
+
+  StatusOutputDefault (csVertexStatus* TempStatus, size_t InCount, 
+    csVertexStatus* OutStatus) :
+    TempStatus (TempStatus), OutStatus (OutStatus)
+  {
+    InS = OutStatus;
+    OutS = TempStatus;
+
+    for (size_t vs = 0; vs < InCount; vs++)
+    {
+      OutS[vs].Type = InS[vs].Type = CS_VERTEX_ORIGINAL;
+      OutS[vs].Vertex = InS[vs].Vertex = vs;
+    }
+  }
+
+  void Flip()
+  {
+    InS = OutS;
+    OutS = (OutS == TempStatus) ? OutStatus : TempStatus;
+  }
+
+  unsigned char GetType (size_t vert) const 
+  { return InS[vert].Type; }
+  double GetPos (size_t vert) const 
+  { return InS[vert].Pos; }
+
+  void Copy (size_t to, size_t from) 
+  { 
+    CS_ASSERT((InS[from].Type == CS_VERTEX_ORIGINAL) 
+      || (InS[from].Type == CS_VERTEX_ONEDGE)
+      || (InS[from].Type == CS_VERTEX_INSIDE));
+    OutS[to] = InS[from];
+  }
+  void OnEdge (size_t to, size_t vertex, double Pos) 
+  {
+    OutS[to].Type = CS_VERTEX_ONEDGE;
+    OutS[to].Vertex = InS[vertex].Vertex;
+    OutS[to].Pos = Pos;
+  }
+  void Inside (size_t to) 
+  {
+    OutS[to].Type = CS_VERTEX_INSIDE;
+  }
+
+  void Copy (size_t outOffs, size_t count, size_t inOffs)
+  {
+    for (size_t vs = 0; vs < count; vs++)
+    {
+      CS_ASSERT ((vs+outOffs) >= 0 && (vs+outOffs) < MAX_OUTPUT_VERTICES);
+      OutS [vs + outOffs] = InS [inOffs + vs];
+    }
+  }
+};
+
+//---------------------------------------------------------------------------
+
+#include "boxclip.h"
+
+struct BoxTestAll
+{
+  bool ClipMinX() const { return true; }
+  bool ClipMaxX() const { return true; }
+  bool ClipMinY() const { return true; }
+  bool ClipMaxY() const { return true; }
+  size_t GetClipCount() const { return 0; }
+};
+
+struct BoxTestBbox
+{
+  uint8 ClipEdges;
+  size_t ClipCount;
+
+  BoxTestBbox (const csBox2& BoundingBox,
+    const csBox2& region) : ClipEdges(0), ClipCount (0)
+  {
+    // Do we need to clip against left x line?
+    if (BoundingBox.MinX () < region.MinX ())
+      ClipEdges |= 1, ClipCount++;
+    // Do we need to clip against right x line?
+    if (BoundingBox.MaxX () > region.MaxX ())
+      ClipEdges |= 2, ClipCount++;
+    // Do we need to clip against bottom y line?
+    if (BoundingBox.MinY () < region.MinY ())
+      ClipEdges |= 4, ClipCount++;
+    // Do we need to clip against top y line?
+    if (BoundingBox.MaxY () > region.MaxY ())
+      ClipEdges |= 8, ClipCount++;
+  }
+
+  bool ClipMinX() const { return ClipEdges & 1; }
+  bool ClipMaxX() const { return ClipEdges & 2; }
+  bool ClipMinY() const { return ClipEdges & 4; }
+  bool ClipMaxY() const { return ClipEdges & 8; }
+  size_t GetClipCount() const { return ClipCount; }
+};
+
 int csBoxClipper::ClassifyBox (const csBox2 &box)
 {
   if (!region.Overlap (box)) return -1;
@@ -73,9 +191,13 @@ uint8 csBoxClipper::Clip (
   csVector2 *OutPolygon,
   size_t &OutCount)
 {
-#include "boxclip.inc"
-  OutCount = OutV;
-  return Clipped ? CS_CLIP_CLIPPED : CS_CLIP_INSIDE;
+  CrystalSpace::BoxClipper<BoxTestAll, StatusOutputNone> boxClip
+    (BoxTestAll(), StatusOutputNone(), region,
+    InPolygon, InCount, OutPolygon);
+
+  uint8 Clipped = boxClip.Clip();
+  OutCount = boxClip.GetOutputCount();
+  return Clipped;
 }
 
 uint8 csBoxClipper::Clip (
@@ -85,10 +207,15 @@ uint8 csBoxClipper::Clip (
   size_t &OutCount,
   csVertexStatus *OutStatus)
 {
-#define OUTPUT_VERTEX_STATUS
-#include "boxclip.inc"
-  OutCount = OutV;
-  return Clipped ? CS_CLIP_CLIPPED : CS_CLIP_INSIDE;
+  csVertexStatus TempStatus [MAX_OUTPUT_VERTICES];
+
+  CrystalSpace::BoxClipper<BoxTestAll, StatusOutputDefault> boxClip
+    (BoxTestAll(), StatusOutputDefault (TempStatus, InCount, OutStatus), 
+    region, InPolygon, InCount, OutPolygon);
+
+  uint8 Clipped = boxClip.Clip();
+  OutCount = boxClip.GetOutputCount();
+  return Clipped;
 }
 
 uint8 csBoxClipper::Clip (
@@ -100,18 +227,24 @@ uint8 csBoxClipper::Clip (
 {
   if (!region.Overlap (BoundingBox)) return false;
 
-#define BOXCLIP_HAVEBOX
-#include "boxclip.inc"
-  OutCount = OutV;
-  BoundingBox.StartBoundingBox (OutPolygon[0]);
+  CrystalSpace::BoxClipper<BoxTestBbox, StatusOutputNone> boxClip
+    (BoxTestBbox (BoundingBox, region), StatusOutputNone(), region,
+    InPolygon, InCount, OutPolygon);
 
+  uint8 Clipped = boxClip.Clip();
+  OutCount = boxClip.GetOutputCount();
+
+  BoundingBox.StartBoundingBox (OutPolygon[0]);
   size_t i;
   for (i = 1; i < OutCount; i++)
     BoundingBox.AddBoundingVertexSmart (OutPolygon[i]);
-  return Clipped ? CS_CLIP_CLIPPED : CS_CLIP_INSIDE;
+  return Clipped;
 }
 
 //---------------------------------------------------------------------------
+
+#include "polyclip.h"
+
 csPolygonClipper::csPolygonClipper (
   csPoly2D *Clipper,
   bool mirror,
@@ -233,9 +366,13 @@ uint8 csPolygonClipper::Clip (
   csVector2 *OutPolygon,
   size_t &OutCount)
 {
-#include "polyclip.inc"
-  OutCount = OutV;
-  return Clipped ? CS_CLIP_CLIPPED : CS_CLIP_INSIDE;
+  CrystalSpace::PolyClipper<StatusOutputNone> polyClip
+    (StatusOutputNone(), InPolygon, InCount, OutPolygon,
+    ClipPolyVertices, ClipPoly, ClipData);
+
+  uint8 Clipped = polyClip.Clip();
+  OutCount = polyClip.GetOutputCount();
+  return Clipped;
 }
 
 uint8 csPolygonClipper::Clip (
@@ -267,8 +404,14 @@ uint8 csPolygonClipper::Clip (
   size_t &OutCount,
   csVertexStatus *OutStatus)
 {
-#define OUTPUT_VERTEX_STATUS
-#include "polyclip.inc"
-  OutCount = OutV;
-  return Clipped ? CS_CLIP_CLIPPED : CS_CLIP_INSIDE;
+  csVertexStatus TempStatus [MAX_OUTPUT_VERTICES];
+
+  CrystalSpace::PolyClipper<StatusOutputDefault> polyClip
+    (StatusOutputDefault (TempStatus, InCount, OutStatus), 
+    InPolygon, InCount, OutPolygon,
+    ClipPolyVertices, ClipPoly, ClipData);
+
+  uint8 Clipped = polyClip.Clip();
+  OutCount = polyClip.GetOutputCount();
+  return Clipped;
 }

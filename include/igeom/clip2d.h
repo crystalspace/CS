@@ -47,10 +47,10 @@ enum
 {
   /// The input polygon is completely outside of clipper polygon
   CS_CLIP_OUTSIDE = 0,
-  /// The input polygon is completely inside (thus has not changed)
-  CS_CLIP_INSIDE = 1,
   /// The input polygon was partially inside, partially outside
-  CS_CLIP_CLIPPED = 2
+  CS_CLIP_CLIPPED = 1,
+  /// The input polygon is completely inside (thus has not changed)
+  CS_CLIP_INSIDE = 2
 };
 /** @} */
 
@@ -72,7 +72,7 @@ struct csVertexStatus
   /// Original vertex number (for #CS_VERTEX_ORIGINAL and #CS_VERTEX_ONEDGE)
   size_t Vertex;
   /// Additional information for #CS_VERTEX_ONEDGE (0..1, the 't' parameter)
-  float Pos;
+  double Pos;
 };
 
 enum
