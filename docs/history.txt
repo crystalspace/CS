@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Oct-2005
+	- swedishcoder changed the cegui entery in the manual again,
+	  the required version of cegui is 0.4.0 nor less or higher.
 8-Oct-2005
 	- res renamed csgeom/quaterni.h to the more verbose 
 	  csgeom/quaternion.h.
