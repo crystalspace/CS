@@ -25,8 +25,8 @@
 #include "csplugincommon/canvas/fontcache.h"
 
 
-csFontCache::FontDeleteNotify::FontDeleteNotify (csFontCache* cache)
-  : scfImplementationType (this), cache (cache)
+csFontCache::FontDeleteNotify::FontDeleteNotify (csFontCache* c)
+  : scfImplementationType (this), cache (c)
 {
 }
 

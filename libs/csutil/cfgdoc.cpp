@@ -54,9 +54,9 @@ public:
 };
 
 
-csConfigDocumentIterator::csConfigDocumentIterator (csConfigDocument* doc, 
+csConfigDocumentIterator::csConfigDocumentIterator (csConfigDocument* d,
 						    const char* Subsection) 
-  : scfImplementationType (this), doc (doc), currentKey (0), currentKeyName(0)
+  : scfImplementationType (this), doc (d), currentKey (0), currentKeyName(0)
 {
   subsection = csStrNew (Subsection);
   subsectionLen = subsection ? strlen (subsection) : 0;

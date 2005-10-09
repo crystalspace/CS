@@ -22,8 +22,8 @@
 #include "cstool/basetexfact.h"
 
 csBaseTextureFactory::csBaseTextureFactory (iTextureType* parent, 
-					    iObjectRegistry* object_reg)
-  : scfImplementationType (this, parent), object_reg (object_reg), 
+					    iObjectRegistry* r)
+  : scfImplementationType (this, parent), object_reg (r), 
   width (128), height (128), texture_type (parent)
 {
 }
