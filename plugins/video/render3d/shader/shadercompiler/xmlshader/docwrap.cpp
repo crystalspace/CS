@@ -38,11 +38,11 @@
 
 CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
 
-csWrappedDocumentNode::csWrappedDocumentNode (csWrappedDocumentNodeFactory* shared,
-					      iDocumentNode* wrappedNode,
-					      iConditionResolver* resolver)
-  : scfImplementationType (this), objreg (shared->objreg), wrappedNode (wrappedNode),
-  resolver (resolver), shared (shared)
+csWrappedDocumentNode::csWrappedDocumentNode (csWrappedDocumentNodeFactory* shared_fact,
+					      iDocumentNode* wrapped_node,
+					      iConditionResolver* res)
+  : scfImplementationType (this), objreg (shared->objreg), wrappedNode (wrapped_node),
+  resolver (res), shared (shared_fact)
 {
   CS_ASSERT (resolver);
   globalState.AttachNew (new GlobalProcessingState);
@@ -50,12 +50,12 @@ csWrappedDocumentNode::csWrappedDocumentNode (csWrappedDocumentNodeFactory* shar
   ProcessWrappedNode ();
 }
 
-csWrappedDocumentNode::csWrappedDocumentNode (iDocumentNode* wrappedNode,
+csWrappedDocumentNode::csWrappedDocumentNode (iDocumentNode* wrapped_node,
 					      csWrappedDocumentNode* parent,
-					      csWrappedDocumentNodeFactory* shared, 
-					      GlobalProcessingState* globalState)
-  : scfImplementationType (this), objreg (shared->objreg), wrappedNode (wrappedNode),
-  resolver (parent->resolver), shared (shared),  globalState (globalState)
+					      csWrappedDocumentNodeFactory* shared_fact, 
+					      GlobalProcessingState* global_state)
+  : scfImplementationType (this), objreg (shared->objreg), wrappedNode (wrapped_node),
+  resolver (parent->resolver), shared (shared_fact),  globalState (global_state)
 {
   ProcessWrappedNode ();
 }
