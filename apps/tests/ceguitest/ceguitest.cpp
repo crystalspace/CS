@@ -80,7 +80,7 @@ void CEGUITest::ProcessFrame()
   // We now assign a new rotation transformation to the camera.  You
   // can think of the rotation this way: starting from the zero
   // position, you first rotate "rotY" radians on your Y axis to get
-  // the first rotation.  From there you rotate "rotX" radians on the
+  // the first rotation.  From there you rotate "rotX" radians on
   // your X axis to get the final rotation.  We multiply the
   // individual rotations on each axis together to get a single
   // rotation matrix.  The rotations are applied in right to left
@@ -163,9 +163,7 @@ bool CEGUITest::Application()
   // Set the logging level
   cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
 
-  vfs->Mount ("/ceguitest/", "$@data$/ceguitest$/");
-
-  vfs->ChDir ("/ceguitest/");
+  vfs->ChDir ("/data/ceguitest/");
 
   // Load the ice skin (which uses Falagard skinning system)
   cegui->GetSchemeManagerPtr ()->loadScheme("ice.scheme");

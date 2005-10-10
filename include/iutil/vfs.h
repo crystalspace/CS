@@ -94,7 +94,7 @@ struct csFileTime
 #define VFS_STATUS_RESOURCES	3
 /**
  * Access denied: either you have no write access, the filesystem is read-only
- * your you tried to read a file opened for write access
+ * or you tried to read a file opened for write access
  */
 #define VFS_STATUS_ACCESSDENIED	4
 /// An error occured during reading or writing data
@@ -303,6 +303,8 @@ struct iVFS : public virtual iBase
    * \param VirtualPath The location in the virtual filesystem in which to
    *   mount RealPath.
    * \param RealPath The physical filesystem path to mount at VirtualPath.
+   *   All VFS pseudo-variables and anything that appears in the right-hand
+   *   side of an equal sign in vfs.cfg is valid.
    * \return True if the mount succeeded, else false.
    */
   virtual bool Mount (const char *VirtualPath, const char *RealPath) = 0;

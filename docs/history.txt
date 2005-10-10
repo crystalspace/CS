@@ -6,8 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Oct-2005
+	- Vincent Knecht made a few changes:
+	    - silenced gcc warnings about initialization order in xmltiny.cpp.
+	    - added a doxygen comment about valid arguments for iVFS::Mount().
+	    - removed $@data mount in ceguitest and use /data/ceguitest/ for
+	      ChDir(). This is more correct since $@ matches
+	      $prefix/etc/crystalspace when CS is installed, at least on Unix.
 9-Oct-2005
-	- swedishcoder changed the cegui entery in the manual again,
+	- swedishcoder changed the cegui entry in the manual again,
 	  the required version of cegui is 0.4.0 nor less or higher.
 	- Marten almost completed conversion of libcrystalspace to new SCF
 	  at least on win32.

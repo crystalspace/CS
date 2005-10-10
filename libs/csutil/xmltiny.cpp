@@ -157,8 +157,8 @@ SCF_IMPLEMENT_IBASE_QUERY(csTinyXmlNode)
 SCF_IMPLEMENT_IBASE_END*/
 
 csTinyXmlNode::csTinyXmlNode (csTinyXmlDocument* doc) 
-  : scfImplementationType (this), doc (doc),
-  node(0), node_children(0), next_pool(0)
+  : scfImplementationType (this), node (0),
+  node_children (0), doc (doc), next_pool (0)
 {
 }
 
@@ -499,7 +499,7 @@ void csTinyXmlNode::SetAttributeAsFloat (const char* name, float value)
 //------------------------------------------------------------------------
 
 csTinyXmlDocument::csTinyXmlDocument (csTinyDocumentSystem* sys)
-  : scfImplementationType (this), sys (sys), pool (0), root (0)
+  : scfImplementationType (this), root (0), sys (sys), pool (0)
 {
 }
 
