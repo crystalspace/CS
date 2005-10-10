@@ -9899,7 +9899,7 @@ sub ACQUIRE {
 ############# Class : cspace::csTinyDocumentSystem ##############
 
 package cspace::csTinyDocumentSystem;
-@ISA = qw( cspace cspace::iDocumentSystem );
+@ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -9919,19 +9919,6 @@ sub DESTROY {
     }
 }
 
-*swig_scfRefCount_get = *cspacec::csTinyDocumentSystem_scfRefCount_get;
-*swig_scfRefCount_set = *cspacec::csTinyDocumentSystem_scfRefCount_set;
-*swig_scfWeakRefOwners_get = *cspacec::csTinyDocumentSystem_scfWeakRefOwners_get;
-*swig_scfWeakRefOwners_set = *cspacec::csTinyDocumentSystem_scfWeakRefOwners_set;
-*scfRemoveRefOwners = *cspacec::csTinyDocumentSystem_scfRemoveRefOwners;
-*swig_scfParent_get = *cspacec::csTinyDocumentSystem_scfParent_get;
-*swig_scfParent_set = *cspacec::csTinyDocumentSystem_scfParent_set;
-*IncRef = *cspacec::csTinyDocumentSystem_IncRef;
-*DecRef = *cspacec::csTinyDocumentSystem_DecRef;
-*GetRefCount = *cspacec::csTinyDocumentSystem_GetRefCount;
-*AddRefOwner = *cspacec::csTinyDocumentSystem_AddRefOwner;
-*RemoveRefOwner = *cspacec::csTinyDocumentSystem_RemoveRefOwner;
-*QueryInterface = *cspacec::csTinyDocumentSystem_QueryInterface;
 *CreateDocument = *cspacec::csTinyDocumentSystem_CreateDocument;
 sub DISOWN {
     my $self = shift;
@@ -13624,7 +13611,7 @@ sub ACQUIRE {
 ############# Class : cspace::csObject ##############
 
 package cspace::csObject;
-@ISA = qw( cspace cspace::iObject );
+@ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -13657,19 +13644,6 @@ sub DESTROY {
 *GetIterator = *cspacec::csObject_GetIterator;
 *AddNameChangeListener = *cspacec::csObject_AddNameChangeListener;
 *RemoveNameChangeListener = *cspacec::csObject_RemoveNameChangeListener;
-*swig_scfRefCount_get = *cspacec::csObject_scfRefCount_get;
-*swig_scfRefCount_set = *cspacec::csObject_scfRefCount_set;
-*swig_scfWeakRefOwners_get = *cspacec::csObject_scfWeakRefOwners_get;
-*swig_scfWeakRefOwners_set = *cspacec::csObject_scfWeakRefOwners_set;
-*scfRemoveRefOwners = *cspacec::csObject_scfRemoveRefOwners;
-*swig_scfParent_get = *cspacec::csObject_scfParent_get;
-*swig_scfParent_set = *cspacec::csObject_scfParent_set;
-*IncRef = *cspacec::csObject_IncRef;
-*DecRef = *cspacec::csObject_DecRef;
-*GetRefCount = *cspacec::csObject_GetRefCount;
-*AddRefOwner = *cspacec::csObject_AddRefOwner;
-*RemoveRefOwner = *cspacec::csObject_RemoveRefOwner;
-*QueryInterface = *cspacec::csObject_QueryInterface;
 *ObjReleaseOld = *cspacec::csObject_ObjReleaseOld;
 sub DISOWN {
     my $self = shift;
@@ -13687,7 +13661,7 @@ sub ACQUIRE {
 ############# Class : cspace::csColliderWrapper ##############
 
 package cspace::csColliderWrapper;
-@ISA = qw( cspace cspace::csObject );
+@ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -13711,12 +13685,6 @@ sub DESTROY {
 *GetCollideSystem = *cspacec::csColliderWrapper_GetCollideSystem;
 *Collide = *cspacec::csColliderWrapper_Collide;
 *GetColliderWrapper = *cspacec::csColliderWrapper_GetColliderWrapper;
-*IncRef = *cspacec::csColliderWrapper_IncRef;
-*DecRef = *cspacec::csColliderWrapper_DecRef;
-*GetRefCount = *cspacec::csColliderWrapper_GetRefCount;
-*AddRefOwner = *cspacec::csColliderWrapper_AddRefOwner;
-*RemoveRefOwner = *cspacec::csColliderWrapper_RemoveRefOwner;
-*QueryInterface = *cspacec::csColliderWrapper_QueryInterface;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -13869,7 +13837,7 @@ sub ACQUIRE {
 ############# Class : cspace::csView ##############
 
 package cspace::csView;
-@ISA = qw( cspace cspace::iView );
+@ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
 sub new {
@@ -13903,19 +13871,6 @@ sub DESTROY {
 *UpdateClipper = *cspacec::csView_UpdateClipper;
 *GetClipper = *cspacec::csView_GetClipper;
 *Draw = *cspacec::csView_Draw;
-*swig_scfRefCount_get = *cspacec::csView_scfRefCount_get;
-*swig_scfRefCount_set = *cspacec::csView_scfRefCount_set;
-*swig_scfWeakRefOwners_get = *cspacec::csView_scfWeakRefOwners_get;
-*swig_scfWeakRefOwners_set = *cspacec::csView_scfWeakRefOwners_set;
-*scfRemoveRefOwners = *cspacec::csView_scfRemoveRefOwners;
-*swig_scfParent_get = *cspacec::csView_scfParent_get;
-*swig_scfParent_set = *cspacec::csView_scfParent_set;
-*IncRef = *cspacec::csView_IncRef;
-*DecRef = *cspacec::csView_DecRef;
-*GetRefCount = *cspacec::csView_GetRefCount;
-*AddRefOwner = *cspacec::csView_AddRefOwner;
-*RemoveRefOwner = *cspacec::csView_RemoveRefOwner;
-*QueryInterface = *cspacec::csView_QueryInterface;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -14065,8 +14020,8 @@ sub G_COEF_SQ () { $cspacec::G_COEF_SQ }
 sub B_COEF_SQ () { $cspacec::B_COEF_SQ }
 sub MAX_OUTPUT_VERTICES () { $cspacec::MAX_OUTPUT_VERTICES }
 sub CS_CLIP_OUTSIDE () { $cspacec::CS_CLIP_OUTSIDE }
-sub CS_CLIP_INSIDE () { $cspacec::CS_CLIP_INSIDE }
 sub CS_CLIP_CLIPPED () { $cspacec::CS_CLIP_CLIPPED }
+sub CS_CLIP_INSIDE () { $cspacec::CS_CLIP_INSIDE }
 sub CS_VERTEX_ORIGINAL () { $cspacec::CS_VERTEX_ORIGINAL }
 sub CS_VERTEX_ONEDGE () { $cspacec::CS_VERTEX_ONEDGE }
 sub CS_VERTEX_INSIDE () { $cspacec::CS_VERTEX_INSIDE }
