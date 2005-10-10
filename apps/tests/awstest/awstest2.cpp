@@ -337,7 +337,8 @@ awsTest::HandleEvent (iEvent &Event)
     return true;
   }
 
-  return aws->HandleEvent(Event);
+  if (aws) return aws->HandleEvent(Event);
+  return false;
 }
 
 void

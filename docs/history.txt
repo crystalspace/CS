@@ -13,6 +13,8 @@ chronological order.
 	    - removed $@data mount in ceguitest and use /data/ceguitest/ for
 	      ChDir(). This is more correct since $@ matches
 	      $prefix/etc/crystalspace when CS is installed, at least on Unix.
+	- Vincent Knecht fixed a few AWS apps to not crash when invoked with
+	  -help.
 9-Oct-2005
 	- swedishcoder changed the cegui entry in the manual again,
 	  the required version of cegui is 0.4.0 nor less or higher.

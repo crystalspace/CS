@@ -246,7 +246,9 @@ bool PartEdit::HandleEvent (iEvent& ev)
       // System window closed, app shutting down
       return true;
   }
-  return aws->HandleEvent(ev);
+
+  if (aws) return aws->HandleEvent(ev);
+  return false;
 }
 
 bool PartEdit::EventHandler (iEvent& ev)
