@@ -36,19 +36,33 @@ namespace autom
     /** The type of map between a variable name and the object it maps. */
     typedef std::map<uint, keeper> variable_map_type;
 
+    /** The the type of map between a scope name and the child scope it maps. */
+    typedef std::map<uint, scope *> child_scope_map_type;
+
     /** The map of variable names. */
     variable_map_type vars;
 
+    /** The map of child scopes. */
+    child_scope_map_type children;
+
+    /** The parent scope. */
+    scope *parent;
+
   public:
-    scope() {}
+    scope():parent(0) {}
+    scope(scope *_parent):parent(_parent) {}
     ~scope() {}
 
     /** Return a keeper to the value. 
-     * Will be nil if the value does not exist. */
+     * Will be nil if the value does not exist. 
+     * Recursively checks parents in order to find
+     * the value. */
     keeper get(const csString &name);  
 
     /** Return a keeper to the value. 
-     * Will be nil if the value does not exist. */
+     * Will be nil if the value does not exist. 
+     * Recursively checks parents in order to find
+     * the value. */
     keeper get(uint id);      
 
     /** Set the value of a variable. */
@@ -56,6 +70,18 @@ namespace autom
 
     /** Set the value of a variable. */
     void set(uint id, keeper &val);   
+
+    /** Adds a child scope to this scope. */
+    void addChild(const csString &name, scope *child);
+
+    /** Adds a child scope to this scope. */
+    void addChild(uint id, scope *child);
+
+    /** Finds the given child scope, returns null if it doesn't exist. */
+    scope *findChild(const csString &name);
+
+    /** Finds the given child scope, returns null if it doesn't exist. */
+    scope *findChild(uint id);
   };
 
 

@@ -98,7 +98,7 @@ bool preferences::load(iObjectRegistry* objreg, const scfString& filename)
 	aws2::defFile df;
 
 	// Parse the definition file into the root registry object.
-	df.Parse(buf->GetData(), root);
+	df.Parse(buf->GetData(), &root);
 
     return true;
 }

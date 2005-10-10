@@ -86,12 +86,41 @@ registrar::lookup(const csString& name)
     else return std::make_pair(false, func_ptr(0,0));      
 }
 
+void 
+scope::addChild(const csString &name, scope *child)
+{
+  addChild(Registrar()->getId(name), child);
+}
+
+void 
+scope::addChild(uint id, scope *child)
+{
+  children[id] = child;
+}
+
+scope *
+scope::findChild(const csString &name)
+{
+  return findChild(Registrar()->getId(name));
+}
+
+scope *
+scope::findChild(uint id)
+{
+  child_scope_map_type::iterator pos = children.find(id);
+
+  if (pos==children.end()) return 0;
+  else return pos->second;
+}
+
 keeper 
 scope::get(const csString &name)
 {
-  variable_map_type::iterator pos = vars.find(Registrar()->getId(name));
+  uint id = Registrar()->getId(name);
 
-  if (pos==vars.end()) return keeper(Nil());
+  variable_map_type::iterator pos = vars.find(id);
+
+  if (pos==vars.end()) return ( parent==0 ? keeper(Nil()) : parent->get(id) );
   else return pos->second;
 }
 
@@ -100,7 +129,7 @@ scope::get(uint id)
 {
   variable_map_type::iterator pos = vars.find(id);
 
-  if (pos==vars.end()) return keeper(Nil());
+  if (pos==vars.end()) return ( parent==0 ? keeper(Nil()) : parent->get(id) );
   else return pos->second;
 }
 

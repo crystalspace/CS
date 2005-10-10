@@ -19,7 +19,7 @@
 #ifndef __AWS_PREFERENCES_MGR_2_H__
 #define __AWS_PREFERENCES_MGR_2_H__
 
-#include "registry.h"
+#include "registrar.h"
 #include "iutil/objreg.h"
 #include "cstool/pen.h"
 
@@ -62,10 +62,11 @@ namespace aws
   class preferences
   {
     /**
-     * The root registry.  All important registries (i.e. for windows or
-     * skins) hang off this registry.
+     * The root scope.  All important registries (i.e. for windows or
+     * skins) hang off this scope.  Note that this scope is root only
+     * for preferences and definitions, not the whole automation subsystem.
      */
-    registry root;
+    autom::scope root;
 
     /**
      * System colors.  These are automatically initialized with some nice
@@ -78,7 +79,7 @@ namespace aws
     void init_default_colors();
 
   public:
-    preferences():root("root") { init_default_colors(); }
+    preferences():root() { init_default_colors(); }
     virtual ~preferences() {}
 
     /**
@@ -89,16 +90,16 @@ namespace aws
     bool load(iObjectRegistry* objreg, const scfString& filename);		
 
     /** Clears all definitions for this preferences object. */
-    void clear() { root.clear(); }
+    /*void clear() { root.clear(); }*/
 
     /**
      * Finds a registry in the given category. If the reference is invalid,
      * then the given registry doesn't exist.
      */
-    csRef<registry> findReg(const csString &category, const csString &name)
+    /*csRef<registry> findReg(const csString &category, const csString &name)
     {
       return root.findChild(category, name);			
-    }
+    }*/
 
   /////////////////////////////////////////////
   /////// Global Color Palette ////////////////

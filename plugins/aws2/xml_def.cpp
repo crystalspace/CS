@@ -26,7 +26,7 @@
 namespace aws2
 {
 
-void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
+void defFile::ParseNode(autom::scope *sc, csRef< iDocumentNodeIterator> &pos)
 {
   // Walk through all of the nodes and
   while(pos->HasNext())
@@ -43,14 +43,16 @@ void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
     if ((name == "component") || (name == "window") || (name == "skin"))
     {
       csRef<iDocumentNodeIterator> new_pos = child->GetNodes();
-      registry *child_reg = new registry(child->GetAttributeValue("name"));
-      
-      /* Add the child.  The category of the child allows us to find certain 
-       * kinds of registries more easily. */
-      reg->addChild(name, child_reg);
-      child_reg->setParent(reg);
+      autom::scope *child_sc = new autom::scope(sc);
 
-      ParseNode(child_reg, new_pos);
+      /* Add the child.  It has a name to distinguish it from other scopes in the parent. */
+      sc->addChild(child->GetAttributeValue("name"), child_sc);
+
+      /* Give the type of the component to it automatically. */
+      child_sc->set("type", autom::keeper(new autom::string(name)));
+            
+      /* Parse all children nodes into this scope. */
+      ParseNode(child_sc, new_pos);
     }
     else
     {			
@@ -70,7 +72,7 @@ void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
 	 * element_name.attribute_name as the key name. */
 	if (a_name=="value")			
 	{
-	  reg->insert(child->GetValue(), 
+	  sc->set(child->GetValue(), 
 	    autom::keeper(autom::Compile(a_value)));				
 	  had_value=true;
 	}
@@ -81,7 +83,7 @@ void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
 	  tmp+=".";
 	  tmp+=a_name;
 	  
-	  reg->insert(tmp, 
+	  sc->set(tmp, 
 	    autom::keeper(autom::Compile(a_value)));				
 	}
       }
@@ -93,13 +95,13 @@ void defFile::ParseNode(registry *reg, csRef< iDocumentNodeIterator> &pos)
       if (_txt)
       {
 	std::string txt(_txt);		
-	reg->insert(name, autom::Compile(txt));
+	sc->set(name, autom::Compile(txt));
       }
     }
   }
 }
 
-bool defFile::Parse(const scfString &txt, registry &reg)
+bool defFile::Parse(const scfString &txt, autom::scope *sc)
 {
   /*csRef<iPluginManager> plugin_mgr =  CS_QUERY_REGISTRY (object_reg, 
     iPluginManager);	
@@ -116,7 +118,7 @@ bool defFile::Parse(const scfString &txt, registry &reg)
   csRef< iDocumentNode > node = doc->GetRoot();
   csRef< iDocumentNodeIterator> pos = node->GetNodes();
 
-  ParseNode(&reg, pos);
+  ParseNode(sc, pos);
 
   return true;
 }
