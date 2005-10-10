@@ -3230,8 +3230,8 @@ _cspace.iAwsConnectionNodeFactory_swigregister(iAwsConnectionNodeFactoryPtr)
 
 MAX_OUTPUT_VERTICES = _cspace.MAX_OUTPUT_VERTICES
 CS_CLIP_OUTSIDE = _cspace.CS_CLIP_OUTSIDE
-CS_CLIP_INSIDE = _cspace.CS_CLIP_INSIDE
 CS_CLIP_CLIPPED = _cspace.CS_CLIP_CLIPPED
+CS_CLIP_INSIDE = _cspace.CS_CLIP_INSIDE
 class csVertexStatus(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csVertexStatus, name, value)
@@ -8901,12 +8901,10 @@ _cspace.iDocumentSystem_swigregister(iDocumentSystemPtr)
 
 iDocumentSystem_scfGetVersion = _cspace.iDocumentSystem_scfGetVersion
 
-class csTinyDocumentSystem(iDocumentSystem):
+class csTinyDocumentSystem(_object):
     __swig_setmethods__ = {}
-    for _s in [iDocumentSystem]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csTinyDocumentSystem, name, value)
     __swig_getmethods__ = {}
-    for _s in [iDocumentSystem]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csTinyDocumentSystem, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csTinyDocumentSystem instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
@@ -8918,22 +8916,6 @@ class csTinyDocumentSystem(iDocumentSystem):
             if self.thisown: destroy(self)
         except: pass
 
-    __swig_setmethods__["scfRefCount"] = _cspace.csTinyDocumentSystem_scfRefCount_set
-    __swig_getmethods__["scfRefCount"] = _cspace.csTinyDocumentSystem_scfRefCount_get
-    if _newclass:scfRefCount = property(_cspace.csTinyDocumentSystem_scfRefCount_get, _cspace.csTinyDocumentSystem_scfRefCount_set)
-    __swig_setmethods__["scfWeakRefOwners"] = _cspace.csTinyDocumentSystem_scfWeakRefOwners_set
-    __swig_getmethods__["scfWeakRefOwners"] = _cspace.csTinyDocumentSystem_scfWeakRefOwners_get
-    if _newclass:scfWeakRefOwners = property(_cspace.csTinyDocumentSystem_scfWeakRefOwners_get, _cspace.csTinyDocumentSystem_scfWeakRefOwners_set)
-    def scfRemoveRefOwners(*args): return _cspace.csTinyDocumentSystem_scfRemoveRefOwners(*args)
-    __swig_setmethods__["scfParent"] = _cspace.csTinyDocumentSystem_scfParent_set
-    __swig_getmethods__["scfParent"] = _cspace.csTinyDocumentSystem_scfParent_get
-    if _newclass:scfParent = property(_cspace.csTinyDocumentSystem_scfParent_get, _cspace.csTinyDocumentSystem_scfParent_set)
-    def IncRef(*args): return _cspace.csTinyDocumentSystem_IncRef(*args)
-    def DecRef(*args): return _cspace.csTinyDocumentSystem_DecRef(*args)
-    def GetRefCount(*args): return _cspace.csTinyDocumentSystem_GetRefCount(*args)
-    def AddRefOwner(*args): return _cspace.csTinyDocumentSystem_AddRefOwner(*args)
-    def RemoveRefOwner(*args): return _cspace.csTinyDocumentSystem_RemoveRefOwner(*args)
-    def QueryInterface(*args): return _cspace.csTinyDocumentSystem_QueryInterface(*args)
     def CreateDocument(*args): return _cspace.csTinyDocumentSystem_CreateDocument(*args)
 
 class csTinyDocumentSystemPtr(csTinyDocumentSystem):
@@ -12357,12 +12339,10 @@ _cspace.iTerraSampler_swigregister(iTerraSamplerPtr)
 
 iTerraSampler_scfGetVersion = _cspace.iTerraSampler_scfGetVersion
 
-class csObject(iObject):
+class csObject(_object):
     __swig_setmethods__ = {}
-    for _s in [iObject]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csObject, name, value)
     __swig_getmethods__ = {}
-    for _s in [iObject]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csObject, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csObject instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
@@ -12387,22 +12367,6 @@ class csObject(iObject):
     def GetIterator(*args): return _cspace.csObject_GetIterator(*args)
     def AddNameChangeListener(*args): return _cspace.csObject_AddNameChangeListener(*args)
     def RemoveNameChangeListener(*args): return _cspace.csObject_RemoveNameChangeListener(*args)
-    __swig_setmethods__["scfRefCount"] = _cspace.csObject_scfRefCount_set
-    __swig_getmethods__["scfRefCount"] = _cspace.csObject_scfRefCount_get
-    if _newclass:scfRefCount = property(_cspace.csObject_scfRefCount_get, _cspace.csObject_scfRefCount_set)
-    __swig_setmethods__["scfWeakRefOwners"] = _cspace.csObject_scfWeakRefOwners_set
-    __swig_getmethods__["scfWeakRefOwners"] = _cspace.csObject_scfWeakRefOwners_get
-    if _newclass:scfWeakRefOwners = property(_cspace.csObject_scfWeakRefOwners_get, _cspace.csObject_scfWeakRefOwners_set)
-    def scfRemoveRefOwners(*args): return _cspace.csObject_scfRemoveRefOwners(*args)
-    __swig_setmethods__["scfParent"] = _cspace.csObject_scfParent_set
-    __swig_getmethods__["scfParent"] = _cspace.csObject_scfParent_get
-    if _newclass:scfParent = property(_cspace.csObject_scfParent_get, _cspace.csObject_scfParent_set)
-    def IncRef(*args): return _cspace.csObject_IncRef(*args)
-    def DecRef(*args): return _cspace.csObject_DecRef(*args)
-    def GetRefCount(*args): return _cspace.csObject_GetRefCount(*args)
-    def AddRefOwner(*args): return _cspace.csObject_AddRefOwner(*args)
-    def RemoveRefOwner(*args): return _cspace.csObject_RemoveRefOwner(*args)
-    def QueryInterface(*args): return _cspace.csObject_QueryInterface(*args)
     def ObjReleaseOld(*args): return _cspace.csObject_ObjReleaseOld(*args)
 
 class csObjectPtr(csObject):
@@ -12412,12 +12376,10 @@ class csObjectPtr(csObject):
         _swig_setattr(self, csObject,self.__class__,csObject)
 _cspace.csObject_swigregister(csObjectPtr)
 
-class csColliderWrapper(csObject):
+class csColliderWrapper(_object):
     __swig_setmethods__ = {}
-    for _s in [csObject]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csColliderWrapper, name, value)
     __swig_getmethods__ = {}
-    for _s in [csObject]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csColliderWrapper, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csColliderWrapper instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
@@ -12434,12 +12396,6 @@ class csColliderWrapper(csObject):
     def Collide(*args): return _cspace.csColliderWrapper_Collide(*args)
     __swig_getmethods__["GetColliderWrapper"] = lambda x: _cspace.csColliderWrapper_GetColliderWrapper
     if _newclass:GetColliderWrapper = staticmethod(_cspace.csColliderWrapper_GetColliderWrapper)
-    def IncRef(*args): return _cspace.csColliderWrapper_IncRef(*args)
-    def DecRef(*args): return _cspace.csColliderWrapper_DecRef(*args)
-    def GetRefCount(*args): return _cspace.csColliderWrapper_GetRefCount(*args)
-    def AddRefOwner(*args): return _cspace.csColliderWrapper_AddRefOwner(*args)
-    def RemoveRefOwner(*args): return _cspace.csColliderWrapper_RemoveRefOwner(*args)
-    def QueryInterface(*args): return _cspace.csColliderWrapper_QueryInterface(*args)
 
 class csColliderWrapperPtr(csColliderWrapper):
     def __init__(self, this):
@@ -12566,12 +12522,10 @@ class csColliderActorPtr(csColliderActor):
         _swig_setattr(self, csColliderActor,self.__class__,csColliderActor)
 _cspace.csColliderActor_swigregister(csColliderActorPtr)
 
-class csView(iView):
+class csView(_object):
     __swig_setmethods__ = {}
-    for _s in [iView]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csView, name, value)
     __swig_getmethods__ = {}
-    for _s in [iView]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csView, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csView instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
@@ -12597,22 +12551,6 @@ class csView(iView):
     def UpdateClipper(*args): return _cspace.csView_UpdateClipper(*args)
     def GetClipper(*args): return _cspace.csView_GetClipper(*args)
     def Draw(*args): return _cspace.csView_Draw(*args)
-    __swig_setmethods__["scfRefCount"] = _cspace.csView_scfRefCount_set
-    __swig_getmethods__["scfRefCount"] = _cspace.csView_scfRefCount_get
-    if _newclass:scfRefCount = property(_cspace.csView_scfRefCount_get, _cspace.csView_scfRefCount_set)
-    __swig_setmethods__["scfWeakRefOwners"] = _cspace.csView_scfWeakRefOwners_set
-    __swig_getmethods__["scfWeakRefOwners"] = _cspace.csView_scfWeakRefOwners_get
-    if _newclass:scfWeakRefOwners = property(_cspace.csView_scfWeakRefOwners_get, _cspace.csView_scfWeakRefOwners_set)
-    def scfRemoveRefOwners(*args): return _cspace.csView_scfRemoveRefOwners(*args)
-    __swig_setmethods__["scfParent"] = _cspace.csView_scfParent_set
-    __swig_getmethods__["scfParent"] = _cspace.csView_scfParent_get
-    if _newclass:scfParent = property(_cspace.csView_scfParent_get, _cspace.csView_scfParent_set)
-    def IncRef(*args): return _cspace.csView_IncRef(*args)
-    def DecRef(*args): return _cspace.csView_DecRef(*args)
-    def GetRefCount(*args): return _cspace.csView_GetRefCount(*args)
-    def AddRefOwner(*args): return _cspace.csView_AddRefOwner(*args)
-    def RemoveRefOwner(*args): return _cspace.csView_RemoveRefOwner(*args)
-    def QueryInterface(*args): return _cspace.csView_QueryInterface(*args)
 
 class csViewPtr(csView):
     def __init__(self, this):
