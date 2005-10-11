@@ -117,7 +117,7 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
 "  -video=<s>         the 3D rendering driver (opengl, software, ...)\n"
 "  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n"
 "  -plugin=<s>        load the plugin after all others\n"
-"  -verbose           be more verbose; print better diagonstic messages\n");
+"  -verbose           be more verbose; print better diagnostic messages\n");
 }
 
 bool csCommandLineHelper::CheckHelp (iObjectRegistry* object_reg,
