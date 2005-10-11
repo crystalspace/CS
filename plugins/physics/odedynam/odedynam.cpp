@@ -976,12 +976,6 @@ void csODECollider::Collision (iRigidBody* other)
 void csODECollider::ClearContents ()
 {
   KillGeoms ();
-
-  surfacedata[0] = 0;
-  surfacedata[1] = 0;
-  surfacedata[2] = 0;
-  density = 0;
-  spaceID = 0;
  
   transformID = dCreateGeomTransform (0);
   dGeomTransformSetCleanup (transformID, 1);
@@ -1055,7 +1049,8 @@ void csODECollider::AttachBody (dBodyID bodyID)
 }
 bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
 {
-  if (geomID) ClearContents ();
+  dBodyID b = dGeomGetBody (transformID);
+  ClearContents ();
 
   geom_type = TRIMESH_COLLIDER_GEOMETRY;
 
@@ -1100,44 +1095,48 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
 
   geomID = dCreateTriMesh(0, TriData, 0, 0, 0);
 
-  if (dGeomGetBody (transformID))
-    MassCorrection ();
-
   GeomData *gd = new GeomData ();
   gd->surfacedata = surfacedata;
   gd->collider = this;
   dGeomSetData (geomID, (void*)gd);
 
-  if (spaceID) AddToSpace (spaceID);
+  if (b)
+  {
+    AddTransformToSpace (spaceID);
+    dGeomSetBody (transformID, b);
+    MassCorrection ();
+  } else if (spaceID) AddToSpace (spaceID);
 
   return true;
 }
 bool csODECollider::CreateCCylinderGeometry (float length, float radius)
 {
-  if (geomID) ClearContents ();
+  dBodyID b = dGeomGetBody (transformID);
+  ClearContents ();
 
   geom_type = CYLINDER_COLLIDER_GEOMETRY;
-
   geomID = dCreateCCylinder (0, radius, length);
-
-  if (dGeomGetBody (transformID))
-    MassCorrection ();
 
   GeomData *gd = new GeomData ();
   gd->surfacedata = surfacedata;
   gd->collider = this;
   dGeomSetData (geomID, (void*)gd);
 
-  if (spaceID) AddToSpace (spaceID);
+  if (b)
+  {
+    AddTransformToSpace (spaceID);
+    dGeomSetBody (transformID, b);
+    MassCorrection ();
+  } else if (spaceID) AddToSpace (spaceID);
 
   return true;
 }
 bool csODECollider::CreatePlaneGeometry (const csPlane3& plane)
 {
-  if (geomID) ClearContents ();
+  dBodyID b = dGeomGetBody (transformID);
+  ClearContents ();
 
   geom_type = PLANE_COLLIDER_GEOMETRY;
-
   geomID = dCreatePlane (0, -plane.A(), -plane.B(), -plane.C(), plane.D());
 
   GeomData *gd = new GeomData ();
@@ -1145,7 +1144,12 @@ bool csODECollider::CreatePlaneGeometry (const csPlane3& plane)
   gd->collider = this;
   dGeomSetData (geomID, (void*)gd);
 
-  if (spaceID) AddToSpace (spaceID);
+  if (b)
+  {
+    AddTransformToSpace (spaceID);
+    dGeomSetBody (transformID, b);
+    MassCorrection ();
+  } else if (spaceID) AddToSpace (spaceID);
 
   return true;
 }
@@ -1153,24 +1157,26 @@ bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
 {
   if (sphere.GetRadius () > 0) //otherwise ODE will treat radius as a 'bad argument' 
   {
-    if (geomID) ClearContents ();
+    dBodyID b = dGeomGetBody (transformID);
+    ClearContents ();
 
     geom_type = SPHERE_COLLIDER_GEOMETRY;
-
     geomID = dCreateSphere (0, sphere.GetRadius ());
 
     csVector3 offset = sphere.GetCenter ();
     dGeomSetPosition (transformID, offset.x, offset.y, offset.z);
-
-    if (dGeomGetBody (transformID))
-      MassCorrection ();
 
     GeomData *gd = new GeomData ();
     gd->surfacedata = surfacedata;
     gd->collider = this;
     dGeomSetData (geomID, (void*)gd);
 
-    if (spaceID) AddToSpace (spaceID);
+    if (b)
+    {
+      if (spaceID) AddTransformToSpace (spaceID);
+      dGeomSetBody (transformID, b);
+      MassCorrection ();
+    } else if (spaceID) AddToSpace (spaceID);
 
     return true;
   }
@@ -1179,21 +1185,23 @@ bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
 }
 bool csODECollider::CreateBoxGeometry (const csVector3& size)
 {
-  if (geomID) ClearContents ();
+  dBodyID b = dGeomGetBody (transformID);
+  ClearContents ();
 
   geom_type = BOX_COLLIDER_GEOMETRY;
-
   geomID = dCreateBox (0, size.x, size.y, size.z);
-
-  if (dGeomGetBody (transformID))
-    MassCorrection ();
 
   GeomData *gd = new GeomData ();
   gd->surfacedata = surfacedata;
   gd->collider = this;
   dGeomSetData (geomID, (void*)gd);
 
-  if (spaceID) AddToSpace (spaceID);
+  if (b)
+  {
+    AddTransformToSpace (spaceID);
+    dGeomSetBody (transformID, b);
+    MassCorrection ();
+  } else if (spaceID) AddToSpace (spaceID);
 
   return true;
 }
@@ -1223,6 +1231,16 @@ void csODECollider::SetTransform (const csOrthoTransform& transform)
   if (dGeomGetBody (transformID))
     MassCorrection ();
 }
+csOrthoTransform csODECollider::GetLocalTransform ()
+{
+  const dReal *tv = dGeomGetPosition (transformID);
+  csVector3 t_pos (tv[0], tv[1], tv[2]);
+
+  csMatrix3 t_rot;
+  ODE2CSMatrix (dGeomGetRotation (transformID), t_rot);
+
+  return csOrthoTransform (t_rot, t_pos);
+}
 csOrthoTransform csODECollider::GetTransform ()
 {
   const dReal *tv = dGeomGetPosition (transformID);
@@ -1248,6 +1266,7 @@ csOrthoTransform csODECollider::GetTransform ()
 }
 void csODECollider::AddTransformToSpace (dSpaceID spaceID)
 {
+  csODECollider::spaceID = spaceID;
   if (geomID)
   {
     dSpaceID gspace = dGeomGetSpace (geomID);

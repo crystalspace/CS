@@ -715,6 +715,12 @@ struct iDynamicsSystemCollider : public iBase
   virtual csOrthoTransform GetTransform () = 0;
 
   /**
+   * Get collider transform (when collider is attached to body transform 
+   * will be in body space)
+   */
+  virtual csOrthoTransform GetLocalTransform () = 0;
+
+  /**
    * Set Collider transform. If this is "static" collider then given transform
    * will be in world space, otherwise it will be in attached rigid body space.
    */ 

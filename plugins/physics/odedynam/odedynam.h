@@ -653,6 +653,7 @@ public:
   void FillWithColliderGeometry (csRef<iGeneralFactoryState> genmesh_fact);
 
   csOrthoTransform GetTransform ();
+  csOrthoTransform GetLocalTransform ();
   void SetTransform (const csOrthoTransform& trans);
 
   csColliderGeometryType GetGeometryType () {return geom_type;};
