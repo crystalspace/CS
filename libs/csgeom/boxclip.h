@@ -160,8 +160,9 @@ namespace CrystalSpace
       uint8 Clipped = CS_CLIP_INSIDE;
       if (boxTest.ClipMinX())
       {
-	EdgeClipper<ClipMinX, StatusOutput> edgeClip (ClipMinX (region), 
-	  statOut, InP, InV, OutP, OutV);
+	ClipMinX const r(region);
+	EdgeClipper<ClipMinX, StatusOutput> edgeClip (
+	  r, statOut, InP, InV, OutP, OutV);
 	Clipped = csMin (Clipped, edgeClip.ClipEdge());
 
 	// Switch input/output polys: now we're going to clip
@@ -173,8 +174,9 @@ namespace CrystalSpace
       }
       if (boxTest.ClipMaxX())
       {
-	EdgeClipper<ClipMaxX, StatusOutput> edgeClip (ClipMaxX (region), 
-	  statOut, InP, InV, OutP, OutV);
+	ClipMaxX const r(region);
+	EdgeClipper<ClipMaxX, StatusOutput> edgeClip (
+	  r, statOut, InP, InV, OutP, OutV);
 	Clipped = csMin (Clipped, edgeClip.ClipEdge());
 
 	InV = OutV;
@@ -184,8 +186,9 @@ namespace CrystalSpace
       }
       if (boxTest.ClipMinY())
       {
-	EdgeClipper<ClipMinY, StatusOutput> edgeClip (ClipMinY (region), 
-	  statOut, InP, InV, OutP, OutV);
+	ClipMinY const r(region);
+	EdgeClipper<ClipMinY, StatusOutput> edgeClip (
+	  r, statOut, InP, InV, OutP, OutV);
 	Clipped = csMin (Clipped, edgeClip.ClipEdge());
 
 	InV = OutV;
@@ -195,8 +198,9 @@ namespace CrystalSpace
       }
       if (boxTest.ClipMaxY())
       {
-	EdgeClipper<ClipMaxY, StatusOutput> edgeClip (ClipMaxY (region), 
-	  statOut, InP, InV, OutP, OutV);
+	ClipMaxY const r(region);
+	EdgeClipper<ClipMaxY, StatusOutput> edgeClip (
+	  r, statOut, InP, InV, OutP, OutV);
 	Clipped = csMin (Clipped, edgeClip.ClipEdge());
 
 	InV = OutV;

@@ -208,9 +208,10 @@ uint8 csBoxClipper::Clip (
   csVector2 *OutPolygon,
   size_t &OutCount)
 {
+  BoxTestAll b;
+  StatusOutputNone n;
   CrystalSpace::BoxClipper<BoxTestAll, StatusOutputNone> boxClip
-    (BoxTestAll(), StatusOutputNone(), region,
-    InPolygon, InCount, OutPolygon);
+    (b, n, region, InPolygon, InCount, OutPolygon);
 
   uint8 Clipped = boxClip.Clip();
   OutCount = boxClip.GetOutputCount();
@@ -226,9 +227,10 @@ uint8 csBoxClipper::Clip (
 {
   csVertexStatus TempStatus [MAX_OUTPUT_VERTICES];
 
+  BoxTestAll b;
+  StatusOutputDefault d(TempStatus, InCount, OutStatus);
   CrystalSpace::BoxClipper<BoxTestAll, StatusOutputDefault> boxClip
-    (BoxTestAll(), StatusOutputDefault (TempStatus, InCount, OutStatus), 
-    region, InPolygon, InCount, OutPolygon);
+    (b, d, region, InPolygon, InCount, OutPolygon);
 
   uint8 Clipped = boxClip.Clip();
   OutCount = boxClip.GetOutputCount();
@@ -383,9 +385,9 @@ uint8 csPolygonClipper::Clip (
   csVector2 *OutPolygon,
   size_t &OutCount)
 {
+  StatusOutputNone n;
   CrystalSpace::PolyClipper<StatusOutputNone> polyClip
-    (StatusOutputNone(), InPolygon, InCount, OutPolygon,
-    ClipPolyVertices, ClipPoly, ClipData);
+    (n, InPolygon, InCount, OutPolygon, ClipPolyVertices, ClipPoly, ClipData);
 
   uint8 Clipped = polyClip.Clip();
   OutCount = polyClip.GetOutputCount();
