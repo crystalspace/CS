@@ -16,6 +16,7 @@
 //
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
+#include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 #include "OSXGetUsername.h"
 
