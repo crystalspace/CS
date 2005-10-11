@@ -1233,11 +1233,11 @@ void csODECollider::SetTransform (const csOrthoTransform& transform)
 }
 csOrthoTransform csODECollider::GetLocalTransform ()
 {
-  const dReal *tv = dGeomGetPosition (transformID);
+  const dReal *tv = dGeomGetPosition (geomID);
   csVector3 t_pos (tv[0], tv[1], tv[2]);
 
   csMatrix3 t_rot;
-  ODE2CSMatrix (dGeomGetRotation (transformID), t_rot);
+  ODE2CSMatrix (dGeomGetRotation (geomID), t_rot);
 
   return csOrthoTransform (t_rot, t_pos);
 }
