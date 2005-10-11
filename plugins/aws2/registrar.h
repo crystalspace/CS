@@ -66,10 +66,10 @@ namespace autom
     keeper get(uint id);      
 
     /** Set the value of a variable. */
-    void set(const csString &name, keeper &val);   
+    void set(const csString &name, const keeper &val);   
 
     /** Set the value of a variable. */
-    void set(uint id, keeper &val);   
+    void set(uint id, const keeper &val);   
 
     /** Adds a child scope to this scope. */
     void addChild(const csString &name, scope *child);

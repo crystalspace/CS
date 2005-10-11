@@ -134,13 +134,13 @@ scope::get(uint id)
 }
 
 void 
-scope::set(const csString &name, keeper &val)
+scope::set(const csString &name, const keeper &val)
 {
   vars[Registrar()->getId(name)]=val;
 }
 
 void 
-scope::set(uint id, keeper &val)
+scope::set(uint id, const keeper &val)
 {
   vars[id]=val;
 }
