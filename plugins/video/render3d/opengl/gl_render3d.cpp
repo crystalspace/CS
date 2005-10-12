@@ -278,83 +278,73 @@ void csGLGraphics3D::SetZModeInternal (csZBufMode mode)
   }
 }
 
-void csGLGraphics3D::SetMixMode (uint mode)
+static GLenum CSblendOpToGLblendOp (uint csop)
 {
-
-  // Note: In all explanations of Mixing:
-  // Color: resulting color
-  // SRC:   Color of the texel (content of the texture to be drawn)
-  // DEST:  Color of the pixel on screen
-  // Alpha: Alpha value of the polygon
-  bool enable_blending = true;
-  switch (mode & CS_FX_MASK_MIXMODE)
+  switch (csop)
   {
-    case CS_FX_MULTIPLY:
-      // Color = SRC * DEST +   0 * SRC = DEST * SRC
-      statecache->SetBlendFunc (GL_ZERO, GL_SRC_COLOR);
-      break;
-    case CS_FX_MULTIPLY2:
-      // Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
-      statecache->SetBlendFunc (GL_DST_COLOR, GL_SRC_COLOR);
-      break;
-    case CS_FX_ADD:
-      // Color = 1 * DEST + 1 * SRC = DEST + SRC
-      statecache->SetBlendFunc (GL_ONE, GL_ONE);
-      break;
-    case CS_FX_DESTALPHAADD:
-      // Color = DEST + DestAlpha * SRC
-      statecache->SetBlendFunc (GL_DST_ALPHA, GL_ONE);
-      break;
-    case CS_FX_SRCALPHAADD:
-      // Color = DEST + SrcAlpha * SRC
-      statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE);
-      break;
-    case CS_FX_PREMULTALPHA:
-      // Color = (1-SrcAlpha) * DEST + SRC
-      statecache->SetBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-      break;
-    case CS_FX_ALPHA:
-      // Color = Alpha * SRC + (1-Alpha) * DEST
-      statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      break;
-    case CS_FX_TRANSPARENT:
-      // Color = 1 * DEST + 0 * SRC
-      statecache->SetBlendFunc (GL_ZERO, GL_ONE);
-      break;
-    case CS_FX_COPY:
     default:
-      enable_blending = false;
-      break;
+    case CS_MIXMODE_FACT_ZERO:		return GL_ZERO;
+    case CS_MIXMODE_FACT_ONE:		return GL_ONE;
+    case CS_MIXMODE_FACT_SRCCOLOR:      return GL_SRC_COLOR;
+    case CS_MIXMODE_FACT_SRCCOLOR_INV:  return GL_ONE_MINUS_SRC_COLOR;
+    case CS_MIXMODE_FACT_DSTCOLOR:      return GL_DST_COLOR;
+    case CS_MIXMODE_FACT_DSTCOLOR_INV:  return GL_ONE_MINUS_DST_COLOR;
+    case CS_MIXMODE_FACT_SRCALPHA:      return GL_SRC_ALPHA;
+    case CS_MIXMODE_FACT_SRCALPHA_INV:  return GL_ONE_MINUS_SRC_ALPHA;
+    case CS_MIXMODE_FACT_DSTALPHA:      return GL_DST_ALPHA;
+    case CS_MIXMODE_FACT_DSTALPHA_INV:  return GL_ONE_MINUS_DST_ALPHA;
   }
-
-  statecache->Disable_GL_ALPHA_TEST ();
-
-  if (enable_blending)
-    statecache->Enable_GL_BLEND ();
-  else
-    statecache->Disable_GL_BLEND ();
 }
 
-void csGLGraphics3D::SetAlphaType (csAlphaMode::AlphaType alphaType)
+void csGLGraphics3D::SetMixMode (uint mode, csAlphaMode::AlphaType alphaType)
 {
-  switch (alphaType)
+  bool doAlphaTest;
+  switch (mode & CS_MIXMODE_ALPHATEST_MASK)
   {
+    case CS_MIXMODE_ALPHATEST_ENABLE:
+      doAlphaTest = true;
+      break;
+    case CS_MIXMODE_ALPHATEST_DISABLE:
+      doAlphaTest = false;
+      break;
     default:
-    case csAlphaMode::alphaNone:
-      statecache->Disable_GL_BLEND ();
-      statecache->Disable_GL_ALPHA_TEST ();
-      break;
-    case csAlphaMode::alphaBinary:
-      statecache->Disable_GL_BLEND ();
-      statecache->Enable_GL_ALPHA_TEST ();
-      statecache->SetAlphaFunc (GL_GEQUAL, 0.5f);
-      break;
-    case csAlphaMode::alphaSmooth:
-      statecache->Enable_GL_BLEND ();
-      statecache->Disable_GL_ALPHA_TEST ();			      
-      statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    case CS_MIXMODE_ALPHATEST_AUTO:
+      doAlphaTest = (alphaType == csAlphaMode::alphaBinary);
       break;
   }
+
+  switch (mode & CS_MIXMODE_TYPE_MASK)
+  {
+    case CS_MIXMODE_TYPE_BLENDOP:
+      statecache->Enable_GL_BLEND ();
+      statecache->SetBlendFunc (
+	CSblendOpToGLblendOp (CS_MIXMODE_BLENDOP_SRC(mode)),
+	CSblendOpToGLblendOp (CS_MIXMODE_BLENDOP_DST(mode)));
+      break;
+    case CS_MIXMODE_TYPE_AUTO:
+    default:
+      switch (alphaType)
+      {
+	case csAlphaMode::alphaNone:
+	case csAlphaMode::alphaBinary:
+	  statecache->Disable_GL_BLEND ();
+	  break;
+	default:
+	case csAlphaMode::alphaSmooth:
+	  statecache->Enable_GL_BLEND ();
+	  statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	  break;
+      }
+      break;
+  }
+
+  if (doAlphaTest)
+  {
+    statecache->Enable_GL_ALPHA_TEST ();
+    statecache->SetAlphaFunc (GL_GEQUAL, 0.5f);
+  }
+  else
+    statecache->Disable_GL_ALPHA_TEST ();
 }
 
 void csGLGraphics3D::CalculateFrustum ()
@@ -1196,7 +1186,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
       SetZMode (CS_ZBUF_NONE);
       
-      SetMixMode (CS_FX_ALPHA); 
+      SetMixMode (CS_FX_ALPHA, csAlphaMode::alphaSmooth); 
       // So alpha blending works w/ 2D drawing
       glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
     }
@@ -1535,7 +1525,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   glPushMatrix ();
   glMultMatrixf (matrix);
 
-  if ((needColorFixup = ((modes.mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)))
+  if ((needColorFixup = (modes.mixmode & CS_FX_MASK_ALPHA)))
     alphaScale = 1.0f - (modes.mixmode & CS_FX_MASK_ALPHA) / 255.0f;
   ApplyBufferChanges();
 
@@ -1696,10 +1686,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS, compType);
   if (bufData != (void*)-1)
   {
-    if ((mixmode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
-      SetMixMode (mixmode);
-    else
-      SetAlphaType (modes.alphaType);
+    SetMixMode (mixmode, modes.alphaType);
 
     if (bugplug)
     {
@@ -1722,7 +1709,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     }
 
     float alpha = 1.0f;
-    if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
+    if (mixmode & CS_FX_MASK_ALPHA)
       alpha = 1.0f - (float)(mixmode & CS_FX_MASK_ALPHA) / 255.0f;
     glColor4f (1.0f, 1.0f, 1.0f, alpha);
     glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
@@ -1788,9 +1775,9 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   // OpenGL blend mode so that it handles the transparent pixels correctly
   if ((hTex->GetKeyColor () || hTex->GetAlphaMap () || Alpha) ||
     (current_drawflags & CSDRAW_2DGRAPHICS)) // In 2D mode we always want to blend
-    SetMixMode (CS_FX_ALPHA);
+    SetMixMode (CS_FX_ALPHA, hTex->GetAlphaType());
   else
-    SetMixMode (CS_FX_COPY);
+    SetMixMode (CS_FX_COPY, hTex->GetAlphaType());
 
   glColor4f (1.0, 1.0, 1.0, Alpha ? (1.0 - BYTE_TO_FLOAT (Alpha)) : 1.0);
   ActivateTexture (hTex);
@@ -2957,7 +2944,6 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
 
   csGLGraphics3D::statecache->SetShadeModel (GL_FLAT);
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, halohandle);
-  G3D->SetAlphaType (csAlphaMode::alphaSmooth);
 
   //???@@@statecache->SetMatrixMode (GL_MODELVIEW);
   glPushMatrix ();
@@ -2965,7 +2951,7 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   G3D->SetGlOrtho (false);
   //glTranslatef (0, 0, 0);
 
-  G3D->SetMixMode (dstblend);
+  G3D->SetMixMode (dstblend, csAlphaMode::alphaSmooth);
 
   glColor4f (R, G, B, iIntensity);
 

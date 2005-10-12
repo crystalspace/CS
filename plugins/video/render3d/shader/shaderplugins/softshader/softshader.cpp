@@ -24,11 +24,15 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/scf.h"
 #include "iutil/plugin.h"
 #include "ivaria/reporter.h"
+#include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
+
 #include "softshader_vp.h"
 #include "softshader_fp.h"
 #include "softshader.h"
+
+#include "scanlinerenderers.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -114,66 +118,38 @@ void csSoftShader::Open()
       if ((pfmt.BlueMask == 0x0000ff)
 	&& (pfmt.GreenMask == 0x00ff00)
 	&& (pfmt.RedMask == 0xff0000))
-	scanlineRenderer = (new ScanlineRenderer<
-	  Pix_Fix<uint32, 24, 0, 0xff,
-			  16, 0, 0xff,
-			  8,  0, 0xff,
-			  0,  0, 0xff> > (pfmt));
+	scanlineRenderer = NewScanlineRendererARGB8888 (pfmt);
       else if ((pfmt.BlueMask == 0xff0000) 
 	&& (pfmt.GreenMask == 0x00ff00)
 	&& (pfmt.RedMask == 0x0000ff))
-	scanlineRenderer = (new ScanlineRenderer<
-	  Pix_Fix<uint32, 24, 0, 0xff,
-			  0,  0, 0xff,
-			  8,  0, 0xff,
-			  16, 0, 0xff> > (pfmt));
+	scanlineRenderer = NewScanlineRendererABGR8888 (pfmt);
       else if (pfmt.RedMask > pfmt.BlueMask)
-	scanlineRenderer = (
-	  new ScanlineRenderer<Pix_Generic<uint32, 1> > (pfmt));
+	scanlineRenderer = NewScanlineRendererARGBgen32 (pfmt);
       else
-	scanlineRenderer = (
-	  new ScanlineRenderer<Pix_Generic<uint32, 0> > (pfmt));
+	scanlineRenderer = NewScanlineRendererABGRgen32 (pfmt);
     }
     else
     {
       if ((pfmt.BlueMask == 0xf800)   // BGR 565
 	&& (pfmt.GreenMask == 0x07e0)
 	&& (pfmt.RedMask == 0x001f))
-	scanlineRenderer = (new ScanlineRenderer<
-	  Pix_Fix<uint16, 0,  0, 0,
-			  0,  3, 0xf8,
-			  3,  0, 0xfc,
-			  8,  0, 0xf8> > (pfmt));
+	scanlineRenderer = NewScanlineRendererBGR565 (pfmt);
       else if ((pfmt.RedMask == 0xf800) // RGB 565
 	&& (pfmt.GreenMask == 0x07e0)
 	&& (pfmt.BlueMask == 0x001f))
-	scanlineRenderer = (new ScanlineRenderer<
-	  Pix_Fix<uint16, 0,  0, 0,
-			  8,  0, 0xf8,
-			  3,  0, 0xfc,
-			  0,  3, 0xf8> > (pfmt));
+	scanlineRenderer = NewScanlineRendererRGB565 (pfmt);
       else if ((pfmt.BlueMask == 0x7c00) // BGR 555
 	&& (pfmt.GreenMask == 0x03e0)
 	&& (pfmt.RedMask == 0x001f))
-	scanlineRenderer = (new ScanlineRenderer<
-	  Pix_Fix<uint16, 0,  0, 0,
-			  0,  3, 0xf8,
-			  2,  0, 0xf8,
-			  7,  0, 0xf8> > (pfmt));
+	scanlineRenderer = NewScanlineRendererBGR555 (pfmt);
       else if ((pfmt.RedMask == 0x7c00) // RGB 555
 	&& (pfmt.GreenMask == 0x03e0)
 	&& (pfmt.BlueMask == 0x001f))
-	scanlineRenderer = (new ScanlineRenderer<
-	  Pix_Fix<uint16, 0,  0, 0,
-			  7,  0, 0xf8,
-			  2,  0, 0xf8,
-			  0,  3, 0xf8> > (pfmt));
+	scanlineRenderer = NewScanlineRendererRGB555 (pfmt);
       else if (pfmt.RedMask > pfmt.BlueMask)
-	scanlineRenderer = (
-	  new ScanlineRenderer<Pix_Generic<uint16, 1> > (pfmt));
+	scanlineRenderer = NewScanlineRendererRGBgen16 (pfmt);
       else
-	scanlineRenderer = (
-	  new ScanlineRenderer<Pix_Generic<uint16, 0> > (pfmt));
+	scanlineRenderer = NewScanlineRendererBGRgen16 (pfmt);
     }
   }
 }

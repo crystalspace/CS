@@ -415,7 +415,7 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
 					bool allowFxMesh)
 {
 #define MIXMODE_EXCLUSIVE				\
-  if (mixmode & CS_FX_MASK_MIXMODE)			\
+  if (mixmodeSpecified)					\
   {							\
     if (!warned)					\
     {							\
@@ -426,9 +426,11 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
 	"Only first one will be used.");		\
       warned = true;					\
     }							\
-  }							\
-  else
+    break;						\
+  }
+
   bool warned = false;
+  bool mixmodeSpecified = false;
   mixmode = 0;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -461,8 +463,6 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
 	}
 	break;
       case XMLTOKEN_TRANSPARENT: mixmode |= CS_FX_TRANSPARENT; break;
-      case XMLTOKEN_KEYCOLOR: mixmode |= CS_FX_KEYCOLOR; break;
-      case XMLTOKEN_TILING: mixmode |= CS_FX_TILING; break;
       case XMLTOKEN_MESH:
 	if (allowFxMesh)
 	{
@@ -486,10 +486,6 @@ bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
   {
     case CS_FX_TRANSPARENT:
       node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("transparent");
-    case CS_FX_KEYCOLOR:
-      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("keycolor");
-    case CS_FX_TILING:
-      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("tiling");
     case CS_FX_COPY: 
       node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("copy");
       break;
@@ -1641,7 +1637,7 @@ csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
 	<m13>1.5</m13>\
       </matrix>\
       <mixmode>\
-        <tiling/> <alpha>.5</alpha>\
+        <alpha>.5</alpha>\
       </mixmode>\
     </root>\
   ", true);
@@ -1674,7 +1670,7 @@ csPtr<iString> csTextSyntaxService::Debug_UnitTest ()
   SYN_ASSERT (mixmode_node != 0, "mixmode_node");
   uint mixmode;
   SYN_ASSERT (ParseMixmode (mixmode_node, mixmode) == true, "");
-  uint desired_mixmode = CS_FX_TILING;
+  uint desired_mixmode = 0;
   desired_mixmode &= ~CS_FX_MASK_ALPHA;
   desired_mixmode |= CS_FX_SETALPHA (.5);
   SYN_ASSERT (mixmode == desired_mixmode, "mixmode");

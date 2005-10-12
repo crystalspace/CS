@@ -361,12 +361,6 @@ void csLightFlareHalo::ProcessFlareComponent (
     mode |= CS_FX_FLAT;
     intensity = 1.0f;
   }
-  else if ((mode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
-  {
-    intensity *= (float (mode & CS_FX_MASK_ALPHA) / 255.0f);
-    mesh.alphaType.autoAlphaMode = false;
-    mesh.alphaType.alphaType = csAlphaMode::alphaSmooth;
-  }
 
   static uint indices[4] = {0, 1, 2, 3};
   csVector4 colors[4] = {csVector4 (intensity), csVector4 (intensity), 

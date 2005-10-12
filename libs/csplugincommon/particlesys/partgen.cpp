@@ -366,10 +366,8 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
     csColoredVertices& sprvt = sprite2ds[i]->GetVertices ();
     // transform to eye coordinates
     csVector3 pos = trans.Other2This (particles[i]->GetPosition ());
-    float alpha = 1.0f;
     uint mixmode = sprite2ds[i]->GetMixMode ();
-    if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
-      alpha = (mixmode & CS_FX_MASK_ALPHA) / 255.0f;
+    float alpha = 1.0f - ((mixmode & CS_FX_MASK_ALPHA) / 255.0f);
 
     size_t j;
     for (j = 0 ; j < part_sides ; j++)
@@ -399,9 +397,11 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
 
   // Prepare for rendering.
   uint mixmode = sprite2ds[0]->GetMixMode ();
-  if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
-    mixmode = (mixmode & ~CS_FX_MASK_ALPHA) | 0xff;
-  rm->mixmode = mixmode;
+  if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_COPY)
+    // Hack to force alpha blending...
+    mixmode = CS_FX_ALPHA | (mixmode & CS_FX_MASK_ALPHA);
+  else
+    rm->mixmode = mixmode & ~CS_FX_MASK_ALPHA;
   rm->clip_portal = ClipPortal;
   rm->clip_plane = ClipPlane;
   rm->clip_z_plane = ClipZ;

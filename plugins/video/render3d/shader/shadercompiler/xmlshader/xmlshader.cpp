@@ -761,12 +761,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   else
     modes.alphaType = thispass->alphaMode.alphaType;
   // Override mixmode, if requested
-  if ((thispass->mixMode & CS_FX_MASK_MIXMODE) == CS_FX_MESH)
-  {
-    if ((modes.mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
-      modes.alphaType = csAlphaMode::alphaSmooth;
-  }
-  else
+  if ((thispass->mixMode & CS_MIXMODE_TYPE_MASK) != CS_FX_MESH)
     modes.mixmode = thispass->mixMode;
 
   if(thispass->vp) thispass->vp->SetupState (mesh, modes, stacks);
@@ -915,13 +910,37 @@ void csShaderConditionResolver::AddToRealNode (csRealConditionNode* realNode,
       falseNode->nodes.Push (realNode->falseNode);
       return;
     }
-    if (evaluator.ConditionIndependent (realNode->condition, true, condition))
-      AddToRealNode (realNode->trueNode, condition, trueNode, falseNode);
-    if (evaluator.ConditionIndependent (realNode->condition, false, condition))
-      AddToRealNode (realNode->falseNode, condition, trueNode, falseNode);
+    if (CheckIndependency (realNode, condition))
+    {
+      if (evaluator.ConditionIndependent (realNode->condition, true, condition))
+	AddToRealNode (realNode->trueNode, condition, trueNode, falseNode);
+      if (evaluator.ConditionIndependent (realNode->condition, false, condition))
+	AddToRealNode (realNode->falseNode, condition, trueNode, falseNode);
+    }
   }
 }
   
+bool csShaderConditionResolver::CheckIndependency (csRealConditionNode* node, 
+						   csConditionID condition)
+{
+  if (node->parent == 0) return true;
+
+  if (node == node->parent->trueNode)
+  {
+    if (!evaluator.ConditionIndependent (node->parent->condition, true, 
+      condition))
+      return false;
+  }
+  else
+  {
+    if (!evaluator.ConditionIndependent (node->parent->condition, false, 
+      condition))
+      return false;
+  }
+
+  return CheckIndependency (node->parent, condition);
+}
+
 size_t csShaderConditionResolver::GetVariant (csRealConditionNode* node)
 {
   csBitArray bits (evaluator.GetNumConditions ());

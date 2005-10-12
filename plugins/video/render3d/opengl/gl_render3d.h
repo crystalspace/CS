@@ -457,8 +457,7 @@ public:
   iTextureManager* GetTextureManager () 
   { return (iTextureManager*)((csGLTextureManager*)txtmgr); }
 
-  void SetMixMode (uint mode);
-  void SetAlphaType (csAlphaMode::AlphaType alphaType);
+  void SetMixMode (uint mode, csAlphaMode::AlphaType alphaType);
   void SetGlOrtho (bool inverted);
   float GetAspect () const { return aspect; }
 

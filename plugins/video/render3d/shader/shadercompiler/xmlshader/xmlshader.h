@@ -232,6 +232,13 @@ class csShaderConditionResolver : public iConditionResolver
   
   void AddToRealNode (csRealConditionNode* node, csConditionID condition, 
     csConditionNode* trueNode, csConditionNode* falseNode);
+  /**
+   * Check whether \a condition is independent in the parents of node.
+   * Returns 'false' if the condition is actually already contained in
+   * one of the parent conditions.
+   */
+  bool CheckIndependency (csRealConditionNode* node, 
+    csConditionID condition);
   void DumpConditionNode (csString& out, csRealConditionNode* node, int level);
   size_t GetVariant (csRealConditionNode* node);
 public:

@@ -104,9 +104,9 @@ void csSoftShader_FP::SetupState (const csRenderMesh* mesh,
     65536.0f, 1.0f/32768.0f);
   int shift;
   if (f >= 1.0)
-    shift = csLog2 (f);
+    shift = csLog2 ((int)f);
   else
-    shift = -csLog2 (1.0f/f);
+    shift = -csLog2 ((int)(1.0f/f));
   shaderPlug->scanlineRenderer->SetShift (shift);
 }
 

@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Oct-2005
+	- res enhanced the mixmode abilities a bit.
+	- res added blending support to SR.
 11-Oct-2005
 	- Piotr Obrzut fixed ode colliders that they work now when we are
 	  changing geometry after body is attached and added mehtod getting

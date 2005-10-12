@@ -26,7 +26,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csplugincommon/softshader/renderinterface.h"
 #include "csplugincommon/shader/shaderplugin.h"
 
-#include "scanline.h"
+#include "scanline_base.h"
 
 namespace cspluginSoftshader
 {

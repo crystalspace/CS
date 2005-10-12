@@ -22,6 +22,8 @@
 
 #include "ivideo/graph2d.h"
 
+#include "csgeom/math.h"
+
 namespace cspluginSoftshader
 {
   template<typename Pix, 
@@ -42,6 +44,46 @@ namespace cspluginSoftshader
 	| (((r & mr) << srl) >> srr)
 	| (((g & mg) << sgl) >> sgr)
 	| (((b & mb) << sbl) >> sbr);
+    }
+
+    CS_FORCEINLINE
+    void MultiplyDstAdd (PixType* dest, 
+      uint8 Mr, uint8 Mg, uint8 Mb, uint8 Ma,
+      uint8 ar, uint8 ag, uint8 ab, uint8 aa)
+    {
+      // @@@ Bleh: optimize.
+      uint8 dr, dg, db, da;
+      GetPix (dest, dr, dg, db, da);
+      WritePix (dest, 
+	csClamp<uint> (((dr * (Mr+1)) >> 8) + ar, 255, 0),
+	csClamp<uint> (((dg * (Mg+1)) >> 8) + ag, 255, 0),
+	csClamp<uint> (((db * (Mb+1)) >> 8) + ab, 255, 0),
+	csClamp<uint> (((da * (Ma+1)) >> 8) + aa, 255, 0));
+    }
+
+    CS_FORCEINLINE
+    void MultiplyDstAdd (PixType* dest, 
+      uint8 M, uint8 ar, uint8 ag, uint8 ab, uint8 aa)
+    {
+      const uint v = M+1;
+      // @@@ Bleh: optimize.
+      uint8 dr, dg, db, da;
+      GetPix (dest, dr, dg, db, da);
+      WritePix (dest, 
+	csClamp<uint> (((dr * v) >> 8) + ar, 255, 0),
+	csClamp<uint> (((dg * v) >> 8) + ag, 255, 0),
+	csClamp<uint> (((db * v) >> 8) + ab, 255, 0),
+	csClamp<uint> (((da * v) >> 8) + aa, 255, 0));
+    }
+
+    CS_FORCEINLINE
+    void GetPix (PixType* dest, uint8& r, uint8& g, uint8& b, uint8& a) const
+    {
+      const PixType px = *dest;
+      r = ((px << srr) >> srl) & mr;
+      g = ((px << sgr) >> sgl) & mg;
+      b = ((px << sbr) >> sbl) & mb;
+      a = ((px << sar) >> sal) & ma;
     }
   };
 
@@ -110,6 +152,56 @@ namespace cspluginSoftshader
 	  | ((b & bMask) << bShift)
 	  | ((g & gMask) << gShift) 
 	  | ((r & rMask) >> rShift); 
+    }
+
+    CS_FORCEINLINE
+    void MultiplyDstAdd (PixType* dest, 
+      uint8 Mr, uint8 Mg, uint8 Mb, uint8 Ma,
+      uint8 ar, uint8 ag, uint8 ab, uint8 aa)
+    {
+      // @@@ Bleh: optimize.
+      uint8 dr, dg, db, da;
+      GetPix (dest, dr, dg, db, da);
+      WritePix (dest, 
+	csClamp<uint> (((dr * (Mr+1)) >> 8) + ar, 255, 0),
+	csClamp<uint> (((dg * (Mg+1)) >> 8) + ag, 255, 0),
+	csClamp<uint> (((db * (Mb+1)) >> 8) + ab, 255, 0),
+	csClamp<uint> (((da * (Ma+1)) >> 8) + aa, 255, 0));
+    }
+
+    CS_FORCEINLINE
+    void MultiplyDstAdd (PixType* dest, 
+      uint8 M, uint8 ar, uint8 ag, uint8 ab, uint8 aa)
+    {
+      const uint v = M+1;
+      // @@@ Bleh: optimize.
+      uint8 dr, dg, db, da;
+      GetPix (dest, dr, dg, db, da);
+      WritePix (dest, 
+	csClamp<uint> (((dr * v) >> 8) + ar, 255, 0),
+	csClamp<uint> (((dg * v) >> 8) + ag, 255, 0),
+	csClamp<uint> (((db * v) >> 8) + ab, 255, 0),
+	csClamp<uint> (((da * v) >> 8) + aa, 255, 0));
+    }
+
+    CS_FORCEINLINE
+    void GetPix (PixType* dest, uint8& r, uint8& g, uint8& b, uint8& a) const
+    {
+      const PixType px = *dest;
+      if (OrderRGB)
+      {
+	a = (px >> aShift) & aMask;
+	r = (px >> rShift) & rMask;
+	g = (px >> gShift) & gMask;
+	b = (px << bShift) & bMask;
+      }
+      else
+      {
+	a = (px >> aShift) & aMask;
+	b = (px >> bShift) & bMask;
+	g = (px >> gShift) & gMask;
+	r = (px << rShift) & rMask;
+      }
     }
   };
 } // namespace cspluginSoftshader

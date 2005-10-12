@@ -4,3 +4,4 @@ Description softshader : "Render3d Shaderplugin for software renderer" ;
 Plugin softshader : [ Wildcard *.cpp *.h ] ;
 LinkWith softshader : crystalspace ;
 CompileGroups softshader : shaders renderers renderall ;
+MsvcCFlags softshader : "/Zm200" ;

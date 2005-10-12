@@ -405,7 +405,6 @@ int csSpriteBuilderMesh::StoreFrameInfo (int FrameCount, int VertexCount)
 
 void csSpriteBuilderMesh::EnableTiling ()
 {
-  Out->SetMixMode (Out->GetMixMode () | CS_FX_TILING);
 }
 
 void csSpriteBuilderMesh::BeginFrame (int Num)
