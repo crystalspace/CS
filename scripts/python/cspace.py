@@ -11323,6 +11323,7 @@ class iDynamicsSystemCollider(iBase):
     def FillWithColliderGeometry(*args): return _cspace.iDynamicsSystemCollider_FillWithColliderGeometry(*args)
     def GetGeometryType(*args): return _cspace.iDynamicsSystemCollider_GetGeometryType(*args)
     def GetTransform(*args): return _cspace.iDynamicsSystemCollider_GetTransform(*args)
+    def GetLocalTransform(*args): return _cspace.iDynamicsSystemCollider_GetLocalTransform(*args)
     def SetTransform(*args): return _cspace.iDynamicsSystemCollider_SetTransform(*args)
     def GetBoxGeometry(*args): return _cspace.iDynamicsSystemCollider_GetBoxGeometry(*args)
     def GetSphereGeometry(*args): return _cspace.iDynamicsSystemCollider_GetSphereGeometry(*args)
