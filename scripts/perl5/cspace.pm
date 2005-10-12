@@ -12479,6 +12479,7 @@ package cspace::iDynamicsSystemCollider;
 *FillWithColliderGeometry = *cspacec::iDynamicsSystemCollider_FillWithColliderGeometry;
 *GetGeometryType = *cspacec::iDynamicsSystemCollider_GetGeometryType;
 *GetTransform = *cspacec::iDynamicsSystemCollider_GetTransform;
+*GetLocalTransform = *cspacec::iDynamicsSystemCollider_GetLocalTransform;
 *SetTransform = *cspacec::iDynamicsSystemCollider_SetTransform;
 *GetBoxGeometry = *cspacec::iDynamicsSystemCollider_GetBoxGeometry;
 *GetSphereGeometry = *cspacec::iDynamicsSystemCollider_GetSphereGeometry;
