@@ -143,13 +143,15 @@ public:
 	    float y = outPoly[i].y;
 	    size_t edge1 [2], edge2 [2];
 	    // Determine edges from which to interpolate the vertex data
-	    if ((y >= v[0].y && y <= v[1].y) ||
-	      (y <= v[0].y && y >= v[1].y))
+	    if ((fabs(v[0].y - v[1].y) > EPSILON) 
+              && ((y >= v[0].y && y <= v[1].y)
+              || (y <= v[0].y && y >= v[1].y)))
 	    {
 	      edge1[0] = 0;
 	      edge1[1] = 1;
-	      if ((y >= v[1].y && y <= v[2].y) ||
-		(y <= v[1].y && y >= v[2].y))
+	      if ((fabsf(v[1].y - v[2].y) > EPSILON) 
+                && ((y >= v[1].y && y <= v[2].y)
+                || (y <= v[1].y && y >= v[2].y)))
 	      {
 		edge2[0] = 1;
 		edge2[1] = 2;
@@ -172,12 +174,8 @@ public:
 	    const csVector3& C = v[edge2 [0]];
 	    const csVector3& D = v[edge2 [1]];
 	    // Coefficients
-            /* dy1/dy2 check to prevent a gcc optimize mode crash
-             * however something is _seriously_ off here [res] */ 
-            const float dy1 = (B.y - A.y);
-	    const float t1 = (dy1 > EPSILON) ? (y - A.y) / dy1 : 1.0f;
-            const float dy2 = (B.y - A.y);
-	    const float t2 = (dy2 > EPSILON) ? (y - C.y) / dy2 : 1.0f;
+	    const float t1 = (y - A.y) / (B.y - A.y);
+	    const float t2 = (y - C.y) / (D.y - C.y);
 	    const float x1 = A.x + t1 * (B.x - A.x);
 	    const float x2 = C.x + t2 * (D.x - C.x);
 	    const float dx = (x2 - x1);
