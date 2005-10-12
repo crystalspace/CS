@@ -96,22 +96,28 @@ if $(CAL3D.AVAILABLE) = "yes"
   WALKALL.PLUGINLIST += sprcal3d sprcal3dldr ;
 }
 
+# Plugins needed by both software & GL renderers
+if $(X11.AVAILABLE) = "yes"
+{
+  WALKALL.PLUGINLIST += xwin xextshm ;
+  if $(XFREE86VM.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += xext86vm ; }
+}
+
 if $(GL.AVAILABLE) = "yes"
 {
   WALKALL.PLUGINLIST += gl3d glshader_arb glshader_fixed ;
   
   # GL canvases
-  if $(GLX.AVAILABLE) = "yes" { STATIC.PLUGINLIST += glx2d ; }
-  if $(TARGET.OS) = "WIN32" && $(GL.AVAILABLE) = "yes"
-    { WALKALL.PLUGINLIST += glwin32 ; }
-  if $(TARGET.OS) = "MACOS_X" && $(GL.AVAILABLE) = "yes"
-    { WALKALL.PLUGINLIST += glosx2d ; }
+  if $(GLX.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += glx2d ; }
+  if $(TARGET.OS) = "WIN32" { WALKALL.PLUGINLIST += glwin32 ; }
+  if $(TARGET.OS) = "MACOS_X" { WALKALL.PLUGINLIST += glosx2d ; }
 }
 else
 {
-  # Software canvases. 
-  if $(X11.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += x2d xextshm xwin ; }
-  if $(XFREE86VM.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += xext86vm ; }
+  WALKALL.PLUGINLIST += soft3d softshader ;
+
+  # Software canvases.
+  if $(X11.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += x2d ; }
   if $(DIRECTX.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += ddraw2d ; }
   if $(TARGET.OS) = "MACOS_X" { WALKALL.PLUGINLIST += cgdriver2d ; }
   #if $(LIBCACA.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += cacacanvas ; }

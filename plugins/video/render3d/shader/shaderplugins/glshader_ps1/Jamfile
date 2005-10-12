@@ -6,5 +6,5 @@ Description glshader_ps1 : "PS 1.x emulation shader" ;
 Plugin glshader_ps1 : [ Wildcard *.cpp *.h ] ;
 LinkWith glshader_ps1 : crystalspace ;
 ExternalLibs glshader_ps1 : GL ;
-CompileGroups glshader_ps1 : shaders renderers renderall ;
+CompileGroups glshader_ps1 : shaders renderers renderall openglrenderer ;
 }

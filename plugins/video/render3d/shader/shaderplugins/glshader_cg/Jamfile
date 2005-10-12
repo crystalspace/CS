@@ -6,5 +6,5 @@ Description glshader_cg : "CG shader" ;
 Plugin glshader_cg : [ Wildcard *.cpp *.h ] ;
 LinkWith glshader_cg : crystalspace ;
 ExternalLibs glshader_cg : CG ;
-CompileGroups glshader_cg : shaders renderers renderall ;
+CompileGroups glshader_cg : shaders renderers renderall openglrenderer ;
 }

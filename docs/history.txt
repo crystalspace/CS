@@ -9,6 +9,11 @@ chronological order.
 12-Oct-2005
 	- res enhanced the mixmode abilities a bit.
 	- res added blending support to SR.
+        - res fixed some walkall issues (notably, not all needed canvas
+          plugins were always compiled).
+        - res added the softrenderer and openglrenderer compile groups.
+        - res worked around a gcc SR optimize mode crash. Needs more
+          investigation though.
 11-Oct-2005
 	- Piotr Obrzut fixed ode colliders that they work now when we are
 	  changing geometry after body is attached and added mehtod getting

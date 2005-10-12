@@ -6,7 +6,7 @@ Description gl3d : "3D OpenGL renderer" ;
 Plugin gl3d : [ Wildcard *.cpp *.h ] ;
 LinkWith gl3d : crystalspace ;
 ExternalLibs gl3d : GL ;
-CompileGroups gl3d : renderers renderall ;
+CompileGroups gl3d : renderers renderall openglrenderer ;
 
 # Historic alias.
 NotFile glrender3d ;

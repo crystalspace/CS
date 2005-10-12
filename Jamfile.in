@@ -43,24 +43,31 @@ BuildDepend dep ;
 SubInclude TOP mk ;
 
 # Define our compile groups
-Description sounddrivers : "sound drivers" ;
-Description soundloaders : "sound loaders" ;
-Description sndsys       : "sound system" ;
-Description imageloaders : "image loaders" ;
-Description fontservers  : "font servers" ;
-Description canvases	 : "2D canvases" ;
-Description renderers	 : "3D renderers" ;
-Description meshes	 : "mesh plugins and loaders" ;
-Description meshimpexp   : "mesh import/export plugins" ;
-Description walkall  	 : "Walktest application and all required plugins" ;
-Description openglcanvas : "canvas for the OpenGL renderer" ;
-Description softcanvas   : "canvas for the software renderer" ;
-Description proctexes    : "procedural texture plugins" ;
-Description renderall    : "modules related to rendering" ;
-Description shaders      : "shaders and related modules" ;
+Description sounddrivers   : "sound drivers" ;
+Description soundloaders   : "sound loaders" ;
+Description sndsys         : "sound system" ;
+Description imageloaders   : "image loaders" ;
+Description fontservers    : "font servers" ;
+Description canvases	   : "2D canvases" ;
+Description renderers	   : "3D renderers" ;
+Description meshes	   : "mesh plugins and loaders" ;
+Description meshimpexp     : "mesh import/export plugins" ;
+Description walkall  	   : "Walktest application and all required plugins" ;
+Description openglcanvas   : "canvas for the OpenGL renderer" ;
+Description softcanvas     : "canvas for the software renderer" ;
+Description proctexes      : "procedural texture plugins" ;
+Description renderall      : "modules related to rendering" ;
+Description shaders        : "shaders and related modules" ;
+Description softrenderer   : "software renderer and related plugins" ;
+Description openglrenderer : "OpenGL renderer and related plugins" ;
 RegisterCompileGroups sounddrivers soundloaders sndsys imageloaders fontservers
 		      canvases renderers meshes meshimpexp walkall
-                      openglcanvas softcanvas proctexes renderall shaders ;
+                      openglcanvas softcanvas proctexes renderall shaders 
+                      softrenderer openglrenderer ;
+
+# Useful dependencies
+Depends softrenderer : softcanvas ;
+Depends openglrenderer : openglcanvas ;
 
 # Historic group aliases.
 NotFile drivers2d ;

@@ -141,6 +141,7 @@ namespace cspluginSoft3d
 	max_x = -99999;
 	min_z = 99999;
 	max_z = -99999;
+        top = bot = 0; // shaddap gcc 
 	compareNum = vertNum;
       }
       for (i = 0 ; i < compareNum ; i += 2)

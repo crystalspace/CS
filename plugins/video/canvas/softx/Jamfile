@@ -6,5 +6,5 @@ Description x2d : "XLib 2D driver" ;
 Plugin x2d : [ Wildcard *.cpp *.h ] ;
 LinkWith x2d : crystalspace ;
 ExternalLibs x2d : X11 ;
-CompileGroups x2d : canvases ;
+CompileGroups x2d : canvases softcanvas ;
 }

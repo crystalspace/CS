@@ -6,5 +6,5 @@ Description xext86vm : "X-Extension Video Mode Plugin" ;
 Plugin xext86vm : [ Wildcard *.cpp *.h ] ;
 LinkWith xext86vm : crystalspace ;
 ExternalLibs xext86vm : XFREE86VM ;
-CompileGroups xext86vm : canvases softcanvas ;
+CompileGroups xext86vm : canvases softcanvas openglcanvas ;
 }

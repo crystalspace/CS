@@ -3,4 +3,4 @@ SubDir TOP plugins video render3d shader shadercompiler xmlshader ;
 Description xmlshader : "XML-format shader compiler" ;
 Plugin xmlshader : [ Wildcard *.cpp *.h ] ;
 LinkWith xmlshader : crystalspace ;
-CompileGroups xmlshader : shaders renderers renderall ;
+CompileGroups xmlshader : shaders renderers renderall openglrenderer softrenderer ;

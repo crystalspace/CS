@@ -3,4 +3,4 @@ SubDir TOP plugins video render3d shader shadermgr ;
 Description shadermgr : "shader manager" ;
 Plugin shadermgr : [ Wildcard *.cpp *.h ] ;
 LinkWith shadermgr : crystalspace ;
-CompileGroups shadermgr : shaders renderers renderall ;
+CompileGroups shadermgr : shaders renderers renderall openglrenderer softrenderer ;

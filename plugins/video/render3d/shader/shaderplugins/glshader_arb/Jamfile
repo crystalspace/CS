@@ -6,5 +6,5 @@ Description glshader_arb : "ARB vp/fp shader" ;
 Plugin glshader_arb : [ Wildcard *.cpp *.h ] ;
 LinkWith glshader_arb : crystalspace ;
 ExternalLibs glshader_arb : GL ;
-CompileGroups glshader_arb : shaders renderers renderall ;
+CompileGroups glshader_arb : shaders renderers renderall openglrenderer ;
 }

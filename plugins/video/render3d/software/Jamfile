@@ -15,7 +15,7 @@ Description soft3d : "3D software renderer" ;
 Plugin soft3d : [ Filter [ Wildcard *.cpp *.h ] : 
   scan16.cpp scan32.cpp ] $(SOFT3D_ASMFILES) ;
 LinkWith soft3d : crystalspace ;
-CompileGroups soft3d : renderers ;
+CompileGroups soft3d : renderers softrenderer ;
 
 # Historic alias.
 NotFile softrender3d ;

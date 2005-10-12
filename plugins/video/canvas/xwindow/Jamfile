@@ -18,7 +18,7 @@ if $(X11.AVAILABLE) = "yes"
   Description xwin : "X Window Plugin" ;
   Plugin xwin : [ Wildcard *.cpp *.h ] $(XWIN_XALERT) ;
   LinkWith xwin : crystalspace ;
-  CompileGroups xwin : canvases softcanvas ;
+  CompileGroups xwin : canvases softcanvas openglcanvas ;
   if $(XFREE86VM.AVAILABLE) = "yes"
   {
     CFlags xwin : [ FDefines XFREE86VM ] ;

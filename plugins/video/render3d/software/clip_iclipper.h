@@ -172,8 +172,12 @@ public:
 	    const csVector3& C = v[edge2 [0]];
 	    const csVector3& D = v[edge2 [1]];
 	    // Coefficients
-	    const float t1 = (y - A.y) / (B.y - A.y);
-	    const float t2 = (y - C.y) / (D.y - C.y);
+            /* dy1/dy2 check to prevent a gcc optimize mode crash
+             * however something is _seriously_ off here [res] */ 
+            const float dy1 = (B.y - A.y);
+	    const float t1 = (dy1 > EPSILON) ? (y - A.y) / dy1 : 1.0f;
+            const float dy2 = (B.y - A.y);
+	    const float t2 = (dy2 > EPSILON) ? (y - C.y) / dy2 : 1.0f;
 	    const float x1 = A.x + t1 * (B.x - A.x);
 	    const float x2 = C.x + t2 * (D.x - C.x);
 	    const float dx = (x2 - x1);

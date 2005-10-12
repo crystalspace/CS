@@ -6,5 +6,5 @@ Description xextshm : "X-Extension Shared Memory Plugin" ;
 Plugin xextshm : [ Wildcard *.cpp *.h ] ;
 LinkWith xextshm : crystalspace ;
 ExternalLibs xextshm : X11 ;
-CompileGroups xextshm : canvases softcanvas ;
+CompileGroups xextshm : canvases softcanvas openglcanvas ;
 }
