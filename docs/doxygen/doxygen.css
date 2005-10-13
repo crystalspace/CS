@@ -276,6 +276,8 @@ SPAN.charliteral   { color: #008080 }
 
 .search     
 { 
+    background-color: #f0f0f2;
+    border: 1px solid #84b0c7;
 	color: #003399;
 	font-family: Verdana, sans-serif;
 	font-size: 10pt;
