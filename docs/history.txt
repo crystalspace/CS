@@ -20,6 +20,7 @@ chronological order.
 	  the GL one).
 	- res removed a superfluous x86_64 codegen check.
 	- res made some more doxygen css tweaks.
+	- Jorrit fixed a few bugs in the new specular shader.
 12-Oct-2005
 	- res enhanced the mixmode abilities a bit.
 	- res added blending support to SR.
