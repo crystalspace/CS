@@ -227,7 +227,7 @@ enum
    * The fragment value written to the framebuffer is computed from the 
    * formula \c SRC * \c srcFactor + \c DST * \c dstFactor. 
    * \c srcFactor and \c dstFactor are one of 
-   * \link CS_MIXMODE_FACT_ONE CS_MIXMODE_FACT_xxx \endlink, encoded into
+   * \link #CS_MIXMODE_FACT_ZERO CS_MIXMODE_FACT_xxx \endlink, encoded into
    * the mixmode specifier with #CS_MIXMODE_BLEND.
    */
   CS_MIXMODE_TYPE_BLENDOP	= 0x40000000,
@@ -295,7 +295,7 @@ enum
 /**
  * Helper macro to construct a blending operation mixmode.
  * \a Src and \a Dst are 
- * \link CS_MIXMODE_FACT_ONE blending op factors \endlink, however sans the
+ * \link #CS_MIXMODE_FACT_ZERO blending op factors \endlink, however sans the
  * CS_MIXMODE_FACT_ prefix. E.g.:
  * \code
  * uint mixmode = CS_MIXMODE_BLEND(SRCALPHA, SRCALPHA_INV);
