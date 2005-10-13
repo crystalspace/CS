@@ -894,8 +894,6 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	    [CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon])
 	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon -march=athlon])
 	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon])
-	    CS_CHECK_CODE_GEN_FLAG([x86_64], [-march=k8])
- 	    CS_CHECK_CODE_GEN_FLAG([x86_64], [-mtune=k8])
 	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686])
 	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro -march=i686])
 	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro])

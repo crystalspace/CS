@@ -47,6 +47,8 @@ public:
   virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
     const utf8_char* text, uint flags)
   {
+    if (!text || !*text) return;
+
     int realColorFG;
     uint8 alphaFG;
     SplitAlpha (fg, realColorFG, alphaFG);

@@ -332,6 +332,11 @@ div.content {
 	margin-right: 0.5cm;
 }
 
+DIV.tabs A
+{
+	font-size: 10pt;
+}
+
 @media print 
 {
 
