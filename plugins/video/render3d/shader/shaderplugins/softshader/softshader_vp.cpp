@@ -23,7 +23,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/xmltiny.h"
 #include "iutil/document.h"
 #include "iutil/string.h"
 #include "iutil/vfs.h"
@@ -33,9 +32,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "softshader_vp.h"
 
-SCF_IMPLEMENT_IBASE(csSoftShader_VP)
-  SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
-SCF_IMPLEMENT_IBASE_END
+namespace cspluginSoftshader
+{
 
 void csSoftShader_VP::Activate()
 {
@@ -45,42 +43,12 @@ void csSoftShader_VP::Deactivate()
 {
 }
 
-void csSoftShader_VP::BuildTokenHash()
-{
-  xmltokens.Register("softvp", XMLTOKEN_SOFTVP);
-
-  xmltokens.Register("integer", 100+csShaderVariable::INT);
-  xmltokens.Register("float", 100+csShaderVariable::FLOAT);
-  xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
-}
-
-bool csSoftShader_VP::Load (iShaderTUResolver* resolve, iDataBuffer* program)
-{
-  csRef<iDocumentSystem> xml (
-    CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
-  if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
-  csRef<iDocument> doc = xml->CreateDocument ();
-  const char* error = doc->Parse (program, true);
-  if (error != 0)
-  { 
-    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, 
-      "crystalspace.graphics3d.shader.software", "XML error '%s'!", error);
-    return false;
-  }
-  return Load (resolve, doc->GetRoot());
-}
-
 bool csSoftShader_VP::Load (iShaderTUResolver*, iDocumentNode* program)
 {
   if(!program)
     return false;
 
-  BuildTokenHash();
-
-  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  csRef<iShaderManager> shadermgr = 
-    CS_QUERY_REGISTRY(object_reg, iShaderManager);
-
+#if 0
   csRef<iDocumentNode> variablesnode = program->GetNode("softvp");
   if(variablesnode)
   {
@@ -95,6 +63,7 @@ bool csSoftShader_VP::Load (iShaderTUResolver*, iDocumentNode* program)
       // @@@ FIXME: Implement me.
     }
   }
+#endif
 
   return true;
 }
@@ -104,3 +73,5 @@ bool csSoftShader_VP::Compile()
   // @@@ FIXME: Implement me.
   return true;
 }
+
+} // namespace cspluginSoftshader

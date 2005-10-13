@@ -40,21 +40,9 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGLShader_FIXED)
 
-SCF_IMPLEMENT_IBASE(csGLShader_FIXED)
-  SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLShader_FIXED::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-
-csGLShader_FIXED::csGLShader_FIXED(iBase* parent)
+csGLShader_FIXED::csGLShader_FIXED(iBase* parent) : 
+  scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
   enable = false;
   enableCombine = false;
   texUnits = 0;
@@ -63,8 +51,6 @@ csGLShader_FIXED::csGLShader_FIXED(iBase* parent)
 
 csGLShader_FIXED::~csGLShader_FIXED()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csGLShader_FIXED::Report (int severity, const char* msg, ...)

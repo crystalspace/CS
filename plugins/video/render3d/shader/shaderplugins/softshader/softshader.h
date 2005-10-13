@@ -33,7 +33,9 @@ namespace cspluginSoftshader
 
 using namespace CrystalSpace::SoftShader;
 
-class csSoftShader : public iShaderProgramPlugin
+class csSoftShader : public scfImplementation2<csSoftShader, 
+					       iShaderProgramPlugin,
+					       iComponent>
 {
 public:
   iObjectRegistry* object_reg;
@@ -43,33 +45,22 @@ public:
 private:
   bool enable;
 public:
-  SCF_DECLARE_IBASE;
-  
   csSoftShader (iBase *parent);
   virtual ~csSoftShader ();
 
-  ////////////////////////////////////////////////////////////////////
-  //                      iShaderProgramPlugin
-  ////////////////////////////////////////////////////////////////////
+  /**\name iShaderProgramPlugin implementation
+   * @{ */
   virtual csPtr<iShaderProgram> CreateProgram(const char* type) ;
 
   virtual bool SupportType(const char* type);
 
   virtual void Open();
+  /** @} */
 
-
-  ////////////////////////////////////////////////////////////////////
-  //                          iComponent
-  ////////////////////////////////////////////////////////////////////
-
+  /**\name iComponent implementation
+   * @{ */
   bool Initialize (iObjectRegistry* reg);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSoftShader);
-    virtual bool Initialize (iObjectRegistry* reg)
-      { return scfParent->Initialize (reg); }
-  } scfiComponent;
+  /** @} */
 };
 
 } // namespace cspluginSoftshader

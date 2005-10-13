@@ -41,28 +41,15 @@ namespace cspluginSoftshader
 
 SCF_IMPLEMENT_FACTORY (csSoftShader)
 
-SCF_IMPLEMENT_IBASE(csSoftShader)
-  SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSoftShader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-
-csSoftShader::csSoftShader(iBase* parent) : object_reg(0), 
-  scanlineRenderer(0), enable(false)
+csSoftShader::csSoftShader(iBase* parent) : 
+  scfImplementationType (this, parent), object_reg(0), scanlineRenderer(0), 
+  enable(false)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSoftShader::~csSoftShader()
 {
   delete scanlineRenderer;
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 ////////////////////////////////////////////////////////////////////

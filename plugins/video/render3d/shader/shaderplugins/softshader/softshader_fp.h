@@ -17,8 +17,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GLSHADER_CGFP_H__
-#define __GLSHADER_CGFP_H__
+#ifndef __SOFTSHADER_FP_H__
+#define __SOFTSHADER_FP_H__
 
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
@@ -82,7 +82,7 @@ public:
   virtual bool Compile();
 };
 
-} // cspluginSoftshader
+} // namespace cspluginSoftshader
 
-#endif //__GLSHADER_CGFP_H__
+#endif //__SOFTSHADER_FP_H__
 

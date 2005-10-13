@@ -26,7 +26,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 struct csGLExtensionManager;
 class csGLStateCache;
 
-class csGLShader_PS1 : public iShaderProgramPlugin
+class csGLShader_PS1 : public scfImplementation2<csGLShader_PS1, 
+					         iShaderProgramPlugin,
+					         iComponent>
 {
 private:
   bool enable;
@@ -40,34 +42,23 @@ public:
   bool useLists;
   bool doVerbose;
 
-  SCF_DECLARE_IBASE;
-  
   csGLShader_PS1 (iBase *parent);
   virtual ~csGLShader_PS1 ();
 
   
-  ////////////////////////////////////////////////////////////////////
-  //                      iShaderProgramPlugin
-  ////////////////////////////////////////////////////////////////////
+  /**\name iShaderProgramPlugin implementation
+   * @{ */
   virtual csPtr<iShaderProgram> CreateProgram(const char* type) ;
 
   virtual bool SupportType(const char* type);
 
   void Open();
+  /** @} */
 
-
-  ////////////////////////////////////////////////////////////////////
-  //                          iComponent
-  ////////////////////////////////////////////////////////////////////
-
+  /**\name iComponent implementation
+   * @{ */
   bool Initialize (iObjectRegistry* reg);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGLShader_PS1);
-    virtual bool Initialize (iObjectRegistry* reg)
-      { return scfParent->Initialize (reg); }
-  } scfiComponent;
+  /** @} */
 };
 
 #endif //__GLSHADER_PS1_H__

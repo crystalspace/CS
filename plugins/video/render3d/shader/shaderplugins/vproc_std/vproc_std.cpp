@@ -33,21 +33,9 @@ CS_LEAKGUARD_IMPLEMENT (csVProcStandardPlugin);
 
 SCF_IMPLEMENT_FACTORY (csVProc_Std)
 
-SCF_IMPLEMENT_IBASE(csVProc_Std)
-  SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csVProc_Std::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-
-csVProc_Std::csVProc_Std(iBase* parent)
+csVProc_Std::csVProc_Std(iBase* parent) : scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
   isOpen = false;
   memset (&lightCalculatorMatrix, 0, sizeof(iVertexLightCalculator*)*16);
 }
@@ -56,8 +44,6 @@ csVProc_Std::~csVProc_Std()
 {
   for (uint i = 0; i < 16; i++)
     delete lightCalculatorMatrix[i];
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csVProc_Std::Initialize (iObjectRegistry *reg)

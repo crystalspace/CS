@@ -42,7 +42,7 @@ csWrappedDocumentNode::csWrappedDocumentNode (csWrappedDocumentNodeFactory* shar
 					      iDocumentNode* wrapped_node,
 					      iConditionResolver* res)
   : scfImplementationType (this), wrappedNode (wrapped_node), resolver (res),
-  objreg (shared_fact->objreg), shared (shared_fact)
+    objreg (shared_fact->objreg), shared (shared_fact)
 {
   CS_ASSERT (resolver);
   globalState.AttachNew (new GlobalProcessingState);
@@ -54,8 +54,9 @@ csWrappedDocumentNode::csWrappedDocumentNode (iDocumentNode* wrapped_node,
 					      csWrappedDocumentNode* parent,
 					      csWrappedDocumentNodeFactory* shared_fact, 
 					      GlobalProcessingState* global_state)
-  : scfImplementationType (this), wrappedNode (wrapped_node), resolver (parent->resolver),
-  objreg (shared_fact->objreg), shared (shared_fact), globalState (global_state)
+  : scfImplementationType (this), wrappedNode (wrapped_node), 
+    resolver (parent->resolver), objreg (shared_fact->objreg), 
+    shared (shared_fact), globalState (global_state)
 {
   ProcessWrappedNode ();
 }

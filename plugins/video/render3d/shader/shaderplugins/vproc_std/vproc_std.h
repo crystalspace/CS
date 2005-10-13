@@ -26,12 +26,12 @@
 
 struct iVertexLightCalculator;
 
-class csVProc_Std : public iShaderProgramPlugin
+class csVProc_Std : public scfImplementation2<csVProc_Std, 
+					      iShaderProgramPlugin,
+					      iComponent>
 {
 public:
   CS_LEAKGUARD_DECLARE (csVProcStandardPlugin);
-  SCF_DECLARE_IBASE;
-
 
   csVProc_Std (iBase *parent);
   virtual ~csVProc_Std ();
@@ -39,27 +39,19 @@ public:
   iVertexLightCalculator* GetLightCalculator (
     const csLightProperties& light, bool useAttenuation = true);
 
-  ////////////////////////////////////////////////////////////////////
-  //                      iShaderProgramPlugin
-  ////////////////////////////////////////////////////////////////////
+  /**\name iShaderProgramPlugin implementation
+   * @{ */
   virtual csPtr<iShaderProgram> CreateProgram(const char* type) ;
 
   virtual bool SupportType(const char* type);
 
   void Open();
+  /** @} */
 
-  ////////////////////////////////////////////////////////////////////
-  //                          iComponent
-  ////////////////////////////////////////////////////////////////////
-
+  /**\name iComponent implementation
+   * @{ */
   bool Initialize (iObjectRegistry* reg);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csVProc_Std);
-    virtual bool Initialize (iObjectRegistry* reg)
-    { return scfParent->Initialize (reg); }
-  } scfiComponent;
+  /** @} */
 
   iObjectRegistry *objreg;
   csRef<iShaderManager> shaderManager;

@@ -23,7 +23,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/xmltiny.h"
 #include "imap/services.h"
 #include "iutil/document.h"
 #include "iutil/string.h"

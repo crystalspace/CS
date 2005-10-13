@@ -41,29 +41,15 @@ CS_LEAKGUARD_IMPLEMENT (csGLShader_ARB);
 
 SCF_IMPLEMENT_FACTORY (csGLShader_ARB)
 
-SCF_IMPLEMENT_IBASE(csGLShader_ARB)
-  SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLShader_ARB::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-
-csGLShader_ARB::csGLShader_ARB(iBase* parent)
+csGLShader_ARB::csGLShader_ARB(iBase* parent) : 
+  scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
   enable = false;
   isOpen = false;
 }
 
 csGLShader_ARB::~csGLShader_ARB()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 ////////////////////////////////////////////////////////////////////

@@ -36,18 +36,20 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 struct csGLExtensionManager;
 
-class csGLShader_CG : public iShaderProgramPlugin
+class csGLShader_CG : public scfImplementation2<csGLShader_CG, 
+						iShaderProgramPlugin,
+					        iComponent>
 {
 private:
-  static void ErrorCallback ();
+  static void ErrorHandler (CGcontext context, CGerror err, void* appdata);
 
   bool enable;
   bool isOpen;
 public:
   CS_LEAKGUARD_DECLARE (csGLShader_CG);
 
-  static iObjectRegistry* object_reg;
-  static CGcontext context;
+  iObjectRegistry* object_reg;
+  CGcontext context;
   csRef<iShaderProgramPlugin> psplg;
   CGprofile psProfile;
   csGLExtensionManager* ext;
@@ -55,35 +57,24 @@ public:
   char* dumpDir;
   bool doVerbose;
 
-  SCF_DECLARE_IBASE;
-  
   csGLShader_CG (iBase *parent);
   virtual ~csGLShader_CG ();
 
   void Report (int severity, const char* msg, ...) CS_GNUC_PRINTF(3, 4);
   
-  ////////////////////////////////////////////////////////////////////
-  //                      iShaderProgramPlugin
-  ////////////////////////////////////////////////////////////////////
+  /**\name iShaderProgramPlugin implementation
+   * @{ */
   virtual csPtr<iShaderProgram> CreateProgram(const char* type) ;
 
   virtual bool SupportType(const char* type);
 
   bool Open();
+  /** @} */
 
-
-  ////////////////////////////////////////////////////////////////////
-  //                          iComponent
-  ////////////////////////////////////////////////////////////////////
-
+  /**\name iComponent implementation
+   * @{ */
   bool Initialize (iObjectRegistry* reg);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGLShader_CG);
-    virtual bool Initialize (iObjectRegistry* reg)
-      { return scfParent->Initialize (reg); }
-  } scfiComponent;
+  /** @} */
 };
 
 #endif //__GLSHADER_CG_H__

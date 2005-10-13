@@ -24,16 +24,16 @@
 #include "csutil/csobject.h"
 #include "ivideo/shader/shader.h"
 
-class csNullShader : public iShader, public csObject
+class csNullShader : public scfImplementationExt1<csNullShader, 
+						  csObject,
+						  iShader>
 {
   csShaderMetadata allShaderMeta;
   csRefArray<csShaderVariable> dummySVs;
 public:
   CS_LEAKGUARD_DECLARE (csNullShader);
 
-  SCF_DECLARE_IBASE_EXT (csObject);
-
-  csNullShader () { }
+  csNullShader () : scfImplementationType (this) { }
   virtual ~csNullShader () { }
 
   virtual iObject* QueryObject () 

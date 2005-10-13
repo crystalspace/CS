@@ -51,31 +51,13 @@
 // Pluginstuff
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csShaderManager)  
-  SCF_IMPLEMENTS_INTERFACE (iShaderManager)
-  SCF_IMPLEMENTS_INTERFACE (iShaderVariableContext)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csShaderManager::Component)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csShaderManager::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csShaderManager)
-
-
 //=================== csShaderManager ================//
 
 // General stuff
-csShaderManager::csShaderManager(iBase* parent)
+csShaderManager::csShaderManager(iBase* parent) : 
+  scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE(parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = 0;
   seqnumber = 0;
 }
 
@@ -83,9 +65,6 @@ csShaderManager::~csShaderManager()
 {
   //clear all shaders
   shaders.DeleteAll ();
-  if (scfiEventHandler) scfiEventHandler->DecRef();
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 void csShaderManager::Report (int severity, const char* msg, ...)
@@ -104,7 +83,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   txtmgr = CS_QUERY_REGISTRY (objectreg, iTextureManager);
 
   if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
+    scfiEventHandler.AttachNew (new EventHandler (this));
 
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (objectreg, iVerbosityManager));

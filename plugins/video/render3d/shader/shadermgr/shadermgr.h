@@ -20,14 +20,15 @@
 #ifndef __SHADERMGR_H__
 #define __SHADERMGR_H__
 
+#include "csutil/cfgacc.h"
+#include "csutil/csstring.h"
+#include "csutil/objreg.h"
+#include "csutil/parray.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
-#include "csutil/objreg.h"
-#include "csutil/csstring.h"
 #include "csutil/util.h"
-#include "csutil/parray.h"
-#include "csutil/cfgacc.h"
+#include "csutil/weakref.h"
 
 #include "iutil/event.h"
 #include "iutil/eventh.h"
@@ -45,7 +46,9 @@
 #include "csgfx/shadervarcontext.h"
 
 
-class csShaderManager : public iShaderManager
+class csShaderManager : public scfImplementation2<csShaderManager,
+						  iShaderManager,
+						  iComponent>
 {
 private:
   iObjectRegistry* objectreg;
@@ -83,15 +86,14 @@ private:
 
   csArray<iLight*> activeLights;
 public:
-  SCF_DECLARE_IBASE;
-
   csShaderManager(iBase* parent);
   virtual ~csShaderManager();
 
   void Open ();
   void Close ();
 
-  //==================== iShaderManager ================//
+  /**\name iShaderManager implementation
+   * @{ */
 
   /**
    * Register a shader to the shadermanager. Compiler should register all
@@ -140,9 +142,10 @@ public:
   {
     return activeLights;
   }
+  /** @} */
 
-  //=================== iShaderVariableContext ================//
-
+  /**\name iShaderVariableContext implementation
+   * @{ */
   /// Add a variable to this context
   void AddVariable (csShaderVariable *variable)
     { svcontext.AddVariable (variable); }
@@ -168,45 +171,33 @@ public:
   void ReplaceVariable (csShaderVariable *variable)
   { svcontext.ReplaceVariable(variable); }
   void Clear () { svcontext.Clear(); }
+  /** @} */
 
-  //==================== iComponent ====================//
+  /**\name iComponent implementation
+   * @{ */
   bool Initialize (iObjectRegistry* objreg);
+  /** @} */
 
-  struct Component : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csShaderManager);
-    virtual bool Initialize (iObjectRegistry* objectreg)
-    {
-      return scfParent->Initialize( objectreg );
-    }
-  } scfiComponent;
 
-  ////////////////////////////////////////////////////////////////////
-  //                         iEventHandler
-  ////////////////////////////////////////////////////////////////////
-  
+  /**\name iEventHandler implementation
+   * @{ */
   bool HandleEvent (iEvent& Event);
 
-  struct EventHandler : public iEventHandler
+  struct EventHandler : public scfImplementation1<EventHandler, 
+						  iEventHandler>
   {
   private:
-    csShaderManager* parent;
+    csWeakRef<csShaderManager> parent;
   public:
-    SCF_DECLARE_IBASE;
-
-    EventHandler (csShaderManager* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      EventHandler::parent = parent;
-    }
-    virtual ~EventHandler ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
+    EventHandler (csShaderManager* parent) : scfImplementationType (this),
+      parent (parent) { }
+    virtual ~EventHandler () { }
     
     virtual bool HandleEvent (iEvent& ev) 
     { return parent->HandleEvent (ev); }
-  } * scfiEventHandler;
+  };
+  csRef<EventHandler> scfiEventHandler;
+  /** @} */
 };
 
 #endif //__SHADERMGR_H__

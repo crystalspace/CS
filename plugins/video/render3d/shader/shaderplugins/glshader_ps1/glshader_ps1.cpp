@@ -36,29 +36,15 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGLShader_PS1)
 
-SCF_IMPLEMENT_IBASE(csGLShader_PS1)
-  SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLShader_PS1::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-
-csGLShader_PS1::csGLShader_PS1(iBase* parent)
+csGLShader_PS1::csGLShader_PS1(iBase* parent) : 
+  scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
   enable = false;
   isOpen = false;
 }
 
 csGLShader_PS1::~csGLShader_PS1()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csGLShader_PS1::Report (int severity, const char* msg, ...)

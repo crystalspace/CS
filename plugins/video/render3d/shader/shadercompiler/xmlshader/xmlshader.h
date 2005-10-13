@@ -261,7 +261,9 @@ public:
   void DumpConditionTree (csString& out);
 };
 
-class csXMLShader : public iShader, public csObject
+class csXMLShader : public scfImplementationExt1<csXMLShader,
+						 csObject,
+						 iShader>
 {
   friend class csShaderConditionResolver;
 
@@ -336,8 +338,6 @@ class csXMLShader : public iShader, public csObject
   }
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
-
-  SCF_DECLARE_IBASE_EXT (csObject);
 
   csXMLShader (csXMLShaderCompiler* compiler, iDocumentNode* source,
     int forcepriority);
@@ -503,12 +503,13 @@ public:
 #include "cstool/tokenlist.h"
 };
 
-class csXMLShaderCompiler : public iShaderCompiler, public iComponent
+class csXMLShaderCompiler : public scfImplementation2<csXMLShaderCompiler,
+						      iShaderCompiler, 
+						      iComponent>
 {
 public:
   CS_LEAKGUARD_DECLARE (csXMLShaderCompiler);
 
-  SCF_DECLARE_IBASE;
   csXMLShaderCompiler(iBase* parent);
 
   virtual ~csXMLShaderCompiler();

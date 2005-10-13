@@ -1089,14 +1089,9 @@ void csShaderConditionResolver::DumpConditionNode (csString& out,
 
 SCF_IMPLEMENT_FACTORY (csXMLShaderCompiler)
 
-SCF_IMPLEMENT_IBASE(csXMLShaderCompiler)
-  SCF_IMPLEMENTS_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_INTERFACE(iShaderCompiler)
-SCF_IMPLEMENT_IBASE_END
-
-csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
+csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent) : 
+  scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE(parent);
   wrapperFact = 0;
   InitTokenTable (xmltokens);
 
@@ -1110,7 +1105,6 @@ csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
 csXMLShaderCompiler::~csXMLShaderCompiler()
 {
   delete wrapperFact;
-  SCF_DESTRUCT_IBASE();
 }
 
 void csXMLShaderCompiler::Report (int severity, const char* msg, ...)
@@ -1300,13 +1294,9 @@ bool csXMLShaderCompiler::IsTemplateToCompiler(iDocumentNode *templ)
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_EXT(csXMLShader)
-  SCF_IMPLEMENTS_INTERFACE(iShader)
-SCF_IMPLEMENT_IBASE_EXT_END
-
 csXMLShader::csXMLShader (csXMLShaderCompiler* compiler, 
 			  iDocumentNode* source,
-			  int forcepriority)
+			  int forcepriority) : scfImplementationType (this)
 {
   InitTokenTable (xmltokens);
 
@@ -1411,22 +1401,19 @@ void csXMLShader::ScanForTechniques (iDocumentNode* templ,
  * A wrapped class to have a csShaderVarStack synced to an
  * iShaderVariableContext*.
  */
-class SVCWrapper : public iShaderVariableContext
+class SVCWrapper : public scfImplementation1<SVCWrapper, 
+					     iShaderVariableContext>
 {
   csShaderVariableContext& wrappedSVC;
 public:
   csShaderVarStack svStack;
 
-  SCF_DECLARE_IBASE;
-  SVCWrapper (csShaderVariableContext& wrappedSVC) : wrappedSVC (wrappedSVC)
+  SVCWrapper (csShaderVariableContext& wrappedSVC) : 
+    scfImplementationType (this), wrappedSVC (wrappedSVC)
   {
-    SCF_CONSTRUCT_IBASE(0);
     wrappedSVC.PushVariables (svStack);
   }
-  virtual ~SVCWrapper ()
-  {
-    SCF_DESTRUCT_IBASE();
-  }
+  virtual ~SVCWrapper () { }
   virtual void AddVariable (csShaderVariable *variable)
   {
     wrappedSVC.AddVariable (variable);
@@ -1444,10 +1431,6 @@ public:
   void Clear ()
   { wrappedSVC.Clear(); }
 };
-
-SCF_IMPLEMENT_IBASE(SVCWrapper)
-  SCF_IMPLEMENTS_INTERFACE(iShaderVariableContext)
-SCF_IMPLEMENT_IBASE_END
 
 void csXMLShader::ParseGlobalSVs ()
 {

@@ -25,7 +25,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 #include "csutil/leakguard.h"
 
-class csGLShader_ARB : public iShaderProgramPlugin
+class csGLShader_ARB : public scfImplementation2<csGLShader_ARB, 
+						 iShaderProgramPlugin,
+					         iComponent>
 {
 private:
   bool enable;
@@ -37,34 +39,22 @@ public:
 
   CS_LEAKGUARD_DECLARE (csGLShader_ARB);
 
-  SCF_DECLARE_IBASE;
-  
   csGLShader_ARB (iBase *parent);
   virtual ~csGLShader_ARB ();
 
-  
-  ////////////////////////////////////////////////////////////////////
-  //                      iShaderProgramPlugin
-  ////////////////////////////////////////////////////////////////////
+  /**\name iShaderProgramPlugin implementation
+   * @{ */
   virtual csPtr<iShaderProgram> CreateProgram(const char* type) ;
 
   virtual bool SupportType(const char* type);
 
   void Open();
+  /** @} */
 
-
-  ////////////////////////////////////////////////////////////////////
-  //                          iComponent
-  ////////////////////////////////////////////////////////////////////
-
+  /**\name iComponent implementation
+   * @{ */
   bool Initialize (iObjectRegistry* reg);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGLShader_ARB);
-    virtual bool Initialize (iObjectRegistry* reg)
-      { return scfParent->Initialize (reg); }
-  } scfiComponent;
+  /** @} */
 };
 
 #endif //__GLSHADER_ARB_H__

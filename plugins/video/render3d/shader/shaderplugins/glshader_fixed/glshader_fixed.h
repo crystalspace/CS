@@ -26,7 +26,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/comp.h"
 #include "ivideo/shader/shader.h"
 
-class csGLShader_FIXED : public iShaderProgramPlugin
+class csGLShader_FIXED : public scfImplementation2<csGLShader_FIXED, 
+						   iShaderProgramPlugin,
+					           iComponent>
 {
 public:
   csGLExtensionManager* ext;
@@ -48,35 +50,20 @@ public:
   /// One-time initialization stuff
   void Open();
 
-  SCF_DECLARE_IBASE;
-  
   csGLShader_FIXED (iBase *parent);
   virtual ~csGLShader_FIXED ();
 
-
-  
-  ////////////////////////////////////////////////////////////////////
-  //                      iShaderProgramPlugin
-  ////////////////////////////////////////////////////////////////////
+  /**\name iShaderProgramPlugin implementation
+   * @{ */
   virtual csPtr<iShaderProgram> CreateProgram(const char* type) ;
 
   virtual bool SupportType(const char* type);
+  /** @} */
 
-  //virtual void Open();
-
-
-  ////////////////////////////////////////////////////////////////////
-  //                          iComponent
-  ////////////////////////////////////////////////////////////////////
-
+  /**\name iComponent implementation
+   * @{ */
   bool Initialize (iObjectRegistry* reg);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGLShader_FIXED);
-    virtual bool Initialize (iObjectRegistry* reg)
-      { return scfParent->Initialize (reg); }
-  } scfiComponent;
+  /** @} */
 };
 
 #endif //__GLSHADER_FIXED_H__

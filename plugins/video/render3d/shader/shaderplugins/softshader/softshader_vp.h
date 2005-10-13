@@ -20,45 +20,25 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __SOFTSHADER_VP_H__
 #define __SOFTSHADER_VP_H__
 
-#include "csgfx/shadervarcontext.h"
 #include "csplugincommon/shader/shaderplugin.h"
+#include "csplugincommon/shader/shaderprogram.h"
 #include "csutil/strhash.h"
 #include "ivideo/shader/shader.h"
 
 struct iDataBuffer;
 
-class csSoftShader_VP : public iShaderProgram
+namespace cspluginSoftshader
 {
-private:
-  enum
-  {
-    XMLTOKEN_SOFTVP = 1
-  };
 
-  iObjectRegistry* object_reg;
-
-  csStringHash xmltokens;
-
-  void BuildTokenHash();
-
-  bool validProgram;
-
-  csShaderVariableContext svContextHelper;
+class csSoftShader_VP : public csShaderProgram
+{
 public:
-  SCF_DECLARE_IBASE;
-
-  csSoftShader_VP(iObjectRegistry* objreg)
+  csSoftShader_VP(iObjectRegistry* objreg) : csShaderProgram(objreg)
   {
-    SCF_CONSTRUCT_IBASE (0);
-    validProgram = true;
-    this->object_reg = objreg;
   }
   virtual ~csSoftShader_VP ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
-
-  void SetValid(bool val) { validProgram = val; }
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram
@@ -76,12 +56,6 @@ public:
 
   virtual void ResetState () {}
 
-  /// Check if valid
-  virtual bool IsValid() { return validProgram;} 
-
-    /// Loads shaderprogram from buffer
-  virtual bool Load (iShaderTUResolver*, iDataBuffer* program);
-
   /// Loads from a document-node
   virtual bool Load (iShaderTUResolver*, iDocumentNode* node);
 
@@ -94,6 +68,7 @@ public:
   virtual bool Compile();
 };
 
+} // namespace cspluginSoftshader
 
 #endif //__SOFTSHADER_VP_H__
 

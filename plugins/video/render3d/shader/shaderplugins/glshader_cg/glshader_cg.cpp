@@ -33,32 +33,17 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_cgfp.h"
 #include "glshader_cg.h"
 
-iObjectRegistry* csGLShader_CG::object_reg = 0;
-CGcontext csGLShader_CG::context;
-
 CS_LEAKGUARD_IMPLEMENT (csGLShader_CG);
 
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGLShader_CG)
 
-SCF_IMPLEMENT_IBASE(csGLShader_CG)
-  SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLShader_CG::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-
-csGLShader_CG::csGLShader_CG(iBase* parent)
+csGLShader_CG::csGLShader_CG (iBase* parent) : 
+  scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
   context = cgCreateContext ();
-  cgSetErrorCallback (ErrorCallback);
+  cgSetErrorHandler (ErrorHandler, 0);
 
   enable = false;
   isOpen = false;
@@ -71,12 +56,12 @@ csGLShader_CG::~csGLShader_CG()
 {
   delete[] dumpDir;
   cgDestroyContext (context);
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
-void csGLShader_CG::ErrorCallback ()
+void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error, 
+				  void* appData)
 {
+  iObjectRegistry* object_reg = (iObjectRegistry*)appData;
   bool doVerbose;
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
@@ -86,7 +71,6 @@ void csGLShader_CG::ErrorCallback ()
     doVerbose = false;
   if (!doVerbose) return;
 
-  CGerror error = cgGetError();
   csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
     "crystalspace.graphics3d.shader.glcg",
     "%s", cgGetErrorString (error));
@@ -143,6 +127,8 @@ bool csGLShader_CG::Open()
 {
   if (isOpen) return true;
   if (!object_reg) return false;
+
+  cgSetErrorHandler (ErrorHandler, object_reg);
 
   csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
 
