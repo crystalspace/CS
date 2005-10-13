@@ -15,6 +15,7 @@ chronological order.
 	- res made some small doxygen fixes to graph3d.h.
 	- res updated the doxygen.css from the one from 1.4.5 and updated the
 	  doxygen header fragment to support 1.4.5.
+	- res added cpu specific flags for x86_64 from Mike Gist to configure.
 12-Oct-2005
 	- res enhanced the mixmode abilities a bit.
 	- res added blending support to SR.
