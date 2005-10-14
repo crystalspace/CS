@@ -13,6 +13,8 @@ chronological order.
 	- Jorrit did the same physics fix for linear and angular velocity.
 	- Eric Sunshine added a Jamfile to CS/data/shader/specular to ensure
 	  that the new specular shader gets installed by 'jam install'.
+	- Jorrit added a replica of the cornell box to CS to make testing
+	  radiosity easier.
 13-Oct-2005
 	- Jorrit added a new specular shader which he got from
 	  Erroroman.
