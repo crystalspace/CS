@@ -1650,6 +1650,7 @@ const csOrthoTransform csODERigidBody::GetTransform () const
 
 void csODERigidBody::SetLinearVelocity (const csVector3& vel)
 {
+  Enable ();
   dBodySetLinearVel (bodyID, vel.x, vel.y, vel.z);
 }
 
@@ -1661,6 +1662,7 @@ const csVector3 csODERigidBody::GetLinearVelocity () const
 
 void csODERigidBody::SetAngularVelocity (const csVector3& vel)
 {
+  Enable ();
   dBodySetAngularVel (bodyID, vel.x, vel.y, vel.z);
 }
 
