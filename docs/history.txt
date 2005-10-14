@@ -10,6 +10,8 @@ chronological order.
 	- Jorrit fixed a bug in the odedynam plugin. Auto-disable for
 	  inactive objects is enabled. However the odedynam plugin didn't
 	  enable physics again when you called AddForce() or similar.
+	- Eric Sunshine added a Jamfile to CS/data/shader/specular to ensure
+	  that the new specular shader gets installed by 'jam install'.
 13-Oct-2005
 	- Jorrit added a new specular shader which he got from
 	  Erroroman.
