@@ -5324,11 +5324,24 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
       return false;
     }
     shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");
+    if (!shaderNode)
+    {
+      SyntaxService->ReportError ("crystalspace.maploader", node,
+        "Shader file '%s' is not a valid shader XML file!", filename.GetData ());
+      return false;
+    }
+
     dirChanger.ChangeTo (filename);
   }
   else
   {
     shaderNode = node->GetNode ("shader");
+    if (!shaderNode)
+    {
+      SyntaxService->ReportError ("crystalspace.maploader", node,
+        "'shader' or 'file' node is missing!");
+      return false;
+    }
   }
 
   const char* name = shaderNode->GetAttributeValue ("name");

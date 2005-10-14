@@ -16,6 +16,8 @@ chronological order.
 	- Jorrit added a replica of the cornell box to CS to make testing
 	  radiosity easier.
 	- Jorrit fixed the xml in light_spec_bumpmap.xml.
+	- Jorrit added proper error reporting to the loader in case a shader
+	  file is malformed.
 13-Oct-2005
 	- Jorrit added a new specular shader which he got from
 	  Erroroman.
