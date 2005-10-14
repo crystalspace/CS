@@ -27,23 +27,35 @@
 namespace cspluginSoftshader
 {
   template<typename Pix, 
-    int sal, int sar, int ma,
-    int srl, int srr, int mr,
-    int sgl, int sgr, int mg, 
-    int sbl, int sbr, int mb>
+    int sa, int ma,
+    int sr, int mr,
+    int sg, int mg, 
+    int sb, int mb>
   struct Pix_Fix
   {
     typedef Pix PixType;
 
+  private:
+    CS_FORCEINLINE
+    static PixType Shift (const uint8 x, const int v)
+    {
+      return (v > 0) ? (x << v) : (x >> -v);
+    }
+    CS_FORCEINLINE
+    static PixType Unshift (const PixType x, const int v)
+    {
+      return (v > 0) ? (x >> v) : (x << -v);
+    }
+  public:
     Pix_Fix (const csPixelFormat& /*pfmt*/) {}
 
     CS_FORCEINLINE
     void WritePix (PixType* dest, uint8 r, uint8 g, uint8 b, uint8 a)
     {
-      *dest = (((a & ma) << sal) >> sar)
-	| (((r & mr) << srl) >> srr)
-	| (((g & mg) << sgl) >> sgr)
-	| (((b & mb) << sbl) >> sbr);
+      *dest = Shift (a & ma, sa)
+	| Shift (r & mr, sr)
+	| Shift (g & mg, sg)
+	| Shift (b & mb, sb);
     }
 
     CS_FORCEINLINE
@@ -80,14 +92,14 @@ namespace cspluginSoftshader
     void GetPix (PixType* dest, uint8& r, uint8& g, uint8& b, uint8& a) const
     {
       const PixType px = *dest;
-      r = ((px << srr) >> srl) & mr;
-      g = ((px << sgr) >> sgl) & mg;
-      b = ((px << sbr) >> sbl) & mb;
-      a = ((px << sar) >> sal) & ma;
+      r = Unshift (px, sr) & mr;
+      g = Unshift (px, sg) & mg;
+      b = Unshift (px, sb) & mb;
+      a = Unshift (px, sa) & ma;
     }
   };
 
-  template<typename Pix, int OrderRGB>
+  template<typename Pix>
   struct Pix_Generic
   {
     typedef Pix PixType;
@@ -97,29 +109,29 @@ namespace cspluginSoftshader
     Pix_Generic (const csPixelFormat& pfmt) 
     {
       int delta = 8-pfmt.RedBits;
-      if (OrderRGB)
+      if (pfmt.RedMask > pfmt.BlueMask)
       {
 	rShift = pfmt.RedShift-delta;
 	rMask = pfmt.RedMask >> rShift;
       }
       else
       {
-	rShift = delta;
-	rMask = pfmt.RedMask << rShift;
+	rShift = pfmt.BlueShift-delta;
+	rMask = pfmt.BlueMask >> rShift;
       }
       delta = 8-pfmt.GreenBits;
       gShift = pfmt.GreenShift-delta;
       gMask = pfmt.GreenMask >> gShift;
       delta = 8-pfmt.BlueBits;
-      if (OrderRGB)
+      if (pfmt.RedMask > pfmt.BlueMask)
       {
 	bShift = delta;
 	bMask = pfmt.BlueMask << bShift;
       }
       else
       {
-	bShift = pfmt.BlueShift-delta;
-	bMask = pfmt.BlueMask >> bShift;
+	bShift = delta;
+	bMask = pfmt.RedMask << bShift;
       }
       aMask = 0;
       aMask |= pfmt.RedMask;
@@ -142,16 +154,10 @@ namespace cspluginSoftshader
     CS_FORCEINLINE
     void WritePix (PixType* dest, uint8 r, uint8 g, uint8 b, uint8 a)
     {
-      if (OrderRGB)
-        *dest = ((a & aMask) << aShift) 
-	  | ((r & rMask) << rShift) 
-	  | ((g & gMask) << gShift) 
-	  | ((b & bMask) >> bShift);
-      else
-        *dest = ((a & aMask) << aShift) 
-	  | ((b & bMask) << bShift)
-	  | ((g & gMask) << gShift) 
-	  | ((r & rMask) >> rShift); 
+      *dest = ((a & aMask) << aShift) 
+	| ((r & rMask) << rShift) 
+	| ((g & gMask) << gShift) 
+	| ((b & bMask) >> bShift);
     }
 
     CS_FORCEINLINE
@@ -188,20 +194,10 @@ namespace cspluginSoftshader
     void GetPix (PixType* dest, uint8& r, uint8& g, uint8& b, uint8& a) const
     {
       const PixType px = *dest;
-      if (OrderRGB)
-      {
-	a = (px >> aShift) & aMask;
-	r = (px >> rShift) & rMask;
-	g = (px >> gShift) & gMask;
-	b = (px << bShift) & bMask;
-      }
-      else
-      {
-	a = (px >> aShift) & aMask;
-	b = (px >> bShift) & bMask;
-	g = (px >> gShift) & gMask;
-	r = (px << rShift) & rMask;
-      }
+      a = (px >> aShift) & aMask;
+      r = (px >> rShift) & rMask;
+      g = (px >> gShift) & gMask;
+      b = (px << bShift) & bMask;
     }
   };
 } // namespace cspluginSoftshader

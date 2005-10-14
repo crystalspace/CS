@@ -99,44 +99,30 @@ void csSoftShader::Open()
       return;
     }
     
+    /* Note: RGB and BGR are handled by the same scanline renderers.
+     * This works as soft3d provides swapped data, if that is needed. */
     const csPixelFormat& pfmt = *(r->GetDriver2D()->GetPixelFormat());
     if (pfmt.PixelBytes == 4)
     {
-      if ((pfmt.BlueMask == 0x0000ff)
+      if (((pfmt.BlueMask == 0x0000ff) || (pfmt.RedMask == 0x0000ff))
 	&& (pfmt.GreenMask == 0x00ff00)
-	&& (pfmt.RedMask == 0xff0000))
+	&& ((pfmt.RedMask == 0xff0000) || (pfmt.BlueMask == 0xff0000)))
 	scanlineRenderer = NewScanlineRendererARGB8888 (pfmt);
-      else if ((pfmt.BlueMask == 0xff0000) 
-	&& (pfmt.GreenMask == 0x00ff00)
-	&& (pfmt.RedMask == 0x0000ff))
-	scanlineRenderer = NewScanlineRendererABGR8888 (pfmt);
-      else if (pfmt.RedMask > pfmt.BlueMask)
-	scanlineRenderer = NewScanlineRendererARGBgen32 (pfmt);
       else
-	scanlineRenderer = NewScanlineRendererABGRgen32 (pfmt);
+	scanlineRenderer = NewScanlineRendererARGBgen32 (pfmt);
     }
     else
     {
-      if ((pfmt.BlueMask == 0xf800)   // BGR 565
+      if (((pfmt.RedMask == 0xf800) || (pfmt.BlueMask == 0xf800))
 	&& (pfmt.GreenMask == 0x07e0)
-	&& (pfmt.RedMask == 0x001f))
-	scanlineRenderer = NewScanlineRendererBGR565 (pfmt);
-      else if ((pfmt.RedMask == 0xf800) // RGB 565
-	&& (pfmt.GreenMask == 0x07e0)
-	&& (pfmt.BlueMask == 0x001f))
+	&& ((pfmt.BlueMask == 0x001f) || (pfmt.RedMask == 0x001f)))
 	scanlineRenderer = NewScanlineRendererRGB565 (pfmt);
-      else if ((pfmt.BlueMask == 0x7c00) // BGR 555
+      else if (((pfmt.RedMask == 0x7c00) || (pfmt.BlueMask == 0x7c00))
 	&& (pfmt.GreenMask == 0x03e0)
-	&& (pfmt.RedMask == 0x001f))
-	scanlineRenderer = NewScanlineRendererBGR555 (pfmt);
-      else if ((pfmt.RedMask == 0x7c00) // RGB 555
-	&& (pfmt.GreenMask == 0x03e0)
-	&& (pfmt.BlueMask == 0x001f))
+	&& ((pfmt.BlueMask == 0x001f) || (pfmt.RedMask == 0x001f)))
 	scanlineRenderer = NewScanlineRendererRGB555 (pfmt);
-      else if (pfmt.RedMask > pfmt.BlueMask)
-	scanlineRenderer = NewScanlineRendererRGBgen16 (pfmt);
       else
-	scanlineRenderer = NewScanlineRendererBGRgen16 (pfmt);
+	scanlineRenderer = NewScanlineRendererRGBgen16 (pfmt);
     }
   }
 }

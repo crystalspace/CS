@@ -86,6 +86,7 @@ class csSoftwareTextureHandle : public csTextureHandle
 {
 protected:
   friend class csSoftwareGraphics3DCommon;
+  friend class csSoftwareTexture;
 
   /// If true then PrepareInt() has done its job.
   bool prepared;
@@ -248,16 +249,12 @@ class csSoftwareTextureManager : public csTextureManager
   friend class csSoftwareTextureHandle;
 
 public:
-
   /// We need a pointer to the 3D driver
   csSoftwareGraphics3DCommon *G3D;
-
   /// Apply dithering to textures while reducing from 24-bit to 8-bit paletted?
   bool dither_textures;
-
   /// Sharpen mipmaps?
   int sharpen_mipmaps;
-
   /// The multiplication tables used for lightmapping
   uint8 *lightmap_tables [3];
 

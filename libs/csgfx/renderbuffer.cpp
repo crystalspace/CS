@@ -152,7 +152,7 @@ size_t csRenderBuffer::GetElementCount() const
     (props.compCount * csRenderBufferComponentSizes[props.comptype]);
 }
 
-csRef<iRenderBuffer> csRenderBuffer::CreateRenderBuffer (size_t elementCount, 
+csRef<csRenderBuffer> csRenderBuffer::CreateRenderBuffer (size_t elementCount, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
   uint componentCount, bool copy)
 {
@@ -162,10 +162,10 @@ csRef<iRenderBuffer> csRenderBuffer::CreateRenderBuffer (size_t elementCount,
     csRenderBufferComponentSizes[componentType];
   csRenderBuffer* buf = new csRenderBuffer (size, type, 
     componentType, componentCount, 0, 0, copy);
-  return csPtr<iRenderBuffer> (buf);
+  return csPtr<csRenderBuffer> (buf);
 }
 
-csRef<iRenderBuffer> csRenderBuffer::CreateIndexRenderBuffer (size_t elementCount, 
+csRef<csRenderBuffer> csRenderBuffer::CreateIndexRenderBuffer (size_t elementCount, 
     csRenderBufferType type, csRenderBufferComponentType componentType,
     size_t rangeStart, size_t rangeEnd, bool copy)
 {
@@ -173,10 +173,10 @@ csRef<iRenderBuffer> csRenderBuffer::CreateIndexRenderBuffer (size_t elementCoun
   csRenderBuffer* buf = new csRenderBuffer (size, type, 
     componentType, 1, rangeStart, rangeEnd, copy);
   buf->props.isIndex = true;
-  return csPtr<iRenderBuffer> (buf);
+  return csPtr<csRenderBuffer> (buf);
 }
 
-csRef<iRenderBuffer> csRenderBuffer::CreateInterleavedRenderBuffers (size_t elementCount, 
+csRef<csRenderBuffer> csRenderBuffer::CreateInterleavedRenderBuffers (size_t elementCount, 
   csRenderBufferType type, uint count, const csInterleavedSubBufferOptions* elements, 
   csRef<iRenderBuffer>* buffers)
 {
@@ -192,7 +192,7 @@ csRef<iRenderBuffer> csRenderBuffer::CreateInterleavedRenderBuffers (size_t elem
   }
   elementSize = offsets[count];
   if (elementSize > 255) return 0;
-  csRef<iRenderBuffer> master;
+  csRef<csRenderBuffer> master;
   master.AttachNew (new csRenderBuffer (elementCount * elementSize,
     type, CS_BUFCOMP_BYTE, (uint)elementSize, 0, 0, true));
   for (i = 0; i < count; i++)
@@ -265,4 +265,40 @@ csRenderBufferName csRenderBuffer::GetBufferNameFromDescr (const char* name)
       r = m;
   }
   return CS_BUFFER_NONE;
+}
+
+void csRenderBuffer::SetRenderBufferProperties (size_t elementCount, 
+						csRenderBufferType type, 
+						csRenderBufferComponentType componentType,
+						uint componentCount, 
+						bool copy)
+{
+  CS_ASSERT(!props.isIndex);
+  if (componentCount > 255) return;
+
+  size_t newSize = elementCount * componentCount * 
+    csRenderBufferComponentSizes[componentType];
+  CS_ASSERT(newSize <= bufferSize);
+  props.bufferType = type;
+  props.comptype = componentType;
+  props.compCount = componentCount;
+  props.doCopy = copy;
+}
+
+void csRenderBuffer::SetIndexBufferProperties (size_t elementCount, 
+					       csRenderBufferType type, 
+					       csRenderBufferComponentType componentType,
+					       size_t rangeStart, 
+					       size_t rangeEnd, 
+					       bool copy)
+{
+  CS_ASSERT(props.isIndex);
+
+  size_t newSize = elementCount * csRenderBufferComponentSizes[componentType];
+  CS_ASSERT(newSize <= bufferSize);
+  props.bufferType = type;
+  props.comptype = componentType;
+  this->rangeStart = rangeStart;
+  this->rangeEnd = rangeEnd;
+  props.doCopy = copy;
 }

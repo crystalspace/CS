@@ -48,9 +48,11 @@ namespace cspluginSoftshader
   {
     static const size_t compCount = 4;
 
-    const int shift;
+    const int cshift;
+    const int ashift;
 
-    Color_Multiply (ScanlineRendererBase* This) : shift(This->colorShift) {}
+    Color_Multiply (ScanlineRendererBase* This) : 
+      cshift (This->colorShift), ashift (This->alphaShift) {}
 
     CS_FORCEINLINE
     static uint8 ClampAndShift (int32 x, const int shift)
@@ -63,10 +65,10 @@ namespace cspluginSoftshader
     void Apply (const ScanlineComp* color, 
       uint8& r, uint8& g, uint8& b, uint8& a) 
     {
-      r = ClampAndShift (r * color[0].c.GetFixed(), shift);
-      g = ClampAndShift (g * color[1].c.GetFixed(), shift);
-      b = ClampAndShift (b * color[2].c.GetFixed(), shift);
-      a = ClampAndShift (a * color[3].c.GetFixed(), shift);
+      r = ClampAndShift (r * color[0].c.GetFixed(), cshift);
+      g = ClampAndShift (g * color[1].c.GetFixed(), cshift);
+      b = ClampAndShift (b * color[2].c.GetFixed(), cshift);
+      a = ClampAndShift (a * color[3].c.GetFixed(), ashift);
     }
   };
 
@@ -375,11 +377,7 @@ namespace cspluginSoftshader
 	  break;
 	case CS_MIXMODE_TYPE_AUTO:
 	default:
-	  if (modes.mixmode & CS_FX_MASK_ALPHA)
-	    // @@@ FIXME: respect alpha component
-	    realMixMode = CS_FX_ALPHA;
-	  else
-	    realMixMode = CS_MIXMODE_BLEND(ONE, ZERO);
+	  realMixMode = CS_MIXMODE_BLEND(ONE, ZERO);
 	  // @@@ FIXME: Determine from texture also
 	  break;
       }

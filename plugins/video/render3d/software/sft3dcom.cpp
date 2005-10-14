@@ -30,7 +30,6 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
-#include "csgfx/renderbuffer.h"
 #include "cstool/rbuflock.h"
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
@@ -130,6 +129,8 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent) :
 
   scrapIndicesSize = 0;
   scrapVerticesSize = 0;
+
+  memset (processedColorsFlag, 0, sizeof (processedColorsFlag));
 }
 
 csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
@@ -243,6 +244,7 @@ bool csSoftwareGraphics3DCommon::Open ()
     	"8-bit palette mode no longer works in the software renderer!");
     return false;
   }
+  pixelBGR = (pfmt.BlueMask > pfmt.RedMask);
 
   DrawMode = 0;
   SetDimensions (G2D->GetWidth (), G2D->GetHeight ());
@@ -3457,6 +3459,50 @@ static csZBufMode GetZModePass2 (csZBufMode mode)
   }
 }
 
+static iRenderBuffer* ColorFixup (iRenderBuffer* srcBuffer, 
+				  csRef<csRenderBuffer>& dstBuffer,
+				  bool swapRB, bool doAlphaScale,
+				  float alphaScale)
+{
+  CS_ASSERT(srcBuffer->GetComponentType() == CS_BUFCOMP_FLOAT);
+  const size_t elemCount = srcBuffer->GetElementCount();
+  const uint comps = doAlphaScale ? 4 : 3;
+  const size_t srcComps = srcBuffer->GetComponentCount();
+  if (!dstBuffer.IsValid()
+    || (dstBuffer->GetSize() < (elemCount * comps * sizeof (float))))
+  {
+    dstBuffer = csRenderBuffer::CreateRenderBuffer (elemCount,
+      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, comps);
+  }
+  else
+  {
+    dstBuffer->SetRenderBufferProperties (elemCount, CS_BUF_STREAM,
+      CS_BUFCOMP_FLOAT, comps);
+  }
+  csRenderBufferLock<csVector4, iRenderBuffer*> src (srcBuffer, 
+    CS_BUF_LOCK_READ);
+  csRenderBufferLock<csVector4, iRenderBuffer*> dst (dstBuffer,
+    CS_BUF_LOCK_NORMAL);
+  const float defComponentsF[] = {0.0f, 0.0f, 0.0f, 1.0f};
+
+  for (size_t e = 0; e < elemCount; e++)
+  {
+    const csVector4& s = src[e];
+    float sv[4];
+    for (int c = 0; c < 4; c++)
+    {
+      sv[c] = c < (int)srcComps ? s[c] : defComponentsF[c];
+    }
+    csVector4& d = dst[e];
+    d.x = swapRB ? sv[2] : sv[0];
+    d.y = sv[1];
+    d.z = swapRB ? sv[0] : sv[2];
+    if (doAlphaScale)
+      d.w = sv[3] * alphaScale;
+  }
+  return dstBuffer;
+}
+
 void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
     const csArray<csShaderVariable*> &stacks)
@@ -3546,6 +3592,31 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     translatedVerts->Release();
 
     activebuffers[VATTR_SPEC(POSITION)] = translatedVerts;
+  }
+
+  const bool alphaScale = ((modes.mixmode & CS_FX_MASK_ALPHA) != 0);
+  if (pixelBGR || alphaScale)
+  {
+    const float alpha = 
+      1.0f - ((modes.mixmode & CS_FX_MASK_ALPHA) / 255.0f);
+
+    if ((activebuffers[VATTR_SPEC(PRIMARY_COLOR)] != 0)
+      && (!processedColorsFlag[0]))
+    {
+      activebuffers[VATTR_SPEC(PRIMARY_COLOR)] = ColorFixup (
+	activebuffers[VATTR_SPEC(PRIMARY_COLOR)], processedColors[0],
+	pixelBGR, alphaScale, alpha);
+      processedColorsFlag[0] = true;
+    }
+
+    if ((activebuffers[VATTR_SPEC(SECONDARY_COLOR)] != 0)
+      && (!processedColorsFlag[1]))
+    {
+      activebuffers[VATTR_SPEC(SECONDARY_COLOR)] = ColorFixup (
+	activebuffers[VATTR_SPEC(SECONDARY_COLOR)], processedColors[1],
+	pixelBGR, alphaScale, alpha);
+      processedColorsFlag[1] = true;
+    }
   }
 
   const csRenderMeshType meshtype = mesh->meshtype;

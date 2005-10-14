@@ -33,6 +33,7 @@
 
 #include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
+#include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
 #include "csplugincommon/softshader/renderinterface.h"
 #include "csutil/cfgacc.h"
@@ -322,6 +323,7 @@ class csSoftwareGraphics3DCommon :
 protected:
   //friend class csSoftHalo;
   friend class TriangleDrawer;
+  friend class csSoftwareTexture;
 
   /// Driver this driver is sharing info with (if any)
   csSoftwareGraphics3DCommon *partner;
@@ -397,6 +399,7 @@ protected:
   int height2;
   /// The pixel format of display
   csPixelFormat pfmt;
+  bool pixelBGR;
 #if defined (CS_HAVE_MMX)
   /// True if CPU has MMX instructions.
   bool cpu_mmx;
@@ -463,6 +466,8 @@ protected:
   csSoftwareTexture* activeSoftTex[activeTextureCount]; 
   csRef<iRenderBuffer> translatedVerts;
   csRef<iScanlineRenderer> scanlineRenderer;
+  csRef<csRenderBuffer> processedColors[2];
+  bool processedColorsFlag[2];
 
   // Structure used for maintaining a stack of clipper portals.
   struct csClipPortal
@@ -689,11 +694,24 @@ public:
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw,
     int sh, int tx, int ty, int tw, int th, uint8 Alpha);
 
+  static inline int ColorPreprocIndex (csVertexAttrib attrib)
+  {
+    if (attrib == CS_VATTRIB_PRIMARY_COLOR)
+      return 0;
+    else if (attrib == CS_VATTRIB_SECONDARY_COLOR)
+      return 1;
+    else
+      return -1;
+  }
+
   /// Activate a vertex buffer
   bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
   {
     if (!CS_VATTRIB_IS_SPECIFIC(attrib)) return false;
     activebuffers[attrib - CS_VATTRIB_SPECIFIC_FIRST] = buffer;
+    int colindex;
+    if ((colindex = ColorPreprocIndex (attrib)) != -1)
+      processedColorsFlag[colindex] = false;
     return true;
   }
 
@@ -714,7 +732,7 @@ public:
     for (i = 0; i < 16; i++)
     {
       buffer = holder->GetRenderBuffer (mapping[i]);
-      activebuffers[i] = buffer;
+      ActivateBuffer ((csVertexAttrib)i, buffer);
     }
     return true;
   }

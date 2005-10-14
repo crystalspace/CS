@@ -48,12 +48,27 @@ void csSoftwareTexture::ImageToBitmap (iImage *Image)
   size_t pixNum = w * h;
   bitmap = new uint32[pixNum];
 #ifdef CS_LITTLE_ENDIAN
-  if (csPackRGBA::IsRGBpixelSane())
+  if (csPackRGBA::IsRGBpixelSane() 
+    && !parent->texman->G3D->pixelBGR)
   {
     memcpy (bitmap, Image->GetImageData(), pixNum * sizeof (uint32));
   }
   else
 #endif
+  if (parent->texman->G3D->pixelBGR)
+  {
+    csRGBpixel* p = (csRGBpixel*)Image->GetImageData();
+    uint32* dst = bitmap;
+    while (pixNum-- > 0)
+    {
+      *dst = p->blue
+	  | (p->green <<  8)
+	  | (p->red   << 16)
+	  | (p->alpha << 24);
+      dst++; p++;
+    }
+  }
+  else
   {
     csRGBpixel* p = (csRGBpixel*)Image->GetImageData();
     uint32* dst = bitmap;

@@ -28,24 +28,14 @@ namespace cspluginSoftshader
    * split over several source file to lessen the burden on the compiler. */
   extern ScanlineRendererBase* NewScanlineRendererARGB8888 (
     const csPixelFormat& pfmt);
-  extern ScanlineRendererBase* NewScanlineRendererABGR8888 (
-    const csPixelFormat& pfmt);
   extern ScanlineRendererBase* NewScanlineRendererARGBgen32 (
-    const csPixelFormat& pfmt);
-  extern ScanlineRendererBase* NewScanlineRendererABGRgen32 (
     const csPixelFormat& pfmt);
   
   extern ScanlineRendererBase* NewScanlineRendererRGB565 (
     const csPixelFormat& pfmt);
-  extern ScanlineRendererBase* NewScanlineRendererBGR565 (
-    const csPixelFormat& pfmt);
   extern ScanlineRendererBase* NewScanlineRendererRGB555 (
     const csPixelFormat& pfmt);
-  extern ScanlineRendererBase* NewScanlineRendererBGR555 (
-    const csPixelFormat& pfmt);
   extern ScanlineRendererBase* NewScanlineRendererRGBgen16 (
-    const csPixelFormat& pfmt);
-  extern ScanlineRendererBase* NewScanlineRendererBGRgen16 (
     const csPixelFormat& pfmt);
 } // namespace cspluginSoftshader
 

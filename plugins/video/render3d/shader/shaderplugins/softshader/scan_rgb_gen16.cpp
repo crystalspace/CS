@@ -26,6 +26,6 @@ namespace cspluginSoftshader
   ScanlineRendererBase* NewScanlineRendererRGBgen16 (
     const csPixelFormat& pfmt)
   {
-    return new ScanlineRenderer<Pix_Generic<uint16, 1> > (pfmt);
+    return new ScanlineRenderer<Pix_Generic<uint16> > (pfmt);
   }
 } // namespace cspluginSoftshader

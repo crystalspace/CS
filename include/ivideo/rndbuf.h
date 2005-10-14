@@ -116,7 +116,10 @@ struct iRenderBuffer : public virtual iBase
    */
   virtual void* Lock(csRenderBufferLockType lockType) = 0;
 
-  /// Releases the buffer. After this all writing to the buffer is illegal
+  /**
+   * Releases the buffer. After this all access to the buffer pointer is 
+   * illegal.
+   */
   virtual void Release() = 0;
 
   /**

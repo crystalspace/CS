@@ -38,6 +38,7 @@ namespace cspluginSoftshader
     int and_w;
     int and_h;
     int colorShift;
+    int alphaShift;
 
     ScanlineRendererBase() : scfImplementationType (this),
       flat_r(255), flat_g(255), flat_b(255), flat_a(255),
@@ -51,7 +52,11 @@ namespace cspluginSoftshader
       flat_b = csClamp ((int)(v.z * 255.99f), 255, 0);
       flat_a = csClamp ((int)(v.w * 255.99f), 255, 0);
     }
-    void SetShift (int x) { colorShift = 16-x; }
+    void SetShift (int c, int a) 
+    { 
+      colorShift = 16-c;
+      alphaShift = 16-a;
+    }
   };
 } // namespace cspluginSoftshader
 

@@ -84,17 +84,13 @@ bool csSoftwareGraphics3D::Open ()
             bFullScreen ? "full screen" : "windowed",
 	    G2D->GetWidth (), G2D->GetHeight (), width, height);
 
-  if (pfmt.PixelBytes == 4)
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.",
-      pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
-  else if (pfmt.PixelBytes == 2)
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.",
-      pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
-  else
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-	       "Using palette mode with 1 byte per pixel (256 colors).");
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "Using truecolor mode with %d bytes per pixel and %d:%d:%d %s mode.",
+    pfmt.PixelBytes, 
+    pixelBGR ? pfmt.BlueBits : pfmt.RedBits, 
+    pfmt.GreenBits, 
+    pixelBGR ? pfmt.RedBits  : pfmt.BlueBits,
+    pixelBGR ? "BGR" : "RGB");
 
   return true;
 }

@@ -68,7 +68,11 @@ bool csSoftShader_FP::Load (iShaderTUResolver*, iDocumentNode* program)
 	    return false;
 	  break;
 	case XMLTOKEN_COLORFACTOR:
-	  if (!ParseProgramParam (child, factor, ParamFloat))
+	  if (!ParseProgramParam (child, cfactor, ParamFloat))
+	    return false;
+	  break;
+	case XMLTOKEN_ALPHAFACTOR:
+	  if (!ParseProgramParam (child, afactor, ParamFloat))
 	    return false;
 	  break;
         default:
@@ -92,6 +96,15 @@ bool csSoftShader_FP::Load (iShaderTUResolver*, iDocumentNode* program)
   return true;
 }
 
+static inline int FactorToShift (float f)
+{
+  f = csClamp (f, 65536.0f, 1.0f/32768.0f);
+  if (f >= 1.0)
+    return csLog2 ((int)f);
+  else
+    return -csLog2 ((int)(1.0f/f));
+}
+
 void csSoftShader_FP::SetupState (const csRenderMesh* mesh,
 				  csRenderMeshModes& modes,
 				  const csShaderVarStack &stacks)
@@ -99,14 +112,9 @@ void csSoftShader_FP::SetupState (const csRenderMesh* mesh,
   csVector4 v = GetParamVectorVal (stacks, flatColor, csVector4 (1));
   shaderPlug->scanlineRenderer->SetFlatColor (v);
 
-  float f = csClamp (GetParamFloatVal (stacks, factor, 1.0f), 
-    65536.0f, 1.0f/32768.0f);
-  int shift;
-  if (f >= 1.0)
-    shift = csLog2 ((int)f);
-  else
-    shift = -csLog2 ((int)(1.0f/f));
-  shaderPlug->scanlineRenderer->SetShift (shift);
+  shaderPlug->scanlineRenderer->SetShift (
+    FactorToShift (GetParamFloatVal (stacks, cfactor, 1.0f)),
+    FactorToShift (GetParamFloatVal (stacks, afactor, 1.0f)));
 }
 
 bool csSoftShader_FP::Compile()

@@ -18,6 +18,9 @@ chronological order.
 	- Jorrit fixed the xml in light_spec_bumpmap.xml.
 	- Jorrit added proper error reporting to the loader in case a shader
 	  file is malformed.
+	- res reduced the number of template instantiations in softshader
+	  somewhat.
+	- res added support for the alpha part of the mixmode to SR.
 13-Oct-2005
 	- Jorrit added a new specular shader which he got from
 	  Erroroman.

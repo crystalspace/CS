@@ -70,47 +70,35 @@ public:
    */
   virtual ~csRenderBuffer ();
 
-  /**
-  * Lock the buffer to allow writing and give us a pointer to the data.
-  * The pointer will be (void*)-1 if there was some error.
-  * \param lockType The type of lock desired.
-  */
+  /**\name iRenderBuffer implementation
+   * @{ */
   virtual void* Lock (csRenderBufferLockType lockType);
 
-  /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release();
 
-  /**
-   * Copy data to the render buffer.
-   */
   virtual void CopyInto (const void *data, size_t elementCount,
     size_t elemOffset = 0);
 
-  /// Gets the number of components per element
   virtual int GetComponentCount () const
   {
     return props.compCount;
   }
 
-  /// Gets the component type (float, int, etc)
   virtual csRenderBufferComponentType GetComponentType () const 
   {
     return props.comptype;
   }
 
-  /// Get type of buffer (static/dynamic)
   virtual csRenderBufferType GetBufferType() const
   {
     return props.bufferType;
   }
 
-  /// Get the size of the buffer (in bytes)
   virtual size_t GetSize() const
   {
     return bufferSize;
   }
 
-  /// Get the stride of the buffer (in bytes)
   virtual size_t GetStride() const 
   {
     return props.stride;
@@ -150,7 +138,10 @@ public:
   { return rangeEnd; }
 
   virtual size_t GetElementCount() const;
+  /** @} */
 
+  /**\name Render buffer creation
+   * @{ */
   /**
    * Create a render buffer.
    * \param elementCount Number of elements in the buffer.
@@ -166,7 +157,7 @@ public:
    *        The pointer passed to CopyInto() must be valid over the lifetime of
    *        the render buffer.
    */
-  static csRef<iRenderBuffer> CreateRenderBuffer (size_t elementCount, 
+  static csRef<csRenderBuffer> CreateRenderBuffer (size_t elementCount, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
     uint componentCount, bool copy = true);
   /**
@@ -186,7 +177,7 @@ public:
    *        The pointer passed to CopyInto() must be valid over the lifetime of
    *        the render buffer.
    */
-  static csRef<iRenderBuffer> CreateIndexRenderBuffer (size_t elementCount, 
+  static csRef<csRenderBuffer> CreateIndexRenderBuffer (size_t elementCount, 
     csRenderBufferType type, csRenderBufferComponentType componentType,
     size_t rangeStart, size_t rangeEnd, bool copy = true);
   /**
@@ -201,6 +192,8 @@ public:
    * \param buffers an array of render buffer references that can hold
    *  at least 'count' render buffers.
    *
+   * Example on creating an interleaved buffer consisting of one three and two
+   * component float buffer:
    * \code
    *  static const csInterleavedSubBufferOptions interleavedElements[2] =
    *    {{CS_BUFCOMP_FLOAT, 3}, {CS_BUFCOMP_FLOAT, 2}};
@@ -211,12 +204,15 @@ public:
    *  csRef<iRenderBuffer> texel_buffer = buffers[1];
    * \endcode
    */
-  static csRef<iRenderBuffer> CreateInterleavedRenderBuffers (
+  static csRef<csRenderBuffer> CreateInterleavedRenderBuffers (
     size_t elementCount, 
     csRenderBufferType type, uint count, 
     const csInterleavedSubBufferOptions* elements, 
     csRef<iRenderBuffer>* buffers);
+  /** @} */
 
+  /**\name "Friendly" name utilities
+   * @{ */
   /**
    * Utility to retrieve the "friendly" string name of a buffer description,
    * e.g. "position" for CS_BUFFER_POSITION.
@@ -227,6 +223,23 @@ public:
    * Can be used to parse e.g. shader files.
    */
   static csRenderBufferName GetBufferNameFromDescr (const char* name);
+  /** @} */
+  
+  //@{
+  /**
+   * Change properties of a render buffer after creation (DANGEROUS).
+   * \warning If the buffer was already passed around and is thus probably 
+   *   used somewhere, changing properties with this methiod is a sure-fire 
+   *   way to wreak havoc. This function is useful in very very specific 
+   *   scenarios; only use it if you really know what you're doing.
+   */
+  void SetRenderBufferProperties (size_t elementCount, 
+    csRenderBufferType type, csRenderBufferComponentType componentType, 
+    uint componentCount, bool copy = true);
+  void SetIndexBufferProperties (size_t elementCount, 
+    csRenderBufferType type, csRenderBufferComponentType componentType,
+    size_t rangeStart, size_t rangeEnd, bool copy = true);
+  //@}
 protected:
   /// Total size of the buffer
   size_t bufferSize;

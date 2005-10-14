@@ -26,9 +26,9 @@ namespace cspluginSoftshader
   ScanlineRendererBase* NewScanlineRendererARGB8888 (
     const csPixelFormat& pfmt)
   {
-    return new ScanlineRenderer<Pix_Fix<uint32, 24, 0, 0xff,
-						16, 0, 0xff,
-						8,  0, 0xff,
-						0,  0, 0xff> > (pfmt);
+    return new ScanlineRenderer<Pix_Fix<uint32, 24, 0xff,
+						16, 0xff,
+						8,  0xff,
+						0,  0xff> > (pfmt);
   }
 } // namespace cspluginSoftshader

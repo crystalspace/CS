@@ -2162,23 +2162,22 @@ void csGLGraphics3D::ApplyBufferChanges()
 }
 
 template<typename T, typename T2>
-static void DoFixup (iRenderBuffer* src, T* dest, size_t elems, 
-                     size_t srcComps, const T2 scales[], 
+static void DoFixup (iRenderBuffer* src, T* dest, const T2 scales[], 
                      size_t comps = (size_t)~0, const T* defaultComps = 0)
 {
-  //if (dest == (void*)-1) return;
+  const size_t elems = src->GetElementCount();
+  const size_t srcComps = src->GetComponentCount();
   if (comps == (size_t)~0) comps = srcComps;
-  T* srcPtr = (T*)src->Lock (CS_BUF_LOCK_READ);
-  size_t srcStride = src->GetElementDistance();
+  csRenderBufferLock<uint8, iRenderBuffer*> srcPtr (src, CS_BUF_LOCK_READ);
+  const size_t srcStride = src->GetElementDistance();
   for (size_t e = 0; e < elems; e++)
   {
-    T* s = (T*)((uint8*)srcPtr + e * srcStride);
+    T* s = (T*)(srcPtr + e * srcStride);
     for (size_t c = 0; c < comps; c++)
     {
       *dest++ = (T)((c < srcComps ? *s++ : defaultComps[c]) * scales[c]);
     }
   }
-  src->Release();
 }
 
 csRef<iRenderBuffer> csGLGraphics3D::DoNPOTSFixup (iRenderBuffer* buffer, int unit)
@@ -2203,42 +2202,34 @@ csRef<iRenderBuffer> csGLGraphics3D::DoNPOTSFixup (iRenderBuffer* buffer, int un
   {
     case CS_BUFCOMP_BYTE:
       DoFixup (buffer, csRenderBufferLock<char> (scrapBuf).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale);
       break;
     case CS_BUFCOMP_UNSIGNED_BYTE:
       DoFixup (buffer, csRenderBufferLock<unsigned char> (scrapBuf).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale);
       break;
     case CS_BUFCOMP_SHORT:
       DoFixup (buffer, csRenderBufferLock<short> (scrapBuf).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale);
       break;
     case CS_BUFCOMP_UNSIGNED_SHORT:
       DoFixup (buffer, csRenderBufferLock<unsigned short> (scrapBuf).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale);
       break;
     case CS_BUFCOMP_INT:
       DoFixup (buffer, csRenderBufferLock<int> (scrapBuf).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale);
       break;
     case CS_BUFCOMP_UNSIGNED_INT:
       DoFixup (buffer, csRenderBufferLock<unsigned int> (scrapBuf).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale);
       break;
     case CS_BUFCOMP_FLOAT:
       DoFixup (buffer, csRenderBufferLock<float> (scrapBuf).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale);
       break;
     case CS_BUFCOMP_DOUBLE:
       DoFixup (buffer, csRenderBufferLock<double> (scrapBuf).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale);
       break;
     default:
@@ -2272,42 +2263,34 @@ csRef<iRenderBuffer> csGLGraphics3D::DoColorFixup (iRenderBuffer* buffer)
   {
     case CS_BUFCOMP_BYTE:
       DoFixup (buffer, csRenderBufferLock<char> (colorScrap).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale, 4, defComponentsB);
       break;
     case CS_BUFCOMP_UNSIGNED_BYTE:
       DoFixup (buffer, csRenderBufferLock<unsigned char> (colorScrap).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale, 4, defComponentsUB);
       break;
     case CS_BUFCOMP_SHORT:
       DoFixup (buffer, csRenderBufferLock<short> (colorScrap).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale, 4, defComponentsS);
       break;
     case CS_BUFCOMP_UNSIGNED_SHORT:
       DoFixup (buffer, csRenderBufferLock<unsigned short> (colorScrap).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale, 4, defComponentsUS);
       break;
     case CS_BUFCOMP_INT:
       DoFixup (buffer, csRenderBufferLock<int> (colorScrap).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale, 4, defComponentsI);
       break;
     case CS_BUFCOMP_UNSIGNED_INT:
       DoFixup (buffer, csRenderBufferLock<unsigned int> (colorScrap).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale, 4, defComponentsUI);
       break;
     case CS_BUFCOMP_FLOAT:
       DoFixup (buffer, csRenderBufferLock<float> (colorScrap).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale, 4, defComponentsF);
       break;
     case CS_BUFCOMP_DOUBLE:
       DoFixup (buffer, csRenderBufferLock<double> (colorScrap).Lock(),
-        buffer->GetElementCount(), buffer->GetComponentCount(),
         componentScale, 4, defComponentsD);
       break;
     default:
