@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Oct-2005
+	- Jorrit fixed a bug in the odedynam plugin. Auto-disable for
+	  inactive objects is enabled. However the odedynam plugin didn't
+	  enable physics again when you called AddForce() or similar.
 13-Oct-2005
 	- Jorrit added a new specular shader which he got from
 	  Erroroman.

@@ -1726,33 +1726,39 @@ void csODERigidBody::AdjustTotalMass (float targetmass)
 
 void csODERigidBody::AddForce (const csVector3& force)
 {
+  Enable ();
   dBodyAddForce (bodyID, force.x, force.y, force.z);
 }
 
 void csODERigidBody::AddTorque (const csVector3& force)
 {
+  Enable ();
   dBodyAddTorque (bodyID, force.x, force.y, force.z);
 }
 
 void csODERigidBody::AddRelForce (const csVector3& force)
 {
+  Enable ();
   dBodyAddRelForce (bodyID, force.x, force.y, force.z);
 }
 
 void csODERigidBody::AddRelTorque (const csVector3& force)
 {
+  Enable ();
   dBodyAddRelTorque (bodyID, force.x, force.y, force.z);
 }
 
 void csODERigidBody::AddForceAtPos (const csVector3& force,
                                     const csVector3& pos)
 {
+  Enable ();
   dBodyAddForceAtPos (bodyID, force.x, force.y, force.z, pos.x, pos.y, pos.z);
 }
 
 void csODERigidBody::AddForceAtRelPos (const csVector3& force,
                                        const csVector3& pos)
 {
+  Enable ();
   dBodyAddForceAtRelPos (bodyID, force.x, force.y, force.z,
     pos.x, pos.y, pos.z);
 }
@@ -1760,6 +1766,7 @@ void csODERigidBody::AddForceAtRelPos (const csVector3& force,
 void csODERigidBody::AddRelForceAtPos (const csVector3& force,
                                        const csVector3& pos)
 {
+  Enable ();
   dBodyAddRelForceAtPos (bodyID, force.x, force.y, force.z,
     pos.x, pos.y, pos.z);
 }
@@ -1767,6 +1774,7 @@ void csODERigidBody::AddRelForceAtPos (const csVector3& force,
 void csODERigidBody::AddRelForceAtRelPos (const csVector3& force,
                                           const csVector3& pos)
 {
+  Enable ();
   dBodyAddRelForceAtRelPos (bodyID, force.x, force.y, force.z,
     pos.x, pos.y, pos.z);
 }
