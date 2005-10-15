@@ -18,7 +18,7 @@ for d in $DIRS; do
 <li><form class=\"search\" action=\"/cgi-bin/htsearch\" method=\"get\">\
 <table cellspacing=\"0\" border=\"0\">\
 <tr><td><label>Search:</label></td>\
-<td><input class=\"search\" type=\"text\" name=\"words\" value="" size=\"20\"/></td></tr>\
+<td><input class=\"search\" type=\"text\" name=\"words\" value=\"\" size=\"20\"/></td></tr>\
 </table></form></li>!" \
       -e "s!( \? </a>]</td>)!\$1
 <td align=\"left\" valign=\"middle\">[ Search: \
