@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Oct-2005
+	- DeSigna:
+	  - Fixed several minor style issues in shaderexpressions.
+	  - Wrote prelim s-expression parser for shader
+	    expressions. Only minimally tested.
 14-Oct-2005
 	- Jorrit fixed a bug in the odedynam plugin. Auto-disable for
 	  inactive objects is enabled. However the odedynam plugin didn't

@@ -117,6 +117,8 @@ private:
   bool parse_sexp_form(const char *& text, cons *);
   /// Parse an S-expression atom 
   bool parse_sexp_atom(const char *& text, cons *);
+  /// Parse a numerical atom for either XEXP or SEXP
+  bool parse_num_atom(const char *& text, oper_arg &);
 
   /// Compile a cons list into the oper_array.
   bool compile_cons(const cons *, int & acc_top);
@@ -205,6 +207,8 @@ private:
   void print_cons(const cons *) const;
   /// Dump the opcode list
   void print_ops(const oper_array &) const;
+  /// Dump the result of an operation
+  void print_result(const oper_arg &) const;
 
   inline const char * get_type_name(csStringID id) const
   {

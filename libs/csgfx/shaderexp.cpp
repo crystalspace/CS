@@ -92,7 +92,7 @@ enum
   // Internal ops
   OP_INT_SELT12,
   OP_INT_SELT34,
-  OP_INT_LOAD
+  OP_INT_LOAD,
 };
 
 enum 
@@ -262,9 +262,9 @@ accstack_max(0)
     sexptokens.Register("vec-len", OP_FUNC_VEC_LEN);
     sexptokens.Register("norm", OP_FUNC_NORMAL);
 
-    xmltokens.Register("arcsin", OP_FUNC_ARCSIN);
-    xmltokens.Register("arccos", OP_FUNC_ARCCOS);
-    xmltokens.Register("arctan", OP_FUNC_ARCTAN);
+    sexptokens.Register("arcsin", OP_FUNC_ARCSIN);
+    sexptokens.Register("arccos", OP_FUNC_ARCCOS);
+    sexptokens.Register("arctan", OP_FUNC_ARCTAN);
 
     sexptokens.Register("pow", OP_FUNC_POW);
     sexptokens.Register("min", OP_FUNC_MIN);
@@ -289,10 +289,10 @@ accstack_max(0)
     mnemonics.Register("SIN", OP_FUNC_SIN);
     mnemonics.Register("COS", OP_FUNC_COS);
     mnemonics.Register("TAN", OP_FUNC_TAN);
-    sexptokens.Register("DOT", OP_FUNC_DOT);
-    sexptokens.Register("CROSS", OP_FUNC_CROSS);
-    sexptokens.Register("VLEN", OP_FUNC_VEC_LEN);
-    sexptokens.Register("NORM", OP_FUNC_NORMAL);
+    mnemonics.Register("DOT", OP_FUNC_DOT);
+    mnemonics.Register("CROSS", OP_FUNC_CROSS);
+    mnemonics.Register("VLEN", OP_FUNC_VEC_LEN);
+    mnemonics.Register("NORM", OP_FUNC_NORMAL);
 
 
     mnemonics.Register("FRAME", OP_FUNC_FRAME);
@@ -349,6 +349,10 @@ bool csShaderExpression::Parse(iDocumentNode * node)
 
   if (!parse_xml(head, node)) 
   {
+#if 0
+    if (head)
+      print_cons(head);
+#endif
     destruct_cons(head);
 
     ParseError ("Failed to construct cons list.");
@@ -404,6 +408,10 @@ bool csShaderExpression::Parse(iDocumentNode * node)
 bool csShaderExpression::Evaluate(csShaderVariable* var, 
                                   csShaderVarStack& stacks)
 {
+#if 0
+  int debug_counter = 0;
+#endif
+
   errorMsg.Empty();
   if (!opcodes.Length())
   {
@@ -419,6 +427,10 @@ bool csShaderExpression::Evaluate(csShaderVariable* var,
   while (iter.HasNext())
   {
     const oper & op = iter.Next();
+
+#if 0
+    debug_counter++;
+#endif
 
     if (op.arg1.type == TYPE_INVALID)
     {
@@ -444,6 +456,12 @@ bool csShaderExpression::Evaluate(csShaderVariable* var,
         break;
       }
     }
+
+#if 0
+    csPrintf("Eval result (op %3i): <ACC%i> <- ", debug_counter, op.acc);
+    print_result(accstack.Get(op.acc));
+    csPrintf("\n");
+#endif    
   }
 
   bool ret = false;
@@ -457,21 +475,21 @@ bool csShaderExpression::Evaluate(csShaderVariable* var,
 bool csShaderExpression::eval_const(cons *& head)
 {
   /* This pass is expected to do the following:
-  - Ensure that arguments are correct. No arg-less ops or multiple-arg
-  operators with single arguments.
-  - In the case of single argument'd multi-arg ops, they are 
-  inserted into the parent cons list, and the sub-cons 
-  removed. This works nicely with the currently used constant 
-  reduction algorithm. (+ (+ 1) 2) becomes (+ 1 2).
-  - In the case of set # of argument ops, error if there aren't enough
-  or too many.
-  - (- <atom>) is resolved to (- 0 <atom>)
-  - Sanity check, ensure that atom types are correct within 
-  the cons tree (currently via CS_ASSERT).
+     - Ensure that arguments are correct. No arg-less ops or multiple-arg
+       operators with single arguments.
+     - In the case of single argument'd multi-arg ops, they are 
+       inserted into the parent cons list, and the sub-cons 
+       removed. This works nicely with the currently used constant 
+       reduction algorithm. (+ (+ 1) 2) becomes (+ 1 2).
+     - In the case of set # of argument ops, error if there aren't enough
+       or too many.
+     - (- <atom>) is resolved to (- 0 <atom>)
+     - Sanity check, ensure that atom types are correct within 
+       the cons tree (currently via CS_ASSERT).
 
-  When modifying, please keep these in mind. The compiler and evaluator
-  have limited error-checking for the above, and will produce incorrect
-  results if they're not resolved. */
+     When modifying, please keep these in mind. The compiler and evaluator
+     have limited error-checking for the above, and will produce incorrect
+     results if they're not resolved. */
 
   cons * cell = head, * last = 0;
   int oper;
@@ -1468,9 +1486,7 @@ bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node)
   }
   else if (tok == OP_XML_SEXP)
   {
-    ParseError ("S-expressions not ready yet.");
-
-    return false;
+    return parse_sexp(head, node);
   }
   else if (tok <= OP_INVALID || tok >= OP_LIMIT)
   {
@@ -1494,7 +1510,8 @@ bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node)
       cptr->cdr->cdr_rev = cptr;
       cptr = cptr->cdr;
 
-      if (sub_tok != OP_XML_ATOM)
+      if (sub_tok != OP_XML_ATOM &&
+	  sub_tok != OP_XML_SEXP)
       {
         cptr->car.type = TYPE_CONS;
         cptr->car.cell = new cons;
@@ -1517,7 +1534,7 @@ bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node)
 
 bool csShaderExpression::parse_sexp(cons * head, iDocumentNode * node)
 {
-  const char * text = node->GetValue();
+  const char * text = node->GetContentsValue();
   cons * cptr = head;
 
   if (text[0] == '(') 
@@ -1529,17 +1546,80 @@ bool csShaderExpression::parse_sexp(cons * head, iDocumentNode * node)
 }
 
 bool csShaderExpression::parse_sexp_form(const char *& text, cons * head) {
+  cons * cptr = head;
 
-  return false;
+  CS_ASSERT(text[0] == '(');
+  text++;
+
+  /* Function name first */
+  const char * tmp = text;
+  while (!isspace(*tmp))
+    tmp++;
+
+  if (!(*tmp)) {
+    ParseError("End of string inside form");
+
+    return false;
+  }
+
+  int size = tmp - text;
+  CS_ALLOC_STACK_ARRAY(char, tmp2, size + 1);
+  memcpy(tmp2, text, size);
+  tmp2[size] = 0;
+
+  csStringID func_name = sexptokens.Request(tmp2);
+  if (func_name <= OP_INVALID || func_name >= OP_LIMIT) {
+    ParseError ("Invalid S-EXP function-name: '%s'.", tmp2);
+
+    return false;
+  }
+
+  cptr->car.type = TYPE_OPER;
+  cptr->car.oper = func_name;
+  
+  text = tmp + 1;
+  while (*text != ')') {
+    while (isspace(*text)) 
+      text++;
+
+    if (!(*text)) {
+      ParseError("End of string inside form at %s<Here>", text - 20);
+
+      return false;
+    }
+
+    if (*text != ')') {
+      cptr->cdr = new cons;
+      cptr->cdr->car.type = TYPE_INVALID;
+      cptr->cdr->cdr_rev = cptr;
+      cptr = cptr->cdr;
+
+      if (text[0] == '(') {
+	cptr->car.type = TYPE_CONS;
+	cptr->car.cell = new cons;
+
+	if (!parse_sexp_form(text, cptr->car.cell))
+	  return false;
+      } else {
+	if (!parse_sexp_atom(text, cptr))
+	  return false;
+      }
+    }
+  }
+  
+  text++;
+
+  return true;
 }
 
 bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
   if (isdigit(*text) || 
     (*text == '-' && isdigit(text[1])) ||
     (*text == '+' && isdigit(text[1])) ||
-    (*text == '.' && isdigit(text[1])))        /* TYPE_NUMBER */
-  { /* @@@ Optimize to use strtod directly, and endval_ptr to check for error conditions ! */
+    (*text == '.' && isdigit(text[1]))) 
+  { /* TYPE_NUMBER */
     const char * tmp = text;
+    char * tmp3 = 0;
 
     while (!isspace(*tmp) && *tmp)
       tmp++;
@@ -1549,13 +1629,15 @@ bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
     memcpy(tmp2, text, size);
     tmp2[size] = 0;
 
-    if (!parse_xml_atom(head->car, TYPE_NUMBER, "num", tmp2))
-      return false;
+    double n = strtod(text, &tmp3);
+  
+    head->car.type = TYPE_NUMBER;
+    head->car.num = n;
 
-    text = tmp;
+    text = tmp3;
   }
   else if (*text == '#' && text[1] == '(')
-  {   /* TYPE_VECTOR* */ 
+  { /* TYPE_VECTOR* */ 
     int args = 0;
     float arg[4];
     char * tmp = 0;
@@ -1570,8 +1652,11 @@ bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
       if (isspace(*tmp))
         tmp++;
 
-      if (*tmp == ')')
+      if (*tmp == ')') {
+	text = tmp; 
+
         break;
+      }
 
       if (*tmp == 0) {
         ParseError ("End of parse string inside atom.");
@@ -1583,7 +1668,7 @@ bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
 
     if (*text != ')') 
     {
-      ParseError ("Vector doesn't terminate with ')', or too many elements in vector.");
+      ParseError ("Vector doesn't terminate with ')', or too many elements in vector. Error at position: %s", text);
       return false;
     }
 
@@ -1612,10 +1697,12 @@ bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
     }
 
     text++;
-  } else {
+  } 
+  else if (isalpha(*text)) 
+  { /* TYPE_VARIABLE */
     const char * tmp = text;
 
-    while (*tmp && !isspace(*tmp)) 
+    while (*tmp && !isspace(*tmp) && *tmp != ')') 
       tmp++;
 
     int size = tmp - text;
@@ -1627,6 +1714,10 @@ bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
     head->car.var = strset->Request(tmp2);
 
     text = tmp;
+  } else {
+    ParseError("Unrecognized item in SEXP parse string. Improved error handling required!");
+
+    return false;
   }
 
   head->cdr = 0;
@@ -1637,36 +1728,13 @@ bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
 
 bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const char * type_str, const char * val_str)
 {
-  char * tmp = 0;
-
   arg.type = type;
 
   switch (type)
   {
-    /* @@@ Since this shares common code with the sexp parser, it may want its own func (?) */
   case TYPE_NUMBER:
     {
-      errno = 0;
-
-      double n = strtod(val_str, &tmp);
-      arg.num = (float)n;
-
-      if (*tmp)
-      {
-        ParseError ("Error parsing float at position %td.",
-          tmp - val_str);
-
-        return false;
-      }
-    }
-
-    if (errno)
-    {
-#ifdef CS_DEBUG
-      perror("Error parsing float");
-#endif
-
-      return false;
+      return parse_num_atom(val_str, arg);
     }
     break;
 
@@ -1725,6 +1793,34 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
 
     return false;
   }
+
+  return true;
+}
+
+bool csShaderExpression::parse_num_atom(const char *& text, oper_arg & arg) {
+  char * tmp = 0;
+
+  errno = 0;
+  
+  double n = strtod(text, &tmp);
+  
+  if (*tmp)
+    {
+      ParseError ("Error parsing float at position %td.",
+		  tmp - text);
+      
+      return false;
+    }       
+  
+  if (errno)
+    {
+#ifdef CS_DEBUG
+      perror("Error parsing float");
+#endif
+      return false;
+    }
+
+  arg.num = (float)n;
 
   return true;
 }
@@ -2094,4 +2190,37 @@ void csShaderExpression::print_ops(const oper_array & ops) const
 
     csPrintf (" -> ACC%d\n", op.acc);
   }
+}
+
+void csShaderExpression::print_result(const oper_arg & arg) const {
+  switch (arg.type)
+    {
+    case TYPE_NUMBER:
+      csPrintf ("#<NUMBER %f>", arg.num);
+      break;
+      
+    case TYPE_VECTOR2:
+      csPrintf ("#<VECTOR2 (%f %f)>", arg.vec4.x, arg.vec4.y);
+      break;
+      
+    case TYPE_VECTOR3:
+      csPrintf ("#<VECTOR3 (%f %f %f)>", arg.vec4.x, arg.vec4.y, arg.vec4.z);
+      break;
+      
+    case TYPE_VECTOR4:
+      csPrintf ("#<VECTOR4 (%f %f %f %f)>", arg.vec4.x, arg.vec4.y, arg.vec4.z, arg.vec4.w);
+      break;
+      
+    case TYPE_VARIABLE:
+      csPrintf ("#<VARIABLEREF \"%s\">", strset->Request(arg.var));
+      break;
+      
+    case TYPE_ACCUM:
+      csPrintf ("#<ACCUMREF ACC%d>", arg.acc);
+      break;
+      
+    default:
+      csPrintf ("#<unknown type %" PRIu8 ">", arg.type);
+    }
+  
 }
