@@ -144,7 +144,7 @@ typedef unsigned int GLhandleARB;
 
 /**\name GL_version_1_2 constants
  * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
- * this extension when teh appropriate GL version was detected. 
+ * this extension when the appropriate GL version was detected. 
  * @{ */
 #ifndef GL_UNSIGNED_BYTE_3_3_2
 #define GL_UNSIGNED_BYTE_3_3_2                                        32818
@@ -311,7 +311,7 @@ typedef unsigned int GLhandleARB;
 
 /**\name GL_version_1_2 functions
  * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
- * this extension when teh appropriate GL version was detected. 
+ * this extension when the appropriate GL version was detected. 
  * @{ */
 typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTS) (GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid* indices);
 typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3D) (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
@@ -321,7 +321,7 @@ typedef GLvoid (csAPIENTRY* csGLCOPYTEXSUBIMAGE3D) (GLenum target, GLint level, 
 /** @} */
 /**\name GL_version_1_3 constants
  * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
- * this extension when teh appropriate GL version was detected. 
+ * this extension when the appropriate GL version was detected. 
  * @{ */
 #ifndef GL_TEXTURE0
 #define GL_TEXTURE0                                                   33984
@@ -716,7 +716,7 @@ typedef GLvoid (csAPIENTRY* csGLCOPYTEXSUBIMAGE3D) (GLenum target, GLint level, 
 
 /**\name GL_version_1_3 functions
  * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
- * this extension when teh appropriate GL version was detected. 
+ * this extension when the appropriate GL version was detected. 
  * @{ */
 typedef GLvoid (csAPIENTRY* csGLACTIVETEXTURE) (GLenum texture);
 typedef GLvoid (csAPIENTRY* csGLCLIENTACTIVETEXTURE) (GLenum texture);

@@ -274,21 +274,6 @@ SPAN.charliteral   { color: #008080 }
 	background-color: #FAFAFA;
 }
 
-.search     
-{ 
-    background-color: #f0f0f2;
-    border: 1px solid #84b0c7;
-	color: #003399;
-	font-family: Verdana, sans-serif;
-	font-size: 10pt;
-	clear: none;
-}
-FORM.search {
-    margin-bottom: 0px;
-    margin-top: 0px;
-	display: inline;
-}
-
 TD.tiny      { font-size: 75%;
 }
 a {
@@ -332,9 +317,25 @@ div.content {
 	margin-right: 0.5cm;
 }
 
-DIV.tabs A
+/* Tweaks for tabs */
+DIV.tabs A, DIV.tabs TD
 {
 	font-size: 10pt;
+}
+
+.search     
+{ 
+    background-color: #f0f0f2;
+    border: 1px solid #84b0c7;
+	color: #003399;
+	font-family: Verdana, sans-serif;
+	font-size: 10pt;
+	clear: none;
+}
+FORM.search {
+    margin-bottom: 0px;
+    margin-top: 0px;
+	display: inline;
 }
 
 @media print 
