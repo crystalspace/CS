@@ -136,7 +136,8 @@ bool csCEGUIEventHandler::OnKeyboard (iEvent &event)
     TRANSLATE(ESC,		Escape);
     TRANSLATE(BACKSPACE,	Backspace);
     TRANSLATE(TAB,		Tab);
-    TRANSLATE(SPACE,		Space);
+    // Seems CEGUI zealously catches Space key events.
+    //TRANSLATE(SPACE,		Space);
     TRANSLATE(INS,		Insert);
     TRANSLATE(DEL,		Delete);
     TRANSLATE(ENTER,		Return);
