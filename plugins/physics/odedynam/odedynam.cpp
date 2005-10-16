@@ -984,57 +984,60 @@ void csODECollider::ClearContents ()
 
 void csODECollider::MassCorrection ()
 {
-  dMass m, om;
-  dMassSetZero (&m);
-
-  switch (geom_type)
+  if (density > 0 && dGeomGetBody (transformID))
   {
-  case BOX_COLLIDER_GEOMETRY:
+    dMass m, om;
+    dMassSetZero (&m);
+
+    switch (geom_type)
     {
-      dVector3 size;
-      dGeomBoxGetLengths (geomID, size);
-      dMassSetBox (&m, density, size[0], size[1], size[2]);
-    }
-    break;
-  case SPHERE_COLLIDER_GEOMETRY:
-    dMassSetSphere (&m, density, dGeomSphereGetRadius (geomID));
-    break;
-  case CYLINDER_COLLIDER_GEOMETRY:
-    {
-      dReal radius, length;
-      dGeomCCylinderGetParams (geomID, &radius, &length);
-      dMassSetCappedCylinder (&m, density, 3, radius, length);
-    }
-    break;
-  case TRIMESH_COLLIDER_GEOMETRY:
-    {
-      // ODE doesn't have any function to get the mass of arbitrary triangles
-      // so we will just use the OBB
-      int tri_count = dGeomTriMeshGetTriangleCount (geomID);
-      csOBB b;
-      for (int i = 0; i < tri_count; i++)
+    case BOX_COLLIDER_GEOMETRY:
       {
-        dVector3 v0, v1, v2;
-        dGeomTriMeshGetTriangle (geomID, i, &v0, &v1, &v2);
-        b.AddBoundingVertex (csVector3 (v0[0], v0[1], v0[2]));
-        b.AddBoundingVertex (csVector3 (v1[0], v1[1], v1[2]));
-        b.AddBoundingVertex (csVector3 (v2[0], v2[1], v2[2]));
+        dVector3 size;
+        dGeomBoxGetLengths (geomID, size);
+        dMassSetBox (&m, density, size[0], size[1], size[2]);
       }
-      dMassSetBox (&m, density, b.MaxX()-b.MinX(), b.MaxY()-b.MinY(), b.MaxZ()-b.MinZ());
+      break;
+    case SPHERE_COLLIDER_GEOMETRY:
+      dMassSetSphere (&m, density, dGeomSphereGetRadius (geomID));
+      break;
+    case CYLINDER_COLLIDER_GEOMETRY:
+      {
+        dReal radius, length;
+        dGeomCCylinderGetParams (geomID, &radius, &length);
+        dMassSetCappedCylinder (&m, density, 3, radius, length);
+      }
+      break;
+    case TRIMESH_COLLIDER_GEOMETRY:
+      {
+        // ODE doesn't have any function to get the mass of arbitrary triangles
+        // so we will just use the OBB
+        int tri_count = dGeomTriMeshGetTriangleCount (geomID);
+        csOBB b;
+        for (int i = 0; i < tri_count; i++)
+        {
+          dVector3 v0, v1, v2;
+          dGeomTriMeshGetTriangle (geomID, i, &v0, &v1, &v2);
+          b.AddBoundingVertex (csVector3 (v0[0], v0[1], v0[2]));
+          b.AddBoundingVertex (csVector3 (v1[0], v1[1], v1[2]));
+          b.AddBoundingVertex (csVector3 (v2[0], v2[1], v2[2]));
+        }
+        dMassSetBox (&m, density, b.MaxX()-b.MinX(), b.MaxY()-b.MinY(), b.MaxZ()-b.MinZ());
+      }
+    default:
+      break;
     }
-  default:
-    break;
+
+    const dReal *pos = dGeomGetPosition (geomID);
+    dMassTranslate (&m, pos[0], pos[1], pos[2]);
+
+    dMassRotate (&m, dGeomGetRotation (geomID));
+
+    dBodyID bodyID = dGeomGetBody (transformID);
+    dBodyGetMass (bodyID, &om);
+    dMassAdd (&om, &m);
+    dBodySetMass (bodyID, &om);
   }
-
-  const dReal *pos = dGeomGetPosition (geomID);
-  dMassTranslate (&m, pos[0], pos[1], pos[2]);
-
-  dMassRotate (&m, dGeomGetRotation (geomID));
-
-  dBodyID bodyID = dGeomGetBody (transformID);
-  dBodyGetMass (bodyID, &om);
-  dMassAdd (&om, &m);
-  dBodySetMass (bodyID, &om);
 }
 void csODECollider::AttachBody (dBodyID bodyID)
 {
@@ -1046,6 +1049,11 @@ void csODECollider::AttachBody (dBodyID bodyID)
       MassCorrection ();
     }
   }
+}
+void csODECollider::SetDensity (float density) 
+{
+  csODECollider::density = density;
+  MassCorrection ();
 }
 bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
 {

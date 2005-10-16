@@ -43,8 +43,6 @@ struct iDynamicsCollisionCallback;
 struct iDynamicsMoveCallback;
 struct iDynamicSystem;
 
-SCF_VERSION (iDynamics, 0, 0, 2);
-
 /**
  * This is the interface for the actual plugin.
  * It is responsible for creating iDynamicSystem.
@@ -58,8 +56,9 @@ SCF_VERSION (iDynamics, 0, 0, 2);
  * Main users of this interface:
  * - Dynamics loader plugin (crystalspace.dynamics.loader)
  */
-struct iDynamics : public iBase
+struct iDynamics : public virtual iBase
 {
+  SCF_INTERFACE(iDynamics,0,0,2);
   /// Create a rigid body and add it to the simulation
   virtual csPtr<iDynamicSystem> CreateSystem () = 0;
 
@@ -76,8 +75,6 @@ struct iDynamics : public iBase
   virtual void Step (float stepsize) = 0;
 };
 
-SCF_VERSION (iDynamicSystem, 0, 0, 2);
-
 struct iDynamicsSystemCollider;
 
 /**
@@ -92,8 +89,10 @@ struct iDynamicsSystemCollider;
  * Main ways to get pointers to this interface:
  * - iDynamicSystem::FindSystem()
  */
-struct iDynamicSystem : public iBase
+struct iDynamicSystem : public virtual iBase
 {
+  SCF_INTERFACE (iDynamicSystem, 0, 0, 2);
+
   /// returns the underlying object
   virtual iObject *QueryObject (void) = 0;
   /// Set the global gravity.
@@ -268,8 +267,6 @@ struct iDynamicSystem : public iBase
   virtual int GetColliderCount () = 0;
 };
 
-SCF_VERSION (iDynamicsMoveCallback, 0, 0, 1);
-
 /**
  * This is the interface for a dynamics move callback.
  * Set on iRigidBody, it can update attachments after each step.
@@ -281,8 +278,10 @@ SCF_VERSION (iDynamicsMoveCallback, 0, 0, 1);
  * Main users of this interface:
  * - iDynamicSystem
  */
-struct iDynamicsMoveCallback : public iBase
+struct iDynamicsMoveCallback : public virtual iBase
 {
+  SCF_INTERFACE (iDynamicsMoveCallback, 0, 0, 1);
+
   virtual void Execute (iMeshWrapper* mesh, csOrthoTransform& t) = 0;
   virtual void Execute (csOrthoTransform& t) = 0;
 };
@@ -332,8 +331,6 @@ struct iBodyGroup : public iBase
    virtual bool BodyInGroup (iRigidBody *body) = 0;
 };
 
-SCF_VERSION (iRigidBody, 0, 0, 2);
-
 /**
  * This is the interface for a rigid body.
  * It keeps all properties for the body.
@@ -349,8 +346,10 @@ SCF_VERSION (iRigidBody, 0, 0, 2);
  * Main users of this interface:
  * - iDynamicSystem
  */
-struct iRigidBody : public iBase
+struct iRigidBody : public virtual iBase
 {
+  SCF_INTERFACE (iRigidBody, 0, 0, 2);
+
   /// returns the underlying object
   virtual iObject *QueryObject (void) = 0;
   /**

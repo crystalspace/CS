@@ -643,7 +643,7 @@ public:
   void SetFriction (float friction) {surfacedata[0] = friction;};
   void SetSoftness (float softness) {surfacedata[2] = softness;};
   void SetElasticity (float elasticity) {surfacedata[1] = elasticity;};
-  void SetDensity (float density) {csODECollider::density = density;}
+  void SetDensity (float density);
   
   float GetFriction () {return surfacedata[0];};
   float GetSoftness () {return surfacedata[1];};

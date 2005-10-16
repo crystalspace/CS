@@ -11,6 +11,8 @@ chronological order.
 	  by adding an actual mount point for ceguitest rather than having it
 	  rely upon an underlying physical directory structure (which might
 	  differ between source and installation locations).
+	- Piotr Obrzut did another fix to cs ode colliders, allownig to do 
+	  mass correction only having all needed paramters.
 15-Oct-2005
 	- DeSigna made the following changes:
 	    - Fixed several minor style issues in shaderexpressions.
