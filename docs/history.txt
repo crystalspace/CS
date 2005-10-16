@@ -6,11 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Oct-2005
+	- Eric Sunshine increased robustness of the ceguitest + VFS interaction
+	  by adding an actual mount point for ceguitest rather than having it
+	  rely upon an underlying physical directory structure (which might
+	  differ between source and installation locations).
 15-Oct-2005
-	- DeSigna:
-	  - Fixed several minor style issues in shaderexpressions.
-	  - Wrote prelim s-expression parser for shader
-	    expressions. Only minimally tested.
+	- DeSigna made the following changes:
+	    - Fixed several minor style issues in shaderexpressions.
+	    - Wrote prelim s-expression parser for shader expressions. Only
+	      minimally tested.
 14-Oct-2005
 	- Jorrit fixed a bug in the odedynam plugin. Auto-disable for
 	  inactive objects is enabled. However the odedynam plugin didn't

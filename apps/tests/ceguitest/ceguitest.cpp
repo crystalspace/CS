@@ -163,7 +163,7 @@ bool CEGUITest::Application()
   // Set the logging level
   cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
 
-  vfs->ChDir ("/data/ceguitest/");
+  vfs->ChDir ("/ceguitest/");
 
   // Load the ice skin (which uses Falagard skinning system)
   cegui->GetSchemeManagerPtr ()->loadScheme("ice.scheme");
