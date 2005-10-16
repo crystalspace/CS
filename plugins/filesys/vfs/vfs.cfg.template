@@ -51,7 +51,7 @@ VFS.Mount.lib/startme  = $(CS_DATADIR)$/startme.zip
 VFS.Mount.aws = $(CS_DATADIR)$/awsdef.zip, $(CS_DATADIR)$/aws$/
 
 ; CEgui test
-VFS.Mount.geguitest  = $(CS_DATADIR)$/ceguitest$/
+VFS.Mount.ceguitest  = $(CS_DATADIR)$/ceguitest$/
 
 ; Mount for unittest
 VFS.Mount.lev/unittest = $(CS_DATADIR)$/unittest$/
