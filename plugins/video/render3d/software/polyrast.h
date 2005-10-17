@@ -32,24 +32,72 @@ namespace cspluginSoft3d
 {
   using namespace CrystalSpace::SoftShader;
 
+  struct SLLogic_ScanlineRenderer
+  {
+    const iScanlineRenderer::RenderInfo& sri;
+    const VertexBuffer* inBuffers;
+    BuffersMask buffersMask;
+    size_t floatsPerVert;
+
+    SLLogic_ScanlineRenderer (const iScanlineRenderer::RenderInfo& sri,
+      const VertexBuffer* inBuffers, BuffersMask buffersMask,
+      size_t floatsPerVert) : 
+      sri (sri), inBuffers (inBuffers), buffersMask (buffersMask),
+      floatsPerVert (floatsPerVert) {}
+
+    CS_FORCEINLINE
+    void RenderScanline (InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
+      int ipolStep, int ipolShift, void* dest, uint len, uint32 *zbuff)
+    {
+      sri.proc (sri.renderer, L, R, ipolStep, ipolShift, 
+	dest, len, zbuff);
+    }
+    void LinearizeBuffers (float* linearBuffers, size_t vertNum)
+    {
+      const size_t* compNum = sri.bufferComps;
+      size_t bufOfs = 0;
+      for (size_t i = 0; i < maxBuffers; i++)
+      {
+	if (!(buffersMask & (1 << i))) continue;
+	float* dest = &linearBuffers[bufOfs];
+	uint8* src = inBuffers[i].data;
+	for (size_t v = 0; v < vertNum; v++)
+	{
+	  memcpy (dest, src, *compNum * sizeof (float));
+	  src += inBuffers[i].comp * sizeof (float);
+	  dest += floatsPerVert;
+	}
+	bufOfs += *compNum;
+	compNum++;
+      }
+    }
+    size_t GetFloatsPerVert() const { return floatsPerVert; }
+  };
+
+  struct SLLogic_ZFill
+  {
+    CS_FORCEINLINE
+    void RenderScanline (InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
+      int ipolStep, int ipolShift, void* /*dest*/, uint len, uint32 *zbuff)
+    {
+      InterpolateScanlinePersp<0> ipol;
+      ipol.Setup (L, R, 1.0f / len, ipolStep, ipolShift);
+
+      while (len-- > 0)
+      {
+	*zbuff = ipol.Iz.GetFixed();
+	ipol.Advance();
+	zbuff++;
+      } /* endwhile */
+    }
+    void LinearizeBuffers (float* /*linearBuffers*/, size_t /*vertNum*/)
+    { }
+    size_t GetFloatsPerVert() const { return 0; }
+  };
+
+  template <typename ScanlineLogic>
   class PolygonRasterizer
   {
-    /*bool dpfx_valid;
-    iTextureHandle* dpfx_tex_handle;
-    uint dpfx_mixmode;
-    bool do_gouraud;
-    bool do_lighting;
-    bool do_textured;
-    /// Alpha mask used for 16-bit mode.
-    uint16 alpha_mask;
-    bool is_for_procedural_textures;
-
-    csDrawPIScanline** ScanProcPI;
-    csDrawPIScanlineGouraud** ScanProcPIG;
-
-    csPixelFormat pfmt;
-    csSoftwareTextureManager* texman;*/
-
     int width, height;
     int do_interlaced;
 
@@ -61,8 +109,8 @@ namespace cspluginSoft3d
       int& InterpolStep, int& InterpolShift)
     {
       /*
-      * For the four interpolation modes.
-      */
+       * For the four interpolation modes.
+       */
       struct csSft3DCom
       {
 	int step1, shift1;
@@ -109,10 +157,10 @@ namespace cspluginSoft3d
     }
 
     void DrawPolygon (size_t vertNum, const csVector3* vertices,
-      const VertexBuffer* inBuffers, BuffersMask buffersMask,
-      iScanlineRenderer::RenderInfo& sri, size_t floatsPerVert)
+      const ScanlineLogic& logic)
     {
       CS_ASSERT_MSG ("Degenerate polygon", vertNum >= 3);
+      ScanlineLogic sll (logic);
       //-----
       // Get the values from the polygon for more convenient local access.
       // Also look for the top-most and bottom-most vertices.
@@ -201,25 +249,9 @@ namespace cspluginSoft3d
 	}
       }
 
+      const size_t floatsPerVert = sll.GetFloatsPerVert();
       CS_ALLOC_STACK_ARRAY(float, linearBuffers, floatsPerVert * vertNum);
-      {
-	const size_t* compNum = sri.bufferComps;
-	size_t bufOfs = 0;
-	for (i = 0; i < maxBuffers; i++)
-	{
-	  if (!(buffersMask & (1 << i))) continue;
-	  float* dest = &linearBuffers[bufOfs];
-	  uint8* src = inBuffers[i].data;
-	  for (size_t v = 0; v < vertNum; v++)
-	  {
-	    memcpy (dest, src, *compNum * sizeof (float));
-	    src += inBuffers[i].comp * sizeof (float);
-	    dest += floatsPerVert;
-	  }
-	  bufOfs += *compNum;
-	  compNum++;
-	}
-      }
+      sll.LinearizeBuffers (linearBuffers, vertNum);
 
       int ipolStep = 16;
       int ipolShift = 4;
@@ -337,7 +369,7 @@ namespace cspluginSoft3d
 	      uint32 *zbuff = z_buffer + width * screenY + xl;
 	      unsigned char *dest = line_table [screenY] + (xl << pixel_shift);
 
-	      sri.proc (sri.renderer, L.edge, R.edge, ipolStep, ipolShift, 
+	      sll.RenderScanline (L.edge, R.edge, ipolStep, ipolShift, 
 		dest, l, zbuff);
 	    }
 	  }

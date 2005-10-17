@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Oct-2005
+	- res removed some now-outdated code from softrender3d.
+	- res made a small importkit documentation tweak.
 16-Oct-2005
 	- Eric Sunshine increased robustness of the ceguitest + VFS interaction
 	  by adding an actual mount point for ceguitest rather than having it

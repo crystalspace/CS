@@ -39,13 +39,10 @@ SCF_IMPLEMENT_FACTORY (csSoftwareGraphics3D)
 csSoftwareGraphics3D::csSoftwareGraphics3D (iBase *iParent)
   : scfImplementationType (this, iParent)
 {
-  is_for_procedural_textures = false;
-  csScan_Initialize ();
 }
 
 csSoftwareGraphics3D::~csSoftwareGraphics3D ()
 {
-  csScan_Finalize ();
 }
 
 bool csSoftwareGraphics3D::Initialize (iObjectRegistry *object_reg)
@@ -97,18 +94,17 @@ bool csSoftwareGraphics3D::Open ()
 
 //---------------------------------------------------------------------------
 
-#define NUM_OPTIONS 7
-
-static const csOptionDescription config_options [NUM_OPTIONS] =
+static const csOptionDescription config_options[] =
 {
   { 0, "ilace", "Interlacing", CSVAR_BOOL },
   { 1, "light", "Texture lighting", CSVAR_BOOL },
   { 2, "alpha", "Semi-transparent textures", CSVAR_BOOL },
   { 3, "txtmap", "Texture mapping", CSVAR_BOOL },
-  { 4, "mmx", "MMX support", CSVAR_BOOL },
-  { 5, "gouraud", "Gouraud shading", CSVAR_BOOL },
-  { 6, "smaller", "Smaller rendering", CSVAR_BOOL },
+  { 4, "gouraud", "Gouraud shading", CSVAR_BOOL },
+  { 5, "smaller", "Smaller rendering", CSVAR_BOOL },
 };
+static const int numOptions = 
+  sizeof (config_options) / sizeof (config_options[0]);
 
 bool csSoftwareGraphics3D::SetOption (int id, csVariant* value)
 {
@@ -120,11 +116,8 @@ bool csSoftwareGraphics3D::SetOption (int id, csVariant* value)
     case 1: do_lighting = value->GetBool (); break;
     case 2: do_alpha = value->GetBool (); break;
     case 3: do_textured = value->GetBool (); break;
-#ifdef CS_HAVE_MMX
-    case 4: do_mmx = value->GetBool (); break;
-#endif
-    case 5: do_gouraud = value->GetBool (); break;
-    case 6: do_smaller_rendering = value->GetBool (); break;
+    case 4: do_gouraud = value->GetBool (); break;
+    case 5: do_smaller_rendering = value->GetBool (); break;
     default: return false;
   }
   return true;
@@ -138,13 +131,8 @@ bool csSoftwareGraphics3D::GetOption (int id, csVariant* value)
     case 1: value->SetBool (do_lighting); break;
     case 2: value->SetBool (do_alpha); break;
     case 3: value->SetBool (do_textured); break;
-#ifdef CS_HAVE_MMX
-    case 4: value->SetBool (do_mmx); break;
-#else
-    case 4: value->SetBool (false); break;
-#endif
-    case 5: value->SetBool (do_gouraud); break;
-    case 6: value->SetBool (do_smaller_rendering); break;
+    case 4: value->SetBool (do_gouraud); break;
+    case 5: value->SetBool (do_smaller_rendering); break;
     default: return false;
   }
   return true;
@@ -153,7 +141,7 @@ bool csSoftwareGraphics3D::GetOption (int id, csVariant* value)
 bool csSoftwareGraphics3D::GetOptionDescription
   (int idx, csOptionDescription* option)
 {
-  if (idx < 0 || idx >= NUM_OPTIONS)
+  if (idx < 0 || idx >= numOptions)
     return false;
   *option = config_options[idx];
   return true;

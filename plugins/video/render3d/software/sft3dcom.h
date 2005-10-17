@@ -21,14 +21,6 @@
 #ifndef __CS_SFTR3DCOM_H__
 #define __CS_SFTR3DCOM_H__
 
-#if defined(CS_HAVE_MMX) && (CS_PROCESSOR_SIZE != 32)
-  /*
-   * Disable MMX stuff on non-32bit machines for the time being.
-   * The asm code needs to be checked/updated for 64bit.
-   */
-  #undef CS_HAVE_MMX
-#endif
-
 #include "csutil/scf.h"
 
 #include "csgeom/plane3.h"
@@ -38,6 +30,7 @@
 #include "csplugincommon/softshader/renderinterface.h"
 #include "csutil/cfgacc.h"
 #include "csutil/cscolor.h"
+#include "csutil/dirtyaccessarray.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/strset.h"
@@ -46,11 +39,7 @@
 #include "ivideo/halo.h"
 #include "ivideo/shader/shader.h"
 
-#include "scan.h"
 #include "soft_txt.h"
-
-//class csSoftwareTextureCache;
-class csPolArrayVertexBufferManager;
 
 struct iConfigFile;
 struct iPolygonBuffer;
@@ -59,247 +48,8 @@ struct csTriangle;
 
 #include "polyrast.h"
 
-// Maximum size of a single lightmap, in pixels
-#define MAX_LIGHTMAP_SIZE	1500000
-
 namespace cspluginSoft3d
 {
-
-/// This structure is used to hold references to all current fog objects.
-/*struct FogBuffer
-{
-  FogBuffer *next, *prev;
-  CS_ID id;
-  float density;
-  float red, green, blue;
-};*/
-
-
-//===========================================================================
-// Not for new renderer! @@@NR@@@
-// The stuff below is either to be ported to new renderer or else
-// it will be removed.
-//===========================================================================
-
-#define CS_FOG_FRONT  0
-#define CS_FOG_BACK   1
-#define CS_FOG_VIEW   2
-
-//======================================================================
-// For vertex based fog the following defines are used:
-#define CS_FOGTABLE_SIZE 64
-
-// Each texel in the fog table holds the fog alpha value at a certain
-// (distance*density).  The median distance parameter determines the
-// (distance*density) value represented by the texel at the center of
-// the fog table.  The fog calculation is:
-// alpha = 1.0 - exp( -(density*distance) / CS_FOGTABLE_MEDIANDISTANCE)
-#define CS_FOGTABLE_MEDIANDISTANCE 10.0f
-#define CS_FOGTABLE_MAXDISTANCE (CS_FOGTABLE_MEDIANDISTANCE * 2.0f)
-#define CS_FOGTABLE_DISTANCESCALE (1.0f / CS_FOGTABLE_MAXDISTANCE)
-
-// Fog (distance*density) is mapped to a texture coordinate and then
-// clamped.  This determines the clamp value.  Some drivers don't
-// like clamping textures so we must do it ourself
-#define CS_FOGTABLE_CLAMPVALUE 0.85f
-#define CS_FOG_MAXVALUE (CS_FOGTABLE_MAXDISTANCE * CS_FOGTABLE_CLAMPVALUE)
-//======================================================================
-
-/// Extra information for vertex fogging.
-class G3DFogInfo
-{
-public:
-  /// Color.
-  float r, g, b;
-  /**
-  * Intensity (== density * thickness).
-  * The second intensity value is always 0 and is put there
-  * to make it easier for 3D implementations to just use the
-  * two values below as a coordinate in a texture of 64*1.
-  */
-  float intensity;
-  float intensity2;
-};
-
-/// Information about a texture plane.
-class G3DCam2TextureTransform
-{
-public:
-  /// Transformation from camera space to texture space.
-  csMatrix3* m_cam2tex;
-  /// Transformation from camera space to texture space.
-  csVector3* v_cam2tex;
-};
-
-/// Structure containing all info needed by DrawFogPolygon (DFP)
-struct G3DPolygonDFP
-{
-  /// Current number of vertices.
-  size_t num;
-  /// Vertices that form the polygon.
-  csVector2 vertices[100];
-
-  /// The plane equation in camera space of this polygon.
-  csPlane3 normal;
-};
-
-/// Structure containing all info needed by DrawPolygon (DP)
-struct G3DPolygonDP : public G3DPolygonDFP
-{
-  /// Extra optional fog information.
-  G3DFogInfo fog_info[100];
-  /// Use fog info?
-  bool use_fog;
-
-  /// The material handle as returned by iTextureManager.
-  iMaterial* mat;
-
-  /// Transformation matrices for the texture. @@@ BAD NAME
-  G3DCam2TextureTransform cam2tex;
-
-  /// Handle to lighted textures (texture + lightmap)
-  csPolyTextureMapping* texmap;
-  iRendererLightmap* rlm;
-
-  /// Draw fullbright?
-  bool do_fullbright;
-
-  /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
-  uint mixmode;
-
-  /// Z value (in camera space) of vertex[0].
-  float z_value;
-
-  iTextureHandle* txt_handle;
-};
-
-/// Structure containing all info needed by DrawPolygonFlat (DPF)
-typedef G3DPolygonDP G3DPolygonDPF;
-
-/**
-* Structure containing all info needed by DrawTriangeMesh.
-* This function is capable of:<br>
-* - Object2camera transformation and perspective.
-* - Linear interpolation between two sets of vertices.
-* - Clipping.
-* - Whatever else DrawPolygonFX can do.
-*
-* To disable the use of one of the components, set it to 0.
-*/
-struct G3DTriangleMesh
-{
-  enum
-  {
-    /// Maximum number of vertex pool, used for vertex weighting/morphing.
-    MAX_VERTEXPOOL = 2
-  };
-
-  /// Number of vertex sets, if > 1, morphing will be applied.
-  int num_vertices_pool;
-
-  /// Number of triangles.
-  int num_triangles;
-  /// Pointer to array of triangles.
-  csTriangle* triangles;
-
-  /// Clip to portal? One of CS_CLIP_???.
-  int clip_portal;
-  /// Clip to near plane? One of CS_CLIP_???.
-  int clip_plane;
-  /// Clip to z plane? One of CS_CLIP_???.
-  int clip_z_plane;
-
-  /// Use precalculated vertex color?
-  bool use_vertex_color;
-
-  /// Apply fogging?
-  bool do_fog;
-  /// Consider triangle vertices in anti-clockwise order if true.
-  bool do_mirror;
-  /// If morphing is applied then morph texels too if true.
-  bool do_morph_texels;
-  /// If morphing is applied then morph vertex colors too if true.
-  bool do_morph_colors;
-
-  /// Types of vertices supplied.
-  enum VertexMode
-  {
-    /// Must apply transformation and perspective.
-    VM_WORLDSPACE,
-    /// Must apply perspective.
-    VM_VIEWSPACE
-  };
-
-  /// Type of vertices supplied.
-  VertexMode vertex_mode;
-
-  /// DrawPolygonFX flag.
-  uint mixmode;
-  float morph_factor;
-  iMaterial* mat;
-  /// Information for fogging the vertices.
-  G3DFogInfo* vertex_fog;
-
-  // TODO : store information required for lighting calculation
-};
-
-/**
-* Structure containing all info needed by DrawPolygonMesh.
-* In theory this function is capable of:<br>
-* - Object2camera transformation and perspective.
-* - Clipping.
-* - Whatever else DrawPolygon can do.
-*
-* To disable the use of one of the components, set it to 0.
-*/
-struct G3DPolygonMesh
-{
-  /// Polygon buffer.
-  iPolygonBuffer* polybuf;
-
-  // Apply fogging?
-  bool do_fog;
-
-  /// Mixmode.
-  uint mixmode;
-
-  /// Clip to portal? One of CS_CLIP_???.
-  int clip_portal;
-  /// Clip to near plane? One of CS_CLIP_???.
-  int clip_plane;
-  /// Clip to z plane? One of CS_CLIP_???.
-  int clip_z_plane;
-
-  /// Consider polygon vertices in anti-clockwise order if true.
-  bool do_mirror;
-
-  /// Types of vertices supplied.
-  enum VertexMode
-  {
-    /// Must apply transformation and perspective.
-    VM_WORLDSPACE,
-    /// Must apply perspective.
-    VM_VIEWSPACE
-  };
-
-  /// Type of vertices supplied.
-  VertexMode vertex_mode;
-
-  /// Information for fogging the vertices.
-  G3DFogInfo* vertex_fog;
-};
-
-
-
-/// Information about a texture plane.
-class G3DTexturePlane
-{
-public:
-  /// Transformation from camera space to texture space.
-  csMatrix3* m_cam2tex;
-  /// Transformation from camera space to texture space.
-  csVector3* v_cam2tex;
-};
 
 #define VATTR_SPEC(x)           (CS_VATTRIB_ ## x - CS_VATTRIB_SPECIFIC_FIRST)
 #define VATTR_GEN(x)							      \
@@ -327,9 +77,6 @@ protected:
 
   /// Driver this driver is sharing info with (if any)
   csSoftwareGraphics3DCommon *partner;
-
-  /// if this is a procedural texture manager
-  bool is_for_procedural_textures;
 
   /// Current render target.
   csRef<iTextureHandle> render_target;
@@ -366,24 +113,6 @@ protected:
    */
   int pixel_shift;
 
-  /// For debugging: the maximum number of polygons to draw in a frame.
-  long dbg_max_polygons_to_draw;
-  /// For debugging: the current polygon number.
-  long dbg_current_polygon;
-
-  /// Values to check if we have to reinit StartPolygonFX.
-  bool dpfx_valid;
-  bool dpfx_use_fog;
-  iTextureHandle* dpfx_tex_handle;
-  uint dpfx_mixmode;
-  csZBufMode dpfx_z_buf_mode;
-
-  /// Alpha mask used for 16-bit mode.
-  uint16 alpha_mask;
-
-  /// Fog buffers.
-  //FogBuffer* fog_buffers;
-
   /// Width of display.
   int display_width;
   /// Height of display.
@@ -400,12 +129,6 @@ protected:
   /// The pixel format of display
   csPixelFormat pfmt;
   bool pixelBGR;
-#if defined (CS_HAVE_MMX)
-  /// True if CPU has MMX instructions.
-  bool cpu_mmx;
-  /// True if 3D rendering should use MMX if available.
-  bool do_mmx;
-#endif
   /// Current transformation from object to camera.
   csReversibleTransform o2c;
   csReversibleTransform w2c;
@@ -442,22 +165,9 @@ protected:
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
 
-  /**
-   * Same as DrawPolygon but no texture mapping.
-   * (Flat drawing).
-   */
-  void DrawPolygonFlat (G3DPolygonDPF& poly);
-
   csRef<iStringSet> strings;
-  csStringID string_vertices;
-  csStringID string_texture_coordinates;
-  csStringID string_normals;
-  csStringID string_colors;
-  csStringID string_indices;
-  csStringID string_texture_diffuse;
-  csStringID string_texture_lightmap;
-  csStringID string_material_flatcolor;
   csStringID string_world2camera;
+  csStringID string_indices;
 
   csRef<iShaderManager> shadermgr;
 
@@ -468,6 +178,8 @@ protected:
   csRef<iScanlineRenderer> scanlineRenderer;
   csRef<csRenderBuffer> processedColors[2];
   bool processedColorsFlag[2];
+  /// The perspective corrected vertices.
+  csDirtyAccessArray<csVector3> persp;
 
   // Structure used for maintaining a stack of clipper portals.
   struct csClipPortal
@@ -530,7 +242,8 @@ public:
   // An experimental filter feature.
   static int filter_bf;
 
-  PolygonRasterizer polyrast;
+  PolygonRasterizer<SLLogic_ScanlineRenderer> polyrast;
+  PolygonRasterizer<SLLogic_ZFill> polyrast_ZFill;
 
   /// Setup scanline drawing routines according to current bpp and setup flags
   csSoftwareGraphics3DCommon (iBase* parent);
@@ -579,8 +292,6 @@ public:
   virtual void Print (csRect const* area);
   /// End the frame and do a page swap.
   virtual void FinishDraw ();
-  /// Draw the projected polygon with light and texture.
-  virtual void DrawPolygon (G3DPolygonDP& poly);
 
   /// Draw a line in camera space.
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,
@@ -660,12 +371,6 @@ public:
   /// Return true if we have near plane.
   virtual bool HasNearPlane () const { return do_near_plane; }
 
-
-  /// Draw a triangle mesh.
-  //virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
-
-  /// Draw a polygon mesh.
-  //virtual void DrawPolygonMesh (G3DPolygonMesh& mesh);
 
   /// Get the iGraphics2D driver.
   virtual iGraphics2D *GetDriver2D ()
@@ -848,9 +553,6 @@ public:
   virtual void DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
     const csArray<csShaderVariable*> &stacks);
-  void DrawPolysMesh (const csCoreRenderMesh* mymesh,
-    const csRenderMeshModes& modes,
-    const csArray<csShaderVariable*> &stacks);
   void DrawSimpleMesh (const csSimpleRenderMesh &mesh, uint flags = 0);
 
   /// Controls shadow drawing
@@ -908,7 +610,6 @@ public:
 
   virtual void OpenPortal (size_t, const csVector2*, const csPlane3&, bool);
   virtual void ClosePortal (bool use_zfill_portal);
-  void DrawPolygonZFill (G3DPolygonDFP&);
 
   //=========================================================================
   // Below this line are all functions that are not yet implemented by

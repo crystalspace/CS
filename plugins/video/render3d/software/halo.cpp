@@ -21,7 +21,6 @@
 #include "csgeom/math2d.h"
 #include "csutil/util.h"
 #include "soft_g3d.h"
-#include "scan.h"
 
 #if 0
 // The structure that stays behind csHaloHandle

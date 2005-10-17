@@ -178,12 +178,12 @@ namespace CrystalSpace
     ImportKit (iObjectRegistry* objectReg);
     ~ImportKit ();
     /**
-     * Open a CrystalSpace container from \a filename (which can
-     * optionally be in the path relative to the current directory in
-     * \a path. Note that the path can contain up to 1 zip file).
-     * \a filename should point to a mesh library, meshfact file or
-     * world file; it is detected whether a file contains sensible data,
-     * so you can e.g. safely call this method for all files of a directory.
+     * Open a Crystal Space container from \a filename. 
+     * \a filename can optionally be in the path relative to the current 
+     * directory in \a path. (Note that the path can contain up to 1 zip file).
+     * It should point to a mesh library, meshfact file or world file; it is 
+     * detected whether a file contains sensible data, so you can e.g. safely 
+     * call this method for all files of a directory.
      */
     Container* OpenContainer (const char* filename, 
       const char* path = 0);
