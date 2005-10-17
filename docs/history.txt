@@ -9,6 +9,7 @@ chronological order.
 17-Oct-2005
 	- res removed some now-outdated code from softrender3d.
 	- res made a small importkit documentation tweak.
+	- res fixed some SR Z buffer issues.
 16-Oct-2005
 	- Eric Sunshine increased robustness of the ceguitest + VFS interaction
 	  by adding an actual mount point for ceguitest rather than having it

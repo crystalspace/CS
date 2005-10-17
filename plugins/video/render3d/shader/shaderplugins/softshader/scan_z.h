@@ -36,65 +36,65 @@ namespace cspluginSoftshader
 
   struct ZBufMode_ZFill
   {
-    const uint32 Iz;
+    const InterpolateScanlinePerspCommon& ipol;
     uint32* zBuff;
 
     ZBufMode_ZFill (const InterpolateScanlinePerspCommon& ipol, 
-      uint32* zBuff) : Iz(ipol.Iz.GetFixed()), zBuff(zBuff) {}
+      uint32* zBuff) : ipol(ipol), zBuff(zBuff) {}
 
     bool Test () { return true; }
-    void Update () { *zBuff = Iz; }
+    void Update () { *zBuff = ipol.Iz.GetFixed(); }
     void Advance () { zBuff++; }
   };
 
   struct ZBufMode_ZTest
   {
-    const uint32 Iz;
+    const InterpolateScanlinePerspCommon& ipol;
     uint32* zBuff;
 
     ZBufMode_ZTest (const InterpolateScanlinePerspCommon& ipol, 
-      uint32* zBuff) : Iz(ipol.Iz.GetFixed()), zBuff(zBuff) {}
+      uint32* zBuff) : ipol(ipol), zBuff(zBuff) {}
 
-    bool Test () { return Iz >= *zBuff; }
+    bool Test () { return (uint32)ipol.Iz.GetFixed() >= *zBuff; }
     void Update () { }
     void Advance () { zBuff++; }
   };
 
   struct ZBufMode_ZUse
   {
-    const uint32 Iz;
+    const InterpolateScanlinePerspCommon& ipol;
     uint32* zBuff;
 
     ZBufMode_ZUse (const InterpolateScanlinePerspCommon& ipol, 
-      uint32* zBuff) : Iz(ipol.Iz.GetFixed()), zBuff(zBuff) {}
+      uint32* zBuff) : ipol(ipol), zBuff(zBuff) {}
 
-    bool Test () { return Iz >= *zBuff; }
-    void Update () { *zBuff = Iz; }
+    bool Test () { return (uint32)ipol.Iz.GetFixed() >= *zBuff; }
+    void Update () { *zBuff = ipol.Iz.GetFixed(); }
     void Advance () { zBuff++; }
   };
 
   struct ZBufMode_ZEqual
   {
-    const uint32 Iz;
+    const InterpolateScanlinePerspCommon& ipol;
     uint32* zBuff;
 
     ZBufMode_ZEqual (const InterpolateScanlinePerspCommon& ipol, 
-      uint32* zBuff) : Iz(ipol.Iz.GetFixed()), zBuff(zBuff) {}
+      uint32* zBuff) : ipol(ipol), zBuff(zBuff) {}
 
-    bool Test () { return Iz == *zBuff; }
+    bool Test () { return ipol.Iz.GetFixed() == *zBuff; }
     void Update () { }
     void Advance () { zBuff++; }
   };
 
   struct ZBufMode_ZInvert
   {
-    const uint32 Iz;
+    const InterpolateScanlinePerspCommon& ipol;
     uint32* zBuff;
 
     ZBufMode_ZInvert (const InterpolateScanlinePerspCommon& ipol, 
-      uint32* zBuff) : Iz(ipol.Iz.GetFixed()), zBuff(zBuff) {}
+      uint32* zBuff) : ipol(ipol), zBuff(zBuff) {}
 
-    bool Test () { return Iz < *zBuff; }
+    bool Test () { return (uint32)ipol.Iz.GetFixed() < *zBuff; }
     void Update () { }
     void Advance () { zBuff++; }
   };
