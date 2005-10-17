@@ -1,12 +1,17 @@
 %define name     crystalspace
 %define version  0.99
-%define release  0.cvs20050924.1
+%define release  0.cvs20051016.1
 %define prefix   /usr
 %define csprefix crystalspace
 
 %define with_DEBUG 0
 %{?_without_debug: %{expand: %%global with_DEBUG 0}}
 %{?_with_debug: %{expand: %%global with_DEBUG 1}}
+
+# (vk) This should prevent symbol stripping for debug build.
+%if %{with_DEBUG}
+%define __spec_install_post /usr/lib/rpm/brp-compress || :
+%endif
                                                                                                          
 %define with_PERL 0
 %{?_without_perl: %{expand: %%global with_PERL 0}}
@@ -39,6 +44,16 @@ Requires:       %{name} = %{version}-%{release}
 %description -n %{name}-utils
 Utilities for Crystal Space free 3D SDK.
 
+# Demos package
+%package -n %{name}-demos
+Summary: Demos for Crystal Space free 3D SDK.
+Group: Development/C++
+Provides:       %{name}-demos = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-utils = %{version}-%{release}
+%description -n %{name}-demos
+Demos for Crystal Space free 3D SDK.
+
 # Dev package
 %package -n %{name}-devel
 Summary: C++ headers and link libraries for Crystal Space free 3D SDK.
@@ -56,7 +71,7 @@ Group: Development/C++
 Provides:       %{name}-doc = %{version}-%{release}
 %description -n %{name}-doc
 Documentation (manual and public API reference)
-for CrystalSpace free 3D SDK.
+for Crystal Space free 3D SDK.
 
 %prep
 %setup -n CS
@@ -74,14 +89,14 @@ sh  configure \
  --datadir=%{prefix}/share \
  --sysconfdir=/etc
 
-make all
+%{__make} %{?_smp_mflags} all
 
 %install
-DESTDIR=%{buildroot} make install
+DESTDIR=%{buildroot} %{__make} %{?_smp_mflags} install
 
 %post -n %{name}-utils
 for map in flarge partsys terrain terrainf ; \
-  do %{_bindir}/cslight -canvas=null -video=null $map ; \
+  do %{_bindir}/cslight -video=null $map ; \
   done ;
 
 %clean
@@ -101,34 +116,50 @@ for map in flarge partsys terrain terrainf ; \
 %exclude %{_sysconfdir}/%{csprefix}/startme.cfg
 %exclude %{_sysconfdir}/%{csprefix}/walktest.cfg
 %exclude %{_sysconfdir}/%{csprefix}/waterdemo.cfg
-
 %{_libdir}/%{csprefix}/*
-
 %{_datadir}/%{csprefix}/data/*
-%exclude %{_datadir}/%{csprefix}/data/maps/*
 %exclude %{_datadir}/%{csprefix}/data/startme.zip
+%exclude %{_datadir}/%{csprefix}/data/ceguitest/
+%exclude %{_datadir}/%{csprefix}/data/maps/*
 
 %files -n %{name}-utils
 %defattr(-,root,root)
 
 %{_bindir}/*
+#%exclude %{_bindir}/awstest
 %exclude %{_bindir}/cs-config
 %exclude %{_bindir}/*.cex
-
+%exclude %{_bindir}/ceguitest
+%exclude %{_bindir}/csdemo
+#%exclude %{_bindir}/isotest
+#%exclude %{_bindir}/lghtngtest
+%exclude %{_bindir}/startme
+#%exclude %{_bindir}/waterdemo
 %{_datadir}/%{csprefix}/data/maps/*
-%{_datadir}/%{csprefix}/data/startme.zip
 %{_datadir}/%{csprefix}/conversion/*
+%{_sysconfdir}/%{csprefix}/heightmapgen.cfg
+%{_sysconfdir}/%{csprefix}/lighter.xml
+%{_sysconfdir}/%{csprefix}/map2cs.cfg
+%{_sysconfdir}/%{csprefix}/walktest.cfg
 
+%files -n %{name}-demos
+%defattr(-,root,root)
+
+#%{_bindir}/awstest
+%{_bindir}/ceguitest
+%{_bindir}/csdemo
+#%{_bindir}/isotest
+#%{_bindir}/lghtngtest
+%{_bindir}/startme
+#%{_bindir}/waterdemo
 %{_sysconfdir}/%{csprefix}/awstest.cfg
 %{_sysconfdir}/%{csprefix}/awstut.cfg
 %{_sysconfdir}/%{csprefix}/csdemo.cfg
 %{_sysconfdir}/%{csprefix}/g2dtest.cfg
-%{_sysconfdir}/%{csprefix}/heightmapgen.cfg
-%{_sysconfdir}/%{csprefix}/lighter.xml
-%{_sysconfdir}/%{csprefix}/map2cs.cfg
 %{_sysconfdir}/%{csprefix}/startme.cfg
-%{_sysconfdir}/%{csprefix}/walktest.cfg
 %{_sysconfdir}/%{csprefix}/waterdemo.cfg
+%{_datadir}/%{csprefix}/data/startme.zip
+%{_datadir}/%{csprefix}/data/ceguitest/
 
 %files -n %{name}-doc
 %defattr(-,root,root)
@@ -141,16 +172,17 @@ for map in flarge partsys terrain terrainf ; \
 
 %{_bindir}/cs-config
 %{_libdir}/*.a
-
 # (vk) Scripting related files are here for now
 %{_bindir}/*.cex
 %{_datadir}/%{csprefix}/bindings/*
-
 %{_datadir}/%{csprefix}/build/*
-
 %{_includedir}/%{csprefix}/*
 
 %changelog
+* Mon Oct 17 2005 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-0.cvs20051016.1
+- Added demos subpackage, no stripping for debug build and SMP friendly macros
+  for make.
+
 * Fri Sep 23 2005 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-0.cvs20050924.1
 - Added 'startme' stuff.
 
