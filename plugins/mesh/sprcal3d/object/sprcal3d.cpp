@@ -1731,7 +1731,7 @@ bool csSpriteCal3DMeshObject::GetActiveAnims (csSpriteCal3DActiveAnim* buffer,
   if ((buffer == 0) || (max_length == 0))
     return false;
 
-  size_t i, n = csMin (active_anims.Length(), max_length-1);
+  size_t i, n = csMin (active_anims.Length(), max_length);
 
   for (i=0; i<n; i++)
   {

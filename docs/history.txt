@@ -10,6 +10,9 @@ chronological order.
 	- res updated the new SCF to support the ref tracker.
 	- res fixed the console on Win32 disappearing to soon under some
 	  circumstances.
+	- Christian Van Brussel fixed csSpriteCal3DMeshObject::GetActiveAnims
+	  in the cal3d plugin. It left uninitialized the last allocated 
+	  csSpriteCal3DActiveAnim buffer.
 17-Oct-2005
 	- res removed some now-outdated code from softrender3d.
 	- res made a small importkit documentation tweak.
