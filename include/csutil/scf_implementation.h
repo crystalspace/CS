@@ -27,9 +27,19 @@
 #include "csextern.h"
 
 #include "csutil/array.h"
+#include "csutil/reftrackeraccess.h"
 
 // Needs to have iBase etc
 #include "csutil/scf_interface.h"
+
+#ifndef CS_TYPENAME
+  #ifdef CS_REF_TRACKER
+   #include <typeinfo>
+   #define CS_TYPENAME(x)		    typeid(x).name()
+  #else
+   #define CS_TYPENAME(x)		    0
+  #endif
+#endif
 
 /**\file
  * Crystal Space Shared Class Facility (SCF) - implementation creation 
@@ -116,19 +126,21 @@ class CS_CRYSTALSPACE_EXPORT scfImplementation : public virtual iBase
 {
 public:
   /**
-  * Constructor. Initialize the SCF-implementation in class named Class.
-  * Will be called from scfImplementation(Ext)N constructor
-  */
+   * Constructor. Initialize the SCF-implementation in class named Class.
+   * Will be called from scfImplementation(Ext)N constructor
+   */
   scfImplementation (Class *object, iBase *parent = 0) :
       scfObject (object), scfRefCount (1), scfParent (parent), 
         scfWeakRefOwners (0)
   {
+    csRefTrackerAccess::TrackConstruction (object);
     if (scfParent) scfParent->IncRef ();
   }
 
   // Cleanup
   virtual ~scfImplementation()
   {
+    csRefTrackerAccess::TrackDestruction (scfObject, scfRefCount);
     scfRemoveRefOwners ();
   }
 
@@ -136,6 +148,7 @@ public:
   {
     CS_ASSERT_MSG("Refcount decremented for destroyed object", 
       scfRefCount != 0);
+    csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
     scfRefCount--;
     if (scfRefCount == 0)
     {
@@ -149,6 +162,7 @@ public:
   {
     CS_ASSERT_MSG("Refcount incremented from inside dtor", 
       scfRefCount != 0);
+    csRefTrackerAccess::TrackIncRef (scfObject, scfRefCount);
     scfRefCount++;
   }
 

@@ -37,6 +37,14 @@
 
 class csPathsList;
 
+#ifndef CS_TYPENAME
+  #ifdef CS_REF_TRACKER
+   #include <typeinfo>
+   #define CS_TYPENAME(x)		    typeid(x).name()
+  #else
+   #define CS_TYPENAME(x)		    0
+  #endif
+#endif
 
 // INTERFACE DEFINITIONS
 #include "csutil/scf_interface.h"
@@ -73,10 +81,6 @@ class csPathsList;
 
 
 #ifdef CS_REF_TRACKER
- #include <typeinfo>
- #include "iutil/string.h"
- #include "iutil/databuff.h"
- #define CS_TYPENAME(x)		    typeid(x).name()
  /* @@@ HACK: Force an AddAlias() call for every contained interface
   * However, when iSCF::SCF == 0, don't call QI to prevent interface ID 
   * resolution (which will fail).
@@ -84,7 +88,6 @@ class csPathsList;
  #define SCF_INIT_TRACKER_ALIASES    \
   if (iSCF::SCF != 0) QueryInterface ((scfInterfaceID)-1, -1);
 #else
- #define CS_TYPENAME(x)		    0
  #define SCF_INIT_TRACKER_ALIASES
 #endif
 

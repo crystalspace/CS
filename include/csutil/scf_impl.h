@@ -165,35 +165,65 @@ protected:
 #ifndef SCF_IMPL_EXT
   SCF_IMPL_NAME(Class *object, iBase *parent=0)
     : SCF_IMPL_SUPER(object, parent)
-  {}
+  { 
+    csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases(); 
+  }
 #else /* SCF_IMPL_EXT */
   SCF_IMPL_NAME(Class *object)
-    : SCF_IMPL_SUPER(), scfObject(object) {}
+    : SCF_IMPL_SUPER(), scfObject(object) 
+  { 
+    csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases(); 
+  }
 
   template<class T1>
   SCF_IMPL_NAME(Class *object, T1 t1)
-    : SCF_IMPL_SUPER(t1), scfObject(object) {}
+    : SCF_IMPL_SUPER(t1), scfObject(object) 
+  { 
+    csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases(); 
+  }
 
   template<class T1, class T2>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2)
-    : SCF_IMPL_SUPER(t1, t2), scfObject(object) {}
+    : SCF_IMPL_SUPER(t1, t2), scfObject(object) 
+  { 
+    csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases(); 
+  }
 
   template<class T1, class T2, class T3>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2, T3 t3)
-    : SCF_IMPL_SUPER(t1, t2, t3), scfObject(object) {}
+    : SCF_IMPL_SUPER(t1, t2, t3), scfObject(object) 
+  { 
+    csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases(); 
+  }
 
   template<class T1, class T2, class T3, class T4>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2, T3 t3, T4 t4)
-    : SCF_IMPL_SUPER(t1, t2, t3, t4), scfObject(object) {}
+    : SCF_IMPL_SUPER(t1, t2, t3, t4), scfObject(object) 
+  {
+    csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases(); 
+  }
 
   template<class T1, class T2, class T3, class T4, class T5>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
-    : SCF_IMPL_SUPER(t1, t2, t3, t4, t5), scfObject(object) {}
+    : SCF_IMPL_SUPER(t1, t2, t3, t4, t5), scfObject(object) 
+  {
+    csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases(); 
+  }
 
   Class *scfObject;
 #endif
 
-  virtual ~SCF_IMPL_NAME() {}
+  virtual ~SCF_IMPL_NAME() 
+  {
+    RemoveReftrackerAliases();
+  }
 
   typedef SCF_IMPL_NAME<Class SCF_IMPL_ARGS> scfImplementationType;
 
@@ -218,7 +248,84 @@ private:
 	return 0;
       }
     }
+    CS_FORCEINLINE static void AddReftrackerAlias (Class* scfObject)
+    {
+      csRefTrackerAccess::AddAlias (CS_STATIC_CAST(InterfaceType*, scfObject),
+	scfObject);
+    }
+    CS_FORCEINLINE static void RemoveReftrackerAlias (Class* scfObject)
+    {
+      csRefTrackerAccess::RemoveAlias (CS_STATIC_CAST(InterfaceType*, scfObject),
+	scfObject);
+    }
   };
+ 
+  void AddReftrackerAliases ()
+  {
+#if SCF_IMPL_N >= 1
+    VC6Workaround<I1>::AddReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 2
+    VC6Workaround<I2>::AddReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 3
+    VC6Workaround<I3>::AddReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 4
+    VC6Workaround<I4>::AddReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 5
+    VC6Workaround<I5>::AddReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 6
+    VC6Workaround<I6>::AddReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 7
+    VC6Workaround<I7>::AddReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 8
+    VC6Workaround<I8>::AddReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 9
+    VC6Workaround<I9>::AddReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 10
+    VC6Workaround<I10>::AddReftrackerAlias (scfObject);
+#endif
+  }
+  void RemoveReftrackerAliases ()
+  {
+#if SCF_IMPL_N >= 1
+    VC6Workaround<I1>::RemoveReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 2
+    VC6Workaround<I2>::RemoveReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 3
+    VC6Workaround<I3>::RemoveReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 4
+    VC6Workaround<I4>::RemoveReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 5
+    VC6Workaround<I5>::RemoveReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 6
+    VC6Workaround<I6>::RemoveReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 7
+    VC6Workaround<I7>::RemoveReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 8
+    VC6Workaround<I8>::RemoveReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 9
+    VC6Workaround<I9>::RemoveReftrackerAlias (scfObject);
+#endif
+#if SCF_IMPL_N >= 10
+    VC6Workaround<I10>::RemoveReftrackerAlias (scfObject);
+#endif
+  }
 };
 
 #undef SCF_IMPL_NAME

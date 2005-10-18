@@ -537,15 +537,22 @@ void Win32Assistant::Shutdown()
     q->RemoveListener(this);
   if (!is_console_app && (cmdline_help_wanted || console_window))
   {
-    csPrintf ("\nPress a key to close this window...");
-    fflush (stdout);
-    HANDLE hConsole;
-    hConsole = CreateFile ("CONIN$", GENERIC_READ, FILE_SHARE_READ, 0, 
+    HANDLE hConsole = CreateFile ("CONIN$", GENERIC_READ, FILE_SHARE_READ, 0, 
       OPEN_EXISTING, 0, 0);
     if (hConsole != 0)
     {
       INPUT_RECORD ir;
       DWORD events_read;
+      /* Empty console events, to remove earlier key presses */
+      while (PeekConsoleInput (hConsole, &ir, 1, &events_read)
+	&& (events_read != 0))
+      {
+	ReadConsoleInput (hConsole, &ir, 1, &events_read);
+      }
+      
+      csPrintf ("\nPress a key to close this window...");
+      fflush (stdout);
+      /* Wait for keyboard event */
       do 
       {
 	ReadConsoleInput (hConsole, &ir, 1, &events_read);

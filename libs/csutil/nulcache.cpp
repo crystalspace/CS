@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/util.h"
 #include "csutil/nulcache.h"
+#include "iutil/databuff.h"
 
 //------------------------------------------------------------------------
 

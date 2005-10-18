@@ -21,6 +21,13 @@
 */
 
 #include "cssysdef.h"
+
+#if defined(CS_REF_TRACKER) && !defined(CS_REF_TRACKER_EXTENSIVE)
+  // Performance hack
+  #undef CS_REF_TRACKER
+  #define CS_REF_TRACKER_REDEFINE
+#endif
+
 #include "csutil/physfile.h"
 #include "csutil/scfstr.h"
 #include "csutil/scfstringarray.h"

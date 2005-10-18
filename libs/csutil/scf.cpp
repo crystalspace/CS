@@ -17,6 +17,17 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+
+#if defined(CS_REF_TRACKER) && !defined(CS_REF_TRACKER_EXTENSIVE)
+  // Performance hack
+  #undef CS_REF_TRACKER
+  #define CS_REF_TRACKER_REDEFINE
+#endif
+#include "csutil/ref.h"
+#ifdef CS_REF_TRACKER_REDEFINE
+  #define CS_REF_TRACKER
+#endif
+
 #include "csutil/scf.h"
 #include "csutil/csshlib.h"
 #include "csutil/sysfunc.h"
@@ -744,7 +755,6 @@ csSCF::~csSCF ()
 #endif
   SCF = PrivateSCF = 0;
 }
-
 void csSCF::RegisterClasses (char const* xml, const char* context)
 {
   csMemFile file(xml, strlen(xml));

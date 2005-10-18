@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Oct-2005
+	- res updated the new SCF to support the ref tracker.
+	- res fixed the console on Win32 disappearing to soon under some
+	  circumstances.
 17-Oct-2005
 	- res removed some now-outdated code from softrender3d.
 	- res made a small importkit documentation tweak.

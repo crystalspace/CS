@@ -25,8 +25,6 @@
 #include "csutil/sysfunc.h"
 #include "reftrack.h"
 
-
-
 csRefTracker::csRefTracker () : scfImplementationType (this), riAlloc(1000)
 {
   (mutex = csMutex::Create ())->IncRef();
@@ -216,7 +214,7 @@ void csRefTracker::SetDescription (void* obj, const char* description)
   csScopedMutexLock lock (mutex);
 
   RefInfo& refInfo = GetObjRefInfo (obj);
-  if (refInfo.descr == 0) refInfo.descr = description;
+  refInfo.descr = description;
 }
 
 void csRefTracker::ReportOnObj (void* obj, RefInfo* info)

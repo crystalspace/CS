@@ -36,6 +36,7 @@
 #include "iutil/eventh.h"
 #include "iutil/plugin.h"
 #include "iutil/pluginconfig.h"
+#include "iutil/string.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/natwin.h"
