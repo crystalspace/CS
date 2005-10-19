@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Oct-2005
+	- Jorrit did a big optimization to the generic renderloop plugin
+	  in combination with the lightiter step. Now the list of visible
+	  meshes will be intersected with the influence radius of the
+	  light (only for point light at this moment). This gives a big
+	  speedup on levels that use the diffuse or shadowed renderloops
+	  and also makes it possible to use a lot more smaller lights in the
+	  same level without big performance degradation.
 18-Oct-2005
 	- res updated the new SCF to support the ref tracker.
 	- res fixed the console on Win32 disappearing to soon under some

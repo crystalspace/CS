@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 
 #include "cstool/fogmath.h"
+#include "csgeom/math3d.h"
 #include "csutil/flags.h"
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
@@ -31,6 +32,7 @@
 #include "iengine/rview.h"
 #include "iengine/sector.h"
 #include "igeom/clip2d.h"
+#include "igeom/objmodel.h"
 #include "imesh/object.h"
 #include "iutil/document.h"
 #include "ivideo/graph3d.h"
@@ -413,9 +415,17 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   meshlist->GetSortedMeshes (sameShaderMeshes, imeshes_scratch.GetArray());
   for (size_t i = 0; i < num; i++)
   {
-    sameShaderMeshInfo[i].svc = imeshes_scratch[i]->GetSVContext();
-    sameShaderMeshInfo[i].noclip = imeshes_scratch[i]->GetFlags ().Check (
-    	CS_ENTITY_NOCLIP);
+    iMeshWrapper* m = imeshes_scratch[i];
+    sameShaderMeshInfo[i].svc = m->GetSVContext();
+    sameShaderMeshInfo[i].noclip = m->GetFlags ().Check (CS_ENTITY_NOCLIP);
+    // Only get this information if we have a light. Otherwise it is not
+    // useful.
+    if (light)
+    {
+      csVector3 radius, center;
+      m->GetMeshObject ()->GetObjectModel ()->GetRadius (radius, center);
+      sameShaderMeshInfo[i].radius = MAX (radius.x, MAX (radius.y, radius.z));
+    }
   }
  
   size_t lastidx = 0;
@@ -474,9 +484,26 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   ShaderTicketHelper ticketHelper (stacks, shadervars, shadervars.Length ()-1);
   const csReversibleTransform& camt = rview->GetCamera ()->GetTransform ();
 
+  csLightType light_type;
+  float cutoff_distance;
+  csVector3 light_center;
+  if (light)
+  {
+    light_type = light->GetType ();
+    cutoff_distance = light->GetCutoffDistance ();
+    light_center = light->GetCenter ();
+  }
+
   for (size_t n = 0; n < num; n++)
   {
     csRenderMesh* mesh = sameShaderMeshes[n];
+    if (light && light_type == CS_LIGHT_POINTLIGHT)
+    {
+      float dist = sqrt (csSquaredDist::PointPoint (mesh->worldspace_origin,
+      	light_center));
+      if (dist-sameShaderMeshInfo[n].radius > cutoff_distance) continue;
+    }
+    // else @@@ TODO: DIRECTIONAL and SPOTLIGHT
 
     if (mesh->portal) 
     {
