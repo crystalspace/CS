@@ -14,6 +14,11 @@ chronological order.
 	  speedup on levels that use the diffuse or shadowed renderloops
 	  and also makes it possible to use a lot more smaller lights in the
 	  same level without big performance degradation.
+	- Jorrit changed the optimization in the generic renderloop plugin
+	  so that it tests for cutoff radius also for spot and directional
+	  lights. A better test for spot light still has to be written
+	  though (one that also takes direction and cone of spot light
+	  into account).
 18-Oct-2005
 	- res updated the new SCF to support the ref tracker.
 	- res fixed the console on Win32 disappearing to soon under some

@@ -497,13 +497,13 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   for (size_t n = 0; n < num; n++)
   {
     csRenderMesh* mesh = sameShaderMeshes[n];
-    if (light && light_type == CS_LIGHT_POINTLIGHT)
+    if (light)
     {
+      // @@@ TODO: Better test for DIRECTIONAL and SPOTLIGHT
       float dist = sqrt (csSquaredDist::PointPoint (mesh->worldspace_origin,
       	light_center));
       if (dist-sameShaderMeshInfo[n].radius > cutoff_distance) continue;
     }
-    // else @@@ TODO: DIRECTIONAL and SPOTLIGHT
 
     if (mesh->portal) 
     {
