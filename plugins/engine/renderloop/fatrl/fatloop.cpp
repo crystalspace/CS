@@ -572,8 +572,12 @@ void csFatLoopStep::SetLightSVs (csShaderVariableContext& shadervars,
   sv->SetValue (lightPosW);
 
 
+  //const csVector3 lightDirW = 
+    //lightT.This2OtherRelative (light->GetDirection ());
+  // @@@ Jorrit: check the following! Untested!
   const csVector3 lightDirW = 
-    lightT.This2OtherRelative (light->GetDirection ());
+    lightT.This2OtherRelative (csVector3 (0, 0, 1));
+
   if (!lightDirW.IsZero())
   {
     sv = GetFrameUniqueSV (framenr, shadervars, 

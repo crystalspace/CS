@@ -76,10 +76,11 @@ csLight::csLight (
   float d,
   float red, float green, float blue,
   csLightDynamicType dyntype) :
-    scfImplementationType (this), light_id (0), color (red, green, blue), specularColor (0,0,0),
+    scfImplementationType (this), light_id (0), color (red, green, blue),
+    specularColor (0,0,0),
     halo (0), dynamicType (dyntype), type (CS_LIGHT_POINTLIGHT), 
     attenuation (CS_ATTN_LINEAR), cutoffDistance (d),
-    directionalCutoffRadius (d), direction (1,0,0), spotlightFalloffInner (0),
+    directionalCutoffRadius (d), spotlightFalloffInner (0),
     spotlightFalloffOuter (1), lightnr (0)
 {
   //movable.scfParent = (iBase*)(csObject*)this; //@@MS: Look at this?

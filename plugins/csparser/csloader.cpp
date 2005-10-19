@@ -4113,8 +4113,11 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 
   csVector3 attenvec (0, 0, 0);
   float spotfalloffInner = 0, spotfalloffOuter = 1;
-  csVector3 direction (1, 0, 0);
   csLightType type = CS_LIGHT_POINTLIGHT;
+
+  bool use_light_transf = false;
+  bool use_light_transf_vector = false;
+  csReversibleTransform light_transf;
 
   float distbright = 1;
 
@@ -4412,12 +4415,32 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
           }
         }
         break;
-      case XMLTOKEN_DIRECTION:
+      case XMLTOKEN_MOVE:
         {
-          if (!SyntaxService->ParseVector (child, direction))
-            return 0;
+	  use_light_transf = true;
+	  csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+	  if (matrix_node)
+	  {
+	    csMatrix3 m;
+	    if (!SyntaxService->ParseMatrix (matrix_node, m))
+	      return false;
+            light_transf.SetO2T (m);
+	  }
+	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
+	  if (vector_node)
+	  {
+	    csVector3 v;
+	    if (!SyntaxService->ParseVector (vector_node, v))
+	      return false;
+	    use_light_transf_vector = true;
+            light_transf.SetO2TTranslation (v);
+	  }
         }
         break;
+      case XMLTOKEN_DIRECTION:
+        SyntaxService->ReportError ("crystalspace.maploader.light", child,
+          "'direction' is no longer support for lights. Use 'move'!");
+        return 0;
       case XMLTOKEN_SPOTLIGHTFALLOFF:
         {
           spotfalloffInner = child->GetAttributeValueAsFloat ("inner");
@@ -4446,8 +4469,15 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   	dist, color, dyn);
   AddToRegion (ldr_context, l->QueryObject ());
   l->SetType (type);
-  l->SetDirection (direction);
   l->SetSpotLightFalloff (spotfalloffInner, spotfalloffOuter);
+
+  if (use_light_transf)
+  {
+    if (!use_light_transf_vector)
+      light_transf.SetOrigin (pos);
+    l->GetMovable ()->SetTransform (light_transf);
+    l->GetMovable ()->UpdateMove ();
+  }
 
   switch (halo.type)
   {

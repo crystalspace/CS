@@ -116,8 +116,6 @@ protected:
   /// Radial cutoff radius for directional lights
   float directionalCutoffRadius;
 
-  /// Direction for directional and spotlight. Should be normalized.
-  csVector3 direction;
   /// Falloff coefficients for spotlight.
   float spotlightFalloffInner, spotlightFalloffOuter;
   
@@ -410,18 +408,6 @@ public:
     this->type = type;
     UpdateViscullMesh ();
   }
-
-  /// Get the light direction. Used for directional and spotlight.
-  const csVector3& GetDirection () const
-  { return direction; }
-  /// Set the light direction. Used for directional and spotlight.
-  void SetDirection (const csVector3& v)
-  {
-    if (v.IsZero()) return;
-    direction = v.Unit ();
-    UpdateViscullMesh ();
-  }
-
 
   //----------------------------------------------------------------------
   // Light influence stuff.

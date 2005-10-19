@@ -207,6 +207,28 @@ bool csTextSyntaxService::ParseMatrix (iDocumentNode* node, csMatrix3 &m)
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_LOOKAT:
+        {
+	  csVector3 to (0, 0, 1);
+	  csVector3 up (0, 1, 0);
+	  
+	  csRef<iDocumentNode> to_node = child->GetNode ("to");
+	  if (to_node)
+	  {
+	    if (!ParseVector (to_node, to))
+	      return false;
+	  }
+	  csRef<iDocumentNode> up_node = child->GetNode ("up");
+	  if (up_node)
+	  {
+	    if (!ParseVector (up_node, up))
+	      return false;
+	  }
+	  csReversibleTransform tr;
+	  tr.LookAt (to, up);
+	  m = tr.GetO2T ();
+	}
+	break;
       case XMLTOKEN_SCALE:
         {
 	  float scale;
