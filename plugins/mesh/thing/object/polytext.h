@@ -23,6 +23,7 @@
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
 #include "iengine/light.h"
+#include "iengine/movable.h"
 #include "ivideo/txtmgr.h"
 
 #include "lghtmap.h"
@@ -83,7 +84,8 @@ public:
   /// Finalize lighting.
   virtual void FinalizeLighting ()
   {
-    UpdateMaps (light, light->GetCenter (), light->GetColor ());
+    UpdateMaps (light, light->GetMovable ()->GetFullPosition (),
+    	light->GetColor ());
   }
 
   SCF_DECLARE_IBASE;

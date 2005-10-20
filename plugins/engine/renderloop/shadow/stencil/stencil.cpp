@@ -469,8 +469,8 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
 
-  csVector3 meshlightpos = light->GetCenter ()
-  	* mesh->GetMovable()->GetFullTransform ();
+  csVector3 light_pos = light->GetMovable ()->GetFullPosition ();
+  csVector3 meshlightpos = light_pos * mesh->GetMovable()->GetFullTransform ();
   int index_range, edge_start;
 
   shadowCacheEntry->SetActiveLight (light, meshlightpos, index_range,
@@ -549,7 +549,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   csReversibleTransform ct = rview->GetCamera ()->GetTransform ();
   const csVector3 camPlaneZ = ct.GetT2O().Col3 ();
   const csVector3 camPos = ct.GetOrigin ();
-  const csVector3 lightPos = light->GetCenter ();
+  const csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
   csVector3 v = lightPos - camPos;
   csRef<iVisibilityCuller> culler = sector->GetVisibilityCuller ();
   

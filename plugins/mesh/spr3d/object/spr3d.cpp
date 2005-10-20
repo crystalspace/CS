@@ -1794,7 +1794,8 @@ void csSprite3DMeshObject::UpdateLightingFast (const csArray<iLight*>& lights,
     sq_light_radius = csSquare (lights [light_num]->GetCutoffDistance ());
 
     // Compute light position in object coordinates
-    csVector3 wor_light_pos = lights [light_num]->GetCenter ();
+    csVector3 wor_light_pos = lights [light_num]->GetMovable ()
+    	->GetFullPosition ();
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
     if (wor_sq_dist >= sq_light_radius) continue;
 
@@ -1896,7 +1897,7 @@ void csSprite3DMeshObject::UpdateLightingLQ (const csArray<iLight*>& lights,
   for (i = 0 ; i < num_lights ; i++)
   {
     // Compute light position in object coordinates
-    csVector3 wor_light_pos = lights [i]->GetCenter ();
+    csVector3 wor_light_pos = lights [i]->GetMovable ()->GetFullPosition ();
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
     if (wor_sq_dist >= csSquare (lights[i]->GetCutoffDistance ())) continue;
 
@@ -1985,7 +1986,7 @@ void csSprite3DMeshObject::UpdateLightingHQ (const csArray<iLight*>& lights,
     float sq_light_radius = csSquare (lights [i]->GetCutoffDistance ());
 
     // Compute light position in object coordinates
-    csVector3 wor_light_pos = lights [i]->GetCenter ();
+    csVector3 wor_light_pos = lights [i]->GetMovable ()->GetFullPosition ();
     csVector3 obj_light_pos = movtrans.Other2This (wor_light_pos);
 
     for (j = 0 ; j < num_texels ; j++)

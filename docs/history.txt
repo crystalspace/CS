@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Oct-2005
+	- Jorrit changed a lot of code in CS to use
+	  light->GetMovable()->GetFullPosition() instead of light->GetCenter().
+	  That means that parenting lights to meshes will work better now.
+	  Still not perfect as with software lighting a manual Setup() is
+	  needed on the light after moving it.
 19-Oct-2005
 	- Jorrit did a big optimization to the generic renderloop plugin
 	  in combination with the lightiter step. Now the list of visible
@@ -19,6 +25,25 @@ chronological order.
 	  lights. A better test for spot light still has to be written
 	  though (one that also takes direction and cone of spot light
 	  into account).
+	- Jorrit removed direction support from lights. A spot or directional
+	  light will now point to 0,0,1 by default. Use a transform (<move>
+	  in xml) to rotate the light. This means iLight->SetDirection() and
+	  iLight->GetDirection() are gone and also it means that it is now
+	  possible to use the <move> keyword in light (just like for meshes).
+	- Jorrit added support for using <lookat> in parsing of matrices. It
+	  works like this:
+	    <move>
+	      <matrix>
+	        <lookat>
+		  <to x="0" y="2" z="1" />
+		  <up x="0" y="1" z="0" />
+		</lookat>
+	      </matrix>
+	    </move>
+	  The default 'up' is 0,1,0.
+	- Jorrit fixed the fat renderloop so that it compiles following
+	  the above changes but wasn't able to test if the change is
+	  actually correct.
 18-Oct-2005
 	- res updated the new SCF to support the ref tracker.
 	- res fixed the console on Win32 disappearing to soon under some

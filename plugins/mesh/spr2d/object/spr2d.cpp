@@ -159,10 +159,11 @@ void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   int num_lights = (int)lights.Length ();
   for (i = 0; i < num_lights; i++)
   {
-    csColor light_color = lights[i]->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL);
+    csColor light_color = lights[i]->GetColor ()
+    	* (256. / CS_NORMAL_LIGHT_LEVEL);
     float sq_light_radius = csSquare (lights [i]->GetCutoffDistance ());
     // Compute light position.
-    csVector3 wor_light_pos = lights [i]->GetCenter ();
+    csVector3 wor_light_pos = lights [i]->GetMovable ()->GetFullPosition ();
     float wor_sq_dist =
       csSquaredDist::PointPoint (wor_light_pos, pos);
     if (wor_sq_dist >= sq_light_radius) continue;

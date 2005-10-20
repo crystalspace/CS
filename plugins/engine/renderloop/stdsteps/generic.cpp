@@ -29,6 +29,7 @@
 #include "iengine/mesh.h"
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
+#include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
 #include "igeom/clip2d.h"
@@ -491,7 +492,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   {
     light_type = light->GetType ();
     cutoff_distance = light->GetCutoffDistance ();
-    light_center = light->GetCenter ();
+    light_center = light->GetMovable ()->GetFullPosition ();
   }
 
   for (size_t n = 0; n < num; n++)

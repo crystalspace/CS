@@ -1654,7 +1654,7 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
   iShadowIterator* shadowIt = shadows->GetShadowIterator ();
 
   // Compute light position in object coordinates
-  csVector3 wor_light_pos = li->GetCenter ();
+  csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
   csVector3 obj_light_pos = o2w.Other2This (wor_light_pos);
 
   bool pseudoDyn = li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO;

@@ -771,7 +771,7 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   csVector3* vertices = factory->GetVertices ();
   csColor4* colors = static_mesh_colors;
   // Compute light position in object coordinates
-  csVector3 wor_light_pos = li->GetCenter ();
+  csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
   csVector3 obj_light_pos = o2w.Other2This (wor_light_pos);
 
   bool pseudoDyn = li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO;
@@ -862,7 +862,7 @@ void csGenmeshMeshObject::UpdateLightingOne (
   csVector3* normals = factory->GetNormals ();
   csColor4* colors = lit_mesh_colors;
   // Compute light position in object coordinates
-  csVector3 wor_light_pos = li->GetCenter ();
+  csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
   csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
   float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
   if (obj_sq_dist >= csSquare (li->GetCutoffDistance ())) return;

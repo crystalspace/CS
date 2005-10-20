@@ -315,7 +315,7 @@ void csNewParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
     size_t num = lights.Length ();
     for (size_t j=0; j<num; j++)
     {
-      float d = (wpos - lights [j]->GetCenter ()).Norm ();
+      float d = (wpos - lights [j]->GetMovable ()->GetFullPosition ()).Norm ();
       float br = lights [j]->GetBrightnessAtDistance (d);
       lightColor += br * lights [j]->GetColor ();
     }

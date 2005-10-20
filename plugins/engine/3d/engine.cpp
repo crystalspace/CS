@@ -1768,8 +1768,10 @@ void csEngine::AddHalo (iCamera* camera, csLight *Light)
   if (!Light->GetHalo () || Light->flags.Check (CS_LIGHT_ACTIVEHALO))
     return ;
 
+  csVector3 light_pos = Light->GetMovable ()->GetFullPosition ();
+
   // Transform light pos into camera space and see if it is directly visible
-  csVector3 v = camera->GetTransform ().Other2This (Light->GetCenter ());
+  csVector3 v = camera->GetTransform ().Other2This (light_pos);
 
   // Check if light is behind us
   if (v.z <= SMALL_Z) return ;
@@ -1786,7 +1788,7 @@ void csEngine::AddHalo (iCamera* camera, csLight *Light)
   csVector3 isect;
   int polyidx = 0;
   if(camera->GetSector ()->HitBeamPortals (camera->GetTransform().GetOrigin(), 
-      Light->GetCenter(), isect, &polyidx))
+      light_pos, isect, &polyidx))
     return; // hit a mesh
   if(polyidx != -1) // double check on the above.
     return; // hit a polygon
@@ -2162,7 +2164,8 @@ static bool FindLightPos_Front2Back (csKDTree* treenode,
       if (obj_bbox.In (pos))
       {
         iLight* light = (iLight*)objects[i]->GetObject ();
-	float sqdist = csSquaredDist::PointPoint (pos, light->GetCenter ());
+	float sqdist = csSquaredDist::PointPoint (pos,
+		light->GetMovable ()->GetFullPosition ());
 	if (sqdist < csSquare(light->GetCutoffDistance ()))
 	{
 	  light_array->AddLight (light, sqdist);
@@ -2206,8 +2209,8 @@ static bool FindLightBox_Front2Back (csKDTree* treenode,
       if (obj_bbox.TestIntersect (*box))
       {
         iLight* light = (iLight*)objects[i]->GetObject ();
-        csBox3 b (box->Min () - light->GetCenter (),
-		  box->Max () - light->GetCenter ());
+	csVector3 light_pos = light->GetMovable ()->GetFullPosition ();
+        csBox3 b (box->Min () - light_pos, box->Max () - light_pos);
         float sqdist = b.SquaredOriginDist ();
         if (sqdist < csSquare (light->GetCutoffDistance ()))
 	{

@@ -300,7 +300,7 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
   while (nlights-- > 0)
   {
     iLight* light = lights->Get (nlights);
-    const csVector3 lightPos = light->GetCenter ();
+    const csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
 
     /* 
     @@@ material specific diffuse/specular/ambient.

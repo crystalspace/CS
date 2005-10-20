@@ -657,7 +657,8 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
     return;
   }
 
-  csSphere lightSphere (light->GetCenter (), light->GetCutoffDistance ());
+  csVector3 light_pos = light->GetMovable ()->GetFullPosition ();
+  csSphere lightSphere (light_pos, light->GetCutoffDistance ());
   csRef<iVisibilityCuller> culler = sector->GetVisibilityCuller ();
   shadowMeshes.Truncate (0);
   culler->VisTest (lightSphere, &shadowDrawVisCallback);
@@ -706,7 +707,7 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
         rview->SetupClipPlanes(tr_o2c, frustum_planes, frustum_mask);
 
         float shadow_length = 100;//(light->GetInfluenceRadius() + maxRadius);
-        csVector3 light_pos2object = tf.Other2This(light->GetCenter());
+        csVector3 light_pos2object = tf.Other2This(light_pos);
 
         bool front_cap_in_frustum;
         bool extrusion_in_frustum;

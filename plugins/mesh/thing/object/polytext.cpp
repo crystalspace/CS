@@ -512,7 +512,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   if (lp->GetLightFrustum ())
     lightpos = lp->GetLightFrustum ()->GetOrigin ();
   else
-    lightpos = light->GetCenter ();
+    lightpos = light->GetMovable ()->GetFullPosition ();
 
   float infradius_sq = csSquare (light->GetCutoffDistance ());
 

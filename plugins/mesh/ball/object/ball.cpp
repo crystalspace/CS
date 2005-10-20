@@ -655,7 +655,7 @@ void csBallMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   {
     iLight* li = lights[l];
     // Compute light position in object coordinates
-    csVector3 wor_light_pos = li->GetCenter ();
+    csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
     csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
     if (obj_sq_dist >= csSquare (li->GetDirectionalCutoffRadius ())) continue;

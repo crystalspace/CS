@@ -1066,7 +1066,7 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
     // Compute light position in object coordinates
     // @@@ Can be optimized a bit. E.g. store obj_light_pos so it can be
     //  reused by submesh lighting.
-    csVector3 wor_light_pos = li->GetCenter ();
+    csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
     csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
     if (obj_sq_dist >= csSquare (li->GetCutoffDistance ())) return;
