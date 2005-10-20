@@ -3781,8 +3781,6 @@ class iLight(iBase):
     def SetSpecularColor(*args): return _cspace.iLight_SetSpecularColor(*args)
     def GetType(*args): return _cspace.iLight_GetType(*args)
     def SetType(*args): return _cspace.iLight_SetType(*args)
-    def GetDirection(*args): return _cspace.iLight_GetDirection(*args)
-    def SetDirection(*args): return _cspace.iLight_SetDirection(*args)
     def GetAttenuationMode(*args): return _cspace.iLight_GetAttenuationMode(*args)
     def SetAttenuationMode(*args): return _cspace.iLight_SetAttenuationMode(*args)
     def SetAttenuationConstants(*args): return _cspace.iLight_SetAttenuationConstants(*args)
