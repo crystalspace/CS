@@ -4300,8 +4300,6 @@ package cspace::iLight;
 *SetSpecularColor = *cspacec::iLight_SetSpecularColor;
 *GetType = *cspacec::iLight_GetType;
 *SetType = *cspacec::iLight_SetType;
-*GetDirection = *cspacec::iLight_GetDirection;
-*SetDirection = *cspacec::iLight_SetDirection;
 *GetAttenuationMode = *cspacec::iLight_GetAttenuationMode;
 *SetAttenuationMode = *cspacec::iLight_SetAttenuationMode;
 *SetAttenuationConstants = *cspacec::iLight_SetAttenuationConstants;
