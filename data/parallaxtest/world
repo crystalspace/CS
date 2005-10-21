@@ -366,6 +366,7 @@
 		<light name="Lamp">
 			<center x="-.05294" y="0" z="0" />
 			<color red="0.9" green="0.9" blue="1.0" />
+	    <radius>50</radius>
 			
 			<attenuation c="0" l="0" q="0.1"/>
 		</light>

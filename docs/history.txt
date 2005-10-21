@@ -78,6 +78,9 @@ chronological order.
 	    - Fixed several minor style issues in shaderexpressions.
 	    - Wrote prelim s-expression parser for shader expressions. Only
 	      minimally tested.
+	- Jorrit added a <radius> to the light in the parallaxtest map.
+	  That works around (hides) the bug where the parallax effect disappears
+	  if the light is too far away.
 14-Oct-2005
 	- Jorrit fixed a bug in the odedynam plugin. Auto-disable for
 	  inactive objects is enabled. However the odedynam plugin didn't
