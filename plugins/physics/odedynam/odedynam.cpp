@@ -224,10 +224,12 @@ void csODEDynamics::RemoveSystem (iDynamicSystem* system)
 {
   systems.Delete (system);
 }
+
 void csODEDynamics::RemoveSystems ()
 {
   systems.DeleteAll ();
 }
+
 iDynamicSystem *csODEDynamics::FindSystem (const char *name)
 {
   return systems.FindByName (name);
@@ -384,6 +386,7 @@ ODE_EXTERN int dCollideRayPlane (dxGeom *o1, dxGeom *o2, int flags,
 
 typedef csDirtyAccessArray<csMeshedPolygon> csPolyMeshList;
 
+#if 0
 void csODEDynamics::GetAABB (dGeomID g, dReal aabb[6])
 {
   csBox3 box;
@@ -401,6 +404,7 @@ void csODEDynamics::GetAABB (dGeomID g, dReal aabb[6])
   aabb[2] = box.MinY(); aabb[3] = box.MaxY();
   aabb[4] = box.MinZ(); aabb[5] = box.MaxZ();
 }
+#endif
 
 void csODEDynamics::SetGlobalERP (float erp)
 {
@@ -568,7 +572,6 @@ csODEDynamicSystem::~csODEDynamicSystem ()
 
   dSpaceDestroy (spaceID);
   dWorldDestroy (worldID);
-  if (move_cb) move_cb->DecRef ();
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiODEDynamicSystemState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiDynamicSystem);
@@ -749,7 +752,9 @@ void csODEDynamicSystem::Step (float elapsed_time)
 }
 
 bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
-                                             const csOrthoTransform& trans, float friction, float elasticity, float softness)
+                                             const csOrthoTransform& trans,
+					     float friction, float elasticity,
+					     float softness)
 {
   csODECollider *odec = new csODECollider ();
   odec->SetElasticity (elasticity);
@@ -764,7 +769,10 @@ bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
 }
 
 bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
-                                                 const csOrthoTransform& trans, float friction, float elasticity, float softness)
+                                                 const csOrthoTransform& trans,
+						 float friction,
+						 float elasticity,
+						 float softness)
 {
   csODECollider *odec = new csODECollider ();
   odec->SetElasticity (elasticity);
@@ -823,6 +831,7 @@ bool csODEDynamicSystem::AttachColliderPlane (const csPlane3 &plane,
 
   return true;
 }
+
 csRef<iDynamicsSystemCollider> csODEDynamicSystem::GetCollider (
 	unsigned int index)
 {
@@ -896,7 +905,6 @@ csODEBodyGroup::~csODEBodyGroup ()
 
 void csODEBodyGroup::AddBody (iRigidBody *body)
 {
-  body->IncRef ();
   bodies.Push (body);
   ((csODERigidBody *)(body->QueryObject()))->SetGroup (this);
 }
@@ -928,12 +936,12 @@ csODECollider::csODECollider ()
   geom_type =  NO_GEOMETRY;
   is_static = true;
 }
-void csODECollider::SetCollisionCallback (iDynamicsColliderCollisionCallback* cb)
+void csODECollider::SetCollisionCallback (
+	iDynamicsColliderCollisionCallback* cb)
 {
-  if (cb) cb->IncRef ();
-  if (coll_cb) coll_cb->DecRef();
   coll_cb = cb;
 }
+
 void csODECollider::KillGeoms ()
 {
   if (transformID)
@@ -947,32 +955,38 @@ void csODECollider::KillGeoms ()
 
   geomID = transformID = 0;
 }
+
 csODECollider::~csODECollider ()
 {
   KillGeoms ();
-  if (coll_cb) coll_cb->DecRef ();
   SCF_DESTRUCT_IBASE();
 }
+
 void csODECollider::MakeStatic ()
 {
   is_static = true;
 }
+
 void csODECollider::MakeDynamic ()
 {
   is_static = false;
 }
+
 bool csODECollider::IsStatic ()
 {
   return is_static;
 }
+
 void csODECollider::Collision (csODECollider* other)
 {
   if (coll_cb) coll_cb->Execute (this, other);
 }
+
 void csODECollider::Collision (iRigidBody* other)
 {
   if (coll_cb) coll_cb->Execute (this, other);
 }
+
 void csODECollider::ClearContents ()
 {
   KillGeoms ();
@@ -1064,7 +1078,8 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
 
   // From Eroroman & Marc Rochel with modifications by Mike Handverger and Piotr Obrzut
 
-  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
+  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()
+  	->GetPolygonMeshColldet();
 
   if (p->GetVertexCount () == 0 || p->GetTriangleCount () == 0)
     return false;
@@ -1407,16 +1422,10 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
   groupID = dSimpleSpaceCreate (dynsys->GetSpaceID ());
   statjoint = 0;
   collision_group = 0;
-
-  mesh = 0;
-  move_cb = 0;
-  coll_cb = 0;
 }
 
 csODERigidBody::~csODERigidBody ()
 {
-  if (move_cb) move_cb->DecRef ();
-  if (coll_cb) coll_cb->DecRef ();
   colliders.DeleteAll ();
   dSpaceDestroy (groupID);
   dBodyDestroy (bodyID);
@@ -1501,7 +1510,8 @@ void csODERigidBody::SetGroup(iBodyGroup *group)
 }
 
 bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
-                                         const csOrthoTransform &trans, float friction, float density,
+                                         const csOrthoTransform &trans,
+					 float friction, float density,
                                          float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider ();
@@ -1514,14 +1524,14 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   odec->AttachBody (bodyID);
   odec->AddTransformToSpace (groupID);
   odec->MakeDynamic ();
-  odec->IncRef ();
   colliders.Push (odec);
 
   return true;
 }
 
 bool csODERigidBody::AttachColliderCylinder (float length, float radius,
-                                             const csOrthoTransform& trans, float friction, float density,
+                                             const csOrthoTransform& trans,
+					     float friction, float density,
                                              float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider ();
@@ -1534,13 +1544,14 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
   odec->AttachBody (bodyID);
   odec->AddTransformToSpace (groupID);
   odec->MakeDynamic ();
-  odec->IncRef ();
   colliders.Push (odec);
 
   return true;
 }
+
 bool csODERigidBody::AttachColliderBox (const csVector3 &size,
-                                        const csOrthoTransform& trans, float friction, float density,
+                                        const csOrthoTransform& trans,
+					float friction, float density,
                                         float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider ();
@@ -1553,14 +1564,15 @@ bool csODERigidBody::AttachColliderBox (const csVector3 &size,
   odec->SetTransform (trans);
   odec->AddTransformToSpace (groupID);
   odec->MakeDynamic ();
-  odec->IncRef ();
   colliders.Push (odec);
 
   return true;
 }
 
-bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset,
-                                           float friction, float density, float elasticity, float softness)
+bool csODERigidBody::AttachColliderSphere (float radius,
+					   const csVector3 &offset,
+                                           float friction, float density,
+					   float elasticity, float softness)
 {
   if (radius > 0) //otherwise ODE will treat radius as a 'bad argument' 
   {
@@ -1573,7 +1585,6 @@ bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset
     odec->AttachBody (bodyID);
     odec->AddTransformToSpace (groupID);
     odec->MakeDynamic ();
-    odec->IncRef ();
     colliders.Push (odec);
     return true;
   }
@@ -1581,7 +1592,8 @@ bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset
 }
 
 bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
-                                          float friction, float density, float elasticity, float softness)
+                                          float friction, float density,
+					  float elasticity, float softness)
 {
   csODECollider *odec = new csODECollider (); 
   odec->SetElasticity (elasticity);
@@ -1593,11 +1605,11 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
   //causes non placeable geom run-time error w/debug build of ode.
   //odec->AttachBody (bodyID);   
   odec->MakeDynamic ();
-  odec->IncRef ();
   odec->AddToSpace (dynsys->GetSpaceID());
 
   return true;
 }
+
 void csODERigidBody::AttachCollider (iDynamicsSystemCollider* collider)
 {
   dynsys->DestroyCollider (collider);
@@ -1610,6 +1622,7 @@ void csODERigidBody::AttachCollider (iDynamicsSystemCollider* collider)
   collider->MakeDynamic ();
   colliders.Push (collider);
 }
+
 void csODERigidBody::SetPosition (const csVector3& pos)
 {
   dBodySetPosition (bodyID, pos.x, pos.y, pos.z);
@@ -1803,22 +1816,26 @@ const csVector3 csODERigidBody::GetTorque () const
 
 void csODERigidBody::AttachMesh (iMeshWrapper* m)
 {
-  if (m) m->IncRef ();
-  if (mesh) mesh->DecRef ();
   mesh = m;
+}
+
+void csODERigidBody::AttachLight (iLight* m)
+{
+  light = m;
+}
+
+void csODERigidBody::AttachCamera (iCamera* m)
+{
+  camera = m;
 }
 
 void csODERigidBody::SetMoveCallback (iDynamicsMoveCallback* cb)
 {
-  if (cb) cb->IncRef ();
-  if (move_cb) move_cb->DecRef ();
   move_cb = cb;
 }
 
 void csODERigidBody::SetCollisionCallback (iDynamicsCollisionCallback* cb)
 {
-  if (cb) cb->IncRef ();
-  if (coll_cb) coll_cb->DecRef();
   coll_cb = cb;
 }
 
@@ -1834,6 +1851,8 @@ void csODERigidBody::Update ()
     csOrthoTransform trans;
     trans = GetTransform ();
     if (mesh) move_cb->Execute (mesh, trans);
+    if (light) move_cb->Execute (light, trans);
+    if (camera) move_cb->Execute (camera, trans);
     /* remainder case for all other callbacks */
     move_cb->Execute (trans);
   }
@@ -2774,18 +2793,44 @@ csODEDefaultMoveCallback::~csODEDefaultMoveCallback ()
   SCF_DESTRUCT_IBASE();
 }
 
-void csODEDefaultMoveCallback::Execute (iMeshWrapper* mesh,
+void csODEDefaultMoveCallback::Execute (iMovable* movable,
                                         csOrthoTransform& t)
 {
   // Dont do anything if nothing has changed
-  if (mesh->GetMovable()->GetPosition() == t.GetOrigin() &&
-    mesh->GetMovable()->GetTransform().GetT2O() == t.GetT2O())
+  if (movable->GetPosition() == t.GetOrigin() &&
+    movable->GetTransform().GetT2O() == t.GetT2O())
     return;
 
   // Update movable
-  mesh->GetMovable ()->SetPosition (t.GetOrigin ());
-  mesh->GetMovable ()->GetTransform ().SetT2O (t.GetT2O ());
-  mesh->GetMovable ()->UpdateMove ();
+  movable->SetPosition (t.GetOrigin ());
+  movable->GetTransform ().SetT2O (t.GetT2O ());
+  movable->UpdateMove ();
+}
+
+void csODEDefaultMoveCallback::Execute (iMeshWrapper* mesh,
+                                        csOrthoTransform& t)
+{
+  Execute (mesh->GetMovable (), t);
+}
+
+void csODEDefaultMoveCallback::Execute (iLight* light,
+                                        csOrthoTransform& t)
+{
+  Execute (light->GetMovable (), t);
+}
+
+void csODEDefaultMoveCallback::Execute (iCamera* camera,
+                                        csOrthoTransform& t)
+{
+  // Dont do anything if nothing has changed
+  csOrthoTransform& cam_trans = camera->GetTransform ();
+  if (cam_trans.GetOrigin() == t.GetOrigin() &&
+    cam_trans.GetT2O() == t.GetT2O())
+    return;
+
+  // Update movable
+  cam_trans.SetOrigin (t.GetOrigin ());
+  cam_trans.SetT2O (t.GetT2O ());
 }
 
 void csODEDefaultMoveCallback::Execute (csOrthoTransform& t)

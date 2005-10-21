@@ -7,6 +7,15 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 21-Oct-2005
+	- Jorrit fixed some huge reference leaks in the odedynam plugin.
+	  It was storing all information (meshes, callbacks, bodies,
+	  colliders, ...) in csRef's or csRefArray's but it was also doing
+	  IncRef() on the objects manually AND in many cases forgetting
+	  to do the DecRef()'s. Fixed by removing all manual IncRef/DecRef
+	  calls.
+	- Jorrit added support to odedynam to also attach lights and
+	  cameras to bodies. The iDynamicsMoveCallback interface has
+	  been extended for this too.
 	- caedes added scripting bindings for the new sound system to cspace.i.
 20-Oct-2005
 	- Jorrit changed a lot of code in CS to use

@@ -27,6 +27,8 @@
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
 #include "iengine/mesh.h"
+#include "iengine/light.h"
+#include "iengine/camera.h"
 #include "iengine/movable.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
@@ -151,7 +153,9 @@ public:
   static int CollideMeshPlane (dGeomID mesh, dGeomID plane, int flags,
         dContactGeom *contact, int skip);
 //  static dColliderFn* CollideSelector (int num);
+#if 0
   static void GetAABB (dGeomID g, dReal aabb[6]);
+#endif
 
   void SetGlobalERP (float erp);
   float GlobalERP () { return erp; }
@@ -703,6 +707,8 @@ private:
   csODEDynamicSystem* dynsys;
 
   csRef<iMeshWrapper> mesh;
+  csRef<iLight> light;
+  csRef<iCamera> camera;
   csRef<iDynamicsMoveCallback> move_cb;
   csRef<iDynamicsCollisionCallback> coll_cb;
 
@@ -817,10 +823,20 @@ public:
     { return scfParent->GetForce (); }
     const csVector3 GetTorque () const
     { return scfParent->GetTorque (); }
+
     void AttachMesh (iMeshWrapper* mesh)
     { scfParent->AttachMesh (mesh); }
-    csRef<iMeshWrapper> GetAttachedMesh ()
+    iMeshWrapper* GetAttachedMesh ()
     { return scfParent->GetAttachedMesh (); }
+    void AttachLight (iLight* light)
+    { scfParent->AttachLight (light); }
+    iLight* GetAttachedLight ()
+    { return scfParent->GetAttachedLight (); }
+    void AttachCamera (iCamera* camera)
+    { scfParent->AttachCamera (camera); }
+    iCamera* GetAttachedCamera ()
+    { return scfParent->GetAttachedCamera (); }
+
     void SetMoveCallback (iDynamicsMoveCallback* cb)
     { scfParent->SetMoveCallback (cb); }
     void SetCollisionCallback (iDynamicsCollisionCallback* cb)
@@ -918,7 +934,11 @@ public:
   //int GetJointCount () const = 0;
 
   void AttachMesh (iMeshWrapper* mesh);
-  csRef<iMeshWrapper> GetAttachedMesh () { return mesh; }
+  iMeshWrapper* GetAttachedMesh () { return mesh; }
+  void AttachLight (iLight* light);
+  iLight* GetAttachedLight () { return light; }
+  void AttachCamera (iCamera* camera);
+  iCamera* GetAttachedCamera () { return camera; }
   void SetMoveCallback (iDynamicsMoveCallback* cb);
   void SetCollisionCallback (iDynamicsCollisionCallback* cb);
 
@@ -1837,14 +1857,19 @@ private:
  */
 class csODEDefaultMoveCallback : public iDynamicsMoveCallback
 {
+private:
+  void Execute (iMovable* movable, csOrthoTransform& t);
+
 public:
   SCF_DECLARE_IBASE;
 
   csODEDefaultMoveCallback ();
   virtual ~csODEDefaultMoveCallback ();
 
-  void Execute (iMeshWrapper* mesh, csOrthoTransform& t);
-  void Execute (csOrthoTransform& t);
+  virtual void Execute (iMeshWrapper* mesh, csOrthoTransform& t);
+  virtual void Execute (iLight* light, csOrthoTransform& t);
+  virtual void Execute (iCamera* camera, csOrthoTransform& t);
+  virtual void Execute (csOrthoTransform& t);
 };
 
 #endif // __CS_ODEDYNAMICS_H__

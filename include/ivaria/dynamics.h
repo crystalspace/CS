@@ -30,6 +30,8 @@
 struct iBodyGroup;
 struct iJoint;
 struct iMeshWrapper;
+struct iLight;
+struct iCamera;
 struct iObject;
 struct iPolygonMesh;
 struct iRigidBody;
@@ -283,6 +285,8 @@ struct iDynamicsMoveCallback : public virtual iBase
   SCF_INTERFACE (iDynamicsMoveCallback, 0, 0, 1);
 
   virtual void Execute (iMeshWrapper* mesh, csOrthoTransform& t) = 0;
+  virtual void Execute (iLight* light, csOrthoTransform& t) = 0;
+  virtual void Execute (iCamera* camera, csOrthoTransform& t) = 0;
   virtual void Execute (csOrthoTransform& t) = 0;
 };
 
@@ -568,10 +572,18 @@ struct iRigidBody : public virtual iBase
   virtual int GetJointCount () const = 0;
   */
 
-  /// Attach a iMeshWrapper to this body
+  /// Attach an iMeshWrapper to this body
   virtual void AttachMesh (iMeshWrapper* mesh) = 0;
   /// Returns the attached MeshWrapper
-  virtual csRef<iMeshWrapper> GetAttachedMesh () = 0;
+  virtual iMeshWrapper* GetAttachedMesh () = 0;
+  /// Attach an iLight to this body
+  virtual void AttachLight (iLight* light) = 0;
+  /// Returns the attached light
+  virtual iLight* GetAttachedLight () = 0;
+  /// Attach an iCamera to this body
+  virtual void AttachCamera (iCamera* camera) = 0;
+  /// Returns the attached camera
+  virtual iCamera* GetAttachedCamera () = 0;
 
   /**
    * Set a callback to be executed when this body moves.
