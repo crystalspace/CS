@@ -239,6 +239,17 @@
   INTERFACE_APPLY(iSoundDriver)
   INTERFACE_APPLY(iSoundSource)
   INTERFACE_APPLY(iSoundListener)
+  INTERFACE_APPLY(iSndSysData)
+  INTERFACE_APPLY(iSndSysManager)
+  INTERFACE_APPLY(iSndSysSoftwareDriver)
+  INTERFACE_APPLY(iSndSysSoftwareFilter3D)
+  INTERFACE_APPLY(iSndSysSoftwareFilterOutput)
+  INTERFACE_APPLY(iSndSysListener)
+  INTERFACE_APPLY(iSndSysLoader)
+  INTERFACE_APPLY(iSndSysSource)
+  INTERFACE_APPLY(iSndSysStream)
+  INTERFACE_APPLY(iSndSysRenderer)
+  INTERFACE_APPLY(iSndSysWrapper)
   INTERFACE_APPLY(iSprite2DState)
   INTERFACE_APPLY(iSprite3DState)
   INTERFACE_APPLY(iSpriteCal3DState)
@@ -962,6 +973,16 @@ TYPEMAP_OUT_csWrapPtr
 %include "isound/driver.h"
 %include "isound/source.h"
 %include "isound/listener.h"
+
+%include "isndsys/ss_data.h"
+%include "isndsys/ss_filter.h"
+%include "isndsys/ss_listener.h"
+%include "isndsys/ss_loader.h"
+%include "isndsys/ss_manager.h"
+%include "isndsys/ss_source.h"
+%include "isndsys/ss_structs.h"
+%include "isndsys/ss_stream.h"
+%include "isndsys/ss_renderer.h"
 
 %include "iutil/comp.h"
 %include "iutil/cache.h"
