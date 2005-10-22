@@ -123,8 +123,8 @@ the required latest @sc{cvs} code at:
 @noindent
 @uref{http://www.ode.org/}
 
-@emph{Note:} You @sc{must} compile @sc{ode} with @sc{opcode} support to being
-able to use the library with @sc{cs}.
+@emph{Note:} You @sc{must} compile @sc{ode} with @sc{opcode} support inorder
+to use the library with @sc{cs}.
 
 @subheading Ogg/Vorbis libraries
 @cindex Ogg/Vorbis
