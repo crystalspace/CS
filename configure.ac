@@ -1461,24 +1461,24 @@ CS_CHECK_LIB_WITH([ode],
     [$srcdir/libs/libode*], [C++])
 
 AS_IF([test $cs_cv_libode = yes],
-    [CS_CHECK_BUILD([if libode is sufficiently recent], [cs_cv_libode_recent],
-	[AC_LANG_PROGRAM(
-	    [[#include <ode/ode.h>]],
-	    [dGeomTriMeshGetTriangleCount(0);])],
-	[], [C++], [], [], [],
-	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])],
-	[cs_cv_libode_recent=no])
-
-AS_IF([test $cs_cv_libode_recent = yes],
     [CS_CHECK_BUILD([if libode is built with OPCODE support],
 	[cs_cv_libode_opcode],
 	[AC_LANG_PROGRAM(
 	    [[#include <ode/ode.h>]],
 	    [dGeomTriMeshDataCreate();])],
 	[], [C++],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libode], [ODE])], [], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libode], [ODE])],
+        [], [], [$cs_cv_libode_cflags], [$cs_cv_libode_lflags],
+        [$cs_cv_libode_libs])], [cs_cv_libode_opcode=no])
+
+AS_IF([test $cs_cv_libode = yes],
+    [CS_CHECK_BUILD([if libode is usable], [cs_cv_libode_recent],
+	[AC_LANG_PROGRAM(
+	    [[#include <ode/ode.h>]],
+	    [dGeomTriMeshGetTriangleCount(0);])],
+	[], [C++], [], [], [],
 	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])],
-	[cs_cv_libode_opcode=no])
+	[cs_cv_libode_recent=no])
 
 AS_IF([test $cs_cv_libode_recent = yes],
     [CS_CHECK_BUILD([if libode requires extern "C"],

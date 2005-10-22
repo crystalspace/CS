@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Oct-2005
+        - Philip Wyett changed the order configure deals with libode and if
+          it has/has not been built with OPCODE support. In this order
+          it is more apparent why the lib you have is usable or not.
 21-Oct-2005
 	- Jorrit fixed some huge reference leaks in the odedynam plugin.
 	  It was storing all information (meshes, callbacks, bodies,
