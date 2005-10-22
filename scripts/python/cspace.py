@@ -7167,6 +7167,491 @@ _cspace.iSoundListener_swigregister(iSoundListenerPtr)
 
 iSoundListener_scfGetVersion = _cspace.iSoundListener_scfGetVersion
 
+CS_SNDSYS_DATA_UNKNOWN_SIZE = _cspace.CS_SNDSYS_DATA_UNKNOWN_SIZE
+class iSndSysData(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysData, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysData, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysData instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def GetFormat(*args): return _cspace.iSndSysData_GetFormat(*args)
+    def GetSampleCount(*args): return _cspace.iSndSysData_GetSampleCount(*args)
+    def GetDataSize(*args): return _cspace.iSndSysData_GetDataSize(*args)
+    def CreateStream(*args): return _cspace.iSndSysData_CreateStream(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysData):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysData_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysData_scfGetVersion)
+
+class iSndSysDataPtr(iSndSysData):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysData, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysData, 'thisown', 0)
+        _swig_setattr(self, iSndSysData,self.__class__,iSndSysData)
+_cspace.iSndSysData_swigregister(iSndSysDataPtr)
+
+iSndSysData_scfGetVersion = _cspace.iSndSysData_scfGetVersion
+
+class iSndSysSoftwareFilter3DProperties(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSoftwareFilter3DProperties, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSoftwareFilter3DProperties, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysSoftwareFilter3DProperties instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_setmethods__["clean_buffer"] = _cspace.iSndSysSoftwareFilter3DProperties_clean_buffer_set
+    __swig_getmethods__["clean_buffer"] = _cspace.iSndSysSoftwareFilter3DProperties_clean_buffer_get
+    if _newclass:clean_buffer = property(_cspace.iSndSysSoftwareFilter3DProperties_clean_buffer_get, _cspace.iSndSysSoftwareFilter3DProperties_clean_buffer_set)
+    __swig_setmethods__["work_buffer"] = _cspace.iSndSysSoftwareFilter3DProperties_work_buffer_set
+    __swig_getmethods__["work_buffer"] = _cspace.iSndSysSoftwareFilter3DProperties_work_buffer_get
+    if _newclass:work_buffer = property(_cspace.iSndSysSoftwareFilter3DProperties_work_buffer_get, _cspace.iSndSysSoftwareFilter3DProperties_work_buffer_set)
+    __swig_setmethods__["buffer_samples"] = _cspace.iSndSysSoftwareFilter3DProperties_buffer_samples_set
+    __swig_getmethods__["buffer_samples"] = _cspace.iSndSysSoftwareFilter3DProperties_buffer_samples_get
+    if _newclass:buffer_samples = property(_cspace.iSndSysSoftwareFilter3DProperties_buffer_samples_get, _cspace.iSndSysSoftwareFilter3DProperties_buffer_samples_set)
+    __swig_setmethods__["source_parameters"] = _cspace.iSndSysSoftwareFilter3DProperties_source_parameters_set
+    __swig_getmethods__["source_parameters"] = _cspace.iSndSysSoftwareFilter3DProperties_source_parameters_get
+    if _newclass:source_parameters = property(_cspace.iSndSysSoftwareFilter3DProperties_source_parameters_get, _cspace.iSndSysSoftwareFilter3DProperties_source_parameters_set)
+    __swig_setmethods__["listener_parameters"] = _cspace.iSndSysSoftwareFilter3DProperties_listener_parameters_set
+    __swig_getmethods__["listener_parameters"] = _cspace.iSndSysSoftwareFilter3DProperties_listener_parameters_get
+    if _newclass:listener_parameters = property(_cspace.iSndSysSoftwareFilter3DProperties_listener_parameters_get, _cspace.iSndSysSoftwareFilter3DProperties_listener_parameters_set)
+    __swig_setmethods__["sound_format"] = _cspace.iSndSysSoftwareFilter3DProperties_sound_format_set
+    __swig_getmethods__["sound_format"] = _cspace.iSndSysSoftwareFilter3DProperties_sound_format_get
+    if _newclass:sound_format = property(_cspace.iSndSysSoftwareFilter3DProperties_sound_format_get, _cspace.iSndSysSoftwareFilter3DProperties_sound_format_set)
+    __swig_setmethods__["closest_speaker_distance"] = _cspace.iSndSysSoftwareFilter3DProperties_closest_speaker_distance_set
+    __swig_getmethods__["closest_speaker_distance"] = _cspace.iSndSysSoftwareFilter3DProperties_closest_speaker_distance_get
+    if _newclass:closest_speaker_distance = property(_cspace.iSndSysSoftwareFilter3DProperties_closest_speaker_distance_get, _cspace.iSndSysSoftwareFilter3DProperties_closest_speaker_distance_set)
+    __swig_setmethods__["speaker_distance"] = _cspace.iSndSysSoftwareFilter3DProperties_speaker_distance_set
+    __swig_getmethods__["speaker_distance"] = _cspace.iSndSysSoftwareFilter3DProperties_speaker_distance_get
+    if _newclass:speaker_distance = property(_cspace.iSndSysSoftwareFilter3DProperties_speaker_distance_get, _cspace.iSndSysSoftwareFilter3DProperties_speaker_distance_set)
+    __swig_setmethods__["speaker_direction_cos"] = _cspace.iSndSysSoftwareFilter3DProperties_speaker_direction_cos_set
+    __swig_getmethods__["speaker_direction_cos"] = _cspace.iSndSysSoftwareFilter3DProperties_speaker_direction_cos_get
+    if _newclass:speaker_direction_cos = property(_cspace.iSndSysSoftwareFilter3DProperties_speaker_direction_cos_get, _cspace.iSndSysSoftwareFilter3DProperties_speaker_direction_cos_set)
+    __swig_setmethods__["channel"] = _cspace.iSndSysSoftwareFilter3DProperties_channel_set
+    __swig_getmethods__["channel"] = _cspace.iSndSysSoftwareFilter3DProperties_channel_get
+    if _newclass:channel = property(_cspace.iSndSysSoftwareFilter3DProperties_channel_get, _cspace.iSndSysSoftwareFilter3DProperties_channel_set)
+    def __init__(self, *args):
+        _swig_setattr(self, iSndSysSoftwareFilter3DProperties, 'this', _cspace.new_iSndSysSoftwareFilter3DProperties(*args))
+        _swig_setattr(self, iSndSysSoftwareFilter3DProperties, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_iSndSysSoftwareFilter3DProperties):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iSndSysSoftwareFilter3DPropertiesPtr(iSndSysSoftwareFilter3DProperties):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysSoftwareFilter3DProperties, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSoftwareFilter3DProperties, 'thisown', 0)
+        _swig_setattr(self, iSndSysSoftwareFilter3DProperties,self.__class__,iSndSysSoftwareFilter3DProperties)
+_cspace.iSndSysSoftwareFilter3DProperties_swigregister(iSndSysSoftwareFilter3DPropertiesPtr)
+
+class iSndSysSoftwareFilter3D(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSoftwareFilter3D, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSoftwareFilter3D, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysSoftwareFilter3D instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def Apply(*args): return _cspace.iSndSysSoftwareFilter3D_Apply(*args)
+    def AddSubFilter(*args): return _cspace.iSndSysSoftwareFilter3D_AddSubFilter(*args)
+    def GetSubFilter(*args): return _cspace.iSndSysSoftwareFilter3D_GetSubFilter(*args)
+    def GetPtr(*args): return _cspace.iSndSysSoftwareFilter3D_GetPtr(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysSoftwareFilter3D):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysSoftwareFilter3D_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysSoftwareFilter3D_scfGetVersion)
+
+class iSndSysSoftwareFilter3DPtr(iSndSysSoftwareFilter3D):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysSoftwareFilter3D, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSoftwareFilter3D, 'thisown', 0)
+        _swig_setattr(self, iSndSysSoftwareFilter3D,self.__class__,iSndSysSoftwareFilter3D)
+_cspace.iSndSysSoftwareFilter3D_swigregister(iSndSysSoftwareFilter3DPtr)
+
+iSndSysSoftwareFilter3D_scfGetVersion = _cspace.iSndSysSoftwareFilter3D_scfGetVersion
+
+class iSndSysSoftwareFilterOutput(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSoftwareFilterOutput, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSoftwareFilterOutput, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysSoftwareFilterOutput instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def Apply(*args): return _cspace.iSndSysSoftwareFilterOutput_Apply(*args)
+    def AddSubFilter(*args): return _cspace.iSndSysSoftwareFilterOutput_AddSubFilter(*args)
+    def GetSubFilter(*args): return _cspace.iSndSysSoftwareFilterOutput_GetSubFilter(*args)
+    def GetPtr(*args): return _cspace.iSndSysSoftwareFilterOutput_GetPtr(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysSoftwareFilterOutput):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysSoftwareFilterOutput_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysSoftwareFilterOutput_scfGetVersion)
+
+class iSndSysSoftwareFilterOutputPtr(iSndSysSoftwareFilterOutput):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysSoftwareFilterOutput, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSoftwareFilterOutput, 'thisown', 0)
+        _swig_setattr(self, iSndSysSoftwareFilterOutput,self.__class__,iSndSysSoftwareFilterOutput)
+_cspace.iSndSysSoftwareFilterOutput_swigregister(iSndSysSoftwareFilterOutputPtr)
+
+iSndSysSoftwareFilterOutput_scfGetVersion = _cspace.iSndSysSoftwareFilterOutput_scfGetVersion
+
+class iSndSysListener(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysListener, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysListener, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysListener instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetDirection(*args): return _cspace.iSndSysListener_SetDirection(*args)
+    def SetPosition(*args): return _cspace.iSndSysListener_SetPosition(*args)
+    def SetDistanceFactor(*args): return _cspace.iSndSysListener_SetDistanceFactor(*args)
+    def SetRollOffFactor(*args): return _cspace.iSndSysListener_SetRollOffFactor(*args)
+    def GetDirection(*args): return _cspace.iSndSysListener_GetDirection(*args)
+    def GetPosition(*args): return _cspace.iSndSysListener_GetPosition(*args)
+    def GetDistanceFactor(*args): return _cspace.iSndSysListener_GetDistanceFactor(*args)
+    def GetRollOffFactor(*args): return _cspace.iSndSysListener_GetRollOffFactor(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysListener):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysListener_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysListener_scfGetVersion)
+
+class iSndSysListenerPtr(iSndSysListener):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysListener, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysListener, 'thisown', 0)
+        _swig_setattr(self, iSndSysListener,self.__class__,iSndSysListener)
+_cspace.iSndSysListener_swigregister(iSndSysListenerPtr)
+
+iSndSysListener_scfGetVersion = _cspace.iSndSysListener_scfGetVersion
+
+class iSndSysLoader(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysLoader, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysLoader, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysLoader instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def LoadSound(*args): return _cspace.iSndSysLoader_LoadSound(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysLoader):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysLoader_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysLoader_scfGetVersion)
+
+class iSndSysLoaderPtr(iSndSysLoader):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysLoader, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysLoader, 'thisown', 0)
+        _swig_setattr(self, iSndSysLoader,self.__class__,iSndSysLoader)
+_cspace.iSndSysLoader_swigregister(iSndSysLoaderPtr)
+
+iSndSysLoader_scfGetVersion = _cspace.iSndSysLoader_scfGetVersion
+
+class iSndSysWrapper(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysWrapper, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysWrapper, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysWrapper instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def QueryObject(*args): return _cspace.iSndSysWrapper_QueryObject(*args)
+    def GetStream(*args): return _cspace.iSndSysWrapper_GetStream(*args)
+    def SetStream(*args): return _cspace.iSndSysWrapper_SetStream(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysWrapper):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysWrapper_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysWrapper_scfGetVersion)
+
+class iSndSysWrapperPtr(iSndSysWrapper):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysWrapper, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysWrapper, 'thisown', 0)
+        _swig_setattr(self, iSndSysWrapper,self.__class__,iSndSysWrapper)
+_cspace.iSndSysWrapper_swigregister(iSndSysWrapperPtr)
+
+iSndSysWrapper_scfGetVersion = _cspace.iSndSysWrapper_scfGetVersion
+
+class iSndSysManager(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysManager, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysManager, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysManager instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def CreateSound(*args): return _cspace.iSndSysManager_CreateSound(*args)
+    def RemoveSound(*args): return _cspace.iSndSysManager_RemoveSound(*args)
+    def RemoveSounds(*args): return _cspace.iSndSysManager_RemoveSounds(*args)
+    def GetSoundCount(*args): return _cspace.iSndSysManager_GetSoundCount(*args)
+    def GetSound(*args): return _cspace.iSndSysManager_GetSound(*args)
+    def FindSoundByName(*args): return _cspace.iSndSysManager_FindSoundByName(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysManager):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysManager_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysManager_scfGetVersion)
+
+class iSndSysManagerPtr(iSndSysManager):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysManager, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysManager, 'thisown', 0)
+        _swig_setattr(self, iSndSysManager,self.__class__,iSndSysManager)
+_cspace.iSndSysManager_swigregister(iSndSysManagerPtr)
+
+iSndSysManager_scfGetVersion = _cspace.iSndSysManager_scfGetVersion
+
+CS_SNDSYS_SOURCE_DISTANCE_INFINITE = _cspace.CS_SNDSYS_SOURCE_DISTANCE_INFINITE
+class iSndSysSource(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSource, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSource, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysSource instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetVolume(*args): return _cspace.iSndSysSource_SetVolume(*args)
+    def GetVolume(*args): return _cspace.iSndSysSource_GetVolume(*args)
+    def GetStream(*args): return _cspace.iSndSysSource_GetStream(*args)
+    def GetPtr(*args): return _cspace.iSndSysSource_GetPtr(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysSource):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysSource_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysSource_scfGetVersion)
+
+class iSndSysSourcePtr(iSndSysSource):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysSource, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSource, 'thisown', 0)
+        _swig_setattr(self, iSndSysSource,self.__class__,iSndSysSource)
+_cspace.iSndSysSource_swigregister(iSndSysSourcePtr)
+
+iSndSysSource_scfGetVersion = _cspace.iSndSysSource_scfGetVersion
+
+class iSndSysSourceSoftware(iSndSysSource):
+    __swig_setmethods__ = {}
+    for _s in [iSndSysSource]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSourceSoftware, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iSndSysSource]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSourceSoftware, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysSourceSoftware instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def MergeIntoBuffer(*args): return _cspace.iSndSysSourceSoftware_MergeIntoBuffer(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysSourceSoftware):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iSndSysSourceSoftwarePtr(iSndSysSourceSoftware):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysSourceSoftware, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSourceSoftware, 'thisown', 0)
+        _swig_setattr(self, iSndSysSourceSoftware,self.__class__,iSndSysSourceSoftware)
+_cspace.iSndSysSourceSoftware_swigregister(iSndSysSourceSoftwarePtr)
+
+class iSndSysSourceSoftware3D(iSndSysSourceSoftware):
+    __swig_setmethods__ = {}
+    for _s in [iSndSysSourceSoftware]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSourceSoftware3D, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iSndSysSourceSoftware]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSourceSoftware3D, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysSourceSoftware3D instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetPosition(*args): return _cspace.iSndSysSourceSoftware3D_SetPosition(*args)
+    def GetPosition(*args): return _cspace.iSndSysSourceSoftware3D_GetPosition(*args)
+    def SetDirection(*args): return _cspace.iSndSysSourceSoftware3D_SetDirection(*args)
+    def GetDirection(*args): return _cspace.iSndSysSourceSoftware3D_GetDirection(*args)
+    def SetDirectionalRadiation(*args): return _cspace.iSndSysSourceSoftware3D_SetDirectionalRadiation(*args)
+    def GetDirectionalRadiation(*args): return _cspace.iSndSysSourceSoftware3D_GetDirectionalRadiation(*args)
+    def SetMinimumDistance(*args): return _cspace.iSndSysSourceSoftware3D_SetMinimumDistance(*args)
+    def SetMaximumDistance(*args): return _cspace.iSndSysSourceSoftware3D_SetMaximumDistance(*args)
+    def GetMinimumDistance(*args): return _cspace.iSndSysSourceSoftware3D_GetMinimumDistance(*args)
+    def GetMaximumDistance(*args): return _cspace.iSndSysSourceSoftware3D_GetMaximumDistance(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysSourceSoftware3D):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iSndSysSourceSoftware3DPtr(iSndSysSourceSoftware3D):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysSourceSoftware3D, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSourceSoftware3D, 'thisown', 0)
+        _swig_setattr(self, iSndSysSourceSoftware3D,self.__class__,iSndSysSourceSoftware3D)
+_cspace.iSndSysSourceSoftware3D_swigregister(iSndSysSourceSoftware3DPtr)
+
+class csSndSysSoundFormat(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csSndSysSoundFormat, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csSndSysSoundFormat, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csSndSysSoundFormat instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_setmethods__["Freq"] = _cspace.csSndSysSoundFormat_Freq_set
+    __swig_getmethods__["Freq"] = _cspace.csSndSysSoundFormat_Freq_get
+    if _newclass:Freq = property(_cspace.csSndSysSoundFormat_Freq_get, _cspace.csSndSysSoundFormat_Freq_set)
+    __swig_setmethods__["Bits"] = _cspace.csSndSysSoundFormat_Bits_set
+    __swig_getmethods__["Bits"] = _cspace.csSndSysSoundFormat_Bits_get
+    if _newclass:Bits = property(_cspace.csSndSysSoundFormat_Bits_get, _cspace.csSndSysSoundFormat_Bits_set)
+    __swig_setmethods__["Channels"] = _cspace.csSndSysSoundFormat_Channels_set
+    __swig_getmethods__["Channels"] = _cspace.csSndSysSoundFormat_Channels_get
+    if _newclass:Channels = property(_cspace.csSndSysSoundFormat_Channels_get, _cspace.csSndSysSoundFormat_Channels_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csSndSysSoundFormat, 'this', _cspace.new_csSndSysSoundFormat(*args))
+        _swig_setattr(self, csSndSysSoundFormat, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csSndSysSoundFormat):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csSndSysSoundFormatPtr(csSndSysSoundFormat):
+    def __init__(self, this):
+        _swig_setattr(self, csSndSysSoundFormat, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csSndSysSoundFormat, 'thisown', 0)
+        _swig_setattr(self, csSndSysSoundFormat,self.__class__,csSndSysSoundFormat)
+_cspace.csSndSysSoundFormat_swigregister(csSndSysSoundFormatPtr)
+
+CS_SNDSYS_STREAM_PAUSED = _cspace.CS_SNDSYS_STREAM_PAUSED
+CS_SNDSYS_STREAM_UNPAUSED = _cspace.CS_SNDSYS_STREAM_UNPAUSED
+CS_SNDSYS_STREAM_DONTLOOP = _cspace.CS_SNDSYS_STREAM_DONTLOOP
+CS_SNDSYS_STREAM_LOOP = _cspace.CS_SNDSYS_STREAM_LOOP
+CS_SND3D_DISABLE = _cspace.CS_SND3D_DISABLE
+CS_SND3D_RELATIVE = _cspace.CS_SND3D_RELATIVE
+CS_SND3D_ABSOLUTE = _cspace.CS_SND3D_ABSOLUTE
+class iSndSysStream(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysStream, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysStream, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysStream instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def GetRenderedFormat(*args): return _cspace.iSndSysStream_GetRenderedFormat(*args)
+    def Get3dMode(*args): return _cspace.iSndSysStream_Get3dMode(*args)
+    def GetSampleCount(*args): return _cspace.iSndSysStream_GetSampleCount(*args)
+    def GetPosition(*args): return _cspace.iSndSysStream_GetPosition(*args)
+    def ResetPosition(*args): return _cspace.iSndSysStream_ResetPosition(*args)
+    def SetPosition(*args): return _cspace.iSndSysStream_SetPosition(*args)
+    def Pause(*args): return _cspace.iSndSysStream_Pause(*args)
+    def Unpause(*args): return _cspace.iSndSysStream_Unpause(*args)
+    def GetPauseState(*args): return _cspace.iSndSysStream_GetPauseState(*args)
+    def SetLoopState(*args): return _cspace.iSndSysStream_SetLoopState(*args)
+    def GetLoopState(*args): return _cspace.iSndSysStream_GetLoopState(*args)
+    def SetPlayRatePercent(*args): return _cspace.iSndSysStream_SetPlayRatePercent(*args)
+    def GetPlayRatePercent(*args): return _cspace.iSndSysStream_GetPlayRatePercent(*args)
+    def SetAutoUnregister(*args): return _cspace.iSndSysStream_SetAutoUnregister(*args)
+    def GetAutoUnregister(*args): return _cspace.iSndSysStream_GetAutoUnregister(*args)
+    def GetAutoUnregisterRequested(*args): return _cspace.iSndSysStream_GetAutoUnregisterRequested(*args)
+    def AdvancePosition(*args): return _cspace.iSndSysStream_AdvancePosition(*args)
+    def GetDataPointers(*args): return _cspace.iSndSysStream_GetDataPointers(*args)
+    def InitializeSourcePositionMarker(*args): return _cspace.iSndSysStream_InitializeSourcePositionMarker(*args)
+    def GetPtr(*args): return _cspace.iSndSysStream_GetPtr(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysStream):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysStream_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysStream_scfGetVersion)
+
+class iSndSysStreamPtr(iSndSysStream):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysStream, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysStream, 'thisown', 0)
+        _swig_setattr(self, iSndSysStream,self.__class__,iSndSysStream)
+_cspace.iSndSysStream_swigregister(iSndSysStreamPtr)
+CS_SNDSYS_STREAM_UNKNOWN_LENGTH = cvar.CS_SNDSYS_STREAM_UNKNOWN_LENGTH
+
+iSndSysStream_scfGetVersion = _cspace.iSndSysStream_scfGetVersion
+
+CS_SNDSYS_SOURCE_STOPPED = _cspace.CS_SNDSYS_SOURCE_STOPPED
+CS_SNDSYS_SOURCE_PLAYING = _cspace.CS_SNDSYS_SOURCE_PLAYING
+class iSndSysRenderer(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysRenderer, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysRenderer, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysRenderer instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetVolume(*args): return _cspace.iSndSysRenderer_SetVolume(*args)
+    def GetVolume(*args): return _cspace.iSndSysRenderer_GetVolume(*args)
+    def CreateStream(*args): return _cspace.iSndSysRenderer_CreateStream(*args)
+    def CreateSource(*args): return _cspace.iSndSysRenderer_CreateSource(*args)
+    def RemoveStream(*args): return _cspace.iSndSysRenderer_RemoveStream(*args)
+    def RemoveSource(*args): return _cspace.iSndSysRenderer_RemoveSource(*args)
+    def GetListener(*args): return _cspace.iSndSysRenderer_GetListener(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysRenderer):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysRenderer_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysRenderer_scfGetVersion)
+
+class iSndSysRendererPtr(iSndSysRenderer):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysRenderer, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysRenderer, 'thisown', 0)
+        _swig_setattr(self, iSndSysRenderer,self.__class__,iSndSysRenderer)
+_cspace.iSndSysRenderer_swigregister(iSndSysRendererPtr)
+
+iSndSysRenderer_scfGetVersion = _cspace.iSndSysRenderer_scfGetVersion
+
 class iComponent(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -11262,6 +11747,10 @@ class iRigidBody(iBase):
     def GetTorque(*args): return _cspace.iRigidBody_GetTorque(*args)
     def AttachMesh(*args): return _cspace.iRigidBody_AttachMesh(*args)
     def GetAttachedMesh(*args): return _cspace.iRigidBody_GetAttachedMesh(*args)
+    def AttachLight(*args): return _cspace.iRigidBody_AttachLight(*args)
+    def GetAttachedLight(*args): return _cspace.iRigidBody_GetAttachedLight(*args)
+    def AttachCamera(*args): return _cspace.iRigidBody_AttachCamera(*args)
+    def GetAttachedCamera(*args): return _cspace.iRigidBody_GetAttachedCamera(*args)
     def SetMoveCallback(*args): return _cspace.iRigidBody_SetMoveCallback(*args)
     def SetCollisionCallback(*args): return _cspace.iRigidBody_SetCollisionCallback(*args)
     def Collision(*args): return _cspace.iRigidBody_Collision(*args)
