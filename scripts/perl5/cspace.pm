@@ -8109,6 +8109,546 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iSndSysData ##############
+
+package cspace::iSndSysData;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*GetFormat = *cspacec::iSndSysData_GetFormat;
+*GetSampleCount = *cspacec::iSndSysData_GetSampleCount;
+*GetDataSize = *cspacec::iSndSysData_GetDataSize;
+*CreateStream = *cspacec::iSndSysData_CreateStream;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysData($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSndSysData_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysSoftwareFilter3DProperties ##############
+
+package cspace::iSndSysSoftwareFilter3DProperties;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_clean_buffer_get = *cspacec::iSndSysSoftwareFilter3DProperties_clean_buffer_get;
+*swig_clean_buffer_set = *cspacec::iSndSysSoftwareFilter3DProperties_clean_buffer_set;
+*swig_work_buffer_get = *cspacec::iSndSysSoftwareFilter3DProperties_work_buffer_get;
+*swig_work_buffer_set = *cspacec::iSndSysSoftwareFilter3DProperties_work_buffer_set;
+*swig_buffer_samples_get = *cspacec::iSndSysSoftwareFilter3DProperties_buffer_samples_get;
+*swig_buffer_samples_set = *cspacec::iSndSysSoftwareFilter3DProperties_buffer_samples_set;
+*swig_source_parameters_get = *cspacec::iSndSysSoftwareFilter3DProperties_source_parameters_get;
+*swig_source_parameters_set = *cspacec::iSndSysSoftwareFilter3DProperties_source_parameters_set;
+*swig_listener_parameters_get = *cspacec::iSndSysSoftwareFilter3DProperties_listener_parameters_get;
+*swig_listener_parameters_set = *cspacec::iSndSysSoftwareFilter3DProperties_listener_parameters_set;
+*swig_sound_format_get = *cspacec::iSndSysSoftwareFilter3DProperties_sound_format_get;
+*swig_sound_format_set = *cspacec::iSndSysSoftwareFilter3DProperties_sound_format_set;
+*swig_closest_speaker_distance_get = *cspacec::iSndSysSoftwareFilter3DProperties_closest_speaker_distance_get;
+*swig_closest_speaker_distance_set = *cspacec::iSndSysSoftwareFilter3DProperties_closest_speaker_distance_set;
+*swig_speaker_distance_get = *cspacec::iSndSysSoftwareFilter3DProperties_speaker_distance_get;
+*swig_speaker_distance_set = *cspacec::iSndSysSoftwareFilter3DProperties_speaker_distance_set;
+*swig_speaker_direction_cos_get = *cspacec::iSndSysSoftwareFilter3DProperties_speaker_direction_cos_get;
+*swig_speaker_direction_cos_set = *cspacec::iSndSysSoftwareFilter3DProperties_speaker_direction_cos_set;
+*swig_channel_get = *cspacec::iSndSysSoftwareFilter3DProperties_channel_get;
+*swig_channel_set = *cspacec::iSndSysSoftwareFilter3DProperties_channel_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_iSndSysSoftwareFilter3DProperties(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysSoftwareFilter3DProperties($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysSoftwareFilter3D ##############
+
+package cspace::iSndSysSoftwareFilter3D;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*Apply = *cspacec::iSndSysSoftwareFilter3D_Apply;
+*AddSubFilter = *cspacec::iSndSysSoftwareFilter3D_AddSubFilter;
+*GetSubFilter = *cspacec::iSndSysSoftwareFilter3D_GetSubFilter;
+*GetPtr = *cspacec::iSndSysSoftwareFilter3D_GetPtr;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysSoftwareFilter3D($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSndSysSoftwareFilter3D_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysSoftwareFilterOutput ##############
+
+package cspace::iSndSysSoftwareFilterOutput;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*Apply = *cspacec::iSndSysSoftwareFilterOutput_Apply;
+*AddSubFilter = *cspacec::iSndSysSoftwareFilterOutput_AddSubFilter;
+*GetSubFilter = *cspacec::iSndSysSoftwareFilterOutput_GetSubFilter;
+*GetPtr = *cspacec::iSndSysSoftwareFilterOutput_GetPtr;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysSoftwareFilterOutput($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSndSysSoftwareFilterOutput_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysListener ##############
+
+package cspace::iSndSysListener;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetDirection = *cspacec::iSndSysListener_SetDirection;
+*SetPosition = *cspacec::iSndSysListener_SetPosition;
+*SetDistanceFactor = *cspacec::iSndSysListener_SetDistanceFactor;
+*SetRollOffFactor = *cspacec::iSndSysListener_SetRollOffFactor;
+*GetDirection = *cspacec::iSndSysListener_GetDirection;
+*GetPosition = *cspacec::iSndSysListener_GetPosition;
+*GetDistanceFactor = *cspacec::iSndSysListener_GetDistanceFactor;
+*GetRollOffFactor = *cspacec::iSndSysListener_GetRollOffFactor;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysListener($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSndSysListener_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysLoader ##############
+
+package cspace::iSndSysLoader;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*LoadSound = *cspacec::iSndSysLoader_LoadSound;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysLoader($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSndSysLoader_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysWrapper ##############
+
+package cspace::iSndSysWrapper;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*QueryObject = *cspacec::iSndSysWrapper_QueryObject;
+*GetStream = *cspacec::iSndSysWrapper_GetStream;
+*SetStream = *cspacec::iSndSysWrapper_SetStream;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysWrapper($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSndSysWrapper_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysManager ##############
+
+package cspace::iSndSysManager;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*CreateSound = *cspacec::iSndSysManager_CreateSound;
+*RemoveSound = *cspacec::iSndSysManager_RemoveSound;
+*RemoveSounds = *cspacec::iSndSysManager_RemoveSounds;
+*GetSoundCount = *cspacec::iSndSysManager_GetSoundCount;
+*GetSound = *cspacec::iSndSysManager_GetSound;
+*FindSoundByName = *cspacec::iSndSysManager_FindSoundByName;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysManager($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSndSysManager_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysSource ##############
+
+package cspace::iSndSysSource;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetVolume = *cspacec::iSndSysSource_SetVolume;
+*GetVolume = *cspacec::iSndSysSource_GetVolume;
+*GetStream = *cspacec::iSndSysSource_GetStream;
+*GetPtr = *cspacec::iSndSysSource_GetPtr;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysSource($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSndSysSource_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysSourceSoftware ##############
+
+package cspace::iSndSysSourceSoftware;
+@ISA = qw( cspace cspace::iSndSysSource );
+%OWNER = ();
+%ITERATORS = ();
+*MergeIntoBuffer = *cspacec::iSndSysSourceSoftware_MergeIntoBuffer;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysSourceSoftware($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysSourceSoftware3D ##############
+
+package cspace::iSndSysSourceSoftware3D;
+@ISA = qw( cspace cspace::iSndSysSourceSoftware );
+%OWNER = ();
+%ITERATORS = ();
+*SetPosition = *cspacec::iSndSysSourceSoftware3D_SetPosition;
+*GetPosition = *cspacec::iSndSysSourceSoftware3D_GetPosition;
+*SetDirection = *cspacec::iSndSysSourceSoftware3D_SetDirection;
+*GetDirection = *cspacec::iSndSysSourceSoftware3D_GetDirection;
+*SetDirectionalRadiation = *cspacec::iSndSysSourceSoftware3D_SetDirectionalRadiation;
+*GetDirectionalRadiation = *cspacec::iSndSysSourceSoftware3D_GetDirectionalRadiation;
+*SetMinimumDistance = *cspacec::iSndSysSourceSoftware3D_SetMinimumDistance;
+*SetMaximumDistance = *cspacec::iSndSysSourceSoftware3D_SetMaximumDistance;
+*GetMinimumDistance = *cspacec::iSndSysSourceSoftware3D_GetMinimumDistance;
+*GetMaximumDistance = *cspacec::iSndSysSourceSoftware3D_GetMaximumDistance;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysSourceSoftware3D($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csSndSysSoundFormat ##############
+
+package cspace::csSndSysSoundFormat;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_Freq_get = *cspacec::csSndSysSoundFormat_Freq_get;
+*swig_Freq_set = *cspacec::csSndSysSoundFormat_Freq_set;
+*swig_Bits_get = *cspacec::csSndSysSoundFormat_Bits_get;
+*swig_Bits_set = *cspacec::csSndSysSoundFormat_Bits_set;
+*swig_Channels_get = *cspacec::csSndSysSoundFormat_Channels_get;
+*swig_Channels_set = *cspacec::csSndSysSoundFormat_Channels_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csSndSysSoundFormat(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csSndSysSoundFormat($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysStream ##############
+
+package cspace::iSndSysStream;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*GetRenderedFormat = *cspacec::iSndSysStream_GetRenderedFormat;
+*Get3dMode = *cspacec::iSndSysStream_Get3dMode;
+*GetSampleCount = *cspacec::iSndSysStream_GetSampleCount;
+*GetPosition = *cspacec::iSndSysStream_GetPosition;
+*ResetPosition = *cspacec::iSndSysStream_ResetPosition;
+*SetPosition = *cspacec::iSndSysStream_SetPosition;
+*Pause = *cspacec::iSndSysStream_Pause;
+*Unpause = *cspacec::iSndSysStream_Unpause;
+*GetPauseState = *cspacec::iSndSysStream_GetPauseState;
+*SetLoopState = *cspacec::iSndSysStream_SetLoopState;
+*GetLoopState = *cspacec::iSndSysStream_GetLoopState;
+*SetPlayRatePercent = *cspacec::iSndSysStream_SetPlayRatePercent;
+*GetPlayRatePercent = *cspacec::iSndSysStream_GetPlayRatePercent;
+*SetAutoUnregister = *cspacec::iSndSysStream_SetAutoUnregister;
+*GetAutoUnregister = *cspacec::iSndSysStream_GetAutoUnregister;
+*GetAutoUnregisterRequested = *cspacec::iSndSysStream_GetAutoUnregisterRequested;
+*AdvancePosition = *cspacec::iSndSysStream_AdvancePosition;
+*GetDataPointers = *cspacec::iSndSysStream_GetDataPointers;
+*InitializeSourcePositionMarker = *cspacec::iSndSysStream_InitializeSourcePositionMarker;
+*GetPtr = *cspacec::iSndSysStream_GetPtr;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysStream($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSndSysStream_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysRenderer ##############
+
+package cspace::iSndSysRenderer;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*SetVolume = *cspacec::iSndSysRenderer_SetVolume;
+*GetVolume = *cspacec::iSndSysRenderer_GetVolume;
+*CreateStream = *cspacec::iSndSysRenderer_CreateStream;
+*CreateSource = *cspacec::iSndSysRenderer_CreateSource;
+*RemoveStream = *cspacec::iSndSysRenderer_RemoveStream;
+*RemoveSource = *cspacec::iSndSysRenderer_RemoveSource;
+*GetListener = *cspacec::iSndSysRenderer_GetListener;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysRenderer($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSndSysRenderer_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iComponent ##############
 
 package cspace::iComponent;
@@ -12393,6 +12933,10 @@ package cspace::iRigidBody;
 *GetTorque = *cspacec::iRigidBody_GetTorque;
 *AttachMesh = *cspacec::iRigidBody_AttachMesh;
 *GetAttachedMesh = *cspacec::iRigidBody_GetAttachedMesh;
+*AttachLight = *cspacec::iRigidBody_AttachLight;
+*GetAttachedLight = *cspacec::iRigidBody_GetAttachedLight;
+*AttachCamera = *cspacec::iRigidBody_AttachCamera;
+*GetAttachedCamera = *cspacec::iRigidBody_GetAttachedCamera;
 *SetMoveCallback = *cspacec::iRigidBody_SetMoveCallback;
 *SetCollisionCallback = *cspacec::iRigidBody_SetCollisionCallback;
 *Collision = *cspacec::iRigidBody_Collision;
@@ -14126,6 +14670,17 @@ sub ENVIRONMENT_UNDERWATER () { $cspacec::ENVIRONMENT_UNDERWATER }
 sub ENVIRONMENT_DRUGGED () { $cspacec::ENVIRONMENT_DRUGGED }
 sub ENVIRONMENT_DIZZY () { $cspacec::ENVIRONMENT_DIZZY }
 sub ENVIRONMENT_PSYCHOTIC () { $cspacec::ENVIRONMENT_PSYCHOTIC }
+sub CS_SNDSYS_DATA_UNKNOWN_SIZE () { $cspacec::CS_SNDSYS_DATA_UNKNOWN_SIZE }
+sub CS_SNDSYS_SOURCE_DISTANCE_INFINITE () { $cspacec::CS_SNDSYS_SOURCE_DISTANCE_INFINITE }
+sub CS_SNDSYS_STREAM_PAUSED () { $cspacec::CS_SNDSYS_STREAM_PAUSED }
+sub CS_SNDSYS_STREAM_UNPAUSED () { $cspacec::CS_SNDSYS_STREAM_UNPAUSED }
+sub CS_SNDSYS_STREAM_DONTLOOP () { $cspacec::CS_SNDSYS_STREAM_DONTLOOP }
+sub CS_SNDSYS_STREAM_LOOP () { $cspacec::CS_SNDSYS_STREAM_LOOP }
+sub CS_SND3D_DISABLE () { $cspacec::CS_SND3D_DISABLE }
+sub CS_SND3D_RELATIVE () { $cspacec::CS_SND3D_RELATIVE }
+sub CS_SND3D_ABSOLUTE () { $cspacec::CS_SND3D_ABSOLUTE }
+sub CS_SNDSYS_SOURCE_STOPPED () { $cspacec::CS_SNDSYS_SOURCE_STOPPED }
+sub CS_SNDSYS_SOURCE_PLAYING () { $cspacec::CS_SNDSYS_SOURCE_PLAYING }
 sub VFS_PATH_DIVIDER () { $cspacec::VFS_PATH_DIVIDER }
 sub VFS_PATH_SEPARATOR () { $cspacec::VFS_PATH_SEPARATOR }
 sub VFS_MAX_PATH_LEN () { $cspacec::VFS_MAX_PATH_LEN }
@@ -14506,5 +15061,6 @@ bless $iSCF_SCF, cspace::iSCF;
 *AWSF_AlwaysRedrawWindows = *cspacec::AWSF_AlwaysRedrawWindows;
 *AWSF_RaiseOnMouseOver = *cspacec::AWSF_RaiseOnMouseOver;
 *AWSF_KeyboardControl = *cspacec::AWSF_KeyboardControl;
+*CS_SNDSYS_STREAM_UNKNOWN_LENGTH = *cspacec::CS_SNDSYS_STREAM_UNKNOWN_LENGTH;
 *csInvalidStringID = *cspacec::csInvalidStringID;
 1;
