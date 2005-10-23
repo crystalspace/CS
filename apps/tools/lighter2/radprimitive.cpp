@@ -233,7 +233,7 @@ namespace lighter
       for (uint i = 0; i < vertices.GetSize (); i++)
       {
         lightmapUVs[i].x = vertices[i].z * uScale;
-        lightmapUVs[i].y = -vertices[i].y * vScale;
+        lightmapUVs[i].y = vertices[i].y * vScale;
       }
     }
     else if (polyAxis == CS_AXIS_Y)
@@ -242,7 +242,7 @@ namespace lighter
       for (uint i = 0; i < vertices.GetSize (); i++)
       {
         lightmapUVs[i].x = vertices[i].x * uScale;
-        lightmapUVs[i].y = -vertices[i].z * vScale;
+        lightmapUVs[i].y = vertices[i].z * vScale;
       }
     }
     else
@@ -251,7 +251,7 @@ namespace lighter
       for (uint i = 0; i < vertices.GetSize (); i++)
       {
         lightmapUVs[i].x = vertices[i].x * uScale;
-        lightmapUVs[i].y = -vertices[i].y * vScale;
+        lightmapUVs[i].y = vertices[i].y * vScale;
       }
     }
   }
@@ -579,6 +579,18 @@ namespace lighter
         patch.center /= patchECount[i];
         patch.energy *= patch.area / primArea;
       }
+    }
+
+    //check
+    float totalElementArea = GetArea ();
+    for (uint i = 0; i < elementAreas.GetSize (); i++)
+    {
+      totalElementArea -= elementAreas[i];
+    }
+    
+    if (totalElementArea != 0.0f)
+    {
+      int a = 0;
     }
   }
 

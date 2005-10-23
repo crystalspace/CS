@@ -16,6 +16,8 @@ chronological order.
 	  informs the user about CS's relatively new ELF-based plugin
 	  meta-information reader which is preferred over the older
 	  GPL-licensed libbfd-based reader.
+	- Marten did some more work on lighter, which soon begins to enter the
+	  realms of usable software.
 22-Oct-2005
         - Philip Wyett changed the order configure deals with libode and if it
 	  has/has not been built with OPCODE support. In this order it is more

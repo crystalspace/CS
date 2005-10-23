@@ -69,7 +69,7 @@ namespace lighter
         // Ok, now remap our coords
         csVector2 uvRemap = csVector2(lmArea.xmin, lmArea.ymin) - minuv + csVector2(1.0f,1.0f);
         prim.RemapUVs (uvRemap);
-
+        prim.QuantizeUVs ();
         prim.SetLightmapID (lmID);
       }
     }

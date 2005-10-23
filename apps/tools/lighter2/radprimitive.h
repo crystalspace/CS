@@ -81,6 +81,17 @@ namespace lighter
       maxV = (int)floor (max.y);
     }
 
+    // Fix down the min/max to ints..
+    inline void QuantizeUVs ()
+    {
+      for (uint i = 0; i < lightmapUVs.GetSize (); i++)
+      {
+        csVector2 &uv = lightmapUVs[i];
+        uv.x = int(uv.x+0.5);
+        uv.y = int(uv.y+0.5);
+      }
+    }
+
     // Remap (in linear fashion) the UVs
     inline void RemapUVs (csVector2 &move)
     {
@@ -97,8 +108,8 @@ namespace lighter
       for (uint i = 0; i < lightmapUVs.GetSize (); i++)
       {
         csVector2 &uv = lightmapUVs[i];
-        uv.x /= (float)uSize;
-        uv.y /= (float)vSize;
+        uv.x = uv.x / (float)uSize;
+        uv.y = uv.y / (float)vSize;
       }
     }
 

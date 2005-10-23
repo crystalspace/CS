@@ -256,8 +256,13 @@ namespace lighter
     csRef<iDocumentNode> texturesNode = worldRoot->GetNode ("textures");
     if (!texturesNode)
     {
+      csRef<iDocumentNode> firstNode;
+      csRef<iDocumentNodeIterator> it = worldRoot->GetNodes ();
+      if (it->HasNext ())
+        firstNode = it->Next ();
+
       //Create one
-      texturesNode = worldRoot->CreateNodeBefore (CS_NODE_ELEMENT);
+      texturesNode = worldRoot->CreateNodeBefore (CS_NODE_ELEMENT, firstNode);
       texturesNode->SetValue ("textures");
     }
 
@@ -269,7 +274,7 @@ namespace lighter
         texturesNode->CreateNodeBefore (CS_NODE_ELEMENT);
       textureNode->SetValue ("texture");
       textureNode->SetAttribute ("name", textureName.GetData ());
-      
+           
       csRef<iDocumentNode> classNode = 
         textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
       classNode->SetValue ("class");
@@ -277,6 +282,12 @@ namespace lighter
         classNode->CreateNodeBefore (CS_NODE_TEXT);
       classContNode->SetValue ("lightmap");
 
+      csRef<iDocumentNode> filterNode = 
+        textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      filterNode->SetValue ("filter");
+      csRef<iDocumentNode> filterContNode = 
+        filterNode->CreateNodeBefore (CS_NODE_TEXT);
+      filterContNode->SetValue ("true");
 
       csRef<iDocumentNode> fileNode = 
         textureNode->CreateNodeBefore (CS_NODE_ELEMENT);

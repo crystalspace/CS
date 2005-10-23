@@ -169,7 +169,7 @@ namespace lighter
 
       for (uint j = 0; j < size; j++, lmData++, mmData++)
       {
-        if (*mmData < FLT_EPSILON || *mmData > totalArea) continue;
+        if (*mmData < FLT_EPSILON || *mmData >= totalArea) continue;
 
         *lmData *= (totalArea / *mmData);
       }
@@ -183,16 +183,18 @@ namespace lighter
             
       uint lmw = lightmaps[i]->GetWidth ();
       uint lmh = lightmaps[i]->GetHeight ();
+
       
       for (uint v = 0; v < lmh; v++)
       {
+        float a = (float)(v&1);
         // now scan over the row
         for (uint u = 0; u < lmw; u++)
         {
           const uint idx = v*lmw+u;
           
           // Only try to fix non-masked
-          if (mmData[idx]>FLT_EPSILON) continue;
+          if (mmData[idx]>0) continue;
 
           uint count = 0;
           csColor newColor (0.0f,0.0f,0.0f);
@@ -221,41 +223,6 @@ namespace lighter
           if (count > 0) newColor *= (1.0f/count);
           else newColor.Set (0.0f, 0.0f, 0.0f);
           lmData[idx] = newColor;
-
- /*         if (curMmRow[u] > FLT_EPSILON) continue; //only fix non-masked
-
-          // Average 8 neighbours
-          uint count = 0;
-          csColor newColor (0.0f, 0.0f, 0.0f);
-          
-          // Top row
-          if (topMmRow)
-          {
-            if (u > 0 && topMmRow[u-1] > FLT_EPSILON) newColor += topLmRow[u-1], count++;
-            if (topMmRow[u] > FLT_EPSILON) newColor += topLmRow[u], count++;
-            if (u < (lmw-1) && topMmRow[u+1] > FLT_EPSILON) newColor += topLmRow[u+1], count++;
-          }
-
-          // current row
-          if (u > 0 && curMmRow[u-1] > FLT_EPSILON) newColor += curLmRow[u-1], count++;
-          if (u < (lmw-1) && curMmRow[u+1] > FLT_EPSILON) newColor += curLmRow[u+1], count++;
-
-          // bottom row
-          if (bottomMmRow)
-          {
-            if (u > 0 && bottomMmRow[u-1] > FLT_EPSILON) newColor += bottomLmRow[u-1], count++;
-            if (bottomMmRow[u] > FLT_EPSILON) newColor += bottomLmRow[u], count++;
-            if (u < (lmw-1) && bottomMmRow[u+1] > FLT_EPSILON) newColor += bottomLmRow[u+1], count++;
-          }
-
-          if (count > 0)
-          {
-            curLmRow[u] = newColor * (1.0f/count);
-          }
-          else
-          {
-            curLmRow[u].Set (0.0f,0.0f,0.0f);
-          }*/
         }
       }
     }

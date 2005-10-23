@@ -55,7 +55,7 @@ namespace lighter
 
     // Max lightmap sizes
     uint maxLightmapU, maxLightmapV;
-
+  
     // Set default settings
     RadSettings ()
       : uTexelPerUnit (4/(1.0f)), vTexelPerUnit (4/(1.0f)),

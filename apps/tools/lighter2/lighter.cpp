@@ -233,7 +233,7 @@ namespace lighter
     while (lightIt.HasNext ())
     {
       csRef<Light> radLight = lightIt.Next ();
-      radLight->freeEnergy = radLight->color * 8000.0f; //@scale
+      radLight->freeEnergy = radLight->color * 75.0f; //@scale
 
       // Generate and shoot rays
       csArray<Ray> rays = rayGenerator (0xFFF, radLight->position);
@@ -274,7 +274,7 @@ namespace lighter
      //@@ THIS NEEDS INVESTIGATION. WHY -? .. 
 #define RAYTEST(rayOrig, visDecr)\
     {\
-      const csVector3 o = (rayOrig)-prim.GetPlane ().GetNormal ()*0.01f;\
+      const csVector3 o = (rayOrig) /*- prim.GetPlane().GetNormal ()*0.01f*/;\
       const csVector3 dir = (oPoint-o);\
       Ray ray; HitPoint hit;\
       ray.origin = o; ray.minLength = FLT_EPSILON*10; ray.maxLength = dir.Norm ();\
@@ -333,7 +333,7 @@ namespace lighter
         //
         float Hij = elemArea / totalArea;
         float dAj = totalArea;
-        float Fij = cosTheta_j / (distSq) * Hij * dAj;
+        float Fij = cosTheta_j / distSq * Hij * dAj;
 
         // energy
         csColor energy = light->freeEnergy * Fij * visFact;

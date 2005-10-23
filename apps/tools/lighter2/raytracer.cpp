@@ -195,6 +195,9 @@ namespace lighter
   {
     csSegment3 seg (ray.origin, ray.origin + ray.direction*ray.maxLength);
 
+    //quick backface culling
+    if (ray.direction * primitive->GetPlane ().norm < 0) return false;
+
     csVector3 isect;
     bool haveHit = csIntersect3::SegmentPolygon (seg, *primitive, primitive->GetPlane (), isect);
     if (haveHit)
