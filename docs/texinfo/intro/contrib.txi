@@ -517,7 +517,7 @@ first tasks he undertook was a reorganization of the @sc{msvc} project
 files. He also helped with project maintenance in general.
 
 @item
-Frank Richter (@email{resqu@@gmx.ch})
+Frank Richter (@email{res@@crystalspace3d.org})
 
 Frank has done too much to mention.  He has worked a great deal on many parts
 of the project, making from minor to large-scale changes, ranging from the

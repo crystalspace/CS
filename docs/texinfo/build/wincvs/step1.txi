@@ -44,7 +44,7 @@ repository by one of the project administrators.  The administrators are:
 @noindent
 Jorrit Tyberghein (@email{jorrit.tyberghein@@gmail.com})@*
 Eric Sunshine (@email{sunshine@@sunshineco.com})@*
-Frank Richter (@email{resqu@@gmx.ch})
+Frank Richter (@email{res@@crystalspace3d.org})
 
 Secure Shell software comes in a variety of forms and increasingly via some
 open source @sc{ssh} projects.  SSH for Windows can be obtained via the

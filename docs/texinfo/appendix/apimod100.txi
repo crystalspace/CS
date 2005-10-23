@@ -5,7 +5,7 @@
 
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com} and
-Frank Richter, @email{resqu@@gmx.ch}.}
+Frank Richter, @email{res@@crystalspace3d.org}.}
 
 This section documents the major changes between versions 0.98 and 1.00 of
 Crystal Space.

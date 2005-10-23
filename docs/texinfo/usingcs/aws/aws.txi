@@ -8,7 +8,7 @@
 @noindent
 @emph{Written by Christopher Nelson, @email{paradox@@bbhc.org}.
 Original @sc{aws} documentation converted to Texinfo by F. Richter,
-@email{resqu@@gmx.ch}.}
+@email{res@@crystalspace3d.org}.}
 
 The Alternate Windowing System is a plugin designed to replace
 the old monolithic (and retired) Crystal Space Windowing System (@sc{csws}). 
