@@ -53,10 +53,11 @@ AC_PREREQ([2.56])
 #	via libbfd, which carries a GPL license. Projects which carry licenses
 #	not compatible with GPL should consider carefully before enabling
 #	embedding on Unix. If your project is GPL-compatible, then set GPL-OKAY
-#	to "yes". This will enable embedding on Unix by default. If not, then
-#	set it to "no" in order to disable embedding on Unix by default. (The
-#	user can still override the setting via the
-#	--enable-meta-info-embedding option.)
+#	to "yes". This will indicate that it is safe to use libbfd if the ELF
+#	reader can not be used.  If your project is not GPL-compatible, then
+#	set it to "no" in order to disable embedding on Unix if the ELF reader
+#	is not usable. (The user can still manually override the setting via
+#	the --enable-meta-info-embedding option.)
 #
 # IMPLEMENTATION NOTES
 #

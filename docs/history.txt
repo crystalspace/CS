@@ -11,6 +11,7 @@ chronological order.
 	  configure.ac which resulted from the 22-Oct-2005 re-ordering of those
 	  checks.
 	- Eric Sunshine eliminated several compilation warnings.
+	- Eric Sunshine clarified the GPL-OKAY documentation in embed.m4.
 22-Oct-2005
         - Philip Wyett changed the order configure deals with libode and if it
 	  has/has not been built with OPCODE support. In this order it is more
