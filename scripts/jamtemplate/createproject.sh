@@ -188,14 +188,21 @@ cat << __EOF__
 **** License
 The meta-information which describes a plugin module can be embedded directly
 into the plugin itself on some platforms or laid down alongside the plugin in a
-separate *.csplugin file. On Unix, embedding is accomplished with the
-GPL-licensed libbfd library, which can be used legally with projects carrying a
-GPL or GPL-compatible license. If your project is not compatible with GPL, then
-embedding via libbfd should be disabled by default on Unix to prevent libbfd's
-GPL license from infecting your project. Your response to this question
-controls the default embedding setting on Unix (though the end-user can
-override the default with the configure script's --enable-meta-info-embedding
-option). If you are unsure of the answer, then respond "no".
+separate *.csplugin file. On Unix, Crystal Space utilizes its own ELF-based
+reader to extract embedded meta-information from plugin modules.  If the
+ELF-based reader is not available for some reason (such as missing elf.h), then
+Crystal Space falls back to using the libbfd library for reading embedded
+meta-information.  The libbfd library carries a GPL license, therefore it can
+be used legally only with projects also carrying a GPL or GPL-compatible
+license. If your project is not compatible with GPL, then Crystal Space needs
+to be instructed not to fallback to using libbfd for extracting
+meta-information if the built-in ELF reader is unavailable. Avoding libbfd, in
+this case, will prevent its GPL license from infecting your non-GPL project.
+Your response to this question controls whether or not it is safe to fall back
+to using libbfd in the event that the ELF-based reader is unusable.  (Note,
+though, that the end-user can manually override the embedding default via the
+configure script's --enable-meta-info-embedding option.) If you are unsure of
+the answer, then respond "no".
 
 __EOF__
 

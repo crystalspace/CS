@@ -12,6 +12,10 @@ chronological order.
 	  checks.
 	- Eric Sunshine eliminated several compilation warnings.
 	- Eric Sunshine clarified the GPL-OKAY documentation in embed.m4.
+	- Eric Sunshine updated jamtemplate/createproject.sh so that it now
+	  informs the user about CS's relatively new ELF-based plugin
+	  meta-information reader which is preferred over the older
+	  GPL-licensed libbfd-based reader.
 22-Oct-2005
         - Philip Wyett changed the order configure deals with libode and if it
 	  has/has not been built with OPCODE support. In this order it is more
