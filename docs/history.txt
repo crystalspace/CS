@@ -28,6 +28,8 @@ chronological order.
 	- Eric Sunshine updated the simple map tutorial (simpmap.txi), which
 	  had become pretty well bonked and failed to reflect present-day
 	  reality.
+	- Eric Sunshine fixed crasher in csMeshWrapper::RemoveFromSectors(0) if
+	  the mesh wrapper did not reside in any sectors. (bug #1325410)
 22-Oct-2005
         - Philip Wyett changed the order configure deals with libode and if it
 	  has/has not been built with OPCODE support. In this order it is more

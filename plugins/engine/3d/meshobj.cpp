@@ -355,20 +355,22 @@ void csMeshWrapper::RemoveFromSectors (iSector* sector)
     cspr->RemoveFromSectors (sector);
   }
 
-  if (Parent) return ;
+  if (Parent)
+    return;
 
   if (sector)
-  {
     sector->GetMeshes ()->Remove ((iMeshWrapper*)this);
-  }
   else
   {
     const iSectorList *sectors = movable.GetSectors ();
-    for (i = 0; i < sectors->GetCount (); i++)
+    if (sectors != 0)
     {
-      iSector *ss = sectors->Get (i);
-      if (ss)
-        ss->GetMeshes ()->Remove ((iMeshWrapper*)this);
+      for (i = 0; i < sectors->GetCount (); i++)
+      {
+	iSector *ss = sectors->Get (i);
+	if (ss)
+	  ss->GetMeshes ()->Remove ((iMeshWrapper*)this);
+      }
     }
   }
 }
