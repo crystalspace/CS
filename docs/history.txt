@@ -6,10 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Oct-2005
+	- Eric Sunshine fixed some serious brokeness in the libode checks in
+	  configure.ac which resulted from the 22-Oct-2005 re-ordering of those
+	  checks.
 22-Oct-2005
-        - Philip Wyett changed the order configure deals with libode and if
-          it has/has not been built with OPCODE support. In this order
-          it is more apparent why the lib you have is usable or not.
+        - Philip Wyett changed the order configure deals with libode and if it
+	  has/has not been built with OPCODE support. In this order it is more
+	  apparent why the lib you have is usable or not.
 21-Oct-2005
 	- Jorrit fixed some huge reference leaks in the odedynam plugin.
 	  It was storing all information (meshes, callbacks, bodies,
@@ -82,9 +86,9 @@ chronological order.
 	    - Fixed several minor style issues in shaderexpressions.
 	    - Wrote prelim s-expression parser for shader expressions. Only
 	      minimally tested.
-	- Jorrit added a <radius> to the light in the parallaxtest map.
-	  That works around (hides) the bug where the parallax effect disappears
-	  if the light is too far away.
+	- Jorrit added a <radius> to the light in the parallaxtest map.  That
+	  works around (hides) the bug where the parallax effect disappears if
+	  the light is too far away.
 14-Oct-2005
 	- Jorrit fixed a bug in the odedynam plugin. Auto-disable for
 	  inactive objects is enabled. However the odedynam plugin didn't

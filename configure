@@ -36415,30 +36415,7 @@ echo "${ECHO_T}$cs_cv_libode_opcode" >&6
 fi
 
     if test $cs_cv_libode_opcode = yes; then
-  if test "$cs_cv_libode" = yes; then
-  cs_build_prop_val="yes"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ODE.AVAILABLE ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val="$cs_cv_libode_cflags"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ODE.CFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val="$cs_cv_libode_lflags $cs_cv_libode_libs"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}ODE.LFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-fi
-
+  :
 else
   cs_cv_libode_opcode_cflags=''
 	cs_cv_libode_opcode_lflags=''
@@ -36451,10 +36428,10 @@ else
 fi
 
 
-if test $cs_cv_libode = yes; then
+if test $cs_cv_libode_opcode = yes; then
   if test "" != yes; then
-  echo "$as_me:$LINENO: checking if libode is usable" >&5
-echo $ECHO_N "checking if libode is usable... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking if libode is sufficiently recent" >&5
+echo $ECHO_N "checking if libode is sufficiently recent... $ECHO_C" >&6
 if test "${cs_cv_libode_recent+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -36607,8 +36584,8 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_libode_recent" >&5
 echo "${ECHO_T}$cs_cv_libode_recent" >&6
 else
-  echo "$as_me:$LINENO: checking if libode is usable" >&5
-echo $ECHO_N "checking if libode is usable... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking if libode is sufficiently recent" >&5
+echo $ECHO_N "checking if libode is sufficiently recent... $ECHO_C" >&6
 	    ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -36759,7 +36736,30 @@ echo "${ECHO_T}$cs_cv_libode_recent" >&6
 fi
 
     if test $cs_cv_libode_recent = yes; then
-  :
+  if test "$cs_cv_libode" = yes; then
+  cs_build_prop_val="yes"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ODE.AVAILABLE ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val="$cs_cv_libode_cflags"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ODE.CFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val="$cs_cv_libode_lflags $cs_cv_libode_libs"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ODE.LFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
 else
   cs_cv_libode_recent_cflags=''
 	cs_cv_libode_recent_lflags=''
