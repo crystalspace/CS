@@ -25,6 +25,9 @@ chronological order.
 	        reference for -dynamic code (reference to a coalesced section
 	        (__TEXT,__textcoal_nt) from section (__TEXT,__text) relocation
 	        entry (1))
+	- Eric Sunshine updated the simple map tutorial (simpmap.txi), which
+	  had become pretty well bonked and failed to reflect present-day
+	  reality.
 22-Oct-2005
         - Philip Wyett changed the order configure deals with libode and if it
 	  has/has not been built with OPCODE support. In this order it is more

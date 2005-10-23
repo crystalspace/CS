@@ -4,9 +4,10 @@
 @cindex Tutorial, Simple
 @cindex Simple Tutorial
 
-This tutorial continues on tutorial one. Here we will learn how to
-load a map from a file instead of creating the geometry
-programmatically.
+This tutorial continues on tutorial one. Here we will learn how to load a map
+from a file instead of creating the geometry programmatically. You can find a
+fully-commented version of this tutorial's source code in the Crystal Space
+source directory at @file{CS/apps/tutorial/simpmap}.
 
 @menu
 * Simple Base Code:: Minimal Base Code
@@ -37,10 +38,10 @@ private:
   csRef<iGraphics3D> g3d;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
+  csRef<iCollideSystem> cdsys;
   csRef<iView> view;
   iSector* room;
-  csVector3 pos;
-  float rotX, rotY;
+  csColliderActor collider_actor;
  
   bool OnKeyboard (iEvent&);
   void ProcessFrame ();
@@ -48,7 +49,7 @@ private:
   bool LoadMap ();
 
 public:
-  Simple (iObjectRegistry* object_reg);
+  Simple ();
   ~Simple ();
 
   void OnExit ();
@@ -66,7 +67,7 @@ Similarly, for @file{simpmap.cpp}:
 
 CS_IMPLEMENT_APPLICATION
 
-Simple::Simple (iObjectRegistry* object_reg)
+Simple::Simple ()
 @{
   SetApplicationName ("CrystalSpace.SimpleMap");
 @}
@@ -79,11 +80,9 @@ void Simple::ProcessFrame ()
 @{
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
-  
-  // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
-  iCamera* c = view->GetCamera();
+  csVector3 obj_move (0);
+  csVector3 obj_rotate (0);
 
   if (kbd->GetKeyState (CSKEY_SHIFT))
   @{
@@ -91,42 +90,39 @@ void Simple::ProcessFrame ()
     // the camera to strafe up, down, left or right from it's
     // current position.
     if (kbd->GetKeyState (CSKEY_RIGHT))
-      c->Move (CS_VEC_RIGHT * 4 * speed);
+      obj_move = CS_VEC_RIGHT * 3.0f;
     if (kbd->GetKeyState (CSKEY_LEFT))
-      c->Move (CS_VEC_LEFT * 4 * speed);
+      obj_move = CS_VEC_LEFT * 3.0f;
     if (kbd->GetKeyState (CSKEY_UP))
-      c->Move (CS_VEC_UP * 4 * speed);
+      obj_move = CS_VEC_UP * 3.0f;
     if (kbd->GetKeyState (CSKEY_DOWN))
-      c->Move (CS_VEC_DOWN * 4 * speed);
+      obj_move = CS_VEC_DOWN * 3.0f;
   @}
   else
   @{
     // left and right cause the camera to rotate on the global Y
     // axis; page up and page down cause the camera to rotate on the
-    // _camera's_ X axis and up and downarrows cause the camera to
-    // go forwards and backwards.
+    // _camera's_ X axis (more on this in a second) and up and down
+    // arrows cause the camera to go forwards and backwards.
     if (kbd->GetKeyState (CSKEY_RIGHT))
-      rotY += speed;
+      obj_rotate.Set (0, 1, 0);
     if (kbd->GetKeyState (CSKEY_LEFT))
-      rotY -= speed;
+      obj_rotate.Set (0, -1, 0);
     if (kbd->GetKeyState (CSKEY_PGUP))
-      rotX += speed;
+      obj_rotate.Set (1, 0, 0);
     if (kbd->GetKeyState (CSKEY_PGDN))
-      rotX -= speed;
+      obj_rotate.Set (-1, 0, 0);
     if (kbd->GetKeyState (CSKEY_UP))
-      c->Move (CS_VEC_FORWARD * 4 * speed);
+      obj_move = CS_VEC_FORWARD * 3.0f;
     if (kbd->GetKeyState (CSKEY_DOWN))
-      c->Move (CS_VEC_BACKWARD * 4 * speed);
+      obj_move = CS_VEC_BACKWARD * 3.0f;
   @}
 
-  // We now assign a new rotation transformation to the camera.
-  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
-  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
-  c->SetTransform (ot);
+  collider_actor.Move (float (elapsed_time) / 1000.0f, 1.0f,
+    	obj_move, obj_rotate);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw(
-    engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS))
+  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
     return;
 
   // Tell the camera to render into the frame buffer.
@@ -155,7 +151,7 @@ bool Simple::OnKeyboard(iEvent& ev)
   return false;
 @}
 
-bool Simple::Initialize ()
+bool Simple::OnInitialize(int argc, char* argv[])
 @{
   if (!csInitializer::RequestPlugins(GetObjectRegistry(),
     CS_REQUEST_VFS,
@@ -166,6 +162,8 @@ bool Simple::Initialize ()
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
+    CS_REQUEST_PLUGIN("crystalspace.collisiondetection.opcode",
+		iCollideSystem),
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
@@ -173,6 +171,10 @@ bool Simple::Initialize ()
     return ReportError("Failed to set up event handler!");
 
   return true;
+@}
+
+void Simple::OnExit()
+@{
 @}
 
 bool Simple::Application()
@@ -195,8 +197,12 @@ bool Simple::Application()
   loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
   if (!loader) return ReportError("Failed to locate Loader!");
 
-  view = csPtr<iView> (new csView (engine, g3d));
+  cdsys = CS_QUERY_REGISTRY (GetObjectRegistry(), iCollideSystem);
+  if (!cdsys) return ReportError ("Failed to locate CD system!");
+
+  view.AttachNew(new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
+  // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   Run();
@@ -213,13 +219,14 @@ int main (int argc, char* argv[])
 @}
 @end example
 
-One important note in the code above: we removed the following line:
+One important note in the code above which differs from the earlier tutorials
+is that we removed the following line:
 
 @example
 engine->SetLightingCacheMode (0);
 @end example
 
-That's because, when we are loading from map file, we actually want
+This is because, when we are loading from map file, we actually want
 the lighting information to be read from the cache (if present).
 We do so because relighting a map can be a time-consuming process.
 
@@ -235,7 +242,7 @@ Here we add the code to load a map. In this example we will load the
 In the second tutorial we already mentioned @sc{vfs} (@pxref{VFS}). This
 is important in this case too since we are going to load the map from
 the virtual filesystem. To do this we first add the new @code{LoadMap()}
-routine right before the @code{Initialize()} function:
+routine just before the @code{OnInitialize()} function:
 
 @example
 bool Simple::LoadMap ()
@@ -246,9 +253,6 @@ bool Simple::LoadMap ()
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");
-
-  engine->Prepare ();
-
   return true;
 @}
 @end example
@@ -270,28 +274,36 @@ is specified there.
 If loading is successful, then you must call @code{iEngine::Prepare()} to
 make sure that all lightmaps are correctly loaded from the cache
 and other necessary setup work is done (i.e. textures are registered
-and so on).
-
-Additionally, change the last part of @code{Application()} to this:
+and so on). This is demonstrated in the code below, which you add to the
+@code{Application()} method, following the @code{SetRectangle()} invocation.
+We also add code to initialize collision detection for geometry in the map
+which was just loaded.
 
 @example
 bool Simple::Application ()
 @{
   @dots{}
-
-  view.AttachNew(new csView (engine, g3d));
-  iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
+  // Here we load our world from a map file.
   if (!LoadMap ()) return false;
 
+  // Initialize collision objects for all loaded objects.
+  csColliderHelper::InitializeCollisionWrappers (cdsys, engine);
+
+  // Let the engine prepare all lightmaps for use and also free all
+  // images that were loaded for the texture manager.
+  engine->Prepare ();
+
+  Run();
   @dots{}
 @}
 @end example
 
-So, first we create our view but haven't set the current sector.
-Instead, we will have @code{LoadMap()} do that based upon the loaded map,
-as shown below.
+So, we now have geometry loaded into the world, but we haven't set the current
+sector or the camera's position in the world. Often, maps contain information
+specifying where the camera should be placed when the map is first loaded, so
+we will use this information if present. This is the topic of the next section.
 
 @node Simple Locating the Camera, , Simple Loading The Map, Tutorial Simple Map
 @subsubsection Locating the Camera
@@ -309,10 +321,11 @@ also don't know where we can safely put our camera. In the map files
 it is possible to specify one or more starting positions. We will
 query the engine for such a starting position and initialize our
 view (camera) to that. This happens with the following code which you should
-add after @code{engine->Prepare()} in @code{LoadMap()}:
+add just after @code{engine->Prepare()} in the @code{Application()} method:
 
 @example
   @dots{}
+  engine->Prepare ();
 
   // Find the starting position in this level.
   csVector3 pos (0, 0, 0);
@@ -328,6 +341,7 @@ add after @code{engine->Prepare()} in @code{LoadMap()}:
     // We didn't find a valid starting position. So we default
     // to going to room called 'room' at position (0,0,0).
     room = engine->GetSectors ()->FindByName ("room");
+    pos = csVector3 (0, 0, 0);
   @}
   if (!room)
     ReportError("Can't find a valid starting position!");
@@ -335,7 +349,17 @@ add after @code{engine->Prepare()} in @code{LoadMap()}:
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
 
-  return true;
+  // Initialize our collider actor.
+  collider_actor.SetCollideSystem (cdsys);
+  collider_actor.SetEngine (engine);
+  csVector3 legs (.2f, .3f, .2f);
+  csVector3 body (.2f, 1.2f, .2f);
+  csVector3 shift (0, -1, 0);
+  collider_actor.InitializeColliders (view->GetCamera (),
+  	legs, body, shift);
+
+  Run ();
+  @dots{}
 @}
 @end example
 
@@ -343,8 +367,11 @@ First, we see how many camera positions there were defined in the
 map by using @code{iEngine::GetCameraPositionCount()}. If there are none,
 then the map didn't define a starting position. In that case we will
 assume there is a sector called 'room' and we will start the camera
-at (0,0,0) in that sector. But otherwise we will use the first
+at (0,0,0) in that sector. Otherwise we will use the first
 starting position defined in the map.
 
-This is all. After adding this code this application will now load
-the @samp{flarge} map and display it so you can explore this map.
+Once we know our position in the sector, we are also able to initialize the
+camera's collision data, as shown in the code above.
+
+That's it. After adding this code this application will now load
+the @samp{flarge} map and display it so you can explore the map.
