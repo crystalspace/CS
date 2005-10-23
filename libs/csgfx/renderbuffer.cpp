@@ -276,9 +276,11 @@ void csRenderBuffer::SetRenderBufferProperties (size_t elementCount,
   CS_ASSERT(!props.isIndex);
   if (componentCount > 255) return;
 
+#ifdef CS_DEBUG
   size_t newSize = elementCount * componentCount * 
     csRenderBufferComponentSizes[componentType];
   CS_ASSERT(newSize <= bufferSize);
+#endif
   props.bufferType = type;
   props.comptype = componentType;
   props.compCount = componentCount;
@@ -294,8 +296,10 @@ void csRenderBuffer::SetIndexBufferProperties (size_t elementCount,
 {
   CS_ASSERT(props.isIndex);
 
+#ifdef CS_DEBUG
   size_t newSize = elementCount * csRenderBufferComponentSizes[componentType];
   CS_ASSERT(newSize <= bufferSize);
+#endif
   props.bufferType = type;
   props.comptype = componentType;
   this->rangeStart = rangeStart;
