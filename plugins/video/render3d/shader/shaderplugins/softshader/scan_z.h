@@ -81,7 +81,7 @@ namespace cspluginSoftshader
     ZBufMode_ZEqual (const InterpolateScanlinePerspCommon& ipol, 
       uint32* zBuff) : ipol(ipol), zBuff(zBuff) {}
 
-    bool Test () { return ipol.Iz.GetFixed() == *zBuff; }
+    bool Test () { return (uint32)ipol.Iz.GetFixed() == *zBuff; }
     void Update () { }
     void Advance () { zBuff++; }
   };
