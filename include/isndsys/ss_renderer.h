@@ -37,9 +37,9 @@ struct iSndSysListener;
 
 SCF_VERSION (iSndSysRenderer, 0, 1, 0);
 
-
+#ifndef CS_SNDSYS_SOURCE_DISTANCE_INFINITE
 #define CS_SNDSYS_SOURCE_DISTANCE_INFINITE -1.0f
-
+#endif
 
 #define CS_SNDSYS_SOURCE_STOPPED    0
 #define CS_SNDSYS_SOURCE_PLAYING    1
