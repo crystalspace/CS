@@ -486,7 +486,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   const csReversibleTransform& camt = rview->GetCamera ()->GetTransform ();
 
   csLightType light_type;
-  float cutoff_distance;
+  float cutoff_distance = 0;
   csVector3 light_center;
   if (light)
   {
