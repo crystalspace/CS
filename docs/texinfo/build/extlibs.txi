@@ -123,8 +123,8 @@ the required latest @sc{cvs} code at:
 @noindent
 @uref{http://www.ode.org/}
 
-@emph{Note:} You @sc{must} compile @sc{ode} with @sc{opcode} support inorder
-to use the library with @sc{cs}.
+@emph{Note:} You @emph{must} compile @sc{ode} with @sc{opcode} support enabled
+in order to use the library with Crystal Space.
 
 @subheading Ogg/Vorbis libraries
 @cindex Ogg/Vorbis
