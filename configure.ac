@@ -793,6 +793,16 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 #     http://www.gnu.org/software/gcc/gcc-4.0/changes.html#visibility
 #     http://www.nedprod.com/programs/gccvisibility.html
 #     http://bugs.gentoo.org/show_bug.cgi?id=78720
+#
+# Furthermore, there seems to be a bug on MacOS/X with gcc 4.0.x where use of
+# -fvisibility-inlines-hidden causes link problems with external clients which
+# do not specify this flag.  For this reason, we also disable this flag on
+# MacOS/X.  In particular, clients receive errors of this sort:
+#
+#    /usr/bin/ld: libcrystalspace.a(scf.o) malformed object, illegal
+#        reference for -dynamic code (reference to a coalesced section
+#        (__TEXT,__textcoal_nt) from section (__TEXT,__text) relocation
+#        entry (1))
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD_FLAGS([for inline visibility flag],
     [cs_cv_prog_cxx_visibility_inlines_hidden],
@@ -801,8 +811,10 @@ CS_CHECK_BUILD_FLAGS([for inline visibility flag],
 AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden"],
     [AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
 	[cs_cv_prog_cxx_visibility_inlines_hidden_buggy],
-	[AS_IF([test $host_cpu = x86_64 && test $ac_compiler_gnu = yes],
-	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
+	[AS_IF([test $ac_compiler_gnu = yes],
+	    [AS_IF([test $host_cpu = x86_64 || test x$cs_host_macosx = xyes],
+		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
+		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])],
 	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])])],
     [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])
 

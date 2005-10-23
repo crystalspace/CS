@@ -18,6 +18,13 @@ chronological order.
 	  GPL-licensed libbfd-based reader.
 	- Marten did some more work on lighter, which soon begins to enter the
 	  realms of usable software.
+	- Eric Sunshine worked around problem with -fvisibility-inlines-hidden
+	  causing link errors for external projects on MacOS/X. This should
+	  resolve problems where clients of CS experienced errors such as:
+	    /usr/bin/ld: libcrystalspace.a(scf.o) malformed object, illegal
+	        reference for -dynamic code (reference to a coalesced section
+	        (__TEXT,__textcoal_nt) from section (__TEXT,__text) relocation
+	        entry (1))
 22-Oct-2005
         - Philip Wyett changed the order configure deals with libode and if it
 	  has/has not been built with OPCODE support. In this order it is more

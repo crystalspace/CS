@@ -13510,6 +13510,16 @@ fi
 #     http://www.gnu.org/software/gcc/gcc-4.0/changes.html#visibility
 #     http://www.nedprod.com/programs/gccvisibility.html
 #     http://bugs.gentoo.org/show_bug.cgi?id=78720
+#
+# Furthermore, there seems to be a bug on MacOS/X with gcc 4.0.x where use of
+# -fvisibility-inlines-hidden causes link problems with external clients which
+# do not specify this flag.  For this reason, we also disable this flag on
+# MacOS/X.  In particular, clients receive errors of this sort:
+#
+#    /usr/bin/ld: libcrystalspace.a(scf.o) malformed object, illegal
+#        reference for -dynamic code (reference to a coalesced section
+#        (__TEXT,__textcoal_nt) from section (__TEXT,__text) relocation
+#        entry (1))
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking for inline visibility flag" >&5
 echo $ECHO_N "checking for inline visibility flag... $ECHO_C" >&6
@@ -13671,8 +13681,13 @@ echo $ECHO_N "checking if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy... 
 if test "${cs_cv_prog_cxx_visibility_inlines_hidden_buggy+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test $host_cpu = x86_64 && test $ac_compiler_gnu = yes; then
+  if test $ac_compiler_gnu = yes; then
+  if test $host_cpu = x86_64 || test x$cs_host_macosx = xyes; then
   cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes
+else
+  cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no
+fi
+
 else
   cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no
 fi
