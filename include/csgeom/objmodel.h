@@ -65,7 +65,7 @@ public:
     polymesh_base = 0;
   }
 
-  virtual ~csObjectModel () { }
+  virtual ~csObjectModel () {}
 
   /**
    * Set the pointer to the base polygon mesh.
