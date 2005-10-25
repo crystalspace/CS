@@ -11,6 +11,8 @@ chronological order.
 	  called jackasyn as it uses a wrapper library called libjackasyn that
 	  has the same interface as oss.
 	- caedes added configure test for libjackasyn to configure.ac.
+	- caedes added commented example to sound.cfg about how to change
+	  sound driver.
 23-Oct-2005
 	- Eric Sunshine fixed some serious brokeness in the libode checks in
 	  configure.ac which resulted from the 22-Oct-2005 re-ordering of those
