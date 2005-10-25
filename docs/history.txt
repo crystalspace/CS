@@ -9,7 +9,8 @@ chronological order.
 25-Oct-2005
 	- caedes added a jack driver for the new sound system in cs. it is
 	  called jackasyn as it uses a wrapper library called libjackasyn that
-	  has the same interface as oss. still configure part must be added.
+	  has the same interface as oss.
+	- caedes added configure test for libjackasyn to configure.ac.
 23-Oct-2005
 	- Eric Sunshine fixed some serious brokeness in the libode checks in
 	  configure.ac which resulted from the 22-Oct-2005 re-ordering of those

@@ -1842,7 +1842,16 @@ AS_IF([test $cs_host_family != windows],
     [AS_IF([test $cs_cv_header_soundcard_h = yes],
 	[CS_EMIT_BUILD_PROPERTY([OSS.AVAILABLE], [yes])])])
 
-
+#------------------------------------------------------------------------------
+# Check for JACK daemon jackasyn library (JACKASYN)
+#------------------------------------------------------------------------------
+AS_IF([test $cs_host_family != windows],
+    [CS_CHECK_LIB_WITH([jackasyn],
+	[AC_LANG_PROGRAM(
+	    [[#include <stdio.h>
+	      #include <libjackoss.h>]],
+	    [jackoss_open("/dev/dsp",1);])],
+	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libjackasyn], [JACKASYN])])])
 
 #------------------------------------------------------------------------------
 # Check for Advanced GNU/Linux Sound Architecture (ALSA)
