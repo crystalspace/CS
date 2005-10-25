@@ -244,6 +244,7 @@ public:
 
   PolygonRasterizer<SLLogic_ScanlineRenderer> polyrast;
   PolygonRasterizer<SLLogic_ZFill> polyrast_ZFill;
+  BlendBase* blendImpl;
 
   /// Setup scanline drawing routines according to current bpp and setup flags
   csSoftwareGraphics3DCommon (iBase* parent);

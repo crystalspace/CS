@@ -32,7 +32,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "softshader_fp.h"
 #include "softshader.h"
 
-#include "scanlinerenderers.h"
+#include "scanline.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -99,31 +99,7 @@ void csSoftShader::Open()
       return;
     }
     
-    /* Note: RGB and BGR are handled by the same scanline renderers.
-     * This works as soft3d provides swapped data, if that is needed. */
-    const csPixelFormat& pfmt = *(r->GetDriver2D()->GetPixelFormat());
-    if (pfmt.PixelBytes == 4)
-    {
-      if (((pfmt.BlueMask == 0x0000ff) || (pfmt.RedMask == 0x0000ff))
-	&& (pfmt.GreenMask == 0x00ff00)
-	&& ((pfmt.RedMask == 0xff0000) || (pfmt.BlueMask == 0xff0000)))
-	scanlineRenderer = NewScanlineRendererARGB8888 (pfmt);
-      else
-	scanlineRenderer = NewScanlineRendererARGBgen32 (pfmt);
-    }
-    else
-    {
-      if (((pfmt.RedMask == 0xf800) || (pfmt.BlueMask == 0xf800))
-	&& (pfmt.GreenMask == 0x07e0)
-	&& ((pfmt.BlueMask == 0x001f) || (pfmt.RedMask == 0x001f)))
-	scanlineRenderer = NewScanlineRendererRGB565 (pfmt);
-      else if (((pfmt.RedMask == 0x7c00) || (pfmt.BlueMask == 0x7c00))
-	&& (pfmt.GreenMask == 0x03e0)
-	&& ((pfmt.BlueMask == 0x001f) || (pfmt.RedMask == 0x001f)))
-	scanlineRenderer = NewScanlineRendererRGB555 (pfmt);
-      else
-	scanlineRenderer = NewScanlineRendererRGBgen16 (pfmt);
-    }
+    scanlineRenderer = new ScanlineRenderer;
   }
 }
 

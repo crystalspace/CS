@@ -13,6 +13,7 @@ chronological order.
 	- caedes added configure test for libjackasyn to configure.ac.
 	- caedes added commented example to sound.cfg about how to change
 	  sound driver.
+	- res split the blending out of the SR scanline rendering.
 23-Oct-2005
 	- Eric Sunshine fixed some serious brokeness in the libode checks in
 	  configure.ac which resulted from the 22-Oct-2005 re-ordering of those

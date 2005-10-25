@@ -60,7 +60,7 @@ namespace CrystalSpace
       typedef void (*ScanlineProc) (iScanlineRenderer* _This,
 	InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
 	int ipolStep, int ipolShift,
-	void* dest, uint len, uint32 *zbuff);
+	uint32* dest, uint len, uint32 *zbuff);
   
       /**
        * Information for settin up rendering, filled by the scanline renderer

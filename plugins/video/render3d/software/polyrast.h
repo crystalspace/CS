@@ -27,6 +27,7 @@
 
 #include "sft3dcom.h"
 #include "types.h"
+#include "scan_blend.h"
 
 namespace cspluginSoft3d
 {
@@ -38,19 +39,25 @@ namespace cspluginSoft3d
     const VertexBuffer* inBuffers;
     BuffersMask buffersMask;
     size_t floatsPerVert;
+    BlendBase* blendBase;
+    BlendBase::BlendProc blendProc;
 
     SLLogic_ScanlineRenderer (const iScanlineRenderer::RenderInfo& sri,
       const VertexBuffer* inBuffers, BuffersMask buffersMask,
-      size_t floatsPerVert) : 
+      size_t floatsPerVert, BlendBase::BlendProc blendProc) : 
       sri (sri), inBuffers (inBuffers), buffersMask (buffersMask),
-      floatsPerVert (floatsPerVert) {}
+      floatsPerVert (floatsPerVert), blendBase (blendBase),
+      blendProc (blendProc) {}
 
     CS_FORCEINLINE
     void RenderScanline (InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
       int ipolStep, int ipolShift, void* dest, uint len, uint32 *zbuff)
     {
+      CS_ALLOC_STACK_ARRAY(uint32, tempDest, len);
       sri.proc (sri.renderer, L, R, ipolStep, ipolShift, 
-	dest, len, zbuff);
+	tempDest/*dest*/, len, zbuff);
+      // Call blending proc...
+      blendProc (blendBase, tempDest, dest, len);
     }
     void LinearizeBuffers (float* linearBuffers, size_t vertNum)
     {

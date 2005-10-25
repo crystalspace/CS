@@ -24,8 +24,6 @@
 
 #include "csplugincommon/softshader/types.h"
 
-#include "scan_blend.h"
-#include "scan_pix.h"
 #include "scan_z.h"
 #include "scanline_base.h"
 
@@ -131,23 +129,20 @@ namespace cspluginSoftshader
     }
   };
 
-  template<typename Pix>
   class ScanlineRenderer : public ScanlineRendererBase
   {
   public:
-    Pix pix;
     csVector4 dnTC;
 
   private:
     template <typename Source, typename Color, 
-      typename SrcBlend, typename DstBlend,
       typename Zmode>
     struct ScanlineImpl
     {
       static void Scan (iScanlineRenderer* _This,
 	InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
 	int ipolStep, int ipolShift,
-	void* dest, uint len, uint32 *zbuff)
+	uint32* dest, uint len, uint32 *zbuff)
       {
 	const size_t offsetColor = 0;
 	const size_t offsetTC = offsetColor + Color::compCount;
@@ -155,18 +150,15 @@ namespace cspluginSoftshader
 
 	InterpolateScanlinePersp<myIpolFloatNum> ipol;
 	ipol.Setup (L, R, 1.0f / len, ipolStep, ipolShift);
-	ScanlineRenderer<Pix>* This = (ScanlineRenderer<Pix>*)_This;
+	ScanlineRenderer* This = (ScanlineRenderer*)_This;
 
-	Pix& pix = This->pix;
 	Source colSrc (This);
 	Color col (This);
 
-	typename_qualifier Pix::PixType* _dest = 
-	  (typename_qualifier Pix::PixType*)dest;
-	typename_qualifier Pix::PixType* _destend = _dest + len;
+	uint32* destend = dest + len;
 	Zmode Z (ipol, zbuff);
 
-	while (_dest < _destend)
+	while (dest < destend)
 	{
 	  if (Z.Test())
 	  {
@@ -174,162 +166,61 @@ namespace cspluginSoftshader
 	    colSrc.GetColor (ipol.GetFloat (offsetTC), r, g, b, a);
 	    col.Apply (ipol.GetFloat (offsetColor), r, g, b, a);
 
-	    Target_Src srcTarget (r, g, b, a);
-	    typename_qualifier SrcBlend::TargetType src (srcTarget);
-	    Target_Dst<Pix> dstTarget (src, pix, _dest);
-	    typename_qualifier DstBlend::TargetType dst (dstTarget);
-
-	    SrcBlend blendSrc (pix, src);
-	    DstBlend blendDst (pix, dst);
-	    blendSrc.Apply (_dest, r, g, b, a);
-	    blendDst.Apply (_dest, r, g, b, a);
+	    *dest = ((a & 0xfe) << 23) | 0x80000000
+	      | (r << 16)
+	      | (g << 8)
+	      | b;
 	    
 	    Z.Update();
 	  }
-	  _dest++;
+	  else
+	    *dest = 0;
+	  dest++;
 	  ipol.Advance();
 	  Z.Advance();
 	} /* endwhile */
       }
     };
-    template<typename Source, typename Color, typename SrcBlend, 
-      typename DstBlend>
-    static iScanlineRenderer::ScanlineProc GetScanlineProcSCMM (csZBufMode zmode)
+    template<typename Source, typename Color>
+    static iScanlineRenderer::ScanlineProc GetScanlineProcSC/*MM*/ (csZBufMode zmode)
     {
       switch (zmode)
       {
 	case CS_ZBUF_NONE:
-	  return ScanlineImpl<Source, Color, SrcBlend, DstBlend, 
-	    ZBufMode_ZNone>::Scan;
+	  return ScanlineImpl<Source, Color, ZBufMode_ZNone>::Scan;
 	case CS_ZBUF_FILL:
-	  return ScanlineImpl<Source, Color, SrcBlend, DstBlend, 
-	    ZBufMode_ZFill>::Scan;
+	  return ScanlineImpl<Source, Color, ZBufMode_ZFill>::Scan;
 	case CS_ZBUF_TEST:
-	  return ScanlineImpl<Source, Color, SrcBlend, DstBlend, 
-	    ZBufMode_ZTest>::Scan;
+	  return ScanlineImpl<Source, Color, ZBufMode_ZTest>::Scan;
 	case CS_ZBUF_USE:
-	  return ScanlineImpl<Source, Color, SrcBlend, DstBlend, 
-	    ZBufMode_ZUse>::Scan;
+	  return ScanlineImpl<Source, Color, ZBufMode_ZUse>::Scan;
 	case CS_ZBUF_EQUAL:
-	  return ScanlineImpl<Source, Color, SrcBlend, DstBlend, 
-	    ZBufMode_ZEqual>::Scan;
+	  return ScanlineImpl<Source, Color, ZBufMode_ZEqual>::Scan;
 	case CS_ZBUF_INVERT:
-	  return ScanlineImpl<Source, Color, SrcBlend, DstBlend, 
-	    ZBufMode_ZInvert>::Scan;
+	  return ScanlineImpl<Source, Color, ZBufMode_ZInvert>::Scan;
 	default:
 	  return 0;
       }
     }
-    template<typename Source, typename Color, typename SrcBlend>
-    static iScanlineRenderer::ScanlineProc GetScanlineProcSCM (uint mixmode,
-      csZBufMode zmode)
-    {
-      switch (CS_MIXMODE_BLENDOP_DST (mixmode))
-      {
-	default:
-	case CS_MIXMODE_FACT_ZERO:
-	  return GetScanlineProcSCMM<Source, Color, SrcBlend,
-	    Blend_Zero<Pix, Target_Dst<Pix> > > (zmode);
-	case CS_MIXMODE_FACT_ONE:
-	  return GetScanlineProcSCMM<Source, Color, SrcBlend,
-	    Blend_Zero<Pix, Target_Inv<Target_Dst<Pix> > > > (zmode);
-
-	case CS_MIXMODE_FACT_SRCCOLOR:
-	  return GetScanlineProcSCMM<Source, Color, SrcBlend,
-	    Blend_SrcColor<Pix, Target_Dst<Pix> > > (zmode);
-	case CS_MIXMODE_FACT_SRCCOLOR_INV:
-	  return GetScanlineProcSCMM<Source, Color, SrcBlend,
-	    Blend_SrcColor<Pix, Target_Inv<Target_Dst<Pix> > > > (zmode);
-
-	case CS_MIXMODE_FACT_SRCALPHA:
-	  return GetScanlineProcSCMM<Source, Color, SrcBlend,
-	    Blend_SrcAlpha<Pix, Target_Dst<Pix> > > (zmode);
-	case CS_MIXMODE_FACT_SRCALPHA_INV:
-	  return GetScanlineProcSCMM<Source, Color, SrcBlend,
-	    Blend_SrcAlpha<Pix, Target_Inv<Target_Dst<Pix> > > > (zmode);
-
-	case CS_MIXMODE_FACT_DSTCOLOR:
-	  return GetScanlineProcSCMM<Source, Color, SrcBlend,
-	    Blend_DstColor<Pix, Target_Dst<Pix> > > (zmode);
-	case CS_MIXMODE_FACT_DSTCOLOR_INV:
-	  return GetScanlineProcSCMM<Source, Color, SrcBlend,
-	    Blend_DstColor<Pix, Target_Inv<Target_Dst<Pix> > > > (zmode);
-
-	case CS_MIXMODE_FACT_DSTALPHA:
-	  return GetScanlineProcSCMM<Source, Color, SrcBlend,
-	    Blend_DstAlpha<Pix, Target_Dst<Pix> > > (zmode);
-	case CS_MIXMODE_FACT_DSTALPHA_INV:
-	  return GetScanlineProcSCMM<Source, Color, SrcBlend,
-	    Blend_DstAlpha<Pix, Target_Inv<Target_Dst<Pix> > > > (zmode);
-      }
-    }
-    template<typename Source, typename Color>
-    static iScanlineRenderer::ScanlineProc GetScanlineProcSC (uint mixmode,
-      csZBufMode zmode)
-    {
-      switch (CS_MIXMODE_BLENDOP_SRC (mixmode))
-      {
-	default:
-	case CS_MIXMODE_FACT_ZERO:
-	  return GetScanlineProcSCM<Source, Color,
-	    Blend_Zero<Pix, Target_Src> > (mixmode, zmode);
-	case CS_MIXMODE_FACT_ONE:
-	  return GetScanlineProcSCM<Source, Color,
-	    Blend_Zero<Pix, Target_Inv<Target_Src> > > (mixmode, zmode);
-
-	case CS_MIXMODE_FACT_SRCCOLOR:
-	  return GetScanlineProcSCM<Source, Color,
-	    Blend_SrcColor<Pix, Target_Src> > (mixmode, zmode);
-	case CS_MIXMODE_FACT_SRCCOLOR_INV:
-	  return GetScanlineProcSCM<Source, Color_Multiply,
-	    Blend_SrcColor<Pix, Target_Inv<Target_Src> > > (mixmode, zmode);
-
-	case CS_MIXMODE_FACT_SRCALPHA:
-	  return GetScanlineProcSCM<Source, Color,
-	    Blend_SrcAlpha<Pix, Target_Src> > (mixmode, zmode);
-	case CS_MIXMODE_FACT_SRCALPHA_INV:
-	  return GetScanlineProcSCM<Source, Color_Multiply,
-	    Blend_SrcAlpha<Pix, Target_Inv<Target_Src> > > (mixmode, zmode);
-
-	case CS_MIXMODE_FACT_DSTCOLOR:
-	  return GetScanlineProcSCM<Source, Color,
-	    Blend_DstColor<Pix, Target_Src> > (mixmode, zmode);
-	case CS_MIXMODE_FACT_DSTCOLOR_INV:
-	  return GetScanlineProcSCM<Source, Color,
-	    Blend_DstColor<Pix, Target_Inv<Target_Src> > > (mixmode, zmode);
-
-	case CS_MIXMODE_FACT_DSTALPHA:
-	  return GetScanlineProcSCM<Source, Color,
-	    Blend_DstAlpha<Pix, Target_Src> > (mixmode, zmode);
-	case CS_MIXMODE_FACT_DSTALPHA_INV:
-	  return GetScanlineProcSCM<Source, Color,
-	    Blend_DstAlpha<Pix, Target_Inv<Target_Src> > > (mixmode, zmode);
-      }
-    }
     template<typename Source>
     static iScanlineRenderer::ScanlineProc GetScanlineProcS (bool colorized, 
-							     uint mixmode, 
 							     csZBufMode zmode)
     {
       if (colorized)
-	return GetScanlineProcSC<Source, Color_Multiply> (mixmode, zmode);
+	return GetScanlineProcSC<Source, Color_Multiply> (zmode);
       else
-	return GetScanlineProcSC<Source, Color_None> (mixmode, zmode);
+	return GetScanlineProcSC<Source, Color_None> (zmode);
     }
     static iScanlineRenderer::ScanlineProc GetScanlineProc (bool flat,
 							    bool colorized, 
-							    uint mixmode,
 							    csZBufMode zmode)
     {
       if (flat)
-	return GetScanlineProcS<Source_Flat> (colorized, mixmode, zmode);
+	return GetScanlineProcS<Source_Flat> (colorized, zmode);
       else
-	return GetScanlineProcS<Source_Texture> (colorized, mixmode, zmode);
+	return GetScanlineProcS<Source_Texture> (colorized, zmode);
     }
   public:
-    ScanlineRenderer (const csPixelFormat& pfmt) : pix (pfmt) 
-    {}
-
     bool Init (SoftwareTexture** textures,
       const csRenderMeshModes& modes,
       BuffersMask availableBuffers,
@@ -369,21 +260,7 @@ namespace cspluginSoftshader
       else
 	renderInfo.bufferComps = &myBufferComps[1];
 
-      uint realMixMode;
-      switch (modes.mixmode & CS_MIXMODE_TYPE_MASK)
-      {
-	case CS_MIXMODE_TYPE_BLENDOP:
-	  realMixMode = modes.mixmode;
-	  break;
-	case CS_MIXMODE_TYPE_AUTO:
-	default:
-	  realMixMode = CS_MIXMODE_BLEND(ONE, ZERO);
-	  // @@@ FIXME: Determine from texture also
-	  break;
-      }
-
-      renderInfo.proc = GetScanlineProc (doFlat, doColor, realMixMode, 
-	modes.z_buf_mode);
+      renderInfo.proc = GetScanlineProc (doFlat, doColor, modes.z_buf_mode);
 
       return renderInfo.proc != 0;
     }

@@ -51,6 +51,7 @@
 #include "clipper.h"
 #include "clip_znear.h"
 #include "clip_iclipper.h"
+#include "scan_pix.h"
 
 namespace cspluginSoft3d
 {
@@ -66,7 +67,6 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent) :
 {
   scfiEventHandler = 0;
   texman = 0;
-  //vbufmgr = 0;
   partner = 0;
   clipper = 0;
   cliptype = CS_CLIPPER_NONE;
@@ -227,6 +227,39 @@ bool csSoftwareGraphics3DCommon::Open ()
   CS_QUERY_REGISTRY_PLUGIN(shadermgr, object_reg,
     "crystalspace.graphics3d.shadermanager", iShaderManager);
 
+  if (pfmt.PixelBytes == 4)
+  {
+    if (((pfmt.BlueMask == 0x0000ff) || (pfmt.RedMask == 0x0000ff))
+      && (pfmt.GreenMask == 0x00ff00)
+      && ((pfmt.RedMask == 0xff0000) || (pfmt.BlueMask == 0xff0000)))
+      blendImpl = new BlendImpl<Pix_Fix<uint32, 24, 0xff,
+						16, 0xff,
+						8,  0xff,
+						0,  0xff> > (pfmt);
+    else
+      blendImpl = new BlendImpl<Pix_Generic<uint32> > (pfmt);
+  }
+  else
+  {
+    if (((pfmt.RedMask == 0xf800) || (pfmt.BlueMask == 0xf800))
+      && (pfmt.GreenMask == 0x07e0)
+      && ((pfmt.BlueMask == 0x001f) || (pfmt.RedMask == 0x001f)))
+      blendImpl = new BlendImpl<Pix_Fix<uint16, 0,  0,
+						8,  0xf8,
+						3,  0xfc,
+						-3, 0xf8> > (pfmt);
+    else if (((pfmt.RedMask == 0x7c00) || (pfmt.BlueMask == 0x7c00))
+      && (pfmt.GreenMask == 0x03e0)
+      && ((pfmt.BlueMask == 0x001f) || (pfmt.RedMask == 0x001f)))
+      blendImpl = new BlendImpl<Pix_Fix<uint16, 0,  0,
+						7,  0xf8,
+						2,  0xf8,
+					        -3, 0xf8> > (pfmt);
+    else
+      blendImpl = new BlendImpl<Pix_Generic<uint16> > (pfmt);
+  }
+
+
   return true;
 }
 
@@ -241,6 +274,7 @@ bool csSoftwareGraphics3DCommon::NewOpen ()
   //SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
 
   polyrast.Init (pfmt, width, height, z_buffer, line_table);
+  polyrast_ZFill.Init (pfmt, width, height, z_buffer, line_table);
 
   return true;
 }
@@ -277,6 +311,7 @@ void csSoftwareGraphics3DCommon::Close ()
   delete [] z_buffer; z_buffer = 0;
   delete [] smaller_buffer; smaller_buffer = 0;
   delete [] line_table; line_table = 0;
+  delete blendImpl; blendImpl = 0;
 
   G2D->Close ();
   width = height = -1;
@@ -993,7 +1028,7 @@ class TriangleDrawer
 
     SLLogic_ScanlineRenderer sll (scanRenderInfo,
       clipOutBuf, buffersMask & scanRenderInfo.desiredBuffers,
-      floatsPerVert);
+      floatsPerVert, g3d.blendImpl->GetBlendProc (modes.mixmode));
     g3d.polyrast.DrawPolygon (rescount, clippedPersp, sll);
   }
 
@@ -1147,6 +1182,18 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     usedModes.z_buf_mode = GetZModePass2 (usedModes.z_buf_mode);
   else if (zBufMode != CS_ZBUF_MESH)
     usedModes.z_buf_mode = zBufMode;
+  switch (modes.mixmode & CS_MIXMODE_TYPE_MASK)
+  {
+    case CS_MIXMODE_TYPE_BLENDOP:
+      usedModes.mixmode = modes.mixmode;
+      break;
+    case CS_MIXMODE_TYPE_AUTO:
+    default:
+      usedModes.mixmode = CS_MIXMODE_BLEND(ONE, ZERO);
+      // @@@ FIXME: Determine from texture also
+      break;
+  }
+
 
   BuffersMask buffersMask = 0;
   for (size_t b = 0; b < maxBuffers; b++)
@@ -1243,7 +1290,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     && (meshtype <= CS_MESHTYPE_TRIANGLEFAN))
   {
     TriangleDrawer triDraw (*this, activebuffers, 
-      rangeStart, rangeEnd, mesh, modes, meowmix);
+      rangeStart, rangeEnd, mesh, usedModes, meowmix);
 
     uint indexstart = mesh->indexstart;
     uint indexend = mesh->indexend;

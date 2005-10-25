@@ -17,10 +17,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_SOFTSHADER_SCAN_BLEND_H__
-#define __CS_SOFTSHADER_SCAN_BLEND_H__
+#ifndef __CS_SOFT3D_SCAN_BLEND_H__
+#define __CS_SOFT3D_SCAN_BLEND_H__
 
-namespace cspluginSoftshader
+namespace cspluginSoft3d
 {
   
   template<typename Pix, typename Target>
@@ -183,6 +183,135 @@ namespace cspluginSoftshader
     }
   };
   
-} // namespace cspluginSoftshader
+  struct BlendBase
+  {
+    typedef void (*BlendProc) (BlendBase* _This, uint32* src,
+      void* dest, uint len);
 
-#endif // __CS_SOFTSHADER_SCAN_BLEND_H__
+    virtual ~BlendBase() {}
+    virtual BlendProc GetBlendProc (uint mixmode) = 0;
+  };
+
+  template<typename Pix>
+  struct BlendImpl : public BlendBase
+  {
+  public:
+    Pix pix;
+  private:
+    template <typename SrcBlend, typename DstBlend>
+    struct BlendImpl2
+    {
+      static void Blend (BlendBase* _This, uint32* src,
+	void* dest, uint len)
+      {
+	BlendImpl<Pix>* This = (BlendImpl<Pix>*)_This;
+
+	Pix& pix = This->pix;
+	typename_qualifier Pix::PixType* _dest = 
+	  (typename_qualifier Pix::PixType*)dest;
+	typename_qualifier Pix::PixType* _destend = _dest + len;
+
+	while (_dest < _destend)
+	{
+	  uint8 r, g, b, a;
+	  const uint32 sp = *src++;
+	  a = sp >> 24;
+
+	  if (a & 0x80)
+	  {
+	    r = (sp >> 16) & 0xff;
+	    g = (sp >> 8) & 0xff;
+	    b = sp & 0xff;
+	    a <<= 1;
+
+	    Target_Src srcTarget (r, g, b, a);
+	    typename_qualifier SrcBlend::TargetType src (srcTarget);
+	    Target_Dst<Pix> dstTarget (src, pix, _dest);
+	    typename_qualifier DstBlend::TargetType dst (dstTarget);
+
+	    SrcBlend blendSrc (pix, src);
+	    DstBlend blendDst (pix, dst);
+	    blendSrc.Apply (_dest, r, g, b, a);
+	    blendDst.Apply (_dest, r, g, b, a);
+	    
+  	    _dest++;
+	  }
+	} /* endwhile */
+      }
+    };
+    template<typename SrcBlend>
+    static BlendBase::BlendProc GetScanlineProcM (uint mixmode)
+    {
+      switch (CS_MIXMODE_BLENDOP_DST (mixmode))
+      {
+	default:
+	case CS_MIXMODE_FACT_ZERO:
+	  return BlendImpl2<SrcBlend, Blend_Zero<Pix, Target_Dst<Pix> > >::Blend;
+	case CS_MIXMODE_FACT_ONE:
+	  return BlendImpl2<SrcBlend, Blend_Zero<Pix, Target_Inv<Target_Dst<Pix> > > >::Blend;
+
+	case CS_MIXMODE_FACT_SRCCOLOR:
+	  return BlendImpl2<SrcBlend, Blend_SrcColor<Pix, Target_Dst<Pix> > >::Blend;
+	case CS_MIXMODE_FACT_SRCCOLOR_INV:
+	  return BlendImpl2<SrcBlend, Blend_SrcColor<Pix, Target_Inv<Target_Dst<Pix> > > >::Blend;
+
+	case CS_MIXMODE_FACT_SRCALPHA:
+	  return BlendImpl2<SrcBlend, Blend_SrcAlpha<Pix, Target_Dst<Pix> > >::Blend;
+	case CS_MIXMODE_FACT_SRCALPHA_INV:
+	  return BlendImpl2<SrcBlend, Blend_SrcAlpha<Pix, Target_Inv<Target_Dst<Pix> > > >::Blend;
+
+	case CS_MIXMODE_FACT_DSTCOLOR:
+	  return BlendImpl2<SrcBlend, Blend_DstColor<Pix, Target_Dst<Pix> > >::Blend;
+	case CS_MIXMODE_FACT_DSTCOLOR_INV:
+	  return BlendImpl2<SrcBlend, Blend_DstColor<Pix, Target_Inv<Target_Dst<Pix> > > >::Blend;
+
+	case CS_MIXMODE_FACT_DSTALPHA:
+	  return BlendImpl2<SrcBlend, Blend_DstAlpha<Pix, Target_Dst<Pix> > >::Blend;
+	case CS_MIXMODE_FACT_DSTALPHA_INV:
+	  return BlendImpl2<SrcBlend, Blend_DstAlpha<Pix, Target_Inv<Target_Dst<Pix> > > >::Blend;
+      }
+    }
+    static BlendBase::BlendProc GetScanlineProc (uint mixmode)
+    {
+      switch (CS_MIXMODE_BLENDOP_SRC (mixmode))
+      {
+	default:
+	case CS_MIXMODE_FACT_ZERO:
+	  return GetScanlineProcM<Blend_Zero<Pix, Target_Src> > (mixmode);
+	case CS_MIXMODE_FACT_ONE:
+	  return GetScanlineProcM<Blend_Zero<Pix, Target_Inv<Target_Src> > > (mixmode);
+
+	case CS_MIXMODE_FACT_SRCCOLOR:
+	  return GetScanlineProcM<Blend_SrcColor<Pix, Target_Src> > (mixmode);
+	case CS_MIXMODE_FACT_SRCCOLOR_INV:
+	  return GetScanlineProcM<Blend_SrcColor<Pix, Target_Inv<Target_Src> > > (mixmode);
+
+	case CS_MIXMODE_FACT_SRCALPHA:
+	  return GetScanlineProcM<Blend_SrcAlpha<Pix, Target_Src> > (mixmode);
+	case CS_MIXMODE_FACT_SRCALPHA_INV:
+	  return GetScanlineProcM<Blend_SrcAlpha<Pix, Target_Inv<Target_Src> > > (mixmode);
+
+	case CS_MIXMODE_FACT_DSTCOLOR:
+	  return GetScanlineProcM<Blend_DstColor<Pix, Target_Src> > (mixmode);
+	case CS_MIXMODE_FACT_DSTCOLOR_INV:
+	  return GetScanlineProcM<Blend_DstColor<Pix, Target_Inv<Target_Src> > > (mixmode);
+
+	case CS_MIXMODE_FACT_DSTALPHA:
+	  return GetScanlineProcM<Blend_DstAlpha<Pix, Target_Src> > (mixmode);
+	case CS_MIXMODE_FACT_DSTALPHA_INV:
+	  return GetScanlineProcM<Blend_DstAlpha<Pix, Target_Inv<Target_Src> > > (mixmode);
+      }
+    }
+  public:
+    BlendImpl (const csPixelFormat& pfmt) : pix (pfmt) 
+    {}
+
+    BlendBase::BlendProc GetBlendProc (uint mixmode)
+    {
+      return GetScanlineProc (mixmode);
+    }
+  };
+
+} // namespace cspluginSoft3d
+
+#endif // __CS_SOFT3D_SCAN_BLEND_H__
