@@ -1,0 +1,11 @@
+SubDir TOP plugins sndsys renderer software drivers jackasyn ;
+
+if $(JACKASYN.AVAILABLE) = "yes"
+{
+Description sndsysjackasyn : "Linux Jack driver for the software sound renderer for sndsys" ;
+Plugin sndsysjackasyn : [ Wildcard *.cpp *.h ] ;
+LinkWith sndsysjackasyn : crystalspace ;
+ExternalLibs sndsysjackasyn : JACKASYN ;
+CompileGroups sndsysjackasyn : sndsys ;
+}
+
