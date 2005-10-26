@@ -4667,7 +4667,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   bool do_mirror = false;
   int msv = -1;
   scfString destSectorName;
-  bool autoresolve = false;
+  bool autoresolve = true;
 
   // Array of keys we need to parse later.
   csRefArray<iDocumentNode> key_nodes;

@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Oct-2005
+	- Jorrit made autoresolve for portals default now. It is still possible
+	  to disable autoresolve by using <autoresolve>no</autoresolve>.
+	  The autoresolve flag is important in case of dynamic loading so it
+	  is best to have it default on.
 25-Oct-2005
 	- caedes added a jack driver for the new sound system in cs. it is
 	  called jackasyn as it uses a wrapper library called libjackasyn that
