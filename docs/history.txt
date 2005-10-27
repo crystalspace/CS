@@ -26,6 +26,7 @@ chronological order.
 	      - iMeshWrapper->SetParentContainer()
 	      - iMovable->GetParent()
 	      - iMovable->SetParent()
+	- Jorrit fixed the saver so it compiles again.
 26-Oct-2005
 	- Jorrit made autoresolve for portals default now. It is still possible
 	  to disable autoresolve by using <autoresolve>no</autoresolve>.

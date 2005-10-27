@@ -31,6 +31,7 @@
 #include "iengine/movable.h"
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
+#include "iengine/scenenode.h"
 #include "iengine/renderloop.h"
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
@@ -777,11 +778,12 @@ bool csSaver::SaveSectors(iDocumentNode *parent)
   return true;
 }
 
-bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
+bool csSaver::SaveSectorMeshes(iMeshList* meshList,
+		iDocumentNode *parent)
 {
-  for (int i=0; i<meshList->GetCount(); i++)
+  for (int i=0; i<meshList->GetCount (); i++)
   {
-    iMeshWrapper* meshwrapper = meshList->Get(i);
+    iMeshWrapper* meshwrapper = meshList->Get (i);
     //Check if it's a portal
     csRef<iPortalContainer> portal = 
       SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iPortalContainer);
@@ -879,8 +881,120 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
     }
 
     //Save all childmeshes
-    iMeshList* childlist = meshwrapper->GetChildren();
-    if (childlist) SaveSectorMeshes(childlist, meshNode);
+    const csRefArray<iSceneNode>& childlist = meshwrapper->QuerySceneNode ()->
+	    GetChildren ();
+    if (childlist.Length () > 0) SaveSectorMeshes(childlist, meshNode);
+  }
+  return true;
+}
+
+bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
+		iDocumentNode *parent)
+{
+  for (size_t i=0; i<meshList.Length(); i++)
+  {
+    iMeshWrapper* meshwrapper = meshList[i]->QueryMesh ();
+    if (!meshwrapper) continue;
+    //Check if it's a portal
+    csRef<iPortalContainer> portal = 
+      SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iPortalContainer);
+    if (portal) 
+    {
+      for (int i=0; i<portal->GetPortalCount(); i++)
+        if (!SavePortals(portal->GetPortal(i), parent)) continue;
+
+      continue;
+    }
+
+    //Create the Tag for the MeshObj
+    csRef<iDocumentNode> meshNode = CreateNode(parent, "meshobj");
+
+    //Add the mesh's name to the MeshObj tag
+    const char* name = meshwrapper->QueryObject()->GetName();
+    if (name && *name) 
+      meshNode->SetAttribute("name", name);
+
+    //Let the iSaverPlugin write the parameters of the mesh
+    //It has to create the params node itself, maybe it might like to write
+    //more things outside the params at a later stage. you never know ;)
+    csRef<iFactory> factory;
+    iMeshObjectFactory* meshobjectfactory = 
+      meshwrapper->GetMeshObject()->GetFactory();
+    if (meshobjectfactory)
+      factory = 
+        SCF_QUERY_INTERFACE(meshobjectfactory->GetMeshObjectType(), iFactory);
+    else
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.plugin.cssaver", 
+	"Factory-less Mesh found! %s => Please fix or report to Jorrit ;)", 
+	name);
+    }
+    if (factory)
+    {
+      const char* pluginname = factory->QueryClassID();
+      if (pluginname && *pluginname)
+      {
+        csRef<iDocumentNode> pluginNode = CreateNode(meshNode, "plugin");
+
+        //Add the plugin tag
+        char loadername[128] = "";
+        csReplaceAll(loadername, pluginname, ".object.", ".loader.", 128);
+
+        pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(GetPluginName (loadername, "Mesh"));
+
+        char savername[128] = "";
+        csReplaceAll(savername, pluginname, ".object.", ".saver.", 128);
+
+        //Invoke the iSaverPlugin::WriteDown
+        csRef<iSaverPlugin> saver = 
+          CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
+          
+        if (!saver) 
+          saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
+          
+        if (saver)
+          saver->WriteDown(meshwrapper->GetMeshObject(), meshNode,
+	  	0/**ssource*/);
+      }
+
+    }
+
+    csZBufMode zmode = meshwrapper->GetZBufMode ();
+    synldr->WriteZMode (meshNode, &zmode, false);
+
+    //TBD: write <priority>
+    //TBD: write other tags
+
+    //Add the transformation tags
+    csVector3 moveVect =
+      meshwrapper->GetMovable()->GetTransform().GetO2TTranslation();
+    csMatrix3 moveMatrix =
+      meshwrapper->GetMovable()->GetTransform().GetO2T();
+    if (moveVect != 0 || !moveMatrix.IsIdentity())
+    {
+      //Add the move tag
+      csRef<iDocumentNode> moveNode = CreateNode(meshNode, "move");
+
+      //Add the matrix tag
+      if (!moveMatrix.IsIdentity())
+      {
+        csRef<iDocumentNode> matrixNode = CreateNode(moveNode, "matrix");
+        synldr->WriteMatrix(matrixNode, &moveMatrix);
+      }
+
+      //Add the v tag
+      if (moveVect != 0)
+      {
+        csRef<iDocumentNode> vNode = CreateNode(moveNode, "v");
+        synldr->WriteVector(vNode, &moveVect);
+      }
+    }
+
+    //Save all childmeshes
+    const csRefArray<iSceneNode>& childlist = meshwrapper->QuerySceneNode ()->
+	    GetChildren ();
+    if (childlist.Length () > 0) SaveSectorMeshes(childlist, meshNode);
   }
   return true;
 }
