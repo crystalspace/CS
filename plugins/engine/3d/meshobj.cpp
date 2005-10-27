@@ -1116,9 +1116,9 @@ iMeshWrapper* csMeshWrapper::FindChildByName (const char* name)
     return 0;
   }
  
-  int firstsize = p-Name;
+  int firstsize = p-name;
   csString firstName;
-  firstName.Append (Name, firstsize);
+  firstName.Append (name, firstsize);
 
   for (i = 0 ; i < children.Length () ; i++)
   {
