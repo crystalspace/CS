@@ -6,6 +6,26 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Oct-2005
+	- Jorrit did a big change to the way hierarchical objects are managed
+	  in the engine. Meshes and lights can now properly be used as
+	  hierarchical objects with the same API. For cameras some preparation
+	  work has been done but it is not ready yet. Here is how it works:
+	  meshes, lights, and camera implement the new iSceneNode interface.
+	  You can do QuerySceneNode() to get the scene object from the mesh,
+	  light, or camera without having to do SCF_QUERY_INTERFACE. To
+	  make some object a child of another you simply do:
+	      object_child->QuerySceneNode ()->SetParent (
+	    	  object_parent->QuerySceneNode ());
+	  To remove some object from a parent you do:
+	      object_child->QuerySceneNode ()->SetParent (0);
+	  You can also get the children by calling iSceneNode->GetChildren().
+	  The following methods have been removed:
+	      - iMeshWrapper->GetChildren()
+	      - iMeshWrapper->GetParentContainer()
+	      - iMeshWrapper->SetParentContainer()
+	      - iMovable->GetParent()
+	      - iMovable->SetParent()
 26-Oct-2005
 	- Jorrit made autoresolve for portals default now. It is still possible
 	  to disable autoresolve by using <autoresolve>no</autoresolve>.

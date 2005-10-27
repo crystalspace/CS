@@ -50,6 +50,7 @@ class csVector3;
 
 struct iSector;
 struct iCamera;
+struct iSceneNode;
 
 SCF_VERSION (iCameraSectorListener, 0, 0, 1);
 
@@ -102,6 +103,13 @@ struct iCamera : public virtual iBase
    * is not cloned.
    */
   virtual iCamera *Clone () const = 0;
+
+  /**
+   * Get the scene node that this object represents. @@@ Note. iCamera
+   * doesn't yet support iMovable so scene nodes are not properly working
+   * yet.
+   */
+  virtual iSceneNode* QuerySceneNode () = 0;
 
   /// Return the FOV (field of view) in pixels
   virtual int GetFOV () const = 0;

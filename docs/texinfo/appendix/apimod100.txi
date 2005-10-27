@@ -1818,3 +1818,40 @@ instead of @code{iBase} as the type of the parameter.
 The @code{csRGBVector} class has been removed. A @code{csComparator<>} 
 specialization has been provided, so equivalent functionality can be achieved
 by simply using @code{csArray<csRGBcolor*>}.
+
+@subheading Changes for hierarchical objects
+
+Meshes and lights can now properly be used as hierarchical objects with the
+same API. Here is how it works: meshes and lights implement the new
+@code{iSceneNode} interface. You can do @code{QuerySceneNode()} to get the
+scene object from the mesh, light, or camera without having to do
+@code{SCF_QUERY_INTERFACE}. To make some object a child of another you simply
+do:
+
+@example
+object_child->QuerySceneNode ()->SetParent (
+	    	  object_parent->QuerySceneNode ());
+@end example
+
+To remove some object from a parent you do:
+
+@example
+object_child->QuerySceneNode ()->SetParent (0);
+@end example
+
+You can get the children by calling @code{iSceneNode->GetChildren()}.
+
+The following methods have been removed:
+@itemize @bullet
+@item
+@code{iMeshWrapper->GetChildren()}
+@item
+@code{iMeshWrapper->GetParentContainer()}
+@item
+@code{iMeshWrapper->SetParentContainer()}
+@item
+@code{iMovable->GetParent()}
+@item
+@code{iMovable->SetParent()}
+@end itemize
+

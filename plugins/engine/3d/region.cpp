@@ -344,19 +344,19 @@ iMeshWrapper *csRegion::FindMeshObject (const char *Name)
     char* cname = csStrNew (Name);
     char* p2 = strchr (cname, ':');
     *p2 = 0;
-    csRef<iMeshWrapper> m (CS_GET_NAMED_CHILD_OBJECT (
-        this, iMeshWrapper, cname));
+    csRef<iMeshWrapper> m = CS_GET_NAMED_CHILD_OBJECT (
+        this, iMeshWrapper, cname);
     delete[] cname;
     if (m)
     {
-      return m->GetChildren ()->FindByName (p+1);
+      return m->FindChildByName (p+1);
     }
     return 0;
   }
   else
   {
-    csRef<iMeshWrapper> m (CS_GET_NAMED_CHILD_OBJECT (
-        this, iMeshWrapper, Name));
+    csRef<iMeshWrapper> m = CS_GET_NAMED_CHILD_OBJECT (
+        this, iMeshWrapper, Name);
     return m;	// DecRef is ok here.
   }
 }

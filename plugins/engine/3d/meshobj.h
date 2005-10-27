@@ -33,6 +33,7 @@
 #include "plugins/engine/3d/movable.h"
 #include "plugins/engine/3d/impmesh.h"
 #include "plugins/engine/3d/meshlod.h"
+#include "plugins/engine/3d/scenenode.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
 #include "iengine/mesh.h"
@@ -108,6 +109,7 @@ public:
   virtual iMeshWrapper *FindByName (const char *Name) const;
 };
 
+#if 0
 /**
  * Subclass of csMeshList to hold the children of another mesh object.
  */
@@ -123,11 +125,13 @@ public:
   virtual void PrepareMesh (iMeshWrapper* item);
   virtual void FreeMesh (iMeshWrapper* item);
 };
+#endif
 
 /**
  * A list of mesh factories.
  */
-class csMeshFactoryList : public scfImplementation1<csMeshFactoryList, iMeshFactoryList>
+class csMeshFactoryList : public scfImplementation1<csMeshFactoryList,
+	iMeshFactoryList>
 {
 private:
   csRefArrayObject<iMeshFactoryWrapper> list;
@@ -198,21 +202,18 @@ public:
 /**
  * The holder class for all implementations of iMeshObject.
  */
-class csMeshWrapper : public scfImplementationExt4<csMeshWrapper,
+class csMeshWrapper : public scfImplementationExt5<csMeshWrapper,
                                                    csObject,
                                                    iMeshWrapper,
                                                    iShaderVariableContext,
                                                    iVisibilityObject,
-                                                   iImposter>
+                                                   iImposter,
+						   iSceneNode>
 {
   friend class csMovable;
   friend class csMovableSectorList;
 
 protected:
-  /// The parent sector object, or 0
-  iMeshWrapper *Parent;
-  csMeshWrapper *csParent;
-
   /**
    * Bounding box in world space.
    * This is a cache for GetWorldBoundingBox() which will recalculate this
@@ -295,9 +296,6 @@ private:
    * (only if this object is a portal container of course).
    */
   csRef<iPortalContainer> portal_container;
-
-  /// Children of this object (other instances of iMeshWrapper).
-  csMeshMeshList children;
 
   /**
    * The callbacks which are called just before drawing.
@@ -390,7 +388,7 @@ protected:
 
 public:
   /// Constructor.
-  csMeshWrapper (iMeshWrapper* theParent, iMeshObject* meshobj = 0);
+  csMeshWrapper (iMeshObject* meshobj = 0);
 
   /// Set the mesh factory.
   virtual void SetFactory (iMeshFactoryWrapper* factory)
@@ -443,11 +441,6 @@ public:
   {
     return (iMovable*)&movable;
   }
-
-  /// Set parent container for this object.
-  virtual void SetParentContainer (iMeshWrapper* newParent);
-  /// Get parent container for this object.
-  virtual iMeshWrapper* GetParentContainer () { return Parent; }
 
   /// Set the render priority for this object.
   virtual void SetRenderPriority (long rp);
@@ -530,9 +523,6 @@ public:
    */
   csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview,
   	uint32 frustum_mask);
-
-  /// Get the children of this mesh object.
-  const csMeshMeshList& GetCsChildren () const { return children; }
 
   /**
    * Do a hard transform of this object.
@@ -645,11 +635,6 @@ public:
   virtual csBox3 GetTransformedBoundingBox (const csReversibleTransform& trans);
   virtual csScreenBoxResult GetScreenBoundingBox (iCamera *camera);
 
-  csMeshWrapper* GetCsParent () const
-  { 
-    return csParent;
-  }
-
   //--------------------- SCF stuff follows ------------------------------//
   //=================== iShaderVariableContext ================//
 
@@ -693,12 +678,38 @@ public:
   { svcontext.ReplaceVariable (variable); }
   void Clear () { svcontext.Clear(); }
 
+  //--------------------- iSceneNode implementation ----------------------//
+
+  virtual void SetParent (iSceneNode* parent)
+  {
+    csSceneNode::SetParent ((iSceneNode*)this, parent, &movable);
+  }
+  virtual iSceneNode* GetParent () const
+  {
+    if (movable.GetParent ())
+      return movable.GetParent ()->GetSceneNode ();
+    else
+      return 0;
+  }
+  virtual const csRefArray<iSceneNode>& GetChildren () const
+  {
+    return movable.GetChildren ();
+  }
+  virtual iMeshWrapper* QueryMesh () { return this; }
+  virtual iLight* QueryLight () { return 0; }
+  virtual iCamera* QueryCamera () { return 0; }
+
   //--------------------- iMeshWrapper implementation --------------------//
 
   virtual iObject *QueryObject ()
   {
     return this;
   }
+  virtual iSceneNode* QuerySceneNode ()
+  {
+    return this;
+  }
+  virtual iMeshWrapper* FindChildByName (const char* name);
   virtual iLightingInfo* GetLightingInfo () const
   {
     return light_info;
@@ -707,11 +718,6 @@ public:
   {
     return flags;
   }
-  virtual iMeshList* GetChildren ()
-  {
-    return &children;
-  }
-
   virtual iShaderVariableContext* GetSVContext()
   {
     return (iShaderVariableContext*)this;

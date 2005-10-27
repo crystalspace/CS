@@ -51,6 +51,7 @@
 #include "iengine/rview.h"
 #include "iengine/sector.h"
 #include "iengine/viscull.h"
+#include "iengine/scenenode.h"
 #include "igeom/polymesh.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
@@ -2343,9 +2344,13 @@ void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
       	indent, "", sn ? sn : "?");
     }
   }
-  for (int i=0; i<mesh->GetChildren ()->GetCount (); ++i)
+  const csRefArray<iSceneNode>& children = mesh->QuerySceneNode ()
+  	->GetChildren ();
+  for (size_t i=0; i<children.Length (); ++i)
   {
-    Dump (indent+4, mesh->GetChildren ()->Get (i));
+    iMeshWrapper* m = children[i]->QueryMesh ();
+    if (m)
+      Dump (indent+4, m);
   }
 }
 

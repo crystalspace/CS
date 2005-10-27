@@ -41,6 +41,7 @@
 #include "iengine/portalcontainer.h"
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
+#include "iengine/scenenode.h"
 #include "igeom/clip2d.h"
 #include "igraphic/imageio.h"
 #include "imap/loader.h"
@@ -895,10 +896,18 @@ void WalkTest::ParseKeyCmds (iObject* src)
       csRef<iMeshWrapper> wrap = SCF_QUERY_INTERFACE (src, iMeshWrapper);
       if (wrap)
       {
-        iMeshList* ml = wrap->GetChildren ();
-	if (ml->GetCount () > 0)
+	const csRefArray<iSceneNode>& ml = wrap->QuerySceneNode ()
+		->GetChildren ();
+	size_t i;
+	iMeshWrapper* pcmesh = 0;
+	for (i = 0 ; i < ml.Length () ; i++)
+	  if (ml[i]->QueryMesh ())
+	  {
+	    pcmesh = ml[i]->QueryMesh ();
+	    break;
+	  }
+	if (pcmesh)
 	{
-	  iMeshWrapper* pcmesh = ml->Get (0);
 	  iPortalContainer* pc = pcmesh->GetPortalContainer ();
 	  if (pc)
 	  {
@@ -949,12 +958,14 @@ void WalkTest::ParseKeyCmds (iObject* src)
   csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (src, iMeshWrapper));
   if (mesh)
   {
-    int k;
-    iMeshList* ml = mesh->GetChildren ();
-    for (k = 0 ; k < ml->GetCount () ; k++)
+    size_t k;
+    const csRefArray<iSceneNode>& ml = mesh->QuerySceneNode ()->GetChildren ();
+    for (k = 0 ; k < ml.Length () ; k++)
     {
-      iMeshWrapper* spr = ml->Get (k);
-      ParseKeyCmds (spr->QueryObject ());
+      iMeshWrapper* spr = ml[k]->QueryMesh ();
+      // @@@ Also for others?
+      if (spr)
+        ParseKeyCmds (spr->QueryObject ());
     }
   }
 

@@ -50,6 +50,7 @@ struct iShaderVariableContext;
 struct iShadowCaster;
 struct iShadowReceiver;
 struct iSharedVariable;
+struct iSceneNode;
 
 struct csRenderMesh;
 
@@ -324,6 +325,18 @@ struct iMeshWrapper : public virtual iBase
   virtual iMovable* GetMovable () const = 0;
 
   /**
+   * Get the scene node that this object represents.
+   */
+  virtual iSceneNode* QuerySceneNode () = 0;
+
+  /**
+   * Find a child mesh by name. If there is a colon in the name
+   * then this function is able to search for children too.
+   * i.e. like mesh:childmesh:childmesh.
+   */
+  virtual iMeshWrapper* FindChildByName (const char* name) = 0;
+
+  /**
    * This routine will find out in which sectors a mesh object
    * is positioned. To use it the mesh has to be placed in one starting
    * sector. This routine will then start from that sector, find all
@@ -589,24 +602,6 @@ struct iMeshWrapper : public virtual iBase
    * the camera and the furthest point of the 3D box.
    */
   virtual csScreenBoxResult GetScreenBoundingBox (iCamera* camera) = 0;
-
-  /**
-   * Get all the children of this mesh object. This is used for hierarchical
-   * meshes. If you want to make a hierarchical mesh you can call
-   * GetChildren ()->Add (mesh).
-   */
-  virtual iMeshList* GetChildren () = 0;
-  /**
-   * Get the parent of this mesh. Returns 0 if the mesh has no parent (i.e.
-   * it is contained in the engine directly). If not 0 then this mesh
-   * is part of a hierarchical mesh.
-   */
-  virtual iMeshWrapper* GetParentContainer () = 0;
-  /**
-   * Set the parent of this mesh. This only changes the 'parent' pointer but
-   * does not add the mesh as a child mesh. Internal use only.
-   */
-  virtual void SetParentContainer (iMeshWrapper *) = 0;
 
   /**
    * Get the radius of this mesh and all its children.
@@ -890,7 +885,6 @@ struct iMeshFactoryWrapper : public virtual iBase
  * Main ways to get pointers to this interface:
  *   - iEngine::GetMeshes()
  *   - iSector::GetMeshes()
- *   - iMeshWrapper::GetChildren()
  *
  * Main users of this interface:
  *   - iEngine

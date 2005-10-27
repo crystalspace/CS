@@ -22,6 +22,9 @@
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/cscoll.h"
 #include "plugins/engine/3d/engine.h"
+#include "plugins/engine/3d/light.h"
+#include "plugins/engine/3d/meshobj.h"
+#include "plugins/engine/3d/camera.h"
 
 //---------------------------------------------------------------------------
 csMovableSectorList::csMovableSectorList ()
@@ -47,11 +50,11 @@ bool csMovableSectorList::PrepareSector (iSector* sector)
   csMeshWrapper *mw = movable->GetMeshWrapper ();
   if (mw) mw->MoveToSector (sector);
 
-  csLight *l = movable->GetLight ();
+  csLight *l = movable->GetCsLight ();
   if (l) l->OnSetSector (sector);
   // Make sure camera and light only is in one sector
-  CS_ASSERT (!(movable->GetLight () && Length () > 0));
-  CS_ASSERT (!(movable->GetCamera () && Length () > 0));
+  CS_ASSERT (!(movable->GetCsLight () && Length () > 0));
+  CS_ASSERT (!(movable->GetCsCamera () && Length () > 0));
   return true;
 }
 
@@ -95,7 +98,7 @@ iSector *csMovableSectorList::FindByName (const char *Name) const
 
 csMovable::csMovable ()
   : scfImplementationType (this), is_identity (true), parent (0),
-  meshobject (0), lightobject (0), cameraobject (0), updatenr (0)
+    meshobject (0), lightobject (0), cameraobject (0), updatenr (0)
 {
   sectors.SetMovable (this);
 }
@@ -169,7 +172,11 @@ void csMovable::UpdateMove ()
   if (meshobject) meshobject->UpdateMove ();
   if (lightobject) lightobject->OnSetPosition ();
 
-  size_t i = listeners.Length ();
+  size_t i;
+  for (i = 0 ; i < scene_children.Length () ; i++)
+    scene_children[i]->GetMovable ()->UpdateMove ();
+
+  i = listeners.Length ();
   while (i > 0)
   {
     i--;
@@ -177,3 +184,15 @@ void csMovable::UpdateMove ()
     ml->MovableChanged (this);
   }
 }
+
+iSceneNode* csMovable::GetSceneNode ()
+{
+  if (meshobject)
+    return meshobject->QuerySceneNode ();
+  if (lightobject)
+    return lightobject->QuerySceneNode ();
+  if (cameraobject)
+    return cameraobject->QuerySceneNode ();
+  return 0;
+}
+

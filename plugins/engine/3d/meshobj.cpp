@@ -62,12 +62,13 @@ public:
   virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
   	const csVector3& origin)
   {
-    const csMeshMeshList& c = static_lod_mesh->GetCsChildren ();
-    int cnt = c.GetCount ();
+    const csRefArray<iSceneNode>& c = static_lod_mesh->QuerySceneNode ()
+    	->GetChildren ();
+    int cnt = c.Length ();
     int i = cnt-1;
     while (i >= 0)
     {
-      iMeshWrapper* child = c.Get (i);
+      iMeshWrapper* child = c[i]->QueryMesh ();
       if (child && child->GetShadowCaster ())
       {
         child->GetShadowCaster ()->AppendShadows (movable, shadows, origin);
@@ -100,12 +101,13 @@ public:
 
   virtual void CastShadows (iMovable* movable, iFrustumView* fview)
   {
-    const csMeshMeshList& c = static_lod_mesh->GetCsChildren ();
-    int cnt = c.GetCount ();
+    const csRefArray<iSceneNode>& c = static_lod_mesh->QuerySceneNode ()
+    	->GetChildren ();
+    int cnt = c.Length ();
     int i;
     for (i = 0 ; i < cnt ; i++)
     {
-      iMeshWrapper* child = c.Get (i);
+      iMeshWrapper* child = c[i]->QueryMesh ();
       if (child && child->GetShadowReceiver ())
         child->GetShadowReceiver ()->CastShadows (movable, fview);
     }
@@ -117,7 +119,7 @@ public:
 // csMeshWrapper
 // ---------------------------------------------------------------------------
 
-csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) 
+csMeshWrapper::csMeshWrapper (iMeshObject *meshobj) 
   : scfImplementationType (this)
 {
   DG_TYPE (this, "csMeshWrapper");
@@ -125,16 +127,6 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj)
 //  movable.scfParent = this; //@TODO: CHECK THIS
   wor_bbox_movablenr = -1;
   movable.SetMeshWrapper (this);
-  Parent = theParent;
-  if (Parent)
-  {
-    csParent = (csMeshWrapper*)Parent;
-    movable.SetParent (Parent->GetMovable ());
-  }
-  else
-  {
-    csParent = 0;
-  }
 
   render_priority = csEngine::currentEngine->GetObjectRenderPriority ();
 
@@ -151,12 +143,11 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj)
     // AddToSectorPortalLists. Because if we don't have a parent yet then
     // we cannot have a sector either. If we have a parent then the parent
     // can have a sector.
-    if (csParent)
+    if (movable.GetParent ())
       AddToSectorPortalLists ();
   }
   factory = 0;
   zbufMode = CS_ZBUF_USE;
-  children.SetMesh (this);
   imposter_active = false;
   imposter_mesh = 0;
   cast_hardware_shadow = true;
@@ -172,15 +163,6 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj)
 
   last_camera = 0;
   last_frame_number = 0;
-}
-
-void csMeshWrapper::SetParentContainer (iMeshWrapper* newParent)
-{
-  Parent = newParent;
-  if (Parent)
-    csParent = (csMeshWrapper*)Parent;
-  else
-    csParent = 0;
 }
 
 iShadowReceiver* csMeshWrapper::GetShadowReceiver ()
@@ -226,11 +208,10 @@ void csMeshWrapper::AddToSectorPortalLists ()
   if (portal_container)
   {
     int i;
-    csMeshWrapper* prev = this;
-    csMeshWrapper* m = csParent;
-    while (m) { prev = m; m = m->GetCsParent (); }
-    const iSectorList *sectors = (prev->GetCsMovable ())
-    	.csMovable::GetSectors ();
+    csMovable* prev = &movable;
+    csMovable* m = movable.GetParent ();
+    while (m) { prev = m; m = m->GetParent (); }
+    const iSectorList *sectors = prev->GetSectors ();
     for (i = 0; i < sectors->GetCount (); i++)
     {
       iSector *ss = sectors->Get (i);
@@ -244,18 +225,17 @@ void csMeshWrapper::ClearFromSectorPortalLists (iSector* sector)
   if (portal_container)
   {
     int i;
-    csMeshWrapper* prev = this;
-    csMeshWrapper* m = csParent;
-    while (m) { prev = m; m = m->GetCsParent (); }
-
     if (sector)
     {
       sector->UnregisterPortalMesh ((iMeshWrapper*)this);
     }
     else
     {
-      const iSectorList *sectors = (prev->GetCsMovable ())
-      	.csMovable::GetSectors ();
+      csMovable* prev = &movable;
+      csMovable* m = movable.GetParent ();
+      while (m) { prev = m; m = m->GetParent (); }
+
+      const iSectorList *sectors = prev->GetSectors ();
       for (i = 0; i < sectors->GetCount (); i++)
       {
         iSector *ss = sectors->Get (i);
@@ -297,19 +277,22 @@ csMeshWrapper::~csMeshWrapper ()
 void csMeshWrapper::UpdateMove ()
 {
   relevant_lights_valid = false;
-  int i;
-  for (i = 0; i < children.GetCount (); i++)
-  {
-    iMeshWrapper *spr = children.Get (i);
-    spr->GetMovable ()->UpdateMove ();
-  }
 }
 
 bool csMeshWrapper::SomeParentHasStaticLOD () const
 {
-  if (!csParent) return false;
-  if (csParent->static_lod) return true;
-  return csParent->SomeParentHasStaticLOD ();
+  if (!movable.GetParent ()) return false;
+  iSceneNode* parent_node = movable.GetParent ()->GetSceneNode ();
+  iMeshWrapper* parent_mesh = parent_node->QueryMesh ();
+  while (!parent_mesh)
+  {
+    parent_node = parent_node->GetParent ();
+    if (!parent_node) return false;
+    parent_mesh = parent_node->QueryMesh ();
+  }
+
+  if (((csMeshWrapper*)parent_mesh)->static_lod) return true;
+  return ((csMeshWrapper*)parent_mesh)->SomeParentHasStaticLOD ();
 }
 
 void csMeshWrapper::MoveToSector (iSector *s)
@@ -317,7 +300,7 @@ void csMeshWrapper::MoveToSector (iSector *s)
   // Only add this mesh to a sector if the parent is the engine.
   // Otherwise we have a hierarchical object and in that case
   // the parent object controls this.
-  if (!Parent) s->GetMeshes ()->Add ((iMeshWrapper*)this);
+  if (!movable.GetParent ()) s->GetMeshes ()->Add ((iMeshWrapper*)this);
   // If we are a portal container then we have to register ourselves
   // to the sector.
   if (portal_container) s->RegisterPortalMesh ((iMeshWrapper*)this);
@@ -325,15 +308,20 @@ void csMeshWrapper::MoveToSector (iSector *s)
   // Fire the new mesh callbacks in the sector.
   ((csSector*)s)->FireNewMesh ((iMeshWrapper*)this);
 
-  int i;
-  for (i = 0; i < children.GetCount (); i++)
+  const csRefArray<iSceneNode>& children = movable.GetChildren ();
+  size_t i;
+  for (i = 0; i < children.Length (); i++)
   {
-    iMeshWrapper* spr = children.Get (i);
-    csMeshWrapper* cspr = (csMeshWrapper*)spr;
-    // If we have children then we call MoveToSector() on them so that
-    // any potential portal_containers among them will also register
-    // themselves to the sector.
-    cspr->MoveToSector (s);
+    iMeshWrapper* spr = children[i]->QueryMesh ();
+    // @@@ What for other types of objects like lights and camera???
+    if (spr)
+    {
+      csMeshWrapper* cspr = (csMeshWrapper*)spr;
+      // If we have children then we call MoveToSector() on them so that
+      // any potential portal_containers among them will also register
+      // themselves to the sector.
+      cspr->MoveToSector (s);
+    }
   }
 }
 
@@ -344,18 +332,23 @@ void csMeshWrapper::RemoveFromSectors (iSector* sector)
     ((csSector*)sector)->FireRemoveMesh ((iMeshWrapper*)this);
 
   ClearFromSectorPortalLists (sector);
-  int i;
-  for (i = 0; i < children.GetCount (); i++)
+  const csRefArray<iSceneNode>& children = movable.GetChildren ();
+  size_t i;
+  for (i = 0; i < children.Length (); i++)
   {
-    iMeshWrapper* spr = children.Get (i);
-    csMeshWrapper* cspr = (csMeshWrapper*)spr;
-    // If we have children then we call RemoveFromSectors() on them so that
-    // any potential portal_containers among them will also unregister
-    // themselves from the sector.
-    cspr->RemoveFromSectors (sector);
+    iMeshWrapper* spr = children[i]->QueryMesh ();
+    // @@@ What to do in case of light!
+    if (spr)
+    {
+      csMeshWrapper* cspr = (csMeshWrapper*)spr;
+      // If we have children then we call RemoveFromSectors() on them so that
+      // any potential portal_containers among them will also unregister
+      // themselves from the sector.
+      cspr->RemoveFromSectors (sector);
+    }
   }
 
-  if (Parent)
+  if (movable.GetParent ())
     return;
 
   if (sector)
@@ -365,6 +358,7 @@ void csMeshWrapper::RemoveFromSectors (iSector* sector)
     const iSectorList *sectors = movable.GetSectors ();
     if (sectors != 0)
     {
+      int i;
       for (i = 0; i < sectors->GetCount (); i++)
       {
 	iSector *ss = sectors->Get (i);
@@ -378,38 +372,47 @@ void csMeshWrapper::RemoveFromSectors (iSector* sector)
 void csMeshWrapper::SetFlagsRecursive (uint32 mask, uint32 value)
 {
   flags.Set (mask, value);
-  const iMeshList* ml = GetChildren ();
-  if (!ml) return;
-  int i;
-  for (i = 0 ; i < ml->GetCount () ; i++)
-    ml->Get (i)->SetFlagsRecursive (mask, value);
+  const csRefArray<iSceneNode>& children = movable.GetChildren ();
+  size_t i;
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    iMeshWrapper* mesh = children[i]->QueryMesh ();
+    if (mesh)
+      mesh->SetFlagsRecursive (mask, value);
+  }
 }
 
 void csMeshWrapper::SetZBufModeRecursive (csZBufMode mode)
 {
   SetZBufMode (mode);
-  const iMeshList* ml = GetChildren ();
-  if (!ml) return;
-  int i;
-  for (i = 0 ; i < ml->GetCount () ; i++)
-    ml->Get (i)->SetZBufModeRecursive (mode);
+  const csRefArray<iSceneNode>& children = movable.GetChildren ();
+  size_t i;
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    iMeshWrapper* mesh = children[i]->QueryMesh ();
+    if (mesh)
+      mesh->SetZBufModeRecursive (mode);
+  }
 }
 
 void csMeshWrapper::SetRenderPriorityRecursive (long rp)
 {
   SetRenderPriority (rp);
-  const iMeshList* ml = GetChildren ();
-  if (!ml) return;
-  int i;
-  for (i = 0 ; i < ml->GetCount () ; i++)
-    ml->Get (i)->SetRenderPriorityRecursive (rp);
+  const csRefArray<iSceneNode>& children = movable.GetChildren ();
+  size_t i;
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    iMeshWrapper* mesh = children[i]->QueryMesh ();
+    if (mesh)
+      mesh->SetRenderPriorityRecursive (rp);
+  }
 }
 
 void csMeshWrapper::SetRenderPriority (long rp)
 {
   render_priority = rp;
 
-  if (Parent) return ;
+  if (movable.GetParent ()) return ;
 
   int i;
   const iSectorList *sectors = movable.GetSectors ();
@@ -548,12 +551,17 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   csMeshWrapper *meshwrap = this;
   last_anim_time = lt;
   csMeshWrapper* lastparent = meshwrap;
-  csMeshWrapper* parent = csParent;
+  csMovable* parent = movable.GetParent ();
   while (parent != 0)
   {
-    parent->GetMeshObject()->PositionChild (lastparent->GetMeshObject(), lt);
-    lastparent = parent;
-    parent = parent->csParent;
+    iMeshWrapper* parent_mesh = parent->GetSceneNode ()->QueryMesh ();
+    if (parent_mesh)
+    {
+      parent_mesh->GetMeshObject()->PositionChild (
+      	lastparent->GetMeshObject(), lt);
+      lastparent = (csMeshWrapper*)parent_mesh;
+    }
+    parent = parent->GetParent ();
   }
 
   csRenderMesh** rmeshes = meshobj->GetRenderMeshes (n, rview, &movable,
@@ -808,11 +816,13 @@ void csMeshWrapper::HardTransform (const csReversibleTransform &t)
 {
   meshobj->HardTransform (t);
 
-  int i;
-  for (i = 0; i < children.GetCount (); i++)
+  const csRefArray<iSceneNode>& children = movable.GetChildren ();
+  size_t i;
+  for (i = 0 ; i < children.Length () ; i++)
   {
-    iMeshWrapper *spr = children.Get (i);
-    spr->HardTransform (t);
+    iMeshWrapper* mesh = children[i]->QueryMesh ();
+    if (mesh)
+      mesh->HardTransform (t);
   }
 }
 
@@ -826,29 +836,33 @@ csEllipsoid csMeshWrapper::GetRadius () const
 void csMeshWrapper::GetRadius (csVector3 &rad, csVector3 &cent) const
 {
   meshobj->GetObjectModel ()->GetRadius (rad, cent);
-  if (children.GetCount () > 0)
+  const csRefArray<iSceneNode>& children = movable.GetChildren ();
+  if (children.Length () > 0)
   {
     float max_radius = rad.x;
     if (max_radius < rad.y) max_radius = rad.y;
     if (max_radius < rad.z) max_radius = rad.z;
 
     csSphere sphere (cent, max_radius);
-    int i;
-    for (i = 0; i < children.GetCount (); i++)
+    size_t i;
+    for (i = 0; i < children.Length (); i++)
     {
-      iMeshWrapper *spr = children.Get (i);
-      csVector3 childrad, childcent;
-      spr->GetRadius (childrad, childcent);
+      iMeshWrapper *spr = children[i]->QueryMesh ();
+      if (spr)
+      {
+        csVector3 childrad, childcent;
+        spr->GetRadius (childrad, childcent);
 
-      float child_max_radius = childrad.x;
-      if (child_max_radius < childrad.y) child_max_radius = childrad.y;
-      if (child_max_radius < childrad.z) child_max_radius = childrad.z;
+        float child_max_radius = childrad.x;
+        if (child_max_radius < childrad.y) child_max_radius = childrad.y;
+        if (child_max_radius < childrad.z) child_max_radius = childrad.z;
 
-      csSphere childsphere (childcent, child_max_radius);
+        csSphere childsphere (childcent, child_max_radius);
 
-      // @@@ Is this the right transform?
-      childsphere *= spr->GetMovable ()->GetTransform ();
-      sphere += childsphere;
+        // @@@ Is this the right transform?
+        childsphere *= spr->GetMovable ()->GetTransform ();
+        sphere += childsphere;
+      }
     }
 
     rad.Set (sphere.GetRadius (), sphere.GetRadius (), sphere.GetRadius ());
@@ -876,7 +890,7 @@ float csMeshWrapper::GetSquaredDistance (iRenderView *rview)
 void csMeshWrapper::GetFullBBox (csBox3& box)
 {
   GetObjectModel ()->GetObjectBoundingBox (box);
-  iMovable* mov = &movable;
+  csMovable* mov = &movable;
   while (mov)
   {
     if (!mov->IsTransformIdentity ())
@@ -892,7 +906,7 @@ void csMeshWrapper::GetFullBBox (csBox3& box)
       b.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (7)));
       box = b;
     }
-    mov = mov->GetParent ();
+    mov = ((csMovable*)mov)->GetParent ();
   }
 }
 
@@ -1085,6 +1099,38 @@ float csMeshWrapper::GetScreenBoundingBox (
   return cbox.MaxZ ();
 }
 
+iMeshWrapper* csMeshWrapper::FindChildByName (const char* name)
+{
+  const csRefArray<iSceneNode>& children = movable.GetChildren ();
+  size_t i;
+
+  char const* p = strchr (name, ':');
+  if (!p)
+  {
+    for (i = 0 ; i < children.Length () ; i++)
+    {
+      iMeshWrapper* m = children[i]->QueryMesh ();
+      if (m && !strcmp (name, m->QueryObject ()->GetName ()))
+        return m;
+    }
+    return 0;
+  }
+ 
+  int firstsize = p-Name;
+  csString firstName;
+  firstName.Append (Name, firstsize);
+
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    iMeshWrapper* m = children[i]->QueryMesh ();
+    if (m && !strcmp (firstName, m->QueryObject ()->GetName ()))
+    {
+      return m->FindChildByName (p+1);
+    }
+  }
+  return 0;
+}
+
 // ---------------------------------------------------------------------------
 // csMeshFactoryWrapper
 // ---------------------------------------------------------------------------
@@ -1147,7 +1193,7 @@ void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)
 iMeshWrapper *csMeshFactoryWrapper::CreateMeshWrapper ()
 {
   csRef<iMeshObject> basemesh = meshFact->NewInstance ();
-  iMeshWrapper *mesh = (iMeshWrapper*)(new csMeshWrapper (0, basemesh));
+  iMeshWrapper *mesh = (iMeshWrapper*)(new csMeshWrapper (basemesh));
   basemesh->SetMeshWrapper (mesh);
 
   if (GetName ()) mesh->QueryObject ()->SetName (GetName ());
@@ -1177,7 +1223,7 @@ iMeshWrapper *csMeshFactoryWrapper::CreateMeshWrapper ()
   {
     iMeshFactoryWrapper *childfact = children.Get (i);
     iMeshWrapper *child = childfact->CreateMeshWrapper ();
-    mesh->GetChildren ()->Add (child);
+    child->QuerySceneNode ()->SetParent (mesh->QuerySceneNode ());
     child->GetMovable ()->SetTransform (childfact->GetTransform ());
     child->GetMovable ()->UpdateMove ();
 
@@ -1299,7 +1345,7 @@ iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
 
   iMeshWrapper* m = meshes_hash.Get (csStrKey (firstName), 0);
   if (!m) return 0;
-  return m->GetChildren ()->FindByName (p+1);
+  return m->FindChildByName (p+1);
 }
 
 int csMeshList::Add (iMeshWrapper *obj)
@@ -1360,6 +1406,7 @@ iMeshWrapper *csMeshList::FindByName (const char *Name) const
     return meshes_hash.Get (Name, 0);
 }
 
+#if 0
 //--------------------------------------------------------------------------
 // csMeshMeshList
 //--------------------------------------------------------------------------
@@ -1411,18 +1458,20 @@ void csMeshMeshList::FreeMesh (iMeshWrapper* item)
 
   for (int i = 0 ; i < mesh->GetCsMovable().GetSectors()->GetCount() ; i++)
   {
-    iSector* isector = (mesh->GetCsMovable ()).csMovable::GetSectors ()->Get (i);
+    iSector* isector = (mesh->GetCsMovable ()).csMovable::GetSectors ()
+    	->Get (i);
     csSector* sector = (csSector*)isector;
     sector->UnprepareMesh (item);
   }
 
   item->SetParentContainer (0);
-  item->GetMovable ()->SetParent (0);
+  ((csMovable*)(item->GetMovable ()))->SetParent (0);
 
   mesh->RemoveMeshFromStaticLOD (item);
 
   csMeshList::FreeMesh (item);
 }
+#endif
 
 //--------------------------------------------------------------------------
 // csMeshFactoryList

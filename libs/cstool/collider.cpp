@@ -35,6 +35,7 @@
 #include "iengine/region.h"
 #include "iengine/sector.h"
 #include "iengine/viscull.h"
+#include "iengine/scenenode.h"
 
 #include "igeom/objmodel.h"
 #include "igeom/polymesh.h"
@@ -186,12 +187,14 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
     cw->DecRef ();
   }
 
-  iMeshList* ml = mesh->GetChildren ();
-  int i;
-  for (i = 0 ; i < ml->GetCount () ; i++)
+  const csRefArray<iSceneNode>& ml = mesh->QuerySceneNode ()->GetChildren ();
+  size_t i;
+  for (i = 0 ; i < ml.Length () ; i++)
   {
-    iMeshWrapper* child = ml->Get (i);
-    InitializeCollisionWrapper (colsys, child);
+    iMeshWrapper* child = ml[i]->QueryMesh ();
+    // @@@ What if we have a light containing another mesh?
+    if (child)
+      InitializeCollisionWrapper (colsys, child);
   }
 
   return cw;

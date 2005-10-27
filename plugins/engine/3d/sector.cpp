@@ -228,12 +228,13 @@ void csSector::RegisterEntireMeshToCuller (iMeshWrapper* mesh)
   culler->RegisterVisObject (vo);
 
   if (cmesh->GetStaticLODMesh ()) return;
-  int i;
-  const csMeshMeshList& ml = cmesh->GetCsChildren ();
-  for (i = 0 ; i < ml.GetCount () ; i++)
+  size_t i;
+  const csRefArray<iSceneNode>& ml = cmesh->GetChildren ();
+  for (i = 0 ; i < ml.Length () ; i++)
   {
-    iMeshWrapper* child = ml.Get (i);
-    RegisterEntireMeshToCuller (child);
+    iMeshWrapper* child = ml[i]->QueryMesh ();
+    if (child)
+      RegisterEntireMeshToCuller (child);
   }
 }
 
@@ -260,12 +261,13 @@ void csSector::PrepareMesh (iMeshWrapper *mesh)
   if (do_camera) cameraMeshes.Push (mesh);
 
   if (culler) RegisterMeshToCuller (mesh);
-  int i;
-  iMeshList* ml = mesh->GetChildren ();
-  for (i = 0 ; i < ml->GetCount () ; i++)
+  size_t i;
+  const csRefArray<iSceneNode>& ml = ((csMeshWrapper*)mesh)->GetChildren ();
+  for (i = 0 ; i < ml.Length () ; i++)
   {
-    iMeshWrapper* child = ml->Get (i);
-    PrepareMesh (child);
+    iMeshWrapper* child = ml[i]->QueryMesh ();
+    if (child)
+      PrepareMesh (child);
   }
 }
 
@@ -274,12 +276,13 @@ void csSector::UnprepareMesh (iMeshWrapper *mesh)
   cameraMeshes.Delete (mesh);
 
   if (culler) UnregisterMeshToCuller (mesh);
-  int i;
-  iMeshList* ml = mesh->GetChildren ();
-  for (i = 0 ; i < ml->GetCount () ; i++)
+  size_t i;
+  const csRefArray<iSceneNode>& ml = ((csMeshWrapper*)mesh)->GetChildren ();
+  for (i = 0 ; i < ml.Length () ; i++)
   {
-    iMeshWrapper* child = ml->Get (i);
-    UnprepareMesh (child);
+    iMeshWrapper* child = ml[i]->QueryMesh ();
+    if (child)
+      UnprepareMesh (child);
   }
 }
 
@@ -289,12 +292,13 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
   bool do_camera = mesh->GetFlags ().Check (CS_ENTITY_CAMERA);
   if (do_camera) cameraMeshes.Push (mesh);
 
-  int i;
-  iMeshList* ml = mesh->GetChildren ();
-  for (i = 0 ; i < ml->GetCount () ; i++)
+  size_t i;
+  const csRefArray<iSceneNode>& ml = ((csMeshWrapper*)mesh)->GetChildren ();
+  for (i = 0 ; i < ml.Length () ; i++)
   {
-    iMeshWrapper* child = ml->Get (i);
-    RelinkMesh (child);
+    iMeshWrapper* child = ml[i]->QueryMesh ();
+    if (child)
+      RelinkMesh (child);
   }
 }
 
@@ -392,12 +396,14 @@ public:
   {
     csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
     ObjectVisible (cmesh, frustum_mask);
-    int i;
-    const csMeshMeshList& children = cmesh->GetCsChildren ();
-    for (i = 0 ; i < children.GetCount () ; i++)
+    size_t i;
+    const csRefArray<iSceneNode>& children = cmesh->GetChildren ();
+    for (i = 0 ; i < children.Length () ; i++)
     {
-      iMeshWrapper* child = children.Get (i);
-      MarkMeshAndChildrenVisible (child, frustum_mask);
+      iMeshWrapper* child = children[i]->QueryMesh ();
+      // @@@ Traverse too in case there are lights/cameras?
+      if (child)
+        MarkMeshAndChildrenVisible (child, frustum_mask);
     }
   }
 

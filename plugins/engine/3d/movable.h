@@ -26,12 +26,13 @@
 #include "csutil/scf_implementation.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
+#include "iengine/scenenode.h"
 
 class csVector3;
 class csMatrix3;
 class csMovable;
-class csMeshWrapper;
 class csLight;
+class csMeshWrapper;
 class csCamera;
 
 /// A list of sectors as the movable uses it
@@ -86,7 +87,10 @@ private:
    * returned) and the 'obj' transformation is relative to
    * the parent one. The pointer is not reference-counted.
    */
-  iMovable* parent;
+  csMovable* parent;
+
+  /// Children.
+  csRefArray<iSceneNode> scene_children;
 
   /**
    * Meshobject on which this movable operates.
@@ -94,7 +98,7 @@ private:
   csMeshWrapper* meshobject;
 
   /**
-   * Light on which this movable operates. 
+   * Light on which this movable operates.
    */
   csLight* lightobject;
 
@@ -117,51 +121,77 @@ public:
 
   /// Set meshobject on which this movable operates.
   void SetMeshWrapper (csMeshWrapper* obj)
-  { 
-    meshobject = obj; 
+  {
+    meshobject = obj;
   }
 
   /// Get the meshobject on which we operate.
   csMeshWrapper* GetMeshWrapper () const
-  { 
-    return meshobject; 
+  {
+    return meshobject;
   }
+
+  csRefArray<iSceneNode>& GetChildren () { return scene_children; }
+  const csRefArray<iSceneNode>& GetChildren () const { return scene_children; }
 
   /// Set light on which this movable operates.
   void SetLight (csLight* obj)
-  { 
-    lightobject = obj; 
+  {
+    lightobject = obj;
   }
 
   /// Get the light on which we operate.
-  csLight* GetLight () const
-  { 
-    return lightobject; 
+  csLight* GetCsLight () const
+  {
+    return lightobject;
   }
 
   /// Set camera on which this movable operates.
   void SetCamera (csCamera* obj)
-  { 
-    cameraobject = obj; 
+  {
+    cameraobject = obj;
   }
 
   /// Get the camera on which we operate.
-  csCamera* GetCamera () const
-  { 
-    return cameraobject; 
+  csCamera* GetCsCamera () const
+  {
+    return cameraobject;
   }
 
   /// Set the parent movable.
-  void SetParent (iMovable* par)
-  { 
-    parent = par; 
+  void SetParent (csMovable* par)
+  {
+    if (parent == par) return;
+  #if 0
+    if (parent)
+    {
+      csMovable* cparent = (csMovable*)parent;
+      csRefArray<iMovable>& parent_children = cparent->GetChildren ();
+      size_t idx = parent_children.Find ((iMovable*)this);
+      CS_ASSERT (idx != csArrayItemNotFound);
+      parent_children.DeleteIndex (idx);
+    }
+#endif
+    parent = par;
+#if 0
+    if (parent)
+    {
+      csMovable* cparent = (csMovable*)parent;
+      csRefArray<iMovable>& parent_children = cparent->GetChildren ();
+      size_t idx = parent_children.Find (par);
+      CS_ASSERT (idx == csArrayItemNotFound);
+      parent_children.Push ((iMovable*)this);
+    }
+#endif
   }
 
   /// Get the parent movable.
-  iMovable* GetParent () const
-  { 
-    return parent; 
+  csMovable* GetParent () const
+  {
+    return parent;
   }
+
+  virtual iSceneNode* GetSceneNode ();
 
   /**
    * Initialize the list of sectors to one sector where

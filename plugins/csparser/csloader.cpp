@@ -58,6 +58,7 @@
 #include "iengine/viscull.h"
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
+#include "iengine/scenenode.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "igraphic/imageio.h"
@@ -3226,7 +3227,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	    goto error;
 	  }
 	  sp->QueryObject ()->SetName (child->GetAttributeValue ("name"));
-          mesh->GetChildren ()->Add (sp);
+	  sp->QuerySceneNode ()->SetParent (mesh->QuerySceneNode ());
 	  sp->DecRef ();
         }
         break;
@@ -3243,7 +3244,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  {
 	    AddToRegion (ldr_context, sp->QueryObject ());
 	  }
-          mesh->GetChildren ()->Add (sp);
+	  sp->QuerySceneNode ()->SetParent (mesh->QuerySceneNode ());
         }
         break;
       case XMLTOKEN_LIGHT:
@@ -3251,7 +3252,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
           iLight * light = ParseStatlight (ldr_context, child);
           if (light)
           {
-            light->GetMovable ()->SetParent (mesh->GetMovable ());
+            light->QuerySceneNode ()->SetParent (mesh->QuerySceneNode ());
           }
           else
           {
@@ -5413,10 +5414,15 @@ void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper,
   while (lastMeshVisited < meshesArray.Length ())
   {
     // Get the children of the current mesh (ie 'mesh').
-    csRef<iMeshList> mL = meshesArray[lastMeshVisited++]->GetChildren ();
-    int i;
-    for (i = 0; i < mL->GetCount (); i++)
-      meshesArray.Push (mL->Get (i));
+    const csRefArray<iSceneNode>& ml = meshesArray[lastMeshVisited++]
+    	->QuerySceneNode ()->GetChildren ();
+    size_t i;
+    for (i = 0; i < ml.Length (); i++)
+    {
+      iMeshWrapper* m = ml[i]->QueryMesh ();
+      if (m)
+        meshesArray.Push (m);
+    }
   }
 
   return;

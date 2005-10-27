@@ -40,6 +40,7 @@ struct iLightingInfo;
 struct iMovable;
 struct iObject;
 struct iSector;
+struct iSceneNode;
 
 struct iBaseHalo;
 struct iCrossHalo;
@@ -264,6 +265,11 @@ struct iLight : public virtual iBase
 
   /// Get the movable for this light.
   virtual iMovable *GetMovable () = 0;
+
+  /**
+   * Get the scene node that this object represents.
+   */
+  virtual iSceneNode* QuerySceneNode () = 0;
 
   /// Get the diffuse color of this light.
   virtual const csColor& GetColor () const = 0;

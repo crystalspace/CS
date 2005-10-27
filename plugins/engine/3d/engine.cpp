@@ -305,8 +305,8 @@ iCollection *csCollectionList::FindByName (
 void csEngineMeshList::FreeMesh (iMeshWrapper* mesh)
 {
   mesh->GetMovable ()->ClearSectors ();
-  iMeshWrapper* p = mesh->GetParentContainer ();
-  if (p) p->GetChildren ()->Remove (mesh);
+  // @@@ Need similar for light/camera!
+  mesh->QuerySceneNode ()->SetParent (0);
   csMeshList::FreeMesh (mesh);
 }
 
@@ -1291,10 +1291,16 @@ iCacheManager* csEngine::GetCacheManager ()
 void csEngine::AddMeshAndChildren (iMeshWrapper* mesh)
 {
   meshes.Add (mesh);
-  iMeshList* ml = mesh->GetChildren ();
-  int i;
-  for (i = 0 ; i < ml->GetCount () ; i++)
-    AddMeshAndChildren (ml->Get (i));
+  // @@@ Consider no longer putting child meshes on main engine list???
+  const csRefArray<iSceneNode>& children = mesh->QuerySceneNode ()
+  	->GetChildren ();
+  size_t i;
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    iMeshWrapper* mesh = children[i]->QueryMesh ();
+    if (mesh)
+      AddMeshAndChildren (mesh);
+  }
 }
 
 void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
@@ -1457,7 +1463,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   {
     iMeshWrapper *s = meshes.Get (sn);
     if (s->GetMovable ()->GetSectors ()->GetCount () <= 0 &&
-	s->GetParentContainer () == 0)
+	s->QuerySceneNode ()->GetParent () == 0)
       continue;	// No sectors and no parent mesh, don't process lighting.
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
@@ -1544,7 +1550,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
   {
     iMeshWrapper *s = meshes.Get (sn);
     if (s->GetMovable ()->GetSectors ()->GetCount () <= 0 &&
-	s->GetParentContainer () == 0)
+	s->QuerySceneNode ()->GetParent () == 0)
       continue;	// No sectors or parent mesh, don't process lighting.
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
@@ -1611,10 +1617,14 @@ void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
   if (s->GetMeshObject ())
     s->GetMeshObject ()->GetRenderMeshes (num, rview,
       s->GetMovable (), 0xf);
-  iMeshList* children = s->GetChildren ();
-  int i;
-  for (i = 0 ; i < children->GetCount () ; i++)
-    PrecacheMesh (children->Get (i), rview);
+  const csRefArray<iSceneNode>& children = s->QuerySceneNode ()->GetChildren ();
+  size_t i;
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    iMeshWrapper* mesh = children[i]->QueryMesh ();
+    if (mesh)
+      PrecacheMesh (mesh, rview);
+  }
 }
 
 void csEngine::PrecacheDraw (iRegion* region)
@@ -3152,7 +3162,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
     plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
   if (!plug) return 0;
 
-  csMeshWrapper *meshwrap = new csMeshWrapper (0);
+  csMeshWrapper *meshwrap = new csMeshWrapper ();
   if (name) meshwrap->SetName (name);
 
   iMeshWrapper *imw = (iMeshWrapper*)meshwrap;
@@ -3203,18 +3213,29 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
   csRef<iPortalContainer> pc;
   if (name)
   {
-    mesh = parentMesh->GetChildren ()->FindByName (name);
-    if (mesh)
+    const csRefArray<iSceneNode>& children = parentMesh->QuerySceneNode ()->
+    	GetChildren ();
+    size_t i;
+    for (i = 0 ; i < children.Length () ; i++)
     {
-      pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	iPortalContainer);
-      if (!pc) mesh = 0;
+      // @@@ Not efficient.
+      iMeshWrapper* mesh = children[i]->QueryMesh ();
+      if (mesh)
+      {
+        if (!strcmp (name, mesh->QueryObject ()->GetName ()))
+	{
+	  pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  	    iPortalContainer);
+          if (!pc) mesh = 0;
+	  break;
+	}
+      }
     }
   }
   if (!mesh)
   {
     mesh = CreatePortalContainer (name);
-    parentMesh->GetChildren ()->Add (mesh);
+    mesh->QuerySceneNode ()->SetParent (parentMesh->QuerySceneNode ());
     pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
   	iPortalContainer);
   }
@@ -3279,7 +3300,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   iSector *sector,
   const csVector3 &pos)
 {
-  csMeshWrapper *meshwrap = new csMeshWrapper (0, mesh);
+  csMeshWrapper *meshwrap = new csMeshWrapper (mesh);
   if (name) meshwrap->SetName (name);
   GetMeshes ()->Add ((iMeshWrapper*)meshwrap);
   if (sector)
@@ -3295,7 +3316,7 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
 
 csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (const char *name)
 {
-  csMeshWrapper *meshwrap = new csMeshWrapper (0);
+  csMeshWrapper *meshwrap = new csMeshWrapper ();
   if (name) meshwrap->SetName (name);
   GetMeshes ()->Add ((iMeshWrapper*)meshwrap);
   return csPtr<iMeshWrapper> ((iMeshWrapper*)meshwrap);
@@ -3579,8 +3600,10 @@ bool csEngine::SetOption (int id, csVariant *value)
       csCamera::SetDefaultFOV (value->GetLong (), G3D->GetWidth ());
       break;
     case 1:
-      if (value->GetBool ()) csEngine::lightmapCacheMode = CS_ENGINE_CACHE_WRITE;
-      else                   csEngine::lightmapCacheMode = CS_ENGINE_CACHE_READ;
+      if (value->GetBool ())
+        csEngine::lightmapCacheMode = CS_ENGINE_CACHE_WRITE;
+      else
+        csEngine::lightmapCacheMode = CS_ENGINE_CACHE_READ;
       break;
     case 2:
       LoadDefaultRenderLoop (value->GetString ());
@@ -3595,9 +3618,15 @@ bool csEngine::GetOption (int id, csVariant *value)
 {
   switch (id)
   {
-    case 0:   value->SetLong (csCamera::GetDefaultFOV ()); break;
-    case 1:   value->SetBool (csEngine::lightmapCacheMode == CS_ENGINE_CACHE_WRITE); break;
-    case 2:   value->SetString (""); break; // @@@
+    case 0:
+      value->SetLong (csCamera::GetDefaultFOV ());
+      break;
+    case 1:
+      value->SetBool (csEngine::lightmapCacheMode == CS_ENGINE_CACHE_WRITE);
+      break;
+    case 2:
+      value->SetString ("");
+      break; // @@@
     default:  return false;
   }
 

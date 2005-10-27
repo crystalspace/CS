@@ -31,9 +31,10 @@
 #include "csutil/hash.h"
 #include "csutil/refarr.h"
 #include "plugins/engine/3d/lview.h"
-#include "iengine/light.h"
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/movable.h"
+#include "plugins/engine/3d/scenenode.h"
+#include "iengine/light.h"
 
 class csLightMap;
 class csPolygon3D;
@@ -78,10 +79,11 @@ public:
  * A light subclassing from this has a color, a position
  * and a radius.
  */
-class csLight : public scfImplementationExt2<csLight,
+class csLight : public scfImplementationExt3<csLight,
                                              csObject,
                                              iLight,
-                                             iVisibilityObject>
+                                             iVisibilityObject,
+					     iSceneNode>
 {
 private:
   /// ID for this light (16-byte MD5).
@@ -93,6 +95,7 @@ private:
 protected:
   /// Movable for the light
   csMovable movable; //@@MS: BAAAD 
+
   /// Color.
   csColor color;
   /// Specular color
@@ -461,13 +464,35 @@ public:
    */
   void OnSetPosition ();
 
-  virtual iObject *QueryObject() { return (iObject*)this; }
+  virtual iObject *QueryObject() { return this; }
+  virtual iSceneNode* QuerySceneNode () { return this; }
   csLight* GetPrivateObject () { return this; }
   //------------------- iVisibilityObject interface -----------------------
   virtual iMovable *GetMovable () const { return (iMovable*)&movable; }
   virtual iMeshWrapper* GetMeshWrapper () const { return 0; }
   virtual iObjectModel* GetObjectModel () { return object_model; }
   virtual csFlags& GetCullerFlags () { return culler_flags; }
+
+  //--------------------- iSceneNode implementation ----------------------//
+
+  virtual void SetParent (iSceneNode* parent)
+  {
+    csSceneNode::SetParent ((iSceneNode*)this, parent, &movable);
+  }
+  virtual iSceneNode* GetParent () const
+  {
+    if (movable.GetParent ())
+      return movable.GetParent ()->GetSceneNode ();
+    else
+      return 0;
+  }
+  virtual const csRefArray<iSceneNode>& GetChildren () const
+  {
+    return movable.GetChildren ();
+  }
+  virtual iMeshWrapper* QueryMesh () { return 0; }
+  virtual iLight* QueryLight () { return this; }
+  virtual iCamera* QueryCamera () { return 0; }
 
   //------------------------ iLight interface -----------------------------
   

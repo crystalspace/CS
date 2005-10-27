@@ -23,8 +23,10 @@
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
 #include "iengine/camera.h"
+#include "iengine/scenenode.h"
 
 #include "plugins/engine/3d/sector.h"
+#include "plugins/engine/3d/movable.h"
 
 class csEngine;
 
@@ -32,9 +34,12 @@ class csEngine;
  * A camera positioned in the 3D world.
  */
 class csCamera : public csOrthoTransform, 
-                 public scfImplementation1<csCamera, iCamera>
+                 public scfImplementation2<csCamera, iCamera, iSceneNode>
 {
 private:
+  /// @@@@@@@@@@@@@@  NOT USED YET!!!
+  csMovable movable;
+
   /// The sector the camera is in.
   iSector* sector;
   /// If true we are in a mirrored world.
@@ -387,6 +392,21 @@ public:
     *(csOrthoTransform*)this = tr;
     cameranr = cur_cameranr++;
   }
+  virtual iSceneNode* QuerySceneNode () { return this; }
+
+  //--------------------- iSceneNode implementation ----------------------//
+
+  virtual iMovable* GetMovable () const { return 0; }
+  virtual void SetParent (iSceneNode* parent) { }
+  virtual iSceneNode* GetParent () const { return 0; }
+  virtual const csRefArray<iSceneNode>& GetChildren () const
+  {
+    return movable.GetChildren ();
+  }
+  virtual iMeshWrapper* QueryMesh () { return 0; }
+  virtual iLight* QueryLight () { return 0; }
+  virtual iCamera* QueryCamera () { return this; }
+
 };
 
 #endif // __CS_CAMERA_H__

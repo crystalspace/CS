@@ -27,6 +27,7 @@
  * @{ */
  
 #include "csutil/scf.h"
+#include "csutil/refarr.h"
 
 class csMatrix3;
 class csReversibleTransform;
@@ -35,6 +36,7 @@ class csVector3;
 struct iMovable;
 struct iSector;
 struct iSectorList;
+struct iSceneNode;
 
 /**
  * Implement this class if you're interested in hearing about
@@ -81,17 +83,11 @@ struct iMovableListener : public virtual iBase
 struct iMovable : public virtual iBase
 {
   SCF_INTERFACE(iMovable, 2,0,0);
+
   /**
-   * Get the parent movable. This is relevant in case the object belonging
-   * to this movable is part of a hierarchical transformation.
+   * Get the scene node that this movable belongs too.
    */
-  virtual iMovable* GetParent () const = 0;
-  /**
-   * Set the parent movable. Usually you don't need to call this function
-   * yourselves as it is called automatically whenever you add some object
-   * to another parent (using iMeshWrapper->GetChildren ()->Add() for meshes).
-   */
-  virtual void SetParent (iMovable* parent) = 0;
+  virtual iSceneNode* GetSceneNode () = 0;
 
   /**
    * Initialize the list of sectors to one sector where
