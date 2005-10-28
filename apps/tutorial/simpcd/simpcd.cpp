@@ -372,7 +372,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   sprite1->GetMovable ()->UpdateMove ();
   spstate = SCF_QUERY_INTERFACE (sprite1->GetMeshObject (), iSprite3DState);
   spstate->SetAction ("default");
-  parent_sprite->GetChildren ()->Add (sprite1);
+  sprite1->QuerySceneNode ()->SetParent (parent_sprite->QuerySceneNode ());
 
   // Now create the second child.
   sprite2 = engine->CreateMeshWrapper (imeshfact, "Rotater2");
@@ -381,7 +381,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   sprite2->GetMovable ()->UpdateMove ();
   spstate = SCF_QUERY_INTERFACE (sprite2->GetMeshObject (), iSprite3DState);
   spstate->SetAction ("default");
-  parent_sprite->GetChildren ()->Add (sprite2);
+  sprite2->QuerySceneNode ()->SetParent (parent_sprite->QuerySceneNode ());
 
   //---------
   // We only do collision detection for the rotating children

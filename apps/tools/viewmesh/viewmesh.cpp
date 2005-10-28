@@ -23,6 +23,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/scfstr.h"
 #include "iutil/eventq.h"
+#include "iengine/scenenode.h"
 
 // Hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -742,7 +743,7 @@ void ViewMesh::AttachMesh (const char* path, const char* file)
     csRef<iMeshWrapper> meshWrapOld = selectedSocket->GetMeshWrapper();
     if ( meshWrapOld )
     {
-      spritewrapper->GetChildren()->Remove( meshWrapOld );
+      meshWrapOld->QuerySceneNode ()->SetParent (0);
       selectedSocket->SetMeshWrapper( 0 );    
     }
   }
@@ -751,7 +752,7 @@ void ViewMesh::AttachMesh (const char* path, const char* file)
     csRef<iMeshWrapper> meshWrapOld = selectedCal3dSocket->GetMeshWrapper();
     if ( meshWrapOld )
     {
-      spritewrapper->GetChildren()->Remove( meshWrapOld );
+      meshWrapOld->QuerySceneNode ()->SetParent (0);
       selectedCal3dSocket->SetMeshWrapper( 0 );    
     }
   }
@@ -793,14 +794,14 @@ void ViewMesh::AttachMesh (const char* path, const char* file)
 
   if (selectedSocket)
   {
-    spritewrapper->GetChildren()->Add( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (spritewrapper->QuerySceneNode ());
     selectedSocket->SetMeshWrapper( meshWrap );
     spritewrapper->GetMovable()->UpdateMove();
   }
   else if (selectedCal3dSocket)
   {
     selectedCal3dSocket->SetTransform(t);
-    spritewrapper->GetChildren()->Add( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (spritewrapper->QuerySceneNode ());
     selectedCal3dSocket->SetMeshWrapper( meshWrap );
     spritewrapper->GetMovable()->UpdateMove();
   }
@@ -1146,7 +1147,7 @@ void ViewMesh::SetRotX (intptr_t awst, iAwsSource *s)
   if (tut->selectedCal3dSocket && tut->selectedCal3dSocket->GetMeshWrapper())
   {
     csRef<iMeshWrapper> meshWrap = tut->selectedCal3dSocket->GetMeshWrapper();
-    tut->spritewrapper->GetChildren()->Remove( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (0);
     csReversibleTransform Tr;
     Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
     Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
@@ -1156,7 +1157,8 @@ void ViewMesh::SetRotX (intptr_t awst, iAwsSource *s)
     Tr.RotateOther(csVector3(0,0,1),tut->meshTz);
     meshWrap->GetMeshObject()->HardTransform(Tr);
     meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
-    tut->spritewrapper->GetChildren()->Add( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (tut->spritewrapper
+    	->QuerySceneNode ());
     tut->selectedCal3dSocket->SetMeshWrapper( meshWrap );
     tut->spritewrapper->GetMovable()->UpdateMove();
     tut->meshTx = f;
@@ -1164,7 +1166,7 @@ void ViewMesh::SetRotX (intptr_t awst, iAwsSource *s)
   else if (tut->selectedSocket && tut->selectedSocket->GetMeshWrapper())
   {
     csRef<iMeshWrapper> meshWrap = tut->selectedSocket->GetMeshWrapper();
-    tut->spritewrapper->GetChildren()->Remove( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (0);
     csReversibleTransform Tr;
     Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
     Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
@@ -1174,7 +1176,8 @@ void ViewMesh::SetRotX (intptr_t awst, iAwsSource *s)
     Tr.RotateOther(csVector3(0,0,1),tut->meshTz);
     meshWrap->GetMeshObject()->HardTransform(Tr);
     meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
-    tut->spritewrapper->GetChildren()->Add( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (tut->spritewrapper
+    	->QuerySceneNode ());
     tut->selectedSocket->SetMeshWrapper( meshWrap );
     tut->spritewrapper->GetMovable()->UpdateMove();
     tut->meshTx = f;
@@ -1196,7 +1199,7 @@ void ViewMesh::SetRotY (intptr_t awst, iAwsSource *s)
   if (tut->selectedCal3dSocket && tut->selectedCal3dSocket->GetMeshWrapper())
   {
     csRef<iMeshWrapper> meshWrap = tut->selectedCal3dSocket->GetMeshWrapper();
-    tut->spritewrapper->GetChildren()->Remove( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (0);
     csReversibleTransform Tr;
     Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
     Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
@@ -1206,7 +1209,8 @@ void ViewMesh::SetRotY (intptr_t awst, iAwsSource *s)
     Tr.RotateOther(csVector3(0,0,1),tut->meshTz);
     meshWrap->GetMeshObject()->HardTransform(Tr);
     meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
-    tut->spritewrapper->GetChildren()->Add( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (tut->spritewrapper
+    	->QuerySceneNode ());
     tut->selectedCal3dSocket->SetMeshWrapper( meshWrap );
     tut->spritewrapper->GetMovable()->UpdateMove();
     tut->meshTy = f;
@@ -1214,7 +1218,7 @@ void ViewMesh::SetRotY (intptr_t awst, iAwsSource *s)
   else if (tut->selectedSocket && tut->selectedSocket->GetMeshWrapper())
   {
     csRef<iMeshWrapper> meshWrap = tut->selectedSocket->GetMeshWrapper();
-    tut->spritewrapper->GetChildren()->Remove( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (0);
     csReversibleTransform Tr;
     Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
     Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
@@ -1224,7 +1228,8 @@ void ViewMesh::SetRotY (intptr_t awst, iAwsSource *s)
     Tr.RotateOther(csVector3(0,0,1),tut->meshTz);
     meshWrap->GetMeshObject()->HardTransform(Tr);
     meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
-    tut->spritewrapper->GetChildren()->Add( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (tut->spritewrapper
+    	->QuerySceneNode ());
     tut->selectedSocket->SetMeshWrapper( meshWrap );
     tut->spritewrapper->GetMovable()->UpdateMove();
     tut->meshTy = f;
@@ -1246,7 +1251,7 @@ void ViewMesh::SetRotZ (intptr_t awst, iAwsSource *s)
   if (tut->selectedCal3dSocket && tut->selectedCal3dSocket->GetMeshWrapper())
   {
     csRef<iMeshWrapper> meshWrap = tut->selectedCal3dSocket->GetMeshWrapper();
-    tut->spritewrapper->GetChildren()->Remove( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (0);
     csReversibleTransform Tr;
     Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
     Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
@@ -1256,7 +1261,8 @@ void ViewMesh::SetRotZ (intptr_t awst, iAwsSource *s)
     Tr.RotateOther(csVector3(0,0,1),f);
     meshWrap->GetMeshObject()->HardTransform(Tr);
     meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
-    tut->spritewrapper->GetChildren()->Add( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (tut->spritewrapper
+    	->QuerySceneNode ());
     tut->selectedCal3dSocket->SetMeshWrapper( meshWrap );
     tut->spritewrapper->GetMovable()->UpdateMove();
     tut->meshTz = f;
@@ -1264,7 +1270,7 @@ void ViewMesh::SetRotZ (intptr_t awst, iAwsSource *s)
   else if (tut->selectedSocket && tut->selectedSocket->GetMeshWrapper())
   {
     csRef<iMeshWrapper> meshWrap = tut->selectedSocket->GetMeshWrapper();
-    tut->spritewrapper->GetChildren()->Remove( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (0);
     csReversibleTransform Tr;
     Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
     Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
@@ -1274,7 +1280,8 @@ void ViewMesh::SetRotZ (intptr_t awst, iAwsSource *s)
     Tr.RotateOther(csVector3(0,0,1),f);
     meshWrap->GetMeshObject()->HardTransform(Tr);
     meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
-    tut->spritewrapper->GetChildren()->Add( meshWrap );
+    meshWrap->QuerySceneNode ()->SetParent (tut->spritewrapper
+    	->QuerySceneNode ());
     tut->selectedSocket->SetMeshWrapper( meshWrap );
     tut->spritewrapper->GetMovable()->UpdateMove();
     tut->meshTz = f;
@@ -1301,7 +1308,7 @@ void ViewMesh::DetachButton (intptr_t awst, iAwsSource *s)
   
   if (!meshWrapOld ) return;
 
-  tut->spritewrapper->GetChildren()->Remove( meshWrapOld );
+  meshWrapOld->QuerySceneNode ()->SetParent (0);
 
   tut->engine->RemoveObject(meshWrapOld);
   tut->engine->RemoveObject(meshWrapOld->GetFactory());

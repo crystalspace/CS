@@ -45,6 +45,7 @@
 #include "ivideo/natwin.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
+#include "iengine/scenenode.h"
 
 #include "geometryextract.h"
 #include "lighter.h"
@@ -314,12 +315,14 @@ bool Lighter::ScanMesh (iMeshWrapper* mesh, iSector *sector)
   }
 
   
-  iMeshList* ml = mesh->GetChildren ();
-  for (i = 0 ; i < ml->GetCount () ; i++)
+  const csRefArray<iSceneNode>& ml = mesh->QuerySceneNode ()->GetChildren ();
+  size_t j;
+  for (j = 0 ; j < ml.Length () ; j++)
   {
-    iMeshWrapper* m = ml->Get (i);
-    if (!ScanMesh (m, sector))
-      return false;
+    iMeshWrapper* m = ml[i]->QueryMesh ();
+    if (m)
+      if (!ScanMesh (m, sector))
+        return false;
   }
   return true;
 }
