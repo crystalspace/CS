@@ -161,28 +161,7 @@ public:
   /// Set the parent movable.
   void SetParent (csMovable* par)
   {
-    if (parent == par) return;
-  #if 0
-    if (parent)
-    {
-      csMovable* cparent = (csMovable*)parent;
-      csRefArray<iMovable>& parent_children = cparent->GetChildren ();
-      size_t idx = parent_children.Find ((iMovable*)this);
-      CS_ASSERT (idx != csArrayItemNotFound);
-      parent_children.DeleteIndex (idx);
-    }
-#endif
     parent = par;
-#if 0
-    if (parent)
-    {
-      csMovable* cparent = (csMovable*)parent;
-      csRefArray<iMovable>& parent_children = cparent->GetChildren ();
-      size_t idx = parent_children.Find (par);
-      CS_ASSERT (idx == csArrayItemNotFound);
-      parent_children.Push ((iMovable*)this);
-    }
-#endif
   }
 
   /// Get the parent movable.
@@ -222,7 +201,8 @@ public:
    */
   bool InSector () const
   {
-    return sectors.Length () > 0;
+    if (parent) return parent->InSector ();
+    else return sectors.Length () > 0;
   }
 
   /**

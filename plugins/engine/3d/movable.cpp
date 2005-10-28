@@ -137,6 +137,7 @@ void csMovable::Transform (const csMatrix3 &matrix)
 
 void csMovable::SetSector (iSector *sector)
 {
+  if (parent != 0) return;
   if (sectors.Length () == 1 && sector == sectors[0]) return ;
   ClearSectors ();
   if (sectors.PrepareSector (sector))
@@ -145,12 +146,12 @@ void csMovable::SetSector (iSector *sector)
 
 void csMovable::ClearSectors ()
 {
-  if (meshobject) meshobject->RemoveFromSectors ();
-  if (parent == 0)
-  {
+  //if (parent == 0)
+  //{
+    if (meshobject) meshobject->RemoveFromSectors ();
     sectors.DeleteAll ();
     sectors.SetLength (0);
-  }
+  //}
 }
 
 void csMovable::AddListener (iMovableListener *listener)

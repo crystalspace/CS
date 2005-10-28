@@ -680,10 +680,7 @@ public:
 
   //--------------------- iSceneNode implementation ----------------------//
 
-  virtual void SetParent (iSceneNode* parent)
-  {
-    csSceneNode::SetParent ((iSceneNode*)this, parent, &movable);
-  }
+  virtual void SetParent (iSceneNode* parent);
   virtual iSceneNode* GetParent () const
   {
     if (movable.GetParent ())

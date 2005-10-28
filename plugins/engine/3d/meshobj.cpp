@@ -647,6 +647,30 @@ void csMeshWrapper::SetMaximumRenderDistanceVar (iSharedVariable* max)
   }
 }
 
+void csMeshWrapper::SetParent (iSceneNode* parent)
+{
+  csMovable* parent_mov = movable.GetParent ();
+  if (!parent_mov && !parent) return;
+  if (parent_mov && parent_mov->GetSceneNode () == parent) return;
+
+  // Incref to make sure we don't ditch our only reference here!
+  this->IncRef ();
+
+  //if (!movable.GetParent ())
+  //{
+    //// Unlink from main engine list.
+    //csEngine::currentEngine->GetMeshes ()->Remove ((iMeshWrapper*)this);
+  //}
+  csSceneNode::SetParent ((iSceneNode*)this, parent, &movable);
+  //if (!movable.GetParent ())
+  //{
+    //// Link to main engine list.
+    //csEngine::currentEngine->GetMeshes ()->Add ((iMeshWrapper*)this);
+  //}
+
+  this->DecRef ();
+}
+
 //----- Static LOD ----------------------------------------------------------
 
 iLODControl* csMeshWrapper::CreateStaticLOD ()

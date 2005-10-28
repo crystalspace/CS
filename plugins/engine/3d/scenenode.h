@@ -51,8 +51,10 @@ public:
     {
       parent_mov = (csMovable*)(parent->GetMovable ());
       csRefArray<iSceneNode>& parent_children = parent_mov->GetChildren ();
+#ifdef CS_DEBUG
       size_t idx = parent_children.Find (parent);
       CS_ASSERT (idx == csArrayItemNotFound);
+#endif
       parent_children.Push (this_node);
     }
   }

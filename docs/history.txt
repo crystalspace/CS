@@ -12,6 +12,11 @@ chronological order.
 	- Jorrit optimized thing, genmesh, and bruteblock mesh objects slightly
 	  by avoiding the unneeded SCF_QUERY_INTERFACE for getting an
 	  iMeshWrapper from an iMeshWrapper.
+	- Jorrit fixed the movable so that InSector() considers parent
+	  movables too. So the movable will be in a sector if the root movable
+	  is in a sector.
+	- Jorrit did some attempts to fix lighting issues with the new
+	  hierarchical meshes. Not yet successful.
 27-Oct-2005
 	- Jorrit did a big change to the way hierarchical objects are managed
 	  in the engine. Meshes and lights can now properly be used as
