@@ -656,17 +656,37 @@ void csMeshWrapper::SetParent (iSceneNode* parent)
   // Incref to make sure we don't ditch our only reference here!
   this->IncRef ();
 
-  //if (!movable.GetParent ())
-  //{
-    //// Unlink from main engine list.
-    //csEngine::currentEngine->GetMeshes ()->Remove ((iMeshWrapper*)this);
-  //}
+  ClearFromSectorPortalLists ();
+
+  if (!movable.GetParent ())
+  {
+    // Unlink from main engine list.
+    csEngine::currentEngine->GetMeshes ()->Remove ((iMeshWrapper*)this);
+  }
   csSceneNode::SetParent ((iSceneNode*)this, parent, &movable);
-  //if (!movable.GetParent ())
-  //{
-    //// Link to main engine list.
-    //csEngine::currentEngine->GetMeshes ()->Add ((iMeshWrapper*)this);
-  //}
+
+  /* csSector->PrepareMesh tells the culler about the mesh
+     (since removing the mesh above also removes it from the culler...) */
+  // First we find the top-level parent.
+  iSceneNode* toplevel = (iSceneNode*)this;
+  while (toplevel->GetParent ())
+    toplevel = toplevel->GetParent ();
+  iMovable* mov = toplevel->GetMovable ();
+  iSectorList* sl = mov->GetSectors ();
+  for (int i = 0 ; i < sl->GetCount() ; i++)
+  {
+    csSector* sector = (csSector*)(sl->Get (i));
+    sector->UnprepareMesh (this);
+    sector->PrepareMesh (this);
+  }
+
+  if (!movable.GetParent ())
+  {
+    // Link to main engine list.
+    csEngine::currentEngine->GetMeshes ()->Add ((iMeshWrapper*)this);
+  }
+
+  AddToSectorPortalLists ();
 
   this->DecRef ();
 }

@@ -17,6 +17,7 @@ chronological order.
 	  is in a sector.
 	- Jorrit did some attempts to fix lighting issues with the new
 	  hierarchical meshes. Not yet successful.
+	- Jorrit fixed lighting and culling for hierarchical meshes again.
 27-Oct-2005
 	- Jorrit did a big change to the way hierarchical objects are managed
 	  in the engine. Meshes and lights can now properly be used as
