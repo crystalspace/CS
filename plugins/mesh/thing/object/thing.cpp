@@ -1616,17 +1616,13 @@ char* csThing::GenerateCacheName ()
 
   if (logparent)
   {
-    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
-    if (mw)
-    {
-      if (mw->QueryObject ()->GetName ())
-        mf.Write (mw->QueryObject ()->GetName (),
-                strlen (mw->QueryObject ()->GetName ()));
-      iSector* sect = mw->GetMovable ()->GetSectors ()->Get (0);
-      if (sect && sect->QueryObject ()->GetName ())
-        mf.Write (sect->QueryObject ()->GetName (),
+    iObject* o = logparent->QueryObject ();
+    if (o->GetName ())
+      mf.Write (o->GetName (), strlen (o->GetName ()));
+    iSector* sect = logparent->GetMovable ()->GetSectors ()->Get (0);
+    if (sect && sect->QueryObject ()->GetName ())
+      mf.Write (sect->QueryObject ()->GetName (),
                 strlen (sect->QueryObject ()->GetName ()));
-    }
   }
 
   l = csConvertEndian ((int32)csQint ((b.MinX () * 1000)+.5));
@@ -2309,8 +2305,7 @@ bool csThing::ReadFromCache (iCacheManager* cache_mgr)
   const char* thing_name = 0;
   if (csThingObjectType::do_verbose && logparent)
   {
-    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
-    if (mw) thing_name = mw->QueryObject ()->GetName ();
+    thing_name = logparent->QueryObject ()->GetName ();
   }
 
   bool rc = true;

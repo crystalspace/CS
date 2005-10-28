@@ -9,6 +9,9 @@ chronological order.
 28-Oct-2005
 	- Jorrit fixed lighter, simpcd, and viewmesh so that they work after
 	  yesterday's changes.
+	- Jorrit optimized thing, genmesh, and bruteblock mesh objects slightly
+	  by avoiding the unneeded SCF_QUERY_INTERFACE for getting an
+	  iMeshWrapper from an iMeshWrapper.
 27-Oct-2005
 	- Jorrit did a big change to the way hierarchical objects are managed
 	  in the engine. Meshes and lights can now properly be used as

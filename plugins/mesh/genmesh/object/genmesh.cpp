@@ -348,45 +348,41 @@ char* csGenmeshMeshObject::GenerateCacheName ()
 
   if (logparent)
   {
-    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
-    if (mw)
-    {
-      if (mw->QueryObject ()->GetName ())
-        mf.Write (mw->QueryObject ()->GetName (),
-        strlen (mw->QueryObject ()->GetName ()));
-      iMovable* movable = mw->GetMovable ();
-      iSector* sect = movable->GetSectors ()->Get (0);
-      if (sect && sect->QueryObject ()->GetName ())
-        mf.Write (sect->QueryObject ()->GetName (),
+    if (logparent->QueryObject ()->GetName ())
+      mf.Write (logparent->QueryObject ()->GetName (),
+        strlen (logparent->QueryObject ()->GetName ()));
+    iMovable* movable = logparent->GetMovable ();
+    iSector* sect = movable->GetSectors ()->Get (0);
+    if (sect && sect->QueryObject ()->GetName ())
+      mf.Write (sect->QueryObject ()->GetName (),
         strlen (sect->QueryObject ()->GetName ()));
-      csVector3 pos = movable->GetFullPosition ();
-      l = csConvertEndian ((int32)csQint ((pos.x * 1000)+.5));
-      mf.Write ((char*)&l, 4);
-      l = csConvertEndian ((int32)csQint ((pos.y * 1000)+.5));
-      mf.Write ((char*)&l, 4);
-      l = csConvertEndian ((int32)csQint ((pos.z * 1000)+.5));
-      mf.Write ((char*)&l, 4);
-      csReversibleTransform tr = movable->GetFullTransform ();
-      const csMatrix3& o2t = tr.GetO2T ();
-      l = csConvertEndian ((int32)csQint ((o2t.m11 * 1000)+.5));
-      mf.Write ((char*)&l, 4);
-      l = csConvertEndian ((int32)csQint ((o2t.m12 * 1000)+.5));
-      mf.Write ((char*)&l, 4);
-      l = csConvertEndian ((int32)csQint ((o2t.m13 * 1000)+.5));
-      mf.Write ((char*)&l, 4);
-      l = csConvertEndian ((int32)csQint ((o2t.m21 * 1000)+.5));
-      mf.Write ((char*)&l, 4);
-      l = csConvertEndian ((int32)csQint ((o2t.m22 * 1000)+.5));
-      mf.Write ((char*)&l, 4);
-      l = csConvertEndian ((int32)csQint ((o2t.m23 * 1000)+.5));
-      mf.Write ((char*)&l, 4);
-      l = csConvertEndian ((int32)csQint ((o2t.m31 * 1000)+.5));
-      mf.Write ((char*)&l, 4);
-      l = csConvertEndian ((int32)csQint ((o2t.m32 * 1000)+.5));
-      mf.Write ((char*)&l, 4);
-      l = csConvertEndian ((int32)csQint ((o2t.m33 * 1000)+.5));
-      mf.Write ((char*)&l, 4);
-    }
+    csVector3 pos = movable->GetFullPosition ();
+    l = csConvertEndian ((int32)csQint ((pos.x * 1000)+.5));
+    mf.Write ((char*)&l, 4);
+    l = csConvertEndian ((int32)csQint ((pos.y * 1000)+.5));
+    mf.Write ((char*)&l, 4);
+    l = csConvertEndian ((int32)csQint ((pos.z * 1000)+.5));
+    mf.Write ((char*)&l, 4);
+    csReversibleTransform tr = movable->GetFullTransform ();
+    const csMatrix3& o2t = tr.GetO2T ();
+    l = csConvertEndian ((int32)csQint ((o2t.m11 * 1000)+.5));
+    mf.Write ((char*)&l, 4);
+    l = csConvertEndian ((int32)csQint ((o2t.m12 * 1000)+.5));
+    mf.Write ((char*)&l, 4);
+    l = csConvertEndian ((int32)csQint ((o2t.m13 * 1000)+.5));
+    mf.Write ((char*)&l, 4);
+    l = csConvertEndian ((int32)csQint ((o2t.m21 * 1000)+.5));
+    mf.Write ((char*)&l, 4);
+    l = csConvertEndian ((int32)csQint ((o2t.m22 * 1000)+.5));
+    mf.Write ((char*)&l, 4);
+    l = csConvertEndian ((int32)csQint ((o2t.m23 * 1000)+.5));
+    mf.Write ((char*)&l, 4);
+    l = csConvertEndian ((int32)csQint ((o2t.m31 * 1000)+.5));
+    mf.Write ((char*)&l, 4);
+    l = csConvertEndian ((int32)csQint ((o2t.m32 * 1000)+.5));
+    mf.Write ((char*)&l, 4);
+    l = csConvertEndian ((int32)csQint ((o2t.m33 * 1000)+.5));
+    mf.Write ((char*)&l, 4);
   }
 
   l = csConvertEndian ((int32)csQint ((b.MinX () * 1000)+.5));
