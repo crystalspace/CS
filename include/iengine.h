@@ -46,6 +46,7 @@
 #include "iengine/rendersteps/irenderstep.h"
 #include "iengine/rendersteps/irsfact.h"
 #include "iengine/rview.h"
+#include "iengine/scenenode.h"
 #include "iengine/sector.h"
 #include "iengine/shadcast.h"
 #include "iengine/shadows.h"
