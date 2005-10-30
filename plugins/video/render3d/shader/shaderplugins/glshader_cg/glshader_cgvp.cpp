@@ -92,7 +92,6 @@ csVertexAttrib csShaderGLCGVP::ResolveBufferDestination (const char* binding)
 	  dest = CS_VATTRIB_FOGCOORD;
 	  break;
         default:
-	  // Should never arrive here? (ASSERT?)
 	  break;
       }
     }
