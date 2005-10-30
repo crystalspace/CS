@@ -109,6 +109,7 @@ class VertexOutput : public VertexOutputBase
 public:
   VertexOutput (uint8* in, size_t inStride, float* out) :
     VertexOutputBase (in, inStride, out) {}
+  virtual ~VertexOutput() {}
 
   virtual void Copy (size_t idx)
   {
@@ -174,7 +175,7 @@ class BuffersClipper
   void SetupVOut2 (size_t i, const VertexBuffer& inBuffer, 
     const size_t inStride, const VertexBuffer& outBuffer)
   {
-    new (&vout[i]) VertexOutput<Ni, No> (inBuffer.data, inStride,
+    (void)new (&vout[i]) VertexOutput<Ni, No> (inBuffer.data, inStride,
       (float*)outBuffer.data);
   }
   template<int Ni>
