@@ -91,6 +91,9 @@ csVertexAttrib csShaderGLCGVP::ResolveBufferDestination (const char* binding)
 	case CG_FOG0:
 	  dest = CS_VATTRIB_FOGCOORD;
 	  break;
+        default:
+	  // Should never arrive here? (ASSERT?)
+	  break;
       }
     }
   }
