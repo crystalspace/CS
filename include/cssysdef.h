@@ -425,14 +425,15 @@ void Name (void (*p)())                                                \
 #endif
 
 /**\def CS_IMPLEMENT_STATIC_VAR(getterFunc,Type,initParam,kill_how)
- * Create a global variable thats created on demand. Create a Getter function
- * to access the variable and a destruction function. The Getter function will
- * register the destruction function on first invocation. Example:
+ * Implement a file-scoped static variable that is created on demand. Defines a
+ * 'getter' function to access the variable and a 'destruction' function. The
+ * 'getter' function will register the 'destruction' function on first
+ * invocation. Example:
  * <pre>
  * CS_IMPLEMENT_STATIC_VAR (GetVertexPool, csVertexPool,)
  * </pre>
- * This will give you a global function GetVertexPool that returns a pointer to
- * a static variable.
+ * This will give you a file-scoped static 'getter' function GetVertexPool()
+ * that returns a pointer to a static variable.
  */
 
 #ifndef CS_IMPLEMENT_STATIC_VAR_EXT
