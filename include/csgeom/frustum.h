@@ -330,12 +330,9 @@ public:
   void ClipPolyToPlane (csPlane3* plane);
 
   /**
-   * Intersect with another frustum. The other frustum
-   * must have the same origin as this one. Otherwise the
-   * result is undefined.
-   * Returns new frustum which you should delete
-   * after usage. If there is no intersection this function
-   * returns 0.
+   * Intersect with another frustum. The other frustum must have the same
+   * origin as this one. Otherwise the result is undefined.
+   * \return The new frustum. If there is no intersection then 0 is returned.
    */
   csPtr<csFrustum> Intersect (const csFrustum& other) const;
 
