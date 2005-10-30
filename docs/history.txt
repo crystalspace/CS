@@ -20,7 +20,7 @@ chronological order.
 	    - Took SR-related projects out of the VC6 workspaces.
 	    - Added a workaround for timing problems on Win32 on multiprocessor
 	      machines.
-	    - Made some reftracker-related tweas.
+	    - Made some reftracker-related tweaks.
 	    - Added a (incomplete and still disabled) Cg-based implementation
 	      of the std_lighting shader.
 	- res fixed shader fallbacks in the (common) case that the variants
