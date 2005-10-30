@@ -1549,31 +1549,26 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
       }
       compiler->vfs->PopDir ();
 
-      var.prepared = true;
-      if (var.tech == 0)
-      {
-	if (fallbackShader.IsValid())
-	{
-	  if (compiler->do_verbose)
-	  {
-	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      "No technique validated for shader '%s'<%zu>: using fallback", 
-	      GetName(), vi);
-	  }
-	  size_t vc = resolver->GetVariantCount();
-	  if (vc == 0) vc = 1;
-	  vi = fallbackShader->GetTicket (modes, stacks) + vc;	    
-	  var.ticketOverride = vi;
-	}
-	else
-	  compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-	    "No technique validated for shader '%s'<%zu>", GetName(), vi);
-      }
+      var.prepared = var.tech != 0;
     }
-    else
+    if (var.tech == 0)
     {
-      if (var.ticketOverride != (size_t)~0)
-	vi = var.ticketOverride;
+      if (fallbackShader.IsValid())
+      {
+	if (compiler->do_verbose && !var.prepared)
+	{
+	  compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    "No technique validated for shader '%s'<%zu>: using fallback", 
+	    GetName(), vi);
+	}
+	size_t vc = resolver->GetVariantCount();
+	if (vc == 0) vc = 1;
+	vi = fallbackShader->GetTicket (modes, stacks) + vc;	    
+      }
+      else if (!var.prepared)
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	  "No technique validated for shader '%s'<%zu>", GetName(), vi);
+      var.prepared = true;
     }
   }
   resolver->SetEvalParams (0, 0);

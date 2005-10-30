@@ -296,13 +296,11 @@ class csXMLShader : public scfImplementationExt1<csXMLShader,
   {
     csXMLShaderTech* tech;
     bool prepared;
-    size_t ticketOverride;
 
     ShaderVariant() 
     {
       tech = 0;
       prepared = false;
-      ticketOverride = (size_t)~0;
     }
   };
   csArray<ShaderVariant> variants;
