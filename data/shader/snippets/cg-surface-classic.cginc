@@ -9,13 +9,22 @@ struct AppToVert_Surface
     float2 texCoord;
   <?endif?>
 };
+
 struct VertToFrag_Surface
 {
   void _dummy_struct_non_empty() {}
   <?if vars."tex diffuse".texture ?>
     float2 texCoord;
   <?endif?>
+  
+  void Compute (AppToVert_Surface IN)
+  {
+  <?if vars."tex diffuse".texture ?>
+    texCoord = IN.texCoord;
+  <?endif?>
+  }
 };
+
 struct AppToFrag_Surface
 {
 <?if vars."tex diffuse".texture ?>
@@ -23,21 +32,18 @@ struct AppToFrag_Surface
 <?else?>
     float4 flatcolor;
 <?endif?>
-};
-
-<?template ComputeVertex_Surface OUT IN?>
+  
+  float4 GetDiffuse (VertToFrag_Surface V2F)
+  {
+    float4 result;
   <?if vars."tex diffuse".texture ?>
-    $OUT$.texCoord = $IN$.texCoord;
-  <?endif?>
-<?endtemplate?>
-
-<?template ComputeFragment_Surface OUT V2F A2F ?>
-  <?if vars."tex diffuse".texture ?>
-    $OUT$ = tex2D ($A2F$.texture, $V2F$.texCoord);
+    result = tex2D (texture, V2F.texCoord);
   <?else?>
-    $OUT$ = $A2F$.flatcolor;
+    result = flatcolor;
   <?endif?>
-<?endtemplate?>
+    return result;
+  }
+};
 
 #endif // __CS_SHADER_SURFACE_CLASSIC_CG__
 </include>

@@ -35,8 +35,8 @@ VertToFrag VertexMain (AppToVert A2V,
   VertToFrag V2F;
 
   V2F.Hposition = mul (ModelViewProj, A2V.Position);
-  <?ComputeVertex_Surface V2F.surface A2V.surface ?>
-  <?ComputeVertex_Lighting V2F.lighting A2V.lighting ?>
+  V2F.surface.Compute (A2V.surface);
+  V2F.lighting.Compute (A2V.lighting);
 
   return V2F;
 }
@@ -44,9 +44,8 @@ VertToFrag VertexMain (AppToVert A2V,
 float4 FragmentMain (VertToFrag V2F,
 		     uniform AppToFrag A2F) : COLOR
 {
-  float4 diffuse, color;
-  <?ComputeFragment_Surface diffuse V2F.surface A2F.surface ?>
-  <?ComputeFragment_Lighting color V2F.lighting A2F.lighting ?>
+  float4 diffuse = A2F.surface.GetDiffuse (V2F.surface);
+  float4 color = A2F.lighting.GetLighting (V2F.lighting);
   return diffuse * color;
 }
 

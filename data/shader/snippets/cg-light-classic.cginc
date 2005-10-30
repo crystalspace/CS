@@ -9,33 +9,39 @@ struct AppToVert_Lighting
     float2 texCoordLM;
   <?endif?>
 };
+
 struct VertToFrag_Lighting
 {
   float4 color : COLOR;
   <?if vars."tex lightmap".texture ?>
     float2 texCoordLM;
   <?endif?>
+  
+  void Compute (AppToVert_Lighting IN)
+  {
+    color = IN.color;
+  <?if vars."tex lightmap".texture ?>
+    texCoordLM = IN.texCoordLM;
+  <?endif?>
+  }
 };
+
 struct AppToFrag_Lighting
 {
   sampler2D lightmap;
-};
-
-<?template ComputeVertex_Lighting V2F A2V?>
-  $V2F$.color = $A2V$.color;
+  
+  float4 GetLighting (VertToFrag_Lighting V2F)
+  {
+    float4 result;
   <?if vars."tex lightmap".texture ?>
-    $V2F$.texCoordLM = $A2V$.texCoordLM;
-  <?endif?>
-<?endtemplate?>
-
-<?template ComputeFragment_Lighting OUT V2F A2F ?>
-  <?if vars."tex lightmap".texture ?>
-    $OUT$ = 2 * tex2D ($A2F$.lightmap, $V2F$.texCoordLM);
-    $OUT$.a *= $V2F$.color.a;
+    result = 2 * tex2D (lightmap, V2F.texCoordLM);
+    result.a *= V2F.color.a;
   <?else?>
-    $OUT$ = $V2F$.color;
+    result = V2F.color;
   <?endif?>
-<?endtemplate?>
+    return result;
+  }
+};
 
 #endif // __CS_SHADER_LIGHT_CLASSIC_CG__
 </include>
