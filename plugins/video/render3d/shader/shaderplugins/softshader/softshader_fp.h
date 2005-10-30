@@ -72,11 +72,11 @@ public:
   virtual void ResetState () {}
 
   /// Loads from a document-node
-  virtual bool Load (iShaderTUResolver*, iDocumentNode* node);
+  virtual bool Load (iShaderDestinationResolver*, iDocumentNode* node);
 
   /// Loads from raw text
-  virtual bool Load (iShaderTUResolver*, const char* program, 
-    csArray<csShaderVarMapping> &mappings)
+  virtual bool Load (iShaderDestinationResolver*, const char*, 
+    csArray<csShaderVarMapping> &)
   { return false; }
 
   /// Compile a program

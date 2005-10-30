@@ -372,7 +372,7 @@ int RTjpeg_s2b(int16 *data, int8 *strm, uint8 bt8, uint32 *qtbl)
 
   switch( bitten ) {
   case 0x03:
-    data[i]= -qtbl[i];
+    data[i]= -((int32)qtbl[i]);
     break;
   case 0x02:
     goto FUSSWEG;

@@ -71,7 +71,7 @@ public:
   /// Compile a program
   virtual bool Compile();
 
-  virtual int ResolveTextureBinding (const char* binding);
+  virtual int ResolveTU (const char* binding);
 };
 
 

@@ -676,18 +676,20 @@ bool csGLShaderFVP::ParseLight (iDocumentNode* node, LightingEntry& entry)
   return true;
 }
 
-static int ParseLayerParam (iDocumentNode* node, iShaderTUResolver* tuResolve)
+static int ParseLayerParam (iDocumentNode* node, 
+			    iShaderDestinationResolver* resolve)
 {
   const char* layerName = node->GetAttributeValue ("layer");
   if (layerName == 0) return -1;
 
   int layer = 
-    tuResolve ? tuResolve->ResolveTextureBinding (layerName) : -1;
+    resolve ? resolve->ResolveTU (layerName) : -1;
   if (layer < 0) layer = node->GetAttributeValueAsInt ("layer");
   return layer;
 }
 
-bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
+bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve, 
+			 iDocumentNode* program)
 {
   const csLightShaderVarCache::LightProperty propNone = 
     (csLightShaderVarCache::LightProperty)-1;
@@ -757,7 +759,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
           break;
         case XMLTOKEN_CONSTANTCOLOR:
           {
-            int layer = ParseLayerParam (child, tuResolve);
+            int layer = ParseLayerParam (child, resolve);
 	    if (layer < 0)
 	    {
 	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
@@ -784,7 +786,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
           break;
         case XMLTOKEN_TEXGEN:
           {
-            int layer = ParseLayerParam (child, tuResolve);
+            int layer = ParseLayerParam (child, resolve);
 	    if (layer < 0)
 	    {
 	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
@@ -849,7 +851,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
           break;
 	case XMLTOKEN_TEXMATRIX:
 	  {
-            int layer = ParseLayerParam (child, tuResolve);
+            int layer = ParseLayerParam (child, resolve);
 	    if (layer < 0)
 	    {
 	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",

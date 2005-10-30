@@ -6,6 +6,23 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Oct-2005
+	- res made the following changes:
+	    - Added support for buffer destination resolution by a shader
+	      program.
+	    - Added support for Cg program parameter names as buffer 
+	      destinations.
+	    - Improved mapping of buffers to generic vertex attributes.
+	    - Improved nesting of shader conditional templates a bit.
+	    - Files included via a shader conditional <?include?> must now
+	      have an <include> node to better comply with the XML spec.
+	    - Fixed some VC7 warnings.
+	    - Took SR-related projects out of the VC6 workspaces.
+	    - Added a workaround for timing problems on Win32 on multiprocessor
+	      machines.
+	    - Made some reftracker-related tweas.
+	    - Added a (incomplete and still disabled) Cg-based implementation
+	      of the std_lighting shader.
 28-Oct-2005
 	- Jorrit fixed lighter, simpcd, and viewmesh so that they work after
 	  yesterday's changes.

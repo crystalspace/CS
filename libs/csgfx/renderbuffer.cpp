@@ -245,6 +245,7 @@ csRenderBufferName csRenderBuffer::GetBufferNameFromDescr (const char* name)
     {"position",		    CS_BUFFER_POSITION},
     {"primary color",		    CS_BUFFER_COLOR},
     {"tangent",			    CS_BUFFER_TANGENT},
+    {"texture coordinate",	    CS_BUFFER_TEXCOORD0},
     {"texture coordinate 0",	    CS_BUFFER_TEXCOORD0},
     {"texture coordinate 1",	    CS_BUFFER_TEXCOORD1},
     {"texture coordinate 2",	    CS_BUFFER_TEXCOORD2},

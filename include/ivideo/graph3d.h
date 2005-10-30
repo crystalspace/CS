@@ -148,11 +148,12 @@ enum csZBufMode
   ((va >= CS_VATTRIB_SPECIFIC_FIRST) && (va <=CS_VATTRIB_SPECIFIC_LAST))
 
 /**
- * For NR:
  * Vertex attributes.
  */
 enum csVertexAttrib
 {
+  /// Invalid attribute
+  CS_VATTRIB_INVALID	      = -1,
   /// Position vertex attribute
   CS_VATTRIB_POSITION	      = CS_VATTRIB_SPECIFIC_FIRST + 0,
   /// Vertex weight attribute

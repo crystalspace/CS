@@ -208,6 +208,11 @@ typedef void (WINAPI * LPFNSETDLLDIRECTORYA)(LPCSTR lpPathName);
 
 bool csPlatformStartup(iObjectRegistry* r)
 {
+  /* Work around QueryPerformanceCounter() issues on multiprocessor systems.
+   * @@@ FIXME: until Marten(or someone else) finds a better solution ... 
+   */
+  SetThreadAffinityMask (GetCurrentThread(), 1);
+  
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (r, iCommandLineParser));
 
   csPathsList* pluginpaths = csGetPluginPaths (cmdline->GetAppPath());

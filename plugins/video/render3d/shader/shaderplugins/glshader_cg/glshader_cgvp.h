@@ -48,6 +48,8 @@ public:
 
   /// Compile a program
   virtual bool Compile();
+
+  virtual csVertexAttrib ResolveBufferDestination (const char* binding);
 };
 
 

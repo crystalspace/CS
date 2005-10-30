@@ -43,7 +43,8 @@ void csSoftShader_VP::Deactivate()
 {
 }
 
-bool csSoftShader_VP::Load (iShaderTUResolver*, iDocumentNode* program)
+bool csSoftShader_VP::Load (iShaderDestinationResolver*, 
+			    iDocumentNode* program)
 {
   if(!program)
     return false;

@@ -47,7 +47,9 @@ struct iObjectRegistry;
  * information, basic program data and data dumping.
  */
 class CS_CRYSTALSPACE_EXPORT csShaderProgram : 
-  public scfImplementation2<csShaderProgram, iShaderProgram, iShaderTUResolver>
+  public scfImplementation2<csShaderProgram, 
+			    iShaderProgram, 
+			    iShaderDestinationResolver>
 {
 protected:
   csStringHash commonTokens;
@@ -218,8 +220,11 @@ public:
   csShaderProgram (iObjectRegistry* objectReg);
   virtual ~csShaderProgram ();
 
-  virtual int ResolveTextureBinding (const char* /*binding*/)
+  virtual int ResolveTU (const char* /*binding*/)
   { return -1; }
+
+  virtual csVertexAttrib ResolveBufferDestination (const char* /*binding*/)
+  { return CS_VATTRIB_INVALID; }
 };
 
 /** @} */

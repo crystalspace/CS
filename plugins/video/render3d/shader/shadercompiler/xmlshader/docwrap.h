@@ -144,31 +144,6 @@ class csWrappedDocumentNode :
   };
   friend class WrapperWalker;
 
-  struct NodeProcessingState;
-  void ParseCondition (WrapperStackEntry& newWrapper, const char* cond,
-    size_t condLen, iDocumentNode* node);
-  void CreateElseWrapper (NodeProcessingState* state, 
-    WrapperStackEntry& elseWrapper);
-  void ProcessInclude (const csString& filename, NodeProcessingState* state, 
-    iDocumentNode* node);
-  void ProcessTemplate (iDocumentNode* templNode, 
-    NodeProcessingState* state);
-  bool InvokeTemplate (const char* name, iDocumentNode* node, 
-    NodeProcessingState* state, const csArray<csString>& params);
-  void ValidateTemplateEnd (iDocumentNode* node, 
-    NodeProcessingState* state);
-  const char* ParseTemplateArguments (const char* str, 
-    csArray<csString>& strings);
-
-  void ProcessSingleWrappedNode (NodeProcessingState* state,
-  	iDocumentNode* wrappedNode);
-  void ProcessWrappedNode (NodeProcessingState* state,
-  	iDocumentNode* wrappedNode);
-  void ProcessWrappedNode ();
-  void Report (int severity, iDocumentNode* node, const char* msg, ...);
-  
-  static void AppendNodeText (WrapperWalker& walker, csString& text);
-
   struct Template
   {
     csRefArray<iDocumentNode> nodes;
@@ -179,6 +154,33 @@ class csWrappedDocumentNode :
     csHash<Template, csString> templates;
   };
   csRef<GlobalProcessingState> globalState;
+
+  struct NodeProcessingState;
+  void ParseCondition (WrapperStackEntry& newWrapper, const char* cond,
+    size_t condLen, iDocumentNode* node);
+  void CreateElseWrapper (NodeProcessingState* state, 
+    WrapperStackEntry& elseWrapper);
+  void ProcessInclude (const csString& filename, NodeProcessingState* state, 
+    iDocumentNode* node);
+  void ProcessTemplate (iDocumentNode* templNode, 
+    NodeProcessingState* state);
+  bool InvokeTemplate (Template* templ, const csArray<csString>& params,
+    csRefArray<iDocumentNode>& templatedNodes);
+  bool InvokeTemplate (const char* name, iDocumentNode* node, 
+    NodeProcessingState* state, const csArray<csString>& params);
+  void ValidateTemplateEnd (iDocumentNode* node, 
+    NodeProcessingState* state);
+  void ParseTemplateArguments (const char* str, 
+    csArray<csString>& strings);
+
+  void ProcessSingleWrappedNode (NodeProcessingState* state,
+  	iDocumentNode* wrappedNode);
+  void ProcessWrappedNode (NodeProcessingState* state,
+  	iDocumentNode* wrappedNode);
+  void ProcessWrappedNode ();
+  void Report (int severity, iDocumentNode* node, const char* msg, ...);
+  
+  static void AppendNodeText (WrapperWalker& walker, csString& text);
 
   csWrappedDocumentNode (iDocumentNode* wrappedNode,
     csWrappedDocumentNode* parent,

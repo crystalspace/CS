@@ -24,13 +24,18 @@
 
 #ifdef CS_REF_TRACKER
 
+static inline iRefTracker* GetRefTracker()
+{
+  return (iSCF::SCF) ? 
+    ((iRefTracker*)(iSCF::SCF)->QueryInterface (
+      scfInterfaceTraits<iRefTracker>::GetID (),
+      scfInterfaceTraits<iRefTracker>::GetVersion())) : 0;
+}
+
 #define TRACKER_CALL_(method, params)		    	\
   {						    	\
-    iRefTracker* refTracker = (iSCF::SCF) ?		\
-      ((iRefTracker*)(iSCF::SCF)->QueryInterface (  	\
-      scfInterfaceTraits<iRefTracker>::GetID (),	    	\
-      scfInterfaceTraits<iRefTracker>::GetVersion())) : 0;    \
-    if (refTracker)				    	\
+    iRefTracker* refTracker;				\
+    if ((refTracker = GetRefTracker()))			\
     {						    	\
       refTracker-> method params;  			\
       refTracker->DecRef ();			    	\
@@ -86,4 +91,4 @@ void csRefTrackerAccess::SetDescription (void* obj, const char* description)
   TRACKER_CALL2 (SetDescription, obj, description);
 }
 
-#endif
+#endif // CS_REF_TRACKER

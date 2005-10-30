@@ -26,9 +26,9 @@
 /**\addtogroup vfs
  * @{ */
 #include "csutil/scf.h"
+#include "iutil/databuff.h"
 
 struct iConfigFile;
-struct iDataBuffer;
 
 class csStringArray;
 

@@ -112,9 +112,9 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     }
   }
 
-  csRef<iShaderTUResolver> tuResolve;
+  csRef<iShaderDestinationResolver> resolveFP;
   if (pass->fp) 
-    tuResolve = SCF_QUERY_INTERFACE(pass->fp, iShaderTUResolver);
+    resolveFP = scfQueryInterface<iShaderDestinationResolver> (pass->fp);
 
   //load vp
   programNode = node->GetNode(xmltokens.Request (
@@ -122,7 +122,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 
   if (programNode)
   {
-    program = LoadProgram (tuResolve, programNode, pass);
+    program = LoadProgram (resolveFP, programNode, pass);
     if (program)
     {
       pass->vp = program;
@@ -135,13 +135,17 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     }
   }
 
+  csRef<iShaderDestinationResolver> resolveVP;
+  if (pass->vp) 
+    resolveVP = scfQueryInterface<iShaderDestinationResolver> (pass->vp);
+
   //load vproc
   programNode = node->GetNode(xmltokens.Request (
     csXMLShaderCompiler::XMLTOKEN_VPROC));
 
   if (programNode)
   {
-    program = LoadProgram (tuResolve, programNode, pass);
+    program = LoadProgram (resolveFP, programNode, pass);
     if (program)
     {
       pass->vproc = program;
@@ -299,7 +303,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 	  const char* target = dest + sizeof (mapName) - 1;
 
 	  int texUnit = 
-	    tuResolve ? tuResolve->ResolveTextureBinding (target) : -1;
+	    resolveFP ? resolveFP->ResolveTU (target) : -1;
 	  if (texUnit >= 0)
 	  {
 	    attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + texUnit);
@@ -313,6 +317,17 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 	      attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + texUnit);
 	      found = true;
 	    }
+	  }
+	}
+	else
+	{
+	  csVertexAttrib attr = 
+	    resolveVP ? resolveVP->ResolveBufferDestination (dest) : 
+	    CS_VATTRIB_INVALID;
+	  if (attr != CS_VATTRIB_INVALID)
+	  {
+	    attrib = attr;
+	    found = true;
 	  }
 	}
       }
@@ -345,7 +360,8 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
           varRef = svcontext.GetVariable (varID);
 
         pass->custommapping_variables.Push (varRef);
-        pass->custommaping_attrib.Push (attrib);
+        pass->custommapping_attrib.Push (attrib);
+	pass->custommapping_buffer.Push (CS_BUFFER_NONE);
       }
       else
       {
@@ -357,7 +373,15 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
           return false;
         }
         
-        pass->defaultMappings[attrib] = sourceName;
+	if ((attrib >= CS_VATTRIB_SPECIFIC_FIRST)
+	  && (attrib <= CS_VATTRIB_SPECIFIC_LAST))
+	  pass->defaultMappings[attrib] = sourceName;
+	else
+	{
+	  pass->custommapping_variables.Push (0);
+	  pass->custommapping_attrib.Push (attrib);
+	  pass->custommapping_buffer.Push (sourceName);
+	}
       }
     }
     else
@@ -380,7 +404,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     const char* dest = mapping->GetAttributeValue ("destination");
     if (mapping->GetAttribute("name") && dest)
     {
-      int texUnit = tuResolve ? tuResolve->ResolveTextureBinding (dest) : -1;
+      int texUnit = resolveFP ? resolveFP->ResolveTU (dest) : -1;
       if (texUnit < 0)
       {
 	if (csStrNCaseCmp (dest, "unit ", 5) == 0)
@@ -439,9 +463,8 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
   return true;
 }
 
-csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (iShaderTUResolver* tuResolve,
-						    iDocumentNode *node, 
-						    shaderPass *pass)
+csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
+  iShaderDestinationResolver* resolve, iDocumentNode *node, shaderPass *pass)
 {
   if (node->GetAttributeValue("plugin") == 0)
   {
@@ -492,7 +515,7 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (iShaderTUResolver* tuResolve
     programNode = parent->LoadProgramFile (node->GetAttributeValue ("file"));
   else
     programNode = node;
-  if (!program->Load (tuResolve, programNode))
+  if (!program->Load (resolve, programNode))
     return 0;
 
   if (!program->Compile ())
@@ -646,8 +669,6 @@ bool csXMLShaderTech::DeactivatePass ()
   iGraphics3D* g3d = parent->g3d;
 /*  g3d->SetBufferState(thispass->vertexattributes, clear_buffers, 
     lastBufferCount);*/
-  g3d->DeactivateBuffers (thispass->custommaping_attrib.GetArray (), (int)lastBufferCount);
-  lastBufferCount=0;
 
   g3d->SetTextureState(textureUnits, clear_textures, 
     (int)lastTexturesCount);
@@ -676,9 +697,15 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
 
   //now map our buffers. all refs should be set
   size_t i;
-  for (i = 0; i < thispass->custommaping_attrib.Length (); i++)
+  for (i = 0; i < thispass->custommapping_attrib.Length (); i++)
   {
-    if (thispass->custommapping_variables.Length () >= i && thispass->custommapping_variables[i] != 0)
+    if (thispass->custommapping_buffer[i] != CS_BUFFER_NONE)
+    {
+      last_buffers[i] = modes.buffers->GetRenderBuffer (
+	thispass->custommapping_buffer[i]);
+    }
+    else if ((thispass->custommapping_variables.Length () >= i) 
+      && (thispass->custommapping_variables[i] != 0))
       thispass->custommapping_variables[i]->GetValue(last_buffers[i]);
     else if (thispass->custommapping_id[i] < (csStringID)stacks.Length ())
     {
@@ -693,9 +720,9 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
       last_buffers[i] = 0;
   }
   g3d->ActivateBuffers (modes.buffers, thispass->defaultMappings);
-  g3d->ActivateBuffers (thispass->custommaping_attrib.GetArray (), last_buffers, 
-    (uint)thispass->custommaping_attrib.Length ());
-  lastBufferCount = thispass->custommaping_attrib.Length ();
+  g3d->ActivateBuffers (thispass->custommapping_attrib.GetArray (), 
+    last_buffers, (uint)thispass->custommapping_attrib.Length ());
+  lastBufferCount = thispass->custommapping_attrib.Length ();
   
   //and the textures
   int j;
@@ -777,6 +804,11 @@ bool csXMLShaderTech::TeardownPass ()
   if(thispass->vproc) thispass->vproc->ResetState ();
   if(thispass->vp) thispass->vp->ResetState ();
   if(thispass->fp) thispass->fp->ResetState ();
+
+  iGraphics3D* g3d = parent->g3d;
+  g3d->DeactivateBuffers (thispass->custommapping_attrib.GetArray (), 
+    (int)lastBufferCount);
+  lastBufferCount=0;
 
   return true;
 }

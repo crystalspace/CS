@@ -26,10 +26,9 @@
  * @{ */
 #include "csutil/scf_interface.h"
 #include "csutil/ref.h"
+#include "iutil/string.h"
 
 struct iGraphics3D;
-struct iString;
-
 
 /**\name iDebugHelper implementation support flags
  * @{ */

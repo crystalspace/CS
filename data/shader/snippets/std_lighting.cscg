@@ -1,0 +1,54 @@
+<include>
+<?Cg_VariableMap_Surface ?>
+<?Cg_VariableMap_Lighting ?>
+<program>
+
+<?Cg_Include_Surface?>
+<?Cg_Include_Lighting?>
+
+struct AppToVert 
+{
+	float4 Position : POSITION;
+	AppToVert_Surface surface;
+	AppToVert_Lighting lighting;
+};
+
+struct VertToFrag 
+{
+	float4 Hposition : POSITION;
+	VertToFrag_Surface surface;
+	VertToFrag_Lighting lighting;
+};
+
+struct AppToFrag
+{
+	AppToFrag_Surface surface;
+	AppToFrag_Lighting lighting;
+};
+
+VertToFrag VertexMain (AppToVert A2V,
+		       /* The matrices are bound with the state.matrix.... semantics.
+			* For more info see the Cg and ARB_vertex_program docs.
+			*/
+		       uniform float4x4 ModelViewProj : state.matrix.mvp)
+{
+  VertToFrag V2F;
+
+  V2F.Hposition = mul (ModelViewProj, A2V.Position);
+  <?ComputeVertex_Surface V2F.surface A2V.surface ?>
+  <?ComputeVertex_Lighting V2F.lighting A2V.lighting ?>
+
+  return V2F;
+}
+
+float4 FragmentMain (VertToFrag V2F,
+		     uniform AppToFrag A2F) : COLOR
+{
+  float4 diffuse, color;
+  <?ComputeFragment_Surface diffuse V2F.surface A2F.surface ?>
+  <?ComputeFragment_Lighting color V2F.lighting A2F.lighting ?>
+  return diffuse * color;
+}
+
+</program>
+</include>

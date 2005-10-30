@@ -392,7 +392,7 @@ csPtr<iDataBuffer> csShaderProgram::GetProgramData ()
     char* data = csStrNew (programNode->GetContentsValue ());
 
     csRef<iDataBuffer> newbuff;
-    newbuff.AttachNew (new csDataBuffer (data, strlen (data)));
+    newbuff.AttachNew (new csDataBuffer (data, data ? strlen (data) : 0));
     return csPtr<iDataBuffer> (newbuff);
   }
 

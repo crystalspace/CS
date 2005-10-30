@@ -46,7 +46,8 @@ void csSoftShader_FP::Deactivate()
   shaderPlug->softSRI->SetScanlineRenderer (0);
 }
 
-bool csSoftShader_FP::Load (iShaderTUResolver*, iDocumentNode* program)
+bool csSoftShader_FP::Load (iShaderDestinationResolver*, 
+			    iDocumentNode* program)
 {
   if(!program)
     return false;

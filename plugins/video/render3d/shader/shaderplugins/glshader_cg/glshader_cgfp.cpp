@@ -148,7 +148,7 @@ bool csShaderGLCGFP::Compile ()
   return true;
 }
 
-int csShaderGLCGFP::ResolveTextureBinding (const char* binding)
+int csShaderGLCGFP::ResolveTU (const char* binding)
 {
   int newTU = -1;
   if (program)

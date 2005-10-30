@@ -52,3 +52,48 @@ bool csShaderGLCGVP::Compile ()
   return true;
 }
 
+csVertexAttrib csShaderGLCGVP::ResolveBufferDestination (const char* binding)
+{
+  csVertexAttrib dest = CS_VATTRIB_INVALID;
+  if (program)
+  {
+    CGparameter parameter = cgGetNamedParameter (program, binding);
+    if (parameter)
+    {
+      CGresource base = cgGetParameterBaseResource (parameter);
+      int index = cgGetParameterResourceIndex (parameter);
+      switch (base)
+      {
+	case CG_TEX0: 
+	case CG_TEXUNIT0:
+	  if ((index >= 0) && (index < 8))
+            dest = (csVertexAttrib)(CS_VATTRIB_TEXCOORD0 + index);
+	  break;
+	case CG_ATTR0:
+	  if ((index >= 0) && (index < 16))
+            dest = (csVertexAttrib)(CS_VATTRIB_0 + index);
+	  break;
+	case CG_COL0:
+	case CG_COLOR0:
+	  if ((index >= 0) && (index < 2))
+            dest = (csVertexAttrib)(CS_VATTRIB_PRIMARY_COLOR + index);
+	  break;
+	case CG_HPOS:
+	case CG_POSITION0:
+	  dest = CS_VATTRIB_POSITION;
+	  break;
+	case CG_BLENDWEIGHT0:
+	  dest = CS_VATTRIB_WEIGHT;
+	  break;
+	case CG_NORMAL0:
+	  dest = CS_VATTRIB_NORMAL;
+	  break;
+	case CG_FOG0:
+	  dest = CS_VATTRIB_FOGCOORD;
+	  break;
+      }
+    }
+  }
+
+  return dest;
+}

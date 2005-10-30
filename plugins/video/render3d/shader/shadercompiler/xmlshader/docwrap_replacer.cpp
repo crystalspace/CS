@@ -18,7 +18,6 @@
 */
 
 #include "cssysdef.h"
-
 #include "csutil/set.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"

@@ -175,9 +175,9 @@ bool csVProcStandardProgram::Compile ()
   return true;
 }
 
-bool csVProcStandardProgram::Load (iShaderTUResolver* tuResolve, 
-				   const char* program, 
-                                   csArray<csShaderVarMapping>& mappings)
+bool csVProcStandardProgram::Load (iShaderDestinationResolver*, 
+				   const char*, 
+                                   csArray<csShaderVarMapping>&)
 {
   return false;
 }
@@ -223,7 +223,8 @@ bool csVProcStandardProgram::ParseBufferName (iDocumentNode* child,
   return true;
 }
 
-bool csVProcStandardProgram::Load (iShaderTUResolver* tuResolve, iDocumentNode* program)
+bool csVProcStandardProgram::Load (iShaderDestinationResolver* resolve, 
+				   iDocumentNode* program)
 {
   if (!program)
     return false;

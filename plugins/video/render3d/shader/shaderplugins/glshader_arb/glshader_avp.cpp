@@ -304,7 +304,7 @@ bool csShaderGLAVP::LoadProgramStringToGL ()
   return true;
 }
 
-bool csShaderGLAVP::Load (iShaderTUResolver*, iDocumentNode* program)
+bool csShaderGLAVP::Load (iShaderDestinationResolver*, iDocumentNode* program)
 {
   if(!program)
     return false;
@@ -328,7 +328,7 @@ bool csShaderGLAVP::Load (iShaderTUResolver*, iDocumentNode* program)
   return true;
 }
 
-bool csShaderGLAVP::Load (iShaderTUResolver*, const char* program, 
+bool csShaderGLAVP::Load (iShaderDestinationResolver*, const char* program, 
 			  csArray<csShaderVarMapping> &mappings)
 {
   programBuffer.AttachNew (new csDataBuffer (csStrNew (program),

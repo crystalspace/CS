@@ -44,17 +44,19 @@ struct csShaderVarMapping
 
 
 /**
- * Interface to allow resolution of friendly TU names. Passed when a shader
- * program is loaded, used to resolve unknown texture unit names etc.
+ * Interface to allow resolution of friendly destination names. Passed when a 
+ * shader program is loaded, used to resolve unknown texture unit names etc.
  */
-struct iShaderTUResolver : public virtual iBase
+struct iShaderDestinationResolver : public virtual iBase
 {
-  SCF_INTERFACE(iShaderTUResolver, 2,0,0);
+  SCF_INTERFACE(iShaderDestinationResolver, 0,0,1);
   /**
    * When the destination of a texture binding wasn't recognized, the FP
    * is asked whether it can provide a TU number for it.
    */
-  virtual int ResolveTextureBinding (const char* binding) = 0;
+  virtual int ResolveTU (const char* binding) = 0;
+
+  virtual csVertexAttrib ResolveBufferDestination (const char* binding) = 0;
 };
 
 /**
@@ -79,10 +81,11 @@ struct iShaderProgram : public virtual iBase
   virtual void ResetState () = 0;
 
   /// Loads from a document-node
-  virtual bool Load (iShaderTUResolver* tuResolve, iDocumentNode* node) = 0;
+  virtual bool Load (iShaderDestinationResolver* resolve, 
+    iDocumentNode* node) = 0;
 
   /// Loads from raw text
-  virtual bool Load (iShaderTUResolver* tuResolve, const char* program, 
+  virtual bool Load (iShaderDestinationResolver* resolve, const char* program, 
     csArray<csShaderVarMapping>& mappings) = 0;
 
   /// Compile a program

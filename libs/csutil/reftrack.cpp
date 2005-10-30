@@ -59,7 +59,7 @@ void csRefTracker::TrackIncRef (void* object, int refCount)
   RefAction& action = refInfo.actions.GetExtend (refInfo.actions.Length ());
   action.type = Increased;
   action.refCount = refCount;
-  action.stack = csCallStackHelper::CreateCallStack (1);
+  action.stack = csCallStackHelper::CreateCallStack (1, true);
   action.tag = 0;
   refInfo.refCount = refCount + 1;
 }
@@ -73,7 +73,7 @@ void csRefTracker::TrackDecRef (void* object, int refCount)
   RefAction& action = refInfo.actions.GetExtend (refInfo.actions.Length ());
   action.type = Decreased;
   action.refCount = refCount;
-  action.stack = csCallStackHelper::CreateCallStack (1);
+  action.stack = csCallStackHelper::CreateCallStack (1, true);
   action.tag = 0;
   refInfo.refCount = refCount - 1;
 }
@@ -111,7 +111,7 @@ void csRefTracker::TrackDestruction (void* object, int refCount)
   RefAction& action = refInfo.actions.GetExtend (refInfo.actions.Length ());
   action.type = Destructed;
   action.refCount = refCount;
-  action.stack = csCallStackHelper::CreateCallStack (1);
+  action.stack = csCallStackHelper::CreateCallStack (1, true);
   action.tag = 0;
   refInfo.destructed = true;
 }
@@ -142,7 +142,7 @@ void csRefTracker::MatchIncRef (void* object, int refCount, void* tag)
     RefAction& action = refInfo.actions.GetExtend (refInfo.actions.Length ());
     action.type = Increased;
     action.refCount = refCount;
-    action.stack = csCallStackHelper::CreateCallStack (1);
+    action.stack = csCallStackHelper::CreateCallStack (1, true);
     action.tag = tag;
     refInfo.refCount = refCount + 1;
   }
@@ -174,7 +174,7 @@ void csRefTracker::MatchDecRef (void* object, int refCount, void* tag)
     RefAction& action = refInfo.actions.GetExtend (refInfo.actions.Length ());
     action.type = Decreased;
     action.refCount = refCount;
-    action.stack = csCallStackHelper::CreateCallStack (1);
+    action.stack = csCallStackHelper::CreateCallStack (1, true);
     action.tag = tag;
     refInfo.refCount = refCount - 1;
   }

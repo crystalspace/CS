@@ -39,7 +39,8 @@ void csShaderGLPS1_Common::Report (int severity, const char* msg, ...)
   va_end (args);
 }
 
-bool csShaderGLPS1_Common::Load (iShaderTUResolver*, iDocumentNode* program)
+bool csShaderGLPS1_Common::Load (iShaderDestinationResolver*, 
+				 iDocumentNode* program)
 {
   if(!program)
     return false;
@@ -60,7 +61,8 @@ bool csShaderGLPS1_Common::Load (iShaderTUResolver*, iDocumentNode* program)
   return true;
 }
 
-bool csShaderGLPS1_Common::Load (iShaderTUResolver*, const char* program, 
+bool csShaderGLPS1_Common::Load (iShaderDestinationResolver*, 
+				 const char* program, 
 				 csArray<csShaderVarMapping> &mappings)
 {
   programBuffer.AttachNew (new csDataBuffer (csStrNew (program),

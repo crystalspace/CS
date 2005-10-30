@@ -55,19 +55,16 @@ public:
   virtual bool IsValid() { return true; } 
 
   /// Loads from a document-node
-  virtual bool Load(iShaderTUResolver* tuResolve, iDocumentNode* node);
+  virtual bool Load(iShaderDestinationResolver* resolve, 
+    iDocumentNode* node);
 
   /// Loads from raw text
-  virtual bool Load (iShaderTUResolver* tuResolve, const char* program, 
-    csArray<csShaderVarMapping>& mappings);
+  virtual bool Load (iShaderDestinationResolver* resolve, 
+    const char* program, csArray<csShaderVarMapping>& mappings);
 
 
   /// Compile a program
   virtual bool Compile();
-
-  virtual int ResolveTextureBinding (const char* binding)
-  { return -1; }
-
 private:
   csVProc_Std *shaderPlugin;
 

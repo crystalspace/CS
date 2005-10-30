@@ -291,6 +291,8 @@ void csShaderGLCGCommon::ResetState()
 bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr, 
   CGGLenum type, bool compiled, bool doLoad)
 {
+  if (!programStr || !*programStr) return false;
+
   size_t i;
 
   CGprofile profile = CG_PROFILE_UNKNOWN;
@@ -449,7 +451,8 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
   }
 }
 
-bool csShaderGLCGCommon::Load (iShaderTUResolver*, iDocumentNode* program)
+bool csShaderGLCGCommon::Load (iShaderDestinationResolver*, 
+			       iDocumentNode* program)
 {
   if(!program)
     return false;

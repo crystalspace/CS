@@ -1,3 +1,4 @@
+<include>
   <?if vars."fog density".float &gt; 0 ?>
     <layer name="pea soup">
       <colorsource num="0" source="constant color" modifier="color"/>
@@ -8,3 +9,4 @@
       <alphaoperation operation="replace"/>
     </layer>
   <?endif?>
+</include>

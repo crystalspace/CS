@@ -162,8 +162,8 @@ csCallStack* csCallStackHelper::CreateCallStack (int skip, bool fast)
     iCallStackCreator* csc = ((CreatorGetter)*cscGetter)();
     if (csc->CreateCallStack (stack->entries, stack->params, fast))
     {
-      if (skip > 0)
-	stack->entries.DeleteRange (0, (size_t)(skip-1));
+      // Remove one more so CreateCallstack() itself does not appear
+      stack->entries.DeleteRange (0, (size_t)(skip));
       stack->entries.ShrinkBestFit();
       stack->params.ShrinkBestFit();
       return stack;

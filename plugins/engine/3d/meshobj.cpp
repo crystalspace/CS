@@ -64,9 +64,8 @@ public:
   {
     const csRefArray<iSceneNode>& c = static_lod_mesh->QuerySceneNode ()
     	->GetChildren ();
-    int cnt = c.Length ();
-    int i = cnt-1;
-    while (i >= 0)
+    size_t i = c.Length ();
+    while (i-- > 0)
     {
       iMeshWrapper* child = c[i]->QueryMesh ();
       if (child && child->GetShadowCaster ())
@@ -74,7 +73,6 @@ public:
         child->GetShadowCaster ()->AppendShadows (movable, shadows, origin);
 	return;
       }
-      i--;
     }
   }
 };
@@ -103,8 +101,8 @@ public:
   {
     const csRefArray<iSceneNode>& c = static_lod_mesh->QuerySceneNode ()
     	->GetChildren ();
-    int cnt = c.Length ();
-    int i;
+    size_t cnt = c.Length ();
+    size_t i;
     for (i = 0 ; i < cnt ; i++)
     {
       iMeshWrapper* child = c[i]->QueryMesh ();

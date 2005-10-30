@@ -1,3 +1,4 @@
+<include>
       <?if vars."fog density".float &gt; 0 ?>
         <pass>
           <mixmode><alpha /></mixmode><!-- @@@ probably not always desired -->
@@ -21,3 +22,4 @@
           </fp>
         </pass>
       <?endif?>
+</include>

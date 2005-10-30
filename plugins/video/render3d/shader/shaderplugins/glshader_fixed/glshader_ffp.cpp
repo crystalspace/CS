@@ -95,7 +95,7 @@ void csGLShaderFFP::BuildTokenHash()
 //                          iShaderProgram
 ////////////////////////////////////////////////////////////////////
 
-bool csGLShaderFFP::Load (iShaderTUResolver*, iDocumentNode* node)
+bool csGLShaderFFP::Load (iShaderDestinationResolver*, iDocumentNode* node)
 {
   if(!node)
     return false;

@@ -18,6 +18,10 @@
 */
 
 #include "cssysdef.h"
+#if defined(CS_REF_TRACKER) && !defined(CS_REF_TRACKER_EXTENSIVE)
+  // Performance hack
+  #undef CS_REF_TRACKER
+#endif
 #include <ctype.h>
 
 #include "csgeom/math.h"
@@ -25,6 +29,7 @@
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
+#include "cstool/vfsdirchange.h"
 #include "imap/services.h"
 #include "ivaria/reporter.h"
 #include "iutil/vfs.h"
@@ -120,10 +125,12 @@ struct csWrappedDocumentNode::NodeProcessingState
   WrapperStackEntry currentWrapper;
   csRef<iDocumentNodeIterator> iter;
 
-  Template* templ;
+  bool templActive;
+  Template templ;
   uint templNestCount;
+  csString templateName;
 
-  NodeProcessingState() : templ(0) {}
+  NodeProcessingState() : templActive(false) {}
 };
 
 static const int syntaxErrorSeverity = CS_REPORTER_SEVERITY_ERROR;
@@ -181,7 +188,7 @@ void csWrappedDocumentNode::ProcessInclude (const csString& filename,
       docsys.AttachNew (new csTinyDocumentSystem ());
 
     csRef<iDocument> includeDoc = docsys->CreateDocument ();
-    const char* err = includeDoc->Parse (include, true);
+    const char* err = includeDoc->Parse (include, false);
     if (err != 0)
     {
       Report (syntaxErrorSeverity, node,
@@ -189,7 +196,17 @@ void csWrappedDocumentNode::ProcessInclude (const csString& filename,
     }
     else
     {
-      csRef<iDocumentNode> includeNode = includeDoc->GetRoot ();
+      csRef<iDocumentNode> rootNode = includeDoc->GetRoot ();
+      csRef<iDocumentNode> includeNode = rootNode->GetNode ("include");
+      if (!includeNode)
+      {
+	Report (syntaxErrorSeverity, rootNode,
+	  "%s: no <include> node", filename.GetData ());
+	return;
+      }
+      csVfsDirectoryChanger dirChange (vfs);
+      dirChange.ChangeTo (filename);
+
       csRef<iDocumentNodeIterator> it = includeNode->GetNodes ();
       while (it->HasNext ())
       {
@@ -203,7 +220,7 @@ void csWrappedDocumentNode::ProcessInclude (const csString& filename,
 void csWrappedDocumentNode::ProcessTemplate (iDocumentNode* templNode, 
 					     NodeProcessingState* state)
 {
-  csRefArray<iDocumentNode>& templNodes = state->templ->nodes;
+  csRefArray<iDocumentNode>& templNodes = state->templ.nodes;
   csRef<iDocumentNode> node = templNode;
   if (node->GetType() == CS_NODE_UNKNOWN)
   {
@@ -247,7 +264,20 @@ void csWrappedDocumentNode::ProcessTemplate (iDocumentNode* templNode,
 	    state->templNestCount++;
 	    // Fall through
 	  default:
-	    templNodes.Push (node);
+	    {
+	      Template* templ;
+	      if ((state->templNestCount == 1)
+		&& (templ = globalState->templates.GetElementPointer (tokenStr)))
+	      {
+		csArray<csString> templArgs;
+		csString pStr (valStart + cmdLen, valLen - cmdLen);
+		pStr.Trim();
+		ParseTemplateArguments (pStr, templArgs);
+		InvokeTemplate (templ, templArgs, templNodes);
+	      }
+	      else
+		templNodes.Push (node);
+	    }
 	    break;
 	}
       }
@@ -258,8 +288,32 @@ void csWrappedDocumentNode::ProcessTemplate (iDocumentNode* templNode,
 
   if (state->templNestCount == 0)
   {
-    state->templ = 0;
+    globalState->templates.PutUnique (state->templateName, state->templ);
+    state->templActive = false;
   }
+}
+
+bool csWrappedDocumentNode::InvokeTemplate (Template* templ,
+					    const csArray<csString>& params,
+					    csRefArray<iDocumentNode>& templatedNodes)
+{
+  if (!templ) return false;
+
+  size_t i;
+  Substitutions paramSubst;
+  for (i = 0; i < csMin (params.Length(), templ->paramMap.Length()); i++)
+  {
+    paramSubst.Put (templ->paramMap[i], params[i]);
+  }
+
+  for (i = 0; i < templ->nodes.Length(); i++)
+  {
+    csRef<iDocumentNode> newNode = 
+      shared->replacerFactory.CreateWrapper (templ->nodes.Get (i), 0,
+      paramSubst);
+    templatedNodes.Push (newNode);
+  }
+  return true;
 }
 
 bool csWrappedDocumentNode::InvokeTemplate (const char* name, 
@@ -269,21 +323,16 @@ bool csWrappedDocumentNode::InvokeTemplate (const char* name,
 {
   Template* templNodes = 
     globalState->templates.GetElementPointer (name);
-  if (!templNodes) return false;
+
+  csRefArray<iDocumentNode> nodes;
+
+  if (!InvokeTemplate (templNodes, params, nodes))
+    return false;
 
   size_t i;
-  Substitutions paramSubst;
-  for (i = 0; i < csMin (params.Length(), templNodes->paramMap.Length()); i++)
+  for (i = 0; i < nodes.Length(); i++)
   {
-    paramSubst.Put (templNodes->paramMap[i], params[i]);
-  }
-
-  for (i = 0; i < templNodes->nodes.Length(); i++)
-  {
-    csRef<iDocumentNode> newNode = 
-      shared->replacerFactory.CreateWrapper (templNodes->nodes.Get (i), 0,
-      paramSubst);
-    ProcessSingleWrappedNode (state, newNode);
+    ProcessSingleWrappedNode (state, nodes[i]);
   }
   ValidateTemplateEnd (node, state);
   return true;
@@ -292,17 +341,17 @@ bool csWrappedDocumentNode::InvokeTemplate (const char* name,
 void csWrappedDocumentNode::ValidateTemplateEnd (iDocumentNode* node, 
 						 NodeProcessingState* state)
 {
-  if ((state->templ != 0) && (state->templNestCount != 0))
+  if ((state->templActive) && (state->templNestCount != 0))
   {
     Report (syntaxErrorSeverity, node,
       "'template' without 'endtemplate'");
   }
 }
 
-const char* csWrappedDocumentNode::ParseTemplateArguments (const char* str, 
-							   csArray<csString>& strings)
+void csWrappedDocumentNode::ParseTemplateArguments (const char* str, 
+						    csArray<csString>& strings)
 {
-  if (!str) return 0;
+  if (!str) return;
 
   csString currentStr;
 
@@ -342,26 +391,12 @@ const char* csWrappedDocumentNode::ParseTemplateArguments (const char* str,
     }
     if (!currentStr.IsEmpty()) strings.Push (currentStr);
   }
-
-  /*const char* paramStart = str;   
-  do
-  {
-    const char* paramEnd = strchr (paramStart, ' ');
-    csString paramName (paramStart, 
-      (paramEnd != 0) ? paramEnd - paramStart : strlen (paramStart));
-    paramName.LTrim();
-    if (!paramName.IsEmpty()) strings.Push (paramName);
-    paramStart = paramEnd;
-  }
-  while (paramStart != 0);*/
-
-  return 0;
 }
 
 void csWrappedDocumentNode::ProcessSingleWrappedNode (
   NodeProcessingState* state, iDocumentNode* node)
 {
-  if (state->templ != 0)
+  if (state->templActive)
   {
     ProcessTemplate (node, state);
     return;
@@ -559,14 +594,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      {
 		// Parse template parameter names
 		csArray<csString> paramNames;
-		const char* err = ParseTemplateArguments (
+		ParseTemplateArguments (
 		  templateName.GetData() + templateEnd + 1, paramNames);
-		if (err != 0)
-		{
-		  Report (syntaxErrorSeverity, node,
-		    "Error parsing template parameters: %s", err);
-		  okay = false;
-		}
 
 		csSet<csString> dupeCheck;
 		for (size_t i = 0; i < paramNames.Length(); i++)
@@ -599,8 +628,11 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      }
 	      if (okay)
 	      {
-		globalState->templates.PutUnique (templateName, newTempl);
-		state->templ = globalState->templates.GetElementPointer (templateName);
+		//globalState->templates.PutUnique (templateName, newTempl);
+		//state->templ = globalState->templates.GetElementPointer (templateName);
+		state->templateName = templateName;
+		state->templ = newTempl;
+		state->templActive = true;
 		state->templNestCount = 1;
 	      }
 	    }
@@ -617,15 +649,10 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      const char* err = 0;
 	      if (space != 0)
 	      {
-		csString pStr (space + 1, valLen - cmdLen - 1);
-		err = ParseTemplateArguments (pStr, params);
+		csString pStr (space + 1, valLen - cmdLen);
+		ParseTemplateArguments (pStr, params);
 	      }
-	      if (err != 0)
-	      {
-		Report (syntaxErrorSeverity, node,
-		  "Error parsing template parameters: %s", err);
-	      }
-	      else if (!InvokeTemplate (tokenStr, node, state, params))
+	      if (!InvokeTemplate (tokenStr, node, state, params))
 	      {
 		Report (syntaxErrorSeverity, node,
 		  "Unknown command '%s'", tokenStr.GetData());
@@ -749,9 +776,11 @@ csRef<iDocumentNode> csWrappedDocumentNode::GetNode (const char* value)
 
 const char* csWrappedDocumentNode::GetContentsValue ()
 {
-  if (contents.GetData () != 0)
-    return contents;
-
+  /* Note: it is tempting to reuse 'contents' here if not empty; however,
+   * since the value may be different depending on the current resolver
+   * and its state, the contents need to be reassembled every time.
+   */
+  contents.Clear();
   WrapperWalker walker (wrappedChildren, resolver);
   while (walker.HasNext ())
   {

@@ -1199,6 +1199,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
 void csGLGraphics3D::FinishDraw ()
 {
+  ApplyBufferChanges();
+
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
 
@@ -1998,6 +2000,8 @@ void* csGLGraphics3D::RenderLock (iRenderBuffer* buffer,
 
 void csGLGraphics3D::RenderRelease (iRenderBuffer* buffer)
 {
+  if (buffer == 0) return;
+
   if (vboManager.IsValid())
     vboManager->RenderRelease (buffer);
   else
@@ -2088,11 +2092,15 @@ void csGLGraphics3D::ApplyBufferChanges()
           statecache->SetTexCoordPointer (buffer->GetComponentCount (),
             compType, (GLsizei)buffer->GetStride (), data);
         }
-        else if (CS_VATTRIB_IS_GENERIC(att) && ext->glEnableVertexAttribArrayARB)
+        else if (CS_VATTRIB_IS_GENERIC(att))
         {
-          ext->glEnableVertexAttribArrayARB (att);
-          ext->glVertexAttribPointerARB(att, buffer->GetComponentCount (),
-            compType, false, (GLsizei)buffer->GetStride (), data);
+	  if (ext->glEnableVertexAttribArrayARB)
+	  {
+	    GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
+	    ext->glEnableVertexAttribArrayARB (index);
+	    ext->glVertexAttribPointerARB(index, buffer->GetComponentCount (),
+	      compType, false, (GLsizei)buffer->GetStride (), data);
+	  }
         }
         else
         {
@@ -2130,9 +2138,13 @@ void csGLGraphics3D::ApplyBufferChanges()
             npotsStatus[unit] = false;
           }
         }
-        else if (CS_VATTRIB_IS_GENERIC(att) && ext->glDisableVertexAttribArrayARB)
+        else if (CS_VATTRIB_IS_GENERIC(att))
         {
-          ext->glDisableVertexAttribArrayARB (att);
+	  if (ext->glDisableVertexAttribArrayARB)
+	  {
+	    GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
+	    ext->glDisableVertexAttribArrayARB (index);
+	  }
         }
         else
         {
@@ -2142,18 +2154,20 @@ void csGLGraphics3D::ApplyBufferChanges()
       }
       if (CS_VATTRIB_IS_GENERIC (att))
       {
-        if (gen_renderBuffers[att]) 
+	uint index = att - CS_VATTRIB_GENERIC_FIRST;
+        if (gen_renderBuffers[index]) 
         {
-          RenderRelease (gen_renderBuffers[att - CS_VATTRIB_GENERIC_FIRST]);
-          gen_renderBuffers[att - CS_VATTRIB_GENERIC_FIRST] = 0;
+          RenderRelease (gen_renderBuffers[index]);
+          gen_renderBuffers[index] = 0;
         }
       }
       else
       {
-        if (spec_renderBuffers[att]) 
+	uint index = att - CS_VATTRIB_SPECIFIC_FIRST;
+        if (spec_renderBuffers[index]) 
         {
-          RenderRelease (spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST]);
-          spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST] = 0;
+          RenderRelease (spec_renderBuffers[index]);
+          spec_renderBuffers[index] = 0;
         }
       }
     }

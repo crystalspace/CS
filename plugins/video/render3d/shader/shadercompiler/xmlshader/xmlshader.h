@@ -79,9 +79,9 @@ private:
     // csRenderBufferName
     csRenderBufferName defaultMappings[STREAMMAX];
     csArray<csStringID> custommapping_id;
-    csDirtyAccessArray<csVertexAttrib> custommaping_attrib;
-    csArray<bool> custommapping_generic;
+    csDirtyAccessArray<csVertexAttrib> custommapping_attrib;
     csDirtyAccessArray<csRef<csShaderVariable> > custommapping_variables;
+    csArray<csRenderBufferName> custommapping_buffer;
 
     // texture mappings
     csStringID textureID[TEXTUREMAX];
@@ -140,7 +140,7 @@ private:
   // load a shaderdefinition block
   //bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
   // load a shaderprogram
-  csPtr<iShaderProgram> LoadProgram (iShaderTUResolver* tuResolve,
+  csPtr<iShaderProgram> LoadProgram (iShaderDestinationResolver* resolve,
   	iDocumentNode *node, shaderPass *pass);
   // Set reason for failure.
   void SetFailReason (const char* reason, ...) CS_GNUC_PRINTF (2, 3);
