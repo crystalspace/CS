@@ -646,7 +646,6 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	  default:
 	    {
 	      csArray<csString> params;
-	      const char* err = 0;
 	      if (space != 0)
 	      {
 		csString pStr (space + 1, valLen - cmdLen);
