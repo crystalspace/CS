@@ -40,6 +40,7 @@ public:
     out(0),
 #endif
     startOut(out), inStride(inStride) {}
+  virtual ~VertexOutputBase() {}
 
   void Reset() { out = startOut; }
   virtual void Copy (size_t idx) {}
@@ -235,8 +236,8 @@ public:
       if (!(buffersMask & (1 << i))) continue;
       SetupVOut (i, inBuffers[i], inStrides[i], outBuffers[i]);
     }
-    new (&voutPersp) VertexOutput<3, 3> ((uint8*)inPersp, sizeof (csVector3),
-      (float*)outPersp);
+    (void)new (&voutPersp) VertexOutput<3, 3> ((uint8*)inPersp,
+      sizeof (csVector3), (float*)outPersp);
   }
 
   size_t DoClip (const csTriangle& tri)
