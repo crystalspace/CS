@@ -236,7 +236,7 @@ public:
   /**
    * Expand a native path relative to the current directory.
    * \remark The specified path must refer to a directory, rather than a file.
-   * \remark Caller is responsible to free the returend string with delete[] 
+   * \remark Caller is responsible to free the returned string with delete[] 
    *   after using it.
    */
   static char* ExpandPath (const char* path);
@@ -251,7 +251,7 @@ public:
   static csPathsList LocateFile (const csPathsList& paths, 
     const char* file, bool thorough = false);
 
-  /// Filter all non-existant items out of a paths list.
+  /// Filter all non-existent items out of a paths list.
   static void FilterInvalid (csPathsList& paths);
 
   /// Expands all paths in a path list.
