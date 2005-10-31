@@ -1361,9 +1361,7 @@ CS_CHECK_LIB_WITH([z],
 CS_CHECK_LIB_WITH([bullet],
     [AC_LANG_PROGRAM(
 	[[#include <CcdPhysics/CcdPhysicsController.h>]])],
-    [$srcdir/libs/bullet*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])],
-    [AC_MSG_NOTICE([*** bullet not found;])], 
-    [], [], [], [])
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])])
 
 
 #------------------------------------------------------------------------------

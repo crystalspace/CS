@@ -7,13 +7,12 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 31-Oct-2005
-        - res changed the cs-win32libs configure check so it is only performed
-          on Windows hosts.
-        - res added a configure check to determine whether "no virtual
-          destructor" warnings should be silenced.
+	- res changed the cs-win32libs configure check so it is only performed
+	  on Windows hosts.
+	- res added a configure check to determine whether "no virtual
+	  destructor" warnings should be silenced.
 	- Piotr Obrzut added bullet plugin. Still there are many missing features like joints,
- 	  some colliders shapes etc.
-
+	  some colliders shapes etc.
 30-Oct-2005
 	- res made the following changes:
 	    - Added support for buffer destination resolution by a shader

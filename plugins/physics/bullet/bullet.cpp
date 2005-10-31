@@ -26,19 +26,19 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "imesh/genmesh.h"
 
 //bullet includes
-#include "CcdPhysics/CcdPhysicsController.h"
-#include "Dynamics/RigidBody.h"
-#include "CcdPhysics/CcdPhysicsEnvironment.h"
-#include "ConstraintSolver/SimpleConstraintSolver.h"
-#include "CollisionDispatch/ToiContactDispatcher.h"
-#include "BroadphaseCollision/SimpleBroadphase.h"
-#include "CollisionShapes/BoxShape.h"
-#include "CollisionShapes/EmptyShape.h"
-#include "CollisionShapes/SphereShape.h"
-#include "CollisionShapes/CylinderShape.h"
-#include "PHY_IMotionState.h"
-#include "SimdTransform.h"
-#include "Dynamics/MassProps.h"
+#include <CcdPhysics/CcdPhysicsController.h>
+#include <Dynamics/RigidBody.h>
+#include <CcdPhysics/CcdPhysicsEnvironment.h>
+#include <ConstraintSolver/SimpleConstraintSolver.h>
+#include <CollisionDispatch/ToiContactDispatcher.h>
+#include <BroadphaseCollision/SimpleBroadphase.h>
+#include <CollisionShapes/BoxShape.h>
+#include <CollisionShapes/EmptyShape.h>
+#include <CollisionShapes/SphereShape.h>
+#include <CollisionShapes/CylinderShape.h>
+#include <PHY_IMotionState.h>
+#include <SimdTransform.h>
+#include <Dynamics/MassProps.h>
 
 #include "bullet.h"
 
