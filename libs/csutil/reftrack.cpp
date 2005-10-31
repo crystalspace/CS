@@ -27,7 +27,7 @@
 
 csRefTracker::csRefTracker () : scfImplementationType (this), riAlloc(1000)
 {
-  (mutex = csMutex::Create ())->IncRef();
+  (mutex = csMutex::Create (true))->IncRef();
 }
 
 csRefTracker::~csRefTracker ()

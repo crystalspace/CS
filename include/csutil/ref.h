@@ -43,9 +43,9 @@ template <class T> class csRef;
  #define CSREF_TRACK(x, cmd, refCount, obj, tag)    \
   {						    \
     const int rc = obj ? refCount : -1;		    \
-    if (obj) cmd;				    \
     if (obj)					    \
     {						    \
+      cmd;                                          \
       csRefTrackerAccess::SetDescription (obj,	    \
 	typeid(T).name());			    \
       csRefTrackerAccess::Match ## x (obj, rc, tag);\
@@ -56,7 +56,7 @@ template <class T> class csRef;
  #define CSREF_TRACK_DECREF(obj,tag)	\
   CSREF_TRACK(DecRef, obj->DecRef(), obj->GetRefCount(), obj, tag);
  #define CSREF_TRACK_ASSIGN(obj,tag)	\
-  CSREF_TRACK(IncRef, (0), obj->GetRefCount() - 1, obj, tag);
+  CSREF_TRACK(IncRef, void(0), obj->GetRefCount() - 1, obj, tag);
 #else
  #define CSREF_TRACK_INCREF(obj,tag) \
   if (obj) obj->IncRef();

@@ -27,6 +27,7 @@ chronological order.
 	  of the shader and its fallback differ.
 	- Eric Sunshine eliminated a number of compilation warnings throughout
 	  the project.
+        - res made the ref tracker activateable via configure.
 28-Oct-2005
 	- Jorrit fixed lighter, simpcd, and viewmesh so that they work after
 	  yesterday's changes.

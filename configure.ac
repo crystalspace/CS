@@ -2515,6 +2515,23 @@ AS_IF([test $enable_memory_tracker = yes],
 
 
 #------------------------------------------------------------------------------
+# Determine if reference tracker should be enabled.
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to use reference tracker])
+AC_ARG_ENABLE([ref-tracker],
+    [AC_HELP_STRING([--enable-ref-tracker],
+        [enable the reference tracker which dumps information 
+        about leaked references (default NO)])],
+    [], [enable_ref_tracker=no])
+AC_MSG_RESULT([$enable_ref_tracker])
+CS_EMIT_BUILD_PROPERTY([REF_TRACKER],
+    [$enable_ref_tracker])
+AS_IF([test $enable_ref_tracker = yes],
+    [CS_HEADER_PROPERTY([CS_REF_TRACKER])])
+
+
+
+#------------------------------------------------------------------------------
 # Determine if leak guard should be enabled.
 #------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to use leak guard])
