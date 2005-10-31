@@ -1,0 +1,8 @@
+SubDir TOP plugins physics bullet ;
+
+Description bullet : "Bullet physics plugin" ;
+Plugin bullet
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith bullet : crystalspace ;
+

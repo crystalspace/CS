@@ -639,7 +639,6 @@ struct iDynamicsColliderCollisionCallback : public iBase
     iRigidBody *otherbody) = 0;
 };
 
-SCF_VERSION (iDynamicsSystemCollider, 0, 0, 1);
 
 struct iGeneralFactoryState;
 class csBox3;
@@ -665,8 +664,10 @@ class csReversibleTransform;
  * - iDynamicSystem
  * - iRigidBody
  */
-struct iDynamicsSystemCollider : public iBase
+struct iDynamicsSystemCollider : public virtual iBase
 {
+  SCF_INTERFACE (iDynamicsSystemCollider, 0, 0, 1);
+
   /// Create Collider Geometry with given sphere
   virtual bool CreateSphereGeometry (const csSphere& sphere) = 0;
 

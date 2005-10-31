@@ -1354,6 +1354,16 @@ CS_CHECK_LIB_WITH([z],
     [AC_MSG_NOTICE([*** zlib not found; VFS will be unusable])], 
     [], [], [], [zlib])
 
+#------------------------------------------------------------------------------
+# Check for bullet.  In addition to the standard installed locations, we also
+# search CS/libs/bullet*.
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([bullet],
+    [AC_LANG_PROGRAM(
+	[[#include <CcdPhysics/CcdPhysicsController.h>]])],
+    [$srcdir/libs/bullet*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])],
+    [AC_MSG_NOTICE([*** bullet not found;])], 
+    [], [], [], [])
 
 
 #------------------------------------------------------------------------------
