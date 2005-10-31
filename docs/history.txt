@@ -11,6 +11,9 @@ chronological order.
           on Windows hosts.
         - res added a configure check to determine whether "no virtual
           destructor" warnings should be silenced.
+	- Piotr Obrzut added bullet plugin. Still there are many missing features like joints,
+ 	  some colliders shapes etc.
+
 30-Oct-2005
 	- res made the following changes:
 	    - Added support for buffer destination resolution by a shader
