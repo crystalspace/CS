@@ -155,10 +155,10 @@ struct iConfigIterator : public virtual iBase
   SCF_INTERFACE(iConfigIterator, 2,0,0);
   /// Returns the configuration object for this iterator.
   virtual iConfigFile *GetConfigFile () const = 0;
-  /// Returns the subsection in the configuruation.
+  /// Returns the subsection in the configuration.
   virtual const char *GetSubsection () const = 0;
 
-  /// Rewind the iterator (points to nowhere after this)
+  /// Rewind the iterator (points to nowhere after this).
   virtual void Rewind () = 0;
   /// Move to the next valid key. Returns false if no more keys exist.
   virtual bool Next() = 0;
