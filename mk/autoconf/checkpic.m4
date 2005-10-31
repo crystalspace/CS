@@ -42,7 +42,7 @@ AC_PREREQ([2.56])
 #	client inserts the result of this check into CFLAGS, for instance. We
 #	do so by attempting to promote warnings to errors using the result of
 #	CS_COMPILER_ERRORS(). As an extra safe-guard, we also scan the compiler
-#	output for an appropriate diganostic because some gcc warnings fail to
+#	output for an appropriate diagnostic because some gcc warnings fail to
 #	promote to error status despite use of -Werror.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_COMPILER_PIC],
