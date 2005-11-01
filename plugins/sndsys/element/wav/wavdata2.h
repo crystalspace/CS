@@ -33,7 +33,7 @@
 struct _RIFFchk
 {
   char riff_id[4]; // for RIFF-files always "RIFF"
-  unsigned long len; // length of chunk after this 8 bytes of header
+  uint32 len; // length of chunk after this 8 bytes of header
   char wave_id[4]; // for wav-files always "WAVE"
 };
 
@@ -41,20 +41,20 @@ struct _RIFFchk
 struct _FMTchk
 {
   char chunk_id[4]; // for the format-chunk of wav-files always "fmt "
-  unsigned long len; // length of this chunk after this 8 bytes of header
-  unsigned short fmt_tag;
-  unsigned short channel;
-  unsigned long samples_per_sec;
-  unsigned long avg_bytes_per_sec;
-  unsigned short blk_align;
-  unsigned short bits_per_sample;
+  uint32 len; // length of this chunk after this 8 bytes of header
+  uint16 fmt_tag;
+  uint16 channel;
+  uint32 samples_per_sec;
+  uint32 avg_bytes_per_sec;
+  uint16 blk_align;
+  uint16 bits_per_sample;
 };
 
 // header of the wav-data-chunk
 struct _WAVchk
 {
   char chunk_id[4]; // for wav-data-chunk this is always "data"
-  unsigned long len; // length of chunk after this 8 bytes of header
+  uint32 len; // length of chunk after this 8 bytes of header
 };
 
 
@@ -75,7 +75,7 @@ struct WavDataStore
 struct WavStreamData
 {
   WavDataStore *datastore;
-  long position;
+  int32 position;
 };
 
 

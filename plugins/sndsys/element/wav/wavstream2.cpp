@@ -144,7 +144,7 @@ size_t SndSysWavSoundStream::GetSampleCount()
   samplecount*=(render_format.Channels * render_format.Freq);
   samplecount/=(data_format->Channels * data_format->Freq);
 
-  return (long)(samplecount & 0x7FFFFFFF);
+  return (size_t)(samplecount & 0x7FFFFFFF);
 }
 
 
@@ -286,7 +286,7 @@ void SndSysWavSoundStream::AdvancePosition(csTicks current_time)
 
 
   size_t needed_bytes;
-  long elapsed_ms;
+  size_t elapsed_ms;
   
   if (last_time==0)
   {
@@ -305,13 +305,13 @@ void SndSysWavSoundStream::AdvancePosition(csTicks current_time)
 
     // If we need more space than is available in the whole cyclic buffer, then we already underbuffered, reduce to just 1 cycle full
     if ((size_t)needed_bytes > p_cyclicbuffer->GetLength())
-      needed_bytes=(long)(p_cyclicbuffer->GetLength() & 0x7FFFFFFF);
+      needed_bytes=(size_t)(p_cyclicbuffer->GetLength() & 0x7FFFFFFF);
 
   }
 
   // Free space in the cyclic buffer if necessary
   if ((size_t)needed_bytes > p_cyclicbuffer->GetFreeBytes())
-    p_cyclicbuffer->AdvanceStartValue(needed_bytes - (long)(p_cyclicbuffer->GetFreeBytes() & 0x7FFFFFFF));
+    p_cyclicbuffer->AdvanceStartValue(needed_bytes - (size_t)(p_cyclicbuffer->GetFreeBytes() & 0x7FFFFFFF));
 
   // Fill in leftover decoded data if needed
   if (prepared_buffer_usage > 0)

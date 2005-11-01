@@ -102,14 +102,14 @@ SCF_IMPLEMENT_IBASE_END
 
 // helper functions
 /// Byte swap 32 bit data.
-static inline unsigned long csByteSwap32bit( const unsigned long value )
+static inline uint32 csByteSwap32bit( const uint32 value )
 {
   return ((value >> 24 ) & 0x000000FF ) | ((value >> 8) & 0x0000FF00)
     | ((value << 8) & 0x00FF0000) | (( value << 24) & 0xFF000000);
 }
 
 /// Byte swap 16 bit data.
-static inline unsigned short csByteSwap16bit( const unsigned short value )
+static inline uint16 csByteSwap16bit( const uint16 value )
 {
   return (( value >> 8 ) & 0x000000FF ) | (( value << 8 ) & 0x0000FF00 );
 }
