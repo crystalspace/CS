@@ -153,7 +153,10 @@ csPtr<iBase> csPhysicsLoader::Parse (iDocumentNode* node,
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   CS_ASSERT (engine != 0);
   csRef<iDynamics> dynamics = CS_QUERY_REGISTRY (object_reg, iDynamics);
-  if (dynamics == 0) {
+  if (dynamics == 0)
+  {
+    synldr->ReportError ("crystalspace.dynamics.loader",
+                node, "No dynamics in object registry!");
     return 0;
   }
 
@@ -164,12 +167,15 @@ csPtr<iBase> csPhysicsLoader::Parse (iDocumentNode* node,
     if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char *value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
-    if (id == XMLTOKEN_SYSTEM) {
+    if (id == XMLTOKEN_SYSTEM)
+    {
       csRef<iDynamicSystem> system = dynamics->CreateSystem ();
-      if (!ParseSystem (child, system)) {
-	    return 0;
-	  }
-    } else {
+      if (!ParseSystem (child, system))
+      {
+	return 0;
+      }
+    } else
+    {
       synldr->ReportBadToken (child);
       return 0;
     }
@@ -189,13 +195,13 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
   {
     if (node->GetAttribute("cfm"))
     {
-	  float cfm = node->GetAttributeValueAsFloat ("cfm");
-	  osys->SetCFM(cfm);
+      float cfm = node->GetAttributeValueAsFloat ("cfm");
+      osys->SetCFM(cfm);
     }
     if (node->GetAttribute("erp"))
     {
-	  float erp = node->GetAttributeValueAsFloat ("erp");
-	  osys->SetERP(erp);
+      float erp = node->GetAttributeValueAsFloat ("erp");
+      osys->SetERP(erp);
     }
   }
   // Get all tokens
@@ -211,7 +217,8 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
       case XMLTOKEN_GRAVITY:
       { 
         csVector3 v;
-        if (!synldr->ParseVector (child, v)) {
+        if (!synldr->ParseVector (child, v))
+	{
           synldr->ReportError ("crystalspace.dynamics.loader",
                 child, "Error processing gravity token");
           return false;
@@ -237,13 +244,17 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
           if (gchild->GetType () != CS_NODE_ELEMENT) continue;
           const char *value = gchild->GetValue ();
           csStringID id = xmltokens.Request (value);
-          if (id == XMLTOKEN_BODY) {
+          if (id == XMLTOKEN_BODY)
+	  {
             csRef<iRigidBody> body = system->CreateBody ();
             group->AddBody (body);
-            if (!ParseBody (gchild, body)) {
-			  return false;
-			}
-          } else {
+            if (!ParseBody (gchild, body))
+	    {
+	      return false;
+	    }
+          }
+	  else
+	  {
             synldr->ReportBadToken (gchild);
           }
         }
@@ -292,14 +303,14 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
 			system, iODEDynamicSystemState);
 	if (osys)
 	{
-		bool autodisable;
-		if (!synldr->ParseBool (child, autodisable, false))
-		{
-			synldr->ReportError ("crystalspace.dynamics.loader",
-				child, "Error processing autodisable token");
-			return false;
-		}
-		osys->EnableAutoDisable(autodisable);
+	  bool autodisable;
+	  if (!synldr->ParseBool (child, autodisable, false))
+	  {
+	    synldr->ReportError ("crystalspace.dynamics.loader",
+		child, "Error processing autodisable token");
+	    return false;
+	  }
+	  osys->EnableAutoDisable(autodisable);
 	}
 	break;
 
@@ -316,15 +327,15 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
 	  switch (sm_id)
 	  {
 	    case XMLTOKEN_WORLDSTEP:
-		  osys->EnableQuickStep(false);
-		  osys->EnableStepFast(false);
-		  break;
+		osys->EnableQuickStep(false);
+		osys->EnableStepFast(false);
+		break;
 	    case XMLTOKEN_STEPFAST:
-		  osys->EnableStepFast(true);
-		  break;
+		osys->EnableStepFast(true);
+		break;
 	    case XMLTOKEN_QUICKSTEP:
-		  osys->EnableQuickStep(true);
-		  break;
+		osys->EnableQuickStep(true);
+		break;
 	    default:
           	synldr->ReportBadToken (child);
         	return false;
@@ -349,9 +360,9 @@ bool csPhysicsLoader::ParseBody (iDocumentNode* node, iRigidBody* body)
   float mass = node->GetAttributeValueAsFloat ("mass");
   bool enabled=true;
   if (node->GetAttribute ("enabled"))
-	  enabled=node->GetAttributeValueAsBool("enabled");
+    enabled=node->GetAttributeValueAsBool("enabled");
   if (!enabled)
-  	body->Disable();
+    body->Disable();
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -360,7 +371,8 @@ bool csPhysicsLoader::ParseBody (iDocumentNode* node, iRigidBody* body)
     if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char *value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
-    switch (id) {
+    switch (id)
+    {
       case XMLTOKEN_STATIC:
         body->MakeStatic ();
         break;
@@ -427,12 +439,13 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
 	    child, "No mesh specified for collidermesh");
 	  return false;
         }
-        iMeshWrapper *m = engine->FindMeshObject (child->GetAttributeValue ("mesh"));
+        iMeshWrapper *m = engine->FindMeshObject (child->GetAttributeValue (
+				"mesh"));
 	csOrthoTransform t;
 	ParseTransform (child, t);
         if (m)
 	{
-          if( s > 0)
+          if (s > 0)
             body->AttachColliderMesh (m, t, f, d, e, s);
           else  //no softness parameter, so use default
             body->AttachColliderMesh (m, t, f, d, e);
@@ -464,14 +477,15 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
       }
       case XMLTOKEN_COLLIDERPLANE:
       {
-          csPlane3 plane;
-          synldr->ParsePlane (node, plane); 
-          body->AttachColliderPlane (plane, f, d, e, s);
+        csPlane3 plane;
+        synldr->ParsePlane (node, plane); 
+        body->AttachColliderPlane (plane, f, d, e, s);
       }
       case XMLTOKEN_COLLIDERBOX:
       {
         csVector3 v;
-        if (!synldr->ParseVector (child, v)) {
+        if (!synldr->ParseVector (child, v))
+	{
           synldr->ReportError ("crystalspace.dynamics.loader",
                 child, "Error processing box parameters");
           return false;
@@ -513,7 +527,8 @@ bool csPhysicsLoader::ParseSystemColliderMesh (
   return true;
 }
   
-bool csPhysicsLoader::ParseSystemColliderPlane (iDocumentNode *node, iDynamicSystem* system)
+bool csPhysicsLoader::ParseSystemColliderPlane (iDocumentNode *node,
+		iDynamicSystem* system)
 {
   float f = node->GetAttributeValueAsFloat ("friction");
   float e = node->GetAttributeValueAsFloat ("elasticity");
@@ -524,7 +539,8 @@ bool csPhysicsLoader::ParseSystemColliderPlane (iDocumentNode *node, iDynamicSys
   return true;
 }
 
-bool csPhysicsLoader::ParseSystemColliderSphere (iDocumentNode* node, iDynamicSystem* system)
+bool csPhysicsLoader::ParseSystemColliderSphere (iDocumentNode* node,
+		iDynamicSystem* system)
 {
   float f = node->GetAttributeValueAsFloat ("friction");
   float e = node->GetAttributeValueAsFloat ("elasticity");
@@ -537,7 +553,8 @@ bool csPhysicsLoader::ParseSystemColliderSphere (iDocumentNode* node, iDynamicSy
 }
   
 
-bool csPhysicsLoader::ParseSystemColliderCylinder (iDocumentNode* node, iDynamicSystem* system)
+bool csPhysicsLoader::ParseSystemColliderCylinder (iDocumentNode* node,
+		iDynamicSystem* system)
 {
   float f = node->GetAttributeValueAsFloat ("friction");
   float e = node->GetAttributeValueAsFloat ("elasticity");
@@ -550,7 +567,8 @@ bool csPhysicsLoader::ParseSystemColliderCylinder (iDocumentNode* node, iDynamic
   return true;
 }
 
-bool csPhysicsLoader::ParseSystemColliderBox (iDocumentNode* node, iDynamicSystem* system)
+bool csPhysicsLoader::ParseSystemColliderBox (iDocumentNode* node,
+		iDynamicSystem* system)
 {
   float f = node->GetAttributeValueAsFloat ("friction");
   float e = node->GetAttributeValueAsFloat ("elasticity");
@@ -597,7 +615,8 @@ bool csPhysicsLoader::ParseTransform (iDocumentNode* node, csOrthoTransform &t)
   return true;
 }
 
-bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint, iDynamicSystem* system)
+bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint,
+		iDynamicSystem* system)
 {
   joint->SetTransConstraints (false, false, false); 
   joint->SetRotConstraints (false, false, false);
@@ -710,7 +729,8 @@ bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint, iDynamicSy
   return true;
 }
 
-bool csPhysicsLoader::ParseConstraint (iDocumentNode *node, bool &x, bool &y, bool &z, csVector3 &min, csVector3 &max)
+bool csPhysicsLoader::ParseConstraint (iDocumentNode *node, bool &x,
+		bool &y, bool &z, csVector3 &min, csVector3 &max)
 {
   x = strcmp (node->GetAttributeValue ("x"), "true") == 0;
   y = strcmp (node->GetAttributeValue ("y"), "true") == 0;

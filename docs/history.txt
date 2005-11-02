@@ -16,6 +16,8 @@ chronological order.
 	- res added fog support to the Cg std_lighting.
 	- Jorrit fixed the xwin plugin so that the alert function works
 	  properly on 64-bit machines.
+	- Jorrit improved error reporting and code style in the physics
+	  loader.
 1-Nov-2005
 	- Jorrit fixed the wav loader of the new sound system so that it
 	  works properly on 64-bit.
