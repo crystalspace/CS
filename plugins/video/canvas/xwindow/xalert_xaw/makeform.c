@@ -100,7 +100,7 @@ make_queryform(Widget parent,	    /* into whom widget should be placed */
 	 * This widget is never visible.
 	 */
 	XtVaGetValues(text, XtNtopMargin, &top, XtNbottomMargin, &bottom,
-		      XtNleftMargin, &left, XtNrightMargin, &right, 0);
+		      XtNleftMargin, &left, XtNrightMargin, &right, (void*)0);
 	label = XtVaCreateWidget("message", labelWidgetClass, form,
 				 XtNlabel, msgstr,
 				 XtNinternalWidth, (left+right+1)/2,

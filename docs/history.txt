@@ -14,6 +14,8 @@ chronological order.
 	- res fixed "accumulator register" allocation being borked in the 
 	  shader expression make-vector op support.
 	- res added fog support to the Cg std_lighting.
+	- Jorrit fixed the xwin plugin so that the alert function works
+	  properly on 64-bit machines.
 1-Nov-2005
 	- Jorrit fixed the wav loader of the new sound system so that it
 	  works properly on 64-bit.
