@@ -61,6 +61,7 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
   /* Note: the renderer relies on this function to setup
    * matrices etc. So be careful when changing stuff. */
 
+  G3D->GetDriver2D()->PerformExtension ("glflushtext");
   if (drawflags & CSDRAW_3DGRAPHICS)
   {
   }

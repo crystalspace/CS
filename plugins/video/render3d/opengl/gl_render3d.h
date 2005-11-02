@@ -208,6 +208,7 @@ private:
   bool needProjectionUpdate;
   float fov;
   int viewwidth, viewheight;
+  bool needViewportUpdate;
   csPoly3D frustum;
   bool frustum_valid;
 
@@ -545,6 +546,7 @@ public:
     G2D->PerformExtension ("userendertarget", hasRenderTarget);
     viewwidth = G2D->GetWidth();
     viewheight = G2D->GetHeight();
+    needViewportUpdate = true;
   }
 
   /// Get the current render target (0 for screen).

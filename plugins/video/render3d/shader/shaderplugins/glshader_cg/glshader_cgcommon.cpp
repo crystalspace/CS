@@ -278,6 +278,7 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* mesh,
               CS_ASSERT_MSG("Don't support CG param type (yet)", false);
           }
         }
+        break;
       default:
         CS_ASSERT_MSG("Don't support CG param type (yet)", false);
     }

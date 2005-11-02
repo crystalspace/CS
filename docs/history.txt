@@ -34,6 +34,10 @@ chronological order.
 	  given name.
 	- Piotr Obrzut fixed orientation getters, and added debuging feature 
 	  for displaying box colliders in bullet plugin.
+	- Anders (hopefully) fixed bugs related to render to texture 
+	  functionality. Render backend needs to flush text drawing to avoid 
+	  conflicts with text drawing states. Also viewport adjustments 
+	  weren't applied correctly in all cases.
 1-Nov-2005
 	- Jorrit fixed the wav loader of the new sound system so that it
 	  works properly on 64-bit.

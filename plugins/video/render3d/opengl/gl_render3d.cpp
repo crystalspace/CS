@@ -91,6 +91,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   do_near_plane = false;
   viewwidth = 100;
   viewheight = 100;
+  needViewportUpdate = true;
 
   stencilclipnum = 0;
   clip_planes_enabled = false;
@@ -1107,12 +1108,14 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
   // if 2D graphics is not locked, lock it
   if ((drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
-   != (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS)))
+   != (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
+   || needViewportUpdate)
   {
     if (!G2D->BeginDraw ())
       return false;
     GLRENDER3D_OUTPUT_STRING_MARKER(("after G2D->BeginDraw()"));
   }
+  needViewportUpdate = false;
   const int old_drawflags = current_drawflags;
   current_drawflags = drawflags;
 
