@@ -7,6 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 2-Nov-2005
+	- res augmented the shader conditionals to also allow access to shader
+	  variable vector value components.
+	- res augmented the shader expression to allow quoted strings (since
+	  spaces in shadervar names are somewhat common).
 	- res fixed "accumulator register" allocation being borked in the 
 	  shader expression make-vector op support.
 	- res added fog support to the Cg std_lighting.
