@@ -1533,8 +1533,7 @@ AS_IF([test $cs_cv_libode_recent = yes],
 
 
 #------------------------------------------------------------------------------
-# Check for bullet.  In addition to the standard installed locations, we also
-# search CS/libs/bullet*.
+# Check for bullet physics library.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([bullet],
     [AC_LANG_PROGRAM([[#include <CcdPhysics/CcdPhysicsController.h>]])],
