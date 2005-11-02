@@ -29,24 +29,6 @@
  * \addtogroup geom_utils
  * @{ */
 
-/*
-template<typename T, int FractionBits>
-class csFixed
-{
-  T v;
-public:
-};
-
-class csFixed16 : public csFixed<int32, 16>
-{
-};
-
-class csFixed24 : public csFixed<int32, 24>
-{
-};
-
-*/
-
 /**
  * Encapsulation of a 16.16 fixed-point number.
  * \todo More operators.
