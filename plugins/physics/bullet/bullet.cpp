@@ -38,6 +38,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <CollisionShapes/CylinderShape.h>
 #include <PHY_IMotionState.h>
 #include <SimdTransform.h>
+#include <SimdMatrix3x3.h>
 #include <Dynamics/MassProps.h>
 
 #include "bullet.h"
@@ -218,7 +219,8 @@ bool csBulletDynamicsSystem::AttachColliderBox (const csVector3 &size,
   bulletc->SetFriction (friction);
   bulletc->SetSoftness (softness);
   bulletc->CreateBoxGeometry (size);
-  bulletc->SetTransform (csOrthoTransform(trans.GetO2T().GetTranspose(),trans.GetOrigin()));
+
+  bulletc->SetTransform (trans);
   colliders.Push (bulletc);
 
   return true;
@@ -264,13 +266,13 @@ csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynsys)
   mass = ccdObjectCi.m_mass = 1;
 
   ccdObjectCi.m_MotionState = ms;
-  bbody = new CcdPhysicsController(ccdObjectCi);
+  pc = new CcdPhysicsController(ccdObjectCi);
 
   move_cb = (iDynamicsMoveCallback*)new csBulletDefaultMoveCallback ();
 }
 csBulletRigidBody::~csBulletRigidBody ()
 {
-  delete bbody;
+  delete pc;
   if (move_cb) move_cb->DecRef ();
 }
 
@@ -292,13 +294,13 @@ bool csBulletRigidBody::Disable (void)
 }
 bool csBulletRigidBody::Enable (void)
 {
-  bbody->SetActive (true);
+  pc->SetActive (true);
   return true;
 }
 
 bool csBulletRigidBody::IsEnabled (void)
 {
-  return bbody->GetRigidBody()->GetActivationState() == 1;
+  return pc->GetRigidBody()->GetActivationState() == 1;
 }
 
 csRef<iBodyGroup> csBulletRigidBody::GetGroup (void)
@@ -308,14 +310,14 @@ csRef<iBodyGroup> csBulletRigidBody::GetGroup (void)
 
 void csBulletRigidBody::ResetShape ()
 {
-  BroadphaseProxy* bpproxy = (BroadphaseProxy*)bbody->m_broadphaseHandle;
-  bpproxy->SetClientObjectType(bbody->GetRigidBody()->GetCollisionShape()->GetShapeType());
+  BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->m_broadphaseHandle;
+  bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
   ds->GetBulletSys ()->GetBroadphase()->CleanProxyFromPairs(bpproxy);
 
   SimdVector3 newinertia;
-  bbody->GetRigidBody()->GetCollisionShape()->CalculateLocalInertia(mass,newinertia);
-  bbody->GetRigidBody()->setMassProps(mass,newinertia);
-  bbody->GetRigidBody()->updateInertiaTensor();
+  pc->GetRigidBody()->GetCollisionShape()->CalculateLocalInertia(mass,newinertia);
+  pc->GetRigidBody()->setMassProps(mass,newinertia);
+  pc->GetRigidBody()->updateInertiaTensor();
 }
 
 bool csBulletRigidBody::AttachColliderMesh (iMeshWrapper* mesh,
@@ -329,10 +331,10 @@ bool csBulletRigidBody::AttachColliderCylinder (float length, float radius,
                                                 const csOrthoTransform& trans, float friction, float density,
                                                 float elasticity, float softness)
 {
-  if (bbody->GetRigidBody ()->GetCollisionShape ())
-    delete bbody->GetCollisionShape ();
+  //if (pc->GetRigidBody ()->GetCollisionShape ())
+  //  delete pc->GetCollisionShape ();
 
-  //bbody->GetRigidBody ()->SetCollisionShape (new CylinderShape ());
+  //pc->GetRigidBody ()->SetCollisionShape (new CylinderShape ());
 
   //ResetShape ();
 
@@ -343,12 +345,12 @@ bool csBulletRigidBody::AttachColliderBox (const csVector3 &size,
                                            const csOrthoTransform& trans, float friction, float density,
                                            float elasticity, float softness)
 {
-  if (bbody->GetRigidBody ()->GetCollisionShape ())
-    delete bbody->GetCollisionShape ();
+  if (pc->GetRigidBody ()->GetCollisionShape ())
+    delete pc->GetCollisionShape ();
 
   SimdVector3 s (size.x, size.y, size.z); 
-  bbody->GetRigidBody ()->SetCollisionShape (new BoxShape (s));
-  bbody->GetRigidBody ()->setFriction (friction);
+  pc->GetRigidBody ()->SetCollisionShape (new BoxShape (s));
+  pc->GetRigidBody ()->setFriction (friction);
 
   ResetShape ();
 
@@ -359,11 +361,11 @@ bool csBulletRigidBody::AttachColliderSphere (float radius, const csVector3 &off
                                               float friction, float density, float elasticity,
                                               float softness)
 {
-  if (bbody->GetRigidBody ()->GetCollisionShape ())
-    delete bbody->GetCollisionShape ();
+  if (pc->GetRigidBody ()->GetCollisionShape ())
+    delete pc->GetCollisionShape ();
 
-  bbody->GetRigidBody ()->SetCollisionShape (new SphereShape (radius)); 
-  bbody->GetRigidBody ()->setFriction (friction);
+  pc->GetRigidBody ()->SetCollisionShape (new SphereShape (radius)); 
+  pc->GetRigidBody ()->setFriction (friction);
 
   ResetShape ();
 
@@ -389,7 +391,7 @@ void csBulletRigidBody::DestroyCollider (iDynamicsSystemCollider* collider)
 
 void csBulletRigidBody::SetPosition (const csVector3& trans)
 {
-  bbody->setPosition (trans.x, trans.y, trans.z);
+  pc->setPosition (trans.x, trans.y, trans.z);
 }
 
 const csVector3 csBulletRigidBody::GetPosition () const
@@ -402,13 +404,13 @@ const csVector3 csBulletRigidBody::GetPosition () const
 void csBulletRigidBody::SetOrientation (const csMatrix3& rot)
 {
   csQuaternion q (rot);
-  bbody->setOrientation (q.x, q.y, q.z, q.r);
+  pc->setOrientation (q.x, q.y, q.z, q.r);
 }
 
 const csMatrix3 csBulletRigidBody::GetOrientation () const
 {
   csQuaternion q;
-  bbody->getOrientation (q.x, q.y, q.z, q.r);
+  ms->getWorldOrientation(q.x,q.y,q.z,q.r);
   return csMatrix3 (q);
 }
 
@@ -425,7 +427,7 @@ const csOrthoTransform csBulletRigidBody::GetTransform () const
 
 void csBulletRigidBody::SetLinearVelocity (const csVector3& vel)
 {
-  bbody->SetLinearVelocity (vel.x,vel.y,vel.z, false);
+  pc->SetLinearVelocity (vel.x,vel.y,vel.z, false);
 }
 
 const csVector3 csBulletRigidBody::GetLinearVelocity () const
@@ -435,6 +437,7 @@ const csVector3 csBulletRigidBody::GetLinearVelocity () const
 
 void csBulletRigidBody::SetAngularVelocity (const csVector3& vel)
 {
+  pc->SetAngularVelocity (vel.x, vel.y, vel.z, false);
 }
 
 const csVector3 csBulletRigidBody::GetAngularVelocity () const
@@ -446,10 +449,10 @@ void csBulletRigidBody::SetProperties (float mass, const csVector3& center,
                                        const csMatrix3& inertia)
 {
   csQuaternion q (inertia); 
-  bbody->GetRigidBody ()->setMassProps (mass,SimdVector3 (q.x, q.y, q.z));
+  pc->GetRigidBody ()->setMassProps (mass,SimdVector3 (q.x, q.y, q.z));
 
   csVector3 g = ds->GetGravity ();
-  bbody->GetRigidBody ()->setGravity (SimdVector3 (g.x, g.y, g.z));
+  pc->GetRigidBody ()->setGravity (SimdVector3 (g.x, g.y, g.z));
 
   csBulletRigidBody::mass = mass;
 }
@@ -478,7 +481,7 @@ void csBulletRigidBody::AdjustTotalMass (float targetmass)
 void csBulletRigidBody::AddForce (const csVector3& force)
 {
   SimdVector3 f (force.x, force.y, force.z);
-  bbody->GetRigidBody ()->applyCentralForce(f);
+  pc->GetRigidBody ()->applyCentralForce(f);
 }
 void csBulletRigidBody::AddTorque (const csVector3& force)
 {
@@ -545,7 +548,7 @@ int csBulletRigidBody::GetColliderCount ()
 }
 void csBulletRigidBody::Update ()
 {
-  if (bbody && move_cb)
+  if (pc && move_cb)
   {
     csOrthoTransform trans;
     trans = GetTransform ();
@@ -643,7 +646,7 @@ csBulletCollider::csBulletCollider (csBulletDynamicsSystem* dynsys)
 {
   CcdConstructionInfo ccdObjectCi;
 
-  MyMotionState *ms = new MyMotionState ();
+  ms = new MyMotionState ();
 
   ms->setWorldPosition (0, 0, 0);
   ms->setWorldOrientation (0,0,0,1);
@@ -656,24 +659,24 @@ csBulletCollider::csBulletCollider (csBulletDynamicsSystem* dynsys)
   ccdObjectCi.m_mass = 0; //collider need 0 mass
   ccdObjectCi.m_MotionState = ms;
 
-  bc = new CcdPhysicsController (ccdObjectCi);
+  pc = new CcdPhysicsController (ccdObjectCi);
 
   ds = dynsys;
 }
 csBulletCollider::~csBulletCollider ()
 {
-  delete bc;
+  delete pc;
 }
 void csBulletCollider::ResetShape ()
 {
-  BroadphaseProxy* bpproxy = (BroadphaseProxy*)bc->m_broadphaseHandle;
-  bpproxy->SetClientObjectType(bc->GetRigidBody()->GetCollisionShape()->GetShapeType());
+  BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->m_broadphaseHandle;
+  bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
   ds->GetBulletSys ()->GetBroadphase()->CleanProxyFromPairs(bpproxy);
 
-  //SimdVector3 newinertia;
-  //bbody->GetRigidBody()->GetCollisionShape()->CalculateLocalInertia(mass,newinertia);
-  //bbody->GetRigidBody()->setMassProps(mass,newinertia);
-  //bbody->GetRigidBody()->updateInertiaTensor();
+  SimdVector3 newinertia;
+  pc->GetRigidBody()->GetCollisionShape()->CalculateLocalInertia(0,newinertia);
+  pc->GetRigidBody()->setMassProps(0,newinertia);
+  pc->GetRigidBody()->updateInertiaTensor();
 }
 
 bool csBulletCollider::CreateSphereGeometry (const csSphere& sphere)
@@ -690,11 +693,11 @@ bool csBulletCollider::CreateMeshGeometry (iMeshWrapper *mesh)
 }
 bool csBulletCollider::CreateBoxGeometry (const csVector3& size)
 {
-  if (bc->GetRigidBody ()->GetCollisionShape ())
-    delete bc->GetCollisionShape ();
+  if (pc->GetRigidBody ()->GetCollisionShape ())
+    delete pc->GetCollisionShape ();
 
   SimdVector3 s (size.x, size.y, size.z); 
-  bc->GetRigidBody ()->SetCollisionShape (new BoxShape (s));
+  pc->GetRigidBody ()->SetCollisionShape (new BoxShape (s));
   ResetShape ();
   geom_type = BOX_COLLIDER_GEOMETRY;
 
@@ -710,7 +713,7 @@ void csBulletCollider::SetCollisionCallback (
 }
 void csBulletCollider::SetFriction (float friction)
 {
-  bc->GetRigidBody ()->setFriction (friction);
+  pc->GetRigidBody ()->setFriction (friction);
 }
 void csBulletCollider::SetSoftness (float softness)
 {
@@ -723,7 +726,7 @@ void csBulletCollider::SetElasticity (float elasticity)
 }
 float csBulletCollider::GetFriction ()
 {
-  return 0;
+  return pc->GetRigidBody ()->getFriction ();
 }
 float csBulletCollider::GetSoftness ()
 {
@@ -739,14 +742,40 @@ float csBulletCollider::GetElasticity ()
 }
 void csBulletCollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmesh_fact)
 {
-}
-csColliderGeometryType csBulletCollider::GetGeometryType ()
-{
-  return NO_GEOMETRY;
+  switch (geom_type)
+  {
+    case BOX_COLLIDER_GEOMETRY:
+    {
+      SimdTransform trans;
+      SimdVector3 max;
+      SimdVector3 min;
+      BoxShape*  b = (BoxShape*)pc->GetRigidBody ()->GetCollisionShape ();
+
+      csBox3 box;
+      for (int i = 0; i < b->GetNumVertices (); i++)
+      {
+        SimdVector3 vtx;
+        b->GetVertex (i, vtx); 
+        box.AddBoundingVertexTest (csVector3 (vtx[0], vtx[1], vtx[2]));
+      }
+      genmesh_fact->GenerateBox (box);
+      genmesh_fact->CalculateNormals (); 
+    }
+    break;
+    default:
+    break;
+  }
 }
 csOrthoTransform csBulletCollider::GetTransform ()
 {
-  return csOrthoTransform ();
+  csQuaternion q;
+  ms->getWorldOrientation(q.x,q.y,q.z,q.r);
+  csMatrix3 rot;
+
+  csVector3 v;
+  ms->getWorldPosition (v.x, v.y, v.z);
+
+  return csOrthoTransform (rot, v);
 }
 csOrthoTransform csBulletCollider::GetLocalTransform ()
 {
@@ -755,9 +784,9 @@ csOrthoTransform csBulletCollider::GetLocalTransform ()
 void csBulletCollider::SetTransform (const csOrthoTransform& trans)
 {
   csQuaternion q (trans.GetO2T ());
-  bc->setOrientation (q.x, q.y, q.z, q.r);
+  ms->setWorldOrientation (q.x, q.y, q.z, q.r);
   csVector3 pos = trans.GetOrigin ();
-  bc->setPosition (pos.x, pos.y, pos.z);
+  ms->setWorldPosition (pos.x, pos.y, pos.z);
 }
 bool csBulletCollider::GetBoxGeometry (csVector3& size)
 {

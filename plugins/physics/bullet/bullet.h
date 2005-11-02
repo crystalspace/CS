@@ -167,7 +167,7 @@ public:
 
 class csBulletRigidBody : public scfImplementationExt1<csBulletRigidBody, csObject, iRigidBody>
 {
-  CcdPhysicsController *bbody; 
+  CcdPhysicsController *pc; 
   MyMotionState *ms;
   csRef<iMeshWrapper> mesh;
   csRef<iDynamicsMoveCallback> move_cb;
@@ -180,7 +180,7 @@ public:
   csBulletRigidBody (csBulletDynamicsSystem* ds);
   virtual ~csBulletRigidBody ();
 
-  CcdPhysicsController *GetBulletBody () {return bbody;}
+  CcdPhysicsController *GetBulletBody () {return pc;}
 
   iObject *QueryObject (void)
   {return (iObject*)this;}
@@ -300,16 +300,17 @@ protected:
 
 class csBulletCollider : public scfImplementation1<csBulletCollider, iDynamicsSystemCollider>
 {
-  CcdPhysicsController* bc;
+  CcdPhysicsController* pc;
   csBulletDynamicsSystem* ds;
   csColliderGeometryType geom_type;
+  MyMotionState *ms;
 
 public:
 
   csBulletCollider (csBulletDynamicsSystem* dynsys);
   virtual ~csBulletCollider ();
 
-  CcdPhysicsController* GetBulletController () {return bc;}
+  CcdPhysicsController* GetBulletController () {return pc;}
 
   bool CreateSphereGeometry (const csSphere& sphere);
   bool CreatePlaneGeometry (const csPlane3& plane);
@@ -330,7 +331,8 @@ public:
   float GetElasticity ();
 
   void FillWithColliderGeometry (csRef<iGeneralFactoryState> genmesh_fact);
-  csColliderGeometryType GetGeometryType ();
+  csColliderGeometryType GetGeometryType () 
+  {return geom_type;};
   csOrthoTransform GetTransform ();
   csOrthoTransform GetLocalTransform ();
   void SetTransform (const csOrthoTransform& trans);
