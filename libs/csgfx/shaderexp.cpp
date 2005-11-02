@@ -85,6 +85,7 @@ enum
   // Pseudo-ops, special case weird stuff
   OP_PS_MAKE_VECTOR,
 
+  // Highest internal op number
   OP_LIMIT,
 
   // XML Special identifiers
@@ -95,6 +96,42 @@ enum
   OP_INT_SELT12,
   OP_INT_SELT34,
   OP_INT_LOAD,
+  
+  OP_LAST
+};
+
+static const char* const opNames[OP_LAST] = {
+  "!INVALID",
+  "ADD",
+  "SUB",
+  "MUL",
+  "DIV",
+  "ELT1",
+  "ELT2",
+  "ELT3",
+  "ELT4",
+  "SIN",
+  "COS",
+  "TAN",
+  "DOT",
+  "CROSS",
+  "VECLEN",
+  "NORMAL",
+  "ARCSIN",
+  "ARCCOS",
+  "ARCTAN",
+  "POW",
+  "MIN",
+  "MAX",
+  "TIME",
+  "FRAME",
+  "!MAKEVECTOR",
+  "!LIMIT",
+  "!ATOM",
+  "!SEXP",
+  "SELT12",
+  "SELT34",
+  "LOAD"
 };
 
 enum 
@@ -114,7 +151,22 @@ enum
   TYPE_CONS,
 
   // Special internal types
-  TYPE_ACCUM
+  TYPE_ACCUM,
+  
+  TYPE_LAST
+};
+
+static const char* const typeNames[TYPE_LAST] = {
+  "!invalid",
+  "num",
+  "vec2",
+  "vec3",
+  "vec4",
+  "var",
+  "!limit",
+  "!oper",
+  "!cons",
+  "!accum"
 };
 
 struct cons 
@@ -187,130 +239,11 @@ static op_args_info optimize_arg_table[] =
 
 CS_LEAKGUARD_IMPLEMENT (csShaderExpression);
 
-bool csShaderExpression::loaded = false;
-csStringHash csShaderExpression::xmltokens;
-csStringHash csShaderExpression::sexptokens;
-csStringHash csShaderExpression::xmltypes;
-csStringHash csShaderExpression::mnemonics;
-
 csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
 accstack_max(0)
 {
   obj_reg = objr;
 
-  // @@@ Sucky hack.
-  parseError = &errorMsg;
-  evalError = &errorMsg;
-
-  if (!loaded)
-  {
-    loaded = true;
-
-    xmltokens.Register("add", OP_ADD);
-    xmltokens.Register("sub", OP_SUB);
-    xmltokens.Register("mul", OP_MUL);
-    xmltokens.Register("div", OP_DIV);
-
-    xmltokens.Register("elt1", OP_VEC_ELT1);
-    xmltokens.Register("elt2", OP_VEC_ELT2);
-    xmltokens.Register("elt3", OP_VEC_ELT3);
-    xmltokens.Register("elt4", OP_VEC_ELT4);
-
-    xmltokens.Register("sin", OP_FUNC_SIN);
-    xmltokens.Register("cos", OP_FUNC_COS);
-    xmltokens.Register("tan", OP_FUNC_TAN);
-    xmltokens.Register("dot", OP_FUNC_DOT);
-    xmltokens.Register("cross", OP_FUNC_CROSS);
-    xmltokens.Register("vec-len", OP_FUNC_VEC_LEN);
-    xmltokens.Register("norm", OP_FUNC_NORMAL);
-
-    xmltokens.Register("arcsin", OP_FUNC_ARCSIN);
-    xmltokens.Register("arccos", OP_FUNC_ARCCOS);
-    xmltokens.Register("arctan", OP_FUNC_ARCTAN);
-
-    xmltokens.Register("pow", OP_FUNC_POW);
-    xmltokens.Register("min", OP_FUNC_MIN);
-    xmltokens.Register("max", OP_FUNC_MAX);
-
-    xmltokens.Register("time", OP_FUNC_TIME);
-    xmltokens.Register("frame", OP_FUNC_FRAME);
-
-    xmltokens.Register("make-vector", OP_PS_MAKE_VECTOR);
-
-    xmltokens.Register("atom", OP_XML_ATOM);
-    xmltokens.Register("sexp", OP_XML_SEXP);
-
-    xmltypes.Register("var", TYPE_VARIABLE);
-    xmltypes.Register("num", TYPE_NUMBER);
-    xmltypes.Register("vec2", TYPE_VECTOR2);
-    xmltypes.Register("vec3", TYPE_VECTOR3);
-    xmltypes.Register("vec4", TYPE_VECTOR4);
-
-    sexptokens.Register("+", OP_ADD);
-    sexptokens.Register("-", OP_SUB);
-    sexptokens.Register("*", OP_MUL);
-    sexptokens.Register("/", OP_DIV);
-
-    sexptokens.Register("elt1", OP_VEC_ELT1);
-    sexptokens.Register("elt2", OP_VEC_ELT2);
-    sexptokens.Register("elt3", OP_VEC_ELT3);
-    sexptokens.Register("elt4", OP_VEC_ELT4);
-
-    sexptokens.Register("sin", OP_FUNC_SIN);
-    sexptokens.Register("cos", OP_FUNC_COS);
-    sexptokens.Register("tan", OP_FUNC_TAN);
-    sexptokens.Register("dot", OP_FUNC_DOT);
-    sexptokens.Register("cross", OP_FUNC_CROSS);
-    sexptokens.Register("vec-len", OP_FUNC_VEC_LEN);
-    sexptokens.Register("norm", OP_FUNC_NORMAL);
-
-    sexptokens.Register("arcsin", OP_FUNC_ARCSIN);
-    sexptokens.Register("arccos", OP_FUNC_ARCCOS);
-    sexptokens.Register("arctan", OP_FUNC_ARCTAN);
-
-    sexptokens.Register("pow", OP_FUNC_POW);
-    sexptokens.Register("min", OP_FUNC_MIN);
-    sexptokens.Register("max", OP_FUNC_MAX);
-
-    sexptokens.Register("time", OP_FUNC_TIME);
-    sexptokens.Register("frame", OP_FUNC_FRAME);
-
-    sexptokens.Register("make-vector", OP_PS_MAKE_VECTOR);
-
-    /* for debugging, can be removed */
-    mnemonics.Register("ADD", OP_ADD);
-    mnemonics.Register("SUB", OP_SUB);
-    mnemonics.Register("MUL", OP_MUL);
-    mnemonics.Register("DIV", OP_DIV);
-
-    mnemonics.Register("ELT1", OP_VEC_ELT1);
-    mnemonics.Register("ELT2", OP_VEC_ELT2);
-    mnemonics.Register("ELT3", OP_VEC_ELT3);
-    mnemonics.Register("ELT4", OP_VEC_ELT4);
-
-    mnemonics.Register("SIN", OP_FUNC_SIN);
-    mnemonics.Register("COS", OP_FUNC_COS);
-    mnemonics.Register("TAN", OP_FUNC_TAN);
-    mnemonics.Register("DOT", OP_FUNC_DOT);
-    mnemonics.Register("CROSS", OP_FUNC_CROSS);
-    mnemonics.Register("VLEN", OP_FUNC_VEC_LEN);
-    mnemonics.Register("NORM", OP_FUNC_NORMAL);
-
-    mnemonics.Register("ARCSIN", OP_FUNC_ARCSIN);
-    mnemonics.Register("ARCCOS", OP_FUNC_ARCCOS);
-    mnemonics.Register("ARCTAN", OP_FUNC_ARCTAN);
-
-    mnemonics.Register("POW", OP_FUNC_POW);
-    mnemonics.Register("MIN", OP_FUNC_MIN);
-    mnemonics.Register("MAX", OP_FUNC_MAX);
-
-    mnemonics.Register("FRAME", OP_FUNC_FRAME);
-    mnemonics.Register("TIME", OP_FUNC_TIME);
-
-    mnemonics.Register("SELT12", OP_INT_SELT12);
-    mnemonics.Register("SELT34", OP_INT_SELT34);
-    mnemonics.Register("LOAD", OP_INT_LOAD);
-  }
 }
 
 csShaderExpression::~csShaderExpression()
@@ -320,19 +253,19 @@ csShaderExpression::~csShaderExpression()
 
 void csShaderExpression::ParseError (const char* message, ...) const
 {
-  if (!parseError->IsEmpty()) *parseError << '\n';
+  if (!errorMsg.IsEmpty()) errorMsg << '\n';
   va_list args;
   va_start (args, message);
-  parseError->AppendFmtV (message, args);
+  errorMsg.AppendFmtV (message, args);
   va_end (args);
 }
 
 void csShaderExpression::EvalError (const char* message, ...) const
 {
-  if (!evalError->IsEmpty()) *evalError << '\n';
+  if (!errorMsg.IsEmpty()) errorMsg << '\n';
   va_list args;
   va_start (args, message);
-  evalError->AppendFmtV (message, args);
+  errorMsg.AppendFmtV (message, args);
   va_end (args);
 }
 
@@ -563,7 +496,7 @@ bool csShaderExpression::eval_const(cons *& head)
     if (cell->cdr)
     {
       EvalError ("Single argument operator \'%s\' has more than 1 argument.", 
-        sexptokens.Request(oper));
+        GetOperName (oper));
 
       return false;
     }
@@ -752,7 +685,7 @@ bool csShaderExpression::eval_const(cons *& head)
     if (argcount < optimize_arg_table[oper].min_args || argcount > optimize_arg_table[oper].max_args)
     {
       EvalError ("Incorrect # of args (%d) to operator %s.", argcount, 
-        sexptokens.Request(oper));
+        GetOperName (oper));
 
       return false;
     }
@@ -916,7 +849,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_
   case OP_INT_SELT34: return eval_selt34(arg1, arg2, output);
 
   default:
-    EvalError ("Unknown multi-arg operator %s (%d).", sexptokens.Request(oper), oper);
+    EvalError ("Unknown multi-arg operator %s (%d).", GetOperName (oper), oper);
   }
 
   return false;
@@ -961,7 +894,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output)
   case OP_INT_LOAD: return eval_load(arg1, output);
 
   default:
-    EvalError ("Unknown single-arg operator %s (%d).", sexptokens.Request(oper), oper);
+    EvalError ("Unknown single-arg operator %s (%d).", GetOperName (oper), oper);
   }
 
   return false;
@@ -975,7 +908,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg & output)
   case OP_FUNC_FRAME: return eval_frame(output);
 
   default:
-    EvalError ("Unknown single-arg operator %s (%d).", sexptokens.Request(oper), oper);
+    EvalError ("Unknown single-arg operator %s (%d).", GetOperName (oper), oper);
   }
 
   return false;
@@ -1004,7 +937,7 @@ bool csShaderExpression::eval_add(const oper_arg & arg1, const oper_arg & arg2, 
   else 
   {
     EvalError ("Invalid types for operator, %s(%" PRIu8 ") + %s(%" PRIu8 ").", 
-      get_type_name(arg1.type), arg1.type, get_type_name(arg2.type), 
+      GetTypeName (arg1.type), arg1.type, GetTypeName (arg2.type), 
       arg2.type);
 
     return false;
@@ -1036,7 +969,7 @@ bool csShaderExpression::eval_sub(const oper_arg & arg1, const oper_arg & arg2, 
   else 
   {
     EvalError ("Invalid types for operator, %s - %s.", 
-      get_type_name(arg1.type), get_type_name(arg2.type));
+      GetTypeName (arg1.type), GetTypeName (arg2.type));
 
     return false;
   }
@@ -1074,7 +1007,7 @@ bool csShaderExpression::eval_mul(const oper_arg & arg1, const oper_arg & arg2, 
   } 
   else 
   {
-    EvalError ("Invalid types for operator, %s * %s.", get_type_name(arg1.type), get_type_name(arg2.type));
+    EvalError ("Invalid types for operator, %s * %s.", GetTypeName (arg1.type), GetTypeName (arg2.type));
 
     return false;
   }
@@ -1101,7 +1034,7 @@ bool csShaderExpression::eval_div(const oper_arg & arg1, const oper_arg & arg2, 
   } 
   else 
   {
-    EvalError ("Invalid types for operator, %s / %s.", get_type_name(arg1.type), get_type_name(arg2.type));
+    EvalError ("Invalid types for operator, %s / %s.", GetTypeName (arg1.type), GetTypeName (arg2.type));
 
     return false;
   }
@@ -1113,7 +1046,7 @@ bool csShaderExpression::eval_elt1(const oper_arg & arg1, oper_arg & output) con
 {
   if (arg1.type < TYPE_VECTOR2 || arg1.type > TYPE_VECTOR4)
   {
-    EvalError ("Invalid type for first argument to elt1, %s.", get_type_name(arg1.type));
+    EvalError ("Invalid type for first argument to elt1, %s.", GetTypeName (arg1.type));
 
     return false;
   }
@@ -1128,7 +1061,7 @@ bool csShaderExpression::eval_elt2(const oper_arg & arg1, oper_arg & output) con
 {
   if (arg1.type < TYPE_VECTOR2 || arg1.type > TYPE_VECTOR4)
   {
-    EvalError ("Invalid type for first argument to elt2, %s.", get_type_name(arg1.type));
+    EvalError ("Invalid type for first argument to elt2, %s.", GetTypeName (arg1.type));
 
     return false;
   }
@@ -1143,7 +1076,7 @@ bool csShaderExpression::eval_elt3(const oper_arg & arg1, oper_arg & output) con
 {
   if (arg1.type < TYPE_VECTOR3 || arg1.type > TYPE_VECTOR4)
   {
-    EvalError ("Invalid type for first argument to elt3, %s.", get_type_name(arg1.type));
+    EvalError ("Invalid type for first argument to elt3, %s.", GetTypeName (arg1.type));
 
     return false;
   }
@@ -1158,7 +1091,7 @@ bool csShaderExpression::eval_elt4(const oper_arg & arg1, oper_arg & output) con
 {
   if (arg1.type != TYPE_VECTOR4)
   {
-    EvalError ("Invalid type for first argument to elt4, %s.", get_type_name(arg1.type));
+    EvalError ("Invalid type for first argument to elt4, %s.", GetTypeName (arg1.type));
 
     return false;
   }
@@ -1173,7 +1106,7 @@ bool csShaderExpression::eval_sin(const oper_arg & arg1, oper_arg & output) cons
 {
   if (arg1.type != TYPE_NUMBER)
   {
-    EvalError ("Invalid type for first argument to sin, %s.", get_type_name(arg1.type));
+    EvalError ("Invalid type for first argument to sin, %s.", GetTypeName (arg1.type));
 
     return false;
   }
@@ -1188,7 +1121,7 @@ bool csShaderExpression::eval_cos(const oper_arg & arg1, oper_arg & output) cons
 {
   if (arg1.type != TYPE_NUMBER)
   {
-    EvalError ("Invalid type for first argument to cos, %s.", get_type_name(arg1.type));
+    EvalError ("Invalid type for first argument to cos, %s.", GetTypeName (arg1.type));
 
     return false;
   }
@@ -1203,7 +1136,7 @@ bool csShaderExpression::eval_tan(const oper_arg & arg1, oper_arg & output) cons
 {
   if (arg1.type != TYPE_NUMBER)
   {
-    EvalError ("Invalid type for first argument to tan, %s.", get_type_name(arg1.type));
+    EvalError ("Invalid type for first argument to tan, %s.", GetTypeName (arg1.type));
 
     return false;
   }
@@ -1218,7 +1151,7 @@ bool csShaderExpression::eval_arcsin(const oper_arg & arg1, oper_arg & output) c
 {
   if (arg1.type != TYPE_NUMBER)
   {
-    EvalError ("Invalid type for first argument to arcsin, %s.", get_type_name(arg1.type));
+    EvalError ("Invalid type for first argument to arcsin, %s.", GetTypeName (arg1.type));
 
     return false;
   }
@@ -1233,7 +1166,7 @@ bool csShaderExpression::eval_arccos(const oper_arg & arg1, oper_arg & output) c
 {
   if (arg1.type != TYPE_NUMBER)
   {
-    EvalError ("Invalid type for first argument to arccos, %s.", get_type_name(arg1.type));
+    EvalError ("Invalid type for first argument to arccos, %s.", GetTypeName (arg1.type));
 
     return false;
   }
@@ -1248,7 +1181,7 @@ bool csShaderExpression::eval_arctan(const oper_arg & arg1, oper_arg & output) c
 {
   if (arg1.type != TYPE_NUMBER)
   {
-    EvalError ("Invalid type for first argument to arctan, %s.", get_type_name(arg1.type));
+    EvalError ("Invalid type for first argument to arctan, %s.", GetTypeName (arg1.type));
 
     return false;
   }
@@ -1359,7 +1292,7 @@ bool csShaderExpression::eval_pow(const oper_arg & arg1, const oper_arg & arg2, 
   else 
   {
     EvalError ("Invalid types for operator, pow(%s, %s).", 
-      get_type_name(arg1.type), get_type_name(arg2.type));
+      GetTypeName (arg1.type), GetTypeName (arg2.type));
 
     return false;
   }
@@ -1377,7 +1310,7 @@ bool csShaderExpression::eval_min(const oper_arg & arg1, const oper_arg & arg2, 
   else 
   {
     EvalError ("Invalid types for operator, min(%s, %s).", 
-      get_type_name(arg1.type), get_type_name(arg2.type));
+      GetTypeName (arg1.type), GetTypeName (arg2.type));
 
     return false;
   }
@@ -1395,7 +1328,7 @@ bool csShaderExpression::eval_max(const oper_arg & arg1, const oper_arg & arg2, 
   else 
   {
     EvalError ("Invalid types for operator, max(%s, %s).", 
-      get_type_name(arg1.type), get_type_name(arg2.type));
+      GetTypeName (arg1.type), GetTypeName (arg2.type));
 
     return false;
   }
@@ -1476,7 +1409,7 @@ bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node)
 {
   csRef<iDocumentNodeIterator> iter (node->GetNodes());
   cons * cptr = head;
-  csStringID tok = xmltokens.Request(node->GetValue());
+  csStringID tok = GetXmlTokenOp (node->GetValue());
 
   if (tok == OP_XML_ATOM)
   {
@@ -1484,7 +1417,7 @@ bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node)
       * val  = node->GetContentsValue();
 
     if (!parse_xml_atom(cptr->car, 
-      xmltypes.Request(type), 
+      GetXmlType (type), 
       type,
       val))
     {
@@ -1513,7 +1446,7 @@ bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node)
 
       csRef<iDocumentNode> next_node (iter->Next());
       if (next_node->GetType() != CS_NODE_ELEMENT) continue;
-      csStringID sub_tok = xmltokens.Request(next_node->GetValue());
+      csStringID sub_tok = GetXmlTokenOp (next_node->GetValue());
 
       cptr->cdr = new cons;
       cptr->cdr->cdr_rev = cptr;
@@ -1580,7 +1513,7 @@ bool csShaderExpression::parse_sexp_form(const char *& text, cons * head) {
   memcpy(tmp2, text, size);
   tmp2[size] = 0;
 
-  csStringID func_name = sexptokens.Request(tmp2);
+  csStringID func_name = GetSexpTokenOp (tmp2);
   if (func_name <= OP_INVALID || func_name >= OP_LIMIT) {
     ParseError ("Invalid S-EXP function-name: '%s'.", tmp2);
 
@@ -2104,7 +2037,7 @@ void csShaderExpression::print_cons(const cons * head) const
       break;
 
     case TYPE_OPER:
-      csPrintf ("%s", sexptokens.Request((csStringID)cell->car.oper));
+      csPrintf ("%s", GetOperName ((csStringID)cell->car.oper));
       break;
 
     case TYPE_NUMBER:
@@ -2126,7 +2059,7 @@ void csShaderExpression::print_cons(const cons * head) const
       break;
 
     case TYPE_VARIABLE:
-      csPrintf (" %s", strset->Request(cell->car.var));
+      csPrintf (" \"%s\"", strset->Request(cell->car.var));
       break;
 
     default:
@@ -2147,7 +2080,7 @@ void csShaderExpression::print_ops(const oper_array & ops) const
   {
     const oper & op = iter.Next();
 
-    csPrintf (" %s", mnemonics.Request(op.opcode));
+    csPrintf (" %s", GetOperName (op.opcode));
 
     if (op.arg1.type != TYPE_INVALID)
     {
@@ -2251,4 +2184,133 @@ void csShaderExpression::print_result(const oper_arg & arg) const {
       csPrintf ("#<unknown type %" PRIu8 ">", arg.type);
     }
   
+}
+
+const char* csShaderExpression::GetTypeName (csStringID id)
+{
+  CS_ASSERT (id < TYPE_LAST);
+  return typeNames[id];
+}
+
+const char* csShaderExpression::GetOperName (csStringID id)
+{
+  CS_ASSERT (id < OP_LAST);
+  return opNames[id];
+}
+
+struct TokenTabEntry
+{
+  const char* token;
+  size_t tokenLen;
+  csStringID id;
+};
+
+static csStringID GetTokenID (const TokenTabEntry* tokenTab,
+  size_t tokenCount, const char* token)
+{
+  const char* p = token;
+  const size_t tokenLen = strlen (token);
+  size_t pos = 0;
+  size_t l = 0, h = tokenCount;
+  while (l < h)
+  {
+    size_t m = (l+h) / 2;
+    if (pos > tokenTab[m].tokenLen) return csInvalidStringID;
+    const char* tabTok = tokenTab[m].token;
+    int d = tabTok[pos] - *p;
+    if (d == 0)
+    {
+      do
+      {
+        pos++; p++;
+      } while (tabTok[pos] == *p);
+      if (pos >= tokenLen)
+        return tokenTab[m].id;
+      continue;
+    }
+    else if (d < 0)
+    {
+      l = m+1;
+    }
+    else
+    {
+      h = m;
+    }
+  }
+  return csInvalidStringID;
+}
+
+static const TokenTabEntry commonTokens[] = {
+  {"arccos", 6, OP_FUNC_ARCCOS},
+  {"arcsin", 6, OP_FUNC_ARCSIN},
+  {"arctan", 6, OP_FUNC_ARCTAN},
+  {"cos", 3, OP_FUNC_COS},
+  {"cross", 5, OP_FUNC_CROSS},
+  {"dot", 3, OP_FUNC_DOT},
+  {"elt1", 4, OP_VEC_ELT1},
+  {"elt2", 4, OP_VEC_ELT2},
+  {"elt3", 4, OP_VEC_ELT3},
+  {"elt4", 4, OP_VEC_ELT4},
+  {"frame", 4, OP_FUNC_FRAME},
+  {"make-vector", 11, OP_PS_MAKE_VECTOR},
+  {"max", 3, OP_FUNC_MAX},
+  {"min", 3, OP_FUNC_MIN},
+  {"norm", 4, OP_FUNC_NORMAL},
+  {"pow", 3, OP_FUNC_POW},
+  {"sin", 3, OP_FUNC_SIN},
+  {"tan", 3, OP_FUNC_TAN},
+  {"time", 4, OP_FUNC_TIME},
+  {"vec-len", 7, OP_FUNC_VEC_LEN}
+};
+const size_t commonTokenNum = sizeof(commonTokens)/sizeof(TokenTabEntry);
+
+csStringID csShaderExpression::GetCommonTokenOp (const char* token)
+{
+  return GetTokenID (commonTokens, commonTokenNum, token);
+}
+
+static const TokenTabEntry xmlTokens[] = {
+  {"add", 3, OP_ADD},
+  {"atom", 4, OP_XML_ATOM},
+  {"div", 3, OP_DIV},
+  {"mul", 3, OP_MUL},
+  {"sexp", 4, OP_XML_SEXP},
+  {"sub", 4, OP_SUB}
+};
+const size_t xmlTokenNum = sizeof(xmlTokens)/sizeof(TokenTabEntry);
+
+csStringID csShaderExpression::GetXmlTokenOp (const char* token)
+{
+  csStringID id = GetCommonTokenOp (token);
+  if (id != csInvalidStringID) return id;
+  return GetTokenID (xmlTokens, xmlTokenNum, token);
+}
+
+static const TokenTabEntry sexpTokens[] = {
+  {"*", 1, OP_MUL},
+  {"+", 1, OP_ADD},
+  {"-", 1, OP_SUB},
+  {"/", 1, OP_DIV}
+};
+const size_t sexpTokenNum = sizeof(sexpTokens)/sizeof(TokenTabEntry);
+
+csStringID csShaderExpression::GetSexpTokenOp (const char* token)
+{
+  csStringID id = GetCommonTokenOp (token);
+  if (id != csInvalidStringID) return id;
+  return GetTokenID (sexpTokens, sexpTokenNum, token);
+}
+
+static const TokenTabEntry xmlTypeTokens[] = {
+  {"num", 3, TYPE_NUMBER},
+  {"var", 3, TYPE_VARIABLE},
+  {"vec2", 4, TYPE_VECTOR2},
+  {"vec3", 4, TYPE_VECTOR3},
+  {"vec4", 4, TYPE_VECTOR4}
+};
+const size_t xmlTypeTokenNum = sizeof(xmlTypeTokens)/sizeof(TokenTabEntry);
+
+csStringID csShaderExpression::GetXmlType (const char* token)
+{
+  return GetTokenID (xmlTypeTokens, xmlTypeTokenNum, token);
 }

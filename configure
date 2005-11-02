@@ -49111,7 +49111,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-cgGetEnumString(CG_PROFILE_VP40);
+cgSetErrorHandler(0,0);
   ;
   return 0;
 }
@@ -49262,7 +49262,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-cgGetEnumString(CG_PROFILE_VP40);
+cgSetErrorHandler(0,0);
   ;
   return 0;
 }

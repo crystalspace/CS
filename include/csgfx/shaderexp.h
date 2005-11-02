@@ -77,17 +77,6 @@ public:
 
 private:
   iObjectRegistry * obj_reg;
-  /// Indicates whether the token- and type-tables have been loaded.
-  static bool loaded;
-  //@{
-  /**
-   * Various internal hash tables
-   */
-  static csStringHash xmltokens;
-  static csStringHash sexptokens;
-  static csStringHash xmltypes;
-  static csStringHash mnemonics;
-  //@}
   /// Variables used for evaluation
   csShaderVarStack* stacks;
   /// String set for producing String IDs
@@ -210,16 +199,19 @@ private:
   /// Dump the result of an operation
   void print_result(const oper_arg &) const;
 
-  inline const char * get_type_name(csStringID id) const
-  {
+  /*inline*/static const char * GetTypeName (csStringID id)/* const*/;
+  /*{
     return xmltypes.Request(id);
-  }
+  }*/
+  static const char* GetOperName (csStringID id);
+  static csStringID GetCommonTokenOp (const char* token);
+  static csStringID GetXmlTokenOp (const char* token);
+  static csStringID GetSexpTokenOp (const char* token);
+  static csStringID GetXmlType (const char* token);
 
   csShaderVariable* ResolveVar (csStringID name);
 
-  csString* parseError;
-  csString* evalError;
-  csString errorMsg;
+  mutable csString errorMsg;
   void ParseError (const char* message, ...) const;
   void EvalError (const char* message, ...) const;
 public:

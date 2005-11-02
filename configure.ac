@@ -1354,14 +1354,6 @@ CS_CHECK_LIB_WITH([z],
     [AC_MSG_NOTICE([*** zlib not found; VFS will be unusable])], 
     [], [], [], [zlib])
 
-#------------------------------------------------------------------------------
-# Check for bullet.  In addition to the standard installed locations, we also
-# search CS/libs/bullet*.
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([bullet],
-    [AC_LANG_PROGRAM(
-	[[#include <CcdPhysics/CcdPhysicsController.h>]])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])])
 
 
 #------------------------------------------------------------------------------
@@ -1537,6 +1529,16 @@ AS_IF([test $cs_cv_libode_recent = yes],
 	    [dCollideBoxPlane(0,0,0,0,0);])],
 	[], [C++], [CS_EMIT_BUILD_PROPERTY([ODE.EXTERN_C], [yes])], [], [],
 	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for bullet.  In addition to the standard installed locations, we also
+# search CS/libs/bullet*.
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([bullet],
+    [AC_LANG_PROGRAM([[#include <CcdPhysics/CcdPhysicsController.h>]])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])])
 
 
 
@@ -1835,7 +1837,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
     AS_IF([test $cs_cv_libCg = yes],
 	[CS_CHECK_BUILD([if Cg is sufficiently recent], [cs_cv_libCg_recent],
 	    [AC_LANG_PROGRAM(
-	    	[[#include <Cg/cg.h>]], [cgGetEnumString(CG_PROFILE_VP40);])],
+	    	[[#include <Cg/cg.h>]], [cgSetErrorHandler(0,0);])],
 	    [], [], [], [], [],
 	    [$cs_cv_libCg_cflags],
 	    [$cs_cv_libCg_lflags],

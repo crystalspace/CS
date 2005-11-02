@@ -38,6 +38,8 @@ chronological order.
 	  functionality. Render backend needs to flush text drawing to avoid 
 	  conflicts with text drawing states. Also viewport adjustments 
 	  weren't applied correctly in all cases.
+	- res removed some static class vars from csShaderExpression.
+	- res updated the Cg recency check.
 1-Nov-2005
 	- Jorrit fixed the wav loader of the new sound system so that it
 	  works properly on 64-bit.
