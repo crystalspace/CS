@@ -104,6 +104,10 @@ bool csConditionEvaluator::OpTypesCompatible (OperandType t1, OperandType t2)
     case operandSVValueInt:
       return OpTypesCompatible (operandInt, t2);
     case operandSVValueFloat:
+    case operandSVValueX:
+    case operandSVValueY:
+    case operandSVValueZ:
+    case operandSVValueW:
       return OpTypesCompatible (operandFloat, t2);
     case operandSVValueTexture:
       return OpTypesCompatible (operandBoolean, t2);
@@ -136,6 +140,14 @@ const char* csConditionEvaluator::OperandTypeDescription (OperandType t)
       return "shadervar int value";
     case operandSVValueFloat:
       return "shadervar float value";
+    case operandSVValueX:
+      return "shadervar vector x value";
+    case operandSVValueY:
+      return "shadervar vector y value";
+    case operandSVValueZ:
+      return "shadervar vector z value";
+    case operandSVValueW:
+      return "shadervar vector w value";
     case operandSVValueTexture:
       return "shadervar texture value";
     case operandSVValueBuffer:
@@ -419,6 +431,22 @@ const char* csConditionEvaluator::ResolveSVIdentifier (
     else if (TokenEquals (right.tokenStart, right.tokenLen, "float"))
     {
       operand.type = operandSVValueFloat;
+    }
+    else if (TokenEquals (right.tokenStart, right.tokenLen, "x"))
+    {
+      operand.type = operandSVValueX;
+    }
+    else if (TokenEquals (right.tokenStart, right.tokenLen, "y"))
+    {
+      operand.type = operandSVValueY;
+    }
+    else if (TokenEquals (right.tokenStart, right.tokenLen, "z"))
+    {
+      operand.type = operandSVValueZ;
+    }
+    else if (TokenEquals (right.tokenStart, right.tokenLen, "w"))
+    {
+      operand.type = operandSVValueW;
     }
     else if (TokenEquals (right.tokenStart, right.tokenLen, "buffer"))
     {
@@ -705,7 +733,15 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
       {
 	if ((op->left.type == operandFloat) 
 	  || (op->left.type == operandSVValueFloat)
+	  || (op->left.type == operandSVValueX)
+	  || (op->left.type == operandSVValueY)
+	  || (op->left.type == operandSVValueZ)
+	  || (op->left.type == operandSVValueW)
 	  || (op->right.type == operandFloat) 
+	  || (op->right.type == operandSVValueX) 
+	  || (op->right.type == operandSVValueY) 
+	  || (op->right.type == operandSVValueZ) 
+	  || (op->right.type == operandSVValueW) 
 	  || (op->right.type == operandSVValueFloat))
 	{
 	  const float f1 = EvaluateOperandF (op->left, modes, stacks);
@@ -730,7 +766,15 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
       {
 	if ((op->left.type == operandFloat) 
 	  || (op->left.type == operandSVValueFloat)
+	  || (op->left.type == operandSVValueX)
+	  || (op->left.type == operandSVValueY)
+	  || (op->left.type == operandSVValueZ)
+	  || (op->left.type == operandSVValueW)
 	  || (op->right.type == operandFloat) 
+	  || (op->right.type == operandSVValueX) 
+	  || (op->right.type == operandSVValueY) 
+	  || (op->right.type == operandSVValueZ) 
+	  || (op->right.type == operandSVValueW) 
 	  || (op->right.type == operandSVValueFloat))
 	{
 	  const float f1 = EvaluateOperandF (op->left, modes, stacks);
@@ -755,7 +799,15 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
       {
 	if ((op->left.type == operandFloat) 
 	  || (op->left.type == operandSVValueFloat)
+	  || (op->left.type == operandSVValueX)
+	  || (op->left.type == operandSVValueY)
+	  || (op->left.type == operandSVValueZ)
+	  || (op->left.type == operandSVValueW)
 	  || (op->right.type == operandFloat) 
+	  || (op->right.type == operandSVValueX) 
+	  || (op->right.type == operandSVValueY) 
+	  || (op->right.type == operandSVValueZ) 
+	  || (op->right.type == operandSVValueW) 
 	  || (op->right.type == operandSVValueFloat))
 	{
 	  const float f1 = EvaluateOperandF (op->left, modes, stacks);
@@ -774,7 +826,15 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
       {
 	if ((op->left.type == operandFloat) 
 	  || (op->left.type == operandSVValueFloat)
+	  || (op->left.type == operandSVValueX)
+	  || (op->left.type == operandSVValueY)
+	  || (op->left.type == operandSVValueZ)
+	  || (op->left.type == operandSVValueW)
 	  || (op->right.type == operandFloat) 
+	  || (op->right.type == operandSVValueX) 
+	  || (op->right.type == operandSVValueY) 
+	  || (op->right.type == operandSVValueZ) 
+	  || (op->right.type == operandSVValueW) 
 	  || (op->right.type == operandSVValueFloat))
 	{
 	  const float f1 = EvaluateOperandF (op->left, modes, stacks);
@@ -878,6 +938,27 @@ int csConditionEvaluator::EvaluateOperandI (const CondOperand& operand,
 	    }
 	}
       }
+      break;
+    case operandSVValueX:
+    case operandSVValueY:
+    case operandSVValueZ:
+    case operandSVValueW:
+      {
+	if (stacks.Length() > operand.svName)
+	{
+	    csShaderVariable* sv = stacks[operand.svName];
+	    if (sv != 0)
+	    {
+	      csVector4 v;
+	      if (sv->GetValue (v))
+	      {
+		int c = operand.type - operandSVValueX;
+		return (int)(v[c]);
+	      }
+	    }
+	}
+      }
+      break;
     case operandSVValueInt:
       {
 	if (stacks.Length() > operand.svName)
@@ -891,6 +972,7 @@ int csConditionEvaluator::EvaluateOperandI (const CondOperand& operand,
 	  }
 	}
       }
+      break;
     default:
       ;
   }
@@ -920,6 +1002,27 @@ float csConditionEvaluator::EvaluateOperandF (const CondOperand& operand,
 	  }
 	}
       }
+      break;
+    case operandSVValueX:
+    case operandSVValueY:
+    case operandSVValueZ:
+    case operandSVValueW:
+      {
+	if (stacks.Length() > operand.svName)
+	{
+	    csShaderVariable* sv = stacks[operand.svName];
+	    if (sv != 0)
+	    {
+	      csVector4 v;
+	      if (sv->GetValue (v))
+	      {
+		int c = operand.type - operandSVValueX;
+		return v[c];
+	      }
+	    }
+	}
+      }
+      break;
     case operandSVValueInt:
       {
 	if (stacks.Length() > operand.svName)
@@ -933,6 +1036,7 @@ float csConditionEvaluator::EvaluateOperandF (const CondOperand& operand,
 	  }
 	}
       }
+      break;
     default:
       ;
   }

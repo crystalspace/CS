@@ -5,17 +5,16 @@
 struct AppToVert_Surface
 {
   void _dummy_struct_non_empty() {}
-  <?if vars."tex diffuse".texture ?>
-    float2 texCoord;
-  <?endif?>
+<?if vars."tex diffuse".texture ?>
+  float2 texCoord;
+<?endif?>
 };
 
 struct VertToFrag_Surface
 {
-  void _dummy_struct_non_empty() {}
-  <?if vars."tex diffuse".texture ?>
-    float2 texCoord;
-  <?endif?>
+<?if vars."tex diffuse".texture ?>
+  float2 texCoord;
+<?endif?>
   
   void Compute (AppToVert_Surface IN)
   {
@@ -28,9 +27,9 @@ struct VertToFrag_Surface
 struct AppToFrag_Surface
 {
 <?if vars."tex diffuse".texture ?>
-    sampler2D texture;
+  uniform sampler2D texture;
 <?else?>
-    float4 flatcolor;
+  uniform float4 flatcolor;
 <?endif?>
   
   float4 GetDiffuse (VertToFrag_Surface V2F)

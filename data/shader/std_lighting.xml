@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <shader compiler="xmlshader" name="std_lighting">
 
-  <!--
+<!--
   <?include snippets/cg-surface-classic.inc ?>
   <?include snippets/cg-light-classic.inc ?>
+  <?include snippets/cg-sectorfog.inc ?>
   <technique priority="150">
     <pass>
       <?Cg_Pass_Surface ?>
       <?Cg_Pass_Lighting ?>      
+      <?Cg_Pass_Fog ?>      
       <vp plugin="glcg">
 	<cgvp>
 	  <entry>VertexMain</entry>
@@ -22,7 +24,7 @@
       </fp>
     </pass>
   </technique>
-  -->
+-->
 
   <fallbackshader name="std_lighting_fixed" file="/shader/std_lighting_fixed.xml" />
 </shader>

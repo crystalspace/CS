@@ -1,16 +1,19 @@
 <include>
 <?Cg_VariableMap_Surface ?>
 <?Cg_VariableMap_Lighting ?>
+<?Cg_VariableMap_Fog ?>
 <program>
 
 <?Cg_Include_Surface?>
 <?Cg_Include_Lighting?>
+<?Cg_Include_Fog?>
 
 struct AppToVert 
 {
 	float4 Position : POSITION;
 	AppToVert_Surface surface;
 	AppToVert_Lighting lighting;
+	AppToVert_Fog fog;
 };
 
 struct VertToFrag 
@@ -18,35 +21,40 @@ struct VertToFrag
 	float4 Hposition : POSITION;
 	VertToFrag_Surface surface;
 	VertToFrag_Lighting lighting;
+	VertToFrag_Fog fog;
 };
 
 struct AppToFrag
 {
 	AppToFrag_Surface surface;
 	AppToFrag_Lighting lighting;
+	AppToFrag_Fog fog;
 };
 
 VertToFrag VertexMain (AppToVert A2V,
 		       /* The matrices are bound with the state.matrix.... semantics.
 			* For more info see the Cg and ARB_vertex_program docs.
 			*/
-		       uniform float4x4 ModelViewProj : state.matrix.mvp)
+		       uniform float4x4 ModelViewProj : state.matrix.mvp,
+		       uniform float4x4 ModelView : state.matrix.modelview)
 {
   VertToFrag V2F;
 
   V2F.Hposition = mul (ModelViewProj, A2V.Position);
   V2F.surface.Compute (A2V.surface);
   V2F.lighting.Compute (A2V.lighting);
+  float4 eyePos = mul (ModelView, A2V.Position);
+  V2F.fog.Compute (A2V.fog, eyePos);
 
   return V2F;
 }
 
 float4 FragmentMain (VertToFrag V2F,
-		     uniform AppToFrag A2F) : COLOR
+		     AppToFrag A2F) : COLOR
 {
   float4 diffuse = A2F.surface.GetDiffuse (V2F.surface);
   float4 color = A2F.lighting.GetLighting (V2F.lighting);
-  return diffuse * color;
+  return A2F.fog.ApplyFog (V2F.fog, diffuse * color);
 }
 
 </program>

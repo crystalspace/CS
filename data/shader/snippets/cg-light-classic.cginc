@@ -5,17 +5,17 @@
 struct AppToVert_Lighting
 {
   float4 color : COLOR;
-  <?if vars."tex lightmap".texture ?>
-    float2 texCoordLM;
-  <?endif?>
+<?if vars."tex lightmap".texture ?>
+  float2 texCoordLM;
+<?endif?>
 };
 
 struct VertToFrag_Lighting
 {
   float4 color : COLOR;
-  <?if vars."tex lightmap".texture ?>
-    float2 texCoordLM;
-  <?endif?>
+<?if vars."tex lightmap".texture ?>
+  float2 texCoordLM;
+<?endif?>
   
   void Compute (AppToVert_Lighting IN)
   {
@@ -28,7 +28,7 @@ struct VertToFrag_Lighting
 
 struct AppToFrag_Lighting
 {
-  sampler2D lightmap;
+  uniform sampler2D lightmap;
   
   float4 GetLighting (VertToFrag_Lighting V2F)
   {

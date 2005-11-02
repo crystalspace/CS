@@ -59,6 +59,10 @@ enum OperandType
   operandSV,
   operandSVValueInt,
   operandSVValueFloat,
+  operandSVValueX,
+  operandSVValueY,
+  operandSVValueZ,
+  operandSVValueW,
   operandSVValueTexture,
   operandSVValueBuffer
 };

@@ -86,6 +86,8 @@ private:
     gllpCount
   };
 
+  struct LightingEntry;
+  friend struct LightingEntry;
   struct LightingEntry
   {
     ProgramParam params[gllpCount];

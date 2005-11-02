@@ -41,6 +41,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define DEBUG_PRINTF while(0) csPrintf
 #endif
 
+//#define SHADEREXP_DEBUG
+
 enum 
 {
   OP_INVALID = 0,
@@ -294,6 +296,13 @@ accstack_max(0)
     mnemonics.Register("VLEN", OP_FUNC_VEC_LEN);
     mnemonics.Register("NORM", OP_FUNC_NORMAL);
 
+    mnemonics.Register("ARCSIN", OP_FUNC_ARCSIN);
+    mnemonics.Register("ARCCOS", OP_FUNC_ARCCOS);
+    mnemonics.Register("ARCTAN", OP_FUNC_ARCTAN);
+
+    mnemonics.Register("POW", OP_FUNC_POW);
+    mnemonics.Register("MIN", OP_FUNC_MIN);
+    mnemonics.Register("MAX", OP_FUNC_MAX);
 
     mnemonics.Register("FRAME", OP_FUNC_FRAME);
     mnemonics.Register("TIME", OP_FUNC_TIME);
@@ -349,7 +358,7 @@ bool csShaderExpression::Parse(iDocumentNode * node)
 
   if (!parse_xml(head, node)) 
   {
-#if 0
+#ifdef SHADEREXP_DEBUG
     if (head)
       print_cons(head);
 #endif
@@ -360,7 +369,7 @@ bool csShaderExpression::Parse(iDocumentNode * node)
     return false;
   }
 
-#if 0
+#ifdef SHADEREXP_DEBUG
   print_cons(head);
   csPrintf("\n***************\n");
 #endif
@@ -374,7 +383,7 @@ bool csShaderExpression::Parse(iDocumentNode * node)
     return false;
   }
 
-#if 0
+#ifdef SHADEREXP_DEBUG
   print_cons(head);
   csPrintf("\n***************\n");
 #endif
@@ -389,7 +398,7 @@ bool csShaderExpression::Parse(iDocumentNode * node)
     return false;
   }
 
-#if 0
+#ifdef SHADEREXP_DEBUG
   print_ops(opcodes);
 #endif
 
@@ -408,7 +417,7 @@ bool csShaderExpression::Parse(iDocumentNode * node)
 bool csShaderExpression::Evaluate(csShaderVariable* var, 
                                   csShaderVarStack& stacks)
 {
-#if 0
+#ifdef SHADEREXP_DEBUG
   int debug_counter = 0;
 #endif
 
@@ -428,7 +437,7 @@ bool csShaderExpression::Evaluate(csShaderVariable* var,
   {
     const oper & op = iter.Next();
 
-#if 0
+#ifdef SHADEREXP_DEBUG
     debug_counter++;
 #endif
 
@@ -457,7 +466,7 @@ bool csShaderExpression::Evaluate(csShaderVariable* var,
       }
     }
 
-#if 0
+#ifdef SHADEREXP_DEBUG
     csPrintf("Eval result (op %3i): <ACC%i> <- ", debug_counter, op.acc);
     print_result(accstack.Get(op.acc));
     csPrintf("\n");
@@ -1537,6 +1546,10 @@ bool csShaderExpression::parse_sexp(cons * head, iDocumentNode * node)
   const char * text = node->GetContentsValue();
   cons * cptr = head;
 
+  if (!text || !*text) return false;
+  
+  while (isspace (*text)) text++;
+
   if (text[0] == '(') 
     return parse_sexp_form(text, cptr);
   else
@@ -1612,7 +1625,7 @@ bool csShaderExpression::parse_sexp_form(const char *& text, cons * head) {
   return true;
 }
 
-bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
+bool csShaderExpression::parse_sexp_atom (const char *& text, cons * head) {
   if (isdigit(*text) || 
     (*text == '-' && isdigit(text[1])) ||
     (*text == '+' && isdigit(text[1])) ||
@@ -1698,24 +1711,38 @@ bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
 
     text++;
   } 
-  else if (isalpha(*text)) 
-  { /* TYPE_VARIABLE */
+  else if (isalpha(*text) || (*text == '"')) 
+  { 
+    /* TYPE_VARIABLE */
+    bool quoted = *text == '"';
+    if (quoted) text++;
     const char * tmp = text;
 
-    while (*tmp && !isspace(*tmp) && *tmp != ')') 
+    while (*tmp 
+      && ((!quoted && !isspace(*tmp) && (*tmp != ')')) 
+	|| (quoted && (*tmp != '"')))) 
       tmp++;
 
-    int size = tmp - text;
+    size_t size = tmp - text;
     CS_ALLOC_STACK_ARRAY(char, tmp2, size + 1);
-    memcpy(tmp2, text, size);
+    memcpy (tmp2, text, size);
     tmp2[size] = 0;
 
     head->car.type = TYPE_VARIABLE;
-    head->car.var = strset->Request(tmp2);
+    head->car.var = strset->Request (tmp2);
 
     text = tmp;
-  } else {
-    ParseError("Unrecognized item in SEXP parse string. Improved error handling required!");
+    if (quoted) text++;
+  } 
+  else 
+  {
+    csString strSnippet (text);
+    if (strSnippet.Length() > 16)
+    {
+      strSnippet.Truncate (13);
+      strSnippet << "...";
+    }
+    ParseError ("Unrecognized item in SEXP parse string: %s", strSnippet.GetData());
 
     return false;
   }
@@ -1966,11 +1993,11 @@ bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, i
 
   if (cptr->car.type == TYPE_CONS)
   {
+    tmp.arg1.type = TYPE_ACCUM;
+    tmp.arg1.acc = acc_top;
+
     if (!compile_cons(cptr->car.cell, acc_top))
       return false;
-
-    tmp.arg1.type = TYPE_ACCUM;
-    tmp.arg1.acc = --acc_top;
   }
   else
   {
@@ -1981,11 +2008,11 @@ bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, i
 
   if (cptr->car.type == TYPE_CONS)
   {
+    tmp.arg2.type = TYPE_ACCUM;
+    tmp.arg2.acc = acc_top;
+
     if (!compile_cons(cptr->car.cell, acc_top))
       return false;
-
-    tmp.arg2.type = TYPE_ACCUM;
-    tmp.arg2.acc = --acc_top;
   }
   else
   {
@@ -1994,10 +2021,11 @@ bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, i
 
   opcodes.Push(tmp);
 
+  acc_top = this_acc + 1;
+
   cptr = cptr->cdr;
   if (!cptr)
   {
-    acc_top++;
     return true;
   }
 
@@ -2006,11 +2034,11 @@ bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, i
 
   if (cptr->car.type == TYPE_CONS)
   {
+    tmp.arg1.type = TYPE_ACCUM;
+    tmp.arg1.acc = acc_top;
+
     if (!compile_cons(cptr->car.cell, acc_top))
       return false;
-
-    tmp.arg1.type = TYPE_ACCUM;
-    tmp.arg1.acc = --acc_top;
   }
   else
   {
@@ -2020,7 +2048,7 @@ bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, i
   cptr = cptr->cdr;
   if (!cptr)
   {
-    acc_top++;
+    acc_top = this_acc + 1;
 
     tmp.arg2.type = TYPE_INVALID;
     opcodes.Push(tmp);
@@ -2030,18 +2058,18 @@ bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, i
 
   if (cptr->car.type == TYPE_CONS)
   {
+    tmp.arg2.type = TYPE_ACCUM;
+    tmp.arg2.acc = acc_top;
+
     if (!compile_cons(cptr->car.cell, acc_top))
       return false;
-
-    tmp.arg2.type = TYPE_ACCUM;
-    tmp.arg2.acc = --acc_top;
   }
   else
   {
     tmp.arg2 = cptr->car;
   }
 
-  acc_top++;
+  acc_top = this_acc + 1;
   opcodes.Push(tmp);
 
   return true;
