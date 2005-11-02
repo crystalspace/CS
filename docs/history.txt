@@ -18,6 +18,13 @@ chronological order.
 	  properly on 64-bit machines.
 	- Jorrit improved error reporting and code style in the physics
 	  loader.
+	- Jorrit improved the plane parser in syntax services so that
+	  a, b, c, and d are now also recognized if you use them as
+	  attributes instead of child nodes.
+	- Jorrit improved the physics loader so that you don't have to
+	  specify the attributes 'friction', 'elasticity', and 'softness'
+	  for all the colliders. Friction now has a default of 1.0 and
+	  the others 0.0.
 1-Nov-2005
 	- Jorrit fixed the wav loader of the new sound system so that it
 	  works properly on 64-bit.

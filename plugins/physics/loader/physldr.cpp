@@ -215,7 +215,7 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
     switch (id)
     {
       case XMLTOKEN_GRAVITY:
-      { 
+      {
         csVector3 v;
         if (!synldr->ParseVector (child, v))
 	{
@@ -225,7 +225,7 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
         }
         system->SetGravity (v);
         break;
-      } 
+      }
       case XMLTOKEN_DAMPENER:
       {
         float angular = child->GetAttributeValueAsFloat ("angular");
@@ -421,7 +421,7 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
   float d = node->GetAttributeValueAsFloat ("density");
   float e = node->GetAttributeValueAsFloat ("elasticity");
   float s = node->GetAttributeValueAsFloat ("softness");
-   
+
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -478,7 +478,7 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
       case XMLTOKEN_COLLIDERPLANE:
       {
         csPlane3 plane;
-        synldr->ParsePlane (node, plane); 
+        synldr->ParsePlane (node, plane);
         body->AttachColliderPlane (plane, f, d, e, s);
       }
       case XMLTOKEN_COLLIDERBOX:
@@ -526,15 +526,22 @@ bool csPhysicsLoader::ParseSystemColliderMesh (
   }
   return true;
 }
-  
+
+static float GetFloat (iDocumentNode* node, const char* name, float def)
+{
+  csRef<iDocumentAttribute> attr = node->GetAttribute (name);
+  if (!attr) return def;
+  return attr->GetValueAsFloat ();
+}
+
 bool csPhysicsLoader::ParseSystemColliderPlane (iDocumentNode *node,
 		iDynamicSystem* system)
 {
-  float f = node->GetAttributeValueAsFloat ("friction");
-  float e = node->GetAttributeValueAsFloat ("elasticity");
-  float s = node->GetAttributeValueAsFloat ("softness");
+  float f = GetFloat (node, "friction", 1.0f);
+  float e = GetFloat (node, "elasticity", 0.0f);
+  float s = GetFloat (node, "softness", 0.0f);
   csPlane3 plane;
-  synldr->ParsePlane (node, plane); 
+  synldr->ParsePlane (node, plane);
   system->AttachColliderPlane (plane, f, e, s);
   return true;
 }
@@ -542,23 +549,23 @@ bool csPhysicsLoader::ParseSystemColliderPlane (iDocumentNode *node,
 bool csPhysicsLoader::ParseSystemColliderSphere (iDocumentNode* node,
 		iDynamicSystem* system)
 {
-  float f = node->GetAttributeValueAsFloat ("friction");
-  float e = node->GetAttributeValueAsFloat ("elasticity");
-  float s = node->GetAttributeValueAsFloat ("softness");
+  float f = GetFloat (node, "friction", 1.0f);
+  float e = GetFloat (node, "elasticity", 0.0f);
+  float s = GetFloat (node, "softness", 0.0f);
   float r = node->GetAttributeValueAsFloat ("radius");
   csOrthoTransform t;
   ParseTransform (node, t);
   system->AttachColliderSphere (r, t.GetOrigin(), f, e, s);
   return true;
 }
-  
+
 
 bool csPhysicsLoader::ParseSystemColliderCylinder (iDocumentNode* node,
 		iDynamicSystem* system)
 {
-  float f = node->GetAttributeValueAsFloat ("friction");
-  float e = node->GetAttributeValueAsFloat ("elasticity");
-  float s = node->GetAttributeValueAsFloat ("softness");
+  float f = GetFloat (node, "friction", 1.0f);
+  float e = GetFloat (node, "elasticity", 0.0f);
+  float s = GetFloat (node, "softness", 0.0f);
   float l = node->GetAttributeValueAsFloat ("length");
   float r = node->GetAttributeValueAsFloat ("radius");
   csOrthoTransform t;
@@ -570,11 +577,12 @@ bool csPhysicsLoader::ParseSystemColliderCylinder (iDocumentNode* node,
 bool csPhysicsLoader::ParseSystemColliderBox (iDocumentNode* node,
 		iDynamicSystem* system)
 {
-  float f = node->GetAttributeValueAsFloat ("friction");
-  float e = node->GetAttributeValueAsFloat ("elasticity");
-  float s = node->GetAttributeValueAsFloat ("softness");
+  float f = GetFloat (node, "friction", 1.0f);
+  float e = GetFloat (node, "elasticity", 0.0f);
+  float s = GetFloat (node, "softness", 0.0f);
   csVector3 v;
-  if (!synldr->ParseVector (node, v)) {
+  if (!synldr->ParseVector (node, v))
+  {
     synldr->ReportError ("crystalspace.dynamics.loader",
       node, "Error processing box parameters");
     return false;
@@ -618,7 +626,7 @@ bool csPhysicsLoader::ParseTransform (iDocumentNode* node, csOrthoTransform &t)
 bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint,
 		iDynamicSystem* system)
 {
-  joint->SetTransConstraints (false, false, false); 
+  joint->SetTransConstraints (false, false, false);
   joint->SetRotConstraints (false, false, false);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
