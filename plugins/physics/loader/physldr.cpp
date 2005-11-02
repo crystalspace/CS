@@ -169,7 +169,16 @@ csPtr<iBase> csPhysicsLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     if (id == XMLTOKEN_SYSTEM)
     {
-      csRef<iDynamicSystem> system = dynamics->CreateSystem ();
+      csRef<iDocumentAttribute> attr = child->GetAttribute ("name");
+      csRef<iDynamicSystem> system;
+      if (attr)
+	system = dynamics->FindSystem (attr->GetValue ());
+      if (!system)
+      {
+        system = dynamics->CreateSystem ();
+	if (attr)
+	  system->QueryObject ()->SetName (attr->GetValue ());
+      }
       if (!ParseSystem (child, system))
       {
 	return 0;
@@ -542,6 +551,7 @@ bool csPhysicsLoader::ParseSystemColliderPlane (iDocumentNode *node,
   float s = GetFloat (node, "softness", 0.0f);
   csPlane3 plane;
   synldr->ParsePlane (node, plane);
+  printf ("%g,%g,%g  %g,%g,%g,%g\n", f, e, s, plane.A (), plane.B (), plane.C (), plane.D ());
   system->AttachColliderPlane (plane, f, e, s);
   return true;
 }

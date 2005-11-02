@@ -25,6 +25,13 @@ chronological order.
 	  specify the attributes 'friction', 'elasticity', and 'softness'
 	  for all the colliders. Friction now has a default of 1.0 and
 	  the others 0.0.
+	- Jorrit changed the physics loader so that the system node now
+	  supports an additional 'name' attribute. If that attribute is
+	  not given then it behaves as it used to behave: i.e. a new
+	  system is created. If the 'name' attribute is given then it
+	  will first try to find a system with that name. If none exists
+	  then a new system is created and the new system will get the
+	  given name.
 1-Nov-2005
 	- Jorrit fixed the wav loader of the new sound system so that it
 	  works properly on 64-bit.
