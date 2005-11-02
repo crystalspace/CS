@@ -551,7 +551,6 @@ bool csPhysicsLoader::ParseSystemColliderPlane (iDocumentNode *node,
   float s = GetFloat (node, "softness", 0.0f);
   csPlane3 plane;
   synldr->ParsePlane (node, plane);
-  printf ("%g,%g,%g  %g,%g,%g,%g\n", f, e, s, plane.A (), plane.B (), plane.C (), plane.D ());
   system->AttachColliderPlane (plane, f, e, s);
   return true;
 }
