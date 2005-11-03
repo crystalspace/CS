@@ -22,6 +22,7 @@
 #include "csgeom/tri.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector4.h"
+#include "csgeom/sphere.h"
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/scanstr.h"
@@ -51,6 +52,7 @@ CS_IMPLEMENT_PLUGIN
 enum
 {
   XMLTOKEN_BOX = 1,
+  XMLTOKEN_SPHERE,
   XMLTOKEN_LIGHTING,
   XMLTOKEN_COLOR,
   XMLTOKEN_DEFAULTCOLOR,
@@ -134,6 +136,7 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
   xmltokens.Register ("box", XMLTOKEN_BOX);
+  xmltokens.Register ("sphere", XMLTOKEN_SPHERE);
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
   xmltokens.Register ("numtri", XMLTOKEN_NUMTRI);
@@ -375,6 +378,23 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  if (!synldr->ParseBox (child, box))
 	    return 0;
 	  state->GenerateBox (box);
+	}
+        break;
+      case XMLTOKEN_SPHERE:
+        {
+	  csVector3 center (0, 0, 0);
+	  float radius = 1.0f;
+	  int rim_vertices = 8;
+	  csRef<iDocumentNode> c = child->GetNode ("center");
+	  if (c)
+	    if (!synldr->ParseVector (c, center))
+	      return 0;
+	  csRef<iDocumentAttribute> attr;
+	  attr = child->GetAttribute ("radius");
+	  if (attr) radius = attr->GetValueAsFloat ();
+	  attr = child->GetAttribute ("rimvertices");
+	  if (attr) rim_vertices = attr->GetValueAsInt ();
+	  state->GenerateSphere (csSphere (center, radius), rim_vertices);
 	}
         break;
       case XMLTOKEN_AUTONORMALS:
