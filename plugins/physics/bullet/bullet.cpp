@@ -220,18 +220,7 @@ bool csBulletDynamicsSystem::AttachColliderBox (const csVector3 &size,
   bulletc->SetSoftness (softness);
   bulletc->CreateBoxGeometry (size);
 
-  csVector3 pos = trans.GetOrigin ();
-
-  //if (pos.x)
-  //  pos.x += size.x;
-
-  //if (pos.y)
-  //  pos.y += size.y;
-
-  //if (pos.z)
-  //  pos.z += size.z;
-
-  bulletc->SetTransform (csOrthoTransform (trans.GetO2T (), pos));
+  bulletc->SetTransform (trans);
   colliders.Push (bulletc);
 
   return true;
