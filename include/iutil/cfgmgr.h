@@ -50,7 +50,7 @@ struct iVFS;
  *
  * Differences in behaviour compared to a normal configuration object are:
  * - Deleting a key will not always remove the key from the configuration
- *   completely. It will only remove the key from the dyamic iConfigFile
+ *   completely. It will only remove the key from the dynamic iConfigFile
  *   object and all higher-priority objects; and will thus reveal a value in
  *   a lower priority domain, if present.  This also applies to the Clear()
  *   method.
@@ -114,7 +114,7 @@ struct iConfigManager : public iConfigFile
    * hold onto the iConfigFile even after it is removed from this object or
    * after the configuration manager is destroyed, be sure to invoke IncRef()
    * or assign it to a csRef<>.  The incoming iVFS* may be null, in which case
-   * the path is assumed to point at a file in the pyhysical filesystem, rather
+   * the path is assumed to point at a file in the physical filesystem, rather
    * than at a file in the virtual filesystem.
    */
   virtual iConfigFile* AddDomain(char const* path, iVFS*, int priority) = 0;
