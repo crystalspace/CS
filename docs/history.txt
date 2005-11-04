@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Nov-2005
+	- Jorrit improved error reporting in the physics loader in case a
+	  body for a joint could not be found.
 3-Nov-2005
 	- Jorrit added a <sphere> keyword to the genmesh loader so that you
 	  can now generate genmesh spheres from map files too.

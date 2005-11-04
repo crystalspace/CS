@@ -653,9 +653,16 @@ bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint,
       case XMLTOKEN_BODY:
         if (body1 == 0)
 	{
-          if (child->GetContentsValue ())
+	  const char* name = child->GetContentsValue ();
+          if (name)
 	  {
-            body1 = system->FindBody (child->GetContentsValue());
+            body1 = system->FindBody (name);
+	    if (!body1)
+	    {
+              synldr->ReportError ("crystalspace.dynamics.loader",
+                child, "Can't find body with name '%s'!", name);
+              return false;
+	    }
           }
 	  else
 	  {
@@ -666,9 +673,16 @@ bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint,
         }
 	else if (body2 == 0)
 	{
-          if (child->GetContentsValue ())
+	  const char* name = child->GetContentsValue ();
+          if (name)
 	  {
-            body2 = system->FindBody (child->GetContentsValue());
+            body2 = system->FindBody (name);
+	    if (!body2)
+	    {
+              synldr->ReportError ("crystalspace.dynamics.loader",
+                child, "Can't find body with name '%s'!", name);
+              return false;
+	    }
           }
 	  else
 	  {
