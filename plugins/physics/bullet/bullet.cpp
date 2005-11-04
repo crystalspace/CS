@@ -220,7 +220,18 @@ bool csBulletDynamicsSystem::AttachColliderBox (const csVector3 &size,
   bulletc->SetSoftness (softness);
   bulletc->CreateBoxGeometry (size);
 
-  bulletc->SetTransform (trans);
+  csVector3 pos = trans.GetOrigin ();
+
+  //if (pos.x)
+  //  pos.x += size.x;
+
+  //if (pos.y)
+  //  pos.y += size.y;
+
+  //if (pos.z)
+  //  pos.z += size.z;
+
+  bulletc->SetTransform (csOrthoTransform (trans.GetO2T (), pos));
   colliders.Push (bulletc);
 
   return true;
@@ -348,7 +359,7 @@ bool csBulletRigidBody::AttachColliderBox (const csVector3 &size,
   if (pc->GetRigidBody ()->GetCollisionShape ())
     delete pc->GetCollisionShape ();
 
-  SimdVector3 s (size.x, size.y, size.z); 
+  SimdVector3 s (size.x / 2, size.y / 2, size.z / 2); 
   pc->GetRigidBody ()->SetCollisionShape (new BoxShape (s));
   pc->GetRigidBody ()->setFriction (friction);
 
@@ -464,7 +475,7 @@ void csBulletRigidBody::GetProperties (float* mass, csVector3* center,
 
 float csBulletRigidBody::GetMass ()
 {
-  return 0;
+  return pc->GetRigidBody ()->getInvMass ();
 }
 
 csVector3 csBulletRigidBody::GetCenter ()
@@ -652,7 +663,7 @@ csBulletCollider::csBulletCollider (csBulletDynamicsSystem* dynsys)
   ms->setWorldOrientation (0,0,0,1);
 
   ccdObjectCi.m_collisionShape = new EmptyShape ();
-  ccdObjectCi.m_collisionShape->SetMargin (0.2f);
+  ccdObjectCi.m_collisionShape->SetMargin (1.f);
   ccdObjectCi.m_broadphaseHandle = 0;
   ccdObjectCi.m_gravity = SimdVector3(0,0,0);
   ccdObjectCi.m_localInertiaTensor = SimdVector3(0,0,0);
@@ -696,7 +707,7 @@ bool csBulletCollider::CreateBoxGeometry (const csVector3& size)
   if (pc->GetRigidBody ()->GetCollisionShape ())
     delete pc->GetCollisionShape ();
 
-  SimdVector3 s (size.x, size.y, size.z); 
+  SimdVector3 s (size.x / 2, size.y / 2, size.z / 2); 
   pc->GetRigidBody ()->SetCollisionShape (new BoxShape (s));
   ResetShape ();
   geom_type = BOX_COLLIDER_GEOMETRY;
@@ -784,8 +795,10 @@ csOrthoTransform csBulletCollider::GetLocalTransform ()
 void csBulletCollider::SetTransform (const csOrthoTransform& trans)
 {
   csQuaternion q (trans.GetO2T ());
+  pc->setOrientation (q.x, q.y, q.z, q.r);
   ms->setWorldOrientation (q.x, q.y, q.z, q.r);
   csVector3 pos = trans.GetOrigin ();
+  pc->setPosition (pos.x, pos.y, pos.z);
   ms->setWorldPosition (pos.x, pos.y, pos.z);
 }
 bool csBulletCollider::GetBoxGeometry (csVector3& size)

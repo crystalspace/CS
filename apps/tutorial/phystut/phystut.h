@@ -41,6 +41,9 @@ private:
   bool disable;
   float remaining_delta;
 
+  csString phys_engine_name;
+  int  phys_engine_id;
+
   csRef<iDynamics> dyn;
   csRef<iDynamicSystem> dynSys;
   csRef<iMeshFactoryWrapper> boxFact;

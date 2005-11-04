@@ -1,24 +1,27 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+Copyright (C) 2001 by Jorrit Tyberghein
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "phystut.h"
 
 CS_IMPLEMENT_APPLICATION
+
+#define ODE_ID 1
+#define BULLET_ID 2
 
 //-----------------------------------------------------------------------------
 
@@ -48,20 +51,20 @@ void Simple::SetupFrame ()
   const float speed = elapsed_time / 1000.0;
 
   if (kbd->GetKeyState (CSKEY_RIGHT))
-      view->GetCamera()->GetTransform().RotateThis (CS_VEC_ROT_RIGHT, speed);
+    view->GetCamera()->GetTransform().RotateThis (CS_VEC_ROT_RIGHT, speed);
   if (kbd->GetKeyState (CSKEY_LEFT))
-      view->GetCamera()->GetTransform().RotateThis (CS_VEC_ROT_LEFT, speed);
+    view->GetCamera()->GetTransform().RotateThis (CS_VEC_ROT_LEFT, speed);
   if (kbd->GetKeyState (CSKEY_PGUP))
-      view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_UP, speed);
+    view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_UP, speed);
   if (kbd->GetKeyState (CSKEY_PGDN))
-      view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_DOWN, speed);
+    view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_DOWN, speed);
   if (kbd->GetKeyState (CSKEY_UP)) {
-      //avatar->GetMovable()->MovePosition(avatar->GetMovable()->GetTransform() * CS_VEC_FORWARD * 5 * speed);
-      avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform().GetT2O () * csVector3 (0, 0, 5));
+    //avatar->GetMovable()->MovePosition(avatar->GetMovable()->GetTransform() * CS_VEC_FORWARD * 5 * speed);
+    avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform().GetT2O () * csVector3 (0, 0, 5));
   }
   if (kbd->GetKeyState (CSKEY_DOWN)) {
-      //avatar->GetMovable()->MovePosition(avatar->GetMovable()->GetTransform() * CS_VEC_BACKWARD * 5 * speed);
-      avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform().GetT2O () * csVector3 (0, 0, -5));
+    //avatar->GetMovable()->MovePosition(avatar->GetMovable()->GetTransform() * CS_VEC_BACKWARD * 5 * speed);
+    avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform().GetT2O () * csVector3 (0, 0, -5));
   }
 
 
@@ -83,7 +86,7 @@ void Simple::SetupFrame ()
   remaining_delta = et;
 
   view->GetCamera()->GetTransform().SetOrigin(avatar->GetMovable()
-  	->GetTransform().GetOrigin());
+    ->GetTransform().GetOrigin());
   //avatar->GetMovable()->SetTransform(view->GetCamera()->GetTransform());
 
   // Tell 3D driver we're going to display 3D things.
@@ -95,15 +98,24 @@ void Simple::SetupFrame ()
 
   // Write FPS and other info..
   if(!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+
+
+  WriteShadow( 10, 390, g2d->FindRGB (255, 150, 100),"Physics engine: %s", 
+    phys_engine_name.GetData ());
   if( speed != 0.0f)
     WriteShadow( 10, 400, g2d->FindRGB (255, 150, 100),"FPS: %.2f",1.0f/speed);
   WriteShadow( 10, 410, g2d->FindRGB (255, 150, 100),"%d Objects",objcnt);
-  if(solver==0)
-    WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: WorldStep");
-  else if(solver==1)
-    WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: StepFast");
-  else if(solver==2)
-    WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: QuickStep");
+
+  if (phys_engine_id == ODE_ID)
+  {
+    if(solver==0)
+      WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: WorldStep");
+    else if(solver==1)
+      WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: StepFast");
+    else if(solver==2)
+      WriteShadow( 10, 420, g2d->FindRGB (255, 150, 100),"Solver: QuickStep");
+  }
+
   if(disable)
     WriteShadow( 10, 430, g2d->FindRGB (255, 150, 100),"AutoDisable ON");
 }
@@ -117,13 +129,13 @@ void Simple::FinishFrame ()
 bool Simple::HandleEvent (iEvent& ev)
 {
   if (ev.Type == csevBroadcast
-  	&& csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+    && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
   {
     simple->SetupFrame ();
     return true;
   }
   else if (ev.Type == csevBroadcast
-  	&& csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+    && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
   {
     simple->FinishFrame ();
     return true;
@@ -159,7 +171,7 @@ bool Simple::HandleEvent (iEvent& ev)
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'g')
     { // Toggle gravity.
       dynSys->SetGravity (dynSys->GetGravity () == 0 ?
-       csVector3 (0,-7,0) : csVector3 (0));
+        csVector3 (0,-7,0) : csVector3 (0));
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'd')
@@ -172,7 +184,7 @@ bool Simple::HandleEvent (iEvent& ev)
     else if (csKeyEventHelper::GetCookedCode (&ev) == '1')
     { // Toggle stepfast.
       csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-      	dynSys, iODEDynamicSystemState);
+        dynSys, iODEDynamicSystemState);
       osys->EnableStepFast (0);
       solver=0;
       return true;
@@ -180,7 +192,7 @@ bool Simple::HandleEvent (iEvent& ev)
     else if (csKeyEventHelper::GetCookedCode (&ev) == '2')
     { // Toggle stepfast.
       csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-      	dynSys, iODEDynamicSystemState);
+        dynSys, iODEDynamicSystemState);
       osys->EnableStepFast (1);
       solver=1;
       return true;
@@ -188,7 +200,7 @@ bool Simple::HandleEvent (iEvent& ev)
     else if (csKeyEventHelper::GetCookedCode (&ev) == '3')
     { // Toggle quickstep.
       csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-      	dynSys, iODEDynamicSystemState);
+        dynSys, iODEDynamicSystemState);
       osys->EnableQuickStep (1);
       solver=2;
       return true;
@@ -228,20 +240,19 @@ bool Simple::Initialize ()
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
-    CS_REQUEST_PLUGIN ("crystalspace.dynamics.ode", iDynamics),
     CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-    "Can't initialize plugins!");
+      "crystalspace.application.phystut",
+      "Can't initialize plugins!");
     return false;
   }
 
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-    "Can't initialize event handler!");
+      "crystalspace.application.phystut",
+      "Can't initialize event handler!");
     return false;
   }
 
@@ -252,13 +263,39 @@ bool Simple::Initialize ()
     return false;
   }
 
+  // Checking for choosen engine
+  csRef<iCommandLineParser> clp = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  phys_engine_name = clp->GetOption ("phys_engine");
+  if (phys_engine_name == "bullet")
+  {
+    phys_engine_id = BULLET_ID;
+    csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg,
+      iPluginManager);
+    dyn = CS_LOAD_PLUGIN (plugmgr, "crystalspace.dynamics.bullet", iDynamics);
+  }
+  else 
+  {
+    phys_engine_name = "ode";
+    phys_engine_id = ODE_ID;
+    csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg,
+      iPluginManager);
+    dyn = CS_LOAD_PLUGIN (plugmgr, "crystalspace.dynamics.ode", iDynamics);
+  }
+  if (!dyn)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.phystut",
+      "No iDynamics plugin!");
+    return false;
+  }
+
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (vc == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-    "Can't find the virtual clock!");
+      "crystalspace.application.phystut",
+      "Can't find the virtual clock!");
     return false;
   }
 
@@ -267,8 +304,8 @@ bool Simple::Initialize ()
   if (engine == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-    "No iEngine plugin!");
+      "crystalspace.application.phystut",
+      "No iEngine plugin!");
     return false;
   }
 
@@ -276,8 +313,8 @@ bool Simple::Initialize ()
   if (loader == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "No iLoader plugin!");
+      "crystalspace.application.phystut",
+      "No iLoader plugin!");
     return false;
   }
 
@@ -285,8 +322,8 @@ bool Simple::Initialize ()
   if (g3d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "No iGraphics3D plugin!");
+      "crystalspace.application.phystut",
+      "No iGraphics3D plugin!");
     return false;
   }
 
@@ -294,8 +331,8 @@ bool Simple::Initialize ()
   if (g2d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "No iGraphics2D plugin!");
+      "crystalspace.application.phystut",
+      "No iGraphics2D plugin!");
     return false;
   }
 
@@ -303,25 +340,17 @@ bool Simple::Initialize ()
   if (kbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "No iKeyboardDriver plugin!");
+      "crystalspace.application.phystut",
+      "No iKeyboardDriver plugin!");
     return false;
   }
 
-  dyn = CS_QUERY_REGISTRY (object_reg, iDynamics);
-  if (!dyn)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "No iDynamics plugin!");
-    return false;
-  }
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "Error opening system!");
+      "crystalspace.application.phystut",
+      "Error opening system!");
     return false;
   }
 
@@ -331,19 +360,8 @@ bool Simple::Initialize ()
   else
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "Error getting FontServer!");
-    return false;
-  };
-
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager);
-  cdsys = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.collisiondetection.opcode" , iCollideSystem);
-  if (!cdsys)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "Error getting Collision Detection System!");
+      "crystalspace.application.phystut",
+      "Error getting FontServer!");
     return false;
   };
 
@@ -354,8 +372,8 @@ bool Simple::Initialize ()
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "Error loading 'stone4' texture!");
+      "crystalspace.application.phystut",
+      "Error loading 'stone4' texture!");
     return false;
   }
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
@@ -392,7 +410,7 @@ bool Simple::Initialize ()
 
   view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -4.5));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -3));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
@@ -403,8 +421,8 @@ bool Simple::Initialize ()
   if (txt == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "Error loading texture!");
+      "crystalspace.application.phystut",
+      "Error loading texture!");
     return false;
   }
 
@@ -413,8 +431,8 @@ bool Simple::Initialize ()
   if (boxFact == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "Error loading mesh object factory!");
+      "crystalspace.application.phystut",
+      "Error loading mesh object factory!");
     return false;
   }
   // Double the size.
@@ -427,19 +445,19 @@ bool Simple::Initialize ()
   if (meshFact == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "Error loading mesh object factory!");
+      "crystalspace.application.phystut",
+      "Error loading mesh object factory!");
     return false;
   }
 
   // Create the ball mesh factory.
   ballFact = engine->CreateMeshFactory("crystalspace.mesh.object.ball",
-   "ballFact");
+    "ballFact");
   if (ballFact == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "Error creating mesh object factory!");
+      "crystalspace.application.phystut",
+      "Error creating mesh object factory!");
     return false;
   }
 
@@ -449,19 +467,22 @@ bool Simple::Initialize ()
   if (dynSys == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.phystut",
-        "Error creating dynamic system!");
+      "crystalspace.application.phystut",
+      "Error creating dynamic system!");
     return false;
   }
 
   dynSys->SetGravity (csVector3 (0,-7,0));
+
   dynSys->SetRollingDampener(.995f);
 
-  csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys,
-  	iODEDynamicSystemState);
-  osys->SetContactMaxCorrectingVel (.1f);
-  osys->SetContactSurfaceLayer (.0001f);
-
+  if (phys_engine_id == ODE_ID)
+  {
+    csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys,
+      iODEDynamicSystemState);
+    osys->SetContactMaxCorrectingVel (.1f);
+    osys->SetContactSurfaceLayer (.0001f);
+  }
   CreateWalls (csVector3 (5));
 
   // Use the camera transform.
@@ -588,10 +609,10 @@ iJoint* Simple::CreateJointed (void)
   // Create and position objects.
   iRigidBody* rb1 = CreateBox();
   rb1->SetPosition (rb1->GetPosition () +
-   rb1->GetOrientation () * csVector3 (-.5, 0, 0));
+    rb1->GetOrientation () * csVector3 (-.5, 0, 0));
   iRigidBody* rb2 = CreateSphere();
   rb2->SetPosition (rb2->GetPosition () +
-   rb2->GetOrientation () * csVector3 (.5, 0, 0));
+    rb2->GetOrientation () * csVector3 (.5, 0, 0));
 
   // Create a joint and attach bodies.
   csRef<iJoint> joint = dynSys->CreateJoint ();
@@ -619,7 +640,7 @@ iRigidBody* Simple::CreateWalls (const csVector3& radius)
   rb->MakeStatic ();
 
   csRef<iThingState> ws =
-        SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls_state = ws->GetFactory ();
 
   csOrthoTransform t;
@@ -640,7 +661,7 @@ iRigidBody* Simple::CreateWalls (const csVector3& radius)
   // wall for now
   for(int i = 0; i < walls_state->GetPolygonCount(); i++)
   {
-      rb->AttachColliderPlane(walls_state->GetPolygonObjectPlane(i), 10, 0, 0);
+    rb->AttachColliderPlane(walls_state->GetPolygonObjectPlane(i), 10, 0, 0);
   }
 #endif
 #if 1
@@ -693,8 +714,8 @@ void Simple::Write(int x,int y,int fg,int bg,const char *str,...)
 }
 
 /*---------------------------------------------------------------------*
- * Main function
- *---------------------------------------------------------------------*/
+* Main function
+*---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
