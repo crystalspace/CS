@@ -381,6 +381,17 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 	  pass->custommapping_variables.Push (0);
 	  pass->custommapping_attrib.Push (attrib);
 	  pass->custommapping_buffer.Push (sourceName);
+	  /* Those buffers are mapped by default to some specific vattribs; 
+	   * since they are now to be mapped to some generic vattrib,
+	   * turn off the default map. */
+	  if (sourceName == CS_BUFFER_POSITION)
+	    pass->defaultMappings[CS_VATTRIB_POSITION] = CS_BUFFER_NONE;
+	  else if (sourceName == CS_BUFFER_COLOR)
+	    pass->defaultMappings[CS_VATTRIB_COLOR] = CS_BUFFER_NONE;
+	  else if (sourceName == CS_BUFFER_NORMAL)
+	    pass->defaultMappings[CS_VATTRIB_NORMAL] = CS_BUFFER_NONE;
+	  else if (sourceName == CS_BUFFER_TEXCOORD0)
+	    pass->defaultMappings[CS_VATTRIB_TEXCOORD] = CS_BUFFER_NONE;
 	}
       }
     }
@@ -669,6 +680,9 @@ bool csXMLShaderTech::DeactivatePass ()
   iGraphics3D* g3d = parent->g3d;
 /*  g3d->SetBufferState(thispass->vertexattributes, clear_buffers, 
     lastBufferCount);*/
+  g3d->DeactivateBuffers (thispass->custommapping_attrib.GetArray (), 
+    (int)lastBufferCount);
+  lastBufferCount=0;
 
   g3d->SetTextureState(textureUnits, clear_textures, 
     (int)lastTexturesCount);
@@ -804,11 +818,6 @@ bool csXMLShaderTech::TeardownPass ()
   if(thispass->vproc) thispass->vproc->ResetState ();
   if(thispass->vp) thispass->vp->ResetState ();
   if(thispass->fp) thispass->fp->ResetState ();
-
-  iGraphics3D* g3d = parent->g3d;
-  g3d->DeactivateBuffers (thispass->custommapping_attrib.GetArray (), 
-    (int)lastBufferCount);
-  lastBufferCount=0;
 
   return true;
 }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <shader compiler="xmlshader" name="std_lighting">
 
-<!--
   <?include snippets/cg-surface-classic.inc ?>
   <?include snippets/cg-light-classic.inc ?>
   <?include snippets/cg-sectorfog.inc ?>
@@ -24,7 +23,6 @@
       </fp>
     </pass>
   </technique>
--->
 
   <fallbackshader name="std_lighting_fixed" file="/shader/std_lighting_fixed.xml" />
 </shader>

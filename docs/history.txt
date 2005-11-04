@@ -13,10 +13,13 @@ chronological order.
 	  std_lighting_nofog and it can be used to disable fog for a specific
 	  material. This is useful in case you want to disable fog for a
 	  skybox.
-	- Piotr Obrzut fixed BoxShape setting in bullet plugin (he was using 
+	- Piotr Obrzut fixed BoxShape setting in bullet plugin (it was using 
 	  box size when it needed half extents)
 	- Piotr Obrzut changed phystut to work with bullet and ode
- 	  engines. To use bullet just run it with '-phys_engine=bullet' parameter.
+ 	  engines. To use bullet just run it with '-phys_engine=bullet' 
+	  parameter.
+	- res fixed some buffer activation/deactivation issues.
+	- res enabled the Cg version of std_lighting.
 3-Nov-2005
 	- Jorrit added a <sphere> keyword to the genmesh loader so that you
 	  can now generate genmesh spheres from map files too.

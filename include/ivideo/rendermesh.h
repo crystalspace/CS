@@ -130,9 +130,10 @@ struct csCoreRenderMesh
   unsigned int indexend;
   /** @} */
 
-  //iMaterialHandle* mathandle;
-  // @@@ FIXME: SW needs it
-  /// Material used for this mesh
+  /**
+   * Material used for this mesh.
+   * Used for e.g. sorting by material.
+   */
   iMaterialWrapper* material;
 
   /** 

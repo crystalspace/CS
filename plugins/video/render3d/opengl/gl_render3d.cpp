@@ -1202,7 +1202,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
 void csGLGraphics3D::FinishDraw ()
 {
-  ApplyBufferChanges();
+  DeactivateBuffers (0, 0);
 
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
@@ -2060,7 +2060,7 @@ void csGLGraphics3D::ApplyBufferChanges()
       }
 
       GLenum compType;
-      void *data = //glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+      void *data =
         RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
 
       if (data == (void*)-1) continue;
