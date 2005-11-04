@@ -9,6 +9,10 @@ chronological order.
 4-Nov-2005
 	- Jorrit improved error reporting in the physics loader in case a
 	  body for a joint could not be found.
+	- Jorrit added a new shader from Raymond Geerts. This shader is
+	  std_lighting_nofog and it can be used to disable fog for a specific
+	  material. This is useful in case you want to disable fog for a
+	  skybox.
 3-Nov-2005
 	- Jorrit added a <sphere> keyword to the genmesh loader so that you
 	  can now generate genmesh spheres from map files too.
