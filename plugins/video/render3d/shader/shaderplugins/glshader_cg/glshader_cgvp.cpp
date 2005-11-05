@@ -46,6 +46,23 @@ bool csShaderGLCGVP::Compile ()
   csString programStr;
   programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
 
+  CGprofile progProf = CG_PROFILE_UNKNOWN;
+  /* @@@ Hack: Make sure at least ARB_v_p is used.
+   * This is done because we don't completely support NV_vertex_program based
+   * profiles - those require "manual" binding of state matrices via 
+   * glTrackMatrixNV() which we don't support right now.
+   */
+  if (cg_profile != 0)
+    progProf = cgGetProfile (cg_profile);
+  
+  if(progProf == CG_PROFILE_UNKNOWN)
+    progProf = cgGLGetLatestProfile (CG_GL_VERTEX);
+  if (progProf < CG_PROFILE_ARBVP1)
+  {
+    delete[] cg_profile;
+    cg_profile = csStrNew ("arbvp1");
+  }
+  
   if (!DefaultLoadProgram (programStr, CG_GL_VERTEX, false, true))
     return false;
 
