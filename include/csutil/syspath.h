@@ -333,6 +333,10 @@ public:
   * \remark Caller is responsible to free the list with delete after using it.
   */
   static csPathsList* GetPluginPaths (const char* argv0);
+  /**
+  * Constructs an executable filename given a basename.
+  */
+  static csString GetAppFilename (const char* basename);
 };
 
 //@{

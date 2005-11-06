@@ -72,3 +72,8 @@ csString csInstallationPathsHelper::GetAppPath (const char* argv0)
   
   return fullpath;
 }
+
+csString csInstallationPathsHelper::GetAppFilename (const char* basename)
+{
+  return basename;
+}

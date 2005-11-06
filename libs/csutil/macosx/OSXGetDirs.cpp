@@ -120,3 +120,14 @@ csString csInstallationPathsHelper::GetResourceDir(char const* argv0)
     dir << CS_PATH_SEPARATOR << name << OSX_RESOURCES_GRIST;
   return dir;
 }
+
+//-----------------------------------------------------------------------------
+// csGetAppFilename
+//      Constructs an executable filename given a basename.
+//-----------------------------------------------------------------------------
+csString csInstallationPathsHelper::GetAppFilename(char const* basename)
+{
+  csString filename;
+  return filename << basename << OSX_WRAPPER_GRIST << basename ;
+}
+

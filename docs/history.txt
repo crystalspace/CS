@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Nov-2005
+	- Vincent Knecht made the following changes:
+	  - Added a csInstallationPathsHelper::GetAppFilename() method which
+	    returns a native executable filename given a basename.
+	  - Modified 'startme' to read demos and star settings from its
+	    configuration file.
 5-Nov-2005
 	- res reinstantiated the forcing of the minimum Cg vertex program
 	  profile to be ARB_v_p since NV vertex programs require some extra

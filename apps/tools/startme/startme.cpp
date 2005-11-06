@@ -25,8 +25,8 @@ CS_IMPLEMENT_APPLICATION
 StartMe::StartMe ()
 {
   SetApplicationName ("CrystalSpace.StartMe");
-  last_selected = -1;
-  description_selected = -1;
+  last_selected = (size_t)-1;
+  description_selected = (size_t)-1;
 }
 
 StartMe::~StartMe ()
@@ -50,18 +50,19 @@ void StartMe::ProcessFrame ()
 
   camera->InvPerspective (p, DEMO_MESH_Z-5, star_v);
   star_ticks += elapsed_time;
-  while (star_ticks > STAR_NEWSTAR_TIMEOUT)
+  while (star_ticks > star_timeout)
   {
-    star_ticks -= STAR_NEWSTAR_TIMEOUT;
+    star_ticks -= star_timeout;
     csVector3 sv = star_v;
     star_v.x += ((float)rand() / (float)RAND_MAX - 0.5f) / 4.0f;
     star_v.y += ((float)rand() / (float)RAND_MAX - 0.5f) / 4.0f;
     star_v.z += ((float)rand() / (float)RAND_MAX - 0.5f) / 4.0f;
-    int max = STAR_COUNT;
+
+    size_t max = star_count;
     while (stars[cur_star].inqueue)
     {
       cur_star++;
-      if (cur_star >= STAR_COUNT) cur_star = 0;
+      if (cur_star >= star_count) cur_star = 0;
       max--;
       if (max <= 0) break;
     }
@@ -75,10 +76,10 @@ void StartMe::ProcessFrame ()
     si.inqueue = true;
     star_queue.Push (cur_star);
     cur_star++;
-    if (cur_star >= STAR_COUNT) cur_star = 0;
+    if (cur_star >= star_count) cur_star = 0;
   }
 
-  float dr = elapsed_seconds / STAR_MAXAGE;
+  float dr = elapsed_seconds / star_maxage;
   size_t j = star_queue.Length ();
   while (j > 0)
   {
@@ -95,13 +96,13 @@ void StartMe::ProcessFrame ()
     else
     {
       float f = 1.0f;
-      if (si.r < STAR_FADE_1)
+      if (si.r < star_fade1)
       {
-        f = 1.0f - (STAR_FADE_1-si.r) / STAR_FADE_1;
+        f = 1.0f - (star_fade1-si.r) / star_fade1;
       }
-      else if (si.r >= STAR_FADE_2)
+      else if (si.r >= star_fade2)
       {
-        f = 1.0f - (si.r - STAR_FADE_2) / (1.0f - STAR_FADE_2);
+        f = 1.0f - (si.r - star_fade2) / (1.0f - star_fade2);
       }
       si.stars_state->SetColor (csColor (f+.2, f, f));
     }
@@ -125,41 +126,41 @@ void StartMe::ProcessFrame ()
   float sqdist = 1.0f;
 
   if (InDescriptionMode ())
-    sel_mesh = meshes[description_selected];
+    sel_mesh = demos[description_selected].mesh;
   else
     sqdist = csColliderHelper::TraceBeam (cdsys, sector,
 	start, end, true,
 	closest_tri, isect, &sel_mesh);
 
-  int i, sel = -1;
+  size_t i, sel = (size_t)-1;
   if (sqdist >= 0 && sel_mesh)
   {
     const char* name = sel_mesh->QueryObject ()->GetName ();
-    for (i = 0 ; i < DEMO_COUNT ; i++)
+    for (i = 0 ; i < demos.Length () ; i++)
       if (!strcmp (demos[i].name, name))
       {
-        spinning_speed[i] += elapsed_seconds / 80.0f;
-	if (spinning_speed[i] > 0.05f) spinning_speed[i] = 0.05f;
+        demos[i].spinning_speed += elapsed_seconds / 80.0f;
+	if (demos[i].spinning_speed > 0.05f) demos[i].spinning_speed = 0.05f;
 	sel = i;
         break;
       }
   }
   last_selected = sel;
 
-  for (i = 0 ; i < DEMO_COUNT ; i++)
+  for (i = 0 ; i < demos.Length () ; i++)
   {
     if (sel != i)
     {
-      if (spinning_speed[i] > 0)
+      if (demos[i].spinning_speed > 0)
       {
-        spinning_speed[i] -= elapsed_seconds / 80.0f;
-	if (spinning_speed[i] < 0)
-	  spinning_speed[i] = 0;
+        demos[i].spinning_speed -= elapsed_seconds / 80.0f;
+	if (demos[i].spinning_speed < 0)
+	  demos[i].spinning_speed = 0;
       }
     }
-    csYRotMatrix3 rot (spinning_speed[i]);
-    meshes[i]->GetMovable ()->Transform (rot);
-    meshes[i]->GetMovable ()->UpdateMove ();
+    csYRotMatrix3 rot (demos[i].spinning_speed);
+    demos[i].mesh->GetMovable ()->Transform (rot);
+    demos[i].mesh->GetMovable ()->UpdateMove ();
   }
 
   // Tell 3D driver we're going to display 3D things.
@@ -174,7 +175,7 @@ void StartMe::ProcessFrame ()
   {
     g3d->BeginDraw (CSDRAW_2DGRAPHICS);
     iGraphics2D* g2d = g3d->GetDriver2D ();
-    csString desc = demos[description_selected].description;
+    csString desc = demos[description_selected].description->GetData ();
     size_t idx = desc.FindFirst ('#');
     int y = 50;
     int fw, fh;
@@ -209,7 +210,7 @@ void StartMe::EnterDescriptionMode ()
 
 void StartMe::LeaveDescriptionMode ()
 {
-  description_selected = -1;
+  description_selected = (size_t)-1;
   main_light->SetColor (MAIN_LIGHT_ON);
   pointer_light->SetColor (POINTER_LIGHT_ON);
 }
@@ -246,12 +247,19 @@ bool StartMe::OnMouseDown (iEvent &event)
 {
   if (InDescriptionMode ())
   {
-    system (demos[description_selected].command);
+    csRef<iCommandLineParser> cmdline =
+        CS_QUERY_REGISTRY(GetObjectRegistry(), iCommandLineParser);
+    csString appdir = cmdline->GetAppDir ();
+    system (appdir << CS_PATH_SEPARATOR <<
+        csInstallationPathsHelper::GetAppFilename (
+            demos[description_selected].exec) << " " << 
+        demos[description_selected].args);
+
     LeaveDescriptionMode ();
     return true;
   }
 
-  if (last_selected != -1)
+  if (last_selected != (size_t)-1)
   {
     EnterDescriptionMode ();
   }
@@ -264,8 +272,8 @@ bool StartMe::LoadTextures ()
     return ReportError ("Error loading '%s' texture!", "spark");
 
   vfs->ChDir ("/lib/startme");
-  int i;
-  for (i = 0 ; i < DEMO_COUNT ; i++)
+  size_t i;
+  for (i = 0 ; i < demos.Length () ; i++)
   {
     if (!loader->LoadTexture (demos[i].name, demos[i].image))
       return ReportError ("Error loading '%s' texture!", demos[i].image);
@@ -346,6 +354,9 @@ bool StartMe::Application()
   vfs = CS_QUERY_REGISTRY(GetObjectRegistry(), iVFS);
   if (!vfs) return ReportError("Failed to locate VFS!");
 
+  confman = CS_QUERY_REGISTRY(GetObjectRegistry(), iConfigManager);
+  if (!confman) return ReportError("Failed to locate Config Manager!");
+
   // We need a View to the virtual world.
   view.AttachNew(new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -355,6 +366,8 @@ bool StartMe::Application()
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
+
+  LoadConfig ();
 
   // Load textures.
   if (!LoadTextures ())
@@ -424,9 +437,11 @@ void StartMe::CreateRoom ()
   spark_state->SetMixMode (CS_FX_ADD);
   spark_state->SetColor (csColor (1, 1, 1));
   spark_state->SetMaterialWrapper (spark_mat);
-  int i;
-  for (i = 0 ; i < STAR_COUNT ; i++)
+  size_t i;
+  for (i = 0 ; i < star_count ; i++)
   {
+    StarInfo starinfo;
+    stars.Push (starinfo);
     stars[i].star = engine->CreateMeshWrapper (spark_fact, "star", room);
     stars[i].star->GetFlags ().Set (CS_ENTITY_INVISIBLE);
     stars[i].star->SetRenderPriority (engine->GetObjectRenderPriority ());
@@ -446,19 +461,19 @@ void StartMe::CreateRoom ()
   box_state->CalculateNormals ();
 
   int cols = 4;
-  int rows = (DEMO_COUNT-1) / cols + 1;
+  int rows = (demos.Length ()-1) / cols + 1;
   float dx = (DEMO_MESH_MAXX-DEMO_MESH_MINX) / float (cols-1);
   float dy = (DEMO_MESH_MAXY-DEMO_MESH_MINY) / float (rows-1);
   int x = 0, y = 0;
-  for (i = 0 ; i < DEMO_COUNT ; i++)
+  for (i = 0 ; i < demos.Length () ; i++)
   {
-    meshes[i] = CreateDemoMesh (demos[i].name,
+    demos[i].mesh = CreateDemoMesh (demos[i].name,
       	csVector3 (DEMO_MESH_MINX + dx * float (x),
 		   DEMO_MESH_MINY + dy * float (y),
 		   DEMO_MESH_Z));
     x++;
     if (x >= cols) { y++; x = 0; }
-    spinning_speed[i] = 0;
+    demos[i].spinning_speed = 0;
   }
 
   // Now we need light to see something.
@@ -473,6 +488,49 @@ void StartMe::CreateRoom ()
   ll->Add (pointer_light);
 
   csColliderHelper::InitializeCollisionWrappers (cdsys, engine, 0);
+}
+
+void StartMe::LoadConfig ()
+{
+  // Retrieve star cursor informations.
+  star_count = confman->GetInt ("Stars.Count", 100);
+  star_timeout = confman->GetInt ("Stars.Timeout", 10);
+  star_maxage = confman->GetFloat ("Stars.MaxAge", 0.5);
+  star_fade1 = confman->GetFloat ("Stars.Fade1", 0.2);
+  star_fade2 = confman->GetFloat ("Stars.Fade2", 0.4);
+  
+  // Retrieve demo programs informations.
+  size_t i = 0;
+  csString pattern;
+  while (confman->SubsectionExists (pattern.Format ("StartMe.%d.", i)))
+  {
+    DemoData demo;
+    demo.description = new scfString ();
+    csRef<iConfigIterator> iterator (confman->Enumerate (pattern.GetData()));
+    while (iterator->Next ())
+    {
+      csString key (iterator->GetKey ());
+      csString leaf;
+      key.SubString (leaf,
+          key.FindLast ('.', key.Length ()) + 1,
+          key.Length ());
+      if (!strcmp(leaf.GetData (), "name"))
+        demo.name = iterator->GetStr ();
+      else if (!strcmp(leaf.GetData (), "exec"))
+        demo.exec = iterator->GetStr ();
+      else if (!strcmp(leaf.GetData (), "args"))
+        demo.args = iterator->GetStr ();
+      else if (!strcmp(leaf.GetData (), "image"))
+        demo.image = iterator->GetStr ();
+      else
+      {
+        demo.description->Append (iterator->GetStr ());
+        demo.description->Append ("#");
+      }
+    }
+    demos.Push (demo);
+    i++;
+  }
 }
 
 /*-------------------------------------------------------------------------*

@@ -153,3 +153,9 @@ csString csInstallationPathsHelper::GetAppPath (const char*)
   appPath[MAX_PATH - 1] = '\0';
   return appPath;
 }
+
+csString csInstallationPathsHelper::GetAppFilename (const char* basename)
+{
+  csString filename;
+  return filename << basename << ".exe";
+}
