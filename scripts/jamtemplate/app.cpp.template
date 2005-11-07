@@ -55,7 +55,7 @@ bool App#PROJECTNAMECAP#::OnKeyboard(iEvent& ev)
       // so we retrieve the event queue from the object registry and then post
       // the event.
       csRef<iEventQueue> q =
-        CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+        csQueryRegistry<iEventQueue> (GetObjectRegistry());
       if (q.IsValid())
         q->GetEventOutlet()->Broadcast(cscmdQuit);
     }
@@ -119,11 +119,11 @@ bool App#PROJECTNAMECAP#::Application()
   // object registry.  The RequestPlugins() call we did earlier registered all
   // loaded plugins with the object registry.  It is also possible to load
   // plugins manually on-demand.
-  g3d = CS_QUERY_REGISTRY(r, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (r);
   if (!g3d)
     return ReportError("Failed to locate 3D renderer!");
 
-  engine = CS_QUERY_REGISTRY(r, iEngine);
+  engine = csQueryRegistry<iEngine> (r);
   if (!engine)
     return ReportError("Failed to locate 3D engine!");
 

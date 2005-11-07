@@ -1202,10 +1202,10 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
 void csGLGraphics3D::FinishDraw ()
 {
-  DeactivateBuffers (0, 0);
-
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
+
+  DeactivateBuffers (0, 0);
 
   if (render_target)
   {

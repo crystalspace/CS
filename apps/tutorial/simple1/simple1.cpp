@@ -117,7 +117,7 @@ bool Simple::OnKeyboard(iEvent& ev)
       // main runloop to stop. To do that we get the event queue from
       // the object registry and then post the event.
       csRef<iEventQueue> q = 
-        CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+        csQueryRegistry<iEventQueue> (GetObjectRegistry());
       if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
     }
   }
@@ -166,19 +166,19 @@ bool Simple::Application()
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
   // registered all loaded plugins with the object registry.
-  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
-  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
   if (!engine) return ReportError("Failed to locate 3D engine!");
 
-  vc = CS_QUERY_REGISTRY(GetObjectRegistry(), iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
   if (!vc) return ReportError("Failed to locate Virtual Clock!");
 
-  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
   if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
-  loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
 
   // We need a View to the virtual world.
@@ -231,6 +231,10 @@ void Simple::CreateRoom ()
     SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls_state = ws->GetFactory ();
   walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  /*walls_state->AddTriangle (
+    csVector3 (5, 0, 5),
+    csVector3 (-5, 0, 5),
+    csVector3 (-5, 20, 5));*/
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 

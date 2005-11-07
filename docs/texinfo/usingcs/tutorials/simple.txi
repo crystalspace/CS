@@ -155,19 +155,19 @@ bool Simple::Application()
   if (!OpenApplication(GetObjectRegistry()))
     return ReportError("Error opening system!");
 
-  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
-  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
   if (!engine) return ReportError("Failed to locate 3D engine!");
 
-  vc = CS_QUERY_REGISTRY(GetObjectRegistry(), iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
   if (!vc) return ReportError("Failed to locate Virtual Clock!");
 
-  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
   if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
-  loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
 
   Run();
@@ -270,7 +270,7 @@ bool Simple::OnKeyboard(iEvent& ev)
     if (code == CSKEY_ESC)
     @{
       csRef<iEventQueue> q =
-        CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+        csQueryRegistry<iEventQueue> (GetObjectRegistry());
       if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
     @}
   @}

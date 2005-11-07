@@ -406,7 +406,9 @@ csRef<iDocumentAttributeIterator> csTinyXmlNode::GetAttributes ()
 
 TiDocumentAttribute* csTinyXmlNode::GetAttributeInternal (const char* name)
 {
-  size_t count = node->ToElement ()->GetAttributeCount ();
+  TiXmlElement* element = node->ToElement ();
+  if (!element) return 0;
+  size_t count = element->GetAttributeCount ();
   size_t i;
   for (i = 0 ; i < count ; i++)
   {

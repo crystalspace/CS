@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Nov-2005
+	- res changed simple1 from using CS_QUERY_REGISTRY to 
+	  csQueryRegistry<>.
+	- res fixed an issue were text was not correctly drawn when output 
+	  just before iGraphics3D->FinishDraw().
+	- res fixed a crash in TinyXML when querying attributes from certain
+	  elements,
 6-Nov-2005
 	- Vincent Knecht made the following changes:
 	  - Added a csInstallationPathsHelper::GetAppFilename() method which
