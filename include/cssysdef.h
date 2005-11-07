@@ -717,7 +717,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
  * the compiler to perform certain optimizations, e.g., eliminating
  * repeated calls with the same arguments.  This is a very strong
  * assertion; if any argument is a pointer, you probably want to use
- * \see CS_PURE_METHOD instead.  
+ * #CS_PURE_METHOD instead.  
  *
  * \todo Is there an MSVC equivalent for gcc's __attribute__((const))?
  */
@@ -731,7 +731,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
  * and at global memory but do not have any side effects.  
  * Basically, if the function doesn't change the values of
  * any non-local variables and doesn't perform any output or other
- * tampering with the envrionment, it is "pure".  This allows the
+ * tampering with the environment, it is "pure".  This allows the
  * compiler to perform certain optimizations, e.g., eliminating
  * repeated calls with the same arguments.
  *
