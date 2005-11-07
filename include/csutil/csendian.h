@@ -254,7 +254,7 @@ struct csSetToAddress
   //@}
 };
 
-/**\name Deprecated endian conversion routines.
+/**\name Deprecated endian conversion routines
  * It is recommended to use csLittleEndian, csBigEndian, csIEEEfloat, 
  * csGetFromAddress or csSetToAddress for the tasks below.
  * @{ */
