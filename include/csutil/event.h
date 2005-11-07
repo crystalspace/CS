@@ -102,6 +102,8 @@ public:
   CS_PURE_METHOD static uint GetNumAxes(const iEvent *event);
   /// Retrieve button code
   CS_PURE_METHOD static uint GetButton(const iEvent *event);
+  /// Retrieve current button mask
+  CS_PURE_METHOD static uint32 GetButtonMask(const iEvent *event);
   /// Retrieve modifier flags
   CS_PURE_METHOD static void GetModifiers(const iEvent *event, 
     csKeyModifiers& modifiers) 
@@ -142,6 +144,8 @@ public:
   CS_PURE_METHOD static uint GetNumAxes(const iEvent *);
   /// Retrieve button number
   CS_PURE_METHOD static uint GetButton(const iEvent *event);
+  /// Retrieve current button mask
+  CS_PURE_METHOD static uint32 GetButtonMask(const iEvent *event);
   /// Retrieve modifier flags
   static void GetModifiers(const iEvent *event, csKeyModifiers& modifiers) 
   { csKeyEventHelper::GetModifiers(event, modifiers); }

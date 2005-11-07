@@ -64,7 +64,8 @@ csEvent::csEvent ()
 }
 
 csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
-		  uint mButton, uint32 mModifiers) 
+		  uint mButton, uint32 mButtonMask,
+		  uint32 mModifiers) 
                   : scfImplementationType (this), attributes (53)
 {
   Time = iTime;
@@ -76,13 +77,15 @@ csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
   Add("mAxes", (void *) axes, 2 * sizeof(int32)); /* copies array for us */
   Add("mNumAxes", (uint8)2);
   Add("mButton", (uint8)mButton);
+  Add("mButtonMask", (uint32)mButtonMask);
   Add("keyModifiers", (uint32)mModifiers);
 
   count = 0;
 }
 
 csEvent::csEvent (csTicks iTime, int eType, uint n, int x, int y, 
-		  uint32 axesChanged, uint button, uint32 modifiers) : 
+		  uint32 axesChanged, uint button, uint32 buttonMask,
+		  uint32 modifiers) : 
   scfImplementationType (this), attributes (53)
 {
 
@@ -102,6 +105,7 @@ csEvent::csEvent (csTicks iTime, int eType, uint n, int x, int y,
     Add("jsNumAxes", (uint8)2);
     Add("jsAxesChanged", axesChanged);
     Add("jsButton", (uint8)button);
+    Add("jsButtonMask", (uint32)buttonMask);
   } 
   else if (eType >= csevMouseMove && eType <= csevMouseDoubleClick) 
   {
@@ -110,6 +114,7 @@ csEvent::csEvent (csTicks iTime, int eType, uint n, int x, int y,
     Add("mNumAxes", (uint8)2);
     Add("mAxesChanged", axesChanged);
     Add("mButton", (uint8)button);
+    Add("mButtonMask", (uint32)buttonMask);
   }
   Add("keyModifiers", modifiers);
 
@@ -118,7 +123,7 @@ csEvent::csEvent (csTicks iTime, int eType, uint n, int x, int y,
 
 csEvent::csEvent (csTicks iTime, int eType, uint n, const int32* axes, 
 		  uint8 numAxes, uint32 axesChanged, uint8 button, 
-		  uint32 modifiers) 
+		  uint32 buttonMask, uint32 modifiers) 
                   : scfImplementationType (this), attributes (53)
 {
   Time = iTime;
@@ -136,6 +141,7 @@ csEvent::csEvent (csTicks iTime, int eType, uint n, const int32* axes,
     Add("jsNumAxes", (uint8)numAxes);
     Add("jsAxesChanged", axesChanged);
     Add("jsButton", (uint8)button);
+    Add("jsButtonMask", (uint32)button);
   } 
   else if (eType >= csevMouseMove && eType <= csevMouseDoubleClick) 
   {
@@ -145,6 +151,7 @@ csEvent::csEvent (csTicks iTime, int eType, uint n, const int32* axes,
     Add("mNumAxes", (uint8)numAxes);
     Add("mAxesChanged", axesChanged);
     Add("mButton", (uint8)button);
+    Add("mButtonMask", (uint32)button);
   }
   Add("keyModifiers", modifiers);
 

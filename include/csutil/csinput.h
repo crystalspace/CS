@@ -211,7 +211,10 @@ protected:
   /// Last mouse positions
   int32 Last [CS_MAX_MOUSE_COUNT][CS_MAX_MOUSE_AXES];
   uint Axes [CS_MAX_MOUSE_COUNT];
-  /// Mouse buttons state
+  /**
+   * Mouse buttons state.
+   * \todo Change this to a bitmask.
+   */
   bool Button [CS_MAX_MOUSE_COUNT][CS_MAX_MOUSE_BUTTONS];
   /// Mouse double click max interval in 1/1000 seconds
   csTicks DoubleClickTime;
@@ -287,7 +290,10 @@ private:
   // Generic keyboard driver (for checking modifier key states).
   csRef<iKeyboardDriver> Keyboard;
 protected:
-  /// Joystick button states
+  /**
+   * Joystick button states
+   * \todo Change this to a bitmask
+   */
   bool Button [CS_MAX_JOYSTICK_COUNT][CS_MAX_JOYSTICK_BUTTONS];
   /// Joystick axis positions
   int32 Last [CS_MAX_JOYSTICK_COUNT][CS_MAX_JOYSTICK_AXES];

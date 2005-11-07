@@ -149,6 +149,13 @@ uint csMouseEventHelper::GetButton (const iEvent *event)
   return res;
 }
 
+uint32 csMouseEventHelper::GetButtonMask (const iEvent *event)
+{
+  uint32 res = 0;
+  event->Retrieve("mButtonMask", res);
+  return res;
+}
+
 uint csMouseEventHelper::GetNumAxes(const iEvent *event)
 {
   uint8 res = 0;
@@ -209,14 +216,21 @@ int csJoystickEventHelper::GetAxis(const iEvent *event, uint axis)
     return 0;
 }
 
-uint csJoystickEventHelper::GetButton(const iEvent *event)
+uint csJoystickEventHelper::GetButton (const iEvent *event)
 {
   uint8 res = 0;
   event->Retrieve("jsButton", res);
   return res;
 }
 
-uint csJoystickEventHelper::GetNumAxes(const iEvent *event)
+uint32 csJoystickEventHelper::GetButtonMask (const iEvent *event)
+{
+  uint32 res = 0;
+  event->Retrieve("jsButtonMask", res);
+  return res;
+}
+
+uint csJoystickEventHelper::GetNumAxes (const iEvent *event)
 {
   uint8 res = 0;
   event->Retrieve("jsNumAxes", res);

@@ -176,18 +176,18 @@ public:
   csEvent (csEvent const&);
 
   /// Create a mouse event object (old interface)
-  csEvent (csTicks, int type, int x, int y, uint button, uint32 modifiers);
+  csEvent (csTicks, int type, int x, int y, uint button, uint32 buttonMask, uint32 modifiers);
 
   /// Create a joystick event object (old interface)
   csEvent (csTicks, int type, uint n, int x, int y, uint32 axesChanged, 
-    uint button, uint32 modifiers);
+	   uint button, uint32 buttonMask, uint32 modifiers);
 
   /**
    * Create an enumerated pointer (mouse/joystick) event object (newer
    * interface)
    */
   csEvent (csTicks, int type, uint n, const int32 *axes, uint8 numAxes, 
-	   uint32 axesChanged, uint8 button, uint32 modifiers);
+	   uint32 axesChanged, uint8 button, uint32 buttonMask, uint32 modifiers);
 
   /// Create a command event object
   csEvent (csTicks, int type, uint code, intptr_t info = 0);

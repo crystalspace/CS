@@ -13,6 +13,8 @@ chronological order.
 	  just before iGraphics3D->FinishDraw().
 	- res fixed a crash in TinyXML when querying attributes from certain
 	  elements,
+	- Adam Bradley <artdodge@cs.bu.edu> added the buttonMask attribute
+	  to mouse and joystick events, with corresponding helper functions.
 6-Nov-2005
 	- Vincent Knecht made the following changes:
 	  - Added a csInstallationPathsHelper::GetAppFilename() method which

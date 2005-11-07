@@ -637,12 +637,20 @@ void csMouseDriver::DoButton (uint number, uint button, bool down,
 
   Button [number - 1][button - 1] = down;
 
+  uint32 buttonMask = 0;
+  for (int i=31 ; i>=0 ; i--) {
+    buttonMask <<= 1;
+    if (Button[number-1][i])
+      buttonMask |= 0x1;
+  }
+
   csRef<iEvent> ev;
   csTicks evtime = csGetTicks();
   ev.AttachNew (new csEvent (evtime,
 			     down ? csevMouseDown : csevMouseUp, 
 			     number, axes, numAxes, 0, 
-			     button, smask));
+			     button, buttonMask,
+			     smask));
   Post(ev);
 
   if ((button == LastClickButton[number - 1])
@@ -654,7 +662,8 @@ void csMouseDriver::DoButton (uint number, uint button, bool down,
     csRef<iEvent> ev;
     ev.AttachNew (new csEvent (evtime,
 			       down ? csevMouseDoubleClick : csevMouseClick, 
-			       number, axes, numAxes, 0, button, smask));
+			       number, axes, numAxes, 0, button, buttonMask,
+			       smask));
     Post (ev);
     // Don't allow for sequential double click events
     if (down)
@@ -697,9 +706,18 @@ void csMouseDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
   memcpy(Last [number - 1], axes, numAxes * sizeof(int));
   Axes [number - 1] = numAxes;
 
+  uint32 buttonMask = 0;
+  for (int i=31 ; i>=0 ; i--) {
+    buttonMask <<= 1;
+    if (Button[number-1][i])
+      buttonMask |= 0x1;
+  }
+
   csRef<iEvent> ev;
   ev.AttachNew (new csEvent (csGetTicks (), csevMouseMove, 
-			     number, axes, numAxes, cflags, 0, smask));
+			     number, axes, numAxes, cflags, 
+			     0, buttonMask, 
+			     smask));
   Post (ev);
 }
 
@@ -767,10 +785,17 @@ void csJoystickDriver::DoButton (uint number, uint button, bool down,
 
   Button [number - 1][button - 1] = down;
 
+  uint32 buttonMask = 0;
+  for (int i=31 ; i>=0 ; i--) {
+    buttonMask <<= 1;
+    if (Button[number-1][i])
+      buttonMask |= 0x1;
+  }
+
   csRef<iEvent> ev;
   ev.AttachNew (new csEvent (csGetTicks (),
 			     down ? csevJoystickDown : csevJoystickUp, number, 
-			     axes, numAxes, 0, button, smask));
+			     axes, numAxes, 0, button, buttonMask, smask));
   Post(ev);
 }
 
@@ -800,8 +825,16 @@ void csJoystickDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
   memcpy(Last [number - 1], axes, numAxes * sizeof(int));
   Axes [number - 1] = numAxes;
 
+  uint32 buttonMask = 0;
+  for (int i=31 ; i>=0 ; i--) {
+    buttonMask <<= 1;
+    if (Button[number-1][i])
+      buttonMask |= 0x1;
+  }
+
   csRef<iEvent> ev;
   ev.AttachNew (new csEvent(csGetTicks(), csevJoystickMove, 
-			    number, axes, numAxes, cflags, 0, smask));
+			    number, axes, numAxes, cflags, 
+			    0, buttonMask, smask));
   Post(ev);
 }
