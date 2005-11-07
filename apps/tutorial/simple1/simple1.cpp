@@ -231,10 +231,6 @@ void Simple::CreateRoom ()
     SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls_state = ws->GetFactory ();
   walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
-  /*walls_state->AddTriangle (
-    csVector3 (5, 0, 5),
-    csVector3 (-5, 0, 5),
-    csVector3 (-5, 20, 5));*/
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 
