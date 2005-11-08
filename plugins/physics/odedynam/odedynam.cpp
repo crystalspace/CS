@@ -1846,7 +1846,7 @@ void csODERigidBody::Collision (iRigidBody *other)
 
 void csODERigidBody::Update ()
 {
-  if (bodyID && !statjoint && move_cb)
+  if (bodyID && move_cb)
   {
     csOrthoTransform trans;
     trans = GetTransform ();

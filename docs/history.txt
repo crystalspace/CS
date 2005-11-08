@@ -9,6 +9,9 @@ chronological order.
 8-Nov-2005
 	- Piotr Obrzut fixed orientation  getters in bullet plugin (reported 
 	  by Erwin Coumans)
+	- Piotr Obrzut changed updating position for rigid bodies to be valid 
+	  for static bodies too (it is possible to change static body position
+ 	  and in some situations it makes sense to do so)
 
 7-Nov-2005
 	- res changed simple1 from using CS_QUERY_REGISTRY to 
