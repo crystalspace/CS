@@ -9570,6 +9570,7 @@ package cspace::csMouseEventHelper;
 *GetAxis = *cspacec::csMouseEventHelper_GetAxis;
 *GetNumAxes = *cspacec::csMouseEventHelper_GetNumAxes;
 *GetButton = *cspacec::csMouseEventHelper_GetButton;
+*GetButtonMask = *cspacec::csMouseEventHelper_GetButtonMask;
 *GetModifiers = *cspacec::csMouseEventHelper_GetModifiers;
 *GetEventData = *cspacec::csMouseEventHelper_GetEventData;
 sub new {
@@ -9612,6 +9613,7 @@ package cspace::csJoystickEventHelper;
 *GetAxis = *cspacec::csJoystickEventHelper_GetAxis;
 *GetNumAxes = *cspacec::csJoystickEventHelper_GetNumAxes;
 *GetButton = *cspacec::csJoystickEventHelper_GetButton;
+*GetButtonMask = *cspacec::csJoystickEventHelper_GetButtonMask;
 *GetModifiers = *cspacec::csJoystickEventHelper_GetModifiers;
 *GetEventData = *cspacec::csJoystickEventHelper_GetEventData;
 sub new {
