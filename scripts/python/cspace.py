@@ -8519,6 +8519,8 @@ class csMouseEventHelper(_object):
     if _newclass:GetNumAxes = staticmethod(_cspace.csMouseEventHelper_GetNumAxes)
     __swig_getmethods__["GetButton"] = lambda x: _cspace.csMouseEventHelper_GetButton
     if _newclass:GetButton = staticmethod(_cspace.csMouseEventHelper_GetButton)
+    __swig_getmethods__["GetButtonMask"] = lambda x: _cspace.csMouseEventHelper_GetButtonMask
+    if _newclass:GetButtonMask = staticmethod(_cspace.csMouseEventHelper_GetButtonMask)
     __swig_getmethods__["GetModifiers"] = lambda x: _cspace.csMouseEventHelper_GetModifiers
     if _newclass:GetModifiers = staticmethod(_cspace.csMouseEventHelper_GetModifiers)
     __swig_getmethods__["GetEventData"] = lambda x: _cspace.csMouseEventHelper_GetEventData
@@ -8551,6 +8553,8 @@ csMouseEventHelper_GetNumAxes = _cspace.csMouseEventHelper_GetNumAxes
 
 csMouseEventHelper_GetButton = _cspace.csMouseEventHelper_GetButton
 
+csMouseEventHelper_GetButtonMask = _cspace.csMouseEventHelper_GetButtonMask
+
 csMouseEventHelper_GetModifiers = _cspace.csMouseEventHelper_GetModifiers
 
 csMouseEventHelper_GetEventData = _cspace.csMouseEventHelper_GetEventData
@@ -8570,6 +8574,8 @@ class csJoystickEventHelper(_object):
     if _newclass:GetNumAxes = staticmethod(_cspace.csJoystickEventHelper_GetNumAxes)
     __swig_getmethods__["GetButton"] = lambda x: _cspace.csJoystickEventHelper_GetButton
     if _newclass:GetButton = staticmethod(_cspace.csJoystickEventHelper_GetButton)
+    __swig_getmethods__["GetButtonMask"] = lambda x: _cspace.csJoystickEventHelper_GetButtonMask
+    if _newclass:GetButtonMask = staticmethod(_cspace.csJoystickEventHelper_GetButtonMask)
     __swig_getmethods__["GetModifiers"] = lambda x: _cspace.csJoystickEventHelper_GetModifiers
     if _newclass:GetModifiers = staticmethod(_cspace.csJoystickEventHelper_GetModifiers)
     __swig_getmethods__["GetEventData"] = lambda x: _cspace.csJoystickEventHelper_GetEventData
@@ -8597,6 +8603,8 @@ csJoystickEventHelper_GetAxis = _cspace.csJoystickEventHelper_GetAxis
 csJoystickEventHelper_GetNumAxes = _cspace.csJoystickEventHelper_GetNumAxes
 
 csJoystickEventHelper_GetButton = _cspace.csJoystickEventHelper_GetButton
+
+csJoystickEventHelper_GetButtonMask = _cspace.csJoystickEventHelper_GetButtonMask
 
 csJoystickEventHelper_GetModifiers = _cspace.csJoystickEventHelper_GetModifiers
 
