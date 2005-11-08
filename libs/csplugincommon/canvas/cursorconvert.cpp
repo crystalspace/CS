@@ -100,8 +100,8 @@ bool csCursorConverter::ConvertTo1bpp (iImage* image, uint8*& bitmap,
 
 bool csCursorConverter::ConvertTo1bppAutoColor (iImage* image, uint8*& bitmap, 
 				                uint8*& mask,
-				                csRGBcolor& forecolor, 
-				                csRGBcolor& backcolor, 
+				                csRGBcolor& /*forecolor*/, 
+				                csRGBcolor& /*backcolor*/, 
 				                const csRGBcolor* keycolor,
 				                bool XbitOrder)
 {

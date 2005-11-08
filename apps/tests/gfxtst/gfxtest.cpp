@@ -154,7 +154,7 @@ static int display_help ()
   return 1;
 }
 
-static int list_supported_formats (iObjectRegistry *r)
+static int list_supported_formats (iObjectRegistry * /*r*/)
 {
   const char *mask =
     "%-20s %-40s %-5s %-5s\n";

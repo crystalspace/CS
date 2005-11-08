@@ -218,7 +218,7 @@ RecurseOp::RecurseOp (iSequence* sequence, csRef<iSequenceManager> manager)
   seqmgr = manager;
 }
 
-void RecurseOp::Do (csTicks dt, iBase*)
+void RecurseOp::Do (csTicks /*dt*/, iBase*)
 {
   seqmgr->RunSequence (0, seq);
 }

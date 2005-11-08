@@ -335,7 +335,7 @@ void CCSWorld::WriteSky(csRef<iDocumentNode> node)
   }
 }
 
-void CCSWorld::WriteSkydome(csRef<iDocumentNode> node)
+void CCSWorld::WriteSkydome(csRef<iDocumentNode> /*node*/)
 {
   CMapEntity* pEntity = GetWorldspawn();
   if (!pEntity) return;
@@ -886,7 +886,7 @@ bool CCSWorld::WriteLibs (csRef<iDocumentNode> node, const char* type)
   return true;
 }
 
-bool CCSWorld::WriteKeys(csRef<iDocumentNode> node, CIWorld* pWorld, 
+bool CCSWorld::WriteKeys(csRef<iDocumentNode> node, CIWorld* /*pWorld*/, 
 			 CMapEntity* pEntity)
 {
   if (pEntity)
@@ -1119,7 +1119,7 @@ void CCSWorld::WriteSpritesTemplate(csRef<iDocumentNode> node)
   return;
 }
 
-void CCSWorld::WriteScriptsTemplate(csRef<iDocumentNode> node)
+void CCSWorld::WriteScriptsTemplate(csRef<iDocumentNode> /*node*/)
 {
   //int i;
 

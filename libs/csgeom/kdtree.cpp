@@ -455,7 +455,7 @@ void csKDTree::DistributeLeafObjects ()
   // There should be some threshold at least.
 }
 
-void csKDTree::AddObject (const csBox3& bbox, csKDTreeChild* obj)
+void csKDTree::AddObject (const csBox3& /*bbox*/, csKDTreeChild* obj)
 {
   // Add this object to the list of objects to be distributed
   // later.

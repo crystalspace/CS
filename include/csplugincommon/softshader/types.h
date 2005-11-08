@@ -271,7 +271,7 @@ namespace CrystalSpace
       /**
        * Return an interpolated component. But since we don't interpolate
        * anything... */
-      const ScanlineComp* GetFloat (size_t i) const { return 0; }
+      const ScanlineComp* GetFloat (size_t /*i*/) const { return 0; }
     };
   } // namespace SoftShader
 } // namespace CrystalSpace

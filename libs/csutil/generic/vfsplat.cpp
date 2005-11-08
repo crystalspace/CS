@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "csutil/vfsplat.h"
 
-const char* csCheckPlatformVFSVar(const char* VarName)
+const char* csCheckPlatformVFSVar(const char* /*VarName*/)
 {
   return 0;
 }

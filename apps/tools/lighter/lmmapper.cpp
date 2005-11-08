@@ -82,7 +82,7 @@ void litLightMapMapper::PolyToLM (const csVector3& vpoly, csVector2& vlm)
   }
 }
 
-void litLightMapMapper::LMToPoly (const csVector2& vlm, csVector3& vpoly)
+void litLightMapMapper::LMToPoly (const csVector2& /*vlm*/, csVector3& /*vpoly*/)
 {
   // @@@ TODO
 }

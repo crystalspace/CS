@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csplugincommon/soundloader/soundraw.h"
 
-csSoundDataRaw::csSoundDataRaw(iBase *p, void *d, long n, csSoundFormat f)
+csSoundDataRaw::csSoundDataRaw(iBase * /*p*/, void *d, long n, csSoundFormat f)
   : scfImplementationType (this), Data (d), NumSamples (n), Format (f)
 {
 }

@@ -516,7 +516,7 @@ pointfound:
 
 // lighting=flase creates polygon lit with full bright texture colours
 void LevelWriter::WriteFaces(iDocumentNode* paramsnode, 
-    Lib3dsMesh* mesh, bool lighting, unsigned int numMesh,
+    Lib3dsMesh* mesh, bool lighting, unsigned int /*numMesh*/,
     bool writesprite)
 {
   if (writesprite)

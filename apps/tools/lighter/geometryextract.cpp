@@ -32,9 +32,9 @@
 #include "imesh/object.h"
 #include "imesh/thing.h"
 
-bool litGeometryExtractor::ExtractGeometry (litScene *scene,
-                                           iMeshObjectFactory *csfact, 
-                                           litLightingMeshFactory *lightmeshfact)
+bool litGeometryExtractor::ExtractGeometry (litScene * /*scene*/,
+                                           iMeshObjectFactory * /*csfact*/, 
+                                           litLightingMeshFactory * /*lightmeshfact*/)
 {
   return true;
 }

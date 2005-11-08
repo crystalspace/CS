@@ -100,7 +100,7 @@ static int display_help ()
   return 1;
 }
 
-static bool Display (iFontServer *fs, iFont *font)
+static bool Display (iFontServer * /*fs*/, iFont *font)
 {
   int l, i;
   utf32_char c;

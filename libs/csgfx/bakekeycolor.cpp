@@ -77,7 +77,7 @@ template<int D> struct DimPixCompute
 };
 CS_SPECIALIZE_TEMPLATE struct DimPixCompute<0>
 {
-  static inline void Compute (int* dimPix, const int* sizes)
+  static inline void Compute (int* dimPix, const int* /*sizes*/)
   {
     dimPix[0] = 1;
   }

@@ -57,7 +57,7 @@ iMeshObjectDrawCallback* csMeshObject::GetVisibleCallback () const
   return VisCallback;
 }
 
-void csMeshObject::NextFrame (csTicks current_time,const csVector3& pos)
+void csMeshObject::NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/)
 {
 }
 
@@ -70,8 +70,8 @@ bool csMeshObject::SupportsHardTransform () const
   return false;
 }
 
-bool csMeshObject::HitBeamOutline (const csVector3& start,
-  	const csVector3& end, csVector3& isect, float* pr)
+bool csMeshObject::HitBeamOutline (const csVector3& /*start*/,
+  	const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
 {
   return false;
 }
@@ -92,17 +92,17 @@ iMeshWrapper* csMeshObject::GetMeshWrapper () const
   return LogParent;
 }
 
-bool csMeshObject::SetColor (const csColor& color)
+bool csMeshObject::SetColor (const csColor& /*color*/)
 {
   return false;
 }
 
-bool csMeshObject::GetColor (csColor& color) const
+bool csMeshObject::GetColor (csColor& /*color*/) const
 {
   return false;
 }
 
-bool csMeshObject::SetMaterialWrapper (iMaterialWrapper* material)
+bool csMeshObject::SetMaterialWrapper (iMaterialWrapper* /*material*/)
 {
   return false;
 }
@@ -144,7 +144,7 @@ csMeshFactory::~csMeshFactory ()
 {
 }
 
-void csMeshFactory::HardTransform (const csReversibleTransform& t)
+void csMeshFactory::HardTransform (const csReversibleTransform& /*t*/)
 {
 }
 

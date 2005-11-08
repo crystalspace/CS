@@ -547,7 +547,7 @@ bool CCSSector::WriteCurves(csRef<iDocumentNode> node, CIWorld* pWorld)
     //  TRANSPARENT ()  //=DST
     //  KEYCOLOR ()     // color 0 is transparent
 
-bool CCSSector::WriteSprites(csRef<iDocumentNode> node, CIWorld* pWorld)
+bool CCSSector::WriteSprites(csRef<iDocumentNode> /*node*/, CIWorld* /*pWorld*/)
 {
   // @@@ check if this still works
 #if 0
@@ -743,7 +743,7 @@ bool CCSSector::WriteSprites(csRef<iDocumentNode> node, CIWorld* pWorld)
 //  TRANSPARENT ()  //=DST
 //  KEYCOLOR ()     // color 0 is transparent
 
-bool CCSSector::WriteSprites2D(csRef<iDocumentNode> node, CIWorld* pWorld)
+bool CCSSector::WriteSprites2D(csRef<iDocumentNode> /*node*/, CIWorld* pWorld)
 {
   assert(pWorld);
 
@@ -854,7 +854,7 @@ bool CCSSector::WriteSprites2D(csRef<iDocumentNode> node, CIWorld* pWorld)
   return true;
 }
 
-bool CCSSector::WriteFog(csRef<iDocumentNode> node, CIWorld* pWorld)
+bool CCSSector::WriteFog(csRef<iDocumentNode> /*node*/, CIWorld* /*pWorld*/)
 {
 /*  assert(pWorld);
 

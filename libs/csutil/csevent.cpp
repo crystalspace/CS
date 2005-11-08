@@ -123,7 +123,7 @@ csEvent::csEvent (csTicks iTime, int eType, uint n, int x, int y,
 
 csEvent::csEvent (csTicks iTime, int eType, uint n, const int32* axes, 
 		  uint8 numAxes, uint32 axesChanged, uint8 button, 
-		  uint32 buttonMask, uint32 modifiers) 
+		  uint32 /*buttonMask*/, uint32 modifiers) 
                   : scfImplementationType (this), attributes (53)
 {
   Time = iTime;

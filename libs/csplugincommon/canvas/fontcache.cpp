@@ -463,8 +463,8 @@ void csFontCache::UncacheGlyph (GlyphCacheData* cacheData)
   InternalUncacheGlyph (cacheData);
 }
 
-void csFontCache::WriteString (iFont *font, int x, int y, int fg, int bg, 
-  const utf8_char* text, uint flags)
+void csFontCache::WriteString (iFont * /*font*/, int /*x*/, int /*y*/,
+  int /*fg*/, int /*bg*/, const utf8_char* /*text*/, uint /*flags*/)
 {
 }
 

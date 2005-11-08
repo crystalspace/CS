@@ -45,7 +45,7 @@ bool csRenderStepParser::Initialize(iObjectRegistry *object_reg)
 }
 
 csPtr<iRenderStep> csRenderStepParser::Parse (
-  iObjectRegistry* object_reg,
+  iObjectRegistry* /*object_reg*/,
   iDocumentNode* node)
 {
   csRef<iDocumentAttribute> pluginAttr = node->GetAttribute ("plugin");

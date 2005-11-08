@@ -32,7 +32,7 @@ namespace Debug
 
 bool CallStackCreatorBacktrace::CreateCallStack (
   csDirtyAccessArray<CallStackEntry>& entries, 
-  csDirtyAccessArray<uintptr_t>& params, bool fast)
+  csDirtyAccessArray<uintptr_t>& /*params*/, bool /*fast*/)
 {
   void* traceBuffer[200];
   int count = backtrace (traceBuffer, sizeof (traceBuffer) / sizeof (void*));
@@ -74,7 +74,7 @@ bool CallStackNameResolverBacktrace::GetAddressSymbol (void* addr,
   return true;
 }
 
-void* CallStackNameResolverBacktrace::OpenParamSymbols (void* addr)
+void* CallStackNameResolverBacktrace::OpenParamSymbols (void* /*addr*/)
 {
   return 0;
 }
@@ -84,7 +84,7 @@ bool CallStackNameResolverBacktrace::GetParamName (void*, size_t, csString&)
   return false;
 }
 
-void CallStackNameResolverBacktrace::FreeParamSymbols (void* handle)
+void CallStackNameResolverBacktrace::FreeParamSymbols (void* /*handle*/)
 {
 }
 

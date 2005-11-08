@@ -839,7 +839,7 @@ bool csPolygonMeshTools::LineInClosedMesh (
 	const csVector3& p1, const csVector3& p2,
   	csVector3* vertices,
   	csTriangleMinMax* tris, int tri_count,
-	csPlane3* planes)
+	csPlane3* /*planes*/)
 {
   int i;
   float minx = p1.x;
@@ -869,7 +869,7 @@ bool csPolygonMeshTools::LineInClosedMesh (
 bool csPolygonMeshTools::BoxInClosedMesh (const csBox3& box,
   	csVector3* vertices,
   	csTriangleMinMax* tris, int tri_count,
-	csPlane3* planes)
+	csPlane3* /*planes*/)
 {
   int i;
   float minx = box.MinX ();

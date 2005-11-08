@@ -54,7 +54,7 @@ namespace CrystalSpace
       const csBox2& region;
       ClipMinX (const csBox2& region) : region(region) {}
 
-      bool Inside (float px, float py)
+      bool Inside (float px, float /*py*/)
       { return (px >= region.MinX ()); }
       void Intersect (float px, float py, float cx, float cy,
 	double& t, float& tx, float& ty)
@@ -75,7 +75,7 @@ namespace CrystalSpace
       const csBox2& region;
       ClipMaxX (const csBox2& region) : region(region) {}
 
-      bool Inside (float px, float py)
+      bool Inside (float px, float /*py*/)
       { return (px <= region.MaxX ()); }
       void Intersect (float px, float py, float cx, float cy,
 	double& t, float& tx, float& ty)
@@ -96,7 +96,7 @@ namespace CrystalSpace
       const csBox2& region;
       ClipMinY (const csBox2& region) : region(region) {}
 
-      bool Inside (float px, float py)
+      bool Inside (float /*px*/, float py)
       { return (py >= region.MinY ()); }
       void Intersect (float px, float py, float cx, float cy,
 	double& t, float& tx, float& ty)
@@ -117,7 +117,7 @@ namespace CrystalSpace
       const csBox2& region;
       ClipMaxY (const csBox2& region) : region(region) {}
 
-      bool Inside (float px, float py)
+      bool Inside (float /*px*/, float py)
       { return (py <= region.MaxY ()); }
       void Intersect (float px, float py, float cx, float cy,
 	double& t, float& tx, float& ty)

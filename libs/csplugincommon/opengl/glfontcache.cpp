@@ -324,7 +324,7 @@ static void ShrinkGlyphData (uint8* glyph, int oldW, int oldH, int newW, int new
   }
 }
 
-void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, size_t tex, 
+void csGLFontCache::CopyGlyphData (iFont* /*font*/, utf32_char /*glyph*/, size_t tex, 
 				   const csBitmapMetrics& bmetrics, 
 				   const csRect& texRect, iDataBuffer* bitmapDataBuf, 
 				   iDataBuffer* alphaDataBuf)

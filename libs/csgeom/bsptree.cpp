@@ -53,7 +53,7 @@ void csBSPTree::Clear ()
 }
 
 size_t csBSPTree::FindBestSplitter (csTriangle* triangles, csPlane3* planes,
-	int num_triangles, csVector3* vertices,
+	int /*num_triangles*/, csVector3* vertices,
 	const csArray<int>& triidx)
 {
   size_t i, j;

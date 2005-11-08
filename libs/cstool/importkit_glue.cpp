@@ -162,7 +162,7 @@ namespace CrystalSpace
       return ret;
     }
 
-    bool Glue::ProbeMaterial (ImportKit::Container& container, 
+    bool Glue::ProbeMaterial (ImportKit::Container& /*container*/, 
 			      iObject* obj)
     {
       csRef<iMaterialWrapper> mat = 

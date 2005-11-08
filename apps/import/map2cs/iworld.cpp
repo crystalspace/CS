@@ -258,7 +258,7 @@ void CIWorld::BuildTexturelist()
     {
       CTextureManager* pTexMan  = m_pMap->GetTextureManager();
 
-	  const char* texturefilename = pEntity->GetValueOfKey("texture");
+      const char* texturefilename = pEntity->GetValueOfKey("texture");
       CTextureFile* pTexture = pTexMan->GetTexture(texturefilename);
 
       bool TextureFound = false;
@@ -281,7 +281,7 @@ void CIWorld::BuildTexturelist()
   }
 }
 
-bool CIWorld::PrepareData(const char* filename, CMapFile* pMap)
+bool CIWorld::PrepareData(const char* /*filename*/, CMapFile* pMap)
 {
   m_pMap = pMap;
   m_ScaleFactor = pMap->GetConfigFloat("Map2CS.General.Scaling", 1.0/40.0);

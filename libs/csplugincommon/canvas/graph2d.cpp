@@ -1071,7 +1071,7 @@ csPtr<iGraphics2D> csGraphics2D::CreateOffscreenCanvas (
   }
 }
 
-bool csGraphics2D::DebugCommand (const char* cmd)
+bool csGraphics2D::DebugCommand (const char* /*cmd*/)
 {
   return false;
 }

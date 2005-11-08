@@ -294,7 +294,7 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
    * a square.  If you want a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
    * angle.
    */
-void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool swap_colors, bool fill)
+void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool /*swap_colors*/, bool fill)
 {
   float width = x2-x1;
   float height = y2-y1;

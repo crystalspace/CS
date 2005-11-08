@@ -300,7 +300,7 @@ csRef<iImage> csImageManipulate::Mipmap2D (iImage* source, int steps,
 }
 
 csRef<iImage> csImageManipulate::Mipmap3D (iImage* source, int step, 
-    csRGBpixel* transp)
+    csRGBpixel* /*transp*/)
 {
   const int nw = source->GetWidth() >> step;
   const int nh = source->GetHeight() >> step;
