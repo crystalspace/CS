@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Nov-2005
+	- Piotr Obrzut fixed orientation  getters (reported by Erwin Coumans)
+
 7-Nov-2005
 	- res changed simple1 from using CS_QUERY_REGISTRY to 
 	  csQueryRegistry<>.
