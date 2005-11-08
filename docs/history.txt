@@ -12,6 +12,10 @@ chronological order.
 	- Piotr Obrzut changed updating position for rigid bodies to be valid 
 	  for static bodies too (it is possible to change static body position
  	  and in some situations it makes sense to do so)
+	- iceeey added the ability to specify a glow texture to the parallax
+	  shader.
+	- iceeey merged the specular parallax shader into the single main
+	  parallax shader using conditionals.
 
 7-Nov-2005
 	- res changed simple1 from using CS_QUERY_REGISTRY to 

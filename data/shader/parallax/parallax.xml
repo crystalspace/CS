@@ -12,11 +12,14 @@
       <texture destination="TexNormal" name="tex normal" />
       <texture destination="TexDiffuse" name="tex diffuse" />
       <texture destination="TexHeight" name="tex height" />
-      <?if vars."specular" ?>
-        <fp plugin="glcg" file="/shader/parallax/parallax_spec.cgfp" />
-      <?else?>
-        <fp plugin="glcg" file="/shader/parallax/parallax.cgfp" />
+      <?if vars."tex glow".texture ?>
+        <texture destination="TexGlow" name="tex glow" />
       <?endif?>
+      <fp plugin="glcg">
+        <cgfp>
+          <?include parallax.cgfp ?>
+        </cgfp>
+      </fp>
     </pass>
   </technique>
   <technique priority="100">

@@ -1,8 +1,8 @@
-<cgfp>
+<include>
 <variablemap variable="light 0 diffuse" destination="lightcolor"/>
 <variablemap variable="specular" destination="specular"/>
 <program>
-<![CDATA[
+
 
 struct vertex2fragment { 
 	float4 Position : POSITION;
@@ -17,27 +17,44 @@ float4 main (vertex2fragment IN,
 			uniform float4 specular,
 			uniform sampler2D TexNormal,
 			uniform sampler2D TexDiffuse,
+<?if vars."tex glow".texture ?>
+			uniform sampler2D TexGlow,
+<?endif?>
 			uniform sampler2D TexHeight) : COLOR
 {
 	float3 normEye = normalize(IN.EyeVec.xyz);
 	float3 normLight = normalize(IN.LightDir.xyz);
-	float selfOcclusion = min(max(0, normLight.z*5), 1);
+
+	float selfOcclusion = saturate(normLight.z*5);
 	
 	float4 height = 0.04 * tex2D(TexHeight, IN.TexCoord) - 0.02;
 	float2 newTexcoord = (height * normEye).xy + IN.TexCoord;
 	
 	float4 diffuseCol = tex2D(TexDiffuse, newTexcoord);
+	<?if vars."tex glow".texture ?>
+	float4 glowCol = tex2D(TexGlow, newTexcoord);
+	<?else?>
+	float4 glowCol = float4(0);
+	<?endif?>
 	float4 bumpNormal = tex2D(TexNormal, newTexcoord);
 	bumpNormal *= 2;
 	bumpNormal -= 1;
 	float3 normBumpNormal = normalize(bumpNormal.xyz);
 		
 	float bump = dot(normLight, normBumpNormal);
+	<?if vars."specular" ?>
+	float spec = pow(dot(normalize(normEye + normLight), normBumpNormal), 32) * (bumpNormal.w+1)/2;
+	<?endif?>
 	float4 outCol = saturate(lightcolor*bump.xxxx);
-	
-	return selfOcclusion*saturate(outCol*diffuseCol);
+
+	<?if vars."specular" ?>
+	float4 result = selfOcclusion*saturate(outCol*diffuseCol + spec*lightcolor*specular);
+	<?else?>
+	float4 result = selfOcclusion*saturate(outCol*diffuseCol);
+	<?endif?>
+
+	return result + glowCol;
 }
 
-]]>
 </program>
-</cgfp>
+</include>
