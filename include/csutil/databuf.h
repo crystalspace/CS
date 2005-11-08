@@ -29,7 +29,7 @@
 #include "iutil/databuff.h"
 
 /**
- * This is a implementation of iDataBuffer interface.
+ * This is an implementation of iDataBuffer interface.
  * The object is extremely lightweight and is recommended
  * for use in plugins as a mean to transparently exchange
  * abstract data between plugins.
