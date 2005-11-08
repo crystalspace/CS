@@ -120,7 +120,7 @@ public:
   csRef<iDynamicsSystemCollider> GetCollider (unsigned int index) 
   {return colliders[index];}
   int GetColliderCount () 
-  {return colliders.GetSize ();}
+  {return (int) colliders.GetSize ();}
 
   CcdPhysicsEnvironment *GetBulletSys () 
   {return bullet_sys;}

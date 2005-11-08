@@ -48,6 +48,13 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csBulletDynamics)
 
+#define ODE2CSMATRIX(odemat, csmat) \
+{   \
+  csmat.m11 = odemat[0]; csmat.m12 = odemat[4]; csmat.m13 = odemat[8]; \
+  csmat.m21 = odemat[1]; csmat.m22 = odemat[5]; csmat.m23 = odemat[9]; \
+  csmat.m31 = odemat[2]; csmat.m32 = odemat[6]; csmat.m33 = odemat[10]; \
+}
+
 //---------------------------------------------------------------------------
 
 csBulletDynamics::csBulletDynamics (iBase *iParent)
@@ -310,14 +317,17 @@ csRef<iBodyGroup> csBulletRigidBody::GetGroup (void)
 
 void csBulletRigidBody::ResetShape ()
 {
-  BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->m_broadphaseHandle;
-  bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
-  ds->GetBulletSys ()->GetBroadphase()->CleanProxyFromPairs(bpproxy);
+  if (pc->GetCollisionShape ()->GetShapeType () != EMPTY_SHAPE_PROXYTYPE)
+  {
+    BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->m_broadphaseHandle;
+    bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
+    ds->GetBulletSys ()->GetBroadphase()->CleanProxyFromPairs(bpproxy);
 
-  SimdVector3 newinertia;
-  pc->GetRigidBody()->GetCollisionShape()->CalculateLocalInertia(mass,newinertia);
-  pc->GetRigidBody()->setMassProps(mass,newinertia);
-  pc->GetRigidBody()->updateInertiaTensor();
+    SimdVector3 newinertia;
+    pc->GetRigidBody()->GetCollisionShape()->CalculateLocalInertia(mass,newinertia);
+    pc->GetRigidBody()->setMassProps(mass,newinertia);
+    pc->GetRigidBody()->updateInertiaTensor();
+  }
 }
 
 bool csBulletRigidBody::AttachColliderMesh (iMeshWrapper* mesh,
@@ -411,7 +421,7 @@ const csMatrix3 csBulletRigidBody::GetOrientation () const
 {
   csQuaternion q;
   ms->getWorldOrientation(q.x,q.y,q.z,q.r);
-  return csMatrix3 (q);
+  return csMatrix3 (q).GetTranspose ();
 }
 
 void csBulletRigidBody::SetTransform (const csOrthoTransform& trans)
@@ -448,13 +458,12 @@ const csVector3 csBulletRigidBody::GetAngularVelocity () const
 void csBulletRigidBody::SetProperties (float mass, const csVector3& center,
                                        const csMatrix3& inertia)
 {
-  csQuaternion q (inertia); 
-  pc->GetRigidBody ()->setMassProps (mass,SimdVector3 (q.x, q.y, q.z));
+  csBulletRigidBody::mass = mass;
+  
+  ResetShape ();
 
   csVector3 g = ds->GetGravity ();
   pc->GetRigidBody ()->setGravity (SimdVector3 (g.x, g.y, g.z));
-
-  csBulletRigidBody::mass = mass;
 }
 
 void csBulletRigidBody::GetProperties (float* mass, csVector3* center,
@@ -770,12 +779,12 @@ csOrthoTransform csBulletCollider::GetTransform ()
 {
   csQuaternion q;
   ms->getWorldOrientation(q.x,q.y,q.z,q.r);
-  csMatrix3 rot;
+  csMatrix3 rot (q);
 
   csVector3 v;
   ms->getWorldPosition (v.x, v.y, v.z);
 
-  return csOrthoTransform (rot, v);
+  return csOrthoTransform (rot.GetTranspose (), v);
 }
 csOrthoTransform csBulletCollider::GetLocalTransform ()
 {
