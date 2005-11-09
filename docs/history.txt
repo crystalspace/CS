@@ -6,6 +6,18 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Nov-2005
+	- Jorrit changed the way cache filenames (lightmaps and such) are
+	  generated for thing, genmesh, bezier, and bruteblock terrain.
+	  All floating point values are now avoided because there was no
+	  way to generate a unique MD5 from those that is guaranteed to
+	  give the same result on all platforms. This would cause failure
+	  to load lightmaps. This changes means that ALL lightmap and
+	  other CS caches are now invalid so you'll have to use -relight
+	  on all maps! This change also means that objects REALLY need
+	  unique names now. The MD5 is now calculated from the name,
+	  the name of the parent sector, the number of vertices, and
+	  the number of polygons only.
 8-Nov-2005
 	- Piotr Obrzut fixed orientation  getters in bullet plugin (reported 
 	  by Erwin Coumans)
@@ -16,7 +28,6 @@ chronological order.
 	  shader.
 	- iceeey merged the specular parallax shader into the single main
 	  parallax shader using conditionals.
-
 7-Nov-2005
 	- res changed simple1 from using CS_QUERY_REGISTRY to 
 	  csQueryRegistry<>.

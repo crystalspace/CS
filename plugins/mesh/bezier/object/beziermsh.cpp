@@ -274,19 +274,6 @@ char* csBezierMesh::GenerateCacheName ()
 		strlen (sect->QueryObject ()->GetName ()));
   }
 
-  l = csConvertEndian ((int32)csQint ((b.MinX () * 1000)+.5));
-  mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)csQint ((b.MinY () * 1000)+.5));
-  mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)csQint ((b.MinZ () * 1000)+.5));
-  mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)csQint ((b.MaxX () * 1000)+.5));
-  mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)csQint ((b.MaxY () * 1000)+.5));
-  mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)csQint ((b.MaxZ () * 1000)+.5));
-  mf.Write ((char*)&l, 4);
-
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
   csString hex(digest.HexString());
   return hex.Detach();
