@@ -19,6 +19,9 @@ chronological order.
 	  the name of the parent sector, the number of vertices, and
 	  the number of polygons only.
 	- Jorrit silenced a few valgrind warnings in odedynam.
+	- Eric Sunshine renamed texinfo/usingcs/plugin_overview.txi to
+	  pluginoverview.txi to work-around TeX shortcoming where it barfs on
+	  underscores in filenames.
 8-Nov-2005
 	- Piotr Obrzut fixed orientation  getters in bullet plugin (reported 
 	  by Erwin Coumans)

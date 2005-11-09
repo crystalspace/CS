@@ -33,7 +33,7 @@ own 3D applications.
 @end menu
 
 @imports{usingcs,basics.txi}
-@imports{usingcs,plugin_overview.txi}
+@imports{usingcs,pluginoverview.txi}
 @importss{usingcs,tutorials,chapter.txi}
 @importss{usingcs,scf,chapter.txi}
 @importss{usingcs,configuration,chapter.txi}
