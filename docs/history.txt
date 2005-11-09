@@ -18,6 +18,7 @@ chronological order.
 	  unique names now. The MD5 is now calculated from the name,
 	  the name of the parent sector, the number of vertices, and
 	  the number of polygons only.
+	- Jorrit silenced a few valgrind warnings in odedynam.
 8-Nov-2005
 	- Piotr Obrzut fixed orientation  getters in bullet plugin (reported 
 	  by Erwin Coumans)

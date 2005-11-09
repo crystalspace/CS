@@ -2360,6 +2360,15 @@ csODEJoint::csODEJoint (csODEDynamicSystem *sys)
   rotConstraint[1] = 1;
   rotConstraint[2] = 1;
 
+  maxTrans.Set (0, 0, 0);
+  minTrans.Set (0, 0, 0);
+  maxAngle.Set (0, 0, 0);
+  minAngle.Set (0, 0, 0);
+
+  stopBounce.Set (0, 0, 0);
+  desiredVelocity.Set (0, 0, 0);
+  fMax.Set (0, 0, 0);
+
   dynsys = sys;
 }
 
