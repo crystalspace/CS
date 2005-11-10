@@ -294,9 +294,9 @@ public:
    * @{ */
   void ReadDatabase (iDocumentNode* dbRoot, 
     int configPriority = iConfigManager::ConfigPriorityPlugin + 20,
-    const char* /*phase*/ = 0)
+    const char* phase = 0)
   {
-    driverdb.Open (this, dbRoot, 0, configPriority);
+    driverdb.Open (this, dbRoot, phase, configPriority);
   }
   /** @} */
 };

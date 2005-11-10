@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 
 #include "csutil/scf.h"
+#include "csgfx/packrgb.h"
 #include "csplugincommon/opengl/glcommon2d.h"
 #include "csplugincommon/opengl/glss.h"
 
@@ -73,44 +74,32 @@ void csGLScreenShot::SetData (void* data)
     dataSize = Width * Height;
   }
 
-// Pixel format is read as RGBA (in a byte array) but as soon as we
-// cast it to a 32 bit integer we have to deal with endianess, so convert
-// to big endian and convert RGBA to ARGB
-// On ABGR machines, we also need to swap B/R bytes
-  uint32* s = (uint32*)data;
+  // Pixel format is read as RGBA (in a byte array)
+  uint8* s = (uint8*)data;
   int x, y;
   for (y = Height; y-- > 0;)
   {
     csRGBpixel* dest = Data + y * Width;
-    for (x = 0 ; x < Width; x++)
+  #ifdef CS_LITTLE_ENDIAN
+    if (csPackRGBA::IsRGBpixelSane())
     {
-      uint32 pix = *s;
-#ifdef CS_LITTLE_ENDIAN
-  #if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
-      dest->red   = (pix & 0x000000FF);
-      dest->green = (pix & 0x0000FF00) >> 8;
-      dest->blue  = (pix & 0x00FF0000) >> 16;
-      dest->alpha = (pix & 0xFF000000) >> 24;
-  #else 
-      dest->blue  = (pix & 0x000000FF);
-      dest->green = (pix & 0x0000FF00) >> 8;
-      dest->red   = (pix & 0x00FF0000) >> 16;
-      dest->alpha = (pix & 0xFF000000) >> 24;
+      // Weee! Shortcut!
+      const size_t bytes = Width * 4;
+      memcpy (dest, s, bytes);
+      s += bytes;
+    }
+    else
   #endif
-#else
-  #if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
-      dest->alpha = (pix & 0x000000FF);
-      dest->blue  = (pix & 0x0000FF00) >> 8;
-      dest->green = (pix & 0x00FF0000) >> 16;
-      dest->red   = (pix & 0xFF000000) >> 24;
-  #else 
-      dest->alpha = (pix & 0x000000FF);
-      dest->red   = (pix & 0x0000FF00) >> 8;
-      dest->green = (pix & 0x00FF0000) >> 16;
-      dest->blue  = (pix & 0xFF000000) >> 24;
-  #endif
-#endif
-      s++; dest++;
+    {
+      for (x = 0 ; x < Width; x++)
+      {
+	uint32 pix = *s;
+	dest->red   = *s++;
+	dest->green = *s++;
+	dest->blue  = *s++;
+	dest->alpha = *s++;
+	dest++;
+      }
     }
   }
 }

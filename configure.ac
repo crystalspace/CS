@@ -338,7 +338,6 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 	cs_host_os_normalized='MacOS/X'
 
 	CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])
-	CS_HEADER_PROPERTY([CS_24BIT_PIXEL_LAYOUT], [CS_24BIT_PIXEL_ARGB])
 
 	# We assume that we always have CoreAudio available on MacOS/X.
 	CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])

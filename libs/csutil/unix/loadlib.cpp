@@ -39,11 +39,11 @@
 csLibraryHandle csLoadLibrary (const char* iName)
 {
   // iName will have an ".csplugin" suffix
-  int nameLen = strlen (iName);
-  char* binName = new char[nameLen + 3];
+  size_t nameLen = strlen (iName);
+  char* binName = new char[nameLen + 4];
   strcpy (binName, iName);
   
-  if ((nameLen >= 7) && 
+  if ((nameLen >= 9) && 
     (strcasecmp (binName + nameLen - 9, ".csplugin") == 0))
   {
     strcpy (binName + nameLen - 9, ".so");

@@ -40,7 +40,6 @@
 #include "csplugincommon/particlesys/partgen.h"
 #include "csplugincommon/particlesys/particle.h"
 #include "csplugincommon/render3d/normalizationcube.h"
-#include "csplugincommon/render3d/pixfmt.h"
 #include "csplugincommon/render3d/txtmgr.h"
 #include "csplugincommon/renderstep/basesteploader.h"
 #include "csplugincommon/renderstep/basesteptype.h"

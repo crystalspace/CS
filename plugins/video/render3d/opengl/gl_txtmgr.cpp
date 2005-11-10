@@ -103,6 +103,9 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
       flags &= ~CS_TEXTURE_NPOTS;
     }
     else if (!txtmgr->enableNonPowerOfTwo2DTextures)
+      /* Note that 'enableNonPowerOfTwo2DTextures' is the flag for ATI's
+       * support of non-POT _2D_ textures; that is, the textures, being
+       * NPOTS, need to go to the 2D target, not RECT. */
       target = CS_TEX_IMG_RECT;
   }
   texFlags.Set (flagsPublicMask, flags);

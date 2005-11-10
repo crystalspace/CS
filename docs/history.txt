@@ -9,6 +9,12 @@ chronological order.
 10-Nov-2005
 	- Jorrit fixed SimpleRoom.java for a recent change in
 	  LoadMeshObjectFactory.
+	- res made the following changes:
+	    - Added a clarifying comment to gl_txtmgr.cpp.
+	    - Made some msvcgen adjustments to have VC7 projects work with
+	      VC8 nicely.
+	    - Fixed some not quite correct size counting in unix/loadlib.cpp.
+	    - Removed need for CS_24BIT_PIXEL_LAYOUT.
 9-Nov-2005
 	- Jorrit changed the way cache filenames (lightmaps and such) are
 	  generated for thing, genmesh, bezier, and bruteblock terrain.

@@ -32,9 +32,6 @@
 #include "csplugincommon/opengl/glstates.h"
 #include "csutil/xmltiny.h"
 
-// This header should be moved
-#include "csplugincommon/render3d/pixfmt.h"
-
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   scfImplementationType (this, iParent), statecache (0), statecontext (0),
     hasRenderTarget (false), vpSet(false)
@@ -60,9 +57,8 @@ bool csGraphics2DGLCommon::Initialize (iObjectRegistry *object_reg)
    * both need settings from that file. */
   config.AddConfig (object_reg, "/config/r3dopengl.cfg");
 
-  // We don't really care about pixel format, except for ScreenShot()
-  // and OpenGL software proctexes
-#if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
+  // Guesstimate pixel format. We don't really care about it anyway.
+#if !defined(CS_LITTLE_ENDIAN)
     pfmt.RedMask =   0x000000FF;
     pfmt.GreenMask = 0x0000FF00;
     pfmt.BlueMask =  0x00FF0000;

@@ -94,6 +94,7 @@ actions GenerateWin32ManifestRc
     cat > $(<) << __EOF__
 // This file is generated automatically.
 
+#ifndef _VC80_UPGRADE
 1 24
 {
   "<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>\r\n",
@@ -127,6 +128,7 @@ __EOF__
   "</dependency>\r\n",
   "</assembly>\r\n"
 }
+#endif
 __EOF__
 }
 
@@ -255,8 +257,7 @@ rule MakeVersionRc
   PRODUCT_DESCRIPTION on $(<) = $(desc) ;
 
   local name ;
-  if $(PACKAGE_LONGNAME) { name = $(PACKAGE_LONGNAME) ; }
-  else if $(PACKAGE_NAME) { name = $(PACKAGE_NAME) ; }
+  if $(PACKAGE_NAME) { name = $(PACKAGE_NAME) ; }
   else { name = $(>) ; }
   PRODUCT_NAME on $(<) = $(name) ;
       
