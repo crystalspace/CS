@@ -61,7 +61,7 @@ class MovingObject
 	iTextureWrapper txt = r.loader.LoadTexture("spark",
 		"/lib/std/spark.png", CS.CS_TEXTURE_3D, txtmgr, true, true);
         iMeshFactoryWrapper imeshfact = r.loader.LoadMeshObjectFactory(
-		"/lib/std/sprite1");
+		"/lib/std/sprite1", null);
         sprite = r.engine.CreateMeshWrapper(imeshfact,
 		"MySprite", room, pos);
         sprite.GetMovable().UpdateMove();

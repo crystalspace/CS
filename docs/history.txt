@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Nov-2005
+	- Jorrit fixed SimpleRoom.java for a recent change in
+	  LoadMeshObjectFactory.
 9-Nov-2005
 	- Jorrit changed the way cache filenames (lightmaps and such) are
 	  generated for thing, genmesh, bezier, and bruteblock terrain.
