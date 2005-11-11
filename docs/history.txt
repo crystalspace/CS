@@ -12,6 +12,8 @@ chronological order.
 	    - Replaced mentions of aalib by libcaca in the manual.
 	    - Hopefully fixed height obtained from
 	      csRainMeshObject::GetDropSize().
+	- Jorrit fixed an initialization error in xmlshader which could
+	  case xmlshader to take a VERY long time in some situations.
 10-Nov-2005
 	- Jorrit fixed SimpleRoom.java for a recent change in
 	  LoadMeshObjectFactory.

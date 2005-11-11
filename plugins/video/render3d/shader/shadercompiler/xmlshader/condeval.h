@@ -50,7 +50,7 @@ enum ConditionOp
 /// Possible types of operands.
 enum OperandType
 {
-  operandNone,
+  operandNone = 0,
   operandOperation,
 
   operandFloat,
@@ -81,6 +81,9 @@ struct CondOperand
   };
   CondOperand ()
   { memset (this, 0, sizeof (*this)); }
+  CondOperand (int /* justToHaveADifferentSignature*/) 
+  { /* Speed hack for when being a member of CondOperation:
+     * it's "initialization" will null this as well */ }
 };
 
 /// An operation.
@@ -90,8 +93,8 @@ struct CondOperation
   CondOperand left;
   CondOperand right;
 
-  CondOperation ()
-  { operation = opInvalid; }
+  CondOperation () : left(23), right(42)
+  { memset (this, 0, sizeof (*this)); }
 };
 
 static bool IsOpCommutative (ConditionOp op)
