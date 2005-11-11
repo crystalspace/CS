@@ -43,7 +43,7 @@ static inline int ColorComponent (int x, int bitcount, int shift)
 #define COLOR565_BLUE(x)    ColorComponent(x, 5, 0)
 
 bool Loader::ProbeDXT1Alpha (const uint8* source, int w, int h, int depth, 
-			     size_t size)
+			     size_t /*size*/)
 {
   int          x, y, z;
   unsigned char *Temp;
@@ -427,7 +427,7 @@ inline static void ComputeMaskParams (uint32 mask, int& shift1, int& mul, int& s
 }
 
 void Loader::DecompressRGB (csRGBpixel* buffer, const uint8* source, 
-			    int w, int h, int depth, size_t size, 
+			    int w, int h, int depth, size_t /*size*/, 
 			    const PixelFormat& pf)
 {
   const uint valMask = (1 << pf.bitdepth) - 1;
@@ -455,7 +455,7 @@ void Loader::DecompressRGB (csRGBpixel* buffer, const uint8* source,
 }
 
 void Loader::DecompressRGBA (csRGBpixel* buffer, const uint8* source, 
-			     int w, int h, int depth, size_t size, 
+			     int w, int h, int depth, size_t /*size*/, 
 			     const PixelFormat& pf)
 {
   const uint valMask = (pf.bitdepth == 32) ? ~0 : (1 << pf.bitdepth) - 1;
@@ -488,7 +488,7 @@ void Loader::DecompressRGBA (csRGBpixel* buffer, const uint8* source,
 }
 
 void Loader::DecompressLum (csRGBpixel* buffer, const uint8* source, 
-			    int w, int h, int depth, size_t size, 
+			    int w, int h, int depth, size_t /*size*/, 
 			    const PixelFormat& pf)
 {
   int lShift1, lMul, lShift2;

@@ -162,7 +162,7 @@ static const unsigned char RTjpeg_chrom_quant_tbl[64] = {
 /* Block to Stream (encoding)                         */
 /*                                                    */
 
-int RTjpeg_b2s(int16 *data, int8 *strm, uint8 bt8)
+int RTjpeg_b2s(int16 *data, int8 *strm, uint8 /*bt8*/)
 {
  register int ci, co=1;
  register int16 ZZvalue;
@@ -332,7 +332,7 @@ csFPrintf(stdout, "\n\n");
 /* Stream to Block  (decoding)                        */
 /*                                                    */
 
-int RTjpeg_s2b(int16 *data, int8 *strm, uint8 bt8, uint32 *qtbl)
+int RTjpeg_s2b(int16 *data, int8 *strm, uint8 /*bt8*/, uint32 *qtbl)
 {
  int ci;
  register int co;
@@ -3451,7 +3451,7 @@ void RTjpeg_color_init(void)
 #define KcbB 132252
 #define Ky 76284
 
-void RTjpeg_yuv422rgb(uint8 *buf, uint8 *rgb, int stride)
+void RTjpeg_yuv422rgb(uint8 *buf, uint8 *rgb, int /*stride*/)
 {
  int tmp;
  int i, j;
@@ -3819,7 +3819,7 @@ void RTjpeg_yuvrgb16(uint8 *buf, uint8 *rgb, int stride)
 
 /* fix stride */
 
-void RTjpeg_yuvrgb8(uint8 *buf, uint8 *rgb, int stride)
+void RTjpeg_yuvrgb8(uint8 *buf, uint8 *rgb, int /*stride*/)
 {
  //bcopy(buf, rgb, RTjpeg_width*RTjpeg_height);
   memcpy (rgb, buf, RTjpeg_width*RTjpeg_height);

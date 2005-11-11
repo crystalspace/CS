@@ -41,19 +41,19 @@ void awsStandardSink::Show (intptr_t sink, iAwsSource *source)
   c->Show ();
 }
 
-void awsStandardSink::HideWindow (intptr_t sink, iAwsSource *source)
+void awsStandardSink::HideWindow (intptr_t /*sink*/, iAwsSource *source)
 {
   iAwsComponent *c = source->GetComponent ();
   c->Window()->Hide ();
 }
 
-void awsStandardSink::MaximizeWindow (intptr_t sink, iAwsSource *source)
+void awsStandardSink::MaximizeWindow (intptr_t /*sink*/, iAwsSource *source)
 {
   iAwsComponent *c = source->GetComponent ();
   c->Window ()->Maximize ();
 }
 
-void awsStandardSink::UnMaximizeWindow (intptr_t sink, iAwsSource *source)
+void awsStandardSink::UnMaximizeWindow (intptr_t /*sink*/, iAwsSource *source)
 {
   iAwsComponent *c = source->GetComponent ();
   c->Window ()->UnMaximize ();

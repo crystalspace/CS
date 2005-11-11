@@ -756,14 +756,14 @@ public:
   struct LightingInfo : public iLightingInfo
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObject);
-    virtual void InitializeDefault (bool clear)
+    virtual void InitializeDefault (bool /*clear*/)
     {
     }
-    virtual bool ReadFromCache (iCacheManager* cache_mgr)
+    virtual bool ReadFromCache (iCacheManager* /*cache_mgr*/)
     {
       return true;
     }
-    virtual bool WriteToCache (iCacheManager* cache_mgr)
+    virtual bool WriteToCache (iCacheManager* /*cache_mgr*/)
     {
       return true;
     }
@@ -787,17 +787,17 @@ public:
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
       csVector3& intersect, float* pr, int* = 0);
 
-  virtual bool SetColor (const csColor& col)
+  virtual bool SetColor (const csColor& /*col*/)
   {
     //SetBaseColor (col);
     return true;
   }
-  virtual bool GetColor (csColor& col) const
+  virtual bool GetColor (csColor& /*col*/) const
   {
     //GetBaseColor (col);
     return true;
   }
-  virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
+  virtual bool SetMaterialWrapper (iMaterialWrapper* /*mat*/)
   {
     //SetMaterial (mat);
     return true;
@@ -835,7 +835,7 @@ public:
   }
   virtual bool Advance (csTicks current_time);
 
-  virtual void NextFrame (csTicks current_time,const csVector3& new_pos)
+  virtual void NextFrame (csTicks current_time, const csVector3& /*new_pos*/)
   {   
     Advance (current_time);
   }
@@ -1146,7 +1146,7 @@ public:
   friend struct SpriteCal3DState;
 
   //--------------------- iLODControl implementation -------------------------
-  int GetLODPolygonCount (float lod)
+  int GetLODPolygonCount (float /*lod*/)
   { return 0; }
 
   struct LODControl : public iLODControl

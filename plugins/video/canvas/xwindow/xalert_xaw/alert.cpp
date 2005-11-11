@@ -46,7 +46,7 @@ static String fallback_resources[] = {
 static Atom wm_delete_window;
 /* ARGSUSED */
 static void
-exit_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
+exit_action(Widget w, XEvent* event, String* /*params*/, Cardinal* /*num_params*/)
 {
   if((event->type == ClientMessage)
      && ((Atom)event->xclient.data.l[0] != wm_delete_window))
@@ -57,8 +57,8 @@ exit_action(Widget w, XEvent *event, String *params, Cardinal *num_params)
 
 /* ARGSUSED */
 static void
-default_exit_action(Widget w, XEvent *event, String *params, 
-    Cardinal *num_params)
+default_exit_action(Widget w, XEvent* /*event*/, String* /*params*/, 
+    Cardinal* /*num_params*/)
 {
   XtAppSetExitFlag (XtWidgetToApplicationContext (w));
 }
@@ -74,7 +74,7 @@ static String top_trans =
 extern "C" Widget make_queryform(Widget parent, const char* message, 
 				 const char* button, const char* title);
 
-bool csXWindow::AlertV (int type, const char* title, const char* okMsg, 
+bool csXWindow::AlertV (int /*type*/, const char* title, const char* okMsg, 
 			const char* msg, va_list args)
 {
     Widget top, queryform;

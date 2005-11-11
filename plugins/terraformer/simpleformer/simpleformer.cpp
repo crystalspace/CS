@@ -466,8 +466,8 @@ bool csSimpleFormer::SampleFloat (csStringID type, float x, float z,
   return false;
 }
 
-bool csSimpleFormer::SampleVector2 (csStringID type, float x, float z, 
-                                    csVector2 &value)
+bool csSimpleFormer::SampleVector2 (csStringID /*type*/, float /*x*/,
+                                    float /*z*/, csVector2& /*value*/)
 {
   return false;
 }

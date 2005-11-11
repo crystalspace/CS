@@ -937,7 +937,7 @@ bool ArchiveFile::SetPos (size_t newpos)
   }
 }
 
-csPtr<iDataBuffer> ArchiveFile::GetAllData (bool nullterm)
+csPtr<iDataBuffer> ArchiveFile::GetAllData (bool /*nullterm*/)
 {
   if (data)
   {

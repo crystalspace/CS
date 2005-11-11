@@ -1911,7 +1911,7 @@ public:
   struct LODControl : public iLODControl
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
-    virtual void SetLOD (float m, float a)
+    virtual void SetLOD (float /*m*/, float /*a*/)
     {
       scfParent->SetLodLevelConfig (CS_SPR_LOD_LOCAL);
       scfParent->ClearLODListeners ();

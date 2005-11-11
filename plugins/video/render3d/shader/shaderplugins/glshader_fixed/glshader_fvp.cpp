@@ -60,8 +60,8 @@ void csGLShaderFVP::Deactivate()
 {
 }
 
-void csGLShaderFVP::SetupState (const csRenderMesh *mesh, 
-                                csRenderMeshModes& modes,
+void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/, 
+                                csRenderMeshModes& /*modes*/,
 				const csShaderVarStack &stacks)
 {
   size_t i;

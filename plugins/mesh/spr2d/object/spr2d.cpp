@@ -673,10 +673,10 @@ const csVector2 *csSprite2DMeshObject::uvAnimationControl::GetVertices (
 
 // The hit beam methods in sprite2d make a couple of small presumptions.
 // 1) The sprite is always facing the start of the beam.
-// 2) Since it is always facing the the beam, only one side
+// 2) Since it is always facing the beam, only one side
 // of its bounding box can be hit (if at all).
 
-void csSprite2DMeshObject::CheckBeam (const csVector3& start,
+void csSprite2DMeshObject::CheckBeam (const csVector3& /*start*/,
       const csVector3& pl, float sqr, csMatrix3& o2t)
 {
   // This method is an optimized version of LookAt() based on

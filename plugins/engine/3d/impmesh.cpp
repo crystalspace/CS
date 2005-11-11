@@ -65,7 +65,7 @@ bool csImposterMesh::CheckIncidenceAngle (iRenderView *rview, float tolerance)
   return true;
 }
 
-void csImposterMesh::FindImposterRectangle (const iCamera *camera)
+void csImposterMesh::FindImposterRectangle (const iCamera* /*camera*/)
 {
   // Called from csImposterProcTex during Anim.
   //  (Recalc of texture causes recalc of imposter poly also.)
@@ -82,7 +82,7 @@ void csImposterMesh::FindImposterRectangle (const iCamera *camera)
 #endif
 }
 
-void csImposterMesh::Draw (iRenderView *rview)
+void csImposterMesh::Draw (iRenderView* /*rview*/)
 {
 #if 0  
   iGraphics3D *g3d = rview->GetG3D();

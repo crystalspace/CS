@@ -562,7 +562,7 @@ float csBezierMesh::GetScreenBoundingBox (
 void csBezierMesh::AppendShadows (
   iMovable* movable,
   iShadowBlockList *shadows,
-  const csVector3 &origin)
+  const csVector3& /*origin*/)
 {
   Prepare ();
   //@@@ Ok?

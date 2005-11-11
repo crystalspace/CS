@@ -89,7 +89,7 @@ bool awsPanel::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-void awsPanel::OnDraw (csRect clip)
+void awsPanel::OnDraw (csRect /*clip*/)
 {
   // If the child exclude region is dirty, refresh it.
   if (todraw_dirty)

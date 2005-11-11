@@ -1128,7 +1128,7 @@ void awsComponent::OnDraw (csRect)
   return ;
 }
 
-bool awsComponent::OnMouseDown (int button, int x, int y)
+bool awsComponent::OnMouseDown (int /*button*/, int /*x*/, int /*y*/)
 {
 #ifdef AWS_COMP_DEBUG
   csPrintf("aws-debug: mouse down  : %s\n", Type ());
@@ -1136,7 +1136,7 @@ bool awsComponent::OnMouseDown (int button, int x, int y)
   return false;
 }
 
-bool awsComponent::OnMouseUp (int button, int x, int y)
+bool awsComponent::OnMouseUp (int /*button*/, int /*x*/, int /*y*/)
 {
 #ifdef AWS_COMP_DEBUG
   csPrintf("aws-debug: mouse up    : %s\n", Type ());
@@ -1144,12 +1144,12 @@ bool awsComponent::OnMouseUp (int button, int x, int y)
   return false;
 }
 
-bool awsComponent::OnMouseMove (int button, int x, int y)
+bool awsComponent::OnMouseMove (int /*button*/, int /*x*/, int /*y*/)
 {
   return false;
 }
 
-bool awsComponent::OnMouseClick (int button, int x, int y)
+bool awsComponent::OnMouseClick (int /*button*/, int /*x*/, int /*y*/)
 {
 #ifdef AWS_COMP_DEBUG
   csPrintf("aws-debug: mouse click : %s\n", Type ());
@@ -1157,7 +1157,7 @@ bool awsComponent::OnMouseClick (int button, int x, int y)
   return false;
 }
 
-bool awsComponent::OnMouseDoubleClick (int button, int x, int y)
+bool awsComponent::OnMouseDoubleClick (int /*button*/, int /*x*/, int /*y*/)
 {
   return false;
 }

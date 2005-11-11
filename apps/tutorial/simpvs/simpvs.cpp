@@ -112,7 +112,7 @@ void Simple::SaveVideoPreference()
   config->SetStr ("System.Plugins.iGraphics3D", vidprefs->GetModePlugin());
 }
 
-bool Simple::OnInitialize(int argc, char* argv[])
+bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
   if (!csInitializer::SetupConfigManager (object_reg, "/config/simpvs.cfg",
     GetApplicationName()))

@@ -51,7 +51,7 @@ csSpider::~csSpider ()
 }
 
 csRenderMesh** csSpider::GetRenderMeshes (int& n, iRenderView* rview, 
-    iMovable* movable, uint32)
+    iMovable* /*movable*/, uint32)
 { 
   if (!camera)
     camera = rview->GetCamera ();

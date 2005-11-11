@@ -167,7 +167,7 @@ void csGLVBOBufferManager::DeactivateVBO ()
 }
 
 void* csGLVBOBufferManager::RenderLock (iRenderBuffer* buffer, 
-					csGLRenderBufferLockType type)
+					csGLRenderBufferLockType /*type*/)
 {
   iRenderBuffer* master = buffer->GetMasterBuffer();
   iRenderBuffer* useBuffer = master ? master : buffer;

@@ -145,7 +145,7 @@ SCF_IMPLEMENT_IBASE_EXT(csTinyXMLPlugin)
   SCF_IMPLEMENTS_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-bool csTinyXMLPlugin::Initialize (iObjectRegistry* objreg)
+bool csTinyXMLPlugin::Initialize (iObjectRegistry* /*objreg*/)
 {
   return true;
 }

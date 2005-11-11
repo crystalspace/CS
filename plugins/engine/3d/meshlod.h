@@ -152,7 +152,7 @@ public:
     varm = lod_varm;
     vara = lod_vara;
   }
-  virtual int GetLODPolygonCount (float lod) const { return 0; }
+  virtual int GetLODPolygonCount (float /*lod*/) const { return 0; }
 
   /// Get the mesh array for the numerical lod.
   csArray<iMeshFactoryWrapper*>& GetMeshesForLOD (int lod)

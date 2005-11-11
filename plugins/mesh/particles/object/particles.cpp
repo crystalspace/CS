@@ -642,14 +642,14 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   return meshpp;
 }
 
-bool csParticlesObject::HitBeamOutline (const csVector3& start,
-	const csVector3& end, csVector3& isect, float* pr)
+bool csParticlesObject::HitBeamOutline (const csVector3& /*start*/,
+	const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
 {
   return false;
 }
 
-bool csParticlesObject::HitBeamObject (const csVector3& start,
-	const csVector3& end, csVector3& isect, float* pr,
+bool csParticlesObject::HitBeamObject (const csVector3& /*start*/,
+	const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/,
 	int* polygon_idx)
 {
   if (polygon_idx) *polygon_idx = -1;

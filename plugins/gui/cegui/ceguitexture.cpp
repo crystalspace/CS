@@ -61,7 +61,7 @@ CEGUI::ushort csCEGUITexture::getHeight () const
 }
 
 void csCEGUITexture::loadFromFile (const CEGUI::String &filename, 
-                                   const CEGUI::String &resourceGroup)
+                                   const CEGUI::String& /*resourceGroup*/)
 {
   csRef<iLoader> loader = CS_QUERY_REGISTRY(obj_reg, iLoader);
   if (!loader)

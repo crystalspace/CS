@@ -128,7 +128,7 @@ int oldCount;
   return(at);
 }
 
-long TableCopy(TableHeader **ppTabHdr, int at, int num, void *el, int elsize)
+long TableCopy(TableHeader **ppTabHdr, int /*at*/, int num, void *el, int elsize)
 { 
   TableMakeSize(ppTabHdr, num, elsize);
   (*ppTabHdr)->count = 0;

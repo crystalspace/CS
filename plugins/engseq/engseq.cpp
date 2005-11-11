@@ -271,7 +271,7 @@ public:
     color = c;
   }
 
-  virtual void Do (csTicks /*dt*/, iBase* params)
+  virtual void Do (csTicks /*dt*/, iBase* /*params*/)
   {
     switch (op)
     {
@@ -506,7 +506,7 @@ public:
     }
   }
 
-  virtual void Do (csTicks dt, iBase* params)
+  virtual void Do (csTicks /*dt*/, iBase* /*params*/)
   {
     sector->SetDynamicAmbientLight (colorvar?colorvar->GetColor():color);
   }
@@ -559,7 +559,7 @@ public:
     OpFadeAmbientLight::eseqmgr = eseqmgr;
   }
 
-  virtual void Do (csTicks dt, iBase* params)
+  virtual void Do (csTicks dt, iBase* /*params*/)
   {
     FadeAmbientLightInfo* fl = new FadeAmbientLightInfo ();
     fl->sector = sector;
@@ -967,7 +967,7 @@ public:
   {
     delete rg;
   }
-  virtual void Do (csTicks dt, iBase* params)
+  virtual void Do (csTicks /*dt*/, iBase* /*params*/)
   {
     int delay = rg->Get(max-min) + min;
     sequence->OverrideTimings(this, delay);
@@ -1572,7 +1572,7 @@ public:
   virtual void OnSectorChange (iLight*, iSector*) { }
   virtual void OnRadiusChange (iLight*, float) { }
   virtual void OnDestroy (iLight*) { }
-  virtual void OnAttenuationChange (iLight* light, int newatt) { }
+  virtual void OnAttenuationChange (iLight* /*light*/, int /*newatt*/) { }
 };
 
 SCF_IMPLEMENT_IBASE (csTriggerLightCallback)

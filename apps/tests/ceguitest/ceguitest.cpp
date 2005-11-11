@@ -106,7 +106,7 @@ void CEGUITest::FinishFrame()
   g3d->Print (0);
 }
 
-bool CEGUITest::OnInitialize(int argc, char* argv[])
+bool CEGUITest::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
   if (!csInitializer::RequestPlugins(GetObjectRegistry(),
     CS_REQUEST_VFS,

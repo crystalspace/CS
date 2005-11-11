@@ -747,7 +747,7 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
 
 int cnt = 1;
 
-void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks current_time)
+void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks /*current_time*/)
 {
   if (!player_spawned)
   {

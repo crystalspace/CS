@@ -175,7 +175,7 @@ public:
   {
     // We visit our material all the time so this is not needed here.
   }
-  virtual void PositionChild (iMeshObject* child,csTicks current_time)
+  virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/)
   {
     // We don't support sockets.
   }

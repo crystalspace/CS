@@ -177,7 +177,7 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
 }
 
 void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2,
-	int z2, bool create_portal1)
+	int z2, bool /*create_portal1*/)
 {
   int a;
   InfRoomData* s1 = (InfRoomData*)(infinite_world->Get (x1, y1, z1));

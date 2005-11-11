@@ -114,7 +114,7 @@ csDefaultFontServer::~csDefaultFontServer()
   SCF_DESTRUCT_IBASE();
 }
 
-csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, float size)
+csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, float /*size*/)
 {
   // First of all, look for an already loaded font
   csDefaultFont* font = fonts.Get (filename, 0);
@@ -190,7 +190,7 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, float size)
   return 0;
 }
 
-void csDefaultFontServer::NotifyCreate (csDefaultFont *font)
+void csDefaultFontServer::NotifyCreate (csDefaultFont* /*font*/)
 {
 }
 

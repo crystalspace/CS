@@ -172,7 +172,7 @@ bool csBallFactorySaver::Initialize (iObjectRegistry* object_reg)
 
 #define MAXLINE 100 /* max number of chars per line... */
 
-bool csBallFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+bool csBallFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
 	iStreamSource*)
 {
   //Nothing gets parsed in the loader, so nothing gets saved here!

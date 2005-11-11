@@ -106,9 +106,9 @@ static inline int FactorToShift (float f)
     return -csLog2 ((int)(1.0f/f));
 }
 
-void csSoftShader_FP::SetupState (const csRenderMesh* mesh,
-				  csRenderMeshModes& modes,
-				  const csShaderVarStack &stacks)
+void csSoftShader_FP::SetupState (const csRenderMesh* /*mesh*/,
+				  csRenderMeshModes& /*modes*/,
+				  const csShaderVarStack& stacks)
 {
   csVector4 v = GetParamVectorVal (stacks, flatColor, csVector4 (1));
   shaderPlug->scanlineRenderer->SetFlatColor (v);

@@ -408,7 +408,7 @@ static uint pow85[] = {
 
 /** Encodes a tuple into ascii85 format. */
 void 
-blob::encode_tuple(uint tuple, int count)
+blob::encode_tuple(uint tuple, int /*count*/)
 {
 	//filter::console_output out;
 	

@@ -60,8 +60,8 @@ public:
   }
 
   size_t DoClip (const csTriangle& tri, const csVector3* inPersp,
-    VertexOutputBase& voutPersp, const VertexBuffer* inBuffers, 
-    const size_t* inStrides, BuffersMask buffersMask, 
+    VertexOutputBase& voutPersp, const VertexBuffer* /*inBuffers*/,
+    const size_t* /*inStrides*/, BuffersMask buffersMask, 
     VertexOutputBase* vout)
   {
     if (!clipper)

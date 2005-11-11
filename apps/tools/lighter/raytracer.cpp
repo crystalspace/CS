@@ -37,7 +37,7 @@ struct kdTraversalS
   }
 };
 
-bool litRaytracer::TraceAnyHit (const litRay &ray, litHitPoint &hit)
+bool litRaytracer::TraceAnyHit (const litRay &ray, litHitPoint& /*hit*/)
 {
   // Must have a tree
   if (!tree) return false;
@@ -102,7 +102,7 @@ bool litRaytracer::TraceAnyHit (const litRay &ray, litHitPoint &hit)
   return false;
 }
 
-bool litRaytracer::TraceClosestHit (const litRay &ray, litHitPoint &hit)
+bool litRaytracer::TraceClosestHit (const litRay &ray, litHitPoint& /*hit*/)
 {
   // Must have a tree
   if (!tree) return false;

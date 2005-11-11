@@ -159,11 +159,11 @@ void select_object (iRenderView* rview, int type, void* entity)
 // Draw debug boxes
 //------------------------------------------------------------------------
 
-void DrawDebugBoxSide (iCamera* cam, bool do3d,
-    	const csVector3& v1, const csColor& c1,
-    	const csVector3& v2, const csColor& c2,
-    	const csVector3& v3, const csColor& c3,
-    	const csVector3& v4, const csColor& c4)
+void DrawDebugBoxSide (iCamera* /*cam*/, bool /*do3d*/,
+    	const csVector3& /*v1*/, const csColor& /*c1*/,
+    	const csVector3& /*v2*/, const csColor& /*c2*/,
+    	const csVector3& /*v3*/, const csColor& /*c3*/,
+    	const csVector3& /*v4*/, const csColor& /*c4*/)
 {
 #if 0 //OR_REMOVAL
   G3DPolygonDPFX poly;

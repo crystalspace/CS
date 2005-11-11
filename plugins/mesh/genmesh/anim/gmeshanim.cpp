@@ -495,16 +495,16 @@ const csVector3* csGenmeshAnimationControl::UpdateVertices (csTicks current,
   return animated_verts;
 }
 
-const csVector2* csGenmeshAnimationControl::UpdateTexels (csTicks current,
-	const csVector2* texels, int num_texels, uint32 version_id)
+const csVector2* csGenmeshAnimationControl::UpdateTexels (csTicks /*current*/,
+	const csVector2* texels, int /*num_texels*/, uint32 /*version_id*/)
 {
   if (!animates_texels) return texels;
   //UpdateAnimation (current);
   return texels;
 }
 
-const csVector3* csGenmeshAnimationControl::UpdateNormals (csTicks current,
-	const csVector3* normals, int num_normals, uint32 version_id)
+const csVector3* csGenmeshAnimationControl::UpdateNormals (csTicks /*current*/,
+	const csVector3* normals, int /*num_normals*/, uint32 /*version_id*/)
 {
   if (!animates_normals) return normals;
 
@@ -607,7 +607,7 @@ csGenmeshAnimationControlFactory::~csGenmeshAnimationControlFactory ()
 }
 
 csPtr<iGenMeshAnimationControl> csGenmeshAnimationControlFactory::
-	CreateAnimationControl (iMeshObject *mesh)
+	CreateAnimationControl (iMeshObject* /*mesh*/)
 {
   csGenmeshAnimationControl* ctrl = new csGenmeshAnimationControl (this);
   size_t i;
@@ -987,7 +987,7 @@ csPtr<iGenMeshAnimationControlFactory> csGenmeshAnimationControlType::
   return csPtr<iGenMeshAnimationControlFactory> (ctrl);
 }
 
-bool csGenmeshAnimationControlType::HandleEvent (iEvent& ev)
+bool csGenmeshAnimationControlType::HandleEvent (iEvent& /*ev*/)
 {
 #if 0
   else if (event.Type == csevBroadcast)

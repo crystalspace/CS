@@ -1033,7 +1033,7 @@ public:
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
-  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
+  virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
 
   //-------------------- iPolygonMesh interface implementation ----------------
   PolyMeshHelper scfiPolygonMesh;
@@ -1162,11 +1162,11 @@ public:
     { return 0; }
     virtual csPtr<iString> StateTest ()
     { return 0; }
-    virtual csTicks Benchmark (int num_iterations)
+    virtual csTicks Benchmark (int /*num_iterations*/)
     { return 0; }
     virtual csPtr<iString> Dump ()
     { return 0; }
-    virtual void Dump (iGraphics3D* g3d)
+    virtual void Dump (iGraphics3D* /*g3d*/)
     { }
     virtual bool DebugCommand (const char* cmd)
     { return scfParent->DebugCommand (cmd); }

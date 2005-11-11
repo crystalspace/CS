@@ -73,7 +73,7 @@ void csStaticLODMesh::SetLOD (iSharedVariable* varm, iSharedVariable* vara)
   lod_a = vara->Get ();
 }
 
-int csStaticLODMesh::GetLODPolygonCount (float lod) const
+int csStaticLODMesh::GetLODPolygonCount (float /*lod*/) const
 {
   // @@@ Not implemented yet.
   return 0;

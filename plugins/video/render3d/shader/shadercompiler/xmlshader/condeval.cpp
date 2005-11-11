@@ -917,7 +917,7 @@ bool csConditionEvaluator::EvaluateOperandB (const CondOperand& operand,
 }
 
 int csConditionEvaluator::EvaluateOperandI (const CondOperand& operand, 
-  const csRenderMeshModes& modes, const csShaderVarStack& stacks)
+  const csRenderMeshModes& /*modes*/, const csShaderVarStack& stacks)
 {
   switch (operand.type)
   {
@@ -981,7 +981,7 @@ int csConditionEvaluator::EvaluateOperandI (const CondOperand& operand,
 }
 
 float csConditionEvaluator::EvaluateOperandF (const CondOperand& operand, 
-  const csRenderMeshModes& modes, const csShaderVarStack& stacks)
+  const csRenderMeshModes& /*modes*/, const csShaderVarStack& stacks)
 {
   switch (operand.type)
   {

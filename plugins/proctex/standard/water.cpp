@@ -77,8 +77,8 @@ csPtWaterLoader::csPtWaterLoader(iBase *p) : csBaseProctexLoader(p)
 //  init_token_table (tokens);
 }
 
-csPtr<iBase> csPtWaterLoader::Parse (iDocumentNode* node, 
-				    iStreamSource*, iLoaderContext* ldr_context,
+csPtr<iBase> csPtWaterLoader::Parse (iDocumentNode* /*node*/, 
+				    iStreamSource*, iLoaderContext* /*ldr_context*/,
   				    iBase* context)
 {
   /*
@@ -134,7 +134,7 @@ csPtWaterSaver::csPtWaterSaver (iBase* p) : csBaseProctexSaver(p)
 {
 }
 
-bool csPtWaterSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+bool csPtWaterSaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/,
 	iStreamSource*)
 {
   return true;

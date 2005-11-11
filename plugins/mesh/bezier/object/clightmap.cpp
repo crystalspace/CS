@@ -374,8 +374,8 @@ stop:
 
 void csCurveLightMap::Cache (
   iFile* file,
-  csCurve *curve,
-  iEngine *engine)
+  csCurve* /*curve*/,
+  iEngine* engine)
 {
   (void)engine;
 

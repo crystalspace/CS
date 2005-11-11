@@ -71,7 +71,7 @@ bool csParticlesFactoryLoader::Initialize (iObjectRegistry* objreg)
 }
 
 csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
-  iStreamSource*, iLoaderContext* ldr_context, iBase* context)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
 {
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
     iPluginManager);
@@ -883,8 +883,8 @@ bool csParticlesFactorySaver::WriteEmitter (iParticlesFactoryState* state,
 }
 
 //TBD
-bool csParticlesFactorySaver::WriteColorMethode (iParticlesFactoryState* state,
-                                                 iDocumentNode* parent)
+bool csParticlesFactorySaver::WriteColorMethode (iParticlesFactoryState* /*state*/,
+                                                 iDocumentNode* /*parent*/)
 {
   //state->GetConstantColor();
 
@@ -924,7 +924,7 @@ bool csParticlesObjectLoader::Initialize (iObjectRegistry* objreg)
 }
 
 csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
-  iStreamSource*, iLoaderContext* ldr_context, iBase* context)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
 {
   csRef<iMeshObject> mesh;
   csRef<iParticlesObjectState> state;
@@ -1735,8 +1735,8 @@ bool csParticlesObjectSaver::WriteEmitter (iParticlesObjectState* object,
 }
 
 //TBD
-bool csParticlesObjectSaver::WriteColorMethode (iParticlesObjectState* object,
-                                                 iDocumentNode* parent)
+bool csParticlesObjectSaver::WriteColorMethode (iParticlesObjectState* /*object*/,
+                                                 iDocumentNode* /*parent*/)
 {
   //state->GetConstantColor();
 

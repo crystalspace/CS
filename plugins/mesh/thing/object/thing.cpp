@@ -1963,9 +1963,9 @@ void csThing::PreparePolygonBuffer ()
 }
 
 void csThing::DrawPolygonArrayDPM (
-  iRenderView *rview,
-  iMovable *movable,
-  csZBufMode zMode)
+  iRenderView* /*rview*/,
+  iMovable* /*movable*/,
+  csZBufMode /*zMode*/)
 {
 
 }
@@ -2823,7 +2823,7 @@ csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()
   return csPtr<iMeshObjectFactory> (ifact);
 }
 
-bool csThingObjectType::DebugCommand (const char* cmd)
+bool csThingObjectType::DebugCommand (const char* /*cmd*/)
 {
   return false;
 }

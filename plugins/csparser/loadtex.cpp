@@ -376,9 +376,9 @@ csImageTextureLoader::csImageTextureLoader (iBase *p) :
 {
 }
 
-csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* node, 
+csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* /*node*/, 
 					  iStreamSource*,
-					  iLoaderContext* ldr_context, 	
+					  iLoaderContext* /*ldr_context*/, 	
 					  iBase* context)
 {
   if (!context) return 0;
@@ -418,7 +418,7 @@ csCheckerTextureLoader::csCheckerTextureLoader (iBase *p) :
 
 csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node, 
 					    iStreamSource*,
-					    iLoaderContext* ldr_context,
+					    iLoaderContext* /*ldr_context*/,
 					    iBase* context)
 {
   int w = 64, h = 64, depth = 6;
@@ -493,7 +493,7 @@ csCubemapTextureLoader::csCubemapTextureLoader (iBase *p) :
 
 csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node, 
 					    iStreamSource*,
-					    iLoaderContext* ldr_context,
+					    iLoaderContext* /*ldr_context*/,
 					    iBase* context)
 {
   if (!context) return 0;
@@ -627,7 +627,7 @@ csTexture3DLoader::csTexture3DLoader (iBase *p) : csBaseTextureLoader(p)
 
 csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
-				       iLoaderContext* ldr_context,
+				       iLoaderContext* /*ldr_context*/,
 				       iBase* context)
 {
   if (!context) return 0;

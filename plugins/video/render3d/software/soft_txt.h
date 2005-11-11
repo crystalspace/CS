@@ -128,18 +128,18 @@ public:
    * @{ */
   virtual void Precache () {}
 
-  virtual bool GetRendererDimensions (int &mw, int &mh, int& md)
+  virtual bool GetRendererDimensions (int& /*mw*/, int& /*mh*/, int& /*md*/)
   { return false; }
 
   virtual bool GetRendererDimensions (int &mw, int &mh);
 
-  virtual void GetOriginalDimensions (int& mw, int& mh, int &md)
+  virtual void GetOriginalDimensions (int& /*mw*/, int& /*mh*/, int& /*md*/)
   { }
 
   virtual void GetOriginalDimensions (int& w, int& h)
   { GetRendererDimensions (w, h); }
 
-  virtual void SetTextureTarget(int target)
+  virtual void SetTextureTarget(int /*target*/)
   { }
   
   virtual int GetTextureTarget () const

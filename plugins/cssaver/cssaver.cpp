@@ -1208,7 +1208,7 @@ bool csSaver::SaveSettings (iDocumentNode* node)
   return true;
 }
 
-bool csSaver::SaveSequence(iDocumentNode *parent)
+bool csSaver::SaveSequence(iDocumentNode* /*parent*/)
 {
 #if 0
   csRef<iEngineSequenceManager> eseqmgr =
@@ -1248,7 +1248,7 @@ bool csSaver::SaveSequence(iDocumentNode *parent)
   return true;
 }
 
-bool csSaver::SaveTriggers(iDocumentNode *parent)
+bool csSaver::SaveTriggers(iDocumentNode* /*parent*/)
 {
 #if 0
   csRef<iEngineSequenceManager> eseqmgr =

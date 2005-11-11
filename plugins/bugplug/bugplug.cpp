@@ -1874,12 +1874,12 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
   return false;
 }
 
-bool csBugPlug::HandleSystemOpen (iEvent* event)
+bool csBugPlug::HandleSystemOpen (iEvent* /*event*/)
 {
   return false;
 }
 
-bool csBugPlug::HandleSystemClose (iEvent* event)
+bool csBugPlug::HandleSystemClose (iEvent* /*event*/)
 {
   fnt = 0;
   return false;

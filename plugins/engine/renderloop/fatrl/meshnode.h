@@ -100,7 +100,7 @@ public:
   bool HasMeshes () const { return !buckets.IsEmpty(); }
 
   virtual bool Preprocess (iRenderView* rview);
-  virtual void Postprocess (iRenderView* rview) {}
+  virtual void Postprocess (iRenderView* /*rview*/) {}
 };
 
 class csMeshRenderNodeFactory

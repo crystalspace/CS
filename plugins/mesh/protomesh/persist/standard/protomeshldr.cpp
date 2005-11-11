@@ -122,7 +122,7 @@ bool csProtoFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csProtoFactoryLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
+	iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /* context */)
 {
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
   	iPluginManager);

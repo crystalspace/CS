@@ -40,7 +40,7 @@ public:
   { return (iObject*)(csObject*)this; }
 
   const char* GetFileName () { return 0; }
-  void SetFileName (const char* filename) {  }
+  void SetFileName (const char* /*filename*/) {  }
 
   virtual size_t GetTicket (const csRenderMeshModes&, 
     const csShaderVarStack&) { return 0; }

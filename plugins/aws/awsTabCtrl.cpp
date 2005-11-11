@@ -66,7 +66,7 @@ bool awsTab::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   return true;
 }
 
-void awsTab::OnDraw (csRect clip)
+void awsTab::OnDraw (csRect /*clip*/)
 {
   int tw = 0, th = 0, tx, ty, itx = 0, ity = 0;
 
@@ -564,7 +564,7 @@ void awsTabCtrl::RemoveTabIndex (int index)
   }
 }
 
-void awsTabCtrl::OnDraw (csRect clip)
+void awsTabCtrl::OnDraw (csRect /*clip*/)
 {
   iGraphics2D *g2d = WindowManager ()->G2D ();
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();

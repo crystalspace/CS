@@ -342,8 +342,8 @@ for rendering and also supports limited 2D drawing capabilities (including 2D
 pixmaps).
 
 @table @code
-@item CS/plugins/video/canvas/asciiart
-@sc{ascii} Art driver.
+@item CS/plugins/video/canvas/caca
+Colour @sc{ascii} Art driver.
 
 @item CS/plugins/video/canvas/common
 Common code for 2D drivers.

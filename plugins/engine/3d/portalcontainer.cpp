@@ -131,7 +131,7 @@ csPortalContainer::~csPortalContainer ()
 }
 
 csRenderMesh** csPortalContainer::GetRenderMeshes (int& num,
-	iRenderView* rview, iMovable* movable, uint32 frustum_mask)
+	iRenderView* rview, iMovable* /*movable*/, uint32 /*frustum_mask*/)
 {
   csReversibleTransform tr_o2c;
   csVector3 camera_origin;
@@ -843,7 +843,7 @@ bool csPortalContainer::ExtraVisTest (iRenderView* rview,
       clip_plane, clip_z_plane);
 }
 
-bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
+bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
   	csZBufMode /*zbufMode*/)
 {
   Prepare ();

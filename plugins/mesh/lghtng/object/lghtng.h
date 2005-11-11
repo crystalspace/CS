@@ -139,7 +139,7 @@ public:
    * see imesh/object.h for specification. The default implementation
    * does nothing.
    */
-  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
+  virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
 
   //------------------------- iLightningState implementation ----------------
   class LightningState : public iLightningState
@@ -169,21 +169,21 @@ public:
     {
       scfParent->length = value;
     }
-    virtual void SetPointCount(int n)
+    virtual void SetPointCount(int /*n*/)
     {      
     }    
     virtual float GetWildness() const
     {
       return scfParent->wildness;
     }
-    virtual void SetWildness(float value)
+    virtual void SetWildness(float /*value*/)
     {
     }
     virtual float GetVibration() const
     {
       return scfParent->vibration;
     }
-    virtual void SetVibration(float value)
+    virtual void SetVibration(float /*value*/)
     {
     }
     virtual void SetDirectional(const csVector3 &pos)
@@ -198,7 +198,7 @@ public:
     {
       return 0;
     }
-    virtual void SetUpdateInterval (csTicks value)
+    virtual void SetUpdateInterval (csTicks /*value*/)
     {
       
     }
@@ -206,7 +206,7 @@ public:
     {
       return scfParent->bandwidth;
     }
-    virtual void SetBandWidth (float value)
+    virtual void SetBandWidth (float /*value*/)
     {
     }
   } scfiLightningState;

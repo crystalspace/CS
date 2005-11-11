@@ -50,7 +50,7 @@ const char *awsCheckBox::Type ()
 }
 
 void 
-awsCheckBox::visualStateChanged(const std::string &name, awsPropertyBase *property)
+awsCheckBox::visualStateChanged(const std::string& /*name*/, awsPropertyBase* /*property*/)
 {
 	Invalidate();
 }

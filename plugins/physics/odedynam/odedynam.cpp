@@ -2842,7 +2842,7 @@ void csODEDefaultMoveCallback::Execute (iCamera* camera,
   cam_trans.SetT2O (t.GetT2O ());
 }
 
-void csODEDefaultMoveCallback::Execute (csOrthoTransform& t)
+void csODEDefaultMoveCallback::Execute (csOrthoTransform& /*t*/)
 {
   /* do nothing by default */
 }

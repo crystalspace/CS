@@ -114,7 +114,7 @@ namespace lighter
     this->meshName = wrapper->QueryObject ()->GetName ();
   }
 
-  void RadObject::SaveMesh (iDocumentNode *node)
+  void RadObject::SaveMesh (iDocumentNode* /*node*/)
   {
 
   }

@@ -475,7 +475,7 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
 }
 
 csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
-  iShaderDestinationResolver* resolve, iDocumentNode *node, shaderPass *pass)
+  iShaderDestinationResolver* resolve, iDocumentNode* node, shaderPass* /*pass*/)
 {
   if (node->GetAttributeValue("plugin") == 0)
   {

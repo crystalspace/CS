@@ -101,7 +101,7 @@ public:
       next_filter->Apply(properties);
   }
 
-  virtual bool AddSubFilter(iSndSysSoftwareFilter3D *filter, int chain_idx)
+  virtual bool AddSubFilter(iSndSysSoftwareFilter3D *filter, int /*chain_idx*/)
   {
     // Add the current next filter to the end of the passed filter chain
     if (next_filter)
@@ -117,7 +117,7 @@ public:
     return true;
   }
 
-  virtual iSndSysSoftwareFilter3D *GetSubFilter(int chain_idx)
+  virtual iSndSysSoftwareFilter3D *GetSubFilter(int /*chain_idx*/)
   {
     return next_filter;
   }
@@ -218,7 +218,7 @@ public:
       next_filter->Apply(properties);
   }
 
-  virtual bool AddSubFilter(iSndSysSoftwareFilter3D *filter, int chain_idx)
+  virtual bool AddSubFilter(iSndSysSoftwareFilter3D *filter, int /*chain_idx*/)
   {
     // Add the current next filter to the end of the passed filter chain
     if (next_filter)
@@ -234,7 +234,7 @@ public:
     return true;
   }
 
-  virtual iSndSysSoftwareFilter3D *GetSubFilter(int chain_idx)
+  virtual iSndSysSoftwareFilter3D *GetSubFilter(int /*chain_idx*/)
   {
     return next_filter;
   }

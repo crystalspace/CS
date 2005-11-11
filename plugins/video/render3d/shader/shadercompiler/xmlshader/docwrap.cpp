@@ -901,7 +901,7 @@ iDocumentNode* csWrappedDocumentNode::WrapperWalker::Next ()
 
 //---------------------------------------------------------------------------
 
-csTextNodeWrapper::csTextNodeWrapper (Pool* pool)
+csTextNodeWrapper::csTextNodeWrapper (Pool* /*pool*/)
   : scfImplementationType (this)
 {  
 }

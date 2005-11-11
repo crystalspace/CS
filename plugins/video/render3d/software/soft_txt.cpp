@@ -517,8 +517,8 @@ void csSoftwareTextureManager::GetMaxTextureSize (int& w, int& h, int& aspect)
 }
 
 void csSoftwareTextureManager::GetLightmapRendererCoords (
-  int slmWidth, int slmHeight, int lm_x1, int lm_y1, int lm_x2, int lm_y2,
-  float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2)
+  int /*slmWidth*/, int /*slmHeight*/, int lm_x1, int lm_y1, int /*lm_x2*/,
+  int /*lm_y2*/, float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2)
 {
   lm_u1 = lm_x1;
   lm_v1 = lm_y1;

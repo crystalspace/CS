@@ -364,7 +364,7 @@ public:
    * see imesh/object.h for specification. The default implementation
    * does nothing.
    */
-  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
+  virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
 
   //------------------------- iHazeState implementation ----------------
   class HazeState : public iHazeState

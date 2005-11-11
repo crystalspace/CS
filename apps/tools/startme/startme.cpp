@@ -243,7 +243,7 @@ bool StartMe::OnKeyboard(iEvent& ev)
   return false;
 }
 
-bool StartMe::OnMouseDown (iEvent &event)
+bool StartMe::OnMouseDown (iEvent& /*event*/)
 {
   if (InDescriptionMode ())
   {
@@ -282,7 +282,7 @@ bool StartMe::LoadTextures ()
   return true;
 }
 
-bool StartMe::OnInitialize(int argc, char* argv[])
+bool StartMe::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
   if (!csInitializer::SetupConfigManager (GetObjectRegistry (),
   	"/config/startme.cfg"))

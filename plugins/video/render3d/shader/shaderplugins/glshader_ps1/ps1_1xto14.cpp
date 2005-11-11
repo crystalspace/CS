@@ -200,8 +200,8 @@ const char* csPS1xTo14Converter::GetTempReg (int oldReg, size_t instrIndex,
   return 0;
 }
 
-const char* csPS1xTo14Converter::GetTexTempReg (int oldReg, size_t instrIndex, 
-						int& newReg)
+const char* csPS1xTo14Converter::GetTexTempReg (int oldReg,
+  size_t /*instrIndex*/, int& newReg)
 {
   newReg = oldReg;
   return 0;

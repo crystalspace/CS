@@ -47,7 +47,7 @@ csRef<iDocument> csBinaryDocumentSystem::CreateDocument ()
   return csPtr<iDocument> (new csBinaryDocument);
 }
 
-bool csBinaryDocumentSystem::Initialize (iObjectRegistry* objreg)
+bool csBinaryDocumentSystem::Initialize (iObjectRegistry* /*objreg*/)
 {
   return true;
 }

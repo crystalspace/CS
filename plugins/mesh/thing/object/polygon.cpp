@@ -1349,7 +1349,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
 }
 
 bool csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
-    iMovable* movable, const csPlane3& world_plane,
+    iMovable* /*movable*/, const csPlane3& world_plane,
     csPolygon3DStatic* spoly)
 {
   csFrustum *light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
@@ -1444,7 +1444,7 @@ bool csPolygon3D::FillLightMapDynamic (iFrustumView* lview,
 }
 
 bool csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
-  iMovable* movable,
+  iMovable* /*movable*/,
   csLightingPolyTexQueue* lptq, bool vis,
   const csMatrix3& m_world2tex,
   const csVector3& v_world2tex,

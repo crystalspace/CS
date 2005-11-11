@@ -356,8 +356,8 @@ public:
   }
   int GetLightMapResolution () const { return lmres; }
 
-  bool SetColor (const csColor &color) { return false; }
-  bool GetColor (csColor &color) const { return false; }
+  bool SetColor (const csColor& /*color*/) { return false; }
+  bool GetColor (csColor& /*color*/) const { return false; }
   bool SetMaterialWrapper (iMaterialWrapper *material)
   {
     matwrap = material;
@@ -451,7 +451,7 @@ public:
     csVector3& isect, float* pr, int* polygon_idx = 0);
 
   virtual void InvalidateMaterialHandles () { }
-  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
+  virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
 
   void FireListeners ();
   void AddListener (iObjectModelListener* listener);
@@ -621,12 +621,12 @@ public:
       return scfParent->GetLODValue (parameter);
     }
 
-    virtual bool SaveState (const char *filename)
+    virtual bool SaveState (const char* /*filename*/)
     {
       return true;
     }
 
-    virtual bool RestoreState (const char *filename)
+    virtual bool RestoreState (const char* /*filename*/)
     {
       return true;
     }
@@ -735,11 +735,11 @@ public:
       return scfParent->GetSamplerRegion ();
     }
 
-    virtual bool SaveState (const char *filename)
+    virtual bool SaveState (const char* /*filename*/)
     {
       return true;
     }
-    virtual bool RestoreState (const char *filename)
+    virtual bool RestoreState (const char* /*filename*/)
     {
       return true;
     }
@@ -751,15 +751,15 @@ public:
   class eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csTerrainFactory);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
+    virtual void GetObjectBoundingBox (csBox3& /*bbox*/)
     {
       //scfParent->GetObjectBoundingBox (bbox);
     }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
+    virtual void SetObjectBoundingBox (const csBox3& /*bbox*/)
     {
       //scfParent->SetObjectBoundingBox (bbox);
     }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    virtual void GetRadius (csVector3& /*rad*/, csVector3& /*cent*/)
     {
       //scfParent->GetRadius (rad, cent);
     }

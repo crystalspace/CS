@@ -1482,8 +1482,8 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
   }
 }
 
-GLvoid csGLGraphics3D::myDrawRangeElements (GLenum mode, GLuint start, 
-    GLuint end, GLsizei count, GLenum type, const GLvoid* indices)
+GLvoid csGLGraphics3D::myDrawRangeElements (GLenum mode, GLuint /*start*/, 
+    GLuint /*end*/, GLsizei count, GLenum type, const GLvoid* indices)
 {
   glDrawElements (mode, count, type, indices);
 }

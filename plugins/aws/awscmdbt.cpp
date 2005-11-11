@@ -233,7 +233,7 @@ bool awsCmdButton::HandleEvent (iEvent &Event)
   return false;
 }
 
-void awsCmdButton::OnDraw (csRect clip)
+void awsCmdButton::OnDraw (csRect /*clip*/)
 {
   int tw = 0, th = 0;
 
@@ -471,7 +471,7 @@ csRect awsCmdButton::getMinimumSize ()
   }
 }
 
-bool awsCmdButton::OnMouseDown (int button, int x, int y)
+bool awsCmdButton::OnMouseDown (int /*button*/, int /*x*/, int /*y*/)
 {
   was_down = is_down;
 
@@ -481,7 +481,7 @@ bool awsCmdButton::OnMouseDown (int button, int x, int y)
   return true;
 }
 
-bool awsCmdButton::OnMouseUp (int button, int x, int y)
+bool awsCmdButton::OnMouseUp (int /*button*/, int /*x*/, int /*y*/)
 {
   if (!is_switch)
   {

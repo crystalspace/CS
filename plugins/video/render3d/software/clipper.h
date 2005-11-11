@@ -43,16 +43,17 @@ public:
   virtual ~VertexOutputBase() {}
 
   void Reset() { out = startOut; }
-  virtual void Copy (size_t idx) {}
-  virtual void LerpTo (float* dst, size_t idx1, size_t idx2, float p) {}
-  virtual void Lerp (size_t idx1, size_t idx2, float p) {}
-  virtual void Lerp3 (size_t idx1, size_t idx2, float p1,
-    size_t idx3, size_t idx4, float p2,
-    float p) {}
-  virtual void Lerp3To (float* dst, size_t idx1, size_t idx2, float p1,
-    size_t idx3, size_t idx4, float p2,
-    float p) {}
-  virtual void Write (float* what) {}
+  virtual void Copy (size_t /*idx*/) {}
+  virtual void LerpTo (float* /*dst*/, size_t /*idx1*/, size_t /*idx2*/,
+    float /*p*/) {}
+  virtual void Lerp (size_t /*idx1*/, size_t /*idx2*/, float /*p*/) {}
+  virtual void Lerp3 (size_t /*idx1*/, size_t /*idx2*/, float /*p1*/,
+    size_t /*idx3*/, size_t /*idx4*/, float /*p2*/,
+    float /*p*/) {}
+  virtual void Lerp3To (float* /*dst*/, size_t /*idx1*/, size_t /*idx2*/,
+    float /*p1*/, size_t /*idx3*/, size_t /*idx4*/, float /*p2*/, float /*p*/)
+    {}
+  virtual void Write (float* /*what*/) {}
 };
 
 template<int Ni, int No>

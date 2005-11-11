@@ -525,7 +525,7 @@ static void cmd_rpath (char *args)
   puts ((char *)db->GetData ());
 }
 
-static void cmd_mounts (char *args)
+static void cmd_mounts (char* /*args*/)
 {
   csRef<iStringArray> mounts = VFS->GetMounts ();
   if (mounts->Length ())

@@ -33,7 +33,7 @@ public:
 	int_builtin() {}
 	~int_builtin() {}
 			
-	function::rc_parm bits(function &fn)
+	function::rc_parm bits(function& /*fn*/)
 	{
 		return func_parm(new integer(64));	
 	}
@@ -201,7 +201,7 @@ public:
 	~keila_builtin() {}
 	
 	/** Returns the version of keila. */		
-	function::rc_parm version_(function &fn)
+	function::rc_parm version_(function& /*fn*/)
 	{				
 		return func_parm(new floating(1.0));		
 	}

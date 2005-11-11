@@ -66,22 +66,22 @@ public:
   {
   }
 
-  virtual void OnColorChange (iLight* light, const csColor& newcolor)
+  virtual void OnColorChange (iLight* light, const csColor& /*newcolor*/)
   {
     watcher->ReportOperation (CS_WATCH_LIGHT_COLOR, light);
   }
 
-  virtual void OnPositionChange (iLight* light, const csVector3& newpos)
+  virtual void OnPositionChange (iLight* light, const csVector3& /*newpos*/)
   {
     watcher->ReportOperation (CS_WATCH_LIGHT_MOVE, light);
   }
 
-  virtual void OnSectorChange (iLight* light, iSector* newsector)
+  virtual void OnSectorChange (iLight* light, iSector* /*newsector*/)
   {
     watcher->ReportOperation (CS_WATCH_LIGHT_SECTOR, light);
   }
 
-  virtual void OnRadiusChange (iLight* light, float newradius)
+  virtual void OnRadiusChange (iLight* light, float /*newradius*/)
   {
     watcher->ReportOperation (CS_WATCH_LIGHT_RADIUS, light);
   }
@@ -92,7 +92,7 @@ public:
     watcher->RemoveLight (light);
   }
 
-  virtual void OnAttenuationChange (iLight* light, int newatt)
+  virtual void OnAttenuationChange (iLight* light, int /*newatt*/)
   {
     watcher->ReportOperation (CS_WATCH_LIGHT_ATTENUATION, light);
   }

@@ -149,7 +149,7 @@ bool csWriteQueue::IsPointAffected (const csVector2& p, float depth)
   return false;
 }
 
-void* csWriteQueue::Fetch (const csBox2& box, float depth, float& out_depth)
+void* csWriteQueue::Fetch (const csBox2& /*box*/, float depth, float& out_depth)
 {
   CS_ASSERT ((queue_min != 0) == (queue_max != 0));
 

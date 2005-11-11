@@ -1502,7 +1502,7 @@ void csTerrainObject::PrepareLighting ()
   }
 }
 
-void csTerrainObject::LightChanged (iLight* light)
+void csTerrainObject::LightChanged (iLight* /*light*/)
 {
   colorVersion++;
 }
@@ -2106,7 +2106,7 @@ void csTerrainObject::TestVisibility (iRenderView* rview)
 
 
 bool csTerrainObject::DrawTest (iRenderView* rview, iMovable* movable, 
-                                uint32 frustummask)
+                                uint32 /*frustummask*/)
 {
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 

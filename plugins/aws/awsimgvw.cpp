@@ -123,7 +123,7 @@ bool awsImageView::SetProperty (const char *name, intptr_t parm)
   return false;
 }
 
-void awsImageView::OnDraw (csRect clip)
+void awsImageView::OnDraw (csRect /*clip*/)
 {
   aws3DFrame frame3d;
 
@@ -199,7 +199,7 @@ void awsImageView::OnDraw (csRect clip)
   }
 }
 
-bool awsImageView::OnMouseDown (int button, int x, int y)
+bool awsImageView::OnMouseDown (int /*button*/, int /*x*/, int /*y*/)
 {
   Broadcast (signalMouseDown);
 
@@ -211,7 +211,7 @@ bool awsImageView::OnMouseDown (int button, int x, int y)
   return true;
 }
 
-bool awsImageView::OnMouseUp (int button, int x, int y)
+bool awsImageView::OnMouseUp (int /*button*/, int /*x*/, int /*y*/)
 {
   Broadcast (signalMouseUp);
 
@@ -225,7 +225,7 @@ bool awsImageView::OnMouseUp (int button, int x, int y)
   return true;
 }
 
-bool awsImageView::OnMouseMove (int button, int x, int y)
+bool awsImageView::OnMouseMove (int /*button*/, int /*x*/, int /*y*/)
 {
   Broadcast (signalMouseMoved);
   return false;

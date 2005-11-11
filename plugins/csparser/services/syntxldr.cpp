@@ -508,7 +508,7 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
 }
 
 bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
-					bool allowFxMesh)
+					bool /*allowFxMesh*/)
 {
   switch ( mixmode & CS_FX_MASK_MIXMODE )
   {
@@ -551,7 +551,7 @@ bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
 }
 
 bool csTextSyntaxService::HandlePortalParameter (
-	iDocumentNode* child, iLoaderContext* ldr_context,
+	iDocumentNode* child, iLoaderContext* /*ldr_context*/,
 	uint32 &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after,
 	iString* destSector, bool& handled, bool& autoresolve)

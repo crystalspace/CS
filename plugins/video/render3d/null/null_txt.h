@@ -67,7 +67,7 @@ public:
   { mw = orig_w; mh = orig_h; md = orig_d; }
   void GetOriginalDimensions (int& mw, int& mh)
   { mw = orig_w; mh = orig_h; }
-  void SetTextureTarget (int target) { }
+  void SetTextureTarget (int /*target*/) { }
   int GetTextureTarget () const { return iTextureHandle::CS_TEX_IMG_2D; }
   const char* GetImageName () const { return imageName; }
   virtual void Blit (int, int, int, int, unsigned char const*, 

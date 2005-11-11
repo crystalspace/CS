@@ -77,8 +77,8 @@ csPtDotsLoader::csPtDotsLoader(iBase *p) : csBaseProctexLoader(p)
 //  init_token_table (tokens);
 }
 
-csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* node, 
-				    iStreamSource*, iLoaderContext* ldr_context,
+csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* /*node*/, 
+				    iStreamSource*, iLoaderContext* /*ldr_context*/,
   				    iBase* context)
 {
   /*
@@ -134,7 +134,7 @@ csPtDotsSaver::csPtDotsSaver (iBase* p) : csBaseProctexSaver(p)
 {
 }
 
-bool csPtDotsSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+bool csPtDotsSaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/,
 	iStreamSource*)
 {
   return true;

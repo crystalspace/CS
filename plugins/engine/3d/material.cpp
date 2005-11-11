@@ -123,7 +123,7 @@ csRGBcolor& csMaterial::GetFlatColor ()
   return flat_color;
 }
   
-void csMaterial::GetFlatColor (csRGBpixel &oColor, bool useTextureMean)
+void csMaterial::GetFlatColor (csRGBpixel &oColor, bool /*useTextureMean*/)
 {
   oColor = GetFlatColor ();
 }

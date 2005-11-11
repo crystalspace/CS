@@ -649,7 +649,7 @@ void csSoftwareGraphics3DCommon::ClearCache()
 }
 
 void csSoftwareGraphics3DCommon::RemoveFromCache (
-	      iRendererLightmap* rlm)
+	      iRendererLightmap* /*rlm*/)
 {
 }
 

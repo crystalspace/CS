@@ -135,8 +135,8 @@ public:
   virtual const char* GetName () { return name; }
   virtual const char* GetValue () { return val; }
 
-  virtual void SetName (const char* name) {}
-  virtual void SetValue (const char* value) {}
+  virtual void SetName (const char* /*name*/) {}
+  virtual void SetValue (const char* /*value*/) {}
 };
 
 class csReplacerDocumentNodeFactory

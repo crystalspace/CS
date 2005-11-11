@@ -80,8 +80,8 @@ csPtSkyLoader::csPtSkyLoader(iBase *p) : csBaseProctexLoader(p)
 //  init_token_table (tokens);
 }
 
-csPtr<iBase> csPtSkyLoader::Parse (iDocumentNode* node, 
-				    iStreamSource*, iLoaderContext* ldr_context,
+csPtr<iBase> csPtSkyLoader::Parse (iDocumentNode* /*node*/, 
+				    iStreamSource*, iLoaderContext* /*ldr_context*/,
   				    iBase* context)
 {
   /*
@@ -137,7 +137,7 @@ csPtSkySaver::csPtSkySaver (iBase* p) : csBaseProctexSaver(p)
 {
 }
 
-bool csPtSkySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+bool csPtSkySaver::WriteDown (iBase* /*obj*/, iDocumentNode* /*parent*/,
 	iStreamSource*)
 {
   return true;

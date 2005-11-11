@@ -565,7 +565,7 @@ char* TrDocumentAttribute::Parse( TrDocument* document, char* p )
   return p;
 }
 
-char* TrXmlText::Parse( TrDocument* document, char* p )
+char* TrXmlText::Parse( TrDocument* /*document*/, char* p )
 {
   //TrDocument* doc = GetDocument();
   bool ignoreWhite = true;
@@ -579,7 +579,7 @@ char* TrXmlText::Parse( TrDocument* document, char* p )
   return 0;
 }
 
-char* TrXmlCData::Parse( TrDocument* document, char* p )
+char* TrXmlCData::Parse( TrDocument* /*document*/, char* p )
 {
   //TrDocument* doc = GetDocument();
   bool ignoreWhite = false;

@@ -64,7 +64,7 @@ const char* awsEngineView::Type ()
   return "Engine View";
 }
 
-void awsEngineView::OnDraw (csRect clip)
+void awsEngineView::OnDraw (csRect /*clip*/)
 {
   if (view)
   {

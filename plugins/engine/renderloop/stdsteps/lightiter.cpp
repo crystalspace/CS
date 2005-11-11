@@ -79,8 +79,8 @@ bool csLightIterRSLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csLightIterRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
-				       iLoaderContext* ldr_context,      
-				       iBase* context)
+				       iLoaderContext* /*ldr_context*/,      
+				       iBase* /*context*/)
 {
   csRef<iLightIterRenderStep> step;
   step.AttachNew (new csLightIterRenderStep (object_reg));
@@ -386,7 +386,7 @@ size_t csLightIterRenderStep::GetStepCount () const
 }
 
 csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
-  int attnType)
+  int /*attnType*/)
 {
   if (!attTex.IsValid())
   {
@@ -454,34 +454,34 @@ csLightIterRenderStep::LightSVAccessor::~LightSVAccessor ()
   SCF_DESTRUCT_IBASE();
 }
 
-void csLightIterRenderStep::LightSVAccessor::OnColorChange (iLight* light, 
-  const csColor& newcolor)
+void csLightIterRenderStep::LightSVAccessor::OnColorChange (iLight* /*light*/,
+  const csColor& /*newcolor*/)
 {
 }
 
-void csLightIterRenderStep::LightSVAccessor::OnPositionChange (iLight* light, 
-  const csVector3& newpos)
+void csLightIterRenderStep::LightSVAccessor::OnPositionChange (iLight* /*light*/, 
+  const csVector3& /*newpos*/)
 {
 }
 
-void csLightIterRenderStep::LightSVAccessor::OnSectorChange (iLight* light, 
-  iSector* newsector)
+void csLightIterRenderStep::LightSVAccessor::OnSectorChange (iLight* /*light*/, 
+  iSector* /*newsector*/)
 {
 }
 
-void csLightIterRenderStep::LightSVAccessor::OnRadiusChange (iLight* light, 
-  float newradius)
+void csLightIterRenderStep::LightSVAccessor::OnRadiusChange (iLight* /*light*/, 
+  float /*newradius*/)
 {
 }
 
-void csLightIterRenderStep::LightSVAccessor::OnDestroy (iLight* light)
+void csLightIterRenderStep::LightSVAccessor::OnDestroy (iLight* /*light*/)
 {
   parent->knownLights.Delete (this->light, this);
   //delete this;
 }
 
 void csLightIterRenderStep::LightSVAccessor::OnAttenuationChange (
-  iLight* light, int newatt)
+  iLight* /*light*/, int newatt)
 {
   needUpdate = true;
   attnType = newatt;

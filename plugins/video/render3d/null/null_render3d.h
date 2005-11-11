@@ -85,8 +85,8 @@ public:
   void Print (csRect const *area);
   void DrawPixmap (iTextureHandle *htex, int sx, int sy,
     int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha = 0);
-  void DrawLine (const csVector3& v1, const csVector3& v2,
-    float fov, int color) { }
+  void DrawLine (const csVector3& /*v1*/, const csVector3& /*v2*/,
+    float /*fov*/, int /*color*/) { }
   void SetClipper (iClipper2D* clipper, int cliptype);
   iClipper2D* GetClipper ();
   int GetClipType () const;
@@ -97,17 +97,19 @@ public:
   bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   long GetRenderState (G3D_RENDERSTATEOPTION op) const;
   bool SetOption (const char*, const char*);
-  bool ActivateBuffers (csRenderBufferHolder* holder, 
+  bool ActivateBuffers (csRenderBufferHolder* /*holder*/, 
     csRenderBufferName mapping[CS_VATTRIB_SPECIFIC_LAST+1])
   {
+    (void)mapping;
     return true;
   }
-  bool ActivateBuffers (csVertexAttrib *attribs,
-    iRenderBuffer **buffers, unsigned int count)
+  bool ActivateBuffers (csVertexAttrib* /*attribs*/,
+    iRenderBuffer** /*buffers*/, unsigned int /*count*/)
   {
     return true;
   }
-  virtual void DeactivateBuffers (csVertexAttrib *attribs, unsigned int count)
+  virtual void DeactivateBuffers (csVertexAttrib* /*attribs*/,
+    unsigned int /*count*/)
   {
   }
   void SetTextureState (int* units, iTextureHandle** textures, int count);
@@ -122,17 +124,17 @@ public:
   void DisableZOffset ();
   void SetShadowState (int state);
   // OR functions, unimplemented
-  uint32* GetZBuffAt (int x, int y) { return 0; }
-  float GetZBuffValue (int x, int y) { return 0.0; };
+  uint32* GetZBuffAt (int /*x*/, int /*y*/) { return 0; }
+  float GetZBuffValue (int /*x*/, int /*y*/) { return 0.0; };
 
   void OpenPortal (size_t, const csVector2*, const csPlane3&, bool) { }
   void ClosePortal (bool) { }
-  iHalo* CreateHalo (float iR, float iG, float iB, unsigned char *iAlpha,
-    int iWidth, int iHeight) { return 0; }
+  iHalo* CreateHalo (float /*iR*/, float /*iG*/, float /*iB*/,
+    unsigned char* /*iAlpha*/, int /*iWidth*/, int /*iHeight*/) { return 0; }
 
-  void RemoveFromCache (iRendererLightmap* rlm) { }
-  void SetWorldToCamera (const csReversibleTransform& w2c) { }
-  void DrawSimpleMesh (const csSimpleRenderMesh& mesh, uint flags = 0) { }
+  void RemoveFromCache (iRendererLightmap* /*rlm*/) { }
+  void SetWorldToCamera (const csReversibleTransform& /*w2c*/) { }
+  void DrawSimpleMesh (const csSimpleRenderMesh& /*mesh*/, uint /*flags*/ = 0) { }
 
 private:
   iObjectRegistry* object_reg;

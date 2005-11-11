@@ -1073,7 +1073,7 @@ void csGenmeshSkelAnimationControl::UpdateAnimatedVertices (csTicks current,
 }
 
 const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
-  const csVector3* verts, int num_verts, uint32 version_id)
+  const csVector3* verts, int num_verts, uint32 /*version_id*/)
 {
   if (!animates_vertices) return verts;
 
@@ -1104,15 +1104,15 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
   return animated_verts;
 }
 
-const csVector2* csGenmeshSkelAnimationControl::UpdateTexels (csTicks current,
-  const csVector2* texels, int num_texels, uint32 version_id)
+const csVector2* csGenmeshSkelAnimationControl::UpdateTexels (csTicks /*current*/,
+  const csVector2* texels, int /*num_texels*/, uint32 /*version_id*/)
 {
   if (!animates_texels) return texels;
   return texels;
 }
 
-const csVector3* csGenmeshSkelAnimationControl::UpdateNormals (csTicks current,
-  const csVector3* normals, int num_normals, uint32 version_id)
+const csVector3* csGenmeshSkelAnimationControl::UpdateNormals (csTicks /*current*/,
+  const csVector3* normals, int num_normals, uint32 /*version_id*/)
 {
   if (!animates_normals) return normals;
   UpdateVertNormArrays (num_normals);
@@ -1120,8 +1120,8 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateNormals (csTicks current,
   return animated_vert_norms;
 }
 
-const csColor4* csGenmeshSkelAnimationControl::UpdateColors (csTicks current,
-  const csColor4* colors, int num_colors, uint32 version_id)
+const csColor4* csGenmeshSkelAnimationControl::UpdateColors (csTicks /*current*/,
+  const csColor4* colors, int /*num_colors*/, uint32 /*version_id*/)
 {
   return colors;
 }
@@ -1262,13 +1262,13 @@ csSkelAnimControlScript* csGenmeshSkelAnimationControlFactory::FindScript (
   return 0;
 }
 
-const char* csGenmeshSkelAnimationControlFactory::LoadScriptFile (const char *filename)
+const char* csGenmeshSkelAnimationControlFactory::LoadScriptFile (const char* /*filename*/)
 {
   //TODO
   return 0;
 }
 
-void csGenmeshSkelAnimationControlFactory::DeleteScript (const char *script_name)
+void csGenmeshSkelAnimationControlFactory::DeleteScript (const char* /*script_name*/)
 {
   //TODO
 }

@@ -541,12 +541,13 @@ public:
   }*/
 
   /// Set the masking of color and/or alpha values to framebuffer
-  virtual void SetWriteMask (bool red, bool green, bool blue, bool alpha)
+  virtual void SetWriteMask (bool /*red*/, bool /*green*/, bool /*blue*/,
+    bool /*alpha*/)
   { 
   }
 
-  virtual void GetWriteMask (bool &red, bool &green, bool &blue,
-  	bool &alpha) const
+  virtual void GetWriteMask (bool& /*red*/, bool& /*green*/, bool& /*blue*/,
+    bool& /*alpha*/) const
   {
   }
 
@@ -557,7 +558,7 @@ public:
   void DrawSimpleMesh (const csSimpleRenderMesh &mesh, uint flags = 0);
 
   /// Controls shadow drawing
-  virtual void SetShadowState (int state)
+  virtual void SetShadowState (int /*state*/)
   {
   }
 
@@ -568,17 +569,17 @@ public:
   }
 
   /// Sets a parameter for light i
-  virtual void SetLightParameter (int i, int param, csVector3 value)
+  virtual void SetLightParameter (int /*i*/, int /*param*/, csVector3 /*value*/)
   {
   }
 
   /// Enables light i
-  virtual void EnableLight (int i)
+  virtual void EnableLight (int /*i*/)
   {
   }
 
   /// Disables light i
-  virtual void DisableLight (int i)
+  virtual void DisableLight (int /*i*/)
   {
   }
 
@@ -593,13 +594,13 @@ public:
   }
 
   /// Set a renderstate boolean.
-  virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val)
+  virtual bool SetRenderState (G3D_RENDERSTATEOPTION /*op*/, long /*val*/)
   {
     return 0;
   }
 
   /// Get a renderstate value.
-  virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const
+  virtual long GetRenderState (G3D_RENDERSTATEOPTION /*op*/) const
   {
     return 0;
   }

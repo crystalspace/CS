@@ -451,7 +451,7 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
 
 void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, 
 				      iMeshWrapper *mesh, iShader* shader, 
-				      size_t shaderTicket, size_t pass)
+				      size_t shaderTicket, size_t /*pass*/)
 {
   csRef<csStencilShadowCacheEntry> shadowCacheEntry = 
     shadowcache.Get (mesh, 0);
@@ -523,8 +523,8 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   }
 }
 
-void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
-  csShaderVarStack &stacks)
+void csStencilShadowStep::Perform (iRenderView* /*rview*/, iSector* /*sector*/,
+  csShaderVarStack& /*stacks*/)
 {
   /// TODO: Report error (no light)
   return;
@@ -731,7 +731,7 @@ csStencilShadowStep::ShadowDrawVisCallback::~ShadowDrawVisCallback ()
 }
 
 void csStencilShadowStep::ShadowDrawVisCallback::ObjectVisible (
-  iVisibilityObject *visobject, iMeshWrapper *mesh, uint32 /*frustum_mask*/)
+  iVisibilityObject* /*visobject*/, iMeshWrapper *mesh, uint32 /*frustum_mask*/)
 {
   parent->shadowMeshes.Push (mesh);
 }
@@ -869,8 +869,8 @@ bool csStencilShadowLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csStencilShadowLoader::Parse (iDocumentNode* node,
 					   iStreamSource*,
-					   iLoaderContext* ldr_context,
-					   iBase* context)
+					   iLoaderContext* /*ldr_context*/,
+					   iBase* /*context*/)
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));

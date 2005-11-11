@@ -163,7 +163,7 @@ bool csStarFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csStarFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
+bool csStarFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
 	iStreamSource*)
 {
   //Nothing gets parsed in the loader, so nothing gets saved here!

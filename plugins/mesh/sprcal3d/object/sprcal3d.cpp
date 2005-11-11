@@ -256,7 +256,7 @@ csSpriteCal3DMeshObjectFactory::~csSpriteCal3DMeshObjectFactory ()
   SCF_DESTRUCT_IBASE ();
 }
 
-bool csSpriteCal3DMeshObjectFactory::Create(const char *name)
+bool csSpriteCal3DMeshObjectFactory::Create(const char* /*name*/)
 {  
   // return calCoreModel.create(name);
   return true;
@@ -1014,7 +1014,7 @@ void csSpriteCal3DMeshObjectFactory::SetObjectBoundingBox (const csBox3&)
 }
 
 void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox,
-	csVector3 *verts,int vertCount)
+	csVector3* /*verts*/, int /*vertCount*/)
 {
   if (object_bbox.Empty())
     RecalcBoundingBox (object_bbox);
@@ -1026,7 +1026,7 @@ void csSpriteCal3DMeshObject::LightChanged (iLight*)
   lighting_dirty = true;
 }
 
-void csSpriteCal3DMeshObject::LightDisconnect (iLight* light)
+void csSpriteCal3DMeshObject::LightDisconnect (iLight* /*light*/)
 {
   lighting_dirty = true;
 }
@@ -1104,7 +1104,7 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
     colors[i].Clamp (2.0f, 2.0f, 2.0f);
 }
 
-void csSpriteCal3DMeshObject::InitSubmeshLighting (int mesh, int submesh,
+void csSpriteCal3DMeshObject::InitSubmeshLighting (int /*mesh*/, int /*submesh*/,
 						   CalRenderer *pCalRenderer,
 						   iMovable* movable, 
 						   csColor* colors)
@@ -2053,7 +2053,7 @@ bool csSpriteCal3DMeshObject::DetachCoreMesh(const char *meshname)
   return DetachCoreMesh(factory->meshes[idx]->index);
 }
 
-bool csSpriteCal3DMeshObject::DetachCoreMesh (int mesh_id)
+bool csSpriteCal3DMeshObject::DetachCoreMesh (int /*mesh_id*/)
 {
   CS_ASSERT_MSG (
     "csSpriteCal3DMeshObject::DetachCoreMesh ... implement me already!",

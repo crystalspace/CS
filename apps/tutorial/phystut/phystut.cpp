@@ -631,7 +631,7 @@ iJoint* Simple::CreateJointed (void)
   return joint;
 }
 
-iRigidBody* Simple::CreateWalls (const csVector3& radius)
+iRigidBody* Simple::CreateWalls (const csVector3& /*radius*/)
 {
   // Create a body for the room.
   csRef<iRigidBody> rb = dynSys->CreateBody ();

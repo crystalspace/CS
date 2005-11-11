@@ -129,7 +129,7 @@ int csRainMeshObject::GetParticleCount () const
 void csRainMeshObject::GetDropSize (float& dropwidth, float& dropheight) const
 {
   dropwidth = Scale.x;
-  dropwidth = Scale.y;
+  dropheight = Scale.y;
 }
 
 void csRainMeshObject::GetBox (csVector3& minbox, csVector3& maxbox) const
@@ -143,7 +143,7 @@ const csVector3& csRainMeshObject::GetFallSpeed () const
   return Speed;
 }
 
-void csRainMeshObject::SetCollisionDetection (bool cd)
+void csRainMeshObject::SetCollisionDetection (bool /*cd*/)
 {
 }
 

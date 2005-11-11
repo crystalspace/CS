@@ -311,7 +311,7 @@ SCF_IMPLEMENT_IBASE(ThreadedLoaderContext);
   SCF_IMPLEMENTS_INTERFACE(iLoaderContext);
 SCF_IMPLEMENT_IBASE_END
 
-ThreadedLoaderContext::ThreadedLoaderContext (iEngine* Engine,
+ThreadedLoaderContext::ThreadedLoaderContext (iEngine* /*Engine*/,
 	iRegion* region, bool curRegOnly, csLoader* loader,
 	bool checkDupes)
 {
@@ -615,7 +615,7 @@ csPtr<iBase> csLoader::LoadStructuredMap (iLoaderContext* ldr_context,
 
 //---------------------------------------------------------------------------
 
-csPtr<iLoaderStatus> csLoader::ThreadedLoadMapFile (const char* filename,
+csPtr<iLoaderStatus> csLoader::ThreadedLoadMapFile (const char* /*filename*/,
 	iRegion* /*region*/, bool /*curRegOnly*/, bool /*checkDupes*/)
 {
   return 0;

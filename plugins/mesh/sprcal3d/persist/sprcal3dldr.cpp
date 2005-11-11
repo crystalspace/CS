@@ -867,7 +867,7 @@ bool csSpriteCal3DSaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-bool csSpriteCal3DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
+bool csSpriteCal3DSaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
 	iStreamSource*)
 {
   if (!parent)

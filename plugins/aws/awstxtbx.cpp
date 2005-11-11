@@ -448,7 +448,7 @@ void awsTextBox::OnDraw (csRect /*clip*/)
   }
 }
 
-bool awsTextBox::OnMouseDown (int, int x, int y)
+bool awsTextBox::OnMouseDown (int, int x, int /*y*/)
 {
   // make sure text is valid
   if (text && text->Length() > 0)

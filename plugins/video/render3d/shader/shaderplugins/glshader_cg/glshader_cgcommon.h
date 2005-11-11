@@ -63,7 +63,7 @@ protected:
     bool compiled = false, bool doLoad = true);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
-  virtual const char ** GetProfileCompilerArgs (CGprofile profile) 
+  virtual const char ** GetProfileCompilerArgs (CGprofile /*profile*/) 
   { return 0; }
 
 public:

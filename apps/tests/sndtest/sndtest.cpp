@@ -89,7 +89,7 @@ bool SndTest::OnKeyboard(iEvent& ev)
   return false;
 }
 
-bool SndTest::OnInitialize(int argc, char* argv[])
+bool SndTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
   // RequestPlugins() will load all plugins we specify. In addition
   // it will also check if there are plugins that need to be loaded

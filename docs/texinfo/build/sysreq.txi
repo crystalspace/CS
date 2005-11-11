@@ -125,13 +125,12 @@ routines, for performance enhancement.  This is optional.
 @noindent
 @uref{http://nasm.sourceforge.net/}
 
-@item @sc{ascii} Art Library
+@item @sc{caca} Colour AsCii Art Library
 This library is used for 2D rendering in text mode.  This is optional and only
-needed for fun.  Currently a modified version of aalib is required and can be
-downloaded from:
+needed for fun. libcaca can be downloaded from:
 
 @noindent
-@uref{http://aa-project.sourceforge.net/}
+@uref{http://sam.zoy.org/libcaca/}
 @end table
 
 @strong{Maps}: Needed if you want to see examples of Crystal Space at work.

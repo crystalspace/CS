@@ -41,7 +41,7 @@ namespace lighter
   };
 
 
-  bool Raytracer::TraceAnyHit (const Ray &ray, HitPoint &hit)
+  bool Raytracer::TraceAnyHit (const Ray &ray, HitPoint& /*hit*/)
   {
     if (!tree || !tree->rootNode) return false;
 

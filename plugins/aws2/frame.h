@@ -83,7 +83,7 @@ namespace aws
      * Override this function in the widget in order to draw it.  The drawing
      * space is 0,0 to bounds.width, bounds.height.
      */
-    virtual void OnDraw(iPen *pen) {}
+    virtual void OnDraw(iPen* /*pen*/) {}
   };
 
   /** This manages frames.  It can find frames within a geometric area. */

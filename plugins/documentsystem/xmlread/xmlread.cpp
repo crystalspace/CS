@@ -182,7 +182,7 @@ csXmlReadXMLPlugin::~csXmlReadXMLPlugin()
   SCF_DESTRUCT_IBASE();
 }
 
-bool csXmlReadXMLPlugin::Initialize (iObjectRegistry* objreg)
+bool csXmlReadXMLPlugin::Initialize (iObjectRegistry* /*objreg*/)
 {
   return true;
 }

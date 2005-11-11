@@ -105,7 +105,7 @@ bool PicView::HandleEvent (iEvent &ev)
   return false;
 }
 
-bool PicView::OnInitialize(int argc, char* argv[])
+bool PicView::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
   if (!csInitializer::RequestPlugins(GetObjectRegistry(),
     CS_REQUEST_VFS,
@@ -223,31 +223,31 @@ void PicView::LoadNextImage (size_t idx, int step)
 
 //---------------------------------------------------------------------------
 
-void PicView::ButtonFirst(intptr_t app, iAwsSource *source)
+void PicView::ButtonFirst(intptr_t app, iAwsSource* /*source*/)
 {
   PicView* picview = (PicView*)app;
   picview->LoadNextImage (1, -1);
 }
 
-void PicView::ButtonPrev (intptr_t app, iAwsSource *source)
+void PicView::ButtonPrev (intptr_t app, iAwsSource* /*source*/)
 {
   PicView* picview = (PicView*)app;
   picview->LoadNextImage (0, -1);
 }
 
-void PicView::ButtonNext (intptr_t app, iAwsSource *source)
+void PicView::ButtonNext (intptr_t app, iAwsSource* /*source*/)
 {
   PicView* picview = (PicView*)app;
   picview->LoadNextImage (0, 1);
 }
 
-void PicView::ButtonQuit (intptr_t app, iAwsSource *source)
+void PicView::ButtonQuit (intptr_t /*app*/, iAwsSource* /*source*/)
 {
   csRef<iEventQueue> q = CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
   if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
 }
 
-void PicView::ButtonScale (intptr_t app, iAwsSource *source)
+void PicView::ButtonScale (intptr_t app, iAwsSource* /*source*/)
 {
   PicView* picview = (PicView*)app;
   picview->scale ^= true;

@@ -67,8 +67,8 @@ csFullScreenQuadRSLoader::csFullScreenQuadRSLoader (iBase* p)
 
 csPtr<iBase> csFullScreenQuadRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
-				       iLoaderContext* ldr_context,      
-				       iBase* context)
+				       iLoaderContext* /*ldr_context*/, 
+				       iBase* /*context*/)
 {
   csFullScreenQuadRenderStep* newstep = 
     new csFullScreenQuadRenderStep (object_reg);
@@ -261,8 +261,8 @@ csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
   SCF_DESTRUCT_IBASE();
 }
 
-void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector,
-  csShaderVarStack &stacks)
+void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* /*sector*/,
+  csShaderVarStack& /*stacks*/)
 {
   csRef<iGraphics3D> g3d = rview->GetGraphics3D();
   if (!shaderMgr.IsValid())

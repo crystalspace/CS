@@ -167,7 +167,7 @@ bool awsNotebook::Execute (const char* action, iAwsParmList* parmlist)
   return awsComponent::Execute (action, parmlist);
 }
 
-void awsNotebook::OnDraw (csRect r)
+void awsNotebook::OnDraw (csRect /*r*/)
 {
   csRect f (Frame ());
   if (bb_location == nbTop)

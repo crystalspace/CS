@@ -55,9 +55,9 @@ void csVProcStandardProgram::Deactivate ()
 {
 }
 
-void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
+void csVProcStandardProgram::SetupState (const csRenderMesh* /*mesh*/,
                                          csRenderMeshModes& modes,
-                                         const csShaderVarStack &stacks)
+                                         const csShaderVarStack& stacks)
 {
   if (numLights > 0)
   {
@@ -223,7 +223,7 @@ bool csVProcStandardProgram::ParseBufferName (iDocumentNode* child,
   return true;
 }
 
-bool csVProcStandardProgram::Load (iShaderDestinationResolver* resolve, 
+bool csVProcStandardProgram::Load (iShaderDestinationResolver* /*resolve*/, 
 				   iDocumentNode* program)
 {
   if (!program)

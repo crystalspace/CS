@@ -1666,7 +1666,7 @@ void csEngine::PrecacheDraw (iRegion* region)
   }
 }
 
-void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
+void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/, csRenderView &rview)
 {
   rview.SetEngine (this);
   rview.SetOriginalCamera (c);
@@ -3010,7 +3010,7 @@ iMaterialWrapper* EngineLoaderContext::FindMaterial (const char* name)
 }
 
 iMaterialWrapper* EngineLoaderContext::FindNamedMaterial (const char* name,
-                                                          const char* filename)
+                                                          const char* /*filename*/)
 {
   return Engine->FindMaterial (name, curRegOnly ? region : 0);
 }
@@ -3031,7 +3031,7 @@ iTextureWrapper* EngineLoaderContext::FindTexture (const char* name)
 }
 
 iTextureWrapper* EngineLoaderContext::FindNamedTexture (const char* name,
-                                                        const char* filename)
+                                                        const char* /*filename*/)
 {
   return Engine->FindTexture (name, curRegOnly ? region : 0);
 }

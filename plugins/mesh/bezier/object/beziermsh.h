@@ -787,13 +787,14 @@ public:
       scfParent->HardTransform (t);
     }
     virtual bool SupportsHardTransform () const { return true; }
-    virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
-      csVector3& isect, float* pr)
+    virtual bool HitBeamOutline (const csVector3& /*start*/,
+      const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/)
     {
       return false;
     }
-    virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr, int* polygon_idx = 0)
+    virtual bool HitBeamObject (const csVector3& /*start*/,
+      const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/,
+      int* /*polygon_idx*/ = 0)
     {
       return false;
     }
@@ -814,7 +815,7 @@ public:
      * see imesh/object.h for specification. The default implementation
      * does nothing.
      */
-    virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
+    virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
   } scfiMeshObject;
   friend struct MeshObject;
 

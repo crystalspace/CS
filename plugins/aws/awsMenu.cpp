@@ -732,7 +732,7 @@ void awsMenu::OnSelect (intptr_t p, iAwsSource* src)
     m->Select (0);
 }
 
-void awsMenu::OnClose (intptr_t p, iAwsSource* src)
+void awsMenu::OnClose (intptr_t p, iAwsSource* /*src*/)
 {
   awsMenu* m = (awsMenu*)p;
   m->HideAllPopups ();
@@ -969,7 +969,7 @@ void awsPopupMenu::HideAllPopups ()
     Hide ();
 }
 
-void awsPopupMenu::OnTimer (intptr_t param, iAwsSource* src)
+void awsPopupMenu::OnTimer (intptr_t param, iAwsSource* /*src*/)
 {
   awsPopupMenu* pm = (awsPopupMenu*)param;
   pm->SwitchPopups ();

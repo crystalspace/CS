@@ -844,7 +844,7 @@ public:
   uint GetMixMode () const
   { return mixmode; }
 
-  virtual void PositionChild (iMeshObject* child,csTicks current_time) {}
+  virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) {}
 
   struct eiParticlesObjectState : public iParticlesObjectState
   {

@@ -20,8 +20,8 @@
 #include "null_render3d.h"
 #include "null_txt.h"
 
-void csNullGraphics3D::DrawPixmap (iTextureHandle *hTex,
-  int sx, int sy, int sw, int sh,
-  int tx, int ty, int tw, int th, uint8 Alpha)
+void csNullGraphics3D::DrawPixmap (iTextureHandle* /*hTex*/,
+  int /*sx*/, int /*sy*/, int /*sw*/, int /*sh*/,
+  int /*tx*/, int /*ty*/, int /*tw*/, int /*th*/, uint8 /*Alpha*/)
 {
 }

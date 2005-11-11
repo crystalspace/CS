@@ -50,7 +50,7 @@ static void AddPerspective (csPoly2D* dest, const csVector3 &v,
   dest->AddVertex (p);
 }
 
-csPortalRenderNode::csPortalRenderNode (iPortal* portal, iRenderView* rview,
+csPortalRenderNode::csPortalRenderNode (iPortal* portal, iRenderView* /*rview*/,
   const csReversibleTransform& movtrans, csPortalRenderNodeFactory* factory, 
   csShaderVariableContext& shadervars) : 
   factory(factory), portal(portal), movtrans(movtrans), shadervars(shadervars)

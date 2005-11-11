@@ -696,11 +696,11 @@ public:
   { return 0; }
   virtual csPtr<iString> StateTest ()
   { return 0; }
-  virtual csTicks Benchmark (int num_iterations)
+  virtual csTicks Benchmark (int /*num_iterations*/)
   { return 0; }
   virtual csPtr<iString> Dump ()
   { return 0; }
-  virtual void Dump (iGraphics3D* g3d)
+  virtual void Dump (iGraphics3D* /*g3d*/)
   { }
 };
 

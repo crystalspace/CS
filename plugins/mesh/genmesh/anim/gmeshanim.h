@@ -339,7 +339,7 @@ public:
   // --- For iGenMeshAnimationControlState ---------------------------
   virtual bool Execute (const char* scriptname);
   virtual void Stop () { }
-  virtual void Stop (const char* scriptname) { }
+  virtual void Stop (const char* /*scriptname*/) { }
 };
 
 /**

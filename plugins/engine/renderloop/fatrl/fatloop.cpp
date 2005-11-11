@@ -77,8 +77,8 @@ csFatLoopLoader::csFatLoopLoader (iBase* p) : csBaseRenderStepLoader (p)
 
 csPtr<iBase> csFatLoopLoader::Parse (iDocumentNode* node, 
                                      iStreamSource*,
-				     iLoaderContext* ldr_context,
-                                     iBase* context)
+				     iLoaderContext* /*ldr_context*/,
+                                     iBase* /*context*/)
 {
   csRef<csFatLoopStep> step;
   step.AttachNew (new csFatLoopStep (object_reg));
@@ -271,7 +271,7 @@ public:
 };
 
 void csFatLoopStep::Perform (iRenderView* rview, iSector* sector,
-                             csShaderVarStack &stacks)
+                             csShaderVarStack& /*stacks*/)
 {
   shadervars.Clear();
   RenderNode* node = renderNodeAlloc.Alloc();
@@ -485,7 +485,7 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
 }
 
 csPtr<iTextureHandle> csFatLoopStep::GetAttenuationTexture (
-  int attnType)
+  int /*attnType*/)
 {
   if (!attTex.IsValid())
   {

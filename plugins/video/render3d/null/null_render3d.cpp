@@ -344,12 +344,12 @@ bool csNullGraphics3D::HasNearPlane () const
   return do_near_plane;
 }
 
-bool csNullGraphics3D::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
+bool csNullGraphics3D::SetRenderState (G3D_RENDERSTATEOPTION /*op*/, long /*val*/)
 {
   return false;
 }
 
-long csNullGraphics3D::GetRenderState (G3D_RENDERSTATEOPTION op) const
+long csNullGraphics3D::GetRenderState (G3D_RENDERSTATEOPTION /*op*/) const
 {
   return 0;
 }
@@ -365,8 +365,8 @@ void csNullGraphics3D::SetTextureState (int*, iTextureHandle**, int)
 }
 
 void csNullGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
-    const csRenderMeshModes& modes,
-    const csArray<csShaderVariable*> &stacks)
+    const csRenderMeshModes& /*modes*/,
+    const csArray<csShaderVariable*>& /*stacks*/)
 {
   if (bugplug)
   {
@@ -422,7 +422,7 @@ void csNullGraphics3D::DisableZOffset ()
 {
  return;
 }
-void csNullGraphics3D::SetShadowState (int state)
+void csNullGraphics3D::SetShadowState (int /*state*/)
 {
  return;
 }
