@@ -168,16 +168,6 @@ private:
 
   bool initialized;
 
-  /**
-   * Camera space bounding box is cached here.
-   * GetCameraBoundingBox() will check the current camera number from the
-   * camera to see if it needs to recalculate this.
-   */
-  csBox3 camera_bbox;
-  csBox3 world_bbox;
-
-  /// Current camera number.
-  long cur_cameranr;
   /// Current movable number.
   long cur_movablenr;
 

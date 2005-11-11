@@ -134,7 +134,6 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   vc = factory->vc;
   logparent = 0;
   initialized = false;
-  cur_cameranr = -1;
   cur_movablenr = -1;
   material = 0;
   MixMode = 0;
@@ -877,6 +876,11 @@ void csGenmeshMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     iMovable* movable)
 {
   int i;
+  if (cur_movablenr != movable->GetUpdateNumber ())
+  {
+    lighting_dirty = true;
+    cur_movablenr = movable->GetUpdateNumber ();
+  }
 
   if (factory->DoFullBright ())
   {

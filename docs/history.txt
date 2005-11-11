@@ -14,6 +14,8 @@ chronological order.
 	      csRainMeshObject::GetDropSize().
 	- Jorrit fixed an initialization error in xmlshader which could
 	  case xmlshader to take a VERY long time in some situations.
+	- Jorrit fixed genmesh so that it once again updates software
+	  vertex colors automatically if the object moved.
 10-Nov-2005
 	- Jorrit fixed SimpleRoom.java for a recent change in
 	  LoadMeshObjectFactory.
