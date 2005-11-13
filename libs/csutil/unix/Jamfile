@@ -24,6 +24,7 @@ SubDir TOP libs csutil unix ;
 CSUTIL.GENERIC +=
   appdir.cpp
   apppath.cpp
+  appfilename.cpp
   csprocessorcap.cpp
   cspthrd.cpp
   cspthrd.h
