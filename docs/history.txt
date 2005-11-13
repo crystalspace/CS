@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit started work on structures to keep track of which
 	  lights influence which sectors. The basic algorithm is there
 	  but it is not used yet and there is also no auto-updating.
+	- Jorrit fixed the LSI algorithms in the engine so that they
+	  no longer crash. Also whenever the light moves the LSI is
+	  now updated.
 11-Nov-2005
 	- Vincent Knecht made the following changes:
 	    - Fixed 'unused parameters' gcc warnings.

@@ -107,6 +107,8 @@ csLight::csLight (
 
 csLight::~csLight ()
 {
+  CleanupLSI ();
+
   int i = (int)light_cb_vector.Length ()-1;
   while (i >= 0)
   {
@@ -253,7 +255,7 @@ void csLight::FindLSI (csLightSectorInfluence* inf)
 	  // Check if in frustum.
 	  csRef<csFrustum> new_frustum = inf->frustum->Intersect (
 	      poly, portal->GetVertexIndicesCount ());
-	  if (!new_frustum->IsEmpty ())
+	  if (new_frustum && !new_frustum->IsEmpty ())
 	  {
 	    new_frustum->SetBackPlane (wor_plane);
 	    if (portal->GetFlags ().Check (CS_PORTAL_WARP))
@@ -264,6 +266,7 @@ void csLight::FindLSI (csLightSectorInfluence* inf)
 	      new_frustum->Transform (&warp_wor);
 	    }
 	    csLightSectorInfluence* newinf = new csLightSectorInfluence ();
+	    portal->CompleteSector (0);
 	    newinf->sector = portal->GetSector ();
 	    newinf->light = (iLight*)this;
 	    newinf->frustum = new_frustum;
@@ -378,6 +381,7 @@ void csLight::CalculateAttenuationVector ()
 
 void csLight::OnSetPosition ()
 {
+  FindLSI ();
   csVector3 pos = GetCenter ();
   size_t i = light_cb_vector.Length ();
   while (i-- > 0)

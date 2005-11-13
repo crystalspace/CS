@@ -133,6 +133,7 @@ csSector::csSector (csEngine *engine) :
 
 csSector::~csSector ()
 {
+  CleanupLSI ();
   lights.RemoveAll ();
 }
 
