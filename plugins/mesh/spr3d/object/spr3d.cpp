@@ -1388,7 +1388,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
 
   if (factory->light_mgr)
   {
-    const csArray<iLight*>& relevant_lights = factory->light_mgr
+    const csArray<iLightSectorInfluence*>& relevant_lights = factory->light_mgr
     	->GetRelevantLights (logparent, -1, false);
     UpdateLighting (relevant_lights, movable);
   }
@@ -1660,8 +1660,9 @@ csVector3* csSprite3DMeshObject::GetObjectVerts (csSpriteFrame* fr)
   return obj_verts->GetArray ();
 }
 
-void csSprite3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
-	iMovable* movable)
+void csSprite3DMeshObject::UpdateLighting (
+    const csArray<iLightSectorInfluence*>& lights,
+    iMovable* movable)
 {
   // Make sure that the color array is initialized.
   AddVertexColor (0, csColor (0, 0, 0));
@@ -1738,8 +1739,8 @@ void csSprite3DMeshObject::UpdateLightingRandom ()
   }
 }
 
-void csSprite3DMeshObject::UpdateLightingFast (const csArray<iLight*>& lights,
-	iMovable* movable)
+void csSprite3DMeshObject::UpdateLightingFast (
+    const csArray<iLightSectorInfluence*>& lights, iMovable* movable)
 {
   int light_num, j;
 
@@ -1789,13 +1790,13 @@ void csSprite3DMeshObject::UpdateLightingFast (const csArray<iLight*>& lights,
   int num_lights = (int)lights.Length ();
   for (light_num = 0 ; light_num < num_lights ; light_num++)
   {
-    light_color = lights [light_num]->GetColor ()
+    iLight* li = lights[light_num]->GetLight ();
+    light_color = li->GetColor ()
     	* (256. / CS_NORMAL_LIGHT_LEVEL);
-    sq_light_radius = csSquare (lights [light_num]->GetCutoffDistance ());
+    sq_light_radius = csSquare (li->GetCutoffDistance ());
 
     // Compute light position in object coordinates
-    csVector3 wor_light_pos = lights [light_num]->GetMovable ()
-    	->GetFullPosition ();
+    csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
     if (wor_sq_dist >= sq_light_radius) continue;
 
@@ -1809,7 +1810,7 @@ void csSprite3DMeshObject::UpdateLightingFast (const csArray<iLight*>& lights,
     float wor_dist = csQsqrt (wor_sq_dist);
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
-    light_bright_wor_dist = lights[light_num]->GetBrightnessAtDistance (
+    light_bright_wor_dist = li->GetBrightnessAtDistance (
     	wor_dist);
 
     color = light_color;
@@ -1864,8 +1865,8 @@ void csSprite3DMeshObject::UpdateLightingFast (const csArray<iLight*>& lights,
   } // end of light loop.
 }
 
-void csSprite3DMeshObject::UpdateLightingLQ (const csArray<iLight*>& lights,
-	iMovable* movable)
+void csSprite3DMeshObject::UpdateLightingLQ (
+    const csArray<iLightSectorInfluence*>& lights, iMovable* movable)
 {
   int i, j;
 
@@ -1896,10 +1897,11 @@ void csSprite3DMeshObject::UpdateLightingLQ (const csArray<iLight*>& lights,
   int num_lights = (int)lights.Length ();
   for (i = 0 ; i < num_lights ; i++)
   {
+    iLight* li = lights[i]->GetLight ();
     // Compute light position in object coordinates
-    csVector3 wor_light_pos = lights [i]->GetMovable ()->GetFullPosition ();
+    csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
-    if (wor_sq_dist >= csSquare (lights[i]->GetCutoffDistance ())) continue;
+    if (wor_sq_dist >= csSquare (li->GetCutoffDistance ())) continue;
 
     csVector3 obj_light_pos;
     if (identity)
@@ -1916,9 +1918,9 @@ void csSprite3DMeshObject::UpdateLightingLQ (const csArray<iLight*>& lights,
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
 
-    csColor light_color = lights[i]->GetColor ()
+    csColor light_color = li->GetColor ()
     	* (256. / CS_NORMAL_LIGHT_LEVEL)
-	* lights[i]->GetBrightnessAtDistance (csQsqrt (wor_sq_dist));
+	* li->GetBrightnessAtDistance (csQsqrt (wor_sq_dist));
 
     for (j = 0 ; j < num_texels ; j++)
     {
@@ -1947,8 +1949,8 @@ void csSprite3DMeshObject::UpdateLightingLQ (const csArray<iLight*>& lights,
   }
 }
 
-void csSprite3DMeshObject::UpdateLightingHQ (const csArray<iLight*>& lights,
-	iMovable* movable)
+void csSprite3DMeshObject::UpdateLightingHQ (
+    const csArray<iLightSectorInfluence*>& lights, iMovable* movable)
 {
   int i, j;
 
@@ -1981,12 +1983,13 @@ void csSprite3DMeshObject::UpdateLightingHQ (const csArray<iLight*>& lights,
   int num_lights = (int)lights.Length ();
   for (i = 0 ; i < num_lights ; i++)
   {
-    csColor light_color = lights [i]->GetColor ()
+    iLight* li = lights[i]->GetLight ();
+    csColor light_color = li->GetColor ()
     	* (256. / CS_NORMAL_LIGHT_LEVEL);
-    float sq_light_radius = csSquare (lights [i]->GetCutoffDistance ());
+    float sq_light_radius = csSquare (li->GetCutoffDistance ());
 
     // Compute light position in object coordinates
-    csVector3 wor_light_pos = lights [i]->GetMovable ()->GetFullPosition ();
+    csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
     csVector3 obj_light_pos = movtrans.Other2This (wor_light_pos);
 
     for (j = 0 ; j < num_texels ; j++)
@@ -2021,7 +2024,7 @@ void csSprite3DMeshObject::UpdateLightingHQ (const csArray<iLight*>& lights,
         color = light_color;
         if (obj_sq_dist >= SMALL_EPSILON) cosinus /= obj_dist;
         if (cosinus < 1) color *= cosinus *
-		lights[i]->GetBrightnessAtDistance (obj_dist);
+		li->GetBrightnessAtDistance (obj_dist);
         AddVertexColor (j, color);
       }
     }

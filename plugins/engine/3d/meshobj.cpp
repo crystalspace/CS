@@ -428,8 +428,23 @@ void csMeshWrapper::SetLightingUpdate (int flags, int num_lights)
   relevant_lights_valid = false;
 }
 
-const csArray<iLight*>& csMeshWrapper::GetRelevantLights (int /*maxLights*/,
-	bool /*desireSorting*/)
+LSIAndDist csMeshWrapper::relevant_lights_cache[MAX_INF_LIGHTS];
+
+static int compare_light (const void *p1, const void *p2)
+{
+  LSIAndDist *sp1 = (LSIAndDist *)p1;
+  LSIAndDist *sp2 = (LSIAndDist *)p2;
+  float z1 = sp1->sqdist;
+  float z2 = sp2->sqdist;
+  if (z1 < z2)
+    return -1;
+  else if (z1 > z2)
+    return 1;
+  return 0;
+}
+
+const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
+    	int /*maxLights*/, bool /*desireSorting*/)
 {
   bool always_update = relevant_lights_flags.Check (
   	CS_LIGHTINGUPDATE_ALWAYSUPDATE);
@@ -443,13 +458,14 @@ const csArray<iLight*>& csMeshWrapper::GetRelevantLights (int /*maxLights*/,
       size_t i;
       for (i = 0 ; i < relevant_lights.Length () ; i++)
       {
-        iLight* l = relevant_lights[i];
-	if (!relevant_lights_ref[i].light)
+	if (!relevant_lights_ref[i].lsi)
 	{
 	  relevant = false;	// Light was removed!
 	  break;
 	}
-	if (l->GetLightNumber () != relevant_lights_ref[i].light_nr)
+        iLightSectorInfluence* l = relevant_lights[i];
+	if (l->GetLight ()->GetLightNumber ()
+	    != relevant_lights_ref[i].light_nr)
 	{
 	  relevant = false;	// Light was removed!
 	  break;
@@ -474,6 +490,48 @@ const csArray<iLight*>& csMeshWrapper::GetRelevantLights (int /*maxLights*/,
       relevant_lights.SetLength (relevant_lights_max);
 
     iSector *sect = movable_sectors->Get (0);
+    csVector3 pos = movable.GetFullPosition ();
+    csSector* cssect = (csSector*)sect;
+    const csLightSectorInfluences& lsi = cssect->GetLSI ();
+    csLightSectorInfluences::GlobalIterator it = lsi.GetIterator ();
+    size_t cnt = 0;
+    while (it.HasNext () && cnt < MAX_INF_LIGHTS)
+    {
+      csLightSectorInfluence* inf = it.Next ();
+      const csVector3& center = inf->GetFrustum ()->GetOrigin ();
+      float sqrad = inf->GetLight ()->GetCutoffDistance ();
+      sqrad *= sqrad;
+      if (csIntersect3::BoxSphere (box, center, sqrad))
+      {
+	// Object is in influence sphere of light.
+	// @@@ TODO: intersect box with frustum too.
+	relevant_lights_cache[cnt].lsi = inf;
+	relevant_lights_cache[cnt].sqdist = csSquaredDist::PointPoint (pos,
+	    center);
+	cnt++;
+      }
+    }
+    qsort (
+      relevant_lights_cache,
+      cnt,
+      sizeof (LSIAndDist),
+      compare_light);
+    if (cnt > relevant_lights_max) cnt = relevant_lights_max;
+    relevant_lights.SetLength (cnt);
+    relevant_lights_ref.SetLength (cnt);
+    if (!always_update)
+    {
+      // Update our ref list.
+      size_t i;
+      for (i = 0 ; i < cnt ; i++)
+      {
+	relevant_lights[i] = relevant_lights_cache[i].lsi;
+        relevant_lights_ref[i].lsi = relevant_lights[i];
+        relevant_lights_ref[i].light_nr = relevant_lights[i]->GetLight ()
+	  ->GetLightNumber ();
+      }
+    }
+#if 0
     int num_lights = csEngine::currentEngine->GetNearbyLights (
         sect,
         box,
@@ -491,6 +549,7 @@ const csArray<iLight*>& csMeshWrapper::GetRelevantLights (int /*maxLights*/,
         relevant_lights_ref[i].light_nr = relevant_lights[i]->GetLightNumber ();
       }
     }
+#endif
   }
   relevant_lights_valid = true;
   return relevant_lights;

@@ -139,8 +139,9 @@ private:
   void SetupObject ();
 
   /// Update lighting given a position.
-  void UpdateLighting (const csArray<iLight*>& lights, const csVector3& pos);
-  void UpdateLighting (const csArray<iLight*>& lights,
+  void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
+      const csVector3& pos);
+  void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
       	iMovable* movable, csVector3 offset);
 
   /// Check the start vector and recalculate the LookAt matrix if changed.
@@ -306,7 +307,7 @@ public:
     virtual void Rotate (float angle);
     virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
       iMovable* movable, uint32 frustum_mask);
-    virtual void UpdateLighting (const csArray<iLight*>& lights,
+    virtual void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
 	const csReversibleTransform& transform);
   } scfiParticle;
   friend class Particle;

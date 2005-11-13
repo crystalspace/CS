@@ -34,6 +34,7 @@
 #include "plugins/engine/3d/impmesh.h"
 #include "plugins/engine/3d/meshlod.h"
 #include "plugins/engine/3d/scenenode.h"
+#include "plugins/engine/3d/light.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
 #include "iengine/mesh.h"
@@ -198,6 +199,11 @@ public:
   virtual void FreeFactory (iMeshFactoryWrapper* item);
 };
 
+struct LSIAndDist
+{
+  csLightSectorInfluence* lsi;
+  float sqdist;
+};
 
 /**
  * The holder class for all implementations of iMeshObject.
@@ -321,14 +327,17 @@ private:
    * Array of lights affecting this mesh object. This is calculated
    * by the csLightManager class.
    */
-  csDirtyAccessArray<iLight*> relevant_lights;
+  csDirtyAccessArray<iLightSectorInfluence*> relevant_lights;
+#define MAX_INF_LIGHTS 100
+  static LSIAndDist relevant_lights_cache[MAX_INF_LIGHTS];
+
   // This is a mirror of 'relevant_lights' which we use to detect if
   // a light has been removed or changed. It is only used in case we
   // are not updating all the time (if CS_LIGHTINGUPDATE_ALWAYSUPDATE is
   // not set).
   struct LightRef
   {
-    csWeakRef<iLight> light;
+    csWeakRef<iLightSectorInfluence> lsi;
     uint32 light_nr;
   };
   csSafeCopyArray<LightRef> relevant_lights_ref;
@@ -494,7 +503,7 @@ public:
   /**
    * Get the array of relevant lights for this object.
    */
-  const csArray<iLight*>& GetRelevantLights (
+  const csArray<iLightSectorInfluence*>& GetRelevantLights (
   	int maxLights, bool desireSorting);
   /**
    * Forcibly invalidate relevant lights.

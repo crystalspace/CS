@@ -140,7 +140,8 @@ void csSprite2DMeshObject::SetupObject ()
 
 static csVector3 cam;
 
-void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
+void csSprite2DMeshObject::UpdateLighting (
+    const csArray<iLightSectorInfluence*>& lights,
     const csVector3& pos)
 {
   if (!lighting) return;
@@ -159,18 +160,19 @@ void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   int num_lights = (int)lights.Length ();
   for (i = 0; i < num_lights; i++)
   {
-    csColor light_color = lights[i]->GetColor ()
+    iLight* li = lights[i]->GetLight ();
+    csColor light_color = li->GetColor ()
     	* (256. / CS_NORMAL_LIGHT_LEVEL);
-    float sq_light_radius = csSquare (lights [i]->GetCutoffDistance ());
+    float sq_light_radius = csSquare (li->GetCutoffDistance ());
     // Compute light position.
-    csVector3 wor_light_pos = lights [i]->GetMovable ()->GetFullPosition ();
+    csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
     float wor_sq_dist =
       csSquaredDist::PointPoint (wor_light_pos, pos);
     if (wor_sq_dist >= sq_light_radius) continue;
     float wor_dist = csQsqrt (wor_sq_dist);
     float cosinus = 1.;
     cosinus /= wor_dist;
-    light_color *= cosinus * lights [i]->GetBrightnessAtDistance (wor_dist);
+    light_color *= cosinus * li->GetBrightnessAtDistance (wor_dist);
     color += light_color;
   }
   for (size_t j = 0 ; j < vertices.Length () ; j++)
@@ -182,7 +184,8 @@ void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
 
 }
 
-void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
+void csSprite2DMeshObject::UpdateLighting (
+    const csArray<iLightSectorInfluence*>& lights,
     iMovable* movable, csVector3 offset)
 {
   if (!lighting) return;
@@ -211,7 +214,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
 
   if (factory->light_mgr)
   {
-    const csArray<iLight*>& relevant_lights = factory->light_mgr
+    const csArray<iLightSectorInfluence*>& relevant_lights = factory->light_mgr
     	->GetRelevantLights (logparent, -1, false);
     UpdateLighting (relevant_lights, movable, offset);
   }
@@ -431,7 +434,7 @@ void csSprite2DMeshObject::NextFrame (csTicks current_time,
 }
 
 void csSprite2DMeshObject::Particle::UpdateLighting (
-	const csArray<iLight*>& lights,
+	const csArray<iLightSectorInfluence*>& lights,
 	const csReversibleTransform& transform)
 {
   csVector3 new_pos = transform.This2Other (part_pos);

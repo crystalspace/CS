@@ -1495,10 +1495,10 @@ void csTerrainObject::PrepareLighting ()
 {
   if (!staticlighting && pFactory->light_mgr)
   {
-    const csArray<iLight*>& relevant_lights = pFactory->light_mgr
+    const csArray<iLightSectorInfluence*>& relevant_lights = pFactory->light_mgr
       ->GetRelevantLights (logparent, -1, false);
     for (size_t i = 0; i < relevant_lights.Length(); i++)
-      affecting_lights.Add (relevant_lights[i]);
+      affecting_lights.Add (relevant_lights[i]->GetLight ());
   }
 }
 

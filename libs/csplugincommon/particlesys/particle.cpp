@@ -300,8 +300,8 @@ void csNewParticleSystem::SetupParticles (
   }
 }
 
-void csNewParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
-  iMovable* movable)
+void csNewParticleSystem::UpdateLighting (
+    const csArray<iLightSectorInfluence*>& lights, iMovable* movable)
 {
   if (!Lighting) return;
   const csReversibleTransform &transform = movable->GetTransform ();
@@ -315,9 +315,10 @@ void csNewParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
     size_t num = lights.Length ();
     for (size_t j=0; j<num; j++)
     {
-      float d = (wpos - lights [j]->GetMovable ()->GetFullPosition ()).Norm ();
-      float br = lights [j]->GetBrightnessAtDistance (d);
-      lightColor += br * lights [j]->GetColor ();
+      iLight* l = lights[j]->GetLight ();
+      float d = (wpos - l->GetMovable ()->GetFullPosition ()).Norm ();
+      float br = l->GetBrightnessAtDistance (d);
+      lightColor += br * l->GetColor ();
     }
 
     LitColors [i] = lightColor;
@@ -368,7 +369,7 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
 
   if (Lighting && light_mgr)
   {
-    const csArray<iLight*>& relevant_lights = light_mgr
+    const csArray<iLightSectorInfluence*>& relevant_lights = light_mgr
       ->GetRelevantLights (LogParent, -1, false);
     UpdateLighting (relevant_lights, movable);
   }

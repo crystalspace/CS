@@ -252,6 +252,7 @@ public:
   void CleanupLSI ();
   void AddLSI (csLightSectorInfluence* inf);
   void RemoveLSI (csLightSectorInfluence* inf);
+  const csLightSectorInfluences& GetLSI () const { return influences; }
 
 private:
   // -- PRIVATE METHODS

@@ -31,7 +31,7 @@ csLightManager::~csLightManager ()
 {
 }
 
-const csArray<iLight*>& csLightManager::GetRelevantLights (
+const csArray<iLightSectorInfluence*>& csLightManager::GetRelevantLights (
 	iMeshWrapper* mw,
 	int maxLights, bool desireSorting)
 {

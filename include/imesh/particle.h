@@ -32,6 +32,7 @@
 struct iLight;
 struct iMovable;
 struct iRenderView;
+struct iLightSectorInfluence;
 
 class csColor;
 class csReversibleTransform;
@@ -77,7 +78,7 @@ struct iParticle : public iBase
    * The given transform is the transform of the parent particle system.
    * The position of this particle should be relative to that transform.
    */
-  virtual void UpdateLighting (const csArray<iLight*>& lights,
+  virtual void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
       const csReversibleTransform& transform) = 0;
 
   /// Get the rendermesh(es) of this particle.

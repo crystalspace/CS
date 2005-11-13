@@ -1310,28 +1310,32 @@ private:
   /**
    * Update the lighting on this sprite.
    */
-  void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);
+  void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
+      iMovable* movable);
 
   /**
    * High quality version of UpdateLighting() which recalculates
    * the distance between the light and every vertex.
    * This version can use tweening of the normals and vertices
    */
-  void UpdateLightingHQ (const csArray<iLight*>& lights, iMovable* movable);
+  void UpdateLightingHQ (const csArray<iLightSectorInfluence*>& lights,
+      iMovable* movable);
 
   /**
    * Low quality version of UpdateLighting() which only
    * calculates the distance once (from the center of the sprite.)
    * This method can use tweening of the normals.
    */
-  void UpdateLightingLQ (const csArray<iLight*>& lights, iMovable* movable);
+  void UpdateLightingLQ (const csArray<iLightSectorInfluence*>& lights,
+      iMovable* movable);
 
   /**
    * Low quality Fast version of UpdateLighting() which only
    * calculates the distance once (from the center of the sprite.)
    * This version can NOT use any tweening.
    */
-  void UpdateLightingFast (const csArray<iLight*>& lights, iMovable* movable);
+  void UpdateLightingFast (const csArray<iLightSectorInfluence*>& lights,
+      iMovable* movable);
 
   /**
    * A fairly fast :P totally inaccurate(usually) lighting method.

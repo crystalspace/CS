@@ -198,7 +198,7 @@ public:
     iMovable* movable, uint32 frustum_mask);
 
   /// update lighting info
-  void UpdateLighting (const csArray<iLight*>&, iMovable*);
+  void UpdateLighting (const csArray<iLightSectorInfluence*>&, iMovable*);
 
   /// calls Update() with the amount of time passed since the previous call
   virtual void NextFrame (csTicks current_time, const csVector3& pos);

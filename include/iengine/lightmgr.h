@@ -30,6 +30,24 @@
 
 struct iLight;
 struct iMeshWrapper;
+struct iSector;
+class csFrustum;
+
+/**
+ * A light-sector influence (LSI). Every LSI represents the influence
+ * a certain light has on a sector.
+ */
+struct iLightSectorInfluence : public virtual iBase
+{
+  SCF_INTERFACE(iLightSectorInfluence, 0, 0, 1);
+
+  /// Get the sector.
+  virtual iSector* GetSector () const = 0;
+  /// Get the light.
+  virtual iLight* GetLight () const = 0;
+  /// Get the frustum (can be infinite too).
+  virtual const csFrustum* GetFrustum () const = 0;
+};
 
 /**
  * An engine (3D or iso) can implement this interface for the benefit
@@ -47,8 +65,8 @@ struct iLightManager : public virtual iBase
 {
   SCF_INTERFACE(iLightManager,2,0,0);
   /**
-   * Return all 'relevant' lights that hit this object.
-   * Depending on implementation in the engine this can simply
+   * Return all 'relevant' light/sector influence objects that hit this
+   * object. Depending on implementation in the engine this can simply
    * mean a list of all lights that affect the object or
    * it can be a list of the N most relevant lights (with N a
    * parameter set by the user on that object).
@@ -63,8 +81,8 @@ struct iLightManager : public virtual iBase
    * and intensity. If you don't need sorting then don't set this as it will
    * decrease performance somewhat.
    */
-  virtual const csArray<iLight*>& GetRelevantLights (iMeshWrapper* logObject,
-  	int maxLights, bool desireSorting) = 0;
+  virtual const csArray<iLightSectorInfluence*>& GetRelevantLights (
+      iMeshWrapper* logObject, int maxLights, bool desireSorting) = 0;
 };
 
 /** @} */

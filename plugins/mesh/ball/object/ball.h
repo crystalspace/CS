@@ -129,7 +129,8 @@ public:
   /// Destructor.
   virtual ~csBallMeshObject ();
 
-  void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);
+  void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
+      iMovable* movable);
 
   /// Get the bounding box in transformed space.
   void GetTransformedBoundingBox (long cameranr, long movablenr,

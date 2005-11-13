@@ -872,7 +872,8 @@ Rules for color calculation:
   0    0    1    C[i] = BC+LC[i]+EAmb+SAmb+FC[i]
 */
 
-void csGenmeshMeshObject::UpdateLighting (const csArray<iLight*>& lights,
+void csGenmeshMeshObject::UpdateLighting (
+    const csArray<iLightSectorInfluence*>& lights,
     iMovable* movable)
 {
   int i;
@@ -962,7 +963,7 @@ void csGenmeshMeshObject::UpdateLighting (const csArray<iLight*>& lights,
       int num_lights = (int)lights.Length ();
       for (int l = 0 ; l < num_lights ; l++)
       {
-        iLight* li = lights[l];
+        iLight* li = lights[l]->GetLight ();
         li->AddAffectedLightingInfo (&scfiLightingInfo);
         affecting_lights.Add (li);
         UpdateLightingOne (trans, li);

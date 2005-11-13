@@ -176,7 +176,6 @@ void csLight::CleanupLSI ()
   {
     csLightSectorInfluence* inf = it.Next ();
     ((csSector*)inf->sector)->RemoveLSI (inf);
-    delete inf;
   }
   influences.DeleteAll ();
 }
@@ -194,6 +193,7 @@ void csLight::FindLSI ()
   inf->light = (iLight*)this;
   inf->frustum.AttachNew (new csFrustum (center));
   influences.Add (inf);
+  inf->DecRef ();
   ((csSector*)sector)->AddLSI (inf);
 
   if (type == CS_LIGHT_SPOTLIGHT)
@@ -271,6 +271,7 @@ void csLight::FindLSI (csLightSectorInfluence* inf)
 	    newinf->light = (iLight*)this;
 	    newinf->frustum = new_frustum;
 	    influences.Add (newinf);
+	    newinf->DecRef ();
 	    ((csSector*)portal->GetSector ())->AddLSI (newinf);
 	    FindLSI (newinf);
 	  }

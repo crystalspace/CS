@@ -299,7 +299,7 @@ bool csParticleSystem::PreGetRenderMeshes (iRenderView*, iMovable* movable,
 
   if (light_mgr)
   {
-    const csArray<iLight*>& relevant_lights = light_mgr
+    const csArray<iLightSectorInfluence*>& relevant_lights = light_mgr
     	->GetRelevantLights (logparent, -1, false);
     UpdateLighting (relevant_lights, movable);
   }
@@ -422,7 +422,8 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   return &rm;
 }
 
-void csParticleSystem::UpdateLighting (const csArray<iLight*>& lights,
+void csParticleSystem::UpdateLighting (
+    const csArray<iLightSectorInfluence*>& lights,
     iMovable* movable)
 {
   SetupObject ();

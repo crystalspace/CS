@@ -30,14 +30,14 @@ class csLightManager : public scfImplementation1<csLightManager,
 {
 private:
   // A dummy empty list used in cases where there is no logObject.
-  csArray<iLight*> nolights;
+  csArray<iLightSectorInfluence*> nolights;
 
 public:
   csLightManager ();
   virtual ~csLightManager ();
 
-  virtual const csArray<iLight*>& GetRelevantLights (iMeshWrapper* logObject,
-  	int maxLights, bool desireSorting);
+  virtual const csArray<iLightSectorInfluence*>& GetRelevantLights (
+      	iMeshWrapper* logObject, int maxLights, bool desireSorting);
 };
 
 #endif // __CS_CSENGINE_LIGHTMGR_H__

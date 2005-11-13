@@ -157,7 +157,7 @@ private:
   csSet<csPtrKey<iLight> > affecting_lights;
   // In case we are not using the iLightingInfo system then we
   // GetRenderMeshes() will updated the following array:
-  csArray<iLight*> relevant_lights;
+  csArray<iLightSectorInfluence*> relevant_lights;
 
   // If the following flag is dirty then some of the affecting lights
   // has changed and we need to recalculate.
@@ -198,7 +198,8 @@ private:
   /**
    * Update lighting using the iLightingInfo system.
    */
-  void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);
+  void UpdateLighting (
+      const csArray<iLightSectorInfluence*>& lights, iMovable* movable);
 
 public:
   /// Constructor.

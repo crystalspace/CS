@@ -1037,7 +1037,7 @@ void csSpriteCal3DMeshObject::SetUserData(void *data)
 }
 
 void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
-	const csArray<iLight*>& lights, 
+	const csArray<iLightSectorInfluence*>& lights, 
 	iMovable* movable,
 	CalRenderer *pCalRenderer,
 	int mesh, int submesh, float *meshNormals,
@@ -1062,7 +1062,7 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
   // Update Lighting for all relevant lights
   for (size_t l = 0; l < num_lights; l++)
   {
-    iLight* li = lights[l];
+    iLight* li = lights[l]->GetLight ();
     // Compute light position in object coordinates
     // @@@ Can be optimized a bit. E.g. store obj_light_pos so it can be
     //  reused by submesh lighting.
@@ -2233,8 +2233,9 @@ void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer
       {
 	render->selectMeshSubmesh (mesh, submesh);
 
-	const csArray<iLight*>& relevant_lights = meshobj->factory->light_mgr
-		->GetRelevantLights (meshobj->logparent, -1, false);
+	const csArray<iLightSectorInfluence*>& relevant_lights =
+	  	meshobj->factory->light_mgr->GetRelevantLights (
+		    meshobj->logparent, -1, false);
 
 	meshobj->UpdateLightingSubmesh (relevant_lights, 
 					movable,

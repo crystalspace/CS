@@ -717,9 +717,9 @@ private:
 
   void InitSubmeshLighting (int mesh, int submesh, CalRenderer *pCalRenderer,
     iMovable* movable, csColor* colors);
-  void UpdateLightingSubmesh (const csArray<iLight*>& lights, iMovable*, 
-    CalRenderer*, int mesh, int submesh, float* have_normals, 
-    csColor* colors);
+  void UpdateLightingSubmesh (const csArray<iLightSectorInfluence*>& lights,
+      iMovable*, CalRenderer*, int mesh, int submesh, float* have_normals, 
+      csColor* colors);
 
 public:
   float updateanim_sqdistance1;

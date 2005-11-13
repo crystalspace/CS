@@ -13,6 +13,14 @@ chronological order.
 	- Jorrit fixed the LSI algorithms in the engine so that they
 	  no longer crash. Also whenever the light moves the LSI is
 	  now updated.
+	- Jorrit added iLightSectorInfluence interface so that this
+	  can now be accessed from outside the engine.
+	- Jorrit changed iLightManager->GetRelevantLights() so that it
+	  now returns an array of iLightSectorInfluence references instead
+	  of iLights. That allows meshes and other systems requiring
+	  lighting (fat renderloop) to use lights from neighbouring
+	  sectors and also with additional frustum information.
+	  Currently this frustum information is not yet used though.
 11-Nov-2005
 	- Vincent Knecht made the following changes:
 	    - Fixed 'unused parameters' gcc warnings.

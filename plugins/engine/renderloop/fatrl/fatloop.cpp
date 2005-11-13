@@ -404,7 +404,7 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
     long prio = mw->GetRenderPriority();
 
     // @@@ FIXME: only fetch when needed
-    const csArray<iLight*>& relevantLights = 
+    const csArray<iLightSectorInfluence*>& relevantLights = 
       lightmgr->GetRelevantLights (mw, -1, true);
     size_t lightOfs = 0;
 
@@ -445,7 +445,7 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
 	{
 	  if (((int)lightOfs + lightCount) >= pass.maxLights) break;
 	  lightCount++;
-	  SetLightSVs (shadervars, relevantLights[i], i-lightOfs, 
+	  SetLightSVs (shadervars, relevantLights[i]->GetLight (), i-lightOfs, 
 	    camTransR, mesh->object2world, framenr);
 	}
 

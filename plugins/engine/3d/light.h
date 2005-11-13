@@ -35,6 +35,8 @@
 #include "plugins/engine/3d/movable.h"
 #include "plugins/engine/3d/scenenode.h"
 #include "iengine/light.h"
+#include "iengine/lightmgr.h"
+#include "iengine/viscull.h"
 
 class csLightMap;
 class csPolygon3D;
@@ -78,7 +80,9 @@ public:
  * Class that represents the influence that a certain light
  * has on a sector.
  */
-class csLightSectorInfluence
+class csLightSectorInfluence : public scfImplementation1<
+			       csLightSectorInfluence,
+			       iLightSectorInfluence>
 {
 public:
   iSector* sector;	// Weak ref@@@?
@@ -86,9 +90,15 @@ public:
   // Influence frustum. Or infinite if point light
   // and in starting sector.
   csRef<csFrustum> frustum;
+
+  csLightSectorInfluence () : scfImplementationType (this) { }
+  virtual ~csLightSectorInfluence () { }
+  virtual iSector* GetSector () const { return sector; }
+  virtual iLight* GetLight () const { return light; }
+  virtual const csFrustum* GetFrustum () const { return frustum; }
 };
 
-typedef csSet<csPtrKey<csLightSectorInfluence> > csLightSectorInfluences;
+typedef csSet<csRef<csLightSectorInfluence> > csLightSectorInfluences;
 
 /**
  * Superclass of all positional lights.

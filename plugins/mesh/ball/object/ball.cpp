@@ -568,7 +568,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
   
   if (((csBallMeshObjectFactory*)factory)->light_mgr)
   {
-    const csArray<iLight*>& relevant_lights
+    const csArray<iLightSectorInfluence*>& relevant_lights
       = ((csBallMeshObjectFactory*)factory)->light_mgr
       ->GetRelevantLights (logparent, -1, false);
     UpdateLighting (relevant_lights, movable);
@@ -615,8 +615,8 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
 }
 
 
-void csBallMeshObject::UpdateLighting (const csArray<iLight*>& lights,
-    iMovable* movable)
+void csBallMeshObject::UpdateLighting (
+    const csArray<iLightSectorInfluence*>& lights, iMovable* movable)
 {
   if (generated_colors) return;
 
@@ -653,7 +653,7 @@ void csBallMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   int num_lights = (int)lights.Length ();
   for (l = 0 ; l < num_lights ; l++)
   {
-    iLight* li = lights[l];
+    iLight* li = lights[l]->GetLight ();
     // Compute light position in object coordinates
     csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
     csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
