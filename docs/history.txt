@@ -21,6 +21,9 @@ chronological order.
 	  lighting (fat renderloop) to use lights from neighbouring
 	  sectors and also with additional frustum information.
 	  Currently this frustum information is not yet used though.
+	- evought split getAppFilename() out into its own module to avoid
+	  multiple defines on OS X. UNIX build now includes the generic
+	  appfilename.cpp.
 11-Nov-2005
 	- Vincent Knecht made the following changes:
 	    - Fixed 'unused parameters' gcc warnings.
