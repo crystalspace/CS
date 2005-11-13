@@ -251,7 +251,7 @@ public:
    * be reused/freed later. The plane should be specified relative
    * to the origin point.
    */
-  void SetBackPlane (csPlane3& plane);
+  void SetBackPlane (const csPlane3& plane);
 
   /**
    * Get the back plane.

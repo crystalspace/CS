@@ -187,7 +187,7 @@ void csFrustum::Clear ()
   mirrored = false;
 }
 
-void csFrustum::SetBackPlane (csPlane3 &plane)
+void csFrustum::SetBackPlane (const csPlane3 &plane)
 {
   delete backplane;
   backplane = new csPlane3 (plane);

@@ -996,6 +996,28 @@ void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const
   }
 }
 
+void csSector::CleanupLSI ()
+{
+  csLightSectorInfluences::GlobalIterator it = influences.GetIterator ();
+  while (it.HasNext ())
+  {
+    csLightSectorInfluence* inf = it.Next ();
+    ((csLight*)inf->light)->RemoveLSI (inf);
+    delete inf;
+  }
+  influences.DeleteAll ();
+}
+
+void csSector::AddLSI (csLightSectorInfluence* inf)
+{
+  influences.Add (inf);
+}
+
+void csSector::RemoveLSI (csLightSectorInfluence* inf)
+{
+  influences.Delete (inf);
+}
+
 //---------------------------------------------------------------------------
 
 void csSector::RegisterPortalMesh (iMeshWrapper* mesh)

@@ -249,6 +249,9 @@ public:
    */
   void UnregisterLightToCuller (csLight* light);
 
+  void CleanupLSI ();
+  void AddLSI (csLightSectorInfluence* inf);
+  void RemoveLSI (csLightSectorInfluence* inf);
 
 private:
   // -- PRIVATE METHODS
@@ -397,6 +400,9 @@ private:
 
   /// Fog information.
   mutable csFog fog;
+
+  /// List of light/sector influences.
+  csLightSectorInfluences influences;
 
   /**
    * The visibility culler for this sector or 0 if none.

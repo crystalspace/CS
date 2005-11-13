@@ -30,6 +30,7 @@
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/sector.h"
+#include "plugins/engine/3d/portal.h"
 
 int csLight::ambient_red = CS_DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_green = CS_DEFAULT_LIGHT_LEVEL;
@@ -44,20 +45,23 @@ void csLight::UpdateViscullMesh ()
   if (!object_model) return;
 
   // Update the 'viscull_mesh' data so that it roughly
-  // represents a shape that corresponds with the shape of the 'influence-object'.
-  // The influence-object is a sphere in case of a point light (with the influence
-  // radius as the radius) and a capped cone in case of a spot light.
-  // The geometry specified here should be at least as big as that shape (for
-  // example, a box in case of a point light would be fine).
+  // represents a shape that corresponds with the shape of the
+  // 'influence-object'. The influence-object is a sphere in case of a
+  // point light (with the influence radius as the radius) and a capped cone
+  // in case of a spot light. The geometry specified here should be at
+  // least as big as that shape (for example, a box in case of a point light
+  // would be fine).
   csRef<iPolygonMesh> m;
   switch (type)
   {
     case CS_LIGHT_POINTLIGHT:
       {
-        object_model->box.Set (-cutoffDistance, -cutoffDistance, -cutoffDistance,
+        object_model->box.Set (
+		-cutoffDistance, -cutoffDistance, -cutoffDistance,
 		cutoffDistance, cutoffDistance, cutoffDistance);
         m.AttachNew (new csPolygonMeshBox (object_model->box));
-	object_model->radius.Set (cutoffDistance, cutoffDistance, cutoffDistance);
+	object_model->radius.Set (
+			cutoffDistance, cutoffDistance, cutoffDistance);
       }
       break;
     case CS_LIGHT_DIRECTIONAL:
@@ -156,6 +160,121 @@ void csLight::RemoveAffectedLightingInfo (iLightingInfo* li)
 {
   csRef<iLightingInfo> p(li);
   lightinginfos.Delete (p);
+}
+
+void csLight::RemoveLSI (csLightSectorInfluence* inf)
+{
+  influences.Delete (inf);
+}
+
+void csLight::CleanupLSI ()
+{
+  csLightSectorInfluences::GlobalIterator it = influences.GetIterator ();
+  while (it.HasNext ())
+  {
+    csLightSectorInfluence* inf = it.Next ();
+    ((csSector*)inf->sector)->RemoveLSI (inf);
+    delete inf;
+  }
+  influences.DeleteAll ();
+}
+
+void csLight::FindLSI ()
+{
+  CleanupLSI ();
+
+  iSector* sector = GetSector ();
+  if (!sector) return;
+  const csVector3& center = GetCenter ();
+
+  csLightSectorInfluence* inf = new csLightSectorInfluence ();
+  inf->sector = sector;
+  inf->light = (iLight*)this;
+  inf->frustum.AttachNew (new csFrustum (center));
+  influences.Add (inf);
+  ((csSector*)sector)->AddLSI (inf);
+
+  if (type == CS_LIGHT_SPOTLIGHT)
+  {
+    // @@@ TODO: calculate frustum for spot light.
+  }
+  else if (type == CS_LIGHT_DIRECTIONAL)
+  {
+    // @@@ TODO: is this right for directional?
+    inf->frustum->MakeInfinite ();
+  }
+  else if (type == CS_LIGHT_POINTLIGHT)
+  {
+    inf->frustum->MakeInfinite ();
+  }
+
+  FindLSI (inf);
+}
+
+void csLight::FindLSI (csLightSectorInfluence* inf)
+{
+  iSector* sector = inf->sector;
+  if (!sector) return;
+  const csVector3& center = inf->frustum->GetOrigin ();
+  float sq_cutoff = cutoffDistance * cutoffDistance;
+
+  // Find all portals that are in the influence radius around
+  // the light center.
+  const csSet<csPtrKey<iMeshWrapper> >& portals = sector->GetPortalMeshes ();
+  csSet<csPtrKey<iMeshWrapper> >::GlobalIterator it = portals.GetIterator ();
+  while (it.HasNext ())
+  {
+    iMeshWrapper* portal_mesh = it.Next ();
+    iPortalContainer* pc = portal_mesh->GetPortalContainer ();
+    int i;
+    for (i = 0 ; i < pc->GetPortalCount () ; i++)
+    {
+      iPortal* portal = pc->GetPortal (i);
+      const csVector3* world_vertices = portal->GetWorldVertices ();
+      const csPlane3& wor_plane = portal->GetWorldPlane ();
+      // Can we see the portal?
+      if (wor_plane.Classify (center) < -0.001)
+      {
+	// @@@ Consider having a simpler version that looks
+	// at center of portal instead of trying to calculate distance
+	// to portal polygon?
+        csVector3 poly[100];	//@@@ HARDCODE
+        int k;
+	int* idx = portal->GetVertexIndices ();
+        for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
+        {
+          poly[k] = world_vertices[idx[k]];
+        }
+        float sqdist_portal = csSquaredDist::PointPoly (
+                  center, poly, portal->GetVertexIndicesCount (),
+                  wor_plane);
+        if (sqdist_portal <= sq_cutoff)
+        {
+	  // Check if in frustum.
+	  csRef<csFrustum> new_frustum = inf->frustum->Intersect (
+	      poly, portal->GetVertexIndicesCount ());
+	  if (!new_frustum->IsEmpty ())
+	  {
+	    new_frustum->SetBackPlane (wor_plane);
+	    if (portal->GetFlags ().Check (CS_PORTAL_WARP))
+	    {
+	      csReversibleTransform warp_wor;
+	      portal->ObjectToWorld (
+		   portal_mesh->GetMovable ()->GetFullTransform (), warp_wor);
+	      new_frustum->Transform (&warp_wor);
+	    }
+	    csLightSectorInfluence* newinf = new csLightSectorInfluence ();
+	    newinf->sector = portal->GetSector ();
+	    newinf->light = (iLight*)this;
+	    newinf->frustum = new_frustum;
+	    influences.Add (newinf);
+	    ((csSector*)portal->GetSector ())->AddLSI (newinf);
+	    FindLSI (newinf);
+	  }
+	}
+      }
+    }
+  }
 }
 
 const char* csLight::GenerateUniqueID ()

@@ -75,6 +75,22 @@ public:
 };
 
 /**
+ * Class that represents the influence that a certain light
+ * has on a sector.
+ */
+class csLightSectorInfluence
+{
+public:
+  iSector* sector;	// Weak ref@@@?
+  iLight* light;	// Weak ref@@@?
+  // Influence frustum. Or infinite if point light
+  // and in starting sector.
+  csRef<csFrustum> frustum;
+};
+
+typedef csSet<csPtrKey<csLightSectorInfluence> > csLightSectorInfluences;
+
+/**
  * Superclass of all positional lights.
  * A light subclassing from this has a color, a position
  * and a radius.
@@ -156,6 +172,9 @@ protected:
 
   void UpdateViscullMesh ();
 
+  /// List of light/sector influences.
+  csLightSectorInfluences influences;
+
 public:
   /// Set of flags
   csFlags flags;
@@ -219,6 +238,12 @@ public:
    * Currently only works on thing meshes.
    */
   void CalculateLighting (iMeshWrapper* mesh);
+
+  // Functions related to light/sector influence.
+  void RemoveLSI (csLightSectorInfluence* inf);
+  void CleanupLSI ();
+  void FindLSI (csLightSectorInfluence* inf);
+  void FindLSI ();
 
   /**
    * Set the kdtree child node used by this light (in the kdtree
