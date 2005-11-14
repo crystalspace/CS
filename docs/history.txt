@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Nov-2005
+	- Jorrit fixed a bug in the new LSI algos so that they
+	  don't crash in case there is a portal that can't resolve
+	  (i.e. destination sector is missing).
 13-Nov-2005
 	- Jorrit started work on structures to keep track of which
 	  lights influence which sectors. The basic algorithm is there

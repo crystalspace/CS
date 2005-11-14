@@ -252,28 +252,31 @@ void csLight::FindLSI (csLightSectorInfluence* inf)
                   wor_plane);
         if (sqdist_portal <= sq_cutoff)
         {
-	  // Check if in frustum.
-	  csRef<csFrustum> new_frustum = inf->frustum->Intersect (
-	      poly, portal->GetVertexIndicesCount ());
-	  if (new_frustum && !new_frustum->IsEmpty ())
+	  portal->CompleteSector (0);
+	  if (portal->GetSector ())
 	  {
-	    new_frustum->SetBackPlane (wor_plane);
-	    if (portal->GetFlags ().Check (CS_PORTAL_WARP))
+	    // Check if in frustum.
+	    csRef<csFrustum> new_frustum = inf->frustum->Intersect (
+	        poly, portal->GetVertexIndicesCount ());
+	    if (new_frustum && !new_frustum->IsEmpty ())
 	    {
-	      csReversibleTransform warp_wor;
-	      portal->ObjectToWorld (
-		   portal_mesh->GetMovable ()->GetFullTransform (), warp_wor);
-	      new_frustum->Transform (&warp_wor);
+	      new_frustum->SetBackPlane (wor_plane);
+	      if (portal->GetFlags ().Check (CS_PORTAL_WARP))
+	      {
+	        csReversibleTransform warp_wor;
+	        portal->ObjectToWorld (
+		  portal_mesh->GetMovable ()->GetFullTransform (), warp_wor);
+	        new_frustum->Transform (&warp_wor);
+	      }
+	      csLightSectorInfluence* newinf = new csLightSectorInfluence ();
+	      newinf->sector = portal->GetSector ();
+	      newinf->light = (iLight*)this;
+	      newinf->frustum = new_frustum;
+	      influences.Add (newinf);
+	      newinf->DecRef ();
+	      ((csSector*)portal->GetSector ())->AddLSI (newinf);
+	      FindLSI (newinf);
 	    }
-	    csLightSectorInfluence* newinf = new csLightSectorInfluence ();
-	    portal->CompleteSector (0);
-	    newinf->sector = portal->GetSector ();
-	    newinf->light = (iLight*)this;
-	    newinf->frustum = new_frustum;
-	    influences.Add (newinf);
-	    newinf->DecRef ();
-	    ((csSector*)portal->GetSector ())->AddLSI (newinf);
-	    FindLSI (newinf);
 	  }
 	}
       }
