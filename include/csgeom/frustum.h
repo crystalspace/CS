@@ -256,7 +256,7 @@ public:
   /**
    * Get the back plane.
    */
-  inline csPlane3* GetBackPlane () { return backplane; }
+  inline csPlane3* GetBackPlane () const { return backplane; }
 
   /**
    * Remove the back plane of this frustum.
@@ -271,7 +271,7 @@ public:
   /**
    * Get the number of vertices.
    */
-  inline int GetVertexCount () { return num_vertices; }
+  inline int GetVertexCount () const { return num_vertices; }
 
   /**
    * Get a vertex.
@@ -283,9 +283,18 @@ public:
   }
 
   /**
+   * Get a vertex.
+   */
+  inline const csVector3& GetVertex (int idx) const
+  {
+    CS_ASSERT (idx >= 0 && idx < num_vertices);
+    return vertices[idx];
+  }
+
+  /**
    * Get the array of vertices.
    */
-  inline csVector3* GetVertices () { return vertices; }
+  inline csVector3* GetVertices () const { return vertices; }
 
   /**
    * Apply a transformation to this frustum.

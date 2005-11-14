@@ -16,7 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include "csutil/csstring.h"
+#include "csutil/syspath.h"
 
 /**
  * Return the actual executable name. On platforms with packages

@@ -17,6 +17,13 @@ chronological order.
 	  plane was used before the portal was first used for rendering
 	  it would return wrong results. This caused functions like
 	  GetNearbyMeshes() and the new LSI to fail.
+	- Jorrit added a new version of csIntersect3::BoxFrustum() that
+	  works directly on a csFrustum.
+	- Jorrit fixed iMeshWrapper->GetRelevantLights() so that it now
+	  checks the frustum of the LSI.
+	- Jorrit fixed the new generic/appfilename.cpp so that it compiles
+	  on linux. Every file must include cssysdef.h and also the
+	  syspath.h include was forgotten.
 13-Nov-2005
 	- Jorrit started work on structures to keep track of which
 	  lights influence which sectors. The basic algorithm is there

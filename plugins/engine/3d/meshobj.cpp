@@ -504,11 +504,13 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
       if (csIntersect3::BoxSphere (box, center, sqrad))
       {
 	// Object is in influence sphere of light.
-	// @@@ TODO: intersect box with frustum too.
-	relevant_lights_cache[cnt].lsi = inf;
-	relevant_lights_cache[cnt].sqdist = csSquaredDist::PointPoint (pos,
-	    center);
-	cnt++;
+	if (csIntersect3::BoxFrustum (box, inf->GetFrustum ()))
+	{
+	  relevant_lights_cache[cnt].lsi = inf;
+	  relevant_lights_cache[cnt].sqdist = csSquaredDist::PointPoint (pos,
+	      center);
+	  cnt++;
+        }
       }
     }
     qsort (

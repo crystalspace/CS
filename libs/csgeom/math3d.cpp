@@ -836,6 +836,36 @@ int csIntersect3::BoxSegment (
   return -1;
 }
 
+bool csIntersect3::BoxFrustum (const csBox3& box, const csFrustum* frustum)
+{
+  if (frustum->IsInfinite ()) return true;
+
+  csVector3 m = box.GetCenter ();
+  csVector3 d = box.Max ()-m;		// Half-diagonal.
+
+  const csVector3& origin = frustum->GetOrigin ();
+  int vtcount = frustum->GetVertexCount ();
+  csVector3* vts = frustum->GetVertices ();
+  int i1 = vtcount-1;
+  int i;
+  for (i = 0 ; i < vtcount ; i++)
+  {
+    csPlane3 p (origin, vts[i], vts[i1]);
+    float NP = (float)(d.x*fabs(p.A ())+d.y*fabs(p.B ())+d.z*fabs(p.C ()));
+    float MP = p.Classify (m);
+    if ((MP+NP) < 0.0f) return false;       // behind clip plane
+    i1 = i;
+  }
+  csPlane3* bp = frustum->GetBackPlane ();
+  if (bp)
+  {
+    float NP = (float)(d.x*fabs(bp->A ())+d.y*fabs(bp->B ())+d.z*fabs(bp->C ()));
+    float MP = bp->Classify (m);
+    if ((MP+NP) < 0.0f) return false;       // behind clip plane
+  }
+  return true;
+}
+
 bool csIntersect3::BoxFrustum (const csBox3& box, csPlane3* f,
 	uint32 inClipMask, uint32& outClipMask)
 {

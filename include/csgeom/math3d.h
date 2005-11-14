@@ -587,6 +587,11 @@ public:
   	uint32 inClipMask, uint32& outClipMask);
 
   /**
+   * Intersect an AABB with a frustum.
+   */
+  static bool BoxFrustum (const csBox3& box, const csFrustum* frustum);
+
+  /**
    * Test if a box intersects with a sphere. The intersection is not
    * computed. The sphere is given with squared radius.
    */
