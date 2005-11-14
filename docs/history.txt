@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit fixed a bug in the new LSI algos so that they
 	  don't crash in case there is a portal that can't resolve
 	  (i.e. destination sector is missing).
+	- Jorrit added 'addmbot' and 'delmbot' commands to walktest.
+	  These are the same as 'addbot' and 'delbot' except that
+	  the bots don't move.
 13-Nov-2005
 	- Jorrit started work on structures to keep track of which
 	  lights influence which sectors. The basic algorithm is there

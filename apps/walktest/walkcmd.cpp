@@ -1060,8 +1060,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Statistics:");
     CONPRI("  stats perftest coordshow");
     CONPRI("Special effects:");
-    CONPRI("  addbot delbot fire explosion spiral frain rain");
-    CONPRI("  snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
+    CONPRI("  addmbot delmbot addbot delbot fire explosion spiral frain");
+    CONPRI("  rain snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
     CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert");
     CONPRI("Debugging:");
     CONPRI("  hi zbuf debug0 debug1 debug2 palette bugplug");
@@ -2143,6 +2143,15 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
   }
+  else if (!csStrCaseCmp (cmd, "addmbot"))
+  {
+    RECORD_ARGS (cmd, arg);
+    float radius = 0;
+    if (arg) csScanStr (arg, "%f", &radius);
+    Sys->add_bot (2, Sys->view->GetCamera ()->GetSector (),
+    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), radius,
+	true);
+  }
   else if (!csStrCaseCmp (cmd, "addbot"))
   {
     RECORD_ARGS (cmd, arg);
@@ -2154,6 +2163,10 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "delbot"))
   {
     Sys->del_bot ();
+  }
+  else if (!csStrCaseCmp (cmd, "delmbot"))
+  {
+    Sys->del_bot (true);
   }
   else if (!csStrCaseCmp (cmd, "clrlights"))
   {

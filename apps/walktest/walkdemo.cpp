@@ -361,7 +361,7 @@ bool do_bots = false;
 
 // Add a bot with some size at the specified positin.
 void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
-	float dyn_radius)
+	float dyn_radius, bool manual)
 {
   csRef<iLight> dyn;
   if (dyn_radius)
@@ -394,13 +394,24 @@ void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
   bot->set_bot_move (pos);
   bot->set_bot_sector (where);
   bot->light = dyn;
-  bots.Push (bot);
+  if (manual)
+    manual_bots.Push (bot);
+  else
+    bots.Push (bot);
 }
 
-void WalkTest::del_bot ()
+void WalkTest::del_bot (bool manual)
 {
-  if (bots.Length () > 0)
-    bots.DeleteIndex (0);
+  if (manual)
+  {
+    if (manual_bots.Length () > 0)
+      manual_bots.DeleteIndex (0);
+  }
+  else
+  {
+    if (bots.Length () > 0)
+      bots.DeleteIndex (0);
+  }
 }
 
 void WalkTest::move_bots (csTicks elapsed_time)
