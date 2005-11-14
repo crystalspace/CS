@@ -2016,13 +2016,13 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere, int num
 {
   int num_vertices = 0;
   int num_triangles = 0;
-  csVector3* vertices = new csVector3[10000];	// Temporary only
-  csVector2* uvverts = new csVector2[10000];
-  csTriangle* triangles = new csTriangle[10000];
+  csDirtyAccessArray<csVector3> vertices;
+  csDirtyAccessArray<csVector2> uvverts;
+  csDirtyAccessArray<csTriangle> triangles;
   float radius = 1.0f;
 
-  int prev_verticesT[60];
-  int prev_verticesB[60];
+  csArray<int> prev_verticesT;
+  csArray<int> prev_verticesB;
   float u, v;
   int i, j;
 
@@ -2039,21 +2039,21 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere, int num
     float new_radius = radius;
     float new_height = 0.0f;
     float angle = j * 2.0f * radius_step * TWO_PI / 360.0f;
-    prev_verticesT[j] = num_vertices;
-    prev_verticesB[j] = num_vertices;
-    vertices[num_vertices].Set (new_radius * (float) cos (angle),
+    prev_verticesT.GetExtend (j) = num_vertices;
+    prev_verticesB.GetExtend (j) = num_vertices;
+    vertices.GetExtend (num_vertices).Set (new_radius * (float) cos (angle),
       new_height, new_radius * (float) sin (angle));
 
     u = (float) cos (angle) * 0.5f + 0.5f;
     v = (float) sin (angle) * 0.5f + 0.5f;
 
-    uvverts[num_vertices].Set (u, v);
+    uvverts.GetExtend (num_vertices).Set (u, v);
     num_vertices++;
   }
 
   // Array with new vertex indices.
-  int new_verticesT[60];         // @@@ HARDCODED == BAD == EASY!
-  int new_verticesB[60];
+  csArray<int> new_verticesT;
+  csArray<int> new_verticesB;
 
   // First create the layered triangle strips.
   for (i = 1; i < (num / 2); i++)
@@ -2076,18 +2076,18 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere, int num
       u = uv_radius * (float) cos (angle) + 0.5f;
       v = uv_radius * (float) sin (angle) + 0.5f;
 
-      new_verticesT[j] = num_vertices;
-      vertices[num_vertices].Set (new_radius * (float) cos (angle),
+      new_verticesT.GetExtend (j) = num_vertices;
+      vertices.GetExtend (num_vertices).Set (new_radius * (float) cos (angle),
         new_height, new_radius * (float) sin (angle));
-      uvverts[num_vertices].Set (u, v);
+      uvverts.GetExtend (num_vertices).Set (u, v);
       num_vertices++;
 
 
-      new_verticesB[j] = num_vertices;
-      vertices[num_vertices].Set (new_radius * (float) cos (angle),
+      new_verticesB.GetExtend (j) = num_vertices;
+      vertices.GetExtend (num_vertices).Set (new_radius * (float) cos (angle),
         -new_height, new_radius * (float) sin (angle));
 
-      uvverts[num_vertices].Set (u, v);
+      uvverts.GetExtend (num_vertices).Set (u, v);
       num_vertices++;
     }
 
@@ -2097,22 +2097,26 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere, int num
     for (j = 0; j < num; j++)
     {
       int j1num = (j+1)%num;
-      triangles[num_triangles].c = prev_verticesT[j];
-      triangles[num_triangles].b = new_verticesT[j1num];
-      triangles[num_triangles].a = new_verticesT[j];
+      csTriangle& tri1 = triangles.GetExtend (num_triangles);
+      tri1.c = prev_verticesT[j];
+      tri1.b = new_verticesT[j1num];
+      tri1.a = new_verticesT[j];
       num_triangles++;
-      triangles[num_triangles].c = prev_verticesT[j];
-      triangles[num_triangles].b = prev_verticesT[j1num];
-      triangles[num_triangles].a = new_verticesT[j1num];
+      csTriangle& tri2 = triangles.GetExtend (num_triangles);
+      tri2.c = prev_verticesT[j];
+      tri2.b = prev_verticesT[j1num];
+      tri2.a = new_verticesT[j1num];
       num_triangles++;
 
-      triangles[num_triangles].a = prev_verticesB[j];
-      triangles[num_triangles].b = new_verticesB[j1num];
-      triangles[num_triangles].c = new_verticesB[j];
+      csTriangle& tri3 = triangles.GetExtend (num_triangles);
+      tri3.a = prev_verticesB[j];
+      tri3.b = new_verticesB[j1num];
+      tri3.c = new_verticesB[j];
       num_triangles++;
-      triangles[num_triangles].a = prev_verticesB[j];
-      triangles[num_triangles].b = prev_verticesB[j1num];
-      triangles[num_triangles].c = new_verticesB[j1num];
+      csTriangle& tri4 = triangles.GetExtend (num_triangles);
+      tri4.a = prev_verticesB[j];
+      tri4.b = prev_verticesB[j1num];
+      tri4.c = new_verticesB[j1num];
       num_triangles++;
 
     }
@@ -2122,21 +2126,21 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere, int num
     //-----
     for (j = 0 ; j < num2 ; j++)
     {
-      prev_verticesT[j] = new_verticesT[j];
-      prev_verticesB[j] = new_verticesB[j];
+      prev_verticesT.GetExtend (j) = new_verticesT[j];
+      prev_verticesB.GetExtend (j) = new_verticesB[j];
     }
   }
 
   // Create the top and bottom vertices.
   int top_vertex = num_vertices;
-  vertices[num_vertices].Set (0.0f, vert_radius, 0.0f);
-  uvverts[num_vertices].Set (0.5f, 0.5f);
+  vertices.GetExtend (num_vertices).Set (0.0f, vert_radius, 0.0f);
+  uvverts.GetExtend (num_vertices).Set (0.5f, 0.5f);
   num_vertices++;
   int bottom_vertex = 0;
 
   bottom_vertex = num_vertices;
-  vertices[num_vertices].Set (0.0f, -vert_radius, 0.0f);
-  uvverts[num_vertices].Set (0.5f, 0.5f);
+  vertices.GetExtend (num_vertices).Set (0.0f, -vert_radius, 0.0f);
+  uvverts.GetExtend (num_vertices).Set (0.5f, 0.5f);
   num_vertices++;
 
 
@@ -2146,9 +2150,10 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere, int num
   for (j = 0 ; j < num ; j++)
   {
     int j1num = (j+1)%num;
-    triangles[num_triangles].c = top_vertex;
-    triangles[num_triangles].b = prev_verticesT[j];
-    triangles[num_triangles].a = prev_verticesT[j1num];
+    csTriangle& tri = triangles.GetExtend (num_triangles);
+    tri.c = top_vertex;
+    tri.b = prev_verticesT[j];
+    tri.a = prev_verticesT[j1num];
     num_triangles++;
   }
 
@@ -2159,9 +2164,10 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere, int num
   for (j = 0 ; j < num ; j++)
   {
     int j1num = (j+1)%num;
-    triangles[num_triangles].a = bottom_vertex;
-    triangles[num_triangles].b = prev_verticesB[j];
-    triangles[num_triangles].c = prev_verticesB[j1num];
+    csTriangle& tri = triangles.GetExtend (num_triangles);
+    tri.a = bottom_vertex;
+    tri.b = prev_verticesB[j];
+    tri.c = prev_verticesB[j1num];
     num_triangles++;
   }
 
@@ -2176,14 +2182,17 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere, int num
 
   SetVertexCount (num_vertices);
   csVector3* genmesh_vertices = GetVertices();
-  memcpy (genmesh_vertices, vertices, sizeof(csVector3)*num_vertices);
+  memcpy (genmesh_vertices, vertices.GetArray (),
+      sizeof(csVector3)*num_vertices);
 
   csVector2* genmesh_texels = GetTexels();
-  memcpy (genmesh_texels, uvverts, sizeof(csVector2)*num_vertices);
+  memcpy (genmesh_texels, uvverts.GetArray (),
+      sizeof(csVector2)*num_vertices);
 
   SetTriangleCount (num_triangles);
   csTriangle* ball_triangles = GetTriangles();
-  memcpy (ball_triangles, triangles, sizeof(csTriangle)*num_triangles);
+  memcpy (ball_triangles, triangles.GetArray (),
+      sizeof(csTriangle)*num_triangles);
 
   csVector3* normals = GetNormals();
   for (int i = 0; i < num_vertices; i++)
@@ -2193,11 +2202,8 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere, int num
   }
 
   Invalidate();
-
-  delete[] vertices;
-  delete[] uvverts;
-  delete[] triangles;
 }
+
 //void csGenmeshMeshObjectFactory::GeneratePlane (const csPlane3& plane)
 //{
 //

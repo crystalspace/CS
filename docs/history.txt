@@ -34,6 +34,10 @@ chronological order.
 	- Jorrit added an optimization to GetRelevantLights() so that
 	  calculation of intensity is now only done when there is a chance
 	  that sorting is required.
+	- Jorrit fixed some very bad code in the genmesh GenerateSphere()
+	  code. First it uses hardcoded array sizes which is bad as such.
+	  Secondly it even called delete[] on statically allocated
+	  arrays!
 13-Nov-2005
 	- Jorrit started work on structures to keep track of which
 	  lights influence which sectors. The basic algorithm is there
