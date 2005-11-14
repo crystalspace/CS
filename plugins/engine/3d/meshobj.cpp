@@ -434,17 +434,17 @@ static int compare_light (const void *p1, const void *p2)
 {
   LSIAndDist *sp1 = (LSIAndDist *)p1;
   LSIAndDist *sp2 = (LSIAndDist *)p2;
-  float z1 = sp1->sqdist;
-  float z2 = sp2->sqdist;
+  float z1 = sp1->influence;
+  float z2 = sp2->influence;
   if (z1 < z2)
-    return -1;
-  else if (z1 > z2)
     return 1;
+  else if (z1 > z2)
+    return -1;
   return 0;
 }
 
 const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
-    	int /*maxLights*/, bool /*desireSorting*/)
+    	int maxLights, bool desireSorting)
 {
   bool always_update = relevant_lights_flags.Check (
   	CS_LIGHTINGUPDATE_ALWAYSUPDATE);
@@ -493,13 +493,22 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
     csVector3 pos = movable.GetFullPosition ();
     csSector* cssect = (csSector*)sect;
     const csLightSectorInfluences& lsi = cssect->GetLSI ();
+
+    // Because calculating the intensity for a light is expensive
+    // we only calculate it if there is a chance we might need sorting.
+    size_t lsi_size = lsi.GetSize ();
+    bool certainly_no_sorting = (!desireSorting)
+    	&& lsi_size < relevant_lights_max
+	&& (maxLights == -1 || lsi_size < (size_t)maxLights);
+
     csLightSectorInfluences::GlobalIterator it = lsi.GetIterator ();
     size_t cnt = 0;
     while (it.HasNext () && cnt < MAX_INF_LIGHTS)
     {
       csLightSectorInfluence* inf = it.Next ();
       const csVector3& center = inf->GetFrustum ()->GetOrigin ();
-      float sqrad = inf->GetLight ()->GetCutoffDistance ();
+      iLight* li = inf->GetLight ();
+      float sqrad = li->GetCutoffDistance ();
       sqrad *= sqrad;
       if (csIntersect3::BoxSphere (box, center, sqrad))
       {
@@ -507,51 +516,50 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
 	if (csIntersect3::BoxFrustum (box, inf->GetFrustum ()))
 	{
 	  relevant_lights_cache[cnt].lsi = inf;
-	  relevant_lights_cache[cnt].sqdist = csSquaredDist::PointPoint (pos,
-	      center);
+	  if (!certainly_no_sorting)
+	  {
+	    float sqdist = csSquaredDist::PointPoint (pos, center);
+#if 0
+	    // Use negative squared distance because the compare function excepts
+	    // high values for lights with a lot of influence.
+	    relevant_lights_cache[cnt].influence = -sqdist;
+#else
+	    relevant_lights_cache[cnt].influence = ((csLight*)li)
+	  	  ->GetLuminanceAtSquaredDistance (sqdist);
+#endif
+	  }
 	  cnt++;
         }
       }
     }
-    qsort (
-      relevant_lights_cache,
-      cnt,
-      sizeof (LSIAndDist),
-      compare_light);
+    if (desireSorting || cnt > relevant_lights_max
+    	|| (maxLights != -1 && int (cnt) > maxLights))
+    {
+      qsort (
+        relevant_lights_cache,
+        cnt,
+        sizeof (LSIAndDist),
+        compare_light);
+    }
     if (cnt > relevant_lights_max) cnt = relevant_lights_max;
+    if (maxLights != -1 && int (cnt) > maxLights) cnt = maxLights;
     relevant_lights.SetLength (cnt);
     relevant_lights_ref.SetLength (cnt);
+    size_t i;
+    for (i = 0 ; i < cnt ; i++)
+    {
+      relevant_lights[i] = relevant_lights_cache[i].lsi;
+    }
     if (!always_update)
     {
       // Update our ref list.
-      size_t i;
       for (i = 0 ; i < cnt ; i++)
       {
-	relevant_lights[i] = relevant_lights_cache[i].lsi;
         relevant_lights_ref[i].lsi = relevant_lights[i];
         relevant_lights_ref[i].light_nr = relevant_lights[i]->GetLight ()
 	  ->GetLightNumber ();
       }
     }
-#if 0
-    int num_lights = csEngine::currentEngine->GetNearbyLights (
-        sect,
-        box,
-        relevant_lights.GetArray (),
-        (int)relevant_lights_max);
-    relevant_lights.SetLength (num_lights);
-    relevant_lights_ref.SetLength (num_lights);
-    if (!always_update)
-    {
-      // Update our ref list.
-      int i;
-      for (i = 0 ; i < num_lights ; i++)
-      {
-        relevant_lights_ref[i].light = relevant_lights[i];
-        relevant_lights_ref[i].light_nr = relevant_lights[i]->GetLightNumber ();
-      }
-    }
-#endif
   }
   relevant_lights_valid = true;
   return relevant_lights;

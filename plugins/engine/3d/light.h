@@ -120,7 +120,7 @@ private:
 
 protected:
   /// Movable for the light
-  csMovable movable; //@@MS: BAAAD 
+  csMovable movable;
 
   /// Color.
   csColor color;
@@ -436,6 +436,13 @@ public:
    * Get the brightness of a light at a given distance.
    */
   float GetBrightnessAtDistance (float d) const;
+
+  /**
+   * Get the brightness of a light at the given distance. This
+   * function correlates for the color too so it can be used to calculate
+   * intensity.
+   */
+  float GetLuminanceAtSquaredDistance (float sqdist) const;
 
   /// Get the light type of this light.
   csLightType GetType () const

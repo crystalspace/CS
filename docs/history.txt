@@ -24,6 +24,16 @@ chronological order.
 	- Jorrit fixed the new generic/appfilename.cpp so that it compiles
 	  on linux. Every file must include cssysdef.h and also the
 	  syspath.h include was forgotten.
+	- Jorrit added a new function csLight::GetLuminanceAtSquaredDistance()
+	  which calculates the real contribution to the brightness of
+	  an object at a given distance.
+	- Jorrit fixed a bug in GetRelevantLights() in mesh object in case
+	  always update was set.
+	- Jorrit changed the GetRelevantLights() in mesh object so that
+	  they now sort based on real contribution of the light intensity.
+	- Jorrit added an optimization to GetRelevantLights() so that
+	  calculation of intensity is now only done when there is a chance
+	  that sorting is required.
 13-Nov-2005
 	- Jorrit started work on structures to keep track of which
 	  lights influence which sectors. The basic algorithm is there

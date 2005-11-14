@@ -339,6 +339,36 @@ void csLight::SetHalo (csHalo *Halo)
   halo = Halo;
 }
 
+float csLight::GetLuminanceAtSquaredDistance (float sqdist) const
+{
+  float bright;
+  switch (attenuation)
+  {
+    case CS_ATTN_NONE:
+      bright = 1;
+      break;
+    case CS_ATTN_LINEAR:
+      bright = 1 - sqrt (sqdist) / attenuationConstants.x;
+      break;
+    case CS_ATTN_INVERSE:
+      {
+        float d = sqrt (sqdist);
+        if (d < SMALL_EPSILON) d = SMALL_EPSILON;
+        bright = 1 / d;
+      }
+      break;
+    case CS_ATTN_REALISTIC:
+      if (sqdist < SMALL_EPSILON) sqdist = SMALL_EPSILON;
+      bright = 1 / sqdist;
+      break;
+    case CS_ATTN_CLQ:
+      bright = (attenuationConstants * csVector3 (1, sqrt (sqdist), sqdist));
+      break;
+  }
+  float lum = color.red * 0.3 + color.green * 0.59 + color.blue * 0.11;
+  return bright * lum;
+}
+
 float csLight::GetBrightnessAtDistance (float d) const
 {
   switch (attenuation)

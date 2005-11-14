@@ -202,7 +202,9 @@ public:
 struct LSIAndDist
 {
   csLightSectorInfluence* lsi;
-  float sqdist;
+  // An indication of how powerful this light affects the object.
+  // Higher values mean more influence.
+  float influence;
 };
 
 /**
@@ -232,7 +234,7 @@ protected:
   /**
    * Position in the world.
    */
-  csMovable movable;
+  csMovable movable; //@@MS: BAAAD
 
   /**
    * The renderer will render all objects in a sector based on this
