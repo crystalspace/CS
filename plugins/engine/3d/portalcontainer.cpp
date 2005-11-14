@@ -94,7 +94,8 @@ void csPortalContainerPolyMeshHelper::Cleanup ()
 // ---------------------------------------------------------------------------
 
 
-csPortalContainer::csPortalContainer (iEngine* engine, iObjectRegistry *object_reg) :
+csPortalContainer::csPortalContainer (iEngine* engine,
+	iObjectRegistry *object_reg) :
 	scfImplementationType (this, engine),
 	scfiPolygonMesh (0),
 	scfiPolygonMeshCD (CS_PORTAL_COLLDET),
@@ -199,6 +200,7 @@ iPortal* csPortalContainer::CreatePortal (csVector3* vertices, int num)
   prepared = false;
   csPortal* prt = new csPortal (this);
   portals.Push (prt);
+  movable_nr--;	// Make sure the movable information is updated for new portal!
 
   int i;
   for (i = 0 ; i < num ; i++)
@@ -221,6 +223,7 @@ void csPortalContainer::RemovePortal (iPortal* portal)
 
 void csPortalContainer::CheckMovable ()
 {
+  Prepare ();
   const csMovable& cmovable = meshwrapper->GetCsMovable ();
   if (movable_nr == cmovable.GetUpdateNumber ()) return;
   const csReversibleTransform movtrans = cmovable.GetFullTransform ();
@@ -240,7 +243,8 @@ void csPortalContainer::ObjectToWorld (const csMovable& movable,
     for (i = 0 ; i < portals.Length () ; i++)
     {
       csPortal* prt = portals[i];
-      prt->SetWorldPlane (prt->GetIntObjectPlane ());
+      csPlane3 wp (prt->GetIntObjectPlane ());
+      prt->SetWorldPlane (wp);
     }
   }
   else
@@ -793,7 +797,6 @@ void csPortalContainer::DrawOnePortal (
 
 void csPortalContainer::CastShadows (iMovable* movable, iFrustumView* fview)
 {
-  Prepare ();
   CheckMovable ();
 
   size_t i;

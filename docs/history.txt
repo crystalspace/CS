@@ -13,6 +13,10 @@ chronological order.
 	- Jorrit added 'addmbot' and 'delmbot' commands to walktest.
 	  These are the same as 'addbot' and 'delbot' except that
 	  the bots don't move.
+	- Jorrit fixed a bug in portal container. If the portal world
+	  plane was used before the portal was first used for rendering
+	  it would return wrong results. This caused functions like
+	  GetNearbyMeshes() and the new LSI to fail.
 13-Nov-2005
 	- Jorrit started work on structures to keep track of which
 	  lights influence which sectors. The basic algorithm is there
