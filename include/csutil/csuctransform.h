@@ -946,8 +946,9 @@ public:
    * get to the next encoded char.
    * \copydoc UTF8Skip(const utf8_char*,size_t)
    */
-  inline static int UTF32Skip (const utf32_char* /*str*/, size_t maxSkip)
+  inline static int UTF32Skip (const utf32_char* str, size_t maxSkip)
   {
+    (void)str; // silence gcc
     return (int)(MIN(maxSkip, 1));
   }
 
@@ -956,8 +957,9 @@ public:
    * get to the start of the previous encoded code point.
    * \copydoc UTF8Rewind(const utf8_char*,size_t)
    */
-  inline static int UTF32Rewind (const utf32_char* /*str*/, size_t maxRew)
+  inline static int UTF32Rewind (const utf32_char* str, size_t maxRew)
   {
+    (void)str; // silence gcc
     if (maxRew < 1) return 0;
     return 1;
   }
