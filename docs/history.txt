@@ -14,6 +14,7 @@ chronological order.
 	- Jorrit added iGeneralFactoryState->Compress() to compress the
 	  vertex table (including texels, normals, and colors) of a genmesh.
 	  Also added <compress> keyword to do it from a map file.
+	- Jorrit optimized software lighting in genmesh slightly.
 14-Nov-2005
 	- Jorrit fixed a bug in the new LSI algos so that they
 	  don't crash in case there is a portal that can't resolve

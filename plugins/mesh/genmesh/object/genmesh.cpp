@@ -831,21 +831,28 @@ void csGenmeshMeshObject::UpdateLightingOne (
 
   csColor col;
   int i;
-  for (i = 0 ; i < factory->GetVertexCount () ; i++)
+  if (obj_sq_dist < SMALL_EPSILON)
   {
-    csVector3& normal = normals[i];
-    float cosinus;
-    if (obj_sq_dist < SMALL_EPSILON) cosinus = 1;
-    else cosinus = obj_light_pos * normal;
-    // because the vector from the object center to the light center
-    // in object space is equal to the position of the light
-
-    if (cosinus > 0)
+    for (i = 0 ; i < factory->GetVertexCount () ; i++)
     {
-      col = light_color;
-      if (obj_sq_dist >= SMALL_EPSILON) cosinus *= in_obj_dist;
-      if (cosinus < 1) col *= cosinus;
-      colors[i] += col;
+      colors[i] += light_color;
+    }
+  }
+  else
+  {
+    obj_light_pos *= in_obj_dist;
+    for (i = 0 ; i < factory->GetVertexCount () ; i++)
+    {
+      float cosinus = obj_light_pos * normals[i];
+      // because the vector from the object center to the light center
+      // in object space is equal to the position of the light
+
+      if (cosinus > 0)
+      {
+        col = light_color;
+        if (cosinus < 1) col *= cosinus;
+        colors[i] += col;
+      }
     }
   }
 }
