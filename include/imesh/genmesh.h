@@ -257,6 +257,12 @@ struct iGeneralFactoryState : public iGeneralMeshCommonState
   virtual void CalculateNormals () = 0;
 
   /**
+   * Compress the vertex table. This should be called after setting
+   * up the geometry.
+   */
+  virtual void Compress () = 0;
+
+  /**
    * Automatically generate a box. This will set the number of vertices
    * to eight and generate vertices, texels, and triangles. The colors
    * and normals are not initialized here.

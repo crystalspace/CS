@@ -671,6 +671,7 @@ public:
 
   void Invalidate ();
   void CalculateNormals ();
+  void Compress ();
   void GenerateBox (const csBox3& box);
   void GenerateSphere (const csSphere& sphere, int rim_vertices);
   //void GeneratePlane (const csPlane3& plane);
@@ -874,6 +875,10 @@ public:
     virtual void Invalidate ()
     {
       scfParent->Invalidate ();
+    }
+    virtual void Compress ()
+    {
+      scfParent->Compress ();
     }
     virtual void CalculateNormals ()
     {

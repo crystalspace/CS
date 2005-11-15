@@ -54,6 +54,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 #include "ivideo/rendermesh.h"
+#include "cstool/vertexcompress.h"
 
 #include "genmesh.h"
 
@@ -1646,7 +1647,41 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
   {
     initialized = true;
     object_bbox_valid = false;
+  }
+}
 
+void csGenmeshMeshObjectFactory::Compress ()
+{
+  csVector3* new_vertices;
+  csVector2* new_texels;
+  csVector3* new_normals;
+  csColor4* new_colors;
+  size_t new_count;
+  csCompressVertexInfo* vt = csVertexCompressor::Compress (
+    	mesh_vertices, mesh_texels, mesh_normals, mesh_colors,
+	num_mesh_vertices,
+	new_vertices, new_texels, new_normals, new_colors, new_count);
+  if (vt)
+  {
+    printf ("From %d to %d\n", num_mesh_vertices, new_count);
+    fflush (stdout);
+    delete[] mesh_vertices; mesh_vertices = new_vertices;
+    delete[] mesh_texels; mesh_texels = new_texels;
+    delete[] mesh_normals; mesh_normals = new_normals;
+    delete[] mesh_colors; mesh_colors = new_colors;
+    num_mesh_vertices = new_count;
+
+    // Now we can remap the vertices in all triangles.
+    csTriangle* new_tris = new csTriangle[num_mesh_triangles];
+    int i;
+    for (i = 0 ; i < num_mesh_triangles ; i++)
+    {
+      new_tris[i].a = vt[mesh_triangles[i].a].new_idx;
+      new_tris[i].b = vt[mesh_triangles[i].b].new_idx;
+      new_tris[i].c = vt[mesh_triangles[i].c].new_idx;
+    }
+    delete[] mesh_triangles; mesh_triangles = new_tris;
+    delete[] vt;
   }
 }
 

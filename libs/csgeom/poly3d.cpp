@@ -767,6 +767,17 @@ csVector3 csPoly3D::GetCenter () const
   return bbox.GetCenter ();
 }
 
+static int compare_vt_orig (const void *p1, const void *p2)
+{
+  csCompressVertex *sp1 = (csCompressVertex *)p1;
+  csCompressVertex *sp2 = (csCompressVertex *)p2;
+  if (sp1->orig_idx < sp2->orig_idx)
+    return -1;
+  else if (sp1->orig_idx > sp2->orig_idx)
+    return 1;
+  return 0;
+}
+
 static int compare_vt (const void *p1, const void *p2)
 {
   csCompressVertex *sp1 = (csCompressVertex *)p1;
@@ -786,17 +797,6 @@ static int compare_vt (const void *p1, const void *p2)
   return 0;
 }
 
-static int compare_vt_orig (const void *p1, const void *p2)
-{
-  csCompressVertex *sp1 = (csCompressVertex *)p1;
-  csCompressVertex *sp2 = (csCompressVertex *)p2;
-  if (sp1->orig_idx < sp2->orig_idx)
-    return -1;
-  else if (sp1->orig_idx > sp2->orig_idx)
-    return 1;
-  return 0;
-}
-
 template <class T>
 static csCompressVertex* TemplatedCompressVertices (T& vertices,
 	size_t num_vertices, csVector3*& new_vertices, size_t& new_count)
@@ -811,9 +811,9 @@ static csCompressVertex* TemplatedCompressVertices (T& vertices,
   for (i = 0; i < num_vertices; i++)
   {
     vt[i].orig_idx = i;
-    vt[i].x = (float)ceil (vertices[i].x * 1000000);
-    vt[i].y = (float)ceil (vertices[i].y * 1000000);
-    vt[i].z = (float)ceil (vertices[i].z * 1000000);
+    vt[i].x = (int)ceil (vertices[i].x * 1000000);
+    vt[i].y = (int)ceil (vertices[i].y * 1000000);
+    vt[i].z = (int)ceil (vertices[i].z * 1000000);
   }
 
   // First sort so that all (nearly) equal vertices are together.
@@ -892,7 +892,7 @@ csCompressVertex* csVector3Array::CompressVertices (
   if (vt == 0) return 0;
 
   size_t i;
-  vertices.DeleteAll ();
+  vertices.Empty ();
   for (i = 0 ; i < new_count ; i++)
     vertices.Push (new_vertices[i]);
   delete[] new_vertices;

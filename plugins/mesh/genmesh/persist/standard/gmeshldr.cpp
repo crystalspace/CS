@@ -72,7 +72,8 @@ enum
   XMLTOKEN_LOCALSHADOWS,
   XMLTOKEN_BACK2FRONT,
   XMLTOKEN_ANIMCONTROL,
-  XMLTOKEN_SUBMESH
+  XMLTOKEN_SUBMESH,
+  XMLTOKEN_COMPRESS
 };
 
 SCF_IMPLEMENT_IBASE (csGeneralFactoryLoader)
@@ -306,6 +307,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
   int num_col = 0;
   int num_vt = 0;
   bool auto_normals = false;
+  bool compress = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -399,6 +401,10 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         break;
       case XMLTOKEN_AUTONORMALS:
         if (!synldr->ParseBool (child, auto_normals, true))
+	  return 0;
+	break;
+      case XMLTOKEN_COMPRESS:
+        if (!synldr->ParseBool (child, compress, true))
 	  return 0;
 	break;
       case XMLTOKEN_NUMTRI:
@@ -557,6 +563,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
     }
   }
 
+  if (compress)
+    state->Compress ();
   if (auto_normals)
     state->CalculateNormals ();
 

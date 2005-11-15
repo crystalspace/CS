@@ -348,7 +348,7 @@ public:
 struct csCompressVertex
 {
   size_t orig_idx;
-  float x, y, z;
+  int x, y, z;
   size_t new_idx;
   bool used;
 };
