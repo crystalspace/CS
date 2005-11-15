@@ -2446,15 +2446,15 @@ void csGenmeshMeshObjectFactory::HardTransform (
 {
   int i;
   for (i = 0 ; i < num_mesh_vertices ; i++)
+  {
     mesh_vertices[i] = t.This2Other (mesh_vertices[i]);
-  for (i = 0 ; i < num_mesh_vertices ; i++)
     mesh_normals[i] = t.This2OtherRelative (mesh_normals[i]);
+  }
 
   mesh_vertices_dirty_flag = true;
 
   initialized = false;
   scfiObjectModel.ShapeChanged ();
-  //CalculateNormals ();
 }
 
 csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
