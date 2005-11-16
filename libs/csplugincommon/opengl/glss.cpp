@@ -76,31 +76,12 @@ void csGLScreenShot::SetData (void* data)
 
   // Pixel format is read as RGBA (in a byte array)
   uint8* s = (uint8*)data;
-  int x, y;
+  int y;
   for (y = Height; y-- > 0;)
   {
     csRGBpixel* dest = Data + y * Width;
-  #ifdef CS_LITTLE_ENDIAN
-    if (csPackRGBA::IsRGBpixelSane())
-    {
-      // Weee! Shortcut!
-      const size_t bytes = Width * 4;
-      memcpy (dest, s, bytes);
-      s += bytes;
-    }
-    else
-  #endif
-    {
-      for (x = 0 ; x < Width; x++)
-      {
-	uint32 pix = *s;
-	dest->red   = *s++;
-	dest->green = *s++;
-	dest->blue  = *s++;
-	dest->alpha = *s++;
-	dest++;
-      }
-    }
+    csPackRGBA::UnpackRGBAtoRGBpixel (dest, s, Width);
+    s += Width*4;
   }
 }
 

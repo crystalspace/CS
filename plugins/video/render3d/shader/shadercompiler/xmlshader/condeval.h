@@ -177,23 +177,6 @@ class csConditionEvaluator
   /// Used to resolve SV names.
   csRef<iStringSet> strings;
 
-  class OperationHashKeyHandler
-  {
-    /**
-     * Test whether an operation is communative.
-     * Those ops are treated specially, so e.g. the expression
-     * "a == b" gets the same hash as "b == a".
-     */
-    static bool IsOpCommutative (ConditionOp op);
-    static uint ActualHash (ConditionOp operation,
-      const CondOperand& left, const CondOperand& right);
-  public:
-    static uint ComputeHash (const CondOperation& operation);
-    static bool CompareKeys (const CondOperation& op1, 
-      const CondOperation& op2);
-  };
-  friend class OperationHashKeyHandler;
-
   csConditionID nextConditionID;
   csHashReversible<csConditionID, CondOperation> conditions;
 

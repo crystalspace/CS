@@ -255,8 +255,6 @@ public:
   bool dither_textures;
   /// Sharpen mipmaps?
   int sharpen_mipmaps;
-  /// The multiplication tables used for lightmapping
-  uint8 *lightmap_tables [3];
 
   ///
   csSoftwareTextureManager (iObjectRegistry *object_reg,

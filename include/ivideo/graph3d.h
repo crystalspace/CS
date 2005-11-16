@@ -266,6 +266,9 @@ enum
   /// Destination fragment 1-alpha
   CS_MIXMODE_FACT_DSTALPHA_INV	= 0x9,
   
+  /// Number of available mixmodes
+  CS_MIXMODE_FACT_COUNT		= 0xa,
+  
   /// Mask to extract factors
   CS_MIXMODE_FACT_MASK		= 0xf
 };

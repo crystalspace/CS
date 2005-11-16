@@ -87,6 +87,7 @@ namespace CrystalSpace
        */
       virtual bool Init (SoftwareTexture** textures,
 	const csRenderMeshModes& modes,
+	bool needColors,
 	BuffersMask availableBuffers,
 	RenderInfo& renderInfo) = 0;
     };

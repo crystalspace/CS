@@ -67,12 +67,7 @@
 [% END %]
 
 [% MACRO compiler_release BLOCK -%]
-				Optimization="4"
-				GlobalOptimizations="TRUE"
-				InlineFunctionExpansion="2"
-				EnableIntrinsicFunctions="TRUE"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="TRUE"
+				Optimization="3"
 				StringPooling="TRUE"
 				EnableFunctionLevelLinking="TRUE"
 				RuntimeLibrary="2"

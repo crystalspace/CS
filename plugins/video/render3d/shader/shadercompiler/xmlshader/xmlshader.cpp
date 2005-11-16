@@ -1653,7 +1653,7 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename)
     {
       if (!isalnum (filenameClean[p])) filenameClean[p] = '_';
     }
-    dumpFN.Format ("%s_%s.xml",
+    dumpFN.Format ("%s_%s",
       GetName(), filenameClean.GetData());
   }
 
@@ -1677,11 +1677,6 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename)
     docsys.AttachNew (new csTinyDocumentSystem);
     csRef<iDocument> newdoc = docsys->CreateDocument();
     CloneNode (programNode, newdoc->CreateRoot());
-    csString filenameClean (filename);
-    for (size_t p = 0; p < filenameClean.Length(); p++)
-    {
-      if (!isalnum (filenameClean[p])) filenameClean[p] = '_';
-    }
     newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%s.xml",
       dumpFN.GetData()));
   }

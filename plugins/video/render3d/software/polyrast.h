@@ -33,31 +33,64 @@ namespace cspluginSoft3d
 {
   using namespace CrystalSpace::SoftShader;
 
+  template<typename Pix, typename SrcBlend, typename DstBlend>
   struct SLLogic_ScanlineRenderer
   {
     const iScanlineRenderer::RenderInfo& sri;
     const VertexBuffer* inBuffers;
     BuffersMask buffersMask;
     size_t floatsPerVert;
-    BlendBase* blendBase;
-    BlendBase::BlendProc blendProc;
+    const Pix& pix;
 
-    SLLogic_ScanlineRenderer (const iScanlineRenderer::RenderInfo& sri,
+    SLLogic_ScanlineRenderer (const Pix& pix,
+      const iScanlineRenderer::RenderInfo& sri,
       const VertexBuffer* inBuffers, BuffersMask buffersMask,
-      size_t floatsPerVert, BlendBase::BlendProc blendProc) : 
+      size_t floatsPerVert) : 
       sri (sri), inBuffers (inBuffers), buffersMask (buffersMask),
-      floatsPerVert (floatsPerVert), blendBase (blendBase),
-      blendProc (blendProc) {}
+      floatsPerVert (floatsPerVert), pix (pix) {}
 
     CS_FORCEINLINE
     void RenderScanline (InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
-      int ipolStep, int ipolShift, void* dest, uint len, uint32 *zbuff)
+      int ipolStep, int ipolShift, uint32* temp, void* dest, uint len, 
+      uint32 *zbuff)
     {
-      CS_ALLOC_STACK_ARRAY(uint32, tempDest, len);
       sri.proc (sri.renderer, L, R, ipolStep, ipolShift, 
-	tempDest/*dest*/, len, zbuff);
-      // Call blending proc...
-      blendProc (blendBase, tempDest, dest, len);
+	temp, len, zbuff);
+
+      // Blend
+      typename_qualifier Pix::PixType* _dest = 
+	(typename_qualifier Pix::PixType*)dest;
+      typename_qualifier Pix::PixType* _destend = _dest + len;
+
+      uint32* src = temp;
+      while (_dest < _destend)
+      {
+	Pixel px (*src++);
+
+	if (px.a & 0x80)
+	{
+	  px.a <<= 1;
+
+	  SrcBlend srcFactor;
+	  DstBlend dstFactor;
+	  const Pixel dp = pix.GetPix (_dest);
+	  // Some special cases...
+	  if (dstFactor.GetBlendFact() == CS_MIXMODE_FACT_ZERO)
+	  {
+	    pix.WritePix (_dest, srcFactor.Apply (px, dp));
+	  }
+	  else if (srcFactor.GetBlendFact() == CS_MIXMODE_FACT_ZERO)
+	  {
+	    if (dstFactor.GetBlendFact() != CS_MIXMODE_FACT_ONE)
+	      pix.WritePix (_dest, dstFactor.Apply (px, dp));
+	  }
+	  else
+	    // General case
+	    pix.WritePix (_dest, 
+	      srcFactor.Apply (px, dp) + dstFactor.Apply (px, dp));
+	}
+ 	_dest++;
+      } /* endwhile */
     }
     void LinearizeBuffers (float* linearBuffers, size_t vertNum)
     {
@@ -85,7 +118,8 @@ namespace cspluginSoft3d
   {
     CS_FORCEINLINE
     void RenderScanline (InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
-      int ipolStep, int ipolShift, void* /*dest*/, uint len, uint32 *zbuff)
+      int ipolStep, int ipolShift, uint32* /*temp*/, void* /*dest*/, uint len, 
+      uint32 *zbuff)
     {
       InterpolateScanlinePersp<0> ipol;
       ipol.Setup (L, R, 1.0f / len, ipolStep, ipolShift);
@@ -102,22 +136,43 @@ namespace cspluginSoft3d
     size_t GetFloatsPerVert() const { return 0; }
   };
 
-  template <typename ScanlineLogic>
-  class PolygonRasterizer
+  struct ScanlineIter
   {
-    int width, height;
-    int do_interlaced;
-
-    uint32* z_buffer;
-    uint8** line_table;
-    int pixel_shift;
+    int vertNum;
+    const csVector3* vertices;
+    const size_t floatsPerVert;
+    int height;
+    size_t top, bot;
+    int ipolStep;
+    int ipolShift;
+    float* linearBuffers;
+    //-----
+    // Scan from top to bottom.
+    // The following structure contains all the data for one side
+    // of the scanline conversion. 'L' is responsible for the left
+    // side, 'R' for the right side respectively.
+    //-----
+    struct
+    {
+      // Start and final vertex number
+      int sv, fv;
+      // The final Y coordinate
+      int fy;
+      
+      // Edge interpolater; contains values as well as deltas
+      InterpolateEdgePersp edge;
+    } L,R;
+    int fin_y;
+    int sy;
+    bool haveTrapezoid;
+    int screenY;
 
     inline static void SelectInterpolationStep (float M, int InterpolMode,
       int& InterpolStep, int& InterpolShift)
     {
       /*
-       * For the four interpolation modes.
-       */
+      * For the four interpolation modes.
+      */
       struct csSft3DCom
       {
 	int step1, shift1;
@@ -158,21 +213,16 @@ namespace cspluginSoft3d
       }
     }
 
-  public:
-    PolygonRasterizer() : do_interlaced(-1)
+    ScanlineIter (size_t vertNum, const csVector3* vertices,
+      const size_t floatsPerVert, float* linearBuffers, int height) : 
+      vertNum ((int)vertNum), vertices (vertices), 
+      floatsPerVert (floatsPerVert), height (height),
+      linearBuffers (linearBuffers), haveTrapezoid (false)
     {
-    }
-
-    void DrawPolygon (size_t vertNum, const csVector3* vertices,
-      const ScanlineLogic& logic)
-    {
-      CS_ASSERT_MSG ("Degenerate polygon", vertNum >= 3);
-      ScanlineLogic sll (logic);
       //-----
       // Get the values from the polygon for more convenient local access.
       // Also look for the top-most and bottom-most vertices.
       //-----
-      size_t top, bot;
       size_t i;
       float top_y, bot_y, min_x, max_x, min_z, max_z;
       size_t compareNum;
@@ -196,7 +246,7 @@ namespace cspluginSoft3d
 	max_x = -99999;
 	min_z = 99999;
 	max_z = -99999;
-        top = bot = 0; // shaddap gcc 
+	top = bot = 0; // shaddap gcc 
 	compareNum = vertNum;
       }
       for (i = 0 ; i < compareNum ; i += 2)
@@ -255,17 +305,13 @@ namespace cspluginSoft3d
 	  if (z1 < min_z) min_z = z1;
 	}
       }
+      ipolStep = 16;
+      ipolShift = 4;
 
-      const size_t floatsPerVert = sll.GetFloatsPerVert();
-      CS_ALLOC_STACK_ARRAY(float, linearBuffers, floatsPerVert * vertNum);
-      sll.LinearizeBuffers (linearBuffers, vertNum);
-
-      int ipolStep = 16;
-      int ipolShift = 4;
       // Pick an interpolation step...
       /* @@@ FIXME: makes that computation sense?
-       * SelectInterpolationStep() is taken verbatim from the old polygon
-       * code, and I'm not certain about the Z slope values... [-res] */
+      * SelectInterpolationStep() is taken verbatim from the old polygon
+      * code, and I'm not certain about the Z slope values... [-res] */
       float dx = max_x - min_x;
       float zss = 0.0f;
       if (ABS(dx) > EPSILON)
@@ -279,33 +325,15 @@ namespace cspluginSoft3d
 	  //((top_y - EPSILON) > height))
 	//return;
     
-      //-----
-      // Scan from top to bottom.
-      // The following structure contains all the data for one side
-      // of the scanline conversion. 'L' is responsible for the left
-      // side, 'R' for the right side respectively.
-      //-----
-      struct
-      {
-	// Start and final vertex number
-	int sv, fv;
-	// The final Y coordinate
-	int fy;
-	
-	// Edge interpolater; contains values as well as deltas
-	InterpolateEdgePersp edge;
-      } L,R;
-    
     // Start of code to stop MSVC bitching about uninitialized variables
       L.sv = R.sv = (int)top;
       L.fv = R.fv = (int)top;
-      int sy = L.fy = R.fy = csQround (vertices[top].y);
+      sy = L.fy = R.fy = csQround (vertices[top].y);
     // End of MSVC specific code
-    
-      //-----
-      // Main scanline loop.
-      //-----
-      for ( ; ; )
+    }
+    bool NextScanline ()
+    {
+      if (!haveTrapezoid)
       {
 	//-----
 	// We have reached the next segment. Recalculate the slopes.
@@ -318,7 +346,7 @@ namespace cspluginSoft3d
 	  {
 	    // Check first if polygon has been finished
 	    if (R.fv == (int)bot)
-	      return;
+	      return false;
 	    R.sv = R.fv;
 	    if (++R.fv >= (int)vertNum)
 	      R.fv = 0;
@@ -334,7 +362,7 @@ namespace cspluginSoft3d
 	  if (sy <= L.fy)
 	  {
 	    if (L.fv == (int)bot)
-	      return;
+	      return false;
 	    L.sv = L.fv;
 	    if (--L.fv < 0)
 	      L.fv = (int)vertNum - 1;
@@ -352,41 +380,94 @@ namespace cspluginSoft3d
 	//-----
 	// Now draw a trapezoid.
 	//-----
-	int fin_y;
 	if (L.fy > R.fy)
 	  fin_y = L.fy;
 	else
 	  fin_y = R.fy;
-    
-	int screenY = height - sy;
-	while (sy > fin_y)
-	{
-	  if ((sy & 1) != do_interlaced)
-	  {
-	    //-----
-	    // Draw one scanline.
-	    //-----
-	    int xl = csQround (L.edge.x);
-	    int xr = csQround (R.edge.x);
-    
-	    if (xr > xl)
-	    {
-	      int l = xr - xl;
-    
-	      uint32 *zbuff = z_buffer + width * screenY + xl;
-	      unsigned char *dest = line_table [screenY] + (xl << pixel_shift);
 
-	      sll.RenderScanline (L.edge, R.edge, ipolStep, ipolShift, 
-		dest, l, zbuff);
-	    }
-	  }
-    
-	  L.edge.Advance (floatsPerVert);
-	  R.edge.Advance (floatsPerVert);
-    
-	  sy--;
-	  screenY++;
+	screenY = height - sy;
+	haveTrapezoid = true;
+      }
+      else
+      {
+	if (sy > fin_y)
+	  return true;
+	else
+	{
+	  haveTrapezoid = false;
+	  return NextScanline();
 	}
+      }
+
+      return true;
+    }
+    void PostScanline()
+    {
+      L.edge.Advance (floatsPerVert);
+      R.edge.Advance (floatsPerVert);
+
+      sy--;
+      screenY++;
+    }
+  };
+  template <typename ScanlineLogic>
+  class PolygonRasterizer
+  {
+    int width, height;
+    int do_interlaced;
+
+    uint32* z_buffer;
+    uint8** line_table;
+    int pixel_shift;
+    uint32* line_buffer;
+
+  public:
+    PolygonRasterizer() : do_interlaced(-1), line_buffer(0)
+    {
+    }
+    ~PolygonRasterizer()
+    {
+      delete[] line_buffer;
+    }
+
+    void DrawPolygon (size_t vertNum, const csVector3* vertices,
+      const ScanlineLogic& logic)
+    {
+      CS_ASSERT_MSG ("Degenerate polygon", vertNum >= 3);
+      ScanlineLogic sll (logic);
+
+      const size_t floatsPerVert = sll.GetFloatsPerVert();
+      CS_ALLOC_STACK_ARRAY(float, linearBuffers, floatsPerVert * vertNum);
+      sll.LinearizeBuffers (linearBuffers, vertNum);
+      
+      ScanlineIter si (vertNum, vertices, floatsPerVert, linearBuffers, 
+	height);
+
+      //-----
+      // Main scanline loop.
+      //-----
+      while (si.NextScanline ())
+      {
+	if ((si.sy & 1) != do_interlaced)
+	{
+	  //-----
+	  // Draw one scanline.
+	  //-----
+	  int xl = csQround (si.L.edge.x);
+	  int xr = csQround (si.R.edge.x);
+  
+	  if (xr > xl)
+	  {
+	    int l = xr - xl;
+  
+	    uint32 *zbuff = z_buffer + width * si.screenY + xl;
+	    unsigned char *dest = line_table [si.screenY] + (xl << pixel_shift);
+
+	    sll.RenderScanline (si.L.edge, si.R.edge, si.ipolStep, si.ipolShift, 
+	      line_buffer, dest, l, zbuff);
+	  }
+	}
+	si.PostScanline();
       }
     }
 
@@ -400,6 +481,7 @@ namespace cspluginSoft3d
       this->line_table = line_table;
 
       pixel_shift = csLog2 (pfmt.PixelBytes);
+      line_buffer = new uint32[width];
     }
   };
   

@@ -22,293 +22,79 @@
 
 namespace cspluginSoft3d
 {
-  
-  template<typename Pix, typename Target>
-  struct Blend_Zero
+  enum
   {
-    typedef typename_qualifier Pix::PixType PixType;
-    typedef Target TargetType;
-
-    Target& target;
-    Blend_Zero (const Pix& /*pix*/, Target& target) : target (target) 
-    { }
-    
-    CS_FORCEINLINE
-    void Apply (PixType* /*dest*/, 
-      uint8 /*r*/, uint8 /*g*/, uint8 /*b*/, uint8 /*a*/)
-    {
-      target.Set (0);
-    }
-  };
-  
-  template<typename Pix, typename Target>
-  struct Blend_SrcColor
-  {
-    typedef typename_qualifier Pix::PixType PixType;
-    typedef Target TargetType;
-
-    Target& target;
-    Blend_SrcColor (const Pix& /*pix*/, Target& target) : target (target) 
-    { }
-    
-    CS_FORCEINLINE
-    void Apply (PixType* /*dest*/, uint8 r, uint8 g, uint8 b, uint8 a)
-    {
-      target.Set (r, g, b, a);
-    }
-  };
-  
-  template<typename Pix, typename Target>
-  struct Blend_DstColor
-  {
-    typedef typename_qualifier Pix::PixType PixType;
-    typedef Target TargetType;
-
-    const Pix& pix;
-    Target& target;
-    Blend_DstColor (const Pix& pix, Target& target) : pix(pix), 
-      target (target) { }
-    
-    CS_FORCEINLINE
-    void Apply (PixType* dest, 
-      uint8 /*r*/, uint8 /*g*/, uint8 /*b*/, uint8 /*a*/)
-    {
-      uint8 r, g, b, a;
-      pix.GetPix (dest, r, g, b, a);
-      target.Set (r, g, b, a);
-    }
-  };
-  
-  template<typename Pix, typename Target>
-  struct Blend_SrcAlpha
-  {
-    typedef typename_qualifier Pix::PixType PixType;
-    typedef Target TargetType;
-
-    Target& target;
-    Blend_SrcAlpha (const Pix& /*pix*/, Target& target) : target (target) 
-    { }
-    
-    CS_FORCEINLINE
-    void Apply (PixType* /*dest*/,
-      uint8 /*r*/, uint8 /*g*/, uint8 /*b*/, uint8 a)
-    {
-      target.Set (a);
-    }
-  };
-  
-  template<typename Pix, typename Target>
-  struct Blend_DstAlpha
-  {
-    typedef typename_qualifier Pix::PixType PixType;
-    typedef Target TargetType;
-
-    const Pix& pix;
-    Target& target;
-    Blend_DstAlpha (const Pix& pix, Target& target) : pix(pix), 
-      target (target) { }
-    
-    CS_FORCEINLINE
-    void Apply (PixType* dest, 
-      uint8 /*r*/, uint8 /*g*/, uint8 /*b*/, uint8 /*a*/)
-    {
-      uint8 r, g, b, a;
-      pix.GetPix (dest, r, g, b, a);
-      target.Set (a);
-    }
-  };
-  
-  template <typename RealTarget>
-  struct Target_Inv
-  {
-    RealTarget& target;
-    Target_Inv (RealTarget& target) : target (target) {}
-
-    CS_FORCEINLINE
-    void Set (uint8 a) { target.Set (~a); }
-    CS_FORCEINLINE
-    void Set (uint8 r, uint8 g, uint8 b, uint8 a) 
-    { target.Set (~r, ~g, ~b, ~a); }
-
-    operator RealTarget& () { return target; }
-  };
-  
-  struct Target_Src
-  {
-    uint8 sr, sg, sb, sa;
-    uint8 r, g, b, a;
-    
-    Target_Src (uint8 sr, uint8 sg, uint8 sb, uint8 sa) :
-      sr(sr), sg(sg), sb(sb), sa(sa) {}
-
-    CS_FORCEINLINE
-    void Set (uint8 A) 
-    { 
-      const uint v = A+1;
-      r = (sr * v) >> 8;
-      g = (sg * v) >> 8;
-      b = (sb * v) >> 8;
-      a = (sa * v) >> 8;
-    }
-    CS_FORCEINLINE
-    void Set (uint8 R, uint8 G, uint8 B, uint8 A) 
-    { 
-      r = (sr * (R+1)) >> 8; 
-      g = (sg * (G+1)) >> 8; 
-      b = (sb * (B+1)) >> 8; 
-      a = (sa * (A+1)) >> 8; 
-    }
-  };
-  
-  template<typename Pix>
-  struct Target_Dst
-  {
-    typedef typename_qualifier Pix::PixType PixType;
-    const Target_Src& src;
-    Pix& pix;
-    PixType* const dest;
-    
-    Target_Dst (const Target_Src& src, Pix& pix, PixType* const dest) : 
-      src(src), pix(pix), dest(dest) {}
-    
-    CS_FORCEINLINE
-    void Set (uint8 A) 
-    { 
-      pix.MultiplyDstAdd (dest, A, src.r, src.g, src.b, src.a);
-    }
-    CS_FORCEINLINE
-    void Set (uint8 R, uint8 G, uint8 B, uint8 A) 
-    {
-      pix.MultiplyDstAdd (dest, R, G, B, A, src.r, src.g, src.b, src.a);
-    }
-  };
-  
-  struct BlendBase
-  {
-    typedef void (*BlendProc) (BlendBase* _This, uint32* src,
-      void* dest, uint len);
-
-    virtual ~BlendBase() {}
-    virtual BlendProc GetBlendProc (uint mixmode) = 0;
+    FactorColorSrc = 0,
+    FactorColorDst = 1
   };
 
-  template<typename Pix>
-  struct BlendImpl : public BlendBase
+  template<int Color, int Inv>
+  struct Factor_Zero
   {
-  public:
-    Pix pix;
-  private:
-    template <typename SrcBlend, typename DstBlend>
-    struct BlendImpl2
+    CS_FORCEINLINE
+    int GetBlendFact() const 
+    { return Inv ? CS_MIXMODE_FACT_ONE : CS_MIXMODE_FACT_ZERO; }
+
+    CS_FORCEINLINE
+    Pixel Apply (const Pixel src, const Pixel dst) const
     {
-      static void Blend (BlendBase* _This, uint32* src,
-	void* dest, uint len)
-      {
-	BlendImpl<Pix>* This = (BlendImpl<Pix>*)_This;
-
-	Pix& pix = This->pix;
-	typename_qualifier Pix::PixType* _dest = 
-	  (typename_qualifier Pix::PixType*)dest;
-	typename_qualifier Pix::PixType* _destend = _dest + len;
-
-	while (_dest < _destend)
-	{
-	  uint8 r, g, b, a;
-	  const uint32 sp = *src++;
-	  a = sp >> 24;
-
-	  if (a & 0x80)
-	  {
-	    r = (sp >> 16) & 0xff;
-	    g = (sp >> 8) & 0xff;
-	    b = sp & 0xff;
-	    a <<= 1;
-
-	    Target_Src srcTarget (r, g, b, a);
-	    typename_qualifier SrcBlend::TargetType src (srcTarget);
-	    Target_Dst<Pix> dstTarget (src, pix, _dest);
-	    typename_qualifier DstBlend::TargetType dst (dstTarget);
-
-	    SrcBlend blendSrc (pix, src);
-	    DstBlend blendDst (pix, dst);
-	    blendSrc.Apply (_dest, r, g, b, a);
-	    blendDst.Apply (_dest, r, g, b, a);
-	    
-  	    _dest++;
-	  }
-	} /* endwhile */
-      }
-    };
-    template<typename SrcBlend>
-    static BlendBase::BlendProc GetScanlineProcM (uint mixmode)
-    {
-      switch (CS_MIXMODE_BLENDOP_DST (mixmode))
-      {
-	default:
-	case CS_MIXMODE_FACT_ZERO:
-	  return BlendImpl2<SrcBlend, Blend_Zero<Pix, Target_Dst<Pix> > >::Blend;
-	case CS_MIXMODE_FACT_ONE:
-	  return BlendImpl2<SrcBlend, Blend_Zero<Pix, Target_Inv<Target_Dst<Pix> > > >::Blend;
-
-	case CS_MIXMODE_FACT_SRCCOLOR:
-	  return BlendImpl2<SrcBlend, Blend_SrcColor<Pix, Target_Dst<Pix> > >::Blend;
-	case CS_MIXMODE_FACT_SRCCOLOR_INV:
-	  return BlendImpl2<SrcBlend, Blend_SrcColor<Pix, Target_Inv<Target_Dst<Pix> > > >::Blend;
-
-	case CS_MIXMODE_FACT_SRCALPHA:
-	  return BlendImpl2<SrcBlend, Blend_SrcAlpha<Pix, Target_Dst<Pix> > >::Blend;
-	case CS_MIXMODE_FACT_SRCALPHA_INV:
-	  return BlendImpl2<SrcBlend, Blend_SrcAlpha<Pix, Target_Inv<Target_Dst<Pix> > > >::Blend;
-
-	case CS_MIXMODE_FACT_DSTCOLOR:
-	  return BlendImpl2<SrcBlend, Blend_DstColor<Pix, Target_Dst<Pix> > >::Blend;
-	case CS_MIXMODE_FACT_DSTCOLOR_INV:
-	  return BlendImpl2<SrcBlend, Blend_DstColor<Pix, Target_Inv<Target_Dst<Pix> > > >::Blend;
-
-	case CS_MIXMODE_FACT_DSTALPHA:
-	  return BlendImpl2<SrcBlend, Blend_DstAlpha<Pix, Target_Dst<Pix> > >::Blend;
-	case CS_MIXMODE_FACT_DSTALPHA_INV:
-	  return BlendImpl2<SrcBlend, Blend_DstAlpha<Pix, Target_Inv<Target_Dst<Pix> > > >::Blend;
-      }
+      return Inv ? ((Color == FactorColorSrc) ? src : dst) : Pixel (0);
     }
-    static BlendBase::BlendProc GetScanlineProc (uint mixmode)
+  };
+
+  template<int Color, int Inv>
+  struct Factor_Src
+  {
+    CS_FORCEINLINE
+    int GetBlendFact() const 
+    { return Inv ? CS_MIXMODE_FACT_SRCCOLOR_INV : CS_MIXMODE_FACT_SRCCOLOR; }
+
+    CS_FORCEINLINE
+    Pixel Apply (const Pixel src, const Pixel dst)
     {
-      switch (CS_MIXMODE_BLENDOP_SRC (mixmode))
-      {
-	default:
-	case CS_MIXMODE_FACT_ZERO:
-	  return GetScanlineProcM<Blend_Zero<Pix, Target_Src> > (mixmode);
-	case CS_MIXMODE_FACT_ONE:
-	  return GetScanlineProcM<Blend_Zero<Pix, Target_Inv<Target_Src> > > (mixmode);
-
-	case CS_MIXMODE_FACT_SRCCOLOR:
-	  return GetScanlineProcM<Blend_SrcColor<Pix, Target_Src> > (mixmode);
-	case CS_MIXMODE_FACT_SRCCOLOR_INV:
-	  return GetScanlineProcM<Blend_SrcColor<Pix, Target_Inv<Target_Src> > > (mixmode);
-
-	case CS_MIXMODE_FACT_SRCALPHA:
-	  return GetScanlineProcM<Blend_SrcAlpha<Pix, Target_Src> > (mixmode);
-	case CS_MIXMODE_FACT_SRCALPHA_INV:
-	  return GetScanlineProcM<Blend_SrcAlpha<Pix, Target_Inv<Target_Src> > > (mixmode);
-
-	case CS_MIXMODE_FACT_DSTCOLOR:
-	  return GetScanlineProcM<Blend_DstColor<Pix, Target_Src> > (mixmode);
-	case CS_MIXMODE_FACT_DSTCOLOR_INV:
-	  return GetScanlineProcM<Blend_DstColor<Pix, Target_Inv<Target_Src> > > (mixmode);
-
-	case CS_MIXMODE_FACT_DSTALPHA:
-	  return GetScanlineProcM<Blend_DstAlpha<Pix, Target_Src> > (mixmode);
-	case CS_MIXMODE_FACT_DSTALPHA_INV:
-	  return GetScanlineProcM<Blend_DstAlpha<Pix, Target_Inv<Target_Src> > > (mixmode);
-      }
+      return ((Color == FactorColorSrc) ? src : dst) * (Inv ? ~src : src);
     }
-  public:
-    BlendImpl (const csPixelFormat& pfmt) : pix (pfmt) 
-    {}
+  };
 
-    BlendBase::BlendProc GetBlendProc (uint mixmode)
+  template<int Color, int Inv>
+  struct Factor_SrcAlpha
+  {
+    CS_FORCEINLINE
+    int GetBlendFact() const 
+    { return Inv ? CS_MIXMODE_FACT_SRCALPHA_INV : CS_MIXMODE_FACT_SRCALPHA; }
+
+    CS_FORCEINLINE
+    Pixel Apply (const Pixel src, const Pixel dst)
     {
-      return GetScanlineProc (mixmode);
+      return ((Color == FactorColorSrc) ? src : dst) * (Inv ? ~src.a : src.a);
+    }
+  };
+
+  template<int Color, int Inv>
+  struct Factor_Dst
+  {
+    CS_FORCEINLINE
+    int GetBlendFact() const 
+    { return Inv ? CS_MIXMODE_FACT_DSTCOLOR_INV : CS_MIXMODE_FACT_DSTCOLOR; }
+
+    CS_FORCEINLINE
+    Pixel Apply (const Pixel src, const Pixel dst)
+    {
+      return ((Color == FactorColorSrc) ? src : dst) * (Inv ? ~dst : dst);
+    }
+  };
+
+  template<int Color, int Inv>
+  struct Factor_DstAlpha
+  {
+    CS_FORCEINLINE
+    int GetBlendFact() const 
+    { return Inv ? CS_MIXMODE_FACT_DSTALPHA_INV : CS_MIXMODE_FACT_DSTALPHA; }
+
+    CS_FORCEINLINE
+    Pixel Apply (const Pixel src, const Pixel dst)
+    {
+      return ((Color == FactorColorSrc) ? src : dst) * (Inv ? ~dst.a : dst.a);
     }
   };
 

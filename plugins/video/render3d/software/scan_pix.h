@@ -36,66 +36,45 @@ namespace cspluginSoft3d
     typedef Pix PixType;
 
   private:
+    template<int v>
     CS_FORCEINLINE
-    static PixType Shift (const uint8 x, const int v)
+    static PixType Shift (const uint x)
     {
-      return (v > 0) ? (x << v) : (x >> -v);
+      if (v > 0)
+        return x << ABS(v);
+      else
+        return x >> ABS(v);
     }
+    template<int v>
     CS_FORCEINLINE
-    static PixType Unshift (const PixType x, const int v)
+    static uint Unshift (const PixType x)
     {
-      return (v > 0) ? (x >> v) : (x << -v);
+      if (v > 0)
+        return x >> ABS(v);
+      else
+        return x << ABS(v);
     }
   public:
     Pix_Fix (const csPixelFormat& /*pfmt*/) {}
 
     CS_FORCEINLINE
-    void WritePix (PixType* dest, uint8 r, uint8 g, uint8 b, uint8 a)
+    void WritePix (PixType* dest, const Pixel p) const
     {
-      *dest = Shift (a & ma, sa)
-	| Shift (r & mr, sr)
-	| Shift (g & mg, sg)
-	| Shift (b & mb, sb);
+      *dest = Shift<sa> (p.a & ma)
+	| Shift<sr> (p.r & mr)
+	| Shift<sg> (p.g & mg)
+	| Shift<sb> (p.b & mb);
     }
 
-    CS_FORCEINLINE
-    void MultiplyDstAdd (PixType* dest, 
-      uint8 Mr, uint8 Mg, uint8 Mb, uint8 Ma,
-      uint8 ar, uint8 ag, uint8 ab, uint8 aa)
+    Pixel GetPix (PixType* dest) const
     {
-      // @@@ Bleh: optimize.
-      uint8 dr, dg, db, da;
-      GetPix (dest, dr, dg, db, da);
-      WritePix (dest, 
-	csClamp<uint> (((dr * (Mr+1)) >> 8) + ar, 255, 0),
-	csClamp<uint> (((dg * (Mg+1)) >> 8) + ag, 255, 0),
-	csClamp<uint> (((db * (Mb+1)) >> 8) + ab, 255, 0),
-	csClamp<uint> (((da * (Ma+1)) >> 8) + aa, 255, 0));
-    }
-
-    CS_FORCEINLINE
-    void MultiplyDstAdd (PixType* dest, 
-      uint8 M, uint8 ar, uint8 ag, uint8 ab, uint8 aa)
-    {
-      const uint v = M+1;
-      // @@@ Bleh: optimize.
-      uint8 dr, dg, db, da;
-      GetPix (dest, dr, dg, db, da);
-      WritePix (dest, 
-	csClamp<uint> (((dr * v) >> 8) + ar, 255, 0),
-	csClamp<uint> (((dg * v) >> 8) + ag, 255, 0),
-	csClamp<uint> (((db * v) >> 8) + ab, 255, 0),
-	csClamp<uint> (((da * v) >> 8) + aa, 255, 0));
-    }
-
-    CS_FORCEINLINE
-    void GetPix (PixType* dest, uint8& r, uint8& g, uint8& b, uint8& a) const
-    {
+      Pixel p;
       const PixType px = *dest;
-      r = Unshift (px, sr) & mr;
-      g = Unshift (px, sg) & mg;
-      b = Unshift (px, sb) & mb;
-      a = Unshift (px, sa) & ma;
+      p.r = Unshift<sr> (px) & mr;
+      p.g = Unshift<sg> (px) & mg;
+      p.b = Unshift<sb> (px) & mb;
+      p.a = Unshift<sa> (px) & ma;
+      return p;
     }
   };
 
@@ -152,52 +131,24 @@ namespace cspluginSoft3d
     }
 
     CS_FORCEINLINE
-    void WritePix (PixType* dest, uint8 r, uint8 g, uint8 b, uint8 a)
+    void WritePix (PixType* dest, const Pixel p) const
     {
-      *dest = ((a & aMask) << aShift) 
-	| ((r & rMask) << rShift) 
-	| ((g & gMask) << gShift) 
-	| ((b & bMask) >> bShift);
+      *dest = ((p.a & aMask) << aShift) 
+	| ((p.r & rMask) << rShift) 
+	| ((p.g & gMask) << gShift) 
+	| ((p.b & bMask) >> bShift);
     }
 
     CS_FORCEINLINE
-    void MultiplyDstAdd (PixType* dest, 
-      uint8 Mr, uint8 Mg, uint8 Mb, uint8 Ma,
-      uint8 ar, uint8 ag, uint8 ab, uint8 aa)
+    Pixel GetPix (PixType* dest) const
     {
-      // @@@ Bleh: optimize.
-      uint8 dr, dg, db, da;
-      GetPix (dest, dr, dg, db, da);
-      WritePix (dest, 
-	csClamp<uint> (((dr * (Mr+1)) >> 8) + ar, 255, 0),
-	csClamp<uint> (((dg * (Mg+1)) >> 8) + ag, 255, 0),
-	csClamp<uint> (((db * (Mb+1)) >> 8) + ab, 255, 0),
-	csClamp<uint> (((da * (Ma+1)) >> 8) + aa, 255, 0));
-    }
-
-    CS_FORCEINLINE
-    void MultiplyDstAdd (PixType* dest, 
-      uint8 M, uint8 ar, uint8 ag, uint8 ab, uint8 aa)
-    {
-      const uint v = M+1;
-      // @@@ Bleh: optimize.
-      uint8 dr, dg, db, da;
-      GetPix (dest, dr, dg, db, da);
-      WritePix (dest, 
-	csClamp<uint> (((dr * v) >> 8) + ar, 255, 0),
-	csClamp<uint> (((dg * v) >> 8) + ag, 255, 0),
-	csClamp<uint> (((db * v) >> 8) + ab, 255, 0),
-	csClamp<uint> (((da * v) >> 8) + aa, 255, 0));
-    }
-
-    CS_FORCEINLINE
-    void GetPix (PixType* dest, uint8& r, uint8& g, uint8& b, uint8& a) const
-    {
+      Pixel p;
       const PixType px = *dest;
-      a = (px >> aShift) & aMask;
-      r = (px >> rShift) & rMask;
-      g = (px >> gShift) & gMask;
-      b = (px << bShift) & bMask;
+      p.a = (px >> aShift) & aMask;
+      p.r = (px >> rShift) & rMask;
+      p.g = (px >> gShift) & gMask;
+      p.b = (px << bShift) & bMask;
+      return p;
     }
   };
 } // namespace cspluginSoft3d

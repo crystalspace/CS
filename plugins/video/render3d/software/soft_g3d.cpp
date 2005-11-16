@@ -97,11 +97,7 @@ bool csSoftwareGraphics3D::Open ()
 static const csOptionDescription config_options[] =
 {
   { 0, "ilace", "Interlacing", CSVAR_BOOL },
-  { 1, "light", "Texture lighting", CSVAR_BOOL },
-  { 2, "alpha", "Semi-transparent textures", CSVAR_BOOL },
-  { 3, "txtmap", "Texture mapping", CSVAR_BOOL },
-  { 4, "gouraud", "Gouraud shading", CSVAR_BOOL },
-  { 5, "smaller", "Smaller rendering", CSVAR_BOOL },
+  { 1, "smaller", "Smaller rendering", CSVAR_BOOL },
 };
 static const int numOptions = 
   sizeof (config_options) / sizeof (config_options[0]);
@@ -113,11 +109,7 @@ bool csSoftwareGraphics3D::SetOption (int id, csVariant* value)
   switch (id)
   {
     case 0: do_interlaced = value->GetBool () ? 0 : -1; break;
-    case 1: do_lighting = value->GetBool (); break;
-    case 2: do_alpha = value->GetBool (); break;
-    case 3: do_textured = value->GetBool (); break;
-    case 4: do_gouraud = value->GetBool (); break;
-    case 5: do_smaller_rendering = value->GetBool (); break;
+    case 1: do_smaller_rendering = value->GetBool (); break;
     default: return false;
   }
   return true;
@@ -128,11 +120,7 @@ bool csSoftwareGraphics3D::GetOption (int id, csVariant* value)
   switch (id)
   {
     case 0: value->SetBool (do_interlaced != -1); break;
-    case 1: value->SetBool (do_lighting); break;
-    case 2: value->SetBool (do_alpha); break;
-    case 3: value->SetBool (do_textured); break;
-    case 4: value->SetBool (do_gouraud); break;
-    case 5: value->SetBool (do_smaller_rendering); break;
+    case 1: value->SetBool (do_smaller_rendering); break;
     default: return false;
   }
   return true;

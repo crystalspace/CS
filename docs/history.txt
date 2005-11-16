@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Nov-2005
+	- res made the following changes:
+	    - Shuffled some code around in the software renderer, made some
+	      speedups here and there.
+	    - Removed a bit of unneeded code from xmlshader.
+	    - Tweaked VC7 projects Release mode optimization to use "Full"
+	      instead of "Custom" and all settings set explicitly.
+	    - Simplified csGLScreenShot::SetData().
+	    - Fixed CS_ASSERT to not cause "empty statement" warnings under
+	      some circumstances.
 15-Nov-2005
 	- Jorrit fixed a bug in HardTransform() of genmesh. It didn't
 	  transform the normals which would give bad results on lighting.

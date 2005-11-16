@@ -61,10 +61,8 @@ void csSoftwareTexture::ImageToBitmap (iImage *Image)
     uint32* dst = bitmap;
     while (pixNum-- > 0)
     {
-      *dst = p->blue
-	  | (p->green <<  8)
-	  | (p->red   << 16)
-	  | (p->alpha << 24);
+      Pixel px (p->blue, p->green, p->red, p->alpha);
+      *dst = px.ToUI32();
       dst++; p++;
     }
   }
@@ -74,10 +72,8 @@ void csSoftwareTexture::ImageToBitmap (iImage *Image)
     uint32* dst = bitmap;
     while (pixNum-- > 0)
     {
-      *dst = p->red
-	  | (p->green <<  8)
-	  | (p->blue  << 16)
-	  | (p->alpha << 24);
+      Pixel px (p->red, p->green, p->blue, p->alpha);
+      *dst = px.ToUI32();
       dst++; p++;
     }
   }
@@ -392,25 +388,6 @@ iTextureHandle* csSoftSuperLightmap::GetTexture ()
 
 //----------------------------------------------- csSoftwareTextureManager ---//
 
-static uint8 *GenLightmapTable (int bits)
-{
-  uint8 *table = new uint8 [64 * 256];
-  uint8 *dst = table;
-  uint8 maxv = (1 << bits) - 1;
-  int rshf = (13 - bits);
-  int i, j;
-  for (i = 0; i < 64; i++)
-  {
-    *dst++ = 0;
-    for (j = 1; j < 256; j++)
-    {
-      int x = (i * j) >> rshf;
-      *dst++ = (x > maxv) ? maxv : (x?x:1) ;
-    }
-  }
-  return table;
-}
-
 csSoftwareTextureManager::csSoftwareTextureManager (
   iObjectRegistry *object_reg,
   csSoftwareGraphics3DCommon *iG3D, iConfigFile *config)
@@ -423,21 +400,6 @@ csSoftwareTextureManager::csSoftwareTextureManager (
 void csSoftwareTextureManager::SetPixelFormat(csPixelFormat const& PixelFormat)
 {
   pfmt = PixelFormat;
-
-  // Create multiplication tables
-  lightmap_tables [0] = GenLightmapTable (pfmt.RedBits);
-
-  if (pfmt.GreenBits == pfmt.RedBits)
-    lightmap_tables [1] = lightmap_tables [0];
-  else
-    lightmap_tables [1] = GenLightmapTable (pfmt.GreenBits);
-
-  if (pfmt.BlueBits == pfmt.RedBits)
-    lightmap_tables [2] = lightmap_tables [0];
-  else if (pfmt.BlueBits == pfmt.GreenBits)
-    lightmap_tables [2] = lightmap_tables [1];
-  else
-    lightmap_tables [2] = GenLightmapTable (pfmt.BlueBits);
 }
 
 void csSoftwareTextureManager::read_config (iConfigFile *config)
@@ -451,12 +413,6 @@ void csSoftwareTextureManager::read_config (iConfigFile *config)
 
 csSoftwareTextureManager::~csSoftwareTextureManager ()
 {
-  delete [] lightmap_tables [0];
-  if (lightmap_tables [1] != lightmap_tables [0])
-    delete [] lightmap_tables [1];
-  if (lightmap_tables [2] != lightmap_tables [1]
-   && lightmap_tables [2] != lightmap_tables [0])
-    delete [] lightmap_tables [2];
   Clear ();
 }
 

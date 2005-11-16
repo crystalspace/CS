@@ -32,7 +32,7 @@ namespace cspluginSoftshader
     public scfImplementation1<ScanlineRendererBase, iScanlineRenderer>
   {
   public:
-    uint8 flat_r, flat_g, flat_b, flat_a;
+    Pixel flat_col;
     uint32* bitmap;
     int v_shift_r;
     int and_w;
@@ -41,16 +41,16 @@ namespace cspluginSoftshader
     int alphaShift;
 
     ScanlineRendererBase() : scfImplementationType (this),
-      flat_r(255), flat_g(255), flat_b(255), flat_a(255),
+      flat_col (255, 255, 255, 255),
       colorShift(16) {}
     virtual ~ScanlineRendererBase() {}
 
     void SetFlatColor (const csVector4& v)
     {
-      flat_r = csClamp ((int)(v.x * 255.99f), 255, 0);
-      flat_g = csClamp ((int)(v.y * 255.99f), 255, 0);
-      flat_b = csClamp ((int)(v.z * 255.99f), 255, 0);
-      flat_a = csClamp ((int)(v.w * 255.99f), 255, 0);
+      flat_col.r = csClamp ((int)(v.x * 255.99f), 255, 0);
+      flat_col.g = csClamp ((int)(v.y * 255.99f), 255, 0);
+      flat_col.b = csClamp ((int)(v.z * 255.99f), 255, 0);
+      flat_col.a = csClamp ((int)(v.w * 255.99f), 255, 0);
     }
     void SetShift (int c, int a) 
     { 

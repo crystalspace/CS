@@ -651,9 +651,9 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  undef  CS_DEBUG_BREAK
 #  define CS_DEBUG_BREAK
 #  undef  CS_ASSERT
-#  define CS_ASSERT(x)
+#  define CS_ASSERT(x)		(void)0
 #  undef  CS_ASSERT_MSG
-#  define CS_ASSERT_MSG(m,x)
+#  define CS_ASSERT_MSG(m,x)	(void)0
 #endif
 
 /**\def CS_DEBUG_BREAK

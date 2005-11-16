@@ -52,13 +52,12 @@
 #include "clip_znear.h"
 #include "clip_iclipper.h"
 #include "scan_pix.h"
+#include "tridraw.h"
 
 namespace cspluginSoft3d
 {
 
   using namespace CrystalSpace::SoftShader;
-
-int csSoftwareGraphics3DCommon::filter_bf = 1;
 
 ///---------------------------------------------------------------------------
 
@@ -72,17 +71,11 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent) :
   cliptype = CS_CLIPPER_NONE;
   do_near_plane = false;
 
-  do_lighting = true;
-  do_alpha = true;
-  do_textured = true;
   do_interlaced = -1;
-  ilace_fastmove = false;
-  bilinear_filter = 0;
   do_smaller_rendering = false;
   smaller_buffer = 0;
   pixel_shift = 0;
   rstate_mipmap = 0;
-  do_gouraud = true;
 
   z_buffer = 0;
   line_table = 0;
@@ -113,6 +106,7 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent) :
   scrapVerticesSize = 0;
 
   memset (processedColorsFlag, 0, sizeof (processedColorsFlag));
+  memset (triDraw, 0, sizeof (triDraw));
 }
 
 csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
@@ -232,33 +226,32 @@ bool csSoftwareGraphics3DCommon::Open ()
     if (((pfmt.BlueMask == 0x0000ff) || (pfmt.RedMask == 0x0000ff))
       && (pfmt.GreenMask == 0x00ff00)
       && ((pfmt.RedMask == 0xff0000) || (pfmt.BlueMask == 0xff0000)))
-      blendImpl = new BlendImpl<Pix_Fix<uint32, 24, 0xff,
-						16, 0xff,
-						8,  0xff,
-						0,  0xff> > (pfmt);
+      TriDrawMatrixFiller<Pix_Fix<uint32, 24, 0xff,
+					  16, 0xff,
+					  8,  0xff,
+					  0,  0xff> >::Fill (this, triDraw);
     else
-      blendImpl = new BlendImpl<Pix_Generic<uint32> > (pfmt);
+      TriDrawMatrixFiller<Pix_Generic<uint32> >::Fill (this, triDraw);
   }
   else
   {
     if (((pfmt.RedMask == 0xf800) || (pfmt.BlueMask == 0xf800))
       && (pfmt.GreenMask == 0x07e0)
       && ((pfmt.BlueMask == 0x001f) || (pfmt.RedMask == 0x001f)))
-      blendImpl = new BlendImpl<Pix_Fix<uint16, 0,  0,
-						8,  0xf8,
-						3,  0xfc,
-						-3, 0xf8> > (pfmt);
+      TriDrawMatrixFiller<Pix_Fix<uint16, 0,  0,
+					  8,  0xf8,
+					  3,  0xfc,
+					  -3, 0xf8> >::Fill (this, triDraw);
     else if (((pfmt.RedMask == 0x7c00) || (pfmt.BlueMask == 0x7c00))
       && (pfmt.GreenMask == 0x03e0)
       && ((pfmt.BlueMask == 0x001f) || (pfmt.RedMask == 0x001f)))
-      blendImpl = new BlendImpl<Pix_Fix<uint16, 0,  0,
-						7,  0xf8,
-						2,  0xf8,
-					        -3, 0xf8> > (pfmt);
+      TriDrawMatrixFiller<Pix_Fix<uint16, 0,  0,
+					  7,  0xf8,
+					  2,  0xf8,
+					  -3, 0xf8> >::Fill (this, triDraw);
     else
-      blendImpl = new BlendImpl<Pix_Generic<uint16> > (pfmt);
+      TriDrawMatrixFiller<Pix_Generic<uint16> >::Fill (this, triDraw);;
   }
-
 
   return true;
 }
@@ -269,11 +262,8 @@ bool csSoftwareGraphics3DCommon::NewOpen ()
   texman = new csSoftwareTextureManager (object_reg, this, config);
   texman->SetPixelFormat (pfmt);
 
-  ScanSetup ();
-
   //SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
 
-  polyrast.Init (pfmt, width, height, z_buffer, line_table);
   polyrast_ZFill.Init (pfmt, width, height, z_buffer, line_table);
 
   return true;
@@ -283,12 +273,7 @@ bool csSoftwareGraphics3DCommon::SharedOpen ()
 {
   pixel_shift = partner->pixel_shift;
   texman = partner->texman;
-  ScanSetup ();
   return true;
-}
-
-void csSoftwareGraphics3DCommon::ScanSetup ()
-{
 }
 
 void csSoftwareGraphics3DCommon::Close ()
@@ -311,7 +296,9 @@ void csSoftwareGraphics3DCommon::Close ()
   delete [] z_buffer; z_buffer = 0;
   delete [] smaller_buffer; smaller_buffer = 0;
   delete [] line_table; line_table = 0;
-  delete blendImpl; blendImpl = 0;
+  for (size_t n = CS_MIXMODE_FACT_COUNT*CS_MIXMODE_FACT_COUNT; n-- > 0; )
+    delete triDraw[n];
+  memset (triDraw, 0, sizeof (triDraw));
 
   G2D->Close ();
   width = height = -1;
@@ -863,254 +850,6 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   DrawMesh (&rmesh, rmesh, stacks);
 }
 
-class TriangleDrawer
-{
-  csSoftwareGraphics3DCommon& g3d;
-  VertexBuffer clipInBuf[maxBuffers];
-  size_t clipInStride[maxBuffers];
-  VertexBuffer clipOutBuf[maxBuffers];
-  iRenderBuffer** activebuffers;
-  BuffersMask buffersMask;
-  const csCoreRenderMesh* mesh;
-  const csRenderMeshModes& modes;
-  iScanlineRenderer::RenderInfo& scanRenderInfo;
-  size_t floatsPerVert;
-
-  static const int outFloatsPerBuf = 16;
-  float clipOut[maxBuffers * outFloatsPerBuf];
-  ClipMeatZNear clipZNear;
-  BuffersClipper<ClipMeatZNear> bclipperZNear;
-  csVector3 outPersp[4];
-
-  void ProjectVertices (size_t rangeStart, size_t rangeEnd)
-  {
-    size_t num_vertices = rangeEnd + 1;
-
-    csDirtyAccessArray<csVector3>& persp = g3d.persp;
-    persp.SetLength (num_vertices);
-    const int width2 = g3d.width2;
-    const int height2 = g3d.height2;
-    const float aspect = g3d.aspect;
-    csRenderBufferLock<csVector3, iRenderBuffer*> work_verts 
-      (activebuffers[VATTR_SPEC(POSITION)], CS_BUF_LOCK_READ);
-    // Perspective project.
-    for (size_t i = rangeStart; i <= rangeEnd; i++)
-    {
-      if (work_verts[i].z >= SMALL_Z)
-      {
-	persp[i].z = 1.0f / work_verts[i].z;
-	float iz = aspect * persp[i].z;
-	persp[i].x = work_verts[i].x * iz + width2;
-	persp[i].y = work_verts[i].y * iz + height2;
-      }
-      else
-	persp[i] = work_verts[i];
-    }
-  }
-  void BufInvZMulAndDenorm (size_t n)
-  {
-    csVector4* denormFact = scanRenderInfo.denormFactors;
-    for (size_t i = 0; i < maxBuffers; i++)
-    {
-      if (!(scanRenderInfo.desiredBuffers & (1 << i))) continue;
-      if (!(buffersMask & (1 << i))) 
-      {
-	if (scanRenderInfo.denormBuffers & (1 << i)) denormFact++;
-	continue;
-      }
-
-      csVector4* bufData = 
-	(csVector4*)clipOutBuf[i].data;
-      if (scanRenderInfo.denormBuffers & (1 << i))
-      {
-	for (size_t v = 0; v < n; v++)
-	{
-	  // Denormalize buffers
-	  const float iz = outPersp[v].z;
-	  bufData->Set (bufData->x * denormFact->x * iz,
-	    bufData->y * denormFact->y * iz,
-	    bufData->z * denormFact->z * iz,
-	    bufData->w * denormFact->w * iz);
-	  bufData++;
-	}
-	denormFact++;
-      }
-      else
-      {
-	for (size_t v = 0; v < n; v++)
-	{
-	  const float iz = outPersp[v].z;
-	  *bufData *= iz;
-	  bufData++;
-	}
-      }
-    }
-  }
-  void ClipAndDrawTriangle (const size_t* trivert)
-  {
-    //-----
-    // Do backface culling. Note that this depends on the
-    // mirroring of the current view.
-    //-----
-    const csVector2& pa = *(csVector2*)&outPersp[trivert[0]];
-    const csVector2& pb = *(csVector2*)&outPersp[trivert[1]];
-    const csVector2& pc = *(csVector2*)&outPersp[trivert[2]];
-    float area = csMath2::Area2 (pa, pb, pc);
-    if (!area) return;
-    if (mesh->do_mirror)
-    {
-      if (area <= -SMALL_EPSILON) return;
-    }
-    else
-    {
-      if (area >= SMALL_EPSILON) return;
-    }
-
-    // Clip triangle. Note that the clipper doesn't care about the
-    // orientation of the triangle vertices. It works just as well in
-    // mirrored mode.
-
-    /* You can only have as much clipped vertices as the sum of vertices in 
-     * the original poly and those in the clipping poly... I think. */
-    const size_t maxClipVertices = g3d.clipper->GetVertexCount() + 3;
-    ClipMeatiClipper meat;
-    meat.Init (g3d.clipper, maxClipVertices);
-    CS_ALLOC_STACK_ARRAY(float, out, 
-      floatsPerVert * maxClipVertices);
-    CS_ALLOC_STACK_ARRAY(csVector3, clippedPersp, maxClipVertices);
-    VertexBuffer clipOutBuf[maxBuffers];
-    const size_t* compNum = scanRenderInfo.bufferComps;
-    float* outPos = out;
-    for (size_t i = 0; i < maxBuffers; i++)
-    {
-      if (!(scanRenderInfo.desiredBuffers & (1 << i))) continue;
-
-      const size_t c = *compNum;
-      if (buffersMask & (1 << i))
-      {
-	clipOutBuf[i].data = (uint8*)outPos;
-	clipOutBuf[i].comp = c;
-	clipInStride[i] = this->clipOutBuf[i].comp * sizeof(float);
-      }
-      else
-      {
-	size_t n = maxClipVertices * c;
-	float* vtx = outPos + n - 1;
-	while (n-- > 0)
-	{
-	  const float iz = outPersp[n / c].z;
-	  *vtx-- = ((i == VATTR_SPEC(COLOR)) || ((i % c) == 3)) ? iz : 0.0f;
-	}
-      }
-      outPos += c * maxClipVertices;
-      compNum++;
-    }
-
-    BuffersClipper<ClipMeatiClipper> clip (meat);
-    clip.Init (outPersp, clippedPersp,
-      this->clipOutBuf, clipInStride, clipOutBuf, 
-      buffersMask & scanRenderInfo.desiredBuffers);
-    csTriangle tri;
-    if (mesh->do_mirror)
-    {
-      tri.a = (int)trivert[2];
-      tri.b = (int)trivert[1];
-      tri.c = (int)trivert[0];
-    }
-    else
-    {
-      tri.a = (int)trivert[0];
-      tri.b = (int)trivert[1];
-      tri.c = (int)trivert[2];
-    }
-    size_t rescount = clip.DoClip (tri);
-    if (rescount == 0) return;
-
-    SLLogic_ScanlineRenderer sll (scanRenderInfo,
-      clipOutBuf, buffersMask & scanRenderInfo.desiredBuffers,
-      floatsPerVert, g3d.blendImpl->GetBlendProc (modes.mixmode));
-    g3d.polyrast.DrawPolygon (rescount, clippedPersp, sll);
-  }
-
-public:
-  TriangleDrawer (csSoftwareGraphics3DCommon& g3d,
-    iRenderBuffer* activebuffers[], size_t rangeStart, 
-    size_t rangeEnd, const csCoreRenderMesh* mesh,
-    const csRenderMeshModes& modes, 
-    iScanlineRenderer::RenderInfo& scanRenderInfo) : g3d(g3d), 
-    activebuffers(activebuffers), mesh(mesh), modes(modes), 
-    scanRenderInfo(scanRenderInfo), bclipperZNear(clipZNear)
-  {
-    const size_t bufNum = csMin (activeBufferCount, maxBuffers);
-
-    floatsPerVert = 0;
-
-    buffersMask = 0;
-    const size_t* compNum = scanRenderInfo.bufferComps;
-    for (size_t b = 0; b < bufNum; b++)
-    {
-      if (scanRenderInfo.desiredBuffers & (1 << b))
-      {
-	floatsPerVert += *compNum;
-	compNum++;
-      }
-      if (activebuffers[b] == 0) continue;
-      buffersMask |= 1 << b;
-      if ((b != CS_SOFT3D_VA_BUFINDEX(POSITION)) 
-	&& !(scanRenderInfo.desiredBuffers & (1 << b))) continue;
-
-      iRenderBuffer* buf = activebuffers[b];
-      clipInBuf[b].data = (uint8*)buf->Lock (CS_BUF_LOCK_READ);
-      clipInBuf[b].comp = buf->GetComponentCount();
-      clipInStride[b] = buf->GetElementDistance();
-      clipOutBuf[b].data = (uint8*)&clipOut[b * outFloatsPerBuf];
-      clipOutBuf[b].comp = 4;
-    }
-
-    ProjectVertices (rangeStart, rangeEnd);
-
-    clipZNear.Init (g3d.width2, g3d.height2, g3d.aspect);
-    bclipperZNear.Init (g3d.persp.GetArray(), outPersp,
-      clipInBuf, clipInStride, clipOutBuf, 
-      (buffersMask & scanRenderInfo.desiredBuffers) 
-	| (CS_SOFT3D_BUFFERFLAG(POSITION)));
-  }
-
-  ~TriangleDrawer()
-  {
-    const size_t bufNum = csMin (activeBufferCount, maxBuffers);
-
-    for (size_t b = 0; b < bufNum; b++)
-    {
-      if (activebuffers[b] != 0) activebuffers[b]->Release();
-    }
-  }
-
-  void DrawTriangle (uint a, uint b, uint c)
-  {
-    csTriangle tri;
-    tri.a = a;
-    tri.b = b;
-    tri.c = c;
-    /* Small Z clipping. Also projects unprojected vertices (skipped in
-     * ProjectVertices() due a Z coord too small) and will invert the Z
-     * of the pespective verts. */
-    size_t n = bclipperZNear.DoClip (tri);
-    if (n == 0) return;
-    CS_ASSERT((n >= 3) && (n <= 4));
-
-    BufInvZMulAndDenorm (n);
-
-    static const size_t trivert1[3] = { 0, 1, 2 };
-    ClipAndDrawTriangle (trivert1);
-    if (n == 4)
-    {
-      static const size_t trivert2[3] = { 0, 2, 3 };
-      ClipAndDrawTriangle (trivert2);
-    }
-  }
-};
-
 static csZBufMode GetZModePass2 (csZBufMode mode)
 {
   switch (mode)
@@ -1206,7 +945,13 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   SoftwareTexture* softTex[activeTextureCount];
   for (size_t t = 0; t < activeTextureCount; t++)
     softTex[t] = activeSoftTex[t];
-  if (!scanlineRenderer->Init (softTex, usedModes, buffersMask, meowmix)) 
+  if (!scanlineRenderer->Init (softTex, usedModes, 
+    (CS_MIXMODE_BLENDOP_SRC(usedModes.mixmode) != CS_MIXMODE_FACT_ZERO)
+    || (CS_MIXMODE_BLENDOP_DST(usedModes.mixmode) == CS_MIXMODE_FACT_SRCCOLOR)
+    || (CS_MIXMODE_BLENDOP_DST(usedModes.mixmode) == CS_MIXMODE_FACT_SRCCOLOR_INV)
+    || (CS_MIXMODE_BLENDOP_DST(usedModes.mixmode) == CS_MIXMODE_FACT_SRCALPHA)
+    || (CS_MIXMODE_BLENDOP_DST(usedModes.mixmode) == CS_MIXMODE_FACT_SRCALPHA_INV),
+    buffersMask, meowmix)) 
     return; // Drat, meowmix can't deliver.
 
   iRenderBuffer* indexbuf = 
@@ -1289,72 +1034,15 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   if ((meshtype >= CS_MESHTYPE_TRIANGLES) 
     && (meshtype <= CS_MESHTYPE_TRIANGLEFAN))
   {
-    TriangleDrawer triDraw (*this, activebuffers, 
-      rangeStart, rangeEnd, mesh, usedModes, meowmix);
+    uint32* tri = indices + mesh->indexstart;
+    const uint32* triEnd = indices + mesh->indexend;
 
-    uint indexstart = mesh->indexstart;
-    uint indexend = mesh->indexend;
+    const uint triDrawIndex = 
+      CS_MIXMODE_BLENDOP_SRC(usedModes.mixmode)*CS_MIXMODE_FACT_COUNT
+      + CS_MIXMODE_BLENDOP_DST(usedModes.mixmode);
 
-    switch (meshtype)
-    {
-    case CS_MESHTYPE_TRIANGLES:
-      {
-	uint32* tri = indices + indexstart;
-	const uint32* triEnd = indices + indexend;
-	while (tri < triEnd)
-	{
-	  triDraw.DrawTriangle (tri[0], tri[1], tri[2]);
-	  tri += 3;
-	}
-      }
-      break;
-    case CS_MESHTYPE_TRIANGLESTRIP:
-      {
-	//triangulate
-	uint32* tri = indices + indexstart;
-	const uint32* triEnd = indices + indexend;
-	uint32 old2 = *tri++;
-	uint32 old1 = *tri++;
-	while (tri < triEnd)
-	{
-	  const uint32 cur = *tri++;
-	  triDraw.DrawTriangle (old2, old1, cur);
-	  old2 = old1;
-	  old1 = cur;
-	}
-	break;
-      }
-    case CS_MESHTYPE_TRIANGLEFAN:
-      {
-	//triangulate
-	uint32* tri = indices + indexstart;
-	const uint32* triEnd = indices + indexend;
-	uint32 first = *tri++;
-	uint32 old1 = *tri++;
-	while (tri < triEnd)
-	{
-	  const uint32 cur = *tri++;
-	  triDraw.DrawTriangle (first, old1, cur);
-	  old1 = cur;
-	}
-	break;
-      }
-    case CS_MESHTYPE_QUADS:
-      {
-	//triangulate
-	uint32* quad = indices + indexstart;
-	const uint32* quadEnd = indices + indexend;
-	while (quad < quadEnd)
-	{
-	  triDraw.DrawTriangle (quad[0], quad[1], quad[2]);
-	  triDraw.DrawTriangle (quad[0], quad[2], quad[3]);
-	  quad += 4;
-	}
-	break;
-      }
-    default:
-      ;
-    }
+    triDraw[triDrawIndex]->DrawMesh (activebuffers, rangeStart, rangeEnd, mesh, 
+      meowmix, meshtype, tri, triEnd);
   }
 }
 

@@ -273,6 +273,86 @@ namespace CrystalSpace
        * anything... */
       const ScanlineComp* GetFloat (size_t /*i*/) const { return 0; }
     };
+    
+    struct Pixel
+    {
+    #if !defined(__STRICT_ANSI__) && !defined(SWIG)
+      union
+      {
+	struct 
+	{
+    #endif
+	  uint8 r;
+	  uint8 g;
+	  uint8 b;
+	  uint8 a;
+    #if !defined(__STRICT_ANSI__) && !defined(SWIG)
+	};
+	uint32 ui32;
+      };
+    #endif
+      
+      Pixel () {}
+      Pixel (uint8 r, uint8 g, uint8 b, uint8 a) : 
+	r (r), g (g), b (b), a (a) {}
+      Pixel (uint32 ui) { FromUI32 (ui); }
+      
+      CS_FORCEINLINE
+      void FromUI32 (uint32 ui)
+      {
+      #if !defined(__STRICT_ANSI__) && !defined(SWIG)
+	ui32 = ui;
+      #else
+	r = ui & 0xff;
+	g = (ui >> 8) & 0xff;
+	b = (ui >> 16) & 0xff;
+	a = (ui >> 24);
+      #endif
+      }
+      CS_FORCEINLINE
+      uint32 ToUI32() const
+      {
+      #if !defined(__STRICT_ANSI__) && !defined(SWIG)
+	return ui32;
+      #else
+	return (a << 24) | (b << 16) | (g << 8) | r;
+      #endif
+      }
+      CS_FORCEINLINE
+      Pixel operator+ (const Pixel other)
+      {
+	// Get rid of csMin<>?
+	uint8 nr = csMin<uint> (r+other.r, 255);
+	uint8 ng = csMin<uint> (g+other.g, 255);
+	uint8 nb = csMin<uint> (b+other.b, 255);
+	uint8 na = csMin<uint> (a+other.a, 255);
+	return Pixel (nr, ng, nb, na);
+      }
+      CS_FORCEINLINE
+      Pixel operator~ () const
+      {
+	return Pixel (~ui32);
+      }
+      CS_FORCEINLINE
+      friend Pixel operator* (const Pixel p1, const Pixel p2)
+      {
+	uint8 nr = (p1.r*(p2.r+1)) >> 8;
+	uint8 ng = (p1.g*(p2.g+1)) >> 8;
+	uint8 nb = (p1.b*(p2.b+1)) >> 8;
+	uint8 na = (p1.a*(p2.a+1)) >> 8;
+	return Pixel (nr, ng, nb, na);
+      }
+      CS_FORCEINLINE
+      friend Pixel operator* (const Pixel p, const uint8 x)
+      {
+	const uint v = x+1;
+	uint8 nr = (p.r*v) >> 8;
+	uint8 ng = (p.g*v) >> 8;
+	uint8 nb = (p.b*v) >> 8;
+	uint8 na = (p.a*v) >> 8;
+	return Pixel (nr, ng, nb, na);
+      }
+    };
   } // namespace SoftShader
 } // namespace CrystalSpace
 

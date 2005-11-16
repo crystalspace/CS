@@ -38,8 +38,7 @@ namespace cspluginSoftshader
     Color_None (ScanlineRendererBase* /*This*/) {}
 
     CS_FORCEINLINE
-    void Apply (const ScanlineComp* /*color*/, 
-      uint8& /*r*/, uint8& /*g*/, uint8& /*b*/, uint8& /*a*/) {}
+    void Apply (const ScanlineComp* /*color*/, Pixel& /*col*/) {}
   };
 
   struct Color_Multiply
@@ -61,12 +60,12 @@ namespace cspluginSoftshader
 
     CS_FORCEINLINE
     void Apply (const ScanlineComp* color, 
-      uint8& r, uint8& g, uint8& b, uint8& a) 
+      Pixel& col) 
     {
-      r = ClampAndShift (r * color[0].c.GetFixed(), cshift);
-      g = ClampAndShift (g * color[1].c.GetFixed(), cshift);
-      b = ClampAndShift (b * color[2].c.GetFixed(), cshift);
-      a = ClampAndShift (a * color[3].c.GetFixed(), ashift);
+      col.r = ClampAndShift (col.r * color[0].c.GetFixed(), cshift);
+      col.g = ClampAndShift (col.g * color[1].c.GetFixed(), cshift);
+      col.b = ClampAndShift (col.b * color[2].c.GetFixed(), cshift);
+      col.a = ClampAndShift (col.a * color[3].c.GetFixed(), ashift);
     }
   };
 
@@ -88,16 +87,12 @@ namespace cspluginSoftshader
     }
 
     CS_FORCEINLINE
-    void GetColor (const ScanlineComp* tc, 
-      uint8& r, uint8& g, uint8& b, uint8& a)
+    void GetColor (const ScanlineComp* tc, Pixel& col)
     {
       int u = (int)(tc[0].c);
       int32 v = tc[1].c.GetFixed();
       uint32 texel = bitmap [((v >> v_shift_r) & and_h) + (u & and_w)];
-      r = texel & 0xff;
-      g = (texel >> 8) & 0xff;
-      b = (texel >> 16) & 0xff;
-      a = (texel >> 24);
+      col.FromUI32 (texel);
     }
   };
 
@@ -105,27 +100,15 @@ namespace cspluginSoftshader
   {
     static const size_t compCount = 0;
 
-    const uint8 flat_r;
-    const uint8 flat_g;
-    const uint8 flat_b;
-    const uint8 flat_a;
+    const Pixel flat_col;
 
     Source_Flat (ScanlineRendererBase* This) :
-      flat_r(This->flat_r),
-      flat_g(This->flat_g),
-      flat_b(This->flat_b),
-      flat_a(This->flat_a)
-    {
-    }
+      flat_col(This->flat_col) { }
 
     CS_FORCEINLINE
-    void GetColor (const ScanlineComp* /*tc*/, 
-      uint8& r, uint8& g, uint8& b, uint8& a)
+    void GetColor (const ScanlineComp* /*tc*/, Pixel& col)
     {
-      r = flat_r;
-      g = flat_g;
-      b = flat_b;
-      a = flat_a;
+      col = flat_col;
     }
   };
 
@@ -136,7 +119,7 @@ namespace cspluginSoftshader
 
   private:
     template <typename Source, typename Color, 
-      typename Zmode>
+      typename Zmode, int needColors>
     struct ScanlineImpl
     {
       static void Scan (iScanlineRenderer* _This,
@@ -162,14 +145,20 @@ namespace cspluginSoftshader
 	{
 	  if (Z.Test())
 	  {
-	    uint8 r, g, b, a;
-	    colSrc.GetColor (ipol.GetFloat (offsetTC), r, g, b, a);
-	    col.Apply (ipol.GetFloat (offsetColor), r, g, b, a);
+	    if (needColors)
+	    {
+	      Pixel px;
+	      colSrc.GetColor (ipol.GetFloat (offsetTC), px);
+	      col.Apply (ipol.GetFloat (offsetColor), px);
 
-	    *dest = ((a & 0xfe) << 23) | 0x80000000
-	      | (r << 16)
-	      | (g << 8)
-	      | b;
+	      px.a = (px.a >> 1) | 0x80;
+	      *dest = px.ToUI32();
+	    }
+	    else
+	    {
+	      const Pixel px (0, 0, 0, 0x80);
+	      *dest = px.ToUI32();
+	    }
 	    
 	    Z.Update();
 	  }
@@ -181,48 +170,60 @@ namespace cspluginSoftshader
 	} /* endwhile */
       }
     };
+    template<typename Source, typename Color, typename Zmode>
+    static iScanlineRenderer::ScanlineProc GetScanlineProcSCC (bool needColors)
+    {
+      if (needColors)
+	return ScanlineImpl<Source, Color, Zmode, 1>::Scan;
+      else
+	return ScanlineImpl<Source, Color, Zmode, 0>::Scan;
+    }
     template<typename Source, typename Color>
-    static iScanlineRenderer::ScanlineProc GetScanlineProcSC/*MM*/ (csZBufMode zmode)
+    static iScanlineRenderer::ScanlineProc GetScanlineProcSC (csZBufMode zmode,
+							      bool needColors)
     {
       switch (zmode)
       {
 	case CS_ZBUF_NONE:
-	  return ScanlineImpl<Source, Color, ZBufMode_ZNone>::Scan;
+  	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZNone> (needColors);
 	case CS_ZBUF_FILL:
-	  return ScanlineImpl<Source, Color, ZBufMode_ZFill>::Scan;
+	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZFill> (needColors);
 	case CS_ZBUF_TEST:
-	  return ScanlineImpl<Source, Color, ZBufMode_ZTest>::Scan;
+	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZTest> (needColors);
 	case CS_ZBUF_USE:
-	  return ScanlineImpl<Source, Color, ZBufMode_ZUse>::Scan;
+	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZUse> (needColors);
 	case CS_ZBUF_EQUAL:
-	  return ScanlineImpl<Source, Color, ZBufMode_ZEqual>::Scan;
+	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZEqual> (needColors);
 	case CS_ZBUF_INVERT:
-	  return ScanlineImpl<Source, Color, ZBufMode_ZInvert>::Scan;
+	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZInvert> (needColors);
 	default:
 	  return 0;
       }
     }
     template<typename Source>
     static iScanlineRenderer::ScanlineProc GetScanlineProcS (bool colorized, 
-							     csZBufMode zmode)
+							     csZBufMode zmode,
+							     bool needColors)
     {
       if (colorized)
-	return GetScanlineProcSC<Source, Color_Multiply> (zmode);
+	return GetScanlineProcSC<Source, Color_Multiply> (zmode, needColors);
       else
-	return GetScanlineProcSC<Source, Color_None> (zmode);
+	return GetScanlineProcSC<Source, Color_None> (zmode, needColors);
     }
     static iScanlineRenderer::ScanlineProc GetScanlineProc (bool flat,
 							    bool colorized, 
-							    csZBufMode zmode)
+							    csZBufMode zmode,
+							    bool needColors)
     {
       if (flat)
-	return GetScanlineProcS<Source_Flat> (colorized, zmode);
+	return GetScanlineProcS<Source_Flat> (colorized, zmode, needColors);
       else
-	return GetScanlineProcS<Source_Texture> (colorized, zmode);
+	return GetScanlineProcS<Source_Texture> (colorized, zmode, needColors);
     }
   public:
     bool Init (SoftwareTexture** textures,
       const csRenderMeshModes& modes,
+      bool needColors,
       BuffersMask availableBuffers,
       iScanlineRenderer::RenderInfo& renderInfo)
     {
@@ -260,7 +261,8 @@ namespace cspluginSoftshader
       else
 	renderInfo.bufferComps = &myBufferComps[1];
 
-      renderInfo.proc = GetScanlineProc (doFlat, doColor, modes.z_buf_mode);
+      renderInfo.proc = GetScanlineProc (doFlat, doColor, modes.z_buf_mode,
+	needColors);
 
       return renderInfo.proc != 0;
     }

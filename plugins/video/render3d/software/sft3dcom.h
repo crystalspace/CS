@@ -55,11 +55,18 @@ namespace cspluginSoft3d
 #define VATTR_GEN(x)							      \
   ((CS_VATTRIB_ ## x - CS_VATTRIB_GENERIC_FIRST) + CS_VATTRIB_SPECIFIC_LAST + 1)
 
-class TriangleDrawer;
-
 static const size_t activeBufferCount = CS_VATTRIB_SPECIFIC_LAST - 
   CS_VATTRIB_SPECIFIC_FIRST + 1;
 static const size_t activeTextureCount = 4;
+
+struct iTriangleDrawer
+{
+  virtual ~iTriangleDrawer() {}
+  virtual void DrawMesh (iRenderBuffer* activebuffers[], 
+    size_t rangeStart, size_t rangeEnd, 
+    const csCoreRenderMesh* mesh, iScanlineRenderer::RenderInfo& scanRenderInfo,
+    const csRenderMeshType meshtype, uint32* tri, const uint32* triEnd) = 0;
+};
 
 /**
  * The basic software renderer class.
@@ -72,7 +79,9 @@ class csSoftwareGraphics3DCommon :
 {
 protected:
   //friend class csSoftHalo;
+  template<typename Pix, typename SrcBlend, typename DstBlend> 
   friend class TriangleDrawer;
+  friend class TriangleDrawerCommon;
   friend class csSoftwareTexture;
 
   /// Driver this driver is sharing info with (if any)
@@ -208,43 +217,18 @@ public:
 
   /// The texture manager.
   csSoftwareTextureManager* texman;
-  /// The vertex buffer manager.
-  //csPolArrayVertexBufferManager* vbufmgr;
-
-  /// The texture cache.
-  //csSoftwareTextureCache *tcache;
 
   /// The System interface.
   iObjectRegistry* object_reg;
 
-  /// Option variable: do texture lighting?
-  bool do_lighting;
-  /// Option variable: render alpha-transparent textures?
-  bool do_alpha;
-  /// Option variable: render textures?
-  bool do_textured;
-  /// Option variable: do very expensive bilinear filtering? (0/1/2)
-  unsigned char bilinear_filter;
-  /// Do we want Gouraud Shaded polygons?
-  bool do_gouraud;
-
   /// Do interlacing? (-1 - no, 0/1 - yes)
   int do_interlaced;
-  /**
-   * For interlacing.  Temporary set to true if we moved quickly.  This will
-   * decrease the bluriness a little.
-   */
-  bool ilace_fastmove;
 
   /// Render capabilities
   csGraphics3DCaps Caps;
 
-  // An experimental filter feature.
-  static int filter_bf;
-
-  PolygonRasterizer<SLLogic_ScanlineRenderer> polyrast;
   PolygonRasterizer<SLLogic_ZFill> polyrast_ZFill;
-  BlendBase* blendImpl;
+  iTriangleDrawer* triDraw[CS_MIXMODE_FACT_COUNT*CS_MIXMODE_FACT_COUNT];
 
   /// Setup scanline drawing routines according to current bpp and setup flags
   csSoftwareGraphics3DCommon (iBase* parent);
@@ -279,8 +263,6 @@ public:
    */
   bool SharedOpen ();
 
-  /// Scan setup.
-  void ScanSetup ();
   /// Close.
   virtual void Close ();
 
