@@ -68,7 +68,7 @@ make_queryform(Widget parent,	    /* into whom widget should be placed */
 
     form = XtVaCreateManagedWidget ("form", formWidgetClass, parent, 
 				    XtNtitle, button,
-				    0);
+				    NULL);
 
     text = XtVaCreateManagedWidget
 	("message", asciiTextWidgetClass, form,
@@ -79,12 +79,12 @@ make_queryform(Widget parent,	    /* into whom widget should be placed */
 	 XtNdisplayCaret, False,
 	 XtNlength, strlen (msgstr),
 	 XtNstring, msgstr,
-	 0);
+	 NULL);
     /*
      * Did the user specify our geometry?
      * If so, don't bother computing it ourselves, since we will be overridden.
      */
-    XtVaGetValues(parent, XtNgeometry, &shell_geom, 0);
+    XtVaGetValues(parent, XtNgeometry, &shell_geom, NULL);
     geom_flags = XParseGeometry(shell_geom, &x, &y, &shell_w, &shell_h);
     if (!(geom_flags & WidthValue && geom_flags & HeightValue))
     {
@@ -105,8 +105,8 @@ make_queryform(Widget parent,	    /* into whom widget should be placed */
 				 XtNlabel, msgstr,
 				 XtNinternalWidth, (left+right+1)/2,
 				 XtNinternalHeight, (top+bottom+1)/2,
-				 0);
-	XtVaGetValues(label, XtNwidth, &width, XtNheight, &height, 0);
+				 NULL);
+	XtVaGetValues(label, XtNwidth, &width, XtNheight, &height, NULL);
 	XtDestroyWidget(label);
 	max_width = .7 * WidthOfScreen(XtScreen(text));
 	max_height = .7 * HeightOfScreen(XtScreen(text));
@@ -116,9 +116,9 @@ make_queryform(Widget parent,	    /* into whom widget should be placed */
 	    /* add in the height of any horizontal scroll bar */
 	    scroll = XtVaCreateWidget("hScrollbar", scrollbarWidgetClass, text,
 				      XtNorientation, XtorientHorizontal,
-				      0);
+				      NULL);
 	    XtVaGetValues(scroll, XtNheight, &scroll_size,
-			  XtNborderWidth, &border_width, 0);
+			  XtNborderWidth, &border_width, NULL);
 	    XtDestroyWidget(scroll);
 	    height_addons = scroll_size + border_width;
 	}
@@ -141,14 +141,14 @@ make_queryform(Widget parent,	    /* into whom widget should be placed */
 	    height = max_height;
 	    /* add in the width of any vertical scroll bar */
 	    scroll = XtVaCreateWidget("vScrollbar", scrollbarWidgetClass, text,
-				      XtNorientation, XtorientVertical, 0);
+				      XtNorientation, XtorientVertical, NULL);
 	    XtVaGetValues(scroll, XtNwidth, &scroll_size,
-			  XtNborderWidth, &border_width, 0);
+			  XtNborderWidth, &border_width, NULL);
 	    XtDestroyWidget(scroll);
 	    width += scroll_size + border_width;
 	}
 	height += height_addons;
-	XtVaSetValues(text, XtNwidth, width, XtNheight, height, 0);
+	XtVaSetValues(text, XtNwidth, width, XtNheight, height, NULL);
     }
     /*
      * Create the buttons
@@ -168,8 +168,8 @@ make_queryform(Widget parent,	    /* into whom widget should be placed */
     XtAddCallback (prev, XtNcallback, handle_button, 0);
     Dimension border;
 
-    XtVaGetValues(prev, XtNborderWidth, &border, 0);
+    XtVaGetValues(prev, XtNborderWidth, &border, NULL);
     border *= 2;
-    XtVaSetValues(prev, XtNborderWidth, border, 0);
+    XtVaSetValues(prev, XtNborderWidth, border, NULL);
     return form;
 }

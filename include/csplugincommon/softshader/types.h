@@ -331,7 +331,11 @@ namespace CrystalSpace
       CS_FORCEINLINE
       Pixel operator~ () const
       {
+      #if !defined(__STRICT_ANSI__) && !defined(SWIG)
 	return Pixel (~ui32);
+      #else
+        return Pixel (~r, ~g, ~b, ~a);
+      #endif
       }
       CS_FORCEINLINE
       friend Pixel operator* (const Pixel p1, const Pixel p2)

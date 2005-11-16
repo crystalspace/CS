@@ -344,6 +344,7 @@ float csLight::GetLuminanceAtSquaredDistance (float sqdist) const
   float bright;
   switch (attenuation)
   {
+    default:
     case CS_ATTN_NONE:
       bright = 1;
       break;
