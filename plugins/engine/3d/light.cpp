@@ -365,6 +365,9 @@ float csLight::GetLuminanceAtSquaredDistance (float sqdist) const
     case CS_ATTN_CLQ:
       bright = (attenuationConstants * csVector3 (1, sqrt (sqdist), sqdist));
       break;
+    default:
+      bright = 0.0;
+      break;
   }
   float lum = color.red * 0.3 + color.green * 0.59 + color.blue * 0.11;
   return bright * lum;

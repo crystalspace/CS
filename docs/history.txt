@@ -16,6 +16,7 @@ chronological order.
 	    - Simplified csGLScreenShot::SetData().
 	    - Fixed CS_ASSERT to not cause "empty statement" warnings under
 	      some circumstances.
+	- Jorrit fixed a small warning.
 15-Nov-2005
 	- Jorrit fixed a bug in HardTransform() of genmesh. It didn't
 	  transform the normals which would give bad results on lighting.
