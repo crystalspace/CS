@@ -35,7 +35,7 @@ partition your map into sectors:
 Creating multiple sectors complicates map design a bit since you have to
 think about placing portals between the sectors. On the other hand it can
 ease map design since you can delegate map creation by assigning different
-portions of amap to other designers.
+portions of a map to other designers.
 
 @item
 It is easier to implement dynamic loading when you use more sectors since you
@@ -57,8 +57,8 @@ benefit in portal culling and dynamic loading with large open spaces.  So, in
 general, it is probably best to use a single sector for an outdoor world.
 
 @item
-The insides of buildings are best represented using seperate sectors. This
-makes it possible to design them seperately and it is also very good for
+The insides of buildings are best represented using distinct sectors. This
+makes it possible to design them separately and it is also very good for
 the visibility culler. Doorways and windows make excellent portals.
 
 @item
@@ -135,7 +135,7 @@ at rendering large objects; more on this later).
 There is a special optimization that follows from the previous two items.
 If you have a number of smaller objects that are themselves not very good
 occluders, but together they are very good (for example, a wall made
-out of seperate segments) then it would be best to disable occlusion writing
+out of separate segments) then it would be best to disable occlusion writing
 for the individual wall segments and add a new null object with a single
 occlusion mesh that represents the entire wall.
 
@@ -308,7 +308,7 @@ One important note when using @samp{thing} meshes: it is @emph{very} important
 to try to use quads instead of triangles. This is because lightmaps are
 rectangular. If you have a wall made out of two triangles then you will have
 two full square lightmaps (one for every triangle) which is a waste given
-that half of these lightmaps will be unusued. If you use a single quad
+that half of these lightmaps will be unused. If you use a single quad
 polygon for the wall then only one lightmap will be used. Lightmaps can be
 big so this really can make a huge difference on performance.
 

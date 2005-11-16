@@ -858,8 +858,8 @@ It is important to note that there is an important difference between normal
 hierarchical meshes and static @sc{lod} meshes with regards to the visibility
 culler.  Both are implemented using hierarchical meshes but, in case of a
 normal hierarchical mesh, all children are registered with the visibility
-culler as seperate meshes.  This means that every mesh in a hierarchical mesh
-is considered a seperate entity for the visibility culler, and is also tested
+culler as separate meshes.  This means that every mesh in a hierarchical mesh
+is considered a separate entity for the visibility culler, and is also tested
 for visibility on its own (so a child of a hierarchical mesh can be visible
 even if the parent is not visible).  For a static @sc{lod} mesh the situation
 is completely different.  In that case, the children are not registered with
