@@ -121,10 +121,8 @@ void csGLRender2TextureFramebuf::FinishDraw ()
     tex_mm->Precache ();
     // Texture is in tha cache, update texture directly.
     G3D->ActivateTexture (tex_mm);
-    /*
-      Texture has a keycolor - so we need to deal specially with it
-      to make sure the keycolor gets transparent.
-      */
+    /* Texture has a keycolor - so we need to deal specially with it
+     * to make sure the keycolor gets transparent. */
     if (tex_mm->GetKeyColor ())
     {
       // @@@ Processing sucks, but how else to handle keycolor?
@@ -143,6 +141,10 @@ void csGLRender2TextureFramebuf::FinishDraw ()
       GLenum textarget = tex_mm->GetGLTextureTarget();
       if ((textarget != GL_TEXTURE_2D) && (textarget != GL_TEXTURE_RECTANGLE_ARB))
         return;
+      /* Reportedly, some drivers crash if using CopyTexImage on a texture
+       * size larger than the framebuffer. Use CopyTexSubImage then. */
+      bool needSubImage = (txt_w > G3D->GetWidth()) 
+	|| (txt_h > G3D->GetHeight());
       // Texture was not used as a render target before.
       // Make some necessary adjustments.
       if (!tex_mm->IsWasRenderTarget())
@@ -150,8 +152,19 @@ void csGLRender2TextureFramebuf::FinishDraw ()
 	tex_mm->SetupAutoMipping();
 	tex_mm->SetWasRenderTarget (true);
 	tex_mm->texFormat = iTextureHandle::RGBA8888;
+	if (needSubImage)
+	{
+	  // Gah. Turn target texture to RGBA storage.
+	  uint8* blub = new uint8[txt_w * txt_h * 4];
+	  glTexImage2D (textarget, 0, GL_RGBA, txt_w, txt_h, 
+	    0, GL_RGBA, GL_UNSIGNED_BYTE, blub);
+	  delete[] blub;
+	}
       }
-      glCopyTexImage2D (textarget, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
+      if (needSubImage)
+	glCopyTexSubImage2D (textarget, 0, 0, 0, 0, 0, txt_w, txt_h);
+      else
+	glCopyTexImage2D (textarget, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
       tex_mm->SetNeedMips (true);
     }
   }

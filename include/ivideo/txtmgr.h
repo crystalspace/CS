@@ -93,6 +93,28 @@ struct iMaterial;
  *  NPOTS or not by checking if this flag is set on it).
  */
 #define CS_TEXTURE_NPOTS		0x00000040
+/**
+ * Texture resizing control flag.
+ * If a texture needs to be resized to power-of-two dimensions (either because
+ * non-power-of-two textures are not supported or just not requested), specify
+ * that powers of two larger than or equal to the original dimensions should
+ * be selected.
+ * \sa #CS_TEXTURE_SCALE_DOWN
+ * \remarks If none or both texture scale flags are specified, the renderer
+ *   will decide whether a dimension is scaled up or down.
+ */
+#define CS_TEXTURE_SCALE_UP		0x00000080
+/**
+ * Texture resizing control flag.
+ * If a texture needs to be resized to power-of-two dimensions (either because
+ * non-power-of-two textures are not supported or just not requested), specify
+ * that powers of two smaller than or equal to the original dimensions should
+ * be selected.
+ * \sa #CS_TEXTURE_SCALE_UP
+ * \remarks If none or both texture scale flags are specified, the renderer
+ *   will decide whether a dimension is scaled up or down.
+ */
+#define CS_TEXTURE_SCALE_DOWN		0x00000100
 /** @} */
 
 SCF_VERSION (iRendererLightmap, 1, 1, 0);

@@ -34,7 +34,7 @@
 
 
 csTextureHandle::csTextureHandle (csTextureManager* texman, int Flags)
-  : scfImplementationType (this), texman (texman)
+  : scfImplementationType (this), texman (texman), alphaType (alphaNone)
 {
   flags = Flags & ~CS_TEXTURE_NPOTS;
 
@@ -83,16 +83,25 @@ void csTextureHandle::AdjustSizePo2 (int width, int height, int depth,
   CalculateNextBestPo2Size (flags, depth, newdepth);
 }
 
-void csTextureHandle::CalculateNextBestPo2Size (int /*texFlags*/, 
+void csTextureHandle::CalculateNextBestPo2Size (int texFlags, 
 						const int orgDim, int& newDim)
 {
+  const int sizeFlags = CS_TEXTURE_SCALE_UP | CS_TEXTURE_SCALE_DOWN;
+  
   newDim = csFindNearestPowerOf2 (orgDim);
   if (newDim != orgDim)
   {
-    int dU = newDim - orgDim;
-    int dD = orgDim - (newDim >> 1);
-    if (dD < dU)
+    if ((texFlags & sizeFlags) == CS_TEXTURE_SCALE_UP)
+      /* newDim is fine */;
+    else if ((texFlags & sizeFlags) == CS_TEXTURE_SCALE_DOWN)
       newDim >>= 1;
+    else
+    {
+      int dU = newDim - orgDim;
+      int dD = orgDim - (newDim >> 1);
+      if (dD < dU)
+	newDim >>= 1;
+    }
   }
 }
 
