@@ -52,6 +52,7 @@
 #include "cstool/sndwrap.h"
 #include "cstool/sprbuild.h"
 #include "cstool/userrndbuf.h"
+#include "cstool/vertexcompress.h"
 #include "cstool/vfsdirchange.h"
 #endif /* __CSTOOL_H__ */
 
