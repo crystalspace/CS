@@ -18,18 +18,17 @@
 
 #include "cssysdef.h"
 #include "soft_txt.h"
-#include "csgfx/inv_cmap.h"
+#include "csgfx/bakekeycolor.h"
+#include "csgfx/imagemanipulate.h"
+#include "csgfx/memimage.h"
 #include "csgfx/packrgb.h"
-#include "csgfx/quantize.h"
+#include "csgfx/xorpat.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "igraphic/image.h"
 #include "ivaria/reporter.h"
 #include "csqint.h"
-#include "csgfx/imagemanipulate.h"
-#include "csgfx/memimage.h"
-#include "csgfx/xorpat.h"
 #include "soft_g3d.h"
 
 namespace cspluginSoft3d
@@ -45,19 +44,25 @@ void csSoftwareTexture::compute_masks ()
 
 void csSoftwareTexture::ImageToBitmap (iImage *Image)
 {
+  csRef<iImage> img;
+  if (parent->GetKeyColor ())
+    img = csBakeKeyColor::Image (Image, parent->transp_color);
+  else
+    img = Image;
+
   size_t pixNum = w * h;
   bitmap = new uint32[pixNum];
 #ifdef CS_LITTLE_ENDIAN
   if (csPackRGBA::IsRGBpixelSane() 
     && !parent->texman->G3D->pixelBGR)
   {
-    memcpy (bitmap, Image->GetImageData(), pixNum * sizeof (uint32));
+    memcpy (bitmap, img->GetImageData(), pixNum * sizeof (uint32));
   }
   else
 #endif
   if (parent->texman->G3D->pixelBGR)
   {
-    csRGBpixel* p = (csRGBpixel*)Image->GetImageData();
+    csRGBpixel* p = (csRGBpixel*)img->GetImageData();
     uint32* dst = bitmap;
     while (pixNum-- > 0)
     {
@@ -68,7 +73,7 @@ void csSoftwareTexture::ImageToBitmap (iImage *Image)
   }
   else
   {
-    csRGBpixel* p = (csRGBpixel*)Image->GetImageData();
+    csRGBpixel* p = (csRGBpixel*)img->GetImageData();
     uint32* dst = bitmap;
     while (pixNum-- > 0)
     {
@@ -97,12 +102,17 @@ csSoftwareTextureHandle::csSoftwareTextureHandle (
   prepared = false;
   memset (tex, 0, sizeof (tex));
 
-  if (image.IsValid() && image->HasKeyColor ())
+  if (image.IsValid() && image->GetFormat () & CS_IMGFMT_ALPHA)
+    alphaType = csAlphaMode::alphaSmooth;
+  else if (image.IsValid() && image->HasKeyColor ())
   {
+    alphaType = csAlphaMode::alphaBinary;
     int r,g,b;
     image->GetKeyColor (r,g,b);
     SetKeyColor (r, g, b);
   }
+  else
+    alphaType = csAlphaMode::alphaNone;
 }
 
 csSoftwareTextureHandle::~csSoftwareTextureHandle ()

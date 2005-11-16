@@ -52,6 +52,10 @@ csTextureHandle::~csTextureHandle ()
 void csTextureHandle::SetKeyColor (bool Enable)
 {
   transp = Enable;
+  if (Enable && alphaType == csAlphaMode::alphaNone)
+    alphaType = csAlphaMode::alphaBinary;
+  else if (!Enable && alphaType == csAlphaMode::alphaBinary)
+    alphaType = csAlphaMode::alphaNone;
 }
 
 // This function must be called BEFORE calling TextureManager::Update().
@@ -61,6 +65,8 @@ void csTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
   transp_color.green = green;
   transp_color.blue = blue;
   transp = true;
+  if (alphaType == csAlphaMode::alphaNone)
+    alphaType = csAlphaMode::alphaBinary;
 }
 
 /// Get the transparent color

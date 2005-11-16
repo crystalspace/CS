@@ -119,7 +119,7 @@ namespace cspluginSoftshader
 
   private:
     template <typename Source, typename Color, 
-      typename Zmode, int needColors>
+      typename Zmode, int needColors, int doAlphaTest>
     struct ScanlineImpl
     {
       static void Scan (iScanlineRenderer* _This,
@@ -145,13 +145,16 @@ namespace cspluginSoftshader
 	{
 	  if (Z.Test())
 	  {
-	    if (needColors)
+	    if (needColors || doAlphaTest)
 	    {
 	      Pixel px;
 	      colSrc.GetColor (ipol.GetFloat (offsetTC), px);
-	      col.Apply (ipol.GetFloat (offsetColor), px);
+	      if (needColors) col.Apply (ipol.GetFloat (offsetColor), px);
 
-	      px.c.a = (px.c.a >> 1) | 0x80;
+	      if (doAlphaTest)
+		px.c.a = (px.c.a >> 1) | (px.c.a & 0x80);
+	      else
+		px.c.a = (px.c.a >> 1) | 0x80;
 	      *dest = px.ui32;
 	    }
 	    else
@@ -170,32 +173,42 @@ namespace cspluginSoftshader
 	} /* endwhile */
       }
     };
+    template<typename Source, typename Color, typename Zmode, int needColors>
+    static iScanlineRenderer::ScanlineProc GetScanlineProcSCCnC (bool doAlphaTest)
+    {
+      if (doAlphaTest)
+	return ScanlineImpl<Source, Color, Zmode, needColors, 1>::Scan;
+      else
+	return ScanlineImpl<Source, Color, Zmode, needColors, 0>::Scan;
+    }
     template<typename Source, typename Color, typename Zmode>
-    static iScanlineRenderer::ScanlineProc GetScanlineProcSCC (bool needColors)
+    static iScanlineRenderer::ScanlineProc GetScanlineProcSCC (bool needColors,
+							       bool doAlphaTest)
     {
       if (needColors)
-	return ScanlineImpl<Source, Color, Zmode, 1>::Scan;
+	return GetScanlineProcSCCnC<Source, Color, Zmode, 1> (doAlphaTest);
       else
-	return ScanlineImpl<Source, Color, Zmode, 0>::Scan;
+	return GetScanlineProcSCCnC<Source, Color, Zmode, 0> (doAlphaTest);
     }
     template<typename Source, typename Color>
     static iScanlineRenderer::ScanlineProc GetScanlineProcSC (csZBufMode zmode,
-							      bool needColors)
+							      bool needColors,
+							      bool doAlphaTest)
     {
       switch (zmode)
       {
 	case CS_ZBUF_NONE:
-  	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZNone> (needColors);
+  	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZNone> (needColors, doAlphaTest);
 	case CS_ZBUF_FILL:
-	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZFill> (needColors);
+	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZFill> (needColors, doAlphaTest);
 	case CS_ZBUF_TEST:
-	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZTest> (needColors);
+	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZTest> (needColors, doAlphaTest);
 	case CS_ZBUF_USE:
-	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZUse> (needColors);
+	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZUse> (needColors, doAlphaTest);
 	case CS_ZBUF_EQUAL:
-	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZEqual> (needColors);
+	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZEqual> (needColors, doAlphaTest);
 	case CS_ZBUF_INVERT:
-	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZInvert> (needColors);
+	  return GetScanlineProcSCC<Source, Color, ZBufMode_ZInvert> (needColors, doAlphaTest);
 	default:
 	  return 0;
       }
@@ -203,22 +216,24 @@ namespace cspluginSoftshader
     template<typename Source>
     static iScanlineRenderer::ScanlineProc GetScanlineProcS (bool colorized, 
 							     csZBufMode zmode,
-							     bool needColors)
+							     bool needColors,
+							     bool doAlphaTest)
     {
       if (colorized)
-	return GetScanlineProcSC<Source, Color_Multiply> (zmode, needColors);
+	return GetScanlineProcSC<Source, Color_Multiply> (zmode, needColors, doAlphaTest);
       else
-	return GetScanlineProcSC<Source, Color_None> (zmode, needColors);
+	return GetScanlineProcSC<Source, Color_None> (zmode, needColors, doAlphaTest);
     }
     static iScanlineRenderer::ScanlineProc GetScanlineProc (bool flat,
 							    bool colorized, 
 							    csZBufMode zmode,
-							    bool needColors)
+							    bool needColors,
+							    bool doAlphaTest)
     {
       if (flat)
-	return GetScanlineProcS<Source_Flat> (colorized, zmode, needColors);
+	return GetScanlineProcS<Source_Flat> (colorized, zmode, needColors, doAlphaTest);
       else
-	return GetScanlineProcS<Source_Texture> (colorized, zmode, needColors);
+	return GetScanlineProcS<Source_Texture> (colorized, zmode, needColors, doAlphaTest);
     }
   public:
     bool Init (SoftwareTexture** textures,
@@ -262,7 +277,7 @@ namespace cspluginSoftshader
 	renderInfo.bufferComps = &myBufferComps[1];
 
       renderInfo.proc = GetScanlineProc (doFlat, doColor, modes.z_buf_mode,
-	needColors);
+	needColors, modes.alphaType == csAlphaMode::alphaBinary);
 
       return renderInfo.proc != 0;
     }

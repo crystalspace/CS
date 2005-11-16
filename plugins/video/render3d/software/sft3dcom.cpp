@@ -928,11 +928,12 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
       break;
     case CS_MIXMODE_TYPE_AUTO:
     default:
-      usedModes.mixmode = CS_MIXMODE_BLEND(ONE, ZERO);
-      // @@@ FIXME: Determine from texture also
+      if (usedModes.alphaType == csAlphaMode::alphaSmooth)
+	usedModes.mixmode = CS_MIXMODE_BLEND(SRCALPHA, SRCALPHA_INV);
+      else
+	usedModes.mixmode = CS_MIXMODE_BLEND(ONE, ZERO);
       break;
   }
-
 
   BuffersMask buffersMask = 0;
   for (size_t b = 0; b < maxBuffers; b++)

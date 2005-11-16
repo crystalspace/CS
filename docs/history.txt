@@ -22,6 +22,8 @@ chronological order.
 	  resizes the dimensions of a texture (if that should be necessary).
 	- res worked around buggy GL drivers that crash when copying the whole
 	  framebuffer to a texture larger than that.
+	- res fixed the SR to properly support alpha modes. Includes addition 
+	  of binary alpha support.
 15-Nov-2005
 	- Jorrit fixed a bug in HardTransform() of genmesh. It didn't
 	  transform the normals which would give bad results on lighting.
