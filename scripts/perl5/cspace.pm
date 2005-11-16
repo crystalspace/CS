@@ -6242,6 +6242,7 @@ package cspace::iGeneralFactoryState;
 *GetTriangleCount = *cspacec::iGeneralFactoryState_GetTriangleCount;
 *Invalidate = *cspacec::iGeneralFactoryState_Invalidate;
 *CalculateNormals = *cspacec::iGeneralFactoryState_CalculateNormals;
+*Compress = *cspacec::iGeneralFactoryState_Compress;
 *GenerateBox = *cspacec::iGeneralFactoryState_GenerateBox;
 *GenerateSphere = *cspacec::iGeneralFactoryState_GenerateSphere;
 *SetBack2Front = *cspacec::iGeneralFactoryState_SetBack2Front;
