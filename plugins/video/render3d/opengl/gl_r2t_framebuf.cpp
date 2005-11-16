@@ -163,7 +163,7 @@ void csGLRender2TextureFramebuf::FinishDraw ()
       }
       if (needSubImage)
 	glCopyTexSubImage2D (textarget, 0, 0, 0, 0, 0, 
-	  G3D->viewwidth, G3D->viewheight);
+	  G3D->GetWidth(), G3D->GetHeight());
       else
 	glCopyTexImage2D (textarget, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
       tex_mm->SetNeedMips (true);

@@ -34,7 +34,8 @@
 
 
 csTextureHandle::csTextureHandle (csTextureManager* texman, int Flags)
-  : scfImplementationType (this), texman (texman), alphaType (alphaNone)
+  : scfImplementationType (this), texman (texman), 
+    alphaType (csAlphaMode::alphaNone)
 {
   flags = Flags & ~CS_TEXTURE_NPOTS;
 
