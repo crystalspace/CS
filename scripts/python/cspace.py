@@ -5514,6 +5514,7 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
 
     def Invalidate(*args): return _cspace.iGeneralFactoryState_Invalidate(*args)
     def CalculateNormals(*args): return _cspace.iGeneralFactoryState_CalculateNormals(*args)
+    def Compress(*args): return _cspace.iGeneralFactoryState_Compress(*args)
     def GenerateBox(*args): return _cspace.iGeneralFactoryState_GenerateBox(*args)
     def GenerateSphere(*args): return _cspace.iGeneralFactoryState_GenerateSphere(*args)
     def SetBack2Front(*args): return _cspace.iGeneralFactoryState_SetBack2Front(*args)
