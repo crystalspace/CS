@@ -276,85 +276,65 @@ namespace CrystalSpace
     
     struct Pixel
     {
-    #if !defined(__STRICT_ANSI__) && !defined(SWIG)
+      struct tag_c
+      {
+	uint8 r;
+	uint8 g;
+	uint8 b;
+	uint8 a;
+      };
       union
       {
-	struct 
-	{
-    #endif
-	  uint8 r;
-	  uint8 g;
-	  uint8 b;
-	  uint8 a;
-    #if !defined(__STRICT_ANSI__) && !defined(SWIG)
-	};
+	tag_c c;
 	uint32 ui32;
       };
-    #endif
       
       Pixel () {}
-      Pixel (uint8 r, uint8 g, uint8 b, uint8 a) : 
-	r (r), g (g), b (b), a (a) {}
-      Pixel (uint32 ui) { FromUI32 (ui); }
+      Pixel (uint8 r, uint8 g, uint8 b, uint8 a)
+      {
+        c.r = r; c.g = g; c.b = b; c.a = a;
+      }
+      Pixel (uint32 ui) : ui32 (ui) { }
       
-      CS_FORCEINLINE
-      void FromUI32 (uint32 ui)
-      {
-      #if !defined(__STRICT_ANSI__) && !defined(SWIG)
-	ui32 = ui;
-      #else
-	r = ui & 0xff;
-	g = (ui >> 8) & 0xff;
-	b = (ui >> 16) & 0xff;
-	a = (ui >> 24);
-      #endif
-      }
-      CS_FORCEINLINE
-      uint32 ToUI32() const
-      {
-      #if !defined(__STRICT_ANSI__) && !defined(SWIG)
-	return ui32;
-      #else
-	return (a << 24) | (b << 16) | (g << 8) | r;
-      #endif
-      }
       CS_FORCEINLINE
       Pixel operator+ (const Pixel other)
       {
-	// Get rid of csMin<>?
-	uint8 nr = csMin<uint> (r+other.r, 255);
-	uint8 ng = csMin<uint> (g+other.g, 255);
-	uint8 nb = csMin<uint> (b+other.b, 255);
-	uint8 na = csMin<uint> (a+other.a, 255);
-	return Pixel (nr, ng, nb, na);
+	// Poor man's SIMD... add two components at once.
+	const uint32 rb1 = (ui32 & 0xff00ff00) >> 8;
+	const uint32 ga1 = (ui32 & 0x00ff00ff);
+	const uint32 rb2 = (other.ui32 & 0xff00ff00) >> 8;
+	const uint32 ga2 = (other.ui32 & 0x00ff00ff);
+	uint32 rb = rb1 + rb2;
+	// Clamp
+	if (rb & 0xff000000) { rb &= 0x0000ffff; rb |= 0x00ff0000; }
+	if (rb & 0x0000ff00) { rb &= 0xffff0000; rb |= 0x000000ff; }
+	uint32 ga = ga1 + ga2;
+	if (ga & 0xff000000) { ga &= 0x0000ffff; ga |= 0x00ff0000; }
+	if (ga & 0x0000ff00) { ga &= 0xffff0000; ga |= 0x000000ff; }
+	return Pixel ((rb << 8) | ga);
       }
       CS_FORCEINLINE
       Pixel operator~ () const
       {
-      #if !defined(__STRICT_ANSI__) && !defined(SWIG)
 	return Pixel (~ui32);
-      #else
-        return Pixel (~r, ~g, ~b, ~a);
-      #endif
       }
       CS_FORCEINLINE
       friend Pixel operator* (const Pixel p1, const Pixel p2)
       {
-	uint8 nr = (p1.r*(p2.r+1)) >> 8;
-	uint8 ng = (p1.g*(p2.g+1)) >> 8;
-	uint8 nb = (p1.b*(p2.b+1)) >> 8;
-	uint8 na = (p1.a*(p2.a+1)) >> 8;
+	uint8 nr = (p1.c.r*(p2.c.r+1)) >> 8;
+	uint8 ng = (p1.c.g*(p2.c.g+1)) >> 8;
+	uint8 nb = (p1.c.b*(p2.c.b+1)) >> 8;
+	uint8 na = (p1.c.a*(p2.c.a+1)) >> 8;
 	return Pixel (nr, ng, nb, na);
       }
       CS_FORCEINLINE
       friend Pixel operator* (const Pixel p, const uint8 x)
       {
+        // Poor man's SIMD...
 	const uint v = x+1;
-	uint8 nr = (p.r*v) >> 8;
-	uint8 ng = (p.g*v) >> 8;
-	uint8 nb = (p.b*v) >> 8;
-	uint8 na = (p.a*v) >> 8;
-	return Pixel (nr, ng, nb, na);
+	const uint32 rb = (p.ui32 & 0xff00ff00) >> 8;
+	const uint32 ga = (p.ui32 & 0x00ff00ff);
+	return Pixel (((rb*v) & 0xff00ff00) | (((ga*v) >> 8) & 0x00ff00ff));
       }
     };
   } // namespace SoftShader

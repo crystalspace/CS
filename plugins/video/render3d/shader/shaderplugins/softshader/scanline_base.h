@@ -47,10 +47,10 @@ namespace cspluginSoftshader
 
     void SetFlatColor (const csVector4& v)
     {
-      flat_col.r = csClamp ((int)(v.x * 255.99f), 255, 0);
-      flat_col.g = csClamp ((int)(v.y * 255.99f), 255, 0);
-      flat_col.b = csClamp ((int)(v.z * 255.99f), 255, 0);
-      flat_col.a = csClamp ((int)(v.w * 255.99f), 255, 0);
+      flat_col.c.r = csClamp ((int)(v.x * 255.99f), 255, 0);
+      flat_col.c.g = csClamp ((int)(v.y * 255.99f), 255, 0);
+      flat_col.c.b = csClamp ((int)(v.z * 255.99f), 255, 0);
+      flat_col.c.a = csClamp ((int)(v.w * 255.99f), 255, 0);
     }
     void SetShift (int c, int a) 
     { 

@@ -62,7 +62,7 @@ void csSoftwareTexture::ImageToBitmap (iImage *Image)
     while (pixNum-- > 0)
     {
       Pixel px (p->blue, p->green, p->red, p->alpha);
-      *dst = px.ToUI32();
+      *dst = px.ui32;
       dst++; p++;
     }
   }
@@ -73,7 +73,7 @@ void csSoftwareTexture::ImageToBitmap (iImage *Image)
     while (pixNum-- > 0)
     {
       Pixel px (p->red, p->green, p->blue, p->alpha);
-      *dst = px.ToUI32();
+      *dst = px.ui32;
       dst++; p++;
     }
   }

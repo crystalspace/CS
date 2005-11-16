@@ -67,9 +67,9 @@ namespace cspluginSoft3d
       {
 	Pixel px (*src++);
 
-	if (px.a & 0x80)
+	if (px.c.a & 0x80)
 	{
-	  px.a <<= 1;
+	  px.c.a <<= 1;
 
 	  SrcBlend srcFactor;
 	  DstBlend dstFactor;

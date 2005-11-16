@@ -62,10 +62,10 @@ namespace cspluginSoftshader
     void Apply (const ScanlineComp* color, 
       Pixel& col) 
     {
-      col.r = ClampAndShift (col.r * color[0].c.GetFixed(), cshift);
-      col.g = ClampAndShift (col.g * color[1].c.GetFixed(), cshift);
-      col.b = ClampAndShift (col.b * color[2].c.GetFixed(), cshift);
-      col.a = ClampAndShift (col.a * color[3].c.GetFixed(), ashift);
+      col.c.r = ClampAndShift (col.c.r * color[0].c.GetFixed(), cshift);
+      col.c.g = ClampAndShift (col.c.g * color[1].c.GetFixed(), cshift);
+      col.c.b = ClampAndShift (col.c.b * color[2].c.GetFixed(), cshift);
+      col.c.a = ClampAndShift (col.c.a * color[3].c.GetFixed(), ashift);
     }
   };
 
@@ -92,7 +92,7 @@ namespace cspluginSoftshader
       int u = (int)(tc[0].c);
       int32 v = tc[1].c.GetFixed();
       uint32 texel = bitmap [((v >> v_shift_r) & and_h) + (u & and_w)];
-      col.FromUI32 (texel);
+      col.ui32 = texel;
     }
   };
 
@@ -151,13 +151,13 @@ namespace cspluginSoftshader
 	      colSrc.GetColor (ipol.GetFloat (offsetTC), px);
 	      col.Apply (ipol.GetFloat (offsetColor), px);
 
-	      px.a = (px.a >> 1) | 0x80;
-	      *dest = px.ToUI32();
+	      px.c.a = (px.c.a >> 1) | 0x80;
+	      *dest = px.ui32;
 	    }
 	    else
 	    {
 	      const Pixel px (0, 0, 0, 0x80);
-	      *dest = px.ToUI32();
+	      *dest = px.ui32;
 	    }
 	    
 	    Z.Update();

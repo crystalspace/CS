@@ -66,7 +66,7 @@ namespace cspluginSoft3d
     CS_FORCEINLINE
     Pixel Apply (const Pixel src, const Pixel dst)
     {
-      return ((Color == FactorColorSrc) ? src : dst) * (Inv ? ~src.a : src.a);
+      return ((Color == FactorColorSrc) ? src : dst) * (Inv ? ~src.c.a : src.c.a);
     }
   };
 
@@ -94,7 +94,7 @@ namespace cspluginSoft3d
     CS_FORCEINLINE
     Pixel Apply (const Pixel src, const Pixel dst)
     {
-      return ((Color == FactorColorSrc) ? src : dst) * (Inv ? ~dst.a : dst.a);
+      return ((Color == FactorColorSrc) ? src : dst) * (Inv ? ~dst.c.a : dst.c.a);
     }
   };
 

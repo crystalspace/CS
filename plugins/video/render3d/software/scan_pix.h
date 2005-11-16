@@ -60,20 +60,20 @@ namespace cspluginSoft3d
     CS_FORCEINLINE
     void WritePix (PixType* dest, const Pixel p) const
     {
-      *dest = Shift<sa> (p.a & ma)
-	| Shift<sr> (p.r & mr)
-	| Shift<sg> (p.g & mg)
-	| Shift<sb> (p.b & mb);
+      *dest = Shift<sa> (p.c.a & ma)
+	| Shift<sr> (p.c.r & mr)
+	| Shift<sg> (p.c.g & mg)
+	| Shift<sb> (p.c.b & mb);
     }
 
     Pixel GetPix (PixType* dest) const
     {
       Pixel p;
       const PixType px = *dest;
-      p.r = Unshift<sr> (px) & mr;
-      p.g = Unshift<sg> (px) & mg;
-      p.b = Unshift<sb> (px) & mb;
-      p.a = Unshift<sa> (px) & ma;
+      p.c.r = Unshift<sr> (px) & mr;
+      p.c.g = Unshift<sg> (px) & mg;
+      p.c.b = Unshift<sb> (px) & mb;
+      p.c.a = Unshift<sa> (px) & ma;
       return p;
     }
   };
@@ -133,10 +133,10 @@ namespace cspluginSoft3d
     CS_FORCEINLINE
     void WritePix (PixType* dest, const Pixel p) const
     {
-      *dest = ((p.a & aMask) << aShift) 
-	| ((p.r & rMask) << rShift) 
-	| ((p.g & gMask) << gShift) 
-	| ((p.b & bMask) >> bShift);
+      *dest = ((p.c.a & aMask) << aShift) 
+	| ((p.c.r & rMask) << rShift) 
+	| ((p.c.g & gMask) << gShift) 
+	| ((p.c.b & bMask) >> bShift);
     }
 
     CS_FORCEINLINE
@@ -144,10 +144,10 @@ namespace cspluginSoft3d
     {
       Pixel p;
       const PixType px = *dest;
-      p.a = (px >> aShift) & aMask;
-      p.r = (px >> rShift) & rMask;
-      p.g = (px >> gShift) & gMask;
-      p.b = (px << bShift) & bMask;
+      p.c.a = (px >> aShift) & aMask;
+      p.c.r = (px >> rShift) & rMask;
+      p.c.g = (px >> gShift) & gMask;
+      p.c.b = (px << bShift) & bMask;
       return p;
     }
   };
