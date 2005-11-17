@@ -349,7 +349,7 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
   SetupFog (node);
 
   // Here go the render nodes we'll actually process
-  csArray<csMeshRenderNode*> meshNodes;
+  csArray<csMeshRenderNode*> meshNodes (passes.GetSize ());
   for (size_t p = 0; p < passes.GetSize(); p++)
   {
     meshNodes.Push (meshNodeFact.CreateMeshNode (passes[p].shadertype, 

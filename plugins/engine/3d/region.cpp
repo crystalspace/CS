@@ -55,7 +55,7 @@ void csRegion::DeleteAll ()
 
   // First we need to copy the objects to a vector to avoid
   // messing up the iterator while we are deleting them.
-  csArray<iObject*> copy;
+  csArray<iObject*> copy (1024, 256);
   iter = GetIterator ();
   while (iter->HasNext ())
   {

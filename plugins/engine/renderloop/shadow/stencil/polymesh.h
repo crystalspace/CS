@@ -56,6 +56,7 @@ public:
   	int* vertidx)
   {
     CS_ASSERT (secondary_vertidx == 0);
+    polysToAdd.SetCapacity (polysToAdd.Length ());
     secondary_vertidx = vertidx;
     size_t i;
     for (i = 0; i < polysToAdd.Length (); i++)

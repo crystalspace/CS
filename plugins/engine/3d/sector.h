@@ -39,7 +39,6 @@
 #include "ivideo/shader/shader.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/meshobj.h"
-#include "plugins/engine/3d/rdrprior.h"
 
 class csEngine;
 class csProgressPulse;

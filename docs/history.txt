@@ -9,6 +9,13 @@ chronological order.
 17-Nov-2005
 	- Jorrit removed the OR specific csRenderQueueSet class from the
 	  engine.
+	- Jorrit increased the default capacity and thresshold for the
+	  following arrays (should improve performance slightly):
+	    - Temporary array in csRegion implementation.
+	    - Temporary array in fat renderloop implementation.
+	    - csStencilPolygonMesh->AddPolys().
+	    - csPolygonMeshTools->CloseMesh().
+	    - shadowMeshes in csStencilShadowStep (bigger thresshold).
 16-Nov-2005
 	- res made the following changes:
 	    - Shuffled some code around in the software renderer, made some
