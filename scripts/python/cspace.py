@@ -10542,6 +10542,8 @@ CS_TEXTURE_NOMIPMAPS = _cspace.CS_TEXTURE_NOMIPMAPS
 CS_TEXTURE_CLAMP = _cspace.CS_TEXTURE_CLAMP
 CS_TEXTURE_NOFILTER = _cspace.CS_TEXTURE_NOFILTER
 CS_TEXTURE_NPOTS = _cspace.CS_TEXTURE_NPOTS
+CS_TEXTURE_SCALE_UP = _cspace.CS_TEXTURE_SCALE_UP
+CS_TEXTURE_SCALE_DOWN = _cspace.CS_TEXTURE_SCALE_DOWN
 class iRendererLightmap(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
