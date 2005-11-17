@@ -16,6 +16,12 @@ chronological order.
 	    - csStencilPolygonMesh->AddPolys().
 	    - csPolygonMeshTools->CloseMesh().
 	    - shadowMeshes in csStencilShadowStep (bigger thresshold).
+	- Jorrit added csArray::SetMinimalCapacity(). This version of
+	  SetCapacity() will never shrink the capacity. Only enlarge it.
+	- Jorrit changed csPolygonMeshTools->CloseMesh() and
+	  csStencilPolygonMesh->AddPolys() so that they are slightly
+	  more optimal with setting the capacity. Also fixed a bug
+	  in the latter function.
 16-Nov-2005
 	- res made the following changes:
 	    - Shuffled some code around in the software renderer, made some

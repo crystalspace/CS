@@ -886,6 +886,20 @@ public:
   }
 
   /**
+   * Set vector capacity to at least \c n elements.
+   * \remarks Never sets the capacity to fewer than the current number of
+   *   elements in the array.  See Truncate() or SetSize() if you need to
+   *   adjust the number of actual array elements. This function will also
+   *   never shrink the current capacity.
+   */
+  void SetMinimalCapacity (size_t n)
+  {
+    if (n < Capacity ()) return;
+    if (n > Length ())
+      InternalSetCapacity (n);
+  }
+
+  /**
    * Make the array just as big as it needs to be. This is useful in cases
    * where you know the array is not going to be modified anymore in order
    * to preserve memory.

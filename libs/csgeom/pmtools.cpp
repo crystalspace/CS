@@ -601,7 +601,7 @@ void csPolygonMeshTools::CloseMesh (iPolygonMesh* polyMesh,
     vertidx_len = tc * 3;
     vertidx = new int[vertidx_len];
     int* vertidx_p = vertidx;
-    newPolys.SetCapacity (tc);
+    newPolys.SetMinimalCapacity (tc);
 
     for (p = 0; p < tc; p++)
     {
@@ -628,7 +628,7 @@ void csPolygonMeshTools::CloseMesh (iPolygonMesh* polyMesh,
     }
     vertidx = new int[vertidx_len];
     int* vertidx_p = vertidx;
-    newPolys.SetCapacity (pc);
+    newPolys.SetMinimalCapacity (pc);
 
     for (p = 0; p < pc; p++)
     {
