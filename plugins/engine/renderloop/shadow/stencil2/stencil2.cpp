@@ -102,8 +102,9 @@ csStencil2ShadowCacheEntry::~csStencil2ShadowCacheEntry ()
   SCF_DESTRUCT_IBASE();
 }
 
-void csStencil2ShadowCacheEntry::UpdateRenderBuffers(csArray<csVector3> & shadow_vertices,
-                                                     csArray<int> & shadow_indeces)
+void csStencil2ShadowCacheEntry::UpdateRenderBuffers(
+	csArray<csVector3> & shadow_vertices,
+	csArray<int> & shadow_indeces)
 {
   int vertex_count = (int)shadow_vertices.Length();
   int index_count = (int)shadow_indeces.Length();
@@ -197,7 +198,8 @@ bool csStencil2ShadowCacheEntry::CalculateEdges()
     }
   }
 
-  edges.DeleteAll();
+  edges.Empty ();
+  edges.SetMinimalCapacity (tri_count * 3);
   for (i = 0; i < tri_count; i++) 
   {
     AddEdge(triangles[i].a, triangles[i].b, (int)i);
@@ -262,9 +264,10 @@ void csStencil2ShadowCacheEntry::AddEdge(int index_v1, int index_v2, int face_in
   }
 }
 
-bool csStencil2ShadowCacheEntry::GetShadow(csVector3 &light_pos, float shadow_length, 
-                                           bool front_cap, bool extrusion, bool back_cap,
-                                           csArray<csVector3> &shadow_vertices, csArray<int> &shadow_indeces)
+bool csStencil2ShadowCacheEntry::GetShadow(
+	csVector3 &light_pos, float shadow_length, 
+	bool front_cap, bool extrusion, bool back_cap,
+	csArray<csVector3> &shadow_vertices, csArray<int> &shadow_indeces)
 {
   csArray<csVector3> extruded_vertices;
   csArray<bool> back_faces;
@@ -278,6 +281,9 @@ bool csStencil2ShadowCacheEntry::GetShadow(csVector3 &light_pos, float shadow_le
   size_t i;
   int j = 0;
 
+  back_faces.SetCapacity (tri_count);
+  shadow_vertices.SetCapacity (tri_count * 3);
+  shadow_indeces.SetCapacity (tri_count * 3);
   for (i = 0; i < tri_count; i++) // calculating dark and light faces
   {
     bool bf = (face_normals[i] * (vertices[triangles[i].a] - light_pos)) > 0;
@@ -299,6 +305,7 @@ bool csStencil2ShadowCacheEntry::GetShadow(csVector3 &light_pos, float shadow_le
   {
     //first calculate silhouette 
     silhouette_edges.SetLength(0);
+    silhouette_edges.SetCapacity (edges.Length ());
     for (i = 0; i < edges.Length(); i++)
     {
       //if (edges[i]->face_2 > -1)
@@ -313,6 +320,11 @@ bool csStencil2ShadowCacheEntry::GetShadow(csVector3 &light_pos, float shadow_le
 
     if (extrusion) // building indexed triangles for shadow sides (using quads should be wiser!)
     {
+      shadow_vertices.SetMinimalCapacity (shadow_vertices.Length () +
+      	silhouette_edges.Length () * 4);
+      shadow_indeces.SetMinimalCapacity (shadow_indeces.Length () +
+      	silhouette_edges.Length () * 6);
+
       for (i = 0; i < silhouette_edges.Length(); i++ )
       {
         int index = silhouette_edges[i];
@@ -330,13 +342,6 @@ bool csStencil2ShadowCacheEntry::GetShadow(csVector3 &light_pos, float shadow_le
           shadow_vertices.Push(v1);
           shadow_vertices.Push(e1);
           shadow_vertices.Push(e0);
-
-          shadow_indeces.Push(j++); 
-          shadow_indeces.Push(j++);
-          shadow_indeces.Push(j++);
-          shadow_indeces.Push(j-3);
-          shadow_indeces.Push(j-1);
-          shadow_indeces.Push(j++);
         }
         else
         {
@@ -344,50 +349,52 @@ bool csStencil2ShadowCacheEntry::GetShadow(csVector3 &light_pos, float shadow_le
           shadow_vertices.Push(v0);
           shadow_vertices.Push(e0);
           shadow_vertices.Push(e1);
+	}
 
-          shadow_indeces.Push(j++);
-          shadow_indeces.Push(j++);
-          shadow_indeces.Push(j++);
-          shadow_indeces.Push(j-3);
-          shadow_indeces.Push(j-1);
-          shadow_indeces.Push(j++);
-        }
+        shadow_indeces.Push(j++);
+        shadow_indeces.Push(j++);
+        shadow_indeces.Push(j++);
+        shadow_indeces.Push(j-3);
+        shadow_indeces.Push(j-1);
+        shadow_indeces.Push(j++);
       }
     }
 
     // optimization for dark cap - building dark cap from silhouette edges
     if (back_cap && (silhouette_edges.Length() > 0)) 
     {
-      csVector3 first_point = ((vertices[edges[silhouette_edges[0]]->v1] - light_pos))*shadow_length
+      csVector3 first_point = ((vertices[edges[silhouette_edges[0]]->v1]
+      	- light_pos))*shadow_length
         + vertices[edges[silhouette_edges[0]]->v1];
+
+      shadow_vertices.SetMinimalCapacity (shadow_vertices.Length () +
+      	silhouette_edges.Length () * 3);
+      shadow_indeces.SetMinimalCapacity (shadow_indeces.Length () +
+      	silhouette_edges.Length () * 3);
+
       for (i = 1; i < silhouette_edges.Length(); i++)
       {
+        shadow_vertices.Push(first_point);
+
+        csVector3 p1 = ((vertices[edges[silhouette_edges[i]]->v1]
+	    - light_pos))*shadow_length
+            + vertices[edges[silhouette_edges[i]]->v1];
+        csVector3 p2 = ((vertices[edges[silhouette_edges[i]]->v2]
+	    - light_pos))*shadow_length
+            + vertices[edges[silhouette_edges[i]]->v2];
         if (back_faces[edges[silhouette_edges[i]]->face_1]) //check edge flip
         {
-          shadow_vertices.Push(first_point);
-          csVector3 p1 = ((vertices[edges[silhouette_edges[i]]->v1] - light_pos))*shadow_length
-            + vertices[edges[silhouette_edges[i]]->v1];
-          csVector3 p2 = ((vertices[edges[silhouette_edges[i]]->v2] - light_pos))*shadow_length
-            + vertices[edges[silhouette_edges[i]]->v2];
           shadow_vertices.Push(p1);
           shadow_vertices.Push(p2);
-          shadow_indeces.Push(j++);
-          shadow_indeces.Push(j++);
-          shadow_indeces.Push(j++);
         }
         else
         {
-          shadow_vertices.Push(first_point);
-          csVector3 p1 = ((vertices[edges[silhouette_edges[i]]->v1] - light_pos))*shadow_length
-            + vertices[edges[silhouette_edges[i]]->v1];
-          csVector3 p2 = ((vertices[edges[silhouette_edges[i]]->v2] - light_pos))*shadow_length
-            + vertices[edges[silhouette_edges[i]]->v2];
           shadow_vertices.Push(p2);
           shadow_vertices.Push(p1);
-          shadow_indeces.Push(j++);
-          shadow_indeces.Push(j++);
-          shadow_indeces.Push(j++);
         }
+        shadow_indeces.Push(j++);
+        shadow_indeces.Push(j++);
+        shadow_indeces.Push(j++);
       }
     }
   }
@@ -450,9 +457,11 @@ void csStencil2ShadowStep::Perform (iRenderView* /*rview*/, iSector* /*sector*/,
   return;
 }
 
-void csStencil2ShadowStep::ModelInFrustum(csVector3 &light_pos, float shadow_length, csPlane3* frustum_planes, 
-                                          uint32& frustum_mask, csBox3 &model_bounding_box, bool & front_cap_in_frustum, 
-                                          bool & extrusion_in_frustum, bool & back_cap_in_frustum)
+void csStencil2ShadowStep::ModelInFrustum(
+	csVector3 &light_pos, float shadow_length, csPlane3* frustum_planes, 
+        uint32& frustum_mask, csBox3 &model_bounding_box,
+	bool & front_cap_in_frustum, bool & extrusion_in_frustum,
+	bool & back_cap_in_frustum)
 {
   //front cap
   uint32 out_clip_mask;
@@ -471,7 +480,7 @@ void csStencil2ShadowStep::ModelInFrustum(csVector3 &light_pos, float shadow_len
       planes_count = 6;
     }
 
-    csArray<csVector3> projected_points;
+    csArray<csVector3> projected_points (16);
 
     int i;
     for (i = 0; i < 8; i++)
@@ -529,17 +538,22 @@ void csStencil2ShadowStep::ModelInFrustum(csVector3 &light_pos, float shadow_len
 }
 
 
-int csStencil2ShadowStep::CalculateShadowMethod(iRenderView *rview, csVector3 &light_pos, 
-                                                const csReversibleTransform &t, csBox3 &model_bounding_box)
+int csStencil2ShadowStep::CalculateShadowMethod(
+	iRenderView *rview, csVector3 &light_pos, 
+        const csReversibleTransform &t, csBox3 &model_bounding_box)
 {
   float lx, rx, ty, dy;
   rview->GetFrustum(lx, rx, ty, dy);
 
   // get view corners in object space
-  csVector3 vll = t.Other2This(rview->GetCamera()->GetTransform().This2Other(csVector3(lx, dy, 0)));
-  csVector3 vlr = t.Other2This(rview->GetCamera()->GetTransform().This2Other(csVector3(rx, dy, 0)));
-  csVector3 vul = t.Other2This(rview->GetCamera()->GetTransform().This2Other(csVector3(lx, ty, 0)));
-  csVector3 vur = t.Other2This(rview->GetCamera()->GetTransform().This2Other(csVector3(rx, ty, 0)));
+  csVector3 vll = t.Other2This(rview->GetCamera()->GetTransform().
+  	This2Other(csVector3(lx, dy, 0)));
+  csVector3 vlr = t.Other2This(rview->GetCamera()->GetTransform().
+  	This2Other(csVector3(rx, dy, 0)));
+  csVector3 vul = t.Other2This(rview->GetCamera()->GetTransform().
+  	This2Other(csVector3(lx, ty, 0)));
+  csVector3 vur = t.Other2This(rview->GetCamera()->GetTransform().
+  	This2Other(csVector3(rx, ty, 0)));
 
   // building oclusion pyramid from light to view corners 
   // and check whether view is shadowed by the object
@@ -552,12 +566,14 @@ int csStencil2ShadowStep::CalculateShadowMethod(iRenderView *rview, csVector3 &l
   oclusion_pyramid.Push(csPlane3(light_pos, vll, vlr));
   oclusion_pyramid.Push(csPlane3(light_pos, vul, vll));
 
-  csVector3 camera_pos = t.Other2This(rview->GetCamera()->GetTransform().GetOrigin());
+  csVector3 camera_pos = t.Other2This(rview->GetCamera()->GetTransform().
+  	GetOrigin());
 
   csVector3 light_dir = camera_pos - light_pos;
 
   csVector3 forward_view_vector = 
-    t.Other2ThisRelative(rview->GetCamera()->GetTransform().This2OtherRelative(csVector3(0, 0, 1)));
+    t.Other2ThisRelative(rview->GetCamera()->GetTransform().
+    	This2OtherRelative(csVector3(0, 0, 1)));
 
   // flip pyramid planes if light is behind camera
   size_t i;
@@ -577,7 +593,8 @@ int csStencil2ShadowStep::CalculateShadowMethod(iRenderView *rview, csVector3 &l
     int v = 0;
     while ((v < 8) && behind_plane) 
     {
-      behind_plane = (oclusion_pyramid[i].Classify(model_bounding_box.GetCorner(v)) < 0);
+      behind_plane = (oclusion_pyramid[i].Classify(
+      	model_bounding_box.GetCorner(v)) < 0);
       v++;
     }
 
@@ -592,9 +609,12 @@ int csStencil2ShadowStep::CalculateShadowMethod(iRenderView *rview, csVector3 &l
   return Z_FAIL;
 }
 
-void csStencil2ShadowStep::DrawShadow(iRenderView *rview, int method, csStencil2ShadowCacheEntry *cache_entry, 
-                                      iMeshWrapper *mesh, csArray<csVector3> & shadow_vertices, csArray<int> & shadow_indeces, 
-                                      iShader* shader, size_t shaderTicket, size_t /*pass*/)
+void csStencil2ShadowStep::DrawShadow(
+	iRenderView *rview, int method,
+	csStencil2ShadowCacheEntry *cache_entry, 
+	iMeshWrapper *mesh, csArray<csVector3> & shadow_vertices,
+	csArray<int> & shadow_indeces, 
+	iShader* shader, size_t shaderTicket, size_t /*pass*/)
 {
   if (!cache_entry->MeshCastsShadow() || !cache_entry->ShadowCaps()) return;
 

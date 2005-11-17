@@ -146,12 +146,8 @@ void csMovable::SetSector (iSector *sector)
 
 void csMovable::ClearSectors ()
 {
-  //if (parent == 0)
-  //{
-    if (meshobject) meshobject->RemoveFromSectors ();
-    sectors.DeleteAll ();
-    sectors.SetLength (0);
-  //}
+  if (meshobject) meshobject->RemoveFromSectors ();
+  sectors.Empty ();
 }
 
 void csMovable::AddListener (iMovableListener *listener)

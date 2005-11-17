@@ -496,10 +496,6 @@ public:
   virtual float GetRadius () const { return radius; }
   /// Get the squared radius.
   virtual float GetSquaredRadius () const { return sq_radius; }
-  /// Enable shadowing for things (off by default). @@@SUSPECT!!!
-  void EnableThingShadows (bool e) { things_shadow = e; }
-  /// Return true if shadowing for things is enabled.
-  virtual bool ThingShadowsEnabled () { return things_shadow; }
   /// Set shadow mask.
   void SetShadowMask (unsigned int mask, unsigned int value)
   {
@@ -532,10 +528,6 @@ public:
   virtual iFrustumViewUserdata* GetUserdata ()
   {
     return userdata;
-  }
-  virtual csPtr<iShadowBlock> CreateShadowBlock ()
-  {
-    return csPtr<iShadowBlock> (new csShadowBlock ());
   }
 };
 

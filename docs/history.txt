@@ -22,6 +22,51 @@ chronological order.
 	  csStencilPolygonMesh->AddPolys() so that they are slightly
 	  more optimal with setting the capacity. Also fixed a bug
 	  in the latter function.
+	- Jorrit further increased the default capacity and thresshold for
+	  the following arrays:
+	    - face_normals in csStencil2PolygonMesh.
+	    - csStencil2PolygonMesh->CalculateEdges().
+	    - csStencil2PolygonMesh->AddPolys().
+	    - A great number of arrays in csStencil2ShadowCachEntry
+	      ->GetShadow().
+	    - projected_points in csStencil2ShadowStep::Perform().
+	    - Temporary 'lightList' in the light iterator step.
+	    - csMeshList capacity for engine goes to 256 and thresshold to 256.
+	    - csMeshList capacity for sector goes to 64 and thresshold to 128.
+	    - csMeshFactoryList capacity goes to 64 and thresshold to 64.
+	    - csDynavis visible object arrays now have initial capacity of
+	      256 and thresshold of 256. occluder_info array is now 128,128.
+	    - csFrustumVis visible object arrays now have initial capacity of
+	      256 and thresshold of 256.
+	- Jorrit cleaned up the stencil2 code a bit. Removed a bit of
+	  duplicated code.
+	- Jorrit fixed the engine to no longer make a copy of the shader
+	  array when trying to find a shader.
+	- Jorrit removed support for software shadows for dynamic lights.
+	  This was only used by bezier mesh and it was not even enabled.
+	  This cleans up the engine a bit more.
+	- Jorrit fixed the engine to no longer make a copy of the shader
+	  variable array when trying to render a portal (portalcontainer).
+	- Jorrit fixed the fat renderloop to no longer make a copy of the
+	  shader variable array when trying to render a portal.
+	- Jorrit removed the obsolete CS_LIGHT_THINGSHADOWS flag. Also
+	  removed the obsolete iFrustumView->ThingShadowsEnabled().
+	- Jorrit replaced several occurances of csArray->DeleteAll() with
+	  Empty() where this is more optimal (DeleteAll() cleans the array
+	  completely while Empty() leaves the allocated items so it can
+	  be reused later).
+	    - csEngine::ControlMeshes().
+	    - csSector::CleanupLSI().
+	    - csLight::CleanupLSI().
+	    - csLight::CalculateLighting().
+	    - csMovable::ClearSectors().
+	    - csShaderVariableList::RemoveAll().
+	    - csStencil2PolygonMesh::CalculateEdges().
+	    - csDynaVis::VisTest().
+	    - csFrustumVis::VisTest().
+	    - csGenmeshSkelAnimationControl::StopAll().
+	- Jorrit increased the default capacity and thresshold of the
+	  update_queue set used in Dynavis and Frustvis.
 16-Nov-2005
 	- res made the following changes:
 	    - Shuffled some code around in the software renderer, made some

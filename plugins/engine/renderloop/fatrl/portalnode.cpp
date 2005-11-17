@@ -191,7 +191,7 @@ void csPortalRenderNode::Postprocess (iRenderView* rview)
     mesh.shader = factory->fog_shader;
     // @@@ Hackish...
     csShaderVariableContext varContext;
-    csRefArray<csShaderVariable> globVars = 
+    const csRefArray<csShaderVariable>& globVars = 
       factory->shaderManager->GetShaderVariables ();
     for (uint i = 0; i < globVars.GetSize (); i++)
     {

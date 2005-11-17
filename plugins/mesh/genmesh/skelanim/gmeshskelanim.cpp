@@ -1126,18 +1126,20 @@ const csColor4* csGenmeshSkelAnimationControl::UpdateColors (csTicks /*current*/
   return colors;
 }
 
-iGenMeshSkeletonScript* csGenmeshSkelAnimationControl::Execute (const char* scriptname)
+iGenMeshSkeletonScript* csGenmeshSkelAnimationControl::Execute (
+	const char* scriptname)
 {
   csSkelAnimControlScript* script = factory->FindScript (scriptname);
   if (!script) return 0;
-  csRef<csSkelAnimControlRunnable> runnable = csPtr<csSkelAnimControlRunnable> (new csSkelAnimControlRunnable (script, this));
+  csRef<csSkelAnimControlRunnable> runnable = csPtr<csSkelAnimControlRunnable> (
+  	new csSkelAnimControlRunnable (script, this));
   running_scripts.Push (runnable);
   return runnable;
 }
 
 void csGenmeshSkelAnimationControl::StopAll ()
 {
-  running_scripts.DeleteAll ();
+  running_scripts.Empty ();
 }
 
 void csGenmeshSkelAnimationControl::Stop (const char* scriptname)

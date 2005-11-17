@@ -89,7 +89,7 @@ public:
   	const char* newname);
 
   /// constructor
-  csMeshList ();
+  csMeshList (int cap, int thresshold);
   virtual ~csMeshList ();
 
   /// Find a mesh in <name>:<childname>:<childname> notation.
@@ -109,24 +109,6 @@ public:
   virtual int Find (iMeshWrapper *obj) const;
   virtual iMeshWrapper *FindByName (const char *Name) const;
 };
-
-#if 0
-/**
- * Subclass of csMeshList to hold the children of another mesh object.
- */
-class csMeshMeshList : public csMeshList
-{
-private:
-  csMeshWrapper* mesh;
-
-public:
-  csMeshMeshList () : mesh (0) { }
-  virtual ~csMeshMeshList () { RemoveAll (); }
-  void SetMesh (csMeshWrapper* m) { mesh = m; }
-  virtual void PrepareMesh (iMeshWrapper* item);
-  virtual void FreeMesh (iMeshWrapper* item);
-};
-#endif
 
 /**
  * A list of mesh factories.

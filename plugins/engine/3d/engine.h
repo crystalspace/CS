@@ -181,6 +181,7 @@ private:
 class csEngineMeshList : public csMeshList
 {
 public:
+  csEngineMeshList () : csMeshList (256, 256) { }
   virtual ~csEngineMeshList () { RemoveAll (); }
   virtual void FreeMesh (iMeshWrapper*);
 };

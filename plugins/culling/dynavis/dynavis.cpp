@@ -225,7 +225,12 @@ bool csDynaVis::do_cull_ignore_bad_occluders = true;
 int csDynaVis::badoccluder_thresshold = 10;
 int csDynaVis::badoccluder_maxsweepcount = 50;
 
-csDynaVis::csDynaVis (iBase *iParent) : visobj_wrappers (1000)
+csDynaVis::csDynaVis (iBase *iParent) :
+	vistest_objects (256, 256),
+	visobj_wrappers (1000),
+	visobj_vector (256, 256),
+	occluder_info (128, 128),
+	update_queue (151, 59)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
@@ -1865,7 +1870,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
   write_queue->Initialize ();
 
   // Clear the list of occluders.
-  occluder_info.SetLength (0);
+  occluder_info.Empty ();
 
   // If BugPlug is currently showing the debug sector we return here
   // so that all is marked invisible and rendering goes faster.
@@ -2032,12 +2037,12 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (csPlane3* planes,
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new csArray<iVisibilityObject*> ();
+    v = new csArray<iVisibilityObject*> (256, 256);
   }
   else
   {
     v = &vistest_objects;
-    vistest_objects.DeleteAll ();
+    vistest_objects.Empty ();
   }
   
   VisTestPlanes_Front2BackData data;
@@ -2138,7 +2143,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csBox3& box)
   else
   {
     v = &vistest_objects;
-    vistest_objects.DeleteAll ();
+    vistest_objects.Empty ();
   }
 
   VisTestBox_Front2BackData data;
@@ -2231,7 +2236,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csSphere& sphere)
   else
   {
     v = &vistest_objects;
-    vistest_objects.DeleteAll ();
+    vistest_objects.Empty ();
   }
 
   VisTestSphere_Front2BackData data;
@@ -2573,7 +2578,7 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
       if (b.SquaredOriginDist () > sqrad)
 	continue;
 
-      if (visobj_wrap->caster && fview->ThingShadowsEnabled () &&
+      if (visobj_wrap->caster &&
             fview->CheckShadowMask (visobj_wrap->mesh->GetFlags ().Get ()))
       {
         data->shadobjs[data->num_shadobjs].sqdist = b.SquaredOriginDist ();

@@ -178,8 +178,6 @@ struct iFrustumView : public virtual iBase
   virtual float GetRadius () const = 0;
   /// Get the squared radius.
   virtual float GetSquaredRadius () const = 0;
-  /// Return true if shadowing for things is enabled.
-  virtual bool ThingShadowsEnabled () = 0;
   /// Check if a mask corresponds with the shadow mask.
   virtual bool CheckShadowMask (unsigned int mask) = 0;
   /// Check if a mask corresponds with the process mask.
@@ -192,9 +190,6 @@ struct iFrustumView : public virtual iBase
   virtual void SetUserdata (iFrustumViewUserdata* data) = 0;
   /// Get userdata.
   virtual iFrustumViewUserdata* GetUserdata () = 0;
-
-  /// Create a new empty shadow block.
-  virtual csPtr<iShadowBlock> CreateShadowBlock () = 0;
 };
 
 /** @} */

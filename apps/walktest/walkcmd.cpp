@@ -2200,14 +2200,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     csRef<iLight> dyn;
 
     bool rnd;
-    float r, g, b, radius, thing_shadows;
-    if (arg && csScanStr (arg, "%f,%f,%f,%f,%f", &r, &g, &b, &radius,
-    	&thing_shadows) == 5)
+    float r, g, b, radius;
+    if (arg && csScanStr (arg, "%f,%f,%f,%f", &r, &g, &b, &radius) == 4)
     {
       dyn = Sys->view->GetEngine ()->CreateLight ("", pos,
       	radius, csColor (r, g, b), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-      if (thing_shadows)
-        dyn->GetFlags ().Set (CS_LIGHT_THINGSHADOWS, CS_LIGHT_THINGSHADOWS);
       rnd = false;
     }
     else

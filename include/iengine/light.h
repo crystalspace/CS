@@ -49,13 +49,6 @@ struct iFlareHalo;
 
 /** \name Light flags
  * @{ */
-/**
- * If CS_LIGHT_THINGSHADOWS is set for a light then things will also
- * cast shadows. This flag is set by default for static lights and unset
- * for dynamic lights.
- */
-#define CS_LIGHT_THINGSHADOWS	0x00000001
-
 /** 
  * If this flag is set, the halo for this light is active and is in the
  * engine's queue of active halos. When halo become inactive, this flag
@@ -366,7 +359,6 @@ struct iLight : public virtual iBase
    * Get flags for this light.
    * Supported flags:
    * - #CS_LIGHT_ACTIVEHALO
-   * - #CS_LIGHT_THINGSHADOWS
    */
   virtual csFlags& GetFlags () = 0;
 

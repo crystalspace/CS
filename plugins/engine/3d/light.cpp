@@ -91,10 +91,6 @@ csLight::csLight (
   movable.SetLight (this);
   movable.SetPosition (csVector3 (x,y,z));
 
-
-  if (dynamicType != CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-    flags.SetAll (CS_LIGHT_THINGSHADOWS);
-
   SetName ("__light__");
 
 
@@ -177,7 +173,7 @@ void csLight::CleanupLSI ()
     csLightSectorInfluence* inf = it.Next ();
     ((csSector*)inf->sector)->RemoveLSI (inf);
   }
-  influences.DeleteAll ();
+  influences.Empty ();
 }
 
 void csLight::FindLSI ()
@@ -575,11 +571,10 @@ void csLight::CalculateLighting ()
     csRef<iLightingInfo> linfo = it.Next ();
     linfo->LightDisconnect (this);
   }
-  lightinginfos.DeleteAll ();
+  lightinginfos.Empty ();
 
   lview.SetObjectFunction (object_light_func);
   lview.SetRadius (GetCutoffDistance ());
-  lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 
@@ -620,7 +615,6 @@ void csLight::CalculateLighting (iMeshWrapper *th)
   csFrustumContext *ctxt = lview.GetFrustumContext ();
   lview.SetObjectFunction (object_light_func);
   lview.SetRadius (GetCutoffDistance ());
-  lview.EnableThingShadows (flags.Get () & CS_LIGHT_THINGSHADOWS);
   lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
 

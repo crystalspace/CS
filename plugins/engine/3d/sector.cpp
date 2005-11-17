@@ -93,7 +93,7 @@ void csSectorLightList::FreeLight (iLight* item)
 
 //--------------------------------------------------------------------------
 
-csSectorMeshList::csSectorMeshList ()
+csSectorMeshList::csSectorMeshList () : csMeshList (64, 128)
 {
   sector = 0;
 }
@@ -1006,7 +1006,7 @@ void csSector::CleanupLSI ()
     ((csLight*)inf->light)->RemoveLSI (inf);
     delete inf;
   }
-  influences.DeleteAll ();
+  influences.Empty ();
 }
 
 void csSector::AddLSI (csLightSectorInfluence* inf)

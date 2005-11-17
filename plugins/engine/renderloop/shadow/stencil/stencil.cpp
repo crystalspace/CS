@@ -407,7 +407,7 @@ void csStencilShadowCacheEntry::UpdateBuffers ()
 //---------------------------------------------------------------------------
 
 csStencilShadowStep::csStencilShadowStep (csStencilShadowType* type) :  
-  shadowDrawVisCallback (), shadowMeshes (0, 128)
+  shadowMeshes (0, 128), shadowDrawVisCallback ()
 {
   SCF_CONSTRUCT_IBASE (0);
   csStencilShadowStep::type = type;

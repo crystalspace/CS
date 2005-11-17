@@ -251,9 +251,6 @@ void csCurve::ShineDynLight (csBezierLightPatch *lp)
 
   iLight *light = lp->GetLight ();
 
-  iShadowIterator *shadow_it = lp->GetShadowBlock ()->GetShadowIterator ();
-  bool has_shadows = shadow_it->HasNext ();
-
   csColor color = light->GetColor () * CS_NORMAL_LIGHT_LEVEL;
 
   csRGBpixel *map = LightMap->GetRealMap ().GetArray ();
@@ -280,28 +277,6 @@ void csCurve::ShineDynLight (csBezierLightPatch *lp)
       if (!lp->GetLightFrustum ()->Contains (pos - center))
         // No, skip it
         continue;
-
-      // if we have any shadow frustrumsq
-      if (has_shadows)
-      {
-        shadow_it->Reset ();
-
-        bool shad = false;
-        while (shadow_it->HasNext ())
-        {
-          csFrustum *csf = shadow_it->Next ();
-
-          // is this point in shadow
-          if (csf->Contains (pos - csf->GetOrigin ()))
-          {
-            shad = true;
-            break;
-          }
-        }
-
-        // if it was found in shadow skip it
-        if (shad) continue;
-      }
 
       d = csSquaredDist::PointPoint (center, pos);
       if (d >= csSquare (light->GetCutoffDistance ())) continue;
@@ -340,8 +315,6 @@ void csCurve::ShineDynLight (csBezierLightPatch *lp)
       }
     }
   }
-
-  shadow_it->DecRef ();
 }
 
 void csCurve::SetObject2World (const csReversibleTransform *o2w)
@@ -527,8 +500,6 @@ void csCurve::CalculateLightingDynamic (iFrustumView *lview)
   // We are working for a dynamic light. In this case we create
   // a light patch for this polygon.
   csBezierLightPatch *lp = thing_type->lightpatch_pool->Alloc ();
-  csRef<iShadowBlock> sb = lview->CreateShadowBlock ();
-  lp->SetShadowBlock (sb);
   AddLightPatch (lp);
 
   iLight* l = lpi->GetLight ();
@@ -537,15 +508,6 @@ void csCurve::CalculateLightingDynamic (iFrustumView *lview)
   // This light patch has exactly 4 vertices because it fits around our
   // LightMap
   lp->Initialize (4);
-
-  // Copy shadow frustums.
-  lp->GetShadowBlock ()->DeleteShadows ();
-
-  // @@@: It would be nice if we could optimize earlier
-  // to determine relevant shadow frustums in curves and use
-  // AddRelevantShadows instead.
-  lp->GetShadowBlock ()->AddAllShadows (
-      lview->GetFrustumContext ()->GetShadows ());
 
   lp->SetNewLightFrustum (
       new csFrustum (*lview->GetFrustumContext ()->GetLightFrustum ()));

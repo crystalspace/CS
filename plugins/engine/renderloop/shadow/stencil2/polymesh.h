@@ -45,6 +45,7 @@ private:
   {
     Triangulate();
     face_normals.SetLength(0);
+    face_normals.SetMinimalCapacity (tri_count);
     int i;
     for (i = 0; i < tri_count; i ++) 
     { 
@@ -73,6 +74,7 @@ public:
   {
     CS_ASSERT (secondary_vertidx == 0);
     secondary_vertidx = vertidx;
+    polys.SetCapacity (polys.Length () + polysToAdd.Length ());
     size_t i;
     for (i = 0; i < polysToAdd.Length (); i++)
     {

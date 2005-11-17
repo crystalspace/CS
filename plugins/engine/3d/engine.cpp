@@ -1886,7 +1886,7 @@ void csEngine::ControlMeshes ()
     iMeshWrapper* mesh = it.Next ();
     GetMeshes ()->Remove (mesh);
   }
-  wantToDieSet.DeleteAll ();
+  wantToDieSet.Empty ();
 }
 
 char* csEngine::SplitRegionName (const char* name, iRegion*& region,
@@ -3041,7 +3041,7 @@ iShader* EngineLoaderContext::FindShader (const char* name)
   if (!curRegOnly || !region)
     return csEngine::currentEngine->shaderManager->GetShader (name);
 
-  csRefArray<iShader> shaders = csEngine::currentEngine->shaderManager
+  const csRefArray<iShader>& shaders = csEngine::currentEngine->shaderManager
   	->GetShaders ();
   size_t i;
   for (i = 0 ; i < shaders.Length () ; i++)
@@ -3527,7 +3527,6 @@ void csEngine::GetDefaultAmbientLight (csColor &c) const
 csPtr<iFrustumView> csEngine::CreateFrustumView ()
 {
   csFrustumView* lview = new csFrustumView ();
-  lview->EnableThingShadows (CS_LIGHT_THINGSHADOWS);
   lview->SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
   lview->SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
   return csPtr<iFrustumView> (lview);

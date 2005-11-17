@@ -70,7 +70,7 @@ bool csSharedVariableList::Remove (int n)
 
 void csSharedVariableList::RemoveAll ()
 {
-  list.DeleteAll ();
+  list.Empty ();
 }
 
 int csSharedVariableList::Find (iSharedVariable *obj) const

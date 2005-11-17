@@ -1425,8 +1425,8 @@ void csMeshFactoryWrapper::AddFactoryToStaticLOD (int lod,
 // csMeshList
 //--------------------------------------------------------------------------
 
-csMeshList::csMeshList ()
-  : scfImplementationType (this)
+csMeshList::csMeshList (int cap, int thresshold)
+  : scfImplementationType (this), list (cap, thresshold)
 {
   listener.AttachNew (new NameChangeListener (this));
 }
@@ -1588,7 +1588,7 @@ void csMeshMeshList::FreeMesh (iMeshWrapper* item)
 // csMeshFactoryList
 //--------------------------------------------------------------------------
 csMeshFactoryList::csMeshFactoryList ()
-  : scfImplementationType (this)
+  : scfImplementationType (this), list (64, 64)
 {
   listener.AttachNew (new NameChangeListener (this));
 }

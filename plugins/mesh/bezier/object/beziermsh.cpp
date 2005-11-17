@@ -472,7 +472,8 @@ void csBezierMesh::HardTransform (const csReversibleTransform &t)
   static_data->curves_center = t.This2Other (static_data->curves_center);
   if (static_data->curve_vertices)
     for (i = 0; i < (size_t)static_data->num_curve_vertices; i++)
-      static_data->curve_vertices[i] = t.This2Other (static_data->curve_vertices[i]);
+      static_data->curve_vertices[i] = t.This2Other (
+      	static_data->curve_vertices[i]);
 
   curves_transf_ok = false;
   for (i = 0; i < curves.Length (); i++)

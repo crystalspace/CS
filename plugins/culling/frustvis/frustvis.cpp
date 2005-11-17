@@ -171,7 +171,10 @@ public:
 
 //----------------------------------------------------------------------
 
-csFrustumVis::csFrustumVis (iBase *iParent)
+csFrustumVis::csFrustumVis (iBase *iParent) :
+	vistest_objects (256, 256),
+	visobj_vector (256, 256),
+	update_queue (151, 59)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
@@ -638,7 +641,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (csPlane3* planes,
   else
   {
     v = &vistest_objects;
-    vistest_objects.DeleteAll ();
+    vistest_objects.Empty ();
   }
   
   FrustTestPlanes_Front2BackData data;
@@ -738,7 +741,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csBox3& box)
   else
   {
     v = &vistest_objects;
-    vistest_objects.DeleteAll ();
+    vistest_objects.Empty ();
   }
   
   FrustTestBox_Front2BackData data;
@@ -831,7 +834,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csSphere& sphere)
   else
   {
     v = &vistest_objects;
-    vistest_objects.DeleteAll ();
+    vistest_objects.Empty ();
   }
 
   FrustTestSphere_Front2BackData data;
@@ -1170,7 +1173,7 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
       if (b.SquaredOriginDist () > sqrad)
 	continue;
 
-      if (visobj_wrap->caster && fview->ThingShadowsEnabled () &&
+      if (visobj_wrap->caster &&
             fview->CheckShadowMask (visobj_wrap->mesh->GetFlags ().Get ()))
       {
         data->shadobjs[data->num_shadobjs].sqdist = b.SquaredOriginDist ();

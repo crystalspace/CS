@@ -755,7 +755,7 @@ void csPortalContainer::DrawOnePortal (
     mesh.shader = fog_shader;
     // @@@ Hackish...
     csShaderVariableContext varContext;
-    csRefArray<csShaderVariable> globVars = shader_man->GetShaderVariables ();
+    const csRefArray<csShaderVariable>& globVars = shader_man->GetShaderVariables ();
     for (uint i = 0; i < globVars.Length (); i++)
     {
       varContext.AddVariable (globVars[i]);
