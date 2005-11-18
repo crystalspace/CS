@@ -18,6 +18,8 @@ chronological order.
 	- Jorrit changed the map loader to also immediatelly register and
 	  free images when loading textures.
 	- Jorrit changed awstut to use OpenGL by default.
+	- Jorrit fixed a bug in AWS Popup Menu. It was using 'sink' before
+	  it was setup.
 17-Nov-2005
 	- Jorrit removed the OR specific csRenderQueueSet class from the
 	  engine.

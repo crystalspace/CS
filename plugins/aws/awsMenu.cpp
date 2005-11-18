@@ -931,7 +931,10 @@ bool awsPopupMenu::Create (
 bool awsPopupMenu::Setup (iAws *wmgr, iAwsComponentNode *settings)
 {
   timer = new awsTimer (wmgr->GetObjectRegistry (), this);
-  
+
+  if (!awsMenu::Setup (wmgr, settings))
+    return false;
+
   sink->RegisterTrigger ("Timer", &OnTimer);
   slot_timer.Connect (
     timer,
@@ -939,8 +942,6 @@ bool awsPopupMenu::Setup (iAws *wmgr, iAwsComponentNode *settings)
     sink,
     sink->GetTriggerID ("Timer"));
 
-  if (!awsMenu::Setup (wmgr, settings))
-    return false;
   return true;
 }
 
