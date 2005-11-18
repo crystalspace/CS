@@ -481,11 +481,17 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       {
         tex->QueryObject()->ObjAdd (kvp->QueryObject ());
 	kvp->DecRef ();
-      } else
+      }
+      else
 	return 0;
     }
   }
 
+  if (tm)
+  {
+    if (!tex->GetTextureHandle ()) tex->Register (tm);
+    tex->SetImageFile (0);
+  }
   return tex;
 
 error:

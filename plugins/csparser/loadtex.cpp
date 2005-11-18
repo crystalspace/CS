@@ -98,10 +98,7 @@ csPtr<iImage> csLoader::LoadImage (iDataBuffer* buf, int Format)
 csPtr<iTextureHandle> csLoader::LoadTexture (iDataBuffer* buf, int Flags,
 	iTextureManager *tm, csRef<iImage>* img)
 {
-  if (!tm && G3D)
-  {
-    tm = G3D->GetTextureManager();
-  }
+  if (!tm && G3D) tm = G3D->GetTextureManager();
   int Format;
   if (tm)
     Format = tm->GetTextureFormat ();
@@ -138,12 +135,13 @@ csPtr<iTextureHandle> csLoader::LoadTexture (iDataBuffer* buf, int Flags,
 
 iTextureWrapper* csLoader::LoadTexture (const char *name,
 	iDataBuffer* buf, int Flags, iTextureManager *tm, bool reg,
-	bool create_material)
+	bool create_material, bool free_image)
 {
   if (!Engine)
     return 0;
 
   csRef<iImage> img;
+  if (!tm && G3D) tm = G3D->GetTextureManager();
   csRef<iTextureHandle> TexHandle = LoadTexture (buf, Flags, tm, &img);
   if (!TexHandle)
     return 0;
@@ -165,6 +163,8 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
     // If we already have a texture handle then we don't register again.
     if (!TexWrapper->GetTextureHandle ())
       TexWrapper->Register (tm);
+    if (free_image)
+      TexWrapper->SetImageFile (0);
   }
 
   return TexWrapper;
@@ -179,10 +179,7 @@ csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
 csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
 	iTextureManager *tm, csRef<iImage>* img)
 {
-  if (!tm && G3D)
-  {
-    tm = G3D->GetTextureManager();
-  }
+  if (!tm && G3D) tm = G3D->GetTextureManager();
   int Format;
   if (tm)
     Format = tm->GetTextureFormat ();
@@ -220,12 +217,13 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
 
 iTextureWrapper* csLoader::LoadTexture (const char *name,
 	const char *fname, int Flags, iTextureManager *tm, bool reg,
-	bool create_material)
+	bool create_material, bool free_image)
 {
   if (!Engine)
     return 0;
 
   csRef<iImage> img;
+  if (!tm && G3D) tm = G3D->GetTextureManager();
   csRef<iTextureHandle> TexHandle = LoadTexture (fname, Flags, tm, &img);
   if (!TexHandle)
     return 0;
@@ -247,6 +245,8 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
     // If we already have a texture handle then we don't register again.
     if (!TexWrapper->GetTextureHandle ())
       TexWrapper->Register (tm);
+    if (free_image)
+      TexWrapper->SetImageFile (0);
   }
 
   return TexWrapper;

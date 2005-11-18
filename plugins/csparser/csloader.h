@@ -559,7 +559,8 @@ public:
   virtual iTextureWrapper* LoadTexture (const char *name,
   	iDataBuffer* buf,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
-	bool reg = false, bool create_material = true);
+	bool reg = true, bool create_material = true,
+	bool free_image = true);
 
   virtual csPtr<iImage> LoadImage (const char *fname, int Format);
   virtual csPtr<iTextureHandle> LoadTexture (const char* fname,
@@ -568,7 +569,8 @@ public:
   virtual iTextureWrapper* LoadTexture (const char *name,
   	const char *fname,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
-	bool reg = false, bool create_material = true);
+	bool reg = true, bool create_material = true,
+	bool free_image = true);
 
   virtual csPtr<iSoundData> LoadSoundData (const char *fname);
   virtual csPtr<iSoundHandle> LoadSound (const char *fname);

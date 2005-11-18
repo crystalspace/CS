@@ -414,10 +414,8 @@ bool Simple::Initialize ()
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
-
   iTextureWrapper* txt = loader->LoadTexture ("spark",
-    "/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
+    "/lib/std/spark.png");
   if (txt == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

@@ -257,9 +257,8 @@ void Simple::CreateRoom ()
 void Simple::CreateSprites ()
 {
   // Load a texture for our sprite.
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
   iTextureWrapper* txt = loader->LoadTexture ("spark",
-    "/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
+    "/lib/std/spark.png");
   if (txt == 0)
     ReportError("Error loading texture!");
 

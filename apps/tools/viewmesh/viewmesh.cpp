@@ -309,7 +309,6 @@ void ViewMesh::LoadTexture(const char* path, const char* file, const char* name)
       ReportError("Cannot load texture '%s' from file '%s'.\n", name, file);
       return;
     }
-    txt->Register (g3d->GetTextureManager ());
     engine->PrepareTextures();
   }
 }

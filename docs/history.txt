@@ -6,6 +6,18 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Nov-2005
+	- Jorrit changed the default for register in iLoader->LoadTexture()
+	  from false to true. That means that all loaded textures are now
+	  automatically registered unless you specifically set that option
+	  to false.
+	- Jorrit added a new 'free_image' flag to iLoader->LoadTexture().
+	  If that flag is true (default) then the loaded image will be
+	  removed after registration of the texture. This save up a lot of
+	  memory during loading of big maps.
+	- Jorrit changed the map loader to also immediatelly register and
+	  free images when loading textures.
+	- Jorrit changed awstut to use OpenGL by default.
 17-Nov-2005
 	- Jorrit removed the OR specific csRenderQueueSet class from the
 	  engine.

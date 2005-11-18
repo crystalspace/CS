@@ -89,17 +89,22 @@ struct iLoader : public iBase
   /**
    * Load a texture as with LoadTexture() above and register it with the
    * engine. 'Name' is the name that the engine will use for the wrapper.
-   * If 'create_material' is true then this function also creates a
-   * material for the texture.<br>
-   * If 'register' is true then the texture and material will be registered
+   * 
+   * \param reg if true then the texture and material will be registered
    * to the texture manager. Set 'register' to false if you plan on calling
    * 'engine->Prepare()' later as that function will take care of registering
    * too.
+   * \param create_material if true then this function also creates a
+   * material for the texture.
+   * \param free_image if true then after registration the loaded image
+   * will be removed immediatelly. This saves some memory. Set to false
+   * if you want to keep it. free_image is ignored if reg is false.
    */
   virtual iTextureWrapper* LoadTexture (const char *Name,
   	const char *FileName,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
-	bool reg = false, bool create_material = true) = 0;
+	bool reg = true, bool create_material = true,
+	bool free_image = true) = 0;
 
   /**
    * Load an image file. The image will be loaded in the format requested by
@@ -124,18 +129,23 @@ struct iLoader : public iBase
   /**
    * Load a texture as with LoadTexture() above and register it with the
    * engine. 'Name' is the name that the engine will use for the wrapper.
-   * If 'create_material' is true then this function also creates a
-   * material for the texture.<br>
-   * If 'register' is true then the texture and material will be registered
+   * This version reads the image from a data buffer.
+   *
+   * \param reg if true then the texture and material will be registered
    * to the texture manager. Set 'register' to false if you plan on calling
    * 'engine->Prepare()' later as that function will take care of registering
    * too.
-   * This version reads the image from a data buffer.
+   * \param create_material if true then this function also creates a
+   * material for the texture.
+   * \param free_image if true then after registration the loaded image
+   * will be removed immediatelly. This saves some memory. Set to false
+   * if you want to keep it. free_image is ignored if reg is false.
    */
   virtual iTextureWrapper* LoadTexture (const char *Name,
   	iDataBuffer* buf,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
-	bool reg = false, bool create_material = true) = 0;
+	bool reg = true, bool create_material = true,
+	bool free_image = true) = 0;
 
   /// Old Sound System: Load a sound file and return an iSoundData object
   virtual csPtr<iSoundData> LoadSoundData (const char *fname) = 0;

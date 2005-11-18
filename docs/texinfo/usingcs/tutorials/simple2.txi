@@ -84,9 +84,8 @@ bool Simple::Application()
 void Simple::CreateSprites()
 @{
   // Load a texture for our sprite.
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
   iTextureWrapper* txt = loader->LoadTexture ("spark",
-        "/lib/std/spark.png", CS_TEXTURE_3D, txtmgr, true);
+        "/lib/std/spark.png");
   if (txt == 0)
     ReportError("Error loading texture!");
 @}
@@ -96,27 +95,10 @@ This code first loads a texture with
 @code{iLoader::LoadTexture()}.  The second argument is the file name for our
 texture (@sc{vfs} path) and the first argument is how that texture should be
 named in the engine.  In this case we use ``spark'' for that because that's
-how the @file{sprite1} definition wants it. The third parameter indicates
-for what we want to use this texture. In this case we want to use it to texture
-map a model for the 3D engine, so the texture must be prepared for 3D.
-The fourth parameter is the texture manager which will be used to register
-and prepare the texture and material. This is done automatically by
-this function because the fifth parameter is set to 'true'. In the previous
-tutorial we also used this function to load a texture but there we didn't
-specify the last three parameters. @samp{CS_TEXTURE_3D} is default so that
-doesn't have to be specified and because we were going to call
-@code{engine->Prepare()} later we also didn't specify the texture manager
-and the last boolean parameter because @code{Prepare()} automatically
-registers and prepares all textures and materials that are loaded.
+how the @file{sprite1} definition wants it.
 
 If loading succeeds this function will register our texture with the
-texture manager. As mentioned above this is needed because we are loading
-this texture @emph{after} @code{engine->Prepare()}. So, this is an easy way to
-dynamically add textures and materials even when the engine is already
-running. Note that if you plan to load many new textures and materials,
-it is more efficient to not let this function register automatically but
-instead register them manually and then call @code{txtmgr->PrepareTextures()}
-to prepare them all at once.
+texture manager so it can be immediatelly used.
 
 Further note that when you load a texture like this, there will also be an
 associated material with the same name. The engine itself works with
