@@ -146,7 +146,7 @@ public:
   virtual bool UnregisterSlot (iAwsSlot *slot, unsigned long signal);
 
   /// Broadcasts a signal to all slots that are interested.
-  virtual void Broadcast (unsigned long signal);
+  virtual void Broadcast (uint32 signal);
 
   /// Returns component that this belongs to.
   virtual iAwsComponent *GetComponent ();
@@ -621,7 +621,7 @@ public:
     if( !_destructionMark )
     {
       _destructionMark = true;
-      Broadcast (0xeffffffe);
+      Broadcast ((uint32)0x7ffffffe);
     }
   }
 

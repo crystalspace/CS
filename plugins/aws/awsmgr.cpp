@@ -941,7 +941,7 @@ void awsManager::CreateChildrenFromDef (
       // out a creation signal for the component.  Note that we can't do this
       // until the connection map has been created, or the signal won't go
       // anywhere!
-      parent->Broadcast (0xefffffff);
+      parent->Broadcast ((uint32)0x7fffffff);
     }         // end else
   }           // end for count of keys
 
@@ -1422,8 +1422,8 @@ void awsManager::RegisterCommonComponents ()
   GetPrefMgr ()->RegisterConstant ("Yes", 1);
   GetPrefMgr ()->RegisterConstant ("No", 0);
 
-  GetPrefMgr ()->RegisterConstant ("signalComponentCreated", 0xefffffff);
-  GetPrefMgr ()->RegisterConstant ("signalComponentDestroyed", 0xeffffffe);
+  GetPrefMgr ()->RegisterConstant ("signalComponentCreated", (uint32)0x7fffffff);
+  GetPrefMgr ()->RegisterConstant ("signalComponentDestroyed", (uint32)0x7ffffffe);
 
   GetPrefMgr ()->RegisterConstant ("mouseOver", 1);
   GetPrefMgr ()->RegisterConstant ("mouseClick", 2);

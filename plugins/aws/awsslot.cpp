@@ -215,7 +215,7 @@ bool awsSource::UnregisterSlot (iAwsSlot *slot, unsigned long signal)
   return false;
 }
 
-void awsSource::Broadcast (unsigned long signal)
+void awsSource::Broadcast (uint32 signal)
 {
   for (size_t i = 0; i < slots.Length (); ++i)
   {

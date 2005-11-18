@@ -20,6 +20,9 @@ chronological order.
 	- Jorrit changed awstut to use OpenGL by default.
 	- Jorrit fixed a bug in AWS Popup Menu. It was using 'sink' before
 	  it was setup.
+	- Jorrit fixed a 64-bit issue in AWS: Broadcast was using an
+	  unsigned long. Should be an uint32. unsigned long caused
+	  signalComponentCreated messages to fail.
 17-Nov-2005
 	- Jorrit removed the OR specific csRenderQueueSet class from the
 	  engine.

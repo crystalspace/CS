@@ -1118,7 +1118,7 @@ bool awsComponent::UnregisterSlot (iAwsSlot *slot, unsigned long signal)
   return signalsrc.UnregisterSlot (slot, signal);
 }
 
-void awsComponent::Broadcast (unsigned long signal)
+void awsComponent::Broadcast (uint32 signal)
 {
   signalsrc.Broadcast (signal);
 }

@@ -724,7 +724,7 @@ struct iAwsSource : public iBase
   virtual bool UnregisterSlot(iAwsSlot *slot, unsigned long signal) = 0;
 
   /// Broadcasts a signal to all slots that are interested.
-  virtual void Broadcast(unsigned long signal) = 0;
+  virtual void Broadcast(uint32 signal) = 0;
 };
 
 
