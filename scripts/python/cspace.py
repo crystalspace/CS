@@ -2487,6 +2487,7 @@ class csPluginRequestArray(_object):
     def Truncate(*args): return _cspace.csPluginRequestArray_Truncate(*args)
     def Empty(*args): return _cspace.csPluginRequestArray_Empty(*args)
     def IsEmpty(*args): return _cspace.csPluginRequestArray_IsEmpty(*args)
+    def SetMinimalCapacity(*args): return _cspace.csPluginRequestArray_SetMinimalCapacity(*args)
     def DeleteIndex(*args): return _cspace.csPluginRequestArray_DeleteIndex(*args)
     def DeleteIndexFast(*args): return _cspace.csPluginRequestArray_DeleteIndexFast(*args)
     def DeleteRange(*args): return _cspace.csPluginRequestArray_DeleteRange(*args)
@@ -3690,13 +3691,11 @@ class iFrustumView(iBase):
     def CallObjectFunction(*args): return _cspace.iFrustumView_CallObjectFunction(*args)
     def GetRadius(*args): return _cspace.iFrustumView_GetRadius(*args)
     def GetSquaredRadius(*args): return _cspace.iFrustumView_GetSquaredRadius(*args)
-    def ThingShadowsEnabled(*args): return _cspace.iFrustumView_ThingShadowsEnabled(*args)
     def CheckShadowMask(*args): return _cspace.iFrustumView_CheckShadowMask(*args)
     def CheckProcessMask(*args): return _cspace.iFrustumView_CheckProcessMask(*args)
     def StartNewShadowBlock(*args): return _cspace.iFrustumView_StartNewShadowBlock(*args)
     def SetUserdata(*args): return _cspace.iFrustumView_SetUserdata(*args)
     def GetUserdata(*args): return _cspace.iFrustumView_GetUserdata(*args)
-    def CreateShadowBlock(*args): return _cspace.iFrustumView_CreateShadowBlock(*args)
     def __del__(self, destroy=_cspace.delete_iFrustumView):
         try:
             if self.thisown: destroy(self)
@@ -3714,7 +3713,6 @@ _cspace.iFrustumView_swigregister(iFrustumViewPtr)
 
 iFrustumView_scfGetVersion = _cspace.iFrustumView_scfGetVersion
 
-CS_LIGHT_THINGSHADOWS = _cspace.CS_LIGHT_THINGSHADOWS
 CS_LIGHT_ACTIVEHALO = _cspace.CS_LIGHT_ACTIVEHALO
 CS_LIGHT_DYNAMICTYPE_STATIC = _cspace.CS_LIGHT_DYNAMICTYPE_STATIC
 CS_LIGHT_DYNAMICTYPE_PSEUDO = _cspace.CS_LIGHT_DYNAMICTYPE_PSEUDO
