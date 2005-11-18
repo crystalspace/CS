@@ -2786,6 +2786,7 @@ sub new {
 *Truncate = *cspacec::csPluginRequestArray_Truncate;
 *Empty = *cspacec::csPluginRequestArray_Empty;
 *IsEmpty = *cspacec::csPluginRequestArray_IsEmpty;
+*SetMinimalCapacity = *cspacec::csPluginRequestArray_SetMinimalCapacity;
 *DeleteIndex = *cspacec::csPluginRequestArray_DeleteIndex;
 *DeleteIndexFast = *cspacec::csPluginRequestArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csPluginRequestArray_DeleteRange;
@@ -4213,13 +4214,11 @@ package cspace::iFrustumView;
 *CallObjectFunction = *cspacec::iFrustumView_CallObjectFunction;
 *GetRadius = *cspacec::iFrustumView_GetRadius;
 *GetSquaredRadius = *cspacec::iFrustumView_GetSquaredRadius;
-*ThingShadowsEnabled = *cspacec::iFrustumView_ThingShadowsEnabled;
 *CheckShadowMask = *cspacec::iFrustumView_CheckShadowMask;
 *CheckProcessMask = *cspacec::iFrustumView_CheckProcessMask;
 *StartNewShadowBlock = *cspacec::iFrustumView_StartNewShadowBlock;
 *SetUserdata = *cspacec::iFrustumView_SetUserdata;
 *GetUserdata = *cspacec::iFrustumView_GetUserdata;
-*CreateShadowBlock = *cspacec::iFrustumView_CreateShadowBlock;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -14577,7 +14576,6 @@ sub CS_POLYMESH_CONVEX () { $cspacec::CS_POLYMESH_CONVEX }
 sub CS_POLYMESH_NOTCONVEX () { $cspacec::CS_POLYMESH_NOTCONVEX }
 sub CS_POLYMESH_DEFORMABLE () { $cspacec::CS_POLYMESH_DEFORMABLE }
 sub CS_POLYMESH_TRIANGLEMESH () { $cspacec::CS_POLYMESH_TRIANGLEMESH }
-sub CS_LIGHT_THINGSHADOWS () { $cspacec::CS_LIGHT_THINGSHADOWS }
 sub CS_LIGHT_ACTIVEHALO () { $cspacec::CS_LIGHT_ACTIVEHALO }
 sub CS_LIGHT_DYNAMICTYPE_STATIC () { $cspacec::CS_LIGHT_DYNAMICTYPE_STATIC }
 sub CS_LIGHT_DYNAMICTYPE_PSEUDO () { $cspacec::CS_LIGHT_DYNAMICTYPE_PSEUDO }
