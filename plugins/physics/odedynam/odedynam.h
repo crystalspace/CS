@@ -1532,113 +1532,113 @@ struct ODEHinge2Joint : public csStrictODEJoint, iODEHinge2Joint
 
   void SetLoStop (float value, int axis)
   {
-    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamLoStop, axis,
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamLoStop, axis,
       value);
   }
   void SetHiStop (float value, int axis)
   {
-    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamHiStop, axis,
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamHiStop, axis,
       value);
   }
   void SetVel (float value, int axis)
   {
-    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamVel, axis,
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamVel, axis,
       value);
   }
   void SetFMax (float value, int axis)
   {
-    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamFMax, axis,
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamFMax, axis,
       value);
   }
   void SetFudgeFactor (float value, int axis)
   {
-    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamFudgeFactor,
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamFudgeFactor,
       axis, value);
   }
   void SetBounce (float value, int axis)
   {
-    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamBounce, axis,
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamBounce, axis,
       value);
   }
   void SetCFM (float value, int axis)
   {
-    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamCFM, axis,
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamCFM, axis,
       value);
   }
   void SetStopERP (float value, int axis)
   {
-    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamStopERP, axis,
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamStopERP, axis,
       value);
   }
   void SetStopCFM (float value, int axis)
   {
-    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamStopCFM, axis,
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamStopCFM, axis,
       value);
   }
   void SetSuspensionERP (float value, int axis)
   {
-    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamSuspensionERP,
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamSuspensionERP,
       axis, value);
   }
   void SetSuspensionCFM (float value, int axis)
   {
-    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamSuspensionCFM,
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamSuspensionCFM,
       axis, value);
   }
 
   float GetLoStop (int axis)
   {
-    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamLoStop,
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamLoStop,
       axis);
   }
   float GetHiStop (int axis)
   {
-    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamHiStop,
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamHiStop,
       axis);
   }
   float GetVel (int axis)
   {
-    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamVel,
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamVel,
       axis);
   }
   float GetFMax (int axis)
   {
-    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamFMax,
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamFMax,
       axis);
   }
   float GetFudgeFactor (int axis)
   {
-    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamFudgeFactor,
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamFudgeFactor,
       axis);
   }
   float GetBounce (int axis)
   {
-    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamBounce,
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamBounce,
       axis);
   }
   float GetCFM (int axis)
   {
-    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamCFM,
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamCFM,
       axis);
   }
   float GetStopERP (int axis)
   {
-    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamStopERP,
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamStopERP,
       axis);
   }
   float GetStopCFM (int axis)
   {
-    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamStopCFM,
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE2, dParamStopCFM,
       axis);
   }
   float GetSuspensionERP (int axis)
   {
-    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE,
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE2,
     	dParamSuspensionERP, axis);
   }
   virtual float GetSuspensionCFM (int axis)
   {
-    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE,
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE2,
     	dParamSuspensionCFM, axis);
   }
 
