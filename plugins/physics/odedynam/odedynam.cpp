@@ -128,6 +128,10 @@ SCF_IMPLEMENT_IBASE (ODEHingeJoint)
 SCF_IMPLEMENTS_INTERFACE (iODEHingeJoint)
 SCF_IMPLEMENT_IBASE_END
 
+SCF_IMPLEMENT_IBASE (ODEHinge2Joint)
+SCF_IMPLEMENTS_INTERFACE (iODEHinge2Joint)
+SCF_IMPLEMENT_IBASE_END
+
 SCF_IMPLEMENT_IBASE (ODEAMotorJoint)
 SCF_IMPLEMENTS_INTERFACE (iODEAMotorJoint)
 SCF_IMPLEMENT_IBASE_END
@@ -642,6 +646,13 @@ csPtr<iODEHingeJoint> csODEDynamicSystem::CreateHingeJoint ()
   return  csPtr<iODEHingeJoint> (joint);
 }
 
+csPtr<iODEHinge2Joint> csODEDynamicSystem::CreateHinge2Joint ()
+{
+  ODEHinge2Joint* joint = new ODEHinge2Joint (GetWorldID());
+  strict_joints.Push (joint);
+  return  csPtr<iODEHinge2Joint> (joint);
+}
+
 csPtr<iODEAMotorJoint> csODEDynamicSystem::CreateAMotorJoint ()
 {
   ODEAMotorJoint* joint = new ODEAMotorJoint (GetWorldID());
@@ -660,10 +671,13 @@ void csODEDynamicSystem::RemoveJoint (iODEUniversalJoint *joint)
 {
   strict_joints.Delete ((ODEUniversalJoint*)joint);
 }
-
 void csODEDynamicSystem::RemoveJoint (iODEHingeJoint *joint)
 {
   strict_joints.Delete ((ODEHingeJoint*)joint);
+}
+void csODEDynamicSystem::RemoveJoint (iODEHinge2Joint *joint)
+{
+  strict_joints.Delete ((ODEHinge2Joint*)joint);
 }
 void csODEDynamicSystem::RemoveJoint (iODEAMotorJoint *joint)
 {
@@ -2249,6 +2263,60 @@ csVector3 ODEAMotorJoint::GetAMotorAxis (int axis_num)
   dVector3 pos;
   dJointGetAMotorAxis (jointID, axis_num, pos);
   return csVector3 (pos[0], pos[1], pos[2]);
+}
+//-------------------------------------------------------------------------------
+
+ODEHinge2Joint::ODEHinge2Joint (dWorldID w_id)
+{
+  SCF_CONSTRUCT_IBASE (0);
+  jointID = dJointCreateHinge2 (w_id, 0);
+}
+
+ODEHinge2Joint::~ODEHinge2Joint ()
+{
+  SCF_DESTRUCT_IBASE();
+  dJointDestroy (jointID);
+}
+
+csVector3 ODEHinge2Joint::GetHingeAnchor1 ()
+{
+  dVector3 pos;
+  dJointGetHinge2Anchor (jointID, pos);
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+
+csVector3 ODEHinge2Joint::GetHingeAnchor2 ()
+{
+  dVector3 pos;
+  dJointGetHinge2Anchor2 (jointID, pos);
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+
+csVector3 ODEHinge2Joint::GetHingeAxis1 ()
+{
+  dVector3 pos;
+  dJointGetHinge2Axis1 (jointID, pos);
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+
+csVector3 ODEHinge2Joint::GetHingeAxis2 ()
+{
+  dVector3 pos;
+  dJointGetHinge2Axis2 (jointID, pos);
+  return csVector3 (pos[0], pos[1], pos[2]);
+}
+
+csVector3 ODEHinge2Joint::GetAnchorError ()
+{
+  csVector3 pos1 = GetHingeAnchor1 ();
+  csVector3 pos2 = GetHingeAnchor2 ();
+
+  csVector3 result =  pos1 - pos2;
+  if (result.x < 0) result.x = - result.x;
+  if (result.y < 0) result.y = - result.y;
+  if (result.z < 0) result.z = - result.z;
+
+  return result;
 }
 
 //-------------------------------------------------------------------------------

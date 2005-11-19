@@ -502,6 +502,8 @@ public:
     { return scfParent->CreateAMotorJoint (); }
     csPtr<iODEHingeJoint> CreateHingeJoint ()
     { return scfParent->CreateHingeJoint (); }
+    csPtr<iODEHinge2Joint> CreateHinge2Joint ()
+    { return scfParent->CreateHinge2Joint (); }
     csPtr<iODESliderJoint> CreateSliderJoint ()
     { return scfParent->CreateSliderJoint (); }
     void RemoveJoint (iODEBallJoint *joint)
@@ -509,6 +511,8 @@ public:
     void RemoveJoint (iODEAMotorJoint *joint)
     { scfParent->RemoveJoint (joint); }
     void RemoveJoint (iODEHingeJoint *joint)
+    { scfParent->RemoveJoint (joint); }
+    void RemoveJoint (iODEHinge2Joint *joint)
     { scfParent->RemoveJoint (joint); }
     void RemoveJoint (iODEUniversalJoint *joint)
     { scfParent->RemoveJoint (joint); }
@@ -553,6 +557,7 @@ public:
   virtual csPtr<iJoint> CreateJoint ();
   virtual csPtr<iODEBallJoint> CreateBallJoint ();
   virtual csPtr<iODEHingeJoint> CreateHingeJoint ();
+  virtual csPtr<iODEHinge2Joint> CreateHinge2Joint ();
   virtual csPtr<iODEAMotorJoint> CreateAMotorJoint ();
   virtual csPtr<iODEUniversalJoint> CreateUniversalJoint ();
   virtual csPtr<iODESliderJoint> CreateSliderJoint ();
@@ -561,6 +566,7 @@ public:
   virtual void RemoveJoint (iODEBallJoint* joint);
   virtual void RemoveJoint (iODEAMotorJoint* joint);
   virtual void RemoveJoint (iODEHingeJoint* joint);
+  virtual void RemoveJoint (iODEHinge2Joint* joint);
   virtual void RemoveJoint (iODEUniversalJoint* joint);
   virtual void RemoveJoint (iODESliderJoint* joint);
 
@@ -1490,6 +1496,172 @@ struct ODEAMotorJoint : public csStrictODEJoint, iODEAMotorJoint
   {
     return dJointGetAMotorAngle (jointID, axis_num);
   }
+  csVector3 GetFeedbackForce1 ()
+  {
+    return csStrictODEJoint::GetFeedbackForce1 ();
+  }
+  csVector3 GetFeedbackTorque1 ()
+  {
+    return csStrictODEJoint::GetFeedbackForce2 ();
+  }
+  csVector3 GetFeedbackForce2 ()
+  {
+    return csStrictODEJoint::GetFeedbackTorque1 ();
+  }
+  csVector3 GetFeedbackTorque2 ()
+  {
+    return csStrictODEJoint::GetFeedbackTorque2 ();
+  }
+
+  void Attach (iRigidBody *body1, iRigidBody *body2)
+  {
+    csStrictODEJoint::Attach (body1, body2);
+  }
+  csRef<iRigidBody> GetAttachedBody (int body)
+  {
+    return csStrictODEJoint::GetAttachedBody (body);
+  }
+};
+
+struct ODEHinge2Joint : public csStrictODEJoint, iODEHinge2Joint
+{
+  SCF_DECLARE_IBASE;
+
+  ODEHinge2Joint (dWorldID w_id);
+  virtual ~ODEHinge2Joint ();
+
+  void SetLoStop (float value, int axis)
+  {
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamLoStop, axis,
+      value);
+  }
+  void SetHiStop (float value, int axis)
+  {
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamHiStop, axis,
+      value);
+  }
+  void SetVel (float value, int axis)
+  {
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamVel, axis,
+      value);
+  }
+  void SetFMax (float value, int axis)
+  {
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamFMax, axis,
+      value);
+  }
+  void SetFudgeFactor (float value, int axis)
+  {
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamFudgeFactor,
+      axis, value);
+  }
+  void SetBounce (float value, int axis)
+  {
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamBounce, axis,
+      value);
+  }
+  void SetCFM (float value, int axis)
+  {
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamCFM, axis,
+      value);
+  }
+  void SetStopERP (float value, int axis)
+  {
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamStopERP, axis,
+      value);
+  }
+  void SetStopCFM (float value, int axis)
+  {
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamStopCFM, axis,
+      value);
+  }
+  void SetSuspensionERP (float value, int axis)
+  {
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamSuspensionERP,
+      axis, value);
+  }
+  void SetSuspensionCFM (float value, int axis)
+  {
+    csStrictODEJoint::SetParam (CS_ODE_JOINT_TYPE_HINGE, dParamSuspensionCFM,
+      axis, value);
+  }
+
+  float GetLoStop (int axis)
+  {
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamLoStop,
+      axis);
+  }
+  float GetHiStop (int axis)
+  {
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamHiStop,
+      axis);
+  }
+  float GetVel (int axis)
+  {
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamVel,
+      axis);
+  }
+  float GetFMax (int axis)
+  {
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamFMax,
+      axis);
+  }
+  float GetFudgeFactor (int axis)
+  {
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamFudgeFactor,
+      axis);
+  }
+  float GetBounce (int axis)
+  {
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamBounce,
+      axis);
+  }
+  float GetCFM (int axis)
+  {
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamCFM,
+      axis);
+  }
+  float GetStopERP (int axis)
+  {
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamStopERP,
+      axis);
+  }
+  float GetStopCFM (int axis)
+  {
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE, dParamStopCFM,
+      axis);
+  }
+  float GetSuspensionERP (int axis)
+  {
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE,
+    	dParamSuspensionERP, axis);
+  }
+  virtual float GetSuspensionCFM (int axis)
+  {
+    return csStrictODEJoint::GetParam (CS_ODE_JOINT_TYPE_HINGE,
+    	dParamSuspensionCFM, axis);
+  }
+
+  void SetHingeAnchor (const csVector3 &pos)
+  {
+    dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
+  }
+  void SetHingeAxis1 (const csVector3 &axis)
+  {
+    dJointSetHinge2Axis1 (jointID, axis.x, axis.y, axis.z);
+  }
+  void SetHingeAxis2 (const csVector3 &axis)
+  {
+    dJointSetHinge2Axis2 (jointID, axis.x, axis.y, axis.z);
+  }
+  csVector3 GetHingeAnchor1 ();
+  csVector3 GetHingeAnchor2 ();
+  csVector3 GetHingeAxis1 ();
+  csVector3 GetHingeAxis2 ();
+  float GetHingeAngle () {return dJointGetHingeAngle (jointID);}
+  float GetHingeAngleRate1 () {return dJointGetHinge2Angle1Rate (jointID);}
+  float GetHingeAngleRate2 () {return dJointGetHinge2Angle2Rate (jointID);};
+  csVector3 GetAnchorError ();
   csVector3 GetFeedbackForce1 ()
   {
     return csStrictODEJoint::GetFeedbackForce1 ();

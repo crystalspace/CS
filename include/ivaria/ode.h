@@ -715,6 +715,78 @@ struct iODEAMotorJoint : public iODEGeneralJointState
   virtual float GetAMotorAngleRate (int axis_num) = 0;
 };
 
+SCF_VERSION (iODEHinge2Joint, 0, 0, 1);
+
+/**
+ * ODE hinge 2 joint. The hinge-2 joint is the same as two hinges connected 
+ * in series, with different hinge axe.
+ */
+struct iODEHinge2Joint : public iODEGeneralJointState
+{
+  /**
+   * Set the joint anchor point. The joint will try to keep this point
+   * on each body together. Input specified in world coordinates.
+   */
+  virtual void SetHingeAnchor (const csVector3 &pos) = 0;
+
+  /**
+   * Sets free hinge2 axis 1.
+   */
+  virtual void SetHingeAxis1 (const csVector3 &axis) = 0;
+
+  /**
+   * Sets free hinge2 axis 2.
+   */
+  virtual void SetHingeAxis2 (const csVector3 &axis) = 0;
+
+
+  /**
+   * Get the joint anchor point, in world coordinates. This returns the
+   * point on body 1.
+   */
+  virtual csVector3 GetHingeAnchor1 () = 0;
+
+  /**
+   * Get the joint anchor point, in world coordinates. This returns the
+   * point on body 2.
+   */
+  virtual csVector3 GetHingeAnchor2 () = 0;
+
+  /**
+   * Get free hinge axis 1.
+   */
+  virtual csVector3 GetHingeAxis1 () = 0;
+
+  /**
+   * Get free hinge axis 2.
+   */
+  virtual csVector3 GetHingeAxis2 () = 0;
+
+  /**
+   * Get the hinge angle. The nagle is measured between the two bodies.
+   * The angle will be between -pi..pi. When the hinge anchor or axis
+   * is set, the current position of the attached bodies is examined and
+   * that position will be the zero angle.
+   */
+  virtual float GetHingeAngle () = 0;
+
+  /**
+   * Get the time derivative of angle value.
+   */
+  virtual float GetHingeAngleRate1 () = 0;
+
+  /**
+   * Get the time derivative of angle value.
+   */
+  virtual float GetHingeAngleRate2 () = 0;
+
+  /**
+   * This value will show you how far the joint has come apart.
+   */
+  virtual csVector3 GetAnchorError () = 0;
+
+};
+
 SCF_VERSION (iODEHingeJoint, 0, 0, 1);
 
 /**
