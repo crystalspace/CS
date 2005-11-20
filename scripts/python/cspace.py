@@ -12313,6 +12313,40 @@ _cspace.iODEAMotorJoint_swigregister(iODEAMotorJointPtr)
 
 iODEAMotorJoint_scfGetVersion = _cspace.iODEAMotorJoint_scfGetVersion
 
+class iODEHinge2Joint(iODEGeneralJointState):
+    __swig_setmethods__ = {}
+    for _s in [iODEGeneralJointState]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEHinge2Joint, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iODEGeneralJointState]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iODEHinge2Joint, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iODEHinge2Joint instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetHingeAnchor(*args): return _cspace.iODEHinge2Joint_SetHingeAnchor(*args)
+    def SetHingeAxis1(*args): return _cspace.iODEHinge2Joint_SetHingeAxis1(*args)
+    def SetHingeAxis2(*args): return _cspace.iODEHinge2Joint_SetHingeAxis2(*args)
+    def GetHingeAnchor1(*args): return _cspace.iODEHinge2Joint_GetHingeAnchor1(*args)
+    def GetHingeAnchor2(*args): return _cspace.iODEHinge2Joint_GetHingeAnchor2(*args)
+    def GetHingeAxis1(*args): return _cspace.iODEHinge2Joint_GetHingeAxis1(*args)
+    def GetHingeAxis2(*args): return _cspace.iODEHinge2Joint_GetHingeAxis2(*args)
+    def GetHingeAngle(*args): return _cspace.iODEHinge2Joint_GetHingeAngle(*args)
+    def GetHingeAngleRate1(*args): return _cspace.iODEHinge2Joint_GetHingeAngleRate1(*args)
+    def GetHingeAngleRate2(*args): return _cspace.iODEHinge2Joint_GetHingeAngleRate2(*args)
+    def GetAnchorError(*args): return _cspace.iODEHinge2Joint_GetAnchorError(*args)
+    def __del__(self, destroy=_cspace.delete_iODEHinge2Joint):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iODEHinge2JointPtr(iODEHinge2Joint):
+    def __init__(self, this):
+        _swig_setattr(self, iODEHinge2Joint, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iODEHinge2Joint, 'thisown', 0)
+        _swig_setattr(self, iODEHinge2Joint,self.__class__,iODEHinge2Joint)
+_cspace.iODEHinge2Joint_swigregister(iODEHinge2JointPtr)
+
 class iODEHingeJoint(iODEGeneralJointState):
     __swig_setmethods__ = {}
     for _s in [iODEGeneralJointState]: __swig_setmethods__.update(_s.__swig_setmethods__)
