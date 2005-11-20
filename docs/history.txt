@@ -6,9 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-
 20-Nov-2005
         - Piotr Obrzut added missing method for creating/deleting hinge2
+	- Jorrit fixed awstest to compile again after changing the Broadcast
+	  prototype.
 19-Nov-2005
         - Piotr Obrzut added cs interface to ode hinge 2 joint
 18-Nov-2005

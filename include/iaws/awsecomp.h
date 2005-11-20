@@ -64,7 +64,7 @@ public:
   { return comp->UnregisterSlot (slot, signal); }
 
   /// Broadcasts a signal to all slots that are interested.
-  virtual void Broadcast (unsigned long signal)
+  virtual void Broadcast (uint32 signal)
   { comp->Broadcast (signal); }
 
 public:
