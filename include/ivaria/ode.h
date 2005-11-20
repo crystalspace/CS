@@ -121,6 +121,7 @@ SCF_VERSION (iODEDynamicSystemState, 0, 0, 2);
 
 struct iODEBallJoint;
 struct iODEHingeJoint;
+struct iODEHinge2Joint;
 struct iODEAMotorJoint;
 struct iODEUniversalJoint;
 struct iODESliderJoint;
@@ -232,6 +233,9 @@ struct iODEDynamicSystemState : public iBase
   /// Create a hinge joint and add it to he simulation
   virtual csPtr<iODEHingeJoint> CreateHingeJoint () = 0;
 
+  /// Create a hinge2 joint and add it to he simulation
+  virtual csPtr<iODEHinge2Joint> CreateHinge2Joint () = 0;
+
   /// Create a AMotor joint and add it to he simulation
   virtual csPtr<iODEAMotorJoint> CreateAMotorJoint () = 0;
 
@@ -255,6 +259,9 @@ struct iODEDynamicSystemState : public iBase
 
   /// Remove a Slider joint from the simulation
   virtual void RemoveJoint (iODESliderJoint* joint) = 0;
+
+  /// Remove a Slider joint from the simulation
+  virtual void RemoveJoint (iODEHinge2Joint* joint) = 0;
 
   /**
    * Set the maximum correcting velocity that contacts are
