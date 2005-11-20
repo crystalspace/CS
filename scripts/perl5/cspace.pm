@@ -13538,6 +13538,47 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iODEHinge2Joint ##############
+
+package cspace::iODEHinge2Joint;
+@ISA = qw( cspace cspace::iODEGeneralJointState );
+%OWNER = ();
+%ITERATORS = ();
+*SetHingeAnchor = *cspacec::iODEHinge2Joint_SetHingeAnchor;
+*SetHingeAxis1 = *cspacec::iODEHinge2Joint_SetHingeAxis1;
+*SetHingeAxis2 = *cspacec::iODEHinge2Joint_SetHingeAxis2;
+*GetHingeAnchor1 = *cspacec::iODEHinge2Joint_GetHingeAnchor1;
+*GetHingeAnchor2 = *cspacec::iODEHinge2Joint_GetHingeAnchor2;
+*GetHingeAxis1 = *cspacec::iODEHinge2Joint_GetHingeAxis1;
+*GetHingeAxis2 = *cspacec::iODEHinge2Joint_GetHingeAxis2;
+*GetHingeAngle = *cspacec::iODEHinge2Joint_GetHingeAngle;
+*GetHingeAngleRate1 = *cspacec::iODEHinge2Joint_GetHingeAngleRate1;
+*GetHingeAngleRate2 = *cspacec::iODEHinge2Joint_GetHingeAngleRate2;
+*GetAnchorError = *cspacec::iODEHinge2Joint_GetAnchorError;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iODEHinge2Joint($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iODEHingeJoint ##############
 
 package cspace::iODEHingeJoint;
