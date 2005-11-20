@@ -10,6 +10,11 @@ chronological order.
         - Piotr Obrzut added missing method for creating/deleting hinge2
 	- Jorrit fixed awstest to compile again after changing the Broadcast
 	  prototype.
+	- Jorrit fixed a bug in the Engine View of AWS. Apparently the clip
+	  rect must be set inverted in y direction (relative to height
+	  of display) if used for 3D rendering as opposed to 2D rendering.
+	  This may actually be a bug in the renderer/canvas. Worked around
+	  it in AWS for now.
 19-Nov-2005
         - Piotr Obrzut added cs interface to ode hinge 2 joint
 18-Nov-2005

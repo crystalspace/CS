@@ -64,7 +64,7 @@ const char* awsEngineView::Type ()
   return "Engine View";
 }
 
-void awsEngineView::OnDraw (csRect /*clip*/)
+void awsEngineView::OnDraw (csRect clip)
 {
   if (view)
   {
@@ -77,6 +77,11 @@ void awsEngineView::OnDraw (csRect /*clip*/)
       g3d->GetHeight () - Frame ().ymax,
       Frame ().Width (),
       Frame ().Height ());
+
+    // @@@ For some reason we have to relocate the cliprect if we
+    // are doing 3D graphics.
+    g3d->GetDriver2D ()->SetClipRect(clip.xmin, g3d->GetHeight ()-clip.ymax, 
+	clip.xmax, g3d->GetHeight ()-clip.ymin);
     view->GetCamera ()->SetPerspectiveCenter (
       Frame ().xmin + (Frame ().Width () >> 1),
       (g3d->GetHeight () - Frame ().Height () - Frame ().ymin) +
