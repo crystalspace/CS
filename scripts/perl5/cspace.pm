@@ -13232,6 +13232,7 @@ package cspace::iODEDynamicSystemState;
 *FastObjectsEnabled = *cspacec::iODEDynamicSystemState_FastObjectsEnabled;
 *CreateBallJoint = *cspacec::iODEDynamicSystemState_CreateBallJoint;
 *CreateHingeJoint = *cspacec::iODEDynamicSystemState_CreateHingeJoint;
+*CreateHinge2Joint = *cspacec::iODEDynamicSystemState_CreateHinge2Joint;
 *CreateAMotorJoint = *cspacec::iODEDynamicSystemState_CreateAMotorJoint;
 *CreateUniversalJoint = *cspacec::iODEDynamicSystemState_CreateUniversalJoint;
 *CreateSliderJoint = *cspacec::iODEDynamicSystemState_CreateSliderJoint;
