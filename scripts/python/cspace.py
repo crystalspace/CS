@@ -12025,6 +12025,7 @@ class iODEDynamicSystemState(iBase):
     def FastObjectsEnabled(*args): return _cspace.iODEDynamicSystemState_FastObjectsEnabled(*args)
     def CreateBallJoint(*args): return _cspace.iODEDynamicSystemState_CreateBallJoint(*args)
     def CreateHingeJoint(*args): return _cspace.iODEDynamicSystemState_CreateHingeJoint(*args)
+    def CreateHinge2Joint(*args): return _cspace.iODEDynamicSystemState_CreateHinge2Joint(*args)
     def CreateAMotorJoint(*args): return _cspace.iODEDynamicSystemState_CreateAMotorJoint(*args)
     def CreateUniversalJoint(*args): return _cspace.iODEDynamicSystemState_CreateUniversalJoint(*args)
     def CreateSliderJoint(*args): return _cspace.iODEDynamicSystemState_CreateSliderJoint(*args)
