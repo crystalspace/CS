@@ -243,7 +243,12 @@
       </applicable>
     </rule>
 
-
+    <!--
+      * 2005-11-22: Jorrit reports despicable performance with 64bit ATI
+		    drivers and also states other sources would attribute a
+		    generally poor performance to ATI Linux drivers.
+		    @@@ Whether only certain version(s) are affected is unknown.
+      -->
     <rule description="Disable VBO for GNU/Linux ATI drivers">
       <conditions fulfill="all">
 	<regexp string="platform" pattern="Unix" />
@@ -254,16 +259,24 @@
       </applicable>
     </rule>
 
+    <!-- 
+      * 2005-11-22: VBO reported to give speed up for at least 
+		    Forceware 81.85 
+      -->
     <rule description="GeForce FX 5xxx: Slow VBO">
       <conditions>
 	<regexp string="renderer" pattern="^GeForce FX 5..." />
-	<!-- @@@ Add some version check ? -->
+	<comparever version="win32_driver" relation="lt 6.14.10.8185" />
       </conditions>
       <applicable>
 	<usecfg>novbo</usecfg>
       </applicable>
     </rule>
 
+    <!-- 
+      * 2005-11-22: VBO reported to give slowdown for at least 
+		    Forceware 75.90
+      -->
     <rule description="GeForce 4 440 Go: Slow VBO">
       <conditions>
 	<regexp string="renderer" pattern="^GeForce *4.*440 *Go" />
