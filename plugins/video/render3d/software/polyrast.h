@@ -292,8 +292,8 @@ namespace cspluginSoft3d
 	  if (v1.x < min_x) min_x = v1.x;
 	}
 
-	const float z1 = 1.0f/v1.z;
-	const float z2 = 1.0f/v2.z;
+	const float z1 = v1.z;
+	const float z2 = v2.z;
 	if (z1 > z2)
 	{
 	  if (z1 > max_z) max_z = z1;
@@ -309,9 +309,9 @@ namespace cspluginSoft3d
       ipolShift = 4;
 
       // Pick an interpolation step...
-      /* @@@ FIXME: makes that computation sense?
-      * SelectInterpolationStep() is taken verbatim from the old polygon
-      * code, and I'm not certain about the Z slope values... [-res] */
+      /* @@@ FIXME: does that computation make sense?
+       * SelectInterpolationStep() is taken verbatim from the old polygon
+       * code, and I'm not certain about the Z slope values... [-res] */
       float dx = max_x - min_x;
       float zss = 0.0f;
       if (ABS(dx) > EPSILON)

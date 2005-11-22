@@ -239,12 +239,19 @@ void WalkTest::SaveCamera (const char *fName)
   const csMatrix3& m_o2t = camtrans.GetO2T ();
   const csVector3& v_o2t = camtrans.GetOrigin ();
   csString s;
-  s << v_o2t.x << ' ' << v_o2t.y << ' ' << v_o2t.z << '\n'
-    << m_o2t.m11 << ' ' << m_o2t.m12 << ' ' << m_o2t.m13 << '\n'
-    << m_o2t.m21 << ' ' << m_o2t.m22 << ' ' << m_o2t.m23 << '\n'
-    << m_o2t.m31 << ' ' << m_o2t.m32 << ' ' << m_o2t.m33 << '\n'
-    << '"' << c->GetSector ()->QueryObject ()->GetName () << "\"\n"
-    << c->IsMirrored () << '\n';
+  s.Format ("%.10f %.10f %.10f\n"
+    "%.10f %.10f %.10f\n"
+    "%.10f %.10f %.10f\n"
+    "%.10f %.10f %.10f\n"
+    "\"%s\"\n"
+    "%d\n",
+    v_o2t.x, v_o2t.y, v_o2t.z,
+    m_o2t.m11, m_o2t.m12, m_o2t.m13, 
+    m_o2t.m21, m_o2t.m22, m_o2t.m23, 
+    m_o2t.m31, m_o2t.m32, m_o2t.m33, 
+    c->GetSector ()->QueryObject ()->GetName (), 
+    int(c->IsMirrored ()));
+
   myVFS->WriteFile (fName, s.GetData(), s.Length());
 }
 

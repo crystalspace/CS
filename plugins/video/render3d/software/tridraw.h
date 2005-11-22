@@ -212,8 +212,8 @@ namespace cspluginSoft3d
       tri.b = b;
       tri.c = c;
       /* Small Z clipping. Also projects unprojected vertices (skipped in
-      * ProjectVertices() due a Z coord too small) and will invert the Z
-      * of the pespective verts. */
+       * ProjectVertices() due a Z coord too small) and will invert the Z
+       * of the pespective verts. */
       size_t n = bclipperZNear.DoClip (tri);
       if (n == 0) return false;
       CS_ASSERT((n >= 3) && (n <= 4));

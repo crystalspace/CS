@@ -72,6 +72,8 @@ public:
   virtual bool Compile();
 
   virtual int ResolveTU (const char* binding);
+
+  virtual const char* GetProgramType() { return "fragment"; }
 };
 
 

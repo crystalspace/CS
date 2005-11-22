@@ -170,7 +170,6 @@ bool csGLShader_CG::Open()
         "Routing Cg fragment programs to Pixel Shader plugin %s (default).", 
         route ? "ON" : "OFF");
   }
-  ext->InitGL_ARB_vertex_program ();
 
   debugDump = config->GetBool ("Video.OpenGL.Shader.Cg.DebugDump", false);
   if (debugDump)

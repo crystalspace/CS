@@ -159,10 +159,12 @@ namespace CrystalSpace
 		// because it is connected with at least one CS_VERTEX_ORIGINAL
 		float newPos;
 		if (statOut.GetVert (vert - 1) == statOut.GetVert (realvert))
+		{
 		  newPos = t * statOut.GetPos (realvert);
+		  statOut.OnEdge (OutV, vert - 1, newPos);
+		}
 		else
-		  newPos = t; // @@@ FIXME: correct?
-		statOut.OnEdge (OutV, vert - 1, newPos);
+		  statOut.Inside (OutV);
 	      }
 	    }
 	    else

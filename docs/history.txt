@@ -12,6 +12,12 @@ chronological order.
 	  needed for external projects using CS. I don't know why apps
 	  within CS itself work fine though (even without this line
 	  in sanity.inc).
+	- res made the haze plugin a bit SR-friendlier.
+	- res tweaked the Cg plugin to report slightly more information on the
+	  used profile.
+	- res fixed an SR clipping issue.
+	- res changed walktest to store the camera position with higher 
+	  precision.
 20-Nov-2005
         - Piotr Obrzut added missing method for creating/deleting hinge2
 	- Jorrit fixed awstest to compile again after changing the Broadcast

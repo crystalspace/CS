@@ -65,7 +65,7 @@ protected:
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   virtual const char ** GetProfileCompilerArgs (CGprofile /*profile*/) 
   { return 0; }
-
+  virtual const char* GetProgramType() = 0;
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 

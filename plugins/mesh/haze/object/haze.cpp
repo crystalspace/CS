@@ -779,7 +779,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
   {
     indices.buffer = csRenderBuffer::CreateIndexRenderBuffer (
       GetTempIndices()->Length(), CS_BUF_STREAM, 
-      CS_BUFCOMP_UNSIGNED_INT, 0, vertCount);
+      CS_BUFCOMP_UNSIGNED_INT, 0, vertCount-1);
   }
   indices.buffer->CopyInto (GetTempIndices()->GetArray(), 
     GetTempIndices()->Length());

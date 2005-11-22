@@ -307,8 +307,8 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
   if (shaderPlug->doVerbose)
   {
     shaderPlug->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Cg program '%s': using profile %s", description.GetData (), 
-      cgGetProfileString (profile));
+      "Cg %s program '%s': using profile %s[%d]", GetProgramType(),
+      description.GetData (), cgGetProfileString (profile), profile);
   }
 
   program = cgCreateProgram (shaderPlug->context, 
