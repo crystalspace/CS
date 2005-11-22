@@ -21,6 +21,9 @@ chronological order.
 	- res fixed an SR clipping issue.
 	- res changed walktest to store the camera position with higher 
 	  precision.
+	- Jorrit disabled VBO globally for the ATI/Linux combination.
+	  Jorrit disabled VBO for GeForce4 440 Go.
+	  Jorrit otherwise enabled VBO again by default.
 20-Nov-2005
         - Piotr Obrzut added missing method for creating/deleting hinge2
 	- Jorrit fixed awstest to compile again after changing the Broadcast

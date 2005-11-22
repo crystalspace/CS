@@ -242,17 +242,37 @@
 	<usecfg>brokenstencil</usecfg>
       </applicable>
     </rule>
-    
-    <rule description="Disable VBO for GNU/Linux ATI drivers 3.2.8">
+
+
+    <rule description="Disable VBO for GNU/Linux ATI drivers">
       <conditions fulfill="all">
 	<regexp string="platform" pattern="Unix" />
 	<regexp string="vendor" pattern="^ATI" />
-	<regexp string="glversion" pattern="X4.3.0-3.2.8" />
       </conditions>
       <applicable>
 	<usecfg>novbo</usecfg>
       </applicable>
     </rule>
+
+    <rule description="GeForce FX 5xxx: Slow VBO">
+      <conditions>
+	<regexp string="renderer" pattern="^GeForce FX 5..." />
+	<!-- @@@ Add some version check ? -->
+      </conditions>
+      <applicable>
+	<usecfg>novbo</usecfg>
+      </applicable>
+    </rule>
+
+    <rule description="GeForce 4 440 Go: Slow VBO">
+      <conditions>
+	<regexp string="renderer" pattern="^GeForce *4.*440 *Go" />
+      </conditions>
+      <applicable>
+	<usecfg>novbo</usecfg>
+      </applicable>
+    </rule>
+
     
     <rule description="Work around broken ATI point sprites">
       <conditions>
@@ -270,16 +290,6 @@
       </conditions>
       <applicable>
 	<usecfg>3dfxhacks</usecfg>
-      </applicable>
-    </rule>
-    
-    <rule description="GeForce FX 5xxx: Slow VBO">
-      <conditions>
-	<regexp string="renderer" pattern="^GeForce FX 5..." />
-	<!-- @@@ Add some version check ? -->
-      </conditions>
-      <applicable>
-	<usecfg>novbo</usecfg>
       </applicable>
     </rule>
     
