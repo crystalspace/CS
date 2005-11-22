@@ -12,6 +12,9 @@ chronological order.
 	  needed for external projects using CS. I don't know why apps
 	  within CS itself work fine though (even without this line
 	  in sanity.inc).
+	- Jorrit reverted the sanity.inc change since it breaks CS. However
+	  this means that iLoader->LoadLibrary() remains unusable for
+	  external projects for now.
 	- res made the haze plugin a bit SR-friendlier.
 	- res tweaked the Cg plugin to report slightly more information on the
 	  used profile.

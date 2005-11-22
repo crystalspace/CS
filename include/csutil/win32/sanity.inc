@@ -25,7 +25,6 @@
 #undef DeleteFile
 #undef GetClassName
 #undef LoadImage
-#undef LoadLibrary
 #undef max
 #undef min
 #undef RegisterClass
