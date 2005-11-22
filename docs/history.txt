@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Nov-2005
+	- Jorrit added LoadLibrary() to sanity.inc to avoid the define
+	  of LoadLibrary() to LoadLibraryA() on windows. This seems to be
+	  needed for external projects using CS. I don't know why apps
+	  within CS itself work fine though (even without this line
+	  in sanity.inc).
 20-Nov-2005
         - Piotr Obrzut added missing method for creating/deleting hinge2
 	- Jorrit fixed awstest to compile again after changing the Broadcast
