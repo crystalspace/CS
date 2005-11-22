@@ -261,12 +261,14 @@
 
     <!-- 
       * 2005-11-22: VBO reported to give speed up for at least 
-		    Forceware 81.85 
+		    Forceware 81.85
+      * 2005-11-22: VBO reported to give speed up for at least 
+		    Forceware 78.01
       -->
     <rule description="GeForce FX 5xxx: Slow VBO">
       <conditions>
 	<regexp string="renderer" pattern="^GeForce FX 5..." />
-	<comparever version="win32_driver" relation="lt 6.14.10.8185" />
+	<comparever version="win32_driver" relation="lt 6.14.10.7801" />
       </conditions>
       <applicable>
 	<usecfg>novbo</usecfg>
