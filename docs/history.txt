@@ -24,6 +24,9 @@ chronological order.
 	- Jorrit disabled VBO globally for the ATI/Linux combination.
 	  Jorrit disabled VBO for GeForce4 440 Go.
 	  Jorrit otherwise enabled VBO again by default.
+	- res limited "GF5 Slow VBO" tweak to only certain driver versions.
+	- res Also annotated some of the tweaks, the idea being to be later 
+	  able to determine whether a tweak may still be needed.
 	- Jorrit fixed a bug in sprcal3d. It was using csGetTicks() instead
 	  of the virtual clock to get the current time. As such this wouldn't
 	  be that bad except that it seems that on linux the csGetTicks()
@@ -32,6 +35,7 @@ chronological order.
 	  (because of a static variable used to normalize the time so it
 	  always starts at 0 or 1 and that static variable is repeated
 	  for every plugin).
+	- res fixed vertex attributes when used in conjunction with Cg shaders.
 20-Nov-2005
         - Piotr Obrzut added missing method for creating/deleting hinge2
 	- Jorrit fixed awstest to compile again after changing the Broadcast

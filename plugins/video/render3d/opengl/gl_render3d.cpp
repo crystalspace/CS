@@ -788,6 +788,7 @@ bool csGLGraphics3D::Open ()
     if (!ext->CS_GL_EXT_texture_rectangle)
       ext->InitGL_NV_texture_rectangle();
   }
+  ext->InitGL_ARB_vertex_program (); // needed for vertex attrib code
   //ext->InitGL_ATI_separate_stencil ();
 #ifdef CS_DEBUG
   ext->InitGL_GREMEDY_string_marker ();
