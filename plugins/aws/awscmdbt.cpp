@@ -263,18 +263,18 @@ void awsCmdButton::OnDraw (csRect /*clip*/)
         showing_style = fsSunken;
       else
         showing_style = fsRaised;
-      }
-      else if (style == fsToolbar)
-      {
-        if (is_down)
-          showing_style = fsSunken;
-        else if (can_raise)
-          showing_style = fsRaised;
-        else
-          showing_style = fsFlat;
-      }
-      frame_drawer.Draw (frame, showing_style, Window ()->Frame ());
     }
+    else if (style == fsToolbar)
+    {
+      if (is_down)
+        showing_style = fsSunken;
+      else if (can_raise)
+        showing_style = fsRaised;
+      else
+        showing_style = fsFlat;
+    }
+    frame_drawer.Draw (frame, showing_style, Window ()->Frame ());
+  }
   
   int tx = Frame ().Width () >> 1;
   int ty = Frame ().Height () >> 1;

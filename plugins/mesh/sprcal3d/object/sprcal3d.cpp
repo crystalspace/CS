@@ -915,7 +915,7 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   // the default anim first
   calModel.getMixer()->blendCycle(0,1,0);
   calModel.update(0);
-  last_update_time = csGetTicks();
+  last_update_time = factory->vc->GetCurrentTicks ();
 
   RecalcBoundingBox(object_bbox);
   calModel.getMixer()->clearCycle(0,0);
