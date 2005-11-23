@@ -10,9 +10,9 @@
     - <regexp>: Match one of the GL strings against a regular expression.
     - <comparever>: Compare the a version against a prefined value.
     - <negate>: True if the contained rule(s) are false.
-    - <match>: True if the contained rule(s) are true.
-    <conditions> as well as <negate> and <match> are containers for conditions;
-    by default, they are true if all contained conditions are true. This 
+    - <conditions>: True if the contained rule(s) are true.
+    <conditions> as well as <negate> are containers for conditions; by 
+    default, they are true if all contained conditions are true. This 
     behaviour can be changed by specifying the 'fulfill="one"' attribute. 
     (You can also specify 'fulfill="all"', but that's just like the default.)
     
@@ -264,11 +264,23 @@
 		    Forceware 81.85
       * 2005-11-22: VBO reported to give speed up for at least 
 		    Forceware 78.01
+      * 2005-11-22: VBO reported to give speed up for at least 
+		    Linux Forceware 76.67 (version string "2.0.0 NVIDIA 76.67")
       -->
     <rule description="GeForce FX 5xxx: Slow VBO">
       <conditions>
 	<regexp string="renderer" pattern="^GeForce FX 5..." />
-	<comparever version="win32_driver" relation="lt 6.14.10.7801" />
+	<conditions fulfill="one">
+	  <comparever version="win32_driver" relation="lt 6.14.10.7801" />
+	  <conditions fulfill="all">
+	    <regexp string="platform" pattern="Unix" />
+	    <comparever version="gl" relation="lt 2.0.0 NVIDIA 76.67" />
+	    <!-- Note: comparever is dumb, it just compares numbers, nothing
+		 in between. 
+		 E.g. "2.0.0 ATI 78.90" would make the comparison above, true,
+		 too. -->
+	  </conditions>
+	</conditions>
       </conditions>
       <applicable>
 	<usecfg>novbo</usecfg>
@@ -409,10 +421,10 @@
     <rule description="ATI: Enable hidden 2D texture NPOTS support">
       <conditions>
 	<regexp string="vendor" pattern="^ATI" />
-	<match fulfill="one">
+	<conditions fulfill="one">
 	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).." />
 	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) X..." />
-	</match>
+	</conditions>
       </conditions>
       <applicable>
 	<usecfg>hiddenNPOTS</usecfg>

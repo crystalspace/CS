@@ -25,7 +25,7 @@ chronological order.
 	  Jorrit disabled VBO for GeForce4 440 Go.
 	  Jorrit otherwise enabled VBO again by default.
 	- res limited "GF5 Slow VBO" tweak to only certain driver versions.
-	- res Also annotated some of the tweaks, the idea being to be later 
+	- res also annotated some of the tweaks, the idea being to be later 
 	  able to determine whether a tweak may still be needed.
 	- Jorrit fixed a bug in sprcal3d. It was using csGetTicks() instead
 	  of the virtual clock to get the current time. As such this wouldn't
@@ -36,6 +36,15 @@ chronological order.
 	  always starts at 0 or 1 and that static variable is repeated
 	  for every plugin).
 	- res fixed vertex attributes when used in conjunction with Cg shaders.
+	- res disabled VBO on GF5/Linux ForceWare below 76.67.
+	- res made the following changes to the driver db code:
+	    - More sensible syntax. You can now nest <conditions> nodes 
+	      instead of counter-intuitively having to use <match> to nest
+	      conditions.
+	    - Version number comparator is more tolerant; notably, an 
+	      arbitrary number of non-digits can appear between version parts
+	      (GL versions are often in the format "1.2.3 Vendor 4.5", those
+	      can be correctly compared now as well.)
 20-Nov-2005
         - Piotr Obrzut added missing method for creating/deleting hinge2
 	- Jorrit fixed awstest to compile again after changing the Broadcast

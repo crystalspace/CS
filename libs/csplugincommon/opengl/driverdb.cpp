@@ -151,7 +151,7 @@ bool csDriverDBReader::ParseConditions (iDocumentNode* node,
 
     switch (token)
     {
-      case csGLDriverDatabase::XMLTOKEN_MATCH:
+      case csGLDriverDatabase::XMLTOKEN_CONDITIONS:
 	if (!ParseConditions (child, lastResult))
 	  return false;
 	break;
@@ -254,6 +254,14 @@ static bool Compare (int a, int b, Relation rel)
   return false;
 }
 
+/* Returns the offset to the next block of characters with chars from
+ * charSet. e.g. NextBlock ("123abc456", "123456") returns 6. */
+static size_t NextBlock (const char* str, const char* charSet)
+{
+  size_t spnpos = strspn (str, charSet);
+  return spnpos + strcspn (str + spnpos, charSet);
+}
+
 bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
 {
   const char* version = node->GetAttributeValue ("version");
@@ -323,12 +331,14 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
   {
     while (1)
     {
-      size_t nextpos1 = strspn (curpos1, "0123456789");
+      static const char digits[] = "0123456789";
+
+      size_t nextpos1 = NextBlock (curpos1, digits);
       if (nextpos1 == 0) break;
-      size_t nextnextpos1 = strspn (curpos1 + nextpos1 + 1, "0123456789");
-      size_t nextpos2 = strspn (curpos2, "0123456789");
+      size_t nextnextpos1 = NextBlock (curpos1 + nextpos1, digits);
+      size_t nextpos2 = NextBlock (curpos2, digits);
       if (nextpos2 == 0) break;
-      size_t nextnextpos2 = strspn (curpos2 + nextpos2 + 1, "0123456789");
+      size_t nextnextpos2 = NextBlock (curpos2 + nextpos2, digits);
 
       bool last = (nextnextpos1 == 0) || (nextnextpos2 == 0);
 
@@ -345,8 +355,8 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
 	break;
       }
 
-      curpos1 += nextpos1 + 1;
-      curpos2 += nextpos2 + 1;
+      curpos1 += nextpos1;
+      curpos2 += nextpos2;
     }
   }
 
