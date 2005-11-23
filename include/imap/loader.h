@@ -78,18 +78,32 @@ struct iLoader : public iBase
     int Format = CS_IMGFMT_INVALID) = 0;
   /**
    * Load an image as with LoadImage() and create a texture handle from it.
-   * The 'Flags' parameter accepts the flags described in ivideo/txtmgr.h.
-   * The texture manager determines the format, so choosing an alternate format
-   * doesn't make sense here. Instead you may choose an alternate texture
-   * manager.
+   * \param Filename VFS path to the image file to load.
+   * \param Flags Accepts the flags described in ivideo/txtmgr.h.
+   *   The texture manager determines the format, so choosing an alternate 
+   *   format doesn't make sense here. Instead you may choose an alternate 
+   *   texture manager.
+   * \param tm Texture manager, used to determine the format the image is to
+   *   be loaded in (defaults to CS_IMGFMT_TRUECOLOR if no texture manager is
+   *   specified).
+   * \param image Optionally returns a reference to the loaded image.
    */
   virtual csPtr<iTextureHandle> LoadTexture (const char* Filename,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
 	csRef<iImage>* image=0) = 0;
   /**
    * Load a texture as with LoadTexture() above and register it with the
-   * engine. 'Name' is the name that the engine will use for the wrapper.
-   * 
+   * engine. 
+   *
+   * \param Name The name that the engine will use for the wrapper.
+   * \param Filename VFS path to the image file to load.
+   * \param Flags Accepts the flags described in ivideo/txtmgr.h.
+   *   The texture manager determines the format, so choosing an alternate 
+   *   format doesn't make sense here. Instead you may choose an alternate 
+   *   texture manager.
+   * \param tm Texture manager, used to determine the format the image is to
+   *   be loaded in (defaults to CS_IMGFMT_TRUECOLOR if no texture manager is
+   *   specified).
    * \param reg if true then the texture and material will be registered
    * to the texture manager. Set 'register' to false if you plan on calling
    * 'engine->Prepare()' later as that function will take care of registering
@@ -117,20 +131,33 @@ struct iLoader : public iBase
     int Format = CS_IMGFMT_INVALID) = 0;
   /**
    * Load an image as with LoadImage() and create a texture handle from it.
-   * The 'Flags' parameter accepts the flags described in ivideo/txtmgr.h.
-   * The texture manager determines the format, so choosing an alternate format
-   * doesn't make sense here. Instead you may choose an alternate texture
-   * manager.
    * This version reads the image from a data buffer.
+   * \param buf Buffer containing the image file data.
+   * \param Flags Accepts the flags described in ivideo/txtmgr.h.
+   *   The texture manager determines the format, so choosing an alternate 
+   *   format doesn't make sense here. Instead you may choose an alternate 
+   *   texture manager.
+   * \param tm Texture manager, used to determine the format the image is to
+   *   be loaded in (defaults to CS_IMGFMT_TRUECOLOR if no texture manager is
+   *   specified).
+   * \param image Optionally returns a reference to the loaded image.
    */
   virtual csPtr<iTextureHandle> LoadTexture (iDataBuffer* buf,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
 	csRef<iImage>* image=0) = 0;
   /**
    * Load a texture as with LoadTexture() above and register it with the
-   * engine. 'Name' is the name that the engine will use for the wrapper.
-   * This version reads the image from a data buffer.
-   *
+   * engine. This version reads the image from a data buffer.
+   * 
+   * \param Name The name that the engine will use for the wrapper.
+   * \param buf Buffer containing the image file data.
+   * \param Flags Accepts the flags described in ivideo/txtmgr.h.
+   *   The texture manager determines the format, so choosing an alternate 
+   *   format doesn't make sense here. Instead you may choose an alternate 
+   *   texture manager.
+   * \param tm Texture manager, used to determine the format the image is to
+   *   be loaded in (defaults to CS_IMGFMT_TRUECOLOR if no texture manager is
+   *   specified).
    * \param reg if true then the texture and material will be registered
    * to the texture manager. Set 'register' to false if you plan on calling
    * 'engine->Prepare()' later as that function will take care of registering
