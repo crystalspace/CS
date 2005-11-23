@@ -64,6 +64,8 @@ WALKALL.PLUGINLIST =
   simpcon
   simpleformer
   simpleformerldr
+  bruteblock
+  terrainldr
   snow
   snowldr
   spiral
@@ -111,6 +113,8 @@ if $(GL.AVAILABLE) = "yes"
   if $(GLX.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += glx2d ; }
   if $(TARGET.OS) = "WIN32" { WALKALL.PLUGINLIST += glwin32 ; }
   if $(TARGET.OS) = "MACOS_X" { WALKALL.PLUGINLIST += glosx2d ; }
+
+  if $(CG.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += glshader_cg ; }
 }
 else
 {
