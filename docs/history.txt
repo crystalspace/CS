@@ -9,6 +9,15 @@ chronological order.
 23-Nov-2005
 	- Jorrit added bruteblock, terrainldr, and glshader_cg to
 	  'walkall' target.
+	- Jorrit changed the trigger system in AWS to have an additional
+	  function. That means that every callback that is registered with
+	  RegisterTrigger() now needs to conform to the following
+	  prototype:
+	      static void Func (unsigned long, intptr_t, iAwsSource*)
+	  This extra parameter was added so that you can discover the
+	  name of the trigger from the callback function (you can do that
+	  by comparing the id from the name as returned by the standard
+	  stringset: crystalspace.shared.stringset).
 22-Nov-2005
 	- Jorrit added LoadLibrary() to sanity.inc to avoid the define
 	  of LoadLibrary() to LoadLibraryA() on windows. This seems to be

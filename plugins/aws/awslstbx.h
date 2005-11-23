@@ -253,7 +253,7 @@ private:
   awsActionDispatcher* actions;
 
   /// Trigger for catching scroll signals.
-  static void ScrollChanged (intptr_t sk, iAwsSource *source);
+  static void ScrollChanged (unsigned long, intptr_t sk, iAwsSource *source);
 
   /// Inserts an item.
   static void InsertItem (intptr_t owner, iAwsParmList* parmlist);

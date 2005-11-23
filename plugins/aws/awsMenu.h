@@ -237,8 +237,8 @@ public:
   virtual bool OnMouseExit ();
   virtual bool OnMouseMove (int button, int x, int y);
   virtual bool OnMouseDown (int button, int x, int y);
-  static void OnSelect (intptr_t p, iAwsSource* src);
-  static void OnClose (intptr_t p, iAwsSource* src);
+  static void OnSelect (unsigned long, intptr_t p, iAwsSource* src);
+  static void OnClose (unsigned long, intptr_t p, iAwsSource* src);
 
   /**
    * Closes all the popup windows. Called automatically when any menu
@@ -302,7 +302,7 @@ public:
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
   virtual const char* Type ();
 
-  static void OnTimer (intptr_t param, iAwsSource* src);
+  static void OnTimer (unsigned long, intptr_t param, iAwsSource* src);
   virtual void StartPopupChange ();
   virtual void PositionPopupMenu(iAwsComponent* showing_entry, awsMenu* popup);
   virtual void HideAllPopups ();

@@ -987,7 +987,7 @@ void ViewMesh::ScaleSprite (float newScale)
 
 //---------------------------------------------------------------------------
 
-void ViewMesh::ReversAnimation (intptr_t awst, iAwsSource* /*source*/)
+void ViewMesh::ReversAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   if (tut->cal3dstate)
@@ -1000,19 +1000,19 @@ void ViewMesh::ReversAnimation (intptr_t awst, iAwsSource* /*source*/)
   }
 }
 
-void ViewMesh::StopAnimation (intptr_t awst, iAwsSource* /*source*/)
+void ViewMesh::StopAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->move_sprite_speed = 0;
 }
 
-void ViewMesh::SlowerAnimation (intptr_t awst, iAwsSource* /*source*/)
+void ViewMesh::SlowerAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->move_sprite_speed -= 0.5f;
 }
 
-void ViewMesh::AddAnimation (intptr_t awst, iAwsSource* /*source*/)
+void ViewMesh::AddAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   if (tut->cal3dstate)
@@ -1023,13 +1023,13 @@ void ViewMesh::AddAnimation (intptr_t awst, iAwsSource* /*source*/)
   }
 }
 
-void ViewMesh::FasterAnimation (intptr_t awst, iAwsSource* /*source*/)
+void ViewMesh::FasterAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->move_sprite_speed += 0.5f;
 }
 
-void ViewMesh::SetAnimation (intptr_t awst, iAwsSource* /*source*/)
+void ViewMesh::SetAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   if (tut->cal3dstate)
@@ -1045,14 +1045,14 @@ void ViewMesh::SetAnimation (intptr_t awst, iAwsSource* /*source*/)
   }
 }
 
-void ViewMesh::RemoveAnimation (intptr_t awst, iAwsSource* /*source*/)
+void ViewMesh::RemoveAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
 {
   //TODO: Implement it.
   ViewMesh* tut = (ViewMesh*)awst;
   tut->ReportWarning("Removal of Animation is not yet implemented");
 }
 
-void ViewMesh::ClearAnimation (intptr_t awst, iAwsSource* /*source*/)
+void ViewMesh::ClearAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   if (tut->cal3dstate)
@@ -1063,7 +1063,7 @@ void ViewMesh::ClearAnimation (intptr_t awst, iAwsSource* /*source*/)
   }
 }
 
-void ViewMesh::SelAnimation (intptr_t awst, iAwsSource* /*source*/)
+void ViewMesh::SelAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1083,7 +1083,7 @@ void ViewMesh::SelAnimation (intptr_t awst, iAwsSource* /*source*/)
 
 //---------------------------------------------------------------------------
 
-void ViewMesh::SetMesh (intptr_t awst, iAwsSource *s)
+void ViewMesh::SetMesh (unsigned long, intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1101,7 +1101,7 @@ void ViewMesh::SetMesh (intptr_t awst, iAwsSource *s)
   tut->UpdateSocket();
 }
 
-void ViewMesh::SetSubMesh (intptr_t awst, iAwsSource *s)
+void ViewMesh::SetSubMesh (unsigned long, intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1119,7 +1119,7 @@ void ViewMesh::SetSubMesh (intptr_t awst, iAwsSource *s)
   tut->UpdateSocket();
 }
 
-void ViewMesh::SetTriangle (intptr_t awst, iAwsSource *s)
+void ViewMesh::SetTriangle (unsigned long, intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1139,7 +1139,7 @@ void ViewMesh::SetTriangle (intptr_t awst, iAwsSource *s)
   tut->UpdateSocket();
 }
 
-void ViewMesh::SetRotX (intptr_t awst, iAwsSource *s)
+void ViewMesh::SetRotX (unsigned long, intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1191,7 +1191,7 @@ void ViewMesh::SetRotX (intptr_t awst, iAwsSource *s)
   }
 }
 
-void ViewMesh::SetRotY (intptr_t awst, iAwsSource *s)
+void ViewMesh::SetRotY (unsigned long, intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1243,7 +1243,7 @@ void ViewMesh::SetRotY (intptr_t awst, iAwsSource *s)
   }
 }
 
-void ViewMesh::SetRotZ (intptr_t awst, iAwsSource *s)
+void ViewMesh::SetRotZ (unsigned long, intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1295,7 +1295,7 @@ void ViewMesh::SetRotZ (intptr_t awst, iAwsSource *s)
   }
 }
 
-void ViewMesh::AttachButton (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::AttachButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->form->Hide();
@@ -1303,7 +1303,7 @@ void ViewMesh::AttachButton (intptr_t awst, iAwsSource* /*s*/)
   tut->stddlgPurpose=attach;
 }
 
-void ViewMesh::DetachButton (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::DetachButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1326,7 +1326,7 @@ void ViewMesh::DetachButton (intptr_t awst, iAwsSource* /*s*/)
     tut->selectedSocket->SetMeshWrapper( 0 );    
 }
 
-void ViewMesh::AddSocket (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::AddSocket (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1347,7 +1347,7 @@ void ViewMesh::AddSocket (intptr_t awst, iAwsSource* /*s*/)
   tut->UpdateSocketList();
 }
 
-void ViewMesh::DelSocket (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::DelSocket (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   //Change API of iSpriteCal3DFactoryState to enable this!
   ViewMesh* tut = (ViewMesh*)awst;
@@ -1357,7 +1357,7 @@ void ViewMesh::DelSocket (intptr_t awst, iAwsSource* /*s*/)
   tut->UpdateSocketList();
 }
 
-void ViewMesh::SelSocket (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::SelSocket (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1376,7 +1376,7 @@ void ViewMesh::SelSocket (intptr_t awst, iAwsSource* /*s*/)
 }
 
 
-void ViewMesh::RenameSocket (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::RenameSocket (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1405,7 +1405,7 @@ void ViewMesh::RenameSocket (intptr_t awst, iAwsSource* /*s*/)
 
 //---------------------------------------------------------------------------
 
-void ViewMesh::CameraMode (intptr_t awst, iAwsSource *s)
+void ViewMesh::CameraMode (unsigned long, intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1427,7 +1427,7 @@ void ViewMesh::CameraMode (intptr_t awst, iAwsSource *s)
     tut->camMode = movenormal;
 }
 
-void ViewMesh::LoadButton (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::LoadButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->form->Hide();
@@ -1435,7 +1435,7 @@ void ViewMesh::LoadButton (intptr_t awst, iAwsSource* /*s*/)
   tut->stddlgPurpose=load;
 }
 
-void ViewMesh::LoadLibButton (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::LoadLibButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->form->Hide();
@@ -1443,7 +1443,7 @@ void ViewMesh::LoadLibButton (intptr_t awst, iAwsSource* /*s*/)
   tut->stddlgPurpose=loadlib;
 }
 
-void ViewMesh::SaveButton (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::SaveButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->form->Hide();
@@ -1451,7 +1451,7 @@ void ViewMesh::SaveButton (intptr_t awst, iAwsSource* /*s*/)
   tut->stddlgPurpose=save;
 }
 
-void ViewMesh::SaveBinaryButton (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::SaveBinaryButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   tut->form->Hide();
@@ -1459,7 +1459,7 @@ void ViewMesh::SaveBinaryButton (intptr_t awst, iAwsSource* /*s*/)
   tut->stddlgPurpose=savebinary;
 }
 
-void ViewMesh::SetScaleSprite (intptr_t awst, iAwsSource *s)
+void ViewMesh::SetScaleSprite (unsigned long, intptr_t awst, iAwsSource *s)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1475,7 +1475,7 @@ void ViewMesh::SetScaleSprite (intptr_t awst, iAwsSource *s)
 }
 
 //---------------------------------------------------------------------------
-void ViewMesh::SelMorph (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::SelMorph (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1493,7 +1493,7 @@ void ViewMesh::SelMorph (intptr_t awst, iAwsSource* /*s*/)
   tut->selectedMorphTarget = text->GetData();
 }
 
-void ViewMesh::BlendButton (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::BlendButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   if (!tut->cal3dstate) return;
@@ -1524,7 +1524,7 @@ void ViewMesh::BlendButton (intptr_t awst, iAwsSource* /*s*/)
   tut->cal3dstate->BlendMorphTarget(target, weight, delay);
 }
 
-void ViewMesh::ClearButton (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::ClearButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
   if (!tut->cal3dstate) return;
@@ -1642,7 +1642,7 @@ void ViewMesh::StdDlgUpdateLists(const char* filename)
 
 //---------------------------------------------------------------------------
 
-void ViewMesh::StdDlgOkButton (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::StdDlgOkButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1680,7 +1680,7 @@ void ViewMesh::StdDlgOkButton (intptr_t awst, iAwsSource* /*s*/)
   }
 }
 
-void ViewMesh::StdDlgCancleButton (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::StdDlgCancleButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1688,7 +1688,7 @@ void ViewMesh::StdDlgCancleButton (intptr_t awst, iAwsSource* /*s*/)
   tut->stddlg->Hide();
 }
 
-void ViewMesh::StdDlgFileSelect (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::StdDlgFileSelect (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 
@@ -1707,7 +1707,7 @@ void ViewMesh::StdDlgFileSelect (intptr_t awst, iAwsSource* /*s*/)
   InputPath->SetProperty("Text", (intptr_t)text);
 }
 
-void ViewMesh::StdDlgDirSelect (intptr_t awst, iAwsSource* /*s*/)
+void ViewMesh::StdDlgDirSelect (unsigned long, intptr_t awst, iAwsSource* /*s*/)
 {
   ViewMesh* tut = (ViewMesh*)awst;
 

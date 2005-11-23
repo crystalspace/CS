@@ -118,13 +118,13 @@ public:
   };
 
   /// Trigger called when inc button is clicked.
-  static void IncClicked (intptr_t sk, iAwsSource *source);
+  static void IncClicked (unsigned long, intptr_t sk, iAwsSource *source);
 
   /// Trigger called when dec button is clicked.
-  static void DecClicked (intptr_t sk, iAwsSource *source);
+  static void DecClicked (unsigned long, intptr_t sk, iAwsSource *source);
 
-  static void TickTock (intptr_t sk, iAwsSource *source);
-  static void KnobTick (intptr_t sk, iAwsSource *source);
+  static void TickTock (unsigned long, intptr_t sk, iAwsSource *source);
+  static void KnobTick (unsigned long, intptr_t sk, iAwsSource *source);
 
   /// Trigger called when area above/left of knob button is clicked.
   static void DecPageClicked (intptr_t sk, iAwsSource *source);
@@ -212,7 +212,7 @@ protected:
   iAwsSink *sink;
   iAwsSlot *tick_slot;
 
-  static void TickTock (intptr_t sk, iAwsSource *);
+  static void TickTock (unsigned long, intptr_t sk, iAwsSource *);
 public:
 
   awsSliderButton ();

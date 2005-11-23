@@ -103,7 +103,7 @@ protected:
   bool GetMarked (int theRow, int &from, int &to);
   void MoveCursor (int theRow, int theCol);
   void InsertChar (utf32_char c);
-  static void BlinkCursor (intptr_t, iAwsSource *source);
+  static void BlinkCursor (unsigned long, intptr_t, iAwsSource *source);
 
   void SetDefaultHandler ();
   bool SetHandler (const char *action,  const char *event);

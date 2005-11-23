@@ -695,12 +695,12 @@ bool awsWindow::IsMoving()
   return moving_mode;
 }
 
-void awsWindow::OnCloseClick(intptr_t p, iAwsSource *)
+void awsWindow::OnCloseClick(unsigned long, intptr_t p, iAwsSource *)
 {
   ((iAwsComponent*)p)->Broadcast(sWindowClosed);
 }
 
-void awsWindow::OnZoomClick(intptr_t p, iAwsSource *)
+void awsWindow::OnZoomClick(unsigned long, intptr_t p, iAwsSource *)
 {
   iAwsComponent* comp = (iAwsComponent*)p;
   if(comp->IsMaximized())
@@ -709,7 +709,7 @@ void awsWindow::OnZoomClick(intptr_t p, iAwsSource *)
     comp->Maximize();
 }
 
-void awsWindow::OnMinClick(intptr_t p, iAwsSource *)
+void awsWindow::OnMinClick(unsigned long, intptr_t p, iAwsSource *)
 {
   ((iAwsComponent*)p)->Broadcast(sWindowMinimized);
 }

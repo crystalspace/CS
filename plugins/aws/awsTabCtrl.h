@@ -216,10 +216,11 @@ public:
 
   virtual void OnResized ();
 
-  static void ActivateTabCallback (intptr_t sk, iAwsSource *source);
+  static void ActivateTabCallback (unsigned long, intptr_t sk,
+      iAwsSource *source);
 
-  static void PrevClicked (intptr_t sk, iAwsSource *source);
-  static void NextClicked (intptr_t sk, iAwsSource *source);
+  static void PrevClicked (unsigned long, intptr_t sk, iAwsSource *source);
+  static void NextClicked (unsigned long, intptr_t sk, iAwsSource *source);
 
   static const int HandleSize;
 

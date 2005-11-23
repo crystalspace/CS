@@ -214,9 +214,9 @@ public:
   virtual void SetMenu (awsMenuBar* menu);
   virtual awsMenuBar* GetMenu ();
 
-  static void OnCloseClick (intptr_t p, iAwsSource* source);
-  static void OnZoomClick (intptr_t p, iAwsSource* source);
-  static void OnMinClick (intptr_t p, iAwsSource* source);
+  static void OnCloseClick (unsigned long, intptr_t p, iAwsSource* source);
+  static void OnZoomClick (unsigned long, intptr_t p, iAwsSource* source);
+  static void OnMinClick (unsigned long, intptr_t p, iAwsSource* source);
 
   /// Event triggered when a window is about to be raised.
   virtual void OnRaise ();

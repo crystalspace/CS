@@ -200,7 +200,7 @@ void awsNotebook::AddChild (iAwsComponent *child)
     sink, sink->GetTriggerID("DeactivateTab"));
 }
 
-void awsNotebook::OnActivateTab(intptr_t param, iAwsSource* src)
+void awsNotebook::OnActivateTab(unsigned long, intptr_t param, iAwsSource* src)
 {
   iAwsComponent* child;
   src->GetComponent()->GetProperty("User Param", (intptr_t*)&child);
@@ -208,7 +208,7 @@ void awsNotebook::OnActivateTab(intptr_t param, iAwsSource* src)
   ((awsNotebook*)param)->Invalidate();
 }
 
-void awsNotebook::OnDeactivateTab(intptr_t param, iAwsSource* src)
+void awsNotebook::OnDeactivateTab(unsigned long, intptr_t param, iAwsSource* src)
 {
   iAwsComponent* child;
   src->GetComponent()->GetProperty("User Param", (intptr_t*)&child);
@@ -1094,7 +1094,8 @@ void awsNotebookButtonBar::Activate (int idx)
   active = idx;
 }
 
-void awsNotebookButtonBar::ActivateTab (intptr_t sk, iAwsSource *source)
+void awsNotebookButtonBar::ActivateTab (unsigned long,
+    intptr_t sk, iAwsSource *source)
 {
   awsNotebookButtonBar *bb = (awsNotebookButtonBar *)sk;
   int idx = (int)bb->vTabs.FindKey (
@@ -1107,13 +1108,15 @@ void awsNotebookButtonBar::ActivateTab (intptr_t sk, iAwsSource *source)
   }
 }
 
-void awsNotebookButtonBar::PrevClicked (intptr_t sk, iAwsSource *)
+void awsNotebookButtonBar::PrevClicked (unsigned long,
+    intptr_t sk, iAwsSource *)
 {
   awsNotebookButtonBar *bb = (awsNotebookButtonBar *)sk;
   bb->ScrollRight ();
 }
 
-void awsNotebookButtonBar::NextClicked (intptr_t sk, iAwsSource *)
+void awsNotebookButtonBar::NextClicked (unsigned long,
+    intptr_t sk, iAwsSource *)
 {
   awsNotebookButtonBar *bb = (awsNotebookButtonBar *)sk;
   bb->ScrollLeft ();

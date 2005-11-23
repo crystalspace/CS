@@ -403,7 +403,7 @@ bool awsScrollBar::SetProperty (const char *name, intptr_t parm)
 
 /*  This function handles at least mouse scrolling on the bar by "grabbing" the scroll "knob".
  */
-void awsScrollBar::KnobTick (intptr_t sk, iAwsSource *)
+void awsScrollBar::KnobTick (unsigned long, intptr_t sk, iAwsSource *)
 {
   awsScrollBar *sb = (awsScrollBar *)sk;
   /* amntvis relates to "proportional scrollbars" which are probably broken
@@ -489,7 +489,7 @@ void awsScrollBar::KnobTick (intptr_t sk, iAwsSource *)
   sb->Invalidate ();
 }
 
-void awsScrollBar::TickTock (intptr_t sk, iAwsSource *)
+void awsScrollBar::TickTock (unsigned long, intptr_t sk, iAwsSource *)
 {
   awsScrollBar *sb = (awsScrollBar *)sk;
 
@@ -523,7 +523,7 @@ void awsScrollBar::TickTock (intptr_t sk, iAwsSource *)
   sb->Invalidate ();
 }
 
-void awsScrollBar::IncClicked (intptr_t sk, iAwsSource *)
+void awsScrollBar::IncClicked (unsigned long, intptr_t sk, iAwsSource *)
 {
   awsScrollBar *sb = (awsScrollBar *)sk;
 
@@ -540,7 +540,7 @@ void awsScrollBar::IncClicked (intptr_t sk, iAwsSource *)
   sb->Invalidate ();
 }
 
-void awsScrollBar::DecClicked (intptr_t sk, iAwsSource *)
+void awsScrollBar::DecClicked (unsigned long, intptr_t sk, iAwsSource *)
 {
   awsScrollBar *sb = (awsScrollBar *)sk;
 
@@ -907,7 +907,7 @@ const char *awsSliderButton::Type ()
   return "Slider Button";
 }
 
-void awsSliderButton::TickTock (intptr_t sk, iAwsSource *)
+void awsSliderButton::TickTock (unsigned long, intptr_t sk, iAwsSource *)
 {
   awsSliderButton *sb = (awsSliderButton *)sk;
   sb->Broadcast (signalClicked);

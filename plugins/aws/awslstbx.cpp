@@ -294,7 +294,7 @@ bool awsListBox::SetProperty (const char *name, intptr_t parm)
   return awsPanel::SetProperty (name, parm);
 }
 
-void awsListBox::ScrollChanged (intptr_t sk, iAwsSource *source)
+void awsListBox::ScrollChanged (unsigned long, intptr_t sk, iAwsSource *source)
 {
   awsListBox *lb = (awsListBox *)sk;
   float *curval = 0;
@@ -1467,7 +1467,7 @@ bool awsListBox::OnKeyboard (const csKeyEventData& eventData)
 	    row = map[drawable_count + scroll_start];
 
 	  if (sel == row)
-	    awsScrollBar::IncClicked ((intptr_t)scrollbar, 0);
+	    awsScrollBar::IncClicked (0, (intptr_t)scrollbar, 0);
 
 	  ///@@@ END_HACK
 
@@ -1503,7 +1503,7 @@ bool awsListBox::OnKeyboard (const csKeyEventData& eventData)
 		  row = map[scroll_start -1];
 
 	  if (sel == row)
-		  awsScrollBar::DecClicked ((intptr_t)scrollbar, 0);
+		  awsScrollBar::DecClicked (0, (intptr_t)scrollbar, 0);
 
 	  ///@@@ END_HACK
 

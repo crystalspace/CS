@@ -49,7 +49,7 @@ void awsTestSink::SetWindowManager(iAws *_wmgr)
   wmgr=_wmgr;
 }
 
-void awsTestSink::FillBarChart(intptr_t sk, iAwsSource *source)
+void awsTestSink::FillBarChart(unsigned long, intptr_t sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   iAwsComponent *comp = source->GetComponent();
@@ -82,7 +82,7 @@ void awsTestSink::FillBarChart(intptr_t sk, iAwsSource *source)
 }
 
 
-void awsTestSink::FillListBox(intptr_t sk, iAwsSource *source)
+void awsTestSink::FillListBox(unsigned long, intptr_t sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   iAwsComponent *comp = source->GetComponent();
@@ -291,7 +291,7 @@ void awsTestSink::FillListBox(intptr_t sk, iAwsSource *source)
   pl->DecRef();
 }
 
-void awsTestSink::RedClicked(intptr_t sink, iAwsSource *source)
+void awsTestSink::RedClicked(unsigned long, intptr_t sink, iAwsSource *source)
 {
   csPrintf("awstest: red button clicked, source: %p, owner: %p, component: %p\n", (void*)source, (void*)sink, (void*)source->GetComponent());
 
@@ -302,18 +302,18 @@ void awsTestSink::RedClicked(intptr_t sink, iAwsSource *source)
   comp->SetProperty("Caption", (intptr_t)new scfString(names[namec]));
 }
 
-void awsTestSink::BlueClicked(intptr_t sink, iAwsSource *source)
+void awsTestSink::BlueClicked(unsigned long, intptr_t sink, iAwsSource *source)
 {
   csPrintf("awstest: blue button clicked, source: %p, owner: %p\n", (void*)source, (void*)sink);
 }
 
 
-void awsTestSink::GreenClicked(intptr_t sink, iAwsSource *source)
+void awsTestSink::GreenClicked(unsigned long, intptr_t sink, iAwsSource *source)
 {
   csPrintf("awstest: green button clicked, source: %p, owner: %p\n", (void*)source, (void*)sink);
 }
 
-void awsTestSink::SetPass(intptr_t sk, iAwsSource *source)
+void awsTestSink::SetPass(unsigned long, intptr_t sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   if (sink->pass) sink->pass->DecRef();
@@ -322,7 +322,7 @@ void awsTestSink::SetPass(intptr_t sk, iAwsSource *source)
   comp->GetProperty("Text", (intptr_t*)&sink->pass);
 }
 
-void awsTestSink::SetUser(intptr_t sk, iAwsSource *source)
+void awsTestSink::SetUser(unsigned long, intptr_t sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   if (sink->user) sink->user->DecRef();
@@ -331,7 +331,7 @@ void awsTestSink::SetUser(intptr_t sk, iAwsSource *source)
   comp->GetProperty("Text", (intptr_t*)&sink->user);
 }
 
-void awsTestSink::Login(intptr_t sk, iAwsSource *source)
+void awsTestSink::Login(unsigned long, intptr_t sk, iAwsSource *source)
 {
   awsTestSink *sink = (awsTestSink *)sk;
   if (sink->user==0 || sink->pass==0)

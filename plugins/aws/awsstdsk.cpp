@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 
-void awsStandardSink::Hide (intptr_t sink, iAwsSource *source)
+void awsStandardSink::Hide (unsigned long, intptr_t sink, iAwsSource *source)
 {
   (void)sink;
 
@@ -32,7 +32,7 @@ void awsStandardSink::Hide (intptr_t sink, iAwsSource *source)
   c->Hide ();
 }
 
-void awsStandardSink::Show (intptr_t sink, iAwsSource *source)
+void awsStandardSink::Show (unsigned long, intptr_t sink, iAwsSource *source)
 {
   (void)sink;
 
@@ -41,25 +41,25 @@ void awsStandardSink::Show (intptr_t sink, iAwsSource *source)
   c->Show ();
 }
 
-void awsStandardSink::HideWindow (intptr_t /*sink*/, iAwsSource *source)
+void awsStandardSink::HideWindow (unsigned long, intptr_t /*sink*/, iAwsSource *source)
 {
   iAwsComponent *c = source->GetComponent ();
   c->Window()->Hide ();
 }
 
-void awsStandardSink::MaximizeWindow (intptr_t /*sink*/, iAwsSource *source)
+void awsStandardSink::MaximizeWindow (unsigned long, intptr_t /*sink*/, iAwsSource *source)
 {
   iAwsComponent *c = source->GetComponent ();
   c->Window ()->Maximize ();
 }
 
-void awsStandardSink::UnMaximizeWindow (intptr_t /*sink*/, iAwsSource *source)
+void awsStandardSink::UnMaximizeWindow (unsigned long, intptr_t /*sink*/, iAwsSource *source)
 {
   iAwsComponent *c = source->GetComponent ();
   c->Window ()->UnMaximize ();
 }
 
-void awsStandardSink::WindowSlideOutLeft (intptr_t _sink, iAwsSource *source)
+void awsStandardSink::WindowSlideOutLeft (unsigned long, intptr_t _sink, iAwsSource *source)
 {
   awsStandardSink *sink = (awsStandardSink *)_sink;
 
@@ -72,7 +72,7 @@ void awsStandardSink::WindowSlideOutLeft (intptr_t _sink, iAwsSource *source)
     sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_LEFT);
 }
 
-void awsStandardSink::WindowSlideOutRight (intptr_t _sink, iAwsSource *source)
+void awsStandardSink::WindowSlideOutRight (unsigned long, intptr_t _sink, iAwsSource *source)
 {
    awsStandardSink *sink = (awsStandardSink *)_sink;
 
@@ -85,7 +85,7 @@ void awsStandardSink::WindowSlideOutRight (intptr_t _sink, iAwsSource *source)
     sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_RIGHT);
 }
 
-void awsStandardSink::WindowSlideOutUp (intptr_t _sink, iAwsSource *source)
+void awsStandardSink::WindowSlideOutUp (unsigned long, intptr_t _sink, iAwsSource *source)
 {
    awsStandardSink *sink = (awsStandardSink *)_sink;
 
@@ -98,7 +98,7 @@ void awsStandardSink::WindowSlideOutUp (intptr_t _sink, iAwsSource *source)
     sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_UP);
 }
 
-void awsStandardSink::WindowSlideOutDown (intptr_t _sink, iAwsSource *source)
+void awsStandardSink::WindowSlideOutDown (unsigned long, intptr_t _sink, iAwsSource *source)
 {
    awsStandardSink *sink = (awsStandardSink *)_sink;
 
@@ -112,7 +112,7 @@ void awsStandardSink::WindowSlideOutDown (intptr_t _sink, iAwsSource *source)
 }
 
 
-void awsStandardSink::Invalidate (intptr_t sink, iAwsSource *source)
+void awsStandardSink::Invalidate (unsigned long, intptr_t sink, iAwsSource *source)
 {
   (void)sink;
 

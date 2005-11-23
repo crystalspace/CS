@@ -148,18 +148,19 @@ void awsSink::HandleTrigger (int trigger, iAwsSource *source)
 {
   sink_err = 0;
 
-  if (triggers.Length () == 0) 
+  if (triggers.Length () == 0)
   {
     sink_err = AWS_ERR_SINK_NO_TRIGGERS;
     return ;
   }
 
-  void (*Trigger) (intptr_t, iAwsSource *) = triggers[trigger]->trigger;
-  (Trigger) (parm, source);
+  void (*Trigger) (unsigned long id, intptr_t, iAwsSource *) =
+    triggers[trigger]->trigger;
+  (Trigger) (triggers[trigger]->name, parm, source);
 }
 
 void awsSink::RegisterTrigger (const char *name,
-  void (*Trigger) (intptr_t, iAwsSource *))
+  void (*Trigger) (unsigned long, intptr_t, iAwsSource *))
 {
   sink_err = 0;
   triggers.Push (new TriggerMap (NameToId (name), Trigger));

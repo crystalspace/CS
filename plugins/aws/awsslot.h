@@ -101,9 +101,10 @@ private:
   struct TriggerMap
   {
     unsigned long name;
-    void (*trigger) (intptr_t, iAwsSource *);
+    void (*trigger) (unsigned long, intptr_t, iAwsSource *);
 
-    TriggerMap (unsigned long n, void (*t) (intptr_t, iAwsSource *))
+    TriggerMap (unsigned long n, void (*t) (
+	  	unsigned long, intptr_t, iAwsSource *))
       : name(n), trigger(t) { };
   };
 
@@ -140,7 +141,7 @@ public:
 
   /// A sink should call this to register trigger events.
   virtual void RegisterTrigger (const char *name,
-    void (*Trigger) (intptr_t, iAwsSource *));
+    void (*Trigger) (unsigned long, intptr_t, iAwsSource *));
 
 #ifndef AWS_VOIDP_IS_ERROR
   /**
@@ -149,8 +150,10 @@ public:
    *   of RegisterTrigger().
    */
   virtual void RegisterTrigger(const char *name,
-  	void (*Trigger)(void *, iAwsSource *))
-  { RegisterTrigger(name, (void(*)(intptr_t,iAwsSource*))Trigger); }
+  	void (*Trigger)(unsigned long, void *, iAwsSource *))
+  {
+    RegisterTrigger(name, (void(*)(unsigned long,intptr_t,iAwsSource*))Trigger);
+  }
 #endif
 
   /// Gets the last error code.

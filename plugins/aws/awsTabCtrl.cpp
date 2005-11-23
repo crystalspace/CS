@@ -709,7 +709,8 @@ void awsTabCtrl::OnResized ()
   DoLayout ();
 }
 
-void awsTabCtrl::ActivateTabCallback (intptr_t p, iAwsSource *source)
+void awsTabCtrl::ActivateTabCallback (unsigned long,
+    intptr_t p, iAwsSource *source)
 {
   awsTabCtrl *tc = (awsTabCtrl *)p;
   int idx = (int)tc->vTabs.Find ((awsTab*) source->GetComponent ());
@@ -721,13 +722,13 @@ void awsTabCtrl::ActivateTabCallback (intptr_t p, iAwsSource *source)
   }
 }
 
-void awsTabCtrl::PrevClicked (intptr_t p, iAwsSource *)
+void awsTabCtrl::PrevClicked (unsigned long, intptr_t p, iAwsSource *)
 {
   awsTabCtrl *tc = (awsTabCtrl *)p;
   tc->ScrollRight ();
 }
 
-void awsTabCtrl::NextClicked (intptr_t p, iAwsSource *)
+void awsTabCtrl::NextClicked (unsigned long, intptr_t p, iAwsSource *)
 {
   awsTabCtrl *tc = (awsTabCtrl *)p;
   tc->ScrollLeft ();

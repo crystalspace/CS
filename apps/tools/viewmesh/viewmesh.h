@@ -114,39 +114,39 @@ private:
   void UpdateSocket ();
 
   //SETTING
-  static void CameraMode (intptr_t awst, iAwsSource *s);
-  static void LoadButton (intptr_t awst, iAwsSource *s);
-  static void LoadLibButton (intptr_t awst, iAwsSource *s);
-  static void SaveButton (intptr_t awst, iAwsSource *s);
-  static void SaveBinaryButton (intptr_t awst, iAwsSource *s);
-  static void SetScaleSprite (intptr_t awst, iAwsSource *s);
+  static void CameraMode (unsigned long, intptr_t awst, iAwsSource *s);
+  static void LoadButton (unsigned long, intptr_t awst, iAwsSource *s);
+  static void LoadLibButton (unsigned long, intptr_t awst, iAwsSource *s);
+  static void SaveButton (unsigned long, intptr_t awst, iAwsSource *s);
+  static void SaveBinaryButton (unsigned long, intptr_t awst, iAwsSource *s);
+  static void SetScaleSprite (unsigned long, intptr_t awst, iAwsSource *s);
   //ANIMATION
-  static void ReversAnimation (intptr_t awstut, iAwsSource *source);
-  static void StopAnimation (intptr_t awstut, iAwsSource *source);
-  static void SlowerAnimation (intptr_t awstut, iAwsSource *source);
-  static void AddAnimation (intptr_t awstut, iAwsSource *source);
-  static void FasterAnimation (intptr_t awstut, iAwsSource *source);
-  static void SetAnimation (intptr_t awstut, iAwsSource *source);
-  static void RemoveAnimation (intptr_t awstut, iAwsSource *source);
-  static void ClearAnimation (intptr_t awstut, iAwsSource *source);
-  static void SelAnimation (intptr_t awstut, iAwsSource *source);
+  static void ReversAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void StopAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void SlowerAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void AddAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void FasterAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void SetAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void RemoveAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void ClearAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void SelAnimation (unsigned long, intptr_t awstut, iAwsSource *source);
   //SOCKET
-  static void SetMesh (intptr_t awstut, iAwsSource *source);
-  static void SetSubMesh (intptr_t awstut, iAwsSource *source);
-  static void SetTriangle (intptr_t awstut, iAwsSource *source);
-  static void SetRotX (intptr_t awstut, iAwsSource *source);
-  static void SetRotY (intptr_t awstut, iAwsSource *source);
-  static void SetRotZ (intptr_t awstut, iAwsSource *source);
-  static void AttachButton (intptr_t awst, iAwsSource *s);
-  static void DetachButton (intptr_t awst, iAwsSource *s);
-  static void AddSocket (intptr_t awst, iAwsSource *s);
-  static void DelSocket (intptr_t awst, iAwsSource *s);
-  static void SelSocket (intptr_t awst, iAwsSource *s);
-  static void RenameSocket (intptr_t awst, iAwsSource *s);
+  static void SetMesh (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void SetSubMesh (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void SetTriangle (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void SetRotX (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void SetRotY (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void SetRotZ (unsigned long, intptr_t awstut, iAwsSource *source);
+  static void AttachButton (unsigned long, intptr_t awst, iAwsSource *s);
+  static void DetachButton (unsigned long, intptr_t awst, iAwsSource *s);
+  static void AddSocket (unsigned long, intptr_t awst, iAwsSource *s);
+  static void DelSocket (unsigned long, intptr_t awst, iAwsSource *s);
+  static void SelSocket (unsigned long, intptr_t awst, iAwsSource *s);
+  static void RenameSocket (unsigned long, intptr_t awst, iAwsSource *s);
   //MORPH
-  static void SelMorph (intptr_t awst, iAwsSource *s);
-  static void BlendButton (intptr_t awst, iAwsSource *s);
-  static void ClearButton (intptr_t awst, iAwsSource *s);
+  static void SelMorph (unsigned long, intptr_t awst, iAwsSource *s);
+  static void BlendButton (unsigned long, intptr_t awst, iAwsSource *s);
+  static void ClearButton (unsigned long, intptr_t awst, iAwsSource *s);
 
 public:
 
@@ -163,10 +163,10 @@ private:
   bool ParseDir(const char* filename);
   void StdDlgUpdateLists(const char* filename);
 
-  static void StdDlgOkButton (intptr_t awst, iAwsSource *s);
-  static void StdDlgCancleButton (intptr_t awst, iAwsSource *s);
-  static void StdDlgFileSelect (intptr_t awst, iAwsSource *s);
-  static void StdDlgDirSelect (intptr_t awst, iAwsSource *s);
+  static void StdDlgOkButton (unsigned long, intptr_t awst, iAwsSource *s);
+  static void StdDlgCancleButton (unsigned long, intptr_t awst, iAwsSource *s);
+  static void StdDlgFileSelect (unsigned long, intptr_t awst, iAwsSource *s);
+  static void StdDlgDirSelect (unsigned long, intptr_t awst, iAwsSource *s);
 };
 
 #endif // __VIEWMESH_H__

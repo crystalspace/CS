@@ -37,7 +37,7 @@ CS_IMPLEMENT_STATIC_VAR (GetTextBoxBlinkingCursorSlot, awsSlot,())
 
 static awsSlot *textbox_slot = 0;
 
-static void BlinkCursor (intptr_t, iAwsSource *source)
+static void BlinkCursor (unsigned long, intptr_t, iAwsSource *source)
 {
   iAwsComponent *comp = source->GetComponent ();
 

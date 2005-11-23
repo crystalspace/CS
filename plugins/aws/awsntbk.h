@@ -259,9 +259,9 @@ public:
   /// Activate the <idx>-th tab.
   void Activate (int idx);
 
-  static void ActivateTab (intptr_t sk, iAwsSource *source);
-  static void PrevClicked (intptr_t sk, iAwsSource *source);
-  static void NextClicked (intptr_t sk, iAwsSource *source);
+  static void ActivateTab (unsigned long, intptr_t sk, iAwsSource *source);
+  static void PrevClicked (unsigned long, intptr_t sk, iAwsSource *source);
+  static void NextClicked (unsigned long, intptr_t sk, iAwsSource *source);
 
   static const int HandleSize;
 
@@ -378,8 +378,8 @@ public:
 
   virtual void AddChild (iAwsComponent *child);
 
-  static void OnActivateTab(intptr_t param, iAwsSource* src);
-  static void OnDeactivateTab(intptr_t param, iAwsSource* src);
+  static void OnActivateTab(unsigned long, intptr_t param, iAwsSource* src);
+  static void OnDeactivateTab(unsigned long, intptr_t param, iAwsSource* src);
 };
 
 class awsNotebookFactory : public awsComponentFactory

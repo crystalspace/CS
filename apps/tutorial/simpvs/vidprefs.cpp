@@ -165,13 +165,13 @@ void csVideoPreferences::SetOpenGLL (iAwsSource *)
   exit_loop = true;
 }
 
-void csVideoPreferences::SetSoftware (intptr_t vp, iAwsSource* source)
+void csVideoPreferences::SetSoftware (unsigned long, intptr_t vp, iAwsSource* source)
 {
   csVideoPreferences* vidprefs = (csVideoPreferences*)vp;
   vidprefs->SetSoftwareL (source);
 }
 
-void csVideoPreferences::SetOpenGL (intptr_t vp, iAwsSource* source)
+void csVideoPreferences::SetOpenGL (unsigned long, intptr_t vp, iAwsSource* source)
 {
   csVideoPreferences* vidprefs = (csVideoPreferences*)vp;
   vidprefs->SetOpenGLL (source);

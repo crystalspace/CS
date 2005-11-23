@@ -79,7 +79,6 @@ void csView::SetRectangle (int x, int y, int w, int h)
   OldHeight = G3D->GetHeight ();
   delete PolyView; PolyView = 0;
   Clipper = 0;
-
   // Do not allow the rectangle to go out of the screen
   if (x < 0) { w += x; x = 0; }
   if (y < 0) { h += y; y = 0; }

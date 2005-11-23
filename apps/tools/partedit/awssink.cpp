@@ -51,7 +51,7 @@
 // This macro implements a static callback function which records the pointer to the iAwsComponent that calls the trigger
 // The function named here should be attached to the creation trigger of the aws component
 #define IMPLEMENT_REGISTER_FUNCTION(function,componentvar)  \
-void PartEditSink::function(intptr_t /*sk*/, iAwsSource *source) \
+void PartEditSink::function(unsigned long, intptr_t /*sk*/, iAwsSource *source) \
 { \
   asink->componentvar=source->GetComponent(); \
 } 
@@ -61,7 +61,7 @@ void PartEditSink::function(intptr_t /*sk*/, iAwsSource *source) \
 // converts it to a float, stores the float in a given variable beneath the global pointer 'asink'
 // and sets a boolean variable beneath 'asink' to true to signal that a data update has occurred
 #define IMPLEMENT_COMPONENT_TEXTBOX_TO_FLOAT(function,floatvar,invalidate_flag,update) \
-void PartEditSink::function(intptr_t /*sk*/, iAwsSource *source) \
+void PartEditSink::function(unsigned long, intptr_t /*sk*/, iAwsSource *source) \
 { \
   iString *textvalue; \
   if (source->GetComponent()->GetProperty("Text",(intptr_t*)&textvalue) && textvalue->Length()) \
@@ -79,7 +79,7 @@ void PartEditSink::function(intptr_t /*sk*/, iAwsSource *source) \
 // converts it to a integer, stores the integer in a given variable beneath the global pointer 'asink'
 // and sets a boolean variable beneath 'asink' to true to signal that a data update has occurred
 #define IMPLEMENT_COMPONENT_TEXTBOX_TO_INT(function,intvar,invalidate_flag,update) \
-void PartEditSink::function(intptr_t /*sk*/, iAwsSource *source) \
+void PartEditSink::function(unsigned long, intptr_t /*sk*/, iAwsSource *source) \
 { \
   iString *textvalue; \
   if (source->GetComponent()->GetProperty("Text",(intptr_t*)&textvalue) && textvalue->Length()) \
@@ -97,7 +97,7 @@ void PartEditSink::function(intptr_t /*sk*/, iAwsSource *source) \
 // and stores the result (on/off) in a given boolean variable beneath the global pointer 'asink'
 // It also sets a different boolean variable beneath 'asink' to true to signal that a data update has occurred.
 #define IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(function,boolvar,invalidate_flag,update) \
-void PartEditSink::function(intptr_t /*sk*/, iAwsSource *source) \
+void PartEditSink::function(unsigned long, intptr_t /*sk*/, iAwsSource *source) \
 { \
   bool *p_bvalue; \
   if (source->GetComponent()->GetProperty("State",(intptr_t*)&p_bvalue)) \
@@ -956,14 +956,14 @@ void PartEditSink::SetWindowManager(iAws *_wmgr)
 
 
 
-void PartEditSink::RegisterSectionSelection(intptr_t /*sk*/, iAwsSource *source)
+void PartEditSink::RegisterSectionSelection(unsigned long, intptr_t /*sk*/, iAwsSource *source)
 {
   asink->iawscomponent_SectionSelection = source->GetComponent();
   return;
 }
 
 
-void PartEditSink::FillSectionList(intptr_t /*sk*/, iAwsSource *source)
+void PartEditSink::FillSectionList(unsigned long, intptr_t /*sk*/, iAwsSource *source)
 {
   asink->iawscomponent_SectionList = source->GetComponent();
   iAwsParmList *pl=0;
@@ -1044,7 +1044,7 @@ void PartEditSink::FillSectionList(intptr_t /*sk*/, iAwsSource *source)
 
 }
 
-void PartEditSink::SectionListSelectionChanged(intptr_t /*sk*/, iAwsSource* /*source*/)
+void PartEditSink::SectionListSelectionChanged(unsigned long, intptr_t /*sk*/, iAwsSource* /*source*/)
 {
   int i;
   iAwsParmList *pl=0;
@@ -1219,7 +1219,7 @@ void PartEditSink::SetGraphicFilter(const char *filterstr)
 }
 
 /// Static callback to handle graphic file working directory change.
-void PartEditSink::AwsSetGraphicFilter(intptr_t /*sk*/, iAwsSource* /*source*/)
+void PartEditSink::AwsSetGraphicFilter(unsigned long, intptr_t /*sk*/, iAwsSource* /*source*/)
 {
   iString *cwd;
   csRef<iString> path=new scfString();
@@ -1265,7 +1265,7 @@ void PartEditSink::AwsSetGraphicFilter(intptr_t /*sk*/, iAwsSource* /*source*/)
 }
 
   /// Static callback to handle graphic file selection change
-void PartEditSink::AwsGraphicFileSelected(intptr_t /*sk*/, iAwsSource* /*source*/)
+void PartEditSink::AwsGraphicFileSelected(unsigned long, intptr_t /*sk*/, iAwsSource* /*source*/)
 {
   // Read the selected value
   iString *filename;
@@ -1422,7 +1422,7 @@ IMPLEMENT_COMPONENT_CHECKBOX_TO_BOOL(AwsSetAlphaBlend,
  * Although this is a radio button, it only has 2 options, so we can treat it like a checkbox if we 
  * only examine the state of one of the buttons.
  */
-void PartEditSink::AwsSetParticleType(intptr_t /*sk*/, iAwsSource* /*source*/)
+void PartEditSink::AwsSetParticleType(unsigned long, intptr_t /*sk*/, iAwsSource* /*source*/)
 {
   bool *p_bvalue;
   if (asink->EmitterStateData.iawscomponent_RectParticlesRadio->GetProperty("State",(intptr_t*)&p_bvalue))
@@ -3747,7 +3747,7 @@ void PartEditSink::FreeScrollSetComponent(bool floatval,intptr_t value_pointer,i
   }
 }
 
-void PartEditSink::AwsSetFSScrollBar(intptr_t /*sk*/, iAwsSource *source)
+void PartEditSink::AwsSetFSScrollBar(unsigned long, intptr_t /*sk*/, iAwsSource *source)
 {
   csRef<iString> value;
   float *value_as_float;
@@ -3775,7 +3775,7 @@ void PartEditSink::AwsSetFSScrollBar(intptr_t /*sk*/, iAwsSource *source)
   }
 }
 
-void PartEditSink::AwsSetFSTextBox(intptr_t /*sk*/, iAwsSource *source)
+void PartEditSink::AwsSetFSTextBox(unsigned long, intptr_t /*sk*/, iAwsSource *source)
 {
   iString *textvalue;
   csRef<iString> value;

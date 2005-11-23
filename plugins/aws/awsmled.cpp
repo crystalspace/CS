@@ -1251,7 +1251,7 @@ void awsMultiLineEdit::actSetText (intptr_t owner, iAwsParmList* parmlist)
   }
 }
 
-void awsMultiLineEdit::BlinkCursor (intptr_t, iAwsSource *source)
+void awsMultiLineEdit::BlinkCursor (unsigned long, intptr_t, iAwsSource *source)
 {
   awsMultiLineEdit *comp = (awsMultiLineEdit*)source->GetComponent ();
   comp->bBlinkOn = !comp->bBlinkOn;

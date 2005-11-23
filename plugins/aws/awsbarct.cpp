@@ -45,7 +45,7 @@ CS_IMPLEMENT_STATIC_VAR (GetChartSlot, awsSlot, ())
 
 static awsSlot *chart_slot = 0;
 
-static void DriveTimer (intptr_t, iAwsSource *source)
+static void DriveTimer (unsigned long, intptr_t, iAwsSource *source)
 {
   iAwsComponent *comp = source->GetComponent ();
   comp->Broadcast (awsBarChart::signalTimer);

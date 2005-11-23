@@ -681,9 +681,16 @@ struct iAwsSink : public iBase
   /// Handles trigger events
   virtual void HandleTrigger(int trigger_id, iAwsSource *source) = 0;
 
-  /// A sink should call this to register trigger events
+  /**
+   * A sink should call this to register trigger events
+   * The first parameter to the trigger function is the id of the given
+   * name as returned by the standard string set (crystalspace.shared.stringset)
+   * The second parameter is the parameter with which the sink was created.
+   * And finally the third parameter is the aws component producing the
+   * trigger message.
+   */
   virtual void RegisterTrigger(const char *name,
-  	void (*Trigger)(intptr_t, iAwsSource *)) = 0;
+  	void (*Trigger)(unsigned long, intptr_t, iAwsSource *)) = 0;
 
 #ifndef AWS_VOIDP_IS_ERROR
   /**
@@ -693,7 +700,7 @@ struct iAwsSink : public iBase
    */
   AWS_VOIDP_IS_WARNING
   virtual void RegisterTrigger(const char *name,
-  	void (*Trigger)(void *, iAwsSource *)) = 0;
+  	void (*Trigger)(unsigned long, void *, iAwsSource *)) = 0;
 #endif
 
   /**
