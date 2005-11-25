@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Nov-2005
+	- Jorrit removed an unneeded call to wview->Draw() in awstest.
+	  Improves performance slightly.
 24-Nov-2005
 	- Jorrit made the unix implementation of csGetTicks() consistent
 	  while still avoiding wrap arround by normalizing the time with a big

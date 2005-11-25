@@ -367,7 +367,6 @@ awsTest::SetupFrame()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
-  wview->Draw();
 
   // Start drawing 2D graphics.
   if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
