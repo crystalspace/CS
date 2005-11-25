@@ -40,7 +40,7 @@ calls, such as @code{CEGUI::Singleton<T>::getSingleton()} or
 @code{CEGUI::System::getSingleton()}.  The reason for this is that global and
 static variables (declared in methods, classes, namespaces, or globally) are
 not normally shared between modules.  Calling @code{getSingleton()} from the
-Crystal Space application will not necessarrily return the same instance as
+Crystal Space application will not necessarily return the same instance as
 calling @code{getSingleton()} from the @sc{cegui} plugin.
 
 To remedy this, there are @samp{Get*} functions in the @samp{iCEGUI} interface
