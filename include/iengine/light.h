@@ -248,8 +248,16 @@ struct iLight : public virtual iBase
    */
   virtual csLightDynamicType GetDynamicType () const = 0;
 
-  /// Get the position of this light.
+  /**
+   * Get the position of this light (local transformation relative
+   * to whatever parent it has).
+   */
   virtual const csVector3& GetCenter () const = 0;
+  /**
+   * Get the position of this light. This function correctly takes
+   * care of the optional parents of this light.
+   */
+  virtual const csVector3 GetFullCenter () const = 0;
   /// Set the position of this light.
   virtual void SetCenter (const csVector3& pos) = 0;
 

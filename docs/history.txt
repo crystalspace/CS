@@ -9,6 +9,14 @@ chronological order.
 25-Nov-2005
 	- Jorrit removed an unneeded call to wview->Draw() in awstest.
 	  Improves performance slightly.
+	- Jorrit added a new iLight->GetFullCenter() method that gets the
+	  real center of the light (taking care to look at parent objects
+	  too). Fixed a few places in the engine where GetCenter() was called
+	  and GetFullCenter() should be called. This fixes dynamic lighting
+	  moving correctly when the light is parented on some object.
+	  Note that at this time it is still needed to manually call
+	  light->Setup() for dynamic software based lighting.
+	- Jorrit fixed halos to use light->GetFullCenter() too.
 24-Nov-2005
 	- Jorrit made the unix implementation of csGetTicks() consistent
 	  while still avoiding wrap arround by normalizing the time with a big

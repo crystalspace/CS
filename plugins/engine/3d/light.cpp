@@ -182,7 +182,7 @@ void csLight::FindLSI ()
 
   iSector* sector = GetSector ();
   if (!sector) return;
-  const csVector3& center = GetCenter ();
+  const csVector3 center = GetFullCenter ();
 
   csLightSectorInfluence* inf = new csLightSectorInfluence ();
   inf->sector = sector;
@@ -413,7 +413,7 @@ void csLight::CalculateAttenuationVector ()
 void csLight::OnSetPosition ()
 {
   FindLSI ();
-  csVector3 pos = GetCenter ();
+  csVector3 pos = GetFullCenter ();
   size_t i = light_cb_vector.Length ();
   while (i-- > 0)
   {
@@ -583,13 +583,14 @@ void csLight::CalculateLighting ()
         this, dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC));
   lview.SetUserdata (lpi);
 
-  ctxt->SetNewLightFrustum (new csFrustum (GetCenter ()));
+  ctxt->SetNewLightFrustum (new csFrustum (GetFullCenter ()));
   ctxt->GetLightFrustum ()->MakeInfinite ();
 
   if (dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
   {
     csRef<iMeshWrapperIterator> it = csEngine::currentEngine
-    	->GetNearbyMeshes (GetSector (), GetCenter (), GetCutoffDistance ());
+    	->GetNearbyMeshes (GetSector (), GetFullCenter (),
+	  GetCutoffDistance ());
     while (it->HasNext ())
     {
       iMeshWrapper* m = it->Next ();
@@ -623,7 +624,7 @@ void csLight::CalculateLighting (iMeshWrapper *th)
       this, dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC));
   lview.SetUserdata (lpi);
 
-  ctxt->SetNewLightFrustum (new csFrustum (GetCenter ()));
+  ctxt->SetNewLightFrustum (new csFrustum (GetFullCenter ()));
   ctxt->GetLightFrustum ()->MakeInfinite ();
 
   lview.CallObjectFunction (th, true);

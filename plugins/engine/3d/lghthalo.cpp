@@ -163,7 +163,7 @@ bool csLightHalo::IsVisible (iCamera* camera, csEngine* Engine, csVector3 &v)
       int polyidx = 0;
       if(camera->GetSector ()->HitBeamPortals (
 	camera->GetTransform().GetOrigin(),
-	Light->GetCenter(), isect, &polyidx))
+	Light->GetFullCenter(), isect, &polyidx))
 	  return false; // hit a mesh
       if(polyidx != -1) // double check on the above if
 	return false; // hit a polygon
@@ -221,7 +221,7 @@ bool csLightHalo::Process (csTicks ElapsedTime, iCamera* camera,
 
   // Project the halo.
   csVector3 v = camera->GetTransform ().Other2This (
-      Light->GetCenter ());
+      Light->GetFullCenter ());
 
   // The clipped halo polygon
   csVector2 HaloClip[32];
@@ -286,7 +286,7 @@ bool csLightFlareHalo::Process (csTicks elapsed_time, iCamera* camera,
 
   // Project the halo.
   csVector3 v = camera->GetTransform ().Other2This (
-      Light->GetCenter ());
+      Light->GetFullCenter ());
   halo_vis = IsVisible (camera, engine, v);
 
   /// compute new intensity

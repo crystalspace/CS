@@ -313,6 +313,15 @@ public:
   }
   
   /**
+   * Get the full center position (correctly accounting for
+   * parenting)..
+   */
+  const csVector3 GetFullCenter () const
+  { 
+    return movable.csMovable::GetFullPosition (); 
+  }
+  
+  /**
    * Get the movable 
    */
   virtual iMovable *GetMovable ()
