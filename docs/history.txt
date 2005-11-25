@@ -17,6 +17,8 @@ chronological order.
 	  Note that at this time it is still needed to manually call
 	  light->Setup() for dynamic software based lighting.
 	- Jorrit fixed halos to use light->GetFullCenter() too.
+	- Jorrit reverted the unix timing function because it appears to
+	  break things for some reason.
 24-Nov-2005
 	- Jorrit made the unix implementation of csGetTicks() consistent
 	  while still avoiding wrap arround by normalizing the time with a big

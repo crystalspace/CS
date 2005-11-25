@@ -21,12 +21,36 @@
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 
+typedef long long csLongTicks;
+
+// Static initializer, for the csGetTicks function. The csGetTicks
+// need to be called once before there are any chance that it will
+// be called from multiple threads to initialize static variables.
+class csInitGetTicks 
+{
+public:
+  csInitGetTicks()
+  {
+    csGetTicks();
+  }    
+};
+
+// Constructor called before main is invoke
+csInitGetTicks initGetTicks;
+
+// This function should return milliseconds since first invocation
+// time. With a 32bit integer there will be 49 days before this
+// counter overflow. When called once in a single thread this
+// function is MT safe. 
 csTicks csGetTicks ()
 {
-  struct timeval now;
+  static struct timeval now, FirstCount;
+
+  // Start counting from first time this function is called. 
+  if (FirstCount.tv_sec == 0)
+    gettimeofday (&FirstCount, 0);    
+
   gettimeofday (&now, 0);
-  // To avoid early wrap of the timer we subtract a high number
-  // from seconds. We know that gettimeofday is relative to 1-1-1970.
-  return (now.tv_sec  - 1100000000 ) * 1000 + 
-         (now.tv_usec) / 1000;
+  return (now.tv_sec  - FirstCount.tv_sec ) * 1000 + 
+         (now.tv_usec - FirstCount.tv_usec) / 1000;
 }
