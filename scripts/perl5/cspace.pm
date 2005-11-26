@@ -4290,6 +4290,7 @@ package cspace::iLight;
 *QueryObject = *cspacec::iLight_QueryObject;
 *GetDynamicType = *cspacec::iLight_GetDynamicType;
 *GetCenter = *cspacec::iLight_GetCenter;
+*GetFullCenter = *cspacec::iLight_GetFullCenter;
 *SetCenter = *cspacec::iLight_SetCenter;
 *GetSector = *cspacec::iLight_GetSector;
 *GetMovable = *cspacec::iLight_GetMovable;
