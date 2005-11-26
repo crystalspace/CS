@@ -3770,6 +3770,7 @@ class iLight(iBase):
     def QueryObject(*args): return _cspace.iLight_QueryObject(*args)
     def GetDynamicType(*args): return _cspace.iLight_GetDynamicType(*args)
     def GetCenter(*args): return _cspace.iLight_GetCenter(*args)
+    def GetFullCenter(*args): return _cspace.iLight_GetFullCenter(*args)
     def SetCenter(*args): return _cspace.iLight_SetCenter(*args)
     def GetSector(*args): return _cspace.iLight_GetSector(*args)
     def GetMovable(*args): return _cspace.iLight_GetMovable(*args)
