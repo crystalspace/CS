@@ -257,7 +257,8 @@ rule MakeVersionRc
   PRODUCT_DESCRIPTION on $(<) = $(desc) ;
 
   local name ;
-  if $(PACKAGE_NAME) { name = $(PACKAGE_NAME) ; }
+  if $(PACKAGE_LONGNAME) { name = $(PACKAGE_LONGNAME) ; }
+  else if $(PACKAGE_NAME) { name = $(PACKAGE_NAME) ; }
   else { name = $(>) ; }
   PRODUCT_NAME on $(<) = $(name) ;
       
@@ -283,8 +284,7 @@ rule MakeManifestRc
   PRODUCT_DESCRIPTION on $(<) = $(desc) ;
 
   local name ;
-  if $(PACKAGE_LONGNAME) { name = $(PACKAGE_LONGNAME) ; }
-  else if $(PACKAGE_NAME) { name = $(PACKAGE_NAME) ; }
+  if $(PACKAGE_NAME) { name = $(PACKAGE_NAME) ; }
   else { name = $(>) ; }
   PRODUCT_NAME on $(<) = $(name) ;
       
