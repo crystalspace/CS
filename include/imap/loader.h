@@ -96,7 +96,7 @@ struct iLoader : public iBase
    * engine. 
    *
    * \param Name The name that the engine will use for the wrapper.
-   * \param Filename VFS path to the image file to load.
+   * \param FileName VFS path to the image file to load.
    * \param Flags Accepts the flags described in ivideo/txtmgr.h.
    *   The texture manager determines the format, so choosing an alternate 
    *   format doesn't make sense here. Instead you may choose an alternate 
