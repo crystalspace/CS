@@ -71,7 +71,7 @@ CS_IMPLEMENT_PLUGIN
 #endif
 
 static void ReportCalError (iObjectRegistry* objreg, const char* msgId, 
-			    const char* msg)
+                const char* msg)
 {
   csString text;
 
@@ -173,17 +173,17 @@ SCF_IMPLEMENT_IBASE (csSpriteCal3DMeshObjectFactory)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   {
-    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
-    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
-      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
-    if (iInterfaceID == iPolygonMesh_scfID &&				
+    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;    
+    if (iPolygonMesh_scfID == (scfInterfaceID)-1)            
+      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");    
+    if (iInterfaceID == iPolygonMesh_scfID &&            
       scfCompatibleVersion(iVersion, scfInterfaceTraits<iPolygonMesh>::GetVersion()))
     {
       csPrintf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "
         "factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
       iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
-      (Object)->IncRef ();						
-      return CS_STATIC_CAST(iPolygonMesh*, Object);				
+      (Object)->IncRef ();            
+      return CS_STATIC_CAST(iPolygonMesh*, Object);    
     }
   }
 SCF_IMPLEMENT_IBASE_END
@@ -242,9 +242,9 @@ csSpriteCal3DMeshObjectFactory::~csSpriteCal3DMeshObjectFactory ()
   // Now remove ugly CS material hack from model so cal dtor will work
   //    for (int i=0; i<calCoreModel.getCoreMaterialCount(); i++)
   //    {
-  //	CalCoreMaterial *mat = calCoreModel.getCoreMaterial(i);
-  //	std::vector< CalCoreMaterial::Map > maps = mat->getVectorMap();
-  //	maps.clear();
+  //    CalCoreMaterial *mat = calCoreModel.getCoreMaterial(i);
+  //    std::vector< CalCoreMaterial::Map > maps = mat->getVectorMap();
+  //    maps.clear();
   //    }
 
 //  calCoreModel.destroy();
@@ -284,7 +284,7 @@ void csSpriteCal3DMeshObjectFactory::RescaleFactory(float factor)
 }
 
 bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
-	const char *filename)
+    const char *filename)
 {
   csString path(basePath);
   path.Append(filename);
@@ -292,7 +292,7 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
   if (file)
   {
     CalCoreSkeletonPtr skel = CalLoader::loadCoreSkeleton (
-    	(void *)file->GetData() );
+        (void *)file->GetData() );
     if (skel)
     {
       calCoreModel.setCoreSkeleton (skel.get());
@@ -305,12 +305,12 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
 }
 
 int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
-	iVFS *vfs,const char *filename,
-	const char *name,
-	int type,
-	float base_vel, float min_vel, float max_vel,
-	int min_interval, int max_interval,
-	int idle_pct, bool lock)
+    iVFS *vfs,const char *filename,
+    const char *name,
+    int type,
+    float base_vel, float min_vel, float max_vel,
+    int min_interval, int max_interval,
+    int idle_pct, bool lock)
 {
   csString path(basePath);
   path.Append(filename);
@@ -318,7 +318,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
   if (file)
   {
     CalCoreAnimationPtr anim = CalLoader::loadCoreAnimation (
-    	(void*)file->GetData(), calCoreModel.getCoreSkeleton() );
+        (void*)file->GetData(), calCoreModel.getCoreSkeleton() );
     if (anim)
     {
       int id = calCoreModel.addCoreAnimation(anim.get());
@@ -348,10 +348,10 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
 }
 
 int csSpriteCal3DMeshObjectFactory::LoadCoreMesh (
-	iVFS *vfs,const char *filename,
-	const char *name,
-	bool attach,
-	iMaterialWrapper *defmat)
+    iVFS *vfs,const char *filename,
+    const char *name,
+    bool attach,
+    iMaterialWrapper *defmat)
 {
   csString path(basePath);
   path.Append(filename);
@@ -362,8 +362,8 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMesh (
     CalCoreMeshPtr coremesh = CalLoader::loadCoreMesh((void*)file->GetData() );
     if (coremesh)
     {
-      mesh->index = calCoreModel.addCoreMesh(coremesh.get());
-      if (mesh->index == -1)
+      mesh->calCoreMeshID = calCoreModel.addCoreMesh(coremesh.get());
+      if (mesh->calCoreMeshID == -1)
       {
         delete mesh;
         return false;
@@ -374,7 +374,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMesh (
 
       meshes.Push(mesh);
 
-      return mesh->index;
+      return mesh->calCoreMeshID;
     }
     else
       return -1;
@@ -383,9 +383,9 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMesh (
 }
 
 int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
-	iVFS *vfs,int mesh_index,
-	const char *filename,
-	const char *name)
+    iVFS *vfs,int mesh_index,
+    const char *filename,
+    const char *name)
 {
   if (mesh_index < 0 || meshes.Length() <= (size_t)mesh_index)
   {
@@ -402,7 +402,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
       return -1;
     
     int morph_index = calCoreModel.getCoreMesh(mesh_index)->
-    	addAsMorphTarget(core_mesh.get());
+                           addAsMorphTarget(core_mesh.get());
     if(morph_index == -1)
     {
       return -1;
@@ -427,9 +427,9 @@ int csSpriteCal3DMeshObjectFactory::AddMorphAnimation(const char *name)
   return id;
 }
 
-bool csSpriteCal3DMeshObjectFactory::AddMorphTarget(
-	int morphanimation_index,
-	const char *mesh_name, const char *morphtarget_name)
+bool csSpriteCal3DMeshObjectFactory::AddMorphTarget( int morphanimation_index,
+                                                 const char *mesh_name, 
+                                                 const char *morphtarget_name)
 {
   int mesh_index = FindMeshName(mesh_name);
   if(mesh_index == -1)
@@ -448,7 +448,7 @@ bool csSpriteCal3DMeshObjectFactory::AddMorphTarget(
     return false;
   }
   CalCoreMorphAnimation* morph_animation = calCoreModel.getCoreMorphAnimation (
-  	morphanimation_index);
+    morphanimation_index);
   return morph_animation->addMorphTarget (mesh_index, (int)i);
 }
 
@@ -500,13 +500,13 @@ void csSpriteCal3DMeshObjectFactory::DefaultGetBuffer (int meshIdx,
       int s;
       for (s = 0; s < mesh->getCoreSubmeshCount(); s++)
       {
-	CalCoreSubmesh* submesh = mesh->getCoreSubmesh (s);
-	indexCount += submesh->getFaceCount() * 3;
-	vertexCount += submesh->getVertexCount();
+        CalCoreSubmesh* submesh = mesh->getCoreSubmesh (s);
+        indexCount += submesh->getFaceCount() * 3;
+        vertexCount += submesh->getVertexCount();
       }
 
       mb->indexBuffer = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
-	CS_BUF_STATIC, CS_BUFCOMP_CALINDEX, 0, vertexCount-1);
+        CS_BUF_STATIC, CS_BUFCOMP_CALINDEX, 0, vertexCount-1);
       mb->texcoordBuffer = csRenderBuffer::CreateRenderBuffer (vertexCount,
         CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
 
@@ -517,30 +517,30 @@ void csSpriteCal3DMeshObjectFactory::DefaultGetBuffer (int meshIdx,
       size_t tcOffs = 0;
       for (s = 0; s < mesh->getCoreSubmeshCount(); s++)
       {
-	CalCoreSubmesh* submesh = mesh->getCoreSubmesh (s);
-	std::vector<CalCoreSubmesh::Face>& faces = submesh->getVectorFace();
-	for (size_t f = 0; f < faces.size(); f++)
-	{
-	  indices[indexOffs++] = faces[f].vertexId[0];
-	  indices[indexOffs++] = faces[f].vertexId[1];
-	  indices[indexOffs++] = faces[f].vertexId[2];
-	}
-	std::vector<std::vector<CalCoreSubmesh::TextureCoordinate> >& tcV =
-	  submesh->getVectorVectorTextureCoordinate();
-	if (tcV.size() > 0)
-	{
-	  std::vector<CalCoreSubmesh::TextureCoordinate>& tc = tcV[0];
-	  for (size_t v = 0; v < tc.size(); v++)
-	  {
-	    texcoords[tcOffs++].Set (tc[v].u, tc[v].v);
-	  }
-	}
-	else
-	{
-	  size_t vc = submesh->getVertexCount();
-	  memset (texcoords.Lock() + tcOffs, 0, vc * sizeof (csVector2));
-	  tcOffs += vc;
-	}
+        CalCoreSubmesh* submesh = mesh->getCoreSubmesh (s);
+        std::vector<CalCoreSubmesh::Face>& faces = submesh->getVectorFace();
+        for (size_t f = 0; f < faces.size(); f++)
+        {
+          indices[indexOffs++] = faces[f].vertexId[0];
+          indices[indexOffs++] = faces[f].vertexId[1];
+          indices[indexOffs++] = faces[f].vertexId[2];
+        }
+        std::vector<std::vector<CalCoreSubmesh::TextureCoordinate> >& tcV =
+          submesh->getVectorVectorTextureCoordinate();
+        if (tcV.size() > 0)
+        {
+          std::vector<CalCoreSubmesh::TextureCoordinate>& tc = tcV[0];
+          for (size_t v = 0; v < tc.size(); v++)
+          {
+            texcoords[tcOffs++].Set (tc[v].u, tc[v].v);
+          }
+        }
+        else
+        {
+          size_t vc = submesh->getVertexCount();
+          memset (texcoords.Lock() + tcOffs, 0, vc * sizeof (csVector2));
+          tcOffs += vc;
+        }
       }
     }
     holder->SetRenderBuffer (buffer, 
@@ -556,7 +556,7 @@ csSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::AddSocket ()
 }
 
 csSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::FindSocket (
-	const char *n) const
+    const char *n) const
 {
   int i;
   for (i = GetSocketCount () - 1; i >= 0; i--)
@@ -567,7 +567,7 @@ csSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::FindSocket (
 }
 
 csSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::FindSocket (
-	iMeshWrapper *mesh) const
+    iMeshWrapper *mesh) const
 {
   int i;
   for (i = GetSocketCount () - 1; i >= 0; i--)
@@ -588,7 +588,7 @@ int csSpriteCal3DMeshObjectFactory::FindMeshName (const char *meshName)
 }
 
 const char* csSpriteCal3DMeshObjectFactory::GetDefaultMaterial (
-	const char* meshName)
+    const char* meshName)
 {
   int meshIndex = FindMeshName (meshName);
   if ( meshIndex != -1 )
@@ -611,7 +611,7 @@ const char *csSpriteCal3DMeshObjectFactory::GetMorphAnimationName(int idx)
 }
 
 int csSpriteCal3DMeshObjectFactory::FindMorphAnimationName (
-	const char *meshName)
+    const char *meshName)
 {
   for (size_t i=0; i<morph_animation_names.Length(); i++)
   {
@@ -645,7 +645,7 @@ void csSpriteCal3DMeshObjectFactory::BindMaterials()
   // NOTE: this is not the right way to do it, but this viewer can't do the
   // right mapping without further information on the model etc.
   for (materialId = 0 ; materialId < calCoreModel.getCoreMaterialCount()
-  	; materialId++)
+    ; materialId++)
   {
     // create the a material thread
     calCoreModel.createCoreMaterialThread (materialId);
@@ -704,7 +704,7 @@ bool csSpriteCal3DMeshObjectFactory::RemoveAnimCallback(
 }
 
 void csSpriteCal3DMeshObjectFactory::HardTransform (
-	const csReversibleTransform& t)
+    const csReversibleTransform& t)
 {
   csQuaternion quat (t.GetO2T ());
   CalQuaternion quatrot(quat.x,quat.y,quat.z,quat.r);
@@ -716,16 +716,16 @@ void csSpriteCal3DMeshObjectFactory::HardTransform (
   // get core skeleton
   CalCoreSkeleton *pCoreSkeleton;
   pCoreSkeleton = calCoreModel.getCoreSkeleton();
-	
+    
   // get core bone vector
   std::vector<CalCoreBone *>& vectorCoreBone = pCoreSkeleton
-  	->getVectorCoreBone();
+    ->getVectorCoreBone();
 
   // loop through all root core bones
   std::list<int>::iterator iteratorRootCoreBoneId;
   for (iteratorRootCoreBoneId = pCoreSkeleton->getListRootCoreBoneId().begin()
-  	; iteratorRootCoreBoneId != pCoreSkeleton->getListRootCoreBoneId().end()
-	; ++iteratorRootCoreBoneId)
+    ; iteratorRootCoreBoneId != pCoreSkeleton->getListRootCoreBoneId().end()
+    ; ++iteratorRootCoreBoneId)
   {
     CalCoreBone *bone = vectorCoreBone[*iteratorRootCoreBoneId];
     CalQuaternion bonerot = bone->getRotation();
@@ -750,21 +750,21 @@ void csSpriteCal3DMeshObjectFactory::HardTransform (
     // loop through all root core bones
     std::list<int>::iterator iteratorRootCoreBoneId;
     for (iteratorRootCoreBoneId = pCoreSkeleton->getListRootCoreBoneId().begin()
-    	; iteratorRootCoreBoneId != pCoreSkeleton->getListRootCoreBoneId().end()
-	; ++iteratorRootCoreBoneId)
+        ; iteratorRootCoreBoneId != pCoreSkeleton->getListRootCoreBoneId().end()
+    ; ++iteratorRootCoreBoneId)
     {
       int boneTrack = anim->getTrackAssignment (*iteratorRootCoreBoneId);
       if (boneTrack < 0) continue;
       for (uint j = 0; j < frameCount; j++)
       {
-	CalTransform& tf = poses[j * trackCount + boneTrack];
-	CalQuaternion bonerot = tf.getRotation();
-	CalVector bonevec = tf.getTranslation();
-	bonerot *= quatrot;
-	bonevec *= quatrot;
-	bonevec += translation;
-	tf.setRotation (bonerot);
-	tf.setTranslation (bonevec);
+        CalTransform& tf = poses[j * trackCount + boneTrack];
+        CalQuaternion bonerot = tf.getRotation();
+        CalVector bonevec = tf.getTranslation();
+        bonerot *= quatrot;
+        bonevec *= quatrot;
+        bonevec += translation;
+        tf.setRotation (bonerot);
+        tf.setTranslation (bonevec);
       }
     }
     anim->setPoses (poses, trackCount);
@@ -822,8 +822,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
 csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
-						  iObjectRegistry* object_reg,
-						  CalCoreModel& calCoreModel)
+                          iObjectRegistry* object_reg,
+                          CalCoreModel& calCoreModel)
                           : calModel(&calCoreModel)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -864,11 +864,11 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
 
   do_update = -1;
   updateanim_sqdistance1 = 10*10;
-  updateanim_skip1 = 5;		// Skip every 5 frames.
+  updateanim_skip1 = 5;  // Skip every 5 frames.
   updateanim_sqdistance2 = 20*20;
-  updateanim_skip2 = 20;	// Skip every 20 frames.
+  updateanim_skip2 = 20;    // Skip every 20 frames.
   updateanim_sqdistance3 = 50*50;
-  updateanim_skip3 = 1000;	// Animate very rarely.
+  updateanim_skip3 = 1000;  // Animate very rarely.
 
   anim_time_handler.AttachNew(new DefaultAnimTimeUpdateHandler());
 }
@@ -907,8 +907,8 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   {
     if (factory->meshes[meshId]->attach_by_default)
     {
-      AttachCoreMesh (factory->meshes[meshId]->index,
-	factory->meshes[meshId]->default_material);
+      AttachCoreMesh (factory->meshes[meshId]->calCoreMeshID,
+                      factory->meshes[meshId]->default_material);
     }
   }
   // To get an accurate bbox below, you must have the model standing in
@@ -1014,7 +1014,7 @@ void csSpriteCal3DMeshObjectFactory::SetObjectBoundingBox (const csBox3&)
 }
 
 void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox,
-	csVector3* /*verts*/, int /*vertCount*/)
+    csVector3* /*verts*/, int /*vertCount*/)
 {
   if (object_bbox.Empty())
     RecalcBoundingBox (object_bbox);
@@ -1037,11 +1037,11 @@ void csSpriteCal3DMeshObject::SetUserData(void *data)
 }
 
 void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
-	const csArray<iLightSectorInfluence*>& lights, 
-	iMovable* movable,
-	CalRenderer *pCalRenderer,
-	int mesh, int submesh, float *meshNormals,
-	csColor* colors)
+    const csArray<iLightSectorInfluence*>& lights, 
+    iMovable* movable,
+    CalRenderer *pCalRenderer,
+    int mesh, int submesh, float *meshNormals,
+    csColor* colors)
 {
   int vertCount;
   vertCount = pCalRenderer->getVertexCount();
@@ -1071,7 +1071,7 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
     if (obj_sq_dist >= csSquare (li->GetCutoffDistance ())) return;
     float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?
-    	csQisqrt (obj_sq_dist):1.0f;
+        csQisqrt (obj_sq_dist):1.0f;
 
     csColor light_color = li->GetColor () * (256.0f / CS_NORMAL_LIGHT_LEVEL)
       * li->GetBrightnessAtDistance (csQsqrt (obj_sq_dist));
@@ -1080,21 +1080,26 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
     for (i = 0; i < vertCount; i++)
     {
       csVector3 normal(meshNormals[normal_index],
-      	meshNormals[normal_index+1],
-	meshNormals[normal_index+2]);
+        meshNormals[normal_index+1],
+        meshNormals[normal_index+2]);
+        
       normal_index+=3;
       float cosinus;
-      if (obj_sq_dist < SMALL_EPSILON) cosinus = 1;
-      else cosinus = obj_light_pos * normal; 
+      if (obj_sq_dist < SMALL_EPSILON) 
+        cosinus = 1;
+      else 
+        cosinus = obj_light_pos * normal; 
       // because the vector from the object center to the light center
       // in object space is equal to the position of the light
 
       if (cosinus > 0)
       {
-	color = light_color;
-	if (obj_sq_dist >= SMALL_EPSILON) cosinus *= in_obj_dist;
-	if (cosinus < 1.0f) color *= cosinus;
-	colors[i] += color;
+        color = light_color;
+        if (obj_sq_dist >= SMALL_EPSILON) 
+            cosinus *= in_obj_dist;
+        if (cosinus < 1.0f) 
+            color *= cosinus;
+        colors[i] += color;
       }
     }
   }
@@ -1105,9 +1110,9 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
 }
 
 void csSpriteCal3DMeshObject::InitSubmeshLighting (int /*mesh*/, int /*submesh*/,
-						   CalRenderer *pCalRenderer,
-						   iMovable* movable, 
-						   csColor* colors)
+                           CalRenderer *pCalRenderer,
+                           iMovable* movable, 
+                           csColor* colors)
 {
   int vertCount = pCalRenderer->getVertexCount();
 
@@ -1131,7 +1136,7 @@ void csSpriteCal3DMeshObject::InitSubmeshLighting (int /*mesh*/, int /*submesh*/
 }
 
 bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
-	const csVector3& end, csVector3& isect, float* pr)
+    const csVector3& end, csVector3& isect, float* pr)
 {
   //Checks all of the cal3d bounding boxes of each bone to see if they hit
 
@@ -1149,14 +1154,12 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
     for(i=0;i<6;i++)
     {
       planes[i].Set(cbb.plane[i].a,
-	  cbb.plane[i].b,
-	  cbb.plane[i].c,
-	  cbb.plane[i].d);
+      cbb.plane[i].b,
+      cbb.plane[i].c,
+      cbb.plane[i].d);
     }
-    csVector3
-      tempisect;
-    float
-      tempdist;
+    csVector3 tempisect;
+    float tempdist;
     if (csIntersect3::SegmentPlanes(start,end,planes,6,tempisect,tempdist))
     {
       hit = true;
@@ -1182,7 +1185,7 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
     for (m = 0; m < meshes.Length(); m++)
     {
       if (!meshes[m].vertex_buffer)
-	GetVertexBuffer (m, 0);
+        GetVertexBufferIndex (m, 0);
       csRenderBufferLock<csVector3> vertices (meshes[m].vertex_buffer);
       csBitArray vUpToDate (vertices.GetSize());
 
@@ -1190,64 +1193,67 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
       CalMesh* calMesh = calModel.getMesh (meshes[m].calCoreMeshID);
       for (int s = 0; s < calMesh->getSubmeshCount(); s++)
       {
-	CalCoreSubmesh* submesh = 
-	  calMesh->getSubmesh(s)->getCoreSubmesh();
-	std::vector<CalCoreSubmesh::Face>& vectorFace = 
-	  submesh->getVectorFace();
-	std::vector<CalCoreSubmesh::Face>::iterator iteratorFace
-	  = vectorFace.begin();
-	while(iteratorFace != vectorFace.end())
-	{
-	  bool bboxhit = false;
-	  int f;
-	  for(f=0;!bboxhit&&f<3;f++)
-	  {
-	    std::vector<CalCoreSubmesh::Influence> influ  = 
-	      submesh->getVectorVertex () 
-	      [(*iteratorFace).vertexId[f]].vectorInfluence;
-	    std::vector<CalCoreSubmesh::Influence>::iterator iteratorInflu =
-	      influ.begin();
-	    while(iteratorInflu != influ.end())
-	    {
-	      if(bboxhits[(*iteratorInflu).boneId])
-	      {
-		bboxhit = true;
-		break;
-	      }
-	      ++iteratorInflu;
-	    }
-	  }
-	  if (bboxhit)
-	  {
-	    csVector3 tri[3];
-	    for(f=0;f<3;f++)
-	    {
-	      CalIndex vIdx = (*iteratorFace).vertexId[f];
-	      //Is the vertex calculated?
-	      if ((meshes[m].vertexVersion != meshVersion)
-		&& !vUpToDate.IsBitSet (vIdx))
-	      {
-		CalVector calVector = calModel.getPhysique()->calculateVertex(
-		    calMesh->getSubmesh(s), vIdx);
-		vertices[(size_t)(vertexOffs + vIdx)].Set (
-		  calVector.x, calVector.y, calVector.z);
-		vUpToDate.SetBit (vIdx);
-	      }
-	      tri[f] = vertices[(size_t)(vertexOffs + vIdx)];
-	    }
+        CalCoreSubmesh* submesh = 
+          calMesh->getSubmesh(s)->getCoreSubmesh();
+        std::vector<CalCoreSubmesh::Face>& vectorFace = 
+          submesh->getVectorFace();
+        std::vector<CalCoreSubmesh::Face>::iterator iteratorFace
+          = vectorFace.begin();
+    
+        while(iteratorFace != vectorFace.end())
+        {
+          bool bboxhit = false;
+          int f;
+          for(f=0;!bboxhit&&f<3;f++)
+          {
+            std::vector<CalCoreSubmesh::Influence> influ  = 
+              submesh->getVectorVertex () 
+              [(*iteratorFace).vertexId[f]].vectorInfluence;
+              
+            std::vector<CalCoreSubmesh::Influence>::iterator iteratorInflu =
+              influ.begin();
+            while(iteratorInflu != influ.end())
+            {
+              if(bboxhits[(*iteratorInflu).boneId])
+              {
+                bboxhit = true;
+                break;
+              }
+              ++iteratorInflu;
+            }
+          }
+          if (bboxhit)
+          {
+            csVector3 tri[3];
+            for(f=0;f<3;f++)
+            {
+              CalIndex vIdx = (*iteratorFace).vertexId[f];
+              //Is the vertex calculated?
+              if ((meshes[m].vertexVersion != meshVersion)
+                && !vUpToDate.IsBitSet (vIdx))
+              {
+                CalVector calVector = calModel.getPhysique()->calculateVertex(
+                  calMesh->getSubmesh(s), vIdx);
+                
+                vertices[(size_t)(vertexOffs + vIdx)].Set (
+                calVector.x, calVector.y, calVector.z);
+                vUpToDate.SetBit (vIdx);
+              }
+              tri[f] = vertices[(size_t)(vertexOffs + vIdx)];
+            }
 
-	    if (csIntersect3::SegmentTriangle (seg,
-		  tri[0], tri[1], tri[2], tsect))
-	    {
-	      isect = tsect;
-	      if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
-		  csSquaredDist::PointPoint (start, end));
-	      return true;
-	    }
-	  }
-	  ++iteratorFace;
-	}
-	vertexOffs += submesh->getVertexCount();
+            if (csIntersect3::SegmentTriangle (seg,
+              tri[0], tri[1], tri[2], tsect))
+            {
+              isect = tsect;
+              if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
+                csSquaredDist::PointPoint (start, end));
+              return true;
+            }
+          }
+          ++iteratorFace;
+        }
+        vertexOffs += submesh->getVertexCount();
       }
     }
   }
@@ -1274,14 +1280,12 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
     for(i=0;i<6;i++)
     {
       planes[i].Set(cbb.plane[i].a,
-	  cbb.plane[i].b,
-	  cbb.plane[i].c,
-	  cbb.plane[i].d);
+      cbb.plane[i].b,
+      cbb.plane[i].c,
+      cbb.plane[i].d);
     }
-    csVector3
-      tempisect;
-    float
-      tempdist;
+    csVector3 tempisect;
+    float tempdist;
     if(csIntersect3::SegmentPlanes(start,end,planes,6,tempisect,tempdist))
     { 
       hit = true;
@@ -1309,7 +1313,7 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
     for (m = 0; m < meshes.Length(); m++)
     {
       if (!meshes[m].vertex_buffer)
-	GetVertexBuffer (m, 0);
+        GetVertexBufferIndex (m, 0);
       csRenderBufferLock<csVector3> vertices (meshes[m].vertex_buffer);
       csBitArray vUpToDate (vertices.GetSize());
 
@@ -1317,70 +1321,77 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
       CalMesh* calMesh = calModel.getMesh (meshes[m].calCoreMeshID);
       for (int s = 0; s < calMesh->getSubmeshCount(); s++)
       {
-	CalCoreSubmesh* submesh = 
-	  calMesh->getSubmesh(s)->getCoreSubmesh();
-	std::vector<CalCoreSubmesh::Face>& vectorFace = 
-	  submesh->getVectorFace();
-	std::vector<CalCoreSubmesh::Face>::iterator iteratorFace
-	  = vectorFace.begin();
-	while(iteratorFace != vectorFace.end())
-	{
-	  bool bboxhit = false;
-	  int f;
-	  for(f=0;!bboxhit&&f<3;f++)
-	  {
-	    std::vector<CalCoreSubmesh::Influence> influ  = 
-	      submesh->getVectorVertex () 
-	      [(*iteratorFace).vertexId[f]].vectorInfluence;
-	    std::vector<CalCoreSubmesh::Influence>::iterator iteratorInflu =
-	      influ.begin();
-	    while(iteratorInflu != influ.end())
-	    {
-	      if(bboxhits[(*iteratorInflu).boneId])
-	      {
-		bboxhit = true;
-		break;
-	      }
-	      ++iteratorInflu;
-	    }
-	  }
-	  if (bboxhit)
-	  {
-	    csVector3 tri[3];
-	    for(f=0;f<3;f++)
-	    {
-	      CalIndex vIdx = (*iteratorFace).vertexId[f];
-	      //Is the vertex calculated?
-	      if ((meshes[m].vertexVersion != meshVersion)
-		&& !vUpToDate.IsBitSet (vIdx))
-	      {
-		CalVector calVector = calModel.getPhysique()->calculateVertex(
-		    calMesh->getSubmesh(s), vIdx);
-		vertices[(size_t)(vertexOffs + vIdx)].Set (
-		  calVector.x, calVector.y, calVector.z);
-		vUpToDate.SetBit (vIdx);
-	      }
-	      tri[f] = vertices[(size_t)(vertexOffs + vIdx)];
-	    }
+        CalCoreSubmesh* submesh = 
+          calMesh->getSubmesh(s)->getCoreSubmesh();
+        std::vector<CalCoreSubmesh::Face>& vectorFace = 
+          submesh->getVectorFace();
+        std::vector<CalCoreSubmesh::Face>::iterator iteratorFace
+          = vectorFace.begin();
+          
+        while(iteratorFace != vectorFace.end())
+        {
+          bool bboxhit = false;
+          int f;
+          for(f=0;!bboxhit&&f<3;f++)
+          {
+            std::vector<CalCoreSubmesh::Influence> influ  = 
+              submesh->getVectorVertex () 
+              [(*iteratorFace).vertexId[f]].vectorInfluence;
+            std::vector<CalCoreSubmesh::Influence>::iterator iteratorInflu =
+              influ.begin();
+            while(iteratorInflu != influ.end())
+            {
+              if(bboxhits[(*iteratorInflu).boneId])
+              {
+                bboxhit = true;
+                break;
+              }
+              
+              ++iteratorInflu;
+            }
+          }
+          if (bboxhit)
+          {
+            csVector3 tri[3];
+            for(f=0;f<3;f++)
+            {
+              CalIndex vIdx = (*iteratorFace).vertexId[f];
+              //Is the vertex calculated?
+              if ((meshes[m].vertexVersion != meshVersion)
+                && !vUpToDate.IsBitSet (vIdx))
+              {
+                CalVector calVector = calModel.getPhysique()->calculateVertex(
+                  calMesh->getSubmesh(s), vIdx);
+                  
+                vertices[(size_t)(vertexOffs + vIdx)].Set (
+                  calVector.x, calVector.y, calVector.z);
+                  
+                vUpToDate.SetBit (vIdx);
+              }
+              
+              tri[f] = vertices[(size_t)(vertexOffs + vIdx)];
+            }
 
-	    if (csIntersect3::SegmentTriangle (seg,
-		  tri[0], tri[1], tri[2], tsect))
-	    {
-	      temp = csSquaredDist::PointPoint (start, tsect);
-	      if (temp < dist)
-	      {
-		dist = temp;
-		isect = tsect;
-	      }
-	    }
-	  }
-	  ++iteratorFace;
-	}
-	vertexOffs += submesh->getVertexCount();
+            if (csIntersect3::SegmentTriangle (seg,
+              tri[0], tri[1], tri[2], tsect))
+            {
+              temp = csSquaredDist::PointPoint (start, tsect);
+              if (temp < dist)
+              {
+                dist = temp;
+                isect = tsect;
+              }
+            }
+          }
+          ++iteratorFace;
+        }
+        vertexOffs += submesh->getVertexCount();
       }
     }
-    if (pr) *pr = csQsqrt (dist / max);
-    if (dist >= max) return false;
+    if (pr) 
+        *pr = csQsqrt (dist / max);
+    if (dist >= max) 
+        return false;
     return true;
   }
   else
@@ -1390,7 +1401,7 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
 }
 
 void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
-	csTicks current_time)
+    csTicks current_time)
 {
   iSpriteCal3DSocket* socket = 0;
   size_t i;
@@ -1400,8 +1411,8 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
     {
       if (sockets[i]->GetMeshWrapper()->GetMeshObject() == child)
       {
-	socket = sockets[i];
-	break;
+        socket = sockets[i];
+        break;
       }
     }
     for (size_t a=0; a<sockets[i]->GetSecondaryCount(); ++a)
@@ -1431,14 +1442,14 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
     // get the vertices
     CalVector vector[3];
     vector[0] = calModel.getPhysique()->calculateVertex(
-	submesh,
-	face.vertexId[0]);
+    submesh,
+    face.vertexId[0]);
     vector[1] = calModel.getPhysique()->calculateVertex(
-	submesh,
-	face.vertexId[1]);
+    submesh,
+    face.vertexId[1]);
     vector[2] = calModel.getPhysique()->calculateVertex(
-	submesh,
-	face.vertexId[2]);
+    submesh,
+    face.vertexId[2]);
     csVector3 vert1(vector[0].x,vector[0].y,vector[0].z);
     csVector3 vert2(vector[1].x,vector[1].y,vector[1].z);
     csVector3 vert3(vector[2].x,vector[2].y,vector[2].z);
@@ -1473,8 +1484,8 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
         iMovable * sec_movable = sec_mesh->GetMovable();
         if (sec_movable)
         {
-            sec_movable->SetTransform(socket->GetSecondaryTransform(a)*trans);
-            sec_movable->UpdateMove();
+          sec_movable->SetTransform(socket->GetSecondaryTransform(a)*trans);
+          sec_movable->UpdateMove();
         }
       }
     }
@@ -1482,8 +1493,8 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
 }
 
 csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n, 
-	iRenderView* rview,
-	iMovable* movable, uint32 frustum_mask)
+    iRenderView* rview,
+    iMovable* movable, uint32 frustum_mask)
 {
   iCamera* camera = rview->GetCamera ();
 
@@ -1500,14 +1511,15 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
 
   int clip_portal, clip_plane, clip_z_plane;
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-  	clip_z_plane);
+    clip_z_plane);
   csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
   // Distance between camera and object. Use this for LOD.
   float sqdist = camera_origin.x * camera_origin.x
-  	+ camera_origin.y * camera_origin.y
-  	+ camera_origin.z * camera_origin.z;
-  if (sqdist < updateanim_sqdistance1) do_update = -1;
+    + camera_origin.y * camera_origin.y
+    + camera_origin.z * camera_origin.z;
+  if (sqdist < updateanim_sqdistance1) 
+    do_update = -1;
   else if (sqdist < updateanim_sqdistance2)
   {
     if (do_update == -1 || do_update > updateanim_skip1)
@@ -1526,20 +1538,20 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
 
   const uint currentFrame = rview->GetCurrentFrameNumber ();
   bool created;
-  csDirtyAccessArray<csRenderMesh*>& meshes = 
+  csDirtyAccessArray<csRenderMesh*>& rendermeshes = 
     factory->sprcal3d_type->rmArrayHolder.GetUnusedData (
     created, currentFrame);
 
   const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
 
-  meshes.SetSize (renderMeshTemplates.Length());
-  for (size_t m = 0; m < renderMeshTemplates.Length(); m++)
+  rendermeshes.SetSize (meshes.Length());
+  for (size_t m = 0; m < rendermeshes.Length(); m++)
   {
     csRenderMesh* rm = factory->sprcal3d_type->rmHolder.GetUnusedMesh (
       created, currentFrame);
-    *rm = renderMeshTemplates[m];
-    meshes[m] = rm;
+    *rm = meshes[m].render_mesh;
+    rendermeshes[m] = rm;
 
     rm->clip_portal = clip_portal;
     rm->clip_plane = clip_plane;
@@ -1552,8 +1564,8 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
     ((MeshAccessor*)rm->buffers->GetAccessor())->movable = movable;
   }
 
-  n = (int)meshes.Length();
-  return meshes.GetArray();
+  n = (int)rendermeshes.Length();
+  return rendermeshes.GetArray();
 }
 
 bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
@@ -1639,9 +1651,9 @@ void csSpriteCal3DMeshObject::ClearAllAnims()
 
   if (last_locked_anim != -1)
   {
-     calModel.getMixer()->removeAction(last_locked_anim);
-     last_locked_anim = -1;
-     is_idling = false;
+    calModel.getMixer()->removeAction(last_locked_anim);
+    last_locked_anim = -1;
+    is_idling = false;
   }
 }
 
@@ -1658,7 +1670,7 @@ bool csSpriteCal3DMeshObject::SetAnimCycle(int idx, float weight)
 }
 
 bool csSpriteCal3DMeshObject::AddAnimCycle(const char *name, float weight,
-	float delay)
+    float delay)
 {
   int idx = FindAnim(name);
   if (idx == -1)
@@ -1726,7 +1738,7 @@ size_t csSpriteCal3DMeshObject::GetActiveAnimCount()
 }
 
 bool csSpriteCal3DMeshObject::GetActiveAnims (csSpriteCal3DActiveAnim* buffer, 
-					      size_t max_length)
+                          size_t max_length)
 {
   if ((buffer == 0) || (max_length == 0))
     return false;
@@ -1743,7 +1755,7 @@ bool csSpriteCal3DMeshObject::GetActiveAnims (csSpriteCal3DActiveAnim* buffer,
 }
 
 void csSpriteCal3DMeshObject::SetActiveAnims(const csSpriteCal3DActiveAnim* buffer, 
-					     size_t anim_count)
+                         size_t anim_count)
 {
   ClearAllAnims();
 
@@ -1754,7 +1766,7 @@ void csSpriteCal3DMeshObject::SetActiveAnims(const csSpriteCal3DActiveAnim* buff
 }
 
 bool csSpriteCal3DMeshObject::SetAnimAction(int idx, float delayIn,
-	                                        float delayOut)
+                                            float delayOut)
 {
   if (idx < 0 || (size_t)idx >=factory->anims.Length() )
     return false;
@@ -1773,7 +1785,7 @@ bool csSpriteCal3DMeshObject::SetAnimAction(int idx, float delayIn,
 }
 
 bool csSpriteCal3DMeshObject::SetAnimAction(const char *name, float delayIn,
-	float delayOut)
+    float delayOut)
 { 
   int idx = FindAnim(name);
   if (idx == -1)
@@ -1790,7 +1802,7 @@ void csSpriteCal3DMeshObject::SetIdleOverrides(csRandomGen *rng,int which)
 
   // Determine interval till next override.
   idle_override_interval = rng->Get(anim->max_interval - anim->min_interval)
-  	+ anim->min_interval;
+    + anim->min_interval;
 
   // Determine which idle override will be played.
   int odds = rng->Get(100);
@@ -1833,8 +1845,8 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
       if (factory->anims[i]->type == iSpriteCal3DState::C3D_ANIM_TYPE_IDLE)
       {
         AddAnimCycle(i,1,0);
-	if (rng)
-	  SetIdleOverrides(rng,i);
+    if (rng)
+      SetIdleOverrides(rng,i);
         return true;
       }
     }
@@ -1860,7 +1872,7 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
     {
       if (vel < factory->anims[i]->min_velocity ||
           vel > factory->anims[i]->max_velocity)
-    	continue;
+        continue;
       if (vel == factory->anims[i]->base_velocity)
       {
         AddAnimCycle(i,1,0);
@@ -1880,7 +1892,7 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
     {
       if (vel < factory->anims[i]->min_velocity ||
           vel > factory->anims[i]->max_velocity)
-    	continue;
+        continue;
       if (vel < factory->anims[i]->base_velocity)
       {
         vel_diff = 
@@ -1912,12 +1924,12 @@ bool csSpriteCal3DMeshObject::AttachCoreMesh(const char *meshname)
   if (idx == -1)
     return false;
 
-  return AttachCoreMesh (factory->meshes[idx]->index,
+  return AttachCoreMesh (factory->meshes[idx]->calCoreMeshID,
     factory->meshes[idx]->default_material);
 }
 
 int csSpriteCal3DMeshObject::CompareMeshIndexKey (const Mesh& m, 
-						  int const& id)
+                          int const& id)
 {
   return m.calCoreMeshID - id;
 }
@@ -1927,81 +1939,75 @@ int csSpriteCal3DMeshObject::CompareMeshMesh (const Mesh& m1, const Mesh& m2)
   return m1.calCoreMeshID - m2.calCoreMeshID;
 }
 
-void csSpriteCal3DMeshObject::SetupRenderMeshTemplate (CalMesh* calMesh, 
-						       size_t index)
+
+csRef<iRenderBuffer> csSpriteCal3DMeshObject::GetVertexBufferIndex (size_t index, 
+  CalRenderer *pCalRenderer)
 {
-  Mesh& mesh = meshes[index];
-  csRenderMesh templ;
-
-  templ.geometryInstance = this;
-  templ.variablecontext = mesh.svc;
-  templ.indexstart = 0;
-  templ.indexend = 0;
-  templ.meshtype = CS_MESHTYPE_TRIANGLES;
-  templ.buffers.AttachNew (new csRenderBufferHolder );
-  csRef<iRenderBufferAccessor> accessor (
-    csPtr<iRenderBufferAccessor> (new MeshAccessor (this, 
-      mesh.calCoreMeshID)));
-  templ.buffers->SetAccessor (accessor, (uint32)CS_BUFFER_ALL_MASK);
-
-  for (int s = 0; s < calMesh->getSubmeshCount(); s++)
-  {
-    CalSubmesh* submesh = calMesh->getSubmesh (s);
-    templ.indexend += submesh->getFaceCount () * 3;
-  }
-
-  renderMeshTemplates.Insert (index, templ);
+  GetVertexBufferCal (meshes[index].calCoreMeshID, pCalRenderer, &meshes[index].vertex_buffer);
+  return meshes[index].vertex_buffer;
 }
 
-iRenderBuffer* csSpriteCal3DMeshObject::GetVertexBuffer (size_t index, 
-							 CalRenderer *pCalRenderer)
+csRef<iRenderBuffer> csSpriteCal3DMeshObject::GetVertexBufferCal (int mesh_id, 
+  CalRenderer *pCalRenderer)
 {
-  Mesh& mesh = meshes[index];
-
-  if (mesh.vertexVersion != meshVersion)
+  size_t index = FindMesh( mesh_id );
+  
+  if (index != csArrayItemNotFound)
   {
-    CalRenderer* render;
+    // Return cached vertex buffer
+    return GetVertexBufferIndex (index, pCalRenderer);
+  }
+  else
+  {
+    // No cached buffer. Return a new one just for the occasion.
+    csRef<iRenderBuffer> newBuffer;
+    GetVertexBufferCal (mesh_id, pCalRenderer, &newBuffer);
+    return newBuffer;
+  }
+}
 
-    if (pCalRenderer)
-      render = pCalRenderer;
-    else
-    {
-      render = calModel.getRenderer();
-      render->beginRendering();
-    }
+void csSpriteCal3DMeshObject::GetVertexBufferCal (int mesh_id, CalRenderer *pCalRenderer,
+                          csRef<iRenderBuffer>* vertex_buffer)
+{
+  CalRenderer* render;
 
-    CalMesh* calMesh = calModel.getMesh (mesh.calCoreMeshID);
-
-    int submesh;
-    int vertexCount = ComputeVertexCount (mesh.calCoreMeshID);;
-
-    if ((mesh.vertex_buffer == 0) 
-      || (mesh.vertex_buffer->GetElementCount() < (size_t)vertexCount))
-    {
-      mesh.vertex_buffer = csRenderBuffer::CreateRenderBuffer (
-	vertexCount, CS_BUF_DYNAMIC,
-	CS_BUFCOMP_FLOAT, 3);
-    }
-
-    csRenderBufferLock<float> vertexLock (mesh.vertex_buffer);
-
-    int vertOffs = 0;
-    for (submesh = 0; submesh < calMesh->getSubmeshCount();
-      submesh++)
-    {
-      render->selectMeshSubmesh (mesh.calCoreMeshID, submesh);
-
-      render->getVertices (vertexLock.Lock() + vertOffs * 3);
-      vertOffs += render->getVertexCount();
-    }
-
-    if (!pCalRenderer)
-      render->endRendering();
-
-    mesh.vertexVersion = meshVersion;
+  if (pCalRenderer)
+    render = pCalRenderer;
+  else
+  {
+    render = calModel.getRenderer();
+    render->beginRendering();
   }
 
-  return mesh.vertex_buffer;
+  CalMesh* calMesh = calModel.getMesh (mesh_id);
+
+  int submesh;
+  int vertexCount = ComputeVertexCount (mesh_id);;
+
+  if ((!(*vertex_buffer).IsValid ()) 
+    || ((*vertex_buffer)->GetElementCount() < (size_t)vertexCount))
+  {
+    *vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+    vertexCount, CS_BUF_DYNAMIC,
+    CS_BUFCOMP_FLOAT, 3);
+  }
+
+  csRenderBufferLock<float> vertexLock (*vertex_buffer);
+
+  int vertOffs = 0;
+  
+  size_t index = FindMesh( mesh_id );                            
+  for (submesh = 0; submesh < calMesh->getSubmeshCount();
+    submesh++)
+  {
+    render->selectMeshSubmesh (index, submesh);
+
+    render->getVertices (vertexLock.Lock() + vertOffs * 3);
+    vertOffs += render->getVertexCount();
+  }
+
+  if (!pCalRenderer)
+    render->endRendering();
 }
 
 int csSpriteCal3DMeshObject::ComputeVertexCount (int meshIdx)
@@ -2017,32 +2023,63 @@ int csSpriteCal3DMeshObject::ComputeVertexCount (int meshIdx)
   return vertexCount;
 }
 
-bool csSpriteCal3DMeshObject::AttachCoreMesh(int mesh_id,
-					     iMaterialWrapper* iMatWrapID)
+
+size_t csSpriteCal3DMeshObject::FindMesh( int mesh_id )
 {
-  if (meshes.FindSortedKey (csArrayCmp<Mesh, int> (mesh_id, 
-    &CompareMeshIndexKey)) != csArrayItemNotFound )
+    for ( size_t z = 0; z < meshes.Length(); z++ )
+    {
+        if ( meshes[z].calCoreMeshID == mesh_id )
+            return z;
+    }
+    
+    return csArrayItemNotFound;
+}
+
+
+bool csSpriteCal3DMeshObject::AttachCoreMesh(int calCoreMeshID, 
+                                             iMaterialWrapper* iMatWrapID)
+{
+
+  if ( FindMesh( calCoreMeshID ) != csArrayItemNotFound )
     return true;
- 
-  if (!calModel.attachMesh(mesh_id))
+    
+  if (!calModel.attachMesh(calCoreMeshID))
     return false;
 
-  CalMesh* calMesh = calModel.getMesh (mesh_id);
+  CalMesh* calMesh = calModel.getMesh (calCoreMeshID);
   CS_ASSERT(calMesh);
 
-  if (iMatWrapID == 0)
-    iMatWrapID = factory->meshes[mesh_id]->default_material;
+  
+  //if (iMatWrapID == 0)
+  //  iMatWrapID = factory->meshes[mesh_id]->default_material;
 
   Mesh newMesh;
-  newMesh.calCoreMeshID = mesh_id;
-  newMesh.svc.AttachNew (new csShaderVariableContext ());
-  size_t attachIndex = meshes.InsertSorted (newMesh, &CompareMeshMesh);
-  // @@@ FIXME: here?
-  SetupRenderMeshTemplate (calMesh, attachIndex);
-  renderMeshTemplates[attachIndex].material = iMatWrapID;
-
+  newMesh.calCoreMeshID = calCoreMeshID;
+  newMesh.svc.AttachNew (new csShaderVariableContext ());  
+  
+  // Sets up the render mesh
+  newMesh.render_mesh.geometryInstance = this;
+  newMesh.render_mesh.variablecontext = newMesh.svc;
+  newMesh.render_mesh.indexstart = 0;
+  newMesh.render_mesh.indexend = 0;
+  newMesh.render_mesh.meshtype = CS_MESHTYPE_TRIANGLES;
+  newMesh.render_mesh.buffers.AttachNew (new csRenderBufferHolder );
+  csRef<iRenderBufferAccessor> accessor (
+    csPtr<iRenderBufferAccessor> (new MeshAccessor (this, 
+      newMesh.calCoreMeshID)));
+  newMesh.render_mesh.buffers->SetAccessor (accessor, (uint32)CS_BUFFER_ALL_MASK);
+  for (int s = 0; s < calMesh->getSubmeshCount(); s++)
+  {
+    CalSubmesh* submesh = calMesh->getSubmesh (s);
+    newMesh.render_mesh.indexend += submesh->getFaceCount () * 3;
+  }  
+  newMesh.render_mesh.material = iMatWrapID;
+  
+  meshes.Push(newMesh);
+  
   return true;
 }
+
 
 bool csSpriteCal3DMeshObject::DetachCoreMesh(const char *meshname)
 {
@@ -2050,22 +2087,25 @@ bool csSpriteCal3DMeshObject::DetachCoreMesh(const char *meshname)
   if (idx == -1)
     return false;
 
-  return DetachCoreMesh(factory->meshes[idx]->index);
+  return DetachCoreMesh(factory->meshes[idx]->calCoreMeshID);
 }
 
-bool csSpriteCal3DMeshObject::DetachCoreMesh (int /*mesh_id*/)
+bool csSpriteCal3DMeshObject::DetachCoreMesh (int calCoreMeshID)
 {
-  CS_ASSERT_MSG (
-    "csSpriteCal3DMeshObject::DetachCoreMesh ... implement me already!",
-    false);
-  return false;
+  size_t index = FindMesh( calCoreMeshID );
+      
+  if (!calModel.detachMesh(calCoreMeshID))
+    return false;
+
+  meshes.DeleteIndex(index);
+  return true;
 }
 
 bool csSpriteCal3DMeshObject::BlendMorphTarget(int morph_animation_id,
-	float weight, float delay)
+    float weight, float delay)
 {
   if(morph_animation_id < 0||
-  	factory->morph_animation_names.Length() <= (size_t)morph_animation_id)
+    factory->morph_animation_names.Length() <= (size_t)morph_animation_id)
   {
     return false;
   }
@@ -2073,10 +2113,10 @@ bool csSpriteCal3DMeshObject::BlendMorphTarget(int morph_animation_id,
 }
 
 bool csSpriteCal3DMeshObject::ClearMorphTarget(int morph_animation_id,
-	float delay)
+    float delay)
 {
   if(morph_animation_id < 0||
-  	factory->morph_animation_names.Length() <= (size_t)morph_animation_id)
+    factory->morph_animation_names.Length() <= (size_t)morph_animation_id)
   {
     return false;
   }
@@ -2107,7 +2147,7 @@ csSpriteCal3DSocket* csSpriteCal3DMeshObject::FindSocket (const char *n) const
 }
 
 csSpriteCal3DSocket* csSpriteCal3DMeshObject::FindSocket (
-	iMeshWrapper *mesh) const
+    iMeshWrapper *mesh) const
 {
   int i;
   for (i = GetSocketCount () - 1; i >= 0; i--)
@@ -2125,18 +2165,18 @@ csSpriteCal3DSocket* csSpriteCal3DMeshObject::FindSocket (
 }
 
 bool csSpriteCal3DMeshObject::SetMaterial(const char *mesh_name,
-	iMaterialWrapper *mat)
+                                          iMaterialWrapper *mat)
 {
   int idx = factory->FindMeshName(mesh_name);
   if (idx == -1)
     return false;
           
-  size_t meshIdx = meshes.FindSortedKey (csArrayCmp<Mesh, int> (idx, 
-    &CompareMeshIndexKey));
+  size_t meshIdx = FindMesh( factory->meshes[idx]->calCoreMeshID );
     
-  if (meshIdx == csArrayItemNotFound ) return false;
+  if (meshIdx == csArrayItemNotFound ) 
+    return false;
 
-  renderMeshTemplates[meshIdx].material = mat;
+  meshes[meshIdx].render_mesh.material = mat;
   return true;
 }
 
@@ -2157,8 +2197,10 @@ iShaderVariableContext* csSpriteCal3DMeshObject::GetCoreMeshShaderVarContext (
   if (idx == -1)
     return 0;
 
-  size_t meshIdx = meshes.FindSortedKey (csArrayCmp<Mesh, int> (idx, 
-    &CompareMeshIndexKey));
+  //size_t meshIdx = meshes.FindSortedKey (csArrayCmp<Mesh, int> (idx, 
+  //  &CompareMeshIndexKey));
+    size_t meshIdx = FindMesh( idx );
+  
   if (meshIdx == csArrayItemNotFound ) return 0;
           
   return meshes[meshIdx].svc;
@@ -2185,7 +2227,7 @@ void csSpriteCal3DMeshObject::MeshAccessor::UpdateNormals (CalRenderer* render,
   for (int submesh = 0; submesh < calMesh->getSubmeshCount();
     submesh++)
   {
-    render->selectMeshSubmesh (mesh, submesh);
+    render->selectMeshSubmesh (MeshIndex(), submesh);
 
     render->getNormals (normalLock.Lock() + vertOffs * 3);
 
@@ -2202,7 +2244,7 @@ void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer
   if (buffer == CS_BUFFER_POSITION)
   {
     holder->SetRenderBuffer (CS_BUFFER_POSITION, 
-      meshobj->GetVertexBuffer (mesh, 0));
+                meshobj->GetVertexBufferCal (mesh, 0));
   }
   else if (buffer == CS_BUFFER_COLOR)
   {
@@ -2214,38 +2256,38 @@ void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer
       int submesh;
       if (color_buffer == 0)
       {
-	color_buffer = csRenderBuffer::CreateRenderBuffer (
-	  vertexCount, CS_BUF_DYNAMIC,
-	  CS_BUFCOMP_FLOAT, 3);
+        color_buffer = csRenderBuffer::CreateRenderBuffer (
+          vertexCount, CS_BUF_DYNAMIC,
+          CS_BUFCOMP_FLOAT, 3);
       }
 
       render->beginRendering();
 
       if (meshobj->meshVersion != normalVersion)
-	UpdateNormals (render, calMesh, (size_t)vertexCount);
+        UpdateNormals (render, calMesh, (size_t)vertexCount);
 
       csRenderBufferLock<float> normalLock (normal_buffer);
       csRenderBufferLock<float> colorLock (color_buffer);
 
       int vertOffs = 0;
       for (submesh = 0; submesh < calMesh->getSubmeshCount();
-	submesh++)
+        submesh++)
       {
-	render->selectMeshSubmesh (mesh, submesh);
+        render->selectMeshSubmesh (MeshIndex(), submesh);
 
-	const csArray<iLightSectorInfluence*>& relevant_lights =
-	  	meshobj->factory->light_mgr->GetRelevantLights (
-		    meshobj->logparent, -1, false);
+        const csArray<iLightSectorInfluence*>& relevant_lights =
+        meshobj->factory->light_mgr->GetRelevantLights (
+          meshobj->logparent, -1, false);
 
-	meshobj->UpdateLightingSubmesh (relevant_lights, 
-					movable,
-					render,
-					mesh,
-					submesh,
-					normalLock.Lock() + vertOffs * 3, 
-					(csColor*)(colorLock.Lock() + vertOffs * 3));
+        meshobj->UpdateLightingSubmesh (relevant_lights, 
+                    movable,
+                    render,
+                    mesh,
+                    submesh,
+                    normalLock.Lock() + vertOffs * 3, 
+                    (csColor*)(colorLock.Lock() + vertOffs * 3));
 
-	vertOffs += render->getVertexCount();
+        vertOffs += render->getVertexCount();
       }
       render->endRendering();
 
@@ -2313,17 +2355,17 @@ bool csSpriteCal3DMeshObjectType::Initialize (iObjectRegistry* object_reg)
   csConfigAccess cfg (object_reg, "/config/sprcal3d.cfg");
 
   updateanim_sqdistance1 = cfg->GetFloat (
-  	"Mesh.SpriteCal3D.DistanceThresshold1", 10.0f);
+    "Mesh.SpriteCal3D.DistanceThresshold1", 10.0f);
   updateanim_sqdistance1 *= updateanim_sqdistance1;
   updateanim_skip1 = cfg->GetInt ("Mesh.SpriteCal3D.SkipFrames1", 4);
 
   updateanim_sqdistance2 = cfg->GetFloat (
-  	"Mesh.SpriteCal3D.DistanceThresshold2", 20.0f);
+    "Mesh.SpriteCal3D.DistanceThresshold2", 20.0f);
   updateanim_sqdistance2 *= updateanim_sqdistance2;
   updateanim_skip2 = cfg->GetInt ("Mesh.SpriteCal3D.SkipFrames2", 20);
 
   updateanim_sqdistance3 = cfg->GetFloat (
-  	"Mesh.SpriteCal3D.DistanceThresshold3", 50.0f);
+    "Mesh.SpriteCal3D.DistanceThresshold3", 50.0f);
   updateanim_sqdistance3 *= updateanim_sqdistance3;
   updateanim_skip3 = cfg->GetInt ("Mesh.SpriteCal3D.SkipFrames3", 1000);
 

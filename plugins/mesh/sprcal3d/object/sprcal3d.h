@@ -81,10 +81,14 @@ struct csCal3DAnimation
   bool     lock;
 };
 
+/** This is a core mesh stored inside the factory. 
+  * These form the main list of available core meshes that can be attached
+  * to a model.
+  */
 struct csCal3DMesh
 {
   CS_LEAKGUARD_DECLARE (csCal3DMesh);
-  int	      index;
+  int         calCoreMeshID;
   csString    name;
   bool	      attach_by_default;
   csRef<iMaterialWrapper> default_material;
@@ -241,7 +245,7 @@ public:
   
   /// Create the sprite template.
   csSpriteCal3DMeshObjectFactory (iMeshObjectType* pParent,
-  	csSpriteCal3DMeshObjectType* type, iObjectRegistry* object_reg);
+    csSpriteCal3DMeshObjectType* type, iObjectRegistry* object_reg);
   /// Destroy the template.
   virtual ~csSpriteCal3DMeshObjectFactory ();
 
@@ -257,16 +261,30 @@ public:
   void CalculateAllBoneBoundingBoxes();
 
   bool LoadCoreSkeleton(iVFS *vfs,const char *filename);
+  
   int  LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,
-  	int type,float base_vel, float min_vel,float max_vel,int min_interval,
-	int max_interval,int idle_pct, bool lock);
+    int type,float base_vel, float min_vel,float max_vel,int min_interval,
+    int max_interval,int idle_pct, bool lock);
+  
+  /** Load a core mesh for the factory.  Reads in the mesh details and stores
+    * them in a list for use by models.
+    * \param vfs  File system to load mesh from.
+    * \param filename The VFS file path to load the mesh from.
+    * \param name The name the mesh should be given inside the list.
+    * \param attach True if this mesh should be attached to all new models.
+    *               false if it is hidden when a model is created. 
+    * \param defmat The default material for this mesh.
+    * 
+    * \return The id of the mesh that cal3d as assigned to it.
+    */ 
   int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,
-  	bool attach,iMaterialWrapper *defmat);
+    bool attach,iMaterialWrapper *defmat);
+    
   int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,const char *filename,
-  	const char *name);
+    const char *name);
   int AddMorphAnimation(const char *name);
   bool AddMorphTarget(int morphanimation_index,const char *mesh_name,
-  	const char *morphtarget_name);
+    const char *morphtarget_name);
   bool AddCoreMaterial(iMaterialWrapper *mat);
   void BindMaterials();
   bool RegisterAnimCallback(const char *anim, CalAnimationCallback *callback,
@@ -457,7 +475,7 @@ public:
     virtual int LoadCoreMorphTarget(iVFS *vfs, int mesh_index,
       const char *filename,const char *name)
     { return scfParent->LoadCoreMorphTarget(vfs, mesh_index, filename,name); }
-	    
+    
     virtual bool AddCoreMaterial(iMaterialWrapper *mat)
     { return scfParent->AddCoreMaterial(mat); }
 
@@ -497,20 +515,20 @@ public:
     virtual iSpriteCal3DSocket* AddSocket ()
     {
       csRef<iSpriteCal3DSocket> ifr (
-	  SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
-	    iSpriteCal3DSocket));
+      SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
+        iSpriteCal3DSocket));
       return ifr;       // DecRef is ok here.
     }
     virtual iSpriteCal3DSocket* FindSocket (const char* name) const
     {
       csRef<iSpriteCal3DSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
-	    scfParent->FindSocket (name), iSpriteCal3DSocket));
+        scfParent->FindSocket (name), iSpriteCal3DSocket));
       return ifr;       // DecRef is ok here.
     }
     virtual iSpriteCal3DSocket* FindSocket (iMeshWrapper* mesh) const
     {
       csRef<iSpriteCal3DSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
-	    scfParent->FindSocket (mesh), iSpriteCal3DSocket));
+        scfParent->FindSocket (mesh), iSpriteCal3DSocket));
       return ifr;       // DecRef is ok here.
     }
     virtual int GetSocketCount () const
@@ -520,8 +538,8 @@ public:
     virtual iSpriteCal3DSocket* GetSocket (int f) const
     {
       csRef<iSpriteCal3DSocket> ifr (
-	  SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
-	    iSpriteCal3DSocket));
+      SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
+        iSpriteCal3DSocket));
       return ifr;       // DecRef is ok here.
     }
 
@@ -618,6 +636,8 @@ private:
    */
   csPDelArray<csSpriteCal3DSocket> sockets;
 
+  size_t FindMesh( int mesh_id );
+    
   class MeshAccessor : public iRenderBufferAccessor
   {
   protected:
@@ -645,7 +665,18 @@ private:
       MeshAccessor::mesh = mesh;
       colorVersion = normalVersion = (uint)-1;
       vertexCount = meshobj->ComputeVertexCount (mesh);
+      normal_buffer = 0;
+      color_buffer = 0;
+      index_buffer = 0;
+      texel_buffer = 0;                        
     }
+
+    /// Finds the index of the mesh in the models list for core ID.
+    int MeshIndex()
+    {
+        return meshobj->FindMesh( mesh );
+    }
+    
     virtual ~MeshAccessor() 
     {
       SCF_DESTRUCT_IBASE ();
@@ -687,6 +718,9 @@ private:
   uint bboxVersion;
   bool lighting_dirty;
 
+  /** A mesh attached to the model.  These form the list of meshes that
+    * the current model has attached to it. 
+    */    
   struct Mesh
   {
     /// Cal3d ID of the mesh
@@ -696,16 +730,22 @@ private:
 
     csRef<iRenderBuffer> vertex_buffer;
     uint vertexVersion;
+    csRenderMesh render_mesh;
 
     Mesh() : vertexVersion((uint)~0) {}
   };
+  
+  /// List of attached meshes. It's important that the order matches that of cal3d.
   csArray<Mesh> meshes;
-  csArray<csRenderMesh> renderMeshTemplates;
+  
   static int CompareMeshIndexKey (const Mesh& m, int const& id);
   static int CompareMeshMesh (const Mesh& m1, const Mesh& m2);
-  void SetupRenderMeshTemplate (CalMesh* calMesh, size_t index);
+  
   // Vertices are handled differently since they're also needed by HitBeam*().
-  iRenderBuffer* GetVertexBuffer (size_t index, CalRenderer *pCalRenderer);
+  csRef<iRenderBuffer> GetVertexBufferIndex (size_t index, CalRenderer *pCalRenderer);
+  csRef<iRenderBuffer> GetVertexBufferCal (int mesh_id, CalRenderer *pCalRenderer);
+  void GetVertexBufferCal (int mesh_id, CalRenderer *pCalRenderer, 
+    csRef<iRenderBuffer>* vertex_buffer);
   int ComputeVertexCount (int mesh);
 
   void SetIdleOverrides(csRandomGen *rng,int which);
@@ -929,9 +969,23 @@ public:
   float GetTimeFactor();
 
   bool AttachCoreMesh(const char *meshname);
-  bool AttachCoreMesh(int mesh_id,iMaterialWrapper* iMatWrapID);
+  
+  /** Attach a 'core' mesh to this model.
+    * \param calCoreMeshID The Cal3D ID of the mesh to attach.
+    * \param iMatWrapID The material to use for the attached mesh.
+    *
+    * \return True if the attachment was successful. 
+    */
+  bool AttachCoreMesh(int calCoreMeshID,iMaterialWrapper* iMatWrapID);
+  
   bool DetachCoreMesh(const char *meshname);
-  bool DetachCoreMesh(int mesh_id);
+  
+  /** Detach a 'core' mesh to this model.
+    * \param calCoreMeshID The Cal3D ID of the mesh to attach.
+    *
+    * \return True if the removal was successful. 
+    */  
+  bool DetachCoreMesh(int calCoreMeshID);
 
   bool BlendMorphTarget(int morph_animation_id, float weight, float delay);
   bool ClearMorphTarget(int morph_animation_id, float delay);
@@ -1029,7 +1083,7 @@ public:
       return scfParent->GetActiveAnims(buffer,max_length);
     }
     virtual void SetActiveAnims(const csSpriteCal3DActiveAnim* buffer,
-    	size_t anim_count)
+      size_t anim_count)
     {
       scfParent->SetActiveAnims(buffer,anim_count);
     }
@@ -1076,20 +1130,20 @@ public:
     virtual iSpriteCal3DSocket* AddSocket ()
     {
       csRef<iSpriteCal3DSocket> ifr (
-	  SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
-	    iSpriteCal3DSocket));
+      SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
+        iSpriteCal3DSocket));
       return ifr;       // DecRef is ok here.
     }
     virtual iSpriteCal3DSocket* FindSocket (const char* name) const
     {
       csRef<iSpriteCal3DSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
-	    scfParent->FindSocket (name), iSpriteCal3DSocket));
+        scfParent->FindSocket (name), iSpriteCal3DSocket));
       return ifr;       // DecRef is ok here.
     }
     virtual iSpriteCal3DSocket* FindSocket (iMeshWrapper* mesh) const
     {
       csRef<iSpriteCal3DSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
-	    scfParent->FindSocket (mesh), iSpriteCal3DSocket));
+        scfParent->FindSocket (mesh), iSpriteCal3DSocket));
       return ifr;       // DecRef is ok here.
     }
     virtual int GetSocketCount () const
@@ -1099,8 +1153,8 @@ public:
     virtual iSpriteCal3DSocket* GetSocket (int f) const
     {
       csRef<iSpriteCal3DSocket> ifr (
-	  SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
-	    iSpriteCal3DSocket));
+      SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
+        iSpriteCal3DSocket));
       return ifr;       // DecRef is ok here.
     }
     virtual bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat)

@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Nov-2005
+        - Andrew Craig fixed sprcal3d so that the following items are 
+          supported again:
+          1) using attach="n" in the .cal3d file to have meshes that
+             are not attached by default. 
+          2) DetachCoreMesh 
+          This patch is a mix of my own work and res2k's patch.
+
 25-Nov-2005
 	- Jorrit removed an unneeded call to wview->Draw() in awstest.
 	  Improves performance slightly.
