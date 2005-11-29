@@ -490,7 +490,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   if (tm)
   {
     if (!tex->GetTextureHandle ()) tex->Register (tm);
-    tex->SetImageFile (0);
+    if (!tex->KeepImage ())
+      tex->SetImageFile (0);
   }
   return tex;
 

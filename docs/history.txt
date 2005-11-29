@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Nov-2005
+	- Jorrit fixed a bug caused by a recent optimization which freed
+	  images directly when they are being loaded. The bug was that
+	  the 'keepimage' flag was not respected.
 28-Nov-2005
         - Andrew Craig fixed sprcal3d so that the following items are 
           supported again:
@@ -13,7 +17,6 @@ chronological order.
              are not attached by default. 
           2) DetachCoreMesh 
           This patch is a mix of my own work and res2k's patch.
-
 25-Nov-2005
 	- Jorrit removed an unneeded call to wview->Draw() in awstest.
 	  Improves performance slightly.
