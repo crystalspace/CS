@@ -10,6 +10,17 @@ chronological order.
 	- Jorrit fixed a bug caused by a recent optimization which freed
 	  images directly when they are being loaded. The bug was that
 	  the 'keepimage' flag was not respected.
+	- res made the following changes:
+	    - Removed the now-unneeded scfstrset.cpp and path.cpp files.
+	    - Tweaked the driver DB to have the GeForce rules not match the
+	      beginning of the GL renderer string (on Macs, this string starts
+	      with "NVIDIA GeForce...").
+	    - Converted sprcal3d to new SCF and made some smaller tweaks.
+	    - Fixed some VC8 warnings.
+	    - Fixed a subtle bug in csRenderBuffer that caused the last lock
+	      type to be stored incorrectly.
+	    - Tweaked csFrameDataHolder<> so it now releases memory after a
+	      while as well.
 28-Nov-2005
         - Andrew Craig fixed sprcal3d so that the following items are 
           supported again:

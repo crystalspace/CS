@@ -74,7 +74,7 @@ void StartMe::ProcessFrame ()
     si.stars_state->SetColor (csColor (0, 0, 0));
     si.star->GetFlags ().Reset (CS_ENTITY_INVISIBLE);
     si.inqueue = true;
-    star_queue.Push (cur_star);
+    star_queue.Push (int (cur_star));
     cur_star++;
     if (cur_star >= star_count) cur_star = 0;
   }
@@ -461,7 +461,7 @@ void StartMe::CreateRoom ()
   box_state->CalculateNormals ();
 
   int cols = 4;
-  int rows = (demos.Length ()-1) / cols + 1;
+  int rows = int (demos.Length ()-1) / cols + 1;
   float dx = (DEMO_MESH_MAXX-DEMO_MESH_MINX) / float (cols-1);
   float dy = (DEMO_MESH_MAXY-DEMO_MESH_MINY) / float (rows-1);
   int x = 0, y = 0;
@@ -495,9 +495,9 @@ void StartMe::LoadConfig ()
   // Retrieve star cursor informations.
   star_count = confman->GetInt ("Stars.Count", 100);
   star_timeout = confman->GetInt ("Stars.Timeout", 10);
-  star_maxage = confman->GetFloat ("Stars.MaxAge", 0.5);
-  star_fade1 = confman->GetFloat ("Stars.Fade1", 0.2);
-  star_fade2 = confman->GetFloat ("Stars.Fade2", 0.4);
+  star_maxage = confman->GetFloat ("Stars.MaxAge", 0.5f);
+  star_fade1 = confman->GetFloat ("Stars.Fade1", 0.2f);
+  star_fade2 = confman->GetFloat ("Stars.Fade2", 0.4f);
   
   // Retrieve demo programs informations.
   size_t i = 0;

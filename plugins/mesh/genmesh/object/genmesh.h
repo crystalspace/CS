@@ -530,7 +530,7 @@ private:
   csVector2* mesh_texels;
   csVector3* mesh_normals;
   csColor4* mesh_colors;
-  int num_mesh_vertices;
+  size_t num_mesh_vertices;
   csVector3* mesh_tri_normals;
 
   bool autonormals;
@@ -592,11 +592,11 @@ private:
    * Compress vertices. This is for CalculateNormals().
    */
   bool CompressVertices (
-	csVector3* orig_verts, int orig_num_vts,
-	csVector3*& new_verts, int& new_num_vts,
-	csTriangle* orig_tris, int num_tris,
+	csVector3* orig_verts, size_t orig_num_vts,
+	csVector3*& new_verts, size_t& new_num_vts,
+	csTriangle* orig_tris, size_t num_tris,
 	csTriangle*& new_tris,
-	int*& mapping);
+	size_t*& mapping);
 
   /**
    * Setup this factory. This function will check if setup is needed.
@@ -642,7 +642,7 @@ public:
   }
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
   void SetVertexCount (int n);
-  int GetVertexCount () const { return num_mesh_vertices; }
+  int GetVertexCount () const { return (int)num_mesh_vertices; }
   csVector3* GetVertices ()
   {
     SetupFactory ();

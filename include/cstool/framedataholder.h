@@ -36,17 +36,52 @@
 template <class T>
 class csFrameDataHolder
 {
+  /// Wrapper around data to hold.
   struct FrameData
   {
+    /// Number of frame this data was last used
     uint lastFrame;
+    /// The actual data
     T data;
   };
+  /// The "cache" for the data
   csArray<FrameData> data;
+  /// Index last checked for an available instance.
   size_t lastData;
+  /// Frame number at which a shrink should be attempted next.
   uint nextShrink;
-  uint lastFrame, clearReq;
+  /// Last frame number
+  uint lastFrame;
+  /// Frame number at which a "clear" was requested.
+  uint clearReq;
+
+  /// Small helper called at the start of a new frame
+  void NewFrame()
+  {
+    if (clearReq != (uint)~0)
+    {
+      data.DeleteAll();
+      clearReq = (uint)~0;
+    }
+    // Try to shrink the cache to a size that reflects what's needed
+    if (lastFrame > nextShrink)
+    {
+      /* lastData is reset every frame, so it gives a good indicator
+       * on how much has been used the last frame */
+      data.Truncate (lastData+1);
+      data.ShrinkBestFit ();
+      nextShrink = (uint)~0;
+    }
+    else if (lastData+1 < data.GetSize())
+    {
+      // Last frame we used less cache than available.
+      // "Schedule" a shrink in the future.
+      nextShrink = lastFrame + 5;
+    }
+    lastData = 0;
+  }
 public:
-  csFrameDataHolder () : lastData(0), nextShrink(0),
+  csFrameDataHolder () : lastData(0), nextShrink((uint)~0),
   	lastFrame((uint)~0), clearReq((uint)~0)
   { }
   ~csFrameDataHolder () { }
@@ -60,35 +95,32 @@ public:
    */
   T& GetUnusedData (bool& created, uint frameNumber)
   {
-    if ((clearReq != (uint)~0) && (clearReq != frameNumber))
-      data.DeleteAll();
-    lastFrame = frameNumber;
+    if (lastFrame != frameNumber)
+    {
+      NewFrame();
+      lastFrame = frameNumber;
+    }
     created = false;
     if ((data.GetSize() == 0) || (data[lastData].lastFrame == frameNumber))
     {
-      lastData = (size_t)-1;
+      size_t startPoint = lastData;
       //check the list
-      size_t i;
-      for(i = 0; i < data.GetSize (); i++)
+      if (data.GetSize() > 0)
       {
-	if (data[i].lastFrame != frameNumber)
+	do
 	{
-	  lastData = i;
-	  break;
+	  if (data[lastData].lastFrame != frameNumber)
+	    break;
+	  lastData++;
+	  if (lastData >= data.GetSize()) lastData = 0;
 	}
+	while (lastData != startPoint);
       }
-      if (lastData == (size_t)-1)
+      if (lastData == startPoint)
       {
 	data.SetSize ((lastData = data.GetSize ()) + 1);
 	created = true;
-	nextShrink = frameNumber + 1;
       }
-    }
-  
-    // Conserve some memory
-    if (!created && (frameNumber <= nextShrink))
-    {
-      data.ShrinkBestFit ();
     }
   
     FrameData& frameData = data[lastData];

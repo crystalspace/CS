@@ -130,14 +130,14 @@ struct iSpriteAction : public iBase
   	float displacement) = 0;
 };
 
-SCF_VERSION (iSpriteSocket, 0, 0, 1);
-
 /**
  * A socket for specifying where sprites can plug into
  * other sprites.
  */
-struct iSpriteSocket : public iBase
+struct iSpriteSocket : public virtual iBase
 {
+  SCF_INTERFACE (iSpriteSocket, 1, 0, 0);
+
   /// Set the name.
   virtual void SetName (char const*) = 0;
   /// Get the name.

@@ -58,8 +58,8 @@ public:
    * Construct a new csObjectModel. Don't forget to call
    * SetPolygonMesh<xxx>()!
    */
-  csObjectModel ()
-    : scfImplementationType (this)
+  csObjectModel (iBase* parent = 0)
+    : scfImplementationType (this, parent)
   {
     shapenr = -1;
     polymesh_base = 0;

@@ -272,7 +272,7 @@ protected:
     bool isIndex : 1;
 
     /// last type of lock used
-    csRenderBufferLockType lastLock : 2;
+    uint lastLock : 2;
 
     Props (csRenderBufferType type, csRenderBufferComponentType componentType,
       uint componentCount, bool copy) : bufferType (type), 

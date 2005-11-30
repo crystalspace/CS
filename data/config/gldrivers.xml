@@ -269,7 +269,7 @@
       -->
     <rule description="GeForce FX 5xxx: Slow VBO">
       <conditions>
-	<regexp string="renderer" pattern="^GeForce FX 5..." />
+	<regexp string="renderer" pattern="GeForce FX 5..." />
 	<conditions fulfill="one">
 	  <comparever version="win32_driver" relation="lt 6.14.10.7801" />
 	  <conditions fulfill="all">
@@ -293,7 +293,7 @@
       -->
     <rule description="GeForce 4 440 Go: Slow VBO">
       <conditions>
-	<regexp string="renderer" pattern="^GeForce *4.*440 *Go" />
+	<regexp string="renderer" pattern="GeForce *4.*440 *Go" />
       </conditions>
       <applicable>
 	<usecfg>novbo</usecfg>
@@ -322,7 +322,7 @@
     
     <rule description="GeForce FX 5xxx: Broken 'Inverted fog'">
       <conditions>
-	<regexp string="renderer" pattern="^GeForce FX 5..." />
+	<regexp string="renderer" pattern="GeForce FX 5..." />
 	<!-- @@@ Add some version check ? -->
       </conditions>
       <applicable>
@@ -400,8 +400,8 @@
 
     <rule description="GeForce: RECT texture extension support apparently sucks">
       <conditions fulfill="one">
-	<regexp	string="renderer" pattern="^GeForce.*MX" />
-	<regexp	string="renderer" pattern="^GeForce.*Go" />
+	<regexp	string="renderer" pattern="GeForce.*MX" />
+	<regexp	string="renderer" pattern="GeForce.*Go" />
       </conditions>
       <applicable>
 	<usecfg>disableRECTTextures</usecfg>
@@ -447,8 +447,8 @@
     <!--
     <rule description="GeForce MX/Go class HW">
       <conditions fulfill="one">
-	<regexp	string="renderer" pattern="^GeForce.*MX" />
-	<regexp	string="renderer" pattern="^GeForce.*Go" />
+	<regexp	string="renderer" pattern="GeForce.*MX" />
+	<regexp	string="renderer" pattern="GeForce.*Go" />
       </conditions>
       <applicable>
 	<usecfg>noavp</usecfg>

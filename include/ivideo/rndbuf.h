@@ -75,7 +75,7 @@ enum csRenderBufferComponentType
  */
 enum csRenderBufferLockType
 {
-  CS_BUF_LOCK_NOLOCK,
+  CS_BUF_LOCK_NOLOCK = 0,
   /// Lock used for reading only from the buffer
   CS_BUF_LOCK_READ,
   /// Just get a point to the buffer, nothing special

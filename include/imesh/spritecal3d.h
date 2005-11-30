@@ -45,13 +45,13 @@ class csString;
 class CalModel;
 class CalCoreModel;
 
-SCF_VERSION (iSpriteCal3DSocket, 0, 0, 2);
-
 /**
  * A socket for specifying where sprites can plug into other sprites.
  */
-struct iSpriteCal3DSocket : public iSpriteSocket
+struct iSpriteCal3DSocket : public virtual iSpriteSocket
 {
+  SCF_INTERFACE (iSpriteCal3DSocket, 1, 0, 0);
+
   /// Set the index of the submesh for the socket.
   virtual void SetSubmeshIndex (int subm_index) = 0;
   /// Get the index of the submesh for the socket.
@@ -89,14 +89,15 @@ struct iSpriteCal3DSocket : public iSpriteSocket
 };
 
 
-SCF_VERSION (iSpriteCal3DFactoryState, 0, 0, 3);
 struct CalAnimationCallback;
 
 /**
  * This interface describes the API for the 3D sprite factory mesh object.
  */
-struct iSpriteCal3DFactoryState : public iBase
+struct iSpriteCal3DFactoryState : public virtual iBase
 {
+  SCF_INTERFACE (iSpriteCal3DFactoryState, 1, 0, 0);
+
   /// Initialize internal Cal3d data structures.
   virtual bool Create(const char *name) = 0;
 
@@ -326,8 +327,6 @@ struct iSpriteCal3DFactoryState : public iBase
 
 };
 
-SCF_VERSION (iAnimTimeUpdateHandler, 0, 0, 1); 
-
 /**
  * By default, csSpriteCal3DMeshObject::Advance() updates the model's via
  * CalModel::update() with the elapsed time since the last advancement.  If
@@ -336,8 +335,10 @@ SCF_VERSION (iAnimTimeUpdateHandler, 0, 0, 1);
  * iAnimTimeUpdateHandler interface and registering it with
  * iSpriteCal3DState::SetAnimTimeUpdateHandler().
  */
-struct iAnimTimeUpdateHandler : public iBase
+struct iAnimTimeUpdateHandler : public virtual iBase
 {
+  SCF_INTERFACE (iAnimTimeUpdateHandler, 1, 0, 0); 
+
   /**
    * Given the elapsed time, update the position of the model. By default,
    * csSpriteCal3DMeshObject::Advance() updates the model's via
@@ -353,14 +354,14 @@ struct csSpriteCal3DActiveAnim
   float weight;
 };
 
-SCF_VERSION (iSpriteCal3DState, 1, 0, 0);
-
 /**
  * This interface describes the API for changing the Cal3D sprite 
  * mesh object's animations playing and other current traits.
  */
-struct iSpriteCal3DState : public iBase
+struct iSpriteCal3DState : public virtual iBase
 {
+  SCF_INTERFACE (iSpriteCal3DState, 2, 0, 0);
+
   /**\name Animation management
    * @{ */
 

@@ -63,10 +63,13 @@
 struct iObjectRegistry;
 struct iEngine;
 struct iMaterialWrapper;
-class csSpriteCal3DMeshObjectType;
 
 #define ALL_LOD_FEATURES (CS_LOD_TRIANGLE_REDUCTION|CS_LOD_DISTANCE_REDUCTION)
 
+namespace cspluginSprCal3d
+{
+
+class csSpriteCal3DMeshObjectType;
 struct csCal3DAnimation
 {
   int      index;
@@ -99,10 +102,12 @@ struct csCal3DMesh
  * A socket for specifying where sprites can plug into
  * other sprites.
  */
-class csSpriteCal3DSocket : public iSpriteCal3DSocket
+class csSpriteCal3DSocket : 
+  public scfImplementation1<csSpriteCal3DSocket, 
+			    iSpriteCal3DSocket>
 {
 private:
-  char* name;
+  csString name;
   int triangle_index;
   int submesh_index;
   int mesh_index;
@@ -188,8 +193,6 @@ public:
   virtual void DetachSecondary (size_t index);
   /// Searches for the index of the given attached secondary mesh
   virtual size_t FindSecondary (const char* mesh_name);
-
-  SCF_DECLARE_IBASE;
 };
 
 class csSpriteCal3DMeshObject;
@@ -199,7 +202,12 @@ class csSpriteCal3DMeshObject;
  * done with frames.  This class represents a template from which a
  * csSpriteCal3D class can be made.
  */
-class csSpriteCal3DMeshObjectFactory : public iMeshObjectFactory
+class csSpriteCal3DMeshObjectFactory : 
+  public scfImplementationExt3<csSpriteCal3DMeshObjectFactory,
+			       csObjectModel,	
+			       iMeshObjectFactory,
+			       iSpriteCal3DFactoryState,
+			       iLODControl>
 {
 private:
   friend class csSpriteCal3DMeshObject;
@@ -244,14 +252,15 @@ public:
   csWeakRef<iEngine> engine;
   
   /// Create the sprite template.
-  csSpriteCal3DMeshObjectFactory (iMeshObjectType* pParent,
-    csSpriteCal3DMeshObjectType* type, iObjectRegistry* object_reg);
+  csSpriteCal3DMeshObjectFactory (csSpriteCal3DMeshObjectType* pParent, 
+    iObjectRegistry* object_reg);
   /// Destroy the template.
   virtual ~csSpriteCal3DMeshObjectFactory ();
 
   void Report (int severity, const char* msg, ...);
 
-  //------------------------iSpriteCal3dFactoryState implementation --------
+  /**\name iSpriteCal3dFactoryState implementation
+   * @{ */
   /// Create a new core object.
   bool Create(const char *name);
   void ReportLastError ();
@@ -287,6 +296,7 @@ public:
     const char *morphtarget_name);
   bool AddCoreMaterial(iMaterialWrapper *mat);
   void BindMaterials();
+  CalCoreModel *GetCal3DCoreModel() { return &calCoreModel; }
   bool RegisterAnimCallback(const char *anim, CalAnimationCallback *callback,
     float min_interval);
   bool RemoveAnimCallback(const char *anim, CalAnimationCallback *callback);
@@ -317,11 +327,10 @@ public:
     return ((size_t)f < sockets.Length()) ?
       (csSpriteCal3DSocket*)sockets [f] : (csSpriteCal3DSocket*)0;
   }
+  /** @} */
 
-
-  //------------------------ iMeshObjectFactory implementation --------------
-  SCF_DECLARE_IBASE;
-
+  /**\name iMeshObjectFactory implementation
+   * @{ */
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
@@ -333,266 +342,38 @@ public:
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const 
   { return (iMeshObjectType*)sprcal3d_type; }
+  /** @} */
 
-  //------------------ iPolygonMesh interface implementation ----------------//
-
-  int GetVertexCount() { return 0; }
-  csVector3* GetVertices () { return 0; }
-  int GetTriangleCount () { return 0; }
-  csMeshedPolygon* GetPolygons () { return 0; }
-  csTriangle* GetTriangles () { return 0; }
-
-  struct PolyMesh : public iPolygonMesh
-  {
-  private:
-    csSpriteCal3DMeshObjectFactory* factory;
-    csFlags flags;
-
-  public:
-    SCF_DECLARE_IBASE;
-
-    void SetFactory (csSpriteCal3DMeshObjectFactory* Factory)
-    {
-      factory = Factory;
-    }
-
-    virtual int GetVertexCount ()
-    {
-      return factory->GetVertexCount ();
-    }
-    virtual csVector3* GetVertices ()
-    {
-      return factory->GetVertices ();
-    }
-    virtual int GetPolygonCount ()
-    {
-      return factory->GetTriangleCount ();
-    }
-    virtual csMeshedPolygon* GetPolygons ()
-    {
-      return factory->GetPolygons();
-    }
-    virtual int GetTriangleCount ()
-    {
-      return factory->GetTriangleCount ();
-    }
-    virtual csTriangle* GetTriangles ()
-    {
-      return factory->GetTriangles();
-    }
-
-    virtual void Lock () {}
-    virtual void Unlock () {}
-
-    virtual csFlags& GetFlags () { return flags; }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh () : polygons (0)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-    virtual ~PolyMesh ()
-    {
-      Cleanup ();
-      SCF_DESTRUCT_IBASE ();
-    }
-    void Cleanup () {} //  delete[] polygons; polygons = 0; }
-
-    csMeshedPolygon* polygons;
-  } scfiPolygonMesh;
-  friend struct PolyMesh;
-
-  //------------------------- iObjectModel implementation --------------------
+  /**\name iObjectModel implementation
+   * @{ */
   void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts,int vertCount);
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (csVector3& rad, csVector3& cent);
+  /** @} */
 
-  class ObjectModel : public csObjectModel
+  virtual iObjectModel* GetObjectModel () { return this; }
+
+  /**\name iLODControl implementation
+   * @{ */
+  virtual void SetLOD (float, float) { }
+  virtual void GetLOD (float& m, float& a) const
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObjectFactory);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetObjectBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-  } scfiObjectModel;
-  friend class ObjectModel;
-
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
-
-  //------------------- iSpriteCal3DFactoryState implementation --------------
-  struct SpriteCal3DFactoryState : public iSpriteCal3DFactoryState
+    m = 0;
+    a = 1;
+  }
+  virtual void SetLOD (iSharedVariable*, iSharedVariable*) { }
+  virtual void GetLOD (iSharedVariable*& varm, iSharedVariable* &vara)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObjectFactory);
-
-    virtual bool Create(const char *name)
-    { return scfParent->Create(name); }
-
-    virtual void SetLoadFlags(int flags)
-    {
-      scfParent->SetLoadFlags(flags);
-    }
-
-    virtual void ReportLastError ()
-    { scfParent->ReportLastError(); }
-
-    virtual void SetBasePath(const char *path)
-    { scfParent->SetBasePath(path); }
-
-    virtual void RescaleFactory(float factor)
-    { scfParent->RescaleFactory(factor); }
-
-    virtual bool LoadCoreSkeleton(iVFS *vfs, const char *filename)
-    { return scfParent->LoadCoreSkeleton(vfs,filename); }
-
-    virtual int LoadCoreAnimation(iVFS *vfs, const char *filename,
-      const char *name, int type, float base_vel, float min_vel, float max_vel,
-      int min_interval,int max_interval,int idle_pct, bool lock)
-    { return scfParent->LoadCoreAnimation(vfs, filename, name, type, base_vel,
-        min_vel, max_vel, min_interval, max_interval, idle_pct, lock); }
-
-    virtual int LoadCoreMesh(iVFS *vfs, const char *filename, const char *name,
-      bool attach,iMaterialWrapper *defmat)
-    { return scfParent->LoadCoreMesh(vfs, filename, name, attach, defmat); }
-
-    virtual int AddMorphAnimation(const char *name)
-    { return scfParent->AddMorphAnimation(name); }
-    
-    virtual bool AddMorphTarget(int morphanimation_index,
-      const char *mesh_name, const char *morphtarget_name)
-    { return scfParent->AddMorphTarget(morphanimation_index, mesh_name,
-        morphtarget_name); }
- 
-    virtual int LoadCoreMorphTarget(iVFS *vfs, int mesh_index,
-      const char *filename,const char *name)
-    { return scfParent->LoadCoreMorphTarget(vfs, mesh_index, filename,name); }
-    
-    virtual bool AddCoreMaterial(iMaterialWrapper *mat)
-    { return scfParent->AddCoreMaterial(mat); }
-
-    virtual void CalculateAllBoneBoundingBoxes()
-    { scfParent->CalculateAllBoneBoundingBoxes(); }
-
-    virtual void BindMaterials()
-    { scfParent->BindMaterials(); }
-
-    virtual int  GetMeshCount()
-    { return scfParent->GetMeshCount(); }
-
-    virtual int GetMorphAnimationCount()
-    { return scfParent->GetMorphAnimationCount();}
-
-    virtual int GetMorphTargetCount(int mesh_id)
-    { return scfParent->GetMorphTargetCount(mesh_id);}
-
-    virtual const char *GetMeshName(int idx)
-    { return scfParent->GetMeshName(idx); }
-
-    virtual int  FindMeshName(const char *meshName)
-    { return scfParent->FindMeshName(meshName); }
-    
-    virtual const char* GetDefaultMaterial( const char* meshName )
-    { return scfParent->GetDefaultMaterial( meshName ); }
-    
-    virtual const char *GetMorphAnimationName(int idx)
-    { return scfParent->GetMorphAnimationName(idx); }
-
-    virtual int  FindMorphAnimationName(const char *meshName)
-    { return scfParent->FindMorphAnimationName(meshName); }
-
-    virtual bool IsMeshDefault(int idx)
-    { return scfParent->IsMeshDefault(idx); }
-
-    virtual iSpriteCal3DSocket* AddSocket ()
-    {
-      csRef<iSpriteCal3DSocket> ifr (
-      SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
-        iSpriteCal3DSocket));
-      return ifr;       // DecRef is ok here.
-    }
-    virtual iSpriteCal3DSocket* FindSocket (const char* name) const
-    {
-      csRef<iSpriteCal3DSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
-        scfParent->FindSocket (name), iSpriteCal3DSocket));
-      return ifr;       // DecRef is ok here.
-    }
-    virtual iSpriteCal3DSocket* FindSocket (iMeshWrapper* mesh) const
-    {
-      csRef<iSpriteCal3DSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
-        scfParent->FindSocket (mesh), iSpriteCal3DSocket));
-      return ifr;       // DecRef is ok here.
-    }
-    virtual int GetSocketCount () const
-    {
-      return scfParent->GetSocketCount ();
-    }
-    virtual iSpriteCal3DSocket* GetSocket (int f) const
-    {
-      csRef<iSpriteCal3DSocket> ifr (
-      SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
-        iSpriteCal3DSocket));
-      return ifr;       // DecRef is ok here.
-    }
-
-    virtual CalCoreModel *GetCal3DCoreModel()
-    {
-      return &scfParent->calCoreModel;
-    }
-    
-    virtual bool RegisterAnimCallback(const char *anim,
-      CalAnimationCallback *callback,float min_interval)
-    {
-      return scfParent->RegisterAnimCallback(anim,callback,min_interval);
-    }
-
-    virtual bool RemoveAnimCallback(const char *anim,
-      CalAnimationCallback *callback)
-    {
-      return scfParent->RemoveAnimCallback(anim,callback);
-    }
-  
-  } scfiSpriteCal3DFactoryState;
-  friend struct SpriteCal3DFactoryState;
-
-  struct LODControl : public iLODControl
+    varm = 0;
+    vara = 0;
+  }
+  virtual int GetLODPolygonCount (float /*lod*/) const { return 0; }
+  virtual void GetLOD(iSharedVariable*& first,iSharedVariable*& second) const
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObjectFactory);
-    virtual void SetLOD (float, float)
-    {
-    }
-    virtual void GetLOD (float& m, float& a) const
-    {
-      m = 0;
-      a = 1;
-    }
-    virtual void SetLOD (iSharedVariable*, iSharedVariable*)
-    {
-    }
-    virtual void GetLOD (iSharedVariable*& varm, iSharedVariable* &vara)
-    {
-      varm = 0;
-      vara = 0;
-    }
-    virtual int GetLODPolygonCount (float /*lod*/) const
-    {
-      return 0;
-    }
-    virtual void GetLOD(iSharedVariable*& first,iSharedVariable*& second) const
-    {
-      first=0; second=0;
-    }
-  } scfiLODControl;
-  friend struct LODControl;
-
+    first=0; second=0;
+  }
+  /** @} */
 };
 
 /**
@@ -600,7 +381,13 @@ public:
  * Animation is done with frames (a frame may be controlled by
  * a skeleton).
  */
-class csSpriteCal3DMeshObject : public iMeshObject
+class csSpriteCal3DMeshObject : 
+  public scfImplementationExt4<csSpriteCal3DMeshObject,
+			       csObjectModel,
+			       iMeshObject,
+			       iLightingInfo,
+			       iSpriteCal3DState,
+			       iLODControl>
 {
 private:
   struct ActiveAnim
@@ -614,7 +401,7 @@ private:
   uint32 current_features;  // LOD Control thing
   iMeshWrapper* logparent;
   CalModel calModel;
-  float last_update_time;
+  csTicks last_update_time;
   csArray<ActiveAnim> active_anims;
   bool is_idling;
   int  default_idle_anim,last_locked_anim;
@@ -638,7 +425,8 @@ private:
 
   size_t FindMesh( int mesh_id );
     
-  class MeshAccessor : public iRenderBufferAccessor
+  class MeshAccessor : 
+    public scfImplementation1<MeshAccessor, iRenderBufferAccessor>
   {
   protected:
     csSpriteCal3DMeshObject* meshobj;
@@ -646,40 +434,31 @@ private:
     uint colorVersion, normalVersion;
     int vertexCount;
 
-    csRef<iRenderBuffer> texel_buffer;
     csRef<iRenderBuffer> normal_buffer;
     csRef<iRenderBuffer> color_buffer;
-    csRef<iRenderBuffer> index_buffer;
 
-    void UpdateNormals (CalRenderer* render,
+    void UpdateNormals (CalRenderer* render, int meshIndex,
       CalMesh* calMesh, size_t vertexCount);
   public:
     iMovable* movable;
 
-    SCF_DECLARE_IBASE;
-
-    MeshAccessor (csSpriteCal3DMeshObject* meshobj, int mesh)
+    MeshAccessor (csSpriteCal3DMeshObject* meshobj, int mesh) : 
+      scfImplementationType (this)
     {
-      SCF_CONSTRUCT_IBASE (0);
       MeshAccessor::meshobj = meshobj;
       MeshAccessor::mesh = mesh;
       colorVersion = normalVersion = (uint)-1;
       vertexCount = meshobj->ComputeVertexCount (mesh);
-      normal_buffer = 0;
-      color_buffer = 0;
-      index_buffer = 0;
-      texel_buffer = 0;                        
     }
 
     /// Finds the index of the mesh in the models list for core ID.
-    int MeshIndex()
+    size_t MeshIndex()
     {
-        return meshobj->FindMesh( mesh );
+      return meshobj->FindMesh (mesh);
     }
     
     virtual ~MeshAccessor() 
     {
-      SCF_DESTRUCT_IBASE ();
     }
     virtual void PreGetBuffer (csRenderBufferHolder*, csRenderBufferName);
     
@@ -690,11 +469,11 @@ private:
   /**
    * Default animation time update handler (simply invokes CalModel::update()).
    */
-  struct DefaultAnimTimeUpdateHandler : public iAnimTimeUpdateHandler
+  struct DefaultAnimTimeUpdateHandler : 
+    public scfImplementation1<DefaultAnimTimeUpdateHandler, 
+			      iAnimTimeUpdateHandler>
   {
-    SCF_DECLARE_IBASE;
-    DefaultAnimTimeUpdateHandler() { SCF_CONSTRUCT_IBASE(0); }
-    virtual ~DefaultAnimTimeUpdateHandler() { SCF_DESTRUCT_IBASE(); }
+    DefaultAnimTimeUpdateHandler() : scfImplementationType (this) {}
     void UpdatePosition (float delta, CalModel*);
   };
 
@@ -770,7 +549,6 @@ public:
   int updateanim_skip3;
 
 public:
-  SCF_DECLARE_IBASE;
   CS_LEAKGUARD_DECLARE (csSpriteCal3DMeshObject);
 
   /// The parent.
@@ -788,40 +566,18 @@ public:
   /// Get the factory.
   csSpriteCal3DMeshObjectFactory* GetFactory3D () const { return factory; }
 
-  // ------------------------------- Lighting --------------------------------
+  /**\name iLightingInfo interface
+   * @{ */
+  void InitializeDefault (bool /*clear*/) {}
+  bool ReadFromCache (iCacheManager* /*cache_mgr*/) { return true; }
+  bool WriteToCache (iCacheManager* /*cache_mgr*/) { return true; }
+  virtual void PrepareLighting () { }
   void LightChanged (iLight* light);
   void LightDisconnect (iLight* light);
+  /** @} */
 
-  //------------------------ iLightingInfo interface -------------------------
-  struct LightingInfo : public iLightingInfo
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObject);
-    virtual void InitializeDefault (bool /*clear*/)
-    {
-    }
-    virtual bool ReadFromCache (iCacheManager* /*cache_mgr*/)
-    {
-      return true;
-    }
-    virtual bool WriteToCache (iCacheManager* /*cache_mgr*/)
-    {
-      return true;
-    }
-    virtual void PrepareLighting ()
-    {
-    }
-    virtual void LightChanged (iLight* light)
-    {
-      scfParent->LightChanged (light);
-    }
-    virtual void LightDisconnect (iLight* light)
-    {
-      scfParent->LightDisconnect (light);
-    }
-  } scfiLightingInfo;
-  friend struct LightingInfo;
-
-  //----------------------- iMeshObject implementation -----------------------
+  /**\name iMeshObject implementation
+   * @{ */
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
       csVector3& intersect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
@@ -885,67 +641,11 @@ public:
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
   void SetUserData(void *data);
 
-  //------------------ iPolygonMesh interface implementation -----------------
-  struct PolyMesh : public iPolygonMesh
-  {
-  private:
-    csFlags flags;
+  virtual iObjectModel* GetObjectModel () { return this; }
+  /** @} */
 
-  public:
-    SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObject);
-
-    /// Get the number of vertices for this mesh.
-    virtual int GetVertexCount ()
-    {
-      csSpriteCal3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
-      return fact->GetVertexCount ();
-    }
-    /// Get the pointer to the array of vertices.
-    virtual csVector3* GetVertices ()
-    {
-      csSpriteCal3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
-      return fact->GetVertices ();
-    }
-    /// Get the number of polygons for this mesh.
-    virtual int GetPolygonCount ()
-    {
-      csSpriteCal3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
-      return fact->GetTriangleCount ();
-    }
-    virtual int GetTriangleCount ()
-    {
-      csSpriteCal3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
-      return fact->GetTriangleCount ();
-    }
-    virtual csTriangle* GetTriangles ()
-    {
-      csSpriteCal3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
-      return fact->GetTriangles();
-    }
-
-    /// Get the pointer to the array of polygons.
-    virtual csMeshedPolygon* GetPolygons ();
-
-    virtual void Lock () { }
-    virtual void Unlock () { }
-    
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh () : polygons (0)
-    {
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-    virtual ~PolyMesh () { Cleanup (); }
-    void Cleanup () { delete[] polygons; polygons = 0; }
-
-    csMeshedPolygon* polygons;
-  } scfiPolygonMesh;
-  friend struct PolyMesh;
-
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
-
-  //--------------------- iSpriteCal3DState implementation -------------------
+  /**\name iSpriteCal3DState implementation
+   * @{ */
   int GetAnimCount();
   const char *GetAnimName(int idx);
   int  GetAnimType(int idx);
@@ -1019,241 +719,50 @@ public:
   {
     calModel.getMixer()->setAnimationTime(animationTime);
   }
+  CalModel *GetCal3DModel() { return &calModel; }
 
   void SetAnimTimeUpdateHandler (iAnimTimeUpdateHandler*);
+  /** @} */
 
   virtual iShaderVariableContext* GetCoreMeshShaderVarContext (
     const char* meshName);
 
-  struct SpriteCal3DState : public iSpriteCal3DState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSpriteCal3DMeshObject);
-
-    virtual int GetAnimCount()
-    {
-      return scfParent->GetAnimCount();
-    }
-    virtual const char *GetAnimName(int idx)
-    {
-      return scfParent->GetAnimName(idx);
-    }
-    virtual int GetAnimType(int idx)
-    {
-      return scfParent->GetAnimType(idx);
-    }
-    virtual int FindAnim(const char* name)
-    {
-      return scfParent->FindAnim(name);
-    }
-    virtual void ClearAllAnims()
-    {
-      scfParent->ClearAllAnims();
-    }
-    virtual bool SetAnimCycle(const char *name, float weight)
-    {
-      return scfParent->SetAnimCycle(name,weight);
-    }
-    virtual bool SetAnimCycle(int idx, float weight)
-    {
-      return scfParent->SetAnimCycle(idx,weight);
-    }
-    virtual bool AddAnimCycle(const char *name, float weight, float delay)
-    {
-      return scfParent->AddAnimCycle(name,weight,delay);
-    }
-    bool AddAnimCycle (int idx, float weight, float delay)
-    {
-      return scfParent->AddAnimCycle (idx, weight, delay);
-    }
-    virtual bool ClearAnimCycle (int idx, float delay)
-    {
-      return scfParent->ClearAnimCycle (idx, delay);
-    }
-    virtual bool ClearAnimCycle(const char *name, float delay)
-    {
-      return scfParent->ClearAnimCycle(name,delay);
-    }
-    virtual size_t GetActiveAnimCount()
-    {
-      return scfParent->GetActiveAnimCount();
-    }
-    virtual bool GetActiveAnims(csSpriteCal3DActiveAnim* buffer, 
-      size_t max_length)
-    {
-      return scfParent->GetActiveAnims(buffer,max_length);
-    }
-    virtual void SetActiveAnims(const csSpriteCal3DActiveAnim* buffer,
-      size_t anim_count)
-    {
-      scfParent->SetActiveAnims(buffer,anim_count);
-    }
-    virtual bool SetAnimAction(const char *name, float delayIn, float delayOut)
-    {
-      return scfParent->SetAnimAction(name,delayIn,delayOut);
-    }
-    virtual bool SetAnimAction(int idx, float delayIn, float delayOut)
-    {
-      return scfParent->SetAnimAction(idx,delayIn,delayOut);
-    }
-
-    virtual bool SetVelocity(float vel,csRandomGen *rng=0)
-    {
-      return scfParent->SetVelocity(vel,rng);
-    }
-    virtual void SetDefaultIdleAnim(const char *name)
-    {
-      scfParent->SetDefaultIdleAnim(name);
-    }
-
-    virtual void SetLOD(float lod)
-    {
-      scfParent->SetLOD(lod);
-    }
-    virtual bool AttachCoreMesh(const char *meshname)
-    { return scfParent->AttachCoreMesh(meshname); }
-
-    virtual bool AttachCoreMesh(int mesh_id,iMaterialWrapper* iMatWrapID)
-    { return scfParent->AttachCoreMesh(mesh_id,iMatWrapID); }
-
-    virtual bool DetachCoreMesh(const char *meshname)
-    { return scfParent->DetachCoreMesh(meshname); }
-
-    virtual bool DetachCoreMesh(int mesh_id)
-    { return scfParent->DetachCoreMesh(mesh_id); }
-
-    virtual bool BlendMorphTarget(int morph_animation_id, float weight,
-      float delay)
-    { return scfParent->BlendMorphTarget(morph_animation_id, weight, delay); }
-
-    virtual bool ClearMorphTarget(int morph_animation_id, float delay)
-    { return scfParent->ClearMorphTarget(morph_animation_id, delay); }
-    virtual iSpriteCal3DSocket* AddSocket ()
-    {
-      csRef<iSpriteCal3DSocket> ifr (
-      SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
-        iSpriteCal3DSocket));
-      return ifr;       // DecRef is ok here.
-    }
-    virtual iSpriteCal3DSocket* FindSocket (const char* name) const
-    {
-      csRef<iSpriteCal3DSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
-        scfParent->FindSocket (name), iSpriteCal3DSocket));
-      return ifr;       // DecRef is ok here.
-    }
-    virtual iSpriteCal3DSocket* FindSocket (iMeshWrapper* mesh) const
-    {
-      csRef<iSpriteCal3DSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
-        scfParent->FindSocket (mesh), iSpriteCal3DSocket));
-      return ifr;       // DecRef is ok here.
-    }
-    virtual int GetSocketCount () const
-    {
-      return scfParent->GetSocketCount ();
-    }
-    virtual iSpriteCal3DSocket* GetSocket (int f) const
-    {
-      csRef<iSpriteCal3DSocket> ifr (
-      SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
-        iSpriteCal3DSocket));
-      return ifr;       // DecRef is ok here.
-    }
-    virtual bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat)
-    {
-      return scfParent->SetMaterial(mesh_name,mat);
-    }
-    virtual void SetTimeFactor(float timeFactor)
-    {
-      scfParent->SetTimeFactor(timeFactor);
-    }
-    virtual float GetTimeFactor()
-    {
-      return scfParent->GetTimeFactor();
-    }
-    virtual float GetAnimationTime()
-    {
-      return scfParent->GetAnimationTime();
-    }
-    virtual float GetAnimationDuration()
-    {
-      return scfParent->GetAnimationDuration();
-    }
-    virtual void SetAnimationTime(float animationTime)
-    {
-      scfParent->SetAnimationTime(animationTime);
-    }
-    virtual CalModel *GetCal3DModel()
-    {
-      return &scfParent->calModel;
-    }
-    virtual void SetUserData(void *data)
-    {
-      scfParent->SetUserData(data);
-    }
-    virtual void SetAnimTimeUpdateHandler(iAnimTimeUpdateHandler* p)
-    {
-      scfParent->SetAnimTimeUpdateHandler(p);
-    }
-    virtual iShaderVariableContext* GetCoreMeshShaderVarContext (
-      const char* meshName)
-    { return scfParent->GetCoreMeshShaderVarContext (meshName); }
-  } scfiSpriteCal3DState;
-  friend struct SpriteCal3DState;
-
-  //--------------------- iLODControl implementation -------------------------
-  int GetLODPolygonCount (float /*lod*/)
+  /**\name iLODControl implementation
+   * @{ */
+  int GetLODPolygonCount (float /*lod*/) const
   { return 0; }
 
-  struct LODControl : public iLODControl
+  void SetLOD (float, float) {  }
+  void GetLOD (float& m, float& a) const { m = 0; a = 1; }
+  void SetLOD (iSharedVariable*, iSharedVariable*) {  }
+  void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObject);
-    virtual void SetLOD (float, float) {  }
-    virtual void GetLOD (float& m, float& a) const { m = 0; a = 1; }
-    virtual void SetLOD (iSharedVariable*, iSharedVariable*) {  }
-    virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara)
-    {
-      varm = 0;
-      vara = 0;
-    }
-    virtual int GetLODPolygonCount (float lod) const
-    {
-      return scfParent->GetLODPolygonCount (lod);
-    }
-    virtual void GetLOD(iSharedVariable*& first,iSharedVariable*& second) const
-    {
-      first=0; second=0;
-    }
-  } scfiLODControl;
-  friend struct LODControl;
+    varm = 0;
+    vara = 0;
+  }
+  void GetLOD(iSharedVariable*& first,iSharedVariable*& second) const
+  {
+    first=0; second=0;
+  }
+  /** @} */
 
+  /**\name iObjectModel implementation
+   * @{ */
   void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts, int vertCount);
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (csVector3& rad, csVector3& cent);
-
-  class ObjectModel : public csObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetObjectBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-  } scfiObjectModel;
-  friend class ObjectModel;
+  /** @} */
 };
 
 /**
  * Sprite Cal3D type. This is the plugin you have to use to create instances
  * of csSpriteCal3DMeshObjectFactory.
  */
-class csSpriteCal3DMeshObjectType : public iMeshObjectType
+class csSpriteCal3DMeshObjectType : 
+  public scfImplementation2<csSpriteCal3DMeshObjectType,
+			    iMeshObjectType,
+			    iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -1278,53 +787,38 @@ public:
   /// Destructor.
   virtual ~csSpriteCal3DMeshObjectType ();
 
+  /**\name iComponent implementation
+   * @{ */
   bool Initialize (iObjectRegistry* p);
+  /** @} */
 
-  //------------------------ iMeshObjectType implementation ------------------
-  SCF_DECLARE_IBASE;
-
+  /**\name iMeshObjectType implementation
+   * @{ */
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
+  /** @} */
 
-  //--------------------- iComponent interface implementation ----------------
-  struct eiComponent : public iComponent
+  struct NullPolyMesh : public scfImplementation1<NullPolyMesh, iPolygonMesh>
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csSpriteCal3DMeshObjectType);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
+    int GetVertexCount() { return 0; }
+    csVector3* GetVertices () { return 0; }
+    int GetPolygonCount () { return 0; }
+    int GetTriangleCount () { return 0; }
+    csMeshedPolygon* GetPolygons () { return 0; }
+    csTriangle* GetTriangles () { return 0; }
+    void Lock () {}
+    void Unlock () {}
 
-  //--------------------- iLODControl implementation -------------------------
-  struct LODControl : public iLODControl
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObjectType);
-    virtual void SetLOD (float, float)
-    {
-    }
-    virtual void GetLOD (float& m, float& a) const
-    {
-      m = 0;
-      a = 1;
-    }
-    virtual void SetLOD (iSharedVariable*, iSharedVariable*)
-    {
-    }
-    virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara)
-    {
-      varm = 0;
-      vara = 0;
-    }
-    virtual int GetLODPolygonCount (float /*lod*/) const
-    {
-      return 0;
-    }
-    virtual void GetLOD(iSharedVariable*& first,iSharedVariable*& second) const
-    {
-      first=0; second=0;
-    }
-  } scfiLODControl;
-  friend struct LODControl;
+    csFlags polymesh_flags;
+    csFlags& GetFlags () { return polymesh_flags; }
+    uint32 GetChangeNumber() const { return 0; }
+
+    NullPolyMesh (iBase* parent) : scfImplementationType (this, parent),
+      polymesh_flags (CS_POLYMESH_TRIANGLEMESH) {}
+  };
+  csRef<iPolygonMesh> nullPolyMesh;
 };
+
+} // namespace cspluginSprCal3d
 
 #endif // __CS_SPRCAL3D_H__
