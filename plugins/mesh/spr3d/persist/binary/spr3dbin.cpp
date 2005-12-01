@@ -54,6 +54,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+namespace cspluginSpr3dBin
+{
+
 /**
  * Reports errors
  */
@@ -66,35 +69,15 @@ static void ReportError (iObjectRegistry* objreg, const char* id,
   va_end (arg);
 }
 
-SCF_IMPLEMENT_IBASE (csSprite3DBinFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iBinaryLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DBinFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite3DBinFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iBinarySaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DBinFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSprite3DBinFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSprite3DBinFactorySaver)
-
 
 /**
  * Creates a new csSprite3DBinFactoryLoader
  */
-csSprite3DBinFactoryLoader::csSprite3DBinFactoryLoader (iBase* pParent)
+csSprite3DBinFactoryLoader::csSprite3DBinFactoryLoader (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 /**
@@ -102,8 +85,6 @@ csSprite3DBinFactoryLoader::csSprite3DBinFactoryLoader (iBase* pParent)
  */
 csSprite3DBinFactoryLoader::~csSprite3DBinFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 /**
@@ -112,12 +93,11 @@ csSprite3DBinFactoryLoader::~csSprite3DBinFactoryLoader ()
 bool csSprite3DBinFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DBinFactoryLoader::object_reg = object_reg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
 const char binsprMagic[4] = {'5','1', '5','0'};
-
 
 /**
  * Loads a csSprite3DBinFactoryLoader
@@ -127,14 +107,14 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 				       iLoaderContext* ldr_context,
 				       iBase* context)
 {
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS(plugin_mgr,
-	"crystalspace.mesh.object.sprite.3d", iMeshObjectType));
+  csRef<iPluginManager> plugin_mgr (
+    csQueryRegistry<iPluginManager> (object_reg));
+  csRef<iMeshObjectType> type (
+    csQueryPluginClass<iMeshObjectType> (plugin_mgr, 
+    "crystalspace.mesh.object.sprite.3d"));
   if (!type)
   {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.3d",
-    	iMeshObjectType);
+    type = csLoadPlugin<iMeshObjectType> (plugin_mgr, "crystalspace.mesh.object.sprite.3d");
   }
   if (!type)
   {
@@ -150,16 +130,15 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
   csRef<iMeshObjectFactory> fact;
   if (context)
   {
-    fact = SCF_QUERY_INTERFACE (context, iMeshObjectFactory);
-    // DecRef of fact will be handled later.
+    fact = scfQueryInterface<iMeshObjectFactory> (context);
   }
 
   // If there was no factory we create a new one.
   if (!fact)
     fact = type->NewFactory ();
 
-  csRef<iSprite3DFactoryState> spr3dLook (SCF_QUERY_INTERFACE (fact,
-  	iSprite3DFactoryState));
+  csRef<iSprite3DFactoryState> spr3dLook (
+    scfQueryInterface<iSprite3DFactoryState> (fact));
 
   char* p = (char*)data;
 
@@ -362,10 +341,9 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 /**
  * Creates a csSprite3DBinFactorySaver
  */
-csSprite3DBinFactorySaver::csSprite3DBinFactorySaver (iBase* pParent)
+csSprite3DBinFactorySaver::csSprite3DBinFactorySaver (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 /**
@@ -373,8 +351,6 @@ csSprite3DBinFactorySaver::csSprite3DBinFactorySaver (iBase* pParent)
  */
 csSprite3DBinFactorySaver::~csSprite3DBinFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 /**
@@ -398,7 +374,7 @@ bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file,
   if (!obj) return false;
 
   csRef<iSprite3DFactoryState> state (
-    SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState));
+    scfQueryInterface<iSprite3DFactoryState> (obj));
 
   // Write a magic number so we can ID the file
   file->Write (binsprMagic, 4);
@@ -541,3 +517,4 @@ bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file,
   return true;
 }
 
+} // namespace cspluginSpr3dBin

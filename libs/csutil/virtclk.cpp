@@ -21,29 +21,45 @@
 #include "csutil/virtclk.h"
 #include "iutil/virtclk.h"
 
+csVirtualClock::csVirtualClock () : 
+  scfImplementationType (this), elapsedTime (0), currentVirtualTime (0), 
+  currentRealTime(0), flags (flagFirstShot)
+{ }
 
-csVirtualClock::csVirtualClock ()
-  : scfImplementationType (this), ElapsedTime (0), CurrentTime (csTicks (-1))
-{
-}
-
-csVirtualClock::~csVirtualClock ()
-{
-}
+csVirtualClock::~csVirtualClock () { }
 
 void csVirtualClock::Advance ()
 {
-  csTicks last = CurrentTime;
-  CurrentTime = csGetTicks ();
-  if (last == csTicks(-1))
-    ElapsedTime = 0;
+  if (flags & flagSuspended) return;
+  csTicks last = currentRealTime;
+  currentRealTime = csGetTicks ();
+  if (flags & flagFirstShot)
+  {
+    flags &= ~flagFirstShot;
+    elapsedTime = 0;
+  }
   else
   {
-      if (CurrentTime < last)
-          // csTicks(-1) is the period for a unsigend value
-          ElapsedTime = CurrentTime + (csTicks(-1) - last) + 1;
-      else
-          ElapsedTime = CurrentTime - last;
+    if (currentRealTime < last)
+      // csTicks(-1) is the period for a unsigend value
+      elapsedTime = currentRealTime + (csTicks(-1) - last) + 1;
+    else
+      elapsedTime = currentRealTime - last;
+    currentVirtualTime += elapsedTime;
   }
 }
 
+void csVirtualClock::Suspend ()
+{
+  flags |= flagSuspended;
+  elapsedTime = 0;
+}
+
+void csVirtualClock::Resume ()
+{
+  if (flags & flagSuspended)
+  {
+    flags &= ~flagSuspended;
+    flags |= flagFirstShot;
+  }
+}

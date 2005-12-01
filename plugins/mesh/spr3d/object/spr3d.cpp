@@ -50,10 +50,12 @@
 
 #include "spr3d.h"
 
+CS_IMPLEMENT_PLUGIN
+
+namespace cspluginSpr3d
+{
 
 CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangleMesh, ())
-
-CS_IMPLEMENT_PLUGIN
 
 CS_LEAKGUARD_IMPLEMENT(csSprite3DMeshObject);
 CS_LEAKGUARD_IMPLEMENT(csSprite3DMeshObjectFactory);
@@ -66,20 +68,9 @@ CS_LEAKGUARD_IMPLEMENT(csSprite3DMeshObjectFactory);
 
 //--------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csSpriteLODListener)
-  SCF_IMPLEMENTS_INTERFACE(iSharedVariableListener)
-SCF_IMPLEMENT_IBASE_END
-
-//--------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (csSpriteFrame)
-  SCF_IMPLEMENTS_INTERFACE (iSpriteFrame)
-SCF_IMPLEMENT_IBASE_END
-
-csSpriteFrame::csSpriteFrame (int anm_idx, int tex_idx)
+csSpriteFrame::csSpriteFrame (int anm_idx, int tex_idx) : 
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  name = 0;
   animation_index = anm_idx;
   texturing_index = tex_idx;
   normals_calculated = false;
@@ -87,46 +78,28 @@ csSpriteFrame::csSpriteFrame (int anm_idx, int tex_idx)
 
 csSpriteFrame::~csSpriteFrame ()
 {
-  delete [] name;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csSpriteFrame::SetName (char const* n)
 {
-  delete [] name;
-  if (n) name = csStrNew (n);
-  else name = 0;
+  name = n;
 }
 
 //--------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csSpriteAction2)
-  SCF_IMPLEMENTS_INTERFACE (iSpriteAction)
-SCF_IMPLEMENT_IBASE_END
-
-csSpriteAction2::csSpriteAction2() : frames (8, 8), delays (8, 8)
+csSpriteAction2::csSpriteAction2() : scfImplementationType (this), 
+  frames (8, 8), delays (8, 8)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  name = 0;
   SetReverseAction (false);
 }
 
 csSpriteAction2::~csSpriteAction2()
 {
-  delete [] name;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csSpriteAction2::SetName (char const* n)
 {
-  delete [] name;
-  if (n)
-  {
-    name = new char [strlen (n) + 1];
-    strcpy (name, n);
-  }
-  else
-    name = 0;
+  name = n;
 }
 
 void csSpriteAction2::AddCsFrame (csSpriteFrame * f, int d, float displacement)
@@ -145,70 +118,22 @@ void csSpriteAction2::AddFrame (iSpriteFrame * f, int d, float displacement)
 
 //--------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csSpriteSocket)
-  SCF_IMPLEMENTS_INTERFACE (iSpriteSocket)
-SCF_IMPLEMENT_IBASE_END
-
-csSpriteSocket::csSpriteSocket()
+csSpriteSocket::csSpriteSocket() : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   triangle_index = 0;
-  name = 0;
   attached_mesh = 0;
 }
 
 csSpriteSocket::~csSpriteSocket ()
 {
-  delete [] name;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csSpriteSocket::SetName (char const* n)
 {
-  delete [] name;
-  if (n)
-  {
-    name = new char [strlen (n)+1];
-    strcpy (name, n);
-  }
-  else
-    name = 0;
+  name = n;
 }
 
 //--------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DFactoryState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-  {
-    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
-    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
-      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
-    if (iInterfaceID == iPolygonMesh_scfID &&				
-      scfCompatibleVersion(iVersion, scfInterfaceTraits<iPolygonMesh>::GetVersion()))
-    {
-      csPrintf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "
-	"factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
-      iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
-      (Object)->IncRef ();						
-      return CS_STATIC_CAST(iPolygonMesh*, Object);				
-    }
-  }
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::Sprite3DFactoryState)
-  SCF_IMPLEMENTS_INTERFACE (iSprite3DFactoryState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::LODControl)
-  SCF_IMPLEMENTS_INTERFACE (iLODControl)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::ObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 {
@@ -227,19 +152,15 @@ void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 
 csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (
 	iMeshObjectType* pParent, iObjectRegistry* object_reg) :
-    texels (8, 8), vertices (8, 8), normals (8, 8)
+  scfImplementationType (this, pParent), texels (8, 8), vertices (8, 8), 
+  normals (8, 8)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DFactoryState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
-
-  scfiPolygonMesh.SetFactory (this);
-  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshViscull (0);
-  scfiObjectModel.SetPolygonMeshShadows (0);
+  csRef<iPolygonMesh> pm;
+  pm.AttachNew (new PolyMesh (this));
+  SetPolygonMeshBase (pm);
+  SetPolygonMeshColldet (pm);
+  SetPolygonMeshViscull (0);
+  SetPolygonMeshShadows (0);
 
   logparent = 0;
   spr3d_type = pParent;
@@ -261,8 +182,6 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (
   MixMode = CS_FX_COPY;
 
   initialized = false;
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
 }
 
 csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
@@ -271,12 +190,6 @@ csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
   delete[] emerge_from;
   delete tri_verts;
   ClearLODListeners ();
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite3DFactoryState);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csSprite3DMeshObjectFactory::AddVertices (int num)
@@ -438,7 +351,7 @@ csSpriteFrame* csSprite3DMeshObjectFactory::AddFrame ()
   return fr;
 }
 
-csSpriteFrame* csSprite3DMeshObjectFactory::FindFrame (const char *n)
+csSpriteFrame* csSprite3DMeshObjectFactory::FindFrame (const char *n) const
 {
   int i;
   for (i = GetFrameCount () - 1; i >= 0; i--)
@@ -481,7 +394,7 @@ csSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (iMeshWrapper *mesh) con
 
   return 0;
 }
-void csSprite3DMeshObjectFactory::SetMaterial (iMaterialWrapper *material)
+void csSprite3DMeshObjectFactory::SetMaterialWrapper (iMaterialWrapper *material)
 {
   cstxt = material;
 }
@@ -746,7 +659,7 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
 	csQsqrt (max_sq_radius.z)));
 
   }
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 void csSprite3DMeshObjectFactory::GetObjectBoundingBox (csBox3& b)
@@ -787,51 +700,8 @@ csMeshedPolygon* csSprite3DMeshObjectFactory::PolyMesh::GetPolygons ()
   return polygons;
 }
 
-//=============================================================================
-
-SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectFactory::PolyMesh)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
 
 //=============================================================================
-
-SCF_IMPLEMENT_IBASE (csSprite3DMeshObject)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
-  {
-    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
-    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
-      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
-    if (iInterfaceID == iPolygonMesh_scfID &&				
-      scfCompatibleVersion(iVersion, scfInterfaceTraits<iPolygonMesh>::GetVersion()))
-    {
-#ifdef CS_DEBUG
-      csPrintf ("Deprecated feature use: iPolygonMesh queried from Sprite3d "
-	"object; use iMeshObject->GetObjectModel()->"
-	"GetPolygonMeshColldet() instead.\n");
-#endif
-      (&scfiPolygonMesh)->IncRef ();						
-      return CS_STATIC_CAST(iPolygonMesh*, &scfiPolygonMesh);				
-    }
-  }
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::Sprite3DState)
-  SCF_IMPLEMENTS_INTERFACE (iSprite3DState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::PolyMesh)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite3DMeshObject::eiRenderBufferAccessor)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::LODControl)
-  SCF_IMPLEMENTS_INTERFACE (iLODControl)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 /// Static vertex array.
 typedef csDirtyAccessArray<csVector3> spr3d_tr_verts;
@@ -851,12 +721,8 @@ spr3d_uv_verts *uv_verts = 0;
 spr3d_obj_verts *obj_verts = 0;
 spr3d_tween_verts *tween_verts = 0;
 
-csSprite3DMeshObject::csSprite3DMeshObject ()
+csSprite3DMeshObject::csSprite3DMeshObject () : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
   logparent = 0;
   cur_frame = 0;
   factory = 0;
@@ -912,11 +778,6 @@ csSprite3DMeshObject::~csSprite3DMeshObject ()
   delete [] vertex_colors;
   delete rand_num;
   ClearLODListeners ();
-  
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
-  SCF_DESTRUCT_IBASE ();
 }
 
 int csSprite3DMeshObject::GetLODPolygonCount (float lod) const
@@ -974,10 +835,11 @@ void csSprite3DMeshObject::SetFactory (csSprite3DMeshObjectFactory* tmpl)
   }
 }
 
-void csSprite3DMeshObject::SetMaterial (iMaterialWrapper *material)
+bool csSprite3DMeshObject::SetMaterialWrapper (iMaterialWrapper *material)
 {
   force_otherskin = true;
   cstxt = material;
+  return true;
 }
 
 void csSprite3DMeshObject::AddVertexColor (int i, const csColor& col)
@@ -2185,26 +2047,8 @@ void csSprite3DMeshObject::PositionChild (iMeshObject* child,
 
 //--------------------------------------------------------------------------
 
-csMeshedPolygon* csSprite3DMeshObject::PolyMesh::GetPolygons ()
-{
-  if (!polygons)
-  {
-    csSprite3DMeshObjectFactory* tmpl = scfParent->GetFactory3D ();
-    csTriangle* triangles = tmpl->GetTriangles ();
-    polygons = new csMeshedPolygon [GetPolygonCount ()];
-    int i;
-    for (i = 0 ; i < GetPolygonCount () ; i++)
-    {
-      polygons[i].num_vertices = 3;
-      polygons[i].vertices = &triangles[i].a;
-    }
-  }
-  return polygons;
-}
-
-
-//iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
-void csSprite3DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
+void csSprite3DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, 
+					 csRenderBufferName buffer)
 {
   if (!holder) return;
   if (buffer == CS_BUFFER_POSITION)
@@ -2312,48 +2156,22 @@ void csSprite3DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPluginConfig)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectType::csSprite3DConfig)
-  SCF_IMPLEMENTS_INTERFACE (iPluginConfig)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectType::LODControl)
-  SCF_IMPLEMENTS_INTERFACE (iLODControl)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSprite3DMeshObjectType)
 
-csSprite3DMeshObjectType::csSprite3DMeshObjectType (iBase* pParent)
+csSprite3DMeshObjectType::csSprite3DMeshObjectType (iBase* pParent) : 
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
 }
 
 csSprite3DMeshObjectType::~csSprite3DMeshObjectType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite3DMeshObjectType::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DMeshObjectType::object_reg = object_reg;
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
+  csRef<iEngine> eng = csQueryRegistry<iEngine> (object_reg);
   // We don't want to keep a reference to the engine (circular ref otherwise).
   engine = eng;
   return true;
@@ -2361,17 +2179,15 @@ bool csSprite3DMeshObjectType::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iMeshObjectFactory> csSprite3DMeshObjectType::NewFactory ()
 {
-  csSprite3DMeshObjectFactory* cm = new csSprite3DMeshObjectFactory (this, object_reg);
+  csRef<csSprite3DMeshObjectFactory> cm;
+  cm.AttachNew (new csSprite3DMeshObjectFactory (this, object_reg));
   cm->vc = vc;
   cm->engine = engine;
 
-  cm->g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  cm->g3d = csQueryRegistry<iGraphics3D> (object_reg);
 
-  cm->light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
-  csRef<iMeshObjectFactory> ifact (
-  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
-  cm->DecRef ();
-  return csPtr<iMeshObjectFactory> (ifact);
+  cm->light_mgr = csQueryRegistry<iLightManager> (object_reg);
+  return csPtr<iMeshObjectFactory> (cm);
 }
 
 #define NUM_OPTIONS 3
@@ -2383,8 +2199,7 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 2, "sprlq", "Sprite Lighting Quality", CSVAR_LONG },
 };
 
-bool csSprite3DMeshObjectType::csSprite3DConfig::SetOption (int id,
-	csVariant* value)
+bool csSprite3DMeshObjectType::SetOption (int id, csVariant* value)
 {
   if (value->GetType () != config_options[id].type)
     return false;
@@ -2399,8 +2214,7 @@ bool csSprite3DMeshObjectType::csSprite3DConfig::SetOption (int id,
   return true;
 }
 
-bool csSprite3DMeshObjectType::csSprite3DConfig::GetOption (int id,
-	csVariant* value)
+bool csSprite3DMeshObjectType::GetOption (int id, csVariant* value)
 {
   switch (id)
   {
@@ -2413,8 +2227,8 @@ bool csSprite3DMeshObjectType::csSprite3DConfig::GetOption (int id,
   return true;
 }
 
-bool csSprite3DMeshObjectType::csSprite3DConfig::GetOptionDescription
-  (int idx, csOptionDescription* option)
+bool csSprite3DMeshObjectType::GetOptionDescription (int idx, 
+  csOptionDescription* option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS)
     return false;
@@ -2422,4 +2236,4 @@ bool csSprite3DMeshObjectType::csSprite3DConfig::GetOptionDescription
   return true;
 }
 
-
+} // namespace cspluginSpr3d

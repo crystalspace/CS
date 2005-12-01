@@ -52,6 +52,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+namespace cspluginSpr3dLoader
+{
+
 enum
 {
   XMLTOKEN_ACTION,
@@ -74,65 +77,24 @@ enum
   XMLTOKEN_V
 };
 
-SCF_IMPLEMENT_IBASE (csSprite3DFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite3DFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite3DLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSprite3DSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSprite3DFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSprite3DFactorySaver)
 SCF_IMPLEMENT_FACTORY (csSprite3DLoader)
 SCF_IMPLEMENT_FACTORY (csSprite3DSaver)
 
-
-csSprite3DFactoryLoader::csSprite3DFactoryLoader (iBase* pParent)
+csSprite3DFactoryLoader::csSprite3DFactoryLoader (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite3DFactoryLoader::~csSprite3DFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("action", XMLTOKEN_ACTION);
   xmltokens.Register ("f", XMLTOKEN_F);
@@ -157,14 +119,14 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 				       iLoaderContext* ldr_context, 
 				       iBase* context)
 {
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.sprite.3d", iMeshObjectType));
+  csRef<iPluginManager> plugin_mgr (csQueryRegistry<iPluginManager>
+    (object_reg));
+  csRef<iMeshObjectType> type (csQueryPluginClass<iMeshObjectType> (
+    plugin_mgr, "crystalspace.mesh.object.sprite.3d"));
   if (!type)
   {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.3d",
-    	iMeshObjectType);
+    type = csLoadPlugin<iMeshObjectType> (plugin_mgr, 
+      "crystalspace.mesh.object.sprite.3d");
   }
   if (!type)
   {
@@ -179,14 +141,14 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
   // below should be removed.
   csRef<iMeshObjectFactory> fact;
   if (context)
-    fact = SCF_QUERY_INTERFACE (context, iMeshObjectFactory);
+    fact = scfQueryInterface<iMeshObjectFactory> (context);
   // DecRef of fact will be handled later.
   // If there was no factory we create a new one.
   if (!fact)
     fact = type->NewFactory ();
 
   csRef<iSprite3DFactoryState> spr3dLook (
-  	SCF_QUERY_INTERFACE (fact, iSprite3DFactoryState));
+    scfQueryInterface<iSprite3DFactoryState> (fact));
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -385,23 +347,19 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csSprite3DFactorySaver::csSprite3DFactorySaver (iBase* pParent)
+csSprite3DFactorySaver::csSprite3DFactorySaver (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite3DFactorySaver::~csSprite3DFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite3DFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DFactorySaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -417,9 +375,9 @@ bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   if (obj)
   {
     csRef<iSprite3DFactoryState> spritefact = 
-      SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState);
+      scfQueryInterface<iSprite3DFactoryState> (obj);
     csRef<iMeshObjectFactory> meshfact = 
-      SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+      scfQueryInterface<iMeshObjectFactory> (obj);
     if (!spritefact) return false;
     if (!meshfact) return false;
 
@@ -518,23 +476,19 @@ bool csSprite3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   return true;
 }
 //---------------------------------------------------------------------------
-csSprite3DLoader::csSprite3DLoader (iBase* pParent)
+csSprite3DLoader::csSprite3DLoader (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite3DLoader::~csSprite3DLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("action", XMLTOKEN_ACTION);
   xmltokens.Register ("basecolor", XMLTOKEN_BASECOLOR);
@@ -573,7 +527,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          spr3dLook = SCF_QUERY_INTERFACE (mesh, iSprite3DState);
+	  spr3dLook = scfQueryInterface<iSprite3DState> (mesh);
 	  if (!spr3dLook)
 	  {
       	    synldr->ReportError (
@@ -620,7 +574,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
 	    return 0;
-	  spr3dLook->SetBaseColor (col);
+	  mesh->SetColor (col);
 	}
         break;
       case XMLTOKEN_LIGHTING:
@@ -660,7 +614,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find material '%s'!", matname);
             return 0;
 	  }
-	  spr3dLook->SetMaterialWrapper (mat);
+	  mesh->SetMaterialWrapper (mat);
 	}
 	break;
       case XMLTOKEN_MIXMODE:
@@ -708,23 +662,19 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csSprite3DSaver::csSprite3DSaver (iBase* pParent)
+csSprite3DSaver::csSprite3DSaver (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSprite3DSaver::~csSprite3DSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSprite3DSaver::Initialize (iObjectRegistry* object_reg)
 {
   csSprite3DSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -739,8 +689,8 @@ bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
   if (obj)
   {
-    csRef<iSprite3DState> sprite = SCF_QUERY_INTERFACE (obj, iSprite3DState);
-    csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+    csRef<iSprite3DState> sprite = scfQueryInterface<iSprite3DState> (obj);
+    csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (obj);
     if (!sprite) return false;
     if (!mesh) return false;
 
@@ -766,7 +716,7 @@ bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
     //Writedown Basecolor tag
     csColor col;
-    sprite->GetBaseColor(col);
+    mesh->GetColor (col);
     csRef<iDocumentNode> colorNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("basecolor");
@@ -783,7 +733,7 @@ bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }    
     
     //Writedown Material tag
-    iMaterialWrapper* mat = sprite->GetMaterialWrapper();
+    iMaterialWrapper* mat = mesh->GetMaterialWrapper();
     if (mat)
     {
       const char* matname = mat->QueryObject()->GetName();
@@ -807,3 +757,5 @@ bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   }
   return true;
 }
+
+} // namespace cspluginSpr3dLoader

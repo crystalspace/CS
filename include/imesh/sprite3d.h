@@ -87,13 +87,13 @@ enum
 // @@@ CONFIG TODO: global_lighting_quality
 // @@@ CONFIG TODO: global_lod_level
 
-SCF_VERSION (iSpriteFrame, 0, 0, 2);
-
 /**
  * A frame for 3D sprite animation.
  */
-struct iSpriteFrame : public iBase
+struct iSpriteFrame : public virtual iBase
 {
+  SCF_INTERFACE (iSpriteFrame, 1, 0, 0);
+
   /// Set the name.
   virtual void SetName (char const*) = 0;
   /// Get the name.
@@ -104,13 +104,13 @@ struct iSpriteFrame : public iBase
   virtual int GetTexIndex () const = 0;
 };
 
-SCF_VERSION (iSpriteAction, 0, 0, 1);
-
 /**
  * An action frameset for 3D sprite animation.
  */
-struct iSpriteAction : public iBase
+struct iSpriteAction : public virtual iBase
 {
+  SCF_INTERFACE (iSpriteAction, 1, 0, 0);
+
   /// Set the name.
   virtual void SetName (char const*) = 0;
   /// Get the name.
@@ -154,13 +154,13 @@ struct iSpriteSocket : public virtual iBase
   virtual int GetTriangleIndex () const = 0;
 };
 
-SCF_VERSION (iSprite3DFactoryState, 0, 0, 3);
-
 /**
  * This interface describes the API for the 3D sprite factory mesh object.
  */
-struct iSprite3DFactoryState : public iBase
+struct iSprite3DFactoryState : public virtual iBase
 {
+  SCF_INTERFACE (iSprite3DFactoryState, 1, 0, 0);
+
   /// Set material of sprite.
   virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
   /// Get material of sprite.
@@ -321,17 +321,13 @@ struct iSprite3DFactoryState : public iBase
   virtual uint GetMixMode () const = 0;
 };
 
-SCF_VERSION (iSprite3DState, 0, 0, 6);
-
 /**
  * This interface describes the API for the 3D sprite mesh object.
  */
-struct iSprite3DState : public iBase
+struct iSprite3DState : public virtual iBase
 {
-  /// Set material of sprite.
-  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
-  /// Get material of sprite.
-  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
+  SCF_INTERFACE (iSprite3DState, 1, 0, 0);
+
   /// Set mix mode.
   virtual void SetMixMode (uint mode) = 0;
   /// Get mix mode.
@@ -448,18 +444,6 @@ struct iSprite3DState : public iBase
    * Returns true if lod is enabled, else false.
    */
   virtual bool IsLodEnabled () const = 0;
-
-  /**
-   * Set the base color. This color will be added to the vertex
-   * colors of the sprite. If no lighting is used then this will
-   * be the color.
-   */
-  virtual void SetBaseColor (const csColor& col) = 0;
-
-  /**
-   * Get the base color.
-   */
-  virtual void GetBaseColor (csColor& col) const = 0;
 
   /// find a socked based on the sprite attached to it.
   virtual iSpriteSocket* FindSocket (iMeshWrapper *mesh) const = 0;  

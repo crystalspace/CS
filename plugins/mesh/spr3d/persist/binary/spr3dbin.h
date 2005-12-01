@@ -30,19 +30,22 @@ struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
 
+namespace cspluginSpr3dBin
+{
 
 /**
  * Sprite 3D factory loader for Binary formatted sprites
  */
-class csSprite3DBinFactoryLoader : public iBinaryLoaderPlugin
+class csSprite3DBinFactoryLoader : 
+  public scfImplementation2<csSprite3DBinFactoryLoader,
+			    iBinaryLoaderPlugin,
+			    iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSprite3DBinFactoryLoader (iBase*);
 
@@ -55,27 +58,21 @@ public:
   /// Parse data  and return a new object for it.
   virtual csPtr<iBase> Parse (void* data, 
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSprite3DBinFactoryLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /**
  * Sprite3D factory saver.
  */
-class csSprite3DBinFactorySaver : public iBinarySaverPlugin
+class csSprite3DBinFactorySaver : 
+  public scfImplementation2<csSprite3DBinFactorySaver, 
+			    iBinarySaverPlugin,
+			    iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSprite3DBinFactorySaver (iBase*);
 
@@ -88,14 +85,8 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iFile* file,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSprite3DBinFactorySaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
+} // namespace cspluginSpr3dBin
 
 #endif // __CS_SPR3DBINLDR_H__

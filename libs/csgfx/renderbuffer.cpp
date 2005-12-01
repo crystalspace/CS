@@ -68,7 +68,7 @@ void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
   {
     if ((lockType > CS_BUF_LOCK_READ) 
       || (props.lastLock > CS_BUF_LOCK_READ)
-      || (lockType != props.lastLock))
+      || ((uint)lockType != props.lastLock))
     {
 #if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
       if (lockStack)

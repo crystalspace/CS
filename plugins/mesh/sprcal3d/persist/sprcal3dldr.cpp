@@ -53,6 +53,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_IMPLEMENT_PLUGIN
 
+namespace cspluginSprCal3dLdr
+{
+
 enum
 {
   XMLTOKEN_PATH,
@@ -72,66 +75,25 @@ enum
   XMLTOKEN_IDLE
 };
 
-SCF_IMPLEMENT_IBASE (csSpriteCal3DFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSpriteCal3DFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSpriteCal3DLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csSpriteCal3DSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSpriteCal3DSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSpriteCal3DFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSpriteCal3DFactorySaver)
 SCF_IMPLEMENT_FACTORY (csSpriteCal3DLoader)
 SCF_IMPLEMENT_FACTORY (csSpriteCal3DSaver)
 
-
-csSpriteCal3DFactoryLoader::csSpriteCal3DFactoryLoader (iBase* pParent)
+csSpriteCal3DFactoryLoader::csSpriteCal3DFactoryLoader (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSpriteCal3DFactoryLoader::~csSpriteCal3DFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpriteCal3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSpriteCal3DFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  vfs    = CS_QUERY_REGISTRY (object_reg, iVFS);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  vfs    = csQueryRegistry<iVFS> (object_reg);
 
   xmltokens.Register ("path",           XMLTOKEN_PATH);
   xmltokens.Register ("scale",          XMLTOKEN_SCALE);
@@ -153,14 +115,14 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 						iLoaderContext* ldr_context, 
 						iBase* context)
 {
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-    iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-    "crystalspace.mesh.object.sprite.cal3d", iMeshObjectType));
+  csRef<iPluginManager> plugin_mgr (
+    csQueryRegistry<iPluginManager> (object_reg));
+  csRef<iMeshObjectType> type (csQueryPluginClass<iMeshObjectType> (plugin_mgr,
+    "crystalspace.mesh.object.sprite.cal3d"));
   if (!type)
   {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.cal3d",
-      iMeshObjectType);
+    type = csLoadPlugin<iMeshObjectType> (plugin_mgr, 
+      "crystalspace.mesh.object.sprite.cal3d");
   }
   if (!type)
   {
@@ -180,13 +142,13 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
   // below should be removed.
   csRef<iMeshObjectFactory> fact;
   if (context)
-    fact = SCF_QUERY_INTERFACE (context, iMeshObjectFactory);
+    fact = scfQueryInterface<iMeshObjectFactory> (context);
   // If there was no factory we create a new one.
   if (!fact)
     fact = type->NewFactory ();
 
   csRef<iSpriteCal3DFactoryState> newspr (
-    SCF_QUERY_INTERFACE (fact, iSpriteCal3DFactoryState));
+    scfQueryInterface<iSpriteCal3DFactoryState> (fact));
 
   if (!newspr->Create("dummy"))
   {
@@ -534,22 +496,18 @@ iMaterialWrapper *csSpriteCal3DFactoryLoader::LoadMaterialTag(
 
 //---------------------------------------------------------------------------
 
-csSpriteCal3DFactorySaver::csSpriteCal3DFactorySaver (iBase* pParent)
+csSpriteCal3DFactorySaver::csSpriteCal3DFactorySaver (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSpriteCal3DFactorySaver::~csSpriteCal3DFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpriteCal3DFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csSpriteCal3DFactorySaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
 
@@ -570,9 +528,9 @@ bool csSpriteCal3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     ("iSaverPlugin not yet supported for cal3d mesh");
  
   csRef<iSpriteCal3DFactoryState> cal3dfact = 
-    SCF_QUERY_INTERFACE (obj, iSpriteCal3DFactoryState);
+    scfQueryInterface<iSpriteCal3DFactoryState> (obj);
   csRef<iMeshObjectFactory> meshfact =
-    SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+    scfQueryInterface<iMeshObjectFactory> (obj);
 #if 0
   if ( cal3dfact && meshfact )
   {
@@ -723,23 +681,19 @@ bool csSpriteCal3DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
 //---------------------------------------------------------------------------
 
-csSpriteCal3DLoader::csSpriteCal3DLoader (iBase* pParent)
+csSpriteCal3DLoader::csSpriteCal3DLoader (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSpriteCal3DLoader::~csSpriteCal3DLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpriteCal3DLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSpriteCal3DLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
   xmltokens.Register ("animcycle", XMLTOKEN_ANIMCYCLE);
@@ -777,7 +731,7 @@ csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
 	mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-	sprCal3dLook = SCF_QUERY_INTERFACE (mesh, iSpriteCal3DState);
+	sprCal3dLook = scfQueryInterface<iSpriteCal3DState> (mesh);
       }
       break;
     case XMLTOKEN_ANIMCYCLE:
@@ -848,22 +802,18 @@ csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csSpriteCal3DSaver::csSpriteCal3DSaver (iBase* pParent)
+csSpriteCal3DSaver::csSpriteCal3DSaver (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSpriteCal3DSaver::~csSpriteCal3DSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpriteCal3DSaver::Initialize (iObjectRegistry* object_reg)
 {
   csSpriteCal3DSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
 }
 
@@ -882,3 +832,5 @@ bool csSpriteCal3DSaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
   
   return true;
 }
+
+} // namespace cspluginSprCal3dLdr

@@ -36,34 +36,34 @@ class CS_CRYSTALSPACE_EXPORT csVirtualClock :
   public scfImplementation1<csVirtualClock, iVirtualClock>
 {
 private:
-  /// Elapsed time between last two frames and absolute time in milliseconds
-  csTicks ElapsedTime, CurrentTime;
-
+  /// Virtual clock state flags
+  enum 
+  { 
+    /// The virtual clock is suspended
+    flagSuspended = 1,
+    /**
+     * The virtual clock did not advance yet, means on the first call to
+     * Advance(), the start time needs to be taken, and no elapsed time
+     * is reported.
+     */
+    flagFirstShot = 2 
+  };
+  /// Elapsed time between last two frames
+  csTicks elapsedTime;
+  /// Virtual time in milliseconds
+  csTicks currentVirtualTime;
+  /// Absolute time in milliseconds
+  csTicks currentRealTime;
+  uint flags;
 public:
   csVirtualClock ();
   virtual ~csVirtualClock ();
 
-  /**
-   * Advance the engine's virtual-time clock.
-   */
   virtual void Advance ();
-  /**
-   * Suspend the engine's virtual-time clock.
-   */
-  virtual void Suspend () { }
-  /**
-   * Resume the engine's virtual-time clock.<p>
-   */
-  virtual void Resume () { CurrentTime = csTicks (-1); }
-  /**
-   * Query the time elapsed between the two most recent invocations of
-   * Advance().
-   */
-  virtual csTicks GetElapsedTicks () const { return ElapsedTime; }
-  /**
-   * Returns the absolute time of the last call to Advance().
-   */
-  virtual csTicks GetCurrentTicks () const { return CurrentTime; }
+  virtual void Suspend ();
+  virtual void Resume ();
+  virtual csTicks GetElapsedTicks () const { return elapsedTime; }
+  virtual csTicks GetCurrentTicks () const { return currentVirtualTime; }
 };
 
 #endif // __CS_VIRTCLK_H__

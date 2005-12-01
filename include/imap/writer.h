@@ -30,13 +30,13 @@
 struct iFile;
 struct iStreamSource;
 
-SCF_VERSION (iSaverPlugin, 0, 2, 0);
-
 /**
  * This is a plugin to save with.
  */
-struct iSaverPlugin : public iBase
+struct iSaverPlugin : public virtual iBase
 {
+  SCF_INTERFACE (iSaverPlugin, 1, 0, 0);
+
   /**
    * Take a given object and push description onto the given file.
    */
@@ -46,16 +46,16 @@ struct iSaverPlugin : public iBase
 
 /** } */
 
-SCF_VERSION (iBinarySaverPlugin, 0, 0, 1);
-
 /**
  * This is a binary plugin to save with.
  */
-struct iBinarySaverPlugin : public iBase
+struct iBinarySaverPlugin : public virtual iBase
 {
-/**
- * Take a given object and push description onto the given file.
- */
+  SCF_INTERFACE (iBinarySaverPlugin, 1, 0, 0);
+
+  /**
+   * Take a given object and push description onto the given file.
+   */
   virtual bool WriteDown (iBase* obj, iFile *file, iStreamSource* ssource) = 0;
 };
 

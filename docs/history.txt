@@ -11,6 +11,13 @@ chronological order.
 	  for a new feature in the engine which can be used to do things
 	  like foliage or other situations where you have to populate a
 	  level with lots of objects.
+	- res changed csVirtualClock to support suspend and return a current
+	  time of 0 (instead ~0) in case it was not advanced yet (the latter
+	  valued confused at least spr3d. 0 seems much saner in the context as
+	  well.)
+	- res converted spr3d, its loaders and the sprcal3d loader to new SCF.
+	- res removed some methods from iSprite3DState that can be found in
+	  iMeshObject as well.
 30-Nov-2005
 	- res added mipmapping to the software renderer.
 	- res converted some more classes in the renderers implementations to

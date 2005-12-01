@@ -58,23 +58,25 @@
 struct iObjectRegistry;
 struct iEngine;
 
+namespace cspluginSpr3d
+{
+
 /**
  * A listener to listen to the variables.
  */
-class csSpriteLODListener : public iSharedVariableListener
+class csSpriteLODListener : 
+  public scfImplementation1<csSpriteLODListener, 
+			    iSharedVariableListener>
 {
 private:
   float* variable;
 public:
-  SCF_DECLARE_IBASE;
-  csSpriteLODListener (float* variable)
+  csSpriteLODListener (float* variable) : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     csSpriteLODListener::variable = variable;
   }
   virtual ~csSpriteLODListener ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
 
   virtual void VariableChanged (iSharedVariable* var)
@@ -86,12 +88,14 @@ public:
 /**
  * A frame for 3D sprite animation.
  */
-class csSpriteFrame : public iSpriteFrame
+class csSpriteFrame : 
+  public scfImplementation1<csSpriteFrame,
+			    iSpriteFrame>
 {
 private:
   int animation_index;
   int texturing_index;
-  char* name;
+  csString name;
 
   /// If true then normals are already calculated for this frame.
   bool normals_calculated;
@@ -145,14 +149,14 @@ public:
    * Get the radius of this frame in object space.
    */
   void GetRadius (csVector3& r) const { r = radius; }
-
-  SCF_DECLARE_IBASE;
 };
 
 /**
  * An action frameset for a 3D sprite animation.
  */
-class csSpriteAction2 : public iSpriteAction
+class csSpriteAction2 : 
+  public scfImplementation1<csSpriteAction2,
+			    iSpriteAction>
 {
 public:
   /// Initialize a action object
@@ -229,10 +233,8 @@ public:
   void SetReverseAction (bool reverse)
   { reverse_action = reverse; }
 
-  SCF_DECLARE_IBASE;
-
 private:
-  char *name;
+  csString name;
   bool reverse_action;
   csArray<csSpriteFrame*> frames;
   csArray<int> delays;
@@ -244,10 +246,12 @@ private:
  * A socket for specifying where sprites can plug into
  * other sprites.
  */
-class csSpriteSocket : public iSpriteSocket
+class csSpriteSocket : 
+  public scfImplementation1<csSpriteSocket, 
+			    iSpriteSocket>
 {
 private:
-  char* name;
+  csString name;
   int triangle_index;
   iMeshWrapper *attached_mesh;
 
@@ -272,8 +276,6 @@ public:
   virtual void SetTriangleIndex (int tri_index) { triangle_index = tri_index; }
   /// Get the index of the triangle for the socket.
   virtual int GetTriangleIndex () const { return triangle_index; }
-  
-  SCF_DECLARE_IBASE;
 };
 
 class csSprite3DMeshObject;
@@ -284,7 +286,12 @@ class csSprite3DMeshObject;
  * This class represents a template from which a csSprite3D
  * class can be made.
  */
-class csSprite3DMeshObjectFactory : public iMeshObjectFactory
+class csSprite3DMeshObjectFactory : 
+  public scfImplementationExt3<csSprite3DMeshObjectFactory,
+			       csObjectModel,  
+			       iMeshObjectFactory,
+			       iSprite3DFactoryState,
+			       iLODControl>
 {
 private:
   friend class csSprite3DMeshObject;
@@ -472,6 +479,8 @@ public:
   /// Get a texel.
   csVector2& GetTexel (int frame, int vertex) const
   { return (*texels.Get(frame)) [vertex]; }
+  void SetTexel (int frame, int vertex, const csVector2 &val)
+  { GetTexel (frame, vertex) = val; }
   /// Get array of texels.
   csVector2* GetTexels (int frame) const
   { return (*texels.Get(frame)).GetVertices (); }
@@ -482,6 +491,8 @@ public:
   /// Get a vertex.
   csVector3& GetVertex (int frame, int vertex) const
   { return (*vertices.Get(frame)) [vertex]; }
+  void SetVertex (int frame, int vertex, const csVector3 &val)
+  { GetVertex (frame, vertex) = val; }
   /// Get vertex array.
   csVector3* GetVertices (int frame) const
   { return (*vertices.Get(frame)).GetVertices (); }
@@ -492,6 +503,8 @@ public:
   /// Get a normal.
   csVector3& GetNormal (int frame, int vertex) const
   { return (*normals.Get(frame)) [vertex]; }
+  void SetNormal (int frame, int vertex, const csVector3 &val)
+  { GetNormal (frame, vertex) = val; }
   /// Get normal array.
   csVector3* GetNormals (int frame) const
   { return (*normals.Get(frame)).GetVertices (); }
@@ -519,7 +532,7 @@ public:
   /// Create and add a new frame to the sprite.
   csSpriteFrame* AddFrame ();
   /// find a named frame into the sprite.
-  csSpriteFrame* FindFrame (const char * name);
+  csSpriteFrame* FindFrame (const char * name) const;
   /// Query the number of frames
   int GetFrameCount () const { return (int)frames.Length (); }
   /// Query the frame number f
@@ -562,10 +575,10 @@ public:
 
 
   /// Get the material
-  iMaterialWrapper* GetMaterial () const
+  iMaterialWrapper* GetMaterialWrapper () const
   { return cstxt; }
   /// Set the material used for this sprite
-  void SetMaterial (iMaterialWrapper *material);
+  void SetMaterialWrapper (iMaterialWrapper *material);
 
   /**
    * Compute all normals in a frame.
@@ -611,9 +624,8 @@ public:
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (csVector3& rad, csVector3 &cent);
 
-  //------------------------ iMeshObjectFactory implementation --------------
-  SCF_DECLARE_IBASE;
-
+  /**\name iMeshObjectFactory implementation
+   * @{ */
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
@@ -624,22 +636,17 @@ public:
   virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return spr3d_type; }
+  /** @} */
 
-  //------------------ iPolygonMesh interface implementation ----------------//
-  struct PolyMesh : public iPolygonMesh
+  /**\name iPolygonMesh implementation
+   * @{ */
+  struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
   {
   private:
     csSprite3DMeshObjectFactory* factory;
     csFlags flags;
 
   public:
-    SCF_DECLARE_IBASE;
-
-    void SetFactory (csSprite3DMeshObjectFactory* Factory)
-    {
-      factory = Factory;
-    }
-
     virtual int GetVertexCount ()
     {
       return factory->GetVertexCount ();
@@ -670,308 +677,60 @@ public:
     virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh () : polygons (0)
+    PolyMesh (csSprite3DMeshObjectFactory* Factory) : 
+      scfImplementationType (this), factory(Factory), polygons (0)
     {
-      SCF_CONSTRUCT_IBASE (0);
       flags.Set (CS_POLYMESH_TRIANGLEMESH);
     }
     virtual ~PolyMesh ()
     {
       Cleanup ();
-      SCF_DESTRUCT_IBASE ();
     }
     void Cleanup () { delete[] polygons; polygons = 0; }
 
     csMeshedPolygon* polygons;
-  } scfiPolygonMesh;
+  };
   friend struct PolyMesh;
+  /** @} */
 
-  //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public csObjectModel
+  virtual iObjectModel* GetObjectModel () { return this; }
+
+  /**\name iLODControl implementation
+   * @{ */
+  virtual void SetLOD (float m, float a)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectFactory);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetObjectBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-  } scfiObjectModel;
-  friend class ObjectModel;
-
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
-
-  //--------------------- iSprite3DFactoryState implementation -------------//
-  struct Sprite3DFactoryState : public iSprite3DFactoryState
+    ClearLODListeners ();
+    lod_m = m;
+    lod_a = a;
+  }
+  virtual void GetLOD (float& m, float& a) const
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectFactory);
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    {
-      scfParent->SetMaterial (material);
-    }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    {
-      return scfParent->GetMaterial ();
-    }
-    virtual void AddVertices (int num)
-    {
-      scfParent->AddVertices (num);
-    }
-    virtual int GetVertexCount () const
-    {
-      return scfParent->GetVertexCount ();
-    }
-    virtual const csVector3& GetVertex (int frame, int vertex) const
-    {
-      return scfParent->GetVertex (frame, vertex);
-    }
-    virtual void SetVertex (int frame, int vertex, const csVector3 &val)
-    {
-      scfParent->GetVertex (frame, vertex) = val;
-    }
-    virtual csVector3* GetVertices (int frame) const
-    {
-      return scfParent->GetVertices (frame);
-    }
-    virtual void SetVertices(csVector3 const* verts, int frame)
-    {
-      scfParent->SetVertices(verts, frame);
-    }
-    virtual const csVector2& GetTexel (int frame, int vertex) const
-    {
-      return scfParent->GetTexel (frame, vertex);
-    }
-    virtual void SetTexel (int frame, int vertex, const csVector2 &val)
-    {
-      scfParent->GetTexel (frame, vertex) = val;
-    }
-    virtual csVector2* GetTexels (int frame) const
-    {
-      return scfParent->GetTexels (frame);
-    }
-    virtual void SetTexels(csVector2 const* tex, int frame)
-    {
-      scfParent->SetTexels(tex, frame);
-    }
-    virtual const csVector3& GetNormal (int frame, int vertex) const
-    {
-      return scfParent->GetNormal (frame, vertex);
-    }
-    virtual void SetNormal (int frame, int vertex, const csVector3 &val)
-    {
-      scfParent->GetNormal (frame, vertex) = val;
-    }
-    virtual csVector3* GetNormals (int frame) const
-    {
-      return scfParent->GetNormals (frame);
-    }
-    virtual void SetNormals(csVector3 const* norms, int frame)
-    {
-      scfParent->SetNormals(norms, frame);
-    }
-    virtual void AddTriangle (int a, int b, int c)
-    {
-      scfParent->AddTriangle (a, b, c);
-    }
-    virtual csTriangle GetTriangle (int x) const
-    {
-      return scfParent->GetTriangle (x);
-    }
-    virtual csTriangle* GetTriangles () const
-    {
-      return scfParent->GetTriangles ();
-    }
-    virtual int GetTriangleCount () const
-    {
-      return scfParent->GetTriangleCount ();
-    }
-    virtual void SetTriangleCount( int count )
-    {
-      scfParent->SetTriangleCount(count);
-    }
-    virtual void SetTriangles( csTriangle const* trig, int count)
-    {
-      scfParent->SetTriangles(trig, count);
-    }
-    virtual iSpriteFrame* AddFrame ()
-    {
-      csRef<iSpriteFrame> ifr (
-      	SCF_QUERY_INTERFACE_SAFE (scfParent->AddFrame (),
-      	iSpriteFrame));
-      return ifr;	// DecRef is ok here.
-    }
-    virtual iSpriteFrame* FindFrame (const char* name) const
-    {
-      csRef<iSpriteFrame> ifr (SCF_QUERY_INTERFACE_SAFE (
-      	scfParent->FindFrame (name), iSpriteFrame));
-      return ifr;	// DecRef is ok here.
-    }
-    virtual int GetFrameCount () const
-    {
-      return scfParent->GetFrameCount ();
-    }
-    virtual iSpriteFrame* GetFrame (int f) const
-    {
-      csRef<iSpriteFrame> ifr (
-      	SCF_QUERY_INTERFACE_SAFE (scfParent->GetFrame (f),
-      	iSpriteFrame));
-      return ifr;	// DecRef is ok here.
-    }
-    virtual iSpriteAction* AddAction ()
-    {
-      csRef<iSpriteAction> ia (
-      	SCF_QUERY_INTERFACE_SAFE (scfParent->AddAction (),
-      	iSpriteAction));
-      return ia;	// DecRef is ok here.
-    }
-    virtual iSpriteAction* FindAction (const char* name) const
-    {
-      csRef<iSpriteAction> ia (SCF_QUERY_INTERFACE_SAFE (
-      	scfParent->FindAction (name), iSpriteAction));
-      return ia;	// DecRef is ok here.
-    }
-    virtual iSpriteAction* GetFirstAction () const
-    {
-      csRef<iSpriteAction> ia (SCF_QUERY_INTERFACE_SAFE (
-      	scfParent->GetFirstAction (), iSpriteAction));
-      return ia;	// DecRef is ok here.
-    }
-    virtual int GetActionCount () const
-    {
-      return scfParent->GetActionCount ();
-    }
-    virtual iSpriteAction* GetAction (int No) const
-    {
-      csRef<iSpriteAction> ia (
-      	SCF_QUERY_INTERFACE_SAFE (scfParent->GetAction (No),
-      	iSpriteAction));
-      return ia;	// DecRef is ok here.
-    }
-    virtual iSpriteSocket* AddSocket ()
-    {
-      csRef<iSpriteSocket> ifr (
-      	SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
-      	iSpriteSocket));
-      return ifr;	// DecRef is ok here.
-    }
-    virtual iSpriteSocket* FindSocket (const char* name) const
-    {
-      csRef<iSpriteSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
-      	scfParent->FindSocket (name), iSpriteSocket));
-      return ifr;	// DecRef is ok here.
-    }
-    virtual iSpriteSocket* FindSocket (iMeshWrapper* mesh) const
-    {
-      csRef<iSpriteSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
-      	scfParent->FindSocket (mesh), iSpriteSocket));
-      return ifr;	// DecRef is ok here.
-    }
-    virtual int GetSocketCount () const
-    {
-      return scfParent->GetSocketCount ();
-    }
-    virtual iSpriteSocket* GetSocket (int f) const
-    {
-      csRef<iSpriteSocket> ifr (
-      	SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
-      	iSpriteSocket));
-      return ifr;	// DecRef is ok here.
-    }
-    virtual void EnableTweening (bool en)
-    {
-      scfParent->EnableTweening (en);
-    }
-    virtual bool IsTweeningEnabled () const
-    {
-      return scfParent->IsTweeningEnabled ();
-    }
-    virtual void SetLightingQuality (int qual)
-    {
-      scfParent->SetLightingQuality (qual);
-    }
-    virtual int GetLightingQuality () const
-    {
-      return scfParent->GetLightingQuality ();
-    }
-    virtual void SetLightingQualityConfig (int qual)
-    {
-      scfParent->SetLightingQualityConfig (qual);
-    }
-    virtual int GetLightingQualityConfig () const
-    {
-      return scfParent->GetLightingQualityConfig ();
-    }
-    virtual void SetLodLevelConfig (int config_flag)
-    {
-      scfParent->SetLodLevelConfig (config_flag);
-    }
-    virtual int GetLodLevelConfig () const
-    {
-      return scfParent->GetLodLevelConfig ();
-    }
-    virtual void MergeNormals (int base, int frame)
-    {
-      scfParent->MergeNormals (base, frame);
-    }
-    virtual void MergeNormals (int base)
-    {
-      scfParent->MergeNormals (base);
-    }
-    virtual void MergeNormals ()
-    {
-      scfParent->MergeNormals ();
-    }
-    virtual void SetMixMode (uint mode)
-    { scfParent->SetMixMode (mode); }
-    virtual uint GetMixMode () const
-    { return scfParent->GetMixMode (); }
-  } scfiSprite3DFactoryState;
-
-  //--------------------- iLODControl implementation -------------//
-  struct LODControl : public iLODControl
+    m = lod_m;
+    a = lod_a;
+  }
+  virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectFactory);
-    virtual void SetLOD (float m, float a)
-    {
-      scfParent->ClearLODListeners ();
-      scfParent->lod_m = m;
-      scfParent->lod_a = a;
-    }
-    virtual void GetLOD (float& m, float& a) const
-    {
-      m = scfParent->lod_m;
-      a = scfParent->lod_a;
-    }
-    virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara)
-    {
-      scfParent->SetupLODListeners (varm, vara);
-      scfParent->lod_m = varm->Get ();
-      scfParent->lod_a = vara->Get ();
-    }
-    virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara) const
-    {
-      varm = scfParent->lod_varm;
-      vara = scfParent->lod_vara;
-    }
-    virtual int GetLODPolygonCount (float lod) const
-    {
-      return scfParent->GetLODPolygonCount (lod);
-    }
-  } scfiLODControl;
-  friend struct LODControl;
+    SetupLODListeners (varm, vara);
+    lod_m = varm->Get ();
+    lod_a = vara->Get ();
+  }
+  virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara) const
+  {
+    varm = lod_varm;
+    vara = lod_vara;
+  }
+  /** @} */
 };
 
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
  * Animation is done with frames.
  */
-class csSprite3DMeshObject : public iMeshObject
+class csSprite3DMeshObject : 
+  public scfImplementation3<csSprite3DMeshObject,
+			    iMeshObject,
+			    iSprite3DState,
+			    iLODControl>
 {
 private:
   /// Set the size of internally used tables
@@ -1360,10 +1119,10 @@ public:
   csSprite3DMeshObjectFactory* GetFactory3D () const { return factory; }
 
   /// Force a new material skin other than default
-  void SetMaterial (iMaterialWrapper *material);
+  bool SetMaterialWrapper (iMaterialWrapper *material);
 
   /// Get the material for this sprite.
-  iMaterialWrapper* GetMaterial () const { return cstxt; }
+  iMaterialWrapper* GetMaterialWrapper () const { return cstxt; }
 
   /// Sets the mode that is used, when drawing that sprite.
   void SetMixMode (uint mode)
@@ -1630,9 +1389,8 @@ public:
 	: (csSpriteSocket*)0;
   }
 
-  ///------------------------ iMeshObject implementation ----------------------
-  SCF_DECLARE_IBASE;
-
+  /**\name iMeshObject implementation
+   * @{ */
   virtual iMeshObjectFactory* GetFactory () const
   {
     csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (factory,
@@ -1666,63 +1424,6 @@ public:
   virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
-  //------------------ iPolygonMesh interface implementation ----------------//
-  struct PolyMesh : public iPolygonMesh
-  {
-  private:
-    csFlags flags;
-
-  public:
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
-
-    virtual int GetVertexCount ()
-    {
-      csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
-      return fact->GetVertexCount ();
-    }
-    virtual csVector3* GetVertices ()
-    {
-      csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
-      return fact->GetVertices (0);
-    }
-    virtual int GetPolygonCount ()
-    {
-      csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
-      return fact->GetTriangleCount ();
-    }
-
-    virtual csMeshedPolygon* GetPolygons ();
-
-    virtual int GetTriangleCount ()
-    {
-      csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
-      return fact->GetTriangleCount ();
-    }
-    virtual csTriangle* GetTriangles ()
-    {
-      csSprite3DMeshObjectFactory* fact = scfParent->GetFactory3D ();
-      return fact->GetTriangles ();
-    }
-
-    virtual void Lock () { }
-    virtual void Unlock () { }
-
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh () : polygons (0)
-    {
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-    virtual ~PolyMesh () { Cleanup (); }
-    void Cleanup () { delete[] polygons; polygons = 0; }
-
-    csMeshedPolygon* polygons;
-  } scfiPolygonMesh;
-  friend struct PolyMesh;
-
-  virtual iObjectModel* GetObjectModel () { return factory->GetObjectModel (); }
-
   virtual bool SetColor (const csColor& col)
   {
     SetBaseColor (col);
@@ -1733,237 +1434,61 @@ public:
     GetBaseColor (col);
     return true;
   }
-  virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
-  {
-    SetMaterial (mat);
-    return true;
-  }
-  virtual iMaterialWrapper* GetMaterialWrapper () const
-  {
-    return GetMaterial ();
-  }
   virtual void InvalidateMaterialHandles () { }
   /**
    * see imesh/object.h for specification. The default implementation
    * does nothing.
    */
   virtual void PositionChild (iMeshObject* child,csTicks current_time);
+  /** @} */
 
-  //--------------------- iSprite3DState implementation -------------//
-  struct Sprite3DState : public iSprite3DState
+  virtual iObjectModel* GetObjectModel () { return factory->GetObjectModel (); }
+
+  /**\name iLODControl implementation
+   * @{ */
+  virtual void SetLOD (float /*m*/, float /*a*/)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    {
-      scfParent->SetMaterial (material);
-    }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    {
-      return scfParent->GetMaterial ();
-    }
-    virtual void SetMixMode (uint mode)
-    {
-      scfParent->SetMixMode (mode);
-    }
-    virtual uint GetMixMode () const
-    {
-      return scfParent->GetMixMode ();
-    }
-    virtual void SetLighting (bool l)
-    {
-      scfParent->SetLighting (l);
-    }
-    virtual bool IsLighting () const
-    {
-      return scfParent->IsLighting ();
-    }
-    virtual void SetFrame (int f)
-    {
-      scfParent->SetFrame (f);
-    }
-    virtual int GetCurFrame () const
-    {
-      return scfParent->GetCurFrame ();
-    }
-    virtual int GetFrameCount () const
-    {
-      return scfParent->GetFrameCount ();
-    }
-    virtual bool SetAction (const char * name, bool loop = true,
-    	float speed = 1)
-    {
-      return scfParent->SetAction (name, loop, speed);
-    }
-    virtual bool SetAction (int index, bool loop = true,
-    	float speed = 1)
-    {
-      return scfParent->SetAction (index, loop, speed);
-    }
-    virtual void SetReverseAction (bool reverse)
-    {
-      scfParent->SetReverseAction (reverse);
-    }
-    virtual bool GetReverseAction () const
-    {
-      return scfParent->GetReverseAction ();
-    }
-    virtual bool SetOverrideAction (const char *name,float speed = 1)
-    {
-      return scfParent->SetOverrideAction (name,speed);
-    }
-    virtual bool SetOverrideAction (int index,float speed = 1)
-    {
-      return scfParent->SetOverrideAction (index,speed);
-    }
-    virtual void SetSingleStepAction(bool singlestep)
-    {
-	scfParent->SetSingleStepAction(singlestep);
-    }
-
-    virtual bool PropagateAction (const char *name)
-    {
-      return scfParent->PropagateAction (name);
-    }
-    virtual iSpriteAction* GetCurAction () const
-    {
-      csRef<iSpriteAction> ia (
-      	SCF_QUERY_INTERFACE_SAFE (scfParent->GetCurAction (),
-      	iSpriteAction));
-      return ia;	// DecRef is ok here.
-    }
-    virtual void EnableTweening (bool en)
-    {
-      scfParent->EnableTweening (en);
-    }
-    virtual bool IsTweeningEnabled () const
-    {
-      return scfParent->IsTweeningEnabled ();
-    }
-    virtual void UnsetTexture ()
-    {
-      scfParent->UnsetTexture ();
-    }
-    virtual int GetLightingQuality ()
-    {
-      return scfParent->GetLightingQuality ();
-    }
-    virtual void SetLocalLightingQuality (int lighting_quality)
-    {
-      scfParent->SetLocalLightingQuality (lighting_quality);
-    }
-    virtual void SetLightingQualityConfig (int config_flag)
-    {
-      scfParent->SetLightingQualityConfig (config_flag);
-    }
-    virtual int GetLightingQualityConfig () const
-    {
-      return scfParent->GetLightingQualityConfig ();
-    }
-    virtual void SetLodLevelConfig (int config_flag)
-    {
-      scfParent->SetLodLevelConfig (config_flag);
-    }
-    virtual int GetLodLevelConfig () const
-    {
-      return scfParent->GetLodLevelConfig ();
-    }
-    virtual bool IsLodEnabled () const
-    {
-      return scfParent->IsLodEnabled ();
-    }
-    virtual void SetBaseColor (const csColor& col)
-    {
-      scfParent->SetBaseColor (col);
-    }
-    virtual void GetBaseColor (csColor& col) const
-    {
-      scfParent->GetBaseColor (col);
-    }
-    virtual iSpriteSocket* AddSocket ()
-    {
-      csRef<iSpriteSocket> ifr (
-      	SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
-      	iSpriteSocket));
-      return ifr;	// DecRef is ok here.
-    }
-    virtual iSpriteSocket* FindSocket (const char* name) const
-    {
-      csRef<iSpriteSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
-      	scfParent->FindSocket (name), iSpriteSocket));
-      return ifr;	// DecRef is ok here.
-    }
-    virtual iSpriteSocket* FindSocket (iMeshWrapper* mesh) const
-    {
-      csRef<iSpriteSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
-      	scfParent->FindSocket (mesh), iSpriteSocket));
-      return ifr;	// DecRef is ok here.
-    }
-    virtual int GetSocketCount () const
-    {
-      return scfParent->GetSocketCount ();
-    }
-    virtual iSpriteSocket* GetSocket (int f) const
-    {
-      csRef<iSpriteSocket> ifr (
-      	SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
-      	iSpriteSocket));
-      return ifr;	// DecRef is ok here.
-    }
-  } scfiSprite3DState;
-
-  //--------------------- iLODControl implementation -------------//
-  struct LODControl : public iLODControl
+    SetLodLevelConfig (CS_SPR_LOD_LOCAL);
+    ClearLODListeners ();
+    local_lod_varm = 0;
+    local_lod_vara = 0;
+  }
+  virtual void GetLOD (float& m, float& a) const
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
-    virtual void SetLOD (float /*m*/, float /*a*/)
-    {
-      scfParent->SetLodLevelConfig (CS_SPR_LOD_LOCAL);
-      scfParent->ClearLODListeners ();
-      scfParent->local_lod_varm = 0;
-      scfParent->local_lod_vara = 0;
-    }
-    virtual void GetLOD (float& m, float& a) const
-    {
-      m = scfParent->local_lod_m;
-      a = scfParent->local_lod_a;
-    }
-    virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara)
-    {
-      scfParent->SetLodLevelConfig (CS_SPR_LOD_LOCAL);
-      scfParent->SetupLODListeners (varm, vara);
-      scfParent->local_lod_m = varm->Get ();
-      scfParent->local_lod_a = vara->Get ();
-    }
-    virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara) const
-    {
-      varm = scfParent->local_lod_varm;
-      vara = scfParent->local_lod_vara;
-    }
-    virtual int GetLODPolygonCount (float lod) const
-    {
-      return scfParent->GetLODPolygonCount (lod);
-    }
-  } scfiLODControl;
-  friend struct LODControl;
+    m = local_lod_m;
+    a = local_lod_a;
+  }
+  virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara)
+  {
+    SetLodLevelConfig (CS_SPR_LOD_LOCAL);
+    SetupLODListeners (varm, vara);
+    local_lod_m = varm->Get ();
+    local_lod_a = vara->Get ();
+  }
+  virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara) const
+  {
+    varm = local_lod_varm;
+    vara = local_lod_vara;
+  }
+  /** @} */
 
-  //------------------ iRenderBufferAccessor implementation ------------
-  class eiRenderBufferAccessor : public iRenderBufferAccessor
+  /**\name iRenderBufferAccessor implementation
+   * @{ */
+  class eiRenderBufferAccessor : 
+    public scfImplementation1<eiRenderBufferAccessor, iRenderBufferAccessor>
   {
   private:
     csSprite3DMeshObject* parent;
 
   public:
-    CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
-    eiRenderBufferAccessor (csSprite3DMeshObject* p)
+    eiRenderBufferAccessor (csSprite3DMeshObject* p) : 
+      scfImplementationType (this)
     {
-      SCF_CONSTRUCT_IBASE (0);
       parent = p;
     }
     virtual ~eiRenderBufferAccessor ()
     {
-      SCF_DESTRUCT_IBASE ();
     }
-    SCF_DECLARE_IBASE;
     virtual void PreGetBuffer (csRenderBufferHolder* holder,
     	csRenderBufferName buffer)
     {
@@ -1971,6 +1496,7 @@ public:
     }
   };
   friend class eiRenderBufferAccessor;
+  /** @} */
   csRef<eiRenderBufferAccessor> scfiRenderBufferAccessor;
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
@@ -1980,12 +1506,17 @@ public:
  * Sprite 3D type. This is the plugin you have to use to create instances
  * of csSprite3DMeshObjectFactory.
  */
-class csSprite3DMeshObjectType : public iMeshObjectType
+class csSprite3DMeshObjectType : 
+  public scfImplementation4<csSprite3DMeshObjectType, 
+			    iMeshObjectType,
+			    iComponent,
+			    iPluginConfig,
+			    iLODControl>
 {
 private:
   iObjectRegistry* object_reg;
   csRef<iVirtualClock> vc;
-  iEngine* engine;
+  csWeakRef<iEngine> engine;
 
 public:
   /// Constructor.
@@ -1994,67 +1525,55 @@ public:
   /// Destructor.
   virtual ~csSprite3DMeshObjectType ();
 
-  bool Initialize (iObjectRegistry* p);
-
-  //------------------------ iMeshObjectType implementation --------------
-  SCF_DECLARE_IBASE;
-
-  /// New Factory.
+  /**\name iMeshObjectType implementation
+   * @{ */
   virtual csPtr<iMeshObjectFactory> NewFactory ();
+  /** @} */
 
   //------------------- iConfig interface implementation -------------------
-  struct csSprite3DConfig : public iPluginConfig
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectType);
-    virtual bool GetOptionDescription (int idx, csOptionDescription *option);
-    virtual bool SetOption (int id, csVariant* value);
-    virtual bool GetOption (int id, csVariant* value);
-  } scfiPluginConfig;
-  friend struct csSprite3DConfig;
+  virtual bool GetOptionDescription (int idx, csOptionDescription *option);
+  virtual bool SetOption (int id, csVariant* value);
+  virtual bool GetOption (int id, csVariant* value);
+  /** @} */
 
-  //--------------------- iComponent interface implementation
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSprite3DMeshObjectType);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
+  /**\name iComponent implementation
+   * @{ */
+  bool Initialize (iObjectRegistry* p);
+  /** @} */
 
-  //--------------------- iLODControl implementation -------------//
-  struct LODControl : public iLODControl
+  /**\name iLODControl implementation
+   * @{ */
+  virtual void SetLOD (float m, float a)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectType);
-    virtual void SetLOD (float m, float a)
-    {
-      csSprite3DMeshObject::global_lod_m = m;
-      csSprite3DMeshObject::global_lod_a = a;
-      csSprite3DMeshObject::global_lod_varm = 0;
-      csSprite3DMeshObject::global_lod_vara = 0;
-    }
-    virtual void GetLOD (float& m, float& a) const
-    {
-      m = csSprite3DMeshObject::global_lod_m;
-      a = csSprite3DMeshObject::global_lod_a;
-    }
-    virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara)
-    {
-      csSprite3DMeshObject::global_lod_varm = varm;
-      csSprite3DMeshObject::global_lod_vara = vara;
-      csSprite3DMeshObject::global_lod_m = varm->Get ();
-      csSprite3DMeshObject::global_lod_a = vara->Get ();
-    }
-    virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara) const
-    {
-      varm = csSprite3DMeshObject::global_lod_varm;
-      vara = csSprite3DMeshObject::global_lod_vara;
-    }
-    virtual int GetLODPolygonCount (float /*lod*/) const
-    {
-      return 0;
-    }
-  } scfiLODControl;
-  friend struct LODControl;
+    csSprite3DMeshObject::global_lod_m = m;
+    csSprite3DMeshObject::global_lod_a = a;
+    csSprite3DMeshObject::global_lod_varm = 0;
+    csSprite3DMeshObject::global_lod_vara = 0;
+  }
+  virtual void GetLOD (float& m, float& a) const
+  {
+    m = csSprite3DMeshObject::global_lod_m;
+    a = csSprite3DMeshObject::global_lod_a;
+  }
+  virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara)
+  {
+    csSprite3DMeshObject::global_lod_varm = varm;
+    csSprite3DMeshObject::global_lod_vara = vara;
+    csSprite3DMeshObject::global_lod_m = varm->Get ();
+    csSprite3DMeshObject::global_lod_a = vara->Get ();
+  }
+  virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara) const
+  {
+    varm = csSprite3DMeshObject::global_lod_varm;
+    vara = csSprite3DMeshObject::global_lod_vara;
+  }
+  virtual int GetLODPolygonCount (float /*lod*/) const
+  {
+    return 0;
+  }
+  /** @} */
 };
+
+} // namespace cspluginSpr3d
 
 #endif // __CS_SPR3D_H__

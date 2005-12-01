@@ -32,21 +32,23 @@ struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
 
+namespace cspluginSpr3dLoader
+{
 
 /**
  * Sprite 3D factory loader.
  */
-class csSprite3DFactoryLoader : public iLoaderPlugin
+class csSprite3DFactoryLoader : 
+  public scfImplementation2<csSprite3DFactoryLoader,
+			    iLoaderPlugin,
+			    iComponent>
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSprite3DFactoryLoader (iBase*);
 
@@ -59,28 +61,21 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSprite3DFactoryLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /**
  * Sprite3D factory saver.
  */
-class csSprite3DFactorySaver : public iSaverPlugin
+class csSprite3DFactorySaver : 
+  public scfImplementation2<csSprite3DFactorySaver,
+			    iSaverPlugin,
+			    iComponent>
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSprite3DFactorySaver (iBase*);
 
@@ -93,29 +88,22 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSprite3DFactorySaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /**
  * Sprite 3D loader.
  */
-class csSprite3DLoader : public iLoaderPlugin
+class csSprite3DLoader : 
+  public scfImplementation2<csSprite3DLoader,
+			    iLoaderPlugin,
+			    iComponent>
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSprite3DLoader (iBase*);
 
@@ -128,28 +116,21 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSprite3DLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /**
  * Sprite3D saver.
  */
-class csSprite3DSaver : public iSaverPlugin
+class csSprite3DSaver : 
+  public scfImplementation2<csSprite3DSaver,
+			    iSaverPlugin,
+			    iComponent>
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csSprite3DSaver (iBase*);
 
@@ -162,13 +143,8 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSprite3DSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
+
+} // namespace cspluginSpr3dLoader
 
 #endif // __CS_SPR3DLDR_H__
