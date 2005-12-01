@@ -117,13 +117,13 @@ struct iMaterial;
 #define CS_TEXTURE_SCALE_DOWN		0x00000100
 /** @} */
 
-SCF_VERSION (iRendererLightmap, 1, 1, 0);
-
 /**
  * A lightmap registered with a renderer.
  */
-struct iRendererLightmap : public iBase
+struct iRendererLightmap : public virtual iBase
 {
+  SCF_INTERFACE (iRendererLightmap, 2, 0, 0);
+
   /**
    * Retrieve the coordinates of this lightmap in the superlightmap, in the
    * 'absolute' system used by iSuperLightmap::RegisterLightmap().
@@ -137,13 +137,13 @@ struct iRendererLightmap : public iBase
   virtual void SetLightCellSize (int size) = 0;
 };
 
-SCF_VERSION (iSuperLightmap, 1, 0, 1);
-
 /**
  * A super light map.
  */
-struct iSuperLightmap : public iBase
+struct iSuperLightmap : public virtual iBase
 {
+  SCF_INTERFACE (iSuperLightmap, 2, 0, 0);
+
   /// Add a lightmap to this SLM.
   virtual csPtr<iRendererLightmap> RegisterLightmap (int left, int top, 
     int width, int height) = 0;

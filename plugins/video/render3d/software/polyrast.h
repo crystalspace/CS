@@ -36,25 +36,27 @@ namespace cspluginSoft3d
   template<typename Pix, typename SrcBlend, typename DstBlend>
   struct SLLogic_ScanlineRenderer
   {
-    const iScanlineRenderer::RenderInfo& sri;
+    const iScanlineRenderer::RenderInfoMesh& srim;
+    const iScanlineRenderer::RenderInfoTriangle& srit;
     const VertexBuffer* inBuffers;
     BuffersMask buffersMask;
     size_t floatsPerVert;
     const Pix& pix;
 
     SLLogic_ScanlineRenderer (const Pix& pix,
-      const iScanlineRenderer::RenderInfo& sri,
+    const iScanlineRenderer::RenderInfoMesh& srim,
+    const iScanlineRenderer::RenderInfoTriangle& srit,
       const VertexBuffer* inBuffers, BuffersMask buffersMask,
       size_t floatsPerVert) : 
-      sri (sri), inBuffers (inBuffers), buffersMask (buffersMask),
-      floatsPerVert (floatsPerVert), pix (pix) {}
+      srim (srim), srit (srit), inBuffers (inBuffers), 
+      buffersMask (buffersMask), floatsPerVert (floatsPerVert), pix (pix) {}
 
     CS_FORCEINLINE
     void RenderScanline (InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
       int ipolStep, int ipolShift, uint32* temp, void* dest, uint len, 
       uint32 *zbuff)
     {
-      sri.proc (sri.renderer, L, R, ipolStep, ipolShift, 
+      srit.proc (srim.renderer, L, R, ipolStep, ipolShift, 
 	temp, len, zbuff);
 
       // Blend
@@ -94,7 +96,7 @@ namespace cspluginSoft3d
     }
     void LinearizeBuffers (float* linearBuffers, size_t vertNum)
     {
-      const size_t* compNum = sri.bufferComps;
+      const size_t* compNum = srim.bufferComps;
       size_t bufOfs = 0;
       for (size_t i = 0; i < maxBuffers; i++)
       {

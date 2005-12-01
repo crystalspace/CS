@@ -64,7 +64,8 @@ struct iTriangleDrawer
   virtual ~iTriangleDrawer() {}
   virtual void DrawMesh (iRenderBuffer* activebuffers[], 
     size_t rangeStart, size_t rangeEnd, 
-    const csCoreRenderMesh* mesh, iScanlineRenderer::RenderInfo& scanRenderInfo,
+    const csCoreRenderMesh* mesh, 
+    const iScanlineRenderer::RenderInfoMesh& scanRenderInfoMesh,
     const csRenderMeshType meshtype, uint32* tri, const uint32* triEnd) = 0;
 };
 
@@ -181,8 +182,7 @@ protected:
   csRef<iShaderManager> shadermgr;
 
   iRenderBuffer* activebuffers[activeBufferCount];
-  iTextureHandle* activeTex[activeTextureCount];
-  csSoftwareTexture* activeSoftTex[activeTextureCount]; 
+  csSoftwareTextureHandle* activeSoftTex[activeTextureCount]; 
   csRef<iRenderBuffer> translatedVerts;
   csRef<iScanlineRenderer> scanlineRenderer;
   csRef<csRenderBuffer> processedColors[2];
@@ -458,9 +458,8 @@ public:
   bool ActivateTexture (iTextureHandle *txthandle, int unit = 0)
   {
     if ((unit < 0) || ((uint)unit >= activeTextureCount)) return false;
-    activeTex[unit] = txthandle;
     csSoftwareTextureHandle* softtex = (csSoftwareTextureHandle*)txthandle;
-    activeSoftTex[unit] = softtex->GetTexture (0);
+    activeSoftTex[unit] = softtex;
     return true;
   }
 
@@ -484,7 +483,6 @@ public:
   {
     if ((unit >= 0) && ((uint)unit < activeTextureCount))
     {
-      activeTex[unit] = 0;
       activeSoftTex[unit] = 0;
     }
   }

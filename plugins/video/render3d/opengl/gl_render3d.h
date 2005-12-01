@@ -57,6 +57,7 @@
 
 #include "csplugincommon/opengl/glstates.h"
 
+#include "gl_txtmgr.h"
 #include "gl_renderbuffer.h"
 #include "gl_r2t_backend.h"
 
@@ -456,7 +457,7 @@ public:
 
   /// Get a pointer to our texture manager
   iTextureManager* GetTextureManager () 
-  { return (iTextureManager*)((csGLTextureManager*)txtmgr); }
+  { return txtmgr; }
 
   void SetMixMode (uint mode, csAlphaMode::AlphaType alphaType);
   void SetGlOrtho (bool inverted);

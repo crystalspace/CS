@@ -152,18 +152,24 @@ namespace cspluginSoftshader
 	      if (needColors) col.Apply (ipol.GetFloat (offsetColor), px);
 
 	      if (doAlphaTest)
-		px.c.a = (px.c.a >> 1) | (px.c.a & 0x80);
+	      {
+		const uint flag = (px.c.a & 0x80);
+		px.c.a = (px.c.a >> 1) | flag;
+		if (flag) Z.Update();
+	      }
 	      else
+	      {
 		px.c.a = (px.c.a >> 1) | 0x80;
+		Z.Update();
+	      }
 	      *dest = px.ui32;
 	    }
 	    else
 	    {
 	      const Pixel px (0, 0, 0, 0x80);
 	      *dest = px.ui32;
+	      Z.Update();
 	    }
-	    
-	    Z.Update();
 	  }
 	  else
 	    *dest = 0;
@@ -236,17 +242,41 @@ namespace cspluginSoftshader
 	return GetScanlineProcS<Source_Texture> (colorized, zmode, needColors, doAlphaTest);
     }
   public:
-    bool Init (SoftwareTexture** textures,
-      const csRenderMeshModes& modes,
-      bool needColors,
-      BuffersMask availableBuffers,
-      iScanlineRenderer::RenderInfo& renderInfo)
+    bool SetupMesh (TexturesMask availableTextures, BuffersMask availableBuffers, 
+      const csRenderMeshModes& modes, bool needColors, 
+      RenderInfoMesh& renderInfoMesh)
     {
-      renderInfo.desiredBuffers = 0;
-      renderInfo.denormBuffers = 0;
+      renderInfoMesh.desiredBuffers = 0;
+      doFlat = false;
+      doTexture = availableTextures & 1;
+      if (doTexture)
+	renderInfoMesh.desiredBuffers |= CS_SOFT3D_BUFFERFLAG(TEXCOORD);
+      else
+	doFlat = true;
 
+      doColor = availableBuffers & CS_SOFT3D_BUFFERFLAG(COLOR);
+      static const size_t myBufferComps[] = {4, 2};
+      if (doColor)
+      {
+	renderInfoMesh.bufferComps = myBufferComps;
+	renderInfoMesh.desiredBuffers |= CS_SOFT3D_BUFFERFLAG(COLOR);
+      }
+      else
+	renderInfoMesh.bufferComps = &myBufferComps[1];
+
+      renderInfoMesh.renderer = this;
+
+      proc = GetScanlineProc (doFlat, doColor, modes.z_buf_mode,
+	needColors, modes.alphaType == csAlphaMode::alphaBinary);
+
+      return proc != 0;
+    }
+    bool SetupTriangle (SoftwareTexture** textures, 
+      const RenderInfoMesh& renderInfoMesh, RenderInfoTriangle& renderInfoTri)
+    {
+      renderInfoTri.denormBuffers = 0;
+      
       SoftwareTexture* tex = textures[0];
-      bool doFlat = false;
       if (tex != 0)
       {
 	bitmap = tex->bitmap;
@@ -255,32 +285,24 @@ namespace cspluginSoftshader
         and_h = tex->and_h << v_shift_r;
         v_shift_r = 16 - v_shift_r;
 
-	renderInfo.desiredBuffers |= CS_SOFT3D_BUFFERFLAG(TEXCOORD);
-	renderInfo.denormFactors = &dnTC;
-	renderInfo.denormBuffers |= CS_SOFT3D_BUFFERFLAG(TEXCOORD);
+	renderInfoTri.denormFactors = &dnTC;
+	renderInfoTri.denormBuffers |= CS_SOFT3D_BUFFERFLAG(TEXCOORD);
 
 	dnTC.Set (tex->w, tex->h, 0.0f, 0.0f);
       }
-      else
-	doFlat = true;
+      else if (doTexture)
+	return false;
 
-      bool doColor = availableBuffers & CS_SOFT3D_BUFFERFLAG(COLOR);
+      renderInfoTri.proc = proc;
 
-      renderInfo.renderer = this;
-      static const size_t myBufferComps[] = {4, 2};
-      if (doColor)
-      {
-	renderInfo.desiredBuffers |= CS_SOFT3D_BUFFERFLAG(COLOR);
-	renderInfo.bufferComps = myBufferComps;
-      }
-      else
-	renderInfo.bufferComps = &myBufferComps[1];
-
-      renderInfo.proc = GetScanlineProc (doFlat, doColor, modes.z_buf_mode,
-	needColors, modes.alphaType == csAlphaMode::alphaBinary);
-
-      return renderInfo.proc != 0;
+      return true;
     }
+  private:
+    // Settings determined per-mesh
+    bool doFlat;
+    bool doColor;
+    bool doTexture;
+    ScanlineProc proc;
   };
 } // namespace cspluginSoftshader
 

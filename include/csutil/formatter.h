@@ -54,16 +54,16 @@
 /**\addtogroup util
  * @{ */
 
-/**\page FormatterNotes Notes about string formatting in CrystalSpace
- * printf()-style formatting in CrystalSpace is usually backed by 
+/**\page FormatterNotes Notes about string formatting in Crystal Space
+ * printf()-style formatting in Crystal Space is usually backed by 
  * csPrintfFormatter<>, thus you can generally expect consistent behaviour
- * for string formatting, across all platforms supported by CS.
+ * for string formatting across all platforms supported by CS.
  * The format specifiers supported by csPrintfFormatter<> are basically the
  * same as supported by glibc. Some notable aspects are summed up here.
  * - For \c size_t, \c intmax_t, \c ptrdiff_t and \c longlong arguments, the 
  *   '<tt>z</tt>', '<tt>j</tt>', '<tt>t</tt>' and '<tt>ll</tt>' modifiers are 
  *   supported.
- * - char* strings ("<tt>%s</tt>") are expected to be UTF-8 encoded -
+ * - char* strings (<tt>"%s"</tt>) are expected to be UTF-8 encoded -
  *   likewise, char* formatting results will usually be encoded in UTF-8.
  * - To format explicitly sized types (like \c uint32) the PRIX99 macros
  *   should be used, e.g.:

@@ -37,6 +37,7 @@
 
 #include "csplugincommon/opengl/glextmanager.h"
 
+#include "gl_render3d.h"
 #include "gl_txtmgr.h"
 
 CS_LEAKGUARD_IMPLEMENT(csGLTextureHandle);
@@ -57,15 +58,11 @@ CS_IMPLEMENT_STATIC_VAR (GetRLMAlloc, csRLMAlloc, ())
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csGLTextureHandle)
-  SCF_IMPLEMENTS_INTERFACE(iTextureHandle)
-SCF_IMPLEMENT_IBASE_END
-
 csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, 
-				      csGLGraphics3D *iG3D) 
-  : origName(0), uploadData(0), texFormat((TextureBlitDataFormat)-1)
+				      csGLGraphics3D *iG3D) : 
+  scfImplementationType (this), origName(0), uploadData(0), 
+  texFormat((TextureBlitDataFormat)-1)
 {
-  SCF_CONSTRUCT_IBASE(0);
   this->image = image;
   switch (image->GetImageType())
   {
@@ -123,10 +120,10 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
 }
 
 csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle, 
-				      csGLGraphics3D *iG3D)
-  : origName(0), uploadData(0), texFormat((TextureBlitDataFormat)-1)
+				      csGLGraphics3D *iG3D) : 
+  scfImplementationType (this), origName(0), uploadData(0), 
+  texFormat((TextureBlitDataFormat)-1)
 {
-  SCF_CONSTRUCT_IBASE(0);
   G3D = iG3D;
   txtmgr = G3D->txtmgr;
   this->target = target;
@@ -140,7 +137,6 @@ csGLTextureHandle::~csGLTextureHandle()
   Clear ();
   txtmgr->UnregisterTexture (this);
   delete[] origName;
-  SCF_DESTRUCT_IBASE()
 }
 
 void csGLTextureHandle::Clear()
@@ -483,23 +479,15 @@ void csGLTextureHandle::CreateMipMaps()
   }
   else
   {
-    // Create each new level by creating a level 2 mipmap from previous level
-    // we do this down to 1x1 as opengl defines it
-    //csArray<int> nMipmaps;
-
-    int w, h;
-
     for (i=0; i < subImageCount; i++)
     {
-      //nMipmaps.Push (image->GetSubImage (i)->HasMipmaps());
-    }
-    
-    for (i=0; i < subImageCount; i++)
-    {
+      // Create each new level by creating a level 2 mipmap from previous level
+      // we do this down to 1x1 as opengl defines it
+      int w, h;
       int nTex = 0;
       int nMip = 0;
       csRef<iImage> thisImage = image->GetSubImage ((uint)i); 
-      int nMipmaps = image->GetSubImage ((uint)i)->HasMipmaps();
+      int nMipmaps = thisImage->HasMipmaps();
 
       do
       {
@@ -1046,19 +1034,14 @@ void csGLTextureHandle::PrepareKeycolor (csRef<iImage>& image,
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csGLTextureManager)
-  SCF_IMPLEMENTS_INTERFACE(iTextureManager)
-SCF_IMPLEMENT_IBASE_END
-
 static const csGLTextureClassSettings defaultSettings = 
   {GL_RGB, GL_RGBA, false, false, true, true};
 
 csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
         csGLGraphics3D *iG3D) : 
-  textures (16, 16)
+  scfImplementationType (this), textures (16, 16)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csGLTextureManager::object_reg = object_reg;
 
   nameDiffuseTexture = iG3D->strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
@@ -1121,7 +1104,6 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
 
 csGLTextureManager::~csGLTextureManager()
 {
-  SCF_DESTRUCT_IBASE()
 }
 
 void csGLTextureManager::read_config (iConfigFile *config)
@@ -1410,14 +1392,6 @@ void csGLTextureManager::GetLightmapRendererCoords (int slmWidth, int slmHeight,
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_INCREF(csGLRendererLightmap)					
-SCF_IMPLEMENT_IBASE_GETREFCOUNT(csGLRendererLightmap)				
-SCF_IMPLEMENT_IBASE_REFOWNER(csGLRendererLightmap)				
-SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csGLRendererLightmap)
-SCF_IMPLEMENT_IBASE_QUERY(csGLRendererLightmap)
-  SCF_IMPLEMENTS_INTERFACE(iRendererLightmap)
-SCF_IMPLEMENT_IBASE_END
-
 void csGLRendererLightmap::DecRef ()
 {
   if (scfRefCount == 1)							
@@ -1429,9 +1403,8 @@ void csGLRendererLightmap::DecRef ()
   scfRefCount--;							
 }
 
-csGLRendererLightmap::csGLRendererLightmap ()
+csGLRendererLightmap::csGLRendererLightmap () : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
 }
 
 csGLRendererLightmap::~csGLRendererLightmap ()
@@ -1461,7 +1434,6 @@ csGLRendererLightmap::~csGLRendererLightmap ()
     delete[] pat;
   }
 #endif
-  SCF_DESTRUCT_IBASE()
 }
 
 void csGLRendererLightmap::GetSLMCoords (int& left, int& top, 
@@ -1491,14 +1463,6 @@ void csGLRendererLightmap::SetLightCellSize (int size)
 //---------------------------------------------------------------------------
 
 
-SCF_IMPLEMENT_IBASE_INCREF(csGLSuperLightmap)					
-SCF_IMPLEMENT_IBASE_GETREFCOUNT(csGLSuperLightmap)				
-SCF_IMPLEMENT_IBASE_REFOWNER(csGLSuperLightmap)				
-SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csGLSuperLightmap)
-SCF_IMPLEMENT_IBASE_QUERY(csGLSuperLightmap)
-  SCF_IMPLEMENTS_INTERFACE(iSuperLightmap)
-SCF_IMPLEMENT_IBASE_END
-
 void csGLSuperLightmap::DecRef ()
 {
   if (scfRefCount == 1)							
@@ -1512,9 +1476,9 @@ void csGLSuperLightmap::DecRef ()
 }
 
 csGLSuperLightmap::csGLSuperLightmap (csGLTextureManager* txtmgr, 
-				      int width, int height)
+				      int width, int height) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   w = width; h = height;
   texHandle = (GLuint)~0;
   numRLMs = 0;
@@ -1524,7 +1488,6 @@ csGLSuperLightmap::csGLSuperLightmap (csGLTextureManager* txtmgr,
 csGLSuperLightmap::~csGLSuperLightmap ()
 {
   DeleteTexture ();
-  SCF_DESTRUCT_IBASE()
 }
 
 void csGLSuperLightmap::CreateTexture ()

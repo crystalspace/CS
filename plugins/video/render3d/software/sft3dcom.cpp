@@ -97,7 +97,7 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent) :
   object_reg = 0;
 
   memset (activebuffers, 0, sizeof (activebuffers));
-  memset (activeTex, 0, sizeof (activeTex));
+  memset (activeSoftTex, 0, sizeof (activeSoftTex));
 
   clipportal_dirty = true;
   clipportal_floating = 0;
@@ -942,19 +942,22 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     buffersMask |= 1 << b;
   }
 
-  iScanlineRenderer::RenderInfo meowmix;
-  SoftwareTexture* softTex[activeTextureCount];
+  iScanlineRenderer::RenderInfoMesh renderInfoMesh;
+  TexturesMask availableTextures = 0;
   for (size_t t = 0; t < activeTextureCount; t++)
-    softTex[t] = activeSoftTex[t];
-  if (!scanlineRenderer->Init (softTex, usedModes, 
+  {
+    if (activeSoftTex[t])
+      availableTextures |= (1 << t);
+  }
+  if (!scanlineRenderer->SetupMesh (availableTextures, buffersMask, usedModes, 
     (CS_MIXMODE_BLENDOP_SRC(usedModes.mixmode) != CS_MIXMODE_FACT_ZERO)
     || (CS_MIXMODE_BLENDOP_DST(usedModes.mixmode) == CS_MIXMODE_FACT_SRCCOLOR)
     || (CS_MIXMODE_BLENDOP_DST(usedModes.mixmode) == CS_MIXMODE_FACT_SRCCOLOR_INV)
     || (CS_MIXMODE_BLENDOP_DST(usedModes.mixmode) == CS_MIXMODE_FACT_SRCALPHA)
     || (CS_MIXMODE_BLENDOP_DST(usedModes.mixmode) == CS_MIXMODE_FACT_SRCALPHA_INV),
-    buffersMask, meowmix)) 
-    return; // Drat, meowmix can't deliver.
-
+    renderInfoMesh)) 
+    return;
+  
   iRenderBuffer* indexbuf = 
     (modes.buffers ? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
 
@@ -988,15 +991,16 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 	rangeEnd + 1, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
     }
 
-    csRenderBufferLock<csVector3, iRenderBuffer*> f1 
-      (activebuffers[VATTR_SPEC(POSITION)], CS_BUF_LOCK_READ);
+    iRenderBuffer* vbuf = activebuffers[VATTR_SPEC(POSITION)];
+    csRenderBufferLock<csVector3, iRenderBuffer*> f1 (vbuf, CS_BUF_LOCK_READ);
     if (!f1) return; 
     csVector3* tr_verts = 
       (csVector3*)translatedVerts->Lock (CS_BUF_LOCK_NORMAL);
 
     size_t i;
+    const size_t maxVert = csMin (rangeEnd, vbuf->GetElementCount());
     // Make sure we don't process too many vertices;
-    for (i = rangeStart; i <= rangeEnd; i++)
+    for (i = rangeStart; i <= maxVert; i++)
     {
       tr_verts[i] = object2camera.This2Other (f1[i]);
     }
@@ -1043,7 +1047,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
       + CS_MIXMODE_BLENDOP_DST(usedModes.mixmode);
 
     triDraw[triDrawIndex]->DrawMesh (activebuffers, rangeStart, rangeEnd, mesh, 
-      meowmix, meshtype, tri, triEnd);
+      renderInfoMesh, meshtype, tri, triEnd);
   }
 }
 

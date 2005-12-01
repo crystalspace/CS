@@ -37,6 +37,8 @@ namespace CrystalSpace
     const size_t maxBuffers = 16;
     /// Type for a bit mask of buffers
     typedef uint BuffersMask;
+    /// Type for a bit mask of textures
+    typedef uint TexturesMask;
   
     /// Helper function to linearly interpolate
     template <typename T>

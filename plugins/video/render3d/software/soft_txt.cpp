@@ -120,21 +120,6 @@ csSoftwareTextureHandle::~csSoftwareTextureHandle ()
   if (texman) texman->UnregisterTexture (this);
 }
 
-csSoftwareTexture* csSoftwareTextureHandle::NewTexture (iImage *newImage,
-	bool ismipmap)
-{
-  csRef<iImage> Image;
-  if (ismipmap && texman->sharpen_mipmaps)
-  { 
-    csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)0;
-    Image = csImageManipulate::Sharpen (newImage, texman->sharpen_mipmaps, tc);
-  }
-  else
-    Image = newImage;
-
-  return new csSoftwareTexture (this, Image);
-}
-
 void csSoftwareTextureHandle::CreateMipmaps ()
 {
   if (!image) return;
@@ -148,26 +133,43 @@ void csSoftwareTextureHandle::CreateMipmaps ()
     delete tex [i];
   }
 
-  // @@@ Jorrit: removed the following IncRef() because I can really
-  // see no reason for it and it seems to be causing memory leaks.
-#if 0
-  // Increment reference counter on image since NewTexture() expects
-  // a image with an already incremented reference counter
-  image->IncRef ();
-#endif
-  tex [0] = NewTexture (image, false);
+  tex [0] = new csSoftwareTexture (this, image);
 
   // 2D textures uses just the top-level mipmap
   if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D)
   {
-    // Create each new level by creating a level 2 mipmap from previous level
-    csRef<iImage> i1 = csImageManipulate::Mipmap (image, 1, tc);
-    csRef<iImage> i2 = csImageManipulate::Mipmap (i1, 1, tc);
-    csRef<iImage> i3 = csImageManipulate::Mipmap (i2, 1, tc);
+    csRef<iImage> thisImage = image;
+    int nMipmaps = thisImage->HasMipmaps();
+    
+    for (int i = 1; i < 4; i++)
+    {
+      csRef<iImage> newImage;
+      if (i <= nMipmaps)
+	newImage = image->GetMipmap (i);
+      if (!newImage.IsValid())
+      {
+	newImage = csImageManipulate::Mipmap (thisImage, 1, tc);
+	if (texman->sharpen_mipmaps)
+	  newImage = csImageManipulate::Sharpen (newImage, texman->sharpen_mipmaps, tc);
+      }
+      thisImage = newImage;
 
-    tex [1] = NewTexture (i1, true);
-    tex [2] = NewTexture (i2, true);
-    tex [3] = NewTexture (i3, true);
+      if (texman->debugMipmaps)
+      {
+	newImage.AttachNew (new csImageMemory (newImage));
+	size_t numPx = newImage->GetWidth() * newImage->GetHeight();
+	csRGBpixel* p = (csRGBpixel*)newImage->GetImageData();
+	while (numPx-- > 0)
+	{
+	  if (i >= 2) p->red = 0;
+	  if ((i == 1) || (i == 3)) p->blue = 0;
+	  if (i <= 2) p->green = 0;
+	  p++;
+	}
+      }
+
+      tex [i] = new csSoftwareTexture (this, newImage);
+    }
   }
 }
 
@@ -256,14 +258,6 @@ bool csSoftwareTextureHandle::GetRendererDimensions (int &mw, int &mh)
 
 //----------------------------------------------------------------------------//
 
-SCF_IMPLEMENT_IBASE_INCREF(csSoftRendererLightmap)					
-SCF_IMPLEMENT_IBASE_GETREFCOUNT(csSoftRendererLightmap)				
-SCF_IMPLEMENT_IBASE_REFOWNER(csSoftRendererLightmap)				
-SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csSoftRendererLightmap)
-SCF_IMPLEMENT_IBASE_QUERY(csSoftRendererLightmap)
-SCF_IMPLEMENTS_INTERFACE(iRendererLightmap)
-SCF_IMPLEMENT_IBASE_END
-
 void csSoftRendererLightmap::DecRef ()
 {
   if (scfRefCount == 1)							
@@ -275,10 +269,9 @@ void csSoftRendererLightmap::DecRef ()
   scfRefCount--;							
 }
 
-csSoftRendererLightmap::csSoftRendererLightmap ()
+csSoftRendererLightmap::csSoftRendererLightmap () : 
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   dirty = false;
   data = 0;
 
@@ -289,7 +282,6 @@ csSoftRendererLightmap::csSoftRendererLightmap ()
 csSoftRendererLightmap::~csSoftRendererLightmap ()
 {
   delete[] data;
-  SCF_DESTRUCT_IBASE();
 }
 
 void csSoftRendererLightmap::SetSize (size_t lmPixels)
@@ -327,14 +319,10 @@ int csSoftRendererLightmap::GetLightCellSize ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csSoftSuperLightmap)
-SCF_IMPLEMENTS_INTERFACE(iSuperLightmap)
-SCF_IMPLEMENT_IBASE_END
-
 csSoftSuperLightmap::csSoftSuperLightmap (csSoftwareTextureManager* texman, 
-					  int width, int height) : RLMs(32)
+					  int width, int height) : 
+  scfImplementationType (this), RLMs(32)
 {
-  SCF_CONSTRUCT_IBASE (0);
   w = width;
   h = height;
   tex.AttachNew (new csSoftwareTextureHandle (texman, 0, 0));
@@ -342,7 +330,6 @@ csSoftSuperLightmap::csSoftSuperLightmap (csSoftwareTextureManager* texman,
 
 csSoftSuperLightmap::~csSoftSuperLightmap ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csSoftSuperLightmap::FreeRLM (csSoftRendererLightmap* rlm)
@@ -415,10 +402,10 @@ void csSoftwareTextureManager::SetPixelFormat(csPixelFormat const& PixelFormat)
 void csSoftwareTextureManager::read_config (iConfigFile *config)
 {
   csTextureManager::read_config (config);
-  dither_textures = config->GetBool
-        ("Video.Software.TextureManager.DitherTextures", true);
   sharpen_mipmaps = config->GetInt
         ("Video.Software.TextureManager.SharpenMipmaps", 0);
+  debugMipmaps = config->GetBool
+        ("Video.Software.TextureManager.DebugMipmaps", false);
 }
 
 csSoftwareTextureManager::~csSoftwareTextureManager ()

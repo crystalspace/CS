@@ -49,8 +49,10 @@ namespace cspluginSoft3d
     VertexBuffer clipOutBuf2[maxBuffers];
 
     bool do_mirror;
-    iScanlineRenderer::RenderInfo scanRenderInfo;
-  
+    iScanlineRenderer::RenderInfoMesh scanRenderInfoMesh;
+    iScanlineRenderer::RenderInfoTriangle scanRenderInfoTri;
+    float texDimension;
+
     // Info to go over triangles
     csRenderMeshType meshtype;
     uint32* tri;
@@ -89,19 +91,19 @@ namespace cspluginSoft3d
     }
     void BufInvZMulAndDenorm (size_t n)
     {
-      csVector4* denormFact = scanRenderInfo.denormFactors;
+      csVector4* denormFact = scanRenderInfoTri.denormFactors;
       for (size_t i = 0; i < maxBuffers; i++)
       {
-	if (!(scanRenderInfo.desiredBuffers & (1 << i))) continue;
+	if (!(scanRenderInfoMesh.desiredBuffers & (1 << i))) continue;
 	if (!(buffersMask & (1 << i))) 
 	{
-	  if (scanRenderInfo.denormBuffers & (1 << i)) denormFact++;
+	  if (scanRenderInfoTri.denormBuffers & (1 << i)) denormFact++;
 	  continue;
 	}
   
 	csVector4* bufData = 
 	  (csVector4*)clipOutBuf[i].data;
-	if (scanRenderInfo.denormBuffers & (1 << i))
+	if (scanRenderInfoTri.denormBuffers & (1 << i))
 	{
 	  for (size_t v = 0; v < n; v++)
 	  {
@@ -157,11 +159,11 @@ namespace cspluginSoft3d
       meat.Init (g3d->clipper, maxClipVertices);
       out.SetSize (floatsPerVert * maxClipVertices);
       clippedPersp.SetSize (maxClipVertices);
-      const size_t* compNum = scanRenderInfo.bufferComps;
+      const size_t* compNum = scanRenderInfoMesh.bufferComps;
       float* outPos = out.GetArray();
       for (size_t i = 0; i < maxBuffers; i++)
       {
-	if (!(scanRenderInfo.desiredBuffers & (1 << i))) continue;
+	if (!(scanRenderInfoMesh.desiredBuffers & (1 << i))) continue;
   
 	const size_t c = *compNum;
 	if (buffersMask & (1 << i))
@@ -187,7 +189,7 @@ namespace cspluginSoft3d
       BuffersClipper<ClipMeatiClipper> clip (meat);
       clip.Init (outPersp, clippedPersp.GetArray(),
 	clipOutBuf, clipInStride, clipOutBuf2, 
-	buffersMask & scanRenderInfo.desiredBuffers);
+	buffersMask & scanRenderInfoMesh.desiredBuffers);
       csTriangle tri;
       if (do_mirror)
       {
@@ -204,6 +206,61 @@ namespace cspluginSoft3d
       return clip.DoClip (tri);
     }
 
+    int PickMipmap (size_t n)
+    {
+      if (!(buffersMask & CS_SOFT3D_BUFFERFLAG(TEXCOORD)))
+	return 0;
+
+      size_t closestVert = 0;
+      float closestZ = outPersp[0].z;
+      for (size_t i = 1; i < n; i++)
+      {
+	const float iz = outPersp[i].z;
+	if (iz > closestZ)
+	{
+	  closestZ = iz;
+	  closestVert = i;
+	}
+      }
+      size_t nextVert = (closestVert == n-1) ? 0 : closestVert+1;
+      size_t prevVert = (closestVert == 0) ? n-1 : closestVert-1;
+
+      const csVector4* texcoords = 
+	(csVector4*)clipOutBuf[VATTR_SPEC(TEXCOORD)].data;
+      const csVector2 tc (texcoords[closestVert].x, texcoords[closestVert].y);
+      const csVector2 tcPrev (texcoords[prevVert].x, texcoords[prevVert].y);
+      const csVector2 tcNext (texcoords[nextVert].x, texcoords[nextVert].y);
+
+      csVector2 screenDiff1 (outPersp[prevVert].x - outPersp[closestVert].x,
+	outPersp[prevVert].y - outPersp[closestVert].y);
+      csVector2 screenDiff2 (outPersp[nextVert].x - outPersp[closestVert].x,
+	outPersp[nextVert].y - outPersp[closestVert].y);
+      // Compute TCs for pixels at one step towards 'prev' resp. 'next'
+      const csVector2 tcIz (tc * outPersp[closestVert].z);
+      const float n1 = screenDiff1.Norm();
+      const float p1 = n1 ? 1.0f / n1 : 0;
+      const csVector2 tc1 = (Lerp (tcIz, 
+	tcPrev * outPersp[prevVert].z, p1) 
+	/ Lerp (outPersp[closestVert].z, outPersp[prevVert].z, p1));
+      const float n2 = screenDiff2.Norm();
+      const float p2 = n2 ? 1.0f / n2 : 0;
+      const csVector2 tc2 = (Lerp (tcIz, 
+	tcNext * outPersp[nextVert].z, p2) 
+	/ Lerp (outPersp[closestVert].z, outPersp[nextVert].z, p2));
+      /* Determine the number of texels a pixel covers (average the two
+       * lengths) */
+      float texelSide = (csVector2 (tc1 - tc).Norm() + 
+	csVector2 (tc2 - tc).Norm()) * texDimension;
+      if (texelSide >= 8)
+	return 3;
+      else if (texelSide >= 4)
+	return 2;
+      else if (texelSide >= 2)
+	return 1;
+
+      return 0;
+    }
+
     bool NextTriangle (const csVector3*& clippedPersp, size_t& num,
       uint a, uint b, uint c)
     {
@@ -218,6 +275,26 @@ namespace cspluginSoft3d
       if (n == 0) return false;
       CS_ASSERT((n >= 3) && (n <= 4));
   
+      // Do scanline per-tri setup
+      const int mipmap = PickMipmap (n);
+      SoftwareTexture* textures[activeTextureCount];
+      csSoftwareTextureHandle** activeTex = g3d->activeSoftTex;
+      for (size_t i = 0; i < activeTextureCount; i++)
+      {
+	if (activeTex[i])
+	{
+	  if (activeTex[i]->GetFlags() & CS_TEXTURE_NOMIPMAPS)
+	    textures[i] = activeTex[i]->GetTexture (0);
+	  else
+	    textures[i] = activeTex[i]->GetTexture (mipmap);
+	}
+	else
+	  textures[i] = 0;
+      }
+      if (!g3d->scanlineRenderer->SetupTriangle (textures, scanRenderInfoMesh, 
+	scanRenderInfoTri))
+	return false;
+
       BufInvZMulAndDenorm (n);
   
       static const size_t trivert1[3] = { 0, 1, 2 };
@@ -314,22 +391,32 @@ namespace cspluginSoft3d
     }
     void SetupDrawMesh (iRenderBuffer* activebuffers[], size_t rangeStart, 
       size_t rangeEnd, const csCoreRenderMesh* mesh,
-      iScanlineRenderer::RenderInfo& scanRenderInfo,
+      const iScanlineRenderer::RenderInfoMesh& scanRenderInfoMesh,
       const csRenderMeshType meshtype, uint32* tri, const uint32* triEnd)
     {
       this->activebuffers = activebuffers;
       do_mirror = mesh->do_mirror;
-      this->scanRenderInfo = scanRenderInfo;
+      this->scanRenderInfoMesh = scanRenderInfoMesh;
   
+      csSoftwareTextureHandle* tex = g3d->activeSoftTex[0];
+      if (tex)
+      {
+	int tw, th;
+	tex->GetRendererDimensions (tw, th);
+	texDimension = float (csMin (tw, th));
+      }
+      else
+	texDimension = 0;
+
       const size_t bufNum = csMin (activeBufferCount, maxBuffers);
   
       floatsPerVert = 0;
   
       buffersMask = 0;
-      const size_t* compNum = scanRenderInfo.bufferComps;
+      const size_t* compNum = scanRenderInfoMesh.bufferComps;
       for (size_t b = 0; b < bufNum; b++)
       {
-	if (scanRenderInfo.desiredBuffers & (1 << b))
+	if (scanRenderInfoMesh.desiredBuffers & (1 << b))
 	{
 	  floatsPerVert += *compNum;
 	  compNum++;
@@ -337,7 +424,7 @@ namespace cspluginSoft3d
 	if (activebuffers[b] == 0) continue;
 	buffersMask |= 1 << b;
 	if ((b != CS_SOFT3D_VA_BUFINDEX(POSITION)) 
-	  && !(scanRenderInfo.desiredBuffers & (1 << b))) continue;
+	  && !(scanRenderInfoMesh.desiredBuffers & (1 << b))) continue;
   
 	iRenderBuffer* buf = activebuffers[b];
 	clipInBuf[b].data = (uint8*)buf->Lock (CS_BUF_LOCK_READ);
@@ -352,7 +439,7 @@ namespace cspluginSoft3d
       clipZNear.Init (g3d->width2, g3d->height2, g3d->aspect);
       bclipperZNear.Init (g3d->persp.GetArray(), outPersp,
 	clipInBuf, clipInStride, clipOutBuf, 
-	(buffersMask & scanRenderInfo.desiredBuffers) 
+	(buffersMask & scanRenderInfoMesh.desiredBuffers) 
 	  | (CS_SOFT3D_BUFFERFLAG(POSITION)));
 
       BeginTriangulate (meshtype, tri, triEnd);
@@ -392,11 +479,11 @@ namespace cspluginSoft3d
   
     void DrawMesh (iRenderBuffer* activebuffers[], size_t rangeStart, 
       size_t rangeEnd, const csCoreRenderMesh* mesh,
-      iScanlineRenderer::RenderInfo& scanRenderInfo,
+      const iScanlineRenderer::RenderInfoMesh& scanRenderInfoMesh,
       const csRenderMeshType meshtype, uint32* tri, const uint32* triEnd)
     {
-      SetupDrawMesh (activebuffers, rangeStart, rangeEnd, mesh, scanRenderInfo,
-	meshtype, tri, triEnd);
+      SetupDrawMesh (activebuffers, rangeStart, rangeEnd, mesh, 
+	scanRenderInfoMesh, meshtype, tri, triEnd);
 
       while (HasNextTri ())
       {
@@ -408,8 +495,8 @@ namespace cspluginSoft3d
 	if (num == 0) continue;
 
 	SLLogic_ScanlineRenderer<Pix, SrcBlend, DstBlend> sll (
-	  pix, scanRenderInfo,
-	  clipOutBuf2, buffersMask & scanRenderInfo.desiredBuffers,
+	  pix, scanRenderInfoMesh, scanRenderInfoTri,
+	  clipOutBuf2, buffersMask & scanRenderInfoMesh.desiredBuffers,
 	  floatsPerVert);
 	polyrast.DrawPolygon (num, clippedPersp, sll);
       }

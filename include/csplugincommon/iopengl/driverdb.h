@@ -36,7 +36,7 @@ struct iDocumentNode;
  * CS provides the so-called "driver database" (<tt>/config/glshader.xml</tt>)
  * which contains configuration settings to work around known issues for 
  * certain drivers. It contains settings that are suitable an out-of-the-box
- * CrystalSpace; however, if an application employs advanced renderer features
+ * Crystal Space; however, if an application employs advanced renderer features
  * (such as complex custom shaders), it may be desireable to provide 
  * driver-dependent tweaks for this custom content as well. For this purpose
  * this interface is provided.

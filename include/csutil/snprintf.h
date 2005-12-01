@@ -34,8 +34,8 @@ extern CS_CRYSTALSPACE_EXPORT int cs_vsnprintf (char *, size_t, const char *,
 extern CS_CRYSTALSPACE_EXPORT int cs_asprintf (char **, const char *, ...)
     CS_GNUC_PRINTF (2, 3);
 /**
- * Portable implementation of vasprintf().
  * \copydoc cs_asprintf
+ * \brief Portable implementation of vasprintf().
  * \sa \ref FormatterNotes
  */
 extern CS_CRYSTALSPACE_EXPORT int cs_vasprintf (char **, const char *, va_list)

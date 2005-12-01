@@ -39,10 +39,9 @@
 #include "igraphic/imageio.h"
 #include "iutil/vfs.h"
 
-
-#include "gl_render3d.h"
 #include "csplugincommon/opengl/glextmanager.h"
 
+class csGLGraphics3D;
 class csGLTextureHandle;
 class csGLTextureManager;
 class csGLTextureCache;
@@ -74,7 +73,9 @@ struct csGLUploadData
 
 struct csGLTextureClassSettings;
 
-class csGLTextureHandle : public iTextureHandle
+class csGLTextureHandle : 
+  public scfImplementation1<csGLTextureHandle, 
+			    iTextureHandle>
 {
 private:
   CS_LEAKGUARD_DECLARE(csGLTextureHandle);
@@ -182,8 +183,6 @@ public:
   void Unprepare () { SetPrepared (false); }
   /// Merge this texture into current palette, compute mipmaps and so on.
   void PrepareInt ();
-
-  SCF_DECLARE_IBASE;
 
   /// Retrieve the flags set for this texture
   virtual int GetFlags () const;
@@ -302,10 +301,11 @@ class csGLSuperLightmap;
 /**
  * A single lightmap on a super lightmap.
  */
-class csGLRendererLightmap : public iRendererLightmap
+class csGLRendererLightmap : 
+  public scfImplementation1<csGLRendererLightmap, 
+			    iRendererLightmap>
 {
 private:
-
   friend class csGLSuperLightmap;
   friend class csGLGraphics3D;
 
@@ -316,7 +316,7 @@ private:
 public:
   CS_LEAKGUARD_DECLARE (csGLRendererLightmap);
 
-  SCF_DECLARE_IBASE;
+  void DecRef();
 
   csGLRendererLightmap ();
   virtual ~csGLRendererLightmap ();
@@ -335,7 +335,9 @@ public:
 /**
  * An OpenGL super lightmap.
  */
-class csGLSuperLightmap : public iSuperLightmap
+class csGLSuperLightmap : 
+  public scfImplementation1<csGLSuperLightmap,
+			    iSuperLightmap>
 {
 private:
   friend class csGLRendererLightmap;
@@ -365,7 +367,7 @@ public:
   /// The texture manager that created this SLM.
   csGLTextureManager* txtmgr;
 
-  SCF_DECLARE_IBASE;
+  void DecRef();
 
   csGLSuperLightmap (csGLTextureManager* txtmgr, int width, int height);
   virtual ~csGLSuperLightmap ();
@@ -395,7 +397,9 @@ struct csGLTextureClassSettings
 * New Texture Manager... done by Phil Aumayr (phil@rarebyte.com)
 *
 */
-class csGLTextureManager : public iTextureManager
+class csGLTextureManager : 
+  public scfImplementation1<csGLTextureManager,
+			    iTextureManager>
 {
 private:
   typedef csWeakRefArray<csGLTextureHandle> csTexVector;
@@ -477,7 +481,6 @@ public:
    */
   static void UnsetTexture (GLenum target, GLuint texture);
 
-  SCF_DECLARE_IBASE;
   /**
    * Register a texture. The given input image is IncRef'd and DecRef'ed
    * later when not needed any more. If you want to keep the input image

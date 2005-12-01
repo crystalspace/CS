@@ -42,7 +42,7 @@ namespace CrystalSpace
     struct iScanlineRenderer : public virtual iBase
     {
     public:
-      SCF_INTERFACE(iScanlineRenderer, 0, 0, 1);
+      SCF_INTERFACE(iScanlineRenderer, 0, 1, 0);
     
       /**
        * Scanline rendering function.
@@ -63,18 +63,13 @@ namespace CrystalSpace
 	uint32* dest, uint len, uint32 *zbuff);
   
       /**
-       * Information for settin up rendering, filled by the scanline renderer
+       * Information for setting up rendering a mesh, filled by the 
+       * scanline renderer.
        */
-      struct RenderInfo
+      struct RenderInfoMesh
       {
 	/// The renderer object to pass to the scanline function
 	iScanlineRenderer* renderer;
-	/// Scanline function
-	ScanlineProc proc;
-	/// Factors for buffer denormalization
-	csVector4* denormFactors;
-	/// Buffers to denormalize
-	BuffersMask denormBuffers;
 	/// Buffers the scanline function expects
 	BuffersMask desiredBuffers;
 	/// Numbers of components in buffers
@@ -82,14 +77,33 @@ namespace CrystalSpace
       };
 
       /**
+       * Information for setting up rendering a triangle, filled by the 
+       * scanline renderer.
+       */
+      struct RenderInfoTriangle
+      {
+	/// Scanline function
+	ScanlineProc proc;
+	/// Factors for buffer denormalization
+	csVector4* denormFactors;
+	/// Buffers to denormalize
+	BuffersMask denormBuffers;
+      };
+
+      /**
        * Return an appropriate scanline function based on the provided
        * parameters (and further more, user options).
        */
-      virtual bool Init (SoftwareTexture** textures,
-	const csRenderMeshModes& modes,
-	bool needColors,
-	BuffersMask availableBuffers,
-	RenderInfo& renderInfo) = 0;
+      virtual bool SetupMesh (TexturesMask availableTextures,
+	BuffersMask availableBuffers, const csRenderMeshModes& modes,
+	bool needColors, RenderInfoMesh& renderInfoMesh) = 0;
+      /**
+       * Return an appropriate scanline function based on the provided
+       * parameters (and further more, user options).
+       */
+      virtual bool SetupTriangle (SoftwareTexture** textures,
+	const RenderInfoMesh& renderInfoMesh,
+	RenderInfoTriangle& renderInfoTri) = 0;
     };
   } // namespace SoftShader
 } // namespace CrystalSpace

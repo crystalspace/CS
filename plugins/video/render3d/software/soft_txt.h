@@ -91,9 +91,6 @@ protected:
   /// If true then PrepareInt() has done its job.
   bool prepared;
 
-  /// Create a new texture object
-  virtual csSoftwareTexture* NewTexture (iImage *Image, bool ismipmap);
-
   /// the texture manager
   csRef<csSoftwareTextureManager> texman;
 
@@ -163,7 +160,9 @@ public:
 
 class csSoftSuperLightmap;
 
-class csSoftRendererLightmap : public iRendererLightmap
+class csSoftRendererLightmap : 
+  public scfImplementation1<csSoftRendererLightmap,
+			    iRendererLightmap>
 {
   friend class csSoftSuperLightmap;
   friend class csSoftwareTextureCache;
@@ -181,7 +180,7 @@ class csSoftRendererLightmap : public iRendererLightmap
 public:
   void* cacheData[4];
 
-  SCF_DECLARE_IBASE;
+  void DecRef ();
 
   csSoftRendererLightmap ();
   virtual ~csSoftRendererLightmap ();
@@ -197,7 +196,9 @@ public:
   virtual int GetLightCellSize ();
 };
 
-class csSoftSuperLightmap : public iSuperLightmap
+class csSoftSuperLightmap :
+  public scfImplementation1<csSoftSuperLightmap,
+			    iSuperLightmap>
 {
   friend class csSoftRendererLightmap;
 
@@ -211,8 +212,6 @@ class csSoftSuperLightmap : public iSuperLightmap
   csHashReversible<csPtrKey<csSoftRendererLightmap>, int> idmap;
 public:
   csSoftRendererLightmap* GetRlmForID (int id);
-
-  SCF_DECLARE_IBASE;
 
   csSoftSuperLightmap (csSoftwareTextureManager* texman, int width, int height);
   virtual ~csSoftSuperLightmap ();
@@ -251,10 +250,10 @@ class csSoftwareTextureManager : public csTextureManager
 public:
   /// We need a pointer to the 3D driver
   csSoftwareGraphics3DCommon *G3D;
-  /// Apply dithering to textures while reducing from 24-bit to 8-bit paletted?
-  bool dither_textures;
   /// Sharpen mipmaps?
   int sharpen_mipmaps;
+  /// Debug mipmapping?
+  bool debugMipmaps;
 
   ///
   csSoftwareTextureManager (iObjectRegistry *object_reg,
