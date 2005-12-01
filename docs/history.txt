@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Dec-2005
+	- Jorrit added a new iMeshGenerator interface. This will be used
+	  for a new feature in the engine which can be used to do things
+	  like foliage or other situations where you have to populate a
+	  level with lots of objects.
 30-Nov-2005
 	- res added mipmapping to the software renderer.
 	- res converted some more classes in the renderers implementations to

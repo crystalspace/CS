@@ -173,6 +173,28 @@
   -->
 
   <sector name="room">
+  <!--
+     <meshgen name="grass">
+        <geometry>
+	    <factory maxdist="10" name="grass1" />
+	    <factory maxdist="20" name="grass2" />
+	    <radius>1</radius>
+	    <density>1</density>
+        </geometry>
+        <geometry>
+	    <factory maxdist="10" name="stone1" />
+	    <factory maxdist="20" name="stone2" />
+	    <radius>.5</radius>
+	    <density>1</density>
+        </geometry>
+	<mapping>
+	    <meshobj>Terrain</meshobj>
+	    <min x="-10" y="-10" z="-10" />
+	    <min x="10" y="10" z="10" />
+	</mapping>
+     </meshgen>
+  -->
+
      <light name="sun">
        <center x="-50000" y="86030" z="0" />
        <color red="0.85903" green="0.80995" blue="0.70420" />
