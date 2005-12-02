@@ -5967,8 +5967,6 @@ class iSprite3DState(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iSprite3DState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def SetMaterialWrapper(*args): return _cspace.iSprite3DState_SetMaterialWrapper(*args)
-    def GetMaterialWrapper(*args): return _cspace.iSprite3DState_GetMaterialWrapper(*args)
     def SetMixMode(*args): return _cspace.iSprite3DState_SetMixMode(*args)
     def GetMixMode(*args): return _cspace.iSprite3DState_GetMixMode(*args)
     def SetLighting(*args): return _cspace.iSprite3DState_SetLighting(*args)
@@ -5993,8 +5991,6 @@ class iSprite3DState(iBase):
     def SetLodLevelConfig(*args): return _cspace.iSprite3DState_SetLodLevelConfig(*args)
     def GetLodLevelConfig(*args): return _cspace.iSprite3DState_GetLodLevelConfig(*args)
     def IsLodEnabled(*args): return _cspace.iSprite3DState_IsLodEnabled(*args)
-    def SetBaseColor(*args): return _cspace.iSprite3DState_SetBaseColor(*args)
-    def GetBaseColor(*args): return _cspace.iSprite3DState_GetBaseColor(*args)
     def FindSocket(*args): return _cspace.iSprite3DState_FindSocket(*args)
     def __del__(self, destroy=_cspace.delete_iSprite3DState):
         try:
