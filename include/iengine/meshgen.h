@@ -60,12 +60,12 @@ struct iMeshGeneratorGeometry : public virtual iBase
   /**
    * Get a specified factory.
    */
-  virtual iMeshFactoryWrapper* GetFactory (size_t idx) = 0
+  virtual iMeshFactoryWrapper* GetFactory (size_t idx) = 0;
 
   /**
    * Get a specified maximum distance.
    */
-  virtual float GetMaximumDistance (size_t idx) = 0
+  virtual float GetMaximumDistance (size_t idx) = 0;
 
   /**
    * Set the radius for this object. No other objects will be generated
