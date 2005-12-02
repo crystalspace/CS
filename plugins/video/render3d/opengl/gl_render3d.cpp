@@ -1114,6 +1114,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   {
     if (!G2D->BeginDraw ())
       return false;
+    if (current_drawflags & CSDRAW_2DGRAPHICS)
+      G2D->PerformExtension ("glflushtext");
     GLRENDER3D_OUTPUT_STRING_MARKER(("after G2D->BeginDraw()"));
   }
   needViewportUpdate = false;
