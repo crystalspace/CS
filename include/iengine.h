@@ -34,6 +34,7 @@
 #include "iengine/lod.h"
 #include "iengine/material.h"
 #include "iengine/mesh.h"
+#include "iengine/meshgen.h"
 #include "iengine/movable.h"
 #include "iengine/objwatch.h"
 #include "iengine/portal.h"
