@@ -6772,8 +6772,6 @@ package cspace::iSprite3DState;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
-*SetMaterialWrapper = *cspacec::iSprite3DState_SetMaterialWrapper;
-*GetMaterialWrapper = *cspacec::iSprite3DState_GetMaterialWrapper;
 *SetMixMode = *cspacec::iSprite3DState_SetMixMode;
 *GetMixMode = *cspacec::iSprite3DState_GetMixMode;
 *SetLighting = *cspacec::iSprite3DState_SetLighting;
@@ -6798,8 +6796,6 @@ package cspace::iSprite3DState;
 *SetLodLevelConfig = *cspacec::iSprite3DState_SetLodLevelConfig;
 *GetLodLevelConfig = *cspacec::iSprite3DState_GetLodLevelConfig;
 *IsLodEnabled = *cspacec::iSprite3DState_IsLodEnabled;
-*SetBaseColor = *cspacec::iSprite3DState_SetBaseColor;
-*GetBaseColor = *cspacec::iSprite3DState_GetBaseColor;
 *FindSocket = *cspacec::iSprite3DState_FindSocket;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
