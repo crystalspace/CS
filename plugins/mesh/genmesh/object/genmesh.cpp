@@ -2237,7 +2237,7 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere, int num
       sizeof(csTriangle)*num_triangles);
 
   csVector3* normals = GetNormals();
-  for (int i = 0; i < num_vertices; i++)
+  for (i = 0; i < num_vertices; i++)
   {
     normals[i] = genmesh_vertices[i];
     normals[i].Normalize ();
