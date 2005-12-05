@@ -329,7 +329,7 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
               cmt->coords[i].mode |= CS_FX_FLAT;
           }
           catch(...) { }
-          cmt->coords[i].mode |= CS_FX_TILING;   // for software renderer :P
+          // not supported any more?  cmt->coords[i].mode |= CS_FX_TILING;   // for software renderer :P
         }
       }
     }

@@ -731,7 +731,7 @@ void csMetaObject3D::setupCollider()
   assert(csvobj3d->GetMeshWrapper()->GetMeshObject()->GetObjectModel());
   if(! csvobj3d->GetMeshWrapper()->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet())
   {
-      csReport(vosa3dl->GetObjectRegistry(), CS_REPORTER_SEVERITY_WARN,
+      csReport(vosa3dl->GetObjectRegistry(), CS_REPORTER_SEVERITY_WARNING,
               "crystalspace.network.vos.a3dl",
               "Unable to setup collision detection for object \"%s\": Object type must not support collision detection.", csvobj3d->GetVobject()->getURLstr().c_str());
       return;

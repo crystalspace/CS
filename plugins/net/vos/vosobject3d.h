@@ -65,8 +65,10 @@ public:
 
   virtual VUtil::vRef<VOS::Vobject> GetVobject();
 
-  virtual void Execute (csOrthoTransform &t);
-  virtual void Execute (iMeshWrapper *mesh, csOrthoTransform &t);
+  virtual void Execute (iMeshWrapper* mesh, csOrthoTransform& t);
+  virtual void Execute (iLight* light, csOrthoTransform& t) { }
+  virtual void Execute (iCamera* camera, csOrthoTransform& t) { }
+  virtual void Execute (csOrthoTransform& t);
 };
 
 class csMetaObject3D : public virtual A3DL::Object3D,

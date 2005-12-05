@@ -108,9 +108,8 @@ ConstructModelTask::~ConstructModelTask()
 {
 }
 
-#ifndef _MAX
-# define _MAX(a, b) ((a > b) ? a : b)
-#endif
+#undef _MAX
+#define _MAX(a, b) ((a > b) ? a : b)
 
 static void NormalizeModel(csRef<iMeshWrapper> wrapper, bool recenter,
                            bool fixalign, std::string datatype)
