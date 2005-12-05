@@ -1688,7 +1688,9 @@ CS_CHECK_LIB_WITH([metaobject_a3dl],
     [AC_LANG_PROGRAM(
 	[[#include <vos/metaobjects/a3dl/object3d.hh>]],
 	[A3DL::Object3D o(0); o.setPosition(0,0,0);])],
-    [], [C++], [], [], [], [], [], [libmetaobject_a3dl])
+    [], [C++], [], [], [], [], 
+    [-lboost_thread -lvutil -lvip -lvos -lmetaobject_property], 
+    [libmetaobject_a3dl])
 
 AS_IF([test $cs_cv_libmetaobject_a3dl = yes],
     [CS_CHECK_LIB_WITH([metaobject_misc],
