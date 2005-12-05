@@ -477,10 +477,10 @@ public:
   }
 
   /// Get a texel.
-  csVector2& GetTexel (int frame, int vertex) const
+  const csVector2& GetTexel (int frame, int vertex) const
   { return (*texels.Get(frame)) [vertex]; }
   void SetTexel (int frame, int vertex, const csVector2 &val)
-  { GetTexel (frame, vertex) = val; }
+  { CS_CONST_CAST (csVector2&, GetTexel (frame, vertex)) = val; }
   /// Get array of texels.
   csVector2* GetTexels (int frame) const
   { return (*texels.Get(frame)).GetVertices (); }
@@ -489,10 +489,10 @@ public:
   { (*texels.Get(frame)).SetVertices(tex, GetVertexCount ()); }
 
   /// Get a vertex.
-  csVector3& GetVertex (int frame, int vertex) const
+  const csVector3& GetVertex (int frame, int vertex) const
   { return (*vertices.Get(frame)) [vertex]; }
   void SetVertex (int frame, int vertex, const csVector3 &val)
-  { GetVertex (frame, vertex) = val; }
+  { CS_CONST_CAST (csVector3&, GetVertex (frame, vertex)) = val; }
   /// Get vertex array.
   csVector3* GetVertices (int frame) const
   { return (*vertices.Get(frame)).GetVertices (); }
@@ -501,10 +501,10 @@ public:
   { (*vertices.Get(frame)).SetVertices(verts, GetVertexCount ()); }
 
   /// Get a normal.
-  csVector3& GetNormal (int frame, int vertex) const
+  const csVector3& GetNormal (int frame, int vertex) const
   { return (*normals.Get(frame)) [vertex]; }
   void SetNormal (int frame, int vertex, const csVector3 &val)
-  { GetNormal (frame, vertex) = val; }
+  { CS_CONST_CAST (csVector3&, GetNormal (frame, vertex)) = val; }
   /// Get normal array.
   csVector3* GetNormals (int frame) const
   { return (*normals.Get(frame)).GetVertices (); }

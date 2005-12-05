@@ -305,13 +305,13 @@ void csSprite3DMeshObjectFactory::ComputeBoundingBox ()
   {
     csBox3 box;
 
-    csVector3& v0 = GetVertex (frame, 0);
+    const csVector3& v0 = GetVertex (frame, 0);
     box.StartBoundingBox (v0);
     csVector3 max_sq_radius (v0.x*v0.x + v0.x*v0.x,
     	v0.y*v0.y + v0.y*v0.y, v0.z*v0.z + v0.z*v0.z);
     for ( vertex = 1 ; vertex < GetVertexCount() ; vertex++ )
     {
-      csVector3& v = GetVertex (frame, vertex);
+      const csVector3& v = GetVertex (frame, vertex);
       box.AddBoundingVertexSmart (v);
       csVector3 sq_radius (v.x*v.x + v.x*v.x, v.y*v.y + v.y*v.y,
       	v.z*v.z + v.z*v.z);
@@ -443,7 +443,7 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
     csTriangleVertexCost &vt = tri_verts->GetVertex (i);
     if (vt.con_triangles.Length ())
     {
-      csVector3 &n = GetNormal (frame_number, i);
+      csVector3 &n = CS_CONST_CAST (csVector3&, GetNormal (frame_number, i));
       if (n.IsZero())
       {
         n.Set (0,0,0);
@@ -458,7 +458,8 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
     {
       // If there are no connecting triangles then we just
       // initialize the normal to a default value.
-      GetNormal (frame_number, i).Set (1, 0, 0);
+      CS_CONST_CAST (csVector3&, 
+	GetNormal (frame_number, i)).Set (1, 0, 0);
     }
   }
 
