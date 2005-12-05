@@ -530,13 +530,13 @@ public:
   { texel_mesh->SetTriangles(trig, count); }
 
   /// Create and add a new frame to the sprite.
-  csSpriteFrame* AddFrame ();
+  iSpriteFrame* AddFrame ();
   /// find a named frame into the sprite.
-  csSpriteFrame* FindFrame (const char * name) const;
+  iSpriteFrame* FindFrame (const char * name) const;
   /// Query the number of frames
   int GetFrameCount () const { return (int)frames.Length (); }
   /// Query the frame number f
-  csSpriteFrame* GetFrame (int f) const
+  iSpriteFrame* GetFrame (int f) const
   {
     return ((size_t)f < frames.Length ())
   	? (csSpriteFrame *)frames [f]
@@ -544,29 +544,29 @@ public:
   }
 
   /// Create and add a new action frameset to the sprite.
-  csSpriteAction2* AddAction ();
+  iSpriteAction* AddAction ();
   /// find a named action into the sprite.
-  csSpriteAction2* FindAction (const char * name) const;
+  iSpriteAction* FindAction (const char * name) const;
   /// Get the first action.
-  csSpriteAction2* GetFirstAction () const
+  iSpriteAction* GetFirstAction () const
   { return (csSpriteAction2 *)actions [0]; }
   /// Get number of actions in sprite
   int GetActionCount () const
   { return (int)actions.Length (); }
   /// Get action number No
-  csSpriteAction2* GetAction (int No) const
+  iSpriteAction* GetAction (int No) const
   { return (csSpriteAction2 *)actions [No]; }
 
   /// Create and add a new socket to the sprite.
-  csSpriteSocket* AddSocket ();
+  iSpriteSocket* AddSocket ();
   /// find a named socket into the sprite.
-  csSpriteSocket* FindSocket (const char * name) const;
+  iSpriteSocket* FindSocket (const char * name) const;
   /// find a socked based on the sprite attached to it
-  csSpriteSocket* FindSocket (iMeshWrapper *mesh) const;
+  iSpriteSocket* FindSocket (iMeshWrapper *mesh) const;
   /// Query the number of sockets
   int GetSocketCount () const { return (int)sockets.Length (); }
   /// Query the socket number f
-  csSpriteSocket* GetSocket (int f) const
+  iSpriteSocket* GetSocket (int f) const
   {
     return ((size_t)f < sockets.Length ())
   	? (csSpriteSocket *)sockets [f]
@@ -1221,7 +1221,7 @@ public:
   /**
    * Get the current frame number.
    */
-  csSpriteAction2* GetCurAction () const { return cur_action; }
+  iSpriteAction* GetCurAction () const { return cur_action; }
 
   /**
    * Get the number of frames.
@@ -1234,7 +1234,7 @@ public:
   bool SetAction (const char * name, bool loop = true, float speed = 1)
   {
     csSpriteAction2 *act;
-    if ((act = factory->FindAction (name)) != 0)
+    if ((act = (csSpriteAction2*)factory->FindAction (name)) != 0)
       return SetAction (act,loop,speed);
     else
       return false;
@@ -1246,7 +1246,7 @@ public:
   bool SetAction (int index, bool loop = true, float speed = 1)
   {
     csSpriteAction2 *act;
-    if ((act = factory->GetAction(index)) != 0)
+    if ((act = (csSpriteAction2*)factory->GetAction(index)) != 0)
       return SetAction (act,loop,speed);
     else
       return false;
@@ -1374,15 +1374,15 @@ public:
   void GetRadius (csVector3& rad, csVector3 &cent);
 
   /// Create and add a new socket to the sprite.
-  csSpriteSocket* AddSocket ();
+  iSpriteSocket* AddSocket ();
   /// find a named socket into the sprite.
-  csSpriteSocket* FindSocket (const char * name) const;
+  iSpriteSocket* FindSocket (const char * name) const;
   /// find a socked based on the sprite attached to it
-  csSpriteSocket* FindSocket (iMeshWrapper *mesh) const;
+  iSpriteSocket* FindSocket (iMeshWrapper *mesh) const;
   /// Query the number of sockets
   int GetSocketCount () const { return (int)sockets.Length (); }
   /// Query the socket number f
-  csSpriteSocket* GetSocket (int f) const
+  iSpriteSocket* GetSocket (int f) const
   {
     return ((size_t)f < sockets.Length ())
   	? (csSpriteSocket *)sockets [f]

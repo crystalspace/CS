@@ -36,8 +36,8 @@ csString csInstallationPathsHelper::GetAppPath (const char* argv0)
   }
   else if (*argv0 == CS_PATH_SEPARATOR) // Absolute: exact location of app.
   {
-    fullpath = argv0;  
-  } 
+    fullpath = argv0;
+  }
   else if (strchr (argv0, CS_PATH_SEPARATOR) != 0) // Relative:containing / ?
   {
     char dir[CS_MAXPATHLEN];		// Yes, getcwd()+relpath gives location
@@ -59,7 +59,10 @@ csString csInstallationPathsHelper::GetAppPath (const char* argv0)
 	*nextPart++ = 0;
 
       csString apppath;
-      apppath << currentPart << CS_PATH_SEPARATOR << argv0;
+      apppath << currentPart;
+      if (apppath.IsEmpty()) // empty entry in PATH behaves like "."
+        apppath = ".";
+      apppath << CS_PATH_SEPARATOR << argv0;
       if (access (apppath, F_OK) == 0)
       {
         fullpath = apppath;

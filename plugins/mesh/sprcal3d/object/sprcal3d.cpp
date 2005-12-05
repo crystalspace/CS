@@ -480,14 +480,14 @@ void csSpriteCal3DMeshObjectFactory::DefaultGetBuffer (int meshIdx,
   }
 }
 
-csSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::AddSocket ()
+iSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::AddSocket ()
 {
   csSpriteCal3DSocket* socket = new csSpriteCal3DSocket();
   sockets.Push (socket);
   return socket;
 }
 
-csSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::FindSocket (
+iSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::FindSocket (
     const char *n) const
 {
   int i;
@@ -498,7 +498,7 @@ csSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::FindSocket (
   return 0;
 }
 
-csSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::FindSocket (
+iSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::FindSocket (
     iMeshWrapper *mesh) const
 {
   int i;
@@ -2006,14 +2006,14 @@ void csSpriteCal3DMeshObject::SetAnimTimeUpdateHandler(
   anim_time_handler = p;
 }
 
-csSpriteCal3DSocket* csSpriteCal3DMeshObject::AddSocket ()
+iSpriteCal3DSocket* csSpriteCal3DMeshObject::AddSocket ()
 {
   csSpriteCal3DSocket* socket = new csSpriteCal3DSocket();
   sockets.Push (socket);
   return socket;
 }
 
-csSpriteCal3DSocket* csSpriteCal3DMeshObject::FindSocket (const char *n) const
+iSpriteCal3DSocket* csSpriteCal3DMeshObject::FindSocket (const char *n) const
 {
   int i;
   for (i = GetSocketCount () - 1; i >= 0; i--)
@@ -2023,7 +2023,7 @@ csSpriteCal3DSocket* csSpriteCal3DMeshObject::FindSocket (const char *n) const
   return 0;
 }
 
-csSpriteCal3DSocket* csSpriteCal3DMeshObject::FindSocket (
+iSpriteCal3DSocket* csSpriteCal3DMeshObject::FindSocket (
     iMeshWrapper *mesh) const
 {
   int i;

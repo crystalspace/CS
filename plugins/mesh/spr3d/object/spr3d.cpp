@@ -320,15 +320,15 @@ void csSprite3DMeshObjectFactory::ComputeBoundingBox ()
       if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
     }
 
-    GetFrame (frame)->SetBoundingBox (box);
-    GetFrame (frame)->SetRadius (csVector3 (
+    ((csSpriteFrame*)GetFrame (frame))->SetBoundingBox (box);
+    ((csSpriteFrame*)GetFrame (frame))->SetRadius (csVector3 (
     	csQsqrt (max_sq_radius.x),
 	csQsqrt (max_sq_radius.y),
 	csQsqrt (max_sq_radius.z)));
   }
 }
 
-csSpriteFrame* csSprite3DMeshObjectFactory::AddFrame ()
+iSpriteFrame* csSprite3DMeshObjectFactory::AddFrame ()
 {
   csSpriteFrame* fr = new csSpriteFrame ((int)frames.Length(), 
     (int)texels.Length());
@@ -351,7 +351,7 @@ csSpriteFrame* csSprite3DMeshObjectFactory::AddFrame ()
   return fr;
 }
 
-csSpriteFrame* csSprite3DMeshObjectFactory::FindFrame (const char *n) const
+iSpriteFrame* csSprite3DMeshObjectFactory::FindFrame (const char *n) const
 {
   int i;
   for (i = GetFrameCount () - 1; i >= 0; i--)
@@ -361,21 +361,21 @@ csSpriteFrame* csSprite3DMeshObjectFactory::FindFrame (const char *n) const
   return 0;
 }
 
-csSpriteAction2* csSprite3DMeshObjectFactory::AddAction ()
+iSpriteAction* csSprite3DMeshObjectFactory::AddAction ()
 {
   csSpriteAction2* a = new csSpriteAction2 ();
   actions.Push (a);
   return a;
 }
 
-csSpriteSocket* csSprite3DMeshObjectFactory::AddSocket ()
+iSpriteSocket* csSprite3DMeshObjectFactory::AddSocket ()
 {
   csSpriteSocket* socket = new csSpriteSocket();
   sockets.Push (socket);
   return socket;
 }
 
-csSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (const char *n) const
+iSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (const char *n) const
 {
   int i;
   for (i = GetSocketCount () - 1; i >= 0; i--)
@@ -385,7 +385,7 @@ csSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (const char *n) const
   return 0;
 }
 
-csSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (iMeshWrapper *mesh) const
+iSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (iMeshWrapper *mesh) const
 {
   int i;
   for (i = GetSocketCount () - 1; i >= 0; i--)
@@ -501,7 +501,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
     return;
   }
 
-  GetFrame (frame)->SetNormalsCalculated (true);
+  ((csSpriteFrame*)GetFrame (frame))->SetNormalsCalculated (true);
 
   csVector3* obj_verts  = GetVertices (frame);
   csVector3* base_verts = GetVertices (base);
@@ -617,7 +617,7 @@ void csSprite3DMeshObjectFactory::SetupLODListeners (iSharedVariable* varm,
   lod_vara->AddListener (lod_vara_listener);
 }
 
-csSpriteAction2* csSprite3DMeshObjectFactory::FindAction (const char *n) const
+iSpriteAction* csSprite3DMeshObjectFactory::FindAction (const char *n) const
 {
   int i;
   for (i = GetActionCount () - 1; i >= 0; i--)
@@ -652,8 +652,8 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
       if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
       if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
     }
-    GetFrame (i)->SetBoundingBox (box);
-    GetFrame (i)->SetRadius (csVector3 (
+    ((csSpriteFrame*)GetFrame (i))->SetBoundingBox (box);
+    ((csSpriteFrame*)GetFrame (i))->SetRadius (csVector3 (
     	csQsqrt (max_sq_radius.x),
 	csQsqrt (max_sq_radius.y),
 	csQsqrt (max_sq_radius.z)));
@@ -664,7 +664,7 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
 
 void csSprite3DMeshObjectFactory::GetObjectBoundingBox (csBox3& b)
 {
-  csSpriteFrame* cframe = GetAction (0)->GetCsFrame (0);
+  csSpriteFrame* cframe = ((csSpriteAction2*)GetAction (0))->GetCsFrame (0);
   cframe->GetBoundingBox (b);
 }
 
@@ -679,7 +679,7 @@ void csSprite3DMeshObjectFactory::GetRadius (csVector3& rad, csVector3& cent)
   GetObjectBoundingBox (bbox);
   cent = bbox.GetCenter();
 
-  csSpriteFrame* cframe = GetAction (0)->GetCsFrame (0);
+  csSpriteFrame* cframe = ((csSpriteAction2*)GetAction (0))->GetCsFrame (0);
   cframe->GetRadius (r);
   rad =  r;
 }
@@ -1046,14 +1046,14 @@ void csSprite3DMeshObject::SetupObject ()
   }
 }
 
-csSpriteSocket* csSprite3DMeshObject::AddSocket ()
+iSpriteSocket* csSprite3DMeshObject::AddSocket ()
 {
   csSpriteSocket* socket = new csSpriteSocket();
   sockets.Push (socket);
   return socket;
 }
 
-csSpriteSocket* csSprite3DMeshObject::FindSocket (const char *n) const
+iSpriteSocket* csSprite3DMeshObject::FindSocket (const char *n) const
 {
   int i;
   for (i = GetSocketCount () - 1; i >= 0; i--)
@@ -1063,7 +1063,7 @@ csSpriteSocket* csSprite3DMeshObject::FindSocket (const char *n) const
   return 0;
 }
 
-csSpriteSocket* csSprite3DMeshObject::FindSocket (iMeshWrapper *mesh) const
+iSpriteSocket* csSprite3DMeshObject::FindSocket (iMeshWrapper *mesh) const
 {
   int i;
   for (i = GetSocketCount () - 1; i >= 0; i--)
@@ -1282,7 +1282,11 @@ void csSprite3DMeshObject::InitSprite ()
     return;
   }
 
-  if (!cur_action) { SetFrame (0); cur_action = factory->GetFirstAction (); }
+  if (!cur_action) 
+  { 
+    SetFrame (0); 
+    cur_action = (csSpriteAction2*)factory->GetFirstAction (); 
+  }
 
   last_time = factory->vc->GetCurrentTicks ();
   last_pos = csVector3(0,0,0);
@@ -1980,7 +1984,7 @@ void csSprite3DMeshObject::PositionChild (iMeshObject* child,
     csSprite3DMeshObject *cs = this;
 
     int current_frame = cs->GetCurFrame();
-    csSpriteAction2* current_action = cs->GetCurAction();
+    csSpriteAction2* current_action = (csSpriteAction2*)cs->GetCurAction();
 
     csSpriteFrame* cf =
       current_action->GetCsFrame (current_frame);

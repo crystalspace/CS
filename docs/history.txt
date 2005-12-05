@@ -6,8 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Dec-2005
+        - res fixed the generic csInstallationPathsHelper::GetAppPath() to
+          treat an empty entry in PATH like ".".
+	- res made compile fixes for spr3d and sprcal3d.
 2-Dec-2005
-	- res2k fixed a bug in flushing of text with the OpenGL renderer.
+	- res fixed a bug in flushing of text with the OpenGL renderer.
 1-Dec-2005
 	- Jorrit added a new iMeshGenerator interface. This will be used
 	  for a new feature in the engine which can be used to do things

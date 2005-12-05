@@ -314,15 +314,15 @@ public:
   void DefaultGetBuffer (int mesh, csRenderBufferHolder*, csRenderBufferName);
 
   /// Create and add a new socket to the sprite.
-  csSpriteCal3DSocket* AddSocket ();
+  iSpriteCal3DSocket* AddSocket ();
   /// find a named socket into the sprite.
-  csSpriteCal3DSocket* FindSocket (const char * name) const;
+  iSpriteCal3DSocket* FindSocket (const char * name) const;
   /// find a socked based on the sprite attached to it
-  csSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const;
+  iSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const;
   /// Query the number of sockets
   int GetSocketCount () const { return (int)sockets.Length (); }
   /// Query the socket number f
-  csSpriteCal3DSocket* GetSocket (int f) const
+  iSpriteCal3DSocket* GetSocket (int f) const
   {
     return ((size_t)f < sockets.Length()) ?
       (csSpriteCal3DSocket*)sockets [f] : (csSpriteCal3DSocket*)0;
@@ -691,15 +691,15 @@ public:
   bool ClearMorphTarget(int morph_animation_id, float delay);
 
   /// Create and add a new socket to the sprite.
-  csSpriteCal3DSocket* AddSocket ();
+  iSpriteCal3DSocket* AddSocket ();
   /// find a named socket into the sprite.
-  csSpriteCal3DSocket* FindSocket (const char * name) const;
+  iSpriteCal3DSocket* FindSocket (const char * name) const;
   /// find a socked based on the sprite attached to it
-  csSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const;
+  iSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const;
   /// Query the number of sockets
   int GetSocketCount () const { return (int)sockets.Length (); }
   /// Query the socket number f
-  csSpriteCal3DSocket* GetSocket (int f) const
+  iSpriteCal3DSocket* GetSocket (int f) const
   {
     return ((size_t)f < sockets.Length()) ?
       (csSpriteCal3DSocket*)sockets[f] : (csSpriteCal3DSocket*)0;
