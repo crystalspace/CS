@@ -57,6 +57,8 @@
 class CS_CRYSTALSPACE_EXPORT csInputBinder : 
   public scfImplementation2<csInputBinder, iInputBinder, iEventHandler>
 {
+  iObjectRegistry *object_reg;
+  csRef<iEventNameRegistry> name_reg;
   struct AxisCmd
   {
     unsigned cmd;
@@ -89,7 +91,7 @@ public:
    * Create a new binder with an initial bindings hash size.
    * For optimum hash storage, size should be a prime number.
    */
-  csInputBinder (iBase *parent = 0, int btnSize = 127, int axisSize = 13);
+  csInputBinder (iObjectRegistry *, iBase *parent = 0, int btnSize = 127, int axisSize = 13);
   virtual ~csInputBinder ();
 
   virtual iEventHandler* QueryHandler () { return this; }

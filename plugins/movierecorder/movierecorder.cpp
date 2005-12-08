@@ -116,6 +116,9 @@ bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)
 {
   object_reg = iobject_reg;
 
+  CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
+  KeyboardEvent = csevKeyboardEvent (object_reg);
+
   // We need to receive keyboard events for our hotkeys, and the nothing
   // event for the actual movie recording.
   if (!scfiEventHandler)
@@ -124,8 +127,15 @@ bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)
   }
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
-    q->RegisterListener (scfiEventHandler,
-			 CSMASK_Nothing | CSMASK_Keyboard);
+  {
+    csEventID events[4] = { KeyboardEvent,
+			    PreProcess,
+			    PostProcess,
+			    CS_EVENTLIST_END };
+    /* DOME : This is a prime example of an application for event ordering;
+       we want to capture csevKeyboardEvent early, and catch the frame event absolutely last. */
+    q->RegisterListener (scfiEventHandler, events);
+  }
 
   // Unregister the normal virtual clock and register our own
   // replacement, hoping nobody will notice :)
@@ -250,22 +260,18 @@ void csMovieRecorder::SetupPlugin()
 
 bool csMovieRecorder::HandleEvent (iEvent &event)
 {
-  if (event.Type == csevKeyboard)
+  if (CS_IS_KEYBOARD_EVENT(object_reg, event))
   {
     return EatKey (event);
   }
-  else if (event.Type == csevBroadcast)
+  else if (event.Name == PreProcess)
   {
-    if (csCommandEventHelper::GetCode(&event) == cscmdPreProcess)
-    {
-      return HandleStartFrame (event);
-    }
-    if (csCommandEventHelper::GetCode(&event) == cscmdPostProcess)
-    {
-      return HandleEndFrame (event);
-    }
+    return HandleStartFrame (event);
   }
-
+  else if (event.Name == PostProcess)
+  {
+    return HandleEndFrame (event);
+  }
   return false;
 }
 

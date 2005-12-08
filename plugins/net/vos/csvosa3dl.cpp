@@ -203,6 +203,8 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
   objreg = o;
 
   csMetaMaterial::object_reg = objreg;
+  
+  Process = csevProcess(objreg);
 
   eventq = CS_QUERY_REGISTRY (objreg, iEventQueue);
   if (! eventq)
@@ -210,7 +212,7 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
     LOG("csVosA3DL", 1, "Error initializing: no event queue in registry!");
     return false;
   }
-  eventq->RegisterListener (this, CSMASK_FrameProcess);
+  eventq->RegisterListener (this, Process);
 
   localsite.assign(new Site(true), false);
   //localsite->addSiteExtension(new LocalSocketSiteExtension());
@@ -241,8 +243,7 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
 
 bool csVosA3DL::HandleEvent (iEvent &ev)
 {
-  if (ev.Type == csevBroadcast &&
-    csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (ev.Name == Process)
   {
     double start = getRealTime();
 

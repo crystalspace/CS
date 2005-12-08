@@ -85,6 +85,11 @@ private:
   csHash<TagInfo, csStringID> tagInfo;
 
   csArray<iLight*> activeLights;
+
+  csEventID PreProcess;
+  csEventID SystemOpen;
+  csEventID SystemClose;
+
 public:
   csShaderManager(iBase* parent);
   virtual ~csShaderManager();
@@ -195,6 +200,8 @@ public:
     
     virtual bool HandleEvent (iEvent& ev) 
     { return parent->HandleEvent (ev); }
+    CS_EVENTHANDLER_NAMES("crystalspace.graphics3d.shadermgr")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   };
   csRef<EventHandler> scfiEventHandler;
   /** @} */

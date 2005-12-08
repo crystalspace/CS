@@ -111,22 +111,21 @@ void Simple::FinishFrame ()
 
 bool Simple::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (ev.Name == Process)
   {
     simple->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Name == FinalProcess)
   {
     simple->FinishFrame ();
     return true;
   }
-  else if ((ev.Type == csevKeyboard) && 
-    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
-    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
+  else if ((ev.Name == KeyboardDown) &&
+	   (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q) q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
     return true;
   }
 
@@ -157,6 +156,10 @@ bool Simple::Initialize ()
 	"Can't initialize plugins!");
     return false;
   }
+
+  Process = csevProcess (object_reg);
+  FinalProcess = csevFinalProcess (object_reg);
+  KeyboardDown = csevKeyboardDown (object_reg);
 
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {

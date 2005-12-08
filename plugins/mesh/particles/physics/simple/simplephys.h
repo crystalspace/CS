@@ -104,9 +104,12 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csParticlesPhysicsSimple);
     virtual bool HandleEvent (iEvent &event)
     { return scfParent->HandleEvent (event); }
+    CS_EVENTHANDLER_NAMES("crystalspace.mesh.particles.physics")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } scfiEventHandler;
   friend struct eiEventHandler;
 
+  csEventID PreProcess;
 };
 
 #endif // __CS_PARTPHYSMPL_H__

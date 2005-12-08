@@ -34,7 +34,8 @@ SCF_IMPLEMENT_IBASE (CustomComponentFactory)
   SCF_IMPLEMENTS_INTERFACE (iAwsComponentFactory)
 SCF_IMPLEMENT_IBASE_END
 
-CustomComponent::CustomComponent ()
+CustomComponent::CustomComponent (iAws *manager) :
+  awsEmbeddedComponent (manager)
 {
   SCF_CONSTRUCT_IBASE (0);
 }
@@ -96,6 +97,7 @@ CustomComponentFactory::CustomComponentFactory (iAws* manager) : awsEmbeddedComp
 {
   SCF_CONSTRUCT_IBASE(0);
   Register ("Demo Component");
+  aws_manager = manager;
 }
 
 CustomComponentFactory::~CustomComponentFactory ()
@@ -106,7 +108,7 @@ CustomComponentFactory::~CustomComponentFactory ()
 iAwsComponent* CustomComponentFactory::Create ()
 {
   // create our component
-  CustomComponent* my_comp = new CustomComponent ();
+  CustomComponent* my_comp = new CustomComponent (aws_manager);
 
   // we create a label component to embed into our own component.
   iAwsComponent* embedded_comp =

@@ -972,10 +972,15 @@ csGenmeshAnimationControlType::~csGenmeshAnimationControlType ()
 bool csGenmeshAnimationControlType::Initialize (iObjectRegistry* object_reg)
 {
   csGenmeshAnimationControlType::object_reg = object_reg;
+  Frame = csevFrame (object_reg);
+  PreProcess = csevPreProcess (object_reg);
   scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  if (q != 0)
-    q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
+  // \todo It looks like @csGenmeshAnimationControlType doesn't actually handle any events.  So why does it register an event listener?
+  if (q != 0) {
+    csEventID events[] = { Frame, PreProcess, CS_EVENTLIST_END };
+    q->RegisterListener (scfiEventHandler, events);
+  }
   return true;
 }
 
@@ -990,12 +995,10 @@ csPtr<iGenMeshAnimationControlFactory> csGenmeshAnimationControlType::
 bool csGenmeshAnimationControlType::HandleEvent (iEvent& /*ev*/)
 {
 #if 0
-  else if (event.Type == csevBroadcast)
+  else if (event.Name == PreProcess)
   {
-    if (event.Command.Code == cscmdPreProcess)
-    {
-      return HandleStartFrame (event);
-    }
+    return HandleStartFrame (event);
+  }
 #endif
   return false;
 }

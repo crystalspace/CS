@@ -26,6 +26,7 @@
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
 #include "csutil/csuctransform.h"
+#include "csutil/eventnames.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 
@@ -50,8 +51,14 @@ NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, '{', '|', '}', '~', NOP
 //--//--//--//--//--//--//--//--//--//--//--//--//--/> Input driver <--//--//--
 
 csInputDriver::csInputDriver(iObjectRegistry* r) :
-  Registered(false), Registry(r), Listener(0)
+  Registered(false), 
+  Registry(r), NameRegistry(csEventNameRegistry::GetRegistry(r)), 
+  Listener(0), 
+  FocusChanged(csevFocusChanged(r)),
+  FocusGained(csevFocusGained(r)),
+  FocusLost(csevFocusLost(r))
 {
+  CS_ASSERT(r != 0);
 }
 
 csInputDriver::~csInputDriver()
@@ -61,7 +68,7 @@ csInputDriver::~csInputDriver()
 
 csPtr<iEventQueue> csInputDriver::GetEventQueue()
 {
-  return CS_QUERY_REGISTRY(Registry, iEventQueue);
+  return csQueryRegistry<iEventQueue> (Registry);
 }
 
 void csInputDriver::StartListening()
@@ -71,7 +78,7 @@ void csInputDriver::StartListening()
     csRef<iEventQueue> q (GetEventQueue());
     if (q != 0)
     {
-      q->RegisterListener(Listener, CSMASK_Broadcast);
+      q->RegisterListener(Listener, FocusChanged);
       Registered = true;
     }
   }
@@ -98,16 +105,17 @@ void csInputDriver::Post(iEvent* e)
 
 bool csInputDriver::HandleEvent(iEvent& e)
 {
-  const bool focusChanged = ((e.Type == csevBroadcast)
-    && (csCommandEventHelper::GetCode(&e) == cscmdFocusChanged));
-  if (focusChanged) 
+  if (e.Name == FocusLost)
   {
-    if (!csCommandEventHelper::GetInfo(&e)) // Application lost focus.
-      LostFocus();
-    if (csCommandEventHelper::GetInfo(&e)) // Application gained focus.
-      GainFocus();
+    LostFocus();
+    return true;
   }
-  return focusChanged;
+  else if (e.Name == FocusGained)
+  {
+    GainFocus();
+    return true;
+  }
+  return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -306,7 +314,9 @@ void csKeyComposer::ResetState ()
 
 
 csKeyboardDriver::csKeyboardDriver (iObjectRegistry* r) :
-  csInputDriver(r), scfImplementationType (this)
+  csInputDriver(r), scfImplementationType (this),
+  KeyboardUp(csevKeyboardUp(r)),
+  KeyboardDown(csevKeyboardDown(r))
 {
   memset (&modifiersState, 0, sizeof (modifiersState));
 
@@ -376,8 +386,7 @@ void csKeyboardDriver::DoKey (utf32_char codeRaw, utf32_char codeCooked,
   // @@@ Pooled events, somehow?
   csRef<iEvent> ev;
   ev.AttachNew (new csEvent ());
-  ev->Type = csevKeyboard;
-  ev->Category = ev->SubCategory = ev->Flags = 0;
+  ev->Name = (iDown ? KeyboardDown : KeyboardUp);
   ev->Add ("keyEventType", 
     (uint8)(iDown ? csKeyEventTypeDown : csKeyEventTypeUp));
   ev->Add ("keyCodeRaw", (uint32)codeRaw);
@@ -577,7 +586,8 @@ csMouseDriver::csMouseDriver (iObjectRegistry* r) :
 {
   Listener = this;
   StartListening();
-  for (int iter=0 ; iter<CS_MAX_MOUSE_COUNT ; iter++) {
+  for (int iter=0 ; iter<CS_MAX_MOUSE_COUNT ; iter++)
+  {
     memset (Button[iter], 0, sizeof(bool) * CS_MAX_MOUSE_BUTTONS);
     memset (Last[iter], 0, sizeof(int) * CS_MAX_MOUSE_AXES);
   }
@@ -597,10 +607,11 @@ csMouseDriver::~csMouseDriver ()
 
 void csMouseDriver::Reset ()
 {
-  for (int i = 0; i < CS_MAX_MOUSE_COUNT; i++) {
+  for (int i = 0; i < CS_MAX_MOUSE_COUNT; i++)
+  {
     for (int j = 0; j < CS_MAX_MOUSE_BUTTONS; j++)
       if (Button [i][j])
-	DoButton (i + 1, j + 1, false, Last[i], Axes[i]);
+	DoButton (i, j, false, Last[i], Axes[i]);
     LastClickButton[i] = (uint)-1;
   }
 }
@@ -621,13 +632,13 @@ iKeyboardDriver* csMouseDriver::GetKeyboardDriver()
 void csMouseDriver::DoButton (uint number, uint button, bool down, 
                               const int32 *axes, uint numAxes)
 {
-  if (number <= 0 || number > CS_MAX_MOUSE_COUNT)
+  if (number < 0 || number >= CS_MAX_MOUSE_COUNT)
     return;
 
-  if (memcmp(Last[number - 1], axes, numAxes * sizeof(int))!=0)
+  if (memcmp(Last[number], axes, numAxes * sizeof(int))!=0)
     DoMotion (number, axes, numAxes);
 
-  if (button <= 0 || button > CS_MAX_MOUSE_BUTTONS)
+  if (button < 0 || button >= CS_MAX_MOUSE_BUTTONS)
     return;
 
   iKeyboardDriver* k = GetKeyboardDriver();
@@ -635,7 +646,7 @@ void csMouseDriver::DoButton (uint number, uint button, bool down,
             | (k->GetKeyState (CSKEY_ALT  ) ? CSMASK_ALT   : 0)
             | (k->GetKeyState (CSKEY_CTRL ) ? CSMASK_CTRL  : 0);
 
-  Button [number - 1][button - 1] = down;
+  Button [number][button] = down;
 
   uint32 buttonMask = 0;
   for (int i=31 ; i>=0 ; i--) {
@@ -646,37 +657,47 @@ void csMouseDriver::DoButton (uint number, uint button, bool down,
 
   csRef<iEvent> ev;
   csTicks evtime = csGetTicks();
-  ev.AttachNew (new csEvent (evtime,
-			     down ? csevMouseDown : csevMouseUp, 
-			     number, axes, numAxes, 0, 
-			     button, buttonMask,
-			     smask));
+
+  ev.AttachNew (csMouseEventHelper::NewEvent
+		(NameRegistry,
+		 evtime, ((down)?
+			  csevMouseDown(NameRegistry, number):
+			  csevMouseUp(NameRegistry, number)),
+		 number, down?csMouseEventTypeDown:csMouseEventTypeUp,
+		 axes, numAxes, 0, button, down, buttonMask, smask));
   Post(ev);
 
-  if ((button == LastClickButton[number - 1])
-      && (evtime - LastClickTime[number - 1] <= DoubleClickTime)) {
-    for (uint iter=0 ; iter<Axes[number - 1] ; iter++)
-      if (unsigned (ABS (axes[iter] - LastClick[number - 1][iter])) >
-	  DoubleClickDist)
+  if ((button == LastClickButton[number])
+      && (evtime - LastClickTime[number] <= DoubleClickTime))
+  {
+    for (uint iter=0 ; iter<Axes[number] ; iter++)
+      if (unsigned 
+	  (ABS (axes[iter] - LastClick[number][iter])) > DoubleClickDist)
 	goto mousedown;
     csRef<iEvent> ev;
-    ev.AttachNew (new csEvent (evtime,
-			       down ? csevMouseDoubleClick : csevMouseClick, 
-			       number, axes, numAxes, 0, button, buttonMask,
-			       smask));
+    ev.AttachNew (csMouseEventHelper::NewEvent
+		  (NameRegistry,
+		   evtime, 
+		   ((down)?
+		    csevMouseDoubleClick(NameRegistry, number):
+		    csevMouseClick(NameRegistry, number)),
+		   number, (down?csMouseEventTypeDoubleClick:
+			    csMouseEventTypeClick),
+		   axes, numAxes, 0, button, down, 
+		   buttonMask, smask));
     Post (ev);
     // Don't allow for sequential double click events
     if (down)
-      LastClickButton [number - 1] = (uint)-1;
+      LastClickButton [number] = (uint)-1;
   }
   else if (down)
   {
   mousedown:
     // Remember the coordinates/button/position of last mousedown event
-    LastClickButton[number - 1] = button;
-    LastClickTime[number - 1] = evtime;
-    for (uint iter=0; iter<Axes[number - 1]; iter++)
-      LastClick[number - 1][iter] = axes[iter];
+    LastClickButton[number] = button;
+    LastClickTime[number] = evtime;
+    for (uint iter=0; iter<Axes[number]; iter++)
+      LastClick[number][iter] = axes[iter];
   }
 }
 
@@ -689,11 +710,11 @@ void csMouseDriver::DoButton (uint number, uint button, bool down,
 void csMouseDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
 {
   uint32 cflags = 0;
-  if (number <= 0 || number > CS_MAX_MOUSE_COUNT)
+  if (number < 0 || number >= CS_MAX_MOUSE_COUNT)
     return;
 
   for (uint iter=0; iter<numAxes ; iter++)
-    if (Last [number - 1][iter] != axes[iter])
+    if (Last [number][iter] != axes[iter])
       cflags |= (1 << iter);
 
   if (cflags==0)
@@ -703,8 +724,8 @@ void csMouseDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
   int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
     | (k->GetKeyState (CSKEY_ALT  ) ? CSMASK_ALT   : 0)
     | (k->GetKeyState (CSKEY_CTRL ) ? CSMASK_CTRL  : 0);
-  memcpy(Last [number - 1], axes, numAxes * sizeof(int));
-  Axes [number - 1] = numAxes;
+  memcpy(Last [number], axes, numAxes * sizeof(int));
+  Axes [number] = numAxes;
 
   uint32 buttonMask = 0;
   for (int i=31 ; i>=0 ; i--) {
@@ -714,10 +735,12 @@ void csMouseDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
   }
 
   csRef<iEvent> ev;
-  ev.AttachNew (new csEvent (csGetTicks (), csevMouseMove, 
-			     number, axes, numAxes, cflags, 
-			     0, buttonMask, 
-			     smask));
+  ev.AttachNew (csMouseEventHelper::NewEvent
+		(NameRegistry,
+		 csGetTicks (), csevMouseMove(NameRegistry, number),
+		 number, csMouseEventTypeMove,
+		 axes, numAxes, cflags, 0, false, 
+		 buttonMask, smask));
   Post (ev);
 }
 
@@ -734,7 +757,8 @@ csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
 {
   Listener = this;
   StartListening();
-  for (int iter=0 ; iter<CS_MAX_JOYSTICK_COUNT ; iter++) {
+  for (int iter=0 ; iter<CS_MAX_JOYSTICK_COUNT ; iter++)
+  {
     memset (Button[iter], 0, sizeof(bool) * CS_MAX_JOYSTICK_BUTTONS);
     memset (Last[iter], 0, sizeof(int) * CS_MAX_JOYSTICK_AXES);
   }
@@ -750,7 +774,7 @@ void csJoystickDriver::Reset ()
   for (int i = 0; i < CS_MAX_JOYSTICK_COUNT; i++)
     for (int j = 0; j < CS_MAX_JOYSTICK_BUTTONS; j++)
       if (Button [i][j])
-        DoButton (i + 1, j + 1, false, Last [i], Axes [i]);
+        DoButton (i, j, false, Last [i], Axes [i]);
 }
 
 iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
@@ -769,13 +793,13 @@ iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
 void csJoystickDriver::DoButton (uint number, uint button, bool down,
 				 const int32 *axes, uint numAxes)
 {
-  if (number <= 0 || number > CS_MAX_JOYSTICK_COUNT)
+  if (number < 0 || number >= CS_MAX_JOYSTICK_COUNT)
     return;
 
-  if (memcmp(Last[number - 1], axes, numAxes * sizeof(int))!=0)
+  if (memcmp(Last[number], axes, numAxes * sizeof(int))!=0)
     DoMotion(number, axes, numAxes);
 
-  if (button <= 0 || button > CS_MAX_JOYSTICK_BUTTONS)
+  if (button < 0 || button >= CS_MAX_JOYSTICK_BUTTONS)
     return;
 
   iKeyboardDriver* k = GetKeyboardDriver();
@@ -783,7 +807,7 @@ void csJoystickDriver::DoButton (uint number, uint button, bool down,
             | (k->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
             | (k->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
 
-  Button [number - 1][button - 1] = down;
+  Button [number][button] = down;
 
   uint32 buttonMask = 0;
   for (int i=31 ; i>=0 ; i--) {
@@ -793,9 +817,13 @@ void csJoystickDriver::DoButton (uint number, uint button, bool down,
   }
 
   csRef<iEvent> ev;
-  ev.AttachNew (new csEvent (csGetTicks (),
-			     down ? csevJoystickDown : csevJoystickUp, number, 
-			     axes, numAxes, 0, button, buttonMask, smask));
+  ev.AttachNew (csJoystickEventHelper::NewEvent
+		(NameRegistry,
+		 csGetTicks (), ((down)?
+				 csevJoystickDown(NameRegistry, number):
+				 csevJoystickUp(NameRegistry, number)),
+		 number, axes, numAxes, 0, button, down, 
+		 buttonMask, smask));
   Post(ev);
 }
 
@@ -808,12 +836,14 @@ void csJoystickDriver::DoButton (uint number, uint button, bool down,
 void csJoystickDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
 {
   uint32 cflags = 0;
-  if (number <= 0 || number > CS_MAX_JOYSTICK_COUNT)
+  if (number < 0 || number >= CS_MAX_JOYSTICK_COUNT)
     return;
 
   for (uint iter=0 ; iter<numAxes ; iter++)
-    if (Last[number - 1][iter] != axes[iter])
+    if (Last[number][iter] != axes[iter]) {
+      Last[number][iter] = axes[iter];
       cflags |= (1 << iter);
+    }
 
   if (cflags==0)
     return; /* no change to report */
@@ -822,8 +852,7 @@ void csJoystickDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
   int smask = (k->GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
     | (k->GetKeyState (CSKEY_ALT)   ? CSMASK_ALT   : 0)
     | (k->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
-  memcpy(Last [number - 1], axes, numAxes * sizeof(int));
-  Axes [number - 1] = numAxes;
+  Axes [number] = numAxes;
 
   uint32 buttonMask = 0;
   for (int i=31 ; i>=0 ; i--) {
@@ -833,8 +862,10 @@ void csJoystickDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
   }
 
   csRef<iEvent> ev;
-  ev.AttachNew (new csEvent(csGetTicks(), csevJoystickMove, 
-			    number, axes, numAxes, cflags, 
-			    0, buttonMask, smask));
+  ev.AttachNew (csJoystickEventHelper::NewEvent
+		(NameRegistry,
+		 csGetTicks(), csevJoystickMove(NameRegistry, number),
+		 number, axes, numAxes, cflags, 0, false, 
+		 buttonMask, smask));
   Post(ev);
 }

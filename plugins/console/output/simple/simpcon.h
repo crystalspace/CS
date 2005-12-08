@@ -22,6 +22,7 @@
 
 #include "ivaria/conout.h"
 #include "csutil/scopedmutexlock.h"
+#include "csutil/eventnames.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivideo/fontserv.h"
@@ -95,6 +96,8 @@ private:
 
 public:
   SCF_DECLARE_IBASE;
+
+  CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
 
   /// Create console object
   csSimpleConsole (iBase *iParent);
@@ -245,6 +248,8 @@ public:
       SCF_DESTRUCT_IBASE ();
     }
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+    CS_EVENTHANDLER_NAMES("crystalspace.console")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } * scfiEventHandler;
 
 private:

@@ -22,13 +22,11 @@
 #include "csutil/csevcord.h"
 #include "iutil/eventh.h"
 
-csEventCord::csEventCord(int cat, int subcat) 
-  : scfImplementationType (this),
-  category(cat), subcategory(subcat)
+csEventCord::csEventCord(csEventID Name, bool Pass) :
+  scfImplementationType (this),
+  pass(Pass), name(Name)
 {
   plugins = 0;
-  // By default, only pass along category 0, subcategory 0 events to the queue.
-  pass = (category == 0 && subcategory == 0);
   SpinLock = 0;
 }
 

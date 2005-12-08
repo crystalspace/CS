@@ -65,6 +65,7 @@ private:
         state[i] = j.state[i];
     }
   };
+  csEventID PreProcess;
 
  protected:
   iObjectRegistry *object_reg;

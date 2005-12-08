@@ -96,18 +96,18 @@ void Simple::SetupFrame ()
     c->Move (CS_VEC_BACKWARD * 4 * speed);
   if (joy) 
   {
-    if (joy->GetLastButton (1,1)) 
+    if (joy->GetLastButton (0,0)) 
       c->Move (CS_VEC_FORWARD * 4 * speed);
-    if (joy->GetLastButton (1,2))
+    if (joy->GetLastButton (0,1))
       c->Move (CS_VEC_BACKWARD * 4 * speed);   
     c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT,
-      ((joy->GetLast (1,1)) / 32767.0) * speed);
+				   ((joy->GetLast (0,0)) / 32767.0) * speed);
     c->GetTransform ().RotateThis (CS_VEC_TILT_UP, 
-      ((joy->GetLast (1,2)) / 32767.0) * speed);
-    if (joy && (joy->GetLastButton (1,4))) 
+				   ((joy->GetLast (0,1)) / 32767.0) * speed);
+    if (joy && (joy->GetLastButton (0,3))) 
     {
       csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-      if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+      if (q) q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
     }
   }
   // Tell 3D driver we're going to display 3D things.
@@ -127,22 +127,21 @@ void Simple::FinishFrame ()
 bool Simple::HandleEvent (iEvent& ev)
 {
   
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (ev.Name == Process)
   {
     simple->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Name == FinalProcess)
   {
     simple->FinishFrame ();
     return true;
   }
-  else if ((ev.Type == csevKeyboard) && 
-    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
-    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
+  else if ((ev.Name == KeyboardDown) &&
+	   (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+    if (q) q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
     return true;
   }
 
@@ -173,11 +172,21 @@ bool Simple::Initialize ()
     return false;
   }
 
-  if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
+  Process = csevProcess (object_reg);
+  FinalProcess = csevFinalProcess (object_reg);
+  KeyboardDown = csevKeyboardDown (object_reg);
+
+  csEventID events[] = {
+    Process,
+    FinalProcess,
+    KeyboardDown,
+    CS_EVENTLIST_END
+  };
+  if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler, events))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.joytest",
-	"Can't initialize event handler!");
+	      "crystalspace.application.joytest",
+	      "Can't initialize event handler!");
     return false;
   }
 

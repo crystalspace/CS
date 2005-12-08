@@ -20,13 +20,21 @@
 #include "cssysdef.h"
 #include "csutil/csbaseeventh.h"
 #include "csutil/event.h"
+#include "csutil/csevent.h"
 #include "csutil/objreg.h"
 
 #include "iutil/eventq.h"
 
-csBaseEventHandler::csBaseEventHandler()
-  : scfImplementationType (this)
+csBaseEventHandler::csBaseEventHandler(iObjectRegistry *r) : 
+  scfImplementationType (this),
+  object_reg(r),
+  self(csEventHandlerRegistry::GetID(r, this))
 {
+  FrameEvent = csevFrame (r);
+  PreProcess = csevPreProcess (r);
+  Process = csevProcess (r);
+  PostProcess = csevPostProcess (r);
+  FinalProcess = csevFinalProcess (r);
 }
 
 
@@ -34,108 +42,128 @@ csBaseEventHandler::~csBaseEventHandler()
 {
   if (queue)
     queue->RemoveListener (this);
+  csEventHandlerRegistry::ReleaseID(object_reg, this);
 }
 
-bool csBaseEventHandler::RegisterQueue (iEventQueue* q, unsigned int trigger)
+bool csBaseEventHandler::RegisterQueue (iEventQueue* q, csEventID event)
 {
   if (queue)
     queue->RemoveListener (this);
   queue = q;
   if (0 != q)
-    q->RegisterListener(this, trigger);
+    q->RegisterListener(this, event);
   return true;
 }
 
-bool csBaseEventHandler::RegisterQueue (
-  iObjectRegistry* registry, unsigned int trigger)
+bool csBaseEventHandler::RegisterQueue (iEventQueue* q, csEventID events[])
+{
+  if (queue)
+    queue->RemoveListener (this);
+  queue = q;
+  if (q != 0)
+    q->RegisterListener(this, events);
+  return true;
+}
+
+bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry, csEventID event)
 {
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
   if (0 == q)
     return false;
-  return RegisterQueue (q, trigger);
+  return RegisterQueue (q, event);
 }
 
-// This is just ugly, but it is the static definition of the pmfnTriggers array
-bool (csBaseEventHandler::*csBaseEventHandler::pmfnTriggers[])(iEvent &event) =
-  {
-    &csBaseEventHandler::OnUnhandledEvent   /*csevNothing*/,
-    &csBaseEventHandler::OnKeyboard         /*csevKeyboard*/,
-    &csBaseEventHandler::OnMouseMove        /*csevMouseMove*/,
-    &csBaseEventHandler::OnMouseDown        /*csevMouseDown*/,
-    &csBaseEventHandler::OnMouseUp          /*csevMouseUp*/,
-    &csBaseEventHandler::OnMouseClick       /*csevMouseClick*/,
-    &csBaseEventHandler::OnMouseDoubleClick /*csevMouseDoubleClick*/,
-    &csBaseEventHandler::OnJoystickMove     /*csevJoystickMove*/,
-    &csBaseEventHandler::OnJoystickDown     /*csevJoystickDown*/,
-    &csBaseEventHandler::OnJoystickUp       /*csevJoystickUp*/,
-    &csBaseEventHandler::OnCommand          /*csevCommand*/,
-    &csBaseEventHandler::OnBroadcast        /*csevBroadcast*/,
-  };
+bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry, csEventID events[])
+{
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
+  if (0 == q)
+    return false;
+  return RegisterQueue (q, events);
+}
 
 bool csBaseEventHandler::HandleEvent (iEvent &event)
 {
-  uint8 index = event.Type;
-  if (_CSBASEEVENT_MAXARRAYINDEX < index)
-    index = 0;
-  return (this->*(pmfnTriggers[index]))(event);
-}
-
-#define DefaultTrigger(trigger) \
-  bool csBaseEventHandler::trigger (iEvent & /*event*/) \
-  { \
-    return false;\
-  }
-
-DefaultTrigger ( OnUnhandledEvent )
-DefaultTrigger ( OnKeyboard )
-DefaultTrigger ( OnMouseMove )
-DefaultTrigger ( OnMouseDown )
-DefaultTrigger ( OnMouseUp )
-DefaultTrigger ( OnMouseClick )
-DefaultTrigger ( OnMouseDoubleClick )
-DefaultTrigger ( OnJoystickMove )
-DefaultTrigger ( OnJoystickDown )
-DefaultTrigger ( OnJoystickUp )
-DefaultTrigger ( OnCommand )
-
-bool csBaseEventHandler::OnBroadcast (iEvent &event)
-{
-  switch (csCommandEventHelper::GetCode(&event))
+  if (event.Name == FrameEvent)
   {
-  case cscmdPreProcess:
-    PreProcessFrame ();
-    break;
-
-  case cscmdProcess:
-    ProcessFrame ();
-    break;
-
-  case cscmdPostProcess:
-    PostProcessFrame ();
-    break;
-
-  case cscmdFinalProcess:
-    FinishFrame ();
-    break;
-
-  default:
-    return OnUnhandledEvent (event);
+    Frame();
+    return true;
   }
-  return true;
+  else if (event.Name == PreProcess)
+  {
+    PreProcessFrame ();
+    return true;
+  }
+  else if (event.Name == Process)
+  {
+    ProcessFrame ();
+    return true;
+  }
+  else if (event.Name == PostProcess)
+  {
+    PostProcessFrame ();
+    return true;
+  }
+  else if (event.Name == FinalProcess)
+  {
+    FinishFrame ();
+    return true;
+  }
+  else if (CS_IS_KEYBOARD_EVENT(object_reg, event))
+    return OnKeyboard(event);
+  else if (CS_IS_MOUSE_EVENT(object_reg, event))
+  {
+    switch(csMouseEventHelper::GetEventType(&event))
+    {
+    case csMouseEventTypeMove:
+      return OnMouseMove(event);
+    case csMouseEventTypeUp:
+      return OnMouseUp(event);
+    case csMouseEventTypeDown:
+      return OnMouseDown(event);
+    case csMouseEventTypeClick:
+      return OnMouseClick(event);
+    case csMouseEventTypeDoubleClick:
+      return OnMouseDoubleClick(event);
+    }
+  }
+  else if (CS_IS_JOYSTICK_EVENT(object_reg, event))
+  {
+    if (csJoystickEventHelper::GetButton(&event))
+    {
+      if (csJoystickEventHelper::GetButtonState(&event))
+	return OnJoystickDown(event);
+      else
+	return OnJoystickUp(event);
+    }
+    else
+    {
+      return OnJoystickMove(event);
+    }
+  }
+  return  OnUnhandledEvent(event);
 }
 
-void csBaseEventHandler::PreProcessFrame ()
-{
-}
+#define DefaultTrigger(trigger)			   \
+  bool csBaseEventHandler::trigger (iEvent &event) \
+  { return false; }
 
-void csBaseEventHandler::ProcessFrame ()
-{
-}
+DefaultTrigger ( OnUnhandledEvent );
+DefaultTrigger ( OnKeyboard );
+DefaultTrigger ( OnMouseMove );
+DefaultTrigger ( OnMouseDown );
+DefaultTrigger ( OnMouseUp );
+DefaultTrigger ( OnMouseClick );
+DefaultTrigger ( OnMouseDoubleClick );
+DefaultTrigger ( OnJoystickMove );
+DefaultTrigger ( OnJoystickDown );
+DefaultTrigger ( OnJoystickUp );
 
-void csBaseEventHandler::PostProcessFrame ()
-{
-}
+#define DefaultVoidTrigger(trigger)   \
+  void csBaseEventHandler::trigger () \
+  { return; }
 
-void csBaseEventHandler::FinishFrame ()
-{
-}
+DefaultVoidTrigger ( Frame );
+DefaultVoidTrigger ( PreProcessFrame );
+DefaultVoidTrigger ( ProcessFrame );
+DefaultVoidTrigger ( PostProcessFrame );
+DefaultVoidTrigger ( FinishFrame );

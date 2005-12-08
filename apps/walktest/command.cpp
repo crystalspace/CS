@@ -316,7 +316,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
   }
   else if (!csStrCaseCmp (cmd, "help"))
   {

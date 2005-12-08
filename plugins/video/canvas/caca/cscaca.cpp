@@ -229,13 +229,13 @@ void csGraphics2DCaca::Print (csRect const* area)
       EventOutlet->Key(MapKey(evrest), MapKey(evrest), false);
       break;
     case CACA_EVENT_MOUSE_PRESS:
-      EventOutlet->Mouse(evrest, true, mousex, mousey);
+      EventOutlet->Mouse(evrest - 1, true, mousex, mousey);
       break;
     case CACA_EVENT_MOUSE_RELEASE:
-      EventOutlet->Mouse(evrest, false, mousex, mousey);
+      EventOutlet->Mouse(evrest - 1, false, mousex, mousey);
       break;
     case CACA_EVENT_MOUSE_MOTION:
-      EventOutlet->Mouse(0, false, mousex, mousey);
+      EventOutlet->Mouse(-1, false, mousex, mousey);
       break;
     case CACA_EVENT_ANY:
     case CACA_EVENT_NONE:

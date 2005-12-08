@@ -195,7 +195,7 @@ public:
   /**
    * Quit running the application.
    * \remarks
-   * This function will send a cscmdQuit event through the event queue. If no
+   * This function will send a csevQuit event through the event queue. If no
    * queue has been initialized, then it will terminate the program with an
    * exit() call.
    */

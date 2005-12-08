@@ -106,8 +106,9 @@ public:
   struct eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE(csPython);
-    virtual bool HandleEvent (iEvent& e)
-    { return scfParent->HandleEvent(e); }
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+    CS_EVENTHANDLER_NAMES("crystalspace.cspython")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } scfiEventHandler;
 };
 

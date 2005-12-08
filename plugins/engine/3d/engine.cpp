@@ -811,9 +811,18 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
   reporter = CS_QUERY_REGISTRY (objectRegistry, iReporter);
 
   // Tell event queue that we want to handle broadcast events
+  CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS(objectRegistry);
+  CanvasResize = csevCanvasResize (objectRegistry, G2D);
+  CanvasClose = csevCanvasClose (objectRegistry, G2D);
+
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectRegistry, iEventQueue);
   if (q)
-    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
+  {
+    csEventID events[5] = { SystemOpen, SystemClose,
+			    CanvasResize, CanvasClose,
+			    CS_EVENTLIST_END };
+    q->RegisterListener (scfiEventHandler, events);
+  }
 
   csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
   ReadConfig (cfg);
@@ -831,12 +840,8 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
 // Handle some system-driver broadcasts
 bool csEngine::HandleEvent (iEvent &Event)
 {
-  if (Event.Type == csevBroadcast)
+  if (Event.Name == SystemOpen)
   {
-    switch (csCommandEventHelper::GetCode(&Event))
-    {
-      case cscmdSystemOpen:
-        {
           if (G3D)
           {
 	    globalStringSet = CS_QUERY_REGISTRY_TAG_INTERFACE (
@@ -933,34 +938,30 @@ bool csEngine::HandleEvent (iEvent &Event)
           if (csCamera::GetDefaultFOV () == 0)
             csCamera::SetDefaultFOV (frameHeight, frameWidth);
 
-          // Allow context resizing since we handle cscmdContextResize
+          // Allow context resizing since we handle CanvasResize(G2D)
           if (G2D) G2D->AllowResize (true);
 
           StartEngine ();
 
           return true;
-        }
-
-      case cscmdSystemClose:
-        {
+  }
+  else if (Event.Name == SystemClose)
+  {
           // We must free all material and texture handles since after
           // G3D->Close() they all become invalid, no matter whenever
           // we did or didn't an IncRef on them.
           DeleteAll ();
           return true;
-        }
-
-      case cscmdContextResize:
-        {
-          resize = true;
+  }
+  else if (Event.Name == CanvasResize)
+  {
+          if (((iGraphics2D *)csCommandEventHelper::GetInfo(&Event)) == G2D)
+            resize = true;
           return false;
-        }
-
-      case cscmdContextClose:
-        {
+  }
+  else if (Event.Name == CanvasClose)
+  {
           return false;
-        }
-    } /* endswitch */
   }
 
   return false;
@@ -1677,7 +1678,7 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/, csRenderView &rview)
     eseqmgr->SetCamera (c);
   }
 
-  // This flag is set in HandleEvent on a cscmdContextResize event
+  // This flag is set in HandleEvent on a CanvasResize event
   if (resize)
   {
     resize = false;

@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "aws.h"
 #include "awsradbt.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -138,7 +139,7 @@ void awsRadButton::ClearGroup ()
 {
   csEvent Event;
 
-  Event.Type = csevGroupOff;
+  Event.Name = ((awsManager*) WindowManager ())->GroupOff;
 
   for (iAwsComponent* cmp = Parent()->GetTopChild(); cmp; cmp = cmp->ComponentBelow())
   {
@@ -154,9 +155,8 @@ bool awsRadButton::HandleEvent (iEvent &Event)
 {
   if (awsComponent::HandleEvent (Event)) return true;
 
-  switch (Event.Type)
+  if (Event.Name == ((awsManager*) WindowManager ())->GroupOff)
   {
-  case csevGroupOff:
     if (is_on)
     {
       is_on = false;
@@ -166,7 +166,6 @@ bool awsRadButton::HandleEvent (iEvent &Event)
     }
 
     return true;
-    break;
   }
 
   return false;

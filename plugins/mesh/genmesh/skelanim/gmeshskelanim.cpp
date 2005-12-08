@@ -1715,11 +1715,12 @@ csGenmeshSkelAnimationControlType::~csGenmeshSkelAnimationControlType ()
 bool csGenmeshSkelAnimationControlType::Initialize (iObjectRegistry* object_reg)
 {
   csGenmeshSkelAnimationControlType::object_reg = object_reg;
+  PreProcess = csevPreProcess (object_reg);
   scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (q != 0)
-    q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
+    q->RegisterListener (scfiEventHandler, PreProcess);
   return true;
 }
 
@@ -1733,7 +1734,7 @@ csPtr<iGenMeshAnimationControlFactory> csGenmeshSkelAnimationControlType::
 
 bool csGenmeshSkelAnimationControlType::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode (&ev) == cscmdPreProcess)
+  if (ev.Name == PreProcess)
   {
       UpdateAUAnimations (vc->GetCurrentTicks ());
     return true;

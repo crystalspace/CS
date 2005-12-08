@@ -24,6 +24,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "iutil/event.h"
+#include "aws.h"
 #include "awsmled.h"
 #include "aws3dfrm.h"
 #include "iaws/awsparm.h"
@@ -341,8 +342,7 @@ bool awsMultiLineEdit::HandleEvent (iEvent &Event)
   if (idx != csArrayItemNotFound)
     (this->*vDispatcher.Get (idx)->ring) ();
   else
-    if ((Event.Type == csevKeyboard) && 
-      (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown))
+    if ((Event.Name == ((awsManager*) WindowManager ())->KeyboardDown))
     {
       csKeyEventData eventData;
       csKeyEventHelper::GetEventData (&Event, eventData);
@@ -392,7 +392,8 @@ bool awsMultiLineEdit::SetHandler (const char *action,  const char *event)
   csEvent e;
   bool bSucc = false;
 
-  csInputDefinition inputDef (event);
+  csInputDefinition inputDef (csEventNameRegistry::GetRegistry (WindowManager ()->GetObjectRegistry ()),
+			      event);
   if (inputDef.IsValid ())
   {
     if (!strcmp (action, "next char"))

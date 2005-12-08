@@ -22,144 +22,53 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-Simple::Simple () : vidprefs(0)
+Simple::Simple ()
 {
   SetApplicationName ("CrystalSpace.SimpVS");
 }
 
 Simple::~Simple ()
 {
+}
+
+Simple::EventHandler::EventHandler (Simple *parent,
+				    iObjectRegistry *object_reg) :
+  csBaseEventHandler (object_reg),
+  parent (parent),
+  vidprefs(0)
+{
+  Process = csevProcess (GetObjectRegistry ());
+  FinalProcess = csevFinalProcess (GetObjectRegistry ());
+  KeyboardDown = csevKeyboardDown (GetObjectRegistry ());
+  Quit = csevQuit (GetObjectRegistry ());
+}
+
+Simple::EventHandler::~EventHandler ()
+{
   delete vidprefs;
 }
 
-void Simple::SetupFrame ()
+bool Simple::EventHandler::Setup ()
 {
-  // First get elapsed time from the virtual clock.
-  csTicks elapsed_time = vc->GetElapsedTicks ();
-
-  // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
-
-  iCamera* c = view->GetCamera();
-  if (kbd->GetKeyState (CSKEY_RIGHT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
-  if (kbd->GetKeyState (CSKEY_LEFT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
-  if (kbd->GetKeyState (CSKEY_PGUP))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
-  if (kbd->GetKeyState (CSKEY_PGDN))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
-  if (kbd->GetKeyState (CSKEY_UP))
-    c->Move (CS_VEC_FORWARD * 4 * speed);
-  if (kbd->GetKeyState (CSKEY_DOWN))
-    c->Move (CS_VEC_BACKWARD * 4 * speed);
-
-  // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
-    return;
-
-  // Tell the camera to render into the frame buffer.
-  view->Draw ();
-}
-
-void Simple::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
-bool Simple::HandleEvent (iEvent& ev)
-{
-  bool res = false;
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
-  {
-    SetupFrame ();
-    res = true;
-  }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
-  {
-    FinishFrame ();
-    res = true;
-  }
-  else if ((ev.Type == csevKeyboard) && 
-    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
-    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
-  {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-    if (q)
-      q->GetEventOutlet()->Broadcast (cscmdQuit);
-    res = true;
-  }
-
-  if (((ev.Type != csevBroadcast) || (csCommandEventHelper::GetCode(&ev) != cscmdQuit)) && vidprefs)
-  {
-    if (vidprefs->HandleEvent (ev))
-    {
-      SaveVideoPreference();
-      Restart();
-      return true;
-    }
-  }
-  return res;
-}
-
-void Simple::SaveVideoPreference()
-{
-  if (!vidprefs) return;
-  csRef<iConfigFile> userConfig (csGetPlatformConfig (GetApplicationName()));
-  csConfigAccess config (object_reg, userConfig, 
-    iConfigManager::ConfigPriorityUserApp);
-  config->SetStr ("System.Plugins.iGraphics3D", vidprefs->GetModePlugin());
-}
-
-bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
-{
-  if (!csInitializer::SetupConfigManager (object_reg, "/config/simpvs.cfg",
-    GetApplicationName()))
-    return ReportError("Failed to initialize config!");
-
-  if (!csInitializer::RequestPlugins (object_reg,
-	CS_REQUEST_VFS,
-	CS_REQUEST_ENGINE,
-	CS_REQUEST_FONTSERVER,
-	CS_REQUEST_IMAGELOADER,
-	CS_REQUEST_LEVELLOADER,
-	CS_REQUEST_REPORTER,
-	CS_REQUEST_REPORTERLISTENER,
-	CS_REQUEST_END))
-    return ReportError("Can't initialize plugins!");
-
-  if (!RegisterQueue(GetObjectRegistry()))
-    return ReportError("Failed to set up event handler!");
-
-  return true;
-}
-
-bool Simple::Application()
-{
-  // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Open())
-    return ReportError("Error opening system!");
-
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = CS_QUERY_REGISTRY (GetObjectRegistry (), iVirtualClock);
   if (!vc)
     return ReportError("Can't find the virtual clock!");
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = CS_QUERY_REGISTRY (GetObjectRegistry (), iEngine);
   if (!engine)
     return ReportError("No iEngine plugin!");
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = CS_QUERY_REGISTRY (GetObjectRegistry (), iLoader);
   if (!loader)
     return ReportError("No iLoader plugin!");
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = CS_QUERY_REGISTRY (GetObjectRegistry (), iKeyboardDriver);
   if (!kbd)
     return ReportError("No iKeyboardDriver plugin!");
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = CS_QUERY_REGISTRY (GetObjectRegistry (), iGraphics3D);
   if (!g3d)
     return ReportError("No iGraphics3D plugin!");
 
@@ -204,11 +113,128 @@ bool Simple::Application()
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   vidprefs = new csVideoPreferences ();
-  if (!vidprefs->Setup (object_reg))
+  if (!vidprefs->Setup (GetObjectRegistry ()))
   {
     delete vidprefs;
     vidprefs = 0;
   }
+
+  return true;
+}
+
+void Simple::EventHandler::SetupFrame ()
+{
+  // First get elapsed time from the virtual clock.
+  csTicks elapsed_time = vc->GetElapsedTicks ();
+
+  // Now rotate the camera according to keyboard state
+  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
+
+  iCamera* c = view->GetCamera();
+  if (kbd->GetKeyState (CSKEY_RIGHT))
+    c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
+  if (kbd->GetKeyState (CSKEY_LEFT))
+    c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
+  if (kbd->GetKeyState (CSKEY_PGUP))
+    c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
+  if (kbd->GetKeyState (CSKEY_PGDN))
+    c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
+  if (kbd->GetKeyState (CSKEY_UP))
+    c->Move (CS_VEC_FORWARD * 4 * speed);
+  if (kbd->GetKeyState (CSKEY_DOWN))
+    c->Move (CS_VEC_BACKWARD * 4 * speed);
+
+  // Tell 3D driver we're going to display 3D things.
+  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+    return;
+
+  // Tell the camera to render into the frame buffer.
+  view->Draw ();
+}
+
+void Simple::EventHandler::FinishFrame ()
+{
+  g3d->FinishDraw ();
+  g3d->Print (0);
+}
+
+bool Simple::EventHandler::HandleEvent (iEvent& ev)
+{
+  bool res = false;
+  if (ev.Name == Process)
+  {
+    SetupFrame ();
+    res = true;
+  }
+  else if (ev.Name == FinalProcess)
+  {
+    FinishFrame ();
+    res = true;
+  }
+  else if ((ev.Name == KeyboardDown) &&
+	   (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
+  {
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue));
+    if (q)
+      q->GetEventOutlet()->Broadcast (Quit);
+    res = true;
+  }
+
+  if ((!ev.Broadcast || (ev.Name!=Quit)) && vidprefs)
+  {
+    if (vidprefs->HandleEvent (ev))
+    {
+      SaveVideoPreference();
+      parent->Restart();
+      return true;
+    }
+  }
+  return res;
+}
+
+void Simple::EventHandler::SaveVideoPreference()
+{
+  if (!vidprefs) return;
+  csRef<iConfigFile> userConfig (csGetPlatformConfig (GetApplicationName()));
+  csConfigAccess config (GetObjectRegistry (), userConfig, 
+    iConfigManager::ConfigPriorityUserApp);
+  config->SetStr ("System.Plugins.iGraphics3D", vidprefs->GetModePlugin());
+}
+
+bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
+{
+  if (!csInitializer::SetupConfigManager (GetObjectRegistry (), "/config/simpvs.cfg",
+    GetApplicationName()))
+    return ReportError("Failed to initialize config!");
+
+  if (!csInitializer::RequestPlugins (GetObjectRegistry (),
+	CS_REQUEST_VFS,
+	CS_REQUEST_ENGINE,
+	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_LEVELLOADER,
+	CS_REQUEST_REPORTER,
+	CS_REQUEST_REPORTERLISTENER,
+	CS_REQUEST_END))
+    return ReportError("Can't initialize plugins!");
+
+  Handler = new EventHandler (this, GetObjectRegistry ());
+
+  if (!Handler->RegisterQueue(GetObjectRegistry(), 
+			      csevAllEvents (GetObjectRegistry ())))
+    return ReportError("Failed to set up event handler!");
+
+  return true;
+}
+
+bool Simple::Application()
+{
+  // Open the main system. This will open all the previously loaded plug-ins.
+  if (!Open())
+    return ReportError("Error opening system!");
+
+  if (!Handler->Setup ())
+    return false;
 
   Run();
 

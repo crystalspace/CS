@@ -36,6 +36,13 @@ class csWaterDemo
 {
 private:
   iObjectRegistry* object_reg;
+
+  csEventID FocusGained;
+  csEventID FocusLost;
+  csEventID Process;
+  csEventID FinalProcess;
+  csEventID KeyboardDown;
+
   csRef<iEngine> engine;
   csRef<iGraphics3D> r3d;
   csRef<iView> view;

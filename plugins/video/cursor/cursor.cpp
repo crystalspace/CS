@@ -83,8 +83,9 @@ bool csCursor::Initialize (iObjectRegistry *objreg)
   // Get event queue
   eventq = CS_QUERY_REGISTRY (reg, iEventQueue);
   if (!eventq) return false;
-  eventq->RegisterListener (&scfiEventHandler, 
-                            CSMASK_Mouse | CSMASK_FrameProcess);
+  csEventID events[3] = { csevPostProcess(reg), csevMouseEvent(reg), 
+			  CS_EVENTLIST_END };
+  eventq->RegisterListener (&scfiEventHandler, events);
 
   return true;
 }
@@ -207,7 +208,7 @@ bool csCursor::HandleEvent (iEvent &ev)
 
   if (!useOS)
   {
-    if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdPostProcess)
+    if (ev.Name == csevPostProcess(reg))
     {
       CursorInfo* ci = cursors.Get (current.GetData(), 0);
       if (!ci)
@@ -260,15 +261,17 @@ bool csCursor::HandleEvent (iEvent &ev)
     }
   }
 
-  if (ev.Type == csevMouseDown)
-  {
-    if (strcmp (current, CSCURSOR_Default) == 0) current = CSCURSOR_MouseDown;
-    return false;
-  }
-  
-  if (ev.Type == csevMouseUp)
-  {
-    if (strcmp (current, CSCURSOR_MouseDown) == 0) current = CSCURSOR_Default;
+  if (CS_IS_MOUSE_EVENT(reg, ev)) {
+    switch (csMouseEventHelper::GetEventType(&ev)) {
+    case csMouseEventTypeDown:
+      if (strcmp (current, CSCURSOR_Default) == 0) current = CSCURSOR_MouseDown;
+      break;
+    case csMouseEventTypeUp:
+      if (strcmp (current, CSCURSOR_MouseDown) == 0) current = CSCURSOR_Default;
+      break;
+    default:
+      break;
+    }
     return false;
   }
 

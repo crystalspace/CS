@@ -27,6 +27,10 @@ class AwsTutorial
 public:
   iObjectRegistry* object_reg;
 
+  csEventID Process;
+  csEventID FinalProcess;
+  csEventID KeyboardDown;
+
 private:
   csRef<iAws> aws;
   iAwsPrefManager* awsprefs;

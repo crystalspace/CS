@@ -28,6 +28,8 @@
 #include "csutil/scopedmutexlock.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
+#include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 
 class csObjectRegistryIterator : 
   public scfImplementation1<csObjectRegistryIterator, iObjectRegistryIterator>

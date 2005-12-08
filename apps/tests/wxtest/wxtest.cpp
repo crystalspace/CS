@@ -170,39 +170,39 @@ void Simple::FinishFrame ()
 
 bool Simple::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (ev.Name == csevProcess)
   {
     SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Name == csevFinalProcess)
   {
     FinishFrame ();
     return true;
   }
-  else if ((ev.Type == csevKeyboard))
+  else if (CS_IS_KEYBOARD_EVENT(ev))
   {
     csPrintf("Got key %" PRIu32 " / %" PRIu32 "\n",
            csKeyEventHelper::GetCookedCode(&ev),
            csKeyEventHelper::GetCookedCode(&ev));
-    if((csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
+    if((ev.Name == csevKeyboardDown) &&
        (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
     {
       csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-      if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+      if (q) q->GetEventOutlet()->Broadcast (csevQuit);
       return true;
     }
   }
-  else if ((ev.Type == csevMouseMove))
+  else if ((ev.Name == csevMouseMove))
   {
     csPrintf("Mouse move to %d %d\n", csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetY(&ev));
   }
-  else if ((ev.Type == csevMouseDown))
+  else if ((ev.Name == csevMouseDown))
   {
     csPrintf("Mouse button %d down at %d %d\n",
       csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetY(&ev));
   }
-  else if ((ev.Type == csevMouseUp))
+  else if ((ev.Name == csevMouseUp))
   {
     csPrintf("Mouse button %d up at %d %d\n",
       csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetY(&ev));
@@ -239,6 +239,7 @@ bool Simple::Initialize ()
     return false;
   }
 
+  csEventNameRegistry::Register (object_reg);
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

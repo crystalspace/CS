@@ -33,6 +33,7 @@
 #include "ivaria/conin.h"
 #include "iutil/vfs.h"
 #include "iutil/plugin.h"
+#include "iutil/eventnames.h"
 #include "ivideo/fontserv.h"
 #include "bot.h"
 
@@ -158,6 +159,14 @@ public:
   csRef<iPluginManager> plugin_mgr;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
+
+  csRef<iEventNameRegistry> name_reg;
+  csEventID Process;
+  csEventID FinalProcess;
+  csEventID CommandLineHelp;
+  csEventID CanvasHidden;
+  csEventID CanvasExposed;
+  csEventID CanvasResize;
 
   csRefArray<iLight> dynamic_lights;
 

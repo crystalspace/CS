@@ -126,6 +126,9 @@ private:
   csConfigAccess config;
   csSoundFormat format;
 
+  // event name (optimization)
+  CS_DECLARE_EVENT_SHORTCUTS;
+
   // Sound distance
   float dist;
   // Rolloff factor 

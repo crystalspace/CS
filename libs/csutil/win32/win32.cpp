@@ -316,7 +316,7 @@ BOOL WINAPI ConsoleHandlerRoutine (DWORD dwCtrlType)
 	if (GLOBAL_ASSISTANT != 0)
 	{
 	  GLOBAL_ASSISTANT->GetEventOutlet()->ImmediateBroadcast (
-	    cscmdQuit, 0);
+	    csevQuit, 0);
 	  return TRUE;
 	}
       }
@@ -592,10 +592,7 @@ iEventOutlet* Win32Assistant::GetEventOutlet()
 
 bool Win32Assistant::HandleEvent (iEvent& e)
 {
-  if (e.Type != csevBroadcast)
-    return false;
-
-  if (csCommandEventHelper::GetCode (&e) == cscmdPreProcess)
+  if (e.Name == csevPreProcess)
   {
     if(use_own_message_loop)
     {
@@ -609,7 +606,7 @@ bool Win32Assistant::HandleEvent (iEvent& e)
         if (!GetMessage (&msg, 0, 0, 0))
         {
           iEventOutlet* outlet = GetEventOutlet();
-          outlet->Broadcast (cscmdQuit);
+          outlet->Broadcast (csevQuit);
           return true;
         }
         TranslateMessage (&msg);
@@ -618,14 +615,14 @@ bool Win32Assistant::HandleEvent (iEvent& e)
     }
     return true;
   }
-  else if (csCommandEventHelper::GetCode (&e) == cscmdSystemOpen)
+  else if (e.Name == csevSystemOpen)
   {
     return true;
   }
-  else if (csCommandEventHelper::GetCode (&e) == cscmdSystemClose)
+  else if (e.Name == csevSystemClose)
   {
   } 
-  else if (csCommandEventHelper::GetCode (&e) == cscmdCommandLineHelp)
+  else if (e.Name == csevCommandLineHelp)
   {
 
    #ifdef CS_DEBUG 
@@ -692,7 +689,8 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
       if ((GLOBAL_ASSISTANT != 0))
       {
 	iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-        outlet->Broadcast (cscmdFocusChanged, LOWORD(wParam) != WA_INACTIVE);
+        outlet->Broadcast ((LOWORD(wParam) != WA_INACTIVE)?
+			   csevFocusGained:csevFocusLost, 0);
       }
       break;
     case WM_CREATE:
@@ -843,12 +841,12 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 	if ( (wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED) )
 	{
           iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  outlet->Broadcast (cscmdCanvasExposed, 0);
+	  outlet->Broadcast (csevCanvasExposed, 0);
 	} 
 	else if (wParam == SIZE_MINIMIZED) 
 	{
           iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  outlet->Broadcast (cscmdCanvasHidden, 0);
+	  outlet->Broadcast (csevCanvasHidden, 0);
 	}
       }
       return TRUE;
@@ -860,12 +858,12 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 	if (wParam)
 	{
           iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  outlet->Broadcast (cscmdCanvasExposed, 0);
+	  outlet->Broadcast (csevCanvasExposed, 0);
 	} 
 	else
 	{
           iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  outlet->Broadcast (cscmdCanvasHidden, 0);
+	  outlet->Broadcast (csevCanvasHidden, 0);
 	}
       }
       break;

@@ -22,6 +22,7 @@
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
 #include "csutil/cmdline.h"
+#include "csutil/eventnames.h"
 #include "csutil/cseventq.h"
 #include "csutil/csinput.h"
 #include "csutil/csshlib.h"
@@ -383,15 +384,14 @@ bool csInitializer::RequestPlugins (
 }
 
 bool csInitializer::SetupEventHandler (
-  iObjectRegistry* r, iEventHandler* evhdlr, unsigned int eventmask)
+  iObjectRegistry* r, 
+  iEventHandler* evhdlr, 
+  const csEventID events[])
 {
   CS_ASSERT(installed_event_handler == 0);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (r, iEventQueue));
-  if (q)
-  {
-    q->RegisterListener (evhdlr, eventmask);
-    installed_event_handler = evhdlr;
-    return true;
+  if (q) {
+    return (q->RegisterListener (evhdlr, events) != CS_HANDLER_INVALID);
   }
   return false;
 }
@@ -408,16 +408,26 @@ public:
   virtual ~csAppEventHandler()
   { }
   virtual bool HandleEvent (iEvent& e) { return evhdlr (e); }
+  CS_EVENTHANDLER_NAMES("application")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 
 bool csInitializer::SetupEventHandler (
-  iObjectRegistry* r, csEventHandlerFunc evhdlr_func, unsigned int eventmask)
+  iObjectRegistry* r, 
+  csEventHandlerFunc evhdlr_func, 
+  const csEventID events[])
 {
   csAppEventHandler* evhdlr = new csAppEventHandler (evhdlr_func);
-  bool rc = SetupEventHandler (r, evhdlr, eventmask);
+  bool rc = SetupEventHandler (r, evhdlr, events);
   evhdlr->DecRef ();
   return rc;
+}
+
+bool csInitializer::SetupEventHandler (iObjectRegistry* r, csEventHandlerFunc evhdlr_func)
+{
+  static const csEventID rootev[2] = { csevAllEvents (r), CS_EVENTLIST_END };
+  return SetupEventHandler(r, evhdlr_func, rootev);
 }
 
 bool csInitializer::OpenApplication (iObjectRegistry* r)
@@ -427,9 +437,8 @@ bool csInitializer::OpenApplication (iObjectRegistry* r)
   // Pass the open event to all interested listeners.
   csRef<iEventQueue> EventQueue (CS_QUERY_REGISTRY (r, iEventQueue));
   CS_ASSERT (EventQueue != 0);
-  csRef<iEvent> e(EventQueue->CreateEvent(csevBroadcast));
-  e->Add("cmdCode", (uint32)cscmdSystemOpen);
-  e->Add("cmdInfo", (uint32)0);
+  csEventID ename = csevSystemOpen(r);
+  csRef<iEvent> e = EventQueue->CreateBroadcastEvent(ename);
   EventQueue->Dispatch(*e);
 
   return true;
@@ -441,9 +450,7 @@ void csInitializer::CloseApplication (iObjectRegistry* r)
   csRef<iEventQueue> EventQueue (CS_QUERY_REGISTRY (r, iEventQueue));
   if (EventQueue)
   {
-    csRef<iEvent> e(EventQueue->CreateEvent(csevBroadcast));
-    e->Add("cmdCode", (uint32)cscmdSystemClose);
-    e->Add("cmdInfo", (uint32)0);
+    csRef<iEvent> e = EventQueue->CreateBroadcastEvent(csevSystemClose(r));
     EventQueue->Dispatch(*e);
   }
 }

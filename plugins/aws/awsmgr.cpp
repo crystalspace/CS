@@ -112,6 +112,21 @@ bool awsManager::Initialize (iObjectRegistry *object_reg)
 {
   awsManager::object_reg = object_reg;
 
+  PreProcess = csevPreProcess (object_reg);
+  MouseDown = csevMouseDown (object_reg, 0);
+  MouseUp = csevMouseUp (object_reg, 0);
+  MouseClick = csevMouseClick (object_reg, 0);
+  MouseMove = csevMouseMove (object_reg, 0);
+  KeyboardDown = csevKeyboardDown (object_reg);
+  KeyboardUp = csevKeyboardUp (object_reg);
+
+  MouseEnter = awsMouseEnter (object_reg);
+  MouseExit = awsMouseExit (object_reg);
+  LoseFocus = awsLoseFocus (object_reg);
+  GainFocus = awsGainFocus (object_reg);
+  GroupOff = awsGroupOff (object_reg);
+  FrameStart = awsFrameStart (object_reg);
+
   prefmgr = SCF_CREATE_INSTANCE("crystalspace.window.preferencemanager",
 				iAwsPrefManager);
   if (!prefmgr)
@@ -665,7 +680,7 @@ void awsManager::Redraw ()
     if (!curwin->isHidden ())
     {
       csEvent Event;
-      Event.Type = csevFrameStart;
+      Event.Name = FrameStart;
       curwin->HandleEvent (Event);
     }
     curwin = curwin->ComponentBelow ();
@@ -991,12 +1006,7 @@ void awsManager::UnSetModal()
 bool awsManager::HandleEvent (iEvent &Event)
 {  
   // Find out what kind of event it is
-  switch (Event.Type)
-  {
-  case csevMouseMove:
-  case csevMouseUp:
-  case csevMouseClick:
-  case csevMouseDown:
+  if (CS_IS_MOUSE_EVENT(object_reg, Event))
     {
       //  If there is a modal_dialog check to see if we are
       //  it or a child of it.  If not return out.
@@ -1050,10 +1060,7 @@ bool awsManager::HandleEvent (iEvent &Event)
       if (comp)
         return true;
     }
-    break;
-
-  case csevKeyboard:
-    if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
+  else if (Event.Name == KeyboardDown)
     {
       iAwsComponent *cmp = 0;
 
@@ -1165,16 +1172,11 @@ bool awsManager::HandleEvent (iEvent &Event)
         return keyb_focus->HandleEvent (Event);
         
     }
-    break;
-
-  case csevBroadcast:
-    if (csCommandEventHelper::GetCode(&Event) == cscmdPreProcess)
+  else if (Event.Name == PreProcess)
     {
       DeleteMarkedComponentsRecursively(top);
       DispatchEventRecursively(top, Event);
     }
-    break;
-  }
   
   return false;
 }
@@ -1286,12 +1288,12 @@ bool awsManager::ChangeMouseFocus(iAwsComponent *cmp, iEvent &Event)
 bool awsManager::ChangeMouseFocusHelper(iAwsComponent *cmp, iEvent &Event)
 {
   // Reusing this event, save the orignal type
-  uint8 et = Event.Type;
+  csEventID et = Event.Name;
   if (mouse_in != cmp)
   {
     if (mouse_in)
     {
-      Event.Type = csevMouseExit;
+      Event.Name = MouseExit;
       mouse_in->HandleEvent (Event);
     }
     
@@ -1302,7 +1304,7 @@ bool awsManager::ChangeMouseFocusHelper(iAwsComponent *cmp, iEvent &Event)
     // left.
     if (mouse_captured && mouse_focus)
     {
-      Event.Type = et;
+      Event.Name = et;
       return false;
     }
     
@@ -1310,18 +1312,20 @@ bool awsManager::ChangeMouseFocusHelper(iAwsComponent *cmp, iEvent &Event)
     
     if (mouse_in)
     {
-      Event.Type = csevMouseEnter;
+      Event.Name = MouseEnter;
       mouse_in->HandleEvent (Event);
     }
     
-    Event.Type = et;
+    Event.Name = et;
   }
   
   // do we need to raise the focused component?  
-  if (et == csevMouseDown)
+  if (et == MouseDown)
     RaiseComponents(cmp);
   else if (flags & AWSF_RaiseOnMouseOver &&
-    (et == csevMouseMove || et == csevMouseUp || et == csevMouseClick))
+	   (et == MouseMove || 
+	    et == MouseUp || 
+	    et == MouseClick))
   {
     RaiseComponents(cmp);
 
@@ -1336,30 +1340,29 @@ bool awsManager::ChangeMouseFocusHelper(iAwsComponent *cmp, iEvent &Event)
 void awsManager::ChangeKeyboardFocus(iAwsComponent *cmp, iEvent &Event)
 {
   // Reusing this event, save the orignal type
-  uint8 et = Event.Type;
+  csEventID et = Event.Name;
 
-  if (et == csevMouseDown 
-    ||(et == csevMouseMove && (flags & AWSF_RaiseOnMouseOver))
-    || ((et == csevKeyboard) && 
-    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&   
-    (flags & AWSF_KeyboardControl)))
+  if (et == MouseDown || 
+      (et == MouseMove && (flags & AWSF_RaiseOnMouseOver)) ||
+      ((et == KeyboardDown) && 
+       (flags & AWSF_KeyboardControl)))
   {
     if (keyb_focus != cmp)
     {
       // Create a new event for Got/Lost Focus messages
       if (keyb_focus)
       {
-        Event.Type = csevLostFocus;
+        Event.Name = LoseFocus;
         keyb_focus->HandleEvent (Event);
       }
 
       keyb_focus = cmp;
       if (keyb_focus)
       {
-        Event.Type = csevGainFocus;
+        Event.Name = GainFocus;
         keyb_focus->HandleEvent (Event);
       }
-      Event.Type = et;
+      Event.Name = et;
     }
   }
 }

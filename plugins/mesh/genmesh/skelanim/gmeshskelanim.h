@@ -35,6 +35,7 @@
 #include "csutil/refarr.h"
 #include "csutil/strhash.h"
 #include "csutil/stringarray.h"
+#include "csutil/eventnames.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshskel.h"
 #include "iutil/comp.h"
@@ -754,7 +755,11 @@ public:
     {
       return parent->HandleEvent (ev);
     }
+    CS_EVENTHANDLER_NAMES("crystalspace.mesh.genmesh.skelanim")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } *scfiEventHandler;
+
+  csEventID PreProcess;
 };
 
 #endif // __CS_GENMESHSKELANIM_H__

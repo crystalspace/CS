@@ -32,7 +32,12 @@ Simple::~Simple ()
 {
 }
 
-void Simple::ProcessFrame ()
+Simple::EventHandler::EventHandler (iObjectRegistry *object_reg) :
+  csBaseEventHandler (object_reg)
+{
+}
+
+void Simple::EventHandler::ProcessFrame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -95,14 +100,14 @@ void Simple::ProcessFrame ()
   view->Draw ();
 }
 
-void Simple::FinishFrame ()
+void Simple::EventHandler::FinishFrame ()
 {
   // Just tell the 3D renderer that everything has been rendered.
   g3d->FinishDraw ();
   g3d->Print (0);
 }
 
-bool Simple::OnKeyboard(iEvent& ev)
+bool Simple::EventHandler::OnKeyboard(iEvent& ev)
 {
   // We got a keyboard event.
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
@@ -114,12 +119,13 @@ bool Simple::OnKeyboard(iEvent& ev)
     {
       // The user pressed escape to exit the application.
       // The proper way to quit a Crystal Space application
-      // is by broadcasting a cscmdQuit event. That will cause the
+      // is by broadcasting a csevQuit event. That will cause the
       // main runloop to stop. To do that we get the event queue from
       // the object registry and then post the event.
       csRef<iEventQueue> q = 
         CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
-      if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
+      if (q.IsValid())
+	q->GetEventOutlet()->Broadcast(csevQuit (GetObjectRegistry ()));
     }
   }
   return false;
@@ -144,10 +150,13 @@ bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
-  // Now we need to setup an event handler for our application.
+  Handler = new EventHandler (GetObjectRegistry ());
+
+  // Now we need to register the event handler for our application.
   // Crystal Space is fully event-driven. Everything (except for this
   // initialization) happens in an event.
-  if (!RegisterQueue(GetObjectRegistry()))
+  if (!Handler->RegisterQueue(GetObjectRegistry(), 
+			      csevAllEvents (GetObjectRegistry ())))
     return ReportError("Failed to set up event handler!");
 
   return true;
@@ -164,6 +173,16 @@ bool Simple::Application()
   if (!OpenApplication(GetObjectRegistry()))
     return ReportError("Error opening system!");
 
+  if (Handler->SetupModules()) {
+    // This calls the default runloop. This will basically just keep
+    // broadcasting process events to keep the game going.
+    Run();
+  }
+  return true;
+}
+
+bool Simple::EventHandler::SetupModules()
+{
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
   // registered all loaded plugins with the object registry.
@@ -210,15 +229,11 @@ bool Simple::Application()
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
 
-  // This calls the default runloop. This will basically just keep
-  // broadcasting process events to keep the game going.
-  Run();
-
   return true;
 }
 
 
-void Simple::CreateRoom ()
+void Simple::EventHandler::CreateRoom ()
 {
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
@@ -254,7 +269,7 @@ void Simple::CreateRoom ()
   ll->Add (light);
 }
 
-void Simple::CreateSprites ()
+void Simple::EventHandler::CreateSprites ()
 {
   // Load a texture for our sprite.
   iTextureWrapper* txt = loader->LoadTexture ("spark",

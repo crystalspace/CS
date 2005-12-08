@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include "csutil/ref.h"
 #include "csgeom/vector3.h"
+#include "iutil/eventnames.h"
 
 struct iEngine;
 struct iLoader;
@@ -74,6 +75,10 @@ private:
   iMeshWrapper* plane;
   csRef<iLight> actor_light;
   csRef<iFont> font;
+
+  csEventID Process;
+  csEventID FinalProcess;
+  csEventID KeyboardDown;
 
   int current_view;
   IsoView views[4];

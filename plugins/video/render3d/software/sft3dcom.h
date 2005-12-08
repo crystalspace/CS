@@ -50,6 +50,8 @@ struct csTriangle;
 
 namespace cspluginSoft3d
 {
+// Forward declaration
+class csSoftwareTextureCache;
 
 #define VATTR_SPEC(x)           (CS_VATTRIB_ ## x - CS_VATTRIB_SPECIFIC_FIRST)
 #define VATTR_GEN(x)							      \
@@ -620,6 +622,8 @@ public:
     {
       return parent->HandleEvent (ev);
     }
+    CS_EVENTHANDLER_NAMES("crystalspace.graphics3d")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } * scfiEventHandler;
 
   /**\name iSoftShaderRenderInterface implementation

@@ -1902,9 +1902,13 @@ bool csEngineSequenceManager::Initialize (iObjectRegistry *r)
   object_reg = r;
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
+  PostProcess = csevPostProcess (object_reg);
+  MouseEvent = csevMouseEvent (object_reg);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
-  if (q != 0)
-    q->RegisterListener (scfiEventHandler, CSMASK_Nothing | CSMASK_MouseDown);
+  if (q != 0) {
+    csEventID events[3] = { PostProcess, MouseEvent, CS_EVENTLIST_END };
+    q->RegisterListener (scfiEventHandler, events);
+  }
 
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));
@@ -1926,8 +1930,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
 {
   // Engine sequence manager must be post because frame must
   // be rendered and this must be fired BEFORE sequence manager. @@@ HACKY
-  if (event.Type == csevBroadcast
-      && csCommandEventHelper::GetCode(&event) == cscmdPostProcess)
+  if (event.Name == PostProcess)
   {
     global_framenr++;
 
@@ -1950,7 +1953,8 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
 
     return true;
   }
-  else if (event.Type == csevMouseDown)
+  else if (CS_IS_MOUSE_EVENT(object_reg, event) &&
+	   csMouseEventHelper::GetEventType(&event) == csMouseEventTypeDown)
   {
     int mouse_x = csMouseEventHelper::GetX(&event);
     int mouse_y = csMouseEventHelper::GetY(&event);

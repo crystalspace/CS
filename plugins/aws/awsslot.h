@@ -205,6 +205,8 @@ public:
 
   /// Broadcasts a signal to all slots that are interested.
   virtual void Broadcast (uint32 signal);
+
+  iAws *WindowManager () { return owner->WindowManager(); }
 };
 
 /**

@@ -23,6 +23,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csutil/stringarray.h"
+#include "iutil/eventnames.h"
 
 struct iEngine;
 struct iSector;
@@ -58,6 +59,12 @@ public:
   iObjectRegistry* object_reg;
   csRef<iVirtualClock> vc;
   csRef<iLoader> loader;
+
+  csEventID Process;
+  csEventID FinalProcess;
+  csEventID KeyboardDown;
+  csEventID MouseDown;
+  csEventID MouseMove;
 
   DemoSequenceManager* seqmgr;
   csRef<iFont> font;

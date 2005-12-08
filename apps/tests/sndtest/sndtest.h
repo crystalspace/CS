@@ -30,10 +30,9 @@
 /**
  * The main class for the sound test.
  */
-class SndTest : public csApplicationFramework, public csBaseEventHandler
+class SndTest : public csApplicationFramework
 {
 private:
-
   /// A pointer to the 3D engine.
   csRef<iEngine> engine;
 
@@ -70,26 +69,6 @@ private:
 
   /// Current angle.
   float cur_angle;
-
-  /**
-   * Handle keyboard events - ie key presses and releases.
-   * This routine is called from the event handler in response to a 
-   * csevKeyboard event.
-   */
-  bool OnKeyboard (iEvent&);
-
-  /**
-   * Setup everything that needs to be rendered on screen. This routine
-   * is called from the event handler in response to a cscmdProcess
-   * broadcast message.
-   */
-  void ProcessFrame ();
-
-  /**
-   * Finally render the screen. This routine is called from the event
-   * handler in response to a cscmdFinalProcess broadcast message.
-   */
-  void FinishFrame ();
 
   /// Here we will create our little, simple world.
   bool CreateRoom ();
@@ -129,6 +108,42 @@ public:
    */
   bool Application ();
 
+  /**
+   * Embedded event handler.
+   */
+  class EventHandler : public csBaseEventHandler {
+  public:
+    EventHandler (SndTest *parent,
+		  iObjectRegistry *);
+
+    /**
+     * Handle keyboard events - ie key presses and releases.
+     * This routine is called from the event handler in response to a 
+     * csevKeyboard event.
+     */
+    bool OnKeyboard (iEvent&);
+    
+    /**
+     * Setup everything that needs to be rendered on screen. This routine
+     * is called from the event handler in response to a cscmdProcess
+     * broadcast message.
+     */
+    void ProcessFrame ();
+    
+    /**
+     * Finally render the screen. This routine is called from the event
+     * handler in response to a cscmdFinalProcess broadcast message.
+     */
+    void FinishFrame ();
+
+    SndTest *parent;
+    csEventID KeyboardDown;
+
+    CS_EVENTHANDLER_NAMES("crystalspace.test.sndtest")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
+  };
+
+  EventHandler *Handler;
 };
 
 #endif // __SNDTEST_H__

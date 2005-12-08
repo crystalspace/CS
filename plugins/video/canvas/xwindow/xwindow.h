@@ -41,6 +41,8 @@ class csXWindow : public iXWindow, public iEventPlug
 {
   /// The Object Registry
   iObjectRegistry *object_reg;
+  /// The name registry
+  csRef<iEventNameRegistry> name_reg;
   /// The Canvas
   iGraphics2D *Canvas;
   /// The event outlet
@@ -159,6 +161,8 @@ public:
       SCF_DESTRUCT_IBASE();
     }
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+    CS_EVENTHANDLER_NAMES("crystalspace.window")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } * scfiEventHandler;
 
   //------------------------ iEventPlug interface ---------------------------//

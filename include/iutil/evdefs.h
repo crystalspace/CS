@@ -22,6 +22,12 @@
     This file must contain only plain-C code.  Do _not_ insert C++ code.
     This file is imported by non-C++ system driver implementations.
 
+    Unfortunately, given the way the new event system works, this means
+    a lot of things that used to be macros and static values that went
+    here are now (fundamentally) C++ method invocations.  Since most of 
+    these are event names which are only really useful in conjunction 
+    with C++ event creation, subscription, and scheduling interfaces 
+    anyway, they have largely moved to csutil/eventnames.h.
 */
 
 /**\file
@@ -35,149 +41,30 @@
 #ifndef __CS_IUTIL_EVDEFS_H__
 #define __CS_IUTIL_EVDEFS_H__
 
-/**
- * System Events
- * Take care not to define more than 32 event types
- */
-typedef enum _csEventType
-{
-  /// Nothing happened	
-  csevNothing = 0,
-  /** A keyboard event (key down/up)  
-        @sa csKeyEventHelper
-        @sa csKeyEventType
-    */
-  csevKeyboard,
-  /// Mouse has been moved
-  csevMouseMove,		
-  /// A mouse button has been pressed
-  csevMouseDown,		
-  /// A mouse button has been released
-  csevMouseUp,			
-  /// A mouse button has been clicked
-  csevMouseClick,		
-  /// A mouse button has been clicked twice
-  csevMouseDoubleClick, 
-  /// A joystick axis has been moved
-  csevJoystickMove,		
-  /// A joystick button has been pressed
-  csevJoystickDown,		
-  /// A joystick button has been released
-  csevJoystickUp,		
-  /**
-   * Somebody(-thing) sent a command. @see csCommandEventData
-   */
-  csevCommand,			
-  /// Somebody(-thing) sent a broadcast command
-  csevBroadcast,		
-  /// The mouse has entered a component
-  csevMouseEnter,		
-  /// The mouse has exited a component
-  csevMouseExit,		
-  /// The component has lost keyboard focus
-  csevLostFocus,        
-  /// The component has gained keyboard focus
-  csevGainFocus,        
-  /**
-   * A component in a group has been selected,
-   * everyone else should go to their off state.
-   */
-  csevGroupOff,         
-  /// The frame is about to draw.
-  csevFrameStart        
-} csEventType;
-
-/// Keyboard event type
+/// Keyboard event type - stored as keyEventType attribute in keyboard events
 typedef enum _csKeyEventType
 {
-  /// A 'key down' event
-  csKeyEventTypeUp = 0,
   /// A 'key up' event
+  csKeyEventTypeUp = 0,
+  /// A 'key down' event
   csKeyEventTypeDown
 } csKeyEventType;
 
-/** \name Event masks
- * The event masks can be used by plugins to tell an event queue, via
- * iEventQueue::RegisterListener, which kinds of events they want to receive at
- * their HandleEvent() entry.  If a plugin registers to receive CSMASK_Nothing
- * events it is always called once per frame, so that plugin can do some
- * per-frame processing.
- * @{ */
-/**
- * Event mask: Empty event.  If a plugin registers to receive this kind of
- * events via iEventQueue::RegisterListener(plugin, CSMASK_Nothing) this has a
- * special meaning: the plugin will be called at the start of every frame and
- * at the end of every frame with an csevBroadcast event with the
- * Event.Retrieve("cmdCode") equal to either cscmdPreProcess or cscmdPostProcess.
- */
-#define CSMASK_Nothing		(1 << csevNothing)
-/**
- * The plugin will be called at the start of every frame and at the
- * end of every frame with an csevBroadcast event with the Event.Retrieve(
- * "cmdCode") equal to cscmdPreProcess, csProcess, cscmdPostProcess, or
- * cscmdFinalProcess.
- */
-#define CSMASK_FrameProcess	CSMASK_Nothing
-/// Keyboard events
-#define CSMASK_Keyboard		(1 << csevKeyboard)
-/// Mouse move events
-#define CSMASK_MouseMove	(1 << csevMouseMove)
-/// Mouse down events
-#define CSMASK_MouseDown	(1 << csevMouseDown)
-/// Mouse up events
-#define CSMASK_MouseUp		(1 << csevMouseUp)
-/// Mouse click events
-#define CSMASK_MouseClick	(1 << csevMouseClick)
-/// Mouse double click events
-#define CSMASK_MouseDoubleClick	(1 << csevMouseDoubleClick)
-/// Joystick movement events
-#define CSMASK_JoystickMove	(1 << csevJoystickMove)
-/// Joystick button down events
-#define CSMASK_JoystickDown	(1 << csevJoystickDown)
-/// Joystick button up events
-#define CSMASK_JoystickUp	(1 << csevJoystickUp)
-/// Command message events
-#define CSMASK_Command		(1 << csevCommand)
-/// Broadcast message events
-#define CSMASK_Broadcast	(1 << csevBroadcast)
+/// Mouse event type - stored as mEventType attribute in mouse events
+typedef enum _csMouseEventType
+{
+  /// A motion event
+  csMouseEventTypeMove = 0,
+  /// A 'button up' event
+  csMouseEventTypeUp,
+  /// A 'button down' event
+  csMouseEventTypeDown,
+  /// A 'click' event
+  csMouseEventTypeClick,
+  /// A 'doubleclick' event
+  csMouseEventTypeDoubleClick
+} csMouseEventType;
 
-/// This mask identifies any mouse event
-#define CSMASK_Mouse \
-  (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp | CSMASK_MouseClick | \
-   CSMASK_MouseDoubleClick)
-/// This mask identifies any joystick event
-#define CSMASK_Joystick \
-  (CSMASK_JoystickMove | CSMASK_JoystickDown | CSMASK_JoystickUp)
-/// This mask identifies any input evemt
-#define CSMASK_Input \
-  (CSMASK_Keyboard | CSMASK_Mouse | CSMASK_Joystick)
-
-// Some handy macros
-/// Check if a event is a broadcast event
-#define CS_IS_BROADCAST_EVENT(e) ((1 << (e).Type) & CSMASK_Broadcast)
-/// Check if a event is a command event
-#define CS_IS_COMMAND_EVENT(e)   ((1 << (e).Type) & CSMASK_Command)
-/// Check if a event is a keyboard event
-#define CS_IS_KEYBOARD_EVENT(e)	 ((1 << (e).Type) & CSMASK_Keyboard)
-/// Check if a event is a mouse event
-#define CS_IS_MOUSE_EVENT(e)	 ((1 << (e).Type) & CSMASK_Mouse)
-/// Check if a event is a joystick event
-#define CS_IS_JOYSTICK_EVENT(e)	 ((1 << (e).Type) & CSMASK_Joystick)
-/// Check if a event is any input event
-#define CS_IS_INPUT_EVENT(e)	 ((1 << (e).Type) & CSMASK_Input)
-/** @} */
-
-/** \name Event flags masks
- * Every event has a `flags' field which describes miscelaneous
- * aspects of the event. The following constants describes every
- * used bit of the `flags' field.
- * @{ */
-/**
- * Event flag: Ignore `true' returned from HandleEvent which says that
- * event has been processed and should not be processed anymore.
- * Normally this is set only for csevBroadcast events.
- */
-#define CSEF_BROADCAST		0x00000001
 /** @} */
 
 /**\name Modifier keys
@@ -505,6 +392,11 @@ typedef enum _csKeyCharType
  * The system driver checks it and if several event plugs generates
  * conflicting types events, one of them (the one with lower priority)
  * is disabled.
+ * <p>
+ * \todo : this should be replaced with something better.
+ * I think we can accomplish the same thing using the event namespace:
+ * no two suppliers can overlap in the event tree.  More expressive,
+ * more flexible, and doesn't lose anything we've got now.
  * @{ */
 /// Keyboard events
 #define CSEVTYPE_Keyboard	0x00000001
@@ -512,139 +404,6 @@ typedef enum _csKeyCharType
 #define CSEVTYPE_Mouse		0x00000002
 /// Joystick events
 #define CSEVTYPE_Joystick	0x00000004
-/** @} */
-
-/**
- * General Command Codes<p>
- * The list below does not contain all defined command codes; these are only
- * the most general ones.
- *<p>
- * Third-party applications should use command codes greater than these
- * standard code, for example:
- *<pre>
- * enum
- * {
- *   cscmdMyCommand1 = 0x10000000,
- *   cscmdMyCommand2,
- *   cscmdMyCommand3
- *   ...
- * }
- *</pre>
- */
-typedef enum _csCommandEventCode
-{
-  /**
-   * No command. Dunno really why it is needed but traditionally
-   * 0 stands for nothing.
-   */
-  cscmdNothing = 0,
-
-  /**
-   * The event below causes system driver to quit the event loop,
-   * even if the event loop has been entered multiple times. The
-   * quit condition is never reset thus even if you call ::Loop
-   * again, the system driver will quit immediately. Such
-   * broadcasts are posted for irreversible finalization of the
-   * application such as when user closes the application window.
-   */
-  cscmdQuit,
-
-  /**
-   * Application has changed its "focused" status.<p>
-   * This event is generated whenever user application receives/loses focus
-   * (that is, when the application itself activates or deactivates).
-   * Upon this event the application may react correspondingly - stop music,
-   * hide software mouse cursor and so on. iEnable = true in the event
-   * application receives focus and false if it loses focus.
-   * <pre>
-   * Info: NULL -> window lose focus, non-NULL -> window got focus
-   * </pre>
-   */
-  cscmdFocusChanged,
-
-  /**
-   * This event is broadcasted to all event listeners just after all modules
-   * have been initialized.
-   */
-  cscmdSystemOpen,
-
-  /**
-   * This event is broadcasted to all event listeners just before modules are
-   * about to be shutdown and unloaded (that is, the system is shutting down).
-   */
-  cscmdSystemClose,
-
-  /**
-   * This event is generated when user resizes the application window.
-   * The argument points to the graphics context that has been resized.
-   * <pre>
-   * Info: (iGraphics2D *) The context that has been resized
-   * </pre>
-   */
-  cscmdContextResize,
-
-  /**
-   * This event is sent when a graphics context is being destroyed.
-   * Usually this event is accompanyed by a shutdown
-   * but there is one exception: when a dynamic texture is closed
-   * (a dynamic texture is a graphics context as well).
-   * <pre>
-   * Info: (iGraphics2D *) The context that has been closed
-   * </pre>
-   */
-  cscmdContextClose,
-
-  /**
-   * This event is broadcasted when system driver displays the
-   * help text for all supported command-line switches. Upon reception
-   * of such event every plugin should display a short help for any
-   * of the command-line switches it supports. The general format is:
-   * <pre>&lt;2 spaces&gt;&lt;switch - 18 positions&gt;&lt;space&gt;</pre>
-   * <pre>&lt;switch description&gt;{default value}</pre>
-   * The help should be displayed to standard output.
-   */
-  cscmdCommandLineHelp,
-
-  /**
-   * Broadcasted before cscmdProcess -- on every frame --
-   * as Event.Retrieve("cmdCode") of a broadcast event.  Use the event mask
-   * CSMASK_FrameProcess to receive this pseudo-event.
-   */
-  cscmdPreProcess,
-
-  /**
-   * Broadcasted every frame as Event.Retrieve("cmdCode") of a broadcast event.
-   * Use the event mask CSMASK_FrameProcess to receive this pseudo-event.
-   */
-  cscmdProcess,
-
-  /**
-   * Broadcasted after cscmdProcess -- on every frame --
-   * as Event.Retrieve("cmdCode") of a broadcast event.  Use the event mask
-   * CSMASK_FrameProcess to receive this pseudo-event.
-   */
-  cscmdPostProcess,
-
-  /**
-   * Broadcasted after cscmdPostProcess -- on every frame --
-   * as Event.Retrieve("cmdCode") of a broadcast event.  Use the event mask
-   * CSMASK_FrameProcess to receive this pseudo-event.
-   */
-  cscmdFinalProcess,
-
-  /**
-   * Broadcast indicating that the display canvas is not currently
-   * visible to the user (such as being iconified).
-   */
-  cscmdCanvasHidden,
-
-  /**
-   * Broadcast indicating that the display canvas has just become
-   * visible (such as being uniconified).
-   */
-  cscmdCanvasExposed
-} csCommandEventCode;
-
 /** @} */
 
 #endif // __CS_IUTIL_EVDEFS_H__

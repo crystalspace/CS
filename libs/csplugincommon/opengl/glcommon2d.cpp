@@ -31,6 +31,7 @@
 #include "csplugincommon/opengl/glcommon2d.h"
 #include "csplugincommon/opengl/glstates.h"
 #include "csutil/xmltiny.h"
+#include "csutil/eventnames.h"
 
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   scfImplementationType (this, iParent), statecache (0), statecontext (0),
@@ -910,7 +911,7 @@ bool csGraphics2DGLCommon::Resize (int width, int height)
     SetClipRect (0, 0, Width, Height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
-  EventOutlet->Broadcast (cscmdContextResize, (intptr_t)this);
+  EventOutlet->Broadcast (csevCanvasResize(object_reg, this), (intptr_t)this);
   return true;
 }
 

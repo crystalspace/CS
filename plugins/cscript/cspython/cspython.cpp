@@ -135,16 +135,14 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
 
   csRef<iEventQueue> queue = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (queue.IsValid())
-    queue->RegisterListener(&scfiEventHandler, CSMASK_Broadcast);
-
+    queue->RegisterListener(&scfiEventHandler, csevCommandLineHelp(object_reg));
   return true;
 }
 
 bool csPython::HandleEvent(iEvent& e)
 {
   bool handled = false;
-  if (e.Type == csevBroadcast && 
-    csCommandEventHelper::GetCode(&e) == cscmdCommandLineHelp)
+  if (e.Name == csevCommandLineHelp(object_reg))
   {
 #undef indent
 #define indent "                     "

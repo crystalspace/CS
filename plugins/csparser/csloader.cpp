@@ -70,7 +70,6 @@
 #include "isound/renderer.h"
 #include "iutil/vfs.h"
 #include "iutil/plugin.h"
-#include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "iutil/verbositymanager.h"
@@ -968,6 +967,10 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_EMBEDDED_IBASE (csLoader::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csLoader::eiComponent::eiComponent()
+{
+}
 
 SCF_IMPLEMENT_FACTORY(csLoader)
 

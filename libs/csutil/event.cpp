@@ -21,6 +21,7 @@
 
 #include "cssysdef.h"
 #include "csutil/event.h"
+#include "csutil/csevent.h"
 
 utf32_char csKeyEventHelper::GetRawCode (const iEvent* event)
 {
@@ -82,11 +83,9 @@ csKeyCharType csKeyEventHelper::GetCharacterType (const iEvent* event)
 }
 
 bool csKeyEventHelper::GetEventData (const iEvent* event, 
-				      csKeyEventData& data)
+				     csKeyEventData& data)
 {
-  if (!CS_IS_KEYBOARD_EVENT (*event) &&
-  	!CS_IS_BROADCAST_EVENT (*event))
-    return false;
+  // if (!CS_IS_KEYBOARD_EVENT (*event)) return false; // Need an iObjectRegistry* to do this...
 
   data.autoRepeat = GetAutoRepeat (event);
   data.charType = GetCharacterType (event);
@@ -118,7 +117,76 @@ uint32 csKeyEventHelper::GetModifiersBits (const csKeyModifiers& m)
   return res;
 }
 
-//---------------------------------------------------------------------------
+csEvent *csMouseEventHelper::NewEvent 
+(csRef<iEventNameRegistry> &reg,
+ csTicks iTime, csEventID name, csMouseEventType mType, 
+ int mx, int my, uint32 axesChanged,
+ uint mButton, bool mButtonState, 
+ uint32 buttonMask, uint32 mModifiers)
+{
+  csEvent *ev = new csEvent(iTime, name, false);
+  ev->Add("mNumber", (uint8) 0);
+  ev->Add("mEventType", (mType+1));
+  int32 axes[2] = { mx, my };
+  ev->Add("mAxes", (void *) axes, 2 * sizeof(int32)); /* makes copy */
+  ev->Add("mNumAxes", (uint8) 2);
+  ev->Add("mAxesChanged", (uint32) axesChanged);
+  ev->Add("mButton", (uint8) mButton);
+  ev->Add("mButtonState", mButtonState);
+  ev->Add("mButtonMask", buttonMask);
+  ev->Add("keyModifiers", (uint32) mModifiers);
+  return ev;
+}
+
+csEvent *csMouseEventHelper::NewEvent
+(csRef<iEventNameRegistry> &reg,
+ csTicks iTime, csEventID name, int n, csMouseEventType mType, 
+ int x, int y, uint32 axesChanged, 
+ uint button, bool buttonState, 
+ uint32 buttonMask, uint32 modifiers)
+{
+  csEvent *ev = new csEvent(iTime, name, false);
+  int32 axes[2] = { x, y };
+  CS_ASSERT(reg->IsKindOf(name, csevMouseEvent(reg)));
+  ev->Add("mNumber", (uint8) n);
+  ev->Add("mEventType", (mType+1));
+  ev->Add("mAxes", (void *) axes, 2 * sizeof(int)); /* makes copy */
+  ev->Add("mNumAxes", (uint8) 2);
+  ev->Add("mAxesChanged", (uint32) axesChanged);
+  ev->Add("mButton", (uint8) button);
+  ev->Add("mButtonState", buttonState);
+  ev->Add("mButtonMask", buttonMask);
+  ev->Add("keyModifiers", (uint32) modifiers);
+  return ev;
+}
+
+csEvent *csMouseEventHelper::NewEvent
+(csRef<iEventNameRegistry> &reg,
+ csTicks iTime, csEventID name, int n, csMouseEventType mType,
+ const int *axes, uint8 numAxes, uint32 axesChanged, 
+ uint button, bool buttonState, uint32 buttonMask, uint32 modifiers)
+{
+  csEvent *ev = new csEvent (iTime, name, false);
+  CS_ASSERT(reg->IsKindOf(name, csevMouseEvent(reg)));
+  ev->Add("mNumber", (uint) n);
+  ev->Add("mEventType", (mType+1));
+  ev->Add("mAxes", (void *) axes, numAxes * sizeof(int)); /* makes copy */
+  ev->Add("mNumAxes", (uint8) numAxes);
+  ev->Add("mAxesChanged", (uint32) axesChanged);
+  ev->Add("mButton", (uint8) button);
+  ev->Add("mButtonState", button);
+  ev->Add("mButtonMask", buttonMask);
+  ev->Add("keyModifiers", (uint32) modifiers);
+  return ev;
+}
+
+csMouseEventType csMouseEventHelper::GetEventType (const iEvent* event)
+{
+  uint8 type;
+  if (event->Retrieve ("mEventType", type) != csEventErrNone)
+    return (csMouseEventType)-1;
+  return (csMouseEventType)type;
+}
 
 uint csMouseEventHelper::GetNumber (const iEvent *event)
 {
@@ -136,8 +204,8 @@ int csMouseEventHelper::GetAxis (const iEvent *event, uint axis)
   if (event->Retrieve("mNumAxes", axs) != csEventErrNone)
     return 0;
   const int32 *axdata = (int32 *) _xs;
-  if ((axis > 0) && (axis <= axs))
-    return axdata[axis - 1];
+  if ((axis >= 0) && (axis < axs))
+    return axdata[axis];
   else
     return 0;
 }
@@ -146,6 +214,13 @@ uint csMouseEventHelper::GetButton (const iEvent *event)
 {
   uint8 res = 0;
   event->Retrieve("mButton", res);
+  return res;
+}
+
+bool csMouseEventHelper::GetButtonState (const iEvent *event)
+{
+  bool res = false;
+  event->Retrieve("mButtonState", res);
   return res;
 }
 
@@ -164,9 +239,9 @@ uint csMouseEventHelper::GetNumAxes(const iEvent *event)
 }
 
 bool csMouseEventHelper::GetEventData (const iEvent* event, 
-					csMouseEventData& data)
+				       csMouseEventData& data)
 {
-  if (!CS_IS_MOUSE_EVENT (*event)) return false;
+  // if (!CS_IS_MOUSE_EVENT (*event)) return false; // Need an iObjectRegistry* to do this...
 
   const void *_ax = 0; size_t _ax_sz = 0;
   uint8 ui8;
@@ -176,7 +251,8 @@ bool csMouseEventHelper::GetEventData (const iEvent* event,
   ok = event->Retrieve("mNumAxes", ui8);
   CS_ASSERT(ok == csEventErrNone);
   data.numAxes = ui8;
-  for (uint iter=0 ; iter<CS_MAX_MOUSE_AXES ; iter++) {
+  for (uint iter=0 ; iter<CS_MAX_MOUSE_AXES ; iter++)
+  {
     if (iter<data.numAxes)
       data.axes[iter] = ((int32*)_ax)[iter];
     else
@@ -194,6 +270,47 @@ bool csMouseEventHelper::GetEventData (const iEvent* event,
 
 //---------------------------------------------------------------------------
 
+csEvent *csJoystickEventHelper::NewEvent
+(csRef<iEventNameRegistry> &reg,
+ csTicks iTime, csEventID name, int n, 
+ int x, int y, uint32 axesChanged, 
+ uint button, bool buttonState, 
+ uint32 buttonMask, uint32 modifiers)
+{
+  csEvent *ev = new csEvent (iTime, name, false);
+  int axes[2] = { x, y };
+  CS_ASSERT(reg->IsKindOf(name, csevJoystickEvent(reg)));
+  ev->Add("jsNumber", (uint8) n);
+  ev->Add("jsAxes", (void *) axes, 2 * sizeof(int)); /* makes copy */
+  ev->Add("jsNumAxes", (uint8) 2);
+  ev->Add("jsAxesChanged", (uint32) axesChanged);
+  ev->Add("jsButton", (uint8) button);
+  ev->Add("jsButtonState", buttonState);
+  ev->Add("jsButtonMask", buttonMask);
+  ev->Add("keyModifiers", (uint32) modifiers);
+  return ev;
+}
+
+csEvent *csJoystickEventHelper::NewEvent
+(csRef<iEventNameRegistry> &reg,
+ csTicks iTime, csEventID name, int n, const int *axes, 
+ uint8 numAxes, uint32 axesChanged, 
+ uint button, bool buttonState,
+ uint32 buttonMask, uint32 modifiers)
+{
+  csEvent *ev = new csEvent (iTime, name, false);
+  CS_ASSERT(reg->IsKindOf(name, csevJoystickEvent(reg)));
+  ev->Add("jsNumber", (uint8) n);
+  ev->Add("jsAxes", (void *) axes, numAxes * sizeof(int)); /* makes copy */
+  ev->Add("jsNumAxes", (uint8) numAxes);
+  ev->Add("jsAxesChanged", (uint32) axesChanged);
+  ev->Add("jsButton", (uint8) button);
+  ev->Add("jsButtonState", buttonState);
+  ev->Add("jsButtonMask", buttonMask);
+  ev->Add("keyModifiers", (uint32) modifiers);
+  return ev;
+}
+
 uint csJoystickEventHelper::GetNumber(const iEvent *event)
 {
   uint8 res = 0;
@@ -210,8 +327,8 @@ int csJoystickEventHelper::GetAxis(const iEvent *event, uint axis)
   if (event->Retrieve("jsNumAxes", axs) != csEventErrNone)
     return 0;
   const int *axdata = (int *) _xs;
-  if ((axis > 0) && (axis <= axs))
-    return axdata[axis - 1];
+  if ((axis >= 0) && (axis < axs))
+    return axdata[axis];
   else
     return 0;
 }
@@ -219,6 +336,13 @@ int csJoystickEventHelper::GetAxis(const iEvent *event, uint axis)
 uint csJoystickEventHelper::GetButton (const iEvent *event)
 {
   uint8 res = 0;
+  event->Retrieve("jsButton", res);
+  return res;
+}
+
+bool csJoystickEventHelper::GetButtonState(const iEvent *event)
+{
+  bool res = false;
   event->Retrieve("jsButton", res);
   return res;
 }
@@ -238,9 +362,9 @@ uint csJoystickEventHelper::GetNumAxes (const iEvent *event)
 }
 
 bool csJoystickEventHelper::GetEventData (const iEvent* event, 
-					   csJoystickEventData& data)
+					  csJoystickEventData& data)
 {
-  if (!CS_IS_JOYSTICK_EVENT (*event)) return false;
+  // if (!CS_IS_JOYSTICK_EVENT (*event)) return false; // Need an iObjectRegistry* to do this...
   
   const void *_ax = 0; size_t _ax_sz = 0;
   uint8 ui8;
@@ -253,7 +377,8 @@ bool csJoystickEventHelper::GetEventData (const iEvent* event,
   ok = event->Retrieve("jsNumAxes", ui8);
   data.numAxes = ui8;
   CS_ASSERT(ok == csEventErrNone);
-  for (uint iter=0 ; iter<CS_MAX_JOYSTICK_AXES ; iter++) {
+  for (uint iter=0 ; iter<CS_MAX_JOYSTICK_AXES ; iter++)
+  {
     if (iter<data.numAxes)
       data.axes[iter] = ((int32 *)_ax)[iter];
     else
@@ -269,7 +394,60 @@ bool csJoystickEventHelper::GetEventData (const iEvent* event,
   return true;
 }
 
+uint csInputEventHelper::GetButton (iEventNameRegistry *reg, const iEvent* event)
+{
+  CS_ASSERT(CS_IS_INPUT_EVENT(reg, *event));
+
+  if (CS_IS_MOUSE_EVENT(reg, *event))
+  {
+    return csMouseEventHelper::GetButton(event);
+  }
+  else if (CS_IS_JOYSTICK_EVENT(reg, *event))
+  {
+    return csJoystickEventHelper::GetButton(event);
+  }
+  else if (CS_IS_KEYBOARD_EVENT(reg, *event))
+  {
+    return 0;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+bool csInputEventHelper::GetButtonState (iEventNameRegistry *reg, const iEvent* event)
+{
+  CS_ASSERT(CS_IS_INPUT_EVENT(reg, *event));
+
+  if (CS_IS_MOUSE_EVENT(reg, *event))
+  {
+    return csMouseEventHelper::GetButtonState (event);
+  }
+  else if (CS_IS_JOYSTICK_EVENT(reg, *event))
+  {
+    return csJoystickEventHelper::GetButtonState (event);
+  }
+  else if (CS_IS_KEYBOARD_EVENT(reg, *event))
+  {
+    return ((csKeyEventHelper::GetEventType (event) == csKeyEventTypeDown)
+	    ?true:false);
+  }
+  else
+  {
+    return false;
+  }
+}
+
 //---------------------------------------------------------------------------
+
+csEvent *csCommandEventHelper::NewEvent
+(csTicks iTime, csEventID name, bool broadcast, intptr_t cInfo)
+{
+  csEvent *ev = new csEvent(iTime, name, broadcast);
+  ev->Add("cmdInfo", (int64)cInfo);
+  return ev;
+}
 
 uint csCommandEventHelper::GetCode(const iEvent* event)
 {
@@ -285,11 +463,9 @@ intptr_t csCommandEventHelper::GetInfo(const iEvent* event)
   return res;
 }
 
-bool csCommandEventHelper::GetEventData(const iEvent* event, 
+bool csCommandEventHelper::GetEventData (const iEvent* event, 
 					 csCommandEventData& data)
 {
-  if (!CS_IS_COMMAND_EVENT (*event)) return false;
-
   csEventError ok = csEventErrNone;
   uint32 ui32;
   ok = event->Retrieve("cmdCode", ui32);
@@ -301,3 +477,4 @@ bool csCommandEventHelper::GetEventData(const iEvent* event,
   CS_ASSERT(ok == csEventErrNone);
   return true;
 }
+

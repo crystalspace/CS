@@ -29,6 +29,7 @@
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
 #include "csutil/csevent.h"
+#include "csutil/eventnames.h"
 #include "csutil/event.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -187,12 +188,15 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
   CursorTime = csGetTicks ();
 
   // We want to see broadcast events
+  CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS (object_reg);
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
-
+  {
+    csEventID events[3] = { SystemOpen, SystemClose, CS_EVENTLIST_END };
+    q->RegisterListener (scfiEventHandler, events);
+  }
   return true;
 }
 
@@ -563,20 +567,16 @@ const char *csSimpleConsole::GetLine (int iLine) const
 
 bool csSimpleConsole::HandleEvent (iEvent &Event)
 {
-  switch (Event.Type)
+  if (Event.Name == SystemOpen)
   {
-    case csevBroadcast:
-      switch (csCommandEventHelper::GetCode(&Event))
-      {
-        case cscmdSystemOpen:
           SystemReady = true;
           CacheColors ();
           return true;
-        case cscmdSystemClose:
+  }
+  else if (Event.Name == SystemClose)
+  {
           SystemReady = false;
           return true;
-      }
-      break;
   }
   return false;
 }

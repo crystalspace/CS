@@ -42,9 +42,10 @@
 class awsEmbeddedComponent : public iAwsComponent
 {
   csRef<iAwsComponent> comp;
+  iAws *aws_manager;
 
 public:
-  awsEmbeddedComponent() { }
+  awsEmbeddedComponent(iAws *mgr) : aws_manager (mgr) { }
   virtual ~awsEmbeddedComponent() 
   { 
     comp->WindowManager()->ComponentDestroyed( this );
@@ -54,6 +55,9 @@ public:
   /// Gets the component owner for this (sources are embedded)
   virtual iAwsComponent *GetComponent ()
   { return this; }
+
+  iAws *GetManager ()
+  { return aws_manager; }
 
   /// Registers a slot for a signal
   virtual bool RegisterSlot (iAwsSlot *slot, unsigned long signal)

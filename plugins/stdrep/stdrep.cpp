@@ -167,8 +167,8 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
   }
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
-    q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
-
+    q->RegisterListener (scfiEventHandler, csevPostProcess(object_reg));
+  
   csRef<iConfigManager> cfg(CS_QUERY_REGISTRY (r, iConfigManager));
   if ( cfg )
   {
@@ -330,10 +330,8 @@ bool csReporterListener::Report (iReporter*, int severity,
 
 bool csReporterListener::HandleEvent (iEvent& event)
 {
-  if (event.Type == csevBroadcast)
+  if (event.Name == csevPostProcess(object_reg))
   {
-    if (csCommandEventHelper::GetCode(&event) == cscmdPostProcess)
-    {
       csScopedMutexLock lock (mutex);
       size_t l = messages.Length ();
       if (l > 0)
@@ -436,7 +434,6 @@ bool csReporterListener::HandleEvent (iEvent& event)
 	  }
         }
       }
-    }
   }
 
   return false;

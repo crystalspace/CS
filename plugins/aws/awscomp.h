@@ -31,6 +31,19 @@
 
 class awsCanvas;
 
+// The primary system mouse has entered a component
+#define awsMouseEnter(reg) (csEventNameRegistry::GetID((reg), "crystalspace.plugin.aws.mouse.enter"))
+// The primary system mouse has exited a component
+#define awsMouseExit(reg) (csEventNameRegistry::GetID((reg), "crystalspace.plugin.aws.mouse.exit"))
+// The component has lost keyboard focus
+#define awsLoseFocus(reg) (csEventNameRegistry::GetID((reg), "crystalspace.plugin.aws.focus.lost"))
+// The component has gained keyboard focus
+#define awsGainFocus(reg) (csEventNameRegistry::GetID((reg), "crystalspace.plugin.aws.focus.gained"))
+// A component in a group has been selected, everyone else should go to their off state.
+#define awsGroupOff(reg) (csEventNameRegistry::GetID((reg), "crystalspace.plugin.aws.group.off"))
+// The frame is about to start rendering
+#define awsFrameStart(reg) (csEventNameRegistry::GetID((reg), "crystalspace.plugin.aws.frame.start"))
+
 /**
  * The general idea for a component's initialization stage is like this:
  * - 1. Construction - any internal structures should be created and

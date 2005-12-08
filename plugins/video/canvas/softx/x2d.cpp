@@ -74,6 +74,8 @@ void csGraphics2DXLib::Report (int severity, const char* msg, ...)
 
 bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
 {
+  CanvasResize = csevCanvasResize (object_reg, this);
+
   if (!csGraphics2D::Initialize (object_reg))
     return false;
 
@@ -122,7 +124,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   if (q != 0)
   {
     // Tell event queue to call us on broadcast messages
-    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, csevCommandLineHelp(object_reg));
     // Create the event outlet
     EventOutlet = q->CreateEventOutlet (this);
   }
@@ -902,7 +904,7 @@ bool csGraphics2DXLib::Resize (int width, int height)
     return false;
 //    Clear (0);
 //    XSync (dpy, false);
-  EventOutlet->Broadcast (cscmdContextResize, (intptr_t)this);
+  EventOutlet->Broadcast (CanvasResize, (intptr_t)this);
   return true;
 }
 
@@ -921,8 +923,7 @@ void csGraphics2DXLib::AllowResize (bool iAllow)
 
 bool csGraphics2DXLib::HandleEvent (iEvent &Event)
 {
-  if ((Event.Type == csevBroadcast)
-      && (csCommandEventHelper::GetCode(&Event) == cscmdCommandLineHelp)
+  if ((Event.Name == csevCommandLineHelp(object_reg))
       && object_reg)
   {
     csPrintf ("Options for X-Windows 2D graphics driver:\n");

@@ -17,6 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "aws.h"
 #include "awstimer.h"
 #include "iutil/eventq.h"
 #include "iutil/event.h"
@@ -73,7 +74,7 @@ bool awsTimer::SetTimer (csTicks nTicks)
 
 bool awsTimer::HandleEvent (iEvent &Event)
 {
-  if (Event.Type == csevBroadcast && csCommandEventHelper::GetCode(&Event) == cscmdPreProcess)
+  if (Event.Name == ((awsManager*) WindowManager ())->PreProcess)
   {
     csTicks now = vc->GetCurrentTicks ();
     csTicks delta = now - start;
@@ -112,7 +113,8 @@ bool awsTimer::Start ()
     csRef<iEventQueue> eq(CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (eq)
     {
-      eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+      eq->RegisterListener (&scfiEventHandler, 
+			    csevPreProcess(object_reg));
       stopped = false;
       start = vc->GetCurrentTicks ();
     }

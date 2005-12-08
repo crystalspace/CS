@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/timer.h"
 #include "csutil/event.h"
+#include "csutil/csevent.h"
 #include "iutil/event.h"
 #include "iutil/evdefs.h"
 #include "iutil/eventh.h"
@@ -53,21 +54,26 @@ public:
   {
     return timer->HandleEvent (e);
   }
+  CS_EVENTHANDLER_NAMES("crystalspace.timer")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 
 //-----------------------------------------------------------------------
 
 
-csEventTimer::csEventTimer (iObjectRegistry* object_reg)
-  : scfImplementationType (this)  
+csEventTimer::csEventTimer (iObjectRegistry* object_reg) : 
+  scfImplementationType (this), 
+  object_reg (object_reg),
+  FinalProcess (csevFinalProcess (object_reg))
 {
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   CS_ASSERT (q != 0);
   if (q != 0)
   {
     handler = new csTimerEventHandler (this);
-    q->RegisterListener (handler, CSMASK_Nothing);
+    q->RegisterListener (handler, FinalProcess);
+
     handler->DecRef ();
   }
   else
@@ -97,9 +103,7 @@ csEventTimer::~csEventTimer ()
 
 bool csEventTimer::HandleEvent (iEvent& event)
 {
-  if (event.Type != csevBroadcast
-      || csCommandEventHelper::GetCode(&event) != cscmdFinalProcess)
-    return false;
+  CS_ASSERT(event.Name == FinalProcess);
 
   csTicks elapsed = vc->GetElapsedTicks ();
   minimum_time -= elapsed;

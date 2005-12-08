@@ -105,7 +105,7 @@ void csApplicationFramework::Quit ()
 {
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (GetObjectRegistry(), iEventQueue));
   if (q)
-    q->GetEventOutlet()->Broadcast (cscmdQuit);
+    q->GetEventOutlet()->Broadcast (csevQuit(GetObjectRegistry()));
   else
     exit (2);
 

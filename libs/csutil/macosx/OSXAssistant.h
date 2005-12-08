@@ -45,7 +45,7 @@ private:
   csRef<iEventQueue> event_queue;	// Global event queue.
   csRef<iEventOutlet> event_outlet;	// Shared event outlet.
   csRef<iVirtualClock> virtual_clock;	// Global virtual clock.
-  bool should_shutdown;			// cscmdQuit was received.
+  bool should_shutdown;			// csevQuit was received.
   bool run_always;		        // Does the run loop process events
                                         // when the app is not focused?
   csRef<iObjectRegistry> get_registry();

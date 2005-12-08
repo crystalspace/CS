@@ -688,7 +688,7 @@ void awsListBox::ClearGroup ()
 {
   csEvent Event;
 
-  Event.Type = csevGroupOff;
+  Event.Name = WindowManager()->GroupOff;
 
   iAwsComponent* cmp = Parent()->GetTopChild();
   while(cmp)
@@ -756,9 +756,8 @@ bool awsListBox::HandleEvent (iEvent &Event)
 {
   if (awsPanel::HandleEvent (Event)) return true;
 
-  switch (Event.Type)
+  if (Event.Name == WindowManager ()->GroupOff)
   {
-    case csevGroupOff:
       if (is_down && is_switch)
       {
         is_down = false;
@@ -766,7 +765,6 @@ bool awsListBox::HandleEvent (iEvent &Event)
       }
 
       return true;
-      break;
   }
 
   return false;

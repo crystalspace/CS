@@ -22,6 +22,8 @@
 
 #include "csutil/scf.h"
 #include "csutil/csunicode.h"
+#include "csutil/strset.h"
+#include "csutil/eventnames.h"
 
 #include "iutil/evdefs.h"
 
@@ -56,7 +58,7 @@ struct iEvent;
  */
 struct iEventAttributeIterator : public virtual iBase
 {
-  SCF_INTERFACE(iEventAttributeIterator, 2,0,0);
+  SCF_INTERFACE(iEventAttributeIterator, 3,0,0);
   /// Whether a next attribute is available.
   virtual bool HasNext() = 0;
   /// Return the name of the next attribute.
@@ -296,18 +298,14 @@ enum csEventAttributeType
 struct iEvent : public virtual iBase
 {
   SCF_INTERFACE(iEvent, 2,0,0);
-  /**
-   * Event type. @see csEventType
-   */
-  uint8 Type;			
-  /// Event category
-  uint8 Category;		
-  /// Even finer granularity
-  uint8 SubCategory;		
-  /// Miscelaneous event flags
-  uint8 Flags;			
+  /// Event name
+  csEventID Name;
+  /// Return event name
+  virtual const csEventID GetName() = 0;
   /// Time when the event occured
   csTicks Time;			
+  /// Ignore "true" returned by HandleEvent
+  bool Broadcast;
 
   //@{
   /**
@@ -524,12 +522,12 @@ struct iEventOutlet : public virtual iBase
    * Put a broadcast event into event queue.<p>
    * This is a generalized way to put any broadcast event into the system
    * event queue. Command code may be used to tell user application that
-   * application's focused state has changed (cscmdFocusChanged), that
-   * a graphics context has been resized (cscmdContextResize), that it
-   * has been closed (cscmdContextClose), to finish the application
-   * immediately (cscmdQuit) and so on.
+   * application's focused state has changed (e.g. csevFocusGained), that
+   * a graphics context has been resized (e.g. csevCanvasResize), that it
+   * has been closed (e.g. csevCanvasClose), to finish the application
+   * immediately (e.g. csevQuit) and so on.
    */
-  virtual void Broadcast (uint iCode, intptr_t iInfo = 0) = 0;
+  virtual void Broadcast (csEventID iName, intptr_t iInfo = 0) = 0;
 
   /**
    * This is a special routine which is called for example when the
@@ -546,7 +544,7 @@ struct iEventOutlet : public virtual iBase
    * chance to process any events only after it will be resumed (which
    * is kind of too late to process this kind of events).
    */
-  virtual void ImmediateBroadcast (uint iCode, intptr_t iInfo) = 0;
+  virtual void ImmediateBroadcast (csEventID iName, intptr_t iInfo) = 0;
 };
 
 
@@ -587,9 +585,7 @@ struct iEventCord : public virtual iBase
   virtual void SetPass (bool) = 0;
 
   /// Get the category of this cord.
-  virtual int GetCategory() const = 0;
-  // Get the subcategory of this cord.
-  virtual int GetSubcategory() const = 0;
+  virtual csEventID GetName() const = 0;
 };
 
 /** @} */

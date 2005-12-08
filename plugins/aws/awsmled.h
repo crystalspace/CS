@@ -34,8 +34,13 @@
 class awsMultiLineEdit : public awsComponent
 {
 protected:
-  struct mlEvent
+  class mlEvent
   {
+  public:
+    mlEvent(csInputDefinition inputDef, void (awsMultiLineEdit::*ring) ()) :
+      inputDef (inputDef), ring (ring)
+    {
+    }
     csInputDefinition inputDef;
     void (awsMultiLineEdit::*ring) ();
   };
@@ -50,7 +55,7 @@ protected:
 
     static int CompareEvent (mlEvent* const& Item, iEvent* const& Key)
     {
-      return Item->inputDef.Compare (csInputDefinition (Key));
+      return Item->inputDef.Compare (csInputDefinition (Item->inputDef.name_reg, Key));
     }
 
     static csArrayCmp<mlEvent*,iEvent*> EventCmp(iEvent* e)
@@ -60,9 +65,7 @@ protected:
 
     bool Add (const csInputDefinition &e, void (awsMultiLineEdit::*ring) ())
     {
-      mlEvent *ev = new mlEvent;
-      ev->inputDef = e;
-      ev->ring = ring;
+      mlEvent *ev = new mlEvent (e, ring);
       if (InsertSorted (ev, Compare) != csArrayItemNotFound)
 	return true;
       delete ev;

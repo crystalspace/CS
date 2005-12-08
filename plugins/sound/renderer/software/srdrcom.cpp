@@ -126,13 +126,21 @@ bool csSoundRenderSoftware::Initialize (iObjectRegistry *r)
   }
 
   // set event callback
+  PreProcess = csevPreProcess(object_reg);
+  SystemOpen = csevSystemOpen(object_reg);
+  SystemClose = csevSystemClose(object_reg);
+
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-    q->RegisterListener(scfiEventHandler,
-      CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
-
+  {
+    csEventID events[4] = { PreProcess,
+			    SystemOpen,
+			    SystemClose,
+			    CS_EVENTLIST_END };
+    q->RegisterListener(scfiEventHandler, events);
+  }
   return true;
 }
 
@@ -398,18 +406,20 @@ void csSoundRenderSoftware::MixingFunction()
 
 bool csSoundRenderSoftware::HandleEvent (iEvent &e)
 {
-  if (e.Type == csevCommand || e.Type == csevBroadcast) {
-    switch (csCommandEventHelper::GetCode(&e)) {
-    case cscmdPreProcess:
-      Update();
-      break;
-    case cscmdSystemOpen:
-      Open();
-      break;
-    case cscmdSystemClose:
-      Close();
-      break;
-    }
+  if (e.Name == PreProcess)
+  {
+    Update();
+    return true;
+  }
+  else if (e.Name == SystemOpen)
+  {
+    Open();
+    return true;
+  }
+  else if (e.Name == SystemClose)
+  {
+    Close();
+    return true;
   }
   return false;
 }

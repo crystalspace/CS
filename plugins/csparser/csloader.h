@@ -614,6 +614,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE(csLoader);
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
+    eiComponent();
   } scfiComponent;
 };
 

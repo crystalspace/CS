@@ -506,16 +506,16 @@ bool csGraphics2DSDL::HandleEvent (iEvent&)
       }
       case SDL_MOUSEMOTION:
       {
-          EventOutlet->Mouse (0, false, ev.motion.x, ev.motion.y);
+          EventOutlet->Mouse (-1, false, ev.motion.x, ev.motion.y);
           break;
       }
       case SDL_MOUSEBUTTONDOWN:
       case SDL_MOUSEBUTTONUP:
       {
-          int btn = (ev.button.button==1)?1:
-                    (ev.button.button==2)?3:
-                    (ev.button.button==3)?2:
-                                          0;
+          int btn = (ev.button.button==1)?0:
+                    (ev.button.button==2)?2:
+                    (ev.button.button==3)?1:
+                                          -1;
 
           if (btn)
             EventOutlet->Mouse ( btn, (bool)(ev.type==SDL_MOUSEBUTTONDOWN),

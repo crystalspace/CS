@@ -57,6 +57,8 @@ private:
   bool Close ();
   void Report (int severity, const char* msg, ...);
 
+  csEventID PreProcess;
+
  public:
   SCF_DECLARE_IBASE;
 
@@ -80,6 +82,8 @@ private:
     SCF_DECLARE_EMBEDDED_IBASE (csLinuxJoystick);
     virtual bool HandleEvent (iEvent &Event)
     { return scfParent->HandleEvent (Event); }
+    CS_EVENTHANDLER_NAMES("crystalspace.device.joystick")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } scfiEventHandler;
   friend struct eiEventHandler;
 };

@@ -420,6 +420,11 @@ struct iGraphics2D : public virtual iBase
   virtual float GetGamma () const = 0;
 
   /**
+   * Get the name of the canvas
+   */
+  virtual const char* GetName () const = 0;
+
+  /**
    * Create an off-screen canvas so you can render on a given memory
    * area. If depth==8 then the canvas will use palette mode. In that
    * case you can do SetRGB() to initialize the palette.

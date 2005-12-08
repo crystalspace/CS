@@ -67,9 +67,10 @@ bool csParticlesPhysicsSimple::Initialize (iObjectRegistry* reg)
 {
   object_reg = reg;
   // hook into eventqueue
-  csRef<iEventQueue> eq (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  PreProcess = csevPreProcess (object_reg);
+  csRef<iEventQueue> eq (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (eq == 0) return false;
-  eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+  eq->RegisterListener (&scfiEventHandler, PreProcess);
 
   vclock = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   leftover_time = 0;
@@ -146,8 +147,7 @@ void csParticlesPhysicsSimple::Stop (iParticlesObjectState *particles)
 
 bool csParticlesPhysicsSimple::HandleEvent (iEvent &event)
 {
-  if (event.Type == csevBroadcast && csCommandEventHelper::GetCode(&event)
-  	== cscmdPreProcess)
+  if (event.Name == PreProcess)
   {
     csTicks elapsed = vclock->GetElapsedTicks ();
     if (elapsed > 200) elapsed = 200;

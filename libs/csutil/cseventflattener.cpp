@@ -27,7 +27,7 @@
 
 #include "iutil/event.h"
 
-#define CS_CRYSTAL_PROTOCOL	  0x43533031
+#define CS_CRYSTAL_PROTOCOL	  0x43533032
 
 enum
 {
@@ -45,12 +45,11 @@ enum
 };
 
 
-csEventFlattenerError csEventFlattener::FlattenSize (iEvent* event, size_t& size)
+csEventFlattenerError csEventFlattener::FlattenSize (iObjectRegistry *object_reg, iEvent* event, size_t& size)
 {
   // Start count with the initial header
-  // Version(4) + packet length(8) + Type(1) + Cat(1) + SubCat(1) 
-  //    + Flags(1) + Time(4)
-  size = 20;
+  // Version(4) + packet length(8) + Time(4) + Broadcast(1) + Name Length(2) + Name(X)
+  size = 19 + strlen(csEventNameRegistry::GetString(object_reg, event->GetName())) + 1;
 
   csRef<iEventAttributeIterator> iter (event->GetAttributeIterator ());
 
@@ -73,7 +72,7 @@ csEventFlattenerError csEventFlattener::FlattenSize (iEvent* event, size_t& size
       // X for data
       size_t innerSize;
       csEventFlattenerError innerResult;
-      if ((innerResult = FlattenSize (ev, innerSize)) 
+      if ((innerResult = FlattenSize (object_reg, ev, innerSize)) 
 	!= csEventFlattenerErrorNone)
 	return innerResult;
       size += 11 + strlen(name) + innerSize;
@@ -160,7 +159,8 @@ csEventFlattenerError csEventFlattener::FlattenSize (iEvent* event, size_t& size
   return csEventFlattenerErrorNone;
 }
 
-csEventFlattenerError csEventFlattener::Flatten (iEvent* event, 
+csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
+						 iEvent* event, 
 						 char * buffer)
 {
   uint8 ui8;
@@ -172,23 +172,25 @@ csEventFlattenerError csEventFlattener::Flatten (iEvent* event,
   int64 i64;
   uint64 ui64;
   size_t size;
-  csEventFlattenerError flattenResult = FlattenSize (event, size);
+  csEventFlattenerError flattenResult = FlattenSize (object_reg, event, size);
   if (flattenResult != csEventFlattenerErrorNone)
     return flattenResult;
   csMemFile b (buffer, size, csMemFile::DISPOSITION_IGNORE);
   
   ui32 = CS_CRYSTAL_PROTOCOL;
   ui32 = csConvertEndian(ui32);
-  b.Write((char *)&ui32, sizeof(uint32));         // protocol version
+  b.Write((char *)&ui32, sizeof(uint32));              // protocol version
   ui64 = size;
   ui64 = csConvertEndian(ui64);
-  b.Write((char *)&ui64, sizeof(uint64));         // packet size
-  b.Write((char *)&event->Type, sizeof(uint8));          // iEvent.Type
-  b.Write((char *)&event->Category, sizeof(uint8));      // iEvent.Category
-  b.Write((char *)&event->SubCategory, sizeof(uint8));   // iEvent.SubCategory
-  b.Write((char *)&event->Flags, sizeof(uint8));         // iEvent.Flags
+  b.Write((char *)&ui64, sizeof(uint64));              // packet size
   ui32 = csConvertEndian((uint32)event->Time);
-  b.Write((char *)&ui32, sizeof(uint32));       // iEvent.Time
+  b.Write((char *)&ui32, sizeof(uint32));              // iEvent.Time
+  b.Write((char *)&event->Broadcast, sizeof(uint8));   // iEvent.Broadcast flag
+  const char *nameStr = csEventNameRegistry::GetString(object_reg, event->GetName());
+  ui16 = strlen(nameStr);
+  ui16 = csConvertEndian(ui16);
+  b.Write((char *)&ui16, sizeof(uint16));              // Event textual name length
+  b.Write(nameStr, strlen(nameStr)); // Event textual name
 
   csRef<iEventAttributeIterator> iter (event->GetAttributeIterator ());
 
@@ -219,7 +221,7 @@ csEventFlattenerError csEventFlattener::Flatten (iEvent* event,
 
 	  size_t innerSize;
 	  csEventFlattenerError innerResult;
-	  if ((innerResult = FlattenSize (ev, innerSize)) 
+	  if ((innerResult = FlattenSize (object_reg, ev, innerSize)) 
 	    != csEventFlattenerErrorNone)
 	    return innerResult;
 
@@ -228,7 +230,7 @@ csEventFlattenerError csEventFlattener::Flatten (iEvent* event,
 	  b.Write((char *)&ui64, sizeof(uint64));
 
 	  // XX byte data
-	  innerResult = Flatten (ev, b.GetPos() + buffer);
+	  innerResult = Flatten (object_reg, ev, b.GetPos() + buffer);
 	  if (innerResult != csEventFlattenerErrorNone)
 	    return innerResult;
 	  else
@@ -389,7 +391,8 @@ csEventFlattenerError csEventFlattener::Flatten (iEvent* event,
   return csEventFlattenerErrorNone;
 }
 
-csEventFlattenerError csEventFlattener::Unflatten (iEvent* event, 
+csEventFlattenerError csEventFlattener::Unflatten (iObjectRegistry *object_reg,
+						   iEvent* event, 
 						   const char *buffer, 
 						   size_t length)
 {
@@ -406,21 +409,25 @@ csEventFlattenerError csEventFlattener::Unflatten (iEvent* event,
   char *name;
   size_t size;
 
-  b.Read((char *)&ui32, sizeof(ui32));
+  b.Read((char *)&ui32, sizeof(ui32));                      // protocol version
   ui32 = csConvertEndian(ui32);
   if (ui32 != CS_CRYSTAL_PROTOCOL)
   {
     //csPrintf("protocol version invalid: %" PRIX32 "\n", ui32);
     return csEventFlattenerErrorWrongFormat;
   }
-  b.Read((char *)&ui64, sizeof(uint64));
+  b.Read((char *)&ui64, sizeof(uint64));                    // packet size
   size = csConvertEndian (ui64);
-  b.Read((char *)&event->Type, sizeof(uint8));          // iEvent.Type
-  b.Read((char *)&event->Category, sizeof(uint8));      // iEvent.Category
-  b.Read((char *)&event->SubCategory, sizeof(uint8));   // iEvent.SubCategory
-  b.Read((char *)&event->Flags, sizeof(uint8));         // iEvent.Flags
-  b.Read((char *)&ui32, sizeof(uint32));         // iEvent.Time
+  b.Read((char *)&ui32, sizeof(uint32));                    // iEvent.Time
   event->Time = csConvertEndian(ui32);
+  b.Read((char *)&event->Broadcast, sizeof(uint8));         // iEvent.Broadcast flag
+  b.Read((char *)&ui16, sizeof(uint16));                    // textual name length
+  ui16 = csConvertEndian (ui16);
+  char *buf = (char *) malloc(ui16+1);
+  b.Read(buf, ui16);                                        // textual name
+  buf[ui16] = '\0';
+  event->Name = csEventNameRegistry::GetID(object_reg, buf); // EventID
+  free(buf);
 
   while (b.GetPos() < size)
   {
@@ -493,8 +500,9 @@ csEventFlattenerError csEventFlattener::Unflatten (iEvent* event,
 	  csRef<iEvent> e;
 	  e.AttachNew (new csEvent ());
 	  event->Add (name, e);
-	  csEventFlattenerError unflattenResult = Unflatten (e, 
-	    buffer+b.GetPos(), ui64);
+	  csEventFlattenerError unflattenResult = 
+	    Unflatten (object_reg, e, 
+		       buffer+b.GetPos(), ui64);
 	  if (unflattenResult != csEventFlattenerErrorNone)
 	  {
 	    delete[] name;

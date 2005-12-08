@@ -24,7 +24,7 @@
 class CustomComponent : public awsEmbeddedComponent  
 {
 public:
-  CustomComponent();
+  CustomComponent(iAws* manager);
   ~CustomComponent();
 
   SCF_DECLARE_IBASE;
@@ -43,6 +43,7 @@ public:
   SCF_DECLARE_IBASE;
 
   iAwsComponent* Create();
+  iAws *aws_manager;
 };
 
 #endif // __AWSCOMP_H__

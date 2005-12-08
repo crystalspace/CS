@@ -27,6 +27,7 @@
 #include "csutil/parray.h"
 #include "csutil/strhash.h"
 #include "csutil/stringarray.h"
+#include "csutil/eventnames.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshanim.h"
 #include "iutil/comp.h"
@@ -469,7 +470,12 @@ public:
     {
       return parent->HandleEvent (ev);
     }
+    CS_EVENTHANDLER_NAMES("crystalspace.mesh.genmesh.anim")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } *scfiEventHandler;
+
+  csEventID Frame;
+  csEventID PreProcess;
 };
 
 #endif // __CS_GENMESHANIM_H__

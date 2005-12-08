@@ -224,11 +224,12 @@ bool csSequenceManager::Initialize (iObjectRegistry *r)
 {
   object_reg = r;
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-    q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
+    q->RegisterListener (scfiEventHandler, FinalProcess);
   return true;
 }
 
@@ -236,8 +237,8 @@ bool csSequenceManager::HandleEvent (iEvent &event)
 {
   // Sequence manager must be final because engine sequence manager
   // must come first. @@@ HACKY
-  if (event.Type != csevBroadcast
-      || csCommandEventHelper::GetCode(&event) != cscmdFinalProcess)
+  // \todo : convert this to a subscription ordering constraint
+  if (event.Name != FinalProcess)
     return false;
 
   if (!suspended)

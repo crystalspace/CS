@@ -96,19 +96,21 @@ awsTest::~awsTest()
 
 static bool AwsEventHandler (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (!System)
+    return false;
+  if (ev.Name == System->Process)
   {
     System->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Name == System->FinalProcess)
   {
     System->FinishFrame ();
     return true;
   }
   else
   {
-    return System ? System->HandleEvent (ev) : false;
+    return System->HandleEvent (ev);
   }
 }
 
@@ -129,6 +131,10 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!");
     return false;
   }
+
+  Process = csevProcess (object_reg);
+  FinalProcess = csevFinalProcess (object_reg);
+  KeyboardDown = csevKeyboardDown (object_reg);
 
   if (!csInitializer::SetupEventHandler (object_reg, AwsEventHandler))
   {
@@ -399,13 +405,12 @@ awsTest::FinishFrame ()
 bool
 awsTest::HandleEvent (iEvent &Event)
 {
-  if ((Event.Type == csevKeyboard) && 
-    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&
-    (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
+  if ((Event.Name == KeyboardDown) && 
+      (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
     return true;
   }
 

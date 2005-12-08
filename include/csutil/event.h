@@ -80,6 +80,9 @@ public:
 };
 /** @} */
 
+/* forward declaration */
+class csEvent;
+
 /**\name Mouse event related
  * @{ */
 /**
@@ -88,23 +91,32 @@ public:
 class CS_CRYSTALSPACE_EXPORT csMouseEventHelper
 {
 public:
-  /// Retrieve mouse number (1, 2, ...)
+  /// Create a new mouse event
+  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, csEventID name, csMouseEventType etype, int x, int y, uint32 AxesChanged, uint button, bool buttonstate, uint32 buttonMask, uint32 modifiers);
+  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, csEventID name, int n, csMouseEventType etype, int x, int y, uint32 axesChanged, uint button, bool buttonstate, uint32 buttonMask, uint32 modifiers);
+  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, csEventID name, int n, csMouseEventType etype, const int *axes, uint8 numAxes, uint32 axesChanged, uint button, bool buttonstate, uint32 buttonMask, uint32 modifiers);
+
+  /// Retrieve the event type (key up or down.)
+  CS_PURE_METHOD static csMouseEventType GetEventType (const iEvent* event);
+  /// retrieve mouse number (0, 1, ...)
   CS_PURE_METHOD static uint GetNumber(const iEvent *event);
-  /// Retrieve X value of mouse #1
+  /// retrieve X value of mouse #0
   CS_PURE_METHOD static int GetX(const iEvent *event)
-  { return csMouseEventHelper::GetAxis(event, 1); }
-  /// Retrieve Y value of mouse #1
+  { return csMouseEventHelper::GetAxis(event, 0); }
+  /// Retrieve Y value of mouse #0
   CS_PURE_METHOD static int GetY(const iEvent *event)
-  { return csMouseEventHelper::GetAxis(event, 2); }
-  /// Retrieve any axis (basis 1) value
+  { return csMouseEventHelper::GetAxis(event, 1); }
+  /// retrieve any axis (basis 0) value
   CS_PURE_METHOD static int GetAxis(const iEvent *event, uint axis);
-  /// Retrieve number of axes
+  /// retrieve number of axes
   CS_PURE_METHOD static uint GetNumAxes(const iEvent *event);
-  /// Retrieve button code
+  /// retrieve button code
   CS_PURE_METHOD static uint GetButton(const iEvent *event);
+  /// retrieve button state (pressed/released)
+  CS_PURE_METHOD static bool GetButtonState(const iEvent *event);
   /// Retrieve current button mask
   CS_PURE_METHOD static uint32 GetButtonMask(const iEvent *event);
-  /// Retrieve modifier flags
+  /// retrieve modifier flags
   CS_PURE_METHOD static void GetModifiers(const iEvent *event, 
     csKeyModifiers& modifiers) 
   { csKeyEventHelper::GetModifiers(event, modifiers); }
@@ -130,23 +142,29 @@ public:
 class CS_CRYSTALSPACE_EXPORT csJoystickEventHelper
 {
 public:
-  /// Retrieve joystick number (1, 2, ...)
+  /// Create new joystick event
+  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, csEventID name, int n, int x, int y, uint32 axesChanged, uint button, bool buttonState, uint32 buttonMask, uint32 modifiers);
+  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, csEventID name, int n, const int *axes, uint8 numAxes, uint32 axesChanged, uint button, bool buttonState, uint32 buttonMask, uint32 modifiers);
+
+  /// Retrieve joystick number (0, 1, 2, ...)
   CS_PURE_METHOD static uint GetNumber(const iEvent *event);
-  /// Retrieve axis 0 value
+  /// Retrieve axis 0 value (X)
   CS_PURE_METHOD CS_DEPRECATED_METHOD static int GetX(const iEvent *event) 
-  { return csJoystickEventHelper::GetAxis(event, 1); }
-  /// Retrieve axis 1 value
+  { return csJoystickEventHelper::GetAxis(event, 0); }
+  /// Retrieve axis 1 value (Y)
   CS_PURE_METHOD CS_DEPRECATED_METHOD static int GetY(const iEvent *event) 
-  { return csJoystickEventHelper::GetAxis(event, 2); }
-  /// Retrieve any axis (basis 1) value
+  { return csJoystickEventHelper::GetAxis(event, 1); }
+  /// retrieve any axis (basis 0) value
   CS_PURE_METHOD static int GetAxis(const iEvent *event, uint);
-  /// Retrieve number of axes
+  /// retrieve number of axes
   CS_PURE_METHOD static uint GetNumAxes(const iEvent *);
-  /// Retrieve button number
+  /// retrieve button number
   CS_PURE_METHOD static uint GetButton(const iEvent *event);
+  /// retrieve button state (pressed/released)
+  CS_PURE_METHOD static bool GetButtonState(const iEvent *event);
   /// Retrieve current button mask
   CS_PURE_METHOD static uint32 GetButtonMask(const iEvent *event);
-  /// Retrieve modifier flags
+  /// retrieve modifier flags
   static void GetModifiers(const iEvent *event, csKeyModifiers& modifiers) 
   { csKeyEventHelper::GetModifiers(event, modifiers); }
   /// Retrieve modifiers bitmask
@@ -161,15 +179,34 @@ public:
 };
 
 /** @} */
- 
+
+/**\name Generic input event stuff
+ * @{ */
+/** 
+ * Helper class to conveniently pull generic data out of input events.
+ */
+class CS_CRYSTALSPACE_EXPORT csInputEventHelper
+{
+public:
+  /// Retrieve button number (0 on error or if keyboard event)
+  CS_PURE_METHOD static uint GetButton (iEventNameRegistry *, const iEvent *event);
+  /// Retrieve button/key state (true = press, false = release)
+  CS_PURE_METHOD static bool GetButtonState (iEventNameRegistry *, const iEvent *event);
+};
+
 /**\name Command event related
  * @{ */
 /**
  * Helper class to conveniently deal with command events.
+ * Note that "command" is a vestigial event type; this class
+ * will probably go away before long.
  */
 class CS_CRYSTALSPACE_EXPORT csCommandEventHelper
 {
 public:
+  /// Create a new "command" event
+  static csEvent *NewEvent (csTicks, csEventID name, bool Broadcast, intptr_t info = 0);
+
   /// Retrieve command code
   CS_PURE_METHOD static uint GetCode(const iEvent *event);
   /// Retrieve command info

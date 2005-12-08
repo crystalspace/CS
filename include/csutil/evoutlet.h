@@ -40,8 +40,6 @@ class CS_CRYSTALSPACE_EXPORT csEventOutlet :
   public scfImplementation1<csEventOutlet, iEventOutlet>
 {
 private:
-  /// The mask of events to allow from this plug
-  unsigned EnableMask;
   /// The event plug object
   iEventPlug *Plug;
   /// The owning event queue
@@ -81,9 +79,9 @@ public:
   virtual void Joystick (uint iNumber, uint iButton, bool iDown, 
     const int32 *axes, uint numAxes);
   /// Put a broadcast event into event queue.
-  virtual void Broadcast (uint iCode, intptr_t iInfo);
+  virtual void Broadcast (csEventID iName, intptr_t iInfo);
   /// Broadcast a event to all plugins
-  virtual void ImmediateBroadcast (uint iCode, intptr_t iInfo);
+  virtual void ImmediateBroadcast (csEventID iName, intptr_t iInfo);
 };
 
 #endif // __CS_UTIL_EVOUTLET_H__

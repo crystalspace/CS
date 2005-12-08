@@ -100,12 +100,12 @@ void Cleanup ()
 
 static bool VideoEventHandler (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (ev.Name == System->Process)
   {
     System->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Name == System->FinalProcess)
   {
     System->FinishFrame ();
     return true;
@@ -140,6 +140,10 @@ bool Video::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
     return false;
   }
+
+  Process = csevProcess (object_reg);
+  FinalProcess = csevFinalProcess (object_reg);
+  KeyboardDown = csevKeyboardDown (object_reg);
 
   if (!csInitializer::SetupEventHandler (object_reg, VideoEventHandler))
   {
@@ -360,13 +364,12 @@ void Video::FinishFrame ()
 
 bool Video::HandleEvent (iEvent &Event)
 {
-  if ((Event.Type == csevKeyboard) && 
-    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&
-    (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
+  if ((Event.Name == KeyboardDown) &&
+      (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
     return true;
   }
 

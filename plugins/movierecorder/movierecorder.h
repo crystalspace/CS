@@ -161,6 +161,8 @@ public:
     {
       return parent->HandleEvent (ev);
     }
+    CS_EVENTHANDLER_NAMES("crystalspace.movierecorder")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS /* DOME : actually, we want a lot of constraints... */
   } *scfiEventHandler;
 
   /**
@@ -204,6 +206,8 @@ public:
       return parent->ClockGetCurrentTicks();
     }
   } *scfiVirtualClock;
+
+  CS_DECLARE_EVENT_SHORTCUTS;
 };
 
 #endif // __CS_MOVIERECORDER_H__

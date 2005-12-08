@@ -644,7 +644,12 @@ public:
       SCF_DESTRUCT_IBASE ();
     }
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+    CS_EVENTHANDLER_NAMES("crystalspace.utilities.sequence.engine")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } * scfiEventHandler;
+
+  csEventID PostProcess;
+  csEventID MouseEvent;
 };
 
 #endif // __CS_ENGSEQ_H__

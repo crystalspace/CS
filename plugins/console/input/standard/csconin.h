@@ -34,6 +34,7 @@
  */
 class csConsoleInput : public iConsoleInput
 {
+  csRef<iEventNameRegistry> name_reg;
   // The command history
   csStringArray History;
   size_t HistoryPos;

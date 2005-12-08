@@ -44,6 +44,9 @@ public:
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
   iObjectRegistry* object_reg;
+  csEventID Process;
+  csEventID FinalProcess;
+  csEventID KeyboardDown;
 
 public:
   PySimple ();

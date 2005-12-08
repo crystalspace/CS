@@ -44,7 +44,7 @@ private:
 public:
   /**
    * Ask for Help. This function will first send a broadcast message
-   * of type cscmdCommandLineHelp and then it will check all plugins and
+   * of type csevCommandLineHelp and then it will check all plugins and
    * see if they implement iConfig.
    * If the commandline parser is not given then the default commandline
    * parser from the registry will be used.

@@ -66,6 +66,8 @@ private:
   bool auto_update;
   bool visible;
 
+  CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
+
   void LoadPix();
   void PrepPix(iConfigFile *ini, const char *sect, ConDecoBorder &border,
     bool bgnd );
@@ -140,6 +142,21 @@ public:
       SCF_DESTRUCT_IBASE ();
     }
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+    CS_EVENTHANDLER_NAMES("crystalspace.console")
+
+    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, csEventID e) const {
+      if (e == csevSystemOpen (r2)) {
+	/* TODO : not thread-safe */
+	static csHandlerID precs[2] = { r1->GetGenericID("crystalspace.graphics3d"), CS_HANDLERLIST_END };
+	return precs;
+      } else {
+	return 0;
+      }
+    }
+    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, csEventID e) const { return 0; }
+    
+    CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
+
   } * scfiEventHandler;
 };
 

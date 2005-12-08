@@ -51,7 +51,11 @@ private:
   bool Registered;
 protected:
   iObjectRegistry* Registry;
+  csRef<iEventNameRegistry> NameRegistry;
   iEventHandler* Listener;
+  csEventID FocusChanged;
+  csEventID FocusGained;
+  csEventID FocusLost;
   csInputDriver(iObjectRegistry*);
   virtual ~csInputDriver();
   csPtr<iEventQueue> GetEventQueue();
@@ -103,6 +107,8 @@ protected:
   csKeyModifiers modifiersState;
   bool keyDebug;
   bool keyDebugChecked;
+  csEventID KeyboardUp;
+  csEventID KeyboardDown;
 
   /**
    * Set key state. For example SetKey (CSKEY_UP, true). Called
@@ -133,6 +139,9 @@ public:
   csKeyboardDriver (iObjectRegistry*);
   /// Destructor.
   virtual ~csKeyboardDriver ();
+
+  CS_EVENTHANDLER_NAMES("crystalspace.inputdriver.keyboard")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 
   /// Call to release all key down flags.
   virtual void Reset ();
@@ -182,13 +191,16 @@ public:
 
   /// Fills in the 'cooked' key code of an event with only a 'raw' key code.
   virtual csEventError SynthesizeCooked (iEvent *);
+
 };
 
 /**
  * Generic Mouse Driver.<p>
  * Mouse driver should generate events and put them into the event queue.  Also
  * it is responsible for generating double-click events. Mouse button numbers
- * are 1-based.
+ * are 0-based.
+ * \todo The csMouseDriver and csJoystickDriver shold be unified, since there's
+ * no real distinction between them under the hood.
  */
 class CS_CRYSTALSPACE_EXPORT csMouseDriver : public csInputDriver, 
   public scfImplementation2<csMouseDriver, iMouseDriver, iEventHandler>
@@ -229,31 +241,34 @@ public:
   /// Destructor.
   virtual ~csMouseDriver ();
 
+  CS_EVENTHANDLER_NAMES("crystalspace.inputdriver.mouse")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
+
   /// Set double-click mouse parameters
   virtual void SetDoubleClickTime (int iTime, size_t iDist);
 
   /// Call to release all mouse buttons.
   virtual void Reset ();
 
-  /// Query last mouse X position for mouse \#n (1, 2, ...)
-  CS_PURE_METHOD virtual int GetLastX (uint n) const { return Last[n - 1][0]; }
-  /// Query last mouse Y position for mouse \#n (1, 2, ...)
-  CS_PURE_METHOD virtual int GetLastY (uint n) const { return Last[n - 1][1]; }
-  /// Query last mouse position on axis ax (1, 2, ...) for mouse n (1, 2, ...)
+  /// Query last mouse X position for mouse \#n (0, 1, 2, ...)
+  CS_PURE_METHOD virtual int GetLastX (uint n) const { return Last[n][0]; }
+  /// Query last mouse Y position for mouse \#n (0, 1, 2, ...)
+  CS_PURE_METHOD virtual int GetLastY (uint n) const { return Last[n][1]; }
+  /// Query last mouse position on axis (0, 1, 2, ...) for mouse n (0, 1, 2, ...)
   CS_PURE_METHOD virtual int GetLast (uint n, uint axis) const
-  { return Last[n - 1][axis - 1]; }
-  /// Query last mouse axis array for mouse n (1, 2, ...)
+  { return Last[n][axis]; }
+  /// Query last mouse axis array for mouse n (0, 1, 2, ...)
   CS_PURE_METHOD virtual const int32 *GetLast (uint n) const
-  { return Last [n - 1]; }
-  /// Query the last known mouse button state for mouse \#1
+  { return Last [n]; }
+  /// Query the last known mouse button state for mouse \#0
   CS_PURE_METHOD virtual bool GetLastButton (uint button) const
-  { return GetLastButton(1, button); }
+  { return GetLastButton(0, button); }
   /// Query the last known mouse button state
   CS_PURE_METHOD virtual bool GetLastButton (uint number, uint button) const
   {
-    return (number > 0 && number <= CS_MAX_MOUSE_COUNT
-	    && button > 0 && button <= CS_MAX_MOUSE_BUTTONS) ?
-	    Button [number - 1][button - 1] : false;
+    return (number >= 0 && number < CS_MAX_MOUSE_COUNT
+	    && button >= 0 && button < CS_MAX_MOUSE_BUTTONS) ?
+	    Button [number][button] : false;
   }
 
   /// Call this to add a 'mouse button down/up' event to queue
@@ -261,19 +276,18 @@ public:
   	const int32 *axes, uint numAxes);
   virtual void DoButton (uint button, bool down, const int32 *axes,
   	uint numAxes) 
-  { DoButton (1, button, down, axes, numAxes); }
+  { DoButton (0, button, down, axes, numAxes); }
   virtual void DoButton (uint button, bool down, int x, int y)
-  { int32 axes[2] = {x, y}; DoButton (1, button, down, axes, 2); }
+  { int32 axes[2] = {x, y}; DoButton (0, button, down, axes, 2); }
   /// Call this to add a 'mouse moved' event to queue
   virtual void DoMotion (uint number, const int32 *axes, uint numAxes);
   virtual void DoMotion (const int32 *axes, uint numAxes) 
-  { DoMotion (1, axes, numAxes); }
+  { DoMotion (0, axes, numAxes); }
   virtual void DoMotion (int x, int y)
-  { int32 axes[2] = {x, y}; DoMotion (1, axes, 2); }
+  { int32 axes[2] = {x, y}; DoMotion (0, axes, 2); }
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
   virtual void GainFocus() { }
-
 
 };
 
@@ -281,7 +295,7 @@ public:
  * Generic Joystick driver.<p>
  * The joystick driver is responsible for tracking current
  * joystick state and also for generating joystick events.
- * Joystick numbers and button numbers are 1-based.
+ * Joystick numbers and button numbers are 0-based.
  */
 class CS_CRYSTALSPACE_EXPORT csJoystickDriver : public csInputDriver,
   public scfImplementation2<csJoystickDriver, iJoystickDriver, iEventHandler>
@@ -289,6 +303,7 @@ class CS_CRYSTALSPACE_EXPORT csJoystickDriver : public csInputDriver,
 private:
   // Generic keyboard driver (for checking modifier key states).
   csRef<iKeyboardDriver> Keyboard;
+
 protected:
   /**
    * Joystick button states
@@ -311,25 +326,28 @@ public:
   /// Destructor.
   virtual ~csJoystickDriver ();
 
+  CS_EVENTHANDLER_NAMES("crystalspace.inputdriver.joystick")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
+
   /// Call to release all joystick buttons.
   virtual void Reset ();
 
   /// Query last joystick X position
   CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastX (uint number) const 
-  { return Last [number - 1][0]; }
+  { return Last [number][0]; }
   /// Query last joystick Y position
   CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastY (uint number) const 
-  { return Last [number - 1][1]; }
+  { return Last [number][0]; }
   CS_PURE_METHOD virtual const int32 *GetLast (uint number) const 
-  { return Last [number - 1]; }
+  { return Last [number]; }
   CS_PURE_METHOD virtual int GetLast (uint number, uint axis) const 
-  { return Last [number - 1][axis - 1]; }
+  { return Last [number][axis]; }
   /// Query the last known joystick button state
   CS_PURE_METHOD virtual bool GetLastButton (uint number, uint button) const
   {
-    return (number > 0 && number <= CS_MAX_JOYSTICK_COUNT
-         && button > 0 && button <= CS_MAX_JOYSTICK_BUTTONS) ?
-            Button [number - 1][button - 1] : false;
+    return (number >= 0 && number < CS_MAX_JOYSTICK_COUNT
+         && button >= 0 && button < CS_MAX_JOYSTICK_BUTTONS) ?
+            Button [number][button] : false;
   }
 
   /// Call this to add a 'joystick button down/up' event to queue

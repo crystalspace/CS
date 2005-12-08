@@ -63,6 +63,8 @@ public:
     {
       return scfParent->HandleEvent (Event);
     }
+    CS_EVENTHANDLER_NAMES("crystalspace.aws.timer");
+    CS_EVENTHANDLER_NIL_CONSTRAINTS;
   }
   scfiEventHandler;
 };

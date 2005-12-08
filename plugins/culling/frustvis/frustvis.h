@@ -95,6 +95,7 @@ public:
 
 private:
   iObjectRegistry *object_reg;
+  csEventID CanvasResize;
   csKDTree* kdtree;
   // Ever growing box of all objects that were ever in the tree.
   // This puts an upper limit of all boxes in the kdtree itself because
@@ -197,6 +198,8 @@ public:
       if (parent) return parent->HandleEvent (ev);
       else return false;
     }
+    CS_EVENTHANDLER_NAMES("crystalspace.frustvis")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } * scfiEventHandler;
 
   struct eiComponent : public iComponent

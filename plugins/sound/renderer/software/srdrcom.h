@@ -62,6 +62,11 @@ class csSoundRenderSoftware : public iSoundRender
   csRef<csCondition> data;
   csRef<csThread> mixer;
 
+  // event names (optimization)
+  csEventID PreProcess;
+  csEventID SystemOpen;
+  csEventID SystemClose;
+
 public:
   SCF_DECLARE_IBASE;
   // The system driver.
@@ -156,6 +161,8 @@ public:
       SCF_DESTRUCT_IBASE();
     }
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+    CS_EVENTHANDLER_NAMES("crystalspace.sound")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } * scfiEventHandler;
 };
 

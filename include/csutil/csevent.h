@@ -1,7 +1,7 @@
 /*
     Crystal Space 3D engine: Event class interface
     Written by Andrew Zabolotny <bit@eltech.ru>, Jonathan Tarbox, 
-      Frank Richter
+      Frank Richter, Adam D. Bradley <artdodge@cs.bu.edu>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -29,6 +29,12 @@
 #include "csutil/weakref.h"
 
 #include "iutil/event.h"
+#include "hashr.h"
+#include "csendian.h"
+#include "weakref.h"
+#include "cseventq.h"
+#include "strset.h"
+#include "eventnames.h"
 
 class csEventQueue;
 
@@ -37,6 +43,7 @@ class csEventQueue;
  */
 
 class csEventAttributeIterator;
+class csEvent;
 
 /**
  * This class represents a system event.<p>
@@ -162,6 +169,7 @@ private:
   static char const* GetTypeName (csEventAttributeType t);
   static csStringID GetKeyID (const char* key);
   static const char* GetKeyName (csStringID id);
+
 protected:
   virtual csRef<iEvent> CreateEvent();
 
@@ -175,28 +183,18 @@ public:
    */
   csEvent (csEvent const&);
 
-  /// Create a mouse event object (old interface)
-  csEvent (csTicks, int type, int x, int y, uint button, uint32 buttonMask, uint32 modifiers);
-
-  /// Create a joystick event object (old interface)
-  csEvent (csTicks, int type, uint n, int x, int y, uint32 axesChanged, 
-	   uint button, uint32 buttonMask, uint32 modifiers);
-
   /**
-   * Create an enumerated pointer (mouse/joystick) event object (newer
-   * interface)
+   * Basic constructor.
    */
-  csEvent (csTicks, int type, uint n, const int32 *axes, uint8 numAxes, 
-	   uint32 axesChanged, uint8 button, uint32 buttonMask, uint32 modifiers);
-
-  /// Create a command event object
-  csEvent (csTicks, int type, uint code, intptr_t info = 0);
+  csEvent (csTicks iTime, csEventID iName, bool iBroadcast);
 
   /// Destructor
   virtual ~csEvent ();
 
-  /// Add a named event with a given parameter.
+  /// Return the event's name
+  const csEventID GetName();
 
+  /// Add a named parameter and typed value
 #define CS_CSEVENT_ADDINT(type)					\
   virtual bool Add (const char* name, type value)		\
   { return InternalAddInt (name, value); }

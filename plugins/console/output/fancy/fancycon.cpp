@@ -26,6 +26,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/csstring.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "csutil/sysfunc.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
@@ -127,11 +128,15 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
   ImageLoader = 0;
 
   // Tell event queue that we want to handle broadcast events
+  CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS (object_reg);
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
+  {
+    csEventID events[3] = { SystemOpen, SystemClose, CS_EVENTLIST_END };
+    q->RegisterListener (scfiEventHandler, events);
+  }
 
   int x, y, w, h;
   base->PerformExtension("GetPos", &x, &y, &w, &h);
@@ -142,12 +147,8 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
 
 bool csFancyConsole::HandleEvent (iEvent &Event)
 {
-  switch (Event.Type)
+  if (Event.Name == SystemOpen)
   {
-    case csevBroadcast:
-      switch (csCommandEventHelper::GetCode(&Event))
-      {
-        case cscmdSystemOpen:
           system_ready = true;
 	  if (!pix_loaded)
 	  {
@@ -156,11 +157,11 @@ bool csFancyConsole::HandleEvent (iEvent &Event)
 	    pix_loaded = true;
 	  }
           return true;
-        case cscmdSystemClose:
+  }
+  else if (Event.Name == SystemClose)
+  {
           system_ready = false;
           return true;
-      }
-      break;
   }
   return false;
 }
@@ -531,6 +532,7 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
     if (Fbuf)
     {
       iTextureManager *tm = G3D->GetTextureManager ();
+      CS_ASSERT (tm != 0);
       csRef<iImage> image (
         ImageLoader->Load (Fbuf, tm->GetTextureFormat ()));
       if (image)

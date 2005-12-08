@@ -28,9 +28,9 @@
 #include "iutil/event.h"
 #include "csutil/scfstr.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include "iaws/awsdefs.h"
 #include "ivideo/graph2d.h"
-#include "csutil/event.h"
 #include "awsgbl.h"
 #include "awsbl.h"
 
@@ -447,67 +447,58 @@ bool awsComponent::HandleEvent (iEvent &Event)
     }\
   }
 
-  switch (Event.Type)
+  if (Event.Name == wmgr->MouseMove)
   {
-  case csevMouseMove:
-    {
       SAVE_COMP(self)
       bool r = self->OnMouseMove (csMouseEventHelper::GetButton(&Event),
 				  csMouseEventHelper::GetX(&Event),
 				  csMouseEventHelper::GetY(&Event));
       UNSAVE_COMP(self)
       return r;
-    }
-    break;
-  case csevMouseUp:
-    {
+  } 
+  else if (Event.Name == wmgr->MouseUp)
+  {
       SAVE_COMP(self)
       bool r = self->OnMouseUp (csMouseEventHelper::GetButton(&Event), 
 				csMouseEventHelper::GetX(&Event),
 				csMouseEventHelper::GetY(&Event));
       UNSAVE_COMP(self)
       return r;
-    }
-    break;
-  case csevMouseDown:
-    {
+  }
+  else if (Event.Name == wmgr->MouseDown)
+  {
       SAVE_COMP(self)
       bool r = self->OnMouseDown (csMouseEventHelper::GetButton(&Event), 
 				  csMouseEventHelper::GetX(&Event),
 				  csMouseEventHelper::GetY(&Event));
       UNSAVE_COMP(self)
       return r;
-    }
-    break;
-  case csevMouseClick:
-    {
+  }
+  else if (Event.Name == wmgr->MouseClick)
+  {
       SAVE_COMP(self)
       bool r = self->OnMouseClick (csMouseEventHelper::GetButton(&Event), 
 				   csMouseEventHelper::GetX(&Event),
 				   csMouseEventHelper::GetY(&Event));
       UNSAVE_COMP(self)
       return r;
-    }
-    break;
-  case csevMouseEnter:
-    {
+  } 
+  else if (Event.Name == wmgr->MouseEnter)
+  {
       SAVE_COMP(self)
       bool r = self->OnMouseEnter ();
       UNSAVE_COMP(self)
       return r;
-    }
-    break;
-  case csevMouseExit:
-    {
+  }
+  else if (Event.Name == wmgr->MouseExit)
+  {
       SAVE_COMP(self)
       bool r = self->OnMouseExit ();
       UNSAVE_COMP(self)
       return r;
-    }
-    break;
-  case csevKeyboard:
-    if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
-    {
+  }
+  else if (Event.Name == wmgr->KeyboardDown)
+  {
       csKeyEventData eventData;
       csKeyEventHelper::GetEventData (&Event, eventData);
       {
@@ -516,34 +507,29 @@ bool awsComponent::HandleEvent (iEvent &Event)
         UNSAVE_COMP(self)
         return r;
       }
-    }
-    else
+  }
+  else if (Event.Name == wmgr->KeyboardUp)
       return false;
-    break;
-  case csevGainFocus:
-    {
+  else if (Event.Name == wmgr->GainFocus)
+  {
       SAVE_COMP(self)
       bool r = self->OnGainFocus ();
       UNSAVE_COMP(self)
       return r;
-    }
-    break;
-  case csevLostFocus:
-    {
+  }
+  else if (Event.Name == wmgr->LoseFocus)
+  {
       SAVE_COMP(self)
       bool r = self->OnLostFocus ();
       UNSAVE_COMP(self)
       return r;
-    }
-    break;
-  case csevFrameStart:
-    {
+  }
+  else if (Event.Name == wmgr->FrameStart)
+  {
       SAVE_COMP(self)
       bool r = self->OnFrame ();
       UNSAVE_COMP(self)
       return r;
-    }
-    break;
   }
   return false;
 

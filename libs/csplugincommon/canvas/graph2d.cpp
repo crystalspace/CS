@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include "csplugincommon/canvas/graph2d.h"
@@ -41,6 +42,8 @@
 
 csGraphics2D::csGraphics2D (iBase* parent) : scfImplementationType (this, parent)
 {
+  static uint g2d_count = 0;
+
   scfiEventHandler = 0;
   Memory = 0;
   LineAddress = 0;
@@ -56,6 +59,11 @@ csGraphics2D::csGraphics2D (iBase* parent) : scfImplementationType (this, parent
   AllowResizing = false;
   refreshRate = 0;
   vsync = false;
+
+  char buffer[32];
+  snprintf(buffer, 31, "graph2d.%x", g2d_count++);
+  name = strdup(buffer);
+
   fontCache = 0;
 }
 
@@ -124,8 +132,12 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
     scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
-
+  {
+    csEventID events[3] = { csevSystemOpen (object_reg), 
+			    csevSystemClose (object_reg), 
+			    CS_EVENTLIST_END };
+    q->RegisterListener (scfiEventHandler, events);
+  }
   return true;
 }
 
@@ -213,6 +225,11 @@ void csGraphics2D::ChangeDepth (int d)
   Depth = d;
 }
 
+const char* csGraphics2D::GetName() const
+{
+  return name;
+}
+
 void csGraphics2D::CreateDefaultFontCache ()
 {
   if (!fontCache)
@@ -237,21 +254,20 @@ void csGraphics2D::CreateDefaultFontCache ()
 
 bool csGraphics2D::HandleEvent (iEvent& Event)
 {
-  if (Event.Type == csevBroadcast)
-    switch (csCommandEventHelper::GetCode(&Event))
-    {
-      case cscmdSystemOpen:
-      {
-        Open ();
-        return true;
-      }
-      case cscmdSystemClose:
-      {
-        Close ();
-        return true;
-      }
-    }
-  return false;
+  if (Event.Name == csevSystemOpen (object_reg))
+  {
+    Open ();
+    return true;
+  }
+  else if (Event.Name == csevSystemClose (object_reg))
+  {
+    Close ();
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 bool csGraphics2D::Open ()
@@ -648,15 +664,20 @@ bool csGraphics2D::CLIPt(float denom, float num, float& tE, float& tL)
 {
     float t;
 
-    if(denom > 0) {
+    if(denom > 0)
+    {
         t = num / denom;
         if(t > tL) return false;
         else if(t > tE) tE = t;
-    } else if(denom < 0) {
+    }
+    else if(denom < 0)
+    {
         t = num / denom;
         if(t < tE) return false;
         else if(t < tL) tL = t; // note: there is a mistake on this line in the C edition of the book!
-    } else if(num > 0) return false;
+    }
+    else 
+      if(num > 0) return false;
     return true;
 }
 
@@ -679,9 +700,12 @@ bool csGraphics2D::ClipLine (float &x0, float &y0, float &x1, float &y1,
     float dy = y1 - y0;
     bool visible = false;
 
-    if(dx == 0 && dy == 0 && x0 >= xmin && y0 >= ymin && x0 < xmax && y0 < ymax) {
+    if(dx == 0 && dy == 0 && x0 >= xmin && y0 >= ymin && x0 < xmax && y0 < ymax) 
+    {
         visible = true;
-    } else {
+    }
+    else
+    {
         float tE = 0.0;
         float tL = 1.0;
         if(CLIPt(dx, xmin - x0, tE, tL))
@@ -690,11 +714,13 @@ bool csGraphics2D::ClipLine (float &x0, float &y0, float &x1, float &y1,
                     if(CLIPt(-dy, y0 - ymax, tE, tL))
                     {
                         visible = true;
-                        if(tL < 1.0) {
+                        if(tL < 1.0)
+			{
                             x1 = x0 + tL * dx;
                             y1 = y0 + tL * dy;
                         }
-                        if(tE > 0) {
+                        if(tE > 0)
+			{
                             x0 += tE * dx;
                             y0 += tE * dy;
                         }

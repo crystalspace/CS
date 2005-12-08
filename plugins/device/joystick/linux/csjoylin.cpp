@@ -85,8 +85,7 @@ bool csLinuxJoystick::Initialize (iObjectRegistry *oreg)
 #define CS_MAX_LINUX_JOYSTICK_AXES CS_MAX_JOYSTICK_AXES
 bool csLinuxJoystick::HandleEvent (iEvent& ev)
 {
-  if (ev.Type != csevBroadcast ||
-      csCommandEventHelper::GetCode(&ev) != cscmdPreProcess)
+  if (ev.Name != PreProcess)
     return false;
 
   struct js_event js;
@@ -107,11 +106,11 @@ bool csLinuxJoystick::HandleEvent (iEvent& ev)
       {
       case JS_EVENT_BUTTON:
         jd.button[js.number] = js.value;
-        EventOutlet->Joystick (jd.number, js.number + 1, js.value,
+        EventOutlet->Joystick (jd.number, js.number, js.value,
 			       axisread, jd.nAxes);
         break;
       case JS_EVENT_AXIS:
-        EventOutlet->Joystick (jd.number, 0, 0, 
+        EventOutlet->Joystick (jd.number, (uint) -1, 0, 
 			       axisread, jd.nAxes);
         break;
       }
@@ -200,11 +199,11 @@ bool csLinuxJoystick::Init ()
       Report (CS_REPORTER_SEVERITY_NOTIFY,
               "Joystick number %d (%s) has %hhu axes and %hhu buttons.\n"
 	      "Driver version is %d.%d.%d.\n",
-	      n + 1, name, axes, buttons,
+	      n, name, axes, buttons,
 	      version >> 16, (version >> 8) & 0xff, version & 0xff);
 
       joydata& jd = joystick[n];
-      jd.number = n + 1; // CS joystick numbers are 1-based.
+      jd.number = n; // CS joystick numbers are 0-based.
       jd.fd = fd;
       jd.nButtons = buttons;
       jd.nAxes = axes;
@@ -216,10 +215,11 @@ bool csLinuxJoystick::Init ()
     }
 
     // hook into eventqueue
+    PreProcess = csevPreProcess (object_reg);
     csRef<iEventQueue> eq (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (eq != 0)
     {
-      eq->RegisterListener (&scfiEventHandler, CSMASK_FrameProcess);
+      eq->RegisterListener (&scfiEventHandler, PreProcess);
       EventOutlet = eq->CreateEventOutlet (&scfiEventPlug);
       bHooked = true;
     }

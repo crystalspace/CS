@@ -1,8 +1,9 @@
-/*
-  Crystal Space Windowing System: Event manager
+ /*
+  Crystal Space - Event Queue Implementation
   Copyright (C) 1998 by Jorrit Tyberghein
   Copyright (C) 2001 by Eric Sunshine <sunshine@sunshineco.com>
   Partially written by Andrew Zabolotny <bit@freya.etu.ru>
+  Copyright (C) 2005 by Adam D. Bradley <artdodge@cs.bu.edu>
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,38 +18,63 @@
   You should have received a copy of the GNU Library General Public
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+  TODO: make this reentrant again
 */
 
 #include "cssysdef.h"
 #include <stddef.h>
+#include "csutil/ref.h"
 #include "csutil/csevcord.h"
 #include "csutil/csevent.h"
 #include "csutil/cseventq.h"
 #include "csutil/evoutlet.h"
 #include "csutil/sysfunc.h"
 #include "iutil/eventh.h"
+#include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 
 
-
-csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) 
-  : scfImplementationType (this),
-  Registry(r), EventQueue(0), evqHead(0), evqTail(0), Length(0),
-  busy_looping (0), delete_occured (false), EventPool(0)
+csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) : 
+  scfImplementationType (this),
+  Registry(r), 
+  NameRegistry(csEventNameRegistry::GetRegistry(r)),
+  HandlerRegistry(csEventHandlerRegistry::GetRegistry(r)),
+  EventQueue(0), evqHead(0), evqTail(0), Length(0),
+  EventTree(0), EventPool(0)
 {
   Mutex = csMutex::Create();
   Resize (iLength);
   // Create the default event outlet.
   EventOutlets.Push (new csEventOutlet (0, this, Registry));
+  csRef<iEventNameRegistry> name_reg;
+  EventTree = csEventTree::CreateRootNode(HandlerRegistry, NameRegistry, this);
+
+  Frame = csevFrame (NameRegistry);
+  PreProcess = csevPreProcess (NameRegistry);
+  ProcessEvent = csevProcess (NameRegistry);
+  PostProcess = csevPostProcess (NameRegistry);
+  FinalProcess = csevFinalProcess (NameRegistry);
+
+  PreProcessEventDispatcher = new PreProcessFrameEventDispatcher (this);
+  ProcessEventDispatcher = new ProcessFrameEventDispatcher (this);
+  PostProcessEventDispatcher = new PostProcessFrameEventDispatcher (this);
+  FinalProcessEventDispatcher = new FinalProcessFrameEventDispatcher (this);
+
+  if (!Subscribe (PreProcessEventDispatcher, Frame) ||
+      !Subscribe (ProcessEventDispatcher, Frame) ||
+      !Subscribe (PostProcessEventDispatcher, Frame) ||
+      !Subscribe (FinalProcessEventDispatcher, Frame)) {
+    CS_ASSERT(0);
+  }
 }
 
 csEventQueue::~csEventQueue ()
 {
   // We don't allow deleting the event queue from within an event handler.
-  CS_ASSERT (busy_looping <= 0);
   Clear();
   if (EventQueue)
     delete[] EventQueue;
-  RemoveAllListeners ();
   EventOutlets.Get(0)->DecRef(); // The default event outlet which we created.
   while (EventPool) 
   {
@@ -56,6 +82,8 @@ csEventQueue::~csEventQueue ()
     EventPool->Free();
     EventPool = e;
   }
+  csEventTree::DeleteRootNode(EventTree); // Magic!
+  EventTree = NULL;
 }
 
 uint32 csEventQueue::CountPool()
@@ -71,7 +99,7 @@ uint32 csEventQueue::CountPool()
   return count;
 }
 
-csPtr<iEvent> csEventQueue::CreateEvent(uint8 type) 
+iEvent *csEventQueue::CreateRawEvent ()
 {
   csPoolEvent *e;
   if (EventPool) 
@@ -83,29 +111,55 @@ csPtr<iEvent> csEventQueue::CreateEvent(uint8 type)
   {
     e = new csPoolEvent(this);
   }
-  e->Type = type;
+  return e;
+}
+
+csPtr<iEvent> csEventQueue::CreateEvent ()
+{
+  iEvent *e = CreateRawEvent ();
+  e->Name = 0;
+  e->Broadcast = 0;
   e->Time = csGetTicks();
-  e->Category = 0;
-  e->SubCategory = 0;
-
-  //@@@ Set here the right event's flag. This seems to me an ugly hack
-  //more than a bug fixed. I think that something should be redesigned.
-  //For example, we could remove the 'Flags' field
-  //from iEvent since it seems pretty unused (ie the only possible
-  //flag used is CSEF_BROADCAST). When we would like to detect if the event
-  //is a "broadcasted" event, instead of detecting the presence
-  //of that flag, we could simply test for the iEvent::Type being equal to
-  //csevBroadcast.     Luca
-  if (type == csevBroadcast)
-    e->Flags = CSEF_BROADCAST;
-  else
-    e->Flags = 0;
-
   return csPtr<iEvent>((iEvent*)e);
 }
- 
+
+csPtr<iEvent> csEventQueue::CreateEvent (const csEventID &name, bool broadcast) 
+{
+  iEvent *e = CreateRawEvent ();
+  e->Name = name;
+  e->Broadcast = broadcast;
+  e->Time = csGetTicks();
+  return csPtr<iEvent>((iEvent*)e);
+}
+
+csPtr<iEvent> csEventQueue::CreateEvent (const csEventID &name)
+{ 
+  return CreateEvent (name, false);
+}
+
+csPtr<iEvent> csEventQueue::CreateEvent (const char *name) 
+{ 
+  return CreateEvent (NameRegistry->GetID(name), false); 
+}
+
+csPtr<iEvent> csEventQueue::CreateBroadcastEvent (const csEventID &name) 
+{ 
+  return CreateEvent (name, true); 
+}
+
+csPtr<iEvent> csEventQueue::CreateBroadcastEvent (const char *name)
+{
+  return CreateEvent (NameRegistry->GetID(name), true); 
+}
+
 void csEventQueue::Post (iEvent *Event)
 {
+#ifdef ADB_DEBUG
+  std::cerr << "Queuing up event " 
+	    << NameRegistry->GetString(Event->Name) 
+	    << " (" << Event->Time << ")"
+	    << std::endl;
+#endif
 again:
   Lock ();
   size_t newHead = evqHead + 1;
@@ -137,6 +191,15 @@ csPtr<iEvent> csEventQueue::Get ()
     ev = (iEvent*)EventQueue [oldTail];
     Unlock ();
   }
+#ifdef ADB_DEBUG
+  if (ev != 0)
+    std::cerr << "Returning head of queue " 
+	      << NameRegistry->GetString(ev->Name)
+	      << " (" << ev->Time << ")"
+	      << std::endl;
+  else
+    std::cerr << "Returning head of queue (null)" << std::endl;
+#endif
   return ev;
 }
 
@@ -183,48 +246,24 @@ void csEventQueue::Resize (size_t iLength)
   Unlock ();
 }
 
-void csEventQueue::StartLoop ()
+void csEventQueue::Notify (const csEventID &name)
 {
-  busy_looping++;
-}
+#ifdef ADB_DEBUG
+  std::cerr << "Doing notify (immediate broadcast) to " << NameRegistry->GetString(name) << std::endl;
+#endif
 
-void csEventQueue::EndLoop ()
-{
-  busy_looping--;
-  if (busy_looping <= 0 && delete_occured)
+  csEventTree *epoint = EventHash.Get(name, NULL);
+  if (!epoint)
   {
-    // We are no longer in a loop and a delete occured so here
-    // we really clean up the entries in the listener array.
-    delete_occured = false;
-    for (size_t i = Listeners.Length(); i > 0; i--)
-    {
-      Listener const& listener = Listeners[i - 1];
-      if (!listener.object)
-        Listeners.DeleteIndex (i - 1);
-    }
+    /* Expensive exception, build the tree out to include "name". */
+    epoint = EventTree->FindNode(name, this);
   }
-}
-
-void csEventQueue::Notify (unsigned int pseudo_event)
-{
-  csRef<iEvent> e(CreateEvent(csevBroadcast));
-  e->Add("cmdCode", (uint32)pseudo_event);
-  e->Add("cmdInfo", (uint32)0);
-
-  StartLoop ();
-  for (size_t i = Listeners.Length(); i > 0; i--)
-  {
-    Listener const& listener = Listeners[i - 1];
-    if (listener.object && (listener.trigger & CSMASK_Nothing) != 0)
-      listener.object->HandleEvent (*e);
-  }
-  EndLoop ();
+  CS_ASSERT(epoint);
+  epoint->Notify();
 }
 
 void csEventQueue::Process ()
 {
-  Notify (cscmdPreProcess);
-
   csRef<iEvent> ev;
   for (ev = Get(); ev.IsValid(); ev = Get())
   {
@@ -232,98 +271,135 @@ void csEventQueue::Process ()
     Dispatch (e);
   }
 
-  Notify (cscmdProcess);
-  Notify (cscmdPostProcess);
-  Notify (cscmdFinalProcess);
+#ifdef ADB_DEBUG
+  std::cerr << "[Sending Frame event]" << std::endl;
+#endif
+
+  Notify (Frame);
+
+#ifdef ADB_DEBUG
+  std::cerr << "[Finished with Frame event]" << std::endl;
+#endif
 }
 
 void csEventQueue::Dispatch (iEvent& e)
 {
-  int const evmask = 1 << e.Type;
-  bool const canstop = ((e.Flags & CSEF_BROADCAST) == 0);
-  StartLoop ();
-  size_t i, n;
-  for (i = 0, n = Listeners.Length(); i < n; i++)
+#ifdef ADB_DEBUG
+  std::cerr << "Dispatching event " 
+	    << NameRegistry->GetString(e.Name) 
+	    << " into event tree"
+	    << std::endl;
+#endif
+  csEventTree *epoint = EventHash.Get(e.Name, NULL);
+  if (!epoint)
   {
-    Listener const& l = Listeners[i];
-    if ((l.trigger & evmask) != 0 && l.object && l.object->HandleEvent(e)
-      && canstop)
-      break;
+    epoint = EventTree->FindNode(e.Name, this);
   }
-  EndLoop ();
+  CS_ASSERT(epoint);
+
+  epoint->Dispatch(e);
 }
 
-size_t csEventQueue::FindListener (iEventHandler* listener) const
+csHandlerID csEventQueue::RegisterListener (iEventHandler * listener)
 {
-  size_t i;
-  for (i = Listeners.Length(); i > 0; i--)
-  {
-    const size_t idx = i - 1;
-    Listener const& l = Listeners[idx];
-    if (l.object == listener)
-      return idx;
-  }
-  return (size_t)-1;
+#ifdef ADB_DEBUG
+  std::cerr << "Registering listener (no events) " << listener->GenericName() << std::endl;
+#endif
+  return HandlerRegistry->GetID(listener);
 }
 
-void csEventQueue::RegisterListener (iEventHandler* listener,
-  unsigned int trigger)
+bool csEventQueue::Subscribe (iEventHandler *listener, const csEventID &ename)
 {
-  size_t const n = FindListener (listener);
-  if (n != (size_t)-1)
-    Listeners[n].trigger = trigger;
-  else
+#ifdef ADB_DEBUG
+  std::cerr << "Registering listener " << listener->GenericName()
+	    << " to " << NameRegistry->GetString(ename) <<  std::endl;
+#endif
+  bool ret = EventTree->Subscribe (HandlerRegistry->GetID(listener), 
+				   ename, this);
+#ifdef ADB_DEBUG
+  EventTree->Dump();
+#endif
+  return ret;
+}
+
+bool csEventQueue::Subscribe (iEventHandler *listener, const csEventID ename[])
+{
+#ifdef ADB_DEBUG
+  std::cerr << "Registering listener " << listener->GenericName() << " to:";
+#endif
+  csHandlerID handler = HandlerRegistry->GetID(listener);
+  for (int ecount=0 ; ename[ecount]!=CS_EVENTLIST_END ; ecount++)
   {
-    Listener l = { listener, trigger };
-    Listeners.Push (l);
-    listener->IncRef ();
+#ifdef ADB_DEBUG
+    std::cerr << " " << NameRegistry->GetString(ename[ecount]);
+#endif
+    if (!EventTree->Subscribe(handler, ename[ecount], this))
+    {
+      for (int i=0 ; i<ecount ; i++)
+      {
+#ifdef ADB_DEBUG
+	std::cerr << " (UNDOING: " 
+		  << NameRegistry->GetString(ename[i])
+		  << ")";
+#endif
+	EventTree->Unsubscribe(handler, ename[i], this);
+      }
+      return false;
+    }
   }
+#ifdef ADB_DEBUG
+  std::cerr << std::endl;
+  EventTree->Dump();
+#endif
+  return true;
+}
+
+void csEventQueue::Unsubscribe (iEventHandler *listener, const csEventID ename[])
+{
+#ifdef ADB_DEBUG
+  std::cerr << "Unregistering listener " 
+	    << listener->GenericName() 
+	    << " from:";
+#endif
+  for (int iter=0 ; ename[iter] != CS_EVENTLIST_END ; iter++)
+  {
+#ifdef ADB_DEBUG
+    std::cerr << " " << NameRegistry->GetString(ename[iter]);
+#endif
+    EventTree->Unsubscribe(HandlerRegistry->GetID(listener), 
+			   ename[iter], this);
+  }
+#ifdef ADB_DEBUG
+  std::cerr << std::endl;
+#endif
+}
+
+void csEventQueue::Unsubscribe (iEventHandler *listener, const csEventID &ename)
+{
+#ifdef ADB_DEBUG
+  std::cerr << "Unregistering listener " << listener->GenericName() 
+	    << " from " << NameRegistry->GetString(ename) << std::endl;
+#endif
+  EventTree->Unsubscribe (HandlerRegistry->GetID(listener), ename, this);
 }
 
 void csEventQueue::RemoveListener (iEventHandler* listener)
 {
-  size_t const n = FindListener(listener);
-  if (n != (size_t)-1)
-  {
-    iBase* listener = Listeners[n].object;
-    // Only delete the entry in the vector if we're not in a loop.
-    if (busy_looping <= 0)
-      Listeners.DeleteIndex (n);
-    else
-    {
-      Listeners[n].object = 0;
-      delete_occured = true;
-    }
-    listener->DecRef();
-  }
+#ifdef ADB_DEBUG
+  std::cerr << "Unregistering listener " << listener->GenericName()
+	    << " (all events)" << std::endl;
+#endif
+  EventTree->Unsubscribe(HandlerRegistry->GetID(listener), CS_EVENT_INVALID, this);
 }
 
 void csEventQueue::RemoveAllListeners ()
 {
-  for (size_t i = Listeners.Length(); i > 0; i--)
-  {
-    const size_t idx = i - 1;
-    iBase* listener = Listeners[idx].object;
-    if (busy_looping <= 0)
-    {
-      Listeners.DeleteIndex (idx);
-    }
-    else
-    {
-      Listeners[idx].object = 0;
-      delete_occured = true;
-    }
-    listener->DecRef();
-  }
-}
-
-
-void csEventQueue::ChangeListenerTrigger (iEventHandler* l,
-  unsigned int trigger)
-{
-  size_t const n = FindListener(l);
-  if (n != (size_t)-1)
-    Listeners[n].trigger = trigger;
+#ifdef ADB_DEBUG
+  std::cerr << "Unregistering all listeners" << std::endl;
+#endif
+  CS_ASSERT(EventTree != 0);
+  csEventTree::DeleteRootNode(EventTree); // Magic!
+  EventTree = csEventTree::CreateRootNode(HandlerRegistry, NameRegistry, this);
 }
 
 csPtr<iEventOutlet> csEventQueue::CreateEventOutlet (iEventPlug* plug)
@@ -342,31 +418,15 @@ iEventOutlet* csEventQueue::GetEventOutlet()
   return EventOutlets.Get(0);
 }
 
-iEventCord* csEventQueue::GetEventCord (int cat, int subcat)
+iEventCord* csEventQueue::GetEventCord (const csEventID &name)
 {
-  csEventCord* cord;
-  size_t const n = EventCordsFind (cat, subcat);
-  if (n != (size_t)-1)
-    cord = EventCords.Get(n);
-  else
+  csEventCord *cord = EventCords.Get (name, NULL);
+  if (!cord)
   {
-    cord = new csEventCord (cat, subcat);
-    EventCords.Push (cord);
+    cord = new csEventCord (name);
+    EventCords.PutUnique(name, cord);
     cord->DecRef ();
   }
   return cord;
 }
 
-size_t csEventQueue::EventCordsFind (int cat, int subcat)
-{
-  size_t i = EventCords.Length();
- 
-  while (i > 0)
-  {
-    i--;
-    csEventCord *cord = EventCords[i];
-    if (cat == cord->GetCategory() && subcat == cord->GetSubcategory())
-      return i;
-  }
-  return (size_t)-1;
-}

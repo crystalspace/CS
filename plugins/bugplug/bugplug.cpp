@@ -34,6 +34,8 @@
 #include "csutil/csuctransform.h"
 #include "csutil/debug.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "csutil/flags.h"
 #include "csutil/profile.h"
 #include "csutil/regexp.h"
@@ -210,15 +212,28 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
   }
   keyComposer = currentKbd->CreateKeyComposer ();
 
+  CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
+
   if (!scfiEventHandler)
   {
     scfiEventHandler = new EventHandler (this);
   }
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
-    q->RegisterListener (scfiEventHandler,
-    	CSMASK_Nothing | CSMASK_Keyboard |
-  	CSMASK_MouseUp | CSMASK_MouseDown | CSMASK_MouseMove);
+  {
+    csEventID esub[] = { 
+      PreProcess,   // this goes away...
+      PostProcess,  // this goes away...
+      FinalProcess, // this goes away...
+      Frame,        // this replaces the above!
+      KeyboardEvent,
+      MouseEvent,
+      SystemOpen,
+      SystemClose,
+      CS_EVENTLIST_END 
+    };
+    q->RegisterListener (scfiEventHandler, esub);
+  }
   return true;
 }
 
@@ -692,8 +707,10 @@ bool csBugPlug::EatMouse (iEvent& event)
   SetupPlugin ();
   if (!process_next_mouse && !debug_view.show) return false;
 
-  bool down = (event.Type == csevMouseDown);
-  bool up = (event.Type == csevMouseUp);
+  bool down = (CS_IS_MOUSE_EVENT(object_reg, event) && 
+	       (csMouseEventHelper::GetEventType(&event) == csMouseEventTypeDown));
+  bool up = (CS_IS_MOUSE_EVENT(object_reg, event) &&
+	     (csMouseEventHelper::GetEventType(&event) == csMouseEventTypeUp));
   int button = csMouseEventHelper::GetButton(&event);
 
   mouse_x = csMouseEventHelper::GetX(&event);
@@ -2448,44 +2465,65 @@ void csBugPlug::Dump (iThingFactoryState* fact, int polyidx)
 
 bool csBugPlug::HandleEvent (iEvent& event)
 {
-  if (event.Type == csevKeyboard)
-  {
+  if (CS_IS_KEYBOARD_EVENT(object_reg, event))
     return EatKey (event);
-  }
-  else if (event.Type == csevMouseDown)
-  {
+  else if (CS_IS_MOUSE_EVENT(object_reg, event))
     return EatMouse (event);
-  }
-  else if (event.Type == csevMouseUp)
-  {
-    return EatMouse (event);
-  }
-  else if (event.Type == csevMouseMove)
-  {
-    return EatMouse (event);
-  }
-  else if (event.Type == csevBroadcast)
-  {
-    if (csCommandEventHelper::GetCode(&event) == cscmdPreProcess)
-    {
-      return HandleStartFrame (event);
-    }
-    if (csCommandEventHelper::GetCode(&event) == cscmdPostProcess)
-    {
-      return HandleEndFrame (event);
-    }
-    if (csCommandEventHelper::GetCode(&event) == cscmdSystemOpen)
-    {
-      return HandleSystemOpen (&event);
-    }
-    if (csCommandEventHelper::GetCode(&event) == cscmdSystemClose)
-    {
-      return HandleSystemClose (&event);
-    }
-  }
+  else if (event.Name == PreProcess)
+    return HandleStartFrame (event);
+  else if (event.Name == PostProcess)
+    return HandleEndFrame (event);
+  else if (event.Name == SystemOpen)
+    return HandleSystemOpen (&event);
+  else if (event.Name == SystemClose)
+    return HandleSystemClose (&event);
 
   return false;
 }
+
+
+/* We want to handle frame events after these,
+   and input (key/mouse) events before them. */
+
+const csHandlerID * csBugPlug::EventHandler::GenericPrec(csRef<iEventHandlerRegistry> &handler_reg,
+							 csRef<iEventNameRegistry> &name_reg,
+							 csEventID e) const {
+  static csHandlerID Constraints[3]; // TODO : this is not thread-safe/reentrant
+
+  Constraints[0] = handler_reg->GetGenericID("crystalspace.graphics3d");
+  Constraints[1] = handler_reg->GetGenericID("crystalspace.window");
+  Constraints[2] = CS_HANDLERLIST_END;
+  
+  if (name_reg->IsKindOf(e, csevFrame (name_reg)))
+  {
+    return Constraints;
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
+const csHandlerID * csBugPlug::EventHandler::GenericSucc(csRef<iEventHandlerRegistry> &handler_reg,
+							 csRef<iEventNameRegistry> &name_reg,
+							 csEventID e) const {
+  static csHandlerID Constraints[3]; // TODO : this is not thread-safe/reentrant
+
+  Constraints[0] = handler_reg->GetGenericID("crystalspace.graphics3d");
+  Constraints[1] = handler_reg->GetGenericID("crystalspace.window");
+  Constraints[2] = CS_HANDLERLIST_END;
+  
+  if (name_reg->IsKindOf(e, csevKeyboardEvent (name_reg)) || 
+      name_reg->IsKindOf(e, csevMouseEvent (name_reg)))
+  {
+    return Constraints;
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
 
 //---------------------------------------------------------------------------
 

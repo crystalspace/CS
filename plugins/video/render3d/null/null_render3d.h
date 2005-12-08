@@ -63,6 +63,8 @@ public:
     }
     virtual bool HandleEvent (iEvent& ev)
     { return parent->HandleEvent (ev); }
+    CS_EVENTHANDLER_NAMES("crystalspace.graphics3d")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   };
   csRef<EventHandler> scfiEventHandler;
 

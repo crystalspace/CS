@@ -85,6 +85,11 @@ private:
   csRef<iMeshWrapper> mw;  
   csRef<iMeshObjectFactory> EmitObjectFactory;
   csRef<iEmitFactoryState> EmitFactoryState;
+
+  csEventID KeyboardDown;
+  csEventID CanvasClose;
+  csEventID Process;
+  csEventID FinalProcess;
    
   static bool EventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);

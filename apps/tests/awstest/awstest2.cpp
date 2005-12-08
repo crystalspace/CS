@@ -86,12 +86,12 @@ awsTest::~awsTest()
 
 static bool AwsEventHandler (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (ev.Name == csevProcess)
   {
     System->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Name == csevFinalProcess)
   {
     System->FinishFrame ();
     return true;
@@ -120,6 +120,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
     return false;
   }
 
+  csEventNameRegistry::Register(object_reg);
   if (!csInitializer::SetupEventHandler (object_reg, AwsEventHandler))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not setup event handler!");
@@ -327,13 +328,12 @@ awsTest::FinishFrame ()
 bool
 awsTest::HandleEvent (iEvent &Event)
 {
-  if ((Event.Type == csevKeyboard) && 
-    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown) &&
-    (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
+  if ((Event.Name == csevKeyboardDown) &&
+      (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->GetEventOutlet()->Broadcast (csevQuit);
     return true;
   }
 

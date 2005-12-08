@@ -67,6 +67,8 @@ public:
   csGraphics2DXLib (iBase*);
   virtual ~csGraphics2DXLib ();
 
+  csEventID CanvasResize;
+
   virtual bool Initialize (iObjectRegistry*);
   virtual bool Open ();
   virtual void Close ();

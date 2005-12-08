@@ -166,7 +166,7 @@ void csWaterDemo::SetupFrame ()
     csPrintf ("(%g,%g,%g) (%g,%g,%g)\n", camPos.x, camPos.y, camPos.z,
       camPlaneZ.x, camPlaneZ.y, camPlaneZ.z);
   }
-  */
+*/
 
   r3d->SetPerspectiveAspect (r3d->GetDriver2D ()->GetHeight ());
   r3d->SetPerspectiveCenter (r3d->GetDriver2D ()->GetWidth ()/2,
@@ -204,40 +204,40 @@ void csWaterDemo::FinishFrame ()
 
 bool csWaterDemo::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFocusChanged)
+  if (ev.Name == FocusGained)
   {
     hasfocus = (bool)csCommandEventHelper::GetInfo(&ev);
-    if (hasfocus)
-    {
-      int w = r3d->GetDriver2D ()->GetWidth()/2;
-      int h = r3d->GetDriver2D ()->GetHeight()/2;
-      r3d->GetDriver2D ()->SetMousePosition (w, h);
-      r3d->GetDriver2D()->SetMouseCursor (csmcNone);
-    }
-    else
-    {
-      r3d->GetDriver2D()->SetMouseCursor (csmcArrow);
-    }
+    CS_ASSERT(hasfocus == true);
+    int w = r3d->GetDriver2D ()->GetWidth ()/2;
+    int h = r3d->GetDriver2D ()->GetHeight ()/2;
+    r3d->GetDriver2D ()->SetMousePosition (w, h);
+    r3d->GetDriver2D ()->SetMouseCursor (csmcNone);
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  else if (ev.Name == FocusLost)
+  {
+    hasfocus = (bool)csCommandEventHelper::GetInfo(&ev);
+    CS_ASSERT(hasfocus == false);
+    r3d->GetDriver2D()->SetMouseCursor (csmcArrow);
+  }
+  else if (ev.Name == Process)
   {
     waterdemo->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Name == FinalProcess)
   {
     waterdemo->FinishFrame ();
     return true;
   }
-  else if ((ev.Type == csevKeyboard) &&
-    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown))
+  else if (ev.Name == KeyboardDown)
   {
     switch (csKeyEventHelper::GetCookedCode (&ev))
     {
     case CSKEY_ESC:
       {
         csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-        if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+        if (q) 
+	  q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
         return true;
       }
     case CSKEY_TAB:
@@ -304,6 +304,12 @@ bool csWaterDemo::Initialize ()
 	"Can't initialize plugins!");
     return false;
   }
+
+  FocusGained = csevFocusGained (object_reg);
+  FocusLost = csevFocusLost (object_reg);
+  Process = csevProcess (object_reg);
+  FinalProcess = csevFinalProcess (object_reg);
+  KeyboardDown = csevKeyboardDown (object_reg);
 
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {

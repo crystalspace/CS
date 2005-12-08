@@ -23,13 +23,14 @@
 #include "csutil/cseventq.h"
 #include "csutil/csevcord.h"
 #include "csutil/sysfunc.h"
+#include "csutil/event.h"
 #include "iutil/csinput.h"
 #include "iutil/objreg.h"
 
 
-csEventOutlet::csEventOutlet(iEventPlug* p,csEventQueue* q,iObjectRegistry* r)
-  : scfImplementationType (this), 
-  EnableMask((unsigned int)(-1)), Plug(p), Queue(q), Registry(r)
+csEventOutlet::csEventOutlet(iEventPlug* p,csEventQueue* q,iObjectRegistry* r):
+  scfImplementationType (this), 
+  Plug(p), Queue(q), Registry(r)
 {
 }
 
@@ -59,25 +60,21 @@ DRIVER_GETTER(Joystick)
 
 csPtr<iEvent> csEventOutlet::CreateEvent ()
 {
-  return Queue->CreateEvent(0);
+  return Queue->CreateEvent();
 }
 
 void csEventOutlet::Post (iEvent *Event)
 {
-  if ((1 << Event->Type) & EnableMask)
-  {
-    // Check for a pertinent event cord
-    csEventCord *cord = (csEventCord*)
-      Queue->GetEventCord (Event->Category, Event->SubCategory);
-    // If the cord does not handle the event, then place it in the queue.
-    if (!cord || !cord->Post (Event))
-      Queue->Post (Event);
-  }
+  // Check for a pertinent event cord
+  csEventCord *cord = (csEventCord*) Queue->GetEventCord (Event->Name);
+  // If the cord does not handle the event, then place it in the queue.
+  if (!cord || !cord->Post (Event))
+    Queue->Post (Event);
 }
 
 void csEventOutlet::Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown)
 {
-  if ((codeRaw || codeCooked) && (EnableMask & CSEVTYPE_Keyboard))
+  if (codeRaw || codeCooked)
   {
     iKeyboardDriver* k = GetKeyboardDriver();
     if (k != 0)
@@ -88,49 +85,45 @@ void csEventOutlet::Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown)
 void csEventOutlet::Mouse (uint iButton, bool iDown, int x, int y)
 {
   int32 axes[2] = { x, y };
-  Mouse(1, iButton, iDown, axes, 2);
+  Mouse (0, iButton, iDown, axes, 2);
 }
 
 void csEventOutlet::Mouse (uint iNumber, uint iButton, bool iDown, const int32 *axes, 
                            uint numAxes)
 {
-  if (EnableMask & CSEVTYPE_Mouse)
+  iMouseDriver* m = GetMouseDriver();
+  if (m != 0)
   {
-    iMouseDriver* m = GetMouseDriver();
-    if (m != 0)
-    {
-      if (iButton == 0)
-        m->DoMotion (iNumber, axes, numAxes);
-      else
-        m->DoButton (iNumber, iButton, iDown, axes, numAxes);
-    }
+    if (iButton == (uint) -1)
+      m->DoMotion (iNumber, axes, numAxes);
+    else
+      m->DoButton (iNumber, iButton, iDown, axes, numAxes);
   }
 }
 
 void csEventOutlet::Joystick (uint iNumber, uint iButton,
 			      bool iDown, const int32 *axes, uint numAxes)
 {
-  if (EnableMask & CSEVTYPE_Joystick)
+  iJoystickDriver *j = GetJoystickDriver();
+  if (j != 0)
   {
-    iJoystickDriver *j = GetJoystickDriver();
-    if (j != 0)
-    {
-      if (iButton == 0)
-	j->DoMotion (iNumber, axes, numAxes);
-      else
-	j->DoButton (iNumber, iButton, iDown, axes, numAxes);
-    }
+    if (iButton == (uint) -1)
+      j->DoMotion (iNumber, axes, numAxes);
+    else
+      j->DoButton (iNumber, iButton, iDown, axes, numAxes);
   }
 }
 
-void csEventOutlet::Broadcast (uint iCode, intptr_t iInfo)
+void csEventOutlet::Broadcast (csEventID iName, intptr_t iInfo)
 {
   Queue->Post (csRef<iEvent> (csPtr<iEvent>
-    (new csEvent (csGetTicks (), csevBroadcast, iCode, iInfo))));
+			      (csCommandEventHelper::NewEvent
+			       (csGetTicks (), iName, true, iInfo))));
 }
 
-void csEventOutlet::ImmediateBroadcast (uint iCode, intptr_t iInfo)
+void csEventOutlet::ImmediateBroadcast (csEventID iName, intptr_t iInfo)
 {
-  csEvent Event (csGetTicks (), csevBroadcast, iCode, iInfo);
-  Queue->Dispatch (Event);
+  csEvent *Event = csCommandEventHelper::NewEvent (csGetTicks (), iName, true, iInfo);
+  Queue->Dispatch (*Event);
+  delete Event;
 }

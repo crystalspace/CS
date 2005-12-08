@@ -29,6 +29,9 @@ class awsTest
 {
 public:
   iObjectRegistry* object_reg;
+  csEventID Process;
+  csEventID FinalProcess;
+  csEventID KeyboardDown;
 
 private:
   csRef<iEngine> engine;

@@ -31,7 +31,7 @@
 
 // Following are declared as constants here to prevent javac complaining about
 // finding a 'long' where an 'int' is expected.
-%constant int CS_CRYSTAL_PROTOCOL = 0x43533030;
+%constant int CS_CRYSTAL_PROTOCOL = 0x43533032;
 %constant int CS_MUSCLE_PROTOCOL = 0x504d3030;
 %constant int CS_XML_PROTOCOL = 0x584d4d30;
 %ignore CS_CRYSTAL_PROTOCOL;

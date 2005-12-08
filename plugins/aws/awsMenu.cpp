@@ -605,17 +605,12 @@ void awsMenu::RemoveChild (iAwsSource* src)
 
 bool awsMenu::HandleEvent (iEvent &Event)
 {
-  switch (Event.Type)
-  {
-  case csevMouseMove:
-  case csevMouseUp:
-  case csevMouseClick:
-  case csevMouseDown:
-  case csevMouseEnter:
-  case csevMouseExit:
-    mouse_pos.Set (csMouseEventHelper::GetX(&Event), csMouseEventHelper::GetY(&Event));
-    break;
-  }
+  iObjectRegistry *object_reg = WindowManager()->GetObjectRegistry();
+  if (csEventNameRegistry::IsKindOf(object_reg,
+				    Event.Name, 
+				    csevMouseEvent(object_reg)))
+    mouse_pos.Set (csMouseEventHelper::GetX(&Event), 
+		   csMouseEventHelper::GetY(&Event));
   return awsControlBar::HandleEvent (Event);
 }
 

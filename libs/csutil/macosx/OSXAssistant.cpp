@@ -148,7 +148,7 @@ void OSXAssistant::init_runmode()
 //-----------------------------------------------------------------------------
 // start_event_loop
 //	This method returns only after a csevBroadcast even has been posted to
-//	the Crystal Space event queue with command code cscmdQuit.
+//	the Crystal Space event queue with command code csevQuit.
 //-----------------------------------------------------------------------------
 void OSXAssistant::start_event_loop()
 {
@@ -168,7 +168,7 @@ void OSXAssistant::start_event_loop()
 //-----------------------------------------------------------------------------
 void OSXAssistant::request_shutdown()
 {
-  event_outlet->ImmediateBroadcast(cscmdQuit, 0);
+  event_outlet->ImmediateBroadcast(csevQuit, 0);
   OSXDelegate_stop_event_loop(controller);
 }
 
@@ -196,7 +196,7 @@ void OSXAssistant::application_activated()
     if (c != 0)
       c->Resume();
   }
-  event_outlet->ImmediateBroadcast(cscmdFocusChanged,true);
+  event_outlet->ImmediateBroadcast(csevFocusGained, 0);
 }
 
 void OSXAssistant::application_deactivated()
@@ -207,17 +207,17 @@ void OSXAssistant::application_deactivated()
     if (c != 0)
       c->Suspend();
   }
-  event_outlet->ImmediateBroadcast(cscmdFocusChanged, false);
+  event_outlet->ImmediateBroadcast(csevFocusLost, 0);
 }
 
 void OSXAssistant::application_hidden()
 {
-  event_outlet->ImmediateBroadcast(cscmdCanvasHidden, false);
+  event_outlet->ImmediateBroadcast(csevCanvasHidden, 0);
 }
 
 void OSXAssistant::application_unhidden()
 {
-  event_outlet->ImmediateBroadcast(cscmdCanvasExposed, false);
+  event_outlet->ImmediateBroadcast(csevCanvasExposed, 0);
 }
 
 void OSXAssistant::flush_graphics_context()
@@ -303,7 +303,7 @@ uint OSXAssistant::eiEventPlug::QueryEventPriority(uint)
 //=============================================================================
 bool OSXAssistant::eiEventHandler::HandleEvent(iEvent& e)
 {
-  if (e.Type == csevBroadcast && csCommandEventHelper::GetCode(&e) == cscmdQuit)
+  if (e.Name == csevQuit)
     scfParent->should_shutdown = true;
   return false;
 }

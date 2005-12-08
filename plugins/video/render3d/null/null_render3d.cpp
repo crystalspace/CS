@@ -85,8 +85,13 @@ bool csNullGraphics3D::Initialize (iObjectRegistry* objreg)
     scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q)
-    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
-  
+  {
+    csEventID events[3] = { csevSystemOpen(object_reg), 
+			    csevSystemClose(object_reg), 
+			    CS_EVENTLIST_END };
+    q->RegisterListener (scfiEventHandler, events);
+  }
+
   bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
 
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
@@ -128,17 +133,15 @@ bool csNullGraphics3D::Initialize (iObjectRegistry* objreg)
 
 bool csNullGraphics3D::HandleEvent (iEvent& e)
 {
-  if (e.Type == csevBroadcast)
+  if (e.Name == csevSystemOpen(object_reg))
   {
-    switch (csCommandEventHelper::GetCode(&e))
-    {
-      case cscmdSystemOpen:
-        Open ();
-        return true;
-      case cscmdSystemClose:
-        Close ();
-        return true;
-    }
+    Open ();
+    return true;
+  }
+  else if (e.Name == csevSystemClose(object_reg))
+  {
+    Close ();
+    return true;
   }
   return false;
 }

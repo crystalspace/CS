@@ -191,6 +191,7 @@ private:
   csBlockAllocator<csVisibilityObjectWrapper> visobj_wrappers;
 
   iObjectRegistry* object_reg;
+  csEventID CanvasResize;
   csRef<iBugPlug> bugplug;
   csKDTree* kdtree;
   // Ever growing box of all objects that were ever in the tree.
@@ -376,6 +377,8 @@ public:
       if (parent) return parent->HandleEvent (ev);
       else return false;
     }
+    CS_EVENTHANDLER_NAMES("crystalspace.dynavis")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } * scfiEventHandler;
 
   struct eiComponent : public iComponent

@@ -128,20 +128,17 @@ void Simple::FinishFrame ()
 
 bool Simple::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast
-    && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (ev.Name == csevProcess)
   {
     simple->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast
-    && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Name == csevFinalProcess)
   {
     simple->FinishFrame ();
     return true;
   }
-  else if ((ev.Type == csevKeyboard) &&
-    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown))
+  else if (ev.Name == csevKeyboardDown) 
   {
     if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_SPACE)
     {
@@ -208,14 +205,13 @@ bool Simple::HandleEvent (iEvent& ev)
     else if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
     {
       csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-      if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
+      if (q) q->GetEventOutlet()->Broadcast (csevQuit);
       return true;
     }
   }
-  else if ((ev.Type == csevKeyboard) &&
-    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeUp) &&
-    ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_DOWN) ||
-    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_UP)))
+  else if ((ev.Name == csevKeyboardUp)
+	   ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_DOWN) ||
+	    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_UP)))
   {
     avatarbody->SetLinearVelocity(csVector3 (0, 0, 0));
     avatarbody->SetAngularVelocity (csVector3 (0, 0, 0));
@@ -248,6 +244,7 @@ bool Simple::Initialize ()
     return false;
   }
 
+  csEventNameRegistry::Register(object_reg);
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

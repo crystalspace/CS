@@ -66,6 +66,10 @@ public:
 
   virtual bool HandleEvent (iEvent& event);
 
+  CS_EVENTHANDLER_NAMES("crystalspace.proxtex")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
+
+public:
   void PushTexture (csProcTexture* txt)
   {
     textures.Add (txt);
@@ -84,7 +88,7 @@ bool csProcTexEventHandler::HandleEvent (iEvent& event)
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
   csSet<csPtrKey<csProcTexture> > keep_tex;
-  if (event.Type == csevBroadcast && csCommandEventHelper::GetCode(&event) == cscmdPreProcess)
+  CS_ASSERT(event.Name == csevPreProcess(object_reg));
   {
     {
       csSet<csPtrKey<csProcTexture> >::GlobalIterator it = textures.GetIterator();
@@ -110,7 +114,6 @@ bool csProcTexEventHandler::HandleEvent (iEvent& event)
     }
     return true;
   }
-  return false;
 }
 
 //---------------------------------------------------------------------------
@@ -150,7 +153,7 @@ iEventHandler* csProcTexture::SetupProcEventHandler (
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
   {
-    q->RegisterListener (proceh, CSMASK_Nothing);
+    q->RegisterListener (proceh, csevPreProcess(object_reg));
     object_reg->Register (proceh, "crystalspace.proctex.eventhandler");
   }
   return proceh;

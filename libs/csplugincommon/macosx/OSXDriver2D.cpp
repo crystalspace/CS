@@ -149,30 +149,26 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
 {
     bool handled = false;
 
-    if (ev.Type == csevBroadcast)
+    if (csEventNameRegistry::IsKindOf(ev.Name, csevFocusChanged))
     {
-        if (csCommandEventHelper::GetCode(&ev) == cscmdFocusChanged)
-        {
-            bool shouldPause = !assistant->always_runs();
-            OSXDelegate2D_focusChanged(delegate, 
-	      csCommandEventHelper::GetInfo (&ev), shouldPause);
-            handled = true;
-        }
-        if (csCommandEventHelper::GetCode(&ev) == cscmdCommandLineHelp)
-        {
-            csPrintf("Options for MacOS X 2D graphics drivers:\n"
-             "  -screen=<num>      Screen number to display on (default=0)\n");
-            handled = true;
-        }
+      bool shouldPause = !assistant->always_runs();
+      OSXDelegate2D_focusChanged(delegate, 
+				 csCommandEventHelper::GetInfo (&ev), shouldPause);
+      handled = true;
     }
-    else if ((ev.Type == csevKeyboard) && 
-            (csKeyEventHelper::GetEventType(&ev) == csKeyEventTypeDown))
+    else if (ev.Name == csevCommandLineHelp)
     {
-        if ((csKeyEventHelper::GetRawCode(&ev) == '\r') && 
-            (csKeyEventHelper::GetModifiersBits(&ev) & CSMASK_ALT))
-            handled = ToggleFullscreen();
+      csPrintf("Options for MacOS X 2D graphics drivers:\n"
+	       "  -screen=<num>      Screen number to display on (default=0)\n");
+      handled = true;
     }
-
+    else if (ev.Name == csevKeyboardDown)
+    {
+      if ((csKeyEventHelper::GetRawCode(&ev) == '\r') && 
+	  (csKeyEventHelper::GetModifiersBits(&ev) & CSMASK_ALT))
+	handled = ToggleFullscreen();
+    }
+    
     return handled;
 }
 

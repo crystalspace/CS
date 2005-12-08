@@ -867,25 +867,27 @@ void WalkTest::Create2DSprites ()
 
 static bool WalkEventHandler (iEvent& ev)
 {
+  if (!Sys)
+    return false;
 
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (ev.Name == Sys->Process)
   {
     Sys->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Name == Sys->FinalProcess)
   {
     Sys->FinishFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdCommandLineHelp)
+  else if (ev.Name == Sys->CommandLineHelp)
   {
     Sys->Help ();
     return true;
   }
   else
   {
-    return Sys ? Sys->WalkHandleEvent (ev) : false;
+    return Sys->WalkHandleEvent (ev);
   }
 }
 
@@ -1031,6 +1033,14 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!");
     return false;
   }
+
+  name_reg = csEventNameRegistry::GetRegistry (object_reg);
+  Process = csevProcess (name_reg);
+  FinalProcess = csevFinalProcess (name_reg);
+  CommandLineHelp = csevCommandLineHelp (name_reg);
+  CanvasHidden = csevCanvasHidden (name_reg, myG2D);
+  CanvasExposed = csevCanvasExposed (name_reg, myG2D);
+  CanvasResize = csevCanvasResize (name_reg, myG2D);
 
   myConsole = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
   mySound = CS_QUERY_REGISTRY (object_reg, iSoundRender);

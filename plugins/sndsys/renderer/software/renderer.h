@@ -163,6 +163,9 @@ protected:
 
   uint32 last_intensity_multiplier;
 
+  csEventID SystemOpen;
+  csEventID SystemClose;
+
 protected:
   size_t CalculateMaxSamples(size_t bytes);
   void CalculateMaxBuffers(size_t samples, size_t *buf1_len, size_t *buf2_len);
@@ -212,6 +215,8 @@ public:
       SCF_DESTRUCT_IBASE();
     }
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+    CS_EVENTHANDLER_NAMES("crystalspace.sndsys.renderer")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } * scfiEventHandler;
 };
 

@@ -129,6 +129,10 @@ public:
    * Change the depth of the canvas.
    */
   virtual void ChangeDepth (int d);
+  /**
+   * Get the name of this canvas
+   */
+  virtual const char *GetName() const;
 
 protected:
   /// Screen refresh rate
@@ -137,6 +141,8 @@ protected:
   bool vsync;
 
   void CreateDefaultFontCache ();
+
+  char *name;
 private:
   /// Find a color in palette mode.
   int FindRGBPalette (int r, int g, int b);
@@ -150,6 +156,7 @@ private:
 public:
   /// Create csGraphics2D object
   csGraphics2D (iBase*);
+
   /// Destroy csGraphics2D object
   virtual ~csGraphics2D ();
 
@@ -385,6 +392,8 @@ public:
     EventHandler (csGraphics2D* parent) : scfImplementationType (this), 
       parent(parent) {}
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+    CS_EVENTHANDLER_NAMES("crystalspace.graphics2d.common")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } * scfiEventHandler;
 
 protected:

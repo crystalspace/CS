@@ -91,8 +91,7 @@ void csWindowsJoystick::LoadAxes(joystate& j)
 
 bool csWindowsJoystick::HandleEvent (iEvent& ev)
 {
-  if (ev.Type != csevBroadcast ||
-      csCommandEventHelper::GetCode(&ev) != cscmdPreProcess)
+  if (ev.Name != PreProcess)
     return false;
 
   for (size_t i = 0; i < joystick.Length (); i++)
@@ -116,17 +115,19 @@ bool csWindowsJoystick::HandleEvent (iEvent& ev)
       int last_state=1-nstate;
       for (int btn = 0; btn < 128; btn++) 
       {
-        if (jd.state[nstate].di.rgbButtons[btn] != 
+	if (jd.state[nstate].di.rgbButtons[btn] != 
 	    jd.state[last_state].di.rgbButtons[btn]) 
-          EventOutlet->Joystick (jd.number, btn + 1, 
+	{
+	  int32 axdata[2] = { jd.state[nstate].lX, jd.state[nstate].lY };
+          EventOutlet->Joystick (jd.number, btn, 
 				 jd.state[nstate].di.rgbButtons[btn] != 0,
-				 jd.state[nstate].axes.GetArray(), jd.nAxes);
+				 js.state[nstate].axes.GetArray(), jd.nAxes);
       }    
       for (uint a = 0; a < jd.nAxes; a++)
       {
         if (jd.state[nstate].axes[a] != jd.state[last_state].axes[a])
 	{
-          EventOutlet->Joystick (jd.number, 0, 0,
+          EventOutlet->Joystick (jd.number, -1, 0,
 	    jd.state[nstate].axes.GetArray(), jd.nAxes);
 	  break;
 	}
@@ -172,7 +173,7 @@ bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCE*  pdidInstanc)
       DIDFT_AXIS)))
     {
       joydata data;
-      data.number = (int)joystick.Length() + 1; // CS joystick numbers 1-based
+      data.number = (int)joystick.Length() + 0; // CS joystick numbers 1-based
       data.device = device2;
       data.nButtons = caps.dwButtons;    
       data.nAxes = (uint)caps.dwAxes;
@@ -242,12 +243,13 @@ bool csWindowsJoystick::Init ()
     }
 
     // hook into eventqueue
+    PreProcess = csevPreProcess (object_reg);
     if (njoys > 0)
     {
-      eq = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+      eq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
       if (eq)
       {
-	eq->RegisterListener (&scfiEventHandler, CSMASK_FrameProcess);
+	eq->RegisterListener (&scfiEventHandler, PreProcess);
 	EventOutlet = eq->CreateEventOutlet (&scfiEventPlug);
       }
     }

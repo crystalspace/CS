@@ -414,7 +414,7 @@ void awsWindow::OnLower ()
 
 bool awsWindow::OnMouseDown (int button, int x, int y)
 {
-  if (button == 2 && popup)
+  if (button == 1 && popup)
   {
     popup->MoveTo(x,y);
     popup->Show();

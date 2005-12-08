@@ -25,6 +25,7 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/debug.h"
+#include "csutil/eventnames.h"
 #include "iutil/objreg.h"
 
 //-----------------------------------------------------------------------------

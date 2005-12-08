@@ -3024,11 +3024,18 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   if (!scfiEventHandler)
     scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
 
+  SystemOpen = csevSystemOpen(object_reg);
+  SystemClose = csevSystemClose(object_reg);
+
   csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q)
-    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
-
-
+  {
+    csEventID events[] = { SystemOpen, SystemClose, 
+			    CS_EVENTLIST_END };
+    q->RegisterListener (scfiEventHandler, events);
+  }
+  // We subscribe to csevCanvasResize after G2D has been created
+  
   bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
 
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
@@ -3057,6 +3064,9 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
     ok = false;
   }
 
+  CanvasResize = csevCanvasResize(object_reg, G2D);
+  q->RegisterListener (scfiEventHandler, CanvasResize);
+
   return ok;
 }
 
@@ -3069,25 +3079,25 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
 
 bool csGLGraphics3D::HandleEvent (iEvent& Event)
 {
-  if (Event.Type == csevBroadcast)
-    switch (csCommandEventHelper::GetCode(&Event))
-    {
-      case cscmdSystemOpen:
-        Open ();
-        return true;
-      case cscmdSystemClose:
-        Close ();
-        return true;
-      case cscmdContextResize:
-	{
-	  int w = G2D->GetWidth ();
-	  int h = G2D->GetHeight ();
-	  SetDimensions (w, h);
-	  asp_center_x = w/2;
-	  asp_center_y = h/2;
-	}
-	return true;
-    }
+  if (Event.Name == SystemOpen)
+  {
+    Open ();
+    return true;
+  }
+  else if (Event.Name == SystemClose)
+  {
+    Close ();
+    return true;
+  }
+  else if (Event.Name == CanvasResize)
+  {
+    int w = G2D->GetWidth ();
+    int h = G2D->GetHeight ();
+    SetDimensions (w, h);
+    asp_center_x = w/2;
+    asp_center_y = h/2;
+    return true;
+  }
   return false;
 }
 

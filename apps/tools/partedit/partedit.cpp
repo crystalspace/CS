@@ -232,19 +232,18 @@ void PartEdit::FinishFrame ()
 
 bool PartEdit::HandleEvent (iEvent& ev)
 {
-  if ((ev.Type == csevKeyboard) && 
-    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown) &&
-    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
+  if ((ev.Name == KeyboardDown) && 
+      (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->GetEventOutlet()->Broadcast (cscmdQuit);
+      q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdSystemClose)
+  else if (ev.Name == CanvasClose)
   {
-      // System window closed, app shutting down
-      return true;
+    // System window closed, app shutting down
+    return true;
   }
 
   if (aws) return aws->HandleEvent(ev);
@@ -253,12 +252,12 @@ bool PartEdit::HandleEvent (iEvent& ev)
 
 bool PartEdit::EventHandler (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (ev.Name == System->Process)
   {
     System->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Name == System->FinalProcess)
   {
     System->FinishFrame ();
     return true;
@@ -929,6 +928,11 @@ bool PartEdit::Initialize ()
 
   g3d->SetDimensions(1024,768);
   g2d->Resize(1024,768);
+
+  KeyboardDown = csevKeyboardDown (object_reg);
+  CanvasClose = csevCanvasClose (object_reg, g2d);
+  Process = csevProcess (object_reg);
+  FinalProcess = csevFinalProcess (object_reg);
 
   iNativeWindow* nw = g2d->GetNativeWindow ();
   if (nw) nw->SetTitle ("Particle System Editor");

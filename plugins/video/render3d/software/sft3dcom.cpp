@@ -136,7 +136,10 @@ bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)
     scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
+  {
+    csEventID events[3] = { csevSystemOpen(object_reg), csevSystemClose(object_reg), CS_EVENTLIST_END };
+    q->RegisterListener (scfiEventHandler, events);
+  }
 
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
@@ -148,20 +151,16 @@ bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)
 
 bool csSoftwareGraphics3DCommon::HandleEvent (iEvent& Event)
 {
-  if (Event.Type == csevBroadcast)
-    switch (csCommandEventHelper::GetCode(&Event))
-    {
-      case cscmdSystemOpen:
-      {
-        Open ();
-        return true;
-      }
-      case cscmdSystemClose:
-      {
-        Close ();
-        return true;
-      }
-    }
+  if (Event.Name == csevSystemOpen(object_reg))
+  {
+    Open ();
+    return true;
+  }
+  else if (Event.Name == csevSystemClose(object_reg))
+  {
+    Close ();
+    return true;
+  }
   return false;
 }
 

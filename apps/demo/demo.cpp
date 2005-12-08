@@ -32,6 +32,7 @@
 #include "csutil/cmdhelp.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
+#include "csutil/csevent.h"
 #include "csutil/stringarray.h"
 #include "csutil/sysfunc.h"
 
@@ -120,12 +121,12 @@ void Cleanup ()
 
 static bool DemoEventHandler (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (ev.Name == System->Process)
   {
     System->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Name == System->FinalProcess)
   {
     System->FinishFrame ();
     return true;
@@ -218,9 +219,23 @@ bool Demo::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  if (!csInitializer::SetupEventHandler (object_reg, DemoEventHandler))
+  Process = csevProcess (object_reg);
+  FinalProcess = csevFinalProcess (object_reg);
+  KeyboardDown = csevKeyboardDown (object_reg);
+  MouseDown = csevMouseDown (object_reg, 0);
+  MouseMove = csevMouseMove (object_reg, 0);
+
+  csEventID events[] = {
+    Process,
+    FinalProcess,
+    KeyboardDown,
+    MouseDown,
+    MouseMove,
+    CS_EVENTLIST_END };
+
+  if (!csInitializer::SetupEventHandler (object_reg, DemoEventHandler, events))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't initialize event handler!");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't setup event handler!");
     return false;
   }
 
@@ -676,8 +691,7 @@ void Demo::DrawEditInfo ()
 
 bool Demo::DemoHandleEvent (iEvent &Event)
 {
-  if ((Event.Type == csevKeyboard) &&
-    (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown))
+  if (Event.Name == KeyboardDown)
   {
     csTicks elapsed_time, current_time;
     elapsed_time = vc->GetElapsedTicks ();
@@ -696,7 +710,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       {
 	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
 	if (q)
-	  q->GetEventOutlet()->Broadcast (cscmdQuit);
+	  q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
         return true;
       }
     }
@@ -1231,7 +1245,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       {
 	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
 	if (q)
-	  q->GetEventOutlet()->Broadcast (cscmdQuit);
+	  q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
         return true;
       }
       switch (keyCode)
@@ -1270,13 +1284,13 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       }
     }
   }
-  else if (Event.Type == csevMouseDown)
+  else if (Event.Name == MouseDown)
   {
     if (do_demo == 0)
     {
       selected_demo = (csMouseEventHelper::GetY(&Event) - first_y) / 10;
       if ((selected_demo != (size_t)-1) && selected_demo < demos.Length ())
-        do_demo = 1;
+	do_demo = 1;
     }
     else if (do_demo < 3)
     {
@@ -1292,18 +1306,18 @@ bool Demo::DemoHandleEvent (iEvent &Event)
         csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
 	if (np)
 	{
-          vw -= view->GetCamera ()->GetTransform ().GetOrigin ();
-          np->SetForwardVector (map_selpoint, vw);
+	  vw -= view->GetCamera ()->GetTransform ().GetOrigin ();
+	  np->SetForwardVector (map_selpoint, vw);
 	  csVector3 up;
 	  np->GetUpVector (map_selpoint, up);
 	  up = up % vw;
 	  up = - (up % vw);
 	  np->SetUpVector (map_selpoint, up);
-        }
+	}
       }
       else if (map_enabled == MAP_EDIT)
       {
-        p.y = csMouseEventHelper::GetY(&Event);
+	p.y = csMouseEventHelper::GetY(&Event);
 	int dim = myG2D->GetHeight ()-10;
 	float dx = (map_br.x-map_tl.x) / 2.0f;
 	float dy = (map_br.y-map_tl.y) / 2.0f;
@@ -1316,7 +1330,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       }
     }
   }
-  else if (Event.Type == csevMouseMove)
+  else if (Event.Name == MouseMove)
   {
     if (do_demo == 0)
     {

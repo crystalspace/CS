@@ -52,7 +52,7 @@ class csString;
  * function) and processes the Crystal Space event queue (which must be present
  * in the shared-object registry at the time of the call to this function).
  * This function only returns after a csevBroadcast message has been received
- * in the Crystal Space event queue with command code cscmdQuit.  The return
+ * in the Crystal Space event queue with command code csevQuit.  The return
  * value of this function indicates whether or not the run-loop was actually
  * able to run.  If there was a problem starting the run-loop, then `false' is
  * returned, otherwise `true' is returned.

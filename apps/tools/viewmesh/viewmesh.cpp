@@ -59,8 +59,8 @@ struct vmAnimCallback : public CalAnimationCallback
 
 //---------------------------------------------------------------------------
 
-ViewMesh::ViewMesh ()
-: camMode(movenormal), roomsize(5), scale(1), selectedSocket(0),
+ViewMesh::ViewMesh () : 
+  camMode(movenormal), roomsize(5), scale(1), selectedSocket(0),
   selectedCal3dSocket(0), meshTx(0), meshTy(0), meshTz(0), callback(0)
 {
   SetApplicationName ("CrystalSpace.ViewMesh");
@@ -78,7 +78,19 @@ ViewMesh::~ViewMesh ()
 #endif
 }
 
-void ViewMesh::ProcessFrame ()
+ViewMesh::EventHandler::EventHandler (ViewMesh *parent,
+				      iObjectRegistry *object_reg) :
+  csBaseEventHandler (object_reg),
+  parent (parent)
+{
+}
+
+void ViewMesh::EventHandler::ProcessFrame ()
+{
+  parent->ProcessFrame();
+}
+
+void ViewMesh::ProcessFrame()
 {
   csTicks elapsed_time = vc->GetElapsedTicks ();
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
@@ -213,13 +225,18 @@ void ViewMesh::ProcessFrame ()
 
 }
 
+void ViewMesh::EventHandler::FinishFrame ()
+{
+  parent->FinishFrame();
+}
+
 void ViewMesh::FinishFrame ()
 {
   g3d->FinishDraw ();
   g3d->Print (0);
 }
 
-bool ViewMesh::OnKeyboard(iEvent& ev)
+bool ViewMesh::EventHandler::OnKeyboard(iEvent& ev)
 {
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
@@ -229,16 +246,17 @@ bool ViewMesh::OnKeyboard(iEvent& ev)
     {
       csRef<iEventQueue> q = 
         CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
-      if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
+      if (q.IsValid())
+	q->GetEventOutlet()->Broadcast(csevQuit (GetObjectRegistry ()));
     }
   }
   return false;
 }
 
-bool ViewMesh::HandleEvent (iEvent &event)
+bool ViewMesh::EventHandler::HandleEvent (iEvent &event)
 {
-  if (aws)
-    if (aws->HandleEvent (event))
+  if (parent->aws)
+    if (parent->aws->HandleEvent (event))
       return true;
   return csBaseEventHandler::HandleEvent(event);;
 }
@@ -343,7 +361,10 @@ bool ViewMesh::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
-  if (!RegisterQueue(GetObjectRegistry()))
+  Handler = new EventHandler (this, GetObjectRegistry ());
+
+  if (!Handler->RegisterQueue(GetObjectRegistry(), 
+			      csevAllEvents (GetObjectRegistry ())))
     return ReportError("Failed to set up event handler!");
 
   return true;
@@ -687,7 +708,7 @@ void ViewMesh::SaveSprite (const char* path, const char* filename, bool binary)
 
   pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(loadername);
   csRef<iPluginManager> plugin_mgr = 
-    CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csQueryRegistry<iPluginManager> (GetObjectRegistry ());
 
   char savername[128] = "";
 

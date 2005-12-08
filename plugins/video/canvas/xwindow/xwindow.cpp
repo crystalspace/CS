@@ -124,6 +124,7 @@ csXWindow::~csXWindow ()
 bool csXWindow::Initialize (iObjectRegistry *object_reg)
 {
   this->object_reg = object_reg;
+  this->name_reg = csEventNameRegistry::GetRegistry(object_reg);
   csConfigAccess Config(object_reg, "/config/video.cfg");
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
 						   iCommandLineParser));
@@ -346,8 +347,12 @@ bool csXWindow::Open ()
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
-  if (q != 0)
-    q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
+  if (q != 0) {
+    csEventID events[3] = { csevPreProcess(name_reg), 
+			    csevCommandLineHelp(name_reg), 
+			    CS_EVENTLIST_END };
+    q->RegisterListener (scfiEventHandler, events);
+  }
 
   if (xf86vm)
   {
@@ -491,8 +496,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
   bool down;
   bool resize = false;
 
-  if ((Event.Type == csevBroadcast)
-      && (csCommandEventHelper::GetCode(&Event) == cscmdCommandLineHelp))
+  if (Event.Name == csevCommandLineHelp(name_reg))
   {
     csPrintf ("Options for X-Window Plugin:\n");
     csPrintf ("  -[no]sysmouse      use/don't use system mouse cursor "
@@ -522,8 +526,8 @@ bool csXWindow::HandleEvent (iEvent &Event)
       case ClientMessage:
 	if (CS_STATIC_CAST(Atom, event.xclient.data.l[0]) == wm_delete_window)
 	{
-	  EventOutlet->Broadcast (cscmdContextClose, (intptr_t)this);
-	  EventOutlet->Broadcast (cscmdQuit);
+	  EventOutlet->Broadcast (csevCanvasClose (name_reg, Canvas), (intptr_t)this);
+	  EventOutlet->Broadcast (csevQuit (name_reg));
 	}
 	break;
       case ButtonPress:
@@ -539,7 +543,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
           false, event.xbutton.x, event.xbutton.y);
         break;
       case MotionNotify:
-        EventOutlet->Mouse (0, false, event.xbutton.x, event.xbutton.y);
+        EventOutlet->Mouse ((uint) -1, false, event.xbutton.x, event.xbutton.y);
         break;
       case KeyPress:
       case KeyRelease:
@@ -703,7 +707,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
         break;
       case FocusIn:
 	{
-	  EventOutlet->Broadcast (cscmdFocusChanged, (event.type == FocusIn));
+	  EventOutlet->Broadcast (csevFocusGained (name_reg), true);
 #ifndef CS_DEBUG
 #ifdef CS_XWIN_GRAB_KEYBOARD
 	  if (xf86vm && !keyboard_grabbed &&
@@ -723,7 +727,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	}
       case FocusOut:
 	{
-	  EventOutlet->Broadcast (cscmdFocusChanged, (event.type == FocusIn));
+	  EventOutlet->Broadcast (csevFocusLost (name_reg), false);
 #ifndef CS_DEBUG
 #ifdef CS_XWIN_GRAB_KEYBOARD
 	  if (xf86vm && keyboard_grabbed && !--keyboard_grabbed)
@@ -745,21 +749,21 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	switch(event.xvisibility.state)
 	{
 	  case VisibilityUnobscured:
-	    EventOutlet->Broadcast (cscmdCanvasExposed, 0);
+	    EventOutlet->Broadcast (csevCanvasExposed (name_reg, Canvas), 0);
 	    break;
 	  case VisibilityPartiallyObscured:
-	    EventOutlet->Broadcast (cscmdCanvasExposed, 0);
+	    EventOutlet->Broadcast (csevCanvasExposed (name_reg, Canvas), 0);
 	    break;
 	  case VisibilityFullyObscured:
-	    EventOutlet->Broadcast (cscmdCanvasHidden, 0);
+	    EventOutlet->Broadcast (csevCanvasHidden (name_reg, Canvas), 0);
 	    break;
 	}
 	break;
       case UnmapNotify:
-	EventOutlet->Broadcast (cscmdCanvasHidden, 0);
+	EventOutlet->Broadcast (csevCanvasHidden (name_reg, Canvas), 0);
 	break;
       case MapNotify:
-	EventOutlet->Broadcast (cscmdCanvasExposed, 0);
+	EventOutlet->Broadcast (csevCanvasExposed (name_reg, Canvas), 0);
 	break;
       default:
         break;

@@ -24,8 +24,9 @@
 #include "iutil/cfgfile.h"
 
 
-csInputBinder::csInputBinder (iBase *parent, int btnSize, int axisSize)
+csInputBinder::csInputBinder (iObjectRegistry *r, iBase *parent, int btnSize, int axisSize)
   : scfImplementationType (this, parent),
+    name_reg(csEventNameRegistry::GetRegistry(r)),
     axisHash (axisSize), axisArray (axisSize),
     btnHash (btnSize), btnArray (btnSize)
 {
@@ -38,60 +39,47 @@ csInputBinder::~csInputBinder ()
 
 bool csInputBinder::HandleEvent (iEvent &ev)
 {
-  switch (ev.Type)
+  if (CS_IS_MOUSE_EVENT(name_reg, ev) && csMouseEventHelper::GetButton(&ev)==0) // mouse move
   {
-    case csevKeyboard:
-    case csevMouseDown:
-    case csevJoystickDown:
-    case csevMouseUp:
-    case csevJoystickUp:
+    for (uint axis = 0; axis <= csMouseEventHelper::GetNumAxes(&ev); axis++)
     {
-      bool down = (ev.Type == csevMouseDown) || (ev.Type == csevJoystickDown) 
-	|| ((ev.Type == csevKeyboard) 
-	    && (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown));
-
-      BtnCmd *bind = btnHash.Get
-        (csInputDefinition (& ev, CSMASK_ALLMODIFIERS, false), 0);
-      if (! bind) return false;
-
-      if (bind->toggle)
-      {
-        if (down) bind->down = ! bind->down;
-      }
-      else bind->down = down;
-
-      return true;
+      AxisCmd *bind = axisHash.Get
+	(csInputDefinition (name_reg, &ev, axis), 0);
+      if (bind) bind->val = 
+	csMouseEventHelper::GetAxis(&ev, axis);
     }
-
-    case csevMouseMove:
+    return true;
+  }
+  else if (CS_IS_JOYSTICK_EVENT(name_reg, ev) && csJoystickEventHelper::GetButton(&ev)==0) // joystick move
+  {
+    for (uint axis = 0; axis < csJoystickEventHelper::GetNumAxes(&ev); axis++)
     {
-      for (uint axis = 0; axis <= csMouseEventHelper::GetNumAxes(&ev); axis++)
-      {
-        AxisCmd *bind = axisHash.Get
-          (csInputDefinition (& ev, (uint8)axis), 0);
-
-        if (bind) bind->val = 
-	  csMouseEventHelper::GetAxis(&ev, axis);
-      }
-
-      return true;
+      AxisCmd *bind = axisHash.Get
+	(csInputDefinition (name_reg, &ev, axis), 0);
+      if (bind) bind->val = 
+	csJoystickEventHelper::GetAxis(&ev, axis);
     }
-
-    case csevJoystickMove:
+    return true;
+  }
+  else if (CS_IS_KEYBOARD_EVENT(name_reg, ev) || 
+	   CS_IS_MOUSE_EVENT(name_reg, ev) || 
+	   CS_IS_JOYSTICK_EVENT(name_reg, ev))
+  {
+    bool down = csInputEventHelper::GetButtonState(name_reg, &ev);
+    BtnCmd *bind = btnHash.Get(csInputDefinition (name_reg, &ev, (uint8) CSMASK_ALLMODIFIERS), 0);
+    if (! bind) return false;
+    
+    if (bind->toggle)
     {
-      for (uint axis = 0; axis < csJoystickEventHelper::GetNumAxes(&ev); axis++)
-      {
-        AxisCmd *bind = axisHash.Get
-          (csInputDefinition (& ev, (uint8)axis), 0);
-
-        if (bind) bind->val = 
-	  csJoystickEventHelper::GetAxis(&ev, axis);
-      }
-
-      return true;
+      if (down) bind->down = ! bind->down;
     }
-
-    default: return false;
+    else bind->down = down;
+    
+    return true;
+  }
+  else
+  {
+    return false;
   }
 }
 
@@ -140,7 +128,7 @@ bool csInputBinder::UnbindAxis (unsigned cmd)
   axisArray[cmd] = 0;
   delete bind;
 
-  csInputDefinition key;
+  csInputDefinition key(name_reg);
   AxisHash::GlobalIterator iter (axisHash.GetIterator ());
   while (iter.HasNext ())
   {
@@ -160,7 +148,7 @@ bool csInputBinder::UnbindButton (unsigned cmd)
   btnArray[cmd] = 0;
   delete bind;
 
-  csInputDefinition key;
+  csInputDefinition key(name_reg);
   BtnHash::GlobalIterator iter (btnHash.GetIterator ());
   while (iter.HasNext ())
   {

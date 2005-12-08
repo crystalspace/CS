@@ -107,15 +107,10 @@ void csSndSysRendererSoftware::Report(int severity, const char* msg, ...)
 
 bool csSndSysRendererSoftware::HandleEvent (iEvent &e)
 {
-  if (e.Type == csevCommand || e.Type == csevBroadcast) {
-    switch (csCommandEventHelper::GetCode(&e)) {
-    case cscmdSystemOpen:
-      Open();
-      break;
-    case cscmdSystemClose:
-      Close();
-      break;
-    }
+  if (e.Name == SystemOpen) {
+    Open();
+  } else if (e.Name == SystemClose) {
+    Close();
   }
   return false;
 }
@@ -164,9 +159,12 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
-  if (q != 0)
-    q->RegisterListener(scfiEventHandler,
-      CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
+  SystemOpen = csevSystemOpen(object_reg);
+  SystemClose = csevSystemClose(object_reg);
+  if (q != 0) {
+    csEventID subEvents[3] = { SystemOpen, SystemClose, CS_EVENTLIST_END };
+    q->RegisterListener(scfiEventHandler, subEvents);
+  }
 
   return true;
 }

@@ -42,16 +42,15 @@ csCEGUIEventHandler::~csCEGUIEventHandler()
 
 bool csCEGUIEventHandler::Initialize ()
 {
-  RegisterQueue (obj_reg, CSMASK_MouseMove | CSMASK_MouseDown |
-    CSMASK_MouseUp | CSMASK_Keyboard | CSMASK_Broadcast);
+  RegisterQueue (obj_reg, csevAllEvents(obj_reg));
   return true;
 }
 
 bool csCEGUIEventHandler::OnUnhandledEvent (iEvent &event) 
 {
-  if (csCommandEventHelper::GetCode (&event) == cscmdContextResize)
+  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (obj_reg, iGraphics2D);
+  if (event.name == csevCanvasResize(obj_reg, g2d))
   {
-    csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (obj_reg, iGraphics2D);
     renderer->setDisplaySize (CEGUI::Size (g2d->GetWidth (), g2d->GetHeight ()));
     return true;
   }

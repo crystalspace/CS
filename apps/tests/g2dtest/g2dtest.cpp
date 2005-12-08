@@ -123,6 +123,11 @@ public:
   csRef<iGraphics3D> myG3D;
   iObjectRegistry* object_reg;
   csRef<iCursor> cursorPlugin;
+  csEventID SystemOpen;
+  csEventID KeyboardDown;
+  csEventID Process;
+  csEventID FinalProcess;
+  csEventID CanvasResize;
 
 public:
   G2DTestSystemDriver (int argc, char* argv[]);
@@ -290,7 +295,7 @@ void G2DTestSystemDriver::SetupFrame ()
 
   if (state_sptr == 0)
   {
-    EventOutlet->Broadcast (cscmdQuit);
+    EventOutlet->Broadcast (csevQuit (object_reg));
     return;
   }
 
@@ -531,33 +536,21 @@ void G2DTestSystemDriver::FinishFrame ()
 
 bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
 {
-  switch (Event.Type)
+  if (myG2D && (Event.Name == SystemOpen))
   {
-    case csevBroadcast:
-      switch (csCommandEventHelper::GetCode(&Event))
-      {
-        case cscmdSystemOpen:
-          if (myG2D)
-          {
             // Create a uniform palette: r(3)g(3)b(2)
             int r,g,b;
             for (r = 0; r < 8; r++)
               for (g = 0; g < 8; g++)
                 for (b = 0; b < 4; b++)
                   myG2D->SetRGB (r * 32 + g * 4 + b, r * 32, g * 32, b * 64);
-            break;
-          }
-        case cscmdContextResize:
-          if (myG2D)
-          {
-            ResizeContext ();
-            break;
-          }
-      }
-      break;
-    case csevKeyboard:
-      if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
-      {
+  }
+  else if (myG2D && (Event.Name == CanvasResize))
+  {
+    ResizeContext ();
+  }
+  else if (Event.Name == KeyboardDown)
+  {
 	if (state_sptr)
 	  switch (state [state_sptr - 1])
 	  {
@@ -591,8 +584,6 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
 	    default:
 	      break;
 	  }
-      }
-      break;
   }
   return false;
 }
@@ -1656,12 +1647,12 @@ void G2DTestSystemDriver::BlitTest ()
 
 static bool G2DEventHandler (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (ev.Name == Sys->Process)
   {
     Sys->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Name == Sys->FinalProcess)
   {
     Sys->FinishFrame ();
     return true;
@@ -1728,6 +1719,12 @@ int main (int argc, char *argv[])
   }
   System.myG2D = System.myG3D->GetDriver2D ();
     
+  System.SystemOpen = csevSystemOpen (object_reg);
+  System.KeyboardDown = csevKeyboardDown (object_reg);
+  System.Process = csevProcess (object_reg);
+  System.FinalProcess = csevFinalProcess (object_reg);
+  System.CanvasResize = csevCanvasResize (object_reg, System.myG2D);
+
   if (!csInitializer::OpenApplication (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

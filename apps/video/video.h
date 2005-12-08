@@ -25,6 +25,7 @@
 #include "ivideo/codec.h"
 #include "imap/loader.h"
 #include "iutil/plugin.h"
+#include "csutil/eventnames.h"
 
 struct iSector;
 struct iView;
@@ -40,6 +41,9 @@ class Video
 {
 public:
   iObjectRegistry* object_reg;
+  csEventID Process;
+  csEventID FinalProcess;
+  csEventID KeyboardDown;
 
 private:
   csRef<iPluginManager> plugin_mgr;

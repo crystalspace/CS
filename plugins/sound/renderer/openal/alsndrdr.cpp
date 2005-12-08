@@ -85,10 +85,16 @@ bool csSoundRenderOpenAL::Initialize(iObjectRegistry *r)
 {
   object_reg = r;
 
+  CS_INITIALIZE_EVENT_SHORTCUTS(object_reg);
+
   csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
-  if (q != 0)
-    q->RegisterListener (&scfiEventHandler,
-    CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
+  if (q != 0) {
+    csEventID events[] = { PreProcess, 
+			   SystemOpen,
+			   SystemClose,
+			   CS_EVENTLIST_END };
+    q->RegisterListener (&scfiEventHandler, events);
+  }
 
   config.AddConfig(object_reg, "/config/sound.cfg");
 
@@ -366,21 +372,18 @@ void csSoundRenderOpenAL::ThreadProc ()
 
 bool csSoundRenderOpenAL::HandleEvent (iEvent &e)
 {
-  if (e.Type == csevCommand || e.Type == csevBroadcast)
+  if (e.Name == csevPreProcess)
   {
-    switch (csCommandEventHelper::GetCode(&e))
-    {
-    case cscmdPreProcess:
-      if (!BackgroundProcessing)
-        Update(); // Only perform updates here if there is no background thread
-      break;
-    case cscmdSystemOpen:
-      Open();
-      break;
-    case cscmdSystemClose:
-      Close();
-      break;
-    }
+    if (!BackgroundProcessing)
+      Update(); // Only perform updates here if there is no background thread
+  }
+  else if (e.Name == csevSystemOpen)
+  {
+    Open();
+  }
+  else if (e.Name == csevSystemClose)
+  {
+    Close();
   }
   return false;
 }

@@ -22,6 +22,7 @@
 #include "cssysdef.h"
 #include "csutil/array.h"
 #include "csutil/csevent.h"
+#include "csutil/eventnames.h"
 #include "csutil/cseventq.h"
 #include "csutil/memfile.h"
 #include "csutil/util.h"
@@ -57,129 +58,32 @@ const char* csEvent::GetKeyName (csStringID id)
   return GetEventStrSet()->Request (id);
 }
 
+const csEventID csEvent::GetName()
+{
+  return Name;
+}
+
 csEvent::csEvent ()
-  : scfImplementationType (this)
+  : scfImplementationType (this), attributes (53), count(0)
 {
-  count = 0;
 }
 
-csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
-		  uint mButton, uint32 mButtonMask,
-		  uint32 mModifiers) 
-                  : scfImplementationType (this), attributes (53)
-{
-  Time = iTime;
-  Type = eType;
-  Category = SubCategory = Flags = 0;
-
-  Add("mNumber", (uint8)1);
-  int32 axes[2] = { mx, my };
-  Add("mAxes", (void *) axes, 2 * sizeof(int32)); /* copies array for us */
-  Add("mNumAxes", (uint8)2);
-  Add("mButton", (uint8)mButton);
-  Add("mButtonMask", (uint32)mButtonMask);
-  Add("keyModifiers", (uint32)mModifiers);
-
-  count = 0;
-}
-
-csEvent::csEvent (csTicks iTime, int eType, uint n, int x, int y, 
-		  uint32 axesChanged, uint button, uint32 buttonMask,
-		  uint32 modifiers) : 
-  scfImplementationType (this), attributes (53)
-{
-
-  Time = iTime;
-  Type = eType;
-  Category = SubCategory = Flags = 0;
-
-  int32 axes[2] = { x, y };
-
-  CS_ASSERT((eType >= csevJoystickMove && eType <= csevJoystickUp) ||
-	    (eType >= csevMouseMove && eType <= csevMouseDoubleClick));
-
-  if (eType >= csevJoystickMove && eType <= csevJoystickUp) 
-  {
-    Add("jsNumber", (uint8)n);
-    Add("jsAxes", (void *) axes, 2 * sizeof(int32)); /* copies array for us */
-    Add("jsNumAxes", (uint8)2);
-    Add("jsAxesChanged", axesChanged);
-    Add("jsButton", (uint8)button);
-    Add("jsButtonMask", (uint32)buttonMask);
-  } 
-  else if (eType >= csevMouseMove && eType <= csevMouseDoubleClick) 
-  {
-    Add("mNumber", (uint8)n);
-    Add("mAxes", (void *) axes, 2 * sizeof(int32)); /* copies array for us */
-    Add("mNumAxes", (uint8)2);
-    Add("mAxesChanged", axesChanged);
-    Add("mButton", (uint8)button);
-    Add("mButtonMask", (uint32)buttonMask);
-  }
-  Add("keyModifiers", modifiers);
-
-  count = 0;
-}
-
-csEvent::csEvent (csTicks iTime, int eType, uint n, const int32* axes, 
-		  uint8 numAxes, uint32 axesChanged, uint8 button, 
-		  uint32 /*buttonMask*/, uint32 modifiers) 
-                  : scfImplementationType (this), attributes (53)
-{
-  Time = iTime;
-  Type = eType;
-  Category = SubCategory = Flags = 0;
-
-  CS_ASSERT((eType >= csevJoystickMove && eType <= csevJoystickUp) ||
-	    (eType >= csevMouseMove && eType <= csevMouseDoubleClick));
-
-  if (eType >= csevJoystickMove && eType <= csevJoystickUp) 
-  {
-    Add("jsNumber", (uint8)n);
-    Add("jsAxes", (void *) axes, numAxes * sizeof(int32)); 
-    /* copies array for us */
-    Add("jsNumAxes", (uint8)numAxes);
-    Add("jsAxesChanged", axesChanged);
-    Add("jsButton", (uint8)button);
-    Add("jsButtonMask", (uint32)button);
-  } 
-  else if (eType >= csevMouseMove && eType <= csevMouseDoubleClick) 
-  {
-    Add("mNumber", (uint8)n);
-    Add("mAxes", (void *) axes, numAxes * sizeof(int32));
-    /* copies array for us */
-    Add("mNumAxes", (uint8)numAxes);
-    Add("mAxesChanged", axesChanged);
-    Add("mButton", (uint8)button);
-    Add("mButtonMask", (uint32)button);
-  }
-  Add("keyModifiers", modifiers);
-
-  count = 0;
-}
-
-csEvent::csEvent (csTicks iTime, int eType, uint cCode, intptr_t cInfo) :
+csEvent::csEvent (csTicks iTime, csEventID iName, bool iBroadcast) :
   scfImplementationType (this), attributes (53)
 {
   Time = iTime;
-  Type = eType;
-  Category = SubCategory = Flags = 0;
-  Add("cmdCode", (uint32)cCode);
-  Add("cmdInfo", (int64)cInfo);
-  if (eType == csevBroadcast)
-    Flags = CSEF_BROADCAST;
-
+  Name = iName;
+  Broadcast = iBroadcast;
   count = 0;
 }
 
+// Copy constructor
 csEvent::csEvent (csEvent const& e) : scfImplementationType (this), attributes (53)
 {
   count = 0;
 
-  Type = e.Type;
-  Category = e.Category;
-  SubCategory = e.SubCategory;
-  Flags = e.Flags;
+  Name = e.Name;
+  Broadcast = e.Broadcast;
   Time = e.Time;
   attributes = e.attributes;
 }
@@ -542,11 +446,9 @@ void csPoolEvent::DecRef()
     next = pool->EventPool;
     pool->EventPool = this;
     RemoveAll();
-    Type = 0;
-    Category = 0;
-    Flags = 0;
+    Name = 0;
     Time = 0;
-    SubCategory = 0;
+    Broadcast = 0;
   }
   else
   {
@@ -557,6 +459,6 @@ void csPoolEvent::DecRef()
 csRef<iEvent> csPoolEvent::CreateEvent()
 {
   if (pool.IsValid())
-    return pool->CreateEvent(0);
+    return pool->CreateEvent();
   return superclass::CreateEvent();
 }

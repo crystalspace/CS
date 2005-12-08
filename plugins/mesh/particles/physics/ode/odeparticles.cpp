@@ -132,6 +132,8 @@ bool csODEParticlePhysics::Initialize (iObjectRegistry* reg)
   odestate->EnableEventProcessing (true);
   odestate->AddFrameUpdateCallback (&scfiODEFrameUpdateCallback);
 
+  PreProcess = csevPreProcess(objreg);
+
   csRef<iEventQueue> eq = CS_QUERY_REGISTRY (objreg, iEventQueue);
   if (eq == 0) 
   {
@@ -140,7 +142,7 @@ bool csODEParticlePhysics::Initialize (iObjectRegistry* reg)
 	"No event queue available");
       return false;
   }
-  eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
+  eq->RegisterListener (&scfiEventHandler, PreProcess);
 
   clock = CS_QUERY_REGISTRY (objreg, iVirtualClock);
   if (clock == 0) 
@@ -310,12 +312,8 @@ void csODEParticlePhysics::Execute (float stepsize)
 
 bool csODEParticlePhysics::HandleEvent (iEvent &event)
 {
-  if (event.Type != csevBroadcast || csCommandEventHelper::GetCode(&event) != cscmdPreProcess)
-  {
-    return false;
-  }
-
-
+  CS_ASSERT(event.Name == PreProcess);
+  
   for (size_t i = 0; i < partobjects.Length(); i ++)
   { 
     ParticleObjects &po = partobjects[i];

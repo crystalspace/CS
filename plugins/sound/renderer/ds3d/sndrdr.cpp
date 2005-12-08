@@ -75,10 +75,12 @@ csSoundRenderDS3D::csSoundRenderDS3D(iBase *piBase)
 bool csSoundRenderDS3D::Initialize(iObjectRegistry *r)
 {
   object_reg = r;
+  CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
   csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
-  if (q != 0)
-    q->RegisterListener (&scfiEventHandler,
-    CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
+  if (q != 0) {
+    csEventID events[] = { PreProcess, SystemOpen, SystemClose, CS_EVENTLIST_END };
+    q->RegisterListener (&scfiEventHandler, events);
+  }
   
   win32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
   if (!win32Assistant)
@@ -378,21 +380,18 @@ void csSoundRenderDS3D::ThreadProc ()
 
 bool csSoundRenderDS3D::HandleEvent (iEvent &e)
 {
-  if (e.Type == csevCommand || e.Type == csevBroadcast)
+  if (e.Name == PreProcess)
   {
-    switch (csCommandEventHelper::GetCode (&e))
-    {
-    case cscmdPreProcess:
-      if (!BackgroundProcessing)
-        Update(); // Only perform updates here if there is no background thread
-      break;
-    case cscmdSystemOpen:
-      Open();
-      break;
-    case cscmdSystemClose:
-      Close();
-      break;
-    }
+    if (!BackgroundProcessing)
+      Update(); // Only perform updates here if there is no background thread
+  }
+  else if (e.Name == SystemOpen)
+  {
+    Open();
+  }
+  else if (e.Name == SystemClose)
+  {
+    Close();
   }
   return false;
 }

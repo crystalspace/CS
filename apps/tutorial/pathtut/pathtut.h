@@ -26,6 +26,9 @@ class PathTut
 {
 private:
   iObjectRegistry* object_reg;
+  csEventID Process;
+  csEventID FinalProcess;
+  csEventID KeyboardDown;
   csRef<iEngine> engine;
   csRef<iLoader> loader;
   csRef<iGraphics3D> g3d;

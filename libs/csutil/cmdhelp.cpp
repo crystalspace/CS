@@ -81,7 +81,7 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
     cmd = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
   CS_ASSERT (cmd != 0);
 
-  // First send a global cscmdCommandLineHelp event.
+  // First send a global csevCommandLineHelp event.
   csRef<iEventQueue> evq (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (evq)
   {
@@ -90,7 +90,7 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
     // We use ImmediateBroadcast here because after processing commandline
     // help the application usually exits. This means there is no chance
     // to actually process the event in the queue.
-    evout->ImmediateBroadcast (cscmdCommandLineHelp, 0);
+    evout->ImmediateBroadcast (csevCommandLineHelp(object_reg), 0);
   }
 
   csRef<iPluginManager> plgmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);

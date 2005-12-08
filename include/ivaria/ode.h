@@ -93,8 +93,8 @@ struct iODEDynamicState : public iBase
   virtual void AddFrameUpdateCallback (iODEFrameUpdateCallback *cb) = 0;
   virtual void RemoveFrameUpdateCallback (iODEFrameUpdateCallback *cb) = 0;
 
-  /**
-   * This makes updates happen on the cscmdPreProcess
+  /** 
+   * This makes updates happen on the csevPreProcess 
    * and invalidates calls to Step()
    * This should be used in conjuction with the FrameRate calls
    */

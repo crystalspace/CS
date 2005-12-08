@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Dec-2005
+	- Adam Bradley checked in a massive event system overhaul.
+	    - The pre-overhaul code is tagged as PRE_EVENT_OVERHAUL_2005
+	    - Replace constant event types/masks with string event names.
+	    - Add constraint-driven event subscription and scheduling
+	    - Change event handler interface to define its own event
+	      delivery constraints
+	    - Change all input, axis, and button enumerations from 
+	      basis-1 to basis-0
 5-Dec-2005
         - res fixed the generic csInstallationPathsHelper::GetAppPath() to
           treat an empty entry in PATH like ".".

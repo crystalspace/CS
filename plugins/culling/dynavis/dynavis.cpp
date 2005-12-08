@@ -315,9 +315,10 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
     scr_height = 480;
   }
 
+  CanvasResize = csevCanvasResize(object_reg, CS_QUERY_REGISTRY(object_reg, iGraphics2D));
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q)
-    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener (scfiEventHandler, CanvasResize);
 
   csConfigAccess config;
   config.AddConfig(object_reg, "/config/dynavis.cfg");
@@ -368,21 +369,14 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
 
 bool csDynaVis::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast)
+  if (ev.Name == CanvasResize)
   {
-    switch (csCommandEventHelper::GetCode (&ev))
-    {
-      case cscmdContextResize:
-        {
 	  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 	  scr_width = g3d->GetWidth ();
 	  scr_height = g3d->GetHeight ();
 	  printf ("Got resize %dx%d!\n", scr_width, scr_height);fflush (stdout);
 	  delete tcovbuf;
 	  tcovbuf = new csTiledCoverageBuffer (scr_width, scr_height);
-	}
-	break;
-    }
   }
   return false;
 }

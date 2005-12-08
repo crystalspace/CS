@@ -165,8 +165,10 @@ public:
   struct eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE (csCursor);
-    virtual bool HandleEvent (iEvent &ev)
-      { return scfParent->HandleEvent (ev); }
+    virtual bool HandleEvent (iEvent &ev) 
+    { return scfParent->HandleEvent (ev); }
+    CS_EVENTHANDLER_NAMES("crystalspace.graphics.cursor")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } scfiEventHandler;
   friend struct eiEventHandler;
 };

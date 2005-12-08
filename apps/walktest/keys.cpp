@@ -623,80 +623,80 @@ void WalkTest::MouseClick3Handler(iEvent &Event)
 
 bool WalkTest::WalkHandleEvent (iEvent &Event)
 {
-  switch (Event.Type)
+  if (Event.Name == CanvasHidden)
   {
-    case csevBroadcast:
+    canvas_exposed = false;
+#ifdef CS_DEBUG
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "canvas hidden");
+#endif
+  }
+  else if (Event.Name == CanvasExposed)
+  {
+    canvas_exposed = true;
+#ifdef CS_DEBUG
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "canvas exposed");
+#endif
+  }
+  else if (Event.Name == CanvasResize)
+  {
+    Sys->FrameWidth = Sys->myG2D->GetWidth();
+    Sys->FrameHeight = Sys->myG2D->GetHeight();
+  }
+  else if (CS_IS_KEYBOARD_EVENT(name_reg, Event))
+  {
+    eatkeypress (&Event);
+  }
+  else if (CS_IS_MOUSE_EVENT(name_reg, Event))
+  {
+    switch(csMouseEventHelper::GetEventType(&Event))
     {
-      if (csCommandEventHelper::GetCode(&Event) == cscmdCanvasHidden)
+    case csMouseEventTypeDown:
+      switch(csMouseEventHelper::GetButton(&Event))
       {
-	canvas_exposed = false;
-      #ifdef CS_DEBUG
-	Report (CS_REPORTER_SEVERITY_NOTIFY, "canvas hidden");
-      #endif
-	break;
-      }
-      else if (csCommandEventHelper::GetCode(&Event) == cscmdCanvasExposed)
-      {
-	canvas_exposed = true;
-      #ifdef CS_DEBUG
-	Report (CS_REPORTER_SEVERITY_NOTIFY, "canvas exposed");
-      #endif
-	break;
-      }
-      else if (csCommandEventHelper::GetCode(&Event) == cscmdContextResize)
-      {
-	Sys->FrameWidth = Sys->myG2D->GetWidth();
-	Sys->FrameHeight = Sys->myG2D->GetHeight();
-	break;
+      case 1:
+	MouseClick1Handler(Event); break;
+      case 2:
+	MouseClick2Handler(Event); break;
+      case 3:
+	MouseClick3Handler(Event); break;
       }
       break;
-    }
-    case csevKeyboard:
-      eatkeypress (&Event);
-      break;
-    case csevMouseDown:
-      {
-	switch(csMouseEventHelper::GetButton(&Event)) {
-	case 1:
-	  MouseClick1Handler(Event); break;
-	case 2:
-	  MouseClick2Handler(Event); break;
-	case 3:
-	  MouseClick3Handler(Event); break;
-	}
-      }
 
-    case csevMouseMove:
+    case csMouseEventTypeMove:
       // additional command by Leslie Saputra -> freelook mode.
-      {
-        static bool first_time = true;
-        if (do_freelook)
+      static bool first_time = true;
+      if (do_freelook)
         {
           int last_x, last_y;
           last_x = csMouseEventHelper::GetX(&Event);
           last_y = csMouseEventHelper::GetY(&Event);
-
+	  
           myG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
           if (!first_time)
-          {
-	    RotateCam (
-		-((float)(last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse),
-		((float)(last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2));
-          }
+	    {
+	      RotateCam (
+			 -((float)(last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse),
+			 ((float)(last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2));
+	    }
           else
             first_time = false;
         }
-        else
-          first_time = true;
-      }
+      else
+	first_time = true;
       break;
-    case csevMouseUp:
-      if (csMouseEventHelper::GetButton(&Event) == 1)
+
+    case csMouseEventTypeUp:
+      if (csMouseEventHelper::GetButton(&Event) == 1) 
       {
-        move_forward = false;
+	move_forward = false;
 	Step (0);
       }
       break;
+
+    default:
+      // ignore
+      break;
+    }
   }
 
   return false;

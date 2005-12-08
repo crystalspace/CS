@@ -435,6 +435,7 @@ public:
   virtual void MarkToDeleteRecursively( iAwsComponent *c );
   
   static void MarkChildToDeleteRecursively( iAwsComponent *c );
+  
 };
 
 #endif // __CS_AWS_H__

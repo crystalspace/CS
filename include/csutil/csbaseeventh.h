@@ -31,6 +31,7 @@
 #include "csutil/scf_implementation.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
+#include "csutil/eventhandlers.h"
 
 #include <limits.h>
 
@@ -59,6 +60,14 @@ private:
   csRef<iEventQueue> queue;
 
 protected:
+  iObjectRegistry *object_reg;
+  csHandlerID self;
+  csEventID FrameEvent;
+  csEventID PreProcess;
+  csEventID Process;
+  csEventID PostProcess;
+  csEventID FinalProcess;
+
   /**
    * Constructor.<p>
    * \remarks
@@ -68,7 +77,7 @@ protected:
    * The constructor is declared as protected to prevent a developer from
    * using this class directly.
    */
-  csBaseEventHandler ();
+  csBaseEventHandler (iObjectRegistry *);
 
 public:
   /// Destructor.
@@ -78,29 +87,40 @@ public:
    * Register the event handler with the event queue registered with the
    * object registry.
    * \param registry The application's object registry
-   * \param trigger Combination of the \c CSMASK_XXX event triggers defined in
-   * iutil/evdefs.h. Multiple triggers may be specified by combining them with
-   * the bitwise "or" operator (`|').
+   * \param name An event name handle.  May be a token from iutil/evdefs.h or
+   * the result of a call to csEventNameRegistry::GetID.
    * \see iEventQueue::RegisterListener()
    */
-  bool RegisterQueue (iObjectRegistry* registry,
-  	unsigned int trigger = UINT_MAX);
+  bool RegisterQueue (iObjectRegistry* registry, csEventID name);
+
+  /**
+   * Register the event handler with the event queue registered with the
+   * object registry.
+   * \param registry The application's object registry
+   * \param names An array of event name handles.  Each may be a tokens from 
+   * iutil/evdefs.h or the result of a call to csEventNameRegistry::GetID.
+   * List must be terminated with CS_EVENTLIST_END.
+   * \see iEventQueue::RegisterListener()
+   */
+  bool RegisterQueue (iObjectRegistry* registry, csEventID names[]);
 
   /**
    * Register the event handler with an event queue.
    * \param queue The event queue to register with
-   * \param trigger Combination of the \c CSMASK_XXX event triggers defined in
-   * iutil/evdefs.h. Multiple triggers may be specified by combining them with
-   * the bitwise "or" operator (`|').
+   * \param name An event name handle.  May be a token from iutil/evdefs.h or
+   * the result of a call to csEventNameRegistry::GetID.
    * \see iEventQueue::RegisterListener()
    */
-  bool RegisterQueue (iEventQueue* queue, unsigned int trigger = UINT_MAX);
-
-private:
-  // This contains an array of trigger functions which are used to dispatch
-  // events based on event type.
-  static bool (csBaseEventHandler::*pmfnTriggers[
-  	_CSBASEEVENT_MAXARRAYINDEX+1])(iEvent &event);
+  bool RegisterQueue (iEventQueue* queue, csEventID name);
+  /**
+   * Register the event handler with an event queue.
+   * \param queue The event queue to register with
+   * \param names An array of event name handles.  Each may be a tokens from 
+   * iutil/evdefs.h or the result of a call to csEventNameRegistry::GetID.
+   * List must be terminated with CS_EVENTLIST_END.
+   * \see iEventQueue::RegisterListener()
+   */
+  bool RegisterQueue (iEventQueue* queue, csEventID names[]);
 
 protected:
   /**
@@ -126,25 +146,39 @@ protected:
   virtual bool HandleEvent (iEvent &event);
 
   /**
-   * Invoked by the event handler when a broadcast event is received.
-   * \remarks
-   * Ordinarily a developer should not override this funtion, as the default
-   * implementation will call PreProcessFrame(), ProcessFrame(),
-   * PostProcessFrame(), or FinishFrame() as appropriate. If you do override
-   * this function, either call the base implementation to invoke the
-   * aforementioned trigger functions or provide your own implementation.
-   * \par
-   * If you are expecting to handle a broadcast event which is not one of the
-   * standard four used for frame rendering, override OnUnhandledEvent(),
-   * which is called by the implementaion of OnBroadcast() for any broadcast
-   * event which is not processed by one of the 4 frame rendering trigger
-   * functions. If you don't plan on responding to the standard 4 broadcast
-   * functions, then overriding OnBroadcast() is appropriate.
+   * Override this if you want to refer to your csBaseEventHandler derived
+   * event handler as anything besides "application" for purposes of
+   * event subscription scheduling.
    */
-  virtual bool OnBroadcast (iEvent &event);
+  CS_CONST_METHOD virtual const char *GenericName() const { return "application"; }
+  
+  CS_CONST_METHOD virtual csHandlerID GenericID() const { 
+    return csEventHandlerRegistry::GetGenericID(object_reg, GenericName()); 
+  }
 
-  /// Invoked by the event handler when a command event is received.
-  virtual bool OnCommand (iEvent &event);
+  /**
+   * Override this if you want to force some modules to always handle some 
+   * events before csBaseEventHandler.
+   */
+  CS_CONST_METHOD virtual const csHandlerID *GenericPrec(csEventID) const { return NULL; }
+
+  /**
+   * Override this if you want to force some modules to always handle some 
+   * events after csBaseEventHandler.
+   */
+  CS_CONST_METHOD virtual const csHandlerID *GenericSucc(csEventID) const { return NULL; }
+
+  /**
+   * Override this if you want to force some modules to always handle some 
+   * events before this instance of csBaseEventHandler.
+   */
+  CS_CONST_METHOD virtual const csHandlerID *InstancePrec(csEventID) const { return NULL; }
+
+  /**
+   * Override this if you want to force some modules to always handle some 
+   * events before this instance of csBaseEventHandler.
+   */
+  CS_CONST_METHOD virtual const csHandlerID *InstanceSucc(csEventID) const { return NULL; }
 
   /// Invoked by the event handler when a joystick movement event is received.
   virtual bool OnJoystickMove (iEvent &event);
@@ -186,6 +220,9 @@ protected:
    * processed by OnBroadcast().
    */
   virtual bool OnUnhandledEvent (iEvent &event);
+
+  /// Invoked by the handler for the crystalspace.frame event.
+  virtual void Frame ();
 
   /// Invoked by the handler during a pre-process frame broadcast event.
   virtual void PreProcessFrame ();

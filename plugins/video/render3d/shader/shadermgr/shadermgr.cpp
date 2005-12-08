@@ -92,10 +92,17 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   else
     do_verbose = false;
 
+  PreProcess = csevPreProcess(objectreg);
+  SystemOpen = csevSystemOpen(objectreg);
+  SystemClose = csevSystemClose(objectreg);
+
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectreg, iEventQueue);
   if (q)
-    q->RegisterListener (scfiEventHandler,
-	CSMASK_Broadcast | CSMASK_Nothing);
+  {
+    csEventID events[] = { PreProcess, SystemOpen, SystemClose, 
+			    CS_EVENTLIST_END };
+    q->RegisterListener (scfiEventHandler, events);
+  }
 
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY  (objectreg,
 	iPluginManager);
@@ -200,24 +207,20 @@ void csShaderManager::Close ()
 
 bool csShaderManager::HandleEvent(iEvent& event)
 {
-  if (event.Type == csevBroadcast)
+  if (event.Name == PreProcess)
   {
-    switch(csCommandEventHelper::GetCode(&event))
-    {
-      case cscmdPreProcess:
-        UpdateStandardVariables();
-	return false;
-      case cscmdSystemOpen:
-	{
-	  Open ();
-	  return true;
-	}
-      case cscmdSystemClose:
-	{
-	  Close ();
-	  return true;
-	}
-    }
+    UpdateStandardVariables();
+    return false;
+  }
+  else if (event.Name == SystemOpen)
+  {
+    Open ();
+    return true;
+  }
+  else if (event.Name == SystemClose)
+  {
+    Close ();
+    return true;
   }
   return false;
 }

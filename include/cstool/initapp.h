@@ -30,6 +30,7 @@
 #include "csextern.h"
 
 #include "csutil/array.h"
+#include "csutil/eventnames.h"
 #include "csutil/csstring.h"
 #include "csutil/scf.h"
 #include "iengine/engine.h"
@@ -173,8 +174,9 @@ public:
    *
    * You may want to call all or some of those manually if you don't wish
    * to use this function. It is suggested that 
-   * #CS_INITIALIZE_PLATFORM_APPLICATION, InitializeSCF() and 
-   * csPlatformStartup() are always invoked; the other calls can be replaced 
+   * #CS_INITIALIZE_PLATFORM_APPLICATION, InitializeSCF(),
+   * and csPlatformStartup() are always invoked; 
+   * the other calls can be replaced 
    * with manual creation of the respective objects. However, the order above
    * should be retained when doing so.
    * \param argc argc argument from main().
@@ -332,13 +334,13 @@ public:
   static bool RequestPlugins(iObjectRegistry*,csArray<csPluginRequest> const&);
 
   /**
-   * Send the cscmdSystemOpen command to all loaded plugins.
+   * Send the csevSystemOpen command to all loaded plugins.
    * This should be done after initializing them (Initialize()).
    */
   static bool OpenApplication (iObjectRegistry*);
 
   /**
-   * Send the cscmdSystemClose command to all loaded plugins.
+   * Send the csevSystemClose command to all loaded plugins.
    */
   static void CloseApplication (iObjectRegistry*);
 
@@ -348,30 +350,26 @@ public:
    * that are sent through the event manager. Use this function to know
    * about keyboard, mouse and other events. Note that you also have to
    * use this function to be able to render something as rendering
-   * happens as a result of one event (cscmdProcess).
+   * happens as a result of one event (csevProcess).
    */
-  static bool SetupEventHandler (
-    iObjectRegistry*, iEventHandler*, unsigned int eventmask);
+  static bool SetupEventHandler (iObjectRegistry*, iEventHandler*, const csEventID[]);
 
   /**
    * Initialize an event handler function. This is an easier version
    * of SetupEventHandler() that takes a function and will register an
-   * event handler to call that function for all relevant events if `eventmask'
-   * is not specified, or for the requested event types if it is specified.
+   * event handler to call that function for all stated events and their
+   * children, or (if the third argument is omitted) for all events.
    */
-  static bool SetupEventHandler (
-    iObjectRegistry*, csEventHandlerFunc, unsigned int eventmask =
-      CSMASK_Nothing          |
-      CSMASK_Broadcast        |
-      CSMASK_MouseUp          |
-      CSMASK_MouseDown        |
-      CSMASK_MouseMove        |
-      CSMASK_Keyboard         |
-      CSMASK_MouseClick       |
-      CSMASK_MouseDoubleClick |
-      CSMASK_JoystickMove     |
-      CSMASK_JoystickDown     |
-      CSMASK_JoystickUp);
+  static bool SetupEventHandler (iObjectRegistry*, csEventHandlerFunc, const csEventID events[]);
+
+  /**
+   * Initialize an event handler function.  This function will receive EVERY
+   * event that passes through the system.  This is usually not what you 
+   * want, since (1) it means you'll probably receive a lot of events you're
+   * not interested in, and (2) it's the most costly operation for the event
+   * subscription scheduler.
+   */
+  static bool SetupEventHandler (iObjectRegistry*, csEventHandlerFunc);
 
   /**
    * Destroy the application.<p>

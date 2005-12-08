@@ -28,6 +28,9 @@
  * @{ */
  
 #include "csutil/scf.h"
+#include "iutil/eventnames.h"
+#include "iutil/eventhandlers.h"
+
 struct iEvent;
 struct iEventCord;
 struct iEventOutlet;
@@ -71,36 +74,52 @@ struct iEventQueue : public virtual iBase
   virtual void Dispatch (iEvent&) = 0;
 
   /**
-   * Register a listener for specific events.  If the listener is already
-   * registered, then this method merely changes the listener's `trigger'. The
-   * `trigger' argument is a combination of the CSMASK_XXX event triggers
-   * defined in iutil/evdefs.h.  Multiple triggers may be specified by
-   * combining them with the bitwise "or" operator (`|').  The CSMASK_Nothing
-   * event trigger is special.  If registered with this trigger, the listener
-   * will be called in just before Process() iterates over the event queue, 
-   * and then it will be called with 3 different csevBroadcast events after 
-   * has been dispatched the last event. In this case, the listener will be 
-   * sent an csevBroadcast event with the Event.Retrieve("cmdCode") equal to 
-   * cscmdPreProcess before events dispatching, and after events dispatching
-   * the listener will receive three csevBroadcast events, in 3 successive 
-   * phases, following this ordering: the first broadcasted event has the 
-   * Event.Retrieve("cmdCode") equal to cscmdProcess, then the second
-   * broadcasted event has a value of cscmdPostProcess and finally the last
-   * event broadcasted has the cscmdFinalProcess value .
+   * Register a listener with the event scheduling subsystem.
+   * The handler will name itself via the iEventHandler::GetGenericID()
+   * method.
    */
-  virtual void RegisterListener (iEventHandler*, unsigned int trigger) = 0;
-
+  virtual csHandlerID RegisterListener (iEventHandler *) = 0;
   /**
-   * Unregister a listener. It is important to call RemoveListener() before
+   * Subscribe an event listener to a given event subtree.  For example, 
+   * subscribers to "crystalspace.input.keyboard" will receive 
+   * "crystalspace.input.keyboard.up" and "crystalspace.input.keyboard.down" 
+   * events.  csEventIDs should be retrieved from csEventNameRegistry::GetID().
+   */
+  virtual bool Subscribe (iEventHandler *, const csEventID &ename) = 0;
+  /**
+   * Subscribe an event listener to a given list of event subtrees.
+   * The list shold be terminated with the CS_EVENTLIST_END token.
+   */
+  virtual bool Subscribe (iEventHandler *, const csEventID ename[]) = 0;
+  /**
+   * Unsubscribe an event listener from a particular event subtree.
+   * This should only be called on an event name which was used as
+   * an argument to Subscribe or to RegisterListener; otherwise, the 
+   * results are undefined.
+   */
+  virtual void Unsubscribe (iEventHandler*, const csEventID[]) = 0;
+  /**
+   * Unsubscribe an event listener from a particular set of event subtrees.
+   * This should only be called on event names which were used as
+   * arguments to Subscribe or RegisterListener; otherwise, the results are 
+   * undefined.  It is important to call RemoveListener() before
    * deleting your event handler!
    */
-  virtual void RemoveListener (iEventHandler*) = 0;
-
+  virtual void Unsubscribe (iEventHandler*, const csEventID &) = 0;
   /**
-   * Change a listener's trigger.  See RegisterListener() for a discussion of
-   * the trigger.
+   * Convenient shorthand for RegisterListener() followed by Subscribe().
    */
-  virtual void ChangeListenerTrigger (iEventHandler*, unsigned int trigger) = 0;
+  virtual csHandlerID RegisterListener (iEventHandler *, const csEventID &ename) = 0;
+  /**
+   * Convenient shorthand for RegisterListener() followed by Subscribe().
+   */
+  virtual csHandlerID RegisterListener (iEventHandler *, const csEventID ename[]) = 0;
+  /**
+   * Unregister a listener and drop all of its subscriptions.
+   * It is important to call RemoveListener() before deleting your event 
+   * handler!
+   */
+  virtual void RemoveListener (iEventHandler *) = 0;
 
   /**
    * Register an event plug and return a new outlet.  Any module which
@@ -134,13 +153,19 @@ struct iEventQueue : public virtual iBase
    * iEventCord returned by this function.  The category and subcategory are
    * matched against the category and subcategory of each actual iEvent.
    */
-  virtual iEventCord* GetEventCord (int Category, int Subcategory) = 0;
+  virtual iEventCord* GetEventCord (const csEventID &name) = 0;
 
   /**
    * Create an event, from the pool if there are any free events available. Else
    * create a new event in the pool and use it.
    */
-  virtual csPtr<iEvent> CreateEvent(uint8 type) = 0;
+  virtual csPtr<iEvent> CreateEvent (const csEventID &name) = 0;
+
+  /**
+   * Create an event with the broadcast flag set.  Draw from the pool if any are
+   * available, else create a new event in the pool and use it.
+   */
+  virtual csPtr<iEvent> CreateBroadcastEvent (const csEventID &name) = 0;
 
   /**
    * Place an event into queue.  In general, clients should post events to the

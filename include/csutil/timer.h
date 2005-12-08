@@ -29,6 +29,7 @@
 #include "csutil/array.h"
 #include "csutil/scf_implementation.h"
 #include "iutil/timer.h"
+#include "iutil/eventnames.h"
 
 struct iEvent;
 struct iObjectRegistry;
@@ -45,6 +46,7 @@ class CS_CRYSTALSPACE_EXPORT csEventTimer :
 {
 private:
   iObjectRegistry* object_reg;
+  csEventID FinalProcess;
   csArray<timerevent> timerevents;
   iEventHandler* handler;
   csRef<iVirtualClock> vc;

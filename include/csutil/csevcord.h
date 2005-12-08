@@ -42,8 +42,8 @@ protected:
   /// Pass events to the system queue?
   volatile bool pass;
 
-  /// The category and subcategory of this events on this cord
-  int category, subcategory;
+  /// The name of the events on this cord
+  csEventID name;
 
   /** \internal
    * Linked list of plugins
@@ -71,8 +71,8 @@ protected:
   bool Post(iEvent*);
 
 public:
-  /// Create an event cord for a given category/subcategory
-  csEventCord(int category, int subcategory);
+  /// Create an event cord for a given name
+  csEventCord(csEventID, bool=false);
 
   /// Destructor.
   virtual ~csEventCord();
@@ -90,10 +90,7 @@ public:
   virtual void SetPass(bool flag) { pass = flag; }
 
   /// Get the category of this cord.
-  virtual int GetCategory() const { return category; }
-
-  /// Get the subcategory of this cord.
-  virtual int GetSubcategory() const { return subcategory; }
+  virtual csEventID GetName() const { return name; }
 };
 
 #endif // __CS_CSEVCORD_H__

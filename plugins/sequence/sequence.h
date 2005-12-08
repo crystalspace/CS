@@ -220,7 +220,11 @@ public:
       SCF_DESTRUCT_IBASE();
     }
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent (e); }
+    CS_EVENTHANDLER_NAMES("crystalspace.sequence")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } * scfiEventHandler;
+
+  CS_DECLARE_EVENT_SHORTCUTS;
 };
 
 #endif // __CS_SEQUENCE_H__

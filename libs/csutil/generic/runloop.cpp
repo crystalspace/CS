@@ -46,22 +46,29 @@ class csDefaultQuitEventHandler :
   public scfImplementation1<csDefaultQuitEventHandler, iEventHandler>
 {
 private:
+  csEventID Quit;
   bool shutdown;
 public:
-  csDefaultQuitEventHandler() 
+  csDefaultQuitEventHandler(iObjectRegistry *reg) 
     : scfImplementationType (this), shutdown(false) 
-  {}
+  {
+    Quit = csevQuit (reg);
+  }
   virtual ~csDefaultQuitEventHandler() { }
   bool ShouldShutdown() const { return shutdown; }
   virtual bool HandleEvent(iEvent& e)
   {
-    if (e.Type == csevBroadcast && csCommandEventHelper::GetCode(&e) == cscmdQuit)
+    if (e.Name == Quit)
     {
       shutdown = true;
       return true;
     }
     return false;
   }
+  CS_EVENTHANDLER_NAMES("crystalspace.runloop")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
+
+  friend bool csDefaultRunLoop (iObjectRegistry *);
 };
 
 
@@ -72,8 +79,8 @@ bool csDefaultRunLoop (iObjectRegistry* r)
     return false;
   csRef<iVirtualClock> vc (CS_QUERY_REGISTRY(r, iVirtualClock));
 
-  csDefaultQuitEventHandler eh;
-  q->RegisterListener(&eh, CSMASK_Broadcast);
+  csDefaultQuitEventHandler eh (r);
+  q->RegisterListener(&eh, eh.Quit);
 
   while (!eh.ShouldShutdown())
   {

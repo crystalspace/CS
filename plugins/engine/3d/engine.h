@@ -31,6 +31,7 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/stringarray.h"
 #include "csutil/weakref.h"
+#include "csutil/eventnames.h"
 #include "iengine/campos.h"
 #include "iengine/collectn.h"
 #include "iengine/engine.h"
@@ -578,6 +579,8 @@ public:
       if (parent) return parent->HandleEvent (ev);
       else return false;
     }
+    CS_EVENTHANDLER_NAMES("crystalspace.engine.3d")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } * scfiEventHandler;
 
   // -- iDebugHelper
@@ -980,6 +983,10 @@ private:
   
   /// Current render context (proc texture) or 0 if global.
   iTextureHandle* currentRenderContext; 
+
+  CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
+  csEventID CanvasResize;
+  csEventID CanvasClose;
 };
 
 #endif // __CS_ENGINE_H__

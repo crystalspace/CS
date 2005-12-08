@@ -205,7 +205,7 @@ void awsCmdButton::ClearGroup ()
 {
   csEvent Event;
 
-  Event.Type = csevGroupOff;
+  Event.Name = awsGroupOff (WindowManager()->GetObjectRegistry());
 
   iAwsComponent* cmp = Parent ()->GetTopChild ();
   while (cmp)
@@ -219,16 +219,14 @@ bool awsCmdButton::HandleEvent (iEvent &Event)
 {
   if (awsComponent::HandleEvent (Event)) return true;
 
-  switch (Event.Type)
+  if (Event.Name == awsGroupOff (WindowManager()->GetObjectRegistry()))
   {
-  case csevGroupOff:
     if (is_down && is_switch)
     {
       is_down = false;
       Invalidate ();
     }
     return true;
-    break;
   }
   return false;
 }

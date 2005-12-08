@@ -84,6 +84,7 @@ bool csConsoleInput::Initialize (iObjectRegistry *object_reg)
 {
   // It is not necessary to call iEventQueue::RegisterListener() since
   // application will usually pass events to us directly.
+  name_reg = csEventNameRegistry::GetRegistry (object_reg);
 
   csRef<iKeyboardDriver> currentKbd = 
     CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
@@ -107,9 +108,8 @@ void csConsoleInput::eiConsoleWatcher::ConsoleVisibilityChanged(
 
 bool csConsoleInput::HandleEvent (iEvent &Event)
 {
-  switch (Event.Type)
+  if (Event.Name == csevKeyboardDown(name_reg))
   {
-    case csevKeyboard:
       if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
 	utf32_char codeCooked = csKeyEventHelper::GetCookedCode (&Event);

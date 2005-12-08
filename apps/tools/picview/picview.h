@@ -21,9 +21,9 @@
 
 #include <crystalspace.h>
 
-class PicView : public csApplicationFramework, public csBaseEventHandler
+class PicView : public csApplicationFramework
 {
-private:
+ protected:
 
   csRef<iEngine> engine;
   csRef<iGraphics3D> g3d;
@@ -40,22 +40,10 @@ private:
   bool scale;
   float x,y;
 
-  bool OnKeyboard (iEvent&);
-  bool HandleEvent (iEvent &);
-
-  void ProcessFrame ();
-  void FinishFrame ();
-
   void CreateGui ();
   void LoadNextImage (size_t idx, int step);
 
-  static void ButtonFirst(unsigned long, intptr_t app, iAwsSource *source);
-  static void ButtonPrev (unsigned long, intptr_t app, iAwsSource *source);
-  static void ButtonNext (unsigned long, intptr_t app, iAwsSource *source);
-  static void ButtonQuit (unsigned long, intptr_t app, iAwsSource *source);
-  static void ButtonScale(unsigned long, intptr_t app, iAwsSource *source);
-
-public:
+ public:
 
   PicView ();
   ~PicView ();
@@ -64,6 +52,29 @@ public:
   bool OnInitialize (int argc, char* argv[]);
 
   bool Application ();
+
+  class EventHandler : public csBaseEventHandler {
+  public:
+    EventHandler (PicView *parent, iObjectRegistry *object_reg);
+
+    bool OnKeyboard (iEvent&);
+    bool HandleEvent (iEvent &);
+
+    void ProcessFrame ();
+    void FinishFrame ();
+
+    PicView *parent;
+
+    static void ButtonFirst(unsigned long, intptr_t app, iAwsSource *source);
+    static void ButtonPrev (unsigned long, intptr_t app, iAwsSource *source);
+    static void ButtonNext (unsigned long, intptr_t app, iAwsSource *source);
+    static void ButtonQuit (unsigned long, intptr_t app, iAwsSource *source);
+    static void ButtonScale(unsigned long, intptr_t app, iAwsSource *source);
+
+    CS_EVENTHANDLER_NAMES("crystalspace.apps.picview")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
+  };
+  EventHandler *Handler;
 };
 
 #endif // __PICVIEW_H__

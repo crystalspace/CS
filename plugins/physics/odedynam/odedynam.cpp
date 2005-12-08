@@ -210,6 +210,8 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
   if (!clock)
     return false;
 
+  PreProcess = csevPreProcess (object_reg);
+
   return true;
 }
 
@@ -493,7 +495,7 @@ void csODEDynamics::EnableEventProcessing (bool enable)
       scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
+      q->RegisterListener (scfiEventHandler, PreProcess);
   }
   else if (!enable && process_events)
   {
@@ -511,7 +513,7 @@ void csODEDynamics::EnableEventProcessing (bool enable)
 
 bool csODEDynamics::HandleEvent (iEvent& Event)
 {
-  if (Event.Type == csevBroadcast && csCommandEventHelper::GetCode(&Event) == cscmdPreProcess)
+  if (Event.Name == PreProcess)
   {
     float stepsize = steptime;
     float elapsed_time = ((float)clock->GetElapsedTicks ())/1000.0;

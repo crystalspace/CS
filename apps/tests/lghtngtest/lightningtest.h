@@ -46,6 +46,10 @@ private:
   csRef<iPluginManager> PluginManager;
   iSector* room;
 
+  csEventID Process;
+  csEventID FinalProcess;
+  csEventID KeyboardDown;
+
   static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();

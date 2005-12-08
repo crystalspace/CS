@@ -43,12 +43,15 @@ class csInputBinder;
  */
 class CS_CRYSTALSPACE_EXPORT csInputDefinition
 {
+public:
+  csRef<iEventNameRegistry> name_reg;
 protected:
-  int containedType;
+  csEventID containedName;
 
   uint32 modifiersHonored;
   csKeyModifiers modifiers;
-
+  // The (basis-0) identifier for the device from which this event came
+  uint deviceNumber;
   union
   {
     struct
@@ -70,10 +73,12 @@ protected:
 public:
   /**
    * Default constructor.
+   * \param name_reg A pointer to the event name registry.
    * \param honorModifiers A bitmask of modifier keys that will be recognised.
    * \param useCookedCode If true, will use the cooked key code instead of raw.
    */
-  csInputDefinition (uint32 honorModifiers = 0, bool useCookedCode = false);
+  csInputDefinition (csRef<iEventNameRegistry> name_reg, 
+		     uint32 honorModifiers = 0, bool useCookedCode = false);
 
   /// Copy constructor.
   csInputDefinition (const csInputDefinition &other);
@@ -84,7 +89,7 @@ public:
    * \param honorModifiers A bitmask of modifier keys that will be recognised.
    * \param useCookedCode If true, will use the cooked key code instead of raw.
    */
-  csInputDefinition (iEvent *event,
+  csInputDefinition (csRef<iEventNameRegistry> name_reg, iEvent *event,
 		     uint32 honorModifiers = 0, bool useCookedCode = false);
 
   /**
@@ -92,22 +97,30 @@ public:
    * \param event The event to analyse for input data.
    * \param axis Events include all axes, so choose: 0 = x, 1 = y.
    */
-  csInputDefinition (iEvent *event, uint8 axis);
+  csInputDefinition (csRef<iEventNameRegistry> name_reg, iEvent *event, uint8 axis);
 
   /**
    * Construct an input description from a string.
-   * \param string The string to parse, e.g. "mouse1", "shift+a".
+   * \param string The string to parse, e.g. "mousebutton1", "shift+a".
    * \param honorModifiers A bitmask of modifier keys that will be recognised.
    * \param useCookedCode If true, will use the cooked key code instead of raw.
+   * More precisely, the syntax for <tt>string</tt> is (in EBNF):
+   * <pre>
+   * [ mod ("+"|"-") ]* ( ( nonZeroDevNumber? ("mouse" | "joystick") ( "X" | "Y" | ("Axis" axisNumber) | ("Button" buttonNumber) | buttonNumber ) ) | key )
+   * </pre>
+   * So the fourth axis of the third joystick is "2JoystickAxis3", and its 
+   * first button is "2JoystickButton0" or "2Joystick0".  The leading number
+   * must be omitted for the first (primary) input device, e.g.,
+   * "MouseAxis0" or "JoystickButton3".
    */
-  csInputDefinition (const char *string,
+  csInputDefinition (csRef<iEventNameRegistry> name_reg, const char *string,
 		     uint32 honorModifiers = 0, bool useCookedCode = false);
 
   /**
    * Gets the string representation of the description.
    * \param distinguishModifiers If false, left and right modifiers will be
    *   output as plain-old modifiers (e.g. "LAlt" and "RAlt" become just "Alt").
-   * \return The string representation of the description (e.g. "mouse1",
+   * \return The string representation of the description (e.g. "mousebutton1",
    *   "shift+a").
    */
   csString ToString (bool distinguishModifiers = true) const;
@@ -115,11 +128,11 @@ public:
   /// Returns a boolean indicating whether the object contains a valid input.
   bool IsValid () const;
 
-  /// Returns the event type of the description (a csev... constant).
-  int GetType () const { return containedType; }
+  /// Returns the event name of the description (a csev... constant).
+  csEventID GetName () const { return containedName; }
 
   /// Set the event type of the description (a csev... constant).
-  void SetType (int t) { containedType = t; }
+  void SetName (csEventID n) { containedName = n; }
 
   /**
    * Gives the key code of the description, assuming it is a keyboard type.
@@ -128,15 +141,15 @@ public:
    * \return False if the description is not a keyboard type.
    */
   bool GetKeyCode (utf32_char &code, bool &isCooked) const
-    { code = keyboard.code;
-      isCooked = keyboard.isCooked;
-      return containedType == csevKeyboard; }
+  { code = keyboard.code;
+    isCooked = keyboard.isCooked;
+    return (containedName == csevKeyboardEvent(name_reg)); }
 
   /// Sets the key code of the description, assuming it is a keyboard type.
   bool SetKeyCode (utf32_char code)
-    { if (containedType != csevKeyboard) return false;
-      keyboard.code = code;
-      return true; }
+  { if (containedName != csevKeyboardEvent(name_reg)) return false;
+    keyboard.code = code;
+    return true; }
 
   /**
    * Returns the numeric value of the description.
@@ -175,15 +188,18 @@ public:
    * \remarks Any of the output parameters may be null, in which case they are
    *   ignored.
    */
-  static bool ParseKey (const char *iStr, utf32_char *oKeyCode,
-    utf32_char *oCookedCode, csKeyModifiers *oModifiers);
+  static bool ParseKey (csRef<iEventNameRegistry> &reg, 
+			const char *iStr, utf32_char *oKeyCode,
+			utf32_char *oCookedCode, csKeyModifiers *oModifiers);
 
   /**
    * Helper function to parse a string (eg. "MouseX", "Alt+Mouse1") into
    * values describing a non-keyboard event.
    * \param iStr The string to parse.
-   * \param oType Will be set to the event type of the description
-   *   (a csev... constant).
+   * \param oType Will be set to the event name of the description
+   *   (a csev... identifier).
+   * \param oDevice For mouse and joystick events, will be set to the
+   *   device number, basis 0 (e.g., the third joystick device is "2").
    * \param oNumeric For button events, will be set to the button number.
    *   For axis events, will be set to the axis number (0 = x, 1 = y).
    * \param oModifiers Will be populated with the modifiers of the description.
@@ -191,8 +207,9 @@ public:
    * \remarks Any of the output parameters may be null, in which case they are
    *   ignored.
    */
-  static bool ParseOther (const char *iStr, int *oType, int *oNumeric,
-    csKeyModifiers *oModifiers);
+  static bool ParseOther (csRef<iEventNameRegistry> &reg, 
+			  const char *iStr, csEventID *oType, uint *oDevice,
+			  int *oNumeric, csKeyModifiers *oModifiers);
 
   /**
    * Helper function to return a string (eg. "Ctrl+A") from values
@@ -204,13 +221,16 @@ public:
    *   (eg. "LCtrl" as opposed to just "Ctrl").
    * \return The description string.
    */
-  static csString GetKeyString (utf32_char code, const csKeyModifiers *mods,
-    bool distinguishModifiers = true);
+  static csString GetKeyString (csRef<iEventNameRegistry> &reg,
+				utf32_char code, const csKeyModifiers *mods,
+				bool distinguishModifiers = true);
 
   /**
    * Helper function to return a string (eg. "MouseX", "Alt+Mouse1") from
    * values describing a non-keyboard event.
-   * \param type The event type of the description (a csev... constant).
+   * \param type The event type of the description (a csev... identifier).
+   * \param device For mouse and joystick events, the device number, basis 0
+   *   (first mouse is 0, second joystick is 1, etc).
    * \param num For button events, the button number. For axis events, the
    *   axis number (0 = x, 1 = y).
    * \param mods The keyboard modifiers. Will be ignored if 0.
@@ -218,8 +238,9 @@ public:
    *   (eg. "LCtrl" as opposed to just "Ctrl").
    * \return The description string.
    */
-  static csString GetOtherString (int type, int num, const csKeyModifiers *mods,
-    bool distinguishModifiers = true);
+  static csString GetOtherString (csRef<iEventNameRegistry> &reg,
+				  csEventID type, uint device, int num, 
+				  const csKeyModifiers *mods, bool distinguishModifiers = true);
 };
 
 /**

@@ -458,6 +458,22 @@ public:
 
   /// Mark the component and its sub-components to be deleted.
   virtual void MarkToDeleteRecursively(iAwsComponent *comp) = 0;
+
+  /// Cached event names.  These should be set up in the ::Initialize method.
+  csEventID PreProcess;
+  csEventID MouseDown;
+  csEventID MouseUp;
+  csEventID MouseClick;
+  csEventID MouseMove;
+  csEventID KeyboardDown;
+  csEventID KeyboardUp;
+
+  csEventID MouseEnter;
+  csEventID MouseExit;
+  csEventID LoseFocus;
+  csEventID GainFocus;
+  csEventID GroupOff;
+  csEventID FrameStart;
 };
 
 SCF_VERSION (iAwsPrefManager, 0, 0, 4);
@@ -718,6 +734,8 @@ SCF_VERSION (iAwsSource, 0, 0, 1);
 /// Interface for signal sources
 struct iAwsSource : public iBase
 {
+  virtual iAws *WindowManager() = 0;
+
   /// Gets the component owner for this (sources are embedded)
   virtual iAwsComponent *GetComponent() = 0;
 
@@ -794,7 +812,6 @@ SCF_VERSION (iAwsComponent, 0, 2, 0);
 /// Interface that is the base of ALL components.
 struct iAwsComponent : public iAwsSource
 {
-  
   /**
    * This function takes care of the creation tasks required to prepare this
    * component for use. If you create a component via the window manager's

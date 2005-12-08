@@ -189,9 +189,9 @@ struct iMouseDriver : public virtual iBase
   virtual void Reset () = 0;
 
   /// Query last mouse X position for mouse number (1, 2, ...)
-  virtual int GetLastX (uint number = 1) const = 0;
+  virtual int GetLastX (uint number = 0) const = 0;
   /// Query last mouse Y position
-  virtual int GetLastY (uint number = 1) const = 0;
+  virtual int GetLastY (uint number = 0) const = 0;
   /// Query last mouse position for mouse n on axis a
   virtual int GetLast (uint n, uint a) const = 0;
   /// Query last mouse position for mouse n

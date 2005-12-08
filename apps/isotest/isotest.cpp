@@ -221,25 +221,24 @@ void IsoTest::FinishFrame ()
 
 bool IsoTest::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+  if (ev.Name == Process)
   {
     isotest->SetupFrame ();
     return true;
   }
-  else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+  else if (ev.Name == FinalProcess)
   {
     isotest->FinishFrame ();
     return true;
   }
-  else if ((ev.Type == csevKeyboard) && 
-    (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown))
+  else if (ev.Name == KeyboardDown)
   {
     utf32_char c = csKeyEventHelper::GetCookedCode (&ev);
     if (c == CSKEY_ESC)
     {
       csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
       if (q)
-	q->GetEventOutlet()->Broadcast (cscmdQuit);
+	q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
       return true;
     }
     else if (c == CSKEY_TAB)
@@ -449,7 +448,17 @@ bool IsoTest::Initialize ()
     return false;
   }
 
-  if (!csInitializer::SetupEventHandler (object_reg, IsoTestEventHandler))
+  Process = csevProcess (object_reg);
+  FinalProcess = csevFinalProcess (object_reg);
+  KeyboardDown = csevKeyboardDown (object_reg);
+
+  const csEventID evs[] = {
+    Process,
+    FinalProcess,
+    KeyboardDown,
+    CS_EVENTLIST_END
+  };
+  if (!csInitializer::SetupEventHandler (object_reg, IsoTestEventHandler, evs))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.isotest",

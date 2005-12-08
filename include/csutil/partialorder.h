@@ -127,7 +127,14 @@ public:
     // delete node
     Nodes.DeleteIndexFast(p);
     NodeMap.Delete(node, p);
-    
+    if (Nodes.Length() > p)
+      NodeMap.PutUnique(Nodes[p].self, p);
+
+    // debug...
+    for (size_t iter=0 ; iter<Nodes.Length() ; iter++) {
+      CS_ASSERT(NodeMap.Get(Nodes[iter].self,csArrayItemNotFound)==iter);
+    }
+
     Dump();
   }
   
@@ -170,6 +177,18 @@ public:
     CS_ASSERT(n2 != csArrayItemNotFound);
     Nodes[n2].pre.DeleteFast(n1);
     Nodes[n1].post.DeleteFast(n2);
+  }
+
+  /// Number of nodes in the graph
+  size_t Size ()
+  {
+    return Nodes.Length();
+  }
+
+  /// Return a node with a given index (0 through Size()-1)
+  const T GetByIndex(size_t i)
+  {
+    return Nodes[i].self;
   }
   
   /**
@@ -337,23 +356,25 @@ private:
   
 public:
   void Dump() {
-#if 0 /* ADB debugging stuff */
+#ifdef ADB_DEBUG
     std::cerr << "PARTIAL ORDER---------------------------------------" 
 	      << std::endl;
     for (size_t i=0 ; i<Nodes.Length() ; i++) 
     {
-      std::cerr << "Node #" << i << " [" << Nodes[i].self 
+      std::cerr << " Node #" << i << " [" << Nodes[i].self 
 		<< "]:" << std::endl;
-      std::cerr << "  pres:" << std::endl;
+      std::cerr << "   pres:";
       for (size_t j=0 ; j<Nodes[i].pre.Length() ; j++) 
       {
-	std::cerr << "    #" << Nodes[i].pre[j] << std::endl;
+	std::cerr << " #" << Nodes[i].pre[j];
       }
-      std::cerr << "  posts:" << std::endl;
+      std::cerr << std::endl 
+		<< "   posts:";
       for (size_t j=0 ; j<Nodes[i].post.Length() ; j++) 
       {
-	std::cerr << "    #" << Nodes[i].post[j] << std::endl;
+	std::cerr << " #" << Nodes[i].post[j];
       }
+      std::cerr << std::endl;
     }
     std::cerr << "PARTIAL ORDER END-----------------------------------" 
 	      << std::endl << std::endl;

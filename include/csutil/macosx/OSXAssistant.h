@@ -74,28 +74,28 @@ struct iOSXAssistant : public iBase
 
   /**
    * Notify Crystal Space that the AppKit application has come to the
-   * foreground.  This causes a `cscmdFocusChanged' event to be posted to the
+   * foreground.  This causes a `csevFocusGained' event to be posted to the
    * Crystal Space event queue.
    */
   virtual void application_activated() = 0;
 
   /**
    * Notify Crystal Space that the AppKit application has been sent to the
-   * background.  This causes a `cscmdFocusChanged' event to be posted to the
+   * background.  This causes a `csevFocusLost' event to be posted to the
    * Crystal Space event queue.
    */
   virtual void application_deactivated() = 0;
 
   /** 
    * Notify Crystal Space that the AppKit application has been hidden.  This
-   * causes a `cscmdCanvasHidden' event to be immediately posted to the Crystal
+   * causes a `csevCanvasHidden' event to be immediately posted to the Crystal
    * Space event queue.
    */
   virtual void application_hidden() = 0;
 
   /** 
    * Notify Crystal Space that the AppKit application has been unhidden.  This
-   * causes a `cscmdCanvasExposed' event to be immediately posted to the
+   * causes a `csevCanvasExposed' event to be immediately posted to the
    * Crystal Space event queue.
    */
   virtual void application_unhidden() = 0;

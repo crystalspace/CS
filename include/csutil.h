@@ -60,6 +60,8 @@
 #include "csutil/documentcommon.h"
 #include "csutil/documenthelper.h"
 #include "csutil/event.h"
+#include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "csutil/evoutlet.h"
 #include "csutil/fifo.h"
 #include "csutil/filereadhelper.h"

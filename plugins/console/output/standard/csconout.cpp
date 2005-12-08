@@ -152,11 +152,15 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
   flash_time = csGetTicks ();
 
   // We want to see broadcast events
+  CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS (object_reg);
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
+  {
+    csEventID events[3] = { SystemOpen, SystemClose, CS_EVENTLIST_END };
+    q->RegisterListener (scfiEventHandler, events);
+  }
   return true;
 }
 
@@ -674,20 +678,16 @@ bool csConsoleOutput::PerformExtensionV (const char *iCommand, va_list args)
 
 bool csConsoleOutput::HandleEvent (iEvent &Event)
 {
-  switch (Event.Type)
+  if (Event.Name == SystemOpen)
   {
-    case csevBroadcast:
-      switch (csCommandEventHelper::GetCode(&Event))
-      {
-        case cscmdSystemOpen:
           system_ready = true;
           CacheColors ();
           return true;
-        case cscmdSystemClose:
+  }
+  else if (Event.Name == SystemClose)
+  {
           system_ready = false;
           return true;
-      }
-      break;
   }
   return false;
 }

@@ -89,18 +89,7 @@ awsManager2::SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d)
 
 bool awsManager2::HandleEvent (iEvent &Event)
 {  
-  // Find out what kind of event it is
-  switch (Event.Type)
-  {
-  case csevMouseMove:
-  case csevMouseUp:
-  case csevMouseClick:
-  case csevMouseDown:
-  case csevKeyboard:
-  case csevBroadcast:
-    break;
-  }
-
+  // Do nothing
   return false;
 }
 
