@@ -2718,7 +2718,6 @@ package cspace::csInitializer;
 *_RequestPlugins = *cspacec::csInitializer__RequestPlugins;
 *OpenApplication = *cspacec::csInitializer_OpenApplication;
 *CloseApplication = *cspacec::csInitializer_CloseApplication;
-*_SetupEventHandler = *cspacec::csInitializer__SetupEventHandler;
 *SetupEventHandler = *cspacec::csInitializer_SetupEventHandler;
 *DestroyApplication = *cspacec::csInitializer_DestroyApplication;
 *GetDefaultAppID = *cspacec::csInitializer_GetDefaultAppID;
@@ -3172,6 +3171,32 @@ package cspace::iAws;
 *ComponentDestroyed = *cspacec::iAws_ComponentDestroyed;
 *DeleteMarkedComponents = *cspacec::iAws_DeleteMarkedComponents;
 *MarkToDeleteRecursively = *cspacec::iAws_MarkToDeleteRecursively;
+*swig_PreProcess_get = *cspacec::iAws_PreProcess_get;
+*swig_PreProcess_set = *cspacec::iAws_PreProcess_set;
+*swig_MouseDown_get = *cspacec::iAws_MouseDown_get;
+*swig_MouseDown_set = *cspacec::iAws_MouseDown_set;
+*swig_MouseUp_get = *cspacec::iAws_MouseUp_get;
+*swig_MouseUp_set = *cspacec::iAws_MouseUp_set;
+*swig_MouseClick_get = *cspacec::iAws_MouseClick_get;
+*swig_MouseClick_set = *cspacec::iAws_MouseClick_set;
+*swig_MouseMove_get = *cspacec::iAws_MouseMove_get;
+*swig_MouseMove_set = *cspacec::iAws_MouseMove_set;
+*swig_KeyboardDown_get = *cspacec::iAws_KeyboardDown_get;
+*swig_KeyboardDown_set = *cspacec::iAws_KeyboardDown_set;
+*swig_KeyboardUp_get = *cspacec::iAws_KeyboardUp_get;
+*swig_KeyboardUp_set = *cspacec::iAws_KeyboardUp_set;
+*swig_MouseEnter_get = *cspacec::iAws_MouseEnter_get;
+*swig_MouseEnter_set = *cspacec::iAws_MouseEnter_set;
+*swig_MouseExit_get = *cspacec::iAws_MouseExit_get;
+*swig_MouseExit_set = *cspacec::iAws_MouseExit_set;
+*swig_LoseFocus_get = *cspacec::iAws_LoseFocus_get;
+*swig_LoseFocus_set = *cspacec::iAws_LoseFocus_set;
+*swig_GainFocus_get = *cspacec::iAws_GainFocus_get;
+*swig_GainFocus_set = *cspacec::iAws_GainFocus_set;
+*swig_GroupOff_get = *cspacec::iAws_GroupOff_get;
+*swig_GroupOff_set = *cspacec::iAws_GroupOff_set;
+*swig_FrameStart_get = *cspacec::iAws_FrameStart_get;
+*swig_FrameStart_set = *cspacec::iAws_FrameStart_set;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -3342,6 +3367,7 @@ package cspace::iAwsSource;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
+*WindowManager = *cspacec::iAwsSource_WindowManager;
 *GetComponent = *cspacec::iAwsSource_GetComponent;
 *RegisterSlot = *cspacec::iAwsSource_RegisterSlot;
 *UnregisterSlot = *cspacec::iAwsSource_UnregisterSlot;
@@ -9340,16 +9366,13 @@ package cspace::iEvent;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
-*swig_Type_get = *cspacec::iEvent_Type_get;
-*swig_Type_set = *cspacec::iEvent_Type_set;
-*swig_Category_get = *cspacec::iEvent_Category_get;
-*swig_Category_set = *cspacec::iEvent_Category_set;
-*swig_SubCategory_get = *cspacec::iEvent_SubCategory_get;
-*swig_SubCategory_set = *cspacec::iEvent_SubCategory_set;
-*swig_Flags_get = *cspacec::iEvent_Flags_get;
-*swig_Flags_set = *cspacec::iEvent_Flags_set;
+*swig_Name_get = *cspacec::iEvent_Name_get;
+*swig_Name_set = *cspacec::iEvent_Name_set;
+*GetName = *cspacec::iEvent_GetName;
 *swig_Time_get = *cspacec::iEvent_Time_get;
 *swig_Time_set = *cspacec::iEvent_Time_set;
+*swig_Broadcast_get = *cspacec::iEvent_Broadcast_get;
+*swig_Broadcast_set = *cspacec::iEvent_Broadcast_set;
 *AddInt8 = *cspacec::iEvent_AddInt8;
 *AddUInt8 = *cspacec::iEvent_AddUInt8;
 *AddInt16 = *cspacec::iEvent_AddInt16;
@@ -9485,8 +9508,7 @@ package cspace::iEventCord;
 *Remove = *cspacec::iEventCord_Remove;
 *GetPass = *cspacec::iEventCord_GetPass;
 *SetPass = *cspacec::iEventCord_SetPass;
-*GetCategory = *cspacec::iEventCord_GetCategory;
-*GetSubcategory = *cspacec::iEventCord_GetSubcategory;
+*GetName = *cspacec::iEventCord_GetName;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -9561,12 +9583,15 @@ package cspace::csMouseEventHelper;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
+*NewEvent = *cspacec::csMouseEventHelper_NewEvent;
+*GetEventType = *cspacec::csMouseEventHelper_GetEventType;
 *GetNumber = *cspacec::csMouseEventHelper_GetNumber;
 *GetX = *cspacec::csMouseEventHelper_GetX;
 *GetY = *cspacec::csMouseEventHelper_GetY;
 *GetAxis = *cspacec::csMouseEventHelper_GetAxis;
 *GetNumAxes = *cspacec::csMouseEventHelper_GetNumAxes;
 *GetButton = *cspacec::csMouseEventHelper_GetButton;
+*GetButtonState = *cspacec::csMouseEventHelper_GetButtonState;
 *GetButtonMask = *cspacec::csMouseEventHelper_GetButtonMask;
 *GetModifiers = *cspacec::csMouseEventHelper_GetModifiers;
 *GetEventData = *cspacec::csMouseEventHelper_GetEventData;
@@ -9606,10 +9631,12 @@ package cspace::csJoystickEventHelper;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
+*NewEvent = *cspacec::csJoystickEventHelper_NewEvent;
 *GetNumber = *cspacec::csJoystickEventHelper_GetNumber;
 *GetAxis = *cspacec::csJoystickEventHelper_GetAxis;
 *GetNumAxes = *cspacec::csJoystickEventHelper_GetNumAxes;
 *GetButton = *cspacec::csJoystickEventHelper_GetButton;
+*GetButtonState = *cspacec::csJoystickEventHelper_GetButtonState;
 *GetButtonMask = *cspacec::csJoystickEventHelper_GetButtonMask;
 *GetModifiers = *cspacec::csJoystickEventHelper_GetModifiers;
 *GetEventData = *cspacec::csJoystickEventHelper_GetEventData;
@@ -9643,12 +9670,51 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csInputEventHelper ##############
+
+package cspace::csInputEventHelper;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetButton = *cspacec::csInputEventHelper_GetButton;
+*GetButtonState = *cspacec::csInputEventHelper_GetButtonState;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csInputEventHelper(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csInputEventHelper($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csCommandEventHelper ##############
 
 package cspace::csCommandEventHelper;
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
+*NewEvent = *cspacec::csCommandEventHelper_NewEvent;
 *GetCode = *cspacec::csCommandEventHelper_GetCode;
 *GetInfo = *cspacec::csCommandEventHelper_GetInfo;
 *GetEventData = *cspacec::csCommandEventHelper_GetEventData;
@@ -9728,13 +9794,15 @@ package cspace::iEventQueue;
 %ITERATORS = ();
 *Process = *cspacec::iEventQueue_Process;
 *Dispatch = *cspacec::iEventQueue_Dispatch;
+*Subscribe = *cspacec::iEventQueue_Subscribe;
+*Unsubscribe = *cspacec::iEventQueue_Unsubscribe;
 *RegisterListener = *cspacec::iEventQueue_RegisterListener;
 *RemoveListener = *cspacec::iEventQueue_RemoveListener;
-*ChangeListenerTrigger = *cspacec::iEventQueue_ChangeListenerTrigger;
 *CreateEventOutlet = *cspacec::iEventQueue_CreateEventOutlet;
 *GetEventOutlet = *cspacec::iEventQueue_GetEventOutlet;
 *GetEventCord = *cspacec::iEventQueue_GetEventCord;
 *CreateEvent = *cspacec::iEventQueue_CreateEvent;
+*CreateBroadcastEvent = *cspacec::iEventQueue_CreateBroadcastEvent;
 *Post = *cspacec::iEventQueue_Post;
 *Get = *cspacec::iEventQueue_Get;
 *Clear = *cspacec::iEventQueue_Clear;
@@ -9772,6 +9840,12 @@ package cspace::iEventHandler;
 %OWNER = ();
 %ITERATORS = ();
 *HandleEvent = *cspacec::iEventHandler_HandleEvent;
+*GenericName = *cspacec::iEventHandler_GenericName;
+*GenericID = *cspacec::iEventHandler_GenericID;
+*GenericPrec = *cspacec::iEventHandler_GenericPrec;
+*GenericSucc = *cspacec::iEventHandler_GenericSucc;
+*InstancePrec = *cspacec::iEventHandler_InstancePrec;
+*InstanceSucc = *cspacec::iEventHandler_InstanceSucc;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -10743,6 +10817,7 @@ package cspace::iGraphics2D;
 *SetMouseCursor = *cspacec::iGraphics2D_SetMouseCursor;
 *SetGamma = *cspacec::iGraphics2D_SetGamma;
 *GetGamma = *cspacec::iGraphics2D_GetGamma;
+*GetName = *cspacec::iGraphics2D_GetName;
 *CreateOffscreenCanvas = *cspacec::iGraphics2D_CreateOffscreenCanvas;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -14765,27 +14840,13 @@ sub csEventAttrFloat () { $cspacec::csEventAttrFloat }
 sub csEventAttrDatabuffer () { $cspacec::csEventAttrDatabuffer }
 sub csEventAttrEvent () { $cspacec::csEventAttrEvent }
 sub csEventAttriBase () { $cspacec::csEventAttriBase }
-sub csevNothing () { $cspacec::csevNothing }
-sub csevKeyboard () { $cspacec::csevKeyboard }
-sub csevMouseMove () { $cspacec::csevMouseMove }
-sub csevMouseDown () { $cspacec::csevMouseDown }
-sub csevMouseUp () { $cspacec::csevMouseUp }
-sub csevMouseClick () { $cspacec::csevMouseClick }
-sub csevMouseDoubleClick () { $cspacec::csevMouseDoubleClick }
-sub csevJoystickMove () { $cspacec::csevJoystickMove }
-sub csevJoystickDown () { $cspacec::csevJoystickDown }
-sub csevJoystickUp () { $cspacec::csevJoystickUp }
-sub csevCommand () { $cspacec::csevCommand }
-sub csevBroadcast () { $cspacec::csevBroadcast }
-sub csevMouseEnter () { $cspacec::csevMouseEnter }
-sub csevMouseExit () { $cspacec::csevMouseExit }
-sub csevLostFocus () { $cspacec::csevLostFocus }
-sub csevGainFocus () { $cspacec::csevGainFocus }
-sub csevGroupOff () { $cspacec::csevGroupOff }
-sub csevFrameStart () { $cspacec::csevFrameStart }
 sub csKeyEventTypeUp () { $cspacec::csKeyEventTypeUp }
 sub csKeyEventTypeDown () { $cspacec::csKeyEventTypeDown }
-sub CSEF_BROADCAST () { $cspacec::CSEF_BROADCAST }
+sub csMouseEventTypeMove () { $cspacec::csMouseEventTypeMove }
+sub csMouseEventTypeUp () { $cspacec::csMouseEventTypeUp }
+sub csMouseEventTypeDown () { $cspacec::csMouseEventTypeDown }
+sub csMouseEventTypeClick () { $cspacec::csMouseEventTypeClick }
+sub csMouseEventTypeDoubleClick () { $cspacec::csMouseEventTypeDoubleClick }
 sub csKeyModifierTypeShift () { $cspacec::csKeyModifierTypeShift }
 sub csKeyModifierTypeCtrl () { $cspacec::csKeyModifierTypeCtrl }
 sub csKeyModifierTypeAlt () { $cspacec::csKeyModifierTypeAlt }
@@ -14837,20 +14898,6 @@ sub csKeyCharTypeDead () { $cspacec::csKeyCharTypeDead }
 sub CSEVTYPE_Keyboard () { $cspacec::CSEVTYPE_Keyboard }
 sub CSEVTYPE_Mouse () { $cspacec::CSEVTYPE_Mouse }
 sub CSEVTYPE_Joystick () { $cspacec::CSEVTYPE_Joystick }
-sub cscmdNothing () { $cspacec::cscmdNothing }
-sub cscmdQuit () { $cspacec::cscmdQuit }
-sub cscmdFocusChanged () { $cspacec::cscmdFocusChanged }
-sub cscmdSystemOpen () { $cspacec::cscmdSystemOpen }
-sub cscmdSystemClose () { $cspacec::cscmdSystemClose }
-sub cscmdContextResize () { $cspacec::cscmdContextResize }
-sub cscmdContextClose () { $cspacec::cscmdContextClose }
-sub cscmdCommandLineHelp () { $cspacec::cscmdCommandLineHelp }
-sub cscmdPreProcess () { $cspacec::cscmdPreProcess }
-sub cscmdProcess () { $cspacec::cscmdProcess }
-sub cscmdPostProcess () { $cspacec::cscmdPostProcess }
-sub cscmdFinalProcess () { $cspacec::cscmdFinalProcess }
-sub cscmdCanvasHidden () { $cspacec::cscmdCanvasHidden }
-sub cscmdCanvasExposed () { $cspacec::cscmdCanvasExposed }
 sub csComposeNoChar () { $cspacec::csComposeNoChar }
 sub csComposeNormalChar () { $cspacec::csComposeNormalChar }
 sub csComposeComposedChar () { $cspacec::csComposeComposedChar }
