@@ -259,7 +259,7 @@ private:
       baseevent(bevent), mode(SI_LIST), qit(*t->fatRecord->SubscriberQueue,false)
     {
       CS_ASSERT(record->iterator == 0);
-      CS_ASSERT(record->deletedList == 0);
+      //CS_ASSERT(record->deletedList == 0);
       record->iterator = this;
     }
 
@@ -271,7 +271,8 @@ private:
     {
       CS_ASSERT(record->iterator == this);
       record->iterator = 0;
-      if (record->deletedList) {
+      if (record->deletedList) 
+      {
 	record->StaleSubscriberQueue = true;
 	delete record->deletedList;
 	record->deletedList = 0;
