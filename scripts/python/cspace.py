@@ -2397,8 +2397,6 @@ class csInitializer(_object):
     if _newclass:OpenApplication = staticmethod(_cspace.csInitializer_OpenApplication)
     __swig_getmethods__["CloseApplication"] = lambda x: _cspace.csInitializer_CloseApplication
     if _newclass:CloseApplication = staticmethod(_cspace.csInitializer_CloseApplication)
-    __swig_getmethods__["_SetupEventHandler"] = lambda x: _cspace.csInitializer__SetupEventHandler
-    if _newclass:_SetupEventHandler = staticmethod(_cspace.csInitializer__SetupEventHandler)
     __swig_getmethods__["SetupEventHandler"] = lambda x: _cspace.csInitializer_SetupEventHandler
     if _newclass:SetupEventHandler = staticmethod(_cspace.csInitializer_SetupEventHandler)
     __swig_getmethods__["DestroyApplication"] = lambda x: _cspace.csInitializer_DestroyApplication
@@ -2452,8 +2450,6 @@ csInitializer__RequestPlugins = _cspace.csInitializer__RequestPlugins
 csInitializer_OpenApplication = _cspace.csInitializer_OpenApplication
 
 csInitializer_CloseApplication = _cspace.csInitializer_CloseApplication
-
-csInitializer__SetupEventHandler = _cspace.csInitializer__SetupEventHandler
 
 csInitializer_SetupEventHandler = _cspace.csInitializer_SetupEventHandler
 
@@ -2810,6 +2806,45 @@ class iAws(iBase):
     def ComponentDestroyed(*args): return _cspace.iAws_ComponentDestroyed(*args)
     def DeleteMarkedComponents(*args): return _cspace.iAws_DeleteMarkedComponents(*args)
     def MarkToDeleteRecursively(*args): return _cspace.iAws_MarkToDeleteRecursively(*args)
+    __swig_setmethods__["PreProcess"] = _cspace.iAws_PreProcess_set
+    __swig_getmethods__["PreProcess"] = _cspace.iAws_PreProcess_get
+    if _newclass:PreProcess = property(_cspace.iAws_PreProcess_get, _cspace.iAws_PreProcess_set)
+    __swig_setmethods__["MouseDown"] = _cspace.iAws_MouseDown_set
+    __swig_getmethods__["MouseDown"] = _cspace.iAws_MouseDown_get
+    if _newclass:MouseDown = property(_cspace.iAws_MouseDown_get, _cspace.iAws_MouseDown_set)
+    __swig_setmethods__["MouseUp"] = _cspace.iAws_MouseUp_set
+    __swig_getmethods__["MouseUp"] = _cspace.iAws_MouseUp_get
+    if _newclass:MouseUp = property(_cspace.iAws_MouseUp_get, _cspace.iAws_MouseUp_set)
+    __swig_setmethods__["MouseClick"] = _cspace.iAws_MouseClick_set
+    __swig_getmethods__["MouseClick"] = _cspace.iAws_MouseClick_get
+    if _newclass:MouseClick = property(_cspace.iAws_MouseClick_get, _cspace.iAws_MouseClick_set)
+    __swig_setmethods__["MouseMove"] = _cspace.iAws_MouseMove_set
+    __swig_getmethods__["MouseMove"] = _cspace.iAws_MouseMove_get
+    if _newclass:MouseMove = property(_cspace.iAws_MouseMove_get, _cspace.iAws_MouseMove_set)
+    __swig_setmethods__["KeyboardDown"] = _cspace.iAws_KeyboardDown_set
+    __swig_getmethods__["KeyboardDown"] = _cspace.iAws_KeyboardDown_get
+    if _newclass:KeyboardDown = property(_cspace.iAws_KeyboardDown_get, _cspace.iAws_KeyboardDown_set)
+    __swig_setmethods__["KeyboardUp"] = _cspace.iAws_KeyboardUp_set
+    __swig_getmethods__["KeyboardUp"] = _cspace.iAws_KeyboardUp_get
+    if _newclass:KeyboardUp = property(_cspace.iAws_KeyboardUp_get, _cspace.iAws_KeyboardUp_set)
+    __swig_setmethods__["MouseEnter"] = _cspace.iAws_MouseEnter_set
+    __swig_getmethods__["MouseEnter"] = _cspace.iAws_MouseEnter_get
+    if _newclass:MouseEnter = property(_cspace.iAws_MouseEnter_get, _cspace.iAws_MouseEnter_set)
+    __swig_setmethods__["MouseExit"] = _cspace.iAws_MouseExit_set
+    __swig_getmethods__["MouseExit"] = _cspace.iAws_MouseExit_get
+    if _newclass:MouseExit = property(_cspace.iAws_MouseExit_get, _cspace.iAws_MouseExit_set)
+    __swig_setmethods__["LoseFocus"] = _cspace.iAws_LoseFocus_set
+    __swig_getmethods__["LoseFocus"] = _cspace.iAws_LoseFocus_get
+    if _newclass:LoseFocus = property(_cspace.iAws_LoseFocus_get, _cspace.iAws_LoseFocus_set)
+    __swig_setmethods__["GainFocus"] = _cspace.iAws_GainFocus_set
+    __swig_getmethods__["GainFocus"] = _cspace.iAws_GainFocus_get
+    if _newclass:GainFocus = property(_cspace.iAws_GainFocus_get, _cspace.iAws_GainFocus_set)
+    __swig_setmethods__["GroupOff"] = _cspace.iAws_GroupOff_set
+    __swig_getmethods__["GroupOff"] = _cspace.iAws_GroupOff_get
+    if _newclass:GroupOff = property(_cspace.iAws_GroupOff_get, _cspace.iAws_GroupOff_set)
+    __swig_setmethods__["FrameStart"] = _cspace.iAws_FrameStart_set
+    __swig_getmethods__["FrameStart"] = _cspace.iAws_FrameStart_get
+    if _newclass:FrameStart = property(_cspace.iAws_FrameStart_get, _cspace.iAws_FrameStart_set)
     def __del__(self, destroy=_cspace.delete_iAws):
         try:
             if self.thisown: destroy(self)
@@ -2955,6 +2990,7 @@ class iAwsSource(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iAwsSource instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def WindowManager(*args): return _cspace.iAwsSource_WindowManager(*args)
     def GetComponent(*args): return _cspace.iAwsSource_GetComponent(*args)
     def RegisterSlot(*args): return _cspace.iAwsSource_RegisterSlot(*args)
     def UnregisterSlot(*args): return _cspace.iAwsSource_UnregisterSlot(*args)
@@ -8294,21 +8330,16 @@ class iEvent(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iEvent instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    __swig_setmethods__["Type"] = _cspace.iEvent_Type_set
-    __swig_getmethods__["Type"] = _cspace.iEvent_Type_get
-    if _newclass:Type = property(_cspace.iEvent_Type_get, _cspace.iEvent_Type_set)
-    __swig_setmethods__["Category"] = _cspace.iEvent_Category_set
-    __swig_getmethods__["Category"] = _cspace.iEvent_Category_get
-    if _newclass:Category = property(_cspace.iEvent_Category_get, _cspace.iEvent_Category_set)
-    __swig_setmethods__["SubCategory"] = _cspace.iEvent_SubCategory_set
-    __swig_getmethods__["SubCategory"] = _cspace.iEvent_SubCategory_get
-    if _newclass:SubCategory = property(_cspace.iEvent_SubCategory_get, _cspace.iEvent_SubCategory_set)
-    __swig_setmethods__["Flags"] = _cspace.iEvent_Flags_set
-    __swig_getmethods__["Flags"] = _cspace.iEvent_Flags_get
-    if _newclass:Flags = property(_cspace.iEvent_Flags_get, _cspace.iEvent_Flags_set)
+    __swig_setmethods__["Name"] = _cspace.iEvent_Name_set
+    __swig_getmethods__["Name"] = _cspace.iEvent_Name_get
+    if _newclass:Name = property(_cspace.iEvent_Name_get, _cspace.iEvent_Name_set)
+    def GetName(*args): return _cspace.iEvent_GetName(*args)
     __swig_setmethods__["Time"] = _cspace.iEvent_Time_set
     __swig_getmethods__["Time"] = _cspace.iEvent_Time_get
     if _newclass:Time = property(_cspace.iEvent_Time_get, _cspace.iEvent_Time_set)
+    __swig_setmethods__["Broadcast"] = _cspace.iEvent_Broadcast_set
+    __swig_getmethods__["Broadcast"] = _cspace.iEvent_Broadcast_get
+    if _newclass:Broadcast = property(_cspace.iEvent_Broadcast_get, _cspace.iEvent_Broadcast_set)
     def AddInt8(*args): return _cspace.iEvent_AddInt8(*args)
     def AddUInt8(*args): return _cspace.iEvent_AddUInt8(*args)
     def AddInt16(*args): return _cspace.iEvent_AddInt16(*args)
@@ -8426,8 +8457,7 @@ class iEventCord(iBase):
     def Remove(*args): return _cspace.iEventCord_Remove(*args)
     def GetPass(*args): return _cspace.iEventCord_GetPass(*args)
     def SetPass(*args): return _cspace.iEventCord_SetPass(*args)
-    def GetCategory(*args): return _cspace.iEventCord_GetCategory(*args)
-    def GetSubcategory(*args): return _cspace.iEventCord_GetSubcategory(*args)
+    def GetName(*args): return _cspace.iEventCord_GetName(*args)
     def __del__(self, destroy=_cspace.delete_iEventCord):
         try:
             if self.thisown: destroy(self)
@@ -8503,6 +8533,10 @@ class csMouseEventHelper(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csMouseEventHelper, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csMouseEventHelper instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_getmethods__["NewEvent"] = lambda x: _cspace.csMouseEventHelper_NewEvent
+    if _newclass:NewEvent = staticmethod(_cspace.csMouseEventHelper_NewEvent)
+    __swig_getmethods__["GetEventType"] = lambda x: _cspace.csMouseEventHelper_GetEventType
+    if _newclass:GetEventType = staticmethod(_cspace.csMouseEventHelper_GetEventType)
     __swig_getmethods__["GetNumber"] = lambda x: _cspace.csMouseEventHelper_GetNumber
     if _newclass:GetNumber = staticmethod(_cspace.csMouseEventHelper_GetNumber)
     __swig_getmethods__["GetX"] = lambda x: _cspace.csMouseEventHelper_GetX
@@ -8515,6 +8549,8 @@ class csMouseEventHelper(_object):
     if _newclass:GetNumAxes = staticmethod(_cspace.csMouseEventHelper_GetNumAxes)
     __swig_getmethods__["GetButton"] = lambda x: _cspace.csMouseEventHelper_GetButton
     if _newclass:GetButton = staticmethod(_cspace.csMouseEventHelper_GetButton)
+    __swig_getmethods__["GetButtonState"] = lambda x: _cspace.csMouseEventHelper_GetButtonState
+    if _newclass:GetButtonState = staticmethod(_cspace.csMouseEventHelper_GetButtonState)
     __swig_getmethods__["GetButtonMask"] = lambda x: _cspace.csMouseEventHelper_GetButtonMask
     if _newclass:GetButtonMask = staticmethod(_cspace.csMouseEventHelper_GetButtonMask)
     __swig_getmethods__["GetModifiers"] = lambda x: _cspace.csMouseEventHelper_GetModifiers
@@ -8537,6 +8573,10 @@ class csMouseEventHelperPtr(csMouseEventHelper):
         _swig_setattr(self, csMouseEventHelper,self.__class__,csMouseEventHelper)
 _cspace.csMouseEventHelper_swigregister(csMouseEventHelperPtr)
 
+csMouseEventHelper_NewEvent = _cspace.csMouseEventHelper_NewEvent
+
+csMouseEventHelper_GetEventType = _cspace.csMouseEventHelper_GetEventType
+
 csMouseEventHelper_GetNumber = _cspace.csMouseEventHelper_GetNumber
 
 csMouseEventHelper_GetX = _cspace.csMouseEventHelper_GetX
@@ -8548,6 +8588,8 @@ csMouseEventHelper_GetAxis = _cspace.csMouseEventHelper_GetAxis
 csMouseEventHelper_GetNumAxes = _cspace.csMouseEventHelper_GetNumAxes
 
 csMouseEventHelper_GetButton = _cspace.csMouseEventHelper_GetButton
+
+csMouseEventHelper_GetButtonState = _cspace.csMouseEventHelper_GetButtonState
 
 csMouseEventHelper_GetButtonMask = _cspace.csMouseEventHelper_GetButtonMask
 
@@ -8562,6 +8604,8 @@ class csJoystickEventHelper(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csJoystickEventHelper, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csJoystickEventHelper instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_getmethods__["NewEvent"] = lambda x: _cspace.csJoystickEventHelper_NewEvent
+    if _newclass:NewEvent = staticmethod(_cspace.csJoystickEventHelper_NewEvent)
     __swig_getmethods__["GetNumber"] = lambda x: _cspace.csJoystickEventHelper_GetNumber
     if _newclass:GetNumber = staticmethod(_cspace.csJoystickEventHelper_GetNumber)
     __swig_getmethods__["GetAxis"] = lambda x: _cspace.csJoystickEventHelper_GetAxis
@@ -8570,6 +8614,8 @@ class csJoystickEventHelper(_object):
     if _newclass:GetNumAxes = staticmethod(_cspace.csJoystickEventHelper_GetNumAxes)
     __swig_getmethods__["GetButton"] = lambda x: _cspace.csJoystickEventHelper_GetButton
     if _newclass:GetButton = staticmethod(_cspace.csJoystickEventHelper_GetButton)
+    __swig_getmethods__["GetButtonState"] = lambda x: _cspace.csJoystickEventHelper_GetButtonState
+    if _newclass:GetButtonState = staticmethod(_cspace.csJoystickEventHelper_GetButtonState)
     __swig_getmethods__["GetButtonMask"] = lambda x: _cspace.csJoystickEventHelper_GetButtonMask
     if _newclass:GetButtonMask = staticmethod(_cspace.csJoystickEventHelper_GetButtonMask)
     __swig_getmethods__["GetModifiers"] = lambda x: _cspace.csJoystickEventHelper_GetModifiers
@@ -8592,6 +8638,8 @@ class csJoystickEventHelperPtr(csJoystickEventHelper):
         _swig_setattr(self, csJoystickEventHelper,self.__class__,csJoystickEventHelper)
 _cspace.csJoystickEventHelper_swigregister(csJoystickEventHelperPtr)
 
+csJoystickEventHelper_NewEvent = _cspace.csJoystickEventHelper_NewEvent
+
 csJoystickEventHelper_GetNumber = _cspace.csJoystickEventHelper_GetNumber
 
 csJoystickEventHelper_GetAxis = _cspace.csJoystickEventHelper_GetAxis
@@ -8600,11 +8648,44 @@ csJoystickEventHelper_GetNumAxes = _cspace.csJoystickEventHelper_GetNumAxes
 
 csJoystickEventHelper_GetButton = _cspace.csJoystickEventHelper_GetButton
 
+csJoystickEventHelper_GetButtonState = _cspace.csJoystickEventHelper_GetButtonState
+
 csJoystickEventHelper_GetButtonMask = _cspace.csJoystickEventHelper_GetButtonMask
 
 csJoystickEventHelper_GetModifiers = _cspace.csJoystickEventHelper_GetModifiers
 
 csJoystickEventHelper_GetEventData = _cspace.csJoystickEventHelper_GetEventData
+
+class csInputEventHelper(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csInputEventHelper, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csInputEventHelper, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csInputEventHelper instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_getmethods__["GetButton"] = lambda x: _cspace.csInputEventHelper_GetButton
+    if _newclass:GetButton = staticmethod(_cspace.csInputEventHelper_GetButton)
+    __swig_getmethods__["GetButtonState"] = lambda x: _cspace.csInputEventHelper_GetButtonState
+    if _newclass:GetButtonState = staticmethod(_cspace.csInputEventHelper_GetButtonState)
+    def __init__(self, *args):
+        _swig_setattr(self, csInputEventHelper, 'this', _cspace.new_csInputEventHelper(*args))
+        _swig_setattr(self, csInputEventHelper, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csInputEventHelper):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csInputEventHelperPtr(csInputEventHelper):
+    def __init__(self, this):
+        _swig_setattr(self, csInputEventHelper, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csInputEventHelper, 'thisown', 0)
+        _swig_setattr(self, csInputEventHelper,self.__class__,csInputEventHelper)
+_cspace.csInputEventHelper_swigregister(csInputEventHelperPtr)
+
+csInputEventHelper_GetButton = _cspace.csInputEventHelper_GetButton
+
+csInputEventHelper_GetButtonState = _cspace.csInputEventHelper_GetButtonState
 
 class csCommandEventHelper(_object):
     __swig_setmethods__ = {}
@@ -8613,6 +8694,8 @@ class csCommandEventHelper(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csCommandEventHelper, name)
     def __repr__(self):
         return "<%s.%s; proxy of C++ csCommandEventHelper instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_getmethods__["NewEvent"] = lambda x: _cspace.csCommandEventHelper_NewEvent
+    if _newclass:NewEvent = staticmethod(_cspace.csCommandEventHelper_NewEvent)
     __swig_getmethods__["GetCode"] = lambda x: _cspace.csCommandEventHelper_GetCode
     if _newclass:GetCode = staticmethod(_cspace.csCommandEventHelper_GetCode)
     __swig_getmethods__["GetInfo"] = lambda x: _cspace.csCommandEventHelper_GetInfo
@@ -8635,33 +8718,21 @@ class csCommandEventHelperPtr(csCommandEventHelper):
         _swig_setattr(self, csCommandEventHelper,self.__class__,csCommandEventHelper)
 _cspace.csCommandEventHelper_swigregister(csCommandEventHelperPtr)
 
+csCommandEventHelper_NewEvent = _cspace.csCommandEventHelper_NewEvent
+
 csCommandEventHelper_GetCode = _cspace.csCommandEventHelper_GetCode
 
 csCommandEventHelper_GetInfo = _cspace.csCommandEventHelper_GetInfo
 
 csCommandEventHelper_GetEventData = _cspace.csCommandEventHelper_GetEventData
 
-csevNothing = _cspace.csevNothing
-csevKeyboard = _cspace.csevKeyboard
-csevMouseMove = _cspace.csevMouseMove
-csevMouseDown = _cspace.csevMouseDown
-csevMouseUp = _cspace.csevMouseUp
-csevMouseClick = _cspace.csevMouseClick
-csevMouseDoubleClick = _cspace.csevMouseDoubleClick
-csevJoystickMove = _cspace.csevJoystickMove
-csevJoystickDown = _cspace.csevJoystickDown
-csevJoystickUp = _cspace.csevJoystickUp
-csevCommand = _cspace.csevCommand
-csevBroadcast = _cspace.csevBroadcast
-csevMouseEnter = _cspace.csevMouseEnter
-csevMouseExit = _cspace.csevMouseExit
-csevLostFocus = _cspace.csevLostFocus
-csevGainFocus = _cspace.csevGainFocus
-csevGroupOff = _cspace.csevGroupOff
-csevFrameStart = _cspace.csevFrameStart
 csKeyEventTypeUp = _cspace.csKeyEventTypeUp
 csKeyEventTypeDown = _cspace.csKeyEventTypeDown
-CSEF_BROADCAST = _cspace.CSEF_BROADCAST
+csMouseEventTypeMove = _cspace.csMouseEventTypeMove
+csMouseEventTypeUp = _cspace.csMouseEventTypeUp
+csMouseEventTypeDown = _cspace.csMouseEventTypeDown
+csMouseEventTypeClick = _cspace.csMouseEventTypeClick
+csMouseEventTypeDoubleClick = _cspace.csMouseEventTypeDoubleClick
 csKeyModifierTypeShift = _cspace.csKeyModifierTypeShift
 csKeyModifierTypeCtrl = _cspace.csKeyModifierTypeCtrl
 csKeyModifierTypeAlt = _cspace.csKeyModifierTypeAlt
@@ -8739,20 +8810,6 @@ csKeyCharTypeDead = _cspace.csKeyCharTypeDead
 CSEVTYPE_Keyboard = _cspace.CSEVTYPE_Keyboard
 CSEVTYPE_Mouse = _cspace.CSEVTYPE_Mouse
 CSEVTYPE_Joystick = _cspace.CSEVTYPE_Joystick
-cscmdNothing = _cspace.cscmdNothing
-cscmdQuit = _cspace.cscmdQuit
-cscmdFocusChanged = _cspace.cscmdFocusChanged
-cscmdSystemOpen = _cspace.cscmdSystemOpen
-cscmdSystemClose = _cspace.cscmdSystemClose
-cscmdContextResize = _cspace.cscmdContextResize
-cscmdContextClose = _cspace.cscmdContextClose
-cscmdCommandLineHelp = _cspace.cscmdCommandLineHelp
-cscmdPreProcess = _cspace.cscmdPreProcess
-cscmdProcess = _cspace.cscmdProcess
-cscmdPostProcess = _cspace.cscmdPostProcess
-cscmdFinalProcess = _cspace.cscmdFinalProcess
-cscmdCanvasHidden = _cspace.cscmdCanvasHidden
-cscmdCanvasExposed = _cspace.cscmdCanvasExposed
 class iEventQueue(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -8765,13 +8822,15 @@ class iEventQueue(iBase):
         return "<%s.%s; proxy of C++ iEventQueue instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def Process(*args): return _cspace.iEventQueue_Process(*args)
     def Dispatch(*args): return _cspace.iEventQueue_Dispatch(*args)
+    def Subscribe(*args): return _cspace.iEventQueue_Subscribe(*args)
+    def Unsubscribe(*args): return _cspace.iEventQueue_Unsubscribe(*args)
     def RegisterListener(*args): return _cspace.iEventQueue_RegisterListener(*args)
     def RemoveListener(*args): return _cspace.iEventQueue_RemoveListener(*args)
-    def ChangeListenerTrigger(*args): return _cspace.iEventQueue_ChangeListenerTrigger(*args)
     def CreateEventOutlet(*args): return _cspace.iEventQueue_CreateEventOutlet(*args)
     def GetEventOutlet(*args): return _cspace.iEventQueue_GetEventOutlet(*args)
     def GetEventCord(*args): return _cspace.iEventQueue_GetEventCord(*args)
     def CreateEvent(*args): return _cspace.iEventQueue_CreateEvent(*args)
+    def CreateBroadcastEvent(*args): return _cspace.iEventQueue_CreateBroadcastEvent(*args)
     def Post(*args): return _cspace.iEventQueue_Post(*args)
     def Get(*args): return _cspace.iEventQueue_Get(*args)
     def Clear(*args): return _cspace.iEventQueue_Clear(*args)
@@ -8805,6 +8864,12 @@ class iEventHandler(iBase):
     def __repr__(self):
         return "<%s.%s; proxy of C++ iEventHandler instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def HandleEvent(*args): return _cspace.iEventHandler_HandleEvent(*args)
+    def GenericName(*args): return _cspace.iEventHandler_GenericName(*args)
+    def GenericID(*args): return _cspace.iEventHandler_GenericID(*args)
+    def GenericPrec(*args): return _cspace.iEventHandler_GenericPrec(*args)
+    def GenericSucc(*args): return _cspace.iEventHandler_GenericSucc(*args)
+    def InstancePrec(*args): return _cspace.iEventHandler_InstancePrec(*args)
+    def InstanceSucc(*args): return _cspace.iEventHandler_InstanceSucc(*args)
     def __del__(self, destroy=_cspace.delete_iEventHandler):
         try:
             if self.thisown: destroy(self)
@@ -9660,6 +9725,7 @@ class iGraphics2D(iBase):
     def SetMouseCursor(*args): return _cspace.iGraphics2D_SetMouseCursor(*args)
     def SetGamma(*args): return _cspace.iGraphics2D_SetGamma(*args)
     def GetGamma(*args): return _cspace.iGraphics2D_GetGamma(*args)
+    def GetName(*args): return _cspace.iGraphics2D_GetName(*args)
     def CreateOffscreenCanvas(*args): return _cspace.iGraphics2D_CreateOffscreenCanvas(*args)
     def __del__(self, destroy=_cspace.delete_iGraphics2D):
         try:
@@ -13222,6 +13288,7 @@ class _csPyEventHandler(iEventHandler):
     __swig_getmethods__ = {}
     for _s in [iEventHandler]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, _csPyEventHandler, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ _csPyEventHandler instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     __swig_setmethods__["scfRefCount"] = _cspace._csPyEventHandler_scfRefCount_set
@@ -13240,9 +13307,6 @@ class _csPyEventHandler(iEventHandler):
     def AddRefOwner(*args): return _cspace._csPyEventHandler_AddRefOwner(*args)
     def RemoveRefOwner(*args): return _cspace._csPyEventHandler_RemoveRefOwner(*args)
     def QueryInterface(*args): return _cspace._csPyEventHandler_QueryInterface(*args)
-    def __init__(self, *args):
-        _swig_setattr(self, _csPyEventHandler, 'this', _cspace.new__csPyEventHandler(*args))
-        _swig_setattr(self, _csPyEventHandler, 'thisown', 1)
     def __del__(self, destroy=_cspace.delete__csPyEventHandler):
         try:
             if self.thisown: destroy(self)
