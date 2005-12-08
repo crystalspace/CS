@@ -663,26 +663,28 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
       break;
 
     case csMouseEventTypeMove:
-      // additional command by Leslie Saputra -> freelook mode.
-      static bool first_time = true;
-      if (do_freelook)
-        {
-          int last_x, last_y;
-          last_x = csMouseEventHelper::GetX(&Event);
-          last_y = csMouseEventHelper::GetY(&Event);
-	  
-          myG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
-          if (!first_time)
-	    {
-	      RotateCam (
-			 -((float)(last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse),
-			 ((float)(last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2));
-	    }
-          else
-            first_time = false;
-        }
-      else
-	first_time = true;
+      {
+	// additional command by Leslie Saputra -> freelook mode.
+	static bool first_time = true;
+	if (do_freelook)
+	{
+	  int last_x, last_y;
+	  last_x = csMouseEventHelper::GetX(&Event);
+	  last_y = csMouseEventHelper::GetY(&Event);
+  	
+	  myG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
+	  if (!first_time)
+	  {
+	    RotateCam (
+		      -((float)(last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse),
+		      ((float)(last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2));
+	  }
+	  else
+	    first_time = false;
+	}
+	else
+	  first_time = true;
+      }
       break;
 
     case csMouseEventTypeUp:

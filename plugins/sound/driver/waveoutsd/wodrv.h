@@ -85,7 +85,6 @@ public:
 
   // Implementation of interface for iComponent
   virtual bool Initialize (iObjectRegistry *object_reg);
-  virtual bool HandleEvent (iEvent &e);
   virtual bool Open(iSoundRender*, int frequency, bool bit16, bool stereo);
   virtual void Close();
   virtual void LockMemory(void **mem, int *memsize);
@@ -102,25 +101,6 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
-  struct EventHandler : public iEventHandler
-  {
-  private:
-    csSoundDriverWaveOut* parent;
-  public:
-    SCF_DECLARE_IBASE;
-    EventHandler (csSoundDriverWaveOut* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      EventHandler::parent = parent;
-    }
-    virtual ~EventHandler ()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
-    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
-  } * scfiEventHandler;
-
-
 protected:
   struct SoundBlock 
   {

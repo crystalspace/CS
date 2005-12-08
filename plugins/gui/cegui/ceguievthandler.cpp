@@ -34,6 +34,8 @@ csCEGUIEventHandler::csCEGUIEventHandler (iObjectRegistry *reg,
   renderer = owner;
   csRef<iKeyboardDriver> kbd = csQueryRegistry<iKeyboardDriver> (reg);
   compose = kbd->CreateKeyComposer ();
+  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (obj_reg, iGraphics2D);
+  CanvasResize = csevCanvasResize (obj_reg, g2d);
 }
 
 csCEGUIEventHandler::~csCEGUIEventHandler()
@@ -42,15 +44,15 @@ csCEGUIEventHandler::~csCEGUIEventHandler()
 
 bool csCEGUIEventHandler::Initialize ()
 {
-  RegisterQueue (obj_reg, csevAllEvents(obj_reg));
+  RegisterQueue (obj_reg, csevAllEvents (obj_reg));
   return true;
 }
 
 bool csCEGUIEventHandler::OnUnhandledEvent (iEvent &event) 
 {
-  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (obj_reg, iGraphics2D);
-  if (event.name == csevCanvasResize(obj_reg, g2d))
+  if (event.GetName() == CanvasResize)
   {
+    csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (obj_reg, iGraphics2D);
     renderer->setDisplaySize (CEGUI::Size (g2d->GetWidth (), g2d->GetHeight ()));
     return true;
   }

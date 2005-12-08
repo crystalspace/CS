@@ -56,6 +56,7 @@ class csODEParticlePhysics : public iParticlesPhysics
   };
   csArray<ParticleObjects> partobjects;
   csRandomGen rng;
+  csEventID PreProcess;
 
   ParticleObjects *Find (iParticlesObjectState *p)
   {
@@ -110,6 +111,8 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csODEParticlePhysics);
     bool HandleEvent (iEvent &event)
     { return scfParent->HandleEvent (event); }
+    CS_EVENTHANDLER_NAMES("crystalspace.particles.physics.ode")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } scfiEventHandler;
 
   const csArray<csParticlesData> *RegisterParticles (

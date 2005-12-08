@@ -145,8 +145,8 @@ public:
   iObjectRegistry *object_reg;
   csStringSet names;
   csHash<csHandlerID, csHandlerID> instantiation; 
-  csHash<iEventHandler *,csHandlerID> idToHandler;
-  csHash<csHandlerID, iEventHandler *> handlerToID;
+  csHash<csRef<iEventHandler>, csHandlerID> idToHandler;
+  csHash<csHandlerID, csRef<iEventHandler> > handlerToID;
   csHash<csHandlerID,csHandlerID> handlerPres;
   csHash<csHandlerID,csHandlerID> handlerPosts;
   uint32 instanceCounter;

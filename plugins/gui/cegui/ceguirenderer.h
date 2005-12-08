@@ -49,12 +49,12 @@ class csCEGUITexture;
 /**
 * The actual implementation of the CEGUI wrapper for CS.
 */
-class csCEGUIRenderer : public CEGUI::Renderer, public iCEGUI, public iComponent
+class csCEGUIRenderer : public CEGUI::Renderer, 
+  public scfImplementation2<csCEGUIRenderer, 
+			    iCEGUI,
+			    iComponent>
 {
 public:
-
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csCEGUIRenderer (iBase *parent);
 

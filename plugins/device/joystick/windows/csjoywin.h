@@ -104,6 +104,8 @@ private:
     SCF_DECLARE_EMBEDDED_IBASE (csWindowsJoystick);
     virtual bool HandleEvent (iEvent &Event)
     { return scfParent->HandleEvent (Event); }
+    CS_EVENTHANDLER_NAMES("crystalspace.device.joystick")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } scfiEventHandler;
   friend struct eiEventHandler;
 };

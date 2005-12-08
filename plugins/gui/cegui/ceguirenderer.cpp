@@ -28,15 +28,11 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csCEGUIRenderer)
-  SCF_IMPLEMENTS_INTERFACE (iCEGUI)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csCEGUIRenderer)
 
 // TODO add description
 csCEGUIRenderer::csCEGUIRenderer (iBase *parent) :
+  scfImplementationType (this, parent),
   obj_reg(0),
   resourceProvider(0),
   scriptModule(0),
@@ -46,7 +42,6 @@ csCEGUIRenderer::csCEGUIRenderer (iBase *parent) :
   texture(0)
 {
   d_identifierString = "Crystal Space Renderer";
-  SCF_CONSTRUCT_IBASE (parent);
 }
 
 // TODO add description
@@ -103,7 +98,6 @@ csCEGUIRenderer::~csCEGUIRenderer ()
   delete CEGUI::System::getSingletonPtr();
   delete scriptModule;
   delete events;
-  SCF_DESTRUCT_IBASE ();
 }
 
 // TODO add description

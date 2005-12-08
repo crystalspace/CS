@@ -48,10 +48,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundDriverWaveOut::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csSoundDriverWaveOut::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
 #define WAVEOUT_BUFFER_COUNT 5
 
 
@@ -59,7 +55,6 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = 0;
 
   object_reg = 0;
   SoundRender = 0;
@@ -70,13 +65,6 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
 
 csSoundDriverWaveOut::~csSoundDriverWaveOut()
 {
-  if (scfiEventHandler)
-  {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
-    if (q != 0)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
-  }
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_DESTRUCT_IBASE();
 }
@@ -84,11 +72,6 @@ csSoundDriverWaveOut::~csSoundDriverWaveOut()
 bool csSoundDriverWaveOut::Initialize (iObjectRegistry *r)
 {
   object_reg = r;
-  if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
-  if (q != 0)
-    q->RegisterListener (scfiEventHandler, CSMASK_Nothing | CSMASK_Broadcast);
   Config.AddConfig(object_reg, "/config/sound.cfg");
 
 
@@ -290,11 +273,6 @@ bool csSoundDriverWaveOut::Is16Bits() {return Bit16;}
 bool csSoundDriverWaveOut::IsStereo() {return Stereo;}
 bool csSoundDriverWaveOut::IsHandleVoidSound() {return false;}
 int csSoundDriverWaveOut::GetFrequency() {return Frequency;}
-
-bool csSoundDriverWaveOut::HandleEvent(iEvent &e)
-{
-  return false;
-}
 
 /*
  * Applications should not call any system-defined functions from inside a callback function, 

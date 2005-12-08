@@ -112,7 +112,7 @@ class Simple : public csApplicationFramework, public csBaseEventHandler
   bool Application ();
   
   // Declare the name of this event handler.
-  CS_EVENTHANDLER_NAMES("crystalspace.apps.simple1")
+  CS_EVENTHANDLER_NAMES("application.simple1")
       
   /* Declare that we're not terribly interested in having events
      delivered to us before or after other modules, plugins, etc. */

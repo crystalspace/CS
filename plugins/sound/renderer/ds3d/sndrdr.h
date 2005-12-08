@@ -26,6 +26,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/cfgacc.h"
+#include "csutil/eventnames.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/thread.h"
@@ -189,6 +190,8 @@ public:
   /// Pointer to the background thread
   csRef<csThread> bgThread;
 
+  CS_DECLARE_EVENT_SHORTCUTS;
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderDS3D);
@@ -200,6 +203,8 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderDS3D);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+    CS_EVENTHANDLER_NAMES("crystalspace.sound")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } scfiEventHandler;
 
   class DS3DRunnable : public csRunnable

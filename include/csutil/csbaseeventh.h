@@ -156,7 +156,8 @@ protected:
    * event handler as anything besides "application" for purposes of
    * event subscription scheduling.
    */
-  CS_CONST_METHOD virtual const char *GenericName() const { return "application"; }
+  CS_CONST_METHOD virtual const char *GenericName() const 
+  { return "application"; }
   
   CS_CONST_METHOD virtual csHandlerID GenericID() const { 
     return csEventHandlerRegistry::GetGenericID(object_registry, GenericName()); 
@@ -166,25 +167,29 @@ protected:
    * Override this if you want to force some modules to always handle some 
    * events before csBaseEventHandler.
    */
-  CS_CONST_METHOD virtual const csHandlerID *GenericPrec(csEventID) const { return NULL; }
+  CS_CONST_METHOD virtual const csHandlerID *GenericPrec(csEventID) const 
+  { return 0; }
 
   /**
    * Override this if you want to force some modules to always handle some 
    * events after csBaseEventHandler.
    */
-  CS_CONST_METHOD virtual const csHandlerID *GenericSucc(csEventID) const { return NULL; }
+  CS_CONST_METHOD virtual const csHandlerID *GenericSucc(csEventID) const 
+  { return 0; }
 
   /**
    * Override this if you want to force some modules to always handle some 
    * events before this instance of csBaseEventHandler.
    */
-  CS_CONST_METHOD virtual const csHandlerID *InstancePrec(csEventID) const { return NULL; }
+  CS_CONST_METHOD virtual const csHandlerID *InstancePrec(csEventID) const 
+  { return 0; }
 
   /**
    * Override this if you want to force some modules to always handle some 
    * events before this instance of csBaseEventHandler.
    */
-  CS_CONST_METHOD virtual const csHandlerID *InstanceSucc(csEventID) const { return NULL; }
+  CS_CONST_METHOD virtual const csHandlerID *InstanceSucc(csEventID) const 
+  { return 0; }
 
   /// Invoked by the event handler when a joystick movement event is received.
   virtual bool OnJoystickMove (iEvent &event);

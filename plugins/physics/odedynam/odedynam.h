@@ -125,6 +125,7 @@ private:
   int qsiter;
   bool fastobjects;
 
+  csEventID PreProcess;
 public:
   SCF_DECLARE_IBASE;
 
@@ -268,6 +269,8 @@ public:
     { SCF_DESTRUCT_IBASE (); }
     virtual bool HandleEvent (iEvent& ev)
     { return parent->HandleEvent (ev); }
+    CS_EVENTHANDLER_NAMES("crystalspace.dynamics.ode")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   };
   csRef<EventHandler> scfiEventHandler;
 };

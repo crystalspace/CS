@@ -118,10 +118,11 @@ bool csWindowsJoystick::HandleEvent (iEvent& ev)
 	if (jd.state[nstate].di.rgbButtons[btn] != 
 	    jd.state[last_state].di.rgbButtons[btn]) 
 	{
-	  int32 axdata[2] = { jd.state[nstate].lX, jd.state[nstate].lY };
+	  int32 axdata[2] = { jd.state[nstate].di.lX, jd.state[nstate].di.lY };
           EventOutlet->Joystick (jd.number, btn, 
 				 jd.state[nstate].di.rgbButtons[btn] != 0,
-				 js.state[nstate].axes.GetArray(), jd.nAxes);
+				 jd.state[nstate].axes.GetArray(), jd.nAxes);
+	}
       }    
       for (uint a = 0; a < jd.nAxes; a++)
       {

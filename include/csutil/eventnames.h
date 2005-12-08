@@ -520,23 +520,23 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (
   CS_DECLARE_FRAME_EVENT_SHORTCUTS;				\
   CS_DECLARE_INPUT_EVENT_SHORTCUTS
 
-#define CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS(x) do {	\
-    SystemOpen = csevSystemOpen ((x));			\
-    SystemClose = csevSystemClose ((x));		\
+#define CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS(object_reg) do {	\
+    SystemOpen = csevSystemOpen ((object_reg));			\
+    SystemClose = csevSystemClose ((object_reg));		\
   } while (0)
 
-#define CS_INITIALIZE_FRAME_EVENT_SHORTCUTS(x) do {	\
-    Frame = csevFrame ((x));				\
-    PreProcess = csevPreProcess ((x));			\
-    Process = csevProcess ((x));			\
-    PostProcess = csevPostProcess ((x));		\
-    FinalProcess = csevFinalProcess ((x));		\
+#define CS_INITIALIZE_FRAME_EVENT_SHORTCUTS(object_reg) do {	\
+    Frame = csevFrame ((object_reg));				\
+    PreProcess = csevPreProcess ((object_reg));			\
+    Process = csevProcess ((object_reg));			\
+    PostProcess = csevPostProcess ((object_reg));		\
+    FinalProcess = csevFinalProcess ((object_reg));		\
   } while (0)
 
-#define CS_INITIALIZE_INPUT_EVENT_SHORTCUTS(x) do {	\
-    KeyboardEvent = csevKeyboardEvent ((x));		\
-    MouseEvent = csevMouseEvent ((x));			\
-    JoystickEvent = csevJoystickEvent ((x));		\
+#define CS_INITIALIZE_INPUT_EVENT_SHORTCUTS(object_reg) do {	\
+    KeyboardEvent = csevKeyboardEvent ((object_reg));		\
+    MouseEvent = csevMouseEvent ((object_reg));			\
+    JoystickEvent = csevJoystickEvent ((object_reg));		\
   } while (0)
 
 /**
@@ -544,10 +544,10 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (
  * CS_DECLARE_EVENT_SHORTCUTS.
  * Requires an iObjectRegistry or iEventNameRegistry.
  */
-#define CS_INITIALIZE_EVENT_SHORTCUTS(x) do {	\
-    CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS (x);	\
-    CS_INITIALIZE_FRAME_EVENT_SHORTCUTS (x);	\
-    CS_INITIALIZE_INPUT_EVENT_SHORTCUTS (x);	\
+#define CS_INITIALIZE_EVENT_SHORTCUTS(object_reg) do {	\
+    CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS (object_reg);	\
+    CS_INITIALIZE_FRAME_EVENT_SHORTCUTS (object_reg);	\
+    CS_INITIALIZE_INPUT_EVENT_SHORTCUTS (object_reg);	\
   } while (0)
 
 /** @} */

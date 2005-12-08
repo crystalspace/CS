@@ -24,6 +24,7 @@
 #include "iutil/comp.h"
 #include "csutil/cfgacc.h"
 #include "iutil/eventh.h"
+#include "csutil/eventnames.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/thread.h"
@@ -91,6 +92,8 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderOpenAL);
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+    CS_EVENTHANDLER_NAMES("crystalspace.sound")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } scfiEventHandler;
 
   class OpenALRunnable : public csRunnable

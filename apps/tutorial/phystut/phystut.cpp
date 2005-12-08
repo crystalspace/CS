@@ -128,93 +128,96 @@ void Simple::FinishFrame ()
 
 bool Simple::HandleEvent (iEvent& ev)
 {
-  if (ev.Name == csevProcess)
+  if (ev.Name == Process)
   {
     simple->SetupFrame ();
     return true;
   }
-  else if (ev.Name == csevFinalProcess)
+  else if (ev.Name == FinalProcess)
   {
     simple->FinishFrame ();
     return true;
   }
-  else if (ev.Name == csevKeyboardDown) 
+  else if (ev.Name == KeyboardEvent) 
   {
-    if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_SPACE)
+    if (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown)
     {
-      if (rand()%2) CreateBox (); else CreateSphere ();
-      return true;
+      if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_SPACE)
+      {
+	if (rand()%2) CreateBox (); else CreateSphere ();
+	return true;
+      }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'b')
+      {
+	CreateBox ();
+	return true;
+      }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
+      {
+	CreateSphere ();
+	return true;
+      }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'm')
+      {
+	CreateMesh ();
+	return true;
+      }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'j')
+      {
+	CreateJointed ();
+	return true;
+      }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'g')
+      { // Toggle gravity.
+	dynSys->SetGravity (dynSys->GetGravity () == 0 ?
+	  csVector3 (0,-7,0) : csVector3 (0));
+	return true;
+      }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == 'd')
+      { // Toggle autodisable.
+	dynSys->EnableAutoDisable (!dynSys->AutoDisableEnabled ());
+	//dynSys->SetAutoDisableParams(1.5f,2.5f,6,0.0f);
+	disable=dynSys->AutoDisableEnabled ();
+	return true;
+      }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == '1')
+      { // Toggle stepfast.
+	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
+	  dynSys, iODEDynamicSystemState);
+	osys->EnableStepFast (0);
+	solver=0;
+	return true;
+      }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == '2')
+      { // Toggle stepfast.
+	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
+	  dynSys, iODEDynamicSystemState);
+	osys->EnableStepFast (1);
+	solver=1;
+	return true;
+      }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == '3')
+      { // Toggle quickstep.
+	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
+	  dynSys, iODEDynamicSystemState);
+	osys->EnableQuickStep (1);
+	solver=2;
+	return true;
+      }
+      else if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
+      {
+	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+	if (q) q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
+	return true;
+      }
     }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'b')
+    else if ((csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeUp)
+	     && ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_DOWN) 
+	      || (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_UP)))
     {
-      CreateBox ();
-      return true;
+      avatarbody->SetLinearVelocity(csVector3 (0, 0, 0));
+      avatarbody->SetAngularVelocity (csVector3 (0, 0, 0));
     }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
-    {
-      CreateSphere ();
-      return true;
-    }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'm')
-    {
-      CreateMesh ();
-      return true;
-    }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'j')
-    {
-      CreateJointed ();
-      return true;
-    }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'g')
-    { // Toggle gravity.
-      dynSys->SetGravity (dynSys->GetGravity () == 0 ?
-        csVector3 (0,-7,0) : csVector3 (0));
-      return true;
-    }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'd')
-    { // Toggle autodisable.
-      dynSys->EnableAutoDisable (!dynSys->AutoDisableEnabled ());
-      //dynSys->SetAutoDisableParams(1.5f,2.5f,6,0.0f);
-      disable=dynSys->AutoDisableEnabled ();
-      return true;
-    }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == '1')
-    { // Toggle stepfast.
-      csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-        dynSys, iODEDynamicSystemState);
-      osys->EnableStepFast (0);
-      solver=0;
-      return true;
-    }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == '2')
-    { // Toggle stepfast.
-      csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-        dynSys, iODEDynamicSystemState);
-      osys->EnableStepFast (1);
-      solver=1;
-      return true;
-    }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == '3')
-    { // Toggle quickstep.
-      csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-        dynSys, iODEDynamicSystemState);
-      osys->EnableQuickStep (1);
-      solver=2;
-      return true;
-    }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
-    {
-      csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-      if (q) q->GetEventOutlet()->Broadcast (csevQuit);
-      return true;
-    }
-  }
-  else if ((ev.Name == csevKeyboardUp)
-	   ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_DOWN) ||
-	    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_UP)))
-  {
-    avatarbody->SetLinearVelocity(csVector3 (0, 0, 0));
-    avatarbody->SetAngularVelocity (csVector3 (0, 0, 0));
   }
 
   return false;
@@ -244,7 +247,6 @@ bool Simple::Initialize ()
     return false;
   }
 
-  csEventNameRegistry::Register(object_reg);
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -252,6 +254,7 @@ bool Simple::Initialize ()
       "Can't initialize event handler!");
     return false;
   }
+  CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
 
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))

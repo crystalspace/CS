@@ -67,6 +67,7 @@ private:
   csRef<iMeshWrapper> avatar;
   csRef<iRigidBody> avatarbody;
 
+  CS_DECLARE_EVENT_SHORTCUTS;
 public:
   Simple (iObjectRegistry *obj);
   ~Simple ();

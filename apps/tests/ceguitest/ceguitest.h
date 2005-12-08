@@ -54,6 +54,13 @@ public:
   bool OnInitialize(int argc, char* argv[]);
 
   bool Application();
+  
+  // Declare the name of this event handler.
+  CS_EVENTHANDLER_NAMES("application.ceguitest")
+      
+  /* Declare that we're not terribly interested in having events
+     delivered to us before or after other modules, plugins, etc. */
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif

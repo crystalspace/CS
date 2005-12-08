@@ -61,11 +61,14 @@ public:
   /// Handle keyboard events.
   bool OnKeyboard (iEvent &event);
 
+  CS_EVENTHANDLER_NAMES("crystalspace.cegui")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 private:
   iObjectRegistry *obj_reg;
   csCEGUIRenderer* renderer;
   csRef<iKeyComposer> compose;
   csSet<utf32_char> caughtCharKeys;
+  csEventID CanvasResize;
 
   static CEGUI::MouseButton CSMBtoCEMB (uint button);
 };

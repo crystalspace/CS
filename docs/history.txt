@@ -19,7 +19,7 @@ chronological order.
 	- Adam refactored csBaseEventHandler to allow co-inheritance
 	  along with csApplicationFramework.  A lot of the tutorial
 	  apps and tools are now much closer to their pre-overhaul form.
-	- res made some Win32-related new event stuff fixes.
+	- res made some VC7 and Win32-related new event stuff fixes.
 	- res did some slight reformatting.
 5-Dec-2005
         - res fixed the generic csInstallationPathsHelper::GetAppPath() to

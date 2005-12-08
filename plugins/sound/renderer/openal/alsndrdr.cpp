@@ -372,16 +372,16 @@ void csSoundRenderOpenAL::ThreadProc ()
 
 bool csSoundRenderOpenAL::HandleEvent (iEvent &e)
 {
-  if (e.Name == csevPreProcess)
+  if (e.Name == PreProcess)
   {
     if (!BackgroundProcessing)
       Update(); // Only perform updates here if there is no background thread
   }
-  else if (e.Name == csevSystemOpen)
+  else if (e.Name == SystemOpen)
   {
     Open();
   }
-  else if (e.Name == csevSystemClose)
+  else if (e.Name == SystemClose)
   {
     Close();
   }

@@ -91,10 +91,21 @@ class csEvent;
 class CS_CRYSTALSPACE_EXPORT csMouseEventHelper
 {
 public:
+  //@{
   /// Create a new mouse event
-  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, csEventID name, csMouseEventType etype, int x, int y, uint32 AxesChanged, uint button, bool buttonstate, uint32 buttonMask, uint32 modifiers);
-  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, csEventID name, int n, csMouseEventType etype, int x, int y, uint32 axesChanged, uint button, bool buttonstate, uint32 buttonMask, uint32 modifiers);
-  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, csEventID name, int n, csMouseEventType etype, const int *axes, uint8 numAxes, uint32 axesChanged, uint button, bool buttonstate, uint32 buttonMask, uint32 modifiers);
+  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, 
+    csTicks, csEventID name, csMouseEventType etype, int x, int y, 
+    uint32 AxesChanged, uint button, bool buttonstate, uint32 buttonMask, 
+    uint32 modifiers);
+  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, 
+    csEventID name, int n, csMouseEventType etype, int x, int y, 
+    uint32 axesChanged, uint button, bool buttonstate, uint32 buttonMask, 
+    uint32 modifiers);
+  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, 
+    csEventID name, int n, csMouseEventType etype, const int *axes, 
+    uint8 numAxes, uint32 axesChanged, uint button, bool buttonstate, 
+    uint32 buttonMask, uint32 modifiers);
+  //@}
 
   /// Retrieve the event type (key up or down.)
   CS_PURE_METHOD static csMouseEventType GetEventType (const iEvent* event);
@@ -142,9 +153,15 @@ public:
 class CS_CRYSTALSPACE_EXPORT csJoystickEventHelper
 {
 public:
+  //@{
   /// Create new joystick event
-  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, csEventID name, int n, int x, int y, uint32 axesChanged, uint button, bool buttonState, uint32 buttonMask, uint32 modifiers);
-  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, csEventID name, int n, const int *axes, uint8 numAxes, uint32 axesChanged, uint button, bool buttonState, uint32 buttonMask, uint32 modifiers);
+  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, 
+    csEventID name, int n, int x, int y, uint32 axesChanged, uint button, 
+    bool buttonState, uint32 buttonMask, uint32 modifiers);
+  static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, 
+    csEventID name, int n, const int *axes, uint8 numAxes, uint32 axesChanged, 
+    uint button, bool buttonState, uint32 buttonMask, uint32 modifiers);
+  //@}
 
   /// Retrieve joystick number (0, 1, 2, ...)
   CS_PURE_METHOD static uint GetNumber(const iEvent *event);
@@ -205,7 +222,8 @@ class CS_CRYSTALSPACE_EXPORT csCommandEventHelper
 {
 public:
   /// Create a new "command" event
-  static csEvent *NewEvent (csTicks, csEventID name, bool Broadcast, intptr_t info = 0);
+  static csEvent *NewEvent (csTicks, csEventID name, bool Broadcast, 
+    intptr_t info = 0);
 
   /// Retrieve command code
   CS_PURE_METHOD static uint GetCode(const iEvent *event);

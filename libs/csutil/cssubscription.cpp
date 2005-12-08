@@ -129,21 +129,27 @@ void csEventTree::ForceFatCopy ()
     
     // If there's a deletedList, our SQ will always need regeneration,
     // no matter which of the above cases happens.
-    newFatRecord->StaleSubscriberQueue = fatRecord->StaleSubscriberQueue || (fatRecord->deletedList!=0);
+    newFatRecord->StaleSubscriberQueue = 
+      fatRecord->StaleSubscriberQueue || (fatRecord->deletedList!=0);
 
     if ((fatRecord->iterator != 0) && 
-	name_reg->IsKindOf(fatRecord->iterator->baseevent, self)) {
-      // The iterator actually should belong to us and not to the parent fatRecord.
+	name_reg->IsKindOf(fatRecord->iterator->baseevent, self)) 
+    {
+      /* The iterator actually should belong to us and not to the parent 
+       * fatRecord. */
       CS_ASSERT(false);
       newFatRecord->iterator = fatRecord->iterator; // DOME : this has to be translated !
       fatRecord->iterator = 0;
       newFatRecord->deletedList = fatRecord->deletedList; // DOME : ditto
       fatRecord->deletedList = 0;
 
-      // If the deletedList belongs to us, we need to regenerate the SQ we swiped it from.
-      // DOME ...
+      /* If the deletedList belongs to us, we need to regenerate the SQ we 
+       * swiped it from.
+       * DOME ... */
 
-    } else {
+    } 
+    else 
+    {
       // There is no iterator, or it belongs to the parent.  Ignore it.
       newFatRecord->iterator = 0;
       newFatRecord->deletedList = 0;
@@ -494,7 +500,7 @@ void csEventTree::Dispatch (iEvent &e)
     fatRecord->RebuildQueue();
 
   /* automatic variable will be destroyed for us... */
-  SubscriberIterator it(handler_reg, this, e.Name); 
+  SubscriberIterator it (handler_reg, this, e.Name); 
 
 #ifdef ADB_DEBUG
   std::cerr << "DISPATCH [" 
@@ -507,9 +513,11 @@ void csEventTree::Dispatch (iEvent &e)
   while (it.HasNext()) 
   {
     iEventHandler *h = it.Next();
-    if (fatRecord->deletedList) {
+    if (fatRecord->deletedList) 
+    {
       csList<csHandlerID>::Iterator dit(*fatRecord->deletedList);
-      while (dit.HasNext()) {
+      while (dit.HasNext()) 
+      {
 	if (dit.Next() == handler_reg->GetID(h))
 	  continue;
       }

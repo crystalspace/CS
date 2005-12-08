@@ -81,44 +81,41 @@ csHandlerID csEventHandlerRegistry::GetGenericPostBoundID (csHandlerID id)
 
 csHandlerID csEventHandlerRegistry::GetID (iEventHandler *handler)
 {
-  csHandlerID res = handlerToID.Get(handler, CS_HANDLER_INVALID);
+  csHandlerID res = handlerToID.Get (handler, CS_HANDLER_INVALID);
   if (res != CS_HANDLER_INVALID)
     return res;
 
-  handler->IncRef();
   csHandlerID generic = GetGenericID (handler->GenericName());
 
-  char buf[16];
-  snprintf(buf, 15, "%u", instanceCounter++);
-  csString iname = (csString(handler->GenericName()) + (":")) + buf;
-  res = names.Request((const char *)iname);
+  csString iname;
+  iname.Format ("%s:%u", handler->GenericName(), instanceCounter++);
+  res = names.Request (iname);
 
-  instantiation.PutUnique(res, generic);
+  instantiation.PutUnique (res, generic);
 
-  handlerToID.PutUnique(handler, res);
-  idToHandler.PutUnique(res, handler);
+  handlerToID.PutUnique (handler, res);
+  idToHandler.PutUnique (res, handler);
 
   return res;
 }
 
 void csEventHandlerRegistry::ReleaseID (csHandlerID id)
 {
-  CS_ASSERT(IsInstance(id));
-  iEventHandler *h = idToHandler.Get(id, NULL);
-  CS_ASSERT(h);
-  handlerToID.DeleteAll(h);
-  idToHandler.DeleteAll(id);
-  instantiation.DeleteAll(id);
-  h->DecRef();
+  CS_ASSERT (IsInstance (id));
+  iEventHandler *h = idToHandler.Get (id, NULL);
+  CS_ASSERT (h);
+  handlerToID.DeleteAll (h);
+  idToHandler.DeleteAll (id);
+  instantiation.DeleteAll (id);
 }
 
 void csEventHandlerRegistry::ReleaseID (iEventHandler *handler)
 {
-  CS_ASSERT(handlerToID.Get(handler, CS_HANDLER_INVALID) != CS_HANDLER_INVALID);
-  csHandlerID id = handlerToID.Get(handler, CS_HANDLER_INVALID);
-  handlerToID.DeleteAll(handler);
-  idToHandler.DeleteAll(id);
-  instantiation.DeleteAll(id);
+  CS_ASSERT(handlerToID.Get (handler, CS_HANDLER_INVALID) != CS_HANDLER_INVALID);
+  csHandlerID id = handlerToID.Get (handler, CS_HANDLER_INVALID);
+  handlerToID.DeleteAll (handler);
+  idToHandler.DeleteAll (id);
+  instantiation.DeleteAll (id);
 }
 
 const char * csEventHandlerRegistry::GetString (csHandlerID id)
