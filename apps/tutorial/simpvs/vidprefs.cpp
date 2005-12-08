@@ -131,7 +131,7 @@ bool csVideoPreferences::SetupWindow ()
 bool csVideoPreferences::HandleEvent (iEvent& ev)
 {
   if (exit_loop) return true;
-  if (ev.Name == csevProcess (object_reg))
+  if (ev.Name == csevProcess(object_reg))
   {
     if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return true;
     //g2d->Clear (0);
@@ -139,7 +139,7 @@ bool csVideoPreferences::HandleEvent (iEvent& ev)
     aws->Print (g3d, 64);
     return false;
   }
-  else if (ev.Name == csevFinalProcess (object_reg))
+  else if (ev.Name == csevFinalProcess(object_reg))
   {
     g3d->FinishDraw ();
     g3d->Print (0);

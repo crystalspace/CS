@@ -29,26 +29,10 @@ Simple::Simple ()
 
 Simple::~Simple ()
 {
-}
-
-Simple::EventHandler::EventHandler (Simple *parent,
-				    iObjectRegistry *object_reg) :
-  csBaseEventHandler (object_reg),
-  parent (parent),
-  vidprefs(0)
-{
-  Process = csevProcess (GetObjectRegistry ());
-  FinalProcess = csevFinalProcess (GetObjectRegistry ());
-  KeyboardDown = csevKeyboardDown (GetObjectRegistry ());
-  Quit = csevQuit (GetObjectRegistry ());
-}
-
-Simple::EventHandler::~EventHandler ()
-{
   delete vidprefs;
 }
 
-bool Simple::EventHandler::Setup ()
+bool Simple::Setup ()
 {
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (GetObjectRegistry (), iVirtualClock);
@@ -122,7 +106,7 @@ bool Simple::EventHandler::Setup ()
   return true;
 }
 
-void Simple::EventHandler::SetupFrame ()
+void Simple::SetupFrame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -152,47 +136,47 @@ void Simple::EventHandler::SetupFrame ()
   view->Draw ();
 }
 
-void Simple::EventHandler::FinishFrame ()
+void Simple::FinishFrame ()
 {
   g3d->FinishDraw ();
   g3d->Print (0);
 }
 
-bool Simple::EventHandler::HandleEvent (iEvent& ev)
+bool Simple::HandleEvent (iEvent& ev)
 {
   bool res = false;
-  if (ev.Name == Process)
+  if (ev.Name == csevProcess(object_reg))
   {
     SetupFrame ();
     res = true;
   }
-  else if (ev.Name == FinalProcess)
+  else if (ev.Name == csevFinalProcess(object_reg))
   {
     FinishFrame ();
     res = true;
   }
-  else if ((ev.Name == KeyboardDown) &&
-	   (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
+  else if ((ev.Name == csevKeyboardDown(object_reg)) &&
+    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue));
     if (q)
-      q->GetEventOutlet()->Broadcast (Quit);
+      q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     res = true;
   }
 
-  if ((!ev.Broadcast || (ev.Name!=Quit)) && vidprefs)
+  if (((ev.Name != csevQuit(object_reg))) && vidprefs)
   {
     if (vidprefs->HandleEvent (ev))
     {
       SaveVideoPreference();
-      parent->Restart();
+      Restart();
       return true;
     }
   }
   return res;
 }
 
-void Simple::EventHandler::SaveVideoPreference()
+void Simple::SaveVideoPreference()
 {
   if (!vidprefs) return;
   csRef<iConfigFile> userConfig (csGetPlatformConfig (GetApplicationName()));
@@ -207,6 +191,11 @@ bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
     GetApplicationName()))
     return ReportError("Failed to initialize config!");
 
+  Process = csevProcess (GetObjectRegistry ());
+  FinalProcess = csevFinalProcess (GetObjectRegistry ());
+  KeyboardDown = csevKeyboardDown (GetObjectRegistry ());
+  Quit = csevQuit (GetObjectRegistry ());
+
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
 	CS_REQUEST_VFS,
 	CS_REQUEST_ENGINE,
@@ -218,10 +207,9 @@ bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
 	CS_REQUEST_END))
     return ReportError("Can't initialize plugins!");
 
-  Handler = new EventHandler (this, GetObjectRegistry ());
+  csBaseEventHandler::Initialize(GetObjectRegistry());
 
-  if (!Handler->RegisterQueue(GetObjectRegistry(), 
-			      csevAllEvents (GetObjectRegistry ())))
+  if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
     return ReportError("Failed to set up event handler!");
 
   return true;
@@ -233,7 +221,7 @@ bool Simple::Application()
   if (!Open())
     return ReportError("Error opening system!");
 
-  if (!Handler->Setup ())
+  if (!Setup ())
     return false;
 
   Run();

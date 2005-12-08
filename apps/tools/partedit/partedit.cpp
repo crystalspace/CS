@@ -232,15 +232,15 @@ void PartEdit::FinishFrame ()
 
 bool PartEdit::HandleEvent (iEvent& ev)
 {
-  if ((ev.Name == KeyboardDown) && 
-      (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
+  if ((ev.Name == csevKeyboardDown (object_reg)) &&
+    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
+      q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     return true;
   }
-  else if (ev.Name == CanvasClose)
+  else if (ev.Name == csevSystemClose (object_reg))
   {
     // System window closed, app shutting down
     return true;
@@ -252,20 +252,25 @@ bool PartEdit::HandleEvent (iEvent& ev)
 
 bool PartEdit::EventHandler (iEvent& ev)
 {
-  if (ev.Name == System->Process)
+  if (System)
   {
-    System->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == System->FinalProcess)
-  {
-    System->FinishFrame ();
-    return true;
+    if (ev.Name == csevProcess (System->object_reg))
+    {
+      System->SetupFrame ();
+      return true;
+    }
+    else if (ev.Name == csevFinalProcess (System->object_reg))
+    {
+      System->FinishFrame ();
+      return true;
+    }
+    else
+    {
+      return System->HandleEvent (ev);
+    }
   }
   else
-  {
-    return System ? System->HandleEvent (ev) : false;
-  }
+    return false;
 }
 
 bool PartEdit::InitEmitterList(EmitterList *elist)

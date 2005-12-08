@@ -16,6 +16,9 @@ chronological order.
 	    - Change all input, axis, and button enumerations from 
 	      basis-1 to basis-0
 	- Adam fixed a memory leak in csGraphics2D shutdown
+	- Adam refactored csBaseEventHandler to allow co-inheritance
+	  along with csApplicationFramework.  A lot of the tutorial
+	  apps and tools are now much closer to their pre-overhaul form.
 5-Dec-2005
         - res fixed the generic csInstallationPathsHelper::GetAppPath() to
           treat an empty entry in PATH like ".".

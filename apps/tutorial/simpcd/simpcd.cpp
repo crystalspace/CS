@@ -124,22 +124,22 @@ void Simple::FinishFrame ()
 
 bool Simple::HandleEvent (iEvent& ev)
 {
-  if (ev.Name == Process)
+  if (ev.Name == csevProcess (object_reg))
   {
     simple->SetupFrame ();
     return true;
   }
-  else if (ev.Name == FinalProcess)
+  else if (ev.Name == csevFinalProcess (object_reg))
   {
     simple->FinishFrame ();
     return true;
   }
-  else if ((ev.Name == KeyboardDown) &&
-	   (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
+  else if ((ev.Name == csevKeyboardDown (object_reg)) && 
+    (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
+      q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     return true;
   }
 

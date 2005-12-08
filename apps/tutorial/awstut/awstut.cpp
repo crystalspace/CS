@@ -43,20 +43,25 @@ AwsTutorial::~AwsTutorial()
 
 static bool AwsEventHandler (iEvent& ev)
 {
-  if (ev.Name == System->Process)
+  if (System)
   {
-    System->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == System->FinalProcess)
-  {
-    System->FinishFrame ();
-    return true;
+    if (ev.Name == csevProcess (System->object_reg))
+    {
+      System->SetupFrame ();
+      return true;
+    }
+    else if (ev.Name == csevFinalProcess (System->object_reg))
+    {
+      System->FinishFrame ();
+      return true;
+    }
+    else
+    {
+      return System->HandleEvent (ev);
+    }
   }
   else
-  {
-    return System ? System->HandleEvent (ev) : false;
-  }
+    return false;
 }
 
 void AwsTutorial::SetPass (unsigned long, intptr_t awst, iAwsSource *)
@@ -187,12 +192,12 @@ void AwsTutorial::FinishFrame ()
 
 bool AwsTutorial::HandleEvent (iEvent &Event)
 {
-  if ((Event.Name == KeyboardDown) &&
-      (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
+  if ((Event.Name == csevKeyboardDown(object_reg)) && 
+    (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
+      q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     return true;
   }
 

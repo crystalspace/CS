@@ -121,7 +121,9 @@ bool CEGUITest::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
-  if (!RegisterQueue(GetObjectRegistry()))
+  csBaseEventHandler::Initialize(GetObjectRegistry());
+
+  if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
     return ReportError("Failed to set up event handler!");
 
   return true;
@@ -206,7 +208,7 @@ bool CEGUITest::OnKeyboard(iEvent& ev)
     {
       csRef<iEventQueue> q =
         CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
-      if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
+      if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
     }
   }
   return false;

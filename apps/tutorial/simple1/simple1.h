@@ -31,75 +31,58 @@
  * csBaseEventHandler provides a base object which does absolutely nothing
  * with the events that are sent to it.
  */
-class Simple : public csApplicationFramework
+class Simple : public csApplicationFramework, public csBaseEventHandler
 {
  private:
-  class EventHandler : public csBaseEventHandler 
-  {
-  private:
-    /// A pointer to the 3D engine.
-    csRef<iEngine> engine;
-
-    /// A pointer to the map loader plugin.
-    csRef<iLoader> loader;
-      
-    /// A pointer to the 3D renderer plugin.
-    csRef<iGraphics3D> g3d;
+  /// A pointer to the 3D engine.
+  csRef<iEngine> engine;
+   
+  /// A pointer to the map loader plugin.
+  csRef<iLoader> loader;
+     
+  /// A pointer to the 3D renderer plugin.
+  csRef<iGraphics3D> g3d;
 	
-    /// A pointer to the keyboard driver.
-    csRef<iKeyboardDriver> kbd;
+  /// A pointer to the keyboard driver.
+  csRef<iKeyboardDriver> kbd;
 	  
-    /// A pointer to the virtual clock.
-    csRef<iVirtualClock> vc;
+  /// A pointer to the virtual clock.
+  csRef<iVirtualClock> vc;
 
-    /// A pointer to the view which contains the camera.
-    csRef<iView> view;
+  /// A pointer to the view which contains the camera.
+  csRef<iView> view;
 
-    /// A pointer to the sector the camera will be in.
-    iSector* room;
+  /// A pointer to the sector the camera will be in.
+  iSector* room;
 
-    /// Current orientation of the camera.
-    float rotX, rotY;
+  /// Current orientation of the camera.
+  float rotX, rotY;
 
-  public:
-    EventHandler (iObjectRegistry *object_reg);
+ public:
+  bool SetupModules ();
 
-    bool SetupModules ();
-
-    /**
-     * Handle keyboard events - ie key presses and releases.
-     * This routine is called from the event handler in response to a 
-     * csevKeyboard event.
-     */
-    bool OnKeyboard (iEvent&);
+  /**
+   * Handle keyboard events - ie key presses and releases.
+   * This routine is called from the event handler in response to a 
+   * csevKeyboard event.
+   */
+  bool OnKeyboard (iEvent&);
+  
+  /**
+   * Setup everything that needs to be rendered on screen. This routine
+   * is called from the event handler in response to a csevProcess
+   * broadcast message.
+   */
+  void ProcessFrame ();
+  
+  /// Here we will create our little, simple world.
+  void CreateRoom ();
     
-    /**
-     * Setup everything that needs to be rendered on screen. This routine
-     * is called from the event handler in response to a csevProcess
-     * broadcast message.
-     */
-    void ProcessFrame ();
-    
-    /// Here we will create our little, simple world.
-    void CreateRoom ();
-
-    /**
-     * Finally render the screen. This routine is called from the event
-     * handler in response to a csevFinalProcess broadcast message.
-     */
-    void FinishFrame ();
-
-    // Declare the name of this event handler.
-    CS_EVENTHANDLER_NAMES("crystalspace.apps.simple1")
-
-    /* Declare that we're not terribly interested in having events
-       delivered to us before or after other modules, plugins, etc. */
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  };
-
-  EventHandler *Handler;
-
-public:
+  /**
+   * Finally render the screen. This routine is called from the event
+   * handler in response to a csevFinalProcess broadcast message.
+   */
+  void FinishFrame ();
 
   /// Construct our game. This will just set the application ID for now.
   Simple ();
@@ -127,6 +110,13 @@ public:
    * Only when the program exits this function will return.
    */
   bool Application ();
+  
+  // Declare the name of this event handler.
+  CS_EVENTHANDLER_NAMES("crystalspace.apps.simple1")
+      
+  /* Declare that we're not terribly interested in having events
+     delivered to us before or after other modules, plugins, etc. */
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __SIMPLE1_H__

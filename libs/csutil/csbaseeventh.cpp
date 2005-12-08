@@ -25,11 +25,19 @@
 
 #include "iutil/eventq.h"
 
-csBaseEventHandler::csBaseEventHandler(iObjectRegistry *r) : 
+csBaseEventHandler::csBaseEventHandler() : 
   scfImplementationType (this),
-  object_reg(r),
-  self(csEventHandlerRegistry::GetID(r, this))
+  object_registry (0),
+  self (CS_EVENT_INVALID)
 {
+  FrameEvent = PreProcess = Process = PostProcess 
+    = FinalProcess = CS_EVENT_INVALID;
+}
+
+void csBaseEventHandler::Initialize (iObjectRegistry *r)
+{
+  object_registry = r;
+  self = csEventHandlerRegistry::GetID(r, this);
   FrameEvent = csevFrame (r);
   PreProcess = csevPreProcess (r);
   Process = csevProcess (r);
@@ -37,12 +45,12 @@ csBaseEventHandler::csBaseEventHandler(iObjectRegistry *r) :
   FinalProcess = csevFinalProcess (r);
 }
 
-
 csBaseEventHandler::~csBaseEventHandler()
 {
   if (queue)
     queue->RemoveListener (this);
-  csEventHandlerRegistry::ReleaseID(object_reg, this);
+  if (object_registry)
+    csEventHandlerRegistry::ReleaseID(object_registry, this);
 }
 
 bool csBaseEventHandler::RegisterQueue (iEventQueue* q, csEventID event)
@@ -108,9 +116,9 @@ bool csBaseEventHandler::HandleEvent (iEvent &event)
     FinishFrame ();
     return true;
   }
-  else if (CS_IS_KEYBOARD_EVENT(object_reg, event))
+  else if (CS_IS_KEYBOARD_EVENT(object_registry, event))
     return OnKeyboard(event);
-  else if (CS_IS_MOUSE_EVENT(object_reg, event))
+  else if (CS_IS_MOUSE_EVENT(object_registry, event))
   {
     switch(csMouseEventHelper::GetEventType(&event))
     {
@@ -126,7 +134,7 @@ bool csBaseEventHandler::HandleEvent (iEvent &event)
       return OnMouseDoubleClick(event);
     }
   }
-  else if (CS_IS_JOYSTICK_EVENT(object_reg, event))
+  else if (CS_IS_JOYSTICK_EVENT(object_registry, event))
   {
     if (csJoystickEventHelper::GetButton(&event))
     {

@@ -58,7 +58,7 @@ struct StarInfo
 /**
  * This is the Crystal Space Demo Launcher program.
  */
-class StartMe : public csApplicationFramework
+class StartMe : public csApplicationFramework, public csBaseEventHandler
 {
 private:
 
@@ -135,24 +135,6 @@ private:
    */
   void FinishFrame ();
 
-  class EventHandler : public csBaseEventHandler
-  {
-  public:
-    EventHandler (StartMe *parent,
-		  iObjectRegistry *object_reg);
-    StartMe *parent;
-
-    void ProcessFrame ();
-    void FinishFrame ();
-    virtual bool OnKeyboard (iEvent&);
-    virtual bool OnMouseDown (iEvent&);
-
-    CS_EVENTHANDLER_NAMES("crystalspace.apps.startme")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  };
-
-  EventHandler *Handler;
-
   /// Here we will create our little, simple world.
   void CreateRoom ();
 
@@ -199,6 +181,9 @@ public:
    * Only when the program exits this function will return.
    */
   bool Application ();
+
+  CS_EVENTHANDLER_NAMES ("crystalspace.startme")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __STARTME_H__

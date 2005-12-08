@@ -31,14 +31,7 @@ Simple::~Simple ()
 {
 }
 
-Simple::EventHandler::EventHandler (Simple *parent,
-				    iObjectRegistry *object_reg) :
-  csBaseEventHandler (object_reg),
-  parent (parent)
-{
-}
-
-bool Simple::EventHandler::Setup ()
+bool Simple::Setup ()
 {
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
@@ -112,7 +105,7 @@ bool Simple::EventHandler::Setup ()
 
   return true;
 }
-void Simple::EventHandler::ProcessFrame ()
+void Simple::ProcessFrame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -165,14 +158,14 @@ void Simple::EventHandler::ProcessFrame ()
   view->Draw ();
 }
 
-void Simple::EventHandler::FinishFrame ()
+void Simple::FinishFrame ()
 {
   // Just tell the 3D renderer that everything has been rendered.
   g3d->FinishDraw ();
   g3d->Print (0);
 }
 
-bool Simple::EventHandler::OnKeyboard(iEvent& ev)
+bool Simple::OnKeyboard(iEvent& ev)
 {
   // We got a keyboard event.
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
@@ -189,8 +182,7 @@ bool Simple::EventHandler::OnKeyboard(iEvent& ev)
       // the object registry and then post the event.
       csRef<iEventQueue> q = 
         CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
-      if (q.IsValid())
-	q->GetEventOutlet()->Broadcast(csevQuit (GetObjectRegistry()));
+      if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
     }
   }
   return false;
@@ -218,12 +210,12 @@ bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
-  Handler = new EventHandler (this, object_reg);
+  csBaseEventHandler::Initialize(GetObjectRegistry());
 
   // Now we need to setup an event handler for our application.
   // Crystal Space is fully event-driven. Everything (except for this
   // initialization) happens in an event.
-  if (!Handler->RegisterQueue(GetObjectRegistry(), csevAllEvents (object_reg)))
+  if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
     return ReportError("Failed to set up event handler!");
 
   return true;
@@ -240,7 +232,7 @@ bool Simple::Application()
   if (!OpenApplication (GetObjectRegistry()))
     return ReportError ("Error opening system!");
 
-  if (!Handler->Setup())
+  if (!Setup())
     return false;
 
   // This calls the default runloop. This will basically just keep
@@ -250,7 +242,7 @@ bool Simple::Application()
   return true;
 }
 
-bool Simple::EventHandler::LoadMap ()
+bool Simple::LoadMap ()
 {
   // Set VFS current directory to the level we want to load.
   csRef<iVFS> VFS (CS_QUERY_REGISTRY (GetObjectRegistry (), iVFS));

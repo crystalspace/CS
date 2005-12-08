@@ -22,47 +22,31 @@
 #include <crystalspace.h>
 #include "vidprefs.h"
 
-class Simple : public csApplicationFramework
+class Simple : public csApplicationFramework, public csBaseEventHandler
 {
 private:
-  class EventHandler : public csBaseEventHandler
-  {
-  private:
-    Simple *parent;
-
-    csRef<iEngine> engine;
-    csRef<iLoader> loader;
-    csRef<iGraphics3D> g3d;
-    csRef<iKeyboardDriver> kbd;
-    csRef<iVirtualClock> vc;
-    iSector* room;
-    csRef<iView> view;
-    
-    bool HandleEvent (iEvent& ev);
-    void SetupFrame ();
-    void FinishFrame ();
-    
-    csVideoPreferences* vidprefs;
-    void SaveVideoPreference();
-
-  public:
-    EventHandler (Simple *parent,
-		  iObjectRegistry *object_reg);
-    ~EventHandler ();
-
-    bool Setup ();
-
-    csEventID Process;
-    csEventID FinalProcess;
-    csEventID KeyboardDown;
-    csEventID Quit;
-
-    CS_EVENTHANDLER_NAMES ("crystlspace.apps.simpvs")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  };
-
-  EventHandler *Handler;
-
+  csRef<iEngine> engine;
+  csRef<iLoader> loader;
+  csRef<iGraphics3D> g3d;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
+  iSector* room;
+  csRef<iView> view;
+  
+  bool HandleEvent (iEvent& ev);
+  void SetupFrame ();
+  void FinishFrame ();
+  
+  csVideoPreferences* vidprefs;
+  void SaveVideoPreference();
+  
+  bool Setup ();
+  
+  csEventID Process;
+  csEventID FinalProcess;
+  csEventID KeyboardDown;
+  csEventID Quit;
+  
 public:
   Simple ();
   virtual ~Simple ();
@@ -71,6 +55,9 @@ public:
 
   bool OnInitialize (int argc, char* argv[]);
   bool Application ();
+
+  CS_EVENTHANDLER_NAMES("crystalspace.simpvs")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __SIMPVS_H__

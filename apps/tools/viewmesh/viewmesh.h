@@ -50,9 +50,9 @@
 
 struct vmAnimCallback;
 
-class ViewMesh : public csApplicationFramework
+class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 {
- protected:
+ private:
 
   csRef<iEngine> engine;
   csRef<iLoader> loader;
@@ -89,6 +89,9 @@ class ViewMesh : public csApplicationFramework
   float meshTx, meshTy, meshTz;
 
   vmAnimCallback* callback;
+
+  bool OnKeyboard (iEvent&);
+  bool HandleEvent (iEvent &);
 
   void ProcessFrame ();
   void FinishFrame ();
@@ -165,25 +168,8 @@ private:
   static void StdDlgFileSelect (unsigned long, intptr_t awst, iAwsSource *s);
   static void StdDlgDirSelect (unsigned long, intptr_t awst, iAwsSource *s);
 
-  class EventHandler : public csBaseEventHandler {
-  public:
-    EventHandler (ViewMesh *parent,
-		  iObjectRegistry *object_reg);
-
-    ViewMesh *parent;
-
-    bool OnKeyboard (iEvent&);
-    bool HandleEvent (iEvent &);
-
-    void ProcessFrame ();
-    void FinishFrame ();
-
-    CS_EVENTHANDLER_NAMES("crystalspace.apps.viewmesh")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  };
-
-  EventHandler *Handler;
-
+  CS_EVENTHANDLER_NAMES ("crystalspace.viewmesh")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __VIEWMESH_H__

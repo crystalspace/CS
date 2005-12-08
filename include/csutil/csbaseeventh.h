@@ -60,7 +60,7 @@ private:
   csRef<iEventQueue> queue;
 
 protected:
-  iObjectRegistry *object_reg;
+  iObjectRegistry *object_registry;
   csHandlerID self;
   csEventID FrameEvent;
   csEventID PreProcess;
@@ -77,11 +77,17 @@ protected:
    * The constructor is declared as protected to prevent a developer from
    * using this class directly.
    */
-  csBaseEventHandler (iObjectRegistry *);
+  csBaseEventHandler ();
 
 public:
   /// Destructor.
   virtual ~csBaseEventHandler ();
+
+  /**
+   * Perform basic initialization.  This function MUST be called before
+   * invoking any of the RegisterQueue() methods.
+   */
+  void Initialize (iObjectRegistry *registry);
 
   /**
    * Register the event handler with the event queue registered with the
@@ -153,7 +159,7 @@ protected:
   CS_CONST_METHOD virtual const char *GenericName() const { return "application"; }
   
   CS_CONST_METHOD virtual csHandlerID GenericID() const { 
-    return csEventHandlerRegistry::GetGenericID(object_reg, GenericName()); 
+    return csEventHandlerRegistry::GetGenericID(object_registry, GenericName()); 
   }
 
   /**

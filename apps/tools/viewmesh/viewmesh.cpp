@@ -78,18 +78,6 @@ ViewMesh::~ViewMesh ()
 #endif
 }
 
-ViewMesh::EventHandler::EventHandler (ViewMesh *parent,
-				      iObjectRegistry *object_reg) :
-  csBaseEventHandler (object_reg),
-  parent (parent)
-{
-}
-
-void ViewMesh::EventHandler::ProcessFrame ()
-{
-  parent->ProcessFrame();
-}
-
 void ViewMesh::ProcessFrame()
 {
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -225,18 +213,13 @@ void ViewMesh::ProcessFrame()
 
 }
 
-void ViewMesh::EventHandler::FinishFrame ()
-{
-  parent->FinishFrame();
-}
-
 void ViewMesh::FinishFrame ()
 {
   g3d->FinishDraw ();
   g3d->Print (0);
 }
 
-bool ViewMesh::EventHandler::OnKeyboard(iEvent& ev)
+bool ViewMesh::OnKeyboard(iEvent& ev)
 {
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
@@ -247,16 +230,16 @@ bool ViewMesh::EventHandler::OnKeyboard(iEvent& ev)
       csRef<iEventQueue> q = 
         CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
       if (q.IsValid())
-	q->GetEventOutlet()->Broadcast(csevQuit (GetObjectRegistry ()));
+	q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
     }
   }
   return false;
 }
 
-bool ViewMesh::EventHandler::HandleEvent (iEvent &event)
+bool ViewMesh::HandleEvent (iEvent &event)
 {
-  if (parent->aws)
-    if (parent->aws->HandleEvent (event))
+  if (aws)
+    if (aws->HandleEvent (event))
       return true;
   return csBaseEventHandler::HandleEvent(event);;
 }
@@ -339,7 +322,6 @@ void ViewMesh::LoadLibrary(const char* path, const char* file)
 
 bool ViewMesh::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
-
   if (csCommandLineHelper::CheckHelp (GetObjectRegistry()))
   {
     ViewMesh::Help();
@@ -361,10 +343,9 @@ bool ViewMesh::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
-  Handler = new EventHandler (this, GetObjectRegistry ());
+  csBaseEventHandler::Initialize(GetObjectRegistry());
 
-  if (!Handler->RegisterQueue(GetObjectRegistry(), 
-			      csevAllEvents (GetObjectRegistry ())))
+  if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
     return ReportError("Failed to set up event handler!");
 
   return true;
@@ -764,7 +745,7 @@ void ViewMesh::AttachMesh (const char* path, const char* file)
     if ( meshWrapOld )
     {
       meshWrapOld->QuerySceneNode ()->SetParent (0);
-      selectedSocket->SetMeshWrapper( 0 );    
+      selectedSocket->SetMeshWrapper( 0 );
     }
   }
   else if (selectedCal3dSocket)

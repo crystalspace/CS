@@ -29,20 +29,8 @@ StartMe::StartMe ()
   description_selected = (size_t)-1;
 }
 
-StartMe::EventHandler::EventHandler (StartMe *parent,
-				     iObjectRegistry *object_reg) :
-  csBaseEventHandler (object_reg),
-  parent (parent)
-{
-}
-
 StartMe::~StartMe ()
 {
-}
-
-void StartMe::EventHandler::ProcessFrame ()
-{
-  parent->ProcessFrame ();
 }
 
 void StartMe::ProcessFrame ()
@@ -206,11 +194,6 @@ void StartMe::ProcessFrame ()
   }
 }
 
-void StartMe::EventHandler::FinishFrame ()
-{
-  parent->FinishFrame ();
-}
-
 void StartMe::FinishFrame ()
 {
   // Just tell the 3D renderer that everything has been rendered.
@@ -230,11 +213,6 @@ void StartMe::LeaveDescriptionMode ()
   description_selected = (size_t)-1;
   main_light->SetColor (MAIN_LIGHT_ON);
   pointer_light->SetColor (POINTER_LIGHT_ON);
-}
-
-bool StartMe::EventHandler::OnKeyboard (iEvent& ev)
-{
-  return parent->OnKeyboard (ev);
 }
 
 bool StartMe::OnKeyboard(iEvent& ev)
@@ -259,16 +237,11 @@ bool StartMe::OnKeyboard(iEvent& ev)
         csRef<iEventQueue> q = 
           CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
         if (q.IsValid()) 
-	  q->GetEventOutlet()->Broadcast(csevQuit (GetObjectRegistry ()));
+	  q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
       }
     }
   }
   return false;
-}
-
-bool StartMe::EventHandler::OnMouseDown (iEvent& event)
-{
-  return parent->OnMouseDown (event);
 }
 
 bool StartMe::OnMouseDown (iEvent& /*event*/)
@@ -335,13 +308,12 @@ bool StartMe::OnInitialize(int /*argc*/, char* /*argv*/ [])
       CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
-  Handler = new EventHandler (this, GetObjectRegistry ());
+  csBaseEventHandler::Initialize(GetObjectRegistry());
 
   // Now we need to setup an event handler for our application.
   // Crystal Space is fully event-driven. Everything (except for this
   // initialization) happens in an event.
-  if (!Handler->RegisterQueue (GetObjectRegistry(), 
-			       csevAllEvents (GetObjectRegistry())))
+  if (!RegisterQueue (GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
     return ReportError ("Failed to set up event handler!");
 
   return true;

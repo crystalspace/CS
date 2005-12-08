@@ -31,74 +31,60 @@
  * csBaseEventHandler provides a base object which does absolutely nothing
  * with the events that are sent to it.
  */
-class Simple : public csApplicationFramework
+class Simple : public csApplicationFramework, public csBaseEventHandler
 {
 private:
-  class EventHandler : public csBaseEventHandler
-  {
-  public:
-    EventHandler (Simple *parent,
-		  iObjectRegistry *object_reg);
+  bool Setup ();
 
-    Simple *parent;
+  /// A pointer to the 3D engine.
+  csRef<iEngine> engine;
 
-    bool Setup ();
+  /// A pointer to the map loader plugin.
+  csRef<iLoader> loader;
 
-    /// A pointer to the 3D engine.
-    csRef<iEngine> engine;
+  /// A pointer to the 3D renderer plugin.
+  csRef<iGraphics3D> g3d;
 
-    /// A pointer to the map loader plugin.
-    csRef<iLoader> loader;
+  /// A pointer to the keyboard driver.
+  csRef<iKeyboardDriver> kbd;
 
-    /// A pointer to the 3D renderer plugin.
-    csRef<iGraphics3D> g3d;
+  /// A pointer to the virtual clock.
+  csRef<iVirtualClock> vc;
 
-    /// A pointer to the keyboard driver.
-    csRef<iKeyboardDriver> kbd;
+  /// A pointer to the collision detection system.
+  csRef<iCollideSystem> cdsys;
 
-    /// A pointer to the virtual clock.
-    csRef<iVirtualClock> vc;
+  /// A pointer to the view which contains the camera.
+  csRef<iView> view;
 
-    /// A pointer to the collision detection system.
-    csRef<iCollideSystem> cdsys;
+  /// A pointer to the sector the camera will be in.
+  iSector* room;
 
-    /// A pointer to the view which contains the camera.
-    csRef<iView> view;
+  /// Our collider used for gravity and CD.
+  csColliderActor collider_actor;
 
-    /// A pointer to the sector the camera will be in.
-    iSector* room;
+  /**
+   * Handle keyboard events - ie key presses and releases.
+   * This routine is called from the event handler in response to a 
+   * csevKeyboard event.
+   */
+  bool OnKeyboard (iEvent&);
 
-    /// Our collider used for gravity and CD.
-    csColliderActor collider_actor;
-
-    /**
-     * Handle keyboard events - ie key presses and releases.
-     * This routine is called from the event handler in response to a 
-     * csevKeyboard event.
-     */
-    bool OnKeyboard (iEvent&);
-
-    /**
-     * Setup everything that needs to be rendered on screen. This routine
-     * is called from the event handler in response to a csevProcess
-     * broadcast message.
-     */
-    void ProcessFrame ();
+  /**
+   * Setup everything that needs to be rendered on screen. This routine
+   * is called from the event handler in response to a csevProcess
+   * broadcast message.
+   */
+  void ProcessFrame ();
     
-    /**
-     * Finally render the screen. This routine is called from the event
-     * handler in response to a csevFinalProcess broadcast message.
-     */
-    void FinishFrame ();
+  /**
+   * Finally render the screen. This routine is called from the event
+   * handler in response to a csevFinalProcess broadcast message.
+   */
+  void FinishFrame ();
     
-    /// Here we will load our world from a map file.
-    bool LoadMap ();
-
-    CS_EVENTHANDLER_NAMES ("crystalspace.apps.simpmap")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  };
-
-  EventHandler *Handler;
+  /// Here we will load our world from a map file.
+  bool LoadMap ();
 
 public:
 
@@ -128,6 +114,9 @@ public:
    * Only when the program exits this function will return.
    */
   bool Application ();
+
+  CS_EVENTHANDLER_NAMES ("crystalspace.simpmap")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __SIMPMAP_H__

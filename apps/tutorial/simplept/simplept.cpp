@@ -184,20 +184,25 @@ Simple::~Simple ()
 
 static bool SimpleEventHandler (iEvent& ev)
 {
-  if (ev.Name == simple->Process)
+  if (simple)
   {
-    simple->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == simple->FinalProcess)
-  {
-    simple->FinishFrame ();
-    return true;
+    if (ev.Name == csevProcess(simple->object_reg))
+    {
+      simple->SetupFrame ();
+      return true;
+    }
+    else if (ev.Name == csevFinalProcess(simple->object_reg))
+    {
+      simple->FinishFrame ();
+      return true;
+    }
+    else
+    {
+      return simple->HandleEvent (ev);
+    }
   }
   else
-  {
-    return simple ? simple->HandleEvent (ev) : false;
-  }
+    return false;
 }
 
 bool Simple::Initialize ()
@@ -380,12 +385,12 @@ bool Simple::Initialize ()
 
 bool Simple::HandleEvent (iEvent& Event)
 {
-  if ((Event.Name == KeyboardDown) &&
-      (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
+  if ((Event.Name == csevKeyboardDown(object_reg)) && 
+    (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
+      q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     return true;
   }
 
