@@ -48,7 +48,7 @@ struct iEventHandler : public virtual iBase
    * (unless the event's Broadcast flag has been set, in which case it is sent
    * to all subscribers regardless of the return value).  If the event was not
    * handled, then false should be returned, in which case other event handlers 
-   * are given a shot at the event.  Do <u>not</u> return true unless you really 
+   * are given a shot at the event.  Do \b not return true unless you really 
    * handled the event and want event dispatch to stop at your handler.
    */
   virtual bool HandleEvent (iEvent&) = 0;
@@ -61,16 +61,16 @@ struct iEventHandler : public virtual iBase
    * This is used, in combination with the GenericPrec, GenericSucc,
    * InstancePrec, and InstanceSucc functions, by the subscription 
    * scheduler to establish the order in which event handlers are to be called.
-   * <p>
+   *
    * Too bad C++ doesn't allow virtual static functions, because this would be one.
    * To make up for this, it is conventional to also define a static method
    * StaticHandlerName() which can be used to reference a class of event handlers
    * abstractly without it having been instantiated, e.g.,
    * csBaseEventHandler::StaticHandlerName().
-   * <p>
+   *
    * The csEventHandlerRegistry also uses this method to construct a unique instance 
    * name for each iEventHandler.  
-   * <p>
+   *
    * Usually, you will want to use the CS_EVENTHANDLER_NAMES macro instead of
    * defining this yourself.
    * \sa csHandlerRegistry::GetID

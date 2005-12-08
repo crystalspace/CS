@@ -111,7 +111,7 @@ struct iMeshGeneratorMapping : public virtual iBase
   /**
    * Get the box where where we will sample. We will sample starting
    * at the highest y value of the box and pointing down to the lowest
-   * y value of the box. (@@@TODO: in future support other directions
+   * y value of the box. (@@@ TODO: in future support other directions
    * for the mapping beam).
    */
   virtual void SetSampleBox (const csBox3& box) = 0;

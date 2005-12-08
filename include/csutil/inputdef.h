@@ -85,6 +85,7 @@ public:
 
   /**
    * Construct an input description from an iEvent (usually a button).
+   * \param name_reg A pointer to the event name registry.
    * \param event The event to analyse for input data.
    * \param honorModifiers A bitmask of modifier keys that will be recognised.
    * \param useCookedCode If true, will use the cooked key code instead of raw.
@@ -94,6 +95,7 @@ public:
 
   /**
    * Construct an input description from an iEvent (usually an axis).
+   * \param name_reg A pointer to the event name registry.
    * \param event The event to analyse for input data.
    * \param axis Events include all axes, so choose: 0 = x, 1 = y.
    */
@@ -101,6 +103,7 @@ public:
 
   /**
    * Construct an input description from a string.
+   * \param name_reg A pointer to the event name registry.
    * \param string The string to parse, e.g. "mousebutton1", "shift+a".
    * \param honorModifiers A bitmask of modifier keys that will be recognised.
    * \param useCookedCode If true, will use the cooked key code instead of raw.
@@ -180,6 +183,7 @@ public:
   /**
    * Helper function to parse a string (eg. "Ctrl+A") into values describing
    * a keyboard event, returning both raw and cooked key codes.
+   * \param reg A pointer to the event name registry.
    * \param iStr The string to parse.
    * \param oKeyCode Will be set to the raw code of the parsed description.
    * \param oCookedCode Will be set to the cooked code of the description.
@@ -195,6 +199,7 @@ public:
   /**
    * Helper function to parse a string (eg. "MouseX", "Alt+Mouse1") into
    * values describing a non-keyboard event.
+   * \param reg A pointer to the event name registry.
    * \param iStr The string to parse.
    * \param oType Will be set to the event name of the description
    *   (a csev... identifier).
@@ -214,6 +219,7 @@ public:
   /**
    * Helper function to return a string (eg. "Ctrl+A") from values
    * describing a keyboard event.
+   * \param reg A pointer to the event name registry.
    * \param code The key code, treated as a raw code although raw vs. cooked
    *   doesn't matter here.
    * \param mods The keyboard modifiers. Will be ignored if 0.
@@ -228,6 +234,7 @@ public:
   /**
    * Helper function to return a string (eg. "MouseX", "Alt+Mouse1") from
    * values describing a non-keyboard event.
+   * \param reg A pointer to the event name registry.
    * \param type The event type of the description (a csev... identifier).
    * \param device For mouse and joystick events, the device number, basis 0
    *   (first mouse is 0, second joystick is 1, etc).

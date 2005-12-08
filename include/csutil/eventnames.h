@@ -550,4 +550,6 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (
     CS_INITIALIZE_INPUT_EVENT_SHORTCUTS (x);	\
   } while (0)
 
+/** @} */
+
 #endif // __CS_CSUTIL_EVENTNAMES_H__
