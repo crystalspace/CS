@@ -35,6 +35,8 @@
 #include "iutil/evdefs.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
+#include "iutil/eventhandlers.h"
+#include "iutil/eventnames.h"
 #include "iutil/eventq.h"
 #include "iutil/job.h"
 #include "iutil/memdebug.h"
