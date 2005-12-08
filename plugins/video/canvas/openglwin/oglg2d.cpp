@@ -484,16 +484,8 @@ bool csGraphics2DOpenGL::Open ()
     ypos = (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2;
   }
 
-  if (cswinIsWinNT ())
-  {
-    m_hWnd = CreateWindowExW (exStyle, CS_WIN32_WINDOW_CLASS_NAMEW, 0, style, 
-      xpos, ypos, wwidth, wheight, 0, 0, m_hInstance, 0);
-  }
-  else
-  {
-    m_hWnd = CreateWindowExA (exStyle, CS_WIN32_WINDOW_CLASS_NAME, 0, style, 
-      xpos, ypos, wwidth, wheight, 0, 0, m_hInstance, 0);
-  }
+  m_hWnd = m_piWin32Assistant->CreateCSWindow (this, exStyle, style,
+    xpos, ypos, wwidth, wheight);
 
   if (!m_hWnd)
     SystemFatalError (L"Cannot create Crystal Space window", GetLastError());
@@ -503,12 +495,14 @@ bool csGraphics2DOpenGL::Open ()
   // Subclass the window
   if (IsWindowUnicode (m_hWnd))
   {
-    m_OldWndProc = (WNDPROC)SetWindowLongPtrW (m_hWnd, GWLP_WNDPROC, (LONG_PTR) WindowProc);
+    m_OldWndProc = (WNDPROC)SetWindowLongPtrW (m_hWnd, GWLP_WNDPROC, 
+      (LONG_PTR) WindowProc);
     SetWindowLongPtrW (m_hWnd, GWLP_USERDATA, (LONG_PTR)this);
   }
   else
   {
-    m_OldWndProc = (WNDPROC)SetWindowLongPtrA (m_hWnd, GWLP_WNDPROC, (LONG_PTR) WindowProc);
+    m_OldWndProc = (WNDPROC)SetWindowLongPtrA (m_hWnd, GWLP_WNDPROC, 
+      (LONG_PTR) WindowProc);
     SetWindowLongPtrA (m_hWnd, GWLP_USERDATA, (LONG_PTR)this);
   }
 

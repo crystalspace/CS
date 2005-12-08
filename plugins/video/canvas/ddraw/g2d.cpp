@@ -54,7 +54,7 @@ SCF_IMPLEMENT_FACTORY (csGraphics2DDDraw3)
 
 
 csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
-  csGraphics2D (iParent),
+  scfImplementationType (this, iParent),
   m_lpDD (0),
   m_lpddsPrimary (0),
   m_lpddsBack (0),
@@ -81,14 +81,7 @@ void csGraphics2DDDraw3::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (rep)
-    rep->ReportV (severity, "crystalspace.canvas.ddraw", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, severity, "crystalspace.canvas.ddraw", msg, arg);
   va_end (arg);
 }
 
@@ -137,18 +130,9 @@ bool csGraphics2DDDraw3::Open ()
   m_rcWindow.bottom = m_rcWindow.top + wheight;
 
   // create the window.
-  if (cswinIsWinNT ())
-  {
-    m_hWnd = CreateWindowW (CS_WIN32_WINDOW_CLASS_NAMEW, 0, 0,
-      m_rcWindow.left, m_rcWindow.top, m_rcWindow.right - m_rcWindow.left,
-      m_rcWindow.bottom - m_rcWindow.top, 0, 0, m_hInstance, 0);
-  }
-  else
-  {
-    m_hWnd = CreateWindowA (CS_WIN32_WINDOW_CLASS_NAME, 0, 0,
-      m_rcWindow.left, m_rcWindow.top, m_rcWindow.right - m_rcWindow.left,
-      m_rcWindow.bottom - m_rcWindow.top, 0, 0, m_hInstance, 0);
-  }
+  m_hWnd = m_piWin32Assistant->CreateCSWindow (this, 0, 0,
+    m_rcWindow.left, m_rcWindow.top, 
+    m_rcWindow.right - m_rcWindow.left, m_rcWindow.bottom - m_rcWindow.top);
   CS_ASSERT (m_hWnd);
 
   SetTitle (win_title);

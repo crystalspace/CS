@@ -19,12 +19,15 @@
 #include "cssysdef.h"
 #include <ctype.h>
 #include <stdarg.h>
+#include "csutil/csuctransform.h"
+#include "csutil/event.h"
 #include "csutil/eventnames.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/ref.h"
+#include "csutil/refarr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 #include "csutil/win32/win32.h"
-#include "csutil/event.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
@@ -78,10 +81,8 @@ private:
   bool ApplicationActive;
   HINSTANCE ModuleHandle;
   int ApplicationShow;
-  /// Handle of the main window.
-  HWND ApplicationWnd;
 
-  iObjectRegistry* registry;
+  csRef<iObjectRegistry> registry;
   /// is a console window to be displayed?
   bool console_window;
   /// is the binary linked as GUI or console app?
@@ -97,15 +98,6 @@ private:
 
   int mouseButtons;
 
-  // @@@ The following aren't thread-safe. Prolly use TLS.
-  /// The "Ok" button text passsed to Alert(),
-  const char* msgOkMsg;
-  /// Hook that will change the OK button text.
-  HHOOK msgBoxOkChanger;
-
-  /// Handle to the exception handler DLL.
-  HANDLE exceptHandlerDLL;
-
   /// The console codepage that was set on program startup. Will be restored on exit.
   //UINT oldCP;
 
@@ -115,6 +107,9 @@ private:
   csEventID CommandLineHelp;
   csEventID FocusGained;
   csEventID FocusLost;
+
+  /// The window class name for this assistant
+  uint8* windowClass;
 
   static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
@@ -135,10 +130,12 @@ public:
   virtual void DisableConsole ();
   void AlertV (HWND window, int type, const char* title, 
     const char* okMsg, const char* msg, va_list args);
-  virtual HWND GetApplicationWindow();
 
   virtual void UseOwnMessageLoop(bool ownmsgloop);
   virtual bool HasOwnMessageLoop();
+  virtual HWND CreateCSWindow (iGraphics2D* canvas,
+    DWORD exStyle, DWORD style, int x,
+    int y, int w, int h);
 
   iEventOutlet* GetEventOutlet();
 
@@ -149,13 +146,11 @@ public:
     WPARAM wParam, LPARAM lParam);
 
   CS_EVENTHANDLER_NAMES ("crystalspace.win32")
-  /*CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
-  CS_EVENTHANDLER_NIL_GENERIC_CONSTRAINTS*/
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
-static Win32Assistant* GLOBAL_ASSISTANT = 0;
-
+//static Win32Assistant* GLOBAL_ASSISTANT = 0;
+static csRefArray<Win32Assistant> assistants;
 
 static inline void ToLower (char *dst, const char *src) 
 {
@@ -295,8 +290,7 @@ bool csPlatformStartup(iObjectRegistry* r)
   bool ok = r->Register (static_cast<iWin32Assistant*>(a), "iWin32Assistant");
   if (ok)
   {
-    a->IncRef ();
-    GLOBAL_ASSISTANT = a;
+    assistants.Push (a);
   }
   else
   {
@@ -308,62 +302,49 @@ bool csPlatformStartup(iObjectRegistry* r)
 
 bool csPlatformShutdown(iObjectRegistry* r)
 {
-  if (GLOBAL_ASSISTANT != 0)
+  csRef<iWin32Assistant> assi = csQueryRegistryTagInterface<iWin32Assistant> 
+    (r, "iWin32Assistant");
+  if (assi.IsValid())
   {
-    r->Unregister(
-      static_cast<iWin32Assistant*>(GLOBAL_ASSISTANT), "iWin32Assistant");
-    GLOBAL_ASSISTANT->Shutdown();
-    GLOBAL_ASSISTANT->DecRef();
-    GLOBAL_ASSISTANT = 0;
+    r->Unregister(assi, "iWin32Assistant");
+    Win32Assistant* a = (Win32Assistant*)((iWin32Assistant*)assi);
+    a->Shutdown();
+    assistants.DeleteFast (a);
+    return true;
   }
-  return true;
+  return false;
 }
 
 BOOL WINAPI Win32Assistant::ConsoleHandlerRoutine (DWORD dwCtrlType)
 {
+  BOOL result = FALSE;
   switch (dwCtrlType)
   {
     case CTRL_CLOSE_EVENT:
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
       {
-	if (GLOBAL_ASSISTANT != 0)
+	for (size_t i = 0; i < assistants.Length(); i++)
 	{
-	  GLOBAL_ASSISTANT->GetEventOutlet()->ImmediateBroadcast (
-	    csevQuit (GLOBAL_ASSISTANT->registry), 0);
-	  return TRUE;
+	  assistants[i]->GetEventOutlet()->ImmediateBroadcast (
+	    csevQuit (assistants[i]->registry), 0);
+	  result = TRUE;
 	}
       }
   }
-  return FALSE;
+  return result;
 }
 
 Win32Assistant::Win32Assistant (iObjectRegistry* r) 
   : scfImplementationType (this),
   ApplicationActive (true),
   ModuleHandle (0),
-  ApplicationWnd (0),
   console_window (false),  
   is_console_app(false),
   cmdline_help_wanted(false),
   EventOutlet (0),
   mouseButtons(0)
 {
-
-  /*
-    Load the exception handler DLL. In case of an OS exception
-    (e.g. Access Violation) this DLL creates a report about
-    where the crash happened. After that, the "Application Error"
-    boy is shown as usual.
-
-    The DLL is contained in the "mingw-utils" package and works
-    for both MinGW and VC compiled binaries.
-   */
-  // @@@ Potentially useful, but seems to interfere with "real" debugging
-  //exceptHandlerDLL = LoadLibraryEx ("exchndl.dll", 0, 
-  //  LOAD_WITH_ALTERED_SEARCH_PATH);
-  exceptHandlerDLL = 0;
-
   ModuleHandle = GetModuleHandle(0);
   STARTUPINFO startupInfo;
   GetStartupInfo (&startupInfo);
@@ -437,7 +418,6 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
   //
 
   registry = r;
-  registry->IncRef();
 
   HICON appIcon;
 
@@ -463,42 +443,52 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
   }
   // finally the default one
   if (!appIcon) appIcon = LoadIcon (0, IDI_APPLICATION);
+  
+  csString wndClass;
+  wndClass.Format ("CrystalSpaceWin32_%p", this);
 
   bool bResult = false;
   HBRUSH backBrush = (HBRUSH)::GetStockObject (BLACK_BRUSH);
   if (cswinIsWinNT ())
   {
     WNDCLASSEXW wc;
+    
+    windowClass = new uint8[(wndClass.Length()+1) * sizeof (WCHAR)];
+    csUnicodeTransform::UTF8toWC ((wchar_t*)windowClass,
+      wndClass.Length()+1, (utf8_char*)(wndClass.GetData()), -1);
 
     wc.cbSize	      = sizeof (wc);
     wc.hCursor        = 0;
     wc.hIcon          = appIcon;
     wc.lpszMenuName   = 0;
-    wc.lpszClassName  = CS_WIN32_WINDOW_CLASS_NAMEW;
+    wc.lpszClassName  = (WCHAR*)windowClass;
     wc.hbrBackground  = backBrush;
     wc.hInstance      = ModuleHandle;
     wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
     wc.lpfnWndProc    = WindowProc;
     wc.cbClsExtra     = 0;
-    wc.cbWndExtra     = 0;
+    wc.cbWndExtra     = 2*sizeof (LONG_PTR);
     wc.hIconSm	      = 0;
     bResult = RegisterClassExW (&wc) != 0;
   }
   else
   {
     WNDCLASSEXA wc;
+    
+    windowClass = new uint8[wndClass.Length()+1];
+    strcpy ((char*)windowClass, wndClass);
 
     wc.cbSize	      = sizeof (wc);
     wc.hCursor        = 0;
     wc.hIcon          = appIcon;
     wc.lpszMenuName   = 0;
-    wc.lpszClassName  = CS_WIN32_WINDOW_CLASS_NAME;
+    wc.lpszClassName  = (char*)windowClass;
     wc.hbrBackground  = backBrush;
     wc.hInstance      = ModuleHandle;
     wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
     wc.lpfnWndProc    = WindowProc;
     wc.cbClsExtra     = 0;
-    wc.cbWndExtra     = 0;
+    wc.cbWndExtra     = 2*sizeof (LONG_PTR);
     wc.hIconSm	      = 0;
     bResult = RegisterClassExA (&wc) != 0;
   }
@@ -551,17 +541,14 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
 
 Win32Assistant::~Win32Assistant ()
 {
-  registry->DecRef();
   //SetConsoleOutputCP (oldCP);
   if (!is_console_app && (console_window || cmdline_help_wanted))
     FreeConsole();
-  if (exceptHandlerDLL != 0)
-    FreeLibrary ((HMODULE)exceptHandlerDLL);
   if (cswinIsWinNT ())
-    UnregisterClassW (CS_WIN32_WINDOW_CLASS_NAMEW, ModuleHandle);
+    UnregisterClassW ((WCHAR*)windowClass, ModuleHandle);
   else
-    UnregisterClassA (CS_WIN32_WINDOW_CLASS_NAME, ModuleHandle); 
-  SCF_DESTRUCT_IBASE();
+    UnregisterClassA ((char*)windowClass, ModuleHandle); 
+  delete[] windowClass;
 }
 
 void Win32Assistant::Shutdown()
@@ -696,42 +683,64 @@ int Win32Assistant::GetCmdShow () const
 #define	WM_XBUTTONUP	0x020c
 #endif
 
+struct CreateInfo
+{
+  Win32Assistant* assistant;
+  iGraphics2D* canvas;
+};
+
 LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
+  Win32Assistant* assistant;
+  if (IsWindowUnicode (hWnd))
+    assistant = (Win32Assistant*)GetWindowLongPtrW (hWnd, 0);
+  else
+    assistant = (Win32Assistant*)GetWindowLongPtrA (hWnd, 0);
   switch (message)
   {
     case WM_ACTIVATEAPP:
-      if ((GLOBAL_ASSISTANT != 0))
+      if ((assistant != 0))
       {
         if (wParam) 
 	{ 
-	  GLOBAL_ASSISTANT->ApplicationActive = true; 
+	  assistant->ApplicationActive = true; 
 	} 
 	else 
 	{ 
-	  GLOBAL_ASSISTANT->ApplicationActive = false; 
+	  assistant->ApplicationActive = false; 
 	}
       }
       break;
     case WM_ACTIVATE:
-      if ((GLOBAL_ASSISTANT != 0))
+      if ((assistant != 0))
       {
-	iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+	iEventOutlet* outlet = assistant->GetEventOutlet();
         outlet->Broadcast ((LOWORD(wParam) != WA_INACTIVE) ?
-			   GLOBAL_ASSISTANT->FocusGained :
-			   GLOBAL_ASSISTANT->FocusLost, 0);
+			   assistant->FocusGained :
+			   assistant->FocusLost, 0);
       }
       break;
     case WM_CREATE:
-      if (GLOBAL_ASSISTANT != 0)
       {
-	GLOBAL_ASSISTANT->ApplicationWnd = hWnd;
-	// a window is created. Hide the console window, if requested.
-	if (GLOBAL_ASSISTANT->is_console_app && 
-	  !GLOBAL_ASSISTANT->console_window)
+	CreateInfo* ci;
+	if (IsWindowUnicode (hWnd))
 	{
-	  GLOBAL_ASSISTANT->DisableConsole ();
+	  ci = (CreateInfo*)((LPCREATESTRUCTW)lParam)->lpCreateParams;
+	  SetWindowLongPtrW (hWnd, 0, (LONG_PTR)ci->assistant);
+	  SetWindowLongPtrW (hWnd, sizeof (LONG_PTR), (LONG_PTR)ci->canvas);
+	}
+	else
+	{
+	  ci = (CreateInfo*)((LPCREATESTRUCTA)lParam)->lpCreateParams;
+	  SetWindowLongPtrA (hWnd, 0, (LONG_PTR)ci->assistant);
+	  SetWindowLongPtrA (hWnd, sizeof (LONG_PTR), (LONG_PTR)ci->canvas);
+	}
+	// a window is created. Hide the console window, if requested.
+	if (ci->assistant->is_console_app && 
+	  !ci->assistant->console_window)
+	{
+	  ci->assistant->DisableConsole ();
 	}
       }
       break;
@@ -753,10 +762,9 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
     case WM_KEYUP:
     case WM_SYSKEYUP:
     {
-      if (GLOBAL_ASSISTANT != 0)
+      if (assistant != 0)
       {	  
-	if (GLOBAL_ASSISTANT->HandleKeyMessage (hWnd, message, wParam,
-	  lParam))
+	if (assistant->HandleKeyMessage (hWnd, message, wParam, lParam))
 	{
 	  return 0;
 	}
@@ -767,14 +775,14 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
     case WM_RBUTTONDOWN:
     case WM_MBUTTONDOWN:
     {
-      if (GLOBAL_ASSISTANT != 0)
+      if (assistant != 0)
       {
 	const int buttonNum = (message == WM_LBUTTONDOWN) ? csmbLeft :
           (message == WM_RBUTTONDOWN) ? csmbRight : csmbMiddle;
-        if (GLOBAL_ASSISTANT->mouseButtons == 0) SetCapture (hWnd);
-	GLOBAL_ASSISTANT->mouseButtons |= 1 << (buttonNum - csmbLeft);
+        if (assistant->mouseButtons == 0) SetCapture (hWnd);
+	assistant->mouseButtons |= 1 << (buttonNum - csmbLeft);
 
-        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+        iEventOutlet* outlet = assistant->GetEventOutlet();
         outlet->Mouse (buttonNum, true,
           short (LOWORD (lParam)), short (HIWORD (lParam)));
       }
@@ -784,14 +792,14 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
     case WM_RBUTTONUP:
     case WM_MBUTTONUP:
     {
-      if (GLOBAL_ASSISTANT != 0)
+      if (assistant != 0)
       {
 	const int buttonNum = (message == WM_LBUTTONUP) ? csmbLeft :
           (message == WM_RBUTTONUP) ? csmbRight : csmbMiddle;
-	GLOBAL_ASSISTANT->mouseButtons &= ~(1 << (buttonNum - csmbLeft));
-        if (GLOBAL_ASSISTANT->mouseButtons == 0) ReleaseCapture ();
+	assistant->mouseButtons &= ~(1 << (buttonNum - csmbLeft));
+        if (assistant->mouseButtons == 0) ReleaseCapture ();
 
-        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+        iEventOutlet* outlet = assistant->GetEventOutlet();
         outlet->Mouse (buttonNum, false,
           short (LOWORD (lParam)), short (HIWORD (lParam)));
       }
@@ -799,15 +807,15 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
     }
     case WM_MOUSEWHEEL:
     {
-      if (GLOBAL_ASSISTANT != 0)
+      if (assistant != 0)
       {
-        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+        iEventOutlet* outlet = assistant->GetEventOutlet();
 	int wheelDelta = (short)HIWORD (wParam);
 	// @@@ Only emit events when WHEEL_DELTA wheel ticks accumulated?
-  POINT coords;
-  coords.x = short (LOWORD (lParam));
-  coords.y = short (HIWORD (lParam));
-  ScreenToClient(hWnd, &coords);
+	POINT coords;
+	coords.x = short (LOWORD (lParam));
+	coords.y = short (HIWORD (lParam));
+	ScreenToClient(hWnd, &coords);
 	outlet->Mouse (wheelDelta > 0 ? csmbWheelUp : csmbWheelDown, true,
 	  coords.x, coords.y);
 	//outlet->Mouse (wheelDelta > 0 ? csmbWheelUp : csmbWheelDown, false,
@@ -818,7 +826,7 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
     case WM_XBUTTONUP:
     case WM_XBUTTONDOWN:
     {
-      if (GLOBAL_ASSISTANT != 0)
+      if (assistant != 0)
       {
 	bool down = (message == WM_XBUTTONDOWN);
 	const int maxXButtons = 16; 
@@ -828,72 +836,84 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 
 	int XButtons = HIWORD(wParam);
 
-	if (down && (GLOBAL_ASSISTANT->mouseButtons == 0)) SetCapture (hWnd);
+	if (down && (assistant->mouseButtons == 0)) SetCapture (hWnd);
 
-        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+        iEventOutlet* outlet = assistant->GetEventOutlet();
 	for (int x = 0; x < maxXButtons; x++)
 	{
 	  if (XButtons & (1 << x))
 	  {
 	    int mbFlag = 1 << (x + mbFlagsOffs);
-	    if (down && !(GLOBAL_ASSISTANT->mouseButtons & mbFlag))
+	    if (down && !(assistant->mouseButtons & mbFlag))
 	    {
-	      GLOBAL_ASSISTANT->mouseButtons |= mbFlag;
+	      assistant->mouseButtons |= mbFlag;
 	      outlet->Mouse (csmbExtra1 + x, true,
 		short (LOWORD (lParam)), short (HIWORD (lParam)));
 	    }
-	    else if (!down && (GLOBAL_ASSISTANT->mouseButtons & mbFlag))
+	    else if (!down && (assistant->mouseButtons & mbFlag))
 	    {
-	      GLOBAL_ASSISTANT->mouseButtons &= ~mbFlag;
+	      assistant->mouseButtons &= ~mbFlag;
 	      outlet->Mouse (csmbExtra1 + x, false,
 		short (LOWORD (lParam)), short (HIWORD (lParam)));
 	    }
 	  }
 	}
-        if (!down && (GLOBAL_ASSISTANT->mouseButtons == 0)) ReleaseCapture ();
+        if (!down && (assistant->mouseButtons == 0)) ReleaseCapture ();
       }
       return TRUE;
     }
     case WM_MOUSEMOVE:
     {
-      if (GLOBAL_ASSISTANT != 0)
+      if (assistant != 0)
       {
-        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-        ::SetCursor (GLOBAL_ASSISTANT->m_hCursor);
+        iEventOutlet* outlet = assistant->GetEventOutlet();
+        ::SetCursor (assistant->m_hCursor);
         outlet->Mouse (0, false, short(LOWORD(lParam)), short(HIWORD(lParam)));
       }
       return TRUE;
     }
     case WM_SIZE:
     {
-      if (GLOBAL_ASSISTANT != 0)
+      if (assistant != 0)
       {
+	iGraphics2D* canvas;
+	if (IsWindowUnicode (hWnd))
+	  canvas = (iGraphics2D*)GetWindowLongPtrW (hWnd, sizeof (LONG_PTR));
+	else
+	  canvas = (iGraphics2D*)GetWindowLongPtrA (hWnd, sizeof (LONG_PTR));
+
 	if ( (wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED) )
 	{
-          iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  //outlet->Broadcast (csevCanvasExposed, 0);
+          iEventOutlet* outlet = assistant->GetEventOutlet();
+	  outlet->Broadcast (csevCanvasExposed (assistant->registry, canvas));
 	} 
 	else if (wParam == SIZE_MINIMIZED) 
 	{
-          iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  //outlet->Broadcast (csevCanvasHidden, 0);
+          iEventOutlet* outlet = assistant->GetEventOutlet();
+	  outlet->Broadcast (csevCanvasHidden (assistant->registry, canvas));
 	}
       }
       return TRUE;
     }
     case WM_SHOWWINDOW:
     {
-      if (GLOBAL_ASSISTANT != 0)
+      if (assistant != 0)
       {
+	iGraphics2D* canvas;
+	if (IsWindowUnicode (hWnd))
+	  canvas = (iGraphics2D*)GetWindowLongPtrW (hWnd, sizeof (LONG_PTR));
+	else
+	  canvas = (iGraphics2D*)GetWindowLongPtrA (hWnd, sizeof (LONG_PTR));
+
 	if (wParam)
 	{
-          iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  //outlet->Broadcast (csevCanvasExposed, 0);
+          iEventOutlet* outlet = assistant->GetEventOutlet();
+	  outlet->Broadcast (csevCanvasExposed (assistant->registry, canvas));
 	} 
 	else
 	{
-          iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  //outlet->Broadcast (csevCanvasHidden, 0);
+          iEventOutlet* outlet = assistant->GetEventOutlet();
+	  outlet->Broadcast (csevCanvasHidden (assistant->registry, canvas));
 	}
       }
       break;
@@ -977,6 +997,12 @@ void Win32Assistant::DisableConsole ()
   csPrintf("====== %s", asctime(now));
 }
 
+// @@@ The following aren't thread-safe. Prolly use TLS.
+/// The "Ok" button text passsed to Alert(),
+static const char* msgOkMsg;
+/// Hook that will change the OK button text.
+static HHOOK msgBoxOkChanger;
+
 LRESULT Win32Assistant::CBTProc (int nCode, WPARAM wParam, LPARAM lParam)
 {
   switch (nCode)
@@ -990,23 +1016,23 @@ LRESULT Win32Assistant::CBTProc (int nCode, WPARAM wParam, LPARAM lParam)
       {
 	if (cswinIsWinNT ())
 	{
-          SetWindowTextW (Button, csCtoW (GLOBAL_ASSISTANT->msgOkMsg));
+          SetWindowTextW (Button, csCtoW (msgOkMsg));
 	}
 	else
 	{
-          SetWindowTextA (Button, cswinCtoA (GLOBAL_ASSISTANT->msgOkMsg));
+          SetWindowTextA (Button, cswinCtoA (msgOkMsg));
 	}
       }
-      LRESULT ret = CallNextHookEx (GLOBAL_ASSISTANT->msgBoxOkChanger,
+      LRESULT ret = CallNextHookEx (msgBoxOkChanger,
 	nCode, wParam, lParam);
       // The work is done, remove the hook.
-      UnhookWindowsHookEx (GLOBAL_ASSISTANT->msgBoxOkChanger);
-      GLOBAL_ASSISTANT->msgBoxOkChanger = 0;
+      UnhookWindowsHookEx (msgBoxOkChanger);
+      msgBoxOkChanger = 0;
       return ret;
     }
     break;
   }
-  return CallNextHookEx (GLOBAL_ASSISTANT->msgBoxOkChanger,
+  return CallNextHookEx (msgBoxOkChanger,
     nCode, wParam, lParam);
 }
 
@@ -1051,11 +1077,6 @@ void Win32Assistant::AlertV (HWND window, int type, const char* title,
   }
 }
 
-HWND Win32Assistant::GetApplicationWindow()
-{
-  return ApplicationWnd;
-}
-
 void Win32Assistant::UseOwnMessageLoop(bool ownmsgloop)
 {
   use_own_message_loop = ownmsgloop;
@@ -1064,6 +1085,27 @@ void Win32Assistant::UseOwnMessageLoop(bool ownmsgloop)
 bool Win32Assistant::HasOwnMessageLoop()
 {
   return use_own_message_loop;
+}
+
+HWND Win32Assistant::CreateCSWindow (iGraphics2D* canvas,
+				     DWORD exStyle, DWORD style, 
+				     int x, int y, int w, int h)
+{
+  HWND wnd;
+  CreateInfo ci;
+  ci.assistant = this;
+  ci.canvas = canvas;
+  if (cswinIsWinNT())
+  {
+    wnd = CreateWindowExW (exStyle, (WCHAR*)windowClass, 0, style,
+      x, y, w, h, 0, 0, ModuleHandle, &ci);
+  }
+  else
+  {
+    wnd = CreateWindowExA (exStyle, (char*)windowClass, 0, style,
+      x, y, w, h, 0, 0, ModuleHandle, &ci);
+  }
+  return wnd;
 }
 
 bool Win32Assistant::HandleKeyMessage (HWND hWnd, UINT message, 

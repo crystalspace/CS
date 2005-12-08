@@ -31,6 +31,7 @@
 #include "iutil/virtclk.h"
 #include "iutil/cmdline.h"
 #include "ivaria/reporter.h"
+#include "ivideo/graph2d.h"
 
 #include "../../renderer.h"
 #include "isndsys/ss_driver.h"
@@ -44,12 +45,12 @@ SCF_IMPLEMENT_FACTORY (SndSysDriverDirectSound)
 
 
 SCF_IMPLEMENT_IBASE(SndSysDriverDirectSound)
-SCF_IMPLEMENTS_INTERFACE(iSndSysSoftwareDriver)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END;
+  SCF_IMPLEMENTS_INTERFACE(iSndSysSoftwareDriver)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (SndSysDriverDirectSound::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SndSysDriverDirectSound::SndSysDriverDirectSound(iBase* piBase) :
@@ -91,16 +92,12 @@ bool SndSysDriverDirectSound::Initialize (iObjectRegistry *obj_reg)
   // read the config file
 //  Config.AddConfig(object_reg, "/config/sound.cfg");
 
-
   win32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
   if (!win32Assistant)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: Direct sound driver: Could not locate iWin32Assistant object in CS registry.");
     return false;
   }
-
-
-
  
   return true;
 }
@@ -134,7 +131,17 @@ bool SndSysDriverDirectSound::Open (csSndSysRendererSoftware *renderer,
     return false;
   }
 
-  hr = ds_device->SetCooperativeLevel (win32Assistant->GetApplicationWindow(),
+  csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (object_reg);
+  if (!g2d.IsValid())
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, 
+      "A canvas is required");
+    return false;
+  }
+  csRef<iWin32Canvas> canvas = scfQueryInterface<iWin32Canvas> (g2d);
+  CS_ASSERT (canvas.IsValid());
+
+  hr = ds_device->SetCooperativeLevel (canvas->GetWindowHandle(),
     DSSCL_PRIORITY);
   if (FAILED(hr))
   {

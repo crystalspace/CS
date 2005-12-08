@@ -23,6 +23,7 @@
 #include "csutil/win32/win32.h"
 #include "csutil/win32/wintools.h"
 #include "ivaria/reporter.h"
+#include "ivideo/graph2d.h"
 
 #define INITGUID
 #include <windows.h>
@@ -200,7 +201,17 @@ bool csWindowsJoystick::Init ()
     &lpdin, 0);
   if (SUCCEEDED (hr))
   {
-    HWND window = win32->GetApplicationWindow ();
+    csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (object_reg);
+    if (!g2d.IsValid())
+    {
+      Report(CS_REPORTER_SEVERITY_ERROR, 
+	"A canvas is required");
+      return false;
+    }
+    csRef<iWin32Canvas> canvas = scfQueryInterface<iWin32Canvas> (g2d);
+    CS_ASSERT(canvas.IsValid());
+
+    HWND window = canvas->GetWindowHandle();
     // Only enum attached Joysticks, get Details of Devices
     lpdin->EnumDevices (DIDEVTYPE_JOYSTICK, &dev_callback,
       (LPVOID)this, DIEDFL_ATTACHEDONLY);

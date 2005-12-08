@@ -25,7 +25,10 @@
 #include "csplugincommon/win32/customcursor.h"
 
 /// Windows version.
-class csGraphics2DDDraw3 : public csGraphics2D
+class csGraphics2DDDraw3 : 
+  public scfImplementationExt1<csGraphics2DDDraw3,
+			       csGraphics2D,
+			       iWin32Canvas>
 {
 public:
   csGraphics2DDDraw3 (iBase *iParent);
@@ -64,6 +67,8 @@ public:
   /// Display a message box
   virtual void AlertV (int type, const char* title, 
     const char* okMsg, const char* msg, va_list args);
+
+  virtual HWND GetWindowHandle() { return m_hWnd; }
 protected:
   static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);

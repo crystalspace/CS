@@ -115,6 +115,8 @@ public:
    * thread (if there is one)
    */
   void ThreadProc();
+
+  void Report (int severity, const char* msg, ...);
   
   /// Pointer to the DirectSound interface
   LPDIRECTSOUND AudioRenderer;

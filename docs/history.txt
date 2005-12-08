@@ -21,6 +21,8 @@ chronological order.
 	  apps and tools are now much closer to their pre-overhaul form.
 	- res made some VC7 and Win32-related new event stuff fixes.
 	- res did some slight reformatting.
+	- res changed the Win32 platform support code to not assume a single 
+	  global Win32Assistant any more.
 5-Dec-2005
         - res fixed the generic csInstallationPathsHelper::GetAppPath() to
           treat an empty entry in PATH like ".".

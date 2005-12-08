@@ -31,6 +31,7 @@
 #include "iutil/objreg.h"
 #include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
+#include "ivideo/graph2d.h"
 
 #include "sndrdr.h"
 #include "sndlstn.h"
@@ -111,10 +112,7 @@ csSoundRenderDS3D::~csSoundRenderDS3D()
 //  Pre-Multi Threaded section
 bool csSoundRenderDS3D::Open()
 {
-  csRef<iReporter> reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter)
-    reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "crystalspace.sound.ds3d",
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
     "SoundRender DirectSound3D selected");
 
   HRESULT r;
@@ -123,29 +121,30 @@ bool csSoundRenderDS3D::Open()
     r = DirectSoundCreate(0, &AudioRenderer, 0);
     if (r != DS_OK)
     {
-      if (reporter)
-        reporter->Report (CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.sound.ds3d",
+      Report (CS_REPORTER_SEVERITY_ERROR,
         "Error : Cannot Initialize DirectSound3D (%s).", GetError(r));
-      else
-        csPrintf (
-        "Error : Cannot Initialize DirectSound3D (%s).\n", GetError(r));
       Close();
       return false;
     }
 
+    csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (object_reg);
+    if (!g2d.IsValid())
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, 
+	"A canvas is required");
+      return false;
+    }
+    csRef<iWin32Canvas> canvas = scfQueryInterface<iWin32Canvas> (g2d);
+    CS_ASSERT (canvas.IsValid());
+
     DWORD dwLevel = DSSCL_PRIORITY;
     r = AudioRenderer->SetCooperativeLevel(
-      win32Assistant->GetApplicationWindow(), dwLevel);
+      canvas->GetWindowHandle(), dwLevel);
     if (r != DS_OK)
     {
-      if (reporter)
-        reporter->Report (CS_REPORTER_SEVERITY_ERROR,
+      Report (CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.sound.ds3d",
         "Error : Cannot Set Cooperative Level (%s).", GetError(r));
-      else
-        csPrintf (
-        "Error : Cannot Set Cooperative Level (%s).\n", GetError(r));
       Close();
       return false;
     }
@@ -162,8 +161,7 @@ bool csSoundRenderDS3D::Open()
 
   float vol = Config->GetFloat("Sound.Volume",-1);
   if (vol>=0) SetVolume(vol);
-  if (reporter)
-    reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
     "crystalspace.sound.ds3d",
     "  Volume: %g\n", GetVolume());
 
@@ -376,6 +374,14 @@ void csSoundRenderDS3D::ThreadProc ()
     Update();
     csSleep(sleeptime);
   }
+}
+
+void csSoundRenderDS3D::Report (int severity, const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  csReportV (object_reg, severity, "crystalspace.sound.ds3d", msg, args);
+  va_end (args);
 }
 
 bool csSoundRenderDS3D::HandleEvent (iEvent &e)

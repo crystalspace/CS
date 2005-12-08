@@ -31,9 +31,10 @@
 struct iWin32Assistant;
 
 /// Windows version.
-class csGraphics2DOpenGL : public scfImplementationExt1<csGraphics2DOpenGL, 
+class csGraphics2DOpenGL : public scfImplementationExt2<csGraphics2DOpenGL, 
 							csGraphics2DGLCommon, 
-							iOpenGLInterface>
+							iOpenGLInterface,
+							iWin32Canvas>
 {
 private:
   struct DummyWndInfo
@@ -100,6 +101,8 @@ public:
 
   virtual void *GetProcAddress (const char *funcname)
   { return (void*)(wglGetProcAddress ((const char *)funcname)); }
+
+  virtual HWND GetWindowHandle() { return m_hWnd; }
 protected:
 
   HDC hDC;

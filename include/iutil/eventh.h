@@ -81,15 +81,17 @@ struct iEventHandler : public virtual iBase
 
   /**
    * This function returns a csHandlerID corresponding with GenericName,
-   * i.e., it should always return csHandlerRegistry::GetGenericID(this->GenericName()).
-   * Normally, it will actually wrap a static method StaticID() which can be used to 
-   * reference a class of event handlers abstractly without it having been instantiated.
-   * Usually, you will want to use the CS_EVENTHANDLER_NAMES macro instead of
-   * defining this yourself.
+   * i.e., it should always return 
+   * csHandlerRegistry::GetGenericID (this->GenericName()).
+   * Normally, it will actually wrap a static method StaticID() which can be 
+   * used to reference a class of event handlers abstractly without it having 
+   * been instantiated. Usually, you will want to use the 
+   * CS_EVENTHANDLER_NAMES macro instead of defining this yourself.
    * \sa iEventHandler::GenericName
    * \sa CS_EVENTHANDLER_NAMES
    */
-  CS_CONST_METHOD virtual csHandlerID GenericID(csRef<iEventHandlerRegistry> &) const = 0; 
+  CS_CONST_METHOD virtual csHandlerID GenericID (
+    csRef<iEventHandlerRegistry> &) const = 0; 
   // wish the above could be "virtual static"
 
   /**
@@ -100,12 +102,12 @@ struct iEventHandler : public virtual iBase
    * other words, every member of the array should be the result of a call to
    * csHandlerRegistry::GetGenericID("name"), where "name" may be some
    * class's static GenericName() function or a literal string.
-   * <p>
+   *
    * This should also be a "virtual static" function, but C++ doesn't have them.
    */
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec(csRef<iEventHandlerRegistry> &, 
-							  csRef<iEventNameRegistry> &,
-							  csEventID) const = 0;
+  CS_CONST_METHOD virtual const csHandlerID * GenericPrec (
+    csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &, 
+    csEventID) const = 0;
 
   /**
    * This function takes a csEventID as an argument and returns an array of
@@ -115,28 +117,28 @@ struct iEventHandler : public virtual iBase
    * other words, every member of the array should be the result of a call to
    * csHandlerRegistry::GetGenericID("name"), where "name" may be some
    * class's static GenericString() function or a literal string.
-   * <p>
+   *
    * This should also be a "virtual static" function, but C++ doesn't have them.
    */
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry> &,
-							  csRef<iEventNameRegistry> &,
-							  csEventID) const = 0;
+  CS_CONST_METHOD virtual const csHandlerID * GenericSucc (
+    csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
+    csEventID) const = 0;
 
   /**
    * This function takes a csEventID as an argument and returns an array of
    * csHandlerIDs identifying those event handlers which must, for the given
    * event, only be called before this one.  May include both generic
    * and instance identifiers, i.e., the results of both
-   * csHandlerRegtistry::GetGenericID() and csHandlerRegistry::GetID() calls.
-   * <p>
+   * csHandlerRegistry::GetGenericID() and csHandlerRegistry::GetID() calls.
+   *
    * If the instance constraints are the same as the generic ones, use
    * ths CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS macro instead of
    * defining this for yourself.
    * \sa CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
    */
-  CS_PURE_METHOD virtual const csHandlerID * InstancePrec(csRef<iEventHandlerRegistry> &,
-							  csRef<iEventNameRegistry> &,
-							  csEventID) const = 0;
+  CS_PURE_METHOD virtual const csHandlerID * InstancePrec (
+    csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
+    csEventID) const = 0;
 
   /**
    * This function takes a csEventID as an argument and returns an array of
@@ -150,9 +152,9 @@ struct iEventHandler : public virtual iBase
    * defining this for yourself.
    * \sa CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
    */
-  CS_PURE_METHOD virtual const csHandlerID * InstanceSucc(csRef<iEventHandlerRegistry> &,
-							  csRef<iEventNameRegistry> &,
-							  csEventID) const = 0;
+  CS_PURE_METHOD virtual const csHandlerID * InstanceSucc (
+    csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
+    csEventID) const = 0;
 };
 
 /**
@@ -181,15 +183,23 @@ struct iEventHandler : public virtual iBase
  * Macro to create nil generic constraints.
  */
 #define CS_EVENTHANDLER_NIL_GENERIC_CONSTRAINTS				\
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, csEventID e) const { return 0; }	\
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, csEventID e) const { return 0; }
+  CS_CONST_METHOD virtual const csHandlerID * GenericPrec (		\
+    csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, 	\
+    csEventID e) const { return 0; }	\
+  CS_CONST_METHOD virtual const csHandlerID * GenericSucc (		\
+    csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, 	\
+    csEventID e) const { return 0; }
 
 /**
  * Macro to declare instance constraints which are the same as the generics.
  */
 #define CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS			\
-  CS_CONST_METHOD virtual const csHandlerID * InstancePrec(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, csEventID e) const { return GenericPrec(r1, r2, e); } \
-  CS_CONST_METHOD virtual const csHandlerID * InstanceSucc(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, csEventID e) const { return GenericSucc(r1, r2, e); }
+  CS_CONST_METHOD virtual const csHandlerID * InstancePrec (		\
+    csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, 	\
+    csEventID e) const { return GenericPrec(r1, r2, e); } \
+  CS_CONST_METHOD virtual const csHandlerID * InstanceSucc (		\
+    csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, 	\
+    csEventID e) const { return GenericSucc(r1, r2, e); }
 
 /** @} */
 

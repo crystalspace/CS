@@ -29,10 +29,7 @@
 
 #include "csutil/scf.h"
 
-/// CrystalSpace window class
-#define CS_WIN32_WINDOW_CLASS_NAME  "CrystalSpaceWin32"
-/// CrystalSpace window class (Unicode version)
-#define CS_WIN32_WINDOW_CLASS_NAMEW L"CrystalSpaceWin32"
+struct iGraphics2D;
 
 /**
  * This interface describes actions specific to the Windows platform.
@@ -46,7 +43,7 @@
  */
 struct iWin32Assistant : public virtual iBase
 {
-  SCF_INTERFACE(iWin32Assistant, 2, 0, 0);
+  SCF_INTERFACE(iWin32Assistant, 2, 1, 0);
 
   /// Returns the HINSTANCE of the program
   virtual HINSTANCE GetInstance () const = 0;
@@ -73,10 +70,6 @@ struct iWin32Assistant : public virtual iBase
    */
   virtual void AlertV (HWND window, int type, const char* title, 
     const char* okMsg, const char* msg, va_list args) = 0;
-  /**
-   * Returns the handle to the main application window.
-   */
-  virtual HWND GetApplicationWindow() = 0;
 
   /**
    * Sets wether CS should get Messages on it's own
@@ -86,6 +79,35 @@ struct iWin32Assistant : public virtual iBase
    * Gets whether CS should get Messages on it's own
    */
   virtual bool HasOwnMessageLoop () = 0;
+  /**
+   * Create a new window with the default CrystalSpace window class.
+   * \a canvas the canvas creating the window.
+   * This window can subsequently be subclassed if more functionality
+   * is needed.
+   */
+  virtual HWND CreateCSWindow (iGraphics2D* canvas,
+    DWORD exStyle, DWORD style, int x,
+    int y, int w, int h) = 0;
+};
+
+/**
+ * This interface provides some extra functionality for Win32 canvases.
+ * \remarks As the name suggests, this interface provides functionality
+ *  specific to the Win32 platform. It can be retrieved from the object
+ *  registry via CS_QUERY_REGISTRY(), as an instance of this object will be 
+ *  registered with the tag `iWin32Assistant'. To ensure that code using this 
+ *  functionality compiles properly on all other platforms, the use of the
+ *  header file should be surrounded by appropriate 
+ *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
+ */
+struct iWin32Canvas : public virtual iBase
+{
+  SCF_INTERFACE(iWin32Canvas, 1, 0, 0);
+
+  /**
+   * Returns the handle to the canvas' window.
+   */
+  virtual HWND GetWindowHandle() = 0;
 };
 
 #endif // __CS_WIN32_H__

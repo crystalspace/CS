@@ -394,14 +394,14 @@ static inline CS_CONST_METHOD csEventID csevJoystickOp (
 
 struct iGraphics2D;
 
-CS_CONST_METHOD csEventID csevCanvasOp (csRef<iEventNameRegistry> &, 
-					const csRef<iGraphics2D> &x, 
+CS_CONST_METHOD csEventID csevCanvasOp (csRef<iEventNameRegistry>& reg, 
+					const iGraphics2D* g2d, 
 					const char *y);
 static inline CS_CONST_METHOD csEventID csevCanvasOp (
-  iObjectRegistry *object_reg, const csRef<iGraphics2D> &x, const char *y)
+  iObjectRegistry *object_reg, const iGraphics2D* g2d, const char *y)
 {
   csRef<iEventNameRegistry> name_reg = csEventNameRegistry::GetRegistry (object_reg);
-  return csevCanvasOp(name_reg, x, y);
+  return csevCanvasOp(name_reg, g2d, y);
 }
 
 
@@ -412,8 +412,8 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (
  * Info: (iGraphics2D *) The context that has been resized
  * </pre>
  */
-#define csevCanvasResize(reg, x)      \
-  csevCanvasOp((reg), (x),"resize")
+#define csevCanvasResize(reg, g2d)      \
+  csevCanvasOp((reg), (g2d), "resize")
 
 /**
  * This event is sent when a graphics context x is being destroyed
@@ -425,23 +425,23 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (
  * Info: (iGraphics2D *) The context that has been closed
  * </pre>
  */
-#define csevCanvasClose(reg, x)	      \
-  csevCanvasOp((reg), (x),"close")
+#define csevCanvasClose(reg, g2d)	      \
+  csevCanvasOp((reg), (g2d), "close")
 
 /**
  * Broadcast indicating that the canvas x is not currently
  * visible to the user, such as being iconified
  * (where x is an iGraphics2D pointer).
  */
-#define csevCanvasHidden(reg, x)      \
-  csevCanvasOp((reg), (x),"hidden")
+#define csevCanvasHidden(reg, g2d)      \
+  csevCanvasOp((reg), (g2d), "hidden")
 
 /**
  * Broadcast indicating that the display canvas has just become
  * visible, such as being uniconified (where x is an iGraphics2D pointer).
  */
-#define csevCanvasExposed(reg, x)     \
-  csevCanvasOp((reg), (x),"exposed")
+#define csevCanvasExposed(reg, g2d)     \
+  csevCanvasOp((reg), (g2d), "exposed")
 
 /**
  * This event is broadcasted when system driver displays the
