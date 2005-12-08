@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include <ctype.h>
 #include <stdarg.h>
+#include "csutil/eventnames.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
@@ -105,12 +106,20 @@ private:
   /// Handle to the exception handler DLL.
   HANDLE exceptHandlerDLL;
 
-  /// The console codepage that was set on program startup. WIll be restored on exit.
+  /// The console codepage that was set on program startup. Will be restored on exit.
   //UINT oldCP;
+
+  CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
+  CS_DECLARE_FRAME_EVENT_SHORTCUTS;
+  csEventID Quit;
+  csEventID CommandLineHelp;
+  csEventID FocusGained;
+  csEventID FocusLost;
 
   static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
   static LRESULT CALLBACK CBTProc (int nCode, WPARAM wParam, LPARAM lParam);
+  static BOOL WINAPI ConsoleHandlerRoutine (DWORD dwCtrlType);
 public:
   Win32Assistant (iObjectRegistry*);
   virtual ~Win32Assistant ();
@@ -138,6 +147,11 @@ public:
    */
   bool HandleKeyMessage (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
+
+  CS_EVENTHANDLER_NAMES ("crystalspace.win32")
+  /*CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
+  CS_EVENTHANDLER_NIL_GENERIC_CONSTRAINTS*/
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 static Win32Assistant* GLOBAL_ASSISTANT = 0;
@@ -305,7 +319,7 @@ bool csPlatformShutdown(iObjectRegistry* r)
   return true;
 }
 
-BOOL WINAPI ConsoleHandlerRoutine (DWORD dwCtrlType)
+BOOL WINAPI Win32Assistant::ConsoleHandlerRoutine (DWORD dwCtrlType)
 {
   switch (dwCtrlType)
   {
@@ -316,7 +330,7 @@ BOOL WINAPI ConsoleHandlerRoutine (DWORD dwCtrlType)
 	if (GLOBAL_ASSISTANT != 0)
 	{
 	  GLOBAL_ASSISTANT->GetEventOutlet()->ImmediateBroadcast (
-	    csevQuit, 0);
+	    csevQuit (GLOBAL_ASSISTANT->registry), 0);
 	  return TRUE;
 	}
       }
@@ -498,7 +512,22 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
 
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
   CS_ASSERT (q != 0);
-  q->RegisterListener (this, CSMASK_Nothing | CSMASK_Broadcast);
+  csEventID events[] = {
+    csevPreProcess (registry),
+    csevSystemOpen (registry),
+    csevSystemClose (registry),
+    csevCommandLineHelp (registry),
+    CS_EVENTLIST_END
+  };
+  q->RegisterListener (this, events);
+  CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS (registry);
+  CS_INITIALIZE_FRAME_EVENT_SHORTCUTS (registry);
+  Quit = csevQuit (registry);
+  CommandLineHelp = csevCommandLineHelp (registry);
+  FocusGained = csevFocusGained (registry);
+  FocusLost = csevFocusLost (registry);
+  //CanvasExposed = csevCanvasExposed (registry, "graph2d");
+  //CanvasHidden = csevCanvasHidden (registry, "graph2d");
 
   // Put our own keyboard driver in place.
   kbdDriver.AttachNew (new csWin32KeyboardDriver (r));
@@ -592,7 +621,7 @@ iEventOutlet* Win32Assistant::GetEventOutlet()
 
 bool Win32Assistant::HandleEvent (iEvent& e)
 {
-  if (e.Name == csevPreProcess)
+  if (e.Name == PreProcess)
   {
     if(use_own_message_loop)
     {
@@ -606,7 +635,7 @@ bool Win32Assistant::HandleEvent (iEvent& e)
         if (!GetMessage (&msg, 0, 0, 0))
         {
           iEventOutlet* outlet = GetEventOutlet();
-          outlet->Broadcast (csevQuit);
+          outlet->Broadcast (Quit);
           return true;
         }
         TranslateMessage (&msg);
@@ -615,14 +644,14 @@ bool Win32Assistant::HandleEvent (iEvent& e)
     }
     return true;
   }
-  else if (e.Name == csevSystemOpen)
+  else if (e.Name == SystemOpen)
   {
     return true;
   }
-  else if (e.Name == csevSystemClose)
+  else if (e.Name == SystemClose)
   {
   } 
-  else if (e.Name == csevCommandLineHelp)
+  else if (e.Name == CommandLineHelp)
   {
 
    #ifdef CS_DEBUG 
@@ -689,8 +718,9 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
       if ((GLOBAL_ASSISTANT != 0))
       {
 	iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-        outlet->Broadcast ((LOWORD(wParam) != WA_INACTIVE)?
-			   csevFocusGained:csevFocusLost, 0);
+        outlet->Broadcast ((LOWORD(wParam) != WA_INACTIVE) ?
+			   GLOBAL_ASSISTANT->FocusGained :
+			   GLOBAL_ASSISTANT->FocusLost, 0);
       }
       break;
     case WM_CREATE:
@@ -841,12 +871,12 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 	if ( (wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED) )
 	{
           iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  outlet->Broadcast (csevCanvasExposed, 0);
+	  //outlet->Broadcast (csevCanvasExposed, 0);
 	} 
 	else if (wParam == SIZE_MINIMIZED) 
 	{
           iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  outlet->Broadcast (csevCanvasHidden, 0);
+	  //outlet->Broadcast (csevCanvasHidden, 0);
 	}
       }
       return TRUE;
@@ -858,12 +888,12 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 	if (wParam)
 	{
           iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  outlet->Broadcast (csevCanvasExposed, 0);
+	  //outlet->Broadcast (csevCanvasExposed, 0);
 	} 
 	else
 	{
           iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	  outlet->Broadcast (csevCanvasHidden, 0);
+	  //outlet->Broadcast (csevCanvasHidden, 0);
 	}
       }
       break;

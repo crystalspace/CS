@@ -71,34 +71,19 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
   csEventNameRegistry (iObjectRegistry *);
  public:
   ~csEventNameRegistry ();
-  /**
-   * Invoke this method to get a csEventID for an event name string
-   * (e.g., "crystalspace.input.keyboard.down").
-   */
+
+  /**\name iEventNameRegistry implementation
+   * @{ */
   CS_CONST_METHOD csEventID GetID (const char *name);
-  /**
-   * Retrieve a string representation of id.
-   */
   CS_CONST_METHOD const char* GetString (const csEventID id);
-  static CS_CONST_METHOD const char* GetString (iObjectRegistry *object_reg, csEventID id);
-  /**
-   * Get the ID of the parent event name, e.g., the parent of
-   * "crystalspace.input.joystick" is "crystalspace.input".
-   */
+  static CS_CONST_METHOD const char* GetString (iObjectRegistry *object_reg, 
+    csEventID id);
   CS_CONST_METHOD csEventID GetParentID (const csEventID id);
-  /**
-   * Returns true iff child is the immediate child of parent,
-   * e.g., "crystalspace.input" is the immediate child of "crystalspace"
-   * but "crystalspace.input;mouse" is not.
-   */
-  CS_CONST_METHOD bool IsImmediateChildOf (const csEventID child, const csEventID parent);
-  /**
-   * Return true iff child is either parent or a descendent of 
-   * parent, e.g., "crystalspace.input.mouse" is a kind of
-   * "crystalspace", "crystalspace.input", and "crystalspace.input.mouse",
-   * but not of "crystalspace.input.mouse.2".
-   */
-  CS_CONST_METHOD bool IsKindOf (const csEventID child, const csEventID parent);
+  CS_CONST_METHOD bool IsImmediateChildOf (const csEventID child, 
+    const csEventID parent);
+  CS_CONST_METHOD bool IsKindOf (const csEventID child, 
+    const csEventID parent);
+  /** @} */
 
   /**
    * Return the singleton iEventNameRegistry object registered in the
@@ -107,21 +92,24 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
   static csRef<iEventNameRegistry> GetRegistry(iObjectRegistry *object_reg);
 
   static inline csEventID GetID (iEventNameRegistry *name_reg,
-				 const char *name) {
+				 const char *name) 
+  {
     if (name_reg != 0)
       return name_reg->GetID (name);
     else
       return CS_EVENT_INVALID;
   }
   static inline csEventID GetID (iObjectRegistry *object_reg, 
-				 const char *name) {
+				 const char *name) 
+  {
     csRef<iEventNameRegistry> nameRegistry = 
       csQueryRegistry<iEventNameRegistry> (object_reg);
     return GetID(nameRegistry, name);
   };
 
   static inline bool IsKindOf (iEventNameRegistry *name_reg,
-			       csEventID name1, csEventID name2) {
+			       csEventID name1, csEventID name2) 
+  {
     if (name_reg != 0)
       return name_reg->IsKindOf(name1, name2);
     else
@@ -159,57 +147,67 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
  * spurious events to be delivered to your handler.  Only subscribe to
  * this event if you know what you're doing!
  */
-#define csevAllEvents(reg) (csEventNameRegistry::GetID((reg), ""))
+#define csevAllEvents(reg)	      \
+  (csEventNameRegistry::GetID((reg), ""))
 
 /**
  * Frame event.  This is sent once per frame.  This should drive all
  * rendering, periodic/clocked game state updates, input device polling, 
  * etc.
  */
-#define csevFrame(reg) (csEventNameRegistry::GetID((reg), "crystalspace.frame"))
+#define csevFrame(reg)		      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.frame"))
 
 /**
  * Generic input event.  All actual input events are children of this one.
  */
-#define csevInput(reg) (csEventNameRegistry::GetID((reg), "crystalspace.input"))
+#define csevInput(reg)		      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.input"))
 
 /**
  * Generic keyboard event.  All actual keyboard events are children of this 
  * one.
  */
-#define csevKeyboardEvent(reg) (csEventNameRegistry::GetID((reg), "crystalspace.input.keyboard"))
+#define csevKeyboardEvent(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.input.keyboard"))
 
 /// Keyboard key down event.
-#define csevKeyboardDown(reg) (csEventNameRegistry::GetID((reg), "crystalspace.input.keyboard.down"))
+#define csevKeyboardDown(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.input.keyboard.down"))
 
 /// Keyboard key up event.
-#define csevKeyboardUp(reg) (csEventNameRegistry::GetID((reg), "crystalspace.input.keyboard.up"))
+#define csevKeyboardUp(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.input.keyboard.up"))
 
 /// Generic mouse event.  All actual mouse events are children of this one.
-#define csevMouseEvent(reg) (csEventNameRegistry::GetID((reg), "crystalspace.input.mouse"))
+#define csevMouseEvent(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.input.mouse"))
 
-static inline CS_CONST_METHOD csEventID csevMouse(iEventNameRegistry *name_reg, uint x)
+static inline CS_CONST_METHOD csEventID csevMouse (
+  iEventNameRegistry *name_reg, uint x)
 {
   char buffer[64];
-  cs_snprintf(buffer, 63, "crystalspace.input.mouse.%d", x);
+  cs_snprintf(buffer, sizeof (buffer)-1, "crystalspace.input.mouse.%d", x);
   return name_reg->GetID(buffer);
 }
 
-static inline CS_CONST_METHOD csEventID csevMouse(iObjectRegistry *object_reg, uint x) 
+static inline CS_CONST_METHOD csEventID csevMouse(
+  iObjectRegistry *object_reg, uint x) 
 {
   return csevMouse(csEventNameRegistry::GetRegistry(object_reg), x);
 }
 
-static inline CS_CONST_METHOD csEventID csevMouseOp(iEventNameRegistry *name_reg,
-						    uint x, const char *y)
+static inline CS_CONST_METHOD csEventID csevMouseOp(
+  iEventNameRegistry *name_reg, uint x, const char *y)
 {
   char buffer[64];
-  cs_snprintf(buffer, 63, "crystalspace.input.mouse.%d.%s", x, y);
+  cs_snprintf(buffer, sizeof (buffer) - 1, "crystalspace.input.mouse.%d.%s", 
+    x, y);
   return name_reg->GetID(buffer);
 }
 
-static inline CS_CONST_METHOD csEventID csevMouseOp(iObjectRegistry *object_reg, 
-						    uint x, const char *y) 
+static inline CS_CONST_METHOD csEventID csevMouseOp(
+  iObjectRegistry *object_reg, uint x, const char *y) 
 {
   return csevMouseOp(csEventNameRegistry::GetRegistry(object_reg), x, y);
 }
@@ -218,61 +216,74 @@ static inline CS_CONST_METHOD csEventID csevMouseOp(iObjectRegistry *object_reg,
  * Generic button event from mouse x.  All button events from mouse x
  * are children of this one.  The default system mouse is 0.
  */
-#define csevMouseButton(reg,x) csevMouseOp((reg),(x),"button")
+#define csevMouseButton(reg,x)	      \
+  csevMouseOp ((reg), (x), "button")
 
 /**
  * Button down event from mouse x.  The default system mouse is 0.
  */
-#define csevMouseDown(reg,x) csevMouseOp((reg),(x),"button.down")
+#define csevMouseDown(reg,x)	      \
+  csevMouseOp ((reg), (x), "button.down")
 
 /**
  * Button up event from mouse x.  The default system mouse is 0.
  */
-#define csevMouseUp(reg,x) csevMouseOp((reg),(x),"button.up")
+#define csevMouseUp(reg,x)	      \
+  csevMouseOp ((reg), (x), "button.up")
 
 /**
  * Click event from mouse x.  The default system mouse is 0.
  */
-#define csevMouseClick(reg,x) csevMouseOp((reg),(x),"button.click")
+#define csevMouseClick(reg,x)	      \
+  csevMouseOp ((reg), (x), "button.click")
 
 /**
  * Double-click event from mouse x.  The default system mouse is 0.
  */
-#define csevMouseDoubleClick(reg,x) csevMouseOp((reg),(x),"button.doubleclick")
+#define csevMouseDoubleClick(reg,x)   \
+  csevMouseOp((reg), (x), "button.doubleclick")
 
 /**
  * Move event from mouse x.  The default system mouse is 0.
  */
-#define csevMouseMove(reg,x) csevMouseOp((reg),(x),"move")
+#define csevMouseMove(reg,x)	      \
+  csevMouseOp((reg), (x), "move")
 
 /**
  * Generic joystick event.  All actual joystick events are children of
  * this one.
  */
-#define csevJoystickEvent(reg) (csEventNameRegistry::GetID((reg), "crystalspace.input.joystick"))
+#define csevJoystickEvent(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.input.joystick"))
 
-static inline CS_CONST_METHOD csEventID csevJoystick(iEventNameRegistry *name_reg, uint x) 
+static inline CS_CONST_METHOD csEventID csevJoystick (
+  iEventNameRegistry *name_reg, uint x) 
 {
   char buffer[64];
-  cs_snprintf(buffer, 63, "crystalspace.input.joystick.%d", x);
+  cs_snprintf(buffer, sizeof (buffer) - 1, "crystalspace.input.joystick.%d", 
+    x);
   return name_reg->GetID(buffer);
 }
 
-static inline CS_CONST_METHOD csEventID csevJoystick(iObjectRegistry *object_reg, uint x)
+static inline CS_CONST_METHOD csEventID csevJoystick (
+  iObjectRegistry *object_reg, uint x)
 {
   return csevJoystick(csEventNameRegistry::GetRegistry(object_reg), x);
 }
 
-static inline CS_CONST_METHOD csEventID csevJoystickOp(iEventNameRegistry *name_reg, uint x, const char *y) 
+static inline CS_CONST_METHOD csEventID csevJoystickOp (
+  iEventNameRegistry *name_reg, uint x, const char *y) 
 {
   char buffer[64];
-  cs_snprintf(buffer, 63, "crystalspace.input.joystick.%d.%s", x, y);
+  cs_snprintf(buffer, sizeof (buffer) - 1, "crystalspace.input.joystick.%d.%s", 
+    x, y);
   return name_reg->GetID(buffer);
 }
 
-static inline CS_CONST_METHOD csEventID csevJoystickOp(iObjectRegistry *object_reg, uint x, const char *y)
+static inline CS_CONST_METHOD csEventID csevJoystickOp (
+  iObjectRegistry *object_reg, uint x, const char *y)
 {
-  return csevJoystickOp(csEventNameRegistry::GetRegistry(object_reg), x, y);
+  return csevJoystickOp (csEventNameRegistry::GetRegistry(object_reg), x, y);
 }
 
 /**
@@ -280,40 +291,52 @@ static inline CS_CONST_METHOD csEventID csevJoystickOp(iObjectRegistry *object_r
  * button events are children of this one.  The first system joystick
  * is 0.
  */
-#define csevJoystickButton(reg,x) csevJoystickOp((reg),(x),"button")
+#define csevJoystickButton(reg,x)     \
+  csevJoystickOp((reg),(x),"button")
 
 /// Button down event from joystick x.  The first system joystick is 0.
-#define csevJoystickDown(reg,x) csevJoystickOp((reg),(x),"button.down")
+#define csevJoystickDown(reg,x)	      \
+  csevJoystickOp((reg),(x),"button.down")
 
 /// Button up event from joystick x.  The first system joystick is 0.
-#define csevJoystickUp(reg,x) csevJoystickOp((reg),(x),"button.up")
+#define csevJoystickUp(reg,x)	      \
+  csevJoystickOp((reg),(x),"button.up")
 
 /// Move event from joystick x.  The first system joystick is 0.
-#define csevJoystickMove(reg,x) csevJoystickOp((reg),(x),"move")
+#define csevJoystickMove(reg,x)	      \
+  csevJoystickOp((reg),(x),"move")
 
 /// Check if an event is a keyboard event
-#define CS_IS_KEYBOARD_EVENT(reg,e)	csEventNameRegistry::IsKindOf((reg), ((e).Name), csevKeyboardEvent(reg))
+#define CS_IS_KEYBOARD_EVENT(reg,e)   \
+  csEventNameRegistry::IsKindOf((reg), ((e).Name), csevKeyboardEvent(reg))
 
 /// Check if an event is a mouse event
-#define CS_IS_MOUSE_EVENT(reg,e)	csEventNameRegistry::IsKindOf((reg), ((e).Name), csevMouseEvent(reg))
+#define CS_IS_MOUSE_EVENT(reg,e)      \
+  csEventNameRegistry::IsKindOf((reg), ((e).Name), csevMouseEvent(reg))
 
 /// Check if an event is a button event from mouse n (basis 0)
-#define CS_IS_MOUSE_BUTTON_EVENT(reg,e,n) csEventNameRegistry::IsKindOf((reg), ((e).Name), csevMouseButton((reg),n))
+#define CS_IS_MOUSE_BUTTON_EVENT(reg,e,n) \
+  csEventNameRegistry::IsKindOf((reg), ((e).Name), csevMouseButton((reg),n))
 
 /// Check if an event is a move event from mouse n (basis 0)
-#define CS_IS_MOUSE_MOVE_EVENT(reg,e,n) csEventNameRegistry::IsKindOf((reg), ((e).Name), csevMouseMove((reg),n))
+#define CS_IS_MOUSE_MOVE_EVENT(reg,e,n)	\
+  csEventNameRegistry::IsKindOf((reg), ((e).Name), csevMouseMove((reg),n))
 
 /// Check if an event is a joystick event
-#define CS_IS_JOYSTICK_EVENT(reg,e)	csEventNameRegistry::IsKindOf((reg), ((e).Name), csevJoystickEvent(reg))
+#define CS_IS_JOYSTICK_EVENT(reg,e)   \
+  csEventNameRegistry::IsKindOf((reg), ((e).Name), csevJoystickEvent(reg))
 
 /// Check if an event is a button event from mouse n (basis 0)
-#define CS_IS_JOYSTICK_BUTTON_EVENT(reg,e,n) csEventNameRegistry::IsKindOf((reg), ((e).Name), csevJoystickButton((reg),n))
+#define CS_IS_JOYSTICK_BUTTON_EVENT(reg,e,n) \
+  csEventNameRegistry::IsKindOf((reg), ((e).Name), csevJoystickButton((reg),n))
 
 /// Check if an event is a move event from mouse n (basis 0)
-#define CS_IS_JOYSTICK_MOVE_EVENT(reg,e,n) csEventNameRegistry::IsKindOf((reg), ((e).Name), csevJoystickMove((reg),n))
+#define CS_IS_JOYSTICK_MOVE_EVENT(reg,e,n) \
+  csEventNameRegistry::IsKindOf((reg), ((e).Name), csevJoystickMove((reg),n))
 
 /// Check if an event is any input event
-#define CS_IS_INPUT_EVENT(reg,e)	csEventNameRegistry::IsKindOf((reg), ((e).Name), csevInput(reg))
+#define CS_IS_INPUT_EVENT(reg,e)      \
+  csEventNameRegistry::IsKindOf((reg), ((e).Name), csevInput(reg))
 
 /**
  * This event causes system driver to quit the event loop,
@@ -323,27 +346,31 @@ static inline CS_CONST_METHOD csEventID csevJoystickOp(iObjectRegistry *object_r
  * broadcasts are posted for irreversible finalization of the
  * application such as when user closes the application window.
  */
-#define csevQuit(reg) (csEventNameRegistry::GetID((reg), "crystalspace.application.quit"))
+#define csevQuit(reg)		      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.application.quit"))
 
 /**
  * Children of this event are generated whenever application (as a whole)
  * receives or loses focus.
  */
-#define csevFocusChanged(reg) (csEventNameRegistry::GetID((reg), "crystalspace.application.focus"))
+#define csevFocusChanged(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.application.focus"))
 
 /**
  * This event is generated whenever user application (as a whole) receives 
  * system focus.  The application may react by staring music, showing 
  * software mouse cursor and so on.
  */
-#define csevFocusGained(reg) (csEventNameRegistry::GetID((reg), "crystalspace.application.focus.gained"))
+#define csevFocusGained(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.application.focus.gained"))
 
 /**
  * This event is generated whenever user application (as a whole) loses 
  * system focus.  Upon this event the application may react by stopping 
  * music, hiding software mouse cursor and so on.
  */
-#define csevFocusLost(reg) (csEventNameRegistry::GetID((reg), "crystalspace.application.focus.lost"))
+#define csevFocusLost(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.application.focus.lost"))
 
 /**
  * This event is broadcasted to all event listeners just after all modules
@@ -355,18 +382,23 @@ static inline CS_CONST_METHOD csEventID csevJoystickOp(iObjectRegistry *object_r
  * to receive csevSystemOpen should be loaded inside of other modules' 
  * ::Initialize() methods.
  */
-#define csevSystemOpen(reg) (csEventNameRegistry::GetID((reg), "crystalspace.application.open"))
+#define csevSystemOpen(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.application.open"))
 
 /**
  * This event is broadcasted to all event listeners just before modules are
  * about to be shutdown and unloaded (that is, the system is shutting down).
  */
-#define csevSystemClose(reg) (csEventNameRegistry::GetID((reg), "crystalspace.application.close"))
+#define csevSystemClose(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.application.close"))
 
-class iGraphics2D;
+struct iGraphics2D;
 
-CS_CONST_METHOD csEventID csevCanvasOp (csRef<iEventNameRegistry> &, const csRef<iGraphics2D> &x, const char *y);
-static inline CS_CONST_METHOD csEventID csevCanvasOp (iObjectRegistry *object_reg, const csRef<iGraphics2D> &x, const char *y)
+CS_CONST_METHOD csEventID csevCanvasOp (csRef<iEventNameRegistry> &, 
+					const csRef<iGraphics2D> &x, 
+					const char *y);
+static inline CS_CONST_METHOD csEventID csevCanvasOp (
+  iObjectRegistry *object_reg, const csRef<iGraphics2D> &x, const char *y)
 {
   csRef<iEventNameRegistry> name_reg = csEventNameRegistry::GetRegistry (object_reg);
   return csevCanvasOp(name_reg, x, y);
@@ -380,7 +412,8 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (iObjectRegistry *object_re
  * Info: (iGraphics2D *) The context that has been resized
  * </pre>
  */
-#define csevCanvasResize(reg, x) csevCanvasOp((reg), (x),"resize")
+#define csevCanvasResize(reg, x)      \
+  csevCanvasOp((reg), (x),"resize")
 
 /**
  * This event is sent when a graphics context x is being destroyed
@@ -392,20 +425,23 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (iObjectRegistry *object_re
  * Info: (iGraphics2D *) The context that has been closed
  * </pre>
  */
-#define csevCanvasClose(reg, x) csevCanvasOp((reg), (x),"close")
+#define csevCanvasClose(reg, x)	      \
+  csevCanvasOp((reg), (x),"close")
 
 /**
  * Broadcast indicating that the canvas x is not currently
  * visible to the user, such as being iconified
  * (where x is an iGraphics2D pointer).
  */
-#define csevCanvasHidden(reg, x) csevCanvasOp((reg), (x),"hidden")
+#define csevCanvasHidden(reg, x)      \
+  csevCanvasOp((reg), (x),"hidden")
 
 /**
  * Broadcast indicating that the display canvas has just become
  * visible, such as being uniconified (where x is an iGraphics2D pointer).
  */
-#define csevCanvasExposed(reg, x) csevCanvasOp((reg), (x),"exposed")
+#define csevCanvasExposed(reg, x)     \
+  csevCanvasOp((reg), (x),"exposed")
 
 /**
  * This event is broadcasted when system driver displays the
@@ -416,7 +452,8 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (iObjectRegistry *object_re
  * <pre>&lt;switch description&gt;{default value}</pre>
  * The help should be displayed to standard output.
  */
-#define csevCommandLineHelp(reg) (csEventNameRegistry::GetID((reg), "crystalspace.application.commandlinehelp"))
+#define csevCommandLineHelp(reg)      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.application.commandlinehelp"))
 
 /**
  * Broadcasted before csevProcess on every frame.
@@ -425,13 +462,15 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (iObjectRegistry *object_re
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-#define csevPreProcess(reg) (csEventNameRegistry::GetID((reg), "crystalspace.deprecated.preprocess"))
+#define csevPreProcess(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.deprecated.preprocess"))
 
 /**
  * Broadcasted every frame.
  * This event will go away soon, replaced by csevFrame.
  */
-#define csevProcess(reg) (csEventNameRegistry::GetID((reg), "crystalspace.deprecated.process"))
+#define csevProcess(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.deprecated.process"))
 
 /**
  * Broadcasted after csevProcess on every frame.
@@ -440,7 +479,8 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (iObjectRegistry *object_re
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-#define csevPostProcess(reg) (csEventNameRegistry::GetID((reg), "crystalspace.deprecated.postprocess"))
+#define csevPostProcess(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.deprecated.postprocess"))
 
 /**
  * Broadcasted after csevPostProcess on every frame.
@@ -449,21 +489,25 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (iObjectRegistry *object_re
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-#define csevFinalProcess(reg) (csEventNameRegistry::GetID((reg), "crystalspace.deprecated.finalprocess"))
+#define csevFinalProcess(reg)	      \
+  (csEventNameRegistry::GetID((reg), "crystalspace.deprecated.finalprocess"))
 
 /** @} */
 
-#define CS_DECLARE_SYSTEM_EVENT_SHORTCUTS csEventID SystemOpen;	\
+#define CS_DECLARE_SYSTEM_EVENT_SHORTCUTS			\
+  csEventID SystemOpen;						\
   csEventID SystemClose
 
-#define CS_DECLARE_FRAME_EVENT_SHORTCUTS csEventID Frame;	\
+#define CS_DECLARE_FRAME_EVENT_SHORTCUTS			\
+  csEventID Frame;						\
   csEventID PreProcess;						\
   csEventID Process;						\
   csEventID PostProcess;					\
   csEventID FinalProcess
 
-#define CS_DECLARE_INPUT_EVENT_SHORTCUTS csEventID KeyboardEvent;	\
-  csEventID MouseEvent;							\
+#define CS_DECLARE_INPUT_EVENT_SHORTCUTS			\
+  csEventID KeyboardEvent;					\
+  csEventID MouseEvent;						\
   csEventID JoystickEvent
 
 /**
@@ -471,8 +515,9 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (iObjectRegistry *object_re
  * Frame, PreProcess, Process, PostProcess, FinalProcess.
  * Pair with CS_INITIALIZE_EVENT_SHORTCUTS(registry).
  */
-#define CS_DECLARE_EVENT_SHORTCUTS CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;	\
-  CS_DECLARE_FRAME_EVENT_SHORTCUTS;					\
+#define CS_DECLARE_EVENT_SHORTCUTS				\
+  CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;				\
+  CS_DECLARE_FRAME_EVENT_SHORTCUTS;				\
   CS_DECLARE_INPUT_EVENT_SHORTCUTS
 
 #define CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS(x) do {	\

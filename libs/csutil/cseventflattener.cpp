@@ -45,11 +45,13 @@ enum
 };
 
 
-csEventFlattenerError csEventFlattener::FlattenSize (iObjectRegistry *object_reg, iEvent* event, size_t& size)
+csEventFlattenerError csEventFlattener::FlattenSize (
+  iObjectRegistry *object_reg, iEvent* event, size_t& size)
 {
   // Start count with the initial header
   // Version(4) + packet length(8) + Time(4) + Broadcast(1) + Name Length(2) + Name(X)
-  size = 19 + strlen(csEventNameRegistry::GetString(object_reg, event->GetName())) + 1;
+  size = 19 + strlen (csEventNameRegistry::GetString (object_reg, 
+    event->GetName())) + 1;
 
   csRef<iEventAttributeIterator> iter (event->GetAttributeIterator ());
 
@@ -187,7 +189,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
   b.Write((char *)&ui32, sizeof(uint32));              // iEvent.Time
   b.Write((char *)&event->Broadcast, sizeof(uint8));   // iEvent.Broadcast flag
   const char *nameStr = csEventNameRegistry::GetString(object_reg, event->GetName());
-  ui16 = strlen(nameStr);
+  ui16 = (uint16)strlen (nameStr);
   ui16 = csConvertEndian(ui16);
   b.Write((char *)&ui16, sizeof(uint16));              // Event textual name length
   b.Write(nameStr, strlen(nameStr)); // Event textual name

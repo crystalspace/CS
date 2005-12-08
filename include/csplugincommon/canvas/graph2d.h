@@ -102,7 +102,7 @@ public:
   csFontCache* fontCache;
 
   /// Pointer to a title.
-  char* win_title;
+  csString win_title;
 
   /// The width, height and depth of visual.
   int Width, Height, Depth;
@@ -142,7 +142,7 @@ protected:
 
   void CreateDefaultFontCache ();
 
-  char *name;
+  csString name;
 private:
   /// Find a color in palette mode.
   int FindRGBPalette (int r, int g, int b);

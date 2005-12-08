@@ -54,15 +54,13 @@ csGraphics2D::csGraphics2D (iBase* parent) : scfImplementationType (this, parent
   DisplayNumber = 0;
   FullScreen = false;
   is_open = false;
-  win_title = csStrNew ("Crystal Space Application");
+  win_title = "Crystal Space Application";
   object_reg = 0;
   AllowResizing = false;
   refreshRate = 0;
   vsync = false;
 
-  char buffer[32];
-  snprintf(buffer, 31, "graph2d.%x", g2d_count++);
-  name = strdup(buffer);
+  name.Format ("graph2d.%x", g2d_count++);
 
   fontCache = 0;
 }
@@ -78,8 +76,6 @@ csGraphics2D::~csGraphics2D ()
   }
   Close ();
   delete [] Palette;
-  delete [] win_title;
-  free(name);
 }
 
 bool csGraphics2D::Initialize (iObjectRegistry* r)
@@ -965,9 +961,7 @@ iNativeWindow* csGraphics2D::GetNativeWindow ()
 
 void csGraphics2D::SetTitle (const char* title)
 {
-  if (title == win_title) return;
-  delete[] win_title;
-  win_title = csStrNew (title);
+  win_title = title;
 }
 
 bool csGraphics2D::Resize (int w, int h)

@@ -18,24 +18,68 @@ will need to make changes in order to adapt to the new architecture.
 
 @subsubheading Event Names
 
-The old system of 32 static event "types" has been replaced with an extensible tree-structured event naming layer.  This system allows event names to be drilled down to arbitrary levels of specificity while simultaneously allowing event subscribers to express interest in general categories or precise event varieties.
+The old system of 32 static event "types" has been replaced with an extensible 
+tree-structured event naming layer.  This system allows event names to be 
+drilled down to arbitrary levels of specificity while simultaneously allowing 
+event subscribers to express interest in general categories or precise event 
+varieties.
 
-For an example: under the old system, any motion of any joystick would produce a @samp{csevJoystickMove} event, and all subscribers to the corresponding @samp{CSMASK_JoystickMove} mask would receive all such events.  Under the new system, each joystick is individually named, so event consumers can listen only to particular devices, or to particular flavors of events.  For example, the fourth joystick can produce the event @samp{crystalspace.input.joystick.3.button.down"}; an event handler may wish to subscribe to @samp{crystalspace.input.joystick.3.button.down} to only receive down events from that joystick, to @samp{crystalspace.input.joystick.3.button} to receive all button events from that joystick, to @samp{crystalspace.input.joystick.3} to receive all events (buttons and moves) from that joystick, to @samp{crystalspace.input.joystick} to receive all events from all joysticks, and so on.
+For an example: under the old system, any motion of any joystick would produce 
+a @samp{csevJoystickMove} event, and all subscribers to the corresponding 
+@samp{CSMASK_JoystickMove} mask would receive all such events.  Under the new 
+system, each joystick is individually named, so event consumers can listen 
+only to particular devices, or to particular flavors of events.  For example, 
+the fourth joystick can produce the event 
+@samp{crystalspace.input.joystick.3.button.down"}; an event handler may wish 
+to subscribe to @samp{crystalspace.input.joystick.3.button.down} to only 
+receive down events from that joystick, to 
+@samp{crystalspace.input.joystick.3.button} to receive all button events from 
+that joystick, to @samp{crystalspace.input.joystick.3} to receive all events 
+(buttons and moves) from that joystick, to @samp{crystalspace.input.joystick} 
+to receive all events from all joysticks, and so on.
 
-This also means that the concept of Command Codes has been obsoleted.  Rather than describing particular command events with a combination of the csevCommand event type and a command-event-specific command code property, each of the old command codes now has its own event name.  For example, @samp{cscmdQuit} is now @samp{crystalspace.application.quit}, and the @samp{cscmdPreProcess}/@samp{cscmdProcess}/@samp{cscmdPostProcess}/@samp{cscmdFinalProcess} series will be replaced with a single @samp{csevFrame} event (see below).
+This also means that the concept of Command Codes has been obsoleted.  Rather 
+than describing particular command events with a combination of the 
+@samp{csevCommand} event type and a command-event-specific command code 
+property, each of the old command codes now has its own event name.  
+For example, @samp{cscmdQuit} is now @samp{crystalspace.application.quit}, and 
+the @samp{cscmdPreProcess}/@samp{cscmdProcess}/@samp{cscmdPostProcess}/
+@samp{cscmdFinalProcess} series will be replaced with a single 
+@samp{csevFrame} event (see below).
 
-Event names are translated into an efficient internal representation, the @samp{csEventID}, using a singleton event name registry object (@samp{csEventNameRegistry}, implementing the @samp{iEventNameRegistry} interface) which can always be retrieved using the @code{csEventNameRegistry::GetRegistry(iObjectRegistry*)} method.  The actual name translation is performed by the @code{GetID()} method, which takes string or @samp{csString} arguments and returns @samp{csEventID}s.  These @samp{csEventID}s are then used in calls to subscribe to event queues and in comparisons to determine the type of an event.  Many common event types' @samp{csEventID}s can be accessed using macros defined in @file{include/csutil/eventnames.h}, e.g., @samp{crystalspace.application.quit} is @samp{csevQuit()}, which must be called upon either an @samp{iObjectRegistry} pointer or a @samp{iEventNameRegistry} reference.  Since referencing an event ID via one of these macros will consume several cycles, performance-sensitive code should cache the results; see, for example, the @samp{CS_DECLARE_EVENT_SHORTCUTS} and @samp{CS_INITIALIZE_EVENT_SHORTCUTS()} macros in @file{include/csutil/eventnames.h}.
+Event names are translated into an efficient internal representation, the 
+@samp{csEventID}, using a singleton event name registry object 
+(@samp{csEventNameRegistry}, implementing the @samp{iEventNameRegistry} 
+interface) which can always be retrieved using the 
+@code{csEventNameRegistry::GetRegistry(iObjectRegistry*)} method.  The actual 
+name translation is performed by the @code{GetID()} method, which takes string 
+or @samp{csString} arguments and returns @samp{csEventID}s.  
+These @samp{csEventID}s are then used in calls to subscribe to event queues 
+and in comparisons to determine the type of an event.  Many common event 
+types' @samp{csEventID}s can be accessed using macros defined in 
+@file{include/csutil/eventnames.h}, e.g., @samp{crystalspace.application.quit} 
+is @samp{csevQuit()}, which must be called upon either an 
+@samp{iObjectRegistry} pointer or a @samp{iEventNameRegistry} reference.  
+Since referencing an event ID via one of these macros will consume several 
+cycles, performance-sensitive code should cache the results; see, for example, 
+the @samp{CS_DECLARE_EVENT_SHORTCUTS} and 
+@samp{CS_INITIALIZE_EVENT_SHORTCUTS()} macros in 
+@file{include/csutil/eventnames.h}.
 
-The most intrusive change needed to handle the new event names is in the event demultiplexing you do in event handlers.  For example, code that used to look like this:
+The most intrusive change needed to handle the new event names is in the event 
+demultiplexing you do in event handlers.  For example, code that used to look 
+like this:
 
 @example
  static bool DemoEventHandler (iEvent& ev)
  @{
-   if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+   if (ev.Type == csevBroadcast 
+    && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
    @{
        @dots{}
    @}
-   else if (ev.Type == csevBroadcast && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+   else if (ev.Type == csevBroadcast 
+    && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
    @{
        @dots{}
    @}
@@ -60,7 +104,8 @@ should be re-written as:
  @}
 @end example
 
-More interestingly, you can also catch entire event hierarchies with a single test:
+More interestingly, you can also catch entire event hierarchies with a single 
+test:
 @example
  if (name_reg->IsKindOf(ev.Name, csevKeyboardEvent (name_reg)))
  @{
@@ -72,28 +117,64 @@ More interestingly, you can also catch entire event hierarchies with a single te
 
 @subsubheading Event Scheduling
 
-The more interesting change to the event system is the introduction of a schedulable event subscription system.  In the old system, event handlers subscribed to event types on a first-come, first-served basis.  This begot an increasing number of event types to represent different points in the frame processing chain that a client might want to hook onto: PreProcess, Process, PostProcess, and FinalProcess.  What was really needed was a generic mechanism for representing the order in which handlers of particular events should be invoked, regardless of the order in which they are initialized or in which their respective plugins are loaded.
+The more interesting change to the event system is the introduction of a 
+schedulable event subscription system.  In the old system, event handlers 
+subscribed to event types on a first-come, first-served basis.  This begot an 
+increasing number of event types to represent different points in the frame 
+processing chain that a client might want to hook onto: PreProcess, Process, 
+PostProcess, and FinalProcess.  What was really needed was a generic mechanism 
+for representing the order in which handlers of particular events should be 
+invoked, regardless of the order in which they are initialized or in which 
+their respective plugins are loaded.
 
-The new event scheduler takes advantage of properties exposed by a new, enriched @code{iEventHandler} interface to do exactly this.  Under the new system, for each event name that an event handler subscribes to, it may also specify essentially arbitrary @emph{happens-before} and @emph{happens-after} relationships with other event handlers, both abstractly ('I want to handle all input events before any instance of the @samp{crystalspace.aws} handler') and specifically ('I want to handle the mouse event only after the @samp{crystalspace.cel} event handler').
+The new event scheduler takes advantage of properties exposed by a new, 
+enriched @code{iEventHandler} interface to do exactly this.  Under the new 
+system, for each event name that an event handler subscribes to, it may also 
+specify essentially arbitrary @emph{happens-before} and @emph{happens-after} 
+relationships with other event handlers, both abstractly ('I want to handle 
+all input events before any instance of the @samp{crystalspace.aws} handler') 
+and specifically ('I want to handle the mouse event only after the 
+@samp{crystalspace.cel} event handler').
 
-Specifically, the new functions that all @code{iEventHandler} implementations must provide are:
+Specifically, the new functions that all @code{iEventHandler} implementations 
+must provide are:
 
 @itemize @bullet
 @item
-@code{const char *GenericName()} Returns a simple text name common to all instances of this event handler.
+@code{const char *GenericName()} Returns a simple text name common to all 
+instances of this event handler.
 @item
-@code{csHandlerID GenericID()} A csHandlerID is a lightweight way to manage generic handler names.  Under almost all circumstances, the implementation of this method simply returns @code{cshandlerRegistry::GetID(this->GenericName())}.
+@code{csHandlerID GenericID()} A csHandlerID is a lightweight way to manage 
+generic handler names.  Under almost all circumstances, the implementation of 
+this method simply returns @code{csHandlerRegistry::GetID(this->GenericName())}.
 @item
-@code{const csHandlerID[] GenericPrec(csEventID)} Returns an array (terminated by @code{CS_EVENTLIST_END}) of @samp{csHandlerID}s of generic event handlers which, for the event name identified by the argument, should always handle events with that name @emph{before} instances of the current handler.
+@code{const csHandlerID[] GenericPrec(csEventID)} Returns an array 
+(terminated by @code{CS_EVENTLIST_END}) of @samp{csHandlerID}s of generic 
+event handlers which, for the event name identified by the argument, should 
+always handle events with that name @emph{before} instances of the current handler.
 @item
-@code{const csHandlerID[] GenericSucc(csEventID)} Returns an array (terminated by @code{CS_EVENTLIST_END}) of @samp{csHandlerID}s of generic event handlers which, for the event name identified by the argument, should always handle events with that name @emph{after} instances of the current handler.
+@code{const csHandlerID[] GenericSucc(csEventID)} Returns an array 
+(terminated by @code{CS_EVENTLIST_END}) of @samp{csHandlerID}s of generic 
+event handlers which, for the event name identified by the argument, should 
+always handle events with that name @emph{after} instances of the current 
+handler.
 @item
-@code{const csHandlerID[] InstancePrec(csEventID)} Returns an array (terminated by @code{CS_EVENTLIST_END}) of @samp{csHandlerID}s of both generic event handlers and event handler instances which, for the event name identified by the argument, should always handle event with that name @emph{before} this @emph{particular} instance of the event handler.
+@code{const csHandlerID[] InstancePrec(csEventID)} Returns an array 
+(terminated by @code{CS_EVENTLIST_END}) of @samp{csHandlerID}s of both generic 
+event handlers and event handler instances which, for the event name 
+identified by the argument, should always handle event with that name 
+@emph{before} this @emph{particular} instance of the event handler.
 @item
-@code{const csHandlerID[] InstanceSucc(csEventID)} Returns an array (terminated by @code{CS_EVENTLIST_END}) of @samp{csHandlerID}s of both generic event handlers and event handler instances which, for the event name identified by the argument, should always handle event with that name @emph{after} this @emph{particular} instance of the event handler.
+@code{const csHandlerID[] InstanceSucc(csEventID)} Returns an array 
+(terminated by @code{CS_EVENTLIST_END}) of @samp{csHandlerID}s of both generic 
+event handlers and event handler instances which, for the event name 
+identified by the argument, should always handle event with that name 
+@emph{after} this @emph{particular} instance of the event handler.
 @end itemize
 
-In many simple cases, you will want to use default implementations of these functions provided by the @code{CS_EVENTHANDLER_NAMES()} and @code{CS_EVENTHANDLER_NIL_CONSTRAINTS} macros, like so:
+In many simple cases, you will want to use default implementations of these 
+functions provided by the @code{CS_EVENTHANDLER_NAMES()} and 
+@code{CS_EVENTHANDLER_NIL_CONSTRAINTS} macros, like so:
 @example
  struct eiEventHandler : public iEventHandler
  @{
@@ -107,29 +188,73 @@ In many simple cases, you will want to use default implementations of these func
  @}
 @end example
 
-As a convention, most csEventHandlers will implement a static method, @code{const char *StaticHandlerName()}, which can be retrieved and converted without instantiating the handler.  This name string can then be converted into a @samp{csHandlerID} by calling @code{csHandlerRegistry::GetID(myHandlerClass::StaticHandlerName())}.  The @samp{csHandlerID} of an instance of an event handler class can be retrieved by passing a pointer to that class to @code{csHandlerRegistry::GetID()}, e.g., @code{csHandlerRegistry::GetID(new myHandlerClass)}.
+As a convention, most csEventHandlers will implement a static method, 
+@code{const char *StaticHandlerName()}, which can be retrieved and converted 
+without instantiating the handler.  This name string can then be converted 
+into a @samp{csHandlerID} by calling 
+@code{csHandlerRegistry::GetID(myHandlerClass::StaticHandlerName())}.  
+The @samp{csHandlerID} of an instance of an event handler class can be 
+retrieved by passing a pointer to that class to 
+@code{csHandlerRegistry::GetID()}, e.g., 
+@code{csHandlerRegistry::GetID(new myHandlerClass)}.
 
 
 @subsubheading Event Subscription
 
-The event scheduling system is invoked by calling the @code{csEventQueue::RegisterListener()} or @code{csEventQueue::Subscribe()} methods (or, if you are inheriting from @code{csBaseEventHandler}, @code{csBaseEventHandler::RegisterQueue}).  For each of these, the arguments of interest to use are the @code{csEventID} and @code{csEventID[]} parameters.  (Note that the @samp{RegisterListener} form with no @samp{csEventID} argument does not subscribe the listener to anything, and must be followed by a call to @code{Subscribe()} if you ever want the handler to receive any events.)  For each @code{csEventID} (arrays are terminated by @code{CS_EVENTLIST_END}), these functions will subscribe the event handler to that event name @emph{as well as all of its children}.  Note, however, that it will only retrieve from the event handler the ordering lists (the Prec and Succ methods) for the event name to which it is @emph{explicitly} subscribed; if you wish to have one set of ordering constraints for both @samp{crystalspace.input.keyboard} and @samp{crystalspace.input.mouse} but a different set for @samp{crystalspace.input.joystick}, you SHOULD NOT simply subscribe to @samp{crystalspace.input} and have the Prec/Succ functions return different values for each of @samp{.keyboard}, @samp{.mouse}, and @samp{.joystick}; rather, you should subscribe to each of those three event names individually.  This restriction helps us avoid the introduction of subtly contradictory or circular ordering rules.
+The event scheduling system is invoked by calling the 
+@code{csEventQueue::RegisterListener()} or @code{csEventQueue::Subscribe()} 
+methods (or, if you are inheriting from @code{csBaseEventHandler}, 
+@code{csBaseEventHandler::RegisterQueue}).  For each of these, the arguments 
+of interest to use are the @code{csEventID} and @code{csEventID[]} parameters.  
+(Note that the @samp{RegisterListener} form with no @samp{csEventID} argument 
+does not subscribe the listener to anything, and must be followed by a call to 
+@code{Subscribe()} if you ever want the handler to receive any events.)  
+For each @code{csEventID} (arrays are terminated by @code{CS_EVENTLIST_END}), 
+these functions will subscribe the event handler to that event name 
+@emph{as well as all of its children}.  Note, however, that it will only 
+retrieve from the event handler the ordering lists (the Prec and Succ methods) 
+for the event name to which it is @emph{explicitly} subscribed; if you wish to 
+have one set of ordering constraints for both @samp{crystalspace.input.keyboard} 
+and @samp{crystalspace.input.mouse} but a different set for 
+@samp{crystalspace.input.joystick}, you SHOULD NOT simply subscribe to 
+@samp{crystalspace.input} and have the Prec/Succ functions return different 
+values for each of @samp{.keyboard}, @samp{.mouse}, and @samp{.joystick}; 
+rather, you should subscribe to each of those three event names individually.  
+This restriction helps us avoid the introduction of subtly contradictory or 
+circular ordering rules.
 
-Also note that you should use the @code{Subscribe()} and @code{Unsubscribe()} methods to add and remove events from the set an event handler wishes to receive.  Note that you should only @code{Unsubscribe()} from the particular events to which you have @code{Subscribe()}d; the behavior is undefined if you (e.g.) subscribe to @samp{crystalspace.input} and subsequently unsubscribe from @samp{crystalspace.input.joystick}.
-
+Also note that you should use the @code{Subscribe()} and @code{Unsubscribe()} 
+methods to add and remove events from the set an event handler wishes to 
+receive.  Note that you should only @code{Unsubscribe()} from the particular 
+events to which you have @code{Subscribe()}d; the behavior is undefined if 
+you (e.g.) subscribe to @samp{crystalspace.input} and subsequently 
+unsubscribe from @samp{crystalspace.input.joystick}.
 
 
 @subsubheading Other porting Issues
 
-Since the @samp{csBaseEventHandler} object can now only be constructed when a valid @samp{iObjectRegistry*} is available, the idiom of deriving an application class from both @samp{csApplicationFramework} and @samp{csBaseEventHandler} will no longer work.  It is recommended that such applications by rewritten to use an embedded @samp{csBaseEventHandler}-derived class (see, for example, the sample1 tutorial application).
-
+Since the @samp{csBaseEventHandler} object can now only be constructed when a 
+valid @samp{iObjectRegistry*} is available, the idiom of deriving an 
+application class from both @samp{csApplicationFramework} and 
+@samp{csBaseEventHandler} will no longer work.  It is recommended that such 
+applications by rewritten to use an embedded @samp{csBaseEventHandler}-derived 
+class (see, for example, the sample1 tutorial application).
 
 
 @subsubheading The @code{csevFrame} Transition
 
-At present, a lot of code depends upon subscription to the PreProcess, Process, PostProcess, and FinalProcess events.  We intend to remove these events shortly; in their place, all event handlers interested in being called per-frame should subscribe to the @samp{csevFrame} event and specify appropriate ordering constraints.  (If a handler needs to be called several times per frame, then it should create several embedded event handlers each with its own ordering constraints.)  Unfortunately, there aren't any really good ways to make this change-over gracefully, so expect for a zero day to be announced in the near future when Pre/Process/Post/Final will all go away.  In the meantime, the @samp{csevPreProcess}, @samp{csevProcess}, @samp{csevPostProcess}, and @samp{csevFinalProcess} events are each dispatched by a handler of the @samp{csevFrame} event.
-
-
-
+At present, a lot of code depends upon subscription to the PreProcess, Process, 
+PostProcess, and FinalProcess events.  We intend to remove these events 
+shortly; in their place, all event handlers interested in being called 
+per-frame should subscribe to the @samp{csevFrame} event and specify 
+appropriate ordering constraints.  (If a handler needs to be called several 
+times per frame, then it should create several embedded event handlers each 
+with its own ordering constraints.)  Unfortunately, there aren't any really 
+good ways to make this change-over gracefully, so expect for a zero day to be 
+announced in the near future when Pre/Process/Post/Final will all go away.  
+In the meantime, the @samp{csevPreProcess}, @samp{csevProcess}, 
+@samp{csevPostProcess}, and @samp{csevFinalProcess} events are each dispatched 
+by a handler of the @samp{csevFrame} event.
 
 
 @subheading @code{csArray<>} Index and Size Type Change

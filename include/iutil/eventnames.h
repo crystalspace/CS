@@ -61,33 +61,36 @@ struct iEventNameRegistry : public virtual iBase
   SCF_INTERFACE(iEventNameRegistry, 1,0,0);
 
   /**
-   * Get the csEventID for an event name string.
+   * Get the csEventID for an event name string 
+   * (e.g., "crystalspace.input.keyboard.down").
    */
   virtual CS_CONST_METHOD  csEventID GetID (const char *name) = 0;
   /**
    * Get the name represented by a csEventID.
    */
-  virtual CS_CONST_METHOD const char* GetString (csEventID id) = 0;
+  virtual CS_CONST_METHOD const char* GetString (const csEventID id) = 0;
   /**
    * Get the csEventID of the parent of the current event
    * (e.g., the parent of "crystalspace.input.mouse" is "crystalspace.input").
    */
-  virtual CS_CONST_METHOD csEventID GetParentID (csEventID id) = 0;
+  virtual CS_CONST_METHOD csEventID GetParentID (const csEventID id) = 0;
   /**
    * Determine whether the name of the first csEventID is an immediate child
    * of the name of the second csEventID (e.g., "crysalspace.input.mouse" is
    * an immediate child of "crystalspace.input" but not of "crystalspace" or
    * of "").
    */
-  virtual CS_CONST_METHOD bool IsImmediateChildOf (csEventID child, 
-						   csEventID parent) = 0;
+  virtual CS_CONST_METHOD bool IsImmediateChildOf (const csEventID child, 
+						   const csEventID parent) = 0;
   /**
    * Determine whether the name of the first csEventID is equivalent to or
    * a child of the name of the second csEventID (e.g., 
-   * "crystalspace.input.mosue" is a "kinf" od "crystalspace.input.mouse",
-   * "crystalspace.input", "crystalspace", and "").
+   * "crystalspace.input.mouse" is a "kind" of "crystalspace.input.mouse",
+   * "crystalspace.input", "crystalspace", and "", but not of 
+   * "crystalspace.input.mouse.2").
    */
-  virtual CS_CONST_METHOD bool IsKindOf (const csEventID child, const csEventID parent) = 0;
+  virtual CS_CONST_METHOD bool IsKindOf (const csEventID child, 
+    const csEventID parent) = 0;
 
 };
 
