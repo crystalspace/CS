@@ -79,6 +79,7 @@ csGraphics2D::~csGraphics2D ()
   Close ();
   delete [] Palette;
   delete [] win_title;
+  free(name);
 }
 
 bool csGraphics2D::Initialize (iObjectRegistry* r)
