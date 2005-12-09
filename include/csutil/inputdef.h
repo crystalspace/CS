@@ -45,6 +45,7 @@ class CS_CRYSTALSPACE_EXPORT csInputDefinition
 {
 public:
   csRef<iEventNameRegistry> name_reg;
+
 protected:
   csEventID containedName;
 
@@ -77,7 +78,7 @@ public:
    * \param honorModifiers A bitmask of modifier keys that will be recognised.
    * \param useCookedCode If true, will use the cooked key code instead of raw.
    */
-  csInputDefinition (csRef<iEventNameRegistry> name_reg, 
+  csInputDefinition (iEventNameRegistry* name_reg, 
 		     uint32 honorModifiers = 0, bool useCookedCode = false);
 
   /// Copy constructor.
@@ -90,7 +91,7 @@ public:
    * \param honorModifiers A bitmask of modifier keys that will be recognised.
    * \param useCookedCode If true, will use the cooked key code instead of raw.
    */
-  csInputDefinition (csRef<iEventNameRegistry> name_reg, iEvent *event,
+  csInputDefinition (iEventNameRegistry* name_reg, iEvent *event,
 		     uint32 honorModifiers = 0, bool useCookedCode = false);
 
   /**
@@ -99,7 +100,7 @@ public:
    * \param event The event to analyse for input data.
    * \param axis Events include all axes, so choose: 0 = x, 1 = y.
    */
-  csInputDefinition (csRef<iEventNameRegistry> name_reg, iEvent *event, uint8 axis);
+  csInputDefinition (iEventNameRegistry* name_reg, iEvent *event, uint8 axis);
 
   /**
    * Construct an input description from a string.
@@ -116,7 +117,7 @@ public:
    * must be omitted for the first (primary) input device, e.g.,
    * "MouseAxis0" or "JoystickButton3".
    */
-  csInputDefinition (csRef<iEventNameRegistry> name_reg, const char *string,
+  csInputDefinition (iEventNameRegistry* name_reg, const char *string,
 		     uint32 honorModifiers = 0, bool useCookedCode = false);
 
   /**
@@ -192,7 +193,7 @@ public:
    * \remarks Any of the output parameters may be null, in which case they are
    *   ignored.
    */
-  static bool ParseKey (csRef<iEventNameRegistry> &reg, 
+  static bool ParseKey (iEventNameRegistry* reg, 
 			const char *iStr, utf32_char *oKeyCode,
 			utf32_char *oCookedCode, csKeyModifiers *oModifiers);
 
@@ -212,7 +213,7 @@ public:
    * \remarks Any of the output parameters may be null, in which case they are
    *   ignored.
    */
-  static bool ParseOther (csRef<iEventNameRegistry> &reg, 
+  static bool ParseOther (iEventNameRegistry* reg, 
 			  const char *iStr, csEventID *oType, uint *oDevice,
 			  int *oNumeric, csKeyModifiers *oModifiers);
 
@@ -227,7 +228,7 @@ public:
    *   (eg. "LCtrl" as opposed to just "Ctrl").
    * \return The description string.
    */
-  static csString GetKeyString (csRef<iEventNameRegistry> &reg,
+  static csString GetKeyString (iEventNameRegistry* reg,
 				utf32_char code, const csKeyModifiers *mods,
 				bool distinguishModifiers = true);
 
@@ -245,7 +246,7 @@ public:
    *   (eg. "LCtrl" as opposed to just "Ctrl").
    * \return The description string.
    */
-  static csString GetOtherString (csRef<iEventNameRegistry> &reg,
+  static csString GetOtherString (iEventNameRegistry* reg,
 				  csEventID type, uint device, int num, 
 				  const csKeyModifiers *mods, bool distinguishModifiers = true);
 };

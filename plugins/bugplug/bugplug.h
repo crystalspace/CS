@@ -620,12 +620,14 @@ public:
       return parent->HandleEvent (ev);
     }
     CS_EVENTHANDLER_NAMES("crystalspace.bugplug")
-    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(csRef<iEventHandlerRegistry>&, 
-							    csRef<iEventNameRegistry>&,
-							    csEventID) const;
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry>&, 
-							    csRef<iEventNameRegistry>&,
-							    csEventID) const;
+    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+    	csRef<iEventHandlerRegistry>&, 
+	csRef<iEventNameRegistry>&,
+	csEventID) const;
+    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+    	csRef<iEventHandlerRegistry>&, 
+	csRef<iEventNameRegistry>&,
+	csEventID) const;
     CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
   } *scfiEventHandler;
 

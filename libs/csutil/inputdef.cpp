@@ -180,8 +180,8 @@ static utf32_char RawToCooked (utf32_char raw)
   return 0;
 }
 
-csInputDefinition::csInputDefinition (csRef<iEventNameRegistry> r, uint32 honorModifiers, bool useCookedCode)
-  : name_reg(r)
+csInputDefinition::csInputDefinition (iEventNameRegistry* r,
+	uint32 honorModifiers, bool useCookedCode) : name_reg(r)
 {
   Initialize (honorModifiers, useCookedCode);
 }
@@ -205,15 +205,15 @@ csInputDefinition::csInputDefinition (const csInputDefinition &o)
   memcpy (&keyboard, &o.keyboard, sizeof (keyboard));
 }
 
-csInputDefinition::csInputDefinition (csRef<iEventNameRegistry> r, iEvent* ev, uint32 mods, bool cook)
-  : name_reg(r)
+csInputDefinition::csInputDefinition (iEventNameRegistry* r,
+	iEvent* ev, uint32 mods, bool cook) : name_reg(r)
 {
   Initialize (mods, cook);
   InitializeFromEvent (ev);
 }
 
-csInputDefinition::csInputDefinition (csRef <iEventNameRegistry> r, iEvent* ev, uint8 axis)
-  : name_reg(r)
+csInputDefinition::csInputDefinition (iEventNameRegistry* r,
+	iEvent* ev, uint8 axis) : name_reg(r)
 {
   Initialize (0, false);
   mouseAxis = axis;
@@ -223,38 +223,49 @@ csInputDefinition::csInputDefinition (csRef <iEventNameRegistry> r, iEvent* ev, 
 void csInputDefinition::InitializeFromEvent (iEvent *ev)
 {
   deviceNumber = 0;
-  if (CS_IS_KEYBOARD_EVENT(name_reg, *ev)) {
+  if (CS_IS_KEYBOARD_EVENT(name_reg, *ev))
+  {
     containedName = csevKeyboardEvent(name_reg);
     keyboard.code = keyboard.isCooked ? csKeyEventHelper::GetCookedCode (ev)
 				      : csKeyEventHelper::GetRawCode (ev);
     csKeyEventHelper::GetModifiers (ev, modifiers);
-  } else if (CS_IS_MOUSE_EVENT(name_reg, *ev)) {
+  }
+  else if (CS_IS_MOUSE_EVENT(name_reg, *ev))
+  {
     deviceNumber = csMouseEventHelper::GetNumber(ev);
-    if (CS_IS_MOUSE_BUTTON_EVENT(name_reg, *ev, deviceNumber)) {
+    if (CS_IS_MOUSE_BUTTON_EVENT(name_reg, *ev, deviceNumber))
+    {
       containedName = csevMouseButton(name_reg, deviceNumber);
       mouseButton = csMouseEventHelper::GetButton(ev);
       uint32 mModifiers;
       ev->Retrieve("keyModifiers", mModifiers);
       csKeyEventHelper::GetModifiers (mModifiers, modifiers);
-    } else if (CS_IS_MOUSE_MOVE_EVENT(name_reg, *ev, deviceNumber)) {
+    }
+    else if (CS_IS_MOUSE_MOVE_EVENT(name_reg, *ev, deviceNumber))
+    {
       containedName = csevMouseMove(name_reg, deviceNumber);
     }
-  } else if (CS_IS_JOYSTICK_EVENT(name_reg, *ev)) {
+  }
+  else if (CS_IS_JOYSTICK_EVENT(name_reg, *ev))
+  {
     deviceNumber = csJoystickEventHelper::GetNumber(ev);
-    if (CS_IS_JOYSTICK_BUTTON_EVENT(name_reg, *ev, deviceNumber)) {
+    if (CS_IS_JOYSTICK_BUTTON_EVENT(name_reg, *ev, deviceNumber))
+    {
       containedName = csevJoystickButton(name_reg, deviceNumber);
       joystickButton = csJoystickEventHelper::GetButton(ev);
       uint32 jModifiers;
       ev->Retrieve("keyModifiers", jModifiers);
       csKeyEventHelper::GetModifiers (jModifiers, modifiers);
-    } else if (CS_IS_JOYSTICK_MOVE_EVENT(name_reg, *ev, deviceNumber)) {
+    }
+    else if (CS_IS_JOYSTICK_MOVE_EVENT(name_reg, *ev, deviceNumber))
+    {
       containedName = csevJoystickMove(name_reg, deviceNumber);
     }
   }
 }
 
-csInputDefinition::csInputDefinition (csRef<iEventNameRegistry> r, const char *_s, uint32 mods, bool cook)
-  : name_reg(r)
+csInputDefinition::csInputDefinition (iEventNameRegistry* r,
+	const char *_s, uint32 mods, bool cook) : name_reg(r)
 {
   Initialize (mods, cook);
 
@@ -307,18 +318,21 @@ csInputDefinition::csInputDefinition (csRef<iEventNameRegistry> r, const char *_
     {
       str.DeleteAt (0, 4);
       mouseAxis = (int) strtoul (str.GetData (), &endp, 10);
-      if (endp != str.GetData ()) containedName = csevMouseMove(name_reg, deviceNumber);
+      if (endp != str.GetData ()) containedName = csevMouseMove(
+      	name_reg, deviceNumber);
     }
     else if (str.CompareNoCase ("Button"))
     {
       str.DeleteAt (0, 6);
       mouseButton = (int) strtoul (str.GetData (), & endp, 10);
-      if (endp != str.GetData ()) containedName = csevMouseButton(name_reg, deviceNumber);
+      if (endp != str.GetData ()) containedName = csevMouseButton(
+      	name_reg, deviceNumber);
     }
     else
     {
       mouseButton = (int) strtoul (str.GetData (), & endp, 10);
-      if (endp != str.GetData ()) containedName = csevMouseDown(name_reg, deviceNumber);
+      if (endp != str.GetData ()) containedName = csevMouseDown(
+      	name_reg, deviceNumber);
     }
   }
   else if (str.StartsWith ("Joystick", true))
@@ -340,23 +354,27 @@ csInputDefinition::csInputDefinition (csRef<iEventNameRegistry> r, const char *_
     {
       str.DeleteAt (0, 4);
       joystickAxis = (int) strtoul (str.GetData (), &endp, 10);
-      if (endp != str.GetData ()) containedName = csevJoystickMove(name_reg, deviceNumber);
+      if (endp != str.GetData ()) containedName = csevJoystickMove(
+      	name_reg, deviceNumber);
     }
     else if (str.CompareNoCase ("Button"))
     {
       str.DeleteAt (0, 6);
       joystickButton = (int) strtoul (str.GetData (), &endp, 10);
-      if (endp != str.GetData ()) containedName = csevJoystickButton(name_reg, deviceNumber);
+      if (endp != str.GetData ()) containedName = csevJoystickButton(
+      	name_reg, deviceNumber);
     }
     else
     {
       joystickButton = (int) strtoul (str.GetData (), & endp, 10);
-      if (endp != str.GetData ()) containedName = csevJoystickButton(name_reg, deviceNumber);
+      if (endp != str.GetData ()) containedName = csevJoystickButton(
+      	name_reg, deviceNumber);
     }
   }
   else
   {
-    if (deviceNumber != 0) { /* this was actually a key, not a device number */
+    if (deviceNumber != 0)
+    { /* this was actually a key, not a device number */
       csString str2 ("");
       str2.Append(deviceNumber);
       str = str2 + str;
@@ -383,7 +401,8 @@ bool csInputDefinition::IsValid () const
   if (containedName == csevKeyboardEvent(name_reg))
     return keyboard.code != 0;
   else
-    return (csEventNameRegistry::IsKindOf(name_reg, containedName, csevInput(name_reg)));
+    return (csEventNameRegistry::IsKindOf(name_reg, containedName,
+    	csevInput(name_reg)));
 }
 
 csString csInputDefinition::ToString (bool distinguishMods) const
@@ -421,28 +440,37 @@ csString csInputDefinition::ToString (bool distinguishMods) const
 	    containedName == csevJoystickButton(name_reg, deviceNumber) ||
 	    containedName == csevJoystickMove(name_reg, deviceNumber));
 
-  if (containedName == csevKeyboardEvent(name_reg)) {
-      if (CSKEY_IS_SPECIAL (keyboard.code) || (keyboard.code <= 0x20))
+  if (containedName == csevKeyboardEvent(name_reg))
+  {
+    if (CSKEY_IS_SPECIAL (keyboard.code) || (keyboard.code <= 0x20))
 	str.Append (RawToName (keyboard.code));
-      else
-      {
-	char buf[CS_UC_MAX_UTF8_ENCODED];
-	size_t size = csUnicodeTransform::EncodeUTF8
+    else
+    {
+      char buf[CS_UC_MAX_UTF8_ENCODED];
+      size_t size = csUnicodeTransform::EncodeUTF8
 	  (keyboard.code, (utf8_char *) buf, sizeof (buf));
-	str.Append (buf, size);
-      }
-  } else if (containedName == csevMouseButton(name_reg, deviceNumber)) {
-      str.Append ("MouseButton");
-      str.Append (mouseButton);
-  } else if (containedName == csevMouseMove(name_reg, deviceNumber)) {
-      str.Append ("MouseAxis");
-      str.Append (mouseAxis);
-  } else if (containedName == csevJoystickButton(name_reg, deviceNumber)) {
-      str.Append ("JoystickButton");
-      str.Append (joystickButton);
-  } else if (containedName == csevJoystickMove(name_reg, deviceNumber)) {
-      str.Append ("JoystickAxis");
-      str.Append (joystickAxis);
+      str.Append (buf, size);
+    }
+  }
+  else if (containedName == csevMouseButton(name_reg, deviceNumber))
+  {
+    str.Append ("MouseButton");
+    str.Append (mouseButton);
+  }
+  else if (containedName == csevMouseMove(name_reg, deviceNumber))
+  {
+    str.Append ("MouseAxis");
+    str.Append (mouseAxis);
+  }
+  else if (containedName == csevJoystickButton(name_reg, deviceNumber))
+  {
+    str.Append ("JoystickButton");
+    str.Append (joystickButton);
+  }
+  else if (containedName == csevJoystickMove(name_reg, deviceNumber))
+  {
+    str.Append ("JoystickAxis");
+    str.Append (joystickAxis);
   }
 
   return str;
@@ -453,7 +481,8 @@ uint32 csInputDefinition::ComputeHash () const
   uint32 hash = csHashComputer<csEventID>::ComputeHash(containedName);
   if (containedName == csevKeyboardEvent(name_reg))
     return (hash<<2) ^ keyboard.code;
-  else if (csEventNameRegistry::IsKindOf(name_reg, containedName, csevInput(name_reg)))
+  else if (csEventNameRegistry::IsKindOf(name_reg, containedName,
+  	csevInput(name_reg)))
     return (hash<<2) ^ mouseButton; /* union - all fields are stored here */
   else /* should never happen... ? */
     return hash;
@@ -501,7 +530,7 @@ int csInputDefinition::Compare (const csInputDefinition &other) const
     return (int)mouseButton - (int)other.mouseButton;
 }
 
-bool csInputDefinition::ParseKey (csRef<iEventNameRegistry> &reg, const char *str, 
+bool csInputDefinition::ParseKey (iEventNameRegistry* reg, const char *str, 
 				  utf32_char *raw, utf32_char *cooked, 
 				  csKeyModifiers *mods)
 {
@@ -519,9 +548,10 @@ bool csInputDefinition::ParseKey (csRef<iEventNameRegistry> &reg, const char *st
   return true;
 }
 
-bool csInputDefinition::ParseOther (csRef<iEventNameRegistry> &reg,
+bool csInputDefinition::ParseOther (iEventNameRegistry* reg,
 				    const char *str, csEventID *name, 
-				    uint *device, int *num, csKeyModifiers *mods)
+				    uint *device, int *num,
+				    csKeyModifiers *mods)
 {
   csInputDefinition def (reg, str, CSMASK_ALLMODIFIERS);
   if (! def.IsValid ()) return false;
@@ -532,9 +562,8 @@ bool csInputDefinition::ParseOther (csRef<iEventNameRegistry> &reg,
   return true;
 }
 
-csString csInputDefinition::GetKeyString (csRef<iEventNameRegistry> &reg,
-					  utf32_char code,
-  const csKeyModifiers *mods, bool distinguishModifiers)
+csString csInputDefinition::GetKeyString (iEventNameRegistry* reg,
+	utf32_char code, const csKeyModifiers *mods, bool distinguishModifiers)
 {
   csInputDefinition def (reg, CSMASK_ALLMODIFIERS);
   def.containedName = csevKeyboardEvent(reg);
@@ -543,8 +572,9 @@ csString csInputDefinition::GetKeyString (csRef<iEventNameRegistry> &reg,
   return def.ToString (distinguishModifiers);
 }
 
-csString csInputDefinition::GetOtherString (csRef<iEventNameRegistry> &reg,
-					    csEventID name, uint device, int num,
+csString csInputDefinition::GetOtherString (iEventNameRegistry* reg,
+					    csEventID name,
+					    uint device, int num,
   const csKeyModifiers *mods, bool distinguishModifiers)
 {
   csInputDefinition def (reg, CSMASK_ALLMODIFIERS);

@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Dec-2005
+	- Jorrit changed csInputDefinition class to use normal pointers
+	  as parameters for iEventNameRegistry instead of csRef.
+	- Jorrit fixed a few coding style issues: don't go over 78 chars
+	  per line and put curly braces on their own lines.
 8-Dec-2005
 	- Adam made some changes to apimod100.txi to reflect last night's
 	  csBaseEventHandler re-factor.

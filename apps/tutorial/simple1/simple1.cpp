@@ -118,7 +118,8 @@ bool Simple::OnKeyboard(iEvent& ev)
       // the object registry and then post the event.
       csRef<iEventQueue> q = 
         csQueryRegistry<iEventQueue> (GetObjectRegistry());
-      if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
+      if (q.IsValid()) q->GetEventOutlet()->Broadcast(
+      	csevQuit(GetObjectRegistry()));
     }
   }
   return false;

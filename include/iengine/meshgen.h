@@ -100,6 +100,8 @@ struct iMeshGeneratorMapping : public virtual iBase
 
   /**
    * Set the mesh object which this mapping will use.
+   * This can be 0 in which case it will act on all objects
+   * in the given sector.
    */
   virtual void SetMeshObject (iMeshObject* mesh) = 0;
 

@@ -2485,9 +2485,11 @@ bool csBugPlug::HandleEvent (iEvent& event)
 /* We want to handle frame events after these,
    and input (key/mouse) events before them. */
 
-const csHandlerID * csBugPlug::EventHandler::GenericPrec(csRef<iEventHandlerRegistry> &handler_reg,
-							 csRef<iEventNameRegistry> &name_reg,
-							 csEventID e) const {
+const csHandlerID * csBugPlug::EventHandler::GenericPrec(
+	csRef<iEventHandlerRegistry> &handler_reg,
+	csRef<iEventNameRegistry> &name_reg,
+	csEventID e) const
+{
   static csHandlerID Constraints[3]; // TODO : this is not thread-safe/reentrant
 
   Constraints[0] = handler_reg->GetGenericID("crystalspace.graphics3d");
@@ -2504,9 +2506,11 @@ const csHandlerID * csBugPlug::EventHandler::GenericPrec(csRef<iEventHandlerRegi
   }
 }
 
-const csHandlerID * csBugPlug::EventHandler::GenericSucc(csRef<iEventHandlerRegistry> &handler_reg,
-							 csRef<iEventNameRegistry> &name_reg,
-							 csEventID e) const {
+const csHandlerID * csBugPlug::EventHandler::GenericSucc(
+	csRef<iEventHandlerRegistry> &handler_reg,
+	csRef<iEventNameRegistry> &name_reg,
+	csEventID e) const
+{
   static csHandlerID Constraints[3]; // TODO : this is not thread-safe/reentrant
 
   Constraints[0] = handler_reg->GetGenericID("crystalspace.graphics3d");
