@@ -11,7 +11,19 @@ chronological order.
 	  as parameters for iEventNameRegistry instead of csRef.
 	- Jorrit fixed a few coding style issues: don't go over 78 chars
 	  per line and put curly braces on their own lines.
+	- res fixed the Win32 "lazy dll unloading" when ref tracking is 
+	  enabled.
+	- res made the Win32 callstack creation via exception VC-debuggable.
+	- res changed csBaseEventHandler to put the iEventHandler 
+	  implementation into an embedded class. This was done to allow
+	  csBaseEventHandler to be co-inherited with classes that are not
+	  refcounted (like csApplicationFramework).
+	- res fixed some leaks in the new event stuff.
 8-Dec-2005
+	- res made some VC7 and Win32-related new event stuff fixes.
+	- res did some slight reformatting.
+	- res changed the Win32 platform support code to not assume a single 
+	  global Win32Assistant any more.
 	- Adam made some changes to apimod100.txi to reflect last night's
 	  csBaseEventHandler re-factor.
 7-Dec-2005
@@ -27,10 +39,6 @@ chronological order.
 	- Adam refactored csBaseEventHandler to allow co-inheritance
 	  along with csApplicationFramework.  A lot of the tutorial
 	  apps and tools are now much closer to their pre-overhaul form.
-	- res made some VC7 and Win32-related new event stuff fixes.
-	- res did some slight reformatting.
-	- res changed the Win32 platform support code to not assume a single 
-	  global Win32Assistant any more.
 5-Dec-2005
         - res fixed the generic csInstallationPathsHelper::GetAppPath() to
           treat an empty entry in PATH like ".".

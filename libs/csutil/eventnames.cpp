@@ -133,10 +133,14 @@ bool csEventNameRegistry::IsKindOf(const csEventID child, const csEventID parent
   return false;
 }
 
-csRef<iEventNameRegistry> csEventNameRegistry::GetRegistry (iObjectRegistry *object_reg) {
-  csRef<iEventNameRegistry> name_reg = csQueryRegistry<iEventNameRegistry> (object_reg);
-  if (name_reg == 0) {
-    name_reg = csPtr<iEventNameRegistry> (new csEventNameRegistry (object_reg));
+csRef<iEventNameRegistry> csEventNameRegistry::GetRegistry (
+  iObjectRegistry *object_reg) 
+{
+  csRef<iEventNameRegistry> name_reg = 
+    csQueryRegistry<iEventNameRegistry> (object_reg);
+  if (name_reg == 0) 
+  {
+    name_reg.AttachNew (new csEventNameRegistry (object_reg));
     object_reg->Register (name_reg, "iEventNameRegistry");
   }
   CS_ASSERT (name_reg != 0);

@@ -79,16 +79,17 @@ bool csDefaultRunLoop (iObjectRegistry* r)
     return false;
   csRef<iVirtualClock> vc (CS_QUERY_REGISTRY(r, iVirtualClock));
 
-  csDefaultQuitEventHandler eh (r);
-  q->RegisterListener(&eh, eh.Quit);
+  csRef<csDefaultQuitEventHandler> eh;
+  eh.AttachNew (new csDefaultQuitEventHandler (r));
+  q->RegisterListener(eh, eh->Quit);
 
-  while (!eh.ShouldShutdown())
+  while (!eh->ShouldShutdown())
   {
     if (vc)
       vc->Advance();
     q->Process();
   }
 
-  q->RemoveListener (&eh);
+  q->RemoveListener (eh);
   return true;
 }

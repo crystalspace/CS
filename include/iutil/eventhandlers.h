@@ -57,7 +57,7 @@ struct iEventHandler;
  */
 struct iEventHandlerRegistry : public virtual iBase
 {
-  SCF_INTERFACE(iEventHandlerRegistry, 1,0,0);
+  SCF_INTERFACE(iEventHandlerRegistry, 1, 1, 0);
 
   /**
    * Get a csHandlerID based upon some string.
@@ -65,7 +65,6 @@ struct iEventHandlerRegistry : public virtual iBase
    * (non-instantiated) handler names or single-instance handlers.
    */	
   virtual CS_CONST_METHOD csHandlerID GetGenericID (const char *) = 0;
-  virtual CS_CONST_METHOD csHandlerID GetGenericID (csString s) = 0;
   virtual CS_CONST_METHOD csHandlerID GetGenericPreBoundID (csHandlerID) = 0;
   virtual CS_CONST_METHOD csHandlerID GetGenericPostBoundID (csHandlerID) = 0;
   /**

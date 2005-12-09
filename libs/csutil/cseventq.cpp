@@ -47,7 +47,6 @@ csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
   Resize (iLength);
   // Create the default event outlet.
   EventOutlets.Push (new csEventOutlet (0, this, Registry));
-  csRef<iEventNameRegistry> name_reg;
   EventTree = csEventTree::CreateRootNode(HandlerRegistry, NameRegistry, this);
 
   Frame = csevFrame (NameRegistry);
@@ -56,15 +55,24 @@ csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
   PostProcess = csevPostProcess (NameRegistry);
   FinalProcess = csevFinalProcess (NameRegistry);
 
-  PreProcessEventDispatcher = new PreProcessFrameEventDispatcher (this);
-  ProcessEventDispatcher = new ProcessFrameEventDispatcher (this);
-  PostProcessEventDispatcher = new PostProcessFrameEventDispatcher (this);
-  FinalProcessEventDispatcher = new FinalProcessFrameEventDispatcher (this);
+  csRef<iTypedFrameEventDispatcher> PreProcessEventDispatcher;
+  csRef<iTypedFrameEventDispatcher> ProcessEventDispatcher;
+  csRef<iTypedFrameEventDispatcher> PostProcessEventDispatcher;
+  csRef<iTypedFrameEventDispatcher> FinalProcessEventDispatcher;
+  PreProcessEventDispatcher.AttachNew (
+    new PreProcessFrameEventDispatcher (this));
+  ProcessEventDispatcher.AttachNew (
+    new ProcessFrameEventDispatcher (this));
+  PostProcessEventDispatcher.AttachNew (
+    new PostProcessFrameEventDispatcher (this));
+  FinalProcessEventDispatcher.AttachNew (
+    new FinalProcessFrameEventDispatcher (this));
 
   if (!Subscribe (PreProcessEventDispatcher, Frame) ||
       !Subscribe (ProcessEventDispatcher, Frame) ||
       !Subscribe (PostProcessEventDispatcher, Frame) ||
-      !Subscribe (FinalProcessEventDispatcher, Frame)) {
+      !Subscribe (FinalProcessEventDispatcher, Frame)) 
+  {
     CS_ASSERT(0);
   }
 }
@@ -82,8 +90,8 @@ csEventQueue::~csEventQueue ()
     EventPool->Free();
     EventPool = e;
   }
-  csEventTree::DeleteRootNode(EventTree); // Magic!
-  EventTree = NULL;
+  csEventTree::DeleteRootNode (EventTree); // Magic!
+  EventTree = 0;
 }
 
 uint32 csEventQueue::CountPool()

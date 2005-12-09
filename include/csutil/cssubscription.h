@@ -162,7 +162,7 @@ private:
       if (SubscriberQueue)
 	delete SubscriberQueue;
       CS_ASSERT(iterator==0);
-      CS_ASSERT(deletedList==0);
+      //CS_ASSERT(deletedList==0);
     }
 
     /**

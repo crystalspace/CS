@@ -18,9 +18,12 @@
 
 #include "cssysdef.h"
 
-#if defined(CS_REF_TRACKER) && !defined(CS_REF_TRACKER_EXTENSIVE)
-  // Performance hack
-  #undef CS_REF_TRACKER
+#if defined(CS_REF_TRACKER)
+  #define CS_REF_TRACKER_DEFINED
+  #if !defined(CS_REF_TRACKER_EXTENSIVE)
+    // Performance hack
+    #undef  CS_REF_TRACKER
+  #endif
 #endif
 
 #include "csutil/csshlib.h"
@@ -146,7 +149,7 @@ void* csGetLibrarySymbol(csLibraryHandle Handle, const char* Name)
 }
 
 #if (defined(CS_EXTENSIVE_MEMDEBUG) && defined(CS_COMPILER_MSVC)) || \
-  defined(CS_MEMORY_TRACKER) || defined(CS_REF_TRACKER)
+  defined(CS_MEMORY_TRACKER) || defined(CS_REF_TRACKER_DEFINED)
 /*
   Lazily unload libs - Because if unloading happens immediately,
   the source file information for leaked objects would get lost.

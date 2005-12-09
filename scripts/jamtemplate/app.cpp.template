@@ -93,10 +93,13 @@ bool App#PROJECTNAMECAP#::OnInitialize(int argc, char* argv[])
 	CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
+  // "Warm up" the event handler so it can interact with the world
+  csBaseEventHandler::Initialize(GetObjectRegistry());
+ 
   // Set up an event handler for the application.  Crystal Space is fully
   // event-driven.  Everything (except for this initialization) happens in
   // response to an event.
-  if (!RegisterQueue(r))
+  if (!RegisterQueue (r, csevAllEvents(GetObjectRegistry())))
     return ReportError("Failed to set up event handler!");
 
   return true;

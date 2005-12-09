@@ -27,6 +27,7 @@
 #include "csextern.h"
 #include "csutil/csunicode.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/weakref.h"
 #include "iutil/event.h"
 #include "iutil/csinput.h"
 
@@ -43,7 +44,7 @@ private:
   /// The event plug object
   iEventPlug *Plug;
   /// The owning event queue
-  csEventQueue *Queue;
+  csWeakRef<csEventQueue> Queue;
   /// The shared-object registry.
   iObjectRegistry* Registry;
   /// The shared keyboard driver.

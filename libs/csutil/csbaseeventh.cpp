@@ -25,19 +25,25 @@
 
 #include "iutil/eventq.h"
 
+csBaseEventHandler::EventHandlerImpl::EventHandlerImpl (
+  csBaseEventHandler* parent) : scfImplementationType (this),
+  parent (parent)
+{
+}
+
 csBaseEventHandler::csBaseEventHandler() : 
-  scfImplementationType (this),
   object_registry (0),
   self (CS_EVENT_INVALID)
 {
   FrameEvent = PreProcess = Process = PostProcess 
     = FinalProcess = CS_EVENT_INVALID;
+  eventh.AttachNew (new EventHandlerImpl (this));
 }
 
 void csBaseEventHandler::Initialize (iObjectRegistry *r)
 {
   object_registry = r;
-  self = csEventHandlerRegistry::GetID(r, this);
+  self = csEventHandlerRegistry::GetID (r, eventh);
   FrameEvent = csevFrame (r);
   PreProcess = csevPreProcess (r);
   Process = csevProcess (r);
@@ -48,28 +54,29 @@ void csBaseEventHandler::Initialize (iObjectRegistry *r)
 csBaseEventHandler::~csBaseEventHandler()
 {
   if (queue)
-    queue->RemoveListener (this);
+    queue->RemoveListener (eventh);
   if (object_registry)
-    csEventHandlerRegistry::ReleaseID(object_registry, this);
+    csEventHandlerRegistry::ReleaseID (object_registry, eventh);
+  eventh->parent = 0;
 }
 
 bool csBaseEventHandler::RegisterQueue (iEventQueue* q, csEventID event)
 {
   if (queue)
-    queue->RemoveListener (this);
+    queue->RemoveListener (eventh);
   queue = q;
   if (0 != q)
-    q->RegisterListener(this, event);
+    q->RegisterListener (eventh, event);
   return true;
 }
 
 bool csBaseEventHandler::RegisterQueue (iEventQueue* q, csEventID events[])
 {
   if (queue)
-    queue->RemoveListener (this);
+    queue->RemoveListener (eventh);
   queue = q;
   if (q != 0)
-    q->RegisterListener(this, events);
+    q->RegisterListener (eventh, events);
   return true;
 }
 

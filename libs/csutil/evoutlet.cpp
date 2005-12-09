@@ -36,11 +36,14 @@ csEventOutlet::csEventOutlet(iEventPlug* p,csEventQueue* q,iObjectRegistry* r):
 
 csEventOutlet::~csEventOutlet ()
 {
-  size_t idx = Queue->EventOutlets.Find (this);
-  if (idx != (size_t)-1)
+  if (Queue.IsValid())
   {
-    Queue->EventOutlets [idx] = 0;
-    Queue->EventOutlets.DeleteIndex (idx);
+    size_t idx = Queue->EventOutlets.Find (this);
+    if (idx != (size_t)-1)
+    {
+      Queue->EventOutlets [idx] = 0;
+      Queue->EventOutlets.DeleteIndex (idx);
+    }
   }
 }
 

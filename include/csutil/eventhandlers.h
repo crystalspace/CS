@@ -56,20 +56,21 @@ public:
    * (non-instantiated) handler names or single-instance handlers.
    */	
   CS_CONST_METHOD csHandlerID GetGenericID (const char *);
-  static CS_CONST_METHOD csHandlerID GetGenericID (iObjectRegistry *reg, const char *name) {
+  static CS_CONST_METHOD csHandlerID GetGenericID (iObjectRegistry *reg, 
+    const char *name) 
+  {
     return GetRegistry (reg)->GetGenericID (name);
   }
-  CS_CONST_METHOD csHandlerID GetGenericID (csString s) 
-  { return GetGenericID((const char *) s); }
-  static CS_CONST_METHOD csHandlerID GetGenericID (iObjectRegistry *reg, csString s) { 
-    return GetGenericID(reg, (const char *) s);
-  }
   CS_CONST_METHOD csHandlerID GetGenericPreBoundID (csHandlerID);
-  static CS_CONST_METHOD csHandlerID GetGenericPreBoundID (iObjectRegistry *reg, csHandlerID id) {
+  static CS_CONST_METHOD csHandlerID GetGenericPreBoundID (
+    iObjectRegistry *reg, csHandlerID id) 
+  {
     return GetRegistry (reg)->GetGenericPreBoundID (id);
   }
   CS_CONST_METHOD csHandlerID GetGenericPostBoundID (csHandlerID);
-  static CS_CONST_METHOD csHandlerID GetGenericPostBoundID (iObjectRegistry *reg, csHandlerID id) {
+  static CS_CONST_METHOD csHandlerID GetGenericPostBoundID (
+    iObjectRegistry *reg, csHandlerID id) 
+  {
     return GetRegistry (reg)->GetGenericPostBoundID (id);
   }
     
@@ -78,21 +79,27 @@ public:
    * its own name via the iEventHandler::GetInstanceName() method.
    */
   csHandlerID GetID (iEventHandler *);
-  static CS_CONST_METHOD csHandlerID GetID (iObjectRegistry *reg, iEventHandler *h) {
+  static CS_CONST_METHOD csHandlerID GetID (iObjectRegistry *reg, 
+    iEventHandler *h) 
+  {
     return GetRegistry (reg)->GetID (h);
   }
   /**
    * Used when an iEventHandler is desroyed to remove our reference.
    */
   void ReleaseID (csHandlerID id);
-  static CS_CONST_METHOD void ReleaseID (iObjectRegistry *reg, csHandlerID id) {
+  static CS_CONST_METHOD void ReleaseID (iObjectRegistry *reg, 
+    csHandlerID id)
+  {
     GetRegistry (reg)->ReleaseID (id);
   }
   /**
    * Used when an iEventHandler is destroyed to remove our reference.
    */
   void ReleaseID (iEventHandler *);
-  static CS_CONST_METHOD void ReleaseID (iObjectRegistry *reg, iEventHandler *h) {
+  static CS_CONST_METHOD void ReleaseID (iObjectRegistry *reg, 
+    iEventHandler *h) 
+  {
     GetRegistry (reg)->ReleaseID (h);
   }
   /**
@@ -101,7 +108,9 @@ public:
    * if (!csEventHandlerRegistry->IsInstance(id)).
    */
   CS_CONST_METHOD iEventHandler* GetHandler (csHandlerID id);
-  static inline CS_CONST_METHOD iEventHandler* GetHandler (iObjectRegistry *reg, csHandlerID id) {
+  static inline CS_CONST_METHOD iEventHandler* GetHandler (
+    iObjectRegistry *reg, csHandlerID id) 
+  {
     return GetRegistry (reg)->GetHandler (id);
   };
 
@@ -110,8 +119,11 @@ public:
    * genericid is a generic instance, and instanceid is an
    * instance of genericid in particular.
    */
-  CS_CONST_METHOD bool const IsInstanceOf (csHandlerID instanceid, csHandlerID genericid);
-  static inline CS_CONST_METHOD bool IsInstanceOf (iObjectRegistry *reg, csHandlerID instanceid, csHandlerID genericid) {
+  CS_CONST_METHOD bool const IsInstanceOf (csHandlerID instanceid, 
+    csHandlerID genericid);
+  static inline CS_CONST_METHOD bool IsInstanceOf (iObjectRegistry *reg, 
+    csHandlerID instanceid, csHandlerID genericid) 
+  {
     return GetRegistry (reg)->IsInstanceOf (instanceid, genericid);
   };
 
@@ -119,7 +131,9 @@ public:
    * returns true if id is a handler instance (i.e., not a generic name).
    */
   CS_CONST_METHOD bool const IsInstance (csHandlerID id);
-  static inline CS_CONST_METHOD bool IsInstance (iObjectRegistry *reg, csHandlerID id) {
+  static inline CS_CONST_METHOD bool IsInstance (iObjectRegistry *reg, 
+  csHandlerID id) 
+  {
     return GetRegistry (reg)->IsInstance (id);
   };
 
@@ -127,7 +141,9 @@ public:
    * Returns the csHandleID for the generic name for instance name id.
    */
   CS_CONST_METHOD csHandlerID const GetGeneric (csHandlerID id);
-  static inline CS_CONST_METHOD csHandlerID GetGeneric (iObjectRegistry *reg, csHandlerID id) {
+  static inline CS_CONST_METHOD csHandlerID GetGeneric (iObjectRegistry *reg, 
+    csHandlerID id) 
+  {
     return GetRegistry (reg)->GetGeneric (id);
   };
 
@@ -135,11 +151,14 @@ public:
    * Returns the string name for a csHandlerID.
    */
   CS_CONST_METHOD const char* GetString (csHandlerID id);
-  static inline CS_CONST_METHOD const char* GetString (iObjectRegistry *reg, csHandlerID id) {
+  static inline CS_CONST_METHOD const char* GetString (
+    iObjectRegistry *reg, csHandlerID id) 
+  {
     return GetRegistry (reg)->GetString (id);
   };
 
-  static csRef<iEventHandlerRegistry> GetRegistry (iObjectRegistry *object_reg);
+  static csRef<iEventHandlerRegistry> GetRegistry (
+    iObjectRegistry *object_reg);
 
  private:
   iObjectRegistry *object_reg;
@@ -147,8 +166,8 @@ public:
   csHash<csHandlerID, csHandlerID> instantiation; 
   csHash<csRef<iEventHandler>, csHandlerID> idToHandler;
   csHash<csHandlerID, csRef<iEventHandler> > handlerToID;
-  csHash<csHandlerID,csHandlerID> handlerPres;
-  csHash<csHandlerID,csHandlerID> handlerPosts;
+  csHash<csHandlerID, csHandlerID> handlerPres;
+  csHash<csHandlerID, csHandlerID> handlerPosts;
   uint32 instanceCounter;
 };
 

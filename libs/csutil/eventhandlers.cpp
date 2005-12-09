@@ -47,7 +47,7 @@ class csHashComputer<iEventHandler*> : public csHashComputerIntegral<void *> {};
 
 csHandlerID csEventHandlerRegistry::GetGenericID (const char *name)
 {
-  CS_ASSERT(strrchr(name, ':') == NULL);
+  CS_ASSERT(strrchr(name, ':') == 0);
   csHandlerID res;
   if (names.Contains(name)) 
   {
@@ -102,7 +102,7 @@ csHandlerID csEventHandlerRegistry::GetID (iEventHandler *handler)
 void csEventHandlerRegistry::ReleaseID (csHandlerID id)
 {
   CS_ASSERT (IsInstance (id));
-  iEventHandler *h = idToHandler.Get (id, NULL);
+  iEventHandler *h = idToHandler.Get (id, 0);
   CS_ASSERT (h);
   handlerToID.DeleteAll (h);
   idToHandler.DeleteAll (id);
@@ -126,7 +126,7 @@ const char * csEventHandlerRegistry::GetString (csHandlerID id)
 iEventHandler *csEventHandlerRegistry::GetHandler (csHandlerID id)
 {
   CS_ASSERT(IsInstance(id));
-  return idToHandler.Get (id, NULL);
+  return idToHandler.Get (id, 0);
 }
 
 bool const csEventHandlerRegistry::IsInstanceOf (csHandlerID instanceid, csHandlerID genericid)
@@ -148,9 +148,11 @@ csHandlerID const csEventHandlerRegistry::GetGeneric (csHandlerID id)
 
 csRef<iEventHandlerRegistry> csEventHandlerRegistry::GetRegistry (iObjectRegistry *object_reg)
 {
-  csRef<iEventHandlerRegistry> handler_reg = csQueryRegistry<iEventHandlerRegistry> (object_reg);
-  if (handler_reg == 0) {
-    handler_reg = new csEventHandlerRegistry (object_reg);
+  csRef<iEventHandlerRegistry> handler_reg = 
+    csQueryRegistry<iEventHandlerRegistry> (object_reg);
+  if (handler_reg == 0) 
+  {
+    handler_reg.AttachNew (new csEventHandlerRegistry (object_reg));
     object_reg->Register (handler_reg, "iEventHandlerRegistry");
   }
   CS_ASSERT (handler_reg != 0);

@@ -33,12 +33,13 @@
 #include "csextern.h"
 
 #include "csutil/array.h"
+#include "csutil/hash.h"
+#include "csutil/list.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/thread.h"
-#include "csutil/list.h"
-#include "csutil/hash.h"
+#include "csutil/weakref.h"
 #include "iutil/eventnames.h"
 #include "iutil/eventhandlers.h"
 #include "iutil/eventq.h"
@@ -238,9 +239,10 @@ public:
    * the handling of the Process event and the handling of the FinalProcess 
    * event").
    */
-  struct iTypedFrameEventDispatcher : public iEventHandler {
+  struct iTypedFrameEventDispatcher : public iEventHandler 
+  {
   protected:
-    csEventQueue* parent;
+    csWeakRef<csEventQueue> parent;
     csEventID sendEvent;
   public:
     iTypedFrameEventDispatcher () 
@@ -250,7 +252,8 @@ public:
     {
     }
     CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
-    virtual bool HandleEvent (iEvent& e) { 
+    virtual bool HandleEvent (iEvent& e) 
+    { 
       parent->Notify (sendEvent);
       return false;
     }
@@ -259,7 +262,8 @@ public:
   class PreProcessFrameEventDispatcher 
     : public scfImplementation2<PreProcessFrameEventDispatcher, 
                                 csEventQueue::iTypedFrameEventDispatcher, 
-                                scfFakeInterface<iEventHandler> > {
+                                scfFakeInterface<iEventHandler> > 
+  {
   public:
     PreProcessFrameEventDispatcher (csEventQueue* parent) 
       : scfImplementationType (this)
@@ -275,7 +279,8 @@ public:
     }
     CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry> &r1,
 							    csRef<iEventNameRegistry> &r2,
-							    csEventID e) const {
+							    csEventID e) const 
+    {
       static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
       if (e == csevFrame(r2)) {
 	constraint[0] = ProcessFrameEventDispatcher::StaticID (r1);
@@ -288,7 +293,8 @@ public:
   class ProcessFrameEventDispatcher 
     : public scfImplementation2<ProcessFrameEventDispatcher, 
                                 csEventQueue::iTypedFrameEventDispatcher, 
-                                scfFakeInterface<iEventHandler> > {
+                                scfFakeInterface<iEventHandler> > 
+  {
   public:
     ProcessFrameEventDispatcher (csEventQueue* parent) 
       : scfImplementationType (this)
@@ -304,7 +310,8 @@ public:
     }
     CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry> &r1,
 							    csRef<iEventNameRegistry> &r2,
-							    csEventID e) const {
+							    csEventID e) const 
+    {
       static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
       if (e == csevFrame(r2)) {
 	constraint[0] = PostProcessFrameEventDispatcher::StaticID (r1);
@@ -317,7 +324,8 @@ public:
   class PostProcessFrameEventDispatcher 
     : public scfImplementation2<PostProcessFrameEventDispatcher, 
                                 csEventQueue::iTypedFrameEventDispatcher, 
-                                scfFakeInterface<iEventHandler> > {
+                                scfFakeInterface<iEventHandler> > 
+  {
   public:
     PostProcessFrameEventDispatcher (csEventQueue* parent) 
       : scfImplementationType (this)
@@ -328,12 +336,14 @@ public:
     CS_EVENTHANDLER_NAMES("crystalspace.frame.postprocess")
     CS_CONST_METHOD virtual const csHandlerID * GenericPrec(csRef<iEventHandlerRegistry> &r1,
 							    csRef<iEventNameRegistry> &r2,
-							    csEventID e) const {
+							    csEventID e) const 
+    {
       return 0;
     }
     CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry> &r1,
 							    csRef<iEventNameRegistry> &r2,
-							    csEventID e) const {
+							    csEventID e) const 
+    {
       static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
       if (e == csevFrame(r2)) {
 	constraint[0] = FinalProcessFrameEventDispatcher::StaticID (r1);
@@ -346,7 +356,8 @@ public:
   class FinalProcessFrameEventDispatcher 
     : public scfImplementation2<FinalProcessFrameEventDispatcher, 
                                 csEventQueue::iTypedFrameEventDispatcher, 
-                                scfFakeInterface<iEventHandler> > {
+                                scfFakeInterface<iEventHandler> > 
+  {
   public:
     FinalProcessFrameEventDispatcher (csEventQueue* parent) 
       : scfImplementationType (this)
@@ -366,11 +377,6 @@ public:
       return 0;
     }
   };
-
-  iTypedFrameEventDispatcher *PreProcessEventDispatcher;
-  iTypedFrameEventDispatcher *ProcessEventDispatcher;
-  iTypedFrameEventDispatcher *PostProcessEventDispatcher;
-  iTypedFrameEventDispatcher *FinalProcessEventDispatcher;
 };
 
 #endif // __CS_CSEVENTQ_H__

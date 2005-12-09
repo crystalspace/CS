@@ -398,10 +398,32 @@ public:
 static CriticalSectionWrapper ExceptStackSection;
 static CONTEXT* currentContextPtr;
 
+struct ExceptionFilterParams
+{
+  int skip;
+  bool fast;
+  csDirtyAccessArray<CallStackEntry>& entries;
+  csDirtyAccessArray<uintptr_t>& params;
+  bool result;
+
+  ExceptionFilterParams (int skip, bool fast,
+    csDirtyAccessArray<CallStackEntry>& entries,
+    csDirtyAccessArray<uintptr_t>& params) : skip (skip), fast (fast),
+    entries (entries), params (params), result (false) {}
+};
+
 static LONG WINAPI ExceptionFilter (struct _EXCEPTION_POINTERS* ExceptionInfo)
 {
-  *((CONTEXT*)ExceptionInfo->ExceptionRecord->ExceptionInformation[0]) = 
-    *(ExceptionInfo->ContextRecord);
+  ExceptionFilterParams* efp = (ExceptionFilterParams*)
+    ExceptionInfo->ExceptionRecord->ExceptionInformation[0];
+
+  HANDLE hProc = symInit.GetSymProcessHandle ();
+  HANDLE hThread = GetCurrentThread ();
+  CONTEXT context (*(ExceptionInfo->ContextRecord));
+  efp->result =  CreateCallStack (hProc, hThread, 
+    context, efp->skip + 3, efp->fast, efp->entries, 
+    efp->params);
+
   return EXCEPTION_CONTINUE_EXECUTION;
 }
 
@@ -420,30 +442,28 @@ static bool CreateCallStackExcept (int skip, bool fast,
 {
   ExceptStackSection.Enter();
     
-  CONTEXT context;
-  memset (&context, 0, sizeof (context));
-  currentContextPtr = &context;
-
+  ExceptionFilterParams efp (skip, fast, entries, params);
+  ULONG_PTR efpPtr = (ULONG_PTR)&efp;
+#if defined (CS_DEBUG) && defined (CS_COMPILER_MSVC)
+  // This method actually works nice in conjunction with debugging.
+  __try
+  {
+    RaiseException (0, 0, 1, &efpPtr);
+  }
+  __except (ExceptionFilter (GetExceptionInformation ()))
+  {
+  }
+#else
   LPTOP_LEVEL_EXCEPTION_FILTER oldFilter = 
     SetUnhandledExceptionFilter (&ExceptionFilter);
-  ULONG_PTR contextPtr = (ULONG_PTR)&context;
 
-  RaiseException (0, 0, 1, &contextPtr);
-  /* HACK: At this point we have the CONTEXT of the backtrace, however, we
-   * subsequently call a couple of functions, with the risk that those
-   * clobber the stack space where precious return addresses from
-   * RaiseException() lie. To avoid losing those addresses, "protect" that
-   * space on the stack by allocating a small block of memory that hopefully
-   * covers the area in question.
-   */
-  alloca (sizeof(ULONG_PTR) * 16);
+  RaiseException (0, 0, 1, &efpPtr);
+
   SetUnhandledExceptionFilter (oldFilter);
-
+#endif
   ExceptStackSection.Leave();
 
-  HANDLE hProc = symInit.GetSymProcessHandle ();
-  HANDLE hThread = GetCurrentThread ();
-  return CreateCallStack (hProc, hThread, context, skip + 3, fast, entries, params); 
+  return efp.result;
 }
 
 typedef BOOL (WINAPI* PFNISDEBUGGERPRESENT)();
@@ -462,9 +482,13 @@ bool CallStackCreatorDbgHelp::CreateCallStack (
       "IsDebuggerPresent");
   }
 
+#if defined (CS_DEBUG) && !defined (CS_COMPILER_MSVC)
+  /* On non-VC, we still need the ugly 2nd thread method to avoid the debugger
+   * catching the exception. */
   if (!IsDebuggerPresent || IsDebuggerPresent())
     return CreateCallStackThreaded (0, fast, entries, params);
   else
+#endif
     return CreateCallStackExcept (0, fast, entries, params);
 }
 

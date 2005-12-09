@@ -28,10 +28,11 @@
  * \addtogroup event_handling
  * @{ */
 
+#include "csutil/eventhandlers.h"
+#include "csutil/ref.h"
 #include "csutil/scf_implementation.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
-#include "csutil/eventhandlers.h"
 
 #include <limits.h>
 
@@ -53,8 +54,7 @@ struct iObjectRegistry;
  * to overload the HandleEvent() method. Always override the specific
  * \c On... trigger function.
  */
-class CS_CRYSTALSPACE_EXPORT csBaseEventHandler : public 
-  scfImplementation1<csBaseEventHandler, iEventHandler>
+class CS_CRYSTALSPACE_EXPORT csBaseEventHandler
 {
 private:
   csRef<iEventQueue> queue;
@@ -67,6 +67,66 @@ protected:
   csEventID Process;
   csEventID PostProcess;
   csEventID FinalProcess;
+
+  /**
+   * Actual iEventHandler implementation.
+   * This is in a wrapper class so it can be properly refcounted and
+   * the csBaseEventHandler can be used in co-inheritance with 
+   * non-refcounted classes.
+   */
+  class CS_CRYSTALSPACE_EXPORT EventHandlerImpl : public 
+    scfImplementation1<EventHandlerImpl, iEventHandler>
+  {
+    friend class csBaseEventHandler;
+    csBaseEventHandler* parent;
+  public:
+    EventHandlerImpl (csBaseEventHandler* parent);
+    virtual bool HandleEvent (iEvent &event)
+    {
+      if (!parent) return false;
+      return parent->HandleEvent (event);
+    }
+    CS_CONST_METHOD virtual const char *GenericName() const 
+    { 
+      if (!parent) return "application"; 
+      return parent->GenericName();
+    }
+    CS_CONST_METHOD virtual csHandlerID GenericID(
+      csRef<iEventHandlerRegistry>& reg) const 
+    { 
+      if (!parent) return CS_HANDLER_INVALID;
+      return parent->GenericID (reg);
+    }
+    CS_CONST_METHOD virtual const csHandlerID *GenericPrec (
+      csRef<iEventHandlerRegistry>& hreg, csRef<iEventNameRegistry>& nreg, 
+      csEventID id) const 
+    { 
+      if (!parent) return 0; 
+      return parent->GenericPrec (hreg, nreg, id);
+    }
+    CS_CONST_METHOD virtual const csHandlerID *GenericSucc (
+      csRef<iEventHandlerRegistry>& hreg, csRef<iEventNameRegistry>& nreg, 
+      csEventID id) const 
+    { 
+      if (!parent) return 0; 
+      return parent->GenericSucc (hreg, nreg, id);
+    }
+    CS_CONST_METHOD virtual const csHandlerID *InstancePrec (
+      csRef<iEventHandlerRegistry>& hreg, csRef<iEventNameRegistry>& nreg, 
+      csEventID id) const 
+    { 
+      if (!parent) return 0; 
+      return parent->InstancePrec (hreg, nreg, id);
+    }
+    CS_CONST_METHOD virtual const csHandlerID *InstanceSucc(
+      csRef<iEventHandlerRegistry>& hreg, csRef<iEventNameRegistry>& nreg, 
+      csEventID id) const 
+    { 
+      if (!parent) return 0; 
+      return parent->InstanceSucc (hreg, nreg, id);
+    }
+  };
+  csRef<EventHandlerImpl> eventh;
 
   /**
    * Constructor.<p>
@@ -159,36 +219,46 @@ protected:
   CS_CONST_METHOD virtual const char *GenericName() const 
   { return "application"; }
   
-  CS_CONST_METHOD virtual csHandlerID GenericID() const { 
-    return csEventHandlerRegistry::GetGenericID(object_registry, GenericName()); 
+  CS_CONST_METHOD virtual csHandlerID GenericID (
+    csRef<iEventHandlerRegistry>& reg) const 
+  { 
+    return reg->GetGenericID (GenericName ()); 
   }
 
   /**
    * Override this if you want to force some modules to always handle some 
    * events before csBaseEventHandler.
    */
-  CS_CONST_METHOD virtual const csHandlerID *GenericPrec(csEventID) const 
+  CS_CONST_METHOD virtual const csHandlerID *GenericPrec (
+    csRef<iEventHandlerRegistry>&, csRef<iEventNameRegistry>&, 
+    csEventID) const 
   { return 0; }
 
   /**
    * Override this if you want to force some modules to always handle some 
    * events after csBaseEventHandler.
    */
-  CS_CONST_METHOD virtual const csHandlerID *GenericSucc(csEventID) const 
+  CS_CONST_METHOD virtual const csHandlerID *GenericSucc (
+    csRef<iEventHandlerRegistry>&, csRef<iEventNameRegistry>&, 
+    csEventID) const 
   { return 0; }
 
   /**
    * Override this if you want to force some modules to always handle some 
    * events before this instance of csBaseEventHandler.
    */
-  CS_CONST_METHOD virtual const csHandlerID *InstancePrec(csEventID) const 
+  CS_CONST_METHOD virtual const csHandlerID *InstancePrec (
+    csRef<iEventHandlerRegistry>&, csRef<iEventNameRegistry>&, 
+    csEventID) const 
   { return 0; }
 
   /**
    * Override this if you want to force some modules to always handle some 
    * events before this instance of csBaseEventHandler.
    */
-  CS_CONST_METHOD virtual const csHandlerID *InstanceSucc(csEventID) const 
+  CS_CONST_METHOD virtual const csHandlerID *InstanceSucc (
+    csRef<iEventHandlerRegistry>&, csRef<iEventNameRegistry>&, 
+    csEventID) const 
   { return 0; }
 
   /// Invoked by the event handler when a joystick movement event is received.

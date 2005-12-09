@@ -58,6 +58,7 @@ csEventTree::csEventTree (csRef<iEventHandlerRegistry> &h_reg,
 csEventTree::~csEventTree() 
 {
   queue->EventHash.DeleteAll(self);
+  if (fatNode) delete fatRecord;
 }
 
 /**
