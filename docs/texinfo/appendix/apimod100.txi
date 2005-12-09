@@ -233,12 +233,10 @@ unsubscribe from @samp{crystalspace.input.joystick}.
 
 @subsubheading Other porting Issues
 
-Since the @samp{csBaseEventHandler} object can now only be constructed when a 
-valid @samp{iObjectRegistry*} is available, the idiom of deriving an 
-application class from both @samp{csApplicationFramework} and 
-@samp{csBaseEventHandler} will no longer work.  It is recommended that such 
-applications by rewritten to use an embedded @samp{csBaseEventHandler}-derived 
-class (see, for example, the sample1 tutorial application).
+Since the @samp{csBaseEventHandler} object's operation is now linked with 
+having a functional event name registry, any derived class must be sure to 
+call the @samp{Initialize(iObjectRegistry*)} method before calling any of 
+the @samp{RegisterQueue(...)} methods.
 
 
 @subsubheading The @code{csevFrame} Transition

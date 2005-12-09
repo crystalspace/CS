@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Dec-2005
+	- Adam made some changes to apimod100.txi to reflect last night's
+	  csBaseEventHandler re-factor.
 7-Dec-2005
 	- Adam Bradley checked in a massive event system overhaul.
 	    - The pre-overhaul code is tagged as PRE_EVENT_OVERHAUL_2005
