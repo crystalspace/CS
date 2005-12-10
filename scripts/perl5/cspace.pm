@@ -7532,7 +7532,6 @@ package cspace::iThingState;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
-*GetFactory = *cspacec::iThingState_GetFactory;
 *GetVertexW = *cspacec::iThingState_GetVertexW;
 *GetVerticesW = *cspacec::iThingState_GetVerticesW;
 *GetMovingOption = *cspacec::iThingState_GetMovingOption;
