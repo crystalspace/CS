@@ -229,9 +229,8 @@ void CEGUITest::CreateRoom ()
   
   csRef<iMeshWrapper> walls (
     engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> thing_state (
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
-  iThingFactoryState* walls_state = thing_state->GetFactory ();
+  csRef<iThingFactoryState> walls_state = 
+    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
   walls_state->AddInsideBox (
     csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);

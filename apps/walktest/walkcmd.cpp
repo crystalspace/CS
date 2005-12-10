@@ -374,9 +374,8 @@ void GenerateThing (iObjectRegistry* object_reg,
       continue;
     }
     csRef<iMeshObjectFactory> thingFactory (thingType->NewFactory());
-    csRef<iThingState> thingState =
-    	SCF_QUERY_INTERFACE(thingFactory, iThingState);
-    csRef<iThingFactoryState> thingFactoryState = thingState->GetFactory ();
+    csRef<iThingFactoryState> thingFactoryState = 
+      scfQueryInterface<iThingFactoryState> (thingFactory);
     if(!thingFactoryState)
     {
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,
@@ -389,8 +388,7 @@ void GenerateThing (iObjectRegistry* object_reg,
       return;
     }
     //Now we have loaded the thing, let's do the mesh
-    csRef<iMeshObject> thingObj (
-    	SCF_QUERY_INTERFACE(thingFactory,iMeshObject));
+    csRef<iMeshObject> thingObj (thingFactory->NewInstance());
     if(!thingObj)
     {
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't Get iMeshObj Interface!");

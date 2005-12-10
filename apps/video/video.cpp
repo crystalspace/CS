@@ -218,9 +218,9 @@ bool Video::Initialize (int argc, const char* const argv[],
 
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> wallmesh (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> ws =
-  	SCF_QUERY_INTERFACE (wallmesh->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> walls = ws->GetFactory ();
+  csRef<iThingFactoryState> walls = 
+    scfQueryInterface<iThingFactoryState> (
+    wallmesh->GetMeshObject ()->GetFactory());
 
   walls->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
   walls->SetPolygonMaterial (CS_POLYRANGE_LAST, iMW);

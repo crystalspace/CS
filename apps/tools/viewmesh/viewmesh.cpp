@@ -420,9 +420,8 @@ void ViewMesh::CreateRoom ()
   room = engine->CreateSector ("room");
 
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> ws =
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
+  csRef<iThingFactoryState> walls_state = 
+    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
   walls_state->AddInsideBox (csVector3 (-roomsize, -roomsize/2, -roomsize),
     csVector3 (roomsize, 3*roomsize/2, roomsize));
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);

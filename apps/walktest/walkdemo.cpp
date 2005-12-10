@@ -698,10 +698,9 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
     	iMaterialWrapper* tm, int& portalPoly)
 {
   csRef<iMeshWrapper> thing = CreateMeshWrapper (name);
-  csRef<iThingState> thing_state =
-  	SCF_QUERY_INTERFACE (thing->GetMeshObject (),
-  	iThingState);
-  csRef<iThingFactoryState> thing_fact_state = thing_state->GetFactory ();
+  csRef<iThingFactoryState> thing_fact_state = 
+    scfQueryInterface<iThingFactoryState> (
+    thing->GetMeshObject ()->GetFactory());
   thing->GetMovable ()->SetSector (room);
   float dx = 1, dy = 3, dz = 0.3f;
   float border = 0.3f; // width of border around the portal
@@ -877,10 +876,9 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
   int portalPoly;
   csRef<iMeshWrapper> thing = CreatePortalThing ("portalTo", room, tm,
   	portalPoly);
-  csRef<iThingState> thing_state = SCF_QUERY_INTERFACE (
-  	thing->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> thing_fact_state = thing_state->GetFactory ();
-csPrintf ("b\n"); fflush (stdout);
+  csRef<iThingFactoryState> thing_fact_state = 
+    scfQueryInterface<iThingFactoryState> (
+    thing->GetMeshObject ()->GetFactory());
 
   bool regionExists = (Sys->Engine->GetRegions ()->FindByName (lev) != 0);
   iRegion* cur_region = Sys->Engine->CreateRegion (lev);
@@ -933,9 +931,9 @@ csPrintf ("b\n"); fflush (stdout);
       int portalPolyBack;
       csRef<iMeshWrapper> thingBack = CreatePortalThing ("portalFrom",
 	  	start_sector, tm, portalPolyBack);
-      thing_state = SCF_QUERY_INTERFACE (thingBack->GetMeshObject (),
-      	iThingState);
-      thing_fact_state = thing_state->GetFactory ();
+      csRef<iThingFactoryState> thing_fact_state = 
+	scfQueryInterface<iThingFactoryState> (
+	thingBack->GetMeshObject ()->GetFactory());
       iMovable* tbmov = thingBack->GetMovable ();
       tbmov->SetPosition (topos + csVector3 (0, Sys->cfg_legs_offset, -0.1f));
       tbmov->Transform (csYRotMatrix3 (PI));//view->GetCamera ()->GetW2C ());

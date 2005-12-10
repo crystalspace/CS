@@ -191,9 +191,8 @@ iSector* CsBench::CreateRoom (const char* name, const char* meshname,
 {
   iSector* room2 = engine->CreateSector (name);
   csRef<iMeshWrapper> walls = engine->CreateSectorWallsMesh (room2, meshname);
-  csRef<iThingState> ws =
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
+  csRef<iThingFactoryState> walls_state = 
+    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
   walls_state->AddInsideBox (p1, p2);
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, material);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);

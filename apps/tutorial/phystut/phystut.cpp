@@ -380,9 +380,8 @@ bool Simple::Initialize ()
 
   room = engine->CreateSector ("room");
   walls = engine->CreateSectorWallsMesh (room, "walls");
-  csRef<iThingState> ws =
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
+  csRef<iThingFactoryState> walls_state = 
+    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
   walls_state->AddInsideBox (csVector3 (-5, -5, -5), csVector3 (5, 5, 5));
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
@@ -637,9 +636,8 @@ iRigidBody* Simple::CreateWalls (const csVector3& /*radius*/)
   rb->SetPosition (csVector3 (0));
   rb->MakeStatic ();
 
-  csRef<iThingState> ws =
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
+  csRef<iThingFactoryState> walls_state = 
+    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
 
   csOrthoTransform t;
 #if 0

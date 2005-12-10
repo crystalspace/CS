@@ -342,9 +342,8 @@ bool Simple::Initialize ()
   ProcTexture->DecRef ();
   room = engine->CreateSector ("proctex-room");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> ws =
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
+  csRef<iThingFactoryState> walls_state = 
+    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
 
   walls_state->CreateVertex (csVector3 (-8, -8, -5));
   walls_state->CreateVertex (csVector3 (-3, -3, +8));
