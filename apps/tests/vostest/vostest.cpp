@@ -138,21 +138,21 @@ void Vostest::FinishFrame ()
 
 bool Vostest::HandleEvent (iEvent& ev)
 {
-  if (ev.Name == csevProcess)
+  if (ev.Name == Process)
   {
     vostest->SetupFrame ();
     return true;
   }
-  else if (ev.Name == csevFinalProcess)
+  else if (ev.Name == FinalProcess)
   {
     vostest->FinishFrame ();
     return true;
   }
-  else if ((ev.Name == csevKeyboardDown) &&
+  else if ((ev.Name == KeyboardDown) &&
            (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-    if (q) q->GetEventOutlet()->Broadcast (csevQuit);
+    if (q) q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     return true;
   }
 
@@ -188,7 +188,7 @@ bool Vostest::Initialize ()
     return false;
   }
 
-  csEventNameRegistry::Register (object_reg);
+  //csEventNameRegistry::Register (object_reg);
   if (!csInitializer::SetupEventHandler (object_reg, VostestEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -196,6 +196,9 @@ bool Vostest::Initialize ()
     "Can't initialize event handler!");
     return false;
   }
+  CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
+
+  KeyboardDown = csevKeyboardDown (object_reg);
 
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))

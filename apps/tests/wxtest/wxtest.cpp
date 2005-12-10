@@ -170,39 +170,39 @@ void Simple::FinishFrame ()
 
 bool Simple::HandleEvent (iEvent& ev)
 {
-  if (ev.Name == csevProcess)
+  if (ev.Name == Process)
   {
     SetupFrame ();
     return true;
   }
-  else if (ev.Name == csevFinalProcess)
+  else if (ev.Name == FinalProcess)
   {
     FinishFrame ();
     return true;
   }
-  else if (CS_IS_KEYBOARD_EVENT(ev))
+  else if (CS_IS_KEYBOARD_EVENT(object_reg, ev))
   {
     csPrintf("Got key %" PRIu32 " / %" PRIu32 "\n",
            csKeyEventHelper::GetCookedCode(&ev),
            csKeyEventHelper::GetCookedCode(&ev));
-    if((ev.Name == csevKeyboardDown) &&
+    if((ev.Name == KeyboardDown) &&
        (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
     {
       csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
-      if (q) q->GetEventOutlet()->Broadcast (csevQuit);
+      if (q) q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
       return true;
     }
   }
-  else if ((ev.Name == csevMouseMove))
+  else if ((ev.Name == MouseMove))
   {
     csPrintf("Mouse move to %d %d\n", csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetY(&ev));
   }
-  else if ((ev.Name == csevMouseDown))
+  else if ((ev.Name == MouseDown))
   {
     csPrintf("Mouse button %d down at %d %d\n",
       csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetY(&ev));
   }
-  else if ((ev.Name == csevMouseUp))
+  else if ((ev.Name == MouseUp))
   {
     csPrintf("Mouse button %d up at %d %d\n",
       csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetY(&ev));
@@ -239,7 +239,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  csEventNameRegistry::Register (object_reg);
+  //csEventNameRegistry::Register (object_reg);
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -247,6 +247,12 @@ bool Simple::Initialize ()
               "Can't initialize event handler!");
     return false;
   }
+  CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
+
+  KeyboardDown = csevKeyboardDown (object_reg);
+  MouseMove = csevMouseMove (object_reg, 0);
+  MouseUp = csevMouseUp (object_reg, 0);
+  MouseDown = csevMouseDown (object_reg, 0);
 
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
@@ -341,9 +347,10 @@ bool Simple::Initialize ()
 
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> ws =
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
+  csRef<iMeshObject> walls_object = walls->GetMeshObject ();
+  csRef<iMeshObjectFactory> walls_factory = walls_object->GetFactory();
+  csRef<iThingFactoryState> walls_state =
+    scfQueryInterface<iThingFactoryState> (walls_factory);
   walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);

@@ -55,6 +55,9 @@ private:
   void CheckKeys ();
   void FinishFrame ();
 
+  CS_DECLARE_EVENT_SHORTCUTS;
+  csEventID KeyboardDown;
+
 public:
   Vostest (iObjectRegistry* object_reg);
   ~Vostest ();

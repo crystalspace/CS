@@ -54,6 +54,12 @@ private:
   void SetupFrame ();
   void FinishFrame ();
 
+  CS_DECLARE_EVENT_SHORTCUTS;
+  csEventID MouseDown;
+  csEventID MouseUp;
+  csEventID MouseMove;
+  csEventID KeyboardDown;
+
 public:
   Simple (iObjectRegistry* object_reg);
   ~Simple ();
