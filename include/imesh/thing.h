@@ -131,8 +131,6 @@ struct csPolygonRange
 #define CS_THING_MOVE_OCCASIONAL 2
 /** @} */
 
-SCF_VERSION (iPolygonHandle, 0, 0, 1);
-
 /**
  * This is an interface that can be used to represent a polygon in
  * situations where a SCF object is required. Create an instance of
@@ -150,8 +148,10 @@ SCF_VERSION (iPolygonHandle, 0, 0, 1);
  * - iThingFactoryState
  *   
  */
-struct iPolygonHandle : public iBase
+struct iPolygonHandle : public virtual iBase
 {
+  SCF_INTERFACE (iPolygonHandle, 1, 0, 0);
+
   /**
    * Get the factory state for this polygon. Or 0 if the factory is
    * removed.
@@ -193,7 +193,7 @@ struct iPolygonHandle : public iBase
  *   
  * Main ways to get pointers to this interface:
  * - scfQueryInterface() on iMeshFactoryWrapper::GetMeshObjectFactory()
- * - iThingState::GetFactory()
+ * - scfQueryInterface() on iMeshObject::GetFactory()
  *   
  * Main users of this interface:
  * - Thing Factory Loader plugin (crystalspace.mesh.loader.factory.thing)
@@ -665,8 +665,6 @@ struct iThingFactoryState : public virtual iBase
   virtual uint GetMixMode () const = 0;
 };
 
-SCF_VERSION (iThingState, 0, 7, 0);
-
 /**
  * This is the state interface to access the internals of a thing
  * mesh object.
@@ -682,10 +680,9 @@ SCF_VERSION (iThingState, 0, 7, 0);
  * - Thing Loader plugin (crystalspace.mesh.loader.thing)
  *   
  */
-struct iThingState : public iBase
+struct iThingState : public virtual iBase
 {
-  /// Get the factory.
-  virtual iThingFactoryState* GetFactory () = 0;
+  SCF_INTERFACE (iThingState, 1, 0, 0);
 
   /// Get the given vertex coordinates in world space
   virtual const csVector3 &GetVertexW (int idx) const = 0;
@@ -780,8 +777,6 @@ struct iThingState : public iBase
   virtual const csPlane3& GetPolygonWorldPlane (int polygon_idx) = 0;
 };
 
-SCF_VERSION (iThingEnvironment, 0, 3, 0);
-
 /**
  * This interface is implemented by the iObjectType for things.
  * Using this interface you can access some global information for things.
@@ -793,8 +788,10 @@ SCF_VERSION (iThingEnvironment, 0, 3, 0);
  * - scfQueryInterface on thing mesh plugin (iMeshObjectType).
  *   
  */
-struct iThingEnvironment : public iBase
+struct iThingEnvironment : public virtual iBase
 {
+  SCF_INTERFACE (iThingEnvironment, 1, 0, 0);
+
   /**
    * Reset the thing environment (clear all stuff related to things).
    */

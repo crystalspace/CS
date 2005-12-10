@@ -58,6 +58,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+namespace cspluginThingLdr
+{
+
 enum
 {
   XMLTOKEN_CLONE = 1,
@@ -99,51 +102,27 @@ enum
   XMLTOKEN_RENDERBUFFER
 };
 
-SCF_IMPLEMENT_IBASE (csThingLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThingLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csThingSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThingSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csThingLoader)
 SCF_IMPLEMENT_FACTORY (csThingFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csThingSaver)
 SCF_IMPLEMENT_FACTORY (csThingFactorySaver)
 
-
-#define MAXLINE 200 /* max number of chars per line... */
-
 //---------------------------------------------------------------------------
 
-csThingLoader::csThingLoader (iBase* pParent)
+csThingLoader::csThingLoader (iBase* pParent) : 
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csThingLoader::~csThingLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csThingLoader::Initialize (iObjectRegistry* object_reg)
 {
   csThingLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("clone", XMLTOKEN_CLONE);
   xmltokens.Register ("cosfact", XMLTOKEN_COSFACT);
@@ -448,18 +427,18 @@ bool csThingLoader::ParsePoly3d (
   if (!thing_type)
   {
     csRef<iPluginManager> plugin_mgr =
-    	CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    	csQueryRegistry<iPluginManager> (object_reg);
     CS_ASSERT (plugin_mgr != 0);
-    thing_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	  "crystalspace.mesh.object.thing", iMeshObjectType);
+    thing_type = csQueryPluginClass<iMeshObjectType> (plugin_mgr,
+  	  "crystalspace.mesh.object.thing" );
     if (!thing_type)
-      thing_type = CS_LOAD_PLUGIN (plugin_mgr,
-    	  "crystalspace.mesh.object.thing", iMeshObjectType);
+      thing_type = csLoadPlugin<iMeshObjectType> (plugin_mgr,
+    	  "crystalspace.mesh.object.thing");
   }
 
   CS_ASSERT (thing_type != 0);
-  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (
-  	thing_type, iThingEnvironment);
+  csRef<iThingEnvironment> te = scfQueryInterface<iThingEnvironment> (
+  	thing_type);
 
   uint texspec = 0;
   int tx_uv_i1 = 0;
@@ -628,8 +607,8 @@ bool csThingLoader::ParsePoly3d (
   	(int)vertices_to_add.Length (), vertices_to_add.GetArray ());
 
   mat = thing_fact_state->GetPolygonMaterial (CS_POLYINDEX_LAST);
-  csRef<iMaterialEngine> mateng = SCF_QUERY_INTERFACE (mat->GetMaterial (),
-  	iMaterialEngine);
+  csRef<iMaterialEngine> mateng = scfQueryInterface<iMaterialEngine> (
+    mat->GetMaterial ());
   bool is_texture_transparent = false;
   if (mateng)
   {
@@ -975,11 +954,9 @@ if (!info.thing_fact_state) \
 { \
   csRef<iMeshObjectFactory> fact; \
   fact = info.type->NewFactory (); \
-  info.thing_fact_state = SCF_QUERY_INTERFACE (fact, \
-	iThingFactoryState); \
+  info.thing_fact_state = scfQueryInterface<iThingFactoryState> (fact); \
   info.obj = fact->NewInstance (); \
-  info.thing_state = SCF_QUERY_INTERFACE (info.obj, \
-	iThingState); \
+  info.thing_state = scfQueryInterface<iThingState> (info.obj); \
 }
 
   uint mixmode = CS_FX_COPY;
@@ -1043,8 +1020,8 @@ if (!info.thing_fact_state) \
               child, "Couldn't find thing factory '%s'!", factname);
             return false;
           }
-	  info.thing_fact_state = SCF_QUERY_INTERFACE (
-	  	fact->GetMeshObjectFactory (), iThingFactoryState);
+	  info.thing_fact_state = scfQueryInterface<iThingFactoryState> (
+	  	fact->GetMeshObjectFactory ());
 	  if (!info.thing_fact_state)
 	  {
 	    synldr->ReportError (
@@ -1053,7 +1030,7 @@ if (!info.thing_fact_state) \
             return false;
 	  }
 	  info.obj = fact->GetMeshObjectFactory ()->NewInstance ();
-	  info.thing_state = SCF_QUERY_INTERFACE (info.obj, iThingState);
+	  info.thing_state = scfQueryInterface<iThingState> (info.obj);
         }
         break;
       case XMLTOKEN_CLONE:
@@ -1085,8 +1062,8 @@ if (!info.thing_fact_state) \
             return false;
           }
 
-	  csRef<iThingState> other_thing_state (SCF_QUERY_INTERFACE (
-	  	wrap->GetMeshObject (), iThingState));
+	  csRef<iThingState> other_thing_state (scfQueryInterface<iThingState> (
+	  	wrap->GetMeshObject ()));
 	  if (!other_thing_state)
 	  {
 	    synldr->ReportError (
@@ -1094,10 +1071,11 @@ if (!info.thing_fact_state) \
               child, "Object '%s' is not a thing!", meshname);
             return false;
 	  }
-	  info.thing_fact_state = other_thing_state->GetFactory ();
+	  info.thing_fact_state = scfQueryInterface<iThingFactoryState>
+	    (wrap->GetMeshObject ()->GetFactory());
 	  info.obj = wrap->GetFactory ()->GetMeshObjectFactory ()
 	  	->NewInstance ();
-	  info.thing_state = SCF_QUERY_INTERFACE (info.obj, iThingState);
+	  info.thing_state = scfQueryInterface<iThingState> (info.obj);
         }
         break;
       case XMLTOKEN_PART:
@@ -1232,14 +1210,14 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
   info.load_factory = false;
   info.global_factory = false;
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager);
-  info.type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr = 
+    csQueryRegistry<iPluginManager> (object_reg);
+  info.type = csQueryPluginClass<iMeshObjectType> (plugin_mgr,
+  	"crystalspace.mesh.object.thing");
   if (!info.type)
   {
-    info.type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.thing",
-    	iMeshObjectType);
+    info.type = csLoadPlugin<iMeshObjectType> (plugin_mgr, 
+      "crystalspace.mesh.object.thing");
   }
   if (!info.type)
   {
@@ -1248,12 +1226,12 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 		node, "Could not load the thing mesh object plugin!");
     return 0;
   }
-  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (info.type,
-  	iThingEnvironment);
-  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iThingEnvironment> te = 
+    scfQueryInterface<iThingEnvironment> (info.type);
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
 
   // It is possible that the mesh wrapper is null.
-  csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE_SAFE (context, iMeshWrapper);
+  csRef<iMeshWrapper> mesh = scfQueryInterfaceSafe<iMeshWrapper> (context);
 
   bool baduv = false;
   if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
@@ -1312,14 +1290,14 @@ csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
   info.load_factory = true;
   info.global_factory = false;
 
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  info.type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (
+    csQueryRegistry<iPluginManager> (object_reg));
+  info.type = csQueryPluginClass<iMeshObjectType> (plugin_mgr,
+  	"crystalspace.mesh.object.thing");
   if (!info.type)
   {
-    info.type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.thing",
-    	iMeshObjectType);
+    info.type = csLoadPlugin<iMeshObjectType> (plugin_mgr, 
+      "crystalspace.mesh.object.thing");
   }
   if (!info.type)
   {
@@ -1328,13 +1306,13 @@ csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
 		node, "Could not load the thing mesh object plugin!");
     return 0;
   }
-  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (info.type,
-  	iThingEnvironment);
-  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iThingEnvironment> te = 
+    scfQueryInterface<iThingEnvironment> (info.type);
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
 
   csRef<iMeshObjectFactory> fact;
   fact = info.type->NewFactory ();
-  info.thing_fact_state = SCF_QUERY_INTERFACE (fact, iThingFactoryState);
+  info.thing_fact_state = scfQueryInterface<iThingFactoryState> (fact);
 
   bool baduv = false;
   if (!LoadThingPart (te, node, ldr_context, object_reg, reporter, synldr, info,
@@ -1355,23 +1333,20 @@ csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csThingSaver::csThingSaver (iBase* pParent)
+csThingSaver::csThingSaver (iBase* pParent) : 
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csThingSaver::~csThingSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csThingSaver::Initialize (iObjectRegistry* object_reg)
 {
   csThingSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 //TBD
@@ -1384,8 +1359,8 @@ bool csThingSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   paramsNode->SetValue("params");
   if (obj)
   {
-    csRef<iThingState> thing = SCF_QUERY_INTERFACE (obj, iThingState);
-    csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+    csRef<iThingState> thing = scfQueryInterface<iThingState> (obj);
+    csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (obj);
     if (!thing) return false;
     if (!mesh) return false;
 
@@ -1403,7 +1378,9 @@ bool csThingSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }
     else
     {
-      WriteFactory(thing->GetFactory(), paramsNode);
+      csRef<iThingFactoryState> fact = scfQueryInterface<iThingFactoryState>
+        (mesh->GetFactory());
+      WriteFactory (fact, paramsNode);
     }
     //Writedown Mixmode tag
     int mixmode = thing->GetMixMode();
@@ -1423,7 +1400,8 @@ bool csThingSaver::WriteFactory (iBase* obj, iDocumentNode* parent)
 
   if (obj)
   {
-    csRef<iThingFactoryState> thingfact = SCF_QUERY_INTERFACE (obj, iThingFactoryState);
+    csRef<iThingFactoryState> thingfact = 
+      scfQueryInterface<iThingFactoryState> (obj);
     if (!thingfact) return false;
 
     for (int vertidx = 0; vertidx < thingfact->GetVertexCount(); vertidx++)
@@ -1497,4 +1475,6 @@ bool csThingSaver::WriteFactory (iBase* obj, iDocumentNode* parent)
   }
   return true;
 }
+
+} // namespace cspluginThingLdr
 

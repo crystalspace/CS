@@ -666,12 +666,12 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   const char* poly_name = 0;
   if (polyidx != -1)
   {
-    csRef<iThingState> ts = SCF_QUERY_INTERFACE (sel->GetMeshObject (),
-    	iThingState);
-    if (ts)
+    csRef<iThingFactoryState> tfs = scfQueryInterface<iThingFactoryState> 
+      (sel->GetMeshObject ()->GetFactory());
+    if (tfs)
     {
-      poly_name = ts->GetFactory ()->GetPolygonName (polyidx);
-      Dump (ts->GetFactory (), polyidx);
+      poly_name = tfs->GetPolygonName (polyidx);
+      Dump (tfs, polyidx);
     }
   }
   else

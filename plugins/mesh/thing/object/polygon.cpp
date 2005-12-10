@@ -47,6 +47,9 @@
 #include "lppool.h"
 #include "thing.h"
 
+namespace cspluginThing
+{
+
 // This is a static vector array which is adapted to the
 // right size everytime it is used. In the beginning it means
 // that this array will grow a lot but finally it will
@@ -1498,3 +1501,5 @@ bool csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   else
     return false;
 }
+
+} // namespace cspluginThing

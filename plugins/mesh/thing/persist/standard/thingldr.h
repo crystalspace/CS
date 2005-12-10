@@ -36,6 +36,9 @@ struct iThingFactoryState;
 struct iMeshObject;
 struct iMeshObjectType;
 
+namespace cspluginThingLdr
+{
+
 struct RepMaterial
 {
   char* oldmat;
@@ -66,7 +69,10 @@ public:
 /**
  * Thing loader.
  */
-class csThingLoader : public iLoaderPlugin
+class csThingLoader : 
+  public scfImplementation2<csThingLoader, 
+			    iLoaderPlugin,
+			    iComponent>
 {
 public:
   iObjectRegistry* object_reg;
@@ -129,8 +135,6 @@ public:
 	iMeshWrapper* mesh, bool& baduv);
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csThingLoader (iBase*);
   /// Destructor.
@@ -141,14 +145,6 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csThingLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
@@ -170,7 +166,10 @@ public:
 /**
  * Thing saver.
  */
-class csThingSaver : public iSaverPlugin
+class csThingSaver : 
+  public scfImplementation2<csThingSaver,
+			    iSaverPlugin,
+			    iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -178,8 +177,6 @@ private:
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csThingSaver (iBase*);
   /// Destructor.
@@ -191,14 +188,6 @@ public:
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
   virtual bool WriteFactory (iBase *obj, iDocumentNode* parent);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csThingSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-  friend struct eiComponent;
 };
 
 /**
@@ -222,5 +211,7 @@ public:
     return WriteFactory (obj, paramsNode);
   };
 };
+
+} // namespace cspluginThingLdr
 
 #endif // __CS_THINGLDR_H__

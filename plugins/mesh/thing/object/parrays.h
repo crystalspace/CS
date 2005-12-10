@@ -24,6 +24,9 @@
 #include "csutil/array.h"
 #include "polygon.h"
 
+namespace cspluginThing
+{
+
 class csThingObjectType;
 
 /**
@@ -94,5 +97,6 @@ public:
   }
 };
 
-#endif // __CS_PARRAYS_H__
+} // namespace cspluginThing
 
+#endif // __CS_PARRAYS_H__

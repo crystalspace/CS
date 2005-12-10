@@ -452,15 +452,15 @@ struct iLightList : public virtual iBase
   virtual iLight *FindByID (const char* id) const = 0;
 };
 
-SCF_VERSION (iLightingProcessData, 0, 0, 1);
-
 /**
  * The iLightingProcessData interface can be implemented by a mesh
  * object so that it can attach additional information for the lighting
  * process.
  */
-struct iLightingProcessData : public iBase
+struct iLightingProcessData : public virtual iBase
 {
+  SCF_INTERFACE (iLightingProcessData, 1, 0, 0);
+
   /**
    * Finalize lighting. This function is called by the lighting
    * routines after performing CheckFrustum().

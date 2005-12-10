@@ -51,16 +51,12 @@
 #include "iutil/pluginconfig.h"
 #include "ivideo/shader/shader.h"
 #include "ivideo/txtmgr.h"
+
 #include "lghtmap.h"
 #include "parrays.h"
 #include "polygon.h"
 #include "polyrender.h"
 
-class csThing;
-class csThingStatic;
-class csThingObjectType;
-class csLightPatchPool;
-class csPolyTexLightMap;
 struct iShadowBlockList;
 struct csVisObjInfo;
 struct iGraphics3D;
@@ -69,6 +65,15 @@ struct iMovable;
 struct iFrustumView;
 struct iMaterialWrapper;
 struct iPolygonBuffer;
+
+namespace cspluginThing
+{
+
+class csThing;
+class csThingStatic;
+class csThingObjectType;
+class csLightPatchPool;
+class csPolyTexLightMap;
 
 /**
  * A structure used to replace materials.
@@ -84,24 +89,22 @@ struct RepMaterial
 /**
  * A helper class for iPolygonMesh implementations used by csThing.
  */
-class PolyMeshHelper : public iPolygonMesh
+class PolyMeshHelper : 
+  public scfImplementation1<PolyMeshHelper, 
+			    iPolygonMesh>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   /**
    * Make a polygon mesh helper which will accept polygons which match
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
-  PolyMeshHelper (uint32 flag) :
-  	polygons (0), vertices (0), poly_flag (flag), triangles (0),
-	locked (0)
+  PolyMeshHelper (uint32 flag) : scfImplementationType (this), 
+    polygons (0), vertices (0), poly_flag (flag), triangles (0),
+locked (0)
   {
-    SCF_CONSTRUCT_IBASE (0);
   }
   virtual ~PolyMeshHelper ()
   {
-    SCF_DESTRUCT_IBASE ();
     Cleanup ();
   }
 
@@ -170,8 +173,11 @@ private:
 /**
  * The static data for a thing.
  */
-class csThingStatic : public iThingFactoryState, public iMeshObjectFactory,
-	public csObjectModel
+class csThingStatic : 
+  public scfImplementationExt2<csThingStatic, 
+			       csObjectModel,
+			       iThingFactoryState, 
+			       iMeshObjectFactory>
 {
 public:
   CS_LEAKGUARD_DECLARE (csThingStatic);
@@ -315,6 +321,16 @@ public:
 
   static csStringID texLightmapName;
 
+  class LightmapTexAccessor : 
+    public scfImplementation1<LightmapTexAccessor,
+			      iShaderVariableAccessor>
+  {
+    csThing* instance;
+    csRef<iTextureHandle> texh;
+  public:
+    LightmapTexAccessor (csThing* instance, size_t polyIndex);
+    void PreGetValue (csShaderVariable *variable);
+  };
 public:
   csThingStatic (iBase* parent, csThingObjectType* thing_type);
   virtual ~csThingStatic ();
@@ -447,8 +463,6 @@ public:
     csVector3 &isect,
     float *pr);
 
-  SCF_DECLARE_IBASE;
-
   virtual int GetPolygonCount () { return (int)static_polygons.Length (); }
   virtual void RemovePolygon (int idx);
   virtual void RemovePolygons ();
@@ -579,8 +593,13 @@ public:
  * walls of a sector. In another kind the polygons are
  * oriented such that they are visible from the outside.
  */
-class csThing : public iMeshObject, public iShadowReceiver,
-	public iLightingInfo, public iShadowCaster
+class csThing : 
+  public scfImplementation5<csThing,
+			    iMeshObject, 
+			    iThingState,
+			    iShadowReceiver,
+			    iLightingInfo, 
+			    iShadowCaster>
 {
   friend class PolyMeshHelper;
   friend class csPolygon3D;
@@ -711,8 +730,6 @@ private:
   void PreparePolygons ();
   void PrepareLMs ();
   void ClearLMs ();
-  void UpdateDirtyLMs ();
-
 private:
   /**
    * Prepare the polygon buffer for use by DrawPolygonMesh.
@@ -823,7 +840,7 @@ public:
    * to worry about this function when you add sectors or things
    * later.
    */
-  void Prepare ();
+  void PrepareSomethingOrOther ();
 
   /** Reset the prepare flag so that this Thing can be re-prepared.
    * Among other things this will allow cached lightmaps to be
@@ -882,6 +899,17 @@ public:
 
   /// Marks the whole object as it is affected by any light.
   void MarkLightmapsDirty ();
+
+  /**
+   * Get LM texture for a polygon.
+   * Note: \a index is into litPolys.
+   */
+  iTextureHandle* GetPolygonTexture (size_t index)
+  {
+    return index < litPolys.Length() ? litPolys[index]->SLM->GetTexture() : 0;
+  }
+  /// Ensure lightmap textures are up-to-date
+  void UpdateDirtyLMs ();
 
   //----------------------------------------------------------------------
   // Utility functions
@@ -952,64 +980,17 @@ public:
   csPtr<iPolygonHandle> CreatePolygonHandle (int polygon_idx);
   const csPlane3& GetPolygonWorldPlane (int polygon_idx);
 
-  SCF_DECLARE_IBASE;
+  /**\name iThingState interface
+   * @{ */
+  virtual const csVector3 &GetVertexW (int i) const
+  { return wor_verts[i]; }
+  virtual const csVector3* GetVerticesW () const
+  { return wor_verts; }
 
-  //------------------------- iThingState interface -------------------------
-  struct ThingState : public iThingState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    virtual iThingFactoryState* GetFactory ()
-    {
-      return (iThingFactoryState*)(scfParent->static_data);
-    }
-
-    virtual const csVector3 &GetVertexW (int i) const
-    { return scfParent->wor_verts[i]; }
-    virtual const csVector3* GetVerticesW () const
-    { return scfParent->wor_verts; }
-
-    virtual int GetMovingOption () const
-    { return scfParent->GetMovingOption (); }
-    virtual void SetMovingOption (int opt)
-    { scfParent->SetMovingOption (opt); }
-
-    /// Prepare.
-    virtual void Prepare ()
-    { scfParent->PrepareForUse (); }
-
-    /// Unprepare.
-    virtual void Unprepare ()
-    {
-      scfParent->Unprepare ();
-    }
-
-    virtual void ReplaceMaterial (iMaterialWrapper* oldmat,
-  	iMaterialWrapper* newmat)
-    {
-      scfParent->ReplaceMaterial (oldmat, newmat);
-    }
-    virtual void ClearReplacedMaterials ()
-    {
-      scfParent->ClearReplacedMaterials ();
-    }
-    virtual void SetMixMode (uint mode)
-    {
-      scfParent->SetMixMode (mode);
-    }
-    virtual uint GetMixMode () const
-    {
-      return scfParent->GetMixMode ();
-    }
-    virtual csPtr<iPolygonHandle> CreatePolygonHandle (int polygon_idx)
-    {
-      return scfParent->CreatePolygonHandle (polygon_idx);
-    }
-    virtual const csPlane3& GetPolygonWorldPlane (int polygon_idx)
-    {
-      return scfParent->GetPolygonWorldPlane (polygon_idx);
-    }
-  } scfiThingState;
-  friend struct ThingState;
+  /// Prepare.
+  virtual void Prepare ()
+  { PrepareForUse (); }
+  /** @} */
 
   //-------------------- iMeshObject interface implementation ----------
   virtual csRenderMesh **GetRenderMeshes (int &num, iRenderView* rview, 
@@ -1055,7 +1036,13 @@ struct intar60 { int ar[60]; };
  * Thing type. This is the plugin you have to use to create instances
  * of csThing.
  */
-class csThingObjectType : public iMeshObjectType
+class csThingObjectType : 
+  public scfImplementation5<csThingObjectType,
+			    iMeshObjectType,
+			    iThingEnvironment,
+			    iComponent,
+			    iPluginConfig,
+			    iDebugHelper>
 {
 public:
   iObjectRegistry* object_reg;
@@ -1090,8 +1077,6 @@ public:
   int maxLightmapW, maxLightmapH;
   float maxSLMSpaceWaste;
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csThingObjectType (iBase*);
 
@@ -1110,67 +1095,47 @@ public:
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  /// Execute a debug command.
+  /**\name iThingEnvironment implementation.
+   * @{ */
+  virtual int GetLightmapCellSize () const
+  {
+    return csLightMap::lightcell_size;
+  }
+  virtual void SetLightmapCellSize (int size)
+  {
+    csLightMap::SetLightCellSize (size);
+  }
+  virtual int GetDefaultLightmapCellSize () const
+  {
+    return csLightMap::default_lightmap_cell_size;
+  }
+  /** @} */
+
+  /**\name iConfig implementation.
+   * @{ */
+  virtual bool GetOptionDescription (int idx, csOptionDescription *option);
+  virtual bool SetOption (int id, csVariant* value);
+  virtual bool GetOption (int id, csVariant* value);
+  /** @} */
+
+  /**\name iDebugHelper implementation
+   * @{ */
+  virtual int GetSupportedTests () const
+  { return 0; }
+  virtual csPtr<iString> UnitTest ()
+  { return 0; }
+  virtual csPtr<iString> StateTest ()
+  { return 0; }
+  virtual csTicks Benchmark (int /*num_iterations*/)
+  { return 0; }
+  virtual csPtr<iString> Dump ()
+  { return 0; }
+  virtual void Dump (iGraphics3D* /*g3d*/)
+  { }
   virtual bool DebugCommand (const char* cmd);
-
-  /// iThingEnvironment implementation.
-  struct eiThingEnvironment : public iThingEnvironment
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
-    virtual void Clear ()
-    {
-      scfParent->Clear ();
-    }
-    virtual int GetLightmapCellSize () const
-    {
-      return csLightMap::lightcell_size;
-    }
-    virtual void SetLightmapCellSize (int size)
-    {
-      csLightMap::SetLightCellSize (size);
-    }
-    virtual int GetDefaultLightmapCellSize () const
-    {
-      return csLightMap::default_lightmap_cell_size;
-    }
-  } scfiThingEnvironment;
-
-  /// iComponent implementation.
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
-
-  /// iConfig implementation.
-  struct eiPluginConfig : public iPluginConfig
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
-    virtual bool GetOptionDescription (int idx, csOptionDescription *option);
-    virtual bool SetOption (int id, csVariant* value);
-    virtual bool GetOption (int id, csVariant* value);
-  } scfiPluginConfig;
-
-  /// iDebugHelper implementation
-  struct eiDebugHelper : public iDebugHelper
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
-    virtual int GetSupportedTests () const
-    { return 0; }
-    virtual csPtr<iString> UnitTest ()
-    { return 0; }
-    virtual csPtr<iString> StateTest ()
-    { return 0; }
-    virtual csTicks Benchmark (int /*num_iterations*/)
-    { return 0; }
-    virtual csPtr<iString> Dump ()
-    { return 0; }
-    virtual void Dump (iGraphics3D* /*g3d*/)
-    { }
-    virtual bool DebugCommand (const char* cmd)
-    { return scfParent->DebugCommand (cmd); }
-  } scfiDebugHelper;
+  /** @} */
 };
+
+} // namespace cspluginThing
 
 #endif // __CS_THING_H__

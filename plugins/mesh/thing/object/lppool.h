@@ -21,9 +21,13 @@
 
 #include "csutil/blockallocator.h"
 
+struct iLight;
+
+namespace cspluginThing
+{
+
 class csLightPatchPool;
 class csPolygon3D;
-struct iLight;
 
 /**
  * A light patch. This is a 3D polygon which fits on a world level 3D
@@ -154,5 +158,7 @@ public:
     csBlockAllocator<csLightPatch>::Free (o);
   }
 };
+
+} // namespace cspluginThing
 
 #endif // __CS_LPPOOL_H__

@@ -884,17 +884,17 @@ system to create such textures. For example:
  
 @example
 csRef<iPluginManager> plugin_mgr(
-  CS_QUERY_REGISTRY(object_reg, iPluginManager));
-csRef<iTextureType> type(CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  "crystalspace.texture.type.fire", iTextureType));
+  csQueryInterface<iPluginManager> (object_reg));
+csRef<iTextureType> type (csQueryPluginClass<iTextureType> (plugin_mgr,
+  "crystalspace.texture.type.fire"));
 if (!type)
 @{
-  type = CS_LOAD_PLUGIN(plugin_mgr,
-    "crystalspace.texture.type.fire", iTextureType);
+  type = csLoadPlugin<iTextureType> (plugin_mgr,
+    "crystalspace.texture.type.fire");
 @}
 csRef<iTextureFactory> fireFact = type->NewFactory();
 csRef<iTextureWrapper> tex = fireFact->Generate();
-csRef<iFireTexture> fire = SCF_QUERY_INTERFACE(tex, iFireTexture);
+csRef<iFireTexture> fire = scfQueryInterface<iFireTexture> (tex);
 @end example
  
 Various procedural textures may or may not implement their own custom @sc{scf}
@@ -1484,6 +1484,22 @@ removed or have become private, and are no longer available to client code:
 @item
 @code{G3DTriangleMesh}
 @end itemize
+
+Some methods from @samp{iSprite3DState} have been removed that basically 
+provided functionality which us also already available through 
+@samp{iMeshObject}:
+
+@itemize @bullet
+@item
+@code{SetBaseColor()}. Use @code{SetColor()} from @samp{iMeshObject}.
+@item
+@code{GetBaseColor()}. Use @code{GetColor()} from @samp{iMeshObject}.
+@end itemize
+
+Likewise, the @code{GetFactory()} method has been removed from 
+@samp{iThingState}. Equivalent functionality can be achieved by using
+@code{GetFactory()} from @samp{iMeshObject} and querying the returned object
+for the @samp{iThingFactoryState} interface.
 
 @subheading Query Macros
 
@@ -2088,7 +2104,7 @@ Meshes and lights can now properly be used as hierarchical objects with the
 same API. Here is how it works: meshes and lights implement the new
 @code{iSceneNode} interface. You can do @code{QuerySceneNode()} to get the
 scene object from the mesh, light, or camera without having to do
-@code{SCF_QUERY_INTERFACE}. To make some object a child of another you simply
+@code{scfQueryInterface<>}. To make some object a child of another you simply
 do:
 
 @example

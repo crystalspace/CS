@@ -31,6 +31,9 @@
 #include "polyrender.h"
 #include "thing.h"
 
+namespace cspluginThing
+{
+
 CS_LEAKGUARD_IMPLEMENT (csPolygonRenderer);
 
 csPolygonRenderer::csPolygonRenderer (csThingObjectType* parent) : csRefCount(),
@@ -543,10 +546,6 @@ bool csPolygonRenderer::UpdateTangents ()
 
 CS_LEAKGUARD_IMPLEMENT (csPolygonRenderer::BufferAccessor);
 
-SCF_IMPLEMENT_IBASE(csPolygonRenderer::BufferAccessor)
-  SCF_IMPLEMENTS_INTERFACE(iRenderBufferAccessor)
-SCF_IMPLEMENT_IBASE_END
-
 void csPolygonRenderer::BufferAccessor::PreGetBuffer (
   csRenderBufferHolder* holder, csRenderBufferName buffer)
 {
@@ -554,8 +553,16 @@ void csPolygonRenderer::BufferAccessor::PreGetBuffer (
 
   if (buffer == CS_BUFFER_COLOR)
   {
-    if (colorVerticesNum != renderer->polysNum)
+    if ((colorVerticesNum != renderer->polysNum)
+      || (instance->GetLightVersion() != light_version))
     {
+      csColor amb (0, 0, 0);
+      if (instance->GetCachedMovable())
+      {
+	iSector* s = instance->GetCachedMovable()->GetSectors ()->Get (0);
+	amb = s->GetDynamicAmbientLight ();
+      }
+
       int num_verts = 0;
       size_t i;
 
@@ -579,14 +586,9 @@ void csPolygonRenderer::BufferAccessor::PreGetBuffer (
 	const csPolyTextureMapping& tmapping = *static_data->tmapping;
 	csLightMap* lm = instance->polygons[renderer->polyIndices[i]].
 	  GetPolyTexture()->GetLightMap();
-	csRGBpixel* staticMap = lm->GetStaticMap (); 
+	csLightingScratchBuffer finalLM;
+	lm->UpdateRealLightMap (amb.red, amb.green, amb.blue, true, finalLM);
 	  // @@@ FIXME: PD lights, ambient
-	if (!staticMap)
-	{
-	  memset (colors, 0, sizeof (csColor) * static_data->num_vertices);
-	  colors += static_data->num_vertices;
-	  continue;
-	}
 	int lmW = lm->GetWidth();
 	int lmH = lm->GetHeight();
 
@@ -634,13 +636,14 @@ void csPolygonRenderer::BufferAccessor::PreGetBuffer (
 	  CS_ASSERT((lmX >= 0) && (lmX < lmW));
 	  int lmY = (int)l.y;
 	  CS_ASSERT((lmY >= 0) && (lmY < lmH));
-	  csRGBpixel& lmp = staticMap[lmY * lmW + lmX];
+	  csRGBpixel& lmp = finalLM[lmY * lmW + lmX];
 	  colors->Set (
 	    lmp.red / 255.0f, lmp.green / 255.0f, lmp.blue / 255.0f);
 	  colors++;
 	}
       }
       colorVerticesNum = renderer->polysNum;
+      light_version = instance->GetLightVersion();
     }
 
     holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
@@ -648,3 +651,5 @@ void csPolygonRenderer::BufferAccessor::PreGetBuffer (
   else
     renderer->PreGetBuffer (holder, buffer);
 }
+
+} // namespace cspluginThing

@@ -75,6 +75,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+namespace cspluginThing
+{
+
 CS_LEAKGUARD_IMPLEMENT (csThingStatic);
 CS_LEAKGUARD_IMPLEMENT (csThing);
 
@@ -84,7 +87,9 @@ bool csThingObjectType::do_verbose = false;
 
 //---------------------------------------------------------------------------
 
-class csPolygonHandle : public iPolygonHandle
+class csPolygonHandle : 
+  public scfImplementation1<csPolygonHandle, 
+			    iPolygonHandle>
 {
 private:
   csWeakRef<iThingFactoryState> factstate;
@@ -97,9 +102,8 @@ public:
   csPolygonHandle (
         iThingFactoryState* factstate, iMeshObjectFactory* factory,
         iThingState* objstate, iMeshObject* obj,
-        int index)
+	int index) : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     csPolygonHandle::factstate = factstate;
     csPolygonHandle::factory = factory;
     csPolygonHandle::objstate = objstate;
@@ -108,10 +112,7 @@ public:
   }
   virtual ~csPolygonHandle ()
   {
-    SCF_DESTRUCT_IBASE ();
   }
-
-  SCF_DECLARE_IBASE;
 
   virtual iThingFactoryState* GetThingFactoryState () const
   {
@@ -135,45 +136,20 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE(csPolygonHandle)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonHandle)
-SCF_IMPLEMENT_IBASE_END
-
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csThing)
-  SCF_IMPLEMENTS_INTERFACE(iLightingInfo)
-  SCF_IMPLEMENTS_INTERFACE(iShadowReceiver)
-  SCF_IMPLEMENTS_INTERFACE(iMeshObject)
-  SCF_IMPLEMENTS_INTERFACE(iShadowCaster)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ThingState)
-  SCF_IMPLEMENTS_INTERFACE(iThingState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-
 int csThing:: last_thing_id = 0;
-
-//----------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE(csThingStatic)
-  SCF_IMPLEMENTS_INTERFACE(iThingFactoryState)
-  SCF_IMPLEMENTS_INTERFACE(iMeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE(iObjectModel)
-SCF_IMPLEMENT_IBASE_END
 
 csStringID csThingStatic::texLightmapName = csInvalidStringID;
 
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
-        last_range (0, -1),
-        static_polygons (32, 64),
-        scfiPolygonMesh (0),
-        scfiPolygonMeshCD (CS_POLY_COLLDET),
-        scfiPolygonMeshLOD (CS_POLY_VISCULL)
+  scfImplementationType (this, parent),
+  last_range (0, -1),
+  static_polygons (32, 64),
+  scfiPolygonMesh (0),
+  scfiPolygonMeshCD (CS_POLY_COLLDET),
+  scfiPolygonMeshLOD (CS_POLY_VISCULL)
 {
-  SCF_CONSTRUCT_IBASE (parent);
   csThingStatic::thing_type = thing_type;
   static_polygons.SetThingType (thing_type);
 
@@ -209,8 +185,6 @@ csThingStatic::~csThingStatic ()
   delete[] obj_normals;
 
   UnprepareLMLayout ();
-
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csThingStatic::InvalidateShape ()
@@ -1079,6 +1053,13 @@ void csThingStatic::FillRenderMeshes (csThing* instance,
     csRef<csShaderVariable> sv (
       csPtr<csShaderVariable> (new csShaderVariable (texLightmapName)));
     rm->variablecontext->AddVariable (sv);
+    
+    csRef<iShaderVariableAccessor> sva;
+    sva.AttachNew (new LightmapTexAccessor (instance, i));
+    sv->SetAccessor (sva);
+
+    /*rm->variablecontext->GetVariable (static_data->texLightmapName)->
+      SetValue (i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);*/
 
     polyRenderer->PrepareRenderMesh (*rm);
   
@@ -1540,19 +1521,30 @@ bool csThingStatic::PointOnPolygon (int polygon_idx, const csVector3& v)
 {
   return static_polygons[GetRealIndex (polygon_idx)]->PointOnPolygon (v);
 }
+//----------------------------------------------------------------------------
+
+csThingStatic::LightmapTexAccessor::LightmapTexAccessor (csThing* instance, 
+							 size_t polyIndex) :
+  scfImplementationType (this), instance (instance)
+{
+  texh = instance->GetPolygonTexture (polyIndex);
+}
+
+void csThingStatic::LightmapTexAccessor::PreGetValue (csShaderVariable *variable)
+{
+  instance->UpdateDirtyLMs ();
+  variable->SetValue (texh);
+}
 
 //----------------------------------------------------------------------------
 
 csThing::csThing (iBase *parent, csThingStatic* static_data) :
-        polygons(32, 64),
-        scfiPolygonMesh (0),
-        scfiPolygonMeshCD (CS_POLY_COLLDET),
-        scfiPolygonMeshLOD (CS_POLY_VISCULL)
+  scfImplementationType (this, parent),
+  polygons(32, 64),
+  scfiPolygonMesh (0),
+  scfiPolygonMeshCD (CS_POLY_COLLDET),
+  scfiPolygonMeshLOD (CS_POLY_VISCULL)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingState);
-  DG_TYPE (this, "csThing");
-
   csThing::static_data = static_data;
   polygons.SetThingType (static_data->thing_type);
   polygon_world_planes = 0;
@@ -1597,9 +1589,6 @@ csThing::~csThing ()
 
   polygons.DeleteAll ();
   delete[] polygon_world_planes;
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiThingState);
-  SCF_DESTRUCT_IBASE ();
 }
 
 char* csThing::GenerateCacheName ()
@@ -1782,7 +1771,7 @@ void csThing::PreparePolygons ()
   polygons.ShrinkBestFit ();
 }
 
-void csThing::Prepare ()
+void csThing::PrepareSomethingOrOther ()
 {
   static_data->Prepare (logparent);
 
@@ -1883,7 +1872,7 @@ csPtr<iPolygonHandle> csThing::CreatePolygonHandle (int polygon_idx)
   return csPtr<iPolygonHandle> (new csPolygonHandle (
         (iThingFactoryState*)(csThingStatic*)static_data,
         (iMeshObjectFactory*)(csThingStatic*)static_data,
-        &scfiThingState,
+        this,
         (iMeshObject*)this,
         polygon_idx));
 }
@@ -1992,7 +1981,7 @@ void csThing::AppendShadows (
   iShadowBlockList *shadows,
   const csVector3 &origin)
 {
-  Prepare ();
+  PrepareSomethingOrOther ();
   //@@@ Ok?
   cached_movable = movable;
   WorUpdate ();
@@ -2064,19 +2053,15 @@ void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
 
 //-------------------------------------------------------------------------
 
-struct PolyMeshTimerEvent : public iTimerEvent
+struct PolyMeshTimerEvent : 
+  public scfImplementation1<PolyMeshTimerEvent, 
+			    iTimerEvent>
 {
   csWeakRef<PolyMeshHelper> pmh;
-  PolyMeshTimerEvent (PolyMeshHelper* pmh)
+  PolyMeshTimerEvent (PolyMeshHelper* pmh) : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     PolyMeshTimerEvent::pmh = pmh;
   }
-  virtual ~PolyMeshTimerEvent ()
-  {
-    SCF_DESTRUCT_IBASE ();
-  }
-  SCF_DECLARE_IBASE;
   virtual bool Perform (iTimerEvent*)
   {
     if (pmh) pmh->Cleanup ();
@@ -2084,15 +2069,7 @@ struct PolyMeshTimerEvent : public iTimerEvent
   }
 };
 
-SCF_IMPLEMENT_IBASE(PolyMeshTimerEvent)
-  SCF_IMPLEMENTS_INTERFACE(iTimerEvent)
-SCF_IMPLEMENT_IBASE_END
-
 //-------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (PolyMeshHelper)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
 
 void PolyMeshHelper::SetThing (csThingStatic* thing)
 {
@@ -2194,7 +2171,7 @@ void PolyMeshHelper::ForceCleanup ()
 
 void csThing::CastShadows (iMovable* movable, iFrustumView *lview)
 {
-  Prepare ();
+  PrepareSomethingOrOther ();
   //@@@ Ok?
   cached_movable = movable;
   WorUpdate ();
@@ -2274,7 +2251,7 @@ void csThing::CastShadows (iMovable* movable, iFrustumView *lview)
 void csThing::InitializeDefault (bool clear)
 {
   if (clear) Unprepare();
-  Prepare ();
+  PrepareSomethingOrOther ();
 
   size_t i;
   for (i = 0; i < polygons.Length (); i++)
@@ -2283,7 +2260,7 @@ void csThing::InitializeDefault (bool clear)
 
 bool csThing::ReadFromCache (iCacheManager* cache_mgr)
 {
-  Prepare ();
+  PrepareSomethingOrOther ();
   char* cachename = GenerateCacheName ();
   cache_mgr->SetCurrentScope (cachename);
   delete[] cachename;
@@ -2404,23 +2381,23 @@ void csThing::PrepareRenderMeshes (
   }
   materials_to_visit.ShrinkBestFit ();
 
-  for (i = 0; i < renderMeshes.Length(); i++)
+  /*for (i = 0; i < renderMeshes.Length(); i++)
   {
     csRenderMesh* rm = renderMeshes[i];
     rm->variablecontext->GetVariable (static_data->texLightmapName)->
       SetValue (i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);
-  }
+  }*/
 
 }
 
 void csThing::PrepareForUse ()
 {
-  Prepare ();
+  PrepareSomethingOrOther ();
   PreparePolygonBuffer ();
   PrepareLMs ();
 
   WorUpdate ();
-  UpdateDirtyLMs ();
+  //UpdateDirtyLMs ();
 
   bool meshesCreated;
   csDirtyAccessArray<csRenderMesh*>& renderMeshes =
@@ -2434,7 +2411,7 @@ void csThing::PrepareForUse ()
 csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
                                          iMovable* movable, uint32 frustum_mask)
 {
-  Prepare ();
+  PrepareSomethingOrOther ();
 
   iCamera *icam = rview->GetCamera ();
 
@@ -2490,7 +2467,7 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
       //SetValue (i < litPolys.Length() ? litPolys[i]->SLM->GetTexture() : 0);
   }
 
-  UpdateDirtyLMs (); // @@@ Here?
+  //UpdateDirtyLMs (); // @@@ Here?
 
   num = (int)renderMeshes.Length ();
   for (i = 0; i < materials_to_visit.Length (); i++)
@@ -2677,8 +2654,7 @@ void csThing::UpdateDirtyLMs ()
         if (lmi->RecalculateDynamicLights (m_world2tex, v_world2tex, &poly,
                 world_plane, amb, scratch))
         {
-          litPolys[i]->lightmaps[j]->SetData (
-            /*lmi->GetLightMap ()->GetMapData ()*/scratch.GetArray ());
+          litPolys[i]->lightmaps[j]->SetData (scratch.GetArray ());
         }
       }
     }
@@ -2696,45 +2672,16 @@ iMeshObjectFactory *csThing::GetFactory () const
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csThingObjectType)
-  SCF_IMPLEMENTS_INTERFACE(iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingEnvironment)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPluginConfig)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE(iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiThingEnvironment)
-  SCF_IMPLEMENTS_INTERFACE(iThingEnvironment)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiPluginConfig)
-  SCF_IMPLEMENTS_INTERFACE(iPluginConfig)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csThingObjectType::eiDebugHelper)
-  SCF_IMPLEMENTS_INTERFACE(iDebugHelper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csThingObjectType)
 
-
 csThingObjectType::csThingObjectType (iBase *pParent) :
-        blk_polygon3dstatic (2000),
-        blk_texturemapping (2000),
-        blk_lightmap (2000),
-        blk_polidx3 (1000),
-        blk_polidx4 (2000)
+  scfImplementationType (this, pParent),
+  blk_polygon3dstatic (2000),
+  blk_texturemapping (2000),
+  blk_lightmap (2000),
+  blk_polidx3 (1000),
+  blk_polidx4 (2000)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiThingEnvironment);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   lightpatch_pool = 0;
   blk_polidx5 = 0;
   blk_polidx6 = 0;
@@ -2749,12 +2696,6 @@ csThingObjectType::~csThingObjectType ()
   delete blk_polidx6;
   delete blk_polidx20;
   delete blk_polidx60;
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiThingEnvironment);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPluginConfig);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
@@ -2899,7 +2840,7 @@ const int NUM_OPTIONS =
     sizeof (config_options[0])
   );
 
-bool csThingObjectType::eiPluginConfig::SetOption (int id, csVariant *value)
+bool csThingObjectType::SetOption (int id, csVariant *value)
 {
   switch (id)
   {
@@ -2909,12 +2850,12 @@ bool csThingObjectType::eiPluginConfig::SetOption (int id, csVariant *value)
     case 1:
       csThing::lightmap_quality = value->GetLong ();
       if (csThingObjectType::do_verbose)
-        scfParent->Notify ("Lightmap quality=%d", csThing::lightmap_quality);
+        Notify ("Lightmap quality=%d", csThing::lightmap_quality);
       break;
     case 2:
       csThing::lightmap_enabled = !value->GetBool ();
       if (csThingObjectType::do_verbose)
-        scfParent->Notify ("Fullbright enabled=%d",
+        Notify ("Fullbright enabled=%d",
                 (int)!csThing::lightmap_enabled);
       break;
     default:
@@ -2924,7 +2865,7 @@ bool csThingObjectType::eiPluginConfig::SetOption (int id, csVariant *value)
   return true;
 }
 
-bool csThingObjectType::eiPluginConfig::GetOption (int id, csVariant *value)
+bool csThingObjectType::GetOption (int id, csVariant *value)
 {
   switch (id)
   {
@@ -2937,7 +2878,7 @@ bool csThingObjectType::eiPluginConfig::GetOption (int id, csVariant *value)
   return true;
 }
 
-bool csThingObjectType::eiPluginConfig::GetOptionDescription (
+bool csThingObjectType::GetOptionDescription (
   int idx,
   csOptionDescription *option)
 {
@@ -2948,3 +2889,4 @@ bool csThingObjectType::eiPluginConfig::GetOptionDescription (
 
 //---------------------------------------------------------------------------
 
+} // namespace cspluginThing

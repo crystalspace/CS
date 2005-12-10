@@ -180,8 +180,8 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	      meshname, seqname);
 	    return 0;
 	  }
-	  csRef<iThingState> st = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-		iThingState);
+	  csRef<iThingState> st = 
+	    scfQueryInterface<iThingState> (mesh->GetMeshObject ());
 	  if (!st)
 	  {
 	    SyntaxService->ReportError (
@@ -190,7 +190,9 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	      meshname, seqname);
 	    return 0;
 	  }
-	  int poly_idx = st->GetFactory ()->FindPolygonByName (parname);
+	  csRef<iThingFactoryState> tfs = scfQueryInterface<iThingFactoryState> 
+	    (mesh->GetMeshObject ()->GetFactory());
+	  int poly_idx = tfs->FindPolygonByName (parname);
 	  if (poly_idx == -1)
 	  {
 	    SyntaxService->ReportError (
@@ -402,8 +404,8 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	    error = true;
 	    return 0;
 	  }
-	  csRef<iThingState> st = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-		iThingState);
+	  csRef<iThingState> st = 
+	    scfQueryInterface<iThingState> (mesh->GetMeshObject ());
 	  if (!st)
 	  {
 	    SyntaxService->ReportError (
@@ -413,7 +415,9 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	    error = true;
 	    return 0;
 	  }
-	  int polygon = st->GetFactory ()->FindPolygonByName (polyname);
+	  csRef<iThingFactoryState> tfs = scfQueryInterface<iThingFactoryState> 
+	    (mesh->GetMeshObject ()->GetFactory());
+	  int polygon = tfs->FindPolygonByName (polyname);
 	  if (polygon == -1)
 	  {
 	    SyntaxService->ReportError (

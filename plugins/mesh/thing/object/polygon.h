@@ -33,8 +33,18 @@
 
 #include "polyrender.h"
 
+struct iFile;
+struct iLight;
+struct iGraphics2D;
+struct iGraphics3D;
+struct iCacheManager;
+struct iMaterialWrapper;
 class csFrustumView;
 class csFrustumContext;
+
+namespace cspluginThing
+{
+
 class csPolyTxtPlane;
 class csPolygon3D;
 class csLightMap;
@@ -42,12 +52,6 @@ class csLightPatch;
 class csPolyTexture;
 class csThing;
 class csThingStatic;
-struct iFile;
-struct iLight;
-struct iGraphics2D;
-struct iGraphics3D;
-struct iCacheManager;
-struct iMaterialWrapper;
 
 /*---------------------------------------------------------------------------*/
 
@@ -698,5 +702,7 @@ public:
 	const csPlane3& world_plane,
 	csPolygon3DStatic* spoly);
 };
+
+} // namespace cspluginThing
 
 #endif // __CS_POLYGON_H__

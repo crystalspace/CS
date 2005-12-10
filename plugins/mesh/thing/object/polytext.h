@@ -35,20 +35,21 @@ struct iPolygon3D;
 struct iLight;
 struct csRGBpixel;
 struct iFrustumView;
+class csMatrix3;
+class csVector3;
+class csVector2;
+class csColor;
+class csFrustumContext;
+
+namespace cspluginThing
+{
+
 struct csLightingPolyTexQueue;
 class csPolygon3D;
 class csPolygon3DStatic;
 class csPolyTexture;
 class csLightMap;
 class csLightPatch;
-class csFrustumContext;
-class csLight;
-class csMatrix3;
-class csVector3;
-class csVector2;
-class csColor;
-
-SCF_VERSION (csLightingPolyTexQueue, 0, 0, 1);
 
 /**
  * This is user-data for iFrustumView for the lighting process.
@@ -56,7 +57,9 @@ SCF_VERSION (csLightingPolyTexQueue, 0, 0, 1);
  * for all polygons that were hit by a light during the lighting
  * process.
  */
-struct csLightingPolyTexQueue : public iLightingProcessData
+struct csLightingPolyTexQueue : 
+  public scfImplementation1<csLightingPolyTexQueue, 
+			    iLightingProcessData>
 {
 private:
   // Vector containing csPolygonTexture pointers.
@@ -87,8 +90,6 @@ public:
     UpdateMaps (light, light->GetMovable ()->GetFullPosition (),
     	light->GetColor ());
   }
-
-  SCF_DECLARE_IBASE;
 };
 
 /**
@@ -380,6 +381,8 @@ public:
   /// Query log2 (cell size)
   int GetLightCellShift ();
 };
+
+} // namespace cspluginThing
 
 #endif // __CS_POLYTEXT_H__
 

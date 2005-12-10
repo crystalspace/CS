@@ -31,6 +31,10 @@
 #include "cstool/userrndbuf.h"
 
 class csShaderVariableContext;
+
+namespace cspluginThing
+{
+
 class csThingObjectType;
 class csThing;
 
@@ -230,26 +234,25 @@ private:
 
   csHash<csRef<iRenderBuffer>, csStringID> extraBufferData;
 
-  class BufferAccessor : public iRenderBufferAccessor
+  class BufferAccessor : 
+    public scfImplementation1<BufferAccessor, 
+			      iRenderBufferAccessor>
   {
     csRef<iRenderBuffer> color_buffer;
     uint colorVerticesNum;
     csPolygonRenderer *renderer;
     csThing* instance;
+    uint32 light_version;
   public:
     CS_LEAKGUARD_DECLARE (BufferAccessor);
-    SCF_DECLARE_IBASE;
 
     BufferAccessor (csPolygonRenderer *renderer, csThing* instance) : 
-      colorVerticesNum(0), renderer(renderer), instance(instance)
+      scfImplementationType (this), colorVerticesNum(0), renderer(renderer), 
+      instance(instance), light_version (~0)
     {
-      SCF_CONSTRUCT_IBASE(0);
     }
 
-    virtual ~BufferAccessor()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
+    virtual ~BufferAccessor() { }
     virtual void PreGetBuffer (csRenderBufferHolder* holder,
       csRenderBufferName buffer);
   };
@@ -270,5 +273,7 @@ public:
     iUserRenderBufferIterator* extraBuffers);
 
 };
+
+} // namespace cspluginThing
 
 #endif // __CS_POLYRENDER_H__

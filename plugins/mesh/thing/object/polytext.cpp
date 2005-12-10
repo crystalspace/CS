@@ -44,6 +44,9 @@
 #include "lppool.h"
 #include "lghtmap.h"
 
+namespace cspluginThing
+{
+
 // Option variable: cosinus factor.
 float csPolyTexture::cfg_cosinus_factor = 0;
 
@@ -1850,23 +1853,19 @@ bool csShadowBitmap::UpdateShadowMap (
 }
 
 //-----------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csLightingPolyTexQueue)
-  SCF_IMPLEMENTS_INTERFACE(iLightingProcessData)
-SCF_IMPLEMENT_IBASE_END
 
 csLightingPolyTexQueue::csLightingPolyTexQueue (
-  iLight *light)
+  iLight *light) : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   csLightingPolyTexQueue::light = light;
 }
 
 csLightingPolyTexQueue::~csLightingPolyTexQueue ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
-void csLightingPolyTexQueue::AddPolyTexture (csPolyTexture *pt, csPolygon3D* polygon)
+void csLightingPolyTexQueue::AddPolyTexture (csPolyTexture *pt, 
+					     csPolygon3D* polygon)
 {
   polytxts.Push (pt);
   polygons.Push (polygon);
@@ -1912,3 +1911,5 @@ void csLightingPolyTexQueue::UpdateMaps (
   polytxts.DeleteAll ();
   polygons.DeleteAll ();
 }
+
+} // namespace cspluginThing

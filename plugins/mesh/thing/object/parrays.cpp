@@ -22,6 +22,9 @@
 #include "polygon.h"
 #include "thing.h"
 
+namespace cspluginThing
+{
+
 //-----------------------------------------------+ csPolygonStaticArray +----//
 csPolygonStaticArray::~csPolygonStaticArray ()
 {
@@ -50,3 +53,4 @@ int csPolygonStaticArray::CompareKey (csPolygon3DStatic* const& Item,
   return name ? strcmp (name, Key) : -1;
 }
 
+} // namespace cspluginThing

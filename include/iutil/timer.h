@@ -26,13 +26,13 @@
 #include "csutil/scf.h"
 
 
-SCF_VERSION (iTimerEvent, 0, 0, 1);
-
 /**
  * A timer event.
  */
-struct iTimerEvent : public iBase
+struct iTimerEvent : public virtual iBase
 {
+  SCF_INTERFACE (iTimerEvent, 1, 0, 0);
+
   /**
    * Perform the event. If this returns true the event is re-scheduled.
    * Otherwise the event will be removed from the event timer.

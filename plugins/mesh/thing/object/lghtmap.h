@@ -23,16 +23,20 @@
 #include "csutil/scf.h"
 #include "csgfx/rgbpixel.h"
 
+struct iLight;
+struct iCacheManager;
+struct iFile;
+struct iEngine;
+
+namespace cspluginThing
+{
+
 class csPolyTexture;
 class csThing;
 class csPolygon3D;
 class csPolygon3DStatic;
 class csDelayedLightingInfo;
 class csObject;
-struct iLight;
-struct iCacheManager;
-struct iFile;
-struct iEngine;
 
 typedef csDirtyAccessArray<csRGBpixel> csLightingScratchBuffer;
 
@@ -199,5 +203,7 @@ public:
   ///
   int GetHeight () const { return lheight; }
 };
+
+} // namespace cspluginThing
 
 #endif // __CS_LIGHTMAP_H__
