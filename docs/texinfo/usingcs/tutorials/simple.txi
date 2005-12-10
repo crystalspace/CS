@@ -351,9 +351,10 @@ void Simple::CreateRoom ()
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (
     engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> thing_state (
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
-  iThingFactoryState* walls_state = thing_state->GetFactory ();
+  csRef<iMeshObject> walls_object = walls->GetMeshObject ();
+  csRef<iMeshObjectFactory> walls_factory = walls_object->GetFactory();
+  csRef<iThingFactoryState> walls_state = 
+    scfQueryInterface<iThingFactoryState> (walls_factory);
   walls_state->AddInsideBox (
     csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
@@ -403,24 +404,36 @@ Now, we want to create the six walls of our room. First, we make our thing mesh
 object. Because this is a very common case there is a convenience function
 in the engine (called @code{CreateSectorWallsMesh()}) which will create a
 thing mesh and add it to the given sector. The only thing that has to be
-done after this is add polygons to that mesh. To do this we first query
-the interface called @samp{iThingState} from the thing mesh object.
-We use the macro @code{SCF_QUERY_INTERFACE()} which is part of @sc{scf}
-(@pxref{SCF}). This will see if the mesh object (which is wrapped by
-the mesh wrapper) actually implements @samp{iThingState} (which should
-be the case here) and, if so, it will return a pointer to the implementation
-of @samp{iThingState}. All mesh objects implement some kind of state
-interface which is used to set up or query the state of that mesh object.
-Note that all interfaces which you query using @code{SCF_QUERY_INTERFACE()}
-should be released when you no longer need them (by calling @code{DecRef()}).
-However in this example we assign them to a @code{csRef<>} which takes care of
-@code{DecRef()} for us.
+done after this is add polygons to that mesh. The geometry of a mesh is 
+generally stored in its @emph{factory}, thus we need to obtain an interface
+to the ``thing'' factory.
 
-From the returned thing state we now get the factory state
-(@samp{iThingFactoryState}) which we can now use to create polygons.
-There are various functions to create individual polygons, if you want that,
-but in this case we use a convenience function to create a box that can
-be seen from the inside. That will serve as the walls of our room.
+To do this we first need to obtain the interface to the @samp{iMeshObject}
+interface. The @samp{iMeshWrapper} interface, as returned by 
+@code{CreateSectorWallsMesh()}, has a method @code{GetMeshObject()} which
+gives us just that.
+
+In the next step, we need to query the @emph{mesh factory}. Again, the 
+previously obtained @samp{iMeshObject} has a method which returns an interface
+to the mesh factory.
+
+And lastly, to obtain the interface to control ``thing''-specific aspects of
+the mesh factory, we query the interface called @samp{iThingFactoryState} 
+from the mesh factory interface.
+We use the function @code{scfQueryInterface<>()} which is part of @sc{scf}
+(@pxref{SCF}). This will see if the mesh factory actually implements 
+@samp{iThingFactoryState} (which should be the case here) and, if so, it will 
+return a pointer to the implementation of @samp{iThingFactoryState}. 
+All mesh objects and factories implement some kind of state interface which is 
+used to set up or query the state of that mesh object or factory.
+Note that all interfaces which you query using @code{scfQueryInterface<>()}
+must be assigned to a variable of type @code{csRef<>}. This ensures that the
+reference to the interface is released one it is no longer needed.
+
+We now have the factory state (@samp{iThingFactoryState}) which we can now use 
+to create polygons. There are various functions to create individual polygons, 
+if you want that, but in this case we use a convenience function to create a 
+box that can be seen from the inside. That will serve as the walls of our room.
 The @code{AddInsideBox()} function does this. It will create six polygons
 arranged so that they are visible from inside.
 (Note that in Crystal Space a polygon is visible if vertices are oriented
