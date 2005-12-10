@@ -6645,7 +6645,6 @@ class iThingState(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iThingState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def GetFactory(*args): return _cspace.iThingState_GetFactory(*args)
     def GetVertexW(*args): return _cspace.iThingState_GetVertexW(*args)
     def GetVerticesW(*args): return _cspace.iThingState_GetVerticesW(*args)
     def GetMovingOption(*args): return _cspace.iThingState_GetMovingOption(*args)
