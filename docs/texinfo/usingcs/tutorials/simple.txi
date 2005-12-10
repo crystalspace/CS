@@ -428,7 +428,7 @@ All mesh objects and factories implement some kind of state interface which is
 used to set up or query the state of that mesh object or factory.
 Note that all interfaces which you query using @code{scfQueryInterface<>()}
 must be assigned to a variable of type @code{csRef<>}. This ensures that the
-reference to the interface is released one it is no longer needed.
+reference to the interface is released once it is no longer needed.
 
 We now have the factory state (@samp{iThingFactoryState}) which we can now use 
 to create polygons. There are various functions to create individual polygons, 
