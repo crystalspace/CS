@@ -1486,7 +1486,7 @@ removed or have become private, and are no longer available to client code:
 @end itemize
 
 Some methods from @samp{iSprite3DState} have been removed that basically 
-provided functionality which us also already available through 
+provided functionality which was also already available through 
 @samp{iMeshObject}:
 
 @itemize @bullet
