@@ -356,8 +356,6 @@ private:
     }
     return false;
   }
-  
-  }
 };
 
 #endif // __CS_UTIL_PO_H__
