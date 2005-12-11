@@ -147,6 +147,8 @@ struct csKeyEventData
  */
 enum csMouseButton
 {
+  /// ID to designate the absence of an acting mouse button.
+  csmbNone = -1,
   /// Left button
   csmbLeft = 0,
   /// Right button
@@ -198,7 +200,7 @@ struct csMouseEventData
  */
 struct csJoystickEventData
 {
-  /// Joystick number (1, 2, ...)       
+  /// Joystick number (0, 1, 2, ...)       
   uint number;
   /// Joystick axis values
   int32 axes[CS_MAX_JOYSTICK_AXES];

@@ -492,31 +492,31 @@ void csGLCanvas::OnMouseEvent( wxMouseEvent& event )
 
   if(event.GetEventType() == wxEVT_MOTION)
   {
-    g2d->EventOutlet->Mouse(-1, false, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(csmbNone, false, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_LEFT_DOWN)
   {
-    g2d->EventOutlet->Mouse(0, true, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(csmbLeft, true, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_LEFT_UP)
   {
-    g2d->EventOutlet->Mouse(0, false, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(csmbLeft, false, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_MIDDLE_DOWN)
   {
-    g2d->EventOutlet->Mouse(2, true, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(csmbMiddle, true, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_MIDDLE_UP)
   {
-    g2d->EventOutlet->Mouse(2, false, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(csmbMiddle, false, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_RIGHT_DOWN)
   {
-    g2d->EventOutlet->Mouse(1, true, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(csmbRight, true, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_RIGHT_UP)
   {
-    g2d->EventOutlet->Mouse(1, false, event.GetX(), event.GetY());
+    g2d->EventOutlet->Mouse(csmbRight, false, event.GetX(), event.GetY());
   }
 }
 

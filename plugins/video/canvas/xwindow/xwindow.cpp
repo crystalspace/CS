@@ -483,11 +483,20 @@ static Bool AlwaysTruePredicate (Display*, XEvent*, char*)
   return True;
 }
 
+static uint TranslateXMouseButton (int xbutton)
+{
+  static uint buttonMapping[] = {csmbNone, csmbLeft, csmbMiddle, csmbRight};
+  const int buttonMapCount =
+    sizeof (buttonMapping) / sizeof (buttonMapping[0]);
+  
+  if (xbutton < buttonMapCount)
+    return buttonMapping[xbutton];
+  else
+    return xbutton-1; // Since mouse buttons are 0-based
+}
+
 bool csXWindow::HandleEvent (iEvent &Event)
 {
-  static int buttonMapping[] = {0, 1, 3, 2};
-  const unsigned int buttonMapCount =
-    sizeof (buttonMapping) / sizeof (buttonMapping[0]);
   XEvent event;
   KeySym xKey;
   utf32_char csKeyRaw = 0, csKeyCooked = 0;
@@ -531,19 +540,15 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	}
 	break;
       case ButtonPress:
-        EventOutlet->Mouse (
-	  (unsigned int)event.xbutton.button < buttonMapCount ? 
-	  buttonMapping [event.xbutton.button] : event.xbutton.button,
+        EventOutlet->Mouse (TranslateXMouseButton (event.xbutton.button),
           true, event.xbutton.x, event.xbutton.y);
         break;
       case ButtonRelease:
-        EventOutlet->Mouse (
-	  (unsigned int)event.xbutton.button < buttonMapCount ? 
-	  buttonMapping [event.xbutton.button] : event.xbutton.button,
+        EventOutlet->Mouse (TranslateXMouseButton (event.xbutton.button),
           false, event.xbutton.x, event.xbutton.y);
         break;
       case MotionNotify:
-        EventOutlet->Mouse ((uint) -1, false, event.xbutton.x, event.xbutton.y);
+        EventOutlet->Mouse (csmbNone, false, event.xbutton.x, event.xbutton.y);
         break;
       case KeyPress:
       case KeyRelease:

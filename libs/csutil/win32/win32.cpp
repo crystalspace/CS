@@ -868,7 +868,8 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
       {
         iEventOutlet* outlet = assistant->GetEventOutlet();
         ::SetCursor (assistant->m_hCursor);
-        outlet->Mouse (0, false, short(LOWORD(lParam)), short(HIWORD(lParam)));
+        outlet->Mouse (csmbNone, false, short(LOWORD(lParam)), 
+	  short(HIWORD(lParam)));
       }
       return TRUE;
     }

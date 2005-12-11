@@ -935,7 +935,7 @@ bool csGraphics2DXLib::HandleEvent (iEvent &Event)
   return false;
 }
 
-bool csGraphics2DXLib::PerformExtensionV (char const* command, va_list)
+bool csGraphics2DXLib::PerformExtensionV (char const* command, va_list args)
 {
   if (!strcasecmp (command, "sim_pal"))
   {
@@ -962,7 +962,7 @@ bool csGraphics2DXLib::PerformExtensionV (char const* command, va_list)
     XSync (dpy, False);
     return true;
   }
-  return false;
+  return csGraphics2D::PerformExtensionV (command, args);
 }
 
 #undef CS_XWIN_SCF_ID
