@@ -13,6 +13,7 @@ chronological order.
 	- Vincent Knecht made the following changes:
 	  - Updated wxtest and vostest for the recent event changes.
 	  - Updated wxtest for the iThingState::GetFactory() removal.
+	- Adam fixed the csMouseButton enumeration to be basis-0
 9-Dec-2005
 	- Jorrit changed csInputDefinition class to use normal pointers
 	  as parameters for iEventNameRegistry instead of csRef.

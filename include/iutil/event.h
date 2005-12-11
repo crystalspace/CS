@@ -148,19 +148,19 @@ struct csKeyEventData
 enum csMouseButton
 {
   /// Left button
-  csmbLeft = 1,
+  csmbLeft = 0,
   /// Right button
-  csmbRight = 2,
+  csmbRight = 1,
   /// Middle button
-  csmbMiddle = 3,
+  csmbMiddle = 2,
   /// Wheel was scrolled up
-  csmbWheelUp = 4,
+  csmbWheelUp = 3,
   /// Wheel was scrolled up
-  csmbWheelDown = 5,
+  csmbWheelDown = 4,
   /// Thumb button 1 (e.g. on 5-button mice)
-  csmbExtra1 = 6,
+  csmbExtra1 = 5,
   /// Thumb button 2 (e.g. on 5-button mice)
-  csmbExtra2 = 7
+  csmbExtra2 = 6
 };
 
 /**
