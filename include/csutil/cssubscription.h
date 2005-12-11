@@ -86,11 +86,13 @@ public:
   
   static inline csEventTree *CreateRootNode(csRef<iEventHandlerRegistry> &reg1,
 					    csRef<iEventNameRegistry> &reg2, 
-					    csEventQueue *q) {
+					    csEventQueue *q)
+  {
     return new csEventTree (reg1, reg2, reg2->GetID(""), 0, q);
   }
   
-  static inline void DeleteRootNode(csEventTree *node) {
+  static inline void DeleteRootNode(csEventTree *node)
+  {
     CS_ASSERT(node);
     CS_ASSERT(node->self == node->name_reg->GetID(""));
     delete node;

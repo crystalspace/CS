@@ -18,6 +18,8 @@ chronological order.
 	  dispatch slightly less efficient when unsubscribing from an 
 	  event name currently in-delivery, but makes the code much more
 	  understandable.
+	- Adam removed some debugging code and cleaned up some
+	  coding style violations.
 9-Dec-2005
 	- Jorrit changed csInputDefinition class to use normal pointers
 	  as parameters for iEventNameRegistry instead of csRef.

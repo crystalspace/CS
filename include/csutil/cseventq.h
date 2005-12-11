@@ -282,7 +282,8 @@ public:
 							    csEventID e) const 
     {
       static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
-      if (e == csevFrame(r2)) {
+      if (e == csevFrame(r2))
+      {
 	constraint[0] = ProcessFrameEventDispatcher::StaticID (r1);
 	return constraint;
       }
@@ -313,7 +314,8 @@ public:
 							    csEventID e) const 
     {
       static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
-      if (e == csevFrame(r2)) {
+      if (e == csevFrame(r2))
+      {
 	constraint[0] = PostProcessFrameEventDispatcher::StaticID (r1);
 	return constraint;
       }
@@ -345,7 +347,8 @@ public:
 							    csEventID e) const 
     {
       static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
-      if (e == csevFrame(r2)) {
+      if (e == csevFrame(r2))
+      {
 	constraint[0] = FinalProcessFrameEventDispatcher::StaticID (r1);
 	return constraint;
       }

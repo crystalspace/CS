@@ -100,7 +100,6 @@ public:
     {
       NodeMap.PutUnique(node, Nodes.Push(node));
     }
-    Dump();
   }
 
   /// Query a node's presence
@@ -135,11 +134,10 @@ public:
       NodeMap.PutUnique(Nodes[p].self, p);
 
     // debug...
-    for (size_t iter=0 ; iter<Nodes.Length() ; iter++) {
+    for (size_t iter=0 ; iter<Nodes.Length() ; iter++)
+    {
       CS_ASSERT(NodeMap.Get(Nodes[iter].self,csArrayItemNotFound)==iter);
     }
-
-    Dump();
   }
   
   /**
@@ -325,7 +323,8 @@ private:
     return InternalCycleTest(n);
   }
   
-  bool InternalIsEnabled(size_t i) {
+  bool InternalIsEnabled(size_t i)
+  {
     if (Nodes[i].marked)
       return false;
     for (size_t j=0 ; j<Nodes[i].pre.Length() ; j++) 
@@ -358,31 +357,6 @@ private:
     return false;
   }
   
-public:
-  void Dump() {
-#ifdef ADB_DEBUG
-    std::cerr << "PARTIAL ORDER---------------------------------------" 
-	      << std::endl;
-    for (size_t i=0 ; i<Nodes.Length() ; i++) 
-    {
-      std::cerr << " Node #" << i << " [" << Nodes[i].self 
-		<< "]:" << std::endl;
-      std::cerr << "   pres:";
-      for (size_t j=0 ; j<Nodes[i].pre.Length() ; j++) 
-      {
-	std::cerr << " #" << Nodes[i].pre[j];
-      }
-      std::cerr << std::endl 
-		<< "   posts:";
-      for (size_t j=0 ; j<Nodes[i].post.Length() ; j++) 
-      {
-	std::cerr << " #" << Nodes[i].post[j];
-      }
-      std::cerr << std::endl;
-    }
-    std::cerr << "PARTIAL ORDER END-----------------------------------" 
-	      << std::endl << std::endl;
-#endif
   }
 };
 
