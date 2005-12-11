@@ -379,10 +379,14 @@ bool csGraphics2DSDL::Open()
   pfmt.complete ();
   Clear(0);
 
+  csEventID PreProcess = csevPreProcess (object_reg);
+  csEventID PostProcess = csevPostProcess (object_reg);
+
   csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
+    csEventID events[] = { PreProcess, PostProcess, CS_EVENTLIST_END };
+    q->RegisterListener (scfiEventHandler, events);
     if (!EventOutlet.IsValid())
       EventOutlet = q->CreateEventOutlet (this);
   }
