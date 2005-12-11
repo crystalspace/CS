@@ -87,6 +87,9 @@ public:
   virtual bool Initialize (iObjectRegistry *objreg);
   virtual bool HandleEvent (iEvent &ev);
 
+  CS_EVENTHANDLER_NAMES("crystalspace.network.vos.a3dl")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
+
   iObjectRegistry* GetObjectRegistry()
   {
     return objreg;
