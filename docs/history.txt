@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Dec-2005
+	- Vincent Knecht fixed wxgl plugin for platforms using GLX by
+	  reversing GLX_VERSION_1_4 test.
 10-Dec-2005
 	- res updated the apps for the iThingState::GetFactory() removal.
 	- res updated and reworded the simple1 tutorial for the 
