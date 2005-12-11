@@ -11,6 +11,8 @@ chronological order.
 	  reversing GLX_VERSION_1_4 test.
 	- Vincent Knecht updated sdl2d canvas for the recent event change.
 	  Only works in software mode for me though, crashes with OpenGL.
+	- Vincent Knecht fixed keyboard handling in phystut. It still crashes
+	  on exit though.
 10-Dec-2005
 	- res updated the apps for the iThingState::GetFactory() removal.
 	- res updated and reworded the simple1 tutorial for the 

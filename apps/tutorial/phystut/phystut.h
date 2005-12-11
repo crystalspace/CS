@@ -68,6 +68,10 @@ private:
   csRef<iRigidBody> avatarbody;
 
   CS_DECLARE_EVENT_SHORTCUTS;
+
+  csEventID KeyboardDown;
+  csEventID KeyboardUp;
+
 public:
   Simple (iObjectRegistry *obj);
   ~Simple ();

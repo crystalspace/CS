@@ -138,9 +138,9 @@ bool Simple::HandleEvent (iEvent& ev)
     simple->FinishFrame ();
     return true;
   }
-  else if (ev.Name == KeyboardEvent) 
+  else if (CS_IS_KEYBOARD_EVENT(object_reg, ev)) 
   {
-    if (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown)
+    if (ev.Name == KeyboardDown)
     {
       if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_SPACE)
       {
@@ -211,7 +211,7 @@ bool Simple::HandleEvent (iEvent& ev)
 	return true;
       }
     }
-    else if ((csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeUp)
+    else if ((ev.Name == KeyboardUp)
 	     && ((csKeyEventHelper::GetCookedCode (&ev) == CSKEY_DOWN) 
 	      || (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_UP)))
     {
@@ -255,6 +255,9 @@ bool Simple::Initialize ()
     return false;
   }
   CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
+
+  KeyboardDown = csevKeyboardDown (object_reg);
+  KeyboardUp = csevKeyboardUp (object_reg);
 
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
