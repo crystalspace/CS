@@ -72,6 +72,8 @@ private:
   boost::mutex relightCounterMutex;
   float remaining_delta;
 
+  csEventID Process;
+
 public:
   SCF_DECLARE_IBASE;
 
