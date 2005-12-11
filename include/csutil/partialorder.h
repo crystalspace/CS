@@ -30,6 +30,10 @@
 #include "util.h"
 #include "hash.h"
 
+#ifdef ADB_DEBUG
+#include <iostream>
+#endif /* ADB_DEBUG */
+
 /**
  * A generic finite partial order class.
  * A finite partial order is a graph with the following properties:

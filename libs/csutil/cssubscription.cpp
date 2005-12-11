@@ -128,10 +128,7 @@ void csEventTree::ForceFatCopy ()
 	new csList<iEventHandler *>(*fatRecord->SubscriberQueue):
 	0));
     
-    // If there's a deletedList, our SQ will always need regeneration,
-    // no matter which of the above cases happens.
-    newFatRecord->StaleSubscriberQueue = 
-      fatRecord->StaleSubscriberQueue || (fatRecord->deletedList!=0);
+    newFatRecord->StaleSubscriberQueue = true;
 
     if ((fatRecord->iterator != 0) && 
 	name_reg->IsKindOf(fatRecord->iterator->baseevent, self)) 
@@ -141,19 +138,15 @@ void csEventTree::ForceFatCopy ()
       CS_ASSERT(false);
       newFatRecord->iterator = fatRecord->iterator; // DOME : this has to be translated !
       fatRecord->iterator = 0;
-      newFatRecord->deletedList = fatRecord->deletedList; // DOME : ditto
-      fatRecord->deletedList = 0;
 
       /* If the deletedList belongs to us, we need to regenerate the SQ we 
        * swiped it from.
        * DOME ... */
-
     } 
     else 
     {
       // There is no iterator, or it belongs to the parent.  Ignore it.
       newFatRecord->iterator = 0;
-      newFatRecord->deletedList = 0;
     }
 
     PushFatCopy(newFatRecord);
@@ -164,7 +157,6 @@ void csEventTree::ForceFatCopy ()
 void csEventTree::KillFatCopy()
 {
   CS_ASSERT(fatRecord->iterator == 0);
-  CS_ASSERT(fatRecord->deletedList == 0);
   if (fatNode)
   {
     delete fatRecord;
@@ -365,58 +357,42 @@ bool csEventTree::SubscribeInternal (csHandlerID id, csEventID baseevent)
   return false;
 }
 
+/**
+ * If we are in graph mode, this is done automagically for us; the PO
+ * implementation doesn't use pointer references, so simply removing a node
+ * (whether marked or not) doesn't endanger us.  We can't delete nodes out 
+ * from under a SubscriberQueue iterator, so we need to switch over to 
+ * graph solver mode in such cases and flag the SQ for regeneration.
+ */
 void csEventTree::FatRecordObject::UnsubscribeInternal(csHandlerID id, csEventID baseevent)
 {
-  iEventHandler *h = handler_reg->GetHandler(id);
   /* It is possible we've been called for a "universal unsubscribe"
    * (baseevent==CS_EVENT_INVALID), so it could be there's nothing
    * to remove from this event node because the handler didn't
    * subscribe here. */
   if (SubscriberGraph->Contains(id)) 
   {
+    /* We may waste a bit of effort going to graph-solver mode, but
+     * it greatly simplifies the bookkeeping for dealing with all sorts of
+     * corner cases (esp. deleting a subscription that is currently 
+     * in-process).
+     */
+    if (iterator)
+    {
+      iterator->GraphMode();
+    }
+
     /* Automagically removes all of the edges for us.
      * Dangling edges are a non-issue, since they go away
      * and their deleted endpoint will never appear again
      * (instance IDs are non-repeating). */
     SubscriberGraph->Delete(id);
-    
-    /* Remove from the delivery queue without unnecessary SubscriberGraph->Solve() */
-    if ((SubscriberQueue != 0) && (iterator == 0)) {
-      csList<iEventHandler *>::Iterator it(*SubscriberQueue);
-      while (it.HasNext()) 
-      {
-	if (it.Next() == h) 
-	{
-	  SubscriberQueue->Delete(it);
-	  break;
-	}
-      }
-    }
-    else
-    {
-      /* It's not safe to delete out from under a live iterator. */
-      StaleSubscriberQueue = true;
-      
-      /* Don't regenerate right away, there may be more to come.
-       * We do lazy re-evaluation, i.e., only when the next
-       * event is dispatched to this target (see Dispatch()). */
-      if (!deletedList)
-	deletedList = new csList<csHandlerID>;
-      deletedList->PushBack(id);
-    }
   }
 }
 
 /*
- * This has to be "reentrant", by which I simply mean it must be safe for
+ * This has to be "reentrant", by which we simply mean it must be safe for
  * an event handler to un-subscribe itself while it is being delivered to.
- * If we are in graph mode, this is done automagically for us; the PO
- * implementation doesn't use pointer references, so simply removing a node
- * (whether marked or not) doesn't endanger us.  In the SQ case, however,
- * we have to be careful, since we can't delete nodes out from under the 
- * SQ iterator.  Instead, we delete them from the graph (as usual), mark 
- * them in deletedList (so the iterator can make sure not to hit them),
- * and signal a regenerate for when the iteration is done.
  */
 void csEventTree::UnsubscribeInternal(csHandlerID id, csEventID baseevent)
 {
@@ -514,15 +490,6 @@ void csEventTree::Dispatch (iEvent &e)
   while (it.HasNext()) 
   {
     iEventHandler *h = it.Next();
-    if (fatRecord->deletedList) 
-    {
-      csList<csHandlerID>::Iterator dit(*fatRecord->deletedList);
-      while (dit.HasNext()) 
-      {
-	if (dit.Next() == handler_reg->GetID(h))
-	  continue;
-      }
-    }
     CS_ASSERT(h != 0);
 #ifdef ADB_DEBUG
     std::cerr << " -- dispatching to "

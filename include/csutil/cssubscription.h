@@ -148,9 +148,8 @@ private:
 		    csRef<iEventNameRegistry> &n_reg,
 		    csPartialOrder<csHandlerID> *new_sg,
 		    csList<iEventHandler *> *new_sq) :
-      handler_reg(h_reg), name_reg (n_reg),
-      SubscriberGraph(new_sg), SubscriberQueue(new_sq),
-      iterator(0), deletedList(0)
+      handler_reg(h_reg), name_reg (n_reg), SubscriberGraph(new_sg), 
+      SubscriberQueue(new_sq), iterator(0)
     {
       /* If there's no SQ, mark it for creation */
       StaleSubscriberQueue = (SubscriberQueue==0);
@@ -162,7 +161,6 @@ private:
       if (SubscriberQueue)
 	delete SubscriberQueue;
       CS_ASSERT(iterator==0);
-      //CS_ASSERT(deletedList==0);
     }
 
     /**
@@ -199,16 +197,6 @@ private:
      * one iterator at any given time.
      */
     SubscriberIterator *iterator;
-    /**
-     * It's not safe to delete an element from a csList when it has an 
-     * iterator.  Instead, if the SQ is being iterated over and a node
-     * is unsubscribed, its csHandlerID is added to this list and it is
-     * deleted from the PO graph.  The iterator then checks this list
-     * at each step to see if it needs to skip its "Next".  At the end 
-     * of the iteration, if any nodes have been deleted, the SQ is 
-     * re-generated from the PO.
-     */
-    csList<csHandlerID> *deletedList;
   };
 
   FatRecordObject *fatRecord;
@@ -259,24 +247,16 @@ private:
       baseevent(bevent), mode(SI_LIST), qit(*t->fatRecord->SubscriberQueue,false)
     {
       CS_ASSERT(record->iterator == 0);
-      //CS_ASSERT(record->deletedList == 0);
       record->iterator = this;
     }
 
     /**
-     * Destructor.  Check for a deletedList, respond accordingly.
-     * Remove the csEventTree reference to us.
+     * Destructor.  Remove the csEventTree reference to us.
      */
     ~SubscriberIterator ()
     {
       CS_ASSERT(record->iterator == this);
       record->iterator = 0;
-      if (record->deletedList) 
-      {
-	record->StaleSubscriberQueue = true;
-	delete record->deletedList;
-	record->deletedList = 0;
-      }
     }
 
     /// Test if there is another available handler
@@ -342,6 +322,9 @@ private:
       }
     }
     
+    /* SI_GRAPH mode data structures and methods */
+    void GraphMode (); // change to graph (SI_GRAPH) iterator mode.
+    
   private:
     friend class csEventTree;
 
@@ -355,9 +338,6 @@ private:
     
     /* SI_LIST mode data structures */
     csList<iEventHandler *>::Iterator qit;
-    
-    /* SI_GRAPH mode data structures and methods */
-    void GraphMode(); // change to graph (SI_GRAPH) iterator mode.
   };
   friend class SubscriberIterator;
   
