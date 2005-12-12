@@ -9,6 +9,8 @@ chronological order.
 12-Dec-2005
         - res fixed some issues with mouse events.
 	- Adam fixed a bug in csInputDefinition::ParseOther().
+	- Jorrit added a few clarifications to the apimod doc about the
+	  recent event changes and GetFactory() removal.
 11-Dec-2005
 	- Vincent Knecht fixed wxgl plugin for platforms using GLX by
 	  reversing GLX_VERSION_1_4 test.

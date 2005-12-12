@@ -255,6 +255,42 @@ In the meantime, the @samp{csevPreProcess}, @samp{csevProcess},
 by a handler of the @samp{csevFrame} event.
 
 
+@subsubheading A Few Common Idioms to Change
+
+If you use @code{csBaseEventHandler} you should add this line after
+@code{RequestPlugins()}:
+
+@example
+  csBaseEventHandler::Initialize(GetObjectRegistry());
+@end example
+
+The call to @code{RegisterQueue()} should be changed too:
+
+@example
+  if (!RegisterQueue(object_reg, csevAllEvents(object_reg)))
+    return ReportError("Failed to set up event handler!");
+@end example
+
+To quit the application you should now use:
+
+@example
+  q->GetEventOutlet ()->Broadcast (csevQuit (object_reg));
+@end example
+
+Handling a broadcast event can be done like this (note that this will
+be removed in the near future):
+
+@example
+  if (event.Name == csevProcess (object_reg))
+@end example
+
+Handling a keyboard event can be done like this:
+
+@example
+  if (event.Name == csevKeyboardDown (object_reg))
+@end example
+
+
 @subheading @code{csArray<>} Index and Size Type Change
 
 @code{csArray<>} has been changed to use @samp{size_t} instead of
@@ -1499,7 +1535,12 @@ provided functionality which was also already available through
 Likewise, the @code{GetFactory()} method has been removed from 
 @samp{iThingState}. Equivalent functionality can be achieved by using
 @code{GetFactory()} from @samp{iMeshObject} and querying the returned object
-for the @samp{iThingFactoryState} interface.
+for the @samp{iThingFactoryState} interface. Example:
+
+@example
+  csRef<iThingFactoryState> thing_fact_state = SCF_QUERY_INTERFACE (
+  	mesh->GetMeshObject ()->GetFactory (), iThingFactoryState);
+@end example
 
 @subheading Query Macros
 
