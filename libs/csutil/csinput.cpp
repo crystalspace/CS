@@ -612,7 +612,7 @@ void csMouseDriver::Reset ()
     for (int j = 0; j < CS_MAX_MOUSE_BUTTONS; j++)
       if (Button [i][j])
 	DoButton (i, j, false, Last[i], Axes[i]);
-    LastClickButton[i] = (uint)-1;
+    LastClickButton[i] = csmbNone;
   }
 }
 
@@ -629,7 +629,7 @@ iKeyboardDriver* csMouseDriver::GetKeyboardDriver()
  * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver 
  *   support to fix.
  */
-void csMouseDriver::DoButton (uint number, uint button, bool down, 
+void csMouseDriver::DoButton (uint number, int button, bool down, 
                               const int32 *axes, uint numAxes)
 {
   if (number < 0 || number >= CS_MAX_MOUSE_COUNT)
@@ -649,9 +649,10 @@ void csMouseDriver::DoButton (uint number, uint button, bool down,
   Button [number][button] = down;
 
   uint32 buttonMask = 0;
-  for (int i=31 ; i>=0 ; i--) {
+  for (int i=31 ; i>=0 ; i--) 
+  {
     buttonMask <<= 1;
-    if (Button[number-1][i])
+    if (Button[number][i])
       buttonMask |= 0x1;
   }
 
@@ -688,7 +689,7 @@ void csMouseDriver::DoButton (uint number, uint button, bool down,
     Post (ev);
     // Don't allow for sequential double click events
     if (down)
-      LastClickButton [number] = (uint)-1;
+      LastClickButton [number] = csmbNone;
   }
   else if (down)
   {
@@ -728,9 +729,10 @@ void csMouseDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
   Axes [number] = numAxes;
 
   uint32 buttonMask = 0;
-  for (int i=31 ; i>=0 ; i--) {
+  for (int i=31 ; i>=0 ; i--)
+  {
     buttonMask <<= 1;
-    if (Button[number-1][i])
+    if (Button[number][i])
       buttonMask |= 0x1;
   }
 
@@ -790,7 +792,7 @@ iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
  * \todo Building the key-modifiers mask is broken, needs \see iKeyboardDriver 
  *  support to fix.
  */
-void csJoystickDriver::DoButton (uint number, uint button, bool down,
+void csJoystickDriver::DoButton (uint number, int button, bool down,
 				 const int32 *axes, uint numAxes)
 {
   if (number < 0 || number >= CS_MAX_JOYSTICK_COUNT)
@@ -810,9 +812,10 @@ void csJoystickDriver::DoButton (uint number, uint button, bool down,
   Button [number][button] = down;
 
   uint32 buttonMask = 0;
-  for (int i=31 ; i>=0 ; i--) {
+  for (int i=31 ; i>=0 ; i--)
+  {
     buttonMask <<= 1;
-    if (Button[number-1][i])
+    if (Button[number][i])
       buttonMask |= 0x1;
   }
 
@@ -840,7 +843,8 @@ void csJoystickDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
     return;
 
   for (uint iter=0 ; iter<numAxes ; iter++)
-    if (Last[number][iter] != axes[iter]) {
+    if (Last[number][iter] != axes[iter])
+    {
       Last[number][iter] = axes[iter];
       cflags |= (1 << iter);
     }
@@ -855,9 +859,10 @@ void csJoystickDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
   Axes [number] = numAxes;
 
   uint32 buttonMask = 0;
-  for (int i=31 ; i>=0 ; i--) {
+  for (int i=31 ; i>=0 ; i--)
+  {
     buttonMask <<= 1;
-    if (Button[number-1][i])
+    if (Button[number][i])
       buttonMask |= 0x1;
   }
 

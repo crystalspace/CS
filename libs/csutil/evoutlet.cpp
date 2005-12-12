@@ -85,13 +85,13 @@ void csEventOutlet::Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown)
   }
 }
 
-void csEventOutlet::Mouse (uint iButton, bool iDown, int x, int y)
+void csEventOutlet::Mouse (int iButton, bool iDown, int x, int y)
 {
   int32 axes[2] = { x, y };
   Mouse (0, iButton, iDown, axes, 2);
 }
 
-void csEventOutlet::Mouse (uint iNumber, uint iButton, bool iDown, const int32 *axes, 
+void csEventOutlet::Mouse (uint iNumber, int iButton, bool iDown, const int32 *axes, 
                            uint numAxes)
 {
   iMouseDriver* m = GetMouseDriver();
@@ -104,13 +104,13 @@ void csEventOutlet::Mouse (uint iNumber, uint iButton, bool iDown, const int32 *
   }
 }
 
-void csEventOutlet::Joystick (uint iNumber, uint iButton,
+void csEventOutlet::Joystick (uint iNumber, int iButton,
 			      bool iDown, const int32 *axes, uint numAxes)
 {
   iJoystickDriver *j = GetJoystickDriver();
   if (j != 0)
   {
-    if (iButton == (uint) -1)
+    if (iButton == -1)
       j->DoMotion (iNumber, axes, numAxes);
     else
       j->DoButton (iNumber, iButton, iDown, axes, numAxes);

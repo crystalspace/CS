@@ -196,17 +196,17 @@ struct iMouseDriver : public virtual iBase
   virtual int GetLast (uint n, uint a) const = 0;
   /// Query last mouse position for mouse n
   virtual const int32 *GetLast (uint n) const = 0;
-  /// Query the last known mouse button state. Button numbers start at 1.
-  virtual bool GetLastButton (uint number, uint button) const = 0;
-  virtual bool GetLastButton (uint button) const = 0;
+  /// Query the last known mouse button state. Button numbers start at 0.
+  virtual bool GetLastButton (uint number, int button) const = 0;
+  virtual bool GetLastButton (int button) const = 0;
 
   /**
    * Call this to add a 'mouse button down/up' event to queue. Button numbers
    * start at one.
    */
-  virtual void DoButton (uint number, uint button, bool down, 
+  virtual void DoButton (uint number, int button, bool down, 
     const int32 *axes, uint numAxes) = 0;
-  virtual void DoButton (uint button, bool down, int x, int y) = 0;
+  virtual void DoButton (int button, bool down, int x, int y) = 0;
   /// Call this to add a 'mouse moved' event to queue
   virtual void DoMotion (uint number, const int32 *axes, uint numAxes) = 0;
   virtual void DoMotion (int x, int y) = 0;
@@ -252,13 +252,13 @@ struct iJoystickDriver : public virtual iBase
    * Query the last known button state of joystick 'number'.  Joystick numbers
    * start at 1.  Button numbers start at 1.
    */
-  virtual bool GetLastButton (uint number, uint button) const = 0;
+  virtual bool GetLastButton (uint number, int button) const = 0;
 
   /**
    * Call this to add a 'button down/up' event to queue.  Joystick
    * numbers start at 1.  Button numbers start at 1.
    */
-  virtual void DoButton (uint number, uint button, bool down, 
+  virtual void DoButton (uint number, int button, bool down, 
     const int32 *axes, uint numAxes) = 0;
   /// Call this to add a 'moved' event to queue for joystick 'number'.
   virtual void DoMotion (uint number, const int32 *axes, uint nunmAxes) = 0;

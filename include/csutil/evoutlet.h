@@ -72,12 +72,12 @@ public:
   /// Put a keyboard event into event queue.
   virtual void Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown);
   /// Put a mouse event into event queue (old interface)
-  virtual void Mouse (uint iButton, bool iDown, int x, int y);
+  virtual void Mouse (int iButton, bool iDown, int x, int y);
   /// Put a mouse event into event queue (new interface)
-  virtual void Mouse (uint iNumber, uint iButton, bool iDown, 
+  virtual void Mouse (uint iNumber, int iButton, bool iDown, 
 		      const int32 *axes, uint numAxes);
   /// Put a joystick event into event queue.
-  virtual void Joystick (uint iNumber, uint iButton, bool iDown, 
+  virtual void Joystick (uint iNumber, int iButton, bool iDown, 
     const int32 *axes, uint numAxes);
   /// Put a broadcast event into event queue.
   virtual void Broadcast (csEventID iName, intptr_t iInfo);

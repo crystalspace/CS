@@ -217,7 +217,7 @@ protected:
   /// Last "mouse down" event time
   csTicks LastClickTime[CS_MAX_MOUSE_COUNT];
   /// Last "mouse down" event button
-  uint LastClickButton[CS_MAX_MOUSE_COUNT];
+  int LastClickButton[CS_MAX_MOUSE_COUNT];
   /// Last "mouse down" event position
   int LastClick [CS_MAX_MOUSE_COUNT][CS_MAX_MOUSE_AXES];
   /// Last mouse positions
@@ -261,10 +261,10 @@ public:
   CS_PURE_METHOD virtual const int32 *GetLast (uint n) const
   { return Last [n]; }
   /// Query the last known mouse button state for mouse \#0
-  CS_PURE_METHOD virtual bool GetLastButton (uint button) const
+  CS_PURE_METHOD virtual bool GetLastButton (int button) const
   { return GetLastButton(0, button); }
   /// Query the last known mouse button state
-  CS_PURE_METHOD virtual bool GetLastButton (uint number, uint button) const
+  CS_PURE_METHOD virtual bool GetLastButton (uint number, int button) const
   {
     return (number >= 0 && number < CS_MAX_MOUSE_COUNT
 	    && button >= 0 && button < CS_MAX_MOUSE_BUTTONS) ?
@@ -272,12 +272,12 @@ public:
   }
 
   /// Call this to add a 'mouse button down/up' event to queue
-  virtual void DoButton (uint number, uint button, bool down,
+  virtual void DoButton (uint number, int button, bool down,
   	const int32 *axes, uint numAxes);
-  virtual void DoButton (uint button, bool down, const int32 *axes,
+  virtual void DoButton (int button, bool down, const int32 *axes,
   	uint numAxes) 
   { DoButton (0, button, down, axes, numAxes); }
-  virtual void DoButton (uint button, bool down, int x, int y)
+  virtual void DoButton (int button, bool down, int x, int y)
   { int32 axes[2] = {x, y}; DoButton (0, button, down, axes, 2); }
   /// Call this to add a 'mouse moved' event to queue
   virtual void DoMotion (uint number, const int32 *axes, uint numAxes);
@@ -343,7 +343,7 @@ public:
   CS_PURE_METHOD virtual int GetLast (uint number, uint axis) const 
   { return Last [number][axis]; }
   /// Query the last known joystick button state
-  CS_PURE_METHOD virtual bool GetLastButton (uint number, uint button) const
+  CS_PURE_METHOD virtual bool GetLastButton (uint number, int button) const
   {
     return (number >= 0 && number < CS_MAX_JOYSTICK_COUNT
          && button >= 0 && button < CS_MAX_JOYSTICK_BUTTONS) ?
@@ -351,7 +351,7 @@ public:
   }
 
   /// Call this to add a 'joystick button down/up' event to queue
-  virtual void DoButton (uint number, uint button, bool down, 
+  virtual void DoButton (uint number, int button, bool down, 
     const int32 *axes, uint numAxes);
   /// Call this to add a 'joystick moved' event to queue
   virtual void DoMotion (uint number, const int32 *axes, uint numAxes);

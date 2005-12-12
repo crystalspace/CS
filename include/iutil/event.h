@@ -507,7 +507,7 @@ struct iEventOutlet : public virtual iBase
    * respective location. iButton can be in the range from 1 to
    * CS_MAX_MOUSE_BUTTONS (or 0 for mouse move event).
    */
-  virtual void Mouse (uint iButton, bool iDown, int x, int y) = 0;
+  virtual void Mouse (int iButton, bool iDown, int x, int y) = 0;
 
   /**
    * Put a joystick event into event queue.<p>
@@ -517,7 +517,7 @@ struct iEventOutlet : public virtual iBase
    * Otherwise an joystick up/down event is generated. iButton can be from
    * 1 to CS_MAX_JOYSTICK_BUTTONS (or 0 for a joystick move event).
    */
-  virtual void Joystick(uint iNumber, uint iButton, bool iDown, 
+  virtual void Joystick(uint iNumber, int iButton, bool iDown, 
     const int32 *axes, uint numAxes) = 0;
 
   /**

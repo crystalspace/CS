@@ -552,7 +552,7 @@ void WalkTest::MouseClick1Handler(iEvent &Event)
   move_forward = true;
 }
 
-// middle mouse button
+// right mouse button
 void WalkTest::MouseClick2Handler(iEvent &Event)
 {
   csVector3 v;
@@ -604,7 +604,7 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
     //view->GetClipper (), select_object);
 }
 
-// right mouse button
+// middle mouse button
 void WalkTest::MouseClick3Handler(iEvent &Event)
 {
   csVector2   screenPoint;
@@ -654,12 +654,12 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
     case csMouseEventTypeDown:
       switch(csMouseEventHelper::GetButton(&Event))
       {
-      case 1:
-	MouseClick1Handler(Event); break;
-      case 2:
-	MouseClick2Handler(Event); break;
-      case 3:
-	MouseClick3Handler(Event); break;
+	case csmbLeft:
+	  MouseClick1Handler(Event); break;
+	case csmbRight:
+	  MouseClick2Handler(Event); break;
+	case csmbMiddle:
+	  MouseClick3Handler(Event); break;
       }
       break;
 
@@ -689,7 +689,7 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
       break;
 
     case csMouseEventTypeUp:
-      if (csMouseEventHelper::GetButton(&Event) == 1) 
+      if (csMouseEventHelper::GetButton(&Event) == csmbLeft) 
       {
 	move_forward = false;
 	Step (0);

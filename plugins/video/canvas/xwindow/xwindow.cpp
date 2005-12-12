@@ -483,9 +483,9 @@ static Bool AlwaysTruePredicate (Display*, XEvent*, char*)
   return True;
 }
 
-static uint TranslateXMouseButton (int xbutton)
+static int TranslateXMouseButton (int xbutton)
 {
-  static uint buttonMapping[] = {csmbNone, csmbLeft, csmbMiddle, csmbRight};
+  static int buttonMapping[] = {csmbNone, csmbLeft, csmbMiddle, csmbRight};
   const int buttonMapCount =
     sizeof (buttonMapping) / sizeof (buttonMapping[0]);
   

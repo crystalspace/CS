@@ -185,7 +185,7 @@ csMouseEventType csMouseEventHelper::GetEventType (const iEvent* event)
   uint8 type;
   if (event->Retrieve ("mEventType", type) != csEventErrNone)
     return (csMouseEventType)-1;
-  return (csMouseEventType)type;
+  return (csMouseEventType)(type-1);
 }
 
 uint csMouseEventHelper::GetNumber (const iEvent *event)
