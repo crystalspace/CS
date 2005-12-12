@@ -97,7 +97,7 @@ void csEventOutlet::Mouse (uint iNumber, int iButton, bool iDown, const int32 *a
   iMouseDriver* m = GetMouseDriver();
   if (m != 0)
   {
-    if (iButton == (uint) csmbNone)
+    if (iButton == csmbNone)
       m->DoMotion (iNumber, axes, numAxes);
     else
       m->DoButton (iNumber, iButton, iDown, axes, numAxes);
