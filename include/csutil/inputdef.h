@@ -110,7 +110,7 @@ public:
    * \param useCookedCode If true, will use the cooked key code instead of raw.
    * More precisely, the syntax for <tt>string</tt> is (in EBNF):
    * <pre>
-   * [ mod ("+"|"-") ]* ( ( nonZeroDevNumber? ("mouse" | "joystick") ( "X" | "Y" | ("Axis" axisNumber) | ("Button" buttonNumber) | buttonNumber ) ) | key )
+   * [ mod ("+"|"-") ]* ( ( devNumber? ("mouse" | "joystick") ( "X" | "Y" | ("Axis" axisNumber) | ("Button" buttonNumber) | buttonNumber ) ) | key )
    * </pre>
    * So the fourth axis of the third joystick is "2JoystickAxis3", and its 
    * first button is "2JoystickButton0" or "2Joystick0".  The leading number

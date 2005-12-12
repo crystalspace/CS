@@ -373,8 +373,11 @@ csInputDefinition::csInputDefinition (iEventNameRegistry* r,
   }
   else
   {
+    containedName = csevKeyboardEvent (name_reg);
+
     if (deviceNumber != 0)
-    { /* this was actually a key, not a device number */
+    {
+      /* this was actually a key, not a device number */
       csString str2 ("");
       str2.Append(deviceNumber);
       str = str2 + str;
