@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2005 by Jorrit Tyberghein
               (C) 2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
@@ -39,6 +39,7 @@
 #include "ivideo/shader/shader.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/meshobj.h"
+#include "plugins/engine/3d/meshgen.h"
 
 class csEngine;
 class csProgressPulse;
@@ -253,6 +254,19 @@ public:
   void RemoveLSI (csLightSectorInfluence* inf);
   const csLightSectorInfluences& GetLSI () const { return influences; }
 
+  iMeshGenerator* CreateMeshGenerator (const char* name);
+  size_t GetMeshGeneratorCount () const
+  {
+    return meshGenerators.Length ();
+  }
+  iMeshGenerator* GetMeshGenerator (size_t idx)
+  {
+    return (iMeshGenerator*)meshGenerators[idx];
+  }
+  iMeshGenerator* GetMeshGeneratorByName (const char* name);
+  void RemoveMeshGenerator (size_t idx);
+  void RemoveMeshGenerators ();
+
 private:
   // -- PRIVATE METHODS
 
@@ -363,6 +377,11 @@ private:
    * List of meshes that have portals that leave from this sector.
    */
   csSet<csPtrKey<iMeshWrapper> > portalMeshes;
+
+  /**
+   * Mesh generators.
+   */
+  csRefArrayObject<csMeshGenerator> meshGenerators;
 
   /**
    * List of sector callbacks.

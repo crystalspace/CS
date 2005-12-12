@@ -32,6 +32,7 @@
 #include "csutil/set.h"
 
 struct iMeshWrapper;
+struct iMeshGenerator;
 struct iMeshList;
 struct iLightList;
 struct iLight;
@@ -244,6 +245,38 @@ struct iSector : public virtual iBase
    * the default renderloop in the engine will be used.
    */
   virtual iRenderLoop* GetRenderLoop () = 0;
+
+  // -- Mesh generator handling.
+
+  /**
+   * Create a mesh generator.
+   */
+  virtual iMeshGenerator* CreateMeshGenerator (const char* name) = 0;
+
+  /**
+   * Get the number of mesh generators.
+   */
+  virtual size_t GetMeshGeneratorCount () const = 0;
+
+  /**
+   * Get the specific mesh generator.
+   */
+  virtual iMeshGenerator* GetMeshGenerator (size_t idx) = 0;
+
+  /**
+   * Get the specific mesh generator by name.
+   */
+  virtual iMeshGenerator* GetMeshGeneratorByName (const char* name) = 0;
+
+  /**
+   * Remove a mesh generator.
+   */
+  virtual void RemoveMeshGenerator (size_t idx) = 0;
+
+  /**
+   * Remove all mesh generators.
+   */
+  virtual void RemoveMeshGenerators () = 0;
 
   // -- Fog handling
 

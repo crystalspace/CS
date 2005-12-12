@@ -1021,6 +1021,32 @@ void csSector::RemoveLSI (csLightSectorInfluence* inf)
 
 //---------------------------------------------------------------------------
 
+iMeshGenerator* csSector::CreateMeshGenerator (const char* name)
+{
+  csMeshGenerator* meshgen = new csMeshGenerator ();
+  meshgen->QueryObject ()->SetName (name);
+  meshGenerators.Push (meshgen);
+  meshgen->DecRef ();
+  return meshgen;
+}
+
+iMeshGenerator* csSector::GetMeshGeneratorByName (const char* name)
+{
+  return meshGenerators.FindByName (name);
+}
+
+void csSector::RemoveMeshGenerator (size_t idx)
+{
+  meshGenerators.DeleteIndex (idx);
+}
+
+void csSector::RemoveMeshGenerators ()
+{
+  meshGenerators.DeleteAll ();
+}
+
+//---------------------------------------------------------------------------
+
 void csSector::RegisterPortalMesh (iMeshWrapper* mesh)
 {
   portalMeshes.Add (mesh);

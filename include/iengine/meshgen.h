@@ -30,6 +30,7 @@
 #include "csutil/scf.h"
 
 struct iMeshFactoryWrapper;
+struct iMeshWrapper;
 class csBox3;
 
 /**
@@ -69,7 +70,10 @@ struct iMeshGeneratorGeometry : public virtual iBase
 
   /**
    * Set the radius for this object. No other objects will be generated
-   * within this radius.
+   * within this radius. If this radius is 0 then there is no limitation
+   * on object generation (i.e. objects can be put on top of each other
+   * if the random generator decides to do that).
+   * Default is 0.
    */
   virtual void SetRadius (float radius) = 0;
 
@@ -80,7 +84,9 @@ struct iMeshGeneratorGeometry : public virtual iBase
 
   /**
    * Set the density. The density is defined as the number of objects
-   * in every 1x1 square.
+   * in every 1x1 square. Default density is 1.
+   * @@@TODO: add density map support.
+   * @@@TODO: add density per material.
    */
   virtual void SetDensity (float density) = 0;
 
@@ -103,12 +109,12 @@ struct iMeshGeneratorMapping : public virtual iBase
    * This can be 0 in which case it will act on all objects
    * in the given sector.
    */
-  virtual void SetMeshObject (iMeshObject* mesh) = 0;
+  virtual void SetMeshWrapper (iMeshWrapper* mesh) = 0;
 
   /**
    * Get the mesh object.
    */
-  virtual iMeshObject* GetMeshObject () = 0;
+  virtual iMeshWrapper* GetMeshWrapper () = 0;
 
   /**
    * Get the box where where we will sample. We will sample starting
