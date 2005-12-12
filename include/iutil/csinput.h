@@ -164,8 +164,8 @@ struct iKeyboardDriver : public virtual iBase
  * records state information about recent events.  It is responsible for
  * synthesizing double-click events when it detects that two mouse-down events
  * have occurred for the same mouse button within a short interval.  Mouse
- * button numbers start at 1.  The left mouse button is 1, the right is 2, the
- * middle 3, and so on.  Typically, one instance of this object is available
+ * button numbers start at 0.  The left mouse button is 0, the right is 1, the
+ * middle 2, and so on.  Typically, one instance of this object is available
  * from the shared-object registry (iObjectRegistry) under the name
  * "crystalspace.driver.input.generic.mouse".
  *
@@ -188,7 +188,7 @@ struct iMouseDriver : public virtual iBase
    */
   virtual void Reset () = 0;
 
-  /// Query last mouse X position for mouse number (1, 2, ...)
+  /// Query last mouse X position for mouse number (0, 1, ...)
   virtual int GetLastX (uint number = 0) const = 0;
   /// Query last mouse Y position
   virtual int GetLastY (uint number = 0) const = 0;
@@ -202,7 +202,7 @@ struct iMouseDriver : public virtual iBase
 
   /**
    * Call this to add a 'mouse button down/up' event to queue. Button numbers
-   * start at one.
+   * start at zero.
    */
   virtual void DoButton (uint number, int button, bool down, 
     const int32 *axes, uint numAxes) = 0;
@@ -218,9 +218,9 @@ SCF_VERSION(iJoystickDriver, 0, 0, 1);
  * Generic Joystick driver.<p>
  * The joystick driver is responsible for tracking current joystick state and
  * also for synthesizing joystick movement events.  Multiple joysticks are
- * supported; they are numbered starting at one.  Joystick button numbers also
- * start at one.  Typically, a single instance of this object is available from
- * the shared-object registry (iObjectRegistry) under the name
+ * supported; they are numbered starting at zero.  Joystick button numbers also
+ * start at zero.  Typically, a single instance of this object is available
+ * from the shared-object registry (iObjectRegistry) under the name
  * "crystalspace.driver.input.generic.joystick".
  *
  * Main creators of instances implementing this interface:
@@ -250,13 +250,13 @@ struct iJoystickDriver : public virtual iBase
 
   /**
    * Query the last known button state of joystick 'number'.  Joystick numbers
-   * start at 1.  Button numbers start at 1.
+   * start at 0.  Button numbers start at 0.
    */
   virtual bool GetLastButton (uint number, int button) const = 0;
 
   /**
    * Call this to add a 'button down/up' event to queue.  Joystick
-   * numbers start at 1.  Button numbers start at 1.
+   * numbers start at 0.  Button numbers start at 0.
    */
   virtual void DoButton (uint number, int button, bool down, 
     const int32 *axes, uint numAxes) = 0;
