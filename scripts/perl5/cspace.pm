@@ -14815,6 +14815,7 @@ sub CS_MAX_MOUSE_BUTTONS () { $cspacec::CS_MAX_MOUSE_BUTTONS }
 sub CS_MAX_JOYSTICK_COUNT () { $cspacec::CS_MAX_JOYSTICK_COUNT }
 sub CS_MAX_JOYSTICK_BUTTONS () { $cspacec::CS_MAX_JOYSTICK_BUTTONS }
 sub CS_MAX_JOYSTICK_AXES () { $cspacec::CS_MAX_JOYSTICK_AXES }
+sub csmbNone () { $cspacec::csmbNone }
 sub csmbLeft () { $cspacec::csmbLeft }
 sub csmbRight () { $cspacec::csmbRight }
 sub csmbMiddle () { $cspacec::csmbMiddle }
