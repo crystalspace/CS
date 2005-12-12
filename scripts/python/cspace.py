@@ -8184,6 +8184,7 @@ class csKeyEventDataPtr(csKeyEventData):
         _swig_setattr(self, csKeyEventData,self.__class__,csKeyEventData)
 _cspace.csKeyEventData_swigregister(csKeyEventDataPtr)
 
+csmbNone = _cspace.csmbNone
 csmbLeft = _cspace.csmbLeft
 csmbRight = _cspace.csmbRight
 csmbMiddle = _cspace.csmbMiddle
