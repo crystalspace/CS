@@ -27,6 +27,7 @@ namespace cspluginSoft3d
   template<typename Pix>
   class Specifica : public iPixTypeSpecifica
   {
+    typedef typename_qualifier Pix::PixType PixType;
     Pix pix;
 
     template<typename SrcBlend, typename DstBlend, int alphaTest,
@@ -42,7 +43,7 @@ namespace cspluginSoft3d
       tx <<= 16; ty = (ty << 16) & bhm;
       for (; sh > 0; sh--, ty = (ty + dy) & bhm, sy++)
       {
-	Pix::PixType *VRAM = (Pix::PixType*)G2D->GetPixelAt (sx, sy);
+	PixType *VRAM = (PixType*)G2D->GetPixelAt (sx, sy);
 	uint32 *data = bitmap + (ty >> 16) * bw;
 	int x = tx;
 	for (int w = sw; w; w--)
@@ -193,7 +194,7 @@ namespace cspluginSoft3d
     {
       for (int y = 0 ; y < txt_h ; y++)
       {
-	Pix::PixType* d = (Pix::PixType*)line_table[y];
+	PixType* d = (PixType*)line_table[y];
 	for (int x = 0 ; x < txt_w ; x++)
 	{
 	  const Pixel px (pix.GetPix (d++));
@@ -206,7 +207,7 @@ namespace cspluginSoft3d
     {
       for (int y = 0 ; y < txt_h ; y++)
       {
-	Pix::PixType* d = (Pix::PixType*)line_table[y];
+	PixType* d = (PixType*)line_table[y];
 	for (int x = 0 ; x < txt_w ; x++)
 	{
 	  const Pixel px (*bitmap++);
