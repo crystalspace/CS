@@ -1538,8 +1538,9 @@ Likewise, the @code{GetFactory()} method has been removed from
 for the @samp{iThingFactoryState} interface. Example:
 
 @example
-  csRef<iThingFactoryState> thing_fact_state = SCF_QUERY_INTERFACE (
-  	mesh->GetMeshObject ()->GetFactory (), iThingFactoryState);
+  csRef<iThingFactoryState> thing_fact_state =
+  	scfQueryInterface<iThingFactoryState> (mesh->GetMeshObject ()
+	->GetFactory ());
 @end example
 
 @subheading Query Macros

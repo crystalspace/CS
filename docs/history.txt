@@ -10,6 +10,8 @@ chronological order.
 	- res fixed render-to-texture support in the software renderer.
 	- res fixed pixmap drawing in the software renderer.
 	- res fixed some miscellaneous new event stuff fallout.
+	- Jorrit added a note about Cg 1.4 requirement to the
+	  documentation.
 12-Dec-2005
         - res fixed some issues with mouse events.
 	- Adam fixed a bug in csInputDefinition::ParseOther().

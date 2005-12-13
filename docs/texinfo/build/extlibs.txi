@@ -28,6 +28,8 @@ libmng
 MikMod
 @item
 @sc{cegui}
+@item
+@sc{cg}
 @end itemize
 
 Most of these libraries are optional.  If you do not have them installed, then
@@ -169,3 +171,17 @@ Crystal Space can optionally utilize the @code{libmng} library for reading
 After downloading you can either install the package normally (i.e. @samp{make
 install}) or unpack it into the directory @file{CS/libs/libmng*}.  In general,
 if you have permission to do so, it is best to install the library.
+
+@subheading @sc{cg}
+@cindex @sc{cg}
+@cindex Libraries, @sc{cg}
+@cindex CG library
+
+Many Crystal Space shaders require the @sc{cg} library from @samp{NVidia}.
+Crystal Space depends on the @sc{cg} library with version number at least
+equal to 1.4. If you're on GNU/Linux then you probably will not find a package
+with that version available (latest stable on Gentoo is 1.2 for example) so
+you have to directly download this from
+@url{http://developer.nvidia.com/object/cg_toolkit.html#downloads}.
+
+
