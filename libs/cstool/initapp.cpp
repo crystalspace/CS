@@ -418,10 +418,9 @@ bool csInitializer::SetupEventHandler (
   csEventHandlerFunc evhdlr_func, 
   const csEventID events[])
 {
-  csAppEventHandler* evhdlr = new csAppEventHandler (evhdlr_func);
-  bool rc = SetupEventHandler (r, evhdlr, events);
-  evhdlr->DecRef ();
-  return rc;
+  csRef<csAppEventHandler> evhdlr;
+  evhdlr.AttachNew (new csAppEventHandler (evhdlr_func));
+  return SetupEventHandler (r, evhdlr, events);
 }
 
 bool csInitializer::SetupEventHandler (iObjectRegistry* r, csEventHandlerFunc evhdlr_func)

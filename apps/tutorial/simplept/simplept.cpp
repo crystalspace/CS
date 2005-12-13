@@ -459,7 +459,7 @@ int main (int argc, char* argv[])
   if (simple->Initialize ())
     simple->Start ();
 
-  delete simple;
+  delete simple; simple = 0;
 
   csInitializer::DestroyApplication (object_reg);
 

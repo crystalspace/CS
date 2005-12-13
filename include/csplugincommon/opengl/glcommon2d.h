@@ -140,9 +140,6 @@ protected:
   csGLDriverDatabase driverdb;
   bool useCombineTE;
 
-  int vpWidth, vpHeight;
-  bool vpSet;
-
   void GetPixelFormatString (const GLPixelFormat& format, csString& str);
 
   /// Open default driver database.
@@ -244,11 +241,6 @@ public:
     int color);
   /// Blit.
   virtual void Blit (int x, int y, int w, int h, unsigned char const* data);
-
-  virtual int GetWidth ()
-  { return vpSet ? vpWidth : Width; }
-  virtual int GetHeight ()
-  { return vpSet ? vpHeight : Height; }
 
   /**
    * Get address of video RAM at given x,y coordinates.

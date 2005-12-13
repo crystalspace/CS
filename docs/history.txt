@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Dec-2005
+	- res fixed render-to-texture support in the software renderer.
+	- res fixed pixmap drawing in the software renderer.
+	- res fixed some miscellaneous new event stuff fallout.
 12-Dec-2005
         - res fixed some issues with mouse events.
 	- Adam fixed a bug in csInputDefinition::ParseOther().

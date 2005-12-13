@@ -40,7 +40,8 @@
 #include "csplugincommon/canvas/softfontcache.h"
 #include "csplugincommon/canvas/softfontcacheimpl.h"
 
-csGraphics2D::csGraphics2D (iBase* parent) : scfImplementationType (this, parent)
+csGraphics2D::csGraphics2D (iBase* parent) : 
+  scfImplementationType (this, parent), vpSet(false)
 {
   static uint g2d_count = 0;
 
@@ -272,6 +273,10 @@ bool csGraphics2D::Open ()
   if (is_open) return true;
   is_open = true;
 
+  vpWidth = Width;
+  vpHeight = Height;
+  vpSet = false;
+  
   FrameBufferLocked = 0;
 
   // Allocate buffer for address of each scan line to avoid multuplication
@@ -315,7 +320,7 @@ void csGraphics2D::FinishDraw ()
 
 void csGraphics2D::Clear(int color)
 {
-  DrawBox (0, 0, Width, Height, color);
+  DrawBox (0, 0, vpWidth, vpHeight, color);
 }
 
 bool csGraphics2D::DoubleBuffer (bool Enable)
@@ -637,13 +642,13 @@ void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
 void csGraphics2D::SetClipRect (int xmin, int ymin, int xmax, int ymax)
 {
   if (xmin < 0) xmin = 0;
-  else if (xmin > Width) xmin = Width;
+  else if (xmin > vpWidth) xmin = vpWidth;
   if (xmax < 0) xmax = 0;
-  else if (xmax > Width) xmax = Width;
+  else if (xmax > vpWidth) xmax = vpWidth;
   if (ymin < 0) ymin = 0;
-  else if (ymin > Height) ymin = Height;
+  else if (ymin > vpHeight) ymin = vpHeight;
   if (ymax < 0) ymax = 0;
-  else if (ymax > Height) ymax = Height;
+  else if (ymax > vpHeight) ymax = vpHeight;
   ClipX1 = xmin; ClipX2 = xmax;
   ClipY1 = ymin; ClipY2 = ymax;
   
@@ -731,12 +736,12 @@ csImageArea *csGraphics2D::SaveArea (int x, int y, int w, int h)
 {
   if (x < 0)
   { w += x; x = 0; }
-  if (x + w > Width)
-    w = Width - x;
+  if (x + w > vpWidth)
+    w = vpWidth - x;
   if (y < 0)
   { h += y; y = 0; }
-  if (y + h > Height)
-    h = Height - y;
+  if (y + h > vpHeight)
+    h = vpHeight - y;
   if ((w <= 0) || (h <= 0))
     return 0;
 
@@ -845,8 +850,22 @@ unsigned char *csGraphics2D::GetPixelAt32 (csGraphics2D *This, int x, int y)
   return (This->Memory + ((x<<2) + This->LineAddress[y]));
 }
 
-bool csGraphics2D::PerformExtensionV (char const*, va_list)
+bool csGraphics2D::PerformExtensionV (char const* command, va_list args)
 {
+  if (!strcasecmp (command, "vp_set"))
+  {
+    vpWidth = va_arg (args, int);
+    vpHeight = va_arg (args, int);
+    vpSet = true;
+    return true;
+  }
+  else if (!strcasecmp (command, "vp_reset"))
+  {
+    vpWidth = Width;
+    vpHeight = Height;
+    vpSet = false;
+    return true;
+  }
   return false;
 }
 
@@ -863,7 +882,7 @@ void csGraphics2D::GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB)
 {
   oR = oG = oB = 0;
 
-  if (x < 0 || y < 0 || x >= Width || y >= Height)
+  if (x < 0 || y < 0 || x >= vpWidth || y >= Height)
     return;
 
   uint8 *vram = GetPixelAt (x, y);
@@ -897,7 +916,7 @@ void csGraphics2D::GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB, uint
   oR = oG = oB = 0;
   oA = 255;
 
-  if (x < 0 || y < 0 || x >= Width || y >= Height)
+  if (x < 0 || y < 0 || x >= vpWidth || y >= Height)
     return;
 
   uint8 *vram = GetPixelAt (x, y);
@@ -994,7 +1013,12 @@ bool csGraphics2D::Resize (int w, int h)
     for (i = 0, addr = 0; i < Height; i++, addr += bpl)
       LineAddress[i] = addr;
 
-    SetClipRect (0, 0, Width, Height);
+    if (!vpSet)
+    {
+      vpWidth = Width;
+      vpHeight = Height;
+      SetClipRect (0, 0, Width, Height);
+    }
   }
   return true;
 }

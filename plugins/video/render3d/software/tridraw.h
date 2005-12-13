@@ -469,8 +469,6 @@ namespace cspluginSoft3d
     TriangleDrawer (csSoftwareGraphics3DCommon* g3d) : 
       TriangleDrawerCommon (g3d), pix(g3d->pfmt)
     {
-      polyrast.Init (g3d->pfmt, g3d->width, g3d->height, g3d->z_buffer,
-	g3d->line_table);
     }
   
     ~TriangleDrawer()
@@ -482,6 +480,8 @@ namespace cspluginSoft3d
       const iScanlineRenderer::RenderInfoMesh& scanRenderInfoMesh,
       const csRenderMeshType meshtype, uint32* tri, const uint32* triEnd)
     {
+      polyrast.Init (g3d->pfmt, g3d->width, g3d->height, g3d->z_buffer,
+	g3d->line_table);
       SetupDrawMesh (activebuffers, rangeStart, rangeEnd, mesh, 
 	scanRenderInfoMesh, meshtype, tri, triEnd);
 

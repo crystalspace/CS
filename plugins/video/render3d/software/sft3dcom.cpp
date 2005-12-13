@@ -47,12 +47,7 @@
 
 #include "sft3dcom.h"
 #include "soft_txt.h"
-
-#include "clipper.h"
 #include "clip_znear.h"
-#include "clip_iclipper.h"
-#include "scan_pix.h"
-#include "tridraw.h"
 
 namespace cspluginSoft3d
 {
@@ -107,6 +102,7 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent) :
 
   memset (processedColorsFlag, 0, sizeof (processedColorsFlag));
   memset (triDraw, 0, sizeof (triDraw));
+  specifica = 0;
 }
 
 csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
@@ -215,42 +211,12 @@ bool csSoftwareGraphics3DCommon::Open ()
   SetDimensions (G2D->GetWidth (), G2D->GetHeight ());
 
   csRef<iPluginManager> plugin_mgr (
-    CS_QUERY_REGISTRY (object_reg, iPluginManager));
+    csQueryRegistry<iPluginManager> (object_reg));
 
   CS_QUERY_REGISTRY_PLUGIN(shadermgr, object_reg,
     "crystalspace.graphics3d.shadermanager", iShaderManager);
 
-  if (pfmt.PixelBytes == 4)
-  {
-    if (((pfmt.BlueMask == 0x0000ff) || (pfmt.RedMask == 0x0000ff))
-      && (pfmt.GreenMask == 0x00ff00)
-      && ((pfmt.RedMask == 0xff0000) || (pfmt.BlueMask == 0xff0000)))
-      TriDrawMatrixFiller<Pix_Fix<uint32, 24, 0xff,
-					  16, 0xff,
-					  8,  0xff,
-					  0,  0xff> >::Fill (this, triDraw);
-    else
-      TriDrawMatrixFiller<Pix_Generic<uint32> >::Fill (this, triDraw);
-  }
-  else
-  {
-    if (((pfmt.RedMask == 0xf800) || (pfmt.BlueMask == 0xf800))
-      && (pfmt.GreenMask == 0x07e0)
-      && ((pfmt.BlueMask == 0x001f) || (pfmt.RedMask == 0x001f)))
-      TriDrawMatrixFiller<Pix_Fix<uint16, 0,  0,
-					  8,  0xf8,
-					  3,  0xfc,
-					  -3, 0xf8> >::Fill (this, triDraw);
-    else if (((pfmt.RedMask == 0x7c00) || (pfmt.BlueMask == 0x7c00))
-      && (pfmt.GreenMask == 0x03e0)
-      && ((pfmt.BlueMask == 0x001f) || (pfmt.RedMask == 0x001f)))
-      TriDrawMatrixFiller<Pix_Fix<uint16, 0,  0,
-					  7,  0xf8,
-					  2,  0xf8,
-					  -3, 0xf8> >::Fill (this, triDraw);
-    else
-      TriDrawMatrixFiller<Pix_Generic<uint16> >::Fill (this, triDraw);;
-  }
+  SetupSpecifica();
 
   return true;
 }
@@ -262,8 +228,6 @@ bool csSoftwareGraphics3DCommon::NewOpen ()
   texman->SetPixelFormat (pfmt);
 
   //SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, do_interlaced == 0);
-
-  polyrast_ZFill.Init (pfmt, width, height, z_buffer, line_table);
 
   return true;
 }
@@ -298,6 +262,7 @@ void csSoftwareGraphics3DCommon::Close ()
   for (size_t n = CS_MIXMODE_FACT_COUNT*CS_MIXMODE_FACT_COUNT; n-- > 0; )
     delete triDraw[n];
   memset (triDraw, 0, sizeof (triDraw));
+  delete specifica; specifica = 0;
 
   G2D->Close ();
   width = height = -1;
@@ -369,59 +334,23 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
       line_table[i] = smaller_buffer + ((i*width)*pfmt.PixelBytes);
     else
       line_table[i] = G2D->GetPixelAt (0, i);
+  
+  polyrast_ZFill.Init (pfmt, width, height, z_buffer, line_table);
 
   if (render_target)
   {
     int txt_w, txt_h;
     render_target->GetRendererDimensions (txt_w, txt_h);
-    if (!rt_cliprectset)
-    {
-      G2D->GetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
-      G2D->SetClipRect (-1, -1, txt_w+1, txt_h+1);
-      rt_cliprectset = true;
-    }
 
     if (!rt_onscreen)
     {
-      /*int txt_w, txt_h;
+      int txt_w, txt_h;
       render_target->GetRendererDimensions (txt_w, txt_h);
       csSoftwareTextureHandle* tex_mm = (csSoftwareTextureHandle *)
-	    render_target->GetPrivateObject ();*/
-      //csSoftwareTexture *tex_0 = (csSoftwareTexture*)(tex_mm->get_texture (0));
-      //int x, y;
-      //uint32* bitmap = tex_0->bitmap;
-      /* @@@ FIXME
-      switch (pfmt.PixelBytes)
-      {
-	case 2:
-	  {
-	    uint16* pal2glob = (uint16*)(tex_mm->GetPaletteToGlobal ());
-	    for (y = txt_h-1 ; y >= 0 ; y--)
-	    {
-              uint16* d = (uint16*)line_table[y];
-	      for (x = 0 ; x < txt_w ; x++)
-	      {
-	        uint8 pix = *bitmap++;
-		*d++ = pal2glob[pix];
-	      }
-	    }
-	  }
-	  break;
-	case 4:
-	  {
-	    uint32* pal2glob = (uint32*)(tex_mm->GetPaletteToGlobal ());
-	    for (y = txt_h-1 ; y >= 0 ; y--)
-	    {
-              uint32* d = (uint32*)line_table[y];
-	      for (x = 0 ; x < txt_w ; x++)
-	      {
-	        uint8 pix = *bitmap++;
-		*d++ = pal2glob[pix];
-	      }
-	    }
-	  }
-	  break;
-      }*/
+	    render_target->GetPrivateObject ();
+      csSoftwareTexture *tex_0 = tex_mm->GetTexture (0);
+      uint32* bitmap = tex_0->bitmap;
+      specifica->BlitTextureToScreen (line_table, txt_w, txt_h, bitmap);
       rt_onscreen = true;
     }
   }
@@ -432,7 +361,7 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
   if (DrawFlags & CSDRAW_CLEARSCREEN)
     G2D->Clear (0);
 
-if (DrawMode & CSDRAW_3DGRAPHICS)
+  if (DrawMode & CSDRAW_3DGRAPHICS)
   {
     // Finished 3D drawing. If we are simulating the flush output to real frame buffer.
     if (do_smaller_rendering)
@@ -498,10 +427,7 @@ void csSoftwareGraphics3DCommon::Print (csRect const* area)
   G2D->Print (area);
   if (do_interlaced != -1)
     do_interlaced ^= 1;
-  //if (tcache)
-    //tcache->frameno++;
 }
-
 
 void csSoftwareGraphics3DCommon::FinishDraw ()
 {
@@ -511,67 +437,19 @@ void csSoftwareGraphics3DCommon::FinishDraw ()
 
   if (render_target)
   {
-    if (rt_cliprectset)
-    {
-      rt_cliprectset = false;
-      G2D->SetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
-    }
-
     if (rt_onscreen)
     {
       rt_onscreen = false;
-      /*int txt_w, txt_h;
+      int txt_w, txt_h;
       render_target->GetRendererDimensions (txt_w, txt_h);
       csSoftwareTextureHandle* tex_mm = (csSoftwareTextureHandle *)
-	    render_target->GetPrivateObject ();*/
-      //tex_mm->DeleteMipmaps ();
-      //csSoftwareTexture *tex_0 = (csSoftwareTexture*)(tex_mm->get_texture (0));
-      //int x, y;
-      //uint32* bitmap = tex_0->bitmap;
-      /* @@@ FIXME
-      switch (pfmt.PixelBytes)
-      {
-	case 2:
-	  {
-	    for (y = 0 ; y < txt_h ; y++)
-	    {
-              uint16* d = (uint16*)line_table[y];
-	      for (x = 0 ; x < txt_w ; x++)
-	      {
-		uint16 pix = *d++;
-		uint8 pix8;
-		pix8 = (((pix & pfmt.RedMask) >> pfmt.RedShift) >>
-			(pfmt.RedBits - 3)) << 5;
-		pix8 |= (((pix & pfmt.GreenMask) >> pfmt.GreenShift) >>
-			(pfmt.GreenBits - 3)) << 2;
-		pix8 |= (((pix & pfmt.BlueMask) >> pfmt.BlueShift) >>
-			(pfmt.BlueBits - 2));
-		*bitmap++ = pix8;
-	      }
-	    }
-	  }
-	  break;
-	case 4:
-	  {
-	    for (y = 0 ; y < txt_h ; y++)
-	    {
-              uint32* d = (uint32*)line_table[y];
-	      for (x = 0 ; x < txt_w ; x++)
-	      {
-		uint32 pix = *d++;
-		uint8 pix8;
-		pix8 = (((pix & pfmt.RedMask) >> pfmt.RedShift) >> 5) << 5;
-		pix8 |= (((pix & pfmt.GreenMask) >> pfmt.GreenShift) >> 5) << 2;
-		pix8 |= (((pix & pfmt.BlueMask) >> pfmt.BlueShift) >> 6);
-		*bitmap++ = pix8;
-	      }
-	    }
-	  }
-	  break;
-      }*/
+	    render_target->GetPrivateObject ();
+      csSoftwareTexture *tex_0 = tex_mm->GetTexture (0);
+      uint32* bitmap = tex_0->bitmap;
+      specifica->BlitScreenToTexture (line_table, txt_w, txt_h, bitmap);
     }
+    SetRenderTarget (0, false);
   }
-  render_target = 0;
 }
 
 #define SMALL_D 0.01
@@ -694,13 +572,38 @@ void csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
 	bool persistent)
 {
   render_target = handle;
-  csSoftwareTextureHandle* tex_mm = (csSoftwareTextureHandle *)
-	    render_target->GetPrivateObject ();
-  // We don't generate mipmaps or so...
-  tex_mm->flags |= CS_TEXTURE_NOMIPMAPS;
-
   rt_onscreen = !persistent;
   rt_cliprectset = false;
+
+  if (handle)
+  {
+    int txt_w, txt_h;
+    render_target->GetRendererDimensions (txt_w, txt_h);
+    GetDriver2D()->PerformExtension ("vp_set", txt_w, txt_h);
+    csSoftwareTextureHandle* tex_mm = (csSoftwareTextureHandle *)
+	      render_target->GetPrivateObject ();
+    // We don't generate mipmaps or so...
+    tex_mm->flags |= CS_TEXTURE_NOMIPMAPS;
+    tex_mm->DeleteMipmaps ();
+
+    GetDriver2D()->GetClipRect (rt_old_minx, rt_old_miny, 
+      rt_old_maxx, rt_old_maxy);
+    if ((rt_old_minx != 0) && (rt_old_miny != 0)
+      && (rt_old_maxx != txt_w) && (rt_old_maxy != txt_h))
+    {
+      GetDriver2D()->SetClipRect (0, 0, txt_w, txt_h);
+    }
+
+    SetDimensions (txt_w, txt_h);
+  }
+  else
+  {
+    GetDriver2D()->PerformExtension ("vp_reset");
+    GetDriver2D()->SetClipRect (rt_old_minx, rt_old_miny, 
+      rt_old_maxx, rt_old_maxy);
+
+    SetDimensions (G2D->GetWidth(), G2D->GetHeight());
+  }
 }
 
 void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
@@ -1048,6 +951,13 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     triDraw[triDrawIndex]->DrawMesh (activebuffers, rangeStart, rangeEnd, mesh, 
       renderInfoMesh, meshtype, tri, triEnd);
   }
+}
+
+void csSoftwareGraphics3DCommon::DrawPixmap (iTextureHandle *hTex,
+  int sx, int sy, int sw, int sh,
+  int tx, int ty, int tw, int th, uint8 Alpha)
+{
+  specifica->DrawPixmap (this, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
 }
 
 } // namespace cspluginSoft3d

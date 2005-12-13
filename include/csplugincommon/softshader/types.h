@@ -338,6 +338,11 @@ namespace CrystalSpace
 	const uint32 ga = (p.ui32 & 0x00ff00ff);
 	return Pixel (((rb*v) & 0xff00ff00) | (((ga*v) >> 8) & 0x00ff00ff));
       }
+      CS_FORCEINLINE
+      Pixel& operator *= (const uint8 x)
+      {
+	return (*this = *this * x);
+      }
     };
   } // namespace SoftShader
 } // namespace CrystalSpace

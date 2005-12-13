@@ -51,7 +51,7 @@ struct csTriangle;
 namespace cspluginSoft3d
 {
 // Forward declaration
-class csSoftwareTextureCache;
+class csSoftwareGraphics3DCommon;
 
 #define VATTR_SPEC(x)           (CS_VATTRIB_ ## x - CS_VATTRIB_SPECIFIC_FIRST)
 #define VATTR_GEN(x)							      \
@@ -71,6 +71,18 @@ struct iTriangleDrawer
     const csRenderMeshType meshtype, uint32* tri, const uint32* triEnd) = 0;
 };
 
+struct iPixTypeSpecifica
+{
+  virtual void DrawPixmap (csSoftwareGraphics3DCommon* G3D, 
+    iTextureHandle *hTex, int sx, int sy, int sw, int sh, 
+    int tx, int ty, int tw, int th, 
+    uint8 Alpha) = 0;
+  virtual void BlitScreenToTexture (uint8** line_table, int txt_w, int txt_h,
+    uint32* bitmap) = 0;
+  virtual void BlitTextureToScreen (uint8** line_table, int txt_w, int txt_h,
+    uint32* bitmap) = 0;
+};
+
 /**
  * The basic software renderer class.
  */
@@ -86,6 +98,8 @@ protected:
   friend class TriangleDrawer;
   friend class TriangleDrawerCommon;
   friend class csSoftwareTexture;
+  template<typename Pix>
+  friend class Specifica;
 
   /// Driver this driver is sharing info with (if any)
   csSoftwareGraphics3DCommon *partner;
@@ -204,6 +218,8 @@ protected:
   csPDelArray<csClipPortal> clipportal_stack;
   bool clipportal_dirty;
   int clipportal_floating;
+
+  void SetupSpecifica();
 public:
   /// Report
   void Report (int severity, const char* msg, ...);
@@ -231,6 +247,8 @@ public:
 
   PolygonRasterizer<SLLogic_ZFill> polyrast_ZFill;
   iTriangleDrawer* triDraw[CS_MIXMODE_FACT_COUNT*CS_MIXMODE_FACT_COUNT];
+  /// Stuff that changes with the pixtype
+  iPixTypeSpecifica* specifica;
 
   /// Setup scanline drawing routines according to current bpp and setup flags
   csSoftwareGraphics3DCommon (iBase* parent);

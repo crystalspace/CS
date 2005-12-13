@@ -106,6 +106,10 @@ public:
 
   /// The width, height and depth of visual.
   int Width, Height, Depth;
+
+  int vpWidth, vpHeight;
+  bool vpSet;
+
   /**
    * Display number.  If 0, use primary display; else if greater than 0, use
    * that display number.  If that display number is not present, use primary
@@ -309,12 +313,10 @@ public:
   virtual iFontServer *GetFontServer ()
   { return FontServer; }
 
-  /// Return the width of the framebuffer.
   virtual int GetWidth ()
-  { return Width; }
-  /// Return the height of the framebuffer.
+  { return vpSet ? vpWidth : Width; }
   virtual int GetHeight ()
-  { return Height; }
+  { return vpSet ? vpHeight : Height; }
 
   /// Get the palette (if there is one)
   virtual csRGBpixel *GetPalette ()

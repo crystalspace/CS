@@ -422,9 +422,11 @@ namespace cspluginSoft3d
     uint8** line_table;
     int pixel_shift;
     uint32* line_buffer;
+    int line_buffer_width;
 
   public:
-    PolygonRasterizer() : do_interlaced(-1), line_buffer(0)
+    PolygonRasterizer() : do_interlaced(-1), line_buffer(0), 
+      line_buffer_width (-1)
     {
     }
     ~PolygonRasterizer()
@@ -483,7 +485,11 @@ namespace cspluginSoft3d
       this->line_table = line_table;
 
       pixel_shift = csLog2 (pfmt.PixelBytes);
-      line_buffer = new uint32[width];
+      if (line_buffer_width < w)
+      {
+	delete line_buffer;
+	line_buffer = new uint32[width];
+      }
     }
   };
   

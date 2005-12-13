@@ -35,7 +35,7 @@
 
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   scfImplementationType (this, iParent), statecache (0), statecontext (0),
-    hasRenderTarget (false), vpSet(false)
+    hasRenderTarget (false)
 {
   EventOutlet = 0;
   screen_shot = 0;
@@ -114,9 +114,6 @@ bool csGraphics2DGLCommon::Open ()
   fontCache = GLFontCache;
 
   statecache->Enable_GL_SCISSOR_TEST ();
-  vpWidth = Width;
-  vpHeight = Height;
-  vpSet = false;
 
   if (!csGraphics2D::Open ())
     return false;
@@ -806,21 +803,8 @@ bool csGraphics2DGLCommon::PerformExtensionV (char const* command, va_list args)
     csGraphics2DGLCommon::hasRenderTarget = (hasRenderTarget != 0);
     return true;
   }
-  else if (!strcasecmp (command, "vp_set"))
-  {
-    vpWidth = va_arg (args, int);
-    vpHeight = va_arg (args, int);
-    vpSet = true;
-    return true;
-  }
-  else if (!strcasecmp (command, "vp_reset"))
-  {
-    vpWidth = Width;
-    vpHeight = Height;
-    vpSet = false;
-    return true;
-  }
-  return false;
+  else 
+    return csGraphics2D::PerformExtensionV (command, args);
 }
 
 bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)

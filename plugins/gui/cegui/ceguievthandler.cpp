@@ -44,6 +44,7 @@ csCEGUIEventHandler::~csCEGUIEventHandler()
 
 bool csCEGUIEventHandler::Initialize ()
 {
+  csBaseEventHandler::Initialize (obj_reg);
   RegisterQueue (obj_reg, csevAllEvents (obj_reg));
   return true;
 }

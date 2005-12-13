@@ -156,6 +156,13 @@ public:
     PrepareInt ();
     return (mipmap >= 0) && (mipmap < 4) ? tex [mipmap] : 0;
   }
+  void DeleteMipmaps()
+  {
+    for (int i = 1; i < 4; i++)
+    {
+      delete tex[i]; tex[i] = 0;
+    }
+  }
 };
 
 class csSoftSuperLightmap;

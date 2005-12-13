@@ -550,10 +550,10 @@ bool csGraphics2DDDraw3::PerformExtensionV (char const* command, va_list args)
 	  "Windowed mode not available!");
       }
     }
+    return true;
   }
   else
-    rc = false;
-  return rc;
+    return csGraphics2D::PerformExtensionV (command, args);
 }
 
 //-----------------------------------------------------------------------------

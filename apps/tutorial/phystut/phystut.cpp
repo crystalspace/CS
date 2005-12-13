@@ -225,7 +225,7 @@ bool Simple::HandleEvent (iEvent& ev)
 
 bool Simple::SimpleEventHandler (iEvent& ev)
 {
-  return simple->HandleEvent (ev);
+  return simple ? simple->HandleEvent (ev) : false;
 }
 
 bool Simple::Initialize ()
@@ -722,7 +722,7 @@ int main (int argc, char* argv[])
   simple = new Simple (object_reg);
   if (simple->Initialize ())
     simple->Start ();
-  delete simple;
+  delete simple; simple = 0;
 
   csInitializer::DestroyApplication (object_reg);
   return 0;
