@@ -92,7 +92,7 @@ Win32-specific options:
 
 @table @code
 @item -[no]console
-Create a debug console (default = yes) (@@@ Note to Frank, depends on release/debug mingw/msvc?)
+Create a debug console (default = yes) (@@@@@@ Note to Frank, depends on release/debug mingw/msvc?)
 @end table
 
 @noindent
