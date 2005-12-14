@@ -92,7 +92,7 @@ Win32-specific options:
 
 @table @code
 @item -[no]console
-Create a debug console (default = yes).
+Create a debug console (default = yes) (@@@ Note to Frank, depends on release/debug mingw/msvc?)
 @end table
 
 @noindent
@@ -109,9 +109,6 @@ bindings which take effect when @emph{not} in console mode.
 @end table
 
 @table @code
-@item -[no]stats
-Statistics (default 'nostats').  This can also be enabled using a Console
-command.
 @item -[no]colldet
 Collision detection system (default 'colldet').
 @item -[no]logo
@@ -121,8 +118,6 @@ the top right of the display.
 Load every map in a separate region (default off).
 @item -dupes
 Check for duplicate objects in multiple maps (default off).
-@item -prepare
-After loading, pre-prepare all things (default off).
 @item -infinite
 Special infinite level generation (ignores map file!).
 @item -bots
@@ -133,14 +128,11 @@ Allow random generation of bots.
 Options for Crystal Space 3D Engine:
 
 @table @code
+@item -fullbright
+Disable all lightmaps and lighting so that everything is fullbright
+(default off).
 @item -fov=<val>
 Field of Vision (0).
-@item -[no]rad
-Pseudo-radiosity system (no).  The entire Radiosity system is disabled
-currently, and will probably be replaced when the new renderer becomes the
-default.
-@item -reflect=<val>
-Max number of reflections for radiosity (2).
 @item -[no]relight
 Force/inhibit recalculation of lightmaps (no) This must be used the first time
 a map is run, and if there have been enough changes to the geometry to require
@@ -150,13 +142,10 @@ time.  The generated lightmaps are cached in the directory containing the
 they are missing.
 @item -lightqual=<val>
 Lighting quality (3).
-@item -[no]radstep
-Enable radiosity step-by-step (no).  The radiosity system is currently
-disabled.
 @end table
 
 @noindent
-Options for Win32 OpenGL 2D graphics driver for Crystal Space:
+Options for the canvas drivers:
 
 @table @code
 @item -depth=<val>
@@ -199,11 +188,11 @@ To get a fairly current list of the commands, press @key{Tab} to get the
 console then type @kbd{help}.
 
 Many of the commands are used to show or set internal variables.  For example,
-@kbd{stats} will show whether the Statistics display is current enabled or not.
-Use @kbd{stats on} or @kbd{stats off} to change the state.  A command that
-accepts @kbd{on} or @kbd{off} also accepts @kbd{toggle} to change the current
-state.  This is useful when bound to a key, so that you don't have to have one
-key to turn a feature on and another to turn it off.
+@kbd{coordshow} will show whether the coordinate display is current enabled or
+not. Use @kbd{coordshow on} or @kbd{coordshow off} to change the state.
+A command that accepts @kbd{on} or @kbd{off} also accepts @kbd{toggle} to
+change the current state. This is useful when bound to a key, so that you
+don't have to have one key to turn a feature on and another to turn it off.
 
 Some of the commands are bound to single keypresses, so they can be invoked
 when not in console mode.  This is controlled by the
@@ -686,9 +675,9 @@ It is possible to add dynamic lights at your current location.  These have a
 serious degradation on frame rate, but can be fun to play with.
 
 @table @code
-@item addlight r,g,b,radius,shadows [@key{Shift-L} or @key{1}]
-Create dynamic light of specified colour at current location.  Shadows is 0 or
-1 to cast shadows.  Defaults are radius=6, colour =white.  If no parameters are
+@item addlight r,g,b,radius[@key{Shift-L} or @key{1}]
+Create dynamic light of specified colour at current location.
+Defaults are radius=6, colour =white.  If no parameters are
 given the light will also move up and down slightly and randomly change colour.
 The rgb components should be floating point numbers in the range 0.0 to 1.0,
 but this is not checked.
@@ -718,12 +707,6 @@ your world map, or to help in identifying areas of the world map that need to
 be simplified or improved.
 
 @table @code
-@item stats boolean
-Enable/disable statistics display.  Corresponds to
-@samp{-stats}/@samp{-nostats} commandline options and `Walktest.Settings.Stats'
-configuration option.  Note that enabling the statistics counter automatically
-disables the display of the coordinates.
-
 @item perftest value [@key{p}]
 Run a performance test, giving the result in Frames Per Second.  It calculates
 n frames, default 100.

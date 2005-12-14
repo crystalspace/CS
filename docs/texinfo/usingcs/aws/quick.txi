@@ -15,8 +15,8 @@ involves loading the @sc{aws} plugin.  You can do this via the normal
 can load it separately, if desired:
 
 @example
-csRef<iAws> aws = CS_LOAD_PLUGIN(plugin_mgr,
-  "crystalspace.window.alternatemanager", iAws);
+csRef<iAws> aws = csLoadPlugin<iAws> (plugin_mgr,
+  "crystalspace.window.alternatemanager");
 @end example
 
 @noindent

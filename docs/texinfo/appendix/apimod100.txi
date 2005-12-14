@@ -920,7 +920,7 @@ system to create such textures. For example:
  
 @example
 csRef<iPluginManager> plugin_mgr(
-  csQueryInterface<iPluginManager> (object_reg));
+  scfQueryInterface<iPluginManager> (object_reg));
 csRef<iTextureType> type (csQueryPluginClass<iTextureType> (plugin_mgr,
   "crystalspace.texture.type.fire"));
 if (!type)

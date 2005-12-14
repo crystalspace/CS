@@ -33,6 +33,8 @@ Contains the source code for applications which ship with Crystal Space.
 @table @code
 @item CS/apps/tests
 Applications for testing specific features of the project reside here.
+@item CS/apps/tutorial
+Various tutorial applications can be found here.
 @end table
 
 @item CS/bin
@@ -44,6 +46,10 @@ Location of data files and maps distributed with Crystal Space.
 @item CS/data/config
 May applications and plugins utilize a (@file{.cfg}) file.  For convenience
 they are grouped here.
+
+@item CS/data/shader
+This important directory contains shaders and other related information
+which is used by the Crystal Space engine.
 
 @item CS/docs
 The root of the Crystal Space documentation hierarchy.  There are several

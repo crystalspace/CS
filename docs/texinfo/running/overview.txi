@@ -31,11 +31,6 @@ that you can get from:
 @code{demodata.zip}
 @end iftex
 
-@cindex @file{csfedit}
-@cindex Applications, @file{csfedit}
-@item csfedit
-A simple GUI based font editor for Crystal Space.
-
 @cindex @file{csfgen}
 @cindex Applications, @file{csfgen}
 @item csfgen

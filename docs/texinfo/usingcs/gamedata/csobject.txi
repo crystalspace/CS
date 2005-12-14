@@ -20,7 +20,7 @@ parent. When the object is removed from a parent, the pointer is set to
 null, even if the object is still a child of another parent!
 
 Although the children of an object are only available as @samp{iObject}
-instances, you can use @code{SCF_QUERY_INTERFACE()} to query other interfaces
+instances, you can use @code{scfQueryInterface} to query other interfaces
 from them.  Some convenience macros are also available:
 
 @table @code

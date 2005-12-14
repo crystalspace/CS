@@ -104,8 +104,8 @@ Here we create the same genmesh programmatically:
 // First create the factory:
 csRef<iMeshFactoryWrapper> fact = engine->CreateMeshFactory (
   "crystalspace.mesh.object.genmesh", "cubeFact");
-csRef<iGeneralFactoryState> factstate = SCF_QUERY_INTERFACE (
-  fact->GetMeshObjectFactory (), iGeneralFactoryState);
+csRef<iGeneralFactoryState> factstate = scfQueryInterface<iGeneralFactoryState> (
+  fact->GetMeshObjectFactory ());
 factstate->SetVertexCount (8);
 factstate->GetVertices ()[0].Set (-0.1, 0.1, 0.1);
 factstate->GetTexels ()[0].Set (0, 0);
@@ -121,8 +121,8 @@ factstate->CalculateNormals ();
 // Now create an instance:
 csRef<iMeshWrapper> mesh =
   engine->CreateMeshWrapper (fact, "cube");
-csRef<iGeneralMeshState> meshstate = SCF_QUERY_INTERFACE (
-  mesh->GetMeshObject (), iGeneralMeshState);
+csRef<iGeneralMeshState> meshstate = scfQueryInterface<iGeneralMeshState> (
+  mesh->GetMeshObject ());
 meshstate->SetMaterialWrapper (myMaterial);
 @dots{}
 @end example

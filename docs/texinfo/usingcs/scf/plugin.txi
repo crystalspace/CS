@@ -404,13 +404,13 @@ directly. Doing this invalidates the entire reason to use plugins in the first
 place.
 
 To load the plugin there are a few possibilities. First, you
-can load the plugin manually using @code{CS_LOAD_PLUGIN()} like this:
+can load the plugin manually using @code{csLoadPlugin} like this:
 
 @example
 csRef<iPluginManager> plugin_mgr = 
-  CS_QUERY_REGISTRY (object_reg, iPluginManager);
-csRef<iMyApi> myapi = CS_LOAD_PLUGIN (plugin_mgr,
-  "crystalspace.mygame.myplugin", iMyApi);        
+  csQueryRegistry<iPluginManager> (object_reg);
+csRef<iMyApi> myapi = csLoadPlugin<iMyApi> (plugin_mgr,
+  "crystalspace.mygame.myplugin");        
 if (myapi.IsValid())
 @{
   @dots{}
@@ -438,7 +438,7 @@ if (!csInitializer::RequestPlugins (object_reg,
 @}
 @dots{}
 
-csRef<iMyApi> myapi = CS_QUERY_REGISTRY (object_reg, iMyApi);
+csRef<iMyApi> myapi = csQueryRegistry<iMyApi> (object_reg);
 @end example
 
 This way has several advantages.  First, it allows the user to override your

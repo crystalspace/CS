@@ -6,6 +6,33 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Dec-2005
+	- Jorrit did various documentation updates:
+	    - Fixed the link to the related projects on the CS page.
+	    - Removed mention of the 'new renderer' in the feedback page.
+	    - Added mention of using -verbose for more output.
+	    - Fixed the link to the bug tracker.
+	    - Added Adam Bradley, Michael D. Adams, Piotr Obrzut,
+	      Mike Handverger, Mike Gist, iceeey, caedes, Christian Van
+	      Brussel, Hristo Hristov, and swedishcoder to the contributor
+	      documentation.
+	    - Added some extra information to the entries for
+	      Marten Svanfeldt, Vincent Knecht, and Andrew Mann.
+	    - Updated the directory hierarchy slightly.
+	    - Updated the outdated entry about OpenGL needing 2*SRC*DST.
+	      Replaced it with an explanation about how to fix slow
+	      OpenGL rendering.
+	    - Mentioned the need for -relight in rundemo.txi.
+	    - Removed several obsolete options from the walktest
+	      documentation. Added documentation for -fullbright.
+	    - Removed a few obsolete programs from the application
+	      overview.
+	    - Fixed a csQueryInterface -> scfQueryInterface.
+	    - Replaced all deprecated CS_QUERY_REGISTRY with csQueryRegistry.
+	    - Replaced all deprecated SCF_QUERY_INTERFACE with
+	      scfQueryInterface.
+	    - Replaced all deprecated CS_LOAD_PLUGIN with csLoadPlugin.
+	    - Updated the simple tutorials for the latest event changes.
 13-Dec-2005
 	- res fixed render-to-texture support in the software renderer.
 	- res fixed pixmap drawing in the software renderer.
@@ -1821,7 +1848,6 @@ chronological order.
 	  interfaces to compile with the new SCF implementation
 	- Peter Amstutz fixed csThing so that it invalidates the bounding
 	  box when HardTransform() is called
-
 2-Aug-2005
 	- Marten converted csSector to new SCF implementation.
 	- Marten fixed some issues in the plugin loader and object registry

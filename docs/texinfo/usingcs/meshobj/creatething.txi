@@ -101,7 +101,7 @@ iMaterialWrapper* upMaterial = @dots{}
 iMaterialWrapper* otherMaterial = @dots{}
 csRef<iMeshWrapper> walls = engine->CreateThingMesh (room, "cube"));
 csRef<iThingState> ws =
-  SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+  scfQueryInterface<iThingState> (walls->GetMeshObject ());
 csRef<iThingFactoryState> walls_state = ws->GetFactory ();
 walls_state->AddQuad (
   csVector3 (-.5, .5, -.5),

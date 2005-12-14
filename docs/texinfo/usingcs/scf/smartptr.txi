@@ -46,7 +46,7 @@ pointer and then utilizing that pointer (assuming the engine plugin is loaded):
 
 @example
 iObjectRegistry* object_reg = @dots{};
-engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+engine = scfQueryInterface<iEngine> (object_reg);
 engine->CreateSector ();
 @end example
 
@@ -72,7 +72,7 @@ MyClass::~MyClass ()
 @}
 
 @dots{}
-engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+engine = csQueryRegistry<iEngine> (object_reg);
 engine->CreateSector (); @dots{}
 @dots{}
 @end example
@@ -86,8 +86,8 @@ Here is another example illustrating smart pointers:
 
 @example
 csRef<iMeshWrapper> sprite(engine->CreateMeshWrapper(@dots{}));
-csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (
-    sprite->GetMeshObject (), iSprite3DState));
+csRef<iSprite3DState> state (scfQueryInterface<iSprite3DState> (
+    sprite->GetMeshObject ()));
 state->SetAction ("default");
 @end example
 
@@ -370,7 +370,7 @@ int main (int argc, char* argv[])
     csInitializer::CreateEnvironment(argc, argv);
   @dots{}
   csRef<iPluginManager> plugin_mgr =
-    (CS_QUERY_REGISTRY (object_reg, iPluginManager));
+    (csQueryRegistry<iPluginManager> (object_reg));
   @dots{}
   csInitializer::DestroyApplication (object_reg);
   return 0;

@@ -37,7 +37,7 @@ if (!csInitializer::RequestPlugins (object_reg,
 @{
   @dots{}
 @}
-csRef<iCollideSystem> cd_sys = CS_QUERY_REGISTRY (object_reg, iCollideSystem);
+csRef<iCollideSystem> cd_sys = csQueryRegistry<iCollideSystem> (object_reg);
 @end example
 
 You can also load the collision detection plugin later with the following
@@ -45,13 +45,13 @@ code:
 
 @example
 csRef<iPluginManager> plugmgr =
-  CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csQueryRegistry<iPluginManager> (object_reg);
 csRef<iConfigManager> config =
-  CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  csQueryRegistry<iConfigManager> (object_reg);
 const char* p = config->GetStr ("MyGame.Settings.CollDetPlugin",
   "crystalspace.collisiondetection.opcode");
 csRef<iCollideSystem> cd_sys =
-  CS_LOAD_PLUGIN (plugmgr, p, iCollideSystem);
+  csLoadPlugin<iCollideSystem> (plugmgr, p);
 if (!cd_sys)
 @{
   csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

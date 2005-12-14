@@ -35,6 +35,10 @@ If your map is not one of those from the CS homepage, you may also have to add
 it to @file{vfs.cfg}.  Look at the entries for the other maps to see how to do
 this.
 
+Note that the very first time you start a lightmap based map (like
+@samp{flarge}) you must use the @samp{-relight} commandline option to update
+the lightmaps.
+
 You can also use other command line parameters when running Crystal Space
 applications.  @xref{Common Command Line Options}.  Detailed setup can be done
 in the configuration file.  @xref{Configuration File}.  For Walktest, in-game

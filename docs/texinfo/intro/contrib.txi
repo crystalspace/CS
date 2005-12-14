@@ -13,6 +13,12 @@ not be reachable.  This list is sorted alphabetically by first name.
 
 @itemize @bullet
 @item
+Adam Bradley (@email{artdodge@@cs.bu.edu})
+
+Adam worked a lot on the Crystal Space event system. He designed it completely
+from scracth and then did all the needed implementation work.
+
+@item
 Alessandro Russo (@email{alessandro.russo@@ntt.it})
 
 Alessandro contributed a patch for the X11 driver which allows simultaneous
@@ -82,7 +88,7 @@ other FreeBSD patches.
 Andrew Mann (@email{amann@@tccgi.com})
 
 Andrew made several fixes and optimizations.  He also created partedit, the
-particle editor.
+particle editor. Andrew also contributed the new 3D sound system.
 
 @item
 Andrew Topp (@email{talmakion@@yahoo.com.au})
@@ -263,6 +269,15 @@ Burton Radonsxi (@email{loth@@pacificcoast.net})
 Burton added an Allegro canvas.
 
 @item
+caedes (@email{caedes@@sindominio.net})
+
+caedes submitted the @samp{Jack} sound renderer. caedes also worked
+on the @samp{sprcal3d} loader and he updated the scripting plugins for
+various classes in CS. caedes also worked on the physics loader plugin and
+the @sc{ode} physics plugin. caedes also added a new sequence to the
+engine sequence manager.
+
+@item
 Charles Al' Quarra (@email{charsquarra@@hotmail.com})
 
 Charles contributed the @sc{opcode} and (the now obsolete) cloth plugins.
@@ -298,6 +313,11 @@ in @sc{aws}, and a few other issues.
 Christian Bayle (@email{bayle@@aist.enst.fr})
 
 Christian Bayle contributed scripts to make a Debian package for Crystal Space.
+
+@item
+Christian Van Brussel
+
+Crhsitian fixed an issue in the cal3d plugin.
 
 @item
 Christopher Nelson (@email{paradox@@BBHC.ORG})
@@ -582,6 +602,17 @@ Helge suggested the algorithm for texel filtering used by the software
 renderer.
 
 @item
+Hristo Hristov (@email{hhristov@@delin.org})
+
+Hristo worked on the genmesh animation plugin. He also did various shader
+updates and worked on the stencil2 shadow plugin.
+
+@item
+iceeey
+
+iceeey worked on the @sc{cegui} plugin and a few other smaller changes.
+
+@item
 Ivan Avramovic (@email{iavramov@@ibm.net})
 
 Ivan cleaned up the matrix/vector code and rewrote the @samp{csCamera} class.
@@ -781,7 +812,8 @@ Marten Svanfeldt (@email{developer@@svanfeldt.com})
 Marten added support for vertex-programs to the old OpenGL renderer.  He was
 also one of the initiators to the new advanced OpenGL renderer and wrote large
 part of the interface. He has written parts of the renderer itself and the
-shader system.
+shader system. Marten also worked on the new @sc{scf} system in Crystal Space
+and he is the main author of the new lightmap system.
 
 @item
 Martin Geisse (@email{mgeisse@@gmx.net})
@@ -855,6 +887,12 @@ movie-recorder plugin, helped with the PicoGUI plugin, and designed and
 installed the nice Crystal Space logo which appears in Walktest.
 
 @item
+Michael D. Adams (@email{mdmkolbe@@gmail.com})
+
+Michael worked together with Marten Svanfeldt on the new @sc{scf} system.
+Besides that he did lots of fixes througout Crystal Space.
+
+@item
 Michael Dale Long (@email{mlong@@custom.net})
 
 Michael helped fix the Glide driver and contributed a number of other small
@@ -895,6 +933,17 @@ shuttle model for ``csdemo''.
 Mike Bond (@email{mbond@@cox.rr.com})
 
 Mike added fullscreen support to the X11 canvas.
+
+@item
+Mike Gist (@email{xordan@@gmail.com})
+
+Mike Gist submitted various fixes to Crystal Space. Most of them related
+to 64-bit code.
+
+@item
+Mike Handverger
+
+Mike worked on the @sc{ode} physics plugin.
 
 @item
 Murat Demircioglu (@email{demircio@@boun.edu.tr})
@@ -1054,6 +1103,12 @@ Philipp Spoth (@email{Spoeth@@t-online.de})
 
 Philipp helped with optimizing the texture cache in the software renderer.  He
 also helped optimize a few other routines.
+
+@item
+Piotr Obrzut (@email{piotr_obrzut@@o2.pl})
+
+Piotr worked on the @sc{ode} physics plugin and also on the @samp{bullet}
+physics plugin.
 
 @item
 Ralf Eisele (@email{eiselera@@pcpool1.informatik.uni-ulm.de})
@@ -1224,6 +1279,11 @@ Sylvain Rochette (@email{srochette@@telweb.com})
 Sylvain provided a few fixes for the Windows port.
 
 @item
+swedishcoder
+
+swedishcoder worked on the @sc{cegui} plugin.
+
+@item
 Thomas Giesel (@email{skoe@@freenet.de})
 
 Thomas supplied a small patch for BeOS to allow full-screen mode with the
@@ -1322,7 +1382,8 @@ enhancements for the odedynam plugin.
 @item
 Vincent Knecht (@email{vince@@iefr.ath.cx})
 
-Vincent worked the @sc{rpm} script for Crystal Space.
+Vincent worked the @sc{rpm} script for Crystal Space. Vincent also did
+various fixes to Crystal Space.
 
 @item
 Void (@email{glitia@@texnet.ro})

@@ -21,11 +21,11 @@ Crystal Space plugin or module is not thread-safe unless it is mentioned here.
 to do with loaded classes are safe.
 
 @item
-The plugin manager is safe, thus macros such as @code{CS_LOAD_PLUGIN()},
-@code{CS_LOAD_PLUGIN_ALWAYS()}, and @code{CS_QUERY_PLUGIN_CLASS()} are safe.
+The plugin manager is safe, thus functions such as @code{csLoadPlugin},
+@code{csLoadPluginAlways}, and @code{csQueryPluginClass} are safe.
 
 @item
-The object registry is safe, thus macros like @code{CS_QUERY_REGISTRY()}
+The object registry is safe, thus macros like @code{csQueryRegistry}
 are safe. The @code{iObjectRegistryIterator} takes a copy of the data
 over which it iterates so it will not even lock.
 

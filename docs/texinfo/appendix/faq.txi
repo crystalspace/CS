@@ -413,7 +413,7 @@ space coordinate system is used with (0,0) in the top-left corner.
 @item
 @strong{Q}: Why can't I get the
 @code{iThingState} / @code{iSprite3DState} / @dots{} from my mesh wrapper?  I
-do @code{SCF_QUERY_INTERFACE} from the mesh and it returns @samp{0}.
+do @code{scfQueryInterface} from the mesh and it returns @samp{0}.
 
 @strong{A}: A common error is to try to query the state interface for
 a mesh object from the @code{iMeshWrapper} instance. However it is not
@@ -432,7 +432,7 @@ make it easier for you to keep track of references. They will automatically
 @code{DecRef()} when they are ready. Here is an example of their usage:
 @example
 csRef<iThingState> st =
-  SCF_QUERY_INTERFACE(mesh->GetMeshObject(), iThingState));
+  scfQueryInterface<iThingState> (mesh->GetMeshObject()));
 if (st)
 @{
   st->blabla @dots{};
@@ -488,13 +488,13 @@ different.
 
 @item
 @strong{Q}: I'm trying to use some plugin but it says that it cannot find it
-(i.e. @code{CS_QUERY_REGISTRY} returns null).
+(i.e. @code{csQueryRegistry} returns null).
 
-@strong{A}: It is important to realize that @code{CS_QUERY_REGISTRY}
+@strong{A}: It is important to realize that @code{csQueryRegistry}
 does NOT load a plugin. It only looks for some component in the object
 registry. There are two basic ways to load a plugin: the first is to use
 @code{csInitializer::RequestPlugins()} and the second is to manually
-load the plugin using @code{CS_LOAD_PLUGIN}. @code{RequestPlugins()} is
+load the plugin using @code{csLoadPlugin}. @code{RequestPlugins()} is
 best because it actually registers the plugin with the object
 registry and it also correctly manages config file, command-line and
 request plugins (so you can override a plugin on command-line/config file).

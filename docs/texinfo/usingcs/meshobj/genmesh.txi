@@ -21,7 +21,7 @@ There is also a @sc{howto} discussing the creation of genmeshes.
 
 @subsubheading Basic Structure
 
-The following @sc{scf} class names are used (for @code{CS_LOAD_PLUGIN()}):
+The following @sc{scf} class names are used (for @code{csLoadPlugin}):
 
 @itemize @bullet
 @item
@@ -33,7 +33,7 @@ Factory loader plugin: @code{crystalspace.mesh.loader.factory.genmesh}
 @end itemize
 
 Objects in this plugin implement the following @sc{scf} interfaces, which you
-can retrieve with @code{SCF_QUERY_INTERFACE()}:
+can retrieve with @code{scfQueryInterface}:
 
 @itemize @bullet
 @item

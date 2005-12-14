@@ -64,7 +64,7 @@ shadows. In the future we will have support for dynamic shadows.
 
 @subsubheading Basic Structure
 
-The following @sc{scf} class names are used (for @code{CS_LOAD_PLUGIN()}):
+The following @sc{scf} class names are used (for @code{csLoadPlugin}):
 
 @itemize @bullet
 @item
@@ -76,7 +76,7 @@ Factory loader plugin: @samp{crystalspace.mesh.loader.factory.terrfunc}
 @end itemize
 
 Objects in this plugin implement the following @sc{scf} interfaces (get
-with @code{SCF_QUERY_INTERFACE()}):
+with @code{scfQueryInterface}):
 
 @itemize @bullet
 @item

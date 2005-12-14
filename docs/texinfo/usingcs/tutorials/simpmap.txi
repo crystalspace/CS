@@ -55,6 +55,9 @@ public:
   void OnExit ();
   bool OnInitialize (int argc, char* argv[]);
   bool Application ();
+
+  CS_EVENTHANDLER_NAMES("application.simpmap")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 @};
 
 #endif // __SIMPMAP_H__
@@ -144,7 +147,7 @@ bool Simple::OnKeyboard(iEvent& ev)
     if (code == CSKEY_ESC)
     @{
       csRef<iEventQueue> q = 
-        CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+        csQueryRegistry<iEventQueue> (GetObjectRegistry());
       if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
     @}
   @}
@@ -167,7 +170,8 @@ bool Simple::OnInitialize(int argc, char* argv[])
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
-  if (!RegisterQueue(GetObjectRegistry()))
+  csBaseEventHandler::Initialize(GetObjectRegistry());
+  if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
     return ReportError("Failed to set up event handler!");
 
   return true;
@@ -182,22 +186,22 @@ bool Simple::Application()
   if (!OpenApplication(GetObjectRegistry()))
     return ReportError("Error opening system!");
 
-  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
-  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
   if (!engine) return ReportError("Failed to locate 3D engine!");
 
-  vc = CS_QUERY_REGISTRY(GetObjectRegistry(), iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
   if (!vc) return ReportError("Failed to locate Virtual Clock!");
 
-  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
   if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
-  loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
 
-  cdsys = CS_QUERY_REGISTRY (GetObjectRegistry(), iCollideSystem);
+  cdsys = csQueryRegistry<iCollideSystem> (GetObjectRegistry());
   if (!cdsys) return ReportError ("Failed to locate CD system!");
 
   view.AttachNew(new csView (engine, g3d));
@@ -248,7 +252,7 @@ routine just before the @code{OnInitialize()} function:
 bool Simple::LoadMap ()
 @{
   // Set VFS current directory to the level we want to load.
-  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
+  csRef<iVFS> VFS (csQueryRegistry<iVFS> (object_reg));
   VFS->ChDir ("/lev/flarge");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))

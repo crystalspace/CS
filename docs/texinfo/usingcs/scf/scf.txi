@@ -593,12 +593,12 @@ calling @code{G3D->DecRef()}.  After this you can not use @samp{G3D} anymore;
 you should create another instance of @samp{iGraphics3D} if needed.
 
 To query an object to see if it implements an interface, you should use the
-@code{SCF_QUERY_INTERFACE()} macro. It also receives two arguments, first being
+@code{scfQueryInterface} macro. It also receives two arguments, first being
 the object you are querying for the embedded interface, and second being the
 name of the interface you desire. Example:
 
 @example
-csRef<iHalo> halo = SCF_QUERY_INTERFACE(G3D, iHalo);
+csRef<iHalo> halo = scfQueryInterface<iHalo> (G3D);
 if (!halo)
 @{
   fprintf(stderr,
@@ -995,7 +995,7 @@ static void test_dog()
     fprintf(stderr, "No csDog shared class!\n");
   else
   @{
-    csRef<iName> name = SCF_QUERY_INTERFACE(dog, iName);
+    csRef<iName> name = scfQueryInterface<iName> (dog);
     if (!name)
       fprintf(stderr,
         "Dog does not support iName interface!\n");

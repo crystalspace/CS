@@ -25,7 +25,7 @@ void MyGame::ProcessKeys (iMeshWrapper* mesh)
   while (it->HasNext ())
   @{
     iObject* obj = it->Next ();
-    csRef<iKeyValuePair> key = SCF_QUERY_INTERFACE (obj, iKeyValuePair);
+    csRef<iKeyValuePair> key = scfQueryInterface<iKeyValuePair> (obj);
     if (key)
     @{
       if (!strcmp (key->GetKey (), "monsterAI"))

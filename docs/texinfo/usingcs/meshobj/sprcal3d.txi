@@ -298,7 +298,7 @@ Add the following to @file{simple1.cpp}
 just after the call to @code{CreateRoom()} in @code{Simple::Application()}:
 
 @example
-csRef<iVFS> VFS(CS_QUERY_REGISTRY(object_reg, iVFS));
+csRef<iVFS> VFS(csQueryRegistry<iVFS> (object_reg));
 VFS->ChDir("/this/");
 csRef<iMeshFactoryWrapper> imeshfact(
   loader->LoadMeshObjectFactory("/this/test.cal3d"));
@@ -325,10 +325,10 @@ after the code which you inserted to display the model:
 @example
 // Make it do something.
 csRef<iSpriteCal3DFactoryState> factstate(
-  SCF_QUERY_INTERFACE(imeshfact->GetMeshObjectFactory(),
-  iSpriteCal3DFactoryState));
-csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
-  sprite->GetMeshObject(), iSpriteCal3DState));
+  scfQueryInterface<iSpriteCal3DFactoryState> (
+  	imeshfact->GetMeshObjectFactory());
+csRef<iSpriteCal3DState> cal3dstate(scfQueryInterface<iSpriteCal3DState> (
+  sprite->GetMeshObject()));
 cal3dstate->SetAnimCycle("walk", 1.0f);
 @end example
 

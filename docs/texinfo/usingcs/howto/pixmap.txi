@@ -33,7 +33,7 @@ To actually use the image loader in your application you need to ask the
 shared-object registry for a handle to the image loader:
 
 @example
-csRef<iImageIO> imgldr = CS_QUERY_REGISTRY (object_reg, iImageIO);
+csRef<iImageIO> imgldr = csQueryRegistry<iImageIO> (object_reg);
 @end example
 
 @subsubheading Loading the Image from @sc{vfs}

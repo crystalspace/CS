@@ -244,9 +244,9 @@ is described below:
 
 @example
 csRef<iSprite3dFactoryState> fstat =
-  SCF_QUERY_INTERFACE(fact, iSprite3dFactoryState);
+  scfQueryInterface<iSprite3dFactoryState> (fact);
 csRef<iSprite3DState> stat =
-  SCF_QUERY_INTERFACE(mesh, iSprite3DState);
+  scfQueryInterface<iSprite3DState> (mesh);
 @end example
 
 The @samp{mesh} and @samp{fact} variables are the ones mentioned earlier in

@@ -49,7 +49,7 @@ from @code{csObject}. In that class you can do whatever you want
 with respect to your own game data. In the example above we only
 have a variable @samp{my_data_int} but of course you can do whatever
 you want. The @sc{scf} macros make sure that you can later query for
-that object (using @code{SCF_QUERY_INTERFACE()} for example).
+that object (using @code{scfQueryInterface} for example).
 
 @subsubheading Attaching Game Data
 
@@ -71,12 +71,12 @@ that implement @code{iObject} have a convenience function called
 implementation. This code is equivalent to:
 
 @example
-csRef<iObject> obj = SCF_QUERY_INTERFACE (mesh, iObject);
+csRef<iObject> obj = scfQueryInterface<iObject> (mesh);
 @end example
 
 with the important difference that @code{QueryObject()} does not increment
 the reference count. If an object doesn't have this convenience function you
-must use @code{SCF_QUERY_INTERFACE()} instead.
+must use @code{scfQueryInterface} instead.
 
 @subsubheading Finding Game Data
 

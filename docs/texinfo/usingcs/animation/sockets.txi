@@ -56,8 +56,8 @@ With this function you can attach a mesh to a socket for a Cal3D model:
 bool AttachMesh (iMeshWrapper* actorMesh, const char* socketName,
 	const char* objectFactoryName)
 @{
-  csRef<iSpriteCal3DState> cal3dstate = SCF_QUERY_INTERFACE (
-  	actorMesh->GetMeshObject (), iSpriteCal3DState);
+  csRef<iSpriteCal3DState> cal3dstate = scfQueryInterface<iSpriteCal3DState> (
+  	actorMesh->GetMeshObject ());
   if (!cal3dstate) return false;
   iSpriteCal3DSocket* socket = cal3dstate->FindSocket (socketName);
   if (!socket) return false;
@@ -87,8 +87,8 @@ To remove a mesh from a socket you can do this:
 @example
 bool DetachMesh (iMeshWrapper* actorMesh, const char* socketName)
 @{
-  csRef<iSpriteCal3DState> cal3dstate = SCF_QUERY_INTERFACE (
-  	actorMesh->GetMeshObject (), iSpriteCal3DState);
+  csRef<iSpriteCal3DState> cal3dstate = scfQueryInterface<iSpriteCal3DState> (
+  	actorMesh->GetMeshObject ());
   if (!cal3dstate) return false;
   iSpriteCal3DSocket* socket = cal3dstate->FindSocket (socketName);
   if (!socket) return false;

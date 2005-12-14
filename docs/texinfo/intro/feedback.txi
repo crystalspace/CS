@@ -9,7 +9,7 @@ developers. The preferred method of reporting bugs is to use the SourceForge
 support request mechanism that can be found at:
 
 @noindent
-@uref{https://sourceforge.net/tracker/?atid=200649&group_id=649&func=browse}
+@uref{https://sourceforge.net/tracker/?group_id=649&atid=100649}
 
 To use the SourceForge trackers, you must have a SourceForge user id,
 and be logged in.
@@ -31,9 +31,7 @@ Operating System (Windows (@emph{95, 98/@sc{se}/@sc{me}, @sc{nt}4, 2000,
 @item
 The compiler that you used (@sc{gcc}, Mingw, @sc{msvc}, @dots{}).
 @item
-Which renderer system you are using (old or new renderer).
-@item
-Architecture (Intel x86, @sc{amd} x86, @sc{sparc}, @sc{mips}, @sc{m68k}, Alpha,
+Architecture (Intel x86, @sc{amd} x86, @sc{amd} 64, @sc{sparc}, @sc{mips}, @sc{m68k}, Alpha,
 PowerPC, @dots{}).
 @item
 Graphics adapter (brand/model, total on-board memory, driver version, @dots{}).
@@ -42,7 +40,7 @@ Video settings (color depth, resolution, Crystal Space video driver, @dots{}).
 @item
 Description of the problem.
 @item
-Exact error message (or output of Crystal Space).
+Exact error message (or output of Crystal Space). If possible it would be nice to get the output of the Crystal Space application with @samp{-verbose} commandline option. If you are using a gcc based compiler and you compiled in optimize mode then you'll also need to add the @samp{-console} option. If you compiled with @sc{msvc} and you build in release mode then you'll need the @samp{-noconsole} option.
 @item
 How to reproduce the crash (if it is reproducible).
 @item

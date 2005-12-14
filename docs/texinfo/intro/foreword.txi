@@ -34,7 +34,7 @@ information, please visit the Related Projects page:
 
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/tikiwiki/tiki-index.php?page=Related+Projects}
+@uref{http://www.crystalspace3d.org/tikiwiki/tiki-directory_browse.php?parent=1}
 @end ifnottex
 @iftex
 @code{http://www.crystalspace3d.org/tikiwiki/tiki-index.php?}@*

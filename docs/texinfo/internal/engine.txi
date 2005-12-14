@@ -333,7 +333,7 @@ more information about that.
 @code{light_info}: Interface @samp{iLightingInfo}.  Some meshes implement this
 interface.  The engine very often requires a pointer to the mesh's
 implementation of this interface.  As an optimization, it therefore maintains a
-pointer to that interface here in order to avoid @code{SCF_QUERY_INTERFACE()},
+pointer to that interface here in order to avoid @code{scfQueryInterface},
 which is somewhat time-consuming.
 
 @item
@@ -345,7 +345,7 @@ information is maintained.
 @code{portal_container}: Interface @samp{iPortalContainer}.  A portal container
 is a special type of mesh which is maintained by the engine itself and which
 contains portals to other sectors.  This interface can also be obtained from
-the mesh object via @code{SCF_QUERY_INTERFACE()}, but it is also maintained
+the mesh object via @code{scfQueryInterface}, but it is also maintained
 here as an optimization.
 
 @item

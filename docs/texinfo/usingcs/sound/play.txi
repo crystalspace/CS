@@ -24,7 +24,7 @@ CS_REQUEST_PLUGIN("crystalspace.sound.loader.multiplexer", iSoundLoader),
 CS_REQUEST_END))
 @dots{}
 
-iSoundRender *sndrdr = CS_QUERY_REGISTRY (object_reg, iSoundRender);
+iSoundRender *sndrdr = csQueryRegistry<iSoundRender> (object_reg);
 if (sndrdr)
 @{
   printf("iSoundRender loaded\n");
@@ -52,7 +52,7 @@ Here is how you can play a looping sound:
 
 @example
 //Sound renderer
-csRef snd = CS_QUERY_REGISTRY (object_reg, iSoundRender);
+csRef snd = csQueryRegistry<iSoundRender> (object_reg);
 if (snd)
 @{
   // "song" is the handle, songname is a const char* to the filename.

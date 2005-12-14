@@ -159,7 +159,7 @@ void Simple::CreateSprites ()
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
   csRef<iSprite3DState> spstate (
-    SCF_QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState));
+    scfQueryInterface<iSprite3DState> (sprite->GetMeshObject ()));
   spstate->SetAction ("default");
   sprite->SetZBufMode (CS_ZBUF_USE);
   sprite->SetRenderPriority (engine->GetObjectRenderPriority ());

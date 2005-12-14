@@ -27,7 +27,7 @@ To finally be able to use the level loader in your application you
 need to do:
 
 @example
-csRef<iLoader> level_loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+csRef<iLoader> level_loader = csQueryRegistry<iLoader> (object_reg);
 @end example
 
 When you don't need it anymore you must call @code{level_loader->DecRef ()}.

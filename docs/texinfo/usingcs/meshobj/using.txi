@@ -113,15 +113,15 @@ But here we show you the full way to create meshes from code:
 
 @itemize
 @item
-Load the Mesh Object Type with @code{CS_LOAD_PLUGIN()} (preferably after
-checking if it is already loaded, by calling @code{CS_QUERY_PLUGIN_CLASS()}).
+Load the Mesh Object Type with @code{csLoadPlugin} (preferably after
+checking if it is already loaded, by calling @code{csQueryPluginClass}).
 
 @item
 Create at least one Mesh Object Factory by calling @code{NewFactory()} on the
 Mesh Object Type instance.
 
 @item
-If the factory has parameters you can call @code{SCF_QUERY_INTERFACE()} to get a
+If the factory has parameters you can call @code{scfQueryInterface} to get a
 handle to the @samp{iSomethingFactoryState} interface (replace @emph{Something}
 with whatever the type name of the Mesh Object is).  Then you set the
 parameters you want on that factory.
@@ -131,7 +131,7 @@ Create one or more Mesh Object instances by using one of your factories and
 calling @code{NewInstance()} on them.
 
 @item
-If the object has parameters you use @code{SCF_QUERY_INTERFACE()} to get a handle
+If the object has parameters you use @code{scfQueryInterface} to get a handle
 to the @samp{iSomethingState} interface (replace @emph{Something} with whatever
 the type name of the Mesh Object is).  Then set the parameters you want on the
 Mesh Object.  Note that there are Mesh Object implementations which have
@@ -152,11 +152,11 @@ void Initialize ()
 @{
   @dots{}
   // Get the ball mesh object plug-in.
-  ball_type = CS_QUERY_PLUGIN_CLASS (this,
-    "crystalspace.mesh.object.ball", iMeshObjectType);
+  ball_type = csQueryPluginClass<iMeshObjectType> (this,
+    "crystalspace.mesh.object.ball");
   if (!ball_type)
-    ball_type = CS_LOAD_PLUGIN (this,
-      "crystalspace.mesh.object.ball", iMeshObjectType);
+    ball_type = csLoadPlugin<iMeshObjectType> (this,
+      "crystalspace.mesh.object.ball");
   if (!ball_type)
     Printf (CS_MSG_WARNING, "No ball type plug-in found!\n");
   ball_factory = ball_type->NewFactory ();
@@ -169,7 +169,7 @@ void SetupWorld ()
   // Make a ball using the ball plug-in.
   csRef<iMeshObject> ballMesh = ball_factory->NewInstance ();
   csRef<iBallState> ballState =
-    SCF_QUERY_INTERFACE (ballMesh, iBallState);
+    scfQueryInterface<iBallState> (ballMesh);
   ballState->SetRadius (.5, .5, .5);
   ballState->SetMaterialWrapper (material);
   ballState->SetRimVertices (12);
