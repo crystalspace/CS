@@ -30,7 +30,7 @@ a @samp{csevJoystickMove} event, and all subscribers to the corresponding
 system, each joystick is individually named, so event consumers can listen 
 only to particular devices, or to particular flavors of events.  For example, 
 the fourth joystick can produce the event 
-@samp{crystalspace.input.joystick.3.button.down"}; an event handler may wish 
+@samp{crystalspace.input.joystick.3.button.down}; an event handler may wish 
 to subscribe to @samp{crystalspace.input.joystick.3.button.down} to only 
 receive down events from that joystick, to 
 @samp{crystalspace.input.joystick.3.button} to receive all button events from 

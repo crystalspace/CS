@@ -52,7 +52,7 @@ If you read CS documents @emph{manually} somewhere in your app, you should
 use the following snippet to obtain a document system object:
 
 @example
-csRef<iDocumentSystem> docsys = csQueryRegistry<iDocumentSystem> (object_reg)));
+csRef<iDocumentSystem> docsys = csQueryRegistry<iDocumentSystem> (object_reg);
 if (xml == 0)
   docsys.AttachNew (new csTinyDocumentSystem ());
 @end example

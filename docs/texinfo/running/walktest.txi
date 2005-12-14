@@ -188,8 +188,8 @@ To get a fairly current list of the commands, press @key{Tab} to get the
 console then type @kbd{help}.
 
 Many of the commands are used to show or set internal variables.  For example,
-@kbd{coordshow} will show whether the coordinate display is current enabled or
-not. Use @kbd{coordshow on} or @kbd{coordshow off} to change the state.
+@kbd{coordshow} will show whether the coordinate display is currently enabled
+or not. Use @kbd{coordshow on} or @kbd{coordshow off} to change the state.
 A command that accepts @kbd{on} or @kbd{off} also accepts @kbd{toggle} to
 change the current state. This is useful when bound to a key, so that you
 don't have to have one key to turn a feature on and another to turn it off.

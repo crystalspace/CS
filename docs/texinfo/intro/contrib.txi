@@ -317,7 +317,7 @@ Christian Bayle contributed scripts to make a Debian package for Crystal Space.
 @item
 Christian Van Brussel
 
-Crhsitian fixed an issue in the cal3d plugin.
+Christian fixed an issue in the cal3d plugin.
 
 @item
 Christopher Nelson (@email{paradox@@BBHC.ORG})
@@ -890,7 +890,7 @@ installed the nice Crystal Space logo which appears in Walktest.
 Michael D. Adams (@email{mdmkolbe@@gmail.com})
 
 Michael worked together with Marten Svanfeldt on the new @sc{scf} system.
-Besides that he did lots of fixes througout Crystal Space.
+Besides that he did lots of fixes throughout Crystal Space.
 
 @item
 Michael Dale Long (@email{mlong@@custom.net})

@@ -432,7 +432,7 @@ make it easier for you to keep track of references. They will automatically
 @code{DecRef()} when they are ready. Here is an example of their usage:
 @example
 csRef<iThingState> st =
-  scfQueryInterface<iThingState> (mesh->GetMeshObject()));
+  scfQueryInterface<iThingState> (mesh->GetMeshObject());
 if (st)
 @{
   st->blabla @dots{};
