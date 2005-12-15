@@ -1279,9 +1279,9 @@ Sylvain Rochette (@email{srochette@@telweb.com})
 Sylvain provided a few fixes for the Windows port.
 
 @item
-swedishcoder
+Dan Hardfeldt (@email{swedishcoder@@sf.net})
 
-swedishcoder worked on the @sc{cegui} plugin.
+Dan worked on the @sc{cegui} plugin.
 
 @item
 Thomas Giesel (@email{skoe@@freenet.de})
