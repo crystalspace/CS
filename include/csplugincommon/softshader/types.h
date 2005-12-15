@@ -132,7 +132,7 @@ namespace CrystalSpace
       /// 1/z and per-pixel delta
       csFixed24 Iz, dIzdx;
       /// 1/f - float for better accuracy, delta is for 1 interpolation span
-      float Iz_f, dIzdx_f;
+      float Iz_f, dIzdx_f, dIzdx_fLast;
     };
   
     /// Undivided buffer values
@@ -150,6 +150,8 @@ namespace CrystalSpace
       float Ic;
       /// 1/component delta
       float dIcdx;
+      /// 1/component delta, last span
+      float dIcdxLast;
     };
 
     /// Interpolator over a scanline
@@ -167,21 +169,33 @@ namespace CrystalSpace
       int InterpolShift;
       /// Remaining pixels for this interpolation span
       int ipx;
+      /// Remaining spans
+      int spans;
+      /// Inverse of last span size
+      float invLastSpan;
   
       /// Setup interpolation over a scanline, given left and right edge
       void Setup (const InterpolateEdgePersp& L, const InterpolateEdgePersp& R,
-	float inv_l, int ipolStep, int ipolShift)
+	uint len, int ipolStep, int ipolShift)
       {
+        // @@@ If you notice something that can be sped up, don't hesitate!
 	InterpolStep = ipolStep;
 	InterpolShift = ipolShift;
-  
+	spans = len / ipolStep;
+
+        const float inv_l = 1.0f/len;
 	const float ipf = (float)InterpolStep;
 	ipx = InterpolStep;
-	float fact = inv_l * ipf;
+	const float fact = inv_l * ipf;
+	uint lastSpanSize = len % ipolStep;
+	if (lastSpanSize == 0) lastSpanSize = ipolStep;
+	const float lastFact = float (lastSpanSize) / ipf;
+	invLastSpan = 1.0f / float(lastSpanSize);
 	Iz = Iz_f = L.Iz;
 	dIzdx = dIzdx_f = (R.Iz - L.Iz) * inv_l;
+	dIzdx_fLast = dIzdx_f * float (lastSpanSize);
 	dIzdx_f *= ipf;
-	Iz_f += dIzdx_f;
+	Iz_f += (spans == 0) ? dIzdx_fLast : dIzdx_f;	
 	float z2 = 1.0f / Iz_f;
 	for (size_t f = 0; f < maxFloats; f++)
 	{
@@ -190,8 +204,26 @@ namespace CrystalSpace
 	  const float IcR = R.Floats[f].Ic;
 	  floats[f].c = cL;
 	  floats_f[f].dIcdx = (IcR - IcL) * fact;
-	  floats_f[f].Ic = IcL + floats_f[f].dIcdx;
-	  floats[f].dcdx = (floats_f[f].Ic*z2 - floats[f].c) >> InterpolShift;
+	  floats_f[f].dIcdxLast = floats_f[f].dIcdx * lastFact;
+	}
+	if (spans == 0)
+	{
+	  for (size_t f = 0; f < maxFloats; f++)
+	  {
+	    const float cL = L.Floats[f].c;
+	    const float IcL = L.Floats[f].Ic;
+	    floats_f[f].Ic = IcL + floats_f[f].dIcdxLast;
+	    floats[f].dcdx = (floats_f[f].Ic*z2 - cL) * invLastSpan;
+	  }
+	}
+	else
+	{
+	  for (size_t f = 0; f < maxFloats; f++)
+	  {
+	    const float IcL = L.Floats[f].Ic;
+	    floats_f[f].Ic = IcL + floats_f[f].dIcdx;
+	    floats[f].dcdx = (floats_f[f].Ic*z2 - floats[f].c) >> InterpolShift;
+	  }
 	}
       }
       /// Advance a pixel right
@@ -207,19 +239,32 @@ namespace CrystalSpace
 	}
 	else
 	{
+	  if (--spans == 0)
+	  {
+	    dIzdx_f = dIzdx_fLast;
+	  }
 	  /* Note: Iz_f is "ahead" one interpolation span, ie when the
 	   * deltas are set up for the next, it has the value from the
 	   * beginning if that span. */
-	  const float z = 1.0f/Iz_f;
+	  const float z = 1.0f / Iz_f;
 	  Iz = Iz_f;
 	  Iz_f += dIzdx_f;
 	  const float z2 = 1.0f / Iz_f;
 	  ipx = InterpolStep;
 	  for (size_t f = 0; f < maxFloats; f++)
 	  {
-	    floats[f].c = floats_f[f].Ic * z;
-	    floats_f[f].Ic += floats_f[f].dIcdx;
-	    floats[f].dcdx = (floats_f[f].Ic*z2 - floats[f].c) >> InterpolShift;
+	    const float c = floats_f[f].Ic * z;
+	    floats[f].c = c;
+	    if (spans == 0)
+	    {
+	      floats_f[f].Ic += floats_f[f].dIcdxLast;
+	      floats[f].dcdx = (floats_f[f].Ic*z2 - c) * invLastSpan;
+	    }
+	    else
+	    {
+	      floats_f[f].Ic += floats_f[f].dIcdx;
+	      floats[f].dcdx = (floats_f[f].Ic*z2 - floats[f].c) >> InterpolShift;
+	    }
 	  }
 	}
       }
@@ -237,18 +282,25 @@ namespace CrystalSpace
       int InterpolShift;
       /// Remaining pixels for this interpolation span
       int ipx;
+      /// Remaining spans
+      int spans;
   
       /// Setup interpolation over a scanline, given left and right edge
       void Setup (const InterpolateEdgePersp& L, const InterpolateEdgePersp& R,
-	float inv_l, int ipolStep, int ipolShift)
+	uint len, int ipolStep, int ipolShift)
       {
 	InterpolStep = ipolStep;
 	InterpolShift = ipolShift;
+	spans = len / ipolStep;
   
+        const float inv_l = 1.0f/len;
 	const float ipf = (float)InterpolStep;
 	ipx = InterpolStep;
+	uint lastSpanSize = len % ipolStep;
+	if (lastSpanSize == 0) lastSpanSize = ipolStep;
 	Iz = Iz_f = L.Iz;
 	dIzdx = dIzdx_f = (R.Iz - L.Iz) * inv_l;
+	dIzdx_fLast = dIzdx_f * float (lastSpanSize);
 	dIzdx_f *= ipf;
 	Iz_f += dIzdx_f;
       }
@@ -261,6 +313,10 @@ namespace CrystalSpace
 	}
 	else
 	{
+	  if (--spans == 0)
+	  {
+	    dIzdx_f = dIzdx_fLast;
+	  }
 	  /* Note: Iz_f is "ahead" one interpolation span, ie when the
 	   * deltas are set up for the next, it has the value from the
 	   * beginning if that span. */

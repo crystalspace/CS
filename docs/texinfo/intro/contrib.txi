@@ -342,7 +342,7 @@ Dan Bogdanov
 Dan was the @sc{djgpp} port maintainer for a time.
 
 @item
-Dan Hardfeldt (@email{swedishcoder@@sf.net})
+Dan H@"ardfeldt (@email{swedishcoder@@sf.net})
 
 Dan worked on the @sc{cegui} plugin.
 
@@ -568,7 +568,7 @@ problem with the X11 driver where it would not start drawing until an expose
 event was generated.  He contributed the @file{lin_joy.cpp} file, which
 provided an example of how to use the joystick from within
 @sc{gnu}/Linux. (This was never integrated into the project, however Norman
-Kraemer much later provided a @sc{gnu}/Linux joystick plugin which is part of
+Kr@"amer much later provided a @sc{gnu}/Linux joystick plugin which is part of
 the project.)
 
 @item
@@ -1007,7 +1007,7 @@ Noah ``angelbob'' L. Gibbs (@email{angelbob@@users.sourceforge.net})
 Noah helped out on Michael Ewert's csPhyzik library.
 
 @item
-Norman Kraemer (@email{norman@@users.sourceforge.net})
+Norman Kr@"amer (@email{norman@@users.sourceforge.net})
 
 Norman contributed several fixes and new features and helped with code cleanup.
 In particular he worked on the sound code, the engine, @sc{csws} and the

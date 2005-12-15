@@ -132,7 +132,7 @@ namespace cspluginSoftshader
 	const size_t myIpolFloatNum = offsetTC + Source::compCount;
 
 	InterpolateScanlinePersp<myIpolFloatNum> ipol;
-	ipol.Setup (L, R, 1.0f / len, ipolStep, ipolShift);
+	ipol.Setup (L, R, len, ipolStep, ipolShift);
 	ScanlineRenderer* This = (ScanlineRenderer*)_This;
 
 	Source colSrc (This);

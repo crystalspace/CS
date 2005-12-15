@@ -124,7 +124,7 @@ namespace cspluginSoft3d
       uint32 *zbuff)
     {
       InterpolateScanlinePersp<0> ipol;
-      ipol.Setup (L, R, 1.0f / len, ipolStep, ipolShift);
+      ipol.Setup (L, R, len, ipolStep, ipolShift);
 
       while (len-- > 0)
       {

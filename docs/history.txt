@@ -20,6 +20,9 @@ chronological order.
 	    - Added some of the new event macros (csev*(reg)) to cspace.i.
 	    - Removed all CSMASK* values from pythpost.i.
 	- Adam fixed a crasher in csPartialOrder::Delete().
+	- res improved the software rendering of certain polys in a sharp
+	  angle to the camera.
+	- res fixed some umlauts in the contributors list.
 14-Dec-2005
 	- Jorrit did various documentation updates:
 	    - Fixed the link to the related projects on the CS page.
