@@ -62,8 +62,6 @@ struct _csPyEventHandler : public iEventHandler
       Py_DECREF(result);
       return res;
     }
-    CS_EVENTHANDLER_NAMES("crystalspace.cscript.python");
-    CS_EVENTHANDLER_NIL_CONSTRAINTS;
   private:
     PyObject * _pySelf;
   };
