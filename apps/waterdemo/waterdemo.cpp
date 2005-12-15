@@ -273,7 +273,10 @@ bool csWaterDemo::HandleEvent (iEvent& ev)
 
 bool csWaterDemo::SimpleEventHandler (iEvent& ev)
 {
-  return waterdemo->HandleEvent (ev);
+  if (waterdemo)
+    return waterdemo->HandleEvent (ev);
+  else
+    return false;
 }
 
 bool csWaterDemo::Initialize ()
@@ -773,6 +776,7 @@ int main (int argc, char* argv[])
   if (waterdemo->Initialize ())
     waterdemo->Start ();
   delete waterdemo;
+  waterdemo = 0;
 
   csInitializer::DestroyApplication (object_reg);
   return 0;

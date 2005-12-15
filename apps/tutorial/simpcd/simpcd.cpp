@@ -148,7 +148,10 @@ bool Simple::HandleEvent (iEvent& ev)
 
 bool Simple::SimpleEventHandler (iEvent& ev)
 {
-  return simple->HandleEvent (ev);
+  if (simple)
+    return simple->HandleEvent (ev);
+  else
+    return false;
 }
 
 iCollider* Simple::InitCollider (iMeshWrapper* mesh)
@@ -414,6 +417,7 @@ int main (int argc, char* argv[])
     simple->Start ();
 
   delete simple;
+  simple = 0;
 
   csInitializer::DestroyApplication (object_reg);
 

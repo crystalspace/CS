@@ -161,7 +161,10 @@ bool Vostest::HandleEvent (iEvent& ev)
 
 bool Vostest::VostestEventHandler (iEvent& ev)
 {
-  return vostest->HandleEvent (ev);
+  if (vostest)
+    return vostest->HandleEvent (ev);
+  else
+    return false;
 }
 
 bool Vostest::Initialize ()
@@ -379,6 +382,7 @@ int main (int argc, char* argv[])
   if (vostest->Initialize ())
     vostest->Start ();
   delete vostest;
+  vostest = 0;
 
   csInitializer::DestroyApplication (object_reg);
   return 0;

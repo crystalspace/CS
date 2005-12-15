@@ -100,7 +100,10 @@ bool PathTut::HandleEvent (iEvent& ev)
 
 bool PathTut::PathTutEventHandler (iEvent& ev)
 {
-  return pathtut->HandleEvent (ev);
+  if (pathtut)
+    return pathtut->HandleEvent (ev);
+  else
+    return false;
 }
 
 bool PathTut::Initialize (int argc, const char* const argv[])
@@ -386,6 +389,7 @@ int main (int argc, char* argv[])
     pathtut->Start ();
 
   delete pathtut;
+  pathtut = 0;
 
   csInitializer::DestroyApplication (object_reg);
 

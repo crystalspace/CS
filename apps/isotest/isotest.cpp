@@ -288,7 +288,10 @@ void IsoTest::SetupIsoView(IsoView& isoview)
 
 bool IsoTest::IsoTestEventHandler (iEvent& ev)
 {
-  return isotest->HandleEvent (ev);
+  if (isotest)
+    return isotest->HandleEvent (ev);
+  else
+    return false;
 }
 
 bool IsoTest::LoadMap ()
@@ -563,6 +566,7 @@ int main (int argc, char* argv[])
     isotest->Start ();
 
   delete isotest;
+  isotest = 0;
 
   csInitializer::DestroyApplication (object_reg);
   return 0;

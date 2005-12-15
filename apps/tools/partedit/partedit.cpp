@@ -1116,6 +1116,7 @@ int main (int argc, char* argv[])
   if (System->Initialize ())
     System->Start ();
   delete System;
+  System = 0;
 
   csInitializer::DestroyApplication (object_reg);
   return 0;
