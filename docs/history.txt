@@ -19,7 +19,7 @@ chronological order.
 	    - Added iEventNameRegistry and iThingFactoryState to cspace.i.
 	    - Added some of the new event macros (csev*(reg)) to cspace.i.
 	    - Removed all CSMASK* values from pythpost.i.
-	
+	- Adam fixed a crasher in csPartialOrder::Delete().
 14-Dec-2005
 	- Jorrit did various documentation updates:
 	    - Fixed the link to the related projects on the CS page.

@@ -34,10 +34,6 @@
 #include <iostream>
 #endif /* ADB_DEBUG */
 
-#ifndef CS_DEBUG
-#define SanityCheck() do { } while (0)
-#endif /* !CS_DEBUG */
-
 /**
  * A generic finite partial order class.
  * A finite partial order is a graph with the following properties:
@@ -135,8 +131,27 @@ public:
     }
     // delete node's post's
     Nodes[p].post.DeleteAll();
-    // delete node
+    // delete node p, move someone else into its place...
     Nodes.DeleteIndexFast(p);
+
+    if (Nodes.Length() > p) {
+      // who got moved into "p"?
+      size_t retarget = NodeMap.Get(Nodes[p].self, csArrayItemNotFound);
+      CS_ASSERT (retarget != csArrayItemNotFound);
+
+      // change references to "retarget" to reference "p"
+      for (size_t iter=0 ; iter<Nodes.Length() ; iter++) {
+	for (size_t iter2=0 ; iter2<Nodes[iter].pre.Length() ; iter2++) {
+	  if (Nodes[iter].pre[iter2] == retarget)
+	    Nodes[iter].pre[iter2] = p;
+	}
+	for (size_t iter2=0 ; iter2<Nodes[iter].post.Length() ; iter2++) {
+	  if (Nodes[iter].post[iter2] == retarget)
+	    Nodes[iter].post[iter2] = p;
+	}
+      }
+    }
+
     NodeMap.Delete(node, p);
     if (Nodes.Length() > p)
       NodeMap.PutUnique(Nodes[p].self, p);
@@ -326,9 +341,9 @@ public:
   }
   
 protected:
-#ifdef CS_DEBUG
   void SanityCheck ()
   {
+#ifdef CS_DEBUG
     CS_ASSERT (NodeMap.GetSize() == Nodes.Length());
     for (size_t i1=0; i1<Nodes.Length() ; i1++) {
       CS_ASSERT (NodeMap.Get(Nodes[i1].self, csArrayItemNotFound) == i1);
@@ -359,8 +374,8 @@ protected:
       CS_ASSERT (index >= 0);
       CS_ASSERT (index < Nodes.Length());
     }
-  }
 #endif /* CS_DEBUG */
+  }
 
   bool CycleTest(const T& node)
   {
