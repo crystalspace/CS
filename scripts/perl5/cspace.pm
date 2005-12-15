@@ -14597,7 +14597,6 @@ sub ACQUIRE {
 package cspace;
 
 sub CS_WCHAR_T_SIZE () { $cspacec::CS_WCHAR_T_SIZE }
-sub CS_VOIDED_PTR () { $cspacec::CS_VOIDED_PTR }
 sub SCF_STATIC_CLASS_CONTEXT () { $cspacec::SCF_STATIC_CLASS_CONTEXT }
 sub SCF_VERBOSE_NONE () { $cspacec::SCF_VERBOSE_NONE }
 sub SCF_VERBOSE_PLUGIN_SCAN () { $cspacec::SCF_VERBOSE_PLUGIN_SCAN }
