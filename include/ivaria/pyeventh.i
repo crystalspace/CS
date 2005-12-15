@@ -62,6 +62,8 @@ struct _csPyEventHandler : public iEventHandler
       Py_DECREF(result);
       return res;
     }
+    CS_EVENTHANDLER_NAMES("crystalspace.cscript.python");
+    CS_EVENTHANDLER_NIL_CONSTRAINTS;
   private:
     PyObject * _pySelf;
   };
@@ -93,7 +95,7 @@ struct _csPyEventHandler : public iEventHandler
       return self._func(event)
 
   def _csInitializer_SetupEventHandler (reg, obj,
-      mask=(CSMASK_FrameProcess|CSMASK_Input|CSMASK_Broadcast)):
+      eventids=None):
     """Replacement of C++ versions."""
     if callable(obj):
       # obj is a function
@@ -102,7 +104,10 @@ struct _csPyEventHandler : public iEventHandler
     else:
       # assume it is a iEventHandler
       hdlr = obj
-    return csInitializer._SetupEventHandler(reg, hdlr, mask)
+    if eventids==None:
+      eventids=[csevFrame(reg), csevInput(reg), csevKeyboard(reg), \
+                 csevMouse(reg), csevQuit(reg)]
+    return csInitializer._SetupEventHandler(reg, hdlr, eventids)
 
   csInitializer.SetupEventHandler = \
     staticmethod(_csInitializer_SetupEventHandler)

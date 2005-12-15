@@ -12,6 +12,14 @@ chronological order.
 	- res made some VC8 warning fixes to wxgl and wxtest.
 	- res made csPtr<>'s CS_VOIDED_PTR more 64-bit friendly.
 	- Adam added debug-mode sanity checks to partialorder.h
+	- caedes did the following fixes and additions to python bindings
+	  (fixes most problems, but SetupEventHandler does not work yet):
+	    - Fixed cspython to build again after event system changes.
+	    - Fixed pysimp example (it used GetFactory from iThingState).
+	    - Added iEventNameRegistry and iThingFactoryState to cspace.i.
+	    - Added some of the new event macros (csev*(reg)) to cspace.i.
+	    - Removed all CSMASK* values from pythpost.i.
+	
 14-Dec-2005
 	- Jorrit did various documentation updates:
 	    - Fixed the link to the related projects on the CS page.

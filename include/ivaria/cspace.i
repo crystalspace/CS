@@ -171,6 +171,7 @@
   INTERFACE_APPLY(iEvent)
   INTERFACE_APPLY(iEventHandler)
   INTERFACE_APPLY(iEventQueue)
+  INTERFACE_APPLY(iEventNameRegistry)
   INTERFACE_APPLY(iFactory)
   INTERFACE_APPLY(iFile)
   INTERFACE_APPLY(iFont)
@@ -269,6 +270,7 @@
   INTERFACE_APPLY(iTextureManager)
   INTERFACE_APPLY(iTextureWrapper)
   INTERFACE_APPLY(iThingState)
+  INTERFACE_APPLY(iThingFactoryState)
   INTERFACE_APPLY(iVFS)
   INTERFACE_APPLY(iVideoStream)
   INTERFACE_APPLY(iView)
@@ -1030,6 +1032,8 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "iutil/evdefs.h"
 %include "iutil/eventq.h"
+%include "iutil/eventnames.h"
+%include "csutil/eventnames.h"
 %include "iutil/eventh.h"
 %include "iutil/plugin.h"
 #endif // CS_MICRO_SWIG
@@ -1233,19 +1237,89 @@ APPLY_FOR_EACH_INTERFACE
   }
 %}
 
-// iutil/evdefs.h
-#define _CS_IS_KEYBOARD_EVENT(e) CS_IS_KEYBOARD_EVENT(e)
+// csutil/eventnames.h
+#define _CS_IS_KEYBOARD_EVENT(reg,e) CS_IS_KEYBOARD_EVENT(reg,e)
 #undef CS_IS_KEYBOARD_EVENT
-bool _CS_IS_KEYBOARD_EVENT (const iEvent &);
-#define _CS_IS_MOUSE_EVENT(e) CS_IS_MOUSE_EVENT(e)
+bool _CS_IS_KEYBOARD_EVENT (iObjectRegistry *,const iEvent &);
+#define _CS_IS_MOUSE_EVENT(reg,e) CS_IS_MOUSE_EVENT(reg,e)
 #undef CS_IS_MOUSE_EVENT
-bool _CS_IS_MOUSE_EVENT (const iEvent &);
-#define _CS_IS_JOYSTICK_EVENT(e) CS_IS_JOYSTICK_EVENT(e)
+bool _CS_IS_MOUSE_EVENT (iObjectRegistry *,const iEvent &);
+#define _CS_IS_JOYSTICK_EVENT(reg,e) CS_IS_JOYSTICK_EVENT(reg,e)
 #undef CS_IS_JOYSTICK_EVENT
-bool _CS_IS_JOYSTICK_EVENT (const iEvent &);
-#define _CS_IS_INPUT_EVENT(e) CS_IS_INPUT_EVENT(e)
+bool _CS_IS_JOYSTICK_EVENT (iObjectRegistry *,const iEvent &);
+#define _CS_IS_INPUT_EVENT(reg,e) CS_IS_INPUT_EVENT(reg,e)
 #undef CS_IS_INPUT_EVENT
-bool _CS_IS_INPUT_EVENT (const iEvent &);
+bool _CS_IS_INPUT_EVENT (iObjectRegistry *,const iEvent &);
+
+/*
+ New Macros for to use instead of event type masks
+ XXX still many missing here!!!
+*/
+#define _csevAllEvents(reg) csevAllEvents(reg)
+#undef csevAllEvents
+csEventID _csevAllEvents (iObjectRegistry *);
+#define _csevFrame(reg) csevFrame(reg)
+#undef csevFrame
+csEventID _csevFrame (iObjectRegistry *);
+#define _csevInput(reg) csevInput(reg)
+#undef csevInput
+csEventID _csevInput (iObjectRegistry *);
+#define _csevQuit(reg) csevQuit(reg)
+#undef csevQuit
+csEventID _csevQuit (iObjectRegistry *);
+
+/* Process */
+#define _csevProcess(reg) csevProcess(reg)
+#undef csevProcess
+csEventID _csevProcess (iObjectRegistry *);
+#define _csevPreProcess(reg) csevPreProcess(reg)
+#undef csevPreProcess
+csEventID _csevPreProcess (iObjectRegistry *);
+#define _csevPostProcess(reg) csevPostProcess(reg)
+#undef csevPostProcess
+csEventID _csevPostProcess (iObjectRegistry *);
+#define _csevFinalProcess(reg) csevFinalProcess(reg)
+#undef csevFinalProcess
+csEventID _csevFinalProcess (iObjectRegistry *);
+
+/* Keyboard */
+#define _csevKeyboardEvent(reg) csevKeyboardEvent(reg)
+#undef csevKeyboardEvent
+csEventID _csevKeyboardEvent (iObjectRegistry *);
+#define _csevKeyboardDown(reg) csevKeyboardDown(reg)
+#undef csevKeyboardDown
+csEventID _csevKeyboardDown (iObjectRegistry *);
+#define _csevKeyboardUp(reg) csevKeyboardUp(reg)
+#undef csevKeyboardUp
+csEventID _csevKeyboardUp (iObjectRegistry *);
+
+/* Mouse */
+#define _csevMouseEvent(reg) csevMouseEvent(reg)
+#undef csevMouseEvent
+csEventID _csevMouseEvent (iObjectRegistry *);
+#define _csevMouseButton(reg,x) csevMouseButton(reg,x)
+#undef csevMouseButton
+csEventID _csevMouseButton (iObjectRegistry *,uint x);
+#define _csevMouseUp(reg,x) csevMouseUp(reg,x)
+#undef csevMouseUp
+csEventID _csevMouseUp (iObjectRegistry *,uint x);
+#define _csevMouseDown(reg,x) csevMouseDown(reg,x)
+#undef csevMouseDown
+csEventID _csevMouseDown (iObjectRegistry *,uint x);
+#define _csevMouseClick(reg,x) csevMouseClick(reg,x)
+#undef csevMouseClick
+csEventID _csevMouseClick (iObjectRegistry *,uint x);
+#define _csevMouseDoubleClick(reg,x) csevMouseDoubleClick(reg,x)
+#undef csevMouseDoubleClick
+csEventID _csevMouseDoubleClick (iObjectRegistry *,uint x);
+#define _csevMouseMove(reg,x) csevMouseMove(reg,x)
+#undef csevMouseMove
+csEventID _csevMouseMove (iObjectRegistry *,uint x);
+
+/* Joystick */
+#define _csevJoystickEvent(reg) csevJoystickEvent(reg)
+#undef csevJoystickEvent
+csEventID _csevJoystickEvent (iObjectRegistry *);
 
 // iutil/objreg.h
 #define _CS_QUERY_REGISTRY_TAG(a, b) CS_QUERY_REGISTRY_TAG(a, b)
