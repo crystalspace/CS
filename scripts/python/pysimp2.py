@@ -78,10 +78,10 @@ def CreateTheRoom(matname):
 
     room = engine.GetSectors().FindByName("room")
     walls = engine.CreateSectorWallsMesh(room,"walls")
-    thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState)
 
+    walls_factory = walls.GetMeshObject().GetFactory()
     material=engine.GetMaterialList().FindByName(matname)
-    walls_state = thingstate.GetFactory()
+    walls_state = SCF_QUERY_INTERFACE(walls_factory, iThingFactoryState)
     walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
     walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
     walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
@@ -124,12 +124,12 @@ def LoadSprite():            # new stuff
     sprite=engine.CreateMeshWrapper(imeshfact,"MySprite",room,csVector3 (-1, 2, 3))
     m=csMatrix3()
     m.Identity()    # make sure its identity
-    m=m*5           # python doesnt support *= operator
+    m=m/5           # python doesnt support *= operator
     sprite.GetMovable().SetTransform(m)
     sprite.GetMovable().UpdateMove()
     spstate=SCF_QUERY_INTERFACE(sprite.GetMeshObject(),iSprite3DState)
     spstate.SetAction("default")
-    #spstate.SetMixMode(CS_FX_SETALPHA (.5))
+    spstate.SetMixMode(CS_FX_SETALPHA_INT (100))
 
     # The following two calls are not needed since CS_ZBUF_USE and
     # Object render priority are the default but they show how you
