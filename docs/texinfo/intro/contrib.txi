@@ -342,6 +342,11 @@ Dan Bogdanov
 Dan was the @sc{djgpp} port maintainer for a time.
 
 @item
+Dan Hardfeldt (@email{swedishcoder@@sf.net})
+
+Dan worked on the @sc{cegui} plugin.
+
+@item
 Dan Ogles (@email{dogles@@peachtree.com})
 
 Dan provided a patch for @samp{printf()} to make it work with the Windows port.
@@ -1277,11 +1282,6 @@ detection system.  He worked on sprcal3d mesh object, as well.
 Sylvain Rochette (@email{srochette@@telweb.com})
 
 Sylvain provided a few fixes for the Windows port.
-
-@item
-Dan Hardfeldt (@email{swedishcoder@@sf.net})
-
-Dan worked on the @sc{cegui} plugin.
 
 @item
 Thomas Giesel (@email{skoe@@freenet.de})
