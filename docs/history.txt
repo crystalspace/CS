@@ -23,6 +23,10 @@ chronological order.
 	- res improved the software rendering of certain polys in a sharp
 	  angle to the camera.
 	- res fixed some umlauts in the contributors list.
+	- caedes removed previous additions to cspace.i that where giving swig 
+	  errors (bad fix for SetupEventHandler brokeness).
+	- caedes added ss_driver.h and changed quaterni.h to quaternion.h in
+	  cspace.i to remove some swig warnings.
 14-Dec-2005
 	- Jorrit did various documentation updates:
 	    - Fixed the link to the related projects on the CS page.
