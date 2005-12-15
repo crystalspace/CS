@@ -16,6 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
+
 // For compilers that support precompilation, includes "wx.h".
 #include "wx/wxprec.h"
 
@@ -27,7 +29,6 @@
 #include "wx/wx.h"
 #endif
 
-#include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/csinput.h"

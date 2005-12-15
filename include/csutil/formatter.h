@@ -921,17 +921,22 @@ class csPrintfFormatter
       strcat (flags, "#");
     if (currentFormat.padZero)
       strcat (flags, "0");
+    /* (sizeof(x)*25)/10+1 is an approximation of the number of characters needed
+     * to display x in decimal system. (x can be at most 256^sizeof(x). You need
+     * log10(256^sizeof(x)) characters, becoming sizeof(x)*log10(256). 25/10 is
+     * an (over-)approximation of log10(256). Add 1 for sign.) */
     CS_ALLOC_STACK_ARRAY(char, precStr, 
-      (sizeof(currentFormat.precision) * 24) / 10 + 3);
+      (sizeof(currentFormat.precision) * 25) / 10 + 2);
     if (currentFormat.precision >= 0)
       sprintf (precStr, ".%d", currentFormat.precision);
     else
       precStr[0] = 0;
     CS_ALLOC_STACK_ARRAY(char, formatStr, 1 + strlen (flags)
-      + (sizeof(currentFormat.width) * 24) / 10 + 2 + strlen (precStr) + 2);
+      + (sizeof(currentFormat.width) * 25) / 10 + 1 + strlen (precStr) + 2);
     sprintf (formatStr, "%%%s%d%s%s", flags, currentFormat.width, precStr,
       type);
-    char formattedStr[64];
+    // Make sure *any* number thrown at us fits
+    char formattedStr[LDBL_MAX_10_EXP+3]; 
     sprintf (formattedStr, formatStr, value);
 
     char* p = formattedStr;

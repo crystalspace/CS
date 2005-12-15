@@ -26,7 +26,7 @@
 
 #include "csextern.h"
 
-#define CS_VOIDED_PTR 0xffffffff
+#define CS_VOIDED_PTR ((intptr_t)-1)
 
 template <class T> class csRef;
 

@@ -16,11 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <wx/wx.h>
-
 #define CS_IMPLEMENT_PLATFORM_APPLICATION
 
 #include "cssysdef.h"
+
+#include <wx/wx.h>
+
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
 #include "csutil/cfgfile.h"
@@ -90,7 +91,8 @@ END_EVENT_TABLE()
 Simple* simple = 0;
 
 Simple::Simple (iObjectRegistry* object_reg)
-  : wxFrame(0, -1, wxT("Crystal Space WxWidget Canvas test"), wxDefaultPosition, wxSize(500, 500))
+  : wxFrame(0, -1, wxT("Crystal Space WxWidget Canvas test"), 
+    wxDefaultPosition, wxSize(500, 500))
 {
   Simple::object_reg = object_reg;
 }
@@ -184,7 +186,7 @@ bool Simple::HandleEvent (iEvent& ev)
   {
     csPrintf("Got key %" PRIu32 " / %" PRIu32 "\n",
            csKeyEventHelper::GetCookedCode(&ev),
-           csKeyEventHelper::GetCookedCode(&ev));
+           csKeyEventHelper::GetRawCode(&ev));
     if((ev.Name == KeyboardDown) &&
        (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
     {
@@ -195,17 +197,20 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if ((ev.Name == MouseMove))
   {
-    csPrintf("Mouse move to %d %d\n", csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetY(&ev));
+    csPrintf("Mouse move to %d %d\n", csMouseEventHelper::GetX(&ev), 
+      csMouseEventHelper::GetY(&ev));
   }
   else if ((ev.Name == MouseDown))
   {
     csPrintf("Mouse button %d down at %d %d\n",
-      csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetY(&ev));
+      csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), 
+      csMouseEventHelper::GetY(&ev));
   }
   else if ((ev.Name == MouseUp))
   {
     csPrintf("Mouse button %d up at %d %d\n",
-      csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), csMouseEventHelper::GetY(&ev));
+      csMouseEventHelper::GetButton(&ev), csMouseEventHelper::GetX(&ev), 
+      csMouseEventHelper::GetY(&ev));
   }
 
   return false;
@@ -220,7 +225,8 @@ bool Simple::Initialize ()
 {
   csRef<iConfigManager> confmgr = CS_QUERY_REGISTRY(object_reg, iConfigManager);
   confmgr->SetDynamicDomainPriority(iConfigManager::PriorityMax);
-  confmgr->GetDynamicDomain()->SetStr("Video.OpenGL.Canvas", "crystalspace.graphics2d.wxgl");
+  confmgr->GetDynamicDomain()->SetStr("Video.OpenGL.Canvas", 
+    "crystalspace.graphics2d.wxgl");
 
   if (!csInitializer::RequestPlugins (object_reg,
                                       CS_REQUEST_VFS,
@@ -458,9 +464,10 @@ IMPLEMENT_APP(MyApp)
 {
 #if defined(wxUSE_UNICODE) && wxUSE_UNICODE
   char** csargv;
-    csargv = (char**)malloc(sizeof(char*) * argc);
-  for(int i = 0; i < argc; i++) {
-    csargv[i] = strdup(wxString(argv[i]).mb_str().data());
+  csargv = (char**)malloc(sizeof(char*) * argc);
+  for(int i = 0; i < argc; i++) 
+  {
+    csargv[i] = strdup (wxString(argv[i]).mb_str().data());
   }
   object_reg = csInitializer::CreateEnvironment (argc, csargv);
 #else

@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Dec-2005
+	- res fixed the printf formatter to properly handle very very large
+	  floats as well.
+	- res made some VC8 warning fixes to wxgl and wxtest.
+	- res made csPtr<>'s CS_VOIDED_PTR more 64-bit friendly.
 14-Dec-2005
 	- Jorrit did various documentation updates:
 	    - Fixed the link to the related projects on the CS page.
