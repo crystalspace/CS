@@ -34,6 +34,10 @@
 #include <iostream>
 #endif /* ADB_DEBUG */
 
+#ifndef CS_DEBUG
+#define SanityCheck() do { } while (0)
+#endif /* !CS_DEBUG */
+
 /**
  * A generic finite partial order class.
  * A finite partial order is a graph with the following properties:
@@ -96,10 +100,12 @@ public:
   /// Add a node.  If the node is already present, has no effect.
   void Add (const T& node)
   {
+    SanityCheck();
     if (NodeMap.Get(node, csArrayItemNotFound) == csArrayItemNotFound) 
     {
       NodeMap.PutUnique(node, Nodes.Push(node));
     }
+    SanityCheck();
   }
 
   /// Query a node's presence
@@ -111,8 +117,10 @@ public:
   /// Delete a node and all edges connected to it.
   void Delete (const T& node)
   {
+    SanityCheck();
     size_t p = NodeMap.Get(node, csArrayItemNotFound);
     CS_ASSERT(p!=csArrayItemNotFound);
+    CS_ASSERT(p < Nodes.Length());
     // delete all posts pointing to node
     for (size_t iter=0 ; iter<Nodes[p].pre.Length() ; iter++) 
     {
@@ -133,11 +141,7 @@ public:
     if (Nodes.Length() > p)
       NodeMap.PutUnique(Nodes[p].self, p);
 
-    // debug...
-    for (size_t iter=0 ; iter<Nodes.Length() ; iter++)
-    {
-      CS_ASSERT(NodeMap.Get(Nodes[iter].self,csArrayItemNotFound)==iter);
-    }
+    SanityCheck();
   }
   
   /**
@@ -148,6 +152,7 @@ public:
    */
   bool AddOrder (const T& node1, const T& node2)
   {
+    SanityCheck();
     size_t n1 = NodeMap.Get(node1, csArrayItemNotFound);
     size_t n2 = NodeMap.Get(node2, csArrayItemNotFound);
     CS_ASSERT(n1 != csArrayItemNotFound);
@@ -168,17 +173,20 @@ public:
       Nodes[n2].pre.Push(n1);
       return true;
     }
+    SanityCheck();
   }
   
   /// Remove an ordering constraint (node1 precedes node2)
   void DeleteOrder (const T& node1, const T& node2)
   {
+    SanityCheck();
     size_t n1 = NodeMap.Get(node1, csArrayItemNotFound);
     size_t n2 = NodeMap.Get(node2, csArrayItemNotFound);
     CS_ASSERT(n1 != csArrayItemNotFound);
     CS_ASSERT(n2 != csArrayItemNotFound);
     Nodes[n2].pre.DeleteFast(n1);
     Nodes[n1].post.DeleteFast(n2);
+    SanityCheck();
   }
 
   /// Number of nodes in the graph
@@ -199,6 +207,7 @@ public:
    */
   void Solve (csList<const T> & result)
   {
+    SanityCheck();
     for (size_t iter=0 ; iter<Nodes.Length() ; iter++) 
     {
       Nodes[iter].output = false;
@@ -234,6 +243,7 @@ public:
       }
     } 
     while (!done);
+    SanityCheck();
   }
   
   /**
@@ -315,7 +325,43 @@ public:
     return fail;
   }
   
-private:
+protected:
+#ifdef CS_DEBUG
+  void SanityCheck ()
+  {
+    CS_ASSERT (NodeMap.GetSize() == Nodes.Length());
+    for (size_t i1=0; i1<Nodes.Length() ; i1++) {
+      CS_ASSERT (NodeMap.Get(Nodes[i1].self, csArrayItemNotFound) == i1);
+      for (size_t i2=0 ; i2<Nodes[i1].pre.Length() ; i2++) {
+	CS_ASSERT (Nodes[i1].pre[i2] >= 0);
+	CS_ASSERT (Nodes[i1].pre[i2] < Nodes.Length());
+	bool reciprocal_post_exists = false;
+	for (size_t i3=0 ; i3<Nodes[Nodes[i1].pre[i2]].post.Length() ; i3++) {
+	  if (Nodes[Nodes[i1].pre[i2]].post[i3] == i1)
+	    reciprocal_post_exists = true;
+	}
+	CS_ASSERT (reciprocal_post_exists);
+      }
+      for (size_t i2=0 ; i2<Nodes[i1].post.Length() ; i2++) {
+	CS_ASSERT(Nodes[i1].post[i2] >= 0);
+	CS_ASSERT(Nodes[i1].post[i2] < Nodes.Length());
+	bool reciprocal_pre_exists = false;
+	for (size_t i3=0 ; i3<Nodes[Nodes[i1].post[i2]].pre.Length() ; i3++) {
+	  if (Nodes[Nodes[i1].post[i2]].pre[i3] == i1)
+	    reciprocal_pre_exists = true;
+	}
+	CS_ASSERT (reciprocal_pre_exists);
+      }
+    }
+    typename csHash<size_t,const T>::GlobalIterator iter = NodeMap.GetIterator ();
+    while (iter.HasNext()) {
+      size_t index = iter.Next();
+      CS_ASSERT (index >= 0);
+      CS_ASSERT (index < Nodes.Length());
+    }
+  }
+#endif /* CS_DEBUG */
+
   bool CycleTest(const T& node)
   {
     size_t n = NodeMap.Get(node, csArrayItemNotFound);

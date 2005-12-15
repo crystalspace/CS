@@ -11,6 +11,7 @@ chronological order.
 	  floats as well.
 	- res made some VC8 warning fixes to wxgl and wxtest.
 	- res made csPtr<>'s CS_VOIDED_PTR more 64-bit friendly.
+	- Adam added debug-mode sanity checks to partialorder.h
 14-Dec-2005
 	- Jorrit did various documentation updates:
 	    - Fixed the link to the related projects on the CS page.
