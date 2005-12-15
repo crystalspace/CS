@@ -27,6 +27,7 @@ chronological order.
 	  errors (bad fix for SetupEventHandler brokeness).
 	- caedes added ss_driver.h and changed quaterni.h to quaternion.h in
 	  cspace.i to remove some swig warnings.
+	- caedes fixed the pysimp2 example.
 14-Dec-2005
 	- Jorrit did various documentation updates:
 	    - Fixed the link to the related projects on the CS page.
