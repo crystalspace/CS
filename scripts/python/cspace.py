@@ -68,7 +68,6 @@ class csWrapPtrPtr(csWrapPtr):
         _swig_setattr(self, csWrapPtr,self.__class__,csWrapPtr)
 _cspace.csWrapPtr_swigregister(csWrapPtrPtr)
 
-CS_VOIDED_PTR = _cspace.CS_VOIDED_PTR
 
 scfCompatibleVersion = _cspace.scfCompatibleVersion
 class iBase(_object):
