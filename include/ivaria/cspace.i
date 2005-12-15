@@ -807,7 +807,7 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csQuaternion::operator+ (const csQuaternion &, const csQuaternion &);
 %ignore csQuaternion::operator- (const csQuaternion &, const csQuaternion &);
 %ignore csQuaternion::operator* (const csQuaternion &, const csQuaternion &);
-%include "csgeom/quaterni.h"
+%include "csgeom/quaternion.h"
 
 %include "csgeom/spline.h"
 %include "csgeom/cspoint.h"
@@ -985,6 +985,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "isndsys/ss_structs.h"
 %include "isndsys/ss_stream.h"
 %include "isndsys/ss_renderer.h"
+%include "isndsys/ss_driver.h"
 
 %include "iutil/comp.h"
 %include "iutil/cache.h"
