@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Dec-2005
+	- Oktal fixed null pointer dereference in csEngine when iGraphics2D/3D
+	  are not available.
+	- dfryer fixed OS X specific stuff for event changes.  Some
+	  canvas-hidden events aren't generated, but the rest of it seems to
+	  work.
+	- Adam changed csEventNameRegistry::GetID to use csString internally
+	  (fixes a MSVC7.1 crash)
+	- Adam fixed csInputDefinition to parse "0" correctly
 15-Dec-2005
 	- res fixed the printf formatter to properly handle very very large
 	  floats as well.
@@ -32,11 +41,8 @@ chronological order.
 	- caedes added ss_driver.h and changed quaterni.h to quaternion.h in
 	  cspace.i to remove some swig warnings.
 	- caedes fixed the pysimp2 example.
-    - acraig fixed an issue in csMeshWrapper::SetParent when parent is set 
-      to 0.  Need to unprepare the mesh.
-    - dfryer fixed OS X specific stuff for event changes.  Some canvas-hidden
-      events aren't generated, but the rest of it seems to work.
-
+	- acraig fixed an issue in csMeshWrapper::SetParent when parent is set
+	  to 0.  Need to unprepare the mesh.
 14-Dec-2005
 	- Jorrit did various documentation updates:
 	    - Fixed the link to the related projects on the CS page.
@@ -178,9 +184,9 @@ chronological order.
 28-Nov-2005
         - Andrew Craig fixed sprcal3d so that the following items are 
           supported again:
-          1) using attach="n" in the .cal3d file to have meshes that
-             are not attached by default. 
-          2) DetachCoreMesh 
+            - Using attach="n" in the .cal3d file to have meshes that are not
+	      attached by default.
+            - DetachCoreMesh()
           This patch is a mix of my own work and res2k's patch.
 25-Nov-2005
 	- Jorrit removed an unneeded call to wview->Draw() in awstest.
@@ -300,8 +306,8 @@ chronological order.
 	    - face_normals in csStencil2PolygonMesh.
 	    - csStencil2PolygonMesh->CalculateEdges().
 	    - csStencil2PolygonMesh->AddPolys().
-	    - A great number of arrays in csStencil2ShadowCachEntry
-	      ->GetShadow().
+	    - A great number of arrays in
+	      csStencil2ShadowCachEntry::GetShadow().
 	    - projected_points in csStencil2ShadowStep::Perform().
 	    - Temporary 'lightList' in the light iterator step.
 	    - csMeshList capacity for engine goes to 256 and thresshold to 256.
@@ -473,10 +479,10 @@ chronological order.
 	  to mouse and joystick events, with corresponding helper functions.
 6-Nov-2005
 	- Vincent Knecht made the following changes:
-	  - Added a csInstallationPathsHelper::GetAppFilename() method which
-	    returns a native executable filename given a basename.
-	  - Modified 'startme' to read demos and star settings from its
-	    configuration file.
+	    - Added a csInstallationPathsHelper::GetAppFilename() method which
+	      returns a native executable filename given a basename.
+	    - Modified 'startme' to read demos and star settings from its
+	      configuration file.
 5-Nov-2005
 	- res reinstantiated the forcing of the minimum Cg vertex program
 	  profile to be ARB_v_p since NV vertex programs require some extra
