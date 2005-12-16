@@ -749,6 +749,12 @@ void csMeshWrapper::SetParent (iSceneNode* parent)
 
   if (!movable.GetParent ())
   {
+    iSectorList* sl = parent_mov->GetSectors ();
+    for (int i = 0 ; i < sl->GetCount() ; i++)
+    {     
+      csSector* sector = (csSector*)(sl->Get (i));
+      sector->UnprepareMesh (this);        
+    }
     // Link to main engine list.
     csEngine::currentEngine->GetMeshes ()->Add ((iMeshWrapper*)this);
   }
