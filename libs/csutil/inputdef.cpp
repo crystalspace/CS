@@ -292,8 +292,6 @@ csInputDefinition::csInputDefinition (iEventNameRegistry* r,
   if (strspn(str.GetData (), "0123456789") > 0) {
     deviceNumber = (int) strtoul (str.GetData (), & endp, 10);
     str.DeleteAt (0, endp - str.GetData ());
-    if (deviceNumber == 0)
-      return;
   } else {
     deviceNumber = 0;
   }
