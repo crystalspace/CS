@@ -1,8 +1,5 @@
 SubDir TOP plugins collide opcode ;
 
-Description opcode : "OPCODE collision detection plugin" ;
-
-Plugin opcode
-	: [ Wildcard *.cpp *.h ] [ Wildcard Ice : *.cpp *.h ]
-;
-LinkWith opcode : crystalspace ;
+Description csopcode : "OPCODE collision detection plugin" ;
+Plugin csopcode : [ Wildcard *.cpp *.h ] [ Wildcard Ice : *.cpp *.h ] ;
+LinkWith csopcode : crystalspace ;
