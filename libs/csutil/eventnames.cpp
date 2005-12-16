@@ -27,8 +27,6 @@
 
 #include "ivideo/graph2d.h"
 
-#include <string.h>
-
 #ifdef ADB_DEBUG
 #include <iostream>
 #endif
@@ -42,7 +40,7 @@ csEventNameRegistry::~csEventNameRegistry()
 {
 }
 
-csEventID csEventNameRegistry::GetID (const char *name)
+csEventID csEventNameRegistry::GetID (const csString &name)
 {
 #ifdef ADB_DEBUG
   std::cerr << "csEventNameRegistry <" 
@@ -56,27 +54,18 @@ csEventID csEventNameRegistry::GetID (const char *name)
     result = names.Request(name);
   } else {
     result = names.Request(name);
-    char *parent;
-    if (strrchr(name, '.') != NULL) 
+    if (name.FindLast('.') != (size_t)-1)
     { 
       /* This is a sub-name, populate Parentage table while
 	 ensuring (recursively) for parent registration */
-      parent = strdup(name);
-      *strrchr(parent, '.') = '\0';
+      csString parent = name.Slice (0, name.FindLast('.'));
+      parentage.PutUnique(result, GetID(parent));
     } 
     else if (strlen(name)>0) 
     {
-      parent = strdup("");
-    } 
-    else 
-    {
-      parent = NULL;
+      parentage.PutUnique(result, GetID(csString("")));
     }
-    if (parent) 
-    {
-      parentage.PutUnique(result, GetID(parent));
-      free(parent);
-    }
+    // else this is the root event, "", which has no parent.
   }
 #ifdef ADB_DEBUG
   std::cerr << result << std::endl;

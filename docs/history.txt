@@ -9,6 +9,8 @@ chronological order.
 16-Dec-2005
 	- Oktal fixed null pointer dereference in csEngine when iGraphics2D/3D
 	  are not available.
+	- Adam changed csEventNameRegistry::GetID to use csString internalyl
+	  (fixes a MSVC7.1 crash)
 15-Dec-2005
 	- res fixed the printf formatter to properly handle very very large
 	  floats as well.

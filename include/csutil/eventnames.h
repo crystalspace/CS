@@ -74,7 +74,10 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
 
   /**\name iEventNameRegistry implementation
    * @{ */
-  CS_CONST_METHOD csEventID GetID (const char *name);
+  CS_CONST_METHOD csEventID GetID (const csString &name);
+  CS_CONST_METHOD inline csEventID GetID (const char *name) {
+    return GetID (csString(name));
+  }
   CS_CONST_METHOD const char* GetString (const csEventID id);
   static CS_CONST_METHOD const char* GetString (iObjectRegistry *object_reg, 
     csEventID id);
