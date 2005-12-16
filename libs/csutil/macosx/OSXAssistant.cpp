@@ -22,6 +22,7 @@
 #include "OSXAssistant.h"
 #include "OSXDelegate.h"
 #include "csutil/cfgacc.h"
+#include "csutil/eventnames.h"
 #include "csutil/event.h"
 #include "csutil/sysfunc.h"
 #include "iutil/cmdline.h"
@@ -62,12 +63,12 @@ OSXAssistant::OSXAssistant(iObjectRegistry* r) : registry(r),
   controller = OSXDelegate_startup(this);
 
   run_always = false;
-
+  scfiEventHandler.Quit = csevQuit(registry);
   csRef<iEventQueue> q = get_event_queue();
   if (q.IsValid())
   {
     event_outlet = q->CreateEventOutlet(&scfiEventPlug);
-    q->RegisterListener(&scfiEventHandler, CSMASK_Broadcast);
+    q->RegisterListener(&scfiEventHandler, csevQuit(registry));
   }
 }
 
@@ -168,7 +169,7 @@ void OSXAssistant::start_event_loop()
 //-----------------------------------------------------------------------------
 void OSXAssistant::request_shutdown()
 {
-  event_outlet->ImmediateBroadcast(csevQuit, 0);
+  event_outlet->ImmediateBroadcast(csevQuit(registry), 0);
   OSXDelegate_stop_event_loop(controller);
 }
 
@@ -196,7 +197,7 @@ void OSXAssistant::application_activated()
     if (c != 0)
       c->Resume();
   }
-  event_outlet->ImmediateBroadcast(csevFocusGained, 0);
+  event_outlet->ImmediateBroadcast(csevFocusGained(registry), 0);
 }
 
 void OSXAssistant::application_deactivated()
@@ -207,17 +208,17 @@ void OSXAssistant::application_deactivated()
     if (c != 0)
       c->Suspend();
   }
-  event_outlet->ImmediateBroadcast(csevFocusLost, 0);
+  event_outlet->ImmediateBroadcast(csevFocusLost(registry), 0);
 }
 
-void OSXAssistant::application_hidden()
+void OSXAssistant::application_hidden()  
 {
-  event_outlet->ImmediateBroadcast(csevCanvasHidden, 0);
+  //event_outlet->ImmediateBroadcast(csevCanvasHidden(registry), 0);
 }
 
 void OSXAssistant::application_unhidden()
 {
-  event_outlet->ImmediateBroadcast(csevCanvasExposed, 0);
+  //event_outlet->ImmediateBroadcast(csevCanvasExposed(registry), 0);
 }
 
 void OSXAssistant::flush_graphics_context()
@@ -303,7 +304,7 @@ uint OSXAssistant::eiEventPlug::QueryEventPriority(uint)
 //=============================================================================
 bool OSXAssistant::eiEventHandler::HandleEvent(iEvent& e)
 {
-  if (e.Name == csevQuit)
+  if (e.Name == Quit)
     scfParent->should_shutdown = true;
   return false;
 }

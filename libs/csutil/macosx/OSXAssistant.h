@@ -86,7 +86,10 @@ public:
   struct eiEventHandler : public iEventHandler
   {
     SCF_DECLARE_EMBEDDED_IBASE(OSXAssistant);
+    csEventID Quit;
     virtual bool HandleEvent(iEvent&);
+    CS_EVENTHANDLER_NAMES ("crystalspace.macosx")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } scfiEventHandler;
   friend struct eiEventHandler;
 

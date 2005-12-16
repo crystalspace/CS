@@ -6,12 +6,6 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-16-Dec-2005
-	- Oktal fixed null pointer dereference in csEngine when iGraphics2D/3D
-	  are not available.
-	- Adam changed csEventNameRegistry::GetID to use csString internally
-	  (fixes a MSVC7.1 crash)
-	- Adam fixed csInputDefinition to parse "0" correctly
 15-Dec-2005
 	- res fixed the printf formatter to properly handle very very large
 	  floats as well.
@@ -40,6 +34,9 @@ chronological order.
 	- caedes fixed the pysimp2 example.
     - acraig fixed an issue in csMeshWrapper::SetParent when parent is set 
       to 0.  Need to unprepare the mesh.
+    - dfryer fixed OS X specific stuff for event changes.  Some canvas-hidden
+      events aren't generated, but the rest of it seems to work.
+
 14-Dec-2005
 	- Jorrit did various documentation updates:
 	    - Fixed the link to the related projects on the CS page.

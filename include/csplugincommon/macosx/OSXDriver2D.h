@@ -88,6 +88,8 @@ public:
       SCF_DESTRUCT_IBASE();
     };
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+    CS_EVENTHANDLER_NAMES ("crystalspace.macosx.driver2d")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   } *scfiEventHandler;
 
 protected:
@@ -139,6 +141,10 @@ protected:
 
   /// Assistant for dispatching events
   csRef<iOSXAssistant> assistant;
+  /// Some symbolic event values
+  csEventID focusChangedEvt;
+  csEventID commandLineHelpEvt;
+  csEventID keyboardDownEvt;
   /// Object registry
   iObjectRegistry *objectReg;
 };

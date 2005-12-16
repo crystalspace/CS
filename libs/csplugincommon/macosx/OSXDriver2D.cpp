@@ -76,9 +76,13 @@ bool OSXDriver2D::Initialize(iObjectRegistry *reg)
 
     // Listen for key down events
     csRef<iEventQueue> queue = CS_QUERY_REGISTRY(reg, iEventQueue);
+    focusChangedEvt = csevFocusChanged(reg);
+     commandLineHelpEvt = csevCommandLineHelp(reg);
+     keyboardDownEvt = csevKeyboardDown(reg);
+     csEventID filter[] = {focusChangedEvt, commandLineHelpEvt, keyboardDownEvt};
     if (queue.IsValid())
-        queue->RegisterListener(scfiEventHandler, 
-	CSMASK_Broadcast | CSMASK_Keyboard);
+      queue->RegisterListener(scfiEventHandler, filter);
+	  
 
     // Figure out what screen we will be using
     ChooseDisplay();
@@ -117,7 +121,7 @@ bool OSXDriver2D::Open()
             return false;
 
     // Create window
-    if (OSXDelegate2D_openWindow(delegate, canvas->win_title,
+    if (OSXDelegate2D_openWindow(delegate, canvas->win_title.GetData(),
 	canvas->Width, canvas->Height, canvas->Depth,
 	canvas->FullScreen, display, screen) == false)
         return false;
@@ -149,20 +153,20 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
 {
     bool handled = false;
 
-    if (csEventNameRegistry::IsKindOf(ev.Name, csevFocusChanged))
+    if (csEventNameRegistry::IsKindOf(objectReg, ev.Name, focusChangedEvt))
     {
       bool shouldPause = !assistant->always_runs();
       OSXDelegate2D_focusChanged(delegate, 
 				 csCommandEventHelper::GetInfo (&ev), shouldPause);
       handled = true;
     }
-    else if (ev.Name == csevCommandLineHelp)
+    else if (ev.Name == commandLineHelpEvt)
     {
       csPrintf("Options for MacOS X 2D graphics drivers:\n"
 	       "  -screen=<num>      Screen number to display on (default=0)\n");
       handled = true;
     }
-    else if (ev.Name == csevKeyboardDown)
+    else if (ev.Name == keyboardDownEvt)
     {
       if ((csKeyEventHelper::GetRawCode(&ev) == '\r') && 
 	  (csKeyEventHelper::GetModifiersBits(&ev) & CSMASK_ALT))
@@ -308,7 +312,7 @@ bool OSXDriver2D::ToggleFullscreen()
     }
 
     if (success == true)
-        OSXDelegate2D_openWindow(delegate, canvas->win_title,
+        OSXDelegate2D_openWindow(delegate, canvas->win_title.GetData(),
                                 canvas->Width, canvas->Height, canvas->Depth, 
                                 canvas->FullScreen, display, screen);
 
