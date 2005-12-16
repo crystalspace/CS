@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Dec-2005
+	- Oktal fixed null pointer dereference in csEngine when iGraphics2D/3D
+	  are not available.
 15-Dec-2005
 	- res fixed the printf formatter to properly handle very very large
 	  floats as well.

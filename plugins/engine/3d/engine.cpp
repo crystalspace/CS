@@ -812,8 +812,11 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
 
   // Tell event queue that we want to handle broadcast events
   CS_INITIALIZE_SYSTEM_EVENT_SHORTCUTS(objectRegistry);
-  CanvasResize = csevCanvasResize (objectRegistry, G2D);
-  CanvasClose = csevCanvasClose (objectRegistry, G2D);
+  if (G2D)
+  {
+    CanvasResize = csevCanvasResize (objectRegistry, G2D);
+    CanvasClose = csevCanvasClose (objectRegistry, G2D);
+  }
 
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectRegistry, iEventQueue);
   if (q)
@@ -821,6 +824,10 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
     csEventID events[5] = { SystemOpen, SystemClose,
 			    CanvasResize, CanvasClose,
 			    CS_EVENTLIST_END };
+
+    // discard canvas events if there is no canvas, by truncating the array
+    if (!G2D) events[2] = CS_EVENTLIST_END;
+
     q->RegisterListener (scfiEventHandler, events);
   }
 
@@ -953,15 +960,18 @@ bool csEngine::HandleEvent (iEvent &Event)
           DeleteAll ();
           return true;
   }
-  else if (Event.Name == CanvasResize)
+  else if (G2D)
   {
+    if (Event.Name == CanvasResize)
+    {
           if (((iGraphics2D *)csCommandEventHelper::GetInfo(&Event)) == G2D)
             resize = true;
           return false;
-  }
-  else if (Event.Name == CanvasClose)
-  {
+    }
+    else if (Event.Name == CanvasClose)
+    {
           return false;
+    }
   }
 
   return false;
