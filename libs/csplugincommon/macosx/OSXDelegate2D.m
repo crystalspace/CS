@@ -17,7 +17,7 @@
 - (int) getWindowStyleForMode:(BOOL) fs;
 
 // Set up strings for active and paused titles
-- (void) configureTitles:(char *) newTitle;
+- (void) configureTitles:(const char *) newTitle;
 
 // Set the title of the window based on the value of paused
 - (void) adjustTitle;
@@ -82,7 +82,7 @@
 // openWindow
 // Open a window if none open
 // In fullscreen mode, opens a zero-sized window to get events
-- (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs onDisplay:(CGDirectDisplayID) display onScreen:(unsigned int) screen;
+- (BOOL) openWindow:(const char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs onDisplay:(CGDirectDisplayID) display onScreen:(unsigned int) screen;
 {
     OSXView *view;
     NSScreen *scr = [[NSScreen screens] objectAtIndex:screen];
@@ -301,7 +301,7 @@
 
 // configureTitles
 // Set up strings for active and paused titles
-- (void) configureTitles:(char *) newTitle
+- (void) configureTitles:(const char *) newTitle
 {
     [title release];
     [pausedTitle release];

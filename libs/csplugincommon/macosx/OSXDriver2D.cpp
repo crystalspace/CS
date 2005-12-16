@@ -79,7 +79,7 @@ bool OSXDriver2D::Initialize(iObjectRegistry *reg)
     focusChangedEvt = csevFocusChanged(reg);
      commandLineHelpEvt = csevCommandLineHelp(reg);
      keyboardDownEvt = csevKeyboardDown(reg);
-     csEventID filter[] = {focusChangedEvt, commandLineHelpEvt, keyboardDownEvt};
+     csEventID filter[] = {focusChangedEvt, commandLineHelpEvt, keyboardDownEvt,CS_EVENTLIST_END};
     if (queue.IsValid())
       queue->RegisterListener(scfiEventHandler, filter);
 	  

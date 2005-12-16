@@ -54,7 +54,7 @@
 - (void) dealloc;
 
 /// Open a window if none open
-- (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h
+- (BOOL) openWindow:(const char *) winTitle width:(int) w height:(int) h
   depth:(int) d fullscreen:(BOOL) fs onDisplay:(CGDirectDisplayID)
   display onScreen:(unsigned int) screen;
 
@@ -95,7 +95,7 @@ typedef void *csGraphics2DHandle;
 // C API to driver delegate class
 DEL2D_FUNC(OSXDelegate2D, new)(csGraphics2DHandle drv);
 DEL2D_FUNC(void, delete)(OSXDelegate2D);
-DEL2D_FUNC(bool, openWindow)(OSXDelegate2D, char *title, int w, int h,
+DEL2D_FUNC(bool, openWindow)(OSXDelegate2D,const char *title, int w, int h,
   int d, bool fs, CGDirectDisplayID display, unsigned int screen);
 DEL2D_FUNC(void, closeWindow)(OSXDelegate2D);
 DEL2D_FUNC(void, setTitle)(OSXDelegate2D, char *title);
