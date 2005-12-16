@@ -27,6 +27,7 @@ WALKALL.PLUGINLIST =
   csddsimg
   csfont
   csgifimg
+  csopcode
   csparser
   cssynldr
   dynavis
@@ -51,7 +52,6 @@ WALKALL.PLUGINLIST =
   ieplex
   imgplex
   nullmesh
-  opcode
   protomesh
   protomeshldr
   rain
