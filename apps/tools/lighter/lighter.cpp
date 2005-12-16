@@ -319,7 +319,7 @@ bool Lighter::ScanMesh (iMeshWrapper* mesh, iSector *sector)
   size_t j;
   for (j = 0 ; j < ml.Length () ; j++)
   {
-    iMeshWrapper* m = ml[i]->QueryMesh ();
+    iMeshWrapper* m = ml[j]->QueryMesh ();
     if (m)
       if (!ScanMesh (m, sector))
         return false;
