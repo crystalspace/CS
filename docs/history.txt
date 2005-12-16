@@ -19,6 +19,7 @@ chronological order.
 	  event handler.  This should fix runtime-loaded bugplug.
 	- Adam fixed a bug in in successor-bound handling when a successor ID
 	  had not yet been instantiated in the partialorder graph.
+	- Adam exchanged some NULLs for 0's.
 15-Dec-2005
 	- res fixed the printf formatter to properly handle very very large
 	  floats as well.

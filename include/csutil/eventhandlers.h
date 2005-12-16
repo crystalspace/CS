@@ -104,7 +104,7 @@ public:
   }
   /**
    * Returns the handler registered for a csHandlerID 
-   * (will be NULL if csHandlerID is a generic name, i.e.,
+   * (will be 0 if csHandlerID is a generic name, i.e.,
    * if (!csEventHandlerRegistry->IsInstance(id)).
    */
   CS_CONST_METHOD iEventHandler* GetHandler (csHandlerID id);

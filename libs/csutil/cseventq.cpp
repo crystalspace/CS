@@ -260,7 +260,7 @@ void csEventQueue::Notify (const csEventID &name)
   std::cerr << "Doing notify (immediate broadcast) to " << NameRegistry->GetString(name) << std::endl;
 #endif
 
-  csEventTree *epoint = EventHash.Get(name, NULL);
+  csEventTree *epoint = EventHash.Get(name, 0);
   if (!epoint)
   {
     /* Expensive exception, build the tree out to include "name". */
@@ -298,7 +298,7 @@ void csEventQueue::Dispatch (iEvent& e)
 	    << " into event tree"
 	    << std::endl;
 #endif
-  csEventTree *epoint = EventHash.Get(e.Name, NULL);
+  csEventTree *epoint = EventHash.Get(e.Name, 0);
   if (!epoint)
   {
     epoint = EventTree->FindNode(e.Name, this);
@@ -428,7 +428,7 @@ iEventOutlet* csEventQueue::GetEventOutlet()
 
 iEventCord* csEventQueue::GetEventCord (const csEventID &name)
 {
-  csEventCord *cord = EventCords.Get (name, NULL);
+  csEventCord *cord = EventCords.Get (name, 0);
   if (!cord)
   {
     cord = new csEventCord (name);
