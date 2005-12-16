@@ -15,6 +15,10 @@ chronological order.
 	- Adam changed csEventNameRegistry::GetID to use csString internally
 	  (fixes a MSVC7.1 crash)
 	- Adam fixed csInputDefinition to parse "0" correctly
+	- Adam fixed a corner case of event subscription inside of a related
+	  event handler.  This should fix runtime-loaded bugplug.
+	- Adam fixed a bug in in successor-bound handling when a successor ID
+	  had not yet been instantiated in the partialorder graph.
 15-Dec-2005
 	- res fixed the printf formatter to properly handle very very large
 	  floats as well.

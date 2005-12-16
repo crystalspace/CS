@@ -119,6 +119,9 @@ private:
   ~csEventTree ();
   
   csEventID self;
+#ifdef CS_DEBUG
+  csString *self_name;
+#endif
   csEventQueue *queue;
   
   bool SubscribeInternal (csHandlerID, csEventID);
@@ -146,12 +149,14 @@ private:
     csRef<iEventHandlerRegistry> handler_reg;
     csRef<iEventNameRegistry> name_reg;
   public:
-    FatRecordObject(csRef<iEventHandlerRegistry> &h_reg,
+    FatRecordObject(csEventTree *root,
+		    csRef<iEventHandlerRegistry> &h_reg,
 		    csRef<iEventNameRegistry> &n_reg,
 		    csPartialOrder<csHandlerID> *new_sg,
 		    csList<iEventHandler *> *new_sq) :
-      handler_reg(h_reg), name_reg (n_reg), SubscriberGraph(new_sg), 
-      SubscriberQueue(new_sq), iterator(0)
+      handler_reg (h_reg), name_reg (n_reg), 
+      SubscriberGraph (new_sg), SubscriberQueue (new_sq), 
+      my_root (root), iterator (0), iterating_for (0)
     {
       /* If there's no SQ, mark it for creation */
       StaleSubscriberQueue = (SubscriberQueue==0);
@@ -162,7 +167,8 @@ private:
       delete SubscriberGraph;
       if (SubscriberQueue)
 	delete SubscriberQueue;
-      CS_ASSERT(iterator==0);
+      CS_ASSERT (iterator == 0);
+      CS_ASSERT (iterating_for == 0);
     }
 
     /**
@@ -194,11 +200,20 @@ private:
      */
     bool StaleSubscriberQueue;
     /**
+     * The root of the event name subtree which this record represents
+     */
+    csEventTree *my_root;
+    /**
      * When this is set, there is an iterator operating upon this particular
      * event subscription record.  Any subscription record may have at most 
      * one iterator at any given time.
      */
     SubscriberIterator *iterator;
+    /**
+     * This points to the particular node in the event name tree for which
+     * the iterator is currently running.
+     */
+    csEventTree *iterating_for;
   };
 
   FatRecordObject *fatRecord;
@@ -250,6 +265,7 @@ private:
     {
       CS_ASSERT(record->iterator == 0);
       record->iterator = this;
+      record->iterating_for = t;
     }
 
     /**
@@ -259,6 +275,7 @@ private:
     {
       CS_ASSERT(record->iterator == this);
       record->iterator = 0;
+      record->iterating_for = 0;
     }
 
     /// Test if there is another available handler

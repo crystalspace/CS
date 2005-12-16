@@ -39,6 +39,9 @@ csEventTree::csEventTree (csRef<iEventHandlerRegistry> &h_reg,
   self (name), queue (q)
 {
   CS_ASSERT(name != CS_EVENT_INVALID);
+#ifdef CS_DEBUG
+  self_name = new csString(n_reg->GetString(name));
+#endif
   if (parent) 
   {
     fatRecord = ((csEventTree *)parent)->fatRecord; // I wish csEventTree was polymorphic.
@@ -48,7 +51,7 @@ csEventTree::csEventTree (csRef<iEventHandlerRegistry> &h_reg,
   {
     /* this is the root node.
      * create the root PO and Queue so everyone else can COW it. */
-    fatRecord = new FatRecordObject(handler_reg, name_reg, 
+    fatRecord = new FatRecordObject(this, handler_reg, name_reg, 
 				    new csPartialOrder<csHandlerID>, 0);
     fatNode = true;
   }
@@ -59,6 +62,9 @@ csEventTree::~csEventTree()
 {
   queue->EventHash.DeleteAll(self);
   if (fatNode) delete fatRecord;
+#ifdef CS_DEBUG
+  delete self_name;
+#endif
 }
 
 /**
@@ -68,14 +74,14 @@ csEventTree *csEventTree::FindNode(csEventID name, csEventQueue *q)
 {
   CS_ASSERT(name != CS_EVENT_INVALID);
   csEventTree *res;
-  if ((res=q->EventHash.Get(name, NULL))!=NULL) 
+  if ((res=q->EventHash.Get(name, 0))!=0) 
   { /* shortcut */
     return res;
   }
   if (!q->EventTree) 
   {
     csEventID root = csevAllEvents(name_reg);
-    q->EventTree = new csEventTree(handler_reg, name_reg, root, NULL, q);
+    q->EventTree = new csEventTree(handler_reg, name_reg, root, 0, q);
     q->EventHash.PutUnique(root, q->EventTree);
   }
   return q->EventTree->FindNodeInternal(name, q);
@@ -121,42 +127,89 @@ void csEventTree::ForceFatCopy ()
     std::cerr << "  ... forcing fat copy here ..." << std::endl;
 #endif
 
-    FatRecordObject *newFatRecord = new FatRecordObject
-      (handler_reg, name_reg,
-       new csPartialOrder<csHandlerID>(fatRecord->SubscriberGraph),
-       (fatRecord->SubscriberQueue?
-	new csList<iEventHandler *>(*fatRecord->SubscriberQueue):
-	0));
-    
-    newFatRecord->StaleSubscriberQueue = true;
-
-    if ((fatRecord->iterator != 0) && 
-	name_reg->IsKindOf(fatRecord->iterator->baseevent, self)) 
+    /**
+     * If there is an iterator in play for the current node's fatRecord
+     * AND it is for one of the current node's children
+     */
+    if ((fatRecord->iterator != 0)
+	&& name_reg->IsKindOf(fatRecord->iterator->baseevent, self)) 
     {
-      /* The iterator actually should belong to us and not to the parent 
-       * fatRecord. */
-      CS_ASSERT(false);
-      newFatRecord->iterator = fatRecord->iterator; // DOME : this has to be translated !
-      fatRecord->iterator = 0;
+      // we MUST NOT get here for a record that is already fat
+      CS_ASSERT (self != fatRecord->iterator->baseevent);
+      /**
+       * This is a messy situation.  Say a handler subscribes to:
+       *     cs.input
+       * And say an event gets delivered:
+       *     cs.input.keyboard.down
+       * And say that the handler creates a new handler which subscribes to:
+       *     cs.input.keyboard
+       *
+       * Then the fatRecord belongs to cs.input, but the iterator is for
+       * cs.input.keybaord.down, but we need to create a new fatRecord 
+       * belonging to cs.input.keyboard (and all of its children) while
+       * not perturbing the iteration over the subscribers to 
+       * cs.input.keyboard.down.
+       *
+       * Ordinarily (see the "else" below) we would just create a new
+       * fatRecord at the subscribe point (cs.input.keyboard) and
+       * propogate that to its children.  However, since a child is
+       * in use with an iterator intimately intertwined with the 
+       * fatRecord, that's no good.
+       * 
+       * Instead of creating a new fatRecord at cs.input.keybaord,
+       * move the root of the existing fatRecord to cs.input.keyboard
+       * and create a new fatRecord at cs.input and all of its
+       * children (EXCEPT cs.input.keyboard), which is done by setting
+       * this.fatNode to true, setting the old root's fatRecord pointer
+       * to point to the new FRO, and calling the old root's PushFatCopy 
+       * method.
+       */
 
-      /* If the deletedList belongs to us, we need to regenerate the SQ we 
-       * swiped it from.
-       * DOME ... */
+      csEventTree *old_FR_root = fatRecord->my_root;
+
+      CS_ASSERT (this != old_FR_root);
+
+      FatRecordObject *newFatRecord = new FatRecordObject
+	(fatRecord->my_root, 
+	 handler_reg, name_reg,
+	 new csPartialOrder<csHandlerID>(fatRecord->SubscriberGraph),
+	 (fatRecord->SubscriberQueue?
+	  new csList<iEventHandler *>(*fatRecord->SubscriberQueue):
+	  0));
+
+      fatRecord->my_root = this;
+      old_FR_root->fatRecord = newFatRecord;
+      fatNode = true;
+      old_FR_root->PushFatCopy(newFatRecord);
+
+      CS_ASSERT (name_reg->IsKindOf(fatRecord->iterator->baseevent, self));
+      CS_ASSERT (fatRecord != old_FR_root->fatRecord);
     } 
     else 
     {
+      FatRecordObject *newFatRecord = new FatRecordObject
+	(this,
+	 handler_reg, name_reg,
+	 new csPartialOrder<csHandlerID>(fatRecord->SubscriberGraph),
+	 (fatRecord->SubscriberQueue?
+	  new csList<iEventHandler *>(*fatRecord->SubscriberQueue):
+	  0));
+      
+      newFatRecord->StaleSubscriberQueue = true;
+      
       // There is no iterator, or it belongs to the parent.  Ignore it.
       newFatRecord->iterator = 0;
+      newFatRecord->iterating_for = 0;
+      PushFatCopy(newFatRecord);
+      fatNode = true;
     }
-
-    PushFatCopy(newFatRecord);
-    fatNode = true;
   }
 }
 
 void csEventTree::KillFatCopy()
 {
   CS_ASSERT(fatRecord->iterator == 0);
+  CS_ASSERT(fatRecord->iterating_for == 0);
   if (fatNode)
   {
     delete fatRecord;
@@ -203,19 +256,19 @@ csPartialOrder<csHandlerID> *csEventTree::FatRecordObject::SubscribeInternal(csH
    * and we do not regenerate the subscriber queue until the iterator
    * has finished its pass.
    */
-  NewSubscriberGraph = new csPartialOrder<csHandlerID>(SubscriberGraph);
+  NewSubscriberGraph = new csPartialOrder<csHandlerID> (SubscriberGraph);
   
-  CS_ASSERT(id != CS_HANDLER_INVALID);
+  CS_ASSERT (id != CS_HANDLER_INVALID);
   NewSubscriberGraph->Add (id); /* ensure this node is present */
   
   /* id is an actual event handler, so we must sandwich it between
    * the abstract handler name's magic ":pre" and ":post" instances
    * to make sure abstract ordering works. */
   
-  csHandlerID preBound = handler_reg->GetGenericPreBoundID(id);
-  csHandlerID postBound = handler_reg->GetGenericPostBoundID(id);
+  csHandlerID preBound = handler_reg->GetGenericPreBoundID (id);
+  csHandlerID postBound = handler_reg->GetGenericPostBoundID (id);
 
-  CS_ASSERT(preBound != CS_HANDLER_INVALID);
+  CS_ASSERT (preBound != CS_HANDLER_INVALID);
   NewSubscriberGraph->Add (preBound);
   if (!NewSubscriberGraph->AddOrder (preBound, id)) 
     goto fail; /* This edge introduced a cycle... possible if generic(id) 
@@ -225,9 +278,9 @@ csPartialOrder<csHandlerID> *csEventTree::FatRecordObject::SubscribeInternal(csH
   NewSubscriberGraph->Dump ();
 #endif
   
-  CS_ASSERT(postBound != CS_HANDLER_INVALID);
-  NewSubscriberGraph->Add(postBound);
-  if (!NewSubscriberGraph->AddOrder(id, postBound))
+  CS_ASSERT (postBound != CS_HANDLER_INVALID);
+  NewSubscriberGraph->Add (postBound);
+  if (!NewSubscriberGraph->AddOrder (id, postBound))
     goto fail; /* Ditto */
 
 #ifdef ADB_DEBUG  
@@ -241,11 +294,11 @@ csPartialOrder<csHandlerID> *csEventTree::FatRecordObject::SubscribeInternal(csH
      Note that this is not deterministic unless your order is
      specifically with request to the currentl in-service handler,
      since PO solutions are not fully deterministic. */
-  if ((iterator) && (NewSubscriberGraph->IsMarked(postBound)))
-    NewSubscriberGraph->Mark(id);
+  if ((iterator) && (NewSubscriberGraph->IsMarked (postBound)))
+    NewSubscriberGraph->Mark (id);
 
   do {
-    const csHandlerID *precs = handler->InstancePrec(handler_reg, name_reg, baseevent);
+    const csHandlerID *precs = handler->InstancePrec (handler_reg, name_reg, baseevent);
     if (precs != 0)
     {
       for (size_t i=0 ; precs[i]!=CS_HANDLERLIST_END ; i++)
@@ -256,9 +309,9 @@ csPartialOrder<csHandlerID> *csEventTree::FatRecordObject::SubscribeInternal(csH
 	 * magic instance as our predecessor; since all instances 
 	 * will be predecessors of this (see above), we get the desired 
 	 * effect. */
-	if (!handler_reg->IsInstance(prec))
+	if (!handler_reg->IsInstance (prec))
 	{
-	  prec = handler_reg->GetGenericPostBoundID(prec);
+	  prec = handler_reg->GetGenericPostBoundID (prec);
 	}
 	NewSubscriberGraph->Add (prec);
 	if (!NewSubscriberGraph->AddOrder (prec, id))
@@ -272,23 +325,23 @@ csPartialOrder<csHandlerID> *csEventTree::FatRecordObject::SubscribeInternal(csH
   } while (0);
   
   do {
-    const csHandlerID *succs = handler->InstanceSucc(handler_reg, name_reg, baseevent);
+    const csHandlerID *succs = handler->InstanceSucc (handler_reg, name_reg, baseevent);
     if (succs != 0)
     {
       for (size_t i=0 ; succs[i]!=CS_HANDLERLIST_END ; i++)
       {
 	csHandlerID succ = succs[i];
 	/* Same rationale as above. */
-	if (!handler_reg->IsInstance(succ))
-	  succ = handler_reg->GetGenericPreBoundID(succ);
-	if (iterator && (NewSubscriberGraph->IsMarked(succ))) 
+	if (!handler_reg->IsInstance (succ))
+	  succ = handler_reg->GetGenericPreBoundID (succ);
+	NewSubscriberGraph->Add (succ);
+	if (iterator && (NewSubscriberGraph->IsMarked (succ))) 
 	{
 	  /* See the above comment about in-delivery event names */
-	  NewSubscriberGraph->Mark(id);
+	  NewSubscriberGraph->Mark (id);
 	  break;
 	}
-	NewSubscriberGraph->Add(succ);
-	if (!NewSubscriberGraph->AddOrder(id, succ))
+	if (!NewSubscriberGraph->AddOrder (id, succ))
 	  goto fail; /* This edge introduced a cycle */
 	
 #ifdef ADB_DEBUG
@@ -518,7 +571,7 @@ void csEventTree::Dispatch (iEvent &e)
 
 void csEventTree::SubscriberIterator::GraphMode()
 {
-  if (mode ==SI_GRAPH)
+  if (mode==SI_GRAPH)
     return;
   CS_ASSERT(mode==SI_LIST);
 
