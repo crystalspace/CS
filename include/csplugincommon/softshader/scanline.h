@@ -105,6 +105,27 @@ namespace CrystalSpace
 	const RenderInfoMesh& renderInfoMesh,
 	RenderInfoTriangle& renderInfoTri) = 0;
     };
+
+    /**
+     * Default software scanline renderer
+     */
+    struct iDefaultScanlineRenderer : public virtual iBase
+    {
+    public:
+      SCF_INTERFACE(iDefaultScanlineRenderer, 0, 1, 0);
+
+      /**
+       * Set the flat color used in lieu a texture when none is given.
+       */
+      virtual void SetFlatColor (const csVector4& v) = 0;
+      /**
+       * Set shift amounts for RGB and Alpha parts of the final pixel color.
+       * Positive shifts left, negative right. 0 means no shift. Can be used
+       * to realize a multiplication (with limited factors) of the pixel color
+       * components.
+       */
+      virtual void SetShift (int rgbShift, int alphaShift) = 0;
+    };
   } // namespace SoftShader
 } // namespace CrystalSpace
 

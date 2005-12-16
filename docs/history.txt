@@ -27,6 +27,10 @@ chronological order.
 	  complain that the Python-specific initopcode() function was missing
 	  from the DLL. This should resolve problem where py2app and py2exe
 	  failed when wrapping a pure-Python CS application.
+	- res made the SR DrawMesh() work again when no shader was activated
+	  previously.
+	- res fixed the Win32 callstack generation to not chop off the top
+	  entry.
 15-Dec-2005
 	- res fixed the printf formatter to properly handle very very large
 	  floats as well.

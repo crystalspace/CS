@@ -72,7 +72,7 @@
 
 #include <stdio.h>
 
-#undef DEBUG_MANAGER
+//#define DEBUG_MANAGER
 
 awsManager::awsManager (iBase *p) :
   updatestore_dirty(true),

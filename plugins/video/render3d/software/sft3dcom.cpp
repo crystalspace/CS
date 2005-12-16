@@ -45,6 +45,8 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/rendermesh.h"
 
+#include "csplugincommon/shader/shaderplugin.h"
+
 #include "sft3dcom.h"
 #include "soft_txt.h"
 #include "clip_znear.h"
@@ -130,15 +132,15 @@ bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)
   object_reg = p;
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
     csEventID events[3] = { csevSystemOpen(object_reg), csevSystemClose(object_reg), CS_EVENTLIST_END };
     q->RegisterListener (scfiEventHandler, events);
   }
 
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
   string_world2camera = strings->Request ("world2camera transform");
   string_indices = strings->Request ("indices");
 
@@ -172,14 +174,7 @@ void csSoftwareGraphics3DCommon::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
-  if (rep)
-    rep->ReportV (severity, "crystalspace.video.software", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, severity, "crystalspace.video.software", msg, arg);
   va_end (arg);
 }
 
@@ -217,6 +212,21 @@ bool csSoftwareGraphics3DCommon::Open ()
     "crystalspace.graphics3d.shadermanager", iShaderManager);
 
   SetupSpecifica();
+
+  csRef<iDefaultShader> shaderPlugin = csLoadPlugin<iDefaultShader> (
+    plugin_mgr, "crystalspace.graphics3d.shader.software");
+  if (!shaderPlugin.IsValid())
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+      "Can't find default software shader plugin");
+  }
+  else
+  {
+    defaultRendererState = shaderPlugin->GetDefaultRenderer ();
+    if (defaultRendererState.IsValid())
+      defaultRenderer = scfQueryInterface<iScanlineRenderer> (
+	defaultRendererState);
+  }
 
   return true;
 }
@@ -616,7 +626,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   if (scrapIndicesSize < indexCount)
   {
     scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
-      CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 0, 0);
+      CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 0, mesh.vertexCount - 1);
     scrapIndicesSize = indexCount;
   }
   if (scrapVerticesSize < mesh.vertexCount)
@@ -642,7 +652,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   }
   else
   {
-    csRenderBufferLock<uint> indexLock (scrapIndices);
+    csRenderBufferLock<uint, iRenderBuffer*> indexLock (scrapIndices);
     for (uint i = 0; i < mesh.vertexCount; i++)
       indexLock[(size_t)i] = i;
   }
@@ -705,15 +715,12 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   {
     csReversibleTransform camtrans;
 
-    const float vwf = (float)(width);
-    const float vhf = (float)(height);
-
     camtrans.SetO2T (
       csMatrix3 (1.0f, 0.0f, 0.0f,
       0.0f, -1.0f, 0.0f,
       0.0f, 0.0f, 1.0f));
     camtrans.SetO2TTranslation (csVector3 (
-      vwf / 2.0f, vhf / 2.0f, -aspect));
+      float (width2), float (GetHeight() - height2), -aspect));
 
     SetWorldToCamera (camtrans.GetInverse ());
   }
@@ -816,6 +823,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
     const csArray<csShaderVariable*> &stacks)
 {
+  ScanlineRendererHelper aNameThatDoesNotReallyMatter (this);
   if (!scanlineRenderer) return;
 
   csRenderMeshModes usedModes (modes);
@@ -871,7 +879,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   }
   CS_ASSERT(indexbuf);
 
-  uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_READ);
+  csRenderBufferLock<uint, iRenderBuffer*> indices (indexbuf, CS_BUF_LOCK_READ);
 
   const csMatrix3& w2c_m = w2c.GetO2T();
   const csMatrix3& o2w_m = mesh->object2world.GetO2T();
@@ -941,8 +949,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   if ((meshtype >= CS_MESHTYPE_TRIANGLES) 
     && (meshtype <= CS_MESHTYPE_TRIANGLEFAN))
   {
-    uint32* tri = indices + mesh->indexstart;
-    const uint32* triEnd = indices + mesh->indexend;
+    uint* tri = indices + mesh->indexstart;
+    const uint* triEnd = indices + mesh->indexend;
 
     const uint triDrawIndex = 
       CS_MIXMODE_BLENDOP_SRC(usedModes.mixmode)*CS_MIXMODE_FACT_COUNT

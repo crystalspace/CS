@@ -29,7 +29,9 @@ namespace cspluginSoftshader
   using namespace CrystalSpace::SoftShader;
 
   class ScanlineRendererBase : 
-    public scfImplementation1<ScanlineRendererBase, iScanlineRenderer>
+    public scfImplementation2<ScanlineRendererBase, 
+			      iScanlineRenderer,
+			      iDefaultScanlineRenderer>
   {
   public:
     Pixel flat_col;
@@ -42,7 +44,7 @@ namespace cspluginSoftshader
 
     ScanlineRendererBase() : scfImplementationType (this),
       flat_col (255, 255, 255, 255),
-      colorShift(16) {}
+      colorShift(16), alphaShift (16) {}
     virtual ~ScanlineRendererBase() {}
 
     void SetFlatColor (const csVector4& v)

@@ -20,6 +20,7 @@
 #ifndef __CS_SOFT3D_TRIDRAW_H__
 #define __CS_SOFT3D_TRIDRAW_H__
 
+#include "csgeom/polyclip.h"
 #include "sft3dcom.h"
 
 namespace cspluginSoft3d
@@ -55,9 +56,9 @@ namespace cspluginSoft3d
 
     // Info to go over triangles
     csRenderMeshType meshtype;
-    uint32* tri;
-    const uint32* triEnd;
-    uint32 old2, old1;
+    uint* tri;
+    const uint* triEnd;
+    uint old2, old1;
     int quadPart;
 
     /* Near clipping may produces 2 tris, needs some special handling.
@@ -153,10 +154,10 @@ namespace cspluginSoft3d
       // mirrored mode.
   
       /* You can only have as much clipped vertices as the sum of vertices in 
-      * the original poly and those in the clipping poly... I think. */
-      const size_t maxClipVertices = g3d->clipper->GetVertexCount() + 3;
-      ClipMeatiClipper meat;
-      meat.Init (g3d->clipper, maxClipVertices);
+       * the original poly and those in the clipping poly... I think. */
+      const size_t maxClipVertices = 
+	g3d->clipper ? g3d->clipper->GetVertexCount() + 3 : 7;
+
       out.SetSize (floatsPerVert * maxClipVertices);
       clippedPersp.SetSize (maxClipVertices);
       const size_t* compNum = scanRenderInfoMesh.bufferComps;
@@ -186,10 +187,6 @@ namespace cspluginSoft3d
 	compNum++;
       }
   
-      BuffersClipper<ClipMeatiClipper> clip (meat);
-      clip.Init (outPersp, clippedPersp.GetArray(),
-	clipOutBuf, clipInStride, clipOutBuf2, 
-	buffersMask & scanRenderInfoMesh.desiredBuffers);
       csTriangle tri;
       if (do_mirror)
       {
@@ -203,7 +200,27 @@ namespace cspluginSoft3d
 	tri.b = (int)trivert[1];
 	tri.c = (int)trivert[2];
       }
-      return clip.DoClip (tri);
+
+      ClipMeatiClipper meat;
+      if (g3d->clipper)
+      {
+	meat.Init (g3d->clipper, maxClipVertices);
+	BuffersClipper<ClipMeatiClipper> clip (meat);
+	clip.Init (outPersp, clippedPersp.GetArray(),
+	  clipOutBuf, clipInStride, clipOutBuf2, 
+	  buffersMask & scanRenderInfoMesh.desiredBuffers);
+	return clip.DoClip (tri);
+      }
+      else
+      {
+	csBoxClipper boxClip (0, 0, g3d->GetWidth()-1, g3d->GetHeight()-1);;
+	meat.Init (&boxClip, maxClipVertices);
+	BuffersClipper<ClipMeatiClipper> clip (meat);
+	clip.Init (outPersp, clippedPersp.GetArray(),
+	  clipOutBuf, clipInStride, clipOutBuf2, 
+	  buffersMask & scanRenderInfoMesh.desiredBuffers);
+	return clip.DoClip (tri);
+      }
     }
 
     int PickMipmap (size_t n)
@@ -392,7 +409,7 @@ namespace cspluginSoft3d
     void SetupDrawMesh (iRenderBuffer* activebuffers[], size_t rangeStart, 
       size_t rangeEnd, const csCoreRenderMesh* mesh,
       const iScanlineRenderer::RenderInfoMesh& scanRenderInfoMesh,
-      const csRenderMeshType meshtype, uint32* tri, const uint32* triEnd)
+      const csRenderMeshType meshtype, uint* tri, const uint* triEnd)
     {
       this->activebuffers = activebuffers;
       do_mirror = mesh->do_mirror;

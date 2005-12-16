@@ -457,8 +457,8 @@ namespace cspluginSoft3d
 	  //-----
 	  // Draw one scanline.
 	  //-----
-	  int xl = csQround (si.L.edge.x);
-	  int xr = csQround (si.R.edge.x);
+	  int xl = int (si.L.edge.x);
+	  int xr = int (si.R.edge.x);
   
 	  if (xr > xl)
 	  {

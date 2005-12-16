@@ -39,6 +39,8 @@
 #include "ivideo/halo.h"
 #include "ivideo/shader/shader.h"
 
+#include "csplugincommon/softshader/defaultshader.h"
+
 #include "soft_txt.h"
 
 struct iConfigFile;
@@ -68,7 +70,7 @@ struct iTriangleDrawer
     size_t rangeStart, size_t rangeEnd, 
     const csCoreRenderMesh* mesh, 
     const iScanlineRenderer::RenderInfoMesh& scanRenderInfoMesh,
-    const csRenderMeshType meshtype, uint32* tri, const uint32* triEnd) = 0;
+    const csRenderMeshType meshtype, uint* tri, const uint* triEnd) = 0;
 };
 
 struct iPixTypeSpecifica
@@ -155,8 +157,7 @@ protected:
   /// The pixel format of display
   csPixelFormat pfmt;
   bool pixelBGR;
-  /// Current transformation from object to camera.
-  csReversibleTransform o2c;
+  /// Current transformation from world to camera.
   csReversibleTransform w2c;
 
   /// Current 2D clipper.
@@ -200,11 +201,40 @@ protected:
   iRenderBuffer* activebuffers[activeBufferCount];
   csSoftwareTextureHandle* activeSoftTex[activeTextureCount]; 
   csRef<iRenderBuffer> translatedVerts;
-  csRef<iScanlineRenderer> scanlineRenderer;
   csRef<csRenderBuffer> processedColors[2];
   bool processedColorsFlag[2];
   /// The perspective corrected vertices.
   csDirtyAccessArray<csVector3> persp;
+
+  csRef<iScanlineRenderer> scanlineRenderer;
+  csRef<iScanlineRenderer> defaultRenderer;
+  csRef<iDefaultScanlineRenderer> defaultRendererState;
+  /**
+   * Helper class to change the scanline renderer to the default one if none
+   * other was set.
+   */
+  class ScanlineRendererHelper
+  {
+    csSoftwareGraphics3DCommon* theG3D;
+    bool unsetRenderer;
+  public:
+    ScanlineRendererHelper (csSoftwareGraphics3DCommon* G3D) : theG3D (G3D)
+    {
+      if (!theG3D->scanlineRenderer.IsValid())
+      {
+	theG3D->scanlineRenderer = theG3D->defaultRenderer;
+	theG3D->defaultRendererState->SetFlatColor (csVector4 (1, 1, 1, 1));
+	theG3D->defaultRendererState->SetShift (0, 0);
+	unsetRenderer = true;
+      }
+      else
+	unsetRenderer = false;
+    }
+    ~ScanlineRendererHelper()
+    {
+      if (unsetRenderer) theG3D->scanlineRenderer = 0;
+    }
+  };
 
   // Structure used for maintaining a stack of clipper portals.
   struct csClipPortal

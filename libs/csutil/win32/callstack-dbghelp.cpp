@@ -421,7 +421,7 @@ static LONG WINAPI ExceptionFilter (struct _EXCEPTION_POINTERS* ExceptionInfo)
   HANDLE hThread = GetCurrentThread ();
   CONTEXT context (*(ExceptionInfo->ContextRecord));
   efp->result =  CreateCallStack (hProc, hThread, 
-    context, efp->skip + 3, efp->fast, efp->entries, 
+    context, efp->skip, efp->fast, efp->entries, 
     efp->params);
 
   return EXCEPTION_CONTINUE_EXECUTION;
@@ -445,6 +445,7 @@ static bool CreateCallStackExcept (int skip, bool fast,
   ExceptionFilterParams efp (skip, fast, entries, params);
   ULONG_PTR efpPtr = (ULONG_PTR)&efp;
 #if defined (CS_DEBUG) && defined (CS_COMPILER_MSVC)
+  efp.skip += 2;
   // This method actually works nice in conjunction with debugging.
   __try
   {
@@ -454,6 +455,7 @@ static bool CreateCallStackExcept (int skip, bool fast,
   {
   }
 #else
+  efp.skip += 2;
   LPTOP_LEVEL_EXCEPTION_FILTER oldFilter = 
     SetUnhandledExceptionFilter (&ExceptionFilter);
 

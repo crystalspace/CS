@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/vector4.h"
 #include "awswin.h"
 #include "awslayot.h"
 #include "ivideo/graph2d.h"
@@ -598,22 +599,32 @@ void awsWindow::DrawGradient(csRect frame,
 			     unsigned char g2,
 			     unsigned char b2)
 {
-  iGraphics2D *g2d = WindowManager()->G2D();
-  iAwsPrefManager *pm = WindowManager()->GetPrefMgr();
+  csVector4 c1 (r1 / 255.0f, g1 / 255.0f, b1 / 255.0f, 1.0f);
+  csVector4 c2 (r2 / 255.0f, g2 / 255.0f, b2 / 255.0f, 1.0f);
 
-  float r_step, g_step, b_step;
-  r_step = (float)(r2 - r1) / frame.Width();
-  g_step = (float)(g2 - g1) / frame.Width();
-  b_step = (float)(b2 - b1) / frame.Width();
+  csSimpleRenderMesh mesh;
+  csVector3 verts[4];
+  csVector4 colors[4];
 
-  for (int i = 0; i < frame.Width(); i++)
-  {
-    int color = pm->FindColor(r1 + (unsigned char)(i*r_step),
-			      g1 + (unsigned char)(i*g_step),
-			      b1 + (unsigned char)(i*b_step));
-    g2d->DrawLine(frame.xmin + i, frame.ymin, frame.xmin + i, frame.ymax,
-		  color);
-  }
+  mesh.meshtype = CS_MESHTYPE_QUADS;
+  mesh.vertexCount = 4;
+  mesh.vertices = verts;
+  mesh.colors = colors;
+  mesh.texture = 0;
+
+  verts[0].Set (frame.xmin, frame.ymin, 0.0f);
+  colors[0] = c1;
+  
+  verts[1].Set (frame.xmax, frame.ymin, 0.0f);
+  colors[1] = c2;
+
+  verts[2].Set (frame.xmax, frame.ymax, 0.0f);
+  colors[2] = c2;
+
+  verts[3].Set (frame.xmin, frame.ymax, 0.0f);
+  colors[3] = c1;
+
+  WindowManager()->G3D()->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
 }
 
 void awsWindow::SetOptions(int o)
