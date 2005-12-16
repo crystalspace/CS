@@ -51,10 +51,10 @@ package cspace;
 *scfRegisterStaticFactoryFunc = *cspacec::scfRegisterStaticFactoryFunc;
 *__modulo__ = *cspacec::__modulo__;
 *__rshift__ = *cspacec::__rshift__;
-*__subtr__ = *cspacec::__subtr__;
 *__mult_ass__ = *cspacec::__mult_ass__;
 *__divide_ass__ = *cspacec::__divide_ass__;
 *__div__ = *cspacec::__div__;
+*__subtr__ = *cspacec::__subtr__;
 *__add__ = *cspacec::__add__;
 *__mult__ = *cspacec::__mult__;
 *__eq__ = *cspacec::__eq__;
@@ -72,6 +72,11 @@ package cspace;
 *csGetUsername = *cspacec::csGetUsername;
 *csGetPlatformConfigPath = *cspacec::csGetPlatformConfigPath;
 *csQueryRegistryTag = *cspacec::csQueryRegistryTag;
+*csevMouse = *cspacec::csevMouse;
+*csevMouseOp = *cspacec::csevMouseOp;
+*csevJoystick = *cspacec::csevJoystick;
+*csevJoystickOp = *cspacec::csevJoystickOp;
+*csevCanvasOp = *cspacec::csevCanvasOp;
 *csLoadPluginAlways = *cspacec::csLoadPluginAlways;
 *csGetShaderVariableFromStack = *cspacec::csGetShaderVariableFromStack;
 *csfxInterference = *cspacec::csfxInterference;
@@ -89,6 +94,25 @@ package cspace;
 *CS_IS_MOUSE_EVENT = *cspacec::CS_IS_MOUSE_EVENT;
 *CS_IS_JOYSTICK_EVENT = *cspacec::CS_IS_JOYSTICK_EVENT;
 *CS_IS_INPUT_EVENT = *cspacec::CS_IS_INPUT_EVENT;
+*csevAllEvents = *cspacec::csevAllEvents;
+*csevFrame = *cspacec::csevFrame;
+*csevInput = *cspacec::csevInput;
+*csevQuit = *cspacec::csevQuit;
+*csevProcess = *cspacec::csevProcess;
+*csevPreProcess = *cspacec::csevPreProcess;
+*csevPostProcess = *cspacec::csevPostProcess;
+*csevFinalProcess = *cspacec::csevFinalProcess;
+*csevKeyboardEvent = *cspacec::csevKeyboardEvent;
+*csevKeyboardDown = *cspacec::csevKeyboardDown;
+*csevKeyboardUp = *cspacec::csevKeyboardUp;
+*csevMouseEvent = *cspacec::csevMouseEvent;
+*csevMouseButton = *cspacec::csevMouseButton;
+*csevMouseUp = *cspacec::csevMouseUp;
+*csevMouseDown = *cspacec::csevMouseDown;
+*csevMouseClick = *cspacec::csevMouseClick;
+*csevMouseDoubleClick = *cspacec::csevMouseDoubleClick;
+*csevMouseMove = *cspacec::csevMouseMove;
+*csevJoystickEvent = *cspacec::csevJoystickEvent;
 *CS_QUERY_REGISTRY_TAG = *cspacec::CS_QUERY_REGISTRY_TAG;
 *CS_LOAD_PLUGIN_ALWAYS = *cspacec::CS_LOAD_PLUGIN_ALWAYS;
 *CS_FX_SETALPHA = *cspacec::CS_FX_SETALPHA;
@@ -2132,6 +2156,67 @@ sub DESTROY {
 *Count = *cspacec::csRectRegion_Count;
 *RectAt = *cspacec::csRectRegion_RectAt;
 *makeEmpty = *cspacec::csRectRegion_makeEmpty;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csQuaternion ##############
+
+package cspace::csQuaternion;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Init = *cspacec::csQuaternion_Init;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csQuaternion(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*__mult_ass__ = *cspacec::csQuaternion___mult_ass__;
+*Conjugate = *cspacec::csQuaternion_Conjugate;
+*Negate = *cspacec::csQuaternion_Negate;
+*Invert = *cspacec::csQuaternion_Invert;
+*GetAxisAngle = *cspacec::csQuaternion_GetAxisAngle;
+*SetWithAxisAngle = *cspacec::csQuaternion_SetWithAxisAngle;
+*PrepRotation = *cspacec::csQuaternion_PrepRotation;
+*Rotate = *cspacec::csQuaternion_Rotate;
+*Normalize = *cspacec::csQuaternion_Normalize;
+*SetWithEuler = *cspacec::csQuaternion_SetWithEuler;
+*GetEulerAngles = *cspacec::csQuaternion_GetEulerAngles;
+*ToAxisAngle = *cspacec::csQuaternion_ToAxisAngle;
+*Slerp = *cspacec::csQuaternion_Slerp;
+*swig_r_get = *cspacec::csQuaternion_r_get;
+*swig_r_set = *cspacec::csQuaternion_r_set;
+*swig_x_get = *cspacec::csQuaternion_x_get;
+*swig_x_set = *cspacec::csQuaternion_x_set;
+*swig_y_get = *cspacec::csQuaternion_y_get;
+*swig_y_set = *cspacec::csQuaternion_y_set;
+*swig_z_get = *cspacec::csQuaternion_z_get;
+*swig_z_set = *cspacec::csQuaternion_z_set;
+*__add__ = *cspacec::csQuaternion___add__;
+*__subtr__ = *cspacec::csQuaternion___subtr__;
+*__mult__ = *cspacec::csQuaternion___mult__;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csQuaternion($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -7519,6 +7604,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iThingFactoryState_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -8664,6 +8750,41 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iSndSysRenderer_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysSoftwareDriver ##############
+
+package cspace::iSndSysSoftwareDriver;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*Open = *cspacec::iSndSysSoftwareDriver_Open;
+*Close = *cspacec::iSndSysSoftwareDriver_Close;
+*StartThread = *cspacec::iSndSysSoftwareDriver_StartThread;
+*StopThread = *cspacec::iSndSysSoftwareDriver_StopThread;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysSoftwareDriver($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSndSysSoftwareDriver_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9825,6 +9946,78 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iEventQueue_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iEventNameRegistry ##############
+
+package cspace::iEventNameRegistry;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*GetID = *cspacec::iEventNameRegistry_GetID;
+*GetString = *cspacec::iEventNameRegistry_GetString;
+*GetParentID = *cspacec::iEventNameRegistry_GetParentID;
+*IsImmediateChildOf = *cspacec::iEventNameRegistry_IsImmediateChildOf;
+*IsKindOf = *cspacec::iEventNameRegistry_IsKindOf;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iEventNameRegistry($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iEventNameRegistry_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csEventNameRegistry ##############
+
+package cspace::csEventNameRegistry;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csEventNameRegistry($self);
+        delete $OWNER{$self};
+    }
+}
+
+*GetString = *cspacec::csEventNameRegistry_GetString;
+*GetParentID = *cspacec::csEventNameRegistry_GetParentID;
+*IsImmediateChildOf = *cspacec::csEventNameRegistry_IsImmediateChildOf;
+*GetRegistry = *cspacec::csEventNameRegistry_GetRegistry;
+*GetID = *cspacec::csEventNameRegistry_GetID;
+*IsKindOf = *cspacec::csEventNameRegistry_IsKindOf;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
