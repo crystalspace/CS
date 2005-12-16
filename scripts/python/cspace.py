@@ -1849,6 +1849,58 @@ class csRectRegionPtr(csRectRegion):
 _cspace.csRectRegion_swigregister(csRectRegionPtr)
 FRAGMENT_BUFFER_SIZE = cvar.FRAGMENT_BUFFER_SIZE
 
+class csQuaternion(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csQuaternion, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csQuaternion, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csQuaternion instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def Init(*args): return _cspace.csQuaternion_Init(*args)
+    def __init__(self, *args):
+        _swig_setattr(self, csQuaternion, 'this', _cspace.new_csQuaternion(*args))
+        _swig_setattr(self, csQuaternion, 'thisown', 1)
+    def __imul__(*args): return _cspace.csQuaternion___imul__(*args)
+    def Conjugate(*args): return _cspace.csQuaternion_Conjugate(*args)
+    def Negate(*args): return _cspace.csQuaternion_Negate(*args)
+    def Invert(*args): return _cspace.csQuaternion_Invert(*args)
+    def GetAxisAngle(*args): return _cspace.csQuaternion_GetAxisAngle(*args)
+    def SetWithAxisAngle(*args): return _cspace.csQuaternion_SetWithAxisAngle(*args)
+    def PrepRotation(*args): return _cspace.csQuaternion_PrepRotation(*args)
+    def Rotate(*args): return _cspace.csQuaternion_Rotate(*args)
+    def Normalize(*args): return _cspace.csQuaternion_Normalize(*args)
+    def SetWithEuler(*args): return _cspace.csQuaternion_SetWithEuler(*args)
+    def GetEulerAngles(*args): return _cspace.csQuaternion_GetEulerAngles(*args)
+    def ToAxisAngle(*args): return _cspace.csQuaternion_ToAxisAngle(*args)
+    def Slerp(*args): return _cspace.csQuaternion_Slerp(*args)
+    __swig_setmethods__["r"] = _cspace.csQuaternion_r_set
+    __swig_getmethods__["r"] = _cspace.csQuaternion_r_get
+    if _newclass:r = property(_cspace.csQuaternion_r_get, _cspace.csQuaternion_r_set)
+    __swig_setmethods__["x"] = _cspace.csQuaternion_x_set
+    __swig_getmethods__["x"] = _cspace.csQuaternion_x_get
+    if _newclass:x = property(_cspace.csQuaternion_x_get, _cspace.csQuaternion_x_set)
+    __swig_setmethods__["y"] = _cspace.csQuaternion_y_set
+    __swig_getmethods__["y"] = _cspace.csQuaternion_y_get
+    if _newclass:y = property(_cspace.csQuaternion_y_get, _cspace.csQuaternion_y_set)
+    __swig_setmethods__["z"] = _cspace.csQuaternion_z_set
+    __swig_getmethods__["z"] = _cspace.csQuaternion_z_get
+    if _newclass:z = property(_cspace.csQuaternion_z_get, _cspace.csQuaternion_z_set)
+    def __add__(*args): return _cspace.csQuaternion___add__(*args)
+    def __sub__(*args): return _cspace.csQuaternion___sub__(*args)
+    def __mul__(*args): return _cspace.csQuaternion___mul__(*args)
+    def __del__(self, destroy=_cspace.delete_csQuaternion):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csQuaternionPtr(csQuaternion):
+    def __init__(self, this):
+        _swig_setattr(self, csQuaternion, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csQuaternion, 'thisown', 0)
+        _swig_setattr(self, csQuaternion,self.__class__,csQuaternion)
+_cspace.csQuaternion_swigregister(csQuaternionPtr)
+
 class csSpline(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSpline, name, value)
@@ -6632,6 +6684,8 @@ class iThingFactoryState(iBase):
             if self.thisown: destroy(self)
         except: pass
 
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iThingFactoryState_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iThingFactoryState_scfGetVersion)
 
 class iThingFactoryStatePtr(iThingFactoryState):
     def __init__(self, this):
@@ -6639,6 +6693,8 @@ class iThingFactoryStatePtr(iThingFactoryState):
         if not hasattr(self,"thisown"): _swig_setattr(self, iThingFactoryState, 'thisown', 0)
         _swig_setattr(self, iThingFactoryState,self.__class__,iThingFactoryState)
 _cspace.iThingFactoryState_swigregister(iThingFactoryStatePtr)
+
+iThingFactoryState_scfGetVersion = _cspace.iThingFactoryState_scfGetVersion
 
 class iThingState(iBase):
     __swig_setmethods__ = {}
@@ -7687,6 +7743,37 @@ class iSndSysRendererPtr(iSndSysRenderer):
 _cspace.iSndSysRenderer_swigregister(iSndSysRendererPtr)
 
 iSndSysRenderer_scfGetVersion = _cspace.iSndSysRenderer_scfGetVersion
+
+class iSndSysSoftwareDriver(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSoftwareDriver, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSoftwareDriver, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysSoftwareDriver instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def Open(*args): return _cspace.iSndSysSoftwareDriver_Open(*args)
+    def Close(*args): return _cspace.iSndSysSoftwareDriver_Close(*args)
+    def StartThread(*args): return _cspace.iSndSysSoftwareDriver_StartThread(*args)
+    def StopThread(*args): return _cspace.iSndSysSoftwareDriver_StopThread(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysSoftwareDriver):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysSoftwareDriver_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysSoftwareDriver_scfGetVersion)
+
+class iSndSysSoftwareDriverPtr(iSndSysSoftwareDriver):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysSoftwareDriver, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysSoftwareDriver, 'thisown', 0)
+        _swig_setattr(self, iSndSysSoftwareDriver,self.__class__,iSndSysSoftwareDriver)
+_cspace.iSndSysSoftwareDriver_swigregister(iSndSysSoftwareDriverPtr)
+
+iSndSysSoftwareDriver_scfGetVersion = _cspace.iSndSysSoftwareDriver_scfGetVersion
 
 class iComponent(iBase):
     __swig_setmethods__ = {}
@@ -8858,6 +8945,77 @@ _cspace.iEventQueue_swigregister(iEventQueuePtr)
 
 iEventQueue_scfGetVersion = _cspace.iEventQueue_scfGetVersion
 
+class iEventNameRegistry(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iEventNameRegistry, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iEventNameRegistry, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iEventNameRegistry instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def GetID(*args): return _cspace.iEventNameRegistry_GetID(*args)
+    def GetString(*args): return _cspace.iEventNameRegistry_GetString(*args)
+    def GetParentID(*args): return _cspace.iEventNameRegistry_GetParentID(*args)
+    def IsImmediateChildOf(*args): return _cspace.iEventNameRegistry_IsImmediateChildOf(*args)
+    def IsKindOf(*args): return _cspace.iEventNameRegistry_IsKindOf(*args)
+    def __del__(self, destroy=_cspace.delete_iEventNameRegistry):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iEventNameRegistry_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iEventNameRegistry_scfGetVersion)
+
+class iEventNameRegistryPtr(iEventNameRegistry):
+    def __init__(self, this):
+        _swig_setattr(self, iEventNameRegistry, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iEventNameRegistry, 'thisown', 0)
+        _swig_setattr(self, iEventNameRegistry,self.__class__,iEventNameRegistry)
+_cspace.iEventNameRegistry_swigregister(iEventNameRegistryPtr)
+
+iEventNameRegistry_scfGetVersion = _cspace.iEventNameRegistry_scfGetVersion
+
+class csEventNameRegistry(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csEventNameRegistry, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csEventNameRegistry, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csEventNameRegistry instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __del__(self, destroy=_cspace.delete_csEventNameRegistry):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["GetString"] = lambda x: _cspace.csEventNameRegistry_GetString
+    if _newclass:GetString = staticmethod(_cspace.csEventNameRegistry_GetString)
+    def GetParentID(*args): return _cspace.csEventNameRegistry_GetParentID(*args)
+    def IsImmediateChildOf(*args): return _cspace.csEventNameRegistry_IsImmediateChildOf(*args)
+    __swig_getmethods__["GetRegistry"] = lambda x: _cspace.csEventNameRegistry_GetRegistry
+    if _newclass:GetRegistry = staticmethod(_cspace.csEventNameRegistry_GetRegistry)
+    __swig_getmethods__["GetID"] = lambda x: _cspace.csEventNameRegistry_GetID
+    if _newclass:GetID = staticmethod(_cspace.csEventNameRegistry_GetID)
+    __swig_getmethods__["IsKindOf"] = lambda x: _cspace.csEventNameRegistry_IsKindOf
+    if _newclass:IsKindOf = staticmethod(_cspace.csEventNameRegistry_IsKindOf)
+
+class csEventNameRegistryPtr(csEventNameRegistry):
+    def __init__(self, this):
+        _swig_setattr(self, csEventNameRegistry, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csEventNameRegistry, 'thisown', 0)
+        _swig_setattr(self, csEventNameRegistry,self.__class__,csEventNameRegistry)
+_cspace.csEventNameRegistry_swigregister(csEventNameRegistryPtr)
+
+csEventNameRegistry_GetString = _cspace.csEventNameRegistry_GetString
+
+csEventNameRegistry_GetRegistry = _cspace.csEventNameRegistry_GetRegistry
+
+csEventNameRegistry_GetID = _cspace.csEventNameRegistry_GetID
+
+csEventNameRegistry_IsKindOf = _cspace.csEventNameRegistry_IsKindOf
+
 class iEventHandler(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -8889,6 +9047,16 @@ class iEventHandlerPtr(iEventHandler):
         if not hasattr(self,"thisown"): _swig_setattr(self, iEventHandler, 'thisown', 0)
         _swig_setattr(self, iEventHandler,self.__class__,iEventHandler)
 _cspace.iEventHandler_swigregister(iEventHandlerPtr)
+
+csevMouse = _cspace.csevMouse
+
+csevMouseOp = _cspace.csevMouseOp
+
+csevJoystick = _cspace.csevJoystick
+
+csevJoystickOp = _cspace.csevJoystickOp
+
+csevCanvasOp = _cspace.csevCanvasOp
 
 iEventHandler_scfGetVersion = _cspace.iEventHandler_scfGetVersion
 
@@ -13240,6 +13408,44 @@ CS_IS_JOYSTICK_EVENT = _cspace.CS_IS_JOYSTICK_EVENT
 
 CS_IS_INPUT_EVENT = _cspace.CS_IS_INPUT_EVENT
 
+csevAllEvents = _cspace.csevAllEvents
+
+csevFrame = _cspace.csevFrame
+
+csevInput = _cspace.csevInput
+
+csevQuit = _cspace.csevQuit
+
+csevProcess = _cspace.csevProcess
+
+csevPreProcess = _cspace.csevPreProcess
+
+csevPostProcess = _cspace.csevPostProcess
+
+csevFinalProcess = _cspace.csevFinalProcess
+
+csevKeyboardEvent = _cspace.csevKeyboardEvent
+
+csevKeyboardDown = _cspace.csevKeyboardDown
+
+csevKeyboardUp = _cspace.csevKeyboardUp
+
+csevMouseEvent = _cspace.csevMouseEvent
+
+csevMouseButton = _cspace.csevMouseButton
+
+csevMouseUp = _cspace.csevMouseUp
+
+csevMouseDown = _cspace.csevMouseDown
+
+csevMouseClick = _cspace.csevMouseClick
+
+csevMouseDoubleClick = _cspace.csevMouseDoubleClick
+
+csevMouseMove = _cspace.csevMouseMove
+
+csevJoystickEvent = _cspace.csevJoystickEvent
+
 CS_QUERY_REGISTRY_TAG = _cspace.CS_QUERY_REGISTRY_TAG
 
 CS_LOAD_PLUGIN_ALWAYS = _cspace.CS_LOAD_PLUGIN_ALWAYS
@@ -13265,27 +13471,6 @@ CS_GET_CHILD_OBJECT = _cspace.CS_GET_CHILD_OBJECT
 CS_GET_NAMED_CHILD_OBJECT = _cspace.CS_GET_NAMED_CHILD_OBJECT
 
 CS_GET_FIRST_NAMED_CHILD_OBJECT = _cspace.CS_GET_FIRST_NAMED_CHILD_OBJECT
-CSMASK_Nothing = (1 << csevNothing)
-CSMASK_FrameProcess = CSMASK_Nothing
-CSMASK_Keyboard = (1 << csevKeyboard)
-CSMASK_MouseMove = (1 << csevMouseMove)
-CSMASK_MouseDown = (1 << csevMouseDown)
-CSMASK_MouseUp = (1 << csevMouseUp)
-CSMASK_MouseClick = (1 << csevMouseClick)
-CSMASK_MouseDoubleClick = (1 << csevMouseDoubleClick)
-CSMASK_JoystickMove = (1 << csevJoystickMove)
-CSMASK_JoystickDown = (1 << csevJoystickDown)
-CSMASK_JoystickUp = (1 << csevJoystickUp)
-CSMASK_Command = (1 << csevCommand)
-CSMASK_Broadcast = (1 << csevBroadcast)
-
-CSMASK_Mouse = (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp
-  | CSMASK_MouseClick | CSMASK_MouseDoubleClick)
-CSMASK_Joystick = (CSMASK_JoystickMove | CSMASK_JoystickDown
-  | CSMASK_JoystickUp)
-CSMASK_Input = (CSMASK_Keyboard | CSMASK_Mouse | CSMASK_Joystick)
-
-
 class _csPyEventHandler(iEventHandler):
     __swig_setmethods__ = {}
     for _s in [iEventHandler]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -13344,7 +13529,7 @@ class _EventHandlerFuncWrapper (csPyEventHandler):
     return self._func(event)
 
 def _csInitializer_SetupEventHandler (reg, obj,
-    mask=(CSMASK_FrameProcess|CSMASK_Input|CSMASK_Broadcast)):
+    eventids=None):
   """Replacement of C++ versions."""
   if callable(obj):
     # obj is a function
@@ -13353,7 +13538,10 @@ def _csInitializer_SetupEventHandler (reg, obj,
   else:
     # assume it is a iEventHandler
     hdlr = obj
-  return csInitializer._SetupEventHandler(reg, hdlr, mask)
+  if eventids==None:
+    eventids=[csevFrame(reg), csevInput(reg), csevKeyboard(reg), \
+               csevMouse(reg), csevQuit(reg)]
+  return csInitializer._SetupEventHandler(reg, hdlr, eventids)
 
 csInitializer.SetupEventHandler = \
   staticmethod(_csInitializer_SetupEventHandler)
