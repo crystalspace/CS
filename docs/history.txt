@@ -9,6 +9,7 @@ chronological order.
 17-Dec-2005
         - res reactivated (and slightly improved) "-ilace" support for the
           software renderer.
+	- Adam really, really fixed csInputDefinition this time.  Really.
 16-Dec-2005
 	- Oktal fixed null pointer dereference in csEngine when iGraphics2D/3D
 	  are not available.
