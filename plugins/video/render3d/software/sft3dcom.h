@@ -114,6 +114,10 @@ protected:
   bool rt_cliprectset;
   /// Old clip rect to restore after rendering on a proc texture.
   int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
+  int oldIlaceMode;
+  uint8* ilaceSaveBuf;
+  size_t ilaceSaveBufSize;
+  bool ilaceRestore;
 
   /// Z buffer.
   uint32* z_buffer;

@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Dec-2005
+        - res reactivated (and slightly improved) "-ilace" support for the
+          software renderer.
 16-Dec-2005
 	- Oktal fixed null pointer dereference in csEngine when iGraphics2D/3D
 	  are not available.

@@ -498,7 +498,7 @@ namespace cspluginSoft3d
       const csRenderMeshType meshtype, uint32* tri, const uint32* triEnd)
     {
       polyrast.Init (g3d->pfmt, g3d->width, g3d->height, g3d->z_buffer,
-	g3d->line_table);
+	g3d->line_table, g3d->do_interlaced);
       SetupDrawMesh (activebuffers, rangeStart, rangeEnd, mesh, 
 	scanRenderInfoMesh, meshtype, tri, triEnd);
 

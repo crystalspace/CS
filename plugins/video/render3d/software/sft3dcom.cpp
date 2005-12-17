@@ -68,11 +68,13 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent) :
   cliptype = CS_CLIPPER_NONE;
   do_near_plane = false;
 
-  do_interlaced = -1;
+  do_interlaced = oldIlaceMode = -1;
   do_smaller_rendering = false;
   smaller_buffer = 0;
   pixel_shift = 0;
   rstate_mipmap = 0;
+  ilaceSaveBuf = 0;
+  ilaceSaveBufSize = 0;
 
   z_buffer = 0;
   line_table = 0;
@@ -273,6 +275,7 @@ void csSoftwareGraphics3DCommon::Close ()
     delete triDraw[n];
   memset (triDraw, 0, sizeof (triDraw));
   delete specifica; specifica = 0;
+  delete[] ilaceSaveBuf; ilaceSaveBuf = 0;
 
   G2D->Close ();
   width = height = -1;
@@ -345,12 +348,38 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
     else
       line_table[i] = G2D->GetPixelAt (0, i);
   
-  polyrast_ZFill.Init (pfmt, width, height, z_buffer, line_table);
+  polyrast_ZFill.Init (pfmt, width, height, z_buffer, line_table, 
+    do_interlaced);
 
   if (render_target)
   {
     int txt_w, txt_h;
     render_target->GetRendererDimensions (txt_w, txt_h);
+
+    if (do_interlaced != -1)
+    {
+      const size_t rowSize = txt_w * pfmt.PixelBytes;
+      const size_t bufSize = txt_h * rowSize;
+      if (ilaceSaveBufSize < bufSize)
+      {
+        ilaceSaveBufSize = bufSize;
+        delete[] ilaceSaveBuf;
+        ilaceSaveBuf = new uint8[ilaceSaveBufSize];
+      }
+      
+      uint8* dest = ilaceSaveBuf;
+      for (int i = 0; i < txt_h; i++)
+      {
+        memcpy (dest, line_table[i], rowSize);
+        dest += rowSize;
+      }
+      
+      oldIlaceMode = do_interlaced;
+      do_interlaced = -1;
+      ilaceRestore = true;
+    }
+    else
+      ilaceRestore = false;
 
     if (!rt_onscreen)
     {
@@ -441,10 +470,6 @@ void csSoftwareGraphics3DCommon::Print (csRect const* area)
 
 void csSoftwareGraphics3DCommon::FinishDraw ()
 {
-  if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
-    G2D->FinishDraw ();
-  DrawMode = 0;
-
   if (render_target)
   {
     if (rt_onscreen)
@@ -457,9 +482,26 @@ void csSoftwareGraphics3DCommon::FinishDraw ()
       csSoftwareTexture *tex_0 = tex_mm->GetTexture (0);
       uint32* bitmap = tex_0->bitmap;
       specifica->BlitScreenToTexture (line_table, txt_w, txt_h, bitmap);
+      
+      if (ilaceRestore)
+      {
+        const size_t rowSize = txt_w * pfmt.PixelBytes;
+        uint8* src = ilaceSaveBuf;
+        for (int i = 0; i < txt_h; i++)
+        {
+          memcpy (line_table[i], src, rowSize);
+          src += rowSize;
+        }
+      }
+    
+      SetRenderTarget (0, false);
+      if (oldIlaceMode != -1) do_interlaced = oldIlaceMode;
     }
-    SetRenderTarget (0, false);
   }
+
+  if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
+    G2D->FinishDraw ();
+  DrawMode = 0;
 }
 
 #define SMALL_D 0.01

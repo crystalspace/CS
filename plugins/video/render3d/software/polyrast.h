@@ -476,13 +476,14 @@ namespace cspluginSoft3d
     }
 
     void Init (const csPixelFormat& pfmt, int w, int h,
-      uint32* z_buffer, uint8** line_table)
+      uint32* z_buffer, uint8** line_table, int interlace)
     {
       width = w;
       height = h;
 
       this->z_buffer = z_buffer;
       this->line_table = line_table;
+      do_interlaced = interlace;
 
       pixel_shift = csLog2 (pfmt.PixelBytes);
       if (line_buffer_width < w)
