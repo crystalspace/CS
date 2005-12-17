@@ -97,24 +97,16 @@ struct iMeshGeneratorGeometry : public virtual iBase
 };
 
 /**
- * This interface defines how to map the generated meshes in the 3D
- * world.
+ * iMeshGenerator defines the interface for a mesh generator.
  */
-struct iMeshGeneratorMapping : public virtual iBase
+struct iMeshGenerator : public virtual iBase
 {
-  SCF_INTERFACE(iMeshGeneratorMapping, 1, 0, 0);
+  SCF_INTERFACE(iMeshGenerator, 1, 0, 0);
 
   /**
-   * Set the mesh object which this mapping will use.
-   * This can be 0 in which case it will act on all objects
-   * in the given sector.
+   * Get the iObject for this mesh generator.
    */
-  virtual void SetMeshWrapper (iMeshWrapper* mesh) = 0;
-
-  /**
-   * Get the mesh object.
-   */
-  virtual iMeshWrapper* GetMeshWrapper () = 0;
+  virtual iObject *QueryObject () = 0;
 
   /**
    * Get the box where where we will sample. We will sample starting
@@ -128,19 +120,6 @@ struct iMeshGeneratorMapping : public virtual iBase
    * Get the sample box.
    */
   virtual const csBox3& GetSampleBox () const = 0;
-};
-
-/**
- * iMeshGenerator defines the interface for a mesh generator.
- */
-struct iMeshGenerator : public virtual iBase
-{
-  SCF_INTERFACE(iMeshGenerator, 1, 0, 0);
-
-  /**
-   * Get the iObject for this mesh generator.
-   */
-  virtual iObject *QueryObject () = 0;
 
   /**
    * Create a geometry specification for this mesh generator.
@@ -163,24 +142,24 @@ struct iMeshGenerator : public virtual iBase
   virtual void RemoveGeometry (size_t idx) = 0;
 
   /**
-   * Create a mapping specification for this mesh generator.
+   * Add a mesh on which we will map our geometry.
    */
-  virtual iMeshGeneratorMapping* CreateMapping () = 0;
+  virtual void AddMesh (iMeshWrapper* mesh) = 0;
 
   /**
-   * Get the number of mapping specifications.
+   * Get the number of meshes.
    */
-  virtual size_t GetMappingCount () const = 0;
+  virtual size_t GetMeshCount () const = 0;
 
   /**
-   * Get a specific mapping.
+   * Get a specific mesh.
    */
-  virtual iMeshGeneratorMapping* GetMapping (size_t idx) = 0;
+  virtual iMeshWrapper* GetMesh (size_t idx) = 0;
 
   /**
-   * Remove a mapping.
+   * Remove a mesh.
    */
-  virtual void RemoveMapping (size_t idx) = 0;
+  virtual void RemoveMesh (size_t idx) = 0;
 };
 
 /** @} */

@@ -51,19 +51,25 @@ void csMeshGeneratorGeometry::SetDensity (float density)
 
 //--------------------------------------------------------------------------
 
-csMeshGeneratorMapping::csMeshGeneratorMapping () :
-	scfImplementationType (this)
-{
-}
-
-void csMeshGeneratorMapping::SetMeshWrapper (iMeshWrapper* mesh)
-{
-  csMeshGeneratorMapping::mesh = mesh;
-}
-
-//--------------------------------------------------------------------------
-
 csMeshGenerator::csMeshGenerator() : scfImplementationType (this)
+{
+  max_blocks = 100;
+  cell_dim = 50;
+
+  cells = new csMGCell [cell_dim * cell_dim];
+  size_t i;
+  for (i = 0 ; i < max_blocks ; i++)
+    cache_blocks.Push (new csMGPositionBlock ());
+
+  block_tick = 1;
+}
+
+csMeshGenerator::~csMeshGenerator ()
+{
+  delete[] cells;
+}
+
+void csMeshGenerator::AllocateBlocks (const csVector3& pos)
 {
 }
 
@@ -80,16 +86,8 @@ void csMeshGenerator::RemoveGeometry (size_t idx)
   geometries.DeleteIndex (idx);
 }
 
-iMeshGeneratorMapping* csMeshGenerator::CreateMapping ()
+void csMeshGenerator::RemoveMesh (size_t idx)
 {
-  csMeshGeneratorMapping* mapping = new csMeshGeneratorMapping ();
-  mappings.Push (mapping);
-  mapping->DecRef ();
-  return mapping;
-}
-
-void csMeshGenerator::RemoveMapping (size_t idx)
-{
-  mappings.DeleteIndex (idx);
+  meshes.DeleteIndex (idx);
 }
 

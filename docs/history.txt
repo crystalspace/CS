@@ -13,10 +13,12 @@ chronological order.
 	- Adam csString-ified more csEventNameRegistry and 
 	  csEventHandlerRegistry internals.
         - BigG Removed unnecessary call to Texture Manager in sndtest.cpp
-        - Modified g2d.cpp - csGraphics2DDDraw3::PerformExtensionV to 
+        - BigG modified g2d.cpp - csGraphics2DDDraw3::PerformExtensionV to 
           meet code standards. Removed unused variables.
 	- caedes commited changes to pysimp script, as he forgot after fixing
 	  it on 15-Dec-2005.
+	- Jorrit continued work on the mesh generator. Still not functional.
+	  Removed the iMeshGeneratorMapping interface.
 16-Dec-2005
 	- Oktal fixed null pointer dereference in csEngine when iGraphics2D/3D
 	  are not available.
