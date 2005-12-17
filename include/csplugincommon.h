@@ -48,6 +48,7 @@
 #include "csplugincommon/shader/shaderprogram.h"
 #include "csplugincommon/sndsys/convert.h"
 #include "csplugincommon/sndsys/cyclicbuf.h"
+#include "csplugincommon/softshader/defaultshader.h"
 #include "csplugincommon/softshader/renderinterface.h"
 #include "csplugincommon/softshader/scanline.h"
 #include "csplugincommon/softshader/texture.h"
