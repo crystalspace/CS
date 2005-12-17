@@ -12,6 +12,8 @@ chronological order.
 	- Adam really, really fixed csInputDefinition this time.  Really.
 	- Adam csString-ified more csEventNameRegistry and 
 	  csEventHandlerRegistry internals.
+        - BigG Removed unnecessary call to Texture Manager in sndtest.cpp
+
 16-Dec-2005
 	- Oktal fixed null pointer dereference in csEngine when iGraphics2D/3D
 	  are not available.
