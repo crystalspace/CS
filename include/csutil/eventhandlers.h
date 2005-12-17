@@ -55,9 +55,9 @@ public:
    * This should only ever be done to reference generic 
    * (non-instantiated) handler names or single-instance handlers.
    */	
-  CS_CONST_METHOD csHandlerID GetGenericID (const char *);
+  CS_CONST_METHOD csHandlerID GetGenericID (const csString &);
   static CS_CONST_METHOD csHandlerID GetGenericID (iObjectRegistry *reg, 
-    const char *name) 
+    const csString &name) 
   {
     return GetRegistry (reg)->GetGenericID (name);
   }

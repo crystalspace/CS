@@ -45,9 +45,9 @@ csEventHandlerRegistry::~csEventHandlerRegistry()
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<iEventHandler*> : public csHashComputerIntegral<void *> {};
 
-csHandlerID csEventHandlerRegistry::GetGenericID (const char *name)
+csHandlerID csEventHandlerRegistry::GetGenericID (const csString &name)
 {
-  CS_ASSERT(strrchr(name, ':') == 0);
+  CS_ASSERT (name.FindFirst(':') == (size_t)-1);
   csHandlerID res;
   if (names.Contains(name)) 
   {
@@ -57,9 +57,9 @@ csHandlerID csEventHandlerRegistry::GetGenericID (const char *name)
   {
     res = names.Request(name);
     csString p;
-    p = csString(name) + csString(":pre");
+    p = name + csString(":pre");
     handlerPres.PutUnique(res, names.Request((const char *)p));
-    p = csString(name) + csString(":post");
+    p = name + csString(":post");
     handlerPosts.PutUnique(res, names.Request((const char *)p));
   }
   return res;

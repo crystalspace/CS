@@ -64,7 +64,7 @@ struct iEventNameRegistry : public virtual iBase
    * Get the csEventID for an event name string 
    * (e.g., "crystalspace.input.keyboard.down").
    */
-  virtual CS_CONST_METHOD  csEventID GetID (const char *name) = 0;
+  virtual CS_CONST_METHOD  csEventID GetID (const csString &name) = 0;
   /**
    * Get the name represented by a csEventID.
    */

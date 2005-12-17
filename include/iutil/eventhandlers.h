@@ -64,7 +64,7 @@ struct iEventHandlerRegistry : public virtual iBase
    * This should only ever be done to reference generic 
    * (non-instantiated) handler names or single-instance handlers.
    */	
-  virtual CS_CONST_METHOD csHandlerID GetGenericID (const char *) = 0;
+  virtual CS_CONST_METHOD csHandlerID GetGenericID (const csString &) = 0;
   virtual CS_CONST_METHOD csHandlerID GetGenericPreBoundID (csHandlerID) = 0;
   virtual CS_CONST_METHOD csHandlerID GetGenericPostBoundID (csHandlerID) = 0;
   /**

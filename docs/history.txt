@@ -10,6 +10,8 @@ chronological order.
         - res reactivated (and slightly improved) "-ilace" support for the
           software renderer.
 	- Adam really, really fixed csInputDefinition this time.  Really.
+	- Adam csString-ified more csEventNameRegistry and 
+	  csEventHandlerRegistry internals.
 16-Dec-2005
 	- Oktal fixed null pointer dereference in csEngine when iGraphics2D/3D
 	  are not available.
