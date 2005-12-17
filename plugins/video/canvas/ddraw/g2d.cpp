@@ -527,7 +527,6 @@ bool csGraphics2DDDraw3::SetMousePosition (int x, int y)
 
 bool csGraphics2DDDraw3::PerformExtensionV (char const* command, va_list args)
 {
-  bool rc = true;
   if (!strcmp (command, "fullscreen"))
   {
     bool fs = bool(va_arg (args, int));
@@ -539,16 +538,14 @@ bool csGraphics2DDDraw3::PerformExtensionV (char const* command, va_list args)
         GetWindowRect (m_hWnd, &m_rcWindow);
       FullScreen = fs;
       if (FAILED(ChangeCoopLevel ()))
-	Report (CS_REPORTER_SEVERITY_WARNING,
-	  "ChangeCoopLevel() failed!");
+	    Report (CS_REPORTER_SEVERITY_WARNING,
+	     "ChangeCoopLevel() failed!");
     } 
     else
     {
       if (!(m_bAllowWindowed || fs))
-      {
-	Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "Windowed mode not available!");
-      }
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+	     "Windowed mode not available!");
     }
     return true;
   }
