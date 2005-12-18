@@ -111,7 +111,7 @@ struct csMGCell
    * An array of meshes that are relevant in this cell (for calculating the
    * beam downwards).
    */
-  csArray<iMeshWrapper> meshes;
+  csRefArray<iMeshWrapper> meshes;
 
   csMGCell () : block (0) { }
 };
