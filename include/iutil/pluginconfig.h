@@ -85,12 +85,15 @@ public:
   /// Assign a string
   void SetString (const char* s)
   {
-    if (type == CSVAR_STRING) delete[] v.s;
-    type = CSVAR_STRING;
-    if (s)
-      v.s = csStrNew (s);
-    else
-      v.s = 0;
+    if (s != v.s)
+    {
+      if (type == CSVAR_STRING) delete[] v.s;
+      type = CSVAR_STRING;
+      if (s)
+	v.s = csStrNew (s);
+      else
+	v.s = 0;
+    }
   }
   /// Assign a command
   void SetCommand ()

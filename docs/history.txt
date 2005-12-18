@@ -15,6 +15,9 @@ chronological order.
 	- Jorrit did more mesh generator work.
         - Magodra fixed a typo in inputdef.cpp where Caps and Scroll lock where
           mixed up. 
+	- Eric Sunshine fixed an unlikely, though potential crasher in
+	  csVariant::SetString() which could occur with an expression such as
+	  variant.SetString(variant.GetString()).
 17-Dec-2005
         - res reactivated (and slightly improved) "-ilace" support for the
           software renderer.
