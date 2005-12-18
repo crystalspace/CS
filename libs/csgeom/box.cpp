@@ -272,6 +272,57 @@ float csBox2::SquaredOriginMaxDist () const
   return res;
 }
 
+float csBox2::SquaredPosDist (const csVector2& pos) const
+{
+  // Thanks to Ivan Avramovic for the original.
+  // Adapted by Norman Kramer, Jorrit Tyberghein and Wouter Wijngaards.
+  float res = 0;
+  float mm = minbox.x - pos.x;
+  if (mm > 0)
+    res = mm * mm;
+  else
+  {
+    mm = maxbox.x - pos.x;
+    if (mm < 0)
+      res = mm * mm;
+  }
+  mm = minbox.y - pos.y;
+  if (mm > 0)
+    res += mm * mm;
+  else
+  {
+    mm = maxbox.y - pos.y;
+    if (mm < 0)
+      res += mm * mm;
+  }
+  return res;
+}
+
+float csBox2::SquaredPosMaxDist (const csVector2& pos) const
+{
+  // Thanks to Ivan Avramovic for the original.
+  // Adapted by Norman Kramer, Jorrit Tyberghein and Wouter Wijngaards.
+  float res;
+  float mi = minbox.x - pos.x;
+  float ma = maxbox.x - pos.x;
+  if (mi > 0)
+    res = ma * ma;
+  else if (ma < 0)
+    res = mi * mi;
+  else
+    res = MAX (ma * ma, mi * mi);
+
+  mi = minbox.y - pos.y;
+  ma = maxbox.y - pos.y;
+  if (mi > 0)
+    res += ma * ma;
+  else if (ma < 0)
+    res += mi * mi;
+  else
+    res += MAX (ma * ma, mi * mi);
+  return res;
+}
+
 //---------------------------------------------------------------------------
 
 /*
@@ -732,6 +783,77 @@ float csBox3::SquaredOriginMaxDist () const
     res += minbox.z * minbox.z;
   else
     res += MAX (maxbox.z * maxbox.z, minbox.z * minbox.z);
+  return res;
+}
+
+float csBox3::SquaredPosDist (const csVector3& pos) const
+{
+  // Thanks to Ivan Avramovic for the original.
+  // Adapted by Norman Kramer, Jorrit Tyberghein and Wouter Wijngaards.
+  float res = 0;
+  float mm = minbox.x - pos.x;
+  if (mm > 0)
+    res = mm * mm;
+  else
+  {
+    mm = maxbox.x - pos.x;
+    if (mm < 0)
+      res = mm * mm;
+  }
+
+  mm = minbox.y - pos.y;
+  if (mm > 0)
+    res += mm * mm;
+  else
+  {
+    mm = maxbox.y - pos.y;
+    if (mm < 0)
+      res += mm * mm;
+  }
+
+  mm = minbox.z - pos.z;
+  if (mm > 0)
+    res += mm * mm;
+  else
+  {
+    mm = maxbox.z - pos.z;
+    if (mm < 0)
+      res += mm * mm;
+  }
+  return res;
+}
+
+float csBox3::SquaredPosMaxDist (const csVector3& pos) const
+{
+  // Thanks to Ivan Avramovic for the original.
+  // Adapted by Norman Kramer, Jorrit Tyberghein and Wouter Wijngaards.
+  float res;
+  float mi = minbox.x - pos.x;
+  float ma = maxbox.x - pos.x;
+  if (mi > 0)
+    res = ma * ma;
+  else if (ma < 0)
+    res = mi * mi;
+  else
+    res = MAX (ma * ma, mi * mi);
+
+  mi = minbox.y - pos.y;
+  ma = maxbox.y - pos.y;
+  if (mi > 0)
+    res += ma * ma;
+  else if (ma < 0)
+    res += mi * mi;
+  else
+    res += MAX (ma * ma, mi * mi);
+
+  mi = minbox.z - pos.z;
+  ma = maxbox.z - pos.z;
+  if (mi > 0)
+    res += ma * ma;
+  else if (ma < 0)
+    res += mi * mi;
+  else
+    res += MAX (ma * ma, mi * mi);
   return res;
 }
 

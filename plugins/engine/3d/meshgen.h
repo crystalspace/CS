@@ -39,10 +39,13 @@ private:
   csArray<float> maxdistances;
   float radius;
   float density;
+  float total_max_dist;
 
 public:
   csMeshGeneratorGeometry ();
   virtual ~csMeshGeneratorGeometry () { }
+
+  float GetTotalMaxDist () const { return total_max_dist; }
 
   virtual void AddFactory (iMeshFactoryWrapper* factory, float maxdist);
   virtual size_t GetFactoryCount () const { return factories.Length (); }
@@ -85,15 +88,16 @@ struct csMGCell;
  */
 struct csMGPositionBlock
 {
+  /// Used when block is in 'inuse_blocks'.
+  csMGPositionBlock* next, * prev;
+  
   csArray<csMGPosition> positions;
 
-  /// A pointer back to the cell that holds this block (or 0).
-  csMGCell* parent_cell;
+  /// An index back to the cell that holds this block (or ~0).
+  size_t parent_cell;
 
-  /// A last-used tick (compares with 'block_tick').
-  size_t last_used;
-
-  csMGPositionBlock () : parent_cell (0), last_used (0) { }
+  csMGPositionBlock () : next (0), prev (0),
+			 parent_cell (csArrayItemNotFound) { }
 };
 
 /**
@@ -123,26 +127,39 @@ class csMeshGenerator : public scfImplementation1<
 	csMeshGenerator, iMeshGenerator>
 {
 private:
+  /// All geometries.
   csRefArray<csMeshGeneratorGeometry> geometries;
+  /// The maximum radius for all geometries.
+  float total_max_dist;
+
   csRefArray<iMeshWrapper> meshes;
 
   /// Sample box where we will place geometry.
   csBox3 samplebox;
-  
+  float samplefact_x;
+  float samplefact_z;
+  float samplecellwidth_x;
+  float samplecellheight_z;
+
   /// 2-dimensional array of cells with cell_dim*cell_dim entries.
   csMGCell* cells;
   int cell_dim;
 
   /// Cache of unused position blocks.
   csPDelArray<csMGPositionBlock> cache_blocks;
-  /// Position blocks that are used. These blocks are linked to a cell.
-  csPDelArray<csMGPositionBlock> inuse_blocks;
+  /**
+   * Position blocks that are used. These blocks are linked to a cell.
+   * This list is ordered so that the most recently used blocks are in front.
+   */
+  csMGPositionBlock* inuse_blocks, * inuse_blocks_last;
   /// Maximum number of blocks (both in 'cache_blocks' as in 'inuse_blocks').
   int max_blocks;
 
-  /// A timer to keep track of when blocks were last used.
-  size_t block_tick;
-
+  /**
+   * Allocate a block for the given cell.
+   */
+  void AllocateBlock (int cx, int cz);
+  
   /**
    * Allocate blocks. This function will allocate all blocks needed
    * around a certain position and associate those blocks with the
@@ -152,13 +169,25 @@ private:
    */
   void AllocateBlocks (const csVector3& pos);
 
+  /// Get the total maximum distance for all geometries.
+  float GetTotalMaxDist ();
+
+  /// World coordinate to cell X.
+  int GetCellX (float x) { return int ((x - samplebox.MinX ()) * samplefact_x); }
+  /// World coordinate to cell Z.
+  int GetCellZ (float z) { return int ((z - samplebox.MinZ ()) * samplefact_z); }
+  /// Cell coordinate to world X.
+  float GetWorldX (int x) { return samplebox.MinX () + x * samplecellwidth_x; }
+  /// Cell coordinate to world Z.
+  float GetWorldZ (int z) { return samplebox.MinZ () + z * samplecellheight_z; }
+
 public:
   csMeshGenerator ();
   virtual ~csMeshGenerator ();
 
   virtual iObject *QueryObject () { return (iObject*)this; }
 
-  virtual void SetSampleBox (const csBox3& box) { samplebox = box; }
+  virtual void SetSampleBox (const csBox3& box);
   virtual const csBox3& GetSampleBox () const { return samplebox; }
 
   virtual iMeshGeneratorGeometry* CreateGeometry ();

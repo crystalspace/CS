@@ -271,6 +271,19 @@ public:
    */
   float SquaredOriginMaxDist () const;
 
+  /**
+   * Calculate the squared distance between pos and the box
+   * This routine is extremely efficient.
+   */
+  float SquaredPosDist (const csVector2& pos) const;
+
+  /**
+   * Calculate the squared distance between pos and the point
+   * on the box which is furthest away from pos.
+   * This routine is extremely efficient.
+   */
+  float SquaredPosMaxDist (const csVector2& pos) const;
+
   /// Initialize this box to empty.
   inline void StartBoundingBox ()
   {
@@ -1052,6 +1065,19 @@ public:
    * This routine is extremely efficient.
    */
   float SquaredOriginMaxDist () const;
+
+  /**
+   * Calculate the squared distance between pos and the box
+   * This routine is extremely efficient.
+   */
+  float SquaredPosDist (const csVector3& pos) const;
+
+  /**
+   * Calculate the squared distance between pos and the point
+   * on the box which is furthest away from pos.
+   * This routine is extremely efficient.
+   */
+  float SquaredPosMaxDist (const csVector3& pos) const;
 
   /**
    * Project this box to a 2D bounding box given the view point

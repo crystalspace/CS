@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Dec-2005
+	- Jorrit added new functions to csBox2/csBox3 to calculate the
+	  squared distance between a point and a box. These new functions
+	  complement the already existing SquaredOriginDist() functions.
+	  The new functions are called SquaredPosDist() and
+	  SquaredPosMaxDist().
+	- Jorrit did more mesh generator work.
 17-Dec-2005
         - res reactivated (and slightly improved) "-ilace" support for the
           software renderer.
