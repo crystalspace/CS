@@ -60,13 +60,10 @@ bool CMapEntity::Read(CMapParser* pParser, CMapFile* pMap)
   csString Buffer;
   csString Key;
   bool finished = false;
-  int bufferLine, bufferLine2;
 
   while (!finished)
   {
-    bufferLine = pParser->GetCurrentLine();
     if (!pParser->GetSafeToken(Buffer)) return false;
-    bufferLine2 = pParser->GetCurrentLine();
     if (strcmp(Buffer, "{") == 0)
     {
       //This entity contains some brushes or curves!
@@ -103,7 +100,7 @@ bool CMapEntity::Read(CMapParser* pParser, CMapFile* pMap)
     {
       //Now this seems to be a key/ value pair
       Key.Replace (Buffer);
-      if ((bufferLine != bufferLine2) || !pParser->GetNextToken(Buffer))
+      if (!pParser->GetNextToken(Buffer))
       {
         pParser->ReportError("Format error. Keys and values for entities must"
                              "always come in pairs. Found no match for key \"%s\"",

@@ -19,6 +19,12 @@ chronological order.
 	  it on 15-Dec-2005.
 	- Jorrit continued work on the mesh generator. Still not functional.
 	  Removed the iMeshGeneratorMapping interface.
+	- Eric Sunshine removed a bogus test in CMapEntity::Read() which was
+	  added on 2004-06-09. Reported by:
+	  http://community.crystalspace3d.org/forum/index.php?topic=624.0
+	  The test would fail on valid input because CMapParser had already
+	  advanced the line count before it was snagged by CMapEntity::Read()
+	  if the closing string quote was the last character on the line.
 16-Dec-2005
 	- Oktal fixed null pointer dereference in csEngine when iGraphics2D/3D
 	  are not available.
