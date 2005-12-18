@@ -48,8 +48,8 @@ static struct csKeyModDef
   { "RShift",	csKeyModifierTypeShift,		csKeyModifierNumRight },
   { "Shift",	csKeyModifierTypeShift,		csKeyModifierNumAny },
   { "Num",	csKeyModifierTypeNumLock,	csKeyModifierNumAny },
-  { "Scroll", 	csKeyModifierTypeCapsLock,	csKeyModifierNumAny },
-  { "Caps",	csKeyModifierTypeScrollLock,	csKeyModifierNumAny },
+  { "Scroll", 	csKeyModifierTypeScrollLock,	csKeyModifierNumAny },
+  { "Caps",	csKeyModifierTypeCapsLock,	csKeyModifierNumAny },
   { 0, 0, 0 }
 };
 

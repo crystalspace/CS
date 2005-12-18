@@ -13,6 +13,8 @@ chronological order.
 	  The new functions are called SquaredPosDist() and
 	  SquaredPosMaxDist().
 	- Jorrit did more mesh generator work.
+        - Magodra fixed a typo in inputdef.cpp where Caps and Scroll lock where
+          mixed up. 
 17-Dec-2005
         - res reactivated (and slightly improved) "-ilace" support for the
           software renderer.
