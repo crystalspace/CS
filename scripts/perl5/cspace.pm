@@ -2416,6 +2416,8 @@ package cspace::csBox2;
 *Empty = *cspacec::csBox2_Empty;
 *SquaredOriginDist = *cspacec::csBox2_SquaredOriginDist;
 *SquaredOriginMaxDist = *cspacec::csBox2_SquaredOriginMaxDist;
+*SquaredPosDist = *cspacec::csBox2_SquaredPosDist;
+*SquaredPosMaxDist = *cspacec::csBox2_SquaredPosMaxDist;
 *StartBoundingBox = *cspacec::csBox2_StartBoundingBox;
 *AddBoundingVertex = *cspacec::csBox2_AddBoundingVertex;
 *AddBoundingVertexSmart = *cspacec::csBox2_AddBoundingVertexSmart;
@@ -2521,6 +2523,8 @@ sub new {
 *ManhattanDistance = *cspacec::csBox3_ManhattanDistance;
 *SquaredOriginDist = *cspacec::csBox3_SquaredOriginDist;
 *SquaredOriginMaxDist = *cspacec::csBox3_SquaredOriginMaxDist;
+*SquaredPosDist = *cspacec::csBox3_SquaredPosDist;
+*SquaredPosMaxDist = *cspacec::csBox3_SquaredPosMaxDist;
 *ProjectBox = *cspacec::csBox3_ProjectBox;
 *ProjectOutline = *cspacec::csBox3_ProjectOutline;
 *ProjectBoxAndOutline = *cspacec::csBox3_ProjectBoxAndOutline;
