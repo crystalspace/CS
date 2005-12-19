@@ -8,6 +8,10 @@ chronological order.
 
 19-Dec-2005
 	- Jorrit did more work on the mesh generator.
+	- Jorrit fixed a memory leak in md32spr as reported by Anuj Goyal
+	  (agoyal@coverty.com).
+	- Jorrit fixed a potential overwrite bug in the fixed shader
+	  plugin as reported by Anuj Goyal.
 18-Dec-2005
 	- Jorrit added new functions to csBox2/csBox3 to calculate the
 	  squared distance between a point and a box. These new functions

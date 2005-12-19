@@ -176,7 +176,7 @@ bool csGLShaderFFP::LoadLayer (mtexlayer* layer, iDocumentNode* node)
         {
           int num = child->GetAttributeValueAsInt("num");
 
-          if(num < 0 || num > 3 ) continue;
+          if(num < 0 || num >= 3 ) continue;
 
           const char* str = child->GetAttributeValue("source");
           if (str)
@@ -217,7 +217,7 @@ bool csGLShaderFFP::LoadLayer (mtexlayer* layer, iDocumentNode* node)
         {
           int num = child->GetAttributeValueAsInt("num");
 
-          if(num < 0 || num > 3 )
+          if(num < 0 || num >= 3 )
             continue;
 
           int i = tokens.Request(child->GetAttributeValue("source"));

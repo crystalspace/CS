@@ -1200,6 +1200,8 @@ char *filename(char *path, char *file)
   sz = strlen(fname);
   memcpy (file, fname, sz);
   file[sz] = '\0';
+  delete[] dir;
+  delete[] fname;
   return file;
 }
 

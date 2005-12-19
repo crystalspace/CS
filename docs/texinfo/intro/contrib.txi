@@ -170,6 +170,11 @@ Antonio provided some notes which allowed a few matrix inversions to be
 optimized away.
 
 @item
+Anuj Goyal (@email{agoyal@@coverty.com})
+
+Anuj reported a few leak/memory corruption issues in CS.
+
+@item
 Aren Blondahl (@email{rean@@pathcom.ca})
 
 Aren applied some patches to map2cs.
