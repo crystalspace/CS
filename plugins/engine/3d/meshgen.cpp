@@ -58,6 +58,9 @@ csMeshGenerator::csMeshGenerator() : scfImplementationType (this)
   max_blocks = 100;
   cell_dim = 50;
 
+  last_cellx = -1000000000;
+  last_cellz = -1000000000;
+
   total_max_dist = -1.0f;
 
   cells = new csMGCell [cell_dim * cell_dim];
@@ -168,6 +171,12 @@ void csMeshGenerator::AllocateBlocks (const csVector3& pos)
   int cellx = GetCellX (pos.x);
   int cellz = GetCellZ (pos.z);
 
+  if (cellx == last_cellx && cellz == last_cellz)
+    return;
+
+  last_cellx = cellx;
+  last_cellz = cellz;
+
   // Total maximum distance for all geometries.
   float md = GetTotalMaxDist ();
   float sqmd = md * md;
@@ -186,13 +195,23 @@ void csMeshGenerator::AllocateBlocks (const csVector3& pos)
 	  float wx = GetWorldX (x);
 	  float wz = GetWorldX (z);
 	  // @@@ Precalculate cell boxes or at least top-left coordinate for x/z?
-	  csBox2 cell_box (wx, wz, wx + samplecellwidth_x, wz + samplecellheight_z);
+	  csBox2 cell_box (wx, wz, wx + samplecellwidth_x,
+	      wz + samplecellheight_z);
 	  float sqdist = cell_box.SquaredPosDist (pos2d);
 	  if (sqdist < sqmd)
-	  {
 	    AllocateBlock (x, z);
-	  }
+	  else
+	    FreeMeshesInBlock (x, z);
         }
+}
+
+void csMeshGenerator::FreeMeshesInBlock (int cx, int cz)
+{
+  int cidx = cz*cell_dim + cx;
+  if (cells[cidx].block)
+  {
+    // @@@ TODO
+  }
 }
 
 iMeshGeneratorGeometry* csMeshGenerator::CreateGeometry ()

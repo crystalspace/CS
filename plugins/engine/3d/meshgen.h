@@ -132,6 +132,7 @@ private:
   /// The maximum radius for all geometries.
   float total_max_dist;
 
+  /// Meshes on which we will map geometry.
   csRefArray<iMeshWrapper> meshes;
 
   /// Sample box where we will place geometry.
@@ -156,6 +157,12 @@ private:
   int max_blocks;
 
   /**
+   * Last position that we used for AllocateBlocks. If our cell position
+   * is equal to this we don't need to calculate the new blocks again.
+   */
+  int last_cellx, last_cellz;
+
+  /**
    * Allocate a block for the given cell.
    */
   void AllocateBlock (int cx, int cz);
@@ -168,6 +175,11 @@ private:
    * then we take the block we needed last from 'inuse_blocks'.
    */
   void AllocateBlocks (const csVector3& pos);
+
+  /**
+   * Free all meshes in a block.
+   */
+  void FreeMeshesInBlock (int cx, int cz);
 
   /// Get the total maximum distance for all geometries.
   float GetTotalMaxDist ();

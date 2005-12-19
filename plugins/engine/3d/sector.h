@@ -39,13 +39,13 @@
 #include "ivideo/shader/shader.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/meshobj.h"
-#include "plugins/engine/3d/meshgen.h"
 
 class csEngine;
 class csProgressPulse;
 class csSector;
 class csMeshMeshList;
 class csMeshWrapper;
+class csMeshGenerator;
 class csKDTree;
 struct iVisibilityCuller;
 struct iRenderView;
