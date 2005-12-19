@@ -18,6 +18,9 @@ chronological order.
 	- Jorrit did some code reformatting in csutil.
 	- res attempted to merge Adam's and Jorrit's respective tries to fix
 	  csInputDefinition.
+	- res updated the GL driver DB to extend the GF5 VBO tweaks to all 
+	  NVIDIA hardware - means that VBO disabling for NV is now only
+	  dependent on the driver version.
 18-Dec-2005
 	- Jorrit added new functions to csBox2/csBox3 to calculate the
 	  squared distance between a point and a box. These new functions

@@ -260,16 +260,20 @@
     </rule>
 
     <!-- 
+      * 2005-11-22: VBO reported to give slowdown for at least 
+		    GF4Go/Forceware 75.90
       * 2005-11-22: VBO reported to give speed up for at least 
-		    Forceware 81.85
+		    GF5/Forceware 81.85
       * 2005-11-22: VBO reported to give speed up for at least 
-		    Forceware 78.01
+		    GF5/Forceware 78.01
       * 2005-11-22: VBO reported to give speed up for at least 
-		    Linux Forceware 76.67 (version string "2.0.0 NVIDIA 76.67")
+		    GF5/Linux Forceware 76.67 
+		    (version string "2.0.0 NVIDIA 76.67")
+      * 2005-12-19: Reported: GF4 slowdown for 77.72, speedup for 81.95
       -->
-    <rule description="GeForce FX 5xxx: Slow VBO">
+    <rule description="NVIDIA: Slow VBO">
       <conditions>
-	<regexp string="renderer" pattern="GeForce FX 5..." />
+	<regexp string="vendor" pattern="NVIDIA" />
 	<conditions fulfill="one">
 	  <comparever version="win32_driver" relation="lt 6.14.10.7801" />
 	  <conditions fulfill="all">
@@ -281,19 +285,6 @@
 		 too. -->
 	  </conditions>
 	</conditions>
-      </conditions>
-      <applicable>
-	<usecfg>novbo</usecfg>
-      </applicable>
-    </rule>
-
-    <!-- 
-      * 2005-11-22: VBO reported to give slowdown for at least 
-		    Forceware 75.90
-      -->
-    <rule description="GeForce 4 440 Go: Slow VBO">
-      <conditions>
-	<regexp string="renderer" pattern="GeForce *4.*440 *Go" />
       </conditions>
       <applicable>
 	<usecfg>novbo</usecfg>
