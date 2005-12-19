@@ -25,7 +25,6 @@
 #define _VOSLIGHT_H_
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
-#include <vos/metaobjects/property/propertylistener.hh>
 
 #include "inetwork/vosa3dl.h"
 #include "csvosa3dl.h"
@@ -52,7 +51,7 @@ public:
   virtual void doExcise();
 
   static VOS::MetaObject* new_csMetaLight(VOS::VobjectBase* superobject,
-  	const std::string& type);
+    const std::string& type);
 
   friend class ConstructLightTask;
 };

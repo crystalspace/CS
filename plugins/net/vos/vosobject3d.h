@@ -24,7 +24,6 @@
 #define _CSVOSOBJECT3D_H_
 
 #include <vos/metaobjects/a3dl/object3d.hh>
-#include <vos/metaobjects/property/propertylistener.hh>
 #include <vos/vos/listener.hh>
 
 #include "inetwork/vosa3dl.h"

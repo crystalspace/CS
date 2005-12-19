@@ -25,8 +25,6 @@
 #define _VOSTEXTURE_H_
 
 #include <vos/vos/vos.hh>
-#include <vos/metaobjects/property/property.hh>
-#include <vos/metaobjects/property/propertylistener.hh>
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
 #include "iengine/engine.h"

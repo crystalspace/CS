@@ -1,7 +1,7 @@
 #ifndef _LIGHTMAPCACHE_H_
 #define _LIGHTMAPCACHE_H_
 
-#include <vos/metaobjects/property/property.hh>
+#include <vos/vos/vos.hh>
 #include <iutil/cache.h>
 #include <imesh/lighting.h>
 #include <csutil/databuf.h>

@@ -34,7 +34,7 @@
 
 #include "vosobject3d.h"
 #include <vos/metaobjects/a3dl/a3dl.hh>
-#include <vos/metaobjects/property/remoteproperty.hh>
+#include <vos/vos/remoteproperty.hh>
 
 using namespace VUtil;
 using namespace VOS;
@@ -66,7 +66,7 @@ csVosObject3D::~csVosObject3D()
   if (meshwrapper.IsValid())
   {
     csRef<iEngine> engine = CS_QUERY_REGISTRY (
-    	object3d->getVosA3DL()->GetObjectRegistry(), iEngine);
+      object3d->getVosA3DL()->GetObjectRegistry(), iEngine);
     meshwrapper->QueryObject()->ObjRemove(this);
     engine->GetMeshes()->Remove(meshwrapper);
   }
