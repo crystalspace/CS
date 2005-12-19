@@ -28,6 +28,18 @@
 #include "iengine/mesh.h"
 #include "iengine/meshgen.h"
 
+struct iSector;
+
+struct csMGGeom
+{
+  csRef<iMeshFactoryWrapper> factory;
+  float maxdistance;
+  float sqmaxdistance;
+
+  // For every lod level we have a cache of meshes.
+  csRefArray<iMeshWrapper> mesh_cache;
+};
+
 /**
  * Geometry implementation for the mesh generator.
  */
@@ -35,8 +47,9 @@ class csMeshGeneratorGeometry : public scfImplementation1<
 	csMeshGeneratorGeometry, iMeshGeneratorGeometry>
 {
 private:
-  csRefArray<iMeshFactoryWrapper> factories;
-  csArray<float> maxdistances;
+  // Array of factories. Every index corresponds with a 'lod' level.
+  // This array is sorted automatically.
+  csArray<csMGGeom> factories;
   float radius;
   float density;
   float total_max_dist;
@@ -52,16 +65,27 @@ public:
   virtual void RemoveFactory (size_t idx);
   virtual iMeshFactoryWrapper* GetFactory (size_t idx)
   {
-    return factories[idx];
+    return factories[idx].factory;
   }
   virtual float GetMaximumDistance (size_t idx)
   {
-    return maxdistances[idx];
+    return factories[idx].maxdistance;
   }
   virtual void SetRadius (float radius);
   virtual float GetRadius () const { return radius; }
   virtual void SetDensity (float density);
   virtual float GetDensity () const { return density; }
+
+  /**
+   * Allocate a new mesh for the given distance. Possibly from the
+   * cache if possible. If the distance is too large it will return 0.
+   */
+  csPtr<iMeshWrapper> AllocMesh (float sqdist);
+
+  /**
+   * Free a mesh. This function will put the mesh back in the cache.
+   */
+  void FreeMesh (iMeshWrapper* mesh);
 };
 
 /**
@@ -70,8 +94,12 @@ public:
 struct csMGPosition
 {
   csVector3 position;
-  /// The type of geometry at this spot.
-  int geom_type;
+  /**
+   * The type of geometry at this spot.
+   * This is basically the index in the 'geometries' table
+   * in csMeshGenerator.
+   */
+  size_t geom_type;
   /// An optional mesh for this position. Can be 0.
   iMeshWrapper* mesh;
 
@@ -90,7 +118,7 @@ struct csMGPositionBlock
 {
   /// Used when block is in 'inuse_blocks'.
   csMGPositionBlock* next, * prev;
-  
+
   csArray<csMGPosition> positions;
 
   /// An index back to the cell that holds this block (or ~0).
@@ -106,6 +134,9 @@ struct csMGPositionBlock
  */
 struct csMGCell
 {
+  /// Box for this cell (in 2D space).
+  csBox2 box;
+
   /**
    * Block of positions. Can be 0 in case none was generated yet.
    */
@@ -131,9 +162,13 @@ private:
   csRefArray<csMeshGeneratorGeometry> geometries;
   /// The maximum radius for all geometries.
   float total_max_dist;
+  float sq_total_max_dist;
 
   /// Meshes on which we will map geometry.
   csRefArray<iMeshWrapper> meshes;
+
+  /// Sector for this generator.
+  iSector* sector;
 
   /// Sample box where we will place geometry.
   csBox3 samplebox;
@@ -157,16 +192,17 @@ private:
   int max_blocks;
 
   /**
-   * Last position that we used for AllocateBlocks. If our cell position
-   * is equal to this we don't need to calculate the new blocks again.
-   */
-  int last_cellx, last_cellz;
-
-  /**
    * Allocate a block for the given cell.
    */
-  void AllocateBlock (int cx, int cz);
-  
+  void AllocateBlock (int cidx, csMGCell& cell);
+
+  /**
+   * Allocate the meshes in this block that are close enough to
+   * the given position.
+   * This function assumes the cell has a valid block.
+   */
+  void AllocateMeshes (csMGCell& cell, const csVector3& pos);
+
   /**
    * Allocate blocks. This function will allocate all blocks needed
    * around a certain position and associate those blocks with the
@@ -177,9 +213,14 @@ private:
   void AllocateBlocks (const csVector3& pos);
 
   /**
+   * Generate the positions in the given block.
+   */
+  void GeneratePositions (int cidx, csMGCell& cell, csMGPositionBlock* block);
+
+  /**
    * Free all meshes in a block.
    */
-  void FreeMeshesInBlock (int cx, int cz);
+  void FreeMeshesInBlock (csMGCell& cell);
 
   /// Get the total maximum distance for all geometries.
   float GetTotalMaxDist ();
@@ -196,6 +237,8 @@ private:
 public:
   csMeshGenerator ();
   virtual ~csMeshGenerator ();
+
+  void SetSector (iSector* sector) { csMeshGenerator::sector = sector; }
 
   virtual iObject *QueryObject () { return (iObject*)this; }
 
