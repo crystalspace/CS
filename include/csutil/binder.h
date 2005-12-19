@@ -54,9 +54,12 @@
  * }
  * \endcode
  */
-class CS_CRYSTALSPACE_EXPORT csInputBinder : 
+class CS_CRYSTALSPACE_EXPORT csInputBinder :
   public scfImplementation2<csInputBinder, iInputBinder, iEventHandler>
 {
+    CS_EVENTHANDLER_NAMES("crystalspace.inputbinder")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
+
   iObjectRegistry *object_reg;
   csRef<iEventNameRegistry> name_reg;
   struct AxisCmd
