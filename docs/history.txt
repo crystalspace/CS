@@ -16,6 +16,8 @@ chronological order.
 	- Jorrit fixed csInputDefinition::ParseOther() so that it again
 	  parses keyboard events.
 	- Jorrit did some code reformatting in csutil.
+	- res attempted to merge Adam's and Jorrit's respective tries to fix
+	  csInputDefinition.
 18-Dec-2005
 	- Jorrit added new functions to csBox2/csBox3 to calculate the
 	  squared distance between a point and a box. These new functions

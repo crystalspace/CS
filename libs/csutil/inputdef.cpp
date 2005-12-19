@@ -288,23 +288,21 @@ csInputDefinition::csInputDefinition (iEventNameRegistry* r,
 
   str.DeleteAt (0, pos);
 
+  // -1 serves as a flag that no device number was parsed from the string
   deviceNumber = (uint) -1;
 
   // device number
   if (strspn(str.GetData (), "0123456789") > 0)
   {
-    deviceNumber = (int) strtoul (str.GetData (), & endp, 10);
+    deviceNumber = (uint)strtoul (str.GetData (), & endp, 10);
     str.DeleteAt (0, endp - str.GetData ());
-  }
-  else
-  {
-    deviceNumber = 0;
   }
 
   // device name
   if (str.StartsWith ("Mouse", true))
   {
     str.DeleteAt (0, 5);
+    if (deviceNumber == (uint)-1) deviceNumber = 0;
 
     // Mouse sub-device names
     if (str.CompareNoCase ("X"))
@@ -341,6 +339,7 @@ csInputDefinition::csInputDefinition (iEventNameRegistry* r,
   else if (str.StartsWith ("Joystick", true))
   {
     str.DeleteAt (0, 8);
+    if (deviceNumber == (uint)-1) deviceNumber = 0;
 
     // Joystick sub-device names
     if (str.CompareNoCase ("X"))
@@ -378,11 +377,11 @@ csInputDefinition::csInputDefinition (iEventNameRegistry* r,
   {
     containedName = csevKeyboardEvent (name_reg);
 
-    if (deviceNumber != 0)//(uint) -1)
+    if (deviceNumber != (uint) -1)
     {
       /* this was actually a key, not a device number */
       csString str2 ("");
-      str2.Append(deviceNumber);
+      str2.Append (deviceNumber);
       str = str2 + str;
     }
     deviceNumber = 0; /* only one logical keyboard, #0 */
