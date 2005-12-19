@@ -849,128 +849,127 @@ bool csEngine::HandleEvent (iEvent &Event)
 {
   if (Event.Name == SystemOpen)
   {
-          if (G3D)
-          {
-	    globalStringSet = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	      objectRegistry, "crystalspace.shared.stringset", iStringSet);
+  if (G3D)
+  {
+    globalStringSet = CS_QUERY_REGISTRY_TAG_INTERFACE (
+      objectRegistry, "crystalspace.shared.stringset", iStringSet);
 
-            maxAspectRatio = 4096;
-	    shaderManager = CS_QUERY_REGISTRY(objectRegistry, iShaderManager);
-	    if (!shaderManager)
-	    {
-	      csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-	      	objectRegistry, iPluginManager);
-	      shaderManager = csPtr<iShaderManager> (
-	      	CS_LOAD_PLUGIN(plugin_mgr,
-			"crystalspace.graphics3d.shadermanager",
-			iShaderManager));
-	      objectRegistry->Register (shaderManager, "iShaderManager");
-	    }
+    maxAspectRatio = 4096;
+    shaderManager = CS_QUERY_REGISTRY(objectRegistry, iShaderManager);
+    if (!shaderManager)
+    {
+      csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
+      	objectRegistry, iPluginManager);
+      shaderManager = csPtr<iShaderManager> (
+      	CS_LOAD_PLUGIN(plugin_mgr,
+		"crystalspace.graphics3d.shadermanager",
+		iShaderManager));
+      objectRegistry->Register (shaderManager, "iShaderManager");
+    }
 
-            csRef<iShaderCompiler> shcom (shaderManager->
-              GetCompiler ("XMLShader"));
+    csRef<iShaderCompiler> shcom (shaderManager->
+      GetCompiler ("XMLShader"));
 
-	    if (!shcom.IsValid())
-	    {
-	      Warn ("'XMLShader' shader compiler not available - "
-		"default shaders are unavailable.");
-	    }
-	    else
-	    {
-	      // Load default shaders
-	      csRef<iDocumentSystem> docsys (
-		CS_QUERY_REGISTRY(objectRegistry, iDocumentSystem));
-	      if (!docsys.IsValid())
-		docsys.AttachNew (new csTinyDocumentSystem ());
-	      csRef<iDocument> shaderDoc = docsys->CreateDocument ();
+    if (!shcom.IsValid())
+    {
+      Warn ("'XMLShader' shader compiler not available - "
+	"default shaders are unavailable.");
+    }
+    else
+    {
+      // Load default shaders
+      csRef<iDocumentSystem> docsys (
+	CS_QUERY_REGISTRY(objectRegistry, iDocumentSystem));
+      if (!docsys.IsValid())
+	docsys.AttachNew (new csTinyDocumentSystem ());
+      csRef<iDocument> shaderDoc = docsys->CreateDocument ();
 
-	      VFS->PushDir();
-	      VFS->ChDir ("/shader/");
-	      char const* shaderPath = "std_lighting.xml";
-	      csRef<iFile> shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
-	      if (shaderFile.IsValid())
-	      {
-		shaderDoc->Parse (shaderFile, true);
-		defaultShader = shcom->CompileShader (shaderDoc->GetRoot ()->
-		  GetNode ("shader"));
-		shaderManager->RegisterShader (defaultShader);
-	      }
-	      else
-		Warn ("Shader %s not available", shaderPath);
+      VFS->PushDir();
+      VFS->ChDir ("/shader/");
+      char const* shaderPath = "std_lighting.xml";
+      csRef<iFile> shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
+      if (shaderFile.IsValid())
+      {
+	shaderDoc->Parse (shaderFile, true);
+	defaultShader = shcom->CompileShader (shaderDoc->GetRoot ()->
+	  GetNode ("shader"));
+	shaderManager->RegisterShader (defaultShader);
+      }
+      else
+	Warn ("Shader %s not available", shaderPath);
 
-	      shaderDoc = docsys->CreateDocument ();
-	      shaderPath = "std_lighting_portal.xml";
-	      shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
-	      if (shaderFile.IsValid())
-	      {
-		shaderDoc->Parse (shaderFile, true);
-		csRef<iShader> portal_shader = shcom->CompileShader (
-		  shaderDoc->GetRoot ()->GetNode ("shader"));
-		shaderManager->RegisterShader (portal_shader);
-	      }
-	      else
-		Warn ("Shader %s not available", shaderPath);
-	      VFS->PopDir();
-	    }
+      shaderDoc = docsys->CreateDocument ();
+      shaderPath = "std_lighting_portal.xml";
+      shaderFile = VFS->Open (shaderPath, VFS_FILE_READ);
+      if (shaderFile.IsValid())
+      {
+	shaderDoc->Parse (shaderFile, true);
+	csRef<iShader> portal_shader = shcom->CompileShader (
+	  shaderDoc->GetRoot ()->GetNode ("shader"));
+	shaderManager->RegisterShader (portal_shader);
+      }
+      else
+	Warn ("Shader %s not available", shaderPath);
+      VFS->PopDir();
+    }
 
-            csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
-	    // Now, try to load the user-specified default render loop.
-	    const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 
-	      0);
-	    if (!configLoop)
-	    {
-	      defaultRenderLoop = CreateDefaultRenderLoop ();
-	    }
-	    else
-	    {
-	      defaultRenderLoop = renderLoopManager->Load (configLoop);
-	      if (!defaultRenderLoop)
-		return false;
-	    }
+    csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
+    // Now, try to load the user-specified default render loop.
+    const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
+    if (!configLoop)
+    {
+      defaultRenderLoop = CreateDefaultRenderLoop ();
+    }
+    else
+    {
+      defaultRenderLoop = renderLoopManager->Load (configLoop);
+      if (!defaultRenderLoop)
+	return false;
+    }
 
-	    // Register it.
-	    renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
-	      defaultRenderLoop);
+    // Register it.
+    renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
+      defaultRenderLoop);
 
-            frameWidth = G3D->GetWidth ();
-            frameHeight = G3D->GetHeight ();
-          }
-          else
-          {
-            maxAspectRatio = 4096;
-            frameWidth = 640;
-            frameHeight = 480;
-          }
+    frameWidth = G3D->GetWidth ();
+    frameHeight = G3D->GetHeight ();
+  }
+  else
+  {
+    maxAspectRatio = 4096;
+    frameWidth = 640;
+    frameHeight = 480;
+  }
 
-          if (csCamera::GetDefaultFOV () == 0)
-            csCamera::SetDefaultFOV (frameHeight, frameWidth);
+  if (csCamera::GetDefaultFOV () == 0)
+    csCamera::SetDefaultFOV (frameHeight, frameWidth);
 
-          // Allow context resizing since we handle CanvasResize(G2D)
-          if (G2D) G2D->AllowResize (true);
+  // Allow context resizing since we handle CanvasResize(G2D)
+  if (G2D) G2D->AllowResize (true);
 
-          StartEngine ();
+  StartEngine ();
 
-          return true;
+  return true;
   }
   else if (Event.Name == SystemClose)
   {
-          // We must free all material and texture handles since after
-          // G3D->Close() they all become invalid, no matter whenever
-          // we did or didn't an IncRef on them.
-          DeleteAll ();
-          return true;
+    // We must free all material and texture handles since after
+    // G3D->Close() they all become invalid, no matter whenever
+    // we did or didn't an IncRef on them.
+    DeleteAll ();
+    return true;
   }
   else if (G2D)
   {
     if (Event.Name == CanvasResize)
     {
-          if (((iGraphics2D *)csCommandEventHelper::GetInfo(&Event)) == G2D)
-            resize = true;
-          return false;
+      //if (((iGraphics2D *)csCommandEventHelper::GetInfo(&Event)) == G2D)
+      resize = true;
+      return false;
     }
     else if (Event.Name == CanvasClose)
     {
-          return false;
+      return false;
     }
   }
 

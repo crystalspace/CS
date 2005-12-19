@@ -12,6 +12,7 @@ chronological order.
 	  (agoyal@coverty.com).
 	- Jorrit fixed a potential overwrite bug in the fixed shader
 	  plugin as reported by Anuj Goyal.
+	- Jorrit fixed the engine from handling the resize event again.
 18-Dec-2005
 	- Jorrit added new functions to csBox2/csBox3 to calculate the
 	  squared distance between a point and a box. These new functions
