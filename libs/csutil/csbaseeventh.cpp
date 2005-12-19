@@ -80,7 +80,8 @@ bool csBaseEventHandler::RegisterQueue (iEventQueue* q, csEventID events[])
   return true;
 }
 
-bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry, csEventID event)
+bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry,
+	csEventID event)
 {
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
   if (0 == q)
@@ -88,7 +89,8 @@ bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry, csEventID eve
   return RegisterQueue (q, event);
 }
 
-bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry, csEventID events[])
+bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry,
+	csEventID events[])
 {
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
   if (0 == q)

@@ -39,8 +39,9 @@ csInputBinder::~csInputBinder ()
 
 bool csInputBinder::HandleEvent (iEvent &ev)
 {
-  if (CS_IS_MOUSE_EVENT(name_reg, ev) && csMouseEventHelper::GetButton(&ev)==0) // mouse move
+  if (CS_IS_MOUSE_EVENT(name_reg, ev) && csMouseEventHelper::GetButton(&ev)==0)
   {
+    // mouse move
     for (uint axis = 0; axis <= csMouseEventHelper::GetNumAxes(&ev); axis++)
     {
       AxisCmd *bind = axisHash.Get
@@ -50,8 +51,10 @@ bool csInputBinder::HandleEvent (iEvent &ev)
     }
     return true;
   }
-  else if (CS_IS_JOYSTICK_EVENT(name_reg, ev) && csJoystickEventHelper::GetButton(&ev)==0) // joystick move
+  else if (CS_IS_JOYSTICK_EVENT(name_reg, ev) &&
+  	csJoystickEventHelper::GetButton(&ev)==0)
   {
+    // joystick move
     for (uint axis = 0; axis < csJoystickEventHelper::GetNumAxes(&ev); axis++)
     {
       AxisCmd *bind = axisHash.Get
@@ -66,7 +69,8 @@ bool csInputBinder::HandleEvent (iEvent &ev)
 	   CS_IS_JOYSTICK_EVENT(name_reg, ev))
   {
     bool down = csInputEventHelper::GetButtonState(name_reg, &ev);
-    BtnCmd *bind = btnHash.Get(csInputDefinition (name_reg, &ev, (uint8) CSMASK_ALLMODIFIERS), 0);
+    BtnCmd *bind = btnHash.Get(csInputDefinition (name_reg, &ev,
+    	(uint8) CSMASK_ALLMODIFIERS), 0);
     if (! bind) return false;
     
     if (bind->toggle)

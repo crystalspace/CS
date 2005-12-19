@@ -74,17 +74,15 @@ const char* TiXmlBase::GetEntity( const char* p, char* value )
   int i;
 
   // Ignore the &#x entities.
-  if (    strncmp( "&#x", p, 3 ) == 0 
-       && *(p+3) 
-     && *(p+4) )
+  if (strncmp( "&#x", p, 3 ) == 0 && *(p+3) && *(p+4) )
   {
     *value = 0;
     
     if ( isalpha( *(p+3) ) ) *value += ( tolower( *(p+3) ) - 'a' + 10 ) * 16;
-    else             *value += ( *(p+3) - '0' ) * 16;
+    else *value += ( *(p+3) - '0' ) * 16;
 
     if ( isalpha( *(p+4) ) ) *value += ( tolower( *(p+4) ) - 'a' + 10 );
-    else             *value += ( *(p+4) - '0' );
+    else *value += ( *(p+4) - '0' );
 
     return p+6;
   }
@@ -274,7 +272,7 @@ const char* TiDocument::Parse( TiDocument*,  const char* p )
     return 0;
   }
 
-    p = SkipWhiteSpace( p );
+  p = SkipWhiteSpace( p );
   if ( !p )
   {
     SetError( TIXML_ERROR_DOCUMENT_EMPTY );
@@ -356,7 +354,8 @@ const char* TiXmlElement::Parse( TiDocument* document, const char* p )
       // Read the value -- which can include other
       // elements -- read the end tag, and return.
       ++p;
-      p = ReadValue( document, p );    // Note this is an Element method, and will set the error if one happens.
+      p = ReadValue( document, p );    // Note this is an Element method,
+      				       // and will set the error if one happens.
       if ( !p || !*p )
       {
         attributeSet.set.ShrinkBestFit ();
@@ -493,7 +492,7 @@ const char* TiXmlUnknown::Parse( TiDocument* document, const char* p )
     return 0;
   }
   ++p;
-    value = "";
+  value = "";
 
   while ( p && *p && *p != '>' )
   {

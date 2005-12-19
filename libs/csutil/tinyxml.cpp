@@ -153,7 +153,8 @@ TiDocumentNode* TiDocumentNode::PreviousSibling( const char * value ) const
   return 0;
 }
 
-TiDocumentNode* TiDocumentNodeChildren::Identify( TiDocument* document, const char* p )
+TiDocumentNode* TiDocumentNodeChildren::Identify( TiDocument* document,
+	const char* p )
 {
   TiDocumentNode* returnNode = 0;
 
@@ -184,8 +185,7 @@ TiDocumentNode* TiDocumentNodeChildren::Identify( TiDocument* document, const ch
   {
     returnNode = new TiXmlDeclaration();
   }
-  else if (    isalpha( *(p+1) )
-        || *(p+1) == '_' )
+  else if (    isalpha( *(p+1) ) || *(p+1) == '_' )
   {
     returnNode = document->blk_element.Alloc ();
   }
@@ -266,7 +266,8 @@ TiDocumentNode* TiDocumentNodeChildren::LinkEndChild( TiDocumentNode* node )
 }
 
 
-TiDocumentNode* TiDocumentNodeChildren::InsertEndChild( const TiDocumentNode& addThis )
+TiDocumentNode* TiDocumentNodeChildren::InsertEndChild(
+	const TiDocumentNode& addThis )
 {
   TiDocumentNode* node = addThis.Clone(GetDocument ());
   if ( !node )

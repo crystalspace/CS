@@ -118,17 +118,19 @@ struct CS_CRYSTALSPACE_EXPORT getopt_option
 #define required_argument	1
 #define optional_argument	2
 
-extern CS_CRYSTALSPACE_EXPORT int getopt (int argc, char *const *argv, const char *shortopts);
-extern CS_CRYSTALSPACE_EXPORT int getopt_long (int argc, char *const *argv, const char *shortopts,
-		        const struct getopt_option *longopts, int *longind);
-extern CS_CRYSTALSPACE_EXPORT int getopt_long_only (int argc, char *const *argv,
-			     const char *shortopts,
-		             const struct getopt_option *longopts, int *longind);
+extern CS_CRYSTALSPACE_EXPORT int getopt (int argc, char *const *argv,
+	const char *shortopts);
+extern CS_CRYSTALSPACE_EXPORT int getopt_long (int argc, char *const *argv,
+	const char *shortopts, const struct getopt_option *longopts,
+	int *longind);
+extern CS_CRYSTALSPACE_EXPORT int getopt_long_only (int argc,
+	char *const *argv, const char *shortopts,
+	const struct getopt_option *longopts, int *longind);
 
 /* Internal only.  Users should not call this directly.  */
 extern int _getopt_internal (int argc, char *const *argv,
-			     const char *shortopts,
-		             const struct getopt_option *longopts, int *longind,
-			     int long_only);
+	const char *shortopts,
+	const struct getopt_option *longopts, int *longind,
+	int long_only);
 
 #endif // __CS_GETOPT_H__

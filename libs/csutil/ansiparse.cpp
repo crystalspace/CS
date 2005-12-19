@@ -101,7 +101,8 @@ bool csAnsiParser::DecodeCommand (const char*& cmd, size_t& cmdLen,
 	command = cmdFormatAttrEnable;
 	commandParams.attrVal = attrItalics;
       }
-      else if (((param >= 0) && (param <= 9)) || ((param >= 20) && (param <= 29)))
+      else if (((param >= 0) && (param <= 9)) ||
+      	((param >= 20) && (param <= 29)))
       {
 	command = (param >= 20) ? cmdFormatAttrDisable : cmdFormatAttrEnable;
 	switch (param % 20)

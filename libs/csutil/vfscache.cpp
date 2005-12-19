@@ -28,7 +28,8 @@
 
 csVfsCacheManager::csVfsCacheManager (iObjectRegistry* object_reg,
 	const char* vfsdir)
-  : scfImplementationType (this), object_reg (object_reg), vfsdir (csStrNew (vfsdir)),
+  : scfImplementationType (this), object_reg (object_reg),
+  vfsdir (csStrNew (vfsdir)),
   vfs (0), current_type (0), current_scope (0), readonly (false)
 {
 }

@@ -26,8 +26,8 @@
 #include "csutil/xmltiny.h"
 #include "csutil/cfgdoc.h"
 
-class csConfigDocumentIterator : public scfImplementation1<csConfigDocumentIterator,
-                                                           iConfigIterator>
+class csConfigDocumentIterator : public scfImplementation1<
+	csConfigDocumentIterator, iConfigIterator>
 {
   csRef<csConfigDocument> doc;
   csHash<csConfigDocument::KeyInfo, csStrKey>::GlobalIterator* iterator;

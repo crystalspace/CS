@@ -91,8 +91,8 @@ void csEventOutlet::Mouse (int iButton, bool iDown, int x, int y)
   Mouse (0, iButton, iDown, axes, 2);
 }
 
-void csEventOutlet::Mouse (uint iNumber, int iButton, bool iDown, const int32 *axes, 
-                           uint numAxes)
+void csEventOutlet::Mouse (uint iNumber, int iButton, bool iDown,
+	const int32 *axes, uint numAxes)
 {
   iMouseDriver* m = GetMouseDriver();
   if (m != 0)
@@ -126,7 +126,8 @@ void csEventOutlet::Broadcast (csEventID iName, intptr_t iInfo)
 
 void csEventOutlet::ImmediateBroadcast (csEventID iName, intptr_t iInfo)
 {
-  csEvent *Event = csCommandEventHelper::NewEvent (csGetTicks (), iName, true, iInfo);
+  csEvent *Event = csCommandEventHelper::NewEvent (csGetTicks (), iName,
+  	true, iInfo);
   Queue->Dispatch (*Event);
   delete Event;
 }

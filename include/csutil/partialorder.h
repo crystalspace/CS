@@ -134,18 +134,22 @@ public:
     // delete node p, move someone else into its place...
     Nodes.DeleteIndexFast(p);
 
-    if (Nodes.Length() > p) {
+    if (Nodes.Length() > p)
+    {
       // who got moved into "p"?
       size_t retarget = NodeMap.Get(Nodes[p].self, csArrayItemNotFound);
       CS_ASSERT (retarget != csArrayItemNotFound);
 
       // change references to "retarget" to reference "p"
-      for (size_t iter=0 ; iter<Nodes.Length() ; iter++) {
-	for (size_t iter2=0 ; iter2<Nodes[iter].pre.Length() ; iter2++) {
+      for (size_t iter=0 ; iter<Nodes.Length() ; iter++)
+      {
+	for (size_t iter2=0 ; iter2<Nodes[iter].pre.Length() ; iter2++)
+	{
 	  if (Nodes[iter].pre[iter2] == retarget)
 	    Nodes[iter].pre[iter2] = p;
 	}
-	for (size_t iter2=0 ; iter2<Nodes[iter].post.Length() ; iter2++) {
+	for (size_t iter2=0 ; iter2<Nodes[iter].post.Length() ; iter2++)
+	{
 	  if (Nodes[iter].post[iter2] == retarget)
 	    Nodes[iter].post[iter2] = p;
 	}
@@ -345,31 +349,38 @@ protected:
   {
 #ifdef CS_DEBUG
     CS_ASSERT (NodeMap.GetSize() == Nodes.Length());
-    for (size_t i1=0; i1<Nodes.Length() ; i1++) {
+    for (size_t i1=0; i1<Nodes.Length() ; i1++)
+    {
       CS_ASSERT (NodeMap.Get(Nodes[i1].self, csArrayItemNotFound) == i1);
-      for (size_t i2=0 ; i2<Nodes[i1].pre.Length() ; i2++) {
+      for (size_t i2=0 ; i2<Nodes[i1].pre.Length() ; i2++)
+      {
 	CS_ASSERT (Nodes[i1].pre[i2] >= 0);
 	CS_ASSERT (Nodes[i1].pre[i2] < Nodes.Length());
 	bool reciprocal_post_exists = false;
-	for (size_t i3=0 ; i3<Nodes[Nodes[i1].pre[i2]].post.Length() ; i3++) {
+	for (size_t i3=0 ; i3<Nodes[Nodes[i1].pre[i2]].post.Length() ; i3++)
+	{
 	  if (Nodes[Nodes[i1].pre[i2]].post[i3] == i1)
 	    reciprocal_post_exists = true;
 	}
 	CS_ASSERT (reciprocal_post_exists);
       }
-      for (size_t i2=0 ; i2<Nodes[i1].post.Length() ; i2++) {
+      for (size_t i2=0 ; i2<Nodes[i1].post.Length() ; i2++)
+      {
 	CS_ASSERT(Nodes[i1].post[i2] >= 0);
 	CS_ASSERT(Nodes[i1].post[i2] < Nodes.Length());
 	bool reciprocal_pre_exists = false;
-	for (size_t i3=0 ; i3<Nodes[Nodes[i1].post[i2]].pre.Length() ; i3++) {
+	for (size_t i3=0 ; i3<Nodes[Nodes[i1].post[i2]].pre.Length() ; i3++)
+	{
 	  if (Nodes[Nodes[i1].post[i2]].pre[i3] == i1)
 	    reciprocal_pre_exists = true;
 	}
 	CS_ASSERT (reciprocal_pre_exists);
       }
     }
-    typename csHash<size_t,const T>::GlobalIterator iter = NodeMap.GetIterator ();
-    while (iter.HasNext()) {
+    typename csHash<size_t,const T>::GlobalIterator iter =
+    	NodeMap.GetIterator ();
+    while (iter.HasNext())
+    {
       size_t index = iter.Next();
       CS_ASSERT (index >= 0);
       CS_ASSERT (index < Nodes.Length());

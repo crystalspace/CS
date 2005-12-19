@@ -261,7 +261,8 @@ private:
     SubscriberIterator (csRef<iEventHandlerRegistry> &r, 
 			csEventTree *t, csEventID bevent) : 
       handler_reg(r), record(t->fatRecord), 
-      baseevent(bevent), mode(SI_LIST), qit(*t->fatRecord->SubscriberQueue,false)
+      baseevent(bevent), mode(SI_LIST), qit(*t->fatRecord->SubscriberQueue,
+      	false)
     {
       CS_ASSERT(record->iterator == 0);
       record->iterator = this;
@@ -289,7 +290,8 @@ private:
       case SI_GRAPH:
         do 
         {
-          csHandlerID id = record->SubscriberGraph->GetEnabled (CS_HANDLER_INVALID);
+          csHandlerID id = record->SubscriberGraph->GetEnabled (
+	  	CS_HANDLER_INVALID);
           if (id == CS_HANDLER_INVALID)
             break;
           else if (handler_reg->IsInstance(id))
@@ -320,7 +322,8 @@ private:
 	/* see if the current element has been flagged for deletion. */
         do 
         {
-          csHandlerID id = record->SubscriberGraph->GetEnabled (CS_HANDLER_INVALID);
+          csHandlerID id = record->SubscriberGraph->GetEnabled (
+	  	CS_HANDLER_INVALID);
           if (id == CS_HANDLER_INVALID)
             break;
           else if (handler_reg->IsInstance (id)) 
@@ -350,7 +353,8 @@ private:
     csRef<iEventHandlerRegistry> handler_reg;
     FatRecordObject *record;
     csEventID baseevent;
-    enum {
+    enum
+    {
       SI_LIST,
       SI_GRAPH
     } mode;

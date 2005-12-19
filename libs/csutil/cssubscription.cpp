@@ -102,7 +102,8 @@ csEventTree *csEventTree::FindNodeInternal(csEventID &name, csEventQueue *q)
       if (((csEventTree *)wrk_parent->children[iter])->self == name)
 	return (csEventTree *) wrk_parent->children[iter];
     }
-    csEventTree *added = new csEventTree(handler_reg, name_reg, name, wrk_parent, q);
+    csEventTree *added = new csEventTree(handler_reg, name_reg, name,
+    	wrk_parent, q);
     return added;
   }
 }
@@ -236,7 +237,8 @@ void csEventTree::FatRecordObject::RebuildQueue()
   StaleSubscriberQueue = false;
 }
 
-csPartialOrder<csHandlerID> *csEventTree::FatRecordObject::SubscribeInternal(csHandlerID id, csEventID baseevent)
+csPartialOrder<csHandlerID> *csEventTree::FatRecordObject::SubscribeInternal(
+	csHandlerID id, csEventID baseevent)
 {
   csPartialOrder<csHandlerID> *NewSubscriberGraph;
   iEventHandler *handler = handler_reg->GetHandler(id);
@@ -297,8 +299,10 @@ csPartialOrder<csHandlerID> *csEventTree::FatRecordObject::SubscribeInternal(csH
   if ((iterator) && (NewSubscriberGraph->IsMarked (postBound)))
     NewSubscriberGraph->Mark (id);
 
-  do {
-    const csHandlerID *precs = handler->InstancePrec (handler_reg, name_reg, baseevent);
+  do
+  {
+    const csHandlerID *precs = handler->InstancePrec (handler_reg, name_reg,
+    	baseevent);
     if (precs != 0)
     {
       for (size_t i=0 ; precs[i]!=CS_HANDLERLIST_END ; i++)
@@ -324,8 +328,10 @@ csPartialOrder<csHandlerID> *csEventTree::FatRecordObject::SubscribeInternal(csH
     }
   } while (0);
   
-  do {
-    const csHandlerID *succs = handler->InstanceSucc (handler_reg, name_reg, baseevent);
+  do
+  {
+    const csHandlerID *succs = handler->InstanceSucc (handler_reg, name_reg,
+    	baseevent);
     if (succs != 0)
     {
       for (size_t i=0 ; succs[i]!=CS_HANDLERLIST_END ; i++)
@@ -417,7 +423,8 @@ bool csEventTree::SubscribeInternal (csHandlerID id, csEventID baseevent)
  * from under a SubscriberQueue iterator, so we need to switch over to 
  * graph solver mode in such cases and flag the SQ for regeneration.
  */
-void csEventTree::FatRecordObject::UnsubscribeInternal(csHandlerID id, csEventID baseevent)
+void csEventTree::FatRecordObject::UnsubscribeInternal(csHandlerID id,
+	csEventID baseevent)
 {
   /* It is possible we've been called for a "universal unsubscribe"
    * (baseevent==CS_EVENT_INVALID), so it could be there's nothing
@@ -553,9 +560,11 @@ void csEventTree::Dispatch (iEvent &e)
       break;
   }
 #ifdef ADB_DEBUG
-  if (it.HasNext()) {
+  if (it.HasNext())
+  {
     std::cerr << "  SKIPPING:" << std::endl;
-    do {
+    do
+    {
       std::cerr << "    " << it.Next()->GenericName() << std::endl;
     } while (it.HasNext());
   }

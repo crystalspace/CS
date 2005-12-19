@@ -248,7 +248,8 @@ public:
    */
   static csString GetOtherString (iEventNameRegistry* reg,
 				  csEventID type, uint device, int num, 
-				  const csKeyModifiers *mods, bool distinguishModifiers = true);
+				  const csKeyModifiers *mods,
+				  bool distinguishModifiers = true);
 };
 
 /**

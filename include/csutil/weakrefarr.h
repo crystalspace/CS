@@ -56,12 +56,12 @@ public:
    */
   void Compact ()
   {
-    int i = this->Length ()-1; // see *1*
-    while (i >= 0)
+    size_t i = this->Length (); // see *1*
+    while (i > 0)
     {
+      i--;
       if (this->Get (i) == 0)  // see *1*
 	this->DeleteIndex (i);
-      i--;
     }
   }
 };

@@ -192,8 +192,10 @@ void csArchive::ReadZipDirectory (FILE *infile)
   if ((long) (cur_offs = ftell (infile)) == -1)
     return;                     /* Can't get file position */
 
-  if (cur_offs >= (65535 + ZIP_END_CENTRAL_DIR_RECORD_SIZE + sizeof (hdr_endcentral)))
-    min_offs = cur_offs - (65535 + ZIP_END_CENTRAL_DIR_RECORD_SIZE + sizeof (hdr_endcentral));
+  if (cur_offs >= (65535 + ZIP_END_CENTRAL_DIR_RECORD_SIZE +
+  	sizeof (hdr_endcentral)))
+    min_offs = cur_offs - (65535 + ZIP_END_CENTRAL_DIR_RECORD_SIZE +
+    	sizeof (hdr_endcentral));
   else
     min_offs = 0;
 
@@ -222,8 +224,9 @@ void csArchive::ReadZipDirectory (FILE *infile)
           /* Central directory structure found */
           central_directory_offset = cur_offs + (size_t)(search_ptr - buff);
           LoadECDR (ecdr, &search_ptr[sizeof (hdr_endcentral)]);
-          if (fseek (infile, (long)(central_directory_offset + sizeof (hdr_endcentral) + 
-				    ZIP_END_CENTRAL_DIR_RECORD_SIZE), SEEK_SET)
+          if (fseek (infile, (long)(central_directory_offset +
+	  	sizeof (hdr_endcentral) +
+		ZIP_END_CENTRAL_DIR_RECORD_SIZE), SEEK_SET)
            || !ReadArchiveComment (infile, ecdr.zipfile_comment_length)
            || fseek (infile, ecdr.offset_start_central_directory, SEEK_SET))
             goto rebuild_cdr;   /* Broken central directory */
@@ -231,8 +234,9 @@ void csArchive::ReadZipDirectory (FILE *infile)
           /* Now read central directory structure */
           for (;;)
           {
-            if ((fread (buff, 1, sizeof (hdr_central), infile) < sizeof (hdr_central))
-             || (memcmp (buff, hdr_central, sizeof (hdr_central)) != 0))
+            if ((fread (buff, 1, sizeof (hdr_central), infile) <
+	    	sizeof (hdr_central)) ||
+		(memcmp (buff, hdr_central, sizeof (hdr_central)) != 0))
             {
               if (dir.Length ())
                 return;         /* Finished reading central directory */
@@ -241,13 +245,14 @@ void csArchive::ReadZipDirectory (FILE *infile)
             }
             if ((!ReadCDFH (cdfh, infile))
              || (cdfh.filename_length > sizeof (buff))
-             || (fread (buff, 1, cdfh.filename_length, infile) < cdfh.filename_length))
+             || (fread (buff, 1, cdfh.filename_length, infile) <
+	     	cdfh.filename_length))
               return;           /* Broken zipfile? */
             buff[cdfh.filename_length] = 0;
 
             ArchiveEntry *curentry = InsertEntry (buff, cdfh);
             if (!curentry->ReadExtraField (infile, cdfh.extra_field_length)
-             || !curentry->ReadFileComment (infile, cdfh.file_comment_length))
+              || !curentry->ReadFileComment (infile, cdfh.file_comment_length))
               return;         /* Broken zipfile? */
           } /* endfor */
         } /* endif */
@@ -333,7 +338,8 @@ bool csArchive::ReadArchiveComment (FILE *infile, size_t zipfile_comment_length)
 
   if (!comment)
     comment = new char [zipfile_comment_length];
-  return (fread (comment, 1, zipfile_comment_length, infile) == zipfile_comment_length);
+  return (fread (comment, 1, zipfile_comment_length, infile) ==
+  	zipfile_comment_length);
 }
 
 void csArchive::Dir () const
@@ -392,7 +398,8 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
       || (fread (buff, 1, sizeof (hdr_local), infile) < sizeof (hdr_local))
       || (memcmp (buff, hdr_local, sizeof (hdr_local)) != 0)
       || (!ReadLFH (lfh, infile))
-      || (fseek (infile, lfh.filename_length + lfh.extra_field_length, SEEK_CUR)))
+      || (fseek (infile, lfh.filename_length + lfh.extra_field_length,
+      	SEEK_CUR)))
   {
     delete [] out_buff;
     return 0;
@@ -443,7 +450,8 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
 
         /* discard dynamically allocated buffers on error */
         // Kludge warning: I've encountered a file where zlib 1.1.1 returned
-        // Z_BUF_ERROR although everything was ok (a slightly compressed PNG file)
+        // Z_BUF_ERROR although everything was ok (a slightly compressed PNG
+	// file)
         if ((err != Z_STREAM_END)
          && ((err != Z_BUF_ERROR) || bytes_left || zs.avail_out))
         {
@@ -604,7 +612,8 @@ skip_entry:
         goto temp_failed;
 
       bytes_to_copy = 0;
-      bytes_to_skip = cdfh.filename_length + cdfh.extra_field_length + cdfh.file_comment_length;
+      bytes_to_skip = cdfh.filename_length + cdfh.extra_field_length +
+      	cdfh.file_comment_length;
     }
     else if (memcmp (buff, hdr_endcentral, sizeof (hdr_endcentral)) == 0)
     {
@@ -612,7 +621,8 @@ skip_entry:
       ZIP_end_central_dir_record ecdr;
       char buff [ZIP_END_CENTRAL_DIR_RECORD_SIZE];
 
-      if (fread (buff, 1, ZIP_END_CENTRAL_DIR_RECORD_SIZE, file) < ZIP_END_CENTRAL_DIR_RECORD_SIZE)
+      if (fread (buff, 1, ZIP_END_CENTRAL_DIR_RECORD_SIZE, file) <
+      	ZIP_END_CENTRAL_DIR_RECORD_SIZE)
         goto temp_failed;
       LoadECDR (ecdr, buff);
 
@@ -779,7 +789,8 @@ void csArchive::UnpackTime (ush zdate, ush ztime, csFileTime & rtime) const
   rtime.sec = ((ztime & 0x1f) * 2);
 }
 
-void csArchive::PackTime (const csFileTime & ztime, ush & rdate, ush & rtime) const
+void csArchive::PackTime (const csFileTime & ztime, ush & rdate,
+	ush & rtime) const
 {
   rdate = (((ztime.year - 1980) & 0x7f) << 9)
         | (((ztime.mon & 0x0f) + 1) << 5)
@@ -793,10 +804,12 @@ void csArchive::LoadECDR (ZIP_end_central_dir_record & ecdr, char *buff)
 {
   ecdr.number_this_disk = BUFF_GET_SHORT (E_NUMBER_THIS_DISK);
   ecdr.num_disk_start_cdir = BUFF_GET_SHORT (E_NUM_DISK_WITH_START_CENTRAL_DIR);
-  ecdr.num_entries_centrl_dir_ths_disk = BUFF_GET_SHORT (E_NUM_ENTRIES_CENTRL_DIR_THS_DISK);
+  ecdr.num_entries_centrl_dir_ths_disk = BUFF_GET_SHORT (
+  	E_NUM_ENTRIES_CENTRL_DIR_THS_DISK);
   ecdr.total_entries_central_dir = BUFF_GET_SHORT (E_TOTAL_ENTRIES_CENTRAL_DIR);
   ecdr.size_central_directory = BUFF_GET_LONG (E_SIZE_CENTRAL_DIRECTORY);
-  ecdr.offset_start_central_directory = BUFF_GET_LONG (E_OFFSET_START_CENTRAL_DIRECTORY);
+  ecdr.offset_start_central_directory = BUFF_GET_LONG (
+  	E_OFFSET_START_CENTRAL_DIRECTORY);
   ecdr.zipfile_comment_length = BUFF_GET_SHORT (E_ZIPFILE_COMMENT_LENGTH);
 }
 
@@ -804,7 +817,8 @@ bool csArchive::ReadCDFH (ZIP_central_directory_file_header & cdfh, FILE *infile
 {
   char buff[ZIP_CENTRAL_DIRECTORY_FILE_HEADER_SIZE];
 
-  if (fread (buff, 1, ZIP_CENTRAL_DIRECTORY_FILE_HEADER_SIZE, infile) < ZIP_CENTRAL_DIRECTORY_FILE_HEADER_SIZE)
+  if (fread (buff, 1, ZIP_CENTRAL_DIRECTORY_FILE_HEADER_SIZE, infile) <
+  	ZIP_CENTRAL_DIRECTORY_FILE_HEADER_SIZE)
     return false;
 
   cdfh.version_made_by[0] = buff[C_VERSION_MADE_BY_0];
@@ -824,7 +838,8 @@ bool csArchive::ReadCDFH (ZIP_central_directory_file_header & cdfh, FILE *infile
   cdfh.disk_number_start = BUFF_GET_SHORT (C_DISK_NUMBER_START);
   cdfh.internal_file_attributes = BUFF_GET_SHORT (C_INTERNAL_FILE_ATTRIBUTES);
   cdfh.external_file_attributes = BUFF_GET_LONG (C_EXTERNAL_FILE_ATTRIBUTES);
-  cdfh.relative_offset_local_header = BUFF_GET_LONG (C_RELATIVE_OFFSET_LOCAL_HEADER);
+  cdfh.relative_offset_local_header = BUFF_GET_LONG (
+  	C_RELATIVE_OFFSET_LOCAL_HEADER);
 
   return true;
 }
@@ -833,7 +848,8 @@ bool csArchive::ReadLFH (ZIP_local_file_header & lfh, FILE *infile)
 {
   char buff[ZIP_LOCAL_FILE_HEADER_SIZE];
 
-  if (fread (buff, 1, ZIP_LOCAL_FILE_HEADER_SIZE, infile) < ZIP_LOCAL_FILE_HEADER_SIZE)
+  if (fread (buff, 1, ZIP_LOCAL_FILE_HEADER_SIZE, infile) <
+  	ZIP_LOCAL_FILE_HEADER_SIZE)
     return false;
 
   lfh.version_needed_to_extract[0] = buff[L_VERSION_NEEDED_TO_EXTRACT_0];
@@ -855,19 +871,23 @@ bool csArchive::WriteECDR (ZIP_end_central_dir_record & ecdr, FILE *outfile)
 {
   char buff[ZIP_END_CENTRAL_DIR_RECORD_SIZE];
 
-  if (fwrite (hdr_endcentral, 1, sizeof (hdr_endcentral), outfile) != sizeof (hdr_endcentral))
+  if (fwrite (hdr_endcentral, 1, sizeof (hdr_endcentral), outfile) !=
+  	sizeof (hdr_endcentral))
     return false;
 
   BUFF_SET_SHORT (E_NUMBER_THIS_DISK, ecdr.number_this_disk);
   BUFF_SET_SHORT (E_NUM_DISK_WITH_START_CENTRAL_DIR, ecdr.num_disk_start_cdir);
-  BUFF_SET_SHORT (E_NUM_ENTRIES_CENTRL_DIR_THS_DISK, ecdr.num_entries_centrl_dir_ths_disk);
+  BUFF_SET_SHORT (E_NUM_ENTRIES_CENTRL_DIR_THS_DISK,
+  	ecdr.num_entries_centrl_dir_ths_disk);
   BUFF_SET_SHORT (E_TOTAL_ENTRIES_CENTRAL_DIR, ecdr.total_entries_central_dir);
   BUFF_SET_LONG (E_SIZE_CENTRAL_DIRECTORY, ecdr.size_central_directory);
-  BUFF_SET_LONG (E_OFFSET_START_CENTRAL_DIRECTORY, ecdr.offset_start_central_directory);
+  BUFF_SET_LONG (E_OFFSET_START_CENTRAL_DIRECTORY,
+  	ecdr.offset_start_central_directory);
   BUFF_SET_SHORT (E_ZIPFILE_COMMENT_LENGTH, ecdr.zipfile_comment_length);
 
-  if ((fwrite (buff, 1, ZIP_END_CENTRAL_DIR_RECORD_SIZE, outfile) != ZIP_END_CENTRAL_DIR_RECORD_SIZE)
-      || (fwrite (comment, 1, comment_length, outfile) != comment_length))
+  if ((fwrite (buff, 1, ZIP_END_CENTRAL_DIR_RECORD_SIZE, outfile) !=
+  	ZIP_END_CENTRAL_DIR_RECORD_SIZE) ||
+	(fwrite (comment, 1, comment_length, outfile) != comment_length))
     return false;
   return true;
 }
@@ -948,9 +968,12 @@ bool csArchive::ArchiveEntry::WriteLFH (FILE *outfile)
                   info.extra_field_length);
 
   if ((fwrite (hdr_local, 1, sizeof (hdr_local), outfile) < sizeof (hdr_local))
-      || (fwrite (buff, 1, ZIP_LOCAL_FILE_HEADER_SIZE, outfile) < ZIP_LOCAL_FILE_HEADER_SIZE)
-      || (fwrite (filename, 1, info.filename_length, outfile) < info.filename_length)
-      || (fwrite (extrafield, 1, info.extra_field_length, outfile) < info.extra_field_length))
+      || (fwrite (buff, 1, ZIP_LOCAL_FILE_HEADER_SIZE, outfile) <
+          ZIP_LOCAL_FILE_HEADER_SIZE)
+      || (fwrite (filename, 1, info.filename_length, outfile) <
+          info.filename_length)
+      || (fwrite (extrafield, 1, info.extra_field_length, outfile) <
+          info.extra_field_length))
     return false;
 
   info.relative_offset_local_header = (u32)lfhpos;
@@ -987,18 +1010,24 @@ bool csArchive::ArchiveEntry::WriteCDFH (FILE *outfile)
   BUFF_SET_SHORT (C_DISK_NUMBER_START, info.disk_number_start);
   BUFF_SET_SHORT (C_INTERNAL_FILE_ATTRIBUTES, info.internal_file_attributes);
   BUFF_SET_LONG (C_EXTERNAL_FILE_ATTRIBUTES, info.external_file_attributes);
-  BUFF_SET_LONG (C_RELATIVE_OFFSET_LOCAL_HEADER, info.relative_offset_local_header);
+  BUFF_SET_LONG (C_RELATIVE_OFFSET_LOCAL_HEADER,
+  	info.relative_offset_local_header);
 
-  if ((fwrite (hdr_central, 1, sizeof (hdr_central), outfile) < sizeof (hdr_central))
-      || (fwrite (buff, 1, ZIP_CENTRAL_DIRECTORY_FILE_HEADER_SIZE, outfile) < ZIP_CENTRAL_DIRECTORY_FILE_HEADER_SIZE)
-      || (fwrite (filename, 1, info.filename_length, outfile) < info.filename_length)
-      || (fwrite (comment, 1, info.file_comment_length, outfile) < info.file_comment_length))
+  if ((fwrite (hdr_central, 1, sizeof (hdr_central), outfile) <
+  	sizeof (hdr_central))
+      || (fwrite (buff, 1, ZIP_CENTRAL_DIRECTORY_FILE_HEADER_SIZE, outfile) <
+      	  ZIP_CENTRAL_DIRECTORY_FILE_HEADER_SIZE)
+      || (fwrite (filename, 1, info.filename_length, outfile) <
+      	  info.filename_length)
+      || (fwrite (comment, 1, info.file_comment_length, outfile) <
+      	  info.file_comment_length))
     return false;
 
   return true;
 }
 
-bool csArchive::ArchiveEntry::ReadExtraField (FILE *infile, size_t extra_field_length)
+bool csArchive::ArchiveEntry::ReadExtraField (FILE *infile,
+	size_t extra_field_length)
 {
   if (extrafield && (info.extra_field_length != extra_field_length))
   {
@@ -1010,12 +1039,14 @@ bool csArchive::ArchiveEntry::ReadExtraField (FILE *infile, size_t extra_field_l
   {
     if (!extrafield)
       extrafield = new char[extra_field_length];
-    return (fread (extrafield, 1, extra_field_length, infile) == extra_field_length);
+    return (fread (extrafield, 1, extra_field_length, infile) ==
+    	extra_field_length);
   }
   else return true;
 }
 
-bool csArchive::ArchiveEntry::ReadFileComment (FILE *infile, size_t file_comment_length)
+bool csArchive::ArchiveEntry::ReadFileComment (FILE *infile,
+	size_t file_comment_length)
 {
   if (comment && (info.file_comment_length != file_comment_length))
   {
@@ -1027,7 +1058,8 @@ bool csArchive::ArchiveEntry::ReadFileComment (FILE *infile, size_t file_comment
   {
     if (!comment)
       comment = new char[file_comment_length];
-    return (fread (comment, 1, file_comment_length, infile) == file_comment_length);
+    return (fread (comment, 1, file_comment_length, infile) ==
+    	file_comment_length);
   }
   else return true;
 }
@@ -1041,8 +1073,10 @@ bool csArchive::ArchiveEntry::WriteFile (FILE *outfile)
 
   while (!finished)
   {
-    if (fseek (outfile, (long)(lfhoffs + sizeof (hdr_local) + ZIP_LOCAL_FILE_HEADER_SIZE +
-	strlen (filename) + (extrafield ? info.extra_field_length : 0)), SEEK_SET))
+    if (fseek (outfile, (long)(lfhoffs + sizeof (hdr_local) +
+    	ZIP_LOCAL_FILE_HEADER_SIZE +
+	strlen (filename) + (extrafield ? info.extra_field_length : 0)),
+		SEEK_SET))
       return false;
 
     switch (info.compression_method)

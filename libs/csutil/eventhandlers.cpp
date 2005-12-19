@@ -111,7 +111,8 @@ void csEventHandlerRegistry::ReleaseID (csHandlerID id)
 
 void csEventHandlerRegistry::ReleaseID (iEventHandler *handler)
 {
-  CS_ASSERT(handlerToID.Get (handler, CS_HANDLER_INVALID) != CS_HANDLER_INVALID);
+  CS_ASSERT(handlerToID.Get (handler, CS_HANDLER_INVALID) !=
+  	CS_HANDLER_INVALID);
   csHandlerID id = handlerToID.Get (handler, CS_HANDLER_INVALID);
   handlerToID.DeleteAll (handler);
   idToHandler.DeleteAll (id);
@@ -129,7 +130,8 @@ iEventHandler *csEventHandlerRegistry::GetHandler (csHandlerID id)
   return idToHandler.Get (id, 0);
 }
 
-bool const csEventHandlerRegistry::IsInstanceOf (csHandlerID instanceid, csHandlerID genericid)
+bool const csEventHandlerRegistry::IsInstanceOf (csHandlerID instanceid,
+	csHandlerID genericid)
 {
   CS_ASSERT(IsInstance(instanceid));
   return (instantiation.Get (instanceid, CS_HANDLER_INVALID) == genericid);
@@ -146,7 +148,8 @@ csHandlerID const csEventHandlerRegistry::GetGeneric (csHandlerID id)
   return instantiation.Get (id, CS_HANDLER_INVALID);
 }
 
-csRef<iEventHandlerRegistry> csEventHandlerRegistry::GetRegistry (iObjectRegistry *object_reg)
+csRef<iEventHandlerRegistry> csEventHandlerRegistry::GetRegistry (
+	iObjectRegistry *object_reg)
 {
   csRef<iEventHandlerRegistry> handler_reg = 
     csQueryRegistry<iEventHandlerRegistry> (object_reg);

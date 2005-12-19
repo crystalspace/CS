@@ -257,7 +257,8 @@ void csEventQueue::Resize (size_t iLength)
 void csEventQueue::Notify (const csEventID &name)
 {
 #ifdef ADB_DEBUG
-  std::cerr << "Doing notify (immediate broadcast) to " << NameRegistry->GetString(name) << std::endl;
+  std::cerr << "Doing notify (immediate broadcast) to " <<
+  	NameRegistry->GetString(name) << std::endl;
 #endif
 
   csEventTree *epoint = EventHash.Get(name, 0);
@@ -311,7 +312,8 @@ void csEventQueue::Dispatch (iEvent& e)
 csHandlerID csEventQueue::RegisterListener (iEventHandler * listener)
 {
 #ifdef ADB_DEBUG
-  std::cerr << "Registering listener (no events) " << listener->GenericName() << std::endl;
+  std::cerr << "Registering listener (no events) " <<
+  	listener->GenericName() << std::endl;
 #endif
   return HandlerRegistry->GetID(listener);
 }

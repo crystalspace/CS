@@ -206,9 +206,11 @@ class CS_CRYSTALSPACE_EXPORT csInputEventHelper
 {
 public:
   /// Retrieve button number (0 on error or if keyboard event)
-  CS_PURE_METHOD static uint GetButton (iEventNameRegistry *, const iEvent *event);
+  CS_PURE_METHOD static uint GetButton (iEventNameRegistry *,
+  	const iEvent *event);
   /// Retrieve button/key state (true = press, false = release)
-  CS_PURE_METHOD static bool GetButtonState (iEventNameRegistry *, const iEvent *event);
+  CS_PURE_METHOD static bool GetButtonState (iEventNameRegistry *,
+  	const iEvent *event);
 };
 
 /**\name Command event related

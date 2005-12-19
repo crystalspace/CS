@@ -117,12 +117,11 @@ uint32 csKeyEventHelper::GetModifiersBits (const csKeyModifiers& m)
   return res;
 }
 
-csEvent *csMouseEventHelper::NewEvent 
-(csRef<iEventNameRegistry> &reg,
- csTicks iTime, csEventID name, csMouseEventType mType, 
- int mx, int my, uint32 axesChanged,
- uint mButton, bool mButtonState, 
- uint32 buttonMask, uint32 mModifiers)
+csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
+  csTicks iTime, csEventID name, csMouseEventType mType, 
+  int mx, int my, uint32 axesChanged,
+  uint mButton, bool mButtonState, 
+  uint32 buttonMask, uint32 mModifiers)
 {
   csEvent *ev = new csEvent(iTime, name, false);
   ev->Add("mNumber", (uint8) 0);
@@ -138,12 +137,11 @@ csEvent *csMouseEventHelper::NewEvent
   return ev;
 }
 
-csEvent *csMouseEventHelper::NewEvent
-(csRef<iEventNameRegistry> &reg,
- csTicks iTime, csEventID name, int n, csMouseEventType mType, 
- int x, int y, uint32 axesChanged, 
- uint button, bool buttonState, 
- uint32 buttonMask, uint32 modifiers)
+csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
+  csTicks iTime, csEventID name, int n, csMouseEventType mType, 
+  int x, int y, uint32 axesChanged, 
+  uint button, bool buttonState, 
+  uint32 buttonMask, uint32 modifiers)
 {
   csEvent *ev = new csEvent(iTime, name, false);
   int32 axes[2] = { x, y };
@@ -160,11 +158,10 @@ csEvent *csMouseEventHelper::NewEvent
   return ev;
 }
 
-csEvent *csMouseEventHelper::NewEvent
-(csRef<iEventNameRegistry> &reg,
- csTicks iTime, csEventID name, int n, csMouseEventType mType,
- const int *axes, uint8 numAxes, uint32 axesChanged, 
- uint button, bool buttonState, uint32 buttonMask, uint32 modifiers)
+csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
+  csTicks iTime, csEventID name, int n, csMouseEventType mType,
+  const int *axes, uint8 numAxes, uint32 axesChanged, 
+  uint button, bool buttonState, uint32 buttonMask, uint32 modifiers)
 {
   csEvent *ev = new csEvent (iTime, name, false);
   CS_ASSERT(reg->IsKindOf(name, csevMouseEvent(reg)));
@@ -270,12 +267,11 @@ bool csMouseEventHelper::GetEventData (const iEvent* event,
 
 //---------------------------------------------------------------------------
 
-csEvent *csJoystickEventHelper::NewEvent
-(csRef<iEventNameRegistry> &reg,
- csTicks iTime, csEventID name, int n, 
- int x, int y, uint32 axesChanged, 
- uint button, bool buttonState, 
- uint32 buttonMask, uint32 modifiers)
+csEvent *csJoystickEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
+  csTicks iTime, csEventID name, int n, 
+  int x, int y, uint32 axesChanged, 
+  uint button, bool buttonState, 
+  uint32 buttonMask, uint32 modifiers)
 {
   csEvent *ev = new csEvent (iTime, name, false);
   int axes[2] = { x, y };
@@ -291,12 +287,11 @@ csEvent *csJoystickEventHelper::NewEvent
   return ev;
 }
 
-csEvent *csJoystickEventHelper::NewEvent
-(csRef<iEventNameRegistry> &reg,
- csTicks iTime, csEventID name, int n, const int *axes, 
- uint8 numAxes, uint32 axesChanged, 
- uint button, bool buttonState,
- uint32 buttonMask, uint32 modifiers)
+csEvent *csJoystickEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
+  csTicks iTime, csEventID name, int n, const int *axes, 
+  uint8 numAxes, uint32 axesChanged, 
+  uint button, bool buttonState,
+  uint32 buttonMask, uint32 modifiers)
 {
   csEvent *ev = new csEvent (iTime, name, false);
   CS_ASSERT(reg->IsKindOf(name, csevJoystickEvent(reg)));
@@ -394,7 +389,8 @@ bool csJoystickEventHelper::GetEventData (const iEvent* event,
   return true;
 }
 
-uint csInputEventHelper::GetButton (iEventNameRegistry *reg, const iEvent* event)
+uint csInputEventHelper::GetButton (iEventNameRegistry *reg,
+	const iEvent* event)
 {
   CS_ASSERT(CS_IS_INPUT_EVENT(reg, *event));
 
@@ -416,7 +412,8 @@ uint csInputEventHelper::GetButton (iEventNameRegistry *reg, const iEvent* event
   }
 }
 
-bool csInputEventHelper::GetButtonState (iEventNameRegistry *reg, const iEvent* event)
+bool csInputEventHelper::GetButtonState (iEventNameRegistry *reg,
+	const iEvent* event)
 {
   CS_ASSERT(CS_IS_INPUT_EVENT(reg, *event));
 
@@ -441,8 +438,8 @@ bool csInputEventHelper::GetButtonState (iEventNameRegistry *reg, const iEvent* 
 
 //---------------------------------------------------------------------------
 
-csEvent *csCommandEventHelper::NewEvent
-(csTicks iTime, csEventID name, bool broadcast, intptr_t cInfo)
+csEvent *csCommandEventHelper::NewEvent (csTicks iTime,
+  csEventID name, bool broadcast, intptr_t cInfo)
 {
   csEvent *ev = new csEvent(iTime, name, broadcast);
   ev->Add("cmdInfo", (int64)cInfo);

@@ -78,7 +78,8 @@ csEvent::csEvent (csTicks iTime, csEventID iName, bool iBroadcast) :
 }
 
 // Copy constructor
-csEvent::csEvent (csEvent const& e) : scfImplementationType (this), attributes (53)
+csEvent::csEvent (csEvent const& e) : scfImplementationType (this),
+	attributes (53)
 {
   count = 0;
 
@@ -432,8 +433,8 @@ const char* csEventAttributeIterator::Next()
 //*****************************************************************************
 csPoolEvent::csPoolEvent(csEventQueue *q)
 {
-    pool = q;
-    next = 0;
+  pool = q;
+  next = 0;
 }
 
 void csPoolEvent::DecRef()

@@ -80,7 +80,8 @@ public:
  * A databuffer pointing into another databuffer.
  */
 class CS_CRYSTALSPACE_EXPORT csParasiticDataBuffer
-  : public scfImplementationExt0<csParasiticDataBuffer, csParasiticDataBufferBase>
+  : public scfImplementationExt0<csParasiticDataBuffer,
+  	csParasiticDataBufferBase>
 {
 public:
   /**

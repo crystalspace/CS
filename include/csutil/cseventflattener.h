@@ -55,16 +55,18 @@ class CS_CRYSTALSPACE_EXPORT csEventFlattener
 {
 public:
   /// Query the size consumed by the flattened event.
-  static csEventFlattenerError FlattenSize (iObjectRegistry*, iEvent* event, size_t& size);
+  static csEventFlattenerError FlattenSize (iObjectRegistry*, iEvent* event,
+  	size_t& size);
   /**
    * Flatten am event.
    * \remark The user is responsible for allocating and deallocating the 
    *  buffer memory.
    */
-  static csEventFlattenerError Flatten (iObjectRegistry*, iEvent* event, char *buffer);
+  static csEventFlattenerError Flatten (iObjectRegistry*, iEvent* event,
+  	char *buffer);
   /// Unflatten an event.
-  static csEventFlattenerError Unflatten (iObjectRegistry*, iEvent* event, const char *buffer, 
-					  size_t length);
+  static csEventFlattenerError Unflatten (iObjectRegistry*, iEvent* event,
+  	const char *buffer, size_t length);
 }; 
 
 #endif // __CS_CSUTIL_CSEVENTFLATTENER_H__

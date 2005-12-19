@@ -99,7 +99,8 @@ csEventID csEventNameRegistry::GetParentID (const csEventID id)
   return parentage.Get (id, CS_EVENT_INVALID);
 }
 
-bool csEventNameRegistry::IsImmediateChildOf(const csEventID child, const csEventID parent)
+bool csEventNameRegistry::IsImmediateChildOf(const csEventID child,
+	const csEventID parent)
 {
   CS_ASSERT(child != CS_EVENT_INVALID);
   CS_ASSERT(parent != CS_EVENT_INVALID);
@@ -109,7 +110,8 @@ bool csEventNameRegistry::IsImmediateChildOf(const csEventID child, const csEven
     return false;
 }
 
-bool csEventNameRegistry::IsKindOf(const csEventID child, const csEventID parent)
+bool csEventNameRegistry::IsKindOf(const csEventID child,
+	const csEventID parent)
 {
   CS_ASSERT(child != CS_EVENT_INVALID);
   CS_ASSERT(parent != CS_EVENT_INVALID);

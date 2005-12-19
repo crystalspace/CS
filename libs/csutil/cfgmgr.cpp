@@ -76,8 +76,8 @@ public:
 // Note: the iterator starts at the last (highest-priority) domain and loops
 // back to the first one.
 
-class csConfigManagerIterator : public scfImplementation1<csConfigManagerIterator,
-                                                          iConfigIterator>
+class csConfigManagerIterator : public scfImplementation1<
+	csConfigManagerIterator, iConfigIterator>
 {
 private:
   csRef<csConfigManager> Config;

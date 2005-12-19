@@ -34,22 +34,22 @@ distribution.
 // TiXmlString constructor, based on a C string
 TiXmlString::TiXmlString (const char* instring)
 {
-    size_t newlen;
-    char * newstring;
+  size_t newlen;
+  char * newstring;
 
-    if (!instring)
-    {
-        allocated = 0;
-        cstring = 0;
-	clength = 0;
-        return;
-    }
-    newlen = strlen (instring) + 1;
-    newstring = (char*)malloc (newlen);
-    strcpy (newstring, instring);
-    allocated = newlen;
-    cstring = newstring;
-    clength = newlen - 1; // length of string not including null terminator.
+  if (!instring)
+  {
+    allocated = 0;
+    cstring = 0;
+    clength = 0;
+    return;
+  }
+  newlen = strlen (instring) + 1;
+  newstring = (char*)malloc (newlen);
+  strcpy (newstring, instring);
+  allocated = newlen;
+  cstring = newstring;
+  clength = newlen - 1; // length of string not including null terminator.
 }
 
 // TiXmlString copy constructor

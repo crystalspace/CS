@@ -87,7 +87,8 @@ private:
   volatile size_t Length;
   // Protection against multiple threads accessing same event queue
   csRef<csMutex> Mutex;
-  // Event tree.  All subscription PO graphs and delivery queues hang off of this.
+  // Event tree.  All subscription PO graphs and delivery queues hang off
+  // of this.
   csEventTree *EventTree;
   // Shortcut to per-event-name delivery queues.
   csHash<csEventTree *,csEventID> EventHash;
@@ -131,30 +132,32 @@ public:
   /// Make the event scheduler subsystem aware of an event handler
   virtual csHandlerID RegisterListener (iEventHandler*);
   /// Shorthand for RegisterListener() followed by Subscribe()
-  virtual csHandlerID RegisterListener (iEventHandler *handler, const csEventID &event) 
+  virtual csHandlerID RegisterListener (iEventHandler *handler,
+  	const csEventID &event) 
   { 
-	  csHandlerID id = RegisterListener(handler);
-	  if (id!=CS_HANDLER_INVALID)
-	  {
-		  if (Subscribe(handler, event))
-			  return id;
-		  else
-			  RemoveListener(handler); /* fall through */
-	  }
-	  return CS_HANDLER_INVALID;
+    csHandlerID id = RegisterListener(handler);
+    if (id!=CS_HANDLER_INVALID)
+    {
+      if (Subscribe(handler, event))
+	return id;
+      else
+	RemoveListener(handler); /* fall through */
+    }
+    return CS_HANDLER_INVALID;
   }
   /// Shorthand for RegisterListener() followed by Subscribe()
-  virtual csHandlerID RegisterListener (iEventHandler *handler, const csEventID events[]) 
+  virtual csHandlerID RegisterListener (iEventHandler *handler,
+  	const csEventID events[]) 
   { 
-	  csHandlerID id = RegisterListener(handler);
-	  if (id!=CS_HANDLER_INVALID)
-	  {
-		  if (Subscribe(handler, events))
-			  return id;
-		  else
-			  RemoveListener(handler); /* fall through */
-	  }
-	  return CS_HANDLER_INVALID;
+    csHandlerID id = RegisterListener(handler);
+    if (id!=CS_HANDLER_INVALID)
+    {
+      if (Subscribe(handler, events))
+	return id;
+      else
+	RemoveListener(handler); /* fall through */
+    }
+    return CS_HANDLER_INVALID;
   }
   /**
    * Subscribe a listener to an event subtree.
@@ -272,14 +275,17 @@ public:
       sendEvent = parent->PreProcess;
     }
     CS_EVENTHANDLER_NAMES("crystalspace.frame.preprocess")
-    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(csRef<iEventHandlerRegistry> &r1,
-							    csRef<iEventNameRegistry> &r2,
-							    csEventID e) const {
+    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+    	csRef<iEventHandlerRegistry> &r1,
+	csRef<iEventNameRegistry> &r2,
+	csEventID e) const
+    {
       return 0;
     }
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry> &r1,
-							    csRef<iEventNameRegistry> &r2,
-							    csEventID e) const 
+    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+    	csRef<iEventHandlerRegistry> &r1,
+	csRef<iEventNameRegistry> &r2,
+	csEventID e) const 
     {
       static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
       if (e == csevFrame(r2))
@@ -304,14 +310,17 @@ public:
       sendEvent = parent->ProcessEvent;
     }
     CS_EVENTHANDLER_NAMES("crystalspace.frame.process")
-    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(csRef<iEventHandlerRegistry> &r1,
-							    csRef<iEventNameRegistry> &r2,
-							    csEventID e) const {
+    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+    	csRef<iEventHandlerRegistry> &r1,
+	csRef<iEventNameRegistry> &r2,
+	csEventID e) const
+    {
       return 0;
     }
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry> &r1,
-							    csRef<iEventNameRegistry> &r2,
-							    csEventID e) const 
+    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+    	csRef<iEventHandlerRegistry> &r1,
+	csRef<iEventNameRegistry> &r2,
+	csEventID e) const 
     {
       static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
       if (e == csevFrame(r2))
@@ -336,15 +345,17 @@ public:
       sendEvent = parent->PostProcess;
     }
     CS_EVENTHANDLER_NAMES("crystalspace.frame.postprocess")
-    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(csRef<iEventHandlerRegistry> &r1,
-							    csRef<iEventNameRegistry> &r2,
-							    csEventID e) const 
+    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+    	csRef<iEventHandlerRegistry> &r1,
+	csRef<iEventNameRegistry> &r2,
+	csEventID e) const 
     {
       return 0;
     }
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry> &r1,
-							    csRef<iEventNameRegistry> &r2,
-							    csEventID e) const 
+    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+    	csRef<iEventHandlerRegistry> &r1,
+	csRef<iEventNameRegistry> &r2,
+	csEventID e) const 
     {
       static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
       if (e == csevFrame(r2))
@@ -369,14 +380,18 @@ public:
       sendEvent = parent->FinalProcess;
     }
     CS_EVENTHANDLER_NAMES("crystalspace.frame.finalprocess")
-    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(csRef<iEventHandlerRegistry> &r1,
-							    csRef<iEventNameRegistry> &r2,
-							    csEventID e) const {
+    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+    	csRef<iEventHandlerRegistry> &r1,
+	csRef<iEventNameRegistry> &r2,
+	csEventID e) const
+    {
       return 0;
     }
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry> &r1,
-							    csRef<iEventNameRegistry> &r2,
-							    csEventID e) const {
+    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+    	csRef<iEventHandlerRegistry> &r1,
+	csRef<iEventNameRegistry> &r2,
+	csEventID e) const
+    {
       return 0;
     }
   };

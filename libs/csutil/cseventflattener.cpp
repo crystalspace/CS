@@ -181,17 +181,18 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
   
   ui32 = CS_CRYSTAL_PROTOCOL;
   ui32 = csConvertEndian(ui32);
-  b.Write((char *)&ui32, sizeof(uint32));              // protocol version
+  b.Write((char *)&ui32, sizeof(uint32));           // protocol version
   ui64 = size;
   ui64 = csConvertEndian(ui64);
-  b.Write((char *)&ui64, sizeof(uint64));              // packet size
+  b.Write((char *)&ui64, sizeof(uint64));           // packet size
   ui32 = csConvertEndian((uint32)event->Time);
-  b.Write((char *)&ui32, sizeof(uint32));              // iEvent.Time
-  b.Write((char *)&event->Broadcast, sizeof(uint8));   // iEvent.Broadcast flag
-  const char *nameStr = csEventNameRegistry::GetString(object_reg, event->GetName());
+  b.Write((char *)&ui32, sizeof(uint32));           // iEvent.Time
+  b.Write((char *)&event->Broadcast, sizeof(uint8));// iEvent.Broadcast flag
+  const char *nameStr = csEventNameRegistry::GetString(object_reg,
+  	event->GetName());
   ui16 = (uint16)strlen (nameStr);
   ui16 = csConvertEndian(ui16);
-  b.Write((char *)&ui16, sizeof(uint16));              // Event textual name length
+  b.Write((char *)&ui16, sizeof(uint16));           // Event textual name length
   b.Write(nameStr, strlen(nameStr)); // Event textual name
 
   csRef<iEventAttributeIterator> iter (event->GetAttributeIterator ());
@@ -411,22 +412,22 @@ csEventFlattenerError csEventFlattener::Unflatten (iObjectRegistry *object_reg,
   char *name;
   size_t size;
 
-  b.Read((char *)&ui32, sizeof(ui32));                      // protocol version
+  b.Read((char *)&ui32, sizeof(ui32));                 // protocol version
   ui32 = csConvertEndian(ui32);
   if (ui32 != CS_CRYSTAL_PROTOCOL)
   {
     //csPrintf("protocol version invalid: %" PRIX32 "\n", ui32);
     return csEventFlattenerErrorWrongFormat;
   }
-  b.Read((char *)&ui64, sizeof(uint64));                    // packet size
+  b.Read((char *)&ui64, sizeof(uint64));               // packet size
   size = csConvertEndian (ui64);
-  b.Read((char *)&ui32, sizeof(uint32));                    // iEvent.Time
+  b.Read((char *)&ui32, sizeof(uint32));               // iEvent.Time
   event->Time = csConvertEndian(ui32);
-  b.Read((char *)&event->Broadcast, sizeof(uint8));         // iEvent.Broadcast flag
-  b.Read((char *)&ui16, sizeof(uint16));                    // textual name length
+  b.Read((char *)&event->Broadcast, sizeof(uint8));    // iEvent.Broadcast flag
+  b.Read((char *)&ui16, sizeof(uint16));               // textual name length
   ui16 = csConvertEndian (ui16);
   char *buf = (char *) malloc(ui16+1);
-  b.Read(buf, ui16);                                        // textual name
+  b.Read(buf, ui16);                                   // textual name
   buf[ui16] = '\0';
   event->Name = csEventNameRegistry::GetID(object_reg, buf); // EventID
   free(buf);
