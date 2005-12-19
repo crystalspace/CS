@@ -18,6 +18,10 @@ chronological order.
 	- Eric Sunshine fixed an unlikely, though potential crasher in
 	  csVariant::SetString() which could occur with an expression such as
 	  variant.SetString(variant.GetString()).
+	- Peter Amstutz updates the csvosa3dl plugin to compile with the
+	  latest VOS CVS.
+	- Peter Amstutz committed an initial fix for csInputBinder to 
+	  work with the new event system.  Needs more work though.
 17-Dec-2005
         - res reactivated (and slightly improved) "-ilace" support for the
           software renderer.
