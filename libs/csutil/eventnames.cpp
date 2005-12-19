@@ -50,9 +50,12 @@ csEventID csEventNameRegistry::GetID (const csString &name)
 	    << ") = ";
 #endif
   csEventID result;
-  if (names.Contains(name)) {
+  if (names.Contains(name))
+  {
     result = names.Request(name);
-  } else {
+  }
+  else
+  {
     result = names.Request(name);
     if (name.FindLast('.') != (size_t)-1)
     { 

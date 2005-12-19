@@ -291,10 +291,13 @@ csInputDefinition::csInputDefinition (iEventNameRegistry* r,
   deviceNumber = (uint) -1;
 
   // device number
-  if (strspn(str.GetData (), "0123456789") > 0) {
+  if (strspn(str.GetData (), "0123456789") > 0)
+  {
     deviceNumber = (int) strtoul (str.GetData (), & endp, 10);
     str.DeleteAt (0, endp - str.GetData ());
-  } else {
+  }
+  else
+  {
     deviceNumber = 0;
   }
 
@@ -375,7 +378,7 @@ csInputDefinition::csInputDefinition (iEventNameRegistry* r,
   {
     containedName = csevKeyboardEvent (name_reg);
 
-    if (deviceNumber != (uint) -1)
+    if (deviceNumber != 0)//(uint) -1)
     {
       /* this was actually a key, not a device number */
       csString str2 ("");
