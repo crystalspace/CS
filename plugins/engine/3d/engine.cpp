@@ -76,6 +76,7 @@
 #include "plugins/engine/3d/region.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/texture.h"
+#include "plugins/engine/3d/meshgen.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -3362,123 +3363,97 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   return CreateMeshWrapper (mo, name, sector, pos);
 }
 
+static void UnlinkFromRegion (iObject* object)
+{
+  if (object->GetObjectParent ())
+    object->GetObjectParent ()->ObjRemove (object);
+}
+
 bool csEngine::RemoveObject (iBase *object)
 {
+  csRef<iMeshWrapper> meshwrap (SCF_QUERY_INTERFACE (object, iMeshWrapper));
+  if (meshwrap)
   {
-    csRef<iSector> sector (SCF_QUERY_INTERFACE (object, iSector));
-    if (sector)
-    {
-      // Remove from region it might be in.
-      if (sector->QueryObject ()->GetObjectParent ())
-      {
-	sector->QueryObject ()->GetObjectParent ()->ObjRemove (
-		sector->QueryObject ());
-      }
-      sectors.Remove (sector);
-      return true;
-    }
+    UnlinkFromRegion (meshwrap->QueryObject ());
+    meshes.Remove (meshwrap);
+    return true;
   }
-  {
-    csRef<iCameraPosition> cp (SCF_QUERY_INTERFACE (object, iCameraPosition));
-    if (cp)
-    {
-      // Remove from region it might be in.
-      if (cp->QueryObject ()->GetObjectParent ())
-      {
-	cp->QueryObject ()->GetObjectParent ()->ObjRemove (
-		cp->QueryObject ());
-      }
-      cameraPositions.Remove (cp);
-      return true;
-    }
-  }
-  {
-    csRef<iLight> dl (SCF_QUERY_INTERFACE (object, iLight));
-    if (dl && dl->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-    {
-      // Remove from region it might be in.
-      if (dl->QueryObject ()->GetObjectParent ())
-      {
-	dl->QueryObject ()->GetObjectParent ()->ObjRemove (
-		dl->QueryObject ());
-      }
-      if (dl->GetSector ())
-        dl->GetSector ()->GetLights ()->Remove (dl);
-      return true;
-    }
-  }
-  {
-    csRef<iCollection> col (SCF_QUERY_INTERFACE (object, iCollection));
-    if (col)
-    {
-      // Remove from region it might be in.
-      if (col->QueryObject ()->GetObjectParent ())
-      {
-	col->QueryObject ()->GetObjectParent ()->ObjRemove (
-		col->QueryObject ());
-      }
-      collections.Remove (col);
-      return true;
-    }
-  }
-  {
-    csRef<iTextureWrapper> txt (SCF_QUERY_INTERFACE (object, iTextureWrapper));
-    if (txt)
-    {
-      // Remove from region it might be in.
-      if (txt->QueryObject ()->GetObjectParent ())
-      {
-	txt->QueryObject ()->GetObjectParent ()->ObjRemove (
-		txt->QueryObject ());
-      }
-      GetTextureList ()->Remove (txt);
-      return true;
-    }
-  }
-  {
-    csRef<iMaterialWrapper> mat (SCF_QUERY_INTERFACE (
-        object,
-        iMaterialWrapper));
-    if (mat)
-    {
-      // Remove from region it might be in.
-      if (mat->QueryObject ()->GetObjectParent ())
-      {
-	mat->QueryObject ()->GetObjectParent ()->ObjRemove (
-		mat->QueryObject ());
-      }
-      GetMaterialList ()->Remove (mat);
-      return true;
-    }
-  }
-  {
-    csRef<iMeshFactoryWrapper> factwrap (SCF_QUERY_INTERFACE (
-        object,
+  csRef<iMeshFactoryWrapper> factwrap (SCF_QUERY_INTERFACE (object,
         iMeshFactoryWrapper));
-    if (factwrap)
-    {
-      // Remove from region it might be in.
-      if (factwrap->QueryObject ()->GetObjectParent ())
-      {
-	factwrap->QueryObject ()->GetObjectParent ()->ObjRemove (
-		factwrap->QueryObject ());
-      }
-      meshFactories.Remove (factwrap);
-      return true;
-    }
-  }
+  if (factwrap)
   {
-    csRef<iMeshWrapper> meshwrap (SCF_QUERY_INTERFACE (object, iMeshWrapper));
-    if (meshwrap)
+    UnlinkFromRegion (factwrap->QueryObject ());
+    meshFactories.Remove (factwrap);
+    return true;
+  }
+  csRef<iTextureWrapper> txt (SCF_QUERY_INTERFACE (object, iTextureWrapper));
+  if (txt)
+  {
+    UnlinkFromRegion (txt->QueryObject ());
+    GetTextureList ()->Remove (txt);
+    return true;
+  }
+  csRef<iMaterialWrapper> mat (SCF_QUERY_INTERFACE (object, iMaterialWrapper));
+  if (mat)
+  {
+    UnlinkFromRegion (mat->QueryObject ());
+    GetMaterialList ()->Remove (mat);
+    return true;
+  }
+  csRef<iSector> sector (SCF_QUERY_INTERFACE (object, iSector));
+  if (sector)
+  {
+    UnlinkFromRegion (sector->QueryObject ());
+    sectors.Remove (sector);
+    return true;
+  }
+  csRef<iLight> dl (SCF_QUERY_INTERFACE (object, iLight));
+  if (dl)
+  {
+    UnlinkFromRegion (dl->QueryObject ());
+    if (dl->GetSector ())
+      dl->GetSector ()->GetLights ()->Remove (dl);
+    return true;
+  }
+  csRef<iSharedVariable> sv = scfQueryInterface<iSharedVariable> (object);
+  if (sv)
+  {
+    UnlinkFromRegion (sv->QueryObject ());
+    GetVariableList ()->Remove (sv);
+    return true;
+  }
+  csRef<iCameraPosition> cp (SCF_QUERY_INTERFACE (object, iCameraPosition));
+  if (cp)
+  {
+    UnlinkFromRegion (cp->QueryObject ());
+    cameraPositions.Remove (cp);
+    return true;
+  }
+  csRef<iCollection> col (SCF_QUERY_INTERFACE (object, iCollection));
+  if (col)
+  {
+    UnlinkFromRegion (col->QueryObject ());
+    collections.Remove (col);
+    return true;
+  }
+  csRef<iMeshGenerator> mg = scfQueryInterface<iMeshGenerator> (object);
+  if (mg)
+  {
+    UnlinkFromRegion (mg->QueryObject ());
+    csMeshGenerator* csmg = (csMeshGenerator*)(iMeshGenerator*)mg;
+    if (csmg->GetSector ())
     {
-      // Remove from region it might be in.
-      if (meshwrap->QueryObject ()->GetObjectParent ())
+      size_t c = csmg->GetSector ()->GetMeshGeneratorCount ();
+      while (c > 0)
       {
-	meshwrap->QueryObject ()->GetObjectParent ()->ObjRemove (
-		meshwrap->QueryObject ());
+        c--;
+	if (csmg->GetSector ()->GetMeshGenerator (c) == mg)
+	{
+          csmg->GetSector ()->RemoveMeshGenerator (c);
+	  return true;
+        }
       }
-      meshes.Remove (meshwrap);
-      return true;
+      CS_ASSERT (false);
     }
   }
 

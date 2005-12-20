@@ -63,6 +63,8 @@ void csRegion::DeleteAll ()
     copy.Push (o);
   }
 
+  size_t total = copy.Length ();
+
   // Now we iterate over all objects in the 'copy' vector and
   // delete them. This will release them as csObject children
   // from this region parent.
@@ -72,8 +74,18 @@ void csRegion::DeleteAll ()
   // and only then delete the sectors.
   size_t i;
 
+  // The first loop is the most general one where we just use
+  // engine->RemoveObject().
   for (i = 0; i < copy.Length (); i++)
-  {
+    if (csEngine::currentEngine->RemoveObject (copy[i]))
+    {
+      copy[i] = 0;
+      total--;
+    }
+
+  if (!total) return;
+
+  for (i = 0; i < copy.Length (); i++)
     if (copy[i])
     {
       iObject *obj = copy[i];
@@ -88,11 +100,12 @@ void csRegion::DeleteAll ()
       if (snd_manager) snd_manager->RemoveSound (o);
       ObjRemove (obj);
       copy[i] = 0;
+      total--;
     }
-  }
+
+  if (!total) return;
 
   for (i = 0; i < copy.Length (); i++)
-  {
     if (copy[i])
     {
       iObject *obj = copy[i];
@@ -102,11 +115,12 @@ void csRegion::DeleteAll ()
       if (engseq) engseq->RemoveSequence (o);
       ObjRemove (obj);
       copy[i] = 0;
+      total--;
     }
-  }
+
+  if (!total) return;
 
   for (i = 0; i < copy.Length (); i++)
-  {
     if (copy[i])
     {
       iObject *obj = copy[i];
@@ -116,128 +130,15 @@ void csRegion::DeleteAll ()
       if (engseq) engseq->RemoveTrigger (o);
       ObjRemove (obj);
       copy[i] = 0;
+      total--;
     }
-  }
 
-  for (i = 0; i < copy.Length (); i++)
-  {
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
-      csRef<iSharedVariable> o (SCF_QUERY_INTERFACE (obj, iSharedVariable));
-      if (!o) continue;
-
-      engine->GetVariableList ()->Remove (o);
-      ObjRemove (obj);
-      copy[i] = 0;
-    }
-  }
-
-  for (i = 0; i < copy.Length (); i++)
-  {
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
-      csRef<iCollection> o (SCF_QUERY_INTERFACE (obj, iCollection));
-      if (!o) continue;
-
-      engine->GetCollections ()->Remove (o);
-      ObjRemove (obj);
-      copy[i] = 0;
-    }
-  }
-
-  for (i = 0; i < copy.Length (); i++)
-  {
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
-      csRef<iLight> o (SCF_QUERY_INTERFACE (obj, iLight));
-      if (!o) continue;
-
-      engine->RemoveLight (o);
-      ObjRemove (obj);
-      copy[i] = 0;
-    }
-  }
-
-  for (i = 0; i < copy.Length (); i++)
-  {
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
-      csRef<iMeshWrapper> o (SCF_QUERY_INTERFACE (obj, iMeshWrapper));
-      if (!o) continue;
-
-      engine->GetMeshes ()->Remove (o);
-      ObjRemove (obj);
-      copy[i] = 0;
-    }
-  }
-
-  for (i = 0; i < copy.Length (); i++)
-  {
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
-      csRef<iMeshFactoryWrapper> o (SCF_QUERY_INTERFACE (
-          obj,
-          iMeshFactoryWrapper));
-      if (!o) continue;
-
-      engine->GetMeshFactories ()->Remove (o);
-      ObjRemove (obj);
-      copy[i] = 0;
-    }
-  }
-
-  for (i = 0; i < copy.Length (); i++)
-  {
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
-      csRef<iSector> o (SCF_QUERY_INTERFACE (obj, iSector));
-      if (!o) continue;
-
-      engine->GetSectors ()->Remove (o);
-      ObjRemove (obj);
-      copy[i] = 0;
-    }
-  }
-
-  for (i = 0; i < copy.Length (); i++)
-  {
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
-      csRef<iMaterialWrapper> o (SCF_QUERY_INTERFACE (obj, iMaterialWrapper));
-      if (!o) continue;
-
-      engine->GetMaterialList ()->Remove (o);
-      ObjRemove (obj);
-      copy[i] = 0;
-    }
-  }
-
-  for (i = 0; i < copy.Length (); i++)
-  {
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
-      csRef<iTextureWrapper> o (SCF_QUERY_INTERFACE (obj, iTextureWrapper));
-      if (!o) continue;
-
-      engine->GetTextureList ()->Remove (o);
-      ObjRemove (obj);
-      copy[i] = 0;
-    }
-  }
+  if (!total) return;
 
   csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (
   	csEngine::currentEngine->objectRegistry, iShaderManager);
   if (shmgr)
     for (i = 0; i < copy.Length (); i++)
-    {
       if (copy[i])
       {
         iObject *obj = copy[i];
@@ -247,40 +148,25 @@ void csRegion::DeleteAll ()
         shmgr->UnregisterShader (o);
         ObjRemove (obj);
         copy[i] = 0;
+	total--;
       }
-    }
 
-  for (i = 0; i < copy.Length (); i++)
+  if (total > 0)
   {
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
-      csRef<iCameraPosition> o (SCF_QUERY_INTERFACE (obj, iCameraPosition));
-      if (!o) continue;
-
-      engine->GetCameraPositions ()->Remove (o);
-      ObjRemove (obj);
-      copy[i] = 0;
-    }
-  }
-
-#ifdef CS_DEBUG
-  // Sanity check (only in debug mode). There should be no more
-  // non-0 references in the copy array now.
-  for (i = 0; i < copy.Length (); i++)
-  {
-    if (copy[i])
-    {
-      iObject *o = copy[i];
-      csEngine::currentEngine->ReportBug (
+    // Sanity check. There should be no more
+    // non-0 references in the copy array now.
+    for (i = 0; i < copy.Length (); i++)
+      if (copy[i])
+      {
+        iObject *o = copy[i];
+        csEngine::currentEngine->ReportBug (
           "\
 There is still an object in the array after deleting region contents!\n\
 Object name is '%s'",
           o->GetName () ? o->GetName () : "<NoName>");
-      CS_ASSERT (false);
-    }
+      }
+    CS_ASSERT (false);
   }
-#endif // CS_DEBUG
 }
 
 bool csRegion::PrepareTextures ()

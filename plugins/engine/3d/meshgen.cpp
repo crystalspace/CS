@@ -169,8 +169,8 @@ void csMeshGenerator::SetSampleBox (const csBox3& box)
       float wx = GetWorldX (x);
       cells[idx].box.Set (wx, wz, wx + samplecellwidth_x,
 	      wz + samplecellheight_z);
+      idx++;
     }
-    idx++;
   }
 }
 
@@ -183,25 +183,17 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
 
   const csBox2& box = cell.box;
 
-  // For now just generate four positions in every cell as a test.
   // @@@ TODO: use density.
+  // This is just a test.
+  float x, z;
   csMGPosition pos;
-  pos.position.Set (box.MinX () + (box.MaxX ()-box.MinX ()) / .25f, 0.0f,
-		    box.MinY () + (box.MaxY ()-box.MinY ()) / .25f);
-  pos.geom_type = 0;	// @@@ Temporary.
-  block->positions.Push (pos);
-  pos.position.Set (box.MinX () + (box.MaxX ()-box.MinX ()) / .25f, 0.0f,
-		    box.MinY () + (box.MaxY ()-box.MinY ()) / .75f);
-  pos.geom_type = 0;	// @@@ Temporary.
-  block->positions.Push (pos);
-  pos.position.Set (box.MinX () + (box.MaxX ()-box.MinX ()) / .75f, 0.0f,
-		    box.MinY () + (box.MaxY ()-box.MinY ()) / .25f);
-  pos.geom_type = 0;	// @@@ Temporary.
-  block->positions.Push (pos);
-  pos.position.Set (box.MinX () + (box.MaxX ()-box.MinX ()) / .75f, 0.0f,
-		    box.MinY () + (box.MaxY ()-box.MinY ()) / .75f);
-  pos.geom_type = 0;	// @@@ Temporary.
-  block->positions.Push (pos);
+  for (z = box.MinY () ; z < box.MaxY () ; z++)
+    for (x = box.MinX () ; x < box.MaxX () ; x++)
+    {
+      pos.position.Set (x+.5, 0.0f, z+.5);
+      pos.geom_type = 0;	// @@@ Temporary.
+      block->positions.Push (pos);
+    }
 }
 
 void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
@@ -230,7 +222,7 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
     // We need a new block and one is available in the cache.
     csMGPositionBlock* block = cache_blocks.Pop ();
     CS_ASSERT (block->parent_cell == csArrayItemNotFound);
-    CS_ASSERT (block->next == block->prev == 0);
+    CS_ASSERT (block->next == 0 && block->prev == 0);
     block->parent_cell = cidx;
     cell.block = block;
     // Link block to the front.
@@ -251,6 +243,7 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
     CS_ASSERT (block == cells[block->parent_cell].block);
     cells[block->parent_cell].block = block;
     block->parent_cell = cidx;
+    cell.block = block;
 
     // Unlink first.
     block->prev->next = 0;
@@ -280,8 +273,8 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
       float sqdist = csSquaredDist::PointPoint (pos, positions[i].position);
       if (sqdist < sq_total_max_dist)
       {
-        csRef<iMeshWrapper> mesh = geometries[positions[i].geom_type]->AllocMesh (
-      	  sqdist);
+        csRef<iMeshWrapper> mesh = geometries[positions[i].geom_type]
+		->AllocMesh (sqdist);
         positions[i].mesh = mesh;
         mesh->GetMovable ()->SetSector (sector);
 	mesh->GetMovable ()->SetPosition (sector, positions[i].position);
@@ -314,6 +307,7 @@ void csMeshGenerator::AllocateBlocks (const csVector3& pos)
 	  int cidx = z*cell_dim + x;
 	  csMGCell& cell = cells[cidx];
 	  float sqdist = cell.box.SquaredPosDist (pos2d);
+
 	  if (sqdist < sqmd)
 	  {
 	    AllocateBlock (cidx, cell);

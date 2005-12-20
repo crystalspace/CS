@@ -21,6 +21,7 @@
 
 #include "csutil/csobject.h"
 #include "csutil/array.h"
+#include "csutil/weakref.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
@@ -168,7 +169,7 @@ private:
   csRefArray<iMeshWrapper> meshes;
 
   /// Sector for this generator.
-  iSector* sector;
+  csWeakRef<iSector> sector;
 
   /// Sample box where we will place geometry.
   csBox3 samplebox;
@@ -204,15 +205,6 @@ private:
   void AllocateMeshes (csMGCell& cell, const csVector3& pos);
 
   /**
-   * Allocate blocks. This function will allocate all blocks needed
-   * around a certain position and associate those blocks with the
-   * appropriate cells. If a new block is needed it will first
-   * take one from 'cache_blocks'. If 'cache_blocks' is empty
-   * then we take the block we needed last from 'inuse_blocks'.
-   */
-  void AllocateBlocks (const csVector3& pos);
-
-  /**
    * Generate the positions in the given block.
    */
   void GeneratePositions (int cidx, csMGCell& cell, csMGPositionBlock* block);
@@ -226,9 +218,15 @@ private:
   float GetTotalMaxDist ();
 
   /// World coordinate to cell X.
-  int GetCellX (float x) { return int ((x - samplebox.MinX ()) * samplefact_x); }
+  int GetCellX (float x)
+  {
+    return int ((x - samplebox.MinX ()) * samplefact_x);
+  }
   /// World coordinate to cell Z.
-  int GetCellZ (float z) { return int ((z - samplebox.MinZ ()) * samplefact_z); }
+  int GetCellZ (float z)
+  {
+    return int ((z - samplebox.MinZ ()) * samplefact_z);
+  }
   /// Cell coordinate to world X.
   float GetWorldX (int x) { return samplebox.MinX () + x * samplecellwidth_x; }
   /// Cell coordinate to world Z.
@@ -239,6 +237,16 @@ public:
   virtual ~csMeshGenerator ();
 
   void SetSector (iSector* sector) { csMeshGenerator::sector = sector; }
+  iSector* GetSector () { return sector; }
+
+  /**
+   * Allocate blocks. This function will allocate all blocks needed
+   * around a certain position and associate those blocks with the
+   * appropriate cells. If a new block is needed it will first
+   * take one from 'cache_blocks'. If 'cache_blocks' is empty
+   * then we take the block we needed last from 'inuse_blocks'.
+   */
+  void AllocateBlocks (const csVector3& pos);
 
   virtual iObject *QueryObject () { return (iObject*)this; }
 

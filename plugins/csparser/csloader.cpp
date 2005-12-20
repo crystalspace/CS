@@ -3634,6 +3634,7 @@ bool csLoader::LoadMeshGen (iLoaderContext* ldr_context,
 {
   const char* name = node->GetAttributeValue ("name");
   iMeshGenerator* meshgen = sector->CreateMeshGenerator (name);
+  AddToRegion (ldr_context, meshgen->QueryObject ());
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())

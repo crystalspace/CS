@@ -732,7 +732,6 @@ iSector *csSector::FollowSegment (
 
 void csSector::PrepareDraw (iRenderView *rview)
 {
-
   if (csEngine::currentEngine->bugplug)
     csEngine::currentEngine->bugplug->AddCounter ("Sector Count", 1);
 
@@ -747,6 +746,13 @@ void csSector::PrepareDraw (iRenderView *rview)
     i--;
     iSectorCallback* cb = sectorCallbackList.Get (i);
     cb->Traverse ((iSector*)this, rview);
+  }
+
+  // Mesh generators.
+  const csVector3& pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
+  for (i = 0 ; i < meshGenerators.Length () ; i++)
+  {
+    meshGenerators[i]->AllocateBlocks (pos);
   }
 
   // CS_ENTITY_CAMERA meshes have to be moved to right position first.

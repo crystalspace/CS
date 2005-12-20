@@ -198,8 +198,8 @@
 	    <density>1</density>
         </geometry>
 	<samplebox>
-	    <min x="-100" y="-10" z="-100" />
-	    <max x="100" y="10" z="100" />
+	    <min x="-256" y="-10" z="-256" />
+	    <max x="256" y="10" z="256" />
 	</samplebox>
 	<meshobj>Terrain</meshobj>
      </meshgen>

@@ -22,6 +22,24 @@ chronological order.
 	  couple of bugs in the parser/constructor.
 	- Adam removed an unnecessary resolution layer from static
 	  csEventNameRegistry methods.
+	- Jorrit changed region removal so that it uses engine->RemoveObject()
+	  first. This means that adding support for removal of some object
+	  to RemoveObject() is sufficient to support regions.
+	- Jorrit added early exit to region removal so that it stops scanning
+	  the list as soon as it is totally empty.
+	- Jorrit changed the test for a successfully cleaned up region so
+	  that it also operates in optimize mode.
+	- Jorrit changed RemoveObject() to first check on meshes, factories,
+	  textures, and materials since there will be more of those.
+	- Jorrit added support for iSharedVariable and iMeshGenerator to
+	  RemoveObject().
+	- Jorrit fixed the loader so that mesh generators are added to the
+	  region if needed.
+	- Jorrit fixed a few bugs in the mesh generator.
+	- Jorrit changed the engine so that it is actually generating the
+	  meshes now. Still not correct though. Density is ignored. The
+	  height of the meshes is ignored and meshes are not properly cleaned
+	  up when you go away from them.
 19-Dec-2005
 	- Jorrit did more work on the mesh generator.
 	- Jorrit fixed a memory leak in md32spr as reported by Anuj Goyal
