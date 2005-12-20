@@ -14,6 +14,7 @@ chronological order.
 	  take coords in screen space but in fact take coordinates with Y
 	  inverted in relation to screen space.
 	- res fixed some uninitialized csEvent members.
+	- res fixed a coordinate inversion in gl3d.
 19-Dec-2005
 	- Jorrit did more work on the mesh generator.
 	- Jorrit fixed a memory leak in md32spr as reported by Anuj Goyal

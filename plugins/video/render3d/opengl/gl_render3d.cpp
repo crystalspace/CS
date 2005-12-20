@@ -2515,8 +2515,8 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
       scissorbox.AddBoundingVertexSmart (csVector2 (clippoly[i].x, 
         clippoly[i].y));
     csBox2 scissorClip;
-    scissorClip.Set (old2dClip.xmin, old2dClip.ymin,
-      old2dClip.xmax, old2dClip.ymax);
+    scissorClip.Set (old2dClip.xmin, viewheight - old2dClip.ymax,
+      old2dClip.xmax, viewheight - old2dClip.ymin);
     scissorbox *= csBox2 (scissorClip);
     if (scissorbox.Empty())
     {
@@ -2594,8 +2594,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   if (scrapIndicesSize < indexCount)
   {
     scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
-      CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT,
-      0, mesh.vertexCount - 1);
+      CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT, 0, mesh.vertexCount - 1);
     scrapIndicesSize = indexCount;
   }
   if (scrapVerticesSize < mesh.vertexCount)
