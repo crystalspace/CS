@@ -43,6 +43,8 @@ chronological order.
 	- res added SR support to the terrain_fixed_* shaders.
 	- res augmented the SR to support index buffers with data types other
 	  than 'uint'.
+	- Jorrit fixed cleaning up of blocks when they are out of range.
+	  Meshes don't yet appear correctly though.
 19-Dec-2005
 	- Jorrit did more work on the mesh generator.
 	- Jorrit fixed a memory leak in md32spr as reported by Anuj Goyal

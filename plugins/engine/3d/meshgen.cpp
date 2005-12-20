@@ -123,6 +123,8 @@ csMeshGenerator::csMeshGenerator() : scfImplementationType (this)
     cache_blocks.Push (new csMGPositionBlock ());
   inuse_blocks = 0;
   inuse_blocks_last = 0;
+
+  prev_cells.MakeEmpty ();
 }
 
 csMeshGenerator::~csMeshGenerator ()
@@ -299,27 +301,55 @@ void csMeshGenerator::AllocateBlocks (const csVector3& pos)
   // @@@ This can be done more efficiently.
   csVector2 pos2d (pos.x, pos.z);
   int x, z;
-  for (z = cellz - cell_z_md ; z <= cellz + cell_z_md ; z++)
-    if (z >= 0 && z < cell_dim)
-      for (x = cellx - cell_x_md ; x <= cellx + cell_x_md ; x++)
-	if (x >= 0 && x < cell_dim)
-        {
+
+  int minz = cellz - cell_z_md;
+  if (minz < 0) minz = 0;
+  int maxz = cellz + cell_z_md+1;
+  if (maxz > cell_dim) maxz = cell_dim;
+
+  int minx = cellx - cell_x_md;
+  if (minx < 0) minx = 0;
+  int maxx = cellx + cell_x_md+1;
+  if (maxx > cell_dim) maxx = cell_dim;
+
+  for (z = minz ; z < maxz ; z++)
+    for (x = minx ; x < maxx ; x++)
+    {
+      int cidx = z*cell_dim + x;
+      csMGCell& cell = cells[cidx];
+      float sqdist = cell.box.SquaredPosDist (pos2d);
+
+      if (sqdist < sqmd)
+      {
+        AllocateBlock (cidx, cell);
+        AllocateMeshes (cell, pos);
+      }
+      else
+      {
+        // Block is out of range. We keep the block in the cache
+        // but free all meshes that are in it.
+        FreeMeshesInBlock (cell);
+      }
+    }
+
+  // Calculate the intersection of minx, ... with prev_minx, ...
+  // This intersection represent all cells that are not used this frame
+  // but may potentially have gotten meshes the previous frame. We need
+  // to free those meshes.
+  csRect cur_cells (minx, minz, maxx, maxz);
+  if (!prev_cells.IsEmpty ())
+  {
+    for (z = prev_cells.ymin ; z < prev_cells.ymax ; z++)
+      for (x = prev_cells.xmin ; x < prev_cells.xmax ; x++)
+        if (!cur_cells.Contains (x, z))
+	{
 	  int cidx = z*cell_dim + x;
 	  csMGCell& cell = cells[cidx];
-	  float sqdist = cell.box.SquaredPosDist (pos2d);
-
-	  if (sqdist < sqmd)
-	  {
-	    AllocateBlock (cidx, cell);
-	    AllocateMeshes (cell, pos);
-	  }
-	  else
-	  {
-	    // Block is out of range. We keep the block in the cache
-	    // but free all meshes that are in it.
-	    FreeMeshesInBlock (cell);
-	  }
+          FreeMeshesInBlock (cell);
         }
+  }
+
+  prev_cells = cur_cells;
 }
 
 void csMeshGenerator::FreeMeshesInBlock (csMGCell& cell)

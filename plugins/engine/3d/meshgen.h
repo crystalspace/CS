@@ -24,6 +24,7 @@
 #include "csutil/weakref.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
+#include "csutil/hash.h"
 #include "csutil/scf_implementation.h"
 #include "csgeom/box.h"
 #include "iengine/mesh.h"
@@ -181,6 +182,13 @@ private:
   /// 2-dimensional array of cells with cell_dim*cell_dim entries.
   csMGCell* cells;
   int cell_dim;
+
+  /**
+   * Here we store the block of cell coordinates that we used the
+   * previous frame. We can use this to find out where to deallocate
+   * meshes on cells that are no longer used in this frame.
+   */
+  csRect prev_cells;
 
   /// Cache of unused position blocks.
   csPDelArray<csMGPositionBlock> cache_blocks;
