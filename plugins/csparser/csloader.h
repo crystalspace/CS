@@ -66,6 +66,7 @@ struct iDocument;
 struct iFile;
 struct iPolygonMesh;
 struct iShaderManager;
+struct iMeshGenerator;
 
 struct iObject;
 struct iThingState;
@@ -414,6 +415,18 @@ private:
    */
   iMeshWrapper* LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
   	iDocumentNode* node, iStreamSource* ssource);
+
+  /**
+   * Load a mesh generator geometry.
+   */
+  bool LoadMeshGenGeometry (iLoaderContext* ldr_context,
+  	iDocumentNode* node, iMeshGenerator* meshgen);
+
+  /**
+   * Load a mesh generator.
+   */
+  bool LoadMeshGen (iLoaderContext* ldr_context,
+  	iDocumentNode* node, iSector* sector);
 
   /**
    * Load a plugin in general.

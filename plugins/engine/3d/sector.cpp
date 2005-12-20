@@ -1026,10 +1026,11 @@ void csSector::RemoveLSI (csLightSectorInfluence* inf)
 iMeshGenerator* csSector::CreateMeshGenerator (const char* name)
 {
   csMeshGenerator* meshgen = new csMeshGenerator ();
+  meshgen->SetSector (this);
   meshgen->QueryObject ()->SetName (name);
   meshGenerators.Push (meshgen);
   meshgen->DecRef ();
-  return meshgen;
+  return (iMeshGenerator*)meshgen;
 }
 
 iMeshGenerator* csSector::GetMeshGeneratorByName (const char* name)

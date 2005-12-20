@@ -15,6 +15,9 @@ chronological order.
 	  inverted in relation to screen space.
 	- res fixed some uninitialized csEvent members.
 	- res fixed a coordinate inversion in gl3d.
+	- Jorrit implemented the mesh generator loader and fixed a
+	  bug in meshgen. Added a test meshgen to terrainf but the engine
+	  doesn't yet show the generated meshes (still todo).
 19-Dec-2005
 	- Jorrit did more work on the mesh generator.
 	- Jorrit fixed a memory leak in md32spr as reported by Anuj Goyal

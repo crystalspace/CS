@@ -154,8 +154,8 @@ struct csMGCell
 /**
  * The mesh generator.
  */
-class csMeshGenerator : public scfImplementation1<
-	csMeshGenerator, iMeshGenerator>
+class csMeshGenerator : public scfImplementationExt1<
+	csMeshGenerator, csObject, iMeshGenerator>
 {
 private:
   /// All geometries.

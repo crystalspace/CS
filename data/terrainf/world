@@ -61,6 +61,9 @@
       <shadervar name="texture scale" type="vector2">16,16</shadervar>
       <shader type="terrain splat">terrain_fixed_splatting</shader>
     </material>
+    <material name="box">
+      <texture>stone4.gif</texture>
+    </material>
   </materials>
 
   <renderpriorities>
@@ -128,73 +131,20 @@
     </params>
   </meshfact>
 
-  <!--
-  <meshfact name="FoliageFact">
-    <plugin>foliageFact</plugin>
-    <params>
-      <terraformer>simple</terraformer>
-      <sampleregion>
-        <min x="-256" y="-256" />
-        <max x="256" y="256" />
-      </sampleregion>
-      <object name="oak">
-	<loddistance varm="LodM" vora="LodA" />
-	<geometry lod="0">
-	  <v x="0" y="0" z="0" u="0" v="u" nx="0" ny="0" nz="0" red="0" green="0" blue="0" />
-	  ...
-	  <t v1="0" v2="1" v3="2" />
-	  ...
-	  <material>xxx</material>
-	</geometry>
-	<geometry lod="1">
-	  <v x="0" y="0" z="0" u="0" v="u" nx="0" ny="0" nz="0" red="0" green="0" blue="0" />
-	  ...
-	  <t v1="0" v2="1" v3="2" />
-	  ...
-	  <material>xxx</material>
-	</geometry>
-      </object>
-      <foliagepalette>
-	<palette index="0">
-	  <foliage name="oak" density="1" />
-	  <foliage name="grass" density="10" />
-	</palette>
-	<palette index="1">
-	  <foliage name="grass" density="10" />
-	</palette>
-	<palette index="2">
-	  <foliage name="oak" density="1" />
-	  <foliage name="pine" density="1" />
-	  <foliage name="grass" density="4" />
-	</palette>
-      </foliagepalette>
-    </params>
+  <meshfact name="box">
+        <plugin>genmeshFactory</plugin>
+        <params>
+            <material>box</material>
+            <box>
+                <min x="-0.1" y="-0.1" z="-0.1" />
+                <max x="0.1" y="0.1" z="0.1" />
+            </box>
+	    <lighting>yes</lighting>
+	    <autonormals />
+	</params>
   </meshfact>
-  -->
 
   <sector name="room">
-  <!--
-     <meshgen name="grass">
-        <geometry>
-	    <factory maxdist="10" name="grass1" />
-	    <factory maxdist="20" name="grass2" />
-	    <radius>1</radius>
-	    <density>1</density>
-        </geometry>
-        <geometry>
-	    <factory maxdist="10" name="stone1" />
-	    <factory maxdist="20" name="stone2" />
-	    <radius>.5</radius>
-	    <density>1</density>
-        </geometry>
-	<mapping>
-	    <meshobj>Terrain</meshobj>
-	    <min x="-10" y="-10" z="-10" />
-	    <min x="10" y="10" z="10" />
-	</mapping>
-     </meshgen>
-  -->
-
      <light name="sun">
        <center x="-50000" y="86030" z="0" />
        <color red="0.85903" green="0.80995" blue="0.70420" />
@@ -240,6 +190,20 @@
         <v x="0" y="0" z="0" /> 
       </move>
     </meshobj>
+
+     <meshgen name="grass">
+        <geometry>
+	    <factory maxdist="20" name="box" />
+	    <radius>1</radius>
+	    <density>1</density>
+        </geometry>
+	<samplebox>
+	    <min x="-100" y="-10" z="-100" />
+	    <max x="100" y="10" z="100" />
+	</samplebox>
+	<meshobj>Terrain</meshobj>
+     </meshgen>
+
 
     <!-- Uncomment for ...fog: -->
     <!--fog red=".3" green=".27" blue=".27" density="0.002" /-->

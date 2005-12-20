@@ -59,6 +59,7 @@
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
 #include "iengine/scenenode.h"
+#include "iengine/meshgen.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "igraphic/imageio.h"
@@ -139,7 +140,8 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
   // @@@ in case the material is not found a replacement is taken.
   // however, somehow the location of the errorneous material name
   // should be reported. 
-  iMaterialWrapper* mat = Engine->FindMaterial (filename, curRegOnly ? region : 0);
+  iMaterialWrapper* mat = Engine->FindMaterial (filename,
+      curRegOnly ? region : 0);
   if (mat)
     return mat;
 
@@ -3583,6 +3585,100 @@ bool csLoader::ParseImposterSettings (iMeshWrapper* mesh, iDocumentNode *node)
   return true;
 }
 
+bool csLoader::LoadMeshGenGeometry (iLoaderContext* ldr_context,
+  	iDocumentNode* node, iMeshGenerator* meshgen)
+{
+  iMeshGeneratorGeometry* geom = meshgen->CreateGeometry ();
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_FACTORY:
+	{
+	  const char* factname = child->GetAttributeValue ("name");
+	  float maxdist = child->GetAttributeValueAsFloat ("maxdist");
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+	  if (!fact)
+	  {
+            SyntaxService->ReportError (
+	        "crystalspace.maploader.parse.meshgen",
+	        child, "Can't find mesh factory '%s' for mesh generator!",
+		factname);
+	    return false;
+	  }
+	  geom->AddFactory (fact, maxdist);
+	}
+        break;
+      case XMLTOKEN_RADIUS:
+	geom->SetRadius (child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_DENSITY:
+	geom->SetDensity (child->GetContentsValueAsFloat ());
+        break;
+      default:
+	SyntaxService->ReportBadToken (child);
+	return false;
+    }
+  }
+  return true;
+}
+
+bool csLoader::LoadMeshGen (iLoaderContext* ldr_context,
+	iDocumentNode* node, iSector* sector)
+{
+  const char* name = node->GetAttributeValue ("name");
+  iMeshGenerator* meshgen = sector->CreateMeshGenerator (name);
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_GEOMETRY:
+	if (!LoadMeshGenGeometry (ldr_context, child, meshgen))
+	  return false;
+        break;
+      case XMLTOKEN_MESHOBJ:
+	{
+	  const char* meshname = child->GetContentsValue ();
+	  iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
+	  if (!mesh)
+	  {
+            SyntaxService->ReportError (
+	        "crystalspace.maploader.parse.meshgen",
+	        child, "Can't find mesh object '%s' for mesh generator!",
+		meshname);
+	    return false;
+	  }
+	  meshgen->AddMesh (mesh);
+	}
+        break;
+      case XMLTOKEN_SAMPLEBOX:
+	{
+	  csBox3 b;
+	  if (!SyntaxService->ParseBox (child, b))
+	    return false;
+	  meshgen->SetSampleBox (b);
+	}
+        break;
+      default:
+	SyntaxService->ReportBadToken (child);
+	return false;
+    }
+  }
+  return true;
+}
+
 bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	iDocumentNode* node, iBase* context, bool is_meta,
 	iStreamSource* ssource)
@@ -4899,6 +4995,10 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	      loopName, secname);
 	  }
 	}
+	break;
+      case XMLTOKEN_MESHGEN:
+	if (!LoadMeshGen (ldr_context, child, sector))
+	  goto error;
 	break;
       case XMLTOKEN_ADDON:
 	if (!LoadAddOn (ldr_context, child, sector, false, ssource))
