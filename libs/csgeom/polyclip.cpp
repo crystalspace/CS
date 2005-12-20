@@ -244,7 +244,7 @@ uint8 csBoxClipper::Clip (
   size_t &OutCount,
   csBox2 &BoundingBox)
 {
-  if (!region.Overlap (BoundingBox)) return false;
+  if (!region.Overlap (BoundingBox)) return CS_CLIP_OUTSIDE;
 
   CrystalSpace::BoxClipper<BoxTestBbox, StatusOutputNone> boxClip
     (BoxTestBbox (BoundingBox, region), StatusOutputNone(), region,
@@ -401,7 +401,7 @@ uint8 csPolygonClipper::Clip (
   size_t &OutCount,
   csBox2 &BoundingBox)
 {
-  if (!ClipBox.Overlap (BoundingBox)) return false;
+  if (!ClipBox.Overlap (BoundingBox)) return CS_CLIP_OUTSIDE;
 
   uint8 rc = Clip (InPolygon, InCount, OutPolygon, OutCount);
   if (rc != CS_CLIP_OUTSIDE)

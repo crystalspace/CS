@@ -80,9 +80,9 @@ struct iPixTypeSpecifica
     int tx, int ty, int tw, int th, 
     uint8 Alpha) = 0;
   virtual void BlitScreenToTexture (uint8** line_table, int txt_w, int txt_h,
-    uint32* bitmap) = 0;
+    int scr_w, int scr_h, uint32* bitmap) = 0;
   virtual void BlitTextureToScreen (uint8** line_table, int txt_w, int txt_h,
-    uint32* bitmap) = 0;
+    int scr_w, int scr_h, uint32* bitmap) = 0;
 };
 
 /**
@@ -135,6 +135,7 @@ protected:
 
   /// If true then really rendering with a smaller size inside a larger window.
   bool do_smaller_rendering;
+  bool smallerActive;
 
   /// Buffer for smaller rendering.
   unsigned char* smaller_buffer;
@@ -154,10 +155,10 @@ protected:
   int width;
   /// pseudo height of display.
   int height;
-  /// Opt: width divided by 2.
-  int width2;
-  /// Opt: height divided by 2.
-  int height2;
+  /// Perspective center X.
+  int persp_center_x;
+  /// Perspective center X.
+  int persp_center_y;
   /// The pixel format of display
   csPixelFormat pfmt;
   bool pixelBGR;
@@ -165,7 +166,10 @@ protected:
   csReversibleTransform w2c;
 
   /// Current 2D clipper.
-  iClipper2D* clipper;
+  csRef<iClipper2D> clipper;
+  csRef<iClipper2D> userClipper;
+  bool clipperDirty;
+  csRect lastClipBox;
   /// Clipper type.
   int cliptype;
   /// Current near plane.
@@ -254,6 +258,8 @@ protected:
   int clipportal_floating;
 
   void SetupSpecifica();
+  void FlushSmallBufferToScreen();
+  void SetupClipper();
 public:
   /// Report
   void Report (int severity, const char* msg, ...);
@@ -275,6 +281,7 @@ public:
 
   /// Do interlacing? (-1 - no, 0/1 - yes)
   int do_interlaced;
+  bool ilaceActive;
 
   /// Render capabilities
   csGraphics3DCaps Caps;
@@ -357,14 +364,14 @@ public:
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y)
   {
-    width2 = x;
-    height2 = y;
+    persp_center_x = x;
+    persp_center_y = y;
   }
   /// Get center of projection.
   virtual void GetPerspectiveCenter (int& x, int& y) const
   {
-    x = width2;
-    y = height2;
+    x = persp_center_x;
+    y = persp_center_y;
   }
   /// Set perspective aspect.
   virtual void SetPerspectiveAspect (float aspect)
@@ -387,7 +394,7 @@ public:
   /// Get clipper.
   virtual iClipper2D* GetClipper ()
   {
-    return clipper;
+    return userClipper;
   }
   /// Get cliptype.
   virtual int GetClipType () const { return cliptype; }

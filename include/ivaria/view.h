@@ -63,7 +63,12 @@ struct iView : public virtual iBase
   /// Set Context
   virtual void SetContext (iGraphics3D *ig3d) = 0;
 
-  /// Set clipping rectangle.
+  /**
+   * Set clipping rectangle.
+   * \remarks The coordinates are vertically mirrored in comparison to screen
+   *   space, i.e. y=0 is at the bottom of the viewport, y=GetHeight() at the 
+   *   top.
+   */
   virtual void SetRectangle (int x, int y, int w, int h) = 0;
   /// Clear clipper in order to start building a polygon-based clipper.
   virtual void ClearView () = 0;

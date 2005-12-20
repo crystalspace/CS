@@ -63,18 +63,20 @@ const csEventID csEvent::GetName()
   return Name;
 }
 
-csEvent::csEvent ()
-  : scfImplementationType (this), attributes (53), count(0)
+csEvent::csEvent () :
+  scfImplementationType (this), attributes (53), count(0)
 {
+  Time = ~0;
+  Name = csInvalidStringID;
+  Broadcast = false;
 }
 
 csEvent::csEvent (csTicks iTime, csEventID iName, bool iBroadcast) :
-  scfImplementationType (this), attributes (53)
+  scfImplementationType (this), attributes (53), count (0)
 {
   Time = iTime;
   Name = iName;
   Broadcast = iBroadcast;
-  count = 0;
 }
 
 // Copy constructor

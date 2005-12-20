@@ -711,11 +711,18 @@ struct iGraphics3D : public virtual iBase
 
   /**
    * Set center of projection for perspective projection.
-   * Center is set in screen space coordinates.
+   * \remarks The coordinates are vertically mirrored in comparison to screen
+   *   space, i.e. y=0 is at the bottom of the viewport, y=GetHeight() at the 
+   *   top.
    */
   virtual void SetPerspectiveCenter (int x, int y) = 0;
 
-  /// Get perspective center.
+  /**
+   * Get perspective center.
+   * \remarks The coordinates are vertically mirrored in comparison to screen
+   *   space, i.e. y=0 is at the bottom of the viewport, y=GetHeight() at the 
+   *   top.
+   */
   virtual void GetPerspectiveCenter (int& x, int& y) const = 0;
 
   /**

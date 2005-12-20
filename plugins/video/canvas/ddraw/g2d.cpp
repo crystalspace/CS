@@ -531,21 +531,21 @@ bool csGraphics2DDDraw3::PerformExtensionV (char const* command, va_list args)
   {
     bool fs = bool(va_arg (args, int));
     if (fs != FullScreen
-     && (m_bAllowWindowed || fs))
+      && (m_bAllowWindowed || fs))
     {
       // Save window position
       if (!FullScreen)
         GetWindowRect (m_hWnd, &m_rcWindow);
       FullScreen = fs;
       if (FAILED(ChangeCoopLevel ()))
-	    Report (CS_REPORTER_SEVERITY_WARNING,
-	     "ChangeCoopLevel() failed!");
+        Report (CS_REPORTER_SEVERITY_WARNING,
+	  "ChangeCoopLevel() failed!");
     } 
     else
     {
       if (!(m_bAllowWindowed || fs))
         Report (CS_REPORTER_SEVERITY_NOTIFY,
-	     "Windowed mode not available!");
+	  "Windowed mode not available!");
     }
     return true;
   }

@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Dec-2005
+	- res fixed support for SR "smaller" rendering.
+	- res made the SR properly support the canvas clipping rect (which is
+	  supposed to effect 3D drawing as well).
+	- res clarified some docs for iGraphics3D methods which claimed to
+	  take coords in screen space but in fact take coordinates with Y
+	  inverted in relation to screen space.
+	- res fixed some uninitialized csEvent members.
 19-Dec-2005
 	- Jorrit did more work on the mesh generator.
 	- Jorrit fixed a memory leak in md32spr as reported by Anuj Goyal

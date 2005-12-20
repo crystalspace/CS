@@ -71,8 +71,8 @@ namespace cspluginSoft3d
   
       csDirtyAccessArray<csVector3>& persp = g3d->persp;
       persp.SetLength (num_vertices);
-      const int width2 = g3d->width2;
-      const int height2 = g3d->height2;
+      const int width2 = g3d->persp_center_x;
+      const int height2 = g3d->persp_center_y;
       const float aspect = g3d->aspect;
       csRenderBufferLock<csVector3, iRenderBuffer*> work_verts 
 	(activebuffers[VATTR_SPEC(POSITION)], CS_BUF_LOCK_READ);
@@ -202,25 +202,13 @@ namespace cspluginSoft3d
       }
 
       ClipMeatiClipper meat;
-      if (g3d->clipper)
-      {
-	meat.Init (g3d->clipper, maxClipVertices);
-	BuffersClipper<ClipMeatiClipper> clip (meat);
-	clip.Init (outPersp, clippedPersp.GetArray(),
-	  clipOutBuf, clipInStride, clipOutBuf2, 
-	  buffersMask & scanRenderInfoMesh.desiredBuffers);
-	return clip.DoClip (tri);
-      }
-      else
-      {
-	csBoxClipper boxClip (0, 0, g3d->GetWidth()-1, g3d->GetHeight()-1);;
-	meat.Init (&boxClip, maxClipVertices);
-	BuffersClipper<ClipMeatiClipper> clip (meat);
-	clip.Init (outPersp, clippedPersp.GetArray(),
-	  clipOutBuf, clipInStride, clipOutBuf2, 
-	  buffersMask & scanRenderInfoMesh.desiredBuffers);
-	return clip.DoClip (tri);
-      }
+      CS_ASSERT (g3d->clipper);
+      meat.Init (g3d->clipper, maxClipVertices);
+      BuffersClipper<ClipMeatiClipper> clip (meat);
+      clip.Init (outPersp, clippedPersp.GetArray(),
+        clipOutBuf, clipInStride, clipOutBuf2, 
+        buffersMask & scanRenderInfoMesh.desiredBuffers);
+      return clip.DoClip (tri);
     }
 
     int PickMipmap (size_t n)
@@ -278,7 +266,7 @@ namespace cspluginSoft3d
       return 0;
     }
 
-    bool NextTriangle (const csVector3*& clippedPersp, size_t& num,
+    bool NextTriangle (csVector3*& clippedPersp, size_t& num,
       uint a, uint b, uint c)
     {
       csTriangle tri;
@@ -351,7 +339,7 @@ namespace cspluginSoft3d
     {
       return (tri < triEnd) || nearClipTri2;
     }
-    void NextTri (const csVector3*& clippedPersp, size_t& num)
+    void NextTri (csVector3*& clippedPersp, size_t& num)
     {
       if (nearClipTri2)
       {
@@ -453,7 +441,7 @@ namespace cspluginSoft3d
   
       ProjectVertices (rangeStart, rangeEnd);
   
-      clipZNear.Init (g3d->width2, g3d->height2, g3d->aspect);
+      clipZNear.Init (g3d->persp_center_x, g3d->persp_center_y, g3d->aspect);
       bclipperZNear.Init (g3d->persp.GetArray(), outPersp,
 	clipInBuf, clipInStride, clipOutBuf, 
 	(buffersMask & scanRenderInfoMesh.desiredBuffers) 
@@ -497,14 +485,23 @@ namespace cspluginSoft3d
       const iScanlineRenderer::RenderInfoMesh& scanRenderInfoMesh,
       const csRenderMeshType meshtype, uint32* tri, const uint32* triEnd)
     {
-      polyrast.Init (g3d->pfmt, g3d->width, g3d->height, g3d->z_buffer,
-	g3d->line_table, g3d->do_interlaced);
+      int w, h;
+      if (g3d->smallerActive)
+      {
+	w = g3d->width/2; h = g3d->height/2;
+      }
+      else
+      {
+	w = g3d->width; h = g3d->height;
+      }
+      polyrast.Init (g3d->pfmt, w, h, g3d->z_buffer,
+	g3d->line_table, g3d->ilaceActive ? g3d->do_interlaced : -1);
       SetupDrawMesh (activebuffers, rangeStart, rangeEnd, mesh, 
 	scanRenderInfoMesh, meshtype, tri, triEnd);
 
       while (HasNextTri ())
       {
-	const csVector3* clippedPersp;
+	csVector3* clippedPersp;
 	size_t num;
 
 	NextTri (clippedPersp, num);
@@ -515,6 +512,14 @@ namespace cspluginSoft3d
 	  pix, scanRenderInfoMesh, scanRenderInfoTri,
 	  clipOutBuf2, buffersMask & scanRenderInfoMesh.desiredBuffers,
 	  floatsPerVert);
+	if (g3d->smallerActive)
+	{
+	  for (size_t i = 0; i < num; i++)
+	  {
+	    clippedPersp[i].x *= 0.5f;
+	    clippedPersp[i].y *= 0.5f;
+	  }
+	}
 	polyrast.DrawPolygon (num, clippedPersp, sll);
       }
   

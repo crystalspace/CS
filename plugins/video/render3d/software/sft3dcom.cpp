@@ -64,12 +64,13 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent) :
   scfiEventHandler = 0;
   texman = 0;
   partner = 0;
-  clipper = 0;
   cliptype = CS_CLIPPER_NONE;
+  clipperDirty = true;
   do_near_plane = false;
 
   do_interlaced = oldIlaceMode = -1;
   do_smaller_rendering = false;
+  smallerActive = false;
   smaller_buffer = 0;
   pixel_shift = 0;
   rstate_mipmap = 0;
@@ -121,12 +122,8 @@ csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
 
   Close ();
   if (partner) partner->DecRef ();
-  if (clipper)
-  {
-    clipper->DecRef ();
-    clipper = 0;
-    cliptype = CS_CLIPPER_NONE;
-  }
+  clipper = 0;
+  cliptype = CS_CLIPPER_NONE;
 }
 
 bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)
@@ -261,12 +258,8 @@ void csSoftwareGraphics3DCommon::Close ()
     texman->Clear();
     texman->DecRef(); texman = 0;
   }
-  if (clipper)
-  {
-    clipper->DecRef ();
-    clipper = 0;
-    cliptype = CS_CLIPPER_NONE;
-  }
+  clipper = 0;
+  cliptype = CS_CLIPPER_NONE;
 
   delete [] z_buffer; z_buffer = 0;
   delete [] smaller_buffer; smaller_buffer = 0;
@@ -285,24 +278,18 @@ void csSoftwareGraphics3DCommon::SetDimensions (int nwidth, int nheight)
 {
   display_width = nwidth;
   display_height = nheight;
-  if (do_smaller_rendering)
-  {
-    width = nwidth/2;
-    height = nheight/2;
-  }
-  else
-  {
-    width = nwidth;
-    height = nheight;
-  }
-  width2 = width/2;
-  height2 = height/2;
+  width = nwidth;
+  height = nheight;
+  persp_center_x = width/2;
+  persp_center_y = height/2;
 
   delete [] smaller_buffer;
   smaller_buffer = 0;
   if (do_smaller_rendering)
   {
-    smaller_buffer = new uint8 [(width*height) * pfmt.PixelBytes];
+    size_t smallSize = (width*height)/4 * pfmt.PixelBytes;
+    smaller_buffer = new uint8 [smallSize];
+    memset (smaller_buffer, 0, smallSize);
   }
 
   delete [] z_buffer;
@@ -315,12 +302,185 @@ void csSoftwareGraphics3DCommon::SetDimensions (int nwidth, int nheight)
 
 void csSoftwareGraphics3DCommon::SetClipper (iClipper2D* clip, int cliptype)
 {
-  if (clip) clip->IncRef ();
-  if (clipper) clipper->DecRef ();
-  clipper = clip;
-  if (!clipper) cliptype = CS_CLIPPER_NONE;
+  userClipper = clip;
+  if (!userClipper) cliptype = CS_CLIPPER_NONE;
   csSoftwareGraphics3DCommon::cliptype = cliptype;
+  clipperDirty = true;
+  clipper = 0;
 }
+
+template<typename T, int pixelMask1, int pixelMask2>
+class SmallBufferScaler
+{
+  static const T Mix2 (const T a, const T b)
+  {
+    const T a1 = a & pixelMask1;
+    const T a2 = a & pixelMask2;
+    const T b1 = b & pixelMask1;
+    const T b2 = b & pixelMask2;
+    return (((a1 >> 1) + (b1 >> 1)) & pixelMask1)
+      | (((a2 >> 1) + (b2 >> 1)) & pixelMask2);
+  }
+  static const T Mix4 (const T a, const T b, const T c, const T d)
+  {
+    const T a1 = a & pixelMask1;
+    const T a2 = a & pixelMask2;
+    const T b1 = b & pixelMask1;
+    const T b2 = b & pixelMask2;
+    const T c1 = c & pixelMask1;
+    const T c2 = c & pixelMask2;
+    const T d1 = d & pixelMask1;
+    const T d2 = d & pixelMask2;
+    return (((a1 >> 2) + (b1 >> 2) + (c1 >> 2) + (d1 >> 2)) & pixelMask1)
+      | (((a2 >> 2) + (b2 >> 2) + (c2 >> 2) + (d2 >> 2)) & pixelMask2);
+  }
+public:
+  static void ScaleUp (int scrwidth, int scrheight, int areax, int areay, 
+    int areaw, int areah, uint8** line_table, iGraphics2D* G2D)
+  {
+    const int width2 = scrwidth/2, height2 = scrheight/2;
+    const int srcStartX = (areax+1)/2;
+    const int srcEndXreal = ((areax+areaw) / 2);
+    const int srcEndX = csMin (srcEndXreal, width2-1);
+    const int srcStartY = (areay+1)/2;
+    const int srcEndYreal = ((areay+areah) / 2);
+    const int srcEndY = csMin (srcEndYreal, height2-1);
+    /* Right/bottom edges need special handling since there is no right and/or
+     * bottom pixel to use with interpolation. */
+    const bool hasRightEdge = srcEndY < srcEndYreal;
+    const bool hasBottomEdge = srcEndX < srcEndXreal;
+    int x, y;
+    for (y = srcStartY; y < srcEndY; y++)
+    {
+      T* src = (T*)line_table[y];
+      T* dst1 = (T*)G2D->GetPixelAt (0, y+y);
+      T* dst2 = (T*)G2D->GetPixelAt (0, y+y+1);
+      for (x = srcStartX; x < srcEndX; x++)
+      {
+	const T s00 = src[x];
+	const T s01 = src[x+width2];
+	const T s10 = src[x+1];
+	const T s11 = src[x+width2+1];
+
+	const T p00 = s00;
+	const T p10 = Mix2 (s00, s10);
+	const T p01 = Mix2 (s00, s01);
+	const T p11 = Mix4 (s00, s01, s10, s11);
+	dst1[x+x] = p00;
+	dst1[x+x+1] = p10;
+	dst2[x+x] = p01;
+	dst2[x+x+1] = p11;
+      }
+      if (hasRightEdge)
+      {
+        const T p00 = src[x];
+        const T p01 = Mix2 (p00, src[x+width2]);
+        dst1[x+x] = p00;
+        dst1[x+x+1] = p00;
+        dst2[x+x] = p01;
+        dst2[x+x+1] = p01;
+      }
+    }
+
+    if (hasBottomEdge)
+    {
+      T* src = (T*)line_table[y];
+      T* dst1 = (T*)G2D->GetPixelAt (0, y+y);
+      T* dst2 = (T*)G2D->GetPixelAt (0, y+y+1);
+      for (x = srcStartX; x < srcEndX; x++)
+      {
+        const T p00 = src[x];
+        const T p10 = Mix2 (p00, src[x+1]);
+        dst1[x+x] = p00;
+        dst1[x+x+1] = p10;
+        dst2[x+x] = p00;
+        dst2[x+x+1] = p10;
+      }
+      if (hasRightEdge)
+      {
+        const T p00 = src[x];
+        dst1[x+x] = p00;
+        dst1[x+x+1] = p00;
+        dst2[x+x] = p00;
+        dst2[x+x+1] = p00;
+      }
+    }
+  }
+};
+
+void csSoftwareGraphics3DCommon::FlushSmallBufferToScreen()
+{
+  csRect clipRect;
+  G2D->GetClipRect (clipRect.xmin, clipRect.ymin, clipRect.xmax, clipRect.ymax);
+  switch (pfmt.PixelBytes)
+  {
+    case 2:
+      if (pfmt.GreenBits == 5)
+	SmallBufferScaler<uint16, 0x781e, 0x03c0>::ScaleUp (width, height, 
+          clipRect.xmin, clipRect.ymin, clipRect.Width(), clipRect.Height(), line_table, G2D);
+      else
+	SmallBufferScaler<uint16, 0xf01e, 0x07c0>::ScaleUp (width, height, 
+          clipRect.xmin, clipRect.ymin, clipRect.Width(), clipRect.Height(), line_table, G2D);
+      break;
+    case 4:
+      SmallBufferScaler<uint32, 0xff00ff00, 0x00ff00ff>::ScaleUp (width, height, 
+        clipRect.xmin, clipRect.ymin, clipRect.Width(), clipRect.Height(), line_table, G2D);
+      break;
+  }
+}
+
+void csSoftwareGraphics3DCommon::SetupClipper()
+{
+  csRect clipBox;
+  G2D->GetClipRect (clipBox.xmin, clipBox.ymin, clipBox.xmax, clipBox.ymax);
+  if (!clipperDirty && (clipBox == lastClipBox)) return;
+  lastClipBox = clipBox;
+
+  int t = height - clipBox.ymin;
+  clipBox.ymin = height - clipBox.ymax;
+  clipBox.ymax = t;
+
+  if (userClipper.IsValid())
+  {
+    csBoxClipper boxClip (clipBox);
+    const size_t vertCount = userClipper->GetVertexCount();
+    size_t outCount = vertCount + 4;
+    
+    CS_ALLOC_STACK_ARRAY(csVector2, clippedPoly, outCount);
+    csBox2 bbox (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
+      CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE);
+    uint8 result = boxClip.Clip (userClipper->GetClipPoly(), vertCount, 
+      clippedPoly, outCount, bbox);
+    switch (result)
+    {
+      default:
+      case CS_CLIP_OUTSIDE:
+        clipper = 0;
+        break;
+      case CS_CLIP_INSIDE:
+        clipper = userClipper;
+        break;
+      case CS_CLIP_CLIPPED:
+        if (userClipper->GetClipperType() == iClipper2D::clipperBox)
+        {
+          clipper.AttachNew (new csBoxClipper (bbox));
+        }
+        else
+        {
+          clipper.AttachNew (new csPolygonClipper (clippedPoly, outCount, false, true));
+        }
+        break;
+    }
+  }
+  else
+  {
+    clipper.AttachNew (new csBoxClipper (clipBox));
+  }
+
+  clipperDirty = false;
+}
+
+#define CSDRAW_MASK2D3D	  (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS)
 
 bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
 {
@@ -333,20 +493,34 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
     SetDimensions (G2D->GetWidth(), G2D->GetHeight());
 
   // if 2D graphics is not locked, lock it
-  if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
-   && (!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
+  if ((DrawFlags & CSDRAW_MASK2D3D) && (!(DrawMode & CSDRAW_MASK2D3D)))
   {
     if (!G2D->BeginDraw())
       return false;
   }
+  bool wasSmallerActive = smallerActive;
+  smallerActive = do_smaller_rendering 
+    && ((DrawFlags & CSDRAW_MASK2D3D) == CSDRAW_3DGRAPHICS)
+    && !(render_target && !rt_onscreen);
+  ilaceActive = ((DrawFlags & CSDRAW_MASK2D3D) == CSDRAW_3DGRAPHICS);
 
-  // Initialize the line table.
+  if (wasSmallerActive && !smallerActive)
+  {
+    FlushSmallBufferToScreen();
+  }
+
   int i;
-  for (i = 0 ; i < height ; i++)
-    if (do_smaller_rendering)
-      line_table[i] = smaller_buffer + ((i*width)*pfmt.PixelBytes);
-    else
+  // Initialize the linetable.
+  if (smallerActive)
+  {
+    for (i = 0 ; i < height/2; i++)
+      line_table[i] = smaller_buffer + ((i*width/2)*pfmt.PixelBytes);
+  }
+  else
+  {
+    for (i = 0 ; i < height; i++)
       line_table[i] = G2D->GetPixelAt (0, i);
+  }
   
   polyrast_ZFill.Init (pfmt, width, height, z_buffer, line_table, 
     do_interlaced);
@@ -389,7 +563,8 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
 	    render_target->GetPrivateObject ();
       csSoftwareTexture *tex_0 = tex_mm->GetTexture (0);
       uint32* bitmap = tex_0->bitmap;
-      specifica->BlitTextureToScreen (line_table, txt_w, txt_h, bitmap);
+      specifica->BlitTextureToScreen (line_table, txt_w, txt_h, 
+	width, height, bitmap);
       rt_onscreen = true;
     }
   }
@@ -399,63 +574,6 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
 
   if (DrawFlags & CSDRAW_CLEARSCREEN)
     G2D->Clear (0);
-
-  if (DrawMode & CSDRAW_3DGRAPHICS)
-  {
-    // Finished 3D drawing. If we are simulating the flush output to real frame buffer.
-    if (do_smaller_rendering)
-    {
-      int x, y;
-      switch (pfmt.PixelBytes)
-      {
-        case 2:
-          if (pfmt.GreenBits == 5)
-            for (y = 0 ; y < height ; y++)
-            {
-              uint16* src = (uint16*)line_table[y];
-              uint16* dst1 = (uint16*)G2D->GetPixelAt (0, y+y);
-              uint16* dst2 = (uint16*)G2D->GetPixelAt (0, y+y+1);
-              for (x = 0 ; x < width ; x++)
-              {
-                dst1[x+x] = src[x];
-                dst1[x+x+1] = ((src[x]&0x7bde)>>1) + ((src[x+1]&0x7bde)>>1);
-                dst2[x+x] = ((src[x]&0x7bde)>>1) + ((src[x+width]&0x7bde)>>1);
-                dst2[x+x+1] = ((dst1[x+x+1]&0x7bde)>>1) + ((dst2[x+x]&0x7bde)>>1);
-              }
-            }
-          else
-            for (y = 0 ; y < height ; y++)
-            {
-              uint16* src = (uint16*)line_table[y];
-              uint16* dst1 = (uint16*)G2D->GetPixelAt (0, y+y);
-              uint16* dst2 = (uint16*)G2D->GetPixelAt (0, y+y+1);
-              for (x = 0 ; x < width ; x++)
-              {
-                dst1[x+x] = src[x];
-                dst1[x+x+1] = ((src[x]&0xf7de)>>1) + ((src[x+1]&0xf7de)>>1);
-                dst2[x+x] = ((src[x]&0xf7de)>>1) + ((src[x+width]&0xf7de)>>1);
-                dst2[x+x+1] = ((dst1[x+x+1]&0xf7de)>>1) + ((dst2[x+x]&0xf7de)>>1);
-              }
-            }
-          break;
-        case 4:
-          for (y = 0 ; y < height ; y++)
-          {
-            uint32* src = (uint32*)line_table[y];
-            uint32* dst1 = (uint32*)G2D->GetPixelAt (0, y+y);
-            uint32* dst2 = (uint32*)G2D->GetPixelAt (0, y+y+1);
-            for (x = 0 ; x < width ; x++)
-            {
-              dst1[x+x] = src[x];
-              dst1[x+x+1] = ((src[x]&0xfefefe)>>1) + ((src[x+1]&0xfefefe)>>1);
-              dst2[x+x] = ((src[x]&0xfefefe)>>1) + ((src[x+width]&0xfefefe)>>1);
-              dst2[x+x+1] = ((dst1[x+x+1]&0xfefefe)>>1) + ((dst2[x+x]&0xfefefe)>>1);
-            }
-          }
-          break;
-      }
-    }
-  }
 
   DrawMode = DrawFlags;
   return true;
@@ -470,10 +588,19 @@ void csSoftwareGraphics3DCommon::Print (csRect const* area)
 
 void csSoftwareGraphics3DCommon::FinishDraw ()
 {
+  if (smallerActive)
+    FlushSmallBufferToScreen();
+
   if (render_target)
   {
     if (rt_onscreen)
     {
+      if (smallerActive)
+      {
+	// Need full line table since we copy from there.
+	for (int i = 0 ; i < height; i++)
+	  line_table[i] = G2D->GetPixelAt (0, i);
+      }
       rt_onscreen = false;
       int txt_w, txt_h;
       render_target->GetRendererDimensions (txt_w, txt_h);
@@ -481,7 +608,8 @@ void csSoftwareGraphics3DCommon::FinishDraw ()
 	    render_target->GetPrivateObject ();
       csSoftwareTexture *tex_0 = tex_mm->GetTexture (0);
       uint32* bitmap = tex_0->bitmap;
-      specifica->BlitScreenToTexture (line_table, txt_w, txt_h, bitmap);
+      specifica->BlitScreenToTexture (line_table, txt_w, txt_h, 
+	width, height, bitmap);
       
       if (ilaceRestore)
       {
@@ -762,7 +890,8 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
       0.0f, -1.0f, 0.0f,
       0.0f, 0.0f, 1.0f));
     camtrans.SetO2TTranslation (csVector3 (
-      float (width2), float (GetHeight() - height2), -aspect));
+      float (persp_center_x), 
+      float (GetHeight() - persp_center_y), -aspect));
 
     SetWorldToCamera (camtrans.GetInverse ());
   }
@@ -867,6 +996,9 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 {
   ScanlineRendererHelper aNameThatDoesNotReallyMatter (this);
   if (!scanlineRenderer) return;
+
+  SetupClipper();
+  if (!clipper) return;
 
   csRenderMeshModes usedModes (modes);
   if (zBufMode == CS_ZBUF_MESH2)
