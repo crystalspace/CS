@@ -104,7 +104,8 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
   {
     csRef<iEventNameRegistry> nameRegistry = 
       csQueryRegistry<iEventNameRegistry> (object_reg);
-    return GetID(nameRegistry, name);
+    CS_ASSERT (nameRegistry);
+    return nameRegistry->GetID (name);
   };
 
   static inline bool IsKindOf (iEventNameRegistry *name_reg,
@@ -121,7 +122,7 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
     csRef<iEventNameRegistry> nameRegistry =
       csQueryRegistry<iEventNameRegistry> (object_reg);
     CS_ASSERT(nameRegistry);
-    return IsKindOf(nameRegistry, name1, name2);
+    return nameRegistry->IsKindOf (name1, name2);
   };
 
  private:

@@ -20,6 +20,8 @@ chronological order.
 	  doesn't yet show the generated meshes (still todo).
 	- Adam implemented a unit test for csInputDefinition and fixed a 
 	  couple of bugs in the parser/constructor.
+	- Adam removed an unnecessary resolution layer from static
+	  csEventNameRegistry methods.
 19-Dec-2005
 	- Jorrit did more work on the mesh generator.
 	- Jorrit fixed a memory leak in md32spr as reported by Anuj Goyal
