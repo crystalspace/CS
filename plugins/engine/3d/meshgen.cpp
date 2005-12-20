@@ -125,6 +125,8 @@ csMeshGenerator::csMeshGenerator() : scfImplementationType (this)
   inuse_blocks_last = 0;
 
   prev_cells.MakeEmpty ();
+
+  setup_cells = false;
 }
 
 csMeshGenerator::~csMeshGenerator ()
@@ -133,7 +135,7 @@ csMeshGenerator::~csMeshGenerator ()
   while (inuse_blocks)
   {
     csMGPositionBlock* n = inuse_blocks->next;
-    delete n;
+    delete inuse_blocks;
     inuse_blocks = n;
   }
 }
@@ -157,6 +159,13 @@ float csMeshGenerator::GetTotalMaxDist ()
 void csMeshGenerator::SetSampleBox (const csBox3& box)
 {
   samplebox = box;
+  setup_cells = false;
+}
+
+void csMeshGenerator::SetupSampleBox ()
+{
+  if (setup_cells) return;
+  setup_cells = true;
   samplefact_x = float (cell_dim) / (samplebox.MaxX () - samplebox.MinX ());
   samplefact_z = float (cell_dim) / (samplebox.MaxZ () - samplebox.MinZ ());
   samplecellwidth_x = 1.0f / samplefact_x;
@@ -171,6 +180,10 @@ void csMeshGenerator::SetSampleBox (const csBox3& box)
       float wx = GetWorldX (x);
       cells[idx].box.Set (wx, wz, wx + samplecellwidth_x,
 	      wz + samplecellheight_z);
+      // Here we need to calculate the meshe relevant for this cell (i.e.
+      // meshes that intersect this cell as seen in 2D space).
+      // @@@ For now we just copy the list of meshes from csMeshGenerator.
+      cells[idx].meshes = meshes;
       idx++;
     }
   }
@@ -188,13 +201,30 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
   // @@@ TODO: use density.
   // This is just a test.
   float x, z;
+  size_t i;
   csMGPosition pos;
   for (z = box.MinY () ; z < box.MaxY () ; z++)
     for (x = box.MinX () ; x < box.MaxX () ; x++)
     {
-      pos.position.Set (x+.5, 0.0f, z+.5);
-      pos.geom_type = 0;	// @@@ Temporary.
-      block->positions.Push (pos);
+      csVector3 start (x+.5, samplebox.MaxY (), z+.5);
+      csVector3 end = start;
+      end.y = samplebox.MinY ();
+      bool hit = false;
+      for (i = 0 ; i < cell.meshes.Length () ; i++)
+      {
+        csHitBeamResult rc = cell.meshes[i]->HitBeam (start, end);
+	if (rc.hit)
+	{
+          pos.position = rc.isect;
+	  end.y = rc.isect.y + 0.0001;
+	  hit = true;
+	}
+      }
+      if (hit)
+      {
+        pos.geom_type = 0;	// @@@ Temporary.
+        block->positions.Push (pos);
+      }
     }
 }
 
@@ -270,10 +300,11 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
   size_t i;
   for (i = 0 ; i < positions.Length () ; i++)
   {
-    if (!positions[i].mesh)
+    float sqdist = csSquaredDist::PointPoint (pos, positions[i].position);
+    if (sqdist < sq_total_max_dist)
     {
-      float sqdist = csSquaredDist::PointPoint (pos, positions[i].position);
-      if (sqdist < sq_total_max_dist)
+      // @@@ Even if there is a mesh we might need to change lod level here!
+      if (!positions[i].mesh)
       {
         csRef<iMeshWrapper> mesh = geometries[positions[i].geom_type]
 		->AllocMesh (sqdist);
@@ -283,11 +314,21 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
 	mesh->GetMovable ()->UpdateMove ();
       }
     }
+    else
+    {
+      if (positions[i].mesh)
+      {
+        geometries[positions[i].geom_type]->FreeMesh (positions[i].mesh);
+        positions[i].mesh = 0;
+      }
+    }
   }
 }
 
 void csMeshGenerator::AllocateBlocks (const csVector3& pos)
 {
+  SetupSampleBox ();
+  
   int cellx = GetCellX (pos.x);
   int cellz = GetCellZ (pos.z);
 
@@ -295,8 +336,8 @@ void csMeshGenerator::AllocateBlocks (const csVector3& pos)
   float md = GetTotalMaxDist ();
   float sqmd = md * md;
   // Same in cell counts:
-  int cell_x_md = int (md * samplefact_x);
-  int cell_z_md = int (md * samplefact_z);
+  int cell_x_md = 1+int (md * samplefact_x);
+  int cell_z_md = 1+int (md * samplefact_z);
 
   // @@@ This can be done more efficiently.
   csVector2 pos2d (pos.x, pos.z);

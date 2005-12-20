@@ -179,6 +179,12 @@ private:
   float samplecellwidth_x;
   float samplecellheight_z;
 
+  /**
+   * If true the cells are correctly set up. This is cleared by
+   * changing the sample box.
+   */
+  bool setup_cells;
+
   /// 2-dimensional array of cells with cell_dim*cell_dim entries.
   csMGCell* cells;
   int cell_dim;
@@ -255,6 +261,11 @@ public:
    * then we take the block we needed last from 'inuse_blocks'.
    */
   void AllocateBlocks (const csVector3& pos);
+
+  /**
+   * Make sure that the sample box dependend data is correctly set up.
+   */
+  void SetupSampleBox ();
 
   virtual iObject *QueryObject () { return (iObject*)this; }
 

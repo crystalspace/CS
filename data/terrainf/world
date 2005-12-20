@@ -61,8 +61,11 @@
       <shadervar name="texture scale" type="vector2">16,16</shadervar>
       <shader type="terrain splat">terrain_fixed_splatting</shader>
     </material>
-    <material name="box">
-      <texture>stone4.gif</texture>
+    <material name="box1">
+      <texture>grass.png</texture>
+    </material>
+    <material name="box2">
+      <texture>andrew_marble4.jpg</texture>
     </material>
   </materials>
 
@@ -131,10 +134,23 @@
     </params>
   </meshfact>
 
-  <meshfact name="box">
+  <meshfact name="box1">
         <plugin>genmeshFactory</plugin>
         <params>
-            <material>box</material>
+            <material>box1</material>
+            <box>
+                <min x="-0.1" y="-0.1" z="-0.1" />
+                <max x="0.1" y="0.1" z="0.1" />
+            </box>
+	    <lighting>yes</lighting>
+	    <autonormals />
+	</params>
+  </meshfact>
+
+  <meshfact name="box2">
+        <plugin>genmeshFactory</plugin>
+        <params>
+            <material>box2</material>
             <box>
                 <min x="-0.1" y="-0.1" z="-0.1" />
                 <max x="0.1" y="0.1" z="0.1" />
@@ -193,13 +209,14 @@
 
      <meshgen name="grass">
         <geometry>
-	    <factory maxdist="20" name="box" />
+	    <factory maxdist="10" name="box1" />
+	    <factory maxdist="20" name="box2" />
 	    <radius>1</radius>
 	    <density>1</density>
         </geometry>
 	<samplebox>
-	    <min x="-256" y="-10" z="-256" />
-	    <max x="256" y="10" z="256" />
+	    <min x="-256" y="-200" z="-256" />
+	    <max x="256" y="200" z="256" />
 	</samplebox>
 	<meshobj>Terrain</meshobj>
      </meshgen>
