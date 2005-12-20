@@ -107,7 +107,7 @@ bool csWindowsJoystick::HandleEvent (iEvent& ev)
       jd.device->Acquire();  // try to reacquire
       // ... and try again
       hr = jd.device->GetDeviceState ((DWORD)sizeof (DIJOYSTATE2), 
-	(LPVOID)&jd.state[nstate].di);
+        (LPVOID)&jd.state[nstate].di);
     } 
     if (SUCCEEDED (hr))
     {
@@ -116,23 +116,22 @@ bool csWindowsJoystick::HandleEvent (iEvent& ev)
       int last_state=1-nstate;
       for (int btn = 0; btn < 128; btn++) 
       {
-	if (jd.state[nstate].di.rgbButtons[btn] != 
-	    jd.state[last_state].di.rgbButtons[btn]) 
-	{
-	  int32 axdata[2] = { jd.state[nstate].di.lX, jd.state[nstate].di.lY };
+    	if (jd.state[nstate].di.rgbButtons[btn] != 
+            jd.state[last_state].di.rgbButtons[btn]) 
+        {
           EventOutlet->Joystick (jd.number, btn, 
-				 jd.state[nstate].di.rgbButtons[btn] != 0,
-				 jd.state[nstate].axes.GetArray(), jd.nAxes);
-	}
+            jd.state[nstate].di.rgbButtons[btn] != 0,
+            jd.state[nstate].axes.GetArray(), jd.nAxes);
+        }
       }    
       for (uint a = 0; a < jd.nAxes; a++)
       {
         if (jd.state[nstate].axes[a] != jd.state[last_state].axes[a])
-	{
+        {
           EventOutlet->Joystick (jd.number, -1, 0,
-	    jd.state[nstate].axes.GetArray(), jd.nAxes);
-	  break;
-	}
+            jd.state[nstate].axes.GetArray(), jd.nAxes);
+          break;
+        }
       }
       jd.nstate=last_state;
     }
@@ -205,7 +204,7 @@ bool csWindowsJoystick::Init ()
     if (!g2d.IsValid())
     {
       Report(CS_REPORTER_SEVERITY_ERROR, 
-	"A canvas is required");
+        "A canvas is required");
       return false;
     }
     csRef<iWin32Canvas> canvas = scfQueryInterface<iWin32Canvas> (g2d);
@@ -226,16 +225,16 @@ bool csWindowsJoystick::Init ()
       hr = jd.device->GetDeviceInfo (&devInfo);
       if (FAILED (hr))
       {
-	Report (CS_REPORTER_SEVERITY_WARNING, 
-	  "Can't retrieve device information for #%zu: error %.8lx", i, hr);
+        Report (CS_REPORTER_SEVERITY_WARNING, 
+          "Can't retrieve device information for #%zu: error %.8lx", i, hr);
       }
       else
       {
-	wchar_t* devProduct = cswinAnsiToWide (devInfo.tszProductName);
+        wchar_t* devProduct = cswinAnsiToWide (devInfo.tszProductName);
         Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "Found input device #%d: %s", jd.number, 
-	  (const char*)csWtoC (devProduct));
-	delete[] devProduct;
+          "Found input device #%d: %s", jd.number, 
+          (const char*)csWtoC (devProduct));
+        delete[] devProduct;
       }
     
 #ifdef CS_DEBUG
