@@ -40,6 +40,9 @@ chronological order.
 	  meshes now. Still not correct though. Density is ignored. The
 	  height of the meshes is ignored and meshes are not properly cleaned
 	  up when you go away from them.
+	- res added SR support to the terrain_fixed_* shaders.
+	- res augmented the SR to support index buffers with data types other
+	  than 'uint'.
 19-Dec-2005
 	- Jorrit did more work on the mesh generator.
 	- Jorrit fixed a memory leak in md32spr as reported by Anuj Goyal

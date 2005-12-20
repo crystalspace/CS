@@ -138,4 +138,18 @@
       </fp>
     </pass>
   </technique>
+
+  <!-- Yes. Software. -->
+  <technique priority="75">
+    <pass>
+      <texture name="tex diffuse" destination="unit 0" />
+      <vp plugin="software" />
+      <fp plugin="software">
+	<softfp>
+	  <flatcolor type="shadervar">mat flatcolor</flatcolor>
+	  <colorfactor type="float">2</colorfactor>
+	</softfp>
+      </fp>
+    </pass>
+  </technique>
 </shader>

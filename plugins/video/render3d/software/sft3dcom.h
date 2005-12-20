@@ -70,7 +70,8 @@ struct iTriangleDrawer
     size_t rangeStart, size_t rangeEnd, 
     const csCoreRenderMesh* mesh, 
     const iScanlineRenderer::RenderInfoMesh& scanRenderInfoMesh,
-    const csRenderMeshType meshtype, uint* tri, const uint* triEnd) = 0;
+    const csRenderMeshType meshtype, uint8* tri, const uint8* triEnd,
+    csRenderBufferComponentType compType) = 0;
 };
 
 struct iPixTypeSpecifica

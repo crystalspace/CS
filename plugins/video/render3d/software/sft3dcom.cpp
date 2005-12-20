@@ -1053,7 +1053,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   }
   CS_ASSERT(indexbuf);
 
-  csRenderBufferLock<uint, iRenderBuffer*> indices (indexbuf, CS_BUF_LOCK_READ);
+  csRenderBufferLock<uint8, iRenderBuffer*> indices (indexbuf, CS_BUF_LOCK_READ);
 
   const csMatrix3& w2c_m = w2c.GetO2T();
   const csMatrix3& o2w_m = mesh->object2world.GetO2T();
@@ -1123,15 +1123,18 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   if ((meshtype >= CS_MESHTYPE_TRIANGLES) 
     && (meshtype <= CS_MESHTYPE_TRIANGLEFAN))
   {
-    uint* tri = indices + mesh->indexstart;
-    const uint* triEnd = indices + mesh->indexend;
+    const csRenderBufferComponentType compType =
+      indexbuf->GetComponentType();
+    size_t indexSize = csRenderBufferComponentSizes[compType];
+    uint8* tri = indices + mesh->indexstart*indexSize;
+    const uint8* triEnd = indices + mesh->indexend*indexSize;
 
     const uint triDrawIndex = 
       CS_MIXMODE_BLENDOP_SRC(usedModes.mixmode)*CS_MIXMODE_FACT_COUNT
       + CS_MIXMODE_BLENDOP_DST(usedModes.mixmode);
 
     triDraw[triDrawIndex]->DrawMesh (activebuffers, rangeStart, rangeEnd, mesh, 
-      renderInfoMesh, meshtype, tri, triEnd);
+      renderInfoMesh, meshtype, tri, triEnd, compType);
   }
 }
 

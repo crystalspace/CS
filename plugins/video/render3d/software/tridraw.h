@@ -56,10 +56,81 @@ namespace cspluginSoft3d
 
     // Info to go over triangles
     csRenderMeshType meshtype;
-    uint* tri;
-    const uint* triEnd;
+    uint8* tri;
+    const uint8* triEnd;
+    csRenderBufferComponentType compType;
     uint old2, old1;
+    bool stripFlag;
     int quadPart;
+
+    /// Fetch the next triangle from the index buffer
+    uint GetNextTri()
+    {
+      uint r;
+      switch (compType)
+      {
+        default:
+          CS_ASSERT(false);
+        case CS_BUFCOMP_BYTE:
+          r = *(char*)tri;
+          tri += sizeof (char);
+          break;
+        case CS_BUFCOMP_UNSIGNED_BYTE:
+          r = *(unsigned char*)tri;
+          tri += sizeof (unsigned char);
+          break;
+        case CS_BUFCOMP_SHORT:
+          r = *(short*)tri;
+          tri += sizeof (short);
+          break;
+        case CS_BUFCOMP_UNSIGNED_SHORT:
+          r = *(unsigned short*)tri;
+          tri += sizeof (unsigned short);
+          break;
+        case CS_BUFCOMP_INT:
+          r = *(int*)tri;
+          tri += sizeof (int);
+          break;
+        case CS_BUFCOMP_UNSIGNED_INT:
+          r = *(unsigned int*)tri;
+          tri += sizeof (unsigned int);
+          break;
+        case CS_BUFCOMP_FLOAT:
+          r = *(float*)tri;
+          tri += sizeof (float);
+          break;
+        case CS_BUFCOMP_DOUBLE:
+          r = *(double*)tri;
+          tri += sizeof (double);
+          break;
+      }
+      return r;
+    }
+    uint GetTri (size_t index)
+    {
+      switch (compType)
+      {
+        default:
+          CS_ASSERT(false);
+        case CS_BUFCOMP_BYTE:
+          return ((char*)tri)[index];
+        case CS_BUFCOMP_UNSIGNED_BYTE:
+          return ((unsigned char*)tri)[index];
+        case CS_BUFCOMP_SHORT:
+          return ((short*)tri)[index];
+        case CS_BUFCOMP_UNSIGNED_SHORT:
+          return ((unsigned short*)tri)[index];
+        case CS_BUFCOMP_INT:
+          return ((int*)tri)[index];
+        case CS_BUFCOMP_UNSIGNED_INT:
+          return ((unsigned int*)tri)[index];
+        case CS_BUFCOMP_FLOAT:
+          return ((float*)tri)[index];
+        case CS_BUFCOMP_DOUBLE:
+          return ((double*)tri)[index];
+      }
+      return 0;
+    }
 
     /* Near clipping may produces 2 tris, needs some special handling.
      * Indicated by this flag. */
@@ -313,11 +384,12 @@ namespace cspluginSoft3d
     }
   public:
     void BeginTriangulate (csRenderMeshType meshtype, 
-      uint32* tri, const uint32* triEnd)
+      uint8* tri, const uint8* triEnd, csRenderBufferComponentType compType)
     { 
       this->meshtype = meshtype;
       this->tri = tri;
       this->triEnd = triEnd;
+      this->compType = compType;
       nearClipTri2 = false;
       quadPart = 0;
 
@@ -326,8 +398,8 @@ namespace cspluginSoft3d
       case CS_MESHTYPE_TRIANGLESTRIP:
       case CS_MESHTYPE_TRIANGLEFAN:
 	{
-	  old2 = *tri++;
-	  old1 = *tri++;
+	  old2 = GetNextTri();
+	  old1 = GetNextTri();
 	  break;
 	}
       default:
@@ -357,21 +429,24 @@ namespace cspluginSoft3d
 	{
 	case CS_MESHTYPE_TRIANGLES:
 	  {
-	    hasTri = NextTriangle (clippedPersp, num, tri[0], tri[1], tri[2]);
-	    tri += 3;
+	    hasTri = NextTriangle (clippedPersp, num, GetTri (0), GetTri (1), GetTri (2));
+	    tri += 3*csRenderBufferComponentSizes[compType];
 	  }
 	  break;
 	case CS_MESHTYPE_TRIANGLESTRIP:
 	  {
-	    const uint32 cur = *tri++;
-	    hasTri = NextTriangle (clippedPersp, num, old2, old1, cur);
-	    old2 = old1;
-	    old1 = cur;
+	    const uint cur = GetNextTri();
+	    hasTri = NextTriangle (clippedPersp, num, old1, old2, cur);
+            if (stripFlag)
+	      old2 = cur;
+            else
+              old1 = cur;
+            stripFlag = !stripFlag;
 	    break;
 	  }
 	case CS_MESHTYPE_TRIANGLEFAN:
 	  {
-	    const uint32 cur = *tri++;
+	    const uint cur = GetNextTri();
 	    hasTri = NextTriangle (clippedPersp, num, old2, old1, cur);
 	    old1 = cur;
 	    break;
@@ -379,11 +454,11 @@ namespace cspluginSoft3d
 	case CS_MESHTYPE_QUADS:
 	  {
 	    if (quadPart == 0)
-	      hasTri = NextTriangle (clippedPersp, num, tri[0], tri[1], tri[2]);
+	      hasTri = NextTriangle (clippedPersp, num, GetTri (0), GetTri (1), GetTri (2));
 	    else
 	    {
-	      hasTri = NextTriangle (clippedPersp, num, tri[0], tri[2], tri[3]);
-	      tri += 4;
+	      hasTri = NextTriangle (clippedPersp, num, GetTri (0), GetTri (2), GetTri (3));
+	      tri += 4*csRenderBufferComponentSizes[compType];
 	    }
 	    quadPart ^= 1;
 	    break;
@@ -397,7 +472,8 @@ namespace cspluginSoft3d
     void SetupDrawMesh (iRenderBuffer* activebuffers[], size_t rangeStart, 
       size_t rangeEnd, const csCoreRenderMesh* mesh,
       const iScanlineRenderer::RenderInfoMesh& scanRenderInfoMesh,
-      const csRenderMeshType meshtype, uint* tri, const uint* triEnd)
+      const csRenderMeshType meshtype, uint8* tri, const uint8* triEnd,
+      csRenderBufferComponentType compType)
     {
       this->activebuffers = activebuffers;
       do_mirror = mesh->do_mirror;
@@ -447,7 +523,7 @@ namespace cspluginSoft3d
 	(buffersMask & scanRenderInfoMesh.desiredBuffers) 
 	  | (CS_SOFT3D_BUFFERFLAG(POSITION)));
 
-      BeginTriangulate (meshtype, tri, triEnd);
+      BeginTriangulate (meshtype, tri, triEnd, compType);
     }
     void FinishDrawMesh ()
     {
@@ -459,7 +535,7 @@ namespace cspluginSoft3d
     }
   public:
     TriangleDrawerCommon (csSoftwareGraphics3DCommon* g3d) : g3d(g3d),
-      bclipperZNear(clipZNear)
+      bclipperZNear(clipZNear), stripFlag (false)
     {}
   };
 
@@ -483,7 +559,8 @@ namespace cspluginSoft3d
     void DrawMesh (iRenderBuffer* activebuffers[], size_t rangeStart, 
       size_t rangeEnd, const csCoreRenderMesh* mesh,
       const iScanlineRenderer::RenderInfoMesh& scanRenderInfoMesh,
-      const csRenderMeshType meshtype, uint32* tri, const uint32* triEnd)
+      const csRenderMeshType meshtype, uint8* tri, const uint8* triEnd,
+      csRenderBufferComponentType compType)
     {
       int w, h;
       if (g3d->smallerActive)
@@ -497,7 +574,7 @@ namespace cspluginSoft3d
       polyrast.Init (g3d->pfmt, w, h, g3d->z_buffer,
 	g3d->line_table, g3d->ilaceActive ? g3d->do_interlaced : -1);
       SetupDrawMesh (activebuffers, rangeStart, rangeEnd, mesh, 
-	scanRenderInfoMesh, meshtype, tri, triEnd);
+	scanRenderInfoMesh, meshtype, tri, triEnd, compType);
 
       while (HasNextTri ())
       {

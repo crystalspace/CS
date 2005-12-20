@@ -103,10 +103,12 @@
   </technique>
   
   <!-- Some HW doesn't even handle the linear fog correctly at all. 
+       SW doesn't support it.
        Effectively disable splatting there. (controlled through linear_fog
        tag.) -->
        
 <?else?>
-  <fallbackshader name="std_lighting" />
+  <!-- @@@ FIXME: with SR that always seems to get used. Why? -->
+  <!--fallbackshader name="std_lighting" /-->
 <?endif?>
 </shader>
