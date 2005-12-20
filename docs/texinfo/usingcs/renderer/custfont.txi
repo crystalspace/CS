@@ -25,7 +25,7 @@ server for a font, but also can search multiple fonts for a glyph.  This is
 especially important if you plan to internationalize your applications; it
 reduces the worry that a particular font supports the glyphs for a specific
 language.  (Crystal Space ships with the @sc{gnu} Unifont, which is used as a
-fallback, so it already pretty good support for internationalization
+fallback, so it already has pretty good support for internationalization
 out-of-the-box.)
 
 @subsubheading Standard Fonts
@@ -67,12 +67,8 @@ Font = G2D->GetFontServer()->LoadFont (CSFONT_LARGE);
 
 @subsubheading Loadable Fonts
 
-The default font server will also look for a file in 
-the virtual file system with the name specified.  The
-file must be in the "csf" font format.  This format is
-pretty simple binary format that supports individual characters
-with different widths and optionally an alpha component
-to provide anti-aliasing.
+The font plexer will also look for a file in the virtual file system with the
+name specified.  The font can be a TrueType font or in the custom @sc{csf} format.
 
 To specify an alternate font simply use the LoadFont method
 with the file name (and optionally a size) such as:
@@ -81,11 +77,17 @@ with the file name (and optionally a size) such as:
 Font = G2D->GetFontServer()->LoadFont ("/fonts/ttf/Vera.ttf", 12);
 @end example
 
-@subsubheading Creating New Loadable Fonts
+The @sc{csf} format is a pretty simple binary format for non-scalable fonts 
+that supports individual characters with different widths and optionally an
+alpha component to provide anti-aliasing.
 
-The easiest way to create a loadable font is to
-use the @file{csfgen} util that comes with CS. It converts 
-a True Type font to the @sc{csf} format.
+However, using a TrueType font is usually more flexible and results in a 
+higher quality than a @sc{csf} font.
+
+@subsubheading Creating @sc{csf} Fonts
+
+The easiest way to is to use the @file{csfgen} util that comes with CS. 
+It converts a True Type font to the @sc{csf} format.
 
 Once the @sc{csf} file is created it can be included
 in the application no matter what platforms are 

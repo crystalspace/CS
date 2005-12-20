@@ -23,7 +23,7 @@ red.
 
 @subsubheading Allowed Parameters
 
-@multitable @columnfractions .10 .5 .40 .45
+@multitable @columnfractions .10 .10 .30 .45
 @item @emph{Name} @tab @emph{Required} @tab @emph{Example} @tab @emph{Description}
 @item @code{cx}
 @tab  yes

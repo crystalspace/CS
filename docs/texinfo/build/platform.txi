@@ -15,6 +15,7 @@ find a reference to it from within the instructions in this section.
 
 @menu
 * Unix::
+* WinCVS Tutorial::
 * MSVC:: Windows using Microsoft Visual C++
 * MinGW:: Windows using MinGW
 * Cygwin:: Windows using Cygwin
@@ -22,5 +23,6 @@ find a reference to it from within the instructions in this section.
 @end menu
 
 @importss{build,platform,unix.txi}
+@importss{build,wincvs,wincvs.txi}
 @importsss{build,platform,win32,win32.txi}
 @importss{build,platform,macosx.txi}

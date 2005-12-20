@@ -857,7 +857,7 @@ Mattias provided a patch for cleaner handling of the X11 visual and window
 creation.
 
 @item
-Mathew Sutcliffe (@email{oktal@@users.sourceforg.net})
+Mathew Sutcliffe (@email{oktal@@users.sourceforge.net})
 
 Mathew added functions to parse input (keyboard, mouse, joystick) to and from
 text. He contributed the Perl bindings, and has made other smaller
@@ -869,7 +869,7 @@ Matthew Tang
 Matthew added a map file exporter script for Blender.
 
 @item
-Matze Braun (@email{matze@@braunis.di})
+Matze Braun (@email{matze@@braunis.de})
 
 Matze made various changes, fixes and enhancements to the project (too many to
 list). Some of the more important include: creation of the cs-config script,

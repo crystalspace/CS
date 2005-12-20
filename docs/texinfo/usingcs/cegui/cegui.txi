@@ -3,7 +3,7 @@
 @section CEGUI Introduction
 @noindent
 @emph{Written by Seth Yastrov, @email{syastrov@@users.sourceforge.net} and
-Dan Hardfeldt,@email{swedishcoder@@users.sourceforge.net}.}
+Dan H@"ardfeldt, @email{swedishcoder@@users.sourceforge.net}.}
 
 @subheading The @sc{cegui} Plugin
 

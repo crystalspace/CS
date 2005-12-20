@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Binary XML, , Old Map File Format, Map Loader
-@subsection binary @sc{xml}
+@subsection Binary @sc{xml}
 @cindex @code{iDocumentSystem}
 @cindex @samp{docconv}
 @cindex @sc{xml}
@@ -46,14 +46,14 @@ parses an XML file faster than the tinyxml plugin, however, only the
 latter one supports creation and modification of XML files - which usually
 isn't needed for map files and alike.)
 
-@subsubheading If you Parse Documents Manually
+@subsubheading If You Parse Documents Manually
 
 If you read CS documents @emph{manually} somewhere in your app, you should
 use the following snippet to obtain a document system object:
 
 @example
 csRef<iDocumentSystem> docsys = csQueryRegistry<iDocumentSystem> (object_reg);
-if (xml == 0)
+if (!docsys.IsValid())
   docsys.AttachNew (new csTinyDocumentSystem ());
 @end example
 
