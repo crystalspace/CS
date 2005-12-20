@@ -172,6 +172,9 @@ public:
   /// Returns the keyboard modifiers of the description.
   const csKeyModifiers& GetModifiers () const { return modifiers; }
 
+  /// Returns the (basis-0) device number of the description
+  const uint GetDeviceNumber () const { return deviceNumber; }
+
   /// Sets the keyboard modifiers of the description.
   void SetModifiers (const csKeyModifiers &mods) { modifiers = mods; }
 

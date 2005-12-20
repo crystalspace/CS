@@ -315,14 +315,14 @@ csInputDefinition::csInputDefinition (iEventNameRegistry* r,
       mouseAxis = 1;
       containedName = csevMouseMove(name_reg, deviceNumber);
     }
-    else if (str.CompareNoCase ("Axis"))
+    else if (str.StartsWith ("Axis", true))
     {
       str.DeleteAt (0, 4);
       mouseAxis = (int) strtoul (str.GetData (), &endp, 10);
       if (endp != str.GetData ()) containedName = csevMouseMove(
       	name_reg, deviceNumber);
     }
-    else if (str.CompareNoCase ("Button"))
+    else if (str.StartsWith ("Button", true))
     {
       str.DeleteAt (0, 6);
       mouseButton = (int) strtoul (str.GetData (), & endp, 10);
@@ -332,7 +332,7 @@ csInputDefinition::csInputDefinition (iEventNameRegistry* r,
     else
     {
       mouseButton = (int) strtoul (str.GetData (), & endp, 10);
-      if (endp != str.GetData ()) containedName = csevMouseDown(
+      if (endp != str.GetData ()) containedName = csevMouseButton(
       	name_reg, deviceNumber);
     }
   }
@@ -352,14 +352,14 @@ csInputDefinition::csInputDefinition (iEventNameRegistry* r,
       joystickAxis = 1;
       containedName = csevJoystickMove(name_reg, deviceNumber);
     }
-    else if (str.CompareNoCase ("Axis"))
+    else if (str.StartsWith ("Axis", true))
     {
       str.DeleteAt (0, 4);
       joystickAxis = (int) strtoul (str.GetData (), &endp, 10);
       if (endp != str.GetData ()) containedName = csevJoystickMove(
       	name_reg, deviceNumber);
     }
-    else if (str.CompareNoCase ("Button"))
+    else if (str.StartsWith ("Button", true))
     {
       str.DeleteAt (0, 6);
       joystickButton = (int) strtoul (str.GetData (), &endp, 10);
