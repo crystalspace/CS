@@ -15,6 +15,8 @@ libjpeg
 @item
 Freetype2
 @item
+@sc{cg}
+@item
 @sc{ode}
 @item
 Cal3D
@@ -29,7 +31,7 @@ MikMod
 @item
 @sc{cegui}
 @item
-@sc{cg}
+@sc{caca}
 @end itemize
 
 Most of these libraries are optional.  If you do not have them installed, then
@@ -132,6 +134,18 @@ can get the latest version at:
 @noindent
 @uref{http://www.freetype.org/}
 
+@subheading @sc{cg}
+@cindex @sc{cg}
+@cindex Libraries, @sc{cg}
+@cindex CG library
+
+Many Crystal Space shaders require the @sc{cg} library from @samp{NVidia}.
+Crystal Space depends on the @sc{cg} library with version number at least
+equal to 1.4. If you're on GNU/Linux then you probably will not find a package
+with that version available (latest stable on Gentoo is 1.2 for example) so
+you have to directly download this from
+@url{http://developer.nvidia.com/object/cg_toolkit.html#downloads}.
+
 @subheading @sc{ode}
 @cindex @sc{ode}
 @cindex Libraries, @sc{ode}
@@ -172,16 +186,18 @@ After downloading you can either install the package normally (i.e. @samp{make
 install}) or unpack it into the directory @file{CS/libs/libmng*}.  In general,
 if you have permission to do so, it is best to install the library.
 
-@subheading @sc{cg}
-@cindex @sc{cg}
-@cindex Libraries, @sc{cg}
-@cindex CG library
+@item @sc{caca} Colour AsCii Art Library
+This library is used for 2D rendering in text mode.  This is optional and only
+needed for fun. libcaca can be downloaded from:
 
-Many Crystal Space shaders require the @sc{cg} library from @samp{NVidia}.
-Crystal Space depends on the @sc{cg} library with version number at least
-equal to 1.4. If you're on GNU/Linux then you probably will not find a package
-with that version available (latest stable on Gentoo is 1.2 for example) so
-you have to directly download this from
-@url{http://developer.nvidia.com/object/cg_toolkit.html#downloads}.
+@noindent
+@uref{http://sam.zoy.org/libcaca/}
+@end table
 
+@strong{Maps}: Needed if you want to see examples of Crystal Space at work.
+A few data files are provided in the Crystal Space release itself, but more can
+be downloaded from the @file{maps} subdirectory of each release.  Most files
+can just be placed in the @file{CS/data} directory.
 
+@noindent
+@uref{http://www.crystalspace3d.org/support/release/}

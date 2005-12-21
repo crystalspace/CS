@@ -44,7 +44,7 @@ Directions for doing this can be found here:
 
 @strong{External Dependencies}: Crystal Space can use a number of optional
 libraries and tools to provide a more robust set of features.  A brief list of
-the current dependencies is presented here.  @xref{External Libraries}.
+the most important dependencies is presented here.  @xref{External Libraries}.
 
 @table @asis
 @item Z Library
@@ -118,25 +118,3 @@ directory):
 ./jam0 -sBINDIR=$HOME/bin install
 @end example
 
-@item The Netwide Assembler
-@sc{nasm} is used by Crystal Space on certain platforms for assembly language
-routines, for performance enhancement.  This is optional.
-
-@noindent
-@uref{http://nasm.sourceforge.net/}
-
-@item @sc{caca} Colour AsCii Art Library
-This library is used for 2D rendering in text mode.  This is optional and only
-needed for fun. libcaca can be downloaded from:
-
-@noindent
-@uref{http://sam.zoy.org/libcaca/}
-@end table
-
-@strong{Maps}: Needed if you want to see examples of Crystal Space at work.
-A few data files are provided in the Crystal Space release itself, but more can
-be downloaded from the @file{maps} subdirectory of each release.  Most files
-can just be placed in the @file{CS/data} directory.
-
-@noindent
-@uref{http://www.crystalspace3d.org/support/release/}
