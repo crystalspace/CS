@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node WinCVS Tutorial Step 1, WinCVS Tutorial Step 2, WinCVS Tutorial, WinCVS Tutorial
-@subsection Step 1: Getting the Software
+@subsubsection Step 1: Getting the Software
 
 Developers with write-access to the Crystal Space @sc{cvs} repository will
 require two separate software packages, the @sc{cvs} client and the secure

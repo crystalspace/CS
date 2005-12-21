@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 
-@node MacOS/X, , Cygwin, WinCVS Tutorial
+@node MacOS/X, , Cygwin, Platform Instructions
 @subsection MacOS/X
 @cindex MacOS/X
 

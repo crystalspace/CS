@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node WinCVS Tutorial Step 4, WinCVS Tutorial Step 5, WinCVS Tutorial Step 3, WinCVS Tutorial
-@subsection Step 4: Setting WinCVS Preferences
+@subsubsection Step 4: Setting WinCVS Preferences
 
 First, start the WinCVS client software.  If it is the first time after
 installation of the client you will be presented with the @emph{Tip of the Day}

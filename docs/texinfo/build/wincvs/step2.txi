@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node WinCVS Tutorial Step 2, WinCVS Tutorial Step 3, WinCVS Tutorial Step 1, WinCVS Tutorial
-@subsection Step 2: Installing the Software
+@subsubsection Step 2: Installing the Software
 
 This section explains how to install the software which you downloaded in the
 previous section.
