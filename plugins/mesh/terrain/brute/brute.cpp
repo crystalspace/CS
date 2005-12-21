@@ -2199,6 +2199,79 @@ int csTerrainObject::CollisionDetect (iMovable* m, csTransform* transform)
   }
 }
 
+bool csTerrainObject::HitBeamVertical (csTerrBlock* block,
+	const csSegment3& seg,
+	csVector3& isect, float* pr)
+{
+  const csVector3& start = seg.Start ();
+  const csVector3& end = seg.End ();
+  const csBox3& b = block->bbox;
+  if (start.x < b.MinX ()) return -1;
+  if (start.x > b.MaxX ()) return -1;
+  if (start.z < b.MinZ ()) return -1;
+  if (start.z > b.MaxZ ()) return -1;
+
+  // We have a hit.
+  if (block->IsLeaf ())
+  {
+    // Check the triangles.
+    csVector3* vt = block->vertex_data;
+    int res = block->res;
+    int x, y;
+    float tot_dist = fabs (end.y-start.y);
+    float dist, temp;
+    float itot_dist = 1 / tot_dist;
+    dist = temp = tot_dist;
+    csVector3 tmp;
+    for (y = 0 ; y < res-1 ; y++)
+    {
+      int yr = y * res;
+      for (x = 0 ; x < res-1 ; x++)
+      {
+        // @@@ Optimize this!
+        if (csIntersect3::SegmentTriangle (seg, vt[yr+x],
+		vt[yr+res+x], vt[yr+x+1], tmp))
+	{
+          temp = fabs (tmp.y-start.y);
+          if (temp < dist)
+          {
+            isect = tmp;
+	    dist = temp;
+          }
+	}
+        // @@@ Optimize this!
+        if (csIntersect3::SegmentTriangle (seg, vt[yr+x+1],
+		vt[yr+res+x], vt[yr+res+x+1], tmp))
+	{
+          temp = fabs (tmp.y-start.y);
+          if (temp < dist)
+          {
+            isect = tmp;
+	    dist = temp;
+          }
+	}
+      }
+    }
+    if (pr) *pr = dist * itot_dist;
+    if (dist >= tot_dist)
+      return false;
+    return true;
+  }
+  else
+  {
+    // Check the children.
+    if (HitBeamVertical (block->children[0], seg, isect, pr))
+      return true;
+    if (HitBeamVertical (block->children[1], seg, isect, pr))
+      return true;
+    if (HitBeamVertical (block->children[2], seg, isect, pr))
+      return true;
+    if (HitBeamVertical (block->children[3], seg, isect, pr))
+      return true;
+  }
+  return false;
+}
+
 bool csTerrainObject::HitBeam (csTerrBlock* block,
 	const csSegment3& seg,
 	csVector3& isect, float* pr)
@@ -2272,7 +2345,17 @@ bool csTerrainObject::HitBeamOutline (const csVector3& start,
                                        csVector3& isect, float* pr)
 {
   csSegment3 seg (start, end);
-  return HitBeam (rootblock, seg, isect, pr);
+  if (fabs (start.x-end.x) < .00001 && fabs (start.z-end.z) < .00001)
+  {
+    // We're dealing with a vertical segment. For that we have a more optimal
+    // way to check intersection.
+    // @@@ TODO: HitBeamVertical seems broken for now.
+    return HitBeam (rootblock, seg, isect, pr);
+  }
+  else
+  {
+    return HitBeam (rootblock, seg, isect, pr);
+  }
 }
 
 bool csTerrainObject::HitBeamObject (const csVector3& start,
@@ -2283,7 +2366,18 @@ bool csTerrainObject::HitBeamObject (const csVector3& start,
 {
   if (polygon_idx) *polygon_idx = -1;
   csSegment3 seg (start, end);
-  bool rc = HitBeam (rootblock, seg, isect, pr);
+  bool rc;
+  if (fabs (start.x-end.x) < .00001 && fabs (start.z-end.z) < .00001)
+  {
+    // We're dealing with a vertical segment. For that we have a more optimal
+    // way to check intersection.
+    // @@@ TODO: HitBeamVertical seems broken for now.
+    rc = HitBeam (rootblock, seg, isect, pr);
+  }
+  else
+  {
+    rc = HitBeam (rootblock, seg, isect, pr);
+  }
   if (material && rc)
   {
     int x = int ((isect.x - region.MinX ()) * wm);

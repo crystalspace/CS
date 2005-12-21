@@ -20,6 +20,11 @@ chronological order.
 	  will return 0 for the material. For genmesh submeshes are not yet
 	  supported.
 	- sueastside contributed some grass for the terrain.
+	- Jorrit started an optimization in bruteblock which detects that the
+	  beam passed to HitBeamObject() is vertical in which case it will resort
+	  to simpler calculations. Not totally finished though. There are still
+	  plenty of ways to optimize this further. Also the current optimization
+	  is not working correctly. So it is disabled for now.
 20-Dec-2005
 	- res fixed support for SR "smaller" rendering.
 	- res made the SR properly support the canvas clipping rect (which is

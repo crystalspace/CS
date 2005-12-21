@@ -446,6 +446,9 @@ public:
   bool HitBeam (csTerrBlock* block,
 	const csSegment3& seg,
 	csVector3& isect, float* pr);
+  bool HitBeamVertical (csTerrBlock* block,
+	const csSegment3& seg,
+	csVector3& isect, float* pr);
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
     csVector3& isect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
