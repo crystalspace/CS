@@ -353,6 +353,25 @@ void csMeshGenerator::AllocateBlocks (const csVector3& pos)
   int maxx = cellx + cell_x_md+1;
   if (maxx > cell_dim) maxx = cell_dim;
 
+  // Calculate the intersection of minx, ... with prev_minx, ...
+  // This intersection represent all cells that are not used this frame
+  // but may potentially have gotten meshes the previous frame. We need
+  // to free those meshes.
+  csRect cur_cells (minx, minz, maxx, maxz);
+  if (!prev_cells.IsEmpty ())
+  {
+    for (z = prev_cells.ymin ; z < prev_cells.ymax ; z++)
+      for (x = prev_cells.xmin ; x < prev_cells.xmax ; x++)
+        if (!cur_cells.Contains (x, z))
+	{
+	  int cidx = z*cell_dim + x;
+	  csMGCell& cell = cells[cidx];
+          FreeMeshesInBlock (cell);
+        }
+  }
+  prev_cells = cur_cells;
+
+  // Now allocate the cells that are close enough.
   for (z = minz ; z < maxz ; z++)
     for (x = minx ; x < maxx ; x++)
     {
@@ -372,25 +391,6 @@ void csMeshGenerator::AllocateBlocks (const csVector3& pos)
         FreeMeshesInBlock (cell);
       }
     }
-
-  // Calculate the intersection of minx, ... with prev_minx, ...
-  // This intersection represent all cells that are not used this frame
-  // but may potentially have gotten meshes the previous frame. We need
-  // to free those meshes.
-  csRect cur_cells (minx, minz, maxx, maxz);
-  if (!prev_cells.IsEmpty ())
-  {
-    for (z = prev_cells.ymin ; z < prev_cells.ymax ; z++)
-      for (x = prev_cells.xmin ; x < prev_cells.xmax ; x++)
-        if (!cur_cells.Contains (x, z))
-	{
-	  int cidx = z*cell_dim + x;
-	  csMGCell& cell = cells[cidx];
-          FreeMeshesInBlock (cell);
-        }
-  }
-
-  prev_cells = cur_cells;
 }
 
 void csMeshGenerator::FreeMeshesInBlock (csMGCell& cell)

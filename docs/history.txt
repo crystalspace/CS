@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Dec-2005
+	- Jorrit improved mesh cache usage by first removing the meshes
+	  that are no longer needed for out of range cells before trying
+	  to allocate new ones.
 20-Dec-2005
 	- res fixed support for SR "smaller" rendering.
 	- res made the SR properly support the canvas clipping rect (which is
@@ -51,8 +55,8 @@ chronological order.
 	    - Distance based generation is now working properly.
 	    - The generated meshes now correctly follow whatever meshes
 	      they are supposed to follow.
-    - BigG Removed unused variable axdata[] from Cajoywin.cpp.
-      Touched code to meet coding standards.
+	- BigG Removed unused variable axdata[] from Cajoywin.cpp.
+	  Touched code to meet coding standards.
 19-Dec-2005
 	- Jorrit did more work on the mesh generator.
 	- Jorrit fixed a memory leak in md32spr as reported by Anuj Goyal
