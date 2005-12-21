@@ -739,8 +739,10 @@ bool csBallMeshObject::HitBeamOutline (const csVector3& start,
 }
 
 bool csBallMeshObject::HitBeamObject(const csVector3& start,
-  const csVector3& end, csVector3& isect, float *pr, int* polygon_idx)
+  const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
+  iMaterialWrapper** material)
 {
+  if (material) *material = csBallMeshObject::material;
   if (polygon_idx) *polygon_idx = -1;
   // This is the slow version. Use for an accurate hit on the object.
   // It will cycle through every triangle in the mesh serching for the

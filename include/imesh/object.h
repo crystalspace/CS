@@ -189,9 +189,12 @@ struct iMeshObject : public virtual iBase
    * returned hit will be guaranteed to be the point closest to the
    * 'start' of the beam. If the object supports this then an index
    * of the hit polygon will be returned (or -1 if not supported or no hit).
+   * \param material if not 0 then the hit material will be put here. Or 0
+   * in case this mesh object doesn't support material selection.
    */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr, int* polygon_idx = 0) = 0;
+  	csVector3& isect, float* pr, int* polygon_idx = 0,
+	iMaterialWrapper** material = 0) = 0;
 
   /**
    * Set a reference to the mesh wrapper holding the mesh objects.

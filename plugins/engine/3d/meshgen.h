@@ -26,6 +26,7 @@
 #include "csutil/refarr.h"
 #include "csutil/hash.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/floatrand.h"
 #include "csgeom/box.h"
 #include "iengine/mesh.h"
 #include "iengine/meshgen.h"
@@ -88,6 +89,17 @@ public:
    * Free a mesh. This function will put the mesh back in the cache.
    */
   void FreeMesh (iMeshWrapper* mesh);
+
+  /**
+   * Get the right lod level for the given squared distance.
+   * Returns csArrayItemNotFound if no lod level is defined for the distance.
+   */
+  size_t GetLODLevel (float sqdist);
+
+  /**
+   * Check if this is the right mesh for the given LOD level.
+   */
+  bool IsRightLOD (iMeshWrapper* mesh, float sqdist);
 };
 
 /**
@@ -165,6 +177,9 @@ private:
   /// The maximum radius for all geometries.
   float total_max_dist;
   float sq_total_max_dist;
+
+  /// Random generator.
+  csRandomFloatGen random;
 
   /// Meshes on which we will map geometry.
   csRefArray<iMeshWrapper> meshes;

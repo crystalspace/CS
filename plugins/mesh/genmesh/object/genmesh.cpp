@@ -1204,7 +1204,8 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
 }
 
 bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
-  const csVector3& end, csVector3& isect, float *pr, int* polygon_idx)
+  const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
+  iMaterialWrapper** material)
 {
   if (polygon_idx) *polygon_idx = -1;
   // This is the slow version. Use for an accurate hit on the object.
@@ -1237,6 +1238,20 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   if (pr) *pr = csQsqrt (dist * itot_dist);
   if (dist >= tot_dist)
     return false;
+
+  if (material)
+  {
+    // @@@ Submeshes not yet supported!
+    //const csPDelArray<csGenmeshSubMesh>& sm = subMeshes.Length () == 0
+    	//? factory->GetSubMeshes ()
+	//: subMeshes;
+    //if (sm.Length () == 0)
+    //{
+      *material = csGenmeshMeshObject::material;
+      if (!*material) *material = factory->GetMaterialWrapper ();
+    //}
+  }
+
   return true;
 }
 

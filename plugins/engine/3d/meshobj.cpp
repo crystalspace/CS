@@ -869,11 +869,13 @@ bool csMeshWrapper::HitBeamOutline (
 
 csHitBeamResult csMeshWrapper::HitBeamObject (
   const csVector3 &start,
-  const csVector3 &end)
+  const csVector3 &end,
+  bool do_material)
 {
   csHitBeamResult rc;
+  rc.material = 0;
   rc.hit = meshobj->HitBeamObject (start, end, rc.isect, &rc.r,
-  	&rc.polygon_idx);
+  	&rc.polygon_idx, do_material ? &rc.material : 0);
   return rc;
 }
 

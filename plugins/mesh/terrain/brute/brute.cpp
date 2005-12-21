@@ -637,10 +637,8 @@ bool csTerrBlock::IsMaterialUsed (int index)
 	center.z + size / 2.0 + 1.0);
     const csBox2& terrRegion = terr->region;
 
-    float wm = ((float)(terr->materialMapW - 1)) /
-                (terrRegion.MaxX() - terrRegion.MinX());
-    float hm = ((float)(terr->materialMapH - 1)) /
-                (terrRegion.MaxY() - terrRegion.MinY());
+    float wm = terr->wm;
+    float hm = terr->hm;
     int mmLeft = 
       (int)floor ((heightmapSpace.MinX() - terrRegion.MinX()) * wm);
     // account for decreasing TCs with increasing Y
@@ -1738,6 +1736,8 @@ bool csTerrainObject::SetMaterialAlphaMaps (
   //materialMaps = data;
   materialMapW = w;
   materialMapH = h;
+  wm = ((float)(materialMapW - 1)) / (region.MaxX() - region.MinX());
+  hm = ((float)(materialMapH - 1)) / (region.MaxY() - region.MinY());
 
   csRef<iGraphics3D> g3d = 
     CS_QUERY_REGISTRY (object_reg, iGraphics3D);
@@ -1879,6 +1879,8 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
   //materialMaps.Push (data);
   materialMapW = w;
   materialMapH = h;
+  wm = ((float)(materialMapW - 1)) / (region.MaxX() - region.MinX());
+  hm = ((float)(materialMapH - 1)) / (region.MaxY() - region.MinY());
 
   csRef<iGraphics3D> g3d = 
     CS_QUERY_REGISTRY (object_reg, iGraphics3D);
@@ -2276,11 +2278,32 @@ bool csTerrainObject::HitBeamOutline (const csVector3& start,
 bool csTerrainObject::HitBeamObject (const csVector3& start,
                                       const csVector3& end, 
                                       csVector3& isect, float* pr,
-                                      int* polygon_idx)
+                                      int* polygon_idx,
+				      iMaterialWrapper** material)
 {
   if (polygon_idx) *polygon_idx = -1;
   csSegment3 seg (start, end);
-  return HitBeam (rootblock, seg, isect, pr);
+  bool rc = HitBeam (rootblock, seg, isect, pr);
+  if (material && rc)
+  {
+    int x = int ((isect.x - region.MinX ()) * wm);
+    int y = int ((isect.z - region.MinY ()) * hm);
+    if (x < 0) x = 0; else if (x > materialMapW-1) x = materialMapW-1;
+    if (y < 0) y = 0; else if (y > materialMapH-1) y = materialMapH-1;
+    size_t i;
+    int idx = y * materialMapW + x;
+    for (i = 0 ; i < globalMaterialsUsed.Length () ; i++)
+    {
+      const csBitArray& bits = globalMaterialsUsed[i];
+      if (bits[idx])
+      {
+        *material = palette[idx];
+	return rc;
+      }
+    }
+    *material = 0;
+  }
+  return rc;
 }
 
 //----------------------------------------------------------------------

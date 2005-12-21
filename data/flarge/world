@@ -527,7 +527,6 @@
   <library>factories/thingCircle.007</library>
   <library>factories/thingCircle.006</library>
   <library>factories/thingPlane.004</library>
-  <library>factories/thingPlane</library>
   <library>factories/thingCircle</library>
   <!--<triggers>
     <trigger name="LaIpoLamp.009_t">

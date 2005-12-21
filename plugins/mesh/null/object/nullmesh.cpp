@@ -130,7 +130,7 @@ bool csNullmeshMeshObject::HitBeamOutline (const csVector3& /*start*/,
 
 bool csNullmeshMeshObject::HitBeamObject (const csVector3& /*start*/,
   const csVector3& /*end*/, csVector3& /*isect*/, float* /*pr*/,
-  int* /*polygon_idx*/)
+  int* /*polygon_idx*/, iMaterialWrapper**)
 {
   // @@@ TODO
   return false;

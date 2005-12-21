@@ -77,7 +77,7 @@ bool csMeshObject::HitBeamOutline (const csVector3& /*start*/,
 }
 
 bool csMeshObject::HitBeamObject (const csVector3&, const csVector3&,
-  	csVector3&, float*, int*)
+  	csVector3&, float*, int*, iMaterialWrapper**)
 {
   return false;
 }

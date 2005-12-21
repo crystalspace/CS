@@ -330,7 +330,7 @@ public:
         csVector3&, float*)
   { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
-  	csVector3&, float*, int* = 0) { return false; }
+  	csVector3&, float*, int* = 0, iMaterialWrapper** = 0) { return false; }
   virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 

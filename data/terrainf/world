@@ -18,6 +18,8 @@
     <plugin name="foliage">crystalspace.mesh.loader.foliage</plugin>
   </plugins>
 
+  <library>grass.lib</library>
+
   <textures>
     <texture name="andrew_marble4.jpg">
       <file>/lib/stdtex/andrew_marble4.jpg</file>
@@ -134,32 +136,6 @@
     </params>
   </meshfact>
 
-  <meshfact name="box1">
-        <plugin>genmeshFactory</plugin>
-        <params>
-            <material>box1</material>
-            <box>
-                <min x="-0.1" y="-0.1" z="-0.1" />
-                <max x="0.1" y="0.1" z="0.1" />
-            </box>
-	    <lighting>yes</lighting>
-	    <autonormals />
-	</params>
-  </meshfact>
-
-  <meshfact name="box2">
-        <plugin>genmeshFactory</plugin>
-        <params>
-            <material>box2</material>
-            <box>
-                <min x="-0.1" y="-0.1" z="-0.1" />
-                <max x="0.1" y="0.1" z="0.1" />
-            </box>
-	    <lighting>yes</lighting>
-	    <autonormals />
-	</params>
-  </meshfact>
-
   <sector name="room">
      <light name="sun">
        <center x="-50000" y="86030" z="0" />
@@ -209,8 +185,8 @@
 
      <meshgen name="grass">
         <geometry>
-	    <factory maxdist="10" name="box1" />
-	    <factory maxdist="20" name="box2" />
+	    <factory maxdist="10" name="Grass" />
+	    <factory maxdist="20" name="GrassLow" />
 	    <radius>1</radius>
 	    <density>1</density>
         </geometry>

@@ -596,7 +596,7 @@ public:
   virtual csHitBeamResult HitBeamOutline (const csVector3& start,
   	const csVector3& end);
   virtual csHitBeamResult HitBeamObject (const csVector3& start,
-  	const csVector3& end);
+  	const csVector3& end, bool do_material = false);
   virtual csHitBeamResult HitBeam (const csVector3& start,
   	const csVector3& end);
 

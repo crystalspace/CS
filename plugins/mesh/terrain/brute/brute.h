@@ -287,6 +287,7 @@ private:
   //csArray<csArray<char> > materialMaps;
   csArray<csBitArray> globalMaterialsUsed;
   int materialMapW, materialMapH;
+  float wm, hm;	// Scales to map between material map and object space.
 
   csDirtyAccessArray<csRenderMesh*>* returnMeshes;
   csRenderMeshHolder rmHolder;
@@ -448,10 +449,12 @@ public:
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
     csVector3& isect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-    csVector3& isect, float* pr, int* polygon_idx = 0);
+    csVector3& isect, float* pr, int* polygon_idx = 0,
+    iMaterialWrapper** material = 0);
 
   virtual void InvalidateMaterialHandles () { }
-  virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+  virtual void PositionChild (iMeshObject* /*child*/,
+  	csTicks /*current_time*/) { }
 
   void FireListeners ();
   void AddListener (iObjectModelListener* listener);

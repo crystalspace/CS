@@ -100,7 +100,7 @@ public:
    */
   PolyMeshHelper (uint32 flag) : scfImplementationType (this), 
     polygons (0), vertices (0), poly_flag (flag), triangles (0),
-locked (0)
+    locked (0)
   {
   }
   virtual ~PolyMeshHelper ()
@@ -938,7 +938,8 @@ public:
    * Test a beam with this thing.
    */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr, int* polygon_idx = 0);
+  	csVector3& isect, float* pr, int* polygon_idx = 0,
+	iMaterialWrapper** material = 0);
 
   //----------------------------------------------------------------------
   // Various

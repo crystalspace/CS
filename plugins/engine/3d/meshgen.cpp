@@ -62,7 +62,7 @@ void csMeshGeneratorGeometry::SetDensity (float density)
   csMeshGeneratorGeometry::density = density;
 }
 
-csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (float sqdist)
+size_t csMeshGeneratorGeometry::GetLODLevel (float sqdist)
 {
   size_t i;
   for (i = 0 ; i < factories.Length () ; i++)
@@ -70,40 +70,60 @@ csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (float sqdist)
     csMGGeom& geom = factories[i];
     if (sqdist <= geom.sqmaxdistance)
     {
-      // See if we have some mesh ready in the cache.
-      if (geom.mesh_cache.Length () > 0)
-      {
-        return geom.mesh_cache.Pop ();
-      }
-      else
-      {
-        // Make a new mesh.
-	csString name = "__mg__";
-	name += geom.factory->QueryObject ()->GetName ();
-	return csEngine::currentEngine->CreateMeshWrapper (geom.factory,
-		name);
-      }
+      return i;
     }
   }
-  return 0;
+  CS_ASSERT (false);
+  return csArrayItemNotFound;
+}
+
+csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (float sqdist)
+{
+  size_t lod = GetLODLevel (sqdist);
+  if (lod == csArrayItemNotFound) return 0;
+
+  csMGGeom& geom = factories[lod];
+  // See if we have some mesh ready in the cache.
+  if (geom.mesh_cache.Length () > 0)
+  {
+    return geom.mesh_cache.Pop ();
+  }
+  else
+  {
+    // Make a new mesh.
+    csString name = "__mg__";
+    // @@@ This technique gives us only support for 10 lod levels.
+    CS_ASSERT (lod < 10);
+    name += lod;
+    name += geom.factory->QueryObject ()->GetName ();
+    return csEngine::currentEngine->CreateMeshWrapper (geom.factory, name);
+  }
 }
 
 void csMeshGeneratorGeometry::FreeMesh (iMeshWrapper* mesh)
 {
   mesh->GetMovable ()->ClearSectors ();
 
-  size_t i;
-  iMeshFactoryWrapper* fact = mesh->GetFactory ();
-  for (i = 0 ; i < factories.Length () ; i++)
-  {
-    csMGGeom& geom = factories[i];
-    if (geom.factory == fact)
-    {
-      geom.mesh_cache.Push (mesh);
-      return;
-    }
-  }
-  CS_ASSERT (false);
+  const char* name = mesh->QueryObject ()->GetName ();
+  // First we have the string __mg__ and then a single digit with
+  // the lod level.
+  int lod = name[6]-'0';
+  CS_ASSERT (lod >= 0 && lod < 10);
+  csMGGeom& geom = factories[lod];
+  CS_ASSERT (mesh->GetFactory () == geom.factory);
+  geom.mesh_cache.Push (mesh);
+}
+
+bool csMeshGeneratorGeometry::IsRightLOD (iMeshWrapper* mesh, float sqdist)
+{
+  const char* name = mesh->QueryObject ()->GetName ();
+  // First we have the string __mg__ and then a single digit with
+  // the lod level.
+  int lod = name[6]-'0';
+  CS_ASSERT (lod >= 0 && lod < 10);
+
+  size_t new_lod = GetLODLevel (sqdist);
+  return new_lod == (size_t)lod;
 }
 
 //--------------------------------------------------------------------------
@@ -192,21 +212,25 @@ void csMeshGenerator::SetupSampleBox ()
 void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
 	csMGPositionBlock* block)
 {
-  srand (cidx);	// @@@ Consider using a better seed?
+  random.Initialize ((unsigned int)cidx); // @@@ Consider using a better seed?
 
   block->positions.Empty ();
 
   const csBox2& box = cell.box;
+  float box_area = box.Area ();
 
-  // @@@ TODO: use density.
-  // This is just a test.
-  float x, z;
-  size_t i;
-  csMGPosition pos;
-  for (z = box.MinY () ; z < box.MaxY () ; z++)
-    for (x = box.MinX () ; x < box.MaxX () ; x++)
+  size_t i, j, g;
+  for (g = 0 ; g < geometries.Length () ; g++)
+  {
+    csMGPosition pos;
+    pos.geom_type = g;
+    float density = geometries[g]->GetDensity ();
+    size_t count = size_t (density * box_area);
+    for (j = 0 ; j < count ; j++)
     {
-      csVector3 start (x+.5, samplebox.MaxY (), z+.5);
+      float x = random.Get (box.MinX (), box.MaxX ());
+      float z = random.Get (box.MinY (), box.MaxY ());
+      csVector3 start (x, samplebox.MaxY (), z);
       csVector3 end = start;
       end.y = samplebox.MinY ();
       bool hit = false;
@@ -222,10 +246,10 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
       }
       if (hit)
       {
-        pos.geom_type = 0;	// @@@ Temporary.
         block->positions.Push (pos);
       }
     }
+  }
 }
 
 void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
@@ -300,26 +324,46 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
   size_t i;
   for (i = 0 ; i < positions.Length () ; i++)
   {
-    float sqdist = csSquaredDist::PointPoint (pos, positions[i].position);
+    csMGPosition& p = positions[i];
+    float sqdist = csSquaredDist::PointPoint (pos, p.position);
     if (sqdist < sq_total_max_dist)
     {
-      // @@@ Even if there is a mesh we might need to change lod level here!
-      if (!positions[i].mesh)
+      if (!p.mesh)
       {
-        csRef<iMeshWrapper> mesh = geometries[positions[i].geom_type]
-		->AllocMesh (sqdist);
-        positions[i].mesh = mesh;
-        mesh->GetMovable ()->SetSector (sector);
-	mesh->GetMovable ()->SetPosition (sector, positions[i].position);
-	mesh->GetMovable ()->UpdateMove ();
+        // We didn't have a mesh here so we allocate one.
+        csRef<iMeshWrapper> mesh = geometries[p.geom_type]->AllocMesh (sqdist);
+	if (mesh)
+	{
+          p.mesh = mesh;
+          mesh->GetMovable ()->SetSector (sector);
+	  mesh->GetMovable ()->SetPosition (sector, p.position);
+	  mesh->GetMovable ()->UpdateMove ();
+        }
+      }
+      else
+      {
+        // We already have a mesh but we check here if we should switch LOD level.
+	if (!geometries[p.geom_type]->IsRightLOD (p.mesh, sqdist))
+	{
+	  // We need a different mesh here.
+          geometries[p.geom_type]->FreeMesh (p.mesh);
+          csRef<iMeshWrapper> mesh = geometries[p.geom_type]->AllocMesh (sqdist);
+          p.mesh = mesh;
+	  if (mesh)
+	  {
+            mesh->GetMovable ()->SetSector (sector);
+	    mesh->GetMovable ()->SetPosition (sector, p.position);
+	    mesh->GetMovable ()->UpdateMove ();
+	  }
+	}
       }
     }
     else
     {
-      if (positions[i].mesh)
+      if (p.mesh)
       {
-        geometries[positions[i].geom_type]->FreeMesh (positions[i].mesh);
-        positions[i].mesh = 0;
+        geometries[p.geom_type]->FreeMesh (p.mesh);
+        p.mesh = 0;
       }
     }
   }

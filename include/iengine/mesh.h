@@ -51,6 +51,7 @@ struct iShadowCaster;
 struct iShadowReceiver;
 struct iSharedVariable;
 struct iSceneNode;
+struct iMaterialWrapper;
 
 struct csRenderMesh;
 
@@ -183,6 +184,11 @@ struct csHitBeamResult
   float r;
   /// Only for HitBeamObject: the polygon/triangle index that was hit.
   int polygon_idx;
+  /**
+   * Only for HitBeamObject: the material that was hit. Can be 0 in case
+   * the meshobject doesn't support getting the material.
+   */
+  iMaterialWrapper* material;
   /**
    * Only for HitBeamBBox: Face number that was hit.
    * \sa csIntersect3::BoxSegment
@@ -419,10 +425,13 @@ struct iMeshWrapper : public virtual iBase
    * Check if this object is hit by this object space vector.
    * Return the collision point in object space coordinates. This version
    * is more accurate than HitBeamOutline.
+   * This version can also return the material that was hit (this will
+   * only happen if 'do_material' is true). This is not
+   * supported by all meshes so this can return 0 even if there was a hit.
    * \sa csHitBeamResult
    */
   virtual csHitBeamResult HitBeamObject (const csVector3& start,
-  	const csVector3& end) = 0;
+  	const csVector3& end, bool do_material = false) = 0;
 
   /**
    * Check if this object is hit by this world space vector.

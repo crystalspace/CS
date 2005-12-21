@@ -10,6 +10,16 @@ chronological order.
 	- Jorrit improved mesh cache usage by first removing the meshes
 	  that are no longer needed for out of range cells before trying
 	  to allocate new ones.
+	- Jorrit did the following mesh generator changes:
+	    - Density now works correctly. Still have to implement density map
+	      and material based density.
+	    - LOD is working correctly.
+	- Jorrit added support for getting the hit material with iMeshWrapper
+	  and iMeshObject->HitBeamObject() function. This is implemented for
+	  ball, proto, spr2d, spr3d, thing, bruteblock, and genmesh. All others
+	  will return 0 for the material. For genmesh submeshes are not yet
+	  supported.
+	- sueastside contributed some grass for the terrain.
 20-Dec-2005
 	- res fixed support for SR "smaller" rendering.
 	- res made the SR properly support the canvas clipping rect (which is

@@ -35,6 +35,7 @@
 #include "iutil/comp.h"
 
 struct iEngine;
+struct iMaterialWrapper;
 
 //Deprecate these when possible!
 /// Declare a simple mesh factory class
@@ -169,7 +170,8 @@ public:
    * will always return a miss.
    */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr, int* polygon_idx = 0);
+  	csVector3& isect, float* pr, int* polygon_idx = 0,
+	iMaterialWrapper** = 0);
 
   /**
    * See imesh/object.h for specification. This function is handled

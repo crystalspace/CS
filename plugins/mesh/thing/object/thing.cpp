@@ -1931,9 +1931,18 @@ bool csThing::HitBeamOutline (const csVector3& start,
 }
 
 bool csThing::HitBeamObject (const csVector3& start,
-  const csVector3& end, csVector3& isect, float *pr, int* polygon_idx)
+  const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
+  iMaterialWrapper** material)
 {
   int idx = static_data->IntersectSegmentIndex (start, end, isect, pr);
+  if (material && idx != -1)
+  {
+    iMaterialWrapper* mat = static_data->static_polygons[idx]
+    	->GetMaterialWrapper ();
+    iMaterialWrapper* mat2 = FindRealMaterial (mat);
+    if (mat2) mat = mat2;
+    *material = mat;
+  }
   if (polygon_idx) *polygon_idx = idx;
   if (idx == -1) return false;
   return true;
