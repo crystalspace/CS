@@ -1,0 +1,76 @@
+<library>
+<meshfact name='thingPlane.060'>
+<plugin>thingFact</plugin>
+<params>
+<material>christmasTree.png</material>
+<v x='0.079116' y='-0.000000' z='-0.113022'/>
+<v x='-0.079115' y='-0.000000' z='-0.113022'/>
+<v x='0.002867' y='-0.000000' z='0.028255'/>
+<v x='-0.005692' y='-0.000000' z='0.028255'/>
+<v x='0.086356' y='-0.000000' z='-0.310811'/>
+<v x='-0.086355' y='-0.000000' z='-0.310811'/>
+<v x='0.040927' y='-0.000000' z='-0.415769'/>
+<v x='-0.040927' y='-0.000000' z='-0.415769'/>
+<p name="0">
+<v>4</v>
+<v>5</v>
+<v>1</v>
+<v>0</v>
+<material>christmasTree.png</material>
+<texmap>
+<uv idx="2" u="0.6796875" v="0.54296875"/><uv idx='1' u='0.244140625' v='0.5234375'/><uv idx='0' u='0.240234375' v='0.904296875'/></texmap>
+<lighting>no</lighting>
+</p>
+<p name="0">
+<v>0</v>
+<v>1</v>
+<v>5</v>
+<v>4</v>
+<material>christmasTree.png</material>
+<texmap>
+<uv idx="2" u="0.244140625" v="0.5234375"/><uv idx='1' u='0.6796875' v='0.54296875'/><uv idx='0' u='0.67578125' v='0.890625'/></texmap>
+<lighting>no</lighting>
+</p>
+<p name="1">
+<v>3</v>
+<v>2</v>
+<v>0</v>
+<v>1</v>
+<material>christmasTree.png</material>
+<texmap>
+<uv idx="2" u="0.67578125" v="0.890625"/><uv idx='1' u='0.98828125' v='0.7265625'/><uv idx='0' u='0.98828125' v='0.70703125'/></texmap>
+<lighting>no</lighting>
+</p>
+<p name="1">
+<v>1</v>
+<v>0</v>
+<v>2</v>
+<v>3</v>
+<material>christmasTree.png</material>
+<texmap>
+<uv idx="2" u="0.98828125" v="0.7265625"/><uv idx='1' u='0.67578125' v='0.890625'/><uv idx='0' u='0.6796875' v='0.54296875'/></texmap>
+<lighting>no</lighting>
+</p>
+<p name="2">
+<v>6</v>
+<v>7</v>
+<v>5</v>
+<v>4</v>
+<material>christmasTree.png</material>
+<texmap>
+<uv idx="2" u="0.244140625" v="0.5234375"/><uv idx='1' u='0.01171875' v='0.62109375'/><uv idx='0' u='0.01171875' v='0.802734375'/></texmap>
+<lighting>no</lighting>
+</p>
+<p name="2">
+<v>4</v>
+<v>5</v>
+<v>7</v>
+<v>6</v>
+<material>christmasTree.png</material>
+<texmap>
+<uv idx="2" u="0.01171875" v="0.62109375"/><uv idx='1' u='0.244140625' v='0.5234375'/><uv idx='0' u='0.240234375' v='0.904296875'/></texmap>
+<lighting>no</lighting>
+</p>
+</params>
+</meshfact>
+</library>

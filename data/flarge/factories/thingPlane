@@ -1,0 +1,22 @@
+<library>
+<meshfact name='thingPlane'>
+<plugin>thingFact</plugin>
+<params>
+<material>no</material>
+<v x='40.000000' y='0.000000' z='39.999996'/>
+<v x='40.000000' y='0.000000' z='-40.000000'/>
+<v x='-40.000004' y='0.000000' z='-39.999992'/>
+<v x='-39.999985' y='0.000000' z='40.000015'/>
+<p name="0">
+<v>1</v>
+<v>2</v>
+<v>3</v>
+<v>0</v>
+<material>no</material>
+<texmap>
+<uv idx="2" u="0.0" v="1.0"/><uv idx='1' u='1.0' v='1.0'/><uv idx='0' u='1.0' v='0.0'/></texmap>
+<lighting>no</lighting>
+</p>
+</params>
+</meshfact>
+</library>
