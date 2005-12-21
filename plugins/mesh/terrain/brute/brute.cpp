@@ -2199,6 +2199,66 @@ int csTerrainObject::CollisionDetect (iMovable* m, csTransform* transform)
   }
 }
 
+static bool VertSegmentPlane (
+  const csVector3 &u,
+  const csVector3 &v,
+  const csPlane3 &p,
+  csVector3 &isect,
+  float &dist)
+{
+  float uv = u.y - v.y;
+  float denom = p.norm.y * uv;
+  if (denom == 0)
+  {
+    // they are parallel
+    dist = 0; //'dist' is an output arg, so it must be initialized.
+    isect = v;
+    return false;
+  }
+  dist = (p.norm * u + p.DD) / denom;
+  if (dist < -SMALL_EPSILON || dist > 1 + SMALL_EPSILON) 
+  {
+    isect = 0;//'isect' is an output arg, so it must be initialized.
+    return false;
+  }
+
+  isect.Set (u.x, u.y - dist * uv, u.z);
+  return true;
+}
+
+static int VertWhichSide3D (const csVector2& v,
+                          const csVector3& s1, const csVector3& s2)
+{
+  float k  = (s1.z - v.y)*(s2.x - s1.x);
+  float k1 = (s1.x - v.x)*(s2.z - s1.z);
+  if (k < k1) return -1;
+  else if (k > k1) return 1;
+  else return 0;
+}
+
+static bool VertSegmentTriangle (
+  const csSegment3 &seg,
+  const csVector3 &tr1,
+  const csVector3 &tr2,
+  const csVector3 &tr3,
+  csVector3 &isect)
+{
+  csVector2 loc (seg.Start ().x, seg.Start ().z);
+  int test1 = VertWhichSide3D (loc, tr3, tr1);
+  if (test1 == 0) return false;
+  int test2 = VertWhichSide3D (loc, tr1, tr2);
+  if (test1 != test2) return false;
+  int test3 = VertWhichSide3D (loc, tr2, tr3);
+  if (test2 != test3) return false;
+
+  csPlane3 plane (tr1, tr2, tr3);
+  float dist;
+  if (!VertSegmentPlane (seg.Start (), seg.End (), plane, isect, dist))
+    return false;
+
+  return true;
+}
+
 bool csTerrainObject::HitBeamVertical (csTerrBlock* block,
 	const csSegment3& seg,
 	csVector3& isect, float* pr)
@@ -2206,10 +2266,10 @@ bool csTerrainObject::HitBeamVertical (csTerrBlock* block,
   const csVector3& start = seg.Start ();
   const csVector3& end = seg.End ();
   const csBox3& b = block->bbox;
-  if (start.x < b.MinX ()) return -1;
-  if (start.x > b.MaxX ()) return -1;
-  if (start.z < b.MinZ ()) return -1;
-  if (start.z > b.MaxZ ()) return -1;
+  if (start.x < b.MinX ()) return false;
+  if (start.x > b.MaxX ()) return false;
+  if (start.z < b.MinZ ()) return false;
+  if (start.z > b.MaxZ ()) return false;
 
   // We have a hit.
   if (block->IsLeaf ())
@@ -2228,8 +2288,7 @@ bool csTerrainObject::HitBeamVertical (csTerrBlock* block,
       int yr = y * res;
       for (x = 0 ; x < res-1 ; x++)
       {
-        // @@@ Optimize this!
-        if (csIntersect3::SegmentTriangle (seg, vt[yr+x],
+        if (VertSegmentTriangle (seg, vt[yr+x],
 		vt[yr+res+x], vt[yr+x+1], tmp))
 	{
           temp = fabs (tmp.y-start.y);
@@ -2237,10 +2296,10 @@ bool csTerrainObject::HitBeamVertical (csTerrBlock* block,
           {
             isect = tmp;
 	    dist = temp;
+	    goto done;
           }
 	}
-        // @@@ Optimize this!
-        if (csIntersect3::SegmentTriangle (seg, vt[yr+x+1],
+        if (VertSegmentTriangle (seg, vt[yr+x+1],
 		vt[yr+res+x], vt[yr+res+x+1], tmp))
 	{
           temp = fabs (tmp.y-start.y);
@@ -2248,10 +2307,12 @@ bool csTerrainObject::HitBeamVertical (csTerrBlock* block,
           {
             isect = tmp;
 	    dist = temp;
+	    goto done;
           }
 	}
       }
     }
+done:
     if (pr) *pr = dist * itot_dist;
     if (dist >= tot_dist)
       return false;
@@ -2349,8 +2410,7 @@ bool csTerrainObject::HitBeamOutline (const csVector3& start,
   {
     // We're dealing with a vertical segment. For that we have a more optimal
     // way to check intersection.
-    // @@@ TODO: HitBeamVertical seems broken for now.
-    return HitBeam (rootblock, seg, isect, pr);
+    return HitBeamVertical (rootblock, seg, isect, pr);
   }
   else
   {
@@ -2371,8 +2431,7 @@ bool csTerrainObject::HitBeamObject (const csVector3& start,
   {
     // We're dealing with a vertical segment. For that we have a more optimal
     // way to check intersection.
-    // @@@ TODO: HitBeamVertical seems broken for now.
-    rc = HitBeam (rootblock, seg, isect, pr);
+    rc = HitBeamVertical (rootblock, seg, isect, pr);
   }
   else
   {

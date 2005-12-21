@@ -21,10 +21,13 @@ chronological order.
 	  supported.
 	- sueastside contributed some grass for the terrain.
 	- Jorrit started an optimization in bruteblock which detects that the
-	  beam passed to HitBeamObject() is vertical in which case it will resort
-	  to simpler calculations. Not totally finished though. There are still
-	  plenty of ways to optimize this further. Also the current optimization
-	  is not working correctly. So it is disabled for now.
+	  beam passed to HitBeamObject() is vertical in which case it will
+	  resort to simpler calculations. Not totally finished though. There
+	  are still plenty of ways to optimize this further. Also the current
+	  optimization is not working correctly. So it is disabled for now.
+	- Jorrit finished the optimization of HitBeamObject() in bruteblock
+	  for vertical beams. The speed difference is very big and it speeds
+	  up mesh generation on terrain considerably.
 20-Dec-2005
 	- res fixed support for SR "smaller" rendering.
 	- res made the SR properly support the canvas clipping rect (which is
