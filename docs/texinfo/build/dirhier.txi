@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Directory Hierarchy, Requirements, WinCVS Tutorial, Building
+@node Directory Hierarchy, Requirements, Building, Building
 @section Directory Hierarchy
 @cindex Directory Hierarchy
 @cindex Hierarchy, Directory

@@ -10,7 +10,7 @@ there is only a section describing the format of the map files.
 * HOWTO Level Loading:: Loading a Level
 * XML File Format:: Format of Map File (@sc{xml})
 * Old Map File Format:: Old Format of Map File
-* Binary XML:: binary @sc{xml}
+* Binary XML:: Binary @sc{xml}
 @end menu
 
 @importss{usingcs,loader,levload.txi}

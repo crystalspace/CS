@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Cygwin, MacOS/X, MinGW, Platform Instructions
+@node Cygwin, MacOS/X, MinGW, WinCVS Tutorial
 @subsection Windows using Cygwin
 
 @noindent

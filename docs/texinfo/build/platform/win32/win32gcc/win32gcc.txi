@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MinGW, Cygwin, MSVC, Platform Instructions
+@node MinGW, Cygwin, MSVC, WinCVS Tutorial
 @subsection Windows using MinGW
 
 @noindent

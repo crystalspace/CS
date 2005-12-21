@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node WinCVS Tutorial, Directory Hierarchy, Building, Building
+@node WinCVS Tutorial, Problems, Platform Instructions, Building
 @section WinCVS Tutorial
 @cindex Tutorial, WinCVS
 @cindex WinCVS, Tutorial
@@ -23,6 +23,10 @@ source code repository kindly hosted by SourceForge
 * WinCVS Tutorial Step 6:: Step 6: Setting Location to Checkout Crystal Space
 * WinCVS Tutorial Step 7:: Step 7: Checking out Crystal Space
 * WinCVS Tutorial Step 8:: Step 8: Updating Crystal Space
+* MSVC:: Windows using Microsoft Visual C++
+* MinGW:: Windows using MinGW
+* Cygwin:: Windows using Cygwin
+* MacOS/X::
 @end menu
 
 @importss{build,wincvs,step1.txi}

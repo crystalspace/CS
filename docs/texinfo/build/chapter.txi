@@ -19,6 +19,7 @@ read the Quick Start section.  @xref{Quick Start}.
 * Requirements::
 * External Libraries::
 * Platform Instructions:: Platform Specific Instructions
+* WinCVS Tutorial::
 * Problems:: Platform Specific Problems
 * Quick Start::
 @end menu

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Platform Instructions, Problems, External Libraries, Building
+@node Platform Instructions, WinCVS Tutorial, External Libraries, Building
 @section Platform Specific Instructions
 
 When working with Crystal Space, always keep in mind that this is a
@@ -15,11 +15,6 @@ find a reference to it from within the instructions in this section.
 
 @menu
 * Unix::
-* WinCVS Tutorial::
-* MSVC:: Windows using Microsoft Visual C++
-* MinGW:: Windows using MinGW
-* Cygwin:: Windows using Cygwin
-* MacOS/X::
 @end menu
 
 @importss{build,platform,unix.txi}

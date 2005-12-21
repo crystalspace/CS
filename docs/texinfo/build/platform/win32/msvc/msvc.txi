@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MSVC, MinGW, Unix, Platform Instructions
+@node MSVC, MinGW, WinCVS Tutorial Step 8, WinCVS Tutorial
 @subsection Windows using Microsoft Visual C++ 
 @cindex Windows, Building
 
