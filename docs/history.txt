@@ -51,6 +51,8 @@ chronological order.
 	    - Distance based generation is now working properly.
 	    - The generated meshes now correctly follow whatever meshes
 	      they are supposed to follow.
+    - BigG Removed unused variable axdata[] from Cajoywin.cpp.
+      Touched code to meet coding standards.
 19-Dec-2005
 	- Jorrit did more work on the mesh generator.
 	- Jorrit fixed a memory leak in md32spr as reported by Anuj Goyal
