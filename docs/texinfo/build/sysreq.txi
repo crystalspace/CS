@@ -118,3 +118,4 @@ directory):
 ./jam0 -sBINDIR=$HOME/bin install
 @end example
 
+@end table

@@ -139,7 +139,7 @@ can get the latest version at:
 @cindex Libraries, @sc{cg}
 @cindex CG library
 
-Many Crystal Space shaders require the @sc{cg} library from @samp{NVidia}.
+Many Crystal Space shaders require the @sc{cg} library from nVidia.
 Crystal Space depends on the @sc{cg} library with version number at least
 equal to 1.4. If you're on GNU/Linux then you probably will not find a package
 with that version available (latest stable on Gentoo is 1.2 for example) so
@@ -186,13 +186,12 @@ After downloading you can either install the package normally (i.e. @samp{make
 install}) or unpack it into the directory @file{CS/libs/libmng*}.  In general,
 if you have permission to do so, it is best to install the library.
 
-@item @sc{caca} Colour AsCii Art Library
+@subheading @sc{caca} Colour AsCii Art Library
 This library is used for 2D rendering in text mode.  This is optional and only
 needed for fun. libcaca can be downloaded from:
 
 @noindent
 @uref{http://sam.zoy.org/libcaca/}
-@end table
 
 @strong{Maps}: Needed if you want to see examples of Crystal Space at work.
 A few data files are provided in the Crystal Space release itself, but more can
