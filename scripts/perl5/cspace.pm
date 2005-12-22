@@ -5511,6 +5511,8 @@ package cspace::csHitBeamResult;
 *swig_r_set = *cspacec::csHitBeamResult_r_set;
 *swig_polygon_idx_get = *cspacec::csHitBeamResult_polygon_idx_get;
 *swig_polygon_idx_set = *cspacec::csHitBeamResult_polygon_idx_set;
+*swig_material_get = *cspacec::csHitBeamResult_material_get;
+*swig_material_set = *cspacec::csHitBeamResult_material_set;
 *swig_facehit_get = *cspacec::csHitBeamResult_facehit_get;
 *swig_facehit_set = *cspacec::csHitBeamResult_facehit_set;
 *swig_hit_get = *cspacec::csHitBeamResult_hit_get;
