@@ -270,6 +270,60 @@ void csMeshGenerator::SetupSampleBox ()
   }
 }
 
+size_t csMeshGenerator::CountPositions (int cidx, csMGCell& cell)
+{
+  random.Initialize ((unsigned int)cidx); // @@@ Consider using a better seed?
+  size_t counter = 0;
+
+  const csBox2& box = cell.box;
+  float box_area = box.Area ();
+
+  size_t i, j, g;
+  for (g = 0 ; g < geometries.Length () ; g++)
+  {
+    float density = geometries[g]->GetDensity ();
+    size_t count = size_t (density * box_area);
+    for (j = 0 ; j < count ; j++)
+    {
+      float x = random.Get (box.MinX (), box.MaxX ());
+      float z = random.Get (box.MinY (), box.MaxY ());
+      csVector3 start (x, samplebox.MaxY (), z);
+      csVector3 end = start;
+      end.y = samplebox.MinY ();
+      bool hit = false;
+      for (i = 0 ; i < cell.meshes.Length () ; i++)
+      {
+        csHitBeamResult rc = cell.meshes[i]->HitBeam (start, end);
+	if (rc.hit)
+	{
+	  end.y = rc.isect.y + 0.0001;
+	  hit = true;
+	  break;
+	}
+      }
+      if (hit)
+      {
+        counter++;
+      }
+    }
+  }
+  return counter;
+}
+
+size_t csMeshGenerator::CountAllPositions ()
+{
+  size_t counter = 0;
+  int x, z;
+  for (z = 0 ; z < cell_dim ; z++)
+    for (x = 0 ; x < cell_dim ; x++)
+    {
+      int cidx = z*cell_dim + x;
+      csMGCell& cell = cells[cidx];
+      counter += CountPositions (cidx, cell);
+    }
+  return counter;
+}
+
 void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
 	csMGPositionBlock* block)
 {
@@ -508,6 +562,7 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
 void csMeshGenerator::AllocateBlocks (const csVector3& pos)
 {
   SetupSampleBox ();
+  //printf ("positions=%d\n", CountAllPositions ()); fflush (stdout);
   
   int cellx = GetCellX (pos.x);
   int cellz = GetCellZ (pos.z);

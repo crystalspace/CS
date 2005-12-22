@@ -312,6 +312,10 @@ private:
   /// Set the fade for a mesh.
   void SetFade (iMeshWrapper* mesh, float factor);
 
+  /// Statistics.
+  size_t CountPositions (int cidx, csMGCell& cell);
+  size_t CountAllPositions ();
+
 public:
   csMeshGenerator ();
   virtual ~csMeshGenerator ();
