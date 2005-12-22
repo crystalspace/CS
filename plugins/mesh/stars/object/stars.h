@@ -180,6 +180,8 @@ public:
   virtual bool GetColor (csColor& col) const { col = color; return true; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
+  virtual void SetMixMode (uint) { }
+  virtual uint GetMixMode () const { return CS_FX_COPY; }
   virtual void InvalidateMaterialHandles () { }
   /**
    * see imesh/object.h for specification. The default implementation

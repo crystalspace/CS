@@ -3664,6 +3664,21 @@ bool csLoader::LoadMeshGen (iLoaderContext* ldr_context,
 	  meshgen->AddMesh (mesh);
 	}
         break;
+      case XMLTOKEN_DENSITYSCALE:
+        {
+	  float mindist = child->GetAttributeValueAsFloat ("mindist");
+	  float maxdist = child->GetAttributeValueAsFloat ("maxdist");
+	  float maxfactor = child->GetAttributeValueAsFloat ("maxfactor");
+	  meshgen->SetDensityScale (mindist, maxdist, maxfactor);
+	}
+	break;
+      case XMLTOKEN_ALPHASCALE:
+        {
+	  float mindist = child->GetAttributeValueAsFloat ("mindist");
+	  float maxdist = child->GetAttributeValueAsFloat ("maxdist");
+	  meshgen->SetAlphaScale (mindist, maxdist);
+	}
+	break;
       case XMLTOKEN_SAMPLEBOX:
 	{
 	  csBox3 b;

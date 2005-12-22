@@ -6,6 +6,25 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Dec-2005
+	- Jorrit added SetMixMode() and GetMixMode() to iMeshObject. This is
+	  supported by most meshes.
+	- Jorrit fixed a bug in the CS_FX_SETALPHA and CS_FX_SETALPHA_INT
+	  macros. They were not putting parenthesis around the macro argument
+	  which means that things like CS_FX_SETALPHA (1-factor) simply
+	  didn't work correctly.
+	- Jorrit did the following meshgen changes:
+	    - Optimized it so that meshes are better reused by setting
+	      them aside first so that they can be reused in the same frame. That
+	      way we avoid removing the meshes from the sector only to put them
+	      back later again. Removing a mesh from a sector is an expensive
+	      operation.
+	    - Implemented density scaling. That way you can have a high density
+	      for objects close to the camera and less density for objects that
+	      are further away.
+	    - Implemented alpha scaling for objects in the distance.
+	    - Implemented random rotation for the generated objects (rotation
+	      around y axis).
 21-Dec-2005
 	- Jorrit improved mesh cache usage by first removing the meshes
 	  that are no longer needed for out of range cells before trying

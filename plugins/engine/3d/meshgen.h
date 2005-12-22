@@ -33,6 +33,8 @@
 
 struct iSector;
 
+#define CS_GEOM_MAX_ROTATIONS 16
+
 struct csMGGeom
 {
   csRef<iMeshFactoryWrapper> factory;
@@ -41,6 +43,8 @@ struct csMGGeom
 
   // For every lod level we have a cache of meshes.
   csRefArray<iMeshWrapper> mesh_cache;
+  // For every lod level we have a cache of meshes that are set aside.
+  csRefArray<iMeshWrapper> mesh_setaside;
 };
 
 /**
@@ -86,6 +90,23 @@ public:
   csPtr<iMeshWrapper> AllocMesh (float sqdist);
 
   /**
+   * Set aside the mesh temporarily. This is called if we have a mesh that
+   * we want to free but we don't free it yet because we might want to allocate
+   * it again. Meshes that are put aside are not removed from the sector (that
+   * is a rather expensive operation) but they are only put in a queue. AllocMesh()
+   * will first check that queue. At the end of the frame you have to call
+   * FreeSetAsideMeshes() to really free the remaining meshes that haven't been
+   * reused.
+   */
+  void SetAsideMesh (iMeshWrapper* mesh);
+
+  /**
+   * Free all meshes that were put aside and that were not reused by
+   * AllocMesh().
+   */
+  void FreeSetAsideMeshes ();
+
+  /**
    * Free a mesh. This function will put the mesh back in the cache.
    */
   void FreeMesh (iMeshWrapper* mesh);
@@ -114,6 +135,19 @@ struct csMGPosition
    * in csMeshGenerator.
    */
   size_t geom_type;
+
+  /**
+   * A number between 0 and CS_GEOM_MAX_ROTATIONS indicating how
+   * to rotate this object.
+   */
+  size_t rotation;
+
+  /**
+   * A random number between 0 and 1 which controls fade and density
+   * scaling for this position.
+   */
+  float random;
+
   /// An optional mesh for this position. Can be 0.
   iMeshWrapper* mesh;
 
@@ -181,6 +215,9 @@ private:
   /// Random generator.
   csRandomFloatGen random;
 
+  /// CS_GEOM_MAX_ROTATIONS rotation matrices.
+  csMatrix3 rotation_matrices[CS_GEOM_MAX_ROTATIONS];
+
   /// Meshes on which we will map geometry.
   csRefArray<iMeshWrapper> meshes;
 
@@ -193,6 +230,17 @@ private:
   float samplefact_z;
   float samplecellwidth_x;
   float samplecellheight_z;
+
+  /// For density scaling.
+  bool use_density_scaling;
+  float density_mindist, sq_density_mindist, density_maxdist;
+  float density_scale;
+  float density_maxfactor;
+
+  /// For alpha scaling.
+  bool use_alpha_scaling;
+  float alpha_mindist, sq_alpha_mindist, alpha_maxdist;
+  float alpha_scale;
 
   /**
    * If true the cells are correctly set up. This is cleared by
@@ -261,6 +309,9 @@ private:
   /// Cell coordinate to world Z.
   float GetWorldZ (int z) { return samplebox.MinZ () + z * samplecellheight_z; }
 
+  /// Set the fade for a mesh.
+  void SetFade (iMeshWrapper* mesh, float factor);
+
 public:
   csMeshGenerator ();
   virtual ~csMeshGenerator ();
@@ -283,6 +334,10 @@ public:
   void SetupSampleBox ();
 
   virtual iObject *QueryObject () { return (iObject*)this; }
+
+  virtual void SetDensityScale (float mindist, float maxdist,
+  	float maxdensityfactor);
+  virtual void SetAlphaScale (float mindist, float maxdist);
 
   virtual void SetSampleBox (const csBox3& box);
   virtual const csBox3& GetSampleBox () const { return samplebox; }

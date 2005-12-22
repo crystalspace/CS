@@ -19,6 +19,7 @@
   </plugins>
 
   <library>grass.lib</library>
+  <library>rock.lib</library>
 
   <textures>
     <texture name="andrew_marble4.jpg">
@@ -188,15 +189,32 @@
 	    <factory maxdist="10" name="Grass" />
 	    <factory maxdist="20" name="GrassLow" />
 	    <radius>1</radius>
-	    <density>1</density>
+	    <density>1.5</density>
         </geometry>
+        <geometry>
+	    <factory maxdist="10" name="TallGrass" />
+	    <factory maxdist="20" name="TallGrassLow" />
+	    <radius>1</radius>
+	    <density>.3</density>
+        </geometry>
+        <geometry>
+	    <factory maxdist="20" name="Rock" />
+	    <radius>1</radius>
+	    <density>.02</density>
+        </geometry>
+        <geometry>
+	    <factory maxdist="20" name="RockSmall" />
+	    <radius>1</radius>
+	    <density>.2</density>
+        </geometry>
+	<densityscale mindist="17" maxdist="20" maxfactor="0" />
+	<alphascale mindist="13" maxdist="20" />
 	<samplebox>
 	    <min x="-256" y="-200" z="-256" />
 	    <max x="256" y="200" z="256" />
 	</samplebox>
 	<meshobj>Terrain</meshobj>
      </meshgen>
-
 
     <!-- Uncomment for ...fog: -->
     <!--fog red=".3" green=".27" blue=".27" density="0.002" /-->

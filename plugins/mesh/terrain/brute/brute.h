@@ -365,6 +365,8 @@ public:
     return true;
   }
   iMaterialWrapper *GetMaterialWrapper () const { return matwrap; }
+  virtual void SetMixMode (uint) { }
+  virtual uint GetMixMode () const { return CS_FX_COPY; }
 
   void SetBlockMaxSize (float size)
   {

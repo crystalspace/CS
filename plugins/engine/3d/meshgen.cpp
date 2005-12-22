@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
+#include "csgeom/matrix3.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/meshgen.h"
 
@@ -83,8 +84,12 @@ csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (float sqdist)
   if (lod == csArrayItemNotFound) return 0;
 
   csMGGeom& geom = factories[lod];
-  // See if we have some mesh ready in the cache.
-  if (geom.mesh_cache.Length () > 0)
+  // See if we have some mesh ready in the setaside or normal cache.
+  if (geom.mesh_setaside.Length () > 0)
+  {
+    return geom.mesh_setaside.Pop ();
+  }
+  else if (geom.mesh_cache.Length () > 0)
   {
     return geom.mesh_cache.Pop ();
   }
@@ -97,6 +102,32 @@ csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (float sqdist)
     name += lod;
     name += geom.factory->QueryObject ()->GetName ();
     return csEngine::currentEngine->CreateMeshWrapper (geom.factory, name);
+  }
+}
+
+void csMeshGeneratorGeometry::SetAsideMesh (iMeshWrapper* mesh)
+{
+  const char* name = mesh->QueryObject ()->GetName ();
+  // First we have the string __mg__ and then a single digit with
+  // the lod level.
+  int lod = name[6]-'0';
+  CS_ASSERT (lod >= 0 && lod < 10);
+  csMGGeom& geom = factories[lod];
+  geom.mesh_setaside.Push (mesh);
+}
+
+void csMeshGeneratorGeometry::FreeSetAsideMeshes ()
+{
+  size_t lod;
+  for (lod = 0 ; lod < factories.Length () ; lod++)
+  {
+    csMGGeom& geom = factories[lod];
+    while (geom.mesh_setaside.Length () > 0)
+    {
+      csRef<iMeshWrapper> mesh = geom.mesh_setaside.Pop ();
+      mesh->GetMovable ()->ClearSectors ();
+      geom.mesh_cache.Push (mesh);
+    }
   }
 }
 
@@ -132,6 +163,8 @@ csMeshGenerator::csMeshGenerator() : scfImplementationType (this)
 {
   max_blocks = 100;
   cell_dim = 50;
+  use_density_scaling = false;
+  use_alpha_scaling = false;
 
   sector = 0;
 
@@ -147,6 +180,12 @@ csMeshGenerator::csMeshGenerator() : scfImplementationType (this)
   prev_cells.MakeEmpty ();
 
   setup_cells = false;
+
+  for (i = 0 ; i < CS_GEOM_MAX_ROTATIONS ; i++)
+  {
+    rotation_matrices[i] = csYRotMatrix3 (2.0f*PI * float (i)
+    	/ float (CS_GEOM_MAX_ROTATIONS));
+  }
 }
 
 csMeshGenerator::~csMeshGenerator ()
@@ -174,6 +213,28 @@ float csMeshGenerator::GetTotalMaxDist ()
     sq_total_max_dist = total_max_dist * total_max_dist;
   }
   return total_max_dist;
+}
+
+void csMeshGenerator::SetDensityScale (float mindist, float maxdist,
+  	float maxdensityfactor)
+{
+  use_density_scaling = true;
+  density_mindist = mindist;
+  sq_density_mindist = density_mindist * density_mindist;
+  density_maxdist = maxdist;
+  density_maxfactor = maxdensityfactor;
+
+  density_scale = (1.0f-density_maxfactor) / (density_maxdist - density_mindist);
+}
+
+void csMeshGenerator::SetAlphaScale (float mindist, float maxdist)
+{
+  use_alpha_scaling = true;
+  alpha_mindist = mindist;
+  sq_alpha_mindist = alpha_mindist * alpha_mindist;
+  alpha_maxdist = maxdist;
+
+  alpha_scale = 1.0f / (alpha_maxdist - alpha_mindist);
 }
 
 void csMeshGenerator::SetSampleBox (const csBox3& box)
@@ -246,6 +307,11 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
       }
       if (hit)
       {
+        int rot = int (random.Get (CS_GEOM_MAX_ROTATIONS));
+	if (rot < 0) rot = 0;
+	else if (rot >= CS_GEOM_MAX_ROTATIONS) rot = CS_GEOM_MAX_ROTATIONS-1;
+        pos.rotation = rot;
+	pos.random = random.Get ();
         block->positions.Push (pos);
       }
     }
@@ -315,6 +381,32 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
   }
 }
 
+void csMeshGenerator::SetFade (iMeshWrapper* mesh, float factor)
+{
+  if (factor < .01)
+    mesh->GetMeshObject ()->SetMixMode (CS_FX_TRANSPARENT);
+  else if (factor < .99)
+  {
+    int alpha = csEngine::currentEngine->GetAlphaRenderPriority ();
+    if (mesh->GetRenderPriority () != alpha)
+    {
+      mesh->SetRenderPriority (alpha);
+      mesh->SetZBufMode (CS_ZBUF_TEST);
+    }
+    mesh->GetMeshObject ()->SetMixMode (CS_FX_SETALPHA(1.0f-factor));
+  }
+  else
+  {
+    mesh->GetMeshObject ()->SetMixMode (CS_FX_COPY);
+    int obj = csEngine::currentEngine->GetObjectRenderPriority ();
+    if (mesh->GetRenderPriority () != obj)
+    {
+      mesh->SetRenderPriority (obj);
+      mesh->SetZBufMode (CS_ZBUF_USE);
+    }
+  }
+}
+
 void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
 {
   CS_ASSERT (cell.block != 0);
@@ -325,20 +417,35 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
   for (i = 0 ; i < positions.Length () ; i++)
   {
     csMGPosition& p = positions[i];
+
     float sqdist = csSquaredDist::PointPoint (pos, p.position);
     if (sqdist < sq_total_max_dist)
     {
       if (!p.mesh)
       {
         // We didn't have a mesh here so we allocate one.
-        csRef<iMeshWrapper> mesh = geometries[p.geom_type]->AllocMesh (sqdist);
-	if (mesh)
-	{
-          p.mesh = mesh;
-          mesh->GetMovable ()->SetSector (sector);
-	  mesh->GetMovable ()->SetPosition (sector, p.position);
-	  mesh->GetMovable ()->UpdateMove ();
+	// But first we test if we have density scaling.
+	bool show = true;
+        if (use_density_scaling && sqdist > sq_density_mindist)
+        {
+          float dist = sqrt (sqdist);
+          float factor = (density_maxdist - dist) * density_scale + density_maxfactor;
+          if (factor < 0) factor = 0;
+          else if (factor > 1) factor = 1;
+          if (p.random > factor) show = false;
         }
+
+	if (show)
+	{
+          csRef<iMeshWrapper> mesh = geometries[p.geom_type]->AllocMesh (sqdist);
+	  if (mesh)
+	  {
+            p.mesh = mesh;
+	    mesh->GetMovable ()->SetPosition (sector, p.position);
+	    mesh->GetMovable ()->SetTransform (rotation_matrices[p.rotation]);
+	    mesh->GetMovable ()->UpdateMove ();
+          }
+	}
       }
       else
       {
@@ -346,23 +453,52 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
 	if (!geometries[p.geom_type]->IsRightLOD (p.mesh, sqdist))
 	{
 	  // We need a different mesh here.
-          geometries[p.geom_type]->FreeMesh (p.mesh);
+          geometries[p.geom_type]->SetAsideMesh (p.mesh);
           csRef<iMeshWrapper> mesh = geometries[p.geom_type]->AllocMesh (sqdist);
           p.mesh = mesh;
 	  if (mesh)
 	  {
-            mesh->GetMovable ()->SetSector (sector);
 	    mesh->GetMovable ()->SetPosition (sector, p.position);
+	    mesh->GetMovable ()->SetTransform (rotation_matrices[p.rotation]);
 	    mesh->GetMovable ()->UpdateMove ();
 	  }
 	}
+      }
+      if (p.mesh && use_alpha_scaling)
+      {
+	// This is used only if we have both density scaling and
+	// alpha scaling. It is the offset to correct the distance at which
+	// the object will disappear. We can adapt alpha scaling to scale
+	// based on that new distance.
+	float correct_dist = 0;
+	float correct_sq_alpha_mindist = sq_alpha_mindist;
+
+#if 0
+        if (use_density_scaling && sqdist > sq_density_mindist)
+        {
+	  correct_dist = (p.random - density_maxfactor) / density_scale;
+	  if (correct_dist < 0) correct_dist = 0;
+	  correct_sq_alpha_mindist = alpha_mindist-correct_dist;
+	  correct_sq_alpha_mindist *= correct_sq_alpha_mindist;
+//printf ("p.mesh='%s' sqdist=%g dist=%g correct_sq_alpha_mindist=%g correct_dist=%g p.random=%g", p.mesh->QueryObject ()->GetName (), sqdist, sqrt (sqdist), correct_sq_alpha_mindist, correct_dist, p.random); fflush (stdout);
+        }
+#endif
+
+	float factor = 1.0;
+        if (sqdist > correct_sq_alpha_mindist)
+        {
+          float dist = sqrt (sqdist);
+          factor = (alpha_maxdist-correct_dist - dist) * alpha_scale;
+	}
+	//printf (" -> factor=%g\n", factor); fflush (stdout);
+	SetFade (p.mesh, factor);
       }
     }
     else
     {
       if (p.mesh)
       {
-        geometries[p.geom_type]->FreeMesh (p.mesh);
+        geometries[p.geom_type]->SetAsideMesh (p.mesh);
         p.mesh = 0;
       }
     }
@@ -417,9 +553,10 @@ void csMeshGenerator::AllocateBlocks (const csVector3& pos)
 
   // Now allocate the cells that are close enough.
   for (z = minz ; z < maxz ; z++)
+  {
+    int cidx = z*cell_dim + minx;
     for (x = minx ; x < maxx ; x++)
     {
-      int cidx = z*cell_dim + x;
       csMGCell& cell = cells[cidx];
       float sqdist = cell.box.SquaredPosDist (pos2d);
 
@@ -434,7 +571,14 @@ void csMeshGenerator::AllocateBlocks (const csVector3& pos)
         // but free all meshes that are in it.
         FreeMeshesInBlock (cell);
       }
+      cidx++;
     }
+  }
+
+  // Now really free the meshes we didn't reuse.
+  size_t i;
+  for (i = 0 ; i < geometries.Length () ; i++)
+    geometries[i]->FreeSetAsideMeshes ();
 }
 
 void csMeshGenerator::FreeMeshesInBlock (csMGCell& cell)
@@ -449,7 +593,7 @@ void csMeshGenerator::FreeMeshesInBlock (csMGCell& cell)
       {
         CS_ASSERT (positions[i].geom_type >= 0);
         CS_ASSERT (positions[i].geom_type < geometries.Length ());
-        geometries[positions[i].geom_type]->FreeMesh (positions[i].mesh);
+        geometries[positions[i].geom_type]->SetAsideMesh (positions[i].mesh);
         positions[i].mesh = 0;
       }
     }

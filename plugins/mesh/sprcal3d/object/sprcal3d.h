@@ -603,6 +603,8 @@ public:
   {
     return 0; //GetMaterial ();
   }
+  virtual void SetMixMode (uint) { }
+  virtual uint GetMixMode () const { return CS_FX_COPY; }
   virtual void InvalidateMaterialHandles () { }
   /**
    * See imesh/object.h for specification. The default implementation

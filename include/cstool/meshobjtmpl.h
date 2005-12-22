@@ -31,6 +31,7 @@
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
 
+#include "ivideo/graph3d.h"
 #include "imesh/object.h"
 #include "iutil/comp.h"
 
@@ -213,6 +214,11 @@ public:
    * does not support a material.
    */
   virtual iMaterialWrapper* GetMaterialWrapper () const;
+
+  /// Set mix mode. Default implementation doesn't do anything.
+  virtual void SetMixMode (uint) { }
+  /// Get mix mode.
+  virtual uint GetMixMode () const { return CS_FX_COPY; }
 
   /**
    * see imesh/object.h for specification. The default implementation

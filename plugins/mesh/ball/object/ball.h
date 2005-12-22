@@ -147,7 +147,6 @@ public:
 	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
   /// Get mixmode.
-  uint GetMixMode () const { return MixMode; }
   void SetRadius (float radiusx, float radiusy, float radiusz);
   void GetRadius (float& radx, float& rady, float& radz) const
   { radx=radiusx; rady=radiusy; radz=radiusz; }
@@ -297,6 +296,8 @@ public:
     return true;
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
+  virtual void SetMixMode (uint mode) { MixMode = mode; }
+  virtual uint GetMixMode () const { return MixMode; }
   virtual void InvalidateMaterialHandles () { }
   /**
    * see imesh/object.h for specification. The default implementation

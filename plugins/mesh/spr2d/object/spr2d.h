@@ -239,6 +239,8 @@ public:
     return true;
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
+  virtual void SetMixMode (uint mode) { MixMode = mode; }
+  virtual uint GetMixMode () const { return MixMode; }
   virtual void InvalidateMaterialHandles () { }
   /**
    * see imesh/object.h for specification. The default implementation

@@ -109,6 +109,32 @@ struct iMeshGenerator : public virtual iBase
   virtual iObject *QueryObject () = 0;
 
   /**
+   * Set the density scale. If this is set then objects in the distance
+   * can have a lower density.
+   * \param mindist is the minimum distance at which density scale starts. At
+   * this distance the density factor will be 1 (meaning original density
+   * as given by the geometry itself).
+   * \param maxdist is the maximum distance at which density scale ends. At
+   * this distance the density factor will be equal to 'maxdensityfactor'.
+   * Note that this is a linear function so distances beyond 'maxdist' will get
+   * even lower density.
+   * \param maxdensityfactor is the density factor to use at 'maxdist'. 1 means
+   * full density and 0 means nothing left.
+   */
+  virtual void SetDensityScale (float mindist, float maxdist,
+  	float maxdensityfactor) = 0;
+
+  /**
+   * Set the alpha scale. If this is set then objects in the distance
+   * will use alpha mode.
+   * \param mindist is the minimum distance at which alpha scale starts. At
+   * this distance the alpha factor will be 1 (meaning no alpha).
+   * \param maxdist is the maximum distance at which alpha scale ends. At
+   * this distance the alpha factor will be equal to '0'.
+   */
+  virtual void SetAlphaScale (float mindist, float maxdist) = 0;
+
+  /**
    * Get the box where where we will sample. We will sample starting
    * at the highest y value of the box and pointing down to the lowest
    * y value of the box. (@@@ TODO: in future support other directions

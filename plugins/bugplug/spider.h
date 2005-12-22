@@ -25,6 +25,7 @@
 #include "iengine/camera.h"
 #include "igeom/objmodel.h"
 #include "imesh/object.h"
+#include "ivideo/graph3d.h"
 
 struct iEngine;
 struct iCamera;
@@ -147,6 +148,8 @@ public:
   virtual bool GetColor (csColor&) const { return false; }
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
+  virtual void SetMixMode (uint) { }
+  virtual uint GetMixMode () const { return CS_FX_COPY; }
   virtual void InvalidateMaterialHandles () { }
   /**
    * see imesh/object.h for specification. The default implementation

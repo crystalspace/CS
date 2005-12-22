@@ -405,10 +405,10 @@ enum
 
 /// Macro for setting of alpha bits into mixmode (alpha between 0 and 1).
 #define CS_FX_SETALPHA(alpha) \
-  (CS_FX_ALPHA | uint (alpha * CS_FX_MASK_ALPHA))
+  (CS_FX_ALPHA | uint ((alpha) * CS_FX_MASK_ALPHA))
 /// Macro for setting of alpha bits into mixmode (alpha between 0 and 255).
 #define CS_FX_SETALPHA_INT(alpha) \
-  (CS_FX_ALPHA | uint (alpha & CS_FX_MASK_ALPHA))
+  (CS_FX_ALPHA | uint ((alpha) & CS_FX_MASK_ALPHA))
 
 /**
  * Describes how to deal with alpha values in textures.

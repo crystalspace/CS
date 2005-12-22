@@ -241,6 +241,11 @@ struct iMeshObject : public virtual iBase
    */
   virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
 
+  /// Set mix mode. Note that not all meshes may support this.
+  virtual void SetMixMode (uint mode) = 0;
+  /// Get mix mode.
+  virtual uint GetMixMode () const = 0;
+
   /**
    * Material changed. This is an 'event' that the engine (or another
    * party managing materials) will send out as soon as the material
