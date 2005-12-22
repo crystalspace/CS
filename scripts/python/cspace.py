@@ -4843,6 +4843,9 @@ class csHitBeamResult(_object):
     __swig_setmethods__["polygon_idx"] = _cspace.csHitBeamResult_polygon_idx_set
     __swig_getmethods__["polygon_idx"] = _cspace.csHitBeamResult_polygon_idx_get
     if _newclass:polygon_idx = property(_cspace.csHitBeamResult_polygon_idx_get, _cspace.csHitBeamResult_polygon_idx_set)
+    __swig_setmethods__["material"] = _cspace.csHitBeamResult_material_set
+    __swig_getmethods__["material"] = _cspace.csHitBeamResult_material_get
+    if _newclass:material = property(_cspace.csHitBeamResult_material_get, _cspace.csHitBeamResult_material_set)
     __swig_setmethods__["facehit"] = _cspace.csHitBeamResult_facehit_set
     __swig_getmethods__["facehit"] = _cspace.csHitBeamResult_facehit_get
     if _newclass:facehit = property(_cspace.csHitBeamResult_facehit_get, _cspace.csHitBeamResult_facehit_set)
