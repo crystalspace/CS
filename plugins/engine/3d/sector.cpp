@@ -766,12 +766,15 @@ void csSector::PrepareDraw (iRenderView *rview)
       // Temporarily move the object to the current camera.
       csReversibleTransform &mov_trans = mov->GetTransform ();
       // @@@ TEMPORARY: now CS_ENTITY_CAMERA only works at 0,0,0 position.
+      csVector3 old_pos = mov_trans.GetOrigin ();
       mov_trans.SetOrigin (csVector3 (0));
       iCamera *orig_cam = rview->GetOriginalCamera ();
       csOrthoTransform &orig_trans = orig_cam->GetTransform ();
       csVector3 v = orig_trans.GetO2TTranslation ();
       mov_trans.SetOrigin (mov_trans.GetOrigin () + v);
-      mov->UpdateMove ();
+      csVector3 diff = old_pos - mov_trans.GetOrigin ();
+      if (!(diff < .00001f))
+        mov->UpdateMove ();
     }
   }
 }

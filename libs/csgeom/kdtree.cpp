@@ -132,7 +132,7 @@ csKDTree::csKDTree () : scfImplementationType(this)
   objects = 0;
   parent = 0;
   num_objects = max_objects = 0;
-  disallow_distribute = false;
+  disallow_distribute = 0;
   split_axis = CS_KDTREE_AXISINVALID;
 
   node_bbox.Set (-KDTREE_MAX, -KDTREE_MAX,
@@ -176,7 +176,7 @@ void csKDTree::Clear ()
     tree_nodes.Free (child2);
     child2 = 0;
   }
-  disallow_distribute = false;
+  disallow_distribute = 0;
   SetUserObject (0);
   estimate_total_objects = 0;
 }
@@ -459,7 +459,8 @@ void csKDTree::AddObject (const csBox3& /*bbox*/, csKDTreeChild* obj)
 {
   // Add this object to the list of objects to be distributed
   // later.
-  disallow_distribute = false;
+  if (disallow_distribute > 0)
+    disallow_distribute--;
   obj->AddLeaf (this);
   AddObject (obj);
 }
@@ -488,7 +489,8 @@ void csKDTree::UnlinkObject (csKDTreeChild* object)
       DebugExit ();
     }
     leaf->RemoveObject (idx);
-    leaf->disallow_distribute = false;	// Give distribute a new chance.
+    if (leaf->disallow_distribute > 0)
+      leaf->disallow_distribute--;	// Give distribute a new chance.
   }
   object->num_leafs = 0;
 }
@@ -501,6 +503,14 @@ void csKDTree::RemoveObject (csKDTreeChild* object)
 
 void csKDTree::MoveObject (csKDTreeChild* object, const csBox3& new_bbox)
 {
+  // First check if the bounding box actually changed.
+  csVector3 dmin = object->bbox.Min () - new_bbox.Min ();
+  csVector3 dmax = object->bbox.Max () - new_bbox.Max ();
+  if ((dmin < .00001f) && (dmax < .00001f))
+  {
+    return;
+  }
+
   // If the object is in only one leaf then we test if this object
   // will still be in the bounding box of that leaf after moving it around.
   if (object->num_leafs == 1)
@@ -510,7 +520,8 @@ void csKDTree::MoveObject (csKDTreeChild* object, const csBox3& new_bbox)
       // Even after moving we are still completely inside the bounding box
       // of the current leaf.
       object->bbox = new_bbox;
-      object->leafs[0]->disallow_distribute = false;
+      if (object->leafs[0]->disallow_distribute > 0)
+        object->leafs[0]->disallow_distribute--;
       return;
     }
   }
@@ -557,7 +568,7 @@ void csKDTree::Distribute ()
 {
   // Check if there are objects to distribute or if distribution
   // is not allowed.
-  if (num_objects == 0 || disallow_distribute) return;
+  if (num_objects == 0 || disallow_distribute > 0) return;
 
   CS_ASSERT ((child1 == 0) == (child2 == 0));
   if (child1)
@@ -608,9 +619,9 @@ void csKDTree::Distribute ()
     {
       // No good quality split was found so we don't split. This
       // can happen if all objects are placed on top of each other.
-      disallow_distribute = true;
+      disallow_distribute = DISALLOW_DISTRIBUTE_TIME;
     }
-    if (!disallow_distribute)
+    if (disallow_distribute == 0)
     {
       child1 = tree_nodes.Alloc ();
       child1->SetParent (this);
@@ -736,7 +747,7 @@ void csKDTree::Flatten ()
 {
   if (!child1) return;	// Nothing to do.
 
-  disallow_distribute = false;
+  disallow_distribute = 0;
 
   FlattenTo (this);
   return;

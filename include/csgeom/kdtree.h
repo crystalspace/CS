@@ -191,13 +191,15 @@ private:
   int estimate_total_objects;
 
   // Disallow Distribute().
-  // If this flag is true it means that we cannot find a good split
+  // If this flag > 0 it means that we cannot find a good split
   // location for the current list of objects. So in that case we don't
-  // split at all and set this flag to true so that we will no longer
-  // attempt to distribute. Whenever objects are added or removed to this
-  // node this flag will be set to false again so that a new Distribute()
-  // attempt can be made. This situation should be rare though.
-  bool disallow_distribute;
+  // split at all and set this flag to DISALLOW_DISTRIBUTE_TIME so
+  // that we will no longer attempt to distribute for a while. Whenever
+  // objects are added or removed to this node this flag will be decreased
+  // so that when it becomes 0 we can make a new Distribute() attempt can
+  // be made. This situation should be rare though.
+#define DISALLOW_DISTRIBUTE_TIME 20
+  int disallow_distribute;
 
   // Current timestamp we are using for Front2Back(). Objects that
   // have the same timestamp are already visited during Front2Back().

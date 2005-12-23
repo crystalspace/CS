@@ -33,6 +33,17 @@ chronological order.
 	      number of cells and blocks.
 	- Jorrit refixed the bug with adding children to regions too so
 	  that it will now also add children of children.
+	- Jorrit fixed the handling of CAMERA objects so that they don't
+	  call UpdateMove() in case the position didn't change. That
+	  optimizes rendering a bit in case the camera stands still.
+	- Jorrit did a rather significant fix to csKDTree. In the past,
+	  whenever an object moves, is deleted, or added CS will try
+	  to do a new distribute of the kdtree. However, this is an
+	  expensive operation so instead we now do it only after
+	  20 such tree operations.
+	- Jorrit optimized csKDTree::MoveObject() so that it will now
+	  test if the bounding box of the object actually changes before
+	  doing more expensive operations.
 22-Dec-2005
 	- Jorrit added SetMixMode() and GetMixMode() to iMeshObject. This is
 	  supported by most meshes.
