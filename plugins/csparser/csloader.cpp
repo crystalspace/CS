@@ -847,6 +847,23 @@ void csLoader::AddToRegion (iLoaderContext* ldr_context, iObject* obj)
     ldr_context->GetRegion ()->QueryObject ()->ObjAdd (obj);
 }
 
+void csLoader::AddChildrenToRegion (iLoaderContext* ldr_context,
+	const csRefArray<iSceneNode>& children)
+{
+  size_t i;
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    iSceneNode* sn = children[i];
+    iObject* obj = 0;
+    if (sn->QueryMesh ()) obj = sn->QueryMesh ()->QueryObject ();
+    else if (sn->QueryLight ()) obj = sn->QueryLight ()->QueryObject ();
+    //else if (sn->QueryCamera ()) obj = sn->QueryCamera ()->QueryObject ();
+    if (obj)
+      AddToRegion (ldr_context, obj);
+    AddChildrenToRegion (ldr_context, sn->GetChildren ());
+  }
+}
+
 //---------------------------------------------------------------------------
 
 csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname,
@@ -2989,17 +3006,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
 	    // Now also add the child mesh objects to the region.
 	    const csRefArray<iSceneNode>& children = mesh->QuerySceneNode ()->
 	    	GetChildren ();
-	    size_t i;
-	    for (i = 0 ; i < children.Length () ; i++)
-	    {
-	      iSceneNode* sn = children[i];
-	      iObject* obj = 0;
-	      if (sn->QueryMesh ()) obj = sn->QueryMesh ()->QueryObject ();
-	      else if (sn->QueryLight ()) obj = sn->QueryLight ()->QueryObject ();
-	      //else if (sn->QueryCamera ()) obj = sn->QueryCamera ()->QueryObject ();
-	      if (obj)
-	        AddToRegion (ldr_context, obj);
-	    }
+	    AddChildrenToRegion (ldr_context, children);
 	  }
 	}
         break;
@@ -3692,6 +3699,12 @@ bool csLoader::LoadMeshGen (iLoaderContext* ldr_context,
 	  float maxdist = child->GetAttributeValueAsFloat ("maxdist");
 	  meshgen->SetAlphaScale (mindist, maxdist);
 	}
+	break;
+      case XMLTOKEN_NUMBLOCKS:
+        meshgen->SetBlockCount (child->GetContentsValueAsInt ());
+	break;
+      case XMLTOKEN_CELLDIM:
+        meshgen->SetCellCount (child->GetContentsValueAsInt ());
 	break;
       case XMLTOKEN_SAMPLEBOX:
 	{

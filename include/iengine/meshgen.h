@@ -148,6 +148,35 @@ struct iMeshGenerator : public virtual iBase
   virtual const csBox3& GetSampleBox () const = 0;
 
   /**
+   * Set the number of cells to use in one direction. Total cells
+   * will be 'number*number'. A cell is a logical unit that can
+   * keep a number of generated positions. Using bigger (fewer) cells
+   * means that more positions are generated at once (possibly causing
+   * hickups when this happens). Smaller cells may mean more runtime
+   * overhead. Default is 50.
+   */
+  virtual void SetCellCount (int number) = 0;
+
+  /**
+   * Get the cell count.
+   */
+  virtual int GetCellCount () const = 0;
+
+  /**
+   * Set the maximum number of blocks to keep in memory at the same time.
+   * A block contains generated positions. Generating a block may be
+   * expensive (depending on density and size of the cells) so it may be
+   * good to have a high number here. Having a high number means more
+   * memory usage though. Default is 100.
+   */
+  virtual void SetBlockCount (int number) = 0;
+
+  /**
+   * Get the block count.
+   */
+  virtual int GetBlockCount () const = 0;
+
+  /**
    * Create a geometry specification for this mesh generator.
    */
   virtual iMeshGeneratorGeometry* CreateGeometry () = 0;

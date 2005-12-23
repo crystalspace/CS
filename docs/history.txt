@@ -23,6 +23,16 @@ chronological order.
 	  child mesh objects (or lights and cameras) of the just created
 	  mesh are also added to the current region.
 	- Jorrit added a nice skybox to terrainf with moving clouds.
+	- Jorrit did the following meshgen changes:
+	    - Added a check and error in case the number of needed
+	      blocks (in one frame) is more then the total number.
+	    - Fixed a bug where blocks were not properly taken from
+	      other blocks already in use. This bug manifested easily
+	      if a big radius was used.
+	    - Jorrit added method calls so that you can change the
+	      number of cells and blocks.
+	- Jorrit refixed the bug with adding children to regions too so
+	  that it will now also add children of children.
 22-Dec-2005
 	- Jorrit added SetMixMode() and GetMixMode() to iMeshObject. This is
 	  supported by most meshes.

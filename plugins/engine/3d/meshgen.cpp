@@ -237,6 +237,77 @@ void csMeshGenerator::SetAlphaScale (float mindist, float maxdist)
   alpha_scale = 1.0f / (alpha_maxdist - alpha_mindist);
 }
 
+void csMeshGenerator::SetCellCount (int number)
+{
+  if (setup_cells)
+  {
+    // We already setup so we need to deallocate all blocks first.
+    int x, z;
+    for (z = 0 ; z < cell_dim ; z++)
+      for (x = 0 ; x < cell_dim ; x++)
+      {
+	int cidx = z*cell_dim + x;
+	csMGCell& cell = cells[cidx];
+        FreeMeshesInBlock (cell);
+	if (cell.block)
+	{
+	  cell.block->parent_cell = csArrayItemNotFound;
+	  cache_blocks.Push (cell.block);
+	  cell.block->next = cell.block->prev = 0;
+	  cell.block = 0;
+        }
+      }
+    inuse_blocks = 0;
+    inuse_blocks_last = 0;
+    setup_cells = false;
+  }
+  cell_dim = number;
+  delete[] cells;
+  cells = new csMGCell [cell_dim * cell_dim];
+}
+
+void csMeshGenerator::SetBlockCount (int number)
+{
+  if (setup_cells)
+  {
+    // We already setup so we need to deallocate all blocks first.
+    int x, z;
+    for (z = 0 ; z < cell_dim ; z++)
+      for (x = 0 ; x < cell_dim ; x++)
+      {
+	int cidx = z*cell_dim + x;
+	csMGCell& cell = cells[cidx];
+        FreeMeshesInBlock (cell);
+	if (cell.block)
+	{
+	  cell.block->parent_cell = csArrayItemNotFound;
+	  cache_blocks.Push (cell.block);
+	  cell.block->next = cell.block->prev = 0;
+	  cell.block = 0;
+        }
+      }
+    inuse_blocks = 0;
+    inuse_blocks_last = 0;
+
+    setup_cells = false;
+  }
+  size_t i;
+  if (number > max_blocks)
+  {
+    for (i = max_blocks ; i < size_t (number) ; i++)
+      cache_blocks.Push (new csMGPositionBlock ());
+  }
+  else
+  {
+    for (i = number ; i < size_t (max_blocks) ; i++)
+    {
+      csMGPositionBlock* block = cache_blocks.Pop ();
+      delete block;
+    }
+  }
+  max_blocks = number;
+}
+
 void csMeshGenerator::SetSampleBox (const csBox3& box)
 {
   samplebox = box;
@@ -417,7 +488,7 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
     csMGPositionBlock* block = inuse_blocks_last;
     CS_ASSERT (block->parent_cell != csArrayItemNotFound);
     CS_ASSERT (block == cells[block->parent_cell].block);
-    cells[block->parent_cell].block = block;
+    cells[block->parent_cell].block = 0;
     block->parent_cell = cidx;
     cell.block = block;
 
@@ -606,6 +677,8 @@ void csMeshGenerator::AllocateBlocks (const csVector3& pos)
   }
   prev_cells = cur_cells;
 
+  int total_needed = 0;
+
   // Now allocate the cells that are close enough.
   for (z = minz ; z < maxz ; z++)
   {
@@ -617,6 +690,13 @@ void csMeshGenerator::AllocateBlocks (const csVector3& pos)
 
       if (sqdist < sqmd)
       {
+        total_needed++;
+	if (total_needed >= max_blocks)
+	{
+	  csEngine::currentEngine->Error (
+	  	"The mesh generator need more blocks then %d!", max_blocks);
+	  return;	// @@@ What to do here???
+	}
         AllocateBlock (cidx, cell);
         AllocateMeshes (cell, pos);
       }

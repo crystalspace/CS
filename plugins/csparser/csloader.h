@@ -67,6 +67,7 @@ struct iFile;
 struct iPolygonMesh;
 struct iShaderManager;
 struct iMeshGenerator;
+struct iSceneNode;
 
 struct iObject;
 struct iThingState;
@@ -501,6 +502,12 @@ private:
    * such a region).
    */
   void AddToRegion (iLoaderContext* ldr_context, iObject* obj);
+
+  /**
+   * Add children to the region.
+   */
+  void AddChildrenToRegion (iLoaderContext* ldr_context,
+	const csRefArray<iSceneNode>& children);
 
   /// Report any error.
   void ReportError (const char* id, const char* description, ...)

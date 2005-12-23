@@ -346,6 +346,11 @@ public:
   virtual void SetSampleBox (const csBox3& box);
   virtual const csBox3& GetSampleBox () const { return samplebox; }
 
+  virtual void SetCellCount (int number);
+  virtual int GetCellCount () const { return cell_dim; }
+  virtual void SetBlockCount (int number);
+  virtual int GetBlockCount () const { return max_blocks; }
+
   virtual iMeshGeneratorGeometry* CreateGeometry ();
   virtual size_t GetGeometryCount () const { return geometries.Length (); }
   virtual iMeshGeneratorGeometry* GetGeometry (size_t idx)
