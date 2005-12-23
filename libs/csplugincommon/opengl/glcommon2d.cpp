@@ -114,7 +114,10 @@ bool csGraphics2DGLCommon::Open ()
   fontCache = GLFontCache;
 
   statecache->Enable_GL_SCISSOR_TEST ();
-
+  /* Some drivers need that to get the initial scissor right
+   * (Mesa DRI Intel(R) 915GM 20050225 in this case) */
+  glScissor (0, 0, 1, 1);
+  
   if (!csGraphics2D::Open ())
     return false;
 

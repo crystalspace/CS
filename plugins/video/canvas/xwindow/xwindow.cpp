@@ -24,6 +24,7 @@
 #include "csutil/event.h"
 #include "xwindow.h"
 #include "csgeom/csrect.h"
+#include "csutil/callstack.h"
 #include "csutil/cfgacc.h"
 #include "csutil/scf.h"
 #include "iutil/plugin.h"
@@ -48,34 +49,14 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csXWindow)
 
-SCF_IMPLEMENT_IBASE(csXWindow)
-  SCF_IMPLEMENTS_INTERFACE(iXWindow)
-  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csXWindow::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csXWindow::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
 #define CS_XEXT_XF86VM_SCF_ID "crystalspace.window.x.extf86vm"
 #define CS_XEXT_XF86VM "XFree86-VidModeExtension"
 
-csXWindow::csXWindow (iBase* parent)
+csXWindow::csXWindow (iBase* parent) : scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-
-  scfiEventHandler = 0;
-
   EmptyMouseCursor = 0;
   memset (&MouseCursor, 0, sizeof (MouseCursor));
   wm_win = ctx_win = 0;
-  win_title = 0;
   EventOutlet = 0;
 
   wm_width = wm_height = 0;
@@ -87,20 +68,14 @@ csXWindow::csXWindow (iBase* parent)
   Canvas = 0;
 
   keyboard_grabbed = 0;
+  oldErrorHandler = 0;
 }
 
 void csXWindow::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
-  if (rep)
-    rep->ReportV (severity, "crystalspace.window.x", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, severity, "crystalspace.window.x", msg, arg);
   va_end (arg);
 }
 
@@ -108,17 +83,45 @@ csXWindow::~csXWindow ()
 {
   if (scfiEventHandler)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q != 0)
       q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
   }
 
-  delete [] win_title;
   cachedCursors.DeleteAll ();
+  
+  if (oldErrorHandler != 0)
+  {
+    XSetErrorHandler (oldErrorHandler);
+  }
+}
 
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE();
+static int MyErrorHandler (Display* dpy, XErrorEvent* ev)
+{
+  char errorText[256];
+  XGetErrorText (dpy, ev->error_code, errorText, sizeof (errorText));
+  csFPrintf (stderr, "X error!\n");
+  csFPrintf (stderr, " type:         %d\n", ev->type);
+  csFPrintf (stderr, " serial:       %ld\n", ev->serial);
+  csFPrintf (stderr, " error code:   %d (%s)\n", ev->error_code, errorText);
+  csFPrintf (stderr, " request code: %d\n", ev->request_code);
+  csFPrintf (stderr, " minor code:   %d\n", ev->minor_code);
+  csFPrintf (stderr, " resource:     %jx\n", (uintmax_t)ev->resourceid);
+  fflush (stderr);
+  
+  csCallStack* stack = csCallStackHelper::CreateCallStack (1);
+  if (stack != 0)
+  {
+    stack->Print (stderr);
+    fflush (stderr);
+    stack->Free();
+  }
+#ifdef CS_DEBUG
+  CS_DEBUG_BREAK;
+#else
+  abort();
+#endif
+  return 0;
 }
 
 bool csXWindow::Initialize (iObjectRegistry *object_reg)
@@ -138,6 +141,13 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "FATAL: Cannot open X display");
     return false;
+  }
+  
+  bool Xsynchronous = Config->GetBool ("Video.X.Sync", false);
+  if (Xsynchronous)
+  {
+    XSynchronize (dpy, True);
+    oldErrorHandler = XSetErrorHandler (MyErrorHandler);
   }
 
   // Set user locale for national character support
@@ -223,7 +233,7 @@ bool csXWindow::Open ()
     if (!xvis)
       Report (CS_REPORTER_SEVERITY_ERROR, "No XVisualInfo!");
     if (!Canvas)
-      Report (CS_REPORTER_SEVERITY_ERROR, "No Canvas!\n");
+      Report (CS_REPORTER_SEVERITY_ERROR, "No Canvas!");
     return false;
   }
 
@@ -253,8 +263,8 @@ bool csXWindow::Open ()
   XSetWMProtocols (dpy, wm_win, &wm_delete_window, 1);
 
   XClassHint *class_hint = XAllocClassHint();
-  class_hint->res_name = win_title;
-  class_hint->res_class = win_title;
+  class_hint->res_name = CS_CONST_CAST (char*, win_title.GetData());
+  class_hint->res_class = CS_CONST_CAST (char*, win_title.GetData());
   XmbSetWMProperties (dpy, wm_win,
 		      0, 0, 0, 0,
 		      0, 0, class_hint);
@@ -345,7 +355,7 @@ bool csXWindow::Open ()
 
   // Tell event queue to call us on every frame
   if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
+    scfiEventHandler.AttachNew (new EventHandler (this));
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0) {
     csEventID events[3] = { csevPreProcess(name_reg), 
@@ -424,9 +434,7 @@ void csXWindow::Close ()
 
 void csXWindow::SetTitle (const char* title)
 {
-  delete [] win_title;
-  win_title = new char [strlen (title) + 1];
-  strcpy (win_title, title);
+  win_title = title;
   if(dpy && wm_win)   
       XStoreName(dpy, wm_win, win_title);
 }

@@ -44,6 +44,13 @@ chronological order.
 	- Jorrit optimized csKDTree::MoveObject() so that it will now
 	  test if the bounding box of the object actually changes before
 	  doing more expensive operations.
+	- res changed the Unix csLoadLibrary() to pass RTLD_GLOBAL to dlopen().
+	  That seems to fix issues were only indirect GL rendering was
+	  available to CS ("export LIBGL_DEBUG=1" revealed a symbol not being
+	  found by the DRI driver).
+	- res rearranged some code in glx2d to make things work for him.
+	- res fixed the X canvases to properly set the default window title.
+	- res ported the xwin plugin to new SCF.
 22-Dec-2005
 	- Jorrit added SetMixMode() and GetMixMode() to iMeshObject. This is
 	  supported by most meshes.

@@ -28,12 +28,12 @@
 
 #ifdef CS_DEBUG
 #  ifdef CS_HAVE_RTLD_NOW
-#    define DLOPEN_MODE   RTLD_NOW // | RTLD_GLOBAL	// handy for debugging
+#    define DLOPEN_MODE   RTLD_NOW | RTLD_GLOBAL	// handy for debugging
 #  else
-#    define DLOPEN_MODE   RTLD_LAZY // | RTLD_GLOBAL
+#    define DLOPEN_MODE   RTLD_LAZY | RTLD_GLOBAL
 #  endif
 #else
-#  define DLOPEN_MODE   RTLD_LAZY // | RTLD_GLOBAL
+#  define DLOPEN_MODE   RTLD_LAZY | RTLD_GLOBAL
 #endif
 
 csLibraryHandle csLoadLibrary (const char* iName)

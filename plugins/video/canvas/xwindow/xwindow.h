@@ -21,8 +21,9 @@
 #define __CS_XWINDOW_H__
 
 #include <stdarg.h>
-#include "csutil/scf.h"
 #include "csutil/hash.h"
+#include "csutil/scf.h"
+#include "csutil/weakref.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/event.h"
@@ -37,7 +38,11 @@
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
 
-class csXWindow : public iXWindow, public iEventPlug
+class csXWindow : 
+  public scfImplementation3<csXWindow,
+                            iXWindow, 
+                            iEventPlug,
+                            iComponent>
 {
   /// The Object Registry
   iObjectRegistry *object_reg;
@@ -50,7 +55,7 @@ class csXWindow : public iXWindow, public iEventPlug
   /// The XFree86-VidModeExtension
   csRef<iXExtF86VM> xf86vm;
   /// The Window Title
-  char *win_title;
+  csString win_title;
   /// The X-display
   Display* dpy;
   /// The Screen Number (not necessarilly the default)
@@ -87,13 +92,14 @@ class csXWindow : public iXWindow, public iEventPlug
   /// List of image-based cursors
   csHash<Cursor, csStrKey> cachedCursors;
   //------------------------------------------------------------
+  
+  typedef int (*XErrorHandler)(Display*, XErrorEvent*);
+  XErrorHandler oldErrorHandler;
 
   void Report (int severity, const char* msg, ...);
   void SetVideoMode (bool full, bool up, bool down);
 
 public:
-  SCF_DECLARE_IBASE;
-
   csXWindow (iBase*);
   virtual ~csXWindow ();
 
@@ -139,31 +145,23 @@ public:
   virtual bool AlertV (int type, const char* title, const char* okMsg,
   	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0);
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csXWindow);
-    virtual bool Initialize (iObjectRegistry *o)
-    { return scfParent->Initialize(o); }
-  } scfiComponent;
-  struct EventHandler : public iEventHandler
+  struct EventHandler : 
+    public scfImplementation1<EventHandler, 
+                              iEventHandler>
   {
   private:
-    csXWindow* parent;
+    csWeakRef<csXWindow> parent;
   public:
-    SCF_DECLARE_IBASE;
-    EventHandler (csXWindow* parent)
+    EventHandler (csXWindow* parent) : scfImplementationType (this)
     {
-      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
-    virtual ~EventHandler ()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
-    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+    virtual ~EventHandler () { }
+    virtual bool HandleEvent (iEvent& e) { return parent ? parent->HandleEvent(e) : false; }
     CS_EVENTHANDLER_NAMES("crystalspace.window")
     CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } * scfiEventHandler;
+  };
+  csRef<EventHandler> scfiEventHandler;
 
   //------------------------ iEventPlug interface ---------------------------//
 

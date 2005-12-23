@@ -53,10 +53,12 @@ class csGraphics2DGLX : public scfImplementationExt1<csGraphics2DGLX ,
   csRef<iOpenGLDisp> dispdriver;
 
   /**
-   * Helper function, attempts to create a visual/context with the
+   * Helper function, attempts to choose a visual with the
    * desired attributes
    */
-  bool CreateVisuals ();
+  bool ChooseVisual ();
+  /// Obtain (and report) the actual attributes of the context.
+  void GetCurrentAttributes ();
 
 public:
   csGraphics2DGLX (iBase *iParent);

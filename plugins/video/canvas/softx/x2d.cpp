@@ -116,7 +116,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
     else
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
-	      "No shared memory X-extension detected....disabling\n");
+	      "No shared memory X-extension detected....disabling");
     }
   }
 
@@ -164,6 +164,8 @@ bool csGraphics2DXLib::Open()
 
   if (!AllocateMemory ())
     return false;
+
+  xwin->SetTitle (win_title);
 
   Clear (0);
   return true;

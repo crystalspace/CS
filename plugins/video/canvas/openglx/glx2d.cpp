@@ -94,7 +94,7 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   if (!xwin)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
-      "Could not create an instance of %s !", XWIN_SCF_ID);
+      "Could not create an instance of " XWIN_SCF_ID "!");
     return false;
   }
 
@@ -132,13 +132,15 @@ bool csGraphics2DGLX::Open()
   // to destroy double buffered contexts and then create a single buffered
   // one.
 
-  if (!CreateVisuals ())
+  if (!ChooseVisual ())
     return false;
+
+  cmap = XCreateColormap (dpy, RootWindow (dpy, xvis->screen),
+    xvis->visual, AllocNone);
 
   xwin->SetColormap (cmap);
   xwin->SetVisualInfo (xvis);
   xwin->SetCanvas ((iGraphics2D *)this);
-
   if (!xwin->Open ())
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
@@ -146,8 +148,9 @@ bool csGraphics2DGLX::Open()
     return false;
   }
   window = xwin->GetWindow ();
+  active_GLContext = glXCreateContext(dpy, xvis, 0, True);
 
-  // this makes the context we created in Initialize() the current
+  // this makes the context we just created the current
   // context, so that all subsequent OpenGL calls will set state and
   // draw stuff on this context.  You could of couse make
   // some more contexts and switch around between several of them...
@@ -156,9 +159,13 @@ bool csGraphics2DGLX::Open()
   
   XSync (dpy, False);
   
+  GetCurrentAttributes();
+  
   // Open your graphic interface
   if (!csGraphics2DGLCommon::Open ())
     return false;
+
+  xwin->SetTitle (win_title);
 
   return true;
 }
@@ -203,8 +210,14 @@ static const char *visual_class_name (int cls)
   }
 }
 
-bool csGraphics2DGLX::CreateVisuals ()
+bool csGraphics2DGLX::ChooseVisual ()
 {
+  bool do_verbose;
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    do_verbose = verbosemgr->Enabled ("renderer.x.visual");
+    
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating Context");
   
   GLPixelFormat format;
@@ -212,6 +225,14 @@ bool csGraphics2DGLX::CreateVisuals ()
   
   while (picker.GetNextFormat (format))
   {
+    if (do_verbose)
+    {
+      csString pfStr;
+      GetPixelFormatString (format, pfStr);
+  
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+	"Probing pixel format: %s", pfStr.GetData());
+    }
     const int colorBits = format[glpfvColorBits];
     const int colorComponentSize = 
 	((colorBits % 32) == 0) ? colorBits / 4 : colorBits / 3;
@@ -236,11 +257,7 @@ bool csGraphics2DGLX::CreateVisuals ()
     };
     // find a visual that supports all the features we need
     xvis = glXChooseVisual (dpy, screen_num, desired_attributes);
-    if (xvis)
-    {
-      hardwareaccelerated = true;
-      break;
-    }
+    if (xvis) break;
   }
 
   // if a visual was found that we can use, make a graphics context which
@@ -289,15 +306,16 @@ bool csGraphics2DGLX::CreateVisuals ()
       }
     }
   }
+  return true;
+}
 
-  active_GLContext = glXCreateContext(dpy, xvis, 0, GL_TRUE);
-  cmap = XCreateColormap (dpy, RootWindow (dpy, xvis->screen),
-    xvis->visual, AllocNone);
-
+void csGraphics2DGLX::GetCurrentAttributes ()
+{
+  hardwareaccelerated = glXIsDirect (dpy, active_GLContext);
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Video driver GL/X version %s",
-    glXIsDirect (dpy, active_GLContext) ? "(direct renderer)" : 
+    hardwareaccelerated ? "(direct renderer)" : 
     "(indirect renderer)");
-  if (!glXIsDirect (dpy, active_GLContext))
+  if (!hardwareaccelerated)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
       "Indirect rendering may indicate a flawed OpenGL setup if you run on "
@@ -362,13 +380,13 @@ bool csGraphics2DGLX::CreateVisuals ()
   int accumAlpha = 0;
   {
     int dummy;
-    glXGetConfig(dpy, xvis, GLX_RED_SIZE, &dummy);
+    glXGetConfig(dpy, xvis, GLX_ACCUM_RED_SIZE, &dummy);
     accumBits += dummy;
-    glXGetConfig(dpy, xvis, GLX_GREEN_SIZE, &dummy);
+    glXGetConfig(dpy, xvis, GLX_ACCUM_GREEN_SIZE, &dummy);
     accumBits += dummy;
-    glXGetConfig(dpy, xvis, GLX_BLUE_SIZE, &dummy);
+    glXGetConfig(dpy, xvis, GLX_ACCUM_BLUE_SIZE, &dummy);
     accumBits += dummy;
-    glXGetConfig(dpy, xvis, GLX_ALPHA_SIZE, &accumAlpha);
+    glXGetConfig(dpy, xvis, GLX_ACCUM_ALPHA_SIZE, &accumAlpha);
   }
   currentFormat[glpfvAccumColorBits] = accumBits;
   currentFormat[glpfvAccumAlphaBits] = accumAlpha;
@@ -390,7 +408,6 @@ bool csGraphics2DGLX::CreateVisuals ()
   Report (CS_REPORTER_SEVERITY_NOTIFY, "level %d, double buffered", level);
 
   pfmt.complete ();
-  return true;
 }
 
 bool csGraphics2DGLX::PerformExtensionV (char const* command, va_list args)
