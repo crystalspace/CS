@@ -6432,6 +6432,8 @@ class iMeshObject(iBase):
     def GetColor(*args): return _cspace.iMeshObject_GetColor(*args)
     def SetMaterialWrapper(*args): return _cspace.iMeshObject_SetMaterialWrapper(*args)
     def GetMaterialWrapper(*args): return _cspace.iMeshObject_GetMaterialWrapper(*args)
+    def SetMixMode(*args): return _cspace.iMeshObject_SetMixMode(*args)
+    def GetMixMode(*args): return _cspace.iMeshObject_GetMixMode(*args)
     def InvalidateMaterialHandles(*args): return _cspace.iMeshObject_InvalidateMaterialHandles(*args)
     def PositionChild(*args): return _cspace.iMeshObject_PositionChild(*args)
     def __del__(self, destroy=_cspace.delete_iMeshObject):
