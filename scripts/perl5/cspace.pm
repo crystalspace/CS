@@ -7318,6 +7318,8 @@ package cspace::iMeshObject;
 *GetColor = *cspacec::iMeshObject_GetColor;
 *SetMaterialWrapper = *cspacec::iMeshObject_SetMaterialWrapper;
 *GetMaterialWrapper = *cspacec::iMeshObject_GetMaterialWrapper;
+*SetMixMode = *cspacec::iMeshObject_SetMixMode;
+*GetMixMode = *cspacec::iMeshObject_GetMixMode;
 *InvalidateMaterialHandles = *cspacec::iMeshObject_InvalidateMaterialHandles;
 *PositionChild = *cspacec::iMeshObject_PositionChild;
 sub DESTROY {
