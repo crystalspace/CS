@@ -1012,7 +1012,6 @@ void csSector::CleanupLSI ()
   {
     csLightSectorInfluence* inf = it.Next ();
     ((csLight*)inf->light)->RemoveLSI (inf);
-    delete inf;
   }
   influences.Empty ();
 }
