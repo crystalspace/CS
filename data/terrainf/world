@@ -34,6 +34,27 @@
     <texture name="materialmap_base.png">
       <file>/lev/terrain/materialmap_base.png</file>
     </texture>
+        <texture name="clouds">
+            <file>clouddome.jpg</file>
+        </texture>
+        <texture name="sky_up">
+            <file>skybox_u.jpg</file>
+        </texture>
+        <texture name="sky_down">
+            <file>skybox_d.jpg</file>
+        </texture>
+        <texture name="sky_left">
+            <file>skybox_l.jpg</file>
+        </texture>
+        <texture name="sky_right">
+            <file>skybox_r.jpg</file>
+        </texture>
+        <texture name="sky_front">
+            <file>skybox_f.jpg</file>
+        </texture>
+        <texture name="sky_back">
+            <file>skybox_b.jpg</file>
+        </texture>
   </textures>
 
   <shaders>
@@ -70,30 +91,28 @@
     <material name="box2">
       <texture>andrew_marble4.jpg</texture>
     </material>
+        <material name="clouds">
+            <texture>clouds</texture>
+        </material>
+        <material name="sky_up">
+            <texture>sky_up</texture>
+        </material>
+        <material name="sky_down">
+            <texture>sky_down</texture>
+        </material>
+        <material name="sky_left">
+            <texture>sky_left</texture>
+        </material>
+        <material name="sky_right">
+            <texture>sky_right</texture>
+        </material>
+        <material name="sky_front">
+            <texture>sky_front</texture>
+        </material>
+        <material name="sky_back">
+            <texture>sky_back</texture>
+        </material>
   </materials>
-
-  <renderpriorities>
-    <priority name="sky">
-      <level>1</level>
-      <sort>NONE</sort>
-    </priority>
-    <priority name="mirror">
-      <level>2</level>
-      <sort>FRONT2BACK</sort>
-    </priority>
-    <priority name="wall">
-      <level>3</level>
-      <sort>NONE</sort>
-    </priority>
-    <priority name="object">
-      <level>4</level>
-      <sort>NONE</sort>
-    </priority>
-    <priority name="alpha">
-      <level>5</level>
-      <sort>BACK2FRONT</sort>
-    </priority>
-  </renderpriorities>
 
   <addon>
     <plugin>crystalspace.renderloop.loop.loader</plugin>
@@ -125,6 +144,11 @@
       <scale x="256" y="32" z="256" />
   </addon>
 
+    <meshfact name="skydome">
+        <plugin>ballFact</plugin>
+        <params />
+    </meshfact>
+
   <meshfact name="TerrainFact">
     <plugin>terrainFact</plugin>
     <params>
@@ -143,22 +167,6 @@
        <color red="0.85903" green="0.80995" blue="0.70420" />
        <radius>1000000</radius>
      </light>
-
-    <meshobj name="sky">
-      <plugin>ball</plugin>
-      <params>
-        <factory>skydome</factory>
-        <radius x="500000" y="500000" z="500000" />
-        <numrim>8</numrim>
-        <reversed>yes</reversed>
-        <material>ScatterSky</material>
-        <color red="0" green="0" blue="0" />
-      </params>
-      <zfill />
-      <priority>sky</priority>
-      <camera />
-      <polymesh> <colldet/> </polymesh>
-    </meshobj>
 
     <meshobj name="Terrain">
       <plugin>terrain</plugin>
@@ -182,7 +190,122 @@
       <move> 
         <v x="0" y="0" z="0" /> 
       </move>
+      <priority>wall</priority>
     </meshobj>
+
+        <meshobj name="clouds">
+            <plugin>ball</plugin>
+            <params>
+                <factory>skydome</factory>
+                <radius x="1000" y="1000" z="1000" />
+                <numrim>6</numrim>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <reversed>yes</reversed>
+                <material>clouds</material>
+                <lighting>no</lighting>
+                <color red="0.5" green="0.5" blue="0.5" />
+            </params>
+            <znone />
+            <priority>portal</priority>
+            <camera />
+        </meshobj>
+        <meshobj name="sky">
+            <plugin>thing</plugin>
+            <params>
+                <v x="-1000" y="-1000" z="1000" />
+                <v x="1000" y="-1000" z="1000" />
+                <v x="-1000" y="-1000" z="-1000" />
+                <v x="1000" y="-1000" z="-1000" />
+                <v x="-1000" y="1000" z="1000" />
+                <v x="1000" y="1000" z="1000" />
+                <v x="-1000" y="1000" z="-1000" />
+                <v x="1000" y="1000" z="-1000" />
+                <p name="up">
+                    <v>6</v>
+                    <v>7</v>
+                    <v>5</v>
+                    <v>4</v>
+                    <texmap>
+                        <uv idx="0" u="0.005" v="0.005" />
+                        <uv idx="1" u="0.995" v="0.005" />
+                        <uv idx="2" u="0.995" v="0.995" />
+                    </texmap>
+                    <material>sky_up</material>
+                    <lighting>no</lighting>
+                </p>
+                <p name="down">
+                    <v>3</v>
+                    <v>2</v>
+                    <v>0</v>
+                    <v>1</v>
+                    <texmap>
+                        <uv idx="0" u="0.005" v="0.005" />
+                        <uv idx="1" u="0.995" v="0.005" />
+                        <uv idx="2" u="0.995" v="0.995" />
+                    </texmap>
+                    <material>sky_down</material>
+                    <lighting>no</lighting>
+                </p>
+                <p name="back">
+                    <v>7</v>
+                    <v>6</v>
+                    <v>2</v>
+                    <v>3</v>
+                    <texmap>
+                        <uv idx="0" u="0.005" v="0.005" />
+                        <uv idx="1" u="0.995" v="0.005" />
+                        <uv idx="2" u="0.995" v="0.995" />
+                    </texmap>
+                    <material>sky_back</material>
+                    <lighting>no</lighting>
+                </p>
+                <p name="front">
+                    <v>4</v>
+                    <v>5</v>
+                    <v>1</v>
+                    <v>0</v>
+                    <texmap>
+                        <uv idx="0" u="0.005" v="0.005" />
+                        <uv idx="1" u="0.995" v="0.005" />
+                        <uv idx="2" u="0.995" v="0.995" />
+                    </texmap>
+                    <material>sky_front</material>
+                    <lighting>no</lighting>
+                </p>
+                <p name="left">
+                    <v>6</v>
+                    <v>4</v>
+                    <v>0</v>
+                    <v>2</v>
+                    <texmap>
+                        <uv idx="0" u="0.005" v="0.005" />
+                        <uv idx="1" u="0.995" v="0.005" />
+                        <uv idx="2" u="0.995" v="0.995" />
+                    </texmap>
+                    <material>sky_left</material>
+                    <lighting>no</lighting>
+                </p>
+                <p name="right">
+                    <v>5</v>
+                    <v>7</v>
+                    <v>3</v>
+                    <v>1</v>
+                    <texmap>
+                        <uv idx="0" u="0.005" v="0.005" />
+                        <uv idx="1" u="0.995" v="0.005" />
+                        <uv idx="2" u="0.995" v="0.995" />
+                    </texmap>
+                    <material>sky_right</material>
+                    <lighting>no</lighting>
+                </p>
+            </params>
+            <camera />
+            <zfill />
+            <priority>sky</priority>
+        </meshobj>
+        <key name="cmd_AnimateSky" value="clouds,y,.005" />
 
      <meshgen name="grass">
         <geometry>

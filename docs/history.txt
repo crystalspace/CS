@@ -22,6 +22,7 @@ chronological order.
 	- Jorrit fixed the main loader so that in case of 'meshref' the
 	  child mesh objects (or lights and cameras) of the just created
 	  mesh are also added to the current region.
+	- Jorrit added a nice skybox to terrainf with moving clouds.
 22-Dec-2005
 	- Jorrit added SetMixMode() and GetMixMode() to iMeshObject. This is
 	  supported by most meshes.
