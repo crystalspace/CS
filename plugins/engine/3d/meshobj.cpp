@@ -725,11 +725,13 @@ void csMeshWrapper::SetParent (iSceneNode* parent)
 
   ClearFromSectorPortalLists ();
 
+#if 0
   if (!movable.GetParent ())
   {
     // Unlink from main engine list.
     csEngine::currentEngine->GetMeshes ()->Remove ((iMeshWrapper*)this);
   }
+#endif
   csSceneNode::SetParent ((iSceneNode*)this, parent, &movable);
 
   /* csSector->PrepareMesh tells the culler about the mesh
@@ -755,8 +757,10 @@ void csMeshWrapper::SetParent (iSceneNode* parent)
       csSector* sector = (csSector*)(sl->Get (i));
       sector->UnprepareMesh (this);        
     }
+#if 0
     // Link to main engine list.
     csEngine::currentEngine->GetMeshes ()->Add ((iMeshWrapper*)this);
+#endif
   }
 
   AddToSectorPortalLists ();

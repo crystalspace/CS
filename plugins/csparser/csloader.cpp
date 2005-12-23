@@ -53,6 +53,7 @@
 #include "iengine/light.h"
 #include "iengine/mesh.h"
 #include "iengine/lod.h"
+#include "iengine/camera.h"
 #include "iengine/imposter.h"
 #include "iengine/sharevar.h"
 #include "iengine/viscull.h"
@@ -2972,9 +2973,8 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
 	}
 	else
 	{
-	  // @@@ Handle regions correctly here???
-          iMeshFactoryWrapper* t = Engine->GetMeshFactories ()
-	  	->FindByName (child->GetContentsValue ());
+	  iMeshFactoryWrapper* t = ldr_context->FindMeshFactory (
+	  	child->GetContentsValue ());
           if (!t)
 	  {
 	    SyntaxService->ReportError (
@@ -2986,6 +2986,20 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
 	  if (mesh)
 	  {
 	    AddToRegion (ldr_context, mesh->QueryObject ());
+	    // Now also add the child mesh objects to the region.
+	    const csRefArray<iSceneNode>& children = mesh->QuerySceneNode ()->
+	    	GetChildren ();
+	    size_t i;
+	    for (i = 0 ; i < children.Length () ; i++)
+	    {
+	      iSceneNode* sn = children[i];
+	      iObject* obj = 0;
+	      if (sn->QueryMesh ()) obj = sn->QueryMesh ()->QueryObject ();
+	      else if (sn->QueryLight ()) obj = sn->QueryLight ()->QueryObject ();
+	      //else if (sn->QueryCamera ()) obj = sn->QueryCamera ()->QueryObject ();
+	      if (obj)
+	        AddToRegion (ldr_context, obj);
+	    }
 	  }
 	}
         break;

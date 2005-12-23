@@ -13,6 +13,15 @@ chronological order.
 	- Jorrit fixed a bug in csThing::SetMixMode(). It would not update
 	  the mixmode in the already created render meshes so in many cases
 	  this method had no effect.
+	- Jorrit fixed the engine so that children of a mesh are now also
+	  added to the main mesh list. This already happened in a few cases
+	  but not all.
+	- Jorrit fixed the main loader so that it uses the loader context
+	  correctly to find the mesh factory in case of 'meshref' (as
+	  opposed to directly trying to find the factory from the engine).
+	- Jorrit fixed the main loader so that in case of 'meshref' the
+	  child mesh objects (or lights and cameras) of the just created
+	  mesh are also added to the current region.
 22-Dec-2005
 	- Jorrit added SetMixMode() and GetMixMode() to iMeshObject. This is
 	  supported by most meshes.
