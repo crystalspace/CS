@@ -2469,6 +2469,7 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = icam->IsMirrored ();
+    rm->mixmode = mixmode;
     rm->object2world = t;
 
     // Jorrit: Moved the code below to PrepareRenderMeshes().

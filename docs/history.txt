@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit fixed a bug reported by Andrew Craig. csSector was
 	  doing a delete on the light sector influence structures but
 	  this is a ref counted thing.
+	- Jorrit fixed a bug in csThing::SetMixMode(). It would not update
+	  the mixmode in the already created render meshes so in many cases
+	  this method had no effect.
 22-Dec-2005
 	- Jorrit added SetMixMode() and GetMixMode() to iMeshObject. This is
 	  supported by most meshes.
