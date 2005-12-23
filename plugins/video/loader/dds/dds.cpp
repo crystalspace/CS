@@ -175,7 +175,7 @@ void Loader::DecompressDXT3(csRGBpixel* buffer, const uint8* source,
 			    size_t planesize)
 {
   int           x, y, z, i, j, k, Select;
-  unsigned char *Temp;
+  uint16        *Temp;
   uint16        color_0, color_1;
   Color8888     colours[4];
   uint32        bitmask;
@@ -183,7 +183,7 @@ void Loader::DecompressDXT3(csRGBpixel* buffer, const uint8* source,
   uint16	word;
   DXTAlphaBlockExplicit alpha;
 
-  Temp = (unsigned char*) source;
+  Temp = (uint16*) source;
   for (z = 0; z < depth; z++) 
   {
     for (y = 0; y < Height; y += 4) 
@@ -194,10 +194,11 @@ void Loader::DecompressDXT3(csRGBpixel* buffer, const uint8* source,
 	alpha.row[1] = csLittleEndianShort (Temp[1]);
 	alpha.row[2] = csLittleEndianShort (Temp[2]);
 	alpha.row[3] = csLittleEndianShort (Temp[3]);
-	Temp += 8;
-	color_0 = csLittleEndianShort (*((uint16*)Temp));   
-	color_1 = csLittleEndianShort (*((uint16*)Temp+1));
+	Temp += 4;
+	color_0 = csLittleEndianShort (*Temp);
+	color_1 = csLittleEndianShort (*(Temp+1));
 	bitmask = csLittleEndianLong (((uint32*)Temp)[1]);
+	Temp += 4;
 
 	colours[0].r = COLOR565_RED(color_0); 
 	colours[0].g = COLOR565_GREEN(color_0);

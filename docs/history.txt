@@ -26,6 +26,7 @@ chronological order.
 	    - Implemented random rotation for the generated objects (rotation
 	      around y axis).
 	- Jorrit fixed the lightning mesh object for the mixmode change.
+	- res unborked software DXT3 decompression in the DDS plugin.
 21-Dec-2005
 	- Jorrit improved mesh cache usage by first removing the meshes
 	  that are no longer needed for out of range cells before trying
