@@ -51,6 +51,8 @@ chronological order.
 	- res rearranged some code in glx2d to make things work for him.
 	- res fixed the X canvases to properly set the default window title.
 	- res ported the xwin plugin to new SCF.
+	- res fixed softshader to use the same alpha test enabling logic as
+	  gl3d.
 22-Dec-2005
 	- Jorrit added SetMixMode() and GetMixMode() to iMeshObject. This is
 	  supported by most meshes.

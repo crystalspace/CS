@@ -96,11 +96,11 @@ namespace cspluginSoft3d
           tri += sizeof (unsigned int);
           break;
         case CS_BUFCOMP_FLOAT:
-          r = *(float*)tri;
+          r = uint (*(float*)tri);
           tri += sizeof (float);
           break;
         case CS_BUFCOMP_DOUBLE:
-          r = *(double*)tri;
+          r = uint (*(double*)tri);
           tri += sizeof (double);
           break;
       }
@@ -125,9 +125,9 @@ namespace cspluginSoft3d
         case CS_BUFCOMP_UNSIGNED_INT:
           return ((unsigned int*)tri)[index];
         case CS_BUFCOMP_FLOAT:
-          return ((float*)tri)[index];
+          return uint (((float*)tri)[index]);
         case CS_BUFCOMP_DOUBLE:
-          return ((double*)tri)[index];
+          return uint (((double*)tri)[index]);
       }
       return 0;
     }

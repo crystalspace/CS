@@ -266,8 +266,22 @@ namespace cspluginSoftshader
 
       renderInfoMesh.renderer = this;
 
+      bool doAlphaTest;
+      switch (modes.mixmode & CS_MIXMODE_ALPHATEST_MASK)
+      {
+	case CS_MIXMODE_ALPHATEST_ENABLE:
+	  doAlphaTest = true;
+	  break;
+	case CS_MIXMODE_ALPHATEST_DISABLE:
+	  doAlphaTest = false;
+	  break;
+	default:
+	case CS_MIXMODE_ALPHATEST_AUTO:
+	  doAlphaTest = (modes.alphaType == csAlphaMode::alphaBinary);
+	  break;
+      }
       proc = GetScanlineProc (doFlat, doColor, modes.z_buf_mode,
-	needColors, modes.alphaType == csAlphaMode::alphaBinary);
+	needColors, doAlphaTest);
 
       return proc != 0;
     }
