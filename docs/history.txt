@@ -8,6 +8,7 @@ chronological order.
 
 24-Dec-2005
 	- Jorrit optimized meshgen lod handling considerably.
+	- Jorrit optimized meshgen alpha handling considerably.
 23-Dec-2005
 	- Jorrit fixed a bug reported by Andrew Craig. csSector was
 	  doing a delete on the light sector influence structures but

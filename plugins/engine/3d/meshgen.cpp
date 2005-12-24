@@ -81,14 +81,6 @@ csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (float sqdist,
   }
   else
   {
-#if 0
-    // Make a new mesh.
-    csString name = "__mg__";
-    // @@@ This technique gives us only support for 10 lod levels.
-    CS_ASSERT (lod < 10);
-    name += lod;
-    name += geom.factory->QueryObject ()->GetName ();
-#endif
     return csEngine::currentEngine->CreateMeshWrapper (geom.factory, 0);
   }
 }
@@ -170,6 +162,9 @@ csMeshGenerator::csMeshGenerator() : scfImplementationType (this)
     rotation_matrices[i] = csYRotMatrix3 (2.0f*PI * float (i)
     	/ float (CS_GEOM_MAX_ROTATIONS));
   }
+
+  alpha_priority = csEngine::currentEngine->GetAlphaRenderPriority ();
+  object_priority = csEngine::currentEngine->GetObjectRenderPriority ();
 }
 
 csMeshGenerator::~csMeshGenerator ()
@@ -490,29 +485,33 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
   }
 }
 
-void csMeshGenerator::SetFade (iMeshWrapper* mesh, float factor)
+void csMeshGenerator::SetFade (csMGPosition& p, float factor)
 {
   if (factor < .01)
-    mesh->GetMeshObject ()->SetMixMode (CS_FX_TRANSPARENT);
+  {
+    if (p.last_mixmode == CS_FX_TRANSPARENT)
+      return;
+    p.last_mixmode = CS_FX_TRANSPARENT;
+    p.mesh->GetMeshObject ()->SetMixMode (CS_FX_TRANSPARENT);
+  }
   else if (factor < .99)
   {
-    int alpha = csEngine::currentEngine->GetAlphaRenderPriority ();
-    if (mesh->GetRenderPriority () != alpha)
+    if (p.mesh->GetRenderPriority () != alpha_priority)
     {
-      mesh->SetRenderPriority (alpha);
-      mesh->SetZBufMode (CS_ZBUF_TEST);
+      p.mesh->SetRenderPriority (alpha_priority);
+      p.mesh->SetZBufMode (CS_ZBUF_TEST);
     }
-    mesh->GetMeshObject ()->SetMixMode (CS_FX_SETALPHA(1.0f-factor));
+    p.last_mixmode = CS_FX_SETALPHA (1.0f-factor);
+    p.mesh->GetMeshObject ()->SetMixMode (p.last_mixmode);
   }
   else
   {
-    mesh->GetMeshObject ()->SetMixMode (CS_FX_COPY);
-    int obj = csEngine::currentEngine->GetObjectRenderPriority ();
-    if (mesh->GetRenderPriority () != obj)
-    {
-      mesh->SetRenderPriority (obj);
-      mesh->SetZBufMode (CS_ZBUF_USE);
-    }
+    if (p.last_mixmode == CS_FX_COPY)
+      return;
+    p.last_mixmode = CS_FX_COPY;
+    p.mesh->GetMeshObject ()->SetMixMode (CS_FX_COPY);
+    p.mesh->SetRenderPriority (object_priority);
+    p.mesh->SetZBufMode (CS_ZBUF_USE);
   }
 }
 
@@ -552,6 +551,7 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
 	  if (mesh)
 	  {
             p.mesh = mesh;
+	    p.last_mixmode = ~0;
 	    mesh->GetMovable ()->SetPosition (sector, p.position);
 	    mesh->GetMovable ()->SetTransform (rotation_matrices[p.rotation]);
 	    mesh->GetMovable ()->UpdateMove ();
@@ -570,6 +570,7 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
           p.mesh = mesh;
 	  if (mesh)
 	  {
+	    p.last_mixmode = ~0;
 	    mesh->GetMovable ()->SetPosition (sector, p.position);
 	    mesh->GetMovable ()->SetTransform (rotation_matrices[p.rotation]);
 	    mesh->GetMovable ()->UpdateMove ();
@@ -603,7 +604,7 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
           factor = (alpha_maxdist-correct_dist - dist) * alpha_scale;
 	}
 	//printf (" -> factor=%g\n", factor); fflush (stdout);
-	SetFade (p.mesh, factor);
+	SetFade (p, factor);
       }
     }
     else

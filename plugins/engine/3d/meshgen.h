@@ -143,12 +143,17 @@ struct csMGPosition
    */
   float random;
 
+  /**
+   * Last used mixmode.
+   */
+  uint last_mixmode;
+
   /// An optional mesh for this position. Can be 0.
   iMeshWrapper* mesh;
   /// The LOD level for the mesh above.
   size_t lod;
 
-  csMGPosition () : mesh (0) { }
+  csMGPosition () : last_mixmode (CS_FX_COPY), mesh (0) { }
 };
 
 struct csMGCell;
@@ -220,6 +225,10 @@ private:
 
   /// Sector for this generator.
   csWeakRef<iSector> sector;
+
+  /// Alpha and object render priority.
+  int alpha_priority;
+  int object_priority;
 
   /// Sample box where we will place geometry.
   csBox3 samplebox;
@@ -307,7 +316,7 @@ private:
   float GetWorldZ (int z) { return samplebox.MinZ () + z * samplecellheight_z; }
 
   /// Set the fade for a mesh.
-  void SetFade (iMeshWrapper* mesh, float factor);
+  void SetFade (csMGPosition& p, float factor);
 
   /// Statistics.
   size_t CountPositions (int cidx, csMGCell& cell);
