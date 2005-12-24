@@ -63,24 +63,10 @@ void csMeshGeneratorGeometry::SetDensity (float density)
   csMeshGeneratorGeometry::density = density;
 }
 
-size_t csMeshGeneratorGeometry::GetLODLevel (float sqdist)
+csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (float sqdist,
+    size_t& lod)
 {
-  size_t i;
-  for (i = 0 ; i < factories.Length () ; i++)
-  {
-    csMGGeom& geom = factories[i];
-    if (sqdist <= geom.sqmaxdistance)
-    {
-      return i;
-    }
-  }
-  CS_ASSERT (false);
-  return csArrayItemNotFound;
-}
-
-csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (float sqdist)
-{
-  size_t lod = GetLODLevel (sqdist);
+  lod = GetLODLevel (sqdist);
   if (lod == csArrayItemNotFound) return 0;
 
   csMGGeom& geom = factories[lod];
@@ -95,23 +81,20 @@ csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (float sqdist)
   }
   else
   {
+#if 0
     // Make a new mesh.
     csString name = "__mg__";
     // @@@ This technique gives us only support for 10 lod levels.
     CS_ASSERT (lod < 10);
     name += lod;
     name += geom.factory->QueryObject ()->GetName ();
-    return csEngine::currentEngine->CreateMeshWrapper (geom.factory, name);
+#endif
+    return csEngine::currentEngine->CreateMeshWrapper (geom.factory, 0);
   }
 }
 
-void csMeshGeneratorGeometry::SetAsideMesh (iMeshWrapper* mesh)
+void csMeshGeneratorGeometry::SetAsideMesh (iMeshWrapper* mesh, size_t lod)
 {
-  const char* name = mesh->QueryObject ()->GetName ();
-  // First we have the string __mg__ and then a single digit with
-  // the lod level.
-  int lod = name[6]-'0';
-  CS_ASSERT (lod >= 0 && lod < 10);
   csMGGeom& geom = factories[lod];
   geom.mesh_setaside.Push (mesh);
 }
@@ -131,30 +114,31 @@ void csMeshGeneratorGeometry::FreeSetAsideMeshes ()
   }
 }
 
-void csMeshGeneratorGeometry::FreeMesh (iMeshWrapper* mesh)
+size_t csMeshGeneratorGeometry::GetLODLevel (float sqdist)
 {
-  mesh->GetMovable ()->ClearSectors ();
-
-  const char* name = mesh->QueryObject ()->GetName ();
-  // First we have the string __mg__ and then a single digit with
-  // the lod level.
-  int lod = name[6]-'0';
-  CS_ASSERT (lod >= 0 && lod < 10);
-  csMGGeom& geom = factories[lod];
-  CS_ASSERT (mesh->GetFactory () == geom.factory);
-  geom.mesh_cache.Push (mesh);
+  size_t i;
+  for (i = 0 ; i < factories.Length () ; i++)
+  {
+    csMGGeom& geom = factories[i];
+    if (sqdist <= geom.sqmaxdistance)
+    {
+      return i;
+    }
+  }
+  CS_ASSERT (false);
+  return csArrayItemNotFound;
 }
 
-bool csMeshGeneratorGeometry::IsRightLOD (iMeshWrapper* mesh, float sqdist)
+bool csMeshGeneratorGeometry::IsRightLOD (iMeshWrapper* mesh, float sqdist,
+    size_t current_lod)
 {
-  const char* name = mesh->QueryObject ()->GetName ();
-  // First we have the string __mg__ and then a single digit with
-  // the lod level.
-  int lod = name[6]-'0';
-  CS_ASSERT (lod >= 0 && lod < 10);
-
-  size_t new_lod = GetLODLevel (sqdist);
-  return new_lod == (size_t)lod;
+  // With only one lod level we are always right.
+  if (factories.Length () <= 1) return true;
+  if (current_lod == 0)
+    return (sqdist <= factories[0].sqmaxdistance);
+  else
+    return (sqdist <= factories[current_lod].sqmaxdistance) &&
+      (sqdist > factories[current_lod-1].sqmaxdistance);
 }
 
 //--------------------------------------------------------------------------
@@ -554,7 +538,8 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
         if (use_density_scaling && sqdist > sq_density_mindist)
         {
           float dist = sqrt (sqdist);
-          float factor = (density_maxdist - dist) * density_scale + density_maxfactor;
+          float factor = (density_maxdist - dist) * density_scale
+	    + density_maxfactor;
           if (factor < 0) factor = 0;
           else if (factor > 1) factor = 1;
           if (p.random > factor) show = false;
@@ -562,7 +547,8 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
 
 	if (show)
 	{
-          csRef<iMeshWrapper> mesh = geometries[p.geom_type]->AllocMesh (sqdist);
+          csRef<iMeshWrapper> mesh = geometries[p.geom_type]->AllocMesh (
+	      sqdist, p.lod);
 	  if (mesh)
 	  {
             p.mesh = mesh;
@@ -575,11 +561,12 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
       else
       {
         // We already have a mesh but we check here if we should switch LOD level.
-	if (!geometries[p.geom_type]->IsRightLOD (p.mesh, sqdist))
+	if (!geometries[p.geom_type]->IsRightLOD (p.mesh, sqdist, p.lod))
 	{
 	  // We need a different mesh here.
-          geometries[p.geom_type]->SetAsideMesh (p.mesh);
-          csRef<iMeshWrapper> mesh = geometries[p.geom_type]->AllocMesh (sqdist);
+          geometries[p.geom_type]->SetAsideMesh (p.mesh, p.lod);
+          csRef<iMeshWrapper> mesh = geometries[p.geom_type]->AllocMesh (
+	      sqdist, p.lod);
           p.mesh = mesh;
 	  if (mesh)
 	  {
@@ -623,7 +610,7 @@ void csMeshGenerator::AllocateMeshes (csMGCell& cell, const csVector3& pos)
     {
       if (p.mesh)
       {
-        geometries[p.geom_type]->SetAsideMesh (p.mesh);
+        geometries[p.geom_type]->SetAsideMesh (p.mesh, p.lod);
         p.mesh = 0;
       }
     }
@@ -728,7 +715,8 @@ void csMeshGenerator::FreeMeshesInBlock (csMGCell& cell)
       {
         CS_ASSERT (positions[i].geom_type >= 0);
         CS_ASSERT (positions[i].geom_type < geometries.Length ());
-        geometries[positions[i].geom_type]->SetAsideMesh (positions[i].mesh);
+        geometries[positions[i].geom_type]->SetAsideMesh (positions[i].mesh,
+	    positions[i].lod);
         positions[i].mesh = 0;
       }
     }

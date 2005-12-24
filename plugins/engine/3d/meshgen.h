@@ -87,7 +87,7 @@ public:
    * Allocate a new mesh for the given distance. Possibly from the
    * cache if possible. If the distance is too large it will return 0.
    */
-  csPtr<iMeshWrapper> AllocMesh (float sqdist);
+  csPtr<iMeshWrapper> AllocMesh (float sqdist, size_t& lod);
 
   /**
    * Set aside the mesh temporarily. This is called if we have a mesh that
@@ -98,18 +98,13 @@ public:
    * FreeSetAsideMeshes() to really free the remaining meshes that haven't been
    * reused.
    */
-  void SetAsideMesh (iMeshWrapper* mesh);
+  void SetAsideMesh (iMeshWrapper* mesh, size_t lod);
 
   /**
    * Free all meshes that were put aside and that were not reused by
    * AllocMesh().
    */
   void FreeSetAsideMeshes ();
-
-  /**
-   * Free a mesh. This function will put the mesh back in the cache.
-   */
-  void FreeMesh (iMeshWrapper* mesh);
 
   /**
    * Get the right lod level for the given squared distance.
@@ -120,7 +115,7 @@ public:
   /**
    * Check if this is the right mesh for the given LOD level.
    */
-  bool IsRightLOD (iMeshWrapper* mesh, float sqdist);
+  bool IsRightLOD (iMeshWrapper* mesh, float sqdist, size_t current_lod);
 };
 
 /**
@@ -150,6 +145,8 @@ struct csMGPosition
 
   /// An optional mesh for this position. Can be 0.
   iMeshWrapper* mesh;
+  /// The LOD level for the mesh above.
+  size_t lod;
 
   csMGPosition () : mesh (0) { }
 };
