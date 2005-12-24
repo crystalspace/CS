@@ -67,6 +67,8 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
   virtual bool Open ();
   virtual void Close ();
+  
+  const char* GetVersionString (const char* ver);
 
   void Report (int severity, const char* msg, ...);
 

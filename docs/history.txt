@@ -9,6 +9,10 @@ chronological order.
 24-Dec-2005
 	- Jorrit optimized meshgen lod handling considerably.
 	- Jorrit optimized meshgen alpha handling considerably.
+	- res added support to gl3d for uploading DXT-compressed textures even
+	  if the S3TC ext is not present (since some DRI drivers support that, 
+	  but don't expose the ext since their implmentation is not conformant
+	  in other aspects).
 23-Dec-2005
 	- Jorrit fixed a bug reported by Andrew Craig. csSector was
 	  doing a delete on the light sector influence structures but

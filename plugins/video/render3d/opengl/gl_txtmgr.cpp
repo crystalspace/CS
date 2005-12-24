@@ -544,7 +544,8 @@ GLenum csGLTextureHandle::DetermineTargetFormat (GLenum defFormat,
 
   if (rawFormat)
   {
-    if (G3D->ext->CS_GL_EXT_texture_compression_s3tc 
+    if ((G3D->ext->CS_GL_EXT_texture_compression_s3tc 
+      || txtmgr->forcePrecompressedDXTUpload)
       && allowCompress)
     {
       if (strcmp (rawFormat, "dxt1") == 0)
@@ -1117,6 +1118,8 @@ void csGLTextureManager::read_config (iConfigFile *config)
   disableRECTTextureCompression = config->GetBool
     ("Video.OpenGL.DisableRECTTextureCompression", false);
   enableNonPowerOfTwo2DTextures = config->GetBool
+    ("Video.OpenGL.EnableNonPowerOfTwo2DTextures", false);
+  forcePrecompressedDXTUpload = config->GetBool
     ("Video.OpenGL.EnableNonPowerOfTwo2DTextures", false);
   
   const char* filterModeStr = config->GetStr (

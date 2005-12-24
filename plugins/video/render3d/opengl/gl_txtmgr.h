@@ -452,6 +452,11 @@ public:
    * POTS.) 
    */
   bool enableNonPowerOfTwo2DTextures;
+  /**
+   * Whether to upload DXT-precompressed textures even if the S3TC ext is not
+   * present (some DRI drivers support that).
+   */
+  bool forcePrecompressedDXTUpload;
 
   csStringID nameDiffuseTexture;
 

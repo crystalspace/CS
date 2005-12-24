@@ -189,6 +189,21 @@ void csGraphics2DGLX::Close(void)
     xwin->Close ();
 }
 
+const char* csGraphics2DGLX::GetVersionString (const char* ver)
+{
+  if (strcmp (ver, "mesa") == 0)
+  {
+    static const char needle[] = "Mesa ";
+    const char* glVersion = (const char*)glGetString (GL_VERSION);
+    const char* p = strstr (glVersion, needle);
+    if (p != 0)
+      return p + sizeof (needle) - 1;
+    return 0;
+  }
+  else
+    return csGraphics2DGLCommon::GetVersionString (ver);
+}
+
 static const char *visual_class_name (int cls)
 {
   switch (cls)
@@ -212,7 +227,7 @@ static const char *visual_class_name (int cls)
 
 bool csGraphics2DGLX::ChooseVisual ()
 {
-  bool do_verbose;
+  bool do_verbose = false;
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
   if (verbosemgr) 
