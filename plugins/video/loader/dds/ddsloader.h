@@ -16,6 +16,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #ifndef __DDS_DDSLOADER_H__
 #define __DDS_DDSLOADER_H__
 
@@ -29,6 +30,9 @@
 #include "dds.h"
 
 struct iObjectRegistry;
+
+namespace cspluginDDSimg
+{
 
 enum csDDSRawDataType
 {
@@ -52,11 +56,12 @@ enum csDDSRawDataType
   csrawAlphaLast = csrawB8G8R8A8
 };
 
-class csDDSImageIO : public iImageIO, public iComponent
+class csDDSImageIO : 
+  public scfImplementation2<csDDSImageIO,
+                            iImageIO,
+                            iComponent>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   csDDSImageIO (iBase* parent);
   virtual ~csDDSImageIO ();
 
@@ -120,5 +125,7 @@ private:
   void Report (int severity, const char* msg, ...);
 };
 
-#endif
+} // namespace cspluginDDSimg
+
+#endif // __DDS_DDSLOADER_H__
 

@@ -396,7 +396,7 @@ public:
     return activeTech->TeardownPass(); 
   }
 
-  /// Completly deactivate a pass
+  /// Completely deactivate a pass
   virtual bool DeactivatePass (size_t ticket);	
 
   /// Get shader metadata
@@ -405,10 +405,12 @@ public:
     if (IsFallbackTicket (ticket))
       return fallbackShader->GetMetadata (GetFallbackTicket (ticket));
 
-    if (ticket == csArrayItemNotFound)
-      return allShaderMeta;
+    csXMLShaderTech* tech;
+    if ((ticket != csArrayItemNotFound)
+      && ((tech = variants[ticket].tech) != 0))
+      return tech->metadata;
     else
-      return variants[ticket].tech->metadata;
+      return allShaderMeta;
   }
 
   friend class csXMLShaderCompiler;

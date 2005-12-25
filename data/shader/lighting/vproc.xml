@@ -53,4 +53,34 @@
 	</fp>
       </pass>
     </technique>
+
+    <technique priority="100" lights="2147483647">
+      <pass>
+	<texture name="tex diffuse" destination="unit 0" />
+	<vp plugin="software" />
+	<vproc plugin="vproc_std">
+	  <vproc_std>
+	    <lightmixmode>add</lightmixmode>
+	    <!--
+	        <?if buffers."color lit"?>
+	        <colormixmode>add</colormixmode>
+	        <colorbuffer>color lit</colorbuffer>
+	        <?else?>
+	        <colormixmode>mul</colormixmode>
+	        <colorbuffer>color unlit</colorbuffer>
+	        <?endif?>
+	    -->
+	    <colormixmode>none</colormixmode>
+	    <finalfactor type="float">0.5</finalfactor>
+	    <lights>2147483647</lights>
+	  </vproc_std>
+	</vproc>
+	<fp plugin="software">
+	  <softfp>
+	    <flatcolor type="shadervar">mat flatcolor</flatcolor>
+	    <colorfactor type="float">2</colorfactor>
+	  </softfp>
+	</fp>
+      </pass>
+    </technique>
 </shader>

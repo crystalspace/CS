@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Dec-2005
+        - res fixed a crash in xmlshader when retrieving metadata from a 
+          fallback shader that itself did not have validated techniques.
+	- res updated the DDS plugin to use new SCF.
+	- res added a SR technique for the "lighting_vproc" shader.
 24-Dec-2005
 	- Jorrit optimized meshgen lod handling considerably.
 	- Jorrit optimized meshgen alpha handling considerably.

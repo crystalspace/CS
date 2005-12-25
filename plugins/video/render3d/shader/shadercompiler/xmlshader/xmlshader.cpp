@@ -1570,11 +1570,17 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	    "No technique validated for shader '%s'<%zu>: using fallback", 
 	    GetName(), vi);
 	}
-	size_t vc = resolver->GetVariantCount();
-	if (vc == 0) vc = 1;
-	vi = fallbackShader->GetTicket (modes, stacks) + vc;	    
+	size_t fallbackTicket = fallbackShader->GetTicket (modes, stacks);
+	if (fallbackTicket != csArrayItemNotFound)
+	{
+	  size_t vc = resolver->GetVariantCount();
+	  if (vc == 0) vc = 1;
+	  vi = fallbackTicket + vc;
+	}
+	else
+	  vi = csArrayItemNotFound;
       }
-      else if (!var.prepared)
+      else if (!var.prepared && compiler->do_verbose)
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING,
 	  "No technique validated for shader '%s'<%zu>", GetName(), vi);
       var.prepared = true;

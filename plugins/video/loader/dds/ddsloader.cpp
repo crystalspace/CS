@@ -28,14 +28,20 @@
 
 #define DDS_MIME "image/dds"
 
-static iImageIO::FileFormatDescription formatlist[1] =
+CS_IMPLEMENT_PLUGIN
+
+namespace cspluginDDSimg
+{
+
+SCF_IMPLEMENT_FACTORY(csDDSImageIO)
+
+static iImageIO::FileFormatDescription formatlist[] =
 {
   {DDS_MIME, "RGBA", CS_IMAGEIO_LOAD | CS_IMAGEIO_SAVE}
 };
 
-csDDSImageIO::csDDSImageIO (iBase* parent)
+csDDSImageIO::csDDSImageIO (iBase* parent) : scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE(parent);
   int const formatcount =
     sizeof(formatlist)/sizeof(iImageIO::FileFormatDescription);
   for (int i=0; i < formatcount; i++)
@@ -44,7 +50,6 @@ csDDSImageIO::csDDSImageIO (iBase* parent)
 
 csDDSImageIO::~csDDSImageIO ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csDDSImageIO::Initialize (iObjectRegistry* objreg)
@@ -447,11 +452,4 @@ void csDDSImageFile::Report (int severity, const char* msg, ...)
   va_end (argv);
 }
 
-CS_IMPLEMENT_PLUGIN
-
-SCF_IMPLEMENT_IBASE (csDDSImageIO)
-  SCF_IMPLEMENTS_INTERFACE (iImageIO)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_FACTORY(csDDSImageIO)
+} // namespace cspluginDDSimg
