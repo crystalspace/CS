@@ -40,7 +40,8 @@
 CS_LEAKGUARD_IMPLEMENT (csGLShaderFVP);
 
 csGLShaderFVP::csGLShaderFVP (csGLShader_FIXED* shaderPlug) :
-  csShaderProgram (shaderPlug->object_reg), colorMaterial(0)
+  csShaderProgram (shaderPlug->object_reg), colorMaterial(0), 
+  separateSpecular(false)
 {
   validProgram = true;
   csGLShaderFVP::shaderPlug = shaderPlug;
@@ -68,15 +69,10 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
 
   csRef<csShaderVariable> var;
 
-  if (colorMaterial != 0)
-  {
-    glEnable (GL_COLOR_MATERIAL);
-    glColorMaterial (GL_FRONT, colorMaterial);
-  }
-
   if (do_lighting)
   {
     csVector4 v;
+    const csVector4 zero (0);
 
     for(i = 0; i < lights.Length(); ++i)
     {
@@ -85,18 +81,16 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
 
       LightingEntry& entry = lights[i];
 
-      const csVector4 null (0);
-
-      v = GetParamVectorVal (stacks, entry.params[gllpPosition], null);
+      v = GetParamVectorVal (stacks, entry.params[gllpPosition], zero);
       glLightfv (glLight, GL_POSITION, (float*)&v);
 
-      v = GetParamVectorVal (stacks, entry.params[gllpDiffuse], null);
+      v = GetParamVectorVal (stacks, entry.params[gllpDiffuse], zero);
       glLightfv (glLight, GL_DIFFUSE, (float*)&v);
 
-      v = GetParamVectorVal (stacks, entry.params[gllpSpecular], null);
+      v = GetParamVectorVal (stacks, entry.params[gllpSpecular], zero);
       glLightfv (glLight, GL_SPECULAR, (float*)&v);
 
-      v = GetParamVectorVal (stacks, entry.params[gllpAmbient], null);
+      v = GetParamVectorVal (stacks, entry.params[gllpAmbient], zero);
       glLightfv (glLight, GL_AMBIENT, (float*)&v);
 
       v = GetParamVectorVal (stacks, entry.params[gllpAttenuation], 
@@ -109,7 +103,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
 	1.0f);
       glLightf (glLight, GL_SPOT_CUTOFF, f);
 
-      v = GetParamVectorVal (stacks, entry.params[gllpDirection], null);
+      v = GetParamVectorVal (stacks, entry.params[gllpDirection], zero);
       glLightfv (glLight, GL_SPOT_DIRECTION, (float*)&v);
     }
 
@@ -118,6 +112,10 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, (float*)&v);
     v = GetParamVectorVal (stacks, matDiffuse, one);
     glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, (float*)&v);
+    v = GetParamVectorVal (stacks, matSpecular, zero);
+    glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, (float*)&v);
+    float f = GetParamFloatVal (stacks, matSpecularExp, 0);
+    glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, f);
 
     var = csGetShaderVariableFromStack (stacks, ambientvar);
     if (var)
@@ -126,6 +124,18 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
       v = csVector4 (0, 0, 0, 1);
     glLightModelfv (GL_LIGHT_MODEL_AMBIENT, (float*)&v);
 
+    if (colorMaterial != 0)
+    {
+      glEnable (GL_COLOR_MATERIAL);
+      glColorMaterial (GL_FRONT, colorMaterial);
+    }
+    
+    if (separateSpecular)
+      glLightModeli (GL_LIGHT_MODEL_COLOR_CONTROL_EXT, 
+	GL_SEPARATE_SPECULAR_COLOR_EXT);
+	
+    glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+    
     statecache->Enable_GL_LIGHTING ();
   }
 
@@ -518,14 +528,17 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
 void csGLShaderFVP::ResetState ()
 {
   size_t i;
-  if (colorMaterial != 0)
-    glDisable (GL_COLOR_MATERIAL);
 
   if (do_lighting)
   {
     for (i = 0; i < lights.Length(); ++i)
       glDisable ((GLenum)GL_LIGHT0+i);
 
+    if (colorMaterial != 0)
+      glDisable (GL_COLOR_MATERIAL);
+    if (separateSpecular)
+      glLightModeli (GL_LIGHT_MODEL_COLOR_CONTROL_EXT, GL_SINGLE_COLOR_EXT);
+    
     statecache->Disable_GL_LIGHTING ();
   }
 
@@ -562,8 +575,7 @@ bool csGLShaderFVP::ParseTexMatrixOp (iDocumentNode* node,
     return false;
   }
   if (!ParseProgramParam (node, op.param,
-    matrix ? ParamMatrix : ParamFloat | ParamVector2 | ParamVector3 |
-    ParamVector4 | ParamShaderExp))
+    matrix ? ParamMatrix : ParamVector | ParamShaderExp))
     return false;
 
   return true;
@@ -647,7 +659,7 @@ bool csGLShaderFVP::ParseLight (iDocumentNode* node, LightingEntry& entry)
 	break
 #define LIGHT_PARAM_V(Token, GLLP)				\
       LIGHT_PARAM(Token, GLLP,					\
-	ParamVector3 | ParamVector4 | ParamShaderExp)
+	ParamVector | ParamShaderExp)
 #define LIGHT_PARAM_F(Token, GLLP)				\
       LIGHT_PARAM(Token, GLLP,					\
 	ParamFloat | ParamShaderExp)
@@ -896,13 +908,31 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 	  break;
 	case XMLTOKEN_MATDIFFUSE:
 	  if (!ParseProgramParam (child, matDiffuse,
-	    ParamVector3 | ParamVector4 | ParamShaderExp))
+	    ParamVector | ParamShaderExp))
 	    return false;
 	  break;
 	case XMLTOKEN_MATAMBIENT:
 	  if (!ParseProgramParam (child, matAmbient,
-	    ParamVector3 | ParamVector4 | ParamShaderExp))
+	    ParamVector | ParamShaderExp))
 	    return false;
+	  break;
+	case XMLTOKEN_MATSPECULAR:
+	  if (!ParseProgramParam (child, matSpecular,
+	    ParamVector | ParamShaderExp))
+	    return false;
+	  break;
+	case XMLTOKEN_MATSPECULAREXP:
+	  if (!ParseProgramParam (child, matSpecularExp,
+	    ParamFloat | ParamShaderExp))
+	    return false;
+	  break;
+	case XMLTOKEN_SEPARATESPECULAR:
+	  {
+	    bool b;
+	    if (!synsrv->ParseBool (child, b, true))
+	      return false;
+	    separateSpecular = b;
+	  }
 	  break;
         default:
 	  {
@@ -935,18 +965,22 @@ bool csGLShaderFVP::Compile()
 {
   shaderPlug->Open ();
 
-  g3d = CS_QUERY_REGISTRY (objectReg, iGraphics3D);
-
-  //get a statecache
-  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (objectReg, iGraphics2D);
-  g2d->PerformExtension ("getstatecache", &statecache);
-
   size_t i;
 
   for (i=0; i<layers.Length (); i++)
     if ((layers[i].texgen == TEXGEN_REFLECT_CUBE) &&
       !shaderPlug->ext->CS_GL_ARB_texture_cube_map)
       return false;
+      
+  if (separateSpecular 
+    && !shaderPlug->ext->CS_GL_EXT_separate_specular_color)
+    return false;
+
+  g3d = CS_QUERY_REGISTRY (objectReg, iGraphics3D);
+
+  //get a statecache
+  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (objectReg, iGraphics2D);
+  g2d->PerformExtension ("getstatecache", &statecache);
 
   return true;
 }

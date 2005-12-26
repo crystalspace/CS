@@ -324,7 +324,7 @@ class csXMLShader : public scfImplementationExt1<csXMLShader,
   bool useFallbackContext;
 
   csShaderVariableContext globalSVContext;
-  void ParseGlobalSVs ();
+  void ParseGlobalSVs (iDocumentNode* node);
 
   csShaderVariableContext& GetUsedSVContext ()
   {

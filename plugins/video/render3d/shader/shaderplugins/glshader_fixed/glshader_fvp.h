@@ -104,6 +104,9 @@ private:
   GLenum colorMaterial;
   ProgramParam matAmbient;
   ProgramParam matDiffuse;
+  ProgramParam matSpecular;
+  ProgramParam matSpecularExp;
+  bool separateSpecular;
 
   struct layerentry
   {

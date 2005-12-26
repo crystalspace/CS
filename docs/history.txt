@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Dec-2005
+        - res added support for separate specular and some specular-related
+          parameters to glshader_fixed.
+        - res added (partial) support for specular lighting to the vproc_fixed
+          shader.
+	- res added loading of the light specular color to csparser.
+	- res fixed XMLshader to always expect the shader-global <shadervar>s
+	  in a <shadervars> block. (One code path expected them outside such a
+	  block.)
+	- res fixed the fat RL to propagate the light specular color.
+	- res added some specularity to simplelights.zip. Shiiiney!
 25-Dec-2005
         - res fixed a crash in xmlshader when retrieving metadata from a 
           fallback shader that itself did not have validated techniques.

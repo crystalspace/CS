@@ -4271,6 +4271,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   float dist = 0;
 
   csColor color;
+  csColor specular (0, 0, 0);
   csLightDynamicType dyn;
   struct csHaloDef
   {
@@ -4338,6 +4339,10 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_COLOR:
 	if (!SyntaxService->ParseColor (child, color))
+	  return 0;
+        break;
+      case XMLTOKEN_SPECULAR:
+	if (!SyntaxService->ParseColor (child, specular))
 	  return 0;
         break;
       case XMLTOKEN_DYNAMIC:
@@ -4613,6 +4618,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   AddToRegion (ldr_context, l->QueryObject ());
   l->SetType (type);
   l->SetSpotLightFalloff (spotfalloffInner, spotfalloffOuter);
+  l->SetSpecularColor (specular);
 
   if (use_light_transf)
   {

@@ -1369,7 +1369,12 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   shaderSource = wrappedNode;
   vfsStartDir = csStrNew (compiler->vfs->GetCwd ());
 
-  ParseGlobalSVs ();
+  //Load global shadervars block
+  csRef<iDocumentNode> varNode = shaderSource->GetNode(
+    xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
+ 
+  if (varNode)
+    ParseGlobalSVs (varNode);
 
   csRef<iDocumentNode> fallbackNode = shaderSource->GetNode ("fallbackshader");
   if (fallbackNode.IsValid())
@@ -1473,12 +1478,12 @@ public:
   { wrappedSVC.Clear(); }
 };
 
-void csXMLShader::ParseGlobalSVs ()
+void csXMLShader::ParseGlobalSVs (iDocumentNode* node)
 {
   SVCWrapper wrapper (globalSVContext);
   resolver->ResetEvaluationCache();
   resolver->SetEvalParams (0, &wrapper.svStack);
-  compiler->LoadSVBlock (shaderSource, &wrapper);
+  compiler->LoadSVBlock (node, &wrapper);
   resolver->SetEvalParams (0, 0);
 }
 

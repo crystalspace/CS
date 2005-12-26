@@ -554,6 +554,12 @@ void csFatLoopStep::SetLightSVs (csShaderVariableContext& shadervars,
   const csColor& color = light->GetColor ();
   sv->SetValue (csVector3 (color.red, color.green, color.blue));
 
+  sv = GetFrameUniqueSV (framenr, shadervars, 
+    lsvCache.GetLightSVId (lightId, 
+      csLightShaderVarCache::lightSpecular));
+  const csColor& specular = light->GetColor ();
+  sv->SetValue (csVector3 (specular.red, specular.green, specular.blue));
+
 
   const csVector3& lightPosW = lightT.GetOrigin();
   sv = GetFrameUniqueSV (framenr, shadervars, 
