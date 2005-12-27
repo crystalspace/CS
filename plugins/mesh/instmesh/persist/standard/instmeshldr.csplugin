@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- instmeshldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.instmesh</name>
+        <implementation>csInstFactoryLoader</implementation>
+        <description>Crystal Space Instancing Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.instmesh</name>
+        <implementation>csInstMeshLoader</implementation>
+        <description>Crystal Space Instancing Mesh Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.instmesh</name>
+        <implementation>csInstFactorySaver</implementation>
+        <description>Crystal Space Instancing Mesh Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.instmesh</name>
+        <implementation>csInstMeshSaver</implementation>
+        <description>Crystal Space Instancing Mesh Mesh Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

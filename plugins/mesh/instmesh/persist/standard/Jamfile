@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh instmesh persist standard ;
+
+Description instmeshldr : "Instancing mesh object loader" ;
+
+Plugin instmeshldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith instmeshldr : crystalspace ;
+
+CompileGroups instmeshldr :  meshes ;
+

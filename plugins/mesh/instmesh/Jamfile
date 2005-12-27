@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh instmesh ;
+
+SubInclude TOP plugins mesh instmesh object ;
+SubInclude TOP plugins mesh instmesh persist ;

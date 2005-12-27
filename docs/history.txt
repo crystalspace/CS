@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Dec-2005
+	- Jorrit made the mesh_tri_normals in genmesh a local array for
+	  CalculateNormals(). For some reason it was stored in the factory
+	  class which means a waste of memory since the array was
+	  used nowhere.
+	- Jorrit fixed a leak in genmesh. For every genmesh object an
+	  instance of a shader variable accessor was leaking.
+	- Jorrit added the first version of the new 'instmesh'. This is
+	  a mesh that is specifically designed to allow for multiple
+	  instances of the same geometry. Currently it doesn't work yet.
 26-Dec-2005
         - res added support for separate specular and some specular-related
           parameters to glshader_fixed.

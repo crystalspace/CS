@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh instmesh object ;
+
+Description instmesh : "Instancing mesh object plugin" ;
+
+Plugin instmesh
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith instmesh : crystalspace ;
+
+CompileGroups instmesh :  meshes ;

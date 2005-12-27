@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Jorrit Tyberghein
+    Copyright (C) 2005 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_GENMESH_H__
-#define __CS_GENMESH_H__
+#ifndef __CS_INSTMESH_H__
+#define __CS_INSTMESH_H__
 
 #include "csgeom/objmodel.h"
 #include "csgeom/transfrm.h"
@@ -39,7 +39,7 @@
 #include "iengine/lightmgr.h"
 #include "iengine/shadcast.h"
 #include "igeom/polymesh.h"
-#include "imesh/genmesh.h"
+#include "imesh/instmesh.h"
 #include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "iutil/comp.h"
@@ -52,9 +52,9 @@
 class csBSPTree;
 class csColor;
 class csColor4;
-class csGenmeshMeshObject;
-class csGenmeshMeshObjectFactory;
-class csGenmeshMeshObjectType;
+class csInstmeshMeshObject;
+class csInstmeshMeshObjectFactory;
+class csInstmeshMeshObjectType;
 class csPolygonMesh;
 struct iCacheManager;
 struct iEngine;
@@ -81,51 +81,37 @@ public:
   }
 };
 
-struct csGenmeshSubMesh
-{
-  csRef<iRenderBuffer> index_buffer;
-  csRef<iMaterialWrapper> material;
-  csRenderMeshHolder rmHolder;
-  csRef<csRenderBufferHolder> bufferHolder;
-  int tricount;
-
-  // Override mixmode from parent.
-  bool override_mixmode;
-  uint MixMode;
-};
-
 /**
- * Genmesh version of mesh object.
+ * Instmesh version of mesh object.
  */
-class csGenmeshMeshObject : public iMeshObject
+class csInstmeshMeshObject : public iMeshObject
 {
 private:
   csRenderMeshHolder rmHolder;
   csRef<csShaderVariableContext> svcontext;
   csRef<csRenderBufferHolder> bufferHolder;
   csWeakRef<iGraphics3D> g3d;
+  bool mesh_vertices_dirty_flag;
+  bool mesh_texels_dirty_flag;
+  bool mesh_normals_dirty_flag;
   bool mesh_colors_dirty_flag;
+  bool mesh_triangle_dirty_flag;
+  bool mesh_tangents_dirty_flag;
 
   uint buffers_version;
-  csRef<iRenderBuffer> sorted_index_buffer;	// Only if factory back2front
-  int num_sorted_mesh_triangles;
-  csTriangle* sorted_mesh_triangles;
-
-  // The following three are only used in case animation control is required.
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
-
   csRef<iRenderBuffer> color_buffer;
+  csRef<iRenderBuffer> index_buffer;
+  csRef<iRenderBuffer> binormal_buffer;
+  csRef<iRenderBuffer> tangent_buffer;
+
   iMovable* lighting_movable;
 
-  csPDelArray<csGenmeshSubMesh> subMeshes;
   csDirtyAccessArray<csRenderMesh*> renderMeshes;
 
-  csUserRenderBufferManager userBuffers;
-  csArray<csStringID> user_buffer_names;
-
-  csGenmeshMeshObjectFactory* factory;
+  csInstmeshMeshObjectFactory* factory;
   iMeshWrapper* logparent;
   csRef<iMaterialWrapper> material;
   bool material_needs_visit;
@@ -144,6 +130,10 @@ private:
   csColor4* lit_mesh_colors;
   int num_lit_mesh_colors;	// Should be equal to factory number.
   csColor4* static_mesh_colors;
+
+  csVector3 radius;
+  csBox3 object_bbox;
+  bool object_bbox_valid;
 
   /**
    * Global sector wide dynamic ambient version.
@@ -203,16 +193,12 @@ private:
 
 public:
   /// Constructor.
-  csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory);
+  csInstmeshMeshObject (csInstmeshMeshObjectFactory* factory);
 
-  CS_LEAKGUARD_DECLARE (csGenmeshMeshObject);
+  CS_LEAKGUARD_DECLARE (csInstmeshMeshObject);
 
   /// Destructor.
-  virtual ~csGenmeshMeshObject ();
-
-  void ClearSubMeshes ();
-  void AddSubMesh (unsigned int *triangles,
-    int tricount, iMaterialWrapper *material, bool do_mixmode, uint mixmode);
+  virtual ~csInstmeshMeshObject ();
 
   void SetMixMode (uint mode)
   {
@@ -224,33 +210,14 @@ public:
   const csColor& GetColor () const { return base_color; }
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
-  void GetObjectBoundingBox (csBox3& bbox);
-  void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (csVector3& rad, csVector3& cent);
   void SetShadowCasting (bool m) { do_shadows = m; }
   void SetShadowReceiving (bool m) { do_shadow_rec = m; }
 
   iVirtualClock* vc;
-  csRef<iGenMeshAnimationControl> anim_ctrl;
-  void SetAnimationControl (iGenMeshAnimationControl* anim_ctrl);
-  iGenMeshAnimationControl* GetAnimationControl () const { return anim_ctrl; }
-  const csVector3* AnimControlGetVertices ();
-  const csVector2* AnimControlGetTexels ();
-  const csVector3* AnimControlGetNormals ();
-  const csColor4* AnimControlGetColors (csColor4* source);
-  bool anim_ctrl_verts;
-  bool anim_ctrl_texels;
-  bool anim_ctrl_normals;
-  bool anim_ctrl_colors;
 
-  // This function sets up the shader variable context depending on
-  // the existance of an animation control. If there is no animation control
-  // then the factory will provide the vertex and other data. Otherwise the
-  // mesh itself will do it.
+  // This function sets up the shader variable context.
   void SetupShaderVariableContext ();
-
-  bool AddRenderBuffer (const char *name, iRenderBuffer* buffer);
-  bool RemoveRenderBuffer (const char *name);
 
   //----------------------- Shadow and lighting system ----------------------
   char* GenerateCacheName ();
@@ -302,7 +269,6 @@ public:
   }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
-  virtual iObjectModel* GetObjectModel ();
   virtual bool SetColor (const csColor& col)
   {
     base_color.Set (col);
@@ -319,10 +285,38 @@ public:
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
 
+  /// Calculate bounding box and radius.
+  void CalculateBBoxRadius ();
+  const csBox3& GetObjectBoundingBox ();
+  void SetObjectBoundingBox (const csBox3& bbox);
+  const csVector3& GetRadius ();
+
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public csObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObject);
+    virtual void GetObjectBoundingBox (csBox3& bbox)
+    {
+      bbox = scfParent->GetObjectBoundingBox ();
+    }
+    virtual void SetObjectBoundingBox (const csBox3& bbox)
+    {
+      scfParent->SetObjectBoundingBox (bbox);
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      rad = scfParent->GetRadius ();
+      cent.Set (0.0f);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+
   //------------------------- iLightingInfo interface -------------------------
   struct LightingInfo : public iLightingInfo
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObject);
     virtual void InitializeDefault (bool clear)
     {
       scfParent->InitializeDefault (clear);
@@ -353,7 +347,7 @@ public:
   //-------------------- iShadowCaster interface implementation ----------
   struct ShadowCaster : public iShadowCaster
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObject);
     virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
     	const csVector3& origin)
     {
@@ -365,7 +359,7 @@ public:
   //-------------------- iShadowReceiver interface implementation ----------
   struct ShadowReceiver : public iShadowReceiver
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObject);
     virtual void CastShadows (iMovable* movable, iFrustumView* fview)
     {
       scfParent->CastShadows (movable, fview);
@@ -373,10 +367,10 @@ public:
   } scfiShadowReceiver;
   friend struct ShadowReceiver;
 
-  //------------------------- iGeneralMeshState implementation ----------------
-  class GeneralMeshState : public iGeneralMeshState
+  //------------------------- iInstancingMeshState implementation ----------------
+  class InstancingMeshState : public iInstancingMeshState
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObject);
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     { scfParent->SetMaterialWrapper (material); }
     virtual iMaterialWrapper* GetMaterialWrapper () const
@@ -411,35 +405,8 @@ public:
     {
       return scfParent->do_shadow_rec;
     }
-    virtual void SetAnimationControl (iGenMeshAnimationControl* anim_ctrl)
-    {
-      scfParent->SetAnimationControl (anim_ctrl);
-    }
-    virtual iGenMeshAnimationControl* GetAnimationControl () const
-    {
-      return scfParent->GetAnimationControl ();
-    }
-    virtual void ClearSubMeshes ()
-    {
-      scfParent->ClearSubMeshes ();
-    }
-    virtual void AddSubMesh (unsigned int *triangles,
-      int tricount,
-      iMaterialWrapper *material)
-    {
-      scfParent->AddSubMesh (triangles, tricount, material, false, CS_FX_COPY);
-    }
-    virtual void AddSubMesh (unsigned int *triangles,
-      int tricount, iMaterialWrapper *material, uint mixmode)
-    {
-      scfParent->AddSubMesh (triangles, tricount, material, true, mixmode);
-    }
-    virtual bool AddRenderBuffer (const char *name, iRenderBuffer* buffer)
-    { return scfParent->AddRenderBuffer (name, buffer); }
-    virtual bool RemoveRenderBuffer (const char *name)
-    { return scfParent->RemoveRenderBuffer (name); }
-  } scfiGeneralMeshState;
-  friend class GeneralMeshState;
+  } scfiInstancingMeshState;
+  friend class InstancingMeshState;
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh
@@ -448,7 +415,7 @@ public:
     csFlags flags;
 
   public:
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObject);
 
     virtual int GetVertexCount ();
     virtual csVector3* GetVertices ();
@@ -475,12 +442,12 @@ public:
   public:
     CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
     SCF_DECLARE_IBASE;
-    csGenmeshMeshObject* parent;
+    csInstmeshMeshObject* parent;
     virtual ~eiRenderBufferAccessor ()
     {
       SCF_DESTRUCT_IBASE ();
     }
-    eiRenderBufferAccessor (csGenmeshMeshObject* parent)
+    eiRenderBufferAccessor (csInstmeshMeshObject* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
       eiRenderBufferAccessor::parent = parent;
@@ -500,12 +467,12 @@ public:
   {
   public:
     SCF_DECLARE_IBASE;
-    csGenmeshMeshObject* parent;
+    csInstmeshMeshObject* parent;
     virtual ~eiShaderVariableAccessor ()
     {
       SCF_DESTRUCT_IBASE ();
     }
-    eiShaderVariableAccessor (csGenmeshMeshObject* parent)
+    eiShaderVariableAccessor (csInstmeshMeshObject* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
       eiShaderVariableAccessor::parent = parent;
@@ -523,44 +490,24 @@ public:
 /**
  * Factory for general meshes.
  */
-class csGenmeshMeshObjectFactory : public iMeshObjectFactory
+class csInstmeshMeshObjectFactory : public iMeshObjectFactory
 {
 private:
+  friend class csInstmeshMeshObject;	//@@@ FIXME: remove
+
   csRef<iMaterialWrapper> material;
-  csVector3* mesh_vertices;
-  csVector2* mesh_texels;
-  csVector3* mesh_normals;
-  csColor4* mesh_colors;
-  size_t num_mesh_vertices;
+  csDirtyAccessArray<csVector3> mesh_vertices;
+  csDirtyAccessArray<csVector2> mesh_texels;
+  csDirtyAccessArray<csVector3> mesh_normals;
+  csDirtyAccessArray<csColor4> mesh_colors;
 
   bool autonormals;
   bool do_fullbright;
 
-  bool mesh_vertices_dirty_flag;
-  bool mesh_texels_dirty_flag;
-  bool mesh_normals_dirty_flag;
-  bool mesh_colors_dirty_flag;
-  bool mesh_triangle_dirty_flag;
-  bool mesh_tangents_dirty_flag;
-
-  csTriangle* mesh_triangles;
-  int num_mesh_triangles;
+  csDirtyAccessArray<csTriangle> mesh_triangles;
 
   csWeakRef<iGraphics3D> g3d;
   csRef<iStringSet> strings;
-
-  csRef<iRenderBuffer> vertex_buffer;
-  csRef<iRenderBuffer> texel_buffer;
-  csRef<iRenderBuffer> normal_buffer;
-  csRef<iRenderBuffer> color_buffer;
-  csRef<iRenderBuffer> index_buffer;
-  csRef<iRenderBuffer> binormal_buffer;
-  csRef<iRenderBuffer> tangent_buffer;
-  
-  csUserRenderBufferManager userBuffers;
-  csArray<csStringID> user_buffer_names;
-
-  csPDelArray<csGenmeshSubMesh> subMeshes;
 
   uint default_mixmode;
   bool default_lighting;
@@ -568,25 +515,6 @@ private:
   bool default_manualcolors;
   bool default_shadowcasting;
   bool default_shadowreceiving;
-
-  csVector3 radius;
-  csBox3 object_bbox;
-  bool object_bbox_valid;
-  bool initialized;
-
-  // For animation control.
-  csRef<iGenMeshAnimationControlFactory> anim_ctrl_fact;
-  void SetAnimationControlFactory (iGenMeshAnimationControlFactory*
-  	anim_ctrl_fact);
-  iGenMeshAnimationControlFactory* GetAnimationControlFactory () const
-  {
-    return anim_ctrl_fact;
-  }
-
-  csMeshedPolygon* polygons;
-
-  /// Calculate bounding box and radius.
-  void CalculateBBoxRadius ();
 
   /**
    * Compress vertices. This is for CalculateNormals().
@@ -598,20 +526,12 @@ private:
 	csTriangle*& new_tris,
 	size_t*& mapping);
 
-  /**
-   * Setup this factory. This function will check if setup is needed.
-   */
-  void SetupFactory ();
-
 public:
-  CS_LEAKGUARD_DECLARE (csGenmeshMeshObjectFactory);
+  CS_LEAKGUARD_DECLARE (csInstmeshMeshObjectFactory);
 
   csRef<iVirtualClock> vc;
 
   uint buffers_version;
-
-  bool back2front;
-  csBSPTree* back2front_tree;
 
   iObjectRegistry* object_reg;
   iMeshFactoryWrapper* logparent;
@@ -621,88 +541,62 @@ public:
 
   iEngine* engine;
 
-  const csPDelArray<csGenmeshSubMesh>& GetSubMeshes () const
-  {
-    return subMeshes;
-  }
-
   /// Constructor.
-  csGenmeshMeshObjectFactory (iMeshObjectType *pParent,
+  csInstmeshMeshObjectFactory (iMeshObjectType *pParent,
   	iObjectRegistry* object_reg);
 
   /// Destructor.
-  virtual ~csGenmeshMeshObjectFactory ();
+  virtual ~csInstmeshMeshObjectFactory ();
 
   /// Do full bright.
   bool DoFullBright () const { return do_fullbright; }
 
   void SetMaterialWrapper (iMaterialWrapper* material)
   {
-    csGenmeshMeshObjectFactory::material = material;
+    csInstmeshMeshObjectFactory::material = material;
   }
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
-  void SetVertexCount (int n);
-  int GetVertexCount () const { return (int)num_mesh_vertices; }
-  csVector3* GetVertices ()
+  void AddVertex (const csVector3& v,
+      const csVector2& uv, const csVector3& normal,
+      const csColor4& color)
   {
-    SetupFactory ();
-    return mesh_vertices;
+    mesh_vertices.Push (v);
+    mesh_texels.Push (uv);
+    mesh_normals.Push (normal);
+    mesh_colors.Push (color);
   }
-  csVector2* GetTexels ()
+  int GetVertexCount () const { return mesh_vertices.Length (); }
+  const csVector3* GetVertices ()
   {
-    SetupFactory ();
-    return mesh_texels;
+    return mesh_vertices.GetArray ();
   }
-  csVector3* GetNormals ()
+  const csVector2* GetTexels ()
   {
-    SetupFactory ();
-    return mesh_normals;
+    return mesh_texels.GetArray ();
   }
-  csColor4* GetColors ()
+  const csVector3* GetNormals ()
   {
-    SetupFactory ();
-    return mesh_colors;
+    return mesh_normals.GetArray ();
+  }
+  const csColor4* GetColors ()
+  {
+    return mesh_colors.GetArray ();
   }
 
-  void SetTriangleCount (int n);
+  void AddTriangle (const csTriangle& tri)
+  {
+    mesh_triangles.Push (tri);
+  }
+  size_t GetTriangleCount () const { return mesh_triangles.Length (); }
+  const csTriangle* GetTriangles () { return mesh_triangles.GetArray (); }
 
-  int GetTriangleCount () const { return num_mesh_triangles; }
-  csTriangle* GetTriangles () { SetupFactory (); return mesh_triangles; }
-
-  void Invalidate ();
   void CalculateNormals ();
   void Compress ();
   void GenerateBox (const csBox3& box);
   void GenerateSphere (const csSphere& sphere, int rim_vertices);
-  //void GeneratePlane (const csPlane3& plane);
-  void SetBack2Front (bool b2f);
-  bool IsBack2Front () const { return back2front; }
-  void BuildBack2FrontTree ();
 
-  bool AddRenderBuffer (const char *name, iRenderBuffer* buffer);
-  bool RemoveRenderBuffer (const char *name);
-  /**
-   * Get the string ID's for the anonymous buffers
-   */
-  const csArray<csStringID>& GetUserBufferNames ()
-  { return user_buffer_names; }
-  const csUserRenderBufferManager& GetUserBuffers()
-  { return userBuffers; }
   iStringSet* GetStrings()
   { return strings; }
-
-  void ClearSubMeshes ();
-  void AddSubMesh (unsigned int *triangles,
-    int tricount, iMaterialWrapper *material, bool do_mixmode, uint mixmode);
-
-  const csBox3& GetObjectBoundingBox ();
-  void SetObjectBoundingBox (const csBox3& bbox);
-  const csVector3& GetRadius ();
-
-  /**
-   * Calculate polygons for iPolygonMesh.
-   */
-  csMeshedPolygon* GetPolygons ();
 
   void SetMixMode (uint mode)
   {
@@ -774,10 +668,10 @@ public:
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return genmesh_type; }
 
-  //----------------------- iGeneralFactoryState implementation -------------
-  class GeneralFactoryState : public iGeneralFactoryState
+  //----------------------- iInstancingFactoryState implementation -------------
+  class InstancingFactoryState : public iInstancingFactoryState
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
+    SCF_DECLARE_EMBEDDED_IBASE (csInstmeshMeshObjectFactory);
 
     virtual void SetMixMode (uint mode)
     {
@@ -836,45 +730,43 @@ public:
     {
       return scfParent->GetMaterialWrapper ();
     }
-    virtual void SetVertexCount (int n)
+    virtual void AddVertex (const csVector3& v,
+      const csVector2& uv, const csVector3& normal,
+      const csColor4& color)
     {
-      scfParent->SetVertexCount (n);
+      scfParent->AddVertex (v, uv, normal, color);
     }
-    virtual int GetVertexCount () const
+    virtual size_t GetVertexCount () const
     {
       return scfParent->GetVertexCount ();
     }
-    virtual csVector3* GetVertices ()
+    virtual const csVector3* GetVertices ()
     {
       return scfParent->GetVertices ();
     }
-    virtual csVector2* GetTexels ()
+    virtual const csVector2* GetTexels ()
     {
       return scfParent->GetTexels ();
     }
-    virtual csVector3* GetNormals ()
+    virtual const csVector3* GetNormals ()
     {
       return scfParent->GetNormals ();
     }
-    virtual void SetTriangleCount (int n)
+    virtual void AddTriangle (const csTriangle& tri)
     {
-      scfParent->SetTriangleCount (n);
+      scfParent->AddTriangle (tri);
     }
-    virtual int GetTriangleCount () const
+    virtual size_t GetTriangleCount () const
     {
       return scfParent->GetTriangleCount ();
     }
-    virtual csTriangle* GetTriangles ()
+    virtual const csTriangle* GetTriangles ()
     {
       return scfParent->GetTriangles ();
     }
-    virtual csColor4* GetColors ()
+    virtual const csColor4* GetColors ()
     {
       return scfParent->GetColors ();
-    }
-    virtual void Invalidate ()
-    {
-      scfParent->Invalidate ();
     }
     virtual void Compress ()
     {
@@ -892,166 +784,21 @@ public:
     {
       scfParent->GenerateSphere (sphere, rim_vertices);
     }
-    virtual void SetBack2Front (bool b2f)
-    {
-      scfParent->SetBack2Front (b2f);
-    }
     virtual bool IsAutoNormals () const
     {
       return scfParent->IsAutoNormals ();
     }
-    virtual bool IsBack2Front () const
-    {
-      return scfParent->IsBack2Front ();
-    }
-    virtual void SetAnimationControlFactory (iGenMeshAnimationControlFactory*
-    	anim_ctrl_fact)
-    {
-      scfParent->SetAnimationControlFactory (anim_ctrl_fact);
-    }
-    virtual iGenMeshAnimationControlFactory* GetAnimationControlFactory () const
-    {
-      return scfParent->GetAnimationControlFactory ();
-    }
-    virtual bool AddRenderBuffer (const char *name, iRenderBuffer* buffer)
-    { return scfParent->AddRenderBuffer (name, buffer); }
-    virtual bool RemoveRenderBuffer (const char *name)
-    { return scfParent->RemoveRenderBuffer (name); }
-    virtual void ClearSubMeshes ()
-    {
-      scfParent->ClearSubMeshes ();
-    }
-    virtual void AddSubMesh (unsigned int *triangles,
-      int tricount,
-      iMaterialWrapper *material)
-    {
-      scfParent->AddSubMesh (triangles, tricount, material, false, CS_FX_COPY);
-    }
-    virtual void AddSubMesh (unsigned int *triangles,
-      int tricount, iMaterialWrapper *material, uint mixmode)
-    {
-      scfParent->AddSubMesh (triangles, tricount, material, true, mixmode);
-    }
-  } scfiGeneralFactoryState;
-  friend class GeneralFactoryState;
+  } scfiInstancingFactoryState;
+  friend class InstancingFactoryState;
 
-  //------------------ iPolygonMesh interface implementation ----------------//
-  struct PolyMesh : public iPolygonMesh
-  {
-  private:
-    csGenmeshMeshObjectFactory* factory;
-    csFlags flags;
-  public:
-    //SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
-    SCF_DECLARE_IBASE;
-
-    void SetFactory (csGenmeshMeshObjectFactory* Factory)
-    { factory = Factory; }
-
-    virtual int GetVertexCount ();
-    virtual csVector3* GetVertices ();
-    virtual int GetPolygonCount ();
-    virtual csMeshedPolygon* GetPolygons ();
-    virtual int GetTriangleCount ();
-    virtual csTriangle* GetTriangles ();
-    virtual void Lock () { }
-    virtual void Unlock () { }
-    
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh ()
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-    virtual ~PolyMesh ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
-  } scfiPolygonMesh;
-  friend struct PolyMesh;
-
-  //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public csObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      bbox = scfParent->GetObjectBoundingBox ();
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
-    {
-      rad = scfParent->GetRadius ();
-      cent.Set (0.0f);
-    }
-  } scfiObjectModel;
-  friend class ObjectModel;
-
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
-
-  //------------------ iShaderVariableAccessor implementation ------------
-  class eiShaderVariableAccessor : public iShaderVariableAccessor
-  {
-  public:
-    //SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
-    SCF_DECLARE_IBASE;
-    csGenmeshMeshObjectFactory* parent;
-    virtual ~eiShaderVariableAccessor ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
-    eiShaderVariableAccessor (csGenmeshMeshObjectFactory* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      eiShaderVariableAccessor::parent = parent;
-    }
-    virtual void PreGetValue (csShaderVariable* variable)
-    {
-      //scfParent->PreGetShaderVariableValue (variable);
-      parent->PreGetShaderVariableValue (variable);
-    }
-  } *scfiShaderVariableAccessor;
-  friend class eiShaderVariableAccessor;
-
-  void PreGetShaderVariableValue (csShaderVariable* variable);
-
-
-  class eiRenderBufferAccessor : public iRenderBufferAccessor
-  {
-  public:
-    CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
-    SCF_DECLARE_IBASE;
-    csGenmeshMeshObjectFactory* parent;
-    virtual ~eiRenderBufferAccessor ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
-    eiRenderBufferAccessor (csGenmeshMeshObjectFactory* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      eiRenderBufferAccessor::parent = parent;
-    }
-    virtual void PreGetBuffer (csRenderBufferHolder* holder,
-    	csRenderBufferName buffer)
-    {
-      parent->PreGetBuffer (holder, buffer);
-    }
-  } *scfiRenderBufferAccessor;
-  friend class eiRenderBufferAccessor;
-
-  void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
+  virtual iObjectModel* GetObjectModel () { return 0; }
 };
 
 /**
- * Genmesh type. This is the plugin you have to use to create instances
- * of csGenmeshMeshObjectFactory.
+ * Instmesh type. This is the plugin you have to use to create instances
+ * of csInstmeshMeshObjectFactory.
  */
-class csGenmeshMeshObjectType : public iMeshObjectType
+class csInstmeshMeshObjectType : public iMeshObjectType
 {
 public:
   iObjectRegistry* object_reg;
@@ -1060,9 +807,9 @@ public:
   SCF_DECLARE_IBASE;
 
   /// Constructor.
-  csGenmeshMeshObjectType (iBase*);
+  csInstmeshMeshObjectType (iBase*);
   /// Destructor.
-  virtual ~csGenmeshMeshObjectType ();
+  virtual ~csInstmeshMeshObjectType ();
   /// Draw.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
   /// Initialize.
@@ -1070,7 +817,7 @@ public:
 
   struct eiComponent : public iComponent
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csGenmeshMeshObjectType);
+    SCF_DECLARE_EMBEDDED_IBASE(csInstmeshMeshObjectType);
     virtual bool Initialize (iObjectRegistry* object_reg)
     {
       return scfParent->Initialize (object_reg);
@@ -1078,4 +825,4 @@ public:
   } scfiComponent;
 };
 
-#endif // __CS_GENMESH_H__
+#endif // __CS_INSTMESH_H__

@@ -10,6 +10,7 @@ SubInclude TOP plugins mesh fountain ;
 SubInclude TOP plugins mesh genmesh ;
 SubInclude TOP plugins mesh haze ;
 SubInclude TOP plugins mesh impexp ;
+SubInclude TOP plugins mesh instmesh ;
 SubInclude TOP plugins mesh lghtng ;
 SubInclude TOP plugins mesh null ;
 SubInclude TOP plugins mesh particles ;
