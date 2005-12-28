@@ -81,6 +81,12 @@ public:
   }
 };
 
+struct csInstance
+{
+  csReversibleTransform transform;
+  size_t id;
+};
+
 /**
  * Instmesh version of mesh object.
  */
@@ -88,7 +94,6 @@ class csInstmeshMeshObject : public iMeshObject
 {
 private:
   csRenderMeshHolder rmHolder;
-  csRef<csShaderVariableContext> svcontext;
   csRef<csRenderBufferHolder> bufferHolder;
   csWeakRef<iGraphics3D> g3d;
   bool mesh_vertices_dirty_flag;
@@ -98,7 +103,6 @@ private:
   bool mesh_triangle_dirty_flag;
   bool mesh_tangents_dirty_flag;
 
-  uint buffers_version;
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
@@ -106,6 +110,19 @@ private:
   csRef<iRenderBuffer> index_buffer;
   csRef<iRenderBuffer> binormal_buffer;
   csRef<iRenderBuffer> tangent_buffer;
+
+  // These buffers are calculated from the instances and the factory data.
+  csDirtyAccessArray<csVector3> mesh_vertices;
+  csDirtyAccessArray<csVector2> mesh_texels;
+  csDirtyAccessArray<csVector3> mesh_normals;
+  csDirtyAccessArray<csColor4> mesh_colors;
+  csDirtyAccessArray<csTriangle> mesh_triangles;
+
+  // The instances.
+  csArray<csInstance> instances;
+  static size_t max_instance_id;
+  bool instances_dirty;
+  void CalculateInstanceArrays ();
 
   iMovable* lighting_movable;
 
@@ -127,9 +144,10 @@ private:
   bool do_shadows;
   bool do_shadow_rec;
 
-  csColor4* lit_mesh_colors;
-  int num_lit_mesh_colors;	// Should be equal to factory number.
-  csColor4* static_mesh_colors;
+  csColor4* lit_fact_colors;
+  // Should be equal to factory number times the number of instances.
+  int num_lit_fact_colors;
+  csColor4* static_fact_colors;
 
   csVector3 radius;
   csBox3 object_bbox;
@@ -173,14 +191,14 @@ private:
   void SetupObject ();
 
   /**
-   * Make sure the 'lit_mesh_colors' array has the right size.
+   * Make sure the 'lit_fact_colors' array has the right size.
    * Also clears the pseudo-dynamic light hash if the vertex count
    * changed!
    */
   void CheckLitColors ();
 
   /**
-   * Process one light and add the values to the genmesh light table.
+   * Process one light and add the values to the instmesh light table.
    * The given transform is the full movable transform.
    */
   void UpdateLightingOne (const csReversibleTransform& trans, iLight* light);
@@ -218,6 +236,13 @@ public:
 
   // This function sets up the shader variable context.
   void SetupShaderVariableContext ();
+
+  // Instancing functions.
+  size_t AddInstance (const csReversibleTransform& trans);
+  void RemoveInstance (size_t id);
+  void RemoveAllInstances ();
+  void MoveInstance (size_t id, const csReversibleTransform& trans);
+  const csReversibleTransform& GetInstanceTransform (size_t id);
 
   //----------------------- Shadow and lighting system ----------------------
   char* GenerateCacheName ();
@@ -405,6 +430,27 @@ public:
     {
       return scfParent->do_shadow_rec;
     }
+    virtual size_t AddInstance (const csReversibleTransform& trans)
+    {
+      return scfParent->AddInstance (trans);
+    }
+    virtual void RemoveInstance (size_t id)
+    {
+      scfParent->RemoveInstance (id);
+    }
+    virtual void RemoveAllInstances ()
+    {
+      scfParent->RemoveAllInstances ();
+    }
+    virtual void MoveInstance (size_t id,
+      const csReversibleTransform& trans)
+    {
+      scfParent->MoveInstance (id, trans);
+    }
+    virtual const csReversibleTransform& GetInstanceTransform (size_t id)
+    {
+      return scfParent->GetInstanceTransform (id);
+    }
   } scfiInstancingMeshState;
   friend class InstancingMeshState;
 
@@ -461,30 +507,6 @@ public:
   friend class eiRenderBufferAccessor;
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
-
-  //------------------ iShaderVariableAccessor implementation ------------
-  class eiShaderVariableAccessor : public iShaderVariableAccessor
-  {
-  public:
-    SCF_DECLARE_IBASE;
-    csInstmeshMeshObject* parent;
-    virtual ~eiShaderVariableAccessor ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
-    eiShaderVariableAccessor (csInstmeshMeshObject* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      eiShaderVariableAccessor::parent = parent;
-    }
-    virtual void PreGetValue (csShaderVariable* variable)
-    {
-      parent->PreGetShaderVariableValue (variable);
-    }
-  } *scfiShaderVariableAccessor;
-  friend class eiShaderVariableAccessor;
-
-  void PreGetShaderVariableValue (csShaderVariable* variable);
 };
 
 /**
@@ -496,15 +518,18 @@ private:
   friend class csInstmeshMeshObject;	//@@@ FIXME: remove
 
   csRef<iMaterialWrapper> material;
-  csDirtyAccessArray<csVector3> mesh_vertices;
-  csDirtyAccessArray<csVector2> mesh_texels;
-  csDirtyAccessArray<csVector3> mesh_normals;
-  csDirtyAccessArray<csColor4> mesh_colors;
+  csDirtyAccessArray<csVector3> fact_vertices;
+  csDirtyAccessArray<csVector2> fact_texels;
+  csDirtyAccessArray<csVector3> fact_normals;
+  csDirtyAccessArray<csColor4> fact_colors;
+
+  csDirtyAccessArray<csTriangle> fact_triangles;
+
+  csBox3 factory_bbox;
+  float factory_radius;
 
   bool autonormals;
   bool do_fullbright;
-
-  csDirtyAccessArray<csTriangle> mesh_triangles;
 
   csWeakRef<iGraphics3D> g3d;
   csRef<iStringSet> strings;
@@ -531,11 +556,9 @@ public:
 
   csRef<iVirtualClock> vc;
 
-  uint buffers_version;
-
   iObjectRegistry* object_reg;
   iMeshFactoryWrapper* logparent;
-  iMeshObjectType* genmesh_type;
+  iMeshObjectType* instmesh_type;
   csRef<iLightManager> light_mgr;
   csFlags flags;
 
@@ -548,6 +571,11 @@ public:
   /// Destructor.
   virtual ~csInstmeshMeshObjectFactory ();
 
+  /// Get the bounding box.
+  const csBox3& GetFactoryBox () const { return factory_bbox; }
+  /// Get the bounding radius.
+  const float GetFactoryRadius () const { return factory_radius; }
+
   /// Do full bright.
   bool DoFullBright () const { return do_fullbright; }
 
@@ -558,37 +586,31 @@ public:
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
   void AddVertex (const csVector3& v,
       const csVector2& uv, const csVector3& normal,
-      const csColor4& color)
-  {
-    mesh_vertices.Push (v);
-    mesh_texels.Push (uv);
-    mesh_normals.Push (normal);
-    mesh_colors.Push (color);
-  }
-  int GetVertexCount () const { return mesh_vertices.Length (); }
+      const csColor4& color);
+  int GetVertexCount () const { return fact_vertices.Length (); }
   const csVector3* GetVertices ()
   {
-    return mesh_vertices.GetArray ();
+    return fact_vertices.GetArray ();
   }
   const csVector2* GetTexels ()
   {
-    return mesh_texels.GetArray ();
+    return fact_texels.GetArray ();
   }
   const csVector3* GetNormals ()
   {
-    return mesh_normals.GetArray ();
+    return fact_normals.GetArray ();
   }
   const csColor4* GetColors ()
   {
-    return mesh_colors.GetArray ();
+    return fact_colors.GetArray ();
   }
 
   void AddTriangle (const csTriangle& tri)
   {
-    mesh_triangles.Push (tri);
+    fact_triangles.Push (tri);
   }
-  size_t GetTriangleCount () const { return mesh_triangles.Length (); }
-  const csTriangle* GetTriangles () { return mesh_triangles.GetArray (); }
+  size_t GetTriangleCount () const { return fact_triangles.Length (); }
+  const csTriangle* GetTriangles () { return fact_triangles.GetArray (); }
 
   void CalculateNormals ();
   void Compress ();
@@ -666,7 +688,7 @@ public:
   }
   virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
   { return logparent; }
-  virtual iMeshObjectType* GetMeshObjectType () const { return genmesh_type; }
+  virtual iMeshObjectType* GetMeshObjectType () const { return instmesh_type; }
 
   //----------------------- iInstancingFactoryState implementation -------------
   class InstancingFactoryState : public iInstancingFactoryState

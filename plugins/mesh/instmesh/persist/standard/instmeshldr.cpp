@@ -66,7 +66,8 @@ enum
   XMLTOKEN_AUTONORMALS,
   XMLTOKEN_NOSHADOWS,
   XMLTOKEN_LOCALSHADOWS,
-  XMLTOKEN_COMPRESS
+  XMLTOKEN_COMPRESS,
+  XMLTOKEN_INSTANCE
 };
 
 SCF_IMPLEMENT_IBASE (csInstFactoryLoader)
@@ -515,7 +516,7 @@ bool csInstMeshLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
   xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
   xmltokens.Register ("localshadows", XMLTOKEN_LOCALSHADOWS);
-  xmltokens.Register ("t", XMLTOKEN_T);
+  xmltokens.Register ("instance", XMLTOKEN_INSTANCE);
   return true;
 }
 
@@ -535,6 +536,28 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_INSTANCE:
+	{
+	  csReversibleTransform trans;
+	  csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+	  if (matrix_node)
+	  {
+	    csMatrix3 m;
+	    if (!synldr->ParseMatrix (matrix_node, m))
+	      return false;
+            trans.SetO2T (m);
+	  }
+	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
+	  if (vector_node)
+	  {
+	    csVector3 v;
+	    if (!synldr->ParseVector (vector_node, v))
+	      return false;
+            trans.SetO2TTranslation (v);
+	  }
+	  meshstate->AddInstance (trans);
+	}
+	break;
       case XMLTOKEN_MANUALCOLORS:
 	{
 	  bool r;

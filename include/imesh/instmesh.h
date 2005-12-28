@@ -112,6 +112,31 @@ SCF_VERSION (iInstancingMeshState, 0, 1, 0);
  */
 struct iInstancingMeshState : public iInstancingMeshCommonState
 {
+  /**
+   * Add an instance. Returns an ID to identify that instance.
+   */
+  virtual size_t AddInstance (const csReversibleTransform& trans) = 0;
+
+  /**
+   * Remove an instance.
+   */
+  virtual void RemoveInstance (size_t id) = 0;
+
+  /**
+   * Remove all instances.
+   */
+  virtual void RemoveAllInstances () = 0;
+
+  /**
+   * Move an instance.
+   */
+  virtual void MoveInstance (size_t id,
+      const csReversibleTransform& trans) = 0;
+
+  /**
+   * Get instance transform.
+   */
+  virtual const csReversibleTransform& GetInstanceTransform (size_t id) = 0;
 };
 
 SCF_VERSION (iInstancingFactoryState, 0, 3, 0);

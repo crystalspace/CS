@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Dec-2005
+	- Jorrit finished the basic implementation of instmesh. Still some
+	  optimizations to do and then the mesh generator has to be modified
+	  to work with it.
 27-Dec-2005
 	- Jorrit made the mesh_tri_normals in genmesh a local array for
 	  CalculateNormals(). For some reason it was stored in the factory
