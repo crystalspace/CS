@@ -33,6 +33,7 @@
 #include "imesh/gmeshanim.h"
 #include "imesh/gmeshskel.h"
 #include "imesh/haze.h"
+#include "imesh/instmesh.h"
 #include "imesh/lghtng.h"
 #include "imesh/lighting.h"
 #include "imesh/mdlconv.h"
