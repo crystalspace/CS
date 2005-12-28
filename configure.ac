@@ -2133,6 +2133,9 @@ AC_CHECK_TYPE([intptr_t], [CS_HEADER_PROPERTY([CS_HAVE_INTPTR_T])], [],
     #endif
     #ifdef HAVE_STDINT_H
     #include <stdint.h>
+    #endif
+    #ifdef HAVE_SYS_TYPES_H
+    #include <sys/types.h>
     #endif]])
 AC_CHECK_TYPE([intmax_t], [CS_HEADER_PROPERTY([CS_HAVE_INTMAX_T])], [],
     [[#include <stddef.h>
@@ -2141,6 +2144,9 @@ AC_CHECK_TYPE([intmax_t], [CS_HEADER_PROPERTY([CS_HAVE_INTMAX_T])], [],
     #endif
     #ifdef HAVE_STDINT_H
     #include <stdint.h>
+    #endif
+    #ifdef HAVE_SYS_TYPES_H
+    #include <sys/types.h>
     #endif]])
 
 

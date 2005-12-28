@@ -60809,6 +60809,9 @@ cat >>conftest.$ac_ext <<_ACEOF
     #ifdef HAVE_STDINT_H
     #include <stdint.h>
     #endif
+    #ifdef HAVE_SYS_TYPES_H
+    #include <sys/types.h>
+    #endif
 
 int
 main ()
@@ -60876,6 +60879,9 @@ cat >>conftest.$ac_ext <<_ACEOF
     #endif
     #ifdef HAVE_STDINT_H
     #include <stdint.h>
+    #endif
+    #ifdef HAVE_SYS_TYPES_H
+    #include <sys/types.h>
     #endif
 
 int
