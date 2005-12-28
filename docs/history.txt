@@ -11,6 +11,9 @@ chronological order.
 	  optimizations to do and then the mesh generator has to be modified
 	  to work with it.
 	- Oktal fixed compilation on Cygwin.
+	- res fixed the "darkness" of the std_lighting_detail_alpha and 
+	  std_lighting_detail_alpha_scroll shaders, inspired by a different
+	  fix from Vasily Rudnikov.
 27-Dec-2005
 	- Jorrit made the mesh_tri_normals in genmesh a local array for
 	  CalculateNormals(). For some reason it was stored in the factory
