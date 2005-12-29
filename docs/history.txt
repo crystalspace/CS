@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Dec-2005
+	- Jorrit fixed a bug with lighting of instmesh.
+	- Jorrit implemented the automatic box generation of instmesh.
 28-Dec-2005
 	- Jorrit finished the basic implementation of instmesh. Still some
 	  optimizations to do and then the mesh generator has to be modified

@@ -121,7 +121,6 @@ private:
   // The instances.
   csArray<csInstance> instances;
   static size_t max_instance_id;
-  bool instances_dirty;
   void CalculateInstanceArrays ();
 
   iMovable* lighting_movable;

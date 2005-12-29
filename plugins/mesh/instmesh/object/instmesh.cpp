@@ -166,8 +166,6 @@ csInstmeshMeshObject::csInstmeshMeshObject (csInstmeshMeshObjectFactory* factory
   mesh_triangle_dirty_flag = true;
   mesh_tangents_dirty_flag = true;
 
-  instances_dirty = true;
-  
   object_bbox_valid = false;
 }
 
@@ -193,8 +191,6 @@ size_t csInstmeshMeshObject::max_instance_id = 0;
 
 void csInstmeshMeshObject::CalculateInstanceArrays ()
 {
-  if (!instances_dirty) return;
-  instances_dirty = false;
   mesh_vertices_dirty_flag = true;
   mesh_texels_dirty_flag = true;
   mesh_normals_dirty_flag = true;
@@ -264,7 +260,7 @@ size_t csInstmeshMeshObject::AddInstance (const csReversibleTransform& trans)
   ++max_instance_id;
   inst.id = max_instance_id;
   instances.Push (inst);
-  instances_dirty = true;
+  initialized = false;
   return max_instance_id;
 }
 
@@ -275,7 +271,7 @@ void csInstmeshMeshObject::RemoveInstance (size_t id)
     if (instances[i].id == id)
     {
       instances.DeleteIndexFast (i);
-      instances_dirty = true;
+      initialized = false;
       return;
     }
 }
@@ -283,7 +279,7 @@ void csInstmeshMeshObject::RemoveInstance (size_t id)
 void csInstmeshMeshObject::RemoveAllInstances ()
 {
   instances.Empty ();
-  instances_dirty = true;
+  initialized = false;
 }
 
 void csInstmeshMeshObject::MoveInstance (size_t id,
@@ -296,7 +292,7 @@ void csInstmeshMeshObject::MoveInstance (size_t id,
     {
       instances[i].transform = trans;
       // @@@ Do in a more optimal way! Don't set everything dirty!
-      instances_dirty = true;
+      initialized = false;
       return;
     }
 }
@@ -664,10 +660,10 @@ void csInstmeshMeshObject::SetupShaderVariableContext ()
   
 void csInstmeshMeshObject::SetupObject ()
 {
-  CalculateInstanceArrays ();
   if (!initialized)
   {
     initialized = true;
+    CalculateInstanceArrays ();
     delete[] lit_fact_colors;
     lit_fact_colors = 0;
     if (!do_manual_colors)
@@ -1252,21 +1248,19 @@ void csInstmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
       }
       else
       {
+	int numcol = factory->fact_vertices.Length () * instances.Length ();
         if (!color_buffer || 
-          (color_buffer->GetSize() != (sizeof (csColor4) * 
-          factory->fact_vertices.Length () * instances.Length ())))
+          (color_buffer->GetSize() != (sizeof (csColor4) * numcol)))
         {
           // Recreate the render buffer only if the new data cannot fit inside
           //  the existing buffer.
           color_buffer = csRenderBuffer::CreateRenderBuffer (
-            mesh_vertices.Length (), CS_BUF_STATIC,
-            CS_BUFCOMP_FLOAT, 4, false);
+            numcol, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 4, false);
         }
         mesh_colors_dirty_flag = false;
         const csColor4* fact_colors = 0;
         fact_colors = factory->GetColors ();
-        color_buffer->CopyInto (fact_colors, factory->fact_vertices.Length () *
-	    instances.Length ());        
+        color_buffer->CopyInto (fact_colors, numcol);
       }
     }
     holder->SetRenderBuffer (buffer, color_buffer);
@@ -1874,132 +1868,104 @@ void csInstmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere,
 
 void csInstmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 {
-  //@@@FIXME
-#if 0
-    SetVertexCount(24);
-    csVector3* vertices = GetVertices();
-    vertices[0].Set(box.MinX(), box.MaxY(), box.MinZ());
-    vertices[1].Set(box.MinX(), box.MaxY(), box.MinZ());
-    vertices[2].Set(box.MinX(), box.MaxY(), box.MinZ());
+  csVector3 v;
+  v.Set(box.MinX(),box.MaxY(),box.MinZ()); v.Normalize();
+  AddVertex (csVector3 (box.MinX(), box.MaxY(), box.MinZ()),
+  	csVector2 (0, 0), v, csColor4 (0, 0, 0));
+  v.Set(box.MinX(),box.MaxY(),box.MinZ()); v.Normalize();
+  AddVertex (csVector3 (box.MinX(), box.MaxY(), box.MinZ()),
+	csVector2 (0, 1), v, csColor4 (0, 0, 0));
+  v.Set(box.MinX(),box.MaxY(),box.MinZ()); v.Normalize();
+  AddVertex (csVector3 (box.MinX(), box.MaxY(), box.MinZ()),
+	csVector2 (1, 0), v, csColor4 (0, 0, 0));
 
-    vertices[3].Set(box.MinX(), box.MaxY(), box.MaxZ());
-    vertices[4].Set(box.MinX(), box.MaxY(), box.MaxZ());
-    vertices[5].Set(box.MinX(), box.MaxY(), box.MaxZ());
+  v.Set(box.MinX(),box.MaxY(),box.MaxZ()); v.Normalize();
+  AddVertex (csVector3 (box.MinX(), box.MaxY(), box.MaxZ()),
+  	csVector2 (0, 0), v, csColor4 (0, 0, 0));
+  v.Set(box.MinX(),box.MaxY(),box.MaxZ()); v.Normalize();
+  AddVertex (csVector3 (box.MinX(), box.MaxY(), box.MaxZ()),
+	csVector2 (0, 0), v, csColor4 (0, 0, 0));
+  v.Set(box.MinX(),box.MaxY(),box.MaxZ()); v.Normalize();
+  AddVertex (csVector3 (box.MinX(), box.MaxY(), box.MaxZ()),
+	csVector2 (1, 0), v, csColor4 (0, 0, 0));
 
-    vertices[6].Set(box.MaxX(), box.MaxY(), box.MaxZ());
-    vertices[7].Set(box.MaxX(), box.MaxY(), box.MaxZ());
-    vertices[8].Set(box.MaxX(), box.MaxY(), box.MaxZ());
+  v.Set(box.MaxX(),box.MaxY(),box.MaxZ()); v.Normalize();
+  AddVertex (csVector3 (box.MaxX(), box.MaxY(), box.MaxZ()),
+  	csVector2 (1, 0), v, csColor4 (0, 0, 0));
+  v.Set(box.MaxX(),box.MaxY(),box.MaxZ()); v.Normalize();
+  AddVertex (csVector3 (box.MaxX(), box.MaxY(), box.MaxZ()),
+	csVector2 (0, 0), v, csColor4 (0, 0, 0));
+  v.Set(box.MaxX(),box.MaxY(),box.MaxZ()); v.Normalize();
+  AddVertex (csVector3 (box.MaxX(), box.MaxY(), box.MaxZ()),
+	csVector2 (1, 0), v, csColor4 (0, 0, 0));
 
-    vertices[9].Set(box.MaxX(), box.MaxY(), box.MinZ());
-    vertices[10].Set(box.MaxX(), box.MaxY(), box.MinZ());
-    vertices[11].Set(box.MaxX(), box.MaxY(), box.MinZ());
+  v.Set(box.MaxX(),box.MaxY(),box.MinZ()); v.Normalize();
+  AddVertex (csVector3 (box.MaxX(), box.MaxY(), box.MinZ()),
+  	csVector2 (1, 0), v, csColor4 (0, 0, 0));
+  v.Set(box.MaxX(),box.MaxY(),box.MinZ()); v.Normalize();
+  AddVertex (csVector3 (box.MaxX(), box.MaxY(), box.MinZ()),
+	csVector2 (1, 1), v, csColor4 (0, 0, 0));
+  v.Set(box.MaxX(),box.MaxY(),box.MinZ()); v.Normalize();
+  AddVertex (csVector3 (box.MaxX(), box.MaxY(), box.MinZ()),
+	csVector2 (0, 0), v, csColor4 (0, 0, 0));
 
-    vertices[12].Set(box.MinX(), box.MinY(), box.MaxZ());
-    vertices[13].Set(box.MinX(), box.MinY(), box.MaxZ());
-    vertices[14].Set(box.MinX(), box.MinY(), box.MaxZ());
+  v.Set(box.MinX(),box.MinY(),box.MaxZ()); v.Normalize();
+  AddVertex (csVector3 (box.MinX(), box.MinY(), box.MaxZ()),
+  	csVector2 (0, 1), v, csColor4 (0, 0, 0));
+  v.Set(box.MinX(),box.MinY(),box.MaxZ()); v.Normalize();
+  AddVertex (csVector3 (box.MinX(), box.MinY(), box.MaxZ()),
+	csVector2 (1, 1), v, csColor4 (0, 0, 0));
+  v.Set(box.MinX(),box.MinY(),box.MaxZ()); v.Normalize();
+  AddVertex (csVector3 (box.MinX(), box.MinY(), box.MaxZ()),
+	csVector2 (1, 1), v, csColor4 (0, 0, 0));
 
-    vertices[15].Set(box.MaxX(), box.MinY(), box.MaxZ());
-    vertices[16].Set(box.MaxX(), box.MinY(), box.MaxZ());
-    vertices[17].Set(box.MaxX(), box.MinY(), box.MaxZ());
+  v.Set(box.MaxX(),box.MinY(),box.MaxZ()); v.Normalize();
+  AddVertex (csVector3 (box.MaxX(), box.MinY(), box.MaxZ()),
+  	csVector2 (0, 1), v, csColor4 (0, 0, 0));
+  v.Set(box.MaxX(),box.MinY(),box.MaxZ()); v.Normalize();
+  AddVertex (csVector3 (box.MaxX(), box.MinY(), box.MaxZ()),
+	csVector2 (1, 1), v, csColor4 (0, 0, 0));
+  v.Set(box.MaxX(),box.MinY(),box.MaxZ()); v.Normalize();
+  AddVertex (csVector3 (box.MaxX(), box.MinY(), box.MaxZ()),
+	csVector2 (1, 0), v, csColor4 (0, 0, 0));
 
-    vertices[18].Set(box.MaxX(), box.MinY(), box.MinZ());
-    vertices[19].Set(box.MaxX(), box.MinY(), box.MinZ());
-    vertices[20].Set(box.MaxX(), box.MinY(), box.MinZ());
+  v.Set(box.MaxX(),box.MinY(),box.MinZ()); v.Normalize();
+  AddVertex (csVector3 (box.MaxX(), box.MinY(), box.MinZ()),
+  	csVector2 (1, 1), v, csColor4 (0, 0, 0));
+  v.Set(box.MaxX(),box.MinY(),box.MinZ()); v.Normalize();
+  AddVertex (csVector3 (box.MaxX(), box.MinY(), box.MinZ()),
+	csVector2 (0, 1), v, csColor4 (0, 0, 0));
+  v.Set(box.MaxX(),box.MinY(),box.MinZ()); v.Normalize();
+  AddVertex (csVector3 (box.MaxX(), box.MinY(), box.MinZ()),
+	csVector2 (0, 0), v, csColor4 (0, 0, 0));
 
-    vertices[21].Set(box.MinX(), box.MinY(), box.MinZ());
-    vertices[22].Set(box.MinX(), box.MinY(), box.MinZ());
-    vertices[23].Set(box.MinX(), box.MinY(), box.MinZ());
+  v.Set(box.MinX(),box.MinY(),box.MinZ()); v.Normalize();
+  AddVertex (csVector3 (box.MinX(), box.MinY(), box.MinZ()),
+  	csVector2 (0, 1), v, csColor4 (0, 0, 0));
+  v.Set(box.MinX(),box.MinY(),box.MinZ()); v.Normalize();
+  AddVertex (csVector3 (box.MinX(), box.MinY(), box.MinZ()),
+	csVector2 (1, 1), v, csColor4 (0, 0, 0));
+  v.Set(box.MinX(),box.MinY(),box.MinZ()); v.Normalize();
+  AddVertex (csVector3 (box.MinX(), box.MinY(), box.MinZ()),
+	csVector2 (0, 1), v, csColor4 (0, 0, 0));
 
-    csVector2* texels = GetTexels();
-    // the comments indicate which face
-    // (numbered 1-6) the texel applies to
-    texels[0].Set(0, 0); // 1
-    texels[1].Set(0, 1); // 2
-    texels[2].Set(1, 0); // 3
+  AddTriangle (csTriangle (0, 9, 18));
+  AddTriangle (csTriangle (0, 18, 21));
 
-    texels[3].Set(0, 0); // 2
-    texels[4].Set(0, 0); // 3
-    texels[5].Set(1, 0); // 4
+  AddTriangle (csTriangle (3, 6, 10));
+  AddTriangle (csTriangle (3, 10, 1));
 
-    texels[6].Set(1, 0); // 2
-    texels[7].Set(0, 0); // 4
-    texels[8].Set(1, 0); // 5
+  AddTriangle (csTriangle (4, 2, 22));
+  AddTriangle (csTriangle (4, 22, 12));
 
-    texels[9].Set(1, 0); // 1
-    texels[10].Set(1, 1); // 2
-    texels[11].Set(0, 0); // 5
+  AddTriangle (csTriangle (7, 5, 13));
+  AddTriangle (csTriangle (7, 13, 15));
 
-    texels[12].Set(0, 1); // 3
-    texels[13].Set(1, 1); // 4
-    texels[14].Set(1, 1); // 6
+  AddTriangle (csTriangle (11, 8, 16));
+  AddTriangle (csTriangle (11, 16, 19));
 
-    texels[15].Set(0, 1); // 4
-    texels[16].Set(1, 1); // 5
-    texels[17].Set(1, 0); // 6
-
-    texels[18].Set(1, 1); // 1
-    texels[19].Set(0, 1); // 5
-    texels[20].Set(0, 0); // 6
-
-    texels[21].Set(0, 1); // 1
-    texels[22].Set(1, 1); // 3
-    texels[23].Set(0, 1); // 6
-
-    SetTriangleCount(12);
-    csTriangle* triangles = GetTriangles();
-    triangles[0].a = 0; triangles[0].b = 9; triangles[0].c = 18;
-    triangles[1].a = 0; triangles[1].b = 18; triangles[1].c = 21;
-
-    triangles[2].a = 3; triangles[2].b = 6; triangles[2].c = 10;
-    triangles[3].a = 3; triangles[3].b = 10; triangles[3].c = 1;
-
-    triangles[4].a = 4; triangles[4].b = 2; triangles[4].c = 22;
-    triangles[5].a = 4; triangles[5].b = 22; triangles[5].c = 12;
-
-    triangles[6].a = 7; triangles[6].b = 5; triangles[6].c = 13;
-    triangles[7].a = 7; triangles[7].b = 13; triangles[7].c = 15;
-
-    triangles[8].a = 11; triangles[8].b = 8; triangles[8].c = 16;
-    triangles[9].a = 11; triangles[9].b = 16; triangles[9].c = 19;
-
-    triangles[10].a = 23; triangles[10].b = 20; triangles[10].c = 17;
-    triangles[11].a = 23; triangles[11].b = 17; triangles[11].c = 14;
-
-    csVector3* normals = GetNormals();
-    normals[0].Set(box.MinX(),box.MaxY(),box.MinZ()); normals[0].Normalize();
-    normals[1].Set(box.MinX(),box.MaxY(),box.MinZ()); normals[1].Normalize();
-    normals[2].Set(box.MinX(),box.MaxY(),box.MinZ()); normals[2].Normalize();
-
-    normals[3].Set(box.MinX(),box.MaxY(),box.MaxZ()); normals[3].Normalize();
-    normals[4].Set(box.MinX(),box.MaxY(),box.MaxZ()); normals[4].Normalize();
-    normals[5].Set(box.MinX(),box.MaxY(),box.MaxZ()); normals[5].Normalize();
-
-    normals[6].Set(box.MaxX(),box.MaxY(),box.MaxZ()); normals[6].Normalize();
-    normals[7].Set(box.MaxX(),box.MaxY(),box.MaxZ()); normals[7].Normalize();
-    normals[8].Set(box.MaxX(),box.MaxY(),box.MaxZ()); normals[8].Normalize();
-
-    normals[9].Set(box.MaxX(),box.MaxY(),box.MinZ()); normals[9].Normalize();
-    normals[10].Set(box.MaxX(),box.MaxY(),box.MinZ()); normals[10].Normalize();
-    normals[11].Set(box.MaxX(),box.MaxY(),box.MinZ()); normals[11].Normalize();
-
-    normals[12].Set(box.MinX(),box.MinY(),box.MaxZ()); normals[12].Normalize();
-    normals[13].Set(box.MinX(),box.MinY(),box.MaxZ()); normals[13].Normalize();
-    normals[14].Set(box.MinX(),box.MinY(),box.MaxZ()); normals[14].Normalize();
-
-    normals[15].Set(box.MaxX(),box.MinY(),box.MaxZ()); normals[15].Normalize();
-    normals[16].Set(box.MaxX(),box.MinY(),box.MaxZ()); normals[16].Normalize();
-    normals[17].Set(box.MaxX(),box.MinY(),box.MaxZ()); normals[17].Normalize();
-
-    normals[18].Set(box.MaxX(),box.MinY(),box.MinZ()); normals[18].Normalize();
-    normals[19].Set(box.MaxX(),box.MinY(),box.MinZ()); normals[19].Normalize();
-    normals[20].Set(box.MaxX(),box.MinY(),box.MinZ()); normals[20].Normalize();
-
-    normals[21].Set(box.MinX(),box.MinY(),box.MinZ()); normals[21].Normalize();
-    normals[22].Set(box.MinX(),box.MinY(),box.MinZ()); normals[22].Normalize();
-    normals[23].Set(box.MinX(),box.MinY(),box.MinZ()); normals[23].Normalize();
-
-    Invalidate();
-#endif
+  AddTriangle (csTriangle (23, 20, 17));
+  AddTriangle (csTriangle (23, 17, 14));
 }
 
 void csInstmeshMeshObjectFactory::HardTransform (
