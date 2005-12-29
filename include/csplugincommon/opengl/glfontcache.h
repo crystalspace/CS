@@ -63,16 +63,23 @@ class CS_CSPLUGINCOMMON_GL_EXPORT csGLFontCache : public csFontCache
      1) Using a special multitexture setup that blends the FG and BG color.
         Preferred, as we save the texture environment switch.
         Obviously requires MT.
-     2) Using "Blend" environment which has the same effect as (1).
+     2) Using ARB_fragment_program.
+        This is a workaround for a bug in some ATI drivers that seem to garble
+        text drawing under certain circumstances, which is avoided by using an
+        AFP instead of a multitexturing setup.
+     3) Using "Blend" environment which has the same effect as (1).
         Not all HW properly supports this.
-     3) Most ugly: separate passes for FG and BG - needs two textures (one 
+     4) Most ugly: separate passes for FG and BG - needs two textures (one 
         with background, one with foreground transparency), and doesn't always 
         look right with AA! (We ignore that until someone complains.)
    */
   // Whether to use method 1.
   bool multiTexText;
   // Whether to use method 2.
+  bool afpText;
+  // Whether to use method 3.
   bool intensityBlendText;
+  GLuint textProgram;
 
   struct CacheTexture
   {
@@ -125,6 +132,8 @@ class CS_CSPLUGINCOMMON_GL_EXPORT csGLFontCache : public csFontCache
   inline void FlushArrays ();
   void BeginText ();
 protected:
+  void Report (int severity, const char* msg, ...);
+
   virtual GlyphCacheData* InternalCacheGlyph (KnownFont* font,
     utf32_char glyph, uint flags);
   virtual void InternalUncacheGlyph (GlyphCacheData* cacheData);

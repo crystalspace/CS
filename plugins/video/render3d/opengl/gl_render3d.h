@@ -306,7 +306,6 @@ private:
 
   /// Should we use special buffertype (VBO) or just systemmeory
   bool use_hw_render_buffers;
-  size_t vbo_thresshold;
   csGLDRAWRANGEELEMENTS glDrawRangeElements;
   static GLvoid csAPIENTRY myDrawRangeElements (GLenum mode, GLuint start, 
     GLuint end, GLsizei count, GLenum type, const GLvoid* indices);
@@ -430,6 +429,13 @@ private:
   bool wantToSwap;
   int delayClearFlags;
   void SwapIfNeeded();
+
+  /**
+   * Whether to use an AFP while DrawPixmap() (to work around an
+   * ATI driver bug).
+   */
+  bool drawPixmapAFP;
+  GLuint drawPixmapProgram;
 public:
   static csGLStateCache* statecache;
   static csGLExtensionManager* ext;

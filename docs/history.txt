@@ -9,6 +9,8 @@ chronological order.
 29-Dec-2005
 	- Jorrit fixed a bug with lighting of instmesh.
 	- Jorrit implemented the automatic box generation of instmesh.
+	- res worked around a bug in the latest ATI driver causing text and
+	  CS logo get corrupted in walktest terrainf.
 28-Dec-2005
 	- Jorrit finished the basic implementation of instmesh. Still some
 	  optimizations to do and then the mesh generator has to be modified

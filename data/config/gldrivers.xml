@@ -226,6 +226,16 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="useAFP2D">
+      <Video>
+	<OpenGL>
+	  <FontCache>
+	    <UseAFP>yes</UseAFP>
+	  </FontCache>
+	  <AFPDrawPixmap>yes</AFPDrawPixmap>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -299,10 +309,15 @@
     </rule>
 
     
+    <!-- 
+      * 2005-12-21: Point sprites are fixed with at least Catalyst 5.13.
+      -->
     <rule description="Work around broken ATI point sprites">
-      <conditions>
+      <conditions fulfill="all">
 	<!-- Point sprite activation messes up all other geometry -->
 	<regexp string="vendor" pattern="^ATI" />
+	<regexp string="platform" pattern="Win32" />
+	<comparever version="win32_driver" relation="lt 6.14.10.5525" />
       </conditions>
       <applicable>
 	<usecfg>noaps</usecfg>
@@ -415,6 +430,22 @@
       </applicable>
     </rule>
 
+    <!--
+      * 2005-12-29: ATI Radeon 9700Pro, Win32, driver 6.14.10.5525 (Cat 5.13)
+		    "walktest terrainf" exhibits garbled text and CS logo;
+		    curiously fixed by not using a multitexturing setup but
+		    an AFP while drawing.
+      -->
+    <rule description="ATI: Use AFP for some 2D drawing">
+      <conditions fulfill="all">
+	<regexp string="vendor" pattern="^ATI" />
+	<comparever version="win32_driver" relation="ge 6.14.10.5525" />
+      </conditions>
+      <applicable>
+	<usecfg>useAFP2D</usecfg>
+      </applicable>
+    </rule>
+    
     <!--
     <rule description="ATI: Enable hidden 2D texture NPOTS support">
       <conditions>

@@ -292,7 +292,7 @@ enum
   /// Unconditionally disable alpha test.
   CS_MIXMODE_ALPHATEST_DISABLE	= 0x20000000,
   
-  /// Bit mask to extract the alpha test flag a mixmode specifier.
+  /// Bit mask to extract the alpha test flag from a mixmode specifier.
   CS_MIXMODE_ALPHATEST_MASK	= 0x30000000
 };
 

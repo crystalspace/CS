@@ -81,6 +81,18 @@ csGLFontCache::~csGLFontCache ()
   }
   glDeleteTextures (1, &texWhite);
   textures.DeleteAll ();
+
+  if (afpText)
+    G2D->ext.glDeleteProgramsARB (1, &textProgram);
+}
+
+void csGLFontCache::Report (int severity, const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  csReportV (G2D->object_reg, severity, 
+    "crystalspace.canvas.openglcommon.fontcache", msg, args);
+  va_end (args);
 }
 
 void csGLFontCache::Setup()
@@ -88,6 +100,10 @@ void csGLFontCache::Setup()
   GLint maxtex = 256;
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &maxtex);
 
+  G2D->ext.InitGL_ARB_fragment_program();
+  afpText = G2D->config->GetBool (
+    "Video.OpenGL.FontCache.UseAFP", false) 
+    && G2D->ext.CS_GL_ARB_fragment_program;
   multiTexText = G2D->config->GetBool (
     "Video.OpenGL.FontCache.UseMultiTexturing", true) && G2D->useCombineTE;
   intensityBlendText = G2D->config->GetBool (
@@ -101,21 +117,68 @@ void csGLFontCache::Setup()
   if (do_verbose)
   {
     int textMethod;
-    if (multiTexText)
+    if (afpText)
+      textMethod = 3;
+    else if (multiTexText)
       textMethod = 0;
     else if (intensityBlendText)
       textMethod = 1;
     else
       textMethod = 2;
-    static const char* textMethodStr[3] =
+    static const char* textMethodStr[4] =
       {"Multitexturing",
        "GL_BLEND texenv with GL_INTENSITY texture",
-       "GL_MODULATE, two-pass"};
-    csReport (G2D->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-      "crystalspace.canvas.openglcommon.fontcache",
+       "GL_MODULATE, two-pass",
+       "ARB fragment program"};
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Text drawing method: %s", textMethodStr[textMethod]);
   }
   
+  if (afpText)
+  {
+    static const char textAFP[] = 
+      "!!ARBfp1.0\n"
+      "PARAM bgColor = program.local[0];\n"
+      "ATTRIB fgColor = fragment.color.primary;\n"
+      "TEMP texel;\n"
+      "TEX texel, fragment.texcoord[0], texture[0], 2D;\n"
+      "LRP result.color, texel.aaaa, fgColor, bgColor;\n"
+      "END\n";
+
+    G2D->ext.glGenProgramsARB (1, &textProgram);
+    G2D->ext.glBindProgramARB (GL_FRAGMENT_PROGRAM_ARB, textProgram);
+    G2D->ext.glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, 
+      GL_PROGRAM_FORMAT_ASCII_ARB, 
+      (GLsizei)(sizeof (textAFP) - 1), (void*)textAFP);
+
+    const GLubyte * programErrorString = glGetString (GL_PROGRAM_ERROR_STRING_ARB);
+
+    GLint errorpos;
+    glGetIntegerv (GL_PROGRAM_ERROR_POSITION_ARB, &errorpos);
+    if(errorpos != -1)
+    {
+      if (do_verbose)
+      {
+        Report (CS_REPORTER_SEVERITY_WARNING, 
+          "Couldn't load fragment program for text drawing");
+        Report (CS_REPORTER_SEVERITY_WARNING, "Program error at position %d", errorpos);
+        Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
+          programErrorString);
+        G2D->ext.glDeleteProgramsARB (1, &textProgram);
+        afpText = false;
+      }
+    }
+    else
+    {
+      if (do_verbose && (programErrorString != 0) && (*programErrorString != 0))
+      {
+        Report (CS_REPORTER_SEVERITY_WARNING, 
+	  "Warning for text drawing fragment program: '%s'", 
+	  programErrorString);
+      }
+    }
+  }
+
   texSize = G2D->config->GetInt ("Video.OpenGL.FontCache.TextureSize", 256);
   texSize = MAX (texSize, 64);
   texSize = MIN (texSize, maxtex);
@@ -424,7 +487,12 @@ void csGLFontCache::FlushArrays ()
 
   if (needStates)
   {
-    if (multiTexText)
+    if (afpText)
+    {
+      glEnable (GL_FRAGMENT_PROGRAM_ARB);
+      G2D->ext.glBindProgramARB (GL_FRAGMENT_PROGRAM_ARB, textProgram);
+    }
+    else if (multiTexText)
     {
       glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PRIMARY_COLOR);
       glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
@@ -456,7 +524,11 @@ void csGLFontCache::FlushArrays ()
     statecache->Enable_GL_BLEND ();
 
     static float envTransparent[4] = {1.0f, 1.0f, 1.0f, 0.0f};
-    glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, envTransparent);
+    if (afpText)
+      G2D->ext.glProgramLocalParameter4fvARB (GL_FRAGMENT_PROGRAM_ARB, 0, 
+        envTransparent);
+    else
+      glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, envTransparent);
     envColor = -1;
     needStates = false;
   }
@@ -476,7 +548,11 @@ void csGLFontCache::FlushArrays ()
         {
           float bgRGB[4];
           G2D->DecomposeColor (job.bg, bgRGB[0], bgRGB[1], bgRGB[2], bgRGB[3]);
-          glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, bgRGB);
+          if (afpText)
+            G2D->ext.glProgramLocalParameter4fvARB (GL_FRAGMENT_PROGRAM_ARB, 0, 
+              bgRGB);
+          else
+            glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, bgRGB);
           envColor = job.bg;
         }
         if (doBG)
@@ -826,7 +902,9 @@ void csGLFontCache::FlushText ()
   if (!tcaEnabled) statecache->Disable_GL_TEXTURE_COORD_ARRAY();
   if (caEnabled) statecache->Enable_GL_COLOR_ARRAY();
 
-  if (G2D->useCombineTE)
+  if (afpText)
+    glDisable (GL_FRAGMENT_PROGRAM_ARB);
+  else if (G2D->useCombineTE)
   {
     if (!multiTexText)
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);

@@ -106,7 +106,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   forceWireframe = false;
 
   use_hw_render_buffers = false;
-  vbo_thresshold = 0;
   stencil_threshold = 500;
   broken_stencil = false;
 
@@ -789,6 +788,7 @@ bool csGLGraphics3D::Open ()
       ext->InitGL_NV_texture_rectangle();
   }
   ext->InitGL_ARB_vertex_program (); // needed for vertex attrib code
+  ext->InitGL_ARB_fragment_program (); // needed for AFP DrawPixmap() workaround
   //ext->InitGL_ATI_separate_stencil ();
 #ifdef CS_DEBUG
   ext->InitGL_GREMEDY_string_marker ();
@@ -827,11 +827,6 @@ bool csGLGraphics3D::Open ()
 
   rendercaps.SupportsPointSprites = ext->CS_GL_ARB_point_parameters &&
     ext->CS_GL_ARB_point_sprite;
-  if (verbose)
-    if (rendercaps.SupportsPointSprites)
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Point sprites are supported.");
-    else
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Point sprites are NOT supported.");
 
   {
     GLint abits;
@@ -842,25 +837,7 @@ bool csGLGraphics3D::Open ()
   glGetIntegerv (GL_MAX_CLIP_PLANES, &maxClipPlanes);
 
   // check for support of VBO
-  vbo_thresshold = config->GetInt ("Video.OpenGL.VBOThresshold", 0);
   use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
-  if (verbose)
-  {
-    if (use_hw_render_buffers)
-    {
-      if (vbo_thresshold == 0)
-        Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "VBO is supported and always used.");
-      else
-        Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "VBO is supported and only used for buffers > %zu bytes.",
-	  vbo_thresshold);
-    }
-    else
-    {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "VBO is NOT supported.");
-    }
-  }
   if (use_hw_render_buffers) 
     vboManager.AttachNew (new csGLVBOBufferManager (ext, statecache, object_reg));
 
@@ -1062,6 +1039,56 @@ bool csGLGraphics3D::Open ()
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Delayed buffer swapping: %s",
       enableDelaySwap ? "enabled" : "disabled");
 
+  drawPixmapAFP = config->GetBool ("Video.OpenGL.AFPDrawPixmap", false)
+    && ext->CS_GL_ARB_fragment_program;
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "AFP DrawPixmap() workaround: %s",
+      drawPixmapAFP ? "enabled" : "disabled");
+
+  if (drawPixmapAFP)
+  {
+    static const char drawPixmapProgramStr[] = 
+      "!!ARBfp1.0\n"
+      "TEMP texel;\n"
+      "TEX texel, fragment.texcoord[0], texture[0], 2D;\n"
+      "MUL result.color, texel, fragment.color.primary;\n"
+      "END\n";
+
+    ext->glGenProgramsARB (1, &drawPixmapProgram);
+    ext->glBindProgramARB (GL_FRAGMENT_PROGRAM_ARB, drawPixmapProgram);
+    ext->glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, 
+      GL_PROGRAM_FORMAT_ASCII_ARB, 
+      (GLsizei)(sizeof (drawPixmapProgramStr) - 1), 
+      (void*)drawPixmapProgramStr);
+
+    const GLubyte * programErrorString = glGetString (GL_PROGRAM_ERROR_STRING_ARB);
+
+    GLint errorpos;
+    glGetIntegerv (GL_PROGRAM_ERROR_POSITION_ARB, &errorpos);
+    if(errorpos != -1)
+    {
+      if (verbose)
+      {
+        Report (CS_REPORTER_SEVERITY_WARNING, 
+          "Couldn't load fragment program for text drawing");
+        Report (CS_REPORTER_SEVERITY_WARNING, "Program error at position %d", errorpos);
+        Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
+          programErrorString);
+        ext->glDeleteProgramsARB (1, &drawPixmapProgram);
+        drawPixmapAFP = false;
+      }
+    }
+    else
+    {
+      if (verbose && (programErrorString != 0) && (*programErrorString != 0))
+      {
+        Report (CS_REPORTER_SEVERITY_WARNING, 
+	  "Warning for DrawPixmap() fragment program: '%s'", 
+	  programErrorString);
+      }
+    }
+  }
+
   return true;
 }
 
@@ -1070,6 +1097,9 @@ void csGLGraphics3D::Close ()
   if (!isOpen) return;
 
   glFinish ();
+
+  if (drawPixmapAFP)
+    ext->glDeleteProgramsARB (1, &drawPixmapProgram);
 
   if (txtmgr)
   {
@@ -1331,6 +1361,8 @@ bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs,
 
 void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int count)
 {
+  GLRENDER3D_OUTPUT_STRING_MARKER(("%p, %u", attribs, count));
+
   if (vboManager) vboManager->DeactivateVBO ();
   unsigned int i;
   if (!attribs)
@@ -1745,6 +1777,8 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
 {
   SwapIfNeeded();
 
+  DeactivateBuffers (0, 0);
+
   /*
     @@@ DrawPixmap is called in 2D mode quite often.
     To reduce state changes, the text drawing states are reset as late
@@ -1752,6 +1786,12 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
     the screen, do the same here.
    */
   G2D->PerformExtension ("glflushtext");
+
+  if (drawPixmapAFP)
+  {
+    ext->glBindProgramARB (GL_FRAGMENT_PROGRAM_ARB, drawPixmapProgram);
+    glEnable (GL_FRAGMENT_PROGRAM_ARB);
+  }
 
   // If original dimensions are different from current dimensions (because
   // image has been scaled to conform to OpenGL texture size restrictions)
@@ -1834,6 +1874,8 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   // Restore.
   SetZModeInternal (current_zmode);
   DeactivateTexture ();
+  if (drawPixmapAFP)
+    glDisable (GL_FRAGMENT_PROGRAM_ARB);
 }
 
 void csGLGraphics3D::SetShadowState (int state)

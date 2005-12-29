@@ -83,6 +83,7 @@ csVertexAttrib csShaderGLCGVP::ResolveBufferDestination (const char* binding)
       {
 	case CG_TEX0: 
 	case CG_TEXUNIT0:
+	case CG_TEXCOORD0:
 	  if ((index >= 0) && (index < 8))
             dest = (csVertexAttrib)(CS_VATTRIB_TEXCOORD0 + index);
 	  break;
