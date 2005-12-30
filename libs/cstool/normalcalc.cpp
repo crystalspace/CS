@@ -161,6 +161,7 @@ void csNormalCalculator::CalculateNormals (
   size_t i;
   size_t j;
 
+  mesh_normals.SetLength (mesh_vertices.Length ());
   size_t num_triangles = mesh_triangles.Length ();
   csTriangle* tris;
   csVector3* new_verts;
