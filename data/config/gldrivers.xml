@@ -441,6 +441,10 @@
 	<regexp string="vendor" pattern="^ATI" />
 	<conditions fulfill="one">
 	  <comparever version="win32_driver" relation="ge 6.14.10.5525" />
+          <!--
+            Problem found with: (MOBILITY RADEON X700 Generic,
+	    1.3.5461 (X4.3.0-8.19.10))
+            -->
 	  <regexp string="platform" pattern="Unix" />
 	</conditions>
       </conditions>
