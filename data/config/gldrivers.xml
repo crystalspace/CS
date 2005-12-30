@@ -439,16 +439,10 @@
     <rule description="ATI: Use AFP for some 2D drawing">
       <conditions fulfill="all">
 	<regexp string="vendor" pattern="^ATI" />
-	<comparever version="win32_driver" relation="ge 6.14.10.5525" />
-      </conditions>
-      <applicable>
-	<usecfg>useAFP2D</usecfg>
-      </applicable>
-    </rule>
-    <rule description="ATI: Use AFP for some 2D drawing">
-      <conditions fulfill="all">
-	<regexp string="vendor" pattern="^ATI" />
-	<regexp string="platform" pattern="Unix" />
+	<conditions fulfill="one">
+	  <comparever version="win32_driver" relation="ge 6.14.10.5525" />
+	  <regexp string="platform" pattern="Unix" />
+	</conditions>
       </conditions>
       <applicable>
 	<usecfg>useAFP2D</usecfg>
