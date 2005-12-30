@@ -27,6 +27,7 @@ chronological order.
 	  genmesh and instmesh to use csPrimitives.
 	- Jorrit fixed bounding volume calculation for instmesh in case
 	  of box and sphere generation.
+	- res fixed some valgrind errors reported by Jorrit.
 29-Dec-2005
 	- Jorrit fixed a bug with lighting of instmesh.
 	- Jorrit implemented the automatic box generation of instmesh.

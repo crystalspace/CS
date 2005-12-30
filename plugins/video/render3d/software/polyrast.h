@@ -488,7 +488,7 @@ namespace cspluginSoft3d
       pixel_shift = csLog2 (pfmt.PixelBytes);
       if (line_buffer_width < w)
       {
-	delete line_buffer;
+	delete[] line_buffer;
 	line_buffer = new uint32[width];
       }
     }

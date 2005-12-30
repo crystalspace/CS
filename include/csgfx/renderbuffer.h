@@ -278,7 +278,7 @@ protected:
       uint componentCount, bool copy) : bufferType (type), 
       comptype (componentType), compCount (componentCount), stride(0), 
       offset (0), doCopy (copy), doDelete (false), isLocked (false), 
-      isIndex (false) 
+      isIndex (false), lastLock (CS_BUF_LOCK_NOLOCK)
     {
       CS_ASSERT(componentCount <= 255); // Just to be sure...
     }
