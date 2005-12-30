@@ -533,6 +533,7 @@ private:
   csDirtyAccessArray<csColor4> mesh_colors;
 
   bool autonormals;
+  bool autonormals_compress;
   bool do_fullbright;
 
   bool mesh_vertices_dirty_flag;
@@ -585,16 +586,6 @@ private:
 
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
-
-  /**
-   * Compress vertices. This is for CalculateNormals().
-   */
-  bool CompressVertices (
-	csVector3* orig_verts, size_t orig_num_vts,
-	csVector3*& new_verts, size_t& new_num_vts,
-	csTriangle* orig_tris, size_t num_tris,
-	csTriangle*& new_tris,
-	size_t*& mapping);
 
   /**
    * Setup this factory. This function will check if setup is needed.
@@ -676,7 +667,7 @@ public:
   }
 
   void Invalidate ();
-  void CalculateNormals ();
+  void CalculateNormals (bool compress);
   void Compress ();
   void GenerateBox (const csBox3& box);
   void GenerateSphere (const csSphere& sphere, int rim_vertices);
@@ -896,9 +887,9 @@ public:
     {
       scfParent->Compress ();
     }
-    virtual void CalculateNormals ()
+    virtual void CalculateNormals (bool compress = true)
     {
-      scfParent->CalculateNormals ();
+      scfParent->CalculateNormals (compress);
     }
     virtual void GenerateBox (const csBox3& box)
     {

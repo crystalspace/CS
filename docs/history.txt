@@ -17,6 +17,11 @@ chronological order.
 	  now obsolete and you can specify the normals and colors directly
 	  in the same <v .../> statement (but only if you don't specify
 	  'numvt'!).
+	- Jorrit added a new csNormalCalculator class which is used by
+	  instmesh and genmesh to calculate normals.
+	- Jorrit added a feature to genmesh and instmesh so that the
+	  auto calculation of normals doesn't compress vertices anymore. Use
+	  <normalnocompress/> to enable this.
 29-Dec-2005
 	- Jorrit fixed a bug with lighting of instmesh.
 	- Jorrit implemented the automatic box generation of instmesh.

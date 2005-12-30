@@ -64,6 +64,7 @@ enum
   XMLTOKEN_T,
   XMLTOKEN_COLORS,
   XMLTOKEN_AUTONORMALS,
+  XMLTOKEN_NORMALNOCOMPRESS,
   XMLTOKEN_NOSHADOWS,
   XMLTOKEN_LOCALSHADOWS,
   XMLTOKEN_COMPRESS,
@@ -137,6 +138,7 @@ bool csInstFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("v", XMLTOKEN_V);
   xmltokens.Register ("t", XMLTOKEN_T);
   xmltokens.Register ("autonormals", XMLTOKEN_AUTONORMALS);
+  xmltokens.Register ("normalnocompress", XMLTOKEN_NORMALNOCOMPRESS);
 
   xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
   xmltokens.Register ("manualcolors", XMLTOKEN_MANUALCOLORS);
@@ -182,6 +184,7 @@ csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
   state = SCF_QUERY_INTERFACE (fact, iInstancingFactoryState);
 
   bool auto_normals = false;
+  bool auto_normals_nocompress = false;
   bool compress = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -278,6 +281,9 @@ csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
         if (!synldr->ParseBool (child, auto_normals, true))
 	  return 0;
 	break;
+      case XMLTOKEN_NORMALNOCOMPRESS:
+        if (!synldr->ParseBool (child, auto_normals_nocompress, true))
+	  return 0;
       case XMLTOKEN_COMPRESS:
         if (!synldr->ParseBool (child, compress, true))
 	  return 0;
@@ -331,7 +337,7 @@ csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
   if (compress)
     state->Compress ();
   if (auto_normals)
-    state->CalculateNormals ();
+    state->CalculateNormals (!auto_normals_nocompress);
 
   return csPtr<iBase> (fact);
 }

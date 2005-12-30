@@ -528,6 +528,7 @@ private:
   float factory_radius;
 
   bool autonormals;
+  bool autonormals_compress;
   bool do_fullbright;
 
   csWeakRef<iGraphics3D> g3d;
@@ -539,16 +540,6 @@ private:
   bool default_manualcolors;
   bool default_shadowcasting;
   bool default_shadowreceiving;
-
-  /**
-   * Compress vertices. This is for CalculateNormals().
-   */
-  bool CompressVertices (
-	csVector3* orig_verts, size_t orig_num_vts,
-	csVector3*& new_verts, size_t& new_num_vts,
-	csTriangle* orig_tris, size_t num_tris,
-	csTriangle*& new_tris,
-	size_t*& mapping);
 
 public:
   CS_LEAKGUARD_DECLARE (csInstmeshMeshObjectFactory);
@@ -611,7 +602,7 @@ public:
   size_t GetTriangleCount () const { return fact_triangles.Length (); }
   const csTriangle* GetTriangles () { return fact_triangles.GetArray (); }
 
-  void CalculateNormals ();
+  void CalculateNormals (bool compress);
   void Compress ();
   void GenerateBox (const csBox3& box);
   void GenerateSphere (const csSphere& sphere, int rim_vertices);
@@ -793,9 +784,9 @@ public:
     {
       scfParent->Compress ();
     }
-    virtual void CalculateNormals ()
+    virtual void CalculateNormals (bool compress = true)
     {
-      scfParent->CalculateNormals ();
+      scfParent->CalculateNormals (compress);
     }
     virtual void GenerateBox (const csBox3& box)
     {
