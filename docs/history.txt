@@ -25,6 +25,8 @@ chronological order.
 	- Jorrit added a new csPrimitives class which can be used to easily
 	  generate primitive meshes (boxes and spheres right now). Changed
 	  genmesh and instmesh to use csPrimitives.
+	- Jorrit fixed bounding volume calculation for instmesh in case
+	  of box and sphere generation.
 29-Dec-2005
 	- Jorrit fixed a bug with lighting of instmesh.
 	- Jorrit implemented the automatic box generation of instmesh.

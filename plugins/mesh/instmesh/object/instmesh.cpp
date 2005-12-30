@@ -1415,6 +1415,22 @@ csInstmeshMeshObjectFactory::~csInstmeshMeshObjectFactory ()
   SCF_DESTRUCT_IBASE ();
 }
 
+void csInstmeshMeshObjectFactory::CalculateBoundingVolumes ()
+{
+  size_t i;
+  factory_bbox.StartBoundingBox (fact_vertices[0]);
+  factory_radius = csQsqrt (csSquaredDist::PointPoint (
+	fact_vertices[0], csVector3 (0)));
+  for (i = 0 ; i < fact_vertices.Length () ; i++)
+  {
+    const csVector3& v = fact_vertices[i];
+    factory_bbox.AddBoundingVertexSmart (v);
+    float rad = csQsqrt (csSquaredDist::PointPoint (v,
+	  csVector3 (0)));
+    if (rad > factory_radius) factory_radius = rad;
+  }
+}
+
 void csInstmeshMeshObjectFactory::AddVertex (const csVector3& v,
       const csVector2& uv, const csVector3& normal,
       const csColor4& color)
@@ -1466,7 +1482,7 @@ void csInstmeshMeshObjectFactory::CalculateNormals (bool compress)
       fact_vertices, fact_triangles, fact_normals, compress);
   autonormals = true;
   autonormals_compress = compress;
-  // @@@ Calc bbox.
+  CalculateBoundingVolumes ();
 }
 
 void csInstmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere,
@@ -1476,7 +1492,7 @@ void csInstmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere,
       fact_normals, fact_triangles);
   fact_colors.SetLength (fact_vertices.Length ());
   memset (fact_colors.GetArray (), 0, sizeof (csColor4)*fact_vertices.Length ());
-  // @@@ Calc bbox.
+  CalculateBoundingVolumes ();
 }
 
 void csInstmeshMeshObjectFactory::GenerateBox (const csBox3& box)

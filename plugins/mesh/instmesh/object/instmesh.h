@@ -566,6 +566,9 @@ public:
   /// Get the bounding radius.
   const float GetFactoryRadius () const { return factory_radius; }
 
+  /// Calculate the factory bounding box and sphere.
+  void CalculateBoundingVolumes ();
+
   /// Do full bright.
   bool DoFullBright () const { return do_fullbright; }
 
