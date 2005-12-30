@@ -445,7 +445,17 @@
 	<usecfg>useAFP2D</usecfg>
       </applicable>
     </rule>
-    
+    <rule description="ATI: Use AFP for some 2D drawing">
+      <conditions fulfill="all">
+	<regexp string="vendor" pattern="^ATI" />
+	<regexp string="platform" pattern="Unix" />
+      </conditions>
+      <applicable>
+	<usecfg>useAFP2D</usecfg>
+      </applicable>
+    </rule>
+
+ 
     <!--
     <rule description="ATI: Enable hidden 2D texture NPOTS support">
       <conditions>
