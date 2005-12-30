@@ -277,6 +277,15 @@ bool csGeneralFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
   return true;
 }
 
+static float GetDef (iDocumentNode* node, const char* attrname, float def)
+{
+  csRef<iDocumentAttribute> attr = node->GetAttribute (attrname);
+  if (attr)
+    return attr->GetValueAsFloat ();
+  else
+    return def;
+}
+
 csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
 {
@@ -302,6 +311,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
   fact = type->NewFactory ();
   state = SCF_QUERY_INTERFACE (fact, iGeneralFactoryState);
 
+  bool num_tri_given = false;
+  bool num_vt_given = false;
   int num_tri = 0;
   int num_nor = 0;
   int num_col = 0;
@@ -376,6 +387,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_BOX:
         {
+	  num_vt_given = true;
+	  num_tri_given = true;
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
 	    return 0;
@@ -384,6 +397,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         break;
       case XMLTOKEN_SPHERE:
         {
+	  num_vt_given = true;
+	  num_tri_given = true;
 	  csVector3 center (0, 0, 0);
 	  float radius = 1.0f;
 	  int rim_vertices = 8;
@@ -408,9 +423,11 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  return 0;
 	break;
       case XMLTOKEN_NUMTRI:
+	num_tri_given = true;
         state->SetTriangleCount (child->GetContentsValueAsInt ());
 	break;
       case XMLTOKEN_NUMVT:
+	num_vt_given = true;
         state->SetVertexCount (child->GetContentsValueAsInt ());
 	break;
       case XMLTOKEN_BACK2FRONT:
@@ -426,32 +443,60 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         break;
       case XMLTOKEN_T:
 	{
-	  csTriangle* tr = state->GetTriangles ();
-	  if (num_tri >= state->GetTriangleCount ())
+	  if (num_tri_given)
 	  {
-	    synldr->ReportError (
-		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
-		    child, "Too many triangles for a general mesh factory!");
-	    return 0;
+	    csTriangle* tr = state->GetTriangles ();
+	    if (num_tri >= state->GetTriangleCount ())
+	    {
+	      synldr->ReportError (
+		      "crystalspace.genmeshfactoryloader.parse.frame.badformat",
+		      child, "Too many triangles for a general mesh factory!");
+	      return 0;
+	    }
+	    tr[num_tri].a = child->GetAttributeValueAsInt ("v1");
+	    tr[num_tri].b = child->GetAttributeValueAsInt ("v2");
+	    tr[num_tri].c = child->GetAttributeValueAsInt ("v3");
+	    if (tr[num_tri].a >= state->GetVertexCount () ||
+	        tr[num_tri].b >= state->GetVertexCount () ||
+	        tr[num_tri].c >= state->GetVertexCount ())
+	    {
+	      synldr->ReportError (
+		      "crystalspace.genmeshfactoryloader.parse.frame.badvt",
+		      child, "Bad vertex index for triangle in genmesh factory!"
+		      );
+	      return 0;
+	    }
+	    num_tri++;
 	  }
-	  tr[num_tri].a = child->GetAttributeValueAsInt ("v1");
-	  tr[num_tri].b = child->GetAttributeValueAsInt ("v2");
-	  tr[num_tri].c = child->GetAttributeValueAsInt ("v3");
-	  if (tr[num_tri].a >= state->GetVertexCount () ||
-	      tr[num_tri].b >= state->GetVertexCount () ||
-	      tr[num_tri].c >= state->GetVertexCount ())
+	  else
 	  {
-	    synldr->ReportError (
-		    "crystalspace.genmeshfactoryloader.parse.frame.badvt",
-		    child, "Bad vertex index for triangle in genmesh factory!"
-		    );
-	    return 0;
+	    csTriangle tri;
+	    tri.a = child->GetAttributeValueAsInt ("v1");
+	    tri.b = child->GetAttributeValueAsInt ("v2");
+	    tri.c = child->GetAttributeValueAsInt ("v3");
+	    if (tri.a >= state->GetVertexCount () ||
+	        tri.b >= state->GetVertexCount () ||
+	        tri.c >= state->GetVertexCount ())
+	    {
+	      synldr->ReportError (
+		      "crystalspace.genmeshfactoryloader.parse.frame.badvt",
+		      child, "Bad vertex index for triangle in genmesh factory!"
+		      );
+	      return 0;
+	    }
+	    state->AddTriangle (tri);
 	  }
-	  num_tri++;
 	}
         break;
       case XMLTOKEN_N:
         {
+	  if (!num_vt_given)
+	  {
+	    synldr->ReportError (
+		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
+		    child, "You didn't specify 'numvt'. You should add normal information to the vertex!");
+	    return 0;
+	  }
 	  csVector3* no = state->GetNormals ();
 	  if (num_nor >= state->GetVertexCount ())
 	  {
@@ -470,6 +515,13 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         break;
       case XMLTOKEN_COLOR:
         {
+	  if (!num_vt_given)
+	  {
+	    synldr->ReportError (
+		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
+		    child, "You didn't specify 'numvt'. You should add color information to the vertex!");
+	    return 0;
+	  }
 	  csColor4* co = state->GetColors ();
 	  if (num_col >= state->GetVertexCount ())
 	  {
@@ -493,24 +545,46 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_V:
         {
-	  csVector3* vt = state->GetVertices ();
-	  csVector2* te = state->GetTexels ();
-	  if (num_vt >= state->GetVertexCount ())
+	  if (num_vt_given)
 	  {
-	    synldr->ReportError (
-		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
-		    child, "Too many vertices for a general mesh factory!");
-	    return 0;
+	    csVector3* vt = state->GetVertices ();
+	    csVector2* te = state->GetTexels ();
+	    if (num_vt >= state->GetVertexCount ())
+	    {
+	      synldr->ReportError (
+		      "crystalspace.genmeshfactoryloader.parse.frame.badformat",
+		      child, "Too many vertices for a general mesh factory!");
+	      return 0;
+	    }
+	    float x, y, z, u, v;
+	    x = child->GetAttributeValueAsFloat ("x");
+	    y = child->GetAttributeValueAsFloat ("y");
+	    z = child->GetAttributeValueAsFloat ("z");
+	    u = child->GetAttributeValueAsFloat ("u");
+	    v = child->GetAttributeValueAsFloat ("v");
+	    vt[num_vt].Set (x, y, z);
+	    te[num_vt].Set (u, v);
+	    num_vt++;
 	  }
-	  float x, y, z, u, v;
-	  x = child->GetAttributeValueAsFloat ("x");
-	  y = child->GetAttributeValueAsFloat ("y");
-	  z = child->GetAttributeValueAsFloat ("z");
-	  u = child->GetAttributeValueAsFloat ("u");
-	  v = child->GetAttributeValueAsFloat ("v");
-	  vt[num_vt].Set (x, y, z);
-	  te[num_vt].Set (u, v);
-	  num_vt++;
+	  else
+	  {
+	    csVector3 v, n;
+	    csVector2 uv;
+	    csColor4 col;
+	    v.x = child->GetAttributeValueAsFloat ("x");
+	    v.y = child->GetAttributeValueAsFloat ("y");
+	    v.z = child->GetAttributeValueAsFloat ("z");
+	    uv.x = child->GetAttributeValueAsFloat ("u");
+	    uv.y = child->GetAttributeValueAsFloat ("v");
+	    n.x = GetDef (child, "nx", 0.0f);
+	    n.y = GetDef (child, "ny", 0.0f);
+	    n.z = GetDef (child, "nz", 0.0f);
+	    col.red = GetDef (child, "red", 0.0f);
+	    col.green = GetDef (child, "green", 0.0f);
+	    col.blue = GetDef (child, "blue", 0.0f);
+	    col.alpha = GetDef (child, "alpha", 1.0f);
+	    state->AddVertex (v, uv, n, col);
+	  }
 	}
         break;
       case XMLTOKEN_ANIMCONTROL:

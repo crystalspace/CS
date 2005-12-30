@@ -200,48 +200,78 @@ class csSphere;
  */
 struct iGeneralFactoryState : public iGeneralMeshCommonState
 {
-  /// Set the number of vertices to use for this mesh.
+  /**
+   * Add a vertex. This is one way to fill the vertex and other tables.
+   * The other way is to use SetVertexCount() and then fill the tables
+   * manually.
+   */
+  virtual void AddVertex (const csVector3& v,
+      const csVector2& uv, const csVector3& normal,
+      const csColor4& color) = 0;
+
+  /**
+   * Set the number of vertices to use for this mesh. The easiest way
+   * to set the mesh data is to just use AddVertex(). However, you can
+   * also call SetVertexCount() and then call GetVertices(), GetTexels(),
+   * ... to set the data that way. Note that you have to call Invalidate()
+   * after modifying the vertex data this way.
+   */
   virtual void SetVertexCount (int n) = 0;
   /// Get the number of vertices for this mesh.
   virtual int GetVertexCount () const = 0;
   /**
    * Get the array of vertices. It is legal to modify the vertices
-   * in this array. The number of vertices in this array will be
-   * equal to the number of vertices set.
+   * in this array (but don't forget to call Invalidate()). The number of
+   * vertices in this array will be equal to the number of vertices set.
    */
   virtual csVector3* GetVertices () = 0;
   /**
    * Get the array of texels. It is legal to modify the texels in this
-   * array. The number of texels in this array will be equal to
-   * the number of vertices set.
+   * array (but don't forget to call Invalidate()). The number of texels in
+   * this array will be equal to the number of vertices set.
    */
   virtual csVector2* GetTexels () = 0;
   /**
    * Get the array of normals. It is legal to modify the normals in this
-   * array. The number of normals in this array will be equal to the
+   * array (but don't forget to call Invalidate()). The number of normals
+   * in this array will be equal to the
    * number of vertices set. Note that modifying the normals is only
    * useful when manual colors are not enabled and lighting is enabled
    * because the normals are used for lighting.
    */
   virtual csVector3* GetNormals () = 0;
+  /**
+   * Get the array of colors. It is legal to modify the colors in this
+   * array (but don't forget to call Invalidate()). The number of colors
+   * in this array will be equal to the number of vertices set. Note
+   * that modifying the colors will not do a lot if manual colors is
+   * not enabled (SetManualColors).
+   */
+  virtual csColor4* GetColors () = 0;
 
-  /// Set the number of triangles to use for this mesh.
+  /**
+   * Add a triangle. This is one way to fill the triangle table.
+   * The other way is to use SetTriangleCount() and then fill the table
+   * manually.
+   */
+  virtual void AddTriangle (const csTriangle& tri) = 0;
+
+  /**
+   * Set the number of triangles to use for this mesh. The easiest way
+   * to set the triangle data is to just use AddTriangle(). However, you can
+   * also call SetTriangleCount() and then call GetTriangles()
+   * to set the data that way. Note that you have to call Invalidate()
+   * after modifying the triangle data this way.
+   */
   virtual void SetTriangleCount (int n) = 0;
   /// Get the number of triangles for this mesh.
   virtual int GetTriangleCount () const = 0;
   /**
    * Get the array of triangles. It is legal to modify the triangles in this
-   * array. The number of triangles in this array will be equal to
-   * the number of triangles set.
+   * array (but don't forget to call Invalidate()). The number of triangles
+   * in this array will be equal to the number of triangles set.
    */
   virtual csTriangle* GetTriangles () = 0;
-  /**
-   * Get the array of colors. It is legal to modify the colors in this
-   * array. The number of colors in this array will be equal to the
-   * number of vertices set. Note that modifying the colors will not do
-   * a lot if manual colors is not enabled (SetManualColors).
-   */
-  virtual csColor4* GetColors () = 0;
 
   /**
    * After making a significant change to the vertices or triangles you

@@ -9,6 +9,14 @@ chronological order.
 30-Dec-2005
 	- Jorrit enabled the new AFP workaround for walktest terrainf so
 	  that it also kicks on in Linux.
+	- Jorrit sanitized genmesh so that you can now also set the geometry
+	  by calling AddVertex/AddTriangle (like instmesh) instead of the
+	  clumsy SetVertexCount() followed by GetVertices() and others.
+	- Jorrit also changed the genmesh loader so that it accepts the same
+	  syntax as instmesh loader. This means that numvt and numtri are
+	  now obsolete and you can specify the normals and colors directly
+	  in the same <v .../> statement (but only if you don't specify
+	  'numvt'!).
 29-Dec-2005
 	- Jorrit fixed a bug with lighting of instmesh.
 	- Jorrit implemented the automatic box generation of instmesh.

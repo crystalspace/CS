@@ -527,11 +527,10 @@ class csGenmeshMeshObjectFactory : public iMeshObjectFactory
 {
 private:
   csRef<iMaterialWrapper> material;
-  csVector3* mesh_vertices;
-  csVector2* mesh_texels;
-  csVector3* mesh_normals;
-  csColor4* mesh_colors;
-  size_t num_mesh_vertices;
+  csDirtyAccessArray<csVector3> mesh_vertices;
+  csDirtyAccessArray<csVector2> mesh_texels;
+  csDirtyAccessArray<csVector3> mesh_normals;
+  csDirtyAccessArray<csColor4> mesh_colors;
 
   bool autonormals;
   bool do_fullbright;
@@ -543,8 +542,7 @@ private:
   bool mesh_triangle_dirty_flag;
   bool mesh_tangents_dirty_flag;
 
-  csTriangle* mesh_triangles;
-  int num_mesh_triangles;
+  csDirtyAccessArray<csTriangle> mesh_triangles;
 
   csWeakRef<iGraphics3D> g3d;
   csRef<iStringSet> strings;
@@ -641,33 +639,41 @@ public:
     csGenmeshMeshObjectFactory::material = material;
   }
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
+  void AddVertex (const csVector3& v,
+      const csVector2& uv, const csVector3& normal,
+      const csColor4& color);
   void SetVertexCount (int n);
-  int GetVertexCount () const { return (int)num_mesh_vertices; }
+  int GetVertexCount () const { return (int)mesh_vertices.Length (); }
   csVector3* GetVertices ()
   {
     SetupFactory ();
-    return mesh_vertices;
+    return mesh_vertices.GetArray ();
   }
   csVector2* GetTexels ()
   {
     SetupFactory ();
-    return mesh_texels;
+    return mesh_texels.GetArray ();
   }
   csVector3* GetNormals ()
   {
     SetupFactory ();
-    return mesh_normals;
+    return mesh_normals.GetArray ();
   }
   csColor4* GetColors ()
   {
     SetupFactory ();
-    return mesh_colors;
+    return mesh_colors.GetArray ();
   }
 
+  void AddTriangle (const csTriangle& tri);
   void SetTriangleCount (int n);
 
-  int GetTriangleCount () const { return num_mesh_triangles; }
-  csTriangle* GetTriangles () { SetupFactory (); return mesh_triangles; }
+  int GetTriangleCount () const { return (int)mesh_triangles.Length (); }
+  csTriangle* GetTriangles ()
+  {
+    SetupFactory ();
+    return mesh_triangles.GetArray ();
+  }
 
   void Invalidate ();
   void CalculateNormals ();
@@ -836,6 +842,12 @@ public:
     {
       return scfParent->GetMaterialWrapper ();
     }
+    virtual void AddVertex (const csVector3& v,
+      const csVector2& uv, const csVector3& normal,
+      const csColor4& color)
+    {
+      scfParent->AddVertex (v, uv, normal, color);
+    }
     virtual void SetVertexCount (int n)
     {
       scfParent->SetVertexCount (n);
@@ -855,6 +867,10 @@ public:
     virtual csVector3* GetNormals ()
     {
       return scfParent->GetNormals ();
+    }
+    virtual void AddTriangle (const csTriangle& tri)
+    {
+      scfParent->AddTriangle (tri);
     }
     virtual void SetTriangleCount (int n)
     {
