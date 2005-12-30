@@ -56,6 +56,7 @@
 #include "ivideo/rendermesh.h"
 #include "cstool/vertexcompress.h"
 #include "cstool/normalcalc.h"
+#include "cstool/primitives.h"
 
 #include "instmesh.h"
 
@@ -1465,304 +1466,25 @@ void csInstmeshMeshObjectFactory::CalculateNormals (bool compress)
       fact_vertices, fact_triangles, fact_normals, compress);
   autonormals = true;
   autonormals_compress = compress;
+  // @@@ Calc bbox.
 }
 
 void csInstmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere,
     int num)
 {
-  //@@@ FIXME
-#if 0
-  int num_vertices = 0;
-  int num_triangles = 0;
-  csDirtyAccessArray<csVector3> vertices;
-  csDirtyAccessArray<csVector2> uvverts;
-  csDirtyAccessArray<csTriangle> triangles;
-  float radius = 1.0f;
-
-  csArray<int> prev_verticesT;
-  csArray<int> prev_verticesB;
-  float u, v;
-  int i, j;
-
-  // Number of degrees between layers.
-  float radius_step = 180.0f / num;
-  float vert_radius = radius;
-
-  int num2 = num;
-
-  // Generate the first series of vertices (the outer circle).
-  // Calculate u,v for them.
-  for (j = 0; j < num2; j++)
-  {
-    float new_radius = radius;
-    float new_height = 0.0f;
-    float angle = j * 2.0f * radius_step * TWO_PI / 360.0f;
-    prev_verticesT.GetExtend (j) = num_vertices;
-    prev_verticesB.GetExtend (j) = num_vertices;
-    vertices.GetExtend (num_vertices).Set (new_radius * (float) cos (angle),
-      new_height, new_radius * (float) sin (angle));
-
-    u = (float) cos (angle) * 0.5f + 0.5f;
-    v = (float) sin (angle) * 0.5f + 0.5f;
-
-    uvverts.GetExtend (num_vertices).Set (u, v);
-    num_vertices++;
-  }
-
-  // Array with new vertex indices.
-  csArray<int> new_verticesT;
-  csArray<int> new_verticesB;
-
-  // First create the layered triangle strips.
-  for (i = 1; i < (num / 2); i++)
-  {
-    //-----
-    // First create a new series of vertices.
-    //-----
-    // Angle from the center to the new circle of vertices.
-    float new_angle = i * radius_step * TWO_PI / 360.0f;
-    // Radius of the new circle of vertices.
-    float new_radius = radius * (float) cos (new_angle);
-    // Height of the new circle of vertices.
-    float new_height = vert_radius * (float) sin (new_angle);
-    // UV radius.
-    float uv_radius = (1.0f - 2.0f * (float) i / (float)num) * 0.5f;
-    for (j = 0; j < num2; j++)
-    {
-      float angle = j * 2.0f * radius_step * TWO_PI / 360.0f;
-
-      u = uv_radius * (float) cos (angle) + 0.5f;
-      v = uv_radius * (float) sin (angle) + 0.5f;
-
-      new_verticesT.GetExtend (j) = num_vertices;
-      vertices.GetExtend (num_vertices).Set (new_radius * (float) cos (angle),
-        new_height, new_radius * (float) sin (angle));
-      uvverts.GetExtend (num_vertices).Set (u, v);
-      num_vertices++;
-
-
-      new_verticesB.GetExtend (j) = num_vertices;
-      vertices.GetExtend (num_vertices).Set (new_radius * (float) cos (angle),
-        -new_height, new_radius * (float) sin (angle));
-
-      uvverts.GetExtend (num_vertices).Set (u, v);
-      num_vertices++;
-    }
-
-    //-----
-    // Now make the triangle strips.
-    //-----
-    for (j = 0; j < num; j++)
-    {
-      int j1num = (j+1)%num;
-      csTriangle& tri1 = triangles.GetExtend (num_triangles);
-      tri1.c = prev_verticesT[j];
-      tri1.b = new_verticesT[j1num];
-      tri1.a = new_verticesT[j];
-      num_triangles++;
-      csTriangle& tri2 = triangles.GetExtend (num_triangles);
-      tri2.c = prev_verticesT[j];
-      tri2.b = prev_verticesT[j1num];
-      tri2.a = new_verticesT[j1num];
-      num_triangles++;
-
-      csTriangle& tri3 = triangles.GetExtend (num_triangles);
-      tri3.a = prev_verticesB[j];
-      tri3.b = new_verticesB[j1num];
-      tri3.c = new_verticesB[j];
-      num_triangles++;
-      csTriangle& tri4 = triangles.GetExtend (num_triangles);
-      tri4.a = prev_verticesB[j];
-      tri4.b = prev_verticesB[j1num];
-      tri4.c = new_verticesB[j1num];
-      num_triangles++;
-
-    }
-
-    //-----
-    // Copy the new vertex array to prev_vertices.
-    //-----
-    for (j = 0 ; j < num2 ; j++)
-    {
-      prev_verticesT.GetExtend (j) = new_verticesT[j];
-      prev_verticesB.GetExtend (j) = new_verticesB[j];
-    }
-  }
-
-  // Create the top and bottom vertices.
-  int top_vertex = num_vertices;
-  vertices.GetExtend (num_vertices).Set (0.0f, vert_radius, 0.0f);
-  uvverts.GetExtend (num_vertices).Set (0.5f, 0.5f);
-  num_vertices++;
-  int bottom_vertex = 0;
-
-  bottom_vertex = num_vertices;
-  vertices.GetExtend (num_vertices).Set (0.0f, -vert_radius, 0.0f);
-  uvverts.GetExtend (num_vertices).Set (0.5f, 0.5f);
-  num_vertices++;
-
-
-  //-----
-  // Make the top triangle fan.
-  //-----
-  for (j = 0 ; j < num ; j++)
-  {
-    int j1num = (j+1)%num;
-    csTriangle& tri = triangles.GetExtend (num_triangles);
-    tri.c = top_vertex;
-    tri.b = prev_verticesT[j];
-    tri.a = prev_verticesT[j1num];
-    num_triangles++;
-  }
-
-  //-----
-  // Make the bottom triangle fan.
-  //-----
-
-  for (j = 0 ; j < num ; j++)
-  {
-    int j1num = (j+1)%num;
-    csTriangle& tri = triangles.GetExtend (num_triangles);
-    tri.a = bottom_vertex;
-    tri.b = prev_verticesB[j];
-    tri.c = prev_verticesB[j1num];
-    num_triangles++;
-  }
-
-  float sphere_radius = sphere.GetRadius ();
-  for (i = 0 ; i < num_vertices ; i++)
-  {
-    vertices[i].x *= sphere_radius;
-    vertices[i].y *= sphere_radius;
-    vertices[i].z *= sphere_radius;
-    vertices[i] += sphere.GetCenter ();
-  }
-
-  SetVertexCount (num_vertices);
-  csVector3* genfact_vertices = GetVertices();
-  memcpy (genfact_vertices, vertices.GetArray (),
-      sizeof(csVector3)*num_vertices);
-
-  csVector2* genfact_texels = GetTexels();
-  memcpy (genfact_texels, uvverts.GetArray (),
-      sizeof(csVector2)*num_vertices);
-
-  SetTriangleCount (num_triangles);
-  csTriangle* ball_triangles = GetTriangles();
-  memcpy (ball_triangles, triangles.GetArray (),
-      sizeof(csTriangle)*num_triangles);
-
-  csVector3* normals = GetNormals();
-  for (i = 0; i < num_vertices; i++)
-  {
-    normals[i] = genfact_vertices[i];
-    normals[i].Normalize ();
-  }
-
-  Invalidate();
-#endif
+  csPrimitives::GenerateSphere (sphere, num, fact_vertices, fact_texels,
+      fact_normals, fact_triangles);
+  fact_colors.SetLength (fact_vertices.Length ());
+  memset (fact_colors.GetArray (), 0, sizeof (csColor4)*fact_vertices.Length ());
+  // @@@ Calc bbox.
 }
 
 void csInstmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 {
-  csVector3 v;
-  v.Set(box.MinX(),box.MaxY(),box.MinZ()); v.Normalize();
-  AddVertex (csVector3 (box.MinX(), box.MaxY(), box.MinZ()),
-  	csVector2 (0, 0), v, csColor4 (0, 0, 0));
-  v.Set(box.MinX(),box.MaxY(),box.MinZ()); v.Normalize();
-  AddVertex (csVector3 (box.MinX(), box.MaxY(), box.MinZ()),
-	csVector2 (0, 1), v, csColor4 (0, 0, 0));
-  v.Set(box.MinX(),box.MaxY(),box.MinZ()); v.Normalize();
-  AddVertex (csVector3 (box.MinX(), box.MaxY(), box.MinZ()),
-	csVector2 (1, 0), v, csColor4 (0, 0, 0));
-
-  v.Set(box.MinX(),box.MaxY(),box.MaxZ()); v.Normalize();
-  AddVertex (csVector3 (box.MinX(), box.MaxY(), box.MaxZ()),
-  	csVector2 (0, 0), v, csColor4 (0, 0, 0));
-  v.Set(box.MinX(),box.MaxY(),box.MaxZ()); v.Normalize();
-  AddVertex (csVector3 (box.MinX(), box.MaxY(), box.MaxZ()),
-	csVector2 (0, 0), v, csColor4 (0, 0, 0));
-  v.Set(box.MinX(),box.MaxY(),box.MaxZ()); v.Normalize();
-  AddVertex (csVector3 (box.MinX(), box.MaxY(), box.MaxZ()),
-	csVector2 (1, 0), v, csColor4 (0, 0, 0));
-
-  v.Set(box.MaxX(),box.MaxY(),box.MaxZ()); v.Normalize();
-  AddVertex (csVector3 (box.MaxX(), box.MaxY(), box.MaxZ()),
-  	csVector2 (1, 0), v, csColor4 (0, 0, 0));
-  v.Set(box.MaxX(),box.MaxY(),box.MaxZ()); v.Normalize();
-  AddVertex (csVector3 (box.MaxX(), box.MaxY(), box.MaxZ()),
-	csVector2 (0, 0), v, csColor4 (0, 0, 0));
-  v.Set(box.MaxX(),box.MaxY(),box.MaxZ()); v.Normalize();
-  AddVertex (csVector3 (box.MaxX(), box.MaxY(), box.MaxZ()),
-	csVector2 (1, 0), v, csColor4 (0, 0, 0));
-
-  v.Set(box.MaxX(),box.MaxY(),box.MinZ()); v.Normalize();
-  AddVertex (csVector3 (box.MaxX(), box.MaxY(), box.MinZ()),
-  	csVector2 (1, 0), v, csColor4 (0, 0, 0));
-  v.Set(box.MaxX(),box.MaxY(),box.MinZ()); v.Normalize();
-  AddVertex (csVector3 (box.MaxX(), box.MaxY(), box.MinZ()),
-	csVector2 (1, 1), v, csColor4 (0, 0, 0));
-  v.Set(box.MaxX(),box.MaxY(),box.MinZ()); v.Normalize();
-  AddVertex (csVector3 (box.MaxX(), box.MaxY(), box.MinZ()),
-	csVector2 (0, 0), v, csColor4 (0, 0, 0));
-
-  v.Set(box.MinX(),box.MinY(),box.MaxZ()); v.Normalize();
-  AddVertex (csVector3 (box.MinX(), box.MinY(), box.MaxZ()),
-  	csVector2 (0, 1), v, csColor4 (0, 0, 0));
-  v.Set(box.MinX(),box.MinY(),box.MaxZ()); v.Normalize();
-  AddVertex (csVector3 (box.MinX(), box.MinY(), box.MaxZ()),
-	csVector2 (1, 1), v, csColor4 (0, 0, 0));
-  v.Set(box.MinX(),box.MinY(),box.MaxZ()); v.Normalize();
-  AddVertex (csVector3 (box.MinX(), box.MinY(), box.MaxZ()),
-	csVector2 (1, 1), v, csColor4 (0, 0, 0));
-
-  v.Set(box.MaxX(),box.MinY(),box.MaxZ()); v.Normalize();
-  AddVertex (csVector3 (box.MaxX(), box.MinY(), box.MaxZ()),
-  	csVector2 (0, 1), v, csColor4 (0, 0, 0));
-  v.Set(box.MaxX(),box.MinY(),box.MaxZ()); v.Normalize();
-  AddVertex (csVector3 (box.MaxX(), box.MinY(), box.MaxZ()),
-	csVector2 (1, 1), v, csColor4 (0, 0, 0));
-  v.Set(box.MaxX(),box.MinY(),box.MaxZ()); v.Normalize();
-  AddVertex (csVector3 (box.MaxX(), box.MinY(), box.MaxZ()),
-	csVector2 (1, 0), v, csColor4 (0, 0, 0));
-
-  v.Set(box.MaxX(),box.MinY(),box.MinZ()); v.Normalize();
-  AddVertex (csVector3 (box.MaxX(), box.MinY(), box.MinZ()),
-  	csVector2 (1, 1), v, csColor4 (0, 0, 0));
-  v.Set(box.MaxX(),box.MinY(),box.MinZ()); v.Normalize();
-  AddVertex (csVector3 (box.MaxX(), box.MinY(), box.MinZ()),
-	csVector2 (0, 1), v, csColor4 (0, 0, 0));
-  v.Set(box.MaxX(),box.MinY(),box.MinZ()); v.Normalize();
-  AddVertex (csVector3 (box.MaxX(), box.MinY(), box.MinZ()),
-	csVector2 (0, 0), v, csColor4 (0, 0, 0));
-
-  v.Set(box.MinX(),box.MinY(),box.MinZ()); v.Normalize();
-  AddVertex (csVector3 (box.MinX(), box.MinY(), box.MinZ()),
-  	csVector2 (0, 1), v, csColor4 (0, 0, 0));
-  v.Set(box.MinX(),box.MinY(),box.MinZ()); v.Normalize();
-  AddVertex (csVector3 (box.MinX(), box.MinY(), box.MinZ()),
-	csVector2 (1, 1), v, csColor4 (0, 0, 0));
-  v.Set(box.MinX(),box.MinY(),box.MinZ()); v.Normalize();
-  AddVertex (csVector3 (box.MinX(), box.MinY(), box.MinZ()),
-	csVector2 (0, 1), v, csColor4 (0, 0, 0));
-
-  AddTriangle (csTriangle (0, 9, 18));
-  AddTriangle (csTriangle (0, 18, 21));
-
-  AddTriangle (csTriangle (3, 6, 10));
-  AddTriangle (csTriangle (3, 10, 1));
-
-  AddTriangle (csTriangle (4, 2, 22));
-  AddTriangle (csTriangle (4, 22, 12));
-
-  AddTriangle (csTriangle (7, 5, 13));
-  AddTriangle (csTriangle (7, 13, 15));
-
-  AddTriangle (csTriangle (11, 8, 16));
-  AddTriangle (csTriangle (11, 16, 19));
-
-  AddTriangle (csTriangle (23, 20, 17));
-  AddTriangle (csTriangle (23, 17, 14));
+  csPrimitives::GenerateBox (box, fact_vertices, fact_texels,
+      fact_normals, fact_triangles);
+  fact_colors.SetLength (fact_vertices.Length ());
+  memset (fact_colors.GetArray (), 0, sizeof (csColor4)*fact_vertices.Length ());
 }
 
 void csInstmeshMeshObjectFactory::HardTransform (
