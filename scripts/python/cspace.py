@@ -5586,6 +5586,7 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iGeneralFactoryState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def AddVertex(*args): return _cspace.iGeneralFactoryState_AddVertex(*args)
     def SetVertexCount(*args): return _cspace.iGeneralFactoryState_SetVertexCount(*args)
     def GetVertexCount(*args): return _cspace.iGeneralFactoryState_GetVertexCount(*args)
     def GetVertices(self):
@@ -5601,14 +5602,15 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
       return CSMutableArrayHelper(self.GetNormalByIndex, self.GetVertexCount)
 
 
+    def GetColors(self):
+      return CSMutableArrayHelper(self.GetNormalByIndex, self.GetVertexCount)
+
+
+    def AddTriangle(*args): return _cspace.iGeneralFactoryState_AddTriangle(*args)
     def SetTriangleCount(*args): return _cspace.iGeneralFactoryState_SetTriangleCount(*args)
     def GetTriangleCount(*args): return _cspace.iGeneralFactoryState_GetTriangleCount(*args)
     def GetTriangles(self):
       return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
-
-
-    def GetColors(self):
-      return CSMutableArrayHelper(self.GetNormalByIndex, self.GetVertexCount)
 
 
     def Invalidate(*args): return _cspace.iGeneralFactoryState_Invalidate(*args)
