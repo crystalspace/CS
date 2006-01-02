@@ -201,7 +201,7 @@ int csMouseEventHelper::GetAxis (const iEvent *event, uint axis)
   if (event->Retrieve("mNumAxes", axs) != csEventErrNone)
     return 0;
   const int32 *axdata = (int32 *) _xs;
-  if ((axis >= 0) && (axis < axs))
+  if (axis < axs)
     return axdata[axis];
   else
     return 0;
@@ -322,7 +322,7 @@ int csJoystickEventHelper::GetAxis(const iEvent *event, uint axis)
   if (event->Retrieve("jsNumAxes", axs) != csEventErrNone)
     return 0;
   const int *axdata = (int *) _xs;
-  if ((axis >= 0) && (axis < axs))
+  if (axis < axs)
     return axdata[axis];
   else
     return 0;

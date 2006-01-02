@@ -632,7 +632,7 @@ iKeyboardDriver* csMouseDriver::GetKeyboardDriver()
 void csMouseDriver::DoButton (uint number, int button, bool down, 
                               const int32 *axes, uint numAxes)
 {
-  if (number < 0 || number >= CS_MAX_MOUSE_COUNT)
+  if (number >= CS_MAX_MOUSE_COUNT)
     return;
 
   if (memcmp(Last[number], axes, numAxes * sizeof(int))!=0)
@@ -711,7 +711,7 @@ void csMouseDriver::DoButton (uint number, int button, bool down,
 void csMouseDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
 {
   uint32 cflags = 0;
-  if (number < 0 || number >= CS_MAX_MOUSE_COUNT)
+  if (number >= CS_MAX_MOUSE_COUNT)
     return;
 
   for (uint iter=0; iter<numAxes ; iter++)
@@ -795,7 +795,7 @@ iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
 void csJoystickDriver::DoButton (uint number, int button, bool down,
 				 const int32 *axes, uint numAxes)
 {
-  if (number < 0 || number >= CS_MAX_JOYSTICK_COUNT)
+  if (number >= CS_MAX_JOYSTICK_COUNT)
     return;
 
   if (memcmp(Last[number], axes, numAxes * sizeof(int))!=0)
@@ -839,7 +839,7 @@ void csJoystickDriver::DoButton (uint number, int button, bool down,
 void csJoystickDriver::DoMotion (uint number, const int32 *axes, uint numAxes)
 {
   uint32 cflags = 0;
-  if (number < 0 || number >= CS_MAX_JOYSTICK_COUNT)
+  if (number >= CS_MAX_JOYSTICK_COUNT)
     return;
 
   for (uint iter=0 ; iter<numAxes ; iter++)

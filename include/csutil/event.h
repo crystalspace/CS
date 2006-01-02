@@ -102,7 +102,7 @@ public:
     uint32 axesChanged, uint button, bool buttonstate, uint32 buttonMask, 
     uint32 modifiers);
   static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, 
-    csEventID name, int n, csMouseEventType etype, const int *axes, 
+    csEventID name, int n, csMouseEventType etype, const int32 *axes, 
     uint8 numAxes, uint32 axesChanged, uint button, bool buttonstate, 
     uint32 buttonMask, uint32 modifiers);
   //@}
@@ -159,7 +159,7 @@ public:
     csEventID name, int n, int x, int y, uint32 axesChanged, uint button, 
     bool buttonState, uint32 buttonMask, uint32 modifiers);
   static csEvent *NewEvent (csRef<iEventNameRegistry> &reg, csTicks, 
-    csEventID name, int n, const int *axes, uint8 numAxes, uint32 axesChanged, 
+    csEventID name, int n, const int32* axes, uint8 numAxes, uint32 axesChanged, 
     uint button, bool buttonState, uint32 buttonMask, uint32 modifiers);
   //@}
 

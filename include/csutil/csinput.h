@@ -266,7 +266,7 @@ public:
   /// Query the last known mouse button state
   CS_PURE_METHOD virtual bool GetLastButton (uint number, int button) const
   {
-    return (number >= 0 && number < CS_MAX_MOUSE_COUNT
+    return (number < CS_MAX_MOUSE_COUNT
 	    && button >= 0 && button < CS_MAX_MOUSE_BUTTONS) ?
 	    Button [number][button] : false;
   }
@@ -345,7 +345,7 @@ public:
   /// Query the last known joystick button state
   CS_PURE_METHOD virtual bool GetLastButton (uint number, int button) const
   {
-    return (number >= 0 && number < CS_MAX_JOYSTICK_COUNT
+    return (number < CS_MAX_JOYSTICK_COUNT
          && button >= 0 && button < CS_MAX_JOYSTICK_BUTTONS) ?
             Button [number][button] : false;
   }

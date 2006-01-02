@@ -9,6 +9,7 @@ chronological order.
 2-Jan-2006
 	- Jorrit fixed a bug in the with lights as children of meshes
 	  (reported with bug #1394869).
+	- res fixed some warnings and issues reported by mdmkolbe.
 30-Dec-2005
 	- Jorrit enabled the new AFP workaround for walktest terrainf so
 	  that it also kicks on in Linux.
