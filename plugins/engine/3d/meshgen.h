@@ -25,6 +25,7 @@
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
 #include "csutil/hash.h"
+#include "csutil/set.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/floatrand.h"
 #include "csgeom/box.h"
@@ -32,19 +33,53 @@
 #include "iengine/meshgen.h"
 
 struct iSector;
+struct iInstancingMeshState;
+class csMeshGenerator;
+struct csMGCell;
 
 #define CS_GEOM_MAX_ROTATIONS 16
 
+/**
+ * In case a csMGGeom uses an instmesh then this holds the
+ * meshes used for a single cell.
+ */
+struct csMGGeomInstMesh
+{
+  // @@@ FIXME: only one instmesh per cell for now?
+  csRef<iMeshWrapper> instmesh;
+  csRef<iInstancingMeshState> instmesh_state;
+  csArray<size_t> inst_setaside;
+};
+
+/**
+ * A single geometry (for a single lod level).
+ */
 struct csMGGeom
 {
   csRef<iMeshFactoryWrapper> factory;
   float maxdistance;
   float sqmaxdistance;
 
-  // For every lod level we have a cache of meshes.
+  /**
+   * 2-dimensional array of cells with cell_dim*cell_dim entries.
+   * This is only used in case this factory represents
+   * an instmesh factory.
+   */
+  csMGGeomInstMesh* instmeshes;
+
+  /// For every lod level we have a cache of meshes.
   csRefArray<iMeshWrapper> mesh_cache;
-  // For every lod level we have a cache of meshes that are set aside.
+  /// For every lod level we have a cache of meshes that are set aside.
   csRefArray<iMeshWrapper> mesh_setaside;
+
+  /**
+   * A set of geom instmeshes where we have put aside instances.
+   * This is an optimization to prevent having to traverse all cells.
+   */
+  csSet<csPtrKey<csMGGeomInstMesh> > instmesh_setaside;
+
+  csMGGeom () : instmeshes (0) { }
+  ~csMGGeom ();
 };
 
 /**
@@ -61,8 +96,10 @@ private:
   float density;
   float total_max_dist;
 
+  csMeshGenerator* generator;
+
 public:
-  csMeshGeneratorGeometry ();
+  csMeshGeneratorGeometry (csMeshGenerator* generator);
   virtual ~csMeshGeneratorGeometry () { }
 
   float GetTotalMaxDist () const { return total_max_dist; }
@@ -86,8 +123,11 @@ public:
   /**
    * Allocate a new mesh for the given distance. Possibly from the
    * cache if possible. If the distance is too large it will return 0.
+   * It will also return an instance_id if the mesh represents an
+   * instance from an instmesh.
    */
-  csPtr<iMeshWrapper> AllocMesh (float sqdist, size_t& lod);
+  csPtr<iMeshWrapper> AllocMesh (int cidx, const csMGCell& cell,
+      float sqdist, size_t& lod, size_t& instance_id);
 
   /**
    * Set aside the mesh temporarily. This is called if we have a mesh that
@@ -98,13 +138,20 @@ public:
    * FreeSetAsideMeshes() to really free the remaining meshes that haven't been
    * reused.
    */
-  void SetAsideMesh (iMeshWrapper* mesh, size_t lod);
+  void SetAsideMesh (int cidx, iMeshWrapper* mesh,
+      size_t lod, size_t instance_id);
 
   /**
    * Free all meshes that were put aside and that were not reused by
    * AllocMesh().
    */
   void FreeSetAsideMeshes ();
+
+  /**
+   * Move the mesh to some position.
+   */
+  void MoveMesh (int cidx, iMeshWrapper* mesh, size_t lod, size_t instance_id,
+      const csVector3& position, const csMatrix3& matrix);
 
   /**
    * Get the right lod level for the given squared distance.
@@ -115,7 +162,7 @@ public:
   /**
    * Check if this is the right mesh for the given LOD level.
    */
-  bool IsRightLOD (iMeshWrapper* mesh, float sqdist, size_t current_lod);
+  bool IsRightLOD (float sqdist, size_t current_lod);
 };
 
 /**
@@ -152,8 +199,15 @@ struct csMGPosition
   iMeshWrapper* mesh;
   /// The LOD level for the mesh above.
   size_t lod;
+  /**
+   * If the mesh on this position is an instmesh then this
+   * number is the id of the instance. Otherwise this id will
+   * be csArrayItemNotFound.
+   */
+  size_t instance_id;
 
-  csMGPosition () : last_mixmode (CS_FX_COPY), mesh (0) { }
+  csMGPosition () : last_mixmode (CS_FX_COPY), mesh (0),
+		    instance_id (csArrayItemNotFound) { }
 };
 
 struct csMGCell;
@@ -285,7 +339,7 @@ private:
    * the given position.
    * This function assumes the cell has a valid block.
    */
-  void AllocateMeshes (csMGCell& cell, const csVector3& pos);
+  void AllocateMeshes (int cidx, csMGCell& cell, const csVector3& pos);
 
   /**
    * Generate the positions in the given block.
@@ -295,7 +349,7 @@ private:
   /**
    * Free all meshes in a block.
    */
-  void FreeMeshesInBlock (csMGCell& cell);
+  void FreeMeshesInBlock (int cidx, csMGCell& cell);
 
   /// Get the total maximum distance for all geometries.
   float GetTotalMaxDist ();

@@ -9,6 +9,9 @@ chronological order.
 2-Jan-2006
 	- Jorrit fixed a bug in the with lights as children of meshes
 	  (reported with bug #1394869).
+	- Jorrit started work on support for instmesh in the mesh generator.
+	  Doesn't work yet.
+	- Jorrit fixed a bug in mesh generator with high radius.
 	- res fixed some warnings and issues reported by mdmkolbe.
         - Magodra fixed some warnings
 30-Dec-2005
