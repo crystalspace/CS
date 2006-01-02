@@ -687,7 +687,6 @@ void csFatLoopStep::BuildPortalNodes (RenderNode* node,
     world_sphere = sphere;
   }
   csSphere cam_sphere = tr_o2c.Other2This (sphere);
-  csVector3 camera_origin = cam_sphere.GetCenter ();
 
   if (!rview->ClipBSphere (cam_sphere, world_sphere, clip_portal,
       clip_plane, clip_z_plane)) return;

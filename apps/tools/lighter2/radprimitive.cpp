@@ -588,10 +588,6 @@ namespace lighter
       totalElementArea -= elementAreas[i];
     }
     
-    if (totalElementArea != 0.0f)
-    {
-      int a = 0;
-    }
   }
 
   void RadPrimitive::PrepareNoPatches ()

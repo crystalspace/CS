@@ -187,7 +187,6 @@ namespace lighter
       
       for (uint v = 0; v < lmh; v++)
       {
-        float a = (float)(v&1);
         // now scan over the row
         for (uint u = 0; u < lmw; u++)
         {

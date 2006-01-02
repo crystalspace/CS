@@ -17,6 +17,10 @@
 */
 
 #include "cssysdef.h"
+extern "C"
+{
+#include <ctype.h>
+}
 #include "fvg.h"
 
 namespace aws

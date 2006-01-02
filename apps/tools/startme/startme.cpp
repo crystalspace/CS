@@ -53,7 +53,6 @@ void StartMe::ProcessFrame ()
   while (star_ticks > star_timeout)
   {
     star_ticks -= star_timeout;
-    csVector3 sv = star_v;
     star_v.x += ((float)rand() / (float)RAND_MAX - 0.5f) / 4.0f;
     star_v.y += ((float)rand() / (float)RAND_MAX - 0.5f) / 4.0f;
     star_v.z += ((float)rand() / (float)RAND_MAX - 0.5f) / 4.0f;
