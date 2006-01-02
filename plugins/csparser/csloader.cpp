@@ -3285,6 +3285,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
             goto error;
           }
         }
+	break;
       case XMLTOKEN_NULLMESH:
         {
 	  if (plug)

@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Jan-2006
+	- Jorrit fixed a bug in the with lights as children of meshes
+	  (reported with bug #1394869).
 30-Dec-2005
 	- Jorrit enabled the new AFP workaround for walktest terrainf so
 	  that it also kicks on in Linux.
