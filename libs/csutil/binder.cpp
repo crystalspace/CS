@@ -41,7 +41,7 @@ bool csInputBinder::HandleEvent (iEvent &ev)
   if (ev.Name == csevMouseMove(name_reg, 0))
   {
     // mouse move
-    for (uint axis = 0; axis <= csMouseEventHelper::GetNumAxes(&ev); axis++)
+    for (uint8 axis = 0; axis <= csMouseEventHelper::GetNumAxes(&ev); axis++)
     {
       AxisCmd *bind = axisHash.Get
         (csInputDefinition (name_reg, &ev, axis), 0);
@@ -54,7 +54,7 @@ bool csInputBinder::HandleEvent (iEvent &ev)
         csJoystickEventHelper::GetButton(&ev)==0)
   {
     // joystick move
-    for (uint axis = 0; axis < csJoystickEventHelper::GetNumAxes(&ev); axis++)
+    for (uint8 axis = 0; axis < csJoystickEventHelper::GetNumAxes(&ev); axis++)
     {
       AxisCmd *bind = axisHash.Get
         (csInputDefinition (name_reg, &ev, axis), 0);

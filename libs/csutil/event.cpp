@@ -125,7 +125,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
 {
   csEvent *ev = new csEvent(iTime, name, false);
   ev->Add("mNumber", (uint8) 0);
-  ev->Add("mEventType", (mType+1));
+  ev->Add("mEventType", (uint8) (mType+1));
   int32 axes[2] = { mx, my };
   ev->Add("mAxes", (void *) axes, 2 * sizeof(int32)); /* makes copy */
   ev->Add("mNumAxes", (uint8) 2);
@@ -138,7 +138,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
 }
 
 csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
-  csTicks iTime, csEventID name, int n, csMouseEventType mType, 
+  csTicks iTime, csEventID name, uint8 n, csMouseEventType mType, 
   int x, int y, uint32 axesChanged, 
   uint button, bool buttonState, 
   uint32 buttonMask, uint32 modifiers)
@@ -147,7 +147,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   int32 axes[2] = { x, y };
   CS_ASSERT(reg->IsKindOf(name, csevMouseEvent(reg)));
   ev->Add("mNumber", (uint8) n);
-  ev->Add("mEventType", (mType+1));
+  ev->Add("mEventType", (uint8) (mType+1));
   ev->Add("mAxes", (void *) axes, 2 * sizeof(int)); /* makes copy */
   ev->Add("mNumAxes", (uint8) 2);
   ev->Add("mAxesChanged", (uint32) axesChanged);
@@ -159,19 +159,19 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
 }
 
 csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
-  csTicks iTime, csEventID name, int n, csMouseEventType mType,
-  const int *axes, uint8 numAxes, uint32 axesChanged, 
+  csTicks iTime, csEventID name, uint8 n, csMouseEventType mType,
+  const int32 *axes, uint8 numAxes, uint32 axesChanged, 
   uint button, bool buttonState, uint32 buttonMask, uint32 modifiers)
 {
   csEvent *ev = new csEvent (iTime, name, false);
   CS_ASSERT(reg->IsKindOf(name, csevMouseEvent(reg)));
-  ev->Add("mNumber", (uint) n);
-  ev->Add("mEventType", (mType+1));
+  ev->Add("mNumber", (uint8) n);
+  ev->Add("mEventType", (uint8) (mType+1));
   ev->Add("mAxes", (void *) axes, numAxes * sizeof(int)); /* makes copy */
   ev->Add("mNumAxes", (uint8) numAxes);
   ev->Add("mAxesChanged", (uint32) axesChanged);
   ev->Add("mButton", (uint8) button);
-  ev->Add("mButtonState", button);
+  ev->Add("mButtonState", buttonState);
   ev->Add("mButtonMask", buttonMask);
   ev->Add("keyModifiers", (uint32) modifiers);
   return ev;
@@ -288,7 +288,7 @@ csEvent *csJoystickEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
 }
 
 csEvent *csJoystickEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
-  csTicks iTime, csEventID name, int n, const int *axes, 
+  csTicks iTime, csEventID name, int n, const int32 *axes, 
   uint8 numAxes, uint32 axesChanged, 
   uint button, bool buttonState,
   uint32 buttonMask, uint32 modifiers)
