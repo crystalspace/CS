@@ -14,6 +14,7 @@ chronological order.
 	- Jorrit fixed a bug in mesh generator with high radius.
 	- res fixed some warnings and issues reported by mdmkolbe.
         - Magodra fixed some warnings
+	- Peter Amstutz fixed csInputBinder to work correctly with mouse events
 30-Dec-2005
 	- Jorrit enabled the new AFP workaround for walktest terrainf so
 	  that it also kicks on in Linux.
