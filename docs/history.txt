@@ -14,6 +14,7 @@ chronological order.
 	    - String formats not matching argument types,
 	    - Missing size_t cast before a -1, and
 	    - Missing #if's around uncalled functions on some configurations.
+	- mdmkolbe fixed some unused parameter warnings.
 2-Jan-2006
 	- Jorrit fixed a bug in the with lights as children of meshes
 	  (reported with bug #1394869).

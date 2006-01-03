@@ -62,6 +62,7 @@ CS_SPECIALIZE_TEMPLATE struct CoordSplitter<0>
 {
   static inline void Split (int* destCoords, size_t coord, const int* dim)
   {
+    (void)dim; // unused except for this assert so silence the warning
     CS_ASSERT (dim[0] == 1);
     destCoords[0] = (int)coord;
   }

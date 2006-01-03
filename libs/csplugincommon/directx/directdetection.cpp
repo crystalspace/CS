@@ -129,7 +129,7 @@ int DirectDetection::AddDevice (const DirectDetectionDevice& dd2d)
 /// Enumeration of directdraw devices
 static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
   LPSTR lpDriverDescription, LPSTR lpDriverName, LPVOID lpContext,
-  HMONITOR p_notUsed)
+  HMONITOR /*p_notUsed*/)
 {
   LPDIRECTDRAW pDD = 0;
   DDCAPS DriverCaps;

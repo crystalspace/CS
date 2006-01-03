@@ -281,6 +281,8 @@ void csRenderBuffer::SetRenderBufferProperties (size_t elementCount,
   size_t newSize = elementCount * componentCount * 
     csRenderBufferComponentSizes[componentType];
   CS_ASSERT(newSize <= bufferSize);
+#else
+  (void)elementCount; // unused except for above so silence the warning
 #endif
   props.bufferType = type;
   props.comptype = componentType;
@@ -300,6 +302,8 @@ void csRenderBuffer::SetIndexBufferProperties (size_t elementCount,
 #ifdef CS_DEBUG
   size_t newSize = elementCount * csRenderBufferComponentSizes[componentType];
   CS_ASSERT(newSize <= bufferSize);
+#else
+  (void)elementCount; // unused except for above assert so silence the warning
 #endif
   props.bufferType = type;
   props.comptype = componentType;

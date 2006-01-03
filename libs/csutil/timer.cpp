@@ -103,6 +103,7 @@ csEventTimer::~csEventTimer ()
 
 bool csEventTimer::HandleEvent (iEvent& event)
 {
+  (void)event; // unused except for this assert so silence the warning
   CS_ASSERT(event.Name == FinalProcess);
 
   csTicks elapsed = vc->GetElapsedTicks ();

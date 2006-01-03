@@ -124,6 +124,8 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   uint32 buttonMask, uint32 mModifiers)
 {
   csEvent *ev = new csEvent(iTime, name, false);
+  (void)reg; // reg is unused except for this assert so silence the warning
+  CS_ASSERT(reg->IsKindOf(name, csevMouseEvent(reg)));
   ev->Add("mNumber", (uint8) 0);
   ev->Add("mEventType", (uint8) (mType+1));
   int32 axes[2] = { mx, my };
@@ -145,6 +147,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
 {
   csEvent *ev = new csEvent(iTime, name, false);
   int32 axes[2] = { x, y };
+  (void)reg; // reg is unused except for this assert so silence the warning
   CS_ASSERT(reg->IsKindOf(name, csevMouseEvent(reg)));
   ev->Add("mNumber", (uint8) n);
   ev->Add("mEventType", (uint8) (mType+1));
@@ -164,6 +167,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   uint button, bool buttonState, uint32 buttonMask, uint32 modifiers)
 {
   csEvent *ev = new csEvent (iTime, name, false);
+  (void)reg; // reg is unused except for this assert so silence the warning
   CS_ASSERT(reg->IsKindOf(name, csevMouseEvent(reg)));
   ev->Add("mNumber", (uint8) n);
   ev->Add("mEventType", (uint8) (mType+1));
@@ -275,6 +279,7 @@ csEvent *csJoystickEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
 {
   csEvent *ev = new csEvent (iTime, name, false);
   int axes[2] = { x, y };
+  (void)reg; // reg is unused except for this assert so silence the warning
   CS_ASSERT(reg->IsKindOf(name, csevJoystickEvent(reg)));
   ev->Add("jsNumber", (uint8) n);
   ev->Add("jsAxes", (void *) axes, 2 * sizeof(int)); /* makes copy */
@@ -294,6 +299,7 @@ csEvent *csJoystickEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   uint32 buttonMask, uint32 modifiers)
 {
   csEvent *ev = new csEvent (iTime, name, false);
+  (void)reg; // reg is unused except for this assert so silence the warning
   CS_ASSERT(reg->IsKindOf(name, csevJoystickEvent(reg)));
   ev->Add("jsNumber", (uint8) n);
   ev->Add("jsAxes", (void *) axes, numAxes * sizeof(int)); /* makes copy */
