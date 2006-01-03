@@ -455,7 +455,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
     
     windowClass = new uint8[(wndClass.Length()+1) * sizeof (WCHAR)];
     csUnicodeTransform::UTF8toWC ((wchar_t*)windowClass,
-      wndClass.Length()+1, (utf8_char*)(wndClass.GetData()), -1);
+      wndClass.Length()+1, (utf8_char*)(wndClass.GetData()), (size_t)-1);
 
     wc.cbSize	      = sizeof (wc);
     wc.hCursor        = 0;

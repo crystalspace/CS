@@ -289,6 +289,9 @@ DWORD CurrentThreadContextHelper::ContextThread (LPVOID lpParameter)
 
 static CurrentThreadContextHelper contextHelper;
 
+#if defined (CS_DEBUG) && !defined (CS_COMPILER_MSVC)
+  /* Only called on non-VC, when we still need the ugly 2nd thread method to
+   * avoid the debugger catching the exception. */
 static bool CreateCallStackThreaded (int skip, bool fast,
                                      csDirtyAccessArray<CallStackEntry>& entries, 
                                      csDirtyAccessArray<uintptr_t>& params)
@@ -380,6 +383,7 @@ static bool CreateCallStackThreaded (int skip, bool fast,
   return CreateCallStack (hProc, hThread, context, skip + currentContextSkip,
     fast, entries, params); 
 }
+#endif
 
 class CriticalSectionWrapper
 {
@@ -396,7 +400,6 @@ public:
 };
 
 static CriticalSectionWrapper ExceptStackSection;
-static CONTEXT* currentContextPtr;
 
 struct ExceptionFilterParams
 {

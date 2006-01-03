@@ -509,7 +509,7 @@ namespace autom
     virtual ~blob() {}
     
     /** Copy constructor. */
-    blob(const blob& s):object(s, T_BLOB), encoded(s.encoded)
+    blob(const blob& s): iObject(), object(s, T_BLOB), encoded(s.encoded)
     {
       
     }    

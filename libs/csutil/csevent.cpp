@@ -80,7 +80,7 @@ csEvent::csEvent (csTicks iTime, csEventID iName, bool iBroadcast) :
 }
 
 // Copy constructor
-csEvent::csEvent (csEvent const& e) : scfImplementationType (this),
+csEvent::csEvent (csEvent const& e) : iBase(), scfImplementationType (this),
 	attributes (53)
 {
   count = 0;

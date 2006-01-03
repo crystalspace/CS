@@ -9,6 +9,11 @@ chronological order.
 3-Jan-2006
 	- mdmkolbe fixed build errors in the new event system and a typo
 	  that used button instead of buttonState.
+	- mdmkolbe fixed several warnings including:
+	    - Copy constructors not calling constructors of virtual parrents,
+	    - String formats not matching argument types,
+	    - Missing size_t cast before a -1, and
+	    - Missing #if's around uncalled functions on some configurations.
 2-Jan-2006
 	- Jorrit fixed a bug in the with lights as children of meshes
 	  (reported with bug #1394869).

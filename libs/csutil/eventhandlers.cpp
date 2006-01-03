@@ -88,7 +88,7 @@ csHandlerID csEventHandlerRegistry::GetID (iEventHandler *handler)
   csHandlerID generic = GetGenericID (handler->GenericName());
 
   csString iname;
-  iname.Format ("%s:%u", handler->GenericName(), instanceCounter++);
+  iname.Format ("%s:%" PRIu32, handler->GenericName(), instanceCounter++);
   res = names.Request (iname);
 
   instantiation.PutUnique (res, generic);

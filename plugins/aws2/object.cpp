@@ -613,7 +613,7 @@ blob::ReprObject()
 	char buf[128]={0};
 		
 	std::string tmp("/");
-	tmp.append(std::string(buf, cs_snprintf(buf, sizeof(buf), "%ld", encoded.size())));		
+	tmp.append(std::string(buf, cs_snprintf(buf, sizeof(buf), "%zu", encoded.size())));		
 	tmp.append(encoded);
 	
 	return csPtr<iString>(new scfString(tmp.c_str()));
