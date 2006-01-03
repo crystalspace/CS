@@ -103,6 +103,12 @@ csLight::csLight (
 
 csLight::~csLight ()
 {
+  // Copy the array because we are going to unlink the children.
+  csRefArray<iSceneNode> children = movable.GetChildren ();
+  size_t j;
+  for (j = 0 ; j < children.Length () ; j++)
+    children[j]->SetParent (0);
+
   CleanupLSI ();
 
   int i = (int)light_cb_vector.Length ()-1;

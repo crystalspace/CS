@@ -268,6 +268,11 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
 
 csMeshWrapper::~csMeshWrapper ()
 {
+  // Copy the array because we are going to unlink the children.
+  csRefArray<iSceneNode> children = movable.GetChildren ();
+  size_t i;
+  for (i = 0 ; i < children.Length () ; i++)
+    children[i]->SetParent (0);
   delete imposter_mesh;
   ClearFromSectorPortalLists ();
 }

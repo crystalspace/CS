@@ -15,6 +15,10 @@ chronological order.
 	    - Missing size_t cast before a -1, and
 	    - Missing #if's around uncalled functions on some configurations.
 	- mdmkolbe fixed some unused parameter warnings.
+	- Jorrit fixed a bug in the engine: when a mesh or light is
+	  deleted it will now automatically unlink whatever children it
+	  might have. This fixes crashes when regions are unloaded that
+	  contain hierarchical objects.
 2-Jan-2006
 	- Jorrit fixed a bug in the with lights as children of meshes
 	  (reported with bug #1394869).
