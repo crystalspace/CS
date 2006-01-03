@@ -23,7 +23,6 @@
 #include "csutil/csevent.h"
 #include "iutil/cfgfile.h"
 
-
 csInputBinder::csInputBinder (iObjectRegistry *r, iBase *parent, int btnSize, int axisSize)
   : scfImplementationType (this, parent),
     name_reg(csEventNameRegistry::GetRegistry(r)),
@@ -39,46 +38,60 @@ csInputBinder::~csInputBinder ()
 
 bool csInputBinder::HandleEvent (iEvent &ev)
 {
-  if (CS_IS_MOUSE_EVENT(name_reg, ev) && csMouseEventHelper::GetButton(&ev)==0)
+  if (ev.Name == csevMouseMove(name_reg, 0))
   {
     // mouse move
     for (uint axis = 0; axis <= csMouseEventHelper::GetNumAxes(&ev); axis++)
     {
       AxisCmd *bind = axisHash.Get
-	(csInputDefinition (name_reg, &ev, axis), 0);
-      if (bind) bind->val = 
-	csMouseEventHelper::GetAxis(&ev, axis);
+        (csInputDefinition (name_reg, &ev, axis), 0);
+      if (bind) bind->val =
+        csMouseEventHelper::GetAxis(&ev, axis);
     }
     return true;
   }
   else if (CS_IS_JOYSTICK_EVENT(name_reg, ev) &&
-  	csJoystickEventHelper::GetButton(&ev)==0)
+        csJoystickEventHelper::GetButton(&ev)==0)
   {
     // joystick move
     for (uint axis = 0; axis < csJoystickEventHelper::GetNumAxes(&ev); axis++)
     {
       AxisCmd *bind = axisHash.Get
-	(csInputDefinition (name_reg, &ev, axis), 0);
-      if (bind) bind->val = 
-	csJoystickEventHelper::GetAxis(&ev, axis);
+        (csInputDefinition (name_reg, &ev, axis), 0);
+      if (bind) bind->val =
+        csJoystickEventHelper::GetAxis(&ev, axis);
     }
     return true;
   }
-  else if (CS_IS_KEYBOARD_EVENT(name_reg, ev) || 
-	   CS_IS_MOUSE_EVENT(name_reg, ev) || 
-	   CS_IS_JOYSTICK_EVENT(name_reg, ev))
+  else if (CS_IS_KEYBOARD_EVENT(name_reg, ev) ||
+           CS_IS_MOUSE_EVENT(name_reg, ev) ||
+           CS_IS_JOYSTICK_EVENT(name_reg, ev))
   {
-    bool down = csInputEventHelper::GetButtonState(name_reg, &ev);
+      // "GetButtonState" doesn't seem to work for mouse buttons(?),
+      // so check if it is a mouse button up/down event specifically
+    bool down;
+    if(CS_IS_MOUSE_EVENT(name_reg, ev)) {
+        if(ev.Name == csevMouseDown (name_reg, 0)) {
+            down = true;
+        } else if(ev.Name == csevMouseUp (name_reg, 0)) {
+            down = false;
+        } else {
+            return false; // ???
+        }
+    } else {
+        down = csInputEventHelper::GetButtonState(name_reg, &ev);
+    }
     BtnCmd *bind = btnHash.Get(csInputDefinition (name_reg, &ev,
-    	(uint8) CSMASK_ALLMODIFIERS), 0);
+        (uint8) CSMASK_ALLMODIFIERS), 0);
+
     if (! bind) return false;
-    
+
     if (bind->toggle)
     {
       if (down) bind->down = ! bind->down;
     }
     else bind->down = down;
-    
+
     return true;
   }
   else
@@ -100,6 +113,7 @@ void csInputBinder::BindButton (const csInputDefinition &def, unsigned cmd,
 {
   BtnCmd *bind = new BtnCmd (cmd, toggle);
   btnArray.GetExtend (cmd) = bind;
+
   btnHash.Put (def, bind);
 }
 
