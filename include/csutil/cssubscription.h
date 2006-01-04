@@ -125,7 +125,7 @@ private:
   csEventQueue *queue;
   
   bool SubscribeInternal (csHandlerID, csEventID);
-  void UnsubscribeInternal (csHandlerID, csEventID);
+  void UnsubscribeInternal (csHandlerID);
   /**
    * We use copy-on-write (COW) semantics to avoid making an 
    * unnecessary number of copies of the PO graph and the
@@ -182,7 +182,7 @@ private:
     /**
      * Handle unsubscribe nitty-gritty
      */
-    void UnsubscribeInternal(csHandlerID, csEventID);
+    void UnsubscribeInternal(csHandlerID);
 
     /**
      * The current partial-order graph.

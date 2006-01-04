@@ -21,6 +21,9 @@ chronological order.
 	  contain hierarchical objects.
 	- Adam marked csevPreProcess, csevProcess, csevPostProcess, and
 	  csevFinalProcess as deprecated.
+	- mdmkolbe removed an unused parameter from
+	  csEventTree::UnsubscribeInternal
+	- mdmkolbe fixed warnings about enum vs non-enum in conditionals.
 2-Jan-2006
 	- Jorrit fixed a bug in the with lights as children of meshes
 	  (reported with bug #1394869).

@@ -423,8 +423,7 @@ bool csEventTree::SubscribeInternal (csHandlerID id, csEventID baseevent)
  * from under a SubscriberQueue iterator, so we need to switch over to 
  * graph solver mode in such cases and flag the SQ for regeneration.
  */
-void csEventTree::FatRecordObject::UnsubscribeInternal(csHandlerID id,
-	csEventID baseevent)
+void csEventTree::FatRecordObject::UnsubscribeInternal(csHandlerID id)
 {
   /* It is possible we've been called for a "universal unsubscribe"
    * (baseevent==CS_EVENT_INVALID), so it could be there's nothing
@@ -454,12 +453,12 @@ void csEventTree::FatRecordObject::UnsubscribeInternal(csHandlerID id,
  * This has to be "reentrant", by which we simply mean it must be safe for
  * an event handler to un-subscribe itself while it is being delivered to.
  */
-void csEventTree::UnsubscribeInternal(csHandlerID id, csEventID baseevent)
+void csEventTree::UnsubscribeInternal(csHandlerID id)
 {
   CS_ASSERT(id != CS_HANDLER_INVALID);
   if (fatNode)
   {
-    fatRecord->UnsubscribeInternal(id, baseevent);
+    fatRecord->UnsubscribeInternal(id);
   }
 
   /* Since we manipulate fatRecord in place, we only really need
@@ -468,7 +467,7 @@ void csEventTree::UnsubscribeInternal(csHandlerID id, csEventID baseevent)
 
   for (size_t i=0 ; i<children.Length() ; i++) 
   {
-    ((csEventTree *)children[i])->UnsubscribeInternal(id, baseevent);
+    ((csEventTree *)children[i])->UnsubscribeInternal(id);
   }
 }
 
@@ -511,12 +510,12 @@ void csEventTree::Unsubscribe(csHandlerID id, csEventID event, csEventQueue *q)
 {
   CS_ASSERT(id != CS_HANDLER_INVALID);
   if (event == CS_EVENT_INVALID)
-    q->EventTree->UnsubscribeInternal(id, event);
+    q->EventTree->UnsubscribeInternal(id);
   else 
   {
     csEventTree *w = FindNode(event, q);
     w->ForceFatCopy ();
-    w->UnsubscribeInternal (id, event);
+    w->UnsubscribeInternal (id);
     // TODO : test if UnsubscribeInternal fails (i.e., is a no-op); 
     // if it turns out we created a fat copy unnecessarily, kill it.
   }

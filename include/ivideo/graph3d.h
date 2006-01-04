@@ -214,33 +214,32 @@ enum csVertexAttrib
  * (or \e blended) with the framebuffer fragment (\c DST).
  * @{ */
 
-/// Mix mode types
-enum
-{
-  /**
-   * Automatic blending mode. Whether the texture is alpha-blended or not is 
-   * taken from csRenderMesh::alphaMode and whether the alpha part of the
-   * mixmode is non-zero.
-   */
-  CS_MIXMODE_TYPE_AUTO		= 0x00000000,
-  /**
-   * Blend with a blending operation.
-   * The fragment value written to the framebuffer is computed from the 
-   * formula \c SRC * \c srcFactor + \c DST * \c dstFactor. 
-   * \c srcFactor and \c dstFactor are one of 
-   * \link #CS_MIXMODE_FACT_ZERO CS_MIXMODE_FACT_xxx \endlink, encoded into
-   * the mixmode specifier with #CS_MIXMODE_BLEND.
-   */
-  CS_MIXMODE_TYPE_BLENDOP	= 0x40000000,
-  /**
-   * Use the mix mode of the mesh mix mode.
-   * \warning NOT VALID AS MESH MIXMODE - only for shader pass mixmodes.
-   */
-  CS_MIXMODE_TYPE_MESH		= 0x80000000,
+/**\name Mix mode types
+ * @{ */
+/**
+ * Automatic blending mode. Whether the texture is alpha-blended or not is 
+ * taken from csRenderMesh::alphaMode and whether the alpha part of the
+ * mixmode is non-zero.
+ */
+#define CS_MIXMODE_TYPE_AUTO (0x00000000)
+/**
+ * Blend with a blending operation.
+ * The fragment value written to the framebuffer is computed from the 
+ * formula \c SRC * \c srcFactor + \c DST * \c dstFactor. 
+ * \c srcFactor and \c dstFactor are one of 
+ * \link #CS_MIXMODE_FACT_ZERO CS_MIXMODE_FACT_xxx \endlink, encoded into
+ * the mixmode specifier with #CS_MIXMODE_BLEND.
+ */
+#define CS_MIXMODE_TYPE_BLENDOP (0x40000000)
+/**
+ * Use the mix mode of the mesh mix mode.
+ * \warning NOT VALID AS MESH MIXMODE - only for shader pass mixmodes.
+ */
+#define CS_MIXMODE_TYPE_MESH (0x80000000)
 
-  /// Bit mask to extract the type from a mixmode specifier.
-  CS_MIXMODE_TYPE_MASK		= 0xc0000000
-};
+/// Bit mask to extract the type from a mixmode specifier.
+#define CS_MIXMODE_TYPE_MASK (0xc0000000)
+/** @} */
 
 /// Blending op mix mode factors
 enum
@@ -273,28 +272,25 @@ enum
   CS_MIXMODE_FACT_MASK		= 0xf
 };
 
-/**
- * Alpha test flags.
+/**\name Alpha test flags.
  * Enabled alpha test (or <i>binary alpha</i>) means that a fragment is only
  * drawn when its alpha component is above a certain threshold, and discarded
  * otherwise.
+ * @{ */
+/**
+ * Automatic alpha test. Whether the texture is alpha-blended binarily is 
+ * taken from csRenderMesh::alphaMode and whether the alpha part of the
+ * mixmode is non-zero.
  */
-enum
-{
-  /**
-   * Automatic alpha test. Whether the texture is alpha-blended binarily is 
-   * taken from csRenderMesh::alphaMode and whether the alpha part of the
-   * mixmode is non-zero.
-   */
-  CS_MIXMODE_ALPHATEST_AUTO	= 0x00000000,
-  /// Unconditionally enable alpha test.
-  CS_MIXMODE_ALPHATEST_ENABLE	= 0x10000000,
-  /// Unconditionally disable alpha test.
-  CS_MIXMODE_ALPHATEST_DISABLE	= 0x20000000,
+#define CS_MIXMODE_ALPHATEST_AUTO (0x00000000)
+/// Unconditionally enable alpha test.
+#define CS_MIXMODE_ALPHATEST_ENABLE (0x10000000)
+/// Unconditionally disable alpha test.
+#define CS_MIXMODE_ALPHATEST_DISABLE (0x20000000)
   
-  /// Bit mask to extract the alpha test flag from a mixmode specifier.
-  CS_MIXMODE_ALPHATEST_MASK	= 0x30000000
-};
+/// Bit mask to extract the alpha test flag from a mixmode specifier.
+#define CS_MIXMODE_ALPHATEST_MASK (0x30000000)
+/** @} */
 
 /**
  * Helper macro to construct a blending operation mixmode.
@@ -314,94 +310,91 @@ enum
 /// Helper macro to extract the \c dstFactor from a blending op mixmode.
 #define CS_MIXMODE_BLENDOP_DST(mode)	((mode >> 16) & CS_MIXMODE_FACT_MASK)
 
-/**
- * Default mixmodes.
+/**\name Default mixmodes
  * A set of commonly used mix modes.
+ * @{ */
+/**
+ * This mixmode uses alpha smooth blending, binary blending (ie enabled
+ * alpha test) and no blending depending on the contents of 
+ * csRenderMesh::alphaMode.
+ * \remarks For a "true" copy mixmode that just writes the source fragment
+ *   color to the frame buffer, you can use:
+ *   \code
+ *   CS_MIXMODE_BLEND(ONE, ZERO) | CS_MIXMODE_ALPHATEST_DISABLE
+ *   \endcode
  */
-enum
-{
-  /**
-   * This mixmode uses alpha smooth blending, binary blending (ie enabled
-   * alpha test) and no blending depending on the contents of 
-   * csRenderMesh::alphaMode.
-   * \remarks For a "true" copy mixmode that just writes the source fragment
-   *   color to the frame buffer, you can use:
-   *   \code
-   *   CS_MIXMODE_BLEND(ONE, ZERO) | CS_MIXMODE_ALPHATEST_DISABLE
-   *   \endcode
-   */
-  CS_FX_COPY = CS_MIXMODE_TYPE_AUTO | CS_MIXMODE_ALPHATEST_AUTO,
-  /// Multiplicative blending. Formula: <tt>=SRC*DST</tt>
-  CS_FX_MULTIPLY = 
-    CS_MIXMODE_BLEND(DSTCOLOR, ZERO) | CS_MIXMODE_ALPHATEST_DISABLE,
-  /// Multiplicative doubling blending. Formula: <tt>=2*SRC*DST</tt>
-  CS_FX_MULTIPLY2 =
-    (CS_MIXMODE_BLEND(DSTCOLOR, SRCCOLOR) | CS_MIXMODE_ALPHATEST_DISABLE),
-  /// Additive blending. Formula: <tt>=SRC+DST</tt>
-  CS_FX_ADD =
-    (CS_MIXMODE_BLEND(ONE, ONE) | CS_MIXMODE_ALPHATEST_DISABLE),
-  /** 
-   * Alpha blending. Formula: <tt>=(1-srcAlpha)*SRC + srcAlpha*DST</tt>
-   * \remarks Usually used with a non-zero alpha part.
-   *  \see CS_FX_MASK_ALPHA, \see CS_FX_SETALPHA
-   */
-  CS_FX_ALPHA =
-    (CS_MIXMODE_BLEND(SRCALPHA, SRCALPHA_INV) | CS_MIXMODE_ALPHATEST_DISABLE),
-  /**
-   * Transparent blending (keep framebuffer unmodified). 
-   * Formula: <tt>=DST</tt>
-   * \remarks The Z buffer will still be modified!
-   */
-  CS_FX_TRANSPARENT =
-    (CS_MIXMODE_BLEND(ZERO, ONE) | CS_MIXMODE_ALPHATEST_DISABLE),
-  /** 
-   * Multiply source color with destination alpha and add.
-   * Formula: <tt>=(dstalpha)*SRC + DST</tt>
-   */
-  CS_FX_DESTALPHAADD =
-    (CS_MIXMODE_BLEND(DSTALPHA, ONE) | CS_MIXMODE_ALPHATEST_DISABLE),
-  /** 
-   * Multiply source color with source alpha and add.
-   * Formula: <tt>=(srcalpha)*SRC + DST</tt>
-   */
-  CS_FX_SRCALPHAADD =
-    (CS_MIXMODE_BLEND(SRCALPHA, ONE) | CS_MIXMODE_ALPHATEST_DISABLE),
-  /** 
-   * Multiply destination color with inverse source alpha and add source color.
-   * Formula: <tt>=SRC + DST*(1-srcalpha)</tt>
-   * \remarks When the \c SRC alpha component was multiplied into the source
-   *  color, this acts like alpha blending; if it was not, it acts like
-   *  additive blending. Hence, this mixmode can be used to use both additive
-   *  and alpha blending on the same triangle even and interpolate between
-   *  those two "extremes" by appropriate choice of the color and alpha values.
-   */
-  CS_FX_PREMULTALPHA =
-    (CS_MIXMODE_BLEND(ONE, SRCALPHA_INV) | CS_MIXMODE_ALPHATEST_DISABLE),
-  /**
-    * Use the mix mode of the mesh mix mode.
-    * \warning NOT VALID AS MESH MIXMODE - only for shader pass mixmodes.
-    */
-  CS_FX_MESH = CS_MIXMODE_TYPE_MESH,
+#define CS_FX_COPY (CS_MIXMODE_TYPE_AUTO | CS_MIXMODE_ALPHATEST_AUTO)
+/// Multiplicative blending. Formula: <tt>=SRC*DST</tt>
+#define CS_FX_MULTIPLY \
+    (CS_MIXMODE_BLEND(DSTCOLOR, ZERO) | CS_MIXMODE_ALPHATEST_DISABLE)
+/// Multiplicative doubling blending. Formula: <tt>=2*SRC*DST</tt>
+#define CS_FX_MULTIPLY2 \
+    (CS_MIXMODE_BLEND(DSTCOLOR, SRCCOLOR) | CS_MIXMODE_ALPHATEST_DISABLE)
+/// Additive blending. Formula: <tt>=SRC+DST</tt>
+#define CS_FX_ADD \
+    (CS_MIXMODE_BLEND(ONE, ONE) | CS_MIXMODE_ALPHATEST_DISABLE)
+/** 
+ * Alpha blending. Formula: <tt>=(1-srcAlpha)*SRC + srcAlpha*DST</tt>
+ * \remarks Usually used with a non-zero alpha part.
+ *  \see CS_FX_MASK_ALPHA, \see CS_FX_SETALPHA
+ */
+#define CS_FX_ALPHA \
+    (CS_MIXMODE_BLEND(SRCALPHA, SRCALPHA_INV) | CS_MIXMODE_ALPHATEST_DISABLE)
+/**
+ * Transparent blending (keep framebuffer unmodified). 
+ * Formula: <tt>=DST</tt>
+ * \remarks The Z buffer will still be modified!
+ */
+#define CS_FX_TRANSPARENT \
+    (CS_MIXMODE_BLEND(ZERO, ONE) | CS_MIXMODE_ALPHATEST_DISABLE)
+/** 
+ * Multiply source color with destination alpha and add.
+ * Formula: <tt>=(dstalpha)*SRC + DST</tt>
+ */
+#define CS_FX_DESTALPHAADD \
+    (CS_MIXMODE_BLEND(DSTALPHA, ONE) | CS_MIXMODE_ALPHATEST_DISABLE)
+/** 
+ * Multiply source color with source alpha and add.
+ * Formula: <tt>=(srcalpha)*SRC + DST</tt>
+ */
+#define CS_FX_SRCALPHAADD \
+    (CS_MIXMODE_BLEND(SRCALPHA, ONE) | CS_MIXMODE_ALPHATEST_DISABLE)
+/** 
+ * Multiply destination color with inverse source alpha and add source color.
+ * Formula: <tt>=SRC + DST*(1-srcalpha)</tt>
+ * \remarks When the \c SRC alpha component was multiplied into the source
+ *  color, this acts like alpha blending; if it was not, it acts like
+ *  additive blending. Hence, this mixmode can be used to use both additive
+ *  and alpha blending on the same triangle even and interpolate between
+ *  those two "extremes" by appropriate choice of the color and alpha values.
+ */
+#define CS_FX_PREMULTALPHA \
+    (CS_MIXMODE_BLEND(ONE, SRCALPHA_INV) | CS_MIXMODE_ALPHATEST_DISABLE)
+/**
+ * Use the mix mode of the mesh mix mode.
+ * \warning NOT VALID AS MESH MIXMODE - only for shader pass mixmodes.
+ */
+#define CS_FX_MESH (CS_MIXMODE_TYPE_MESH)
   
-  /// Flat shading flag.
-  CS_FX_FLAT = 0x04000000,
-  /**
-   * Mixmode alpha part. 
-   * Values range from 0(opaque) to 255 (transparent) (note that this is the
-   * reverse of the "common" alpha meaning). When this part is non-null, the
-   * renderer will scale the incoming color buffer alpha components by the
-   * (inverse of) this value.
-   * \remarks The scaling may be relatively expensive, it is recommended to
-   *  scale the vertex alpha by other means, e.g. through a vertex program.
-   */
-  CS_FX_MASK_ALPHA = 0x000000FF,
+/// Flat shading flag.
+#define CS_FX_FLAT (0x04000000)
+/**
+ * Mixmode alpha part. 
+ * Values range from 0(opaque) to 255 (transparent) (note that this is the
+ * reverse of the "common" alpha meaning). When this part is non-null, the
+ * renderer will scale the incoming color buffer alpha components by the
+ * (inverse of) this value.
+ * \remarks The scaling may be relatively expensive, it is recommended to
+ *  scale the vertex alpha by other means, e.g. through a vertex program.
+ */
+#define CS_FX_MASK_ALPHA (0x000000FF)
   
-  /**
-   * Bit mask for bits relevant to mix mode comparison; contains type, alpha
-   * test flags and blending op factors.
-   */
-  CS_FX_MASK_MIXMODE = 0xf0ff0000
-};
+/**
+ * Bit mask for bits relevant to mix mode comparison; contains type, alpha
+ * test flags and blending op factors.
+ */
+#define CS_FX_MASK_MIXMODE (0xf0ff0000)
+/** @} */
 
 /// Macro for setting of alpha bits into mixmode (alpha between 0 and 1).
 #define CS_FX_SETALPHA(alpha) \

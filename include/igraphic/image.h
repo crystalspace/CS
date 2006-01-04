@@ -33,33 +33,31 @@
 struct iDataBuffer;
 struct csRGBpixel;
 
-/*
+/**\name Image format masks
  * We can request csImageLoader to load an image in several formats.
  * The format we should use depends on what we want to do with the image;
  * usually if we're going to use the image as a texture, the format we
  * should use is determined by querying the 3D rasterizer for the preferred
  * image format.
+ * @{ */
+/// The mask to separate the image format apart
+#define CS_IMGFMT_MASK (0x0000ffff)
+/// We don't want the pixels at all, just (possibly) the alphamap
+#define CS_IMGFMT_NONE (0x00000000)
+/// Truecolor format (r/g/b/unused per each pixel)
+#define CS_IMGFMT_TRUECOLOR (0x00000001)
+/// 8-bit indexed paletted image
+#define CS_IMGFMT_PALETTED8 (0x00000002)
+/// Autodetect: use whatever format the file is in. Use ONLY for loading.
+#define CS_IMGFMT_ANY (CS_IMGFMT_MASK)
+/// Do we need alpha channel or not
+#define CS_IMGFMT_ALPHA (0x00010000)
+/**
+ * This flag indicates an invalid image format. No image may have this set,
+ * and you may not load images with this flag set.
  */
-enum
-{
-  /// The mask to separate the image format apart
-  CS_IMGFMT_MASK = 0x0000ffff,
-  /// We don't want the pixels at all, just (possibly) the alphamap
-  CS_IMGFMT_NONE = 0x00000000,
-  /// Truecolor format (r/g/b/unused per each pixel)
-  CS_IMGFMT_TRUECOLOR = 0x00000001,
-  /// 8-bit indexed paletted image
-  CS_IMGFMT_PALETTED8 = 0x00000002,
-  /// Autodetect: use whatever format the file is in. Use ONLY for loading.
-  CS_IMGFMT_ANY = CS_IMGFMT_MASK,
-  /// Do we need alpha channel or not
-  CS_IMGFMT_ALPHA = 0x00010000,
-  /**
-  * This flag indicates an invalid image format. No image may have this set,
-  * and you may not load images with this flag set.
-  */
-  CS_IMGFMT_INVALID = 0x80000000
-};
+#define CS_IMGFMT_INVALID (0x80000000)
+/** @} */
 
 /** Type of an image. */
 enum csImageType
