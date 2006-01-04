@@ -435,16 +435,17 @@
 		    "walktest terrainf" exhibits garbled text and CS logo;
 		    curiously fixed by not using a multitexturing setup but
 		    an AFP while drawing.
+      * 2005-12-30: Jorrit reports problems with MOBILITY RADEON X700 Generic,
+		    1.3.5461 (X4.3.0-8.19.10) on Linux
+      * 2006-01-03: Vasily Rudnikov reports corruption and subsequent fix
+		    by this tweak with a Radeon 9600, Win32, 
+		    driver 6.14.10.4517 (Cat 4.8)
       -->
     <rule description="ATI: Use AFP for some 2D drawing">
       <conditions fulfill="all">
 	<regexp string="vendor" pattern="^ATI" />
 	<conditions fulfill="one">
-	  <comparever version="win32_driver" relation="ge 6.14.10.5525" />
-          <!--
-            Problem found with: (MOBILITY RADEON X700 Generic,
-	    1.3.5461 (X4.3.0-8.19.10))
-            -->
+	  <comparever version="win32_driver" relation="ge 6.14.10.4517" />
 	  <regexp string="platform" pattern="Unix" />
 	</conditions>
       </conditions>

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Jan-2006
+	- res updated the driver DB tweak against terrainf corruption on ATIs
+	  to also include older drivers (Cat 4.8, as reported by Vasily 
+	  Rudnikov).
 3-Jan-2006
 	- mdmkolbe fixed build errors in the new event system and a typo
 	  that used button instead of buttonState.
