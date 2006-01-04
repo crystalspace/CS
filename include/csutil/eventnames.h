@@ -465,15 +465,15 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-#define csevPreProcess(reg)	      \
-  (csEventNameRegistry::GetID((reg), "crystalspace.deprecated.preprocess"))
+CS_DEPRECATED_METHOD csEventID csevPreProcess(iObjectRegistry *reg);
+CS_DEPRECATED_METHOD csEventID csevPreProcess(iEventNameRegistry *reg);
 
 /**
  * Broadcasted every frame.
  * This event will go away soon, replaced by csevFrame.
  */
-#define csevProcess(reg)	      \
-  (csEventNameRegistry::GetID((reg), "crystalspace.deprecated.process"))
+CS_DEPRECATED_METHOD csEventID csevProcess(iObjectRegistry *reg);
+CS_DEPRECATED_METHOD csEventID csevProcess(iEventNameRegistry *reg);
 
 /**
  * Broadcasted after csevProcess on every frame.
@@ -482,8 +482,8 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-#define csevPostProcess(reg)	      \
-  (csEventNameRegistry::GetID((reg), "crystalspace.deprecated.postprocess"))
+CS_DEPRECATED_METHOD csEventID csevPostProcess(iObjectRegistry *reg);
+CS_DEPRECATED_METHOD csEventID csevPostProcess(iEventNameRegistry *reg);
 
 /**
  * Broadcasted after csevPostProcess on every frame.
@@ -492,8 +492,8 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-#define csevFinalProcess(reg)	      \
-  (csEventNameRegistry::GetID((reg), "crystalspace.deprecated.finalprocess"))
+CS_DEPRECATED_METHOD csEventID csevFinalProcess(iObjectRegistry *reg);
+CS_DEPRECATED_METHOD csEventID csevFinalProcess(iEventNameRegistry *reg);
 
 /** @} */
 

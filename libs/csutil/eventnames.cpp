@@ -158,3 +158,62 @@ csEventID csevCanvasOp (csRef<iEventNameRegistry> &name_reg,
   return name_reg->GetID (name);
 }
 
+
+
+/*
+  These are only here until they go away, which will be soon.
+*/
+
+
+/**
+ * Broadcasted before csevProcess on every frame.
+ * This event will go away soon, since it was a kludge to
+ * work around the lack of subscription priorities/scheduling.
+ * Should be replaced with subscriptions to csevFrame with subscription 
+ * ordering.
+ */
+CS_DEPRECATED_METHOD csEventID csevPreProcess(iObjectRegistry *reg) {
+  return csEventNameRegistry::GetID((reg), "crystalspace.deprecated.preprocess");
+}
+CS_DEPRECATED_METHOD csEventID csevPreProcess(iEventNameRegistry *reg) {
+  return csEventNameRegistry::GetID((reg), "crystalspace.deprecated.preprocess");
+}
+
+/**
+ * Broadcasted every frame.
+ * This event will go away soon, replaced by csevFrame.
+ */
+CS_DEPRECATED_METHOD csEventID csevProcess(iObjectRegistry *reg) {
+  return csEventNameRegistry::GetID((reg), "crystalspace.deprecated.process");
+}
+CS_DEPRECATED_METHOD csEventID csevProcess(iEventNameRegistry *reg) {
+  return csEventNameRegistry::GetID((reg), "crystalspace.deprecated.process");
+}
+
+/**
+ * Broadcasted after csevProcess on every frame.
+ * This event will go away soon, since it was a kludge to
+ * work around the lack of subscription priorities/scheduling.
+ * Should be replaced with subscriptions to csevFrame with subscription 
+ * ordering.
+ */
+CS_DEPRECATED_METHOD csEventID csevPostProcess(iObjectRegistry *reg) {
+  return csEventNameRegistry::GetID((reg), "crystalspace.deprecated.postprocess");
+}
+CS_DEPRECATED_METHOD csEventID csevPostProcess(iEventNameRegistry *reg) {
+  return csEventNameRegistry::GetID((reg), "crystalspace.deprecated.postprocess");
+}
+
+/**
+ * Broadcasted after csevPostProcess on every frame.
+ * This event will go away soon, since it was a kludge to
+ * work around the lack of subscription priorities/scheduling.
+ * Should be replaced with subscriptions to csevFrame with subscription 
+ * ordering.
+ */
+CS_DEPRECATED_METHOD csEventID csevFinalProcess(iObjectRegistry *reg) {
+  return csEventNameRegistry::GetID((reg), "crystalspace.deprecated.finalprocess");
+}
+CS_DEPRECATED_METHOD csEventID csevFinalProcess(iEventNameRegistry *reg) {
+  return csEventNameRegistry::GetID((reg), "crystalspace.deprecated.finalprocess");
+}
