@@ -159,15 +159,15 @@ struct iSector : public virtual iBase
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 
-  // -- Mesh handling
-
+  /**\name Mesh handling
+   * @{ */
   /// Get the list of meshes in this sector.
   virtual iMeshList* GetMeshes () = 0;
 
   /**
    * Get a set of visible meshes for given camera. These will be cached for
    * a given frame and camera, but if the cached result isn't enough it will
-   * be reculled. The returned pointer is valid as long as the sector exsist
+   * be reculled. The returned pointer is valid as long as the sector exists
    * (the sector will delete it)
    */
   virtual csRenderMeshList* GetVisibleMeshes (iRenderView *) = 0;
@@ -206,9 +206,10 @@ struct iSector : public virtual iBase
    * Remove a mesh callback.
    */
   virtual void RemoveSectorMeshCallback (iSectorMeshCallback* cb) = 0;
+  /** @} */
 
-  // -- Drawing related
-  
+  /**\name Drawing related
+   * @{ */
   /// Draw the sector with the given render view
   virtual void Draw (iRenderView* rview) = 0;
 
@@ -245,9 +246,10 @@ struct iSector : public virtual iBase
    * the default renderloop in the engine will be used.
    */
   virtual iRenderLoop* GetRenderLoop () = 0;
+  /** @} */
 
-  // -- Mesh generator handling.
-
+  /**\name Mesh generator handling
+   * @{ */
   /**
    * Create a mesh generator.
    */
@@ -277,9 +279,10 @@ struct iSector : public virtual iBase
    * Remove all mesh generators.
    */
   virtual void RemoveMeshGenerators () = 0;
+  /** @} */
 
-  // -- Fog handling
-
+  /**\name Fog handling
+   * @{ */
   /// Has this sector fog?
   virtual bool HasFog () const = 0;
   /// Return the fog structure (even if fog is disabled)
@@ -288,9 +291,10 @@ struct iSector : public virtual iBase
   virtual void SetFog (float density, const csColor& color) = 0;
   /// Disable fog in this sector
   virtual void DisableFog () = 0;
+  /** @} */
 
-  // -- Light handling
-
+  /**\name Light handling
+   * @{ */
   /**
    * Get the list of static and pseudo-dynamic lights in this sector.
    */
@@ -315,9 +319,10 @@ struct iSector : public virtual iBase
    * number is increased whenever dynamic ambient changes.
    */
   virtual uint GetDynamicAmbientVersion () const = 0;
+  /** @} */
 
-  // -- Visculling
-
+  /**\name Visculling
+   * @{ */
   /**
    * Calculate the bounding box of all objects in this sector.
    * This function is not very efficient as it will traverse all objects
@@ -390,9 +395,10 @@ struct iSector : public virtual iBase
    */
   virtual iSector* FollowSegment (csReversibleTransform& t,
     csVector3& new_position, bool& mirror, bool only_portals = false) = 0;
+  /** @} */
 
-  // -- Various  
-
+  /**\name Various  
+   * @ { */
   /**
    * Set the sector callback. This will call IncRef() on the callback
    * So make sure you call DecRef() to release your own reference.
@@ -430,6 +436,7 @@ struct iSector : public virtual iBase
    * Remove a light visible callback.
    */
   virtual void RemoveLightVisibleCallback (iLightVisibleCallback* cb) = 0;
+  /** @} */
 };
 
 
