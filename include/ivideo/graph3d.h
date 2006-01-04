@@ -209,12 +209,9 @@ enum csVertexAttrib
   //@}
 };
 
-/**\name Mix modes
+/**\name Mix mode: Types
  * The mix mode specifies how a shaded fragment (denoted as \c SRC) is mixed 
  * (or \e blended) with the framebuffer fragment (\c DST).
- * @{ */
-
-/**\name Mix mode types
  * @{ */
 /**
  * Automatic blending mode. Whether the texture is alpha-blended or not is 
@@ -241,7 +238,7 @@ enum csVertexAttrib
 #define CS_MIXMODE_TYPE_MASK (0xc0000000)
 /** @} */
 
-/// Blending op mix mode factors
+/// Mix mode: Blending op factors
 enum
 {
   /// 0
@@ -272,7 +269,7 @@ enum
   CS_MIXMODE_FACT_MASK		= 0xf
 };
 
-/**\name Alpha test flags.
+/**\name Mix mode: Alpha test flags
  * Enabled alpha test (or <i>binary alpha</i>) means that a fragment is only
  * drawn when its alpha component is above a certain threshold, and discarded
  * otherwise.
@@ -292,8 +289,10 @@ enum
 #define CS_MIXMODE_ALPHATEST_MASK (0x30000000)
 /** @} */
 
+/**\name Mix mode: Blending mode helpers
+ * @{ */
 /**
- * Helper macro to construct a blending operation mixmode.
+ * Helper macro to construct a blending operation mixmode
  * \a Src and \a Dst are 
  * \link #CS_MIXMODE_FACT_ZERO blending op factors \endlink, however sans the
  * CS_MIXMODE_FACT_ prefix. E.g.:
@@ -309,8 +308,9 @@ enum
 #define CS_MIXMODE_BLENDOP_SRC(mode)	((mode >> 20) & CS_MIXMODE_FACT_MASK)
 /// Helper macro to extract the \c dstFactor from a blending op mixmode.
 #define CS_MIXMODE_BLENDOP_DST(mode)	((mode >> 16) & CS_MIXMODE_FACT_MASK)
+/** @} */
 
-/**\name Default mixmodes
+/**\name Mix mode: Default modes
  * A set of commonly used mix modes.
  * @{ */
 /**
@@ -396,12 +396,15 @@ enum
 #define CS_FX_MASK_MIXMODE (0xf0ff0000)
 /** @} */
 
+/**\name Mix mode: alpha helpers
+ * @{ */
 /// Macro for setting of alpha bits into mixmode (alpha between 0 and 1).
 #define CS_FX_SETALPHA(alpha) \
   (CS_FX_ALPHA | uint ((alpha) * CS_FX_MASK_ALPHA))
 /// Macro for setting of alpha bits into mixmode (alpha between 0 and 255).
 #define CS_FX_SETALPHA_INT(alpha) \
   (CS_FX_ALPHA | uint ((alpha) & CS_FX_MASK_ALPHA))
+/** @} */
 
 /**
  * Describes how to deal with alpha values in textures.
