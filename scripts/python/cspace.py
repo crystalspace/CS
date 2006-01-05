@@ -9069,6 +9069,14 @@ csevJoystickOp = _cspace.csevJoystickOp
 
 csevCanvasOp = _cspace.csevCanvasOp
 
+csevPreProcess = _cspace.csevPreProcess
+
+csevProcess = _cspace.csevProcess
+
+csevPostProcess = _cspace.csevPostProcess
+
+csevFinalProcess = _cspace.csevFinalProcess
+
 iEventHandler_scfGetVersion = _cspace.iEventHandler_scfGetVersion
 
 class iPluginIterator(iBase):
@@ -10008,14 +10016,6 @@ CS_MIXMODE_ALPHATEST_ENABLE = _cspace.CS_MIXMODE_ALPHATEST_ENABLE
 CS_MIXMODE_ALPHATEST_DISABLE = _cspace.CS_MIXMODE_ALPHATEST_DISABLE
 CS_MIXMODE_ALPHATEST_MASK = _cspace.CS_MIXMODE_ALPHATEST_MASK
 CS_FX_COPY = _cspace.CS_FX_COPY
-CS_FX_MULTIPLY = _cspace.CS_FX_MULTIPLY
-CS_FX_MULTIPLY2 = _cspace.CS_FX_MULTIPLY2
-CS_FX_ADD = _cspace.CS_FX_ADD
-CS_FX_ALPHA = _cspace.CS_FX_ALPHA
-CS_FX_TRANSPARENT = _cspace.CS_FX_TRANSPARENT
-CS_FX_DESTALPHAADD = _cspace.CS_FX_DESTALPHAADD
-CS_FX_SRCALPHAADD = _cspace.CS_FX_SRCALPHAADD
-CS_FX_PREMULTALPHA = _cspace.CS_FX_PREMULTALPHA
 CS_FX_MESH = _cspace.CS_FX_MESH
 CS_FX_FLAT = _cspace.CS_FX_FLAT
 CS_FX_MASK_ALPHA = _cspace.CS_FX_MASK_ALPHA
@@ -13426,14 +13426,6 @@ csevFrame = _cspace.csevFrame
 csevInput = _cspace.csevInput
 
 csevQuit = _cspace.csevQuit
-
-csevProcess = _cspace.csevProcess
-
-csevPreProcess = _cspace.csevPreProcess
-
-csevPostProcess = _cspace.csevPostProcess
-
-csevFinalProcess = _cspace.csevFinalProcess
 
 csevKeyboardEvent = _cspace.csevKeyboardEvent
 
