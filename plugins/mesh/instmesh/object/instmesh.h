@@ -145,7 +145,7 @@ private:
 
   csColor4* lit_fact_colors;
   // Should be equal to factory number times the number of instances.
-  int num_lit_fact_colors;
+  size_t num_lit_fact_colors;
   csColor4* static_fact_colors;
 
   csVector3 radius;
@@ -580,7 +580,7 @@ public:
   void AddVertex (const csVector3& v,
       const csVector2& uv, const csVector3& normal,
       const csColor4& color);
-  int GetVertexCount () const { return fact_vertices.Length (); }
+  int GetVertexCount () const { return (int)fact_vertices.Length (); }
   const csVector3* GetVertices ()
   {
     return fact_vertices.GetArray ();
