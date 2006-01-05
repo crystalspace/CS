@@ -77,6 +77,10 @@ package cspace;
 *csevJoystick = *cspacec::csevJoystick;
 *csevJoystickOp = *cspacec::csevJoystickOp;
 *csevCanvasOp = *cspacec::csevCanvasOp;
+*csevPreProcess = *cspacec::csevPreProcess;
+*csevProcess = *cspacec::csevProcess;
+*csevPostProcess = *cspacec::csevPostProcess;
+*csevFinalProcess = *cspacec::csevFinalProcess;
 *csLoadPluginAlways = *cspacec::csLoadPluginAlways;
 *csGetShaderVariableFromStack = *cspacec::csGetShaderVariableFromStack;
 *csfxInterference = *cspacec::csfxInterference;
@@ -98,10 +102,6 @@ package cspace;
 *csevFrame = *cspacec::csevFrame;
 *csevInput = *cspacec::csevInput;
 *csevQuit = *cspacec::csevQuit;
-*csevProcess = *cspacec::csevProcess;
-*csevPreProcess = *cspacec::csevPreProcess;
-*csevPostProcess = *cspacec::csevPostProcess;
-*csevFinalProcess = *cspacec::csevFinalProcess;
 *csevKeyboardEvent = *cspacec::csevKeyboardEvent;
 *csevKeyboardDown = *cspacec::csevKeyboardDown;
 *csevKeyboardUp = *cspacec::csevKeyboardUp;
@@ -15197,14 +15197,6 @@ sub CS_MIXMODE_ALPHATEST_ENABLE () { $cspacec::CS_MIXMODE_ALPHATEST_ENABLE }
 sub CS_MIXMODE_ALPHATEST_DISABLE () { $cspacec::CS_MIXMODE_ALPHATEST_DISABLE }
 sub CS_MIXMODE_ALPHATEST_MASK () { $cspacec::CS_MIXMODE_ALPHATEST_MASK }
 sub CS_FX_COPY () { $cspacec::CS_FX_COPY }
-sub CS_FX_MULTIPLY () { $cspacec::CS_FX_MULTIPLY }
-sub CS_FX_MULTIPLY2 () { $cspacec::CS_FX_MULTIPLY2 }
-sub CS_FX_ADD () { $cspacec::CS_FX_ADD }
-sub CS_FX_ALPHA () { $cspacec::CS_FX_ALPHA }
-sub CS_FX_TRANSPARENT () { $cspacec::CS_FX_TRANSPARENT }
-sub CS_FX_DESTALPHAADD () { $cspacec::CS_FX_DESTALPHAADD }
-sub CS_FX_SRCALPHAADD () { $cspacec::CS_FX_SRCALPHAADD }
-sub CS_FX_PREMULTALPHA () { $cspacec::CS_FX_PREMULTALPHA }
 sub CS_FX_MESH () { $cspacec::CS_FX_MESH }
 sub CS_FX_FLAT () { $cspacec::CS_FX_FLAT }
 sub CS_FX_MASK_ALPHA () { $cspacec::CS_FX_MASK_ALPHA }
