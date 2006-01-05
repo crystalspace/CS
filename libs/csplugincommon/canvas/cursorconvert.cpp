@@ -25,7 +25,7 @@
 #include "cstool/debugimagewriter.h"
 #include "igraphic/imageio.h"
 
-#define DEBUG_WRITE_IMAGES
+//#define DEBUG_WRITE_IMAGES
 
 static inline int rgb_dist (int tR, int tG, int tB, int sR, int sG, int sB)
 {
