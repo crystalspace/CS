@@ -187,7 +187,7 @@ bool csUnloadLibrary (csLibraryHandle Handle)
 #endif
 }
 
-void csPrintLibraryError (const char *iModule)
+void csPrintLibraryError (const char* /*iModule*/)
 {
   char *str;
   while (ErrorMessages.Length () > 0)

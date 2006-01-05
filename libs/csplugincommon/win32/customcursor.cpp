@@ -84,7 +84,8 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateMonoCursor (
 HCURSOR csWin32CustomCursors::GetMouseCursor (iImage* image, 
 					      const csRGBcolor* keycolor, 
 					      int hotspot_x, int hotspot_y, 
-					      csRGBcolor fg, csRGBcolor bg)
+					      csRGBcolor /*fg*/, 
+					      csRGBcolor /*bg*/)
 {
   CachedCursor cursor;
   const char* cacheName = image->GetName();
@@ -116,7 +117,7 @@ static HBITMAP CreateCursorBitmapXP (HDC hDC, const BITMAPINFO* bitmapInfo,
 }
 
 static HBITMAP CreateCursorBitmapOther (HDC hDC, const BITMAPINFO* bitmapInfo,
-                                         DWORD dibFlags, const void* data)
+                                         DWORD /*dibFlags*/, const void* data)
 {
   HDC memDC = CreateCompatibleDC (hDC);
   HBITMAP bm = CreateCompatibleBitmap (hDC, bitmapInfo->bmiHeader.biWidth,

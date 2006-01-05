@@ -286,7 +286,8 @@ namespace cspluginSoftshader
       return proc != 0;
     }
     bool SetupTriangle (SoftwareTexture** textures, 
-      const RenderInfoMesh& renderInfoMesh, RenderInfoTriangle& renderInfoTri)
+      const RenderInfoMesh& /*renderInfoMesh*/, 
+      RenderInfoTriangle& renderInfoTri)
     {
       renderInfoTri.denormBuffers = 0;
       
