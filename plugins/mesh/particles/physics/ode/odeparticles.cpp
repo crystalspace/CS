@@ -312,6 +312,7 @@ void csODEParticlePhysics::Execute (float stepsize)
 
 bool csODEParticlePhysics::HandleEvent (iEvent &event)
 {
+  (void) event; // unused except for this assert so silence the warning
   CS_ASSERT(event.Name == PreProcess);
   
   for (size_t i = 0; i < partobjects.Length(); i ++)

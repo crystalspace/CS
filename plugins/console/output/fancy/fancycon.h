@@ -153,7 +153,7 @@ public:
 	return 0;
       }
     }
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, csEventID e) const { return 0; }
+    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &, csEventID) const { return 0; }
     
     CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
 

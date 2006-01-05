@@ -87,7 +87,7 @@ awsManager2::SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d)
  ***************** Event Handling ************************************
  ********************************************************************/
 
-bool awsManager2::HandleEvent (iEvent &Event)
+bool awsManager2::HandleEvent (iEvent &)
 {  
   // Do nothing
   return false;

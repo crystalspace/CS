@@ -1176,6 +1176,8 @@ void csDynaVis::AppendWriteQueue (iVisibilityObject* visobj,
 	    depth, (int)obj->hint_goodoccluder);
     }
   }
+# else
+  (void)visobj; // Avoid an unused parameter warning
 # endif
 }
 

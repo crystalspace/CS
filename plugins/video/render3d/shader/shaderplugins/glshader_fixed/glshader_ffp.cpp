@@ -353,6 +353,8 @@ void csGLShaderFFP::DumpTexFunc (const mtexlayer::TexFunc& tf)
   opStr = csOpenGLEnums.StringForIdent (tf.op);
   if (opStr.IsEmpty()) opStr.Format ("%.4x", tf.op);
   csPrintf (" %s %f\n\n", opStr.GetData(), tf.scale);
+#else
+  (void) tf; // unused except for the above block so silence the warning
 #endif
 }
 

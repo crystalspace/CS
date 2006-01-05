@@ -66,6 +66,8 @@ static void TestMapping (const char* str)
     MapString (str, &csUnicodeTransform::MapToUpper).GetData(),
     MapString (str, &csUnicodeTransform::MapToLower).GetData(),
     MapString (str, &csUnicodeTransform::MapToFold).GetData());
+#else
+  (void) str; // unused except for the above block so silence the warning
 #endif // TEST_UNICODE_MAPPINGS
 }
 

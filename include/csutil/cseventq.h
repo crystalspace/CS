@@ -276,9 +276,9 @@ public:
     }
     CS_EVENTHANDLER_NAMES("crystalspace.frame.preprocess")
     CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
-    	csRef<iEventHandlerRegistry> &r1,
-	csRef<iEventNameRegistry> &r2,
-	csEventID e) const
+    	csRef<iEventHandlerRegistry> &,
+	csRef<iEventNameRegistry> &,
+	csEventID) const
     {
       return 0;
     }
@@ -311,9 +311,9 @@ public:
     }
     CS_EVENTHANDLER_NAMES("crystalspace.frame.process")
     CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
-    	csRef<iEventHandlerRegistry> &r1,
-	csRef<iEventNameRegistry> &r2,
-	csEventID e) const
+    	csRef<iEventHandlerRegistry> &,
+	csRef<iEventNameRegistry> &,
+	csEventID) const
     {
       return 0;
     }
@@ -346,9 +346,9 @@ public:
     }
     CS_EVENTHANDLER_NAMES("crystalspace.frame.postprocess")
     CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
-    	csRef<iEventHandlerRegistry> &r1,
-	csRef<iEventNameRegistry> &r2,
-	csEventID e) const 
+    	csRef<iEventHandlerRegistry> &,
+	csRef<iEventNameRegistry> &,
+	csEventID) const 
     {
       return 0;
     }
@@ -381,16 +381,16 @@ public:
     }
     CS_EVENTHANDLER_NAMES("crystalspace.frame.finalprocess")
     CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
-    	csRef<iEventHandlerRegistry> &r1,
-	csRef<iEventNameRegistry> &r2,
-	csEventID e) const
+    	csRef<iEventHandlerRegistry> &,
+	csRef<iEventNameRegistry> &,
+	csEventID) const
     {
       return 0;
     }
     CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
-    	csRef<iEventHandlerRegistry> &r1,
-	csRef<iEventNameRegistry> &r2,
-	csEventID e) const
+    	csRef<iEventHandlerRegistry> &,
+	csRef<iEventNameRegistry> &,
+	csEventID) const
     {
       return 0;
     }

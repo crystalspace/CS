@@ -560,12 +560,12 @@ int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show)\
 
 #if !defined(CS_IMPLEMENT_PLATFORM_PLUGIN)
 #define CS_IMPLEMENT_PLATFORM_PLUGIN                                   \
-int _cs_main(int argc, char* argv[])                                   \
+int _cs_main(int /*argc*/, char* /*argv*/[])                           \
 {                                                                      \
          return 0;                                                     \
 }                                                                      \
 extern "C" BOOL WINAPI                                                 \
-DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/)  \
+DllMain (HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/, LPVOID /*lpvReserved*/) \
 {                                                                      \
           return TRUE;                                                 \
 }                                                                      \

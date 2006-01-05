@@ -88,6 +88,7 @@ bool csProcTexEventHandler::HandleEvent (iEvent& event)
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
   csSet<csPtrKey<csProcTexture> > keep_tex;
+  (void) event; // unused except for this assert so silence the warning
   CS_ASSERT(event.Name == csevPreProcess(object_reg));
   {
     {
