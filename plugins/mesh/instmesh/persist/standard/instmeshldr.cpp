@@ -387,14 +387,14 @@ bool csInstFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     numvtNode->SetValue("numvt");
     numvtNode->CreateNodeBefore(CS_NODE_TEXT, 0)
-      ->SetValueAsInt(gfact->GetVertexCount());
+      ->SetValueAsInt((int)gfact->GetVertexCount());
 
     //Write NumTri Tag
     csRef<iDocumentNode> numtriNode = 
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     numtriNode->SetValue("numtri");
     numtriNode->CreateNodeBefore(CS_NODE_TEXT, 0)
-      ->SetValueAsInt(gfact->GetTriangleCount());
+      ->SetValueAsInt((int)gfact->GetTriangleCount());
 
     size_t i;
     //Write Vertex Tags
