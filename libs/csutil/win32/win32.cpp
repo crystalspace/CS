@@ -365,7 +365,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (r, iCommandLineParser));
   console_window = cmdline->GetBoolOption ("console", console_window);
 
-  cmdline_help_wanted = cmdline->GetOption ("help");
+  cmdline_help_wanted = (cmdline->GetOption ("help") != 0);
 
   /*
      to determine if we are actually a console app we look up

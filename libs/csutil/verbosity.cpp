@@ -164,7 +164,7 @@ bool csVerbosityParser::TestFlag(Str name, bool& enable) const
   csStringID const b = flags.Request(name.GetDataSafe());
   bool const ok = (b != csInvalidStringID);
   if (ok)
-    enable = (bool)b;
+    enable = (b != 0);
   return ok;
 }
 

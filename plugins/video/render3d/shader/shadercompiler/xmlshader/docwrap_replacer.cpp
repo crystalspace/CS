@@ -59,7 +59,7 @@ void csReplacerDocumentNode::Set (iDocumentNode* wrappedNode,
 
 bool csReplacerDocumentNode::Equals (iDocumentNode* other)
 {
-  return (csReplacerDocumentNode*)other->Equals (wrappedNode);
+  return ((csReplacerDocumentNode*)other)->Equals (wrappedNode);
 }
 
 csRef<iDocumentNodeIterator> csReplacerDocumentNode::GetNodes ()

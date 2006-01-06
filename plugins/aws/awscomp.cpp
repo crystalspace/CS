@@ -128,7 +128,7 @@ bool awsComponent::IsMaximized()
 
 bool awsComponent::isHidden ()
 {
-  return self->Flags () & AWSF_CMP_HIDDEN;
+  return (self->Flags () & AWSF_CMP_HIDDEN) != 0;
 }
 
 void awsComponent::SetFocusable (bool _focusable)
@@ -143,12 +143,12 @@ bool awsComponent::Focusable ()
 
 bool awsComponent::isFocused ()
 {
-  return self->Flags () & AWSF_CMP_FOCUSED;
+  return (self->Flags () & AWSF_CMP_FOCUSED) != 0;
 }
 
 bool awsComponent::isDeaf ()
 {
-  return self->Flags () & AWSF_CMP_DEAF;
+  return (self->Flags () & AWSF_CMP_DEAF) != 0;
 }
 
 void awsComponent::SetFlag (unsigned int flag)

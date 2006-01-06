@@ -83,7 +83,7 @@ csWinMutex::~csWinMutex ()
 bool csWinMutex::Destroy ()
 {
   bool rc;
-  CS_TEST (rc = CloseHandle (mutex));
+  CS_TEST (rc = (CloseHandle (mutex) == TRUE));
   return rc;
 }
 
@@ -104,7 +104,7 @@ bool csWinMutex::LockTry ()
 bool csWinMutex::Release ()
 {
   bool rc;
-  CS_TEST (rc = ReleaseMutex (mutex));
+  CS_TEST (rc = (ReleaseMutex (mutex) == TRUE));
   return rc;
 }
 
@@ -160,7 +160,7 @@ bool csWinSemaphore::LockTry ()
 bool csWinSemaphore::Release ()
 {
   bool rc;
-  CS_TEST (rc = ReleaseSemaphore (sem, 1, &value));
+  CS_TEST (rc = (ReleaseSemaphore (sem, 1, &value) == TRUE));
   if (rc)
     value++;
   return rc;
@@ -174,7 +174,7 @@ uint32 csWinSemaphore::Value ()
 bool csWinSemaphore::Destroy ()
 {
   bool rc;
-  CS_TEST (rc = CloseHandle (sem));
+  CS_TEST (rc = (CloseHandle (sem) == TRUE));
   return rc;
 }
 
@@ -204,7 +204,7 @@ csWinCondition::~csWinCondition ()
 void csWinCondition::Signal (bool /*WakeAll*/)
 {
   // only releases one waiting thread, coz its auto-reset
-  CS_TEST (PulseEvent (cond));
+  CS_TEST (PulseEvent (cond) == TRUE);
 }
 
 bool csWinCondition::Wait (csMutex* mutex, csTicks timeout)
@@ -226,7 +226,7 @@ bool csWinCondition::LockWait (DWORD nMilliSec)
 bool csWinCondition::Destroy ()
 {
   bool rc;
-  CS_TEST (rc = CloseHandle (cond));
+  CS_TEST (rc = (CloseHandle (cond) == TRUE));
   return rc;
 }
 

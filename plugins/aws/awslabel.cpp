@@ -55,7 +55,7 @@ bool awsLabel::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   int _focusable = 0;
   pm->GetInt (settings, "Focusable", _focusable);
-	focusable = _focusable;
+  focusable = (_focusable != 0);
 
   return true;
 }

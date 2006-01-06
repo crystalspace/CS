@@ -206,7 +206,7 @@ bool csWaterDemo::HandleEvent (iEvent& ev)
 {
   if (ev.Name == FocusGained)
   {
-    hasfocus = (bool)csCommandEventHelper::GetInfo(&ev);
+    hasfocus = (csCommandEventHelper::GetInfo(&ev) != 0);
     CS_ASSERT(hasfocus == true);
     int w = r3d->GetDriver2D ()->GetWidth ()/2;
     int h = r3d->GetDriver2D ()->GetHeight ()/2;
@@ -215,7 +215,7 @@ bool csWaterDemo::HandleEvent (iEvent& ev)
   }
   else if (ev.Name == FocusLost)
   {
-    hasfocus = (bool)csCommandEventHelper::GetInfo(&ev);
+    hasfocus = (csCommandEventHelper::GetInfo(&ev) != 0);
     CS_ASSERT(hasfocus == false);
     r3d->GetDriver2D()->SetMouseCursor (csmcArrow);
   }

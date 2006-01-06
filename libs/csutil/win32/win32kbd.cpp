@@ -443,14 +443,14 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
 	    bool lshiftDown, rshiftDown;
             if (cswinIsWinNT())
             {
-              lshiftDown = ::GetKeyState (VK_LSHIFT) & 0x8000;
-              rshiftDown = ::GetKeyState (VK_RSHIFT) & 0x8000;
+              lshiftDown = (::GetKeyState (VK_LSHIFT) & 0x8000) != 0;
+              rshiftDown = (::GetKeyState (VK_RSHIFT) & 0x8000) != 0;
             }
             else
             {
               /* @@@ Bah. Win9x can't really distinguish between left and right shift.
                 Can't help it. Only emit LShift in all cases. */
-              lshiftDown = ::GetKeyState (VK_SHIFT) & 0x8000;
+              lshiftDown = (::GetKeyState (VK_SHIFT) & 0x8000) != 0;
               rshiftDown = false;
             }
 

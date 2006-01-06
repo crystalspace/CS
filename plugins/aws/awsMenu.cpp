@@ -171,7 +171,7 @@ bool awsMenuEntry::SetProperty (const char *name, intptr_t parm)
   }
   else if (strcmp (name, "Selected") == 0)
   {
-    selected = (bool)parm;
+    selected = (parm != 0);
     return true;
   }
   else if (strcmp (name, "UserParam") == 0)

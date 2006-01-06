@@ -58,7 +58,7 @@ static int _cs_fputs (const char* string, FILE* stream)
   UINT cp = CP_ACP;
   HANDLE hCon = 0; 
   WORD textAttr = 0, oldAttr = 0;
-  bool isTTY = _isatty (_fileno (stream));
+  bool isTTY = (_isatty (_fileno (stream)) != 0);
   if (isTTY) 
   {
     cp = GetConsoleOutputCP ();

@@ -183,10 +183,10 @@ struct BoxTestBbox
       ClipEdges |= 8, ClipCount++;
   }
 
-  bool ClipMinX() const { return ClipEdges & 1; }
-  bool ClipMaxX() const { return ClipEdges & 2; }
-  bool ClipMinY() const { return ClipEdges & 4; }
-  bool ClipMaxY() const { return ClipEdges & 8; }
+  bool ClipMinX() const { return (ClipEdges & 1) != 0; }
+  bool ClipMaxX() const { return (ClipEdges & 2) != 0; }
+  bool ClipMinY() const { return (ClipEdges & 4) != 0; }
+  bool ClipMaxY() const { return (ClipEdges & 8) != 0; }
   size_t GetClipCount() const { return ClipCount; }
 };
 

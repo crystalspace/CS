@@ -374,7 +374,7 @@ public:
   {
     if (writeable)
     {
-      value = (bool)_value->toInt().Value();
+      value = (_value->toInt().Value() != 0);
       Changed(name, this);
       return true;
     }

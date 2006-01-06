@@ -489,7 +489,7 @@ void csGraphics2DGLCommon::DrawLine (
 
   // prepare for 2D drawing--so we need no fancy GL effects!
   statecache->Disable_GL_TEXTURE_2D ();
-  bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
+  bool gl_alphaTest = (glIsEnabled(GL_ALPHA_TEST) == GL_TRUE);
   if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
   setGLColorfromint (color);
 
@@ -614,7 +614,7 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
   data += 4*(x-orig_x);
 
   statecache->Disable_GL_TEXTURE_2D ();
-  bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
+  bool gl_alphaTest = (glIsEnabled(GL_ALPHA_TEST) == GL_TRUE);
   if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
 
   glColor3f (0., 0., 0.);
@@ -682,7 +682,7 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
     return 0;
   }
   statecache->Disable_GL_TEXTURE_2D ();
-  bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
+  bool gl_alphaTest = (glIsEnabled(GL_ALPHA_TEST) == GL_TRUE);
   if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
   //csGLStates::Disable_GL_DITHER ();
   GLenum format, type;
@@ -717,7 +717,7 @@ void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
   ((csGLFontCache*)fontCache)->FlushText ();
 
   statecache->Disable_GL_TEXTURE_2D ();
-  bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
+  bool gl_alphaTest = (glIsEnabled(GL_ALPHA_TEST) == GL_TRUE);
   if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
   //csGLStates::Disable_GL_DITHER ();
   if (Area)

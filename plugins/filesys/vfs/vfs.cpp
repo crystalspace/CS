@@ -704,7 +704,7 @@ bool DiskFile::AtEOF ()
 {
   if (file)
   {
-    return feof (file);
+    return (feof (file) != 0);
   }
   else
   {

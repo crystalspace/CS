@@ -1406,7 +1406,7 @@ csInstmeshMeshObjectFactory::csInstmeshMeshObjectFactory (
 
   csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
   	object_reg, iCommandLineParser);
-  do_fullbright = cmdline->GetOption ("fullbright");
+  do_fullbright = (cmdline->GetOption ("fullbright") != 0);
 }
 
 csInstmeshMeshObjectFactory::~csInstmeshMeshObjectFactory ()

@@ -1565,7 +1565,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   glPushMatrix ();
   glMultMatrixf (matrix);
 
-  if ((needColorFixup = (modes.mixmode & CS_FX_MASK_ALPHA)))
+  needColorFixup = (modes.mixmode & CS_FX_MASK_ALPHA) != 0;
+  if (needColorFixup)
     alphaScale = 1.0f - (modes.mixmode & CS_FX_MASK_ALPHA) / 255.0f;
   ApplyBufferChanges();
 

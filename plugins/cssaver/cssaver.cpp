@@ -202,12 +202,12 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       }
     }
   
-    synldr->WriteBool (child, "for2d", texWrap->GetFlags () & CS_TEXTURE_2D, false);
-    synldr->WriteBool (child, "for3d", texWrap->GetFlags () & CS_TEXTURE_3D, true);
-    synldr->WriteBool (child, "mipmap", !(texWrap->GetFlags () & CS_TEXTURE_NOMIPMAPS), true);
-    synldr->WriteBool (child, "dither", texWrap->GetFlags () & CS_TEXTURE_DITHER, false);
-    synldr->WriteBool (child, "clamp", texWrap->GetFlags () & CS_TEXTURE_CLAMP, false);
-    synldr->WriteBool (child, "filter", !(texWrap->GetFlags () & CS_TEXTURE_NOFILTER), true);
+    synldr->WriteBool (child, "for2d", (texWrap->GetFlags () & CS_TEXTURE_2D) != 0, false);
+    synldr->WriteBool (child, "for3d", (texWrap->GetFlags () & CS_TEXTURE_3D) != 0, true);
+    synldr->WriteBool (child, "mipmap", (texWrap->GetFlags () & CS_TEXTURE_NOMIPMAPS) == 0, true);
+    synldr->WriteBool (child, "dither", (texWrap->GetFlags () & CS_TEXTURE_DITHER) != 0, false);
+    synldr->WriteBool (child, "clamp", (texWrap->GetFlags () & CS_TEXTURE_CLAMP) != 0, false);
+    synldr->WriteBool (child, "filter", (texWrap->GetFlags () & CS_TEXTURE_NOFILTER) == 0, true);
     synldr->WriteBool (child, "keepimage", texWrap->KeepImage (), false);
 
     const char* texClass = texWrap->GetTextureClass();

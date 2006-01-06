@@ -34,27 +34,26 @@ class csReversibleTransform;
 class csVector2;
 class csVector3;
 
-SCF_VERSION (iBugPlugRenderObject, 0, 0, 1);
-
 /**
  * An application/module can implement this interface to render something.
  * BugPlug can call the render function when it decides it is time to
  * render the object.
  */
-struct iBugPlugRenderObject : public iBase
+struct iBugPlugRenderObject : public virtual iBase
 {
+  SCF_INTERFACE(iBugPlugRenderObject, 2,0,0);
   /// Render.
   virtual void Render (iGraphics3D* g3d, iBugPlug* bugplug) = 0;
 };
 
-SCF_VERSION (iBugPlug, 0, 0, 3);
 
 /**
  * Using this interface you can communicate with the BugPlug plugin.
  * This can be useful for specialized debugging operations.
  */
-struct iBugPlug : public iBase
+struct iBugPlug : public virtual iBase
 {
+  SCF_INTERFACE(iBugPlug,2,0,0);
   //=========================================================================
 
   /**

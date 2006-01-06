@@ -93,18 +93,6 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csBugPlug)
 
 
-SCF_IMPLEMENT_IBASE (csBugPlug)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iBugPlug)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBugPlug::BugPlug)
-  SCF_IMPLEMENTS_INTERFACE (iBugPlug)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csBugPlug::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
 
 void csBugPlug::Report (int severity, const char* msg, ...)
 {
@@ -122,9 +110,8 @@ void csBugPlug::Report (int severity, const char* msg, ...)
 }
 
 csBugPlug::csBugPlug (iBase *iParent)
-{
-  SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBugPlug);
+  : scfImplementationType (this, iParent)
+{  
   object_reg = 0;
   mappings = 0;
   visculler = 0;
@@ -195,8 +182,6 @@ csBugPlug::~csBugPlug ()
   delete spider;
   delete shadow;
 
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiBugPlug);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBugPlug::Initialize (iObjectRegistry *object_reg)
@@ -595,7 +580,7 @@ void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
 {
   if (!G3D) return;
   bool v;
-  v = G3D->GetRenderState (op);
+  v = (G3D->GetRenderState (op) != 0);
   v = !v;
   if (G3D->SetRenderState (op, v))
   {
@@ -1076,7 +1061,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	  if (Engine && (Engine->GetBeginDrawFlags () & CSDRAW_CLEARSCREEN))
 	    break;
 	  bool v;
-	  v = G3D->GetRenderState (G3DRENDERSTATE_EDGES);
+	  v = (G3D->GetRenderState (G3DRENDERSTATE_EDGES) != 0);
 	  if (v && !do_clear) do_clear = true;
 	}
         break;
@@ -1648,7 +1633,7 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     G3D->BeginDraw (CSDRAW_2DGRAPHICS |
     	(debug_view.clear ? CSDRAW_CLEARSCREEN : 0));
     if (debug_view.object)
-      debug_view.object->Render (G3D, &scfiBugPlug);
+      debug_view.object->Render (G3D, this);
     int pointcol = G2D->FindRGB (255, 255, 0);
     int linecol = G2D->FindRGB (255, 255, 255);
     int i;

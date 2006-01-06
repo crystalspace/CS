@@ -233,8 +233,8 @@ end_detect:
     : "eax", "ebx", "ecx", "edx", "esi");
 
     #endif //CS_COMPILER_MSVC/GCC
-    mmxSupported = capFlags & (1<<23);
-    sseSupported = capFlags & (1<<25);
+    mmxSupported = (capFlags & (1<<23)) != 0;
+    sseSupported = (capFlags & (1<<25)) != 0;
     //AMD3dnowSupported = capFlags & (1<<31);
   }
 #else //CS_PROCESSOR_X86

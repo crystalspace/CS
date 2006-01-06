@@ -150,7 +150,7 @@ static bool csASEReadWord (csFileReadHelper &str, char *buf, int max)
 
   while (count < max-1) {
     int c = str.GetChar ();
-    bool Finished = quoted ? (c == '"') : (isspace (c));
+    bool Finished = quoted ? (c == '"') : (isspace (c) != 0);
     if (c == EOF || Finished) break;
     buf [count] = c;
     count++;

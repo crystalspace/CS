@@ -89,7 +89,7 @@ struct litKDTreeNodeH
 
   static bool GetFlag (const litKDTreeNode *node)
   {
-    return node->leaf.flagAndOffset & 0x4;
+    return (node->leaf.flagAndOffset & 0x4) != 0;
   }
 
   static void SetDimension (litKDTreeNode *node, uint dim)

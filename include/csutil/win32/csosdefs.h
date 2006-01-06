@@ -38,7 +38,7 @@
   //#pragma warning(disable:4102)   // 'label' : unreferenced label
   //#pragma warning(disable:4146)   /* unary minus operator applied to unsigned 
   //                                 * type, result still unsigned */
-  #pragma warning(disable:4201)   // VC6: structure/ union without name.
+  //#pragma warning(disable:4201)   // VC6: structure/ union without name.
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
   #pragma warning(disable:4250)   // '...' inherits '..' via dominance
   //#pragma warning(disable:4251)   /* class needs to have dll-interface to be 
@@ -60,35 +60,15 @@
   //#pragma warning(disable:4702)   // Unreachable Code
   //#pragma warning(disable:4706)   // Assignment in conditional expression
   //#pragma warning(disable:4710)   // function not inlined
-  #pragma warning(disable:4711)   /* function 'function' selected for inline 
-				   * expansion */
-  #pragma warning(disable:4786)   /* VC6: identifier was truncated to '255' 
-				   * characters in the browser information */
-  #pragma warning(disable:4800)   // Forcing value to bool
+//  #pragma warning(disable:4711)   /* function 'function' selected for inline 
+//				   * expansion */
+//  #pragma warning(disable:4786)   /* VC6: identifier was truncated to '255'
+//				   * characters in the browser information */
+//  #pragma warning(disable:4800)   // Forcing value to bool
   //#pragma warning(disable:4805)   // unsafe mix of bool and int.
 
-#if (_MSC_VER < 1300)
-  #pragma warning(disable:4248)   /* MSVC6 gives bogus "protected constructor"
-				   * for csHash::*Iterator, even though csHash
-				   * is friend. */
-  #pragma warning(disable:4284)   /* At least some versions of MSVC6 (though
-				   * not all) complain about
-				   * csList<int>::operator->() returning a
-				   * pointer to a base type.  In general, this
-				   * is a valid complaint because you can not
-				   * legally apply -> to a pointer to a base
-				   * type, however, in the context of a
-				   * template, such as csList<>, the complaint
-				   * is useless if it occurs at declaration
-				   * time.  It would be meaningful if it
-				   * complained at invocation time, though.
-				   */
-  #pragma warning(disable:4503)   /* 'identifier' : decorated name length 
-				   * exceeded, name was truncated */
-#endif
-
-  #pragma warning(default:4265)   /* class has virtual functions, but 
-				   * destructor is not virtual */
+//  #pragma warning(default:4265)   /* class has virtual functions, but 
+//				   * destructor is not virtual */
 
   #pragma inline_depth (255)
   #pragma inline_recursion (on)

@@ -188,7 +188,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
     reccam->vec.x = csLongToFloat (csConvertEndian (camint.x));
     reccam->vec.y = csLongToFloat (csConvertEndian (camint.y));
     reccam->vec.z = csLongToFloat (csConvertEndian (camint.z));
-    reccam->mirror = camint.mirror;
+    reccam->mirror = (camint.mirror != 0);
     unsigned char len;
     cf->Read ((char*)&len, 1);
     iSector* s;
@@ -297,7 +297,7 @@ bool WalkTest::LoadCamera (const char *fName)
   {
     iCamera *c = view->GetCamera ();
     c->SetSector (s);
-    c->SetMirrored ((bool)imirror);
+    c->SetMirrored (imirror != 0);
     c->GetTransform ().SetO2T (m);
     c->GetTransform ().SetOrigin (v);
     collider_actor.SetCamera (c);
@@ -1823,72 +1823,72 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "i_forward"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_forward (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_forward (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "i_backward"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_backward (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_backward (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "i_left"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_left (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_left (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "i_right"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_right (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_right (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "i_up"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_up (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_up (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "i_down"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_down (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_down (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "i_rotleftc"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_left_camera (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_rot_left_camera (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "i_rotleftw"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_left_world (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_rot_left_world (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "i_rotrightc"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_right_camera (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_rot_right_camera (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "i_rotrightw"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_right_world (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_rot_right_world (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "i_rotleftx"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_left_xaxis (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_rot_left_xaxis (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "i_rotleftz"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_left_zaxis (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_rot_left_zaxis (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "i_rotrightx"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_right_xaxis (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_rot_right_xaxis (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "i_rotrightz"))
   {
     int slow = 0, fast = 0; if (arg) csScanStr (arg, "%d,%d", &slow, &fast);
-    Sys->imm_rot_right_zaxis (0.1f, (bool)slow, (bool)fast);
+    Sys->imm_rot_right_zaxis (0.1f, (slow != 0), (fast != 0));
   }
   else if (!csStrCaseCmp (cmd, "fire"))
   {

@@ -177,7 +177,7 @@ bool csOPCODECollideSystem::Collide (
   	&col2->transform);
   if (isOk)
   {
-    bool status = TreeCollider.GetContactStatus ();
+    bool status = (TreeCollider.GetContactStatus () != FALSE);
     if (status)
     {
       CopyCollisionPairs (col1, col2);
@@ -251,7 +251,7 @@ bool csOPCODECollideSystem::CollideRaySegment (
   bool isOk = RayCol.Collide (ray, *ColCache.Model0, &col->transform);
   if (isOk)
   {
-    bool status = RayCol.GetContactStatus ();
+    bool status = (RayCol.GetContactStatus () != FALSE);
     if (status)
     {
       // Now calculate the real intersection points for all hit faces.
@@ -370,5 +370,5 @@ void csOPCODECollideSystem::SetOneHitOnly (bool on)
 */
 bool csOPCODECollideSystem::GetOneHitOnly ()
 {
-  return TreeCollider.FirstContactEnabled ();
+  return (TreeCollider.FirstContactEnabled () != FALSE);
 }

@@ -22,6 +22,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/parray.h"
 #include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/util.h"
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
@@ -199,7 +200,7 @@ struct csCounter
  * Debugger plugin. Loading this plugin is sufficient to get debugging
  * functionality in your application.
  */
-class csBugPlug : public iComponent
+class csBugPlug : public scfImplementation2<csBugPlug, iBugPlug, iComponent>
 {
 private:
   iObjectRegistry *object_reg;
@@ -422,8 +423,6 @@ private:
 
   void SaveMap ();
 public:
-  SCF_DECLARE_IBASE;
-
   csBugPlug (iBase *iParent);
   virtual ~csBugPlug ();
   ///
@@ -486,135 +485,22 @@ public:
   void ResetCounter (const char* countername, int value = 0);
   void RemoveCounter (const char* countername);
 
-  struct BugPlug : public iBugPlug
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csBugPlug);
-    virtual void SetupDebugSector ()
-    {
-      scfParent->SetupDebugSector ();
-    }
-    virtual void DebugSectorBox (const csBox3& box, float r, float g, float b,
-  	const char* name = 0, iMeshObject* mesh = 0,
-	uint mixmode = CS_FX_COPY)
-    {
-      scfParent->DebugSectorBox (box, r, g, b, name, mesh, mixmode);
-    }
-    virtual void DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
-  	const csVector3& s3, float r, float g, float b,
-	uint mixmode = CS_FX_ADD)
-    {
-      scfParent->DebugSectorTriangle (s1, s2, s3, r, g, b, mixmode);
-    }
-    virtual void DebugSectorMesh (
-	csVector3* vertices, int vertex_count,
-	csTriangle* triangles, int tri_count,
-	float r, float g, float b, uint mixmode = CS_FX_COPY)
-    {
-      scfParent->DebugSectorMesh (vertices, vertex_count,
-      	triangles, tri_count, r, g, b, mixmode);
-    }
-    virtual void SwitchDebugSector (const csReversibleTransform& trans,
-    	bool clear = true)
-    {
-      scfParent->SwitchDebugSector (trans, clear);
-    }
-    virtual bool CheckDebugSector () const
-    {
-      return scfParent->CheckDebugSector ();
-    }
-    virtual void SetupDebugView ()
-    {
-      scfParent->SetupDebugView ();
-    }
-    virtual int DebugViewPoint (const csVector2& point)
-    {
-      return scfParent->DebugViewPoint (point);
-    }
-    virtual void DebugViewLine (int i1, int i2)
-    {
-      scfParent->DebugViewLine (i1, i2);
-    }
-    virtual void DebugViewBox (int i1, int i2)
-    {
-      scfParent->DebugViewBox (i1, i2);
-    }
-    virtual int DebugViewPointCount () const
-    {
-      return scfParent->DebugViewPointCount ();
-    }
-    virtual const csVector2& DebugViewGetPoint (int i) const
-    {
-      return scfParent->DebugViewGetPoint (i);
-    }
-    virtual int DebugViewLineCount () const
-    {
-      return scfParent->DebugViewLineCount ();
-    }
-    virtual void DebugViewGetLine (int i, int& i1, int& i2) const
-    {
-      scfParent->DebugViewGetLine (i, i1, i2);
-    }
-    virtual int DebugViewBoxCount () const
-    {
-      return scfParent->DebugViewBoxCount ();
-    }
-    virtual void DebugViewGetBox (int i, int& i1, int& i2) const
-    {
-      scfParent->DebugViewGetBox (i, i1, i2);
-    }
-    virtual void DebugViewRenderObject (iBugPlugRenderObject* obj)
-    {
-      scfParent->DebugViewRenderObject (obj);
-    }
-    virtual void DebugViewClearScreen (bool cs)
-    {
-      scfParent->DebugViewClearScreen (cs);
-    }
-    virtual void SwitchDebugView (bool clear = true)
-    {
-      scfParent->SwitchDebugView (clear);
-    }
-    virtual bool CheckDebugView () const
-    {
-      return scfParent->CheckDebugView ();
-    }
-    virtual void AddCounter (const char* countername, int amount = 1)
-    {
-      scfParent->AddCounter (countername, amount);
-    }
-    virtual void AddCounterEnum (const char* countername, int enumval,
-  	int amount = 1)
-    {
-      scfParent->AddCounterEnum (countername, enumval, amount);
-    }
-    virtual void ResetCounter (const char* countername, int value = 0)
-    {
-      scfParent->ResetCounter (countername, value);
-    }
-    virtual void RemoveCounter (const char* countername)
-    {
-      scfParent->RemoveCounter (countername);
-    }
-  } scfiBugPlug;
-
   // This is not an embedded interface in order to avoid
   // a circular reference between this registered event handler
   // and the parent object.
-  class EventHandler : public iEventHandler
+  class EventHandler : public scfImplementation1<EventHandler,iEventHandler>
   {
   private:
     csBugPlug* parent;
   public:
     EventHandler (csBugPlug* parent)
+      :scfImplementationType (this)
     {
-      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     virtual ~EventHandler ()
     {
-      SCF_DESTRUCT_IBASE();
     }
-    SCF_DECLARE_IBASE;
     virtual bool HandleEvent (iEvent& ev)
     {
       return parent->HandleEvent (ev);

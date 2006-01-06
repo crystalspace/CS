@@ -136,7 +136,7 @@ void csCommandProcessor::change_boolean (const char* arg, bool* value, const cha
     int v = yes_or_no (arg, *value);
     if (v != -1)
     {
-      *value = v;
+      *value = (v != 0);
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Set %s %s", what, say_on_or_off (*value));
     }

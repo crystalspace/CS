@@ -73,11 +73,11 @@ static void CollectHeapInfo (HANDLE snap, HANDLE tempFile,
   DWORD rangeSize = 0;
   DWORD rangeOffset = 0;
 
-  bool hasHeapList = Heap32ListFirst (snap, &heapList);
+  bool hasHeapList = (Heap32ListFirst (snap, &heapList) == TRUE);
   while (hasHeapList)
   {
-    bool hasHeapEntry = Heap32First (&heapEntry, 
-      GetCurrentProcessId(), heapList.th32HeapID);
+    bool hasHeapEntry = (Heap32First (&heapEntry, 
+      GetCurrentProcessId(), heapList.th32HeapID) == TRUE);
     while (hasHeapEntry)
     {
       DWORD bytesWritten;
@@ -104,10 +104,10 @@ static void CollectHeapInfo (HANDLE snap, HANDLE tempFile,
       else
 	SetFilePointer (tempFile, - ((LONG)bytesWritten), 0, FILE_CURRENT);
 
-      hasHeapEntry = Heap32Next (&heapEntry);
+      hasHeapEntry = (Heap32Next (&heapEntry) == TRUE);
     }
 
-    hasHeapList = Heap32ListNext (snap, &heapList);
+    hasHeapList = (Heap32ListNext (snap, &heapList) == TRUE);
   }
 
   WriteRangeInfo (rangeFile, rangeStart, rangeSize, rangeOffset, 
@@ -285,11 +285,11 @@ const char* cswinMinidumpWriter::WriteMinidump (
     Stack is fine when exception information is passed in.
    */
 
-  bool dumpSucceeded = DbgHelp::MiniDumpWriteDump (GetCurrentProcess(),
+  bool dumpSucceeded = (DbgHelp::MiniDumpWriteDump (GetCurrentProcess(),
     GetCurrentProcessId(), dumpFile,
     MiniDumpWithDataSegs | MiniDumpScanMemory/* | 
     MiniDumpWithIndirectlyReferencedMemory*/,
-    except, 0, 0);
+    except, 0, 0) == TRUE);
 
   if (dumpHeap && PostprocessMiniDump (dumpFile, hHeapRanges, rangeCount))
   {

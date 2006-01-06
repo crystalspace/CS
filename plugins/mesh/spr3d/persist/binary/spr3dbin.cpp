@@ -332,7 +332,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 
 
   // Read the 1 byte tween value
-  spr3dLook->EnableTweening (*p++);
+  spr3dLook->EnableTweening ((*p++) != 0);
   return csPtr<iBase> (fact);
 }
 

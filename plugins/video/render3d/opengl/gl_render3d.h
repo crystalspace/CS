@@ -595,7 +595,8 @@ public:
   {
     GLboolean r, g, b, a;
     statecache->GetColorMask (r, g, b, a);
-    red = r; green = g; blue = b; alpha = a;
+    red = (r == GL_TRUE); green = (g == GL_TRUE); blue = (b == GL_TRUE); 
+    alpha = (a == GL_TRUE);
   }
 
   /// Controls shadow drawing

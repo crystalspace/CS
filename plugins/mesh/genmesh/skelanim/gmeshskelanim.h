@@ -277,7 +277,7 @@ public:
   csTicks& GetTime () { return time; }
   void SetLoop (bool loop) { csSkelAnimControlScript::loop = loop; }
   bool GetLoop () { return loop; }
-  void SetLoopTimes (bool loop_times) 
+  void SetLoopTimes (int loop_times) 
   { csSkelAnimControlScript::loop_times = loop_times; }
   int GetLoopTimes () { return loop_times; }
 };

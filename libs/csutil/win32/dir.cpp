@@ -95,7 +95,7 @@ int closedir (DIR *dirp)
 bool isdir (const char *path, dirent *de)
 {
   (void)path;
-  return (de->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+  return ((de->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0);
 }
 
 }

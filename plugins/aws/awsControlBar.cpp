@@ -94,7 +94,7 @@ bool awsControlBar::Setup (iAws *_wmgr, iAwsComponentNode* settings)
   pm->GetInt (settings, "Alignment", vert_align);
   int v = vertical;
   pm->GetInt (settings, "Vertical", v);
-  vertical = v;
+  vertical = (v != 0);
 
   //Show ();
 

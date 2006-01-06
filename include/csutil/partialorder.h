@@ -24,11 +24,12 @@
  */
 
 #include "csextern.h"
-#include "array.h"
-#include "comparator.h"
-#include "ref.h"
-#include "util.h"
-#include "hash.h"
+#include "csutil/array.h"
+#include "csutil/comparator.h"
+#include "csutil/hash.h"
+#include "csutil/list.h"
+#include "csutil/ref.h"
+#include "csutil/util.h"
 
 #ifdef ADB_DEBUG
 #include <iostream>

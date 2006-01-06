@@ -55,7 +55,7 @@ BinaryTreeNode<T> *BinaryTree<T>::Add(T *pT,int iOwner)
     int x=1;
 
     if (!pRoot)
-	pRoot = new BinaryTreeNode<T>(pT,iOwner);
+	pRoot = new BinaryTreeNode<T>(pT,iOwner != 0);
     else
 	x = pRoot->AddOffspring(pT,iOwner);
     
@@ -327,7 +327,7 @@ int BinaryTreeNode<T>::AddOffspring(T *pNew,int iOwner)
 	    return pLeft->AddOffspring(pNew,iOwner);
 	else
 	{
-	    pLeft = new BinaryTreeNode<T>(pNew,iOwner);
+	    pLeft = new BinaryTreeNode<T>(pNew,iOwner != 0);
 	    return 1;
 	}
     }
@@ -337,7 +337,7 @@ int BinaryTreeNode<T>::AddOffspring(T *pNew,int iOwner)
 	    return pRight->AddOffspring(pNew,iOwner);
 	else
 	{
-	    pRight = new BinaryTreeNode<T>(pNew,iOwner);
+	    pRight = new BinaryTreeNode<T>(pNew,iOwner != 0);
 	    return 1;
 	}
     }

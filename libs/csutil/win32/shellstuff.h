@@ -76,7 +76,7 @@ GetShellFolderPath (int CSIDL, char* path)
     {
       if (SUCCEEDED(SHGetSpecialFolderLocation (0, CSIDL, &pidl)))
       {
-	result = SHGetPathFromIDList (pidl, path);
+	result = (SHGetPathFromIDList (pidl, path) == TRUE);
 	MAlloc->Free (pidl);
       }
       MAlloc->Release ();
@@ -119,7 +119,7 @@ static inline bool GetShellFolderPath (int CSIDL, csString& path)
     {
       if (SUCCEEDED(SHGetSpecialFolderLocation (0, CSIDL, &pidl)))
       {
-	result = SHGetPathFromIDListA (pidl, buf);
+	result = (SHGetPathFromIDListA (pidl, buf) == TRUE);
 	MAlloc->Free (pidl);
       }
       MAlloc->Release ();

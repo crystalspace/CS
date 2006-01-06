@@ -8,6 +8,8 @@ chronological order.
 
 6-Jan-2006
 	- mdmkolbe made some more warning fixes.
+	- Marten removed some warning-disable #pragmas for VC, and
+	  cleaned up the warnins instead.
 5-Jan-2006
         - Arianna fixed some warnings in MSVC 7.1 (64bits) related to 
           size_t int conversions.

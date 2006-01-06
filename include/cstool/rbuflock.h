@@ -55,7 +55,7 @@ class csRenderBufferLock
   size_t currElement;
   
   enum { LockedFlag = 0x10000, LockTypeMask = 0xffff };
-  inline bool IsLocked() { return lockState & LockedFlag; }
+  inline bool IsLocked() { return (lockState & LockedFlag) != 0; }
   inline void SetLocked (bool b) 
   { lockState = b ? (lockState | LockedFlag) : (lockState & ~LockedFlag); }
   inline csRenderBufferLockType LockType() 

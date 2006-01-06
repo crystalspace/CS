@@ -449,18 +449,18 @@ public:
     parameter_wmGreen = writemask[1];
     parameter_wmBlue = writemask[2];
     parameter_wmAlpha = writemask[3];
-    enabled_GL_DEPTH_TEST = glIsEnabled (GL_DEPTH_TEST);
-    enabled_GL_BLEND = glIsEnabled (GL_BLEND);
-    enabled_GL_DITHER = glIsEnabled (GL_DITHER);
-    enabled_GL_STENCIL_TEST = glIsEnabled (GL_STENCIL_TEST);
-    enabled_GL_CULL_FACE = glIsEnabled (GL_CULL_FACE);
-    enabled_GL_POLYGON_OFFSET_FILL = glIsEnabled (GL_POLYGON_OFFSET_FILL);
-    enabled_GL_LIGHTING = glIsEnabled (GL_LIGHTING);
-    enabled_GL_ALPHA_TEST = glIsEnabled (GL_ALPHA_TEST);
-    enabled_GL_TEXTURE_GEN_S = glIsEnabled (GL_TEXTURE_GEN_S);
-    enabled_GL_TEXTURE_GEN_T = glIsEnabled (GL_TEXTURE_GEN_T);
-    enabled_GL_TEXTURE_GEN_R = glIsEnabled (GL_TEXTURE_GEN_R);
-    enabled_GL_FOG = glIsEnabled (GL_FOG);
+    enabled_GL_DEPTH_TEST = (glIsEnabled (GL_DEPTH_TEST) == GL_TRUE);
+    enabled_GL_BLEND = (glIsEnabled (GL_BLEND) == GL_TRUE);
+    enabled_GL_DITHER = (glIsEnabled (GL_DITHER) == GL_TRUE);
+    enabled_GL_STENCIL_TEST = (glIsEnabled (GL_STENCIL_TEST) == GL_TRUE);
+    enabled_GL_CULL_FACE = (glIsEnabled (GL_CULL_FACE) == GL_TRUE);
+    enabled_GL_POLYGON_OFFSET_FILL = (glIsEnabled (GL_POLYGON_OFFSET_FILL) == GL_TRUE);
+    enabled_GL_LIGHTING = (glIsEnabled (GL_LIGHTING) == GL_TRUE);
+    enabled_GL_ALPHA_TEST = (glIsEnabled (GL_ALPHA_TEST) == GL_TRUE);
+    enabled_GL_TEXTURE_GEN_S = (glIsEnabled (GL_TEXTURE_GEN_S) == GL_TRUE);
+    enabled_GL_TEXTURE_GEN_T = (glIsEnabled (GL_TEXTURE_GEN_T) == GL_TRUE);
+    enabled_GL_TEXTURE_GEN_R = (glIsEnabled (GL_TEXTURE_GEN_R) == GL_TRUE);
+    enabled_GL_FOG = (glIsEnabled (GL_FOG) == GL_TRUE);
 
     if (extmgr->CS_GL_ARB_multitexture)
     {
@@ -468,15 +468,15 @@ public:
       {
         extmgr->glActiveTextureARB (GL_TEXTURE0_ARB + i);
         extmgr->glClientActiveTextureARB (GL_TEXTURE0_ARB + i);
-        enabled_GL_TEXTURE_1D[i] = glIsEnabled (GL_TEXTURE_1D);
-        enabled_GL_TEXTURE_2D[i] = glIsEnabled (GL_TEXTURE_2D);
-        enabled_GL_TEXTURE_3D[i] = glIsEnabled (GL_TEXTURE_3D);
-        enabled_GL_TEXTURE_CUBE_MAP[i] = glIsEnabled (GL_TEXTURE_CUBE_MAP);
-        enabled_GL_TEXTURE_COORD_ARRAY[i] = glIsEnabled (GL_TEXTURE_COORD_ARRAY);
+        enabled_GL_TEXTURE_1D[i] = (glIsEnabled (GL_TEXTURE_1D) == GL_TRUE);
+        enabled_GL_TEXTURE_2D[i] = (glIsEnabled (GL_TEXTURE_2D) == GL_TRUE);
+        enabled_GL_TEXTURE_3D[i] = (glIsEnabled (GL_TEXTURE_3D) == GL_TRUE);
+        enabled_GL_TEXTURE_CUBE_MAP[i] = (glIsEnabled (GL_TEXTURE_CUBE_MAP) == GL_TRUE);
+        enabled_GL_TEXTURE_COORD_ARRAY[i] = (glIsEnabled (GL_TEXTURE_COORD_ARRAY) == GL_TRUE);
 	if (extmgr->CS_GL_ARB_texture_rectangle
 	  || extmgr->CS_GL_EXT_texture_rectangle
 	  || extmgr->CS_GL_NV_texture_rectangle)
-	  enabled_GL_TEXTURE_RECTANGLE_ARB[i] = glIsEnabled (GL_TEXTURE_RECTANGLE_ARB);
+	  enabled_GL_TEXTURE_RECTANGLE_ARB[i] = (glIsEnabled (GL_TEXTURE_RECTANGLE_ARB) == GL_TRUE);
 	else
 	  enabled_GL_TEXTURE_RECTANGLE_ARB[i] = false;
         glGetIntegerv (GL_TEXTURE_COORD_ARRAY_SIZE, (GLint*)&parameter_tsize[i]);
@@ -487,15 +487,15 @@ public:
     } 
     else 
     {
-      enabled_GL_TEXTURE_1D[0] = glIsEnabled (GL_TEXTURE_1D);
-      enabled_GL_TEXTURE_2D[0] = glIsEnabled (GL_TEXTURE_2D);
-      enabled_GL_TEXTURE_3D[0] = glIsEnabled (GL_TEXTURE_3D);
-      enabled_GL_TEXTURE_CUBE_MAP[0] = glIsEnabled (GL_TEXTURE_CUBE_MAP);
-      enabled_GL_TEXTURE_COORD_ARRAY[0] = glIsEnabled (GL_TEXTURE_COORD_ARRAY);
+      enabled_GL_TEXTURE_1D[0] = (glIsEnabled (GL_TEXTURE_1D) == GL_TRUE);
+      enabled_GL_TEXTURE_2D[0] = (glIsEnabled (GL_TEXTURE_2D) == GL_TRUE);
+      enabled_GL_TEXTURE_3D[0] = (glIsEnabled (GL_TEXTURE_3D) == GL_TRUE);
+      enabled_GL_TEXTURE_CUBE_MAP[0] = (glIsEnabled (GL_TEXTURE_CUBE_MAP) == GL_TRUE);
+      enabled_GL_TEXTURE_COORD_ARRAY[0] = (glIsEnabled (GL_TEXTURE_COORD_ARRAY) == GL_TRUE);
 	if (extmgr->CS_GL_ARB_texture_rectangle
 	  || extmgr->CS_GL_EXT_texture_rectangle
 	  || extmgr->CS_GL_NV_texture_rectangle)
-	  enabled_GL_TEXTURE_RECTANGLE_ARB[0] = glIsEnabled (GL_TEXTURE_RECTANGLE_ARB);
+	  enabled_GL_TEXTURE_RECTANGLE_ARB[0] = (glIsEnabled (GL_TEXTURE_RECTANGLE_ARB) == GL_TRUE);
 	else
 	  enabled_GL_TEXTURE_RECTANGLE_ARB[0] = false;
       glGetIntegerv (GL_TEXTURE_COORD_ARRAY_SIZE, (GLint*)&parameter_tsize[0]);
@@ -516,10 +516,10 @@ public:
 	parameter_tpointer[i] = parameter_tpointer[0];
       }
     }
-    enabled_GL_SCISSOR_TEST = glIsEnabled (GL_SCISSOR_TEST);
-    enabled_GL_VERTEX_ARRAY = glIsEnabled (GL_VERTEX_ARRAY);
-    enabled_GL_COLOR_ARRAY = glIsEnabled (GL_COLOR_ARRAY);
-    enabled_GL_NORMAL_ARRAY = glIsEnabled (GL_NORMAL_ARRAY);
+    enabled_GL_SCISSOR_TEST = (glIsEnabled (GL_SCISSOR_TEST) == GL_TRUE);
+    enabled_GL_VERTEX_ARRAY = (glIsEnabled (GL_VERTEX_ARRAY) == GL_TRUE);
+    enabled_GL_COLOR_ARRAY = (glIsEnabled (GL_COLOR_ARRAY) == GL_TRUE);
+    enabled_GL_NORMAL_ARRAY = (glIsEnabled (GL_NORMAL_ARRAY) == GL_TRUE);
 
     if (extmgr->CS_GL_ARB_multitexture)
     {

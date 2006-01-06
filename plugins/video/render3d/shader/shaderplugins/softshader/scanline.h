@@ -254,7 +254,7 @@ namespace cspluginSoftshader
       else
 	doFlat = true;
 
-      doColor = availableBuffers & CS_SOFT3D_BUFFERFLAG(COLOR);
+      doColor = ((availableBuffers & CS_SOFT3D_BUFFERFLAG(COLOR)) != 0);
       static const size_t myBufferComps[] = {4, 2};
       if (doColor)
       {

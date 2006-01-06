@@ -1012,8 +1012,8 @@ class csPrintfFormatter
       const int lo = (sizeof (T) / sizeof (Tbase)) - 1;
       const int d = -1;
   #endif
-      sign = toBase.vB[lo + (signBit / baseBits) * d]
-	& (1 << (signBit % baseBits));
+      sign = ((toBase.vB[lo + (signBit / baseBits) * d]
+	& (1 << (signBit % baseBits))) != 0);
       exp = (toBase.vB[hi] >> (mantissaBits % (baseBits)))
 	& ((1 << expBits) - 1);
       for (int n = lo, p = 0; n != hi + d; n += d, p++)

@@ -214,8 +214,8 @@ void csFancyConsole::Draw3D (csRect *oArea)
   }
 
   zBuf = G3D->GetRenderState (G3DRENDERSTATE_ZBUFFERMODE);
-  btext = G3D->GetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE);
-  bgour = G3D->GetRenderState (G3DRENDERSTATE_GOURAUDENABLE);
+  btext = (G3D->GetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE) != 0);
+  bgour = (G3D->GetRenderState (G3DRENDERSTATE_GOURAUDENABLE) != 0);
 
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
 

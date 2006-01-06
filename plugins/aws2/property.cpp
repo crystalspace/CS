@@ -73,8 +73,8 @@ namespace aws
 	csString name = fn["name"]->ToString().Value();
 	autom::keeper value = fn["value"];
 
-	bool readable = fn["readable"]->ToInt().Value();
-	bool writeable = fn["writeable"]->ToInt().Value();
+	bool readable = (fn["readable"]->ToInt().Value() != 0);
+	bool writeable = (fn["writeable"]->ToInt().Value() != 0);
 
 	return autom::func_parm(new autom::integer (
 	  CreateProperty(name, property(value, readable, writeable))));

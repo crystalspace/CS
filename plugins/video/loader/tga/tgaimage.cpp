@@ -152,7 +152,7 @@ csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   TGAheader hdr;
   int w = Image->GetWidth ();
   int h = Image->GetHeight ();
-  bool has_alpha = Image->GetFormat() & CS_IMGFMT_ALPHA;
+  bool has_alpha = (Image->GetFormat() & CS_IMGFMT_ALPHA) != 0;
 
   hdr.IDLength  = (uint8)(strlen (CSTGA_ID) + 1);
   hdr.CoMapType = (palette ? 1 : 0);
@@ -470,7 +470,7 @@ bool ImageTgaFile::TgaLoader::LoadData ()
       for (uint i = colorMapOffs; i < colorMapOffs + colorMapSize; ++i)
       {
 	get_map_entry (iBuffer, colorMap + i, tga_head.CoSize,
-	  Format & CS_IMGFMT_ALPHA);
+	  (Format & CS_IMGFMT_ALPHA) != 0);
       }
     }
     else
@@ -516,7 +516,7 @@ bool ImageTgaFile::TgaLoader::LoadData ()
       for (int col = 0; col < Width; ++col)
       {
 	if (!get_pixel (iBuffer, indexData + (realrow * Width + col),
-	  tga_head.PixelSize, Format & CS_IMGFMT_ALPHA))
+	  tga_head.PixelSize, (Format & CS_IMGFMT_ALPHA) != 0))
         {
           // Can't read pixel.... file is probably damaged.
           // Use obnoxious pattern for replacement.
@@ -530,7 +530,7 @@ bool ImageTgaFile::TgaLoader::LoadData ()
       for (int col = 0; col < Width; ++col)
       {
 	if (!get_pixel (iBuffer, rgbaData + (realrow * Width + col),
-	  tga_head.PixelSize, Format & CS_IMGFMT_ALPHA))
+	  tga_head.PixelSize, (Format & CS_IMGFMT_ALPHA) != 0))
         {
           // Can't read pixel.... file is probably damaged.
           // Use obnoxious pattern for replacement.

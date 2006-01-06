@@ -100,16 +100,16 @@ static size_t GetParams (const STACKFRAME64& frame,
   stackFrame.Virtual = frame.Virtual;
 
   SetLastError (ERROR_SUCCESS);
-  bool result = DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
-    &stackFrame, 0);
+  bool result = (DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
+    &stackFrame, 0) == TRUE);
   if (!result)
   {
     // Bit hackish: if SymSetContext() failed, scan the loaded DLLs
     // and try to load their debug info.
     symInit.RescanModules ();
     SetLastError (ERROR_SUCCESS);
-    result = DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
-      &stackFrame, 0);
+    result = (DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
+      &stackFrame, 0) == TRUE);
   }
   if (result)
   {
@@ -120,7 +120,7 @@ static size_t GetParams (const STACKFRAME64& frame,
     if (DbgHelp::SymEnumSymbols (symInit.GetSymProcessHandle (), 
       0
       /*DbgHelp::SymGetModuleBase64(GetCurrentProcess(),frame.AddrPC.Offset)*/,
-      "*", &EnumSymCallbackCount, &callbackInfo))
+      "*", &EnumSymCallbackCount, &callbackInfo) == TRUE)
       return callbackInfo.count;
   }
   else
@@ -567,16 +567,16 @@ void* CallStackNameResolverDbgHelp::OpenParamSymbols (void* addr)
   stackFrame.InstructionOffset = (uintptr_t)addr;
 
   SetLastError (ERROR_SUCCESS);
-  bool result = DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
-    &stackFrame, 0);
+  bool result = (DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
+    &stackFrame, 0) == TRUE);
   if (!result)
   {
     // Bit hackish: if SymSetContext() failed, scan the loaded DLLs
     // and try to load their debug info.
     symInit.RescanModules ();
     SetLastError (ERROR_SUCCESS);
-    result = DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
-      &stackFrame, 0);
+    result = (DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
+      &stackFrame, 0) == TRUE);
   }
   if (result)
   {
@@ -584,7 +584,7 @@ void* CallStackNameResolverDbgHelp::OpenParamSymbols (void* addr)
     if (DbgHelp::SymEnumSymbols (symInit.GetSymProcessHandle (), 
       0
       /*DbgHelp::SymGetModuleBase64(GetCurrentProcess(),frame.AddrPC.Offset)*/,
-      "*", &EnumSymCallbackNames, names))
+      "*", &EnumSymCallbackNames, names) == TRUE)
       return names;
     else
       delete names;

@@ -409,7 +409,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image,
     return 0;
   }
 
-  bool has_alpha = imgRGBA->GetFormat() & CS_IMGFMT_ALPHA;
+  bool has_alpha = (imgRGBA->GetFormat() & CS_IMGFMT_ALPHA) != 0;
 
   if (mng_putchunk_jhdr (handle, imgRGBA->GetWidth(), imgRGBA->GetHeight(),
 			 has_alpha ? MNG_COLORTYPE_JPEGCOLORA 

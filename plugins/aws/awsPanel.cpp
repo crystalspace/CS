@@ -82,7 +82,7 @@ bool awsPanel::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   // These properties get stored with the frame drawer for convenience.
   int _focusable = 0;
   pm->GetInt (settings, "Focusable", _focusable);
-  focusable = _focusable;
+  focusable = (_focusable != 0);
 
   frame_drawer.Setup (WindowManager (), bkg, bkg_alpha, ovl, ovl_alpha);
 

@@ -190,7 +190,7 @@ csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
     cubeMap = (head.capabilities.caps2 & (dds::DDSCAPS2_CUBEMAP_POSITIVEX
       | dds::DDSCAPS2_CUBEMAP_NEGATIVEX | dds::DDSCAPS2_CUBEMAP_POSITIVEY
       | dds::DDSCAPS2_CUBEMAP_NEGATIVEY | dds::DDSCAPS2_CUBEMAP_POSITIVEZ
-      | dds::DDSCAPS2_CUBEMAP_NEGATIVEZ));
+      | dds::DDSCAPS2_CUBEMAP_NEGATIVEZ)) != 0;
   else if (head.capabilities.caps2 & dds::DDSCAPS2_VOLUME)
     volMap = true;
 

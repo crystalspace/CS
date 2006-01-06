@@ -98,7 +98,7 @@ namespace CrystalSpace
       MODULEENTRY32 me;
       memset (&me, 0, sizeof (me));
       me.dwSize = sizeof (me);
-      bool res = Module32First (hSnap, &me);
+      bool res = (Module32First (hSnap, &me) == TRUE);
       while (res)
       {
 	SetLastError (ERROR_SUCCESS);
@@ -110,7 +110,7 @@ namespace CrystalSpace
 	    PrintError ("SymLoadModule64 %s: %s", me.szModule, 
 	      cswinGetErrorMessage (err));
 	}
-	res = Module32Next (hSnap, &me);
+	res = (Module32Next (hSnap, &me) == TRUE);
       }
       CloseHandle (hSnap);
     }

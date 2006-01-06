@@ -1791,7 +1791,7 @@ bool csTerrainObject::SetMaterialAlphaMaps (
           v = 255 - (unsigned char)total[idx];
 	}
         map[idx].Set (v, v, v, v);
-	matused[idx] = bool (v);
+	matused[idx] = (v != 0);
 	idx++;
       }
     globalMaterialsUsed.Push (matused);
@@ -1911,7 +1911,7 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
       {
         int v = ((unsigned char)data[idx] == i) ? 255 : 0;
         map[idx].Set (v, v, v, v);
-	matused[idx] = bool (v);
+	matused[idx] = (v != 0);
 	idx++;
       }
     globalMaterialsUsed.Push (matused);

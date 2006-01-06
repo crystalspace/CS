@@ -272,7 +272,7 @@ void csSoundSourceDS3D::Play(unsigned long PlayMethod)
     * If we're playing streaming data, the buffer is set to always loop since
     *  streams normally have a longer playtime than a single buffer fill.
     */
-    Looped = Static ? (PlayMethod & SOUND_LOOP) : true;
+    Looped = Static ? ((PlayMethod & SOUND_LOOP) != 0) : true;
 
     // Make sure the buffer is in a stop state
     Buffer2D->Stop();

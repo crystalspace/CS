@@ -276,7 +276,7 @@ int ImageGifFile::decode_gif (uint8* iBuffer, size_t iSize, int* Prefix,
 
   ch = gptr.nextbyte();
 
-  bool has_cmap = ch & COLORMAPMASK;
+  bool has_cmap = (ch & COLORMAPMASK) != 0;
   int cmap_size = 1 << ( (ch & 7) + 1 );
 
   gptr += 2;  // skip 2 bytes : background color and '0'
@@ -327,7 +327,7 @@ int ImageGifFile::decode_gif (uint8* iBuffer, size_t iSize, int* Prefix,
   int height = gptr.nextword();
   SetDimensions (width, height);
 
-  GIFOutput optr(width, height, (gptr.nextbyte() & INTERLACEMASK));
+  GIFOutput optr(width, height, (gptr.nextbyte() & INTERLACEMASK) != 0);
 
   // Note that I ignore the possible existence of a local color map.
   // I'm told there aren't many files around that use them, and the spec

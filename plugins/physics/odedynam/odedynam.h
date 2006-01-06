@@ -1886,18 +1886,18 @@ public:
   csOrthoTransform GetTransform ();
 
   void SetTransConstraints (bool X, bool Y, bool Z);
-  inline bool IsXTransConstrained () { return transConstraint[0]; }
-  inline bool IsYTransConstrained () { return transConstraint[1]; }
-  inline bool IsZTransConstrained () { return transConstraint[2]; }
+  inline bool IsXTransConstrained () { return (transConstraint[0] != 0); }
+  inline bool IsYTransConstrained () { return (transConstraint[1] != 0); }
+  inline bool IsZTransConstrained () { return (transConstraint[2] != 0); }
   void SetMinimumDistance (const csVector3 &min);
   csVector3 GetMinimumDistance ();
   void SetMaximumDistance (const csVector3 &max);
   csVector3 GetMaximumDistance ();
 
   void SetRotConstraints (bool X, bool Y, bool Z);
-  inline bool IsXRotConstrained () { return rotConstraint[0]; }
-  inline bool IsYRotConstrained () { return rotConstraint[1]; }
-  inline bool IsZRotConstrained () { return rotConstraint[2]; }
+  inline bool IsXRotConstrained () { return (rotConstraint[0] != 0); }
+  inline bool IsYRotConstrained () { return (rotConstraint[1] != 0); }
+  inline bool IsZRotConstrained () { return (rotConstraint[2] != 0); }
   void SetMinimumAngle (const csVector3 &min);
   csVector3 GetMinimumAngle ();
   void SetMaximumAngle (const csVector3 &max);

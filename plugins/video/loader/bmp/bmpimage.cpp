@@ -208,7 +208,7 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   } /* endswitch */
 
   // alpha channel?
-  bool hasAlpha = format & CS_IMGFMT_ALPHA;
+  bool hasAlpha = (format & CS_IMGFMT_ALPHA) != 0;
   // number of bytes per pixel in truecolor mode
   int bytesPerPixel = palette?1:(hasAlpha?4:3);
 

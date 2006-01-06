@@ -1513,7 +1513,7 @@ bool csODERigidBody::Enable ()
 
 bool csODERigidBody::IsEnabled ()
 {
-  return dBodyIsEnabled (bodyID);
+  return (dBodyIsEnabled (bodyID) != 0);
 }
 
 void csODERigidBody::SetGroup(iBodyGroup *group)

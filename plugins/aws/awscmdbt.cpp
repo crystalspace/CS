@@ -74,7 +74,7 @@ bool awsCmdButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   caption.AttachNew (new scfString (""));
   pm->GetString (settings, "Caption", caption);
 
-  is_switch = switch_style;
+  is_switch = (switch_style != 0);
 
   if (style == fsNormal || style == fsToolbar)
   {
@@ -93,7 +93,7 @@ bool awsCmdButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
     pm->GetString (settings, "BitmapNormal", tn1);
     pm->GetString (settings, "BitmapFocused", tn2);
     pm->GetString (settings, "BitmapClicked", tn3);
-    if (pm->GetInt (settings, "Stretched", stretch)) stretched = stretch;
+    if (pm->GetInt (settings, "Stretched", stretch) != 0) stretched = (stretch != 0);
 
 #define GET_TEXTURE( t_id )     \
   if (tn##t_id) \
@@ -184,16 +184,16 @@ bool awsCmdButton::SetProperty (const char *name, intptr_t parm)
   {
     if (is_switch)
     {
-      is_down  = (bool)parm;
-      was_down = (bool)parm;
+      is_down  = (parm != 0);
+      was_down = (parm != 0);
       ClearGroup ();
     }
     else
     {
-      if (((bool)parm) == is_down)
+      if ((parm != 0) == is_down)
         return true;
 
-      is_down = (bool)parm;
+      is_down = (parm != 0);
     }
     Invalidate ();
     return true;
