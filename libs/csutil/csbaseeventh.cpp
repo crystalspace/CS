@@ -164,23 +164,23 @@ bool csBaseEventHandler::HandleEvent (iEvent &event)
   bool csBaseEventHandler::trigger (iEvent &)      \
   { return false; }
 
-DefaultTrigger ( OnUnhandledEvent );
-DefaultTrigger ( OnKeyboard );
-DefaultTrigger ( OnMouseMove );
-DefaultTrigger ( OnMouseDown );
-DefaultTrigger ( OnMouseUp );
-DefaultTrigger ( OnMouseClick );
-DefaultTrigger ( OnMouseDoubleClick );
-DefaultTrigger ( OnJoystickMove );
-DefaultTrigger ( OnJoystickDown );
-DefaultTrigger ( OnJoystickUp );
+DefaultTrigger ( OnUnhandledEvent )
+DefaultTrigger ( OnKeyboard )
+DefaultTrigger ( OnMouseMove )
+DefaultTrigger ( OnMouseDown )
+DefaultTrigger ( OnMouseUp )
+DefaultTrigger ( OnMouseClick )
+DefaultTrigger ( OnMouseDoubleClick )
+DefaultTrigger ( OnJoystickMove )
+DefaultTrigger ( OnJoystickDown )
+DefaultTrigger ( OnJoystickUp )
 
 #define DefaultVoidTrigger(trigger)   \
   void csBaseEventHandler::trigger () \
   { return; }
 
-DefaultVoidTrigger ( Frame );
-DefaultVoidTrigger ( PreProcessFrame );
-DefaultVoidTrigger ( ProcessFrame );
-DefaultVoidTrigger ( PostProcessFrame );
-DefaultVoidTrigger ( FinishFrame );
+DefaultVoidTrigger ( Frame )
+DefaultVoidTrigger ( PreProcessFrame )
+DefaultVoidTrigger ( ProcessFrame )
+DefaultVoidTrigger ( PostProcessFrame )
+DefaultVoidTrigger ( FinishFrame )

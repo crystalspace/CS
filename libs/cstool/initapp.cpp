@@ -45,7 +45,7 @@
 static bool config_done = false;
 static iEventHandler* installed_event_handler = 0;
 
-CS_IMPLEMENT_STATIC_VAR(GetDefaultAppID, csString, ());
+CS_IMPLEMENT_STATIC_VAR(GetDefaultAppID, csString, ())
 
 csPluginRequest::csPluginRequest(
   csString cname, csString iname, scfInterfaceID iid, int iver) :

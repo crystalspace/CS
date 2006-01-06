@@ -60,7 +60,7 @@ bool csTriangulate2::InsideTriangle(float Ax, float Ay,
   bCROSScp = bx*cpy - by*cpx;
 
   return ((aCROSSbp >= 0.0f) && (bCROSScp >= 0.0f) && (cCROSSap >= 0.0f));
-};
+}
 
 bool csTriangulate2::Snip(const csContour2 &contour,int u,int v,int w,int n,int *V)
 {

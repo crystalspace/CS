@@ -75,7 +75,7 @@ namespace aws
       csColor4 ParseColor(const char *val);
 
       /** Parses a floating point value out of some text, returns the number of characters used. */
-      uint fvg_parser::ParseFloat(const char *base, float &rv);
+      uint ParseFloat(const char *base, float &rv);
 
       /** Fills a shape attribute structure from the attributes values in the node. */
       shape_attr* FillAttribute(csRef<iDocumentNode> &pos, shape_attr *parent_attr);
@@ -100,7 +100,7 @@ namespace aws
       virtual object *Find(const csString &name);
     };
 
- }; // end fvg namespace
-}; // end aws namespace
+ } // end fvg namespace
+} // end aws namespace
 
 #endif

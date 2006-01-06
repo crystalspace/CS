@@ -445,7 +445,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
   if (!appIcon) appIcon = LoadIcon (0, IDI_APPLICATION);
   
   csString wndClass;
-  wndClass.Format ("CrystalSpaceWin32_%p", this);
+  wndClass.Format ("CrystalSpaceWin32_%p", (void*)this);
 
   bool bResult = false;
   HBRUSH backBrush = (HBRUSH)::GetStockObject (BLACK_BRUSH);

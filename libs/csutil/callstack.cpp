@@ -24,22 +24,22 @@
 #ifdef CS_HAVE_BACKTRACE
   #include "generic/callstack-backtrace.h"
   CS_IMPLEMENT_STATIC_VAR(cscBacktrace, 
-			  CrystalSpace::Debug::CallStackCreatorBacktrace, ());
+			  CrystalSpace::Debug::CallStackCreatorBacktrace, ())
   CS_IMPLEMENT_STATIC_VAR(csnrBacktrace, 
-			  CrystalSpace::Debug::CallStackNameResolverBacktrace, ());
+			  CrystalSpace::Debug::CallStackNameResolverBacktrace, ())
 #endif
 
 #ifdef CS_PLATFORM_WIN32
   #include "win32/callstack-dbghelp.h"
   CS_IMPLEMENT_STATIC_VAR(cscDbgHelp, 
-			  CrystalSpace::Debug::CallStackCreatorDbgHelp, ());
+			  CrystalSpace::Debug::CallStackCreatorDbgHelp, ())
   CS_IMPLEMENT_STATIC_VAR(csnrDbgHelp, 
-			  CrystalSpace::Debug::CallStackNameResolverDbgHelp, ());
+			  CrystalSpace::Debug::CallStackNameResolverDbgHelp, ())
 
   #ifdef CS_HAVE_LIBBFD
     #include "win32/callstack-bfd.h"
     CS_IMPLEMENT_STATIC_VAR(csnrBfd, 
-			    CrystalSpace::Debug::CallStackNameResolverBfd, ());
+			    CrystalSpace::Debug::CallStackNameResolverBfd, ())
   #endif
 #endif
 

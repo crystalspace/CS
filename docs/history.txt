@@ -6,10 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Jan-2006
+	- mdmkolbe made some more warning fixes.
 5-Jan-2006
         - Arianna fixed some warnings in MSVC 7.1 (64bits) related to 
           size_t int conversions.
-
 4-Jan-2006
 	- res updated the driver DB tweak against terrainf corruption on ATIs
 	  to also include older drivers (Cat 4.8, as reported by Vasily 

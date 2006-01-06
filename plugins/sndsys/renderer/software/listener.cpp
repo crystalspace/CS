@@ -27,7 +27,7 @@
 
 SCF_IMPLEMENT_IBASE(SndSysListenerSoftware)
 	SCF_IMPLEMENTS_INTERFACE(iSndSysListener)
-SCF_IMPLEMENT_IBASE_END;
+SCF_IMPLEMENT_IBASE_END
 
 
 SndSysListenerSoftware::SndSysListenerSoftware()

@@ -291,7 +291,7 @@ namespace aws
     
       
 
-  }; // end fvg namespace  
-}; // end aws namespace
+  } // end fvg namespace  
+} // end aws namespace
 
 #endif

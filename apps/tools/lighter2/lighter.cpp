@@ -27,7 +27,7 @@
 #include "radprimitive.h"
 
 
-CS_IMPLEMENT_APPLICATION;
+CS_IMPLEMENT_APPLICATION
 
 // used below
 CS_SPECIALIZE_TEMPLATE
