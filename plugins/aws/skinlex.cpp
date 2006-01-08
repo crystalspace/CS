@@ -469,6 +469,13 @@ char *yytext;
   to compile do:  flex -L skinlang.flx
  *********/
 
+/* MSVC 8 complains about deprecated methods in the generated code. Although
+ * inclusion of cssysdef.h as the very first header would enable a workaround
+ * for that, we can't ensure that; hence, just disable the warning here. */
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
+#pragma warning(disable:4996)
+#endif
+
 #include "cssysdef.h"
 #include "csgeom/csrect.h"
 #include "awsprefs.h"
@@ -480,6 +487,12 @@ char *yytext;
 #include <string.h>
 
 #include "skinpars.hpp"
+
+// We have no control over this generated code, so silence some warnings.
+#if defined(CS_COMPILER_MSVC)
+#pragma warning(disable:4065)
+#pragma warning(disable:4102)
+#endif
 
 #ifdef YY_PROTO
 #define YY_DECL int yylex YY_PROTO(( YYSTYPE *awslval ))
@@ -641,7 +654,7 @@ YY_MALLOC_DECL
 YY_DECL
 	{
 	register yy_state_type yy_current_state;
-	register char *yy_cp, *yy_bp;
+	register char *yy_cp = NULL, *yy_bp = NULL;
 	register int yy_act;
 
 
@@ -749,35 +762,35 @@ return TOKEN_IS;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-/* csPrintf("skin-");   */ return TOKEN_SKIN;
+/* printf("skin-");   */ return TOKEN_SKIN;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-/* csPrintf("window-"); */ return TOKEN_WINDOW;
+/* printf("window-"); */ return TOKEN_WINDOW;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-/* csPrintf("for-");    */ return TOKEN_FOR;
+/* printf("for-");    */ return TOKEN_FOR;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-/* csPrintf("from-");   */ return TOKEN_FROM;
+/* printf("from-");   */ return TOKEN_FROM;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-/* csPrintf("<int>-");  */ awslval->val = atoi(awstext);   return TOKEN_NUM;
+/* printf("<int>-");  */ awslval->val = atoi(awstext);   return TOKEN_NUM;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-/* csPrintf("<float>-"); */ awslval->fval = atof(awstext);   return TOKEN_FLOAT;
+/* printf("<float>-"); */ awslval->fval = atof(awstext);   return TOKEN_FLOAT;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-/* csPrintf("<attr>-"); */ awslval->str = strdup(awstext); return TOKEN_ATTR;
+/* printf("<attr>-"); */ awslval->str = strdup(awstext); return TOKEN_ATTR;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-/* csPrintf("<str>-");  */ awstext[awsleng-1]=0; awslval->str = strdup(awstext+1); return TOKEN_STR;
+/* printf("<str>-");  */ awstext[awsleng-1]=0; awslval->str = strdup(awstext+1); return TOKEN_STR;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP

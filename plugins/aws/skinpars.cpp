@@ -108,11 +108,10 @@
 // allowed in g++, so work around the problem.
 #define __attribute__(x)
 
-// MSVC 7.1 complains about switch statement without any 'case' labels in
-// generated yydestruct(). We have no control over this generated code, so
-// silence the warning.
+// We have no control over this generated code, so silence some warnings.
 #if defined(CS_COMPILER_MSVC)
 #pragma warning(disable:4065)
+#pragma warning(disable:4102)
 #endif
 
 
@@ -367,12 +366,12 @@ static const yysigned_char yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned short int yyrline[] =
 {
-       0,   107,   107,   108,   111,   112,   113,   114,   122,   127,
-     132,   140,   142,   144,   146,   148,   150,   157,   166,   177,
-     182,   191,   193,   195,   197,   199,   206,   218,   223,   231,
-     246,   248,   250,   252,   254,   256,   261,   266,   274,   288,
-     297,   298,   299,   300,   301,   302,   303,   306,   307,   308,
-     309,   310,   311,   312,   313
+       0,   106,   106,   107,   110,   111,   112,   113,   121,   126,
+     131,   139,   141,   143,   145,   147,   149,   156,   165,   176,
+     181,   190,   192,   194,   196,   198,   205,   217,   222,   230,
+     245,   247,   249,   251,   253,   255,   260,   265,   273,   287,
+     296,   297,   298,   299,   300,   301,   302,   305,   306,   307,
+     308,   309,   310,   311,   312
 };
 #endif
 
@@ -655,7 +654,7 @@ while (0)
 
 # ifndef YYFPRINTF
 #  include <stdio.h> /* INFRINGES ON USER NAME SPACE */
-#  define YYFPRINTF csFPrintf
+#  define YYFPRINTF fprintf
 # endif
 
 # define YYDPRINTF(Args)			\
@@ -1741,7 +1740,6 @@ yyreturn:
 int
 awserror(char *s)
 {
-  static_awsparser->ReportError ("Parse error at line %d", awslineno );
   static_awsparser->ReportError (s);
   return 0;
 }
