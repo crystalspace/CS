@@ -191,24 +191,6 @@ CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 
 
 #------------------------------------------------------------------------------
-# Check for NASM and extensions (such as %xdefine) which we require.
-#------------------------------------------------------------------------------
-CS_CHECK_TOOLS([NASM], [nasmw nasm])
-AS_IF([test -n "$NASM"],
-    [AC_CACHE_CHECK([if nasm is sufficiently recent], [cs_cv_prog_nasm_ok],
-	[echo "%xdefine TEST" > conftest.asm
-	AS_IF([AC_RUN_LOG(
-	    [$NASM conftest.asm -o conftest.$OBJEXT 1>&2])],
-	    [cs_cv_prog_nasm_ok=yes], [cs_cv_prog_nasm_ok=no])
-	rm -f conftest.*])
-    AS_IF([test $cs_cv_prog_nasm_ok = yes],
-	[CS_EMIT_BUILD_PROPERTY([NASM.AVAILABLE], [yes])
-	CS_EMIT_BUILD_PROPERTY([CMD.NASM], [$NASM])
-	CS_HEADER_PROPERTY([CS_HAVE_NASM])])])
-
-
-
-#------------------------------------------------------------------------------
 # Check for typical required libraries (libm, libmx, libdl, libnsl).
 #------------------------------------------------------------------------------
 AC_LANG_PUSH([C++])
@@ -851,7 +833,7 @@ AS_IF([test $cs_cv_prog_cxx_declare_visible_def != no && \
 # an annyoing flood of warnings. Test whether the compiler exhibits this
 # behaviour and if so, pass a flag to disable the warning.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for flag to disable lack of virtual destructor warning],
+CS_CHECK_BUILD_FLAGS([for flag to disable 'lack of virtual destructor' warning],
     [cs_cv_prog_cxx_no_non_virtual_dtor],
     [CS_CREATE_TUPLE([-Wno-non-virtual-dtor])], [C++])
 
@@ -1489,10 +1471,6 @@ AS_IF([test $cs_cv_lib3ds = yes],
 #------------------------------------------------------------------------------
 # Check for ODE.  In addition to the standard installed locations, we also
 # search CS/libs/libode*.  Also check if it is a sufficiently recent version.
-# Finally, the cs-win32libs package uses a slightly augmented libode in which
-# functions are exported as `extern "C"' to avoid name mangling problems which
-# would otherwise prevent the package from being used with different compilers.
-# Therefore, we need to check if `extern "C"' is needed.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([ode],
     [AC_LANG_PROGRAM([[#include <ode/ode.h>]], [dWorldCreate()])],
@@ -1517,17 +1495,6 @@ AS_IF([test $cs_cv_libode_opcode = yes],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libode], [ODE])], [], [],
 	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])],
 	[cs_cv_libode_recent=no])
-
-AS_IF([test $cs_cv_libode_recent = yes],
-    [CS_CHECK_BUILD([if libode requires extern "C"],
-	[cs_cv_libode_extern_c],
-	[AC_LANG_PROGRAM(
-	    [[#include <ode/ode.h>
-	    extern "C"
-	    int dCollideBoxPlane(dxGeom*,dxGeom*,int,dContactGeom*,int);]],
-	    [dCollideBoxPlane(0,0,0,0,0);])],
-	[], [C++], [CS_EMIT_BUILD_PROPERTY([ODE.EXTERN_C], [yes])], [], [],
-	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])])
 
 
 
@@ -1778,7 +1745,8 @@ AS_IF([test $cs_cv_libwx_opengl = yes],
 #----------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([CEGUI],
     [AC_LANG_PROGRAM([[#include <CEGUI.h>]],
-    [CEGUI::WindowManager::getSingleton();])], [], [C++])
+    [CEGUI::WindowManager::getSingleton();])], [], [C++],
+    [], [], [], [], [], [CEGUIBase])
 
 AS_IF([test $cs_cv_libCEGUI = yes],
     [CS_CHECK_BUILD([if CEGUI is sufficiently recent], [cs_cv_CEGUI_recent],

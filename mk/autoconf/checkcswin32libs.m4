@@ -38,7 +38,8 @@ AC_DEFUN([CS_CHECK_CSWIN32LIBS],
     mingw*|cygwin*)
         CS_CHECK_TOOLS([CSLIBS_CONFIG], [cslibs-config])
         AS_IF([test $ac_compiler_gnu = yes],
-	    [cs_cv_cslibs_compiler="--compiler gcc-`$CXX -dumpversion`"])
+	    [cs_cv_cslibs_compiler="--compiler gcc-`$CXX -dumpversion | 
+	      sed 's/\([[0-9]]\?\)\.\([[0-9]]\?\)\.[[0-9]]\?/\1.\2/'`"])
         AC_CACHE_CHECK([for cslibs package], [cs_cv_cslibs],
 	    [AS_IF([test -n "$CSLIBS_CONFIG"],
 	       [cs_cv_cslibs=yes

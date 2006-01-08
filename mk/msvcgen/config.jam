@@ -37,6 +37,7 @@
 CAL3D.AVAILABLE = yes ;
 CAL3D.DEFINES = CS_HAVE_CAL3D ;
 CAL3D.LIBS = cal3d.lib ;
+CAL3D.LIBS.DEBUG = cal3d_d.lib ;
 CG.AVAILABLE = yes ;
 CG.LIBS = cg.lib cgGL.lib ;
 DIRECTX.AVAILABLE = yes ;

@@ -78,7 +78,6 @@ END -%]
 				IgnoreImportLibrary="TRUE"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="[% composedirs('libdirs', []) %]"
-				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMT,LIBCMTD"
 				ProgramDatabaseFile="[% workbuild([my.doc.rawtarget.0,'.pdb']) %]"
 				TargetMachine="1"/>
 			<Tool
