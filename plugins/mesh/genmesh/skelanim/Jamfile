@@ -5,6 +5,7 @@ Description gmeshskelanim : "General mesh skeletal animation plugin" ;
 Plugin gmeshskelanim
 	: [ Wildcard *.cpp *.h ]
 ;
+Includes gmeshskelanim.h : $(SUBDIR)/gmeshskelanim.tok ;
 LinkWith gmeshskelanim : crystalspace ;
 
 CompileGroups gmeshskelanim :  meshes ;

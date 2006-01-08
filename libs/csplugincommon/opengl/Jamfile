@@ -8,6 +8,7 @@ if $(GL.AVAILABLE) = "yes"
     [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include
 		 csplugincommon opengl ] : *.h ]
     : shared ;
+  Includes driverdb.cpp : $(SUBDIR)/driverdb.tok ;
   LibDepends crystalspace_opengl : crystalspace ;
   ExternalLibs crystalspace_opengl : GL ;
   CFlags crystalspace_opengl : [ FDefines CS_CSPLUGINCOMMON_GL_LIB ] ;

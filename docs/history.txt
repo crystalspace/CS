@@ -13,6 +13,8 @@ chronological order.
 	- res made Win32 thread error reporting more verbose.
 	- res fixed an uninitialized var in viewmesh (which caused display
 	  issues).
+	- res added dependencies for .tok files where used.
+	- res fixed VC warnings in tritri.cpp.
 6-Jan-2006
 	- mdmkolbe made some more warning fixes.
 	- Marten removed some warning-disable #pragmas for VC, and

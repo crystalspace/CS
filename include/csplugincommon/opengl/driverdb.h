@@ -48,8 +48,6 @@ public:
   const char* rulePhase;
 
   csStringHash tokens;
-#define CS_TOKEN_ITEM_FILE "csplugincommon/opengl/driverdb.tok"
-#include "cstool/tokenlist.h"
 
   csGLDriverDatabase ();
   ~csGLDriverDatabase ();

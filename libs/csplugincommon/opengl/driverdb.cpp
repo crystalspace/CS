@@ -32,6 +32,9 @@
 
 CS_LEAKGUARD_IMPLEMENT (csGLDriverDatabase);
 
+#define CS_TOKEN_ITEM_FILE "libs/csplugincommon/opengl/driverdb.tok"
+#include "cstool/tokenlist.h"
+
 class csDriverDBReader
 {
 private:
@@ -90,7 +93,7 @@ bool csDriverDBReader::Apply (iDocumentNode* node)
 
     switch (token)
     {
-      case csGLDriverDatabase::XMLTOKEN_USECFG:
+      case XMLTOKEN_USECFG:
 	{
 	  const char* cfgname = child->GetContentsValue ();
 	  csRef<csConfigDocument> cfg (configs.Get (cfgname, 0));
@@ -151,19 +154,19 @@ bool csDriverDBReader::ParseConditions (iDocumentNode* node,
 
     switch (token)
     {
-      case csGLDriverDatabase::XMLTOKEN_CONDITIONS:
+      case XMLTOKEN_CONDITIONS:
 	if (!ParseConditions (child, lastResult))
 	  return false;
 	break;
-      case csGLDriverDatabase::XMLTOKEN_NEGATE:
+      case XMLTOKEN_NEGATE:
 	if (!ParseConditions (child, lastResult, true))
 	  return false;
 	break;
-      case csGLDriverDatabase::XMLTOKEN_REGEXP:
+      case XMLTOKEN_REGEXP:
 	if (!ParseRegexp (child, lastResult))
 	  return false;
 	break;
-      case csGLDriverDatabase::XMLTOKEN_COMPAREVER:
+      case XMLTOKEN_COMPAREVER:
 	if (!ParseCompareVer (child, lastResult))
 	  return false;
 	break;
@@ -374,7 +377,7 @@ bool csDriverDBReader::ParseConfigs (iDocumentNode* node)
 
     switch (token)
     {
-      case csGLDriverDatabase::XMLTOKEN_CONFIG:
+      case XMLTOKEN_CONFIG:
 	{
 	  const char* name = child->GetAttributeValue ("name");
 	  if (!name)
@@ -414,7 +417,7 @@ bool csDriverDBReader::ParseRules (iDocumentNode* node)
 
     switch (token)
     {
-      case csGLDriverDatabase::XMLTOKEN_RULE:
+      case XMLTOKEN_RULE:
 	{
 	  const char* rulePhase = child->GetAttributeValue ("phase");
 	  if (rulePhase == 0) rulePhase = "";
@@ -480,7 +483,7 @@ void csGLDriverDatabase::Report (int severity, const char* msg, ...)
 
 csGLDriverDatabase::csGLDriverDatabase ()
 {
-  InitTokenTable (tokens);
+  ::InitTokenTable (tokens);
 }
 
 csGLDriverDatabase::~csGLDriverDatabase ()

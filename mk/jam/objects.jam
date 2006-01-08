@@ -171,10 +171,10 @@ rule HeaderRule
   local i ;
   for i in $(s)
   {
-    HDRGRIST on $(s) = $(HDRGRIST) ;
-    HDRSEARCH on $(s) = $(HDRSEARCH) ;
-    HDRRULE on $(s) = [ on $(<) GetVar HDRRULE ] ;
-    HDRSCAN on $(s) = [ on $(<) GetVar HDRPATTERN ] ;
+    HDRGRIST on $(i) = $(HDRGRIST) ;
+    HDRSEARCH on $(i) = $(HDRSEARCH) ;
+    HDRRULE on $(i) = [ on $(<) GetVar HDRRULE ] ;
+    HDRSCAN on $(i) = [ on $(<) GetVar HDRPATTERN ] ;
   }
 }
 
@@ -196,10 +196,10 @@ rule HeaderRule
   {
     if $(HDRRULE_$(i:S))
     {
-      HDRGRIST on $(s) = $(HDRGRIST) ;
-      HDRSEARCH on $(s) = $(HDRSEARCH) ;	
-      HDRRULE on $(s) = $(HDRRULE_$(i:S)) ;
-      HDRSCAN on $(s) = $(HDRPATTERN_$(i:S)) ;
+      HDRGRIST on $(i) = $(HDRGRIST) ;
+      HDRSEARCH on $(i) = $(HDRSEARCH) ;	
+      HDRRULE on $(i) = $(HDRRULE_$(i:S)) ;
+      HDRSCAN on $(i) = $(HDRPATTERN_$(i:S)) ;
     }
     else if $(JAM_DEBUG)
     {

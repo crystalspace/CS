@@ -2,5 +2,6 @@ SubDir TOP plugins video render3d shader shaderplugins softshader ;
 
 Description softshader : "Render3d Shaderplugin for software renderer" ;
 Plugin softshader : [ Wildcard *.cpp *.h ] ;
+Includes softshader_fp.h : $(SUBDIR)/softshader_fp.tok ;
 LinkWith softshader : crystalspace ;
 CompileGroups softshader : shaders renderers renderall softrenderer ;

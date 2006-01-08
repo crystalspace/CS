@@ -5,6 +5,7 @@ Description stdpt : "standard procedural textures" ;
 Plugin stdpt
 	: [ Wildcard *.cpp *.h ]
 ;
+Includes fire.h : $(SUBDIR)/fire.tok ;
 LinkWith stdpt : crystalspace ;
 
 CompileGroups stdpt : proctexes ;

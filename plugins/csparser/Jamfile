@@ -5,6 +5,8 @@ Description csparser : "map file parser" ;
 Plugin csparser
 	: [ Wildcard *.cpp *.h ]
 ;
+Includes csloader.h : $(SUBDIR)/csloader.tok ;
+Includes loadtex.h : $(SUBDIR)/cubemaploader.tok $(SUBDIR)/tex3dloader.tok ;
 LinkWith csparser : crystalspace ;
 
 SubInclude TOP plugins csparser services ;

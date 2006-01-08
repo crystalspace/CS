@@ -67,11 +67,11 @@
     e=Ax*Cy-Ay*Cx;                                    \
     if(f>0)                                           \
     {                                                 \
-      if(e>=0 && e<=f) return 1;                      \
+      if(e>=0 && e<=f) return true;                   \
     }                                                 \
     else                                              \
     {                                                 \
-      if(e<=0 && e>=f) return 1;                      \
+      if(e<=0 && e>=f) return true;                   \
     }                                                 \
   }                                
 
@@ -109,12 +109,12 @@
   d2=a*V0[i0]+b*V0[i1]+c;                   \
   if(d0*d1>0.0)                             \
   {                                         \
-    if(d0*d2>0.0) return 1;                 \
+    if(d0*d2>0.0) return true;              \
   }                                         \
 }
 
-static int coplanar_tri_tri(const csVector3& N, const csVector3 tri1[3],
-                     const csVector3 tri2[3])
+static bool coplanar_tri_tri(const csVector3& N, const csVector3 tri1[3],
+                             const csVector3 tri2[3])
 {
    float A[3];
    short i0,i1;
@@ -159,7 +159,7 @@ static int coplanar_tri_tri(const csVector3& N, const csVector3 tri1[3],
     POINT_IN_TRI(tri1[0],tri2[0],tri2[1],tri2[2]);
     POINT_IN_TRI(tri2[0],tri1[0],tri1[1],tri1[2]);
 
-    return 0;
+    return false;
 }
 
 #define NEWCOMPUTE_INTERVALS(VV0,VV1,VV2,D0,D1,D2,D0D1,D0D2,A,B,C,X0,X1) \
@@ -205,7 +205,7 @@ static int coplanar_tri_tri(const csVector3& N, const csVector3 tri1[3],
  */
 
 bool csIntersect3::TriangleTriangle(const csVector3 tri1[3],
-                     const csVector3 tri2[3])
+                                    const csVector3 tri2[3])
 {
   csVector3 E1,E2;
   csVector3 N1,N2;
@@ -311,8 +311,8 @@ bool csIntersect3::TriangleTriangle(const csVector3 tri1[3],
   SORT(isect1[0],isect1[1]);
   SORT(isect2[0],isect2[1]);
 
-  if(isect1[1]<isect2[0] || isect2[1]<isect1[0]) return 0;
-  return 1;
+  if(isect1[1]<isect2[0] || isect2[1]<isect1[0]) return false;
+  return true;
 }
 
 /* sort so that a<=b */
@@ -569,7 +569,7 @@ bool csIntersect3::TriangleTriangle(const csVector3 tri1[3],
       else { isectline.SetEnd(isectpointB[0]); } 
     }
   }
-  return 1;
+  return true;
 }
 
 

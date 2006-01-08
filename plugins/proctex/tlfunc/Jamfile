@@ -5,4 +5,5 @@ Description tlfunc : "Function texture loader" ;
 Plugin tlfunc
 	: [ Wildcard *.cpp *.h ]
 ;
+Includes tlfunc.h : $(SUBDIR)/tlfunc.tok ;
 LinkWith tlfunc : crystalspace ;
