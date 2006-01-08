@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Jan-2006
+	- res fixed some spurious text drawing issues.
+	- res removed the 'extern "C"' functions from the ODE plugin (since
+	  they aren't used any more).
+	- res made Win32 thread error reporting more verbose.
+	- res fixed an uninitialized var in viewmesh (which caused display
+	  issues).
 6-Jan-2006
 	- mdmkolbe made some more warning fixes.
 	- Marten removed some warning-disable #pragmas for VC, and

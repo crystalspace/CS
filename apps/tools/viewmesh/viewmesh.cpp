@@ -60,8 +60,9 @@ struct vmAnimCallback : public CalAnimationCallback
 //---------------------------------------------------------------------------
 
 ViewMesh::ViewMesh () : 
-  camMode(movenormal), roomsize(5), scale(1), selectedSocket(0),
-  selectedCal3dSocket(0), meshTx(0), meshTy(0), meshTz(0), callback(0)
+  camMode(movenormal), roomsize(5), scale(1), move_sprite_speed(0),
+  selectedSocket(0),  selectedCal3dSocket(0), meshTx(0), meshTy(0), 
+  meshTz(0), callback(0)
 {
   SetApplicationName ("CrystalSpace.ViewMesh");
 }

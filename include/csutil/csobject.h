@@ -36,7 +36,7 @@ typedef csRefArray<iObject> csObjectContainer;
 
 /**
  * A generic csObject class. Any csObject can have any number of iObject
- * children attached to it. You can use SCF_QUERY_INTERFACE to get interfaces
+ * children attached to it. You can use scfQueryInterface to get interfaces
  * from the child objects.
  */
 class CS_CRYSTALSPACE_EXPORT csObject : 

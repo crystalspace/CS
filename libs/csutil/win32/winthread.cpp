@@ -24,9 +24,13 @@
 
 #include "csutil/win32/wintools.h"
 
-static inline bool CheckLastError (char*& lasterr)
+/* Uncomment to throw an assertion in case of a returned error
+ * (otherwise, the error is just printed) */
+//#define ASSERT_ON_ERROR
+
+static inline bool CheckLastError (char*& lasterr, DWORD& errCode)
 {
-  DWORD errCode = GetLastError();
+  errCode = GetLastError();
   delete[] lasterr;
   if (errCode != NO_ERROR)
   {
@@ -39,10 +43,15 @@ static inline bool CheckLastError (char*& lasterr)
   return (errCode != NO_ERROR);
 }
 
-static inline void ShowError (const char* message, const char* lasterr)
+static inline void ShowError (const char* function, const char* message, 
+				const char* lasterr, DWORD errCode)
 {
 #ifdef CS_DEBUG
-  csPrintf ("'%s' failed: %s\n", message, lasterr);
+  csPrintf ("'%s' failed in %s: %s [0x%x]\n", message, function, lasterr, 
+	    (uint)errCode);
+  #ifdef ASSERT_ON_ERROR
+    CS_ASSERT(false);
+  #endif
 #else
   /* Pacify the compiler warnings */
   (void)message;
@@ -50,16 +59,18 @@ static inline void ShowError (const char* message, const char* lasterr)
 #endif
 }
 
-static inline void TestError (bool result, const char* message, char*& lasterr)
+static inline void TestError (bool result, const char* function, 
+				const char* message, char*& lasterr)
 {
   if (!result)
   {
-    if (CheckLastError (lasterr))
-      ShowError (message, lasterr);
+    DWORD errCode;
+    if (CheckLastError (lasterr, errCode))
+      ShowError (function, message, lasterr, errCode);
   }
 }
 
-#define CS_TEST(x)    TestError ((x), #x, lasterr);
+#define CS_TEST(x)    TestError ((x), CS_FUNCTION_NAME, #x, lasterr);
 
 csRef<csMutex> csMutex::Create (bool recursive)
 {

@@ -370,26 +370,6 @@ csReversibleTransform GetGeomTransform (dGeomID id)
   return csReversibleTransform (rot, csVector3 (pos[0], pos[1], pos[2]));
 }
 
-/*
-The ODE version contained in the win32libs package defines the dCollide*
-functions as extern "C" (otherwise the DLL couldn't be shared by different
-compilers). For other platforms, it's not the case. For Mingw and Cygwin
-users, this setting will be detected automatically by the CS configure
-script.
-*/
-#if defined(CS_USE_ODE_EXTERN_C)
-#define ODE_EXTERN  extern "C"
-#else
-#define ODE_EXTERN  extern
-#endif
-/* defined in ode */
-ODE_EXTERN int dCollideBoxPlane (dxGeom *o1, dxGeom *o2, int flags,
-                                 dContactGeom *outcontacts, int skip);
-ODE_EXTERN int dCollideCCylinderPlane (dxGeom *o1, dxGeom *o2, int flags,
-                                       dContactGeom *outcontacts, int skip);
-ODE_EXTERN int dCollideRayPlane (dxGeom *o1, dxGeom *o2, int flags,
-                                 dContactGeom *contact, int skip);
-
 typedef csDirtyAccessArray<csMeshedPolygon> csPolyMeshList;
 
 #if 0

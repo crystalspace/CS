@@ -1374,7 +1374,7 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
     if (ext->CS_GL_ARB_multitexture)
     {
-      for (i = 0; i < CS_GL_MAX_LAYER; i++)
+      for (i = CS_GL_MAX_LAYER; i-- > 0;)
       {
         statecache->SetActiveTU (i);
         statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
@@ -1778,8 +1778,6 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
 {
   SwapIfNeeded();
 
-  DeactivateBuffers (0, 0);
-
   /*
     @@@ DrawPixmap is called in 2D mode quite often.
     To reduce state changes, the text drawing states are reset as late
@@ -1787,6 +1785,9 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
     the screen, do the same here.
    */
   G2D->PerformExtension ("glflushtext");
+
+  if (current_drawflags & CSDRAW_3DGRAPHICS)
+    DeactivateBuffers (0, 0);
 
   if (drawPixmapAFP)
   {
