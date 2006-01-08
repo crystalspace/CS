@@ -1740,7 +1740,7 @@ yyreturn:
 int
 awserror(char *s)
 {
-  static_awsparser->ReportError (s);
+  static_awsparser->ReportError ("Parse error at line %d: %s", awslineno, s);
   return 0;
 }
 
