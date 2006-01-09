@@ -27,18 +27,21 @@
 #include "iutil/databuff.h"
 #include "csplugincommon/imageloader/commonimagefile.h"
 
+namespace cspluginPNGimg
+{
+
 /**
  * The PNG image file format loader.
  */
-class csPNGImageIO : public iImageIO
+class csPNGImageIO : public scfImplementation2<csPNGImageIO, 
+                                               iImageIO,
+                                               iComponent>
 {
 protected:
   csImageIOFileFormatDescriptions formats;
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csPNGImageIO (iBase *pParent);
   virtual ~csPNGImageIO ();
 
@@ -51,13 +54,8 @@ public:
       iImageIO::FileFormatDescription *format = 0,
     const char* extraoptions = 0);
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csPNGImageIO);
-    virtual bool Initialize (iObjectRegistry* p) 
-    { scfParent->object_reg = p; return true; }
-  } scfiComponent;
-  friend struct eiComponent;
+  virtual bool Initialize (iObjectRegistry* p) 
+  { object_reg = p; return true; }
 };
 
 /**
@@ -106,5 +104,7 @@ private:
 public:
   CS_LEAKGUARD_DECLARE (ImagePngFile);
 };
+
+} // namespace cspluginPNGimg
 
 #endif // __CS_PNGIMAGE_H__

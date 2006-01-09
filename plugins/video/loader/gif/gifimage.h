@@ -25,17 +25,20 @@
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 
+namespace cspluginGIFimg
+{
+
 /**
  * The GIF image file format loader.
  */
-class csGIFImageIO : public iImageIO
+class csGIFImageIO : public scfImplementation2<csGIFImageIO, 
+                                               iImageIO,
+                                               iComponent>
 {
  protected:
   csImageIOFileFormatDescriptions formats;
 
  public:
-  SCF_DECLARE_IBASE;
-
   csGIFImageIO (iBase *pParent);
   virtual ~csGIFImageIO ();
 
@@ -48,11 +51,7 @@ class csGIFImageIO : public iImageIO
   	iImageIO::FileFormatDescription *format = 0,
     	const char* extraoptions = 0);
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csGIFImageIO);
-    virtual bool Initialize (iObjectRegistry*) { return true; }
-  } scfiComponent;
+  virtual bool Initialize (iObjectRegistry*) { return true; }
 };
 
 /// An csImageFile subclass for reading GIF files.
@@ -68,5 +67,7 @@ private:
   /// Try to read the GIF file from the buffer and return success status
   bool Load (uint8* iBuffer, size_t iSize);
 };
+
+} // namespace cspluginGIFimg
 
 #endif // __CS_GIFIMAGE_H__

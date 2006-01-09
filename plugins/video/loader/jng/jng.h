@@ -28,13 +28,15 @@
 #include "iutil/virtclk.h"
 #include "csutil/memfile.h"
 
-namespace JngLoader
+namespace cspluginJNGimg
 {
 
 /**
  * The JNG image file format loader.
  */
-class csJNGImageIO : public iImageIO
+class csJNGImageIO : public scfImplementation2<csJNGImageIO,
+                                               iImageIO,
+                                               iComponent>
 {
  protected:
   csImageIOFileFormatDescriptions formats;
@@ -53,8 +55,6 @@ class csJNGImageIO : public iImageIO
   	mng_uint32 iLinenr);
 
  public:
-  SCF_DECLARE_IBASE;
-
   csJNGImageIO (iBase *pParent);
   virtual ~csJNGImageIO ();
 
@@ -69,20 +69,15 @@ class csJNGImageIO : public iImageIO
 
   virtual bool Initialize (iObjectRegistry* p) 
   { object_reg = p; return true; }
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csJNGImageIO);
-    virtual bool Initialize (iObjectRegistry* p) 
-      { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /**
  * An csImageFile subclass for reading JNG files.<p>
  * This implementation needs libmng to read .JNG files.
  */
-class ImageJngFile : public csImageMemory, public iAnimatedImage
+class ImageJngFile : public scfImplementationExt1<ImageJngFile, 
+                                                  csImageMemory, 
+                                                  iAnimatedImage>
 {
   friend class csJNGImageIO;
 private:
@@ -127,12 +122,10 @@ private:
   /// Try to read the JNG file from the buffer and return success status
   bool Load (uint8* iBuffer, size_t iSize);
 public:
-  SCF_DECLARE_IBASE_EXT (csImageMemory);
-
   virtual bool Animate (csTicks time, csRect* dirtyrect = 0);
   virtual bool IsAnimated ();
 };
 
-} // namespace JngLoader
+} // namespace cspluginJNGimg
 
 #endif // __CS_JNG_H__

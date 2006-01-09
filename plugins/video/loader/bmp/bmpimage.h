@@ -26,17 +26,20 @@
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 
+namespace cspluginBMPimg
+{
+
 /**
  * The BMP image file format loader.
  */
-class csBMPImageIO : public iImageIO
+class csBMPImageIO : public scfImplementation2<csBMPImageIO,
+                                               iImageIO,
+                                               iComponent>
 {
  protected:
   csImageIOFileFormatDescriptions formats;
 
  public:
-  SCF_DECLARE_IBASE;
-
   csBMPImageIO (iBase *pParent);
   virtual ~csBMPImageIO ();
 
@@ -49,11 +52,7 @@ class csBMPImageIO : public iImageIO
   	iImageIO::FileFormatDescription *format = 0,
 	const char* extraoptions = 0);
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csBMPImageIO);
-    virtual bool Initialize (iObjectRegistry*) { return true; }
-  } scfiComponent;
+  virtual bool Initialize (iObjectRegistry*) { return true; }
 };
 
 /**
@@ -75,5 +74,7 @@ private:
   /// Try to read the BMP file from the buffer and return success status
   bool Load (uint8* iBuffer, size_t iSize);
 };
+
+} // namespace cspluginBMPimg
 
 #endif // __CS_BMPIMAGE_H__

@@ -26,18 +26,21 @@
 #include "iutil/databuff.h"
 #include "csplugincommon/imageloader/commonimagefile.h"
 
+namespace cspluginTGAimg
+{
+
 /**
  * The TGA image file format loader.
  */
-class csTGAImageIO : public iImageIO
+class csTGAImageIO : public scfImplementation2<csTGAImageIO,
+                                               iImageIO,
+                                               iComponent>
 {
 protected:
   csImageIOFileFormatDescriptions formats;
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csTGAImageIO (iBase *pParent);
   virtual ~csTGAImageIO ();
 
@@ -50,13 +53,8 @@ public:
   	iImageIO::FileFormatDescription *format = 0,
     	const char* extraoptions = 0);
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csTGAImageIO);
-    virtual bool Initialize (iObjectRegistry* p) 
-    { scfParent->object_reg = p; return true; }
-  } scfiComponent;
-  friend struct eiComponent;
+  virtual bool Initialize (iObjectRegistry* p) 
+  { object_reg = p; return true; }
 };
 
 /* Header definition. */
@@ -146,5 +144,7 @@ private:
   /// Try to read the TGA file from the buffer and return success status
   virtual csRef<iImageFileLoader> InitLoader (csRef<iDataBuffer> source);
 };
+
+} // namespace cspluginTGAimg
 
 #endif // __CS_TGAIMAGE_H__

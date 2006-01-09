@@ -37,21 +37,14 @@ extern "C"
 
 #include "pngimage.h"
 
-CS_LEAKGUARD_IMPLEMENT (ImagePngFile);
-
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csPNGImageIO)
-  SCF_IMPLEMENTS_INTERFACE (iImageIO)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
+namespace cspluginPNGimg
+{
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPNGImageIO::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+CS_LEAKGUARD_IMPLEMENT (ImagePngFile);
 
 SCF_IMPLEMENT_FACTORY (csPNGImageIO)
-
 
 #define PNG_MIME "image/png"
 
@@ -92,10 +85,9 @@ static iImageIO::FileFormatDescription formatlist[5] =
   {PNG_MIME, "RGBA", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE}
 };
 
-csPNGImageIO::csPNGImageIO (iBase *pParent)
+csPNGImageIO::csPNGImageIO (iBase *pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   formats.Push (&formatlist[0]);
   formats.Push (&formatlist[1]);
   formats.Push (&formatlist[2]);
@@ -105,8 +97,6 @@ csPNGImageIO::csPNGImageIO (iBase *pParent)
 
 csPNGImageIO::~csPNGImageIO()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 const csImageIOFileFormatDescriptions& csPNGImageIO::GetDescription ()
@@ -278,9 +268,9 @@ error2:
       Image->GetKeyColor (key_r, key_g, key_b);
       png_color_16 trans;
       memset (&trans, 0, sizeof(trans));
-      trans.red = csBigEndianShort (key_r << 8);
-      trans.green = csBigEndianShort (key_g << 8);
-      trans.blue = csBigEndianShort (key_b << 8);
+      trans.red = csBigEndian::UInt16 (key_r << 8);
+      trans.green = csBigEndian::UInt16 (key_g << 8);
+      trans.blue = csBigEndian::UInt16 (key_b << 8);
       png_set_tRNS (png, info, 0, 0, &trans);
     }
   }
@@ -446,9 +436,9 @@ nomem2:
 	  png_color_16p trans_values;
 	  png_get_tRNS (png, info, 0, 0, &trans_values);
 	  hasKeycolor = true;
-	  keycolor.red = csConvertEndian (trans_values->gray) & 0xff;
-	  keycolor.green = csConvertEndian (trans_values->gray) & 0xff;
-	  keycolor.blue = csConvertEndian (trans_values->gray) & 0xff;
+	  keycolor.red = csLittleEndian::Convert (trans_values->gray) & 0xff;
+	  keycolor.green = csLittleEndian::Convert (trans_values->gray) & 0xff;
+	  keycolor.blue = csLittleEndian::Convert (trans_values->gray) & 0xff;
 	}
       }
       break;
@@ -507,9 +497,9 @@ nomem2:
 	  png_color_16p trans_values;
 	  png_get_tRNS (png, info, 0, 0, &trans_values);
 	  hasKeycolor = true;
-	  keycolor.red = csConvertEndian (trans_values->red) & 0xff;
-	  keycolor.green = csConvertEndian (trans_values->green) & 0xff;
-	  keycolor.blue = csConvertEndian (trans_values->blue) & 0xff;
+	  keycolor.red = csLittleEndian::Convert (trans_values->red) & 0xff;
+	  keycolor.green = csLittleEndian::Convert (trans_values->green) & 0xff;
+	  keycolor.blue = csLittleEndian::Convert (trans_values->blue) & 0xff;
 	}
         png_set_filler (png, 0xff, PNG_FILLER_AFTER);
       }
@@ -676,3 +666,5 @@ csRef<iImageFileLoader> ImagePngFile::InitLoader (csRef<iDataBuffer> source)
   if (!loader->InitOk()) return 0;
   return loader;
 }
+
+} // namespace cspluginPNGimg

@@ -53,20 +53,10 @@ extern "C"
 
 CS_IMPLEMENT_PLUGIN
 
-namespace JngLoader
+namespace cspluginJNGimg
 {
 
-SCF_IMPLEMENT_IBASE (csJNGImageIO)
-  SCF_IMPLEMENTS_INTERFACE (iImageIO)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csJNGImageIO::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csJNGImageIO)
-
 
 #define JNG_MIME "image/x-jng" 
 #define MNG_MIME "image/x-mng"
@@ -113,18 +103,15 @@ void ReportLibmngError (iObjectRegistry *object_reg, mng_handle hMNG, char* msg)
     msg, errortext, severity, chunkname, chunkseq, extra1, extra2);
 }
 
-csJNGImageIO::csJNGImageIO (iBase *pParent)
+csJNGImageIO::csJNGImageIO (iBase *pParent) : 
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   formats.Push (&formatlist[0]);
   formats.Push (&formatlist[1]);
 }
 
 csJNGImageIO::~csJNGImageIO()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 const csImageIOFileFormatDescriptions& csJNGImageIO::GetDescription ()
@@ -703,10 +690,6 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, const char *mime,
  * (http://www.libmng.com/MNGsuite) and see for yourself.
  */
 
-SCF_IMPLEMENT_IBASE_EXT (ImageJngFile)
-  SCF_IMPLEMENTS_INTERFACE (iAnimatedImage)
-SCF_IMPLEMENT_IBASE_EXT_END
-
 mng_bool ImageJngFile::cb_readdata (mng_handle hHandle, mng_ptr pBuf,
 					      mng_uint32 iBuflen, mng_uint32 *pRead)
 {
@@ -787,7 +770,7 @@ mng_bool ImageJngFile::cb_settimer (mng_handle hHandle, mng_uint32 iMsecs)
 }
 
 ImageJngFile::ImageJngFile (int iFormat, iObjectRegistry* p) : 
-  csImageMemory (iFormat)
+  scfImplementationType (this, iFormat)
 { 
   object_reg = p; 
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
@@ -953,4 +936,4 @@ bool ImageJngFile::IsAnimated ()
    */
 }
 
-} // namespace JngLoader
+} // namespace cspluginJNGimg

@@ -25,17 +25,10 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csGIFImageIO)
-  SCF_IMPLEMENTS_INTERFACE (iImageIO)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGIFImageIO::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+namespace cspluginGIFimg
+{
 
 SCF_IMPLEMENT_FACTORY (csGIFImageIO)
-
 
 static iImageIO::FileFormatDescription formatlist[2] =
 {
@@ -43,18 +36,15 @@ static iImageIO::FileFormatDescription formatlist[2] =
   {"image/gif", "GIF89a", CS_IMAGEIO_LOAD}
 };
 
-csGIFImageIO::csGIFImageIO (iBase *pParent)
+csGIFImageIO::csGIFImageIO (iBase *pParent) : 
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   formats.Push (&formatlist[0]);
   formats.Push (&formatlist[1]);
 }
 
 csGIFImageIO::~csGIFImageIO()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 const csImageIOFileFormatDescriptions& csGIFImageIO::GetDescription ()
@@ -460,3 +450,5 @@ bool ImageGifFile::Load (uint8* iBuffer, size_t iSize)
 
   return (rc == 0);
 }
+
+} // namespace cspluginGIFimg

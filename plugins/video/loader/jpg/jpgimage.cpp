@@ -30,21 +30,14 @@
 #include "csutil/databuf.h"
 #include "ivaria/reporter.h"
 
-CS_LEAKGUARD_IMPLEMENT (ImageJpgFile);
-
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csJPGImageIO)
-  SCF_IMPLEMENTS_INTERFACE (iImageIO)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
+namespace cspluginJPGimg
+{
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csJPGImageIO::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+CS_LEAKGUARD_IMPLEMENT (ImageJpgFile);
 
 SCF_IMPLEMENT_FACTORY (csJPGImageIO)
-
 
 #define JPG_MIME "image/jpg"
 
@@ -72,18 +65,15 @@ void Report (iObjectRegistry *object_reg, int severity, const char* msg, ...)
   va_end (arg);
 }
 
-csJPGImageIO::csJPGImageIO (iBase *pParent)
+csJPGImageIO::csJPGImageIO (iBase *pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   formats.Push (&formatlist[0]);
   formats.Push (&formatlist[1]);
 }
 
 csJPGImageIO::~csJPGImageIO()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 const csImageIOFileFormatDescriptions& csJPGImageIO::GetDescription ()
@@ -622,3 +612,5 @@ csRef<iImageFileLoader> ImageJpgFile::InitLoader (csRef<iDataBuffer> source)
   if (!loader->InitOk()) return 0;
   return loader;
 }
+
+} // namespace cspluginJPGimg

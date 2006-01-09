@@ -103,7 +103,7 @@ bool csDDSSaver::FmtDXT::Save (csMemFile& out, iImage* image)
   size_t wordCount = (MAX(imgW, 4)*MAX(imgH, 4)) / ((method == ImageLib::DC_DXT1) ? 4 : 2);
   while (wordCount-- > 0)
   {
-    uint16 ui16 = csLittleEndianShort (*dxtBlocks++);
+    uint16 ui16 = csLittleEndian::Convert (*dxtBlocks++);
     out.Write ((char*)&ui16, sizeof (ui16));
   }
 
@@ -230,7 +230,7 @@ csPtr<iDataBuffer> csDDSSaver::Save (csRef<iImage> image,
     uint32* ptr = (uint32*)&ddsHead;
     while (n-- > 0)
     {
-      uint32 x = csGetLittleEndianLong (ptr++);
+      uint32 x = csLittleEndian::Convert (*(ptr++));
       outFile.Write ((char*)&x, sizeof (x));
     }
   }

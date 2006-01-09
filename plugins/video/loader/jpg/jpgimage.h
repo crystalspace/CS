@@ -37,18 +37,21 @@ extern "C"
 #undef INT32
 }
 
+namespace cspluginJPGimg
+{
+
 /**
  * The JPG image file format loader.
  */
-class csJPGImageIO : public iImageIO
+class csJPGImageIO : public scfImplementation2<csJPGImageIO, 
+                                               iImageIO,
+                                               iComponent>
 {
 protected:
   csImageIOFileFormatDescriptions formats;
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csJPGImageIO (iBase *pParent);
   virtual ~csJPGImageIO ();
 
@@ -63,13 +66,6 @@ public:
 
   bool Initialize (iObjectRegistry* p) 
   { object_reg = p; return true; }
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csJPGImageIO);
-    virtual bool Initialize (iObjectRegistry* p) 
-      { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 /* ==== Error mgmnt ==== */
@@ -119,5 +115,7 @@ private:
 public:
   CS_LEAKGUARD_DECLARE (ImageJpgFile);
 };
+
+} // namespace cspluginJPGimg
 
 #endif // __CS_JPGIMAGE_H__

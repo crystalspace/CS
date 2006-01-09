@@ -18,6 +18,7 @@ chronological order.
 	- res moved the generated manifest for apps into a separate file.
 	- res applied a fix from Xordan to fix (old sound) .wav loading on
 	  64bit systems.
+	- res converted the image loaders to new SCF.
 8-Jan-2006
 	- res fixed some spurious text drawing issues.
 	- res removed the 'extern "C"' functions from the ODE plugin (since
