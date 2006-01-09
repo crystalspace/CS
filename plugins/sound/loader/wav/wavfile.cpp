@@ -75,13 +75,13 @@ CS_IMPLEMENT_PLUGIN
   struct _FMTchk
   {
     char chunk_id[4];  // for the format-chunk of wav-files always "fmt "
-    unsigned long len; // length of this chunk after this 8 bytes of header
-    unsigned short fmt_tag; // format category of file. 0x0001 = Microsoft PCM
-    unsigned short channel; // number of channels (1 = mono, 2 = stereo)
-    unsigned long samples_per_sec; // sampling rate
-    unsigned long avg_bytes_per_sec; // for buffer estimation
-    unsigned short blk_align; // data block size
-    unsigned short bits_per_sample; // sample size  (only if Microsoft PCM)
+    uint32 len; // length of this chunk after this 8 bytes of header
+    uint16 fmt_tag; // format category of file. 0x0001 = Microsoft PCM
+    uint16 channel; // number of channels (1 = mono, 2 = stereo)
+    uint32 samples_per_sec; // sampling rate
+    uint32 avg_bytes_per_sec; // for buffer estimation
+    uint16 blk_align; // data block size
+    uint16 bits_per_sample; // sample size  (only if Microsoft PCM)
   } fmtchk;
 
   WAVE Data Chunk:
@@ -89,7 +89,7 @@ CS_IMPLEMENT_PLUGIN
   struct _WAVchk
   {
     char chunk_id[4];  // for the data-chunk of wav-files always "data"
-    unsigned long len; // length of this chunk after this 8 bytes of header
+    uint32 len; // length of this chunk after this 8 bytes of header
   }
 
    ====================================
@@ -140,7 +140,7 @@ SCF_IMPLEMENT_FACTORY(csSoundLoader_WAV)
 struct _RIFFchk
 {
   char riff_id[4]; // for RIFF-files always "RIFF"
-  unsigned long len; // length of chunk after this 8 bytes of header
+  uint32 len; // length of chunk after this 8 bytes of header
   char wave_id[4]; // for wav-files always "WAVE"
 } riffchk;
 
@@ -148,32 +148,32 @@ struct _RIFFchk
 struct _FMTchk
 {
   char chunk_id[4]; // for the format-chunk of wav-files always "fmt "
-  unsigned long len; // length of this chunk after this 8 bytes of header
-  unsigned short fmt_tag;
-  unsigned short channel;
-  unsigned long samples_per_sec;
-  unsigned long avg_bytes_per_sec;
-  unsigned short blk_align;
-  unsigned short bits_per_sample;
+  uint32 len; // length of this chunk after this 8 bytes of header
+  uint16 fmt_tag;
+  uint16 channel;
+  uint32 samples_per_sec;
+  uint32 avg_bytes_per_sec;
+  uint16 blk_align;
+  uint16 bits_per_sample;
 } fmtchk;
 
 // header of the wav-data-chunk
 struct _WAVchk
 {
   char chunk_id[4]; // for wav-data-chunk this is always "data"
-  unsigned long len; // length of chunk after this 8 bytes of header
+  uint32 len; // length of chunk after this 8 bytes of header
 } wavchk;
 
 // helper functions
 /// Byte swap 32 bit data.
-static inline unsigned long csByteSwap32bit( const unsigned long value )
+static inline uint32 csByteSwap32bit( const uint32 value )
 {
   return ((value >> 24 ) & 0x000000FF ) | ((value >> 8) & 0x0000FF00)
         | ((value << 8) & 0x00FF0000) | (( value << 24) & 0xFF000000);
 }
 
 /// Byte swap 16 bit data.
-static inline unsigned short csByteSwap16bit( const unsigned short value )
+static inline uint16 csByteSwap16bit( const uint16 value )
 {
   return (( value >> 8 ) & 0x000000FF ) | (( value << 8 ) & 0x0000FF00 );
 }
@@ -309,7 +309,7 @@ csSoundLoader_WAV::LoadSound (void* databuf, size_t size)
 
   #ifdef CS_BIG_ENDIAN
   if (fmtchk.bits_per_sample == 16)
-    csByteSwap16bitBuffer ( (unsigned short*)data, wavchk.len / 2);
+    csByteSwap16bitBuffer ( (uint16*)data, wavchk.len / 2);
   #endif // CS_BIG_ENDIAN
 
   // set up format for csSoundDataRaw

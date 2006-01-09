@@ -297,9 +297,11 @@ rule MakeManifestFile
 rule MakeManifestRc
 {
   manifestfile = $(<:S=.manifest) ;
+  MakeLocate $(manifestfile) : [ on $(<) GetVar LOCATE ] ;
   MakeManifestFile $(manifestfile) : $(>) ;
-  MANIFEST_NAME on $(<) = $(manifestfile) ;
-  GenerateWin32ManifestRc $(<) : $(manifestfile) ;
+  MANIFEST_NAME on $(<) = $(manifestfile:G=) ;
+  GenerateWin32ManifestRc $(<) ;
+  Depends $(<) : $(manifestfile) ;
 }
 
 rule MakeMetadataRc

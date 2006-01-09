@@ -16,6 +16,8 @@ chronological order.
 	  configuration to use the out/debug directory again (since this is
 	  probably easier to utilize for external projects).
 	- res moved the generated manifest for apps into a separate file.
+	- res applied a fix from Xordan to fix (old sound) .wav loading on
+	  64bit systems.
 8-Jan-2006
 	- res fixed some spurious text drawing issues.
 	- res removed the 'extern "C"' functions from the ODE plugin (since
