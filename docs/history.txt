@@ -21,6 +21,9 @@ chronological order.
 	  issues).
 	- res added dependencies for .tok files where used.
 	- res fixed VC warnings in tritri.cpp.
+7-Jan-2006
+	- Jorrit did some more work on integrating instmesh with meshgen.
+	  Still not 100% functional.
 6-Jan-2006
 	- mdmkolbe made some more warning fixes.
 	- Marten removed some warning-disable #pragmas for VC, and

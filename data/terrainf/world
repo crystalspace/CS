@@ -16,6 +16,8 @@
     <plugin name="ball">crystalspace.mesh.loader.ball</plugin>
     <plugin name="foliageFact">crystalspace.mesh.loader.factory.foliage</plugin>
     <plugin name="foliage">crystalspace.mesh.loader.foliage</plugin>
+    <plugin name="instFact">crystalspace.mesh.loader.factory.instmesh</plugin>
+    <plugin name="inst">crystalspace.mesh.loader.instmesh</plugin>
   </plugins>
 
   <library>grass.lib</library>
@@ -147,6 +149,17 @@
     <meshfact name="skydome">
         <plugin>ballFact</plugin>
         <params />
+    </meshfact>
+
+    <meshfact name="squareInst">
+        <plugin>instFact</plugin>
+        <params>
+                <box>
+                    <min x="-.2" y="-.2" z="-.2" />
+                    <max x=".2" y=".2" z=".2" />
+                </box>
+                <material>box2</material>
+        </params>
     </meshfact>
 
   <meshfact name="TerrainFact">
@@ -330,6 +343,13 @@
 	    <radius>1</radius>
 	    <density>.2</density>
         </geometry>
+	<!--
+        <geometry>
+	    <factory maxdist="20" name="squareInst" />
+	    <radius>1</radius>
+	    <density>.3</density>
+        </geometry>
+	-->
 	<densityscale mindist="17" maxdist="20" maxfactor="0" />
 	<alphascale mindist="13" maxdist="20" />
 	<samplebox>

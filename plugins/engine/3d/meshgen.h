@@ -31,6 +31,7 @@
 #include "csgeom/box.h"
 #include "iengine/mesh.h"
 #include "iengine/meshgen.h"
+#include "imesh/instmesh.h"
 
 struct iSector;
 struct iInstancingMeshState;
@@ -65,7 +66,7 @@ struct csMGGeom
    * This is only used in case this factory represents
    * an instmesh factory.
    */
-  csMGGeomInstMesh* instmeshes;
+  csArray<csMGGeomInstMesh> instmeshes;
 
   /// For every lod level we have a cache of meshes.
   csRefArray<iMeshWrapper> mesh_cache;
@@ -77,9 +78,6 @@ struct csMGGeom
    * This is an optimization to prevent having to traverse all cells.
    */
   csSet<csPtrKey<csMGGeomInstMesh> > instmesh_setaside;
-
-  csMGGeom () : instmeshes (0) { }
-  ~csMGGeom ();
 };
 
 /**

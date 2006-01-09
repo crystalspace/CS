@@ -21,12 +21,6 @@
 #include "csgeom/matrix3.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/meshgen.h"
-#include "imesh/instmesh.h"
-
-csMGGeom::~csMGGeom ()
-{
-  delete[] instmeshes;
-}
 
 csMeshGeneratorGeometry::csMeshGeneratorGeometry (
     csMeshGenerator* generator) : scfImplementationType (this),
@@ -51,16 +45,18 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.factory = factory;
   g.maxdistance = maxdist;
   g.sqmaxdistance = maxdist * maxdist;
+
+  size_t idx = factories.InsertSorted (g, CompareGeom);
+
   csRef<iInstancingFactoryState> fs =
     scfQueryInterface<iInstancingFactoryState> (
 	factory->GetMeshObjectFactory ());
   if (fs != 0)
   {
     int cell_dim = generator->GetCellCount ();
-    g.instmeshes = new csMGGeomInstMesh [cell_dim * cell_dim];
+    factories[idx].instmeshes.SetLength (cell_dim * cell_dim);
   }
 
-  factories.InsertSorted (g, CompareGeom);
   if (maxdist > total_max_dist) total_max_dist = maxdist;
 }
 
@@ -88,7 +84,7 @@ csPtr<iMeshWrapper> csMeshGeneratorGeometry::AllocMesh (
 
   csMGGeom& geom = factories[lod];
   // First check if the geometry is for instmesh.
-  if (geom.instmeshes)
+  if (geom.instmeshes.Length () > 0)
   {
     csMGGeomInstMesh& geominst = geom.instmeshes[cidx];
     if (!geominst.instmesh)
@@ -145,8 +141,10 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
   {
     csMGGeom& geom = factories[lod];
     csMGGeomInstMesh& geominst = geom.instmeshes[cidx];
-    csReversibleTransform tr (matrix, position - mesh->GetMovable ()->
-	GetTransform ().GetOrigin ());
+    csVector3 meshpos = mesh->GetMovable ()->GetFullPosition ();
+    csVector3 pos = position - meshpos;
+    printf ("position=%g,%g,%g    meshpos=%g,%g,%g  ->  pos=%g,%g,%g\n", position.x, position.y, position.z, meshpos.x, meshpos.y, meshpos.z, pos.x, pos.y, pos.z); fflush (stdout);
+    csReversibleTransform tr (matrix, pos);
     geominst.instmesh_state->MoveInstance (instance_id, tr);
   }
 }
@@ -155,7 +153,7 @@ void csMeshGeneratorGeometry::SetAsideMesh (int cidx, iMeshWrapper* mesh,
     size_t lod, size_t instance_id)
 {
   csMGGeom& geom = factories[lod];
-  if (geom.instmeshes)
+  if (geom.instmeshes.Length () > 0)
   {
     csMGGeomInstMesh& geominst = geom.instmeshes[cidx];
     geominst.inst_setaside.Push (cidx);
