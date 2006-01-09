@@ -26,10 +26,6 @@
 # generated but don't appear in any workspaces (since e.g. required libraries 
 # are relatively uncommon and/or not shipped with cs-win32libs).
 MSVC_CONVENIENCE_PROJECTS = vos ;
-if [ Property build : projgen_version ] = 6
-{
-  MSVC_CONVENIENCE_PROJECTS += cegui soft3d softshader ;
-}
 
 # What the typical user will need. Presently, everything but wxWidgets.
 MsvcGenWorkspace typical : : 

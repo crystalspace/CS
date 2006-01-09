@@ -29,15 +29,12 @@ SubInclude TOP plugins stdrep ;
 SubInclude TOP plugins terraformer ;
 SubInclude TOP plugins video ;
 
-if [ Property build : projgen_version ] != 6
+# Assemble big static plugins lib
+if [ Property build : projgen ] = msvc
 {
-  # Assemble big static plugins lib
-  if [ Property build : projgen ] = msvc
-  {
-    StaticPluginLibrary crystalspace_staticplugins : wxgl csvosa3dl ;
-  }
-  else
-  {
-    StaticPluginLibrary crystalspace_staticplugins ;
-  }
+  StaticPluginLibrary crystalspace_staticplugins : wxgl csvosa3dl ;
+}
+else
+{
+  StaticPluginLibrary crystalspace_staticplugins ;
 }
