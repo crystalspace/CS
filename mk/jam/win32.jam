@@ -95,40 +95,43 @@ actions GenerateWin32ManifestRc
 // This file is generated automatically.
 
 #if !defined(CS_PROJECTGEN_VERSION) || (CS_PROJECTGEN_VERSION != 8)
-1 24
+1 24 "$(MANIFEST_NAME)"
+#endif
+__EOF__
+}
+
+actions GenerateWin32Manifest
 {
-  "<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>\r\n",
-  "<assembly xmlns=""urn:schemas-microsoft-com:asm.v1"" manifestVersion=""1.0"">\r\n",
-  "<assemblyIdentity\r\n",
-  "    version=""",
+    cat > $(<) << __EOF__
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- This file is generated automatically. -->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+<assemblyIdentity
 __EOF__
 
     # Filter out non-numerical characters from the version number. Windows does
     # not like them.
-    echo '$(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2]).$(PACKAGE_VERSION_LIST[3]).$(PACKAGE_VERSION_LIST[4])' | $(SED) 's/[^0123456789.]//g' | $(SED) 's/\(.*\)/  "\1",/' >> $(<)
+    echo '$(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2]).$(PACKAGE_VERSION_LIST[3]).$(PACKAGE_VERSION_LIST[4])' | $(SED) 's/[^0123456789.]//g' | $(SED) 's/\(.*\)/    version="\1"/' >> $(<)
   
     cat >> $(<) << __EOF__
-  """\r\n",
-  "    processorArchitecture=""X86""\r\n",
-  "    name=""$(PRODUCT_NAME)""\r\n",
-  "    type=""win32""\r\n",
-  "/>\r\n",
-  "<description>$(PRODUCT_DESCRIPTION)</description>\r\n",
-  "<dependency>\r\n",
-  "    <dependentAssembly>\r\n",
-  "	  <assemblyIdentity\r\n",
-  "	      type=""win32""\r\n",
-  "	      name=""Microsoft.Windows.Common-Controls""\r\n",
-  "	      version=""6.0.0.0""\r\n",
-  "	      processorArchitecture=""X86""\r\n",
-  "	      publicKeyToken=""6595b64144ccf1df""\r\n",
-  "	      language=""*""\r\n",
-  "	  />\r\n",
-  "    </dependentAssembly>\r\n",
-  "</dependency>\r\n",
-  "</assembly>\r\n"
-}
-#endif
+    processorArchitecture="X86"
+    name="$(PRODUCT_NAME)"
+    type="win32"
+/>
+<description>$(PRODUCT_DESCRIPTION)</description>
+<dependency>
+    <dependentAssembly>
+	  <assemblyIdentity
+	      type="win32"
+	      name="Microsoft.Windows.Common-Controls"
+	      version="6.0.0.0"
+	      processorArchitecture="X86"
+	      publicKeyToken="6595b64144ccf1df"
+	      language="*"
+	  />
+    </dependentAssembly>
+</dependency>
+</assembly>
 __EOF__
 }
 
@@ -265,7 +268,7 @@ rule MakeVersionRc
   GenerateWin32VersionRc $(<) ;
 }
 
-rule MakeManifestRc
+rule MakeManifestFile
 {
   # normalize version list
   local v1, v2, v3, v4 ;
@@ -284,11 +287,19 @@ rule MakeManifestRc
   PRODUCT_DESCRIPTION on $(<) = $(desc) ;
 
   local name ;
-  if $(PACKAGE_NAME) { name = $(PACKAGE_NAME) ; }
+  if $(PACKAGE_NAME) { name = $(PACKAGE_NAME).$(>) ; }
   else { name = $(>) ; }
   PRODUCT_NAME on $(<) = $(name) ;
       
-  GenerateWin32ManifestRc $(<) ;
+  GenerateWin32Manifest $(<) ;
+}
+
+rule MakeManifestRc
+{
+  manifestfile = $(<:S=.manifest) ;
+  MakeManifestFile $(manifestfile) : $(>) ;
+  MANIFEST_NAME on $(<) = $(manifestfile) ;
+  GenerateWin32ManifestRc $(<) : $(manifestfile) ;
 }
 
 rule MakeMetadataRc

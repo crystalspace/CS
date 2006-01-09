@@ -746,10 +746,18 @@ rule MsvcProject
 
     if [ IsElem $(type) : appgui appcon ]
     {
+      local manifest = $(msvcname:S=.manifest) ; 
+      MakeLocate $(manifest) : $(outdir) ;
+      MakeManifestFile $(manifest) : $(rawnam) ;
+      Always $(manifest) ;
+      
       local manifestrc = $(resource:S=.mfrctmp) ;
       MakeLocate $(manifestrc) : $(workdir) ;
-      MakeManifestRc $(manifestrc) : $(rawname) ;
+      MANIFEST_NAME on $(manifestrc) = $(msvcname:S=.manifest) ;
+      GenerateWin32ManifestRc $(manifestrc) ;
+      Depends $(manifestrc) : $(manifest) ;
       Always $(manifestrc) ;
+      
       Win32Resource $(rawname) : $(manifestrc) ;
       MsvcRmTemps $(resource) : $(manifestrc) ;
       

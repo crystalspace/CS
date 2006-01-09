@@ -15,6 +15,7 @@ chronological order.
 	- res changed the MemoryTracker and RefTracker VC project build
 	  configuration to use the out/debug directory again (since this is
 	  probably easier to utilize for external projects).
+	- res moved the generated manifest for apps into a separate file.
 8-Jan-2006
 	- res fixed some spurious text drawing issues.
 	- res removed the 'extern "C"' functions from the ODE plugin (since
