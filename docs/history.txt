@@ -12,6 +12,9 @@ chronological order.
 	- res dropped the "ExtensiveMemDebug" VC project build configuration, 
 	  but added they (probably more useful) MemoryTracker and RefTracker
 	  configurations.
+	- res changed the MemoryTracker and RefTracker VC project build
+	  configuration to use the out/debug directory again (since this is
+	  probably easier to utilize for external projects).
 8-Jan-2006
 	- res fixed some spurious text drawing issues.
 	- res removed the 'extern "C"' functions from the ODE plugin (since

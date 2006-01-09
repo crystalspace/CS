@@ -81,12 +81,6 @@
 				RuntimeTypeInfo="TRUE"
 				RuntimeLibrary="3"
 [% END %]
-[% MACRO compiler_memtrack BLOCK -%]
-[% compiler_debug -%]
-[% END %]
-[% MACRO compiler_reftrack BLOCK -%]
-[% compiler_debug -%]
-[% END %]
 
 [% MACRO linker_release BLOCK -%]
 				LinkIncremental="1"
@@ -99,12 +93,6 @@
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
 				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMT,LIBCMTD,MSVCRT"
-[% END %]
-[% MACRO linker_memtrack BLOCK -%]
-[% linker_debug -%]
-[% END %]
-[% MACRO linker_reftrack BLOCK -%]
-[% linker_debug -%]
 [% END %]
 
 [% MACRO linker_common BLOCK -%]

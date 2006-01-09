@@ -25,7 +25,7 @@
 #------------------------------------------------------------------------------
 builds = builds.merge([
   {
-    tag => 'memtrack',
+    tag => 'debug',
     name => 'MemoryTracker',
     defines => ['_DEBUG','CS_DEBUG','CS_MEMORY_TRACKER'],
     defineskey => 'definedebug',
@@ -37,7 +37,7 @@ builds = builds.merge([
     priority => 400
   },
   {
-    tag => 'reftrack',
+    tag => 'debug',
     name => 'RefTracker',
     defines => ['_DEBUG','CS_DEBUG','CS_REF_TRACKER'],
     defineskey => 'definedebug',
