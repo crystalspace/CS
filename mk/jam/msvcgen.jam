@@ -41,7 +41,7 @@
 #
 #==============================================================================
 
-MSVCGEN_SUPPORTED_VERSIONS = 6 7 ;
+MSVCGEN_SUPPORTED_VERSIONS = 6 7 71 8 ;
 MSVCGEN_BUILD_ROOT ?= [ ConcatDirs $(BUILDTOP) out ] ;
 MSVCGEN_BUILD_TEMP ?= [ ConcatDirs $(MSVCGEN_BUILD_ROOT) msvcgen ] ;
 
@@ -416,12 +416,29 @@ if $(MSVC_VERSION) = 6
   SUFPRJ = dsp ;
   SUFWSP = dsw ;
   MSVC_FORCE_CRLF = yes ;
+  MSVC_TEMPLATE_SUFFIX = 6 ;
 }
-else if $(MSVC_VERSION) = 7
+else if $(MSVC_VERSION) = 7 || $(MSVC_VERSION) = 71 || $(MSVC_VERSION) = 8
 {
   SUFPRJ = vcproj ;
   SUFWSP = sln ;
   MSVC_FORCE_CRLF = no ;
+  MSVC_TEMPLATE_SUFFIX = 7 ;
+  if $(MSVC_VERSION) = 7
+  {
+    MSVC_FORMATVERSION_PRJ = 7.00 ;
+    MSVC_FORMATVERSION_WSP = 7.00 ;
+  }
+  else if $(MSVC_VERSION) = 71
+  {
+    MSVC_FORMATVERSION_PRJ = 7.10 ;
+    MSVC_FORMATVERSION_WSP = 8.00 ;
+  }
+  else if $(MSVC_VERSION) = 8
+  {
+    MSVC_FORMATVERSION_PRJ = 8.00 ;
+    MSVC_FORMATVERSION_WSP = 9.00 ;
+  }
 }
 else
 {
@@ -554,6 +571,7 @@ rule MsvcGenWorkspace1
     "key|value"
     "accept|$(accepts)"
     "reject|$(rejects)"
+    "formatversion|$(MSVC_FORMATVERSION_WSP)"
     $(MSVCGEN_VARIABLES)
     : notfile : $(respdir) ;
   MsvcRmTemps msvcgen : $(respfile) ;
@@ -638,6 +656,7 @@ rule MsvcProject
   # Boilerplate.
   ResponseFile $(respfile) :
     "key|value"
+    "formatversion|$(MSVC_FORMATVERSION_PRJ)"
     "projtype|$(type)"
     "project|$(msvcname)"
     "rawtarget|$(rawname)"
@@ -663,6 +682,7 @@ rule MsvcProject
     "librarydebug|$(MSVC.LIBRARY_DEBUG.$(type))"
     "librarydelay|$(MSVC.LIBRARY_DELAY)"
     "librarydelay|$(MSVC.LIBRARY_DELAY.$(type))"
+    "msvcversion|$(MSVC_VERSION)"
     "static|$($(rawname)_STATIC)"
     $(MSVCGEN_VARIABLES)
     : notfile : $(respdir) ;
@@ -1331,7 +1351,7 @@ rule Win32Resource
 actions MsvcBuildFile
 {
   cat > $(<) <<EOF
-[% INCLUDE '$(MSVC_BUILD_TYPE)$(MSVC_VERSION).tlib' respfile='$(>)' -%]
+[% INCLUDE '$(MSVC_BUILD_TYPE)$(MSVC_TEMPLATE_SUFFIX).tlib' respfile='$(>)' -%]
 EOF
 }
 

@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Jan-2006
+        - res dropped the VC project generation for VC6 and added generation
+          for VC7.1 and VC8.
+	- res dropped the "ExtensiveMemDebug" VC project build configuration, 
+	  but added they (probably more useful) MemoryTracker and RefTracker
+	  configurations.
 8-Jan-2006
 	- res fixed some spurious text drawing issues.
 	- res removed the 'extern "C"' functions from the ODE plugin (since

@@ -94,7 +94,7 @@ actions GenerateWin32ManifestRc
     cat > $(<) << __EOF__
 // This file is generated automatically.
 
-#ifndef _VC80_UPGRADE
+#if !defined(CS_PROJECTGEN_VERSION) || (CS_PROJECTGEN_VERSION != 8)
 1 24
 {
   "<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>\r\n",
