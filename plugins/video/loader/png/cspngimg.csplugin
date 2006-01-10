@@ -10,12 +10,4 @@
       </class>
     </classes>
   </scf>
-  <imageloader>
-    <imagetype>
-      <class>crystalspace.graphic.image.io.png</class>
-      <identify>
-        <!--scan offset="0" length="4" bytes="\0x89PNG"/-->
-     </identify>
-    </imagetype>
-  </imageloader>
 </plugin>
