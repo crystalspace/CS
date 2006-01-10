@@ -36,6 +36,7 @@ END -%]
 	ProjectType="Visual C++"
 	Version="[% my.doc.formatversion.0 %]"
 	Name="[% my.doc.project.0 %]"
+	ProjectGUID="{[% guid(my.doc.project.0) %]}"
 	SccProjectName=""
 	SccLocalPath="">
 	<Platforms>

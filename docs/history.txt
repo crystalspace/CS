@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Jan-2006
+	- res tweaked the VC7 project templates a bit to avoid VC8 modifying
+	  them when doing "Save all".
 9-Jan-2006
         - res dropped the VC project generation for VC6 and added generation
           for VC7.1 and VC8.
