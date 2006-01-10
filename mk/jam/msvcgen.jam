@@ -748,7 +748,7 @@ rule MsvcProject
     {
       local manifest = $(msvcname:S=.manifest) ; 
       MakeLocate $(manifest) : $(outdir) ;
-      MakeManifestFile $(manifest) : $(rawnam) ;
+      MakeManifestFile $(manifest) : $(rawname) ;
       Always $(manifest) ;
       
       local manifestrc = $(resource:S=.mfrctmp) ;
