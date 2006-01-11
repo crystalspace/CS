@@ -1056,7 +1056,11 @@ rule StaticPluginLibrary
   _MsvcDefine $(name) : $(STATICPLUGINS.MSVC_DEFINES) ;
 
   # Write out needed CFLAGS, LFLAGS
-  local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
+  local outdir = [ Property msvcgen : outdircommon ] ;
+  if $(outdir) = ""
+  {
+    outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
+  }
   STATICPLUGINS.DEPENDENCIES = $(name)_msvc.jam ;
   MakeLocate $(STATICPLUGINS.DEPENDENCIES) : $(outdir) ;
   SEARCH on $(STATICPLUGINS.DEPENDENCIES) = $(outdir) ;
