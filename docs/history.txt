@@ -12,6 +12,8 @@ chronological order.
 	- res changed the VC project generation to regenerate the "common"
 	  files only when needed (the idea is to speed up the process by
 	  avoiding redundant generation of those files by every msvcXgen).
+	- res tweaked the VC8 projects to include the manifest file among the
+	  "normal" project files (so it gets picked up by the manifest tool).
 10-Jan-2006
 	- res tweaked the VC7 project templates a bit to avoid VC8 modifying
 	  them when doing "Save all".

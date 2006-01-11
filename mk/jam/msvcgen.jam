@@ -772,6 +772,14 @@ rule MsvcProject
       MANIFEST_NAME on $(manifestrc) = $(manifest) ;
       GenerateWin32ManifestRc $(manifestrc) ;
       Depends $(manifestrc) : $(manifest) ;
+      if $(MSVC_VERSION) = 8
+      {
+        # VC8: Manifest appears in project along other files, a special build
+        # tool cares about the embedding into a resource. (The resource goop
+        # still has to be generated since it is shared with other VCs.)
+	ResponseFile $(respfile) : "file|$(manifest:R=$(outdircommon))" : notfile :
+	  $(respdir) ;
+      }
       
       Win32Resource $(rawname) : $(manifestrc) ;
       MsvcRmTemps $(resource) : $(manifestrc) ;
