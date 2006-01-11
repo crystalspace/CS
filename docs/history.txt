@@ -9,6 +9,9 @@ chronological order.
 11-Jan-2006
         - res changed the VC project generation to put files that can be shared
           between different VC project versions into the mk/msvc directory.
+	- res changed the VC project generation to regenerate the "common"
+	  files only when needed (the idea is to speed up the process by
+	  avoiding redundant generation of those files by every msvcXgen).
 10-Jan-2006
 	- res tweaked the VC7 project templates a bit to avoid VC8 modifying
 	  them when doing "Save all".
@@ -2215,7 +2218,7 @@ chronological order.
 	- Jorrit changed reflect.xml and reflectsphere.xml so that they
 	  support objects with mixmode add/alpha/... Changed the teapot
 	  in flarge to use add mixmode.
-	- Eric Sunshine chnaged the check for buggy -finline-visibility-hidden
+	- Eric Sunshine changed the check for buggy -finline-visibility-hidden
 	  in configure.ac so that it merely disables the option entirely for
 	  AMD64 since the old test (checking for link error when manipulating a
 	  std::basic_string<>) apparently did not catch every buggy

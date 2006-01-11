@@ -237,8 +237,6 @@ rule msvcgen_build_dir
 { return [ ConcatDirs $(MSVCGEN_BUILD_TEMP) build$(<) ] ; }
 rule msvcgen_work_dir
 { return [ ConcatDirs $(MSVCGEN_BUILD_TEMP) temp$(<) ] ; }
-rule msvcgen_common_work_dir
-{ return [ ConcatDirs $(MSVCGEN_BUILD_TEMP) temp ] ; }
 rule msvcgen_template_dir
 { return [ ConcatDirs [ msvcgen_resolve_dir $(<) ] ] ; }
 rule msvcgen_version_check
@@ -247,6 +245,14 @@ rule msvcgen_version_check
   {
     exit "Error: `$(<)' is not a supported msvcgen version number; valid "
       "numbers are:" $(MSVCGEN_SUPPORTED_VERSIONS) ;
+  }
+}
+
+rule MsvcRmTemps
+{
+  if $(MSVCGEN_KEEPTEMPS) != yes
+  {
+    RmTemps $(<) : $(>) ;
   }
 }
 
@@ -323,6 +329,8 @@ rule MsvcGenTarget
   if $(version) = common
   {
     MSVCGEN_PATH_COMMON = $(path) ;
+    CleanDir msvccommonclean : [ msvcgen_target_dir $(path) ] ;
+    Depends msvcclean : msvccommonclean ;
   }
   else
   {
@@ -334,10 +342,12 @@ rule MsvcGenTarget
     Depends msvcgen : msvc$(version)gen ;
     Help msvc$(version)gen : "Create MSVC$(version) project files" ;
     MSVCGEN_TARGETS += msvc$(version)gen ;
+    local commonworkdir = [ msvcgen_work_dir common ] ;
     CleanDir msvc$(version)clean :
       [ msvcgen_target_dir $(path) ]
       [ msvcgen_build_dir $(version) ]
-      [ msvcgen_work_dir $(version) ] ;
+      [ msvcgen_work_dir $(version) ] 
+      $(commonworkdir) ;
     Depends msvcclean : msvc$(version)clean ;
     Help msvc$(version)clean : "Remove built MSVC$(version) project files" ;
   }
@@ -520,14 +530,6 @@ MSVC.PREFIX.workspace ?= wks ;
 SetProperty build : projgen : msvc ;
 SetProperty build : projgen_version : $(MSVC_VERSION) ;
 
-rule MsvcRmTemps
-{
-  if $(MSVCGEN_KEEPTEMPS) != yes
-  {
-    RmTemps $(<) : $(>) ;
-  }
-}
-
 # MsvcAddPrefix name : type
 rule MsvcAddPrefix
 {
@@ -652,6 +654,7 @@ rule MsvcProject
   local outdircommon = [ Property msvcgen : outdircommon ] ;
   local builddir = [ msvcgen_build_dir $(MSVC_VERSION) ] ;
   local workdir = [ msvcgen_work_dir $(MSVC_VERSION) ] ;
+  local workdircommon = [ msvcgen_work_dir common ] ;
 
   local msvcname = $(MSVC.NAME_OVERRIDE.$(rawname)) ;
   if ! $(msvcname) { msvcname = [ MsvcAddPrefix $(rawname) : $(type) ] ; }
@@ -733,20 +736,21 @@ rule MsvcProject
       $(respdir) ;
   
     local versionrc = $(resource:S=.vrctmp) ;
-    MakeLocate $(versionrc) : $(workdir) ;
+    MakeLocate $(versionrc) : $(workdircommon) ;
     MakeVersionRc $(versionrc) : $(rawname) ;
-    Always $(versionrc) ;
+    Depends $(versionrc) : $(TOP)/Jamconfig ;
+    Depends $(versionrc) : $(SUBDIR)/Jamfile ;
     Win32Resource $(rawname) : $(versionrc) ;
     MsvcRmTemps $(resource) : $(versionrc) ;
     
     if $(type) = "plugin" 
     {
       local metarc = $(resource:S=.mrctmp) ;
-      MakeLocate $(metarc) : $(workdir) ;
+      MakeLocate $(metarc) : $(workdircommon) ;
       SEARCH on $(metarc) = $(SEARCH_SOURCE) ;
       Depends $(metarc) : $($(rawname)_METAFILE) ;
       GenerateWin32MetadataRc $(metarc) : $($(rawname)_METAFILE) ;
-      Always $(metarc) ;
+      
       Win32Resource $(rawname) : $(metarc) ;
       MsvcRmTemps $(resource) : $(metarc) ;
       ResponseFile $(respfile) :
@@ -759,14 +763,15 @@ rule MsvcProject
       local manifest = $(msvcname:S=.manifest) ; 
       MakeLocate $(manifest) : $(outdircommon) ;
       MakeManifestFile $(manifest) : $(rawname) ;
-      Always $(manifest) ;
+      Depends $(manifest) : $(TOP)/Jamconfig ;
+      Depends $(manifest) : $(SUBDIR)/Jamfile ;
+      Depends msvcgen : $(manifest) ;
       
       local manifestrc = $(resource:S=.mfrctmp) ;
-      MakeLocate $(manifestrc) : $(workdir) ;
+      MakeLocate $(manifestrc) : $(workdircommon) ;
       MANIFEST_NAME on $(manifestrc) = $(manifest) ;
       GenerateWin32ManifestRc $(manifestrc) ;
       Depends $(manifestrc) : $(manifest) ;
-      Always $(manifestrc) ;
       
       Win32Resource $(rawname) : $(manifestrc) ;
       MsvcRmTemps $(resource) : $(manifestrc) ;
@@ -784,16 +789,14 @@ rule MsvcProject
 	# RELPATH includes trailing slash (hence the "" in ConcatDirs).
 	RELPATH on $(iconrc) =
 	  [ ConcatDirs [ Property msvcgen : relpath$(MSVC_VERSION) ] "" ] ;
-	MakeLocate $(iconrc) : $(workdir) ;
+	MakeLocate $(iconrc) : $(workdircommon) ;
 	Depends $(iconrc) : $(icon) ;
+        Depends $(iconrc) : $(SUBDIR)/Jamfile ;
         GenerateIconRc $(iconrc) : $(icon) ;
-	Always $(iconrc) ;
 	Win32Resource $(rawname) : $(iconrc) ;
 	MsvcRmTemps $(resource) : $(iconrc) ;
       }
     }
-
-    Always $(resource) ;
   }
   
   local inckeys = "include" includedebug ;
@@ -952,7 +955,6 @@ rule LinkStaticPlugins
   SEARCH on $(staticuse_out) = $(outdir) ;
   
   GenerateStaticPluginInstantiation $(staticuse_out) : $(plugins) ;
-  Always $(staticuse_out) ;
   Depends msvcgen : $(staticuse_out) ;
 
   # Add usefile to project
@@ -1003,7 +1005,6 @@ rule Plugin
   MakeLocate $(staticreg_out) : $(outdir) ;
   SEARCH on $(staticreg_out) = $(outdir) ;
   GenerateStaticPluginRegistration $(staticreg_out) : $(metafile) ;
-  Always $(staticreg_out) ;
   Depends msvcgen : $(staticreg_out) ;
   STATICPLUGINS.SOURCES.$(<) += $(outdir)/$(staticreg_out) ;
 }
