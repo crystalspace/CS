@@ -328,7 +328,6 @@ rule MsvcGenTarget
   local version = $(2) ;
   if $(version) = common
   {
-    MSVCGEN_PATH_COMMON = $(path) ;
     CleanDir msvccommonclean : [ msvcgen_target_dir $(path) ] ;
     Depends msvcclean : msvccommonclean ;
   }
@@ -652,6 +651,10 @@ rule MsvcProject
   local relpath = [ Property msvcgen : relpath$(MSVC_VERSION) ] ;
   local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
   local outdircommon = [ Property msvcgen : outdircommon ] ;
+  if "$(outdircommon)" = ""
+  {
+    outdircommon = $(outdir) ;
+  }
   local builddir = [ msvcgen_build_dir $(MSVC_VERSION) ] ;
   local workdir = [ msvcgen_work_dir $(MSVC_VERSION) ] ;
   local workdircommon = [ msvcgen_work_dir common ] ;
@@ -948,6 +951,10 @@ rule LinkStaticPlugins
 
   # Generate static plugin instantiation
   local outdir = [ Property msvcgen : outdircommon ] ;
+  if "$(outdir)" = ""
+  {
+    outdir = [ Property msvcgen : outdir ] ;
+  }
   local staticuse_out ;
   if $(package)
   {
