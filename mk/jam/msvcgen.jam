@@ -237,11 +237,13 @@ rule msvcgen_build_dir
 { return [ ConcatDirs $(MSVCGEN_BUILD_TEMP) build$(<) ] ; }
 rule msvcgen_work_dir
 { return [ ConcatDirs $(MSVCGEN_BUILD_TEMP) temp$(<) ] ; }
+rule msvcgen_common_work_dir
+{ return [ ConcatDirs $(MSVCGEN_BUILD_TEMP) temp ] ; }
 rule msvcgen_template_dir
 { return [ ConcatDirs [ msvcgen_resolve_dir $(<) ] ] ; }
 rule msvcgen_version_check
 {
-  if ! [ IsElem $(<) : $(MSVCGEN_SUPPORTED_VERSIONS) ]
+  if $(<) != common && ! [ IsElem $(<) : $(MSVCGEN_SUPPORTED_VERSIONS) ]
   {
     exit "Error: `$(<)' is not a supported msvcgen version number; valid "
       "numbers are:" $(MSVCGEN_SUPPORTED_VERSIONS) ;
@@ -318,20 +320,27 @@ rule MsvcGenTarget
 {
   local path = $(1) ;
   local version = $(2) ;
-  MsvcGenUmbrella ;
-  Always msvc$(version)gen ;
-  NotFile msvc$(version)gen ;
-  MSVC_VERSION on msvc$(version)gen = $(version) ;
-  MsvcGen msvc$(version)gen ;
-  Depends msvcgen : msvc$(version)gen ;
-  Help msvc$(version)gen : "Create MSVC$(version) project files" ;
-  MSVCGEN_TARGETS += msvc$(version)gen ;
-  CleanDir msvc$(version)clean :
-    [ msvcgen_target_dir $(path) ]
-    [ msvcgen_build_dir $(version) ]
-    [ msvcgen_work_dir $(version) ] ;
-  Depends msvcclean : msvc$(version)clean ;
-  Help msvc$(version)clean : "Remove built MSVC$(version) project files" ;
+  if $(version) = common
+  {
+    MSVCGEN_PATH_COMMON = $(path) ;
+  }
+  else
+  {
+    MsvcGenUmbrella ;
+    Always msvc$(version)gen ;
+    NotFile msvc$(version)gen ;
+    MSVC_VERSION on msvc$(version)gen = $(version) ;
+    MsvcGen msvc$(version)gen ;
+    Depends msvcgen : msvc$(version)gen ;
+    Help msvc$(version)gen : "Create MSVC$(version) project files" ;
+    MSVCGEN_TARGETS += msvc$(version)gen ;
+    CleanDir msvc$(version)clean :
+      [ msvcgen_target_dir $(path) ]
+      [ msvcgen_build_dir $(version) ]
+      [ msvcgen_work_dir $(version) ] ;
+    Depends msvcclean : msvc$(version)clean ;
+    Help msvc$(version)clean : "Remove built MSVC$(version) project files" ;
+  }
 }
 
 actions MsvcGen bind MSVCGEN_CONFIG_FILES
@@ -640,6 +649,7 @@ rule MsvcProject
   local sources = $(4) ;
   local relpath = [ Property msvcgen : relpath$(MSVC_VERSION) ] ;
   local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
+  local outdircommon = [ Property msvcgen : outdircommon ] ;
   local builddir = [ msvcgen_build_dir $(MSVC_VERSION) ] ;
   local workdir = [ msvcgen_work_dir $(MSVC_VERSION) ] ;
 
@@ -715,11 +725,11 @@ rule MsvcProject
   {
     local resource = $(msvcname:S=.rc) ;
     Depends msvcgen : $(resource) ;
-    MakeLocate $(resource) : $(outdir) ;
-    SEARCH on $(resource) = $(outdir) ;
+    MakeLocate $(resource) : $(outdircommon) ;
+    SEARCH on $(resource) = $(outdircommon) ;
     NAME on $(resource) = $(rawname) ;
     $(rawname)_RCNAME = $(resource) ;
-    ResponseFile $(respfile) : "file|$(resource:R=$(outdir))" : notfile :
+    ResponseFile $(respfile) : "file|$(resource:R=$(outdircommon))" : notfile :
       $(respdir) ;
   
     local versionrc = $(resource:S=.vrctmp) ;
@@ -747,13 +757,13 @@ rule MsvcProject
     if [ IsElem $(type) : appgui appcon ]
     {
       local manifest = $(msvcname:S=.manifest) ; 
-      MakeLocate $(manifest) : $(outdir) ;
+      MakeLocate $(manifest) : $(outdircommon) ;
       MakeManifestFile $(manifest) : $(rawname) ;
       Always $(manifest) ;
       
       local manifestrc = $(resource:S=.mfrctmp) ;
       MakeLocate $(manifestrc) : $(workdir) ;
-      MANIFEST_NAME on $(manifestrc) = $(msvcname:S=.manifest) ;
+      MANIFEST_NAME on $(manifestrc) = $(manifest) ;
       GenerateWin32ManifestRc $(manifestrc) ;
       Depends $(manifestrc) : $(manifest) ;
       Always $(manifestrc) ;
@@ -926,7 +936,7 @@ rule LinkStaticPlugins
   }
 
   # Generate static plugin instantiation
-  local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
+  local outdir = [ Property msvcgen : outdircommon ] ;
   local staticuse_out ;
   if $(package)
   {
@@ -988,7 +998,7 @@ rule Plugin
 
   # Generate static variant of plugin
   #  Static registry
-  local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
+  local outdir = [ Property msvcgen : outdircommon ] ;
   local staticreg_out = $(MSVC.PREFIX.library)$(<)_staticreg.cpp ;
   MakeLocate $(staticreg_out) : $(outdir) ;
   SEARCH on $(staticreg_out) = $(outdir) ;

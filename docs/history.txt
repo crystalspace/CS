@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Jan-2006
+        - res changed the VC project generation to put files that can be shared
+          between different VC project versions into the mk/msvc directory.
 10-Jan-2006
 	- res tweaked the VC7 project templates a bit to avoid VC8 modifying
 	  them when doing "Save all".
