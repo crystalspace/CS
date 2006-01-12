@@ -953,7 +953,7 @@ rule LinkStaticPlugins
   local outdir = [ Property msvcgen : outdircommon ] ;
   if "$(outdir)" = ""
   {
-    outdir = [ Property msvcgen : outdir ] ;
+    outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
   }
   local staticuse_out ;
   if $(package)
