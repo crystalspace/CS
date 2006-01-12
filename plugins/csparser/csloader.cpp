@@ -5457,7 +5457,7 @@ bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
   return true;
 }
 
-bool csLoader::LoadShader (const char* filename, const char* type)
+bool csLoader::LoadShader (const char* filename)
 {
   csRef<iShaderManager> shaderMgr = csQueryRegistry<iShaderManager> (
   	object_reg);
@@ -5497,7 +5497,11 @@ bool csLoader::LoadShader (const char* filename, const char* type)
 
   dirChanger.ChangeTo (filename);
 
-  if (type == 0) type = "xmlshader";
+  const char* type = shaderNode->GetAttributeValue ("compiler");
+  if (type == 0)
+    type = shaderNode->GetAttributeValue ("type");
+  if (type == 0)
+    type = "xmlshader";
   csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
   csRef<iShader> shader = shcom->CompileShader (shaderNode);
   if (shader)

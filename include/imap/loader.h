@@ -426,10 +426,9 @@ struct iLoader : public iBase
 	iStreamSource* ssource = 0) = 0;
 
   /**
-   * Load a shader from a file. If 'type' is not given then 'xmlshader' is
-   * assumed.
+   * Load a shader from a file.
    */
-  virtual bool LoadShader (const char* filename, const char* type = 0) = 0;
+  virtual bool LoadShader (const char* filename) = 0;
 };
 
 /** @} */
