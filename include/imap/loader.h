@@ -424,6 +424,12 @@ struct iLoader : public iBase
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false,
 	iStreamSource* ssource = 0) = 0;
+
+  /**
+   * Load a shader from a file. If 'type' is not given then 'xmlshader' is
+   * assumed.
+   */
+  virtual bool LoadShader (const char* filename, const char* type = 0) = 0;
 };
 
 /** @} */

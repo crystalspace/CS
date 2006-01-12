@@ -5457,6 +5457,61 @@ bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
   return true;
 }
 
+bool csLoader::LoadShader (const char* filename, const char* type)
+{
+  csRef<iShaderManager> shaderMgr = csQueryRegistry<iShaderManager> (
+  	object_reg);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+
+  csVfsDirectoryChanger dirChanger (vfs);
+
+  csRef<iFile> shaderFile = vfs->Open (filename, VFS_FILE_READ);
+  if (!shaderFile)
+  {
+    ReportError ("crystalspace.maploader",
+	"Unable to open shader file '%s'!", filename);
+    return false;
+  }
+
+  csRef<iDocumentSystem> docsys = csQueryRegistry<iDocumentSystem> (
+  	object_reg);
+  if (docsys == 0)
+    docsys.AttachNew (new csTinyDocumentSystem ());
+
+  csRef<iDocument> shaderDoc = docsys->CreateDocument ();
+  const char* err = shaderDoc->Parse (shaderFile, false);
+  if (err != 0)
+  {
+    ReportError ("crystalspace.maploader",
+	"Could not parse shader file '%s': %s",
+	filename, err);
+    return false;
+  }
+  csRef<iDocumentNode> shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");
+  if (!shaderNode)
+  {
+    ReportError ("crystalspace.maploader",
+        "Shader file '%s' is not a valid shader XML file!", filename);
+    return false;
+  }
+
+  dirChanger.ChangeTo (filename);
+
+  if (type == 0) type = "xmlshader";
+  csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
+  csRef<iShader> shader = shcom->CompileShader (shaderNode);
+  if (shader)
+  {
+    shader->SetFileName (filename);
+    shaderMgr->RegisterShader (shader);
+    return true;
+  }
+  else 
+  {
+    return false;
+  }
+}
+
 bool csLoader::ParseShader (iLoaderContext* ldr_context,
 			    iDocumentNode* node,
 			    iShaderManager* shaderMgr)

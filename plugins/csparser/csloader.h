@@ -360,6 +360,7 @@ private:
   bool ParseShaderList (iLoaderContext* ldr_context, iDocumentNode* node);
   bool ParseShader (iLoaderContext* ldr_context, iDocumentNode* node,
     iShaderManager* shaderMgr);
+  virtual bool LoadShader (const char* filename, const char* type = 0);
 
   /// For heightgen.
   csGenerateImageTexture* ParseHeightgenTexture (iDocumentNode* node);
