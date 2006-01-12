@@ -1118,7 +1118,9 @@ rule WriteDependencies
   }
   CFLAGS.DEBUG on $(depfile_gristed) = "$(cflags.debug)" ;
   CFLAGS.RELEASE on $(depfile_gristed) = "$(cflags.release)" ;
+  lflags.debug = [ RemoveDups $(lflags.debug) ] ;
   LFLAGS.DEBUG on $(depfile_gristed) = "$(lflags.debug)" ;
+  lflags.release = [ RemoveDups $(lflags.release) ] ;
   LFLAGS.RELEASE on $(depfile_gristed) = "$(lflags.release)" ;
   LIBNAME on $(depfile_gristed) = $(libname) ;
   
