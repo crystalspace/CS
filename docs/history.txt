@@ -17,6 +17,7 @@ chronological order.
 	- res fixed msvcgen to also work when no msvc "common" directory was
 	  specified.
 	- res made the static plugins jam file "common", too.
+	- res made some fixes to MSVC static plugins support.
 10-Jan-2006
 	- res tweaked the VC7 project templates a bit to avoid VC8 modifying
 	  them when doing "Save all".
