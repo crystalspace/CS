@@ -99,12 +99,16 @@
 // --- Stuff that needs to go before *any* inclusion of VC standard headers:
 
 #if defined(CS_COMPILER_MSVC) && (_MSC_VER >= 1400)
-#  define _CRT_SECURE_NO_DEPRECATE
-	/* In VC8, a lot of CRT methods were marked "deprecated" b/c they're 
-	 * deemed "insecure". Silence those warnings. 
-	 * NB: This is here b/c it needs to be set before any standard headers
-	 * are included. */
-#  define _CRT_NONSTDC_NO_DEPRECATE /* Similar.	*/
+#  ifndef _CRT_SECURE_NO_DEPRECATE
+#    define _CRT_SECURE_NO_DEPRECATE
+	  /* In VC8, a lot of CRT methods were marked "deprecated" b/c they're 
+	   * deemed "insecure". Silence those warnings. 
+	   * NB: This is here b/c it needs to be set before any standard headers
+	   * are included. */
+#  endif
+#  ifndef _CRT_NONSTDC_NO_DEPRECATE
+#    define _CRT_NONSTDC_NO_DEPRECATE /* Similar.	*/
+#  endif
 #endif
 
 #endif // __CS_WIN32_CSCONFIG_H__
