@@ -41,7 +41,7 @@ struct iKitchenSink : public virtual iBase
   /**
    * Remove an object from the kitchen sink.
    * \return Whether the removal succeeded. Failure usually means that it
-   *   wasn't in the first place.
+   *   wasn't in the sink in first place.
    */
   virtual bool Remove (iBase* object) = 0;
   /**
@@ -66,7 +66,7 @@ struct iKitchenSink : public virtual iBase
   /**
    * Drain the water from the sink.
    * \warning If small objects were inserted, they might get flushed away
-   *  and (if a shredded is present and enabled) shredded.
+   *  and (if a shredder is present and enabled) shredded.
    */
   virtual void Drain () = 0;
 };
