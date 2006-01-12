@@ -77,11 +77,13 @@ rule BuildStaticRegFile
 
 rule BuildStaticUseFile
 {
+  local statictarget = $(2) ;
+  local package = $(3) ;
   # prepare source files
   local sources ;
   if $(3)
   {
-    sources = [ DoObjectGrist _cs_static_use_$(3).cpp ] ;
+    sources = [ DoObjectGrist _cs_static_use_$(package).cpp ] ;
   }
   else
   {
@@ -142,9 +144,9 @@ rule LinkStaticPlugins
     {
       NotFile $(p) ;
       CFlags $(target) : $(STATICPLUGIN.$(p).CFLAGS) ;
-      lflags += $(STATICPLUGIN.$(p).LFLAGS) ;
+      lflags = [ MergeLFlags $(lflags) : $(STATICPLUGIN.$(p).LFLAGS) ] ;
     }
-    LFlags $(target) : [ Reverse [ RemoveDups [ Reverse $(lflags) ] ] ] ;
+    LFlags $(target) : $(lflags) ;
   }
   else
   {
@@ -225,7 +227,7 @@ rule StaticPluginLibrary
   MakeLocate $(STATICPLUGINS.DEPENDENCIES) : $(LOCATE.OBJECTS)/libs ;
   for t in $(targets)
   {
-    WriteDependencies $(STATICPLUGINS.DEPENDENCIES) : $(t) ;
+    WriteDependencies $(STATICPLUGINS.DEPENDENCIES) : $(t) : $(name) ;
   }
   Depends $(name) : $(STATICPLUGINS.DEPENDENCIES) ;
   Clean $(name)clean : $(STATICPLUGINS.DEPENDENCIES) ;
@@ -266,10 +268,12 @@ rule WriteDependencies
   local lflags ;
   local depfile = $(<) ;
   local plugin = $(>) ;
+  local name = $(3) ;
   local depfile_gristed = $(depfile:G=$(plugin)) ;
   MakeLocate $(depfile_gristed) : [ on $(depfile) GetVar LOCATE ] ;
   
   # Collect flags
+  lflags += -l$(name) ;
   local libs = [ ResolveLibs $($(plugin).NEEDLIBS) ] ;
   lflags += -l$(libs) ;
   

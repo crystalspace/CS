@@ -8,6 +8,7 @@ chronological order.
 
 12-Jan-2006
 	- Jorrit added iLoader->LoadShader() to load a shader from a file.
+	- res made more tweaks to static plugin linking.
 11-Jan-2006
         - res changed the VC project generation to put files that can be shared
           between different VC project versions into the mk/msvc directory.

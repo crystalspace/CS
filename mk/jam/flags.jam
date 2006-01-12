@@ -59,6 +59,38 @@ rule CFlags
   UnitTestCFlags $(<) : $(>) : $(3) ;
 }
 
+##  MergeLFlags flags1 : flags2
+##    Merge two arrays of linker flags. Removes duplicate entries, however,
+##    ensures that the correct relative right-to-left order of both flag arrays
+##    is kept.
+rule MergeLFlags
+{
+  local result = ;
+  local libs2 = $(2) ;
+  for l in $(1)
+  {
+    if [ IsElem $(l) : $(libs2) ]
+    {
+      # If a flag from set 1 is in set 2, add all flags from start of set 2
+      # to the occurance of the flag to result.
+      while "$(libs2[1])" != "" && $(libs2[1]) != $(l)
+      {
+        result += $(libs2[1]) ;
+        libs2 = $(libs2[2-]) ;
+      }
+      result += $(libs2[1]) ;
+      libs2 = $(libs2[2-]) ;
+    }
+    else
+    {
+      # Just add the flag.
+      result += $(l) ;
+    }
+  }
+  result += $(libs2) ;
+  return $(result) ;
+}
+
 ##  LFlags target : flags [ : options ]
 ##    Sets linker flags for a library, plugin or application target
 rule LFlags
