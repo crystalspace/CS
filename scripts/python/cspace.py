@@ -6896,6 +6896,7 @@ class iLoader(iBase):
     def LoadMeshObjectFactory(*args): return _cspace.iLoader_LoadMeshObjectFactory(*args)
     def LoadMeshObject(*args): return _cspace.iLoader_LoadMeshObject(*args)
     def Load(*args): return _cspace.iLoader_Load(*args)
+    def LoadShader(*args): return _cspace.iLoader_LoadShader(*args)
     def __del__(self, destroy=_cspace.delete_iLoader):
         try:
             if self.thisown: destroy(self)
