@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Jan-2006
+	- res changed gl3d to also utilize an iGraphics2D from the object
+	  registry, if present (to allow canvas specification from
+	  RequestPlugins()).
+	- res fixed the wxgl canvas to only call wxGLCanvas->SetContext() on
+	  initialization when it's actually visible.
+	- res ditched the csavi (and related), cssgiimg and cswalimg plugins.
 12-Jan-2006
 	- Jorrit added iLoader->LoadShader() to load a shader from a file.
 	- res made more tweaks to static plugin linking.

@@ -64,7 +64,7 @@ SCF_IMPLEMENT_FACTORY (csGraphics2DWX)
 
 // csGraphics2DWX function
 csGraphics2DWX::csGraphics2DWX (iBase *iParent) :
-    scfImplementationType (this, iParent), myParent(0)
+    scfImplementationType (this, iParent), myParent (0), theCanvas (0)
 {
 }
 
@@ -436,7 +436,8 @@ csGLCanvas::csGLCanvas(csGraphics2DWX* g, wxWindow *parent,
                        const wxPoint& pos,
                        const wxSize& size, long style,
                        const wxString& name, int* attr)
-  : wxGLCanvas(parent, id, pos, size, style | wxWANTS_CHARS, name, attr), g2d(g)
+  : wxGLCanvas(parent, id, pos, size, style | wxWANTS_CHARS, name, attr), 
+    g2d(g)
 {
   int w, h;
   GetClientSize(&w, &h);
@@ -446,7 +447,15 @@ csGLCanvas::csGLCanvas(csGraphics2DWX* g, wxWindow *parent,
     w = 0;
     h = 0;
   }
-  SetCurrent();
+  // Canvas on creation not necessarily visible
+  bool visible = IsShown();
+  wxWindow* p = parent;
+  while (visible && p)
+  {
+    visible &= p->IsShown();
+    p = p->GetParent();
+  }
+  if (visible) SetCurrent();
   g2d->Resize(w, h);
 }
 
@@ -490,7 +499,6 @@ void csGLCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
 void csGLCanvas::OnMouseEvent( wxMouseEvent& event )
 {
   // csPrintf("got mouse event %ld %ld\n", event.GetX(), event.GetY());
-
   if(event.GetEventType() == wxEVT_MOTION)
   {
     g2d->EventOutlet->Mouse(csmbNone, false, event.GetX(), event.GetY());
@@ -523,141 +531,144 @@ void csGLCanvas::OnMouseEvent( wxMouseEvent& event )
 
 int wxCodeToCSCode(int wxkey)
 {
-  switch(wxkey) {
-  case WXK_BACK: return CSKEY_BACKSPACE;
-  case WXK_TAB: return CSKEY_TAB;
-  case WXK_RETURN: return CSKEY_ENTER;
-  case WXK_ESCAPE: return CSKEY_ESC;
-  case WXK_SPACE: return CSKEY_SPACE;
-  case WXK_DELETE: return CSKEY_DEL;
-  case WXK_START: return 0;
-  case WXK_LBUTTON: return 0;
-  case WXK_RBUTTON: return 0;
-  case WXK_CANCEL: return 0;
-  case WXK_MBUTTON: return 0;
-  case WXK_CLEAR: return CSKEY_DEL;
-  case WXK_SHIFT: return CSKEY_SHIFT;
-  case WXK_ALT: return CSKEY_ALT;
-  case WXK_CONTROL: return CSKEY_CTRL;
-  case WXK_MENU: return CSKEY_CONTEXT;
-  case WXK_PAUSE: return CSKEY_PAUSE;
-  case WXK_CAPITAL: return CSKEY_CAPSLOCK;
-  case WXK_PRIOR: return CSKEY_PGUP;
-  case WXK_NEXT: return CSKEY_PGDN;
-  case WXK_END: return CSKEY_END;
-  case WXK_HOME: return CSKEY_HOME;
-  case WXK_LEFT: return CSKEY_LEFT;
-  case WXK_UP: return CSKEY_UP;
-  case WXK_RIGHT: return CSKEY_RIGHT;
-  case WXK_DOWN: return CSKEY_DOWN;
-  case WXK_SELECT: return 0;
-  case WXK_PRINT: return CSKEY_PRINTSCREEN;
-  case WXK_EXECUTE: return 0;
-  case WXK_SNAPSHOT: return 0;
-  case WXK_INSERT: return CSKEY_INS;
-  case WXK_HELP: return 0;
-  case WXK_NUMPAD0: return CSKEY_PAD0;
-  case WXK_NUMPAD1: return CSKEY_PAD1;
-  case WXK_NUMPAD2: return CSKEY_PAD2;
-  case WXK_NUMPAD3: return CSKEY_PAD3;
-  case WXK_NUMPAD4: return CSKEY_PAD4;
-  case WXK_NUMPAD5: return CSKEY_PAD5;
-  case WXK_NUMPAD6: return CSKEY_PAD6;
-  case WXK_NUMPAD7: return CSKEY_PAD7;
-  case WXK_NUMPAD8: return CSKEY_PAD8;
-  case WXK_NUMPAD9: return CSKEY_PAD9;
-  case WXK_MULTIPLY: return CSKEY_PADMULT;
-  case WXK_ADD: return CSKEY_PADPLUS;
-  case WXK_SEPARATOR: return 0;
-  case WXK_SUBTRACT: return CSKEY_PADMINUS;
-  case WXK_DECIMAL: return CSKEY_PADDECIMAL;
-  case WXK_DIVIDE: return CSKEY_PADDIV;
-  case WXK_F1: return CSKEY_F1;
-  case WXK_F2: return CSKEY_F2;
-  case WXK_F3: return CSKEY_F3;
-  case WXK_F4: return CSKEY_F4;
-  case WXK_F5: return CSKEY_F5;
-  case WXK_F6: return CSKEY_F6;
-  case WXK_F7: return CSKEY_F7;
-  case WXK_F8: return CSKEY_F8;
-  case WXK_F9: return CSKEY_F9;
-  case WXK_F10: return CSKEY_F10;
-  case WXK_F11: return CSKEY_F11;
-  case WXK_F12: return CSKEY_F12;
-  case WXK_F13: return 0;
-  case WXK_F14: return 0;
-  case WXK_F15: return 0;
-  case WXK_F16: return 0;
-  case WXK_F17: return 0;
-  case WXK_F18: return 0;
-  case WXK_F19: return 0;
-  case WXK_F20: return 0;
-  case WXK_F21: return 0;
-  case WXK_F22: return 0;
-  case WXK_F23: return 0;
-  case WXK_F24: return 0;
-  case WXK_NUMLOCK: return CSKEY_PADNUM;
-  case WXK_SCROLL: return CSKEY_SCROLLLOCK;
-  case WXK_PAGEUP: return CSKEY_PGUP;
-  case WXK_PAGEDOWN: return CSKEY_PGDN;
-  case WXK_NUMPAD_SPACE: return 0;
-  case WXK_NUMPAD_TAB: return 0;
-  case WXK_NUMPAD_ENTER: return 0;
-  case WXK_NUMPAD_F1: return 0;
-  case WXK_NUMPAD_F2: return 0;
-  case WXK_NUMPAD_F3: return 0;
-  case WXK_NUMPAD_F4: return 0;
-  case WXK_NUMPAD_HOME: return 0;
-  case WXK_NUMPAD_LEFT: return 0;
-  case WXK_NUMPAD_UP: return 0;
-  case WXK_NUMPAD_RIGHT: return 0;
-  case WXK_NUMPAD_DOWN: return 0;
-  case WXK_NUMPAD_PRIOR: return 0;
-  case WXK_NUMPAD_PAGEUP: return 0;
-  case WXK_NUMPAD_NEXT: return 0;
-  case WXK_NUMPAD_PAGEDOWN: return 0;
-  case WXK_NUMPAD_END: return 0;
-  case WXK_NUMPAD_BEGIN: return 0;
-  case WXK_NUMPAD_INSERT: return 0;
-  case WXK_NUMPAD_DELETE: return 0;
-  case WXK_NUMPAD_EQUAL: return 0;
-  case WXK_NUMPAD_MULTIPLY: return 0;
-  case WXK_NUMPAD_ADD: return 0;
-  case WXK_NUMPAD_SEPARATOR: return 0;
-  case WXK_NUMPAD_SUBTRACT: return 0;
-  case WXK_NUMPAD_DECIMAL: return 0;
-  case WXK_NUMPAD_DIVIDE: return 0;
-  default: return 0;
+  switch(wxkey) 
+  {
+    case WXK_BACK: return CSKEY_BACKSPACE;
+    case WXK_TAB: return CSKEY_TAB;
+    case WXK_RETURN: return CSKEY_ENTER;
+    case WXK_ESCAPE: return CSKEY_ESC;
+    case WXK_SPACE: return CSKEY_SPACE;
+    case WXK_DELETE: return CSKEY_DEL;
+    case WXK_START: return 0;
+    case WXK_LBUTTON: return 0;
+    case WXK_RBUTTON: return 0;
+    case WXK_CANCEL: return 0;
+    case WXK_MBUTTON: return 0;
+    case WXK_CLEAR: return CSKEY_DEL;
+    case WXK_SHIFT: return CSKEY_SHIFT;
+    case WXK_ALT: return CSKEY_ALT;
+    case WXK_CONTROL: return CSKEY_CTRL;
+    case WXK_MENU: return CSKEY_CONTEXT;
+    case WXK_PAUSE: return CSKEY_PAUSE;
+    case WXK_CAPITAL: return CSKEY_CAPSLOCK;
+    case WXK_PRIOR: return CSKEY_PGUP;
+    case WXK_NEXT: return CSKEY_PGDN;
+    case WXK_END: return CSKEY_END;
+    case WXK_HOME: return CSKEY_HOME;
+    case WXK_LEFT: return CSKEY_LEFT;
+    case WXK_UP: return CSKEY_UP;
+    case WXK_RIGHT: return CSKEY_RIGHT;
+    case WXK_DOWN: return CSKEY_DOWN;
+    case WXK_SELECT: return 0;
+    case WXK_PRINT: return CSKEY_PRINTSCREEN;
+    case WXK_EXECUTE: return 0;
+    case WXK_SNAPSHOT: return 0;
+    case WXK_INSERT: return CSKEY_INS;
+    case WXK_HELP: return 0;
+    case WXK_NUMPAD0: return CSKEY_PAD0;
+    case WXK_NUMPAD1: return CSKEY_PAD1;
+    case WXK_NUMPAD2: return CSKEY_PAD2;
+    case WXK_NUMPAD3: return CSKEY_PAD3;
+    case WXK_NUMPAD4: return CSKEY_PAD4;
+    case WXK_NUMPAD5: return CSKEY_PAD5;
+    case WXK_NUMPAD6: return CSKEY_PAD6;
+    case WXK_NUMPAD7: return CSKEY_PAD7;
+    case WXK_NUMPAD8: return CSKEY_PAD8;
+    case WXK_NUMPAD9: return CSKEY_PAD9;
+    case WXK_MULTIPLY: return CSKEY_PADMULT;
+    case WXK_ADD: return CSKEY_PADPLUS;
+    case WXK_SEPARATOR: return 0;
+    case WXK_SUBTRACT: return CSKEY_PADMINUS;
+    case WXK_DECIMAL: return CSKEY_PADDECIMAL;
+    case WXK_DIVIDE: return CSKEY_PADDIV;
+    case WXK_F1: return CSKEY_F1;
+    case WXK_F2: return CSKEY_F2;
+    case WXK_F3: return CSKEY_F3;
+    case WXK_F4: return CSKEY_F4;
+    case WXK_F5: return CSKEY_F5;
+    case WXK_F6: return CSKEY_F6;
+    case WXK_F7: return CSKEY_F7;
+    case WXK_F8: return CSKEY_F8;
+    case WXK_F9: return CSKEY_F9;
+    case WXK_F10: return CSKEY_F10;
+    case WXK_F11: return CSKEY_F11;
+    case WXK_F12: return CSKEY_F12;
+    case WXK_F13: return 0;
+    case WXK_F14: return 0;
+    case WXK_F15: return 0;
+    case WXK_F16: return 0;
+    case WXK_F17: return 0;
+    case WXK_F18: return 0;
+    case WXK_F19: return 0;
+    case WXK_F20: return 0;
+    case WXK_F21: return 0;
+    case WXK_F22: return 0;
+    case WXK_F23: return 0;
+    case WXK_F24: return 0;
+    case WXK_NUMLOCK: return CSKEY_PADNUM;
+    case WXK_SCROLL: return CSKEY_SCROLLLOCK;
+    case WXK_PAGEUP: return CSKEY_PGUP;
+    case WXK_PAGEDOWN: return CSKEY_PGDN;
+    case WXK_NUMPAD_SPACE: return 0;
+    case WXK_NUMPAD_TAB: return 0;
+    case WXK_NUMPAD_ENTER: return 0;
+    case WXK_NUMPAD_F1: return 0;
+    case WXK_NUMPAD_F2: return 0;
+    case WXK_NUMPAD_F3: return 0;
+    case WXK_NUMPAD_F4: return 0;
+    case WXK_NUMPAD_HOME: return 0;
+    case WXK_NUMPAD_LEFT: return 0;
+    case WXK_NUMPAD_UP: return 0;
+    case WXK_NUMPAD_RIGHT: return 0;
+    case WXK_NUMPAD_DOWN: return 0;
+    case WXK_NUMPAD_PRIOR: return 0;
+    case WXK_NUMPAD_PAGEUP: return 0;
+    case WXK_NUMPAD_NEXT: return 0;
+    case WXK_NUMPAD_PAGEDOWN: return 0;
+    case WXK_NUMPAD_END: return 0;
+    case WXK_NUMPAD_BEGIN: return 0;
+    case WXK_NUMPAD_INSERT: return 0;
+    case WXK_NUMPAD_DELETE: return 0;
+    case WXK_NUMPAD_EQUAL: return 0;
+    case WXK_NUMPAD_MULTIPLY: return 0;
+    case WXK_NUMPAD_ADD: return 0;
+    case WXK_NUMPAD_SEPARATOR: return 0;
+    case WXK_NUMPAD_SUBTRACT: return 0;
+    case WXK_NUMPAD_DECIMAL: return 0;
+    case WXK_NUMPAD_DIVIDE: return 0;
+    default: return 0;
   }
 }
 
 void csGLCanvas::EmitKeyEvent(wxKeyEvent& event, bool down)
 {
+  // @@@ FIXME: this so does not support non-English...
+
   long wxkey = event.GetKeyCode();
   long cskey_raw = 0, cskey_cooked = 0;
 
   // csPrintf("got key %s event %ld\n", (down ? "down" : "up"), wxkey);
 
   if((wxkey >= '!' && wxkey <= '/')
-	  || (wxkey >= '0' && wxkey <= '9')
-	  || (wxkey >= ':' && wxkey <= '@')
-	  || (wxkey >= '[' && wxkey <= '`')
-	  || (wxkey >= 'a' && wxkey <= 'z')
-	  || (wxkey >= '{' && wxkey <= '~'))
+    || (wxkey >= '0' && wxkey <= '9')
+    || (wxkey >= ':' && wxkey <= '@')
+    || (wxkey >= '[' && wxkey <= '`')
+    || (wxkey >= 'a' && wxkey <= 'z')
+    || (wxkey >= '{' && wxkey <= '~'))
   {
-	  cskey_raw = cskey_cooked = wxkey;
+    cskey_raw = cskey_cooked = wxkey;
   }
   else if(wxkey >= 'A' && wxkey <= 'Z')
   {
-	  cskey_raw = wxkey + 32;
-	  cskey_cooked = wxkey;
+    cskey_raw = wxkey + 32;
+    cskey_cooked = wxkey;
   }
   else 
   {
-	  cskey_raw = cskey_cooked = wxCodeToCSCode(wxkey);
+    cskey_raw = cskey_cooked = wxCodeToCSCode (wxkey);
   }
 
-  if(cskey_raw != 0) g2d->EventOutlet->Key(cskey_raw, cskey_cooked, down);
+  if(cskey_raw != 0) g2d->EventOutlet->Key (cskey_raw, cskey_cooked, down);
 }
 
 void csGLCanvas::OnKeyDown( wxKeyEvent& event )

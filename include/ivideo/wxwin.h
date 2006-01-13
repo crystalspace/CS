@@ -36,13 +36,17 @@
 #endif
 #endif
 
-SCF_VERSION(iWxWindow, 0, 0, 0);
-
-/// @@@ Document me
+/**
+ * Interface to communicate with with a wxWidgets-based canvas.
+ */
 struct iWxWindow : public virtual iBase
 {
+  SCF_INTERFACE(iWxWindow, 0, 0, 1);
+
+  /// Set wxWidgets parent window of the canvas.
   virtual void SetParent(wxWindow* parent) = 0;
+  /// Get wxWidgets window object of the canvas.
   virtual wxWindow* GetWindow() = 0;
 };
 
-#endif
+#endif // _CS_IVIDEO_WXWIN_H_

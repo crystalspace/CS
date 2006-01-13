@@ -3094,17 +3094,28 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
    * both need settings from that file. */
   config.AddConfig(object_reg, "/config/r3dopengl.cfg");
 
+  /* Obtain the iGraphics2D, with the following precedence:
+   * - Canvas supplied with the -canvas option.
+   * - The one from the object registry.
+   * - The one set with the Video.OpenGL.Canvas config setting.
+   * - Default canvas.
+   */
   const char *driver = cmdline->GetOption ("canvas");
-  if (!driver)
-    driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
-
-  G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
-  if (G2D != 0)
-    object_reg->Register(G2D, "iGraphics2D");
-  else
+  if (driver == 0)
+    G2D = csQueryRegistry<iGraphics2D> (object_reg);
+  if (!G2D.IsValid())
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Error loading Graphics2D plugin.");
-    ok = false;
+    if (!driver)
+      driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
+
+    G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
+    if (G2D.IsValid())
+      object_reg->Register(G2D, "iGraphics2D");
+    else
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, "Error loading Graphics2D plugin.");
+      ok = false;
+    }
   }
 
   CanvasResize = csevCanvasResize(object_reg, G2D);

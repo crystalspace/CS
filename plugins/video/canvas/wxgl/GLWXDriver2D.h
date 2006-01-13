@@ -34,7 +34,6 @@ class csGraphics2DWX : public scfImplementationExt2<csGraphics2DWX,
 {
   wxWindow* myParent;
   csGLCanvas* theCanvas;
-
 public:
   csGraphics2DWX (iBase *iParent);
   virtual ~csGraphics2DWX ();
@@ -76,8 +75,11 @@ public:
   virtual bool SetMouseCursor (csMouseCursorID iShape)
   { return false;}
 
+  /**\name iWxWindow implementation
+   * @{ */
   virtual void SetParent(wxWindow* wx);
   virtual wxWindow* GetWindow();
+  /** @} */
 
   void *GetProcAddress (const char *funcname);
 };
@@ -86,7 +88,6 @@ class csGLCanvas: public wxGLCanvas
 {
 private:
   csGraphics2DWX* g2d;
-
 public:
   csGLCanvas(csGraphics2DWX* g2d, wxWindow *parent, wxWindowID id = wxID_ANY,
              const wxPoint& pos = wxDefaultPosition,
