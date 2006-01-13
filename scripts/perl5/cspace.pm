@@ -7839,6 +7839,7 @@ package cspace::iLoader;
 *LoadMeshObjectFactory = *cspacec::iLoader_LoadMeshObjectFactory;
 *LoadMeshObject = *cspacec::iLoader_LoadMeshObject;
 *Load = *cspacec::iLoader_Load;
+*LoadShader = *cspacec::iLoader_LoadShader;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
