@@ -29,6 +29,7 @@
 #include "wx/wx.h"
 #endif
 
+#include "csutil/csuctransform.h"
 #include "csutil/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/csinput.h"
@@ -529,146 +530,110 @@ void csGLCanvas::OnMouseEvent( wxMouseEvent& event )
   }
 }
 
-int wxCodeToCSCode(int wxkey)
+static bool wxCodeToCSCode(int wxkey, utf32_char& raw, utf32_char& cooked)
 {
+#define MAP(wx, r, c) \
+    case WXK_ ## wx: { raw = CSKEY_ ## r; cooked = CSKEY_ ## c; return true; }
+#define MAPC(wx, r, c) \
+    case WXK_ ## wx: { raw = CSKEY_ ## r; cooked = c; return true; }
   switch(wxkey) 
   {
-    case WXK_BACK: return CSKEY_BACKSPACE;
-    case WXK_TAB: return CSKEY_TAB;
-    case WXK_RETURN: return CSKEY_ENTER;
-    case WXK_ESCAPE: return CSKEY_ESC;
-    case WXK_SPACE: return CSKEY_SPACE;
-    case WXK_DELETE: return CSKEY_DEL;
-    case WXK_START: return 0;
-    case WXK_LBUTTON: return 0;
-    case WXK_RBUTTON: return 0;
-    case WXK_CANCEL: return 0;
-    case WXK_MBUTTON: return 0;
-    case WXK_CLEAR: return CSKEY_DEL;
-    case WXK_SHIFT: return CSKEY_SHIFT;
-    case WXK_ALT: return CSKEY_ALT;
-    case WXK_CONTROL: return CSKEY_CTRL;
-    case WXK_MENU: return CSKEY_CONTEXT;
-    case WXK_PAUSE: return CSKEY_PAUSE;
-    case WXK_CAPITAL: return CSKEY_CAPSLOCK;
-    case WXK_PRIOR: return CSKEY_PGUP;
-    case WXK_NEXT: return CSKEY_PGDN;
-    case WXK_END: return CSKEY_END;
-    case WXK_HOME: return CSKEY_HOME;
-    case WXK_LEFT: return CSKEY_LEFT;
-    case WXK_UP: return CSKEY_UP;
-    case WXK_RIGHT: return CSKEY_RIGHT;
-    case WXK_DOWN: return CSKEY_DOWN;
-    case WXK_SELECT: return 0;
-    case WXK_PRINT: return CSKEY_PRINTSCREEN;
-    case WXK_EXECUTE: return 0;
-    case WXK_SNAPSHOT: return 0;
-    case WXK_INSERT: return CSKEY_INS;
-    case WXK_HELP: return 0;
-    case WXK_NUMPAD0: return CSKEY_PAD0;
-    case WXK_NUMPAD1: return CSKEY_PAD1;
-    case WXK_NUMPAD2: return CSKEY_PAD2;
-    case WXK_NUMPAD3: return CSKEY_PAD3;
-    case WXK_NUMPAD4: return CSKEY_PAD4;
-    case WXK_NUMPAD5: return CSKEY_PAD5;
-    case WXK_NUMPAD6: return CSKEY_PAD6;
-    case WXK_NUMPAD7: return CSKEY_PAD7;
-    case WXK_NUMPAD8: return CSKEY_PAD8;
-    case WXK_NUMPAD9: return CSKEY_PAD9;
-    case WXK_MULTIPLY: return CSKEY_PADMULT;
-    case WXK_ADD: return CSKEY_PADPLUS;
-    case WXK_SEPARATOR: return 0;
-    case WXK_SUBTRACT: return CSKEY_PADMINUS;
-    case WXK_DECIMAL: return CSKEY_PADDECIMAL;
-    case WXK_DIVIDE: return CSKEY_PADDIV;
-    case WXK_F1: return CSKEY_F1;
-    case WXK_F2: return CSKEY_F2;
-    case WXK_F3: return CSKEY_F3;
-    case WXK_F4: return CSKEY_F4;
-    case WXK_F5: return CSKEY_F5;
-    case WXK_F6: return CSKEY_F6;
-    case WXK_F7: return CSKEY_F7;
-    case WXK_F8: return CSKEY_F8;
-    case WXK_F9: return CSKEY_F9;
-    case WXK_F10: return CSKEY_F10;
-    case WXK_F11: return CSKEY_F11;
-    case WXK_F12: return CSKEY_F12;
-    case WXK_F13: return 0;
-    case WXK_F14: return 0;
-    case WXK_F15: return 0;
-    case WXK_F16: return 0;
-    case WXK_F17: return 0;
-    case WXK_F18: return 0;
-    case WXK_F19: return 0;
-    case WXK_F20: return 0;
-    case WXK_F21: return 0;
-    case WXK_F22: return 0;
-    case WXK_F23: return 0;
-    case WXK_F24: return 0;
-    case WXK_NUMLOCK: return CSKEY_PADNUM;
-    case WXK_SCROLL: return CSKEY_SCROLLLOCK;
-    case WXK_PAGEUP: return CSKEY_PGUP;
-    case WXK_PAGEDOWN: return CSKEY_PGDN;
-    case WXK_NUMPAD_SPACE: return 0;
-    case WXK_NUMPAD_TAB: return 0;
-    case WXK_NUMPAD_ENTER: return 0;
-    case WXK_NUMPAD_F1: return 0;
-    case WXK_NUMPAD_F2: return 0;
-    case WXK_NUMPAD_F3: return 0;
-    case WXK_NUMPAD_F4: return 0;
-    case WXK_NUMPAD_HOME: return 0;
-    case WXK_NUMPAD_LEFT: return 0;
-    case WXK_NUMPAD_UP: return 0;
-    case WXK_NUMPAD_RIGHT: return 0;
-    case WXK_NUMPAD_DOWN: return 0;
-    case WXK_NUMPAD_PRIOR: return 0;
-    case WXK_NUMPAD_PAGEUP: return 0;
-    case WXK_NUMPAD_NEXT: return 0;
-    case WXK_NUMPAD_PAGEDOWN: return 0;
-    case WXK_NUMPAD_END: return 0;
-    case WXK_NUMPAD_BEGIN: return 0;
-    case WXK_NUMPAD_INSERT: return 0;
-    case WXK_NUMPAD_DELETE: return 0;
-    case WXK_NUMPAD_EQUAL: return 0;
-    case WXK_NUMPAD_MULTIPLY: return 0;
-    case WXK_NUMPAD_ADD: return 0;
-    case WXK_NUMPAD_SEPARATOR: return 0;
-    case WXK_NUMPAD_SUBTRACT: return 0;
-    case WXK_NUMPAD_DECIMAL: return 0;
-    case WXK_NUMPAD_DIVIDE: return 0;
-    default: return 0;
+    MAP (BACK,            BACKSPACE,    BACKSPACE)
+    MAP (TAB,             TAB,          TAB)
+    MAP (RETURN,          ENTER,        ENTER)
+    MAP (ESCAPE,          ESC,          ESC)
+    MAP (SPACE,           SPACE,        SPACE)
+    MAP (DELETE,          DEL,          DEL)
+    MAP (CLEAR,           DEL,          DEL)
+    MAP (SHIFT,           SHIFT,        SHIFT)
+    MAP (ALT,             ALT,          ALT)
+    MAP (CONTROL,         CTRL,         CTRL)
+    MAP (MENU,            CONTEXT,      CONTEXT)
+    MAP (PAUSE,           PAUSE,        PAUSE)
+    MAP (CAPITAL,         CAPSLOCK,     CAPSLOCK)
+    MAP (PRIOR,           PGUP,         PGUP)
+    MAP (NEXT,            PGDN,         PGDN)
+    MAP (END,             END,          END)
+    MAP (HOME,            HOME,         HOME)
+    MAP (LEFT,            LEFT,         LEFT)
+    MAP (UP,              UP,           UP)
+    MAP (RIGHT,           RIGHT,        RIGHT)
+    MAP (DOWN,            DOWN,         DOWN)
+    MAP (PRINT,           PRINTSCREEN,  PRINTSCREEN)
+    MAP (INSERT,          INS,          INS)
+    MAPC (NUMPAD0,        PAD0,         '0')
+    MAP (NUMPAD_INSERT,   PAD0,         INS)
+    MAPC (NUMPAD1,        PAD1,         '1')
+    MAP (NUMPAD_END,      PAD1,         END)
+    MAPC (NUMPAD2,        PAD2,         '2')
+    MAP (NUMPAD_DOWN,     PAD2,         DOWN)
+    MAPC (NUMPAD3,        PAD3,         '3')
+    MAP (NUMPAD_NEXT,     PAD3,         PGDN)
+    MAP (NUMPAD_PAGEDOWN, PAD3,         PGDN)
+    MAPC (NUMPAD4,        PAD4,         '4')
+    MAP (NUMPAD_LEFT,     PAD4,         LEFT)
+    MAPC (NUMPAD5,        PAD5,         '5')
+    MAPC (NUMPAD6,        PAD6,         '6')
+    MAP (NUMPAD_RIGHT,    PAD6,         RIGHT)
+    MAPC (NUMPAD7,        PAD7,         '7')
+    MAP (NUMPAD_HOME,     PAD7,         HOME)
+    MAPC (NUMPAD8,        PAD8,         '8')
+    MAP (NUMPAD_UP,       PAD8,         UP)
+    MAPC (NUMPAD9,        PAD9,         '9')
+    MAP (NUMPAD_PRIOR,    PAD9,         PGUP)
+    MAP (NUMPAD_PAGEUP,   PAD9,         PGUP)
+    MAPC (MULTIPLY,       PADMULT,      '*')
+    MAPC (NUMPAD_MULTIPLY,PADMULT,      '*')
+    MAPC (ADD,            PADPLUS,      '+')
+    MAPC (SUBTRACT,       PADMINUS,     '-')
+    MAPC (NUMPAD_SUBTRACT,PADMINUS,     '-')
+    MAPC (NUMPAD_ADD,     PADPLUS,      '+')
+    MAPC (DECIMAL,        PADDECIMAL,   '.')
+    MAPC (NUMPAD_DECIMAL, PADDECIMAL,   '.')
+    MAP (NUMPAD_DELETE,   PADDECIMAL,   DEL)
+    MAPC (DIVIDE,         PADDIV,       '/')
+    MAPC (NUMPAD_DIVIDE,  PADDIV,       '/')
+    MAP (F1,              F1,           F1)
+    MAP (F2,              F2,           F2)
+    MAP (F3,              F3,           F3)
+    MAP (F4,              F4,           F4)
+    MAP (F5,              F5,           F5)
+    MAP (F6,              F6,           F6)
+    MAP (F7,              F7,           F7)
+    MAP (F8,              F8,           F8)
+    MAP (F9,              F9,           F9)
+    MAP (F10,             F10,          F10)
+    MAP (F11,             F11,          F11)
+    MAP (F12,             F12,          F12)
+    MAP (NUMLOCK,         PADNUM,       PADNUM)
+    MAP (SCROLL,          SCROLLLOCK,   SCROLLLOCK)
+    MAP (PAGEUP,          PGUP,         PGUP)
+    MAP (PAGEDOWN,        PGDN,         PGDN)
+    MAP (NUMPAD_ENTER,    PADENTER,     ENTER)
+    default: return false;
   }
+#undef MAP
+#undef MAPC
 }
 
 void csGLCanvas::EmitKeyEvent(wxKeyEvent& event, bool down)
 {
-  // @@@ FIXME: this so does not support non-English...
+  utf32_char cskey_raw = 0, cskey_cooked = 0, cskey_cooked_new = 0;
+  wxCodeToCSCode (event.GetKeyCode(), cskey_raw, cskey_cooked);
 
-  long wxkey = event.GetKeyCode();
-  long cskey_raw = 0, cskey_cooked = 0;
-
-  // csPrintf("got key %s event %ld\n", (down ? "down" : "up"), wxkey);
-
-  if((wxkey >= '!' && wxkey <= '/')
-    || (wxkey >= '0' && wxkey <= '9')
-    || (wxkey >= ':' && wxkey <= '@')
-    || (wxkey >= '[' && wxkey <= '`')
-    || (wxkey >= 'a' && wxkey <= 'z')
-    || (wxkey >= '{' && wxkey <= '~'))
-  {
-    cskey_raw = cskey_cooked = wxkey;
-  }
-  else if(wxkey >= 'A' && wxkey <= 'Z')
-  {
-    cskey_raw = wxkey + 32;
-    cskey_cooked = wxkey;
-  }
-  else 
-  {
-    cskey_raw = cskey_cooked = wxCodeToCSCode (wxkey);
-  }
-
-  if(cskey_raw != 0) g2d->EventOutlet->Key (cskey_raw, cskey_cooked, down);
+#if wxHAS_UNICODE
+  cskey_cooked_new = event.GetUnicodeKey();
+#else
+  // Argh! Seems there is no way to get the character code for non-ASCII keys
+  // in non-Unicode builds... not even a character in the local charset...
+  if (event.GetKeyCode() <= 127)
+    cskey_cooked_new = event.GetKeyCode();
+#endif
+  if (cskey_raw == 0)
+    csUnicodeTransform::MapToLower (cskey_cooked_new, &cskey_raw, 1, 
+      csUcMapSimple);
+  if (cskey_cooked == 0) cskey_cooked = cskey_cooked_new;
+  if (cskey_raw != 0) g2d->EventOutlet->Key (cskey_raw, cskey_cooked, down);
 }
 
 void csGLCanvas::OnKeyDown( wxKeyEvent& event )
