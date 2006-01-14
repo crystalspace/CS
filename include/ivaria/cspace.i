@@ -146,7 +146,6 @@
 %define APPLY_FOR_EACH_INTERFACE
   INTERFACE_APPLY(iAws)
   INTERFACE_APPLY(iAwsKey)
-  INTERFACE_APPLY(iAudioStream)
   INTERFACE_APPLY(iBase)
   INTERFACE_APPLY(iBallState)
   INTERFACE_APPLY(iBinaryLoaderPlugin)
@@ -255,9 +254,6 @@
   INTERFACE_APPLY(iSprite3DState)
   INTERFACE_APPLY(iSpriteCal3DState)
   INTERFACE_APPLY(iStandardReporterListener)
-  INTERFACE_APPLY(iStream)
-  INTERFACE_APPLY(iStreamIterator)
-  INTERFACE_APPLY(iStreamFormat)
   INTERFACE_APPLY(iString)
   INTERFACE_APPLY(iStringArray)
   INTERFACE_APPLY(iStringSet)
@@ -272,7 +268,6 @@
   INTERFACE_APPLY(iThingState)
   INTERFACE_APPLY(iThingFactoryState)
   INTERFACE_APPLY(iVFS)
-  INTERFACE_APPLY(iVideoStream)
   INTERFACE_APPLY(iView)
   INTERFACE_APPLY(iVirtualClock)
   INTERFACE_APPLY(iVisibilityCuller)
@@ -1078,9 +1073,6 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "ivideo/txtmgr.h"
 %include "ivideo/material.h"
-
-%immutable csStreamDescription::name;
-%include "ivideo/codec.h"
 
 %include "igraphic/image.h"
 
