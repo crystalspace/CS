@@ -10,8 +10,12 @@ chronological order.
 	- rhad added two missing interface declarations for software sound 
 	  source types. The lack of these could cause SCF_QUERY_INTERFACE 
 	  to return a non-null pointer cast as an incorrect interface.
-	- rhad made some updates to the mac oss software sound driver so
-	  that it will hopefully work now.
+	- rhad made some updates to the oss software sound driver so
+	  that it respects byte order requests from the renderer.
+	- rhad made some updates to the mac coreaudio software sound driver
+	  so that it respects byte order requests from the renderer. 
+	  (and shouldn't crash now).  Mac changes are untested even for
+	  compilation as I don't own a Mac, sorry! :(
 14-Jan-2006
 	- res improved the wxgl keyboard handling somewhat.
 13-Jan-2006
