@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Jan-2006
+	- rhad added two missing interface declarations for software sound 
+	  source types. The lack of these could cause SCF_QUERY_INTERFACE 
+	  to return a non-null pointer cast as an incorrect interface.
+	- rhad made some updates to the mac oss software sound driver so
+	  that it will hopefully work now.
 14-Jan-2006
 	- res improved the wxgl keyboard handling somewhat.
 13-Jan-2006
