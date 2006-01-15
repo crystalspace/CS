@@ -28,6 +28,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 /**\addtogroup sndsys
  * @{ */
 
+
+#define CSSNDSYS_SAMPLE_LITTLE_ENDIAN   0x00
+#define CSSNDSYS_SAMPLE_BIG_ENDIAN      0x01
+#define CSSNDSYS_SAMPLE_ENDIAN_MASK     0x01
+
 /**
  * The sound format. This keeps information about the frequency, bits and
  * channels of a sound data object.
@@ -37,9 +42,14 @@ struct csSndSysSoundFormat
   /// Frequency of the sound (hz)
   int Freq;
   /// number of bits per sample (8 or 16)
-  int Bits;
+  uint8 Bits;
   /// number of channels (1 or 2)
-  int Channels;
+  uint8 Channels;
+  /// Flags further describing the format of the sound data
+  // Mask                             Option
+  // CSSNDSYS_SAMPLE_ENDIAN_MASK      CSSNDSYS_SAMPLE_LITTLE_ENDIAN 
+  // CSSNDSYS_SAMPLE_ENDIAN_MASK      CSSNDSYS_SAMPLE_BIG_ENDIAN
+  uint8 Flags;
 };
 
 // A single sound sample will be stored as a signed int
