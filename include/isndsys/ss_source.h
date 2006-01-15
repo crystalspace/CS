@@ -25,12 +25,15 @@
  */
 
 #include "csutil/scf.h"
+#include "csgeom/vector3.h"
 #include "isndsys/ss_structs.h"
 
 /**\addtogroup sndsys
  * @{ */
 
 SCF_VERSION (iSndSysSource, 0, 1, 0);
+SCF_VERSION (iSndSysSourceSoftware, 0, 1, 0);
+SCF_VERSION (iSndSysSourceSoftware3D, 0, 1, 0);
 
 struct iSndSysFilter;
 struct iSndSysStream;
