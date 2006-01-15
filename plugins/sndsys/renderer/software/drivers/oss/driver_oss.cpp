@@ -155,18 +155,31 @@ bool SndSysDriverOSS::Open (csSndSysRendererSoftware*renderer,
       param=AFMT_U8;
     break;
     case 16:
-      param=AFMT_S16_LE;
+      if ((requested_format->Flags & CSSNDSYS_SAMPLE_ENDIAN_MASK) == CSSNDSYS_SAMPLE_BIG_ENDIAN)
+        param=AFMT_S16_BE;
+      else
+        param=AFMT_S16_LE;
     break;
     default:
       Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: OSS Driver: Unhandled output bits %d. Forcing to 16 bit.", requested_format->Bits);
       requested_format->Bits=16;
-      param=AFMT_S16_LE;
+      if ((requested_format->Flags & CSSNDSYS_SAMPLE_ENDIAN_MASK) == CSSNDSYS_SAMPLE_BIG_ENDIAN)
+        param=AFMT_S16_BE;
+      else
+        param=AFMT_S16_LE;
     break;
   }
   result=ioctl(output_fd, SNDCTL_DSP_SETFMT, &param);
   if (result==-1)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: OSS Driver: Failed to set output format to %d bit.", requested_format->Bits);
+    const char *endian_string;
+
+    if ((requested_format->Flags & CSSNDSYS_SAMPLE_ENDIAN_MASK) == CSSNDSYS_SAMPLE_BIG_ENDIAN)
+      endian_string="Big Endian";
+    else
+      endian_string="Little Endian";
+    
+    Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: OSS Driver: Failed to set output format to %d bit (%s).", requested_format->Bits, endian_string);
     close(output_fd);
     output_fd=-1;
     return false;
