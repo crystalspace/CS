@@ -187,6 +187,14 @@ bool csSndSysRendererSoftware::Open ()
   render_format.Freq = Config->GetInt("SndSys.Frequency", 44100);
   render_format.Bits = Config->GetInt("SndSys.Bits", 16);
   render_format.Channels = Config->GetInt("SndSys.Channels", 2);
+  render_format.Flags=0;
+  // Renderer data format is native endian
+#ifdef CS_LITTLE_ENDIAN
+  render_format.Flags|=CSSNDSYS_SAMPLE_LITTLE_ENDIAN;
+#else
+  render_format.Flags|=CSSNDSYS_SAMPLE_BIG_ENDIAN;
+#endif
+  
 
   Report (CS_REPORTER_SEVERITY_DEBUG, 
     "Sound System: Initializing driver with Freq=%d Channels=%d Bits=%d",
@@ -197,6 +205,23 @@ bool csSndSysRendererSoftware::Open ()
     Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: SoundDriver->Open() failed!");
     return false;
   }
+
+  // The software renderer always works in native endian format.  If the driver changes
+  //  the endian format away from the native format, we note that here, but don't pass it down
+  //  to the stream and sources.
+  if ((render_format.Flags & CSSNDSYS_SAMPLE_ENDIAN_MASK) == CSSNDSYS_SAMPLE_LITTLE_ENDIAN)
+    driver_little_endian=true;
+  else
+    driver_little_endian=false;
+
+  // Clear out the flag for byte order and reset to what we'll use in the renderer
+  render_format.Flags&=~(CSSNDSYS_SAMPLE_ENDIAN_MASK);
+#ifdef CS_LITTLE_ENDIAN
+  render_format.Flags|=CSSNDSYS_SAMPLE_LITTLE_ENDIAN;
+#else
+  render_format.Flags|=CSSNDSYS_SAMPLE_BIG_ENDIAN;
+#endif
+
 
   Listener = new SndSysListenerSoftware();
   
@@ -598,12 +623,25 @@ csSoundSample *csSndSysRendererSoftware::CopySampleBufferToDriverBuffer (
 //    while (drvbuf_len-- > 0)
 //      *(dptr++)=(((*(src++)) >> 16) & 0xFFFF);
     drvbuf_len/=4;
-    while (drvbuf_len-- > 0)
+    if (driver_little_endian)
     {
-      // 16 bit output should be in little endian
-      *(dptr++)=csLittleEndianShort((((src[0]) >> 16) & 0xFFFF));
-      *(dptr++)=csLittleEndianShort((((src[samples_per_channel]) >> 16) & 0xFFFF));
-      src++;
+      while (drvbuf_len-- > 0)
+      {
+        // 16 bit output should be in little endian
+        *(dptr++)=csLittleEndianShort((((src[0]) >> 16) & 0xFFFF));
+        *(dptr++)=csLittleEndianShort((((src[samples_per_channel]) >> 16) & 0xFFFF));
+        src++;
+      }
+    }
+    else
+    {
+      while (drvbuf_len-- > 0)
+      {
+        // 16 bit output should be in big endian
+        *(dptr++)=csBigEndianShort((((src[0]) >> 16) & 0xFFFF));
+        *(dptr++)=csBigEndianShort((((src[samples_per_channel]) >> 16) & 0xFFFF));
+        src++;
+      }
     }
   }
   return src;

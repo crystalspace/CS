@@ -129,24 +129,24 @@ public:
   // the global listener object
   csRef<SndSysListenerSoftware> Listener;
 
-
+  /// The sample format used by the software renderer
   csSndSysSoundFormat render_format;
+
+  /// Set to true if the driver expects little endian data
+  bool driver_little_endian;
 
   // TODO: Move to listener
   struct st_speaker_properties Speakers[MAX_CHANNELS];
 
 protected:
-  // the config file
+  /// Interface to the Configuration file
   csConfigAccess Config;
 
-   // the low-level sound driver
+  /// Interface to the low level sound driver
   csRef<iSndSysSoftwareDriver> SoundDriver;
 
-   // global volume setting
+  /// Global volume setting
   float Volume;
-
-  // previous time the sound handles were updated
-  //csTicks LastTime;
 
   Queue<iSndSysSourceSoftware> source_add_queue;
   Queue<iSndSysSource> source_remove_queue,source_clear_queue;
