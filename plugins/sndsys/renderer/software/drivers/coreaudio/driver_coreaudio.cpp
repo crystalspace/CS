@@ -168,9 +168,14 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
   outStreamDesc.mSampleRate=requested_format->Freq;
   outStreamDesc.mFormatID=kAudioFormatLinearPCM;
   // This is where we set the output to signed integer output (not float),
-  // little endian
   outStreamDesc.mFormatFlags =
     kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
+
+  // Set the byte order of the format to the renderer requested byte order, which is
+  //  probably machine byte order.
+  if ((requested_format.Flags & CSSNDSYS_SAMPLE_ENDIAN_MASK) == CSSNDSYS_SAMPLE_BIG_ENDIAN)
+    outStreamDesc.mFormatFlags |= kAudioFormatFlagIsBigEndian;
+
   outStreamDesc.mChannelsPerFrame=requested_format->Channels;
   outStreamDesc.mBitsPerChannel=requested_format->Bits;
   // Frames per packet are the number of full sets of sound samples (one for
