@@ -140,26 +140,52 @@ Subcommands allowed for a texture specification are:
 @item @samp{file}
 @samp{String}. @sc{vfs} filename for the texture.
 @item @samp{mipmap}
-@samp{Boolean}. Texture uses mipmaps (default on).
-@item @samp{dither}
-@samp{Boolean}. Texture uses dithering (default on).
+@samp{Boolean}. Texture uses mipmaps (default on). For 2D textures it is
+usually better to disable this. Also skybox textures should probably disable
+this.
 @item @samp{dither}
 @samp{Boolean}. Texture uses dithering (default off).
 @item @samp{npots}
 @samp{Boolean}. Texture doesn't have to be power of two and it will
-not be scaled to power of two dimensions. (default off).
+not be scaled to power of two dimensions. (default off). Note that not all
+hardware supports this. Sometimes this only works if mipmaps are also
+disabled.
+@item @samp{clamp}
+@samp{Boolean}. If set the texture will not be tiled and color lookups
+outside the 0..1 range will be clamped to the edge of the texture. Default off.
+@item @samp{filter}
+@samp{Boolean}. If disabled then no texture filtering will occur. This usually
+looks worse. Default is on.
 @item @samp{keepimage}
 @samp{Boolean}. If this is set then the loaded image will be kept
 and attached to the texture for later usage. With this flag off (which is
 default) the image will be freed after the texture is given to the
 3D renderer (to conserve memory).
+@item @samp{type}
+@samp{String}. Name of the texture plugin. Some examples of texture
+plugins are @samp{crystalspace.texture.loader.water},
+@samp{crystalspace.texture.loader.plasma},
+@samp{crystalspace.texture.loader.checkerboard},
+@samp{crystalspace.texture.loader.cubemap}, @dots{}
 @item @samp{params}
 @samp{Node}. Parameters for the optional texture plugin.
-@item @samp{type}
-@samp{String}. Name of the texture plugin.
 @item @samp{size}
-@samp{Attributes 'width' and 'height'}. Desired size of the texture.
-@ TODO
+@samp{Attributes 'width' and 'height'}. Desired size of the texture. This
+is mainly useful in case you use one of the texture plugins. If you use a
+normal file then the width and height is fetched from the image.
+@item @samp{alwaysanimate}
+@samp{Boolean}. If this is an animated texture then this flag will
+make sure the texture keeps animating even if out of view. This is less
+performant but in some cases it is more correct. Default off.
+@item @samp{class}
+@samp{String}. This is used to specify the class of the texture. One
+common example is @samp{normalmap} which is used by many shaders.
+@item @samp{alpha}
+@samp{String}. One of @samp{none}, @samp{binary}, @samp{smooth}, or @samp{auto}.
+@samp{binary} is often used to force binary alpha (keycolor) for a normal
+alpha mapped texture. By using this flag the texture can be used on regular
+objects using @samp{zuse} and @samp{object} render priority. This greatly
+helps performance and correct visual appearance of objects.
 @end itemize
 
 @subsubheading Material Specification Section
@@ -206,12 +232,43 @@ that uses the @samp{plasma} texture. The layer is scaled 10 times in both
 @emph{u} and @emph{v} direction and it is added to the original texture
 (i.e. the colors are added).
 
+Subcommands allowed for a material specification are:
+
+@itemize
+@item @samp{key}
+@samp{Key/value node}. Specifies a generic key/value.
+@item @samp{texture}
+@samp{String}. Name of the texture.
+@item @samp{color}
+@samp{Color}. A color instead of a texture. If you use this then @samp{texture}
+should not be used.
+@item @samp{shader}
+@samp{String}. A shader to use for this material. The value of this should
+be the name of the shader to use. In addition you also need to specify
+the @samp{type} (as an attribute) of this shader. This will be used in combination
+with the renderloop to control when this material will be used in the rendering
+steps.
+@item @samp{shadervar}
+@samp{Value}. This defines a variable for the shader attached to this material.
+The type of the value depends on the specific variable. A shader variable
+has two attributes: @samp{name} and @samp{type}. The type can be anything like
+@samp{texture}, @samp{vector2}, @samp{vector3}, @samp{vector4}, @samp{integer},
+@samp{float},  @samp{expr}, @samp{expression}, or @samp{array}.
+@end itemize
+
 @subsubheading Shader Section
 @cindex shaders (Map File)
 
 With shaders you can describe more advanced texture and material
-effects. The documentation for this section is not up-to-date
-since the entire shader system is still work in progress.
+effects. Here is an example:
+
+@example
+<shaders>
+  <shader><file>/shader/reflect.xml</file></shader>
+</shaders>
+@end example
+
+Most of the times you simply refer to shaders from a file.
 
 @subsubheading Sounds Section
 @cindex sounds (Map File)

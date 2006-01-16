@@ -8,6 +8,8 @@ chronological order.
 
 16-Jan-2006
 	- Jorrit did some documentation enhancements.
+	- Jorrit updated the xml format document with a bit more information
+	  about textures and materials.
 15-Jan-2006
 	- rhad added two missing interface declarations for software sound 
 	  source types. The lack of these could cause SCF_QUERY_INTERFACE 
