@@ -7633,6 +7633,9 @@ class iSndSysSourceSoftware3DPtr(iSndSysSourceSoftware3D):
         _swig_setattr(self, iSndSysSourceSoftware3D,self.__class__,iSndSysSourceSoftware3D)
 _cspace.iSndSysSourceSoftware3D_swigregister(iSndSysSourceSoftware3DPtr)
 
+CSSNDSYS_SAMPLE_LITTLE_ENDIAN = _cspace.CSSNDSYS_SAMPLE_LITTLE_ENDIAN
+CSSNDSYS_SAMPLE_BIG_ENDIAN = _cspace.CSSNDSYS_SAMPLE_BIG_ENDIAN
+CSSNDSYS_SAMPLE_ENDIAN_MASK = _cspace.CSSNDSYS_SAMPLE_ENDIAN_MASK
 class csSndSysSoundFormat(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSndSysSoundFormat, name, value)
@@ -7649,6 +7652,9 @@ class csSndSysSoundFormat(_object):
     __swig_setmethods__["Channels"] = _cspace.csSndSysSoundFormat_Channels_set
     __swig_getmethods__["Channels"] = _cspace.csSndSysSoundFormat_Channels_get
     if _newclass:Channels = property(_cspace.csSndSysSoundFormat_Channels_get, _cspace.csSndSysSoundFormat_Channels_set)
+    __swig_setmethods__["Flags"] = _cspace.csSndSysSoundFormat_Flags_set
+    __swig_getmethods__["Flags"] = _cspace.csSndSysSoundFormat_Flags_get
+    if _newclass:Flags = property(_cspace.csSndSysSoundFormat_Flags_get, _cspace.csSndSysSoundFormat_Flags_set)
     def __init__(self, *args):
         _swig_setattr(self, csSndSysSoundFormat, 'this', _cspace.new_csSndSysSoundFormat(*args))
         _swig_setattr(self, csSndSysSoundFormat, 'thisown', 1)
