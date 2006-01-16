@@ -220,7 +220,7 @@ void PicView::LoadNextImage (size_t idx, int step)
   if (!ifile) return;
 
   delete pic;
-  txt = txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D | CS_TEXTURE_DITHER);
+  txt = txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D);
   pic = new csSimplePixmap (txt);
 }
 

@@ -143,13 +143,11 @@ Subcommands allowed for a texture specification are:
 @samp{Boolean}. Texture uses mipmaps (default on). For 2D textures it is
 usually better to disable this. Also skybox textures should probably disable
 this.
-@item @samp{dither}
-@samp{Boolean}. Texture uses dithering (default off).
 @item @samp{npots}
 @samp{Boolean}. Texture doesn't have to be power of two and it will
 not be scaled to power of two dimensions. (default off). Note that not all
-hardware supports this. Sometimes this only works if mipmaps are also
-disabled.
+hardware supports this, and sometimes this only works if mipmaps are 
+disabled as well as clamping enabled.
 @item @samp{clamp}
 @samp{Boolean}. If set the texture will not be tiled and color lookups
 outside the 0..1 range will be clamped to the edge of the texture. Default off.
@@ -182,10 +180,11 @@ performant but in some cases it is more correct. Default off.
 common example is @samp{normalmap} which is used by many shaders.
 @item @samp{alpha}
 @samp{String}. One of @samp{none}, @samp{binary}, @samp{smooth}, or @samp{auto}.
-@samp{binary} is often used to force binary alpha (keycolor) for a normal
-alpha mapped texture. By using this flag the texture can be used on regular
-objects using @samp{zuse} and @samp{object} render priority. This greatly
-helps performance and correct visual appearance of objects.
+@samp{binary} is often used to force binary alpha for an alpha mapped texture. 
+In short, by using this flag the texture can be used on regular objects using 
+@samp{zuse} and @samp{object} render priority. This greatly helps performance 
+and correct visual appearance of objects. For a more detailed explanation
+@pxref{Alpha in Textures}.
 @end itemize
 
 @subsubheading Material Specification Section
@@ -230,7 +229,10 @@ The last material is interesting. The base of the material is the
 @samp{wood} texture. On top of that there is an additional texture layer
 that uses the @samp{plasma} texture. The layer is scaled 10 times in both
 @emph{u} and @emph{v} direction and it is added to the original texture
-(i.e. the colors are added).
+(i.e. the colors are added). This ``special effect'' is achieved by attaching
+the @samp{std_lighting_detail} shader to this material. Different shaders
+allow different effects - the additive blending of a second texture in this
+case.
 
 Subcommands allowed for a material specification are:
 
@@ -250,10 +252,14 @@ with the renderloop to control when this material will be used in the rendering
 steps.
 @item @samp{shadervar}
 @samp{Value}. This defines a variable for the shader attached to this material.
-The type of the value depends on the specific variable. A shader variable
-has two attributes: @samp{name} and @samp{type}. The type can be anything like
+The meaning of a variable as well as the required type depends on the specific
+shader A shader variable has two attributes: @samp{name} and @samp{type}. 
+@samp{name} is the name as used in the shader. The type can be anything like
 @samp{texture}, @samp{vector2}, @samp{vector3}, @samp{vector4}, @samp{integer},
 @samp{float},  @samp{expr}, @samp{expression}, or @samp{array}.
+@c FIXME: Link to more detailed docs, if we have some.
+@c FIXME: Probably good idea to list or link to a list of "common" shader
+@c 	  variables (e.g. "tex diffuse").
 @end itemize
 
 @subsubheading Shader Section

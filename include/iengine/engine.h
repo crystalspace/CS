@@ -426,7 +426,6 @@ struct iEngine : public virtual iBase
    * - CS_TEXTURE_2D image will be used only for 2D drawing
    * - CS_TEXTURE_3D image will be textured onto 3D polygon
    *   (this is almost always the flag you want)
-   * - CS_TEXTURE_DITHER texture will be dithered before use
    * - CS_TEXTURE_NOMIPMAPS texture will not be mipmapped before use
    *
    * \note You will need to call iTextureWrapper::Register()

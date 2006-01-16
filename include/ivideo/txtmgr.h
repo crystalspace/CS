@@ -52,15 +52,6 @@ struct iMaterial;
 /// You're going to use the texture for 3D drawing
 #define CS_TEXTURE_3D			0x00000002
 /**
- * Dither texture or not.
- * Some renderers may use dithering while converting textures to internal
- * format (say from truecolor to 8-bit paletted). For most textures dithering
- * won't give any visual effect, but very seldom there are textures that looks
- * relatively bad after being converted. In this case you can enable this
- * per-texture flag.
- */
-#define CS_TEXTURE_DITHER		0x00000004
-/**
  * Create mipmaps for this texture?
  * Sometimes we know in advance that some texture will need just one
  * mipmap (or we just don't care about the mipmapping artifacts because of,

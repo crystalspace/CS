@@ -228,13 +228,11 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_DITHER:
 	{
-	  bool di;
-	  if (!SyntaxService->ParseBool (child, di, true))
-	    goto error;
-          if (di)
-	    context.SetFlags (context.GetFlags() | CS_TEXTURE_DITHER);
-          else
-	    context.SetFlags (context.GetFlags() & ~CS_TEXTURE_DITHER);
+	  SyntaxService->Report (
+	    "crystalspace.maploader.parse.texture",
+	    CS_REPORTER_SEVERITY_NOTIFY,
+	    node,
+	    "\"dither\" flag has been dropped");
 	}
         break;
       case XMLTOKEN_NPOTS:
