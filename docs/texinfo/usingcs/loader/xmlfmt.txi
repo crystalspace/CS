@@ -126,6 +126,42 @@ The third texture is a procedural texture. There are four types of
 procedural textures predefined in Crystal Space: @samp{fire}, @samp{water},
 @samp{dots}, and @samp{plasma}.
 
+Subcommands allowed for a texture specification are:
+
+@itemize
+@item @samp{key}
+@samp{Key/value node}. Specifies a generic key/value.
+@item @samp{for2d}
+@samp{Boolean}. Texture is for 2D usage.
+@item @samp{for3d}
+@samp{Boolean}. Texture is for 3D usage (default).
+@item @samp{transparent}
+@samp{Color}. Texture uses keycolor with the given color.
+@item @samp{file}
+@samp{String}. @sc{vfs} filename for the texture.
+@item @samp{mipmap}
+@samp{Boolean}. Texture uses mipmaps (default on).
+@item @samp{dither}
+@samp{Boolean}. Texture uses dithering (default on).
+@item @samp{dither}
+@samp{Boolean}. Texture uses dithering (default off).
+@item @samp{npots}
+@samp{Boolean}. Texture doesn't have to be power of two and it will
+not be scaled to power of two dimensions. (default off).
+@item @samp{keepimage}
+@samp{Boolean}. If this is set then the loaded image will be kept
+and attached to the texture for later usage. With this flag off (which is
+default) the image will be freed after the texture is given to the
+3D renderer (to conserve memory).
+@item @samp{params}
+@samp{Node}. Parameters for the optional texture plugin.
+@item @samp{type}
+@samp{String}. Name of the texture plugin.
+@item @samp{size}
+@samp{Attributes 'width' and 'height'}. Desired size of the texture.
+@ TODO
+@end itemize
+
 @subsubheading Material Specification Section
 @cindex materials (Map File)
 

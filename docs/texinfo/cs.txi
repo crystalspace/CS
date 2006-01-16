@@ -97,11 +97,6 @@ technical information.
 This is edition @value{EDITION} of the Crystal Space manual for Crystal Space
 version @value{VERSION}, last updated @value{UPDATED}.
 
-Important Note! The documentation is currently being reorganized. All the sections
-marked @sc{old} are old chapters. They are still useful but they will disappear
-in the final documentation when the new chapters have all information from the old
-chapters.
-
 @menu
 * CS Introduction:: Introduction
 * Building:: Building and Installing

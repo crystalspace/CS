@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Jan-2006
+	- Jorrit did some documentation enhancements.
 15-Jan-2006
 	- rhad added two missing interface declarations for software sound 
 	  source types. The lack of these could cause SCF_QUERY_INTERFACE 
