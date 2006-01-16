@@ -13,6 +13,8 @@ chronological order.
 	- res dropped the unused CS_TEXTURE_DITHER flag.
 	- res added an assertion to csBaseEventHandler to ensure it's properly
 	  initialized.
+	- mdmkolbe fixed some compile errors in the Swig bindings
+	  that happen when compiling with a separate build directory.
 15-Jan-2006
 	- rhad added two missing interface declarations for software sound 
 	  source types. The lack of these could cause SCF_QUERY_INTERFACE 

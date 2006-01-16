@@ -56,7 +56,8 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
     [ DoSourceGrist cspace.i ] :
     java :
     -c++ -java -package org.crystalspace3d :
-    [ ConcatDirs $(TOP) include ] :
+    [ ConcatDirs $(TOP) include ]
+    [ ConcatDirs $(BUILDTOP) include ] :
     [ ConcatDirs $(TOP) include ivaria ] :
     :
     :

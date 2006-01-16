@@ -89,21 +89,37 @@
 %module cspace
 #endif
 
+%include "csconfig.h"
 // Ignored macros.
+#undef CS_STRUCT_ALIGN_4BYTE_BEGIN
 #define CS_STRUCT_ALIGN_4BYTE_BEGIN
+#undef CS_STRUCT_ALIGN_4BYTE_END
 #define CS_STRUCT_ALIGN_4BYTE_END
+#undef CS_GNUC_PRINTF(format_idx, arg_idx)
 #define CS_GNUC_PRINTF(format_idx, arg_idx)
+#undef CS_GNUC_SCANF(format_idx, arg_idx)
 #define CS_GNUC_SCANF(format_idx, arg_idx)
+#undef CS_DECLARE_STATIC_CLASSVAR(a, b, c)
 #define CS_DECLARE_STATIC_CLASSVAR(a, b, c)
+#undef CS_SPECIALIZE_TEMPLATE template<>
 #define CS_SPECIALIZE_TEMPLATE template<>
+#undef CS_FORCEINLINE
 #define CS_FORCEINLINE
+#undef CS_EXPORT_SYM
 #define CS_EXPORT_SYM
+#undef CS_IMPORT_SYM
 #define CS_IMPORT_SYM
+#undef CS_CRYSTALSPACE_EXPORT
 #define CS_CRYSTALSPACE_EXPORT
+#undef CS_LEAKGUARD_DECLARE(m)
 #define CS_LEAKGUARD_DECLARE(m)
+#undef CS_DEPRECATED_METHOD
 #define CS_DEPRECATED_METHOD
+#undef CS_DEPRECATED_TYPE
 #define CS_DEPRECATED_TYPE
+#undef CS_PURE_METHOD
 #define CS_PURE_METHOD
+#undef CS_CONST_METHOD
 #define CS_CONST_METHOD
 
 // Compatibility macros.
