@@ -8655,6 +8655,8 @@ package cspace::csSndSysSoundFormat;
 *swig_Bits_set = *cspacec::csSndSysSoundFormat_Bits_set;
 *swig_Channels_get = *cspacec::csSndSysSoundFormat_Channels_get;
 *swig_Channels_set = *cspacec::csSndSysSoundFormat_Channels_set;
+*swig_Flags_get = *cspacec::csSndSysSoundFormat_Flags_get;
+*swig_Flags_set = *cspacec::csSndSysSoundFormat_Flags_set;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csSndSysSoundFormat(@_);
@@ -14640,6 +14642,9 @@ sub ENVIRONMENT_DIZZY () { $cspacec::ENVIRONMENT_DIZZY }
 sub ENVIRONMENT_PSYCHOTIC () { $cspacec::ENVIRONMENT_PSYCHOTIC }
 sub CS_SNDSYS_DATA_UNKNOWN_SIZE () { $cspacec::CS_SNDSYS_DATA_UNKNOWN_SIZE }
 sub CS_SNDSYS_SOURCE_DISTANCE_INFINITE () { $cspacec::CS_SNDSYS_SOURCE_DISTANCE_INFINITE }
+sub CSSNDSYS_SAMPLE_LITTLE_ENDIAN () { $cspacec::CSSNDSYS_SAMPLE_LITTLE_ENDIAN }
+sub CSSNDSYS_SAMPLE_BIG_ENDIAN () { $cspacec::CSSNDSYS_SAMPLE_BIG_ENDIAN }
+sub CSSNDSYS_SAMPLE_ENDIAN_MASK () { $cspacec::CSSNDSYS_SAMPLE_ENDIAN_MASK }
 sub CS_SNDSYS_STREAM_PAUSED () { $cspacec::CS_SNDSYS_STREAM_PAUSED }
 sub CS_SNDSYS_STREAM_UNPAUSED () { $cspacec::CS_SNDSYS_STREAM_UNPAUSED }
 sub CS_SNDSYS_STREAM_DONTLOOP () { $cspacec::CS_SNDSYS_STREAM_DONTLOOP }
