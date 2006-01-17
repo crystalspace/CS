@@ -86,9 +86,31 @@ struct iMeshGeneratorGeometry : public virtual iBase
    * Set the density. The density is defined as the number of objects
    * in every 1x1 square. Default density is 1.
    * @@@TODO: add density map support.
-   * @@@TODO: add density per material.
    */
   virtual void SetDensity (float density) = 0;
+
+  /**
+   * Add a density factor based on a material.
+   * The base density will be used to try a number of positions in
+   * every cell. Then for that position it will determine the material
+   * that is hit. If that material is listed in the density factor
+   * table then that factor will be used to determine if the position
+   * should be used or not. Setting a factor of 0 here will disable
+   * the material. Setting a factor of 1 will give full density.
+   */
+  virtual void AddDensityMaterialFactor (iMaterialWrapper* material,
+  	float factor) = 0;
+
+  /**
+   * Set the default factor to use in case the material found on
+   * the meshes is not any of the ones defined in the material factory
+   * table. By default the default factor is 0. This means that as soon
+   * as you use SetDensityMaterialFactor() above then on every material
+   * that is not listed there will be no foliage generated. The default
+   * factor is NOT used in case the material factor table
+   * is empty.
+   */
+  virtual void SetDefaultDensityMaterialFactor (float factor) = 0;
 
   /**
    * Get the density.

@@ -326,22 +326,30 @@
 	    <factory maxdist="20" name="GrassLow" />
 	    <radius>1</radius>
 	    <density>1.5</density>
+	    <materialfactor material="Grass" factor="1" />
         </geometry>
         <geometry>
 	    <factory maxdist="10" name="TallGrass" />
 	    <factory maxdist="20" name="TallGrassLow" />
 	    <radius>1</radius>
 	    <density>.3</density>
+	    <materialfactor material="Grass" factor="1" />
         </geometry>
         <geometry>
 	    <factory maxdist="20" name="Rock" />
 	    <radius>1</radius>
 	    <density>.02</density>
+	    <materialfactor material="Marble" factor="1" />
+	    <materialfactor material="Stone" factor="0" />
+	    <defaultmaterialfactor>.5</defaultmaterialfactor>
         </geometry>
         <geometry>
 	    <factory maxdist="20" name="RockSmall" />
 	    <radius>1</radius>
 	    <density>.2</density>
+	    <materialfactor material="Marble" factor="1" />
+	    <materialfactor material="Stone" factor="0" />
+	    <defaultmaterialfactor>.5</defaultmaterialfactor>
         </geometry>
 	<!--
         <geometry>

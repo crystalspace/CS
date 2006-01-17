@@ -7,6 +7,17 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 17-Jan-2006
+	- Jorrit fixed bruteblock->HitBeamObject() so that it correctly
+	  returns the resulting material.
+	- Jorrit changed csIntersect3::SegmentTriangle() to also detect a
+	  hit on triangle boundaries.
+	- Jorrit fixed bruteblock->HitBeamObject() so that it works on
+	  triangle boundaries too.
+	- Jorrit implemented material specific density modifications
+	  in the mesh generator. So you can now disable generation of
+	  a specific type of mesh depending on a material.
+	- Jorrit added a elapsed time cap to csColliderActor to prevent
+	  falling through terrain in case of very slow fps.
 	- res added csStringBase& csStringBase::operator= (const 
 	  csStringBase&) to allow assignment of a csStringBase& to another
 	  csStringBase&.

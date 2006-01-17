@@ -80,6 +80,12 @@ struct csMGGeom
   csSet<csPtrKey<csMGGeomInstMesh> > instmesh_setaside;
 };
 
+struct csMGDensityMaterialFactor
+{
+  iMaterialWrapper* material;
+  float factor;
+};
+
 /**
  * Geometry implementation for the mesh generator.
  */
@@ -94,6 +100,11 @@ private:
   float density;
   float total_max_dist;
 
+  // Table with density material factors.
+  csArray<csMGDensityMaterialFactor> material_factors;
+  // Default material factor. Only used in case the table above is not empty.
+  float default_material_factor;
+
   csMeshGenerator* generator;
 
 public:
@@ -101,6 +112,14 @@ public:
   virtual ~csMeshGeneratorGeometry () { }
 
   float GetTotalMaxDist () const { return total_max_dist; }
+  const csArray<csMGDensityMaterialFactor>& GetDensityMaterialFactors () const
+  {
+    return material_factors;
+  }
+  float GetDefaultDensityMaterialFactor () const
+  {
+    return default_material_factor;
+  }
 
   virtual void AddFactory (iMeshFactoryWrapper* factory, float maxdist);
   virtual size_t GetFactoryCount () const { return factories.Length (); }
@@ -117,6 +136,12 @@ public:
   virtual float GetRadius () const { return radius; }
   virtual void SetDensity (float density);
   virtual float GetDensity () const { return density; }
+  virtual void AddDensityMaterialFactor (iMaterialWrapper* material,
+  	float factor);
+  virtual void SetDefaultDensityMaterialFactor (float factor)
+  {
+    default_material_factor = factor;
+  }
 
   /**
    * Allocate a new mesh for the given distance. Possibly from the
@@ -131,10 +156,10 @@ public:
    * Set aside the mesh temporarily. This is called if we have a mesh that
    * we want to free but we don't free it yet because we might want to allocate
    * it again. Meshes that are put aside are not removed from the sector (that
-   * is a rather expensive operation) but they are only put in a queue. AllocMesh()
-   * will first check that queue. At the end of the frame you have to call
-   * FreeSetAsideMeshes() to really free the remaining meshes that haven't been
-   * reused.
+   * is a rather expensive operation) but they are only put in a queue.
+   * AllocMesh() will first check that queue. At the end of the frame you have
+   * to call FreeSetAsideMeshes() to really free the remaining meshes that
+   * haven't been reused.
    */
   void SetAsideMesh (int cidx, iMeshWrapper* mesh,
       size_t lod, size_t instance_id);

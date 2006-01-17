@@ -1902,7 +1902,8 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
       CS_IMGFMT_ALPHA | CS_IMGFMT_TRUECOLOR));
 
     csRGBpixel *map = (csRGBpixel *)alpha->GetImageData ();
-    csBitArray matused;
+    size_t muidx = globalMaterialsUsed.Push (csBitArray ());
+    csBitArray& matused = globalMaterialsUsed[muidx];
     matused.SetSize (w * h);
     int y, x;
     size_t idx = 0;
@@ -1914,7 +1915,6 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
 	matused[idx] = (v != 0);
 	idx++;
       }
-    globalMaterialsUsed.Push (matused);
 
     csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
       CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
@@ -2245,11 +2245,10 @@ static bool VertSegmentTriangle (
 {
   csVector2 loc (seg.Start ().x, seg.Start ().z);
   int test1 = VertWhichSide3D (loc, tr3, tr1);
-  if (test1 == 0) return false;
   int test2 = VertWhichSide3D (loc, tr1, tr2);
-  if (test1 != test2) return false;
+  if (test1 != test2 && test1 != 0 && test2 != 0) return false;
   int test3 = VertWhichSide3D (loc, tr2, tr3);
-  if (test2 != test3) return false;
+  if (test3 != 0 && (test3 == -test1 || test3 == -test2)) return false;
 
   csPlane3 plane (tr1, tr2, tr3);
   float dist;
@@ -2440,7 +2439,7 @@ bool csTerrainObject::HitBeamObject (const csVector3& start,
   if (material && rc)
   {
     int x = int ((isect.x - region.MinX ()) * wm);
-    int y = int ((isect.z - region.MinY ()) * hm);
+    int y = materialMapH - int ((isect.z - region.MinY ()) * hm);
     if (x < 0) x = 0; else if (x > materialMapW-1) x = materialMapW-1;
     if (y < 0) y = 0; else if (y > materialMapH-1) y = materialMapH-1;
     size_t i;
@@ -2450,7 +2449,7 @@ bool csTerrainObject::HitBeamObject (const csVector3& start,
       const csBitArray& bits = globalMaterialsUsed[i];
       if (bits[idx])
       {
-        *material = palette[idx];
+        *material = palette[i];
 	return rc;
       }
     }

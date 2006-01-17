@@ -3637,6 +3637,34 @@ bool csLoader::LoadMeshGenGeometry (iLoaderContext* ldr_context,
 	  geom->AddFactory (fact, maxdist);
 	}
         break;
+      case XMLTOKEN_MATERIALFACTOR:
+        {
+	  const char* matname = child->GetAttributeValue ("material");
+	  if (!matname)
+	  {
+            SyntaxService->ReportError (
+	        "crystalspace.maploader.parse.meshgen",
+	        child, "'material' attribute is missing!");
+	    return false;
+	  }
+	  iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	  if (!mat)
+	  {
+            SyntaxService->ReportError (
+	        "crystalspace.maploader.parse.meshgen",
+	        child, "Can't find material '%s'!", matname);
+	    return false;
+	  }
+	  float factor = child->GetAttributeValueAsFloat ("factor");
+	  geom->AddDensityMaterialFactor (mat, factor);
+	}
+	break;
+      case XMLTOKEN_DEFAULTMATERIALFACTOR:
+        {
+	  float factor = child->GetContentsValueAsFloat ();
+	  geom->SetDefaultDensityMaterialFactor (factor);
+	}
+        break;
       case XMLTOKEN_RADIUS:
 	geom->SetRadius (child->GetContentsValueAsFloat ());
         break;

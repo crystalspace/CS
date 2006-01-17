@@ -21,6 +21,7 @@
 #include "csgeom/matrix3.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/meshgen.h"
+#include "iengine/material.h"
 
 csMeshGeneratorGeometry::csMeshGeneratorGeometry (
     csMeshGenerator* generator) : scfImplementationType (this),
@@ -29,6 +30,16 @@ csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   radius = 0.0f;
   density = 1.0f;
   total_max_dist = 0.0f;
+  default_material_factor = 0.0f;
+}
+
+void csMeshGeneratorGeometry::AddDensityMaterialFactor (
+	iMaterialWrapper* material, float factor)
+{
+  csMGDensityMaterialFactor mf;
+  mf.material = material;
+  mf.factor = factor;
+  material_factors.Push (mf);
 }
 
 static int CompareGeom (csMGGeom const& m1, csMGGeom const& m2)
@@ -476,6 +487,11 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
     pos.geom_type = g;
     float density = geometries[g]->GetDensity ();
     size_t count = size_t (density * box_area);
+    const csArray<csMGDensityMaterialFactor>& mftable
+    	= geometries[g]->GetDensityMaterialFactors ();
+    float default_material_factor
+    	= geometries[g]->GetDefaultDensityMaterialFactor ();
+    bool do_material = mftable.Length () > 0;
     for (j = 0 ; j < count ; j++)
     {
       float x = random.Get (box.MinX (), box.MaxX ());
@@ -484,24 +500,47 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
       csVector3 end = start;
       end.y = samplebox.MinY ();
       bool hit = false;
+      iMaterialWrapper* hit_material = 0;
       for (i = 0 ; i < cell.meshes.Length () ; i++)
       {
-        csHitBeamResult rc = cell.meshes[i]->HitBeam (start, end);
+        csHitBeamResult rc = cell.meshes[i]->HitBeamObject (start, end,
+		do_material);
 	if (rc.hit)
 	{
           pos.position = rc.isect;
 	  end.y = rc.isect.y + 0.0001;
+	  hit_material = rc.material;
 	  hit = true;
 	}
       }
       if (hit)
       {
-        int rot = int (random.Get (CS_GEOM_MAX_ROTATIONS));
-	if (rot < 0) rot = 0;
-	else if (rot >= CS_GEOM_MAX_ROTATIONS) rot = CS_GEOM_MAX_ROTATIONS-1;
-        pos.rotation = rot;
-	pos.random = random.Get ();
-        block->positions.Push (pos);
+	if (do_material)
+	{
+	  // We use material density tables.
+	  float factor = default_material_factor;
+	  size_t mi;
+	  for (mi = 0 ; mi < mftable.Length () ; mi++)
+	    if (mftable[mi].material == hit_material)
+	    {
+	      factor = mftable[mi].factor;
+	      break;
+	    }
+	  if (factor < 0.0001) hit = false;
+	  else if (factor < 0.9999 && random.Get () > factor)
+	  {
+	    hit = false;
+	  }
+	}
+	if (hit)
+	{
+          int rot = int (random.Get (CS_GEOM_MAX_ROTATIONS));
+	  if (rot < 0) rot = 0;
+	  else if (rot >= CS_GEOM_MAX_ROTATIONS) rot = CS_GEOM_MAX_ROTATIONS-1;
+          pos.rotation = rot;
+	  pos.random = random.Get ();
+          block->positions.Push (pos);
+        }
       }
     }
   }

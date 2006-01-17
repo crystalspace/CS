@@ -391,6 +391,7 @@ bool csIntersect3::SegmentTriangle (
   {
     test1 = csMath3::WhichSide3D (isect, tr3, tr1);
     test2 = csMath3::WhichSide3D (isect, tr1, tr2);
+    if (test1 != test2 && test1 != 0 && test2 != 0) return false;
     test3 = csMath3::WhichSide3D (isect, tr2, tr3);
   }
   else  // shift plane because it is too close to origin
@@ -402,18 +403,17 @@ bool csIntersect3::SegmentTriangle (
     csVector3 ntr3 = tr3 + norm;
     test1 = csMath3::WhichSide3D (nsect, ntr3, ntr1);
     test2 = csMath3::WhichSide3D (nsect, ntr1, ntr2);
+    if (test1 != test2 && test1 != 0 && test2 != 0) return false;
     test3 = csMath3::WhichSide3D (nsect, ntr2, ntr3);
   }
 
   // Check if the point is on the same side of each plane.
   // This works for both backface and frontface triangles.
-  // Return success if all WhichSide3D tests are either all -1 or all 1.
-  // Note: if we want to only check for one side of the triangle
-  // and we did a plane shift, we would need to check if the same
-  // face of the shifted plane is facing the origin (0,0,0).
-  // Shifting the plane often times causes us to look at the other
-  // side of the plane we are testing.
-  return (test1 == test2) && (test2 == test3) && (test1 != 0);
+  // Return success if all WhichSide3D tests have all the same
+  // sign (ignoring the ones that return 0).
+  // We already compared 'test1' and 'test2' above.
+  if (test3 != 0 && (test3 == -test1 || test3 == -test2)) return false;
+  return true;
 }
 
 bool csIntersect3::SegmentPolygon (

@@ -1244,6 +1244,10 @@ static float ComputeLocalMaxInterval (
 bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
 	const csVector3& angularVelocity)
 {
+  // Artificial cap to avoid falling through objects when the framerate
+  // is extremely low.
+  if (delta > .3) delta = .3;
+
   //float local_max_interval;
   bool rc = false;
 
