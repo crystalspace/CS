@@ -750,6 +750,10 @@ public:
   template<typename T>
   const csStringBase& operator = (T const& s) { return Replace (s); }
 
+  /// Assign another string to this one
+  const csStringBase& operator = (const csStringBase& copy)
+  { Replace(copy); return *this; }
+
   /**
    * Append a formatted value to this string.
    */
