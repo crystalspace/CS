@@ -199,7 +199,7 @@ public:
  * Mouse driver should generate events and put them into the event queue.  Also
  * it is responsible for generating double-click events. Mouse button numbers
  * are 0-based.
- * \todo The csMouseDriver and csJoystickDriver shold be unified, since there's
+ * \todo The csMouseDriver and csJoystickDriver should be unified, since there's
  * no real distinction between them under the hood.
  */
 class CS_CRYSTALSPACE_EXPORT csMouseDriver : public csInputDriver, 
