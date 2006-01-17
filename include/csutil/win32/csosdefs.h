@@ -338,6 +338,13 @@ static inline longlong strtoll(char const* s, char** sN, int base)
 #define CS_PROVIDES_EXPAND_PATH 1
 inline void csPlatformExpandPath(const char* path, char* buffer, int nbuf) {}
 
+// Although CS_COMPILER_GCC has opendir(), readdir(), etc., we prefer the CS
+// versions of these functions.
+#define CS_WIN32_USE_CUSTOM_OPENDIR
+
+#ifndef CS_WIN32_USE_CUSTOM_OPENDIR
+# include <dirent.h>
+#else
 struct dirent
 {
   char d_name [CS_MAXPATHLEN + 1]; // File name, 0 terminated
@@ -345,12 +352,7 @@ struct dirent
   long dwFileAttributes; // File attributes (Windows-specific)
 };
 
-// Although CS_COMPILER_GCC has opendir(), readdir(), etc., we prefer the CS
-// versions of these functions.
-#define CS_WIN32_USE_CUSTOM_OPENDIR
-
-# if defined(CS_WIN32_USE_CUSTOM_OPENDIR)
-  struct DIR;
+struct DIR;
 # ifdef CS_CRYSTALSPACE_LIB
   extern "C" CS_EXPORT_SYM DIR *opendir (const char *name);
   extern "C" CS_EXPORT_SYM dirent *readdir (DIR *dirp);

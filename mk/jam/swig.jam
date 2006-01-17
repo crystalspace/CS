@@ -46,6 +46,11 @@ if $(CMD.SWIG)
   # cs_pyth.cpp may reside in a shared lib, so we rather want the name 
   # SWIG_init and define init_cspace as a simple forwared ourselves.
   #
+  # (6) perl.h includes dirent.h on some configurations which conflicts with
+  # the CS definitions of dirent, opendir, etc.  So define _DIRENT_H_ to 
+  # make dirent.h skip its body.  This is hackish but no better solution
+  # has been found.
+  #
   # (Despite the fact that these customizations might seem project-specific,
   # they should be safe for all projects.)
   SWIG.SED_SCRIPT =
@@ -62,7 +67,12 @@ if $(CMD.SWIG)
     \\1/g
     /\$Header:/d
     s/new[ 	][ 	]*(\\([^)][^)]*\\))[ 	]*\\[/new \\1 [/g
-    s/[ 	]*#[ 	]*define[ 	][ 	]*SWIG_init[ 	]*init_\\(.*\\)/#define SWIG_init SWIG_init_\\1/g'" ;
+    s/[ 	]*#[ 	]*define[ 	][ 	]*SWIG_init[ 	]*init_\\(.*\\)/#define SWIG_init SWIG_init_\\1/g
+    s/\\([	 ]*#[	 ]*include[	 ][	 ]*[<\"]perl.h[>\"]\\)/\\
+    #ifndef _DIRENT_H_\\
+    #define _DIRENT_H_
+    #endif\\
+    \\1/g'" ;
 
   ## Swig targets : swigfile : language [ : swigflags [ : swigincdirs
   ##     [ : swigfiledir [ : frozendirs [ : tag [ : outdir ]]]]]]
