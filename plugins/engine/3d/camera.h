@@ -373,7 +373,10 @@ public:
 
   virtual iCamera* Clone () const
   {
-    return (iCamera*)new csCamera (*this);
+    csCamera* nc = new csCamera (*this);
+    // The reference count is inherited.
+    nc->scfRefCount = 1;
+    return (iCamera*)nc;
   }
   virtual void OnlyPortals (bool hop)
   {

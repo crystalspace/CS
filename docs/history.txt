@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Jan-2006
+	- Jorrit fixed a bug as reported by rvl_ involving a memory leak
+	  when looking at space warping portals.
 17-Jan-2006
 	- Jorrit fixed bruteblock->HitBeamObject() so that it correctly
 	  returns the resulting material.
