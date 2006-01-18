@@ -29,6 +29,12 @@ csShaderVariableContext::csShaderVariableContext () :
 csShaderVariableContext::~csShaderVariableContext ()
 {}
 
+csShaderVariableContext::csShaderVariableContext (
+  const csShaderVariableContext& other) : scfImplementationType(this)
+{
+  variables = other.variables;
+}
+
 class SvVarArrayCmp : public csArrayCmp<csShaderVariable*, csStringID>
 {
   static int SvKeyCompare (csShaderVariable* const& r, csStringID const& k)

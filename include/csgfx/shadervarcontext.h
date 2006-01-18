@@ -44,6 +44,7 @@ public:
   CS_LEAKGUARD_DECLARE (csShaderVariableContext);
 
   csShaderVariableContext ();
+  csShaderVariableContext (const csShaderVariableContext& other);
   virtual ~csShaderVariableContext ();
 
   const csRefArray<csShaderVariable>& GetShaderVariables () const

@@ -2115,8 +2115,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  {
 	    csRef<iDataBuffer> dbuf = VFS->ReadFile (
 	    	child->GetContentsValue ());
-	    mof = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	    	dbuf->GetSize (),
+	    mof = binplug->Parse (dbuf,
 	  	ssource, ldr_context, stemp->GetMeshObjectFactory ());
 	  }
 	  if (!mof)
@@ -3393,8 +3392,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	    else
 	    {
 	      csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
-	      mo = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	      	  dbuf->GetSize (),
+	      mo = binplug->Parse (dbuf,
 	  	  ssource, ldr_context, mesh);
 	    }
             if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
@@ -3476,8 +3474,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  else
 	  {
 	    csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
-	    mo = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-		dbuf->GetSize (),
+	    mo = binplug->Parse (dbuf,
 	  	ssource, ldr_context, mesh);
 	  }
           if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
@@ -3859,8 +3856,7 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	    else
 	    {
 	      csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
-	      csRef<iBase> ret = binplug->Parse ((void*)(dbuf->GetUint8 ()),
-	      	  dbuf->GetSize (),
+	      csRef<iBase> ret = binplug->Parse (dbuf,
 	  	  ssource, ldr_context, 0);
 	      rc = (ret != 0);
 	    }

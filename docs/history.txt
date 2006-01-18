@@ -15,6 +15,18 @@ chronological order.
 	- Jorrit fixed genmesh so that it ignores the request for Compress()
 	  if submeshes are used. Compress() should be called before adding
 	  submeshes or else Compress() should not be called at all.
+	- res made the following changes:
+	    - Fixed a VC warning in collider.cpp.
+	    - Added scfImplementation::operator=() which does nothing. The 
+	      compiler-generated operator would be unsuitable.
+	    - Copy constructor for scfImplementation which triggers an 
+	      assertion. The compiler-generated constructor would be 
+	      unsuitable.
+	    - Changed iBinaryLoaderPlugin::Parse() to take an iDataBuffer*
+	      instead of a pointer and a size.
+	    - The scfImplementation::operator=() addition allows the removal
+	      of the less than beautiful "scfRefCount = 1" in 
+	      csCamera::Clone().
 17-Jan-2006
 	- Jorrit fixed bruteblock->HitBeamObject() so that it correctly
 	  returns the resulting material.

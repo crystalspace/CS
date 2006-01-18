@@ -137,11 +137,37 @@ public:
     if (scfParent) scfParent->IncRef ();
   }
 
+  /**
+   * Copy constructor.
+   * Use of the default copy constructor is nor desired since the information
+   * is insufficient to fully initialize scfImplementation; hence, an
+   * explicit copy constructor must be created in the derived class that
+   * initializes scfImplementation like in the normal constructor, i.e.
+   * "scfImplementation (this)".
+   */
+  scfImplementation (const scfImplementation& /*other*/)
+  {
+    CS_ASSERT_MSG ("To allow copying SCF classes, create a copy "
+      "constructor in the derived class, and initialize scfImplementation "
+      "like in the normal constructor, i.e. use "
+      "\"scfImplementation (this)\".", false);
+  }
+
   // Cleanup
   virtual ~scfImplementation()
   {
     csRefTrackerAccess::TrackDestruction (scfObject, scfRefCount);
     scfRemoveRefOwners ();
+  }
+
+  /**
+   * Assign to another instance.
+   * When assigning an SCF object to another, anything contained
+   * in this class should not be copied, since it's all instance-
+   * specific. Hence the assignment operator does nothing. */
+  scfImplementation& operator= (const scfImplementation& /*other*/)
+  {
+    return *this;
   }
 
   virtual void DecRef ()

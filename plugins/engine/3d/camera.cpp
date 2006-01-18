@@ -30,7 +30,7 @@ float csCamera:: default_fov_angle = 90;
 long csCamera:: cur_cameranr = 0;
 
 csCamera::csCamera () :
-  csOrthoTransform(), scfImplementationType (this)
+  csOrthoTransform(), scfImplementationType (this), fp (0)
 {
   mirror = false;
   sector = 0;
@@ -39,13 +39,12 @@ csCamera::csCamera () :
   fov_angle = default_fov_angle;
   shift_x = csEngine::frameWidth / 2;
   shift_y = csEngine::frameHeight / 2;
-  fp = 0;
   cameranr = cur_cameranr++;
   only_portals = true;
 }
 
 csCamera::csCamera (csCamera *c) :
-  csOrthoTransform(), scfImplementationType (this)
+  csOrthoTransform(), scfImplementationType (this), fp (0)
 {
   *this = *c;
   if (fp)
@@ -53,12 +52,12 @@ csCamera::csCamera (csCamera *c) :
     // Make a copy of the plane.
     fp = new csPlane3 (*fp);
   }
-
+  
   cameranr = cur_cameranr++;
 }
 
 csCamera::csCamera (const csCamera &c) :
-  iBase(), csOrthoTransform(), scfImplementationType (this)
+  iBase(), csOrthoTransform(), scfImplementationType (this), fp (0)
 {
   *this = c;
   if (fp)
@@ -66,7 +65,7 @@ csCamera::csCamera (const csCamera &c) :
     // Make a copy of the plane.
     fp = new csPlane3 (*fp);
   }
-
+  
   cameranr = cur_cameranr++;
 }
 

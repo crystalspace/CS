@@ -1246,7 +1246,7 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
 {
   // Artificial cap to avoid falling through objects when the framerate
   // is extremely low.
-  if (delta > .3) delta = .3;
+  if (delta > .3f) delta = .3f;
 
   //float local_max_interval;
   bool rc = false;

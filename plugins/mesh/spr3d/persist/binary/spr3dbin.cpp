@@ -102,8 +102,7 @@ const char binsprMagic[4] = {'5','1', '5','0'};
 /**
  * Loads a csSprite3DBinFactoryLoader
  */
-csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
-				       size_t,
+csPtr<iBase> csSprite3DBinFactoryLoader::Parse (iDataBuffer* data,
 				       iStreamSource*,
 				       iLoaderContext* ldr_context,
 				       iBase* context)
@@ -141,7 +140,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
   csRef<iSprite3DFactoryState> spr3dLook (
     scfQueryInterface<iSprite3DFactoryState> (fact));
 
-  char* p = (char*)data;
+  char* p = data->GetData();
 
   // Read the magic number so we can ID the file
   if (memcmp(binsprMagic, p, 4) != 0)
@@ -213,16 +212,16 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
     int j;
     for (j = 0; j < vertex_count; j++)
     {
-      x = csConvertEndian(csLongToFloat(*((long *)p))); p += sizeof(float);
-      y = csConvertEndian(csLongToFloat(*((long *)p))); p += sizeof(float);
-      z = csConvertEndian(csLongToFloat(*((long *)p))); p += sizeof(float);
-      u = csConvertEndian(csLongToFloat(*((long *)p))); p += sizeof(float);
-      v = csConvertEndian(csLongToFloat(*((long *)p))); p += sizeof(float);
+      x = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
+      y = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
+      z = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
+      u = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
+      v = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
       if (has_normals)
       {
-	nx = csConvertEndian(csLongToFloat(*((long *)p))); p += sizeof(float);
-	ny = csConvertEndian(csLongToFloat(*((long *)p))); p += sizeof(float);
-	nz = csConvertEndian(csLongToFloat(*((long *)p))); p += sizeof(float);
+	nx = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
+	ny = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
+	nz = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
       }
 
       // check if it's the first frame
@@ -292,7 +291,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
       float disp = 0;
       if (!delay)  // read optional displacement if no delay
       {
-        disp = csConvertEndian(csLongToFloat(*((long *)p))); p += sizeof(float);
+        disp = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
       }
       act->AddFrame (ff, delay,disp);
     }
@@ -416,22 +415,22 @@ bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file,
     // Write out each vertex and texcel coord
     for (j=0; j<vertex_count; j++)
     {
-      long v;
-      v = csConvertEndian(csFloatToLong(state->GetVertex(anm_idx, j).x));
+      uint32 v;
+      v = csConvertEndian((uint32)csFloatToLong(state->GetVertex(anm_idx, j).x));
       file->Write ((char *)&v, 4);
-      v = csConvertEndian(csFloatToLong(state->GetVertex(anm_idx, j).y));
+      v = csConvertEndian((uint32)csFloatToLong(state->GetVertex(anm_idx, j).y));
       file->Write ((char *)&v, 4);
-      v = csConvertEndian(csFloatToLong(state->GetVertex(anm_idx, j).z));
+      v = csConvertEndian((uint32)csFloatToLong(state->GetVertex(anm_idx, j).z));
       file->Write ((char *)&v, 4);
-      v = csConvertEndian(csFloatToLong(state->GetTexel(tex_idx, j).x));
+      v = csConvertEndian((uint32)csFloatToLong(state->GetTexel(tex_idx, j).x));
       file->Write ((char *)&v, 4);
-      v = csConvertEndian(csFloatToLong(state->GetTexel(tex_idx, j).y));
+      v = csConvertEndian((uint32)csFloatToLong(state->GetTexel(tex_idx, j).y));
       file->Write ((char *)&v, 4);
-      v = csConvertEndian(csFloatToLong(state->GetNormal(anm_idx, j).x));
+      v = csConvertEndian((uint32)csFloatToLong(state->GetNormal(anm_idx, j).x));
       file->Write ((char *)&v, 4);
-      v = csConvertEndian(csFloatToLong(state->GetNormal(anm_idx, j).y));
+      v = csConvertEndian((uint32)csFloatToLong(state->GetNormal(anm_idx, j).y));
       file->Write ((char *)&v, 4);
-      v = csConvertEndian(csFloatToLong(state->GetNormal(anm_idx, j).z));
+      v = csConvertEndian((uint32)csFloatToLong(state->GetNormal(anm_idx, j).z));
       file->Write ((char *)&v, 4);
     }
   }
@@ -468,7 +467,7 @@ bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file,
       if (!frame_delay)  // write optional displacement if no delay
       {
         disp = action->GetFrameDisplacement(j);
-	long ce_disp = csConvertEndian(csFloatToLong(disp));
+	uint32 ce_disp = csConvertEndian((uint32)csFloatToLong(disp));
         file->Write ((char *)&ce_disp, 4);
       }
     }
