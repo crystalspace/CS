@@ -9,6 +9,12 @@ chronological order.
 18-Jan-2006
 	- Jorrit fixed a bug as reported by rvl_ involving a memory leak
 	  when looking at space warping portals.
+	- Jorrit added a size parameter to iBinaryLoaderPlugin->Parse.
+	- Jorrit added a new 3DS loader for genmesh. Supports multiple submeshes
+	  (different materials).
+	- Jorrit fixed genmesh so that it ignores the request for Compress()
+	  if submeshes are used. Compress() should be called before adding
+	  submeshes or else Compress() should not be called at all.
 17-Jan-2006
 	- Jorrit fixed bruteblock->HitBeamObject() so that it correctly
 	  returns the resulting material.

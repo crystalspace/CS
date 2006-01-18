@@ -1,0 +1,370 @@
+/*
+    Copyright (C) 2006 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include "cssysdef.h"
+
+#include "csgeom/math3d.h"
+#include "csgeom/matrix3.h"
+#include "csgeom/quaternion.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/tri.h"
+#include "csutil/csendian.h"
+#include "csutil/csstring.h"
+#include "csutil/scanstr.h"
+#include "csutil/sysfunc.h"
+#include "csutil/memfile.h"
+#include "csutil/cscolor.h"
+
+#include "iengine/engine.h"
+#include "iengine/material.h"
+#include "iengine/mesh.h"
+#include "imap/ldrctxt.h"
+#include "imesh/object.h"
+#include "imesh/genmesh.h"
+#include "iutil/comp.h"
+#include "iutil/document.h"
+#include "iutil/eventh.h"
+#include "iutil/object.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
+#include "ivaria/reporter.h"
+#include "ivideo/graph3d.h"
+
+#include "gmesh3ds.h"
+#include <lib3ds/camera.h>
+#include <lib3ds/file.h>
+#include <lib3ds/io.h>
+#include <lib3ds/light.h>
+#include <lib3ds/material.h>
+#include <lib3ds/matrix.h>
+#include <lib3ds/mesh.h>
+#include <lib3ds/node.h>
+#include <lib3ds/vector.h>
+
+
+CS_IMPLEMENT_PLUGIN
+
+namespace cspluginGenmesh3DS
+{
+
+/**
+ * Reports errors
+ */
+static void ReportError (iObjectRegistry* objreg, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+  csReportV (objreg, CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  va_end (arg);
+}
+
+SCF_IMPLEMENT_FACTORY (csGenmesh3DSFactoryLoader)
+
+csGenmesh3DSFactoryLoader::csGenmesh3DSFactoryLoader (iBase* pParent) :
+  scfImplementationType (this, pParent)
+{
+}
+
+csGenmesh3DSFactoryLoader::~csGenmesh3DSFactoryLoader ()
+{
+}
+
+bool csGenmesh3DSFactoryLoader::Initialize (iObjectRegistry* object_reg)
+{
+  csGenmesh3DSFactoryLoader::object_reg = object_reg;
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  return true;
+}
+
+bool csGenmesh3DSFactoryLoader::LoadMeshObjectData (
+	iLoaderContext* ldr_context,
+	iGeneralFactoryState* gmstate, Lib3dsMesh *p3dsMesh,
+	Lib3dsMaterial* pCurMaterial)
+{
+  int i;
+
+  // Get the number of vertices in the current mesh.
+  int numVertices = p3dsMesh->points;
+  int numTexels = p3dsMesh->texels;
+  printf ("numVertices=%d numTexels=%d\n", numVertices, numTexels); fflush (stdout);
+
+  // Current last vertex in the factory.
+  int curLastVt = gmstate->GetVertexCount ();
+
+  // Load up the vertices
+  Lib3dsPoint* curPoint = p3dsMesh->pointL;
+  Lib3dsTexel* curTexel = p3dsMesh->texelL;
+
+  csColor4 black (0, 0, 0);
+  csVector3 normal (0, 0, 0);
+  for (i = 0 ; i < numVertices ; i++)
+  {
+    csVector2 uv;
+    if (i < numTexels)
+    {
+      uv.Set ((*curTexel)[0], 1.0f - (*curTexel)[1]);
+      curTexel++;
+    }
+    else uv.Set (0, 0);
+    csVector3 v (curPoint->pos[0], curPoint->pos[1], curPoint->pos[2]);
+    gmstate->AddVertex (v, uv, normal, black);
+    curPoint++;
+  }
+
+  /*** Load up the triangles ***/
+
+  // Get the trianle count and go to the first triangle
+  int numTriangles = p3dsMesh->faces;
+  Lib3dsFace* curFace = p3dsMesh->faceL;
+
+  for (i = 0 ; i < numTriangles ; i++)
+  {
+    csTriangle tri (curLastVt + curFace->points[0],
+    		    curLastVt + curFace->points[1],
+		    curLastVt + curFace->points[2]);
+    size_t tri_idx = gmstate->GetTriangleCount ();
+    gmstate->AddTriangle (tri);
+    iMaterialWrapper* mat = ldr_context->FindMaterial (curFace->material);
+    if (!mat)
+    {
+      ReportError (object_reg,
+		"crystalspace.genmesh3dsfactoryloader.load",
+		"Can't find material '%s'!", curFace->material);
+      return false;
+    }
+    size_t j;
+    bool found = false;
+    for (j = 0 ; j < materials_and_tris.Length () ; j++)
+    {
+      csMatAndTris& mt = materials_and_tris[j];
+      if (mt.material == mat)
+      {
+        found = true;
+        mt.tris.Push (tri_idx);
+        break;
+      }
+    }
+    if (!found)
+    {
+      size_t ii = materials_and_tris.Push (csMatAndTris ());
+      materials_and_tris[ii].material = mat;
+      materials_and_tris[ii].tris.Push (tri_idx);
+    }
+    curFace++;
+  }
+
+  return true;
+}
+
+bool csGenmesh3DSFactoryLoader::Load (iLoaderContext* ldr_context,
+	iGeneralFactoryState* gmstate,
+	uint8* buffer, size_t size)
+{
+  Lib3dsFile *p3dsFile;
+
+  /***  send the buffer in to be translated  ***/
+  p3dsFile = LoadFileData (buffer, size);
+  if (!p3dsFile)
+  {
+    ReportError (object_reg,
+		"crystalspace.genmesh3dsfactoryloader.load",
+		"Error reading the 3DS file!");
+    return false;
+  }
+
+  /***  go through all of the mesh objects and convert them  ***/
+  Lib3dsMesh *pCurMesh;
+
+  // RDS NOTE: add support for frames
+
+  // set the current mesh to the first in the file
+  pCurMesh = p3dsFile->meshes;
+
+  // As long as we have a valid mesh...
+  while (pCurMesh)
+  {
+    // Now process that mesh
+    if (!LoadMeshObjectData (ldr_context, gmstate, pCurMesh, p3dsFile->materials))
+    {
+      ReportError (object_reg,
+		"crystalspace.genmesh3dsfactoryloader.load",
+		"Error parsing the 3DS file!");
+      return false;
+    }
+    pCurMesh = pCurMesh->next;
+  }
+
+  lib3ds_file_free (p3dsFile);
+
+  return true;
+}
+
+// these are wrappers for csDataStream to interface with Lib3dsIO
+static Lib3dsBool DataErrorFunc (void *)
+{
+  // does nothing for now
+  return LIB3DS_FALSE;
+}
+
+
+static long DataSeekFunc (void *self, long offset, Lib3dsIoSeek origin)
+{
+  iFile *pData = (iFile*)self;
+
+  size_t newOffs = offset;
+  switch (origin)
+  {
+    case LIB3DS_SEEK_SET:
+      break;
+    case LIB3DS_SEEK_CUR:
+      newOffs += pData->GetPos();
+      break;
+    case LIB3DS_SEEK_END:
+      newOffs = pData->GetSize();
+      break;
+    default:
+      return 1;
+  }
+  pData->SetPos (newOffs);
+  return 0;
+}
+
+
+static long DataTellFunc (void *self)
+{
+  iFile* pData = (iFile*)self;
+  return (long)pData->GetPos();
+}
+
+
+static int DataReadFunc (void *self, Lib3dsByte *buffer, int size)
+{
+  iFile* pData = (iFile*)self;
+  return (int)pData->Read ((char*)buffer, size );
+}
+
+
+static int DataWriteFunc (void* /*self*/, const Lib3dsByte* /*buffer*/,
+	int /*size*/)
+{
+  // not yet implemented
+  return 0;
+}
+
+
+Lib3dsFile* csGenmesh3DSFactoryLoader::LoadFileData (uint8* pBuffer, size_t size)
+{
+  // This code is pulled from lib3ds
+  Lib3dsFile *pFile;
+  Lib3dsIo *pLibIO;
+  csRef<iFile> pData;
+
+  pFile = lib3ds_file_new ();
+  if (!pFile) return 0;
+
+  // create a data stream from the buffer and don't delete it
+  pData.AttachNew (new csMemFile ((const char*)pBuffer, size));
+
+  pLibIO = lib3ds_io_new (
+    pData,
+    DataErrorFunc,
+    DataSeekFunc,
+    DataTellFunc,
+    DataReadFunc,
+    DataWriteFunc
+  );
+
+  if (!pLibIO)
+  {
+    lib3ds_file_free (pFile);
+    return 0;
+  }
+
+  if (!lib3ds_file_read (pFile, pLibIO))
+  {
+    lib3ds_file_free (pFile);
+    return 0;
+  }
+
+  if (!pFile) return 0;
+
+  lib3ds_io_free (pLibIO);
+  return pFile;
+}
+
+csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (void* data, size_t size,
+				       iStreamSource*,
+				       iLoaderContext* ldr_context,
+				       iBase* context)
+{
+  csRef<iPluginManager> plugin_mgr (
+    csQueryRegistry<iPluginManager> (object_reg));
+  csRef<iMeshObjectType> type (
+    csQueryPluginClass<iMeshObjectType> (plugin_mgr, 
+    "crystalspace.mesh.object.genmesh"));
+  if (!type)
+  {
+    type = csLoadPlugin<iMeshObjectType> (plugin_mgr,
+    	"crystalspace.mesh.object.genmesh");
+  }
+  if (!type)
+  {
+    ReportError (object_reg,
+		"crystalspace.genmesh3dsfactoryloader.setup.objecttype",
+		"Could not load the genmesh mesh object plugin!");
+    return 0;
+  }
+
+  // @@@ Temporary fix to allow to set actions for objects loaded
+  // with impexp. Once those loaders move to another plugin this code
+  // below should be removed.
+  csRef<iMeshObjectFactory> fact;
+  if (context)
+  {
+    fact = scfQueryInterface<iMeshObjectFactory> (context);
+  }
+
+  // If there was no factory we create a new one.
+  if (!fact)
+    fact = type->NewFactory ();
+
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState> (
+  	fact);
+
+  uint8* p = (uint8*)data;
+  bool rc = Load (ldr_context, gmstate, p, size);
+  if (!rc) return 0;
+
+  size_t j;
+  gmstate->SetMaterialWrapper (materials_and_tris[0].material);
+  gmstate->Compress ();
+  gmstate->CalculateNormals ();
+  if (materials_and_tris.Length () > 1)
+    for (j = 0 ; j < materials_and_tris.Length () ; j++)
+    {
+      gmstate->AddSubMesh (materials_and_tris[j].tris.GetArray (),
+      	materials_and_tris[j].tris.Length (),
+	materials_and_tris[j].material);
+    }
+
+  return csPtr<iBase> (fact);
+}
+
+} // namespace cspluginGenmesh3DS

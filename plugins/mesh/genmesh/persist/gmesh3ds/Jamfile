@@ -1,0 +1,12 @@
+SubDir TOP plugins mesh genmesh persist gmesh3ds ;
+
+if $(3DS.AVAILABLE) = "yes"
+{
+Description gmesh3ds : "Genmesh 3DS mesh object loader" ;
+
+Plugin gmesh3ds
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith gmesh3ds : crystalspace ;
+ExternalLibs gmesh3ds : 3DS ;
+}

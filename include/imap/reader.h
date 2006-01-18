@@ -60,6 +60,7 @@ struct iBinaryLoaderPlugin : public virtual iBase
   /**
    * Parse given data and return a new object for it.
    * \param data is the data to parse.
+   * \param size is the size of that data.
    * \param ssource is an optional stream source where we can get buffers
    * from in a fast way.
    * \param ldr_context can be used to get the context for the loading.
@@ -67,7 +68,7 @@ struct iBinaryLoaderPlugin : public virtual iBase
    * \param context is the context in which we are loading (can be the mesh
    * wrapper for meshes for example).
    */
-  virtual csPtr<iBase> Parse (void* data,
+  virtual csPtr<iBase> Parse (void* data, size_t size,
   	iStreamSource* ssource, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 };

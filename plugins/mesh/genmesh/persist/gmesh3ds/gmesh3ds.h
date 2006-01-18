@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Jorrit Tyberghein
+    Copyright (C) 2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,28 +16,37 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_SPR3DBINLDR_H__
-#define __CS_SPR3DBINLDR_H__
+#ifndef __CS_GMESH3DSLDR_H__
+#define __CS_GMESH3DSLDR_H__
 
+#include "csutil/dirtyaccessarray.h"
 #include "imap/reader.h"
 #include "imap/writer.h"
 #include "imap/services.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
+#include <lib3ds/types.h>
+
 struct iEngine;
 struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
 
-namespace cspluginSpr3dBin
+namespace cspluginGenmesh3DS
 {
 
+struct csMatAndTris
+{
+  iMaterialWrapper* material;
+  csDirtyAccessArray<unsigned int> tris;
+};
+
 /**
- * Sprite 3D factory loader for Binary formatted sprites
+ * Genmesh factory loader for 3DS models.
  */
-class csSprite3DBinFactoryLoader : 
-  public scfImplementation2<csSprite3DBinFactoryLoader,
+class csGenmesh3DSFactoryLoader : 
+  public scfImplementation2<csGenmesh3DSFactoryLoader,
 			    iBinaryLoaderPlugin,
 			    iComponent>
 {
@@ -45,12 +54,21 @@ private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
+  Lib3dsFile* LoadFileData (uint8* pBuffer, size_t size);
+  bool Load (iLoaderContext* ldr_context,
+  	iGeneralFactoryState* gmstate, uint8* buffer, size_t size);
+  bool LoadMeshObjectData (iLoaderContext* ldr_context,
+  	iGeneralFactoryState* gmstate, Lib3dsMesh *p3dsMesh,
+	Lib3dsMaterial* pCurMaterial);
+
+  csArray<csMatAndTris> materials_and_tris;
+
 public:
   /// Constructor.
-  csSprite3DBinFactoryLoader (iBase*);
+  csGenmesh3DSFactoryLoader (iBase*);
 
   /// Destructor.
-  virtual ~csSprite3DBinFactoryLoader ();
+  virtual ~csGenmesh3DSFactoryLoader ();
 
   /// Register plugin with the system driver
   virtual bool Initialize (iObjectRegistry *object_reg);
@@ -60,33 +78,6 @@ public:
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 };
 
-/**
- * Sprite3D factory saver.
- */
-class csSprite3DBinFactorySaver : 
-  public scfImplementation2<csSprite3DBinFactorySaver, 
-			    iBinarySaverPlugin,
-			    iComponent>
-{
-private:
-  iObjectRegistry* object_reg;
-  csRef<iSyntaxService> synldr;
+} // namespace cspluginGenmesh3DS
 
-public:
-  /// Constructor.
-  csSprite3DBinFactorySaver (iBase*);
-
-  /// Destructor.
-  virtual ~csSprite3DBinFactorySaver ();
-
-  /// Register plugin with the system driver
-  virtual bool Initialize (iObjectRegistry *object_reg);
-
-  /// Write down given object and add to iDocumentNode.
-  virtual bool WriteDown (iBase *obj, iFile* file,
-  	iStreamSource*);
-};
-
-} // namespace cspluginSpr3dBin
-
-#endif // __CS_SPR3DBINLDR_H__
+#endif // __CS_GMESH3DSLDR_H__

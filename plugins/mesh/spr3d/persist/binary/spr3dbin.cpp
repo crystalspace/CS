@@ -103,6 +103,7 @@ const char binsprMagic[4] = {'5','1', '5','0'};
  * Loads a csSprite3DBinFactoryLoader
  */
 csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
+				       size_t,
 				       iStreamSource*,
 				       iLoaderContext* ldr_context,
 				       iBase* context)

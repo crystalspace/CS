@@ -54,6 +54,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 #include "ivideo/rendermesh.h"
+#include "ivaria/reporter.h"
 #include "cstool/vertexcompress.h"
 #include "cstool/normalcalc.h"
 #include "cstool/primitives.h"
@@ -1662,6 +1663,14 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
 
 void csGenmeshMeshObjectFactory::Compress ()
 {
+  if (subMeshes.Length () > 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+    	"crystalspace.genmesh.compress",
+	"WARNING! Compress ignored because there are submeshes!");
+    return;
+  }
+
   size_t old_num = mesh_vertices.Length ();
   csCompressVertexInfo* vt = csVertexCompressor::Compress (
     	mesh_vertices, mesh_texels, mesh_normals, mesh_colors);
