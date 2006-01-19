@@ -70,7 +70,7 @@ if $(CMD.SWIG)
     s/[ 	]*#[ 	]*define[ 	][ 	]*SWIG_init[ 	]*init_\\(.*\\)/#define SWIG_init SWIG_init_\\1/g
     s/\\([	 ]*#[	 ]*include[	 ][	 ]*[<\"]perl.h[>\"]\\)/\\
     #ifndef _DIRENT_H_\\
-    #define _DIRENT_H_
+    #define _DIRENT_H_\\
     #endif\\
     \\1/g'" ;
 

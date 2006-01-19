@@ -27,6 +27,7 @@ chronological order.
 	  models.
 	- res changed some code to use csLittleEndian::Convert() for endian
 	  conversions.
+	- res fixed the broken SWIG post-processing sed expression.
 18-Jan-2006
 	- Jorrit fixed a bug as reported by rvl_ involving a memory leak
 	  when looking at space warping portals.
