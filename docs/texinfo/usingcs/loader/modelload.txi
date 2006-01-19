@@ -61,7 +61,7 @@ void LoadModel ()
   csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
   csRef<iModelLoader> loader = csLoadPlugin<iModelLoader> (plugin_mgr,
 			"crystalspace.mesh.loader.factory.genmesh.3ds");
-  iMeshFactoryWrapper* ff = l->Load ("model", "/lib/model.3ds");
+  iMeshFactoryWrapper* ff = loader->Load ("model", "/lib/model.3ds");
   if (!ff)
   @{
     @dots{}
