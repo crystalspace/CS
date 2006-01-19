@@ -33,6 +33,7 @@
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/mesh.h"
+#include "iengine/engine.h"
 #include "imap/ldrctxt.h"
 #include "imesh/object.h"
 #include "imesh/genmesh.h"
@@ -365,6 +366,33 @@ csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (iDataBuffer* buf,
     }
 
   return csPtr<iBase> (fact);
+}
+
+iMeshFactoryWrapper* csGenmesh3DSFactoryLoader::Load (const char* factname,
+	const char* filename)
+{
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
+  csRef<iMeshFactoryWrapper> ff = engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", factname);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  csRef<iDataBuffer> dbuf = vfs->ReadFile (filename);
+  if (!dbuf)
+  {
+    ReportError (object_reg,
+		"crystalspace.genmesh3dsfactoryloader.load",
+		"Can't load file '%s'!", filename);
+    return 0;
+  }
+  csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext ();
+  csRef<iBase> b = Parse (dbuf, 0, ldr_context, ff->GetMeshObjectFactory ());
+  if (!b)
+  {
+    ReportError (object_reg,
+		"crystalspace.genmesh3dsfactoryloader.load",
+		"Error loading 3DS file '%s'!", filename);
+    return 0;
+  }
+  return ff;
 }
 
 } // namespace cspluginGenmesh3DS

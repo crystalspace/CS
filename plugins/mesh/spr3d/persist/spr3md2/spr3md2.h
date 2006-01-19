@@ -16,10 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_GMESH3DSLDR_H__
-#define __CS_GMESH3DSLDR_H__
+#ifndef __CS_SPR3MD2LDR_H__
+#define __CS_SPR3MD2LDR_H__
 
-#include "csutil/dirtyaccessarray.h"
 #include "imap/reader.h"
 #include "imap/writer.h"
 #include "imap/services.h"
@@ -27,27 +26,19 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
-#include <lib3ds/types.h>
-
 struct iEngine;
 struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
 
-namespace cspluginGenmesh3DS
+namespace cspluginSpr3Md2
 {
-
-struct csMatAndTris
-{
-  iMaterialWrapper* material;
-  csDirtyAccessArray<unsigned int> tris;
-};
 
 /**
- * Genmesh factory loader for 3DS models.
+ * Sprite 3D factory loader for Binary formatted sprites
  */
-class csGenmesh3DSFactoryLoader : 
-  public scfImplementation3<csGenmesh3DSFactoryLoader,
+class csSprite3DMD2FactoryLoader : 
+  public scfImplementation3<csSprite3DMD2FactoryLoader,
 			    iBinaryLoaderPlugin,
 			    iModelLoader,
 			    iComponent>
@@ -56,32 +47,25 @@ private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
 
-  Lib3dsFile* LoadFileData (uint8* pBuffer, size_t size);
-  bool Load (iLoaderContext* ldr_context,
-  	iGeneralFactoryState* gmstate, uint8* buffer, size_t size);
-  bool LoadMeshObjectData (iLoaderContext* ldr_context,
-  	iGeneralFactoryState* gmstate, Lib3dsMesh *p3dsMesh,
-	Lib3dsMaterial* pCurMaterial);
-
-  csArray<csMatAndTris> materials_and_tris;
+  bool Load (iSprite3DFactoryState* state, uint8 *Buffer, size_t Size);
 
 public:
   /// Constructor.
-  csGenmesh3DSFactoryLoader (iBase*);
+  csSprite3DMD2FactoryLoader (iBase*);
 
   /// Destructor.
-  virtual ~csGenmesh3DSFactoryLoader ();
+  virtual ~csSprite3DMD2FactoryLoader ();
 
   /// Register plugin with the system driver
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Parse data  and return a new object for it.
-  virtual csPtr<iBase> Parse (iDataBuffer* buf,
+  virtual csPtr<iBase> Parse (iDataBuffer* data,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 
   virtual iMeshFactoryWrapper* Load (const char* factname, const char* filename);
 };
 
-} // namespace cspluginGenmesh3DS
+} // namespace cspluginSpr3Md2
 
-#endif // __CS_GMESH3DSLDR_H__
+#endif // __CS_SPR3MD2LDR_H__

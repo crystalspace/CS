@@ -1,0 +1,512 @@
+/*
+    Copyright (C) 2006 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+/**
+ *
+ * These classes Save and Load Sprites with a binary representation
+ *
+ */
+
+#include "cssysdef.h"
+
+#include "csgeom/math3d.h"
+#include "csgeom/matrix3.h"
+#include "csgeom/quaternion.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/tri.h"
+#include "csutil/csendian.h"
+#include "csutil/csstring.h"
+#include "csutil/scanstr.h"
+#include "csutil/sysfunc.h"
+#include "csutil/stringarray.h"
+#include "csutil/filereadhelper.h"
+#include "csutil/memfile.h"
+#include "csutil/hash.h"
+#include "csutil/comparator.h"
+#include "csutil/dirtyaccessarray.h"
+
+#include "iengine/engine.h"
+#include "iengine/material.h"
+#include "iengine/mesh.h"
+#include "imap/ldrctxt.h"
+#include "imesh/object.h"
+#include "imesh/sprite3d.h"
+#include "iutil/comp.h"
+#include "iutil/document.h"
+#include "iutil/eventh.h"
+#include "iutil/object.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
+#include "ivaria/reporter.h"
+#include "ivideo/graph3d.h"
+
+#include "spr3md2.h"
+
+#include <ctype.h>
+
+CS_IMPLEMENT_PLUGIN
+
+struct csVertexTexel
+{
+  int vt;
+  int texel;
+
+  csVertexTexel ()
+  	: vt (0), texel (0) { }
+  csVertexTexel (int vt, int texel)
+  	: vt (vt), texel (texel) { }
+  csVertexTexel (const csVertexTexel& other)
+  	: vt (other.vt), texel (other.texel) { }
+
+  bool operator== (const csVertexTexel& other)
+  {
+    return other.vt == vt && other.texel == texel;
+  }
+  inline friend bool operator < (const csVertexTexel& r1, const csVertexTexel& r2)
+  {
+    if (r1.vt < r2.vt) return true;
+    else if (r1.vt > r2.vt) return false;
+    else return r1.texel < r2.texel;
+  }
+};
+
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<csVertexTexel>
+{
+public:
+  /// Compute a hash value for \a key.
+  static uint ComputeHash (const csVertexTexel& key)
+  {
+    return (uintptr_t)(key.vt + key.texel * 196613);
+  }
+};
+
+namespace cspluginSpr3Md2
+{
+
+/**
+ * Reports errors
+ */
+static void ReportError (iObjectRegistry* objreg, const char* id,
+	const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+  csReportV (objreg, CS_REPORTER_SEVERITY_ERROR, id, description, arg);
+  va_end (arg);
+}
+
+SCF_IMPLEMENT_FACTORY (csSprite3DMD2FactoryLoader)
+
+/**
+ * Creates a new csSprite3DMD2FactoryLoader
+ */
+csSprite3DMD2FactoryLoader::csSprite3DMD2FactoryLoader (iBase* pParent) :
+  scfImplementationType (this, pParent)
+{
+}
+
+/**
+ * Destroys a csSprite3DMD2FactoryLoader
+ */
+csSprite3DMD2FactoryLoader::~csSprite3DMD2FactoryLoader ()
+{
+}
+
+/**
+ * Initializes a csSprite3DMD2FactoryLoader
+ */
+bool csSprite3DMD2FactoryLoader::Initialize (iObjectRegistry* object_reg)
+{
+  csSprite3DMD2FactoryLoader::object_reg = object_reg;
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  return true;
+}
+
+// upper bound onsize of biggest data element (vertex, polygon) in an MD2 file
+static int const MAX_DATAELEMENT_SIZE = 8192;
+
+// size of various MD2 elements
+static int const SIZEOF_MD2SHORT = 2;
+static int const SIZEOF_MD2LONG = 4;
+static int const SIZEOF_MD2FLOAT = 4;
+static int const SIZEOF_MD2SKINNAME = 64;
+static int const SIZEOF_MD2FRAMENAME = 16;
+static int const SIZEOF_MD2HEADER = 15*SIZEOF_MD2LONG;
+
+static const float SCALE_FACTOR = 0.025f;
+static const float FRAME_DELAY = 0.1f;
+
+struct csMD2Header
+{
+  // width and height of skin texture in pixels
+  long SkinWidth, SkinHeight;
+  // size of each frame int the sprite, in pixels
+  long FrameSize;
+  // number of skins, vertices, texels, triangles, glcmds(?), frames
+  long SkinCount, VertexCount, TexelCount, TriangleCount, glcmds, FrameCount;
+  // offset of the skin information in the file
+  long SkinOffset;
+  // offset of the texel information in the file
+  long TexelOffset;
+  // offset of the triangle information in the file
+  long TriangleOffset;
+  // offset of the frame information in the file
+  long FramesOffset;
+  // offset of the GL commands information in the file
+  long GLCommandsOffset;
+  // total file size
+  long FileSize;
+};
+
+static bool CheckMD2Version (csFileReadHelper& in)
+{
+  // Read in header and check for a correct file.  The
+  // header consists of two longs, containing
+  // the magic identifiter 'IDP2' as the first long,
+  // followed by a version number (8)
+  uint32 FileID, FileVersion;
+  in.ReadUInt32 (FileID);
+  in.ReadUInt32 (FileVersion);
+  FileID = csLittleEndianLong (FileID);
+  FileVersion = csLittleEndianLong (FileVersion);
+
+  if (FileID != ( ('2'<<24)+('P'<<16)+('D'<<8)+'I' ) )
+    return false;
+
+  if (FileVersion != 8)
+    return false;
+
+  return true;
+}
+
+#define CS_MD2_READ(num,name)						\
+  hdr->name = csGetLittleEndianLong (buf + num * SIZEOF_MD2LONG);
+
+static void ReadMD2Header (csMD2Header *hdr, csFileReadHelper* in)
+{
+  char buf [SIZEOF_MD2HEADER];
+  in->GetFile()->Read (buf, SIZEOF_MD2HEADER);
+
+  CS_MD2_READ (0, SkinWidth);
+  CS_MD2_READ (1, SkinHeight);
+  CS_MD2_READ (2, FrameSize);
+  CS_MD2_READ (3, SkinCount);
+  CS_MD2_READ (4, VertexCount);
+  CS_MD2_READ (5, TexelCount);
+  CS_MD2_READ (6, TriangleCount);
+  CS_MD2_READ (7, glcmds);
+  CS_MD2_READ (8, FrameCount);
+  CS_MD2_READ (9, SkinOffset);
+  CS_MD2_READ (10, TexelOffset);
+  CS_MD2_READ (11, TriangleOffset);
+  CS_MD2_READ (12, FramesOffset);
+  CS_MD2_READ (13, GLCommandsOffset);
+  CS_MD2_READ (14, FileSize);
+}
+
+#undef CS_MD2_READ
+
+static void extractActionName (const char * str, char * act)
+{
+  size_t i;
+  for (i = 0; str[i] != '\0' && !isdigit(str[i]); i++)
+    act[i] = str[i];
+  act[i] = 0;
+}
+
+struct csFrame
+{
+  csString name;
+  csDirtyAccessArray<csVector3> vertices;
+};
+
+
+struct csFrameTime
+{
+  float time;
+  size_t frameidx;
+};
+
+struct csAction
+{
+  csString name;
+  csArray<csFrameTime> frames;
+};
+
+bool csSprite3DMD2FactoryLoader::Load (iSprite3DFactoryState* state,
+	uint8 *Buffer, size_t Size)
+{
+  // Prepare input buffer
+  csRef<iFile> file;
+  file.AttachNew (new csMemFile ((const char*)Buffer, Size));
+  csFileReadHelper in (file);
+  uint8 readbuffer[MAX_DATAELEMENT_SIZE];
+  int i,j;
+
+  // Check for the correct version
+  if (!CheckMD2Version (in))
+    return 0;
+
+  // Read MD2 header
+  csMD2Header Header;
+  ReadMD2Header (&Header, &in);
+
+  // The data we read in.
+  csDirtyAccessArray<csTriangle> triangles;
+  csDirtyAccessArray<csVector2> Texels;
+  csArray<csFrame> frames;
+  csArray<csAction> actions;
+  csStringArray SkinNames;
+  // Map between the vertex/texel combination and the final vertex index.
+  csHash<size_t, csVertexTexel> vertex_mapping;
+  csArray<csVertexTexel> mapped_vertices;
+
+  // Read in texmap (skin) names - skin names are 64 bytes long
+  // Unused
+  in.GetFile()->SetPos (Header.SkinOffset);
+  for (i = 0; i < Header.SkinCount; i++)
+  {
+    char name[SIZEOF_MD2SKINNAME];
+    in.GetFile()->Read (name, SIZEOF_MD2SKINNAME);
+    SkinNames.Push (name);
+  }
+
+  // Next we read in the triangle connectivity data.  This data describes
+  // each triangle as three indices, referring to three numbered vertices.
+  // This data is, like the skin texture coords, independent of frame number.
+  // There are actually two set of indices in the original quake file;
+  // one indexes into the xyz coordinate table, the other indexes into
+  // the uv texture coordinate table.
+  in.GetFile()->SetPos (Header.TriangleOffset);
+  triangles.SetCapacity (Header.TriangleCount);
+  for (i = 0; i < Header.TriangleCount; i++)
+  {
+    in.GetFile()->Read ((char*)readbuffer, SIZEOF_MD2SHORT*6);
+    csVertexTexel vt;
+    size_t idx[3];
+    for (int j = 0 ; j < 3 ; j++)
+    {
+      vt.vt = csGetLittleEndianShort (readbuffer + j * SIZEOF_MD2SHORT);
+      vt.texel = csGetLittleEndianShort (readbuffer + (j+3) * SIZEOF_MD2SHORT);
+      idx[j] = vertex_mapping.Get (vt, csArrayItemNotFound);
+      if (idx[j] == csArrayItemNotFound)
+      {
+        idx[j] = mapped_vertices.Push (vt);
+        vertex_mapping.Put (vt, idx[j]);
+      }
+    }
+    triangles.Push (csTriangle (idx[0], idx[1], idx[2]));
+  }
+
+  // Read in skin data. This contains texture map coordinates for each
+  // vertex; the spatial location of each vertex varies with each
+  // frame, and is stored elsewhere, in the frame data section.
+  // The only data we read here
+  // are the static texture map (uv) locations for each vertex!
+  in.GetFile()->SetPos (Header.TexelOffset);
+  csArray<csVector2> intexels;
+  intexels.SetCapacity (Header.TexelCount);
+  for (i = 0; i < Header.TexelCount; i++)
+  {
+    in.GetFile()->Read ((char*)readbuffer, SIZEOF_MD2SHORT*2);
+    intexels.Push (
+    	csVector2 (csGetLittleEndianShort(readbuffer)/(float)Header.SkinWidth,
+                   csGetLittleEndianShort(readbuffer+2)/(float)Header.SkinHeight));
+  }
+  // Now map the read texels to the real data.
+  Texels.SetLength (mapped_vertices.Length ());
+  size_t fi;
+  for (fi = 0 ; fi < mapped_vertices.Length () ; fi++)
+    Texels[fi] = intexels[mapped_vertices[fi].texel];
+
+  // Now we read in the frames.  The number of frames is stored in 'num_object'
+  csString currAction;
+  size_t currActionIdx = csArrayItemNotFound;
+  float time = 0;
+
+  in.GetFile()->SetPos (Header.FramesOffset);
+  frames.SetCapacity (Header.FrameCount);
+  for (i = 0; i < Header.FrameCount; i++, time += FRAME_DELAY)
+  {
+    size_t idx = frames.Push (csFrame ());
+    csFrame& frame = frames[idx];
+
+    csVector3 scale, translate;
+    // read in scale and translate info
+    in.GetFile()->Read ((char*)&scale, SIZEOF_MD2FLOAT*3);
+    in.GetFile()->Read ((char*)&translate, SIZEOF_MD2FLOAT*3);
+    for (j = 0; j < 3; j++)
+    {
+      scale[j] = csConvertEndian (scale[j]);
+      translate[j] = csConvertEndian (translate[j]);
+    }
+    scale *= SCALE_FACTOR;
+    translate *= SCALE_FACTOR;
+
+    // name of this frame
+    char FrameName [SIZEOF_MD2FRAMENAME+1];
+    char ActionName [SIZEOF_MD2FRAMENAME+1];
+    in.GetFile()->Read (FrameName, SIZEOF_MD2FRAMENAME);
+    FrameName [SIZEOF_MD2FRAMENAME] = 0;
+    frame.name = FrameName;
+    extractActionName (FrameName, ActionName);
+    if (currActionIdx == csArrayItemNotFound ||
+    	strcmp (ActionName, actions[currActionIdx].name))
+    {
+      currActionIdx = actions.Push (csAction ());
+      actions[currActionIdx].name = ActionName;
+      time = FRAME_DELAY;
+    }
+
+    // read in vertex coordinate data for the frame
+    in.GetFile()->Read ((char*)readbuffer, 4*Header.VertexCount);
+
+    csFrameTime ft;
+    ft.time = time;
+    ft.frameidx = i;
+    actions[currActionIdx].frames.Push (ft);
+
+    csArray<csVector3> inframe;
+    inframe.SetCapacity (Header.VertexCount);
+    for (j = 0; j < Header.VertexCount; j++)
+    {
+      const uint8 * buf = readbuffer + j*4;
+      csVector3 v (buf [0], buf [1], buf [2]);
+      v.x = v.x * scale.x + translate.x;
+      v.y = v.y * scale.y + translate.y;
+      v.z = v.z * scale.z + translate.z;
+      // swap y and z
+      float t = v.y;
+      v.y = v.z;
+      v.z = t;
+ 
+      inframe.Push (v);
+    }
+    // Now map the read vertices to the real data.
+    frame.vertices.SetLength (mapped_vertices.Length ());
+    for (fi = 0 ; fi < mapped_vertices.Length () ; fi++)
+      frame.vertices[fi] = inframe[mapped_vertices[fi].vt];
+  }
+
+  // Now fill the sprite.
+  state->SetTriangles (triangles.GetArray (), triangles.Length ());
+  for (j = 0 ; j < int (frames.Length ()) ; j++)
+  {
+    csFrame& f = frames[j];
+    iSpriteFrame* fr = state->AddFrame ();
+    fr->SetName (f.name);
+    if (j == 0) state->AddVertices (mapped_vertices.Length ());
+    state->SetVertices (f.vertices.GetArray (), j);
+    state->SetTexels (Texels.GetArray (), j);
+  }
+  for (j = 0 ; j < int (actions.Length ()) ; j++)
+  {
+    csAction& a = actions[j];
+    iSpriteAction* action = state->AddAction ();
+    action->SetName (a.name);
+    size_t k;
+    for (k = 0 ; k < a.frames.Length () ; k++)
+    {
+      csFrameTime& ft = a.frames[k];
+      action->AddFrame (state->GetFrame (ft.frameidx), csTicks (1000.0f * ft.time),
+      	0.0f);
+    }
+  }
+  state->MergeNormals ();
+
+  return true;
+}
+
+/**
+ * Loads a csSprite3DMD2FactoryLoader
+ */
+csPtr<iBase> csSprite3DMD2FactoryLoader::Parse (iDataBuffer* data,
+				       iStreamSource*,
+				       iLoaderContext* ldr_context,
+				       iBase* context)
+{
+  csRef<iPluginManager> plugin_mgr (
+    csQueryRegistry<iPluginManager> (object_reg));
+  csRef<iMeshObjectType> type (
+    csQueryPluginClass<iMeshObjectType> (plugin_mgr, 
+    "crystalspace.mesh.object.sprite.3d"));
+  if (!type)
+  {
+    type = csLoadPlugin<iMeshObjectType> (plugin_mgr,
+    	"crystalspace.mesh.object.sprite.3d");
+  }
+  if (!type)
+  {
+    ReportError (object_reg,
+		"crystalspace.sprite3dmd2factoryloader.setup.objecttype",
+		"Could not load the sprite.3d mesh object plugin!");
+    return 0;
+  }
+
+  // @@@ Temporary fix to allow to set actions for objects loaded
+  // with impexp. Once those loaders move to another plugin this code
+  // below should be removed.
+  csRef<iMeshObjectFactory> fact;
+  if (context)
+  {
+    fact = scfQueryInterface<iMeshObjectFactory> (context);
+  }
+
+  // If there was no factory we create a new one.
+  if (!fact)
+    fact = type->NewFactory ();
+
+  csRef<iSprite3DFactoryState> state = scfQueryInterface<iSprite3DFactoryState>
+    (fact);
+
+  bool rc = Load (state, data->GetUint8 (), data->GetSize ());
+  if (!rc) return 0;
+
+  return csPtr<iBase> (fact);
+}
+
+iMeshFactoryWrapper* csSprite3DMD2FactoryLoader::Load (const char* factname,
+	const char* filename)
+{
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
+  csRef<iMeshFactoryWrapper> ff = engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.sprite.3d", factname);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  csRef<iDataBuffer> dbuf = vfs->ReadFile (filename);
+  if (!dbuf)
+  {
+    ReportError (object_reg,
+		"crystalspace.sprite3dmd2factoryloader.load",
+		"Can't load file '%s'!", filename);
+    return 0;
+  }
+  csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext ();
+  csRef<iBase> b = Parse (dbuf, 0, ldr_context, ff->GetMeshObjectFactory ());
+  if (!b)
+  {
+    ReportError (object_reg,
+		"crystalspace.sprite3dmd2factoryloader.load",
+		"Error loading MD2 file '%s'!", filename);
+    return 0;
+  }
+  return ff;
+}
+
+} // namespace cspluginSpr3Md2

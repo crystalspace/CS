@@ -1083,7 +1083,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
 
   n = 0;
 
-  if (!factory->cstxt)
+  if (!(factory->cstxt || (force_otherskin && cstxt)))
   {
     factory->Report (CS_REPORTER_SEVERITY_ERROR,
     	"Error! Trying to draw a sprite with no material!");

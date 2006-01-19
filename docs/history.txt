@@ -8,6 +8,23 @@ chronological order.
 
 19-Jan-2006
 	- Jorrit fixed gmesh3ds for Frank's latest refactor.
+	- Jorrit fixed a bug in spr3d. If the factory had no material but
+	  the mesh had one then it would still complain that the material was
+	  missing. Now the factory material is really optional.
+	- Jorrit added a new md2 loader for spr3d. This will help replace
+	  the model importing system.
+	- Jorrit added a new iModelLoader interface. This is a conveniance
+	  interface that some loading plugins can implement. This makes it
+	  easier to create a mesh factory from a model file. Currently
+	  this is implemented by the new gmesh3ds and spr3md2 plugins.
+	  Loading a model is now as simple as:
+		csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (
+			object_reg);
+		csRef<iModelLoader> l = csLoadPlugin<iModelLoader> (plugin_mgr,
+			"crystalspace.mesh.loader.factory.genmesh.3ds");
+		iMeshFactoryWrapper* ff = l->Load ("model", "/lib/model.3ds");
+	- Jorrit updated the documentation to document the new way to load
+	  models.
 18-Jan-2006
 	- Jorrit fixed a bug as reported by rvl_ involving a memory leak
 	  when looking at space warping portals.

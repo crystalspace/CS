@@ -11,9 +11,11 @@ there is only a section describing the format of the map files.
 * XML File Format:: Format of Map File (@sc{xml})
 * Old Map File Format:: Old Format of Map File
 * Binary XML:: Binary @sc{xml}
+* Model Loading:: Loading Models
 @end menu
 
 @importss{usingcs,loader,levload.txi}
 @importss{usingcs,loader,xmlfmt.txi}
 @importss{usingcs,loader,mapfmt.txi}
 @importss{usingcs,loader,binload.txi}
+@importss{usingcs,loader,modelload.txi}
