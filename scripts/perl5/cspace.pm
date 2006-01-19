@@ -14911,7 +14911,6 @@ sub TagForbidden () { $cspacec::TagForbidden }
 sub TagRequired () { $cspacec::TagRequired }
 sub CS_TEXTURE_2D () { $cspacec::CS_TEXTURE_2D }
 sub CS_TEXTURE_3D () { $cspacec::CS_TEXTURE_3D }
-sub CS_TEXTURE_DITHER () { $cspacec::CS_TEXTURE_DITHER }
 sub CS_TEXTURE_NOMIPMAPS () { $cspacec::CS_TEXTURE_NOMIPMAPS }
 sub CS_TEXTURE_CLAMP () { $cspacec::CS_TEXTURE_CLAMP }
 sub CS_TEXTURE_NOFILTER () { $cspacec::CS_TEXTURE_NOFILTER }
