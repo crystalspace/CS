@@ -32,34 +32,37 @@
 
 CS_IMPLEMENT_PLUGIN
 
+namespace cspluginFontplex
+{
+
 //---------------------------------------------------------------------------
 
-csFontLoadOrderEntry::csFontLoadOrderEntry (iFontServer* server, 
-					    const char* fontName, float scale)
+csFontLoadOrderEntry::csFontLoadOrderEntry (csRefArray<iFontServer> servers, 
+					    const char* fontName, float scale,
+                                            bool fallback) : servers (servers),
+                                              fallback (fallback), loaded (false), 
+                                              scale (scale)
 {
-  csFontLoadOrderEntry::server = server;
-  csFontLoadOrderEntry::scale = scale;
-  csFontLoadOrderEntry::fontName = csStrNew (fontName);
-  loaded = false;
+  csFontLoadOrderEntry::fontName = fontName;
 }
 
 csFontLoadOrderEntry::csFontLoadOrderEntry (const csFontLoadOrderEntry& other)
 {
-  fontName = csStrNew (other.fontName);
-  server = other.server;
+  fontName = other.fontName;
+  servers = other.servers;
   loaded = other.loaded;
   font = other.font;
   scale = other.scale;
+  fallback = other.fallback;
 }
 
 csFontLoadOrderEntry::~csFontLoadOrderEntry ()
 {
-  delete[] fontName;
 }
 
 bool csFontLoadOrderEntry::operator== (const csFontLoadOrderEntry& e2)
 {
-  return ((strcmp (e2.fontName, fontName) == 0) && (e2.server == server));
+  return ((strcmp (e2.fontName, fontName) == 0) && (e2.servers == servers));
 }
 
 iFont* csFontLoadOrderEntry::GetFont (csFontPlexer* parent)
@@ -67,7 +70,13 @@ iFont* csFontLoadOrderEntry::GetFont (csFontPlexer* parent)
   if (!loaded)
   {
     loaded = true;
-    font = server->LoadFont (fontName, parent->size * scale);
+    for (size_t i = 0; i < servers.GetSize(); i++)
+    {
+      font = servers[i]->LoadFont (fontName, parent->size * scale);
+      if (font.IsValid()) break;
+    }
+    if (!font.IsValid())
+      parent->parent->ReportFontNotFound (fallback, fontName);
   }
   return font;
 }
@@ -85,46 +94,33 @@ void csFontLoaderOrder::AppendSmart (const csFontLoaderOrder& other)
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csFontServerMultiplexer)
-  SCF_IMPLEMENTS_INTERFACE (iFontServer)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFontServerMultiplexer::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csFontServerMultiplexer)
 
 csFontServerMultiplexer::FontServerMapEntry::FontServerMapEntry (
   const char* name, iFontServer* server)
 {
-  FontServerMapEntry::name = csStrNew (name);
+  FontServerMapEntry::name = name;
   FontServerMapEntry::server = server;
 }
 
 csFontServerMultiplexer::FontServerMapEntry::FontServerMapEntry (
   const FontServerMapEntry& source)
 {
-  name = csStrNew (source.name);
+  name = source.name;
   server = source.server;
 }
 
 csFontServerMultiplexer::FontServerMapEntry::~FontServerMapEntry ()
 {
-  delete[] name;
 }
 
-csFontServerMultiplexer::csFontServerMultiplexer (iBase *pParent)
+csFontServerMultiplexer::csFontServerMultiplexer (iBase *pParent) :
+  scfImplementationType (this, pParent), emitErrors (true)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csFontServerMultiplexer::~csFontServerMultiplexer ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csFontServerMultiplexer::Initialize (iObjectRegistry *object_reg)
@@ -149,6 +145,7 @@ bool csFontServerMultiplexer::Initialize (iObjectRegistry *object_reg)
 
     if (fs)
     {
+      fs->SetWarnOnError (false);
       const char* name = mapEnum->GetKey (true);
 
       FontServerMapEntry entry (name, fs);
@@ -175,6 +172,7 @@ bool csFontServerMultiplexer::Initialize (iObjectRegistry *object_reg)
     {
       errorcount = 0;	
       csRef<iFontServer> fs (SCF_QUERY_INTERFACE (b, iFontServer));
+      fs->SetWarnOnError (false);
       fontservers.Push (fs);
     }
   }
@@ -190,16 +188,30 @@ bool csFontServerMultiplexer::Initialize (iObjectRegistry *object_reg)
   if (fontset) fallbackKey << fontset << '.';
   fallbackKey << "*Fallback";
 
-  ParseFontLoaderOrder (fallbackOrder, config->GetStr (fallbackKey, 0));
+  ParseFontLoaderOrder (fallbackOrder, config->GetStr (fallbackKey, 0), true);
 
   return true;
 }
 
+void csFontServerMultiplexer::ReportFontNotFound (bool fallback, const char* font)
+{
+  int oldSeverity = fontsNotFound.Get (font, INT_MAX);
+  int newSeverity = fallback ? CS_REPORTER_SEVERITY_NOTIFY : GetErrorSeverity();
+  if (oldSeverity > newSeverity)
+  {
+    csReport (object_reg,
+      newSeverity,
+      "crystalspace.font.server.multiplexer",
+      "Could not load font \"%s\"",
+      font);
+    fontsNotFound.PutFirst (font, newSeverity);
+  }
+}
+
 void csFontServerMultiplexer::NotifyDelete (csFontPlexer* font, 
-					    char* fontid)
+					    const char* fontid)
 {
   loadedFonts.Delete (fontid, font);
-  delete[] fontid;
 }
 
 csPtr<iFont> csFontServerMultiplexer::LoadFont (const char *filename, 
@@ -223,28 +235,33 @@ csPtr<iFont> csFontServerMultiplexer::LoadFont (const char *filename,
   const char* orderStr = config->GetStr (substKey, 0);
   if (orderStr)
   {
-    ParseFontLoaderOrder (*order, orderStr);
+    ParseFontLoaderOrder (*order, orderStr, false);
   }
   else
   {
-    size_t i;
-    for (i = 0; i < fontservers.Length (); i++)
-    {
-      order->PushSmart (csFontLoadOrderEntry (fontservers[i], filename, 1.0f));
-    }
+    order->PushSmart (csFontLoadOrderEntry (fontservers, filename, 1.0f, false));
   }
 
   order->AppendSmart (fallbackOrder);
 
+  csRef<csFontPlexer> newFont;
+  newFont.AttachNew (new csFontPlexer (this, filename, size, order));
+
   // The first font that could be loaded is the "primary" font.
   iFont* primary = 0;
   size_t i;
+  bool wasFallback = false;
   for (i = 0; i < order->Length (); i++)
   {
     csFontLoadOrderEntry& orderEntry = (*order)[i];
-    primary = orderEntry.font = 
-      orderEntry.server->LoadFont (orderEntry.fontName, 
-	size * orderEntry.scale);
+    if ((i > 0) && !wasFallback && orderEntry.fallback)
+    {
+      // This means none of the non-fallback fonts loaded.
+      // Worth a message to us...
+      ReportFontNotFound (false, filename);
+    }
+    wasFallback = orderEntry.fallback;
+    primary = orderEntry.font = orderEntry.GetFont (newFont);
     orderEntry.loaded = true;
     if (primary != 0) break;
   }
@@ -256,15 +273,14 @@ csPtr<iFont> csFontServerMultiplexer::LoadFont (const char *filename,
   }
   else
   {
-    char* newFontId = csStrNew (fontid);
-    iFont* newFont = new csFontPlexer (this, newFontId, primary, size, order);
-    loadedFonts.Put (newFontId, newFont);
-    return (newFont);
+    newFont->primaryFont = primary;
+    loadedFonts.Put (fontid, newFont);
+    return csPtr<iFont> (newFont);
   }
 }
 
 void csFontServerMultiplexer::ParseFontLoaderOrder (
-  csFontLoaderOrder& order, const char* str)
+  csFontLoaderOrder& order, const char* str, bool fallback)
 {
   while ((str != 0) && (*str != 0))
   {
@@ -300,14 +316,12 @@ void csFontServerMultiplexer::ParseFontLoaderOrder (
       csRef<iFontServer> fs = ResolveFontServer (newserver);
       if (fs)
       {
-	order.PushSmart (csFontLoadOrderEntry (fs, fontName, scale));
+        csRefArray<iFontServer> a (1, 1);
+        a.Push (fs);
+	order.PushSmart (csFontLoadOrderEntry (a, fontName, scale, fallback));
       }
     }
-    size_t i;
-    for (i = 0; i < fontservers.Length (); i++)
-    {
-      order.PushSmart (csFontLoadOrderEntry (fontservers[i], fontName, scale));
-    }
+    order.PushSmart (csFontLoadOrderEntry (fontservers, fontName, scale, fallback));
 
     str = comma ? comma + 1 : 0;
   }
@@ -349,24 +363,17 @@ csPtr<iFontServer> csFontServerMultiplexer::ResolveFontServer (const char* name)
       fs = CS_LOAD_PLUGIN (plugin_mgr, plugName, iFontServer);
     }
   }
-  if (fs) fs->IncRef ();
-  return ((iFontServer*)fs);
+  return csPtr<iFontServer> (fs);
 }
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csFontPlexer)
-  SCF_IMPLEMENTS_INTERFACE (iFont)
-SCF_IMPLEMENT_IBASE_END
-
 csFontPlexer::csFontPlexer (csFontServerMultiplexer* parent,
-			    char* fontid, iFont* primary, 
-			    float size, csFontLoaderOrder* order)
+			    const char* fontid, float size, 
+                            csFontLoaderOrder* order) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   csFontPlexer::order = order;
-  primaryFont = primary;
   csFontPlexer::size = size;
   csFontPlexer::parent = parent;
   csFontPlexer::fontid = fontid;
@@ -384,8 +391,6 @@ csFontPlexer::~csFontPlexer ()
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
     delnot->BeforeDelete (this);
   }
-
-  SCF_DESTRUCT_IBASE();
 }
 
 float csFontPlexer::GetSize ()
@@ -595,15 +600,17 @@ bool csFontPlexer::HasGlyph (utf32_char c)
 
 int csFontPlexer::GetTextHeight ()
 {
-	return primaryFont->GetTextHeight();
+  return primaryFont->GetTextHeight();
 }
 
 int csFontPlexer::GetUnderlinePosition ()
 {
-	return primaryFont->GetUnderlinePosition();
+  return primaryFont->GetUnderlinePosition();
 }
 
 int csFontPlexer::GetUnderlineThickness ()
 {
-	return primaryFont->GetUnderlineThickness();
+  return primaryFont->GetUnderlineThickness();
 }
+
+} // namespace cspluginFontplex

@@ -31,19 +31,21 @@
 #include "iutil/plugin.h"
 #include "iutil/databuff.h"
 #include "csutil/parasiticdatabuffer.h"
+#include "ivaria/reporter.h"
 
 struct iObjectRegistry;
 struct iPluginManager;
-class csDefaultFontServer;
 
-#define GLYPH_INDEX_UPPER_SHIFT	    8
-#define GLYPH_INDEX_LOWER_COUNT	    256
-#define GLYPH_INDEX_LOWER_MASK	    0xff
+namespace cspluginCSfont
+{
+
+class csDefaultFontServer;
 
 /**
  * Bitmap font
  */
-class csDefaultFont : public iFont
+class csDefaultFont : public scfImplementation1<csDefaultFont, 
+                                                iFont>
 {
 public:
   struct CharRange
@@ -86,8 +88,6 @@ public:
   csRef<iDataBuffer> alphaData;
   csRef<csDefaultFontServer> Parent;
   csRefArray<iFontDeleteNotify> DeleteCallbacks;
-
-  SCF_DECLARE_IBASE;
 
   /// Create the font object
   csDefaultFont (csDefaultFontServer *parent, const char *name, 
@@ -203,7 +203,9 @@ public:
 /**
  * Default font server.
  */
-class csDefaultFontServer : public iFontServer
+class csDefaultFontServer : public scfImplementation2<csDefaultFontServer, 
+                                                      iFontServer,
+                                                      iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -211,17 +213,23 @@ private:
   // A list of csDefaultFont pointers.
   //csRefArray<csDefaultFont> fonts;
   csHash<csDefaultFont*, csStrKey> fonts;
+  bool emitErrors;
 
   /// read a font file from vfs
   csDefaultFont *ReadFontFile(const char *file);
 
+  int GetErrorSeverity () const
+  { 
+    return emitErrors ? 
+      CS_REPORTER_SEVERITY_WARNING : CS_REPORTER_SEVERITY_NOTIFY; 
+  }
 public:
-  SCF_DECLARE_IBASE;
-
   /// Create the plugin object
   csDefaultFontServer (iBase *pParent);
   /// destroy it
   virtual ~csDefaultFontServer ();
+
+  virtual bool Initialize(iObjectRegistry* p);
 
   /**
    * Load a font by name.
@@ -236,12 +244,12 @@ public:
   /// This function is called by iFont objects when they are destroyed
   void NotifyDelete (csDefaultFont *font);
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csDefaultFontServer);
-    virtual bool Initialize(iObjectRegistry* p);
-  } scfiComponent;
-  friend struct eiComponent;
+  virtual void SetWarnOnError (bool enable)
+  { emitErrors = enable; }
+  virtual bool GetWarnOnError ()
+  { return emitErrors; }
 };
+
+} // namespace cspluginCSfont
 
 #endif // __CS_CSFONT_H__

@@ -30,6 +30,9 @@
 #include "csutil/cfgacc.h"
 #include "csutil/weakref.h"
 
+namespace cspluginFreeFnt2
+{
+
 class csFreeType2Server;
 
 /**
@@ -50,7 +53,8 @@ struct csFt2FaceWrapper : public csRefCount
 /**
  * A FreeType font object
  */
-class csFreeType2Font : public iFont
+class csFreeType2Font : public scfImplementation1<csFreeType2Font, 
+                                                  iFont>
 {
 protected:
   FT_Glyph glyph;
@@ -73,8 +77,6 @@ public:
   //
   csRef<csFt2FaceWrapper> face;
   FT_Size size;
-
-  SCF_DECLARE_IBASE;
 
   /// Constructor
   csFreeType2Font (csFreeType2Server* server, char* fontid, 
@@ -175,7 +177,9 @@ public:
 /**
  * FreeType font server.
  */
-class csFreeType2Server : public iFontServer
+class csFreeType2Server : public scfImplementation2<csFreeType2Server, 
+                                                    iFontServer,
+                                                    iComponent>
 {
 public:
   FT_Library library;
@@ -186,8 +190,13 @@ public:
   bool freetype_inited;
   csHash<csFt2FaceWrapper*, const char*> ftfaces;
   csHash<iFont*, const char*> fonts;
+  bool emitErrors;
 
-  SCF_DECLARE_IBASE;
+  int GetErrorSeverity () const
+  { 
+    return emitErrors ? 
+      CS_REPORTER_SEVERITY_WARNING : CS_REPORTER_SEVERITY_NOTIFY; 
+  }
 
   csFreeType2Server (iBase *iParent);
   virtual ~csFreeType2Server ();
@@ -214,12 +223,12 @@ public:
    */
   virtual csPtr<iFont> LoadFont (const char *filename, float size = 10.0f);
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csFreeType2Server);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
+  virtual void SetWarnOnError (bool enable)
+  { emitErrors = enable; }
+  virtual bool GetWarnOnError ()
+  { return emitErrors; }
 };
+
+} // namespace cspluginFreeFnt2
 
 #endif // __CS_FREEFONT2_H__

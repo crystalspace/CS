@@ -102,8 +102,6 @@ struct csGlyphMetrics
   int advance;
 };
 
-SCF_VERSION (iFont, 5, 1, 0);
-
 /**
  * A font object.
  * Objects of this class are used by canvas driver to paint glyphs.
@@ -111,8 +109,10 @@ SCF_VERSION (iFont, 5, 1, 0);
  * Main creators of instances implementing this interface:
  * - iFontServer::LoadFont()
  */
-struct iFont : public iBase
+struct iFont : public virtual iBase
 {
+  SCF_INTERFACE (iFont, 6, 0, 0);
+
   /**
    * Add a font delete notification callback routine.
    * This routine will be called from font destructor,
@@ -220,8 +220,6 @@ struct iFont : public iBase
   virtual int GetUnderlineThickness () = 0;
 };
 
-SCF_VERSION (iFontServer, 3, 0, 0);
-
 /**
  * A font server interface.
  * Font server can load fonts and create iFont objects.
@@ -241,14 +239,25 @@ SCF_VERSION (iFontServer, 3, 0, 0);
  * Main users of this interface:
  * - iGraphics3D implementations (3D renderers).
  */
-struct iFontServer : public iBase
+struct iFontServer : public virtual iBase
 {
+  SCF_INTERFACE (iFontServer, 4, 0, 0);
+
   /**
    * Load a font by name.
    * Returns a new iFont object or 0 on failure.
    */
   virtual csPtr<iFont> LoadFont (const char* filename, 
     float size = 10.0f) = 0;
+
+  /**
+   * Enable or disable error reporting.
+   * By default, the font loaders emit a warning when a font could not loaded.
+   * Use this method to enable or disable that behaviour.
+   */
+  virtual void SetWarnOnError (bool enable) = 0;
+  /// Get status of warning emission on error
+  virtual bool GetWarnOnError () = 0;
 };
 
 /** @} */

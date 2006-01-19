@@ -28,14 +28,16 @@
 #include "csutil/dirtyaccessarray.h"
 #include "iutil/objreg.h"
 #include "iutil/comp.h"
-#include "ivaria/reporter.h"
+
+CS_IMPLEMENT_PLUGIN
+
+namespace cspluginCSfont
+{
 
 #include "font_police.h"
 #include "font_courier.h"	// font (C) Andrew Zabolotny
 #include "font_tiny.h"		// font (C) Andrew Zabolotny
 #include "font_italic.h"	// font (C) Andrew Zabolotny
-
-CS_IMPLEMENT_PLUGIN
 
 //---------------------------------------------------------------------------
 
@@ -91,27 +93,15 @@ static csFontDef const FontList [] =
 
 int const FontListCount = sizeof (FontList) / sizeof (csFontDef);
 
-SCF_IMPLEMENT_IBASE (csDefaultFontServer)
-  SCF_IMPLEMENTS_INTERFACE (iFontServer)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csDefaultFontServer::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csDefaultFontServer)
 
-csDefaultFontServer::csDefaultFontServer (iBase *pParent) : object_reg(0)
+csDefaultFontServer::csDefaultFontServer (iBase *pParent) : 
+  scfImplementationType (this, pParent), object_reg(0), emitErrors (true)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csDefaultFontServer::~csDefaultFontServer()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, float /*size*/)
@@ -205,9 +195,10 @@ csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)
   csRef<iDataBuffer> fntfile (VFS->ReadFile (file, false));
   if (!fntfile)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-        "crystalspace.font.csfont",
-      	"Could not read font file %s.", file);
+    if (emitErrors)
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+          "crystalspace.font.csfont",
+      	  "Could not read font file %s.", file);
     return 0;
   }
 
@@ -311,7 +302,7 @@ error:
         fontdef.underline_thickness = n;
       else
       {
-	csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+        csReport (object_reg, GetErrorSeverity(),
 	  "crystalspace.font.csfont",
       	  "Unrecognized property '%s' in font file %s.", kw, file);
       }
@@ -360,7 +351,7 @@ error:
     {
       if (fontdefGlyphs == 0)
       {
-	csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	csReport (object_reg, GetErrorSeverity(),
 	  "crystalspace.font.csfont",
 	  "Malformed font %s: neither 'Glyphs' nor 'HasCharRanges' property",
 	  fontdef.Name);
@@ -529,10 +520,6 @@ error:
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//- The font object -//--//
 
-SCF_IMPLEMENT_IBASE (csDefaultFont)
-  SCF_IMPLEMENTS_INTERFACE (iFont)
-SCF_IMPLEMENT_IBASE_END
-
 csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name, 
 			      CharRange* glyphRanges, int height, 
 			      int ascent, int descent,
@@ -541,9 +528,8 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
 			      csGlyphMetrics* gMetrics,
 			      iDataBuffer* bitmap, csBitmapMetrics* bMetrics,
 			      iDataBuffer* alpha, csBitmapMetrics* aMetrics) 
-			      : DeleteCallbacks (4, 4)
+			      : scfImplementationType (this), DeleteCallbacks (4, 4)
 {
-  SCF_CONSTRUCT_IBASE (parent);
   Parent = parent;
   Parent->NotifyCreate (this);
   Name = csStrNew (name);
@@ -615,8 +601,6 @@ csDefaultFont::~csDefaultFont ()
 
   Parent->NotifyDelete (this);
   delete [] Name;
-
-  SCF_DESTRUCT_IBASE();
 }
 
 void csDefaultFont::SetSize (int)
@@ -790,9 +774,9 @@ bool csDefaultFont::RemoveDeleteCallback (iFontDeleteNotify* func)
   return false;
 }
 
-bool csDefaultFontServer::eiComponent::Initialize (iObjectRegistry* p)
+bool csDefaultFontServer::Initialize (iObjectRegistry* p)
 {
-  scfParent->object_reg = p;
+  object_reg = p;
   return true;
 }
 
@@ -828,3 +812,5 @@ int csDefaultFont::GetUnderlineThickness ()
 {
   return UnderlineThickness;
 }
+
+} // namespace cspluginCSfont

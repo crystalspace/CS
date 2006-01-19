@@ -37,6 +37,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+namespace cspluginFreeFnt2
+{
+
 SCF_IMPLEMENT_FACTORY (csFreeType2Server)
 
 csFt2FaceWrapper::csFt2FaceWrapper (csFreeType2Server* owner,
@@ -57,21 +60,10 @@ csFt2FaceWrapper::~csFt2FaceWrapper ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csFreeType2Server)
-  SCF_IMPLEMENTS_INTERFACE (iFontServer)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFreeType2Server::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csFreeType2Server::csFreeType2Server (iBase *pParent)
+csFreeType2Server::csFreeType2Server (iBase *pParent) : 
+  scfImplementationType (this, pParent), library (0), freetype_inited (false),
+  emitErrors (true)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  library = 0;
-  freetype_inited = false;
 }
 
 csFreeType2Server::~csFreeType2Server ()
@@ -81,8 +73,6 @@ csFreeType2Server::~csFreeType2Server ()
   {
     FT_Done_FreeType (library);
   }
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 void csFreeType2Server::Report (int severity, const char* msg, ...)
@@ -95,14 +85,7 @@ void csFreeType2Server::Report (int severity, const char* msg, ...)
 
 void csFreeType2Server::ReportV (int severity, const char* msg, va_list arg)
 {
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
-  if (rep)
-    rep->ReportV (severity, "crystalspace.font.freefont2", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV (object_reg, severity, "crystalspace.font.freefont2", msg, arg);
 }
 
 const char* csFreeType2Server::GetErrorDescription(int code)
@@ -147,7 +130,7 @@ bool csFreeType2Server::FreetypeError (int errorCode, const char* message,
     msg.FormatV (message, arg);
     va_end (arg);
 
-    Report (CS_REPORTER_SEVERITY_WARNING,
+    Report (GetErrorSeverity (),
       "%s: %s (code %d)", 
       msg.GetData (), GetErrorDescription (errorCode), errorCode);
     return true;
@@ -249,7 +232,7 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, float size)
 	{
 	  if (ftFace->num_charmaps == 0)
 	  {
-	    Report (CS_REPORTER_SEVERITY_WARNING,
+	    Report (GetErrorSeverity (),
 	      "Fontfile %s doesn't contain charmaps", filename);
 	    return 0;
 	  }
@@ -268,7 +251,7 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, float size)
 	  }
 	  else
 	  {
-	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    Report (GetErrorSeverity (),
 	      "Using charmap '%s' for %s", encName, filename);
 	  }
 	}
@@ -280,15 +263,16 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, float size)
       }
       else
       {
-	Report (CS_REPORTER_SEVERITY_WARNING,
-	  "Could not determine filesize for fontfile %s!", filename);
+	  Report (GetErrorSeverity (),
+	    "Could not determine filesize for fontfile %s!", filename);
 	return 0;
       }
     }
     else
     {
-      Report (CS_REPORTER_SEVERITY_WARNING,
-	"Could not open fontfile %s!", filename);
+      if (emitErrors)
+        Report (CS_REPORTER_SEVERITY_WARNING,
+	  "Could not open fontfile %s!", filename);
       return 0;
     }
   }
@@ -302,17 +286,12 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, float size)
 
 //-------------------------------------------// A FreeType font object //----//
 
-SCF_IMPLEMENT_IBASE (csFreeType2Font)
-  SCF_IMPLEMENTS_INTERFACE (iFont)
-SCF_IMPLEMENT_IBASE_END
-
 csFreeType2Font::csFreeType2Font (csFreeType2Server* server, 
 				  char* fontid,
 				  csFt2FaceWrapper* face, 
 				  float iSize) :
-  DeleteCallbacks (4, 4)
+  scfImplementationType (this), DeleteCallbacks (4, 4)
 {
-  SCF_CONSTRUCT_IBASE (0);
   name = strchr (fontid, ':') + 1;
   csFreeType2Font::fontid = fontid;
   csFreeType2Font::face = face;
@@ -351,7 +330,6 @@ csFreeType2Font::~csFreeType2Font ()
   server->RemoveFont (this, fontid);
   face = 0;
   //delete [] name;
-  SCF_DESTRUCT_IBASE();
 }
 
 float csFreeType2Font::GetSize ()
@@ -643,46 +621,49 @@ bool csFreeType2Font::HasGlyph (utf32_char c)
 
 int csFreeType2Font::GetTextHeight ()
 {
-	FT_Short height = face->face->height;
+  FT_Short height = face->face->height;
 
-	// Need to convert from font units to pixel units.
-	return height * size->metrics.y_ppem / face->face->units_per_EM;
+  // Need to convert from font units to pixel units.
+  return height * size->metrics.y_ppem / face->face->units_per_EM;
 }
 
 int csFreeType2Font::GetUnderlinePosition ()
 {
-	FT_Short underline_position = face->face->underline_position;
+  FT_Short underline_position = face->face->underline_position;
 
-	// Need to convert from font units to pixel units.
-	float temp = underline_position * size->metrics.y_ppem / (float)face->face->units_per_EM;
+  // Need to convert from font units to pixel units.
+  float temp = underline_position * size->metrics.y_ppem / 
+    (float)face->face->units_per_EM;
 
-	// The value returned from freetype is the opposite of what we want.
-	temp *= -1;
+  // The value returned from freetype is the opposite of what we want.
+  temp *= -1;
 
-	// Round to the nearest integer.
-	if(temp > 0)
-	{
-		temp += 0.5;
-	}
-	else
-	{
-		temp -= 0.5;
-	}
-	return (int)temp;
+  // Round to the nearest integer.
+  if(temp > 0)
+  {
+    temp += 0.5;
+  }
+  else
+  {
+    temp -= 0.5;
+  }
+  return (int)temp;
 }
 
 int csFreeType2Font::GetUnderlineThickness ()
 {
-	FT_Short underline_thickness = face->face->underline_thickness;
+  FT_Short underline_thickness = face->face->underline_thickness;
 
-	// Need to convert from font units to pixel units.
-	underline_thickness = (int)(underline_thickness * size->metrics.y_ppem / (float)face->face->units_per_EM + 0.5);
+  // Need to convert from font units to pixel units.
+  underline_thickness = (int)(underline_thickness * size->metrics.y_ppem / 
+    (float)face->face->units_per_EM + 0.5);
 
-	// The thicknes should never be 0.
-	if(underline_thickness == 0)
-	{
-		underline_thickness = 1;
-	}
-	return underline_thickness;
+  // The thicknes should never be 0.
+  if(underline_thickness == 0)
+  {
+    underline_thickness = 1;
+  }
+  return underline_thickness;
 }
 
+} // namespace cspluginFreeFnt2

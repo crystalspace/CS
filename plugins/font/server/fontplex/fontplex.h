@@ -22,6 +22,7 @@
 #ifndef __CS_FONTPLEX_H__
 #define __CS_FONTPLEX_H__
 
+#include "csutil/scf_implementation.h"
 #include "ivideo/fontserv.h"
 #include "csutil/weakref.h"
 #include "iutil/eventh.h"
@@ -30,20 +31,24 @@
 #include "csutil/cfgacc.h"
 #include "csutil/hash.h"
 
+namespace cspluginFontplex
+{
+
 class csFontServerMultiplexer;
 class csFontPlexer;
 
 struct csFontLoadOrderEntry
 {
-  char* fontName;
-  csRef<iFontServer> server;
+  csString fontName;
+  csRefArray<iFontServer> servers;
+  bool fallback;
 
   bool loaded;
   csRef<iFont> font;
   float scale;
 
-  csFontLoadOrderEntry (iFontServer* server, const char* fontName,
-    float scale);
+  csFontLoadOrderEntry (csRefArray<iFontServer> servers, const char* fontName,
+    float scale, bool fallback);
   csFontLoadOrderEntry (const csFontLoadOrderEntry& other);
   ~csFontLoadOrderEntry ();
 
@@ -58,24 +63,23 @@ public:
   void AppendSmart (const csFontLoaderOrder& other);
 };
 
-class csFontPlexer : public iFont
+class csFontPlexer : public scfImplementation1<csFontPlexer, 
+                                               iFont>
 {
 private:
   friend struct csFontLoadOrderEntry;
 
-  csRef<csFontServerMultiplexer> parent;
-  char* fontid;
+  csString fontid;
   float size;
-  iFont* primaryFont;
 
   csFontLoaderOrder* order;
   csRefArray<iFontDeleteNotify> DeleteCallbacks;
 public:
-  SCF_DECLARE_IBASE;
+  csRef<csFontServerMultiplexer> parent;
+  iFont* primaryFont;
 
   csFontPlexer (csFontServerMultiplexer* parent, 
-    char* fontid, iFont* primary, 
-    float size, csFontLoaderOrder* order);
+    const char* fontid, float size, csFontLoaderOrder* order);
   virtual ~csFontPlexer ();
 
   virtual float GetSize ();
@@ -120,36 +124,47 @@ public:
  * ...
  * </code>
  */
-class csFontServerMultiplexer : public iFontServer
+class csFontServerMultiplexer : 
+  public scfImplementation2<csFontServerMultiplexer, 
+                            iFontServer,
+                            iComponent>
 {
 private:
   iObjectRegistry* object_reg;
   csRefArray<iFontServer> fontservers;
 
   csConfigAccess config;
-  const char *fontset;
+  csString fontset;
 
   struct FontServerMapEntry
   {
     csRef<iFontServer> server;
-    char* name;
+    csString name;
 
     FontServerMapEntry (const char* name, iFontServer* server);
     FontServerMapEntry (const FontServerMapEntry& source);
     ~FontServerMapEntry ();
   };
   csHash<FontServerMapEntry, csStrKey> fontServerMap;
-  csHash<iFont*, const char*> loadedFonts;
+  csHash<iFont*, csString> loadedFonts;
 
   csFontLoaderOrder fallbackOrder;
+  bool emitErrors;
+
+  int GetErrorSeverity () const
+  { 
+    return emitErrors ? 
+      CS_REPORTER_SEVERITY_WARNING : CS_REPORTER_SEVERITY_NOTIFY; 
+  }
+  csHash<int, csString> fontsNotFound;
 
   void ParseFontLoaderOrder (csFontLoaderOrder& order, 
-    const char* str);
+    const char* str, bool fallback);
   csPtr<iFontServer> ResolveFontServer (const char* name);
 public:
-  void NotifyDelete (csFontPlexer* font, char* fontid);
+  void ReportFontNotFound (bool fallback, const char* font);
 
-  SCF_DECLARE_IBASE;
+  void NotifyDelete (csFontPlexer* font, const char* fontid);
 
   /// Create the plugin object
   csFontServerMultiplexer (iBase *pParent);
@@ -165,12 +180,12 @@ public:
    */
   virtual csPtr<iFont> LoadFont (const char *filename, float size = 10.0f);
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csFontServerMultiplexer);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
+  virtual void SetWarnOnError (bool enable)
+  { emitErrors = enable; }
+  virtual bool GetWarnOnError ()
+  { return emitErrors; }
 };
+
+} // namespace cspluginFontplex
 
 #endif // __CS_FONTPLEX_H__

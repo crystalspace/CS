@@ -1064,6 +1064,15 @@ public:
   /** Returns an Iterator which traverses the array. */
   Iterator GetIterator() const
   { return Iterator(*this); }
+  
+  /// Check if this array has the exact same contents as \a other.
+  bool operator== (const csArray& other) const
+  {
+    if (other.GetSize() != GetSize()) return false;
+    for (size_t i = 0; i < GetSize(); i++)
+      if (Get (i) != other[i]) return false;
+    return true;
+  }
 };
 
 /**

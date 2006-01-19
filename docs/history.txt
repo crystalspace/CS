@@ -45,6 +45,7 @@ chronological order.
 		- transp
 		- alpha (only one with back2front sorting)
 		- final
+	- res toned down file-not-found warnings when using the font plexer.
 18-Jan-2006
 	- Jorrit fixed a bug as reported by rvl_ involving a memory leak
 	  when looking at space warping portals.
