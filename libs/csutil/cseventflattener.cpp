@@ -180,18 +180,18 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
   csMemFile b (buffer, size, csMemFile::DISPOSITION_IGNORE);
   
   ui32 = CS_CRYSTAL_PROTOCOL;
-  ui32 = csConvertEndian(ui32);
+  ui32 = csLittleEndian::Convert (ui32);
   b.Write((char *)&ui32, sizeof(uint32));           // protocol version
   ui64 = size;
-  ui64 = csConvertEndian(ui64);
+  ui64 = csLittleEndian::Convert (ui64);
   b.Write((char *)&ui64, sizeof(uint64));           // packet size
-  ui32 = csConvertEndian((uint32)event->Time);
+  ui32 = csLittleEndian::Convert ((uint32)event->Time);
   b.Write((char *)&ui32, sizeof(uint32));           // iEvent.Time
   b.Write((char *)&event->Broadcast, sizeof(uint8));// iEvent.Broadcast flag
   const char *nameStr = csEventNameRegistry::GetString(object_reg,
   	event->GetName());
   ui16 = (uint16)strlen (nameStr);
-  ui16 = csConvertEndian(ui16);
+  ui16 = csLittleEndian::Convert (ui16);
   b.Write((char *)&ui16, sizeof(uint16));           // Event textual name length
   b.Write(nameStr, strlen(nameStr)); // Event textual name
 
@@ -210,7 +210,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 	{
 	  // 2 byte name length (little endian)
 	  ui16 = (uint16)strlen(name);
-	  ui16 = csConvertEndian(ui16);
+	  ui16 = csLittleEndian::Convert (ui16);
 	  b.Write((char *)&ui16, sizeof(int16));
 	  // XX byte name
 	  b.Write(name, ui16);
@@ -229,7 +229,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 	    return innerResult;
 
 	  // 8 byte data length
-	  ui64 = csConvertEndian ((uint64)innerSize);
+	  ui64 = csLittleEndian::Convert ((uint64)innerSize);
 	  b.Write((char *)&ui64, sizeof(uint64));
 
 	  // XX byte data
@@ -249,7 +249,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 
 	  // 2 byte name length (little endian)
 	  ui16 = (uint16)strlen(name);
-	  ui16 = csConvertEndian(ui16);
+	  ui16 = csLittleEndian::Convert (ui16);
 	  b.Write((char *)&ui16, sizeof(int16));
 	  // XX byte name
 	  b.Write(name, ui16);
@@ -258,7 +258,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 	  b.Write((char *)&ui8, sizeof(uint8));
 	  // 4 byte data length
 	  ui64 = dataSize;
-	  ui64 = csConvertEndian (ui64);
+	  ui64 = csLittleEndian::Convert (ui64);
 	  b.Write((char *)&ui64, sizeof(uint64));
 	  // XX byte data
 	  b.Write ((char*)data, dataSize);
@@ -271,7 +271,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 	    return csEventFlattenerErrorAttributeRetrieval;
 	  // 2 byte name length (little endian)
 	  ui16 = (uint16)strlen(name);
-	  ui16 = csConvertEndian(ui16);
+	  ui16 = csLittleEndian::Convert (ui16);
 	  b.Write((char *)&ui16, sizeof(int16));
 	  // XX byte name
 	  b.Write(name, ui16);
@@ -281,7 +281,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 	    ui8 = CS_DATATYPE_INT64;
 	    b.Write((char *)&ui8, sizeof(uint8));
 	    // 4 byte data
-	    i64 = csConvertEndian(val);
+	    i64 = csLittleEndian::Convert (val);
 	    b.Write((char *)&i64, sizeof(int64));
 	    break;
 	  }
@@ -291,7 +291,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 	    ui8 = CS_DATATYPE_INT32;
 	    b.Write((char *)&ui8, sizeof(uint8));
 	    // 4 byte data
-	    i32 = csConvertEndian((int32)val);
+	    i32 = csLittleEndian::Convert ((int32)val);
 	    b.Write((char *)&i32, sizeof(int32));
 	    break;
 	  }
@@ -301,7 +301,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 	    ui8 = CS_DATATYPE_INT16;
 	    b.Write((char *)&ui8, sizeof(uint8));
 	    // 2 byte data
-	    i16 = csConvertEndian((int16)val);
+	    i16 = csLittleEndian::Convert ((int16)val);
 	    b.Write((char *)&i16, sizeof(int16));
 	    break;
 	  }
@@ -323,7 +323,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 	    return csEventFlattenerErrorAttributeRetrieval;
 	  // 2 byte name length (little endian)
 	  ui16 = (uint16)strlen(name);
-	  ui16 = csConvertEndian(ui16);
+	  ui16 = csLittleEndian::Convert (ui16);
 	  b.Write((char *)&ui16, sizeof(int16));
 	  // XX byte name
 	  b.Write(name, ui16);
@@ -333,7 +333,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 	    ui8 = CS_DATATYPE_UINT64;
 	    b.Write((char *)&ui8, sizeof(uint8));
 	    // 4 byte data
-	    ui64 = csConvertEndian(val);
+	    ui64 = csLittleEndian::Convert (val);
 	    b.Write((char *)&ui64, sizeof(uint64));
 	    break;
 	  }
@@ -343,7 +343,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 	    ui8 = CS_DATATYPE_UINT32;
 	    b.Write((char *)&ui8, sizeof(uint8));
 	    // 4 byte data
-	    ui32 = csConvertEndian((uint32)val);
+	    ui32 = csLittleEndian::Convert ((uint32)val);
 	    b.Write((char *)&ui32, sizeof(uint32));
 	    break;
 	  }
@@ -353,7 +353,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 	    ui8 = CS_DATATYPE_UINT16;
 	    b.Write((char *)&ui8, sizeof(uint8));
 	    // 2 byte data
-	    ui16 = csConvertEndian((uint16)val);
+	    ui16 = csLittleEndian::Convert ((uint16)val);
 	    b.Write((char *)&ui16, sizeof(uint16));
 	    break;
 	  }
@@ -375,7 +375,7 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 	    return csEventFlattenerErrorAttributeRetrieval;
 	  // 2 byte name length (little endian)
 	  ui16 = (uint16)strlen(name);
-	  ui16 = csConvertEndian(ui16);
+	  ui16 = csLittleEndian::Convert (ui16);
 	  b.Write((char *)&ui16, sizeof(int16));
 	  // XX byte name
 	  b.Write(name, ui16);
@@ -413,19 +413,19 @@ csEventFlattenerError csEventFlattener::Unflatten (iObjectRegistry *object_reg,
   size_t size;
 
   b.Read((char *)&ui32, sizeof(ui32));                 // protocol version
-  ui32 = csConvertEndian(ui32);
+  ui32 = csLittleEndian::Convert (ui32);
   if (ui32 != CS_CRYSTAL_PROTOCOL)
   {
     //csPrintf("protocol version invalid: %" PRIX32 "\n", ui32);
     return csEventFlattenerErrorWrongFormat;
   }
   b.Read((char *)&ui64, sizeof(uint64));               // packet size
-  size = csConvertEndian (ui64);
+  size = csLittleEndian::Convert (ui64);
   b.Read((char *)&ui32, sizeof(uint32));               // iEvent.Time
-  event->Time = csConvertEndian(ui32);
+  event->Time = csLittleEndian::Convert (ui32);
   b.Read((char *)&event->Broadcast, sizeof(uint8));    // iEvent.Broadcast flag
   b.Read((char *)&ui16, sizeof(uint16));               // textual name length
-  ui16 = csConvertEndian (ui16);
+  ui16 = csLittleEndian::Convert (ui16);
   char *buf = (char *) malloc(ui16+1);
   b.Read(buf, ui16);                                   // textual name
   buf[ui16] = '\0';
@@ -435,7 +435,7 @@ csEventFlattenerError csEventFlattener::Unflatten (iObjectRegistry *object_reg,
   while (b.GetPos() < size)
   {
     b.Read((char *)&ui16, sizeof(uint16));
-    ui16 = csConvertEndian(ui16);
+    ui16 = csLittleEndian::Convert (ui16);
     name = new char[ui16+1];
     b.Read(name, ui16);
     name[ui16] = 0;
@@ -453,32 +453,32 @@ csEventFlattenerError csEventFlattener::Unflatten (iObjectRegistry *object_reg,
         break;
       case CS_DATATYPE_INT16:
         b.Read((char *)&i16, sizeof(int16));
-        i16 = csConvertEndian(i16);
+        i16 = csLittleEndian::Convert (i16);
         event->Add (name, i16);
         break;
       case CS_DATATYPE_UINT16:
         b.Read((char *)&ui16, sizeof(uint16));
-        ui16 = csConvertEndian(ui16);
+        ui16 = csLittleEndian::Convert (ui16);
         event->Add (name, ui16);
         break;
       case CS_DATATYPE_INT32:
         b.Read((char *)&i32, sizeof(int32));
-        i32 = csConvertEndian(i32);
+        i32 = csLittleEndian::Convert (i32);
         event->Add (name, i32);
         break;
       case CS_DATATYPE_UINT32:
         b.Read((char *)&ui32, sizeof(uint32));
-        ui32 = csConvertEndian(ui32);
+        ui32 = csLittleEndian::Convert (ui32);
         event->Add (name, ui32);
         break;
       case CS_DATATYPE_INT64:
         b.Read((char *)&i64, sizeof(int64));
-        i64 = csConvertEndian(i64);
+        i64 = csLittleEndian::Convert (i64);
         event->Add (name, i64);
         break;
       case CS_DATATYPE_UINT64:
         b.Read((char *)&ui64, sizeof(uint64));
-        ui64 = csConvertEndian(ui64);
+        ui64 = csLittleEndian::Convert (ui64);
         event->Add (name, ui64);
         break;
       case CS_DATATYPE_DOUBLE:
@@ -489,7 +489,7 @@ csEventFlattenerError csEventFlattener::Unflatten (iObjectRegistry *object_reg,
       case CS_DATATYPE_DATABUFFER:
         {
           b.Read((char *)&ui64, sizeof(uint64));
-          ui64 = csConvertEndian(ui64);
+          ui64 = csLittleEndian::Convert (ui64);
           char* data = new char[ui64];
           b.Read(data, ui64);
           event->Add (name, data, ui64);
@@ -499,7 +499,7 @@ csEventFlattenerError csEventFlattener::Unflatten (iObjectRegistry *object_reg,
       case CS_DATATYPE_EVENT:
         {
           b.Read((char *)&ui64, sizeof (uint64));
-          ui64 = csConvertEndian (ui64);
+          ui64 = csLittleEndian::Convert (ui64);
 	  csRef<iEvent> e;
 	  e.AttachNew (new csEvent ());
 	  event->Add (name, e);

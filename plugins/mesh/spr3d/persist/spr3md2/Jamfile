@@ -6,3 +6,4 @@ Plugin spr3md2
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith spr3md2 : crystalspace ;
+CompileGroups spr3md2 : meshes ;

@@ -99,6 +99,18 @@ bool csSprite3DBinFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 const char binsprMagic[4] = {'5','1', '5','0'};
 
+static int GetInt32 (char*& p)
+{
+  int i = csLittleEndian::Convert (csGetFromAddress::Int32 (p));
+  p += sizeof(int32);
+  return i;
+}
+
+static float GetFloat (char*& p)
+{
+  return csLongToFloat (GetInt32 (p));
+}
+
 /**
  * Loads a csSprite3DBinFactoryLoader
  */
@@ -181,7 +193,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (iDataBuffer* data,
   p += strlen(mat_name) + 1;
 
   // Read the number of frames
-  int frame_count = csConvertEndian(*((int32 *)p)); p += sizeof(int);
+  int frame_count = GetInt32 (p);
 
   // Read all the frames
   int i;
@@ -206,22 +218,22 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (iDataBuffer* data,
     }
 
     // Read the number of vertecies
-    int vertex_count = csConvertEndian(*((int32 *)p));
+    int vertex_count = GetInt32 (p);
     p += sizeof(int);
 
     int j;
     for (j = 0; j < vertex_count; j++)
     {
-      x = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
-      y = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
-      z = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
-      u = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
-      v = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
+      x = GetFloat (p);
+      y = GetFloat (p);
+      z = GetFloat (p);
+      u = GetFloat (p);
+      v = GetFloat (p);
       if (has_normals)
       {
-	nx = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
-	ny = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
-	nz = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
+	nx = GetFloat (p);
+	ny = GetFloat (p);
+	nz = GetFloat (p);
       }
 
       // check if it's the first frame
@@ -253,7 +265,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (iDataBuffer* data,
   }
 
   // Read the number of actions
-  int action_count = csConvertEndian(*((int32 *)p)); p += sizeof(int);
+  int action_count = GetInt32 (p);
 
 
   // Read each action
@@ -267,7 +279,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (iDataBuffer* data,
 
     act->SetName (action_name);
 
-    int as = csConvertEndian(*((int32 *)p)); p += sizeof(int);
+    int as = GetInt32 (p);
 
     int j;
     for (j = 0; j < as; j++)
@@ -287,30 +299,30 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (iDataBuffer* data,
       }
 
       // Read the delay
-      int delay = csConvertEndian(*((int32 *)p)); p += sizeof(int);
+      int delay = GetInt32 (p);
       float disp = 0;
       if (!delay)  // read optional displacement if no delay
       {
-        disp = csConvertEndian(csLongToFloat(*((uint32*)p))); p += sizeof(float);
+        disp = GetFloat (p);
       }
       act->AddFrame (ff, delay,disp);
     }
   }
 
   // Read the number of triangles
-  int tri_count = csConvertEndian(*((int32 *)p)); p += sizeof(int);
+  int tri_count = GetInt32 (p);
 
   for(i=0; i<tri_count; i++)
   {
-    int a = csConvertEndian(*((int32 *)p)); p += sizeof(int);
-    int b = csConvertEndian(*((int32 *)p)); p += sizeof(int);
-    int c = csConvertEndian(*((int32 *)p)); p += sizeof(int);
+    int a = GetInt32 (p);
+    int b = GetInt32 (p);
+    int c = GetInt32 (p);
 
     spr3dLook->AddTriangle (a, b, c);
   }
 
   // Read the number of sockets
-  int socket_count = csConvertEndian(*((int32 *)p)); p += sizeof(int);
+  int socket_count = GetInt32 (p);
 
   for(i=0; i<socket_count; i++)
   {
@@ -318,7 +330,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (iDataBuffer* data,
     strcpy(name, p);
     p += strlen(name) + 1;
  
-    int a = csConvertEndian(*((int32 *)p)); p += sizeof(int);
+    int a = GetInt32 (p);
  
     iSpriteSocket* socket = spr3dLook->AddSocket();
     socket->SetName(name);
@@ -362,6 +374,16 @@ bool csSprite3DBinFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+static void WriteInt32 (iFile* file, int i)
+{
+  int j = csLittleEndian::Convert (int32 (i));
+  file->Write ((char*)&j, sizeof (int32));
+}
+
+static void WriteFloat (iFile* file, float f)
+{
+  WriteInt32 (file, csFloatToLong (f));
+}
 
 /**
  * Saves a csSprite3DBinFactorySaver
@@ -389,9 +411,7 @@ bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file,
   file->Write (name, strlen(name) + 1);
 
   // Write the number of frames
-  int frame_count = state->GetFrameCount();
-  int fc = csConvertEndian((int32)frame_count);
-  file->Write ((char *)&fc, 4);
+  WriteInt32 (file, state->GetFrameCount());
 
   // Write all the frames
   int i,j;
@@ -405,8 +425,7 @@ bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file,
 
     // Write the number of verts
     int vertex_count = state->GetVertexCount();
-    int vc = csConvertEndian((int32)vertex_count);
-    file->Write ((char *)&vc, 4);
+    WriteInt32 (file, vertex_count);
 
     // Get the animation and textures indicies for the frame
     int anm_idx = frame->GetAnmIndex ();
@@ -415,30 +434,20 @@ bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file,
     // Write out each vertex and texcel coord
     for (j=0; j<vertex_count; j++)
     {
-      uint32 v;
-      v = csConvertEndian((uint32)csFloatToLong(state->GetVertex(anm_idx, j).x));
-      file->Write ((char *)&v, 4);
-      v = csConvertEndian((uint32)csFloatToLong(state->GetVertex(anm_idx, j).y));
-      file->Write ((char *)&v, 4);
-      v = csConvertEndian((uint32)csFloatToLong(state->GetVertex(anm_idx, j).z));
-      file->Write ((char *)&v, 4);
-      v = csConvertEndian((uint32)csFloatToLong(state->GetTexel(tex_idx, j).x));
-      file->Write ((char *)&v, 4);
-      v = csConvertEndian((uint32)csFloatToLong(state->GetTexel(tex_idx, j).y));
-      file->Write ((char *)&v, 4);
-      v = csConvertEndian((uint32)csFloatToLong(state->GetNormal(anm_idx, j).x));
-      file->Write ((char *)&v, 4);
-      v = csConvertEndian((uint32)csFloatToLong(state->GetNormal(anm_idx, j).y));
-      file->Write ((char *)&v, 4);
-      v = csConvertEndian((uint32)csFloatToLong(state->GetNormal(anm_idx, j).z));
-      file->Write ((char *)&v, 4);
+      WriteFloat (file, state->GetVertex(anm_idx, j).x);
+      WriteFloat (file, state->GetVertex(anm_idx, j).y);
+      WriteFloat (file, state->GetVertex(anm_idx, j).z);
+      WriteFloat (file, state->GetTexel(tex_idx, j).x);
+      WriteFloat (file, state->GetTexel(tex_idx, j).y);
+      WriteFloat (file, state->GetNormal(anm_idx, j).x);
+      WriteFloat (file, state->GetNormal(anm_idx, j).y);
+      WriteFloat (file, state->GetNormal(anm_idx, j).z);
     }
   }
 
   // Write out the number of actions
   int action_count = state->GetActionCount();
-  int ac = csConvertEndian((int32)action_count);
-  file->Write ((char *)&ac, 4);
+  WriteInt32 (file, action_count);
 
   // Write out each action
   for(i=0; i<action_count; i++)
@@ -451,8 +460,7 @@ bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file,
 
     // Write out the number of frames
     int action_frame_count = action->GetFrameCount();
-    int afc = csConvertEndian((int32)action_frame_count);
-    file->Write ((char *)&afc, 4);
+    WriteInt32 (file, action_frame_count);
 
     // Write the frame name, delay tuples
     for (j=0; j<action_frame_count; j++)
@@ -461,47 +469,37 @@ bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file,
       file->Write (name, strlen(name) + 1);
 
       int frame_delay = action->GetFrameDelay(j);
-      int fd = csConvertEndian((int32)frame_delay);
-      file->Write ((char *)&fd, 4);
+      WriteInt32 (file, frame_delay);
       float disp = 0;
       if (!frame_delay)  // write optional displacement if no delay
       {
         disp = action->GetFrameDisplacement(j);
-	uint32 ce_disp = csConvertEndian((uint32)csFloatToLong(disp));
-        file->Write ((char *)&ce_disp, 4);
+	WriteFloat (file, disp);
       }
     }
   }
 
   // Write out the number of triangles
   int tri_count = state->GetTriangleCount();
-  int tc = csConvertEndian((int32)tri_count);
-  file->Write ((char *)&tc, 4);
+  WriteInt32 (file, tri_count);
 
   for (i=0; i<tri_count; i++)
   {
-    int idx;
-    idx = csConvertEndian((int32)state->GetTriangle(i).a);
-    file->Write ((char *)&idx, 4);
-    idx = csConvertEndian((int32)state->GetTriangle(i).b);
-    file->Write ((char *)&idx, 4);
-    idx = csConvertEndian((int32)state->GetTriangle(i).c);
-    file->Write ((char *)&idx, 4);
+    WriteInt32 (file, state->GetTriangle(i).a);
+    WriteInt32 (file, state->GetTriangle(i).b);
+    WriteInt32 (file, state->GetTriangle(i).c);
   }
 
   // Write out the number of sockets
   int socket_count = state->GetSocketCount();
-  int sc = csConvertEndian((int32)socket_count);
-  file->Write ((char *)&sc, 4);
+  WriteInt32 (file, socket_count);
 
   for (i=0; i<socket_count; i++)
   {
     name = state->GetSocket(i)->GetName();
     file->Write (name, strlen(name) + 1);
 
-    int idx;
-    idx = csConvertEndian((int32)state->GetSocket(i)->GetTriangleIndex());
-    file->Write ((char *)&idx, 4);
+    WriteInt32 (file, state->GetSocket(i)->GetTriangleIndex());
   }
   // [res] the following doesn't matter as the normals are saved:
   /// @@@ Cannot retrieve smoothing information.

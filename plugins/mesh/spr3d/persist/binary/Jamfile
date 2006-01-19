@@ -6,3 +6,4 @@ Plugin spr3dbin
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith spr3dbin : crystalspace ;
+CompileGroups spr3dbin : meshes ;

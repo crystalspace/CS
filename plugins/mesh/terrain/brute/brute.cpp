@@ -847,7 +847,7 @@ bool csTerrainObject::ReadCDLODFromCache ()
 
   uint32 cache_cd_res;
   cf->Read ((char*)&cache_cd_res, 4);
-  cache_cd_res = csConvertEndian (cache_cd_res);
+  cache_cd_res = csLittleEndian::Convert (cache_cd_res);
   if ((int)cache_cd_res != cd_resolution)
   {
     if (verbose)
@@ -859,15 +859,15 @@ bool csTerrainObject::ReadCDLODFromCache ()
 
   uint32 ptc;
   cf->Read ((char*)&ptc, 4);
-  polymesh_tri_count = (int)csConvertEndian (ptc);
+  polymesh_tri_count = (int)csLittleEndian::Convert (ptc);
   polymesh_triangles = new csTriangle [polymesh_tri_count];
 
   for (int i = 0 ; i < polymesh_tri_count ; i++)
   {
     uint32 a, b, c;
-    cf->Read ((char*)&a, 4); a = csConvertEndian (a);
-    cf->Read ((char*)&b, 4); b = csConvertEndian (b);
-    cf->Read ((char*)&c, 4); c = csConvertEndian (c);
+    cf->Read ((char*)&a, 4); a = csLittleEndian::Convert (a);
+    cf->Read ((char*)&b, 4); b = csLittleEndian::Convert (b);
+    cf->Read ((char*)&c, 4); c = csLittleEndian::Convert (c);
     polymesh_triangles[i].a = a;
     polymesh_triangles[i].b = b;
     polymesh_triangles[i].c = c;
@@ -892,20 +892,20 @@ void csTerrainObject::WriteCDLODToCache ()
   mf->Write ((char const*) header, 4);
 
   uint32 cd_res = (uint32)cd_resolution;
-  cd_res = csConvertEndian (cd_res);
+  cd_res = csLittleEndian::Convert (cd_res);
   mf->Write ((char const*) &cd_res, 4);
 
   uint32 tri_count = (uint32)polymesh_tri_count;
-  tri_count = csConvertEndian (tri_count);
+  tri_count = csLittleEndian::Convert (tri_count);
   mf->Write ((char const*) &tri_count, 4);
 
   int i;
   for (i = 0 ; i < polymesh_tri_count ; i++)
   {
     uint32 a, b, c;
-    a = (uint32)polymesh_triangles[i].a; a = csConvertEndian (a);
-    b = (uint32)polymesh_triangles[i].b; b = csConvertEndian (b);
-    c = (uint32)polymesh_triangles[i].c; c = csConvertEndian (c);
+    a = (uint32)polymesh_triangles[i].a; a = csLittleEndian::Convert (a);
+    b = (uint32)polymesh_triangles[i].b; b = csLittleEndian::Convert (b);
+    c = (uint32)polymesh_triangles[i].c; c = csLittleEndian::Convert (c);
     mf->Write ((char const*) &a, 4);
     mf->Write ((char const*) &b, 4);
     mf->Write ((char const*) &c, 4);
@@ -1334,9 +1334,9 @@ char* csTerrainObject::GenerateCacheName ()
   csMemFile mf;
   mf.Write ("bruteblock", 8);
   uint32 l;
-  l = csConvertEndian ((uint32)pFactory->hm_x);
+  l = csLittleEndian::Convert ((uint32)pFactory->hm_x);
   mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((uint32)pFactory->hm_y);
+  l = csLittleEndian::Convert ((uint32)pFactory->hm_y);
   mf.Write ((char*)&l, 4);
 
   if (logparent)

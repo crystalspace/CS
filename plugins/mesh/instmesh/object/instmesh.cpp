@@ -415,9 +415,9 @@ char* csInstmeshMeshObject::GenerateCacheName ()
   csMemFile mf;
   mf.Write ("instmesh", 8);
   uint32 l;
-  l = csConvertEndian ((uint32)factory->GetVertexCount ());
+  l = csLittleEndian::Convert ((uint32)factory->GetVertexCount ());
   mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((uint32)factory->GetTriangleCount ());
+  l = csLittleEndian::Convert ((uint32)factory->GetTriangleCount ());
   mf.Write ((char*)&l, 4);
 
   if (logparent)

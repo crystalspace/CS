@@ -1598,9 +1598,9 @@ char* csThing::GenerateCacheName ()
 
   csMemFile mf;
   int32 l;
-  l = csConvertEndian ((int32)static_data->num_vertices);
+  l = csLittleEndian::Convert ((int32)static_data->num_vertices);
   mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)polygons.Length ());
+  l = csLittleEndian::Convert ((int32)polygons.Length ());
   mf.Write ((char*)&l, 4);
 
   if (logparent)

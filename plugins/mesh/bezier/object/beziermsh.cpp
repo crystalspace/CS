@@ -257,9 +257,9 @@ char* csBezierMesh::GenerateCacheName ()
 
   csMemFile mf;
   int32 l;
-  l = csConvertEndian ((int32)static_data->num_curve_vertices);
+  l = csLittleEndian::Convert ((int32)static_data->num_curve_vertices);
   mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)curves.Length ());
+  l = csLittleEndian::Convert ((int32)curves.Length ());
   mf.Write ((char*)&l, 4);
 
   if (logparent)

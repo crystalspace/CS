@@ -222,8 +222,8 @@ const char* csCurveLightMap::ReadFromCache (
     return "File too short while reading lightmap info header!";
 
   // Endian convert the file header.
-  ps.lm_size = csConvertEndian (ps.lm_size);
-  ps.lm_cnt = csConvertEndian (ps.lm_cnt);
+  ps.lm_size = csLittleEndian::Convert (ps.lm_size);
+  ps.lm_cnt = csLittleEndian::Convert (ps.lm_cnt);
 
   //-------------------------------
   // From this point on we will try to skip the wrong lightmap
@@ -265,11 +265,11 @@ const char* csCurveLightMap::ReadFromCache (
         return error_buf;
       if (file->Read ((char*)&lh.dyn_cnt, 4) != 4)
         return error_buf;
-      lh.dyn_cnt = csConvertEndian (lh.dyn_cnt);
+      lh.dyn_cnt = csLittleEndian::Convert (lh.dyn_cnt);
       uint32 size;
       if (file->Read ((char*)&size, sizeof (size)) != sizeof (size))
         return error_buf;
-      size = csConvertEndian (size);
+      size = csLittleEndian::Convert (size);
       data = new char[size];
       file->Read (data, size);
       delete[] data;
@@ -310,7 +310,7 @@ const char* csCurveLightMap::ReadFromCache (
     return "File too short at start of dynamic lightmaps!";
   if (file->Read ((char*)&lh.dyn_cnt, 4) != 4)
     return "File too short at start of dynamic lightmaps!";
-  lh.dyn_cnt = csConvertEndian (lh.dyn_cnt);
+  lh.dyn_cnt = csLittleEndian::Convert (lh.dyn_cnt);
 
   uint32 size;
   if (file->Read ((char*)&size, sizeof (size)) != sizeof (size))
@@ -319,7 +319,7 @@ const char* csCurveLightMap::ReadFromCache (
   // Calculate the expected size and see if it matches with the
   // size we still have in our data buffer. If it doesn't match
   // we don't load anything.
-  size = csConvertEndian (size);
+  size = csLittleEndian::Convert (size);
 
   unsigned int expected_size;
   expected_size = lh.dyn_cnt * (sizeof (LightSave) + lm_size);
@@ -386,9 +386,9 @@ void csCurveLightMap::Cache (
   if (file->Write ("lmpn", 4) != 4)
     return;
 
-  ps.lm_size = csConvertEndian ((int32)lm_size);
+  ps.lm_size = csLittleEndian::Convert ((int32)lm_size);
   ps.lm_cnt = 111;          // Dummy!
-  ps.lm_cnt = csConvertEndian (ps.lm_cnt);
+  ps.lm_cnt = csLittleEndian::Convert (ps.lm_cnt);
 
   //-------------------------------
   // Write the normal lightmap data.
@@ -425,12 +425,12 @@ void csCurveLightMap::Cache (
     smap = first_smap;
 
     file->Write (lh.header, 4);
-    uint32 l = csConvertEndian (lh.dyn_cnt);
+    uint32 l = csLittleEndian::Convert (lh.dyn_cnt);
     file->Write ((char *) &l, 4);
 
     // unsigned long == ls.light_id.
     uint32 size = lh.dyn_cnt * (sizeof (LightSave) + lm_size);
-    uint32 s = csConvertEndian (size);
+    uint32 s = csLittleEndian::Convert (size);
     file->Write ((char*)&s, sizeof (s));
 
     while (smap)

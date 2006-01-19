@@ -25,6 +25,8 @@ chronological order.
 		iMeshFactoryWrapper* ff = l->Load ("model", "/lib/model.3ds");
 	- Jorrit updated the documentation to document the new way to load
 	  models.
+	- res changed some code to use csLittleEndian::Convert() for endian
+	  conversions.
 18-Jan-2006
 	- Jorrit fixed a bug as reported by rvl_ involving a memory leak
 	  when looking at space warping portals.

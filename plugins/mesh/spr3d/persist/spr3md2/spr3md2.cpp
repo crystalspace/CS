@@ -143,12 +143,8 @@ bool csSprite3DMD2FactoryLoader::Initialize (iObjectRegistry* object_reg)
 static int const MAX_DATAELEMENT_SIZE = 8192;
 
 // size of various MD2 elements
-static int const SIZEOF_MD2SHORT = 2;
-static int const SIZEOF_MD2LONG = 4;
-static int const SIZEOF_MD2FLOAT = 4;
 static int const SIZEOF_MD2SKINNAME = 64;
 static int const SIZEOF_MD2FRAMENAME = 16;
-static int const SIZEOF_MD2HEADER = 15*SIZEOF_MD2LONG;
 
 static const float SCALE_FACTOR = 0.025f;
 static const float FRAME_DELAY = 0.1f;
@@ -156,23 +152,23 @@ static const float FRAME_DELAY = 0.1f;
 struct csMD2Header
 {
   // width and height of skin texture in pixels
-  long SkinWidth, SkinHeight;
+  int32 SkinWidth, SkinHeight;
   // size of each frame int the sprite, in pixels
-  long FrameSize;
+  int32 FrameSize;
   // number of skins, vertices, texels, triangles, glcmds(?), frames
-  long SkinCount, VertexCount, TexelCount, TriangleCount, glcmds, FrameCount;
+  int32 SkinCount, VertexCount, TexelCount, TriangleCount, glcmds, FrameCount;
   // offset of the skin information in the file
-  long SkinOffset;
+  int32 SkinOffset;
   // offset of the texel information in the file
-  long TexelOffset;
+  int32 TexelOffset;
   // offset of the triangle information in the file
-  long TriangleOffset;
+  int32 TriangleOffset;
   // offset of the frame information in the file
-  long FramesOffset;
+  int32 FramesOffset;
   // offset of the GL commands information in the file
-  long GLCommandsOffset;
+  int32 GLCommandsOffset;
   // total file size
-  long FileSize;
+  int32 FileSize;
 };
 
 static bool CheckMD2Version (csFileReadHelper& in)
@@ -184,8 +180,8 @@ static bool CheckMD2Version (csFileReadHelper& in)
   uint32 FileID, FileVersion;
   in.ReadUInt32 (FileID);
   in.ReadUInt32 (FileVersion);
-  FileID = csLittleEndianLong (FileID);
-  FileVersion = csLittleEndianLong (FileVersion);
+  FileID = csLittleEndian::Convert (FileID);
+  FileVersion = csLittleEndian::Convert (FileVersion);
 
   if (FileID != ( ('2'<<24)+('P'<<16)+('D'<<8)+'I' ) )
     return false;
@@ -197,12 +193,13 @@ static bool CheckMD2Version (csFileReadHelper& in)
 }
 
 #define CS_MD2_READ(num,name)						\
-  hdr->name = csGetLittleEndianLong (buf + num * SIZEOF_MD2LONG);
+  hdr->name = csLittleEndian::Convert (csGetFromAddress::Int32 (	\
+    buf + num * sizeof (int32)));
 
 static void ReadMD2Header (csMD2Header *hdr, csFileReadHelper* in)
 {
-  char buf [SIZEOF_MD2HEADER];
-  in->GetFile()->Read (buf, SIZEOF_MD2HEADER);
+  char buf [sizeof (csMD2Header)];
+  in->GetFile()->Read (buf, sizeof (csMD2Header));
 
   CS_MD2_READ (0, SkinWidth);
   CS_MD2_READ (1, SkinHeight);
@@ -298,13 +295,15 @@ bool csSprite3DMD2FactoryLoader::Load (iSprite3DFactoryState* state,
   triangles.SetCapacity (Header.TriangleCount);
   for (i = 0; i < Header.TriangleCount; i++)
   {
-    in.GetFile()->Read ((char*)readbuffer, SIZEOF_MD2SHORT*6);
+    in.GetFile()->Read ((char*)readbuffer, sizeof (uint16)*6);
     csVertexTexel vt;
     size_t idx[3];
     for (int j = 0 ; j < 3 ; j++)
     {
-      vt.vt = csGetLittleEndianShort (readbuffer + j * SIZEOF_MD2SHORT);
-      vt.texel = csGetLittleEndianShort (readbuffer + (j+3) * SIZEOF_MD2SHORT);
+      vt.vt = csLittleEndian::Convert (csGetFromAddress::UInt16 (
+	readbuffer + j * sizeof (uint16)));
+      vt.texel = csLittleEndian::Convert (csGetFromAddress::UInt16 (
+	readbuffer + (j+3) * sizeof (uint16)));
       idx[j] = vertex_mapping.Get (vt, csArrayItemNotFound);
       if (idx[j] == csArrayItemNotFound)
       {
@@ -325,10 +324,12 @@ bool csSprite3DMD2FactoryLoader::Load (iSprite3DFactoryState* state,
   intexels.SetCapacity (Header.TexelCount);
   for (i = 0; i < Header.TexelCount; i++)
   {
-    in.GetFile()->Read ((char*)readbuffer, SIZEOF_MD2SHORT*2);
+    int16 x, y;
+    in.ReadInt16 (x);
+    in.ReadInt16 (y);
     intexels.Push (
-    	csVector2 (csGetLittleEndianShort(readbuffer)/(float)Header.SkinWidth,
-                   csGetLittleEndianShort(readbuffer+2)/(float)Header.SkinHeight));
+    	csVector2 (csLittleEndian::Convert (x)/(float)Header.SkinWidth,
+                   csLittleEndian::Convert (y)/(float)Header.SkinHeight));
   }
   // Now map the read texels to the real data.
   Texels.SetLength (mapped_vertices.Length ());
@@ -350,12 +351,18 @@ bool csSprite3DMD2FactoryLoader::Load (iSprite3DFactoryState* state,
 
     csVector3 scale, translate;
     // read in scale and translate info
-    in.GetFile()->Read ((char*)&scale, SIZEOF_MD2FLOAT*3);
-    in.GetFile()->Read ((char*)&translate, SIZEOF_MD2FLOAT*3);
-    for (j = 0; j < 3; j++)
     {
-      scale[j] = csConvertEndian (scale[j]);
-      translate[j] = csConvertEndian (translate[j]);
+      uint32 u;
+      for (j = 0; j < 3; j++)
+      {
+	in.ReadUInt32 (u);
+	scale[j] = csIEEEfloat::ToNative (csLittleEndian::Convert (u));
+      }
+      for (j = 0; j < 3; j++)
+      {
+	in.ReadUInt32 (u);
+	translate[j] = csIEEEfloat::ToNative (csLittleEndian::Convert (u));
+      }
     }
     scale *= SCALE_FACTOR;
     translate *= SCALE_FACTOR;

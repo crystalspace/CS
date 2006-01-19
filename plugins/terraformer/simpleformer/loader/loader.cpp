@@ -378,8 +378,10 @@ bool csSimpleFormerLoader::LoadHeightmap32 (iDocumentNode* child,
       child, "File '%s' is not a heightmap32 file", filename);
     return false;
   }
-  uint32 width = csGetLittleEndianLong (data); data += 4;
-  uint32 height = csGetLittleEndianLong (data); data += 4;
+  uint32 width = csLittleEndian::Convert (csGetFromAddress::UInt32 (data)); 
+  data += 4;
+  uint32 height = csLittleEndian::Convert (csGetFromAddress::UInt32 (data)); 
+  data += 4;
   if (buf->GetSize () != (4+4+4+ width*height*4))
   {
     const char *filename = child->GetContentsValue ();

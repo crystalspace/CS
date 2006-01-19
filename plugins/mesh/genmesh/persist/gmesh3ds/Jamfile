@@ -9,4 +9,5 @@ Plugin gmesh3ds
 ;
 LinkWith gmesh3ds : crystalspace ;
 ExternalLibs gmesh3ds : 3DS ;
+CompileGroups gmesh3ds :  meshes ;
 }
