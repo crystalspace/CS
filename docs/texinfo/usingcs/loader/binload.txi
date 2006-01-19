@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Binary XML, , Old Map File Format, Map Loader
+@node Binary XML, Model Loading, Old Map File Format, Map Loader
 @subsection Binary @sc{xml}
 @cindex @code{iDocumentSystem}
 @cindex @samp{docconv}

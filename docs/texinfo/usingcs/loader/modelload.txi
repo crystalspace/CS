@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Model Loading, , Old Map File Format, Map Loader
+@node Model Loading, , Binary XML, Map Loader
 @subsection Loading Models
 @cindex @code{iModelLoader}
 @cindex @sc{3ds}
