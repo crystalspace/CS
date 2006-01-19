@@ -309,7 +309,7 @@ Lib3dsFile* csGenmesh3DSFactoryLoader::LoadFileData (uint8* pBuffer, size_t size
   return pFile;
 }
 
-csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (void* data, size_t size,
+csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (iDataBuffer* buf,
 				       iStreamSource*,
 				       iLoaderContext* ldr_context,
 				       iBase* context)
@@ -345,11 +345,11 @@ csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (void* data, size_t size,
   if (!fact)
     fact = type->NewFactory ();
 
-  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState> (
-  	fact);
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
+  	(fact);
 
-  uint8* p = (uint8*)data;
-  bool rc = Load (ldr_context, gmstate, p, size);
+  uint8* p = buf->GetUint8 ();
+  bool rc = Load (ldr_context, gmstate, p, buf->GetSize ());
   if (!rc) return 0;
 
   size_t j;
