@@ -27,6 +27,8 @@ chronological order.
 	    - The scfImplementation::operator=() addition allows the removal
 	      of the less than beautiful "scfRefCount = 1" in 
 	      csCamera::Clone().
+	- Peter Amstutz added support for setting gravity and collision detection policies
+	  for sectors in the csvosa3dl plugin
 17-Jan-2006
 	- Jorrit fixed bruteblock->HitBeamObject() so that it correctly
 	  returns the resulting material.
