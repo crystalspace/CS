@@ -1116,11 +1116,17 @@ void csEngine::ClearRenderPriorities ()
   renderPrioritiesDirty = true;
   renderPriorities.DeleteAll ();
   renderPrioritySortflag.SetLength (0);
+  RegisterRenderPriority ("init", 1);
   RegisterRenderPriority ("sky", 2);
-  RegisterRenderPriority ("portal", 3);
-  RegisterRenderPriority ("wall", 4);
-  RegisterRenderPriority ("object", 6);
-  RegisterRenderPriority ("alpha", 8, CS_RENDPRI_SORT_BACK2FRONT);
+  RegisterRenderPriority ("sky2", 3);
+  RegisterRenderPriority ("portal", 4);
+  RegisterRenderPriority ("wall", 5);
+  RegisterRenderPriority ("wall2", 6);
+  RegisterRenderPriority ("object", 7);
+  RegisterRenderPriority ("object2", 8);
+  RegisterRenderPriority ("transp", 9);
+  RegisterRenderPriority ("alpha", 10, CS_RENDPRI_SORT_BACK2FRONT);
+  RegisterRenderPriority ("final", 11);
 }
 
 int csEngine::GetRenderPriorityCount () const

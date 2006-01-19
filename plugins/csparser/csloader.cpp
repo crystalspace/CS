@@ -1128,9 +1128,9 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
 	  return false;
 	break;
       case XMLTOKEN_RENDERPRIORITIES:
-	Engine->ClearRenderPriorities ();
-	if (!LoadRenderPriorities (child))
-	  return false;
+	ReportWarning (
+		"crystalspace.maploader.parse.region",
+		worldnode, "<renderpriorities> is no longer supported!");
 	break;
       case XMLTOKEN_ADDON:
 	if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, false, ssource))
@@ -2414,8 +2414,18 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         stemp->SetZBufMode (CS_ZBUF_TEST);
         break;
       case XMLTOKEN_PRIORITY:
-        stemp->SetRenderPriority (
-		Engine->GetRenderPriority (child->GetContentsValue ()));
+	{
+	  const char* priname = child->GetContentsValue ();
+	  long pri = Engine->GetRenderPriority (priname);
+	  if (pri == 0)
+	  {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+              child, "Unknown render priority '%s'!", priname);
+	    return false;
+	  }
+          stemp->SetRenderPriority (pri);
+	}
         break;
       case XMLTOKEN_SHADERVAR:
 	{
@@ -2610,13 +2620,23 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       }
       break;
     case XMLTOKEN_PRIORITY:
-      delete[] priority;
-      priority = csStrNew (child->GetContentsValue ());
-      if (recursive)
-        mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
-      else
-        mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
-      prioChanged = true;
+      {
+        delete[] priority;
+        priority = csStrNew (child->GetContentsValue ());
+	long pri = Engine->GetRenderPriority (priority);
+	if (pri == 0)
+	{
+          SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+              child, "Unknown render priority '%s'!", priority);
+	  return false;
+	}
+        if (recursive)
+          mesh->SetRenderPriorityRecursive (pri);
+        else
+          mesh->SetRenderPriority (pri);
+        prioChanged = true;
+      }
       break;
     case XMLTOKEN_ADDON:
       TEST_MISSING_MESH
@@ -4024,76 +4044,6 @@ bool csLoader::LoadSettings (iDocumentNode* node)
       default:
 	SyntaxService->ReportBadToken (child);
         return false;
-    }
-  }
-
-  return true;
-}
-
-bool csLoader::LoadRenderPriorities (iDocumentNode* node)
-{
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_PRIORITY:
-      {
-	const char* name = child->GetAttributeValue ("name");
-	csRef<iDocumentNode> levelnode = child->GetNode ("level");
-	if (!levelnode)
-	{
-          SyntaxService->ReportError (
-	    "crystalspace.maploader.parse.priorities",
-	    child, "Render priority '%s' is missing a 'level'!",
-	    name);
-	  return false;
-	}
-	long pri = levelnode->GetContentsValueAsInt ();
-
-	csRef<iDocumentNode> cameranode = child->GetNode ("camera");
-	if (cameranode)
-	{
-	  ReportWarning ("crystalspace.maploader",
-	      "The <camera/> flag for render priorities is no longer needed");
-	}
-
-	csRenderPrioritySorting rendsort = CS_RENDPRI_SORT_NONE;
-	csRef<iDocumentNode> sortnode = child->GetNode ("sort");
-	if (sortnode)
-	{
-	  const char* sorting = sortnode->GetContentsValue ();
-	  if (!strcmp (sorting, "BACK2FRONT"))
-	  {
-	    rendsort = CS_RENDPRI_SORT_BACK2FRONT;
-	  }
-	  else if (!strcmp (sorting, "FRONT2BACK"))
-	  {
-	    rendsort = CS_RENDPRI_SORT_FRONT2BACK;
-	  }
-	  else if (!strcmp (sorting, "NONE"))
-	  {
-	    rendsort = CS_RENDPRI_SORT_NONE;
-	  }
-	  else
-	  {
-            SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.priorities",
-	      child, "Unknown sorting attribute '%s' for the render priority!",
-	      sorting);
-	    return false;
-	  }
-	}
-	Engine->RegisterRenderPriority (name, pri, rendsort);
-        break;
-      }
-      default:
-	SyntaxService->ReportBadToken (child);
-	return false;
     }
   }
 

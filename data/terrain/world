@@ -84,29 +84,6 @@
     </material>
   </materials>
 
-  <renderpriorities>
-    <priority name="sky">
-      <level>1</level>
-      <sort>NONE</sort>
-    </priority>
-    <priority name="mirror">
-      <level>2</level>
-      <sort>FRONT2BACK</sort>
-    </priority>
-    <priority name="wall">
-      <level>3</level>
-      <sort>NONE</sort>
-    </priority>
-    <priority name="object">
-      <level>4</level>
-      <sort>NONE</sort>
-    </priority>
-    <priority name="alpha">
-      <level>5</level>
-      <sort>BACK2FRONT</sort>
-    </priority>
-  </renderpriorities>
-
   <addon>
   	<plugin>crystalspace.renderloop.loop.loader</plugin>
 	<!-- @@@ NOTE a custom RL is needed to ensure that the base & splat

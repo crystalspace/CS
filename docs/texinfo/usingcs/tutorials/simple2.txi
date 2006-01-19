@@ -211,7 +211,8 @@ in a room. @samp{CS_ZBUF_FILL} is usually used for the outside walls of
 a sector.
 
 @code{SetRenderPriority()} controls when this object is rendered in this
-sector. By default there are four render priorities: @dfn{sky}, @dfn{wall},
+sector. By default there are several render priorities. Some of the
+more important ones are: @dfn{sky}, @dfn{wall},
 @dfn{object}, and @dfn{alpha}. Every object can be put in a render
 priority queue. Objects in lower render priorities will be rendered before
 objects in higher render priorities. In addition some render priority queues

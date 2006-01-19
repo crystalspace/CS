@@ -129,28 +129,6 @@
         <plugin name="spiralFact">crystalspace.mesh.loader.factory.spiral</plugin>
         <plugin name="spiral">crystalspace.mesh.loader.spiral</plugin>
     </plugins>
-    <renderpriorities>
-        <priority name="sky">
-            <level>1</level>
-            <sort>NONE</sort>
-        </priority>
-        <priority name="portal">
-            <level>2</level>
-            <sort>NONE</sort>
-        </priority>
-        <priority name="wall">
-            <level>3</level>
-            <sort>NONE</sort>
-        </priority>
-        <priority name="object">
-            <level>4</level>
-            <sort>NONE</sort>
-        </priority>
-        <priority name="alpha">
-            <level>5</level>
-            <sort>BACK2FRONT</sort>
-        </priority>
-    </renderpriorities>
     <meshfact name="fireFact">
         <plugin>fireFact</plugin>
         <params />

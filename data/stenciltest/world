@@ -46,25 +46,6 @@
 		<clearzbuf>yes</clearzbuf>
 	</settings>
 	
-	<renderpriorities>
-		<priority name="sky">
-			<level>1</level>
-			<sort>NONE</sort>
-			<camera />
-		</priority>
-		<priority name="wall">
-			<level>2</level>
-			<sort>NONE</sort>
-		</priority>
-		<priority name="object">
-			<level>3</level>
-			<sort>NONE</sort>
-		</priority>
-		<priority name="alpha">
-			<level>4</level>
-			<sort>BACK2FRONT</sort>
-		</priority>
-	</renderpriorities>
 	<meshfact name="Torus01FACT">
 		<plugin>genmeshFactory</plugin>
 		<params>

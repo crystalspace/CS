@@ -18,8 +18,8 @@ chronological order.
 	  easier to create a mesh factory from a model file. Currently
 	  this is implemented by the new gmesh3ds and spr3md2 plugins.
 	  Loading a model is now as simple as:
-		csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (
-			object_reg);
+		csRef<iPluginManager> plugin_mgr = csQueryRegistry<
+			iPluginManager> (object_reg);
 		csRef<iModelLoader> l = csLoadPlugin<iModelLoader> (plugin_mgr,
 			"crystalspace.mesh.loader.factory.genmesh.3ds");
 		iMeshFactoryWrapper* ff = l->Load ("model", "/lib/model.3ds");
@@ -28,6 +28,23 @@ chronological order.
 	- res changed some code to use csLittleEndian::Convert() for endian
 	  conversions.
 	- res fixed the broken SWIG post-processing sed expression.
+	- Jorrit changed the render priority system in CS:
+	    - Giving an unknown priority to a mesh or factory will now
+	      result in an error.
+	    - It is no longer possible to define render priorities in a
+	      world file. It is now only possible to define them from code.
+	    - The standard render priorities are now:
+		- init
+		- sky
+		- sky2
+		- portal
+		- wall
+		- wall2
+		- object
+		- object2
+		- transp
+		- alpha (only one with back2front sorting)
+		- final
 18-Jan-2006
 	- Jorrit fixed a bug as reported by rvl_ involving a memory leak
 	  when looking at space warping portals.

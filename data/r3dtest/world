@@ -109,29 +109,6 @@
         <shadervar name="tex normal" type="texture">C2A1_W1_NORM</shadervar>
       </material>
     </materials>
-    <renderpriorities>
-        <priority name="sky">
-            <level>1</level>
-            <sort>NONE</sort>
-            <camera />
-        </priority>
-        <priority name="mirror">
-            <level>2</level>
-            <sort>FRONT2BACK</sort>
-        </priority>
-        <priority name="wall">
-            <level>3</level>
-            <sort>NONE</sort>
-        </priority>
-        <priority name="object">
-            <level>4</level>
-            <sort>NONE</sort>
-        </priority>
-        <priority name="alpha">
-            <level>5</level>
-            <sort>BACK2FRONT</sort>
-        </priority>
-    </renderpriorities>
     <plugins>
         <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
         <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>

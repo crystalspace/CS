@@ -588,15 +588,6 @@ Same remark as for mesh objects: the stuff that is inside the
     @LP{} [ @nonterm{sound-file} ] @RP{}}@*
 @production{sounds, @token{SOUNDS} @LP{} [ @nonterm{sound} @dots{} ] @RP{}}
 
-@subsubheading Render Priorities
-@production{rendpri-value, @nonterm{integer}}@*
-@production{rendpri-setting,
-    @token{BACK2FRONT} | @token{FRONT2BACK} | @token{NONE}}@*
-@production{rendpri-comp, @token{PRIORITY} @nonterm{priority-name}
-    @LP{} @nonterm{rendpri-value} @ACOMMA{} @nonterm{rendpri-setting} @RP{}}@*
-@production{renderpriorities, @token{RENDERPRIORITIES}
-    @LP{} [ @nonterm{rendpri-comp} @dots{} ] @RP{}}
-
 @subsubheading Settings
 @production{setting-ambient, @token{AMBIENT} @LP{} @nonterm{color} @RP{}}@*
 @production{setting-clearzbuf, @token{CLEARZBUF} @LP{} @nonterm{yes-no} @RP{}}@*
@@ -618,7 +609,6 @@ Same remark as for mesh objects: the stuff that is inside the
     @prodnext{@nonterm{addon}}@*
     @prodnext{@nonterm{material-set}}@*
     @prodnext{@nonterm{sounds}}@*
-    @prodnext{@nonterm{renderpriorities}}@*
     @prodnext{@nonterm{plugins}}@*
     @prodnext{@nonterm{sector}}@*
     @prodnext{@nonterm{meshfact}}@*

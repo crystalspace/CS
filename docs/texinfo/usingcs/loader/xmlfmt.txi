@@ -48,7 +48,6 @@ The basic structure of a map file for Crystal Space is as follows:
     one shader section.
     one sounds section.
     one variable section.
-    one render priority section.
     one plugin section.
     one settings section.
     zero or more start locations.
@@ -285,38 +284,6 @@ Most of the times you simply refer to shaders from a file.
 @cindex variables (Map File)
 
 @@@@@@Todo.
-
-@subsubheading Render Priority Section
-@cindex render priorities (Map File)
-
-Render priorities are important for deciding when to render objects.
-When placing objects in a sector you place them in some render priority
-queue (@pxref{HOWTO Render Priorities}).
-
-Here is an example render priority section. It is also the default
-render priority section. i.e. if you don't specify render priorities you
-will get at least @samp{sky}, @samp{wall}, @samp{object}, and @samp{alpha}:
-
-@example
-<renderpriorities>
-    <priority name="sky">
-        <level>1</level>
-        <sort>NONE</sort>
-    </priority>
-    <priority name="wall">
-        <level>2</level>
-        <sort>NONE</sort>
-    </priority>
-    <priority name="object">
-        <level>3</level>
-        <sort>NONE</sort>
-    </priority>
-    <priority name="alpha">
-        <level>4</level>
-        <sort>BACK2FRONT</sort>
-    </priority>
-</renderpriorities>
-@end example
 
 @subsubheading Plugin Section
 @cindex plugin section (Map File)

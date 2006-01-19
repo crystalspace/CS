@@ -438,11 +438,6 @@ private:
 	iStreamSource* ssource);
 
   /**
-   * Load the render priority section.
-   */
-  bool LoadRenderPriorities (iDocumentNode* node);
-
-  /**
    * Load the settings section.
    */
   bool LoadSettings (iDocumentNode* node);
