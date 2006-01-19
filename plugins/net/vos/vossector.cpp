@@ -438,30 +438,43 @@ void csVosSector::notifyChildInserted (VobjectEvent &event)
   LOG("csVosSector", 3, "notifyChildInserted");
   try
   {
-    vRef<csMetaObject3D> obj3d = meta_cast<csMetaObject3D>(event.getChild());
-    LOG("SectorChildInserted", 3, "Looking at " << event.getChild()->getURLstr()
-        << " " << obj3d.isValid())
+    if (event.getContextualName() == "a3dl:gravity"
+        || event.getContextualName() == "a3dl:collision-detection")
+    {
+      vRef<Property> p = meta_cast<Property> (event.getChild());
+      if(p.isValid())
+      {
+        p->addParentListener (&DoNothingListener::static_);
+        p->addPropertyListener (this);
+      }
+    }
+    else
+    {
+      vRef<csMetaObject3D> obj3d = meta_cast<csMetaObject3D>(event.getChild());
+      LOG("SectorChildInserted", 3, "Looking at " << event.getChild()->getURLstr()
+          << " " << obj3d.isValid())
 
-      if(obj3d.isValid())
-      {
-        //obj3d->Setup(vosa3dl, this);
-        vosa3dl->mainThreadTasks.push(new LoadObjectTask( vosa3dl, obj3d, this,
-                                                          false, meter));
-        if (obj3d->getTypes().hasItem ("a3dl:object3D.polygonmesh")
-            && obj3d->getTypes().hasItem ("a3dl:static"))
+        if(obj3d.isValid())
         {
-          vosa3dl->incrementRelightCounter();
+          //obj3d->Setup(vosa3dl, this);
+          vosa3dl->mainThreadTasks.push(new LoadObjectTask( vosa3dl, obj3d, this,
+                                                            false, meter));
+          if (obj3d->getTypes().hasItem ("a3dl:object3D.polygonmesh")
+              && obj3d->getTypes().hasItem ("a3dl:static"))
+          {
+            vosa3dl->incrementRelightCounter();
+          }
         }
-      }
-      else
-      {
-        vRef<csMetaLight> light = meta_cast<csMetaLight>(event.getChild());
-        if(light.isValid())
+        else
         {
-          light->Setup(vosa3dl, this);
-          vosa3dl->incrementRelightCounter();
+          vRef<csMetaLight> light = meta_cast<csMetaLight>(event.getChild());
+          if(light.isValid())
+          {
+            light->Setup(vosa3dl, this);
+            vosa3dl->incrementRelightCounter();
+          }
         }
-      }
+    }
   }
   catch(std::runtime_error e)
   {
@@ -523,6 +536,54 @@ void csVosSector::CacheLightmaps()
       mpm->WriteLightmapCache();
     }
   }
+}
+
+class SetGravityAndColDetTask : public Task
+{
+public:
+  double grav;
+  bool coldet;
+  vRef<csMetaSector> sectorvobj;
+
+  virtual void doTask()
+    {
+        for(ChildListIterator ci = sectorvobj->getChildren(); ci.hasMore(); ci++) {
+          vRef<csMetaObject3D> obj3d = meta_cast<csMetaObject3D>((*ci)->getChild());
+          if(obj3d.isValid()) {
+            obj3d->setupCollider(coldet, grav);
+          }
+        }
+    };
+};
+
+void csVosSector::notifyPropertyChange(const VOS::PropertyEvent &event)
+{
+  try
+  {
+      vRef<ParentChildRelation> pcr = event.getProperty()->findParent (sectorvobj);
+      LOG("vosobject3d", 5, "found parent");
+
+      if (pcr->getContextualName() == "a3dl:gravity"
+          || pcr->getContextualName() == "a3dl:collision-detection")
+      {
+        SetGravityAndColDetTask* t = new SetGravityAndColDetTask();
+        t->sectorvobj = sectorvobj;
+        t->grav = sectorvobj->getGravity();
+        t->coldet = sectorvobj->getCollisionDetection();
+
+        LOG("vossector", 1, "setting sectorvobj to " << sectorvobj
+            << " and grav to " << t->grav
+            << " and coldet to " << t->coldet);
+
+        vosa3dl->mainThreadTasks.push (t);
+      }
+  }
+  catch(std::runtime_error e)
+  {
+    LOG("csVosSector", 2, "caught runtime error on property change "
+        << event.getProperty()->getURLstr() << ": " << e.what());
+  }
+
 }
 
 /// csMetaSector ///

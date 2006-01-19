@@ -34,7 +34,8 @@
 class csMetaSector;
 
 class csVosSector : public iVosSector, public iVosApi,
-                    public VOS::ChildChangeListener
+                    public VOS::ChildChangeListener,
+                    public VOS::PropertyListener
 {
 private:
   bool didLoad;
@@ -77,6 +78,8 @@ public:
   csRef<iCollideSystem> GetCollideSystem() { return colsys; }
 
   virtual void CacheLightmaps();
+
+  virtual void notifyPropertyChange(const VOS::PropertyEvent &event);
 
   //void addLight (iVosLight *light);
   //void removeLight (iVosLight *light);

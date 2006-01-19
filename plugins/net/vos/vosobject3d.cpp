@@ -232,7 +232,7 @@ void ConstructObject3DTask::doTask()
                              mw->GetMeshObject(), iThingState);
     if (thingstate.IsValid()) thingstate->Unprepare();
 
-    obj->setupCollider();
+    obj->setupCollider(true, 6);
   }
 }
 
@@ -724,36 +724,44 @@ void csMetaObject3D::moveTo(double x, double y, double z, double timestep)
   }
 }
 
-void csMetaObject3D::setupCollider()
+void csMetaObject3D::setupCollider(bool coldet, double gravity)
 {
-  assert(csvobj3d->GetMeshWrapper());
-  assert(csvobj3d->GetMeshWrapper()->GetMeshObject());
-  assert(csvobj3d->GetMeshWrapper()->GetMeshObject()->GetObjectModel());
-  if(! csvobj3d->GetMeshWrapper()->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet())
+  if(setupCA)
   {
-      csReport(vosa3dl->GetObjectRegistry(), CS_REPORTER_SEVERITY_WARNING,
-              "crystalspace.network.vos.a3dl",
-              "Unable to setup collision detection for object \"%s\": Object type must not support collision detection.", csvobj3d->GetVobject()->getURLstr().c_str());
-      return;
+    collider_actor.SetCD(coldet);
+    collider_actor.SetGravity(gravity);
   }
+  else
+  {
+    assert(csvobj3d->GetMeshWrapper());
+    assert(csvobj3d->GetMeshWrapper()->GetMeshObject());
+    assert(csvobj3d->GetMeshWrapper()->GetMeshObject()->GetObjectModel());
+    if(! csvobj3d->GetMeshWrapper()->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet())
+    {
+      csReport(vosa3dl->GetObjectRegistry(), CS_REPORTER_SEVERITY_WARNING,
+               "crystalspace.network.vos.a3dl",
+               "Unable to setup collision detection for object \"%s\": Object type must not support collision detection.", csvobj3d->GetVobject()->getURLstr().c_str());
+      return;
+    }
 
-  csRef<iEngine> engine = CS_QUERY_REGISTRY(vosa3dl->GetObjectRegistry(), iEngine);
-  collider_actor.SetEngine(engine);
-  collider_actor.SetCollideSystem(sector->GetCollideSystem());
+    csRef<iEngine> engine = CS_QUERY_REGISTRY(vosa3dl->GetObjectRegistry(), iEngine);
+    collider_actor.SetEngine(engine);
+    collider_actor.SetCollideSystem(sector->GetCollideSystem());
 
-  csRef<iPolygonMesh> pm = SCF_QUERY_INTERFACE(
-    csvobj3d->GetMeshWrapper()->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet(),
-    iPolygonMesh);
+    csRef<iPolygonMesh> pm = SCF_QUERY_INTERFACE(
+      csvobj3d->GetMeshWrapper()->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet(),
+      iPolygonMesh);
 
-  (new csColliderWrapper(csvobj3d->GetMeshWrapper()->QueryObject(),
-                         sector->GetCollideSystem(), pm))->DecRef();
+    (new csColliderWrapper(csvobj3d->GetMeshWrapper()->QueryObject(),
+                           sector->GetCollideSystem(), pm))->DecRef();
 
-  csVector3 bbox = csvobj3d->GetMeshWrapper()->GetWorldBoundingBox().GetSize();
-  collider_actor.InitializeColliders(csvobj3d->GetMeshWrapper(), csVector3(bbox.x, bbox.y/2, bbox.z),
-                                     csVector3(bbox.x, bbox.y/2, bbox.z), csVector3(0, -bbox.y/2, 0));
-  collider_actor.SetGravity(1);
+    csVector3 bbox = csvobj3d->GetMeshWrapper()->GetWorldBoundingBox().GetSize();
+    collider_actor.InitializeColliders(csvobj3d->GetMeshWrapper(), csVector3(bbox.x, bbox.y/2, bbox.z),
+                                       csVector3(bbox.x, bbox.y/2, bbox.z), csVector3(0, -bbox.y/2, 0));
+    collider_actor.SetGravity(gravity);
 
-  setupCA = true;
+    setupCA = true;
+  }
 }
 
 
