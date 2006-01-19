@@ -311,7 +311,7 @@ bool csSprite3DMD2FactoryLoader::Load (iSprite3DFactoryState* state,
         vertex_mapping.Put (vt, idx[j]);
       }
     }
-    triangles.Push (csTriangle (idx[0], idx[1], idx[2]));
+    triangles.Push (csTriangle (int (idx[0]), int (idx[1]), int (idx[2])));
   }
 
   // Read in skin data. This contains texture map coordinates for each
@@ -413,13 +413,13 @@ bool csSprite3DMD2FactoryLoader::Load (iSprite3DFactoryState* state,
   }
 
   // Now fill the sprite.
-  state->SetTriangles (triangles.GetArray (), triangles.Length ());
+  state->SetTriangles (triangles.GetArray (), int (triangles.Length ()));
   for (j = 0 ; j < int (frames.Length ()) ; j++)
   {
     csFrame& f = frames[j];
     iSpriteFrame* fr = state->AddFrame ();
     fr->SetName (f.name);
-    if (j == 0) state->AddVertices (mapped_vertices.Length ());
+    if (j == 0) state->AddVertices (int (mapped_vertices.Length ()));
     state->SetVertices (f.vertices.GetArray (), j);
     state->SetTexels (Texels.GetArray (), j);
   }
@@ -432,8 +432,8 @@ bool csSprite3DMD2FactoryLoader::Load (iSprite3DFactoryState* state,
     for (k = 0 ; k < a.frames.Length () ; k++)
     {
       csFrameTime& ft = a.frames[k];
-      action->AddFrame (state->GetFrame (ft.frameidx), csTicks (1000.0f * ft.time),
-      	0.0f);
+      action->AddFrame (state->GetFrame (int (ft.frameidx)), 
+        csTicks (1000.0f * ft.time), 0.0f);
     }
   }
   state->MergeNormals ();

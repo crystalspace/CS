@@ -361,7 +361,7 @@ csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (iDataBuffer* buf,
     for (j = 0 ; j < materials_and_tris.Length () ; j++)
     {
       gmstate->AddSubMesh (materials_and_tris[j].tris.GetArray (),
-      	materials_and_tris[j].tris.Length (),
+      	int (materials_and_tris[j].tris.Length ()),
 	materials_and_tris[j].material);
     }
 
