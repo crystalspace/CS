@@ -2878,6 +2878,7 @@ sub new {
 *DeleteIndex = *cspacec::csPluginRequestArray_DeleteIndex;
 *DeleteIndexFast = *cspacec::csPluginRequestArray_DeleteIndexFast;
 *DeleteRange = *cspacec::csPluginRequestArray_DeleteRange;
+*__eq__ = *cspacec::csPluginRequestArray___eq__;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -11522,6 +11523,8 @@ package cspace::iFontServer;
 %OWNER = ();
 %ITERATORS = ();
 *LoadFont = *cspacec::iFontServer_LoadFont;
+*SetWarnOnError = *cspacec::iFontServer_SetWarnOnError;
+*GetWarnOnError = *cspacec::iFontServer_GetWarnOnError;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
