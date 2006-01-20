@@ -19,6 +19,7 @@
 */
 
 #include "cssysdef.h"
+#include <limits.h>
 #include "csqint.h"
 #include "csutil/csuctransform.h"
 #include "csutil/util.h"
