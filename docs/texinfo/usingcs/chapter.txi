@@ -22,8 +22,7 @@ own 3D applications.
 * 3D Renderer:: The Rendering System
 * Collision Detection:: Collision Detection and Physics
 * Animation:: Animating your Objects
-* Model Conversion:: Importing Model Files
-* Map Loader::
+* Map Loader:: Loading Maps and Models
 * Sound System::
 * Scripting Languages::
 * AWS:: Alternate Windowing System (@sc{aws})
@@ -47,7 +46,6 @@ own 3D applications.
 @importss{usingcs,renderer,chapter.txi}
 @importss{usingcs,colldet,chapter.txi}
 @importss{usingcs,animation,chapter.txi}
-@imports{usingcs,model.txi}
 @importss{usingcs,loader,chapter.txi}
 @importss{usingcs,sound,chapter.txi}
 @importss{usingcs,script,script.txi}

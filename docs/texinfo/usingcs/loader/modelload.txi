@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Model Loading, , Binary XML, Map Loader
-@subsection Loading Models
+@subsection Loading @sc{3ds} and @sc{md2} Models
 @cindex @code{iModelLoader}
 @cindex @sc{3ds}
 @cindex @sc{md2}

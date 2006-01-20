@@ -465,15 +465,15 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-CS_DEPRECATED_METHOD csEventID csevPreProcess(iObjectRegistry *reg);
-CS_DEPRECATED_METHOD csEventID csevPreProcess(iEventNameRegistry *reg);
+csEventID csevPreProcess(iObjectRegistry *reg);
+csEventID csevPreProcess(iEventNameRegistry *reg);
 
 /**
  * Broadcasted every frame.
  * This event will go away soon, replaced by csevFrame.
  */
-CS_DEPRECATED_METHOD csEventID csevProcess(iObjectRegistry *reg);
-CS_DEPRECATED_METHOD csEventID csevProcess(iEventNameRegistry *reg);
+csEventID csevProcess(iObjectRegistry *reg);
+csEventID csevProcess(iEventNameRegistry *reg);
 
 /**
  * Broadcasted after csevProcess on every frame.
@@ -482,8 +482,8 @@ CS_DEPRECATED_METHOD csEventID csevProcess(iEventNameRegistry *reg);
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-CS_DEPRECATED_METHOD csEventID csevPostProcess(iObjectRegistry *reg);
-CS_DEPRECATED_METHOD csEventID csevPostProcess(iEventNameRegistry *reg);
+csEventID csevPostProcess(iObjectRegistry *reg);
+csEventID csevPostProcess(iEventNameRegistry *reg);
 
 /**
  * Broadcasted after csevPostProcess on every frame.
@@ -492,8 +492,8 @@ CS_DEPRECATED_METHOD csEventID csevPostProcess(iEventNameRegistry *reg);
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-CS_DEPRECATED_METHOD csEventID csevFinalProcess(iObjectRegistry *reg);
-CS_DEPRECATED_METHOD csEventID csevFinalProcess(iEventNameRegistry *reg);
+csEventID csevFinalProcess(iObjectRegistry *reg);
+csEventID csevFinalProcess(iEventNameRegistry *reg);
 
 /** @} */
 

@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Jan-2006
+	- Jorrit did the following documentation updates:
+	    - Removed everything about the soon-to-be-removed model
+	      importing system.
+	    - Added mention of this to the apimod doc.
+	    - Added mention of the changed render priorities to the
+	      apimod doc.
+	- Jorrit temporarily removed the deprecation warnings for
+	  the csevProcess and similar events. We don't want these warnings
+	  present in the new pseudo-stable. After release of that we can
+	  put the warnings back in.
 19-Jan-2006
 	- Jorrit fixed gmesh3ds for Frank's latest refactor.
 	- Jorrit fixed a bug in spr3d. If the factory had no material but
@@ -50,8 +61,8 @@ chronological order.
 	- Jorrit fixed a bug as reported by rvl_ involving a memory leak
 	  when looking at space warping portals.
 	- Jorrit added a size parameter to iBinaryLoaderPlugin->Parse.
-	- Jorrit added a new 3DS loader for genmesh. Supports multiple submeshes
-	  (different materials).
+	- Jorrit added a new 3DS loader for genmesh. Supports multiple
+	  submeshes (different materials).
 	- Jorrit fixed genmesh so that it ignores the request for Compress()
 	  if submeshes are used. Compress() should be called before adding
 	  submeshes or else Compress() should not be called at all.

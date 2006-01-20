@@ -2176,3 +2176,64 @@ The following methods have been removed:
 @code{iMovable->SetParent()}
 @end itemize
 
+@subheading Model Importing
+
+The old model importing system has been completely removed. That means
+the following interfaces and classes are gone:
+
+@itemize @bullet
+@item
+@code{csSingleIndexVertexSet}
+@item
+@code{csModelDataTools}
+@item
+@code{csModelConverterFormat}
+@item
+@code{iModelConverter}
+@item
+@code{iModelDataTexture}
+@item
+@code{iModelDataMaterial}
+@item
+@code{iModelDataVertices}
+@item
+@code{iModelDataAction}
+@item
+@code{iModelDataPolygon}
+@item
+@code{iModelDataObject}
+@item
+@code{iModelDataCamera}
+@item
+@code{iModelDataLight}
+@item
+@code{iModelData}
+@item
+@code{csModelDataTexture}
+@item
+@code{csModelDataMaterial}
+@item
+@code{csModelDataVertices}
+@item
+@code{csModelDataAction}
+@item
+@code{csModelDataPolygon}
+@item
+@code{csModelDataObject}
+@item
+@code{csModelDataCamera}
+@item
+@code{csModelDataLight}
+@item
+@code{csModelData}
+@end itemize
+
+Instead it is now possible to load @sc{3ds} models as genmesh mesh
+objects and @sc{md2} models as 3D sprites. @xref{Model Loading}.
+
+@subheading Render Priority System
+
+It is no longer possible to define render priorities in a map file. You can
+now only redefine render priorities from the engine @sc{api}.
+@xref{HOWTO Render Priorities}.
+

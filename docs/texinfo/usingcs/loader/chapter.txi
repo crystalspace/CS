@@ -1,17 +1,17 @@
 @c -*-texinfo-*-
 @node Map Loader, Sound System, Model Conversion, Using Crystal Space
-@section Map Loader
+@section Loading Maps and Models
 @cindex map loader
 
-This section will describe the map file parser. Currently
-there is only a section describing the format of the map files.
+This section describes the map file parser and the plugins to
+load models.
 
 @menu
 * HOWTO Level Loading:: Loading a Level
 * XML File Format:: Format of Map File (@sc{xml})
 * Old Map File Format:: Old Format of Map File
 * Binary XML:: Binary @sc{xml}
-* Model Loading:: Loading Models
+* Model Loading:: Loading @sc{3ds} and @sc{md2} Models
 @end menu
 
 @importss{usingcs,loader,levload.txi}
