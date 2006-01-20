@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Animation, Model Conversion, Collision Detection, Using Crystal Space
+@node Animation, Map Loader, Collision Detection, Using Crystal Space
 @section Animating your Objects
 @cindex animation
 @cindex sequence manager

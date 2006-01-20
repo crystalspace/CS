@@ -16,7 +16,7 @@ find a reference to it from within the instructions in this section.
 @menu
 * Unix::
 * WinCVS Tutorial::
-* MSVC:: Windows using Microsoft Visual C++
+* MSVC7:: Microsoft Visual C++ 7
 * MinGW:: Windows using MinGW
 * Cygwin:: Windows using Cygwin
 * MacOS/X::

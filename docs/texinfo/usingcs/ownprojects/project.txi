@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO CS Project, HOWTO Creating External MSVC 6 Application, Making Own Projects, Making Own Projects
+@node HOWTO CS Project, HOWTO Creating External MSVC 7 Application, Making Own Projects, Making Own Projects
 @subsection Creating an External Crystal Space Application
 @cindex External Crystal Space Application
 

@@ -58,6 +58,8 @@ chronological order.
 	- Jorrit changed the renderloop loader addon so that it also
 	  respects regions and it will now add the new renderloop to the
 	  current region from the loader context.
+	- res removed the VC6-related docs and updated the VC7-related docs
+	  for the fact that they basically apply to VC7.1 and 8 as well.
 19-Jan-2006
 	- Jorrit fixed gmesh3ds for Frank's latest refactor.
 	- Jorrit fixed a bug in spr3d. If the factory had no material but

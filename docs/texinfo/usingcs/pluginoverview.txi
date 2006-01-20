@@ -55,12 +55,6 @@ it also contains functions to load mesh objects, textures, and sounds.
 @xref{Map Loader}.
 
 @item
-@emph{Model Converters}
-
-Helps loading model files of various formats (3DS, ASE, MDL, MD2, ...)
-and store them in a common data structure. @xref{Model Conversion}.
-
-@item
 @emph{Image Loaders}
 
 In many cases you don't have to use these plugins directly as they

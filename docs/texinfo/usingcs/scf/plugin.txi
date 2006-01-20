@@ -385,8 +385,6 @@ Depending on the development tools that you use, you should refer to one of the
 @item
 @ref{HOWTO Creating External MSVC 7 Application}
 @item
-@ref{HOWTO Creating External MSVC 6 Application}
-@item
 @ref{HOWTO Creating External Application Using KDevelop}
 @end itemize
 

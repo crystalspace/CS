@@ -9,7 +9,7 @@
 Everything about materials.
 
 @menu
-* Alpha Textures:: Alpha in Textures
+* Alpha Textures:: Alpha and Keycolor in Textures
 * Texture Mapping::
 * Efficient Textures::
 @end menu

@@ -183,7 +183,7 @@ common example is @samp{normalmap} which is used by many shaders.
 In short, by using this flag the texture can be used on regular objects using 
 @samp{zuse} and @samp{object} render priority. This greatly helps performance 
 and correct visual appearance of objects. For a more detailed explanation
-@pxref{Alpha in Textures}.
+@pxref{Alpha Textures}.
 @end itemize
 
 @subsubheading Material Specification Section

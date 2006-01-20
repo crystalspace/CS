@@ -43,31 +43,14 @@ with these libraries pre-installed.  If the libraries are not already available
 on your system, then see the following sections for information about how to
 obtain them.
 
-@c This section should be moved once we have build instructions covering VC8
-@subheading Platform @sc{sdk} (Microsoft Visual C++ 2005 Express Edition only)
-@cindex Windows, Building
-
-All supported versions of Microsoft Visual C++ ship with a version of the
-Platform @sc{sdk} that suffices to compile Crystal Space, except the 
-Microsoft Visual C++ 2005 Express Edition, which requires a seperate setup of 
-the Platform SDK. Follow these instructions to set up the @sc{psdk}:
-
-@noindent
-@ifnottex
-@uref{http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/}
-@end ifnottex
-@iftex
-@code{http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/}
-@end iftex
-
 @subheading The ``cs-win32libs'' Package
 @cindex Windows, Building
 @anchor{cs-win32libs}
 
-Rather than having to install these components manually, Microsoft Visual C++ 6
-& 7, MinGW/MSYS, and Cygwin users can download a single package which contains
-all common headers, pre-built library files, and dynamic link libraries in
-pre-compiled form from the following location:
+Rather than having to install these components manually, Microsoft Visual C++ 
+7/7.1/8, MinGW/MSYS, and Cygwin users can download a single package which
+contains all common headers, pre-built library files, and dynamic link 
+libraries in pre-compiled form from the following location:
 
 @noindent
 @ifnottex

@@ -8,8 +8,7 @@ Space with various development platforms.
 
 @menu
 * HOWTO CS Project:: Creating an External Crystal Space Application
-* HOWTO Creating External MSVC 6 Application:: Creating an External @sc{msvc} 6 Application
-* HOWTO Creating External MSVC 7 Application:: Creating an External @sc{msvc} 7 Application
+* HOWTO Creating External MSVC 7 Application:: Creating an External @sc{msvc} 7, 7.1 or 8 Application
 * HOWTO Creating External Application Using KDevelop:: Creating an External Application using KDevelop
 * HOWTO CS Project DevCPP:: Creating an External Crystal Space Application Using Dev-CPP
 * HOWTO Create RPM:: Creating Crystal Space @sc{rpm}'s
@@ -17,7 +16,6 @@ Space with various development platforms.
 @end menu
 
 @importss{usingcs,ownprojects,project.txi}
-@importsss{usingcs,ownprojects,msvc6proj,msvc6proj.txi}
 @importsss{usingcs,ownprojects,msvc7proj,msvc7proj.txi}
 @importsss{usingcs,ownprojects,kdevproj,kdevproj.txi}
 @importss{usingcs,ownprojects,devcppproj.txi}

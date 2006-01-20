@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node WinCVS Tutorial, MSVC, Unix, Platform Instructions
+@node WinCVS Tutorial, MSVC7, Unix, Platform Instructions
 @subsection WinCVS Tutorial
 @cindex Tutorial, WinCVS
 @cindex WinCVS, Tutorial

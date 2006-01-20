@@ -1,14 +1,24 @@
 @c -*-texinfo-*-
-@node HOWTO Creating External MSVC 7 Application, HOWTO Creating External Application Using KDevelop, HOWTO Creating External MSVC 6 Application, Making Own Projects
-@subsection Creating an External @sc{msvc} 7 Application
+@node HOWTO Creating External MSVC 7 Application, HOWTO Creating External Application Using KDevelop, HOWTO CS Project, Making Own Projects
+@subsection Creating an External @sc{msvc} 7, 7.1 or 8 Application
+@cindex MSVC, external projects
 
 @noindent
 @emph{Written by Philip Wyett @email{philip.wyett@@w-tech.co.uk}.}
 @noindent
-@emph{Last updated 2 June 2003.}
+@emph{Last updated 20 January 2006.}
 
 This @sc{howto} is a step by step guide for creating a basic Crystal Space
-application with @sc{msvc} 7 @sc{.net} outside the Crystal Space source tree.
+application with @sc{msvc} 7 (@sc{.net} 2002), 7.1 (@sc{.net} 2003) or
+8 (@sc{.net} 2005) outside the Crystal Space source tree. 
+
+@emph{Note:} This text was initially written with only @sc{msvc} 7 in mind, 
+consequently, the screenshots are from that version. However, its successors, 
+versions 7.1 and 8, are, in the aspects relevant to this @sc{howto}, very
+similar to version 7. Hence, the instructions herein should be easily
+applicable to those versions as well. If there is a setting that needs to be
+different for different @sc{msvc} versions, the text will explicitly state 
+that.
 
 @sc{important}: This tutorial assumes you have a basic familiarity with
 @sc{msvc} and it's inner workings. This tutorial also assumes you have a fully
@@ -17,7 +27,7 @@ computer.
 
 @subsubheading Step 1 - Creating a basic project solution.
 
-Start @sc{msvc} 7 and from the @emph{File} menu click on @emph{File} then
+Start @sc{msvc} and from the @emph{File} menu click on @emph{File} then
 @emph{New} and once the sub menu of @emph{New} opens, click on
 @emph{Project}.  You will now be presented with a dialog box (see image
 below) for creating a new project.
@@ -63,7 +73,7 @@ diagnostic text via @emph{-console}.  Under @emph{Application type:}, select
 @emph{Additional options:} section, check the box @emph{Empty project}.  Once
 done, click on the @emph{Finish} button.
 
-You should now be in the @sc{msvc} 7 @sc{ide} (Intergrated Development
+You should now be in the @sc{msvc ide} (Intergrated Development
 Environment), with the @emph{simple1} project loaded.  Lets move on...
 
 @subsubheading Step 2 - Adding files/code to the project solution.
@@ -109,7 +119,7 @@ should have a @emph{Solution Explorer} window which looks like the image below.
 
 @subsubheading Step 3 - Setting Crystal Space @sc{paths} inside @sc{msvc}.
 
-First thing we need todo is point MSVC to both Crystal Spaces @file{include}
+First thing we need todo is point @sc{msvc} to both Crystal Spaces @file{include}
 and both the release and debug build @file{libs} directories, so it may access
 them at compile/link time.  Select @emph{Tools} from the @emph{File menu} and
 then @emph{Options}@dots{} You will now be presented with the @emph{Options}
@@ -143,21 +153,24 @@ to where the debug libs are located.  In the @emph{Show directories} for drop
 down menu, now select @emph{Library files}.  Follow the same browse and
 selection procedure as you used when adding the @file{include} path, adding the
 following paths - adjusting for where you have Crystal Space located on your
-system.
+system as well as the @sc{msvc} version number you compiled with. Here it was
+version 7; for versions 7.1 you need to use 
+@file{out\release71\libs\} and @file{out\debug71\libs\}, likewise for version 
+8 you need @file{out\release8\libs\} and @file{out\debug8\libs\}.
 
 @noindent
-@file{CS\out\release\libs\}@*
-@file{CS\out\debug\libs\}
+@file{CS\out\release7\libs\}@*
+@file{CS\out\debug7\libs\}
 
-See image below for an example of these set.
+See image below for an example of this set.
 
 @ifnotinfo
 @picturesss{usingcs,ownprojects,msvc7proj,snap9}
 @end ifnotinfo
 
-Once done, click on the @emph{OK} button and return to the MSVC IDE.
+Once done, click on the @emph{OK} button and return to the @sc{msvc ide}.
 
-@subsubheading Step 4 - Setting Preprocessor Definitions in MSVC.
+@subsubheading Step 4 - Setting Preprocessor Definitions in @sc{msvc}.
 
 Crystal Space essentially has three preprocessor definitions which MUST be set
 in-order to successfully compile and link your application.  They are
@@ -206,7 +219,7 @@ entered for a release build can be seen in the image below.
 @picturesss{usingcs,ownprojects,msvc7proj,snap12}
 @end ifnotinfo
 
-Once done, click on the OK button and return to the MSVC IDE.
+Once done, click on the OK button and return to the MSVC @sc{msvc ide}.
 
 @subsubheading Step 5 - Setting Run-Time Library Used with Crystal Space Applications.
 
@@ -241,7 +254,7 @@ For release builds you need to select @emph{Multithreaded DLL} from the
 @picturesss{usingcs,ownprojects,msvc7proj,snap14}
 @end ifnotinfo
 
-Once done, click on the @emph{OK} button and return to the MSVC IDE.
+Once done, click on the @emph{OK} button and return to the @sc{msvc ide}.
 
 @subsubheading Step 6 - Linking with the Crystal Space libraries.
 
@@ -270,15 +283,17 @@ Crystal Space release library names:
 @code{libcrystalspace_opengl.lib libcrystalspace_windows.lib}
 @end iftex
 @ifnottex
-@code{libcrystalspace.lib libcrystalspaceirectx.lib libcrystalspace_opengl.lib libcrystalspace_windows.lib}
+@code{libcrystalspace.lib libcrystalspace_directx.lib libcrystalspace_opengl.lib libcrystalspace_windows.lib}
 @end ifnottex
 
-To add the necessary libraries to link our application.  As in step 4 we need
-to change one or more project settings.  Select your project in the
-@emph{Workspace} window.  See area highlighted in blue in the image below.
-Now, from the @emph{Project} menu select @emph{Properties}.  Alternatively, you
-can right click on the highlighted area in the @emph{Workspace} and then click
-on @emph{Properties} - both ways work.
+To add the necessary libraries to link our application.  If you are unsure
+which libraries to take, using only @file{libcrystalspace(_d).lib} is 
+sufficient in most cases.  As in step 4 we need to change one or more project 
+settings.  Select your project in the @emph{Workspace} window.  See area 
+highlighted in blue in the image below. Now, from the @emph{Project} menu 
+select @emph{Properties}.  Alternatively, you can right click on the 
+highlighted area in the @emph{Workspace} and then click on @emph{Properties} - 
+both ways work.
 
 @ifnotinfo
 @picturesss{usingcs,ownprojects,msvc7proj,snap5}
@@ -316,7 +331,7 @@ See image below for example of release build link settings.
 @picturesss{usingcs,ownprojects,msvc7proj,snap16}
 @end ifnotinfo
 
-Finally, click on @emph{OK} to return to the MSVC IDE and then build the
+Finally, click on @emph{OK} to return to the @sc{msvc ide} and then build the
 project.
 
 @subsubheading Commonly encountered problems.
