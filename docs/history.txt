@@ -70,6 +70,10 @@ chronological order.
 	- Jorrit added a work around for the placement new as used in
 	  the GL renderer so that it compiles with the memory tracker
 	  enabled.
+	- Jorrit fixed an infinite loop in csarray which is triggered with
+	  the memory tracker because it was using cs_snprintf. Rewrote to
+	  use strcpy/strcat instead.
+	- Jorrit fixed another 64-bit issue in the memory tracker.
 19-Jan-2006
 	- Jorrit fixed gmesh3ds for Frank's latest refactor.
 	- Jorrit fixed a bug in spr3d. If the factory had no material but

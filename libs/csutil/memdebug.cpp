@@ -903,22 +903,22 @@ void mtiUpdateAmount (csMemTrackerInfo* mti, int dcount, int dsize)
 void* operator new (size_t s, void* filename, int /*line*/)
 {
   //CS_ASSERT (s > 0);
-  uint32* rc = (uint32*)malloc (s+16);
-  memset (rc, 0xfe, s+16);
+  uintptr_t* rc = (uintptr_t*)malloc (s+4*sizeof(uintptr_t));
+  memset (rc, 0xfe, s+4*sizeof(uintptr_t));
   *rc++ = s;
   *rc++ = 0xbeebbeeb;
-  *rc++ = (uint32)mtiRegisterAlloc (s, filename);
+  *rc++ = (uintptr_t)mtiRegisterAlloc (s, filename);
   *rc++ = 0xdeadbeef;
   return (void*)rc;
 }
 void* operator new[] (size_t s, void* filename, int /*line*/)
 {
   //CS_ASSERT (s > 0);
-  uint32* rc = (uint32*)malloc (s+16);
-  memset (rc, 0xfe, s+16);
+  uintptr_t* rc = (uintptr_t*)malloc (s+4*sizeof(uintptr_t));
+  memset (rc, 0xfe, s+4*sizeof(uintptr_t));
   *rc++ = s;
   *rc++ = 0xfeedbeef;
-  *rc++ = (uint32)mtiRegisterAlloc (s, filename);
+  *rc++ = (uintptr_t)mtiRegisterAlloc (s, filename);
   *rc++ = 0xdeadbeef;
   return (void*)rc;
 }
@@ -926,7 +926,7 @@ void operator delete (void* p)
 {
   if (p)
   {
-    uint32* rc = ((uint32*)p)-4;
+    uintptr_t* rc = ((uintptr_t*)p)-4;
     if (rc[3] != 0xdeadbeef) { free (p); return; }
     size_t s = rc[0];
     csMemTrackerInfo* mti = (csMemTrackerInfo*)rc[2];
@@ -938,7 +938,7 @@ void operator delete[] (void* p)
 {
   if (p)
   {
-    uint32* rc = ((uint32*)p)-4;
+    uintptr_t* rc = ((uintptr_t*)p)-4;
     if (rc[3] != 0xdeadbeef) { free (p); return; }
     size_t s = rc[0];
     csMemTrackerInfo* mti = (csMemTrackerInfo*)rc[2];

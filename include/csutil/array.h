@@ -311,7 +311,11 @@ private:
     {
       if (!curcapacity) return;
       char buf[1024];
-      cs_snprintf (buf, sizeof (buf), "csArray<%s>", typeid (T).name());
+      strcpy (buf, "csArray<");
+      size_t l = strlen (typeid (T).name ());
+      if (l > 1000) l = 1000;
+      strncat (buf, typeid (T).name (), l);
+      strcat (buf, ">");
       mti = mtiRegisterAlloc (1 * sizeof (T), buf);
       if (!mti) return;
       curcapacity--;
