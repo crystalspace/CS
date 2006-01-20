@@ -42,7 +42,7 @@ class csSoftShader :
 {
 public:
   iObjectRegistry* object_reg;
-  ScanlineRendererBase* scanlineRenderer;
+  csRef<ScanlineRendererBase> scanlineRenderer;
   csRef<iSoftShaderRenderInterface> softSRI;
 
 private:

@@ -20,6 +20,7 @@
 #ifndef __CS_SOFT3D_CLIP_ICLIPPER_H__
 #define __CS_SOFT3D_CLIP_ICLIPPER_H__
 
+#include "csgeom/box.h"
 #include "igeom/clip2d.h"
 
 #include "clipper.h"
@@ -52,6 +53,21 @@ class ClipMeatiClipper
     }
     return 3;
   }
+  CS_FORCEINLINE 
+  static void MinMax3 (const float a, const float b, const float c, 
+                       float& min, float& max)
+  {
+    if (a < b)
+    {
+      min = csMin (a, c);
+      max = csMax (b, c);
+    }
+    else
+    {
+      min = csMin (b, c);
+      max = csMax (a, c);
+    }
+  }
 public:
   void Init (iClipper2D* clipper, size_t maxClipVertices)
   {
@@ -81,6 +97,17 @@ public:
     CS_ALLOC_STACK_ARRAY(csVector2, outPoly, maxClipVertices);
     CS_ALLOC_STACK_ARRAY(csVertexStatus, outStatus, maxClipVertices);
     size_t outNum;
+
+    float minx, maxx, miny, maxy;
+    MinMax3 (v[0].x, v[1].x, v[2].x, minx, maxx);
+    MinMax3 (v[0].y, v[1].y, v[2].y, miny, maxy);
+    csBox2 bbox (minx, miny, maxx, maxy);
+
+    int boxClassify = clipper->ClassifyBox (bbox);
+    if (boxClassify == -1)
+      return 0;
+    else if (boxClassify == 1)
+      return CopyTri (tri, buffersMask, voutPersp, vout);
 
     uint clip_result = clipper->Clip (inpoly, 3, outPoly, outNum, outStatus);
     CS_ASSERT(outNum <= maxClipVertices);

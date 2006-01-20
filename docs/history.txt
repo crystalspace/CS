@@ -60,6 +60,8 @@ chronological order.
 	  current region from the loader context.
 	- res removed the VC6-related docs and updated the VC7-related docs
 	  for the fact that they basically apply to VC7.1 and 8 as well.
+	- res made a small optimization in SR clipping.
+	- res fixed a crash-on-exit with SR.
 19-Jan-2006
 	- Jorrit fixed gmesh3ds for Frank's latest refactor.
 	- Jorrit fixed a bug in spr3d. If the factory had no material but

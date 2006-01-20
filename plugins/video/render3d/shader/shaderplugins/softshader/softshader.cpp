@@ -42,14 +42,12 @@ namespace cspluginSoftshader
 SCF_IMPLEMENT_FACTORY (csSoftShader)
 
 csSoftShader::csSoftShader(iBase* parent) : 
-  scfImplementationType (this, parent), object_reg(0), scanlineRenderer(0), 
-  enable(false)
+  scfImplementationType (this, parent), object_reg(0), enable(false)
 {
 }
 
 csSoftShader::~csSoftShader()
 {
-  delete scanlineRenderer;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -99,7 +97,7 @@ void csSoftShader::Open()
       return;
     }
     
-    scanlineRenderer = new ScanlineRenderer;
+    scanlineRenderer.AttachNew (new ScanlineRenderer);
   }
 }
 
