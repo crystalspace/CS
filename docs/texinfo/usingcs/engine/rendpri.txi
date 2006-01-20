@@ -64,10 +64,15 @@ you can choose in which order to render objects.
 
 The @samp{alpha} render priority is a bit special. Objects in that
 render priority will be rendered from back to front. This is needed for
-objects that use alpha transparency. If you use other kinds of transparency
-like add or mult then you can use the @samp{transp} render priority. That
-one is not sorted from back to front so it is only usable for transparencies
-that are correct even if rendered in other order.
+objects that use alpha transparency and also if you need a mix of different
+kinds of transparencies. If you use a single other kind of transparency
+like add or mult (but not both) then you can use the @samp{transp} render
+priority. That one is not sorted from back to front so it is only usable for
+transparencies that are correct even if rendered in other order.
+
+For keycolor objects (@pxref{Alpha Textures}) you can use the normal
+@samp{object} render priority with @samp{ZUSE} z-buffer mode. This is also
+true for objects that have textures using binary alpha.
 
 To set up render priorities from within your application you can use
 the @code{engine->RegisterRenderPriority()} function.
@@ -156,7 +161,8 @@ is cleared every frame.
 using @samp{ZFILL}.
 @item
 @samp{object}: After sector walls the normal objects are rendered. Usually
-these have @samp{ZUSE} Z-buffer mode.
+these have @samp{ZUSE} Z-buffer mode. You can also use this render priority
+for objects using keycolor transparency.
 @item
 @samp{transp}: Non-alpha transparent objects need to be rendered after all other
 objects. The best Z-buffer mode for these kinds of objects is @samp{ZTEST}.

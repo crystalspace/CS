@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Alpha Textures, Texture Mapping, Materials, Materials
-@subsection Alpha in Textures
+@subsection Alpha and Keycolor in Textures
 @cindex alpha
 @cindex alpha textures
 @cindex keycolor

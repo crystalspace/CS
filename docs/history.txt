@@ -24,6 +24,8 @@ chronological order.
 	      - Cleaner (no dependencies on non-engine stuff).
 	      - Extensible (everyone can implement iSelfDestruct).
 	- Jorrit implemented iSelfDestruct in csMeshWrapper.
+	- Jorrit clarified the render priority documentation with regards
+	  to alpha and keycolor.
 19-Jan-2006
 	- Jorrit fixed gmesh3ds for Frank's latest refactor.
 	- Jorrit fixed a bug in spr3d. If the factory had no material but
