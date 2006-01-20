@@ -540,13 +540,13 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
  * function which is not qualified as `extern "C"'.
  */
 #ifdef CS_MEMORY_TRACKER
+#include "memdebug.h" // needed for mtiRegisterModule
 // This special version of SCF_IMPLEMENT_FACTORY_INIT will make sure that
 // the memory tracker for this plugin is implemented.
 #define SCF_IMPLEMENT_FACTORY_INIT(Class)				\
 static inline void Class ## _scfUnitInitialize(iSCF* SCF)		\
 {									\
   iSCF::SCF = SCF;							\
-  extern void mtiRegisterModule (char*);				\
   mtiRegisterModule (#Class);						\
 }									\
 CS_EXPORTED_FUNCTION							\

@@ -51,6 +51,7 @@ struct CS_CRYSTALSPACE_EXPORT csMemTrackerInfo
 
 /// 'info' can be filename or some other information to recognize allocation.
 CS_CRYSTALSPACE_EXPORT csMemTrackerInfo* mtiRegisterAlloc(size_t, void* info);
+CS_CRYSTALSPACE_EXPORT void mtiRegisterModule (char*);
 CS_CRYSTALSPACE_EXPORT void mtiRegisterFree(csMemTrackerInfo* mti, size_t s);
 CS_CRYSTALSPACE_EXPORT void mtiUpdateAmount(csMemTrackerInfo* mti, int dcount,
 					    int dsize);

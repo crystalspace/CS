@@ -64,6 +64,7 @@ chronological order.
 	- res fixed a crash-on-exit with SR.
 	- Jorrit fixed csBlockAllocator so it actually compiles with
 	  the memory tracker enabled.
+	- res fixed memtracker linking issues for namespaced plugins.
 19-Jan-2006
 	- Jorrit fixed gmesh3ds for Frank's latest refactor.
 	- Jorrit fixed a bug in spr3d. If the factory had no material but
