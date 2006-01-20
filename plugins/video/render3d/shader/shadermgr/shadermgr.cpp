@@ -52,6 +52,12 @@
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csShaderManager)
+
+void csNullShader::SelfDestruct ()
+{
+  mgr->UnregisterShader ((iShader*)this);
+}
+
 //=================== csShaderManager ================//
 
 // General stuff
@@ -112,7 +118,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 
   {
     csRef<csNullShader> nullShader;
-    nullShader.AttachNew (new csNullShader ());
+    nullShader.AttachNew (new csNullShader (this));
     nullShader->SetName ("*null");
     RegisterShader (nullShader);
   }
@@ -311,8 +317,8 @@ csSet<csStringID>& csShaderManager::GetTagSet (csShaderTagPresence presence)
   }
 }
 
-void csShaderManager::SetTagOptions (csStringID tag, csShaderTagPresence presence, 
-  int priority)
+void csShaderManager::SetTagOptions (csStringID tag,
+	csShaderTagPresence presence, int priority)
 {
   TagInfo* info = tagInfo.GetElementPointer (tag);
   if (info != 0)
@@ -344,8 +350,8 @@ void csShaderManager::SetTagOptions (csStringID tag, csShaderTagPresence presenc
   }
 }
 
-void csShaderManager::GetTagOptions (csStringID tag, csShaderTagPresence& presence, 
-  int& priority)
+void csShaderManager::GetTagOptions (csStringID tag,
+	csShaderTagPresence& presence, int& priority)
 {
   TagInfo* info = tagInfo.GetElementPointer (tag);
   if (info == 0) 

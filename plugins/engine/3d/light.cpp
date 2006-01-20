@@ -133,6 +133,12 @@ csLight::~csLight ()
   lightinginfos.DeleteAll ();
 }
 
+void csLight::SelfDestruct ()
+{
+  if (GetSector ())
+    GetSector ()->GetLights ()->Remove ((iLight*)this);
+}
+
 void csLight::UseAsCullingObject ()
 {
   sectors_wanting_visculling++;

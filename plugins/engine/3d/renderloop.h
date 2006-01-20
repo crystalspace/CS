@@ -26,9 +26,11 @@
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/csobject.h"
 #include "iengine/renderloop.h"
 #include "iengine/rendersteps/irenderstep.h"
 #include "iutil/strset.h"
+#include "iutil/selfdestruct.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
@@ -36,10 +38,11 @@ class csEngine;
 class csRenderView;
 class csRenderLoop;
 
-class csRenderLoop : public scfImplementation2<csRenderLoop,
-                                               iRenderLoop,
-                                               scfFakeInterface<
-					       		iRenderStepContainer> >
+class csRenderLoop : public scfImplementationExt3<csRenderLoop,
+	csObject,
+	iRenderLoop,
+	scfFakeInterface<iRenderStepContainer>,
+	iSelfDestruct>
 {
 protected:
   friend class csLightIteratorRenderStep;
@@ -61,6 +64,10 @@ public:
   virtual iRenderStep* GetStep (size_t n) const;
   virtual size_t Find (iRenderStep* step) const;
   virtual size_t GetStepCount () const;
+
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 };
 
 class csRenderLoopManager : public scfImplementation1<csRenderLoopManager,

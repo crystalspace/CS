@@ -1396,6 +1396,12 @@ csXMLShader::~csXMLShader ()
   delete[] allShaderMeta.description;
 }
 
+void csXMLShader::SelfDestruct ()
+{
+  if (shadermgr)
+    shadermgr->UnregisterShader ((iShader*)this);
+}
+
 int csXMLShader::CompareTechniqueKeeper (
   TechniqueKeeper const& t1, TechniqueKeeper const& t2)
 {

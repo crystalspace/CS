@@ -742,10 +742,11 @@ public:
 /**
  * The holder class for all implementations of iMeshObjectFactory.
  */
-class csMeshFactoryWrapper : public scfImplementationExt2<csMeshFactoryWrapper,
+class csMeshFactoryWrapper : public scfImplementationExt3<csMeshFactoryWrapper,
                                                           csObject, 
                                                           iMeshFactoryWrapper,
-                                                          iShaderVariableContext>
+                                                          iShaderVariableContext,
+							  iSelfDestruct>
 {
 private:
   /// Mesh object factory corresponding with this csMeshFactoryWrapper.
@@ -852,6 +853,9 @@ public:
   }
   void SetRenderPriorityRecursive (long rp);
 
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 
   //=================== iShaderVariableContext ================//
 

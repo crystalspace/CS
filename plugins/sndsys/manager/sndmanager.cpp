@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 by Jorrit Tyberghein
+    Copyright (C) 2005-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -29,6 +29,11 @@
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csSndSysManager)
+
+void csSndSysWrapper::SelfDestruct ()
+{
+  mgr->RemoveSound ((iSndSysWrapper*)this);
+}
 
 bool csSndSysManager::Initialize (iObjectRegistry *object_reg)
 {

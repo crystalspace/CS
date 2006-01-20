@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 by Jorrit Tyberghein
+    Copyright (C) 2005-2005 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -271,6 +271,24 @@ csMeshGenerator::~csMeshGenerator ()
     csMGPositionBlock* n = inuse_blocks->next;
     delete inuse_blocks;
     inuse_blocks = n;
+  }
+}
+
+void csMeshGenerator::SelfDestruct ()
+{
+  if (GetSector ())
+  {
+    size_t c = GetSector ()->GetMeshGeneratorCount ();
+    while (c > 0)
+    {
+      c--;
+      if (GetSector ()->GetMeshGenerator (c) == (iMeshGenerator*)this)
+      {
+        GetSector ()->RemoveMeshGenerator (c);
+	return;
+      }
+    }
+    CS_ASSERT (false);
   }
 }
 

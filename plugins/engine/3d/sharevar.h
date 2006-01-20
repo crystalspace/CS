@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2002 by Jorrit Tyberghein and Keith Fulton
+    Copyright (C) 1998-2006 by Jorrit Tyberghein and Keith Fulton
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,6 +27,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
+#include "iutil/selfdestruct.h"
 #include "iengine/sharevar.h"
 
 
@@ -34,9 +35,10 @@
 /**
  * A SharedVariable is a refcounted floating point value.
  */
-class csSharedVariable : public scfImplementationExt1<csSharedVariable, 
+class csSharedVariable : public scfImplementationExt2<csSharedVariable, 
                                                       csObject,
-                                                      iSharedVariable>
+                                                      iSharedVariable,
+						      iSelfDestruct>
 {
 private:
   int   type;
@@ -125,6 +127,10 @@ public:
   { csObject::SetName (iName); }
   virtual const char *GetName () const
   { return csObject::GetName (); }
+
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 };
 
 /// List of 3D engine SharedVariables.

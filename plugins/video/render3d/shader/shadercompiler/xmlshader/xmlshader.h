@@ -30,6 +30,7 @@
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iutil/strset.h"
+#include "iutil/selfdestruct.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 #include "ivideo/shader/shader.h"
@@ -261,9 +262,10 @@ public:
   void DumpConditionTree (csString& out);
 };
 
-class csXMLShader : public scfImplementationExt1<csXMLShader,
+class csXMLShader : public scfImplementationExt2<csXMLShader,
 						 csObject,
-						 iShader>
+						 iShader,
+						 iSelfDestruct>
 {
   friend class csShaderConditionResolver;
 
@@ -414,6 +416,10 @@ public:
   }
 
   friend class csXMLShaderCompiler;
+
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 
   //=================== iShaderVariableContext ================//
 

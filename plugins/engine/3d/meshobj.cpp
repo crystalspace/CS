@@ -165,9 +165,6 @@ csMeshWrapper::csMeshWrapper (iMeshObject *meshobj)
 
 void csMeshWrapper::SelfDestruct ()
 {
-  // Unlink from region.
-  if (GetObjectParent ())
-    GetObjectParent ()->ObjRemove ((iObject*)this);
   csEngine::currentEngine->GetMeshes ()->Remove ((iMeshWrapper*)this);
 }
 
@@ -1294,6 +1291,12 @@ csMeshFactoryWrapper::~csMeshFactoryWrapper ()
   // This line MUST be here to ensure that the children are not
   // removed after the destructor has already finished.
   children.RemoveAll ();
+}
+
+void csMeshFactoryWrapper::SelfDestruct ()
+{
+  csEngine::currentEngine->GetMeshFactories ()->Remove (
+  	(iMeshFactoryWrapper*)this);
 }
 
 void csMeshFactoryWrapper::SetZBufModeRecursive (csZBufMode mode)

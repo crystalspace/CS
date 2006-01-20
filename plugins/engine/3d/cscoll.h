@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,6 +23,7 @@
 #include "csutil/csobject.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
+#include "iutil/selfdestruct.h"
 #include "iengine/collectn.h"
 
 class csSector;
@@ -33,9 +34,10 @@ class csEngine;
  * A collection object is for convenience of the script language.
  * It simply groups objects which are related in some way.
  */
-class csCollection : public scfImplementationExt1<csCollection,
+class csCollection : public scfImplementationExt2<csCollection,
                                                   csObject,
-                                                  iCollection>
+                                                  iCollection,
+						  iSelfDestruct>
 {
 public:
   /**
@@ -71,6 +73,10 @@ public:
 
   virtual iObject* GetObject (int i) const
   { return (*this)[i]; }
+
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 
 private:
   /// The list of objects contained in this csCollection.

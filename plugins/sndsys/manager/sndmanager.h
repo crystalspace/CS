@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 by Jorrit Tyberghein
+    Copyright (C) 2005-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,20 +30,27 @@
 #include "iutil/csinput.h"
 #include "iutil/eventh.h"
 #include "iutil/plugin.h"
+#include "iutil/selfdestruct.h"
 #include "isndsys/ss_manager.h"
 #include "isndsys/ss_stream.h"
+
+class csSndSysManager;
 
 /**
  * Sound wrapper.
  */
-class csSndSysWrapper : public scfImplementationExt1<csSndSysWrapper,
-	csObject, iSndSysWrapper>
+class csSndSysWrapper : public scfImplementationExt2<csSndSysWrapper,
+						     csObject,
+						     iSndSysWrapper,
+						     iSelfDestruct>
 {
 private:
+  csSndSysManager* mgr;
   csRef<iSndSysStream> stream;
 
 public:
-  csSndSysWrapper (const char* name) : scfImplementationType (this)
+  csSndSysWrapper (csSndSysManager* mgr, const char* name)
+  	: scfImplementationType (this), mgr (mgr)
   {
     SetName (name);
   }
@@ -55,6 +62,10 @@ public:
   {
     csSndSysWrapper::stream = stream;
   }
+
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 };
 
 /**

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,6 +30,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/hash.h"
 #include "csutil/refarr.h"
+#include "iutil/selfdestruct.h"
 #include "plugins/engine/3d/lview.h"
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/movable.h"
@@ -105,11 +106,12 @@ typedef csSet<csRef<csLightSectorInfluence> > csLightSectorInfluences;
  * A light subclassing from this has a color, a position
  * and a radius.
  */
-class csLight : public scfImplementationExt3<csLight,
+class csLight : public scfImplementationExt4<csLight,
                                              csObject,
                                              iLight,
                                              iVisibilityObject,
-					     iSceneNode>
+					     iSceneNode,
+					     iSelfDestruct>
 {
 private:
   /// ID for this light (16-byte MD5).
@@ -544,6 +546,10 @@ public:
   virtual iMeshWrapper* QueryMesh () { return 0; }
   virtual iLight* QueryLight () { return this; }
   virtual iCamera* QueryCamera () { return 0; }
+
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 
   //------------------------ iLight interface -----------------------------
   

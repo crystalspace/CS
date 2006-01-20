@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,6 +17,7 @@
 */
 #include "cssysdef.h"
 #include "plugins/engine/3d/cscoll.h"
+#include "plugins/engine/3d/engine.h"
 
 
 csCollection::csCollection ()
@@ -26,6 +27,12 @@ csCollection::csCollection ()
 
 csCollection::~csCollection ()
 {
+}
+
+void csCollection::SelfDestruct ()
+{
+  csEngine::currentEngine->GetCollections ()->Remove (
+  	(iCollection*)this);
 }
 
 iObject *csCollection::FindObject (char *name) const

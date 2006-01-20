@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2002 by Jorrit Tyberghein and Keith Fulton
+    Copyright (C) 1998-2006 by Jorrit Tyberghein and Keith Fulton
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,6 +19,7 @@
 #include "csqint.h"
 #include "csutil/csstring.h"
 #include "plugins/engine/3d/sharevar.h"
+#include "plugins/engine/3d/engine.h"
 
 CS_LEAKGUARD_IMPLEMENT (csSharedVariable);
 
@@ -28,6 +29,12 @@ void csSharedVariable::FireListeners ()
   size_t i;
   for (i = 0 ; i < listeners.Length () ; i++)
     listeners[i]->VariableChanged (this);
+}
+
+void csSharedVariable::SelfDestruct ()
+{
+  csEngine::currentEngine->GetVariableList ()->Remove (
+  	(iSharedVariable*)this);
 }
 
 //-----------------------------------------------------------------------------

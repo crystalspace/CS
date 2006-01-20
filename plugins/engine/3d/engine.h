@@ -47,7 +47,6 @@
 #include "iutil/vfs.h"
 #include "iutil/virtclk.h"
 #include "ivaria/bugplug.h"
-#include "ivaria/engseq.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -370,6 +369,8 @@ public:
 
   virtual void AddEngineSectorCallback (iEngineSectorCallback* cb);
   virtual void RemoveEngineSectorCallback (iEngineSectorCallback* cb);
+  virtual void AddEngineFrameCallback (iEngineFrameCallback* cb);
+  virtual void RemoveEngineFrameCallback (iEngineFrameCallback* cb);
 
   //-- Mesh handling
 
@@ -629,13 +630,6 @@ public:
   void ReportBug (const char* description, ...) CS_GNUC_PRINTF (2, 3);
 
   /**
-   * Get/create the engine sequence manager.
-   * \param create
-   * Should a sequence manager be created if one does not exist.
-   */
-  iEngineSequenceManager* GetEngineSequenceManager (bool create = true);
- 
-  /**
    * Get the last animation time.
    */
   csTicks GetLastAnimationTime () const 
@@ -655,6 +649,12 @@ public:
    * Return the object managing all shared variables.
    */
   csSharedVariableList* GetVariables () const { return sharedVariables; }
+
+  /// Get the renderloop manager.
+  csRenderLoopManager* GetRenderLoopManager () const
+  {
+    return renderLoopManager;
+  }
 
 private:
   // -- PRIVATE METHODS
@@ -742,6 +742,7 @@ private:
   //Sector event helpers
   void FireNewSector (iSector* sector);
   void FireRemoveSector (iSector* sector);
+  void FireStartFrame (iRenderView* rview);
 
   /**
    * Split a name into optional 'region/name' format.
@@ -842,6 +843,8 @@ private:
 
   /// Sector callbacks.
   csRefArray<iEngineSectorCallback> sectorCallbacks;
+  /// Frame callbacks.
+  csRefArray<iEngineFrameCallback> frameCallbacks;
 
   /**
    * This is a vector which holds objects of type 'csCleanable'.
@@ -874,12 +877,6 @@ private:
    * and warning messages.
    */
   csRef<iReporter> reporter;
-
-  /**
-   * Pointer to the engine sequence manager.
-   */
-  csWeakRef<iEngineSequenceManager> sequenceManager;
-  bool sequenceManagerLoadAttempted;
 
   /// Store virtual clock to speed up time queries.
   csRef<iVirtualClock> virtualClock;

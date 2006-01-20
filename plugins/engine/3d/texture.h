@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,6 +24,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/leakguard.h"
+#include "iutil/selfdestruct.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
@@ -38,9 +39,10 @@ struct iImage;
  * csTextureWrapper represents a texture and its link
  * to the iTextureHandle as returned by iTextureManager.
  */
-class csTextureWrapper : public scfImplementationExt1<csTextureWrapper,
+class csTextureWrapper : public scfImplementationExt2<csTextureWrapper,
                                                       csObject,
-                                                      iTextureWrapper>
+                                                      iTextureWrapper,
+						      iSelfDestruct>
 {
 private:
   /// The corresponding iImage.
@@ -168,9 +170,12 @@ public:
   void SetTextureClass (const char* className);
   const char* GetTextureClass ();
 
+  //--------------------- iSelfDestruct implementation -------------------//
 
+  virtual void SelfDestruct ();
 
   //-------------------- iTextureWrapper implementation -----------------------
+
   virtual iObject *QueryObject() {return this; }
   virtual iTextureWrapper *Clone () const
   {

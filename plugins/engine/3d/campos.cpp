@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Andrew Zabolotny
+    Copyright (C) 2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -38,8 +39,8 @@ csCameraPosition::csCameraPosition (
 
 csCameraPosition::csCameraPosition (const csCameraPosition& other)
   : iBase(), scfImplementationType (this),
-  sector (csStrNew (other.sector)), position (other.position), forward (other.forward),
-  upward (other.upward), far_plane (0)
+  sector (csStrNew (other.sector)), position (other.position),
+  forward (other.forward), upward (other.upward), far_plane (0)
 {
   SetName (other.GetName ());
 }
@@ -48,6 +49,12 @@ csCameraPosition::~csCameraPosition ()
 {
   delete[] sector;
   delete[] far_plane;
+}
+
+void csCameraPosition::SelfDestruct ()
+{
+  csEngine::currentEngine->GetCameraPositions ()->Remove (
+  	(iCameraPosition*)this);
 }
 
 void csCameraPosition::Set (

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 by Jorrit Tyberghein
+    Copyright (C) 2005-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -28,6 +28,7 @@
 #include "csutil/set.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/floatrand.h"
+#include "iutil/selfdestruct.h"
 #include "csgeom/box.h"
 #include "iengine/mesh.h"
 #include "iengine/meshgen.h"
@@ -281,8 +282,10 @@ struct csMGCell
 /**
  * The mesh generator.
  */
-class csMeshGenerator : public scfImplementationExt1<
-	csMeshGenerator, csObject, iMeshGenerator>
+class csMeshGenerator : public scfImplementationExt2<csMeshGenerator,
+						     csObject,
+						     iMeshGenerator,
+						     iSelfDestruct>
 {
 private:
   /// All geometries.
@@ -446,6 +449,10 @@ public:
   virtual size_t GetMeshCount () const { return meshes.Length (); }
   virtual iMeshWrapper* GetMesh (size_t idx) { return meshes[idx]; }
   virtual void RemoveMesh (size_t idx);
+
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 };
 
 #endif // __CS_MESHGEN_H__

@@ -56,6 +56,12 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith)
   UpdateKeyColorFromHandle ();
 }
 
+void csTextureWrapper::SelfDestruct ()
+{
+  csEngine::currentEngine->GetTextureList ()->Remove (
+  	(iTextureWrapper*)this);
+}
+
 csTextureWrapper::csTextureWrapper (const csTextureWrapper &t) :
   iBase(), scfImplementationType (this),
   flags(CS_TEXTURE_3D)

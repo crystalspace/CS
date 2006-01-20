@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2005 by Jorrit Tyberghein
+    Copyright (C) 1998-2006 by Jorrit Tyberghein
               (C) 2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
@@ -31,6 +31,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
+#include "iutil/selfdestruct.h"
 #include "iengine/portalcontainer.h"
 #include "iengine/sector.h"
 #include "iengine/viscull.h"
@@ -100,9 +101,10 @@ private:
  * A sector is a container for objects. It is one of
  * the base classes for the portal engine.
  */
-class csSector : public scfImplementationExt1<csSector, 
+class csSector : public scfImplementationExt2<csSector, 
                                               csObject,
-                                              iSector>
+                                              iSector,
+					      iSelfDestruct>
 {
   // Friends
   friend class csEngine;
@@ -266,6 +268,10 @@ public:
   iMeshGenerator* GetMeshGeneratorByName (const char* name);
   void RemoveMeshGenerator (size_t idx);
   void RemoveMeshGenerators ();
+
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 
 private:
   // -- PRIVATE METHODS

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Andrew Zabolotny
+    Copyright (C) 2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,6 +24,7 @@
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "csutil/scf_implementation.h"
+#include "iutil/selfdestruct.h"
 #include "iengine/campos.h"
 #include "plugins/engine/3d/camera.h"
 
@@ -34,9 +36,10 @@ class csPlane3;
  * A camera position. This object can be used to initialize a camera object to
  * a certain state.
  */
-class csCameraPosition : public scfImplementationExt1<csCameraPosition,
+class csCameraPosition : public scfImplementationExt2<csCameraPosition,
                                                  csObject,
-                                                 iCameraPosition>
+                                                 iCameraPosition,
+						 iSelfDestruct>
 {
 public:
   /// Initialize the camera position object
@@ -68,6 +71,10 @@ public:
   {
     return far_plane;
   }
+
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 
 private:
   /// The sector this camera points to

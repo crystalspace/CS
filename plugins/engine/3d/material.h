@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2001-2006 by Jorrit Tyberghein
     Copyright (C) 2000 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
@@ -25,6 +25,7 @@
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "csutil/hash.h"
+#include "iutil/selfdestruct.h"
 #include "csutil/leakguard.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
@@ -224,6 +225,8 @@ public:
   /// Copy constructor
   csMaterialWrapper (csMaterialWrapper &);
 
+  void SelfDestruct ();
+
   /**
    * Change the base material. Note: The changes will not be visible until
    * you re-register the material.
@@ -262,6 +265,17 @@ public:
     }
   } scfiMaterialWrapper;
   friend struct MaterialWrapper;
+
+  //------------------- iSelfDestruct implementation -----------------------
+  struct eiSelfDestruct : public iSelfDestruct
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csMaterialWrapper);
+    virtual void SelfDestruct ()
+    {
+      scfParent->SelfDestruct ();
+    }
+  } scfiSelfDestruct;
+  friend struct SelfDestruct;
 };
 
 /**

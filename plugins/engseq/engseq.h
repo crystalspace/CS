@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Jorrit Tyberghein
+    Copyright (C) 2002-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,8 +25,10 @@
 #include "csutil/refarr.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/selfdestruct.h"
 #include "ivaria/engseq.h"
 #include "iengine/sector.h"
+#include "iengine/engine.h"
 
 struct iObjectRegistry;
 class csEngineSequenceManager;
@@ -108,7 +110,10 @@ public:
 /**
  * Wrapper for a sequence. Implements iSequenceWrapper.
  */
-class csSequenceWrapper : public csObject
+class csSequenceWrapper : public scfImplementationExt2<csSequenceWrapper,
+						       csObject,
+						       iSequenceWrapper,
+						       iSelfDestruct>
 {
 private:
   csRef<iSequence> sequence;
@@ -119,209 +124,75 @@ public:
   csSequenceWrapper (csEngineSequenceManager* eseqmgr, iSequence* sequence);
   virtual ~csSequenceWrapper ();
 
-  iSequence* GetSequence () { return sequence; }
+  virtual iSequence* GetSequence () { return sequence; }
 
-  iEngineSequenceParameters* CreateBaseParameterBlock ();
-  iEngineSequenceParameters* GetBaseParameterBlock ();
-  csPtr<iEngineSequenceParameters> CreateParameterBlock ();
+  virtual iEngineSequenceParameters* CreateBaseParameterBlock ();
+  virtual iEngineSequenceParameters* GetBaseParameterBlock ();
+  virtual csPtr<iEngineSequenceParameters> CreateParameterBlock ();
 
-  void AddOperationSetVariable (csTicks time,
+  virtual void AddOperationSetVariable (csTicks time,
   		iSharedVariable* var, float value, float dvalue = 0);
-  void AddOperationSetVariable (csTicks time,
+  virtual void AddOperationSetVariable (csTicks time,
   		iSharedVariable* var, iSharedVariable* value,
 		iSharedVariable* dvalue = 0);
-  void AddOperationSetVariable (csTicks time,
+  virtual void AddOperationSetVariable (csTicks time,
   		iSharedVariable* var, const csVector3& v);
-  void AddOperationSetVariable (csTicks time,
+  virtual void AddOperationSetVariable (csTicks time,
   		iSharedVariable* var, const csColor& c);
-  void AddOperationSetMaterial (csTicks time, iParameterESM* mesh,
-		  iParameterESM* mat);
-  void AddOperationSetPolygonMaterial (csTicks time, iParameterESM* polygon,
-		  iParameterESM* mat);
-  void AddOperationSetLight (csTicks time, iParameterESM* light,
+  virtual void AddOperationSetMaterial (csTicks time, iParameterESM* mesh,
+		iParameterESM* mat);
+  virtual void AddOperationSetPolygonMaterial (csTicks time,
+  		iParameterESM* polygon, iParameterESM* mat);
+  virtual void AddOperationSetLight (csTicks time, iParameterESM* light,
 		  const csColor& color);
-  void AddOperationFadeLight (csTicks time, iParameterESM* light,
+  virtual void AddOperationFadeLight (csTicks time, iParameterESM* light,
 		  const csColor& color, csTicks duration);
-  void AddOperationSetAmbient (csTicks time, iParameterESM* sector,
+  virtual void AddOperationSetAmbient (csTicks time, iParameterESM* sector,
 		  const csColor& color,iSharedVariable *var);
-  void AddOperationFadeAmbient (csTicks time, iParameterESM* sector,
+  virtual void AddOperationFadeAmbient (csTicks time, iParameterESM* sector,
 		  const csColor& color, csTicks duration);
-  void AddOperationRandomDelay(csTicks time,int min, int max);
-  void AddOperationSetMeshColor (csTicks time, iParameterESM* mesh,
+  virtual void AddOperationRandomDelay(csTicks time,int min, int max);
+  virtual void AddOperationSetMeshColor (csTicks time, iParameterESM* mesh,
 		  const csColor& color);
-  void AddOperationFadeMeshColor (csTicks time, iParameterESM* mesh,
+  virtual void AddOperationFadeMeshColor (csTicks time, iParameterESM* mesh,
 		  const csColor& color, csTicks duration);
-  void AddOperationSetFog (csTicks time, iParameterESM* sector,
+  virtual void AddOperationSetFog (csTicks time, iParameterESM* sector,
 		  const csColor& color, float density);
-  void AddOperationFadeFog (csTicks time, iParameterESM* sector,
+  virtual void AddOperationFadeFog (csTicks time, iParameterESM* sector,
 		  const csColor& color, float density, csTicks duration);
-  void AddOperationAbsoluteMove (csTicks time, iParameterESM* mesh,
-		  iParameterESM* sector, const csReversibleTransform& trans);
-  void AddOperationAbsoluteMove (csTicks time, iParameterESM* mesh,
-		  iParameterESM* sector, const csVector3& pos);
-  void AddOperationRelativeMove (csTicks time, iParameterESM* mesh,
-		  const csReversibleTransform& trans);
-  void AddOperationRelativeMove (csTicks time, iParameterESM* mesh,
-		  const csVector3& pos);
-  void AddOperationRotateDuration (csTicks time, iParameterESM* mesh,
+  //virtual void AddOperationAbsoluteMove (csTicks time, iParameterESM* mesh,
+		  //iParameterESM* sector, const csReversibleTransform& trans);
+  //virtual void AddOperationAbsoluteMove (csTicks time, iParameterESM* mesh,
+		  //iParameterESM* sector, const csVector3& pos);
+  //virtual void AddOperationRelativeMove (csTicks time, iParameterESM* mesh,
+		  //const csReversibleTransform& trans);
+  //virtual void AddOperationRelativeMove (csTicks time, iParameterESM* mesh,
+		  //const csVector3& pos);
+  virtual void AddOperationRotateDuration (csTicks time, iParameterESM* mesh,
   		int axis1, float tot_angle1,
 		int axis2, float tot_angle2,
 		int axis3, float tot_angle3,
 		const csVector3& offset,
 		csTicks duration);
-  void AddOperationMoveDuration (csTicks time, iParameterESM* mesh,
+  virtual void AddOperationMoveDuration (csTicks time, iParameterESM* mesh,
 		const csVector3& offset,
 		csTicks duration);
-  void AddOperationTriggerState (csTicks time, iParameterESM* trigger,
+  virtual void AddOperationTriggerState (csTicks time, iParameterESM* trigger,
 		  bool en);
-  void AddOperationCheckTrigger (csTicks time,
+  virtual void AddOperationCheckTrigger (csTicks time,
   		  iParameterESM* trigger, csTicks delay);
-  void AddOperationTestTrigger (csTicks time,
+  virtual void AddOperationTestTrigger (csTicks time,
   		  iParameterESM* trigger,
 		  iSequence* trueSequence,
 		  iSequence* falseSequence);
 
   void OverrideTimings(OpStandard *afterop,int ticks);
 
-  SCF_DECLARE_IBASE_EXT (csObject);
+  virtual iObject* QueryObject () { return this; }
 
-  //------------------- iSequenceWrapper implementation ------------------//
-  struct SequenceWrapper : public iSequenceWrapper
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSequenceWrapper);
-    virtual iObject* QueryObject ()
-    {
-      return scfParent;
-    }
-    virtual iSequence* GetSequence ()
-    {
-      return scfParent->GetSequence ();
-    }
-    virtual iEngineSequenceParameters* CreateBaseParameterBlock ()
-    {
-      return scfParent->CreateBaseParameterBlock ();
-    }
-    virtual iEngineSequenceParameters* GetBaseParameterBlock ()
-    {
-      return scfParent->GetBaseParameterBlock ();
-    }
-    virtual csPtr<iEngineSequenceParameters> CreateParameterBlock ()
-    {
-      return scfParent->CreateParameterBlock ();
-    }
-    virtual void AddOperationSetVariable (csTicks time,
-  		iSharedVariable* var, float value, float dvalue = 0)
-    {
-      scfParent->AddOperationSetVariable (time, var, value, dvalue);
-    }
-    virtual void AddOperationSetVariable (csTicks time,
-  		iSharedVariable* var, iSharedVariable* value,
-		iSharedVariable* dvalue = 0)
-    {
-      scfParent->AddOperationSetVariable (time, var, value, dvalue);
-    }
-    virtual void AddOperationSetVariable (csTicks time,
-  		iSharedVariable* var, const csVector3& v)
-    {
-      scfParent->AddOperationSetVariable (time, var, v);
-    }
-    virtual void AddOperationSetVariable (csTicks time,
-  		iSharedVariable* var, const csColor& c)
-    {
-      scfParent->AddOperationSetVariable (time, var, c);
-    }
-    virtual void AddOperationSetPolygonMaterial (csTicks time,
-    		  iParameterESM* polygon, iParameterESM* mat)
-    {
-      scfParent->AddOperationSetPolygonMaterial (time, polygon, mat);
-    }
-    virtual void AddOperationSetMaterial (csTicks time, iParameterESM* mesh,
-		  iParameterESM* mat)
-    {
-      scfParent->AddOperationSetMaterial (time, mesh, mat);
-    }
-    virtual void AddOperationSetLight (csTicks time, iParameterESM* light,
-		  const csColor& color)
-    {
-      scfParent->AddOperationSetLight (time, light, color);
-    }
-    virtual void AddOperationFadeLight (csTicks time, iParameterESM* light,
-		  const csColor& color, csTicks duration)
-    {
-      scfParent->AddOperationFadeLight (time, light, color, duration);
-    }
-    virtual void AddOperationSetAmbient (csTicks time, iParameterESM* sector,
-		  const csColor& color, iSharedVariable *colorvar)
-    {
-      scfParent->AddOperationSetAmbient (time, sector, color, colorvar);
-    }
-    virtual void AddOperationFadeAmbient (csTicks time, iParameterESM* sector,
-		  const csColor& color, csTicks duration)
-    {
-      scfParent->AddOperationFadeAmbient (time, sector, color, duration);
-    }
-    virtual void AddOperationRandomDelay (csTicks time,int min, int max)
-    {
-      scfParent->AddOperationRandomDelay (time,min,max);
-    }
-    virtual void AddOperationSetMeshColor (csTicks time, iParameterESM* mesh,
-		  const csColor& color)
-    {
-      scfParent->AddOperationSetMeshColor (time, mesh, color);
-    }
-    virtual void AddOperationFadeMeshColor (csTicks time, iParameterESM* mesh,
-		  const csColor& color, csTicks duration)
-    {
-      scfParent->AddOperationFadeMeshColor (time, mesh, color, duration);
-    }
-    virtual void AddOperationSetFog (csTicks time, iParameterESM* sector,
-		  const csColor& color, float density)
-    {
-      scfParent->AddOperationSetFog (time, sector, color, density);
-    }
-    virtual void AddOperationFadeFog (csTicks time, iParameterESM* sector,
-		  const csColor& color, float density, csTicks duration)
-    {
-      scfParent->AddOperationFadeFog (time, sector, color, density,
-      	duration);
-    }
-    virtual void AddOperationRotateDuration (csTicks time, iParameterESM* mesh,
-  		int axis1, float tot_angle1,
-		int axis2, float tot_angle2,
-		int axis3, float tot_angle3,
-		const csVector3& offset,
-		csTicks duration)
-    {
-      scfParent->AddOperationRotateDuration (time, mesh,
-      	axis1, tot_angle1, axis2, tot_angle2, axis3, tot_angle3,
-	offset, duration);
-    }
-    virtual void AddOperationMoveDuration (csTicks time, iParameterESM* mesh,
-		const csVector3& offset,
-		csTicks duration)
-    {
-      scfParent->AddOperationMoveDuration (time, mesh, offset, duration);
-    }
-    virtual void AddOperationTriggerState (csTicks time,
-    		  iParameterESM* trigger, bool en)
-    {
-      scfParent->AddOperationTriggerState (time, trigger, en);
-    }
-    virtual void AddOperationCheckTrigger (csTicks time,
-  		  iParameterESM* trigger, csTicks delay)
-    {
-      scfParent->AddOperationCheckTrigger (time, trigger, delay);
-    }
-    virtual void AddOperationTestTrigger (csTicks time,
-  		  iParameterESM* trigger,
-		  iSequence* trueSequence,
-		  iSequence* falseSequence)
-    {
-      scfParent->AddOperationTestTrigger (time, trigger,
-		      trueSequence, falseSequence);
-    }
-  } scfiSequenceWrapper;
-  friend struct SequenceWrapper;
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 };
 
 /**
@@ -353,7 +224,10 @@ public:
 /**
  * Sequence trigger implementation. Implements iSequenceTrigger.
  */
-class csSequenceTrigger : public csObject
+class csSequenceTrigger : public scfImplementationExt2<csSequenceTrigger,
+						       csObject,
+						       iSequenceTrigger,
+						       iSelfDestruct>
 {
 private:
   bool enabled;
@@ -384,30 +258,30 @@ public:
 
   void AddConditionInSector (iSector* sector, bool insideonly,
 		  const csBox3* box, const csSphere* sphere);
-  void AddConditionMeshClick (iMeshWrapper* mesh);
-  void AddConditionLightChange (iLight *whichlight, 
+  virtual void AddConditionMeshClick (iMeshWrapper* mesh);
+  virtual void AddConditionLightChange (iLight *whichlight, 
 				int oper, const csColor& col);
-  void AddConditionManual ();
+  virtual void AddConditionManual ();
 
-  void SetEnabled (bool en) { enabled = en; }
-  bool IsEnabled () const { return enabled; }
-  void ClearConditions ();
-  void Trigger ();
+  virtual void SetEnabled (bool en) { enabled = en; }
+  virtual bool IsEnabled () const { return enabled; }
+  virtual void ClearConditions ();
+  virtual void Trigger ();
 
-  void SetParameters (iEngineSequenceParameters* params)
+  virtual void SetParameters (iEngineSequenceParameters* params)
   {
     csSequenceTrigger::params = params;
   }
-  iEngineSequenceParameters* GetParameters () const
+  virtual iEngineSequenceParameters* GetParameters () const
   {
     return params;
   }
 
-  void FireSequence (csTicks delay, iSequenceWrapper* seq);
-  iSequenceWrapper* GetFiredSequence () { return fire_sequence; }
+  virtual void FireSequence (csTicks delay, iSequenceWrapper* seq);
+  virtual iSequenceWrapper* GetFiredSequence () { return fire_sequence; }
 
-  void TestConditions (csTicks delay);
-  bool CheckState ();
+  virtual void TestConditions (csTicks delay);
+  virtual bool CheckState ();
   csTicks GetConditionTestDelay () const { return condtest_delay; }
   void EnableOneTest ();
 
@@ -419,96 +293,29 @@ public:
   }
 
   void Fire ();
-  void ForceFire (bool now);
+  virtual void ForceFire (bool now = false);
 
-  SCF_DECLARE_IBASE_EXT (csObject);
-
-  //------------------- iSequenceTrigger implementation ------------------//
-  struct SequenceTrigger : public iSequenceTrigger
+  virtual iObject* QueryObject () { return this; }
+  virtual void AddConditionInSector (iSector* sector)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (csSequenceTrigger);
-    virtual iObject* QueryObject ()
-    {
-      return scfParent;
-    }
-    virtual void AddConditionInSector (iSector* sector)
-    {
-      scfParent->AddConditionInSector (sector, true, 0, 0);
-    }
-    virtual void AddConditionInSector (iSector* sector,
-	const csBox3& box)
-    {
-      scfParent->AddConditionInSector (sector, true, &box, 0);
-    }
-    virtual void AddConditionInSector (iSector* sector,
-	const csSphere& sphere)
-    {
-      scfParent->AddConditionInSector (sector, true, 0, &sphere);
-    }
-    virtual void AddConditionSectorVisible (iSector* sector)
-    {
-      scfParent->AddConditionInSector (sector, false, 0, 0);
-    }
-    virtual void AddConditionMeshClick (iMeshWrapper* mesh)
-    {
-      scfParent->AddConditionMeshClick (mesh);
-    }
-    virtual void AddConditionLightChange (iLight *whichlight, 
-					  int oper, const csColor& col)
-    {
-      scfParent->AddConditionLightChange(whichlight,oper,col);
-    }
+    AddConditionInSector (sector, true, 0, 0);
+  }
+  virtual void AddConditionInSector (iSector* sector, const csBox3& box)
+  {
+    AddConditionInSector (sector, true, &box, 0);
+  }
+  virtual void AddConditionInSector (iSector* sector, const csSphere& sphere)
+  {
+    AddConditionInSector (sector, true, 0, &sphere);
+  }
+  virtual void AddConditionSectorVisible (iSector* sector)
+  {
+    AddConditionInSector (sector, false, 0, 0);
+  }
 
-    virtual void AddConditionManual ()
-    {
-      scfParent->AddConditionManual ();
-    }
-    virtual void SetEnabled (bool en)
-    {
-      scfParent->SetEnabled (en);
-    }
-    virtual bool IsEnabled () const
-    {
-      return scfParent->IsEnabled ();
-    }
-    virtual void ClearConditions ()
-    {
-      scfParent->ClearConditions ();
-    }
-    virtual void Trigger ()
-    {
-      scfParent->Trigger ();
-    }
-    virtual void SetParameters (iEngineSequenceParameters* params)
-    {
-      scfParent->SetParameters (params);
-    }
-    virtual iEngineSequenceParameters* GetParameters () const
-    {
-      return scfParent->GetParameters ();
-    }
-    virtual void FireSequence (csTicks delay, iSequenceWrapper* seq)
-    {
-      scfParent->FireSequence (delay, seq);
-    }
-    virtual iSequenceWrapper* GetFiredSequence ()
-    {
-      return scfParent->GetFiredSequence ();
-    }
-    virtual void TestConditions (csTicks delay)
-    {
-      scfParent->TestConditions (delay);
-    }
-    virtual bool CheckState ()
-    {
-      return scfParent->CheckState ();
-    }
-    virtual void ForceFire (bool now = false)
-    {
-      scfParent->ForceFire (now);
-    }
-  } scfiSequenceTrigger;
-  friend struct SequenceTrigger;
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 };
 
 /**
@@ -549,6 +356,21 @@ public:
   int GetRefCount () { return ref; }
 };
 
+class csCameraCatcher : public scfImplementation1<csCameraCatcher,
+	iEngineFrameCallback>
+{
+public:
+  iCamera* camera;
+
+public:
+  csCameraCatcher () : scfImplementationType (this) { camera = 0; }
+  virtual ~csCameraCatcher () { }
+  virtual void StartFrame (iEngine* engine, iRenderView* rview)
+  {
+    camera = rview->GetCamera ();
+  }
+};
+
 /**
  * Implementation of iEngineSequenceManager.
  */
@@ -571,8 +393,11 @@ private:
   csRefArray<csTimedOperation> timed_operations;
   uint32 global_framenr;
 
-  /// Set the camera to use for some features.
-  csWeakRef<iCamera> camera;
+  /// Camera catcher.
+  csRef<csCameraCatcher> cameracatcher;
+
+  /// Refernce to the engine.
+  csWeakRef<iEngine> engine;
 
 public:
   SCF_DECLARE_IBASE;
@@ -584,11 +409,6 @@ public:
   /// This is set to receive the once per frame nothing event.
   virtual bool HandleEvent (iEvent &event);
 
-  virtual void SetCamera (iCamera* c)
-  {
-    camera = c;
-  }
-  virtual iCamera* GetCamera () { return camera; }
   virtual csPtr<iParameterESM> CreateParameterESM (iBase* value);
   virtual iSequenceManager* GetSequenceManager () { return seqmgr; }
   virtual csPtr<iSequenceTrigger> CreateTrigger (const char* name);

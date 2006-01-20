@@ -139,6 +139,11 @@ csSector::~csSector ()
   lights.RemoveAll ();
 }
 
+void csSector::SelfDestruct ()
+{
+  csEngine::currentEngine->GetSectors ()->Remove ((iSector*)this);
+}
+
 void csSector::RegisterLightToCuller (csLight* light)
 {
   light->UseAsCullingObject ();

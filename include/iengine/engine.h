@@ -122,6 +122,19 @@ enum csRenderPrioritySorting
 
 
 /**
+ * A callback that will be fired whenever the engine starts drawing
+ * a frame.
+ */
+struct iEngineFrameCallback : public virtual iBase
+{
+  SCF_INTERFACE(iEngineFrameCallback,1,0,0);
+  /**
+   * Start a new frame.
+   */
+  virtual void StartFrame (iEngine* engine, iRenderView* rview) = 0;
+};
+
+/**
  * A callback that will be fired whenever a sector is created or
  * removed from the engine.
  */
@@ -609,6 +622,17 @@ struct iEngine : public virtual iBase
    */
   virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius) = 0;
+
+  /**
+   * Add a frame callback. This will call IncRef() on the callback
+   * So make sure you call DecRef() to release your own reference.
+   */
+  virtual void AddEngineFrameCallback (iEngineFrameCallback* cb) = 0;
+
+  /**
+   * Remove a frame callback.
+   */
+  virtual void RemoveEngineFrameCallback (iEngineFrameCallback* cb) = 0;
 
   /**
    * Add a sector callback. This will call IncRef() on the callback

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2001-2006 by Jorrit Tyberghein
     Copyright (C) 2000 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
@@ -52,11 +52,16 @@ csMaterial::csMaterial (csEngine* engine)
   csMaterial::engine = engine;
 
 
-  nameDiffuseParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_DIFFUSE);
-  nameAmbientParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_AMBIENT);
-  nameReflectParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_REFLECTION);
-  nameFlatColorParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_FLATCOLOR);
-  nameDiffuseTexture = engine->globalStringSet->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
+  nameDiffuseParam = engine->globalStringSet->Request (
+  	CS_MATERIAL_VARNAME_DIFFUSE);
+  nameAmbientParam = engine->globalStringSet->Request (
+  	CS_MATERIAL_VARNAME_AMBIENT);
+  nameReflectParam = engine->globalStringSet->Request (
+  	CS_MATERIAL_VARNAME_REFLECTION);
+  nameFlatColorParam = engine->globalStringSet->Request (
+  	CS_MATERIAL_VARNAME_FLATCOLOR);
+  nameDiffuseTexture = engine->globalStringSet->Request (
+  	CS_MATERIAL_TEXTURE_DIFFUSE);
 
   SetTextureWrapper (0);
   // @@@ This will force the shader vars to be created...
@@ -75,11 +80,16 @@ csMaterial::csMaterial (csEngine* engine,
 
   csMaterial::engine = engine;
 
-  nameDiffuseParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_DIFFUSE);
-  nameAmbientParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_AMBIENT);
-  nameReflectParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_REFLECTION);
-  nameFlatColorParam = engine->globalStringSet->Request (CS_MATERIAL_VARNAME_FLATCOLOR);
-  nameDiffuseTexture = engine->globalStringSet->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
+  nameDiffuseParam = engine->globalStringSet->Request (
+  	CS_MATERIAL_VARNAME_DIFFUSE);
+  nameAmbientParam = engine->globalStringSet->Request (
+  	CS_MATERIAL_VARNAME_AMBIENT);
+  nameReflectParam = engine->globalStringSet->Request (
+  	CS_MATERIAL_VARNAME_REFLECTION);
+  nameFlatColorParam = engine->globalStringSet->Request (
+  	CS_MATERIAL_VARNAME_FLATCOLOR);
+  nameDiffuseTexture = engine->globalStringSet->Request (
+  	CS_MATERIAL_TEXTURE_DIFFUSE);
 
 
   SetTextureWrapper (w);
@@ -287,6 +297,7 @@ bool csMaterial::IsVisitRequired () const
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csMaterialWrapper)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMaterialWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSelfDestruct)
   SCF_IMPLEMENTS_INTERFACE(csMaterialWrapper)
 SCF_IMPLEMENT_IBASE_EXT_END
 
@@ -294,9 +305,14 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterialWrapper::MaterialWrapper)
   SCF_IMPLEMENTS_INTERFACE(iMaterialWrapper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterialWrapper::eiSelfDestruct)
+  SCF_IMPLEMENTS_INTERFACE(iSelfDestruct)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csMaterialWrapper::csMaterialWrapper (iMaterial *m) : csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSelfDestruct);
   material = m;
   matEngine = SCF_QUERY_INTERFACE (material, iMaterialEngine);
 }
@@ -305,6 +321,7 @@ csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) :
   iBase(), csObject(w)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSelfDestruct);
 
   material = w.material;
   matEngine = w.matEngine;
@@ -312,7 +329,14 @@ csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) :
 
 csMaterialWrapper::~csMaterialWrapper ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSelfDestruct);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+}
+
+void csMaterialWrapper::SelfDestruct ()
+{
+  csEngine::currentEngine->GetMaterialList ()->Remove (
+  	&scfiMaterialWrapper);
 }
 
 void csMaterialWrapper::SetMaterial (iMaterial *m)

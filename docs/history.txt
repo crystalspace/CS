@@ -26,6 +26,38 @@ chronological order.
 	- Jorrit implemented iSelfDestruct in csMeshWrapper.
 	- Jorrit clarified the render priority documentation with regards
 	  to alpha and keycolor.
+	- Jorrit converted csSequenceWrapper and csSequenceTrigger to new SCF.
+	- Jorrit implemented iSelfDestruct in various engine objects.
+	- Jorrit implemented iSelfDestruct in iSndSysWrapper. By doing that
+	  this removes a dependency from engine to the new sound system
+	  and it also enables engine->RemoveObject() to work on sounds.
+	- Jorrit implemented iSelfDestruct in iSequenceWrapper and
+	  iSequenceTrigger. By doing that this removes one dependency from
+	  engine to the engine sequence manager and it also enables
+	  engine->RemoveObject() to work on sequence wrappers and triggers.
+	- Jorrit implemented iSelfDestruct in csNullShader and csXMLShader.
+	  This removes the dependency from the engine to the shader manager
+	  and enables engine->RemoveObject() to work on shaders.
+	- Jorrit added a new iEngineFrameCallback interface. This can be
+	  implemented if you want to know whenever the engine starts drawing
+	  a new frame.
+	- Jorrit announces:
+	  For long and dark years a fierce creature roamed in the gloomy
+	  corners of BugPlug. Taking the shape of a big Spider it wove its
+	  web of deceit and catched many careless wanderers. But no more! The
+	  age of the darkness is over and light shines over the land again.
+	  The Spider has been defeated. But not by a great warrior, oh no!
+	  A small and innocent creature has given Spider a bitter defeat and
+	  from now on BugPlug shall be a safer place for everyone.
+	- Jorrit completely removed the dependency from engine to engine
+	  sequence manager. The engine sequence manager will now use the new
+	  iEngineFrameCallback interface to find out the current camera.
+	- Jorrit changed csRenderLoop to inherit from csObject. By doing
+	  that renderloops can now be added to regions too.
+	- Jorrit implemented iSelfDestruct in csRenderLoop.
+	- Jorrit changed the renderloop loader addon so that it also
+	  respects regions and it will now add the new renderloop to the
+	  current region from the loader context.
 19-Jan-2006
 	- Jorrit fixed gmesh3ds for Frank's latest refactor.
 	- Jorrit fixed a bug in spr3d. If the factory had no material but

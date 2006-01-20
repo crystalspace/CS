@@ -86,7 +86,7 @@ bool csRenderLoopLoader::ParseRenderSteps (iRenderLoop* loop,
 }
 
 csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node, 
-  iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /*context*/)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
 {
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
@@ -109,6 +109,9 @@ csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node,
   }
 
   csRef<iRenderLoop> loop = loopmgr->Create ();
+  csRef<iObject> obj = scfQueryInterface<iObject> (loop);
+  if (ldr_context->GetRegion ())
+    ldr_context->GetRegion ()->QueryObject ()->ObjAdd (obj);
 
   char* loopName = 0;
 

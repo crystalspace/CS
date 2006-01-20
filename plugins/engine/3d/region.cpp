@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000-2001 by Jorrit Tyberghein
+    Copyright (C) 2000-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,10 +18,6 @@
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/array.h"
-#include "ivideo/txtmgr.h"
-#include "ivideo/texture.h"
-#include "ivideo/material.h"
-#include "ivideo/shader/shader.h"
 #include "plugins/engine/3d/region.h"
 #include "plugins/engine/3d/engine.h"
 #include "iengine/sector.h"
@@ -31,8 +27,6 @@
 #include "iengine/material.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
-#include "ivaria/engseq.h"
-#include "isndsys/ss_manager.h"
 
 //---------------------------------------------------------------------------
 
@@ -49,14 +43,10 @@ csRegion::~csRegion ()
 
 void csRegion::DeleteAll ()
 {
-  csRef<iObjectIterator> iter;
-  iEngineSequenceManager* engseq = csEngine::currentEngine
-    ->GetEngineSequenceManager (false);
-
   // First we need to copy the objects to a vector to avoid
   // messing up the iterator while we are deleting them.
   csArray<iObject*> copy (1024, 256);
-  iter = GetIterator ();
+  csRef<iObjectIterator> iter = GetIterator ();
   while (iter->HasNext ())
   {
     iObject *o = iter->Next ();
@@ -84,72 +74,6 @@ void csRegion::DeleteAll ()
     }
 
   if (!total) return;
-
-  for (i = 0; i < copy.Length (); i++)
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
-      csRef<iSndSysWrapper> o = SCF_QUERY_INTERFACE (obj, iSndSysWrapper);
-      if (!o) continue;
-
-      if (!snd_manager)
-      {
-	snd_manager = CS_QUERY_REGISTRY (
-  	  csEngine::currentEngine->objectRegistry, iSndSysManager);
-      }
-      if (snd_manager) snd_manager->RemoveSound (o);
-      ObjRemove (obj);
-      copy[i] = 0;
-      total--;
-    }
-
-  if (!total) return;
-
-  for (i = 0; i < copy.Length (); i++)
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
-      csRef<iSequenceWrapper> o (SCF_QUERY_INTERFACE (obj, iSequenceWrapper));
-      if (!o) continue;
-
-      if (engseq) engseq->RemoveSequence (o);
-      ObjRemove (obj);
-      copy[i] = 0;
-      total--;
-    }
-
-  if (!total) return;
-
-  for (i = 0; i < copy.Length (); i++)
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
-      csRef<iSequenceTrigger> o (SCF_QUERY_INTERFACE (obj, iSequenceTrigger));
-      if (!o) continue;
-
-      if (engseq) engseq->RemoveTrigger (o);
-      ObjRemove (obj);
-      copy[i] = 0;
-      total--;
-    }
-
-  if (!total) return;
-
-  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY (
-  	csEngine::currentEngine->objectRegistry, iShaderManager);
-  if (shmgr)
-    for (i = 0; i < copy.Length (); i++)
-      if (copy[i])
-      {
-        iObject *obj = copy[i];
-        csRef<iShader> o (SCF_QUERY_INTERFACE (obj, iShader));
-        if (!o) continue;
-
-        shmgr->UnregisterShader (o);
-        ObjRemove (obj);
-        copy[i] = 0;
-	total--;
-      }
 
   if (total > 0)
   {

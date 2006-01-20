@@ -51,6 +51,11 @@ csRenderLoop::~csRenderLoop ()
 {
 }
 
+void csRenderLoop::SelfDestruct ()
+{
+  engine->GetRenderLoopManager ()->Unregister ((iRenderLoop*)this);
+}
+
 void csRenderLoop::Draw (iRenderView *rview, iSector *s)
 {
   if (!shadermanager)

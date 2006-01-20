@@ -727,7 +727,7 @@ csEngine::csEngine (iBase *iParent) :
   scfImplementationType (this, iParent),
   textures (new csTextureList), materials (new csMaterialList),
   sharedVariables (new csSharedVariableList),
-  sectorItPool (0), sequenceManagerLoadAttempted(false), 
+  sectorItPool (0),
   renderLoopManager (0), topLevelClipper (0), resize (false),
   worldSaveable (false), maxAspectRatio (0), nextframePending (0),
   currentFrameNumber (0), clearZBuf (false), defaultClearZBuf (false),
@@ -1600,35 +1600,6 @@ void csEngine::StartEngine ()
   DeleteAll ();
 }
 
-iEngineSequenceManager* csEngine::GetEngineSequenceManager (bool create)
-{
-  if (!sequenceManager && create && !sequenceManagerLoadAttempted)
-  {
-    csRef<iEngineSequenceManager> es = CS_QUERY_REGISTRY (
-    	objectRegistry, iEngineSequenceManager);
-    if (!es)
-    {
-      csRef<iPluginManager> plugin_mgr =
-  	  CS_QUERY_REGISTRY (objectRegistry, iPluginManager);
-      es = CS_LOAD_PLUGIN (plugin_mgr,
-    	  "crystalspace.utilities.sequence.engine", iEngineSequenceManager);
-      sequenceManagerLoadAttempted = true;
-      if (!es)
-      {
-	Warn ("Could not load the engine sequence manager!");
-        return 0;
-      }
-      if (!objectRegistry->Register (es, "iEngineSequenceManager"))
-      {
-	Warn ("Could not register the engine sequence manager!");
-        return 0;
-      }
-    }
-    sequenceManager = (iEngineSequenceManager*)es;
-  }
-  return sequenceManager;
-}
-
 void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
 {
   int num;
@@ -1689,12 +1660,6 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/, csRenderView &rview)
   rview.SetEngine (this);
   rview.SetOriginalCamera (c);
 
-  iEngineSequenceManager* eseqmgr = GetEngineSequenceManager ();
-  if (eseqmgr)
-  {
-    eseqmgr->SetCamera (c);
-  }
-
   // This flag is set in HandleEvent on a CanvasResize event
   if (resize)
   {
@@ -1728,6 +1693,8 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
   G3D->ResetNearPlane ();
   G3D->SetPerspectiveAspect (c->GetFOV ());
+
+  FireStartFrame (&rview);
 
   iSector *s = c->GetSector ();
   if (s) 
@@ -2831,6 +2798,26 @@ iSector *csEngine::CreateSector (const char *name)
   return sector;
 }
 
+void csEngine::AddEngineFrameCallback (iEngineFrameCallback* cb)
+{
+  frameCallbacks.Push (cb);
+}
+
+void csEngine::RemoveEngineFrameCallback (iEngineFrameCallback* cb)
+{
+  frameCallbacks.Delete (cb);
+}
+
+void csEngine::FireStartFrame (iRenderView* rview)
+{
+  size_t i = frameCallbacks.Length ();
+  while (i > 0)
+  {
+    i--;
+    frameCallbacks[i]->StartFrame (this, rview);
+  }
+}
+
 void csEngine::AddEngineSectorCallback (iEngineSectorCallback* cb)
 {
   sectorCallbacks.Push (cb);
@@ -3370,98 +3357,17 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   return CreateMeshWrapper (mo, name, sector, pos);
 }
 
-static void UnlinkFromRegion (iObject* object)
-{
-  if (object->GetObjectParent ())
-    object->GetObjectParent ()->ObjRemove (object);
-}
-
 bool csEngine::RemoveObject (iBase *object)
 {
+  csRef<iObject> obj = scfQueryInterface<iObject> (object);
+  if (obj && obj->GetObjectParent ())
+    obj->GetObjectParent ()->ObjRemove (obj);
+
   csRef<iSelfDestruct> sd = scfQueryInterface<iSelfDestruct> (object);
   if (sd)
   {
     sd->SelfDestruct ();
     return true;
-  }
-
-  csRef<iMeshFactoryWrapper> factwrap (SCF_QUERY_INTERFACE (object,
-        iMeshFactoryWrapper));
-  if (factwrap)
-  {
-    UnlinkFromRegion (factwrap->QueryObject ());
-    meshFactories.Remove (factwrap);
-    return true;
-  }
-  csRef<iTextureWrapper> txt (SCF_QUERY_INTERFACE (object, iTextureWrapper));
-  if (txt)
-  {
-    UnlinkFromRegion (txt->QueryObject ());
-    GetTextureList ()->Remove (txt);
-    return true;
-  }
-  csRef<iMaterialWrapper> mat (SCF_QUERY_INTERFACE (object, iMaterialWrapper));
-  if (mat)
-  {
-    UnlinkFromRegion (mat->QueryObject ());
-    GetMaterialList ()->Remove (mat);
-    return true;
-  }
-  csRef<iSector> sector (SCF_QUERY_INTERFACE (object, iSector));
-  if (sector)
-  {
-    UnlinkFromRegion (sector->QueryObject ());
-    sectors.Remove (sector);
-    return true;
-  }
-  csRef<iLight> dl (SCF_QUERY_INTERFACE (object, iLight));
-  if (dl)
-  {
-    UnlinkFromRegion (dl->QueryObject ());
-    if (dl->GetSector ())
-      dl->GetSector ()->GetLights ()->Remove (dl);
-    return true;
-  }
-  csRef<iSharedVariable> sv = scfQueryInterface<iSharedVariable> (object);
-  if (sv)
-  {
-    UnlinkFromRegion (sv->QueryObject ());
-    GetVariableList ()->Remove (sv);
-    return true;
-  }
-  csRef<iCameraPosition> cp (SCF_QUERY_INTERFACE (object, iCameraPosition));
-  if (cp)
-  {
-    UnlinkFromRegion (cp->QueryObject ());
-    cameraPositions.Remove (cp);
-    return true;
-  }
-  csRef<iCollection> col (SCF_QUERY_INTERFACE (object, iCollection));
-  if (col)
-  {
-    UnlinkFromRegion (col->QueryObject ());
-    collections.Remove (col);
-    return true;
-  }
-  csRef<iMeshGenerator> mg = scfQueryInterface<iMeshGenerator> (object);
-  if (mg)
-  {
-    UnlinkFromRegion (mg->QueryObject ());
-    csMeshGenerator* csmg = (csMeshGenerator*)(iMeshGenerator*)mg;
-    if (csmg->GetSector ())
-    {
-      size_t c = csmg->GetSector ()->GetMeshGeneratorCount ();
-      while (c > 0)
-      {
-        c--;
-	if (csmg->GetSector ()->GetMeshGenerator (c) == mg)
-	{
-          csmg->GetSector ()->RemoveMeshGenerator (c);
-	  return true;
-        }
-      }
-      CS_ASSERT (false);
-    }
   }
 
   return false;

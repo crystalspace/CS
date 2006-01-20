@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2001-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -33,6 +33,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 #include "ivaria/bugplug.h"
+#include "iengine/engine.h"
 
 struct iCamera;
 struct iConsoleOutput;
@@ -65,7 +66,6 @@ class csView;
 
 struct csTriangle;
 
-class csSpider;
 class csShadow;
 
 //--------------------------------------------------------------------------
@@ -196,6 +196,23 @@ struct csCounter
 
 //--------------------------------------------------------------------------
 
+class csCameraCatcher : public scfImplementation1<csCameraCatcher,
+	iEngineFrameCallback>
+{
+public:
+  iCamera* camera;
+
+public:
+  csCameraCatcher () : scfImplementationType (this) { camera = 0; }
+  virtual ~csCameraCatcher () { }
+  virtual void StartFrame (iEngine* engine, iRenderView* rview)
+  {
+    camera = rview->GetCamera ();
+  }
+};
+
+//--------------------------------------------------------------------------
+
 /**
  * Debugger plugin. Loading this plugin is sufficient to get debugging
  * functionality in your application.
@@ -273,29 +290,10 @@ private:
   // Shadow!
   csShadow* shadow;
 
-  // Spider!
-  csSpider* spider;
-  // If true then spider is hunting.
-  bool spider_hunting;
-  /*
-   * Timeout. Every frame this value is decreased.
-   * If it reaches 0 and no camera has been found we stop hunting.
-   */
-  int spider_timeout;
-  // Command to execute when spider found a camera.
-  int spider_command;
-  // Arguments for spider command.
-  char* spider_args;
+  // The camera catcher.
+  csRef<csCameraCatcher> catcher;
   // Mouse x and y for the command (if a selection command).
   int mouse_x, mouse_y;
-  // Send the Spider on a hunt.
-  void UnleashSpider (int cmd, const char* args = 0);
-  /*
-   * The Spider has done its job. Send him back to his hiding place.
-   * Also perform the Spider command on the camera we found (only if
-   * camera != 0).
-   */
-  void HideSpider (iCamera* camera);
 
   /// MIME type of the screenshot image to save
   const char* captureMIME;
@@ -369,6 +367,9 @@ private:
   char msg_string[81];
   /// Command to perform after finishing edit mode.
   int edit_command;
+
+  /// Delayed command (this command will be delayed one frame).
+  int delay_command;
 
   /// Eat a key and process it.
   bool EatKey (iEvent& event);

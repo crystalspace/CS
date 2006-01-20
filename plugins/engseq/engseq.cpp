@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Jorrit Tyberghein
+    Copyright (C) 2002-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -1187,25 +1187,19 @@ csPtr<iParameterESM> csEngineSequenceParameters::CreateParameterESM (
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_EXT (csSequenceWrapper)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSequenceWrapper)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSequenceWrapper::SequenceWrapper)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceWrapper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csSequenceWrapper::csSequenceWrapper (csEngineSequenceManager* eseqmgr,
 	iSequence* sequence)
+  : scfImplementationType (this), sequence (sequence), eseqmgr (eseqmgr)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceWrapper);
-  csSequenceWrapper::eseqmgr = eseqmgr;
-  csSequenceWrapper::sequence = sequence;
 }
 
 csSequenceWrapper::~csSequenceWrapper ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSequenceWrapper);
+}
+
+void csSequenceWrapper::SelfDestruct ()
+{
+  eseqmgr->RemoveSequence ((iSequenceWrapper*)this);
 }
 
 iEngineSequenceParameters* csSequenceWrapper::CreateBaseParameterBlock ()
@@ -1633,17 +1627,9 @@ public:
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_EXT (csSequenceTrigger)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSequenceTrigger)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSequenceTrigger::SequenceTrigger)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTrigger)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csSequenceTrigger::csSequenceTrigger (csEngineSequenceManager* eseqmgr)
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceTrigger);
   enabled = true;
   enable_onetest = false;
   onetest_framenr = 0;
@@ -1658,7 +1644,11 @@ csSequenceTrigger::csSequenceTrigger (csEngineSequenceManager* eseqmgr)
 csSequenceTrigger::~csSequenceTrigger ()
 {
   ClearConditions ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSequenceTrigger);
+}
+
+void csSequenceTrigger::SelfDestruct ()
+{
+  eseqmgr->RemoveTrigger ((iSequenceTrigger*)this);
 }
 
 void csSequenceTrigger::AddConditionInSector (iSector* sector,
@@ -1905,7 +1895,8 @@ bool csEngineSequenceManager::Initialize (iObjectRegistry *r)
   PostProcess = csevPostProcess (object_reg);
   MouseEvent = csevMouseEvent (object_reg);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
-  if (q != 0) {
+  if (q != 0)
+  {
     csEventID events[3] = { PostProcess, MouseEvent, CS_EVENTLIST_END };
     q->RegisterListener (scfiEventHandler, events);
   }
@@ -1922,6 +1913,17 @@ bool csEngineSequenceManager::Initialize (iObjectRegistry *r)
     return false;
   }
   seqmgr->Resume ();
+
+  engine = csQueryRegistry<iEngine> (object_reg);
+  if (!engine)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.utilities.sequence.engine",
+	"Couldn't locate engine plugin for engine sequence manager!");
+    return false;
+  }
+  cameracatcher.AttachNew (new csCameraCatcher ());
+  engine->AddEngineFrameCallback (cameracatcher);
 
   return true;
 }
@@ -1958,6 +1960,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
   {
     int mouse_x = csMouseEventHelper::GetX(&event);
     int mouse_y = csMouseEventHelper::GetY(&event);
+    iCamera* camera = cameracatcher->camera;
     if (camera != 0 && mesh_triggers.Length () > 0)
     {
       csVector3 v;
@@ -2007,8 +2010,8 @@ csPtr<iSequenceTrigger> csEngineSequenceManager::CreateTrigger (
 {
   csSequenceTrigger* trig = new csSequenceTrigger (this);
   trig->SetName (name);
-  triggers.Push (&(trig->scfiSequenceTrigger));
-  return &(trig->scfiSequenceTrigger);
+  triggers.Push ((iSequenceTrigger*)trig);
+  return (iSequenceTrigger*)trig;
 }
 
 csPtr<iParameterESM> csEngineSequenceManager::CreateParameterESM (iBase* value)
@@ -2067,8 +2070,8 @@ csPtr<iSequenceWrapper> csEngineSequenceManager::CreateSequence (
   csRef<iSequence> seq = seqmgr->NewSequence ();
   csSequenceWrapper* seqwrap = new csSequenceWrapper (this, seq);
   seqwrap->SetName (name);
-  sequences.Push (&(seqwrap->scfiSequenceWrapper));
-  return &(seqwrap->scfiSequenceWrapper);
+  sequences.Push ((iSequenceWrapper*)seqwrap);
+  return (iSequenceWrapper*)seqwrap;
 }
 
 void csEngineSequenceManager::RemoveSequence (iSequenceWrapper* seq)

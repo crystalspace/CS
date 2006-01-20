@@ -26,7 +26,6 @@
  */
 
 
-struct iCamera;
 struct iLight;
 struct iMeshWrapper;
 struct iObject;
@@ -182,8 +181,6 @@ struct iEngineSequenceParameters : public iBase
   virtual csPtr<iParameterESM> CreateParameterESM (const char* name) = 0;
 };
 
-SCF_VERSION (iSequenceWrapper, 0, 3, 0);
-
 /**
  * A sequence wrapper. This objects holds the reference
  * to the original sequence and also implements iObject.
@@ -206,8 +203,9 @@ SCF_VERSION (iSequenceWrapper, 0, 3, 0);
  * - iEngineSequenceManager
  *   
  */
-struct iSequenceWrapper : public iBase
+struct iSequenceWrapper : public virtual iBase
 {
+  SCF_INTERFACE (iSequenceWrapper, 0, 3, 0);
   /**
    * Query iObject that is implemented by the sequence manager.
    */
@@ -503,8 +501,6 @@ struct iSequenceWrapper : public iBase
 		  iSequence* falseSequence) = 0;
 };
 
-SCF_VERSION (iSequenceTrigger, 0, 0, 3);
-
 /**
  * A sequence trigger. When all conditions in a trigger are
  * true it will run a sequence. Note that after the succesfull firing
@@ -521,8 +517,10 @@ SCF_VERSION (iSequenceTrigger, 0, 0, 3);
  * - iEngineSequenceManager
  *   
  */
-struct iSequenceTrigger : public iBase
+struct iSequenceTrigger : public virtual iBase
 {
+  SCF_INTERFACE (iSequenceTrigger, 0, 0, 3);
+
   /**
    * Query object.
    */
@@ -702,18 +700,6 @@ struct iEngineSequenceManager : public iBase
    */
   virtual iSequenceManager* GetSequenceManager () = 0;
 
-  /**
-   * Set the camera to use for some of the features (like clicking
-   * on mesh objects). If this is not set then those features will
-   * not be available.
-   */
-  virtual void SetCamera (iCamera* camera) = 0;
-
-  /**
-   * Get the camera that is used for some features.
-   */
-  virtual iCamera* GetCamera () = 0;
-  
   /**
    * Create a parameter ESM for a constant value.
    */

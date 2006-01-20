@@ -85,14 +85,11 @@
 
 #include "bugplug.h"
 #include "shadow.h"
-#include "spider.h"
 
 
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csBugPlug)
-
-
 
 void csBugPlug::Report (int severity, const char* msg, ...)
 {
@@ -119,10 +116,8 @@ csBugPlug::csBugPlug (iBase *iParent)
   process_next_mouse = false;
   edit_mode = false;
   initialized = false;
-  spider = new csSpider ();
+  catcher.AttachNew (new csCameraCatcher ());
   shadow = new csShadow ();
-  spider_hunting = false;
-  spider_args = 0;
   scfiEventHandler = 0;
 
   do_fps = true;
@@ -155,6 +150,7 @@ csBugPlug::csBugPlug (iBase *iParent)
   captureFormat = 0;
 
   do_shadow_debug = false;
+  delay_command = DEBUGCMD_UNKNOWN;
 }
 
 csBugPlug::~csBugPlug ()
@@ -177,11 +173,8 @@ csBugPlug::~csBugPlug ()
     scfiEventHandler->DecRef ();
   }
   delete[] captureFormat;
-  delete[] spider_args;
 
-  delete spider;
   delete shadow;
-
 }
 
 bool csBugPlug::Initialize (iObjectRegistry *object_reg)
@@ -226,7 +219,11 @@ void csBugPlug::SetupPlugin ()
 {
   if (initialized) return;
 
-  if (!Engine) Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  if (!Engine)
+  {
+    Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+    Engine->AddEngineFrameCallback (catcher);
+  }
 
   if (!G3D) G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
@@ -347,32 +344,6 @@ void csBugPlug::SetupPlugin ()
   Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug loaded...");
 
   do_clear = false;
-}
-
-void csBugPlug::UnleashSpider (int cmd, const char* args)
-{
-  if (Engine)
-  {
-    spider->ClearCamera ();
-    if (spider->WeaveWeb (Engine))
-    {
-      spider_command = cmd;
-      spider_hunting = true;
-      spider_timeout = 20;
-      delete[] spider_args;
-      spider_args = csStrNew (args);
-    }
-    else
-    {
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-	"Spider could not weave its web (No sectors)!");
-    }
-  }
-  else
-  {
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Spider could not weave its web (No engine)!");
-  }
 }
 
 void csBugPlug::SwitchCuller (iSector* sector, const char* culler)
@@ -515,67 +486,6 @@ void csBugPlug::VisculView (iCamera* camera)
       "Bugplug is now tracking a visibility culler");
 }
 
-void csBugPlug::HideSpider (iCamera* camera)
-{
-  spider_hunting = false;
-  spider->UnweaveWeb (Engine);
-  if (camera)
-  {
-    csString buf;
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Spider caught a camera!");
-    switch (spider_command)
-    {
-      case DEBUGCMD_DUMPCAM:
-	Dump (camera);
-	break;
-      case DEBUGCMD_FOV:
-	{
-          int fov = camera->GetFOV ();
-	  buf.Format ("%d", fov);
-	  EnterEditMode (spider_command, "Enter new fov value:", buf);
-	}
-	break;
-      case DEBUGCMD_FOVANGLE:
-	{
-          float fov = camera->GetFOVAngle ();
-	  buf.Format ("%g", fov);
-	  EnterEditMode (spider_command, "Enter new fov angle:", buf);
-	}
-	break;
-      case DEBUGCMD_SCRSHOT:
-        CaptureScreen ();
-	break;
-      case DEBUGCMD_SAVEMAP:
-        SaveMap ();
-	break;
-      case DEBUGCMD_DEBUGSECTOR:
-	SwitchDebugSector (camera->GetTransform ());
-        break;
-      case DEBUGCMD_MOUSE1:
-        MouseButton3 (camera); //@@@ Temp hack to make bugplug cross platform.
-	break;
-      case DEBUGCMD_MOUSE2:
-        MouseButton2 (camera);
-	break;
-      case DEBUGCMD_MOUSE3:
-        MouseButton3 (camera);
-	break;
-      case DEBUGCMD_VISCULVIEW:
-        VisculView (camera);
-        break;
-      case DEBUGCMD_SWITCHCULLER:
-        SwitchCuller (camera->GetSector (), spider_args);
-        break;
-      case DEBUGCMD_SELECTMESH:
-        SelectMesh (camera->GetSector (), spider_args);
-        break;
-      case DEBUGCMD_ONESECTOR:
-        OneSector (camera);
-        break;
-    }
-  }
-}
-
 void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
 {
   if (!G3D) return;
@@ -693,7 +603,8 @@ bool csBugPlug::EatMouse (iEvent& event)
   if (!process_next_mouse && !debug_view.show) return false;
 
   bool down = (CS_IS_MOUSE_EVENT(object_reg, event) && 
-	       (csMouseEventHelper::GetEventType(&event) == csMouseEventTypeDown));
+	       (csMouseEventHelper::GetEventType(&event)
+	       == csMouseEventTypeDown));
   bool up = (CS_IS_MOUSE_EVENT(object_reg, event) &&
 	     (csMouseEventHelper::GetEventType(&event) == csMouseEventTypeUp));
   int button = csMouseEventHelper::GetButton(&event);
@@ -720,7 +631,15 @@ bool csBugPlug::EatMouse (iEvent& event)
     }
     else
     {
-      UnleashSpider (DEBUGCMD_MOUSE1+button-1);
+      if (catcher->camera)
+      {
+        switch (button)
+	{
+	  case 1: MouseButton3 (catcher->camera); break;
+	  case 2: MouseButton2 (catcher->camera); break;
+	  case 3: MouseButton3 (catcher->camera); break;
+	}
+      }
       process_next_mouse = false;
     }
   }
@@ -1259,16 +1178,47 @@ bool csBugPlug::EatKey (iEvent& event)
 	SwitchDebugView ();
         break;
       case DEBUGCMD_SWITCHCULLER:
+	if (catcher->camera)
+          SwitchCuller (catcher->camera->GetSector (), args);
+        break;
       case DEBUGCMD_ONESECTOR:
+	if (catcher->camera)
+          OneSector (catcher->camera);
+	break;
       case DEBUGCMD_VISCULVIEW:
+        if (catcher->camera)
+          VisculView (catcher->camera);
+        break;
       case DEBUGCMD_DUMPCAM:
+        if (catcher->camera) Dump (catcher->camera);
+	break;
       case DEBUGCMD_FOV:
+        if (catcher->camera)
+	{
+	  csString buf;
+          int fov = catcher->camera->GetFOV ();
+	  buf.Format ("%d", fov);
+	  EnterEditMode (cmd, "Enter new fov value:", buf);
+	}
+	break;
       case DEBUGCMD_FOVANGLE:
+        if (catcher->camera)
+	{
+	  csString buf;
+          float fov = catcher->camera->GetFOVAngle ();
+	  buf.Format ("%g", fov);
+	  EnterEditMode (cmd, "Enter new fov angle:", buf);
+	}
+	break;
       case DEBUGCMD_DEBUGSECTOR:
+	if (catcher->camera)
+	  SwitchDebugSector (catcher->camera->GetTransform ());
+        break;
       case DEBUGCMD_SAVEMAP:
+        delay_command = DEBUGCMD_SAVEMAP;
+	break;
       case DEBUGCMD_SCRSHOT:
-        // Set spider on a hunt.
-	UnleashSpider (cmd, args);
+        delay_command = DEBUGCMD_SCRSHOT;
         break;
       case DEBUGCMD_DS_LEFT:
         if (debug_sector.show && debug_sector.clear)
@@ -1565,6 +1515,7 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
     int bgcolor_clear = G2D->FindRGB (0, 255, 255);
     G2D->Clear (bgcolor_clear);
   }
+
   return false;
 }
 
@@ -1622,7 +1573,7 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
   {
     G3D->BeginDraw (CSDRAW_3DGRAPHICS |
     	CSDRAW_CLEARZBUFFER | (debug_sector.clear ? CSDRAW_CLEARSCREEN : 0));
-    iCamera* camera = spider->GetCamera ();
+    iCamera* camera = catcher->camera;
     if (camera)
       debug_sector.view->GetCamera ()->SetTransform (camera->GetTransform ());
     debug_sector.view->Draw ();
@@ -1854,23 +1805,18 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
 
   ShowCounters ();
 
-  if (spider_hunting)
+  if (delay_command != DEBUGCMD_UNKNOWN)
   {
-    iCamera* camera = spider->GetCamera ();
-    if (camera)
+    switch (delay_command)
     {
-      HideSpider (camera);
+      case DEBUGCMD_SAVEMAP:
+        SaveMap ();
+	break;
+      case DEBUGCMD_SCRSHOT:
+        CaptureScreen ();
+        break;
     }
-    else
-    {
-      spider_timeout--;
-      if (spider_timeout < 0)
-      {
-	HideSpider (0);
-        Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Spider could not catch a camera!");
-      }
-    }
+    delay_command = DEBUGCMD_UNKNOWN;
   }
 
   return false;
@@ -1912,14 +1858,17 @@ void csBugPlug::ExitEditMode ()
       break;
     case DEBUGCMD_FOV:
       csScanStr (edit_string, "%d", &i);
-      spider->GetCamera ()->SetFOV (i, G3D->GetWidth ());
+      if (catcher->camera)
+        catcher->camera->SetFOV (i, G3D->GetWidth ());
       break;
     case DEBUGCMD_FOVANGLE:
       csScanStr (edit_string, "%f", &f);
-      spider->GetCamera ()->SetFOVAngle (f, G3D->GetWidth ());
+      if (catcher->camera)
+        catcher->camera->SetFOVAngle (f, G3D->GetWidth ());
       break;
     case DEBUGCMD_SELECTMESH:
-      UnleashSpider (edit_command, edit_string);
+      if (catcher->camera)
+        SelectMesh (catcher->camera->GetSector (), edit_string);
       break;
   }
 }

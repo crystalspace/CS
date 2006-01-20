@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005 by Jorrit Tyberghein
+  Copyright (C) 2005-2006 by Jorrit Tyberghein
 	    (C) 2005 by Frank Richter
 
   This library is free software; you can redistribute it and/or
@@ -23,17 +23,25 @@
 
 #include "csutil/csobject.h"
 #include "ivideo/shader/shader.h"
+#include "iutil/selfdestruct.h"
 
-class csNullShader : public scfImplementationExt1<csNullShader, 
+class csShaderManager;
+
+class csNullShader : public scfImplementationExt2<csNullShader, 
 						  csObject,
-						  iShader>
+						  iShader,
+						  iSelfDestruct>
 {
+private:
   csShaderMetadata allShaderMeta;
   csRefArray<csShaderVariable> dummySVs;
+  csShaderManager* mgr;
+
 public:
   CS_LEAKGUARD_DECLARE (csNullShader);
 
-  csNullShader () : scfImplementationType (this) { }
+  csNullShader (csShaderManager* mgr) : scfImplementationType (this),
+  	mgr (mgr) { }
   virtual ~csNullShader () { }
 
   virtual iObject* QueryObject () 
@@ -67,6 +75,10 @@ public:
   bool IsEmpty() const { return true; }
   void ReplaceVariable (csShaderVariable*) {}
   void Clear () { }
+
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 };
 
 #endif // __CS_NULLSHADER_H__
