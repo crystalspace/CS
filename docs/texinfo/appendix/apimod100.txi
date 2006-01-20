@@ -2226,6 +2226,8 @@ the following interfaces and classes are gone:
 @code{csModelDataLight}
 @item
 @code{csModelData}
+@item
+@code{iCrossBuilder}
 @end itemize
 
 Instead it is now possible to load @sc{3ds} models as genmesh mesh
