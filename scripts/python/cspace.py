@@ -2542,6 +2542,7 @@ class csPluginRequestArray(_object):
     def DeleteIndex(*args): return _cspace.csPluginRequestArray_DeleteIndex(*args)
     def DeleteIndexFast(*args): return _cspace.csPluginRequestArray_DeleteIndexFast(*args)
     def DeleteRange(*args): return _cspace.csPluginRequestArray_DeleteRange(*args)
+    def __eq__(*args): return _cspace.csPluginRequestArray___eq__(*args)
 
 class csPluginRequestArrayPtr(csPluginRequestArray):
     def __init__(self, this):
@@ -10488,6 +10489,8 @@ class iFontServer(iBase):
     def __repr__(self):
         return "<%s.%s; proxy of C++ iFontServer instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def LoadFont(*args): return _cspace.iFontServer_LoadFont(*args)
+    def SetWarnOnError(*args): return _cspace.iFontServer_SetWarnOnError(*args)
+    def GetWarnOnError(*args): return _cspace.iFontServer_GetWarnOnError(*args)
     def __del__(self, destroy=_cspace.delete_iFontServer):
         try:
             if self.thisown: destroy(self)
