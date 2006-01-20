@@ -237,7 +237,12 @@ bool Simple::Initialize ()
 
   PluginManager = CS_QUERY_REGISTRY(object_reg, iPluginManager);
   if (!PluginManager)
-    return "No iPluginManager plugin!";
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.lightningtest",
+    	"No iPluginManager plugin!");
+    return false;
+  }
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
