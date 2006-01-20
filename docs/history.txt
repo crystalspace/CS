@@ -17,6 +17,13 @@ chronological order.
 	  the csevProcess and similar events. We don't want these warnings
 	  present in the new pseudo-stable. After release of that we can
 	  put the warnings back in.
+	- Jorrit added support for scfImplementationExt6.
+	- Jorrit added a new iSelfDestruct interface. This will be used
+	  by engine->RemoveObject() so that it will become:
+	      - Faster (only one scfQueryInterface).
+	      - Cleaner (no dependencies on non-engine stuff).
+	      - Extensible (everyone can implement iSelfDestruct).
+	- Jorrit implemented iSelfDestruct in csMeshWrapper.
 19-Jan-2006
 	- Jorrit fixed gmesh3ds for Frank's latest refactor.
 	- Jorrit fixed a bug in spr3d. If the factory had no material but

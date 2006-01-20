@@ -217,6 +217,14 @@ protected:
     AddReftrackerAliases(); 
   }
 
+  template<class T1, class T2, class T3, class T4, class T5, class T6>
+  SCF_IMPL_NAME(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
+    : SCF_IMPL_SUPER(t1, t2, t3, t4, t5, t6), scfObject(object) 
+  {
+    csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
+    AddReftrackerAliases(); 
+  }
+
   Class *scfObject;
 #endif
 

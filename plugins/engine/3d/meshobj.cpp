@@ -163,6 +163,14 @@ csMeshWrapper::csMeshWrapper (iMeshObject *meshobj)
   last_frame_number = 0;
 }
 
+void csMeshWrapper::SelfDestruct ()
+{
+  // Unlink from region.
+  if (GetObjectParent ())
+    GetObjectParent ()->ObjRemove ((iObject*)this);
+  csEngine::currentEngine->GetMeshes ()->Remove ((iMeshWrapper*)this);
+}
+
 iShadowReceiver* csMeshWrapper::GetShadowReceiver ()
 {
   if (!shadow_receiver_valid)

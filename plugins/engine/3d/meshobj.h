@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000-2004 by Jorrit Tyberghein
+    Copyright (C) 2000-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -29,6 +29,7 @@
 #include "csutil/weakref.h"
 #include "csutil/leakguard.h"
 #include "csutil/hash.h"
+#include "iutil/selfdestruct.h"
 #include "csgfx/shadervarcontext.h"
 #include "plugins/engine/3d/movable.h"
 #include "plugins/engine/3d/impmesh.h"
@@ -192,13 +193,14 @@ struct LSIAndDist
 /**
  * The holder class for all implementations of iMeshObject.
  */
-class csMeshWrapper : public scfImplementationExt5<csMeshWrapper,
+class csMeshWrapper : public scfImplementationExt6<csMeshWrapper,
                                                    csObject,
                                                    iMeshWrapper,
                                                    iShaderVariableContext,
                                                    iVisibilityObject,
                                                    iImposter,
-						   iSceneNode>
+						   iSceneNode,
+						   iSelfDestruct>
 {
   friend class csMovable;
   friend class csMovableSectorList;
@@ -670,6 +672,10 @@ public:
   void ReplaceVariable (csShaderVariable *variable)
   { svcontext.ReplaceVariable (variable); }
   void Clear () { svcontext.Clear(); }
+
+  //--------------------- iSelfDestruct implementation -------------------//
+
+  virtual void SelfDestruct ();
 
   //--------------------- iSceneNode implementation ----------------------//
 

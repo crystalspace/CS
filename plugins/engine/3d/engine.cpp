@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2006 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -55,6 +55,7 @@
 #include "iutil/verbositymanager.h"
 #include "iutil/vfs.h"
 #include "iutil/virtclk.h"
+#include "iutil/selfdestruct.h"
 #include "ivaria/engseq.h"
 #include "ivaria/pmeter.h"
 #include "ivaria/reporter.h"
@@ -3377,13 +3378,13 @@ static void UnlinkFromRegion (iObject* object)
 
 bool csEngine::RemoveObject (iBase *object)
 {
-  csRef<iMeshWrapper> meshwrap (SCF_QUERY_INTERFACE (object, iMeshWrapper));
-  if (meshwrap)
+  csRef<iSelfDestruct> sd = scfQueryInterface<iSelfDestruct> (object);
+  if (sd)
   {
-    UnlinkFromRegion (meshwrap->QueryObject ());
-    meshes.Remove (meshwrap);
+    sd->SelfDestruct ();
     return true;
   }
+
   csRef<iMeshFactoryWrapper> factwrap (SCF_QUERY_INTERFACE (object,
         iMeshFactoryWrapper));
   if (factwrap)
