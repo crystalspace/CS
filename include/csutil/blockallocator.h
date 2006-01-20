@@ -94,16 +94,17 @@ public:
 #ifdef CS_MEMORY_TRACKER
 /**
  * This class implements block allocating policy for memory-tracking builds
- * (when CS_MEMORY_TRACKER is defined).  It has a per-block overhead of eigtht
+ * (when CS_MEMORY_TRACKER is defined).  It has a per-block overhead of eight
  * bytes.
  */
+template <class T>
 class csBlockAllocatorMTBlockPolicy
 {
 public:
   /**
    * Allocate a raw block of given size. 
    */
-  static inline uint8* AllocBlock (size_t blocksize) const
+  static inline uint8* AllocBlock (size_t blocksize)
   {
     char buf[255];
     sprintf (buf, "csBlockAllocator<%s>", typeid (T).name());
@@ -117,7 +118,7 @@ public:
    * Free a block.
    * \remarks Does not check that the block pointer is valid.
    */
-  static inline void FreeBlock(uint8* p) const
+  static inline void FreeBlock(uint8* p)
   {
     int32* ptr = ((int32*)p)-2;
     mtiRegisterFree ((csMemTrackerInfo*)*ptr, (size_t)ptr[1]);
@@ -147,7 +148,7 @@ public:
  * \sa csMemoryPool
  */
 #ifdef CS_MEMORY_TRACKER
-template <class T, class BlockPolicy = csBlockAllocatorMTBlockPolicy>
+template <class T, class BlockPolicy = csBlockAllocatorMTBlockPolicy<T> >
 #else
 template <class T, class BlockPolicy = csBlockAllocatorNormalBlockPolicy>
 #endif

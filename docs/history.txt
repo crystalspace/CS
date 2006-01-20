@@ -62,6 +62,8 @@ chronological order.
 	  for the fact that they basically apply to VC7.1 and 8 as well.
 	- res made a small optimization in SR clipping.
 	- res fixed a crash-on-exit with SR.
+	- Jorrit fixed csBlockAllocator so it actually compiles with
+	  the memory tracker enabled.
 19-Jan-2006
 	- Jorrit fixed gmesh3ds for Frank's latest refactor.
 	- Jorrit fixed a bug in spr3d. If the factory had no material but
