@@ -101,11 +101,17 @@ public:
 
   MakeAString (const char* fmt, ...)
   {
+#ifdef CS_EXTENSIVE_MEMDEBUG_NEW
+#undef new
+#endif
     new (GetReader()) Reader ((utf8_char*)fmt, strlen (fmt));
     va_list args;
     va_start (args, fmt);
     new ((Formatter*)GetFormatter()) Formatter ((Reader*)GetReader(), args);
     va_end (args);
+#ifdef CS_EXTENSIVE_MEMDEBUG_NEW
+#define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
   }
   ~MakeAString()
   {

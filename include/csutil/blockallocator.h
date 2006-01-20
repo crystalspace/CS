@@ -108,8 +108,8 @@ public:
   {
     char buf[255];
     sprintf (buf, "csBlockAllocator<%s>", typeid (T).name());
-    int32* ptr = (int32*)malloc (blocksize + sizeof (int32)*2);
-    *ptr++ = (int32)mtiRegisterAlloc (blocksize, buf);
+    uintptr_t* ptr = (uintptr_t*)malloc (blocksize + sizeof (uintptr_t)*2);
+    *ptr++ = (uintptr_t)mtiRegisterAlloc (blocksize, buf);
     *ptr++ = blocksize;
     return (uint8*)ptr;
   }
@@ -120,7 +120,7 @@ public:
    */
   static inline void FreeBlock(uint8* p)
   {
-    int32* ptr = ((int32*)p)-2;
+    uintptr_t* ptr = ((uintptr_t*)p)-2;
     mtiRegisterFree ((csMemTrackerInfo*)*ptr, (size_t)ptr[1]);
     free (ptr);
   }
