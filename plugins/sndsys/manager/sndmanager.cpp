@@ -43,7 +43,7 @@ bool csSndSysManager::Initialize (iObjectRegistry *object_reg)
 
 iSndSysWrapper* csSndSysManager::CreateSound (const char* name)
 {
-  csSndSysWrapper* wrap = new csSndSysWrapper (name);
+  csSndSysWrapper* wrap = new csSndSysWrapper (this, name);
   sounds.Push (wrap);
   wrap->DecRef ();
   return wrap;
