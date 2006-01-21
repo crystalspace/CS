@@ -4902,6 +4902,37 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iEngineFrameCallback ##############
+
+package cspace::iEngineFrameCallback;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*StartFrame = *cspacec::iEngineFrameCallback_StartFrame;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iEngineFrameCallback($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iEngineSectorCallback ##############
 
 package cspace::iEngineSectorCallback;
@@ -4988,6 +5019,8 @@ package cspace::iEngine;
 *GetSectors = *cspacec::iEngine_GetSectors;
 *FindSector = *cspacec::iEngine_FindSector;
 *GetNearbySectors = *cspacec::iEngine_GetNearbySectors;
+*AddEngineFrameCallback = *cspacec::iEngine_AddEngineFrameCallback;
+*RemoveEngineFrameCallback = *cspacec::iEngine_RemoveEngineFrameCallback;
 *AddEngineSectorCallback = *cspacec::iEngine_AddEngineSectorCallback;
 *RemoveEngineSectorCallback = *cspacec::iEngine_RemoveEngineSectorCallback;
 *CreateMeshWrapper = *cspacec::iEngine_CreateMeshWrapper;
@@ -13797,8 +13830,6 @@ package cspace::iEngineSequenceManager;
 %OWNER = ();
 %ITERATORS = ();
 *GetSequenceManager = *cspacec::iEngineSequenceManager_GetSequenceManager;
-*SetCamera = *cspacec::iEngineSequenceManager_SetCamera;
-*GetCamera = *cspacec::iEngineSequenceManager_GetCamera;
 *CreateParameterESM = *cspacec::iEngineSequenceManager_CreateParameterESM;
 *CreateTrigger = *cspacec::iEngineSequenceManager_CreateTrigger;
 *RemoveTrigger = *cspacec::iEngineSequenceManager_RemoveTrigger;
