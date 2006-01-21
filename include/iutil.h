@@ -46,6 +46,7 @@
 #include "iutil/plugin.h"
 #include "iutil/pluginconfig.h"
 #include "iutil/reftrack.h"
+#include "iutil/selfdestruct.h"
 #include "iutil/string.h"
 #include "iutil/stringarray.h"
 #include "iutil/strset.h"
