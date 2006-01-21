@@ -874,11 +874,6 @@ bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-// @@@ Something for cssyssrv?
-static bool ParseBoolAttribute (iDocumentNode *node, bool def)
-{
-}
-
 bool csGeneralMeshLoader::ParseRenderBuffer(iDocumentNode *node,
 	iGeneralMeshState* state, iGeneralFactoryState* factstate)
 {
