@@ -473,6 +473,7 @@ public:
   void PrepareLighting ();
   void LightChanged (iLight* light);
   void LightDisconnect (iLight* light);
+  void DisconnectAllLights ();
   char* GenerateCacheName ();
   void SetStaticLighting (bool enable);
 
@@ -570,6 +571,10 @@ public:
     virtual void LightDisconnect (iLight* light)
     {
       scfParent->LightDisconnect (light);
+    }
+    virtual void DisconnectAllLights ()
+    {
+      scfParent->DisconnectAllLights ();
     }
   } scfiLightingInfo;
   friend struct LightingInfo;

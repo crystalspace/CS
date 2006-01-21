@@ -968,6 +968,7 @@ public:
 
   virtual void LightChanged (iLight* light);
   virtual void LightDisconnect (iLight* light);
+  virtual void DisconnectAllLights ();
 
   void SetMixMode (uint mode)
   {

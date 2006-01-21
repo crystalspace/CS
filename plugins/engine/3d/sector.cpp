@@ -378,8 +378,9 @@ iVisibilityCuller* csSector::GetVisibilityCuller ()
   return culler;
 }
 
-class csSectorVisibleMeshCallback : public scfImplementation1<csSectorVisibleMeshCallback,
-                                                              iVisibilityCullerListener>
+class csSectorVisibleMeshCallback : public scfImplementation1<
+	csSectorVisibleMeshCallback,
+	iVisibilityCullerListener>
 {
 public:
 

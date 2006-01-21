@@ -1543,7 +1543,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     return;
 
   GLRENDER3D_OUTPUT_STRING_MARKER(("%p ('%s')", mymesh, mymesh->db_mesh_name));
-
   SwapIfNeeded();
 
   SetupProjection ();

@@ -1645,6 +1645,12 @@ void csThing::LightDisconnect (iLight* light)
   }
 }
 
+void csThing::DisconnectAllLights ()
+{
+  MarkLightmapsDirty ();
+  // @@@?
+}
+
 void csThing::SetMovingOption (int opt)
 {
   cfg_moving = opt;

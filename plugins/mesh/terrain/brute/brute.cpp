@@ -1511,6 +1511,19 @@ void csTerrainObject::LightDisconnect (iLight* light)
   colorVersion++;
 }
 
+void csTerrainObject::DisconnectAllLights ()
+{
+  csSet<csPtrKey<iLight> >::GlobalIterator it = affecting_lights.
+      	GetIterator ();
+  while (it.HasNext ())
+  {
+    iLight* l = (iLight*)it.Next ();
+    l->RemoveAffectedLightingInfo (&scfiLightingInfo);
+  }
+  affecting_lights.Empty ();
+  colorVersion++;
+}
+
 void csTerrainObject::UpdateColors (iMovable* movable)
 {
   if (!staticlighting) return;

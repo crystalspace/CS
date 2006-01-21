@@ -304,6 +304,17 @@ void csBezierMesh::LightDisconnect (iLight* light)
   }
 }
 
+void csBezierMesh::DisconnectAllLights ()
+{
+  MarkLightmapsDirty ();
+  size_t i;
+  for (i = 0; i < curves.Length (); i++)
+  {
+    csCurve *c = GetCurve ((int)i);
+    c->DisconnectAllLights ();
+  }
+}
+
 void csBezierMesh::WorUpdate ()
 {
   if (cached_movable && cached_movable->GetUpdateNumber () != movablenr)

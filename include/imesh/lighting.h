@@ -91,6 +91,11 @@ struct iLightingInfo : public virtual iBase
    * Indicate that some light no longer affects this mesh.
    */
   virtual void LightDisconnect (iLight* light) = 0;
+
+  /**
+   * Disconnect all lights from this mesh.
+   */
+  virtual void DisconnectAllLights () = 0;
 };
 
 /** @} */

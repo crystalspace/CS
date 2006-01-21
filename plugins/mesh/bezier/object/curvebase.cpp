@@ -184,6 +184,10 @@ void csCurve::SetMaterial (iMaterialWrapper *m)
   Material = m;
 }
 
+void csCurve::DisconnectAllLights ()
+{
+}
+
 void csCurve::DynamicLightDisconnect (iLight* dynlight)
 {
   csBezierLightPatch* lp = LightPatches;

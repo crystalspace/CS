@@ -582,6 +582,19 @@ void csInstmeshMeshObject::LightDisconnect (iLight* light)
   lighting_dirty = true;
 }
 
+void csInstmeshMeshObject::DisconnectAllLights ()
+{
+  csSet<csPtrKey<iLight> >::GlobalIterator it = affecting_lights.
+      	GetIterator ();
+  while (it.HasNext ())
+  {
+    iLight* l = (iLight*)it.Next ();
+    l->RemoveAffectedLightingInfo (&scfiLightingInfo);
+  }
+  affecting_lights.Empty ();
+  lighting_dirty = true;
+}
+
 #define SHADOW_CAST_BACKFACE
 
 void csInstmeshMeshObject::AppendShadows (iMovable* movable,

@@ -335,6 +335,10 @@ void csMeshWrapper::MoveToSector (iSector *s)
 
 void csMeshWrapper::RemoveFromSectors (iSector* sector)
 {
+  // First disconnect us from all lights.
+  if (light_info)
+    light_info->DisconnectAllLights ();
+  
   // Fire the remove mesh callbacks in the sector.
   if (sector)
     ((csSector*)sector)->FireRemoveMesh ((iMeshWrapper*)this);

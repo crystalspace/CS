@@ -173,6 +173,8 @@ public:
   void SetMaterial (iMaterialWrapper* h);
 
   /// @@@
+  void DisconnectAllLights ();
+  /// @@@
   void DynamicLightDisconnect (iLight* dynlight);
   /// @@@
   void StaticLightDisconnect (iLight* statlight);

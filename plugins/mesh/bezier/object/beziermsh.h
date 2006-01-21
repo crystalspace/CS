@@ -594,6 +594,7 @@ public:
 
   void LightChanged (iLight* light);
   void LightDisconnect (iLight* light);
+  void DisconnectAllLights ();
 
   SCF_DECLARE_IBASE;
 
@@ -701,6 +702,8 @@ public:
     { scfParent->LightChanged (light); }
     virtual void LightDisconnect (iLight* light)
     { scfParent->LightDisconnect (light); }
+    virtual void DisconnectAllLights ()
+    { scfParent->DisconnectAllLights (); }
   } scfiLightingInfo;
   friend struct LightingInfo;
 

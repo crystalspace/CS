@@ -264,6 +264,7 @@ public:
   void CastShadows (iMovable* movable, iFrustumView* fview);
   void LightChanged (iLight* light);
   void LightDisconnect (iLight* light);
+  void DisconnectAllLights ();
 
   //----------------------- iMeshObject implementation ----------------------
   SCF_DECLARE_IBASE;
@@ -346,6 +347,10 @@ public:
     virtual void LightDisconnect (iLight* light)
     {
       scfParent->LightDisconnect (light);
+    }
+    virtual void DisconnectAllLights ()
+    {
+      scfParent->DisconnectAllLights ();
     }
   } scfiLightingInfo;
   friend struct LightingInfo;

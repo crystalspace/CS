@@ -574,6 +574,7 @@ public:
   virtual void PrepareLighting () { }
   void LightChanged (iLight* light);
   void LightDisconnect (iLight* light);
+  void DisconnectAllLights ();
   /** @} */
 
   /**\name iMeshObject implementation
