@@ -12,6 +12,12 @@ chronological order.
 	  default) would leak as soon as they were rendered once.
 	- Jorrit fixed a big memory leak in thing. Once a thing was
 	  rendered it would never release the render meshes at destruction.
+	- res added an option to the GM loader to omit a warning when the
+	  element count of a custom buffer does not match the vertex count
+	  (there is the odd legitimate use for that).
+	- res added support for index buffers to 
+	  csTextSyntaxService->ParseBuffer().
+	- res took the "no texture mappings" warning out of xmlshader.
 20-Jan-2006
 	- Jorrit did the following documentation updates:
 	    - Removed everything about the soon-to-be-removed model

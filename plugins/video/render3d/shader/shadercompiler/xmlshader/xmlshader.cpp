@@ -444,14 +444,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     }
   }
 
-  if (pass->textureCount == 0)
-  {
-    parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-      "Shader '%s', pass %d has no texture mappings",
-      parent->GetName (), GetPassNumber (pass));
-    
-  }
-
   return true;
 }
 

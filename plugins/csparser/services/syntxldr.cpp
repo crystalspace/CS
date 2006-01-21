@@ -19,8 +19,10 @@
 #include "cssysdef.h"
 #include <stdarg.h>
 #include <ctype.h>
+#include <limits.h>
 
 #include "csgeom/box.h"
+#include "csgeom/math.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
@@ -1304,7 +1306,7 @@ template <class ValGetter>
 struct BufferParser
 {
   template <class T>
-  static const char* Parse (iDocumentNode* node,int compNum,
+  static const char* Parse (iDocumentNode* node, int compNum,
     csDirtyAccessArray<T>& buf)
   {
     csString compAttrName;
@@ -1334,6 +1336,57 @@ struct BufferParser
   }
 };
 
+template<typename T>
+static csRef<iRenderBuffer> FillBuffer (const csDirtyAccessArray<T>& buf,
+                                        csRenderBufferComponentType compType,
+                                        int componentNum,
+                                        bool indexBuf)
+{
+  csRef<iRenderBuffer> buffer;
+  size_t bufElems = buf.GetSize() / componentNum;
+  if (indexBuf)
+  {
+    T min;
+    T max;
+    size_t i = 0;
+    size_t n = buf.GetSize(); 
+    if (n & 1)
+    {
+      min = max = csMax (buf[0], T (0));
+      i++;
+    }
+    else
+    {
+      min = T (INT_MAX);
+      max = 0;
+    }
+    for (; i < n; i += 2)
+    {
+      T a = buf[i]; T b = buf[i+1];
+      if (a < b)
+      {
+        min = csMin (min, a);
+        max = csMax (max, b);
+      }
+      else
+      {
+        min = csMin (min, b);
+        max = csMax (max, a);
+      }
+    }
+    buffer = csRenderBuffer::CreateIndexRenderBuffer (bufElems, CS_BUF_STATIC,
+      compType, size_t (min), size_t (max));
+  }
+  else
+  {
+    buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
+	  CS_BUF_STATIC, compType, (uint)componentNum);
+  }
+  buffer->CopyInto (buf.GetArray(), bufElems);
+  return buffer;
+}
+
+
 csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node)
 {
   static const char* msgid = "crystalspace.syntax.renderbuffer";
@@ -1351,6 +1404,23 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     return 0;
   }
 
+  bool indexBuf = false;
+  {
+    const char* index = node->GetAttributeValue("indices");
+    if (index && *index)
+    {
+      indexBuf = ((strcmp (index, "yes") == 0)
+		  || (strcmp (index, "true") == 0)
+		  || (strcmp (index, "on") == 0));
+    }
+  }
+
+  if (indexBuf && (componentNum != 1))
+  {
+    ReportError (msgid, node, "index buffers are required to have 1 component", componentNum);
+    return 0;
+  }
+  
   const char* err;
   csRef<iRenderBuffer> buffer;
   if ((strcmp (componentType, "int") == 0) 
@@ -1360,10 +1430,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     err = BufferParser<vgInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      size_t bufElems = buf.Length() / componentNum;
-      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
-	CS_BUF_STATIC, CS_BUFCOMP_INT, (uint)componentNum);
-      buffer->CopyInto (buf.GetArray(), bufElems);
+      buffer = FillBuffer<int> (buf, CS_BUFCOMP_INT, componentNum, indexBuf);
     }
   }
   else if ((strcmp (componentType, "uint") == 0) 
@@ -1373,62 +1440,47 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     err = BufferParser<vgInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      size_t bufElems = buf.Length() / componentNum;
-      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
-	CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, (uint)componentNum);
-      buffer->CopyInto (buf.GetArray(), bufElems);
+      buffer = FillBuffer<uint> (buf, CS_BUFCOMP_UNSIGNED_INT, componentNum, indexBuf);
     }
   }
   else if ((strcmp (componentType, "byte") == 0) 
     || (strcmp (componentType, "b") == 0))
   {
-    csDirtyAccessArray<int8> buf;
+    csDirtyAccessArray<char> buf;
     err = BufferParser<vgInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      size_t bufElems = buf.Length() / componentNum;
-      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
-	CS_BUF_STATIC, CS_BUFCOMP_BYTE, (uint)componentNum);
-      buffer->CopyInto (buf.GetArray(), bufElems);
+      buffer = FillBuffer<char> (buf, CS_BUFCOMP_BYTE, componentNum, indexBuf);
     }
   }
   else if ((strcmp (componentType, "ubyte") == 0) 
     || (strcmp (componentType, "ub") == 0))
   {
-    csDirtyAccessArray<uint8> buf;
+    csDirtyAccessArray<unsigned char> buf;
     err = BufferParser<vgInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      size_t bufElems = buf.Length() / componentNum;
-      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
-	CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_BYTE, (uint)componentNum);
-      buffer->CopyInto (buf.GetArray(), bufElems);
+      buffer = FillBuffer<unsigned char> (buf, CS_BUFCOMP_UNSIGNED_BYTE, componentNum, indexBuf);
     }
   }
   else if ((strcmp (componentType, "short") == 0) 
     || (strcmp (componentType, "s") == 0))
   {
-    csDirtyAccessArray<int16> buf;
+    csDirtyAccessArray<short> buf;
     err = BufferParser<vgInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      size_t bufElems = buf.Length() / componentNum;
-      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
-	CS_BUF_STATIC, CS_BUFCOMP_SHORT, (uint)componentNum);
-      buffer->CopyInto (buf.GetArray(), bufElems);
+      buffer = FillBuffer<short> (buf, CS_BUFCOMP_SHORT, componentNum, indexBuf);
     }
   }
   else if ((strcmp (componentType, "ushort") == 0) 
     || (strcmp (componentType, "us") == 0))
   {
-    csDirtyAccessArray<uint16> buf;
+    csDirtyAccessArray<unsigned short> buf;
     err = BufferParser<vgInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      size_t bufElems = buf.Length() / componentNum;
-      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
-	CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT, (uint)componentNum);
-      buffer->CopyInto (buf.GetArray(), bufElems);
+      buffer = FillBuffer<unsigned short> (buf, CS_BUFCOMP_UNSIGNED_SHORT, componentNum, indexBuf);
     }
   }
   else if ((strcmp (componentType, "float") == 0) 
@@ -1438,10 +1490,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     err = BufferParser<vgFloat>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      size_t bufElems = buf.Length() / componentNum;
-      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
-	CS_BUF_STATIC, CS_BUFCOMP_FLOAT, (uint)componentNum);
-      buffer->CopyInto (buf.GetArray(), bufElems);
+      buffer = FillBuffer<float> (buf, CS_BUFCOMP_FLOAT, componentNum, indexBuf);
     }
   }
   else if ((strcmp (componentType, "double") == 0) 
@@ -1451,10 +1500,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     err = BufferParser<vgFloat>::Parse (node, componentNum, buf);
     if (err == 0)
     {
-      size_t bufElems = buf.Length() / componentNum;
-      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
-	CS_BUF_STATIC, CS_BUFCOMP_DOUBLE, (uint)componentNum);
-      buffer->CopyInto (buf.GetArray(), bufElems);
+      buffer = FillBuffer<double> (buf, CS_BUFCOMP_DOUBLE, componentNum, indexBuf);
     }
   }
   else

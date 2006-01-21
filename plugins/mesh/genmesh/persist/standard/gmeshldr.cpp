@@ -874,6 +874,11 @@ bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+// @@@ Something for cssyssrv?
+static bool ParseBoolAttribute (iDocumentNode *node, bool def)
+{
+}
+
 bool csGeneralMeshLoader::ParseRenderBuffer(iDocumentNode *node,
 	iGeneralMeshState* state, iGeneralFactoryState* factstate)
 {
@@ -887,11 +892,23 @@ bool csGeneralMeshLoader::ParseRenderBuffer(iDocumentNode *node,
       node, "<renderbuffer>s must have names");
     return false;
   }
+  
   csRef<iRenderBuffer> buf = synldr->ParseRenderBuffer (node);
   if (!buf.IsValid()) return false;
+    
+  bool checkElementCount = true;
+  {
+    const char* check = node->GetAttributeValue("checkelementcount");
+    if (check && *check)
+    {
+      checkElementCount = ((strcmp (check, "no") != 0)
+			  && (strcmp (check, "false") != 0)
+			  && (strcmp (check, "off") != 0));
+    }
+  }
 
   size_t rbElem = buf->GetElementCount();
-  if ((size_t)factstate->GetVertexCount() != rbElem)
+  if (checkElementCount && ((size_t)factstate->GetVertexCount() != rbElem))
   {
     synldr->ReportError ("crystalspace.genmeshloader.parse",
       node, "Render buffer vertex count(%zu) different from "
