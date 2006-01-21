@@ -4294,6 +4294,30 @@ CS_ENGINE_CACHE_NOUPDATE = _cspace.CS_ENGINE_CACHE_NOUPDATE
 CS_RENDPRI_SORT_NONE = _cspace.CS_RENDPRI_SORT_NONE
 CS_RENDPRI_SORT_BACK2FRONT = _cspace.CS_RENDPRI_SORT_BACK2FRONT
 CS_RENDPRI_SORT_FRONT2BACK = _cspace.CS_RENDPRI_SORT_FRONT2BACK
+class iEngineFrameCallback(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iEngineFrameCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iEngineFrameCallback, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iEngineFrameCallback instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def StartFrame(*args): return _cspace.iEngineFrameCallback_StartFrame(*args)
+    def __del__(self, destroy=_cspace.delete_iEngineFrameCallback):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iEngineFrameCallbackPtr(iEngineFrameCallback):
+    def __init__(self, this):
+        _swig_setattr(self, iEngineFrameCallback, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iEngineFrameCallback, 'thisown', 0)
+        _swig_setattr(self, iEngineFrameCallback,self.__class__,iEngineFrameCallback)
+_cspace.iEngineFrameCallback_swigregister(iEngineFrameCallbackPtr)
+
 class iEngineSectorCallback(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -4377,6 +4401,8 @@ class iEngine(iBase):
     def GetSectors(*args): return _cspace.iEngine_GetSectors(*args)
     def FindSector(*args): return _cspace.iEngine_FindSector(*args)
     def GetNearbySectors(*args): return _cspace.iEngine_GetNearbySectors(*args)
+    def AddEngineFrameCallback(*args): return _cspace.iEngine_AddEngineFrameCallback(*args)
+    def RemoveEngineFrameCallback(*args): return _cspace.iEngine_RemoveEngineFrameCallback(*args)
     def AddEngineSectorCallback(*args): return _cspace.iEngine_AddEngineSectorCallback(*args)
     def RemoveEngineSectorCallback(*args): return _cspace.iEngine_RemoveEngineSectorCallback(*args)
     def CreateMeshWrapper(*args): return _cspace.iEngine_CreateMeshWrapper(*args)
@@ -12535,8 +12561,6 @@ class iEngineSequenceManager(iBase):
     def __repr__(self):
         return "<%s.%s; proxy of C++ iEngineSequenceManager instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def GetSequenceManager(*args): return _cspace.iEngineSequenceManager_GetSequenceManager(*args)
-    def SetCamera(*args): return _cspace.iEngineSequenceManager_SetCamera(*args)
-    def GetCamera(*args): return _cspace.iEngineSequenceManager_GetCamera(*args)
     def CreateParameterESM(*args): return _cspace.iEngineSequenceManager_CreateParameterESM(*args)
     def CreateTrigger(*args): return _cspace.iEngineSequenceManager_CreateTrigger(*args)
     def RemoveTrigger(*args): return _cspace.iEngineSequenceManager_RemoveTrigger(*args)
