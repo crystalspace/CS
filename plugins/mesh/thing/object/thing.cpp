@@ -1582,6 +1582,19 @@ csThing::~csThing ()
 {
   ClearLMs ();
 
+  bool meshesCreated;
+  csDirtyAccessArray<csRenderMesh*>& renderMeshes =
+    meshesHolder.GetUnusedData (meshesCreated, 0);
+  size_t i;
+  for (i = 0; i < renderMeshes.Length () ; i++)
+  {
+    // @@@ Is this needed?
+    //if (renderMeshes[i]->variablecontext != 0)
+      //renderMeshes[i]->variablecontext->DecRef ();
+    static_data->thing_type->blk_rendermesh.Free (renderMeshes[i]);
+  }
+  renderMeshes.DeleteAll ();
+
   if (wor_verts != static_data->obj_verts)
   {
     delete[] wor_verts;

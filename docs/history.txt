@@ -10,6 +10,8 @@ chronological order.
 	- Jorrit fixed a very big memory leak in the engine. All objects
 	  that would use software dynamic lighting (like genmesh by
 	  default) would leak as soon as they were rendered once.
+	- Jorrit fixed a big memory leak in thing. Once a thing was
+	  rendered it would never release the render meshes at destruction.
 20-Jan-2006
 	- Jorrit did the following documentation updates:
 	    - Removed everything about the soon-to-be-removed model
