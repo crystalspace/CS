@@ -86,7 +86,7 @@ public:
   {
     initialized = false;
     csExploMeshObject::center = center;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get the explosion center
   const csVector3 &GetCenter () const {return center;}
@@ -95,7 +95,7 @@ public:
   {
     initialized = false;
     csExploMeshObject::push = push;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get the push vector.
   const csVector3& GetPush () const {return push;}
@@ -104,7 +104,7 @@ public:
   {
     initialized = false;
     csExploMeshObject::nr_sides = nr_sides;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get the number of sides.
   int GetNrSides () const {return nr_sides;}
@@ -113,7 +113,7 @@ public:
   {
     initialized = false;
     csExploMeshObject::part_radius = part_radius;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get the radius of all particles.
   float GetPartRadius () const {return part_radius;}
@@ -130,7 +130,7 @@ public:
   {
     initialized = false;
     csExploMeshObject::spread_pos = spread_pos;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get the spread position.
   float GetSpreadPos () const {return spread_pos;}
@@ -139,7 +139,7 @@ public:
   {
     initialized = false;
     csExploMeshObject::spread_speed = spread_speed;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get the spread speed.
   float GetSpreadSpeed () const {return spread_speed;}
@@ -148,7 +148,7 @@ public:
   {
     initialized = false;
     csExploMeshObject::spread_accel = spread_accel;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get the spread acceleration.
   float GetSpreadAcceleration () const {return spread_accel;}

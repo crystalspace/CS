@@ -30,7 +30,8 @@ csShaderVariableContext::~csShaderVariableContext ()
 {}
 
 csShaderVariableContext::csShaderVariableContext (
-  const csShaderVariableContext& other) : scfImplementationType(this)
+  const csShaderVariableContext& other) :
+  iBase(), scfImplementationType(this)
 {
   variables = other.variables;
 }

@@ -67,7 +67,9 @@ const int CS_PARTICLE_ALIGN_Y           = 512;
  * be disabled, enabled with global values and enabled with per-particle
  * values.
  */
-class CS_CRYSTALSPACE_EXPORT csNewParticleSystem : public csMeshObject
+class CS_CRYSTALSPACE_EXPORT csNewParticleSystem :
+  public scfImplementationExt1<csNewParticleSystem,
+    csMeshObject, iParticleState>
 {
 protected:
   /// the mesh factory (should be an empty frame)
@@ -176,8 +178,6 @@ public:
 
   /// destructor
   virtual ~csNewParticleSystem ();
-
-  SCF_DECLARE_IBASE_EXT (csMeshObject);
 
   /// grow or shrink the storage area to the specified amount of particles
   void SetCount (int num);
@@ -291,93 +291,8 @@ public:
   inline bool GetChangeRotation (float& angle) const
   { if(!change_rotation) return false; angle = anglepersecond; return true; }
 
-
-  struct eiParticleState : public iParticleState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csNewParticleSystem);
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    {
-      scfParent->SetMaterialWrapper (material);
-    }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    { 
-      return scfParent->GetMaterialWrapper ();
-    }
-    virtual void SetMixMode (uint mode)
-    {
-      scfParent->MixMode = mode;
-    }
-    virtual uint GetMixMode () const
-    {
-      return scfParent->MixMode;
-    }
-    virtual void SetColor (const csColor& color)
-    {
-      scfParent->SetColor (color);
-    }
-    virtual const csColor& GetColor () const
-    {
-      return scfParent->GetColor ();
-    }
-    virtual void SetAlpha(float alpha) { scfParent->SetAlpha(alpha); }
-    virtual float GetAlpha() const { return scfParent->GetAlpha (); }
-    virtual void SetChangeColor (const csColor& color)
-    {
-      scfParent->SetChangeColor (color);
-    }
-    virtual void UnsetChangeColor ()
-    {
-      scfParent->UnsetChangeColor ();
-    }
-    virtual bool GetChangeColor (csColor& col) const
-    {
-      return scfParent->GetChangeColor(col); }
-    virtual void SetChangeSize (float factor)
-    {
-      scfParent->SetChangeSize (factor);
-    }
-    virtual void UnsetChangeSize ()
-    {
-      scfParent->UnsetChangeSize ();
-    }
-    virtual bool GetChangeSize (float& factor) const
-    {
-      return scfParent->GetChangeSize(factor);
-    }
-    virtual void SetChangeRotation (float angle)
-    {
-      scfParent->SetChangeRotation (angle);
-    }
-    virtual void UnsetChangeRotation ()
-    {
-      scfParent->UnsetChangeRotation ();
-    }
-    virtual bool GetChangeRotation (float& angle) const
-    {
-      return scfParent->GetChangeRotation(angle);
-    }
-    virtual void SetChangeAlpha (float factor)
-    {
-      scfParent->SetChangeAlpha (factor);
-    }
-    virtual void UnsetChangeAlpha ()
-    {
-      scfParent->UnsetChangeAlpha ();
-    }
-    virtual bool GetChangeAlpha (float& factor) const
-    {
-      return scfParent->GetChangeAlpha(factor);
-    }
-    virtual void SetSelfDestruct (csTicks t)
-    {
-      scfParent->SetSelfDestruct (t);
-    }
-    virtual void UnSetSelfDestruct ()
-    {
-      scfParent->UnSetSelfDestruct ();
-    }
-  } scfiParticleState;
-  friend struct eiParticleState;
+  virtual void SetMixMode (uint mode) { MixMode = mode; }
+  virtual uint GetMixMode () const { return MixMode; }
 };
 
 /** @} */

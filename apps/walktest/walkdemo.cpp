@@ -124,9 +124,9 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed,
 
   csRef<iRainState> rainstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iRainState));
-  rainstate->SetMaterialWrapper (mat);
+  exp->GetMeshObject()->SetMaterialWrapper (mat);
   rainstate->SetMixMode (CS_FX_ADD);
-  rainstate->SetColor (csColor (.25,.25,.25));
+  exp->GetMeshObject()->SetColor (csColor (.25,.25,.25));
   rainstate->SetParticleCount (num);
   rainstate->SetDropSize (0.3f/50.0f, 0.3f);
   rainstate->SetLighting (false);
@@ -163,9 +163,9 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
 
   csRef<iParticleState> partstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
-  partstate->SetMaterialWrapper (mat);
+  exp->GetMeshObject()->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_ADD);
-  partstate->SetColor (csColor (.25,.25,.25));
+  exp->GetMeshObject()->SetColor (csColor (.25,.25,.25));
 
   csRef<iSnowState> snowstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iSnowState));
@@ -204,7 +204,7 @@ void add_particles_fire (iSector* sector, char* matname, int num,
 
   csRef<iParticleState> partstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
-  partstate->SetMaterialWrapper (mat);
+  exp->GetMeshObject()->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_ADD);
 
   csRef<iFireState> firestate (
@@ -246,9 +246,9 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
 
   csRef<iParticleState> partstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
-  partstate->SetMaterialWrapper (mat);
+  exp->GetMeshObject()->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_ADD);
-  partstate->SetColor (csColor (0.25f, 0.35f, 0.55f));
+  exp->GetMeshObject()->SetColor (csColor (0.25f, 0.35f, 0.55f));
   partstate->SetChangeRotation (7.5f);
 
   csRef<iFountainState> fountstate (
@@ -292,9 +292,9 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
 
   csRef<iParticleState> partstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
-  partstate->SetMaterialWrapper (mat);
+  exp->GetMeshObject()->SetMaterialWrapper (mat);
   //partstate->SetMixMode (CS_FX_SETALPHA (0.50));
-  partstate->SetColor (csColor (1, 1, 0));
+  exp->GetMeshObject()->SetColor (csColor (1, 1, 0));
   partstate->SetChangeRotation (5.0);
   partstate->SetChangeSize (1.25);
   partstate->SetSelfDestruct (3000);
@@ -342,9 +342,9 @@ void add_particles_spiral (iSector* sector, const csVector3& bottom,
 
   csRef<iParticleState> partstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
-  partstate->SetMaterialWrapper (mat);
+  exp->GetMeshObject()->SetMaterialWrapper (mat);
   partstate->SetMixMode (CS_FX_SETALPHA (0.50));
-  partstate->SetColor (csColor (1, 1, 0));
+  exp->GetMeshObject()->SetColor (csColor (1, 1, 0));
   partstate->SetChangeColor (csColor(+0.01f, 0.0f, -0.012f));
 
   csRef<iSpiralState> spirstate (

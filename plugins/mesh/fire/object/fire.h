@@ -110,7 +110,7 @@ public:
     initialized = false;
     drop_width = dropwidth;
     drop_height = dropheight;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get the size of the fire drops.
   void GetDropSize (float& dropwidth, float& dropheight) const
@@ -120,7 +120,7 @@ public:
   {
     initialized = false;
     csFireMeshObject::origin = origin;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get origin of the fire.
   const csBox3& GetOrigin () const
@@ -130,7 +130,7 @@ public:
   {
     initialized = false;
     csFireMeshObject::direction = direction;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get direction of the fire.
   const csVector3& GetDirection () const
@@ -149,7 +149,7 @@ public:
   {
     initialized = false;
     csFireMeshObject::swirl = swirl;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get swirl.
   float GetSwirl () const

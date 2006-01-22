@@ -31,25 +31,17 @@
 struct iMaterialWrapper;
 class csColor;
 
-SCF_VERSION (iParticleState, 0, 0, 2);
-
 /**
  * This interface describes the API for the particle mesh object.
  */
-struct iParticleState : public iBase
+struct iParticleState : public virtual iBase
 {
-  /// Set material of particle system.
-  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
-  /// Get material of particle system.
-  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
+  SCF_INTERFACE(iParticleState, 2, 0, 0);
+
   /// Set mix mode.
   virtual void SetMixMode (uint mode) = 0;
   /// Get mix mode.
   virtual uint GetMixMode () const = 0;
-  /// Set particle color.
-  virtual void SetColor (const csColor& color) = 0;
-  /// Get particle color.
-  virtual const csColor& GetColor () const = 0;
   /// Set the alpha of particles.
   virtual void SetAlpha(float alpha) = 0;
   /// Get the probable alpha of the particles

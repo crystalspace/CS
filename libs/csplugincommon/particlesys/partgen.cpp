@@ -43,26 +43,10 @@
 #include "iutil/strset.h"
 #include "ivideo/rendermesh.h"
 
-SCF_IMPLEMENT_IBASE (csParticleSystem)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticleState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticleSystem::ObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csParticleSystem::ParticleState)
-  SCF_IMPLEMENTS_INTERFACE (iParticleState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
-				    iMeshObjectFactory* factory) 
+csParticleSystem::csParticleSystem (
+  iObjectRegistry* object_reg, iMeshObjectFactory* factory) :
+  scfImplementationType(this, factory)
 {
-  SCF_CONSTRUCT_IBASE (factory);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
   initialized = false;
   csParticleSystem::factory = factory;
   csParticleSystem::object_reg = object_reg;
@@ -107,9 +91,6 @@ csParticleSystem::~csParticleSystem()
 {
   if (vis_cb) vis_cb->DecRef ();
   RemoveParticles ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticleState);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csParticleSystem::SetupObject ()
@@ -156,7 +137,7 @@ void csParticleSystem::RemoveParticles ()
 
   particles.DeleteAll ();
   sprite2ds.DeleteAll ();
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 void csParticleSystem::AppendRectSprite (float width, float height,
@@ -180,7 +161,7 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   part->SetColor (csColor (1.0, 1.0, 1.0));
   state->SetMaterialWrapper (mat);
   AppendParticle (part, state);
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 
@@ -197,7 +178,7 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
   part->SetColor (csColor (1.0, 1.0, 1.0));
 
   AppendParticle (part, state);
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 
@@ -244,7 +225,7 @@ void csParticleSystem::ScaleBy (float factor)
   size_t i;
   for (i = 0 ; i<particles.Length () ; i++)
     GetParticle (i)->ScaleBy (factor);
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 
@@ -253,7 +234,7 @@ void csParticleSystem::Rotate (float angle)
   size_t i;
   for (i = 0 ; i<particles.Length () ; i++)
     GetParticle (i)->Rotate (angle);
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 
@@ -470,7 +451,7 @@ csVector3 csParticleSystem::GetRandomPosition (csBox3 const& box)
 csNewtonianParticleSystem::csNewtonianParticleSystem (
 	iObjectRegistry* object_reg,
 	iMeshObjectFactory* factory)
-  : csParticleSystem (object_reg, factory)
+  : scfImplementationType(this, object_reg, factory)
 {
   // create csVector3's
   part_speed = 0;

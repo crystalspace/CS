@@ -623,7 +623,7 @@ void csEmitMeshObject::SetupObject ()
     }
     SetupColor ();
     SetupMixMode ();
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
 }
 

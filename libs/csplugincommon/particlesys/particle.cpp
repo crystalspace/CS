@@ -33,18 +33,10 @@
 #include "ivideo/material.h"
 #include "iutil/objreg.h"
 
-SCF_IMPLEMENT_IBASE_EXT (csNewParticleSystem)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticleState)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csNewParticleSystem::eiParticleState)
-  SCF_IMPLEMENTS_INTERFACE (iParticleState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csNewParticleSystem::csNewParticleSystem (
-	iEngine *eng, iMeshObjectFactory *fact, int flags) : csMeshObject (eng)
+	iEngine *eng, iMeshObjectFactory *fact, int flags) :
+  scfImplementationType(this, eng)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
   Factory = fact;
   ParticleFlags = flags;
   ParticleCount = 0;
@@ -90,7 +82,6 @@ csNewParticleSystem::~csNewParticleSystem ()
   delete[] texels;
   delete[] triangles;
   delete[] colors;
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticleState);
 }
 
 #define UPDATE_ARRAY_ALWAYS(NAME,TYPE) {                                \

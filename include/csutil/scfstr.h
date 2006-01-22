@@ -50,7 +50,7 @@ public:
 
   /// Copy constructor
   scfString (const iString &copy) 
-    : scfImplementationType (this), s(copy.GetData())
+    : iBase(), scfImplementationType (this), s(copy.GetData())
   { }
 
   /// Yet another copy constructor

@@ -58,7 +58,9 @@ struct iMeshWrapper;
  * Subclasses of this class may be of more interest to users.
  * More specialised particle systems can be found below.
  */
-class CS_CRYSTALSPACE_EXPORT csParticleSystem : public iMeshObject
+class CS_CRYSTALSPACE_EXPORT csParticleSystem :
+  public scfImplementationExt2<csParticleSystem,
+    csObjectModel, iMeshObject, iParticleState>
 {
 protected:
   iObjectRegistry* object_reg;
@@ -138,7 +140,7 @@ protected:
   void ChangeObject ()
   {
     initialized = false;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
 
 private:
@@ -286,7 +288,7 @@ public:
   void SetObjectBoundingBox (const csBox3& bbox)
   {
     csParticleSystem::bbox = bbox;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   void GetRadius (csVector3& rad, csVector3& cent)
   {
@@ -296,8 +298,6 @@ public:
   }
 
   //----------------------- iMeshObject implementation ------------------------
-  SCF_DECLARE_IBASE;
-
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
@@ -335,25 +335,7 @@ public:
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
   //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public csObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csParticleSystem);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      scfParent->GetObjectBoundingBox (bbox);
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-  } scfiObjectModel;
-  friend class ObjectModel;
-
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual iObjectModel* GetObjectModel () { return this; }
   virtual bool SetColor (const csColor& col)
   {
     color = col;
@@ -372,6 +354,7 @@ public:
     return true;
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return mat; }
+  //------------------------- iParticleState implementation ----------------
   virtual void SetMixMode (uint mode)
   {
     MixMode = mode;
@@ -384,101 +367,14 @@ public:
    * does nothing.
    */
   virtual void PositionChild (iMeshObject* /*child*/,csTicks /*current_time*/) { }
-
-  //------------------------- iParticleState implementation ----------------
-  class ParticleState : public iParticleState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csParticleSystem);
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    {
-      scfParent->initialized = false;
-      scfParent->mat = material;
-    }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    {
-      return scfParent->mat;
-    }
-    virtual void SetMixMode (uint mode)
-    {
-      scfParent->MixMode = mode;
-      scfParent->SetupMixMode ();
-    }
-    virtual uint GetMixMode () const { return scfParent->MixMode; }
-    virtual void SetColor (const csColor& color)
-    {
-      scfParent->color = color;
-      scfParent->SetupColor ();
-    }
-    virtual const csColor& GetColor () const
-    {
-      return scfParent->color;
-    }
-    virtual void SetAlpha(float alpha) {scfParent->SetAlpha(alpha);}
-    virtual float GetAlpha() const {return scfParent->GetAlpha ();}
-    virtual void SetChangeColor (const csColor& color)
-    {
-      scfParent->SetChangeColor (color);
-    }
-    virtual void UnsetChangeColor ()
-    {
-      scfParent->UnsetChangeColor ();
-    }
-    virtual bool GetChangeColor (csColor& col) const
-    {
-      return scfParent->GetChangeColor(col); }
-    virtual void SetChangeSize (float factor)
-    {
-      scfParent->SetChangeSize (factor);
-    }
-    virtual void UnsetChangeSize ()
-    {
-      scfParent->UnsetChangeSize ();
-    }
-    virtual bool GetChangeSize (float& factor) const
-    {
-      return scfParent->GetChangeSize(factor);
-    }
-    virtual void SetChangeRotation (float angle)
-    {
-      scfParent->SetChangeRotation (angle);
-    }
-    virtual void UnsetChangeRotation ()
-    {
-      scfParent->UnsetChangeRotation ();
-    }
-    virtual bool GetChangeRotation (float& angle) const
-    {
-      return scfParent->GetChangeRotation(angle);
-    }
-    virtual void SetChangeAlpha (float factor)
-    {
-      scfParent->SetChangeAlpha (factor);
-    }
-    virtual void UnsetChangeAlpha ()
-    {
-      scfParent->UnsetChangeAlpha ();
-    }
-    virtual bool GetChangeAlpha (float& factor) const
-    {
-      return scfParent->GetChangeAlpha(factor);
-    }
-    virtual void SetSelfDestruct (csTicks t)
-    {
-      scfParent->SetSelfDestruct (t);
-    }
-    virtual void UnSetSelfDestruct ()
-    {
-      scfParent->UnSetSelfDestruct ();
-    }
-  } scfiParticleState;
-  friend class ParticleState;
 };
 
 /**
  * This class has a set of particles that behave with phsyics.
  * They each have a speed and an acceleration.
  */
-class CS_CRYSTALSPACE_EXPORT csNewtonianParticleSystem : public csParticleSystem
+class CS_CRYSTALSPACE_EXPORT csNewtonianParticleSystem :
+  public scfImplementationExt0<csNewtonianParticleSystem, csParticleSystem>
 {
 protected:
   /// Particle speed, m/s.

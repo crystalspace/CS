@@ -115,7 +115,6 @@ csTinyXmlNodeIterator::csTinyXmlNodeIterator (
 csTinyXmlNodeIterator::~csTinyXmlNodeIterator ()
 {
   delete[] value;
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTinyXmlNodeIterator::HasNext ()
@@ -138,27 +137,6 @@ csRef<iDocumentNode> csTinyXmlNodeIterator::Next ()
 }
 
 //------------------------------------------------------------------------
-
-
-//------------------------------------------------------------------------
-/*
-SCF_IMPLEMENT_IBASE_INCREF(csTinyXmlNode)
-void csTinyXmlNode::DecRef ()
-{
-  csRefTrackerAccess::TrackDecRef (this, scfRefCount);
-  scfRefCount--;
-  if (scfRefCount <= 0)
-  {
-    if (scfParent) scfParent->DecRef ();
-    doc->Free (this);
-  }
-}
-SCF_IMPLEMENT_IBASE_GETREFCOUNT(csTinyXmlNode)
-SCF_IMPLEMENT_IBASE_REFOWNER(csTinyXmlNode)
-SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(csTinyXmlNode)
-SCF_IMPLEMENT_IBASE_QUERY(csTinyXmlNode)
-  SCF_IMPLEMENTS_INTERFACE (iDocumentNode)
-SCF_IMPLEMENT_IBASE_END*/
 
 csTinyXmlNode::csTinyXmlNode (csTinyXmlDocument* doc) 
   : scfImplementationType (this), node (0),

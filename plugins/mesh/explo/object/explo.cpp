@@ -129,7 +129,7 @@ void csExploMeshObject::HardTransform (const csReversibleTransform& t)
 {
   center = t.This2Other (center);
   initialized = false;
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 //----------------------------------------------------------------------

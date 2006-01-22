@@ -255,7 +255,7 @@ public:
     {
     }
     CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
-    virtual bool HandleEvent (iEvent& e) 
+    virtual bool HandleEvent (iEvent&) 
     { 
       parent->Notify (sendEvent);
       return false;

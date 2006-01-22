@@ -72,7 +72,7 @@ public:
     initialized = false;
     drop_width = dropwidth;
     drop_height = dropheight;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get the size of the drops.
   void GetDropSize (float& dropwidth, float& dropheight) const
@@ -82,7 +82,7 @@ public:
   {
     initialized = false;
     rainbox.Set (minbox, maxbox);
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get box.
   void GetBox (csVector3& minbox, csVector3& maxbox) const
@@ -101,7 +101,7 @@ public:
   {
     initialized = false;
     rain_dir = fspeed;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get fall speed.
   const csVector3& GetFallSpeed () const
@@ -111,7 +111,7 @@ public:
   {
     initialized = false;
     swirl_amount = sw;
-    scfiObjectModel.ShapeChanged ();
+    ShapeChanged ();
   }
   /// Get swirl.
   float GetSwirl () const

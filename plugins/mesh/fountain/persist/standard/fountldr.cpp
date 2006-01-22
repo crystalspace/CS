@@ -225,7 +225,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
 	    return 0;
-	  partstate->SetColor (color);
+	  mesh->SetColor (color);
 	}
 	break;
       case XMLTOKEN_DROPSIZE:
@@ -304,7 +304,7 @@ csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find material '%s'!", matname);
 	    return 0;
 	  }
-	  partstate->SetMaterialWrapper (mat);
+	  mesh->SetMaterialWrapper (mat);
 	}
 	break;
       case XMLTOKEN_MIXMODE:
@@ -387,7 +387,8 @@ bool csFountainSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }    
     
     //Writedown Color tag
-    csColor col = partstate->GetColor();
+    csColor col;
+    mesh->GetColor(col);
     csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     colorNode->SetValue("color");
     synldr->WriteColor(colorNode, &col);
@@ -443,7 +444,7 @@ bool csFountainSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     falltimeNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat(falltime);
 
     //Writedown Material tag
-    iMaterialWrapper* mat = partstate->GetMaterialWrapper();
+    iMaterialWrapper* mat = mesh->GetMaterialWrapper();
     if (mat)
     {
       const char* matname = mat->QueryObject()->GetName();

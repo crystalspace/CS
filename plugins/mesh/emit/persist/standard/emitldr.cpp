@@ -451,7 +451,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 		child, "Cannot find material '%s' for emit!", matname);
             return 0;
 	  }
-	  partstate->SetMaterialWrapper (mat);
+	  mesh->SetMaterialWrapper (mat);
 	}
 	break;
       case XMLTOKEN_MIXMODE:
@@ -656,7 +656,7 @@ bool csEmitSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     synldr->WriteBool(paramsNode, "lighting", emitstate->GetLighting(), true);
 
     //Writedown Material tag
-    iMaterialWrapper* mat = partstate->GetMaterialWrapper();
+    iMaterialWrapper* mat = mesh->GetMaterialWrapper();
     if (mat)
     {
       const char* matname = mat->QueryObject()->GetName();

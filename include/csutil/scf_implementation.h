@@ -145,7 +145,7 @@ public:
    * initializes scfImplementation like in the normal constructor, i.e.
    * "scfImplementation (this)".
    */
-  scfImplementation (const scfImplementation& /*other*/)
+  scfImplementation (const scfImplementation& /*other*/) : iBase()
   {
     CS_ASSERT_MSG ("To allow copying SCF classes, create a copy "
       "constructor in the derived class, and initialize scfImplementation "

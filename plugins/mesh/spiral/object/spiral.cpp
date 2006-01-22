@@ -146,7 +146,7 @@ void csSpiralMeshObject::SetSource (const csVector3& source)
   part_source.Set( csQsqrt(source.x*source.x+source.z*source.z),
                   source.y,
                   atan2(source.x,-source.z));
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 void csSpiralMeshObject::Update (csTicks elapsed_time)
@@ -179,7 +179,7 @@ void csSpiralMeshObject::HardTransform (const csReversibleTransform& t)
 {
   source = t.This2Other (source);
   initialized = false;
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 //----------------------------------------------------------------------

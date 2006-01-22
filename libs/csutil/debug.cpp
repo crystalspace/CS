@@ -153,7 +153,17 @@ struct csDGEL
   }
 };
 
-class csDebugGraph : public iBase
+struct iDebugGraph : public virtual iBase
+{
+  virtual void Clear () = 0;
+  virtual csDGEL* FindEl (void* object) = 0;
+  virtual csDGEL* AddEl (void* object) = 0;
+  virtual int GetNumEls () = 0;
+  virtual csDGEL** GetEls () = 0;
+  virtual uint32 GetLastTimestamp() = 0;
+};
+
+class csDebugGraph : public scfImplementation1<csDebugGraph, iDebugGraph>
 {
 public:
   int num_els;
@@ -161,9 +171,8 @@ public:
   csDGEL** els;
   uint32 last_timestamp;
 
-  csDebugGraph ()
+  csDebugGraph () : scfImplementationType(this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     num_els = 0;
     max_els = 100;
     els = new csDGEL* [max_els];
@@ -173,7 +182,6 @@ public:
   {
     Clear ();
     delete[] els;
-    SCF_DESTRUCT_IBASE ();
   }
   void Clear ()
   {
@@ -217,13 +225,12 @@ public:
     return 0;
   }
 
-  SCF_DECLARE_IBASE;
+  uint32 GetLastTimestamp() { return last_timestamp++; }
+  int GetNumEls () { return num_els; }
+  csDGEL** GetEls () { return els; }
 };
 
-SCF_IMPLEMENT_IBASE (csDebugGraph)
-SCF_IMPLEMENT_IBASE_END
-
-static csDebugGraph* SetupDebugGraph (iObjectRegistry* object_reg)
+static csRef<iDebugGraph> SetupDebugGraph (iObjectRegistry* object_reg)
 {
   csRef<iBase> idg (CS_QUERY_REGISTRY_TAG (object_reg, "__Debug_Graph__"));
   if (!idg)
@@ -237,7 +244,8 @@ static csDebugGraph* SetupDebugGraph (iObjectRegistry* object_reg)
     }
   }
   //@@FIX
-  return (csDebugGraph*)(iBase*)idg;	// DecRef() but that's ok in this case.
+  return SCF_QUERY_INTERFACE(idg, iDebugGraph);
+//  return (csDebugGraph*)(iBase*)idg;	// DecRef() but that's ok in this case.
 }
 
 //-----------------------------------------------------------------------------
@@ -258,7 +266,7 @@ void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
   if (!object_reg) object_reg = iSCF::SCF->object_reg;
 #endif
   if (!object_reg) return;
-  csDebugGraph* dg = SetupDebugGraph (object_reg);
+  iDebugGraph* dg = SetupDebugGraph (object_reg);
   if (!dg) return;
 
   csDGEL* el = dg->FindEl (object);
@@ -296,7 +304,7 @@ void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
   }
 
   el->used = true;
-  el->timestamp = dg->last_timestamp++;
+  el->timestamp = dg->GetLastTimestamp();
   el->scf = scf;
 
   if (description)
@@ -321,7 +329,7 @@ void csDebuggingGraph::AttachDescription (iObjectRegistry* object_reg,
   if (!object_reg) object_reg = iSCF::SCF->object_reg;
 #endif
   if (!object_reg) return;
-  csDebugGraph* dg = SetupDebugGraph (object_reg);
+  iDebugGraph* dg = SetupDebugGraph (object_reg);
   if (!dg) return;
 
   csDGEL* el = dg->FindEl (object);
@@ -358,7 +366,7 @@ void csDebuggingGraph::AttachType (iObjectRegistry* object_reg,
   if (!object_reg) object_reg = iSCF::SCF->object_reg;
 #endif
   if (!object_reg) return;
-  csDebugGraph* dg = SetupDebugGraph (object_reg);
+  iDebugGraph* dg = SetupDebugGraph (object_reg);
   if (!dg) return;
 
   csDGEL* el = dg->FindEl (object);
@@ -385,7 +393,7 @@ void csDebuggingGraph::RemoveObject (iObjectRegistry* object_reg,
   if (!object_reg) return;
   (void)file;
   (void)linenr;
-  csDebugGraph* dg = SetupDebugGraph (object_reg);
+  iDebugGraph* dg = SetupDebugGraph (object_reg);
   if (!dg) return;
 
   csDGEL* el = dg->FindEl (object);
@@ -414,7 +422,7 @@ void csDebuggingGraph::AddParent (iObjectRegistry* object_reg,
   if (!object_reg) object_reg = iSCF::SCF->object_reg;
 #endif
   if (!object_reg) return;
-  csDebugGraph* dg = SetupDebugGraph (object_reg);
+  iDebugGraph* dg = SetupDebugGraph (object_reg);
   if (!dg) return;
   csDGEL* p_el = dg->FindEl (parent);
   // If parent could not be found. Create a dummy place holder for later.
@@ -423,7 +431,7 @@ void csDebuggingGraph::AddParent (iObjectRegistry* object_reg,
   // If child could not be found. Create a dummy place holder for later.
   if (!c_el) c_el = dg->AddEl (child);
 
-  c_el->AddParent (p_el, dg->last_timestamp++);
+  c_el->AddParent (p_el, dg->GetLastTimestamp());
 }
 
 void csDebuggingGraph::AddChild (iObjectRegistry* object_reg,
@@ -433,7 +441,7 @@ void csDebuggingGraph::AddChild (iObjectRegistry* object_reg,
   if (!object_reg) object_reg = iSCF::SCF->object_reg;
 #endif
   if (!object_reg) return;
-  csDebugGraph* dg = SetupDebugGraph (object_reg);
+  iDebugGraph* dg = SetupDebugGraph (object_reg);
   if (!dg) return;
   csDGEL* p_el = dg->FindEl (parent);
   // If parent could not be found. Create a dummy place holder for later.
@@ -442,7 +450,7 @@ void csDebuggingGraph::AddChild (iObjectRegistry* object_reg,
   // If child could not be found. Create a dummy place holder for later.
   if (!c_el) c_el = dg->AddEl (child);
 
-  p_el->AddChild (c_el, dg->last_timestamp++);
+  p_el->AddChild (c_el, dg->GetLastTimestamp());
 }
 
 void csDebuggingGraph::RemoveParent (iObjectRegistry* object_reg,
@@ -452,7 +460,7 @@ void csDebuggingGraph::RemoveParent (iObjectRegistry* object_reg,
   if (!object_reg) object_reg = iSCF::SCF->object_reg;
 #endif
   if (!object_reg) return;
-  csDebugGraph* dg = SetupDebugGraph (object_reg);
+  iDebugGraph* dg = SetupDebugGraph (object_reg);
   if (!dg) return;
   csDGEL* c_el = dg->FindEl (child);
   if (!c_el) return;	// Nothing to do if child is not there.
@@ -469,7 +477,7 @@ void csDebuggingGraph::RemoveChild (iObjectRegistry* object_reg,
   if (!object_reg) object_reg = iSCF::SCF->object_reg;
 #endif
   if (!object_reg) return;
-  csDebugGraph* dg = SetupDebugGraph (object_reg);
+  iDebugGraph* dg = SetupDebugGraph (object_reg);
   if (!dg) return;
   csDGEL* p_el = dg->FindEl (parent);
   if (!p_el) return;	// Nothing to do.
@@ -485,7 +493,7 @@ void csDebuggingGraph::Clear (iObjectRegistry* object_reg)
   if (!object_reg) object_reg = iSCF::SCF->object_reg;
 #endif
   if (!object_reg) return;
-  csDebugGraph* dg = SetupDebugGraph (object_reg);
+  iDebugGraph* dg = SetupDebugGraph (object_reg);
   if (!dg) return;
   dg->Clear ();
 }
@@ -496,14 +504,14 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg)
   if (!object_reg) object_reg = iSCF::SCF->object_reg;
 #endif
   if (!object_reg) return;
-  csDebugGraph* dg = SetupDebugGraph (object_reg);
+  iDebugGraph* dg = SetupDebugGraph (object_reg);
   if (!dg) return;
 
-  csDGEL** els = dg->els;
+  csDGEL** els = dg->GetEls();
   // First mark all elements as unused and count the number
   // of elements we have.
   int i, cnt = 0;
-  for (i = 0 ; i < dg->num_els ; i++)
+  for (i = 0 ; i < dg->GetNumEls() ; i++)
   {
     if (els[i]->used)
     {
@@ -520,7 +528,7 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg)
 
   // Find the first unmarked object and dump it.
   i = 0;
-  while (i < dg->num_els)
+  while (i < dg->GetNumEls())
   {
     if (!els[i]->marker)
     {
@@ -656,14 +664,14 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg, void* object,
   if (!object_reg) object_reg = iSCF::SCF->object_reg;
 #endif
   if (!object_reg) return;
-  csDebugGraph* dg = SetupDebugGraph (object_reg);
+  iDebugGraph* dg = SetupDebugGraph (object_reg);
   if (!dg) return;
   int i;
   if (reset_mark)
   {
     // First mark all elements as unused.
-    csDGEL** els = dg->els;
-    for (i = 0 ; i < dg->num_els ; i++)
+    csDGEL** els = dg->GetEls();
+    for (i = 0 ; i < dg->GetNumEls() ; i++)
     {
       if (els[i]->used) els[i]->marker = false;
       else els[i]->marker = true;
@@ -676,7 +684,7 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg, void* object,
 
   // First copy all elements that belong to this sub-graph
   // to a local array.
-  csDGEL** local_els = new csDGEL* [dg->num_els];
+  csDGEL** local_els = new csDGEL* [dg->GetNumEls()];
   int done = 0, num = 0;
   local_els[num++] = el; el->marker = true;
   while (done < num)
