@@ -26,6 +26,7 @@
 #include "iutil/eventh.h"
 
 #include "csutil/cfgacc.h"
+#include "csutil/flags.h"
 #include "csutil/weakref.h"
 #include "csutil/scf_implementation.h"
 #include "csgeom/plane3.h"
@@ -129,8 +130,8 @@ public:
   uint32* GetZBuffAt (int /*x*/, int /*y*/) { return 0; }
   float GetZBuffValue (int /*x*/, int /*y*/) { return 0.0; };
 
-  void OpenPortal (size_t, const csVector2*, const csPlane3&, bool) { }
-  void ClosePortal (bool) { }
+  void OpenPortal (size_t, const csVector2*, const csPlane3&, csFlags) { }
+  void ClosePortal () { }
   iHalo* CreateHalo (float /*iR*/, float /*iG*/, float /*iB*/,
     unsigned char* /*iAlpha*/, int /*iWidth*/, int /*iHeight*/) { return 0; }
 

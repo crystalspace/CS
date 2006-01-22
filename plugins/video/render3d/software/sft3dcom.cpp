@@ -35,6 +35,7 @@
 #include "csutil/event.h"
 #include "csutil/scfstrset.h"
 #include "csutil/sysfunc.h"
+#include "iengine/portal.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
 #include "iutil/event.h"
@@ -648,13 +649,14 @@ void csSoftwareGraphics3DCommon::FinishDraw ()
 void csSoftwareGraphics3DCommon::OpenPortal (size_t numVertices, 
 				 const csVector2* vertices,
 				 const csPlane3& normal,
-				 bool floating)
+				 csFlags flags)
 {
   csClipPortal* cp = new csClipPortal ();
   cp->poly = new csVector2[numVertices];
   memcpy (cp->poly, vertices, numVertices * sizeof (csVector2));
   cp->num_poly = (int)numVertices;
   cp->normal = normal;
+  cp->flags = flags;
   clipportal_stack.Push (cp);
   clipportal_dirty = true;
 
@@ -662,16 +664,16 @@ void csSoftwareGraphics3DCommon::OpenPortal (size_t numVertices,
   // number. Otherwise we start at one.
   if (clipportal_floating)
     clipportal_floating++;
-  else if (floating)
+  else if (flags.Check(CS_PORTAL_FLOAT))
     clipportal_floating = 1;
 }
 
-void csSoftwareGraphics3DCommon::ClosePortal (bool use_zfill_portal)
+void csSoftwareGraphics3DCommon::ClosePortal ()
 {
   if (clipportal_stack.Length () <= 0) return;
   csClipPortal* cp = clipportal_stack.Pop ();
 
-  if (use_zfill_portal)
+  if (cp->flags.Check(CS_PORTAL_ZFILL))
   {
     CS_ALLOC_STACK_ARRAY(csVector3, vertices, cp->num_poly);
     for (int v = 0; v < cp->num_poly; v++)

@@ -32,6 +32,7 @@
 #include "csutil/scf.h"
 
 #include "csgeom/transfrm.h"
+#include "csutil/flags.h"
 #include "csutil/strset.h"
 
 #include "ivideo/rndbuf.h"
@@ -911,7 +912,8 @@ struct iGraphics3D : public virtual iBase
   virtual float GetZBuffValue (int x, int y) = 0;
 
   /**
-   * Enter a new portal. If 'floating' is true then this routine will restrict
+   * Enter a new portal. 
+   * If 'flags' contains CS_PORTAL_FLOAT then this routine will restrict
    * all further drawing to the given 2D area and it will also respect
    * the current contents of the Z-buffer so that geometry will only
    * render where the Z-buffer allows it (even if zfill or znone is used).
@@ -920,13 +922,13 @@ struct iGraphics3D : public virtual iBase
    * portal must be fully contained in the previous ones.
    */
   virtual void OpenPortal (size_t numVertices, const csVector2* vertices,
-    const csPlane3& normal, bool floating) = 0;
+    const csPlane3& normal, csFlags flags) = 0;
 
   /**
    * Close a portal previously opened with OpenPortal().
    * If 'zfill_portal' then the portal area will be zfilled.
    */
-  virtual void ClosePortal (bool zfill_portal) = 0;
+  virtual void ClosePortal () = 0;
 
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,

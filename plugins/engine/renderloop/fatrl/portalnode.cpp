@@ -128,9 +128,8 @@ bool csPortalRenderNode::Preprocess (iRenderView* rview)
   PORTAL_CHECK(portal, !poly.GetVertexCount (), false);
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
-  bool use_float_portal = portal->GetFlags().Check (CS_PORTAL_FLOAT);
   g3d->OpenPortal (poly.GetVertexCount(), poly.GetVertices(),
-    camera_plane, use_float_portal);
+    camera_plane, portal->GetFlags());
 
   PrepareView (rview, sector);
 
@@ -226,8 +225,7 @@ void csPortalRenderNode::Postprocess (iRenderView* rview)
     g3d->DrawSimpleMesh (mesh);
   }
 
-  bool use_zfill_portal = portal->GetFlags().Check (CS_PORTAL_ZFILL);
-  g3d->ClosePortal (use_zfill_portal);
+  g3d->ClosePortal ();
 
   old_clipper = 0;
 

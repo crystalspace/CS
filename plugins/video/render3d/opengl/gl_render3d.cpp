@@ -36,11 +36,13 @@
 #include "cstool/fogmath.h"
 #include "cstool/rbuflock.h"
 #include "csutil/event.h"
+#include "csutil/flags.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/strset.h"
 
+#include "iengine/portal.h"
 #include "igeom/clip2d.h"
 #include "iutil/cmdline.h"
 #include "iutil/comp.h"
@@ -1959,7 +1961,7 @@ void csGLGraphics3D::DebugVisualizeStencil (uint32 mask)
 void csGLGraphics3D::OpenPortal (size_t numVertices, 
 				 const csVector2* vertices,
 				 const csPlane3& normal,
-				 bool floating)
+				 csFlags flags)
 {
   csClipPortal* cp = new csClipPortal ();
   GLRENDER3D_OUTPUT_STRING_MARKER(("%p", cp));
@@ -1967,6 +1969,7 @@ void csGLGraphics3D::OpenPortal (size_t numVertices,
   memcpy (cp->poly, vertices, numVertices * sizeof (csVector2));
   cp->num_poly = (int)numVertices;
   cp->normal = normal;
+  cp->flags = flags;
   clipportal_stack.Push (cp);
   clipportal_dirty = true;
 
@@ -1974,17 +1977,17 @@ void csGLGraphics3D::OpenPortal (size_t numVertices,
   // number. Otherwise we start at one.
   if (clipportal_floating)
     clipportal_floating++;
-  else if (floating)
+  else if (flags.Check(CS_PORTAL_FLOAT))
     clipportal_floating = 1;
 }
 
-void csGLGraphics3D::ClosePortal (bool use_zfill_portal)
+void csGLGraphics3D::ClosePortal ()
 {
   if (clipportal_stack.Length () <= 0) return;
   csClipPortal* cp = clipportal_stack.Pop ();
-  GLRENDER3D_OUTPUT_STRING_MARKER(("%p, %d", cp, (int)use_zfill_portal));
+  GLRENDER3D_OUTPUT_STRING_MARKER(("%p, %d", cp, cp->flags.Check(CS_PORTAL_ZFILL)?1:0));
 
-  if (use_zfill_portal)
+  if (cp->flags.Check(CS_PORTAL_ZFILL))
   {
     GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
     statecache->GetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);

@@ -36,6 +36,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
 #include "csutil/csuctransform.h"
+#include "csutil/flags.h"
 #include "csutil/formatter.h"
 #include "csutil/parray.h"
 #include "csutil/scf.h"
@@ -233,6 +234,7 @@ private:
     csVector2* poly;
     int num_poly;
     csPlane3 normal;
+    csFlags flags;
     csClipPortal () : poly (0) { }
     ~csClipPortal () { delete[] poly; }
   };
@@ -610,10 +612,10 @@ public:
 
   /// Enter a new clipped portal. Basically this routine will restrict
   virtual void OpenPortal (size_t numVertices, const csVector2* vertices,
-    const csPlane3& normal, bool floating);
+    const csPlane3& normal, csFlags flags);
 
   /// Close a portal previously opened with OpenPortal().
-  virtual void ClosePortal (bool use_zfill_portal);
+  virtual void ClosePortal ();
 
   void SetupClipPortals ();
 

@@ -7,6 +7,14 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 21-Jan-2006
+	- rvl_ changed iGraphics3D::OpenPortal(...) to give a render 
+	  plugin more information about portal's properties (flags). 
+	  Portal flags are stored in 'clipportal_stack' member of 
+	  render plugins (opengl, soft3d). iGraphics3D::ClosePortal() 
+	  is called without parameters now. 
+	  Corresponding changes were made in engine code (portalcontainer, 
+	  fat renderloop) and render plugins code (null, opengl, soft3d).
+
 	- Jorrit fixed a very big memory leak in the engine. All objects
 	  that would use software dynamic lighting (like genmesh by
 	  default) would leak as soon as they were rendered once.

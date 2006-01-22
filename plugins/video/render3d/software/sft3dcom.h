@@ -31,6 +31,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/flags.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/strset.h"
@@ -251,6 +252,7 @@ protected:
     csVector2* poly;
     int num_poly;
     csPlane3 normal;
+    csFlags flags;
     csClipPortal () : poly (0) { }
     ~csClipPortal () { delete[] poly; }
   };
@@ -652,8 +654,8 @@ public:
     return false;
   }
 
-  virtual void OpenPortal (size_t, const csVector2*, const csPlane3&, bool);
-  virtual void ClosePortal (bool use_zfill_portal);
+  virtual void OpenPortal (size_t, const csVector2*, const csPlane3&, csFlags);
+  virtual void ClosePortal ();
 
   //=========================================================================
   // Below this line are all functions that are not yet implemented by
