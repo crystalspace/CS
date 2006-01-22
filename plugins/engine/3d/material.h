@@ -205,7 +205,10 @@ public:
  * csMaterialWrapper represents a texture and its link
  * to the iMaterialHandle as returned by iTextureManager.
  */
-class csMaterialWrapper : public csObject
+class csMaterialWrapper : public scfImplementationExt2<csMaterialWrapper,
+						       csObject,
+						       iMaterialWrapper,
+						       iSelfDestruct>
 {
 private:
   /// The corresponding iMaterial.
@@ -222,60 +225,30 @@ public:
 
   /// Construct a material handle given a material.
   csMaterialWrapper (iMaterial* Image);
-  /// Copy constructor
-  csMaterialWrapper (csMaterialWrapper &);
-
-  void SelfDestruct ();
 
   /**
    * Change the base material. Note: The changes will not be visible until
    * you re-register the material.
    */
-  void SetMaterial (iMaterial* material);
+  virtual void SetMaterial (iMaterial* material);
   /// Get the original material.
-  iMaterial* GetMaterial () { return material; }
+  virtual iMaterial* GetMaterial () { return material; }
 
   /**
    * Visit this material. This should be called by the engine right
    * before using the material. It will call Visit() on all textures
    * that are used.
    */
-  void Visit ();
-  bool IsVisitRequired () const;
-
-  SCF_DECLARE_IBASE_EXT (csObject);
+  virtual void Visit ();
+  virtual bool IsVisitRequired () const;
 
   //------------------- iMaterialWrapper implementation -----------------------
-  struct MaterialWrapper : public iMaterialWrapper
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csMaterialWrapper);
-    virtual iObject *QueryObject()
-    { return scfParent; }
-    virtual iMaterialWrapper *Clone () const
-    { return &(new csMaterialWrapper (*scfParent))->scfiMaterialWrapper; }
-    virtual void SetMaterial (iMaterial* material)
-    { scfParent->SetMaterial (material); }
-    virtual iMaterial* GetMaterial ()
-    { return scfParent->GetMaterial (); }
-    virtual void Visit ()
-    { scfParent->Visit (); }
-    virtual bool IsVisitRequired () const
-    {
-      return scfParent->IsVisitRequired ();
-    }
-  } scfiMaterialWrapper;
-  friend struct MaterialWrapper;
+
+  virtual iObject *QueryObject() { return (iObject*)this; }
 
   //------------------- iSelfDestruct implementation -----------------------
-  struct eiSelfDestruct : public iSelfDestruct
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csMaterialWrapper);
-    virtual void SelfDestruct ()
-    {
-      scfParent->SelfDestruct ();
-    }
-  } scfiSelfDestruct;
-  friend struct SelfDestruct;
+
+  virtual void SelfDestruct ();
 };
 
 /**

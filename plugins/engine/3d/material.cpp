@@ -295,48 +295,21 @@ bool csMaterial::IsVisitRequired () const
 }
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE_EXT(csMaterialWrapper)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMaterialWrapper)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSelfDestruct)
-  SCF_IMPLEMENTS_INTERFACE(csMaterialWrapper)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterialWrapper::MaterialWrapper)
-  SCF_IMPLEMENTS_INTERFACE(iMaterialWrapper)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterialWrapper::eiSelfDestruct)
-  SCF_IMPLEMENTS_INTERFACE(iSelfDestruct)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csMaterialWrapper::csMaterialWrapper (iMaterial *m) : csObject()
+csMaterialWrapper::csMaterialWrapper (iMaterial *m) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSelfDestruct);
   material = m;
   matEngine = SCF_QUERY_INTERFACE (material, iMaterialEngine);
 }
 
-csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) :
-  iBase(), csObject(w)
-{
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSelfDestruct);
-
-  material = w.material;
-  matEngine = w.matEngine;
-}
-
 csMaterialWrapper::~csMaterialWrapper ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSelfDestruct);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
 }
 
 void csMaterialWrapper::SelfDestruct ()
 {
   csEngine::currentEngine->GetMaterialList ()->Remove (
-  	&scfiMaterialWrapper);
+  	(iMaterialWrapper*)this);
 }
 
 void csMaterialWrapper::SetMaterial (iMaterial *m)
@@ -390,8 +363,7 @@ void csMaterialList::NameChanged (iObject* object, const char* oldname,
 iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material,
 	const char* name)
 {
-  iMaterialWrapper *tm = &
-    (new csMaterialWrapper (material))->scfiMaterialWrapper;
+  iMaterialWrapper *tm = (iMaterialWrapper*)(new csMaterialWrapper (material));
   tm->QueryObject ()->SetName (name);
   if (name)
     mat_hash.Put (name, tm);

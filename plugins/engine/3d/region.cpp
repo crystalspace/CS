@@ -58,20 +58,19 @@ void csRegion::DeleteAll ()
   // Now we iterate over all objects in the 'copy' vector and
   // delete them. This will release them as csObject children
   // from this region parent.
-  // Note that we traverse the list again and again for every
-  // object type since the order in which objects types are deleted
-  // is important. i.e. we should first delete all meshes and things
-  // and only then delete the sectors.
   size_t i;
 
   // The first loop is the most general one where we just use
   // engine->RemoveObject().
   for (i = 0; i < copy.Length (); i++)
-    if (csEngine::currentEngine->RemoveObject (copy[i]))
+  {
+    iBase* b = (iBase*)copy[i];
+    if (csEngine::currentEngine->RemoveObject (b))
     {
       copy[i] = 0;
       total--;
     }
+  }
 
   if (!total) return;
 

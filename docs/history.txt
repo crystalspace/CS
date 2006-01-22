@@ -8,6 +8,10 @@ chronological order.
 
 22-Jan-2006
 	- Jorrit fixed an accidental commit in the standard renderloop.
+	- Jorrit rewrote csMaterialWrapper to use new SCF. For some reason
+	  this fixed engine->RemoveObject() for material wrappers. Not
+	  sure why.
+	- Jorrit removed iMaterialWrapper->Clone().
 21-Jan-2006
 	- rvl_ changed iGraphics3D::OpenPortal(...) to give a render 
 	  plugin more information about portal's properties (flags). 

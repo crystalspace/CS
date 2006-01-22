@@ -35,8 +35,6 @@ struct iTextureManager;
 struct iTextureWrapper;
 struct iObject;
 
-SCF_VERSION (iMaterialWrapper, 0, 0, 5);
-
 /**
  * A material wrapper is an engine-level object that wraps around an actual
  * material (iMaterial). Every material in the engine is represented by a 
@@ -60,13 +58,12 @@ SCF_VERSION (iMaterialWrapper, 0, 0, 5);
  * - iEngine
  * - Mesh objects
  */
-struct iMaterialWrapper : public iBase
+struct iMaterialWrapper : public virtual iBase
 {
+  SCF_INTERFACE (iMaterialWrapper, 0, 0, 5);
+
   /// Get the iObject for this material.
   virtual iObject *QueryObject() = 0;
-
-  /// Create a clone this material wrapper, using the same material handle
-  virtual iMaterialWrapper *Clone () const = 0;
 
   /**
    * Change the base material. Note: The changes will not be visible until
