@@ -246,7 +246,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
         mesh->variablecontext->PushVariables (stacks);
       if (meshContext)
         meshContext->PushVariables (stacks);
-      //shader->PushVariables (stacks);
+      shader->PushVariables (stacks);
       material = mesh->material->GetMaterial ();
       if (material)
         material->PushVariables (stacks);
@@ -367,7 +367,7 @@ public:
         mesh->variablecontext->PushVariables (stacks);
       if (meshContext)
         meshContext->PushVariables (stacks);
-      //shader->PushVariables (stacks);
+      shader->PushVariables (stacks);
       material->PushVariables (stacks);
 
       csRenderMeshModes modes (*mesh);
@@ -385,7 +385,7 @@ public:
           mesh->variablecontext->PushVariables (stacks);
         if (meshContext)
           meshContext->PushVariables (stacks);
-        //shader->PushVariables (stacks);
+        shader->PushVariables (stacks);
         material->PushVariables (stacks);
 
 	csRenderMeshModes modes (*mesh);
