@@ -35,8 +35,15 @@ chronological order.
 	  returned csPtr but didn't increase the ref count first.
 	- Jorrit fixed another leak in the engine sequence manager by
 	  adding iEngineSequenceManager->AddOperationRunSequence(). This
-	  should be used instead of the normal iSequenceManager->AddRunSequence()
-	  so that the clean up works properly.
+	  should be used instead of the normal
+	  iSequenceManager->AddRunSequence() so that the clean up works
+	  properly.
+	- Jorrit fixed the sequence manager conditional functions
+	  (AddRunSequence(), AddCondition(), and AddLoop()) so that they
+	  actually perform as documented. Which means that they don't
+	  increase the ref count on the sequence. This fixes a number
+	  of memory leaks and makes the above change to the engine
+	  sequence manager obsolete (hence it has been removed).
 22-Jan-2006
 	- Jorrit fixed an accidental commit in the standard renderloop.
 	- Jorrit rewrote csMaterialWrapper to use new SCF. For some reason

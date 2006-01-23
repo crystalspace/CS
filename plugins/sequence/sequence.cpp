@@ -171,7 +171,7 @@ void csSequence::AddLoop (csTicks time, iSequenceCondition* condition,
 
 void csSequence::RunLoop::Do (csTicks dt, iBase* params)
 {
-  while (condition->Condition (dt, params))
+  while (sequence && condition->Condition (dt, params))
     seqmgr->RunSequence (-(signed)dt, sequence, params);
 }
 
