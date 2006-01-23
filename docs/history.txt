@@ -31,6 +31,8 @@ chronological order.
 	- Jorrit changed the csloader plugin to use csString for strings
 	  instead of char*. That cleans up the code a bit (eliminated a lot of
 	  goto's) and it also eliminates a few memory leaks.
+	- Jorrit fixed a walktest crash. The texture loading plugins
+	  returned csPtr but didn't increase the ref count first.
 22-Jan-2006
 	- Jorrit fixed an accidental commit in the standard renderloop.
 	- Jorrit rewrote csMaterialWrapper to use new SCF. For some reason

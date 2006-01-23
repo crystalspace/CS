@@ -339,8 +339,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     if (image && type.IsEmpty ())
     {
       // special treatment for animated textures
-      csRef<iAnimatedImage> anim = csPtr<iAnimatedImage>
-	(SCF_QUERY_INTERFACE (image, iAnimatedImage));
+      csRef<iAnimatedImage> anim = SCF_QUERY_INTERFACE (image, iAnimatedImage);
       if (anim && anim->IsAnimated())
       {
 	type = PLUGIN_TEXTURELOADER_ANIMIMG;
@@ -456,12 +455,9 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     if (overrideAlphaType)
       tex->GetTextureHandle()->SetAlphaType (alphaType);
 
-    csRef<iProcTexture> ipt = csPtr<iProcTexture>
-      (SCF_QUERY_INTERFACE (tex, iProcTexture));
+    csRef<iProcTexture> ipt = SCF_QUERY_INTERFACE (tex, iProcTexture);
     if (ipt)
-    {
       ipt->SetAlwaysAnimate (always_animate);
-    }
     AddToRegion (ldr_context, tex->QueryObject ());
 
     size_t i;

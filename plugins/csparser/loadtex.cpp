@@ -427,8 +427,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
   csRef<iTextureLoaderContext> ctx;
   if (context)
   {
-    ctx = csPtr<iTextureLoaderContext>
-      (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+    ctx = SCF_QUERY_INTERFACE (context, iTextureLoaderContext);
     if (ctx)
     {
       if (ctx->HasSize())
@@ -478,6 +477,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (Image);
 
+  TexWrapper->IncRef ();
   return csPtr<iBase> ((iBase*)TexWrapper);
 }
 
@@ -613,6 +613,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (cube);
 
+  TexWrapper->IncRef ();
   return csPtr<iBase> (TexWrapper);
 }
 
@@ -694,5 +695,6 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (vol);
 
+  TexWrapper->IncRef ();
   return csPtr<iBase> (TexWrapper);
 }
