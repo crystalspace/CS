@@ -20,6 +20,8 @@ chronological order.
 	  - GetMaterialWrapper().
         - mdmkolbe converted some classes in CS/libs to the new SCF.
 	- mdmkolbe fixed some copy constructor issues in scfImplementation.
+	- Rhad added basic thread priority adjustment to the csThread interface
+	  and implementations.
 21-Jan-2006
 	- rvl_ changed iGraphics3D::OpenPortal(...) to give a render 
 	  plugin more information about portal's properties (flags). 

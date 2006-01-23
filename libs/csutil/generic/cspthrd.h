@@ -63,6 +63,19 @@ class csPosixThread : public csThread
   virtual void Yield ();
 
   /**
+  * Retrieve the current execution priority of this thread.
+  * @return A member of the csThreadPriority enumeration
+  */
+  virtual csThreadPriority GetPriority();
+
+  /**
+  * Set the current execution priority of this thread.  
+  *  The specifics of when this takes effect and what underlying platform priority
+  *  each value maps to are properties of the specific platform-based implementation.
+  */
+  virtual bool SetPriority(csThreadPriority Priority);
+
+  /**
    * Return the last eror description and 0 if there was none.
    */
   virtual char const* GetLastError () const;
@@ -76,6 +89,7 @@ class csPosixThread : public csThread
   const char *lasterr;
   bool running;
   bool created;
+  csThreadPriority priority;
 };
 
 class csPosixMutex : public csMutex

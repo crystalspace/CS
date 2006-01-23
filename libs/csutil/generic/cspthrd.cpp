@@ -356,9 +356,11 @@ csRef<csThread> csThread::Create (csRunnable* r, uint32 options)
 csPosixThread::csPosixThread (csRunnable* r, uint32 /*options*/)
 {
   runnable = r;
+  thread = (pthread_t)0;
   running = false;
   created = false;
   lasterr = 0;
+  priority = CS_THREAD_PRIORITY_NORMAL;
 }
 
 csPosixThread::~csPosixThread ()
@@ -466,6 +468,56 @@ bool csPosixThread::Wait ()
 void csPosixThread::Yield ()
 {
   if (running) sched_yield();
+}
+
+csThreadPriority csPosixThread::GetPriority()
+{
+  return priority;
+}
+
+bool csPosixThread::SetPriority(csThreadPriority Priority)
+{
+  int Result;
+  struct sched_param SchedulerProperties;
+
+  // Clear the properties initially
+  memset(&SchedulerProperties, 0, sizeof(struct sched_param));
+
+  // Map the CS thread priority identifier to an appropriate platform specific identifier
+  //  or fail if this mapping is not possible.
+  switch(Priority)
+  {
+    case CS_THREAD_PRIORITY_IDLE:
+      // Posix Pthreads does not guarantee support for any compatible priority,
+      //  so we'll default to NORMAL
+    case CS_THREAD_PRIORITY_NORMAL:
+      // If no change is needed, no more work needs to be done
+      if (priority == CS_THREAD_PRIORITY_NORMAL)
+        return true;
+
+      SchedulerProperties.sched_priority=sched_get_priority_max(SCHED_OTHER);
+      Result=pthread_setschedparam(thread, SCHED_OTHER, &SchedulerProperties);
+
+      if (Result!=0)
+        return false;
+      priority=CS_THREAD_PRIORITY_NORMAL;
+
+      return true;
+    case CS_THREAD_PRIORITY_TIMECRITICAL:
+
+      SchedulerProperties.sched_priority=sched_get_priority_max(SCHED_RR);
+      Result=pthread_setschedparam(thread, SCHED_RR, &SchedulerProperties);
+
+      if (Result!=0)
+        return false;
+      priority=CS_THREAD_PRIORITY_NORMAL;
+
+      return true;
+    default:
+      // 
+      CS_ASSERT_MSG("Unhandled thread priority specified", false);
+      return false;
+  }
 }
 
 char const* csPosixThread::GetLastError () const

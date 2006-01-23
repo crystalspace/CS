@@ -255,8 +255,10 @@ csRef<csThread> csThread::Create (csRunnable* r, uint32 options)
 csWinThread::csWinThread (csRunnable* r, uint32 /*options*/)
 {
   runnable = r;
+  thread = 0;
   running = false;
   lasterr = 0;
+  priority = CS_THREAD_PRIORITY_NORMAL;
 }
 
 csWinThread::~csWinThread ()
@@ -280,6 +282,15 @@ bool csWinThread::Start ()
 
   bool created;
   CS_TEST (created = (thread != 0));
+
+  // Apply any previously specified priority alterations
+  if (priority!= CS_THREAD_PRIORITY_NORMAL)
+  {
+    // Revert our stored priority value to NORMAL if the Set call fails.
+    if (!SetPriority(priority))
+      priority=CS_THREAD_PRIORITY_NORMAL;
+  }
+
   CS_TEST (running = (ResumeThread (thread) != (DWORD)-1));
   return running;
 }
@@ -299,6 +310,56 @@ void csWinThread::Yield ()
 {
   if (running)
     Sleep(0);
+}
+
+csThreadPriority csWinThread::GetPriority()
+{
+  return priority;
+}
+
+bool csWinThread::SetPriority(csThreadPriority Priority)
+{
+  int NumericPriority;
+  bool Result=TRUE;
+
+  // Map the CS thread priority identifier to an appropriate platform specific identifier
+  //  or fail if this mapping is not possible.
+  switch(Priority)
+  {
+    case CS_THREAD_PRIORITY_IDLE:
+      NumericPriority=THREAD_PRIORITY_IDLE;
+    break;
+    case CS_THREAD_PRIORITY_NORMAL:
+      NumericPriority=THREAD_PRIORITY_NORMAL;
+    break;
+    case CS_THREAD_PRIORITY_TIMECRITICAL:
+      NumericPriority=THREAD_PRIORITY_TIME_CRITICAL;
+    break;
+    default:
+      // 
+      CS_ASSERT_MSG("Unhandled thread priority specified", false);
+      return false;
+  }
+
+  // If the thread is not yet created, the SetThreadPriority() call cannot be made.
+  //  However, we can store the priority for use after creation.
+  if (thread != 0)
+  {
+    // Note that SetThreadPriority() requires a HANDLE to the thread with
+    //  THREAD_SET_INFORMATION access rights.  Our HANDLE has such access rights
+    //  since, by default, the CreateThread() call returns a HANDLE with 
+    //  THREAD_ALL_ACCESS rights.
+
+    // SetThreadPriority returns a BOOL.  The comparison wrapper silences MSVC warnings.
+    Result=(SetThreadPriority(thread, NumericPriority) != 0);
+    CS_TEST(Result);
+  }
+
+  // Store the CS priority type in our data member for quick access
+  if (Result)
+    priority=Priority;
+
+  return Result;
 }
 
 bool csWinThread::Stop ()
