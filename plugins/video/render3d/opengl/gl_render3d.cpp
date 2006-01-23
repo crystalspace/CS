@@ -792,6 +792,7 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_ARB_vertex_program (); // needed for vertex attrib code
   ext->InitGL_ARB_fragment_program (); // needed for AFP DrawPixmap() workaround
   //ext->InitGL_ATI_separate_stencil ();
+  ext->InitGL_EXT_secondary_color ();
 #ifdef CS_DEBUG
   ext->InitGL_GREMEDY_string_marker ();
 #endif
@@ -1374,6 +1375,8 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     statecache->Disable_GL_NORMAL_ARRAY ();
     statecache->Disable_GL_COLOR_ARRAY ();
     statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
+    if (ext->CS_GL_EXT_secondary_color)
+      statecache->Disable_GL_SECONDARY_COLOR_ARRAY_EXT ();
     if (ext->CS_GL_ARB_multitexture)
     {
       for (i = CS_GL_MAX_LAYER; i-- > 0;)
@@ -2131,6 +2134,14 @@ void csGLGraphics3D::ApplyBufferChanges()
         statecache->SetColorPointer (buffer->GetComponentCount (),
           compType, (GLsizei)buffer->GetStride (), data);
         break;
+      case CS_VATTRIB_SECONDARY_COLOR:
+        if (ext->CS_GL_EXT_secondary_color)
+        {
+	  statecache->Enable_GL_SECONDARY_COLOR_ARRAY_EXT ();
+	  statecache->SetSecondaryColorPointerExt (buffer->GetComponentCount (),
+	    compType, (GLsizei)buffer->GetStride (), data);
+        }
+        break;
       default:
         if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
         {
@@ -2173,6 +2184,10 @@ void csGLGraphics3D::ApplyBufferChanges()
         break;
       case CS_VATTRIB_COLOR:
         statecache->Disable_GL_COLOR_ARRAY ();
+        break;
+      case CS_VATTRIB_SECONDARY_COLOR:
+        if (ext->CS_GL_EXT_secondary_color)
+	  statecache->Disable_GL_SECONDARY_COLOR_ARRAY_EXT ();
         break;
       default:
         if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)

@@ -47,6 +47,8 @@ chronological order.
 	- Jorrit added memory tracker protection to the clipper in the
 	  software renderer so that it compiles again with the memory
 	  tracker enabled.
+	- res added support for secondary color and color sum to the GL
+	  renderer and fixed function plugin.
 22-Jan-2006
 	- Jorrit fixed an accidental commit in the standard renderloop.
 	- Jorrit rewrote csMaterialWrapper to use new SCF. For some reason

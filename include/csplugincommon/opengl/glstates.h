@@ -384,6 +384,7 @@ public:
   DECLARE_CACHED_BOOL (GL_TEXTURE_GEN_T)
   DECLARE_CACHED_BOOL (GL_TEXTURE_GEN_R)
   DECLARE_CACHED_BOOL (GL_FOG)
+  DECLARE_CACHED_BOOL (GL_COLOR_SUM_EXT)
   DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_1D)
   DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_2D)
   DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_3D)
@@ -403,6 +404,7 @@ public:
 
   DECLARE_CACHED_CLIENT_STATE (GL_VERTEX_ARRAY)
   DECLARE_CACHED_CLIENT_STATE (GL_COLOR_ARRAY)
+  DECLARE_CACHED_CLIENT_STATE (GL_SECONDARY_COLOR_ARRAY_EXT)
   DECLARE_CACHED_CLIENT_STATE (GL_NORMAL_ARRAY)
   DECLARE_CACHED_CLIENT_STATE_LAYER (GL_TEXTURE_COORD_ARRAY)
 
@@ -414,6 +416,9 @@ public:
     GLsizei, nstride, GLvoid*, npointer)
   DECLARE_CACHED_PARAMETER_4 (glColorPointer, ColorPointer, GLint, csize,
     GLenum, ctype, GLsizei, cstride, GLvoid*, cpointer)
+  DECLARE_CACHED_PARAMETER_4 (extmgr->glSecondaryColorPointerEXT, 
+    SecondaryColorPointerEXT, GLint, scsize, GLenum, sctype, GLsizei, scstride, 
+    GLvoid*, scpointer);
   DECLARE_CACHED_PARAMETER_4_LAYER (glTexCoordPointer, TexCoordPointer, GLint, tsize,
     GLenum, ttype, GLsizei, tstride, GLvoid*, tpointer)
   
@@ -519,6 +524,11 @@ public:
     enabled_GL_SCISSOR_TEST = (glIsEnabled (GL_SCISSOR_TEST) == GL_TRUE);
     enabled_GL_VERTEX_ARRAY = (glIsEnabled (GL_VERTEX_ARRAY) == GL_TRUE);
     enabled_GL_COLOR_ARRAY = (glIsEnabled (GL_COLOR_ARRAY) == GL_TRUE);
+    if (extmgr->CS_GL_EXT_secondary_color)
+      enabled_GL_SECONDARY_COLOR_ARRAY_EXT = 
+        (glIsEnabled (GL_SECONDARY_COLOR_ARRAY_EXT) == GL_TRUE);
+    else
+      enabled_GL_SECONDARY_COLOR_ARRAY_EXT = false;
     enabled_GL_NORMAL_ARRAY = (glIsEnabled (GL_NORMAL_ARRAY) == GL_TRUE);
 
     if (extmgr->CS_GL_ARB_multitexture)
@@ -545,6 +555,27 @@ public:
     glGetIntegerv (GL_COLOR_ARRAY_STRIDE, (GLint*)&parameter_cstride);
     glGetIntegerv (GL_COLOR_ARRAY_TYPE, (GLint*)&parameter_ctype);
     glGetPointerv (GL_COLOR_ARRAY_POINTER, &parameter_cpointer);
+    
+    if (extmgr->CS_GL_EXT_secondary_color)
+    {
+      glGetIntegerv (GL_SECONDARY_COLOR_ARRAY_SIZE_EXT, 
+        (GLint*)&parameter_scsize);
+      glGetIntegerv (GL_SECONDARY_COLOR_ARRAY_STRIDE_EXT, 
+        (GLint*)&parameter_scstride);
+      glGetIntegerv (GL_SECONDARY_COLOR_ARRAY_TYPE_EXT, 
+        (GLint*)&parameter_sctype);
+      glGetPointerv (GL_SECONDARY_COLOR_ARRAY_POINTER_EXT, 
+        &parameter_scpointer);
+      enabled_GL_COLOR_SUM_EXT = glIsEnabled (GL_COLOR_SUM_EXT);
+    }
+    else
+    {
+      parameter_scsize = 0;
+      parameter_scstride = 0;
+      parameter_sctype = 0;
+      parameter_scpointer = 0;
+      enabled_GL_COLOR_SUM_EXT = false;
+    }
   }
 };
 
@@ -590,6 +621,7 @@ public:
   IMPLEMENT_CACHED_BOOL (GL_TEXTURE_GEN_T)
   IMPLEMENT_CACHED_BOOL (GL_TEXTURE_GEN_R)
   IMPLEMENT_CACHED_BOOL (GL_FOG)
+  IMPLEMENT_CACHED_BOOL (GL_COLOR_SUM_EXT)
   IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_1D)
   IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_2D)
   IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_3D)
@@ -609,6 +641,7 @@ public:
 
   IMPLEMENT_CACHED_CLIENT_STATE (GL_VERTEX_ARRAY)
   IMPLEMENT_CACHED_CLIENT_STATE (GL_COLOR_ARRAY)
+  IMPLEMENT_CACHED_CLIENT_STATE (GL_SECONDARY_COLOR_ARRAY_EXT)
   IMPLEMENT_CACHED_CLIENT_STATE (GL_NORMAL_ARRAY)
   IMPLEMENT_CACHED_CLIENT_STATE_LAYER (GL_TEXTURE_COORD_ARRAY)
 
@@ -620,6 +653,9 @@ public:
     GLsizei, nstride, GLvoid*, npointer);
   IMPLEMENT_CACHED_PARAMETER_4 (glColorPointer, ColorPointer, GLint, csize,
     GLenum, ctype, GLsizei, cstride, GLvoid*, cpointer);
+  IMPLEMENT_CACHED_PARAMETER_4 (extmgr->glSecondaryColorPointerEXT, 
+    SecondaryColorPointerExt, GLint, scsize, GLenum, sctype, GLsizei, scstride, 
+    GLvoid*, scpointer);
   IMPLEMENT_CACHED_PARAMETER_4_LAYER (glTexCoordPointer, TexCoordPointer, GLint, tsize,
     GLenum, ttype, GLsizei, tstride, GLvoid*, tpointer);
   

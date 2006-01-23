@@ -43,7 +43,7 @@
 CS_LEAKGUARD_IMPLEMENT (csGLShaderFFP);
 
 csGLShaderFFP::csGLShaderFFP(csGLShader_FIXED* shaderPlug) :
-  csShaderProgram (shaderPlug->object_reg)
+  csShaderProgram (shaderPlug->object_reg), colorSum (false)
 {
   csGLShaderFFP::shaderPlug = shaderPlug;
   validProgram = false;
@@ -127,6 +127,14 @@ bool csGLShaderFFP::Load (iShaderDestinationResolver*, iDocumentNode* node)
 	  {
 	    if (!ParseFog (child, fog))
 	      return false;
+	  }
+	  break;
+	case XMLTOKEN_COLORSUM:
+	  {
+	    bool b;
+	    if (!synsrv->ParseBool (child, b, true))
+	      return false;
+	    colorSum = b;
 	  }
 	  break;
         default:
@@ -537,6 +545,8 @@ bool csGLShaderFFP::Compile ()
       return false;
   }
 
+  if (colorSum && !ext->CS_GL_EXT_secondary_color)
+    return false;
 
   validProgram = true;
 
@@ -580,6 +590,8 @@ void csGLShaderFFP::Activate ()
   {
     statecache->Enable_GL_FOG ();
   }
+  if (colorSum)
+    statecache->Enable_GL_COLOR_SUM_EXT ();
 }
 
 void csGLShaderFFP::Deactivate()
@@ -607,6 +619,8 @@ void csGLShaderFFP::Deactivate()
   {
     statecache->Disable_GL_FOG ();
   }
+  if (colorSum)
+    statecache->Disable_GL_COLOR_SUM_EXT ();
 }
 
 static const csVector4 defVector (0.0f, 0.0f, 0.0f, 1.0f);

@@ -59,9 +59,8 @@ private:
 
     FogInfo () : mode (CS_FOG_MODE_NONE) {}
   };
-  friend struct FogInfo; // MSVC6: For access to csGLStateCache::FogOff.
-
   FogInfo fog;
+  bool colorSum;
 
   // Layers of multitexturing
   struct mtexlayer

@@ -103,6 +103,7 @@ void csGLShader_FIXED::Open()
 
   ext->InitGL_ARB_multitexture();
   ext->InitGL_EXT_separate_specular_color();
+  ext->InitGL_EXT_secondary_color();
 
   if (ext->CS_GL_ARB_multitexture)
   {
