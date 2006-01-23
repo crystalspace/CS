@@ -92,6 +92,8 @@ struct csSequenceOp
   csTicks time;
   csRef<iBase> params;
   csRef<iSequenceOperation> operation;
+  // Unique id to identify all operations belonging to a running sequence.
+  uint sequence_id;
 
   csSequenceOp () { }
   ~csSequenceOp () { }
@@ -125,14 +127,14 @@ struct iSequence : public iBase
    * on the operation.
    */
   virtual void AddOperation (csTicks time, iSequenceOperation* operation,
-  	iBase* params = 0) = 0;
+  	iBase* params = 0, uint sequence_id = 0) = 0;
 
   /**
    * Add a standard operation to execute another sequence. This function
    * will NOT call IncRef() on the sequence.
    */
   virtual void AddRunSequence (csTicks time, iSequence* sequence,
-  	iBase* params = 0) = 0;
+  	iBase* params = 0, uint sequence_id = 0) = 0;
 
   /**
    * Add a standard operation to perform a condition and execute the right
@@ -141,7 +143,7 @@ struct iSequence : public iBase
    */
   virtual void AddCondition (csTicks time, iSequenceCondition* condition,
   	iSequence* trueSequence, iSequence* falseSequence,
-	iBase* params = 0) = 0;
+	iBase* params = 0, uint sequence_id = 0) = 0;
 
   /**
    * Perform the sequence for as long as the condition is valid.
@@ -149,7 +151,7 @@ struct iSequence : public iBase
    * sequence.
    */
   virtual void AddLoop (csTicks time, iSequenceCondition* condition,
-  	iSequence* sequence, iBase* params = 0) = 0;
+  	iSequence* sequence, iBase* params = 0, uint sequence_id = 0) = 0;
 
   /**
    * Clear all operations in this sequence (call DecRef()).
@@ -265,9 +267,24 @@ struct iSequenceManager : public iBase
    * are added on the main sequence. Ref counting is used to keep track
    * of this object. So you can safely DecRef() your own reference after
    * calling RunSequence.
+   *
+   * \param sequence_id This identifier can be used to get track of
+   * a given sequence. You can use this id to remove all operations that
+   * have this id.
    */
   virtual void RunSequence (csTicks time, iSequence* sequence,
-  	iBase* params = 0) = 0;
+  	iBase* params = 0, uint sequence_id = 0) = 0;
+
+  /**
+   * Destroy all operations with a given sequence id.
+   */
+  virtual void DestroySequenceOperations (uint sequence_id) = 0;
+
+  /**
+   * Return a unique id that you can use for identifying the sequence
+   * operations.
+   */
+  virtual uint GetUniqueID () = 0;
 };
 
 #endif // __CS_IVARIA_SEQUENCE_H__

@@ -41,6 +41,10 @@ csRegion::~csRegion ()
   Clear ();
 }
 
+// If you enable this then after deleting a region it will
+// print out which objects were not removed and their ref count.
+//#define REGION_CHECK
+
 void csRegion::DeleteAll ()
 {
   // First we need to copy the objects to a vector to avoid
@@ -60,17 +64,36 @@ void csRegion::DeleteAll ()
   // from this region parent.
   size_t i;
 
+#ifdef REGION_CHECK
+  struct rcStruct { csString n; csWeakRef<iBase> weakb; };
+  rcStruct* rc = new rcStruct[total];
+#endif
+
   // The first loop is the most general one where we just use
   // engine->RemoveObject().
   for (i = 0; i < copy.Length (); i++)
   {
     iBase* b = (iBase*)copy[i];
+#ifdef REGION_CHECK
+    rc[i].weakb = b;
+    rc[i].n = copy[i]->GetName ();
+#endif
     if (csEngine::currentEngine->RemoveObject (b))
     {
       copy[i] = 0;
       total--;
     }
   }
+
+#ifdef REGION_CHECK
+  for (i = 0 ; i < copy.Length () ; i++)
+    if (rc[i].weakb != 0)
+      printf ("Not Deleted %p '%s' ref=%d\n",
+	  (iBase*)rc[i].weakb, (const char*)rc[i].n,
+	  rc[i].weakb->GetRefCount ());
+  fflush (stdout);
+  delete[] rc;
+#endif
 
   if (!total) return;
 

@@ -983,7 +983,7 @@ class OpTriggerState : public OpStandard
 {
 private:
   csRef<iParameterESM> triggerpar;
-  csRef<iSequenceTrigger> trigger;
+  csWeakRef<iSequenceTrigger> trigger;
   bool en;
 
 public:
@@ -1001,6 +1001,7 @@ public:
     if (triggerpar)
       trigger = SCF_QUERY_INTERFACE (
       	triggerpar->GetValue (params), iSequenceTrigger);
+    if (!trigger) return;
     trigger->SetEnabled (en);
     if (triggerpar)
       trigger = 0;
@@ -1016,7 +1017,7 @@ class OpCheckTrigger : public OpStandard
 {
 private:
   csRef<iParameterESM> triggerpar;
-  csRef<iSequenceTrigger> trigger;
+  csWeakRef<iSequenceTrigger> trigger;
   csTicks delay;
 
 public:
@@ -1034,6 +1035,7 @@ public:
     if (triggerpar)
       trigger = SCF_QUERY_INTERFACE (
       	triggerpar->GetValue (params), iSequenceTrigger);
+    if (!trigger) return;
     trigger->TestConditions (delay);
     if (triggerpar)
       trigger = 0;
@@ -1049,7 +1051,7 @@ class CondTestTrigger : public CondStandard
 {
 private:
   csRef<iParameterESM> triggerpar;
-  csRef<iSequenceTrigger> trigger;
+  csWeakRef<iSequenceTrigger> trigger;
 
 public:
   CondTestTrigger (iParameterESM* triggerpar)
@@ -1065,6 +1067,7 @@ public:
     if (triggerpar)
       trigger = SCF_QUERY_INTERFACE (
       	triggerpar->GetValue (params), iSequenceTrigger);
+    if (!trigger) return false;
     bool rc = trigger->CheckState ();
     if (triggerpar)
       trigger = 0;
@@ -1111,7 +1114,7 @@ SCF_IMPLEMENT_IBASE_END
 class constantPar : public iParameterESM
 {
 private:
-  csRef<iBase> value;
+  csWeakRef<iBase> value;
 
 public:
   SCF_DECLARE_IBASE;
@@ -1139,37 +1142,6 @@ SCF_IMPLEMENT_IBASE (constantPar)
   SCF_IMPLEMENTS_INTERFACE (iParameterESM)
 SCF_IMPLEMENT_IBASE_END
 
-class sharedvarPar : public iParameterESM
-{
-private:
-  csRef<iBase> value;
-
-public:
-  SCF_DECLARE_IBASE;
-  sharedvarPar (iBase* value)
-  {
-    SCF_CONSTRUCT_IBASE (0);
-    sharedvarPar::value = value;
-  }
-  virtual ~sharedvarPar ()
-  {
-    SCF_DESTRUCT_IBASE();
-  }
-  virtual iBase* GetValue (iBase* params = 0) const
-  {
-    (void)params;
-    return value;
-  }
-  virtual bool IsConstant () const
-  {
-    return false;
-  }
-};
-
-SCF_IMPLEMENT_IBASE (sharedvarPar)
-  SCF_IMPLEMENTS_INTERFACE (iParameterESM)
-SCF_IMPLEMENT_IBASE_END
-
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csEngineSequenceParameters)
@@ -1181,20 +1153,22 @@ csPtr<iParameterESM> csEngineSequenceParameters::CreateParameterESM (
 {
   size_t idx = GetParameterIdx (name);
   if (idx == csArrayItemNotFound) return 0;
-  csRef<iParameterESM> par = csPtr<iParameterESM> (new esmPar (idx));
-  return csPtr<iParameterESM>(par);
+  return csPtr<iParameterESM> (new esmPar (idx));
 }
 
 //---------------------------------------------------------------------------
 
 csSequenceWrapper::csSequenceWrapper (csEngineSequenceManager* eseqmgr,
-	iSequence* sequence)
-  : scfImplementationType (this), sequence (sequence), eseqmgr (eseqmgr)
+	iSequence* sequence, uint sequence_id)
+  : scfImplementationType (this), sequence (sequence), eseqmgr (eseqmgr),
+    sequence_id (sequence_id)
 {
 }
 
 csSequenceWrapper::~csSequenceWrapper ()
 {
+  if (eseqmgr->GetSequenceManager ())
+    eseqmgr->GetSequenceManager ()->DestroySequenceOperations (sequence_id);
 }
 
 void csSequenceWrapper::SelfDestruct ()
@@ -1234,7 +1208,7 @@ void csSequenceWrapper::AddOperationSetVariable (csTicks time,
   		iSharedVariable* var, float value, float dvalue)
 {
   OpSetVariable* op = new OpSetVariable (var, value, dvalue);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1243,7 +1217,7 @@ void csSequenceWrapper::AddOperationSetVariable (csTicks time,
 		iSharedVariable* dvalue)
 {
   OpSetVariable* op = new OpSetVariable (var, value, dvalue);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1251,7 +1225,7 @@ void csSequenceWrapper::AddOperationSetVariable (csTicks time,
   		iSharedVariable* var, const csVector3& v)
 {
   OpSetVariable* op = new OpSetVariable (var, v);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1259,7 +1233,7 @@ void csSequenceWrapper::AddOperationSetVariable (csTicks time,
   		iSharedVariable* var, const csColor& c)
 {
   OpSetVariable* op = new OpSetVariable (var, c);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1267,7 +1241,7 @@ void csSequenceWrapper::AddOperationSetPolygonMaterial (csTicks time,
 	iParameterESM* polygon, iParameterESM* material)
 {
   OpSetMaterial* op = new OpSetMaterial (0, polygon, material);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1275,7 +1249,7 @@ void csSequenceWrapper::AddOperationSetMaterial (csTicks time,
 	iParameterESM* mesh, iParameterESM* material)
 {
   OpSetMaterial* op = new OpSetMaterial (mesh, 0, material);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1283,7 +1257,7 @@ void csSequenceWrapper::AddOperationSetLight (csTicks time,
 	iParameterESM* light, const csColor& color)
 {
   OpSetLight* op = new OpSetLight (light, color);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1291,7 +1265,7 @@ void csSequenceWrapper::AddOperationFadeLight (csTicks time,
 	iParameterESM* light, const csColor& color, csTicks duration)
 {
   OpFadeLight* op = new OpFadeLight (light, color, duration, eseqmgr);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1299,7 +1273,7 @@ void csSequenceWrapper::AddOperationSetAmbient (csTicks time,
 	iParameterESM* sector, const csColor& color,iSharedVariable *var)
 {
   OpSetAmbientLight* op = new OpSetAmbientLight (sector, color, var);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1308,14 +1282,14 @@ void csSequenceWrapper::AddOperationFadeAmbient (csTicks time,
 {
   OpFadeAmbientLight* op = new OpFadeAmbientLight (sector, color, duration,
   	eseqmgr);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationRandomDelay(csTicks time,int min, int max)
 {
   OpRandomDelay* op = new OpRandomDelay (min,max,this,eseqmgr);
-  sequence->AddOperation (time,op);
+  sequence->AddOperation (time,op, 0, sequence_id);
   op->DecRef();
 }
 
@@ -1323,7 +1297,7 @@ void csSequenceWrapper::AddOperationSetMeshColor (csTicks time,
 	iParameterESM* mesh, const csColor& color)
 {
   OpSetMeshColor* op = new OpSetMeshColor (mesh, color);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1331,7 +1305,7 @@ void csSequenceWrapper::AddOperationFadeMeshColor (csTicks time,
 	iParameterESM* mesh, const csColor& color, csTicks duration)
 {
   OpFadeMeshColor* op = new OpFadeMeshColor (mesh, color, duration, eseqmgr);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1339,7 +1313,7 @@ void csSequenceWrapper::AddOperationSetFog (csTicks time,
 	iParameterESM* sector, const csColor& color, float density)
 {
   OpSetFog* op = new OpSetFog (sector, color, density);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1348,7 +1322,7 @@ void csSequenceWrapper::AddOperationFadeFog (csTicks time,
 	csTicks duration)
 {
   OpFadeFog* op = new OpFadeFog (sector, color, density, duration, eseqmgr);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1362,7 +1336,7 @@ void csSequenceWrapper::AddOperationRotateDuration (csTicks time,
   OpRotate* op = new OpRotate (mesh,
   	axis1, tot_angle1, axis2, tot_angle2, axis3, tot_angle3,
 	offset, duration, eseqmgr);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1372,7 +1346,7 @@ void csSequenceWrapper::AddOperationMoveDuration (csTicks time,
 {
   OpMove* op = new OpMove (mesh, offset,
 	duration, eseqmgr);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1380,7 +1354,7 @@ void csSequenceWrapper::AddOperationTriggerState (csTicks time,
 	iParameterESM* trigger, bool en)
 {
   OpTriggerState* op = new OpTriggerState (trigger, en);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1388,7 +1362,7 @@ void csSequenceWrapper::AddOperationCheckTrigger (csTicks time,
 	iParameterESM* trigger, csTicks delay)
 {
   OpCheckTrigger* op = new OpCheckTrigger (trigger, delay);
-  sequence->AddOperation (time, op);
+  sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
 
@@ -1753,8 +1727,9 @@ void csSequenceTrigger::Fire ()
       last_trigger_state = true;
       // Only fire if trigger is enabled. Otherwise we are only
       // doing the test.
+      csSequenceWrapper* wf = (csSequenceWrapper*)fire_sequence;
       eseqmgr->GetSequenceManager ()->RunSequence (fire_delay,
-    	  fire_sequence->GetSequence (), params);
+    	  fire_sequence->GetSequence (), params, wf->GetSequenceID ());
       enabled = false;
       fired_conditions = 0;
     }
@@ -1791,8 +1766,9 @@ void csSequenceTrigger::Fire ()
 
 void csSequenceTrigger::ForceFire (bool now)
 {
+  csSequenceWrapper* wf = (csSequenceWrapper*)fire_sequence;
   eseqmgr->GetSequenceManager ()->RunSequence (now ? 0 : fire_delay,
-    	  fire_sequence->GetSequence (), params);
+    	  fire_sequence->GetSequence (), params, wf->GetSequenceID ());
 }
 
 /**
@@ -1838,7 +1814,8 @@ void csSequenceTrigger::TestConditions (csTicks delay)
     CondTestConditions* cond = new CondTestConditions (this, delay);
     interval_seq->AddCondition (delay, cond, interval_seq, 0);
     cond->DecRef ();
-    eseqmgr->GetSequenceManager ()->RunSequence (0, interval_seq, params);
+    // @@@ Sequence ID?
+    eseqmgr->GetSequenceManager ()->RunSequence (0, interval_seq, params, 0);
   }
   else
   {
@@ -2016,8 +1993,7 @@ csPtr<iSequenceTrigger> csEngineSequenceManager::CreateTrigger (
 
 csPtr<iParameterESM> csEngineSequenceManager::CreateParameterESM (iBase* value)
 {
-  csRef<iParameterESM> par = csPtr<iParameterESM> (new constantPar (value));
-  return csPtr<iParameterESM>(par);
+  return csPtr<iParameterESM> (new constantPar (value));
 }
 
 void csEngineSequenceManager::RemoveTrigger (iSequenceTrigger* trigger)
@@ -2068,7 +2044,8 @@ csPtr<iSequenceWrapper> csEngineSequenceManager::CreateSequence (
 	const char* name)
 {
   csRef<iSequence> seq = seqmgr->NewSequence ();
-  csSequenceWrapper* seqwrap = new csSequenceWrapper (this, seq);
+  csSequenceWrapper* seqwrap = new csSequenceWrapper (this, seq,
+      seqmgr->GetUniqueID ());
   seqwrap->SetName (name);
   sequences.Push ((iSequenceWrapper*)seqwrap);
   return (iSequenceWrapper*)seqwrap;
@@ -2112,7 +2089,9 @@ bool csEngineSequenceManager::RunSequenceByName (
   iSequenceWrapper *seq = FindSequenceByName(name);
   if (seq)
   {
-    seqmgr->RunSequence (delay, seq->GetSequence (), 0);
+    csSequenceWrapper* wf = (csSequenceWrapper*)seq;
+    seqmgr->RunSequence (delay, seq->GetSequence (), 0,
+	wf->GetSequenceID ());
     return true;
   }
   return false;

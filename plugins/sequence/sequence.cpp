@@ -82,12 +82,13 @@ void csSequence::DeleteFirstSequence ()
 }
 
 void csSequence::AddOperation (csTicks time, iSequenceOperation* operation,
-	iBase* params)
+	iBase* params, uint sequence_id)
 {
   csSequenceOp* op = new csSequenceOp ();
   op->time = time;
   op->operation = operation;
   op->params = params;
+  op->sequence_id = sequence_id;
   // Insert this operation at the right time.
   if (first)
   {
@@ -123,10 +124,10 @@ void csSequence::AddOperation (csTicks time, iSequenceOperation* operation,
 }
 
 void csSequence::AddRunSequence (csTicks time, iSequence* sequence,
-	iBase* params)
+	iBase* params, uint sequence_id)
 {
   RunSequenceOp* op = new RunSequenceOp (seqmgr, sequence);
-  AddOperation (time, op, params);
+  AddOperation (time, op, params, sequence_id);
   op->DecRef ();
 }
 
@@ -138,11 +139,11 @@ void csSequence::RunSequenceOp::Do (csTicks dt, iBase* params)
 
 void csSequence::AddCondition (csTicks time, iSequenceCondition* condition,
   	iSequence* trueSequence, iSequence* falseSequence,
-	iBase* params)
+	iBase* params, uint sequence_id)
 {
   RunCondition* op = new RunCondition (seqmgr, condition, trueSequence,
   	falseSequence);
-  AddOperation (time, op, params);
+  AddOperation (time, op, params, sequence_id);
   op->DecRef ();
 }
 
@@ -161,10 +162,10 @@ void csSequence::RunCondition::Do (csTicks dt, iBase* params)
 }
 
 void csSequence::AddLoop (csTicks time, iSequenceCondition* condition,
-  	iSequence* sequence, iBase* params)
+  	iSequence* sequence, iBase* params, uint sequence_id)
 {
   RunLoop* op = new RunLoop (seqmgr, condition, sequence);
-  AddOperation (time, op, params);
+  AddOperation (time, op, params, sequence_id);
   op->DecRef ();
 }
 
@@ -203,6 +204,7 @@ csSequenceManager::csSequenceManager (iBase *iParent) :
   previous_time_valid = false;
   main_time = 0;
   suspended = true;
+  sequence_id = 0;
 }
 
 csSequenceManager::~csSequenceManager ()
@@ -355,15 +357,32 @@ csPtr<iSequence> csSequenceManager::NewSequence ()
 }
 
 void csSequenceManager::RunSequence (csTicks time, iSequence* sequence,
-	iBase* params)
+	iBase* params, uint sequence_id)
 {
   csSequence* seq = (csSequence*)sequence;
   csSequenceOp* op = seq->GetFirstSequence ();
   while (op)
   {
     main_sequence->AddOperation (main_time + time + op->time, op->operation,
-    	params ? params : (iBase*)op->params);
+    	params ? params : (iBase*)op->params, sequence_id);
     op = op->next;
+  }
+}
+
+void csSequenceManager::DestroySequenceOperations (uint sequence_id)
+{
+  csSequenceOp* op = main_sequence->GetFirstSequence ();
+  while (op)
+  {
+    csSequenceOp* op_next = op->next;
+    if (op->sequence_id == sequence_id)
+    {
+      if (op->next) op->next->prev = op->prev;
+      if (op->prev) op->prev->next = op->next;
+      else main_sequence->SetFirstSequence (op->next);
+      delete op;
+    }
+    op = op_next;
   }
 }
 

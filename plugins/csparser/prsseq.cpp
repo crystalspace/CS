@@ -214,8 +214,7 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
 	partype, parname, seqname);
       return 0;
     }
-    csRef<iParameterESM> par = eseqmgr->CreateParameterESM (value);
-    return csPtr<iParameterESM>(par);
+    return eseqmgr->CreateParameterESM (value);
   }
 }
 

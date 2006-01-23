@@ -119,10 +119,14 @@ private:
   csRef<iSequence> sequence;
   csEngineSequenceManager* eseqmgr;
   csRef<csEngineSequenceParameters> params;
+  uint sequence_id;
 
 public:
-  csSequenceWrapper (csEngineSequenceManager* eseqmgr, iSequence* sequence);
+  csSequenceWrapper (csEngineSequenceManager* eseqmgr, iSequence* sequence,
+      uint sequence_id);
   virtual ~csSequenceWrapper ();
+
+  uint GetSequenceID () const { return sequence_id; }
 
   virtual iSequence* GetSequence () { return sequence; }
 

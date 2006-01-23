@@ -131,17 +131,18 @@ public:
   virtual ~csSequence ();
 
   csSequenceOp* GetFirstSequence () { return first; }
+  void SetFirstSequence (csSequenceOp* nf) { first = nf; }
   void DeleteFirstSequence ();
 
   virtual void AddOperation (csTicks time, iSequenceOperation* operation,
-  	iBase* params = 0);
+  	iBase* params = 0, uint sequence_id = 0);
   virtual void AddRunSequence (csTicks time, iSequence* sequence,
-  	iBase* params = 0);
+  	iBase* params = 0, uint sequence_id = 0);
   virtual void AddCondition (csTicks time, iSequenceCondition* condition,
   	iSequence* trueSequence, iSequence* falseSequence,
-	iBase* params = 0);
+	iBase* params = 0, uint sequence_id = 0);
   virtual void AddLoop (csTicks time, iSequenceCondition* condition,
-  	iSequence* sequence, iBase* params = 0);
+  	iSequence* sequence, iBase* params = 0, uint sequence_id = 0);
   virtual void Clear ();
   virtual bool IsEmpty () { return first == 0; }
 
@@ -175,6 +176,9 @@ private:
   // If true the sequence manager is suspended
   bool suspended;
 
+  // Unique id.
+  uint sequence_id;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -195,7 +199,9 @@ public:
   virtual csTicks GetDeltaTime () const;
   virtual csPtr<iSequence> NewSequence ();
   virtual void RunSequence (csTicks time, iSequence* sequence,
-  	iBase* params = 0);
+  	iBase* params = 0, uint sequence_id = 0);
+  virtual void DestroySequenceOperations (uint sequence_id);
+  virtual uint GetUniqueID () { sequence_id++; return sequence_id; }
 
   struct eiComponent : public iComponent
   {

@@ -6,6 +6,20 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Jan-2006
+	- Jorrit changed the sequence manager to have support for removing
+	  sequences. This is done by optionally allowing to assing
+	  a unique id to sequence operations.
+	- Jorrit changed the engine sequence manager to use the above new
+	  sequence manager feature so that every sequence wrapper gets
+	  a unique id. That way, at destruction time, the sequence wrapper
+	  can discard its own operations from the sequence manager.
+	- Jorrit added some (default disabled) test code to print out all
+	  objects that didn't manage to get deleted by a region deletion.
+	- Jorrit cleaned up some reference use and introduced a few weak
+	  references in the engine sequence manager in order to attempt
+	  to fix a leak with triggers that are referenced in other sequences.
+	  So far the leak is not gone though.
 22-Jan-2006
 	- Jorrit fixed an accidental commit in the standard renderloop.
 	- Jorrit rewrote csMaterialWrapper to use new SCF. For some reason
