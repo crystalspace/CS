@@ -392,7 +392,7 @@ private:
    */
   bool HandleMeshParameter (iLoaderContext* ldr_context,
   	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
-	csStringID id, bool& handled, char*& priority,
+	csStringID id, bool& handled, csString& priority,
 	bool do_portal_container, bool& staticpos, bool& staticshape,
 	bool& zmodeChanged, bool& prioChanged,
 	bool recursive, iStreamSource* ssource);
@@ -586,7 +586,7 @@ public:
   	const char *fname,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
 	bool reg = true, bool create_material = true,
-	bool free_image = true);
+	bool free_image = true, iRegion* region = 0);
 
   virtual csPtr<iSoundData> LoadSoundData (const char *fname);
   virtual csPtr<iSoundHandle> LoadSound (const char *fname);

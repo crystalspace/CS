@@ -391,7 +391,7 @@ private:
   csRefArray<iSequenceWrapper> sequences;
 
   /// All triggers interested in knowing when a mesh is clicked.
-  csRefArray<csSequenceTrigger> mesh_triggers;
+  csArray<csSequenceTrigger*> mesh_triggers;
 
   /// All timed operations.
   csRefArray<csTimedOperation> timed_operations;

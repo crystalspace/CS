@@ -113,12 +113,14 @@ struct iLoader : public iBase
    * \param free_image if true then after registration the loaded image
    * will be removed immediatelly. This saves some memory. Set to false
    * if you want to keep it. free_image is ignored if reg is false.
+   * \param the optional region will be used to register the texture and
+   * material.
    */
   virtual iTextureWrapper* LoadTexture (const char *Name,
   	const char *FileName,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
 	bool reg = true, bool create_material = true,
-	bool free_image = true) = 0;
+	bool free_image = true, iRegion* region = 0) = 0;
 
   /**
    * Load an image file. The image will be loaded in the format requested by

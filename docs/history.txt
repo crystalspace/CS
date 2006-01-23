@@ -20,6 +20,17 @@ chronological order.
 	  references in the engine sequence manager in order to attempt
 	  to fix a leak with triggers that are referenced in other sequences.
 	  So far the leak is not gone though.
+	- Jorrit fixed a memory leak in the engine sequence manager.
+	  Triggers were sometimes put in two ref counting arrays causing
+	  them to be leaking.
+	- Jorrit fixed memory leaks with the material and texture in case
+	  a checkerboard was made on request from some mesh object. The
+	  problem was that the texture was added to the region but not the
+	  material. Extended iLoader->LoadTexture() with an optional region
+	  parameter to fix this.
+	- Jorrit changed the csloader plugin to use csString for strings
+	  instead of char*. That cleans up the code a bit (eliminated a lot of
+	  goto's) and it also eliminates a few memory leaks.
 22-Jan-2006
 	- Jorrit fixed an accidental commit in the standard renderloop.
 	- Jorrit rewrote csMaterialWrapper to use new SCF. For some reason

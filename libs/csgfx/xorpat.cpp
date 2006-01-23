@@ -51,9 +51,7 @@ csPtr<iImage> csCreateXORPatternImage(int width, int height, int recdepth,
     }
   }
 
-  csRef<iImage> imageRef;
-  imageRef.AttachNew (image);
-  return csPtr<iImage> (imageRef);
+  return csPtr<iImage> ((iImage*)image);
 }
 
 

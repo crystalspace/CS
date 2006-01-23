@@ -32,6 +32,7 @@
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/texture.h"
+#include "iengine/region.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "imap/reader.h"
@@ -217,7 +218,7 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
 
 iTextureWrapper* csLoader::LoadTexture (const char *name,
 	const char *fname, int Flags, iTextureManager *tm, bool reg,
-	bool create_material, bool free_image)
+	bool create_material, bool free_image, iRegion* region)
 {
   if (!Engine)
     return 0;
@@ -232,12 +233,14 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->QueryObject ()->SetName (name);
   TexWrapper->SetImageFile(img);
+  if (region) region->QueryObject ()->ObjAdd (TexWrapper->QueryObject ());
 
   iMaterialWrapper* matwrap = 0;
   if (create_material)
   {
     csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
     matwrap = Engine->GetMaterialList ()->NewMaterial (material, name);
+    if (region) region->QueryObject ()->ObjAdd (matwrap->QueryObject ());
   }
 
   if (reg && tm)
@@ -272,12 +275,10 @@ TextureLoaderContext::TextureLoaderContext (const char* texname)
   width = height = 128;
 
   TextureLoaderContext::texname = texname;
-  texClass = 0;
 }
 
 TextureLoaderContext::~TextureLoaderContext ()
 {
-  delete[] texClass;
   SCF_DESTRUCT_IBASE();
 }
 
@@ -336,7 +337,7 @@ const char* TextureLoaderContext::GetName ()
 
 void TextureLoaderContext::SetClass (const char* className)
 {
-  texClass = csStrNew (className);
+  texClass = className;
 }
 
 const char* TextureLoaderContext::GetClass ()
@@ -458,9 +459,8 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
     }
   }
 
-  csRef<iImage> Image;
-  Image.AttachNew (csCreateXORPatternImage (w, h, depth, color.red, color.green,
-    color.blue));
+  csRef<iImage> Image = csCreateXORPatternImage (w, h, depth, color.red,
+  	color.green, color.blue);
 
   csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!G3D) return 0;
@@ -478,7 +478,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->SetImageFile (Image);
 
-  return csPtr<iBase> (TexWrapper);
+  return csPtr<iBase> ((iBase*)TexWrapper);
 }
 
 //----------------------------------------------------------------------------

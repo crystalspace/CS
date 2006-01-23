@@ -157,7 +157,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   bool always_animate = false;
   TextureLoaderContext context (txtname);
   csRef<iDocumentNode> ParamsNode;
-  char* type = 0;
+  csString type;
   csAlphaMode::AlphaType alphaType = csAlphaMode::alphaNone;
   bool overrideAlphaType = false;
 
@@ -179,7 +179,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	{
 	  bool for2d;
 	  if (!SyntaxService->ParseBool (child, for2d, true))
-	    goto error;
+	    return 0;
           if (for2d)
 	    context.SetFlags (context.GetFlags() | CS_TEXTURE_2D);
           else
@@ -190,7 +190,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	{
 	  bool for3d;
 	  if (!SyntaxService->ParseBool (child, for3d, true))
-	    goto error;
+	    return 0;
           if (for3d)
 	    context.SetFlags (context.GetFlags() | CS_TEXTURE_3D);
           else
@@ -200,7 +200,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       case XMLTOKEN_TRANSPARENT:
         do_transp = true;
 	if (!SyntaxService->ParseColor (child, transp))
-	  goto error;
+	  return 0;
         break;
       case XMLTOKEN_FILE:
 	{
@@ -210,7 +210,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	    SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.texture",
 	      child, "Expected VFS filename for 'file'!");
-	    goto error;
+	    return 0;
 	  }
           filename = fname;
 	}
@@ -219,7 +219,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	{
 	  bool mm;
 	  if (!SyntaxService->ParseBool (child, mm, true))
-	    goto error;
+	    return 0;
           if (!mm)
 	    context.SetFlags (context.GetFlags() | CS_TEXTURE_NOMIPMAPS);
           else
@@ -239,7 +239,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	{
 	  bool npots;
 	  if (!SyntaxService->ParseBool (child, npots, true))
-	    goto error;
+	    return 0;
           if (npots)
 	    context.SetFlags (context.GetFlags() | CS_TEXTURE_NPOTS);
           else
@@ -249,20 +249,20 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       case XMLTOKEN_KEEPIMAGE:
         {
 	  if (!SyntaxService->ParseBool (child, keep_image, true))
-	    goto error;
+	    return 0;
 	}
 	break;
       case XMLTOKEN_PARAMS:
 	ParamsNode = child;
 	break;
       case XMLTOKEN_TYPE:
-	type = csStrNew (child->GetContentsValue ());
-	if (!type)
+	type = child->GetContentsValue ();
+	if (type.IsEmpty ())
 	{
 	  SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.texture",
 	    child, "Expected plugin ID for <type>!");
-	  goto error;
+	  return 0;
 	}
 	break;
       case XMLTOKEN_SIZE:
@@ -278,13 +278,13 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	break;
       case XMLTOKEN_ALWAYSANIMATE:
 	if (!SyntaxService->ParseBool (child, always_animate, true))
-	  goto error;
+	  return 0;
 	break;
       case XMLTOKEN_CLAMP:
         {
           bool c;
           if (!SyntaxService->ParseBool (child, c, true))
-            goto error;
+            return 0;
           if (c)
             context.SetFlags (context.GetFlags() | CS_TEXTURE_CLAMP);
           else
@@ -295,7 +295,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
         {
           bool c;
           if (!SyntaxService->ParseBool (child, c, true))
-            goto error;
+            return 0;
           if (c)
             context.SetFlags (context.GetFlags() & ~CS_TEXTURE_NOFILTER);
           else
@@ -311,19 +311,19 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	{
 	  csAlphaMode am;
 	  if (!SyntaxService->ParseAlphaMode (child, 0, am, false))
-            goto error;
+            return 0;
 	  overrideAlphaType = true;
 	  alphaType = am.alphaType;
 	}
 	break;
       default:
         SyntaxService->ReportBadToken (child);
-	goto error;
+	return 0;
     }
   }
 
   // @@@ some more comments
-  if ((!type || (*type == 0)) && filename.IsEmpty ())
+  if (type.IsEmpty () && filename.IsEmpty ())
   {
     filename = txtname;
   }
@@ -336,14 +336,14 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   {
     csRef<iImage> image = LoadImage (filename, Format);
     context.SetImage (image);
-    if (image && !type)
+    if (image && type.IsEmpty ())
     {
       // special treatment for animated textures
       csRef<iAnimatedImage> anim = csPtr<iAnimatedImage>
 	(SCF_QUERY_INTERFACE (image, iAnimatedImage));
       if (anim && anim->IsAnimated())
       {
-	type = csStrNew (PLUGIN_TEXTURELOADER_ANIMIMG);
+	type = PLUGIN_TEXTURELOADER_ANIMIMG;
       }
       else
       {
@@ -361,15 +361,15 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   
   iLoaderPlugin* Plug; Plug = 0;
   iBinaryLoaderPlugin* Binplug;
-  if (type && !plugin)
+  if ((!type.IsEmpty ()) && !plugin)
   {
     iDocumentNode* defaults = 0;
     if (!loaded_plugins.FindPlugin (type, Plug, Binplug, defaults))
     {
-      if ((!strcasecmp (type, "dots")) ||
-	  (!strcasecmp (type, "plasma")) ||
-	  (!strcasecmp (type, "water")) ||
-	  (!strcasecmp (type, "fire")))
+      if ((type == "dots") ||
+	  (type == "plasma") ||
+	  (type == "water") ||
+	  (type == "fire"))
       {
 	// old style proctex type
 	if (!deprecated_warned)
@@ -384,12 +384,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	  deprecated_warned = true;
 	}
 
-	char* newtype = new char[
-		strlen (PLUGIN_LEGACY_TEXTYPE_PREFIX) +
-		strlen (type) + 1];
-	strcpy (newtype, PLUGIN_LEGACY_TEXTYPE_PREFIX);
-	strcat (newtype, type);
-	delete[] type;
+	csString newtype = PLUGIN_LEGACY_TEXTYPE_PREFIX;
+	newtype += type;
 	type = newtype;
 
 	loaded_plugins.FindPlugin (type, Plug, Binplug, defaults);
@@ -405,12 +401,12 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     }
   }
 
-  if (type && !plugin)
+  if ((!type.IsEmpty ()) && !plugin)
   {
     SyntaxService->Report (
       "crystalspace.maploader.parse.texture",
       CS_REPORTER_SEVERITY_WARNING,
-      node, "Could not get plugin '%s', using default", type);
+      node, "Could not get plugin '%s', using default", (const char*)type);
 
     if (!BuiltinImageTexLoader)
     {
@@ -446,8 +442,6 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
     CS_ASSERT(tex);
   }
-
-  delete[] type;
 
   if (tex)
   {
@@ -492,10 +486,6 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       tex->SetImageFile (0);
   }
   return tex;
-
-error:
-  delete[] type;
-  return 0;
 }
 
 iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,

@@ -1998,11 +1998,13 @@ csPtr<iParameterESM> csEngineSequenceManager::CreateParameterESM (iBase* value)
 
 void csEngineSequenceManager::RemoveTrigger (iSequenceTrigger* trigger)
 {
+  mesh_triggers.Delete ((csSequenceTrigger*)trigger);
   triggers.Delete (trigger);
 }
 
 void csEngineSequenceManager::RemoveTriggers ()
 {
+  mesh_triggers.DeleteAll ();
   triggers.DeleteAll ();
 }
 

@@ -41,7 +41,7 @@ class TextureLoaderContext : public iTextureLoaderContext
   bool has_size;
   int width, height;
   const char* texname;
-  char* texClass;
+  csString texClass;
 public:
   SCF_DECLARE_IBASE;
 

@@ -274,8 +274,8 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
     if (csLoader::do_verbose)
       loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
         name);
-    csRef<iTextureWrapper> rc = loader->LoadTexture (name, name);
-    if (region) region->QueryObject ()->ObjAdd (rc->QueryObject ());
+    csRef<iTextureWrapper> rc = loader->LoadTexture (name, name,
+    	CS_TEXTURE_3D, 0, true, true, true, region);
     result = rc;
   }
   return result;
@@ -299,9 +299,7 @@ iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
       loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
         name);
     csRef<iTextureWrapper> rc = loader->LoadTexture (name, filename,
-	CS_TEXTURE_3D, 0, false, false);
-    if (region)
-      region->QueryObject ()->ObjAdd (rc->QueryObject ());
+	CS_TEXTURE_3D, 0, false, false, region);
     result = rc;
   }
   return result;
@@ -469,8 +467,8 @@ iTextureWrapper* ThreadedLoaderContext::FindTexture (const char* name)
     if (csLoader::do_verbose)
       loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
         name);
-    csRef<iTextureWrapper> rc = loader->LoadTexture (name, name);
-    if (region) region->QueryObject ()->ObjAdd (rc->QueryObject ());
+    csRef<iTextureWrapper> rc = loader->LoadTexture (name, name,
+    	CS_TEXTURE_3D, 0, true, true, true, region);
     result = rc;
   }
   return result;
@@ -493,8 +491,8 @@ iTextureWrapper* ThreadedLoaderContext::FindNamedTexture (const char* name,
     if (csLoader::do_verbose)
       loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
         name);
-    csRef<iTextureWrapper> rc = loader->LoadTexture (name, filename);
-    if (region) region->QueryObject ()->ObjAdd (rc->QueryObject ());
+    csRef<iTextureWrapper> rc = loader->LoadTexture (name, filename,
+    	CS_TEXTURE_3D, 0, true, true, true, region);
     result = rc;
   }
   return result;
@@ -2478,7 +2476,7 @@ static bool TestOrthoMatrix (csMatrix3& m)
 
 bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
-	csStringID id, bool& handled, char*& priority,
+	csStringID id, bool& handled, csString& priority,
 	bool do_portal_container, bool& staticpos, bool& staticshape,
 	bool& zmodeChanged, bool& prioChanged,
 	bool recursive, iStreamSource* ssource)
@@ -2621,14 +2619,13 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_PRIORITY:
       {
-        delete[] priority;
-        priority = csStrNew (child->GetContentsValue ());
+        priority = child->GetContentsValue ();
 	long pri = Engine->GetRenderPriority (priority);
 	if (pri == 0)
 	{
           SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.meshobject",
-              child, "Unknown render priority '%s'!", priority);
+              child, "Unknown render priority '%s'!", (const char*)priority);
 	  return false;
 	}
         if (recursive)
@@ -2706,7 +2703,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_ZFILL:
       TEST_MISSING_MESH
-      if (!priority) priority = csStrNew ("wall");
+      if (priority.IsEmpty ()) priority = "wall";
       if (recursive)
       {
         mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
@@ -2721,7 +2718,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_ZUSE:
       TEST_MISSING_MESH
-      if (!priority) priority = csStrNew ("object");
+      if (priority.IsEmpty ()) priority = "object";
       if (recursive)
       {
         mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
@@ -2736,7 +2733,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_ZNONE:
       TEST_MISSING_MESH
-      if (!priority) priority = csStrNew ("sky");
+      if (priority.IsEmpty ()) priority = "sky";
       if (recursive)
       {
         mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
@@ -2751,7 +2748,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_ZTEST:
       TEST_MISSING_MESH
-      if (!priority) priority = csStrNew ("alpha");
+      if (priority.IsEmpty ()) priority = "alpha";
       if (recursive)
       {
         mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
@@ -2766,7 +2763,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_CAMERA:
       TEST_MISSING_MESH
-      if (!priority) priority = csStrNew ("sky");
+      if (priority.IsEmpty ()) priority = "sky";
       if (recursive)
       {
         mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
@@ -2978,7 +2975,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
 {
   if (!Engine) return 0;
 
-  char* priority = '\0';
+  csString priority;
 
   iMeshWrapper* mesh = 0;
   bool staticpos = false;
@@ -2997,7 +2994,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
     if (!HandleMeshParameter (ldr_context, mesh, 0, child, id,
     	handled, priority, false, staticpos, staticshape, zbufSet,
 	prioSet, true, ssource))
-      goto error;
+      return 0;
     if (!handled) switch (id)
     {
       case XMLTOKEN_FACTORY:
@@ -3006,7 +3003,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
 	  SyntaxService->ReportError (
 	  	"crystalspace.maploader.load.meshobject",
 	  	child, "There is already a factory for this mesh!");
-	  goto error;
+	  return 0;
 	}
 	else
 	{
@@ -3017,7 +3014,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
 	    SyntaxService->ReportError (
 	  	"crystalspace.maploader.load.meshobject",
 	  	child, "Can't find factory '%s'!", child->GetContentsValue ());
-	    goto error;
+	    return 0;
 	  }
 	  mesh = t->CreateMeshWrapper ();
 	  if (mesh)
@@ -3032,7 +3029,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
         break;
       default:
 	SyntaxService->ReportBadToken (child);
-	goto error;
+	return 0;
     }
   }
 
@@ -3041,9 +3038,9 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
     SyntaxService->ReportError (
 	  	"crystalspace.maploader.load.meshobject",
 	  	node, "There is no 'factory' for this mesh!");
-    goto error;
+    return 0;
   }
-  if (!priority) priority = csStrNew ("object");
+  if (priority.IsEmpty ()) priority = "object";
   mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
   
   //I had to put these ugly curly brackets. It's due to the uglier label
@@ -3062,12 +3059,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
     }
   }
 
-  delete[] priority;
   return mesh;
-
-error:
-  delete[] priority;
-  return 0;
 }
 
 bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
@@ -3218,7 +3210,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 {
   if (!Engine) return false;
 
-  char* priority = 0;
+  csString priority;
 
   iLoaderPlugin* plug = 0;
   iBinaryLoaderPlugin* binplug = 0;
@@ -3249,7 +3241,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
     if (!HandleMeshParameter (ldr_context, mesh, parent, child, id,
         handled, priority, false, staticpos, staticshape, zbufSet, prioSet,
         false, ssource))
-      goto error;
+      return false;
     if (!handled) switch (id)
     {
       case XMLTOKEN_PORTAL:
@@ -3270,7 +3262,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
           if (!sp)
 	  {
 	    // Error is already reported.
-	    goto error;
+	    return false;
 	  }
 	  sp->QueryObject ()->SetName (child->GetAttributeValue ("name"));
 	  sp->QuerySceneNode ()->SetParent (mesh->QuerySceneNode ());
@@ -3284,7 +3276,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
           if (!LoadMeshObject (ldr_context, sp, mesh, child, ssource))
 	  {
 	    // Error is already reported.
-	    goto error;
+	    return false;
 	  }
 	  else
 	  {
@@ -3302,7 +3294,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
           }
           else
           {
-            goto error;
+            return false;
           }
         }
 	break;
@@ -3313,14 +3305,14 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
             SyntaxService->ReportError (
 	        "crystalspace.maploader.load.plugin",
                 child, "Don't specify the plugin if you use <nullmesh>!");
-	    goto error;
+	    return false;
 	  }
 	  if (mesh->GetMeshObject ())
 	  {
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.mesh", child,
 	      "Please don't use <params> in combination with <nullmesh>!");
-	    goto error;
+	    return false;
 	  }
 	  csRef<iPluginManager> plugin_mgr =
 	  	CS_QUERY_REGISTRY (object_reg, iPluginManager);
@@ -3335,7 +3327,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
             SyntaxService->ReportError (
 	        "crystalspace.maploader.load.plugin",
                 child, "Could not find the nullmesh plugin!");
-	    goto error;
+	    return false;
 	  }
 	  csRef<iMeshObjectFactory> fact = type->NewFactory ();
 	  csRef<iMeshObject> mo = fact->NewInstance ();
@@ -3343,7 +3335,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  mo->SetMeshWrapper (mesh);
 	  csBox3 b;
 	  if (!SyntaxService->ParseBox (child, b))
-	    goto error;
+	    return false;
 	  csRef<iNullMeshState> nullmesh = SCF_QUERY_INTERFACE (
 		mo, iNullMeshState);
 	  if (nullmesh)
@@ -3357,7 +3349,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
           SyntaxService->ReportError (
 	      "crystalspace.maploader.load.plugin",
               child, "Could not load plugin!");
-	  goto error;
+	  return false;
 	}
 	else
 	{
@@ -3365,7 +3357,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  	mesh);
           if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh, zbufSet, 
 	    prioSet))
-	    goto error;	// Error already reported.
+	    return false;	// Error already reported.
 	}
         break;
       case XMLTOKEN_FILE:
@@ -3376,7 +3368,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.loadingfile",
 	      child, "Specify a VFS filename with 'file'!");
-	    goto error;
+	    return false;
 	  }
           csRef<iFile> buf = VFS->Open (fname, VFS_FILE_READ);
 	  if (!buf)
@@ -3384,7 +3376,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.loadingfile",
 	      child, "Error opening file '%s'!", fname);
-	    goto error;
+	    return false;
 	  }
 	  csRef<iDocument> doc;
 	  bool er = LoadStructuredDoc (fname, buf, doc);
@@ -3393,7 +3385,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.loadingfile",
 	      child, "'%s' is not an XML file!", fname);
-	    goto error;
+	    return false;
 	  }
 	  csRef<iDocumentNode> paramsnode = doc->GetRoot ()->GetNode ("params");
 	  if (paramsnode)
@@ -3404,7 +3396,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 		"crystalspace.maploader.load.plugin",
 		child, "Could not load plugin for mesh '%s'!",
 		mesh->QueryObject ()->GetName ());
-	      goto error;
+	      return false;
 	    }
 	    csRef<iBase> mo;
 	    if (plug)
@@ -3417,7 +3409,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	    }
             if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
 	      zbufSet, prioSet))
-	      goto error;	// Error already reported.
+	      return false;	// Error already reported.
 	    break;
 	  }
 	  csRef<iDocumentNode> meshobjnode = doc->GetRoot ()->GetNode (
@@ -3426,7 +3418,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  {
 	    if (!LoadMeshObject (ldr_context, mesh, parent, meshobjnode,
 	    	ssource))
-	      goto error;
+	      return false;
 	    break;
 	  }
 	  csRef<iDocumentNode> meshfactnode = doc->GetRoot ()->GetNode (
@@ -3444,7 +3436,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	      	meshfactnode, 0, ssource))
 	      {
 	        // Error is already reported.
-	        goto error;
+	        return false;
 	      }
 	      else
 	      {
@@ -3457,7 +3449,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 		"crystalspace.maploader.load.plugin", child,
 		"File '%s' doesn't contain <params>, <meshobj>, nor <meshfact>!",
 		fname);
-	  goto error;
+	  return false;
 	}
 	break;
       case XMLTOKEN_PARAMSFILE:
@@ -3467,7 +3459,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	      "crystalspace.maploader.load.plugin",
               child, "Could not load plugin for mesh '%s'!",
 	      mesh->QueryObject ()->GetName ());
-	  goto error;
+	  return false;
 	}
 	else
         {
@@ -3477,7 +3469,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.loadingfile",
 	      child, "Specify a VFS filename with 'paramsfile'!");
-	    goto error;
+	    return false;
 	  }
           csRef<iFile> buf (VFS->Open (fname, VFS_FILE_READ));
 	  if (!buf)
@@ -3485,7 +3477,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.loadingfile",
 	      child, "Error opening file '%s'!", fname);
-	    goto error;
+	    return false;
 	  }
 	  csRef<iBase> mo;
 	  if (plug)
@@ -3499,7 +3491,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  }
           if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
 	      zbufSet, prioSet))
-	    goto error;	// Error already reported.
+	    return false;	// Error already reported.
 	}
         break;
 
@@ -3510,7 +3502,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.mesh",
               child, "Please use 'params' before specifying 'polymesh'!");
-	    goto error;
+	    return false;
 	  }
 	  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
 	  if (!objmodel)
@@ -3518,12 +3510,12 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.mesh", child,
 	      "This mesh doesn't support setting of other 'polymesh'!");
-	    goto error;
+	    return false;
 	  }
 	  if (!ParsePolyMesh (child, objmodel))
 	  {
 	    // Error already reported.
-	    goto error;
+	    return false;
 	  }
 	}
 	break;
@@ -3544,7 +3536,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.plugin",
 	      child, "Specify a plugin name with 'plugin'!");
-	    goto error;
+	    return false;
 	  }
 	  iDocumentNode* defaults = 0;
 	  if (!loaded_plugins.FindPlugin (plugname, plug, binplug, defaults))
@@ -3552,7 +3544,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	    SyntaxService->ReportError (
  	        "crystalspace.maploader.parse.meshobj",
 	        child, "Error loading plugin '%s'!", plugname);
-	    goto error;
+	    return false;
 	  }
 	  if (defaults)
 	  {
@@ -3564,21 +3556,16 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
         break;
       default:
 	SyntaxService->ReportBadToken (child);
-	goto error;
+	return false;
     }
   }
 
-  if (priority)
+  if (!priority.IsEmpty ())
     mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
   mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICPOS, staticpos);
   mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICSHAPE, staticshape);
 
-  delete[] priority;
   return true;
-
-error:
-  delete[] priority;
-  return false;
 }
 
 bool csLoader::ParseImposterSettings (iMeshWrapper* mesh, iDocumentNode *node)
@@ -4175,7 +4162,7 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
 
 bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
 {
-  char* start_sector = csStrNew ("room");
+  csString start_sector = "room";
   csVector3 pos (0, 0, 0);
   csVector3 up (0, 1, 0);
   csVector3 forward (0, 0, 1);
@@ -4190,8 +4177,7 @@ bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
     switch (id)
     {
       case XMLTOKEN_SECTOR:
-	delete[] start_sector;
-	start_sector = csStrNew (child->GetContentsValue ());
+	start_sector = child->GetContentsValue ();
 	break;
       case XMLTOKEN_POSITION:
 	if (!SyntaxService->ParseVector (child, pos))
@@ -4222,7 +4208,6 @@ bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
   }
 
   campos->Set (start_sector, pos, forward, up);
-  delete[] start_sector;
   return true;
 }
 
@@ -4741,7 +4726,7 @@ class csMissingSectorCallback : public iPortalCallback
 {
 public:
   csRef<iLoaderContext> ldr_context;
-  char* sectorname;
+  csString sectorname;
   bool autoresolve;
 
   SCF_DECLARE_IBASE;
@@ -4750,12 +4735,11 @@ public:
   {
     SCF_CONSTRUCT_IBASE (0);
     csMissingSectorCallback::ldr_context = ldr_context;
-    sectorname = csStrNew (sector);
+    sectorname = sector;
     csMissingSectorCallback::autoresolve = autoresolve;
   }
   virtual ~csMissingSectorCallback ()
   {
-    delete[] sectorname;
     SCF_DESTRUCT_IBASE();
   }
   
@@ -4767,8 +4751,7 @@ public:
     // For efficiency reasons we deallocate the name here.
     if (!autoresolve)
     {
-      delete[] sectorname;
-      sectorname = 0;
+      sectorname.Empty ();
       portal->RemoveMissingSectorCallback (this);
     }
     return true;
@@ -4921,7 +4904,7 @@ bool csLoader::ParsePortals (iLoaderContext* ldr_context,
 {
   const char* container_name = node->GetAttributeValue ("name");
   iMeshWrapper* container_mesh = 0;
-  char* priority = 0;
+  csString priority;
   bool staticpos = false;
   bool staticshape = false;
   bool zbufSet = false;
@@ -4937,33 +4920,28 @@ bool csLoader::ParsePortals (iLoaderContext* ldr_context,
     if (!HandleMeshParameter (ldr_context, container_mesh, parent, child, id,
     	handled, priority, true, staticpos, staticshape, zbufSet, prioSet,
 	false, ssource))
-      goto error;
+      return false;
     if (!handled) switch (id)
     {
       case XMLTOKEN_PORTAL:
         if (!ParsePortal (ldr_context, child, sourceSector,
 		container_name, container_mesh, parent))
-	  goto error;
+	  return false;
         break;
       default:
 	SyntaxService->ReportBadToken (child);
-	goto error;
+	return false;
     }
   }
 
-  if (priority)
+  if (!priority.IsEmpty ())
     container_mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
   container_mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICPOS,
   	staticpos);
   container_mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICSHAPE,
   	staticshape);
 
-  delete[] priority;
   return true;
-
-error:
-  delete[] priority;
-  return false;
 }
 
 iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
@@ -4972,7 +4950,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
   const char* secname = node->GetAttributeValue ("name");
 
   bool do_culler = false;
-  char* culplugname = 0;
+  csString culplugname;
 
   iSector* sector = ldr_context->FindSector (secname);
   if (sector == 0)
@@ -5026,55 +5004,55 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	break;
       case XMLTOKEN_MESHGEN:
 	if (!LoadMeshGen (ldr_context, child, sector))
-	  goto error;
+	  return 0;
 	break;
       case XMLTOKEN_ADDON:
 	if (!LoadAddOn (ldr_context, child, sector, false, ssource))
-	  goto error;
+	  return 0;
       	break;
       case XMLTOKEN_META:
 	if (!LoadAddOn (ldr_context, child, sector, true, ssource))
-	  goto error;
+	  return 0;
       	break;
       case XMLTOKEN_PORTAL:
 	{
 	  iMeshWrapper* container_mesh = 0;
           if (!ParsePortal (ldr_context, child, sector, 0, container_mesh, 0))
-	    goto error;
+	    return 0;
 	}
         break;
       case XMLTOKEN_PORTALS:
         if (!ParsePortals (ldr_context, child, sector, 0, ssource))
-	  goto error;
+	  return 0;
         break;
       case XMLTOKEN_CULLER:
 	SyntaxService->ReportError (
 	  "crystalspace.maploader.parse.sector",
 	  child, "<culler> no longer supported! Convert your level to Dynavis using 'levtool'!");
 	csPrintf ("<culler> no longer supported! Convert your level to Dynavis using 'levtool'!");
-	goto error;
+	return 0;
       case XMLTOKEN_CULLERP:
         {
 	  const char* pluginname = child->GetAttributeValue ("plugin");
 	  if (pluginname)
 	  {
 	    // New way to write cullerp.
-	    culplugname = csStrNew (pluginname);
+	    culplugname = pluginname;
 	    culler_params = child;	// Remember for later.
 	  }
 	  else
 	  {
 	    // Old way.
-	    culplugname = csStrNew (child->GetContentsValue ());
+	    culplugname = child->GetContentsValue ();
 	    culler_params = 0;
 	  }
-	  if (!culplugname)
+	  if (culplugname.IsEmpty ())
 	  {
 	    SyntaxService->ReportError (
 		  "crystalspace.maploader.parse.sector",
 	  	  child,
 		  "CULLERP expects the name of a visibility culling plugin!");
-	    goto error;
+	    return 0;
 	  }
 	  else
 	  {
@@ -5091,14 +5069,14 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	      	"crystalspace.maploader.load.meshobject",
 		child, "'meshref' requires a name in sector '%s'!",
 		secname ? secname : "<noname>");
-	    goto error;
+	    return 0;
 	  }
           iMeshWrapper* mesh = LoadMeshObjectFromFactory (ldr_context, child,
 	  	ssource);
           if (!mesh)
 	  {
 	    // Error is already reported.
-	    goto error;
+	    return 0;
 	  }
 	  mesh->QueryObject ()->SetName (meshname);
           mesh->GetMovable ()->SetSector (sector);
@@ -5116,14 +5094,14 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	      	"crystalspace.maploader.load.polymesh",
 		child, "'polymesh' requires a name in sector '%s'!",
 		secname ? secname : "<noname>");
-	    goto error;
+	    return 0;
 	  }
 	  csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
 	  	"crystalspace.mesh.object.null", meshname);
           if (!LoadPolyMeshInSector (ldr_context, mesh, child, ssource))
 	  {
 	    // Error is already reported.
-	    goto error;
+	    return 0;
 	  }
 	  else
 	  {
@@ -5142,13 +5120,13 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	      	"crystalspace.maploader.load.meshobject",
 		child, "'meshobj' requires a name in sector '%s'!",
 		secname ? secname : "<noname>");
-	    goto error;
+	    return 0;
 	  }
 	  csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (meshname);
           if (!LoadMeshObject (ldr_context, mesh, 0, child, ssource))
 	  {
 	    // Error is already reported.
-	    goto error;
+	    return 0;
 	  }
 	  else
 	  {
@@ -5167,7 +5145,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	      	"crystalspace.maploader.load.meshobject",
 		child, "'meshlib' requires a name (sector '%s')!",
 		secname ? secname : "<noname>");
-	    goto error;
+	    return 0;
 	  }
 	  iMeshWrapper* mesh = Engine->GetMeshes ()->FindByName (meshname);
 	  if (!mesh)
@@ -5177,12 +5155,12 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 		child,
 		"Could not find mesh object '%s' (sector '%s') for MESHLIB!",
 		meshname, secname ? secname : "<noname>");
-	    goto error;
+	    return 0;
 	  }
           if (!LoadMeshObject (ldr_context, mesh, 0, child, ssource))
 	  {
 	    // Error is already reported.
-	    goto error;
+	    return 0;
 	  }
           mesh->GetMovable ()->GetSectors ()->Add (sector);
 	  mesh->GetMovable ()->UpdateMove ();
@@ -5191,7 +5169,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
       case XMLTOKEN_LIGHT:
         {
 	  iLight* sl = ParseStatlight (ldr_context, child);
-	  if (!sl) goto error;
+	  if (!sl) return 0;
           sector->GetLights ()->Add (sl);
 	  sl->DecRef ();
 	}
@@ -5205,7 +5183,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	  }
 	  else
 	  {
-	    goto error;
+	    return 0;
 	  }
 	}
         break;
@@ -5219,51 +5197,31 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	  f->density = child->GetAttributeValueAsFloat ("density");
 	  csRef<iDocumentAttribute> start_attr = child->GetAttribute ("start");
 	  if (start_attr)
-	  {
-		f->start = start_attr->GetValueAsFloat();
-	  }
+	    f->start = start_attr->GetValueAsFloat();
 	  else
-	  {
-		f->start = 1.0f;
-	  }
+	    f->start = 1.0f;
 
 	  csRef<iDocumentAttribute> end_attr = child->GetAttribute ("end");
 	  if (end_attr)
-	  {
-		f->end = end_attr->GetValueAsFloat();
-	  }
+	    f->end = end_attr->GetValueAsFloat();
 	  else
-	  {
-		f->end = 1000.0f;
-	  }
+	    f->end = 1000.0f;
 
 	  csRef<iDocumentAttribute> mode_attr = child->GetAttribute ("mode");
 	  if (mode_attr)
 	  {
-		const char* str_mode = mode_attr->GetValue();
-		if (!strcmp(str_mode, "linear"))
-		{
-			f->mode = CS_FOG_MODE_LINEAR;
-		}
-		else
-		if (!strcmp(str_mode, "exp"))
-		{
-			f->mode = CS_FOG_MODE_EXP;
-		}
-		else
-		if (!strcmp(str_mode, "exp2"))
-		{
-			f->mode = CS_FOG_MODE_EXP2;
-		}
-		else
-		{
-			f->mode = CS_FOG_MODE_NONE;
-		}
+	    const char* str_mode = mode_attr->GetValue();
+	    if (!strcmp(str_mode, "linear"))
+	      f->mode = CS_FOG_MODE_LINEAR;
+	    else if (!strcmp(str_mode, "exp"))
+	      f->mode = CS_FOG_MODE_EXP;
+	    else if (!strcmp(str_mode, "exp2"))
+	      f->mode = CS_FOG_MODE_EXP2;
+	    else
+	      f->mode = CS_FOG_MODE_NONE;
 	  }
 	  else
-	  {
-		f->mode = CS_FOG_MODE_NONE;
-	  }
+	    f->mode = CS_FOG_MODE_NONE;
 
         }
         break;
@@ -5275,13 +5233,14 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
           {
             sector->QueryObject()->ObjAdd (kvp->QueryObject ());
 	    kvp->DecRef ();
-          } else
-	    goto error;
+          }
+	  else
+	    return 0;
         }
         break;
       default:
 	SyntaxService->ReportBadToken (child);
-	goto error;
+	return 0;
     }
   }
   if (do_culler)
@@ -5293,16 +5252,11 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	      	"crystalspace.maploader.load.sector",
 		node, "Could not load visibility culler for sector '%s'!",
 		secname ? secname : "<noname>");
-      goto error;
+      return 0;
     }
   }
 
-  delete[] culplugname;
   return sector;
-
-error:
-  delete[] culplugname;
-  return 0;
 }
 
 iEngineSequenceManager* csLoader::GetEngineSequenceManager ()

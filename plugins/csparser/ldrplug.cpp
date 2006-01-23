@@ -25,8 +25,8 @@
 
 struct csLoaderPluginRec
 {
-  char* ShortName;
-  char* ClassID;
+  csString ShortName;
+  csString ClassID;
   csRef<iBase> Component;
   csRef<iLoaderPlugin> Plugin;
   csRef<iBinaryLoaderPlugin> BinPlugin;
@@ -38,18 +38,11 @@ struct csLoaderPluginRec
 	iLoaderPlugin *plugin,
 	iBinaryLoaderPlugin* binPlugin)
   {
-    if (shortName) ShortName = csStrNew (shortName);
-    else ShortName = 0;
-    ClassID = csStrNew (classID);
+    if (shortName) ShortName = shortName;
+    ClassID = classID;
     Component = component;
     Plugin = plugin;
     BinPlugin = binPlugin;
-  }
-
-  ~csLoaderPluginRec ()
-  {
-    delete [] ShortName;
-    delete [] ClassID;
   }
 
   void SetDefaults (iDocumentNode* defaults)
@@ -95,7 +88,7 @@ csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPluginRec (
   for (i=0 ; i<vector.Length () ; i++)
   {
     csLoaderPluginRec* pl = vector.Get (i);
-    if (pl->ShortName && !strcmp (name, pl->ShortName))
+    if ((!pl->ShortName.IsEmpty ()) && !strcmp (name, pl->ShortName))
       return pl;
     if (!strcmp (name, pl->ClassID))
       return pl;
