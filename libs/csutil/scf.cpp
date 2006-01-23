@@ -53,6 +53,18 @@
 #include "reftrack.h"
 #endif
 
+#if (defined(CS_EXTENSIVE_MEMDEBUG) && defined(CS_COMPILER_MSVC)) || \
+  defined(CS_MEMORY_TRACKER) || defined(CS_REF_TRACKER)
+/*
+  Lazily unload libs - Because if unloading happens immediately,
+  the source file information for leaked objects would get lost.
+  But unload them nevertheless so memory checker don't report leaked
+  handles.
+  Similar for reftracking - but here it's also debug symbols.
+ */
+#define LAZY_UNLOAD
+#endif
+
 /// This is the registry for all class factories
 static class scfClassRegistry *ClassRegistry = 0;
 /// If this bool is true, we should sort the registery
@@ -94,6 +106,10 @@ public:
 
   /// The global table of all known interface names
   csStringSet InterfaceRegistry;
+#ifdef LAZY_UNLOAD
+  /// Modules to lazily unload at end
+  csArray<csLibraryHandle> lazyUnloadLibs;
+#endif
   
   /**
    * Constructor.
@@ -258,7 +274,11 @@ scfSharedLibrary::~scfSharedLibrary ()
     if (PrivateSCF->IsVerbose(SCF_VERBOSE_PLUGIN_LOAD))
       csPrintfErr("SCF_NOTIFY: unloading plugin %s\n",
 	get_library_name(LibraryName));
+#ifndef LAZY_UNLOAD
     csUnloadLibrary (LibraryHandle);
+#else
+    PrivateSCF->lazyUnloadLibs.Push (LibraryHandle);
+#endif
   }
 }
 
@@ -752,6 +772,10 @@ csSCF::~csSCF ()
 #ifdef CS_REF_TRACKER
   refTracker->Report ();
   delete refTracker;
+#endif
+#ifdef LAZY_UNLOAD
+  for (size_t i = 0; i < lazyUnloadLibs.GetSize(); i++)
+    csUnloadLibrary (lazyUnloadLibs[i]);
 #endif
   SCF = PrivateSCF = 0;
 }

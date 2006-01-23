@@ -49,6 +49,8 @@ chronological order.
 	  tracker enabled.
 	- res added support for secondary color and color sum to the GL
 	  renderer and fixed function plugin.
+	- res moved the "lazy unload" from the Win32 library loading code
+	  to SCF (seems it is also needed for other platforms).
 22-Jan-2006
 	- Jorrit fixed an accidental commit in the standard renderloop.
 	- Jorrit rewrote csMaterialWrapper to use new SCF. For some reason
