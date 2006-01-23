@@ -134,6 +134,8 @@ public:
   virtual iEngineSequenceParameters* GetBaseParameterBlock ();
   virtual csPtr<iEngineSequenceParameters> CreateParameterBlock ();
 
+  virtual void AddOperationRunSequence (csTicks time,
+  		iSequenceWrapper* sequence2, iBase* params = 0);
   virtual void AddOperationSetVariable (csTicks time,
   		iSharedVariable* var, float value, float dvalue = 0);
   virtual void AddOperationSetVariable (csTicks time,

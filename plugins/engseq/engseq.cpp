@@ -209,6 +209,27 @@ public:
 
 //---------------------------------------------------------------------------
 
+class OpRunSequence : public OpStandard
+{
+private:
+  iSequenceManager* seqmgr;
+  csWeakRef<iSequenceWrapper> sequence2;
+
+public:
+  OpRunSequence (iSequenceManager* seqmgr, iSequenceWrapper* sequence2) :
+  	seqmgr (seqmgr), sequence2 (sequence2)
+  {
+  }
+
+  virtual void Do (csTicks dt, iBase* params)
+  {
+    if (sequence2)
+      seqmgr->RunSequence (-(signed)dt, sequence2->GetSequence (), params);
+  }
+};
+
+//---------------------------------------------------------------------------
+
 /**
  * Set variable operation.
  */
@@ -1202,6 +1223,15 @@ csPtr<iEngineSequenceParameters> csSequenceWrapper::CreateParameterBlock ()
   }
 
   return csPtr<iEngineSequenceParameters> (copyparams);
+}
+
+void csSequenceWrapper::AddOperationRunSequence (csTicks time,
+  		iSequenceWrapper* sequence2, iBase* params)
+{
+  OpRunSequence* op = new OpRunSequence (eseqmgr->GetSequenceManager (),
+  	sequence2);
+  sequence->AddOperation (time, op, params, sequence_id);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationSetVariable (csTicks time,

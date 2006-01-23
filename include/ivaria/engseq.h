@@ -250,6 +250,15 @@ struct iSequenceWrapper : public virtual iBase
   virtual csPtr<iEngineSequenceParameters> CreateParameterBlock () = 0; 
 
   /**
+   * Operation: run a sequence wrapper.
+   * \param time is the relative time at which this operation will fire.
+   * \param sequence2 is the sequence to run.
+   * \param params are optional parameters to run the sequence with.
+   */
+  virtual void AddOperationRunSequence (csTicks time,
+  		iSequenceWrapper* sequence2, iBase* params = 0) = 0;
+
+  /**
    * Operation: set a variable to a floating point value.
    * If 'dvalue' is not 0 then that will be used instead of the absolute
    * value. In that case 'dvalue' is added.

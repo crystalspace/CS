@@ -771,8 +771,10 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	    return 0;
 	  }
 
-	  sequence->GetSequence ()->AddRunSequence (cur_time,
-	  	sequence2->GetSequence (), (iBase*)params2);
+	  sequence->AddOperationRunSequence (cur_time,
+	  	sequence2, (iBase*)params2);
+	  //sequence->GetSequence ()->AddRunSequence (cur_time,
+	  	//sequence2->GetSequence (), (iBase*)params2);
 	}
 	break;
       case XMLTOKEN_DELAY:

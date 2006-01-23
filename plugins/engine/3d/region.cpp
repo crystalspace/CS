@@ -43,7 +43,7 @@ csRegion::~csRegion ()
 
 // If you enable this then after deleting a region it will
 // print out which objects were not removed and their ref count.
-//#define REGION_CHECK
+#define REGION_CHECK
 
 void csRegion::DeleteAll ()
 {
