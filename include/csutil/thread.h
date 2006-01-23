@@ -48,6 +48,25 @@ enum
   CS_THREAD_SEMA_BUSY
 };
 
+/* Priority values indicate how frequently a thread runs compared to other threads.
+ *
+ * Thread scheduling is handled by the underlying OS, and so the true meaning of these
+ *  values will vary depending on platform.  A minimal set of values is defined for CS
+ *  so that chances of support of the full range of values by the platform are greater.
+*/
+typedef enum
+{
+  // IDLE priority is the lowest priority.  Threads with this priority are scheduled to
+  //  run only when no other thread would be running anyway - or as close as the platform
+  //  allows.
+  CS_THREAD_PRIORITY_IDLE=0,
+  // NORMAL priority is the default priority.
+  CS_THREAD_PRIORITY_NORMAL,
+  // TIMECRITICAL is the highest priority.
+  CS_THREAD_PRIORITY_TIMECRITICAL
+} csThreadPriority;
+
+
 /**
  * Abstract interface for objects which can be run in a thread.  Objects which
  * want to be run in a thread must implement this interface.
@@ -116,8 +135,24 @@ public:
 
   /**
    * Yield Thread frees CPU time if nothing to do.
+   * NOTE:  This Yields execution time in the thread in which this function is called.
+   *        For example,  OtherThread->Yeild() will NOT have the results that
+   *        would be expected.
    */
   virtual void Yield () = 0;
+
+  /**
+   * Retrieve the current execution priority of this thread.
+   * @return A member of the csThreadPriority enumeration
+   */
+  virtual csThreadPriority GetPriority() = 0;
+
+  /**
+  * Set the current execution priority of this thread.  
+  *  The specifics of when this takes effect and what underlying platform priority
+  *  each value maps to are properties of the specific platform-based implementation.
+  */
+  virtual bool SetPriority(csThreadPriority Priority) = 0;
 
   /**
    * Return the last error description, else 0 if there was none.
