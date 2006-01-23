@@ -176,8 +176,14 @@ class BuffersClipper
   void SetupVOut2 (size_t i, const VertexBuffer& inBuffer, 
     const size_t inStride, const VertexBuffer& outBuffer)
   {
+#ifdef CS_EXTENSIVE_MEMDEBUG_NEW
+#undef new
+#endif
     (void)new (&vout[i]) VertexOutput<Ni, No> (inBuffer.data, inStride,
       (float*)outBuffer.data);
+#ifdef CS_EXTENSIVE_MEMDEBUG_NEW
+#define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
   }
   template<int Ni>
   void SetupVOut1 (size_t i, const VertexBuffer& inBuffer, 
@@ -238,8 +244,14 @@ public:
       if (!(buffersMask & (1 << i))) continue;
       SetupVOut (i, inBuffers[i], inStrides[i], outBuffers[i]);
     }
+#ifdef CS_EXTENSIVE_MEMDEBUG_NEW
+#undef new
+#endif
     (void)new (&voutPersp) VertexOutput<3, 3> ((uint8*)inPersp,
       sizeof (csVector3), (float*)outPersp);
+#ifdef CS_EXTENSIVE_MEMDEBUG_NEW
+#define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
   }
 
   size_t DoClip (const csTriangle& tri)

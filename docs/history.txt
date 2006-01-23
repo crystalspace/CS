@@ -44,6 +44,9 @@ chronological order.
 	  increase the ref count on the sequence. This fixes a number
 	  of memory leaks and makes the above change to the engine
 	  sequence manager obsolete (hence it has been removed).
+	- Jorrit added memory tracker protection to the clipper in the
+	  software renderer so that it compiles again with the memory
+	  tracker enabled.
 22-Jan-2006
 	- Jorrit fixed an accidental commit in the standard renderloop.
 	- Jorrit rewrote csMaterialWrapper to use new SCF. For some reason
