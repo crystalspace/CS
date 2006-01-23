@@ -4742,7 +4742,6 @@ class iMaterialWrapper(iBase):
     def __repr__(self):
         return "<%s.%s; proxy of C++ iMaterialWrapper instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def QueryObject(*args): return _cspace.iMaterialWrapper_QueryObject(*args)
-    def Clone(*args): return _cspace.iMaterialWrapper_Clone(*args)
     def SetMaterial(*args): return _cspace.iMaterialWrapper_SetMaterial(*args)
     def GetMaterial(*args): return _cspace.iMaterialWrapper_GetMaterial(*args)
     def Visit(*args): return _cspace.iMaterialWrapper_Visit(*args)
