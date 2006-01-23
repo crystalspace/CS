@@ -5401,7 +5401,6 @@ package cspace::iMaterialWrapper;
 %OWNER = ();
 %ITERATORS = ();
 *QueryObject = *cspacec::iMaterialWrapper_QueryObject;
-*Clone = *cspacec::iMaterialWrapper_Clone;
 *SetMaterial = *cspacec::iMaterialWrapper_SetMaterial;
 *GetMaterial = *cspacec::iMaterialWrapper_GetMaterial;
 *Visit = *cspacec::iMaterialWrapper_Visit;
