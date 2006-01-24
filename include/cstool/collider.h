@@ -165,6 +165,10 @@ struct CS_CRYSTALSPACE_EXPORT csTraceBeamResult
    * or else a negative number if there was no hit.
    */
   float sqdistance;
+  /**
+   * Sector in which the collision occured.
+   */
+  iSector* end_sector;
 };
 
 /**
@@ -284,6 +288,7 @@ public:
    * \param closest_isect will be set to the closest intersection point (in
    * world space).
    * \param closest_mesh will be set to the closest mesh that is hit.
+   * \param [optional] end_sector will be set the sector containing the closest_mesh.
    * \return the squared distance between 'start' and the closest hit
    * or else a negative number if there was no hit.
    */
@@ -292,7 +297,8 @@ public:
 	bool traverse_portals,
 	csIntersectingTriangle& closest_tri,
 	csVector3& closest_isect,
-	iMeshWrapper** closest_mesh = 0);
+	iMeshWrapper** closest_mesh = 0,
+	iSector** end_sector = 0);
 
   /**
    * Trace a beam from 'start' to 'end' and return the first hit.

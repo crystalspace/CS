@@ -323,7 +323,7 @@ csTraceBeamResult csColliderHelper::TraceBeam (iCollideSystem* cdsys,
 {
   csTraceBeamResult rc;
   rc.sqdistance = TraceBeam (cdsys, sector, start, end, traverse_portals,
-  	rc.closest_tri, rc.closest_isect, &rc.closest_mesh);
+  	rc.closest_tri, rc.closest_isect, &rc.closest_mesh, &rc.end_sector);
   return rc;
 }
 
@@ -332,13 +332,17 @@ float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
 	bool traverse_portals,
 	csIntersectingTriangle& closest_tri,
 	csVector3& closest_isect,
-	iMeshWrapper** closest_mesh)
+	iMeshWrapper** closest_mesh,
+	iSector** end_sector)
 {
   if (!sector)
   {
     if (closest_mesh) *closest_mesh = 0;
+	if (end_sector) *end_sector = 0;
     return -1.0f;
   }
+  if (end_sector) *end_sector = sector;
+
   iVisibilityCuller* culler = sector->GetVisibilityCuller ();
   csRef<iVisibilityObjectIterator> it = culler->IntersectSegmentSloppy (
   	start, end);
@@ -467,11 +471,13 @@ float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
       new_end = portal->Warp (warp_wor, new_end);
     }
 
+    if (end_sector) *end_sector = portal->GetSector();
+
     // Recurse with the new beam to the new sector.
     float new_squared_dist = TraceBeam (cdsys, portal->GetSector (),
 	new_start, new_end, traverse_portals,
 	closest_tri, closest_isect,
-	closest_mesh);
+	closest_mesh, end_sector);
     if (new_squared_dist >= 0)
     {
       // We have a hit. We have to add the distance so far to the
@@ -488,7 +494,6 @@ float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
   else
     return -1.0f;
 }
-
 //----------------------------------------------------------------------
 
 csColliderActor::csColliderActor ()

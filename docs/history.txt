@@ -18,6 +18,8 @@ chronological order.
 	  loaded the old way (embedded in the thing plugin). The problem was
 	  that the thing loader forgot to register the created portal
 	  container mesh to the current region.
+	- Jorrit added a patch from Lak_Moore to add support for returning
+	  sector information to csColliderHelper::TraceBeam.
 23-Jan-2006
 	- Jorrit changed the sequence manager to have support for removing
 	  sequences. This is done by optionally allowing to assing
