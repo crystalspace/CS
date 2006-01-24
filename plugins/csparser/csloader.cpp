@@ -698,7 +698,7 @@ bool csLoader::Load (iDataBuffer* buffer, const char* fname,
     csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (
     	object_reg);
     csRef<iStringArray> model_loader_ids = iSCF::SCF->QueryClassList (
-      "crystalspace.mesh.loader.factory:");
+      "crystalspace.mesh.loader.factory.");
     for (size_t i = 0; i < model_loader_ids->GetSize(); i++)
     {
       const char* plugin = model_loader_ids->Get (i);
