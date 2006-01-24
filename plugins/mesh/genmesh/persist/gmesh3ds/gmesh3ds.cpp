@@ -315,6 +315,8 @@ csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (iDataBuffer* buf,
 				       iLoaderContext* ldr_context,
 				       iBase* context)
 {
+  materials_and_tris.Empty ();
+
   csRef<iPluginManager> plugin_mgr (
     csQueryRegistry<iPluginManager> (object_reg));
   csRef<iMeshObjectType> type (
@@ -364,6 +366,7 @@ csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (iDataBuffer* buf,
       	int (materials_and_tris[j].tris.Length ()),
 	materials_and_tris[j].material);
     }
+  materials_and_tris.Empty ();
 
   return csPtr<iBase> (fact);
 }

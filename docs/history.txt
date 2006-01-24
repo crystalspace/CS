@@ -9,6 +9,8 @@ chronological order.
 24-Jan-2006
 	- mdmkolbe removed a VC6 workaround from SCF.
 	- mdmkolbe fixed a few more dirent.h issues with the Perl 5 bindings.
+	- Jorrit fixed a bad bug in the gmesh 3ds loader plugin which basically
+	  prevented it from loading more then one model without crashing.
 23-Jan-2006
 	- Jorrit changed the sequence manager to have support for removing
 	  sequences. This is done by optionally allowing to assing
