@@ -2,14 +2,12 @@ SubDir TOP plugins mesh ;
 
 SubInclude TOP plugins mesh ball ;
 SubInclude TOP plugins mesh bezier ;
-SubInclude TOP plugins mesh crossbld ;
 SubInclude TOP plugins mesh emit ;
 SubInclude TOP plugins mesh explo ;
 SubInclude TOP plugins mesh fire ;
 SubInclude TOP plugins mesh fountain ;
 SubInclude TOP plugins mesh genmesh ;
 SubInclude TOP plugins mesh haze ;
-SubInclude TOP plugins mesh impexp ;
 SubInclude TOP plugins mesh instmesh ;
 SubInclude TOP plugins mesh lghtng ;
 SubInclude TOP plugins mesh null ;

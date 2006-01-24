@@ -1122,12 +1122,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  // Find the model converter plugin
-  ModelConverter = CS_QUERY_REGISTRY (object_reg, iModelConverter);
-
-  // Find the model crossbuilder plugin
-  CrossBuilder = CS_QUERY_REGISTRY (object_reg, iCrossBuilder);
-
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little

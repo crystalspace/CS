@@ -25,7 +25,6 @@
 #include "cstool/cspixmap.h"
 #include "cstool/csview.h"
 #include "cstool/keyval.h"
-#include "cstool/mdltool.h"
 #include "csutil/callstack.h"
 #include "csutil/csendian.h"
 #include "csutil/cspmeter.h" 
@@ -46,9 +45,6 @@
 #include "igraphic/imageio.h"
 #include "imap/loader.h"
 #include "imap/saver.h"
-#include "imesh/crossbld.h"
-#include "imesh/mdlconv.h"
-#include "imesh/mdldata.h"
 #include "imesh/object.h"
 #include "imesh/sprite3d.h"
 #include "imesh/thing.h"
@@ -327,135 +323,18 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
     return;
   }
 
-  // read in the model file
-  csRef<iDataBuffer> buf (Sys->myVFS->ReadFile (filename));
-  if (!buf)
+  iBase* result;
+  if (!Sys->LevelLoader->Load (filename, result))
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-  	"There was an error reading the data!");
+  	"There was an error reading model '%s'!", filename);
     return;
   }
 
-  csRef<iModelData> Model (Sys->ModelConverter->Load (buf->GetUint8 (),
-  	buf->GetSize ()));
-  if (!Model)
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-  	"There was an error reading the data!");
-    return;
-  }
-
-  csModelDataTools::SplitObjectsByMaterial (Model);
-  csModelDataTools::MergeObjects (Model, false);
-  iMeshFactoryWrapper *wrap =
-    Sys->CrossBuilder->BuildSpriteFactoryHierarchy (Model, Sys->Engine,
-    Sys->Engine->GetMaterialList ()->FindByName (txtname));
-  wrap->QueryObject ()->SetName (templatename);
-}
-
-
-void GenerateThing (iObjectRegistry* object_reg,
-	iObjectIterator * it, iMaterialWrapper* mat,
-	char* spriteName, iSector* sector, csVector3 position, float size)
-{
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager);
-  csRef<iMeshObjectType> thingType = CS_QUERY_PLUGIN_CLASS (
-      plugin_mgr, "crystalspace.mesh.object.thing",
-      iMeshObjectType);
-
-  it->Reset();
-  while(it->HasNext())
-  {
-    csRef<iModelDataObject> mdo (SCF_QUERY_INTERFACE(it->Next(),
-		                    iModelDataObject));
-    if(!mdo)
-    {
-      continue;
-    }
-    csRef<iMeshObjectFactory> thingFactory (thingType->NewFactory());
-    csRef<iThingFactoryState> thingFactoryState = 
-      scfQueryInterface<iThingFactoryState> (thingFactory);
-    if(!thingFactoryState)
-    {
-      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,
-		  "Can't get iThingState Interface!");
-      return;
-    }
-    if(!Sys->CrossBuilder->BuildThing(mdo,thingFactoryState,mat))
-    {
-      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't Build Thing!");
-      return;
-    }
-    //Now we have loaded the thing, let's do the mesh
-    csRef<iMeshObject> thingObj (thingFactory->NewInstance());
-    if(!thingObj)
-    {
-      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't Get iMeshObj Interface!");
-      return;
-    }
-    csRef<iMeshWrapper> thingWrapper (Sys->Engine->CreateMeshWrapper(
-    	thingObj,spriteName));
-
-    if(!thingWrapper)
-    {
-      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't Get iMeshObj Interface!");
-      return;
-    }
-    csMatrix3 m; m.Identity(); m = m*(1./size);
-    csReversibleTransform t = csReversibleTransform(m,csVector3(0,0,0));
-    csReversibleTransform t2;
-    t2.SetOrigin(position);
-    thingWrapper->HardTransform(t);
-    thingWrapper->HardTransform(t2);
-    thingWrapper->GetMovable()->SetSector(sector);
-    thingWrapper->GetMovable()->UpdateMove();
-  }
-}
-
-void load_thing (iObjectRegistry* object_reg,
-	iSector* sector, csVector3 position,
-	iObjectIterator* it, iEngine* Engine)
-{
-  /*
-   * First we check for mesh material:
-   * It must be in memory, since we've registered needed materials before
-   * object creation.
-   * I'll use only one material til i know how to register more materials
-   */
-
-  csString defaultMat = LookForKeyValue(it,"factorymaterial");
-  csString fileName = LookForKeyValue(it,"factoryfile");
-  csString spriteName = LookForKeyValue(it,"cs_name");
-  iMaterialWrapper *mat;
-
-  mat = Engine->GetMaterialList()->FindByName(defaultMat);
-  if(!mat)
-  {
-    Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't find material %s \
-	            for thing creation in memory!!",(const char*)defaultMat);
-    return;
-  }
-  csRef<iDataBuffer> buffer (Sys->myVFS->ReadFile(fileName));
-  if(!buffer)
-  {
-    Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"There was an error loading \
-	            model %s for thing creation!", (const char*)fileName);
-    return;
-  }
-
-  csRef<iModelData> Model (Sys->ModelConverter->Load (buffer->GetUint8(),
-  	buffer->GetSize()));
-  if(!Model)
-  {
-    Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,
-    	"There was an error reading the data!");
-    return;
-  }
-
-  csRef<iObjectIterator> it2 (Model->QueryObject()->GetIterator());
-  GenerateThing(object_reg, it2,mat,(char*)(const char*)spriteName,sector,
-  	position, ParseScaleFactor(it));
+  csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (
+  	result);
+  if (wrap)
+    wrap->QueryObject ()->SetName (templatename);
 }
 
 
@@ -776,11 +655,6 @@ void BuildFactory(iObjectIterator* it, char* factoryName, iEngine* Engine)
   load_meshobj((char*)(const char*)modelFilename,
   	(char*)(const char*)factoryName,(char*)(const char*)materialName);
 
-  csRef<iSprite3DFactoryState> state (SCF_QUERY_INTERFACE(
-	  Engine->GetMeshFactories()->FindByName(factoryName)\
-	  ->GetMeshObjectFactory(),
-	  iSprite3DFactoryState));
-
   iMeshFactoryWrapper* factWrapper =
 	                   Engine->GetMeshFactories()->FindByName(factoryName);
 
@@ -812,13 +686,6 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
 
 
 
-void BuildThing(iObjectRegistry* object_reg,
-	iSector* sector, csVector3 position,iObjectIterator* it,
-	iEngine* Engine)
-{
-  load_thing(object_reg, sector,position,it,Engine);
-}
-
 void BuildObject(iObjectRegistry* object_reg, iSector * sector,
 	iObjectIterator* it, iEngine* Engine,
 	csVector3 position, iGraphics3D* MyG3D, iLoader* loader,
@@ -830,18 +697,11 @@ void BuildObject(iObjectRegistry* object_reg, iSector * sector,
   //Proceeding to contruct the object
 
   RegisterMaterials(it,Engine,MyG3D,loader,objReg);
-  if (!strcmp(LookForKeyValue(it,"staticflag"),"static"))
-  {
-    BuildThing(object_reg, sector,position,it,Engine);
-  }
-  else
-  {
-    factoryName = LookForKeyValue(it,"factory");
-    if(!Engine->GetMeshFactories()->FindByName(factoryName))
+  factoryName = LookForKeyValue(it,"factory");
+  if(!Engine->GetMeshFactories()->FindByName(factoryName))
 	  BuildFactory(it, (char*)(const char*)factoryName, Engine);
 
-    BuildSprite(sector, it, position);
-  }
+  BuildSprite(sector, it, position);
 }
 
 //===========================================================================

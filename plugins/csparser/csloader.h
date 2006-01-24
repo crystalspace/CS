@@ -58,8 +58,6 @@ struct iLoaderPlugin;
 struct iBinaryLoaderPlugin;
 struct iObjectRegistry;
 struct iPluginManager;
-struct iModelConverter;
-struct iCrossBuilder;
 struct iCameraPosition;
 struct iDocumentNode;
 struct iDocument;
@@ -563,10 +561,6 @@ public:
   csRef<iSoundRender> SoundRender;
   // sound renderer
   csRef<iSndSysRenderer> SndSysRender;
-  // model converter
-  csRef<iModelConverter> ModelConverter;
-  // crossbuilder
-  csRef<iCrossBuilder> CrossBuilder;
 
   // constructor
   csLoader(iBase *p);

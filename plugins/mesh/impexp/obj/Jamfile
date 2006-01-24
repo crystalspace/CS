@@ -1,6 +1,0 @@
-SubDir TOP plugins mesh impexp obj ;
-
-Description objie : "OBJ Import/Export plugin" ;
-Plugin objie : [ Wildcard *.cpp *.h ] ;
-LinkWith objie : crystalspace ;
-CompileGroups objie : meshimpexp ;

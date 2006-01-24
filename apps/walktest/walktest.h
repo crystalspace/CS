@@ -56,8 +56,6 @@ struct iMeshWrapper;
 struct iLight;
 struct iView;
 struct iSoundRender;
-struct iModelConverter;
-struct iCrossBuilder;
 struct iKeyboardDriver;
 struct iVirtualClock;
 struct iGraphics3D;
@@ -317,9 +315,6 @@ public:
   csRef<iEngine> Engine;
   /// The level loader
   csRef<iLoader> LevelLoader;
-  /// The model importer and crossbuilder
-  csRef<iModelConverter> ModelConverter;
-  csRef<iCrossBuilder> CrossBuilder;
   ///
   csRef<iGraphics2D> myG2D;
   csRef<iGraphics3D> myG3D;

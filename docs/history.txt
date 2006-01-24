@@ -32,6 +32,18 @@ chronological order.
 	  any kind of model (CS library files, factories, 3ds, md2, ...).
 	- mdmkolbe did a blind commit of a patch from Razor that fixes
 	  receiving keyboard events from numpad5 when numlock is off.
+	- Jorrit removed the old model importing system (crossbuilder
+	  and similar). If you need it for some reason then you can get
+	  it back by checking out with the tag PRE_CROSSBUILD_REMOVAL.
+	- Jorrit fixed the walktest loadmesh command to use the new
+	  iLoader->Load(). That way it can load a lot more models and it
+	  is no longer tied to 3D sprites.
+	- Jorrit added a new feature to 'meshfact' in world files so that
+	  you can now do:
+	  	<meshfact name="bla" file="/lib/data/model.md2" />
+	  That way you can now create mesh factories easily from meshfact
+	  files. This works for md2, 3ds, and normal CS XML files like
+	  mesh factories and libraries.
 23-Jan-2006
 	- Jorrit changed the sequence manager to have support for removing
 	  sequences. This is done by optionally allowing to assing

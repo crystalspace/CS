@@ -30,7 +30,6 @@
 #include "cstool/keyval.h"
 #include "cstool/sndwrap.h"
 #include "cstool/mapnode.h"
-#include "cstool/mdltool.h"
 #include "cstool/vfsdirchange.h"
 #include "csloader.h"
 
@@ -78,9 +77,6 @@
 #include "iutil/verbositymanager.h"
 #include "imesh/thing.h"
 #include "imesh/nullmesh.h"
-#include "imesh/mdlconv.h"
-#include "imesh/mdldata.h"
-#include "imesh/crossbld.h"
 #include "ivaria/reporter.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/polymesh.h"
@@ -1178,8 +1174,6 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   GET_PLUGIN (G3D, iGraphics3D, "video driver");
   GET_PLUGIN (SoundRender, iSoundRender, "sound driver");
   GET_PLUGIN (SndSysRender, iSndSysRenderer, "sound driver (v2)");
-  GET_PLUGIN (ModelConverter, iModelConverter, "model converter");
-  GET_PLUGIN (CrossBuilder, iCrossBuilder, "model crossbuilder");
 
   SndSysManager = CS_QUERY_REGISTRY (object_reg, iSndSysManager);
   if (!SndSysManager)
@@ -1251,7 +1245,26 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
       	break;
       case XMLTOKEN_MESHFACT:
         {
-	  const char* name = child->GetAttributeValue ("name");
+	  csRef<iDocumentAttribute> attr_name = child->GetAttribute ("name");
+	  const char* name = attr_name ? attr_name->GetValue () : 0;
+	  csRef<iDocumentAttribute> attr_file = child->GetAttribute ("file");
+	  if (attr_file)
+	  {
+	    const char* filename = attr_file->GetValue ();
+	    iBase* result;
+	    if (!Load (filename, result, ldr_context->GetRegion (),
+	  	  ldr_context->CurrentRegionOnly (),
+		  ldr_context->CheckDupes (),
+		  ssource, name))
+	    {
+              SyntaxService->ReportError (
+	        "crystalspace.maploader.parse.loadingmodel",
+	        child, "Error opening file model '%s'!", filename);
+	      return false;
+	    }
+	    break;
+	  }
+
 	  if (ldr_context->CheckDupes () && name)
 	  {
 	    iMeshFactoryWrapper* t = Engine->FindMeshFactory (name);
@@ -2360,40 +2373,24 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 
       case XMLTOKEN_FILE:
         {
-          if (!ModelConverter || !CrossBuilder) return false;
-
+	  ReportWarning (
+	        "crystalspace.maploader.parse.meshfact",
+                child, "<file> is now obsolete. Use <meshfact> in the world!");
+#if 0
 	  const char* filename = child->GetContentsValue ();
-          csRef<iDataBuffer> buf (VFS->ReadFile (filename));
-	  if (!buf)
+	  csRef<iDocumentAttribute> attr_name = child->GetAttribute ("name");
+	  iBase* result;
+	  if (!Load (filename, result, ldr_context->GetRegion (),
+	  	ldr_context->CurrentRegionOnly (),
+		ldr_context->CheckDupes (),
+		ssource, attr_name ? attr_name->GetValue () : 0))
 	  {
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.loadingmodel",
 	      child, "Error opening file model '%s'!", filename);
 	    return false;
 	  }
-
-	  csRef<iModelData> Model (ModelConverter->Load (buf->GetUint8 (),
-	  	buf->GetSize ()));
-          if (!Model)
-	  {
-            SyntaxService->ReportError (
- 	      "crystalspace.maploader.parse.loadingmodel",
-	      child, "Error loading file model '%s'!", filename);
-	    return false;
-	  }
-
-	  csModelDataTools::SplitObjectsByMaterial (Model);
-	  csModelDataTools::MergeObjects (Model, false);
-	  iMeshFactoryWrapper *stemp2 =
-	    CrossBuilder->BuildSpriteFactoryHierarchy (Model, Engine, mat);
-
-	  stemp->SetMeshObjectFactory (stemp2->GetMeshObjectFactory ());
-	  int i;
-	  iMeshFactoryList* mfl2 = stemp2->GetChildren ();
-	  iMeshFactoryList* mfl = stemp->GetChildren ();
-	  for (i=0; i<mfl2->GetCount (); i++)
-	    mfl->Add (mfl2->Get (i));
-	  stemp2->DecRef ();
+#endif
         }
         break;
 
