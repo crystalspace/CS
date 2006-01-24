@@ -138,7 +138,6 @@ if [ Property build : projgen_version ] != 6
 WALKTEST_STATIC.PLUGINLIST =
   $(WALKALL.PLUGINLIST)
   bruteblock
-  crossbld
   csbmpimg
   rendstep_stencil
   ;

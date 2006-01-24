@@ -44,6 +44,8 @@ chronological order.
 	  That way you can now create mesh factories easily from meshfact
 	  files. This works for md2, 3ds, and normal CS XML files like
 	  mesh factories and libraries.
+	- Jorrit fixed the walktest_static target by removing 'crossbld'
+	  target.
 23-Jan-2006
 	- Jorrit changed the sequence manager to have support for removing
 	  sequences. This is done by optionally allowing to assing
