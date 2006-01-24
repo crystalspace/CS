@@ -27,6 +27,16 @@
 #include <string.h>
 #include <stdarg.h>
 
+/*
+ perl.h includes dirent.h on some configurations which conflicts with
+ the CS definitions of dirent, opendir, etc.  So define _DIRENT_H_ to 
+ make dirent.h skip its body.  This is hackish but no better solution
+ has been found.
+*/
+#ifndef _DIRENT_H_
+#define _DIRENT_H_
+#endif
+
 #undef MIN
 #undef MAX
 #include <EXTERN.h>

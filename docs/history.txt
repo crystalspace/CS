@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Jan-2006
+	- mdmkolbe removed a VC6 workaround from SCF.
+	- mdmkolbe fixed a few more dirent.h issues with the Perl 5 bindings.
 23-Jan-2006
 	- Jorrit changed the sequence manager to have support for removing
 	  sequences. This is done by optionally allowing to assing

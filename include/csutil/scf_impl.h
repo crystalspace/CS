@@ -127,35 +127,35 @@ public:
   inline void *QueryInterface(scfInterfaceID id, scfInterfaceVersion version)
   {
 #if SCF_IMPL_N >= 1
-    void *x;
-    if((x = VC6Workaround<I1>::GetInterface(this->scfObject, id, version)) != 0) return x;
+    void *x; // Inside #if avoids unused variable warnings for SCF_IMPL_N == 0
+    if((x = GetInterface<I1>(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 2
-    if((x = VC6Workaround<I2>::GetInterface(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I2>(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 3
-    if((x = VC6Workaround<I3>::GetInterface(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I3>(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 4
-    if((x = VC6Workaround<I4>::GetInterface(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I4>(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 5
-    if((x = VC6Workaround<I5>::GetInterface(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I5>(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 6
-    if((x = VC6Workaround<I6>::GetInterface(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I6>(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 7
-    if((x = VC6Workaround<I7>::GetInterface(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I7>(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 8
-    if((x = VC6Workaround<I8>::GetInterface(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I8>(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 9
-    if((x = VC6Workaround<I9>::GetInterface(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I9>(this->scfObject, id, version)) != 0) return x;
 #endif
 #if SCF_IMPL_N >= 10
-    if((x = VC6Workaround<I10>::GetInterface(this->scfObject, id, version)) != 0) return x;
+    if((x = GetInterface<I10>(this->scfObject, id, version)) != 0) return x;
 #endif
 
     return SCF_IMPL_SUPER::QueryInterface(id, version);
@@ -237,101 +237,105 @@ protected:
 
 private:
   template<typename I>
-  struct VC6Workaround
+  CS_FORCEINLINE static void* GetInterface(
+    Class* scfObject, scfInterfaceID id, scfInterfaceVersion version)
   {
-    typedef typename_qualifier scfInterfaceTraits<I>::InterfaceType 
-      InterfaceType;
+    if (id == scfInterfaceTraits<I>::GetID() &&
+      scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))
+    {
+      scfObject->IncRef();
+      return CS_STATIC_CAST(
+        typename_qualifier scfInterfaceTraits<I>::InterfaceType*, scfObject);
+    }
+    else
+    {
+      return 0;
+    }
+  }
 
-    CS_FORCEINLINE static void* GetInterface(
-    	Class* scfObject, scfInterfaceID id, scfInterfaceVersion version)
-    {
-      if (id == scfInterfaceTraits<I>::GetID() &&
-	  scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))
-      {
-	scfObject->IncRef();
-	return CS_STATIC_CAST(InterfaceType*, scfObject);
-      }
-      else
-      {
-	return 0;
-      }
-    }
-    CS_FORCEINLINE static void AddReftrackerAlias (Class* scfObject)
-    {
-      csRefTrackerAccess::AddAlias (CS_STATIC_CAST(InterfaceType*, scfObject),
-	scfObject);
-    }
-    CS_FORCEINLINE static void RemoveReftrackerAlias (Class* scfObject)
-    {
-      csRefTrackerAccess::RemoveAlias (CS_STATIC_CAST(InterfaceType*, scfObject),
-	scfObject);
-    }
-  };
+  template<typename I>
+  CS_FORCEINLINE static void AddReftrackerAlias (Class* scfObject)
+  {
+    csRefTrackerAccess::AddAlias(
+      CS_STATIC_CAST(
+        typename_qualifier scfInterfaceTraits<I>::InterfaceType*, scfObject),
+      scfObject);
+  }
+
+  template<typename I>
+  CS_FORCEINLINE static void RemoveReftrackerAlias (Class* scfObject)
+  {
+    csRefTrackerAccess::RemoveAlias(
+      CS_STATIC_CAST(
+        typename_qualifier scfInterfaceTraits<I>::InterfaceType*, scfObject),
+      scfObject);
+  }
  
   void AddReftrackerAliases ()
   {
 #if SCF_IMPL_N >= 1
-    VC6Workaround<I1>::AddReftrackerAlias (this->scfObject);
+    AddReftrackerAlias<I1>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 2
-    VC6Workaround<I2>::AddReftrackerAlias (this->scfObject);
+    AddReftrackerAlias<I2>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 3
-    VC6Workaround<I3>::AddReftrackerAlias (this->scfObject);
+    AddReftrackerAlias<I3>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 4
-    VC6Workaround<I4>::AddReftrackerAlias (this->scfObject);
+    AddReftrackerAlias<I4>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 5
-    VC6Workaround<I5>::AddReftrackerAlias (this->scfObject);
+    AddReftrackerAlias<I5>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 6
-    VC6Workaround<I6>::AddReftrackerAlias (this->scfObject);
+    AddReftrackerAlias<I6>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 7
-    VC6Workaround<I7>::AddReftrackerAlias (this->scfObject);
+    AddReftrackerAlias<I7>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 8
-    VC6Workaround<I8>::AddReftrackerAlias (this->scfObject);
+    AddReftrackerAlias<I8>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 9
-    VC6Workaround<I9>::AddReftrackerAlias (this->scfObject);
+    AddReftrackerAlias<I9>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 10
-    VC6Workaround<I10>::AddReftrackerAlias (this->scfObject);
+    AddReftrackerAlias<I10>(this->scfObject);
 #endif
   }
+
   void RemoveReftrackerAliases ()
   {
 #if SCF_IMPL_N >= 1
-    VC6Workaround<I1>::RemoveReftrackerAlias (this->scfObject);
+    RemoveReftrackerAlias<I1>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 2
-    VC6Workaround<I2>::RemoveReftrackerAlias (this->scfObject);
+    RemoveReftrackerAlias<I2>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 3
-    VC6Workaround<I3>::RemoveReftrackerAlias (this->scfObject);
+    RemoveReftrackerAlias<I3>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 4
-    VC6Workaround<I4>::RemoveReftrackerAlias (this->scfObject);
+    RemoveReftrackerAlias<I4>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 5
-    VC6Workaround<I5>::RemoveReftrackerAlias (this->scfObject);
+    RemoveReftrackerAlias<I5>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 6
-    VC6Workaround<I6>::RemoveReftrackerAlias (this->scfObject);
+    RemoveReftrackerAlias<I6>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 7
-    VC6Workaround<I7>::RemoveReftrackerAlias (this->scfObject);
+    RemoveReftrackerAlias<I7>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 8
-    VC6Workaround<I8>::RemoveReftrackerAlias (this->scfObject);
+    RemoveReftrackerAlias<I8>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 9
-    VC6Workaround<I9>::RemoveReftrackerAlias (this->scfObject);
+    RemoveReftrackerAlias<I9>(this->scfObject);
 #endif
 #if SCF_IMPL_N >= 10
-    VC6Workaround<I10>::RemoveReftrackerAlias (this->scfObject);
+    RemoveReftrackerAlias<I10>(this->scfObject);
 #endif
   }
 };
