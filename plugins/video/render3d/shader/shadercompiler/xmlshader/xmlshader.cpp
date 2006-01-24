@@ -343,7 +343,11 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
       }
       csRenderBufferName sourceName = 
 	csRenderBuffer::GetBufferNameFromDescr (source);
-      if ((sourceName == CS_BUFFER_NONE) || (cname != 0)) 
+      
+      // The user has explicitly asked for a "none" mapping
+      const bool explicitlyUnmapped = (strcasecmp (source, "none") == 0);
+      if (((sourceName == CS_BUFFER_NONE) || (cname != 0)) 
+	&& !explicitlyUnmapped)
       {
         //custom name
 	if (cname == 0)
@@ -366,7 +370,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
       else
       {
         //default mapping
-	if (sourceName < CS_BUFFER_POSITION)
+	if ((sourceName < CS_BUFFER_POSITION) && !explicitlyUnmapped)
         {
           SetFailReason ("invalid buffermapping, '%s' not allowed here.",
 	    source);
@@ -386,12 +390,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
 	   * turn off the default map. */
 	  if (sourceName == CS_BUFFER_POSITION)
 	    pass->defaultMappings[CS_VATTRIB_POSITION] = CS_BUFFER_NONE;
-	  else if (sourceName == CS_BUFFER_COLOR)
-	    pass->defaultMappings[CS_VATTRIB_COLOR] = CS_BUFFER_NONE;
-	  else if (sourceName == CS_BUFFER_NORMAL)
-	    pass->defaultMappings[CS_VATTRIB_NORMAL] = CS_BUFFER_NONE;
-	  else if (sourceName == CS_BUFFER_TEXCOORD0)
-	    pass->defaultMappings[CS_VATTRIB_TEXCOORD] = CS_BUFFER_NONE;
 	}
       }
     }

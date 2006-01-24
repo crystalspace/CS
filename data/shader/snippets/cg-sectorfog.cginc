@@ -8,6 +8,8 @@ struct AppToVert_Fog
 <?if vars."fog density".float &gt; 0 ?>
   uniform float4 fogPlaneS;
   uniform float4 fogPlaneT;
+  uniform float4x4 ModelView : state.matrix.modelview;
+  float4 Position : POSITION;
 <?endif?>
 };
 
@@ -17,9 +19,10 @@ struct VertToFrag_Fog
   float2 fogTC;
 <?endif?>
   
-  void Compute (AppToVert_Fog IN, float4 eyePos)
+  void Compute (AppToVert_Fog IN)
   {
   <?if vars."fog density".float &gt; 0 ?>
+    float4 eyePos = mul (IN.ModelView, IN.Position);
     fogTC.x = dot (eyePos, IN.fogPlaneS);
     fogTC.y = dot (eyePos, IN.fogPlaneT);
   <?endif?>
@@ -40,7 +43,7 @@ struct AppToFrag_Fog
     float4 result;
     result.rgb = lerp (color.rgb, fogColor.rgb, fog.a);
     result.a = color.a;
-    return result;//float4(V2F.fogTC.x, V2F.fogTC.y, 0, 1);
+    return result;
   <?else?>
     return color;
   <?endif?>

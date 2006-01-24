@@ -6,10 +6,12 @@
       <pass>
 	<?if vars."tex diffuse".texture ?>
 	  <texture name="tex diffuse" destination="diffuse" />
+	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
 	<?else?>
 	  <!-- need to bind at least some texture -->
 	  <texture name="standardtex white" destination="diffuse" />
 	<?endif?>
+	<buffer source="color" destination="color" />
 	<vp plugin="glfixed">
 	  <fixedvp>
 	    <?if !vars."tex diffuse".texture ?>

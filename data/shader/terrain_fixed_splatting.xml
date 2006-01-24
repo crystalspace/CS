@@ -10,7 +10,9 @@
     <pass>
       <mixmode><srcalphaadd /></mixmode>
       <alphamode><smooth /></alphamode>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <buffer source="texture coordinate 0" destination="texture coordinate 1" />
+      <buffer source="color" destination="color" />
       <vp plugin="glfixed">
 	<fixedvp>
 	  <texmatrix layer="0">
@@ -62,7 +64,9 @@
     <pass>
       <mixmode><srcalphaadd /></mixmode>
       <alphamode><smooth /></alphamode>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <buffer source="texture coordinate 0" destination="texture coordinate 1" />
+      <buffer source="color" destination="color" />
       <vp plugin="glfixed">
 	<fixedvp>
 	  <texmatrix layer="0">

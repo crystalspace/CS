@@ -4,6 +4,7 @@
       <mixmode>
         <copy />
       </mixmode>
+      <buffer source="normal" destination="normal" />
       <writemask r="false" g="false" b="false" a="false" />
       <vp plugin="glarb" file="/shader/shadowextrude2.avp" />
     </pass>

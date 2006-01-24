@@ -8,6 +8,7 @@
       <buffer source="normal" destination="normal" />
       <buffer source="tangent" destination="texture coordinate 1" />
       <buffer source="binormal" destination="texture coordinate 2" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/bump_ppl_diffuse_attn2.avp" />
       <texture destination="unit 0" name="light 0 attenuationtex" />
       <texture destination="unit 1" name="light 0 attenuationtex" />

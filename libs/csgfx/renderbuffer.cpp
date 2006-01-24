@@ -241,6 +241,7 @@ csRenderBufferName csRenderBuffer::GetBufferNameFromDescr (const char* name)
     {"generic 3",		    CS_BUFFER_GENERIC3},
     {"index",			    CS_BUFFER_INDEX},
     {"lit color",		    CS_BUFFER_COLOR},
+    {"none",			    CS_BUFFER_NONE},
     {"normal",			    CS_BUFFER_NORMAL},
     {"position",		    CS_BUFFER_POSITION},
     {"primary color",		    CS_BUFFER_COLOR},

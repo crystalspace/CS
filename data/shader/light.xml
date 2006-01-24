@@ -25,6 +25,8 @@
         <destalphaadd />
       </mixmode>
       <buffer source="normal" destination="normal" />
+      <buffer source="color" destination="color" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_diffuse.avp" />
       <texture destination="unit 0" name="standardtex normalization map" />
       <texture destination="unit 1" name="standardtex normalization map" />
@@ -61,6 +63,7 @@
       <mixmode>
         <copy />
       </mixmode>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
       <texture destination="unit 0" name="light 0 attenuationtex" />
       <texture destination="unit 1" name="light 0 attenuationtex" />
@@ -84,6 +87,7 @@
       </mixmode>
       <writemask r="false" g="false" b="false" a="true" />
       <buffer source="normal" destination="normal" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_diffuse_a.avp" />
       <texture destination="unit 0" name="standardtex normalization map" />
       <texture destination="unit 1" name="standardtex normalization map" />
@@ -105,6 +109,7 @@
       <mixmode>
         <destalphaadd />
       </mixmode>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_diffuse_b.avp" />
       <texture destination="unit 0" name="tex diffuse" />
       <fp plugin="glfixed">
@@ -124,6 +129,7 @@
         <add />
       </mixmode>
       <buffer source="normal" destination="normal" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/vertexlight.avp" />
       <texture destination="unit 0" name="tex diffuse" />
       <fp plugin="glfixed">
@@ -143,6 +149,7 @@
         <add />
       </mixmode>
       <buffer source="normal" destination="normal" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glfixed" file="/shader/vertexlight.fvp" />
       <texture destination="unit 0" name="tex diffuse" />
       <fp plugin="glfixed">

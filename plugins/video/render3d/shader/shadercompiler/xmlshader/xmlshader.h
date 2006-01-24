@@ -64,9 +64,6 @@ private:
         defaultMappings[i] = CS_BUFFER_NONE;
 
       defaultMappings[CS_VATTRIB_POSITION] = CS_BUFFER_POSITION;
-      defaultMappings[CS_VATTRIB_COLOR] = CS_BUFFER_COLOR;
-      defaultMappings[CS_VATTRIB_NORMAL] = CS_BUFFER_NORMAL;
-      defaultMappings[CS_VATTRIB_TEXCOORD] = CS_BUFFER_TEXCOORD0;
     }
 
     enum

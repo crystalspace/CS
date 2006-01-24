@@ -35,16 +35,14 @@ VertToFrag VertexMain (AppToVert A2V,
 		       /* The matrices are bound with the state.matrix.... semantics.
 			* For more info see the Cg and ARB_vertex_program docs.
 			*/
-		       uniform float4x4 ModelViewProj : state.matrix.mvp,
-		       uniform float4x4 ModelView : state.matrix.modelview)
+		       uniform float4x4 ModelViewProj : state.matrix.mvp)
 {
   VertToFrag V2F;
 
   V2F.Hposition = mul (ModelViewProj, A2V.Position);
   V2F.surface.Compute (A2V.surface);
   V2F.lighting.Compute (A2V.lighting);
-  float4 eyePos = mul (ModelView, A2V.Position);
-  V2F.fog.Compute (A2V.fog, eyePos);
+  V2F.fog.Compute (A2V.fog);
 
   return V2F;
 }

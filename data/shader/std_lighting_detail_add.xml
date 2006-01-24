@@ -3,13 +3,16 @@
   <technique priority="200">
     <tag>detail texture</tag>
     <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <buffer source="texture coordinate 0" destination="texture coordinate 1" />
-      <buffer source="texture coordinate lightmap" destination="texture coordinate 2" />
       <texture name="tex detail" destination="unit 0" />
       <texture name="tex diffuse" destination="unit 1" />
-      <texture name="tex lightmap" destination="unit 2" />
       <?if !vars."tex lightmap".texture ?>
-	<texture name="tex diffuse" destination="unit 3" />
+	<texture name="tex diffuse" destination="unit 2" />
+	<buffer source="color" destination="color" />
+      <?else?>
+	<texture name="tex lightmap" destination="unit 2" />
+	<buffer source="texture coordinate lightmap" destination="texture coordinate 2" />
       <?endif?>
       <vp plugin="glfixed">
         <fixedvp>
@@ -53,6 +56,7 @@
     </pass>
     <?include snippets/fog-pass.inc ?>
   </technique>
+
   <technique priority="150">
     <tag>detail texture</tag>
     <tag>multipass detail texture</tag>

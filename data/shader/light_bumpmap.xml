@@ -7,6 +7,7 @@
       <buffer source="normal" destination="normal" />
       <buffer source="tangent" destination="texture coordinate 1" />
       <buffer source="binormal" destination="texture coordinate 2" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/bump_ppl_diffuse_attn.avp" />
       <texture destination="unit 0" name="light 0 attenuationtex" />
       <texture destination="unit 1" name="light 0 attenuationtex" />
@@ -62,6 +63,7 @@
       <mixmode>
         <copy />
       </mixmode>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
       <texture destination="unit 0" name="light 0 attenuationtex" />
       <texture destination="unit 1" name="light 0 attenuationtex" />
@@ -86,6 +88,7 @@
       <buffer source="normal" destination="normal" />
       <buffer source="tangent" destination="texture coordinate 1" />
       <buffer source="binormal" destination="texture coordinate 2" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/bump_ppl_diffuse.avp" />
       <texture destination="unit 0" name="standardtex normalization map" />
       <texture destination="unit 1" name="tex normal" />
@@ -122,6 +125,7 @@
       <mixmode>
         <copy />
       </mixmode>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
       <texture destination="unit 0" name="light 0 attenuationtex" />
       <texture destination="unit 1" name="light 0 attenuationtex" />
@@ -147,6 +151,7 @@
       <buffer source="normal" destination="normal" />
       <buffer source="tangent" destination="texture coordinate 1" />
       <buffer source="binormal" destination="texture coordinate 2" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/bump_ppl_diffuse_a.avp" />
       <texture destination="unit 0" name="standardtex normalization map" />
       <texture destination="unit 1" name="tex normal" />
@@ -168,6 +173,7 @@
       <mixmode>
         <destalphaadd />
       </mixmode>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_diffuse_b.avp" />
       <texture destination="unit 0" name="tex diffuse" />
       <fp plugin="glfixed">
@@ -188,6 +194,7 @@
         <copy />
       </mixmode>
       <buffer source="position" destination="attribute 0" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
       <texture destination="unit 0" name="light 0 attenuationtex" />
       <texture destination="unit 1" name="light 0 attenuationtex" />
@@ -210,6 +217,7 @@
         <destalphaadd />
       </mixmode>
       <buffer source="normal" destination="normal" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_diffuse.avp" />
       <texture destination="unit 0" name="standardtex normalization map" />
       <texture destination="unit 1" name="standardtex normalization map" />
@@ -246,6 +254,7 @@
       <mixmode>
         <copy />
       </mixmode>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
       <texture destination="unit 0" name="light 0 attenuationtex" />
       <texture destination="unit 1" name="light 0 attenuationtex" />
@@ -268,6 +277,7 @@
         <multiply />
       </mixmode>
       <writemask r="false" g="false" b="false" a="true" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <buffer source="normal" destination="normal" />
       <vp plugin="glarb" file="/shader/flat_ppl_diffuse_a.avp" />
       <texture destination="unit 0" name="standardtex normalization map" />
@@ -290,6 +300,7 @@
       <mixmode>
         <destalphaadd />
       </mixmode>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_diffuse_b.avp" />
       <texture destination="unit 0" name="tex diffuse" />
       <fp plugin="glfixed">
@@ -309,6 +320,7 @@
         <add />
       </mixmode>
       <buffer source="normal" destination="normal" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/vertexlight.avp" />
       <texture destination="unit 0" name="tex diffuse" />
       <fp plugin="glfixed">
@@ -327,6 +339,7 @@
       <mixmode>
         <add />
       </mixmode>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <buffer source="normal" destination="normal" />
       <vp plugin="glfixed" file="/shader/vertexlight.fvp" />
       <texture destination="unit 0" name="tex diffuse" />

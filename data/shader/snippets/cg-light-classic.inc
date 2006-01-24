@@ -4,6 +4,8 @@
       <buffer source="texture coordinate lightmap" 
 	destination="A2V.lighting.texCoordLM" />
       <texture name="tex lightmap" destination="A2F.lighting.lightmap" />
+    <?else?>
+      <buffer source="color" destination="A2V.lighting.color" />
     <?endif?>
   <?endtemplate?>
   <?template Cg_VariableMap_Lighting ?>

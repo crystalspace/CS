@@ -32,6 +32,7 @@
     <pass>
       <mixmode><srcalphaadd/></mixmode>
       <buffer source="normal" destination="normal" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glarb" file="/shader/compressed_splatting_scattering.avp" />
       <texture destination="unit 0" name="standardtex normalization map" />
       <texture destination="unit 1" name="tex normal" />

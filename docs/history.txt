@@ -51,6 +51,15 @@ chronological order.
 	- res fixed a gl3d crash when no canvas is present.
 	- res fixed gl3d to properly activate buffers from a holder bound to 
 	  the secondary color.
+	- res changed the xmlshader plugin to not have buffer mappings for
+	  the color, normal and texcoord buffers by default. While conveniant,
+	  it could also result in subtle performance issues, e.g. when a
+	  buffer is autobound that has to be calculated relatively expensively
+	  by a buffer getter, yet is not used in the actual shader (e.g. Thing
+	  vertex colors, which are often not used). In this context, requiring 
+	  an explicit mapping of all buffers seems the better approach - you
+	  can see if you forgot a mapping, but may never notice if you waste
+	  cycles because of an autobound buffer you don't need.
 23-Jan-2006
 	- Jorrit changed the sequence manager to have support for removing
 	  sequences. This is done by optionally allowing to assing
