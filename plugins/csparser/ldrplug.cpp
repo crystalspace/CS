@@ -146,18 +146,51 @@ void csLoader::csLoadedPluginVector::NewPlugin
 {
   csScopedMutexLock lock (mutex);
   csRef<iDocumentNode> id = child->GetNode ("id");
-  if (id)
+  csRef<iDocumentNode> defaults = child->GetNode ("defaults");
+
+  csLoaderPluginRec* pl = FindPluginRec (ShortName);
+  if (pl)
   {
-    const char* ClassID = id->GetContentsValue ();
-    csLoaderPluginRec* pr = new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0);
+    // There is already an entry with this name. We check if it has
+    // the same class id. If not we replace it anyway.
     csRef<iDocumentNode> defaults = child->GetNode ("defaults");
-    pr->SetDefaults (defaults);
-    vector.Push (pr);
+    pl->SetDefaults (defaults);
+    if (id)
+    {
+      const char* ClassID = id->GetContentsValue ();
+      if (pl->ClassID != ClassID)
+      {
+        vector.Delete (pl);
+	pl = new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0);
+	vector.Push (pl);
+      }
+      pl->SetDefaults (defaults);
+    }
+    else
+    {
+      const char* ClassID = child->GetContentsValue ();
+      if (pl->ClassID != ClassID)
+      {
+        vector.Delete (pl);
+        vector.Push (new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0));
+      }
+    }
   }
   else
   {
-    const char* ClassID = child->GetContentsValue ();
-    vector.Push (new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0));
+    if (id)
+    {
+      const char* ClassID = id->GetContentsValue ();
+      csLoaderPluginRec* pr = new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0);
+      csRef<iDocumentNode> defaults = child->GetNode ("defaults");
+      pr->SetDefaults (defaults);
+      vector.Push (pr);
+    }
+    else
+    {
+      const char* ClassID = child->GetContentsValue ();
+      vector.Push (new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0));
+    }
   }
 }
 

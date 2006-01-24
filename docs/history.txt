@@ -11,6 +11,9 @@ chronological order.
 	- mdmkolbe fixed a few more dirent.h issues with the Perl 5 bindings.
 	- Jorrit fixed a bad bug in the gmesh 3ds loader plugin which basically
 	  prevented it from loading more then one model without crashing.
+	- Jorrit fixed a big memory leak in the loader. Every time the loader
+	  parsed a plugins section with a plugin it previously encountered
+	  the plugin would be loaded again which caused big leaks.
 23-Jan-2006
 	- Jorrit changed the sequence manager to have support for removing
 	  sequences. This is done by optionally allowing to assing
