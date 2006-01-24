@@ -62,6 +62,9 @@ private:
   bool LoadMeshObjectData (iLoaderContext* ldr_context,
   	iGeneralFactoryState* gmstate, Lib3dsMesh *p3dsMesh,
 	Lib3dsMaterial* pCurMaterial);
+  iMeshFactoryWrapper* Load (const char* factname, const char* filename,
+  	iDataBuffer* buffer);
+  bool Test3DS (uint8 *Buffer, size_t Size);
 
   csArray<csMatAndTris> materials_and_tris;
 
@@ -80,6 +83,9 @@ public:
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 
   virtual iMeshFactoryWrapper* Load (const char* factname, const char* filename);
+  virtual iMeshFactoryWrapper* Load (const char* factname, iDataBuffer* buffer);
+  virtual bool IsRecognized (const char* filename);
+  virtual bool IsRecognized (iDataBuffer* buffer);
 };
 
 } // namespace cspluginGenmesh3DS

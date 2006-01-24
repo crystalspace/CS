@@ -28,6 +28,7 @@
  * @{ */
 
 struct iMeshFactoryWrapper;
+struct iDataBuffer;
 
 /**
  * Some loader plugins implement this as an easier way to load a factory from
@@ -53,6 +54,26 @@ struct iModelLoader : public virtual iBase
    */
   virtual iMeshFactoryWrapper* Load (const char* factname,
     const char* filename) = 0;
+
+  /**
+   * Create a mesh factory and load the given model into it.
+   * \param factname The name of the factory.
+   * \param buffer The buffer containing the file.
+   * \return a mesh factory wrapper on success or otherwise 0. The error
+   * will be reported to the reporter.
+   */
+  virtual iMeshFactoryWrapper* Load (const char* factname,
+    iDataBuffer* buffer) = 0;
+
+  /**
+   * Test if the model is recognized by this model loader.
+   */
+  virtual bool IsRecognized (const char* filename) = 0;
+
+  /**
+   * Test if the model is recognized by this model loader.
+   */
+  virtual bool IsRecognized (iDataBuffer* buffer) = 0;
 };
 
 /** @} */

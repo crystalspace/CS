@@ -192,6 +192,31 @@ static bool CheckMD2Version (csFileReadHelper& in)
   return true;
 }
 
+bool csSprite3DMD2FactoryLoader::TestMD2 (uint8 *Buffer, size_t Size)
+{
+  // Prepare input buffer
+  csRef<iFile> file;
+  file.AttachNew (new csMemFile ((const char*)Buffer, Size));
+  csFileReadHelper in (file);
+  // Check for the correct version
+  if (!CheckMD2Version (in))
+    return false;
+  return true;
+}
+
+bool csSprite3DMD2FactoryLoader::IsRecognized (const char* filename)
+{
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  csRef<iDataBuffer> dbuf = vfs->ReadFile (filename);
+  if (!dbuf) return false;
+  return IsRecognized (dbuf);
+}
+
+bool csSprite3DMD2FactoryLoader::IsRecognized (iDataBuffer* buffer)
+{
+  return TestMD2 (buffer->GetUint8 (), buffer->GetSize ());
+}
+
 #define CS_MD2_READ(num,name)						\
   hdr->name = csLittleEndian::Convert (csGetFromAddress::Int32 (	\
     buf + num * sizeof (int32)));
@@ -259,7 +284,7 @@ bool csSprite3DMD2FactoryLoader::Load (iSprite3DFactoryState* state,
 
   // Check for the correct version
   if (!CheckMD2Version (in))
-    return 0;
+    return false;
 
   // Read MD2 header
   csMD2Header Header;
@@ -490,11 +515,34 @@ csPtr<iBase> csSprite3DMD2FactoryLoader::Parse (iDataBuffer* data,
 }
 
 iMeshFactoryWrapper* csSprite3DMD2FactoryLoader::Load (const char* factname,
-	const char* filename)
+	const char* filename, iDataBuffer* buffer)
 {
   csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
   csRef<iMeshFactoryWrapper> ff = engine->CreateMeshFactory (
   	"crystalspace.mesh.object.sprite.3d", factname);
+  csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext ();
+  csRef<iBase> b = Parse (buffer, 0, ldr_context, ff->GetMeshObjectFactory ());
+  if (!b)
+  {
+    ReportError (object_reg,
+		"crystalspace.sprite3dmd2factoryloader.load",
+		filename
+		    ? "Error loading MD2 file '%s'!"
+		    : "Error loading MD2 file!", filename);
+    return 0;
+  }
+  return ff;
+}
+
+iMeshFactoryWrapper* csSprite3DMD2FactoryLoader::Load (const char* factname,
+	iDataBuffer* buffer)
+{
+  return Load (factname, 0, buffer);
+}
+
+iMeshFactoryWrapper* csSprite3DMD2FactoryLoader::Load (const char* factname,
+	const char* filename)
+{
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
   csRef<iDataBuffer> dbuf = vfs->ReadFile (filename);
   if (!dbuf)
@@ -504,16 +552,7 @@ iMeshFactoryWrapper* csSprite3DMD2FactoryLoader::Load (const char* factname,
 		"Can't load file '%s'!", filename);
     return 0;
   }
-  csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext ();
-  csRef<iBase> b = Parse (dbuf, 0, ldr_context, ff->GetMeshObjectFactory ());
-  if (!b)
-  {
-    ReportError (object_reg,
-		"crystalspace.sprite3dmd2factoryloader.load",
-		"Error loading MD2 file '%s'!", filename);
-    return 0;
-  }
-  return ff;
+  return Load (factname, filename, dbuf);
 }
 
 } // namespace cspluginSpr3Md2

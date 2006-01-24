@@ -20,6 +20,16 @@ chronological order.
 	  container mesh to the current region.
 	- Jorrit added a patch from Lak_Moore to add support for returning
 	  sector information to csColliderHelper::TraceBeam.
+	- Jorrit added iModelLoader->Load() version that accepts an iDataBuffer
+	  instead of a filename. Fixed gmesh3ds and spr3md2 to support this.
+	- Jorrit added iModelLoader->IsRecognized() so that the model loader
+	  plugin can check if some model is recognized.
+	- Jorrit added a version of iLoader->Load() that accepts an
+	  iDataBuffer.
+	- Jorrit extended iLoader->Load() so that it will now also try the
+	  3ds or md2 model loader if the file is not an XML file. That
+	  way iLoader->Load() has become a very flexible method to load
+	  any kind of model (CS library files, factories, 3ds, md2, ...).
 	- mdmkolbe did a blind commit of a patch from Razor that fixes
 	  receiving keyboard events from numpad5 when numlock is off.
 23-Jan-2006

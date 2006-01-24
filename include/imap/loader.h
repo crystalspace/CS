@@ -357,6 +357,7 @@ struct iLoader : public iBase
    * - 'library' file: 'result' will be 0.
    * - 'meshfact' file: 'result' will be the mesh factory wrapper.
    * - 'meshobj' file: 'result' will be the mesh wrapper.
+   * - 3ds/md2 models: 'result' will be the mesh factory wrapper.
    *
    * Returns false on failure.
    * <br>
@@ -383,10 +384,56 @@ struct iLoader : public iBase
    * with the same name. Only use checkDupes == true if you know that your
    * objects have unique names accross all world files.
    * \param ssource is an optional stream source for faster loading.
+   * \param override_name if this is given the the name of the loaded object
+   * will be set to that. This only works in case of meshfact, meshobj, and
+   * 3ds or md2 model.
    */
   virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false,
-	iStreamSource* ssource = 0) = 0;
+	iStreamSource* ssource = 0, const char* override_name = 0) = 0;
+
+  /**
+   * Load a file. This is a smart function that will try to recognize
+   * what kind of file it is. It recognizes the following types of
+   * files:
+   * - 'world' file: in that case 'result' will be set to the engine.
+   * - 'library' file: 'result' will be 0.
+   * - 'meshfact' file: 'result' will be the mesh factory wrapper.
+   * - 'meshobj' file: 'result' will be the mesh wrapper.
+   * - 3ds/md2 models: 'result' will be the mesh factory wrapper.
+   *
+   * Returns false on failure.
+   * <br>
+   * Note! In case a world file is loaded this function will NOT
+   * clear the engine!
+   * <br>
+   * Note! In case a mesh factory or mesh object is loaded this function
+   * will not actually do anything checkDupes is true and the mesh or
+   * factory is already in memory (with that name). This function will
+   * still return true in that case and set 'result' to the correct object.
+   * <br>
+   * Note! Use SCF_QUERY_INTERFACE on 'result' to detect what type was loaded.
+   * \param buffer is a buffer for the model contents.
+   * \param result will be set to the loaded result (see above).
+   * \param region is 0 by default which means that all loaded objects are not
+   * added to any region. If you give a region here then all loaded objects
+   * will be added to that region.
+   * \param curRegOnly is true by default which means that it will only
+   * find materials/factories/... from current region if that is given.
+   * \param checkDupes if true then materials, textures,
+   * and mesh factories will only be loaded if they don't already exist
+   * in the entire engine (ignoring regions). By default this is false because
+   * it is very legal for different world files to have different objects
+   * with the same name. Only use checkDupes == true if you know that your
+   * objects have unique names accross all world files.
+   * \param ssource is an optional stream source for faster loading.
+   * \param override_name if this is given the the name of the loaded object
+   * will be set to that. This only works in case of meshfact, meshobj, and
+   * 3ds or md2 model.
+   */
+  virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region = 0,
+  	bool curRegOnly = true, bool checkDupes = false,
+	iStreamSource* ssource = 0, const char* override_name = 0) = 0;
 
   /**
    * Load a node. This is a smart function that will try to recognize
@@ -422,10 +469,13 @@ struct iLoader : public iBase
    * with the same name. Only use checkDupes == true if you know that your
    * objects have unique names accross all world files.
    * \param ssource is an optional stream source for faster loading.
+   * \param override_name if this is given the the name of the loaded object
+   * will be set to that. This only works in case of meshfact, meshobj, and
+   * 3ds or md2 model.
    */
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region = 0,
   	bool curRegOnly = true, bool checkDupes = false,
-	iStreamSource* ssource = 0) = 0;
+	iStreamSource* ssource = 0, const char* override_name = 0) = 0;
 
   /**
    * Load a shader from a file.

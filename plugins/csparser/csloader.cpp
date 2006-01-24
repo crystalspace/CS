@@ -38,6 +38,7 @@
 #include "iutil/document.h"
 #include "imap/reader.h"
 #include "imap/ldrctxt.h"
+#include "imap/modelload.h"
 #include "imesh/lighting.h"
 #include "imesh/sprite3d.h"
 #include "imesh/object.h"
@@ -90,6 +91,8 @@
 
 #include "ivideo/shader/shader.h"
 #include "iengine/renderloop.h"
+
+#include <ctype.h>
 
 //---------------------------------------------------------------------------
 
@@ -553,6 +556,28 @@ void csLoader::ReportWarning (const char* id, iDocumentNode* node,
 }
 //---------------------------------------------------------------------------
 
+bool csLoader::LoadStructuredDoc (const char* file, iDataBuffer* buf,
+	csRef<iDocument>& doc)
+{
+  csRef<iDocumentSystem> docsys (
+      CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+  if (!docsys) docsys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
+  doc = docsys->CreateDocument ();
+  const char* error = doc->Parse (buf, true);
+  if (error != 0)
+  {
+    ReportError (
+	    "crystalspace.maploader.parse.plugin",
+	    file
+	      ? "Document system error for file '%s': %s!"
+	      : "Document system error for buffer%s: %s!",
+	    file ? file : "", error);
+    doc = 0;
+    return false;
+  }
+  return true;
+}
+
 bool csLoader::LoadStructuredDoc (const char* file, iFile* buf,
 	csRef<iDocument>& doc)
 {
@@ -621,12 +646,101 @@ csPtr<iLoaderStatus> csLoader::ThreadedLoadMapFile (const char* /*filename*/,
   return 0;
 }
 
-bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource)
+static bool TestXML (const char* b)
+{
+  while (*b && isspace (*b)) b++;
+  if (*b != '<') return false;
+  b++;
+  if (*b == '?')
+  {
+    return (b[1] == 'x' && b[2] == 'm' && b[3] == 'l' && isspace (b[4]));
+  }
+  else
+  {
+    b++;
+    if (!isalpha (*b) && *b != '_')
+      return false;
+    b++;
+    while (isalnum (*b)) b++;
+    if (!isspace (*b) && *b != '>')
+      return false;
+    return true;
+  }
+}
+
+char* model_loader_ids[] =
+{
+  "crystalspace.mesh.loader.factory.genmesh.3ds",
+  "crystalspace.mesh.loader.factory.sprite.3d.md2",
+  0
+};
+
+bool csLoader::Load (iDataBuffer* buffer, const char* fname,
+	iBase*& result, iRegion* region,
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name)
 {
   result = 0;
 
-  csRef<iFile> buf = VFS->Open (fname, VFS_FILE_READ);
+  if (TestXML (buffer->GetData ()))
+  {
+    csRef<iDocument> doc;
+    bool er = LoadStructuredDoc (fname, buffer, doc);
+    if (!er) return false;
+
+    if (doc)
+    {
+      csRef<iDocumentNode> node = doc->GetRoot ();
+      return Load (node, result, region, curRegOnly, checkDupes, ssource,
+      	override_name);
+    }
+    else
+    {
+      ReportError ("crystalspace.maploader.parse",
+        fname
+	  ? "File does not appear to be correct XML file (%s)!"
+	  : "Buffer does not appear to be correct XML!", fname);
+      return false;
+    }
+  }
+  else
+  {
+    csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (
+    	object_reg);
+    size_t i = 0;
+    while (model_loader_ids[i])
+    {
+      csRef<iModelLoader> l = csQueryPluginClass<iModelLoader> (plugin_mgr,
+      	model_loader_ids[i]);
+      if (!l)
+        l = csLoadPlugin<iModelLoader> (plugin_mgr, model_loader_ids[i]);
+      if (l && l->IsRecognized (buffer))
+      {
+        iMeshFactoryWrapper* ff = l->Load (
+		override_name ? override_name :
+		fname ? fname : "__model__", buffer);
+	if (!ff) return false;
+	result = ff;
+	return true;
+      }
+      i++;
+    }
+    ReportError ("crystalspace.maploader.parse",
+        fname
+	  ? "Model file not recognized (%s)!"
+	  : "Model buffer not recognized!", fname);
+  }
+
+  return false;
+}
+
+bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name)
+{
+  result = 0;
+
+  csRef<iDataBuffer> buf = VFS->ReadFile (fname);
 
   if (!buf)
   {
@@ -635,26 +749,21 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
     	      "Could not open map file '%s' on VFS!", fname);
     return false;
   }
+  return Load (buf, fname, result, region, curRegOnly, checkDupes, ssource,
+  	override_name);
+}
 
-  csRef<iDocument> doc;
-  bool er = LoadStructuredDoc (fname, buf, doc);
-  if (!er) return false;
-
-  if (doc)
-  {
-    csRef<iDocumentNode> node = doc->GetRoot ();
-    return Load (node, result, region, curRegOnly, checkDupes, ssource);
-  }
-  else
-  {
-    ReportError ("crystalspace.maploader.parse",
-      "File does not appear to be correct XML file (%s)!", fname);
-  }
-  return false;
+bool csLoader::Load (iDataBuffer* buffer, iBase*& result, iRegion* region,
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name)
+{
+  return Load (buffer, 0, result, region, curRegOnly, checkDupes, ssource,
+  	override_name);
 }
 
 bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource)
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name)
 {
   result = 0;
 
@@ -664,7 +773,8 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
   csRef<iDocumentNode> meshfactnode = node->GetNode ("meshfact");
   if (meshfactnode)
   {
-    const char* meshfactname = meshfactnode->GetAttributeValue ("name");
+    const char* meshfactname = override_name ? override_name :
+    	meshfactnode->GetAttributeValue ("name");
     if (ldr_context->CheckDupes () && meshfactname)
     {
       iMeshFactoryWrapper* t = Engine->FindMeshFactory (meshfactname);
@@ -691,7 +801,8 @@ bool csLoader::Load (iDocumentNode* node, iBase*& result, iRegion* region,
   csRef<iDocumentNode> meshobjnode = node->GetNode ("meshobj");
   if (meshobjnode)
   {
-    const char* meshobjname = meshobjnode->GetAttributeValue ("name");
+    const char* meshobjname = override_name ? override_name :
+    	meshobjnode->GetAttributeValue ("name");
     if (ldr_context->CheckDupes () && meshobjname)
     {
       iMeshWrapper* t = Engine->FindMeshObject (meshobjname);

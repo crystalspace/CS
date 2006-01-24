@@ -40,6 +40,14 @@ void Simple::ProcessFrame ()
 
   iCamera* c = view->GetCamera();
 
+csRef<iMeshFactoryWrapper> f = engine->CreateMeshFactory ("crystalspace.mesh.object.genmesh", "f");
+csRef <iGeneralFactoryState> fstate = scfQueryInterface <iGeneralFactoryState> (f->GetMeshObjectFactory());
+fstate->GenerateBox (csBox3 (-1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f));
+csRef<iMeshWrapper> m = engine->CreateMeshWrapper (f, "m", room, csVector3 (0));
+iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("stone");
+csRef <iGeneralMeshState> mstate = scfQueryInterface <iGeneralMeshState> (m->GetMeshObject());
+mstate->SetMaterialWrapper (mat);
+
   if (kbd->GetKeyState (CSKEY_SHIFT))
   {
     // If the user is holding down shift, the arrow keys will cause
@@ -92,6 +100,9 @@ void Simple::ProcessFrame ()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
+
+engine->RemoveObject (m);
+engine->RemoveObject (f);
 }
 
 void Simple::FinishFrame ()

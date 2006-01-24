@@ -479,6 +479,13 @@ private:
   bool LoadStructuredDoc (const char* file, iFile* buf, csRef<iDocument>& doc);
 
   /**
+   * Try loading file as a structured document via iDocumentSystem.
+   * \return False on failure.
+   */
+  bool LoadStructuredDoc (const char* file, iDataBuffer* buf,
+  	csRef<iDocument>& doc);
+
+  /**
    * Try loading the file as a structured document.
    * \return True if the documented loaded and appears to be a map file,
    *   otherwise false.
@@ -615,10 +622,18 @@ public:
 	iDocumentNode* child,
 	iStreamSource* ssource);
 
+  bool Load (iDataBuffer* buffer, const char* fname, iBase*& result,
+  	iRegion* region, bool curRegOnly, bool checkDupes,
+	iStreamSource* ssource, const char* override_name);
   virtual bool Load (const char* fname, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource);
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name);
+  virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region,
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name);
   virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region,
-  	bool curRegOnly, bool checkDupes, iStreamSource* ssource);
+  	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
+	const char* override_name);
 
   virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname,
   	iStreamSource* ssource);

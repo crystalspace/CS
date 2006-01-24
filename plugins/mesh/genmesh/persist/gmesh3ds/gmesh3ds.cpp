@@ -217,6 +217,27 @@ bool csGenmesh3DSFactoryLoader::Load (iLoaderContext* ldr_context,
   return true;
 }
 
+bool csGenmesh3DSFactoryLoader::Test3DS (uint8* buffer, size_t size)
+{
+  Lib3dsFile *p3dsFile = LoadFileData (buffer, size);
+  if (!p3dsFile) return false;
+  lib3ds_file_free (p3dsFile);
+  return true;
+}
+
+bool csGenmesh3DSFactoryLoader::IsRecognized (const char* filename)
+{
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  csRef<iDataBuffer> dbuf = vfs->ReadFile (filename);
+  if (!dbuf) return false;
+  return IsRecognized (dbuf);
+}
+
+bool csGenmesh3DSFactoryLoader::IsRecognized (iDataBuffer* buffer)
+{
+  return Test3DS (buffer->GetUint8 (), buffer->GetSize ());
+}
+
 // these are wrappers for csDataStream to interface with Lib3dsIO
 static Lib3dsBool DataErrorFunc (void *)
 {
@@ -372,11 +393,34 @@ csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (iDataBuffer* buf,
 }
 
 iMeshFactoryWrapper* csGenmesh3DSFactoryLoader::Load (const char* factname,
-	const char* filename)
+	const char* filename, iDataBuffer* buffer)
 {
   csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
   csRef<iMeshFactoryWrapper> ff = engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", factname);
+  csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext ();
+  csRef<iBase> b = Parse (buffer, 0, ldr_context, ff->GetMeshObjectFactory ());
+  if (!b)
+  {
+    ReportError (object_reg,
+		"crystalspace.genmesh3dsfactoryloader.load",
+		filename
+			? "Error loading 3DS file '%s'!"
+			: "Error loading 3DS file!", filename);
+    return 0;
+  }
+  return ff;
+}
+
+iMeshFactoryWrapper* csGenmesh3DSFactoryLoader::Load (const char* factname,
+	iDataBuffer* buffer)
+{
+  return Load (factname, 0, buffer);
+}
+
+iMeshFactoryWrapper* csGenmesh3DSFactoryLoader::Load (const char* factname,
+	const char* filename)
+{
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
   csRef<iDataBuffer> dbuf = vfs->ReadFile (filename);
   if (!dbuf)
@@ -386,16 +430,7 @@ iMeshFactoryWrapper* csGenmesh3DSFactoryLoader::Load (const char* factname,
 		"Can't load file '%s'!", filename);
     return 0;
   }
-  csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext ();
-  csRef<iBase> b = Parse (dbuf, 0, ldr_context, ff->GetMeshObjectFactory ());
-  if (!b)
-  {
-    ReportError (object_reg,
-		"crystalspace.genmesh3dsfactoryloader.load",
-		"Error loading 3DS file '%s'!", filename);
-    return 0;
-  }
-  return ff;
+  return Load (factname, filename, dbuf);
 }
 
 } // namespace cspluginGenmesh3DS

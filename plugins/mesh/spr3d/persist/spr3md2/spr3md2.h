@@ -48,6 +48,9 @@ private:
   csRef<iSyntaxService> synldr;
 
   bool Load (iSprite3DFactoryState* state, uint8 *Buffer, size_t Size);
+  iMeshFactoryWrapper* Load (const char* factname, const char* filename,
+  	iDataBuffer* buffer);
+  bool TestMD2 (uint8 *Buffer, size_t Size);
 
 public:
   /// Constructor.
@@ -64,6 +67,9 @@ public:
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 
   virtual iMeshFactoryWrapper* Load (const char* factname, const char* filename);
+  virtual iMeshFactoryWrapper* Load (const char* factname, iDataBuffer* buffer);
+  virtual bool IsRecognized (const char* filename);
+  virtual bool IsRecognized (iDataBuffer* buffer);
 };
 
 } // namespace cspluginSpr3Md2
