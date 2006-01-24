@@ -690,6 +690,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	    }
 	  MAP_KEY (XK_KP_Divide, CSKEY_PADDIV, '/');
 	  MAP_KEY (XK_KP_Begin, CSKEY_PAD5, '5');
+	  MAP_KEY (XK_KP_5, CSKEY_PAD5, '5');
 	  case XK_KP_Enter:
           case XK_Return:
 	    {

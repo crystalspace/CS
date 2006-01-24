@@ -20,6 +20,8 @@ chronological order.
 	  container mesh to the current region.
 	- Jorrit added a patch from Lak_Moore to add support for returning
 	  sector information to csColliderHelper::TraceBeam.
+	- mdmkolbe did a blind commit of a patch from Razor that fixes
+	  receiving keyboard events from numpad5 when numlock is off.
 23-Jan-2006
 	- Jorrit changed the sequence manager to have support for removing
 	  sequences. This is done by optionally allowing to assing
