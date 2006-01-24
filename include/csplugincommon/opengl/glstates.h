@@ -566,7 +566,7 @@ public:
         (GLint*)&parameter_sctype);
       glGetPointerv (GL_SECONDARY_COLOR_ARRAY_POINTER_EXT, 
         &parameter_scpointer);
-      enabled_GL_COLOR_SUM_EXT = glIsEnabled (GL_COLOR_SUM_EXT);
+      enabled_GL_COLOR_SUM_EXT = glIsEnabled (GL_COLOR_SUM_EXT) != GL_FALSE;
     }
     else
     {

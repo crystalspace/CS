@@ -205,7 +205,7 @@ void csFontServerMultiplexer::ReportFontNotFound (bool fallback, const char* fon
       "crystalspace.font.server.multiplexer",
       "Could not load font \"%s\"",
       font);
-    fontsNotFound.PutFirst (font, newSeverity);
+    fontsNotFound.PutUnique (font, newSeverity);
   }
 }
 

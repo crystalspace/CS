@@ -51,7 +51,6 @@ Description fontservers    : "font servers" ;
 Description canvases	   : "2D canvases" ;
 Description renderers	   : "3D renderers" ;
 Description meshes	   : "mesh plugins and loaders" ;
-Description meshimpexp     : "mesh import/export plugins" ;
 Description walkall  	   : "Walktest application and all required plugins" ;
 Description openglcanvas   : "canvas for the OpenGL renderer" ;
 Description softcanvas     : "canvas for the software renderer" ;

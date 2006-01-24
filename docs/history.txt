@@ -46,6 +46,11 @@ chronological order.
 	  mesh factories and libraries.
 	- Jorrit fixed the walktest_static target by removing 'crossbld'
 	  target.
+	- res changed csparser to not have a hardcoded model loader list.
+	- res made some warning fixes.
+	- res fixed a gl3d crash when no canvas is present.
+	- res fixed gl3d to properly activate buffers from a holder bound to 
+	  the secondary color.
 23-Jan-2006
 	- Jorrit changed the sequence manager to have support for removing
 	  sequences. This is done by optionally allowing to assing

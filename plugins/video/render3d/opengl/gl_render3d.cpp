@@ -1336,6 +1336,10 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
   queueEntry.attrib = CS_VATTRIB_COLOR;
   changeQueue.Push (queueEntry);
   
+  queueEntry.buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_SECONDARY_COLOR]);
+  queueEntry.attrib = CS_VATTRIB_SECONDARY_COLOR;
+  changeQueue.Push (queueEntry);
+  
   for (int i = 0; i < 8; i++)
   {
     queueEntry.buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0+i]);
@@ -3135,8 +3139,11 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
     }
   }
 
-  CanvasResize = csevCanvasResize(object_reg, G2D);
-  q->RegisterListener (scfiEventHandler, CanvasResize);
+  if (ok)
+  {
+    CanvasResize = csevCanvasResize(object_reg, G2D);
+    q->RegisterListener (scfiEventHandler, CanvasResize);
+  }
 
   return ok;
 }

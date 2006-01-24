@@ -21,6 +21,7 @@
 #include "csutil/sysfunc.h"
 #include "csqint.h"
 #include "csqsqrt.h"
+#include "iutil/stringarray.h"
 #include "ivideo/graph3d.h"
 #include "csutil/xmltiny.h"
 #include "csutil/cfgfile.h"
@@ -298,7 +299,7 @@ iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
       loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
         name);
     csRef<iTextureWrapper> rc = loader->LoadTexture (name, filename,
-	CS_TEXTURE_3D, 0, false, false, region);
+	CS_TEXTURE_3D, 0, false, false, region != 0);
     result = rc;
   }
   return result;
@@ -664,13 +665,6 @@ static bool TestXML (const char* b)
   }
 }
 
-char* model_loader_ids[] =
-{
-  "crystalspace.mesh.loader.factory.genmesh.3ds",
-  "crystalspace.mesh.loader.factory.sprite.3d.md2",
-  0
-};
-
 bool csLoader::Load (iDataBuffer* buffer, const char* fname,
 	iBase*& result, iRegion* region,
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
@@ -703,13 +697,15 @@ bool csLoader::Load (iDataBuffer* buffer, const char* fname,
   {
     csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (
     	object_reg);
-    size_t i = 0;
-    while (model_loader_ids[i])
+    csRef<iStringArray> model_loader_ids = iSCF::SCF->QueryClassList (
+      "crystalspace.mesh.loader.factory:");
+    for (size_t i = 0; i < model_loader_ids->GetSize(); i++)
     {
+      const char* plugin = model_loader_ids->Get (i);
       csRef<iModelLoader> l = csQueryPluginClass<iModelLoader> (plugin_mgr,
-      	model_loader_ids[i]);
+        plugin);
       if (!l)
-        l = csLoadPlugin<iModelLoader> (plugin_mgr, model_loader_ids[i]);
+        l = csLoadPlugin<iModelLoader> (plugin_mgr, plugin);
       if (l && l->IsRecognized (buffer))
       {
         iMeshFactoryWrapper* ff = l->Load (
