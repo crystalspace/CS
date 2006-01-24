@@ -14,6 +14,10 @@ chronological order.
 	- Jorrit fixed a big memory leak in the loader. Every time the loader
 	  parsed a plugins section with a plugin it previously encountered
 	  the plugin would be loaded again which caused big leaks.
+	- Jorrit fixed a leak with portals in the engine when portals were
+	  loaded the old way (embedded in the thing plugin). The problem was
+	  that the thing loader forgot to register the created portal
+	  container mesh to the current region.
 23-Jan-2006
 	- Jorrit changed the sequence manager to have support for removing
 	  sequences. This is done by optionally allowing to assing
