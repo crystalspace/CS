@@ -51,6 +51,8 @@ chronological order.
 	  particles mesh.
 	- Jorrit fixed instmesh and instmeshldr so they work again. In addition
 	  they now support ellipsoids too (like GenerateSphere for genmesh).
+	- Jorrit added support for 'direction variation' to the particles mesh.
+	  That way it becomes easier to make things like fountains.
 24-Jan-2006
 	- mdmkolbe removed a VC6 workaround from SCF.
 	- mdmkolbe fixed a few more dirent.h issues with the Perl 5 bindings.
