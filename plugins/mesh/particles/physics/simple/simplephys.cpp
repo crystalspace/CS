@@ -243,38 +243,35 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
                         (rng.Get() - 0.5f) * 2.0f,
 			(rng.Get() - 0.5f) * 2.0f);
       start.Normalize ();
-      start = emitter +
-        (start * ((rng.Get() * (outer_radius - inner_radius ))
-        + inner_radius ));
+      start *= ((rng.Get() * (outer_radius - inner_radius )) + inner_radius );
       break;
     }
     case CS_PART_EMIT_PLANE:
     {
       start = csVector3((rng.Get() - 0.5f) * emitx_size,
-        0.0f, (rng.Get() - 0.5f) * emity_size);
+			0.0f,
+			(rng.Get() - 0.5f) * emity_size);
       start = rotation * start;
-      start += emitter;
       break;
     }
     case CS_PART_EMIT_BOX:
       start = csVector3((rng.Get() - 0.5f) * emitx_size,
-        (rng.Get() - 0.5f) * emity_size,
-        (rng.Get() - 0.5f) * emitz_size);
+			(rng.Get() - 0.5f) * emity_size,
+			(rng.Get() - 0.5f) * emitz_size);
       start = rotation * start;
-      start += emitter;
       break;
     case CS_PART_EMIT_CYLINDER:
       start = csVector3((rng.Get() - 0.5f) * 2.0f,
-        0.0f, (rng.Get() - 0.5f) * 2.0f);
+			0.0f,
+			(rng.Get() - 0.5f) * 2.0f);
       start.Normalize ();
       start *= emitx_size * rng.Get();
       start.y = (rng.Get() - 0.5f) * emity_size;
       start = rotation * start;
-      start += emitter;
       break;
     }
 
-    point.position = start;
+    point.position = start + emitter;
     point.color = csVector4 (0.0f, 0.0f, 0.0f, 0.0f);
     point.velocity = csVector3 (0.0f, 0.0f, 0.0f);
     point.time_to_live = ttl + (timevar * rng.Get());
@@ -289,17 +286,31 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
 
   float elapsed_time = 0.0f;
 
+  float dampener = part->particles->GetDampener ();
+  float force = part->particles->GetForce ();
   float force_range = part->particles->GetForceRange ();
+  float diffusion = part->particles->GetDiffusion ();
+  csParticleForceType force_type = part->particles->GetForceType ();
+  csVector3 force_dir;
+  part->particles->GetForceDirection (force_dir);
+  csParticleFalloffType force_falloff, cone_falloff;
+  part->particles->GetFalloffType (force_falloff, cone_falloff);
+
+  csVector3 gravity;
+  part->particles->GetGravity (gravity);
+  csColor4 constant_color;
+  part->particles->GetConstantColor (constant_color);
+  csParticleColorMethod colormethod = part->particles->GetParticleColorMethod ();
+  const csArray<csColor4> &gradient_colors = part->particles->GetGradient ();
+  csRef<iParticlesColorCallback> color_callback =
+        part->particles->GetColorCallback ();
+
   for (i=0; i < dead_offset; i++)
   {
     if(elapsed_time < true_elapsed_time - time_increment)
-    {
       elapsed_time += time_increment;
-    }
     else
-    {
       elapsed_time = true_elapsed_time;
-    }
 
     // Setup for this particle
     csParticlesData &point = part->data.Get (i);
@@ -318,64 +329,44 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
     // Diffusion
     csVector3 diff((rng.Get() * 2.0f) - 1.0f, (rng.Get() * 2.0f) - 1.0f,
       (rng.Get() * 2.0f) - 1.0f);
-    diff *= part->particles->GetDiffusion ();
+    diff *= diffusion;
     point.position += (diff * elapsed_time);
 
     // Force related stuff
     float force_range_squared = (force_range * force_range);
     csVector3 dir = point.position - emitter;
     float dist_squared = dir.SquaredNorm();
-    float falloff = 1.0f;
 
-    csParticleForceType force_type;
-    force_type = part->particles->GetForceType ();
-
-    switch (force_type)
-    {
-    case CS_PART_FORCE_RADIAL:
+    if (force_type == CS_PART_FORCE_RADIAL)
       dir.Normalize ();
-      break;
-    case CS_PART_FORCE_LINEAR:
-      part->particles->GetForceDirection (dir);
-      break;
-    case CS_PART_FORCE_CONE:
-      part->particles->GetForceDirection (dir);
-      break;
+    else
+      dir = force_dir;
+
+    float falloff = 1.0f;
+    switch (force_falloff)
+    {
+      case CS_PART_FALLOFF_CONSTANT:
+        if (dist_squared > force_range_squared) falloff = 0.0f;
+        break;
+      case CS_PART_FALLOFF_LINEAR:
+        if (dist_squared > force_range_squared) falloff = 0.0f;
+        else falloff = 1.0f - (dist_squared / force_range_squared);
+        break;
+      case CS_PART_FALLOFF_PARABOLIC:
+        if (dist_squared < force_range_squared)
+          falloff = (1.0f / (force_range_squared - dist_squared));
+        break;
     }
 
-    csParticleFalloffType force_falloff, cone_falloff;
-
-    part->particles->GetFalloffType (force_falloff, cone_falloff);
-
-    switch (force_falloff) {
-    case CS_PART_FALLOFF_CONSTANT:
-      if (dist_squared > force_range_squared) falloff = 0.0f;
-      break;
-    case CS_PART_FALLOFF_LINEAR:
-      if (dist_squared > force_range_squared) falloff = 0.0f;
-      else falloff = 1.0f - (dist_squared / force_range_squared);
-      break;
-    case CS_PART_FALLOFF_PARABOLIC:
-      if (dist_squared < force_range_squared)
-        falloff = (1.0f / (force_range_squared - dist_squared));
-      break;
-    }
-
-    csVector3 gravity;
-    part->particles->GetGravity (gravity);
-
-    point.velocity += dir * (((part->particles->GetForce() * falloff -
-      fabs(point.velocity.Norm()) * part->particles->GetDampener ()) /
-      point.mass) * elapsed_time) + gravity * elapsed_time;
+    point.velocity += dir * (((force * falloff - fabs(point.velocity.Norm()) * dampener)
+    	/ point.mass) * elapsed_time) + gravity * elapsed_time;
     point.position += point.velocity * elapsed_time;
 
     // The color functions
-    switch (part->particles->GetParticleColorMethod ())
+    switch (colormethod)
     {
     case CS_PART_COLOR_CONSTANT:
     {
-      csColor4 constant_color;
-      part->particles->GetConstantColor (constant_color);
       point.color.x = constant_color.red;
       point.color.y = constant_color.green;
       point.color.z = constant_color.blue;
@@ -384,11 +375,7 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
     }
     case CS_PART_COLOR_LINEAR:
     {
-      float colortime = point.time_to_live
-        / (part->particles->GetTimeToLive ()
-        + part->particles->GetTimeVariation ());
-      const csArray<csColor4> &gradient_colors =
-        part->particles->GetGradient ();
+      float colortime = point.time_to_live / (ttl + timevar);
       int color_len = (int)gradient_colors.Length();
       if (color_len)
       {
@@ -398,12 +385,9 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
         csColor4 color1 = gradient_colors.Get(index);
         csColor4 color2 = color1;
         if (index != color_len - 1)
-        {
           color2 = gradient_colors.Get(index + 1);
-        }
 
         float pos = cref - floor(cref);
-
         point.color.x = ((1.0f - pos) * color1.red) + (pos * color2.red);
         point.color.y = ((1.0f - pos) * color1.green) + (pos * color2.green);
         point.color.z = ((1.0f - pos) * color1.blue) + (pos * color2.blue);
@@ -426,13 +410,9 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
       break;
     case CS_PART_COLOR_CALLBACK:
     {
-      csRef<iParticlesColorCallback> color_callback =
-        part->particles->GetColorCallback ();
       if (color_callback.IsValid())
       {
-        float colortime = point.time_to_live
-          / (part->particles->GetTimeToLive ()
-          + part->particles->GetTimeVariation ());
+        float colortime = point.time_to_live / (ttl + timevar);
         csColor color = color_callback->GetColor(colortime);
         point.color.x = color.red;
         point.color.y = color.green;
