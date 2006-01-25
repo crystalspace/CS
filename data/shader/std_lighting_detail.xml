@@ -66,7 +66,7 @@
       <?if vars."tex lightmap".texture ?>
 	<texture name="tex lightmap" destination="unit 1" />
       <?else?>
-	<buffer source="color" destinantion="color" />
+	<buffer source="color" destination="color" />
       <?endif?>
       <fp plugin="glfixed">
         <fixedfp>
