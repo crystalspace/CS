@@ -57,6 +57,8 @@ chronological order.
 	- Jorrit fixed animation speed in md2 loader.
 	- res fixed a bug in the font plexer where a font was not properly
 	  removed from the "loaded font cache" upon deletion.
+	- res fixed consoletest to utilize the proper output charset on
+	  non-Win32 platforms.
 24-Jan-2006
 	- mdmkolbe removed a VC6 workaround from SCF.
 	- mdmkolbe fixed a few more dirent.h issues with the Perl 5 bindings.

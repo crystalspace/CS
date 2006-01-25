@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include <locale.h>
 #include "csutil/ansicolor.h"
 #include "csutil/csuctransform.h"
 #include "csutil/sysfunc.h"
@@ -76,6 +77,9 @@ static void TestMapping (const char* str)
  *---------------------------------------------------------------------*/
 int main (int /*argc*/, char* /*argv*/ [])
 {
+  // Required so non-Win32 csPrintf() picks up the right char set
+  setlocale (LC_CTYPE, "");
+
   {
     const char** qbf = quickBrownFox;
     while (*qbf != 0)
