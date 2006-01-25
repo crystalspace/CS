@@ -248,20 +248,8 @@ bool Simple::LoadMap ()
   csRef<iVFS> VFS (CS_QUERY_REGISTRY (GetObjectRegistry (), iVFS));
   VFS->ChDir ("/lev/flarge");
   // Load the level file which is called 'world'.
-size_t i;
-	    csRef<iMemoryTracker> mtr = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	    	object_reg, "crystalspace.utilities.memorytracker",
-		iMemoryTracker);
-	      mtr->Dump (false);
-  iRegion* reg = engine->CreateRegion ("bla");
-for (i = 0 ; i < 10 ; i++)
-{
-  printf ("load %d\n", i); fflush (stdout);
-  if (!loader->LoadMapFile ("world", false, reg))
+  if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");
-  reg->DeleteAll ();
-	      mtr->Dump (false);
-}
 
   return true;
 }
