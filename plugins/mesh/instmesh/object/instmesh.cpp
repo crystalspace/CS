@@ -1498,11 +1498,11 @@ void csInstmeshMeshObjectFactory::CalculateNormals (bool compress)
   CalculateBoundingVolumes ();
 }
 
-void csInstmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere,
-    int num)
+void csInstmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& sphere,
+    int num, bool cyl_mapping, bool toponly, bool reversed)
 {
   csPrimitives::GenerateSphere (sphere, num, fact_vertices, fact_texels,
-      fact_normals, fact_triangles);
+      fact_normals, fact_triangles, cyl_mapping, toponly, reversed);
   fact_colors.SetLength (fact_vertices.Length ());
   memset (fact_colors.GetArray (), 0, sizeof (csColor4)*fact_vertices.Length ());
   CalculateBoundingVolumes ();

@@ -205,22 +205,44 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
   csVector3 emitter;
   part->particles->GetEmitPosition (emitter);
 
+  csParticleEmitType emit_type = part->particles->GetEmitType ();
+  float inner_radius, outer_radius, emitx_size, emity_size, emitz_size;
+  float ttl = part->particles->GetTimeToLive ();
+  float timevar = part->particles->GetTimeVariation ();
+  float mass = part->particles->GetMass ();
+  float massvar = part->particles->GetMassVariation ();
+  csMatrix3 rotation;
+  switch (emit_type)
+  {
+    case CS_PART_EMIT_SPHERE:
+      inner_radius = part->particles->GetSphereEmitInnerRadius ();
+      outer_radius = part->particles->GetSphereEmitOuterRadius ();
+      break;
+    case CS_PART_EMIT_BOX:
+      emitz_size = part->particles->GetEmitZSize ();
+      // FALL THRU
+    case CS_PART_EMIT_CYLINDER:
+    case CS_PART_EMIT_PLANE:
+      emitx_size = part->particles->GetEmitXSize ();
+      emity_size = part->particles->GetEmitYSize ();
+      rotation = part->particles->GetRotation ();
+      break;
+  }
+
   for (i = 0; i < (size_t)part->new_particles; i++)
   {
     csParticlesData &point = part->data.Get(i + dead_offset);
     // Emission
     csVector3 start;
 
-    switch (part->particles->GetEmitType ())
+    switch (emit_type)
     {
     case CS_PART_EMIT_SPHERE:
     {
       start = csVector3((rng.Get() - 0.5f) * 2.0f,
                         (rng.Get() - 0.5f) * 2.0f,
-			                  (rng.Get() - 0.5f) * 2.0f);
+			(rng.Get() - 0.5f) * 2.0f);
       start.Normalize ();
-      float inner_radius = part->particles->GetSphereEmitInnerRadius ();
-      float outer_radius = part->particles->GetSphereEmitOuterRadius ();
       start = emitter +
         (start * ((rng.Get() * (outer_radius - inner_radius ))
         + inner_radius ));
@@ -228,27 +250,26 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
     }
     case CS_PART_EMIT_PLANE:
     {
-      start = csVector3((rng.Get() - 0.5f) * part->particles->GetEmitXSize(),
-        0.0f, (rng.Get() - 0.5f) * part->particles->GetEmitYSize());
-      start = part->particles->GetRotation () * start;
+      start = csVector3((rng.Get() - 0.5f) * emitx_size,
+        0.0f, (rng.Get() - 0.5f) * emity_size);
+      start = rotation * start;
       start += emitter;
       break;
     }
     case CS_PART_EMIT_BOX:
-      start = csVector3((rng.Get() - 0.5f) * part->particles->GetEmitXSize(),
-        (rng.Get() - 0.5f) * part->particles->GetEmitYSize(),
-        (rng.Get() - 0.5f) * part->particles->GetEmitZSize());
-      start = part->particles->GetRotation () * start;
+      start = csVector3((rng.Get() - 0.5f) * emitx_size,
+        (rng.Get() - 0.5f) * emity_size,
+        (rng.Get() - 0.5f) * emitz_size);
+      start = rotation * start;
       start += emitter;
       break;
     case CS_PART_EMIT_CYLINDER:
       start = csVector3((rng.Get() - 0.5f) * 2.0f,
-        0.0f,
-			  (rng.Get() - 0.5f) * 2.0f);
+        0.0f, (rng.Get() - 0.5f) * 2.0f);
       start.Normalize ();
-      start *= part->particles->GetEmitXSize () * rng.Get();
-      start.y = (rng.Get() - 0.5f) * part->particles->GetEmitYSize ();
-      start = part->particles->GetRotation () * start;
+      start *= emitx_size * rng.Get();
+      start.y = (rng.Get() - 0.5f) * emity_size;
+      start = rotation * start;
       start += emitter;
       break;
     }
@@ -256,10 +277,8 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
     point.position = start;
     point.color = csVector4 (0.0f, 0.0f, 0.0f, 0.0f);
     point.velocity = csVector3 (0.0f, 0.0f, 0.0f);
-    point.time_to_live = part->particles->GetTimeToLive() +
-      (part->particles->GetTimeVariation () * rng.Get());
-    point.mass = part->particles->GetMass() +
-      (rng.Get() * part->particles->GetMassVariation ());
+    point.time_to_live = ttl + (timevar * rng.Get());
+    point.mass = mass + (rng.Get() * massvar);
   }
 
   float time_increment = true_elapsed_time / part->new_particles;

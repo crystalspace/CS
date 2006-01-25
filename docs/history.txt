@@ -47,6 +47,10 @@ chronological order.
 	  need this. So by default zsorting is now disabled which gives a great
 	  boost on performance. This no-sorting option is implemented in the simple
 	  and the ode particle physics plugins.
+	- Jorrit did some optimizations to the simple physics plugin for the
+	  particles mesh.
+	- Jorrit fixed instmesh and instmeshldr so they work again. In addition
+	  they now support ellipsoids too (like GenerateSphere for genmesh).
 24-Jan-2006
 	- mdmkolbe removed a VC6 workaround from SCF.
 	- mdmkolbe fixed a few more dirent.h issues with the Perl 5 bindings.

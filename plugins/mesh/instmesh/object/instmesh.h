@@ -613,7 +613,9 @@ public:
   void CalculateNormals (bool compress);
   void Compress ();
   void GenerateBox (const csBox3& box);
-  void GenerateSphere (const csSphere& sphere, int rim_vertices);
+  void GenerateSphere (const csEllipsoid& sphere, int rim_vertices,
+      	bool cyl_mapping = false, bool toponly = false,
+	bool reversed = false);
 
   iStringSet* GetStrings()
   { return strings; }
@@ -800,9 +802,12 @@ public:
     {
       scfParent->GenerateBox (box);
     }
-    virtual void GenerateSphere (const csSphere& sphere, int rim_vertices)
+    virtual void GenerateSphere (const csEllipsoid& sphere, int rim_vertices,
+		bool cyl_mapping = false, bool toponly = false,
+		bool reversed = false)
     {
-      scfParent->GenerateSphere (sphere, rim_vertices);
+      scfParent->GenerateSphere (sphere, rim_vertices,
+	  cyl_mapping, toponly, reversed);
     }
     virtual bool IsAutoNormals () const
     {

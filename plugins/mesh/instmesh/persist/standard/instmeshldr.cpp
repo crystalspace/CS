@@ -263,18 +263,41 @@ csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_SPHERE:
         {
 	  csVector3 center (0, 0, 0);
-	  float radius = 1.0f;
 	  int rim_vertices = 8;
+	  csEllipsoid ellips;
+	  csRef<iDocumentAttribute> attr;
 	  csRef<iDocumentNode> c = child->GetNode ("center");
 	  if (c)
-	    if (!synldr->ParseVector (c, center))
+	    if (!synldr->ParseVector (c, ellips.GetCenter ()))
 	      return 0;
-	  csRef<iDocumentAttribute> attr;
-	  attr = child->GetAttribute ("radius");
-	  if (attr) radius = attr->GetValueAsFloat ();
+	  c = child->GetNode ("radius");
+	  if (c)
+	  {
+	    if (!synldr->ParseVector (c, ellips.GetRadius ()))
+	      return 0;
+	  }
+	  else
+	  {
+	    attr = child->GetAttribute ("radius");
+	    float radius;
+	    if (attr) radius = attr->GetValueAsFloat ();
+	    else radius = 1.0f;
+	    ellips.SetRadius (csVector3 (radius, radius, radius));
+	  }
 	  attr = child->GetAttribute ("rimvertices");
 	  if (attr) rim_vertices = attr->GetValueAsInt ();
-	  state->GenerateSphere (csSphere (center, radius), rim_vertices);
+	  bool cylmapping, toponly, reversed;
+	  if (!synldr->ParseBoolAttribute (child, "cylindrical", cylmapping,
+	  	false, false))
+  	    return 0;
+	  if (!synldr->ParseBoolAttribute (child, "toponly", toponly,
+	  	false, false))
+  	    return 0;
+	  if (!synldr->ParseBoolAttribute (child, "reversed", reversed,
+	  	false, false))
+  	    return 0;
+	  state->GenerateSphere (ellips, rim_vertices,
+	      cylmapping, toponly, reversed);
 	}
         break;
       case XMLTOKEN_AUTONORMALS:
