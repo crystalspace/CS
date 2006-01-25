@@ -35,12 +35,14 @@ class csParticlesPhysicsSimple : public iParticlesPhysics
   /// Object registry.
   iObjectRegistry* object_reg;
 
-  struct particles_object {
+  struct particles_object
+  {
     iParticlesObjectState *particles;
     csArray<csParticlesData> data;
     float new_particles;
     int dead_particles;
     float total_elapsed_time;
+    bool zsort_enabled;
   };
   csArray<particles_object*> partobjects;
 

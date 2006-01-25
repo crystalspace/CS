@@ -118,6 +118,7 @@ private:
   float particle_radius;
 
   csString physics_plugin;
+  bool physics_zsort;
 
   csArray<csColor4> gradient_colors;
 
@@ -129,6 +130,7 @@ private:
   csFlags flags;
 
   uint mixmode;
+  bool zsort_enabled;
 
 public:
   CS_LEAKGUARD_DECLARE (csParticlesFactory);
@@ -338,6 +340,8 @@ public:
   { mixmode = mode; }
   uint GetMixMode () const
   { return mixmode; }
+  void EnableZSort (bool en) { zsort_enabled = en; }
+  bool IsZSortEnabled () const { return zsort_enabled; }
 
   struct eiParticlesFactoryState : public iParticlesFactoryState
   {
@@ -473,6 +477,10 @@ public:
     { scfParent->SetMixMode (mode); }
     virtual uint GetMixMode () const
     { return scfParent->GetMixMode(); }
+    virtual void EnableZSort (bool en)
+    { scfParent->EnableZSort (en); }
+    virtual bool IsZSortEnabled () const
+    { return scfParent->IsZSortEnabled (); }
   } scfiParticlesFactoryState;
   friend struct eiParticlesFactoryState;
 };
@@ -583,6 +591,7 @@ private:
   csFlags flags;
 
   uint mixmode;
+  bool zsort_enabled;
 
 public:
   CS_LEAKGUARD_DECLARE (csParticlesObject);
@@ -844,6 +853,8 @@ public:
   { mixmode = mode; }
   uint GetMixMode () const
   { return mixmode; }
+  void EnableZSort (bool en);
+  bool IsZSortEnabled () const { return zsort_enabled; }
 
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) {}
 
@@ -989,6 +1000,10 @@ public:
     { scfParent->SetMixMode (mode); }
     virtual uint GetMixMode () const
     { return scfParent->GetMixMode(); }
+    virtual void EnableZSort (bool en)
+    { scfParent->EnableZSort (en); }
+    virtual bool IsZSortEnabled () const
+    { return scfParent->IsZSortEnabled (); }
   } scfiParticlesObjectState;
   friend struct eiParticlesObjectState;
 

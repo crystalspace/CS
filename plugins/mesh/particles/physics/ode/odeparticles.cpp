@@ -364,16 +364,52 @@ bool csODEParticlePhysics::HandleEvent (iEvent &event)
       case CS_PART_COLOR_LOOPING:
         break;
       }
-      part.sort = po.particles->GetObjectToCamera ().Other2This (part.position).z;
-      po.bodies[j].sort = part.sort;
+      if (po.zsort_enabled)
+      {
+        part.sort = po.particles->GetObjectToCamera ().Other2This (part.position).z;
+        po.bodies[j].sort = part.sort;
+      }
+      else
+      {
+        part.sort = 0.0f;
+        po.bodies[j].sort = 0.0f;
+      }
     }
-    po.data.Sort (DataSort);
-    po.bodies.Sort (BodySort);
+    if (po.zsort_enabled)
+    {
+      po.data.Sort (DataSort);
+      po.bodies.Sort (BodySort);
+    }
+    else
+    {
+      size_t tot = po.data.Length () - 1;
+      csArray<csParticlesData>& data = po.data;
+      csArray<SortableBody>& bodies = po.bodies;
+      i = 0;
+      while (i < tot)
+      {
+        if (data[i].sort < -1)
+        {
+          // This particle belongs to the particles to be deleted. So we move
+          // to the back.
+          csParticlesData swap = data[tot];
+          data[tot] = data[i];
+          data[i] = swap;
+          SortableBody swapb = bodies[tot];
+          bodies[tot] = bodies[i];
+          bodies[i] = swapb;
+          tot--;	 // We know the last one is ok.
+        }
+        else
+          i++;
+      }
+    }
   }
   return true;
 }
 
-const csArray<csParticlesData> *csODEParticlePhysics::RegisterParticles (iParticlesObjectState *particles)
+const csArray<csParticlesData> *csODEParticlePhysics::RegisterParticles (
+	iParticlesObjectState *particles)
 {
   if (!dyn) 
   {
@@ -384,6 +420,7 @@ const csArray<csParticlesData> *csODEParticlePhysics::RegisterParticles (iPartic
   }
   ParticleObjects &po = partobjects.GetExtend (partobjects.Length());
   po.particles = particles;
+  po.zsort_enabled = particles->IsZSortEnabled ();
   po.dynsys = dyn->CreateSystem ();
   return &po.data;
 }

@@ -132,11 +132,13 @@ csParticlesFactory::csParticlesFactory (csParticlesType* p,
   transform_mode = false;
 
   physics_plugin = "crystalspace.particles.physics.simple";
+  physics_zsort = false;
 
   color_method = CS_PART_COLOR_CONSTANT;
   constant_color = csColor4 (1.0f, 1.0f, 1.0f, 1.0f);
 
   mixmode = CS_FX_COPY;
+  zsort_enabled = false;
 }
 
 csParticlesFactory::~csParticlesFactory ()
@@ -255,9 +257,10 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   sv = svcontext->GetVariableAdd (scale_name);
   sv->SetValue (1.0f);
 
-  LoadPhysicsPlugin (p->physics_plugin);
-
   mixmode = p->mixmode;
+  zsort_enabled = p->zsort_enabled;
+
+  LoadPhysicsPlugin (p->physics_plugin);
 
   if(autostart) Start();
 }
@@ -357,6 +360,7 @@ csPtr<iMeshObject> csParticlesObject::Clone ()
 
   new_obj->flags = flags;
   new_obj->mixmode = mixmode;
+  new_obj->zsort_enabled = zsort_enabled;
   
   return csPtr<iMeshObject> (new_obj);
 }
@@ -385,6 +389,17 @@ bool csParticlesObject::LoadPhysicsPlugin (const char *plugin_id)
   }
   point_data = physics->RegisterParticles (&scfiParticlesObjectState);
   return true;
+}
+
+void csParticlesObject::EnableZSort (bool en)
+{
+  if (zsort_enabled == en) return;
+  zsort_enabled = en;
+  if (physics)
+  {
+    physics->RemoveParticles (&scfiParticlesObjectState);
+    physics->RegisterParticles (&scfiParticlesObjectState);
+  }
 }
 
 void csParticlesObject::SetParticleRadius (float rad)

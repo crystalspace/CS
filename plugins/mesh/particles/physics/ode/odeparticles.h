@@ -53,6 +53,7 @@ class csODEParticlePhysics : public iParticlesPhysics
     csRef<iDynamicSystem> dynsys;
     csArray<SortableBody> bodies;
     int dead_particles;
+    bool zsort_enabled;
   };
   csArray<ParticleObjects> partobjects;
   csRandomGen rng;

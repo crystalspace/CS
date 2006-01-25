@@ -243,6 +243,13 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
 	  state->SetMixMode (mixmode);
 	}
 	break;
+      case XMLTOKEN_ZSORT:
+	{
+	  bool zsort;
+	  if (!synldr->ParseBool (child, zsort, true)) return 0;
+	  state->EnableZSort (zsort);
+	}
+	break;
       default:
         synldr->ReportError ("crystalspace.particles.factory.loader",
           child, "Unknown token '%s'!", value);
@@ -1077,6 +1084,13 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
 	  uint mixmode;
 	  if (!synldr->ParseMixmode (child, mixmode)) return 0;
 	  state->SetMixMode (mixmode);
+	}
+	break;
+      case XMLTOKEN_ZSORT:
+	{
+	  bool zsort;
+	  if (!synldr->ParseBool (child, zsort, true)) return 0;
+	  state->EnableZSort (zsort);
 	}
 	break;
       default:

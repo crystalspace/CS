@@ -296,6 +296,23 @@ struct iParticlesStateBase : public iBase
 
   /// Returns true if this particle object uses transform mode
   virtual bool GetTransformMode () = 0;
+
+  /// Set mix mode.
+  virtual void SetMixMode (uint mode) = 0;
+  /// Get mix mode.
+  virtual uint GetMixMode () const = 0;
+
+  /**
+   * Set Z sorting enabled. Default is false. With sorting enabled the
+   * particles will be sorted back to front. This is useful in case you
+   * use alpha on the particles. However this also slows down a bit.
+   * For mixmodes add or multiply sorting is not needed.
+   */
+  virtual void EnableZSort (bool en) = 0;
+  /**
+   * Return true if Z sorting is enabled.
+   */
+  virtual bool IsZSortEnabled () const = 0;
 };
 
 
@@ -333,11 +350,6 @@ struct iParticlesObjectState : public iParticlesStateBase
 
   /// Returns true if this particle simulation is running
   virtual bool IsRunning () = 0;
-
-  /// Set mix mode.
-  virtual void SetMixMode (uint mode) = 0;
-  /// Get mix mode.
-  virtual uint GetMixMode () const = 0;
 };
 
 SCF_VERSION (iParticlesFactoryState, 1, 0, 1);
@@ -358,11 +370,6 @@ struct iParticlesFactoryState : public iParticlesStateBase
    * (Defaults to 'crystalspace.particles.physics.simple')
    */
   virtual void SetPhysicsPlugin (const char *plugin) = 0;
-
-  /// Set mix mode.
-  virtual void SetMixMode (uint mode) = 0;
-  /// Get mix mode.
-  virtual uint GetMixMode () const = 0;
 };
 
 

@@ -86,6 +86,7 @@ const csArray<csParticlesData> *csParticlesPhysicsSimple::RegisterParticles (
   part->dead_particles = 0;
   part->new_particles = 0;
   part->total_elapsed_time = 0.0f;
+  part->zsort_enabled = particles->IsZSortEnabled ();
   partobjects.Push (part);
   return &part->data;
 }
@@ -183,7 +184,8 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
       oldlen << 1 : (int)part->new_particles << 1;
     part->data.SetLength (newlen);
     part->dead_particles += (int)part->data.Length() - oldlen;
-    for(i = oldlen; i < part->data.Length (); i++) {
+    for(i = oldlen; i < part->data.Length (); i++)
+    {
       csParticlesData &p = part->data.Get (i);
       p.sort = -FLT_MAX;
       p.color.w = 0.0f;
@@ -425,11 +427,41 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
       break;
     }
 
-    csVector3 transformed =
-      part->particles->GetObjectToCamera ().Other2This(point.position);
-    point.sort = transformed.z;
+    if (part->zsort_enabled)
+    {
+      csVector3 transformed =
+        part->particles->GetObjectToCamera ().Other2This(point.position);
+      point.sort = transformed.z;
+    }
+    else
+    {
+      point.sort = 0.0f;
+    }
   }
-  part->data.Sort (ZSort);
+  if (part->zsort_enabled)
+  {
+    part->data.Sort (ZSort);
+  }
+  else
+  {
+    size_t tot = part->data.Length () - 1;
+    csArray<csParticlesData>& data = part->data;
+    i = 0;
+    while (i < tot)
+    {
+      if (data[i].sort < -1)
+      {
+        // This particle belongs to the particles to be deleted. So we move
+        // to the back.
+        csParticlesData swap = data[tot];
+        data[tot] = data[i];
+        data[i] = swap;
+        tot--;	 // We know the last one is ok.
+      }
+      else
+        i++;
+    }
+  }
 }
 
 csParticlesPhysicsSimple::particles_object*

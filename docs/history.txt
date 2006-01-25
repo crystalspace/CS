@@ -41,6 +41,12 @@ chronological order.
 	- Jorrit changed all levels to use genmesh instead of ball mesh.
 	- Jorrit changed phystut to use genmesh instead of ball mesh.
 	- Jorrit removed the ball mesh. It is now obsolete.
+	- Jorrit added a new 'zsort' option to the particles mesh. Previously
+	  the particles mesh always sorted particles from back to front. But this
+	  is slow and only needed if you use alpha. For add and multiply you don't
+	  need this. So by default zsorting is now disabled which gives a great
+	  boost on performance. This no-sorting option is implemented in the simple
+	  and the ode particle physics plugins.
 24-Jan-2006
 	- mdmkolbe removed a VC6 workaround from SCF.
 	- mdmkolbe fixed a few more dirent.h issues with the Perl 5 bindings.
