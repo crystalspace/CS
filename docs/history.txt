@@ -60,6 +60,8 @@ chronological order.
 	  an explicit mapping of all buffers seems the better approach - you
 	  can see if you forgot a mapping, but may never notice if you waste
 	  cycles because of an autobound buffer you don't need.
+	- mdmkolbe documented in apimod the recent function removals
+	  from iParticleState.
 23-Jan-2006
 	- Jorrit changed the sequence manager to have support for removing
 	  sequences. This is done by optionally allowing to assing

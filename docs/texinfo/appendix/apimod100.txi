@@ -1501,6 +1501,20 @@ methods have been removed:
 @code{DrawTest()}
 @end itemize
 
+From @samp{iParticleState}, the following methods have been removed.
+Use the methods with the same name from @samp{iMeshObject} instead.
+
+@itemize @bullet
+@item
+@code{SetColor()}
+@item
+@code{GetColor()}
+@item
+@code{SetMaterialWrapper()}
+@item
+@code{GetMaterialWrapper()}
+@end itemize
+
 Apart from these methods, the following classes and structures have been
 removed or have become private, and are no longer available to client code:
 
