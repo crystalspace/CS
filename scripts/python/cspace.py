@@ -6342,69 +6342,6 @@ _cspace.iSpriteCal3DState_swigregister(iSpriteCal3DStatePtr)
 
 iSpriteCal3DState_scfGetVersion = _cspace.iSpriteCal3DState_scfGetVersion
 
-class csModelConverterFormat(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csModelConverterFormat, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csModelConverterFormat, name)
-    def __repr__(self):
-        return "<%s.%s; proxy of C++ csModelConverterFormat instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    __swig_setmethods__["Name"] = _cspace.csModelConverterFormat_Name_set
-    __swig_getmethods__["Name"] = _cspace.csModelConverterFormat_Name_get
-    if _newclass:Name = property(_cspace.csModelConverterFormat_Name_get, _cspace.csModelConverterFormat_Name_set)
-    __swig_setmethods__["CanLoad"] = _cspace.csModelConverterFormat_CanLoad_set
-    __swig_getmethods__["CanLoad"] = _cspace.csModelConverterFormat_CanLoad_get
-    if _newclass:CanLoad = property(_cspace.csModelConverterFormat_CanLoad_get, _cspace.csModelConverterFormat_CanLoad_set)
-    __swig_setmethods__["CanSave"] = _cspace.csModelConverterFormat_CanSave_set
-    __swig_getmethods__["CanSave"] = _cspace.csModelConverterFormat_CanSave_get
-    if _newclass:CanSave = property(_cspace.csModelConverterFormat_CanSave_get, _cspace.csModelConverterFormat_CanSave_set)
-    def __init__(self, *args):
-        _swig_setattr(self, csModelConverterFormat, 'this', _cspace.new_csModelConverterFormat(*args))
-        _swig_setattr(self, csModelConverterFormat, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_csModelConverterFormat):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-
-class csModelConverterFormatPtr(csModelConverterFormat):
-    def __init__(self, this):
-        _swig_setattr(self, csModelConverterFormat, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, csModelConverterFormat, 'thisown', 0)
-        _swig_setattr(self, csModelConverterFormat,self.__class__,csModelConverterFormat)
-_cspace.csModelConverterFormat_swigregister(csModelConverterFormatPtr)
-
-class iModelConverter(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iModelConverter, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iModelConverter, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<%s.%s; proxy of C++ iModelConverter instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def GetFormatCount(*args): return _cspace.iModelConverter_GetFormatCount(*args)
-    def GetFormat(*args): return _cspace.iModelConverter_GetFormat(*args)
-    def Load(*args): return _cspace.iModelConverter_Load(*args)
-    def Save(*args): return _cspace.iModelConverter_Save(*args)
-    def __del__(self, destroy=_cspace.delete_iModelConverter):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iModelConverter_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iModelConverter_scfGetVersion)
-
-class iModelConverterPtr(iModelConverter):
-    def __init__(self, this):
-        _swig_setattr(self, iModelConverter, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iModelConverter, 'thisown', 0)
-        _swig_setattr(self, iModelConverter,self.__class__,iModelConverter)
-_cspace.iModelConverter_swigregister(iModelConverterPtr)
-
-iModelConverter_scfGetVersion = _cspace.iModelConverter_scfGetVersion
-
 CS_MESH_STATICPOS = _cspace.CS_MESH_STATICPOS
 CS_MESH_STATICSHAPE = _cspace.CS_MESH_STATICSHAPE
 CS_FACTORY_STATICSHAPE = _cspace.CS_FACTORY_STATICSHAPE
@@ -6544,56 +6481,6 @@ class iMeshObjectTypePtr(iMeshObjectType):
 _cspace.iMeshObjectType_swigregister(iMeshObjectTypePtr)
 
 iMeshObjectType_scfGetVersion = _cspace.iMeshObjectType_scfGetVersion
-
-class iBallState(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iBallState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iBallState, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<%s.%s; proxy of C++ iBallState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def SetRadius(*args): return _cspace.iBallState_SetRadius(*args)
-    def GetRadius(*args): return _cspace.iBallState_GetRadius(*args)
-    def SetShift(*args): return _cspace.iBallState_SetShift(*args)
-    def GetShift(*args): return _cspace.iBallState_GetShift(*args)
-    def SetRimVertices(*args): return _cspace.iBallState_SetRimVertices(*args)
-    def GetRimVertices(*args): return _cspace.iBallState_GetRimVertices(*args)
-    def SetMaterialWrapper(*args): return _cspace.iBallState_SetMaterialWrapper(*args)
-    def GetMaterialWrapper(*args): return _cspace.iBallState_GetMaterialWrapper(*args)
-    def SetMixMode(*args): return _cspace.iBallState_SetMixMode(*args)
-    def GetMixMode(*args): return _cspace.iBallState_GetMixMode(*args)
-    def SetReversed(*args): return _cspace.iBallState_SetReversed(*args)
-    def IsReversed(*args): return _cspace.iBallState_IsReversed(*args)
-    def SetTopOnly(*args): return _cspace.iBallState_SetTopOnly(*args)
-    def IsTopOnly(*args): return _cspace.iBallState_IsTopOnly(*args)
-    def SetLighting(*args): return _cspace.iBallState_SetLighting(*args)
-    def IsLighting(*args): return _cspace.iBallState_IsLighting(*args)
-    def SetColor(*args): return _cspace.iBallState_SetColor(*args)
-    def GetColor(*args): return _cspace.iBallState_GetColor(*args)
-    def SetCylindricalMapping(*args): return _cspace.iBallState_SetCylindricalMapping(*args)
-    def IsCylindricalMapping(*args): return _cspace.iBallState_IsCylindricalMapping(*args)
-    def ApplyVertGradient(*args): return _cspace.iBallState_ApplyVertGradient(*args)
-    def ApplyLightSpot(*args): return _cspace.iBallState_ApplyLightSpot(*args)
-    def PaintSky(*args): return _cspace.iBallState_PaintSky(*args)
-    def __del__(self, destroy=_cspace.delete_iBallState):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iBallState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iBallState_scfGetVersion)
-
-class iBallStatePtr(iBallState):
-    def __init__(self, this):
-        _swig_setattr(self, iBallState, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iBallState, 'thisown', 0)
-        _swig_setattr(self, iBallState,self.__class__,iBallState)
-_cspace.iBallState_swigregister(iBallStatePtr)
-
-iBallState_scfGetVersion = _cspace.iBallState_scfGetVersion
 
 class csPolygonRange(_object):
     __swig_setmethods__ = {}
@@ -12936,6 +12823,9 @@ class csTraceBeamResult(_object):
     __swig_setmethods__["sqdistance"] = _cspace.csTraceBeamResult_sqdistance_set
     __swig_getmethods__["sqdistance"] = _cspace.csTraceBeamResult_sqdistance_get
     if _newclass:sqdistance = property(_cspace.csTraceBeamResult_sqdistance_get, _cspace.csTraceBeamResult_sqdistance_set)
+    __swig_setmethods__["end_sector"] = _cspace.csTraceBeamResult_end_sector_set
+    __swig_getmethods__["end_sector"] = _cspace.csTraceBeamResult_end_sector_get
+    if _newclass:end_sector = property(_cspace.csTraceBeamResult_end_sector_get, _cspace.csTraceBeamResult_end_sector_set)
     def __init__(self, *args):
         _swig_setattr(self, csTraceBeamResult, 'this', _cspace.new_csTraceBeamResult(*args))
         _swig_setattr(self, csTraceBeamResult, 'thisown', 1)
