@@ -36,6 +36,11 @@ chronological order.
 	  reversed="false").
 	- Jorrit removed some dependencies from csparser to the removed
 	  crossbuilder.
+	- Jorrit fixed odedynam plugin for the api change in
+	  iGeneralFactoryState->GenerateSphere().
+	- Jorrit changed all levels to use genmesh instead of ball mesh.
+	- Jorrit changed phystut to use genmesh instead of ball mesh.
+	- Jorrit removed the ball mesh. It is now obsolete.
 24-Jan-2006
 	- mdmkolbe removed a VC6 workaround from SCF.
 	- mdmkolbe fixed a few more dirent.h issues with the Perl 5 bindings.

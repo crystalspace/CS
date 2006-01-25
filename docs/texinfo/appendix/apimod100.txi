@@ -2253,3 +2253,65 @@ It is no longer possible to define render priorities in a map file. You can
 now only redefine render priorities from the engine @sc{api}.
 @xref{HOWTO Render Priorities}.
 
+@subheading Ball Mesh Removed
+
+The ball mesh has been removed. The genmesh mesh can now be used to generate
+spheres instead. Here is an example how you would have to change the map file. First
+here is the old way:
+
+@example
+<meshfact name="ballFact">
+  <plugin>crystalspace.mesh.loader.factory.ball</plugin>
+  <params />
+</meshfact>
+@dots{}
+<sector name="room">
+  <meshobj name="ball">
+    <plugin>crystalspace.mesh.loader.ball</plugin>
+    <params>
+      <factory>ballFact</factory>
+      <material>plasma</material>
+      <numrim>16</numrim>
+      <radius x="2" y="1" z=".5" />
+      <shift x="0" y=".5" z="0" />
+      <reversed />
+      <toponly />
+      <cylindrical />
+    </params>
+    <move> <v x="15" y="4" z="14" /> </move>
+  </meshobj>
+</sector>
+@end example
+
+And here is the new way:
+
+@example
+<meshfact name="ballFact">
+  <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+  <params>
+    <sphere rimvertices="16" reversed="true" toponly="true" cylindrical="true" >
+      <radius x="2" y="1" z=".5" />
+      <center x="0" y=".5" z="0" />
+    </sphere>
+  </params>
+</meshfact>
+@dots{}
+<sector name="room">
+  <meshobj name="transpBall">
+    <plugin>crystalspace.mesh.loader.genmesh</plugin>
+    <params>
+      <factory>ballFact</factory>
+      <material>plasma</material>
+    </params>
+    <move> <v x="15" y="4" z="14" /> </move>
+  </meshobj>
+</sector>
+@end example
+
+It is important to note that the geometry defining the sphere is now in the
+factory (as with all genmeshes).
+
+If you want to create them from code then you have to get rid of using the
+@code{iBallState} and instead use @code{iGeneralFactoryState->GenerateSphere()}
+to generate the desired sphere in a genmesh factory.
+

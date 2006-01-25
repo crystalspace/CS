@@ -18,8 +18,6 @@ if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
 
 # List of plugins which should be go into walkall.
 WALKALL.PLUGINLIST =
-  ball
-  ballldr
   bezier
   bezierldr
   bugplug

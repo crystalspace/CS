@@ -1370,7 +1370,8 @@ void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmes
     break;
   case SPHERE_COLLIDER_GEOMETRY:
     {
-      csSphere sphere (csVector3 (0), dGeomSphereGetRadius (geomID));
+      float r = dGeomSphereGetRadius (geomID);
+      csEllipsoid sphere (csVector3 (0), csVector3 (r, r, r));
       genmesh_fact->GenerateSphere (sphere, 30);
       genmesh_fact->CalculateNormals (); 
     }

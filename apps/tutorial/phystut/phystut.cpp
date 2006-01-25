@@ -450,18 +450,6 @@ bool Simple::Initialize ()
     return false;
   }
 
-  // Create the ball mesh factory.
-  ballFact = engine->CreateMeshFactory("crystalspace.mesh.object.ball",
-    "ballFact");
-  if (ballFact == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.phystut",
-      "Error creating mesh object factory!");
-    return false;
-  }
-
-
   // Create the dynamic system.
   dynSys = dyn->CreateSystem ();
   if (dynSys == 0)
@@ -572,20 +560,29 @@ iRigidBody* Simple::CreateSphere (void)
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
+  // Create the ball mesh factory.
+  csRef<iMeshFactoryWrapper> ballFact = engine->CreateMeshFactory(
+  	"crystalspace.mesh.object.genmesh", "ballFact");
+  if (ballFact == 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.phystut",
+      "Error creating mesh object factory!");
+    return 0;
+  }
+
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState> (
+  	ballFact->GetMeshObjectFactory ());
+  const float r (rand()%5/10. + .1);
+  csVector3 radius (r, r, r);
+  csEllipsoid ellips (csVector3 (0), radius);
+  gmstate->GenerateSphere (ellips, 16);
 
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (ballFact, "ball", room));
 
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
-
-  // Set the ball mesh properties.
-  csRef<iBallState> s (
-    SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iBallState));
-  const float r (rand()%5/10. + .1);
-  const csVector3 radius (r, r, r);
-  s->SetRadius (radius.x, radius.y, radius.z);
-  s->SetRimVertices (16);
-  s->SetMaterialWrapper (mat);
+  mesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();

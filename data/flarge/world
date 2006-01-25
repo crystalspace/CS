@@ -10,10 +10,12 @@
 	    </defaults>
 	</plugin>
         <plugin name="spr3dFact">crystalspace.mesh.loader.factory.sprite.3d</plugin>
+        <plugin name="spr3dMD2Fact">crystalspace.mesh.loader.factory.sprite.3d.md2</plugin>
         <plugin name="spr3d">crystalspace.mesh.loader.sprite.3d</plugin>
         <plugin name="spr2dFact">crystalspace.mesh.loader.factory.sprite.2d</plugin>
         <plugin name="spr2d">crystalspace.mesh.loader.sprite.2d</plugin>
         <plugin name="meshFact">crystalspace.mesh.loader.factory.genmesh</plugin>
+        <plugin name="mesh3DSFact">crystalspace.mesh.loader.factory.genmesh.3ds</plugin>
         <plugin name="mesh">crystalspace.mesh.loader.genmesh</plugin>
         <plugin name="instFact">crystalspace.mesh.loader.factory.instmesh</plugin>
         <plugin name="inst">crystalspace.mesh.loader.instmesh</plugin>
@@ -8411,10 +8413,43 @@
         <plugin>crystalspace.mesh.loader.factory.fire</plugin>
         <params />
     </meshfact>
-    <meshfact name="ballFact">
-        <plugin>crystalspace.mesh.loader.factory.ball</plugin>
-        <params />
+    <meshfact name="exteriorFact">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <material>asphalt</material>
+	    <sphere rimvertices="12" reversed="true">
+                <radius x="100" y="100" z="100" />
+	    </sphere>
+        </params>
     </meshfact>
+    <meshfact name="ball1Fact">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+	<params>
+	    <material>white</material>
+	    <sphere rimvertices="12">
+		<radius x="0.2" y="0.2" z="0.2" />
+		<center x="0.5" y="0" z="0" />
+	    </sphere>
+	</params>
+    </meshfact>
+    <meshfact name="ball3Fact">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+	<params>
+	    <material>white</material>
+	    <sphere rimvertices="12">
+		<radius x="0.2" y="0.2" z="0.2" />
+		<center x="0" y="0" z="0.5" />
+	    </sphere>
+	</params>
+    </meshfact>
+    <meshfact name="transpBallFact">
+        <plugin>meshFact</plugin>
+        <params>
+            <material>plasma</material>
+	    <sphere rimvertices="16" />
+        </params>
+    </meshfact>
+ 
     <meshfact name="cube">
         <plugin>thingFact</plugin>
         <params>
@@ -14845,22 +14880,14 @@
         </light>
 
         <meshobj name="transpBall">
-            <plugin>crystalspace.mesh.loader.ball</plugin>
+            <plugin>mesh</plugin>
             <params>
-                <factory>ballFact</factory>
-                <material>plasma</material>
-                <numrim>16</numrim>
-                <radius x="1" y="1" z="1" />
-                <shift x="0" y="0" z="0" />
-                <mixmode>
-                    <multiply />
-                </mixmode>
+                <factory>transpBallFact</factory>
+                <mixmode> <multiply /> </mixmode>
             </params>
             <ztest />
             <priority>alpha</priority>
-            <move>
-                <v x="15" y="4" z="14" />
-            </move>
+            <move> <v x="15" y="4" z="14" /> </move>
         </meshobj>
       
         <meshobj name="s_large1">
@@ -15841,43 +15868,19 @@
                     </matrix>
                 </move>
                 <meshobj name="ball1">
-                    <plugin>crystalspace.mesh.loader.ball</plugin>
-                    <params>
-                        <factory>ballFact</factory>
-                        <material>white</material>
-                        <numrim>12</numrim>
-                        <radius x="0.2" y="0.2" z="0.2" />
-                        <shift x="0.5" y="0" z="0" />
-                    </params>
-                    <move>
-                        <v x="0" y="0.5" z="0" />
-                    </move>
+                    <plugin>mesh</plugin>
+                    <params> <factory>ball1Fact</factory> </params>
+                    <move> <v x="0" y="0.5" z="0" /> </move>
                 </meshobj>
                 <meshobj name="ball2">
-                    <plugin>crystalspace.mesh.loader.ball</plugin>
-                    <params>
-                        <factory>ballFact</factory>
-                        <material>white</material>
-                        <numrim>12</numrim>
-                        <radius x="0.2" y="0.2" z="0.2" />
-                        <shift x="0.5" y="0" z="0" />
-                    </params>
-                    <move>
-                        <v x="0" y="0.5" z="0" />
-                    </move>
+                    <plugin>mesh</plugin>
+                    <params> <factory>ball1Fact</factory> </params>
+                    <move> <v x="0" y="0.5" z="0" /> </move>
                 </meshobj>
                 <meshobj name="ball3">
-                    <plugin>crystalspace.mesh.loader.ball</plugin>
-                    <params>
-                        <factory>ballFact</factory>
-                        <material>white</material>
-                        <numrim>12</numrim>
-                        <radius x="0.2" y="0.2" z="0.2" />
-                        <shift x="0" y="0" z="0.5" />
-                    </params>
-                    <move>
-                        <v x="0" y="0.5" z="0" />
-                    </move>
+                    <plugin>mesh</plugin>
+                    <params> <factory>ball3Fact</factory> </params>
+                    <move> <v x="0" y="0.5" z="0" /> </move>
                 </meshobj>
             </meshobj>
             <meshobj name="robotArmRight">
@@ -29485,16 +29488,12 @@
     </sector>
     <sector name="kamer2lhuge">
         <meshobj name="exterior">
-            <plugin>crystalspace.mesh.loader.ball</plugin>
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
             <zfill />
             <priority>wall</priority>
             <params>
-                <factory>ballFact</factory>
+                <factory>exteriorFact</factory>
                 <material>asphalt</material>
-                <numrim>12</numrim>
-                <radius x="100" y="100" z="100" />
-                <shift x="0" y="0" z="0" />
-                <reversed />
             </params>
             <move>
                 <v x="-80" y="-16" z="13" />

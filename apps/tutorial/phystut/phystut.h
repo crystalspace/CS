@@ -48,7 +48,6 @@ private:
   csRef<iDynamicSystem> dynSys;
   csRef<iMeshFactoryWrapper> boxFact;
   csRef<iMeshFactoryWrapper> meshFact;
-  csRef<iMeshFactoryWrapper> ballFact;
   csRef<iFont> courierFont;
 
   static bool SimpleEventHandler (iEvent& ev);

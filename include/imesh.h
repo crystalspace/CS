@@ -22,7 +22,6 @@
  * subdirectory of the top Crystal Space include directory.
  */
 #include "cssysdef.h"
-#include "imesh/ball.h"
 #include "imesh/bezier.h"
 #include "imesh/emit.h"
 #include "imesh/explode.h"

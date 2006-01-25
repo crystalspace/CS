@@ -12,8 +12,6 @@
     <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
     <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain</plugin>
     <plugin name="terrain">crystalspace.mesh.loader.terrain</plugin>
-    <plugin name="ballFact">crystalspace.mesh.loader.factory.ball</plugin>
-    <plugin name="ball">crystalspace.mesh.loader.ball</plugin>
     <plugin name="foliageFact">crystalspace.mesh.loader.factory.foliage</plugin>
     <plugin name="foliage">crystalspace.mesh.loader.foliage</plugin>
     <plugin name="instFact">crystalspace.mesh.loader.factory.instmesh</plugin>
@@ -135,8 +133,12 @@
   </start>
 
   <meshfact name="skydome">
-    <plugin>ballFact</plugin>
-    <params />
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <sphere rimvertices="6" reversed="true">
+	<radius x="1000" y="1000" z="1000" />
+      </sphere>
+    </params>
   </meshfact>
 
   <addon plugin="crystalspace.terraformer.simple.loader">
@@ -145,11 +147,6 @@
       <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
       <scale x="256" y="32" z="256" />
   </addon>
-
-    <meshfact name="skydome">
-        <plugin>ballFact</plugin>
-        <params />
-    </meshfact>
 
     <meshfact name="squareInst">
         <plugin>instFact</plugin>
@@ -207,15 +204,10 @@
     </meshobj>
 
         <meshobj name="clouds">
-            <plugin>ball</plugin>
+            <plugin>genmesh</plugin>
             <params>
                 <factory>skydome</factory>
-                <radius x="1000" y="1000" z="1000" />
-                <numrim>6</numrim>
-                <mixmode>
-                    <add />
-                </mixmode>
-                <reversed>yes</reversed>
+                <mixmode> <add /> </mixmode>
                 <material>clouds</material>
                 <lighting>no</lighting>
                 <color red="0.5" green="0.5" blue="0.5" />

@@ -161,10 +161,6 @@
       <autonormals />
     </params>
   </meshfact>
-  <meshfact name = "ballFact">
-    <plugin>crystalspace.mesh.loader.factory.ball</plugin>
-	<params />
-  </meshfact>
 	<meshfact name="fountainFACT">
 	  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
 	    <params>
