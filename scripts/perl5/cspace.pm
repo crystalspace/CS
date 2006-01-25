@@ -7221,83 +7221,6 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csModelConverterFormat ##############
-
-package cspace::csModelConverterFormat;
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-*swig_Name_get = *cspacec::csModelConverterFormat_Name_get;
-*swig_Name_set = *cspacec::csModelConverterFormat_Name_set;
-*swig_CanLoad_get = *cspacec::csModelConverterFormat_CanLoad_get;
-*swig_CanLoad_set = *cspacec::csModelConverterFormat_CanLoad_set;
-*swig_CanSave_get = *cspacec::csModelConverterFormat_CanSave_get;
-*swig_CanSave_set = *cspacec::csModelConverterFormat_CanSave_set;
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csModelConverterFormat(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csModelConverterFormat($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iModelConverter ##############
-
-package cspace::iModelConverter;
-@ISA = qw( cspace cspace::iBase );
-%OWNER = ();
-%ITERATORS = ();
-*GetFormatCount = *cspacec::iModelConverter_GetFormatCount;
-*GetFormat = *cspacec::iModelConverter_GetFormat;
-*Load = *cspacec::iModelConverter_Load;
-*Save = *cspacec::iModelConverter_Save;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_iModelConverter($self);
-        delete $OWNER{$self};
-    }
-}
-
-*scfGetVersion = *cspacec::iModelConverter_scfGetVersion;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : cspace::iMeshObjectDrawCallback ##############
 
 package cspace::iMeshObjectDrawCallback;
@@ -7441,60 +7364,6 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iMeshObjectType_scfGetVersion;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iBallState ##############
-
-package cspace::iBallState;
-@ISA = qw( cspace cspace::iBase );
-%OWNER = ();
-%ITERATORS = ();
-*SetRadius = *cspacec::iBallState_SetRadius;
-*GetRadius = *cspacec::iBallState_GetRadius;
-*SetShift = *cspacec::iBallState_SetShift;
-*GetShift = *cspacec::iBallState_GetShift;
-*SetRimVertices = *cspacec::iBallState_SetRimVertices;
-*GetRimVertices = *cspacec::iBallState_GetRimVertices;
-*SetMaterialWrapper = *cspacec::iBallState_SetMaterialWrapper;
-*GetMaterialWrapper = *cspacec::iBallState_GetMaterialWrapper;
-*SetMixMode = *cspacec::iBallState_SetMixMode;
-*GetMixMode = *cspacec::iBallState_GetMixMode;
-*SetReversed = *cspacec::iBallState_SetReversed;
-*IsReversed = *cspacec::iBallState_IsReversed;
-*SetTopOnly = *cspacec::iBallState_SetTopOnly;
-*IsTopOnly = *cspacec::iBallState_IsTopOnly;
-*SetLighting = *cspacec::iBallState_SetLighting;
-*IsLighting = *cspacec::iBallState_IsLighting;
-*SetColor = *cspacec::iBallState_SetColor;
-*GetColor = *cspacec::iBallState_GetColor;
-*SetCylindricalMapping = *cspacec::iBallState_SetCylindricalMapping;
-*IsCylindricalMapping = *cspacec::iBallState_IsCylindricalMapping;
-*ApplyVertGradient = *cspacec::iBallState_ApplyVertGradient;
-*ApplyLightSpot = *cspacec::iBallState_ApplyLightSpot;
-*PaintSky = *cspacec::iBallState_PaintSky;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_iBallState($self);
-        delete $OWNER{$self};
-    }
-}
-
-*scfGetVersion = *cspacec::iBallState_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -14260,6 +14129,8 @@ package cspace::csTraceBeamResult;
 *swig_closest_mesh_set = *cspacec::csTraceBeamResult_closest_mesh_set;
 *swig_sqdistance_get = *cspacec::csTraceBeamResult_sqdistance_get;
 *swig_sqdistance_set = *cspacec::csTraceBeamResult_sqdistance_set;
+*swig_end_sector_get = *cspacec::csTraceBeamResult_end_sector_get;
+*swig_end_sector_set = *cspacec::csTraceBeamResult_end_sector_set;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csTraceBeamResult(@_);
