@@ -61,6 +61,7 @@
     <tag>detail texture</tag>
     <tag>multipass detail texture</tag>
     <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <texture name="tex diffuse" destination="unit 0" />
     </pass>
     <pass>
@@ -70,6 +71,7 @@
       <zmode>
         <zmesh2 />
       </zmode>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <texture name="tex detail" destination="unit 0" />
       <vp plugin="glfixed">
         <fixedvp>
@@ -86,8 +88,13 @@
       <zmode>
         <zmesh2 />
       </zmode>
-      <buffer source="texture coordinate lightmap" destination="texture coordinate 0" />
-      <texture name="tex lightmap" destination="unit 0" />
+      <?if vars."tex lightmap".texture ?>
+	<buffer source="texture coordinate lightmap" destination="texture coordinate 0" />
+	<texture name="tex lightmap" destination="unit 0" />
+      <?else?>
+	<buffer source="color" destination="color" />
+	<texture name="standardtex white" destination="unit 0" />
+      <?endif?>
     </pass>
     <?include snippets/fog-pass.inc ?>
   </technique>
