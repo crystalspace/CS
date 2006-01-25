@@ -22,6 +22,8 @@ chronological order.
 	      <sphere>
 	          <radius x="1" y=".5" z=".5" />
 	      </sphere>
+	- Jorrit fixed the XML test in the loader so that it also recognizes
+	  XML comments.
 24-Jan-2006
 	- mdmkolbe removed a VC6 workaround from SCF.
 	- mdmkolbe fixed a few more dirent.h issues with the Perl 5 bindings.

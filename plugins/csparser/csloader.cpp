@@ -652,6 +652,10 @@ static bool TestXML (const char* b)
   {
     return (b[1] == 'x' && b[2] == 'm' && b[3] == 'l' && isspace (b[4]));
   }
+  else if (*b == '!')
+  {
+    return (b[1] == '-' && b[2] == '-');
+  }
   else
   {
     b++;
