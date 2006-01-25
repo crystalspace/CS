@@ -64,6 +64,10 @@ chronological order.
 	  These tricks don't work very well in optimize mode. This caused
 	  TraceBeam to fail sometimes and this also caused startme to not
 	  work properly.
+	- res fixed the software renderer to handle shader-desired but unbound
+	  buffers correctly.
+	- res fixed some SR-related shader techniques for the recent buffer
+	  changes.
 24-Jan-2006
 	- mdmkolbe removed a VC6 workaround from SCF.
 	- mdmkolbe fixed a few more dirent.h issues with the Perl 5 bindings.

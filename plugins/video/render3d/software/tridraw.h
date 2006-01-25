@@ -238,10 +238,10 @@ namespace cspluginSoft3d
 	if (!(scanRenderInfoMesh.desiredBuffers & (1 << i))) continue;
   
 	const size_t c = *compNum;
+        clipOutBuf2[i].data = (uint8*)outPos;
+	clipOutBuf2[i].comp = c;
 	if (buffersMask & (1 << i))
 	{
-	  clipOutBuf2[i].data = (uint8*)outPos;
-	  clipOutBuf2[i].comp = c;
 	  clipInStride[i] = clipOutBuf[i].comp * sizeof(float);
 	}
 	else
@@ -587,7 +587,7 @@ namespace cspluginSoft3d
 
 	SLLogic_ScanlineRenderer<Pix, SrcBlend, DstBlend> sll (
 	  pix, scanRenderInfoMesh, scanRenderInfoTri,
-	  clipOutBuf2, buffersMask & scanRenderInfoMesh.desiredBuffers,
+	  clipOutBuf2, scanRenderInfoMesh.desiredBuffers,
 	  floatsPerVert);
 	if (g3d->smallerActive)
 	{
