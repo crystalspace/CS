@@ -268,9 +268,13 @@ struct iSequenceManager : public iBase
    * of this object. So you can safely DecRef() your own reference after
    * calling RunSequence.
    *
+   * \param time Time at which the sequence should be executed.
+   * \param sequence Sequence to execute.
+   * \param params Optional instance given to all operations added to the
+   *   main sequence.
    * \param sequence_id This identifier can be used to get track of
-   * a given sequence. You can use this id to remove all operations that
-   * have this id.
+   *   a given sequence. You can use this id to remove all operations that
+   *   have this id.
    */
   virtual void RunSequence (csTicks time, iSequence* sequence,
   	iBase* params = 0, uint sequence_id = 0) = 0;

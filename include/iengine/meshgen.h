@@ -85,7 +85,7 @@ struct iMeshGeneratorGeometry : public virtual iBase
   /**
    * Set the density. The density is defined as the number of objects
    * in every 1x1 square. Default density is 1.
-   * @@@TODO: add density map support.
+   * @@@ TODO: add density map support.
    */
   virtual void SetDensity (float density) = 0;
 

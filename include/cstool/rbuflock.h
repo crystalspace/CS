@@ -62,6 +62,8 @@ class csRenderBufferLock
   { return (csRenderBufferLockType)(lockState & LockTypeMask); }
   
   csRenderBufferLock() {}
+  // Copying the locking stuff is somewhat nasty so ... prevent it
+  csRenderBufferLock (const csRenderBufferLock& other) {}
 public:
   /**
    * Construct the helper.
@@ -91,6 +93,7 @@ public:
    */
   T* Lock ()
   {
+    CS_ASSERT (buffer != 0);
     if (!IsLocked())
     {
       lockBuf = 

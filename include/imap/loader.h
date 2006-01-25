@@ -104,17 +104,17 @@ struct iLoader : public iBase
    * \param tm Texture manager, used to determine the format the image is to
    *   be loaded in (defaults to CS_IMGFMT_TRUECOLOR if no texture manager is
    *   specified).
-   * \param reg if true then the texture and material will be registered
-   * to the texture manager. Set 'register' to false if you plan on calling
-   * 'engine->Prepare()' later as that function will take care of registering
-   * too.
-   * \param create_material if true then this function also creates a
-   * material for the texture.
-   * \param free_image if true then after registration the loaded image
-   * will be removed immediatelly. This saves some memory. Set to false
-   * if you want to keep it. free_image is ignored if reg is false.
-   * \param the optional region will be used to register the texture and
-   * material.
+   * \param reg If true then the texture and material will be registered
+   *   to the texture manager. Set 'register' to false if you plan on calling
+   *   'engine->Prepare()' later as that function will take care of registering
+   *   too.
+   * \param create_material If true then this function also creates a
+   *   material for the texture.
+   * \param free_image If true then after registration the loaded image
+   *   will be removed immediatelly. This saves some memory. Set to false
+   *   if you want to keep it. free_image is ignored if reg is false.
+   * \param region [optional] Region to register the texture and
+   *   material to.
    */
   virtual iTextureWrapper* LoadTexture (const char *Name,
   	const char *FileName,

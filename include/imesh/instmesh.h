@@ -229,6 +229,8 @@ struct iInstancingFactoryState : public iInstancingMeshCommonState
    * Automatically generate a sphere. This will set the apropriate number 
    * of vertices and generate vertices, texels, normals, and triangles.
    * The colors are not initialized here.
+   * \param sphere Properties of the ellipsoid to generate.
+   * \param rim_vertices Number of vertices on a rim.
    * \param cyl_mapping if true then use cylindrical texture mapping.
    * \param toponly if true then only generate the top half of the sphere.
    * \param reversed if true then generate the sphere so it is visible

@@ -238,7 +238,7 @@ public:
    * This function will reset the collision pair array. If there was a
    * collision along the way the array will contain the information for
    * the first collision preventing movement.
-   * <p>
+   * 
    * The given transform should be the transform of the object corresponding
    * with the old position. 'colliders' and 'transforms' should be arrays
    * with 'num_colliders' elements for all the objects that we should
@@ -277,20 +277,21 @@ public:
    * this! A special note about portals! Portal traversal will NOT be used
    * on portals that have a collider! The idea there is that the portal itself
    * is a surface that cannot be penetrated.
-   * \param cdsys is the collider system.
-   * \param sector is the starting sector for the beam.
-   * \param start is the start of the beam.
-   * \param end is the end of the beam.
-   * \param traverse_portals set to true in case you want the beam to
-   * traverse portals.
-   * \param closest_tri will be set to the closest triangle that is hit. The
-   * triangle will be specified in world space.
-   * \param closest_isect will be set to the closest intersection point (in
-   * world space).
-   * \param closest_mesh will be set to the closest mesh that is hit.
-   * \param [optional] end_sector will be set the sector containing the closest_mesh.
-   * \return the squared distance between 'start' and the closest hit
-   * or else a negative number if there was no hit.
+   * \param cdsys The collider system.
+   * \param sector The starting sector for the beam.
+   * \param start The start of the beam.
+   * \param end The end of the beam.
+   * \param traverse_portals Set it to true in case you want the beam to
+   *   traverse portals.
+   * \param closest_tri Will be set to the closest triangle that is hit. The
+   *   triangle will be specified in world space.
+   * \param closest_isect Will be set to the closest intersection point (in
+   *   world space).
+   * \param closest_mesh Will be set to the closest mesh that is hit.
+   * \param end_sector [optional] Will be set to the sector containing the 
+   *   closest_mesh.
+   * \return The squared distance between 'start' and the closest hit
+   *   or else a negative number if there was no hit.
    */
   static float TraceBeam (iCollideSystem* cdsys, iSector* sector,
 	const csVector3& start, const csVector3& end,

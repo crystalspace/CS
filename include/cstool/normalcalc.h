@@ -46,10 +46,13 @@ private:
 public:
   /**
    * Calculate normals for the given mesh.
+   * \param mesh_vertices Vertices of the mesh.
+   * \param mesh_triangles Triangles of the mesh.
+   * \param mesh_normals Normals of the mesh.
    * \param do_compress if true then the vertices will be
-   * compressed (equal vertices collapsed) before calculating normals.
-   * If false then this will not happen which means that you can have
-   * seams.
+   *  compressed (equal vertices collapsed) before calculating normals.
+   *  If false then this will not happen which means that you can have
+   *  seams.
    */
   static void CalculateNormals (
     csDirtyAccessArray<csVector3>& mesh_vertices,

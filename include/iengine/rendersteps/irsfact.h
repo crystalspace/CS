@@ -32,13 +32,13 @@
 
 struct iRenderStep;
 
-SCF_VERSION (iRenderStepFactory, 0, 0, 1);
-
 /**
  * Interface to a render step factory.
  */
-struct iRenderStepFactory : public iBase
+struct iRenderStepFactory : public virtual iBase
 {
+  SCF_INTERFACE (iRenderStepFactory, 1, 0, 0);
+
   /**
    * Create a new render step with the selected parameters.
    */

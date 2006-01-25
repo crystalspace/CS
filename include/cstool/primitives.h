@@ -54,6 +54,12 @@ public:
 
   /**
    * Generate a sphere with 'num' vertices on the rim.
+   * \param ellips Properties of the ellipsoid to create.
+   * \param num Number of vertices in the generated  mesh.
+   * \param mesh_vertices Returns the generated vertices.
+   * \param mesh_texels Returns the generated texture coordinates.
+   * \param mesh_normals Returns the generated normals.
+   * \param mesh_triangles Returns the generated triangles.
    * \param cyl_mapping if true then use cylindrical texture mapping.
    * \param toponly if true then only generate the top half of the sphere.
    * \param reversed if true then generate the sphere so it is visible

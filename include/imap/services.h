@@ -103,9 +103,14 @@ struct iSyntaxService : public iBase
    * - off -> false
    * - (empty value) -> (def_result)
    * - (everyting else) -> error
+   * \param node Document node with the attribute to parse.
+   * \param attrname Name of the attribute.
+   * \param result Returns the result.
+   * \param def_result Default result value.
    * \param required if this is true then not having the attribute will result in
-   * an error. If this is false then not having the attribute will result in
-   * the default value.
+   *   an error. If this is false then not having the attribute will result in
+   *   the default value.
+   * \returns Whether the parsing was successful. \c false if an error occured.
    */
   virtual bool ParseBoolAttribute (iDocumentNode* node, const char* attrname,
   	bool& result, bool def_result, bool required) = 0;
