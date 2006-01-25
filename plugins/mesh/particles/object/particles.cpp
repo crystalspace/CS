@@ -104,6 +104,7 @@ csParticlesFactory::csParticlesFactory (csParticlesType* p,
   force_type = CS_PART_FORCE_RADIAL;
 
   force_direction = csVector3(0.0f, 0.0f, 0.0f);
+  force_direction_variation = csVector3(0.0f, 0.0f, 0.0f);
   force_range = 1.0f;
   force_falloff = CS_PART_FALLOFF_LINEAR;
   force_cone_radius = 0.0f;
@@ -199,6 +200,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   force_type = p->force_type;
 
   force_direction = p->force_direction;
+  force_direction_variation = p->force_direction_variation;
   force_range = p->force_range;
   force_falloff = p->force_falloff;
   force_cone_radius = p->force_cone_radius;
@@ -313,6 +315,7 @@ csPtr<iMeshObject> csParticlesObject::Clone ()
   new_obj->force_type = force_type;
 
   new_obj->force_direction = force_direction;
+  new_obj->force_direction_variation = force_direction_variation;
   new_obj->force_range = force_range;
   new_obj->force_falloff = force_falloff;
   new_obj->force_cone_radius = force_cone_radius;

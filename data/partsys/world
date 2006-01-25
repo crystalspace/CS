@@ -157,6 +157,40 @@
         <plugin>hazeFact</plugin>
         <params />
     </meshfact>
+	<meshfact name="fountainFACT">
+	  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+	    <params>
+		  <emitter type="sphere">
+			<time>3000000</time>
+			<innerradius>0.01</innerradius>
+			<outerradius>0.03</outerradius>
+		    <force type="linear">
+			  <direction x="0" y="2" z="1"/>
+			  <directionvariation x="0" y="1" z="1"/>
+  			  <amount>10</amount>
+			  <range>3.0</range>
+			  <falloff>linear</falloff>
+		    </force>
+		  </emitter>
+		  <dampener>0.1</dampener>
+		  <mass>5</mass>
+		  <massvariation>2.5</massvariation>
+		  <pps>30</pps>
+		  <initial>0</initial>
+		  <gravity x="0" y="-1" z="0"/>
+		  <diffusion>0.1</diffusion>
+		  <radius>0.075</radius>
+		  <ttl>10</ttl>
+		  <timevariation>0.5</timevariation>
+		  <colormethod type="linear">
+  		    <gradient>
+			  <color red="0" green="0" blue="1"/>
+			  <color red="0" green="0.5" blue="1"/>
+			  <color red="1" green="1" blue="1"/>
+		    </gradient>
+	      </colormethod>
+	  </params>
+	</meshfact>
     <sector name="room">
         <meshobj name="walls">
             <zfill />
@@ -444,15 +478,22 @@
                 <elevation>1</elevation>
                 <azimuth>1.75</azimuth>
                 <opening>0.2</opening>
-                <mixmode>
-                    <add />
-                </mixmode>
+                <mixmode> <add /> </mixmode>
             </params>
             <ztest />
-            <move>
-                <v x="15" y="0" z="-15" />
-            </move>
+            <move> <v x="15" y="0" z="-15" /> </move>
         </meshobj>
+	<meshobj name="fount2">
+	  <plugin>crystalspace.mesh.loader.particles</plugin>
+	  <params>
+		<factory>fountainFACT</factory>
+		<material>spark</material>
+                <mixmode> <add /> </mixmode>
+	  </params>
+          <move> <v x="10" y="0" z="-15" /> </move>
+          <priority>alpha</priority>
+          <ztest/>
+	</meshobj>
     </sector>
     <sector name="room0,1">
         <meshobj name="walls">
@@ -801,7 +842,7 @@
                 <mixmode>
                     <add />
                 </mixmode>
-                <number>200</number>
+                <number>2000</number>
                 <material>spark</material>
                 <rectparticles w="0.1" h="0.1" />
                 <lighting>no</lighting>

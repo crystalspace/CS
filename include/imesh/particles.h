@@ -158,13 +158,15 @@ struct iParticlesStateBase : public iBase
   virtual void SetRadialForceType (float range, csParticleFalloffType) = 0;
 
   /// Set a linear force type
-  virtual void SetLinearForceType (const csVector3 &direction, float range,
-    csParticleFalloffType falloff) = 0;
+  virtual void SetLinearForceType (const csVector3 &direction,
+  	const csVector3& direction_variation, float range,
+	csParticleFalloffType falloff) = 0;
 
   /// Set a cone force type
-  virtual void SetConeForceType (const csVector3 &direction, float range,
-    csParticleFalloffType falloff, float radius,
-    csParticleFalloffType radius_falloff) = 0;
+  virtual void SetConeForceType (const csVector3 &direction,
+  	const csVector3& direction_variation, float range,
+	csParticleFalloffType falloff, float radius,
+	csParticleFalloffType radius_falloff) = 0;
 
   /// Get the force type
   virtual csParticleForceType GetForceType () = 0;
@@ -178,6 +180,9 @@ struct iParticlesStateBase : public iBase
 
   /// Get the force direction
   virtual void GetForceDirection (csVector3 &dir) = 0;
+
+  /// Get the force direction variation
+  virtual void GetForceDirectionVariation (csVector3 &dirvar) = 0;
 
   /// Get the force cone radius
   virtual float GetForceConeRadius () = 0;

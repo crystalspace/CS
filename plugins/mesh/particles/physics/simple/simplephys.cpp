@@ -291,8 +291,11 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
   float force_range = part->particles->GetForceRange ();
   float diffusion = part->particles->GetDiffusion ();
   csParticleForceType force_type = part->particles->GetForceType ();
-  csVector3 force_dir;
+  csVector3 force_dir, force_dir_variation;
   part->particles->GetForceDirection (force_dir);
+  part->particles->GetForceDirectionVariation (force_dir_variation);
+  bool do_force_direction_variation = !(force_dir_variation < 0.001f);
+
   csParticleFalloffType force_falloff, cone_falloff;
   part->particles->GetFalloffType (force_falloff, cone_falloff);
 
@@ -341,6 +344,14 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
       dir.Normalize ();
     else
       dir = force_dir;
+    if (do_force_direction_variation)
+    {
+      csVector3 force_var (
+      	(rng.Get() * 2.0f) - 1.0f,
+      	(rng.Get() * 2.0f) - 1.0f,
+      	(rng.Get() * 2.0f) - 1.0f);
+      dir += force_var * force_dir_variation;
+    }
 
     float falloff = 1.0f;
     switch (force_falloff)

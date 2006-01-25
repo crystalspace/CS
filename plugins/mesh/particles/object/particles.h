@@ -91,6 +91,7 @@ private:
   csParticleForceType force_type;
 
   csVector3 force_direction;
+  csVector3 force_direction_variation;
   float force_range;
   csParticleFalloffType force_falloff;
   float force_cone_radius;
@@ -199,20 +200,24 @@ public:
     force_range = range;
     force_falloff = falloff;
   }
-  void SetLinearForceType (const csVector3 &direction, float range,
-    csParticleFalloffType falloff)
+  void SetLinearForceType (const csVector3 &direction,
+  	const csVector3& direction_variation, float range,
+	csParticleFalloffType falloff)
   {
     force_type = CS_PART_FORCE_LINEAR;
     force_direction = direction;
+    force_direction_variation = direction_variation;
     force_range = range;
     force_falloff = falloff;
   }
-  void SetConeForceType (const csVector3 &direction, float range,
-    csParticleFalloffType falloff, float radius,
-    csParticleFalloffType radius_falloff)
+  void SetConeForceType (const csVector3 &direction,
+  	const csVector3& direction_variation, float range,
+	csParticleFalloffType falloff, float radius,
+	csParticleFalloffType radius_falloff)
   {
     force_type = CS_PART_FORCE_CONE;
     force_direction = direction;
+    force_direction_variation = direction_variation;
     force_range = range;
     force_falloff = falloff;
     force_cone_radius = radius;
@@ -290,6 +295,8 @@ public:
   { return force_range; }
   void GetForceDirection (csVector3 &dir)
   { dir = force_direction; }
+  void GetForceDirectionVariation (csVector3 &dirvar)
+  { dirvar = force_direction_variation; }
   float GetForceConeRadius ()
   { return force_cone_radius; }
   float GetForce ()
@@ -364,14 +371,16 @@ public:
     {scfParent->SetCylinderEmitType (radius, height); }
     virtual void SetRadialForceType(float range, csParticleFalloffType falloff)
     { scfParent->SetRadialForceType(range, falloff); }
-    virtual void SetLinearForceType(const csVector3 &direction, float range,
-      csParticleFalloffType falloff)
-    { scfParent->SetLinearForceType(direction, range, falloff); }
-    virtual void SetConeForceType (const csVector3 &direction, float range,
-      csParticleFalloffType falloff, float radius,
-      csParticleFalloffType radius_falloff)
-    { scfParent->SetConeForceType (direction, range, falloff, radius,
-        radius_falloff); }
+    virtual void SetLinearForceType(const csVector3 &direction,
+    	const csVector3& direction_variation, float range,
+	csParticleFalloffType falloff)
+    { scfParent->SetLinearForceType(direction, direction_variation, range, falloff); }
+    virtual void SetConeForceType (const csVector3 &direction,
+    	const csVector3& direction_variation, float range,
+	csParticleFalloffType falloff, float radius,
+	csParticleFalloffType radius_falloff)
+    { scfParent->SetConeForceType (direction, direction_variation, range,
+    	falloff, radius, radius_falloff); }
     virtual void SetForce (float force)
     { scfParent->SetForce (force); }
     virtual void SetDiffusion (float size)
@@ -437,6 +446,8 @@ public:
     { return scfParent->GetForceRange (); }
     virtual void GetForceDirection (csVector3 &dir)
     { scfParent->GetForceDirection (dir); }
+    virtual void GetForceDirectionVariation (csVector3 &dir)
+    { scfParent->GetForceDirectionVariation (dir); }
     virtual float GetForceConeRadius ()
     { return scfParent->GetForceConeRadius (); }
     virtual float GetForce ()
@@ -528,6 +539,7 @@ private:
   csParticleForceType force_type;
 
   csVector3 force_direction;
+  csVector3 force_direction_variation;
   float force_range;
   csParticleFalloffType force_falloff;
   float force_cone_radius;
@@ -703,20 +715,24 @@ public:
     force_range = range;
     force_falloff = falloff;
   }
-  void SetLinearForceType (const csVector3 &direction, float range,
-    csParticleFalloffType falloff)
+  void SetLinearForceType (const csVector3 &direction,
+  	const csVector3& direction_variation, float range,
+	csParticleFalloffType falloff)
   {
     force_type = CS_PART_FORCE_LINEAR;
     force_direction = direction;
+    force_direction_variation = direction_variation;
     force_range = range;
     force_falloff = falloff;
   }
-  void SetConeForceType (const csVector3 &direction, float range,
-    csParticleFalloffType falloff, float radius,
-    csParticleFalloffType radius_falloff)
+  void SetConeForceType (const csVector3 &direction,
+  	const csVector3& direction_variation, float range,
+	csParticleFalloffType falloff, float radius,
+	csParticleFalloffType radius_falloff)
   {
     force_type = CS_PART_FORCE_CONE;
     force_direction = direction;
+    force_direction_variation = direction_variation;
     force_range = range;
     force_falloff = falloff;
     force_cone_radius = radius;
@@ -798,6 +814,8 @@ public:
   { return force_range; }
   void GetForceDirection (csVector3 &dir)
   { dir = force_direction; }
+  void GetForceDirectionVariation (csVector3 &dirvar)
+  { dirvar = force_direction_variation; }
   float GetForceConeRadius ()
   { return force_cone_radius; }
   float GetForce ()
@@ -877,14 +895,16 @@ public:
     {scfParent->SetCylinderEmitType (radius, height); }
     virtual void SetRadialForceType(float range, csParticleFalloffType falloff)
     { scfParent->SetRadialForceType(range, falloff); }
-    virtual void SetLinearForceType(const csVector3 &direction, float range,
-      csParticleFalloffType falloff)
-    { scfParent->SetLinearForceType(direction, range, falloff); }
-    virtual void SetConeForceType (const csVector3 &direction, float range,
-      csParticleFalloffType falloff, float radius,
-      csParticleFalloffType radius_falloff)
-    { scfParent->SetConeForceType (direction, range, falloff, radius,
-        radius_falloff); }
+    virtual void SetLinearForceType(const csVector3 &direction,
+    	const csVector3& direction_variation, float range,
+	csParticleFalloffType falloff)
+    { scfParent->SetLinearForceType(direction, direction_variation, range, falloff); }
+    virtual void SetConeForceType (const csVector3 &direction,
+    	const csVector3& direction_variation, float range,
+	csParticleFalloffType falloff, float radius,
+	csParticleFalloffType radius_falloff)
+    { scfParent->SetConeForceType (direction, direction_variation, range,
+    	falloff, radius, radius_falloff); }
     virtual void SetForce (float force)
     { scfParent->SetForce (force); }
     virtual void SetDiffusion (float size)
@@ -952,6 +972,8 @@ public:
     { return scfParent->GetForceRange (); }
     virtual void GetForceDirection (csVector3 &dir)
     { scfParent->GetForceDirection (dir); }
+    virtual void GetForceDirectionVariation (csVector3 &dir)
+    { scfParent->GetForceDirectionVariation (dir); }
     virtual float GetForceConeRadius ()
     { return scfParent->GetForceConeRadius (); }
     virtual float GetForce ()

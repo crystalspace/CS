@@ -347,6 +347,7 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
   }
 
   csVector3 direction (0.0f, 0.0f, 0.0f);
+  csVector3 direction_variation (0.0f, 0.0f, 0.0f);
   float range = 0.0f, radius = 0.0f;
   csParticleFalloffType falloff = CS_PART_FALLOFF_LINEAR,
     radius_falloff = CS_PART_FALLOFF_LINEAR;
@@ -390,6 +391,9 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
         synldr->ParseVector (child, direction);
         direction.Normalize ();
         break;
+      case XMLTOKEN_DIRECTIONVARIATION:
+        synldr->ParseVector (child, direction_variation);
+        break;
       case XMLTOKEN_CONERADIUS:
         radius = child->GetContentsValueAsFloat ();
         break;
@@ -432,11 +436,12 @@ bool csParticlesFactoryLoader::ParseForce (iDocumentNode *node,
   }
   else if (!strcmp(type, "linear"))
   {
-    state->SetLinearForceType (direction, range, falloff);
+    state->SetLinearForceType (direction, direction_variation, range, falloff);
   }
   else if (!strcmp(type, "cone"))
   {
-    state->SetConeForceType(direction, range, falloff, radius, radius_falloff);
+    state->SetConeForceType(direction, direction_variation, range, falloff,
+    	radius, radius_falloff);
   }
   else
   {
@@ -858,6 +863,13 @@ bool csParticlesFactorySaver::WriteEmitter (iParticlesFactoryState* state,
       directionNode->SetValue("direction");
       synldr->WriteVector(directionNode, &direction);
 
+      csVector3 direction_variation;
+      state->GetForceDirectionVariation(direction_variation);
+      csRef<iDocumentNode> directionVariationNode =
+        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      directionVariationNode->SetValue("directionvariation");
+      synldr->WriteVector(directionVariationNode, &direction_variation);
+
       float amount = state->GetForce();
       csRef<iDocumentNode> amountNode =
         forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
@@ -1190,6 +1202,7 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
   }
 
   csVector3 direction (0.0f, 0.0f, 0.0f);
+  csVector3 direction_variation (0.0f, 0.0f, 0.0f);
   float range = 0.0f, radius = 0.0f;
   csParticleFalloffType falloff = CS_PART_FALLOFF_LINEAR,
     radius_falloff = CS_PART_FALLOFF_LINEAR;
@@ -1233,6 +1246,9 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
         synldr->ParseVector (child, direction);
         direction.Normalize ();
         break;
+      case XMLTOKEN_DIRECTIONVARIATION:
+        synldr->ParseVector (child, direction_variation);
+        break;
       case XMLTOKEN_CONERADIUS:
         radius = child->GetContentsValueAsFloat ();
         break;
@@ -1275,11 +1291,11 @@ bool csParticlesObjectLoader::ParseForce (iDocumentNode *node,
   }
   else if (!strcmp(type, "linear"))
   {
-    state->SetLinearForceType (direction, range, falloff);
+    state->SetLinearForceType (direction, direction_variation, range, falloff);
   }
   else if (!strcmp(type, "cone"))
   {
-    state->SetConeForceType(direction, range, falloff, radius,
+    state->SetConeForceType(direction, direction_variation, range, falloff, radius,
       radius_falloff);
   }
   else
@@ -1716,6 +1732,13 @@ bool csParticlesObjectSaver::WriteEmitter (iParticlesObjectState* object,
         forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       directionNode->SetValue("direction");
       synldr->WriteVector(directionNode, &direction);
+
+      csVector3 direction_variation;
+      object->GetForceDirectionVariation(direction_variation);
+      csRef<iDocumentNode> directionVariationNode =
+        forceNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      directionVariationNode->SetValue("directionvariation");
+      synldr->WriteVector(directionVariationNode, &direction_variation);
 
       float amount = object->GetForce();
       csRef<iDocumentNode> amountNode =
