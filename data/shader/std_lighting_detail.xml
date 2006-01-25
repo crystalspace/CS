@@ -60,10 +60,13 @@
     <tag>detail_texture</tag>
     <tag>multipass detail texture</tag>
     <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <buffer source="texture coordinate lightmap" destination="texture coordinate 1" />
       <texture name="tex diffuse" destination="unit 0" />
       <?if vars."tex lightmap".texture ?>
 	<texture name="tex lightmap" destination="unit 1" />
+      <?else?>
+	<buffer source="color" destinantion="color" />
       <?endif?>
       <fp plugin="glfixed">
         <fixedfp>
@@ -80,13 +83,15 @@
 	      <alphaoperation operation="replace" />
 	    <?endif?>
           </layer>
-          <layer>
-            <colorsource num="0" source="previous layer" modifier="color" />
-            <colorsource num="1" source="texture" modifier="color" />
-            <coloroperation operation="modulate" scale="2" />
-            <alphasource num="0" source="previous layer" modifier="alpha" />
-            <alphaoperation operation="replace" />
-          </layer>
+	  <?if vars."tex lightmap".texture ?>
+	    <layer>
+	      <colorsource num="0" source="previous layer" modifier="color" />
+	      <colorsource num="1" source="texture" modifier="color" />
+	      <coloroperation operation="modulate" scale="2" />
+	      <alphasource num="0" source="previous layer" modifier="alpha" />
+	      <alphaoperation operation="replace" />
+	    </layer>
+	  <?endif?>
         </fixedfp>
       </fp>
     </pass>
@@ -98,6 +103,7 @@
         <zmesh2 />
       </zmode>
       <texture name="tex detail" destination="unit 0" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glfixed">
         <fixedvp>
           <texmatrix layer="0">
@@ -140,6 +146,7 @@
         <zmesh2 />
       </zmode>
       <texture name="tex detail" destination="unit 0" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glfixed">
         <fixedvp>
           <texmatrix layer="0">
