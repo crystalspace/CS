@@ -719,7 +719,6 @@ bool csLoader::Load (iDataBuffer* buffer, const char* fname,
 	result = ff;
 	return true;
       }
-      i++;
     }
     ReportError ("crystalspace.maploader.parse",
         fname
