@@ -53,6 +53,7 @@ chronological order.
 	  they now support ellipsoids too (like GenerateSphere for genmesh).
 	- Jorrit added support for 'direction variation' to the particles mesh.
 	  That way it becomes easier to make things like fountains.
+	- Jorrit also implemented this for the ODE physics particles plugin.
 24-Jan-2006
 	- mdmkolbe removed a VC6 workaround from SCF.
 	- mdmkolbe fixed a few more dirent.h issues with the Perl 5 bindings.

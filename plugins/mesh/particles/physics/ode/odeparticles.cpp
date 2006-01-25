@@ -246,6 +246,9 @@ void csODEParticlePhysics::Execute (float stepsize)
     dead_offset += (int)po.new_particles;
     po.dead_particles -= (int)po.new_particles;
     po.new_particles -= (int)po.new_particles;
+    csVector3 force_dir_variation;
+    po.particles->GetForceDirectionVariation (force_dir_variation);
+    bool do_force_direction_variation = !(force_dir_variation < 0.001f);
 
     for (j = 0; j < dead_offset; j ++)
     {
@@ -287,6 +290,14 @@ void csODEParticlePhysics::Execute (float stepsize)
       case CS_PART_FORCE_CONE:
         po.particles->GetForceDirection (dir);
         break;
+      }
+      if (do_force_direction_variation)
+      {
+        csVector3 force_var (
+      	  (rng.Get() * 2.0f) - 1.0f,
+      	  (rng.Get() * 2.0f) - 1.0f,
+      	  (rng.Get() * 2.0f) - 1.0f);
+        dir += force_var * force_dir_variation;
       }
 
       float falloff;
