@@ -458,7 +458,7 @@ bool csSprite3DMD2FactoryLoader::Load (iSprite3DFactoryState* state,
     {
       csFrameTime& ft = a.frames[k];
       action->AddFrame (state->GetFrame (int (ft.frameidx)), 
-        csTicks (1000.0f * ft.time), 0.0f);
+        csTicks (100.0f * ft.time), 0.0f);
     }
   }
   state->MergeNormals ();
