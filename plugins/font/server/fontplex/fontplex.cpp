@@ -212,7 +212,10 @@ void csFontServerMultiplexer::ReportFontNotFound (bool fallback, const char* fon
 void csFontServerMultiplexer::NotifyDelete (csFontPlexer* font, 
 					    const char* fontid)
 {
-  loadedFonts.Delete (fontid, font);
+  bool result = loadedFonts.Delete (fontid, font);
+  (void)result;
+  CS_ASSERT_MSG ("NotifyDelete() for font not in 'loaded' list",
+    result);
 }
 
 csPtr<iFont> csFontServerMultiplexer::LoadFont (const char *filename, 
@@ -246,7 +249,7 @@ csPtr<iFont> csFontServerMultiplexer::LoadFont (const char *filename,
   order->AppendSmart (fallbackOrder);
 
   csRef<csFontPlexer> newFont;
-  newFont.AttachNew (new csFontPlexer (this, filename, size, order));
+  newFont.AttachNew (new csFontPlexer (this, fontid, size, order));
 
   // The first font that could be loaded is the "primary" font.
   iFont* primary = 0;
