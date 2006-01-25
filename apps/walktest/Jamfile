@@ -92,7 +92,7 @@ if $(PNG.AVAILABLE) = "yes"
 }
 if $(CAL3D.AVAILABLE) = "yes"
 {
-  WALKALL.PLUGINLIST += sprcal3d sprcal3dldr ;
+  ;WALKALL.PLUGINLIST += sprcal3d sprcal3dldr ;
 }
 
 # Plugins needed by both software & GL renderers

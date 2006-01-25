@@ -751,7 +751,6 @@ void RayCollider::_RayStab(const AABBTreeNode* node, Container& box_indices)
 	node->GetAABB()->GetCenter(Center);
 	node->GetAABB()->GetExtents(Extents);
 	if(!RayAABBOverlap(Center, Extents))	return;
-
 	if(node->IsLeaf())
 	{
 		mFlags |= OPC_CONTACT;

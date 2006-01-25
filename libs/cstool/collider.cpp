@@ -388,6 +388,7 @@ float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
 	    tri.b = trans.This2Other (tris[i].b);
 	    tri.c = trans.This2Other (tris[i].c);
 	  }
+
 	  // The function below should always return true but you never know
 	  // due to numerical inaccuracies.
 	  if (csIntersect3::SegmentTriangle (seg, tri.a, tri.b, tri.c,

@@ -39,20 +39,20 @@ inline_ bool RayCollider::RayTriOverlap(const Point& vert0, const Point& vert1, 
 		// Calculate U parameter and test bounds
 		mStabbedFace.mU = tvec|pvec;
 //		if(IR(u)&0x80000000 || u>det)					return FALSE;
-		if(IS_NEGATIVE_FLOAT(mStabbedFace.mU) || IR(mStabbedFace.mU)>IR(det))		return FALSE;
+		if((mStabbedFace.mU < 0.0f) || IR(mStabbedFace.mU)>IR(det))		return FALSE;
 
 		// Prepare to test V parameter
 		Point qvec = tvec^edge1;
 
 		// Calculate V parameter and test bounds
 		mStabbedFace.mV = mDir|qvec;
-		if(IS_NEGATIVE_FLOAT(mStabbedFace.mV) || mStabbedFace.mU+mStabbedFace.mV>det)	return FALSE;
+		if((mStabbedFace.mV < 0.0f) || mStabbedFace.mU+mStabbedFace.mV>det)	return FALSE;
 
 		// Calculate t, scale parameters, ray intersects triangle
 		mStabbedFace.mDistance = edge2|qvec;
 		// Det > 0 so we can early exit here
 		// Intersection point is valid if distance is positive (else it can just be a face behind the orig point)
-		if(IS_NEGATIVE_FLOAT(mStabbedFace.mDistance))								return FALSE;
+		if((mStabbedFace.mDistance < 0.0f))								return FALSE;
 		// Else go on
 		float OneOverDet = 1.0f / det;
 		mStabbedFace.mDistance *= OneOverDet;
@@ -71,19 +71,19 @@ inline_ bool RayCollider::RayTriOverlap(const Point& vert0, const Point& vert1, 
 		// Calculate U parameter and test bounds
 		mStabbedFace.mU = (tvec|pvec) * OneOverDet;
 //		if(IR(u)&0x80000000 || u>1.0f)					return FALSE;
-		if(IS_NEGATIVE_FLOAT(mStabbedFace.mU) || IR(mStabbedFace.mU)>IEEE_1_0)		return FALSE;
+		if((mStabbedFace.mU < 0.0f) || (mStabbedFace.mU>1.0f))		return FALSE;
 
 		// prepare to test V parameter
 		Point qvec = tvec^edge1;
 
 		// Calculate V parameter and test bounds
 		mStabbedFace.mV = (mDir|qvec) * OneOverDet;
-		if(IS_NEGATIVE_FLOAT(mStabbedFace.mV) || mStabbedFace.mU+mStabbedFace.mV>1.0f)	return FALSE;
+		if((mStabbedFace.mV < 0.0f) || mStabbedFace.mU+mStabbedFace.mV>1.0f)	return FALSE;
 
 		// Calculate t, ray intersects triangle
 		mStabbedFace.mDistance = (edge2|qvec) * OneOverDet;
 		// Intersection point is valid if distance is positive (else it can just be a face behind the orig point)
-		if(IS_NEGATIVE_FLOAT(mStabbedFace.mDistance))								return FALSE;
+		if((mStabbedFace.mDistance < 0.0f))								return FALSE;
 	}
 	return TRUE;
 }
