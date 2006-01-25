@@ -163,7 +163,6 @@
   INTERFACE_APPLY(iAws)
   INTERFACE_APPLY(iAwsKey)
   INTERFACE_APPLY(iBase)
-  INTERFACE_APPLY(iBallState)
   INTERFACE_APPLY(iBinaryLoaderPlugin)
   INTERFACE_APPLY(iBodyGroup)
   INTERFACE_APPLY(iCamera)
@@ -223,7 +222,6 @@
   INTERFACE_APPLY(iMeshObjectType)
   INTERFACE_APPLY(iMeshWrapper)
   INTERFACE_APPLY(iMeshWrapperIterator)
-  INTERFACE_APPLY(iModelConverter)
   INTERFACE_APPLY(iMouseDriver)
   INTERFACE_APPLY(iMovable)
   INTERFACE_APPLY(iMovableListener)
@@ -966,12 +964,10 @@ TYPEMAP_OUT_csWrapPtr
 %include "imesh/sprite2d.h"
 %include "imesh/sprite3d.h"
 %include "imesh/spritecal3d.h"
-%include "imesh/mdlconv.h"
 // Swig 1.3.24 doesn't handle pointer default args well unless we tell it
 // to use an alternate way for that function
 %feature("compactdefaultargs") HitBeamObject;
 %include "imesh/object.h"
-%include "imesh/ball.h"
 %include "imesh/thing.h"
 %include "imesh/terrain.h"
 
