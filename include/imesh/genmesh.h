@@ -41,6 +41,7 @@ class csColor4;
 struct csTriangle;
 class csVector2;
 class csVector3;
+class csEllipsoid;
 
 SCF_VERSION (iGeneralMeshCommonState, 0, 0, 3);
 
@@ -175,7 +176,6 @@ struct iGeneralMeshState : public iGeneralMeshCommonState
 
 SCF_VERSION (iGeneralFactoryState, 0, 3, 0);
 
-class csSphere;
 /**
  * This interface describes the API for the general mesh factory.
  * iGeneralFactoryState inherits from iGeneralMeshState. All methods
@@ -296,17 +296,24 @@ struct iGeneralFactoryState : public iGeneralMeshCommonState
 
   /**
    * Automatically generate a box. This will set the number of vertices
-   * to eight and generate vertices, texels, and triangles. The colors
-   * and normals are not initialized here.
+   * to eight and generate vertices, texels, normals, and triangles. The
+   * vertex colors are set to black.
    */
   virtual void GenerateBox (const csBox3& box) = 0;
 
   /**
    * Automatically generate a sphere. This will set the apropriate number 
    * of vertices and generate vertices, texels, normals, and triangles.
-   * The colors are not initialized here.
+   * The vertex colors are set to black.
+   * \param cyl_mapping if true then use cylindrical texture mapping.
+   * \param toponly if true then only generate the top half of the sphere.
+   * \param reversed if true then generate the sphere so it is visible
+   * from the inside.
    */
-  virtual void GenerateSphere (const csSphere& sphere, int rim_vertices) = 0;
+  virtual void GenerateSphere (const csEllipsoid& ellips, int rim_vertices,
+      bool cyl_mapping = false,
+      bool toponly = false,
+      bool reversed = false) = 0;
 
   //virtual void GeneratePlane (const csPlane3& plane) = 0;
 

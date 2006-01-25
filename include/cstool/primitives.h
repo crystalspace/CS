@@ -31,7 +31,7 @@
 #include "csutil/dirtyaccessarray.h"
 
 class csBox3;
-class csSphere;
+class csEllipsoid;
 
 /**
  * A primitive mesh generator.
@@ -54,12 +54,19 @@ public:
 
   /**
    * Generate a sphere with 'num' vertices on the rim.
+   * \param cyl_mapping if true then use cylindrical texture mapping.
+   * \param toponly if true then only generate the top half of the sphere.
+   * \param reversed if true then generate the sphere so it is visible
+   * from the inside.
    */
-  static void GenerateSphere (const csSphere& sphere, int num,
+  static void GenerateSphere (const csEllipsoid& ellips, int num,
       csDirtyAccessArray<csVector3>& mesh_vertices,
       csDirtyAccessArray<csVector2>& mesh_texels,
       csDirtyAccessArray<csVector3>& mesh_normals,
-      csDirtyAccessArray<csTriangle>& mesh_triangles);
+      csDirtyAccessArray<csTriangle>& mesh_triangles,
+      bool cyl_mapping = false,
+      bool toponly = false,
+      bool reversed = false);
 };
 
 /** @} */

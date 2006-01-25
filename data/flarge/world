@@ -7352,20 +7352,6 @@
 	    <t v1="4" v2="1" v3="5" />
         </params>
     </meshfact>
-    <meshfact name="squareInst">
-        <plugin>instFact</plugin>
-        <params>
-            <v x="-2" y="0" z="-2" u="0" v="0" />
-            <v x="2" y="0" z="-2" u="1" v="0" />
-            <v x="2" y="0" z="2" u="1" v="1" />
-            <v x="-2" y="0" z="2" u="0" v="1" />
-            <t v1="3" v2="0" v3="1" />
-            <t v1="1" v2="2" v3="3" />
-            <t v1="1" v2="0" v3="3" />
-            <t v1="3" v2="2" v3="1" />
-            <autonormals />
-        </params>
-    </meshfact>
     <meshfact name="square">
         <plugin>meshFact</plugin>
         <params>
@@ -22538,21 +22524,6 @@
         </meshobj>
     </sector>
     <sector name="street1">
-        <meshobj name="instancegroup1">
-            <plugin>inst</plugin>
-            <params>
-                <factory>squareInst</factory>
-		<instance> <v x="0" y="0" z="0" /> </instance>
-		<instance> <v x=".3" y=".3" z=".3" /> </instance>
-		<instance> <v x=".3" y="-.6" z=".3" /> </instance>
-		<instance> <v x="0" y=".9" z="0" /> </instance>
-		<instance> <v x="0" y="-1.2" z="0" /> </instance>
-                <material>mosaic</material>
-            </params>
-            <move>
-                <v x="-20" y="1" z="-7" />
-            </move>
-	</meshobj>
         <meshobj name="walls_transp">
             <plugin>thing</plugin>
             <zfill />
@@ -33485,7 +33456,7 @@
             <delay time="6000" />
             <run sequence="openbox" />
         </sequence>
-        <sequence name="handle1">
+        <sequence name="seq_handle1">
             <rotate mesh="handle1" duration="500">
                 <rotx>.4</rotx>
                 <v x="-14.7" y="0.8" z="8.8" />
@@ -33499,7 +33470,7 @@
                 <v x="-14.7" y="0.8" z="8.8" />
             </rotate>
             <delay time="500" />
-            <enable trigger="handle1" />
+            <enable trigger="tri_handle1" />
         </sequence>
         <!--
 	 *** This sequence is fired when the camera is near the door.
@@ -33622,9 +33593,9 @@
             <sectorvis sector="kamer2lhuge" />
             <fire delay="1000" sequence="dobox" />
         </trigger>
-        <trigger name="handle1">
+        <trigger name="tri_handle1">
             <onclick mesh="handle1" />
-            <fire sequence="handle1" />
+            <fire sequence="seq_handle1" />
         </trigger>
         <trigger name="handle1off">
             <onclick mesh="handle1" />

@@ -6,6 +6,22 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Jan-2006
+	- Jorrit added support for cylindrical mapping, half-sphere
+	  generation, and reversed triangle generation to
+	  csPrimitives::GenerateSphere().
+	- Jorrit added support to genmesh for these flags. You can specify
+	  them in a map file by using the attributes 'cylindrical',
+	  'toponly', and 'reversed' in the <sphere> statement.
+	- Jorrit fixed a bug in normal generation of GenerateSphere() in
+	  case the center of the sphere was not the origin.
+	- Jorrit changed the csSphere in GenerateSphere() to be a
+	  csEllipsoid instead. That way one can create ellipsoids.
+	- Jorrit added support to the genmesh loader for using an ellipsoid.
+	  It works by having radius as a child node instead of an attribute:
+	      <sphere>
+	          <radius x="1" y=".5" z=".5" />
+	      </sphere>
 24-Jan-2006
 	- mdmkolbe removed a VC6 workaround from SCF.
 	- mdmkolbe fixed a few more dirent.h issues with the Perl 5 bindings.

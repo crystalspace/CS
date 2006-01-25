@@ -1871,12 +1871,14 @@ void csGenmeshMeshObjectFactory::CalculateNormals (bool compress)
   autonormals_compress = compress;
 }
 
-void csGenmeshMeshObjectFactory::GenerateSphere (const csSphere& sphere, int num)
+void csGenmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& ellips,
+    int num, bool cyl_mapping, bool toponly, bool reversed)
 {
-  csPrimitives::GenerateSphere (sphere, num, mesh_vertices, mesh_texels,
-      mesh_normals, mesh_triangles);
+  csPrimitives::GenerateSphere (ellips, num, mesh_vertices, mesh_texels,
+      mesh_normals, mesh_triangles, cyl_mapping, toponly, reversed);
   mesh_colors.SetLength (mesh_vertices.Length ());
-  memset (mesh_colors.GetArray (), 0, sizeof (csColor4)*mesh_vertices.Length ());
+  memset (mesh_colors.GetArray (), 0,
+      sizeof (csColor4)*mesh_vertices.Length ());
   Invalidate();
 }
 

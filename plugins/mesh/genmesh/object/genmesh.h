@@ -675,7 +675,9 @@ public:
   void CalculateNormals (bool compress);
   void Compress ();
   void GenerateBox (const csBox3& box);
-  void GenerateSphere (const csSphere& sphere, int rim_vertices);
+  void GenerateSphere (const csEllipsoid& ellips, int rim_vertices,
+      	bool cyl_mapping = false, bool toponly = false,
+	bool reversed = false);
   //void GeneratePlane (const csPlane3& plane);
   void SetBack2Front (bool b2f);
   bool IsBack2Front () const { return back2front; }
@@ -900,9 +902,12 @@ public:
     {
       scfParent->GenerateBox (box);
     }
-    virtual void GenerateSphere (const csSphere& sphere, int rim_vertices)
+    virtual void GenerateSphere (const csEllipsoid& ellips, int rim_vertices,
+		bool cyl_mapping = false, bool toponly = false,
+		bool reversed = false)
     {
-      scfParent->GenerateSphere (sphere, rim_vertices);
+      scfParent->GenerateSphere (ellips, rim_vertices,
+	  cyl_mapping, toponly, reversed);
     }
     virtual void SetBack2Front (bool b2f)
     {

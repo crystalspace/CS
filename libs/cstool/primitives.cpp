@@ -155,11 +155,12 @@ void csPrimitives::GenerateBox (
   normals[23].Set(box.MinX(),box.MinY(),box.MinZ()); normals[23].Normalize();
 }
 
-void csPrimitives::GenerateSphere (const csSphere& sphere, int num,
+void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
       csDirtyAccessArray<csVector3>& mesh_vertices,
       csDirtyAccessArray<csVector2>& mesh_texels,
       csDirtyAccessArray<csVector3>& mesh_normals,
-      csDirtyAccessArray<csTriangle>& mesh_triangles)
+      csDirtyAccessArray<csTriangle>& mesh_triangles,
+      bool cyl_mapping, bool toponly, bool reversed)
 {
   int num_vertices = 0;
   int num_triangles = 0;
@@ -177,7 +178,11 @@ void csPrimitives::GenerateSphere (const csSphere& sphere, int num,
   float radius_step = 180.0f / num;
   float vert_radius = radius;
 
+  // If cylindrical mapping is used we duplicate the last column of
+  // vertices. That is because we need to connect the two sides of the
+  // texture and a vertex can only have one texture coordinate.
   int num2 = num;
+  if (cyl_mapping) num2++;
 
   // Generate the first series of vertices (the outer circle).
   // Calculate u,v for them.
@@ -191,8 +196,16 @@ void csPrimitives::GenerateSphere (const csSphere& sphere, int num,
     vertices.GetExtend (num_vertices).Set (new_radius * (float) cos (angle),
       new_height, new_radius * (float) sin (angle));
 
-    u = (float) cos (angle) * 0.5f + 0.5f;
-    v = (float) sin (angle) * 0.5f + 0.5f;
+    if (cyl_mapping)
+    {
+      u = float (j) / float (num);
+      v = 0.5f;
+    }
+    else
+    {
+      u = (float) cos (angle) * 0.5f + 0.5f;
+      v = (float) sin (angle) * 0.5f + 0.5f;
+    }
 
     uvverts.GetExtend (num_vertices).Set (u, v);
     num_vertices++;
@@ -220,8 +233,16 @@ void csPrimitives::GenerateSphere (const csSphere& sphere, int num,
     {
       float angle = j * 2.0f * radius_step * TWO_PI / 360.0f;
 
-      u = uv_radius * (float) cos (angle) + 0.5f;
-      v = uv_radius * (float) sin (angle) + 0.5f;
+      if (cyl_mapping)
+      {
+        u = float (j) / float (num);
+        v = 1.0f - float (i + num / 2) / float (num);
+      }
+      else
+      {
+        u = uv_radius * (float) cos (angle) + 0.5f;
+        v = uv_radius * (float) sin (angle) + 0.5f;
+      }
 
       new_verticesT.GetExtend (j) = num_vertices;
       vertices.GetExtend (num_vertices).Set (new_radius * (float) cos (angle),
@@ -229,13 +250,16 @@ void csPrimitives::GenerateSphere (const csSphere& sphere, int num,
       uvverts.GetExtend (num_vertices).Set (u, v);
       num_vertices++;
 
+      if (!toponly)
+      {
+        new_verticesB.GetExtend (j) = num_vertices;
+        vertices.GetExtend (num_vertices).Set (new_radius * (float) cos (angle),
+          -new_height, new_radius * (float) sin (angle));
 
-      new_verticesB.GetExtend (j) = num_vertices;
-      vertices.GetExtend (num_vertices).Set (new_radius * (float) cos (angle),
-        -new_height, new_radius * (float) sin (angle));
-
-      uvverts.GetExtend (num_vertices).Set (u, v);
-      num_vertices++;
+        if (cyl_mapping) v = 1.0f - v;
+        uvverts.GetExtend (num_vertices).Set (u, v);
+        num_vertices++;
+      }
     }
 
     //-----
@@ -243,7 +267,9 @@ void csPrimitives::GenerateSphere (const csSphere& sphere, int num,
     //-----
     for (j = 0; j < num; j++)
     {
-      int j1num = (j+1)%num;
+      int j1num;
+      if (cyl_mapping) j1num = j+1;
+      else j1num = (j+1)%num;
       csTriangle& tri1 = triangles.GetExtend (num_triangles);
       tri1.c = prev_verticesT[j];
       tri1.b = new_verticesT[j1num];
@@ -255,17 +281,19 @@ void csPrimitives::GenerateSphere (const csSphere& sphere, int num,
       tri2.a = new_verticesT[j1num];
       num_triangles++;
 
-      csTriangle& tri3 = triangles.GetExtend (num_triangles);
-      tri3.a = prev_verticesB[j];
-      tri3.b = new_verticesB[j1num];
-      tri3.c = new_verticesB[j];
-      num_triangles++;
-      csTriangle& tri4 = triangles.GetExtend (num_triangles);
-      tri4.a = prev_verticesB[j];
-      tri4.b = prev_verticesB[j1num];
-      tri4.c = new_verticesB[j1num];
-      num_triangles++;
-
+      if (!toponly)
+      {
+        csTriangle& tri3 = triangles.GetExtend (num_triangles);
+        tri3.a = prev_verticesB[j];
+        tri3.b = new_verticesB[j1num];
+        tri3.c = new_verticesB[j];
+        num_triangles++;
+        csTriangle& tri4 = triangles.GetExtend (num_triangles);
+        tri4.a = prev_verticesB[j];
+        tri4.b = prev_verticesB[j1num];
+        tri4.c = new_verticesB[j1num];
+        num_triangles++;
+      }
     }
 
     //-----
@@ -274,21 +302,30 @@ void csPrimitives::GenerateSphere (const csSphere& sphere, int num,
     for (j = 0 ; j < num2 ; j++)
     {
       prev_verticesT.GetExtend (j) = new_verticesT[j];
-      prev_verticesB.GetExtend (j) = new_verticesB[j];
+      if (!toponly) prev_verticesB.GetExtend (j) = new_verticesB[j];
     }
   }
 
   // Create the top and bottom vertices.
   int top_vertex = num_vertices;
   vertices.GetExtend (num_vertices).Set (0.0f, vert_radius, 0.0f);
-  uvverts.GetExtend (num_vertices).Set (0.5f, 0.5f);
+  if (cyl_mapping)
+    uvverts.GetExtend (num_vertices).Set (0.5f, 0.0f);
+  else
+    uvverts.GetExtend (num_vertices).Set (0.5f, 0.5f);
   num_vertices++;
   int bottom_vertex = 0;
 
-  bottom_vertex = num_vertices;
-  vertices.GetExtend (num_vertices).Set (0.0f, -vert_radius, 0.0f);
-  uvverts.GetExtend (num_vertices).Set (0.5f, 0.5f);
-  num_vertices++;
+  if (!toponly)
+  {
+    bottom_vertex = num_vertices;
+    vertices.GetExtend (num_vertices).Set (0.0f, -vert_radius, 0.0f);
+    if (cyl_mapping)
+      uvverts.GetExtend (num_vertices).Set (0.5f, 1.0f);
+    else
+      uvverts.GetExtend (num_vertices).Set (0.5f, 0.5f);
+    num_vertices++;
+  }
 
 
   //-----
@@ -296,7 +333,9 @@ void csPrimitives::GenerateSphere (const csSphere& sphere, int num,
   //-----
   for (j = 0 ; j < num ; j++)
   {
-    int j1num = (j+1)%num;
+    int j1num;
+    if (cyl_mapping) j1num = j+1;
+    else j1num = (j+1)%num;
     csTriangle& tri = triangles.GetExtend (num_triangles);
     tri.c = top_vertex;
     tri.b = prev_verticesT[j];
@@ -308,28 +347,44 @@ void csPrimitives::GenerateSphere (const csSphere& sphere, int num,
   // Make the bottom triangle fan.
   //-----
 
-  for (j = 0 ; j < num ; j++)
-  {
-    int j1num = (j+1)%num;
-    csTriangle& tri = triangles.GetExtend (num_triangles);
-    tri.a = bottom_vertex;
-    tri.b = prev_verticesB[j];
-    tri.c = prev_verticesB[j1num];
-    num_triangles++;
-  }
+  if (!toponly)
+    for (j = 0 ; j < num ; j++)
+    {
+      int j1num;
+      if (cyl_mapping) j1num = j+1;
+      else j1num = (j+1)%num;
+      csTriangle& tri = triangles.GetExtend (num_triangles);
+      tri.a = bottom_vertex;
+      tri.b = prev_verticesB[j];
+      tri.c = prev_verticesB[j1num];
+      num_triangles++;
+    }
 
-  float sphere_radius = sphere.GetRadius ();
+  // Scale and shift all the vertices.
+  mesh_normals.SetLength (num_vertices);
+  const csVector3& sphere_radius = ellips.GetRadius ();
   for (i = 0 ; i < num_vertices ; i++)
   {
-    vertices[i].x *= sphere_radius;
-    vertices[i].y *= sphere_radius;
-    vertices[i].z *= sphere_radius;
-    vertices[i] += sphere.GetCenter ();
+    vertices[i].x *= sphere_radius.x;
+    vertices[i].y *= sphere_radius.y;
+    vertices[i].z *= sphere_radius.z;
+    mesh_normals[i] = vertices[i].Unit ();
+    vertices[i] += ellips.GetCenter ();
+  }
+
+  // Swap all triangles if needed.
+  if (reversed)
+  {
+    for (i = 0 ; i < num_triangles ; i++)
+    {
+      int s = triangles[i].a;
+      triangles[i].a = triangles[i].c;
+      triangles[i].c = s;
+    }
   }
 
   mesh_vertices.SetLength (num_vertices);
   mesh_texels.SetLength (num_vertices);
-  mesh_normals.SetLength (num_vertices);
   csVector3* genmesh_vertices = mesh_vertices.GetArray ();
   memcpy (genmesh_vertices, vertices.GetArray (),
       sizeof(csVector3)*num_vertices);
@@ -342,13 +397,6 @@ void csPrimitives::GenerateSphere (const csSphere& sphere, int num,
   csTriangle* ball_triangles = mesh_triangles.GetArray ();
   memcpy (ball_triangles, triangles.GetArray (),
       sizeof(csTriangle)*num_triangles);
-
-  csVector3* normals = mesh_normals.GetArray ();
-  for (i = 0; i < num_vertices; i++)
-  {
-    normals[i] = genmesh_vertices[i];
-    normals[i].Normalize ();
-  }
 }
 
 //---------------------------------------------------------------------------
