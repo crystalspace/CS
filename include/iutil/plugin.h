@@ -176,7 +176,7 @@ inline csPtr<Interface> csQueryPluginClass (iPluginManager *mgr,
     scfInterfaceTraits<Interface>::GetID (),
     scfInterfaceTraits<Interface>::GetVersion ());
 
-  if (x) base->DecRef (); //release our base interface
+  base->DecRef (); //release our base interface
 
   return csPtr<Interface> (x);
 }
@@ -206,7 +206,7 @@ inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
     scfInterfaceTraits<Interface>::GetID (),
     scfInterfaceTraits<Interface>::GetVersion ());
 
-  if (x) base->DecRef (); //release our base interface
+  base->DecRef (); //release our base interface
 
   return csPtr<Interface> (x);
 }

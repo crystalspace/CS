@@ -107,11 +107,44 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+bool csTextSyntaxService::ParseBoolAttribute (iDocumentNode* node,
+	const char* attrname, bool& result, bool def_result, bool required)
+{
+  csRef<iDocumentAttribute> attr = node->GetAttribute (attrname);
+  if (!attr)
+    if (required)
+    {
+      ReportError ("crystalspace.syntax.boolean", node,
+        "Boolean attribute '%s' is missing!", attrname);
+      return false;
+    }
+    else
+    {
+      result = def_result;
+      return true;
+    }
+  const char* v = attr->GetValue ();
+  if (!v) { result = def_result; return true; }
+  if (!strcasecmp (v, "1"))     { result = true; return true; }
+  if (!strcasecmp (v, "0"))     { result = false; return true; }
+  if (!strcasecmp (v, "yes"))   { result = true; return true; }
+  if (!strcasecmp (v, "no"))    { result = false; return true; }
+  if (!strcasecmp (v, "true"))  { result = true; return true; }
+  if (!strcasecmp (v, "false")) { result = false; return true; }
+  if (!strcasecmp (v, "on"))    { result = true; return true; }
+  if (!strcasecmp (v, "off"))   { result = false; return true; }
+  ReportError ("crystalspace.syntax.boolean", node,
+    "Bad boolean value '%s' for attribute '%s'!", v, attrname);
+  return false;
+}
+
 bool csTextSyntaxService::ParseBool (iDocumentNode* node, bool& result,
 		bool def_result)
 {
   const char* v = node->GetContentsValue ();
   if (!v) { result = def_result; return true; }
+  if (!strcasecmp (v, "1"))     { result = true; return true; }
+  if (!strcasecmp (v, "0"))     { result = false; return true; }
   if (!strcasecmp (v, "yes"))   { result = true; return true; }
   if (!strcasecmp (v, "no"))    { result = false; return true; }
   if (!strcasecmp (v, "true"))  { result = true; return true; }

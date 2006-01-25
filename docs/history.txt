@@ -24,6 +24,18 @@ chronological order.
 	      </sphere>
 	- Jorrit fixed the XML test in the loader so that it also recognizes
 	  XML comments.
+	- Jorrit fixed csLoadPlugin and csQueryPluginClass so that they no
+	  longer leave a dangling reference in case the plugin actually
+	  loaded but didn't implement the requested interface.
+	- Jorrit added support for '1' and '0' in the ParseBool implementation
+	  of syntax services.
+	- Jorrit added a new iSyntaxService->ParseBoolAttribute() to make it
+	  easier to parse boolean attributes.
+	- Jorrit fixed the new attributes for genmesh/sphere in the loader so
+	  that they properly parse as booleans now (so you can say:
+	  reversed="false").
+	- Jorrit removed some dependencies from csparser to the removed
+	  crossbuilder.
 24-Jan-2006
 	- mdmkolbe removed a VC6 workaround from SCF.
 	- mdmkolbe fixed a few more dirent.h issues with the Perl 5 bindings.

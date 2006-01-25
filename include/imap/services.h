@@ -76,6 +76,8 @@ struct iSyntaxService : public iBase
   /**
    * Parse the value of this node and return a boolean depending
    * on this value. The following mapping happens (case insensitive):
+   * - 1 -> true
+   * - 0 -> false
    * - yes -> true
    * - no -> false
    * - true -> true
@@ -87,7 +89,27 @@ struct iSyntaxService : public iBase
    */
   virtual bool ParseBool (iDocumentNode* node, bool& result,
   	bool def_result) = 0;
-  
+ 
+  /**
+   * Parse the value of an attribute of this node and return a boolean depending
+   * on this value. The following mapping happens (case insensitive):
+   * - 1 -> true
+   * - 0 -> false
+   * - yes -> true
+   * - no -> false
+   * - true -> true
+   * - false -> false
+   * - on -> true
+   * - off -> false
+   * - (empty value) -> (def_result)
+   * - (everyting else) -> error
+   * \param required if this is true then not having the attribute will result in
+   * an error. If this is false then not having the attribute will result in
+   * the default value.
+   */
+  virtual bool ParseBoolAttribute (iDocumentNode* node, const char* attrname,
+  	bool& result, bool def_result, bool required) = 0;
+
   /**
    * Write a node representing the value of the boolean.
    */

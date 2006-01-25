@@ -426,12 +426,16 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  }
 	  attr = child->GetAttribute ("rimvertices");
 	  if (attr) rim_vertices = attr->GetValueAsInt ();
-	  attr = child->GetAttribute ("cylindrical");
-	  bool cylmapping = (attr != 0);
-	  attr = child->GetAttribute ("toponly");
-	  bool toponly = (attr != 0);
-	  attr = child->GetAttribute ("reversed");
-	  bool reversed = (attr != 0);
+	  bool cylmapping, toponly, reversed;
+	  if (!synldr->ParseBoolAttribute (child, "cylindrical", cylmapping,
+	  	false, false))
+  	    return 0;
+	  if (!synldr->ParseBoolAttribute (child, "toponly", toponly,
+	  	false, false))
+  	    return 0;
+	  if (!synldr->ParseBoolAttribute (child, "reversed", reversed,
+	  	false, false))
+  	    return 0;
 	  state->GenerateSphere (ellips, rim_vertices,
 	      cylmapping, toponly, reversed);
 	}
