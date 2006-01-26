@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Jan-2006
+	- Peter Amstutz updated the VOS plugin to remove the crossbuilder code
+	  and use the new, much cleaner iLoader interface instead.
+	- Peter Amstutz fixed the csvosa3dl plugin to use GenerateSphere()
+	  and genmesh in place of the old "ball" plugin
 25-Jan-2006
 	- Jorrit added support for cylindrical mapping, half-sphere
 	  generation, and reversed triangle generation to
