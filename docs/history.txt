@@ -24,6 +24,8 @@ chronological order.
 	  event info on FocusGained/FocusLost events.
 	- res restored the waterdemo asserts (since the real cause is fixed 
 	  now).
+	- res worked around a crash on exit that occured when the csVFS
+	  object gets released before all VFS files get.
 25-Jan-2006
 	- Jorrit added support for cylindrical mapping, half-sphere
 	  generation, and reversed triangle generation to

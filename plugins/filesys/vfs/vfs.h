@@ -29,9 +29,13 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"		  
 
+struct iConfigFile;
+
+namespace cspluginVFS
+{
+
 class VfsNode;
 class csVFS;
-struct iConfigFile;
 
 /// A replacement for standard-C FILE type in the virtual file space
 class csFile : public scfImplementation1<csFile, iFile>
@@ -294,5 +298,7 @@ private:
    */
   bool TryChDirAuto(char const* dir, char const* filename);
 };
+
+} // namespace cspluginVFS
 
 #endif // __CS_VFS_H__

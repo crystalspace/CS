@@ -43,6 +43,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+namespace cspluginVFS
+{
+
 // Characters ignored in VFS paths (except in middle)
 #define CS_VFSSPACE		" \t"
 
@@ -367,7 +370,12 @@ csFile::csFile (int /*Mode*/, VfsNode *ParentNode, size_t RIndex,
 csFile::~csFile ()
 {
   delete [] Name;
-  ArchiveCache->CheckUp ();
+  /* @@@ It can happen that the csVFS object gets released before all
+   * VFS files are. Since the csVFS destruction also destroys the
+   * ArchiveCache, it may be 0 here.
+   */
+  if (ArchiveCache != 0)
+    ArchiveCache->CheckUp ();
 }
 
 int csFile::GetStatus ()
@@ -2378,3 +2386,5 @@ csRef<iStringArray> csVFS::GetRealMountPaths (const char *VirtualPath)
   rmounts->DecRef ();
   return r;
 }
+
+} // namespace cspluginVFS
