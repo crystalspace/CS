@@ -20,6 +20,10 @@ chronological order.
 	  somewhat better performance.
 	- Jorrit updated the screenshot of terrainf for the startme app.
 	- Jorrit removed a few asserts in waterdemo which caused it to crash.
+	- res fixed the Win32 and (blindly) OS/X port to set the correct
+	  event info on FocusGained/FocusLost events.
+	- res restored the waterdemo asserts (since the real cause is fixed 
+	  now).
 25-Jan-2006
 	- Jorrit added support for cylindrical mapping, half-sphere
 	  generation, and reversed triangle generation to

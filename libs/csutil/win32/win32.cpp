@@ -716,9 +716,10 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
       if ((assistant != 0))
       {
 	iEventOutlet* outlet = assistant->GetEventOutlet();
-        outlet->Broadcast ((LOWORD(wParam) != WA_INACTIVE) ?
-			   assistant->FocusGained :
-			   assistant->FocusLost, 0);
+        if (LOWORD(wParam) != WA_INACTIVE)
+          outlet->Broadcast (assistant->FocusGained, 1);
+        else
+          outlet->Broadcast (assistant->FocusLost, 0);
       }
       break;
     case WM_CREATE:

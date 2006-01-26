@@ -197,7 +197,7 @@ void OSXAssistant::application_activated()
     if (c != 0)
       c->Resume();
   }
-  event_outlet->ImmediateBroadcast(csevFocusGained(registry), 0);
+  event_outlet->ImmediateBroadcast(csevFocusGained (registry), 1);
 }
 
 void OSXAssistant::application_deactivated()
