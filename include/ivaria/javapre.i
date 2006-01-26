@@ -244,8 +244,8 @@ APPLY_FOR_EACH_INTERFACE
 // Swig 1.3.23 introduces support for default arguments, so it generates this
 // automatically. Prior versions do not.
 #if (SWIG_VERSION < 0x010323)
-#define IEVENTOUTLET_BROADCAST \
-public void Broadcast (int iCode) { Broadcast(iCode, 0); }
+#define IEVENTOUTLET_BROADCAST 		\
+public void Broadcast (long iCode) { Broadcast(iCode, new SWIGTYPE_p_intptr_t()); }
 #else
 #define IEVENTOUTLET_BROADCAST
 #endif
