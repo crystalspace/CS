@@ -26,6 +26,9 @@ chronological order.
 	  now).
 	- res worked around a crash on exit that occured when the csVFS
 	  object gets released before all VFS files get.
+	- res added a missing SCF_INTERFACE to iDebugGraph. Absence of 
+	  SCF_INTERFACE in an interface causes weirdness at runtime.
+	- res made csColliderActor::InitializeColliders() tolerate a 0 mesh.
 25-Jan-2006
 	- Jorrit added support for cylindrical mapping, half-sphere
 	  generation, and reversed triangle generation to

@@ -155,6 +155,8 @@ struct csDGEL
 
 struct iDebugGraph : public virtual iBase
 {
+  SCF_INTERFACE(iDebugGraph, 0, 0, 1);
+
   virtual void Clear () = 0;
   virtual csDGEL* FindEl (void* object) = 0;
   virtual csDGEL* AddEl (void* object) = 0;
@@ -232,11 +234,12 @@ public:
 
 static csRef<iDebugGraph> SetupDebugGraph (iObjectRegistry* object_reg)
 {
-  csRef<iBase> idg (CS_QUERY_REGISTRY_TAG (object_reg, "__Debug_Graph__"));
+  const char graphTag[] = "__Debug_Graph__";
+  csRef<iBase> idg (csQueryRegistryTag (object_reg, graphTag));
   if (!idg)
   {
     idg = csPtr<iBase> (new csDebugGraph ());
-    if (!object_reg->Register (idg, "__Debug_Graph__"))
+    if (!object_reg->Register (idg, graphTag))
     {
       // If registering fails this probably means we are in the destruction
       // pass and the object registry doesn't allow new updates anymore.
@@ -244,7 +247,7 @@ static csRef<iDebugGraph> SetupDebugGraph (iObjectRegistry* object_reg)
     }
   }
   //@@FIX
-  return SCF_QUERY_INTERFACE(idg, iDebugGraph);
+  return scfQueryInterface<iDebugGraph> (idg);
 //  return (csDebugGraph*)(iBase*)idg;	// DecRef() but that's ok in this case.
 }
 

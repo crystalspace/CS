@@ -562,7 +562,7 @@ void csColliderActor::InitializeColliders (iMeshWrapper* mesh,
 {
   csColliderActor::mesh = mesh;
   camera = 0;
-  movable = mesh->GetMovable ();
+  movable = mesh ? mesh->GetMovable () : 0;
   InitializeColliders (legs, body, shift);
 }
 
