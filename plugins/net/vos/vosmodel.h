@@ -26,7 +26,6 @@
 
 #include <vos/metaobjects/a3dl/model.hh>
 #include <vos/metaobjects/a3dl/actor.hh>
-#include "imesh/mdldata.h"
 #include "inetwork/vosa3dl.h"
 #include "csvosa3dl.h"
 #include "vosobject3d.h"

@@ -24,8 +24,9 @@
 #include "cssysdef.h"
 
 #include "iengine/mesh.h"
-#include "imesh/ball.h"
 #include "imesh/object.h"
+#include "imesh/genmesh.h"
+#include "csgeom/sphere.h"
 
 #include "csvosa3dl.h"
 #include "vossphere.h"
@@ -72,20 +73,17 @@ void ConstructSphereTask::doTask()
   //if(! sphere_factor)
   //{
   csRef<iMeshFactoryWrapper> ball_factory = engine->CreateMeshFactory (
-                         "crystalspace.mesh.object.ball", "ball_factory");
+                         "crystalspace.mesh.object.genmesh", "ball_factory");
   //}
 
-  csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper
-      (ball_factory, name.c_str(), sector, csVector3(0, 0, 0));
-
-  csRef<iBallState> ballLook = SCF_QUERY_INTERFACE (
-                          meshwrapper->GetMeshObject(), iBallState);
-
-  if(ballLook)
-  {
+  csRef<iGeneralFactoryState> ballLook = SCF_QUERY_INTERFACE(
+                   ball_factory->GetMeshObjectFactory(), iGeneralFactoryState);
+  if(ballLook) {
     ballLook->SetMaterialWrapper(metamat->GetMaterialWrapper());
-    ballLook->SetRadius (.5, .5, .5);
-    ballLook->SetRimVertices (rim_vertices);
+    ballLook->GenerateSphere(csEllipsoid(csVector3(0, 0, 0), csVector3(.5, .5, .5)), 12);
+
+    csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper
+                       (ball_factory, name.c_str(), sector, csVector3(0, 0, 0));
 
     if (dynsys)
     {

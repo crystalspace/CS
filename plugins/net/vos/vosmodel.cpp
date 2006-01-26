@@ -26,13 +26,12 @@
 #include "iengine/mesh.h"
 #include "imesh/sprite3d.h"
 #include "imesh/object.h"
-#include "imesh/mdlconv.h"
-#include "imesh/crossbld.h"
-#include "cstool/mdltool.h"
+#include "imap/loader.h"
 #include "csutil/databuf.h"
 #include "igeom/objmodel.h"
 #include "iutil/plugin.h"
 #include "ivaria/dynamics.h"
+#include "imap/modelload.h"
 
 #include "csvosa3dl.h"
 #include "vosmodel.h"
@@ -164,51 +163,18 @@ static void NormalizeModel(csRef<iMeshWrapper> wrapper, bool recenter,
 
 void ConstructModelTask::doTask()
 {
-  LOG("vosmodel", 3, "Constructing model");
+  LOG("vosmodel", 2, "Constructing model");
 
-
-
-  // Engine
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
-  // Get the model converter and cross builder
-  csRef<iModelConverter> modconv;
-  csRef<iCrossBuilder> xbuild;
-  CS_QUERY_REGISTRY_PLUGIN(modconv, object_reg, "crystalspace.modelconverter.multiplexer", iModelConverter);
-  CS_QUERY_REGISTRY_PLUGIN(xbuild, object_reg, "crystalspace.mesh.crossbuilder", iCrossBuilder);
-
-  // Check they were loaded
-  if (!modconv || !xbuild)
+  iBase* result;
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
+  if (!loader->Load (model->getDatabuf(), result))
   {
-    LOG ("ConstructModelTask", 2, "Failed to load model converter and cross builder plugins, " <<
-         "ignoring model (" << model->getURLstr() << ")");
+    LOG("vosmodel", 2, "Was not able to load model " << model->getURLstr());
     return;
   }
-
-  LOG ("ConstructModelTask", 3, "Loading into model converter");
-  csRef<iModelData> data = modconv->Load (model->getDatabuf()->GetUint8(),
-                                          model->getDatabuf()->GetSize());
-  if (!data)
-  {
-    LOG ("ConstructModelTask", 2, "Could not load model using converter");
-    return;
-  }
-
-  LOG ("ConstructModelTask", 3, "Splitting objects");
-  csModelDataTools::SplitObjectsByMaterial (data);
-  csModelDataTools::MergeObjects (data, false);
-
-  LOG ("ConstructModelTask", 3, "Creating factory");
-  csRef<iMeshFactoryWrapper> factory;
-  if(model->getMetaMaterial().isValid()) {
-    factory = xbuild->BuildSpriteFactoryHierarchy (
-      data, engine, model->getMetaMaterial()->GetMaterialWrapper());
-  }
-  else
-  {
-    factory = xbuild->BuildSpriteFactoryHierarchy (
-      data, engine, csMetaMaterial::GetCheckerboard());
-  }
+  csRef<iMeshFactoryWrapper> factory = scfQueryInterface<iMeshFactoryWrapper> (result);
 
   if (!factory)
   {
