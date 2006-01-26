@@ -11,6 +11,14 @@ chronological order.
 	  and use the new, much cleaner iLoader interface instead.
 	- Peter Amstutz fixed the csvosa3dl plugin to use GenerateSphere()
 	  and genmesh in place of the old "ball" plugin
+	- Jorrit fixed a few more cases in opcode plugin where it was using
+	  dangerous floating point comparisons.
+	- Jorrit added a better description of terrainf (mentioning
+	  foliage generator) to startme.cfg.
+	- Jorrit fixed terrainf so that the skybox no longer casts a shadow.
+	- Jorrit decreased density of foliage in terrainf slightly to get
+	  somewhat better performance.
+	- Jorrit updated the screenshot of terrainf for the startme app.
 25-Jan-2006
 	- Jorrit added support for cylindrical mapping, half-sphere
 	  generation, and reversed triangle generation to
@@ -48,10 +56,10 @@ chronological order.
 	- Jorrit removed the ball mesh. It is now obsolete.
 	- Jorrit added a new 'zsort' option to the particles mesh. Previously
 	  the particles mesh always sorted particles from back to front. But this
-	  is slow and only needed if you use alpha. For add and multiply you don't
-	  need this. So by default zsorting is now disabled which gives a great
-	  boost on performance. This no-sorting option is implemented in the simple
-	  and the ode particle physics plugins.
+	  is slow and only needed if you use alpha. For add and multiply you
+	  don't need this. So by default zsorting is now disabled which gives a
+	  great boost on performance. This no-sorting option is implemented in
+	  the simple and the ode particle physics plugins.
 	- Jorrit did some optimizations to the simple physics plugin for the
 	  particles mesh.
 	- Jorrit fixed instmesh and instmeshldr so they work again. In addition

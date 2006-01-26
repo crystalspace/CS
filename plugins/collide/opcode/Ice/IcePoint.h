@@ -252,17 +252,17 @@
 		//! Slighty moves the point out
 		inline_	void			TweakBigger()
 								{
-									udword	Dummy = (IR(x)&TWEAKNOTMASK);	if(!IS_NEGATIVE_FLOAT(x))	Dummy+=TWEAKMASK+1;	x = FR(Dummy);
-											Dummy = (IR(y)&TWEAKNOTMASK);	if(!IS_NEGATIVE_FLOAT(y))	Dummy+=TWEAKMASK+1;	y = FR(Dummy);
-											Dummy = (IR(z)&TWEAKNOTMASK);	if(!IS_NEGATIVE_FLOAT(z))	Dummy+=TWEAKMASK+1;	z = FR(Dummy);
+									udword	Dummy = (IR(x)&TWEAKNOTMASK);	if(x >= 0.0f)	Dummy+=TWEAKMASK+1;	x = FR(Dummy);
+											Dummy = (IR(y)&TWEAKNOTMASK);	if(y >= 0.0f)	Dummy+=TWEAKMASK+1;	y = FR(Dummy);
+											Dummy = (IR(z)&TWEAKNOTMASK);	if(z >= 0.0f)	Dummy+=TWEAKMASK+1;	z = FR(Dummy);
 								}
 
 		//! Slighty moves the point in
 		inline_	void			TweakSmaller()
 								{
-									udword	Dummy = (IR(x)&TWEAKNOTMASK);	if(IS_NEGATIVE_FLOAT(x))	Dummy+=TWEAKMASK+1;	x = FR(Dummy);
-											Dummy = (IR(y)&TWEAKNOTMASK);	if(IS_NEGATIVE_FLOAT(y))	Dummy+=TWEAKMASK+1;	y = FR(Dummy);
-											Dummy = (IR(z)&TWEAKNOTMASK);	if(IS_NEGATIVE_FLOAT(z))	Dummy+=TWEAKMASK+1;	z = FR(Dummy);
+									udword	Dummy = (IR(x)&TWEAKNOTMASK);	if(x < 0.0f)	Dummy+=TWEAKMASK+1;	x = FR(Dummy);
+											Dummy = (IR(y)&TWEAKNOTMASK);	if(y < 0.0f)	Dummy+=TWEAKMASK+1;	y = FR(Dummy);
+											Dummy = (IR(z)&TWEAKNOTMASK);	if(z < 0.0f)	Dummy+=TWEAKMASK+1;	z = FR(Dummy);
 								}
 
 		//! Normalizes the vector

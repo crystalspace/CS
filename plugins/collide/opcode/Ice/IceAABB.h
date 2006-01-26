@@ -206,15 +206,15 @@
 
 										// Take the transformed min & axes and find new extents
 										// Using CPU code in the right place is faster...
-										if(IS_NEGATIVE_FLOAT(vx.x))	aabb.mMin.x += vx.x; else aabb.mMax.x += vx.x;
-										if(IS_NEGATIVE_FLOAT(vx.y))	aabb.mMin.y += vx.y; else aabb.mMax.y += vx.y;
-										if(IS_NEGATIVE_FLOAT(vx.z))	aabb.mMin.z += vx.z; else aabb.mMax.z += vx.z;
-										if(IS_NEGATIVE_FLOAT(vy.x))	aabb.mMin.x += vy.x; else aabb.mMax.x += vy.x;
-										if(IS_NEGATIVE_FLOAT(vy.y))	aabb.mMin.y += vy.y; else aabb.mMax.y += vy.y;
-										if(IS_NEGATIVE_FLOAT(vy.z))	aabb.mMin.z += vy.z; else aabb.mMax.z += vy.z;
-										if(IS_NEGATIVE_FLOAT(vz.x))	aabb.mMin.x += vz.x; else aabb.mMax.x += vz.x;
-										if(IS_NEGATIVE_FLOAT(vz.y))	aabb.mMin.y += vz.y; else aabb.mMax.y += vz.y;
-										if(IS_NEGATIVE_FLOAT(vz.z))	aabb.mMin.z += vz.z; else aabb.mMax.z += vz.z;
+										if(vx.x < 0.0f)	aabb.mMin.x += vx.x; else aabb.mMax.x += vx.x;
+										if(vx.y < 0.0f)	aabb.mMin.y += vx.y; else aabb.mMax.y += vx.y;
+										if(vx.z < 0.0f)	aabb.mMin.z += vx.z; else aabb.mMax.z += vx.z;
+										if(vy.x < 0.0f)	aabb.mMin.x += vy.x; else aabb.mMax.x += vy.x;
+										if(vy.y < 0.0f)	aabb.mMin.y += vy.y; else aabb.mMax.y += vy.y;
+										if(vy.z < 0.0f)	aabb.mMin.z += vy.z; else aabb.mMax.z += vy.z;
+										if(vz.x < 0.0f)	aabb.mMin.x += vz.x; else aabb.mMax.x += vz.x;
+										if(vz.y < 0.0f)	aabb.mMin.y += vz.y; else aabb.mMax.y += vz.y;
+										if(vz.z < 0.0f)	aabb.mMin.z += vz.z; else aabb.mMax.z += vz.z;
 									}
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -450,9 +450,9 @@
 		inline_			BOOL		IsValid()	const
 									{
 										// Consistency condition for (Center, Extents) boxes: Extents >= 0
-										if(IS_NEGATIVE_FLOAT(mExtents.x))	return FALSE;
-										if(IS_NEGATIVE_FLOAT(mExtents.y))	return FALSE;
-										if(IS_NEGATIVE_FLOAT(mExtents.z))	return FALSE;
+										if(mExtents.x < 0.0f)	return FALSE;
+										if(mExtents.y < 0.0f)	return FALSE;
+										if(mExtents.z < 0.0f)	return FALSE;
 										return TRUE;
 									}
 
