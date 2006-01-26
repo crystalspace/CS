@@ -19,6 +19,7 @@ chronological order.
 	- Jorrit decreased density of foliage in terrainf slightly to get
 	  somewhat better performance.
 	- Jorrit updated the screenshot of terrainf for the startme app.
+	- Jorrit removed a few asserts in waterdemo which caused it to crash.
 25-Jan-2006
 	- Jorrit added support for cylindrical mapping, half-sphere
 	  generation, and reversed triangle generation to
