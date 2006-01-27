@@ -61,7 +61,12 @@
     <pass>
       <!-- First pass, Cd*Cm -->
       <!-- Use same texcoords for mask and diffuse texture -->
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <buffer source="texture coordinate 0" destination="texture coordinate 1" />
+      <?if !vars."tex lightmap".texture ?>
+	<!-- Bind vertex colors if lightmapping isn't used -->
+	<buffer source="color" destination="color" />
+      <?endif?>
       <!-- Bind the textures to the TUs. "unit 0" correlates with the 1st 
            <layer> in <fixedfp>, "unit 1" with the 2nd and so on. -->
       <texture name="tex diffuse" destination="unit 0" />
@@ -121,6 +126,10 @@
       <buffer source="texture coordinate 0" destination="texture coordinate 1" />
       <!-- However, reflection texcoord generation needs normals. -->
       <buffer source="normal" destination="normal"/>
+      <?if !vars."tex lightmap".texture ?>
+	<!-- Bind vertex colors if lightmapping isn't used -->
+	<buffer source="color" destination="color" />
+      <?endif?>
       <texture name="tex reflection" destination="unit 0" />
       <texture name="tex mask" destination="unit 1" />
       <vp plugin="glfixed">
