@@ -100,6 +100,7 @@
         <zmesh2 />
       </zmode>
       <texture name="tex detail" destination="unit 0" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <vp plugin="glfixed">
         <fixedvp>
           <texmatrix layer="0">
