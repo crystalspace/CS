@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 27-Jan-2006
+	- rvl_ changed portal code (mainly for floating portals) inside opengl 
+	  renderer to fix the bugs #1411948, #1398043
 	- res updated the memory mapping support in VFS for the not so recent
 	  memory mapping changes.
 	- res fixed the memory mapping code to properly support mapping ranges
