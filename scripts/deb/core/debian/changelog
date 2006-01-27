@@ -1,4 +1,4 @@
-crystalspace (0.99-20060125-rc1) unstable; urgency=low
+crystalspace (0.99-20060125-1) unstable; urgency=low
 
   * change build-deps to xlibmesa-gl-dev | libgl-dev (Closes: #331573)
   * solved FTBFS: amd64: -fPIC missing (Closes: #254680)
