@@ -94,17 +94,17 @@ void Simple::SetupFrame ()
     c->Move (CS_VEC_FORWARD * 4 * speed);
   if (kbd->GetKeyState (CSKEY_DOWN))
     c->Move (CS_VEC_BACKWARD * 4 * speed);
-  if (joy) 
+  if (joy)
   {
-    if (joy->GetLastButton (0,0)) 
+    if (joy->GetLastButton (0,0))
       c->Move (CS_VEC_FORWARD * 4 * speed);
     if (joy->GetLastButton (0,1))
-      c->Move (CS_VEC_BACKWARD * 4 * speed);   
+      c->Move (CS_VEC_BACKWARD * 4 * speed);
     c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT,
 				   ((joy->GetLast (0,0)) / 32767.0) * speed);
-    c->GetTransform ().RotateThis (CS_VEC_TILT_UP, 
+    c->GetTransform ().RotateThis (CS_VEC_TILT_UP,
 				   ((joy->GetLast (0,1)) / 32767.0) * speed);
-    if (joy && (joy->GetLastButton (0,3))) 
+    if (joy->GetLastButton (0,3))
     {
       csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
       if (q) q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
@@ -126,7 +126,7 @@ void Simple::FinishFrame ()
 
 bool Simple::HandleEvent (iEvent& ev)
 {
-  
+
   if (ev.Name == Process)
   {
     simple->SetupFrame ();
@@ -199,7 +199,7 @@ bool Simple::Initialize ()
     csCommandLineHelper::Help (object_reg);
     return false;
   }
-  
+
   // Attempt to load a joystick plugin.
   csRef<iStringArray> joystickClasses =
     iSCF::SCF->QueryClassList ("crystalspace.device.joystick.");
@@ -213,7 +213,7 @@ bool Simple::Initialize ()
       iBase* b = plugmgr->LoadPlugin (className);
 
       csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-	"crystalspace.application.joytest", "Attempt to load plugin '%s' %s", 
+	"crystalspace.application.joytest", "Attempt to load plugin '%s' %s",
 	className, (b != 0) ? "successful" : "failed");
       if (b != 0) b->DecRef ();
     }
@@ -298,7 +298,7 @@ bool Simple::Initialize ()
 
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingFactoryState> walls_state = 
+  csRef<iThingFactoryState> walls_state =
     scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
   walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
