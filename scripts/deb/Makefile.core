@@ -14,6 +14,7 @@ default:
 	@echo "	make fromcvs"
 	@echo "=============================================================="
 
+devel: start copy makeorig debfiles pdebbuild
 # BUILD FROM CVS EXPORT
 fromcvs: start cvsexportdate makeorig debfiles debcopy debbuild
 # BUILD FROM LOCAL COPY
@@ -82,6 +83,9 @@ debbinary:
 
 debbuild:
 	cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE); debuild
+
+pdebbuild:
+	cd $(BUILDDIR)/crystalspace-$(VERSION).$(DATE); pdebuild --buildresult $(BUILDDIR)
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)

@@ -1,3 +1,25 @@
+crystalspace (0.99-20060125-rc1) unstable; urgency=low
+
+  * change build-deps to xlibmesa-gl-dev | libgl-dev (Closes: #331573)
+  * solved FTBFS: amd64: -fPIC missing (Closes: #254680)
+  * solved FTBFS: Error with soft3d.csplugin (Closes: #290100)
+  * solved FTBFS: build-depends on removed xlibs-dev (Closes: #346653)
+    changed with libx11-dev, libxext-dev, libxxf86vm-dev, x-dev
+  * update to very last CVS (Closes: #344874)
+  * crystalspace is not anymore a native package (Closes: #294037)(Closes: #348297)
+  * solved upstream: Cannot load freetype2 font server plug-in (Closes: #263014)
+
+ -- Christian Bayle <bayle@debian.org>  Wed, 18 Jan 2006 22:27:26 +0100
+
+crystalspace (0.98-20040623-2.1) unstable; urgency=high
+
+  * NMU
+  * Urgency high because of RC bugfix
+  * Added autoconf to Build-Depends so the _modified_ configure.ac is actually
+    compiled, to get proper paths for the Python files (Closes: bug#266287)
+
+ -- Esteban Manchado Velázquez <zoso@debian.org>  Wed,  8 Sep 2004 12:39:48 +0100
+
 crystalspace (0.98-20040623-2) unstable; urgency=low
 
   * Corrected make disclean that was making fail most autobuild 

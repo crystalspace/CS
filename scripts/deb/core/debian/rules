@@ -34,7 +34,13 @@ endif
 ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), s390))
 	CONFFLAG = --without-lib3ds --without-libode
 endif
-#NEWRENDERER = --enable-new-renderer
+ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), amd64))
+	CONFFLAG = --without-lib3ds --without-libode
+endif
+NEWRENDERER = --enable-new-renderer
+#PYTHON = --without-python
+CPUOPTIM = --enable-cpu-specific-optimizations=no
+CONFDIR = --prefix=/usr --sysconfdir=/etc
 
 configure: configure-stamp
 configure-stamp:
@@ -47,7 +53,7 @@ configure-stamp:
 #	perl -pi -e "s/^#PLUGINS/PLUGINS/" $(CURDIR)/CS/mk/user.mak
 	# Temp remove of render3d renderers
 	#perl -pi -e "s/^PLUGINS(.*render3.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
-	perl -pi -e "s/^PLUGINS(.*glshader_cg$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+##	perl -pi -e "s/^PLUGINS(.*glshader_cg$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	# Temp? remove of cslua
 	#perl -pi -e "s/^PLUGINS(.*cslua.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	# Temp? remove of openal
@@ -67,7 +73,7 @@ endif
 	# Don't support until this is dynamic lib
 	# --enable-meta-info-embedding was by default before (enbed .csplugin info)
 	perl -pi -e "s:\[crystal\]:\[crystalspace\]:" $(CURDIR)/CS/configure.ac
-	cd CS; ./bin/autogen.sh ; cs_cv_prog_cxx_local_include=no ./configure --prefix=/usr --sysconfdir=/etc --enable-cpu-specific-optimizations=no $(NEWRENDERER) $(CONFFLAG)
+	cd CS; ./bin/autogen.sh ; cs_cv_prog_cxx_local_include=no ./configure $(CONFDIR) $(CPUOPTIM) $(PYTHON) $(NEWRENDERER) $(CONFFLAG)
 
 	# Install as much as possible
 #	perl -pi -e "s/#TO_INSTALL/TO_INSTALL/" $(CURDIR)/CS/cache.mak
@@ -175,7 +181,20 @@ install-arch:
 	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace-dev $(MAKE) install_include
 
 	# Let's fix some things
-	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/python/*.py
+	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/bindings/python/tutor*.py
+	rm -f $(CURDIR)/debian/crystalspace/usr/share/doc/crystalspace-0.99/LICENSE.gz
+	rm -f $(CURDIR)/debian/crystalspace-doc/usr/share/doc/crystalspace-0.99/LICENSE.gz
+	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/config.guess
+	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/config.sub
+	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/install-sh
+	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/jamtemplate/autogen.template
+	[ ! -d $(CURDIR)/debian/crystalspace/usr/share/crystalspace/data/maps/flarge/factories ] && \
+		cp -r $(CURDIR)/CS/data/flarge/factories \
+		$(CURDIR)/debian/crystalspace/usr/share/crystalspace/data/maps/flarge 
+
+	# Calculate ligths
+	cd $(CURDIR)/CS ; ./cslight -video=null \
+		$(CURDIR)/debian/crystalspace/usr/share/crystalspace/data/maps/flarge/
 
 	# Adding home made xpm
 	mkdir -p $(CURDIR)/debian/crystalspace/usr/share/pixmaps
