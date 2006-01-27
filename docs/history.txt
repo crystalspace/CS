@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Jan-2006
+	- res updated the memory mapping support in VFS for the not so recent
+	  memory mapping changes.
+	- res fixed the memory mapping code to properly support mapping ranges
+	  including the end of the file.
 26-Jan-2006
 	- Peter Amstutz updated the VOS plugin to remove the crossbuilder code
 	  and use the new, much cleaner iLoader interface instead.

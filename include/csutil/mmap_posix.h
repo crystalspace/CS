@@ -51,6 +51,7 @@ protected:
   
   bool OpenNative (const char* filename);
   bool Ok() { return hMappedFile != -1; }
+  size_t GetMaxSize ();
   
   /**
    * Map a part of the file into memory and return a pointer to mapped data.

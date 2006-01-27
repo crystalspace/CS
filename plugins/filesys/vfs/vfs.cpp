@@ -28,6 +28,7 @@
 #include "csutil/cmdline.h"
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
+#include "csutil/mmapio.h"
 #include "csutil/parray.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/scfstringarray.h"
@@ -387,45 +388,28 @@ int csFile::GetStatus ()
 
 // ------------------------------------------------------------ DiskFile --- //
 
-#ifdef CS_HAVE_MEMORY_MAPPED_IO
-bool csMemoryMapFile(csMemMapInfo*, char const* filename);
-void csUnMemoryMapFile(csMemMapInfo*);
-
 class csMMapDataBuffer :
   public scfImplementation1<csMMapDataBuffer, iDataBuffer>
 {
-  csMemMapInfo mapping;
-  bool status;
+  csRef<csMemoryMapping> mapping;
 public:
-  csMMapDataBuffer (const char* filename);
-  virtual ~csMMapDataBuffer ();
+  csMMapDataBuffer (const char* filename, size_t fileSize);
+  virtual ~csMMapDataBuffer () { }
 
-  bool GetStatus() { return status; }
+  bool GetStatus() { return mapping.IsValid(); }
 
-  virtual size_t GetSize () const { return mapping.file_size; };
-  virtual char* GetData () const { return (char*)mapping.data; };
+  virtual size_t GetSize () const { return mapping->GetLength(); };
+  virtual char* GetData () const { return (char*)mapping->GetData(); };
 };
 
-csMMapDataBuffer::csMMapDataBuffer (const char* filename) :
+csMMapDataBuffer::csMMapDataBuffer (const char* filename, size_t fileSize) :
   scfImplementationType(this, 0)
 {
-  status = csMemoryMapFile (&mapping, filename);
-  if (!status)
-  {
-    mapping.data = 0; 
-    mapping.file_size = 0;
-  }
+  csRef<csMemoryMappedIO> mmio;
+  mmio.AttachNew (new csMemoryMappedIO (filename));
+  if (mmio->IsValid())
+    mapping = mmio->GetData (0, fileSize);
 }
-
-csMMapDataBuffer::~csMMapDataBuffer ()
-{
-  if (status)
-  {
-    csUnMemoryMapFile (&mapping);
-  }
-}
-
-#endif
 
 #ifndef O_BINARY
 #  define O_BINARY 0
@@ -511,7 +495,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   if (debug && file)
     csPrintf ("VFS_DEBUG: Successfully opened, handle = %d\n", fileno (file));
 
-#if defined(VFS_DISKFILE_MAPPING) && defined(CS_HAVE_MEMORY_MAPPED_IO)
+#if defined(VFS_DISKFILE_MAPPING)
   if ((Error == VFS_STATUS_OK) && (!writemode) && 
     (Size >= VFS_DISKFILE_MAPPING_THRESHOLD_MIN) &&
     (Size <= VFS_DISKFILE_MAPPING_THRESHOLD_MAX))
@@ -806,18 +790,14 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
 
 iDataBuffer* DiskFile::TryCreateMapping ()
 {
-#ifdef CS_HAVE_MEMORY_MAPPED_IO  
-  csMMapDataBuffer* buf = new csMMapDataBuffer (fName);
+  csMMapDataBuffer* buf = new csMMapDataBuffer (fName, Size);
   if (buf->GetStatus())
-  {
     return buf;
-  }
   else
   {
     delete buf;
+    return 0;
   }
-#endif
-  return 0;
 }
 
 // --------------------------------------------------------- ArchiveFile --- //

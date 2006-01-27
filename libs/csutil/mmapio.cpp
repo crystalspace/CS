@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csutil/mmapio.h"
 #include "csutil/ref.h"
+#include "csgeom/math.h"
 
 #include "iutil/databuff.h"
 #include "iutil/vfs.h"
@@ -74,10 +75,15 @@ csRef<csMemoryMapping> csMemoryMappedIO::GetData (size_t offset, size_t length)
     }
     else
     {
-      size_t pageStart = offset / granularity;
-      size_t pageEnd = (offset + length + granularity - 1) / granularity;
-      MapWindow (*mapping, pageStart * granularity, 
-          (pageEnd - pageStart) * granularity);
+      size_t maxSize = GetMaxSize ();
+      if (offset + length > maxSize) return 0;
+      // Granularity-aligned start and end positions
+      size_t alignedStart = (offset / granularity) * granularity;
+      size_t alignedEnd = 
+        ((offset + length + granularity - 1) / granularity) * granularity;
+      // Get mapping for aligned range
+      MapWindow (*mapping, alignedStart, 
+        csMin (alignedEnd - alignedStart, maxSize));
       p = (uint8*)mapping->realPtr;
       if (!p) return 0;
       p += (offset % granularity);

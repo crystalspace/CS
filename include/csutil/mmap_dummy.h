@@ -45,6 +45,7 @@ protected:
   
   bool OpenNative (const char* filename) { return false; }
   bool Ok() { return false; }
+  size_t GetMaxSize () { return 0; }
   
   void MapWindow (PlatformMemoryMapping& mapping, size_t offset, size_t len)
   { mapping.realPtr = 0; }

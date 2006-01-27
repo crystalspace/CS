@@ -45,6 +45,13 @@ bool csPlatformMemoryMappingPosix::OpenNative (const char* filename)
   return Ok();
 }
 
+size_t csPlatformMemoryMappingPosix::GetMaxSize ()
+{
+  struct stat Stat;
+  if (fstat (hMappedFile, &Stat) != 0) return 0;
+  return Stat.st_size;
+}
+
 void csPlatformMemoryMappingPosix::MapWindow (PlatformMemoryMapping& mapping, 
                                          size_t offset, size_t len)
 {

@@ -56,6 +56,11 @@ bool csPlatformMemoryMappingWin32::Ok()
   return hFileMapping != 0; 
 }
   
+size_t csPlatformMemoryMappingWin32::GetMaxSize ()
+{
+  return GetFileSize (hMappedFile, 0);
+}
+
 void csPlatformMemoryMappingWin32::MapWindow (PlatformMemoryMapping& mapping, 
 					       size_t offset, size_t len)
 {
