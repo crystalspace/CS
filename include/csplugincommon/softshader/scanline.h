@@ -112,7 +112,7 @@ namespace CrystalSpace
     struct iDefaultScanlineRenderer : public virtual iBase
     {
     public:
-      SCF_INTERFACE(iDefaultScanlineRenderer, 0, 1, 0);
+      SCF_INTERFACE(iDefaultScanlineRenderer, 0, 1, 1);
 
       /**
        * Set the flat color used in lieu a texture when none is given.
@@ -125,6 +125,8 @@ namespace CrystalSpace
        * components.
        */
       virtual void SetShift (int rgbShift, int alphaShift) = 0;
+      /// Enable/disable color sum
+      virtual void SetColorSum (bool enable) = 0;
     };
   } // namespace SoftShader
 } // namespace CrystalSpace

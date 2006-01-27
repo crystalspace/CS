@@ -553,6 +553,7 @@ public:
   { return current_zmode; }
   
   virtual void SetWorldToCamera (const csReversibleTransform& w2c);
+  virtual const csReversibleTransform& GetWorldToCamera () { return world2camera; }
 
   /// Set the current render target (0 for screen).
   virtual void SetRenderTarget (iTextureHandle* handle,

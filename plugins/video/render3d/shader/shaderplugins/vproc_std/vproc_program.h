@@ -87,6 +87,9 @@ private:
   ProgramParam finalLightFactor;
   size_t numLights;
   bool useAttenuation;
+  bool doSpecular;
+  csRenderBufferName specularOutputBuffer;
+  ProgramParam shininessParam;
 
   struct BufferName
   {

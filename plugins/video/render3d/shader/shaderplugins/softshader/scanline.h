@@ -69,6 +69,39 @@ namespace cspluginSoftshader
     }
   };
 
+  struct Color2_None
+  {
+    static const size_t compCount = 0;
+
+    Color2_None (ScanlineRendererBase* /*This*/) {}
+
+    CS_FORCEINLINE
+    void Apply (const ScanlineComp* /*color*/, Pixel& /*col*/) {}
+  };
+
+  struct Color2_Sum
+  {
+    static const size_t compCount = 3;
+
+    Color2_Sum (ScanlineRendererBase* /*This*/) {}
+
+    CS_FORCEINLINE
+    static uint8 ClampAndShift (int32 x)
+    {
+      return (x & 0x80000000) ? 0 : 
+	(((x >> 8) & 0x7fffff00) ? 0xff : (x >> 8));
+    }
+
+    CS_FORCEINLINE
+    void Apply (const ScanlineComp* color2, 
+      Pixel& col) 
+    {
+      col.c.r = ClampAndShift ((col.c.r << 8) + color2[0].c.GetFixed());
+      col.c.g = ClampAndShift ((col.c.g << 8) + color2[1].c.GetFixed());
+      col.c.b = ClampAndShift ((col.c.b << 8) + color2[2].c.GetFixed());
+    }
+  };
+
   struct Source_Texture
   {
     static const size_t compCount = 2;
@@ -119,7 +152,7 @@ namespace cspluginSoftshader
 
   private:
     template <typename Source, typename Color, 
-      typename Zmode, int needColors, int doAlphaTest>
+      typename Zmode, int needColors, int doAlphaTest, typename Color2>
     struct ScanlineImpl
     {
       static void Scan (iScanlineRenderer* _This,
@@ -128,7 +161,8 @@ namespace cspluginSoftshader
 	uint32* dest, uint len, uint32 *zbuff)
       {
 	const size_t offsetColor = 0;
-	const size_t offsetTC = offsetColor + Color::compCount;
+	const size_t offsetColor2 = offsetColor + Color::compCount;
+	const size_t offsetTC = offsetColor2 + Color2::compCount;
 	const size_t myIpolFloatNum = offsetTC + Source::compCount;
 
 	InterpolateScanlinePersp<myIpolFloatNum> ipol;
@@ -137,6 +171,7 @@ namespace cspluginSoftshader
 
 	Source colSrc (This);
 	Color col (This);
+	Color2 col2 (This);
 
 	uint32* destend = dest + len;
 	Zmode Z (ipol, zbuff);
@@ -149,7 +184,11 @@ namespace cspluginSoftshader
 	    {
 	      Pixel px;
 	      colSrc.GetColor (ipol.GetFloat (offsetTC), px);
-	      if (needColors) col.Apply (ipol.GetFloat (offsetColor), px);
+	      if (needColors)
+	      {
+	        col.Apply (ipol.GetFloat (offsetColor), px);
+	        col2.Apply (ipol.GetFloat (offsetColor2), px);
+	      }
 
 	      if (doAlphaTest)
 	      {
@@ -179,17 +218,28 @@ namespace cspluginSoftshader
 	} /* endwhile */
       }
     };
+    template<typename Source, typename Color, typename Zmode, int needColors, 
+      int doAlphaTest>
+    iScanlineRenderer::ScanlineProc GetScanlineProcSCCnCA ()
+    {
+      if (colorSum)
+	return ScanlineImpl<Source, Color, Zmode, needColors, doAlphaTest, 
+	  Color2_Sum>::Scan;
+      else
+	return ScanlineImpl<Source, Color, Zmode, needColors, doAlphaTest,
+	  Color2_None>::Scan;
+    }
     template<typename Source, typename Color, typename Zmode, int needColors>
-    static iScanlineRenderer::ScanlineProc GetScanlineProcSCCnC (bool doAlphaTest)
+    iScanlineRenderer::ScanlineProc GetScanlineProcSCCnC (bool doAlphaTest)
     {
       if (doAlphaTest)
-	return ScanlineImpl<Source, Color, Zmode, needColors, 1>::Scan;
+	return GetScanlineProcSCCnCA<Source, Color, Zmode, needColors, 1> ();
       else
-	return ScanlineImpl<Source, Color, Zmode, needColors, 0>::Scan;
+	return GetScanlineProcSCCnCA<Source, Color, Zmode, needColors, 0> ();
     }
     template<typename Source, typename Color, typename Zmode>
-    static iScanlineRenderer::ScanlineProc GetScanlineProcSCC (bool needColors,
-							       bool doAlphaTest)
+    iScanlineRenderer::ScanlineProc GetScanlineProcSCC (bool needColors,
+						        bool doAlphaTest)
     {
       if (needColors)
 	return GetScanlineProcSCCnC<Source, Color, Zmode, 1> (doAlphaTest);
@@ -197,9 +247,9 @@ namespace cspluginSoftshader
 	return GetScanlineProcSCCnC<Source, Color, Zmode, 0> (doAlphaTest);
     }
     template<typename Source, typename Color>
-    static iScanlineRenderer::ScanlineProc GetScanlineProcSC (csZBufMode zmode,
-							      bool needColors,
-							      bool doAlphaTest)
+    iScanlineRenderer::ScanlineProc GetScanlineProcSC (csZBufMode zmode,
+                                                       bool needColors,
+						       bool doAlphaTest)
     {
       switch (zmode)
       {
@@ -220,26 +270,23 @@ namespace cspluginSoftshader
       }
     }
     template<typename Source>
-    static iScanlineRenderer::ScanlineProc GetScanlineProcS (bool colorized, 
-							     csZBufMode zmode,
-							     bool needColors,
-							     bool doAlphaTest)
+    iScanlineRenderer::ScanlineProc GetScanlineProcS (csZBufMode zmode,
+						      bool needColors,
+						      bool doAlphaTest)
     {
-      if (colorized)
+      if (doColor)
 	return GetScanlineProcSC<Source, Color_Multiply> (zmode, needColors, doAlphaTest);
       else
 	return GetScanlineProcSC<Source, Color_None> (zmode, needColors, doAlphaTest);
     }
-    static iScanlineRenderer::ScanlineProc GetScanlineProc (bool flat,
-							    bool colorized, 
-							    csZBufMode zmode,
-							    bool needColors,
-							    bool doAlphaTest)
+    iScanlineRenderer::ScanlineProc GetScanlineProc (csZBufMode zmode,
+						     bool needColors,
+						     bool doAlphaTest)
     {
-      if (flat)
-	return GetScanlineProcS<Source_Flat> (colorized, zmode, needColors, doAlphaTest);
+      if (doTexture)
+	return GetScanlineProcS<Source_Texture> (zmode, needColors, doAlphaTest);
       else
-	return GetScanlineProcS<Source_Texture> (colorized, zmode, needColors, doAlphaTest);
+	return GetScanlineProcS<Source_Flat> (zmode, needColors, doAlphaTest);
     }
   public:
     bool SetupMesh (TexturesMask availableTextures, BuffersMask availableBuffers, 
@@ -247,22 +294,36 @@ namespace cspluginSoftshader
       RenderInfoMesh& renderInfoMesh)
     {
       renderInfoMesh.desiredBuffers = 0;
-      doFlat = false;
       doTexture = availableTextures & 1;
       if (doTexture)
 	renderInfoMesh.desiredBuffers |= CS_SOFT3D_BUFFERFLAG(TEXCOORD);
-      else
-	doFlat = true;
 
       doColor = ((availableBuffers & CS_SOFT3D_BUFFERFLAG(COLOR)) != 0);
-      static const size_t myBufferComps[] = {4, 2};
-      if (doColor)
+      if (colorSum)
       {
-	renderInfoMesh.bufferComps = myBufferComps;
-	renderInfoMesh.desiredBuffers |= CS_SOFT3D_BUFFERFLAG(COLOR);
+	static const size_t myBufferComps[] = {4, 3, 2};
+	if (doColor)
+	{
+	  renderInfoMesh.bufferComps = myBufferComps;
+	  renderInfoMesh.desiredBuffers |= CS_SOFT3D_BUFFERFLAG(COLOR);
+	}
+	else
+	{
+	  renderInfoMesh.bufferComps = &myBufferComps[1];
+	}
+	renderInfoMesh.desiredBuffers |= CS_SOFT3D_BUFFERFLAG(SECONDARY_COLOR);
       }
       else
-	renderInfoMesh.bufferComps = &myBufferComps[1];
+      {
+	static const size_t myBufferComps[] = {4, 2};
+	if (doColor)
+	{
+	  renderInfoMesh.bufferComps = myBufferComps;
+	  renderInfoMesh.desiredBuffers |= CS_SOFT3D_BUFFERFLAG(COLOR);
+	}
+	else
+	  renderInfoMesh.bufferComps = &myBufferComps[1];
+      }
 
       renderInfoMesh.renderer = this;
 
@@ -280,7 +341,7 @@ namespace cspluginSoftshader
 	  doAlphaTest = (modes.alphaType == csAlphaMode::alphaBinary);
 	  break;
       }
-      proc = GetScanlineProc (doFlat, doColor, modes.z_buf_mode,
+      proc = GetScanlineProc (modes.z_buf_mode,
 	needColors, doAlphaTest);
 
       return proc != 0;
@@ -314,9 +375,8 @@ namespace cspluginSoftshader
     }
   private:
     // Settings determined per-mesh
-    bool doFlat;
-    bool doColor;
     bool doTexture;
+    bool doColor;
     ScanlineProc proc;
   };
 } // namespace cspluginSoftshader

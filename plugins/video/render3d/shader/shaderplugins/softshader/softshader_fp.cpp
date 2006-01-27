@@ -76,6 +76,14 @@ bool csSoftShader_FP::Load (iShaderDestinationResolver*,
 	  if (!ParseProgramParam (child, afactor, ParamFloat))
 	    return false;
 	  break;
+	case XMLTOKEN_COLORSUM:
+	  {
+	    bool b;
+	    if (!synsrv->ParseBool (child, b, true))
+	      return false;
+	    colorSum = b;
+	  }
+	  break;
         default:
 	  {
 	    switch (commonTokens.Request (value))
@@ -116,6 +124,7 @@ void csSoftShader_FP::SetupState (const csRenderMesh* /*mesh*/,
   shaderPlug->scanlineRenderer->SetShift (
     FactorToShift (GetParamFloatVal (stacks, cfactor, 1.0f)),
     FactorToShift (GetParamFloatVal (stacks, afactor, 1.0f)));
+  shaderPlug->scanlineRenderer->SetColorSum (colorSum);
 }
 
 bool csSoftShader_FP::Compile()

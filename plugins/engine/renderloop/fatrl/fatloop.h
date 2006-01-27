@@ -80,21 +80,23 @@ public:
     iBase* context);
 };
 
-class csFatLoopFactory : public iRenderStepFactory
+class csFatLoopFactory :
+  public scfImplementation1<csFatLoopFactory,
+                            iRenderStepFactory>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csFatLoopFactory (iObjectRegistry* object_reg);
   virtual ~csFatLoopFactory ();
 
   virtual csPtr<iRenderStep> Create ();
 };
 
-class csFatLoopStep : public iRenderStep
+class csFatLoopStep :
+  public scfImplementation1<csFatLoopStep,
+                            iRenderStep>
 {
   iObjectRegistry* object_reg;
 
@@ -172,8 +174,6 @@ class csFatLoopStep : public iRenderStep
     const csReversibleTransform &objT, uint framenr);
   /** @} */
 public:
-  SCF_DECLARE_IBASE;
-
   csFatLoopStep (iObjectRegistry* object_reg);
   virtual ~csFatLoopStep ();
 

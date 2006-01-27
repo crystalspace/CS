@@ -102,6 +102,9 @@
       <colorbuffer>color unlit</colorbuffer>
     <?endif?>
     -->
+    <!-- @@@ FIXME: Support software specular
+      -- Unfortunately, the only way I see is to uglily use a 2nd pass
+      -- for the specular part... [res] -->
     <colormixmode>none</colormixmode>
     <finalfactor type="float">0.5</finalfactor>
     <lights>$N$</lights>

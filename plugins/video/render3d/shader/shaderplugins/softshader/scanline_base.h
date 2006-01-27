@@ -41,10 +41,11 @@ namespace cspluginSoftshader
     int and_h;
     int colorShift;
     int alphaShift;
+    bool colorSum;
 
     ScanlineRendererBase() : scfImplementationType (this),
-      flat_col (255, 255, 255, 255),
-      colorShift(16), alphaShift (16) {}
+      flat_col (255, 255, 255, 255), colorShift(16), alphaShift (16), 
+      colorSum (false) {}
     virtual ~ScanlineRendererBase() {}
 
     void SetFlatColor (const csVector4& v)
@@ -59,6 +60,7 @@ namespace cspluginSoftshader
       colorShift = 16-c;
       alphaShift = 16-a;
     }
+    void SetColorSum (bool enable) { colorSum = enable; }
   };
 } // namespace cspluginSoftshader
 

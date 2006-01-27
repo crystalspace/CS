@@ -669,7 +669,7 @@ struct csSimpleRenderMesh
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 2, 0, 0);
+  SCF_INTERFACE(iGraphics3D, 2, 0, 1);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -947,6 +947,12 @@ struct iGraphics3D : public virtual iBase
    * \remarks 'this' space is world space, 'other' space is camera space
    */
   virtual void SetWorldToCamera (const csReversibleTransform& w2c) = 0;
+  
+  /**
+   * Get the current world to camera transform.
+   * \remarks 'this' space is world space, 'other' space is camera space
+   */
+  virtual const csReversibleTransform& GetWorldToCamera () = 0;
 };
 
 /** @} */

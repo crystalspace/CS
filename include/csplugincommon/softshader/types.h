@@ -372,6 +372,11 @@ namespace CrystalSpace
 	return Pixel ((rb << 8) | ga);
       }
       CS_FORCEINLINE
+      Pixel& operator += (const Pixel other)
+      {
+	return (*this = *this + other);
+      }
+      CS_FORCEINLINE
       Pixel operator~ () const
       {
 	return Pixel (~ui32);

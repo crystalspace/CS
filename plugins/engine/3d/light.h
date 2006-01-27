@@ -128,6 +128,13 @@ protected:
   csColor color;
   /// Specular color
   csColor specularColor;
+  /**
+   * Whether the user changed the specular color.
+   * This decides whether a call to SetColor() changes both the diffuse and
+   * specular color (userSpecular == false) or only diffuse 
+   * (userSpecular == true).
+   */
+  bool userSpecular;
   /// The associated halo (if not 0)
   csHalo *halo;
 
@@ -350,7 +357,7 @@ public:
   { return specularColor; }
   /// Set the specular color of this light.
   void SetSpecularColor (const csColor& col) 
-  { specularColor = col; }
+  { userSpecular = true; specularColor = col; }
 
   /**
    * Return the associated halo

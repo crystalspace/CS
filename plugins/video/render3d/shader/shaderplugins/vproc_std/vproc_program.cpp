@@ -19,8 +19,9 @@
 #include "cssysdef.h"
 
 #include "csgfx/renderbuffer.h"
-#include "csgfx/vertexlight.h"
 #include "csgfx/shadervar.h"
+#include "csgfx/vertexlight.h"
+#include "csgfx/vertexlistwalker.h"
 
 #include "imap/services.h"
 #include "iutil/document.h"
@@ -35,7 +36,8 @@ csVProcStandardProgram::csVProcStandardProgram (csVProc_Std *plug)
   : scfImplementationType (this, plug->objreg), shaderPlugin (plug), 
   lightMixMode (LIGHTMIXMODE_NONE), 
   colorMixMode (LIGHTMIXMODE_NONE), 
-  numLights (0), useAttenuation (true),
+  numLights (0), useAttenuation (true), doSpecular (false),
+  specularOutputBuffer (CS_BUFFER_NONE),
   positionBuffer (CS_BUFFER_POSITION),
   normalBuffer (CS_BUFFER_NORMAL),
   colorBuffer (CS_BUFFER_COLOR_UNLIT)
@@ -55,7 +57,7 @@ void csVProcStandardProgram::Deactivate ()
 {
 }
 
-void csVProcStandardProgram::SetupState (const csRenderMesh* /*mesh*/,
+void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
                                          csRenderMeshModes& modes,
                                          const csShaderVarStack& stacks)
 {
@@ -73,17 +75,37 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* /*mesh*/,
     iRenderBuffer *cbuf = GetBuffer (colorBuffer, modes, stacks);
 
     if (vbuf == 0 || nbuf == 0) return;
+    
+    csReversibleTransform camtrans;
+    if ((stacks.Length() > shaderPlugin->string_world2camera) 
+      && (stacks[shaderPlugin->string_world2camera] != 0))
+      stacks[shaderPlugin->string_world2camera]->GetValue (camtrans);
+    csVector3 eyePos (camtrans.GetT2OTranslation ());
+    csVector3 eyePosObject (mesh->object2world.Other2This (eyePos));
+    
+    bool hasAlpha = cbuf && cbuf->GetComponentCount() >= 4;
 
     //copy output
+    size_t elementCount = vbuf->GetElementCount ();
     csRef<iRenderBuffer> clbuf = 
-      csRenderBuffer::CreateRenderBuffer (vbuf->GetElementCount (), CS_BUF_STREAM,
-      CS_BUFCOMP_FLOAT, 3, true);
+      csRenderBuffer::CreateRenderBuffer (elementCount, CS_BUF_STREAM,
+      CS_BUFCOMP_FLOAT, hasAlpha ? 4 : 3, true);
+    csRef<iRenderBuffer> specBuf;
+    if (doSpecular)
+    {
+      specBuf = csRenderBuffer::CreateRenderBuffer (elementCount, 
+        CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3, true);
+      csRenderBufferLock<float> tmpColor (specBuf);
+      memset (tmpColor, 0, sizeof(csColor) * elementCount);
+    }
+    float shininess = GetParamFloatVal (stacks, shininessParam, 0.0f);
 
     // tempdata
-    csRenderBufferLock<csColor, iRenderBuffer*> tmpColor (clbuf);
-
-    size_t elementCount = vbuf->GetElementCount ();
-    memset (tmpColor.Lock(), 0, sizeof(csColor) * elementCount);
+    {
+      // @@@ FIXME: should probably get rid of the multiple locking/unlocking...
+      csRenderBufferLock<float> tmpColor (clbuf);
+      memset (tmpColor, 0, sizeof(float) * (hasAlpha?4:3) * elementCount);
+    }
 
     if (lightsActive > 0)
     {
@@ -98,7 +120,8 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* /*mesh*/,
 	  csLightProperties light (lightNum, shaderPlugin->lsvCache, stacks);
 	  iVertexLightCalculator *calc = 
 	    shaderPlugin->GetLightCalculator (light, useAttenuation);
-	  calc->CalculateLighting (light, elementCount, vbuf, nbuf, tmpColor);
+	  calc->CalculateLighting (light, eyePosObject, shininess, elementCount, 
+	   vbuf, nbuf, clbuf, specBuf);
 	}
       }
       else
@@ -111,7 +134,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* /*mesh*/,
 	    useMixMode = lightMixMode;
 	    continue;
 	  }
-
+	  
 	  csLightProperties light (i, shaderPlugin->lsvCache, stacks);
 	  iVertexLightCalculator *calc = 
 	    shaderPlugin->GetLightCalculator (light, useAttenuation);
@@ -120,14 +143,14 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* /*mesh*/,
 	  {
 	  case LIGHTMIXMODE_ADD:
 	    {
-	      calc->CalculateLightingAdd (light, elementCount, vbuf, nbuf, 
-		tmpColor);
+	      calc->CalculateLightingAdd (light, eyePosObject, shininess, elementCount, 
+	        vbuf, nbuf, clbuf, specBuf);
 	      break;
 	    }
 	  case LIGHTMIXMODE_MUL:
 	    {
-	      calc->CalculateLightingMul (light, elementCount, vbuf, nbuf, 
-		tmpColor);
+	      calc->CalculateLightingMul (light, eyePosObject, shininess, elementCount,
+	        vbuf, nbuf, clbuf, specBuf);
 	      break;
 	    }
 	  case LIGHTMIXMODE_NONE:
@@ -139,30 +162,83 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* /*mesh*/,
 
     }
 
-    if (cbuf && (colorMixMode != LIGHTMIXMODE_NONE))
+    if (cbuf) 
     {
-      csRenderBufferLock<csColor, iRenderBuffer*> cbufWalker (cbuf);
-      
-      if (colorMixMode == LIGHTMIXMODE_ADD)
+      switch (colorMixMode)
       {
-	for (size_t i = 0; i < elementCount; i++)
-	  tmpColor[i] += cbufWalker[i];
-      }
-      else
-      {
-	for (size_t i = 0; i < elementCount; i++)
-	  tmpColor[i] *= cbufWalker[i];
+        case LIGHTMIXMODE_NONE:
+          if (!hasAlpha) break;
+          {
+            csVertexListWalker<float> cbufWalker (cbuf, 4);
+            csRenderBufferLock<csVector4, iRenderBuffer*> tmpColor (clbuf);
+	    for (size_t i = 0; i < elementCount; i++)
+	    {
+	      const float* c = cbufWalker;
+	      tmpColor[i].w = c[3];
+	      ++cbufWalker;
+	    }
+          }
+          break;
+	case LIGHTMIXMODE_ADD:
+          {
+            csVertexListWalker<float> cbufWalker (cbuf, 4);
+            csRenderBufferLock<csVector4, iRenderBuffer*> tmpColor (clbuf);
+	    for (size_t i = 0; i < elementCount; i++)
+	    {
+	      csVector4& t = tmpColor[i];
+	      const float* c = cbufWalker;
+	      for (size_t j = 0; j < 3; j++)
+	        t[j] += c[j];
+	      if (hasAlpha) t[3] = c[3];
+	      ++cbufWalker;
+	    }
+          }
+          break;
+	case LIGHTMIXMODE_MUL:
+          {
+            csVertexListWalker<float> cbufWalker (cbuf, 4);
+            csRenderBufferLock<csVector4, iRenderBuffer*> tmpColor (clbuf);
+	    for (size_t i = 0; i < elementCount; i++)
+	    {
+	      csVector4& t = tmpColor[i];
+	      const float* c = cbufWalker;
+	      for (size_t j = 0; j < 3; j++)
+	        t[j] *= c[j];
+	      if (hasAlpha) t[3] = c[3];
+	      ++cbufWalker;
+	    }
+          }
+          break;
+	default:
+	  CS_ASSERT (false);
       }
     }
 
     float finalLightFactorReal = GetParamFloatVal (stacks, finalLightFactor,
       1.0f);
-    for (size_t i = 0; i < elementCount; i++)
-      tmpColor[i] *= finalLightFactorReal;
+    {
+      csRenderBufferLock<csColor> tmpColor (clbuf);
+      for (size_t i = 0; i < elementCount; i++)
+      {
+        tmpColor[i] *= finalLightFactorReal;
+      }
+    }
 
     modes.buffers->SetAccessor (modes.buffers->GetAccessor(),
       modes.buffers->GetAccessorMask() & ~CS_BUFFER_COLOR_MASK);
     modes.buffers->SetRenderBuffer (CS_BUFFER_COLOR, clbuf);
+    if (doSpecular)
+    {
+      csRenderBufferLock<csColor> tmpColor (specBuf);
+      for (size_t i = 0; i < elementCount; i++)
+      {
+        tmpColor[i] *= finalLightFactorReal;
+      }
+      
+      modes.buffers->SetAccessor (modes.buffers->GetAccessor(),
+	modes.buffers->GetAccessorMask() & ~(1 << specularOutputBuffer));
+      modes.buffers->SetRenderBuffer (specularOutputBuffer, specBuf);
+    }
   }
 }
 
@@ -287,6 +363,32 @@ bool csVProcStandardProgram::Load (iShaderDestinationResolver* /*resolve*/,
 	  }
 	  break;
 	}
+      case XMLTOKEN_SPECULAR:
+        {
+	  if (!synsrv->ParseBool (child, doSpecular, true))
+	    return false;
+	  const char* buffer = child->GetAttributeValue ("buffer");
+	  if (!buffer)
+	  {
+	    synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
+	      pnode, "'buffer' attribute missing");
+	    return false;
+	  }
+	  csRenderBufferName bufferName = csRenderBuffer::GetBufferNameFromDescr (buffer);
+	  if (bufferName == CS_BUFFER_NONE)
+	  {
+	    synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
+	      pnode, "buffer name '%s' invalid here", buffer);
+	    return false;
+	  }
+	  specularOutputBuffer = bufferName;
+	}
+	break;
+      case XMLTOKEN_SPECULAREXP:
+	if (!ParseProgramParam (child, shininessParam,
+	  ParamFloat | ParamShaderExp))
+	  return false;
+        break;
       default:
         {
           switch (commonTokens.Request (value))

@@ -192,19 +192,14 @@ bool csFatLoopLoader::ParsePass (iDocumentNode* node, RenderPass& pass)
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csFatLoopFactory);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_IBASE_END
-
-csFatLoopFactory::csFatLoopFactory (iObjectRegistry* object_reg)
+csFatLoopFactory::csFatLoopFactory (iObjectRegistry* object_reg) : 
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   csFatLoopFactory::object_reg = object_reg;
 }
 
 csFatLoopFactory::~csFatLoopFactory ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csFatLoopFactory::Create ()
@@ -214,11 +209,8 @@ csPtr<iRenderStep> csFatLoopFactory::Create ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csFatLoopStep);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStep);
-SCF_IMPLEMENT_IBASE_END
-
-csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
+csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) : 
+  scfImplementationType (this),
   /*buckets(2, 2), */passes(2, 2), meshNodeFact(object_reg), 
   portalNodeFact(object_reg)
 {
@@ -235,6 +227,7 @@ csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
   fogplane_name = strings->Request ("fogplane");
   fogdensity_name = strings->Request ("fog density");
   fogcolor_name = strings->Request ("fog color");
+  fogcolor_name = strings->Request ("camera transform");
 
   lsvCache.SetStrings (strings);
 }
@@ -242,7 +235,6 @@ csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
 csFatLoopStep::~csFatLoopStep ()
 {
   shadervars.Clear();
-  SCF_DESTRUCT_IBASE();
 }
 
 class PriorityHelper
@@ -426,7 +418,7 @@ void csFatLoopStep::BuildNodeGraph (RenderNode* node, iRenderView* rview,
       if ((shader == 0) || (shader == nullShader))
 	continue;
 
-      // Render passes untik the limit is hit
+      // Render passes until the limit is hit
       while (passCount < pass.maxPasses)
       {
 	passCount++;
@@ -557,7 +549,7 @@ void csFatLoopStep::SetLightSVs (csShaderVariableContext& shadervars,
   sv = GetFrameUniqueSV (framenr, shadervars, 
     lsvCache.GetLightSVId (lightId, 
       csLightShaderVarCache::lightSpecular));
-  const csColor& specular = light->GetColor ();
+  const csColor& specular = light->GetSpecularColor ();
   sv->SetValue (csVector3 (specular.red, specular.green, specular.blue));
 
 

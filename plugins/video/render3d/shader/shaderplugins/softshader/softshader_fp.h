@@ -45,9 +45,11 @@ private:
   ProgramParam flatColor;
   ProgramParam cfactor;
   ProgramParam afactor;
+  bool colorSum;
 public:
   csSoftShader_FP (csSoftShader* shaderPlug) : 
-    csShaderProgram(shaderPlug->object_reg), shaderPlug(shaderPlug)
+    csShaderProgram(shaderPlug->object_reg), shaderPlug(shaderPlug), 
+    colorSum (false)
   {
     InitTokenTable (tokens);
   }

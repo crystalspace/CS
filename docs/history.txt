@@ -11,6 +11,14 @@ chronological order.
 	  memory mapping changes.
 	- res fixed the memory mapping code to properly support mapping ranges
 	  including the end of the file.
+	- res added support for specular lighting to vproc_std.
+	- res added support for color sum to softshader.
+	- res changed the fatloop to use new SCF.
+	- res changed lights to have their specular color the same as the 
+	  diffuse color by default.
+	- res revived csVertexListWalker<>, albeit with a slightly different
+	  purpose: it now converts the data inside a render buffer to some
+	  user-specified type.
 26-Jan-2006
 	- Peter Amstutz updated the VOS plugin to remove the crossbuilder code
 	  and use the new, much cleaner iLoader interface instead.

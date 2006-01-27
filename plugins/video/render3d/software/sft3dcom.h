@@ -235,6 +235,7 @@ protected:
 	theG3D->scanlineRenderer = theG3D->defaultRenderer;
 	theG3D->defaultRendererState->SetFlatColor (csVector4 (1, 1, 1, 1));
 	theG3D->defaultRendererState->SetShift (0, 0);
+	theG3D->defaultRendererState->SetColorSum (false);
 	unsetRenderer = true;
       }
       else
@@ -392,6 +393,8 @@ public:
     this->w2c = w2c;
     shadermgr->GetVariableAdd (string_world2camera)->SetValue (w2c);
   }
+  virtual const csReversibleTransform& GetWorldToCamera ()
+  { return w2c; }
   /// Set optional clipper.
   virtual void SetClipper (iClipper2D* clipper, int cliptype);
   /// Get clipper.

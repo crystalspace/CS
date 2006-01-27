@@ -55,6 +55,7 @@ bool csVProc_Std::Initialize (iObjectRegistry *reg)
     CS_QUERY_REGISTRY_TAG_INTERFACE (objreg, 
     "crystalspace.shared.stringset", iStringSet);
   string_object2world = strings->Request ("object2world transform");
+  string_world2camera = strings->Request ("world2camera transform");
 
   //setup the matrix of light calculators
   lightCalculatorMatrix[GetMatrixIndex (CS_LIGHT_POINTLIGHT, CS_ATTN_NONE)] =

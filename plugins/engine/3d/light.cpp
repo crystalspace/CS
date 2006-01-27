@@ -81,7 +81,7 @@ csLight::csLight (
   float red, float green, float blue,
   csLightDynamicType dyntype) :
     scfImplementationType (this), light_id (0), color (red, green, blue),
-    specularColor (0,0,0),
+    specularColor (red, green, blue), userSpecular (false),
     halo (0), dynamicType (dyntype), type (CS_LIGHT_POINTLIGHT), 
     attenuation (CS_ATTN_LINEAR), cutoffDistance (d),
     directionalCutoffRadius (d), spotlightFalloffInner (0),
@@ -458,6 +458,7 @@ void csLight::SetColor (const csColor& col)
   }
 
   color = col; 
+  if (!userSpecular) specularColor = col;
   lightnr++;
 
   LightingInfo::GlobalIterator it(lightinginfos.GetIterator());

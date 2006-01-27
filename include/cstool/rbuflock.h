@@ -75,7 +75,7 @@ public:
     currElement(0)
   {
 #ifdef CS_DEBUG
-    elements = buf->GetElementCount();
+    elements = buf ? buf->GetElementCount() : 0;
 #endif
   }
   

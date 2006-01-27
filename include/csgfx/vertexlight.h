@@ -24,6 +24,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "csgfx/lightsvcache.h"
+#include "csgfx/vertexlistwalker.h"
 #include "csutil/cscolor.h"
 #include "cstool/rbuflock.h"
 
@@ -38,7 +39,7 @@
 /**
  * Light properties, as needed by the attenuation and lighting functors.
  */
-struct CS_CRYSTALSPACE_EXPORT csLightProperties
+struct csLightProperties
 {
   /// Attenuation coefficients (for CLQ attenuation)
   csVector3 attenuationConsts;
@@ -59,6 +60,8 @@ struct CS_CRYSTALSPACE_EXPORT csLightProperties
   csLightType type;
   /// Light attenuation mode
   csLightAttenuationMode attenuationMode;
+  /// Specular color
+  csColor specular;
 
   csLightProperties () : spotFalloffInner(0.0f), spotFalloffOuter(0.0f),
     type(CS_LIGHT_POINTLIGHT) {}
@@ -114,13 +117,18 @@ struct CS_CRYSTALSPACE_EXPORT csLightProperties
     if ((stacks.Length() > id) && (stacks[id] != 0))
       stacks[id]->GetValue (t);
     attenuationMode = (csLightAttenuationMode)t;
-  }
+  
+    id = svcache.GetLightSVId (lightNum, 
+      csLightShaderVarCache::lightSpecular);
+    if ((stacks.Length() > id) && (stacks[id] != 0))
+      stacks[id]->GetValue (specular);
+}
 };
 
 /**
  * No attenuation. 
  */
-struct CS_CRYSTALSPACE_EXPORT csNoAttenuation
+struct csNoAttenuation
 {
   csNoAttenuation (const csLightProperties& /*light*/)
   {}
@@ -133,7 +141,7 @@ struct CS_CRYSTALSPACE_EXPORT csNoAttenuation
  * Linear attenuation.
  * Out = in * (1 - distance/radius)
  */
-struct CS_CRYSTALSPACE_EXPORT csLinearAttenuation
+struct csLinearAttenuation
 {
   csLinearAttenuation (const csLightProperties& light)
   {
@@ -152,7 +160,7 @@ struct CS_CRYSTALSPACE_EXPORT csLinearAttenuation
  * Inverse linear attenuation.
  * Out = in * / distance
  */
-struct CS_CRYSTALSPACE_EXPORT csInverseAttenuation
+struct csInverseAttenuation
 {
   csInverseAttenuation (const csLightProperties& /*light*/)
   {}
@@ -168,7 +176,7 @@ struct CS_CRYSTALSPACE_EXPORT csInverseAttenuation
  * Inverse quadratic attenuation.
  * Out = in * / distance^2
  */
-struct CS_CRYSTALSPACE_EXPORT csRealisticAttenuation
+struct csRealisticAttenuation
 {
   csRealisticAttenuation (const csLightProperties& /*light*/)
   {}
@@ -183,7 +191,7 @@ struct CS_CRYSTALSPACE_EXPORT csRealisticAttenuation
  * Constant, Linear, Quadratic attenuation
  * Out = in /(const + distance*lin + distance^2*quad)
  */
-struct CS_CRYSTALSPACE_EXPORT csCLQAttenuation
+struct csCLQAttenuation
 {
   csCLQAttenuation (const csLightProperties& light)
     : attnVec (light.attenuationConsts)
@@ -207,34 +215,42 @@ template<class AttenuationProc>
 class csPointLightProc
 {
 public:
-  csPointLightProc (const csLightProperties& light, 
-    float blackLimit = 0.0001f)
-    : attn (light), nullColor (0.0f, 0.0f, 0.0f), blackLimit (blackLimit)
+  csPointLightProc (const csLightProperties& light, float blackLimit = 0.0001f)
+    : attn (light), blackLimit (blackLimit)
   {    
     lightPos = light.posObject;
-    lightCol = light.color;
   }
-
-  CS_FORCEINLINE
-  csColor ProcessVertex (const csVector3 &v,const csVector3 &n) const
+  class PerVertex
   {
-    //compute gouraud shading..
-    csVector3 direction = lightPos-v;
-    float distance = csQsqrt(direction.SquaredNorm ());
-    float dp = (direction*n)/distance;
-    if (dp > blackLimit)
+    csVector3 direction;
+    float invDistance;
+    float a;
+    float dp;
+    bool vertexLit;
+  public:
+    CS_FORCEINLINE
+    PerVertex (const csPointLightProc& parent, const csVector3 &v,
+      const csVector3 &n)
     {
-      attn (distance, dp);
-      return lightCol*dp;
+      direction = parent.lightPos-v;
+      float distance = csQsqrt (direction.SquaredNorm ());
+      invDistance = 1.0f/distance;
+      dp = (direction*n) * invDistance;
+      if ((vertexLit = (dp > parent.blackLimit)))
+      {
+	a = 1.0f;
+	parent.attn (distance, a);
+      }
     }
-    return nullColor;
-  }
-
+    bool IsLit() const { return vertexLit; }
+    float Attenuation() const { return a; }
+    float DiffuseAttenuated() const { return a*dp; }
+    const csVector3& LightDirection() const { return direction; }
+    const float LightInvDistance() const { return invDistance; }
+  };
 private:
   AttenuationProc attn;
   csVector3 lightPos; //localspace
-  csColor lightCol;
-  csColor nullColor;
   float blackLimit;
 };
 
@@ -248,35 +264,45 @@ class csDirectionalLightProc
 {
 public:
   csDirectionalLightProc (const csLightProperties& light, 
-    float blackLimit = 0.0001f)
-    : attn (light), nullColor (0.0f, 0.0f, 0.0f), blackLimit (blackLimit)
+                          float blackLimit = 0.0001f) : attn (light), 
+                          blackLimit (blackLimit)
   {
     lightPos = light.posObject;
     lightDir = light.dirObject;
-    lightCol = light.color;
   }
-
-  CS_FORCEINLINE
-  csColor ProcessVertex (const csVector3 &v,const csVector3 &n) const
+  class PerVertex
   {
-    //compute gouraud shading..
-    float dp = -lightDir*n;
-    if (dp > blackLimit)
+    csVector3 direction;
+    float invDistance;
+    float a;
+    float dp;
+    bool vertexLit;
+  public:
+    CS_FORCEINLINE
+    PerVertex (const csDirectionalLightProc& parent, const csVector3 &v,
+      const csVector3 &n)
     {
-      csVector3 direction = lightPos-v;
-      float distance = csQsqrt(direction.SquaredNorm ());
-      attn (distance, dp);
-      return lightCol*dp;
+      //compute gouraud shading..
+      dp = -parent.lightDir*n;
+      if ((vertexLit = (dp > parent.blackLimit)))
+      {
+	csVector3 direction = parent.lightPos-v;
+	a = 1.0f;
+        float distance = csQsqrt(direction.SquaredNorm ());
+        invDistance = 1.0f/distance;
+	parent.attn (distance, a);
+      }
     }
-    return nullColor;
-  }
-
+    bool IsLit() const { return vertexLit; }
+    float Attenuation() const { return a; }
+    float DiffuseAttenuated() const { return a*dp; }
+    const csVector3& LightDirection() const { return direction; }
+    const float LightInvDistance() const { return invDistance; }
+  };
 private:
   AttenuationProc attn;
   csVector3 lightPos; //localspace
   csVector3 lightDir; //localspace
-  csColor lightCol;
-  csColor nullColor;
   float blackLimit;
 };
 
@@ -290,44 +316,61 @@ class csSpotLightProc
 {
 public:
   csSpotLightProc (const csLightProperties& light, 
-    float blackLimit = 0.0001f)
-    : attn (light), nullColor (0.0f, 0.0f, 0.0f), blackLimit (blackLimit)
+                   float blackLimit = 0.0001f) : attn (light), 
+                   blackLimit (blackLimit)
   {
     lightPos = light.posObject;
     lightDir = light.dirObject;
 
-    lightCol = light.color;
     falloffInner = light.spotFalloffInner;
     falloffOuter = light.spotFalloffOuter;
   }
 
-  CS_FORCEINLINE
-  csColor ProcessVertex (const csVector3 &v,const csVector3 &n) const
+  class PerVertex
   {
-    csVector3 direction = (lightPos-v).Unit ();
-
-    //compute gouraud shading..
-    float dp = direction*n;
-    if (dp > blackLimit)
+    csVector3 direction;
+    float invDistance;
+    float a;
+    float cosfact;
+    bool vertexLit;
+  public:
+    CS_FORCEINLINE
+    PerVertex (const csSpotLightProc& parent, const csVector3 &v,
+      const csVector3 &n)
     {
-      float cosfact =
-	csSmoothStep (-(direction*lightDir), falloffInner, falloffOuter);
-      float distance = csQsqrt(direction.SquaredNorm ());
-      if (cosfact > 0)
+      //compute gouraud shading..
+      direction = parent.lightPos-v;
+      csVector3 dirUnit (direction.Unit ());
+  
+      //compute gouraud shading..
+      float dp = dirUnit*n;
+      if (dp > parent.blackLimit)
       {
-        attn (distance, dp);
-        return lightCol*dp*cosfact;
+	cosfact =
+	  csSmoothStep (-(dirUnit*parent.lightDir), 
+	    parent.falloffInner, parent.falloffOuter);
+	if ((vertexLit = (cosfact > 0)))
+	{
+	  cosfact *= dp;
+	  float distance = csQsqrt(direction.SquaredNorm ());
+	  invDistance = 1.0f/distance;
+	  a = 1.0f;
+	  parent.attn (distance, a);
+	}
       }
+      else
+        vertexLit = false;
     }
-    return nullColor;
-  }
-
+    bool IsLit() const { return vertexLit; }
+    float Attenuation() const { return a; }
+    float DiffuseAttenuated() const { return a*cosfact; }
+    const csVector3& LightDirection() const { return direction; }
+    const float LightInvDistance() const { return invDistance; }
+  };
 private:
   AttenuationProc attn;
   csVector3 lightPos; //localspace
   csVector3 lightDir; //localspace
-  csColor lightCol;
-  csColor nullColor;
   float blackLimit;
   float falloffInner, falloffOuter;
 };
@@ -346,25 +389,28 @@ public:
    * \param nb Normals. Buffer should contain (at least) 3 component vectors.
    * \param litColor Destination colors.
    */
-  virtual void CalculateLighting (const csLightProperties& light, 
+  virtual void CalculateLighting (const csLightProperties& light,
+    const csVector3& eyePos, float shininess,
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
-    csColor *litColor) const = 0;
+    iRenderBuffer* litColor, iRenderBuffer* specColor = 0) const = 0;
 
   /**
    * Compute lighting, add lit colors to the destination colors.
    * \copydoc CalculateLighting 
    */
-  virtual void CalculateLightingAdd (const csLightProperties& light, 
+  virtual void CalculateLightingAdd (const csLightProperties& light,
+    const csVector3& eyePos, float shininess,
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
-    csColor *litColor) const = 0;
+    iRenderBuffer* litColor, iRenderBuffer* specColor = 0) const = 0;
 
   /**
    * Compute lighting, multiply lit colors with destination colors.
    * \copydoc CalculateLighting 
    */
-  virtual void CalculateLightingMul (const csLightProperties& light, 
+  virtual void CalculateLightingMul (const csLightProperties& light,
+    const csVector3& eyePos, float shininess,
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
-    csColor *litColor) const = 0;
+    iRenderBuffer* litColor, iRenderBuffer* specColor = 0) const = 0;
 };
 
 /**
@@ -375,52 +421,120 @@ public:
 template<class LightProc>
 class csVertexLightCalculator : public iVertexLightCalculator
 {
+  struct OpAssign
+  {
+    OpAssign (csColor& d, const csColor& x) { d = x; }
+  };
+  struct OpAdd
+  {
+    OpAdd (csColor& d, const csColor& x) { d += x; }
+  };
+  struct OpMul
+  {
+    OpMul (csColor& d, const csColor& x) { d *= x; }
+  };
+  template<typename Op, int zeroDest, int diffuse, int specular>
+  void CalculateLightingODS (const csLightProperties& light,
+    const csVector3& eyePos, float shininess,
+    size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
+    iRenderBuffer* litColor, iRenderBuffer* specColor) const
+  {
+    if (!diffuse && !specular) return;
+
+    // setup the light calculator
+    LightProc lighter (light);
+    csVertexListWalker<float, csVector3> vbLock (vb, 3);
+    csVertexListWalker<float, csVector3> nbLock (nb, 3);
+    csRenderBufferLock<csColor, iRenderBuffer*> color (litColor);
+    csRenderBufferLock<csColor, iRenderBuffer*> spec (specColor);
+
+    for (size_t i = 0; i < numvert; i++)
+    {
+      const csVector3 v (*vbLock);
+      const csVector3 n (*nbLock);
+      typename_qualifier LightProc::PerVertex pv (lighter, v, n);
+      if (pv.IsLit())
+      {
+        if (diffuse)
+        {
+          Op op (color[i], pv.DiffuseAttenuated() * light.color);
+        }
+        if (specular)
+        {
+	  csVector3 vertToEye = eyePos - v;
+	  csVector3 halfvec = pv.LightDirection() * pv.LightInvDistance();
+	  halfvec += vertToEye.Unit();
+	  float specDP = halfvec.Unit() * n;
+          Op op (spec[i], pow (specDP, shininess) * light.specular * pv.Attenuation());
+        }
+      }
+      else if (zeroDest)
+      {
+        csColor nullColor (0.0f, 0.0f, 0.0f);
+        if (diffuse)
+        {
+          Op op (color[i], nullColor);
+	}
+        if (specular)
+        {
+          Op op (spec[i],  nullColor);
+	}
+      }
+      ++vbLock; ++nbLock;
+    }
+  }
+  template<typename Op, int zeroDest, int diffuse>
+  void CalculateLightingOD (const csLightProperties& light,
+    const csVector3& eyePos, float shininess,
+    size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
+    iRenderBuffer* litColor, iRenderBuffer* specColor) const
+  {
+    if (specColor != 0)
+      CalculateLightingODS<Op, zeroDest, diffuse, 1> (light, eyePos, shininess,
+        numvert, vb, nb, litColor, specColor);
+    else
+      CalculateLightingODS<Op, zeroDest, diffuse, 0> (light, eyePos, shininess,
+        numvert, vb, nb, litColor, specColor);
+  }
+  template<typename Op, int zeroDest>
+  void CalculateLightingO (const csLightProperties& light,
+    const csVector3& eyePos, float shininess,
+    size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
+    iRenderBuffer* litColor, iRenderBuffer* specColor) const
+  {
+    if (litColor != 0)
+      CalculateLightingOD<Op, zeroDest, 1> (light, eyePos, shininess, numvert, 
+        vb, nb, litColor, specColor);
+    else
+      CalculateLightingOD<Op, zeroDest, 0> (light, eyePos, shininess, numvert, 
+        vb, nb, litColor, specColor);
+  }
 public:
-  virtual void CalculateLighting (const csLightProperties& light, 
+  virtual void CalculateLighting (const csLightProperties& light,
+    const csVector3& eyePos, float shininess,
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
-    csColor *litColor) const
+    iRenderBuffer* litColor, iRenderBuffer* specColor = 0) const
   {
-    // setup the light calculator
-    LightProc lighter (light);
-    csRenderBufferLock<csVector3, iRenderBuffer*> vbLock (vb);
-    csRenderBufferLock<csVector3, iRenderBuffer*> nbLock (nb);
-
-    for (size_t n = 0; n < numvert; n++)
-    {
-      litColor[n] = lighter.ProcessVertex (vbLock[n], nbLock[n]);
-    }
+    CalculateLightingO<OpAssign, 1> (light, eyePos, shininess, 
+      numvert, vb, nb, litColor, specColor);
   }
 
-  virtual void CalculateLightingAdd (const csLightProperties& light, 
+  virtual void CalculateLightingAdd (const csLightProperties& light,
+    const csVector3& eyePos, float shininess,
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
-    csColor *litColor) const
+    iRenderBuffer* litColor, iRenderBuffer* specColor = 0) const
   {
-    // setup the light calculator
-    LightProc lighter (light);
-    csRenderBufferLock<csVector3, iRenderBuffer*> vbLock (vb);
-    csRenderBufferLock<csVector3, iRenderBuffer*> nbLock (nb);
-
-
-    for (size_t n = 0; n < numvert; n++)
-    {
-      litColor[n] += lighter.ProcessVertex (vbLock[n], nbLock[n]);
-    }
+    CalculateLightingO<OpAdd, 0> (light, eyePos, shininess, numvert, vb, nb, 
+      litColor, specColor);
   }
 
-  virtual void CalculateLightingMul (const csLightProperties& light, 
+  virtual void CalculateLightingMul (const csLightProperties& light,
+    const csVector3& eyePos, float shininess,
     size_t numvert, iRenderBuffer* vb, iRenderBuffer* nb, 
-    csColor *litColor) const
+    iRenderBuffer* litColor, iRenderBuffer* specColor = 0) const
   {
-    // setup the light calculator
-    LightProc lighter (light);
-    csRenderBufferLock<csVector3, iRenderBuffer*> vbLock (vb);
-    csRenderBufferLock<csVector3, iRenderBuffer*> nbLock (nb);
-
-
-    for (size_t n = 0; n < numvert; n++)
-    {
-      litColor[n] *= lighter.ProcessVertex (vbLock[n], nbLock[n]);
-    }
+    CalculateLightingO<OpMul, 0> (light, eyePos, shininess, numvert, vb, nb, 
+      litColor, specColor);
   }
 };
 

@@ -136,7 +136,8 @@ public:
     unsigned char* /*iAlpha*/, int /*iWidth*/, int /*iHeight*/) { return 0; }
 
   void RemoveFromCache (iRendererLightmap* /*rlm*/) { }
-  void SetWorldToCamera (const csReversibleTransform& /*w2c*/) { }
+  void SetWorldToCamera (const csReversibleTransform& w2c) { this->w2c = w2c; }
+  const csReversibleTransform& GetWorldToCamera () { return w2c; }
   void DrawSimpleMesh (const csSimpleRenderMesh& /*mesh*/, uint /*flags*/ = 0) { }
 
 private:
@@ -159,7 +160,7 @@ private:
   int w, h;
   int cx, cy;
   float a;
-  csReversibleTransform other2cam;
+  csReversibleTransform w2c;
 
   int current_drawflags;
 
