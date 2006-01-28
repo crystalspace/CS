@@ -10178,6 +10178,7 @@ class iGraphics3D(iBase):
     def CreateHalo(*args): return _cspace.iGraphics3D_CreateHalo(*args)
     def RemoveFromCache(*args): return _cspace.iGraphics3D_RemoveFromCache(*args)
     def SetWorldToCamera(*args): return _cspace.iGraphics3D_SetWorldToCamera(*args)
+    def GetWorldToCamera(*args): return _cspace.iGraphics3D_GetWorldToCamera(*args)
     def __del__(self, destroy=_cspace.delete_iGraphics3D):
         try:
             if self.thisown: destroy(self)
