@@ -45,7 +45,6 @@ class csWireFrameCam;
 class InfiniteMaze;
 struct iEngine;
 struct iRegion;
-struct iSoundHandle;
 struct iCollideSystem;
 struct iObjectRegistry;
 struct iPluginManager;
@@ -55,7 +54,8 @@ struct iLoader;
 struct iMeshWrapper;
 struct iLight;
 struct iView;
-struct iSoundRender;
+struct iSndSysWrapper;
+struct iSndSysRenderer;
 struct iKeyboardDriver;
 struct iVirtualClock;
 struct iGraphics3D;
@@ -320,7 +320,7 @@ public:
   csRef<iGraphics3D> myG3D;
   csRef<iConsoleOutput> myConsole;
   csRef<iVFS> myVFS;
-  csRef<iSoundRender> mySound;
+  csRef<iSndSysRenderer> mySound;
 
   /// The view on the world.
   iView* view;
@@ -342,8 +342,8 @@ public:
   InfiniteMaze* infinite_maze;
 
   /// Some sounds.
-  iSoundHandle* wMissile_boom;
-  iSoundHandle* wMissile_whoosh;
+  iSndSysWrapper* wMissile_boom;
+  iSndSysWrapper* wMissile_whoosh;
 
   /// Some flags.
   bool do_show_coord;

@@ -48,11 +48,7 @@
 #include "imesh/object.h"
 #include "imesh/sprite3d.h"
 #include "imesh/thing.h"
-#include "isound/handle.h"
-#include "isound/listener.h"
-#include "isound/renderer.h"
-#include "isound/source.h"
-#include "isound/wrapper.h"
+#include "isndsys.h"
 #include "iutil/databuff.h"
 #include "iutil/pluginconfig.h"
 #include "iutil/vfs.h"
@@ -2202,11 +2198,17 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     if (Sys->mySound)
     {
-      csRef<iSoundWrapper> sb (
-        CS_GET_NAMED_CHILD_OBJECT (Sys->view->GetEngine ()->
-        QueryObject (), iSoundWrapper, arg));
+      csRef<iSndSysManager> mgr = csQueryRegistry<iSndSysManager> (
+	Sys->object_reg);
+      iSndSysWrapper* sb = mgr->FindSoundByName (arg);
       if (sb)
-        sb->GetSound ()->Play();
+      {
+	csRef<iSndSysSource> sndsource = Sys->mySound->CreateSource (
+	    sb->GetStream ());
+	sndsource->SetVolume (1.0f);
+        sb->GetStream ()->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
+        sb->GetStream ()->Unpause ();
+      }
       else
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 		"Sound '%s' not found!", arg);

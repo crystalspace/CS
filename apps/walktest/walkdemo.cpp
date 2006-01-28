@@ -47,11 +47,7 @@
 #include "imesh/spiral.h"
 #include "imesh/sprite3d.h"
 #include "imesh/thing.h"
-#include "isound/handle.h"
-#include "isound/listener.h"
-#include "isound/renderer.h"
-#include "isound/source.h"
-#include "isound/wrapper.h"
+#include "isndsys.h"
 #include "ivaria/collider.h"
 #include "ivaria/engseq.h"
 #include "ivaria/reporter.h"
@@ -441,7 +437,7 @@ struct MissileStruct
   int type;		// type == DYN_TYPE_MISSILE
   csOrthoTransform dir;
   csRef<iMeshWrapper> sprite;
-  csRef<iSoundSource> snd;
+  csRef<iSndSysSource> snd;
 };
 
 struct ExplosionStruct
@@ -497,18 +493,27 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
         dyn->QueryObject ()->ObjRemove (ido);
         if (ms->snd)
         {
-          ms->snd->Stop();
+          ms->snd->GetStream ()->Pause();
         }
         delete ms;
         if (Sys->mySound)
         {
-          csRef<iSoundSource> sndsrc (
-	  	Sys->wMissile_boom->CreateSource (SOUND3D_ABSOLUTE));
-          if (sndsrc)
-          {
-            sndsrc->SetPosition (v);
-            sndsrc->Play();
-          }
+	  if (Sys->wMissile_boom)
+	  {
+	    iSndSysStream* st = Sys->wMissile_boom->GetStream ();
+	    csRef<iSndSysSource> sndsource = Sys->mySound->
+	      	CreateSource (st);
+	    if (sndsource)
+	    {
+	      csRef<iSndSysSourceSoftware3D> sndsource3d
+		= scfQueryInterface<iSndSysSourceSoftware3D> (sndsource);
+
+	      sndsource3d->SetPosition (v);
+	      sndsource3d->SetVolume (1.0f);
+	      st->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
+	      st->Unpause ();
+	    }
+	  }
         }
         ExplosionStruct* es = new ExplosionStruct;
         es->type = DYN_TYPE_EXPLOSION;
@@ -532,7 +537,13 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
       dyn->SetCenter (v);
       dyn->Setup ();
       if (ms->sprite) move_mesh (ms->sprite, s, v);
-      if (Sys->mySound && ms->snd) ms->snd->SetPosition (v);
+      if (Sys->mySound && ms->snd)
+      {
+	csRef<iSndSysSourceSoftware3D> sndsource3d
+		= scfQueryInterface<iSndSysSourceSoftware3D> (ms->snd);
+	sndsource3d->SetPosition (v);
+	sndsource3d->SetVolume (1.0f);
+      }
       break;
     }
     case DYN_TYPE_EXPLOSION:
@@ -627,11 +638,16 @@ void fire_missile ()
   ms->snd = 0;
   if (Sys->mySound)
   {
-    ms->snd = Sys->wMissile_whoosh->CreateSource (SOUND3D_ABSOLUTE);
+    iSndSysStream* sndstream = Sys->wMissile_whoosh->GetStream ();
+    ms->snd = Sys->mySound->CreateSource (sndstream);
     if (ms->snd)
     {
-      ms->snd->SetPosition (pos);
-      ms->snd->Play();
+      csRef<iSndSysSourceSoftware3D> sndsource3d
+		= scfQueryInterface<iSndSysSourceSoftware3D> (ms->snd);
+
+      sndsource3d->SetPosition (pos);
+      sndsource3d->SetVolume (1.0f);
+      ms->snd->GetStream ()->Unpause ();
     }
   }
   ms->type = DYN_TYPE_MISSILE;

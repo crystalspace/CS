@@ -32,6 +32,7 @@
 // "crystalspace.h" rather than including only the headers we need so that we
 // test as many headers for standards conformance as possible.
 #include "crystalspace.h"
+#include "isndsys.h"
 
 #include "walktest.h"
 #include "infmaze.h"
@@ -373,7 +374,7 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
 
     if (mySound)
     {
-      iSoundListener *sndListener = mySound->GetListener();
+      iSndSysListener *sndListener = mySound->GetListener();
       if(sndListener)
       {
         // take position/direction from view->GetCamera ()
@@ -1043,7 +1044,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   CanvasResize = csevCanvasResize (name_reg, myG2D);
 
   myConsole = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
-  mySound = CS_QUERY_REGISTRY (object_reg, iSoundRender);
+  mySound = CS_QUERY_REGISTRY (object_reg, iSndSysRenderer);
 
   // Some commercials...
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space version %s (%s).", CS_VERSION, CS_RELEASE_DATE);
@@ -1366,12 +1367,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Load a few sounds.
   if (mySound)
   {
-    csRef<iSoundWrapper> w (CS_GET_NAMED_CHILD_OBJECT (
-    	Engine->QueryObject (), iSoundWrapper, "boom.wav"));
-    wMissile_boom = w ? w->GetSound () : 0;
-    w = CS_GET_NAMED_CHILD_OBJECT (Engine->QueryObject (),
-					iSoundWrapper, "whoosh.wav");
-    wMissile_whoosh = w ? w->GetSound () : 0;
+    csRef<iSndSysManager> mgr = csQueryRegistry<iSndSysManager> (
+	object_reg);
+    wMissile_boom = mgr->FindSoundByName ("boom.wav");
+    wMissile_whoosh = mgr->FindSoundByName ("whoosh.wav");
   }
 
   Report (CS_REPORTER_SEVERITY_NOTIFY,
