@@ -38,9 +38,6 @@ struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iRegion;
 struct iSector;
-struct iSoundData;
-struct iSoundHandle;
-struct iSoundWrapper;
 struct iTextureHandle;
 struct iTextureManager;
 struct iTextureWrapper;
@@ -175,17 +172,6 @@ struct iLoader : public iBase
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
 	bool reg = true, bool create_material = true,
 	bool free_image = true) = 0;
-
-  /// Old Sound System: Load a sound file and return an iSoundData object
-  virtual csPtr<iSoundData> LoadSoundData (const char *fname) = 0;
-  /// Old Sound System: Load a sound file and register the sound
-  virtual csPtr<iSoundHandle> LoadSound (const char *fname) = 0;
-  /**
-   * Old Sound System: Load a sound file, register the sound and create a
-   * wrapper object for it.
-   */
-  virtual csPtr<iSoundWrapper> LoadSound (const char *name,
-  	const char *fname) = 0;
 
   /// New Sound System: Load a sound file and return an iSndSysData object
   virtual csPtr<iSndSysData> LoadSoundSysData (const char *fname) = 0;

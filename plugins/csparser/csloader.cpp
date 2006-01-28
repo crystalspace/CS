@@ -29,7 +29,6 @@
 #include "csutil/scfstr.h"
 #include "cstool/gentrtex.h"
 #include "cstool/keyval.h"
-#include "cstool/sndwrap.h"
 #include "cstool/mapnode.h"
 #include "cstool/vfsdirchange.h"
 #include "csloader.h"
@@ -69,8 +68,6 @@
 #include "isndsys/ss_manager.h"
 #include "isndsys/ss_renderer.h"
 #include "isndsys/ss_stream.h"
-#include "isound/loader.h"
-#include "isound/renderer.h"
 #include "iutil/vfs.h"
 #include "iutil/plugin.h"
 #include "iutil/comp.h"
@@ -1167,11 +1164,9 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
   // Get all optional plugins.
   GET_PLUGIN (ImageLoader, iImageIO, "image loader");
-  GET_PLUGIN (SoundLoader, iSoundLoader, "sound loader");
   GET_PLUGIN (SndSysLoader, iSndSysLoader, "sound loader (v2)");
   GET_PLUGIN (Engine, iEngine, "engine");
   GET_PLUGIN (G3D, iGraphics3D, "video driver");
-  GET_PLUGIN (SoundRender, iSoundRender, "sound driver");
   GET_PLUGIN (SndSysRender, iSndSysRenderer, "sound driver (v2)");
 
   SndSysManager = CS_QUERY_REGISTRY (object_reg, iSndSysManager);
@@ -1623,43 +1618,10 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 
 	  if (mode3d == -1)
 	  {
-	    if (!SoundLoader)
-	    {
-	      //ReportNotify (
-	        //"crystalspace.maploader.parse.sound", child,
-	        //"Old sound loader not loaded!");
-	      return true;
-	    }
-	    // Old style sounds!
-            csRef<iSoundWrapper> snd = CS_GET_NAMED_CHILD_OBJECT (
-                Engine->QueryObject (), iSoundWrapper, name);
-            if (!snd)
-              snd = LoadSound (name, filename);
-            if (snd)
-            {
-              csRef<iDocumentNodeIterator> it2 (child->GetNodes ());
-              while (it2->HasNext ())
-              {
-                csRef<iDocumentNode> child2 = it2->Next ();
-                if (child2->GetType () != CS_NODE_ELEMENT) continue;
-                switch (xmltokens.Request (child2->GetValue ()))
-                {
-                  case XMLTOKEN_KEY:
-                    {
-                      iKeyValuePair *kvp = 0;
-                      SyntaxService->ParseKey (child2, kvp);
-                      if (kvp)
-                      {
-                        snd->QueryObject ()->ObjAdd (kvp->QueryObject ());
-                        kvp->DecRef ();
-                      }
-		      else
-                        return false;
-                    }
-                    break;
-                }
-              }
-            }
+	    ReportNotify (
+	        "crystalspace.maploader.parse.sound", child,
+	        "The old sound system is no longer supported. Use 'mode3d'!");
+	    return true;
 	  }
 	  else
 	  {

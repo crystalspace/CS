@@ -8,6 +8,7 @@ chronological order.
 
 28-Jan-2006
 	- Jorrit changed walktest to use the new sound renderer.
+	- Jorrit completely removed the old sound system from CS.
 27-Jan-2006
 	- rvl_ changed portal code (mainly for floating portals) inside
 	  opengl renderer to fix the bugs #1411948, #1398043

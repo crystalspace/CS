@@ -246,13 +246,6 @@
   INTERFACE_APPLY(iSectorList)
   INTERFACE_APPLY(iShaderManager)
   INTERFACE_APPLY(iShaderVariableContext)
-  INTERFACE_APPLY(iSoundHandle)
-  INTERFACE_APPLY(iSoundLoader)
-  INTERFACE_APPLY(iSoundRender)
-  INTERFACE_APPLY(iSoundWrapper)
-  INTERFACE_APPLY(iSoundDriver)
-  INTERFACE_APPLY(iSoundSource)
-  INTERFACE_APPLY(iSoundListener)
   INTERFACE_APPLY(iSndSysData)
   INTERFACE_APPLY(iSndSysManager)
   INTERFACE_APPLY(iSndSysSoftwareDriver)
@@ -974,14 +967,6 @@ TYPEMAP_OUT_csWrapPtr
 %include "imap/loader.h"
 %include "imap/reader.h"
 %include "imap/saver.h"
-
-%include "isound/handle.h"
-%include "isound/loader.h"
-%include "isound/renderer.h"
-%include "isound/wrapper.h"
-%include "isound/driver.h"
-%include "isound/source.h"
-%include "isound/listener.h"
 
 %include "isndsys/ss_data.h"
 %include "isndsys/ss_filter.h"

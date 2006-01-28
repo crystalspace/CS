@@ -47,13 +47,11 @@ struct csRGBcolor;
 struct iImageIO;
 struct iRegion;
 struct iObjectModel;
-struct iSoundLoader;
 struct iSndSysLoader;
 struct iSndSysManager;
 struct iEngine;
 struct iVFS;
 struct iGraphics3D;
-struct iSoundRender;
 struct iLoaderPlugin;
 struct iBinaryLoaderPlugin;
 struct iObjectRegistry;
@@ -548,19 +546,15 @@ public:
   // image loader
   csRef<iImageIO> ImageLoader;
   // sound loader
-  csRef<iSoundLoader> SoundLoader;
-  // sound loader
   csRef<iSndSysLoader> SndSysLoader;
   // sound manager
   csRef<iSndSysManager> SndSysManager;
+  // sound renderer
+  csRef<iSndSysRenderer> SndSysRender;
   // engine
   csRef<iEngine> Engine;
   // graphics renderer
   csRef<iGraphics3D> G3D;
-  // sound renderer
-  csRef<iSoundRender> SoundRender;
-  // sound renderer
-  csRef<iSndSysRenderer> SndSysRender;
 
   // constructor
   csLoader(iBase *p);
@@ -589,9 +583,6 @@ public:
 	bool reg = true, bool create_material = true,
 	bool free_image = true, iRegion* region = 0);
 
-  virtual csPtr<iSoundData> LoadSoundData (const char *fname);
-  virtual csPtr<iSoundHandle> LoadSound (const char *fname);
-  virtual csPtr<iSoundWrapper> LoadSound (const char *name, const char *fname);
   virtual csPtr<iSndSysData> LoadSoundSysData (const char *fname);
   virtual csPtr<iSndSysStream> LoadSoundStream (const char *fname,
   	int mode3d);

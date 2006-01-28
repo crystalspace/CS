@@ -161,7 +161,6 @@ CS_MASTER_HEADERS =
       imesh
       inetwork
       isndsys
-      isound
       itexture
       iutil
       ivaria

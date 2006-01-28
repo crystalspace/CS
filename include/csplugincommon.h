@@ -53,9 +53,5 @@
 #include "csplugincommon/softshader/scanline.h"
 #include "csplugincommon/softshader/texture.h"
 #include "csplugincommon/softshader/types.h"
-#include "csplugincommon/soundloader/sndload.h"
-#include "csplugincommon/soundloader/soundraw.h"
-#include "csplugincommon/soundrenderer/shdl.h"
-#include "csplugincommon/soundrenderer/slstn.h"
 #endif /* __CSPLUGINCOMMON_H__ */
 

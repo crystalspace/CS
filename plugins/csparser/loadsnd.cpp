@@ -23,49 +23,13 @@
 
 #include "cssysdef.h"
 #include "csloader.h"
-#include "cstool/sndwrap.h"
 #include "iutil/databuff.h"
 #include "iutil/vfs.h"
 #include "iengine/engine.h"
-#include "isound/data.h"
-#include "isound/loader.h"
-#include "isound/renderer.h"
-#include "isound/handle.h"
 #include "isndsys/ss_loader.h"
 #include "isndsys/ss_manager.h"
 #include "isndsys/ss_data.h"
 #include "isndsys/ss_stream.h"
-
-csPtr<iSoundData> csLoader::LoadSoundData (const char* filename)
-{
-  if (!VFS || !SoundLoader)
-    return 0;
-
-  // read the file data
-  csRef<iDataBuffer> buf (VFS->ReadFile (filename));
-  if (!buf || !buf->GetSize ())
-  {
-    ReportError (
-	      "crystalspace.maploader.parse.sound",
-	      "Cannot open sound file '%s' from VFS!", filename);
-    return 0;
-  }
-
-  // load the sound
-  csRef<iSoundData> Sound (
-    SoundLoader->LoadSound (buf->GetUint8 (), buf->GetSize ()));
-
-  // check for valid sound data
-  if (!Sound)
-  {
-    ReportError (
-	      "crystalspace.maploader.parse.sound",
-	      "Cannot create sound data from file '%s'!", filename);
-    return 0;
-  }
-
-  return csPtr<iSoundData> (Sound);
-}
 
 csPtr<iSndSysData> csLoader::LoadSoundSysData (const char* filename)
 {
@@ -97,27 +61,6 @@ csPtr<iSndSysData> csLoader::LoadSoundSysData (const char* filename)
   return csPtr<iSndSysData> (Sound);
 }
 
-csPtr<iSoundHandle> csLoader::LoadSound (const char* filename)
-{
-  if (!SoundRender)
-    return 0;
-
-  csRef<iSoundData> Sound (LoadSoundData(filename));
-  if (!Sound) return 0;
-
-  /* register the sound */
-  csRef<iSoundHandle> hdl (SoundRender->RegisterSound(Sound));
-  if (!hdl)
-  {
-    ReportError (
-	      "crystalspace.maploader.parse.sound",
-	      "Cannot register sound '%s'!", filename);
-    return 0;
-  }
-
-  return csPtr<iSoundHandle> (hdl);
-}
-
 csPtr<iSndSysStream> csLoader::LoadSoundStream (const char* filename,
 	int mode3d)
 {
@@ -138,20 +81,6 @@ csPtr<iSndSysStream> csLoader::LoadSoundStream (const char* filename,
   }
 
   return csPtr<iSndSysStream> (stream);
-}
-
-csPtr<iSoundWrapper> csLoader::LoadSound (const char* name, const char* fname)
-{
-  // load the sound handle
-  csRef<iSoundHandle> Sound (LoadSound(fname));
-  if (!Sound) return 0;
-
-  // build wrapper object
-  iSoundWrapper* Wrapper = new csSoundWrapper (Sound);
-  Wrapper->QueryObject ()->SetName (name);
-  if (Engine) Engine->QueryObject ()->ObjAdd(Wrapper->QueryObject ());
-
-  return csPtr<iSoundWrapper> (Wrapper);
 }
 
 iSndSysWrapper* csLoader::LoadSoundWrapper (const char* name, const char* fname,

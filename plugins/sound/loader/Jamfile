@@ -1,9 +1,0 @@
-SubDir TOP plugins sound loader ;
-
-SubInclude TOP plugins sound loader aiff ;
-SubInclude TOP plugins sound loader au ;
-SubInclude TOP plugins sound loader iff ;
-SubInclude TOP plugins sound loader mod ;
-SubInclude TOP plugins sound loader mplex ;
-SubInclude TOP plugins sound loader ogg ;
-SubInclude TOP plugins sound loader wav ;

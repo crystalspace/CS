@@ -49,7 +49,6 @@
 #include "cstool/rbuflock.h"
 #include "cstool/rendermeshholder.h"
 #include "cstool/rendermeshlist.h"
-#include "cstool/sndwrap.h"
 #include "cstool/userrndbuf.h"
 #include "cstool/vertexcompress.h"
 #include "cstool/vfsdirchange.h"
