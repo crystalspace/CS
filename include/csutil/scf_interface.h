@@ -27,6 +27,11 @@
 
 #include "csextern.h"
 
+// These are needed for compiletime checks on interfaces
+
+#include "csutil/compileassert.h"
+#include "csutil/typetraits.h"
+
 // -- Forward declarations
 struct iDocument;
 #if defined(CS_DEBUG) || defined(CS_MEMORY_TRACKER)
@@ -370,6 +375,13 @@ class scfInterfaceTraits
 public:
   typedef typename_qualifier Interface::InterfaceTraits::InterfaceType 
     InterfaceType;
+
+  /*
+  Make sure that we either have a SCF_VERSION macro which results in this class
+  being specialized, or that we have a SCF_INTERFACE macro in the interface itself.
+  */
+  CS_COMPILE_ASSERT((::CrystalSpace::TypeTraits::IsSame<InterfaceType,
+    Interface>::value));
 
   /**
    * Retrieve the interface's current version number.

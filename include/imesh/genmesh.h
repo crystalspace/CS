@@ -31,6 +31,7 @@ struct iGenMeshAnimationControlFactory;
 struct iMaterialWrapper;
 struct iRenderBuffer;
 struct iMeshObject;
+struct iString;
 
 /**\addtogroup meshplugins
  * @{ */
@@ -138,10 +139,26 @@ struct iGeneralMeshCommonState : public iBase
    * Adds an independently named render buffer.
    */
   virtual bool AddRenderBuffer (const char *name, iRenderBuffer* buffer) = 0;
+
   /**
    * Removes an independently named render buffer.
    */
   virtual bool RemoveRenderBuffer (const char *name) = 0;
+
+  /**
+   * Get number of independent render buffers
+   */
+  virtual int GetRenderBufferCount () const = 0;
+
+  /**
+   * Get independent render buffer by index
+   */
+  virtual csRef<iRenderBuffer> GetRenderBuffer (int index) = 0;
+
+  /**
+   * Get the name of an independent render buffer by index
+   */
+  virtual csRef<iString> GetRenderBufferName (int index) const = 0;
 };
 
 SCF_VERSION (iGeneralMeshState, 0, 1, 0);

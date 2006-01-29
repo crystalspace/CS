@@ -325,6 +325,11 @@ struct iSyntaxService : public iBase
    * Parse a user render buffer.
    */
   virtual csRef<iRenderBuffer> ParseRenderBuffer (iDocumentNode* node) = 0;
+
+  /**
+   * Write a render buffer.
+   */
+  virtual bool WriteRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer) = 0;
   
   /**
    * Parse a node that is a reference to a shader. Those nodes look like 

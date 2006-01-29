@@ -32,7 +32,9 @@
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
+#include "csutil/scfstr.h"
 #include "csutil/sysfunc.h"
+
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
@@ -1443,6 +1445,20 @@ bool csGenmeshMeshObject::RemoveRenderBuffer (const char *name)
   return false;
 }
 
+csRef<iRenderBuffer> csGenmeshMeshObject::GetRenderBuffer (int index)
+{
+  csStringID bufID = user_buffer_names[index];
+  return userBuffers.GetRenderBuffer (bufID);
+}
+
+csRef<iString> csGenmeshMeshObject::GetRenderBufferName (int index) const
+{
+  csRef<iString> name; 
+  name.AttachNew (new scfString (factory->GetStrings ()->Request 
+    (user_buffer_names[index])));
+  return name;
+}
+
 //----------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
@@ -1949,6 +1965,19 @@ bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (const char *name)
     return true;
   }
   return false;
+}
+
+csRef<iRenderBuffer> csGenmeshMeshObjectFactory::GetRenderBuffer (int index)
+{
+  csStringID bufID = user_buffer_names[index];
+  return userBuffers.GetRenderBuffer (bufID);
+}
+
+csRef<iString> csGenmeshMeshObjectFactory::GetRenderBufferName (int index) const
+{
+  csRef<iString> name; 
+  name.AttachNew (new scfString (strings->Request (user_buffer_names[index])));
+  return name;
 }
 
 void csGenmeshMeshObjectFactory::Invalidate ()

@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Jan-2006
+	- Marten added some static type-checking to SCF.
+	- Marten fixed VC8 compatibility for rvl_s latest commit.
+	- Marten added render buffer saving to genmesh factory saver.
+	- Marten fixed some random warnings and errors in comments.
 28-Jan-2006
 	- Jorrit changed walktest to use the new sound renderer.
 	- Jorrit completely removed the old sound system from CS.

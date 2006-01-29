@@ -33,6 +33,7 @@
 #include "csgfx/shaderexp.h"
 #include "csgfx/shaderexpaccessor.h"
 #include "cstool/keyval.h"
+#include "cstool/rbuflock.h"
 #include "cstool/vfsdirchange.h"
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
@@ -1321,18 +1322,27 @@ bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue
 
 CS_IMPLEMENT_STATIC_VAR (GetBufferParseError, csString, ())
 
-struct vgInt
+struct vhInt
 {
   template <class T>
   static void Get (T& v, iDocumentNode* node, const char* attr)
   { v = node->GetAttributeValueAsInt (attr); }
+
+  template <class T>
+  static void Set (const T& v, iDocumentNode* node, const char* attr)
+  { node->SetAttributeAsInt (attr, (int)v); }
 };
 
-struct vgFloat
+
+struct vhFloat
 {
   template <class T>
   static void Get (T& v, iDocumentNode* node, const char* attr)
   { v = node->GetAttributeValueAsFloat (attr); }
+
+  template <class T>
+  static void Set (const T& v, iDocumentNode* node, const char* attr)
+  { node->SetAttributeAsFloat (attr, v); }  
 };
 
 template <class ValGetter>
@@ -1368,6 +1378,8 @@ struct BufferParser
     return 0;
   }
 };
+
+
 
 template<typename T>
 static csRef<iRenderBuffer> FillBuffer (const csDirtyAccessArray<T>& buf,
@@ -1420,6 +1432,28 @@ static csRef<iRenderBuffer> FillBuffer (const csDirtyAccessArray<T>& buf,
 }
 
 
+template <class ValSetter>
+struct BufferWriter
+{
+  template<class T>
+  static const char* Write (iDocumentNode* node, int compNum,
+    const T* buf, size_t bufferSize)
+  {
+    csString compAttrName;
+    for (size_t i = 0; i < bufferSize / compNum; ++i)
+    {
+      csRef<iDocumentNode> child = node->CreateNodeBefore (CS_NODE_ELEMENT);
+      child->SetValue ("e");
+      for (int c = 0; c < compNum; ++c)
+      {
+        compAttrName.Format ("c%d", c);
+        ValSetter::Set (buf[i*compNum + c], child, compAttrName);
+      }
+    }
+    return 0;
+  }
+};
+
 csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node)
 {
   static const char* msgid = "crystalspace.syntax.renderbuffer";
@@ -1460,7 +1494,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     || (strcmp (componentType, "i") == 0))
   {
     csDirtyAccessArray<int> buf;
-    err = BufferParser<vgInt>::Parse (node, componentNum, buf);
+    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
       buffer = FillBuffer<int> (buf, CS_BUFCOMP_INT, componentNum, indexBuf);
@@ -1470,7 +1504,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     || (strcmp (componentType, "ui") == 0))
   {
     csDirtyAccessArray<uint> buf;
-    err = BufferParser<vgInt>::Parse (node, componentNum, buf);
+    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
       buffer = FillBuffer<uint> (buf, CS_BUFCOMP_UNSIGNED_INT, componentNum, indexBuf);
@@ -1480,7 +1514,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     || (strcmp (componentType, "b") == 0))
   {
     csDirtyAccessArray<char> buf;
-    err = BufferParser<vgInt>::Parse (node, componentNum, buf);
+    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
       buffer = FillBuffer<char> (buf, CS_BUFCOMP_BYTE, componentNum, indexBuf);
@@ -1490,7 +1524,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     || (strcmp (componentType, "ub") == 0))
   {
     csDirtyAccessArray<unsigned char> buf;
-    err = BufferParser<vgInt>::Parse (node, componentNum, buf);
+    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
       buffer = FillBuffer<unsigned char> (buf, CS_BUFCOMP_UNSIGNED_BYTE, componentNum, indexBuf);
@@ -1500,7 +1534,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     || (strcmp (componentType, "s") == 0))
   {
     csDirtyAccessArray<short> buf;
-    err = BufferParser<vgInt>::Parse (node, componentNum, buf);
+    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
       buffer = FillBuffer<short> (buf, CS_BUFCOMP_SHORT, componentNum, indexBuf);
@@ -1510,7 +1544,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     || (strcmp (componentType, "us") == 0))
   {
     csDirtyAccessArray<unsigned short> buf;
-    err = BufferParser<vgInt>::Parse (node, componentNum, buf);
+    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     if (err == 0)
     {
       buffer = FillBuffer<unsigned short> (buf, CS_BUFCOMP_UNSIGNED_SHORT, componentNum, indexBuf);
@@ -1520,7 +1554,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     || (strcmp (componentType, "f") == 0))
   {
     csDirtyAccessArray<float> buf;
-    err = BufferParser<vgFloat>::Parse (node, componentNum, buf);
+    err = BufferParser<vhFloat>::Parse (node, componentNum, buf);
     if (err == 0)
     {
       buffer = FillBuffer<float> (buf, CS_BUFCOMP_FLOAT, componentNum, indexBuf);
@@ -1530,7 +1564,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     || (strcmp (componentType, "d") == 0))
   {
     csDirtyAccessArray<double> buf;
-    err = BufferParser<vgFloat>::Parse (node, componentNum, buf);
+    err = BufferParser<vhFloat>::Parse (node, componentNum, buf);
     if (err == 0)
     {
       buffer = FillBuffer<double> (buf, CS_BUFCOMP_DOUBLE, componentNum, indexBuf);
@@ -1547,6 +1581,106 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     return 0;
   }
   return buffer;
+}
+
+
+bool csTextSyntaxService::WriteRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer)
+{
+  static const char* msgid = "crystalspace.syntax.renderbuffer";
+
+  if (buffer == 0)
+  {
+    ReportError (msgid, node, "no buffer specified");
+    return false;
+  }
+
+  if (buffer->GetMasterBuffer () != 0)
+  {
+    ReportError (msgid, node, "cannot save child-buffer");
+    return false;
+  }
+
+  const char* err = 0;
+
+  // Common attribute
+  int componentCount = buffer->GetComponentCount ();
+  node->SetAttributeAsInt ("components", componentCount);
+
+  switch (buffer->GetComponentType ())
+  {
+  case CS_BUFCOMP_BYTE:
+    {
+      node->SetAttribute ("type", "byte");
+      csRenderBufferLock<int8> lock (buffer, CS_BUF_LOCK_READ);
+      err = BufferWriter<vhInt>::Write (node, componentCount, (int8*)lock, 
+        lock.GetSize ()*componentCount);
+      break;
+    }
+  case CS_BUFCOMP_UNSIGNED_BYTE:
+    {
+      node->SetAttribute ("type", "ubyte");
+      csRenderBufferLock<uint8> lock (buffer, CS_BUF_LOCK_READ);
+      err = BufferWriter<vhInt>::Write (node, componentCount, (uint8*)lock, 
+        lock.GetSize ()*componentCount);
+      break;
+    }
+
+  case CS_BUFCOMP_SHORT:
+    {
+      node->SetAttribute ("type", "short");
+      csRenderBufferLock<int16> lock (buffer, CS_BUF_LOCK_READ);
+      err = BufferWriter<vhInt>::Write (node, componentCount, (int16*)lock, 
+        lock.GetSize ()*componentCount);
+      break;
+    }
+  case CS_BUFCOMP_UNSIGNED_SHORT:
+    {
+      node->SetAttribute ("type", "ushort");
+      csRenderBufferLock<uint16> lock (buffer, CS_BUF_LOCK_READ);
+      err = BufferWriter<vhInt>::Write (node, componentCount, (uint16*)lock, 
+        lock.GetSize ()*componentCount);
+      break;
+    }
+    
+  case CS_BUFCOMP_INT:
+    {
+      node->SetAttribute ("type", "int");
+      csRenderBufferLock<int32> lock (buffer, CS_BUF_LOCK_READ);
+      err = BufferWriter<vhInt>::Write (node, componentCount, (int32*)lock, 
+        lock.GetSize ()*componentCount);
+      break;
+    }
+  case CS_BUFCOMP_UNSIGNED_INT:
+    {
+      node->SetAttribute ("type", "uint");
+      csRenderBufferLock<uint32> lock (buffer, CS_BUF_LOCK_READ);
+      err = BufferWriter<vhInt>::Write (node, componentCount, (uint32*)lock, 
+        lock.GetSize ()*componentCount);
+      break;
+    }
+
+  case CS_BUFCOMP_FLOAT:
+    {
+      node->SetAttribute ("type", "float");
+      csRenderBufferLock<float> lock (buffer, CS_BUF_LOCK_READ);
+      err = BufferWriter<vhFloat>::Write (node, componentCount, (float*)lock, 
+        lock.GetSize ()*componentCount);
+      break;
+    }
+  case CS_BUFCOMP_DOUBLE:
+    {
+      node->SetAttribute ("type", "double");
+      csRenderBufferLock<double> lock (buffer, CS_BUF_LOCK_READ);
+      err = BufferWriter<vhFloat>::Write (node, componentCount, (double*)lock, 
+        lock.GetSize ()*componentCount);
+      break;
+    }
+    
+  default:
+    return false;
+  }
+
+  return true;
 }
 
 csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)

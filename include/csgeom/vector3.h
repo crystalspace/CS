@@ -208,16 +208,16 @@ public:
 
   /// Returns n-th component of the vector.
 #ifdef __STRICT_ANSI__
-  inline float operator[] (int n) const { return !n?x:n&1?y:z; }
+  inline float operator[] (size_t n) const { return !n?x:n&1?y:z; }
 #else
-  inline float operator[] (int n) const { return m[n]; }
+  inline float operator[] (size_t n) const { return m[n]; }
 #endif
 
   /// Returns n-th component of the vector.
 #ifdef __STRICT_ANSI__
-  inline float & operator[] (int n) { return !n?x:n&1?y:z; }
+  inline float & operator[] (size_t n) { return !n?x:n&1?y:z; }
 #else
-  inline float & operator[] (int n) { return m[n]; }
+  inline float & operator[] (size_t n) { return m[n]; }
 #endif
 
   /// Add another vector to this vector.

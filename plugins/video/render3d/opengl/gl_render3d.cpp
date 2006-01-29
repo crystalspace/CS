@@ -846,7 +846,7 @@ bool csGLGraphics3D::Open ()
 
   GLint dbits;
   glGetIntegerv (GL_DEPTH_BITS, &dbits);
-  depth_epsilon = 1.0f/(pow(2, dbits)-1);
+  depth_epsilon = 1.0f/(powf(2, dbits)-1);
   
   stencil_shadow_mask = 127;
   {
@@ -1999,7 +1999,7 @@ void csGLGraphics3D::OpenPortal (size_t numVertices,
 void csGLGraphics3D::ClosePortal ()
 {
   if (clipportal_stack.Length () <= 0) return;
-  bool mirror = IsPortalMirrored(clipportal_stack.Length()-1);
+  bool mirror = IsPortalMirrored((int)clipportal_stack.Length()-1);
   csClipPortal* cp = clipportal_stack.Pop ();
   GLRENDER3D_OUTPUT_STRING_MARKER(("%p, %d", cp, cp->flags.Check(CS_PORTAL_ZFILL)?1:0));
 
@@ -2577,7 +2577,7 @@ void csGLGraphics3D::SetupClipPortals ()
   //init portal indexes
   ffpnz = -1;
   ffps = -1; 
-  cfp = clipportal_stack.Length()-1; 
+  cfp = (int)clipportal_stack.Length()-1; 
   for (ffp=0;ffp<=cfp;ffp++) 
     if (clipportal_stack[ffp]->flags.Check(CS_PORTAL_FLOAT)) break;
     

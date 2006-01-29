@@ -107,6 +107,7 @@ public:
   virtual bool WriteKey (iDocumentNode* node, iKeyValuePair* keyvalue);
 
   virtual csRef<iRenderBuffer> ParseRenderBuffer (iDocumentNode* node);
+  virtual bool WriteRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer);
 
   virtual csRef<iShader> ParseShaderRef (iDocumentNode* node);
 

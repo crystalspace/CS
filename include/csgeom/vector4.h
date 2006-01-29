@@ -60,9 +60,10 @@ public:
     T m[4];
   };
 #endif
-  /* Note: since T is used in an union above, it cannot have custom ctors.
-   * So be careful when creating new Ts; e.g.: don't use T(x), but something
-   * like T y = x.
+  /* Note: Since T is used in an union above it have to be an aggregate
+   * type (C++ Std 8.5.1).
+   * This implies that T cannot have custom constructor, base classes,
+   * or virtual functions. This applies to all of Ts members recursivly.
    */
   
   /**
@@ -194,18 +195,18 @@ public:
 
   /// Returns n-th component of the vector.
 #ifdef __STRICT_ANSI__
-  inline float operator[] (int n) const 
+  inline float operator[] (size_t n) const 
   { return (n&2)?((n&1)?w:z):((n&1)?y:x); }
 #else
-  inline float operator[] (int n) const { return m[n]; }
+  inline float operator[] (size_t n) const { return m[n]; }
 #endif
 
   /// Returns n-th component of the vector.
 #ifdef __STRICT_ANSI__
-  inline float & operator[] (int n) 
+  inline float & operator[] (size_t n) 
   { return (n&2)?((n&1)?w:z):((n&1)?y:x); }
 #else
-  inline float & operator[] (int n) { return m[n]; }
+  inline float & operator[] (size_t n) { return m[n]; }
 #endif
 
   /// Add another vector to this vector.

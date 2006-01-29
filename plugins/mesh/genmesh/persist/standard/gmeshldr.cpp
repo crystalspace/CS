@@ -858,7 +858,18 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
     //TBD: Writedown box tag
 
-    //TBD: Writedown renderbuffer tag
+    // Write render buffers
+    int rbufCount = gfact->GetRenderBufferCount ();
+    for (i = 0; i < rbufCount; ++i)
+    {
+      csRef<iDocumentNode> rbufNode = 
+        paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+      rbufNode->SetValue ("renderbuffer");
+      csRef<iString> name = gfact->GetRenderBufferName (i);
+      rbufNode->SetAttribute ("name", name->GetData ());
+      csRef<iRenderBuffer> buffer = gfact->GetRenderBuffer (i);
+      synldr->WriteRenderBuffer (rbufNode, buffer);
+    }
   }
   return true;
 }

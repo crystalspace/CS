@@ -34,6 +34,7 @@
 #include "comparator.h"
 #include "hash.h"
 
+
 class csBitArray;
 CS_SPECIALIZE_TEMPLATE class csComparator<csBitArray, csBitArray>;
 CS_SPECIALIZE_TEMPLATE class csHashComputer<csBitArray>;
@@ -548,11 +549,7 @@ public:
   static uint ComputeHash (csBitArray const& key)
   {
     const size_t uintCount = sizeof (csBitArray::store_type) / sizeof (uint);
-    union
-    {
-      csBitArray::store_type store;
-      uint ui[uintCount];
-    } bitStoreToUint;
+    uint ui[uintCount];    
     uint hash = 0;
     csBitArray::store_type const* p = key.GetStore();
     // @@@ Not very good. Find a better hash function; however, it should
@@ -560,9 +557,9 @@ public:
     // the amount of trailing zeros. (e.g. f(10010110) == f(100101100000...))
     for (size_t i = 0; i < key.mLength; i++)
     {
-      bitStoreToUint.store = p[i];
+      memcpy(ui, &p[i], sizeof(ui));
       for (size_t j = 0; j < uintCount; j++)
-	hash += bitStoreToUint.ui[j];
+	hash += ui[j];
     }
     return hash;
   }

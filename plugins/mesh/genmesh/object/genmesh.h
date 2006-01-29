@@ -251,6 +251,13 @@ public:
 
   bool AddRenderBuffer (const char *name, iRenderBuffer* buffer);
   bool RemoveRenderBuffer (const char *name);
+  int GetRenderBufferCount () const
+  {
+    return (int)this->user_buffer_names.GetSize ();
+  }
+  csRef<iRenderBuffer> GetRenderBuffer (int index); 
+  csRef<iString> GetRenderBufferName (int index) const;
+
 
   //----------------------- Shadow and lighting system ----------------------
   char* GenerateCacheName ();
@@ -443,6 +450,13 @@ public:
     { return scfParent->AddRenderBuffer (name, buffer); }
     virtual bool RemoveRenderBuffer (const char *name)
     { return scfParent->RemoveRenderBuffer (name); }
+    virtual int GetRenderBufferCount () const
+    { return scfParent->GetRenderBufferCount (); }
+    virtual csRef<iRenderBuffer> GetRenderBuffer (int index)
+    { return scfParent->GetRenderBuffer (index); }
+    virtual csRef<iString> GetRenderBufferName (int index) const
+    { return scfParent->GetRenderBufferName (index); }
+
   } scfiGeneralMeshState;
   friend class GeneralMeshState;
 
@@ -685,6 +699,13 @@ public:
 
   bool AddRenderBuffer (const char *name, iRenderBuffer* buffer);
   bool RemoveRenderBuffer (const char *name);
+  int GetRenderBufferCount () const
+  {
+    return (int)this->user_buffer_names.GetSize ();
+  }
+  csRef<iRenderBuffer> GetRenderBuffer (int index); 
+  csRef<iString> GetRenderBufferName (int index) const;
+
   /**
    * Get the string ID's for the anonymous buffers
    */
@@ -949,6 +970,13 @@ public:
     {
       scfParent->AddSubMesh (triangles, tricount, material, true, mixmode);
     }
+    virtual int GetRenderBufferCount () const
+    { return scfParent->GetRenderBufferCount (); }
+    virtual csRef<iRenderBuffer> GetRenderBuffer (int index)
+    { return scfParent->GetRenderBuffer (index); }
+    virtual csRef<iString> GetRenderBufferName (int index) const
+    { return scfParent->GetRenderBufferName (index); }
+    
   } scfiGeneralFactoryState;
   friend class GeneralFactoryState;
 
