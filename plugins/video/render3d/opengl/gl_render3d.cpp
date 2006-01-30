@@ -42,7 +42,6 @@
 #include "csutil/scf.h"
 #include "csutil/strset.h"
 
-#include "iengine/portal.h"
 #include "igeom/clip2d.h"
 #include "iutil/cmdline.h"
 #include "iutil/comp.h"
@@ -846,8 +845,12 @@ bool csGLGraphics3D::Open ()
 
   GLint dbits;
   glGetIntegerv (GL_DEPTH_BITS, &dbits);
-  depth_epsilon = 1.0f/(powf(2, dbits)-1);
-  
+
+  if (dbits<25) 
+    depth_epsilon = 1.0f/(powf(2, dbits)-1);
+  else 
+    depth_epsilon = 1.0f/(powf(2, 24)-1);
+    
   stencil_shadow_mask = 127;
   {
     GLint sbits;
@@ -1990,10 +1993,12 @@ void csGLGraphics3D::OpenPortal (size_t numVertices,
   if (clipportal_floating)
   {
     clipportal_floating++;
-    cp->flags.Set(CS_PORTAL_FLOAT);
+    cp->flags.Set(CS_OPENPORTAL_FLOAT);
   }
-  else if (flags.Check(CS_PORTAL_FLOAT))
+  else if (flags.Check(CS_OPENPORTAL_FLOAT))
     clipportal_floating = 1;
+    
+  //if (clipportal_stack.Length() > 1) debug_inhibit_draw = true;
 }
 
 void csGLGraphics3D::ClosePortal ()
@@ -2001,12 +2006,10 @@ void csGLGraphics3D::ClosePortal ()
   if (clipportal_stack.Length () <= 0) return;
   bool mirror = IsPortalMirrored((int)clipportal_stack.Length()-1);
   csClipPortal* cp = clipportal_stack.Pop ();
-  GLRENDER3D_OUTPUT_STRING_MARKER(("%p, %d", cp, cp->flags.Check(CS_PORTAL_ZFILL)?1:0));
+  GLRENDER3D_OUTPUT_STRING_MARKER(("%p, %d", cp, cp->flags.Check(CS_OPENPORTAL_ZFILL)?1:0));
 
-  if (cp->flags.Check(CS_PORTAL_FLOAT))
+  if (cp->flags.Check(CS_OPENPORTAL_FLOAT) || cp->flags.Check(CS_OPENPORTAL_ZFILL))
   {
-    // Clear clipping polygon in stencil buffer
-    
     // Store glstate and setup matrices for 2D drawing
     statecache->SetMatrixMode (GL_PROJECTION);
     glPushMatrix ();
@@ -2021,33 +2024,39 @@ void csGLGraphics3D::ClosePortal ()
     
     GLenum oldcullface;
     statecache->GetCullFace (oldcullface);
-      
+    if (render_target)
+    {
+      r2tbackend->SetupClipPortalDrawing ();
+      statecache->SetCullFace (mirror?GL_FRONT:GL_BACK);
+    }
+    else    
+      statecache->SetCullFace (mirror?GL_BACK:GL_FRONT);
+        
     GLboolean sciss = glIsEnabled(GL_SCISSOR_TEST);
     glDisable(GL_SCISSOR_TEST);
     
     bool tex2d = statecache->IsEnabled_GL_TEXTURE_2D ();
     statecache->Disable_GL_TEXTURE_2D ();
     statecache->SetShadeModel (GL_FLAT);
-    
-    if (render_target) 
-      r2tbackend->SetupClipPortalDrawing ();
-    else 
-      statecache->SetCullFace (mirror?GL_BACK:GL_FRONT);
         
     //Fill Z here, if required (assumed stencil is correct)
-    if (cp->flags.Check(CS_PORTAL_ZFILL))
+    if (cp->flags.Check(CS_OPENPORTAL_ZFILL))
     {
       SetZModeInternal (CS_ZBUF_USE);
       Draw2DPolygon (cp->poly, cp->num_poly, cp->normal);
     }
-    //clear stencil finally
-    statecache->SetStencilFunc (GL_ALWAYS, 0, stencil_clip_mask);
-    statecache->SetStencilOp (GL_ZERO, GL_ZERO, GL_ZERO);
-    SetZModeInternal (CS_ZBUF_NONE);
- 
-    //Draw2DPolygon (cp->poly, cp->num_poly, cp->normal);
-    DrawScreenPolygon (cp->poly, cp->num_poly);
-      
+    
+    if (cp->flags.Check(CS_OPENPORTAL_FLOAT))
+    {
+      //clear stencil for floating portal
+      statecache->SetStencilFunc (GL_ALWAYS, 0, stencil_clip_mask);
+      statecache->SetStencilOp (GL_ZERO, GL_ZERO, GL_ZERO);
+      SetZModeInternal (CS_ZBUF_NONE);
+   
+      //Draw2DPolygon (cp->poly, cp->num_poly, cp->normal);
+      DrawScreenPolygon (cp->poly, cp->num_poly);
+    }
+    
     //restore glstate and matrices
     statecache->SetMatrixMode (GL_MODELVIEW);
     glPopMatrix ();
@@ -2060,50 +2069,13 @@ void csGLGraphics3D::ClosePortal ()
     if (sciss) glEnable(GL_SCISSOR_TEST);
     SetZModeInternal (current_zmode);
   }
-  else if (cp->flags.Check(CS_PORTAL_ZFILL))
-  {
-    //z-fill for non-floating portals
-    
-    GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
-    statecache->GetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
-    statecache->SetColorMask (false, false, false, false);
-
-    GLenum oldcullface;
-    statecache->GetCullFace (oldcullface);
-    statecache->SetCullFace (GL_FRONT);
-    bool tex2d = statecache->IsEnabled_GL_TEXTURE_2D ();
-    statecache->Disable_GL_TEXTURE_2D ();
-    statecache->SetShadeModel (GL_FLAT);
-
-    // Setup projection matrix for 2D drawing.
-    statecache->SetMatrixMode (GL_PROJECTION);
-    glPushMatrix ();
-    glLoadIdentity ();
-    statecache->SetMatrixMode (GL_MODELVIEW);
-    glPushMatrix ();
-    glLoadIdentity ();
-
-    SetZModeInternal (CS_ZBUF_USE);
-    Draw2DPolygon (cp->poly, cp->num_poly, cp->normal);
-    SetZModeInternal (current_zmode);
-
-    statecache->SetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
-    statecache->SetCullFace (oldcullface);
-    if (tex2d)
-      statecache->Enable_GL_TEXTURE_2D ();
-
-    // Restore matrices
-    statecache->SetMatrixMode (GL_MODELVIEW);
-    glPopMatrix ();
-    statecache->SetMatrixMode (GL_PROJECTION);
-    glPopMatrix ();
-  }
   
   delete cp;
   clipportal_dirty = true;
   if (clipportal_floating > 0)
     clipportal_floating--;
-  if (clipportal_stack.Length() == 0) debug_inhibit_draw = false;
+    
+  //if (clipportal_stack.Length() < 2) debug_inhibit_draw = false;
 }
 
 void* csGLGraphics3D::RenderLock (iRenderBuffer* buffer, 
@@ -2578,17 +2550,18 @@ void csGLGraphics3D::SetupClipPortals ()
   ffpnz = -1;
   ffps = -1; 
   cfp = (int)clipportal_stack.Length()-1; 
-  for (ffp=0;ffp<=cfp;ffp++) 
-    if (clipportal_stack[ffp]->flags.Check(CS_PORTAL_FLOAT)) break;
+  
+  for (ffp = 0; ffp <= cfp; ffp++) 
+    if (clipportal_stack[ffp]->flags.Check(CS_OPENPORTAL_FLOAT)) break;
     
-  for (i=ffp;i<=cfp;i++)
+  for (i = ffp; i <= cfp; i++)
     if (!(clipportal_stack[i]->status.Check(CS_PORTALSTATUS_ZCLEARED)))
     {
       ffpnz = i;
       break;
     }
     
-  for (i=ffp;i<=cfp;i++)
+  for (i = ffp; i <= cfp; i++)
     if (clipportal_stack[i]->status.Check(CS_PORTALSTATUS_SFILLED))
     {
       ffps = i;
@@ -2602,6 +2575,10 @@ void csGLGraphics3D::SetupClipPortals ()
   statecache->SetMatrixMode (GL_MODELVIEW);
   glPushMatrix ();
   glLoadIdentity ();
+  //We should call render_target->SetupClipPortalDrawing just one time
+  //because next call will flip modelview matrix again
+  if (render_target)
+    r2tbackend->SetupClipPortalDrawing ();
   
   GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
   statecache->GetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
@@ -2639,10 +2616,10 @@ void csGLGraphics3D::SetupClipPortals ()
       if (ffps<ffpnz)
       {
         //clear stencil of ffps
-        if (render_target) 
-          r2tbackend->SetupClipPortalDrawing ();// ???
+        if (render_target)
+        	statecache->SetCullFace (IsPortalMirrored(ffps)?GL_FRONT:GL_BACK);
         else 
-          statecache->SetCullFace (IsPortalMirrored(ffps)?GL_BACK:GL_FRONT);//ffps
+          statecache->SetCullFace (IsPortalMirrored(ffps)?GL_BACK:GL_FRONT);
             
         statecache->SetStencilFunc (GL_ALWAYS, 0, stencil_clip_mask);
         statecache->SetStencilOp (GL_ZERO, GL_ZERO, GL_ZERO);
@@ -2659,9 +2636,9 @@ void csGLGraphics3D::SetupClipPortals ()
     {
       //make s-fill of ffpnz
       if (render_target) 
-        r2tbackend->SetupClipPortalDrawing ();// ???
+        statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_FRONT:GL_BACK);
       else 
-        statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_BACK:GL_FRONT);//ffpnz
+        statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_BACK:GL_FRONT);
           
       statecache->SetStencilFunc (GL_ALWAYS, stencil_clip_value, stencil_clip_mask);
       statecache->SetStencilOp (GL_ZERO, GL_ZERO, GL_REPLACE);
@@ -2675,9 +2652,9 @@ void csGLGraphics3D::SetupClipPortals ()
     }
     //perform z-clear finally
     if (render_target) 
-      r2tbackend->SetupClipPortalDrawing ();// ???
+      statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_FRONT:GL_BACK);
     else 
-      statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_BACK:GL_FRONT);//ffpnz
+      statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_BACK:GL_FRONT);
         
     statecache->SetStencilFunc (GL_EQUAL, stencil_clip_value, stencil_clip_mask);
     statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
@@ -2723,7 +2700,7 @@ void csGLGraphics3D::SetupClipPortals ()
     {
       //clear previous s-fill
       if (render_target) 
-        r2tbackend->SetupClipPortalDrawing ();
+        statecache->SetCullFace (IsPortalMirrored(ffps)?GL_FRONT:GL_BACK);
       else 
         statecache->SetCullFace (IsPortalMirrored(ffps)?GL_BACK:GL_FRONT);
           
@@ -2739,8 +2716,8 @@ void csGLGraphics3D::SetupClipPortals ()
       ffps = -1;
     }
     //perform s-fill finally
-    if (render_target) 
-      r2tbackend->SetupClipPortalDrawing ();
+    if (render_target)
+      statecache->SetCullFace (IsPortalMirrored(cfp)?GL_FRONT:GL_BACK);
     else 
       statecache->SetCullFace (IsPortalMirrored(cfp)?GL_BACK:GL_FRONT);
         
@@ -3539,16 +3516,16 @@ void csGLGraphics3D::DumpZBuffer (const char* path)
     GLfloat* zvalues = new GLfloat[num];
     glReadPixels (0, 0, viewwidth, viewheight, GL_DEPTH_COMPONENT, GL_FLOAT, 
       zvalues);
-    GLfloat minValue = 0.0;//1.0f;
-    GLfloat maxValue = 1.0;//0.0f;
-    /*for (int i = 0; i < num; i++)
+    GLfloat minValue = 1.0f;
+    GLfloat maxValue = 0.0f;
+    for (int i = 0; i < num; i++)
     {
       if (zvalues[i] == 0.0f) continue;	 // possibly leftovers from a Z buffer clean
       if (zvalues[i] < minValue)
 	minValue = zvalues[i];
       else if (zvalues[i] > maxValue)
 	maxValue = zvalues[i];
-    }*/
+    }
     float zMul = 1.0f;
     if (maxValue - minValue > 0)
       zMul /= (maxValue - minValue);

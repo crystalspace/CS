@@ -182,5 +182,5 @@ void csGLRender2TextureFramebuf::SetupClipPortalDrawing ()
 {
   G3D->statecache->SetMatrixMode (GL_MODELVIEW);
   glScalef (1, -1, 1);
-  G3D->statecache->SetCullFace (GL_BACK);
+  //G3D->statecache->SetCullFace (GL_BACK);
 }

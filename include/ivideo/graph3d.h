@@ -582,6 +582,36 @@ enum csSimpleMeshFlags
 };
 
 /**
+ * Flags to inform the renderer about properties of a portal when
+ * calling OpenPortal(). 
+ */
+enum csOpenPortalFlags
+{
+  /**
+   * If this flag is set then renderer must do a Z-fill after rendering
+   * the portal contents. This is mainly useful for floating portals
+   * where it is possible that there is geometry in the same sector
+   * that will be rendered behind the portal (and does could accidently
+   * get written in the portal sector because the Z-buffer cannot
+   * be trusted).
+   */
+  CS_OPENPORTAL_ZFILL = 0x00000004,
+  /**
+   * If this flag is set then this portal mirrors space (changes order
+   * of the vertices of polygons).
+   */
+  CS_OPENPORTAL_MIRROR = 0x00000010,
+  /**
+   * If this flag is used then the portal must use possible available
+   * stencil buffer on the hardware to do good clipping. This flag should
+   * be used if you have a portal that is not at the boundary of the sector
+   * and that can be covered (or itself covers) other objects. It is usually
+   * used in combination with CS_OPENPORTAL_ZFILL.
+   */
+  CS_OPENPORTAL_FLOAT = 0x00000040
+};
+
+/**
  * A simple render mesh.
  */
 struct csSimpleRenderMesh
@@ -669,7 +699,7 @@ struct csSimpleRenderMesh
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 2, 0, 1);
+  SCF_INTERFACE(iGraphics3D, 2, 0, 2);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;

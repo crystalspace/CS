@@ -7,6 +7,12 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 29-Jan-2006
+	- rvl_ corrected portal logic of opengl renderer to handle 
+	  rendering to target correctly. Some code logic/style was 
+	  changed as advised by res.
+	  Removed dependence on engine headers (portal.h) from opengl &
+	  software renderers. Version of iGraphics3D was bumped up 
+	  according to past OpenPortal/ClosePortal changes.
 	- Marten added some static type-checking to SCF.
 	- Marten fixed VC8 compatibility for rvl_s latest commit.
 	- Marten added render buffer saving to genmesh factory saver.

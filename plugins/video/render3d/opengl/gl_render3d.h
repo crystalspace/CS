@@ -44,7 +44,6 @@
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
 
-#include "iengine/portal.h"
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
 #include "iutil/event.h"
@@ -229,18 +228,20 @@ private:
   // GetObjectToCamera() because it returns a `const&'.
   csReversibleTransform other2cam;
 
-  // Floating portal status flags
-  // 'status' field of csClipPortal structure has the 
-  // CS_PORTALSTATUS_ZCLEARED flag when depth buffer 
-  // under the portal is cleared. Any portal from stack
-  // may have the flag
-  #define CS_PORTALSTATUS_ZCLEARED 0x1
-  // 'status' field of csClipPortal structure has the 
-  // CS_PORTALSTATUS_SFILLED flag when stencil buffer under the portal is
-  // initialized with 'stencil_clip_value'. Just one portal from stack
-  // may have the flag
-  #define CS_PORTALSTATUS_SFILLED 0x2
-  
+  enum csPortalStatus {
+    // Floating portal status flags
+    // 'status' field of csClipPortal structure has the 
+    // CS_PORTALSTATUS_ZCLEARED flag when depth buffer 
+    // under the portal is cleared. Any portal from stack
+    // may have the flag
+    CS_PORTALSTATUS_ZCLEARED = 0x00000001, 
+    // 'status' field of csClipPortal structure has the 
+    // CS_PORTALSTATUS_SFILLED flag when stencil buffer under the portal is
+    // initialized with 'stencil_clip_value'. Just one portal from stack
+    // may have the flag
+    CS_PORTALSTATUS_SFILLED = 0x00000002
+  };
+    
   // Structure used for maintaining a stack of clipper portals.
   struct csClipPortal
   {
@@ -263,7 +264,7 @@ private:
   {
     bool mirror = false;
     for (int i=0;i<index;i++) 
-      if (clipportal_stack[i]->flags.Check(CS_PORTAL_MIRROR)) 
+      if (clipportal_stack[i]->flags.Check(CS_OPENPORTAL_MIRROR)) 
         mirror = !mirror;
     return mirror;
   }
@@ -454,9 +455,11 @@ private:
   csRef<iRenderBuffer> DoNPOTSFixup (iRenderBuffer* buffer, int unit);
   csRef<iRenderBuffer> DoColorFixup (iRenderBuffer* buffer);
 
-  // 1.0/(2^GL_DEPTH_BITS-1) - minimal depth(z) difference to store
+  // Minimal float depth(z) difference to store
   // different values in depth buffer. Of course, for standard depth
   // range [0.0, 1.0]. See glDepthRange() function reference
+  // It is equal to: 1.0/(2^GL_DEPTH_BITS-1) if GL_DEPTH_BITS<=24 and
+  // 1.0/(2^24-1) when GL_DEPTH_BITS>24 
   float depth_epsilon;
   
   // Draw a 2D polygon (screen space coordinates) with correct Z information

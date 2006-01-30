@@ -35,7 +35,6 @@
 #include "csutil/event.h"
 #include "csutil/scfstrset.h"
 #include "csutil/sysfunc.h"
-#include "iengine/portal.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
 #include "iutil/event.h"
@@ -664,7 +663,7 @@ void csSoftwareGraphics3DCommon::OpenPortal (size_t numVertices,
   // number. Otherwise we start at one.
   if (clipportal_floating)
     clipportal_floating++;
-  else if (flags.Check(CS_PORTAL_FLOAT))
+  else if (flags.Check(CS_OPENPORTAL_FLOAT))
     clipportal_floating = 1;
 }
 
@@ -673,7 +672,7 @@ void csSoftwareGraphics3DCommon::ClosePortal ()
   if (clipportal_stack.Length () <= 0) return;
   csClipPortal* cp = clipportal_stack.Pop ();
 
-  if (cp->flags.Check(CS_PORTAL_ZFILL))
+  if (cp->flags.Check(CS_OPENPORTAL_ZFILL))
   {
     CS_ALLOC_STACK_ARRAY(csVector3, vertices, cp->num_poly);
     for (int v = 0; v < cp->num_poly; v++)
