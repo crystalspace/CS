@@ -6329,6 +6329,9 @@ package cspace::iGeneralMeshCommonState;
 *AddSubMesh = *cspacec::iGeneralMeshCommonState_AddSubMesh;
 *AddRenderBuffer = *cspacec::iGeneralMeshCommonState_AddRenderBuffer;
 *RemoveRenderBuffer = *cspacec::iGeneralMeshCommonState_RemoveRenderBuffer;
+*GetRenderBufferCount = *cspacec::iGeneralMeshCommonState_GetRenderBufferCount;
+*GetRenderBuffer = *cspacec::iGeneralMeshCommonState_GetRenderBuffer;
+*GetRenderBufferName = *cspacec::iGeneralMeshCommonState_GetRenderBufferName;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -14484,6 +14487,9 @@ sub CS_MESHTYPE_POINT_SPRITES () { $cspacec::CS_MESHTYPE_POINT_SPRITES }
 sub CS_MESHTYPE_LINES () { $cspacec::CS_MESHTYPE_LINES }
 sub CS_MESHTYPE_LINESTRIP () { $cspacec::CS_MESHTYPE_LINESTRIP }
 sub csSimpleMeshScreenspace () { $cspacec::csSimpleMeshScreenspace }
+sub CS_OPENPORTAL_ZFILL () { $cspacec::CS_OPENPORTAL_ZFILL }
+sub CS_OPENPORTAL_MIRROR () { $cspacec::CS_OPENPORTAL_MIRROR }
+sub CS_OPENPORTAL_FLOAT () { $cspacec::CS_OPENPORTAL_FLOAT }
 sub csmcNone () { $cspacec::csmcNone }
 sub csmcArrow () { $cspacec::csmcArrow }
 sub csmcLens () { $cspacec::csmcLens }
