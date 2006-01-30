@@ -116,7 +116,7 @@ private:
   uint MixMode;
   bool initialized;
   iMeshObjectDrawCallback* vis_cb;
-  csVector3 radius;
+  float radius;
   float current_lod;
   uint32 current_features;
   csBox2 bbox_2d;
@@ -168,7 +168,7 @@ public:
 
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
-  void GetRadius (csVector3& rad, csVector3& cent)
+  void GetRadius (float& rad, csVector3& cent)
   { rad = radius; cent.Set (0,0,0); }
 
   ///---------------------- iMeshObject implementation ------------------------
@@ -223,7 +223,7 @@ public:
     {
       scfParent->SetObjectBoundingBox (bbox);
     }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    virtual void GetRadius (float& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
     }

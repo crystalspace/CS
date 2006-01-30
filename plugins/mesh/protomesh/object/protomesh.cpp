@@ -373,24 +373,26 @@ void csProtoMeshObjectFactory::CalculateBBoxRadius ()
   object_bbox_valid = true;
   csVector3& v0 = vertices[0];
   object_bbox.StartBoundingBox (v0);
-  csVector3 max_sq_radius (v0.x*v0.x + v0.x*v0.x,
-        v0.y*v0.y + v0.y*v0.y, v0.z*v0.z + v0.z*v0.z);
   int i;
   for (i = 1 ; i < PROTO_VERTS ; i++)
   {
     csVector3& v = vertices[i];
     object_bbox.AddBoundingVertexSmart (v);
-    csVector3 sq_radius (v.x*v.x + v.x*v.x,
-        v.y*v.y + v.y*v.y, v.z*v.z + v.z*v.z);
-    if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
-    if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
-    if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
   }
-  radius.Set (csQsqrt (max_sq_radius.x),
-    csQsqrt (max_sq_radius.y), csQsqrt (max_sq_radius.z));
+
+  const csVector3& center = object_bbox.GetCenter ();
+  float max_sqradius = 0.0f;
+  for (i = 0 ; i < PROTO_VERTS ; i++)
+  {
+    csVector3& v = vertices[i];
+    float sqradius = csSquaredDist::PointPoint (center, v);
+    if (sqradius > max_sqradius) max_sqradius = sqradius;
+  }
+
+  radius = csQsqrt (max_sqradius);
 }
 
-const csVector3& csProtoMeshObjectFactory::GetRadius ()
+float csProtoMeshObjectFactory::GetRadius ()
 {
   SetupFactory ();
   if (!object_bbox_valid) CalculateBBoxRadius ();

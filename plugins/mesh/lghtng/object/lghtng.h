@@ -78,7 +78,7 @@ public:
   virtual ~csLightningMeshObject ();
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
-  void GetRadius (csVector3& rad, csVector3& cent);
+  void GetRadius (float& rad, csVector3& cent);
 
   ///--------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -122,7 +122,7 @@ public:
     {
       scfParent->SetObjectBoundingBox (bbox);
     }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    virtual void GetRadius (float& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
     }

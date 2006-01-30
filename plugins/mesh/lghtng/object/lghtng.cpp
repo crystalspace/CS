@@ -134,7 +134,7 @@ void csLightningMeshObject::SetObjectBoundingBox (const csBox3& inbbox)
   scfiObjectModel.ShapeChanged ();
 }
 
-void csLightningMeshObject::GetRadius (csVector3& rad, csVector3& cent)
+void csLightningMeshObject::GetRadius (float& rad, csVector3& cent)
 {
   GenMesh->GetObjectModel ()->GetRadius (rad, cent);
 }

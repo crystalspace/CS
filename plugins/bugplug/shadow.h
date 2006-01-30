@@ -104,10 +104,10 @@ public:
     return;
   }
   void SetObjectBoundingBox (const csBox3&) { }
-  void GetRadius (csVector3& rad, csVector3& cent)
+  void GetRadius (float& rad, csVector3& cent)
   {
-     rad.Set (200000, 200000, 200000);
-     cent.Set (0,0,0);
+    rad = 200000;
+    cent.Set (0,0,0);
   }
 
   SCF_DECLARE_IBASE;
@@ -152,7 +152,7 @@ public:
     {
       scfParent->SetObjectBoundingBox (bbox);
     }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    virtual void GetRadius (float& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
     }

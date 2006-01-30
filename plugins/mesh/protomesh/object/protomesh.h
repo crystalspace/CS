@@ -283,7 +283,7 @@ private:
   void PrepareBuffers ();
 
   // Bounding box/sphere.
-  csVector3 radius;
+  float radius;
   csBox3 object_bbox;
   bool object_bbox_valid;
 
@@ -323,7 +323,7 @@ public:
 
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& b);
-  const csVector3& GetRadius ();
+  float GetRadius ();
 
   /**
    * Calculate polygons for iPolygonMesh.
@@ -429,10 +429,10 @@ public:
     {
       scfParent->SetObjectBoundingBox (bbox);
     }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    virtual void GetRadius (float& rad, csVector3& cent)
     {
       rad = scfParent->GetRadius ();
-      cent.Set (0.0f);
+      cent = scfParent->object_bbox.GetCenter ();
     }
   } scfiObjectModel;
   friend class ObjectModel;

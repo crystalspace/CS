@@ -231,9 +231,7 @@ public:
   csBox3 obj_bbox;
 
   /// Radius of object in object space.
-  csVector3 obj_radius;
-  /// Full radius of object in object space.
-  float max_obj_radius;
+  float obj_radius;
 
   /// Static polys which share the same material
   struct csStaticPolyGroup
@@ -392,7 +390,7 @@ public:
   /**
    * Get the radius in object space for this polygon set.
    */
-  void GetRadius (csVector3& rad, csVector3& cent);
+  void GetRadius (float& rad, csVector3& cent);
 
   //----------------------------------------------------------------------
   // Vertex handling functions

@@ -148,7 +148,7 @@ private:
   size_t num_lit_fact_colors;
   csColor4* static_fact_colors;
 
-  csVector3 radius;
+  float radius;
   csBox3 object_bbox;
   bool object_bbox_valid;
 
@@ -227,7 +227,7 @@ public:
   const csColor& GetColor () const { return base_color; }
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
-  void GetRadius (csVector3& rad, csVector3& cent);
+  void GetRadius (float& rad, csVector3& cent);
   void SetShadowCasting (bool m) { do_shadows = m; }
   void SetShadowReceiving (bool m) { do_shadow_rec = m; }
 
@@ -314,7 +314,7 @@ public:
   void CalculateBBoxRadius ();
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
-  const csVector3& GetRadius ();
+  float GetRadius ();
 
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public csObjectModel
@@ -328,10 +328,10 @@ public:
     {
       scfParent->SetObjectBoundingBox (bbox);
     }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    virtual void GetRadius (float& rad, csVector3& cent)
     {
       rad = scfParent->GetRadius ();
-      cent.Set (0.0f);
+      cent = scfParent->object_bbox.GetCenter ();
     }
   } scfiObjectModel;
   friend class ObjectModel;

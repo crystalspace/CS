@@ -2183,12 +2183,12 @@ void csTerrainObject::SetObjectBoundingBox (const csBox3& bbox)
   scfiObjectModel.ShapeChanged ();
 }
 
-void csTerrainObject::GetRadius (csVector3& rad, csVector3& cent)
+void csTerrainObject::GetRadius (float& rad, csVector3& cent)
 {
   csBox3 bbox;
   GetObjectBoundingBox (bbox);
   cent = bbox.GetCenter ();
-  rad = (bbox.Max () - bbox.Min ()) * 0.5f;
+  rad = csQsqrt (csSquaredDist::PointPoint (bbox.Max (), bbox.Min ()));
 }
 
 int csTerrainObject::CollisionDetect (iMovable* m, csTransform* transform)

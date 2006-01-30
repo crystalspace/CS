@@ -65,7 +65,7 @@ csParticleSystem::csParticleSystem (
   MixMode = 0;
   vis_cb = 0;
   mat = 0;
-  radius.Set (0, 0, 0);
+  radius = 0.0f;
   color.Set (0, 0, 0);
   csRef<iPluginManager> plugin_mgr (
 	  	CS_QUERY_REGISTRY (object_reg, iPluginManager));

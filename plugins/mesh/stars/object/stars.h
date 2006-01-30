@@ -56,7 +56,7 @@ private:
   int seed;
 
   bool initialized;
-  csVector3 max_radius;
+  float max_radius;
   float current_lod;
   uint32 current_features;
 
@@ -123,7 +123,7 @@ public:
 
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
-  void GetRadius (csVector3& rad, csVector3& cent)
+  void GetRadius (float& rad, csVector3& cent)
   { rad = max_radius; cent = box.GetCenter(); }
 
   ///---------------------- iMeshObject implementation ------------------------
@@ -168,7 +168,7 @@ public:
     {
       scfParent->SetObjectBoundingBox (bbox);
     }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    virtual void GetRadius (float& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
     }

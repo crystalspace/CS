@@ -164,7 +164,7 @@ struct iObjectModel : public virtual iBase
   /**
    * Get the radius and center of this object in object space.
    */
-  virtual void GetRadius (csVector3& radius, csVector3& center) = 0;
+  virtual void GetRadius (float& radius, csVector3& center) = 0;
 
   /**
    * Add a listener to this object model. This listener will be called whenever

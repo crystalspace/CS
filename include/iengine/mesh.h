@@ -616,10 +616,10 @@ struct iMeshWrapper : public virtual iBase
    * Get the radius of this mesh and all its children.
    * \deprecated Use GetRadius() that returns csEllipsoid.
    */
-  CS_DEPRECATED_METHOD virtual void GetRadius (csVector3& rad,
+  CS_DEPRECATED_METHOD virtual void GetRadius (float& rad,
   	csVector3& cent) const = 0;
   /// Get the radius of this mesh and all its children.
-  virtual csEllipsoid GetRadius () const = 0;
+  virtual csSphere GetRadius () const = 0;
 
   /**
    * Reset minimum/maximum render range to defaults (i.e. unlimited).

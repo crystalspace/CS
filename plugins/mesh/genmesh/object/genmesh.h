@@ -226,7 +226,7 @@ public:
   bool IsManualColors () const { return do_manual_colors; }
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
-  void GetRadius (csVector3& rad, csVector3& cent);
+  void GetRadius (float& rad, csVector3& cent);
   void SetShadowCasting (bool m) { do_shadows = m; }
   void SetShadowReceiving (bool m) { do_shadow_rec = m; }
 
@@ -587,7 +587,7 @@ private:
   bool default_shadowcasting;
   bool default_shadowreceiving;
 
-  csVector3 radius;
+  float radius;
   csBox3 object_bbox;
   bool object_bbox_valid;
   bool initialized;
@@ -722,7 +722,7 @@ public:
 
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
-  const csVector3& GetRadius ();
+  float GetRadius ();
 
   /**
    * Calculate polygons for iPolygonMesh.
@@ -1029,7 +1029,7 @@ public:
     {
       scfParent->SetObjectBoundingBox (bbox);
     }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    virtual void GetRadius (float& rad, csVector3& cent)
     {
       rad = scfParent->GetRadius ();
       cent.Set (0.0f);

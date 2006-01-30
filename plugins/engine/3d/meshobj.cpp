@@ -963,38 +963,32 @@ void csMeshWrapper::HardTransform (const csReversibleTransform &t)
   }
 }
 
-csEllipsoid csMeshWrapper::GetRadius () const
+csSphere csMeshWrapper::GetRadius () const
 {
-  csEllipsoid e;
-  GetRadius (e.GetRadius (), e.GetCenter ());
-  return e;
+  float radius;
+  csVector3 center;
+  GetRadius (radius, center);
+  return csSphere (center, radius);
 }
 
-void csMeshWrapper::GetRadius (csVector3 &rad, csVector3 &cent) const
+void csMeshWrapper::GetRadius (float &rad, csVector3 &cent) const
 {
   meshobj->GetObjectModel ()->GetRadius (rad, cent);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   if (children.Length () > 0)
   {
-    float max_radius = rad.x;
-    if (max_radius < rad.y) max_radius = rad.y;
-    if (max_radius < rad.z) max_radius = rad.z;
-
-    csSphere sphere (cent, max_radius);
+    csSphere sphere (cent, rad);
     size_t i;
     for (i = 0; i < children.Length (); i++)
     {
       iMeshWrapper *spr = children[i]->QueryMesh ();
       if (spr)
       {
-        csVector3 childrad, childcent;
+	float childrad;
+        csVector3 childcent;
         spr->GetRadius (childrad, childcent);
 
-        float child_max_radius = childrad.x;
-        if (child_max_radius < childrad.y) child_max_radius = childrad.y;
-        if (child_max_radius < childrad.z) child_max_radius = childrad.z;
-
-        csSphere childsphere (childcent, child_max_radius);
+        csSphere childsphere (childcent, childrad);
 
         // @@@ Is this the right transform?
         childsphere *= spr->GetMovable ()->GetTransform ();
@@ -1002,7 +996,7 @@ void csMeshWrapper::GetRadius (csVector3 &rad, csVector3 &cent) const
       }
     }
 
-    rad.Set (sphere.GetRadius (), sphere.GetRadius (), sphere.GetRadius ());
+    rad = sphere.GetRadius ();
     cent.Set (sphere.GetCenter ());
   }
 }
@@ -1053,24 +1047,21 @@ void csMeshWrapper::PlaceMesh ()
   iSectorList *movable_sectors = movable.GetSectors ();
   if (movable_sectors->GetCount () == 0) return ; // Do nothing
   csSphere sphere;
-  csVector3 radius;
+  float radius;
   GetObjectModel ()->GetRadius (radius, sphere.GetCenter ());
 
   iSector *sector = movable_sectors->Get (0);
   movable.SetSector (sector);       // Make sure all other sectors are removed
 
   // Transform the sphere from object to world space.
-  float max_radius = radius.x;
-  if (max_radius < radius.y) max_radius = radius.y;
-  if (max_radius < radius.z) max_radius = radius.z;
-  sphere.SetRadius (max_radius);
+  sphere.SetRadius (radius);
   if (!movable.IsFullTransformIdentity ())
     sphere = movable.GetFullTransform ().This2Other (sphere);
-  max_radius = sphere.GetRadius ();
-  float max_sq_radius = max_radius * max_radius;
+  radius = sphere.GetRadius ();
+  float max_sq_radius = radius * radius;
 
   csRef<iMeshWrapperIterator> it = csEngine::currentEngine
-  	->GetNearbyMeshes (sector, sphere.GetCenter (), max_radius, true);
+  	->GetNearbyMeshes (sector, sphere.GetCenter (), radius, true);
 
   int j;
   while (it->HasNext ())

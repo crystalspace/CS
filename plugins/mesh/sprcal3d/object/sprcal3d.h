@@ -349,7 +349,7 @@ public:
   void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts,int vertCount);
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
-  void GetRadius (csVector3& rad, csVector3& cent);
+  void GetRadius (float& rad, csVector3& cent);
   /** @} */
 
   virtual iObjectModel* GetObjectModel () { return this; }
@@ -755,7 +755,7 @@ public:
   void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts, int vertCount);
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
-  void GetRadius (csVector3& rad, csVector3& cent);
+  void GetRadius (float& rad, csVector3& cent);
   /** @} */
 };
 

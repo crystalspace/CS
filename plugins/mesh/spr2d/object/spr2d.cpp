@@ -127,8 +127,7 @@ void csSprite2DMeshObject::SetupObject ()
       float sqdist = v.pos.x*v.pos.x + v.pos.y*v.pos.y;
       if (sqdist > max_sq_dist) max_sq_dist = sqdist;
     }
-    float max_dist = csQsqrt (max_sq_dist);
-    radius.Set (max_dist, max_dist, max_dist);
+    radius = csQsqrt (max_sq_dist);
 
     bufferHolder.AttachNew (new csRenderBufferHolder);
     csRef<iRenderBufferAccessor> newAccessor;

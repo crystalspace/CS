@@ -187,8 +187,7 @@ void csPortalContainer::Prepare ()
   for (i = 0 ; i < vertices.Length () ; i++)
     object_bbox.AddBoundingVertex (vertices[i]);
 
-  object_radius = object_bbox.Max () - object_bbox.GetCenter ();
-  max_object_radius = csQsqrt (csSquaredDist::PointPoint (
+  object_radius = csQsqrt (csSquaredDist::PointPoint (
   	object_bbox.Max (), object_bbox.Min ())) * 0.5f;
 
 }
@@ -990,7 +989,7 @@ bool csPortalContainer::HitBeamObject (const csVector3& start,
   return best_p != -1;
 }
 
-void csPortalContainer::GetRadius (csVector3& radius, csVector3& center)
+void csPortalContainer::GetRadius (float& radius, csVector3& center)
 {
   Prepare ();
   center = object_bbox.GetCenter ();

@@ -60,8 +60,7 @@ void csLight::UpdateViscullMesh ()
 		-cutoffDistance, -cutoffDistance, -cutoffDistance,
 		cutoffDistance, cutoffDistance, cutoffDistance);
         m.AttachNew (new csPolygonMeshBox (object_model->box));
-	object_model->radius.Set (
-			cutoffDistance, cutoffDistance, cutoffDistance);
+	object_model->radius = cutoffDistance;
       }
       break;
     case CS_LIGHT_DIRECTIONAL:

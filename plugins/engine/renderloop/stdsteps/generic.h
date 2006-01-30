@@ -79,7 +79,8 @@ struct meshInfo
 {
   iShaderVariableContext* svc;
   bool noclip;	// From iMeshWrapper CS_ENTITY_NOCLIP.
-  float radius;	// Radius of the bounding sphere of this object.
+  csVector3 wor_center;	// Center of the bounding sphere of this object.
+  float radius;		// Radius of the bounding sphere of this object.
 };
 
 class csGenericRenderStep : public iRenderStep, 

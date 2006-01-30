@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Jan-2006
+	- Jorrit changed iObjectModel->GetRadius() to return the radius as
+	  a single float instead of a vector. It was always used as a single
+	  sphere and not an ellipsoid.
+	- Jorrit changed all mesh objects for the above change.
+	- Jorrit changed many mesh objects to correctly set the center as
+	  returned by GetRadius() to the actual center of the model and not
+	  to (0,0,0). The radius is calculated accordingly.
+	- Jorrit fixed the generic renderstep so that it uses the model center
+	  to check if an object is affected by the light (instead of object
+	  origin).
 29-Jan-2006
 	- rvl_ corrected portal logic of opengl renderer to handle 
 	  rendering to target correctly. Some code logic/style was 

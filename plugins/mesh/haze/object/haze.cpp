@@ -497,7 +497,7 @@ void csHazeMeshObject::SetupObject ()
 {
   if (!initialized)
   {
-    bbox.StartBoundingBox( origin );
+    bbox.StartBoundingBox (origin);
     csVector3 pos;
     size_t l;
     int i;
@@ -505,8 +505,9 @@ void csHazeMeshObject::SetupObject ()
       for(i=0; i<layers[l]->hull->GetVerticeCount(); i++)
       {
 	layers[l]->hull->GetVertex(pos, i);
-        bbox.AddBoundingVertex( pos );
+        bbox.AddBoundingVertex (pos);
       }
+    radius = csQsqrt (csSquaredDist::PointPoint (bbox.Max (), bbox.Min ()));
     initialized = true;
   }
 }

@@ -886,7 +886,6 @@ csPtr<csThingStatic> csThingStatic::CloneStatic ()
   clone->obj_bbox = obj_bbox;
   clone->SetObjBboxValid (IsObjBboxValid ());
   clone->obj_radius = obj_radius;
-  clone->max_obj_radius = max_obj_radius;
   clone->SetPrepared (IsPrepared());
   clone->SetShapeNumber (GetShapeNumber ());
   clone->cosinus_factor = cosinus_factor;
@@ -977,29 +976,24 @@ void csThingStatic::GetBoundingBox (csBox3 &box)
 
   SetObjBboxValid (true);
 
-  if (!obj_verts)
+  if (!obj_verts || num_vertices <= 0)
   {
     obj_bbox.Set (0, 0, 0, 0, 0, 0);
+    obj_radius = 0.0f;
     box = obj_bbox;
     return ;
   }
 
-  if (num_vertices > 0)
-  {
-    obj_bbox.StartBoundingBox (obj_verts[0]);
-    for (i = 1; i < num_vertices; i++)
-    {
-      obj_bbox.AddBoundingVertexSmart (obj_verts[i]);
-    }
-  }
+  obj_bbox.StartBoundingBox (obj_verts[0]);
+  for (i = 1; i < num_vertices; i++)
+    obj_bbox.AddBoundingVertexSmart (obj_verts[i]);
 
-  obj_radius = (obj_bbox.Max () - obj_bbox.Min ()) * 0.5f;
-  max_obj_radius = csQsqrt (csSquaredDist::PointPoint (
+  obj_radius = csQsqrt (csSquaredDist::PointPoint (
         obj_bbox.Max (), obj_bbox.Min ())) * 0.5f;
   box = obj_bbox;
 }
 
-void csThingStatic::GetRadius (csVector3 &rad, csVector3 &cent)
+void csThingStatic::GetRadius (float &rad, csVector3 &cent)
 {
   csBox3 b;
   GetBoundingBox (b);
@@ -2459,7 +2453,7 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
 
   csSphere sphere;
   sphere.SetCenter (b.GetCenter ());
-  sphere.SetRadius (static_data->max_obj_radius);
+  sphere.SetRadius (static_data->obj_radius);
 
   size_t i;
 

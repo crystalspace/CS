@@ -622,7 +622,8 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   size_t numShadowMeshes;
   if ((numShadowMeshes = shadowMeshes.Length ()) > 0)
   {
-    csVector3 rad, center;
+    float rad;
+    csVector3 center;
     float maxRadius;
     csRenderMeshModes modes;
     modes.z_buf_mode = CS_ZBUF_TEST;
@@ -638,7 +639,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
         
 	const csReversibleTransform& tf = sp->GetMovable ()->GetTransform ();
 	csVector3 pos = tf.This2Other (center); //transform it
-	csVector3 radWorld = tf.This2Other (rad);
+	csVector3 radWorld = tf.This2Other (csVector3 (rad));
 	maxRadius = MAX(radWorld.x, MAX(radWorld.y, radWorld.z));
 
 	if (!lightBehindCamera)

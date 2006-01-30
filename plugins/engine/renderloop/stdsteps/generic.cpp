@@ -423,9 +423,15 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     // useful.
     if (light)
     {
-      csVector3 radius, center;
-      m->GetMeshObject ()->GetObjectModel ()->GetRadius (radius, center);
-      sameShaderMeshInfo[i].radius = MAX (radius.x, MAX (radius.y, radius.z));
+      csVector3 obj_center;
+      m->GetMeshObject ()->GetObjectModel ()->GetRadius (
+      	sameShaderMeshInfo[i].radius, obj_center);
+      iMovable* mov = m->GetMovable ();
+      if (mov->IsFullTransformIdentity ())
+        sameShaderMeshInfo[i].wor_center = obj_center;
+      else
+        sameShaderMeshInfo[i].wor_center = mov->GetFullTransform ().
+		This2Other (obj_center);
     }
   }
  
@@ -501,7 +507,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     if (light)
     {
       // @@@ TODO: Better test for DIRECTIONAL and SPOTLIGHT
-      float dist = sqrt (csSquaredDist::PointPoint (mesh->worldspace_origin,
+      float dist = sqrt (csSquaredDist::PointPoint (
+	sameShaderMeshInfo[n].wor_center, //mesh->worldspace_origin,
       	light_center));
       if (dist-sameShaderMeshInfo[n].radius > cutoff_distance) continue;
     }

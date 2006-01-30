@@ -818,18 +818,14 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
 }
 
 
-void csSpriteCal3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
+void csSpriteCal3DMeshObject::GetRadius (float& rad, csVector3& cent)
 {
   cent.Set (object_bbox.GetCenter());
-  csVector3 maxbox, minbox;
 
   RecalcBoundingBox (object_bbox);
-  maxbox = object_bbox.Max();
-  minbox = object_bbox.Min();
-  float r1 = (maxbox.x-minbox.x)/2;
-  float r2 = (maxbox.y-minbox.y)/2;
-  float r3 = (maxbox.z-minbox.z)/2;
-  rad.Set(r1,r2,r3);
+  const csBox3& maxbox = object_bbox.Max();
+  const csBox3& minbox = object_bbox.Min();
+  rad = csQsqrt (csSquaredDist::PointPoint (minbox, maxbox));
 }
 
 #define CAL3D_EXACT_BOXES true 
@@ -866,10 +862,10 @@ void csSpriteCal3DMeshObject::SetObjectBoundingBox (const csBox3& bbox)
   ShapeChanged ();
 }
 
-void csSpriteCal3DMeshObjectFactory::GetRadius (csVector3& rad, csVector3& cent)
+void csSpriteCal3DMeshObjectFactory::GetRadius (float& rad, csVector3& cent)
 {
   cent.Set(0,0,0);
-  rad.Set(1,1,1);
+  rad = 1.0f;
 }
 
 void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox)

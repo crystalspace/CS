@@ -582,8 +582,8 @@ public:
   
   //---------- Bounding volume and beam functions -----------------//
 
-  virtual void GetRadius (csVector3& rad, csVector3& cent) const;
-  virtual csEllipsoid GetRadius () const;
+  virtual void GetRadius (float& rad, csVector3& cent) const;
+  virtual csSphere GetRadius () const;
 
   virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
          csVector3& isect, float* pr);

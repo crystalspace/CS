@@ -82,8 +82,7 @@ void csExploMeshObject::SetupObject ()
     maxaccel = csQsqrt (sqmaxaccel);
     SetupColor ();
     SetupMixMode ();
-    float r = csQsqrt (csSquaredDist::PointPoint (bbox.Max (), bbox.Min ())) / 2;
-    radius.Set (r, r, r);
+    radius = csQsqrt (csSquaredDist::PointPoint (bbox.Max (), bbox.Min ())) / 2;
   }
 }
 

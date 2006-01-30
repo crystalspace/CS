@@ -685,9 +685,9 @@ void csParticlesObject::SetObjectBoundingBox (const csBox3&)
   // @@@ TODO
 }
 
-void csParticlesObject::GetRadius(csVector3 &rad, csVector3 &c)
+void csParticlesObject::GetRadius(float &rad, csVector3 &c)
 {
-  rad = csVector3(radius,radius,radius);
+  rad = radius;
   c = emitter;
 }
 

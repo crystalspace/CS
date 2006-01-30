@@ -84,6 +84,7 @@ void csStarsMeshObject::SetupObject ()
 {
   if (!initialized)
   {
+    max_radius = 10000.0f;	// @@@ Dummy
     initialized = true;
   }
 }

@@ -248,7 +248,7 @@ public:
    * See igeom/objmodel.h for specification. The default implementation
    * returns an infinite radius.
    */
-  virtual void GetRadius (csVector3& radius, csVector3& center);
+  virtual void GetRadius (float& radius, csVector3& center);
 
 };
 

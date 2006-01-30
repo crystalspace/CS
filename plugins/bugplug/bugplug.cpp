@@ -1663,15 +1663,16 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       if (do_rad)
       {
         int rad_color = G3D->GetDriver2D ()->FindRGB (0, 255, 0);
-        csVector3 radius, r, center;
+	float radius;
+        csVector3 r, center;
         selected_meshes[k]->GetMeshObject ()->GetObjectModel ()
 		->GetRadius (radius,center);
         csVector3 trans_o = tr_o2c * center;
-        r.Set (radius.x, 0, 0);
+        r.Set (radius, 0, 0);
         G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
-        r.Set (0, radius.y, 0);
+        r.Set (0, radius, 0);
         G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
-        r.Set (0, 0, radius.z);
+        r.Set (0, 0, radius);
         G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
       }
       if (show_polymesh != BUGPLUG_POLYMESH_NO)

@@ -103,7 +103,7 @@ private:
   /// Bounding box in object space for this frame.
   csBox3 box;
   /// Radius in object space for this frame.
-  csVector3 radius;
+  float radius;
 
 public:
   ///
@@ -143,12 +143,12 @@ public:
   /**
    * Set the radius of this frame in object space.
    */
-  void SetRadius (const csVector3& r) { radius = r; }
+  void SetRadius (float r) { radius = r; }
 
   /**
    * Get the radius of this frame in object space.
    */
-  void GetRadius (csVector3& r) const { r = radius; }
+  void GetRadius (float& r) const { r = radius; }
 };
 
 /**
@@ -622,7 +622,7 @@ public:
 
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
-  void GetRadius (csVector3& rad, csVector3 &cent);
+  void GetRadius (float& rad, csVector3 &cent);
 
   /**\name iMeshObjectFactory implementation
    * @{ */
@@ -1371,7 +1371,7 @@ public:
 
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
-  void GetRadius (csVector3& rad, csVector3 &cent);
+  void GetRadius (float& rad, csVector3 &cent);
 
   /// Create and add a new socket to the sprite.
   iSpriteSocket* AddSocket ();

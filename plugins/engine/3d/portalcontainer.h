@@ -136,7 +136,7 @@ private:
   // Object space data.
   csDirtyAccessArray<csVector3> vertices;
   csBox3 object_bbox;
-  csVector3 object_radius;
+  float object_radius;
   float max_object_radius;
 
   csRef<iShaderManager> shader_man;
@@ -250,7 +250,7 @@ public:
     object_bbox = bbox;
     ShapeChanged ();
   }
-  virtual void GetRadius (csVector3& radius, csVector3& center);
+  virtual void GetRadius (float& radius, csVector3& center);
 };
 
 #endif // __CS_PORTALCONTAINER_H__

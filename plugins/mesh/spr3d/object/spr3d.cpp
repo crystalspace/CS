@@ -307,24 +307,16 @@ void csSprite3DMeshObjectFactory::ComputeBoundingBox ()
 
     const csVector3& v0 = GetVertex (frame, 0);
     box.StartBoundingBox (v0);
-    csVector3 max_sq_radius (v0.x*v0.x + v0.x*v0.x,
-    	v0.y*v0.y + v0.y*v0.y, v0.z*v0.z + v0.z*v0.z);
     for ( vertex = 1 ; vertex < GetVertexCount() ; vertex++ )
     {
       const csVector3& v = GetVertex (frame, vertex);
       box.AddBoundingVertexSmart (v);
-      csVector3 sq_radius (v.x*v.x + v.x*v.x, v.y*v.y + v.y*v.y,
-      	v.z*v.z + v.z*v.z);
-      if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
-      if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
-      if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
     }
+    float radius = csQsqrt (
+    	csSquaredDist::PointPoint (box.Max (), box.Min ()));
 
     ((csSpriteFrame*)GetFrame (frame))->SetBoundingBox (box);
-    ((csSpriteFrame*)GetFrame (frame))->SetRadius (csVector3 (
-    	csQsqrt (max_sq_radius.x),
-	csQsqrt (max_sq_radius.y),
-	csQsqrt (max_sq_radius.z)));
+    ((csSpriteFrame*)GetFrame (frame))->SetRadius (radius);
   }
 }
 
@@ -640,25 +632,16 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
     verts[0] = t.This2Other (verts[0]);
     csVector3& v0 = verts[0];
     box.StartBoundingBox (v0);
-    csVector3 max_sq_radius (v0.x*v0.x + v0.x*v0.x,
-    	v0.y*v0.y + v0.y*v0.y, v0.z*v0.z + v0.z*v0.z);
     for (j = 1 ; j < num ; j++)
     {
       csVector3& v = verts[j];
       v = t.This2Other (v);
       box.AddBoundingVertexSmart (v);
-      csVector3 sq_radius (v.x*v.x + v.x*v.x, v.y*v.y + v.y*v.y,
-		v.z*v.z + v.z*v.z);
-      if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
-      if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
-      if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
     }
+    float radius = csQsqrt (
+    	csSquaredDist::PointPoint (box.Max (), box.Min ()));
     ((csSpriteFrame*)GetFrame (i))->SetBoundingBox (box);
-    ((csSpriteFrame*)GetFrame (i))->SetRadius (csVector3 (
-    	csQsqrt (max_sq_radius.x),
-	csQsqrt (max_sq_radius.y),
-	csQsqrt (max_sq_radius.z)));
-
+    ((csSpriteFrame*)GetFrame (i))->SetRadius (radius);
   }
   ShapeChanged ();
 }
@@ -674,15 +657,15 @@ void csSprite3DMeshObjectFactory::SetObjectBoundingBox (const csBox3&)
   // @@@ TODO
 }
 
-void csSprite3DMeshObjectFactory::GetRadius (csVector3& rad, csVector3& cent)
+void csSprite3DMeshObjectFactory::GetRadius (float& rad, csVector3& cent)
 {
-  csVector3 r; csBox3 bbox;
+  float r; csBox3 bbox;
   GetObjectBoundingBox (bbox);
   cent = bbox.GetCenter();
 
   csSpriteFrame* cframe = ((csSpriteAction2*)GetAction (0))->GetCsFrame (0);
   cframe->GetRadius (r);
-  rad =  r;
+  rad = r;
 }
 
 csMeshedPolygon* csSprite3DMeshObjectFactory::PolyMesh::GetPolygons ()
@@ -1025,9 +1008,9 @@ void csSprite3DMeshObject::SetObjectBoundingBox (const csBox3&)
   // @@@ TODO
 }
 
-void csSprite3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
+void csSprite3DMeshObject::GetRadius (float& rad, csVector3& cent)
 {
-  csVector3 r; csBox3 bbox;
+  float r; csBox3 bbox;
   GetObjectBoundingBox(bbox);
   cent = bbox.GetCenter();
 

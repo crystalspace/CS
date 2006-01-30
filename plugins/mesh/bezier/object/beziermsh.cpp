@@ -613,7 +613,7 @@ void csBezierMesh::AppendShadows (
 #endif
 }
 
-void csBezierMesh::GetRadius (csVector3 &rad, csVector3 &cent)
+void csBezierMesh::GetRadius (float &rad, csVector3 &cent)
 {
   csBox3 b;
   GetBoundingBox (b);
@@ -650,8 +650,7 @@ void csBezierMesh::GetBoundingBox (csBox3 &box)
     }
   }
 
-  static_data->obj_radius = (static_data->obj_bbox.Max () - static_data->obj_bbox.Min ()) * 0.5f;
-  static_data->max_obj_radius = csQsqrt (csSquaredDist::PointPoint (
+  static_data->obj_radius = csQsqrt (csSquaredDist::PointPoint (
   	static_data->obj_bbox.Max (), static_data->obj_bbox.Min ())) * 0.5f;
   box = static_data->obj_bbox;
 }

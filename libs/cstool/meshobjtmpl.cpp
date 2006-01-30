@@ -18,6 +18,8 @@
 
 #include "cssysdef.h"
 #include "cstool/meshobjtmpl.h"
+#include "csgeom/math3d.h"
+#include "csqsqrt.h"
 #include "csutil/ref.h"
 
 #include "iengine/engine.h"
@@ -122,11 +124,11 @@ void csMeshObject::SetObjectBoundingBox (const csBox3& bbox)
   boundingbox = bbox;
 }
 
-void csMeshObject::GetRadius (csVector3& radius, csVector3& center)
+void csMeshObject::GetRadius (float& radius, csVector3& center)
 {
   csBox3 b;
   GetObjectBoundingBox (b);
-  radius = (b.Max () - b.Min ()) * 0.5f;
+  radius = csQsqrt (csSquaredDist::PointPoint (b.Max (), b.Min ()));
   center = b.GetCenter ();
 }
 

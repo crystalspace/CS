@@ -146,9 +146,7 @@ public:
   bool obj_bbox_valid;
 
   /// Radius of object in object space.
-  csVector3 obj_radius;
-  /// Full radius of object in object space.
-  float max_obj_radius;
+  float obj_radius;
 
   /**
    * Tesselation parameter:
@@ -507,7 +505,7 @@ public:
   /**
    * Get the radius in object space for this polygon set.
    */
-  void GetRadius (csVector3& rad, csVector3& cent);
+  void GetRadius (float& rad, csVector3& cent);
 
   /**
    * Get a write object for a vis culling system.
@@ -761,7 +759,7 @@ public:
     {
       scfParent->SetBoundingBox (bbox);
     }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    virtual void GetRadius (float& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
     }

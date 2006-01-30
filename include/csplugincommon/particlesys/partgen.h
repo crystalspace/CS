@@ -69,7 +69,7 @@ protected:
   iEngine* engine;
   csRef<iLightManager> light_mgr;
   /// Object space radius.
-  csVector3 radius;
+  float radius;
   /// iParticle ptrs to the particles.
   csRefArray<iSprite2DState> sprite2ds;
   csRefArray<iParticle> particles;
@@ -290,7 +290,7 @@ public:
     csParticleSystem::bbox = bbox;
     ShapeChanged ();
   }
-  void GetRadius (csVector3& rad, csVector3& cent)
+  void GetRadius (float& rad, csVector3& cent)
   {
     SetupObject ();
     rad = radius;

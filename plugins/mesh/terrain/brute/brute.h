@@ -410,7 +410,7 @@ public:
 
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
-  void GetRadius (csVector3& rad, csVector3& cent);
+  void GetRadius (float& rad, csVector3& cent);
 
   SCF_DECLARE_IBASE;
   ///--------------------- iMeshObject implementation ---------------------
@@ -524,7 +524,7 @@ public:
     {
       scfParent->SetObjectBoundingBox (bbox);
     }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    virtual void GetRadius (float& rad, csVector3& cent)
     {
       scfParent->GetRadius (rad, cent);
     }
@@ -772,7 +772,7 @@ public:
     {
       //scfParent->SetObjectBoundingBox (bbox);
     }
-    virtual void GetRadius (csVector3& /*rad*/, csVector3& /*cent*/)
+    virtual void GetRadius (float& /*rad*/, csVector3& /*cent*/)
     {
       //scfParent->GetRadius (rad, cent);
     }

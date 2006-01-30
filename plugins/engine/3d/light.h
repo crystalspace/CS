@@ -52,7 +52,7 @@ class csLightObjectModel : public scfImplementationExt0<csLightObjectModel,
 {
 public:
   csBox3 box;
-  csVector3 radius;
+  float radius;
 
   csLightObjectModel ()
     : scfImplementationType (this)
@@ -70,10 +70,10 @@ public:
   {
     box = bbox;
   }
-  virtual void GetRadius (csVector3& rad, csVector3& cent)
+  virtual void GetRadius (float& rad, csVector3& cent)
   {
     rad = radius;
-    cent.Set (0, 0, 0);
+    cent.Set (0, 0, 0);	// @@@ FIXME!
   }
 };
 
