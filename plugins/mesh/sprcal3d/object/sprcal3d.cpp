@@ -823,8 +823,8 @@ void csSpriteCal3DMeshObject::GetRadius (float& rad, csVector3& cent)
   cent.Set (object_bbox.GetCenter());
 
   RecalcBoundingBox (object_bbox);
-  const csBox3& maxbox = object_bbox.Max();
-  const csBox3& minbox = object_bbox.Min();
+  const csVector3& maxbox = object_bbox.Max();
+  const csVector3& minbox = object_bbox.Min();
   rad = csQsqrt (csSquaredDist::PointPoint (minbox, maxbox));
 }
 
