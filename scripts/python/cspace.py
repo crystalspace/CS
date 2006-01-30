@@ -5560,6 +5560,9 @@ class iGeneralMeshCommonState(iBase):
     def AddSubMesh(*args): return _cspace.iGeneralMeshCommonState_AddSubMesh(*args)
     def AddRenderBuffer(*args): return _cspace.iGeneralMeshCommonState_AddRenderBuffer(*args)
     def RemoveRenderBuffer(*args): return _cspace.iGeneralMeshCommonState_RemoveRenderBuffer(*args)
+    def GetRenderBufferCount(*args): return _cspace.iGeneralMeshCommonState_GetRenderBufferCount(*args)
+    def GetRenderBuffer(*args): return _cspace.iGeneralMeshCommonState_GetRenderBuffer(*args)
+    def GetRenderBufferName(*args): return _cspace.iGeneralMeshCommonState_GetRenderBufferName(*args)
     def __del__(self, destroy=_cspace.delete_iGeneralMeshCommonState):
         try:
             if self.thisown: destroy(self)
@@ -9777,6 +9780,9 @@ CS_MESHTYPE_POINT_SPRITES = _cspace.CS_MESHTYPE_POINT_SPRITES
 CS_MESHTYPE_LINES = _cspace.CS_MESHTYPE_LINES
 CS_MESHTYPE_LINESTRIP = _cspace.CS_MESHTYPE_LINESTRIP
 csSimpleMeshScreenspace = _cspace.csSimpleMeshScreenspace
+CS_OPENPORTAL_ZFILL = _cspace.CS_OPENPORTAL_ZFILL
+CS_OPENPORTAL_MIRROR = _cspace.CS_OPENPORTAL_MIRROR
+CS_OPENPORTAL_FLOAT = _cspace.CS_OPENPORTAL_FLOAT
 class csSimpleRenderMesh(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csSimpleRenderMesh, name, value)
