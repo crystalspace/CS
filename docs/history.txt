@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Jan-2006
+	- Jorrit fixed csMeshObject::GetRadius() so that it calculates the
+	  radius instead of double the radius.
 30-Jan-2006
 	- Jorrit changed iObjectModel->GetRadius() to return the radius as
 	  a single float instead of a vector. It was always used as a single

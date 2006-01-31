@@ -128,7 +128,7 @@ void csMeshObject::GetRadius (float& radius, csVector3& center)
 {
   csBox3 b;
   GetObjectBoundingBox (b);
-  radius = csQsqrt (csSquaredDist::PointPoint (b.Max (), b.Min ()));
+  radius = csQsqrt (csSquaredDist::PointPoint (b.Max (), b.Min ())) * 0.5f;
   center = b.GetCenter ();
 }
 
