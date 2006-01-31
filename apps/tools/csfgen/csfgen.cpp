@@ -217,9 +217,9 @@ public:
 	else
 	{
 	  uint32 ui;
-	  ui = csConvertEndian ((uint32)firstConsecChar);
+          ui = csLittleEndian::Convert ((uint32)firstConsecChar);
 	  fCharRanges.Write ((char*)&ui, sizeof (ui));
-	  ui = csConvertEndian ((uint32)numConsecChars);
+	  ui = csLittleEndian::Convert ((uint32)numConsecChars);
 	  fCharRanges.Write ((char*)&ui, sizeof (ui));
 	}
       }
@@ -246,7 +246,7 @@ public:
       else
       {
 	uint32 ui;
-	ui = csConvertEndian ((uint32)gMetrics.advance);
+	ui = csLittleEndian::Convert ((uint32)gMetrics.advance);
 	fGlyphAdvances.Write ((char*)&ui, sizeof (ui));
       }
 
@@ -287,13 +287,13 @@ public:
       else
       {
 	int32 i;
-	i = csConvertEndian ((int32)metrics.width);
+	i = csLittleEndian::Convert ((int32)metrics.width);
 	fBitmapMetrics.Write ((char*)&i, sizeof (i));
-	i = csConvertEndian ((int32)metrics.height);
+	i = csLittleEndian::Convert ((int32)metrics.height);
 	fBitmapMetrics.Write ((char*)&i, sizeof (i));
-	i = csConvertEndian ((int32)metrics.left);
+	i = csLittleEndian::Convert ((int32)metrics.left);
 	fBitmapMetrics.Write ((char*)&i, sizeof (i));
-	i = csConvertEndian ((int32)metrics.top);
+	i = csLittleEndian::Convert ((int32)metrics.top);
 	fBitmapMetrics.Write ((char*)&i, sizeof (i));
       }
 
@@ -333,13 +333,13 @@ public:
       else
       {
 	uint32 i;
-	i = csConvertEndian ((uint32)metrics.width);
+	i = csLittleEndian::Convert ((uint32)metrics.width);
 	fAlphaMetrics.Write ((char*)&i, sizeof (i));
-	i = csConvertEndian ((uint32)metrics.height);
+	i = csLittleEndian::Convert ((uint32)metrics.height);
 	fAlphaMetrics.Write ((char*)&i, sizeof (i));
-	i = csConvertEndian ((uint32)metrics.left);
+	i = csLittleEndian::Convert ((uint32)metrics.left);
 	fAlphaMetrics.Write ((char*)&i, sizeof (i));
-	i = csConvertEndian ((uint32)metrics.top);
+	i = csLittleEndian::Convert ((uint32)metrics.top);
 	fAlphaMetrics.Write ((char*)&i, sizeof (i));
       }
       numConsecChars++;
@@ -359,9 +359,9 @@ public:
       else
       {
 	uint32 ui;
-	ui = csConvertEndian ((uint32)firstConsecChar);
+	ui = csLittleEndian::Convert ((uint32)firstConsecChar);
 	fCharRanges.Write ((char*)&ui, sizeof (ui));
-	ui = csConvertEndian ((uint32)numConsecChars);
+	ui = csLittleEndian::Convert ((uint32)numConsecChars);
 	fCharRanges.Write ((char*)&ui, sizeof (ui));
       }
     }

@@ -17,6 +17,14 @@ chronological order.
 	- Jorrit fixed the generic renderstep so that it uses the model center
 	  to check if an object is affected by the light (instead of object
 	  origin).
+	- res updated some code to use new-style endian conversions.
+	- res deprecated old-style endian conversions.
+	- res added support for optimized byte swapping, when supported by
+	  the compiler.
+	- res removed support for MD2 conversions from md22spr (since MD2s
+	  can now be loaded via the spr3md2 plugin). Also renamed md22spr to
+	  mdl2spr.
+	- res changed wxtest to use RequestPlugins() to load the WX canvas.
 29-Jan-2006
 	- rvl_ corrected portal logic of opengl renderer to handle 
 	  rendering to target correctly. Some code logic/style was 

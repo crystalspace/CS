@@ -24,7 +24,7 @@
 #include "cstypes.h"
 #include <stdio.h>
 
-typedef float scalar_t;       // Scalar value,
+typedef uint32 scalar_t;       // Scalar value,
 
 struct vec3_t                 // Vector or Position
 {

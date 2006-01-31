@@ -628,8 +628,8 @@ csSoundSample *csSndSysRendererSoftware::CopySampleBufferToDriverBuffer (
       while (drvbuf_len-- > 0)
       {
         // 16 bit output should be in little endian
-        *(dptr++)=csLittleEndianShort((((src[0]) >> 16) & 0xFFFF));
-        *(dptr++)=csLittleEndianShort((((src[samples_per_channel]) >> 16) & 0xFFFF));
+        *(dptr++) = csLittleEndian::UInt16 ((((src[0]) >> 16) & 0xFFFF));
+        *(dptr++) = csLittleEndian::UInt16 ((((src[samples_per_channel]) >> 16) & 0xFFFF));
         src++;
       }
     }
@@ -638,8 +638,8 @@ csSoundSample *csSndSysRendererSoftware::CopySampleBufferToDriverBuffer (
       while (drvbuf_len-- > 0)
       {
         // 16 bit output should be in big endian
-        *(dptr++)=csBigEndianShort((((src[0]) >> 16) & 0xFFFF));
-        *(dptr++)=csBigEndianShort((((src[samples_per_channel]) >> 16) & 0xFFFF));
+        *(dptr++) = csBigEndian::UInt16 ((((src[0]) >> 16) & 0xFFFF));
+        *(dptr++) = csBigEndian::UInt16 ((((src[samples_per_channel]) >> 16) & 0xFFFF));
         src++;
       }
     }

@@ -25,7 +25,6 @@
 #include <string.h>
 
 #include "m2s_mdl.h"
-#include "m2s_md2.h"
 #include "igraphic/imageio.h"
 
 CS_IMPLEMENT_APPLICATION
@@ -111,7 +110,7 @@ static float get_float(int& n, int argc, const char* const* argv)
 int main(int argc,char *argv[])
 {
   csPrintf("mdl2spr version 0.40\n"
-    "A quake model (MDL/MD2) convertor for Crystal Space.\n"
+    "A quake model (MDL) convertor for Crystal Space.\n"
     "By Nathaniel Saint Martin <noote@bigfoot.com>\n"
     "Project overhauled by Eric Sunshine <sunshine@sunshineco.com>\n\n");
 
@@ -188,8 +187,6 @@ int main(int argc,char *argv[])
   QModel* mdl = 0;
   if (Mdl::IsFileMDLModel(mdlfile))
     mdl = new Mdl(mdlfile);
-  else if (Md2::IsFileMD2Model(mdlfile))
-    mdl = new Md2(mdlfile);
   else
   {
     csFPrintf(stderr, "Not a recognized model file: %s\n", mdlfile);

@@ -269,8 +269,8 @@ private:
   uint32 GetRealNameID() const
   {
     return (nameID & BD_ATTR_FLAGS_IN_NAME) ? 
-      (csLittleEndianLong (nameID) & BD_ATTR_NAME_ID_WITH_FLAGS_MASK) : 
-      csLittleEndianLong (nameID);
+      (csLittleEndian::UInt32 (nameID) & BD_ATTR_NAME_ID_WITH_FLAGS_MASK) : 
+      csLittleEndian::UInt32 (nameID);
   }
 public:
   uint32 GetRealFlags() const
@@ -391,7 +391,7 @@ private:
   {
     if (flags & BD_NODE_HAS_ATTR)
       return (sizeof (bdNode) + sizeof (bdNodeAttrTab) + 
-	(csLittleEndianLong (GetAttrTab()->num) * sizeof (uint32)));
+	(csLittleEndian::UInt32 (GetAttrTab()->num) * sizeof (uint32)));
     else
       return (sizeof (bdNode));
   }

@@ -338,9 +338,11 @@ error:
       int numRanges = 0;
       do
       {
-	ranges.GetExtend (numRanges).startChar = csGetLittleEndianLong (binary);
+	ranges.GetExtend (numRanges).startChar = 
+          csLittleEndian::Convert (csGetFromAddress::UInt32 (binary));
 	binary += 4;
-	ranges[numRanges].charCount = csGetLittleEndianLong (binary);
+	ranges[numRanges].charCount = 
+          csLittleEndian::Convert (csGetFromAddress::UInt32 (binary));
 	binary += 4;
 	numGlyphs += ranges[numRanges].charCount;
 	numRanges++;
@@ -375,13 +377,17 @@ error:
       for (j = 0; j < numGlyphs; j++)
       {
 	memset (&(bMetrics[j]), 0, sizeof (csBitmapMetrics));
-	bMetrics[j].width = csGetLittleEndianLong (binary);
+	bMetrics[j].width = 
+          csLittleEndian::Convert (csGetFromAddress::UInt32 (binary));
 	binary += 4;
-	bMetrics[j].height = csGetLittleEndianLong (binary);
+	bMetrics[j].height = 
+          csLittleEndian::Convert (csGetFromAddress::UInt32 (binary));
 	binary += 4;
-	bMetrics[j].left = csGetLittleEndianLong (binary);
+	bMetrics[j].left = 
+          csLittleEndian::Convert (csGetFromAddress::UInt32 (binary));
 	binary += 4;
-	bMetrics[j].top = csGetLittleEndianLong (binary);
+	bMetrics[j].top = 
+          csLittleEndian::Convert (csGetFromAddress::UInt32 (binary));
 	binary += 4;
 	bitmapSize += ((bMetrics[j].width + 7) / 8) * bMetrics[j].height;
       }
@@ -390,13 +396,17 @@ error:
 	for (j = 0; j < numGlyphs; j++)
 	{
 	  memset (&(aMetrics[j]), 0, sizeof (csBitmapMetrics));
-	  aMetrics[j].width = csGetLittleEndianLong (binary);
+	  aMetrics[j].width = 
+            csLittleEndian::Convert (csGetFromAddress::UInt32 (binary));
 	  binary += 4;
-	  aMetrics[j].height = csGetLittleEndianLong (binary);
+	  aMetrics[j].height = 
+            csLittleEndian::Convert (csGetFromAddress::UInt32 (binary));
 	  binary += 4;
-	  aMetrics[j].left = csGetLittleEndianLong (binary);
+	  aMetrics[j].left = 
+            csLittleEndian::Convert (csGetFromAddress::UInt32 (binary));
 	  binary += 4;
-	  aMetrics[j].top = csGetLittleEndianLong (binary);
+	  aMetrics[j].top = 
+            csLittleEndian::Convert (csGetFromAddress::UInt32 (binary));
 	  binary += 4;
 	  alphaSize += bMetrics[j].width * bMetrics[j].height;
 	}
@@ -427,7 +437,8 @@ error:
       for (int j = 0; j < numGlyphs; j++)
       {
 	memset (&(gMetrics[j]), 0, sizeof (csGlyphMetrics));
-	gMetrics[j].advance = csGetLittleEndianLong (binary);
+	gMetrics[j].advance = 
+          csLittleEndian::Convert (csGetFromAddress::UInt32 (binary));
 	binary += 4;
       }
     }

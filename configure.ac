@@ -939,6 +939,15 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 
 
 #------------------------------------------------------------------------------
+# Check if byteswap.h is available, which contains optimized byte swapping
+# functiosn (used for endian conversion).
+#------------------------------------------------------------------------------
+AC_CHECK_HEADERS([byteswap.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_BYTESWAP_H])])
+
+
+
+#------------------------------------------------------------------------------
 # Check for compiler optimization flags.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_OPTIMIZE_FLAGS],

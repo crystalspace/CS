@@ -299,9 +299,9 @@ const char* csLight::GenerateUniqueID ()
 
   mf.Write ("light", 5);
 
-  l = csConvertEndian ((int32)type);
+  l = csLittleEndian::Convert ((int32)type);
   mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)dynamicType);
+  l = csLittleEndian::Convert ((int32)dynamicType);
   mf.Write ((char*)&l, 4);
 
   iSector* sector = GetSector ();
@@ -313,23 +313,23 @@ const char* csLight::GenerateUniqueID ()
   }
 
   csVector3 center = GetCenter ();
-  l = csConvertEndian ((int32)csQint ((center.x * 1000)+.5));
+  l = csLittleEndian::Convert ((int32)csQint ((center.x * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)csQint ((center.y * 1000)+.5));
+  l = csLittleEndian::Convert ((int32)csQint ((center.y * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)csQint ((center.z * 1000)+.5));
-  mf.Write ((char*)&l, 4);
-
-  l = csConvertEndian ((int32)csQint ((cutoffDistance * 1000)+.5));
+  l = csLittleEndian::Convert ((int32)csQint ((center.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
-  l = csConvertEndian ((int32)attenuation);
+  l = csLittleEndian::Convert ((int32)csQint ((cutoffDistance * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)csQint ((attenuationConstants.x * 1000)+.5));
+
+  l = csLittleEndian::Convert ((int32)attenuation);
   mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)csQint ((attenuationConstants.y * 1000)+.5));
+  l = csLittleEndian::Convert ((int32)csQint ((attenuationConstants.x * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = csConvertEndian ((int32)csQint ((attenuationConstants.z * 1000)+.5));
+  l = csLittleEndian::Convert ((int32)csQint ((attenuationConstants.y * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = csLittleEndian::Convert ((int32)csQint ((attenuationConstants.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());

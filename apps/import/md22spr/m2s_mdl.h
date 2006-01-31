@@ -49,7 +49,7 @@ struct skin_t
   bool group;
   int32 nbtexs;                // number of pictures in group
   unsigned char **texs;       // the textures
-  float *timebtwskin;         // time values, for each texture
+  float* timebtwskin;         // time values, for each texture
 };
 
 struct vertice_t

@@ -223,13 +223,9 @@ bool Simple::SimpleEventHandler (iEvent& ev)
 
 bool Simple::Initialize ()
 {
-  csRef<iConfigManager> confmgr = CS_QUERY_REGISTRY(object_reg, iConfigManager);
-  confmgr->SetDynamicDomainPriority(iConfigManager::PriorityMax);
-  confmgr->GetDynamicDomain()->SetStr("Video.OpenGL.Canvas", 
-    "crystalspace.graphics2d.wxgl");
-
   if (!csInitializer::RequestPlugins (object_reg,
                                       CS_REQUEST_VFS,
+                                      CS_REQUEST_PLUGIN( "crystalspace.graphics2d.wxgl", iGraphics2D ),
                                       CS_REQUEST_OPENGL3D,
                                       CS_REQUEST_ENGINE,
                                       CS_REQUEST_FONTSERVER,
@@ -240,7 +236,7 @@ bool Simple::Initialize ()
                                       CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-              "crystalspace.application.simple1",
+              "crystalspace.application.wxtest",
               "Can't initialize plugins!");
     return false;
   }
@@ -249,7 +245,7 @@ bool Simple::Initialize ()
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-              "crystalspace.application.simple1",
+              "crystalspace.application.wxtest",
               "Can't initialize event handler!");
     return false;
   }
@@ -272,7 +268,7 @@ bool Simple::Initialize ()
   if (vc == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-              "crystalspace.application.simple1",
+              "crystalspace.application.wxtest",
               "Can't find the virtual clock!");
     return false;
   }
@@ -282,7 +278,7 @@ bool Simple::Initialize ()
   if (engine == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-              "crystalspace.application.simple1",
+              "crystalspace.application.wxtest",
               "No iEngine plugin!");
     return false;
   }
@@ -291,7 +287,7 @@ bool Simple::Initialize ()
   if (loader == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-              "crystalspace.application.simple1",
+              "crystalspace.application.wxtest",
               "No iLoader plugin!");
     return false;
   }
@@ -300,7 +296,7 @@ bool Simple::Initialize ()
   if (g3d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-              "crystalspace.application.simple1",
+              "crystalspace.application.wxtest",
               "No iGraphics3D plugin!");
     return false;
   }
@@ -309,7 +305,7 @@ bool Simple::Initialize ()
   if (kbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-              "crystalspace.application.simple1",
+              "crystalspace.application.wxtest",
               "No iKeyboardDriver plugin!");
     return false;
   }
@@ -321,13 +317,20 @@ bool Simple::Initialize ()
 
   iGraphics2D* g2d = g3d->GetDriver2D();
   csRef<iWxWindow> wxwin = SCF_QUERY_INTERFACE(g2d, iWxWindow);
+  if( !wxwin )
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+              "crystalspace.application.wxtest",
+              "Canvas is no iWxWindow plugin!");
+    return false;
+  }
   wxwin->SetParent(panel);
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-              "crystalspace.application.simple1",
+              "crystalspace.application.wxtest",
               "Error opening system!");
     return false;
   }
@@ -342,7 +345,7 @@ bool Simple::Initialize ()
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-              "crystalspace.application.simple1",
+              "crystalspace.application.wxtest",
               "Error loading 'stone4' texture!");
     return false;
   }

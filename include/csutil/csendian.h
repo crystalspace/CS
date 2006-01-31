@@ -28,6 +28,9 @@
 
 #include <math.h>
 #include "cstypes.h"
+#if defined(CS_HAVE_BYTESWAP_H)
+#include <byteswap.h>
+#endif
 
 #define csQroundSure(x) (int ((x) + ((x < 0) ? -0.5 : +0.5)))
 
@@ -45,15 +48,36 @@ public:
   //@{
   /// Swap byte order
   static CS_FORCEINLINE uint16 Swap (uint16 s) 
-  { return (s >> 8) | (s << 8); }
+  { 
+  #if defined(CS_COMPILER_MSVC) && (_MSC_VER >= 1300)
+    return _byteswap_ushort (s);
+  #elif defined(CS_HAVE_BYTESWAP_H)
+    return bswap_16 (s);
+  #else
+    return (s >> 8) | (s << 8); 
+  #endif
+  }
   static CS_FORCEINLINE int16  Swap (int16 s)
   { return (int16)Swap ((uint16)s); }
   static CS_FORCEINLINE uint32 Swap (uint32 l)
-  { return (l >> 24) | ((l >> 8) & 0xff00) | ((l << 8) & 0xff0000) | (l << 24); }
+  { 
+  #if defined(CS_COMPILER_MSVC) && (_MSC_VER >= 1300)
+    return _byteswap_ulong (l);
+  #elif defined(CS_HAVE_BYTESWAP_H)
+    return bswap_32 (l);
+  #else
+    return (l >> 24) | ((l >> 8) & 0xff00) | ((l << 8) & 0xff0000) | (l << 24); 
+  #endif
+  }
   static CS_FORCEINLINE int32  Swap (int32 l)
   { return (int32)Swap ((uint32)l); }
   static CS_FORCEINLINE uint64 Swap (uint64 l)
   {
+  #if defined(CS_COMPILER_MSVC) && (_MSC_VER >= 1300)
+    return _byteswap_uint64 (l);
+  #elif defined(CS_HAVE_BYTESWAP_H)
+    return bswap_64 (l);
+  #else
     uint64 r;
     Swap8 *p1 = (Swap8 *)&l;
     Swap8 *p2 = (Swap8 *)&r;
@@ -66,6 +90,7 @@ public:
     p2->b7 = p1->b2;
     p2->b8 = p1->b1;
     return r;
+  #endif
   }
   static CS_FORCEINLINE int64  Swap (int64 l)
   { return (int64)Swap ((uint64)l); }
@@ -260,41 +285,43 @@ struct csSetToAddress
  * @{ */
 
 /// Convert a longlong from big-endian to machine format
-static inline uint64 csBigEndianLongLong (uint64 l)
+CS_DEPRECATED_METHOD static inline uint64 csBigEndianLongLong (uint64 l)
 { return csBigEndian::Convert (l); }
 
 /// Convert a long from big-endian to machine format
-static inline uint32 csBigEndianLong (uint32 l)
+CS_DEPRECATED_METHOD static inline uint32 csBigEndianLong (uint32 l)
 { return csBigEndian::Convert (l); }
 
 /// Convert a short from big-endian to machine format
-static inline uint16 csBigEndianShort (uint16 s)
+CS_DEPRECATED_METHOD static inline uint16 csBigEndianShort (uint16 s)
 { return csBigEndian::Convert (s); }
 
 /// Convert a big-endian floating-point number to machine format
-static inline float csBigEndianFloat (float f)
+CS_DEPRECATED_METHOD static inline float csBigEndianFloat (float f)
 { 
-  uint32 u = csBigEndian::Convert (*(uint32*)&f); 
-  return *(float*)&u;
+  uint32 u = *((uint32*)&f);
+  u = csBigEndian::Convert (u); 
+  return *((float*)&u);
 }
 
 /// Convert a longlong from little-endian to machine format
-static inline uint64 csLittleEndianLongLong (uint64 l)
+CS_DEPRECATED_METHOD static inline uint64 csLittleEndianLongLong (uint64 l)
 { return csLittleEndian::Convert (l); }
 
 /// Convert a long from little-endian to machine format
-static inline uint32 csLittleEndianLong (uint32 l)
+CS_DEPRECATED_METHOD static inline uint32 csLittleEndianLong (uint32 l)
 { return csLittleEndian::Convert (l); }
 
 /// Convert a short from little-endian to machine format
-static inline uint16 csLittleEndianShort (uint16 s)
+CS_DEPRECATED_METHOD static inline uint16 csLittleEndianShort (uint16 s)
 { return csLittleEndian::Convert (s); }
 
 /// Convert a little-endian floating-point number to machine format
-static inline float csLittleEndianFloat (float f)
-{
-  uint32 u = csLittleEndian::Convert (*(uint32*)&f); 
-  return *(float*)&u;
+CS_DEPRECATED_METHOD static inline float csLittleEndianFloat (float f)
+{ 
+  uint32 u = *((uint32*)&f);
+  u = csLittleEndian::Convert (u); 
+  return *((float*)&u);
 }
 
 /*
@@ -317,7 +344,7 @@ static inline float csLittleEndianFloat (float f)
  * Convert a float to a cross-platform 32-bit format (no endianess
  * adjustments!)
  */
-static inline int32 csFloatToLong (float f)
+/*CS_DEPRECATED_METHOD*/ static inline int32 csFloatToLong (float f)
 {
   int exp;
   int32 mant = csQroundSure (frexp (f, &exp) * 0x1000000);
@@ -331,7 +358,7 @@ static inline int32 csFloatToLong (float f)
  * Convert a 32-bit cross-platform float to native format (no endianess
  * adjustments!)
  */
-static inline float csLongToFloat (int32 l)
+/*CS_DEPRECATED_METHOD*/ static inline float csLongToFloat (int32 l)
 {
   int exp = (l >> 24) & 0x7f;
   if (exp & 0x40) exp = exp | ~0x7f;
@@ -352,7 +379,7 @@ static inline float csLongToFloat (int32 l)
  * Convert a double to a cross-platform 64-bit format (no endianess
  * adjustments!)
  */
-static inline int64 csDoubleToLongLong (double d)
+/*CS_DEPRECATED_METHOD*/ static inline int64 csDoubleToLongLong (double d)
 {
   int exp;
   int64 mant = (int64) (frexp (d, &exp) * ((int64)1 << 48));
@@ -367,7 +394,7 @@ static inline int64 csDoubleToLongLong (double d)
  * Convert a 64-bit cross-platform double to native format (no endianess
  * adjustments!)
  */
-static inline double csLongLongToDouble (int64 i)
+/*CS_DEPRECATED_METHOD*/ static inline double csLongLongToDouble (int64 i)
 {
   int exp = (i >> 48) & 0x7fff;
   if (exp & 0x4000) exp = exp | ~0x7fff;
@@ -389,7 +416,7 @@ static inline double csLongLongToDouble (int64 i)
  * Convert a float to a cross-platform 16-bit format (no endianess
  * adjustments!)
  */
-static inline short csFloatToShort (float f)
+/*CS_DEPRECATED_METHOD*/ static inline short csFloatToShort (float f)
 {
   int exp;
   long mant = csQroundSure (frexp (f, &exp) * 0x1000);
@@ -403,7 +430,7 @@ static inline short csFloatToShort (float f)
  * Convert a 16-bit cross-platform float to native format (no endianess
  * adjustments!)
  */
-static inline float csShortToFloat (short s)
+/*CS_DEPRECATED_METHOD*/ static inline float csShortToFloat (short s)
 {
   int exp = (s >> 11) & 0xf;
   if (exp & 0x8) exp = exp | ~0xf;
@@ -415,52 +442,62 @@ static inline float csShortToFloat (short s)
 /** @} */
 
 /// Convert a uint64 value from host byte order to little-endian.
-static inline uint64 csConvertEndian (uint64 l)
-{ return csLittleEndianLongLong (l); }
+CS_DEPRECATED_METHOD static inline uint64 csConvertEndian (uint64 l)
+{ return csLittleEndian::Convert (l); }
 
 /// Convert a int64 value from host byte order to little-endian.
-static inline int64 csConvertEndian (int64 l)
-{ return csLittleEndianLongLong (l); }
+CS_DEPRECATED_METHOD static inline int64 csConvertEndian (int64 l)
+{ return csLittleEndian::Convert (l); }
 
 /// Convert a uint32 value from host byte order to little-endian.
-static inline uint32 csConvertEndian (uint32 l)
-{ return csLittleEndianLong (l); }
+CS_DEPRECATED_METHOD static inline uint32 csConvertEndian (uint32 l)
+{ return csLittleEndian::Convert (l); }
 
 /// Convert a int32 value from host byte order to little-endian.
-static inline int32 csConvertEndian (int32 l)
-{ return csLittleEndianLong (l); }
+CS_DEPRECATED_METHOD static inline int32 csConvertEndian (int32 l)
+{ return csLittleEndian::Convert (l); }
 
 /// Convert a int16 value from host byte order to little-endian.
-static inline int16 csConvertEndian (int16 s)
-{ return csLittleEndianShort (s); }
+CS_DEPRECATED_METHOD static inline int16 csConvertEndian (int16 s)
+{ return csLittleEndian::Convert (s); }
 
 /// Convert a uint16 value from host byte order to little-endian.
-static inline uint16 csConvertEndian (uint16 s)
-{ return csLittleEndianShort (s); }
+CS_DEPRECATED_METHOD static inline uint16 csConvertEndian (uint16 s)
+{ return csLittleEndian::Convert (s); }
 
 /// Convert bytes in a float value from host byte order to little-endian.
-static inline float csConvertEndian (float f)
-{ return csLittleEndianFloat (f); }
+CS_DEPRECATED_METHOD static inline float csConvertEndian (float f)
+{ 
+  uint32 u = *((uint32*)&f);
+  u = csLittleEndian::Convert (u); 
+  return *((float*)&u);
+}
 
 /// Read a little-endian short from address
-inline uint16 csGetLittleEndianShort (const void *buff)
+CS_DEPRECATED_METHOD inline uint16 csGetLittleEndianShort (const void *buff)
 {
   return csLittleEndian::Convert (csGetFromAddress::UInt16 (buff));
 }
 
 /// Read a little-endian long from address
-inline uint32 csGetLittleEndianLong (const void *buff)
+CS_DEPRECATED_METHOD inline uint32 csGetLittleEndianLong (const void *buff)
 {
   return csLittleEndian::Convert (csGetFromAddress::UInt32 (buff));
 }
 
 /// Read a little-endian 32-bit float from address
-inline float csGetLittleEndianFloat32 (const void *buff)
-{ uint32 l = csGetLittleEndianLong (buff); return csLongToFloat (l); }
+CS_DEPRECATED_METHOD inline float csGetLittleEndianFloat32 (const void *buff)
+{ 
+  uint32 l = csLittleEndian::Convert (csGetFromAddress::UInt32 (buff));
+  return csLongToFloat (l); 
+}
 
 /// Read a little-endian 16-bit float from address
-inline float csGetLittleEndianFloat16 (const void *buff)
-{ uint16 s = csGetLittleEndianShort (buff); return csShortToFloat (s); }
+CS_DEPRECATED_METHOD inline float csGetLittleEndianFloat16 (const void *buff)
+{ 
+  uint16 s = csLittleEndian::Convert (csGetFromAddress::UInt16 (buff));
+  return csShortToFloat (s); 
+}
 
 /** @} */
 

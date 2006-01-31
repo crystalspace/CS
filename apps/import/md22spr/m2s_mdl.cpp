@@ -94,7 +94,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
     return setError("Invalid mdl magic", f);
 
   // check if is a correct version
-  magic.version = csConvertEndian (magic.version);
+  magic.version = csLittleEndian::Convert (magic.version);
   if (magic.version != 6)
     return setError("Invalid mdl version", f);
 
@@ -103,34 +103,34 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
   if (fread(&header, sizeof(mdl_t), 1, f) != 1)
     return setError("Cannot read mdl header", f);
 
-  header.scale.x = csConvertEndian (header.scale.x);
-  header.scale.y = csConvertEndian (header.scale.y);
-  header.scale.z = csConvertEndian (header.scale.z);
-  header.origin.x = csConvertEndian (header.origin.x);
-  header.origin.y = csConvertEndian (header.origin.y);
-  header.origin.z = csConvertEndian (header.origin.z);
-  header.radius = csConvertEndian (header.radius);
-  header.offsets.x = csConvertEndian (header.offsets.x);
-  header.offsets.y = csConvertEndian (header.offsets.y);
-  header.offsets.z = csConvertEndian (header.offsets.z);
-  header.numskins = csConvertEndian (header.numskins);
-  header.skinwidth = csConvertEndian (header.skinwidth);
-  header.skinheight = csConvertEndian (header.skinheight);
-  header.numverts = csConvertEndian (header.numverts);
-  header.numtris = csConvertEndian (header.numtris);
-  header.numframes = csConvertEndian (header.numframes);
-  header.synctype = csConvertEndian (header.synctype);
-  header.flags = csConvertEndian (header.flags);
-  header.size = csConvertEndian (header.size);
+  header.scale.x = csLittleEndian::Convert (header.scale.x);
+  header.scale.y = csLittleEndian::Convert (header.scale.y);
+  header.scale.z = csLittleEndian::Convert (header.scale.z);
+  header.origin.x = csLittleEndian::Convert (header.origin.x);
+  header.origin.y = csLittleEndian::Convert (header.origin.y);
+  header.origin.z = csLittleEndian::Convert (header.origin.z);
+  header.radius = csLittleEndian::Convert (header.radius);
+  header.offsets.x = csLittleEndian::Convert (header.offsets.x);
+  header.offsets.y = csLittleEndian::Convert (header.offsets.y);
+  header.offsets.z = csLittleEndian::Convert (header.offsets.z);
+  header.numskins = csLittleEndian::Convert (header.numskins);
+  header.skinwidth = csLittleEndian::Convert (header.skinwidth);
+  header.skinheight = csLittleEndian::Convert (header.skinheight);
+  header.numverts = csLittleEndian::Convert (header.numverts);
+  header.numtris = csLittleEndian::Convert (header.numtris);
+  header.numframes = csLittleEndian::Convert (header.numframes);
+  header.synctype = csLittleEndian::Convert (header.synctype);
+  header.flags = csLittleEndian::Convert (header.flags);
+  header.size = csLittleEndian::Convert (header.size);
 
   // sprite ops
-  radiusbound = header.radius;
-  originX = header.origin.x;
-  originY = header.origin.y;
-  originZ = header.origin.z;
-  scaleX = header.scale.x;
-  scaleY = header.scale.y;
-  scaleZ = header.scale.z;
+  radiusbound = csIEEEfloat::ToNative (header.radius);
+  originX = csIEEEfloat::ToNative (header.origin.x);
+  originY = csIEEEfloat::ToNative (header.origin.y);
+  originZ = csIEEEfloat::ToNative (header.origin.z);
+  scaleX = csIEEEfloat::ToNative (header.scale.x);
+  scaleY = csIEEEfloat::ToNative (header.scale.y);
+  scaleZ = csIEEEfloat::ToNative (header.scale.z);
 
   // skins ops
   skinheight = header.skinheight;
@@ -142,7 +142,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
     int32 group = 0;
     if (fread(&group, sizeof(group), 1, f) != 1)
       return setError("Error reading mdl file", f);
-    group = csConvertEndian (group);
+    group = csLittleEndian::Convert (group);
 
     if (group != 1 && group != 0)
       return setError("Incoherence in skin model properties", f);
@@ -161,14 +161,22 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
       skins[i].group = true;
       if (fread(&skins[i].nbtexs, sizeof(skins[i].nbtexs), 1, f) != 1)
         return setError("Error reading mdl file", f);
-      skins[i].nbtexs = csConvertEndian (skins[i].nbtexs);
+      skins[i].nbtexs = csLittleEndian::Convert (skins[i].nbtexs);
 
       // read time between frame
       skins[i].timebtwskin = new float [skins[i].nbtexs];
-      if (fread(skins[i].timebtwskin, sizeof(float)*skins[i].nbtexs, 1, f)!=1)
+      uint32* delays = new uint32[skins[i].nbtexs];
+      if (fread (delays, sizeof (uint32)*skins[i].nbtexs, 1, f) != 1)
+      {
+        delete[] delays;
         return setError("Error reading multi-tex skin", f);
+      }
       for (ii = 0 ; ii < skins[i].nbtexs ; ii++)
-        skins[i].timebtwskin[ii] = csConvertEndian (skins[i].timebtwskin[ii]);
+      {
+        skins[i].timebtwskin[ii] = csIEEEfloat::ToNative (csLittleEndian::Convert (
+          delays[ii]));
+      }
+      delete[] delays;
 
       // read all texture of group
       skins[i].texs = new unsigned char *[skins[i].nbtexs];
@@ -189,9 +197,9 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
   {
     if (fread(&vertices[i], sizeof(vertice_t), 1, f) != 1)
       return setError("Error reading mdl file", f);
-    vertices[i].onseam = csConvertEndian (vertices[i].onseam);
-    vertices[i].s = csConvertEndian (vertices[i].s);
-    vertices[i].t = csConvertEndian (vertices[i].t);
+    vertices[i].onseam = csLittleEndian::Convert (vertices[i].onseam);
+    vertices[i].s = csLittleEndian::Convert (vertices[i].s);
+    vertices[i].t = csLittleEndian::Convert (vertices[i].t);
   }
 
   // triangles ops
@@ -202,10 +210,10 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
   {
     if (fread(&triangles[i], sizeof(triangle_t), 1, f) != 1)
       return setError("Error reading mdl file", f);
-    triangles[i].facefront = csConvertEndian (triangles[i].facefront);
-    triangles[i].vertice[0] = csConvertEndian (triangles[i].vertice[0]);
-    triangles[i].vertice[1] = csConvertEndian (triangles[i].vertice[1]);
-    triangles[i].vertice[2] = csConvertEndian (triangles[i].vertice[2]);
+    triangles[i].facefront = csLittleEndian::Convert (triangles[i].facefront);
+    triangles[i].vertice[0] = csLittleEndian::Convert (triangles[i].vertice[0]);
+    triangles[i].vertice[1] = csLittleEndian::Convert (triangles[i].vertice[1]);
+    triangles[i].vertice[2] = csLittleEndian::Convert (triangles[i].vertice[2]);
   }
 
   // frames ops
@@ -217,7 +225,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
     int32 typeframe = 0;
     if (fread(&typeframe, sizeof(typeframe), 1, f) != 1)
       return setError("Error reading mdl file", f);
-    typeframe = csConvertEndian (typeframe);
+    typeframe = csLittleEndian::Convert (typeframe);
 
     if (typeframe == 0) // one animation frame
     {
@@ -255,7 +263,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
       if (fread(&framesets[i].nbframes, sizeof(framesets[i].nbframes),
                 1, f) != 1)
         return setError("Error reading mdl file", f);
-      framesets[i].nbframes = csConvertEndian (framesets[i].nbframes);
+      framesets[i].nbframes = csLittleEndian::Convert (framesets[i].nbframes);
 
       framesets[i].delay = new float[framesets[i].nbframes];
       framesets[i].frames = new frame_t[framesets[i].nbframes];
@@ -269,10 +277,19 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
         return setError("Error reading mdl file", f);
 
       // read time between frame
-      if (fread(framesets[i].delay,sizeof(float)*framesets[i].nbframes,1,f)!=1)
+      
+      uint32* delays = new uint32[framesets[i].nbframes];
+      if (fread (delays, sizeof(uint32)*framesets[i].nbframes, 1, f) != 1)
+      {
+        delete[] delays;
         return setError("Error reading mdl file", f);
+      }
       for (ii = 0 ; ii < framesets[i].nbframes; ii++)
-        framesets[i].delay[ii] = csConvertEndian (framesets[i].delay[ii]);
+      {
+        framesets[i].delay[ii] = csIEEEfloat::ToNative (csLittleEndian::Convert (
+          delays[ii]));
+      }
+      delete[] delays;
 
       // read all frames in frameset
       for (j = 0; j < framesets[i].nbframes; j++)
