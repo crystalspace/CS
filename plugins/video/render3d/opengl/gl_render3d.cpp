@@ -2007,7 +2007,7 @@ void csGLGraphics3D::ClosePortal ()
   csClipPortal* cp = clipportal_stack.Pop ();
   GLRENDER3D_OUTPUT_STRING_MARKER(("%p, %d", cp, cp->flags.Check(CS_OPENPORTAL_ZFILL)?1:0));
 
-  if (cp->flags.Check(CS_OPENPORTAL_FLOAT) || cp->flags.Check(CS_OPENPORTAL_ZFILL))
+  if (cp->status.Check(CS_PORTALSTATUS_SFILLED) || cp->flags.Check(CS_OPENPORTAL_ZFILL))
   {
     // Store glstate and setup matrices for 2D drawing
     statecache->SetMatrixMode (GL_PROJECTION);
@@ -2030,9 +2030,6 @@ void csGLGraphics3D::ClosePortal ()
     }
     else    
       statecache->SetCullFace (mirror?GL_BACK:GL_FRONT);
-        
-    GLboolean sciss = glIsEnabled(GL_SCISSOR_TEST);
-    glDisable(GL_SCISSOR_TEST);
     
     bool tex2d = statecache->IsEnabled_GL_TEXTURE_2D ();
     statecache->Disable_GL_TEXTURE_2D ();
@@ -2045,7 +2042,7 @@ void csGLGraphics3D::ClosePortal ()
       Draw2DPolygon (cp->poly, cp->num_poly, cp->normal);
     }
     
-    if (cp->flags.Check(CS_OPENPORTAL_FLOAT))
+    if (cp->status.Check(CS_PORTALSTATUS_SFILLED))
     {
       //clear stencil for floating portal
       statecache->SetStencilFunc (GL_ALWAYS, 0, stencil_clip_mask);
@@ -2065,7 +2062,6 @@ void csGLGraphics3D::ClosePortal ()
     statecache->SetCullFace (oldcullface);
     statecache->SetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
     if (tex2d) statecache->Enable_GL_TEXTURE_2D ();
-    if (sciss) glEnable(GL_SCISSOR_TEST);
     SetZModeInternal (current_zmode);
   }
   

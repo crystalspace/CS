@@ -7,6 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 31-Jan-2006
+	- rvl_ removed logical bug in his code (that was trying to clear 
+	  stencil in ClosePortal() on hardware where stencil is not available)
+	  Portal flags coversion was added to make renderer portal code 
+	  independent of engine stuff.
 	- Jorrit fixed csMeshObject::GetRadius() so that it calculates the
 	  radius instead of double the radius.
 	- Jorrit fixed a big bug in portal container introduced yesterday.

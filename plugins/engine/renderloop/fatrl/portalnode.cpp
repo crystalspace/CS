@@ -127,9 +127,15 @@ bool csPortalRenderNode::Preprocess (iRenderView* rview)
 
   PORTAL_CHECK(portal, !poly.GetVertexCount (), false);
 
+  csFlags engine_flags = portal->GetFlags();
+  csFlags g3d_flags = 0;
+  if (engine_flags.Check(CS_PORTAL_FLOAT)) g3d_flags.Set(CS_OPENPORTAL_FLOAT);
+  if (engine_flags.Check(CS_PORTAL_ZFILL)) g3d_flags.Set(CS_OPENPORTAL_ZFILL);
+  if (engine_flags.Check(CS_PORTAL_MIRROR)) g3d_flags.Set(CS_OPENPORTAL_MIRROR);
+    
   iGraphics3D* g3d = rview->GetGraphics3D ();
   g3d->OpenPortal (poly.GetVertexCount(), poly.GetVertices(),
-    camera_plane, portal->GetFlags());
+    camera_plane, g3d_flags);
 
   PrepareView (rview, sector);
 

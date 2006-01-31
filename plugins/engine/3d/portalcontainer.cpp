@@ -727,8 +727,12 @@ void csPortalContainer::DrawOnePortal (
     keep_camera_z = camera_vertices[po->GetVertexIndices ()[0]].z;
   }
   // First call OpenPortal().
+  csFlags g3d_flags = 0;
+  if (po->flags.Check(CS_PORTAL_FLOAT)) g3d_flags.Set(CS_OPENPORTAL_FLOAT);
+  if (po->flags.Check(CS_PORTAL_ZFILL)) g3d_flags.Set(CS_OPENPORTAL_ZFILL);
+  if (po->flags.Check(CS_PORTAL_MIRROR)) g3d_flags.Set(CS_OPENPORTAL_MIRROR);
   g3d->OpenPortal (poly.GetVertexCount(), poly.GetVertices(),
-      camera_plane, po->flags);
+      camera_plane, g3d_flags);
 
   // Draw through the portal. This can fail.
   // Drawing through a portal can fail because we have reached
