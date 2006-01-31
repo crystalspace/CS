@@ -9,6 +9,9 @@ chronological order.
 31-Jan-2006
 	- Jorrit fixed csMeshObject::GetRadius() so that it calculates the
 	  radius instead of double the radius.
+	- Jorrit fixed a big bug in portal container introduced yesterday.
+	  The problem was an uninitialized radius variable causing havoc
+	  in portal culling.
 30-Jan-2006
 	- Jorrit changed iObjectModel->GetRadius() to return the radius as
 	  a single float instead of a vector. It was always used as a single

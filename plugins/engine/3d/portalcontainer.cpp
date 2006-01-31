@@ -823,7 +823,7 @@ bool csPortalContainer::ExtraVisTest (iRenderView* rview,
 
   csSphere sphere, world_sphere;
   sphere.SetCenter (object_bbox.GetCenter ());
-  sphere.SetRadius (max_object_radius);
+  sphere.SetRadius (object_radius);
 
   tr_o2c = camtrans;
   if (!movable_identity)

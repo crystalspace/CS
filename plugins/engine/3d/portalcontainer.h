@@ -137,7 +137,6 @@ private:
   csDirtyAccessArray<csVector3> vertices;
   csBox3 object_bbox;
   float object_radius;
-  float max_object_radius;
 
   csRef<iShaderManager> shader_man;
   csRef<iShader> fog_shader;
