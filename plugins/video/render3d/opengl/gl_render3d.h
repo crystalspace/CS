@@ -260,11 +260,11 @@ private:
   //Calculate if the portal clipportal_stack[index] is
   //mirrored by preceding portals. Each reflection reverses
   //vertex order of portal polygon.
-  bool IsPortalMirrored(int index)
+  bool IsPortalMirrored(size_t index)
   {
     bool mirror = false;
-    for (int i=0;i<index;i++) 
-      if (clipportal_stack[i]->flags.Check(CS_OPENPORTAL_MIRROR)) 
+    for (size_t i = 0; i < index; i++) 
+      if (clipportal_stack[i]->flags.Check (CS_OPENPORTAL_MIRROR)) 
         mirror = !mirror;
     return mirror;
   }

@@ -1618,8 +1618,10 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 
 	  if (mode3d == -1)
 	  {
-	    ReportNotify (
-	        "The old sound system is no longer supported. Use 'mode3d'!");
+	    SyntaxService->Report (
+	      "crystalspace.maploader.parse.sound", 
+	      CS_REPORTER_SEVERITY_NOTIFY, child,
+	      "The old sound system is no longer supported. Use 'mode3d'!");
 	    return true;
 	  }
 	  else

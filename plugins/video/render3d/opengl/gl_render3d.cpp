@@ -845,11 +845,10 @@ bool csGLGraphics3D::Open ()
 
   GLint dbits;
   glGetIntegerv (GL_DEPTH_BITS, &dbits);
-
   if (dbits<25) 
-    depth_epsilon = 1.0f/(powf(2, dbits)-1);
+    depth_epsilon = 1.0f/float ((1 << dbits)-1);
   else 
-    depth_epsilon = 1.0f/(powf(2, 24)-1);
+    depth_epsilon = 1.0f/float ((1 << 24)-1);
     
   stencil_shadow_mask = 127;
   {
@@ -2004,7 +2003,7 @@ void csGLGraphics3D::OpenPortal (size_t numVertices,
 void csGLGraphics3D::ClosePortal ()
 {
   if (clipportal_stack.Length () <= 0) return;
-  bool mirror = IsPortalMirrored((int)clipportal_stack.Length()-1);
+  bool mirror = IsPortalMirrored (clipportal_stack.Length()-1);
   csClipPortal* cp = clipportal_stack.Pop ();
   GLRENDER3D_OUTPUT_STRING_MARKER(("%p, %d", cp, cp->flags.Check(CS_OPENPORTAL_ZFILL)?1:0));
 
@@ -2534,35 +2533,34 @@ void csGLGraphics3D::SetupClipPortals ()
 {
   if (broken_stencil || !stencil_clipping_available)
     return;
-  int i;
+  size_t i;
   //index of first floating portal in stack
-  int ffp;
+  size_t ffp;
   //index of current floating portal in stack (top)
-  int cfp;
+  size_t cfp;
   //first floating portal which has no z-cleared status
-  int ffpnz;
+  size_t ffpnz;
   //first floating portal which has s-filled status
-  int ffps;
+  size_t ffps;
   //clipping portal to operate on
   csClipPortal* cp;
   
   //init portal indexes
-  ffpnz = -1;
-  ffps = -1; 
-  cfp = (int)clipportal_stack.Length()-1; 
-  
+  ffpnz = csArrayItemNotFound;
+  ffps = csArrayItemNotFound; 
+  cfp = clipportal_stack.Length()-1; 
   for (ffp = 0; ffp <= cfp; ffp++) 
-    if (clipportal_stack[ffp]->flags.Check(CS_OPENPORTAL_FLOAT)) break;
+    if (clipportal_stack[ffp]->flags.Check (CS_OPENPORTAL_FLOAT)) break;
     
   for (i = ffp; i <= cfp; i++)
-    if (!(clipportal_stack[i]->status.Check(CS_PORTALSTATUS_ZCLEARED)))
+    if (!(clipportal_stack[i]->status.Check (CS_PORTALSTATUS_ZCLEARED)))
     {
       ffpnz = i;
       break;
     }
     
   for (i = ffp; i <= cfp; i++)
-    if (clipportal_stack[i]->status.Check(CS_PORTALSTATUS_SFILLED))
+    if (clipportal_stack[i]->status.Check (CS_PORTALSTATUS_SFILLED))
     {
       ffps = i;
       break;
@@ -2607,13 +2605,13 @@ void csGLGraphics3D::SetupClipPortals ()
   // some of conditions below may never met but we keep them for
   // reliability
 
-  if (ffpnz>=0)
+  if (ffpnz != csArrayItemNotFound)
   {
     //needed z-clear, but first we need s-fill for the same portal
     //glClear(GL_STENCIL_BUFFER_BIT);//TEMP!!!
-    if ((ffps>=0)&&(ffps!=ffpnz))
+    if ((ffps != csArrayItemNotFound) && (ffps != ffpnz))
     {
-      if (ffps<ffpnz)
+      if (ffps < ffpnz)
       {
         //clear stencil of ffps
         if (render_target)
@@ -2630,9 +2628,9 @@ void csGLGraphics3D::SetupClipPortals ()
         DrawScreenPolygon (cp->poly, cp->num_poly);
       }
       clipportal_stack[ffps]->status.Reset(CS_PORTALSTATUS_SFILLED);
-      ffps = -1;
+      ffps = csArrayItemNotFound;
     }
-    if (ffps<0)
+    if (ffps == csArrayItemNotFound)
     {
       //make s-fill of ffpnz
       if (render_target) 
@@ -2687,16 +2685,17 @@ void csGLGraphics3D::SetupClipPortals ()
     //glColorMask (false, false, false, false);
     
     //set z-clear status from ffpnz to cfp
-    for (i=ffpnz;i<=cfp;i++) clipportal_stack[i]->status.Set(CS_PORTALSTATUS_ZCLEARED);
+    for (i = ffpnz; i <= cfp; i++) 
+      clipportal_stack[i]->status.Set (CS_PORTALSTATUS_ZCLEARED);
     //just in case
-    ffpnz = -1;
+    ffpnz = csArrayItemNotFound;
   }
   
-  if (ffps!=cfp)
+  if (ffps != cfp)
   {
     //need s-fill for current portal
     //glClear(GL_STENCIL_BUFFER_BIT);//TEMP!!!
-    if (ffps>=0)
+    if (ffps != csArrayItemNotFound)
     {
       //clear previous s-fill
       if (render_target) 
@@ -2713,7 +2712,7 @@ void csGLGraphics3D::SetupClipPortals ()
       DrawScreenPolygon (cp->poly, cp->num_poly);
       
       clipportal_stack[ffps]->status.Reset(CS_PORTALSTATUS_SFILLED);
-      ffps = -1;
+      ffps = csArrayItemNotFound;
     }
     //perform s-fill finally
     if (render_target)

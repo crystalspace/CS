@@ -570,10 +570,10 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   vw = isect;
   v = view->GetCamera ()->GetTransform ().Other2This (vw);
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-  	"LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)",
+  	"RMB down : cam:(%f,%f,%f) world:(%f,%f,%f)",
 	v.x, v.y, v.z, vw.x, vw.y, vw.z);
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-  	"LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)",
+  	"RMB down : cam:(%f,%f,%f) world:(%f,%f,%f)",
 	v.x, v.y, v.z, vw.x, vw.y, vw.z);
 
   if (mesh && sel != -1)

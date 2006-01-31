@@ -187,7 +187,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	    {
 	      csVector4& t = tmpColor[i];
 	      const float* c = cbufWalker;
-	      for (size_t j = 0; j < 3; j++)
+	      for (int j = 0; j < 3; j++)
 	        t[j] += c[j];
 	      if (hasAlpha) t[3] = c[3];
 	      ++cbufWalker;
@@ -202,7 +202,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	    {
 	      csVector4& t = tmpColor[i];
 	      const float* c = cbufWalker;
-	      for (size_t j = 0; j < 3; j++)
+	      for (int j = 0; j < 3; j++)
 	        t[j] *= c[j];
 	      if (hasAlpha) t[3] = c[3];
 	      ++cbufWalker;
