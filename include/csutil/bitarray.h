@@ -549,7 +549,7 @@ public:
   static uint ComputeHash (csBitArray const& key)
   {
     const size_t uintCount = sizeof (csBitArray::store_type) / sizeof (uint);
-    uint ui[uintCount];    
+    uint ui[uintCount];
     uint hash = 0;
     csBitArray::store_type const* p = key.GetStore();
     // @@@ Not very good. Find a better hash function; however, it should
@@ -557,7 +557,7 @@ public:
     // the amount of trailing zeros. (e.g. f(10010110) == f(100101100000...))
     for (size_t i = 0; i < key.mLength; i++)
     {
-      memcpy(ui, &p[i], sizeof(ui));
+      memcpy (ui, &p[i], sizeof (ui));
       for (size_t j = 0; j < uintCount; j++)
 	hash += ui[j];
     }

@@ -41,10 +41,9 @@ namespace CrystalSpace
         char padding[8];
       };
 
-
       /// Simple dummy-wrapper
       template <class T>
-      struct Wrap {};
+      struct Wrap { Wrap () {} };
 
       template <class T> T&(* IsReferenceHelper1(Wrap<T>) )(Wrap<T>);
       char IsReferenceHelper1(...);

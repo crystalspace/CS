@@ -79,6 +79,7 @@
   #pragma intrinsic (memset, memcpy, memcmp)
   #pragma intrinsic (strcpy, strcmp, strlen, strcat)
   #pragma intrinsic (abs, fabs)
+  #pragma intrinsic (_byteswap_ushort, _byteswap_ulong, _byteswap_uint64)
 
   #if defined(__CRYSTAL_SPACE__) && !defined(CS_DEBUG)
     #pragma code_seg("CSpace")	  // Just for fun :)

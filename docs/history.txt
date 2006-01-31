@@ -7,15 +7,17 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 31-Jan-2006
-	- rvl_ removed logical bug in his code (that was trying to clear 
-	  stencil in ClosePortal() on hardware where stencil is not available)
-	  Portal flags coversion was added to make renderer portal code 
-	  independent of engine stuff.
 	- Jorrit fixed csMeshObject::GetRadius() so that it calculates the
 	  radius instead of double the radius.
 	- Jorrit fixed a big bug in portal container introduced yesterday.
 	  The problem was an uninitialized radius variable causing havoc
 	  in portal culling.
+	- rvl_ removed logical bug in his code (that was trying to clear 
+	  stencil in ClosePortal() on hardware where stencil is not available)
+	  Portal flags coversion was added to make renderer portal code 
+	  independent of engine stuff.
+	- res fixed a VC7 compile error in Marten's static typechecking.
+	- res made the VC _byteswap_* functions intrinsic.
 30-Jan-2006
 	- Jorrit changed iObjectModel->GetRadius() to return the radius as
 	  a single float instead of a vector. It was always used as a single

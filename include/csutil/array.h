@@ -745,6 +745,10 @@ public:
   /**
    * Insert an element at a sorted position, using an element comparison
    * function.
+   * \param item The item to insert.
+   * \param compare [optional] Pointer to a function to compare two elements.
+   * \param equal_index [optional] Returns the index of an element equal to
+   *   the one to be inserted, if one is found. csArrayItemNotFound otherwise.
    * \return The index of the inserted item.
    * \remarks The array must be sorted.
    */
