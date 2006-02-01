@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Feb-2006
+	- res converted protomesh to new SCF.
+	- res fixed std_lighting_detail to work with per-vertex lighting.
+	- res fixed a closing of an invalid handle in the Win32 memory mapping
+	  code.
 31-Jan-2006
 	- Jorrit fixed csMeshObject::GetRadius() so that it calculates the
 	  radius instead of double the radius.

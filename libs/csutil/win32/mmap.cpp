@@ -46,7 +46,11 @@ bool csPlatformMemoryMappingWin32::OpenNative (const char* filename)
   {
     hFileMapping = CreateFileMapping (hMappedFile, 0, 
       PAGE_READONLY, 0, 0, 0);
-    if (hFileMapping == 0) CloseHandle (hMappedFile);
+    if (hFileMapping == 0)
+    {
+      CloseHandle (hMappedFile);
+      hMappedFile = INVALID_HANDLE_VALUE;
+    }
   }
   return Ok();
 }

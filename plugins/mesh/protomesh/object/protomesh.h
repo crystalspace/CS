@@ -34,8 +34,12 @@
 
 struct iObjectRegistry;
 
-class csProtoMeshObjectFactory;
 class csShaderVariableContext;
+
+namespace cspluginProtoMesh
+{
+
+class csProtoMeshObjectFactory;
 
 #define PROTO_TRIS 12
 #define PROTO_VERTS 8
@@ -43,7 +47,10 @@ class csShaderVariableContext;
 /**
  * Protomesh version of mesh object.
  */
-class csProtoMeshObject : public iMeshObject
+class csProtoMeshObject : 
+  public scfImplementation2<csProtoMeshObject, 
+                            iMeshObject,
+                            iProtoMeshState>
 {
 private:
   // The render mesh holder is used by GetRenderMeshes() to supply
@@ -69,7 +76,7 @@ private:
 
   // Admin stuff.
   csWeakRef<iGraphics3D> g3d;
-  csProtoMeshObjectFactory* factory;
+  csRef<csProtoMeshObjectFactory> factory;
   iMeshWrapper* logparent;
 
   // Callback when object is rendered (in GetRenderMeshes()).
@@ -94,6 +101,8 @@ private:
   uint32 current_features;
   csFlags flags;
 
+  float fuzz;
+
   // This flag is set to false initially and will be set to true
   // by SetupObject() after object is initialized. Some functions
   // can set this to false again to force reinit.
@@ -111,19 +120,15 @@ public:
   /// Destructor.
   virtual ~csProtoMeshObject ();
 
+  virtual void SetFuzzFactor (float factor) { fuzz = factor; }
+  virtual float GetFuzzFactor () { return fuzz; }
+
+  /**\name iMeshObject implementation
+   * @{ */
   void SetMixMode (uint mode) { MixMode = mode; }
   uint GetMixMode () const { return MixMode; }
-  const csColor& GetColor () const { return color; }
-  void GetObjectBoundingBox (csBox3& bbox);
-  void SetObjectBoundingBox (const csBox3& bbox);
 
-  //----------------------- iMeshObject implementation ----------------------
-  SCF_DECLARE_IBASE;
-
-  virtual iMeshObjectFactory* GetFactory () const
-  {
-    return (iMeshObjectFactory*)factory;
-  }
+  virtual iMeshObjectFactory* GetFactory () const;
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone ()
   {
@@ -180,71 +185,45 @@ public:
   {
     // We don't support sockets.
   }
+  /** @} */
 
-  //------------------------- iProtoMeshState implementation ----------------
-  class ProtoMeshState : public iProtoMeshState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csProtoMeshObject);
-    virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    {
-      scfParent->SetMaterialWrapper (material);
-    }
-    virtual iMaterialWrapper* GetMaterialWrapper () const
-    {
-      return scfParent->material;
-    }
-    virtual void SetMixMode (uint mode)
-    {
-      scfParent->SetMixMode (mode);
-    }
-    virtual uint GetMixMode () const
-    {
-      return scfParent->GetMixMode ();
-    }
-    virtual void SetColor (const csColor& col)
-    {
-      scfParent->SetColor (col);
-    }
-    virtual const csColor& GetColor () const
-    {
-      return scfParent->GetColor ();
-    }
-  } scfiProtoMeshState;
-
-  friend class ProtoMeshState;
-
-  //------------------ iRenderBufferAccessor implementation ------------
-  class RenderBufferAccessor : public iRenderBufferAccessor
+  /**\name iRenderBufferAccessor implementation
+   * @{ */
+  class RenderBufferAccessor : 
+    public scfImplementation1<RenderBufferAccessor, 
+                              iRenderBufferAccessor>
   {
   private:
-    csProtoMeshObject* parent;
+    csWeakRef<csProtoMeshObject> parent;
 
   public:
-    SCF_DECLARE_IBASE;
-    RenderBufferAccessor (csProtoMeshObject* parent)
+    RenderBufferAccessor (csProtoMeshObject* parent) : 
+      scfImplementationType (0)
     {
-      SCF_CONSTRUCT_IBASE (0);
       RenderBufferAccessor::parent = parent;
     }
-    virtual ~RenderBufferAccessor ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
+    virtual ~RenderBufferAccessor () { }
     virtual void PreGetBuffer (csRenderBufferHolder* holder,
     	csRenderBufferName buffer)
     {
-      parent->PreGetBuffer (holder, buffer);
+      if (parent) parent->PreGetBuffer (holder, buffer);
     }
-  } *scfiRenderBufferAccessor;
+  };
+  csRef<RenderBufferAccessor> myRenderBufferAccessor;
   friend class RenderBufferAccessor;
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
+  /** @} */
 };
 
 /**
  * Factory for proto meshes.
  */
-class csProtoMeshObjectFactory : public iMeshObjectFactory
+class csProtoMeshObjectFactory : 
+  public scfImplementationExt2<csProtoMeshObjectFactory, 
+                               csObjectModel,
+                              iMeshObjectFactory,
+                              iProtoFactoryState>
 {
   friend class csProtoMeshObject;
 
@@ -299,12 +278,9 @@ private:
   void SetupFactory ();
 
 public:
-  static csStringID vertex_name, texel_name, normal_name, color_name, 
-    index_name, string_object2world;
-
   iObjectRegistry* object_reg;
   iMeshFactoryWrapper* logparent;
-  iMeshObjectType* proto_type;
+  csRef<iMeshObjectType> proto_type;
   csFlags flags;
 
   /// Constructor.
@@ -314,25 +290,27 @@ public:
   /// Destructor.
   virtual ~csProtoMeshObjectFactory ();
 
+  /**\name iProtoFactoryState implementation
+   * @{ */
   csVector3* GetVertices () { return vertices; }
   csVector2* GetTexels () { return texels; }
   csVector3* GetNormals () { return normals; }
   csColor* GetColors () { return colors; }
   csTriangle* GetTriangles () { return triangles; }
   void Invalidate ();
+  /** @} */
 
-  const csBox3& GetObjectBoundingBox ();
+  void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& b);
-  float GetRadius ();
+  void GetRadius (float& radius, csVector3& center);
 
   /**
    * Calculate polygons for iPolygonMesh.
    */
   csMeshedPolygon* GetPolygons ();
 
-  //------------------------ iMeshObjectFactory implementation --------------
-  SCF_DECLARE_IBASE;
-
+  /**\name iMeshObjectFactory implementation
+   * @{ */
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual csPtr<iMeshObjectFactory> Clone () { return 0; }
@@ -346,98 +324,41 @@ public:
   virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return proto_type; }
-
-  //----------------------- iProtoFactoryState implementation -------------
-  class ProtoFactoryState : public iProtoFactoryState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csProtoMeshObjectFactory);
-
-    virtual csVector3* GetVertices ()
-    {
-      return scfParent->GetVertices ();
-    }
-    virtual csVector2* GetTexels ()
-    {
-      return scfParent->GetTexels ();
-    }
-    virtual csVector3* GetNormals ()
-    {
-      return scfParent->GetNormals ();
-    }
-    virtual csColor* GetColors ()
-    {
-      return scfParent->GetColors ();
-    }
-    virtual csTriangle* GetTriangles ()
-    {
-      return scfParent->GetTriangles ();
-    }
-    virtual void Invalidate ()
-    {
-      scfParent->Invalidate ();
-    }
-  } scfiProtoFactoryState;
+  /** @} */
 
   //------------------ iPolygonMesh interface implementation ----------------//
-  struct PolyMesh : public iPolygonMesh
+  struct PolyMesh : public scfImplementation1<PolyMesh, 
+                                              iPolygonMesh>
   {
   private:
-    csProtoMeshObjectFactory* factory;
+    csWeakRef<csProtoMeshObjectFactory> factory;
     csFlags flags;
 
   public:
-    SCF_DECLARE_IBASE;
-
-    void SetFactory (csProtoMeshObjectFactory* Factory)
-    {
-      factory = Factory;
-    }
-
     virtual int GetVertexCount () { return PROTO_VERTS; }
-    virtual csVector3* GetVertices () { return factory->GetVertices (); }
+    virtual csVector3* GetVertices () 
+    { return factory ? factory->GetVertices () : 0; }
     virtual int GetPolygonCount () { return PROTO_TRIS; }
     virtual csMeshedPolygon* GetPolygons ();
     virtual int GetTriangleCount () { return PROTO_TRIS; }
-    virtual csTriangle* GetTriangles () { return factory->GetTriangles (); }
+    virtual csTriangle* GetTriangles () 
+    { return factory ? factory->GetTriangles () : 0; }
     virtual void Lock () { }
     virtual void Unlock () { }
     
     virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh ()
+    PolyMesh (csProtoMeshObjectFactory* Factory) : 
+      scfImplementationType (this), factory (Factory)
     {
-      SCF_CONSTRUCT_IBASE (0);
       flags.Set (CS_POLYMESH_TRIANGLEMESH);
     }
-    virtual ~PolyMesh ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
-  } scfiPolygonMesh;
+    virtual ~PolyMesh () { }
+  };
   friend struct PolyMesh;
 
-  //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public csObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csProtoMeshObjectFactory);
-    virtual void GetObjectBoundingBox (csBox3& bbox)
-    {
-      bbox = scfParent->GetObjectBoundingBox ();
-    }
-    virtual void SetObjectBoundingBox (const csBox3& bbox)
-    {
-      scfParent->SetObjectBoundingBox (bbox);
-    }
-    virtual void GetRadius (float& rad, csVector3& cent)
-    {
-      rad = scfParent->GetRadius ();
-      cent = scfParent->object_bbox.GetCenter ();
-    }
-  } scfiObjectModel;
-  friend class ObjectModel;
-
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual iObjectModel* GetObjectModel () { return this; }
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
@@ -446,12 +367,13 @@ public:
  * Protomesh type. This is the plugin you have to use to create instances
  * of csProtoMeshObjectFactory.
  */
-class csProtoMeshObjectType : public iMeshObjectType
+class csProtoMeshObjectType : 
+  public scfImplementation2<csProtoMeshObjectType, 
+                            iMeshObjectType,
+                            iComponent>
 {
 public:
   iObjectRegistry* object_reg;
-
-  SCF_DECLARE_IBASE;
 
   /// Constructor.
   csProtoMeshObjectType (iBase*);
@@ -461,15 +383,8 @@ public:
   virtual csPtr<iMeshObjectFactory> NewFactory ();
   /// Initialize.
   bool Initialize (iObjectRegistry* object_reg);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csProtoMeshObjectType);
-    virtual bool Initialize (iObjectRegistry* object_reg)
-    {
-      return scfParent->Initialize (object_reg);
-    }
-  } scfiComponent;
 };
+
+} // namespace cspluginProtoMesh
 
 #endif // __CS_PROTOMESH_H__

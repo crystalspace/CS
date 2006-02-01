@@ -41,25 +41,13 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csProtoMeshObject)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iProtoMeshState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoMeshObject::ProtoMeshState)
-  SCF_IMPLEMENTS_INTERFACE (iProtoMeshState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csProtoMeshObject::RenderBufferAccessor)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
-SCF_IMPLEMENT_IBASE_END
-
-csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory)
+namespace cspluginProtoMesh
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiProtoMeshState);
 
-  scfiRenderBufferAccessor = new RenderBufferAccessor (this);
+csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory) :
+  scfImplementationType (this)
+{
+  myRenderBufferAccessor.AttachNew (new RenderBufferAccessor (this));
 
   csProtoMeshObject::factory = factory;
   logparent = 0;
@@ -77,17 +65,18 @@ csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory)
   current_lod = 1;
   current_features = 0;
 
-  g3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (factory->object_reg);
 
   variableContext.AttachNew (new csShaderVariableContext);
 }
 
 csProtoMeshObject::~csProtoMeshObject ()
 {
-  scfiRenderBufferAccessor->DecRef ();
+}
 
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiProtoMeshState);
-  SCF_DESTRUCT_IBASE ();
+iMeshObjectFactory* csProtoMeshObject::GetFactory () const
+{
+  return (csProtoMeshObjectFactory*)factory;
 }
 
 bool csProtoMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
@@ -128,7 +117,7 @@ void csProtoMeshObject::SetupBufferHolder ()
   // for those because they are not always needed.
   // Colors are fetched from the object because we need to add the mesh
   // base color to the static colors in the factory.
-  bufferHolder->SetAccessor (scfiRenderBufferAccessor, CS_BUFFER_NORMAL_MASK | CS_BUFFER_COLOR_MASK);
+  bufferHolder->SetAccessor (myRenderBufferAccessor, CS_BUFFER_NORMAL_MASK | CS_BUFFER_COLOR_MASK);
 }
   
 void csProtoMeshObject::SetupObject ()
@@ -192,13 +181,12 @@ csRenderMesh** csProtoMeshObject::GetRenderMeshes (
   meshPtr->indexend = PROTO_TRIS * 3;	// 12 triangles.
   meshPtr->material = material;
   meshPtr->worldspace_origin = wo;
+  meshPtr->object2world = o2wt;
   if (rmCreated)
   {
     meshPtr->buffers = bufferHolder;
     meshPtr->variablecontext = variableContext;
   }
-  meshPtr->variablecontext->GetVariableAdd (factory->string_object2world)->
-    SetValue (o2wt);
 
   meshPtr->geometryInstance = (void*)factory;
  
@@ -275,7 +263,8 @@ iObjectModel* csProtoMeshObject::GetObjectModel ()
   return factory->GetObjectModel ();
 }
 
-void csProtoMeshObject::PreGetBuffer (csRenderBufferHolder *holder, csRenderBufferName buffer)
+void csProtoMeshObject::PreGetBuffer (csRenderBufferHolder *holder, 
+                                      csRenderBufferName buffer)
 {
   if (buffer == CS_BUFFER_COLOR)
   {
@@ -308,36 +297,18 @@ void csProtoMeshObject::PreGetBuffer (csRenderBufferHolder *holder, csRenderBuff
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csProtoMeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iProtoFactoryState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoMeshObjectFactory::ProtoFactoryState)
-  SCF_IMPLEMENTS_INTERFACE (iProtoFactoryState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoMeshObjectFactory::ObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csStringID csProtoMeshObjectFactory::string_object2world = csInvalidStringID;
-
 csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
-      iObjectRegistry* object_reg)
+                                                    iObjectRegistry* object_reg) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiProtoFactoryState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-
   csProtoMeshObjectFactory::object_reg = object_reg;
 
-  scfiPolygonMesh.SetFactory (this);
-  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshViscull (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMesh);
+  csRef<PolyMesh> polyMesh;
+  polyMesh.AttachNew (new PolyMesh (this));
+  SetPolygonMeshBase (polyMesh);
+  SetPolygonMeshColldet (polyMesh);
+  SetPolygonMeshViscull (polyMesh);
+  SetPolygonMeshShadows (polyMesh);
 
   logparent = 0;
   proto_type = pParent;
@@ -347,13 +318,7 @@ csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
 
   polygons = 0;
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
-  if (string_object2world == csInvalidStringID)
-  {
-    string_object2world = strings->Request ("object2world transform");
-  }
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
 
   mesh_vertices_dirty_flag = true;
   mesh_texels_dirty_flag = true;
@@ -363,9 +328,6 @@ csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
 
 csProtoMeshObjectFactory::~csProtoMeshObjectFactory ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiProtoFactoryState);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csProtoMeshObjectFactory::CalculateBBoxRadius ()
@@ -392,18 +354,19 @@ void csProtoMeshObjectFactory::CalculateBBoxRadius ()
   radius = csQsqrt (max_sqradius);
 }
 
-float csProtoMeshObjectFactory::GetRadius ()
+void csProtoMeshObjectFactory::GetRadius (float& radius, csVector3& center)
 {
   SetupFactory ();
   if (!object_bbox_valid) CalculateBBoxRadius ();
-  return radius;
+  radius = this->radius;
+  center = object_bbox.GetCenter();
 }
 
-const csBox3& csProtoMeshObjectFactory::GetObjectBoundingBox ()
+void csProtoMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox)
 {
   SetupFactory ();
   if (!object_bbox_valid) CalculateBBoxRadius ();
-  return object_bbox;
+  bbox = object_bbox;
 }
 
 void csProtoMeshObjectFactory::SetObjectBoundingBox (const csBox3& bbox)
@@ -422,7 +385,8 @@ void csProtoMeshObjectFactory::SetupFactory ()
   }
 }
 
-void csProtoMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
+void csProtoMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, 
+                                             csRenderBufferName buffer)
 {
   if (buffer == CS_BUFFER_NORMAL)
   {
@@ -455,7 +419,7 @@ void csProtoMeshObjectFactory::Invalidate ()
 
   color_nr++;
 
-  scfiObjectModel.ShapeChanged ();
+  ShapeChanged ();
 }
 
 void csProtoMeshObjectFactory::PrepareBuffers ()
@@ -496,10 +460,6 @@ void csProtoMeshObjectFactory::PrepareBuffers ()
   }
 }
 
-SCF_IMPLEMENT_IBASE (csProtoMeshObjectFactory::PolyMesh)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
-
 csMeshedPolygon* csProtoMeshObjectFactory::PolyMesh::GetPolygons ()
 {
   return factory->GetPolygons ();
@@ -507,10 +467,10 @@ csMeshedPolygon* csProtoMeshObjectFactory::PolyMesh::GetPolygons ()
 
 csPtr<iMeshObject> csProtoMeshObjectFactory::NewInstance ()
 {
-  csProtoMeshObject* cm = new csProtoMeshObject (this);
+  csRef<csProtoMeshObject> cm;
+  cm.AttachNew (new csProtoMeshObject (this));
 
-  csRef<iMeshObject> im = SCF_QUERY_INTERFACE (cm, iMeshObject);
-  cm->DecRef ();
+  csRef<iMeshObject> im = scfQueryInterface<iMeshObject> (cm);
   return csPtr<iMeshObject> (im);
 }
 
@@ -531,37 +491,25 @@ csMeshedPolygon* csProtoMeshObjectFactory::GetPolygons ()
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csProtoMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoMeshObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csProtoMeshObjectType)
 
 
-csProtoMeshObjectType::csProtoMeshObjectType (iBase* pParent)
+csProtoMeshObjectType::csProtoMeshObjectType (iBase* pParent) : 
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csProtoMeshObjectType::~csProtoMeshObjectType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csProtoMeshObjectType::NewFactory ()
 {
-  csProtoMeshObjectFactory* cm = new csProtoMeshObjectFactory (this,
-    object_reg);
+  csRef<csProtoMeshObjectFactory> cm;
+  cm.AttachNew (new csProtoMeshObjectFactory (this,
+    object_reg));
   csRef<iMeshObjectFactory> ifact (
-    SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
-  cm->DecRef ();
+    scfQueryInterface<iMeshObjectFactory> (cm));
   return csPtr<iMeshObjectFactory> (ifact);
 }
 
@@ -571,3 +519,4 @@ bool csProtoMeshObjectType::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+} // namespace cspluginProtoMesh

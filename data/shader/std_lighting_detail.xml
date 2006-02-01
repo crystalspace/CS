@@ -4,13 +4,15 @@
     <tag>detail_texture</tag>
     <pass>
       <buffer source="texture coordinate 0" destination="texture coordinate 0" />
-      <buffer source="texture coordinate 0" destination="texture coordinate 2" />
+      <buffer source="texture coordinate 0" destination="texture coordinate detail" />
       <?if vars."tex lightmap".texture ?>
 	<buffer source="texture coordinate lightmap" destination="texture coordinate 1" />
 	<texture name="tex lightmap" destination="unit 1" />
+      <?else?>
+	<buffer source="color" destination="color" />
       <?endif?>
       <texture name="tex diffuse" destination="unit 0" />
-      <texture name="tex detail" destination="unit 2" />
+      <texture name="tex detail" destination="detail" />
       <vp plugin="glfixed">
         <fixedvp>
           <texmatrix layer="2">
@@ -44,7 +46,7 @@
             <alphasource num="0" source="previous layer" modifier="alpha" />
             <alphaoperation operation="replace" />
           </layer>
-          <layer>
+          <layer name="detail">
             <colorsource num="0" source="previous layer" modifier="color" />
             <colorsource num="1" source="texture" modifier="color" />
             <coloroperation operation="modulate" scale="2" />

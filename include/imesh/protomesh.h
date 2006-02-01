@@ -35,13 +35,10 @@ class csColor;
 struct csTriangle;
 struct iMaterialWrapper;
 
-SCF_VERSION (iProtoFactoryState, 0, 0, 1);
-
 /**
  * The proto mesh is a demonstration or tutorial mesh. It is
  * very simple and really unusable in games but it is a very good
- * start to make a new mesh object. It supports only the new renderer
- * but should compile with old renderer too (just not visible then).
+ * start to make a new mesh object. 
  * 
  * The proto mesh supports:
  * - Primitive geometry (8 vertices, 12 triangles, just enough for a box).
@@ -68,8 +65,10 @@ SCF_VERSION (iProtoFactoryState, 0, 0, 1);
         (crystalspace.mesh.loader.factory.protomesh)
  *   
  */
-struct iProtoFactoryState : public iBase
+struct iProtoFactoryState : public virtual iBase
 {
+  SCF_INTERFACE (iProtoFactoryState, 2, 0, 0);
+
   /**
    * Get the array of vertices. It is legal to modify the vertices
    * in this array. The number of vertices in this array is guaranteed
@@ -110,8 +109,6 @@ struct iProtoFactoryState : public iBase
   virtual void Invalidate () = 0;
 };
 
-SCF_VERSION (iProtoMeshState, 0, 0, 1);
-
 /**
  * This interface describes the API for the proto mesh object.
  * 
@@ -126,21 +123,21 @@ SCF_VERSION (iProtoMeshState, 0, 0, 1);
  * - Protomesh Loader plugin (crystalspace.mesh.loader.protomesh)
  *   
  */
-struct iProtoMeshState : public iBase
+struct iProtoMeshState : public virtual iBase
 {
-  /// Set material of mesh.
-  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
-  /// Get material of mesh.
-  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
-  /// Set mix mode.
-  virtual void SetMixMode (uint mode) = 0;
-  /// Get mix mode.
-  virtual uint GetMixMode () const = 0;
+  SCF_INTERFACE (iProtoMeshState, 1, 0, 0);
 
-  /// Set the base color to use. Will be added to the colors values.
-  virtual void SetColor (const csColor& col) = 0;
-  /// Get the color.
-  virtual const csColor& GetColor () const = 0;
+  /**
+   * Set mesh-specific fuzz factor.
+   * \remarks This method is purely present for illustrational purposes and
+   *   has, in fact, no effect on the actual mesh.
+   */
+  virtual void SetFuzzFactor (float factor) = 0;
+  /**
+   * Get mesh-specific fuzz factor.
+   * \remarks This method is purely present for illustrational purposes.
+   */
+  virtual float GetFuzzFactor () = 0;
 };
 
 /** @} */

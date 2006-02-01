@@ -46,51 +46,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-enum
+namespace cspluginProtoMeshLoader
 {
-  XMLTOKEN_V = 1,
-  XMLTOKEN_T,
-  XMLTOKEN_COLOR,
-  XMLTOKEN_MATERIAL,
-  XMLTOKEN_FACTORY,
-  XMLTOKEN_MIXMODE
-};
-
-SCF_IMPLEMENT_IBASE (csProtoFactoryLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoFactoryLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csProtoFactorySaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoFactorySaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csProtoMeshLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoMeshLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csProtoMeshSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoMeshSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csProtoFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csProtoFactorySaver)
@@ -98,40 +55,37 @@ SCF_IMPLEMENT_FACTORY (csProtoMeshLoader)
 SCF_IMPLEMENT_FACTORY (csProtoMeshSaver)
 
 
-csProtoFactoryLoader::csProtoFactoryLoader (iBase* pParent)
+csProtoFactoryLoader::csProtoFactoryLoader (iBase* pParent) :
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csProtoFactoryLoader::~csProtoFactoryLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csProtoFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csProtoFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
-  xmltokens.Register ("v", XMLTOKEN_V);
-  xmltokens.Register ("t", XMLTOKEN_T);
+  InitTokenTable (xmltokens);
   return true;
 }
 
 csPtr<iBase> csProtoFactoryLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /* context */)
+                                          iStreamSource*, 
+                                          iLoaderContext* /*ldr_context*/, 
+                                          iBase* /* context */)
 {
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager);
-  csRef<iMeshObjectType> type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.protomesh", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr = 
+    csQueryRegistry<iPluginManager> (object_reg);
+  csRef<iMeshObjectType> type = csQueryPluginClass<iMeshObjectType> (
+    plugin_mgr, "crystalspace.mesh.object.protomesh");
   if (!type)
   {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.protomesh",
-    	iMeshObjectType);
+    type = csLoadPlugin<iMeshObjectType> (plugin_mgr, 
+      "crystalspace.mesh.object.protomesh");
   }
   if (!type)
   {
@@ -144,7 +98,7 @@ csPtr<iBase> csProtoFactoryLoader::Parse (iDocumentNode* node,
   csRef<iProtoFactoryState> state;
 
   fact = type->NewFactory ();
-  state = SCF_QUERY_INTERFACE (fact, iProtoFactoryState);
+  state = scfQueryInterface<iProtoFactoryState> (fact);
 
   int idx = 0;
   int triidx = 0;
@@ -225,23 +179,19 @@ csPtr<iBase> csProtoFactoryLoader::Parse (iDocumentNode* node,
 }
 //---------------------------------------------------------------------------
 
-csProtoFactorySaver::csProtoFactorySaver (iBase* pParent)
+csProtoFactorySaver::csProtoFactorySaver (iBase* pParent) : 
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csProtoFactorySaver::~csProtoFactorySaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csProtoFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csProtoFactorySaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -257,9 +207,9 @@ bool csProtoFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   if (obj)
   {
     csRef<iProtoFactoryState> gfact = 
-      SCF_QUERY_INTERFACE (obj, iProtoFactoryState);
+      scfQueryInterface<iProtoFactoryState> (obj);
     csRef<iMeshObjectFactory> meshfact = 
-      SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+      scfQueryInterface<iMeshObjectFactory> (obj);
     if (!gfact) return false;
     if (!meshfact) return false;
 
@@ -304,28 +254,21 @@ bool csProtoFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
 //---------------------------------------------------------------------------
 
-csProtoMeshLoader::csProtoMeshLoader (iBase* pParent)
+csProtoMeshLoader::csProtoMeshLoader (iBase* pParent) : 
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csProtoMeshLoader::~csProtoMeshLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csProtoMeshLoader::Initialize (iObjectRegistry* object_reg)
 {
   csProtoMeshLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
-  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
-  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
-  xmltokens.Register ("color", XMLTOKEN_COLOR);
-  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  InitTokenTable (xmltokens);
   return true;
 }
 
@@ -349,7 +292,7 @@ csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
 	    return 0;
-	  meshstate->SetColor (col);
+	  mesh->SetColor (col);
 	}
 	break;
       case XMLTOKEN_FACTORY:
@@ -387,7 +330,7 @@ csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find material '%s'!", matname);
             return 0;
 	  }
-	  meshstate->SetMaterialWrapper (mat);
+	  mesh->SetMaterialWrapper (mat);
 	}
 	break;
       case XMLTOKEN_MIXMODE:
@@ -395,7 +338,7 @@ csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
 	    return 0;
-          meshstate->SetMixMode (mm);
+          mesh->SetMixMode (mm);
 	}
 	break;
       default:
@@ -409,23 +352,19 @@ csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-csProtoMeshSaver::csProtoMeshSaver (iBase* pParent)
+csProtoMeshSaver::csProtoMeshSaver (iBase* pParent) : 
+  scfImplementationType (this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csProtoMeshSaver::~csProtoMeshSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csProtoMeshSaver::Initialize (iObjectRegistry* object_reg)
 {
   csProtoMeshSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -442,7 +381,7 @@ bool csProtoMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   {
     csRef<iProtoMeshState> gmesh = 
       SCF_QUERY_INTERFACE (obj, iProtoMeshState);
-    csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+    csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (obj);
     if (!gmesh) return false;
     if (!mesh) return false;
 
@@ -461,14 +400,15 @@ bool csProtoMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }
 
     // Writedown Color tag
-    csColor col = gmesh->GetColor();
+    csColor col (0, 0, 0);
+    mesh->GetColor (col);
     csRef<iDocumentNode> colorNode = 
       paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     colorNode->SetValue ("color");
     synldr->WriteColor (colorNode, &col);
 
     // Writedown Material tag
-    iMaterialWrapper* mat = gmesh->GetMaterialWrapper ();
+    iMaterialWrapper* mat = mesh->GetMaterialWrapper ();
     if (mat)
     {
       const char* matname = mat->QueryObject()->GetName ();
@@ -484,7 +424,7 @@ bool csProtoMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }    
 
     // Writedown Mixmode tag
-    int mixmode = gmesh->GetMixMode();
+    int mixmode = mesh->GetMixMode();
     csRef<iDocumentNode> mixmodeNode = 
       paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     mixmodeNode->SetValue ("mixmode");
@@ -493,3 +433,4 @@ bool csProtoMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   return true;
 }
 
+} // namespace cspluginProtoMeshLoader

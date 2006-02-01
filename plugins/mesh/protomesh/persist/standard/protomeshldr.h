@@ -32,20 +32,28 @@ struct iObjectRegistry;
 struct iSyntaxService;
 struct iProtoFactoryState;
 
+namespace cspluginProtoMeshLoader
+{
+
 /**
  * Proto Mesh factory loader.
  */
-class csProtoFactoryLoader : public iLoaderPlugin
+class csProtoFactoryLoader : 
+  public scfImplementation2<csProtoFactoryLoader, 
+                            iLoaderPlugin,
+                            iComponent>
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
+
   csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE \
+  "plugins/mesh/protomesh/persist/standard/protomesh_factory.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csProtoFactoryLoader (iBase*);
 
@@ -58,28 +66,21 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csProtoFactoryLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 /**
  * Proto Mesh factory saver.
  */
-class csProtoFactorySaver : public iSaverPlugin
+class csProtoFactorySaver : 
+  public scfImplementation2<csProtoFactorySaver,
+                            iSaverPlugin,
+                            iComponent>
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csProtoFactorySaver (iBase*);
 
@@ -92,29 +93,27 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csProtoFactorySaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 /**
  * Proto Mesh loader.
  */
-class csProtoMeshLoader : public iLoaderPlugin
+class csProtoMeshLoader : 
+  public scfImplementation2<csProtoMeshLoader, 
+                            iLoaderPlugin,
+                            iComponent>
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
+
   csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE \
+  "plugins/mesh/protomesh/persist/standard/protomesh_meshobject.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csProtoMeshLoader (iBase*);
 
@@ -127,28 +126,21 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csProtoMeshLoader);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
 
 /**
  * Proto Mesh saver.
  */
-class csProtoMeshSaver : public iSaverPlugin
+class csProtoMeshSaver :
+  public scfImplementation2<csProtoMeshSaver,
+                            iSaverPlugin,
+                            iComponent>
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
   csRef<iSyntaxService> synldr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// Constructor.
   csProtoMeshSaver (iBase*);
 
@@ -161,14 +153,9 @@ public:
   /// Write down given object and add to iDocumentNode.
   virtual bool WriteDown (iBase *obj, iDocumentNode* parent,
   	iStreamSource*);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csProtoMeshSaver);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
 };
+
+} // namespace cspluginProtoMeshLoader
 
 #endif // __CS_PROTOMESHLDR_H__
 
