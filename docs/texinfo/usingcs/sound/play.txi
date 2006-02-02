@@ -5,44 +5,40 @@
 
 @subsubheading Playing a Sound Once
 
-You can create more than one source to have the same sound played multiple times at the same time. For instance if you have a shooting sound and you want your players to shoot at the same time and have the correct number of shooting sounds.
+You can create more than one source to have the same sound played
+multiple times at the same time. For instance if you have a shooting
+sound and you want your players to shoot at the same time and have the
+correct number of shooting sounds.
 
 @example
-#include "isound/handle.h"
-#include "isound/source.h"
-#include "isound/loader.h"
-#include "isound/source.h"
-#include "isound/renderer.h"
-#include "isound/wrapper.h"
+#include "isndsys/ss_source.h"
+#include "isndsys/ss_loader.h"
+#include "isndsys/ss_renderer.h"
+#include "isndsys/ss_manager.h"
+#include "imap/loader.h"
 
 @dots{}
 
 if (!csInitializer::RequestPlugins(object_reg,
 @dots{}
-CS_REQUEST_PLUGIN("crystalspace.sound.render.software", iSoundRender),
-CS_REQUEST_PLUGIN("crystalspace.sound.loader.multiplexer", iSoundLoader),
+CS_REQUEST_PLUGIN("crystalspace.sndsys.renderer.software", iSndSysRenderer),
+CS_REQUEST_PLUGIN("crystalspace.sndsys.element.loader", iSndSysLoader),
 CS_REQUEST_END))
 @dots{}
 
-iSoundRender *sndrdr = csQueryRegistry<iSoundRender> (object_reg);
+csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
+csRef<iSndSysRenderer> sndrdr = csQueryRegistry<iSndSysRenderer> (object_reg);
 if (sndrdr)
 @{
-  printf("iSoundRender loaded\n");
-  csRef<iSoundWrapper> w_boom = loader->LoadSound(<sound name>,<sound url>);
+  iSndSysWrapper* w_boom = loader->LoadSoundWrapper (<sound name>,
+  	<sound file>, CS_SND3D_DISABLE);
   if (w_boom)
   @{
     csRef<iSoundSource> sndsrc = w_boom->GetSound()->CreateSource(
-    	SOUND3D_ABSOLUTE);
-    sndsrc->Play();
+    	SOUND3D_DISABLE);
+    w_boom->GetStream ()->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
+    w_boom->GetStream ()->Unpause();
   @}
-  else
-  @{
-    printf("ERROR: SoundWrapper empty. \n");
-  @}
-@}
-else
-@{
-  printf("Error: no iSoundRender plugin\n");
 @}
 @end example
 
@@ -51,20 +47,15 @@ else
 Here is how you can play a looping sound:
 
 @example
-//Sound renderer
-csRef snd = csQueryRegistry<iSoundRender> (object_reg);
-if (snd)
+csRef<iSndSysRenderer> sndrdr = csQueryRegistry<iSndSysRenderer> (object_reg);
+if (sndrdr)
 @{
-  // "song" is the handle, songname is a const char* to the filename.
-  csRef<iSoundWrapper> w = loader->LoadSound("song",songname);
-  if (w)
+  iSndSysWrapper* w_music = loader->LoadSoundWrapper (<sound name>,
+  	<sound file>, CS_SND3D_DISABLE);
+  if (w_music)
   @{
-    // Declare 'music' as a csRef<iSoundSource> somewhere.
-    music = w->GetSound ()->Play (true);
-  @}
-  else
-  @{
-    printf("ERROR: Wrapper empty. \n");
+    w_boom->GetStream ()->SetLoopState (CS_SNDSYS_STREAM_LOOP);
+    w_boom->GetStream ()->Unpause();
   @}
 @}
 @end example

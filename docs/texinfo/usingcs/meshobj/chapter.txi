@@ -8,7 +8,36 @@ This section covers the Crystal Space Mesh Object plug-in system.  This is a
 very general system for defining various kinds of 3D objects and using them in
 the Crystal Space 3D engine.  There are already a number of mesh objects
 predefined in Crystal Space: particle systems like snow and fountain, 2D
-sprites, a general mesh and a ball, etc.
+sprites, a general mesh, etc.
+
+In practice you will probably want to use the following mesh objects
+in your own game:
+
+@itemize @bullet
+@item
+@samp{GenMesh} (@pxref{MeshObject Genmesh}). The genmesh object is one of the
+most useful mesh objects. You can use it for static data (walls, buildings,
+floor, @dots{}) or for dynamic data (moving objects). It supports multiple
+materials, vertex lighting, and even animation.
+@item
+@samp{Thing} (@pxref{MeshObject Thing}). The thing object is often used
+for static geometry (walls and buildings). It is currently the only object
+that supports lightmaps (although that will change in the future). It
+doesn't support animation and in general it is less suitable for moving
+objects.
+@item
+@samp{Terrain} (@pxref{MeshObject TerrFunc}). The terrain object is very
+useful if you want landscapes although you can do landscapes with genmesh
+too. But the terrain mesh object can do it more efficiently.
+@item
+@samp{SprCal3D} (@pxref{MeshObject SprCal3D}). The sprcal3d object is
+one of the options you have for animated skeletal models. Both Blender
+and 3DSMax can export @sc{cal3d} models. The other option is to use
+the genmesh skeletal animation system.
+@item
+@samp{Particles}. If you want particles then the particles mesh is
+the best choice.
+@end itemize
 
 In the first section a general overview is given on some of the concepts
 in the mesh object system.
@@ -30,12 +59,13 @@ Crystal Space supports.
 * HOWTO Create Genmesh:: Creating a Genmesh Mesh
 * HOWTO Mesh LightAnim:: Mesh Lighting and Animation
 * HOWTO Mesh Movement:: Mesh Movement
+* MeshObject Genmesh:: Genmesh Mesh Object
+* MeshObject Thing:: Thing Mesh Object
+* MeshObject TerrFunc:: Terrain Mesh Object
 * MeshObject Portal Container:: Portal Container Mesh Object
 * MeshObject Spr2D:: Sprite2D Mesh Object
 * MeshObject Spr3D:: Sprite3D Mesh Object
 * MeshObject SprCal3D:: SpriteCal3D Mesh Object
-* MeshObject Genmesh:: Genmesh Mesh Object
-* MeshObject Ball:: Ball Mesh Object
 * MeshObject Emit:: Emitter Mesh Object
 * MeshObject PartSys:: Particle Systems in General
 * MeshObject Fountain:: Fountain Mesh Object
@@ -45,8 +75,6 @@ Crystal Space supports.
 * MeshObject Explo:: Explosion Mesh Object
 * MeshObject Spiral:: Spiral Mesh Object
 * MeshObject Haze:: Haze Mesh Object
-* MeshObject TerrFunc:: Terrain Mesh Object
-* MeshObject Thing:: Thing Mesh Object
 @end menu
 
 @importss{usingcs,meshobj,concepts.txi}
@@ -56,12 +84,13 @@ Crystal Space supports.
 @importss{usingcs,meshobj,creategenmesh.txi}
 @importss{usingcs,meshobj,meshanim.txi}
 @importss{usingcs,meshobj,meshmove.txi}
+@importss{usingcs,meshobj,genmesh.txi}
+@importss{usingcs,meshobj,thing.txi}
+@importss{usingcs,meshobj,terrfunc.txi}
 @importss{usingcs,meshobj,portalcontainer.txi}
 @importss{usingcs,meshobj,spr2d.txi}
 @importss{usingcs,meshobj,spr3d.txi}
 @importss{usingcs,meshobj,sprcal3d.txi}
-@importss{usingcs,meshobj,genmesh.txi}
-@importss{usingcs,meshobj,ball.txi}
 @importss{usingcs,meshobj,emit.txi}
 @importss{usingcs,meshobj,partsys.txi}
 @importss{usingcs,meshobj,fountain.txi}
@@ -71,6 +100,4 @@ Crystal Space supports.
 @importss{usingcs,meshobj,explo.txi}
 @importss{usingcs,meshobj,spiral.txi}
 @importss{usingcs,meshobj,haze.txi}
-@importss{usingcs,meshobj,terrfunc.txi}
-@importss{usingcs,meshobj,thing.txi}
 

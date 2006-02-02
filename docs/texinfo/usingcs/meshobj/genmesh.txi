@@ -13,8 +13,10 @@
 @email{jorrit.tyberghein@@gmail.com}.}
 
 A Genmesh is a complex set of 3D triangles (just like a 3D sprite)
-that doesn't support any automatic animation (unlike a 3D sprite). In general
-genmeshes are ideal for high detailed objects.
+that normally doesn't support any automatic animation (unlike a 3D sprite)
+unless you use a genmesh animation plugin (@pxref{GenMesh Animation}).
+In general genmeshes are ideal for high detailed objects. Genmeshes also
+support multiple materials using submeshes.
 
 There is also a @sc{howto} discussing the creation of genmeshes.
 @xref{HOWTO Create Genmesh}.

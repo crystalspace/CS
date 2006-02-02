@@ -6,6 +6,18 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Feb-2006
+	- Jorrit did the following documentation updates:
+	    - Reorganized the 'The Basics' and 'Quick Overview' sections
+	      in the 'Using Crystal Space' chapter of the manual so that
+	      it becomes clearer.
+	    - Updated the landscape mesh documentation.
+	    - Updated the sound documentation.
+	    - Extended the documentation about engine concepts.
+	    - Removed the section about the ball mesh.
+	    - Added a stub for shader documentation.
+	    - Added a stub for renderloop documentation.
+	    - Many other small updates.
 1-Feb-2006
 	- res converted protomesh to new SCF.
 	- res fixed std_lighting_detail to work with per-vertex lighting.

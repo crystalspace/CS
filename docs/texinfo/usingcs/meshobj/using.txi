@@ -111,7 +111,7 @@ has a few conveniance functions you can use for that
 (@code{iEngine::CreateMeshwrapper()} and @code{iEngine::CreateMeshFactory()}).
 But here we show you the full way to create meshes from code:
 
-@itemize
+@itemize @bullet
 @item
 Load the Mesh Object Type with @code{csLoadPlugin} (preferably after
 checking if it is already loaded, by calling @code{csQueryPluginClass}).
@@ -145,48 +145,65 @@ For every instance of @samp{iMeshObject} you need to create a
 position and rotation (transformation).
 @end itemize
 
-Here is a code example for creating an instance of the ball plug-in.
+Here is a code example for creating an instance of the genmesh plug-in.
 
 @example
 void Initialize ()
 @{
   @dots{}
-  // Get the ball mesh object plug-in.
-  ball_type = csQueryPluginClass<iMeshObjectType> (this,
-    "crystalspace.mesh.object.ball");
-  if (!ball_type)
-    ball_type = csLoadPlugin<iMeshObjectType> (this,
-      "crystalspace.mesh.object.ball");
-  if (!ball_type)
-    Printf (CS_MSG_WARNING, "No ball type plug-in found!\n");
-  ball_factory = ball_type->NewFactory ();
+  // First create the factory:
+  csRef<iMeshFactoryWrapper> fact = engine->CreateMeshFactory (
+    "crystalspace.mesh.object.genmesh", "cubeFact");
+  csRef<iGeneralFactoryState> factstate = scfQueryInterface<iGeneralFactoryState> (
+    fact->GetMeshObjectFactory ());
+
+  csEllipsoid ellips (csVector3 (0, 0, 0), csVector3 (1, 1, 1));
+  factstate->GenerateSphere (ellips, 8);
+  factstate->CalculateNormals ();
   @dots{}
 @}
 @dots{}
 void SetupWorld ()
 @{
   @dots{}
-  // Make a ball using the ball plug-in.
-  csRef<iMeshObject> ballMesh = ball_factory->NewInstance ();
-  csRef<iBallState> ballState =
-    scfQueryInterface<iBallState> (ballMesh);
-  ballState->SetRadius (.5, .5, .5);
-  ballState->SetMaterialWrapper (material);
-  ballState->SetRimVertices (12);
-
+  // Make a ball using the genmesh plug-in.
   csRef<iMeshWrapper> ball =
-    engine->CreateMeshWrapper (ballMesh, "MyBall", room);
-  m.Identity ();
-  ball->GetMovable ().SetTransform (m);
-  ball->GetMovable ().SetPosition (csVector3 (-3, 5, -3));
-  ball->GetMovable ().UpdateMove ();
+    engine->CreateMeshWrapper (fact, "ball", room, csVector3 (-3, 5, -3));
+  csRef<iGeneralMeshState> ballstate = scfQueryInterface<iGeneralMeshState> (
+    ball->GetMeshObject ());
+  ballstate->SetMaterialWrapper (myMaterial);
   @dots{}
 @}
 @end example
 
 This example will load a ball using the plug-in and place it at (-3,5,-3) in
-@samp{room}.  It will also make sure that it will be lit by the 10 closest
-lights.
+@samp{room}.
 
-@samp{iBallState} is the state interface for setting the characteristics of
-ball Mesh Objects.
+@code{iGeneralFactoryState} and @code{iGeneralMeshState} are the state
+interfaces for setting the characteristics of genmesh Mesh Objects.
+
+@anchor{Generic Mesh Creation Code}
+@subsubheading Generic Mesh Creation Code
+
+In general you should use the following code to create any kind of mesh:
+
+@example
+  // First create the factory:
+  csRef<iMeshFactoryWrapper> fact = engine->CreateMeshFactory (
+	"crystalspace.mesh.object.meshtype", "factoryName");
+  csRef<iMeshtypeFactoryState> factstate = scfQueryInterface<
+  	iMeshtypeFactoryState> (fact->GetMeshObjectFactory ());
+  @dots{}
+  // Then make one or more meshes:
+  csRef<iMeshWrapper> mesh = engine->CreateMeshWrapper (
+  	fact, "meshName", sector, csVector3 (-3, 5, -3));
+  csRef<iMeshtypeObjectState> meshstate = scfQueryInterface<
+  	iMeshtypeObjectState> (mesh->GetMeshObject ());
+  @dots{}
+@end example
+
+Replace @samp{meshtype} with the correct mesh type (like @samp{genmesh},
+@samp{thing}, @dots{}). Replace @code{iMeshtypeFactoryState} with the
+correct factory state and @code{iMeshtypeObjectState} with the correct
+object state.
+

@@ -6,61 +6,29 @@
 @cindex @code{iMeshObject}
 @cindex @code{iMeshObjectFactory}
 @cindex @code{iMeshObjectType}
-@cindex @code{iTerrFuncState}
+@cindex @code{iTerrainObjectState}
+@cindex @code{iTerrainFactoryState}
 
 @emph{Written by Jorrit Tyberghein,
 (@email{jorrit.tyberghein@@gmail.com}).}
 
-@strong{THIS MANUAL SECTION IS HEAVILY OUTDATED!}
+This mesh object represents a landscape engine. The basic idea is that
+the entire landscape is represented by a two dimensional heightmap.
+This heighmap typically comes from a heightmap image file but it can also
+come from other sources.
 
-This mesh object represents a landscape engine. It features four static
-@sc{lod} levels and dynamic lighting for one directional light. In future
-it will also have support for dynamic shadows but this is still a todo
-at this moment.
-
-The basic principle behind the terrain engine is that the entire terrain
-is divided in a number of blocks. Usually this is equal to 8x8 blocks
-for the terrain but this is something that you can control. The division
-into blocks is important for three reasons. The first reason is that @sc{lod}
-selection happens on a block level. i.e. every block is shown at one level
-of @sc{lod} independent from the other blocks. The second reason is that
-visibility culling for terrain engine also works on block granularity (also
-the visibility algo itself goes deeper for doing the actual tests). The
-last reason for the blocks is that every block can have a separate texture.
-This is important because some hardware has texture limitations and you
-often want to overlay a very big texture on a landscape. Since very block
-has its own texture you can do this easily.
-
-The terrain engine is based on a height function (as opposed to a heightmap
-alone). Support for heightmaps is provided too by converting a heightmap
-to a height function. But in general you can feed the terrain engine with
-any function @code{height=heightfunc(x,y)}. You can also optionally give
-a normal function. If not given the landscape engine will calculate normals
-from the height function automatically.
-
-Every block is further divided into a grid. For example, with a grid
-of 16x16 every block will have 16x16 quads or 16x16x2 triangles at the
-highest detail level. The combination of blocks and grids control how
-many triangles the entire terrain will have.
-
-The terrain engine supports four levels of @sc{lod} which it will use
-independently for every block. Level 0 is highest detail. You can control
-the distance at which every @sc{lod} level kicks in and you can also
-control the quality of every level.
-
-The terrain engine supports a visibility algorithm based on a quad-tree.
-The visibility algorithm will cull away geometry on a blocks level (i.e.
-either an entire block is visible or not). But internally it will use
-a quad-tree which can (and should) go deeper than the blocks resolution
-to make sure that the visibility testing is fine enough.
-
-Every block has its own texture. You can use a big texture and split it
-into individual parts. One part for every block. Crystal Space also has
-a texture generation utility which is able to create realistic terrain
-textures given several base textures and a heightmap.
-
-The terrain engine also supports one colored directional light without
-shadows. In the future we will have support for dynamic shadows.
+It features:
+@itemize @bullet
+@item
+Automatic lod.
+@item
+Splatting: having multiple detail materials selected with a material palette
+and smooth transitions between the different materials.
+@item
+Static precalculated lighting with shadows.
+@item
+Dynamic lighting using bumpmapping and similar techniques.
+@end itemize
 
 @subsubheading Basic Structure
 
@@ -68,15 +36,15 @@ The following @sc{scf} class names are used (for @code{csLoadPlugin}):
 
 @itemize @bullet
 @item
-Type plugin: @samp{crystalspace.mesh.object.terrfunc}
+Type plugin: @code{crystalspace.mesh.object.terrain.bruteblock}
 @item
-Loader plugin: @samp{crystalspace.mesh.loader.terrfunc}
+Loader plugin: @code{crystalspace.mesh.loader.terrain}
 @item
-Factory loader plugin: @samp{crystalspace.mesh.loader.factory.terrfunc}
+Factory loader plugin: @code{crystalspace.mesh.loader.factory.terrain}
 @end itemize
 
-Objects in this plugin implement the following @sc{scf} interfaces (get
-with @code{scfQueryInterface}):
+Objects in this plugin implement the following @sc{scf} interfaces, which you
+can retrieve with @code{scfQueryInterface}:
 
 @itemize @bullet
 @item
@@ -85,16 +53,18 @@ with @code{scfQueryInterface}):
 @item
 Implements @samp{iMeshObject}
 @item
-Implements @samp{iTerrFuncState}
+Implements @samp{iTerrainObjectState}
 @end itemize
 @item
 @emph{MeshObjectFactory}
 @itemize @bullet
 @item
 Implements @samp{iMeshObjectFactory}
+@item
+Implements @samp{iTerrainFactoryState}
 @end itemize
 @item
-@emph{MeshObjectFactory}
+@emph{MeshObjectType}
 @itemize @bullet
 @item
 Implements @samp{iMeshObjectType}
@@ -103,122 +73,233 @@ Implements @samp{iMeshObjectType}
 
 @subsubheading Factory State Interface
 
-This plugin has no factory state interface.
-
-@subsubheading Factory Loader
-
-The fire mesh factory loader has no parameters.
+Use the @samp{iTerrainFactoryState} @sc{scf} interface to access settings for
+a terrain factory.  The definition of this interface can be found in
+@file{CS/include/imesh/terrain.h} and that is also the include file you need
+to include in your applications to use this plugin.  Using this interface you
+can access the terraformer and sample area for a terrain factory.
 
 @subsubheading Object State Interface
 
-@samp{iTerrFuncState} is the @sc{scf} interface that you can
-use to set/get settings for a landscape object. The definition of this
-interface can be found in @file{CS/include/imesh/terrfunc.h} and that's also
-the include file you need to include in your applications to use this plugin.
-Using this interface you can access the terrain parameters.
+@samp{iTerrainObjectState} (residing in @file{CS/include/imesh/terrain.h})
+is the @sc{scf} interface that you can use to manipulate settings for a terrain
+object.  By using this interface you can access the base material, material
+palette, and various other settings for the terrain object.
 
-@subsubheading Object Loader
+@subsubheading How Does it Work
 
-The terrain loader recognizes the following keywords:
+The easiest way to explain how the landscape engine works is to show
+an example world file:
 
-@table @code
-@item <factory>factoryName</factory>
-Name of the factory to use for creation of this instance.
-@item <material index="" />
-The material to use for the given block of the terrain. The
-block number is 0 to the total number of blocks (see the
-@samp{blocks} command).
-@item <material>materialName</material>
-The material to use for all blocks of the terrain.
-@item <material start="" end="">materialName%d</material>
-@samp{materialName} is a @code{printf} style string
-containing a @code{%d} to indicate the number used for the material
-name. @samp{start} and @samp{end} indicate the range of materials
-to set (block numbers).
-@item <correctseams w="" h="" />
-When the given materials are split from a big texture you can use
-@samp{correctseams} to make sure the textures line up correctly at
-the borders of blocks. Here is an example. Given a terrain of 8x8
-blocks (64 total) and given a texture size of 128x128 for every block
-you would have to generate a total big texture with horizontal and
-vertical dimensions equal to @code{(partsize-2)*8+2}. In this case (with
-partsize equal to 128) this would mean a total texture of 1010x1010 where
-every block gets a 128x128 texture where the borders are shared with the
-adjacent block (hence the 126x126 that is really allocated for one block).
-If you follow these guidelines you can then use @code{<correctseams w="128" h="128" />}
-and you will have perfectly aligned textures for all 8x8 blocks.
-@item <blocks x="" y="" />
-The number of blocks in horizontal and vertical direction. Blocks are
-important for visibility culling and @sc{lod} selection because these happen
-on a block level. So you should use enough blocks to make sure that
-everything works smoothly. 8x8 is probably a good bet in most cases.
-4x4 is a default though.
-Warning! Due to a current limitation in the terrain
-engine the number of horizontal blocks must be equal to the number of
-vertical blocks.
-@item <grid x="" y="" />
-With @samp{grid} you control the highest detail resolution of every
-block. For example @code{<grid x="16 y="16" />} means that every block will use
-16x16 quads (or 16x16x2 triangles) at highest detail. The default value
-for @samp{grid} is 8x8.
-@item <topleft x="" y="" z="" />
-The top-left coordinate of the terrain. By default this is (0,0,0).
-For @samp{x} and @samp{z} the terrain will be generated from 0 to
-@samp{xblocks-1} and @samp{yblocks-1} respectively. Use @samp{scale}
-to scale this first and then use @samp{topleft} to relocate.
-The @samp{y} value in @samp{topleft} will be added to the height
-function (after scaling).
-@item <scale x="" y="" z="" />
-Scale the entire terrain. @samp{x} and @samp{z} will scale the
-default 0 to @samp{xblocks-1} and @samp{yblocks-1}. The @samp{y}
-scale will be used to multiply with the value from the height function.
-@item <color red="" green="" blue="" />
-This is the base color which will be added to all triangle of the
-terrain. Consider this a kind of ambient lighting. Default is black.
-Full bright would be @code{1,1,1}.
-@item <dirlight>
 @example
-	<position x="" y="" z="" />
-	<color red="" green="" blue="" />
-</dirlight>
+<world>
+  <textures>
+    <texture name="andrew_marble4.jpg">
+      <file>/lib/stdtex/andrew_marble4.jpg</file>
+    </texture>
+    <texture name="stone4.gif">
+      <file>/lib/std/stone4.gif</file>
+    </texture>
+    <texture name="grass.png">
+      <file>/lev/terrain/grass.png</file>
+    </texture>
+    <texture name="materialmap_base.png">
+      <file>/lev/terrain/materialmap_base.png</file>
+    </texture>
+  </textures>
+
+  <shaders>
+    <shader><file>/shader/terrain_fixed_base.xml</file></shader>
+    <shader><file>/shader/terrain_fixed_splatting.xml</file></shader>
+  </shaders>
+
+  <materials>
+    <material name="Base">
+      <texture>materialmap_base.png</texture>
+      <shader type="ambient">terrain_fixed_base</shader>
+    </material>
+    <material name="Marble">
+      <texture>andrew_marble4.jpg</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+    <material name="Stone">
+      <texture>stone4.gif</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+    <material name="Grass">
+      <texture>grass.png</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+  </materials>
+
+  <addon>
+    <plugin>crystalspace.renderloop.loop.loader</plugin>
+    <paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>
+  </addon>
+    
+  <settings>
+    <clearzbuf>yes</clearzbuf>
+    <renderloop>std_rloop_terrainfixed</renderloop>
+  </settings>
+
+  <start>
+    <sector>room</sector>
+    <position x="0" y="30" z="0" />
+  </start>
+
+  <addon plugin="crystalspace.terraformer.simple.loader">
+    <name>simple</name>
+    <heightmap>/lev/terrain/heightmap_257x257.png</heightmap>
+    <scale x="256" y="32" z="256" />
+  </addon>
+
+  <meshfact name="TerrainFact">
+    <plugin>crystalspace.mesh.loader.factory.terrain</plugin>
+    <params>
+      <plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>
+      <terraformer>simple</terraformer>
+      <sampleregion>
+        <min x="-256" y="-256" />
+        <max x="256" y="256" />
+      </sampleregion>
+    </params>
+  </meshfact>
+
+  <sector name="room">
+     <light name="sun">
+       <center x="-50000" y="86030" z="0" />
+       <color red="0.85903" green="0.80995" blue="0.70420" />
+       <radius>1000000</radius>
+     </light>
+
+    <meshobj name="Terrain">
+      <plugin>crystalspace.mesh.loader.terrain</plugin>
+      <params>
+        <factory>TerrainFact</factory>
+        <material>Base</material>
+	<materialpalette>
+	  <material>Grass</material>
+	  <material>Marble</material>
+	  <material>Stone</material>
+	</materialpalette>
+	<lodvalue name="splatting distance">200</lodvalue>
+  	<lodvalue name="block resolution">16</lodvalue>
+  	<lodvalue name="block split distance">8</lodvalue>
+  	<lodvalue name="minimum block size">32</lodvalue>
+  	<lodvalue name="cd resolution">256</lodvalue>
+	<materialmap image="/lev/terrain/materialmap.png" />
+	<staticlighting>yes</staticlighting>
+	<castshadows>yes</castshadows>
+      </params>
+    </meshobj>
+  </sector>
+</world>
 @end example
-Set a directional light. @code{x,y,z} is a normal vector for the light.
-@code{red,green,blue} is the color of the light.
-@item <loddist level="" distance="" />
-Set the distance at which we switch to the given @sc{lod} level. @sc{lod}
-level 0 (highest detail) is always used for very close viewpoints but you
-can control distance for levels 1, 2, and 3. Default values are 100,
-400, and 800 for the three levels. Note that @sc{lod} happens on a
-block basis so for every block the distance here will be used to see
-what @sc{lod} level to select.
-@item <lodcost level="" cost="" />
-Set the cost factor to use for going from the previous @sc{lod} level
-to the new one. High values for @samp{cost} mean that more triangles
-will be removed (i.e. better @sc{lod} but worse quality). The default
-values are @code{0.03}, @code{0.08}, and @code{0.2}. So @samp{loddist}
-controls at which distance a new @sc{lod} level is selected while
-@samp{lodcost} controls the quality of every @sc{lod} level. The base
-quality (i.e. highest quality) of every block is controlled with the
-@samp{grid} command.
-@item <quaddepth>quaddepthValue</quaddepth>
-Control the depth of the quad-tree which is used for visibility culling.
-This depth is measured from the entire terrain. Usually you make sure
-that the depth is high enough so that individual blocks are at least
-sub-divided about three extra times. i.e. given a terrain with 8x8 blocks
-you would probably want to use a depth of six (which is default). Higher
-quadtree depth's will increase the cost of visibility culling but also
-increase the accuracy. So a higher depth will be more important for a
-slow renderer (software renderer for example).
-@item <vistest />
-Enable or disable visibility culling. Default is on.
-@item <heightmap>
-@example
-	<image>imageFile</image>
-	<scale>scaleValue</scale>
-	<shift>shiftValue</shift>
-</heightmap>
-@end example
-Use the given image file as a heightmap for the landscape. Values from
-this heightmap will go between 0 and 256. You can alter the range by
-playing with @samp{scale} (default 1) and @samp{shift} (default 0).
-@end table
+
+@subsubheading Textures and Materials
+
+In the first part of this world file we define the textures as used
+by the landscape mesh. In this particular example we use
+@file{materialmap_base.png} as the base material. This is the material that
+is going to be used for the landscape in the distance. The three other
+textures are individual textures that are going to be used by the splatting
+algorithm (more on that later).
+
+In this particular example we use the @file{terrain_fixed_base.xml} and
+@file{terrain_fixed_splatting.xml} shaders. This means that we use simple
+static lighting (needs a @samp{-relight}). Other options here are the
+@file{splatting_base.xml} and related shaders which allow for fully dynamic
+lighting and bumpmapping.
+
+We need to define four materials. One material for the base material so
+that one uses the @samp{terrain_fixed_base} shader. The three others will
+be used by the splatting algorithm so they need the
+@samp{terrain_fixed_splatting} shader. Using the @samp{texture scale}
+shader variable you can control the scale of these textures as used on the
+terrain.
+
+@subsubheading Level Setup
+
+Because we need the @samp{terrain_fixed_base} shaders we also need the
+@file{std_rloop_terrainfixed.xml} renderloop. This renderloop works together
+with the fixed terrain shaders. It also supports rendering of normal
+software vertex lighted meshes and meshes using lightmaps so you can easily
+put other objects on the landscape.
+
+@subsubheading Heightmap Data
+
+The landscape engine uses a terraformer plugin to get the heightmap
+data from. Currently there is only one terraformer which loads heightmap
+data from a normal image. Using the
+@samp{crystalspace.terraformer.simple.loader} terraformer plugin loader
+we can load the heightmap data (@file{heightmap_257x257.png}) and
+give it the name @samp{simple}. Using the @samp{scale} keyword we can
+scale it to the right dimensions as needed for the landscape engine.
+
+@subsubheading Mesh Factory
+
+In the mesh factory of the landscape engine we say which terraformer we
+are going to use (i.e. @samp{simple} in this case) and also where we will
+sample the terraformer. In the terraformer itself we scaled the heightmap
+data to the right dimensions. But in the factory we decide which region
+we will actually use for geometry.
+
+@subsubheading Mesh Object
+
+Finally we need the actual mesh object representing the landscape.
+Here we say what the base material is that we will use and we also setup
+the material palette. In our case we use a palette as follows:
+
+@itemize @bullet
+@item
+@samp{Grass}: index 0
+@item
+@samp{Marble}: index 1
+@item
+@samp{Stone}; index 2
+@end itemize
+
+This palette is used in combination with a materialmap (@file{materialmap.png}).
+The materialmap is an indexed image which tells the landscape engine which
+material should be used on every triangle of the terrain. In addition the
+following flags are set here:
+
+@itemize @bullet
+@item
+@samp{splatting distance}: this is the distance at which it stops using
+splatting and switches to the base material. Making this lower will cause
+the landscape to be less detailed (less detailed material) but it will run
+faster.
+@item
+@samp{block resolution}: this controls the internal resolution of the blocks.
+@item
+@samp{block split distance}: unknown?
+@item
+@samp{minimum block size}: unknown?
+@item
+@samp{cd resolution}: this is a current hack to control the resolution
+of the triangle mesh used for collision detection. The default is 256 which
+means that a mesh of 256x256x2 triangles will be used. Larger values will
+result in more accurate collision detection (no sinking through floor) but
+slower and more memory usage.
+@item
+@samp{staticlighting}: enable this if you want to use static lighting (using
+@samp{-relight}).
+@item
+@samp{castshadows}: enable this if you want to enable shadow casting for
+other objects on this terrain. This is only used in combination with
+static lighting.
+@end itemize
+
+@subsubheading Using From Code
+
+It is also possible to use the landscape mesh from code. Use the state
+interfaces @code{iTerrainFactoryState} and @code{iTerrainObjectState}
+with the @samp{terrain} mesh type using the generic mesh generation code
+(@pxref{Generic Mesh Creation Code}).
+
+TODO: add more information here.
+

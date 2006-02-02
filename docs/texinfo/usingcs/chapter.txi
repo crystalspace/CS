@@ -8,7 +8,6 @@ own 3D applications.
 
 @menu
 * The Basics::
-* Plug-In Overview:: Quick Overview
 * Tutorials::
 * SCF Chapter:: Plugins, Reference counting, Interfaces (SCF)
 * Options:: Configuring Crystal Space
@@ -32,7 +31,6 @@ own 3D applications.
 @end menu
 
 @imports{usingcs,basics.txi}
-@imports{usingcs,pluginoverview.txi}
 @importss{usingcs,tutorials,chapter.txi}
 @importss{usingcs,scf,chapter.txi}
 @importss{usingcs,configuration,chapter.txi}
