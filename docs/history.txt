@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Feb-2006
+	- iceeey made CEGUI wrapper inject time pulses into CEGUI. These are
+	  used in CEGUI for things like tooltip timers.
 2-Feb-2006
 	- Jorrit did the following documentation updates:
 	    - Reorganized the 'The Basics' and 'Quick Overview' sections

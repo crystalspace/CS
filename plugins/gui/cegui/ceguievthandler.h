@@ -30,6 +30,7 @@
 #include "csutil/set.h"
 
 struct iObjectRegistry;
+struct iVirtualClock;
 
 class csCEGUIRenderer;
 
@@ -49,6 +50,9 @@ public:
   /// Handle unhandled events (like broadcast messages).
   bool OnUnhandledEvent (iEvent &event);
 
+  /// Handle frame events.
+  void Frame ();
+
   /// Handle mouse down events.
   bool OnMouseDown (iEvent &event);
 
@@ -66,6 +70,7 @@ public:
 private:
   iObjectRegistry *obj_reg;
   csCEGUIRenderer* renderer;
+  csRef<iVirtualClock> vc;
   csRef<iKeyComposer> compose;
   csSet<utf32_char> caughtCharKeys;
   csEventID CanvasResize;

@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 
 #include "iutil/objreg.h"
+#include "iutil/virtclk.h"
 #include "csutil/event.h"
 #include "csutil/csinput.h"
 
@@ -32,9 +33,10 @@ csCEGUIEventHandler::csCEGUIEventHandler (iObjectRegistry *reg,
 {
   obj_reg = reg;
   renderer = owner;
-  csRef<iKeyboardDriver> kbd = csQueryRegistry<iKeyboardDriver> (reg);
+  vc = csQueryRegistry<iVirtualClock> (obj_reg);
+  csRef<iKeyboardDriver> kbd = csQueryRegistry<iKeyboardDriver> (obj_reg);
   compose = kbd->CreateKeyComposer ();
-  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (obj_reg, iGraphics2D);
+  csRef<iGraphics2D> g2d = csQueryRegistry <iGraphics2D> (obj_reg);
   CanvasResize = csevCanvasResize (obj_reg, g2d);
 }
 
@@ -59,6 +61,11 @@ bool csCEGUIEventHandler::OnUnhandledEvent (iEvent &event)
   }
 
   return false;
+}
+
+void csCEGUIEventHandler::Frame ()
+{
+  CEGUI::System::getSingletonPtr()->injectTimePulse ((float) vc->GetElapsedTicks () / 1000.0f);
 }
 
 CEGUI::MouseButton csCEGUIEventHandler::CSMBtoCEMB (uint button)
