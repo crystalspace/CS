@@ -50,6 +50,8 @@ class AppMazing;
 #define ROTATECAMERA_SPEED 3.0	// Speed to rotate with.
 #define PLAYER_SIZE 2.0
 
+// These numbers define the position of the specific portal
+// for the CreateRoom() function.
 #define PORTAL_UP 0
 #define PORTAL_DOWN 1
 #define PORTAL_LEFT 2
@@ -61,22 +63,9 @@ class RoomCoordinate
 {
 public:
   int x, y, z;
-  RoomCoordinate ()
-  {
-    x = y = z = 0;
-  }
-  RoomCoordinate (int x, int y, int z)
-  {
-    RoomCoordinate::x = x;
-    RoomCoordinate::y = y;
-    RoomCoordinate::z = z;
-  }
-  RoomCoordinate (const RoomCoordinate& rc)
-  {
-    x = rc.x;
-    y = rc.y;
-    z = rc.z;
-  }
+  RoomCoordinate () : x (0), y (0), z (0) { }
+  RoomCoordinate (int x, int y, int z) : x (x), y (y), z (z) { }
+  RoomCoordinate (const RoomCoordinate& rc) : x (rc.x), y (rc.y), z (rc.z) { }
 # ifdef CS_DEBUG
   static bool IsValid (int x, int y, int z)
   {

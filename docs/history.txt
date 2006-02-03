@@ -17,6 +17,8 @@ chronological order.
 	- Jorrit added a mazing tutorial. This is a more or less full but
 	  small game. Soon I will write a section in the manual dedicated
 	  to explaining this tutorial step by step.
+	- Jorrit added the first version of the mazing tutorial to the
+	  documentation. Not yet finished.
 2-Feb-2006
 	- Jorrit did the following documentation updates:
 	    - Reorganized the 'The Basics' and 'Quick Overview' sections

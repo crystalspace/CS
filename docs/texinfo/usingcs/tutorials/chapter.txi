@@ -26,8 +26,10 @@ Using gcc based compiler (MingW or GNU/Linux based) (@pxref{HOWTO CS Project}).
 * Tutorial Simple:: Simple Tutorial 1: Basic Setup, World Creation
 * Tutorial Simple 2:: Simple Tutorial 2: Adding a Mesh
 * Tutorial Simple Map:: Simple Tutorial 3: Map Loading, Collision Detection
+* Tutorial Mazing:: Mazing Tutorial: Small Game
 @end menu
 
 @importss{usingcs,tutorials,simple.txi}
 @importss{usingcs,tutorials,simple2.txi}
 @importss{usingcs,tutorials,simpmap.txi}
+@importss{usingcs,tutorials,mazing.txi}
