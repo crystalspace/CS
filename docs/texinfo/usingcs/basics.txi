@@ -262,7 +262,7 @@ Now that you have learned some basics about the Crystal Space environment,
 you can try writing your first program.
 
 @node TutIntro Plugin Overview, Tutorials, The Basics, Using Crystal Space
-@section Plugin Overview
+@subsection Plugin Overview
 @cindex Plugin List
 @cindex Plugin Overview
 
