@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Thing, , MeshObject TerrFunc, MeshObject
+@node MeshObject Thing, MeshObject TerrFunc, MeshObject Genmesh, MeshObject
 @subsection Thing Mesh Object
 @cindex MeshObject
 @cindex Thing

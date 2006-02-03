@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject TerrFunc, MeshObject Thing, MeshObject Haze, MeshObject
+@node MeshObject TerrFunc, MeshObject Portal Container, MeshObject Thing, MeshObject
 @subsection Terrain Mesh Object
 @cindex MeshObject
 @cindex Terrain Engine

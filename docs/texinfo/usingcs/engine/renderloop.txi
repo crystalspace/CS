@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Renderloops, , Dynamic Worlds, Engine
+@node Renderloops, HOWTO Render Priorities, World Components, Engine
 @subsection Renderloops
 @cindex renderloop
 @cindex @code{iRenderLoop}

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Tutorials, SCF Chapter, Plug-In Overview, Using Crystal Space
+@node Tutorials, SCF Chapter, TutIntro Plugin Overview, Using Crystal Space
 @section Tutorials
 @cindex Tutorials
 

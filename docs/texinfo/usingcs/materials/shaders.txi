@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Shaders, Texture Mapping, Materials, Materials
+@node Shaders, Alpha Textures, Materials, Materials
 @subsection Shaders
 @cindex shader
 @cindex @code{iShader}

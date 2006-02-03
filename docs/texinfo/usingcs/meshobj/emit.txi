@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Emit, MeshObject PartSys, MeshObject Ball, MeshObject
+@node MeshObject Emit, MeshObject PartSys, MeshObject SprCal3D, MeshObject
 @subsection Emitter Mesh Object
 @cindex MeshObject
 @cindex Emitter Particle System

@@ -7,7 +7,8 @@ In this chapter you can find all information related to using Crystal Space for 
 own 3D applications.
 
 @menu
-* The Basics::
+* The Basics:: Basics and Overview
+* TutIntro Plugin Overview:: Plugin Overview
 * Tutorials::
 * SCF Chapter:: Plugins, Reference counting, Interfaces (SCF)
 * Options:: Configuring Crystal Space

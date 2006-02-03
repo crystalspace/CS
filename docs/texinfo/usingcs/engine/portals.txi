@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Portal Engine, Cameras and Matrices, World Components, Engine
+@node Portal Engine, Cameras and Matrices, HOWTO Render Priorities, Engine
 @subsection Portal Engine
 @cindex Portal Engine
 @cindex @code{iPortal}

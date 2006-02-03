@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node The Basics, Plug-In Overview, Using Crystal Space, Using Crystal Space
+@node The Basics, TutIntro Plugin Overview, Using Crystal Space, Using Crystal Space
 @section Basics and Overview
 @cindex Object Registry
 @cindex Plugin Manager
@@ -16,14 +16,9 @@ Crystal Space phylosophy.
 
 @menu
 * TutIntro Plugins and Modules:: Plugins and Modules
-* TutIntro Plugin Overview:: Plugin Overview
-* TutIntro Basic Concepts:: Basic Crystal Space Concepts
-* TutIntro Basic Engine Concepts:: Basic Engine Concepts
-* TutIntro Minimum Requirements:: Minimum Application Requirements
-* TutIntro Compilation:: Compiling the Application
 @end menu
 
-@node TutIntro Plugins and Modules, TutIntro Minimum Requirements, The Basics, The Basics
+@node TutIntro Plugins and Modules, , The Basics, The Basics
 @subsection Plugins and Modules
 @cindex Plugins and Modules
 
@@ -373,7 +368,7 @@ like output console, standard output, and so on).
 
 @end itemize
 
-@node TutIntro Basic Concepts, TutIntro Minimum Requirements, The Basics, The Basics
+@node TutIntro Basic Concepts, TutIntro Basic Engine Concepts, TutIntro Plugin Overview, TutIntro Plugin Overview
 @subsection Basic Crystal Space Concepts
 @cindex Basic Crystal Space Concepts
 @cindex Simple Tutorial
@@ -537,7 +532,7 @@ get the application running. In the tutorial below we will use several of the
 functions from @samp{csInitializer}. This class contains only static member
 functions.
 
-@node TutIntro Basic Engine Concepts, TutIntro Minimum Requirements, The Basics, The Basics
+@node TutIntro Basic Engine Concepts, TutIntro Minimum Requirements, TutIntro Basic Concepts, TutIntro Plugin Overview
 @subsection Basic Engine Concepts
 @cindex Basic Engine Concepts
 @cindex Simple Tutorial
@@ -547,7 +542,7 @@ framework. In this section we explain the basic concepts of the engine. These
 are the concepts that you have to work with to make your 3D game data.
 (@pxref{World Components}).
 
-@node TutIntro Minimum Requirements, TutIntro Compilation, TutIntro Basic Concepts, The Basics
+@node TutIntro Minimum Requirements, TutIntro Compilation, TutIntro Basic Engine Concepts, TutIntro Plugin Overview
 @subsection Minimum Application Requirements
 @cindex Tutorial Minimum Application Requirements
 @cindex Minimum Application Requirements, Tutorial
@@ -579,7 +574,7 @@ int main(int argc, char const* argv[]);
 Following these guidelines will help to ensure that your application builds
 and runs on all platforms supported by Crystal Space.
 
-@node TutIntro Compilation, , TutIntro Minimum Requirements, The Basics
+@node TutIntro Compilation, , TutIntro Minimum Requirements, TutIntro Plugin Overview
 @subsection Compiling the Application
 @cindex Compiling an Application, Tutorial
 
