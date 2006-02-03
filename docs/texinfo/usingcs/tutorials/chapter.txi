@@ -7,10 +7,25 @@ This chapter contains various tutorial to help you quickly familiarize
 yourself with the various aspects of the Crystal Space development
 environment.
 
+Note, these tutorials only talk about the coding issues when working
+on Crystal Space applications. They don't talk about how to build the
+tutorials as that is specific to the operating system and compiler
+that you use. Here is a list of where you should go in the manual to
+find information about this:
+
+@itemize @bullet
+@item
+For MSVC 7 or higher (@pxref{HOWTO Creating External MSVC 7 Application}).
+@item
+Using Dev-@sc{cpp} (@pxref{HOWTO CS Project DevCPP}).
+@item
+Using gcc based compiler (MingW or GNU/Linux based) (@pxref{HOWTO CS Project}).
+@end itemize
+
 @menu
-* Tutorial Simple:: Simple Tutorial 1
-* Tutorial Simple 2:: Simple Tutorial 2: Sprites
-* Tutorial Simple Map:: Simple Tutorial 3: Map Loading
+* Tutorial Simple:: Simple Tutorial 1: Basic Setup, World Creation
+* Tutorial Simple 2:: Simple Tutorial 2: Adding a Mesh
+* Tutorial Simple Map:: Simple Tutorial 3: Map Loading, Collision Detection
 @end menu
 
 @importss{usingcs,tutorials,simple.txi}

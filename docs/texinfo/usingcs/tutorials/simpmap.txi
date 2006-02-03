@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Tutorial Simple Map, , Tutorial Simple 2, Tutorials
-@subsection Simple Tutorial 3: Map Loading
+@subsection Simple Tutorial 3: Map Loading, Collision Detection
 @cindex Tutorial, Simple
 @cindex Simple Tutorial
 
@@ -8,6 +8,20 @@ This tutorial continues on tutorial one. Here we will learn how to load a map
 from a file instead of creating the geometry programmatically. You can find a
 fully-commented version of this tutorial's source code in the Crystal Space
 source directory at @file{CS/apps/tutorial/simpmap}.
+
+This tutorial features (in addition to what is explained in simple1 tutorial):
+@itemize @bullet
+@item
+Creating geometry by loading a map file using @code{iLoader::LoadMap()}.
+@item
+Setting up collision detection for the loaded map using
+@code{csColliderHelper::InitializeCollisionWrappers()}.
+@item
+Doing movement and collision detection using the @code{csColliderActor} class.
+@item
+Finding a starting position in the map file using
+@code{iEngine::GetCameraPositions()}.
+@end itemize
 
 @menu
 * Simple Base Code:: Minimal Base Code

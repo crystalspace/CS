@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Tutorial Simple, Tutorial Simple 2, Tutorials, Tutorials
-@subsection Simple Tutorial 1
+@subsection Simple Tutorial 1: Basic Setup, World Creation
 @cindex Tutorial, Simple
 @cindex Simple Tutorial
 
@@ -40,6 +40,32 @@ documentation.
 
 Before reading this tutorial you should first read the basics
 (@pxref{The Basics}).
+
+This tutorial features:
+@itemize @bullet
+@item
+Basic setup of a Crystal Space application using @code{csApplicationFramework}.
+@item
+Setting up the application event handler using @code{csBaseEventHandler}.
+@item
+Using events to draw 3D frame and listen to keyboard so we can quit
+the application.
+@item
+Loading of the basic plugins needed to get the engine going using
+@code{csInitializer::RequestPlugins()}.
+@item
+Creating of the 3D window.
+@item
+Loading of a texture and material using @code{iLoader::LoadTexture()}.
+@item
+Creation of a simple room using @code{iEngine::CreateSector()} and
+@code{iEngine::CreateSectorWallsMesh()}. Also adding a few lights so
+that everything is visible.
+@item
+Creation of a view (@code{csView} class) and a camera.
+@item
+Basic movement using the keyboard.
+@end itemize
 
 @menu
 * Simple Header File::

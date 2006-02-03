@@ -1,13 +1,28 @@
 @c -*-texinfo-*-
 @node Tutorial Simple 2, Tutorial Simple Map, Tutorial Simple, Tutorials
-@subsection Simple Tutorial 2: Sprites
+@subsection Simple Tutorial 2: Adding a Mesh
 @cindex Tutorial, Simple, Sprite, VFS, Texture
 @cindex Simple Tutorial 2
 
 This tutorial continues on the Simple Tutorial (@pxref{Tutorial Simple}).
 In this tutorial we explain a bit about @sc{vfs}, texture management, and
-how you can add a simple sprite to the room.
+how you can add a simple mesh to the room.
 
+This tutorial features (in addition to what is explained in simple1 tutorial):
+@itemize @bullet
+@item
+Loading a 3D sprite mesh factory using @code{iLoader::LoadMeshObjectFactory()}.
+@item
+Creating a 3D sprite mesh object using @code{iEngine::CreateMeshWrapper()}.
+@item
+Using the mesh state interfaces to change mesh factory and object
+attributes.
+@item
+Putting the mesh at some position in the world using
+@code{iMeshWrapper::GetMovable()}.
+@end itemize
+
+Basic setup of a Crystal Space application using @code{csApplicationFramework}.
 Crystal Space has the concept of mesh factories and meshes. A mesh is basically
 some kind of 3D object. Crystal Space supports several kinds of meshes. In
 the previous tutorial we used the thing mesh to create the geometry of

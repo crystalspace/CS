@@ -29,26 +29,35 @@ that is to inherit from @code{csObject} which implements @code{iObject}
 for you. Here is an example on how you can do this easily:
 
 @example
-SCF_VERSION (MyOwnData, 0, 0, 1);
-class MyOwnData : public csObject
+class MyOwnData : public scfImplementationExt1<MyOwnData, csObject
+	scfFakeInterface<MyOwnData> >
 @{
-public:
+private:
   int my_data_int;
+
+public:
+  SCF_INTERFACE (MyOwnData, 1, 0, 0);
   @dots{}
-
-  SCF_DECLARE_IBASE_EXT (csObject);
+  MyOwnData () : scfImplementationType (this)
+  @{
+    @dots{}
+  @}
+  virtual ~MyOwnData ()
+  @{
+    @dots{}
+  @}
 @};
-
-SCF_IMPLEMENT_IBASE_EXT (MyOwnData)
-  SCF_IMPLEMENTS_INTERFACE (MyOwnData)
-SCF_IMPLEMENT_IBASE_EXT_END
 @end example
+
+In this example you must use some @sc{scf} templates so that your
+own class becomes a valid @sc{scf} object that inherits from @code{csObject}
+properly.
 
 Basically you create a class called @samp{MyOwnData} which inherits
 from @code{csObject}. In that class you can do whatever you want
 with respect to your own game data. In the example above we only
 have a variable @samp{my_data_int} but of course you can do whatever
-you want. The @sc{scf} macros make sure that you can later query for
+you want. The @sc{scf} templates make sure that you can later query for
 that object (using @code{scfQueryInterface} for example).
 
 @subsubheading Attaching Game Data
