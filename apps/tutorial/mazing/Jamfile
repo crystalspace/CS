@@ -1,0 +1,6 @@
+SubDir TOP apps tutorial mazing ;
+
+Description mazing : "mazing tutorial" ;
+Application mazing : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith mazing : crystalspace ;
+
