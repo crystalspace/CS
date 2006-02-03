@@ -22,6 +22,8 @@ Using Dev-@sc{cpp} (@pxref{HOWTO CS Project DevCPP}).
 Using gcc based compiler (MingW or GNU/Linux based) (@pxref{HOWTO CS Project}).
 @end itemize
 
+Here are the tutorials:
+
 @menu
 * Tutorial Simple:: Simple Tutorial 1: Basic Setup, World Creation
 * Tutorial Simple 2:: Simple Tutorial 2: Adding a Mesh

@@ -37,6 +37,10 @@ And a lot more small tiny details that are nice to know.
 * Mazing RoomCoordinate Class:: RoomCoordinate Class
 * Mazing Maze Class:: Maze Class
 * Mazing Player Class:: Player Class
+* Mazing Adversary Class:: Adversary Class
+* Mazing Explosion Class:: Explosion Class
+* Mazing Laser Class:: Laser Class
+* Mazing AppMazing Class:: AppMazing Main Class
 @end menu
 
 @node Mazing Classes, Mazing Constants, Tutorial Mazing, Tutorial Mazing
@@ -488,7 +492,7 @@ the individual portals to neighbour nodes wherever there needs to be a connectio
 This is done in the @code{CreateWallOrPortal()} function. This function will
 either add a wall polygon to the wall thing or else it will create a portal.
 
-@node Mazing Player Class, , Mazing Maze Class, Tutorial Mazing
+@node Mazing Player Class, Mazing Adversary Class, Mazing Maze Class, Tutorial Mazing
 @subsubsection Player Class
 
 The @code{Player} class manages the player and player movement including collision
@@ -685,4 +689,878 @@ move the player there. It will use the actual number of seconds that have
 elapsed since the previous frame to ensure that movement is the same on
 all hardware.
 
+@node Mazing Adversary Class, Mazing Explosion Class, Mazing Player Class, Tutorial Mazing
+@subsubsection Adversary Class
+
+The @code{Adversary} class represents an enemy. For every enemy in the game
+we will have an adversary.
+
+@example
+class Adversary : public scfImplementationExt1<Adversary,
+	csObject, scfFakeInterface<Adversary> >
+@{
+private:
+  csWeakRef<iMeshWrapper> mesh;
+  RoomCoordinate current_location;
+  AppMazing* app;
+
+  bool moving;
+  csVector3 start, end;
+  float remaining_seconds;
+
+public:
+  SCF_INTERFACE(Adversary, 1, 0, 0);
+
+  Adversary (AppMazing* app, iMeshWrapper* mesh, const RoomCoordinate& rc);
+  virtual ~Adversary () @{ @}
+
+  void ThinkAndMove (float elapsed_seconds);
+
+  iMeshWrapper* GetMesh () const @{ return mesh; @}
+@};
+@end example
+
+This class declaration may look a bit strange. The reason for this
+is that we need to be able to find the correct @code{Adversary} instance
+starting from a Crystal Space mesh object. To do that Crystal Space provides
+the @code{csObject} system. With this system one can relate objects to each
+other (parent/child relationships). Note that this relation is purely
+organizational. It is not a visual hierarchical object. (@pxref{Game Data}).
+What we want to do here is to attach the adversary instance to the mesh so
+that when we have a mesh we can go back to the adversary instance without
+having to scan all adversaries one by one. To do this we basically have
+to implement the @code{iObject} interface. Objects that implement that interface
+can be attached to other objects that also implement that interface. A mesh
+(@code{iMeshWrapper}) also implements @code{iObject} so that is very conveniant
+here. To let our @code{Adversary} class implement @code{iObject} the easiest
+way is to inherit from @code{csObject}. And this is what the class inheritence
+above actually does. The @code{scfImplementationExt1} template makes it
+possible to let @code{Adversary} be an @sc{scf} class (which is needed to
+implement @code{iObject}) and extend from @code{csObject} as well. Finally
+we add a @code{scfFakeInterface<Adversary>} so that we can actually find out
+if an @code{iObject} instance is an adversary. How to do this will be shown
+later.
+
+In the class declaration itself we also need to specify a version of
+this class using @code{SCF_INTERFACE}. For our simple case this is actually
+not very useful but in general these versions can allow someone to be sure
+it gets the right version of the interface.
+
+The main function in this class is the @code{ThinkAndMove()} function. This
+function takes the elapsed seconds (since last frame) as a parameter and
+based on that it will calculate how and where to move the adversary.
+
+@example
+Adversary::Adversary (AppMazing* app,
+	iMeshWrapper* mesh, const RoomCoordinate& rc) :
+	scfImplementationType (this)
+@{
+  Adversary::app = app;
+  Adversary::mesh = mesh;
+  current_location = rc;
+  moving = false;
+@}
+
+void Adversary::ThinkAndMove (float elapsed_seconds)
+@{
+  if (!moving)
+  @{
+    const csArray<RoomCoordinate>& connections = app->GetMaze ()
+    	->GetConnections (current_location);
+    int moveto = (rand () >> 3) % connections.Length ();
+    if (app->GetMaze ()->IsSpaceFree (connections[moveto]))
+    @{
+      start.x = float (current_location.x) * ROOM_DIMENSION;
+      start.y = float (current_location.y) * ROOM_DIMENSION;
+      start.z = float (current_location.z) * ROOM_DIMENSION;
+      app->GetMaze ()->FreeSpace (current_location);
+      current_location = connections[moveto];
+      app->GetMaze ()->OccupySpace (current_location);
+      end.x = float (current_location.x) * ROOM_DIMENSION;
+      end.y = float (current_location.y) * ROOM_DIMENSION;
+      end.z = float (current_location.z) * ROOM_DIMENSION;
+      remaining_seconds = ADVERSARY_MOVETIME;
+      moving = true;
+    @}
+  @}
+  else
+  @{
+    remaining_seconds -= elapsed_seconds;
+    csVector3 new_pos;
+    if (remaining_seconds <= 0)
+    @{
+      moving = false;
+      new_pos = end;
+    @}
+    else
+    @{
+      csMath3::Between (end, start, new_pos,
+      	100.0 * remaining_seconds / ADVERSARY_MOVETIME, 0);
+    @}
+    iMovable* movable = mesh->GetMovable ();
+    iSector* old_sector = movable->GetSectors ()->Get (0);
+    bool mirror;
+    iSector* new_sector = old_sector->FollowSegment (
+    	movable->GetTransform (), new_pos, mirror, true);
+    movable->SetSector (new_sector);
+    movable->GetTransform ().SetOrigin (new_pos);
+    movable->UpdateMove ();
+  @}
+@}
+@end example
+
+An adversary can be in two states: either it is moving or else it is not
+moving. This state is set in the @samp{moving} boolean variable. If the
+adversary is not moving the @code{ThinkAndMove()} will attempt a random
+connection from the current node it is occupying. If the destination node
+of that connection is free then it will initiate a move to that location
+and set @samp{moving} to true. Otherwise it will do nothing (in which case
+next frame the test happens again).
+
+If the adversary is moving then @code{ThinkAndMove()} will calculate
+(based on how much time has elapsed since previous frame) how far the
+adversary should move between the original node and the new destination node.
+If it arrives at the destination the @code{moving} flag is set to false
+again.
+
+@node Mazing Explosion Class, Mazing Laser Class, Mazing Adversary Class, Tutorial Mazing
+@subsubsection Explosion Class
+
+This is a very simple class that keeps track of an explosion. Once the
+explosion particle system has died out the instance of this class will be
+removed as well.
+
+@example
+class Explosion
+@{
+private:
+  csRef<iMeshWrapper> mesh;
+  int timeleft;
+
+public:
+  Explosion (iMeshWrapper* mesh, int timeleft);
+
+  bool Handle (csTicks elapsed_ticks);
+
+  iMeshWrapper* GetMesh () const @{ return mesh; @}
+@};
+@end example
+
+The main function here is the @code{Handle()} function. This one takes
+the elapsed ticks (i.e. milliseconds) since last frame which it will use
+to decide when to delete the explosion mesh.
+
+@example
+Explosion::Explosion (iMeshWrapper* mesh, int timeleft)
+@{
+  Explosion::mesh = mesh;
+  Explosion::timeleft = timeleft;
+@}
+
+bool Explosion::Handle (csTicks elapsed_ticks)
+@{
+  timeleft -= elapsed_ticks;
+  if (timeleft <= 0)
+  @{
+    return false;
+  @}
+  return true;
+@}
+@end example
+
+The implementation is very simple. The @code{Explosion} class is instantiated
+with a certain lifetime (see later). Every frame @code{Handle()} will be called
+which will subtract the elapsed ticks from the lifetime. When the lifetime
+becomes smaller or equal then 0 then the explosion should be removed.
+
+@node Mazing Laser Class, Mazing AppMazing Class, Mazing Explosion Class, Tutorial Mazing
+@subsubsection Laser Class
+
+The @code{Laser} class is responsible for managing the laserbeam that the
+player can shoot. There is only one instance of this class.
+
+@example
+class Laser
+@{
+private:
+  AppMazing* app;
+
+  /// Our laserbeam mesh.
+  csRef<iMeshWrapper> laserbeam;
+  // Lifetime of the laserbeam.
+  int lasertime;
+  // The current laserbeam coordinates.
+  csVector3 laserstart, laserend;
+  iSector* lasersector;
+
+public:
+  Laser (AppMazing* app);
+
+  void SetMeshWrapper (iMeshWrapper* laser)
+  @{
+    laserbeam = laser;
+  @}
+
+  /// Start the laser.
+  void Start ();
+  /// Handle life time of the laser.
+  void Handle (csTicks ticks);
+  /// Check if the laser hits anything.
+  void Check ();
+@};
+@end example
+
+The three important functions in this class are: @code{Start()} which starts
+the laser (unless it is already in progress), @code{Handle()} which takes
+care of the lifetime of the laser, and @code{Check()} which will check if
+the laser hits anything.
+
+@example
+Laser::Laser (AppMazing* app)
+@{
+  Laser::app = app;
+  lasertime = 0;
+@}
+
+void Laser::Start ()
+@{
+  if (lasertime > 0) return;	// Laser already in progress.
+  lasertime = LASER_LIFETIME;
+  const csOrthoTransform& tr = app->GetCamera ()->GetTransform ();
+  laserstart = tr.This2Other (LASER_OFFSET);
+  laserend = tr.This2Other (csVector3 (0, 0, 20.0));
+  lasersector = app->GetCamera ()->GetSector ();
+
+  // Fire up our beam.
+  laserbeam->GetMovable ()->SetPosition (lasersector, laserstart);
+  laserbeam->GetMovable ()->GetTransform ().LookAt (
+  	laserend-tr.GetOrigin (), csVector3 (0, 1, 0));
+  laserbeam->GetMovable ()->UpdateMove ();
+@}
+@end example
+
+This function starts the laserbeam (unless it is already in progress).
+Starting the laser means that we basically put it at the same position
+of the camera but lowered a bit with the @samp{LASER_OFFSET} offset.
+This offset is calculated in camera space that means that it will always
+be below the camera as seen from the perspective of the camera. The
+@code{This2Other()} functions transforms the offset (as seen in camera
+space) to world space by using the camera transformation
+(@code{iCamera->GetTransform()}).
+
+We also transform a point in front of the camera (20 units in front) to
+world space. So these two world space coordinates give us a starting and a
+direction for our laserbeam. We place the laserbeam mesh at the starting
+position and then we use @code{LookAt()} to change the transform of that
+mesh to look at the destination position. Then we place the mesh in the
+sector of the camera and finally we call @code{UpdateMove()} which is required
+after moving a mesh.
+
+@example
+void Laser::Handle (csTicks ticks)
+@{
+  if (lasertime <= 0) return;
+  lasertime -= ticks;
+  if (lasertime <= 0)
+  @{
+    // Time to stop the laser.
+    lasertime = 0;
+    laserbeam->GetMovable ()->ClearSectors ();
+    laserbeam->GetMovable ()->UpdateMove ();
+  @}
+  else
+  @{
+    int flick = (lasertime / LASER_FLICKTIME) & 1;
+    Check ();
+    csRef<iGeneralMeshState> state = scfQueryInterface<iGeneralMeshState> (
+    	laserbeam->GetMeshObject ());
+    state->SetColor (flick ? csColor (2.0, 2.0, 2.0) : csColor (.5, .5, .5));
+  @}
+@}
+@end example
+
+This function handles the lifetime of the laser. Again depending on the
+elapsed ticks since previous frame. This function also makes the beam
+flicker by changing the color. Additionally, every time the laserbeam
+changes color it will check if there is an adversary hit by the laser. This
+happens with the @code{Check()} function below:
+
+@example
+void Laser::Check ()
+@{
+  // Do a beam to check if we hit an adversary.
+  csVector3 isect;
+  iMeshWrapper* mesh = lasersector->HitBeamPortals (laserstart,
+  	laserend, isect, 0);
+  if (mesh)
+  @{
+    csRef<Adversary> adv = CS_GET_CHILD_OBJECT (
+    	mesh->QueryObject (), Adversary);
+    if (adv)
+    @{
+      // Hit!
+      app->ExplodeAdversary (adv);
+    @}
+  @}
+@}
+@end example
+
+Using @code{iSector::HitBeamPortals()} we try to find if there is an object
+in the beam of the laser. We use the start and end position as calculated
+in the @code{Start()} function. If we hit a mesh then we will use
+@code{CS_GET_CHILD_OBJECT()} to get the @code{Adversary} instance that is
+attached to the mesh. This makes use of the fact that we added the
+adversary to the mesh using the @code{iObject} system.
+
+If we hit an adversary then we explode it by calling @code{ExplodeAdversary()}.
+
+@node Mazing AppMazing Class, , Mazing Laser Class, Tutorial Mazing
+@subsubsection AppMazing Main Class
+
+@code{AppMazing} is the main application class. Besides the usual Crystal
+Space setup code it also contains the game logic.
+
+@example
+class AppMazing :
+  public csApplicationFramework, public csBaseEventHandler
+@{
+private:
+  /**
+   * A reference to the 3D renderer plugin.
+   */
+  csRef<iGraphics3D> g3d;
+
+  /**
+   * A reference to the 3D engine plugin.
+   */
+  csRef<iEngine> engine;
+
+  /**
+   * The main loader.
+   */
+  csRef<iLoader> loader;
+
+  /**
+   * The view.
+   */
+  csRef<iView> view;
+
+  /**
+   * The collision detection system.
+   */
+  csRef<iCollideSystem> cdsys;
+
+  /**
+   * The virtual clock.
+   */
+  csRef<iVirtualClock> vc;
+
+  /**
+   * The factory for our adversary.
+   */
+  csRef<iMeshFactoryWrapper> adversary_factory;
+
+  /**
+   * The factory for our laser beam.
+   */
+  csRef<iMeshFactoryWrapper> laserbeam_factory;
+
+  /**
+   * The factory for our explosion.
+   */
+  csRef<iMeshFactoryWrapper> explosion_factory;
+
+  /**
+   * Set up everything that needs to be rendered on screen.  This routine is
+   * called from the event handler in response to a cscmdProcess broadcast
+   * message.
+   */
+  virtual void ProcessFrame();
+
+  /**
+   * Finally, render the screen.  This routine is called from the event handler
+   * in response to a cscmdFinalProcess broadcast message.
+   */
+  virtual void FinishFrame();
+
+  /**
+   * Handle keyboard events, such as key presses and releases.  This routine is
+   * called from the event handler in response to a csevKeyboard event.
+   */
+  virtual bool OnKeyboard(iEvent&);
+
+  //--- Game Data ------------------------------------------------------
+
+  Player player;
+  Maze maze;
+  Laser laser;
+  /// A list of all adversaries.
+  csRefArray<Adversary> adversaries;
+
+  /// A list of all explosions in progress.
+  csArray<Explosion> explosions;
+
+  /// Start an explosion.
+  void StartExplosion (iSector* sector, const csVector3& pos);
+  /// Handle all explosions.
+  void HandleExplosions (csTicks elapsed_ticks);
+
+  //--- Setup of Game --------------------------------------------------
+  bool CreateFactories ();
+  bool CreateAdversary (int x, int y, int z);
+
+  bool InitCollisionDetection ();
+
+  bool SetupGame ();
+
+public:
+  /**
+   * Constructor.
+   */
+  AppMazing();
+
+  /**
+   * Destructor.
+   */
+  virtual ~AppMazing();
+
+  iCamera* GetCamera () const @{ return view->GetCamera (); @}
+  iEngine* GetEngine () const @{ return engine; @}
+  iLoader* GetLoader () const @{ return loader; @}
+  iCollideSystem* GetCollisionDetectionSystem () const @{ return cdsys; @}
+  Maze* GetMaze () @{ return &maze; @}
+
+  /**
+   * Explode an adversary.
+   */
+  void ExplodeAdversary (Adversary* adv);
+
+  /**
+   * Final cleanup.
+   */
+  virtual void OnExit();
+
+  /**
+   * Main initialization routine.  This routine should set up basic facilities
+   * (such as loading startup-time plugins, etc.).  In case of failure this
+   * routine will return false.  You can assume that the error message has been
+   * reported to the user.
+   */
+  virtual bool OnInitialize(int argc, char* argv[]);
+
+  /**
+   * Run the application.  Performs additional initialization (if needed), and
+   * then fires up the main run/event loop.  The loop will fire events which
+   * actually causes Crystal Space to "run".  Only when the program exits does
+   * this function return.
+   */
+  virtual bool Application();
+  
+  // Declare the name of this event handler.
+  CS_EVENTHANDLER_NAMES("application.mazing")
+      
+  /* Declare that we're not terribly interested in having events
+     delivered to us before or after other modules, plugins, etc. */
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
+@};
+@end example
+
+TODO... fill in extra info...
+
+@example
+CS_IMPLEMENT_APPLICATION
+
+AppMazing::AppMazing() :
+	csApplicationFramework(),
+	player (this),
+	maze (this),
+	laser (this)
+@{
+  SetApplicationName("mazing");
+@}
+
+AppMazing::~AppMazing()
+@{
+@}
+
+bool AppMazing::CreateFactories ()
+@{
+  csRef<iGeneralFactoryState> fstate;
+
+  //---------------------------------------------------------------------
+  // Adversary factory.
+  adversary_factory = engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", "adversary");
+  if (!adversary_factory) return false;
+
+  fstate = scfQueryInterface<iGeneralFactoryState> (
+  	adversary_factory->GetMeshObjectFactory ());
+  csEllipsoid ellips (
+  	csVector3 (0, 0, 0),
+	csVector3 (ADVERSARY_DIMENSION, ADVERSARY_DIMENSION,
+		ADVERSARY_DIMENSION));
+  fstate->GenerateSphere (ellips, 10);
+
+  if (!loader->LoadTexture ("adversary_texture", "/lib/stdtex/misty.jpg"))
+    return ReportError ("Error loading 'misty' texture!");
+  iMaterialWrapper* adversary_material = engine->GetMaterialList ()
+  	->FindByName ("adversary_texture");
+  fstate->SetMaterialWrapper (adversary_material);
+
+  //---------------------------------------------------------------------
+  // Beam factory.
+  laserbeam_factory = engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", "laserbeam");
+  if (!laserbeam_factory) return false;
+
+  fstate = scfQueryInterface<iGeneralFactoryState> (
+  	laserbeam_factory->GetMeshObjectFactory ());
+  csBox3 laser_box (
+  	csVector3 (-LASER_WIDTH, -LASER_WIDTH, 0),
+  	csVector3 (LASER_WIDTH, LASER_WIDTH, LASER_LENGTH));
+  fstate->GenerateBox (laser_box);
+  fstate->SetLighting (false);
+  fstate->SetColor (csColor (1.0, 1.0, 1.0));
+  // We don't want to hit the player against the laserbeam when it is
+  // visible so we disable the collision detection mesh here.
+  laserbeam_factory->GetMeshObjectFactory ()->GetObjectModel ()
+  	->SetPolygonMeshColldet (0);
+
+  if (!loader->LoadTexture ("laserbeam_texture", "/lib/stdtex/blobby.jpg"))
+    return ReportError ("Error loading 'blobby' texture!");
+  iMaterialWrapper* laserbeam_material = engine->GetMaterialList ()
+  	->FindByName ("laserbeam_texture");
+  fstate->SetMaterialWrapper (laserbeam_material);
+
+  //---------------------------------------------------------------------
+  // Beam object.
+  csRef<iMeshWrapper> laserbeam = engine->CreateMeshWrapper (
+  	laserbeam_factory, "laserbeam");
+  if (!laserbeam)
+    return ReportError ("Error creating laserbeam mesh!");
+  // Set our laser beam to NOHITBEAM so that we can use HitBeam() methods
+  // to find out what our laser hits without HitBeam() returning the
+  // laser itself.
+  laserbeam->GetFlags ().Set (CS_ENTITY_NOHITBEAM);
+  laser.SetMeshWrapper (laserbeam);
+
+  //---------------------------------------------------------------------
+  // Explosion factory.
+  explosion_factory = engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.particles", "explosion");
+  if (!explosion_factory) return false;
+  csRef<iParticlesFactoryState> pstate = scfQueryInterface<
+  	iParticlesFactoryState> (explosion_factory->GetMeshObjectFactory ());
+
+  if (!loader->LoadTexture ("explosion_texture", "/lib/std/spark.png"))
+    return ReportError ("Error loading 'spark' texture!");
+  iMaterialWrapper* explosion_material = engine->GetMaterialList ()
+  	->FindByName ("explosion_texture");
+  pstate->SetMaterial (explosion_material);
+  pstate->SetParticleRadius (0.2);
+  pstate->SetParticlesPerSecond (50);
+  pstate->SetInitialParticleCount (10);
+  pstate->SetPointEmitType ();
+  pstate->SetRadialForceType (2.0, CS_PART_FALLOFF_LINEAR);
+  pstate->SetForce (6.0);
+  pstate->SetDiffusion (1.0);
+  pstate->SetEmitTime (float (EXPLOSION_EMITTIME) / 1000.0);
+  pstate->SetTimeToLive (float (EXPLOSION_PARTTIME) / 1000.0);
+  pstate->SetTimeVariation (float (EXPLOSION_PARTVARTIME) / 1000.0);
+  pstate->SetConstantColorMethod (csColor4 (1.0, 0.8, 0.5));
+  pstate->SetMixMode (CS_FX_ADD);
+  pstate->EnableZSort (false);
+
+  return true;
+@}
+
+bool AppMazing::CreateAdversary (int x, int y, int z)
+@{
+  float sx = float (x) * ROOM_DIMENSION;
+  float sy = float (y) * ROOM_DIMENSION;
+  float sz = float (z) * ROOM_DIMENSION;
+  csRef<iMeshWrapper> adversary = engine->CreateMeshWrapper (adversary_factory,
+  	"adversary", maze.GetSector (x, y, z), csVector3 (sx, sy, sz));
+  if (!adversary)
+    return ReportError ("Couldn't create adversary mesh!");
+
+  RoomCoordinate rc (x, y, z);
+  Adversary* adv = new Adversary (this, adversary, rc);
+  adversaries.Push (adv);
+  adversary->QueryObject ()->ObjAdd ((iObject*)adv);
+  adv->DecRef ();
+  
+  return true;
+@}
+
+bool AppMazing::InitCollisionDetection ()
+@{
+  csColliderHelper::InitializeCollisionWrappers (cdsys, engine, 0);
+  return player.InitCollisionDetection ();
+@}
+
+bool AppMazing::SetupGame ()
+@{
+  if (!maze.CreateGeometry ())
+    return ReportError("Error creating the geometry!");
+
+  if (!CreateFactories ())
+    return ReportError ("Error creating mesh factories!");
+
+  engine->Prepare ();
+
+  // Create a view.
+  view = csPtr<iView> (new csView (engine, g3d));
+  view->GetCamera ()->SetSector (engine->FindSector ("room_0_0_0"));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  if (!InitCollisionDetection ())
+    return false;
+
+  if (!CreateAdversary (0, 0, 2)) return false;
+  if (!CreateAdversary (1, 1, 1)) return false;
+  if (!CreateAdversary (1, 0, 2)) return false;
+  if (!CreateAdversary (2, 2, 2)) return false;
+  return true;
+@}
+
+void AppMazing::ExplodeAdversary (Adversary* adv)
+@{
+  iMeshWrapper* mesh = adv->GetMesh ();
+  StartExplosion (mesh->GetMovable ()->GetSectors ()->Get (0),
+      	mesh->GetMovable ()->GetTransform ().GetOrigin ());
+  engine->RemoveObject (mesh);
+  adversaries.Delete (adv);
+@}
+
+void AppMazing::StartExplosion (iSector* sector, const csVector3& pos)
+@{
+  csRef<iMeshWrapper> explo = engine->CreateMeshWrapper (explosion_factory,
+  	"explosion", sector, pos);
+  if (!explo)
+  @{
+    ReportError ("Error creating explosion mesh!");
+    return;
+  @}
+  explo->SetZBufMode (CS_ZBUF_TEST);
+  Explosion exp (explo, EXPLOSION_TIME);
+  explosions.Push (exp);
+@}
+
+void AppMazing::HandleExplosions (csTicks elapsed_ticks)
+@{
+  size_t i = 0;
+  while (i < explosions.Length ())
+  @{
+    if (explosions[i].Handle (elapsed_ticks)) i++;
+    else
+    @{
+      engine->RemoveObject (explosions[i].GetMesh ());
+      explosions.DeleteIndex (i);
+    @}
+  @}
+@}
+
+void AppMazing::ProcessFrame()
+@{
+  // First we move the camera.
+  csTicks elapsed_time = vc->GetElapsedTicks ();
+  float elapsed_seconds = float (elapsed_time) / 1000.0;
+
+  // Handle the laser.
+  laser.Handle (elapsed_time);
+
+  // Handle explosions.
+  HandleExplosions (elapsed_time);
+
+  // Move the camera.
+  player.MoveAndRotateCamera (elapsed_seconds);
+
+  // Let all the adversaries think about what to do.
+  size_t i;
+  for (i = 0 ; i < adversaries.Length () ; i++)
+    adversaries[i]->ThinkAndMove (elapsed_seconds);
+
+  // Tell 3D driver we're going to display 3D things.
+  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+    return;
+
+  view->Draw ();
+@}
+
+void AppMazing::FinishFrame()
+@{
+  g3d->FinishDraw();
+  g3d->Print(0);
+@}
+
+bool AppMazing::OnKeyboard(iEvent& ev)
+@{
+  // We got a keyboard event.
+  if (csKeyEventHelper::GetEventType(&ev) == csKeyEventTypeDown)
+  @{
+    // The user pressed a key (as opposed to releasing it).
+    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
+    switch (code)
+    @{
+      case CSKEY_ESC:
+        @{
+          // The user pressed escape, so terminate the application.  The proper
+	  // way to terminate a Crystal Space application is by broadcasting a
+          // csevQuit event.  That will cause the main run loop to stop.  To do
+          // so we retrieve the event queue from the object registry and then
+	  // post the event.
+          csRef<iEventQueue> q =
+            csQueryRegistry<iEventQueue> (GetObjectRegistry());
+          if (q.IsValid())
+            q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
+        @}
+        return true;
+      case 'e':
+	player.StartMovement (csVector3 (0, 1, 0));
+	return true;
+      case 'q':
+	player.StartMovement (csVector3 (0, -1, 0));
+	return true;
+      case 'a':
+	player.StartMovement (csVector3 (-1, 0, 0));
+	return true;
+      case 'd':
+	player.StartMovement (csVector3 (1, 0, 0));
+	return true;
+      case 'w':
+	player.StartMovement (csVector3 (0, 0, 1));
+	return true;
+      case 's':
+	player.StartMovement (csVector3 (0, 0, -1));
+	return true;
+      case CSKEY_UP:
+	player.StartRotation (csVector3 (-1, 0, 0));
+	return true;
+      case CSKEY_DOWN:
+	player.StartRotation (csVector3 (1, 0, 0));
+	return true;
+      case CSKEY_LEFT:
+	player.StartRotation (csVector3 (0, -1, 0));
+	return true;
+      case CSKEY_RIGHT:
+	player.StartRotation (csVector3 (0, 1, 0));
+	return true;
+      case ' ':
+	laser.Start ();
+	return true;
+    @}
+  @}
+  return false;
+@}
+
+bool AppMazing::OnInitialize(int argc, char* argv[])
+@{
+  iObjectRegistry* r = GetObjectRegistry();
+
+  // Load application-specific configuration file.
+  if (!csInitializer::SetupConfigManager(r, 0, GetApplicationName()))
+    return ReportError("Failed to initialize configuration manager!");
+
+  // RequestPlugins() will load all plugins we specify.  In addition it will
+  // also check if there are plugins that need to be loaded from the
+  // configuration system (both the application configuration and CS or global
+  // configurations).  It also supports specifying plugins on the command line
+  // via the --plugin= option.
+  if (!csInitializer::RequestPlugins(r,
+	CS_REQUEST_VFS,
+	CS_REQUEST_OPENGL3D,
+	CS_REQUEST_ENGINE,
+	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_LEVELLOADER,
+        CS_REQUEST_PLUGIN ("crystalspace.collisiondetection.opcode",
+		iCollideSystem),
+	CS_REQUEST_REPORTER,
+	CS_REQUEST_REPORTERLISTENER,
+	CS_REQUEST_END))
+    return ReportError("Failed to initialize plugins!");
+
+  // "Warm up" the event handler so it can interact with the world
+  csBaseEventHandler::Initialize(r);
+ 
+  // Set up an event handler for the application.  Crystal Space is fully
+  // event-driven.  Everything (except for this initialization) happens in
+  // response to an event.
+  if (!RegisterQueue (r, csevAllEvents(GetObjectRegistry())))
+    return ReportError("Failed to set up event handler!");
+
+  return true;
+@}
+
+void AppMazing::OnExit()
+@{
+@}
+
+bool AppMazing::Application()
+@{
+  iObjectRegistry* r = GetObjectRegistry();
+
+  // Open the main system. This will open all the previously loaded plugins
+  // (i.e. all windows will be opened).
+  if (!OpenApplication(r))
+    return ReportError("Error opening system!");
+
+  // Now get the pointer to various modules we need.  We fetch them from the
+  // object registry.  The RequestPlugins() call we did earlier registered all
+  // loaded plugins with the object registry.  It is also possible to load
+  // plugins manually on-demand.
+  g3d = csQueryRegistry<iGraphics3D> (r);
+  if (!g3d)
+    return ReportError("Failed to locate 3D renderer!");
+
+  engine = csQueryRegistry<iEngine> (r);
+  if (!engine)
+    return ReportError("Failed to locate 3D engine!");
+
+  loader = csQueryRegistry<iLoader> (r);
+  if (!loader)
+    return ReportError("Failed to locate the map loader!");
+
+  cdsys = csQueryRegistry<iCollideSystem> (r);
+  if (!cdsys)
+    return ReportError("Failed to locate the collision detection system!");
+
+  vc = csQueryRegistry<iVirtualClock> (r);
+  if (!vc)
+    return ReportError("Failed to locate the virtual clock!");
+
+  // Setup game.
+  if (!SetupGame ())
+    return false;
+
+  // Start the default run/event loop.  This will return only when some code,
+  // such as OnKeyboard(), has asked the run loop to terminate.
+  Run();
+
+  return true;
+@}
+
+int main(int argc, char** argv)
+@{
+  csPrintf ("mazing version 1.0 by Jorrit Tyberghein.\n");
+
+  /* Runs the application.  
+   *
+   * csApplicationRunner<> cares about creating an application instance 
+   * which will perform initialization and event handling for the entire game. 
+   *
+   * The underlying csApplicationFramework also performs some core 
+   * initialization.  It will set up the configuration manager, event queue, 
+   * object registry, and much more.  The object registry is very important, 
+   * and it is stored in your main application class (again, by 
+   * csApplicationFramework). 
+   */
+  return csApplicationRunner<AppMazing>::Run (argc, argv);
+@}
+@end example
+
+TODO... fill in extra info...
 
