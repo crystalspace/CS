@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Tutorial Mazing, Tutorial Simple Map, Tutorial Simple, Tutorials
+@node Tutorial Mazing, , Tutorial Simple Map, Tutorials
 @subsection Mazing Tutorial: Small Game
 @cindex Tutorial, Mazing
 @cindex Mazing Tutorial
@@ -23,8 +23,8 @@ Creating genmesh mesh objects for the adversaries and the laserbeam
 @item
 Creating particle mesh objects for explosions (@pxref{MeshObject PartSys}).
 @item
-Doing collision detection manually (@pxref{csColliderWrapper} and
-@pxref{csColliderHelper}).
+Doing collision detection manually (@code{csColliderWrapper} and
+@code{csColliderHelper}).
 @item
 Handling game objects attached to Crystal Space objects (@pxref{User Objects}).
 @item
@@ -34,12 +34,12 @@ And a lot more small tiny details that are nice to know.
 @menu
 * Mazing Classes:: Class Distribution
 * Mazing Constants:: Constants
-* Mazing RoomCoordinate Class:: RoomCoordinate Maze Class
+* Mazing RoomCoordinate Class:: RoomCoordinate Class
 * Mazing Maze Class:: Maze Class
 * Mazing Player Class:: Player Class
 @end menu
 
-@node Mazing Classes, Simple Event Handling, Tutorial Simple, Tutorial Simple
+@node Mazing Classes, Mazing Constants, Tutorial Mazing, Tutorial Mazing
 @subsubsection Class Distribution
 
 In this tutorial we will divide the logic into several classes:
@@ -71,7 +71,7 @@ every explosion we have an instance of this class.
 class which manages visibility and collision detection of the beam.
 @end itemize
 
-@node Mazing Constants, Simple Event Handling, Tutorial Simple, Tutorial Simple
+@node Mazing Constants, Mazing RoomCoordinate Class, Mazing Classes, Tutorial Mazing
 @subsubsection Constants
 
 There are several constants that we use in this game. By using constants it
@@ -118,7 +118,7 @@ from a configuration file but that is beyond the scope of this tutorial:
 #define PORTAL_BACK 5
 @end example
 
-@node Mazing RoomCoordinate Class, Simple Event Handling, Tutorial Simple, Tutorial Simple
+@node Mazing RoomCoordinate Class, Mazing Maze Class, Mazing Constants, Tutorial Mazing
 @subsubsection RoomCoordinate Class
 
 This is a very simple class that keeps track of a coordinate in the maze:
@@ -151,7 +151,7 @@ When your application is compiled in debug mode this define will be set. This
 means that you can do additional checks in debug mode that will disappear
 in optimize/release mode. This is very useful during development.
 
-@node Mazing Maze Class, Simple Event Handling, Tutorial Simple, Tutorial Simple
+@node Mazing Maze Class, Mazing Player Class, Mazing RoomCoordinate Class, Tutorial Mazing
 @subsubsection Maze Class
 
 The @code{Maze} class is responsible for managing the game world. To do that
@@ -482,13 +482,13 @@ of @code{CreateRoom()} is a string describing the connections to neighbour
 nodes. Finally this function will also create a few lights using the
 @code{CreateLight()} method.
 
-The @code{CreateRoom()} function will create one thing mesh (@pxref{MeshObjec Thing})
+The @code{CreateRoom()} function will create one thing mesh (@pxref{MeshObject Thing})
 for the solid walls and then it will use @code{iEngine::CreatePortal()} to create
 the individual portals to neighbour nodes wherever there needs to be a connection.
 This is done in the @code{CreateWallOrPortal()} function. This function will
 either add a wall polygon to the wall thing or else it will create a portal.
 
-@node Mazing Player Class, Simple Event Handling, Tutorial Simple, Tutorial Simple
+@node Mazing Player Class, , Mazing Maze Class, Tutorial Mazing
 @subsubsection Player Class
 
 The @code{Player} class manages the player and player movement including collision

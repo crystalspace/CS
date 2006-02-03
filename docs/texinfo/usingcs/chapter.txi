@@ -8,7 +8,6 @@ own 3D applications.
 
 @menu
 * The Basics:: Basics and Overview
-* TutIntro Plugin Overview:: Plugin Overview
 * Tutorials::
 * SCF Chapter:: Plugins, Reference counting, Interfaces (SCF)
 * Options:: Configuring Crystal Space

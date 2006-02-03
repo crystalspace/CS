@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Tutorial Simple Map, , Tutorial Simple 2, Tutorials
+@node Tutorial Simple Map, Tutorial Mazing, Tutorial Simple 2, Tutorials
 @subsection Simple Tutorial 3: Map Loading, Collision Detection
 @cindex Tutorial, Simple
 @cindex Simple Tutorial
