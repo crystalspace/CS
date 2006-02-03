@@ -9,6 +9,8 @@ chronological order.
 3-Feb-2006
 	- iceeey made CEGUI wrapper inject time pulses into CEGUI. These are
 	  used in CEGUI for things like tooltip timers.
+	- Jorrit fixed the jam project template so that the generated program
+	  actually compiles.
 2-Feb-2006
 	- Jorrit did the following documentation updates:
 	    - Reorganized the 'The Basics' and 'Quick Overview' sections

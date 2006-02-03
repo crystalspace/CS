@@ -51,13 +51,13 @@ bool App#PROJECTNAMECAP#::OnKeyboard(iEvent& ev)
     {
       // The user pressed escape, so terminate the application.  The proper way
       // to terminate a Crystal Space application is by broadcasting a
-      // cscmdQuit event.  That will cause the main run loop to stop.  To do
+      // csevQuit event.  That will cause the main run loop to stop.  To do
       // so we retrieve the event queue from the object registry and then post
       // the event.
       csRef<iEventQueue> q =
         csQueryRegistry<iEventQueue> (GetObjectRegistry());
       if (q.IsValid())
-        q->GetEventOutlet()->Broadcast(cscmdQuit);
+        q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
     }
   }
   return false;
