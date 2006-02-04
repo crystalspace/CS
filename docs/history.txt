@@ -9,6 +9,8 @@ chronological order.
 4-Feb-2006
 	- Jorrit changed the driver database to disable point sprites
 	  for ATI on Linux. The particles are miniscule.
+	- Jorrit restructured mazing so that the game logic is now seperated
+	  in a new Game class. Continued working on the tutorial itself.
 3-Feb-2006
 	- iceeey made CEGUI wrapper inject time pulses into CEGUI. These are
 	  used in CEGUI for things like tooltip timers.

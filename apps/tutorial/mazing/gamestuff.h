@@ -220,5 +220,76 @@ public:
   void Check ();
 };
 
+class Game
+{
+private:
+  AppMazing* app;
+
+  /**
+   * The factory for our adversary.
+   */
+  csRef<iMeshFactoryWrapper> adversary_factory;
+
+  /**
+   * The factory for our laser beam.
+   */
+  csRef<iMeshFactoryWrapper> laserbeam_factory;
+
+  /**
+   * The factory for our explosion.
+   */
+  csRef<iMeshFactoryWrapper> explosion_factory;
+
+  //--- Game Data ------------------------------------------------------
+
+  Player player;
+  Maze maze;
+  Laser laser;
+  /// A list of all adversaries.
+  csRefArray<Adversary> adversaries;
+
+  /// A list of all explosions in progress.
+  csArray<Explosion> explosions;
+
+  /// Start an explosion.
+  void StartExplosion (iSector* sector, const csVector3& pos);
+  /// Handle all explosions.
+  void HandleExplosions (csTicks elapsed_ticks);
+
+  //--- Setup of Game --------------------------------------------------
+  bool CreateFactories ();
+  bool CreateAdversary (int x, int y, int z);
+
+  bool InitCollisionDetection ();
+
+public:
+  /**
+   * Constructor.
+   */
+  Game(AppMazing* app);
+
+  /**
+   * Setup the game.
+   */
+  bool SetupGame ();
+
+  Maze* GetMaze () { return &maze; }
+
+  /**
+   * Explode an adversary.
+   */
+  void ExplodeAdversary (Adversary* adv);
+
+  /**
+   * Handle a frame in the game.
+   */
+  void Handle (csTicks elapsed_ticks);
+
+  /**
+   * Handle game keyboard event.
+   */
+  bool OnKeyboard (iEvent& ev);
+};
+
 #endif // __appmazing_maze_h
 

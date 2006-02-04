@@ -57,21 +57,6 @@ private:
   csRef<iVirtualClock> vc;
 
   /**
-   * The factory for our adversary.
-   */
-  csRef<iMeshFactoryWrapper> adversary_factory;
-
-  /**
-   * The factory for our laser beam.
-   */
-  csRef<iMeshFactoryWrapper> laserbeam_factory;
-
-  /**
-   * The factory for our explosion.
-   */
-  csRef<iMeshFactoryWrapper> explosion_factory;
-
-  /**
    * Set up everything that needs to be rendered on screen.  This routine is
    * called from the event handler in response to a cscmdProcess broadcast
    * message.
@@ -90,29 +75,8 @@ private:
    */
   virtual bool OnKeyboard(iEvent&);
 
-  //--- Game Data ------------------------------------------------------
-
-  Player player;
-  Maze maze;
-  Laser laser;
-  /// A list of all adversaries.
-  csRefArray<Adversary> adversaries;
-
-  /// A list of all explosions in progress.
-  csArray<Explosion> explosions;
-
-  /// Start an explosion.
-  void StartExplosion (iSector* sector, const csVector3& pos);
-  /// Handle all explosions.
-  void HandleExplosions (csTicks elapsed_ticks);
-
-  //--- Setup of Game --------------------------------------------------
-  bool CreateFactories ();
-  bool CreateAdversary (int x, int y, int z);
-
-  bool InitCollisionDetection ();
-
-  bool SetupGame ();
+  /// The Game.
+  Game game;
 
 public:
   /**
@@ -129,12 +93,7 @@ public:
   iEngine* GetEngine () const { return engine; }
   iLoader* GetLoader () const { return loader; }
   iCollideSystem* GetCollisionDetectionSystem () const { return cdsys; }
-  Maze* GetMaze () { return &maze; }
-
-  /**
-   * Explode an adversary.
-   */
-  void ExplodeAdversary (Adversary* adv);
+  Game& GetGame () { return game; }
 
   /**
    * Final cleanup.

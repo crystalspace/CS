@@ -405,17 +405,18 @@ void Adversary::ThinkAndMove (float elapsed_seconds)
 {
   if (!moving)
   {
-    const csArray<RoomCoordinate>& connections = app->GetMaze ()
-    	->GetConnections (current_location);
+    Maze* maze = app->GetGame ().GetMaze ();
+    const csArray<RoomCoordinate>& connections = maze->GetConnections (
+	current_location);
     int moveto = (rand () >> 3) % connections.Length ();
-    if (app->GetMaze ()->IsSpaceFree (connections[moveto]))
+    if (maze->IsSpaceFree (connections[moveto]))
     {
       start.x = float (current_location.x) * ROOM_DIMENSION;
       start.y = float (current_location.y) * ROOM_DIMENSION;
       start.z = float (current_location.z) * ROOM_DIMENSION;
-      app->GetMaze ()->FreeSpace (current_location);
+      maze->FreeSpace (current_location);
       current_location = connections[moveto];
-      app->GetMaze ()->OccupySpace (current_location);
+      maze->OccupySpace (current_location);
       end.x = float (current_location.x) * ROOM_DIMENSION;
       end.y = float (current_location.y) * ROOM_DIMENSION;
       end.z = float (current_location.z) * ROOM_DIMENSION;
@@ -506,9 +507,263 @@ void Laser::Check ()
     if (adv)
     {
       // Hit!
-      app->ExplodeAdversary (adv);
+      app->GetGame ().ExplodeAdversary (adv);
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+
+Game::Game (AppMazing* app) :
+  	app (app),
+	player (app),
+	maze (app),
+	laser (app)
+{
+}
+
+bool Game::CreateFactories ()
+{
+  csRef<iGeneralFactoryState> fstate;
+  iEngine* engine = app->GetEngine ();
+  iLoader* loader = app->GetLoader ();
+
+  //---------------------------------------------------------------------
+  // Adversary factory.
+  adversary_factory = engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", "adversary");
+  if (!adversary_factory) return false;
+
+  fstate = scfQueryInterface<iGeneralFactoryState> (
+  	adversary_factory->GetMeshObjectFactory ());
+  csEllipsoid ellips (
+  	csVector3 (0, 0, 0),
+	csVector3 (ADVERSARY_DIMENSION, ADVERSARY_DIMENSION,
+		ADVERSARY_DIMENSION));
+  fstate->GenerateSphere (ellips, 10);
+
+  if (!loader->LoadTexture ("adversary_texture", "/lib/stdtex/misty.jpg"))
+    return app->ReportError ("Error loading 'misty' texture!");
+  iMaterialWrapper* adversary_material = engine->GetMaterialList ()
+  	->FindByName ("adversary_texture");
+  fstate->SetMaterialWrapper (adversary_material);
+
+  //---------------------------------------------------------------------
+  // Beam factory.
+  laserbeam_factory = engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", "laserbeam");
+  if (!laserbeam_factory) return false;
+
+  fstate = scfQueryInterface<iGeneralFactoryState> (
+  	laserbeam_factory->GetMeshObjectFactory ());
+  csBox3 laser_box (
+  	csVector3 (-LASER_WIDTH, -LASER_WIDTH, 0),
+  	csVector3 (LASER_WIDTH, LASER_WIDTH, LASER_LENGTH));
+  fstate->GenerateBox (laser_box);
+  fstate->SetLighting (false);
+  fstate->SetColor (csColor (1.0, 1.0, 1.0));
+  // We don't want to hit the player against the laserbeam when it is
+  // visible so we disable the collision detection mesh here.
+  laserbeam_factory->GetMeshObjectFactory ()->GetObjectModel ()
+  	->SetPolygonMeshColldet (0);
+
+  if (!loader->LoadTexture ("laserbeam_texture", "/lib/stdtex/blobby.jpg"))
+    return app->ReportError ("Error loading 'blobby' texture!");
+  iMaterialWrapper* laserbeam_material = engine->GetMaterialList ()
+  	->FindByName ("laserbeam_texture");
+  fstate->SetMaterialWrapper (laserbeam_material);
+
+  //---------------------------------------------------------------------
+  // Beam object.
+  csRef<iMeshWrapper> laserbeam = engine->CreateMeshWrapper (
+  	laserbeam_factory, "laserbeam");
+  if (!laserbeam)
+    return app->ReportError ("Error creating laserbeam mesh!");
+  // Set our laser beam to NOHITBEAM so that we can use HitBeam() methods
+  // to find out what our laser hits without HitBeam() returning the
+  // laser itself.
+  laserbeam->GetFlags ().Set (CS_ENTITY_NOHITBEAM);
+  laser.SetMeshWrapper (laserbeam);
+
+  //---------------------------------------------------------------------
+  // Explosion factory.
+  explosion_factory = engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.particles", "explosion");
+  if (!explosion_factory) return false;
+  csRef<iParticlesFactoryState> pstate = scfQueryInterface<
+  	iParticlesFactoryState> (explosion_factory->GetMeshObjectFactory ());
+
+  if (!loader->LoadTexture ("explosion_texture", "/lib/std/spark.png"))
+    return app->ReportError ("Error loading 'spark' texture!");
+  iMaterialWrapper* explosion_material = engine->GetMaterialList ()
+  	->FindByName ("explosion_texture");
+  pstate->SetMaterial (explosion_material);
+  pstate->SetParticleRadius (0.2);
+  pstate->SetParticlesPerSecond (50);
+  pstate->SetInitialParticleCount (10);
+  pstate->SetPointEmitType ();
+  pstate->SetRadialForceType (2.0, CS_PART_FALLOFF_LINEAR);
+  pstate->SetForce (6.0);
+  pstate->SetDiffusion (1.0);
+  pstate->SetEmitTime (float (EXPLOSION_EMITTIME) / 1000.0);
+  pstate->SetTimeToLive (float (EXPLOSION_PARTTIME) / 1000.0);
+  pstate->SetTimeVariation (float (EXPLOSION_PARTVARTIME) / 1000.0);
+  pstate->SetConstantColorMethod (csColor4 (1.0, 0.8, 0.5));
+  pstate->SetMixMode (CS_FX_ADD);
+  pstate->EnableZSort (false);
+
+  return true;
+}
+
+bool Game::CreateAdversary (int x, int y, int z)
+{
+  float sx = float (x) * ROOM_DIMENSION;
+  float sy = float (y) * ROOM_DIMENSION;
+  float sz = float (z) * ROOM_DIMENSION;
+  csRef<iMeshWrapper> adversary = app->GetEngine ()->CreateMeshWrapper (
+      	adversary_factory, "adversary",
+	maze.GetSector (x, y, z), csVector3 (sx, sy, sz));
+  if (!adversary)
+    return app->ReportError ("Couldn't create adversary mesh!");
+
+  RoomCoordinate rc (x, y, z);
+  Adversary* adv = new Adversary (app, adversary, rc);
+  adversaries.Push (adv);
+  adversary->QueryObject ()->ObjAdd ((iObject*)adv);
+  adv->DecRef ();
+  
+  return true;
+}
+
+bool Game::InitCollisionDetection ()
+{
+  csColliderHelper::InitializeCollisionWrappers (
+      app->GetCollisionDetectionSystem (), app->GetEngine (), 0);
+  return player.InitCollisionDetection ();
+}
+
+bool Game::SetupGame ()
+{
+  if (!maze.CreateGeometry ())
+    return app->ReportError("Error creating the geometry!");
+
+  if (!CreateFactories ())
+    return app->ReportError ("Error creating mesh factories!");
+
+  iEngine* engine = app->GetEngine ();
+  engine->Prepare ();
+
+  if (!InitCollisionDetection ())
+    return false;
+
+  if (!CreateAdversary (0, 0, 2)) return false;
+  if (!CreateAdversary (1, 1, 1)) return false;
+  if (!CreateAdversary (1, 0, 2)) return false;
+  if (!CreateAdversary (2, 2, 2)) return false;
+  return true;
+}
+
+void Game::ExplodeAdversary (Adversary* adv)
+{
+  iMeshWrapper* mesh = adv->GetMesh ();
+  StartExplosion (mesh->GetMovable ()->GetSectors ()->Get (0),
+      	mesh->GetMovable ()->GetTransform ().GetOrigin ());
+  app->GetEngine ()->RemoveObject (mesh);
+  adversaries.Delete (adv);
+}
+
+void Game::StartExplosion (iSector* sector, const csVector3& pos)
+{
+  csRef<iMeshWrapper> explo = app->GetEngine ()->CreateMeshWrapper (
+      explosion_factory, "explosion", sector, pos);
+  if (!explo)
+  {
+    app->ReportError ("Error creating explosion mesh!");
+    return;
+  }
+  explo->SetZBufMode (CS_ZBUF_TEST);
+  Explosion exp (explo, EXPLOSION_TIME);
+  explosions.Push (exp);
+}
+
+void Game::HandleExplosions (csTicks elapsed_ticks)
+{
+  size_t i = 0;
+  while (i < explosions.Length ())
+  {
+    if (explosions[i].Handle (elapsed_ticks)) i++;
+    else
+    {
+      app->GetEngine ()->RemoveObject (explosions[i].GetMesh ());
+      explosions.DeleteIndex (i);
+    }
+  }
+}
+
+void Game::Handle (csTicks elapsed_ticks)
+{
+  float elapsed_seconds = float (elapsed_ticks) / 1000.0;
+
+  // Handle the laser.
+  laser.Handle (elapsed_ticks);
+
+  // Handle explosions.
+  HandleExplosions (elapsed_ticks);
+
+  // Move the camera.
+  player.MoveAndRotateCamera (elapsed_seconds);
+
+  // Let all the adversaries think about what to do.
+  size_t i;
+  for (i = 0 ; i < adversaries.Length () ; i++)
+    adversaries[i]->ThinkAndMove (elapsed_seconds);
+}
+
+bool Game::OnKeyboard(iEvent& ev)
+{
+  // We got a keyboard event.
+  if (csKeyEventHelper::GetEventType(&ev) == csKeyEventTypeDown)
+  {
+    // The user pressed a key (as opposed to releasing it).
+    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
+    switch (code)
+    {
+      case 'e':
+	player.StartMovement (csVector3 (0, 1, 0));
+	return true;
+      case 'q':
+	player.StartMovement (csVector3 (0, -1, 0));
+	return true;
+      case 'a':
+	player.StartMovement (csVector3 (-1, 0, 0));
+	return true;
+      case 'd':
+	player.StartMovement (csVector3 (1, 0, 0));
+	return true;
+      case 'w':
+	player.StartMovement (csVector3 (0, 0, 1));
+	return true;
+      case 's':
+	player.StartMovement (csVector3 (0, 0, -1));
+	return true;
+      case CSKEY_UP:
+	player.StartRotation (csVector3 (-1, 0, 0));
+	return true;
+      case CSKEY_DOWN:
+	player.StartRotation (csVector3 (1, 0, 0));
+	return true;
+      case CSKEY_LEFT:
+	player.StartRotation (csVector3 (0, -1, 0));
+	return true;
+      case CSKEY_RIGHT:
+	player.StartRotation (csVector3 (0, 1, 0));
+	return true;
+      case ' ':
+	laser.Start ();
+	return true;
+    }
+  }
+  return false;
 }
 
 //-----------------------------------------------------------------------------
