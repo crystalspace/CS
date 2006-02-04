@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 4-Feb-2006
+	- Piotr fixed small bug in protmesh when index_buffer is created (csTriangle
+ 	  artibutes are stored as int not unsigned int)
 	- Jorrit changed the driver database to disable point sprites
 	  for ATI on Linux. The particles are miniscule.
 	- Jorrit restructured mazing so that the game logic is now seperated
