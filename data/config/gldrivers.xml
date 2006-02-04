@@ -323,6 +323,21 @@
 	<usecfg>noaps</usecfg>
       </applicable>
     </rule>
+
+    <!-- 
+      * 2006-02-04: Found on driver version X4.3.0-8.19.10
+      -->
+    <rule description="Broken ATI point sprites">
+      <conditions fulfill="all">
+	<!-- Point sprite activation messes up all other geometry -->
+	<regexp string="vendor" pattern="^ATI" />
+	<regexp string="platform" pattern="Unix" />
+      </conditions>
+      <applicable>
+	<usecfg>noaps</usecfg>
+      </applicable>
+    </rule>
+    
     
     <rule description="Work around 3dfx Voodoo shortcomings">
       <conditions>

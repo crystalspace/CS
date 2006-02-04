@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Feb-2006
+	- Jorrit changed the driver database to disable point sprites
+	  for ATI on Linux. The particles are miniscule.
 3-Feb-2006
 	- iceeey made CEGUI wrapper inject time pulses into CEGUI. These are
 	  used in CEGUI for things like tooltip timers.
