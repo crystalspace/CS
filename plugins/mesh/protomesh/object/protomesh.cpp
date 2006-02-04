@@ -454,7 +454,7 @@ void csProtoMeshObjectFactory::PrepareBuffers ()
     if (!index_buffer)
       index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
 	PROTO_TRIS*3,
-              CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT,
+              CS_BUF_STATIC, CS_BUFCOMP_INT,
               0, PROTO_VERTS-1);
     index_buffer->CopyInto (triangles, PROTO_TRIS*3);
   }
