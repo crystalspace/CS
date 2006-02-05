@@ -24,11 +24,14 @@
 
 namespace lighter
 {
+
+  struct RadObjectVertexData;
   
   class LightmapUVLayouter 
   {
   public:
     virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
+      RadObjectVertexData& vertexData,
       LightmapPtrDelArray& lightmaps) = 0;
   };
 
@@ -36,11 +39,15 @@ namespace lighter
   {
   public:
     virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
+      RadObjectVertexData& vertexData,
       LightmapPtrDelArray& lightmaps);
 
   protected:
     bool AllocLightmap (LightmapPtrDelArray& lightmaps, int u, int v,
       csRect &lightmapArea,  int &lightmapID);
+
+    bool ProjectPrimitive (RadPrimitive &prim, BoolDArray &usedVerts,
+      float uscale, float vscale);
   };
 
 }

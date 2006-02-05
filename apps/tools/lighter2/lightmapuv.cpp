@@ -20,16 +20,27 @@
 
 #include "common.h"
 #include "lightmapuv.h"
+#include "radobject.h"
 
 namespace lighter
 {
 
   // Very simple layouter.. just map "flat" on the lightmap
   bool SimpleUVLayouter::LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
+    RadObjectVertexData& vdata,
     LightmapPtrDelArray& lightmaps)
   {
-    // Layout every primitive by itself
-    unsigned int i;
+    if (prims.GetSize () == 0) return false;
+
+    // This is really dumb.. make sure every vertex have unqiue UV
+    size_t i;
+
+    BoolDArray vused;
+    vused.SetSize (vdata.vertexArray.GetSize (), false);
+
+    //TODO Reimplement simple UV-layouter
+    
+    // Layout every primitive by itself    
     for (i = 0; i < prims.GetSize (); i++)
     {
       RadPrimitive &prim = prims[i];
@@ -40,8 +51,14 @@ namespace lighter
       while (!lmCoordsGood && its < 5)
       {
         // Compute lightmapping
-        prim.SetLightmapMapping (globalSettings.uTexelPerUnit / (1<<its), 
-                                 globalSettings.vTexelPerUnit / (1<<its));
+
+        /*prim.SetLightmapMapping (globalSettings.uTexelPerUnit / (1<<its), 
+                                 globalSettings.vTexelPerUnit / (1<<its));*/
+
+
+        ProjectPrimitive (prim, vused,
+                          globalSettings.uTexelPerUnit / (1<<its), 
+                          globalSettings.vTexelPerUnit / (1<<its));
 
         // Compute uv-size  
         prim.ComputeMinMaxUV (minuv, maxuv);
@@ -69,7 +86,7 @@ namespace lighter
         // Ok, now remap our coords
         csVector2 uvRemap = csVector2(lmArea.xmin, lmArea.ymin) - minuv + csVector2(1.0f,1.0f);
         prim.RemapUVs (uvRemap);
-        prim.QuantizeUVs ();
+        //prim.QuantizeUVs ();
         prim.SetLightmapID (lmID);
       }
     }
@@ -117,6 +134,55 @@ namespace lighter
     }
 
     return false;
+  }
+
+  bool SimpleUVLayouter::ProjectPrimitive (RadPrimitive &prim, BoolDArray &usedVerts,
+    float uscale, float vscale)
+  {
+    size_t i;
+
+    // Select projection dimension to be biggest component of plane normal
+    if (prim.GetPlane ().GetNormal ().SquaredNorm () == 0.0f)
+      prim.ComputePlane ();
+
+    const csVector3& normal = prim.GetPlane ().GetNormal ();
+    size_t projDimension = 0; //x
+
+    if (fabsf (normal.y) > fabsf (normal.x) &&
+        fabsf (normal.y) > fabsf (normal.z))
+      projDimension = 1; //y biggest
+    else if (fabsf (normal.z) > fabsf (normal.x))
+      projDimension = 2; //z biggest
+
+    size_t selX = (projDimension + 1) % 3;
+    size_t selY = (projDimension + 2) % 3;
+
+    RadObjectVertexData &vdata = prim.GetVertexData ();
+
+    SizeTDArray &indexArray = prim.GetIndexArray ();
+
+    for (i = 0; i < indexArray.GetSize (); ++i)
+    {
+      if (usedVerts[indexArray[i]])
+      {
+        //need to duplicate        
+        indexArray[i] = vdata.SplitVertex (indexArray[i]);
+        usedVerts.SetSize (vdata.vertexArray.GetSize (), false);
+      }
+      usedVerts[indexArray[i]] = true;
+    }
+
+    for (i = 0; i < indexArray.GetSize (); ++i)
+    {
+      size_t index = indexArray[i];
+      const csVector3 &position = vdata.vertexArray[index].position;
+      csVector2 &lightmapUV = vdata.vertexArray[index].lightmapUV;
+
+      lightmapUV.x = position[selX] * uscale;
+      lightmapUV.y = position[selY] * vscale;
+    }
+
+    return true;
   }
 
 }

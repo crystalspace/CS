@@ -41,6 +41,12 @@ namespace lighter
   typedef csArray<int> IntArray;
   typedef csDirtyAccessArray<int> IntDArray;
 
+  typedef csArray<size_t> SizeTArray;
+  typedef csDirtyAccessArray<size_t> SizeTDArray;
+
+  typedef csArray<bool> BoolArray;
+  typedef csDirtyAccessArray<bool> BoolDArray;
+
   // Constants
   static const float LITEPSILON = 1.0e-5f;
 

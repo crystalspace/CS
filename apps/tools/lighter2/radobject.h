@@ -21,11 +21,75 @@
 
 #include "radprimitive.h"
 #include "lightmap.h"
+#include "csgeom/transfrm.h"
 
 namespace lighter
 {
   class LightmapUVLayouter;
   class RadObject;
+
+  /**
+   * Hold per object vertex data
+   */
+  struct RadObjectVertexData 
+  {
+    struct Vertex
+    {
+      //Position
+      csVector3 position;
+
+      //Normal
+      csVector3 normal;
+
+      //Texture UV
+      csVector2 textureUV;
+
+      //Lightmap UV (not normalized.. pixel-coordinates)
+      csVector2 lightmapUV;
+
+      //Extra data
+      csRef<csRefCount> extraData;
+    };
+
+    typedef csDirtyAccessArray<Vertex> VertexDelArray;
+    VertexDelArray vertexArray;
+
+    //Helper functions
+
+    /// Split one vertex, duplicate it and return index for new one
+    size_t SplitVertex (size_t oldIndex)
+    {
+      const Vertex& oldVertex = vertexArray[oldIndex];
+      return vertexArray.Push (oldVertex);
+    }
+
+    /// Interpolate between two vertices with t
+    Vertex InterpolateVertex (size_t i0, size_t i1, float t)
+    {
+      Vertex newVertex;
+
+      const Vertex& v0 = vertexArray[i0];
+      const Vertex& v1 = vertexArray[i1];
+
+      newVertex.position = v0.position - (v1.position - v0.position) * t;
+      newVertex.normal = v0.normal - (v1.normal - v0.normal) * t;
+      newVertex.normal.Normalize ();
+
+      newVertex.textureUV = v0.textureUV - (v1.textureUV - v0.textureUV) * t;
+      newVertex.lightmapUV = v0.lightmapUV - (v1.lightmapUV - v0.lightmapUV) * t;
+
+      return newVertex;
+    }
+
+    /// Transform all vertex positions
+    void Transform (const csReversibleTransform& transform)
+    {
+      for(size_t i = 0; i < vertexArray.GetSize (); ++i)
+      {
+        vertexArray[i].position = transform.This2Other (vertexArray[i].position);
+      }
+    }
+  };
 
   /**
    * Baseclass for RadObject factories.
@@ -40,20 +104,28 @@ namespace lighter
     // Compute lightmap coordinates for this factory. Returns true on success
     virtual bool ComputeLightmapUV (LightmapUVLayouter* layoutEngine);
 
+    // Renormalize lightmap UVs
+    virtual void RenormalizeLightmapUVs ();
+
     // Get a new object
     virtual RadObject* CreateObject ();
 
     // Parse data
     virtual void ParseFactory (iMeshFactoryWrapper *factory);
-
+  
     // Write out the data again
     virtual void SaveFactory (iDocumentNode *node);
 
     // Name of the factory
     csString factoryName;
+  
   protected:
+
     // All faces, untransformed
     RadPrimitiveArray allPrimitives;
+
+    // Vertex data for above faces
+    RadObjectVertexData vertexData;
 
     // Size of the required lightmaps
     LightmapPtrDelArray lightmapTemplates;
@@ -111,12 +183,21 @@ namespace lighter
     RadPrimitiveArray& GetPrimitives ()
     { return allPrimitives; }
     
+    const RadObjectVertexData& GetVertexData () const
+    { return vertexData; }
+
+    RadObjectVertexData& GetVertexData ()
+    { return vertexData; }
 
     // Name
     csString meshName;
+
   protected:
     // All faces, already transformed
     RadPrimitiveArray allPrimitives;
+
+    // Vertex data for above, transformed
+    RadObjectVertexData vertexData;
 
     // Lightmaps associated with this mesh
     LightmapPtrDelArray lightmaps;

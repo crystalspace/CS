@@ -48,7 +48,7 @@ namespace lighter
     filename = fname;
     //write it out
 
-    ApplyExposureFunction (1.0f, 1.0f);
+    ApplyExposureFunction (0.8f, 1.0f);
 
     // first we downsample to LDR csRGBpixel RGBA
     csRGBpixel *pixelData = new csRGBpixel[width*height];

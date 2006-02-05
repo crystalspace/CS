@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005 by Marten Svanfeldt
+  Copyright (C) 2005-2006 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,6 +17,8 @@
 */
 
 #include "crystalspace.h"
+
+#include <algorithm>
 
 #include "common.h"
 #include "lighter.h"
@@ -40,7 +42,7 @@ namespace lighter
   bool RadObjectFactory::ComputeLightmapUV (LightmapUVLayouter* layoutEngine)
   {
     // Default implementation
-    bool res = layoutEngine->LayoutUVOnPrimitives (allPrimitives, 
+    bool res = layoutEngine->LayoutUVOnPrimitives (allPrimitives, vertexData,
       lightmapTemplates);
     if (!res) return false;
 
@@ -73,6 +75,28 @@ namespace lighter
     }
   }
 
+  void RadObjectFactory::RenormalizeLightmapUVs ()
+  {
+    BoolArray vertexProcessed;
+    vertexProcessed.SetSize (vertexData.vertexArray.GetSize (),false);
+
+    // Iterate over lightmaps and renormalize UVs
+    for (size_t j = 0; j < allPrimitives.GetSize (); ++j)
+    {
+      //TODO make sure no vertex is used in several lightmaps.. 
+      const RadPrimitive &prim = allPrimitives.Get (j);
+      const SizeTDArray &indexArray = prim.GetIndexArray ();
+      const Lightmap* lm= lightmapTemplates[prim.GetLightmapID ()];
+      for (size_t i = 0; i < indexArray.GetSize (); ++i)
+      {
+        csVector2 &lmUV = vertexData.vertexArray[indexArray[i]].lightmapUV;
+        lmUV.x /= lm->GetWidth ();
+        lmUV.y /= lm->GetHeight ();
+      }
+    }
+  }
+
+
   RadObject::RadObject (RadObjectFactory* fact)
     : factory (fact)
   {
@@ -85,14 +109,18 @@ namespace lighter
       GetFullTransform ();
 
     //Copy over data, transform the radprimitives..
-    allPrimitives = factory->allPrimitives;
-    unsigned int i = 0;
-    for (i = 0; i < allPrimitives.GetSize (); i++)
-    {
-      RadPrimitive& prim = allPrimitives[i];
+    vertexData = factory->vertexData;
+    
+    vertexData.Transform (transform);
 
-      prim.Transform (transform);
-      //recompute the factors
+    unsigned int i = 0;
+    for(i = 0; i < factory->allPrimitives.GetSize (); ++i)
+    {
+      RadPrimitive newPrim (vertexData);
+      
+      RadPrimitive& prim = allPrimitives[allPrimitives.Push (newPrim)];
+      prim.SetOriginalPrimitive (&factory->allPrimitives[i]);
+      prim.GetIndexArray () = factory->allPrimitives[i].GetIndexArray ();
       prim.ComputePlane ();
       prim.ComputeUVTransform ();
       prim.SetRadObject (this);
@@ -100,7 +128,7 @@ namespace lighter
     }
 
     // Create and init lightmaps
-    for (i = 0; i < factory->lightmapTemplates.GetSize (); i++)
+    for (i = 0; i < factory->lightmapTemplates.GetSize (); ++i)
     {
       Lightmap *lm = new Lightmap (*(factory->lightmapTemplates.Get (i)));
       lm->Initialize ();
@@ -256,27 +284,23 @@ namespace lighter
     int i = 0;
 
     // Here we should save extra per-vertex stuff!
-    normals = new csVector3[genFact->GetVertexCount ()];
+    vertexData.vertexArray.SetSize (genFact->GetVertexCount ());
+    
     for (i = 0; i < genFact->GetVertexCount (); i++)
     {
-      normals[i] = factNormals[i];
+      RadObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
+      vertex.position = verts[i];
+      vertex.normal = factNormals[i];
     }
 
+    
     for (i=0; i<genFact->GetTriangleCount ();i++)
     {
-      RadPrimitive newPrim;
-      Vector3DArray &arr = newPrim.GetVertices ();
-      IntArray &extra = newPrim.GetExtraData ();
+      RadPrimitive newPrim (vertexData);
+      newPrim.GetIndexArray ().Push (tris[i].a);
+      newPrim.GetIndexArray ().Push (tris[i].b);
+      newPrim.GetIndexArray ().Push (tris[i].c);
 
-      arr.Push (verts[tris[i].a]);
-      arr.Push (verts[tris[i].b]);
-      arr.Push (verts[tris[i].c]);
-
-      extra.Push (tris[i].a);
-      extra.Push (tris[i].b);
-      extra.Push (tris[i].c);
-
-      newPrim.GetUVs ().SetSize (3);
       newPrim.ComputePlane ();
       
       allPrimitives.Push (newPrim);
@@ -292,43 +316,58 @@ namespace lighter
     if (!genFact) return; // bail
 
     // For now, just dump.. later we should preserve extra attributes etc :)
-
-    genFact->SetVertexCount ((int)allPrimitives.GetSize () * 3);
-    genFact->SetTriangleCount ((int)allPrimitives.GetSize ());
     
+    RenormalizeLightmapUVs ();
+
+    genFact->SetVertexCount ((int)vertexData.vertexArray.GetSize ());
+
     csTriangle *tris = genFact->GetTriangles ();
     csVector3 *verts = genFact->GetVertices ();
-    csVector2 *tc = genFact->GetTexels ();
+    csVector2 *textureUV = genFact->GetTexels ();
+    csRef<csRenderBuffer> lightmapBuffer = csRenderBuffer::CreateRenderBuffer (
+      genFact->GetVertexCount (), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+    genFact->RemoveRenderBuffer ("texture coordinate lightmap");
+    genFact->AddRenderBuffer ("texture coordinate lightmap", lightmapBuffer);
+    
     csVector3 *factNormals = genFact->GetNormals ();
 
-    int j = 0;
-
-    for (int i=0; i< genFact->GetTriangleCount (); i++)
     {
-      const Lightmap* lm = lightmapTemplates[allPrimitives[i].GetLightmapID ()];
-      
-      allPrimitives[i].RenormalizeUVs (lm->GetWidth (),
-                                       lm->GetHeight ());
-
-      const Vector3DArray& v = allPrimitives[i].GetVertices ();
-      const Vector2DArray& uv = allPrimitives[i].GetUVs ();
-      const IntArray& extra = allPrimitives[i].GetExtraData ();
-
-      verts[j] = v[0];
-      tc[j] = uv[0];
-      factNormals[j] = normals[extra[0]];
-      tris[i].a = j++;
-
-      verts[j] = v[1];
-      tc[j] = uv[1];
-      factNormals[j] = normals[extra[1]];
-      tris[i].b = j++;
-
-      verts[j] = v[2];
-      tc[j] = uv[2];
-      factNormals[j] = normals[extra[2]];
-      tris[i].c = j++;
+      csRenderBufferLock<csVector2> bufferLock(lightmapBuffer);
+      csVector2 *lightmapUV = bufferLock.Lock ();
+      // Save vertex-data
+      for (int i = 0; i < genFact->GetVertexCount (); ++i)
+      {
+        const RadObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
+        verts[i] = vertex.position;
+        textureUV[i] = vertex.textureUV;
+        lightmapUV[i] = vertex.lightmapUV;
+        factNormals[i] = vertex.normal;
+      }
     }
+
+    // Save primitives, trianglate on the fly
+    IntDArray indexArray;
+    indexArray.SetCapacity (allPrimitives.GetSize ());
+    for (uint i = 0; i < allPrimitives.GetSize (); ++i)
+    {
+      SizeTDArray& indices = allPrimitives[i].GetIndexArray ();
+      if (indices.GetSize () == 3)
+      {
+        //Triangle, easy case
+        indexArray.Push ((int)indices[0]);
+        indexArray.Push ((int)indices[1]);
+        indexArray.Push ((int)indices[2]);
+      }
+      else
+      {
+        //TODO: Implement this case, use a triangulator
+      }
+    }
+
+    genFact->SetTriangleCount ((int)indexArray.GetSize ()/3);
+    csTriangle *gentri = genFact->GetTriangles ();
+    std::copy (indexArray.GetArray (), indexArray.GetArray () + indexArray.GetSize (),
+      (int*)gentri);
 
     RadObjectFactory::SaveFactory (node);
   }

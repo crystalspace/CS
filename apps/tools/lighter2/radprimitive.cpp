@@ -18,9 +18,84 @@
 
 #include "crystalspace.h"
 #include "radprimitive.h"
+#include "radobject.h"
 
 namespace lighter
 {
+
+  void RadPrimitive::ComputeMinMaxUV (csVector2 &min, csVector2 &max) const
+  {
+    size_t index = indexArray[0];
+    min = vertexData.vertexArray[index].lightmapUV;
+    max = vertexData.vertexArray[index].lightmapUV;
+    for (uint i = 1; i < indexArray.GetSize (); ++i)
+    {
+      index = indexArray[i];
+      const csVector2 &uv = vertexData.vertexArray[index].lightmapUV;
+      min.x = csMin (min.x, uv.x);
+      min.y = csMin (min.y, uv.y);
+
+      max.x = csMax (max.x, uv.x);
+      max.y = csMax (max.y, uv.y);
+    }
+  }
+
+  void RadPrimitive::RemapUVs (csVector2 &move)
+  {    
+    for (uint i = 0; i < indexArray.GetSize (); i++)
+    {
+      size_t index = indexArray[i];
+      csVector2 &uv = vertexData.vertexArray[index].lightmapUV;
+      uv += move;
+    }
+  }
+
+  void RadPrimitive::ComputePlane ()
+  {
+    //Setup a temporary array of our vertices
+    Vector3DArray vertices;
+    for(uint i = 0; i < indexArray.GetSize (); ++i)
+    {
+      vertices.Push (vertexData.vertexArray[indexArray[i]].position);
+    }
+    plane = csPoly3D::ComputePlane (vertices);
+  }
+
+  const csVector3 RadPrimitive::GetCenter () const
+  {
+    csVector3 centroid(0.0f);
+    for(uint i = 0; i < indexArray.GetSize (); ++i)
+    {
+      centroid += vertexData.vertexArray[indexArray[i]].position;
+    }
+    centroid / (float)indexArray.GetSize ();
+    return centroid;
+  }
+
+  float RadPrimitive::GetArea () const
+  {
+    float area = 0;
+    for(uint i = 0; i < indexArray.GetSize () - 2; ++i)
+    {
+      area += csMath3::DoubleArea3 (vertexData.vertexArray[indexArray[i]].position,
+        vertexData.vertexArray[indexArray[i+1]].position, 
+        vertexData.vertexArray[indexArray[i+2]].position);
+    }
+    return area/2.0f;
+  }
+
+  void RadPrimitive::GetExtent (uint axis, float &min, float &max) const
+  {
+    min = FLT_MAX;
+    max = -FLT_MAX;
+    for (unsigned int i = 0; i < indexArray.GetSize (); ++i)
+    {
+      float val = vertexData.vertexArray[indexArray[i]].position[axis];
+      min = csMin(min, val);
+      max = csMax(max, val);
+    }
+  }
+
 
   bool RadPrimitive::Split (const csPlane3& splitPlane, RadPrimitive &back)
   {
@@ -28,14 +103,14 @@ namespace lighter
     
     // Classify all points
     FloatArray classification;
-    classification.SetSize (vertices.GetSize ());
+    classification.SetSize (indexArray.GetSize ());
     
     bool n = false, p = false;
     uint i;
 
-    for (i = 0; i < vertices.GetSize (); i++)
+    for (i = 0; i < indexArray.GetSize (); i++)
     {
-      float c = splitPlane.Classify (vertices[i]);
+      float c = splitPlane.Classify (vertexData.vertexArray[indexArray[i]].position);
       if (c > LITEPSILON) p = true;
       else if (c < LITEPSILON) n = true;
 
@@ -58,136 +133,94 @@ namespace lighter
     if (!n)
     {
       //No negative, back is empty
-      back.vertices.DeleteAll ();
-      back.lightmapUVs.DeleteAll ();
-      back.extraData.DeleteAll ();
+      back.indexArray.DeleteAll ();
       return true;
     }
     else if (!p)
     {
       //No positive, current is back
-      back.vertices = vertices;
-      back.lightmapUVs = lightmapUVs;
-      back.extraData = extraData;
-
-      vertices.DeleteAll ();
-      lightmapUVs.DeleteAll ();
-      extraData.DeleteAll ();
+      back.indexArray = indexArray;
+      
+      indexArray.DeleteAll ();
     }
     else
     {
       // Split-time! :)
       back.plane = plane;
 
-      Vector3DArray &negVert = back.vertices;
-      Vector2DArray &negUV = back.lightmapUVs;
-      IntArray &negExtra = back.extraData;
-      negVert.Empty (); negVert.SetSize (vertices.GetSize ());
-      negUV.Empty (); negUV.SetSize (vertices.GetSize ());
-      negExtra.Empty (); negExtra.SetSize (vertices.GetSize ());
+      SizeTDArray negIndex;
+      SizeTDArray posIndex;
 
-      Vector3DArray posVert;
-      Vector2DArray posUV;
-      IntDArray posExtra;
-
-      posVert.SetSize (vertices.GetSize ());
-      posUV.SetSize (vertices.GetSize ());
-      posExtra.SetSize (vertices.GetSize ());
+      negIndex.SetCapacity (indexArray.GetSize ());
+      posIndex.SetCapacity (indexArray.GetSize ());
 
       // Visit all edges, add vertices to back/front as needed. Add intersection-points
       // if needed
-      size_t v0 = vertices.GetSize () - 1;
-      for (size_t v1 = 0; v1 < vertices.GetSize (); v1++)
+      size_t i0 = indexArray.GetSize () - 1;
+      for (size_t i1 = 0; i1 < indexArray.GetSize (); ++i1)
       {
-        const csVector3 & p0 = vertices[v0];
-        const csVector3 & p1 = vertices[v1];
-        const csVector2 & t0 = lightmapUVs[v0];
-        const csVector2 & t1 = lightmapUVs[v1];
+        size_t v0 = indexArray[i0];
+        size_t v1 = indexArray[i1];
+        
         float d0 = classification[v0];
         float d1 = classification[v1];
 
         if (d0 < 0 && d1 < 0)
         {
           // neg-neg
-          negVert.Push (p1);
-          negUV.Push (t1);
-          negExtra.Push (extraData[v1]);
+          negIndex.Push (v1);
         }
         else if (d0 < 0 && d1 == 0)
         {
           // neg-zero
-          negVert.Push (p1);
-          negUV.Push (t1);
-          negExtra.Push (extraData[v1]);
-
-          posVert.Push (p1);
-          posUV.Push (t1);
-          posExtra.Push (extraData[v1]);
+          negIndex.Push (v1);
+          posIndex.Push (v1);
         }
         else if (d0 < 0 && d1 > 0)
         {
           // neg-pos xing
           float D = d0 / (d1 - d0);
-          csVector3 isecVert = p0 - (p1 - p0) * D;
-          negVert.Push (isecVert);
-          posVert.Push (isecVert);
-          posVert.Push (p1);
 
-          csVector2 isecUV = t0 - (t1 - t0) * D;
-          negUV.Push (isecUV);
-          posUV.Push (isecUV);
-          posUV.Push (t1);
+          RadObjectVertexData::Vertex isec = 
+            vertexData.InterpolateVertex (v0, v1, D);
 
-          posExtra.Push (-1);
+          size_t vi = vertexData.vertexArray.Push (isec);
+
+          negIndex.Push (vi);
+          posIndex.Push (vi);
         }
         else if (d0 == 0 && d1 > 0)
         {
           // zero-pos
-          posVert.Push (p1);
-          posUV.Push (t1);
-          posExtra.Push (extraData[v1]);
+          posIndex.Push (v1);
         }
         else if (d0 == 0 && d1 < 0)
         {
           // zero-neg
-          negVert.Push (p1);
-          negUV.Push (t1);
-          negExtra.Push (extraData[v1]);
+          negIndex.Push (v1);
         }
         else if (d0 > 0 && d1 > 0)
         {
           // pos-pos
-          posVert.Push (p1);
-          posUV.Push (t1);
-          posExtra.Push (extraData[v1]);
+          posIndex.Push (v1);
         }
         else if (d0 > 0 && d1 < 0)
         {
           // pos-neg
           float D = d1 / (d0 - d1);
-          csVector3 isecVert = p1 - (p0 - p1) * D;
-          posVert.Push (isecVert);
-          negVert.Push (isecVert);
-          negVert.Push (p1);
-         
-          csVector2 isecUV = t1 - (t0 - t1) * D;
-          posUV.Push (isecUV);
-          negUV.Push (isecUV);
-          negUV.Push (t1);
+          RadObjectVertexData::Vertex isec = 
+            vertexData.InterpolateVertex (v0, v1, D);
 
-          negExtra.Push (-1);
+          size_t vi = vertexData.vertexArray.Push (isec);
+
+          negIndex.Push (vi);
+          posIndex.Push (vi);
         }
         else if (d0 > 0 && d1 == 0)
         {
           //pos-zero
-          posVert.Push (p1);
-          negVert.Push (p1);
-
-          posUV.Push (t1);
-          negUV.Push (t1);
-
-          posExtra.Push (extraData[v1]);
-          negExtra.Push (extraData[v1]);
+          negIndex.Push (v1);
+          posIndex.Push (v1);
         }
         else if (d0 == 0 && d1 == 0)
         {
@@ -198,14 +231,13 @@ namespace lighter
         v0 = v1;
       }
       // set ourself as front
-      vertices = posVert;
-      lightmapUVs = posUV;
-      extraData = posExtra;
+      indexArray = posIndex;
+      back.indexArray = negIndex;
     }
 
 
     // Make sure back gets any extra data
-    if (back.vertices.GetSize ())
+    if (back.indexArray.GetSize ())
     {
       back.plane = plane;
       back.uFormVector = uFormVector;
@@ -219,42 +251,6 @@ namespace lighter
     return true;
   }
 
-  void RadPrimitive::SetLightmapMapping (float uScale /* = 1.0f */, 
-                                         float vScale /* = 1.0f */)
-  {
-    int polyAxis = csPoly3D::ComputeMainNormalAxis ();
-    
-    // Make sure we have room
-    lightmapUVs.SetSize (vertices.GetSize ());
-
-    if (polyAxis == CS_AXIS_X)
-    {
-      // use YZ-plane
-      for (uint i = 0; i < vertices.GetSize (); i++)
-      {
-        lightmapUVs[i].x = vertices[i].z * uScale;
-        lightmapUVs[i].y = vertices[i].y * vScale;
-      }
-    }
-    else if (polyAxis == CS_AXIS_Y)
-    {
-      // use XZ-plane
-      for (uint i = 0; i < vertices.GetSize (); i++)
-      {
-        lightmapUVs[i].x = vertices[i].x * uScale;
-        lightmapUVs[i].y = vertices[i].z * vScale;
-      }
-    }
-    else
-    {
-      // use XY-plane
-      for (uint i = 0; i < vertices.GetSize (); i++)
-      {
-        lightmapUVs[i].x = vertices[i].x * uScale;
-        lightmapUVs[i].y = vertices[i].y * vScale;
-      }
-    }
-  }
 
   /* Ok, this is a very strange method.. it is fetched from FSrad
    * and basically computes the world->uv-transform. Check following 
@@ -390,23 +386,28 @@ namespace lighter
     float maxuDist = -1, maxvDist = -1;
 
     //visit all vertices
-    for (uint i = 0; i < vertices.GetSize (); i++)
+    for (uint i = 0; i < indexArray.GetSize (); i++)
     {
-      csVector3& c3D = vertices[i];
-      csVector2& c2D = lightmapUVs[i];
-      size_t v0 = vertices.GetSize () - 1;
+      const RadObjectVertexData::Vertex& v = vertexData.vertexArray[indexArray[i]];
+      const csVector3& c3D = v.position;
+      const csVector2& c2D = v.lightmapUV;
+
+      size_t v0 = indexArray.GetSize () - 1;
 
       // Visit all edges
-      for (size_t v1 = 0; v1 < vertices.GetSize (); v1++)
+      for (size_t v1 = 0; v1 < indexArray.GetSize (); v1++)
       {
         // Skip those that includes current vertex
         if (v0 != i && v1 != i)
         {
-          csVector3& v03D = vertices[v0];
-          csVector3& v13D = vertices[v1];
+          const RadObjectVertexData::Vertex& vert0 = vertexData.vertexArray[indexArray[v0]];
+          const RadObjectVertexData::Vertex& vert1 = vertexData.vertexArray[indexArray[v1]];
 
-          csVector2& v02D = lightmapUVs[v0];
-          csVector2& v12D = lightmapUVs[v1];
+          const csVector3& v03D = vert0.position;
+          const csVector3& v13D = vert1.position;
+
+          const csVector2& v02D = vert0.lightmapUV;
+          const csVector2& v12D = vert1.lightmapUV;
 
           //intercept u
           if ((v02D.x - LITEPSILON <= c2D.x && v12D.x + LITEPSILON >= c2D.x) || 
@@ -473,8 +474,8 @@ namespace lighter
     maxUV.x = maxu; maxUV.y = maxv;
 
     // Min xyz
-    csVector2 d = minUV - lightmapUVs[0];
-    minCoord = vertices[0] + uFormVector * d.x + vFormVector * d.y;
+    csVector2 d = minUV - vertexData.vertexArray[indexArray[0]].lightmapUV;
+    minCoord = vertexData.vertexArray[indexArray[0]].position + uFormVector * d.x + vFormVector * d.y;
     
     // Number of patches in u/v direction
     uPatches = uc / uResolution;
@@ -509,7 +510,7 @@ namespace lighter
     if (vCut.Classify (primCenter) < 0) vCut.Normal () = -vCut.Normal ();
 
     // Start slicing
-    csPoly3D poly = *this;
+    csPoly3D poly = BuildPoly3D ();
 
 
     csPlane3 evCut = vCut;
@@ -587,7 +588,6 @@ namespace lighter
     {
       totalElementArea -= elementAreas[i];
     }
-    
   }
 
   void RadPrimitive::PrepareNoPatches ()
@@ -607,8 +607,8 @@ namespace lighter
     maxUV.x = maxu; maxUV.y = maxv;
 
     // Min xyz
-    csVector2 d = minUV - lightmapUVs[0];
-    minCoord = vertices[0] + uFormVector * d.x + vFormVector * d.y;
+    csVector2 d = minUV - vertexData.vertexArray[indexArray[0]].lightmapUV;
+    minCoord = vertexData.vertexArray[indexArray[0]].position + uFormVector * d.x + vFormVector * d.y;
 
     elementAreas.SetCapacity (uc * vc);
 
@@ -627,7 +627,7 @@ namespace lighter
     if (vCut.Classify (primCenter) < 0) vCut.Normal () = -vCut.Normal ();
 
     // Start slicing
-    csPoly3D poly = *this;
+    csPoly3D poly = BuildPoly3D ();
 
     csPlane3 evCut = vCut;
     for (uint v = 0; v  < vc; v++)
@@ -670,6 +670,39 @@ namespace lighter
         elementAreas.Push (elArea);
       }
     }
+  }
+
+  csPoly3D RadPrimitive::BuildPoly3D () const
+  {
+    csPoly3D poly;
+
+    for(uint i = 0; i < indexArray.GetSize (); ++i)
+    {
+      poly.AddVertex (vertexData.vertexArray[indexArray[i]].position);
+    }
+
+    return poly;
+  }
+
+  int RadPrimitive::Classify (const csPlane3 &plane) const
+  {
+    size_t i;
+    size_t front = 0, back = 0;
+
+    for (i = 0; i < indexArray.GetSize (); i++)
+    {
+      float dot = plane.Classify (vertexData.vertexArray[indexArray[i]].position);
+      if (ABS (dot) < EPSILON) dot = 0;
+      if (dot > 0)
+        back++;
+      else if (dot < 0)
+        front++;
+    }
+
+    if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
+    if (back == 0) return CS_POL_FRONT;
+    if (front == 0) return CS_POL_BACK;
+    return CS_POL_SPLIT_NEEDED;
   }
 
 }

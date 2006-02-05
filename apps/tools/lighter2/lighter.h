@@ -19,6 +19,8 @@
 #ifndef __LIGHTER_H__
 #define __LIGHTER_H__
 
+#include "csutil/refcount.h"
+
 namespace lighter
 {
   class Scene;
@@ -27,7 +29,7 @@ namespace lighter
   class RadPrimitive;
   class Raytracer;
 
-  class Lighter
+  class Lighter : public csRefCount
   {
   public:
     Lighter (iObjectRegistry *objectRegistry);

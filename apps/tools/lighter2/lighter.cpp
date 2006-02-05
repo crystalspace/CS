@@ -285,11 +285,11 @@ namespace lighter
     csVector3 halfU = prim.GetuFormVector () * 0.5f;
     csVector3 halfV = prim.GetvFormVector () * 0.5f;
 
-    RAYTEST(elCenter, 0.2f);
-    RAYTEST(elCenter + halfU + halfV, 0.2f);
+    RAYTEST(elCenter, 1.0f);
+    /*RAYTEST(elCenter + halfU + halfV, 0.2f);
     RAYTEST(elCenter - halfU + halfV, 0.2f);
     RAYTEST(elCenter + halfU - halfV, 0.2f);
-    RAYTEST(elCenter - halfU - halfV, 0.2f);
+    RAYTEST(elCenter - halfU - halfV, 0.2f);*/
 
 #undef RAYTEST
     return vis;
@@ -337,12 +337,13 @@ namespace lighter
 
         // energy
         csColor energy = light->freeEnergy * Fij * visFact;
-        csColor reflected = energy;
+        csColor reflected = energy * prim.GetOriginalPrimitive ()->GetReflectanceColor();
         //blah
         //store stats
 
         Lightmap * lm = prim.GetRadObject ()->GetLightmaps ()[prim.GetLightmapID ()];
         lm->GetData ()[v*lm->GetWidth ()+u] += reflected;
+        //lm->GetData ()[v*lm->GetWidth ()+u] = csColor(1.0f, 1.0f, 1.0f);
 
         uint patchIndex = (v-minV)/globalSettings.vPatchResolution * prim.GetuPatches ()+(u-minU)/globalSettings.uPatchResolution;
         RadPatch &patch = prim.GetPatches ()[patchIndex];
@@ -360,7 +361,9 @@ int main (int argc, char* argv[])
   if (!object_reg) return 1;
 
   // Load up the global object
-  lighter::globalLighter = new lighter::Lighter (object_reg);
+  csRef<lighter::Lighter> localLighter;
+  localLighter.AttachNew (new lighter::Lighter (object_reg));
+  lighter::globalLighter = localLighter;
 
   // Initialize it
   if (!lighter::globalLighter->Initialize ()) return 1;
@@ -368,8 +371,9 @@ int main (int argc, char* argv[])
   // Light em up!
   if (!lighter::globalLighter->LightEmUp ()) return 1;
 
+  localLighter = 0;
+
   // Remove it
-  delete lighter::globalLighter;
   csInitializer::DestroyApplication (object_reg);
 
   return 0;

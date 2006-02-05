@@ -199,7 +199,11 @@ namespace lighter
     if (ray.direction * primitive->GetPlane ().norm < 0) return false;
 
     csVector3 isect;
-    bool haveHit = csIntersect3::SegmentPolygon (seg, *primitive, primitive->GetPlane (), isect);
+    //bool haveHit = csIntersect3::SegmentPolygon (seg, *primitive, primitive->GetPlane (), isect);
+    //TODO: REWORK, ugly, and slow, slow, slow..
+    bool haveHit = csIntersect3::SegmentPolygon (seg, primitive->BuildPoly3D (), 
+      primitive->GetPlane (), isect);
+  
     if (haveHit)
     {
       hit.hitPoint = isect;

@@ -26,51 +26,31 @@
 namespace lighter
 {
   class RadObject;
+  struct RadObjectVertexData;
 
   /**
   * Primitive in the radiosity world.
   * Represents a single primitive (face) in the radiosity world.
   */
-  class RadPrimitive : public csPoly3D
+  class RadPrimitive
   {
   public:
     // Constructors
-    inline RadPrimitive () 
-      : uFormVector (0), vFormVector (0), illuminationColor (0,0,0),
-      reflectanceColor (0,0,0), uPatches (0), vPatches (0), minCoord (0),
+    inline RadPrimitive (RadObjectVertexData &dataHolder) 
+      : vertexData(dataHolder),
+      uFormVector (0), vFormVector (0), illuminationColor (0,0,0),
+      reflectanceColor (1.0f,1.0f,1.0f), uPatches (0), vPatches (0), minCoord (0),
       minUV (0,0), maxUV (0,0), originalPrim (0), radObject (0), lightmapID (0)
     {
     }
 
-    // Transform the primitive with given transform
-    inline void Transform (const csReversibleTransform& trans)
-    {
-      for (unsigned int i = 0; i < vertices.GetSize (); i++)
-      {
-        vertices[i] = trans.This2Other (vertices[i]);
-      }
-    }
-
-    // Split primitive into two. Front side is kept in current
+    ///Split primitive into two. Front side is kept in current
     bool Split (const csPlane3& plane, RadPrimitive &back);
 
-    // Calculate min-max UV-coords
-    inline void ComputeMinMaxUV (csVector2 &min, csVector2 &max) const
-    {
-      min = lightmapUVs[0];
-      max = lightmapUVs[0];
-      for (uint i = 1; i < lightmapUVs.GetSize (); i++)
-      {
-        const csVector2 &uv = lightmapUVs[i];
-        min.x = csMin (min.x, uv.x);
-        min.y = csMin (min.y, uv.y);
+    /// Calculate min-max UV-coords
+    void ComputeMinMaxUV (csVector2 &min, csVector2 &max) const;
 
-        max.x = csMax (max.x, uv.x);
-        max.y = csMax (max.y, uv.y);
-      }
-    }
-
-    // Calculate min-max UV-coords as integers
+    /// Calculate min-max UV-coords as integers
     inline void ComputeMinMaxUV (int &minU, int &maxU, int &minV, int &maxV) const
     {
       csVector2 min, max;
@@ -81,82 +61,50 @@ namespace lighter
       maxV = (int)floor (max.y);
     }
 
-    // Fix down the min/max to ints..
-    inline void QuantizeUVs ()
+    /// Fix down the min/max to ints..
+/*    inline void QuantizeUVs ()
     {
+      //TODO Move to per object
       for (uint i = 0; i < lightmapUVs.GetSize (); i++)
       {
         csVector2 &uv = lightmapUVs[i];
         uv.x = int(uv.x+0.5);
         uv.y = int(uv.y+0.5);
       }
-    }
+    }*/
 
-    // Remap (in linear fashion) the UVs
-    inline void RemapUVs (csVector2 &move)
-    {
-      for (uint i = 0; i < lightmapUVs.GetSize (); i++)
-      {
-        csVector2 &uv = lightmapUVs[i];
-        uv += move;
-      }
-    }
+    /// Remap (in linear fashion) the UVs
+    void RemapUVs (csVector2 &move);
 
-    // Renormalize UVs given picture size
-    inline void RenormalizeUVs (int uSize, int vSize)
-    {
-      for (uint i = 0; i < lightmapUVs.GetSize (); i++)
-      {
-        csVector2 &uv = lightmapUVs[i];
-        uv.x = uv.x / (float)uSize;
-        uv.y = uv.y / (float)vSize;
-      }
-    }
+    /// Calculate and save primitive plane
+    void ComputePlane ();
 
-    // Calculate and save primitive plane
-    inline void ComputePlane ()
-    {
-      plane = csPoly3D::ComputePlane ();
-    }
+    /// Calculate center
+    const csVector3 GetCenter () const;
 
-    // Calculate center
-    const csVector3 GetCenter () const
-    {
-      return csPoly3D::GetCenter ();
-    }
+    /// Calculate area, forwarder
+    float GetArea () const;
 
-    // Calculate area, forwarder
-    inline float GetArea () const
-    {
-      return csPoly3D::GetArea ();
-    }
+    /// Get min/max extent in given dimension
+    void GetExtent (uint dimension, float &min, float &max) const;
 
-    // Get min/max extent in given dimension
-    inline void GetExtent (uint dimension, float &min, float &max) const
-    {
-      min = FLT_MAX;
-      max = -FLT_MAX;
-      for (unsigned int i = 0; i < vertices.GetSize (); i++)
-      {
-        float val = vertices[i][dimension];
-        min = csMin(min, val);
-        max = csMax(max, val);
-      }
-    }
-
-    // Set 3d->2d mapping scales
-    void SetLightmapMapping (float uScale = 1.0f, float vScale = 1.0f);
-
-    // Calculate the u/v form vectors
+    /// Calculate the u/v form vectors
     void ComputeUVTransform ();
 
-    // Prepare the primitive, create patches and elements
+    /// Prepare the primitive, create patches and elements
     void Prepare (uint uResolution, uint vResolution);
 
-    // Prepare the primitive wihtout creating new patches (just make sure elements are right)
+    /// Prepare the primitive wihtout creating new patches (just make sure elements are right)
     void PrepareNoPatches ();
 
+    /// Build a 
+    csPoly3D BuildPoly3D () const;
+
+    /// Classify with respect to another plane
+    int Classify (const csPlane3 &plane) const;
+
     // Data accessors
+    /*
     inline Vector3DArray& GetVertices () { return vertices; }
     inline const Vector3DArray& GetVertices () const { return vertices; }
 
@@ -165,6 +113,12 @@ namespace lighter
 
     inline IntDArray& GetExtraData () { return extraData; }
     inline const IntDArray& GetExtraData () const { return extraData; }
+*/
+    inline SizeTDArray& GetIndexArray () { return indexArray; }
+    inline const SizeTDArray& GetIndexArray () const { return indexArray; }
+
+    inline RadObjectVertexData& GetVertexData () { return vertexData; }
+    inline const RadObjectVertexData& GetVertexData () const { return vertexData; }
 
     inline const csPlane3& GetPlane () const { return plane; }
 
@@ -197,42 +151,48 @@ namespace lighter
 
   protected:
     // Lightmap texture coordinates
-    Vector2DArray lightmapUVs;
+    //Vector2DArray lightmapUVs;
 
     // Extra per-vertex data (meshtype specific)
-    IntDArray extraData;
+    //IntDArray extraData;
 
-    // Computed plane
+    /// Vertex data holder
+    RadObjectVertexData& vertexData;
+
+    /// Index array for this primitive
+    SizeTDArray indexArray;
+
+    /// Computed plane
     csPlane3 plane;
 
-    // Mapping vectors
+    /// Mapping vectors
     csVector3 uFormVector;
     csVector3 vFormVector;
 
-    // Color
+    /// Color
     csColor illuminationColor;
     csColor reflectanceColor;
 
-    // Elements
+    /// Elements
     FloatDArray elementAreas;
 
-    // Patches
+    /// Patches
     RadPatchArray patches;
     uint uPatches;
     uint vPatches;
 
-    // Min/max data
+    /// Min/max data
     csVector3 minCoord;
     csVector2 minUV;
     csVector2 maxUV;
 
-    // Pointer to unchanged prim
+    /// Pointer to unchanged prim
     RadPrimitive *originalPrim;
 
-    // Original object
+    /// Original object
     RadObject* radObject;
 
-    // Lightmap id
+    /// Lightmap id
     uint lightmapID;
   };
 

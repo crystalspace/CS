@@ -271,14 +271,15 @@ namespace lighter
     void operator() (RadObject* obj)
     {
       RadPrimitiveArray &primArray = obj->GetPrimitives ();
+      RadObjectVertexData &vdata = obj->GetVertexData ();
       for (unsigned int i = 0; i < primArray.GetSize (); i++)
       {
         root->radPrimitives.Push (&primArray[i]);
-        const Vector3DArray & va = primArray[i].GetVertices ();
+        const SizeTDArray & ia = primArray[i].GetIndexArray ();
         //compute bb at same time
-        for (unsigned int j = 0; j < va.GetSize (); j++)
+        for (unsigned int j = 0; j < ia.GetSize (); j++)
         {
-          root->boundingBox.AddBoundingVertexSmart (va[j]);
+          root->boundingBox.AddBoundingVertexSmart (vdata.vertexArray[ia[j]].position);
         }
       }
     }
