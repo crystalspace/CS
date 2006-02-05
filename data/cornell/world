@@ -245,22 +245,22 @@
       </move>
     </meshobj>
     <light name="Lamp">
-      <center x="3.43" y="5.488" z="2.27"/>
+      <center x="3.43" y="5.4" z="2.27"/>
       <color red="1" green="1" blue="1"/>
       <radius>20</radius>
     </light>
     <light name="Lamp.001">
-      <center x="3.43" y="5.488" z="3.32"/>
+      <center x="3.43" y="5.4" z="3.32"/>
       <color red="1" green="1" blue="1"/>
       <radius>20</radius>
     </light>
     <light name="Lamp.002">
-      <center x="2.13" y="5.488" z="3.32"/>
+      <center x="2.13" y="5.4" z="3.32"/>
       <color red="1" green="1" blue="1"/>
       <radius>20</radius>
     </light>
     <light name="Lamp.003">
-      <center x="2.13" y="5.488" z="2.27"/>
+      <center x="2.13" y="5.4" z="2.27"/>
       <color red="1" green="1" blue="1"/>
       <radius>20</radius>
     </light>

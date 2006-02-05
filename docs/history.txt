@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Feb-2006
+	- Marten fixed the lighter2 after last refactoring. Running lighter2 on
+	  cornell level should now work out-of-the-box. Still work to do to
+	  make it work on other levels and more features..
 4-Feb-2006
 	- Piotr fixed small bug in protmesh when index_buffer is created (csTriangle
  	  artibutes are stored as int not unsigned int)

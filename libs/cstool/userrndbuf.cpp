@@ -57,7 +57,7 @@ bool csUserRenderBufferManager::AddRenderBuffer (csStringID name,
 bool csUserRenderBufferManager::RemoveRenderBuffer (csStringID name)
 {
   size_t bufIndex = userBuffers.FindSortedKey (UserBufArrayCmp (name));
-  if (bufIndex != csArrayItemNotFound) return false;
+  if (bufIndex == csArrayItemNotFound) return false;
   userBuffers.DeleteIndex (bufIndex);
   return true;
 }
