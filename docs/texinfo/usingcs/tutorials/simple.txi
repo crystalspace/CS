@@ -389,8 +389,8 @@ void Simple::CreateRoom ()
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (
     engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iMeshObject> walls_object = walls->GetMeshObject ();
-  csRef<iMeshObjectFactory> walls_factory = walls_object->GetFactory();
+  iMeshObject* walls_object = walls->GetMeshObject ();
+  iMeshObjectFactory* walls_factory = walls_object->GetFactory();
   csRef<iThingFactoryState> walls_state = 
     scfQueryInterface<iThingFactoryState> (walls_factory);
   walls_state->AddInsideBox (
