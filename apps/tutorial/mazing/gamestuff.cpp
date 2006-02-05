@@ -408,7 +408,7 @@ void Adversary::ThinkAndMove (float elapsed_seconds)
     Maze* maze = app->GetGame ().GetMaze ();
     const csArray<RoomCoordinate>& connections = maze->GetConnections (
 	current_location);
-    int moveto = (rand () >> 3) % connections.Length ();
+    size_t moveto = (rand () >> 3) % connections.Length ();
     if (maze->IsSpaceFree (connections[moveto]))
     {
       start.x = float (current_location.x) * ROOM_DIMENSION;
@@ -598,7 +598,7 @@ bool Game::CreateFactories ()
   iMaterialWrapper* explosion_material = engine->GetMaterialList ()
   	->FindByName ("explosion_texture");
   pstate->SetMaterial (explosion_material);
-  pstate->SetParticleRadius (0.2);
+  pstate->SetParticleRadius (0.2f);
   pstate->SetParticlesPerSecond (50);
   pstate->SetInitialParticleCount (10);
   pstate->SetPointEmitType ();
@@ -607,8 +607,8 @@ bool Game::CreateFactories ()
   pstate->SetDiffusion (1.0);
   pstate->SetEmitTime (float (EXPLOSION_EMITTIME) / 1000.0);
   pstate->SetTimeToLive (float (EXPLOSION_PARTTIME) / 1000.0);
-  pstate->SetTimeVariation (float (EXPLOSION_PARTVARTIME) / 1000.0);
-  pstate->SetConstantColorMethod (csColor4 (1.0, 0.8, 0.5));
+  pstate->SetTimeVariation (float (EXPLOSION_PARTVARTIME) / 1000.0f);
+  pstate->SetConstantColorMethod (csColor4 (1.0f, 0.8f, 0.5f));
   pstate->SetMixMode (CS_FX_ADD);
   pstate->EnableZSort (false);
 

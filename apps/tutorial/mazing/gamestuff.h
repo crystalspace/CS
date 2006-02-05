@@ -36,11 +36,11 @@ class AppMazing;
 #define EXPLOSION_TIME (EXPLOSION_PARTTIME+EXPLOSION_EMITTIME+EXPLOSION_PARTVARTIME)
 
 // Laserbeam defines.
-#define LASER_WIDTH 0.05
-#define LASER_LENGTH 100.0
+#define LASER_WIDTH 0.05f
+#define LASER_LENGTH 100.0f
 #define LASER_LIFETIME 300	// Milliseconds the laser will be visible.
 #define LASER_FLICKTIME 20
-#define LASER_OFFSET csVector3(0,-.5,0)
+#define LASER_OFFSET csVector3(0,-.5f,0)
 
 // Movement defines.
 #define MOVE_DISTANCE 5.0	// In one keypress we will move this far.

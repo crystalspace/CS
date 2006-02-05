@@ -151,7 +151,7 @@ public:
    *        etc
    * \param componentCount Number of components per element (e.g. 4 for RGBA)
    * \param copy if true (default) then this buffer will make a copy of the
-   *        data, else just svae the buffer pointers provided by the caller.
+   *        data, else just save the buffer pointers provided by the caller.
    *        This has some implications: CopyInto() does not copy, merely update
    *	    the internal buffer pointer. Lock() just returns that pointer.
    *        The pointer passed to CopyInto() must be valid over the lifetime of
@@ -171,7 +171,7 @@ public:
    * \param rangeEnd Maximum index value that is expected to be written to 
    *  the created buffer.
    * \param copy if true (default) then this buffer will make a copy of the
-   *        data, else just svae the buffer pointers provided by the caller.
+   *        data, else just save the buffer pointers provided by the caller.
    *        This has some implications: CopyInto() does not copy, merely update
    *	    the internal buffer pointer. Lock() just returns that pointer.
    *        The pointer passed to CopyInto() must be valid over the lifetime of
