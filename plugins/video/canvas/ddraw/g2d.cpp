@@ -31,6 +31,7 @@
 #include "iutil/cmdline.h"
 
 #include "csplugincommon/directx/directdetection.h"
+#include "csplugincommon/directx/error.h"
 
 #include "csutil/win32/wintools.h"
 #include "csplugincommon/canvas/softfontcache.h"
@@ -157,7 +158,7 @@ bool csGraphics2DDDraw3::Open ()
 
   if (DirectDevice == 0)
   {
-    InitFail (DD_FALSE, "Error creating DirectDevice\n");
+    InitFail ((HRESULT)~0, "Error creating DirectDevice");
     return false;
   }
 
@@ -172,7 +173,7 @@ bool csGraphics2DDDraw3::Open ()
   HRESULT ddrval;
   if ((ddrval = DirectDrawCreate ((LPGUID)pGuid, &m_lpDD, 0)) != DD_OK)
   {
-    InitFail (ddrval, "DirectDrawCreate FAILED (Code: %08lx)\n");
+    InitFail (ddrval, "DirectDrawCreate FAILED");
     return false;
   }
 
@@ -457,7 +458,7 @@ void csGraphics2DDDraw3::SetColorPalette ()
 
       if (!CreateIdentityPalette (Palette))
       {
-        InitFail (DD_FALSE, "Error creating Identity Palette.\n");
+        InitFail ((HRESULT)~0, "Error creating Identity Palette");
         return;
       }
 
@@ -619,7 +620,7 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
   hRet = m_lpDD->SetCooperativeLevel (m_hWnd, FullScreen ?
     (DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN) : DDSCL_NORMAL);
   if (hRet != DD_OK)
-    return InitFail (hRet, "SetCooperativeLevel FAILED (Code: %08lx)\n");
+    return InitFail (hRet, "SetCooperativeLevel FAILED");
 
   // Set window style bits
   SetWindowLong (m_hWnd, GWL_STYLE, FullScreen ? FULLSCREEN_STYLE : WINDOW_STYLE);
@@ -635,7 +636,7 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
     ddsd.dwFlags = DDSD_CAPS;
     ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
     if ((hRet = m_lpDD->CreateSurface (&ddsd, &m_lpddsPrimary, 0)) != DD_OK)
-      return InitFail (hRet, "Cannot create primary surface for DirectDraw (Code: %08lx)\n");
+      return InitFail (hRet, "Cannot create primary surface for DirectDraw");
 
     // Create the backbuffer. In fullscreen mode by default we don't
     // use the backbuffer, but we use it in single-buffered modes.
@@ -645,7 +646,7 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
     ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
     if ((hRet = m_lpDD->CreateSurface (&ddsd, &m_lpddsBack, 0)) != DD_OK)
     {
-      InitFail (hRet, "CreateSurface for backbuffer FAILED (Code: %08lx)\n");
+      InitFail (hRet, "CreateSurface for backbuffer FAILED");
       return false;
     }
 
@@ -654,7 +655,7 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
       // Create a clipper object since this is for a Windowed render
       LPDIRECTDRAWCLIPPER pClipper;
       if ((hRet = m_lpDD->CreateClipper (0, &pClipper, 0)) != DD_OK)
-        return InitFail (hRet, "CreateClipper FAILED (Code: %08lx)\n");
+        return InitFail (hRet, "CreateClipper FAILED");
 
       // Associate the clipper with the window
       pClipper->SetHWnd (0, m_hWnd);
@@ -673,13 +674,13 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
 
     hRet = m_lpDD->CreateSurface (&ddsd, &m_lpddsPrimary, 0);
     if (hRet != DD_OK)
-      return InitFail (hRet, "Cannot create primary surface for DirectDraw FAILED (Code: %08lx)\n");
+      return InitFail (hRet, "Cannot create primary surface for DirectDraw FAILED");
 
     ZeroMemory (&ddscaps, sizeof (ddscaps));
     ddscaps.dwCaps = DDSCAPS_BACKBUFFER;
     hRet = m_lpddsPrimary->GetAttachedSurface (&ddscaps, &m_lpddsBack);
     if (hRet != DD_OK)
-      return InitFail (hRet, "GetAttachedSurface FAILED (Code: %08lx)\n");
+      return InitFail (hRet, "GetAttachedSurface FAILED");
   }
 
   // get the pixel format
@@ -687,7 +688,7 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
   ddpf.dwSize = sizeof (ddpf);
   hRet = m_lpddsPrimary->GetPixelFormat (&ddpf);
   if (hRet != DD_OK)
-    return InitFail (hRet, "Can't get pixel format (Code: %08lx)\n");
+    return InitFail (hRet, "Can't get pixel format");
 
   pfmt.RedMask = ddpf.dwRBitMask;
   pfmt.GreenMask = ddpf.dwGBitMask;
@@ -757,7 +758,7 @@ HRESULT csGraphics2DDDraw3::ChangeCoopLevel ()
 
   // Release all objects that need to be re-created for the new device
   if (FAILED (hRet = ReleaseAllObjects ()))
-    return InitFail (hRet, "ReleaseAllObjects FAILED (Code: %08lx)\n");
+    return InitFail (hRet, "ReleaseAllObjects FAILED");
 
   // In case we're coming from a fullscreen mode, restore the window size
   if (!FullScreen)
@@ -799,7 +800,13 @@ HRESULT csGraphics2DDDraw3::InitFail (HRESULT hRet, LPCTSTR szError)
   ReleaseAllObjects ();
   if (m_lpDD)
     m_lpDD->RestoreDisplayMode ();
-  Report (CS_REPORTER_SEVERITY_ERROR, szError, hRet);
+  if (hRet == (HRESULT)~0)
+    Report (CS_REPORTER_SEVERITY_ERROR, "%s", szError);
+  else
+    Report (CS_REPORTER_SEVERITY_ERROR, "%s\nError: %s [%s]", szError,
+    csDirectXError::GetErrorDescription (hRet),
+    csDirectXError::GetErrorSymbol (hRet));
+
   DestroyWindow (m_hWnd);
   return hRet;
 }

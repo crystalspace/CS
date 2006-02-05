@@ -33,6 +33,8 @@
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
 
+#include "csplugincommon/directx/error.h"
+
 #include "../../renderer.h"
 #include "isndsys/ss_driver.h"
 #include "isndsys/ss_renderer.h"
@@ -147,7 +149,9 @@ bool SndSysDriverDirectSound::Open (csSndSysRendererSoftware *renderer,
   {
     Report(CS_REPORTER_SEVERITY_ERROR, 
       "Sound System: Direct Sound Driver: Failed to set cooperative level to "
-      "DSSCL_PRIORITY! Error %08x :'%s'", hr, GetDSError(hr));
+      "DSSCL_PRIORITY: %s (%s)", 
+      csDirectXError::GetErrorDescription (hr),
+      csDirectXError::GetErrorSymbol (hr));
     return false;
   }
 
@@ -393,27 +397,3 @@ void SndSysDriverDirectSound::AdvanceWriteBuffer (size_t bytes)
   if (ds_buffer_writecursor >= ds_buffer_bytes)
     ds_buffer_writecursor-=ds_buffer_bytes;
 }
-
-
-const char *SndSysDriverDirectSound::GetDSError(HRESULT hr)
-{
-  switch (hr)
-  {
-    case DSERR_BUFFERLOST:
-      return "Buffer Lost";
-    case DSERR_INVALIDCALL:
-      return "Invalid Call";
-    case DSERR_INVALIDPARAM:
-      return "Invalid Parameter";
-    case DSERR_PRIOLEVELNEEDED:
-      return "Priority Level Needed";
-    case DSERR_OUTOFMEMORY:
-      return "Out of Memory";
-    default:
-      return "Unknown error";
-    break;
-  }
-
-
-}
-

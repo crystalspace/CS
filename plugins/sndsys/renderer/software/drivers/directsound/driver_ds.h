@@ -86,8 +86,6 @@ public:
   // The system driver.
   iObjectRegistry *object_reg;
 
-  const char *GetDSError(HRESULT hr);
-
   void Report (int severity, const char* msg, ...);
 
   /*

@@ -7,12 +7,15 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 5-Feb-2006
-	- Marten fixed the lighter2 after last refactoring. Running lighter2 on
-	  cornell level should now work out-of-the-box. Still work to do to
-	  make it work on other levels and more features..
+	- Marten fixed the lighter2 after last refactoring. Running lighter2 
+	  on cornell level should now work out-of-the-box. Still work to do to
+	  make it work on other levels and more features.
+	- res added routines to get descriptions for DirectX error codes to
+	  crystalspace_directx.
+	- res converted csjoywin to new SCF.
 4-Feb-2006
-	- Piotr fixed small bug in protmesh when index_buffer is created (csTriangle
- 	  artibutes are stored as int not unsigned int)
+	- Piotr fixed small bug in protmesh when index_buffer is created 
+	  (csTriangle attributes are stored as int not unsigned int)
 	- Jorrit changed the driver database to disable point sprites
 	  for ATI on Linux. The particles are miniscule.
 	- Jorrit restructured mazing so that the game logic is now seperated

@@ -45,6 +45,7 @@
 #include <d3dcaps.h>
 
 #include "csplugincommon/directx/directdetection.h"
+#include "csplugincommon/directx/error.h"
 
 #ifdef CS_COMPILER_BCC
 # define _strdup _fstrdup
@@ -56,17 +57,10 @@
 
 void DirectDetection::ReportResult (int severity, char *str, HRESULT hRes)
 {
-  csString szMsg;
-  //if (FAILED (hRes))
-  {
-    char* errmsg = cswinGetErrorMessage (hRes);
-      // in the length formula above the format specifier lengths were subtracted.
-    szMsg.Format ("%s\nLast Error: %s [0x%.8x]", str, errmsg, (int)hRes);
-    delete[] errmsg;
-  }
-
   csReport (object_reg, severity, "crystalspace.canvas.ddraw.directdetection", 
-    "%s", !szMsg.IsEmpty() ? szMsg.GetData() : str);
+    "%s\nError: %s [%s]", 
+    str, csDirectXError::GetErrorDescription (hRes),
+    csDirectXError::GetErrorSymbol (hRes));
 }
 
 void DirectDetection::SystemFatalError (char *str, HRESULT hRes)

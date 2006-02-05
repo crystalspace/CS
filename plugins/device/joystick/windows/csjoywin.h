@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CS_WINDOWS_JOYSTICK_
-#define _CS_WINDOWS_JOYSTICK_
+#ifndef __CS_CSJOYWIN_H__
+#define __CS_CSJOYWIN_H__
 
 #include "csutil/scf.h"
 #include "iutil/event.h"
@@ -34,11 +34,18 @@
 #include "dinputdefs.h"
 #endif
 
+namespace cspluginJoyWin
+{
+
 /**
  * This plugin puts joystick events in the CS eventqueue.
  * Joystick data is gathered via the DirectInput joystick api.
  */
-class csWindowsJoystick : public iComponent
+class csWindowsJoystick : 
+  public scfImplementation3<csWindowsJoystick, 
+                            iComponent,
+                            iEventPlug,
+                            iEventHandler>
 {
 private:
   struct joystate
@@ -80,34 +87,29 @@ private:
   void Report (int severity, const char* msg, ...);
   void LoadAxes(joystate&);
 
+  void ReportDXError (HRESULT hr, const char* msg, ...);
  public:
-  SCF_DECLARE_IBASE;
-
   csWindowsJoystick (iBase *parent);
   virtual ~csWindowsJoystick ();
 
   virtual bool Initialize (iObjectRegistry *oreg);
-  virtual bool HandleEvent (iEvent &Event);
   virtual bool CreateDevice (const DIDEVICEINSTANCE* pdidInstance);
 
-  struct eiEventPlug : public iEventPlug
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csWindowsJoystick);
-    virtual unsigned GetPotentiallyConflictingEvents ()
-    { return CSEVTYPE_Joystick; }
-    virtual unsigned QueryEventPriority (unsigned) { return 110; }
-  } scfiEventPlug;
-  friend struct eiEventPlug;
+  /**\name iEventPlug implementation
+   * @{ */
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Joystick; }
+  virtual unsigned QueryEventPriority (unsigned) { return 110; }
+  /** @} */
 
-  struct eiEventHandler : public iEventHandler
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csWindowsJoystick);
-    virtual bool HandleEvent (iEvent &Event)
-    { return scfParent->HandleEvent (Event); }
-    CS_EVENTHANDLER_NAMES("crystalspace.device.joystick")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } scfiEventHandler;
-  friend struct eiEventHandler;
+  /**\name iEventHandler implementation
+   * @{ */
+  virtual bool HandleEvent (iEvent &Event);
+  CS_EVENTHANDLER_NAMES("crystalspace.device.joystick")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  /** @} */
 };
 
-#endif
+} // namespace cspluginJoyWin
+
+#endif // __CS_CSJOYWIN_H__

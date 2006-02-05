@@ -30,45 +30,31 @@
 // using DirectInput -- included from csjoywin.h
 #include "csjoywin.h"
 
+#include "csplugincommon/directx/error.h"
+
 // no config yet
 // #define CS_WINDOWS_JOYSTICK_CFG "/config/joystick.cfg"
 // #define CS_WINDOWS_JOYSTICK_KEY "Device.Joystick." CS_PLATFORM_NAME "."
 
 CS_IMPLEMENT_PLUGIN;
 
+namespace cspluginJoyWin
+{
+
 SCF_IMPLEMENT_FACTORY (csWindowsJoystick);
 
-SCF_IMPLEMENT_IBASE (csWindowsJoystick)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventPlug)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csWindowsJoystick::eiEventPlug)
-  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csWindowsJoystick::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csWindowsJoystick::csWindowsJoystick (iBase *parent) :
+  scfImplementationType (this, parent),
   object_reg (0),
   joystick (0),
   eq (0),
   EventOutlet (0)
 {
-  SCF_CONSTRUCT_IBASE(parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventPlug);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
 }
 
 csWindowsJoystick::~csWindowsJoystick ()
 {
   Close ();
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventPlug);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csWindowsJoystick::Initialize (iObjectRegistry* oreg)
@@ -225,15 +211,14 @@ bool csWindowsJoystick::Init ()
       hr = jd.device->GetDeviceInfo (&devInfo);
       if (FAILED (hr))
       {
-        Report (CS_REPORTER_SEVERITY_WARNING, 
-          "Can't retrieve device information for #%zu: error %.8lx", i, hr);
+        ReportDXError (hr,
+          "Can't retrieve information for device %zu", i);
       }
       else
       {
         wchar_t* devProduct = cswinAnsiToWide (devInfo.tszProductName);
         Report (CS_REPORTER_SEVERITY_NOTIFY,
-          "Found input device #%d: %s", jd.number, 
-          (const char*)csWtoC (devProduct));
+          "Found input device %d: %ls", jd.number, devProduct);
         delete[] devProduct;
       }
     
@@ -260,8 +245,8 @@ bool csWindowsJoystick::Init ()
       eq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
       if (eq)
       {
-	eq->RegisterListener (&scfiEventHandler, PreProcess);
-	EventOutlet = eq->CreateEventOutlet (&scfiEventPlug);
+	eq->RegisterListener (this, PreProcess);
+	EventOutlet = eq->CreateEventOutlet (this);
       }
     }
     Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -269,8 +254,8 @@ bool csWindowsJoystick::Init ()
   } 
   else
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Joystick plugin: can't retrieve "
-      "Direct Input interface: error %.8lx", hr);
+    ReportDXError (hr,
+      "Joystick plugin: can't retrieve Direct Input interface");
   }
 
   return eq && EventOutlet;
@@ -280,7 +265,7 @@ bool csWindowsJoystick::Close ()
 {
   if (eq)
   {
-    eq->RemoveListener (&scfiEventHandler);
+    eq->RemoveListener (this);
     eq = 0;
   }
   EventOutlet = 0;
@@ -302,3 +287,17 @@ void csWindowsJoystick::Report (int severity, const char* msg, ...)
     msg, arg);
   va_end (arg);
 }
+
+void csWindowsJoystick::ReportDXError (HRESULT hr, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  csString s;
+  s.FormatV (msg, arg);
+  Report (CS_REPORTER_SEVERITY_ERROR, "%s: %s [%s]",
+    s.GetData(), csDirectXError::GetErrorDescription (hr),
+    csDirectXError::GetErrorSymbol (hr));
+  va_end (arg);
+}
+
+} // namespace cspluginJoyWin
