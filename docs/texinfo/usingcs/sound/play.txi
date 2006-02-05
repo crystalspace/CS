@@ -34,8 +34,7 @@ if (sndrdr)
   	<sound file>, CS_SND3D_DISABLE);
   if (w_boom)
   @{
-    csRef<iSoundSource> sndsrc = w_boom->GetSound()->CreateSource(
-    	SOUND3D_DISABLE);
+    csRef<iSoundSource> sndsrc = w_boom->GetSound()->CreateSource(w_boom->GetStream());
     w_boom->GetStream ()->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
     w_boom->GetStream ()->Unpause();
   @}
