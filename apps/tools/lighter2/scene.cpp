@@ -282,13 +282,6 @@ namespace lighter
         classNode->CreateNodeBefore (CS_NODE_TEXT);
       classContNode->SetValue ("lightmap");
 
-      csRef<iDocumentNode> filterNode = 
-        textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      filterNode->SetValue ("filter");
-      csRef<iDocumentNode> filterContNode = 
-        filterNode->CreateNodeBefore (CS_NODE_TEXT);
-      filterContNode->SetValue ("true");
-
       csRef<iDocumentNode> fileNode = 
         textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
       fileNode->SetValue ("file");

@@ -13,6 +13,8 @@ chronological order.
 	- res added routines to get descriptions for DirectX error codes to
 	  crystalspace_directx.
 	- res converted csjoywin to new SCF.
+	- res changed lighter2 to not write out a <filter> texture attribute
+	  (since it is enabled by default).
 4-Feb-2006
 	- Piotr fixed small bug in protmesh when index_buffer is created 
 	  (csTriangle attributes are stored as int not unsigned int)
