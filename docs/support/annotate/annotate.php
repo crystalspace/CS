@@ -4,12 +4,27 @@
 // Matthias Braun <matze@braunis.de>
 //-----------------------------------------------------------------------------
 
-$basedir="/home/groups/c/cr/crystal/htdocs/annotations";
+$basedir="/home/crystal/www/htdocs/annotations";
 
 $theme=preg_replace("\" \"","_",$theme);
 $theme=preg_replace("[^a-zA-Z0-9_]","",$theme);
 $file=$basedir."/$theme.xml";
 $self=$PHP_SELF;
+
+if (array_key_exists('action', $_REQUEST)){
+	$action = $_REQUEST['action'];
+}
+if (array_key_exists('emailname', $_REQUEST)){
+	$emailname = $_REQUEST['emailname'];
+}
+if (array_key_exists('authorname', $_REQUEST)){
+	$authorname = $_REQUEST['authorname'];
+}
+
+if (array_key_exists('texttext', $_REQUEST)){
+	$texttext = $_REQUEST['texttext'];
+}
+
 
 readXMLFile($file);
 print "<hr><a name=\"comments\">\n";
