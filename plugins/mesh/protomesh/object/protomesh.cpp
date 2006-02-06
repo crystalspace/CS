@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2004 by Jorrit Tyberghein
+Copyright (C) 2004 by Jorrit Tyberghein
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -44,8 +44,8 @@ CS_IMPLEMENT_PLUGIN
 namespace cspluginProtoMesh
 {
 
-csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory) :
-  scfImplementationType (this)
+  csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory) :
+scfImplementationType (this)
 {
   myRenderBufferAccessor.AttachNew (new RenderBufferAccessor (this));
 
@@ -106,20 +106,20 @@ void csProtoMeshObject::SetupBufferHolder ()
 
   // Indices are fetched directly from the factory.
   bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, factory->index_buffer);
-  
+
   // Vertices are fetched from the factory.
   bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, factory->vertex_buffer);
 
   // Texels are fetched from the factory.
   bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, factory->texel_buffer);
-  
+
   // Normals are fetched from the factory but we use an accessor
   // for those because they are not always needed.
   // Colors are fetched from the object because we need to add the mesh
   // base color to the static colors in the factory.
   bufferHolder->SetAccessor (myRenderBufferAccessor, CS_BUFFER_NORMAL_MASK | CS_BUFFER_COLOR_MASK);
 }
-  
+
 void csProtoMeshObject::SetupObject ()
 {
   if (!initialized)
@@ -130,14 +130,14 @@ void csProtoMeshObject::SetupObject ()
 }
 
 /*
- * This function actually supplies the meshes to render to the
- * 3D renderer (which will call g3d->DrawMesh()). In this simple
- * case there is only one render mesh but more complex objects
- * can have multiple render meshes.
- */
+* This function actually supplies the meshes to render to the
+* 3D renderer (which will call g3d->DrawMesh()). In this simple
+* case there is only one render mesh but more complex objects
+* can have multiple render meshes.
+*/
 csRenderMesh** csProtoMeshObject::GetRenderMeshes (
-	int& n, iRenderView* rview, 
-	iMovable* movable, uint32 frustum_mask)
+  int& n, iRenderView* rview, 
+  iMovable* movable, uint32 frustum_mask)
 {
   n = 0;
 
@@ -149,7 +149,7 @@ csRenderMesh** csProtoMeshObject::GetRenderMeshes (
 
   int clip_portal, clip_plane, clip_z_plane;
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-      clip_z_plane);
+    clip_z_plane);
 
   const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
@@ -189,13 +189,13 @@ csRenderMesh** csProtoMeshObject::GetRenderMeshes (
   }
 
   meshPtr->geometryInstance = (void*)factory;
- 
+
   n = 1;
   return &meshPtr;
 }
 
 bool csProtoMeshObject::HitBeamOutline (const csVector3& start,
-  const csVector3& end, csVector3& isect, float* pr)
+                                        const csVector3& end, csVector3& isect, float* pr)
 {
   // This is now closer to an outline hitting method. It will
   // return as soon as it touches any triangle in the mesh, and
@@ -208,7 +208,7 @@ bool csProtoMeshObject::HitBeamOutline (const csVector3& start,
   for (i = 0 ; i < max ; i++)
   {
     if (csIntersect3::SegmentTriangle (seg, vrt[tr[i].a], vrt[tr[i].b],
-        vrt[tr[i].c], isect))
+      vrt[tr[i].c], isect))
     {
       if (pr) *pr = csQsqrt (csSquaredDist::PointPoint (start, isect) /
         csSquaredDist::PointPoint (start, end));
@@ -220,8 +220,8 @@ bool csProtoMeshObject::HitBeamOutline (const csVector3& start,
 }
 
 bool csProtoMeshObject::HitBeamObject (const csVector3& start,
-  const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
-  iMaterialWrapper** material)
+                                       const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
+                                       iMaterialWrapper** material)
 {
   if (material) *material = csProtoMeshObject::material;
   if (polygon_idx) *polygon_idx = -1;
@@ -241,14 +241,14 @@ bool csProtoMeshObject::HitBeamObject (const csVector3& start,
   for (i = 0 ; i < max ; i++)
   {
     if (csIntersect3::SegmentTriangle (seg, vrt[tr[i].a], vrt[tr[i].b],
-        vrt[tr[i].c], tmp))
+      vrt[tr[i].c], tmp))
     {
       temp = csSquaredDist::PointPoint (start, tmp);
       if (temp < dist)
       {
         isect = tmp;
-	dist = temp;
-	if (polygon_idx) *polygon_idx = i;
+        dist = temp;
+        if (polygon_idx) *polygon_idx = i;
       }
     }
   }
@@ -273,11 +273,11 @@ void csProtoMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
       if (!color_buffer)
       {
         // Here we create a render buffer that copies the data
-	// since we don't keep a local copy of the color buffer here.
-	// (final 'true' parameter).
+        // since we don't keep a local copy of the color buffer here.
+        // (final 'true' parameter).
         color_buffer = csRenderBuffer::CreateRenderBuffer (
-              PROTO_VERTS, CS_BUF_STATIC,
-              CS_BUFCOMP_FLOAT, 3, true);
+          PROTO_VERTS, CS_BUF_STATIC,
+          CS_BUFCOMP_FLOAT, 3, true);
       }
       mesh_colors_dirty_flag = false;
       const csColor* factory_colors = factory->colors;
@@ -299,7 +299,7 @@ void csProtoMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
 
 csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
                                                     iObjectRegistry* object_reg) :
-  scfImplementationType (this, pParent)
+scfImplementationType (this, pParent)
 {
   csProtoMeshObjectFactory::object_reg = object_reg;
 
@@ -431,8 +431,8 @@ void csProtoMeshObjectFactory::PrepareBuffers ()
     {
       // Create a buffer that doesn't copy the data.
       vertex_buffer = csRenderBuffer::CreateRenderBuffer (
-          PROTO_VERTS, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-          3);
+        PROTO_VERTS, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+        3);
     }
     vertex_buffer->CopyInto (vertices, PROTO_VERTS);
   }
@@ -443,8 +443,8 @@ void csProtoMeshObjectFactory::PrepareBuffers ()
     {
       // Create a buffer that doesn't copy the data.
       texel_buffer = csRenderBuffer::CreateRenderBuffer (
-          PROTO_VERTS, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-          2);
+        PROTO_VERTS, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+        2);
     }
     texel_buffer->CopyInto (texels, PROTO_VERTS);
   }
@@ -453,9 +453,9 @@ void csProtoMeshObjectFactory::PrepareBuffers ()
     mesh_triangle_dirty_flag = false;
     if (!index_buffer)
       index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
-	PROTO_TRIS*3,
-              CS_BUF_STATIC, CS_BUFCOMP_INT,
-              0, PROTO_VERTS-1);
+      PROTO_TRIS*3,
+      CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT,
+      0, PROTO_VERTS-1);
     index_buffer->CopyInto (triangles, PROTO_TRIS*3);
   }
 }
@@ -495,7 +495,7 @@ SCF_IMPLEMENT_FACTORY (csProtoMeshObjectType)
 
 
 csProtoMeshObjectType::csProtoMeshObjectType (iBase* pParent) : 
-  scfImplementationType (this, pParent)
+scfImplementationType (this, pParent)
 {
 }
 
