@@ -128,7 +128,7 @@ textures.
 
 Now that we have our material we can use it to load the mesh factory.
 Edit @file{simple.cpp} and add the following code in
-@code{Simple::CreateSprites()} (before @samp{return true} and after
+@code{Simple::CreateSprites()} (before the end and after
 the code we just added to load the material):
 
 @example
