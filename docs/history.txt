@@ -9,6 +9,7 @@ chronological order.
 6-Feb-2006
 	- Piotr Obrzut reverts back his changes in protomesh related to index buffer 
 	  creation as previous resolution was right.
+	- Erroroman fixed creating quaterion from matrix
 5-Feb-2006
 	- Marten fixed the lighter2 after last refactoring. Running lighter2 
 	  on cornell level should now work out-of-the-box. Still work to do to

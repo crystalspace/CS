@@ -129,79 +129,64 @@ csQuaternion csQuaternion::Slerp (
       scale0 * z + scale1 * -quato.r);
 }
 
-
-csQuaternion::csQuaternion(const csMatrix3& mat)
+csQuaternion::csQuaternion(const csMatrix3& matrix)
 {
-    float  tr, s;
-    int    i;
+      float mat[3][3] = { { matrix.m11, matrix.m21, matrix.m31 },
+                          { matrix.m12, matrix.m22, matrix.m32 },
+                          { matrix.m13, matrix.m23, matrix.m33 } };
+      float qx, qy, qz, qw;
+      // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
+      // article "Quaternion Calculus and Fast Animation".
 
-    tr = mat.m11 + mat.m22 + mat.m33 + 1.0;
+      float fTrace = mat[0][0] + mat[1][1] + mat[2][2];
+      float fRoot;
 
-    // check the diagonal
-    if (tr > 0.0) {
-        s = 0.5 / sqrt (tr);
-        r = 0.25 / s;
-        x = (mat.m32 - mat.m23) * s;
-        y = (mat.m13 - mat.m31) * s;
-        z = (mat.m21 - mat.m12) * s;
-    } else {
-        // diagonal is negative
-        i = 1;
-        if (mat.m22 > mat.m11) i = 2;
-        if ((i == 1 && mat.m33 > mat.m11)
-            || (i == 2 && mat.m33 > mat.m22)) i = 3;
+      if( fTrace > 0.0 )
+      {
+        fRoot = sqrtf( fTrace + 1.0f );
 
-            /*
-            m11 = 0
-            m12 = 1
-            m13 = 2
-            m21 = 4
-            m22 = 5
-            m23 = 6
-            m31 = 8
-            m32 = 9
-            m33 = 10
-            */
+        qw = 0.5f * fRoot;
 
-        switch(i) {
-        case 1:
-            s = sqrt ((mat.m11 - (mat.m22 + mat.m33)) + 1.0);
+        fRoot = 0.5f / fRoot;
 
-            x = s * 0.5;
+        qx = ( mat[2][1] - mat[1][2] ) * fRoot;
+        qy = ( mat[0][2] - mat[2][0] ) * fRoot;
+        qz = ( mat[1][0] - mat[0][1] ) * fRoot;
+      }
+      else
+      {
+        int iNext[3] = { 1, 2, 0 };
 
-            if (s != 0.0) s = 0.5 / s;
+        int i = 0;
+        if( mat[1][1] > mat[0][0] )
+          i = 1;
 
-            y = (mat.m12 + mat.m21) * s;
-            z = (mat.m13 + mat.m31) * s;
-            r = (mat.m23 - mat.m32) * s;
-            break;
-        case 2:
-            s = sqrt ((mat.m22 - (mat.m33 + mat.m11)) + 1.0);
+        if( mat[2][2] > mat[i][i] )
+          i = 2;
 
-            y = 0.5 * s;
+        int j = iNext[i];
+        int k = iNext[j];
 
-            if (s != 0.0) s = 0.5 / s;
+        fRoot = sqrtf( mat[i][i] - mat[j][j] - mat[k][k] + 1.0f );
 
-            x = (mat.m12 + mat.m21) * s;
-            z = (mat.m23 + mat.m32) * s;
-            r = (mat.m13 - mat.m31) * s;
+        float *apfQuat[3] = { &qx, &qy, &qz };
 
-            break;
-        case 3:
-            s = sqrt ((mat.m33 - (mat.m11 + mat.m22)) + 1.0);
+        *(apfQuat[i]) = 0.5f * fRoot;
 
-            z = 0.5 * s;
+        fRoot = 0.5f / fRoot;
 
-            if (s != 0.0) s = 0.5 / s;
+        qw = ( mat[k][j] - mat[j][k] ) * fRoot;
 
-            x = (mat.m13 + mat.m31) * s;
-            y = (mat.m23 + mat.m32) * s;
-            r = (mat.m12 - mat.m21) * s;
-            break;
-        }
-    }
+        *(apfQuat[j]) = ( mat[j][i] + mat[i][j] ) * fRoot;
+        *(apfQuat[k]) = ( mat[k][i] + mat[i][k] ) * fRoot;
+      }
+
+	  x = qx;
+	  y = qy;
+	  z = qz;
+	  r = qw;
+      Normalize();
 }
-
 
 void csQuaternion::Invert()
 {
