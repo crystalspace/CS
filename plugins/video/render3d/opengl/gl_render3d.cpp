@@ -920,8 +920,8 @@ bool csGLGraphics3D::Open ()
       glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
       for (int u = texUnits - 1; u >= 0; u--)
       {
-	statecache->SetActiveTU (u);
-        statecache->ActivateTU ();
+        statecache->SetCurrentTU (u);
+        statecache->ActivateTU (csGLStateCache::activateTexEnv);
         glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, 
 	  GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
       }
@@ -1218,8 +1218,9 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       statecache->Disable_GL_ALPHA_TEST ();
       if (ext->CS_GL_ARB_multitexture)
       {
-	statecache->SetActiveTU (0);
-        statecache->ActivateTU ();
+        statecache->SetCurrentTU (0);
+        statecache->ActivateTU (csGLStateCache::activateImage
+          | csGLStateCache::activateTexCoord);
       }
 
       needProjectionUpdate = false; 
@@ -1391,7 +1392,7 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     {
       for (i = CS_GL_MAX_LAYER; i-- > 0;)
       {
-        statecache->SetActiveTU (i);
+        statecache->SetCurrentTU (i);
         statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
       }
     }
@@ -1435,8 +1436,8 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 {
   if (ext->CS_GL_ARB_multitexture)
   {
-    statecache->SetActiveTU (unit);
-    statecache->ActivateTU ();
+    statecache->SetCurrentTU (unit);
+    statecache->ActivateTU (csGLStateCache::activateTexEnable);
   }
   else if (unit != 0) return false;
 
@@ -1486,7 +1487,8 @@ void csGLGraphics3D::DeactivateTexture (int unit)
 
   if (ext->CS_GL_ARB_multitexture)
   {
-    statecache->SetActiveTU (unit);
+    statecache->SetCurrentTU (unit);
+    statecache->ActivateTU (csGLStateCache::activateTexEnable);
   }
   else if (unit != 0) return;
 
@@ -1573,11 +1575,15 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   const csReversibleTransform& o2w = mymesh->object2world;
 
-  float matrix[16];
-  makeGLMatrix (o2w, matrix);
-  statecache->SetMatrixMode (GL_MODELVIEW);
-  glPushMatrix ();
-  glMultMatrixf (matrix);
+  bool needMatrix = !o2w.IsIdentity();
+  if (needMatrix)
+  {
+    float matrix[16];
+    makeGLMatrix (o2w, matrix);
+    statecache->SetMatrixMode (GL_MODELVIEW);
+    glPushMatrix ();
+    glMultMatrixf (matrix);
+  }
 
   needColorFixup = (modes.mixmode & CS_FX_MASK_ALPHA) != 0;
   if (needColorFixup)
@@ -1647,8 +1653,11 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
       glEnable (GL_POINT_SPRITE_ARB);
       primitivetype = GL_POINTS;
-      statecache->SetActiveTU (0);
-      statecache->ActivateTU ();
+      if (ext->CS_GL_ARB_multitexture)
+      {
+        statecache->SetCurrentTU (0);
+        statecache->ActivateTU (csGLStateCache::activateTexCoord);
+      }
       glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
 
       break;
@@ -1779,7 +1788,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
     glDisable (GL_POINT_SPRITE_ARB);
   }
-  glPopMatrix ();
+  if (needMatrix)
+    glPopMatrix ();
   //indexbuf->RenderRelease ();
   RenderRelease (iIndexbuf);
   statecache->SetCullFace (cullFace);
@@ -1977,7 +1987,8 @@ void csGLGraphics3D::OpenPortal (size_t numVertices,
 				 csFlags flags)
 {
   csClipPortal* cp = new csClipPortal ();
-  GLRENDER3D_OUTPUT_STRING_MARKER(("%p", cp));
+  GLRENDER3D_OUTPUT_STRING_MARKER(("portal = %p, flags = %s", cp,
+    csBitmaskToString::GetStr (flags.Get(), openPortalFlags)));
   cp->poly = new csVector2[numVertices];
   memcpy (cp->poly, vertices, numVertices * sizeof (csVector2));
   cp->num_poly = (int)numVertices;
@@ -2005,7 +2016,7 @@ void csGLGraphics3D::ClosePortal ()
   if (clipportal_stack.Length () <= 0) return;
   bool mirror = IsPortalMirrored (clipportal_stack.Length()-1);
   csClipPortal* cp = clipportal_stack.Pop ();
-  GLRENDER3D_OUTPUT_STRING_MARKER(("%p, %d", cp, cp->flags.Check(CS_OPENPORTAL_ZFILL)?1:0));
+  GLRENDER3D_OUTPUT_STRING_MARKER(("portal %p", cp));
 
   if (cp->status.Check(CS_PORTALSTATUS_SFILLED) || cp->flags.Check(CS_OPENPORTAL_ZFILL))
   {
@@ -2189,7 +2200,7 @@ void csGLGraphics3D::ApplyBufferChanges()
           unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
           if (ext->CS_GL_ARB_multitexture)
           {
-            statecache->SetActiveTU (unit);
+            statecache->SetCurrentTU (unit);
           } 
           statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
           statecache->SetTexCoordPointer (buffer->GetComponentCount (),
@@ -2236,7 +2247,7 @@ void csGLGraphics3D::ApplyBufferChanges()
           unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
           if (ext->CS_GL_ARB_multitexture)
           {
-            statecache->SetActiveTU (unit);
+            statecache->SetCurrentTU (unit);
           }
           statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
           if (npotsStatus[unit])
@@ -2943,8 +2954,9 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   {
     if (ext->CS_GL_ARB_multitexture)
     {
-      statecache->SetActiveTU (0);
-      statecache->ActivateTU ();
+      statecache->SetCurrentTU (0);
+      statecache->ActivateTU (csGLStateCache::activateImage
+        | csGLStateCache::activateTexCoord);
     }
     if (mesh.texture)
       ActivateTexture (mesh.texture);
@@ -3110,8 +3122,8 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   // Create handle
   glGenTextures (1, &halohandle);
   // Activate handle
-  csGLGraphics3D::statecache->SetActiveTU (0);
-  csGLGraphics3D::statecache->ActivateTU ();
+  csGLGraphics3D::statecache->SetCurrentTU (0);
+  csGLGraphics3D::statecache->ActivateTU (csGLStateCache::activateImage);
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, halohandle);
 
   // Jaddajaddajadda
@@ -3197,10 +3209,11 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   float hw = (float)G3D->GetWidth() * 0.5f;
   float hh = (float)G3D->GetHeight() * 0.5f;
 
-  int oldTU = G3D->statecache->GetActiveTU ();
+  int oldTU = G3D->statecache->GetCurrentTU ();
   if (G3D->ext->CS_GL_ARB_multitexture)
-    G3D->statecache->SetActiveTU (0);
-  G3D->statecache->ActivateTU ();
+    G3D->statecache->SetCurrentTU (0);
+  G3D->statecache->ActivateTU (csGLStateCache::activateImage
+    | csGLStateCache::activateTexCoord);
 
   
   //csGLGraphics3D::SetGLZBufferFlags (CS_ZBUF_NONE);
@@ -3244,8 +3257,9 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   if (!texEnabled)
     csGLGraphics3D::statecache->Disable_GL_TEXTURE_2D ();
   if (G3D->ext->CS_GL_ARB_multitexture)
-    G3D->statecache->SetActiveTU (oldTU);
-  G3D->statecache->ActivateTU ();
+    G3D->statecache->SetCurrentTU (oldTU);
+  G3D->statecache->ActivateTU (csGLStateCache::activateImage
+    | csGLStateCache::activateTexCoord);
 }
 
 iHalo *csGLGraphics3D::CreateHalo (float iR, float iG, float iB,

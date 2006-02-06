@@ -1278,15 +1278,15 @@ void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
       if (statecache->GetTexture (target, u) == texture)
       {
 	if (oldTU == -1)
-	  oldTU = statecache->GetActiveTU ();
-	statecache->SetActiveTU (u);
+          oldTU = statecache->GetCurrentTU ();
+        statecache->SetCurrentTU (u);
 	statecache->SetTexture (target, 0);
       }
     }
     if (oldTU != -1)
     {
-      statecache->SetActiveTU (oldTU);
-      statecache->ActivateTU ();
+      statecache->SetCurrentTU (oldTU);
+      statecache->ActivateTU (csGLStateCache::activateImage);
     }
   }
   else

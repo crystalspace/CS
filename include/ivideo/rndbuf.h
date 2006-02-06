@@ -126,6 +126,9 @@ struct iRenderBuffer : public virtual iBase
    * Copy data to the render buffer.
    * \remarks Does not work with interleaved buffer, copy to master buffer
    *  instead.
+   *  A buffer may actually not make a copy of the data but only store a
+   *  pointer to it. Whether this is the case depends on the actual
+   *  implementation and/or parameters to the buffer creation.
    */
   virtual void CopyInto (const void *data, size_t elementCount,
     size_t elemOffset = 0) = 0;

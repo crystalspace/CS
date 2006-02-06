@@ -130,7 +130,8 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
   size_t i;
   for(i = 0; i < 4; i++)
   {
-    shaderPlug->stateCache->SetActiveTU ((int)i);
+    shaderPlug->stateCache->SetCurrentTU ((int)i);
+    shaderPlug->stateCache->ActivateTU (csGLStateCache::activateTexCoord);
     glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
       GL_NONE);
   }
@@ -140,7 +141,8 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
   {
     const nv_texture_shader_stage &shader = texture_shader_stages.Get(i);
 
-    shaderPlug->stateCache->SetActiveTU (shader.stage);
+    shaderPlug->stateCache->SetCurrentTU (shader.stage);
+    shaderPlug->stateCache->ActivateTU (csGLStateCache::activateTexCoord);
 
     switch(shader.instruction)
     {

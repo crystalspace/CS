@@ -883,7 +883,8 @@ void csGLFontCache::BeginText ()
   tcaEnabled = statecache->IsEnabled_GL_TEXTURE_COORD_ARRAY ();
   caEnabled = statecache->IsEnabled_GL_COLOR_ARRAY ();
 
-  statecache->SetActiveTU (0);
+  statecache->SetCurrentTU (0);
+  statecache->ActivateTU (csGLStateCache::activateTexCoord);
   statecache->Enable_GL_VERTEX_ARRAY();
   statecache->Enable_GL_TEXTURE_COORD_ARRAY();
   statecache->Disable_GL_COLOR_ARRAY();

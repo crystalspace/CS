@@ -13,6 +13,10 @@ chronological order.
 	- res committed a patch from Andres to annotate.php, to make it work
 	  on crystalspace3d.org (it was actually broken since the move from
 	  SF).
+	- res changed the GL state manager to allow a more fine-grained
+	  control about the texture state. The idea is to ease supporting
+	  differing maximum numbers of texture coordinate sets and texture
+	  image units.
 5-Feb-2006
 	- Marten fixed the lighter2 after last refactoring. Running lighter2 
 	  on cornell level should now work out-of-the-box. Still work to do to

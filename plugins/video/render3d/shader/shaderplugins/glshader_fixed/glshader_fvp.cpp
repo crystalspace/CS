@@ -61,6 +61,10 @@ void csGLShaderFVP::Deactivate()
 {
 }
 
+const uint tuFlags = csGLStateCache::activateMatrix
+  | csGLStateCache::activateTexGen
+  | csGLStateCache::activateTexEnable;
+
 void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/, 
                                 csRenderMeshModes& /*modes*/,
 				const csShaderVarStack &stacks)
@@ -141,8 +145,8 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
 
   for (i=0; i<layers.Length (); i++)
   {
-    statecache->SetActiveTU ((int)i);
-    statecache->ActivateTU ();
+    statecache->SetCurrentTU ((int)i);
+    statecache->ActivateTU (tuFlags);
     if (layers[i].texgen == TEXGEN_PROJECTION)
     {
         if (!lights.Length())
@@ -164,7 +168,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
         statecache->Enable_GL_TEXTURE_GEN_S ();
         statecache->Enable_GL_TEXTURE_GEN_T ();
         statecache->Enable_GL_TEXTURE_GEN_R ();
-        glEnable(GL_TEXTURE_GEN_Q);
+        statecache->Enable_GL_TEXTURE_GEN_Q ();
         glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
         glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
         glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
@@ -513,8 +517,11 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
     }
   }
 
-  statecache->SetActiveTU (0);
-  statecache->ActivateTU ();
+  if (shaderPlug->ext->CS_GL_ARB_multitexture)
+  {
+    statecache->SetCurrentTU (0);
+    statecache->ActivateTU (tuFlags);
+  }
 
   var = csGetShaderVariableFromStack (stacks, primcolvar);
   if (var)
@@ -542,24 +549,28 @@ void csGLShaderFVP::ResetState ()
     statecache->Disable_GL_LIGHTING ();
   }
 
-  for (i=0; i<layers.Length (); i++)
+  i = layers.Length ();
+  while (i-- > 0)
   {
-    statecache->SetActiveTU ((int)i);
-    statecache->ActivateTU ();
+    statecache->SetCurrentTU ((int)i);
+    statecache->ActivateTU (tuFlags);
     if ((layers[i].texgen != TEXGEN_NONE) ||
       (layers[i].texMatrixOps.Length() > 0))
     {
       statecache->Disable_GL_TEXTURE_GEN_S ();
       statecache->Disable_GL_TEXTURE_GEN_T ();
       statecache->Disable_GL_TEXTURE_GEN_R ();
-	  glDisable(GL_TEXTURE_GEN_Q);
+      statecache->Disable_GL_TEXTURE_GEN_Q ();
 
       statecache->SetMatrixMode (GL_TEXTURE);
       glLoadIdentity ();
     }
   }
-  statecache->SetActiveTU (0);
-  statecache->ActivateTU ();
+  if (shaderPlug->ext->CS_GL_ARB_multitexture)
+  {
+    statecache->SetCurrentTU (0);
+    statecache->ActivateTU (tuFlags);
+  }
 }
 
 bool csGLShaderFVP::ParseTexMatrixOp (iDocumentNode* node, 
@@ -966,6 +977,9 @@ bool csGLShaderFVP::Compile()
   shaderPlug->Open ();
 
   size_t i;
+
+  if (layers.Length () > (size_t)shaderPlug->texUnits)
+    return false;
 
   for (i=0; i<layers.Length (); i++)
     if ((layers[i].texgen == TEXGEN_REFLECT_CUBE) &&

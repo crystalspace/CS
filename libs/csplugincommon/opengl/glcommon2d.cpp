@@ -184,10 +184,11 @@ bool csGraphics2DGLCommon::Open ()
     glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
     for (GLint u = texUnits - 1; u >= 0; u--)
     {
-      statecache->SetActiveTU (u);
-      statecache->ActivateTU ();
+      statecache->SetCurrentTU (u);
+      statecache->ActivateTU (csGLStateCache::activateTexEnv);
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
     }
+    statecache->ActivateTU (csGLStateCache::activateTexCoord);
   }
   ext.InitGL_ARB_multisample();
 
