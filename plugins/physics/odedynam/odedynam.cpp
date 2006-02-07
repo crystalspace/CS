@@ -1580,6 +1580,7 @@ bool csODERigidBody::AttachColliderSphere (float radius,
     odec->SetDensity (density);
     odec->CreateSphereGeometry (csSphere (offset, radius));
     odec->AttachBody (bodyID);
+    odec->SetTransform (csReversibleTransform (csMatrix3 (), offset));
     odec->AddTransformToSpace (groupID);
     odec->MakeDynamic ();
     colliders.Push (odec);
