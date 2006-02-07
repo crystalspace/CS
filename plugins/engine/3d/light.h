@@ -38,6 +38,8 @@
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"
 #include "iengine/viscull.h"
+#include "csgfx/shadervarcontext.h"
+
 
 class csLightMap;
 class csPolygon3D;
@@ -106,10 +108,11 @@ typedef csSet<csRef<csLightSectorInfluence> > csLightSectorInfluences;
  * A light subclassing from this has a color, a position
  * and a radius.
  */
-class csLight : public scfImplementationExt4<csLight,
+class csLight : public scfImplementationExt5<csLight,
                                              csObject,
                                              iLight,
                                              iVisibilityObject,
+                                             iShaderVariableContext,
 					     iSceneNode,
 					     iSelfDestruct>
 {
@@ -193,6 +196,8 @@ protected:
 
   /// List of light/sector influences.
   csLightSectorInfluences influences;
+
+  csShaderVariableContext svcontext;
 
 public:
   /// Set of flags
@@ -471,6 +476,48 @@ public:
     this->type = type;
     UpdateViscullMesh ();
   }
+
+  virtual iShaderVariableContext* GetSVContext()
+  {
+    return (iShaderVariableContext*)this;
+  }
+  //=================== iShaderVariableContext ================//
+
+  /// Add a variable to this context
+  void AddVariable (csShaderVariable *variable)
+  { svcontext.AddVariable (variable); }
+
+  /// Get a named variable from this context
+  csShaderVariable* GetVariable (csStringID name) const
+  { 
+    return svcontext.GetVariable (name); 
+  }
+
+  /// Get Array of all ShaderVariables
+  const csRefArray<csShaderVariable>& GetShaderVariables () const
+  { 
+    // @@@ Will not return factory SVs
+    return svcontext.GetShaderVariables (); 
+  }
+
+  /**
+   * Push the variables of this context onto the variable stacks
+   * supplied in the "stacks" argument
+   */
+  void PushVariables (csShaderVarStack &stacks) const
+  { 
+    svcontext.PushVariables (stacks); 
+  }
+
+  bool IsEmpty () const 
+  {
+    return svcontext.IsEmpty();
+  }
+
+  void ReplaceVariable (csShaderVariable *variable)
+  { svcontext.ReplaceVariable (variable); }
+
+  void Clear () { svcontext.Clear(); }
 
   //----------------------------------------------------------------------
   // Light influence stuff.

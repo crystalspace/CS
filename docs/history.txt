@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Feb-2006
+	- Erroroman added shader variables to light.
+	- Erroroman added support for light shader variables in loader.
 6-Feb-2006
 	- Piotr Obrzut reverts back his changes in protomesh related to index 
 	  buffer creation as previous resolution was right.

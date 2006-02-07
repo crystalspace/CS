@@ -4308,6 +4308,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   csColor specular (0, 0, 0);
   bool userSpecular = false;
   csLightDynamicType dyn;
+  csRefArray<csShaderVariable> shader_variables;
   struct csHaloDef
   {
     int type;
@@ -4635,7 +4636,25 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
           spotfalloffOuter = cosf(spotfalloffOuter);
         }
         break;
-      default:
+
+      case XMLTOKEN_SHADERVAR:
+	{
+	  const char* varname = child->GetAttributeValue ("name");
+	  csRef<csShaderVariable> var;
+	  var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
+	  if (!SyntaxService->ParseShaderVar (child, *var))
+	  {
+	    SyntaxService->ReportError (
+	      "crystalspace.maploader.load.meshobject", child,
+	      "Error loading shader variable '%s' in light '%s'.", 
+	      varname, lightname);
+	    break;
+	  }
+	  //svc->AddVariable (var);
+	  shader_variables.Push(var);
+	}
+	break;
+    default:
 	SyntaxService->ReportBadToken (child);
 	return 0;
     }
@@ -4654,6 +4673,12 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   AddToRegion (ldr_context, l->QueryObject ());
   l->SetType (type);
   l->SetSpotLightFalloff (spotfalloffInner, spotfalloffOuter);
+
+  for (size_t i = 0; i < shader_variables.Length(); i++)
+  {
+     l->GetSVContext()->AddVariable(shader_variables[i]);
+  }
+
   if (userSpecular) l->SetSpecularColor (specular);
 
   if (use_light_transf)

@@ -41,6 +41,7 @@ struct iMovable;
 struct iObject;
 struct iSector;
 struct iSceneNode;
+struct iShaderVariableContext;
 
 struct iBaseHalo;
 struct iCrossHalo;
@@ -410,6 +411,11 @@ struct iLight : public virtual iBase
    * lighting calculations.
    */
   virtual void Setup () = 0;
+
+  /**
+   * Get the shader variable context of the light.
+   */
+  virtual iShaderVariableContext* GetSVContext() = 0;
 };
 
 /**
