@@ -6,7 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-7-Feb-2006
+7-Feb-2006 
+	- Piotr Obrzut fixed a bug in dynamics system colliders reported by CAOZANE.
+	  Setting offset for sphere collider wasn't working right when collider was attached 
+	  to body.
 	- Erroroman added shader variables to light.
 	- Erroroman added support for light shader variables in loader.
 6-Feb-2006
