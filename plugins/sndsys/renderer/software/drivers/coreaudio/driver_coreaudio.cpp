@@ -173,7 +173,7 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
 
   // Set the byte order of the format to the renderer requested byte order, which is
   //  probably machine byte order.
-  if ((requested_format.Flags & CSSNDSYS_SAMPLE_ENDIAN_MASK) == CSSNDSYS_SAMPLE_BIG_ENDIAN)
+  if ((requested_format->Flags & CSSNDSYS_SAMPLE_ENDIAN_MASK) == CSSNDSYS_SAMPLE_BIG_ENDIAN)
     outStreamDesc.mFormatFlags |= kAudioFormatFlagIsBigEndian;
 
   outStreamDesc.mChannelsPerFrame=requested_format->Channels;
