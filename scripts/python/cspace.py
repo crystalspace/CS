@@ -3897,6 +3897,7 @@ class iLight(iBase):
     def AddAffectedLightingInfo(*args): return _cspace.iLight_AddAffectedLightingInfo(*args)
     def RemoveAffectedLightingInfo(*args): return _cspace.iLight_RemoveAffectedLightingInfo(*args)
     def Setup(*args): return _cspace.iLight_Setup(*args)
+    def GetSVContext(*args): return _cspace.iLight_GetSVContext(*args)
     def __del__(self, destroy=_cspace.delete_iLight):
         try:
             if self.thisown: destroy(self)
