@@ -908,10 +908,12 @@ bool csMeshWrapper::HitBeamObject (
 
 csHitBeamResult csMeshWrapper::HitBeam (
   const csVector3 &start,
-  const csVector3 &end)
+  const csVector3 &end,
+  bool do_material)
 {
   csHitBeamResult rc;
-  rc.hit = HitBeam (start, end, rc.isect, &rc.r);
+  rc.hit = HitBeam (start, end, rc.isect, &rc.r,
+  	do_material ? &rc.material : 0);
   return rc;
 }
 
@@ -919,7 +921,8 @@ bool csMeshWrapper::HitBeam (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect,
-  float *pr)
+  float *pr,
+  iMaterialWrapper** material)
 {
   csVector3 startObj;
   csVector3 endObj;
@@ -938,7 +941,10 @@ bool csMeshWrapper::HitBeam (
   bool rc = false;
   if (HitBeamBBox (startObj, endObj, isect, 0) > -1)
   {
-    rc = HitBeamOutline (startObj, endObj, isect, pr);
+    if (material)
+      rc = meshobj->HitBeamObject (startObj, endObj, isect, pr, 0, material);
+    else
+      rc = HitBeamOutline (startObj, endObj, isect, pr);
     if (rc)
     {
       if (!movable.IsFullTransformIdentity ())

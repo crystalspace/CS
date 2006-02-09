@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Feb-2006
+	- Jorrit added parameters to iMeshWrapper->HitBeam() so that it
+	  can now also fetch the material that was hit.
+	- Jorrit fixed the mesh generator so that it now works correctly
+	  even if it sits on a mesh (terrain) that is not positioned
+	  at 0,0,0.
 8-Feb-2006
 	- iceeey moved the renderloop from the terrain level to
 	  std_rloop_terrain.xml. Also added support to it for regular
@@ -15,9 +21,9 @@ chronological order.
 	  with std_rloop_terrainfixed renderloop.
         - Daniel Fryer fixed compile error in cursor plugin
 7-Feb-2006 
-	- Piotr Obrzut fixed a bug in dynamics system colliders reported by CAOZANE.
-	  Setting offset for sphere collider wasn't working right when collider was attached 
-	  to body.
+	- Piotr Obrzut fixed a bug in dynamics system colliders reported
+	  by CAOZANE. Setting offset for sphere collider wasn't working right
+	  when collider was attached to body.
 	- Erroroman added shader variables to light.
 	- Erroroman added support for light shader variables in loader.
         - Daniel Fryer fixed compile error in CoreAudio driver

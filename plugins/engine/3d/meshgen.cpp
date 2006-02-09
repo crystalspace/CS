@@ -521,7 +521,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
       iMaterialWrapper* hit_material = 0;
       for (i = 0 ; i < cell.meshes.Length () ; i++)
       {
-        csHitBeamResult rc = cell.meshes[i]->HitBeamObject (start, end,
+        csHitBeamResult rc = cell.meshes[i]->HitBeam (start, end,
 		do_material);
 	if (rc.hit)
 	{

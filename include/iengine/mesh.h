@@ -185,8 +185,8 @@ struct csHitBeamResult
   /// Only for HitBeamObject: the polygon/triangle index that was hit.
   int polygon_idx;
   /**
-   * Only for HitBeamObject: the material that was hit. Can be 0 in case
-   * the meshobject doesn't support getting the material.
+   * Only for HitBeamObject and HitBeam: the material that was hit. Can be 0
+   * in case the meshobject doesn't support getting the material.
    */
   iMaterialWrapper* material;
   /**
@@ -398,7 +398,8 @@ struct iMeshWrapper : public virtual iBase
    * \deprecated Use HitBeamObject() with csHitBeamResult instead.
    */
   CS_DEPRECATED_METHOD virtual bool HitBeam (const csVector3& start,
-  	const csVector3& end, csVector3& isect, float* pr) = 0;
+  	const csVector3& end, csVector3& isect, float* pr,
+	iMaterialWrapper** material = 0) = 0;
 
   /**
    * Check if this mesh is hit by this object space vector.
@@ -436,10 +437,13 @@ struct iMeshWrapper : public virtual iBase
   /**
    * Check if this object is hit by this world space vector.
    * Return the collision point in world space coordinates.
+   * This version can also return the material that was hit (this will
+   * only happen if 'do_material' is true). This is not
+   * supported by all meshes so this can return 0 even if there was a hit.
    * \sa csHitBeamResult
    */
   virtual csHitBeamResult HitBeam (const csVector3& start,
-  	const csVector3& end) = 0;
+  	const csVector3& end, bool do_material = false) = 0;
 
   /**
    * Set a callback which is called just before the object is drawn.
