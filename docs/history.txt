@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 9-Feb-2006
+	- Piotr Obrzut added density map to mesh generator
+	- Piotr Obrzut changed simple terraformer to work with different sized intmaps nad
+	  floatmaps than heightmap
 	- Jorrit added parameters to iMeshWrapper->HitBeam() so that it
 	  can now also fetch the material that was hit.
 	- Jorrit fixed the mesh generator so that it now works correctly

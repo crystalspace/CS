@@ -33,6 +33,8 @@ class csSimpleSampler;
 
 struct csIntMap
 {
+  size_t width;
+  size_t height;
   csStringID type;
   int* data;
   csIntMap () : data (0) { }
@@ -41,6 +43,8 @@ struct csIntMap
 
 struct csFloatMap
 {
+  size_t width;
+  size_t height;
   csStringID type;
   float* data;
   csFloatMap () : data (0) { }

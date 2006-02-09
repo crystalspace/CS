@@ -80,6 +80,7 @@
 #include "csgeom/polymesh.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
+#include "ivaria/terraform.h"
 
 #include "loadtex.h"
 
@@ -3685,7 +3686,7 @@ bool csLoader::ParseImposterSettings (iMeshWrapper* mesh, iDocumentNode *node)
 }
 
 bool csLoader::LoadMeshGenGeometry (iLoaderContext* ldr_context,
-  	iDocumentNode* node, iMeshGenerator* meshgen)
+                                    iDocumentNode* node, iMeshGenerator* meshgen)
 {
   iMeshGeneratorGeometry* geom = meshgen->CreateGeometry ();
 
@@ -3698,66 +3699,84 @@ bool csLoader::LoadMeshGenGeometry (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_FACTORY:
-	{
-	  const char* factname = child->GetAttributeValue ("name");
-	  float maxdist = child->GetAttributeValueAsFloat ("maxdist");
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-	  if (!fact)
-	  {
-            SyntaxService->ReportError (
-	        "crystalspace.maploader.parse.meshgen",
-	        child, "Can't find mesh factory '%s' for mesh generator!",
-		factname);
-	    return false;
-	  }
-	  geom->AddFactory (fact, maxdist);
-	}
-        break;
-      case XMLTOKEN_MATERIALFACTOR:
+    case XMLTOKEN_FACTORY:
+      {
+        const char* factname = child->GetAttributeValue ("name");
+        float maxdist = child->GetAttributeValueAsFloat ("maxdist");
+        iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+        if (!fact)
         {
-	  const char* matname = child->GetAttributeValue ("material");
-	  if (!matname)
-	  {
-            SyntaxService->ReportError (
-	        "crystalspace.maploader.parse.meshgen",
-	        child, "'material' attribute is missing!");
-	    return false;
-	  }
-	  iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	  if (!mat)
-	  {
-            SyntaxService->ReportError (
-	        "crystalspace.maploader.parse.meshgen",
-	        child, "Can't find material '%s'!", matname);
-	    return false;
-	  }
-	  float factor = child->GetAttributeValueAsFloat ("factor");
-	  geom->AddDensityMaterialFactor (mat, factor);
-	}
-	break;
-      case XMLTOKEN_DEFAULTMATERIALFACTOR:
+          SyntaxService->ReportError (
+            "crystalspace.maploader.parse.meshgen",
+            child, "Can't find mesh factory '%s' for mesh generator!",
+            factname);
+          return false;
+        }
+        geom->AddFactory (fact, maxdist);
+      }
+      break;
+    case XMLTOKEN_DENSITYMAP:
+      {
+        const char* map_name = child->GetContentsValue ();
+        csRef<iTerraFormer> map_tf = csQueryRegistryTagInterface<iTerraFormer> 
+          (object_reg, map_name);
+        if (!map_tf)
         {
-	  float factor = child->GetContentsValueAsFloat ();
-	  geom->SetDefaultDensityMaterialFactor (factor);
-	}
-        break;
-      case XMLTOKEN_RADIUS:
-	geom->SetRadius (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_DENSITY:
-	geom->SetDensity (child->GetContentsValueAsFloat ());
-        break;
-      default:
-	SyntaxService->ReportBadToken (child);
-	return false;
+          SyntaxService->ReportError (
+            "crystalspace.maploader.parse.meshgen",
+            child, "Can't find map density map terraformer '%s'!", map_name);
+          return false;
+        }
+        float factor = child->GetAttributeValueAsFloat ("factor");
+        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+        object_reg, "crystalspace.shared.stringset", iStringSet);
+        geom->SetDensityMap (map_tf, factor, strings->Request ("densitymap"));
+      }
+      break;
+    case XMLTOKEN_MATERIALFACTOR:
+      {
+        const char* matname = child->GetAttributeValue ("material");
+        if (!matname)
+        {
+          SyntaxService->ReportError (
+            "crystalspace.maploader.parse.meshgen",
+            child, "'material' attribute is missing!");
+          return false;
+        }
+        iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+        if (!mat)
+        {
+          SyntaxService->ReportError (
+            "crystalspace.maploader.parse.meshgen",
+            child, "Can't find material '%s'!", matname);
+          return false;
+        }
+        float factor = child->GetAttributeValueAsFloat ("factor");
+        geom->AddDensityMaterialFactor (mat, factor);
+      }
+      break;
+    case XMLTOKEN_DEFAULTMATERIALFACTOR:
+      {
+        float factor = child->GetContentsValueAsFloat ();
+        geom->SetDefaultDensityMaterialFactor (factor);
+      }
+      break;
+    case XMLTOKEN_RADIUS:
+      geom->SetRadius (child->GetContentsValueAsFloat ());
+      break;
+    case XMLTOKEN_DENSITY:
+      geom->SetDensity (child->GetContentsValueAsFloat ());
+      break;
+    default:
+      SyntaxService->ReportBadToken (child);
+      return false;
     }
   }
   return true;
 }
 
 bool csLoader::LoadMeshGen (iLoaderContext* ldr_context,
-	iDocumentNode* node, iSector* sector)
+                            iDocumentNode* node, iSector* sector)
 {
   const char* name = node->GetAttributeValue ("name");
   iMeshGenerator* meshgen = sector->CreateMeshGenerator (name);
@@ -3772,57 +3791,57 @@ bool csLoader::LoadMeshGen (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_GEOMETRY:
-	if (!LoadMeshGenGeometry (ldr_context, child, meshgen))
-	  return false;
-        break;
-      case XMLTOKEN_MESHOBJ:
-	{
-	  const char* meshname = child->GetContentsValue ();
-	  iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
-	  if (!mesh)
-	  {
-            SyntaxService->ReportError (
-	        "crystalspace.maploader.parse.meshgen",
-	        child, "Can't find mesh object '%s' for mesh generator!",
-		meshname);
-	    return false;
-	  }
-	  meshgen->AddMesh (mesh);
-	}
-        break;
-      case XMLTOKEN_DENSITYSCALE:
+    case XMLTOKEN_GEOMETRY:
+      if (!LoadMeshGenGeometry (ldr_context, child, meshgen))
+        return false;
+      break;
+    case XMLTOKEN_MESHOBJ:
+      {
+        const char* meshname = child->GetContentsValue ();
+        iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
+        if (!mesh)
         {
-	  float mindist = child->GetAttributeValueAsFloat ("mindist");
-	  float maxdist = child->GetAttributeValueAsFloat ("maxdist");
-	  float maxfactor = child->GetAttributeValueAsFloat ("maxfactor");
-	  meshgen->SetDensityScale (mindist, maxdist, maxfactor);
-	}
-	break;
-      case XMLTOKEN_ALPHASCALE:
-        {
-	  float mindist = child->GetAttributeValueAsFloat ("mindist");
-	  float maxdist = child->GetAttributeValueAsFloat ("maxdist");
-	  meshgen->SetAlphaScale (mindist, maxdist);
-	}
-	break;
-      case XMLTOKEN_NUMBLOCKS:
-        meshgen->SetBlockCount (child->GetContentsValueAsInt ());
-	break;
-      case XMLTOKEN_CELLDIM:
-        meshgen->SetCellCount (child->GetContentsValueAsInt ());
-	break;
-      case XMLTOKEN_SAMPLEBOX:
-	{
-	  csBox3 b;
-	  if (!SyntaxService->ParseBox (child, b))
-	    return false;
-	  meshgen->SetSampleBox (b);
-	}
-        break;
-      default:
-	SyntaxService->ReportBadToken (child);
-	return false;
+          SyntaxService->ReportError (
+            "crystalspace.maploader.parse.meshgen",
+            child, "Can't find mesh object '%s' for mesh generator!",
+            meshname);
+          return false;
+        }
+        meshgen->AddMesh (mesh);
+      }
+      break;
+    case XMLTOKEN_DENSITYSCALE:
+      {
+        float mindist = child->GetAttributeValueAsFloat ("mindist");
+        float maxdist = child->GetAttributeValueAsFloat ("maxdist");
+        float maxfactor = child->GetAttributeValueAsFloat ("maxfactor");
+        meshgen->SetDensityScale (mindist, maxdist, maxfactor);
+      }
+      break;
+    case XMLTOKEN_ALPHASCALE:
+      {
+        float mindist = child->GetAttributeValueAsFloat ("mindist");
+        float maxdist = child->GetAttributeValueAsFloat ("maxdist");
+        meshgen->SetAlphaScale (mindist, maxdist);
+      }
+      break;
+    case XMLTOKEN_NUMBLOCKS:
+      meshgen->SetBlockCount (child->GetContentsValueAsInt ());
+      break;
+    case XMLTOKEN_CELLDIM:
+      meshgen->SetCellCount (child->GetContentsValueAsInt ());
+      break;
+    case XMLTOKEN_SAMPLEBOX:
+      {
+        csBox3 b;
+        if (!SyntaxService->ParseBox (child, b))
+          return false;
+        meshgen->SetSampleBox (b);
+      }
+      break;
+    default:
+      SyntaxService->ReportBadToken (child);
+      return false;
     }
   }
   return true;

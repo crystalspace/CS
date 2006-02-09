@@ -32,6 +32,7 @@
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;
 class csBox3;
+struct iTerraFormer;
 
 /**
  * This interface defines one piece of geometry for the mesh
@@ -100,6 +101,16 @@ struct iMeshGeneratorGeometry : public virtual iBase
    */
   virtual void AddDensityMaterialFactor (iMaterialWrapper* material,
   	float factor) = 0;
+
+  /**
+   * Set a density map in grayscale with factor.
+   * The base density will be used to try a number of positions in
+   * every cell. Density map will be used to affect base density at
+   * given point. So for given point density will be based on 
+   * base density * value from density map * map factor.
+   */
+  virtual void SetDensityMap (iTerraFormer* map, float factor, 
+    const csStringID & type) = 0;
 
   /**
    * Set the default factor to use in case the material found on

@@ -33,6 +33,7 @@
 #include "iengine/mesh.h"
 #include "iengine/meshgen.h"
 #include "imesh/instmesh.h"
+#include "ivaria/terraform.h"
 
 struct iSector;
 struct iInstancingMeshState;
@@ -101,6 +102,11 @@ private:
   float density;
   float total_max_dist;
 
+  //density map
+  csRef<iTerraFormer> density_map;
+  float density_map_factor;
+  csStringID density_map_type;
+
   // Table with density material factors.
   csArray<csMGDensityMaterialFactor> material_factors;
   // Default material factor. Only used in case the table above is not empty.
@@ -110,7 +116,9 @@ private:
 
 public:
   csMeshGeneratorGeometry (csMeshGenerator* generator);
-  virtual ~csMeshGeneratorGeometry () { }
+  virtual ~csMeshGeneratorGeometry ();
+
+  void GetDensityMapFactor (float x, float z, float &data);
 
   float GetTotalMaxDist () const { return total_max_dist; }
   const csArray<csMGDensityMaterialFactor>& GetDensityMaterialFactors () const
@@ -139,6 +147,8 @@ public:
   virtual float GetDensity () const { return density; }
   virtual void AddDensityMaterialFactor (iMaterialWrapper* material,
   	float factor);
+  virtual void SetDensityMap (iTerraFormer* map, float factor, 
+    const csStringID & type);
   virtual void SetDefaultDensityMaterialFactor (float factor)
   {
     default_material_factor = factor;
