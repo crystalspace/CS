@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Feb-2006
+	- iceeey moved the renderloop from the terrain level to
+	  std_rloop_terrain.xml. Also added support to it for regular
+	  diffuse shaders (before it only had steps for terrain).
 7-Feb-2006 
 	- Piotr Obrzut fixed a bug in dynamics system colliders reported by CAOZANE.
 	  Setting offset for sphere collider wasn't working right when collider was attached 

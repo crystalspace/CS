@@ -51,13 +51,12 @@
   <materials>
     <material name="ScatterSky">
       <color red="0" green="0" blue="0" /> 
-      <shader type="terrain_base">sky_scattering</shader>
+      <shader type="ambient">sky_scattering</shader>
     </material>
     <material name="Base">
       <texture>basemap</texture>
       <shadervar name="tex normal" type="texture">base_normalmap</shadervar>
-      <!-- <shader type="ambient">splatting_scattering_base</shader> -->
-      <shader type="terrain_base">splatting_scattering_base</shader>
+      <shader type="ambient">splatting_scattering_base</shader>
     </material>
     <material name="Marble">
       <texture>andrew_marble4.jpg</texture>
@@ -84,35 +83,13 @@
 
   <addon>
   	<plugin>crystalspace.renderloop.loop.loader</plugin>
-	<!-- @@@ NOTE a custom RL is needed to ensure that the base & splat
-	  -- meshes are only drawn once -->
-	<params>
-	  <name>rloop_terrain</name>
-	  <steps>
-	    <step plugin="crystalspace.renderloop.step.generic">
-	      <shadertype>terrain_base</shadertype>
-	      <zoffset>yes</zoffset>
-	      <portaltraversal />
-	      <zuse />
-	    </step>
-	    <step plugin="crystalspace.renderloop.step.lightiter">
-	      <steps>
-		<!-- diffuse lighting -->
-		<step plugin="crystalspace.renderloop.step.generic">
-		  <shadertype>terrain_splat</shadertype>
-		  <zoffset>no</zoffset>
-		  <ztest />
-		</step>
-	      </steps>
-	    </step>
-	  </steps>
-	</params>
+	<paramsfile>/shader/std_rloop_terrain.xml</paramsfile>
   </addon>
 
   <settings>
     <clearzbuf>yes</clearzbuf>
     <lightmapcellsize>16</lightmapcellsize>
-    <renderloop>rloop_terrain</renderloop>
+    <renderloop>std_rloop_terrain</renderloop>
   </settings>
 
   <start>
