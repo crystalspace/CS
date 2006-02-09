@@ -4441,6 +4441,7 @@ package cspace::iLight;
 *AddAffectedLightingInfo = *cspacec::iLight_AddAffectedLightingInfo;
 *RemoveAffectedLightingInfo = *cspacec::iLight_RemoveAffectedLightingInfo;
 *Setup = *cspacec::iLight_Setup;
+*GetSVContext = *cspacec::iLight_GetSVContext;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
