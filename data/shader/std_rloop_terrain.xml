@@ -13,7 +13,7 @@
       <step plugin="crystalspace.renderloop.step.lightiter">
         <steps>
           <step plugin="crystalspace.renderloop.step.generic">
-            <shadertype>terrain_splat</shadertype>
+            <shadertype>terrain splat</shadertype>
             <zoffset>no</zoffset>
             <zuse />
           </step>

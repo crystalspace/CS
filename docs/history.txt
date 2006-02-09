@@ -10,6 +10,9 @@ chronological order.
 	- iceeey moved the renderloop from the terrain level to
 	  std_rloop_terrain.xml. Also added support to it for regular
 	  diffuse shaders (before it only had steps for terrain).
+	- caedes changed the name of terrain_splat shader type in new
+	  std_rloop_terrain to "terrain splat" so it is more consistent
+	  with std_rloop_terrainfixed renderloop.
 7-Feb-2006 
 	- Piotr Obrzut fixed a bug in dynamics system colliders reported by CAOZANE.
 	  Setting offset for sphere collider wasn't working right when collider was attached 

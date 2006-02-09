@@ -63,21 +63,21 @@
       <shadervar name="tex normal" type="texture">blobbyDOT3.png</shadervar>
       <shadervar name="texture scale" type="vector2">16,16</shadervar>
       <!-- <shader type="diffuse">splatting_bump</shader> -->
-      <shader type="terrain_splat">splatting_scattering</shader>
+      <shader type="terrain splat">splatting_scattering</shader>
     </material>
     <material name="Stone">
       <texture>stone4.gif</texture>
       <shadervar name="tex normal" type="texture">stone2DOT3.png</shadervar>
       <shadervar name="texture scale" type="vector2">64,64</shadervar>
       <!-- <shader type="diffuse">splatting_bump</shader> -->
-      <shader type="terrain_splat">splatting_scattering</shader>
+      <shader type="terrain splat">splatting_scattering</shader>
     </material>
     <material name="Grass">
       <texture>grass.png</texture>
       <shadervar name="tex normal" type="texture">grassDOT3.png</shadervar>
       <shadervar name="texture scale" type="vector2">16,16</shadervar>
       <!-- <shader type="diffuse">splatting_bump</shader> -->
-      <shader type="terrain_splat">splatting_scattering</shader>
+      <shader type="terrain splat">splatting_scattering</shader>
     </material>
   </materials>
 
