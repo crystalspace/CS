@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cursor.h"
+
 #include "csutil/ref.h"
 #include "csutil/cfgacc.h"
 #include "csutil/csstring.h"
@@ -33,6 +33,7 @@
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
 #include "ivideo/texture.h"
+#include "cursor.h"
 
 CS_IMPLEMENT_PLUGIN
 

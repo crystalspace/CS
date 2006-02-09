@@ -13,6 +13,7 @@ chronological order.
 	- caedes changed the name of terrain_splat shader type in new
 	  std_rloop_terrain to "terrain splat" so it is more consistent
 	  with std_rloop_terrainfixed renderloop.
+        - Daniel Fryer fixed compile error in cursor plugin
 7-Feb-2006 
 	- Piotr Obrzut fixed a bug in dynamics system colliders reported by CAOZANE.
 	  Setting offset for sphere collider wasn't working right when collider was attached 
