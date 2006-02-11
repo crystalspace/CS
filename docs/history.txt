@@ -6,10 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Feb-2006
+	- Jorrit fixed a bug in setting a parent on a mesh that was already
+	  in a sector. The bug is fixed by automatically clearing the
+	  list of sectors of the child mesh as soon as it gets another
+	  parent.
 9-Feb-2006
 	- Piotr Obrzut added density map to mesh generator
-	- Piotr Obrzut changed simple terraformer to work with different sized intmaps nad
-	  floatmaps than heightmap
+	- Piotr Obrzut changed simple terraformer to work with different
+	  sized intmaps and floatmaps than heightmap.
 	- Jorrit added parameters to iMeshWrapper->HitBeam() so that it
 	  can now also fetch the material that was hit.
 	- Jorrit fixed the mesh generator so that it now works correctly

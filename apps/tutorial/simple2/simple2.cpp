@@ -119,7 +119,8 @@ bool Simple::OnKeyboard(iEvent& ev)
       // the object registry and then post the event.
       csRef<iEventQueue> q = 
         CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
-      if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
+      if (q.IsValid()) q->GetEventOutlet()->Broadcast(
+	  csevQuit(GetObjectRegistry()));
     }
   }
   return false;
@@ -166,7 +167,8 @@ bool Simple::Application()
   if (!OpenApplication(GetObjectRegistry()))
     return ReportError("Error opening system!");
 
-  if (SetupModules()) {
+  if (SetupModules())
+  {
     // This calls the default runloop. This will basically just keep
     // broadcasting process events to keep the game going.
     Run();

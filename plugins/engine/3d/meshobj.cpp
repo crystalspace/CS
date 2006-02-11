@@ -739,6 +739,10 @@ void csMeshWrapper::SetParent (iSceneNode* parent)
 
   ClearFromSectorPortalLists ();
 
+  // If we are setting a parent then we clear the sectors of this object.
+  if (parent)
+    movable.ClearSectors ();
+
 #if 0
   if (!movable.GetParent ())
   {
