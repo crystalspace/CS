@@ -64,7 +64,7 @@ SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data,
   sound_data=data;
 
   // Allocate an advance buffer
-  p_cyclicbuffer = new CrystalSpace:: SoundCyclicBuffer (
+  p_cyclicbuffer = new CS::Sound::SoundCyclicBuffer (
     (render_format.Bits/8 * render_format.Channels) * 
       (render_format.Freq * OGG_BUFFER_LENGTH_MULTIPLIER / 
 	OGG_BUFFER_LENGTH_DIVISOR));
@@ -371,7 +371,7 @@ void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
 
       // Create the pcm sample converter if it's not yet created
       if (pcm_convert == 0)
-        pcm_convert = new CrystalSpace::PCMSampleConverter (
+        pcm_convert = new CS::Sound::PCMSampleConverter (
 	  current_ogg_format_info->channels, render_format.Bits,
 	  current_ogg_format_info->rate);
 

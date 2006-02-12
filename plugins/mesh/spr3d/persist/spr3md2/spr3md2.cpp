@@ -97,8 +97,7 @@ public:
   }
 };
 
-namespace cspluginSpr3Md2
-{
+using namespace CS::Plugins::Spr3dMd2;
 
 /**
  * Reports errors
@@ -555,4 +554,3 @@ iMeshFactoryWrapper* csSprite3DMD2FactoryLoader::Load (const char* factname,
   return Load (factname, filename, dbuf);
 }
 
-} // namespace cspluginSpr3Md2

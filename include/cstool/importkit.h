@@ -30,7 +30,7 @@
 
 struct iObjectRegistry;
 
-namespace CrystalSpace
+namespace CS
 {
   /**
    * \internal Namespace for the import kit implementation, to "shield"

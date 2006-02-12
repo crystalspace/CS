@@ -37,8 +37,13 @@ extern "C"
 #undef INT32
 }
 
-namespace cspluginJPGimg
+namespace CS
 {
+namespace Plugins
+{
+namespace JPGImageIO
+{
+
 
 /**
  * The JPG image file format loader.
@@ -116,6 +121,8 @@ public:
   CS_LEAKGUARD_DECLARE (ImageJpgFile);
 };
 
-} // namespace cspluginJPGimg
+} // namespace JPGImageIO
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_JPGIMAGE_H__

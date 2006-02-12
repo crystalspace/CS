@@ -37,8 +37,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginFreeFnt2
-{
+using namespace CS::Plugins::FreeFont2;
 
 SCF_IMPLEMENT_FACTORY (csFreeType2Server)
 
@@ -666,4 +665,3 @@ int csFreeType2Font::GetUnderlineThickness ()
   return underline_thickness;
 }
 
-} // namespace cspluginFreeFnt2

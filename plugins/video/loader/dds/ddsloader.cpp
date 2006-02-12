@@ -30,8 +30,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginDDSimg
-{
+using namespace CS::Plugins::DDSImageIO;
 
 SCF_IMPLEMENT_FACTORY(csDDSImageIO)
 
@@ -452,4 +451,3 @@ void csDDSImageFile::Report (int severity, const char* msg, ...)
   va_end (argv);
 }
 
-} // namespace cspluginDDSimg

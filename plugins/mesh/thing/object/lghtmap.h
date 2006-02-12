@@ -28,7 +28,11 @@ struct iCacheManager;
 struct iFile;
 struct iEngine;
 
-namespace cspluginThing
+namespace CS
+{
+namespace Plugins
+{
+namespace Thing
 {
 
 class csPolyTexture;
@@ -204,6 +208,8 @@ public:
   int GetHeight () const { return lheight; }
 };
 
-} // namespace cspluginThing
+} // namespace Thing
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_LIGHTMAP_H__

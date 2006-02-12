@@ -17,6 +17,7 @@
 */
 
 #include "simple1.h"
+#include "csutil/radixsort.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -265,6 +266,17 @@ void Simple::CreateRoom ()
  *-------------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
+  csRadixSorter rs;
+  csRandomGen rgen;
+  float blah[16];
+  for(size_t i=0; i< 16; i++)
+  {
+    blah[i] = (rgen.Get()-0.5f)*100.0f;
+  }
+
+  rs.Sort (blah, 16);
+  rs.ReorderInplace (blah, 16);
+
   /* Runs the application. 
    *
    * csApplicationRunner<> is a small wrapper to support "restartable" 

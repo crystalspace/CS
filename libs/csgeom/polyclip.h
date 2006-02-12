@@ -38,7 +38,7 @@
 
 #include "edgeclip.h"
 
-namespace CrystalSpace
+namespace CS
 {
   
   template<typename StatusOutput>
@@ -144,6 +144,6 @@ namespace CrystalSpace
     size_t GetOutputCount() { return OutV; }
   };
  
-} // namespace CrystalSpace
+} // namespace CS
 
 #endif // __CS_CSGEOM_POLYCLIP_H__

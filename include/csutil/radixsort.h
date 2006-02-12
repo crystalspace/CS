@@ -1,6 +1,6 @@
 /*
-  Crystal Space In-Place Radix Sort
-  Copyright (C) 2003 by Jorrit Tyberghein
+  Crystal Space Radix Sort
+  Copyright (C) 2006 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -21,35 +21,128 @@
 #define __CSUTIL_RADIX_SORT_H__
 
 /**\file
- * 32-bit unsigned integer in-place radix-sorter
+ * General radix-sorter
  */
 
 #include "csextern.h"
 
 /**
- * An in-place radix-sorter for a raw array of 32-bit unsigned integers.
+ * A radix-sorter for signed and unsigned integers as well as floats.
+ * Creates an index-table instead of reordering elements.
+ * Based on ideas by Pierre Terdiman
  */
 class CS_CRYSTALSPACE_EXPORT csRadixSorter
 {
-private:
-  // Element counter table. This is used to count the
-  // distribution of all elements in the input table (for the
-  // given part of the elements we are sorting).
-  int counter_table[256];
-  // Offset table where every element starts in the sorted result.
-  int offset_table[256];
-
-  // Sort from one table to the other on the given bit-mask.
-  void Sort (uint32* table_source, uint32* table_dest, int size,
-  	uint32 bit_mask, int shift);
-
 public:
+  csRadixSorter();
+  ~csRadixSorter();
+
   /**
-   * Sort a given table numerically. If you know the maximum value
-   * of all elements in the array you can pass that to Sort. It will
-   * then try to minimize the passes based on that max_value.
+   * Sort array of unsigned integers.
+   * \param array Array of integers to sort
+   * \param size Number of elements in array
    */
-  void Sort (uint32* table, int size, int max_value);
+  void Sort(uint32* array, size_t size);
+
+  /**
+   * Sort array of signed integers.
+   * \param array Array of integers to sort
+   * \param size Number of elements in array
+   */
+  void Sort(int32* array, size_t size);
+
+  /**
+   * Sort array of floats.
+   * \param array Array of floats to sort
+   * \param size Number of elements in array
+   */
+  void Sort(float* array, size_t size);
+
+  /**
+   * Get the last generated ranks array.
+   */
+  inline size_t* GetRanks() const
+  {
+    return ranks1;
+  }
+
+  /**
+   * Reorder a list with the ranks in-place
+   */
+  template<class T>
+  void ReorderInplace(T* source, size_t size)
+  {
+    if(size*sizeof(T) < 0x4000) //Max out to 16kb
+    {
+      //Stack-allocated temp-array
+      CS_ALLOC_STACK_ARRAY(uint8, tmpStorage, size*sizeof(T));
+      T* dest = (T*)tmpStorage;
+      for(size_t i = 0; i < size; i++)
+      {
+        new (&dest[i]) T(source[ranks1[i]]); //to make sure it is initialized
+      }
+      for(size_t i = 0; i < size; i++)
+      {
+        source[i] = dest[i];
+        dest[i].~T();
+      }
+    }
+    else
+    {
+      //Heap-allocated
+      uint8* tmpStorage = (uint8*)malloc(size*sizeof(T));
+      T* dest = (T*)tmpStorage;
+      for(size_t i = 0; i < size; i++)
+      {
+        new (&dest[i]) T(source[ranks1[i]]); //to make sure it is initialized
+      }
+      for(size_t i = 0; i < size; i++)
+      {
+        source[i] = dest[i];
+        dest[i].~T();
+      }
+      free(tmpStorage);
+    }
+  }
+
+  /**
+   * Reorder a list with the ranks in-place. 
+   * Source and destination arrays should not overlap in memory!
+   */
+  template<class T>
+  bool Reorder(const T* source, T* dest, size_t size)
+  {
+    //make sure ranges don't overlap
+#ifdef _DEBUG
+    if((source + size - dest > 0 && dest - source < size) ||
+       (dest + size - source > 0 && source - dest < size))
+       return false;
+#endif
+
+    for(size_t i = 0; i < size; i++)
+    {
+      dest[i] = source[ranks1[i]];
+    }
+    return true;
+  }
+
+private:
+  // Resize the rank arrays
+  void Resize(size_t size);
+
+  //Helper-function to create histograms. Returns true if values are already sorted
+  template<class T>
+  bool CreateHistogram(T* data, size_t size, uint32* histogram);
+
+  // Check if pass should be performed
+  template<class T>
+  bool DoPass(size_t pass, T* data, size_t size, uint32* histogram);
+
+  size_t currentSize;
+  size_t* ranks1;
+  size_t* ranks2;
+
+  bool ranksValid;
 };
 
 #endif

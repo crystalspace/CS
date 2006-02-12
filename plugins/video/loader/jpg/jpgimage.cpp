@@ -32,8 +32,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginJPGimg
-{
+using namespace CS::Plugins::JPGImageIO;
 
 CS_LEAKGUARD_IMPLEMENT (ImageJpgFile);
 
@@ -613,4 +612,3 @@ csRef<iImageFileLoader> ImageJpgFile::InitLoader (csRef<iDataBuffer> source)
   return loader;
 }
 
-} // namespace cspluginJPGimg

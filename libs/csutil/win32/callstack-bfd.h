@@ -29,7 +29,7 @@
 #include "../callstack.h"
 #include "../bfdsymbols.h"
 
-namespace CrystalSpace
+namespace CS
 {
   namespace Debug
   {
@@ -50,6 +50,6 @@ namespace CrystalSpace
     };
   
   } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS
 
 #endif // __CS_LIBS_UTIL_WIN32_CALLSTACK_BFD_H__

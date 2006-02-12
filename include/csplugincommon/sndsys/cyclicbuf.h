@@ -23,7 +23,9 @@
  * An implementation of a cyclic buffer oriented for sound functionality.
  */
  
-namespace CrystalSpace
+namespace CS
+{
+namespace Sound
 {
 
 /** 
@@ -100,6 +102,7 @@ private:
   //@}
 };
 
-} // namespace CrystalSpace
+} // namespace Sound
+} // namespace CS
 
 #endif // __CS_SNDSYS_CYCLICBUF_H__

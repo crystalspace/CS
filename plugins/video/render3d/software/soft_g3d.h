@@ -25,7 +25,11 @@
 #include "iutil/pluginconfig.h"
 #include "sft3dcom.h"
 
-namespace cspluginSoft3d
+namespace CS
+{
+namespace Plugins
+{
+namespace Soft3D
 {
 
 /// Software 3D renderer
@@ -50,6 +54,8 @@ public:
   virtual bool GetOption (int id, csVariant* value);
 };
 
-} // namespace cspluginSoft3d
+} // namespace Soft3D
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_SOFT_RENDER3D_H__

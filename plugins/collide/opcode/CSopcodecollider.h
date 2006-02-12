@@ -51,18 +51,18 @@ class csOPCODECollider : public iCollider
 {
 public:
   /// The internal model object.
-  cspluginOpcode::Opcode::Model* m_pCollisionModel;
-  cspluginOpcode::IceMaths::Matrix4x4 transform;
+  CS::Plugins::Opcode::Opcode::Model* m_pCollisionModel;
+  CS::Plugins::Opcode::IceMaths::Matrix4x4 transform;
   unsigned int* indexholder;
-  cspluginOpcode::Point *vertholder;
+  CS::Plugins::Opcode::Point *vertholder;
 
-  cspluginOpcode::Opcode::MeshInterface opcMeshInt;
+  CS::Plugins::Opcode::Opcode::MeshInterface opcMeshInt;
 
 private:
   void GeometryInitialize (iPolygonMesh *mesh);
 
-  static void MeshCallback (cspluginOpcode::udword triangle_index, 
-    cspluginOpcode::Opcode::VertexPointers& triangle, void* user_data);
+  static void MeshCallback (CS::Plugins::Opcode::udword triangle_index, 
+    CS::Plugins::Opcode::Opcode::VertexPointers& triangle, void* user_data);
 public:
   /// Create a collider based on geometry.
   csOPCODECollider (iPolygonMesh* mesh);

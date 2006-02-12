@@ -47,7 +47,7 @@
 
 #include <ctype.h>
 
-namespace CrystalSpace
+namespace CS
 {
   namespace ImportKitImpl 
   { 

@@ -59,8 +59,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginSprCal3d
-{
+using namespace CS::Plugins::SprCal3d;
+
 CS_LEAKGUARD_IMPLEMENT (csCal3DMesh);
 CS_LEAKGUARD_IMPLEMENT (csSpriteCal3DMeshObject);
 CS_LEAKGUARD_IMPLEMENT (csSpriteCal3DMeshObjectFactory);
@@ -2243,4 +2243,3 @@ csPtr<iMeshObjectFactory> csSpriteCal3DMeshObjectType::NewFactory ()
   return csPtr<iMeshObjectFactory> (cm);
 }
 
-} // namespace cspluginSprCal3d

@@ -32,7 +32,11 @@ struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
 
-namespace cspluginSpr3dLoader
+namespace CS
+{
+namespace Plugins
+{
+namespace Spr3dLoader
 {
 
 /**
@@ -145,6 +149,8 @@ public:
   	iStreamSource*);
 };
 
-} // namespace cspluginSpr3dLoader
+} // namespace Spr3dLoader
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_SPR3DLDR_H__

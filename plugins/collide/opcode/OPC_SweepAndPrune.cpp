@@ -19,15 +19,15 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace cspluginOpcode;
-using namespace cspluginOpcode::Opcode;
+using namespace CS::Plugins::Opcode;
+using namespace CS::Plugins::Opcode::Opcode;
 
 inline_ void Sort(udword& id0, udword& id1)
 {
 	if(id0>id1)	Swap(id0, id1);
 }
 
-	class cspluginOpcode::Opcode::SAP_Element
+	class Opcode::SAP_Element
 	{
 		public:
 		inline_					SAP_Element()														{}
@@ -38,14 +38,14 @@ inline_ void Sort(udword& id0, udword& id1)
 				SAP_Element*	mNext;
 	};
 
-	class cspluginOpcode::Opcode::SAP_Box
+	class Opcode::SAP_Box
 	{
 		public:
 				SAP_EndPoint*	Min[3];
 				SAP_EndPoint*	Max[3];
 	};
 
-	class cspluginOpcode::Opcode::SAP_EndPoint
+	class Opcode::SAP_EndPoint
 	{
 		public:
 				float			Value;		// Min or Max value

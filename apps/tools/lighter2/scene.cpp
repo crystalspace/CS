@@ -22,7 +22,7 @@
 #include "lighter.h"
 #include "kdtree.h"
 
-using namespace CrystalSpace;
+using namespace CS;
 
 namespace lighter
 {

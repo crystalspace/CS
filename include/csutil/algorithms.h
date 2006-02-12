@@ -24,7 +24,7 @@
  * General Algorithms
  */
 
-namespace CrystalSpace
+namespace CS
 {
   /**
    * Iterate over all elements in the iterator and perform operation

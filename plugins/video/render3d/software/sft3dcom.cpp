@@ -51,10 +51,8 @@
 #include "soft_txt.h"
 #include "clip_znear.h"
 
-namespace cspluginSoft3d
-{
-
-  using namespace CrystalSpace::SoftShader;
+using namespace CS::Plugins::Soft3D;
+using namespace CS::PluginCommon::SoftShader;
 
 ///---------------------------------------------------------------------------
 
@@ -1146,4 +1144,3 @@ void csSoftwareGraphics3DCommon::DrawPixmap (iTextureHandle *hTex,
   specifica->DrawPixmap (this, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
 }
 
-} // namespace cspluginSoft3d

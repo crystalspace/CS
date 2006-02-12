@@ -55,9 +55,10 @@
  */
 #define CS_SOUND_INTERNAL_FREQUENCY_DIVISOR 1024
 
-namespace CrystalSpace
+namespace CS
 {
-
+namespace Sound
+{
 /**
  * A PCMSampleConverter object converts PCM data from one format to another.
  *
@@ -172,6 +173,7 @@ protected:
   bool swap_16;
 };
 
-} // namespace CrystalSpace
+} // namespace Sound
+} // namespace CS
 
 #endif // __CS_SNDSYS_CONVERT_H__

@@ -29,8 +29,13 @@ struct iSyntaxService;
 struct iPluginManager;
 struct iEngine;
 
-namespace cspluginSimpleFormerLoader
+namespace CS
 {
+namespace Plugins
+{
+namespace SimpleFormerLoader
+{
+
 
 template<typename Tgetter>
 class RawHeightmapReader;
@@ -76,6 +81,8 @@ private:
   bool LoadHeightmapRawFloatBE (iDocumentNode* child, iSimpleFormerState* state);
 };
 
-} // namespace cspluginSimpleFormerLoader
+} // namespace SimpleFormerLoader
+} // namespace Plugins
+} // namespace CS
 
 #endif /* __LOADER_H__ */

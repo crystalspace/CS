@@ -20,9 +20,9 @@
 #include "cstool/importkit.h"
 #include "importkit_glue.h"
 
-using namespace CrystalSpace::ImportKitImpl;
+using namespace CS::ImportKitImpl;
 
-namespace CrystalSpace
+namespace CS
 {
 
   ImportKit::Container::Model::~Model()
@@ -77,4 +77,4 @@ namespace CrystalSpace
     return cnt;
   }
 
-} // namespace CrystalSpace
+} // namespace CS

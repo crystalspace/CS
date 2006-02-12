@@ -24,10 +24,13 @@
 #include "isndsys/ss_stream.h"
 #include "wavdata2.h"
 
-namespace CrystalSpace
+namespace CS
 {
-  class PCMSampleConverter;
-  class SoundCyclicBuffer;
+  namespace Sound
+  {
+    class PCMSampleConverter;
+    class SoundCyclicBuffer;
+  }
 }
 
 class SndSysWavSoundStream : public iSndSysStream
@@ -77,7 +80,7 @@ class SndSysWavSoundStream : public iSndSysStream
   csSndSysSoundFormat render_format;
   csRef<SndSysWavSoundData> sound_data;
 
-  CrystalSpace::SoundCyclicBuffer *p_cyclicbuffer;
+  CS::Sound::SoundCyclicBuffer *p_cyclicbuffer;
   bool paused, looping;
   bool playback_read_complete;
   csTicks last_time;
@@ -95,7 +98,7 @@ class SndSysWavSoundStream : public iSndSysStream
    * Pointer to the PCM sample converter object that will handle our 
    * conversions
    */
-  CrystalSpace::PCMSampleConverter *pcm_convert;
+  CS::Sound::PCMSampleConverter *pcm_convert;
 
   char *prepared_data_buffer;
   int prepared_data_buffer_length;

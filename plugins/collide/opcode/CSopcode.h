@@ -46,9 +46,9 @@ struct iObjectRegistry;
 class csOPCODECollideSystem : public iCollideSystem
 {
 public:
-  cspluginOpcode::Opcode::AABBTreeCollider TreeCollider;
-  cspluginOpcode::Opcode::RayCollider RayCol;
-  cspluginOpcode::Opcode::BVTCache ColCache;
+  CS::Plugins::Opcode::Opcode::AABBTreeCollider TreeCollider;
+  CS::Plugins::Opcode::Opcode::RayCollider RayCol;
+  CS::Plugins::Opcode::Opcode::BVTCache ColCache;
 
   csDirtyAccessArray<csCollisionPair> pairs;
   csArray<int> collision_faces;

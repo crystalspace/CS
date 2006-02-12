@@ -633,16 +633,16 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #    endif
 #  endif
 #  if !defined (CS_ASSERT_MSG)
-    namespace CrystalSpace
+    namespace CS
     {
       namespace Debug
       {
 	extern void AssertMessage (const char* expr, const char* filename, 
 	  int line, const char* msg = 0);
       } // namespace Debug
-    } // namespace CrystalSpace
+    } // namespace CS
 #   define CS_ASSERT_MSG(msg,x) 					\
-      if (!(x)) CrystalSpace::Debug::AssertMessage (#x, __FILE__, __LINE__, msg);
+      if (!(x)) CS::Debug::AssertMessage (#x, __FILE__, __LINE__, msg);
 #  endif
 #  if !defined (CS_ASSERT)
 #    define CS_ASSERT(x)	CS_ASSERT_MSG(0, x)

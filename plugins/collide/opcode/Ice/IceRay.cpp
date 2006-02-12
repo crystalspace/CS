@@ -61,8 +61,8 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace cspluginOpcode;
-using namespace cspluginOpcode::IceMaths;
+using namespace CS::Plugins::Opcode;
+using namespace CS::Plugins::Opcode::IceMaths;
 
 float Ray::SquareDistance(const Point& point, float* t)	const
 {

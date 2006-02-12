@@ -35,8 +35,8 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace cspluginOpcode;
-using namespace cspluginOpcode::IceMaths;
+using namespace CS::Plugins::Opcode;
+using namespace CS::Plugins::Opcode::IceMaths;
 
 // Cast operator
 Matrix3x3::operator Matrix4x4() const

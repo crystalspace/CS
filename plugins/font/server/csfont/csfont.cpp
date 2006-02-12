@@ -31,14 +31,21 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginCSfont
+namespace CS
 {
-
+namespace Plugins
+{
+namespace CSFont
+{
 #include "font_police.h"
 #include "font_courier.h"	// font (C) Andrew Zabolotny
 #include "font_tiny.h"		// font (C) Andrew Zabolotny
 #include "font_italic.h"	// font (C) Andrew Zabolotny
+}
+}
+}
 
+using namespace CS::Plugins::CSFont;
 //---------------------------------------------------------------------------
 
 struct csFontDef
@@ -824,4 +831,3 @@ int csDefaultFont::GetUnderlineThickness ()
   return UnderlineThickness;
 }
 
-} // namespace cspluginCSfont

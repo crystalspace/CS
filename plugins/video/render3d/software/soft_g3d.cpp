@@ -31,8 +31,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginSoft3d
-{
+using namespace CS::Plugins::Soft3D;
 
 SCF_IMPLEMENT_FACTORY (csSoftwareGraphics3D)
 
@@ -135,4 +134,3 @@ bool csSoftwareGraphics3D::GetOptionDescription
   return true;
 }
 
-} // namespace cspluginSoft3d

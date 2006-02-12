@@ -51,8 +51,8 @@ To do:
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace cspluginOpcode;
-using namespace cspluginOpcode::IceCore;
+using namespace CS::Plugins::Opcode;
+using namespace CS::Plugins::Opcode::IceCore;
 
 #define INVALIDATE_RANKS	mCurrentSize|=0x80000000
 #define VALIDATE_RANKS		mCurrentSize&=0x7fffffff

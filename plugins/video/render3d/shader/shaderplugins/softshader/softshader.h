@@ -29,10 +29,15 @@
 
 #include "scanline_base.h"
 
-namespace cspluginSoftshader
+namespace CS
+{
+namespace Plugins
+{
+namespace SoftShader
 {
 
-using namespace CrystalSpace::SoftShader;
+
+using namespace CS::PluginCommon::SoftShader;
 
 class csSoftShader : 
   public scfImplementation3<csSoftShader, 
@@ -75,7 +80,9 @@ public:
   /** @} */
 };
 
-} // namespace cspluginSoftshader
+} // namespace SoftShader
+} // namespace Plugins
+} // namespace CS
 
 #endif //__SOFTSHADER_H__
 

@@ -44,8 +44,7 @@
 #include "lppool.h"
 #include "lghtmap.h"
 
-namespace cspluginThing
-{
+using namespace CS::Plugins::Thing;
 
 // Option variable: cosinus factor.
 float csPolyTexture::cfg_cosinus_factor = 0;
@@ -1912,4 +1911,3 @@ void csLightingPolyTexQueue::UpdateMaps (
   polygons.DeleteAll ();
 }
 
-} // namespace cspluginThing

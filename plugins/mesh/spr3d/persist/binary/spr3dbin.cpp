@@ -54,8 +54,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginSpr3dBin
-{
+using namespace CS::Plugins::Spr3dBin;
 
 /**
  * Reports errors
@@ -515,4 +514,4 @@ bool csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile* file,
   return true;
 }
 
-} // namespace cspluginSpr3dBin
+

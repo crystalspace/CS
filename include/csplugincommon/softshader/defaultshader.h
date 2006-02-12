@@ -29,7 +29,9 @@
 /**\addtogroup plugincommon
  * @{ */
 
-namespace CrystalSpace
+namespace CS
+{
+namespace PluginCommon
 {
   namespace SoftShader
   {
@@ -44,7 +46,8 @@ namespace CrystalSpace
       virtual iDefaultScanlineRenderer* GetDefaultRenderer() = 0;
     };
   } // namespace SoftShader
-} // namespace CrystalSpace
+} // namespace PluginCommon
+} // namespace CS
 
 /** @} */
 

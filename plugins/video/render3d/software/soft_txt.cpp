@@ -31,8 +31,7 @@
 #include "csqint.h"
 #include "soft_g3d.h"
 
-namespace cspluginSoft3d
-{
+using namespace CS::Plugins::Soft3D;
 
 void csSoftwareTexture::compute_masks ()
 {
@@ -481,4 +480,3 @@ void csSoftwareTextureManager::GetLightmapRendererCoords (
   lm_v1 =*/ lm_u2 = lm_v2 = 0.0f;
 }
 
-} // namespace cspluginSoft3d

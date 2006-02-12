@@ -68,8 +68,8 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace cspluginOpcode;
-using namespace cspluginOpcode::Opcode;
+using namespace CS::Plugins::Opcode;
+using namespace CS::Plugins::Opcode::Opcode;
 
 //! Compilation flag:
 //! - true to fix quantized boxes (i.e. make sure they enclose the original ones)

@@ -61,7 +61,7 @@ SndSysWavSoundStream::SndSysWavSoundStream (csRef<SndSysWavSoundData> data,
   sound_data=data;
 
   // Allocate an advance buffer
-  p_cyclicbuffer = new CrystalSpace::SoundCyclicBuffer (
+  p_cyclicbuffer = new CS::Sound::SoundCyclicBuffer (
     (render_format.Bits/8 * render_format.Channels) * 
     (render_format.Freq * WAV_BUFFER_LENGTH_MULTIPLIER / 
       WAV_BUFFER_LENGTH_DIVISOR));
@@ -343,16 +343,16 @@ void SndSysWavSoundStream::AdvancePosition(csTicks current_time)
       if (pcm_convert == 0)
       {
 #ifdef CS_LITTLE_ENDIAN
-        pcm_convert = new CrystalSpace::PCMSampleConverter (
+        pcm_convert = new CS::Sound::PCMSampleConverter (
 	  data_format->Channels,data_format->Bits,data_format->Freq);
 #else
         // If we're running on a big endian system and the data is using 
 	// 16 bit samples, endian conversion is necessary
         if (data_format->Bits>8)
-          pcm_convert = new CrystalSpace::PCMSampleConverter(
+          pcm_convert = new CS::Sound::PCMSampleConverter(
 	    data_format->Channels,data_format->Bits,data_format->Freq, true);
         else
-          pcm_convert = new CrystalSpace::PCMSampleConverter (
+          pcm_convert = new CS::Sound::PCMSampleConverter (
 	    data_format->Channels,data_format->Bits,data_format->Freq);
 #endif
       }

@@ -31,8 +31,13 @@
 #include "csutil/cfgacc.h"
 #include "csutil/hash.h"
 
-namespace cspluginFontplex
+namespace CS
 {
+namespace Plugins
+{
+namespace FontPlex
+{
+
 
 class csFontServerMultiplexer;
 class csFontPlexer;
@@ -186,6 +191,8 @@ public:
   { return emitErrors; }
 };
 
-} // namespace cspluginFontplex
+} // namespace FontPlex
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_FONTPLEX_H__

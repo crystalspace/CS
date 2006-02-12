@@ -21,7 +21,7 @@
 #include "kdtree.h"
 #include "radprimitive.h"
 
-using namespace CrystalSpace;
+using namespace CS;
 
 namespace lighter
 {

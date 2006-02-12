@@ -42,8 +42,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginSimpleFormerLoader
-{
+using namespace CS::Plugins::SimpleFormerLoader;
 
 SCF_IMPLEMENT_IBASE (csSimpleFormerLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -283,6 +282,12 @@ struct GetterUint32
   { return sizeof(uint32); }
 };
 
+namespace CS
+{
+namespace Plugins
+{
+namespace SimpleFormerLoader
+{
 template<typename Tgetter>
 class RawHeightmapReader
 {
@@ -344,6 +349,9 @@ public:
     return true;
   }
 };
+}
+}
+}
 
 csRef<iDataBuffer> csSimpleFormerLoader::GetDataBuffer (iDocumentNode* child)
 {
@@ -439,4 +447,3 @@ bool csSimpleFormerLoader::LoadHeightmapRawFloatBE (iDocumentNode* child,
   return reader.ReadRawMap (child);
 }
 
-} // namespace cspluginSimpleFormerLoader

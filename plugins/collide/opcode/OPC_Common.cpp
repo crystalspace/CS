@@ -45,4 +45,4 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace cspluginOpcode::Opcode;
+using namespace CS::Plugins::Opcode::Opcode;

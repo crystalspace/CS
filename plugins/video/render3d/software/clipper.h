@@ -20,8 +20,13 @@
 #ifndef __CS_SOFT3D_CLIPPER_H__
 #define __CS_SOFT3D_CLIPPER_H__
 
-namespace cspluginSoft3d
+namespace CS
 {
+namespace Plugins
+{
+namespace Soft3D
+{
+
 
 //#define VOUT_DEBUG
 
@@ -267,6 +272,8 @@ public:
   }
 };
 
-} // namespace cspluginSoft3d
+} // namespace Soft3D
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_SOFT3D_CLIPPER_H__

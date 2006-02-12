@@ -41,11 +41,10 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginProtoMesh
-{
+using namespace CS::Plugins::ProtoMesh;
 
-  csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory) :
-scfImplementationType (this)
+csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory) :
+  scfImplementationType (this)
 {
   myRenderBufferAccessor.AttachNew (new RenderBufferAccessor (this));
 
@@ -519,4 +518,3 @@ bool csProtoMeshObjectType::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-} // namespace cspluginProtoMesh

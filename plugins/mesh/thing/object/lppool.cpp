@@ -22,8 +22,7 @@
 #include "polygon.h"
 #include "iengine/shadows.h"
 
-namespace cspluginThing
-{
+using namespace CS::Plugins::Thing;
 
 csLightPatch::csLightPatch ()
 {
@@ -59,4 +58,3 @@ void csLightPatch::Initialize (int n)
   num_vertices = n;
 }
 
-} // namespace cspluginThing

@@ -37,7 +37,7 @@ static void PrintError (const char* format, ...)
   csPrintfErr ("\n");
 }
 
-namespace CrystalSpace
+namespace CS
 {
   namespace Debug
   {
@@ -117,4 +117,4 @@ namespace CrystalSpace
     
     SymInitializer symInit;
   } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS

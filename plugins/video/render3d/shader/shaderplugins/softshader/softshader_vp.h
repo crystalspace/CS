@@ -27,7 +27,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 struct iDataBuffer;
 
-namespace cspluginSoftshader
+namespace CS
+{
+namespace Plugins
+{
+namespace SoftShader
 {
 
 class csSoftShader_VP : public csShaderProgram
@@ -68,7 +72,8 @@ public:
   virtual bool Compile();
 };
 
-} // namespace cspluginSoftshader
-
+} // namespace SoftShader
+} // namespace Plugins
+} // namespace CS
 #endif //__SOFTSHADER_VP_H__
 

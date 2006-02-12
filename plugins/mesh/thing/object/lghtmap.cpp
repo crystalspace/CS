@@ -31,8 +31,7 @@
 #include "polygon.h"
 #include "thing.h"
 
-namespace cspluginThing
-{
+using namespace CS::Plugins::Thing;
 
 #define LMMAGIC	    "LM04" // must be 4 chars!
 
@@ -686,5 +685,3 @@ void csLightMap::CalcMaxStatic (int r, int g, int b)
     static_lm = 0;
   }
 }
-
-} // namespace cspluginThing

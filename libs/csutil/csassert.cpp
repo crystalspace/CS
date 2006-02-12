@@ -22,7 +22,7 @@
 #include "csutil/callstack.h"
 #include "csutil/sysfunc.h"
 
-namespace CrystalSpace
+namespace CS
 {
   namespace Debug
   {
@@ -74,4 +74,4 @@ namespace CrystalSpace
     }
     
   } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS

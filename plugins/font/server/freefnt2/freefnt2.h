@@ -30,8 +30,13 @@
 #include "csutil/cfgacc.h"
 #include "csutil/weakref.h"
 
-namespace cspluginFreeFnt2
+namespace CS
 {
+namespace Plugins
+{
+namespace FreeFont2
+{
+
 
 class csFreeType2Server;
 
@@ -229,6 +234,8 @@ public:
   { return emitErrors; }
 };
 
-} // namespace cspluginFreeFnt2
+} // namespace FreeFont2
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_FREEFONT2_H__

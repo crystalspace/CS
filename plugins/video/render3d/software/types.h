@@ -20,7 +20,11 @@
 #ifndef __CS_SOFT3D_TYPES_H__
 #define __CS_SOFT3D_TYPES_H__
 
-namespace cspluginSoft3d
+namespace CS
+{
+namespace Plugins
+{
+namespace Soft3D
 {
   /// A buffer used to pass vertex data around in the renderer
   struct VertexBuffer
@@ -28,6 +32,8 @@ namespace cspluginSoft3d
     uint8* data;
     size_t comp;
   };
-} // namespace cspluginSoft3d
+} // namespace Soft3D
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_SOFT3D_TYPES_H__

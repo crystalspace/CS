@@ -36,8 +36,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginSoftshader
-{
+using namespace CS::Plugins::SoftShader;
 
 SCF_IMPLEMENT_FACTORY (csSoftShader)
 
@@ -110,4 +109,3 @@ bool csSoftShader::Initialize(iObjectRegistry* reg)
   return true;
 }
 
-} // namespace cspluginSoftshader

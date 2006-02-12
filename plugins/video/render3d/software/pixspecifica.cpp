@@ -31,8 +31,13 @@
 #include "scan_pix.h"
 #include "tridraw.h"
 
-namespace cspluginSoft3d
+namespace CS
 {
+namespace Plugins
+{
+namespace Soft3D
+{
+
   template<typename Pix>
   class Specifica : public iPixTypeSpecifica
   {
@@ -277,4 +282,6 @@ namespace cspluginSoft3d
     }
   }
 
-} // namespace cspluginSoft3d
+} // namespace Soft3D
+} // namespace Plugins
+} // namespace CS

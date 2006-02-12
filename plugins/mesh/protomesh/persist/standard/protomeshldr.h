@@ -32,8 +32,13 @@ struct iObjectRegistry;
 struct iSyntaxService;
 struct iProtoFactoryState;
 
-namespace cspluginProtoMeshLoader
+namespace CS
 {
+namespace Plugins
+{
+namespace ProtoMeshLoader
+{
+
 
 /**
  * Proto Mesh factory loader.
@@ -155,7 +160,9 @@ public:
   	iStreamSource*);
 };
 
-} // namespace cspluginProtoMeshLoader
+} // namespace ProtoMeshLoader
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_PROTOMESHLDR_H__
 

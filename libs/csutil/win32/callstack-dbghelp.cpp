@@ -35,7 +35,7 @@
 
 //#define CALLSTACK_PROFILE
 
-namespace CrystalSpace
+namespace CS
 {
 namespace Debug
 {
@@ -644,9 +644,9 @@ bool CallStackNameResolverDbgHelp::GetLineNumber (void* addr, csString& str)
 }
 
 } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS
 
-using namespace CrystalSpace::Debug;
+using namespace CS::Debug;
 
 csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc, 
                                                     HANDLE hThread, 
@@ -655,7 +655,7 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
 {
   skip += 1; /* Adjust for this function */
   CallStackImpl* stack = new CallStackImpl();
-  if (CrystalSpace::Debug::CreateCallStack (hProc, hThread, context, skip, 
+  if (CS::Debug::CreateCallStack (hProc, hThread, context, skip, 
     fast, stack->entries, stack->params))
     return stack;
   delete stack;

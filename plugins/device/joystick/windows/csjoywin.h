@@ -34,8 +34,13 @@
 #include "dinputdefs.h"
 #endif
 
-namespace cspluginJoyWin
+namespace CS
 {
+namespace Plugins
+{
+namespace JoystickWin
+{
+
 
 /**
  * This plugin puts joystick events in the CS eventqueue.
@@ -110,6 +115,8 @@ private:
   /** @} */
 };
 
-} // namespace cspluginJoyWin
+} // namespace JoystickWin
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_CSJOYWIN_H__

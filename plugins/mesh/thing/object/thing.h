@@ -66,7 +66,11 @@ struct iFrustumView;
 struct iMaterialWrapper;
 struct iPolygonBuffer;
 
-namespace cspluginThing
+namespace CS
+{
+namespace Plugins
+{
+namespace Thing
 {
 
 class csThing;
@@ -1136,6 +1140,8 @@ public:
   /** @} */
 };
 
-} // namespace cspluginThing
+} // namespace Thing
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_THING_H__

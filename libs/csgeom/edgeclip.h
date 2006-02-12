@@ -27,7 +27,7 @@
 #ifndef __CS_CSGEOM_EDGECLIP_H__
 #define __CS_CSGEOM_EDGECLIP_H__
 
-namespace CrystalSpace
+namespace CS
 {
   
   template <typename ClipLogic, typename StatusOutput>
@@ -211,6 +211,6 @@ namespace CrystalSpace
     }
   };
   
-} // namespace CrystalSpace
+} // namespace CS
 
 #endif // __CS_CSGEOM_EDGECLIP_H__

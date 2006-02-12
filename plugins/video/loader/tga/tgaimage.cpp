@@ -39,8 +39,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginTGAimg
-{
+using namespace CS::Plugins::TGAImageIO;
 
 SCF_IMPLEMENT_FACTORY (csTGAImageIO)
 
@@ -544,4 +543,3 @@ bool ImageTgaFile::TgaLoader::LoadData ()
   return true;
 }
 
-} // namespace cspluginTGAimg

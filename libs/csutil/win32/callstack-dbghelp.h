@@ -28,7 +28,7 @@
 
 #include "../callstack.h"
 
-namespace CrystalSpace
+namespace CS
 {
 namespace Debug
 {
@@ -49,6 +49,6 @@ class CallStackNameResolverDbgHelp : public iCallStackNameResolver
 };
 
 } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS
 
 #endif // __CS_LIBS_UTIL_WIN32_CALLSTACK_DBGHELP_H__

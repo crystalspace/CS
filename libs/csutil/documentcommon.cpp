@@ -21,7 +21,7 @@
 #include "csutil/documentcommon.h"
 #include "csutil/documenthelper.h"
 
-using namespace CrystalSpace;
+using namespace CS;
 
 
 csEmptyDocumentNodeIterator::csEmptyDocumentNodeIterator ()

@@ -66,7 +66,11 @@ struct iMaterialWrapper;
 
 #define ALL_LOD_FEATURES (CS_LOD_TRIANGLE_REDUCTION|CS_LOD_DISTANCE_REDUCTION)
 
-namespace cspluginSprCal3d
+namespace CS
+{
+namespace Plugins
+{
+namespace SprCal3d
 {
 
 class csSpriteCal3DMeshObjectType;
@@ -823,6 +827,8 @@ public:
   csRef<iPolygonMesh> nullPolyMesh;
 };
 
-} // namespace cspluginSprCal3d
+} // namespace SprCal3d
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_SPRCAL3D_H__

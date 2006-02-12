@@ -20,9 +20,14 @@
 #ifndef __CS_SOFTSHADER_SCAN_Z_H__
 #define __CS_SOFTSHADER_SCAN_Z_H__
 
-namespace cspluginSoftshader
+namespace CS
 {
-  using namespace CrystalSpace::SoftShader;
+namespace Plugins
+{
+namespace SoftShader
+{
+
+  using namespace CS::PluginCommon::SoftShader;
 
   struct ZBufMode_ZNone
   {
@@ -98,6 +103,7 @@ namespace cspluginSoftshader
     void Update () { }
     void Advance () { zBuff++; }
   };
-} // namespace cspluginSoftshader
-
+} // namespace SoftShader
+} // namespace Plugins
+} // namespace CS
 #endif // __CS_SOFTSHADER_SCAN_Z_H__

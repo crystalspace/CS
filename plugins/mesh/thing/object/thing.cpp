@@ -75,8 +75,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginThing
-{
+using namespace CS::Plugins::Thing;
 
 CS_LEAKGUARD_IMPLEMENT (csThingStatic);
 CS_LEAKGUARD_IMPLEMENT (csThing);
@@ -2912,4 +2911,3 @@ bool csThingObjectType::GetOptionDescription (
 
 //---------------------------------------------------------------------------
 
-} // namespace cspluginThing

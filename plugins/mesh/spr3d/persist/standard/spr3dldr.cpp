@@ -52,8 +52,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginSpr3dLoader
-{
+using namespace CS::Plugins::Spr3dLoader;
 
 enum
 {
@@ -758,4 +757,3 @@ bool csSprite3DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   return true;
 }
 
-} // namespace cspluginSpr3dLoader

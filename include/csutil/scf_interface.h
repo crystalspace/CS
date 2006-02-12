@@ -380,7 +380,7 @@ public:
   Make sure that we either have a SCF_VERSION macro which results in this class
   being specialized, or that we have a SCF_INTERFACE macro in the interface itself.
   */
-  CS_COMPILE_ASSERT((::CrystalSpace::TypeTraits::IsSame<InterfaceType,
+  CS_COMPILE_ASSERT((::CS::TypeTraits::IsSame<InterfaceType,
     Interface>::value));
 
   /**

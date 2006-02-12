@@ -31,7 +31,11 @@ struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
 
-namespace cspluginSpr3Md2
+namespace CS
+{
+namespace Plugins
+{
+namespace Spr3dMd2
 {
 
 /**
@@ -72,6 +76,7 @@ public:
   virtual bool IsRecognized (iDataBuffer* buffer);
 };
 
-} // namespace cspluginSpr3Md2
-
+} // namespace Spr3dMd2
+} // namespace Plugins
+} // namespace CS
 #endif // __CS_SPR3MD2LDR_H__

@@ -38,8 +38,7 @@
 
 CS_IMPLEMENT_PLUGIN;
 
-namespace cspluginJoyWin
-{
+using namespace CS::Plugins::JoystickWin;
 
 SCF_IMPLEMENT_FACTORY (csWindowsJoystick);
 
@@ -300,4 +299,3 @@ void csWindowsJoystick::ReportDXError (HRESULT hr, const char* msg, ...)
   va_end (arg);
 }
 
-} // namespace cspluginJoyWin

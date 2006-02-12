@@ -51,8 +51,13 @@ struct csTriangle;
 
 #include "polyrast.h"
 
-namespace cspluginSoft3d
+namespace CS
 {
+namespace Plugins
+{
+namespace Soft3D
+{
+
 // Forward declaration
 class csSoftwareGraphics3DCommon;
 
@@ -697,6 +702,8 @@ public:
   /** @} */
 };
 
-} // namespace cspluginSoft3d
+} // namespace Soft3D
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_SFTR3DCOM_H__

@@ -31,7 +31,11 @@
 
 struct iObjectRegistry;
 
-namespace cspluginDDSimg
+namespace CS
+{
+namespace Plugins
+{
+namespace DDSImageIO
 {
 
 enum csDDSRawDataType
@@ -125,7 +129,9 @@ private:
   void Report (int severity, const char* msg, ...);
 };
 
-} // namespace cspluginDDSimg
+} // namespace DDSImageIO
+} // namespace Plugins
+} // namespace CS
 
 #endif // __DDS_DDSLOADER_H__
 

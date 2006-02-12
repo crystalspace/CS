@@ -33,8 +33,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "softshader.h"
 #include "softshader_fp.h"
 
-namespace cspluginSoftshader
-{
+using namespace CS::Plugins::SoftShader;
 
 void csSoftShader_FP::Activate()
 {
@@ -132,4 +131,3 @@ bool csSoftShader_FP::Compile()
   return true;
 }
 
-} // namespace cspluginSoftshader

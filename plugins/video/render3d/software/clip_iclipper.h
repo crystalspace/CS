@@ -27,8 +27,13 @@
 
 //#define CLIP_DEBUG
 
-namespace cspluginSoft3d
+namespace CS
 {
+namespace Plugins
+{
+namespace Soft3D
+{
+
 
 class ClipMeatiClipper
 {
@@ -239,6 +244,8 @@ public:
   }
 };
 
-} // namespace cspluginSoft3d
+} // namespace Soft3D
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_SOFT3D_CLIP_ICLIPPER_H__

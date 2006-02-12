@@ -28,8 +28,13 @@
 
 #include "softshader.h"
 
-namespace cspluginSoftshader
+namespace CS
 {
+namespace Plugins
+{
+namespace SoftShader
+{
+
 
 class csSoftShader_FP : public csShaderProgram
 {
@@ -85,7 +90,8 @@ public:
   virtual bool Compile();
 };
 
-} // namespace cspluginSoftshader
-
+} // namespace SoftShader
+} // namespace Plugins
+} // namespace CS
 #endif //__SOFTSHADER_FP_H__
 

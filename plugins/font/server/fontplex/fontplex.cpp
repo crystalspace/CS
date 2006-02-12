@@ -33,8 +33,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginFontplex
-{
+using namespace CS::Plugins::FontPlex;
 
 //---------------------------------------------------------------------------
 
@@ -617,4 +616,3 @@ int csFontPlexer::GetUnderlineThickness ()
   return primaryFont->GetUnderlineThickness();
 }
 
-} // namespace cspluginFontplex

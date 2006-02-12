@@ -114,8 +114,8 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace cspluginOpcode;
-using namespace cspluginOpcode::Opcode;
+using namespace CS::Plugins::Opcode;
+using namespace CS::Plugins::Opcode::Opcode;
 
 #include "OPC_RayAABBOverlap.h"
 #include "OPC_RayTriOverlap.h"

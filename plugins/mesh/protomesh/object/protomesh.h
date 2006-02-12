@@ -36,8 +36,13 @@ struct iObjectRegistry;
 
 class csShaderVariableContext;
 
-namespace cspluginProtoMesh
+namespace CS
 {
+namespace Plugins
+{
+namespace ProtoMesh
+{
+
 
 class csProtoMeshObjectFactory;
 
@@ -385,6 +390,8 @@ public:
   bool Initialize (iObjectRegistry* object_reg);
 };
 
-} // namespace cspluginProtoMesh
+} // namespace ProtoMesh
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_PROTOMESH_H__

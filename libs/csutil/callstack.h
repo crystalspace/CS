@@ -22,7 +22,7 @@
 
 #include "csutil/dirtyaccessarray.h"
 
-namespace CrystalSpace
+namespace CS
 {
 namespace Debug
 {
@@ -88,6 +88,6 @@ public:
 };
 
 } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS
 
 #endif // __CS_LIBS_CSUTIL_CALLSTACK_H__

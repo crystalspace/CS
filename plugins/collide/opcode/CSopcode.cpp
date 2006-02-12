@@ -51,10 +51,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csOPCODECollideSystem)
 
-using namespace cspluginOpcode;
-using namespace cspluginOpcode::Opcode;
+using namespace CS::Plugins::Opcode;
+using namespace CS::Plugins::Opcode::Opcode;
 
-void cspluginOpcode::Opcode_Log (const char* msg, ...)
+void CS::Plugins::Opcode::Opcode_Log (const char* msg, ...)
 {
   va_list args;
   va_start (args, msg);
@@ -63,7 +63,7 @@ void cspluginOpcode::Opcode_Log (const char* msg, ...)
   va_end (args);
 }
 
-bool cspluginOpcode::Opcode_Err (const char* msg, ...)
+bool CS::Plugins::Opcode::Opcode_Err (const char* msg, ...)
 {
   va_list args;
   va_start (args, msg);

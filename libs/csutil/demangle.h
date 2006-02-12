@@ -23,7 +23,7 @@
 #include <cxxabi.h>
 #endif
 
-namespace CrystalSpace
+namespace CS
 {
   namespace Debug
   {
@@ -44,4 +44,4 @@ namespace CrystalSpace
     }
 
   } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS

@@ -53,8 +53,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginSprCal3dLdr
-{
+using namespace CS::Plugins::SprCal3dLoader;
 
 enum
 {
@@ -833,4 +832,3 @@ bool csSpriteCal3DSaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
   return true;
 }
 
-} // namespace cspluginSprCal3dLdr

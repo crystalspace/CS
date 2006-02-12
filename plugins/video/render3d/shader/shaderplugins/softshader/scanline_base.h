@@ -24,9 +24,14 @@
 #include "csplugincommon/softshader/scanline.h"
 #include "csutil/scf_implementation.h"
 
-namespace cspluginSoftshader
+namespace CS
 {
-  using namespace CrystalSpace::SoftShader;
+namespace Plugins
+{
+namespace SoftShader
+{
+
+  using namespace CS::PluginCommon::SoftShader;
 
   class ScanlineRendererBase : 
     public scfImplementation2<ScanlineRendererBase, 
@@ -62,6 +67,9 @@ namespace cspluginSoftshader
     }
     void SetColorSum (bool enable) { colorSum = enable; }
   };
-} // namespace cspluginSoftshader
+
+} // namespace SoftShader
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_SOFTSHADER_SCANLINE_BASE_H__

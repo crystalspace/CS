@@ -22,7 +22,7 @@
 
 #include "csutil/algorithms.h"
 
-using namespace CrystalSpace;
+using namespace CS;
 
 //--- BUILD TREE ---
 litKDBuildTree::litKDBuildTree ()

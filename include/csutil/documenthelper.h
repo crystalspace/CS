@@ -30,7 +30,7 @@
 
 #include "iutil/document.h"
 
-namespace CrystalSpace
+namespace CS
 {
   /**
    * Namespace contains helper functions and classes which operate on
@@ -307,6 +307,6 @@ namespace CrystalSpace
         (parent, filter);
     }
   }
-}
+} //namespace CS
 
 #endif

@@ -28,8 +28,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginBMPimg
-{
+using namespace CS::Plugins::BMPImageIO;
 
 SCF_IMPLEMENT_FACTORY (csBMPImageIO)
 
@@ -485,5 +484,3 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, size_t iSize)
 
   return false;
 }
-
-} // namespace cspluginBMPimg

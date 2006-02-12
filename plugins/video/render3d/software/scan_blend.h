@@ -20,8 +20,13 @@
 #ifndef __CS_SOFT3D_SCAN_BLEND_H__
 #define __CS_SOFT3D_SCAN_BLEND_H__
 
-namespace cspluginSoft3d
+namespace CS
 {
+namespace Plugins
+{
+namespace Soft3D
+{
+
   enum
   {
     FactorColorSrc = 0,
@@ -98,6 +103,9 @@ namespace cspluginSoft3d
     }
   };
 
-} // namespace cspluginSoft3d
+} // namespace Soft3D
+} // namespace Plugins
+} // namespace CS
+
 
 #endif // __CS_SOFT3D_SCAN_BLEND_H__

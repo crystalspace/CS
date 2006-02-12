@@ -29,7 +29,9 @@
 /**\addtogroup plugincommon
  * @{ */
 
-namespace CrystalSpace
+namespace CS
+{
+namespace PluginCommon
 {
   namespace SoftShader
   {
@@ -406,7 +408,8 @@ namespace CrystalSpace
       }
     };
   } // namespace SoftShader
-} // namespace CrystalSpace
+} // namespace PluginCommon
+} // namespace CS
 
 /**
  * Helper macro to obtain a software renderer buffer index for a vertex 

@@ -46,8 +46,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginProtoMeshLoader
-{
+using namespace CS::Plugins::ProtoMeshLoader;
 
 SCF_IMPLEMENT_FACTORY (csProtoFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csProtoFactorySaver)
@@ -432,5 +431,3 @@ bool csProtoMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
   }
   return true;
 }
-
-} // namespace cspluginProtoMeshLoader

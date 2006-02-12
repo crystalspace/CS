@@ -19,8 +19,7 @@
 #include "cssysdef.h"
 #include "csplugincommon/sndsys/cyclicbuf.h"
 
-namespace CrystalSpace
-{
+using namespace CS::Sound;
 
 SoundCyclicBuffer::SoundCyclicBuffer(size_t buffer_size)
 {
@@ -162,4 +161,3 @@ void SoundCyclicBuffer::GetDataPointersFromPosition(size_t *position_value,
   *buffer2_length=max_length-copy_length;
 }
 
-} // namespace CrystalSpace

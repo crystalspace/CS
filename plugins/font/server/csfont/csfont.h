@@ -36,7 +36,11 @@
 struct iObjectRegistry;
 struct iPluginManager;
 
-namespace cspluginCSfont
+namespace CS
+{
+namespace Plugins
+{
+namespace CSFont
 {
 
 class csDefaultFontServer;
@@ -250,6 +254,8 @@ public:
   { return emitErrors; }
 };
 
-} // namespace cspluginCSfont
+} // namespace CSFont
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_CSFONT_H__

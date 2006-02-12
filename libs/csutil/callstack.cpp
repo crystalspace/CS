@@ -24,26 +24,26 @@
 #ifdef CS_HAVE_BACKTRACE
   #include "generic/callstack-backtrace.h"
   CS_IMPLEMENT_STATIC_VAR(cscBacktrace, 
-			  CrystalSpace::Debug::CallStackCreatorBacktrace, ())
+			  CS::Debug::CallStackCreatorBacktrace, ())
   CS_IMPLEMENT_STATIC_VAR(csnrBacktrace, 
-			  CrystalSpace::Debug::CallStackNameResolverBacktrace, ())
+			  CS::Debug::CallStackNameResolverBacktrace, ())
 #endif
 
 #ifdef CS_PLATFORM_WIN32
   #include "win32/callstack-dbghelp.h"
   CS_IMPLEMENT_STATIC_VAR(cscDbgHelp, 
-			  CrystalSpace::Debug::CallStackCreatorDbgHelp, ())
+			  CS::Debug::CallStackCreatorDbgHelp, ())
   CS_IMPLEMENT_STATIC_VAR(csnrDbgHelp, 
-			  CrystalSpace::Debug::CallStackNameResolverDbgHelp, ())
+			  CS::Debug::CallStackNameResolverDbgHelp, ())
 
   #ifdef CS_HAVE_LIBBFD
     #include "win32/callstack-bfd.h"
     CS_IMPLEMENT_STATIC_VAR(csnrBfd, 
-			    CrystalSpace::Debug::CallStackNameResolverBfd, ())
+			    CS::Debug::CallStackNameResolverBfd, ())
   #endif
 #endif
 
-namespace CrystalSpace
+namespace CS
 {
 namespace Debug
 {
@@ -146,9 +146,9 @@ bool CallStackImpl::GetParameters (size_t num, csString& str)
 }
 
 } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS
 
-using namespace CrystalSpace::Debug;
+using namespace CS::Debug;
 
 typedef iCallStackCreator* (*CreatorGetter)();
 

@@ -26,8 +26,13 @@
 #include "iutil/databuff.h"
 #include "csplugincommon/imageloader/commonimagefile.h"
 
-namespace cspluginTGAimg
+namespace CS
 {
+namespace Plugins
+{
+namespace TGAImageIO
+{
+
 
 /**
  * The TGA image file format loader.
@@ -145,6 +150,8 @@ private:
   virtual csRef<iImageFileLoader> InitLoader (csRef<iDataBuffer> source);
 };
 
-} // namespace cspluginTGAimg
+} // namespace TGAImageIO
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_TGAIMAGE_H__

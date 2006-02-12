@@ -52,8 +52,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginSpr3d
-{
+using namespace CS::Plugins::Spr3d;
 
 CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangleMesh, ())
 
@@ -2230,4 +2229,3 @@ bool csSprite3DMeshObjectType::GetOptionDescription (int idx,
   return true;
 }
 
-} // namespace cspluginSpr3d

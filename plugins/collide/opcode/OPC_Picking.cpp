@@ -19,8 +19,8 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace cspluginOpcode;
-using namespace cspluginOpcode::Opcode;
+using namespace CS::Plugins::Opcode;
+using namespace CS::Plugins::Opcode::Opcode;
 
 #ifdef OPC_RAYHIT_CALLBACK
 
@@ -33,7 +33,7 @@ using namespace cspluginOpcode::Opcode;
 
 */
 
-bool cspluginOpcode::Opcode::SetupAllHits(RayCollider& collider, CollisionFaces& contacts)
+bool Opcode::SetupAllHits(RayCollider& collider, CollisionFaces& contacts)
 {
 	struct Local
 	{
@@ -50,7 +50,7 @@ bool cspluginOpcode::Opcode::SetupAllHits(RayCollider& collider, CollisionFaces&
 	return true;
 }
 
-bool cspluginOpcode::Opcode::SetupClosestHit(RayCollider& collider, CollisionFace& closest_contact)
+bool Opcode::SetupClosestHit(RayCollider& collider, CollisionFace& closest_contact)
 {
 	struct Local
 	{
@@ -68,14 +68,14 @@ bool cspluginOpcode::Opcode::SetupClosestHit(RayCollider& collider, CollisionFac
 	return true;
 }
 
-bool cspluginOpcode::Opcode::SetupShadowFeeler(RayCollider& collider)
+bool Opcode::SetupShadowFeeler(RayCollider& collider)
 {
 	collider.SetFirstContact(true);
 	collider.SetHitCallback(null);
 	return true;
 }
 
-bool cspluginOpcode::Opcode::SetupInOutTest(RayCollider& collider)
+bool Opcode::SetupInOutTest(RayCollider& collider)
 {
 	collider.SetFirstContact(false);
 	collider.SetHitCallback(null);
@@ -83,7 +83,7 @@ bool cspluginOpcode::Opcode::SetupInOutTest(RayCollider& collider)
 	return true;
 }
 
-bool cspluginOpcode::Opcode::Picking(
+bool Opcode::Picking(
 CollisionFace& picked_face,
 const Ray& world_ray, const Model& model, const Matrix4x4* world,
 float min_dist, float max_dist, const Point& view_point, CullModeCallback callback, void* user_data)

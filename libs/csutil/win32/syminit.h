@@ -20,7 +20,7 @@
 #ifndef __CS_LIBS_UTIL_WIN32_SYMINIT_H__
 #define __CS_LIBS_UTIL_WIN32_SYMINIT_H__
 
-namespace CrystalSpace
+namespace CS
 {
   namespace Debug
   {
@@ -39,6 +39,6 @@ namespace CrystalSpace
     
     extern SymInitializer symInit;
   } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS
 
 #endif // __CS_LIBS_UTIL_WIN32_SYMINIT_H__

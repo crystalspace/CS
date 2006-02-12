@@ -24,10 +24,13 @@
 #include "isndsys/ss_stream.h"
 #include "oggdata2.h"
 
-namespace CrystalSpace
+namespace CS
 {
-  class PCMSampleConverter;
-  class SoundCyclicBuffer;
+  namespace Sound
+  {
+    class PCMSampleConverter;
+    class SoundCyclicBuffer;
+  }
 }
 
 
@@ -107,7 +110,7 @@ class SndSysOggSoundStream : public iSndSysStream
   OggStreamData stream_data;
   csRef<SndSysOggSoundData> sound_data;
 
-  CrystalSpace::SoundCyclicBuffer *p_cyclicbuffer;
+  CS::Sound::SoundCyclicBuffer *p_cyclicbuffer;
   bool paused, looping;
   bool playback_read_complete;
   csTicks last_time;
@@ -124,7 +127,7 @@ class SndSysOggSoundStream : public iSndSysStream
    * Pointer to the PCM sample converter object that will handle our 
    * conversions.
    */
-  CrystalSpace::PCMSampleConverter *pcm_convert;
+  CS::Sound::PCMSampleConverter *pcm_convert;
 
   char *prepared_data_buffer;
   int prepared_data_buffer_length;

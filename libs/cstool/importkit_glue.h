@@ -35,7 +35,7 @@ struct iMeshFactoryWrapper;
 struct iObject;
 struct iTextureWrapper;
 
-namespace CrystalSpace
+namespace CS
 {
   namespace ImportKitImpl 
   { 
@@ -110,6 +110,6 @@ namespace CrystalSpace
     };
 
   } // namespace ImportKitImpl 
-} // namespace CrystalSpace
+} // namespace CS
 
 #endif // __CS_LIBS_CSTOOL_IMPORTKIT_GLUE_H__

@@ -26,8 +26,13 @@
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
 
-namespace cspluginSprCal3dLdr
+namespace CS
 {
+namespace Plugins
+{
+namespace SprCal3dLoader
+{
+
 
 /**
  * Sprite Cal3D factory loader.
@@ -146,6 +151,8 @@ public:
   	iStreamSource*);
 };
 
-} // namespace cspluginSprCal3dLdr
+} // namespace SprCal3dLoader
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_SPRCAL3DLDR_H__

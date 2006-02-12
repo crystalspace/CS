@@ -29,9 +29,14 @@
 #include "types.h"
 #include "scan_blend.h"
 
-namespace cspluginSoft3d
+namespace CS
 {
-  using namespace CrystalSpace::SoftShader;
+namespace Plugins
+{
+namespace Soft3D
+{
+
+  using namespace CS::PluginCommon::SoftShader;
 
   template<typename Pix, typename SrcBlend, typename DstBlend>
   struct SLLogic_ScanlineRenderer
@@ -494,6 +499,8 @@ namespace cspluginSoft3d
     }
   };
   
-} // namespace cspluginSoft3d
+} // namespace Soft3D
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_SOFT3D_POLYRAST_H__

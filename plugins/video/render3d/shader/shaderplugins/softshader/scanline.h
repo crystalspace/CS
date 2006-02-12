@@ -27,9 +27,13 @@
 #include "scan_z.h"
 #include "scanline_base.h"
 
-namespace cspluginSoftshader
+namespace CS
 {
-  using namespace CrystalSpace::SoftShader;
+namespace Plugins
+{
+namespace SoftShader
+{
+  using namespace CS::PluginCommon::SoftShader;
 
   struct Color_None
   {
@@ -379,6 +383,7 @@ namespace cspluginSoftshader
     bool doColor;
     ScanlineProc proc;
   };
-} // namespace cspluginSoftshader
-
+} // namespace SoftShader
+} // namespace Plugins
+} // namespace CS
 #endif // __CS_SOFTSHADER_SCANLINE_H__

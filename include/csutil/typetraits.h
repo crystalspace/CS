@@ -24,7 +24,7 @@
  * on types.
  */
 
-namespace CrystalSpace
+namespace CS
 {
   namespace TypeTraits
   {
@@ -100,7 +100,7 @@ namespace CrystalSpace
     template <class Type>
     struct IsReference
     {
-      static const bool value = CrystalSpace::TypeTraits::Implementation::IsReferenceImpl<Type>::value;
+      static const bool value = CS::TypeTraits::Implementation::IsReferenceImpl<Type>::value;
     };
 
     /**
@@ -109,10 +109,10 @@ namespace CrystalSpace
     template <class Type1, class Type2>
     struct IsSame
     {
-      static const bool value = CrystalSpace::TypeTraits::Implementation::IsSameImpl<Type1, Type2>::value;
+      static const bool value = CS::TypeTraits::Implementation::IsSameImpl<Type1, Type2>::value;
     };
   } // namespace TypeTraits
 
-} // namespace CrystalSpace
+} // namespace CS
 
 #endif 

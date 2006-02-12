@@ -61,8 +61,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginGenmesh3DS
-{
+using namespace CS::Plugins::Genmesh3DS;
 
 /**
  * Reports errors
@@ -433,4 +432,3 @@ iMeshFactoryWrapper* csGenmesh3DSFactoryLoader::Load (const char* factname,
   return Load (factname, filename, dbuf);
 }
 
-} // namespace cspluginGenmesh3DS

@@ -31,8 +31,7 @@
 #include "polyrender.h"
 #include "thing.h"
 
-namespace cspluginThing
-{
+using namespace CS::Plugins::Thing;
 
 CS_LEAKGUARD_IMPLEMENT (csPolygonRenderer);
 
@@ -652,4 +651,3 @@ void csPolygonRenderer::BufferAccessor::PreGetBuffer (
     renderer->PreGetBuffer (holder, buffer);
 }
 
-} // namespace cspluginThing

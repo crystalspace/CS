@@ -25,8 +25,7 @@
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginGIFimg
-{
+using namespace CS::Plugins::GIFImageIO;
 
 SCF_IMPLEMENT_FACTORY (csGIFImageIO)
 
@@ -451,4 +450,3 @@ bool ImageGifFile::Load (uint8* iBuffer, size_t iSize)
   return (rc == 0);
 }
 
-} // namespace cspluginGIFimg

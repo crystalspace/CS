@@ -23,8 +23,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Preprocessor
 
-namespace cspluginOpcode
+namespace CS
 {
+namespace Plugins
+{
+namespace Opcode
+{
+
 
 	#define OPCODE_API
 
@@ -67,6 +72,8 @@ namespace cspluginOpcode
 		FUNCTION OPCODE_API bool CloseOpcode();
 	}
 
-} // namespace cspluginOpcode
+} // namespace Opcode
+} // namespace Plugins
+} // namespace CS
 	
 #endif // __OPCODE_H__

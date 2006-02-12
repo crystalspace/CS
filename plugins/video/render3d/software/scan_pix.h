@@ -24,8 +24,13 @@
 
 #include "csgeom/math.h"
 
-namespace cspluginSoft3d
+namespace CS
 {
+namespace Plugins
+{
+namespace Soft3D
+{
+
   template<typename Pix, 
     int sa, int ma,
     int sr, int mr,
@@ -151,6 +156,8 @@ namespace cspluginSoft3d
       return p;
     }
   };
-} // namespace cspluginSoft3d
+} // namespace Soft3D
+} // namespace Plugins
+} // namespace CS
 
 #endif // __CS_SOFT3D_SCAN_PIX_H__

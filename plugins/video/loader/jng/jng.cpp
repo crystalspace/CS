@@ -53,8 +53,7 @@ extern "C"
 
 CS_IMPLEMENT_PLUGIN
 
-namespace cspluginJNGimg
-{
+using namespace CS::Plugins::JNGImageIO;
 
 SCF_IMPLEMENT_FACTORY (csJNGImageIO)
 
@@ -936,4 +935,3 @@ bool ImageJngFile::IsAnimated ()
    */
 }
 
-} // namespace cspluginJNGimg
