@@ -22,150 +22,176 @@
 
 #include "csutil/array.h"
 #include "csutil/bitarray.h"
+#include "csutil/blockallocator.h"
 #include "csutil/hashr.h"
+#include "csgeom/math.h"
 #include "iutil/strset.h"
 #include "ivideo/shader/shader.h"
 
-#include "docwrap.h"
+#include "condition.h"
 #include "expparser.h"
+#include "logic3.h"
+#include "valueset.h"
 
-/**
-  * Possible operations for a node in the internal expression
-  * representation.
-  */
-enum ConditionOp
+CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
 {
-  opInvalid = 0,
-
-  opNot,
-  opAnd,
-  opOr,
-
-  opEqual,
-  opNEqual,
-  opLesser,
-  opLesserEq
-};
-
-/// Possible types of operands.
-enum OperandType
-{
-  operandNone = 0,
-  operandOperation,
-
-  operandFloat,
-  operandInt,
-  operandBoolean,
-  operandSV,
-  operandSVValueInt,
-  operandSVValueFloat,
-  operandSVValueX,
-  operandSVValueY,
-  operandSVValueZ,
-  operandSVValueW,
-  operandSVValueTexture,
-  operandSVValueBuffer
-};
-
-/// An actual operand.
-struct CondOperand
-{
-  OperandType type;
-  union
-  {
-    int intVal;
-    float floatVal;
-    bool boolVal;
-    csStringID svName;
-    csConditionID operation;
-  };
-  CondOperand ()
-  { memset (this, 0, sizeof (*this)); }
-  CondOperand (int /* justToHaveADifferentSignature*/) 
-  { /* Speed hack for when being a member of CondOperation:
-     * it's "initialization" will null this as well */ }
-};
-
-/// An operation.
-struct CondOperation
-{
-  ConditionOp operation;
-  CondOperand left;
-  CondOperand right;
-
-  CondOperation () : left(23), right(42)
-  { memset (this, 0, sizeof (*this)); }
-};
-
-static bool IsOpCommutative (ConditionOp op)
-{
-  return (op == opAnd) || (op == opOr) || (op == opEqual) || (op == opNEqual);
-}
-
-CS_SPECIALIZE_TEMPLATE
-class csHashComputer<CondOperation>
-{
-  static uint ActualHash (ConditionOp operation, const CondOperand& left, 
-    const CondOperand& right)
-  {
-    CondOperation tempOp;
-    tempOp.operation = operation;
-    tempOp.left = left;
-    tempOp.right = right;
-    return csHashCompute ((char*)&tempOp, sizeof (tempOp));
-  }
-public:
-  static uint ComputeHash (CondOperation const& operation)
-  {
-    uint result = ActualHash (operation.operation, operation.left, 
-      operation.right);
-    if (IsOpCommutative (operation.operation))
-      result ^= ActualHash (operation.operation, operation.right, 
-      operation.left);
-    return result;
-  }
-};
-
-CS_SPECIALIZE_TEMPLATE
-class csComparator<CondOperation, CondOperation>
-{
-public:
-  static int Compare (CondOperation const& op1, CondOperation const& op2)
-  {
-    if (op1.operation == op2.operation)
-    {
-      bool result = (memcmp (&op1.left, &op2.left, sizeof (CondOperand)) == 0) 
-        && (memcmp (&op1.right, &op2.right, sizeof (CondOperand)) == 0);
-      if (IsOpCommutative (op1.operation))
-      {
-        result = result 
-	  || ((memcmp (&op1.left, &op2.right, sizeof (CondOperand)) == 0)
-	  && (memcmp (&op1.right, &op2.left, sizeof (CondOperand)) == 0));
-      }
-      if (result) return 0;
-      // @@@ Hm, just some order...
-      return (int)csHashComputer<CondOperation>::ComputeHash (op1)
-        - (int)csHashComputer<CondOperation>::ComputeHash (op2);
-    }
-    else
-      return (int)op1.operation - (int)op2.operation;
-  }
-};
 
 /// Container for shader expression constants
 class csConditionEvaluator;
 
-class csConditionConstants
+class Variables
 {
-  friend class csConditionEvaluator;
-  csHash<CondOperand, csString> constants;
 public:
-  //@{
-  /// Add a constant to the list of constants.
-  bool AddConstant (const char* name, float value);
-  bool AddConstant (const char* name, int value);
-  bool AddConstant (const char* name, bool value);
-  //@}
+  struct Values
+  {
+    // The variable "itself" (boolean for variables resp. constants)
+    ValueSet var;
+    ValueSet vec[4];
+    ValueSet tex;
+    ValueSet buf;
+
+    Values () {}
+    Values (const float f) : var (f), tex (f), buf (f)
+    {
+      for (int i = 0; i < 4; i++)
+        vec[i] = ValueSet (f);
+    }
+
+    Values& operator=(const Values& other)
+    {
+      var = other.var;
+      for (int i = 0; i < 4; i++)
+        vec[i] = other.vec[i];
+      tex = other.tex;
+      buf = other.buf;
+      return *this;
+    }
+    friend Values operator& (const Values& a, const Values& b)
+    {
+      Values newValues;
+      newValues.var = a.var & b.var;
+      for (int i = 0; i < 4; i++)
+        newValues.vec[i] = a.vec[i] & b.vec[i];
+      newValues.tex = a.tex & b.tex;
+      newValues.buf = a.buf & b.buf;
+      return newValues;
+    }
+    friend Values operator| (const Values& a, const Values& b)
+    {
+      Values newValues;
+      newValues.var = a.var | b.var;
+      for (int i = 0; i < 4; i++)
+        newValues.vec[i] = a.vec[i] | b.vec[i];
+      newValues.tex = a.tex | b.tex;
+      newValues.buf = a.buf | b.buf;
+      return newValues;
+    }
+    friend Logic3 operator== (const Values& a, const Values& b);
+    friend Logic3 operator!= (const Values& a, const Values& b);
+
+    friend Logic3 operator< (const Values& a, const Values& b);
+    friend Logic3 operator<= (const Values& a, const Values& b);
+  };
+protected:
+  Values def;
+  csArray<Values*> possibleValues;
+  csBlockAllocator<Values> valAlloc;
+
+  void CopyValues (const Variables& other)
+  {
+    for (size_t i = 0; i < other.possibleValues.GetSize(); i++)
+    {
+      const Values* v = other.possibleValues[i];
+      if (v != 0)
+      {
+        Values* newVals = valAlloc.Alloc ();
+        *newVals = *v;
+        possibleValues.Push (newVals);
+      }
+      else
+        possibleValues.Push (0);
+    }
+  }
+public:
+  Variables () {}
+  Variables (const Variables& other)
+  { CopyValues (other); }
+  Variables& operator= (const Variables& other)
+  {
+    valAlloc.Empty();
+    possibleValues.Empty();
+    CopyValues (other);
+    return *this;
+  }
+
+  Values* GetValues (csStringID variable)
+  {
+    Values*& vals = possibleValues.GetExtend (variable);
+    if (!vals) vals = valAlloc.Alloc();
+    return vals;
+  }
+  const Values* GetValues (csStringID variable) const
+  {
+    const Values* vals = 0;
+    if (possibleValues.GetSize () > variable)
+      vals = possibleValues[variable];
+    if (vals != 0)
+      return vals;
+    else
+      return &def;
+  }
+  friend Variables operator& (const Variables& a, const Variables& b)
+  {
+    Variables newVars;
+    const size_t num = csMin (a.possibleValues.GetSize(),
+      b.possibleValues.GetSize());
+    for (size_t i = 0; i < num; i++)
+    {
+      const Values* va = a.possibleValues[i];
+      const Values* vb = b.possibleValues[i];
+      if ((va != 0) && (vb != 0))
+      {
+        Values*& v = newVars.possibleValues.GetExtend (i);
+        v = newVars.valAlloc.Alloc ();
+        *v = *va & *vb;
+      }
+    }
+    return newVars;
+  }
+  friend Variables operator| (const Variables& a, const Variables& b)
+  {
+    Variables newVars;
+    const csArray<Values*>& pvA = a.possibleValues;
+    const csArray<Values*>& pvB = b.possibleValues;
+    const size_t num = csMax (pvA.GetSize(), pvB.GetSize());
+    for (size_t i = 0; i < num; i++)
+    {
+      const Values* va = (i < pvA.GetSize()) ? pvA[i] : 0;
+      const Values* vb = (i < pvB.GetSize()) ? pvB[i] : 0;
+      if ((va != 0) || (vb != 0))
+      {
+        if (va == 0)
+        {
+          Values*& v = newVars.possibleValues.GetExtend (i);
+          v = newVars.valAlloc.Alloc ();
+          *v = *vb;
+        }
+        else if (vb == 0)
+        {
+          Values*& v = newVars.possibleValues.GetExtend (i);
+          v = newVars.valAlloc.Alloc ();
+          *v = *va;
+        }
+        else
+        {
+          Values*& v = newVars.possibleValues.GetExtend (i);
+          v = newVars.valAlloc.Alloc ();
+          *v = (*va | *vb);
+        }
+      }
+    }
+    return newVars;
+  }
 };
 
 /**
@@ -210,19 +236,51 @@ class csConditionEvaluator
   const char* ResolveConst (csExpression* expression, 
     CondOperand& operand);
 
-  bool EvaluateOperandB (const CondOperand& operand, 
-    const csRenderMeshModes& modes, const csShaderVarStack& stacks);
-  int EvaluateOperandI (const CondOperand& operand, 
-    const csRenderMeshModes& modes, const csShaderVarStack& stacks);
-  float EvaluateOperandF (const CondOperand& operand, 
-    const csRenderMeshModes& modes, const csShaderVarStack& stacks);
-
   bool EvaluateConst (const CondOperation& operation, bool& result);
   bool EvaluateOperandBConst (const CondOperand& operand, bool& result);
   bool EvaluateOperandIConst (const CondOperand& operand, int& result);
   bool EvaluateOperandFConst (const CondOperand& operand, float& result);
 
+  struct EvaluatorShadervar
+  {
+    typedef bool EvalResult;
+    typedef bool BoolType;
+    struct FloatType
+    {
+      float v;
+
+      FloatType () {}
+      FloatType (float f) : v (f) {}
+      operator float() const { return v; }
+      bool operator== (const FloatType& other)
+      { return fabsf (v - other.v) < SMALL_EPSILON; }
+      bool operator!= (const FloatType& other)
+      { return !operator==(other); }
+    };
+    typedef int IntType;
+    csConditionEvaluator& evaluator;
+    const csRenderMeshModes& modes;
+    const csShaderVarStack& stacks;
+
+    EvalResult GetDefaultResult() const { return false; }
+
+    EvaluatorShadervar (csConditionEvaluator& evaluator,
+      const csRenderMeshModes& modes, const csShaderVarStack& stacks) : 
+        evaluator (evaluator), modes (modes), stacks (stacks)
+    { }
+    BoolType Boolean (const CondOperand& operand);
+    IntType Int (const CondOperand& operand);
+    FloatType Float (const CondOperand& operand);
+
+    EvalResult LogicAnd (const CondOperand& a, const CondOperand& b)
+    { return Boolean (a) && Boolean (b); }
+    EvalResult LogicOr (const CondOperand& a, const CondOperand& b)
+    { return Boolean (a) || Boolean (b); }
+  };
 public:
+  template<typename Evaluator>
+  typename_qualifier Evaluator::EvalResult Evaluate (Evaluator& eval, csConditionID condition);
+
   csConditionEvaluator (iStringSet* strings, 
     const csConditionConstants& constants);
 
@@ -242,12 +300,18 @@ public:
   /// Get number of conditions allocated so far
   size_t GetNumConditions() { return nextConditionID; }
 
-  /**
-   * Determines whether - under the condition that 'a' evaluates to aVal -
-   * 'b' can still evaluate to something other than aVal.
+  /*
+   * Check whether a condition, given a set of possible values for
+   * variables, is definitely true, definitely false, or uncertain.
+   *
+   * If uncertain returns the possible variable values in the case
+   * the condition would be true resp. false.
    */
-  bool ConditionIndependent (csConditionID a, bool aVal,
-    csConditionID b);
+  Logic3 CheckConditionResults (csConditionID condition,
+    const Variables& vars, Variables& trueVars, Variables& falseVars);
 };
+
+}
+CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
 
 #endif // __CONDEVAL_H__

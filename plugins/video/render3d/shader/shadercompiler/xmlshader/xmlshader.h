@@ -27,6 +27,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
+#include "iutil/comp.h"
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iutil/strset.h"
@@ -38,6 +39,9 @@
 #include "expparser.h"
 #include "docwrap.h"
 #include "condeval.h"
+
+CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+{
 
 class csXMLShaderCompiler;
 class csXMLShader;
@@ -168,20 +172,25 @@ public:
 /**
  * A node in the actual binary condition tree.
  */
-struct csRealConditionNode : public csRefCount
+struct csConditionNode
 {
   csConditionID condition;
   size_t variant;
 
-  csRealConditionNode* parent;
-  csRef<csRealConditionNode> trueNode;
-  csRef<csRealConditionNode> falseNode;
+  csConditionNode* parent;
+  csConditionNode* trueNode;
+  csConditionNode* falseNode;
 
-  csRealConditionNode (csRealConditionNode* parent)
+  csConditionNode (csConditionNode* parent) : parent (parent),
+    trueNode (0), falseNode (0)
   {
-    this->parent = parent;
     condition = csCondAlwaysTrue;
     variant = csArrayItemNotFound;
+  }
+  ~csConditionNode ()
+  {
+    delete trueNode;
+    delete falseNode;
   }
   void FillConditionArray (csBitArray& array)
   {
@@ -194,28 +203,13 @@ struct csRealConditionNode : public csRefCount
 };
 
 /**
- * A node in the condition tree.
- * 'Clients' of the condition tree only see single nodes, although
- * it may be backed by multiple nodes in the actual tree. (Happens
- * if nodes need to be inserted into multiple locations in the actual
- * tree, when multiple conditions are on the same level - the tree
- * is just binary, after all.)
- */
-struct csConditionNode
-{
-  csRefArray<csRealConditionNode> nodes;
-};
-
-/**
  * An implementation of the callback used by csWrappedDocumentNode.
  */
 class csShaderConditionResolver : public iConditionResolver
 {
   csExpressionTokenizer tokenizer;
   csExpressionParser parser;
-  csConditionEvaluator evaluator;
   
-  csPDelArray<csConditionNode> condNodes;
   csConditionNode* rootNode;
   size_t nextVariant;
   csHash<size_t, csBitArray> variantIDs;
@@ -225,21 +219,14 @@ class csShaderConditionResolver : public iConditionResolver
 
   csString lastError;
   const char* SetLastError (const char* msg, ...) CS_GNUC_PRINTF (2, 3);
-  csConditionNode* NewNode ();
+  csConditionNode* NewNode (csConditionNode* parent);
   csConditionNode* GetRoot ();
   
-  void AddToRealNode (csRealConditionNode* node, csConditionID condition, 
-    csConditionNode* trueNode, csConditionNode* falseNode);
-  /**
-   * Check whether \a condition is independent in the parents of node.
-   * Returns 'false' if the condition is actually already contained in
-   * one of the parent conditions.
-   */
-  bool CheckIndependency (csRealConditionNode* node, 
-    csConditionID condition);
-  void DumpConditionNode (csString& out, csRealConditionNode* node, int level);
-  size_t GetVariant (csRealConditionNode* node);
+  void DumpConditionNode (csString& out, csConditionNode* node, int level);
+  size_t GetVariant (csConditionNode* node);
 public:
+  csConditionEvaluator evaluator;
+
   csShaderConditionResolver (csXMLShaderCompiler* compiler);
   virtual ~csShaderConditionResolver ();
 
@@ -561,5 +548,8 @@ public:
   "plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"
 #include "cstool/tokenlist.h"
 };
+
+}
+CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
 
 #endif

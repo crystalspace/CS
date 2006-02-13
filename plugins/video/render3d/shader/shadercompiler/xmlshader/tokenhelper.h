@@ -20,10 +20,15 @@
 #ifndef __TOKENHELPER_H__
 #define __TOKENHELPER_H__
 
-static inline
-bool TokenEquals (const char* token, size_t tokenLen, const char* cmp)
+CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
 {
-  return (tokenLen == strlen (cmp)) && (strncmp (token, cmp, tokenLen) == 0);
+  static inline
+  bool TokenEquals (const char* token, size_t tokenLen, const char* cmp)
+  {
+    return (tokenLen == strlen (cmp)) && (strncmp (token, cmp, tokenLen) == 0);
+  }
+
 }
+CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
 
 #endif // __TOKENHELPER_H__

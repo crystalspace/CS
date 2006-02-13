@@ -22,43 +22,8 @@
 #include "condeval.h"
 #include "tokenhelper.h"
 
-bool csConditionConstants::AddConstant (const char* name, float value)
+CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
 {
-  if (constants.Contains (name)) return false;
-
-  CondOperand op;
-  op.type = operandFloat;
-  op.floatVal = value;
-
-  constants.Put (name, op);
-  return true;
-}
-
-bool csConditionConstants::AddConstant (const char* name, int value)
-{
-  if (constants.Contains (name)) return false;
-
-  CondOperand op;
-  op.type = operandInt;
-  op.intVal = value;
-
-  constants.Put (name, op);
-  return true;
-}
-
-bool csConditionConstants::AddConstant (const char* name, bool value)
-{
-  if (constants.Contains (name)) return false;
-
-  CondOperand op;
-  op.type = operandBoolean;
-  op.boolVal = value;
-
-  constants.Put (name, op);
-  return true;
-}
-
-//---------------------------------------------------------------------------
 
 csConditionEvaluator::csConditionEvaluator (iStringSet* strings, 
     const csConditionConstants& constants) :
@@ -255,11 +220,6 @@ csConditionID csConditionEvaluator::FindOptimizedCondition (
 	return FindOptimizedCondition (newNewOp);
       }
     }
-  }
-  else if (newOp.operation == opNot)
-  {
-    if (newOp.right.type == operandBoolean)
-      return newOp.right.boolVal ? csCondAlwaysFalse : csCondAlwaysTrue;
   }
 
   csConditionID id = conditions.Get (operation, (csConditionID)~0);
@@ -473,8 +433,7 @@ const char* csConditionEvaluator::ResolveConst (csExpression* expression,
   if (expression->type == csExpression::Value)
   {
     csExpressionToken::Extractor symbol (expression->valueValue);
-    const CondOperand* constOp = 
-      constants.constants.GetElementPointer (symbol.Get());
+    const CondOperand* constOp = constants.GetConstant (symbol.Get());
     if (!constOp)
     {
       SetLastError ("Unknown symbol '%s'", symbol.Get());
@@ -523,18 +482,18 @@ const char* csConditionEvaluator::ProcessExpression (
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "!"))
     {
-      memset (&newOp.left, 0, sizeof (newOp.left));
-      newOp.left.type = operandNone;
-      newOp.operation = opNot;
-      err = ResolveOperand (expression->expressionValue.right, newOp.right);
+      newOp.operation = opEqual;
+      err = ResolveOperand (expression->expressionValue.right, newOp.left);
       if (err)
 	return err;
-      if (!OpTypesCompatible (newOp.right.type, operandBoolean))
+      if (!OpTypesCompatible (newOp.left.type, operandBoolean))
       {
 	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
-	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.right.type),
+	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
 	  OperandTypeDescription (operandBoolean));
       }
+      newOp.right.type = operandBoolean;
+      newOp.right.boolVal = false;
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "=="))
     {
@@ -711,147 +670,8 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
     return condResult.IsBitSet (condition);
   }
 
-  bool result = false;
-
-  const CondOperation* op = conditions.GetKeyPointer (condition);
-  CS_ASSERT (op != 0);
-
-  switch (op->operation)
-  {
-    case opNot:
-      result = !EvaluateOperandB (op->right, modes, stacks);
-      break;
-    case opAnd:
-      result = EvaluateOperandB (op->left, modes, stacks)
-	&& EvaluateOperandB (op->right, modes, stacks);
-      break;
-    case opOr:
-      result = EvaluateOperandB (op->left, modes, stacks)
-	|| EvaluateOperandB (op->right, modes, stacks);
-      break;
-    case opEqual:
-      {
-	if ((op->left.type == operandFloat) 
-	  || (op->left.type == operandSVValueFloat)
-	  || (op->left.type == operandSVValueX)
-	  || (op->left.type == operandSVValueY)
-	  || (op->left.type == operandSVValueZ)
-	  || (op->left.type == operandSVValueW)
-	  || (op->right.type == operandFloat) 
-	  || (op->right.type == operandSVValueX) 
-	  || (op->right.type == operandSVValueY) 
-	  || (op->right.type == operandSVValueZ) 
-	  || (op->right.type == operandSVValueW) 
-	  || (op->right.type == operandSVValueFloat))
-	{
-	  const float f1 = EvaluateOperandF (op->left, modes, stacks);
-	  const float f2 = EvaluateOperandF (op->right, modes, stacks);
-	  result = (f1 - f2) < EPSILON;
-	}
-	else if (OpTypesCompatible (op->left.type, operandBoolean) 
-	  && OpTypesCompatible (op->right.type, operandBoolean))
-	{
-	  result = EvaluateOperandB (op->left, modes, stacks)
-	    == EvaluateOperandB (op->right, modes, stacks);
-	}
-	else
-	{
-	  const int i1 = EvaluateOperandI (op->left, modes, stacks);
-	  const int i2 = EvaluateOperandI (op->right, modes, stacks);
-	  result = i1 == i2;
-	}
-	break;
-      }
-    case opNEqual:
-      {
-	if ((op->left.type == operandFloat) 
-	  || (op->left.type == operandSVValueFloat)
-	  || (op->left.type == operandSVValueX)
-	  || (op->left.type == operandSVValueY)
-	  || (op->left.type == operandSVValueZ)
-	  || (op->left.type == operandSVValueW)
-	  || (op->right.type == operandFloat) 
-	  || (op->right.type == operandSVValueX) 
-	  || (op->right.type == operandSVValueY) 
-	  || (op->right.type == operandSVValueZ) 
-	  || (op->right.type == operandSVValueW) 
-	  || (op->right.type == operandSVValueFloat))
-	{
-	  const float f1 = EvaluateOperandF (op->left, modes, stacks);
-	  const float f2 = EvaluateOperandF (op->right, modes, stacks);
-	  result = (f1 - f2) >= EPSILON;
-	}
-	else if (OpTypesCompatible (op->left.type, operandBoolean) 
-	  && OpTypesCompatible (op->right.type, operandBoolean))
-	{
-	  result = EvaluateOperandB (op->left, modes, stacks)
-	    != EvaluateOperandB (op->right, modes, stacks);
-	}
-	else
-	{
-	  const int i1 = EvaluateOperandI (op->left, modes, stacks);
-	  const int i2 = EvaluateOperandI (op->right, modes, stacks);
-	  result = i1 != i2;
-	}
-	break;
-      }
-    case opLesser:
-      {
-	if ((op->left.type == operandFloat) 
-	  || (op->left.type == operandSVValueFloat)
-	  || (op->left.type == operandSVValueX)
-	  || (op->left.type == operandSVValueY)
-	  || (op->left.type == operandSVValueZ)
-	  || (op->left.type == operandSVValueW)
-	  || (op->right.type == operandFloat) 
-	  || (op->right.type == operandSVValueX) 
-	  || (op->right.type == operandSVValueY) 
-	  || (op->right.type == operandSVValueZ) 
-	  || (op->right.type == operandSVValueW) 
-	  || (op->right.type == operandSVValueFloat))
-	{
-	  const float f1 = EvaluateOperandF (op->left, modes, stacks);
-	  const float f2 = EvaluateOperandF (op->right, modes, stacks);
-	  result = (f1 < f2);
-	}
-	else
-	{
-	  const int i1 = EvaluateOperandI (op->left, modes, stacks);
-	  const int i2 = EvaluateOperandI (op->right, modes, stacks);
-	  result = i1 < i2;
-	}
-	break;
-      }
-    case opLesserEq:
-      {
-	if ((op->left.type == operandFloat) 
-	  || (op->left.type == operandSVValueFloat)
-	  || (op->left.type == operandSVValueX)
-	  || (op->left.type == operandSVValueY)
-	  || (op->left.type == operandSVValueZ)
-	  || (op->left.type == operandSVValueW)
-	  || (op->right.type == operandFloat) 
-	  || (op->right.type == operandSVValueX) 
-	  || (op->right.type == operandSVValueY) 
-	  || (op->right.type == operandSVValueZ) 
-	  || (op->right.type == operandSVValueW) 
-	  || (op->right.type == operandSVValueFloat))
-	{
-	  const float f1 = EvaluateOperandF (op->left, modes, stacks);
-	  const float f2 = EvaluateOperandF (op->right, modes, stacks);
-	  result = (f1 <= f2);
-	}
-	else
-	{
-	  const int i1 = EvaluateOperandI (op->left, modes, stacks);
-	  const int i2 = EvaluateOperandI (op->right, modes, stacks);
-	  result = i1 <= i2;
-	}
-	break;
-      }
-    default:
-      CS_ASSERT (false);
-  }
+  EvaluatorShadervar eval (*this, modes, stacks);
+  bool result = Evaluate<EvaluatorShadervar> (eval, condition);
 
   condChecked.Set (condition, true);
   condResult.Set (condition, result);
@@ -859,20 +679,14 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
   return result;
 }
 
-void csConditionEvaluator::ResetEvaluationCache()
-{
-  condChecked.SetLength (GetNumConditions ());
-  condChecked.Clear();
-  condResult.SetLength (GetNumConditions ());
-}
-
-bool csConditionEvaluator::EvaluateOperandB (const CondOperand& operand, 
-  const csRenderMeshModes& modes, const csShaderVarStack& stacks)
+csConditionEvaluator::EvaluatorShadervar::BoolType 
+csConditionEvaluator::EvaluatorShadervar::Boolean (
+  const CondOperand& operand)
 {
   switch (operand.type)
   {
     case operandOperation:
-      return Evaluate (operand.operation, modes, stacks);
+      return evaluator.Evaluate<EvaluatorShadervar> (*this, operand.operation);
     case operandBoolean:
       return operand.boolVal;
     case operandSV:
@@ -916,8 +730,9 @@ bool csConditionEvaluator::EvaluateOperandB (const CondOperand& operand,
   return false;
 }
 
-int csConditionEvaluator::EvaluateOperandI (const CondOperand& operand, 
-  const csRenderMeshModes& /*modes*/, const csShaderVarStack& stacks)
+csConditionEvaluator::EvaluatorShadervar::IntType 
+csConditionEvaluator::EvaluatorShadervar::Int (
+  const CondOperand& operand)
 {
   switch (operand.type)
   {
@@ -980,8 +795,9 @@ int csConditionEvaluator::EvaluateOperandI (const CondOperand& operand,
   return 0;
 }
 
-float csConditionEvaluator::EvaluateOperandF (const CondOperand& operand, 
-  const csRenderMeshModes& /*modes*/, const csShaderVarStack& stacks)
+csConditionEvaluator::EvaluatorShadervar::FloatType 
+csConditionEvaluator::EvaluatorShadervar::Float (
+  const CondOperand& operand)
 {
   switch (operand.type)
   {
@@ -1044,6 +860,164 @@ float csConditionEvaluator::EvaluateOperandF (const CondOperand& operand,
   return 0.0f;
 }
 
+template<typename Evaluator>
+typename_qualifier Evaluator::EvalResult csConditionEvaluator::Evaluate (
+  Evaluator& eval, csConditionID condition)
+{
+  typedef typename_qualifier Evaluator::EvalResult EvResult;
+  typedef typename_qualifier Evaluator::BoolType EvBool;
+  typedef typename_qualifier Evaluator::FloatType EvFloat;
+  typedef typename_qualifier Evaluator::IntType EvInt;
+  EvResult result (eval.GetDefaultResult());
+
+  const CondOperation* op = conditions.GetKeyPointer (condition);
+  CS_ASSERT (op != 0);
+
+  switch (op->operation)
+  {
+    case opAnd:
+      result = eval.LogicAnd (op->left, op->right);
+      break;
+    case opOr:
+      result = eval.LogicOr (op->left, op->right);
+      break;
+    case opEqual:
+      {
+	if ((op->left.type == operandFloat) 
+	  || (op->left.type == operandSVValueFloat)
+	  || (op->left.type == operandSVValueX)
+	  || (op->left.type == operandSVValueY)
+	  || (op->left.type == operandSVValueZ)
+	  || (op->left.type == operandSVValueW)
+	  || (op->right.type == operandFloat) 
+	  || (op->right.type == operandSVValueX) 
+	  || (op->right.type == operandSVValueY) 
+	  || (op->right.type == operandSVValueZ) 
+	  || (op->right.type == operandSVValueW) 
+	  || (op->right.type == operandSVValueFloat))
+	{
+	  EvFloat f1 (eval.Float (op->left));
+	  EvFloat f2 (eval.Float (op->right));
+          result = f1 == f2;
+	}
+	else if (OpTypesCompatible (op->left.type, operandBoolean) 
+	  && OpTypesCompatible (op->right.type, operandBoolean))
+	{
+	  result = eval.Boolean (op->left)
+	    == eval.Boolean (op->right);
+	}
+	else
+	{
+	  EvInt i1 (eval.Int (op->left));
+	  EvInt i2 (eval.Int (op->right));
+	  result = i1 == i2;
+	}
+	break;
+      }
+    case opNEqual:
+      {
+	if ((op->left.type == operandFloat) 
+	  || (op->left.type == operandSVValueFloat)
+	  || (op->left.type == operandSVValueX)
+	  || (op->left.type == operandSVValueY)
+	  || (op->left.type == operandSVValueZ)
+	  || (op->left.type == operandSVValueW)
+	  || (op->right.type == operandFloat) 
+	  || (op->right.type == operandSVValueX) 
+	  || (op->right.type == operandSVValueY) 
+	  || (op->right.type == operandSVValueZ) 
+	  || (op->right.type == operandSVValueW) 
+	  || (op->right.type == operandSVValueFloat))
+	{
+	  EvFloat f1 (eval.Float (op->left));
+	  EvFloat f2 (eval.Float (op->right));
+          result = f1 != f2;
+	}
+	else if (OpTypesCompatible (op->left.type, operandBoolean) 
+	  && OpTypesCompatible (op->right.type, operandBoolean))
+	{
+	  result = eval.Boolean (op->left)
+	    != eval.Boolean (op->right);
+	}
+	else
+	{
+	  EvInt i1 (eval.Int (op->left));
+	  EvInt i2 (eval.Int (op->right));
+	  result = i1 != i2;
+	}
+	break;
+      }
+    case opLesser:
+      {
+	if ((op->left.type == operandFloat) 
+	  || (op->left.type == operandSVValueFloat)
+	  || (op->left.type == operandSVValueX)
+	  || (op->left.type == operandSVValueY)
+	  || (op->left.type == operandSVValueZ)
+	  || (op->left.type == operandSVValueW)
+	  || (op->right.type == operandFloat) 
+	  || (op->right.type == operandSVValueX) 
+	  || (op->right.type == operandSVValueY) 
+	  || (op->right.type == operandSVValueZ) 
+	  || (op->right.type == operandSVValueW) 
+	  || (op->right.type == operandSVValueFloat))
+	{
+	  EvFloat f1 (eval.Float (op->left));
+	  EvFloat f2 (eval.Float (op->right));
+	  result = (f1 < f2);
+	}
+	else
+	{
+	  EvInt i1 (eval.Int (op->left));
+	  EvInt i2 (eval.Int (op->right));
+	  result = i1 < i2;
+	}
+	break;
+      }
+    case opLesserEq:
+      {
+	if ((op->left.type == operandFloat) 
+	  || (op->left.type == operandSVValueFloat)
+	  || (op->left.type == operandSVValueX)
+	  || (op->left.type == operandSVValueY)
+	  || (op->left.type == operandSVValueZ)
+	  || (op->left.type == operandSVValueW)
+	  || (op->right.type == operandFloat) 
+	  || (op->right.type == operandSVValueX) 
+	  || (op->right.type == operandSVValueY) 
+	  || (op->right.type == operandSVValueZ) 
+	  || (op->right.type == operandSVValueW) 
+	  || (op->right.type == operandSVValueFloat))
+	{
+	  EvFloat f1 (eval.Float (op->left));
+	  EvFloat f2 (eval.Float (op->right));
+	  result = (f1 <= f2);
+	}
+	else
+	{
+	  EvInt i1 (eval.Int (op->left));
+	  EvInt i2 (eval.Int (op->right));
+	  result = i1 <= i2;
+	}
+	break;
+      }
+    default:
+      CS_ASSERT (false);
+  }
+
+  //condChecked.Set (condition, true);
+  //condResult.Set (condition, result);
+
+  return result;
+}
+
+void csConditionEvaluator::ResetEvaluationCache()
+{
+  condChecked.SetLength (GetNumConditions ());
+  condChecked.Clear();
+  condResult.SetLength (GetNumConditions ());
+}
+
 bool csConditionEvaluator::EvaluateConst (const CondOperation& op, bool& result)
 {
   bool rB1, rB2;
@@ -1051,10 +1025,6 @@ bool csConditionEvaluator::EvaluateConst (const CondOperation& op, bool& result)
   float rF1, rF2;
   switch (op.operation)
   {
-    case opNot:
-      if (!EvaluateOperandBConst (op.right, rB1)) return false;
-      result = !rB1;
-      break;
     case opAnd:
       if (!EvaluateOperandBConst (op.left, rB1)) return false;
       if (!EvaluateOperandBConst (op.right, rB2)) return false;
@@ -1199,36 +1169,442 @@ bool csConditionEvaluator::EvaluateOperandFConst (const CondOperand& operand,
   return true;
 }
 
-bool csConditionEvaluator::ConditionIndependent (csConditionID a, bool aVal,
-						 csConditionID b)
+/**
+ * This struct contains references to 2 value sets.
+ * Used by csConditionEvaluator::CheckConditionResults() which returns the
+ * possible values for variables for both the cases that the condition is
+ * true or false.
+ *
+ * These variable values are actually constructed by operating with
+ * JanusValueSet - operations will adjust the _operands_ to contain the
+ * the values in case that operation returns true or false.
+ */
+struct JanusValueSet
 {
-  if (a == b) return false;
+  const ValueSet* startVals;
+  ValueSet* trueVals;
+  ValueSet* falseVals;
 
-  if (aVal && (b == csCondAlwaysTrue)) return false;
-  if (!aVal && (b == csCondAlwaysFalse)) return false;
+  JanusValueSet (const ValueSet& startVals, ValueSet& trueVals, 
+    ValueSet& falseVals) : startVals (&startVals), trueVals (&trueVals), 
+    falseVals (&falseVals) {}
+  JanusValueSet (float f);
 
-  if ((a == csCondAlwaysFalse) || (a == csCondAlwaysTrue) 
-    || (b == csCondAlwaysFalse) || (b == csCondAlwaysTrue))
-    return true;
+  friend Logic3 operator== (JanusValueSet& a, JanusValueSet& b)
+  {
+    if (*a.startVals == *b.startVals)
+    {
+      *a.trueVals = *b.trueVals = *a.startVals;
+      *a.falseVals = *b.falseVals = !*a.startVals;
+      return Logic3::Truth;
+    }
+    else
+    {
+      if (a.startVals->Overlaps (*b.startVals))
+      {
+        // Make the "true" values those that both share.
+        ValueSet overlap = *a.startVals & *b.startVals;
+        *a.trueVals = *b.trueVals = overlap;
+        // Take the overlap out of the "false" values.
+        *a.falseVals = *a.startVals & !overlap;
+        *b.falseVals = *b.startVals & !overlap;
+        return Logic3::Uncertain;
+      }
+      else
+      {
+        *a.trueVals = *a.falseVals = *a.startVals;
+        *b.trueVals = *b.falseVals = *b.startVals;
+        return Logic3::Lie;
+      }
+    }
+  }
+  friend Logic3 operator!= (JanusValueSet& a, JanusValueSet& b)
+  {
+    Logic3 r = !operator== (a, b);
+    ValueSet t1 = *a.trueVals;
+    ValueSet t2 = *b.trueVals;
+    ValueSet f1 = *a.falseVals;
+    ValueSet f2 = *b.falseVals;
+    /* To make != true, we need the ranges that makes == false
+     * and vice versa */
+    *a.trueVals = f1;
+    *b.trueVals = f2;
+    *a.falseVals = t1;
+    *b.falseVals = t2;
+    return r;
+  }
+  friend Logic3 operator< (JanusValueSet& a, JanusValueSet& b)
+  {
+    ValueSet::Interval::Side aMax = a.startVals->GetMax ();
+    ValueSet::Interval::Side bMin = b.startVals->GetMin ();
+    if (!a.startVals->Overlaps (*b.startVals))
+    {
+      /* The two value sets don't overlap.
+       * We can just take the maximum/minimum values of the sets and
+       * compare those to find whether a value from a can be smaller
+       * than one from b.
+       * In either case, the ranges can stay as they are.
+       */
+      *a.trueVals = *a.falseVals = *a.startVals;
+      *b.trueVals = *b.falseVals = *b.startVals;
+      if (aMax < bMin)
+      {
+        return Logic3::Truth;
+      }
+      else
+      {
+        return Logic3::Lie;
+      }
+    }
+    else
+    {
+      ValueSet::Interval::Side aMin = a.startVals->GetMin ();
+      ValueSet::Interval::Side bMax = b.startVals->GetMax ();
 
-  const CondOperation* A = conditions.GetKeyPointer (a);
-  CS_ASSERT (A);
-  const CondOperation* B = conditions.GetKeyPointer (b);
-  CS_ASSERT (B);
+      if (aMin >= bMax)
+      {
+        return Logic3::Lie;
+      }
 
-  if ((A->operation == opNot) && (A->right.type >= operandSV)
-    && (B->operation == opEqual) && (B->left.type >= operandSV)
-    && (B->right.type == operandBoolean) && (B->right.boolVal == true)
-    && (B->left.svName == A->right.svName)) return false;
-  if ((B->operation == opNot) && (B->right.type >= operandSV)
-    && (A->operation == opEqual) && (A->left.type >= operandSV)
-    && (A->right.type == operandBoolean) && (A->right.boolVal == true)
-    && (A->left.svName == B->right.svName)) return false;
-  
-  if ((A->operation == opNot) && (A->right.type == operandOperation)
-    && (A->right.operation == b)) return false;
-  if ((B->operation == opNot) && (B->right.type == operandOperation)
-    && (B->right.operation == a)) return false;
+      ValueSet::Interval intvA (
+        ValueSet::Interval::Side (aMin.value, false),
+        ValueSet::Interval::Side (false, false));
+      ValueSet::Interval intvB (
+        ValueSet::Interval::Side (true, false),
+        ValueSet::Interval::Side (bMax.value, false));
 
-  return true;
+      ValueSet setA (intvA);
+      ValueSet setB (intvB);
+
+      *a.trueVals = *a.startVals & setB;
+      *a.falseVals = *a.startVals & !setB;
+      *b.trueVals = *b.startVals & setA;
+      *b.falseVals = *b.startVals & !setA;
+
+      return Logic3::Uncertain;
+    }
+  }
+  friend Logic3 operator<= (JanusValueSet& a, JanusValueSet& b)
+  {
+    ValueSet::Interval::Side aMax = a.startVals->GetMax ();
+    ValueSet::Interval::Side bMin = b.startVals->GetMin ();
+    if (!a.startVals->Overlaps (*b.startVals))
+    {
+      /* The two value sets don't overlap.
+       * We can just take the maximum/minimum values of the sets and
+       * compare those to find whether a value from a can be smaller
+       * than one from b.
+       * In either case, the ranges can stay as they are.
+       */
+      *a.trueVals = *a.falseVals = *a.startVals;
+      *b.trueVals = *b.falseVals = *b.startVals;
+      if (aMax <= bMin)
+      {
+        return Logic3::Truth;
+      }
+      else
+      {
+        return Logic3::Lie;
+      }
+    }
+    else
+    {
+      ValueSet::Interval intvA (
+        ValueSet::Interval::Side (a.startVals->GetMin ().value, true),
+        ValueSet::Interval::Side (false, true));
+      ValueSet::Interval intvB (
+        ValueSet::Interval::Side (true, true),
+        ValueSet::Interval::Side (b.startVals->GetMax ().value, true));
+
+      ValueSet setA (intvA);
+      ValueSet setB (intvB);
+
+      *a.trueVals = *a.startVals & setB;
+      *a.falseVals = *a.startVals & !setB;
+      *b.trueVals = *b.startVals & setA;
+      *b.falseVals = *b.startVals & !setA;
+
+      return Logic3::Uncertain;
+    }
+  }
+
+  operator Logic3 () const
+  {
+    ValueSet falseSet (0.0f);
+    ValueSet trueSet (1.0f);
+    bool canTrue = startVals->Overlaps (trueSet);
+    bool canFalse = startVals->Overlaps (falseSet);
+    if (canTrue && !canFalse)
+      return Logic3::Truth;
+    else if (!canTrue && canFalse)
+      return Logic3::Lie;
+    else
+      return Logic3::Uncertain;
+  }
+};
+
+struct EvaluatorShadervarValues
+{
+  typedef Logic3 EvalResult;
+  typedef JanusValueSet BoolType;
+  typedef JanusValueSet FloatType;
+  typedef JanusValueSet IntType;
+
+  static const ValueSet defaultResult;
+  EvalResult GetDefaultResult() const
+  { 
+    return Logic3::Uncertain;
+  }
+
+  csConditionEvaluator& evaluator;
+  const Variables& vars; 
+  Variables& trueVars; 
+  Variables& falseVars;
+  ValueSet boolMask;
+
+  EvaluatorShadervarValues (csConditionEvaluator& evaluator, const Variables& vars,
+    Variables& trueVars, Variables& falseVars) : evaluator (evaluator), 
+    vars (vars), trueVars (trueVars), falseVars (falseVars),
+    boolMask (ValueSet (0.0f) | ValueSet (1.0f)) {}
+
+  BoolType Boolean (const CondOperand& operand);
+  IntType Int (const CondOperand& operand)
+  { return Float (operand); }
+  FloatType Float (const CondOperand& operand);
+
+  EvalResult LogicAnd (const CondOperand& a, const CondOperand& b);
+  EvalResult LogicOr (const CondOperand& a, const CondOperand& b);
+protected:
+  csBlockAllocator<ValueSet> createdValues;
+  ValueSet& CreateValue ()
+  {
+    ValueSet* vs = createdValues.Alloc(); //new (createdValues) ValueSet;
+    return *vs;
+  }
+  ValueSet& CreateValue (float f)
+  {
+    ValueSet* vs = createdValues.Alloc(); //new (createdValues) ValueSet (f);
+    *vs = f;
+    return *vs;
+  }
+};
+
+Logic3 csConditionEvaluator::CheckConditionResults (
+  csConditionID condition, const Variables& vars, 
+  Variables& trueVars, Variables& falseVars)
+{
+  trueVars = falseVars = vars;
+  EvaluatorShadervarValues eval (*this, vars, trueVars, falseVars);
+  return Evaluate<EvaluatorShadervarValues> (eval, condition);
 }
+
+EvaluatorShadervarValues::BoolType EvaluatorShadervarValues::Boolean (
+  const CondOperand& operand)
+{
+  switch (operand.type)
+  {
+    case operandBoolean:
+      {
+        ValueSet& vs = CreateValue();
+        vs = operand.boolVal ? 1.0f : 0.0f;
+        ValueSet& vsTrue = CreateValue();
+        ValueSet& vsFalse = CreateValue();
+        return JanusValueSet (vs, vsTrue, vsFalse);
+      }
+    case operandSV:
+      {
+        const Variables::Values* startValues = vars.GetValues (operand.svName);
+        ValueSet& vs = CreateValue();
+        vs = startValues->var & boolMask;
+        Variables::Values* valuesTrue = trueVars.GetValues (operand.svName);
+        Variables::Values* valuesFalse = falseVars.GetValues (operand.svName);
+        return JanusValueSet (vs, valuesTrue->var, valuesFalse->var);
+      }
+    case operandSVValueTexture:
+      {
+        const Variables::Values* startValues = vars.GetValues (operand.svName);
+        ValueSet& vs = CreateValue();
+        vs = startValues->tex & boolMask;
+        Variables::Values* valuesTrue = trueVars.GetValues (operand.svName);
+        Variables::Values* valuesFalse = falseVars.GetValues (operand.svName);
+        return JanusValueSet (vs, valuesTrue->tex, valuesFalse->tex);
+      }
+    case operandSVValueBuffer:
+      //@@TODO: CHECK FOR DEFAULTBUFFERS
+      {
+        const Variables::Values* startValues = vars.GetValues (operand.svName);
+        ValueSet& vs = CreateValue();
+        vs = startValues->buf & boolMask;
+        Variables::Values* valuesTrue = trueVars.GetValues (operand.svName);
+        Variables::Values* valuesFalse = falseVars.GetValues (operand.svName);
+        return JanusValueSet (vs, valuesTrue->buf, valuesFalse->buf);
+      }
+    default:
+      {
+        CS_ASSERT_MSG("Bug: Unexpected operand type", false);
+      }
+  }
+
+  const ValueSet& startValues = CreateValue();
+  ValueSet& vsTrue = CreateValue();
+  ValueSet& vsFalse = CreateValue();
+  return JanusValueSet (startValues, vsTrue, vsFalse);
+}
+
+EvaluatorShadervarValues::FloatType EvaluatorShadervarValues::Float (
+  const CondOperand& operand)
+{
+  switch (operand.type)
+  {
+    case operandFloat:
+      {
+        ValueSet& vs = CreateValue();
+        vs = operand.floatVal;
+        ValueSet& vsTrue = CreateValue();
+        vsTrue = vs;
+        ValueSet& vsFalse = CreateValue();
+        vsFalse = vsTrue;
+        return JanusValueSet (vs, vsTrue, vsFalse);
+      }
+    case operandInt:
+      {
+        ValueSet& vs = CreateValue();
+        vs = float (operand.intVal);
+        ValueSet& vsTrue = CreateValue();
+        vsTrue = vs;
+        ValueSet& vsFalse = CreateValue();
+        vsFalse = vsTrue;
+        return JanusValueSet (vs, vsTrue, vsFalse);
+      }
+    case operandSVValueFloat:
+    case operandSVValueInt:
+      {
+        const Variables::Values* startValues = vars.GetValues (operand.svName);
+        Variables::Values* valuesTrue = trueVars.GetValues (operand.svName);
+        Variables::Values* valuesFalse = falseVars.GetValues (operand.svName);
+        return JanusValueSet (startValues->vec[0], valuesTrue->vec[0], valuesFalse->vec[0]);
+      }
+    case operandSVValueX:
+    case operandSVValueY:
+    case operandSVValueZ:
+    case operandSVValueW:
+      {
+        const Variables::Values* startValues = vars.GetValues (operand.svName);
+        Variables::Values* valuesTrue = trueVars.GetValues (operand.svName);
+        Variables::Values* valuesFalse = falseVars.GetValues (operand.svName);
+	int c = operand.type - operandSVValueX;
+        return JanusValueSet (startValues->vec[c], valuesTrue->vec[c], valuesFalse->vec[c]);
+      }
+      break;
+    default:
+      ;
+  }
+
+  const ValueSet& startValues = CreateValue();
+  ValueSet& vsTrue = CreateValue();
+  ValueSet& vsFalse = CreateValue();
+  return JanusValueSet (startValues, vsTrue, vsFalse);
+}
+
+EvaluatorShadervarValues::EvalResult EvaluatorShadervarValues::LogicAnd (
+  const CondOperand& a, const CondOperand& b)
+{
+  Logic3 rA;
+  Variables trueVarsA; 
+  Variables falseVarsA;
+  if (a.type == operandOperation)
+  {
+    rA = evaluator.CheckConditionResults (a.operation,
+      vars, trueVarsA, falseVarsA);
+  }
+  else
+  {
+    rA = Boolean (a);
+    trueVarsA = trueVars;
+    falseVarsA = falseVars;
+  }
+
+  Logic3 rB;
+  Variables trueVarsB; 
+  Variables falseVarsB;
+  if (b.type == operandOperation)
+  {
+    if (rA.state == Logic3::Truth)
+    {
+      rB = evaluator.CheckConditionResults (b.operation,
+        trueVarsA, trueVarsB, falseVarsB);
+    }
+    else if (rB.state == Logic3::Lie)
+    {
+      rB = evaluator.CheckConditionResults (b.operation,
+        falseVarsA, trueVarsB, falseVarsB);
+    }
+    else
+    {
+      rB = evaluator.CheckConditionResults (b.operation,
+        trueVarsA | falseVarsA, trueVarsB, falseVarsB);
+    }
+  }
+  else
+  {
+    rB = Boolean (b);
+    trueVarsB = trueVars;
+    falseVarsB = falseVars;
+  }
+  trueVars = trueVarsA & trueVarsB;
+  falseVars = falseVarsA | falseVarsB;
+  return rA && rB;
+}
+
+EvaluatorShadervarValues::EvalResult EvaluatorShadervarValues::LogicOr (
+  const CondOperand& a, const CondOperand& b)
+{
+  Logic3 rA;
+  Variables trueVarsA; 
+  Variables falseVarsA;
+  if (a.type == operandOperation)
+  {
+    rA = evaluator.CheckConditionResults (a.operation,
+      vars, trueVarsA, falseVarsA);
+  }
+  else
+  {
+    rA = Boolean (a);
+    trueVarsA = trueVars;
+    falseVarsA = falseVars;
+  }
+
+  Logic3 rB;
+  Variables trueVarsB; 
+  Variables falseVarsB;
+  if (b.type == operandOperation)
+  {
+    if (rA.state == Logic3::Truth)
+    {
+      rB = evaluator.CheckConditionResults (b.operation,
+        trueVarsA, trueVarsB, falseVarsB);
+    }
+    else if (rB.state == Logic3::Lie)
+    {
+      rB = evaluator.CheckConditionResults (b.operation,
+        falseVarsA, trueVarsB, falseVarsB);
+    }
+    else
+    {
+      rB = evaluator.CheckConditionResults (b.operation,
+        trueVarsA | falseVarsA, trueVarsB, falseVarsB);
+    }
+  }
+  else
+  {
+    rB = Boolean (b);
+    trueVarsB = trueVars;
+    falseVarsB = falseVars;
+  }
+  trueVars = trueVarsA | trueVarsB;
+  falseVars = falseVarsA & falseVarsB;
+  return rA || rB;
+}
+
+}
+CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)

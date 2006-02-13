@@ -37,22 +37,141 @@
 
 #include "docwrap.h"
 #include "tokenhelper.h"
+#include "xmlshader.h"
+
+CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+{
+
+void csWrappedDocumentNode::ConditionTree::RecursiveAdd (
+  csConditionID condition, Node* node, NodeStackEntry& newCurrent)
+{
+  Variables trueVals;
+  Variables falseVals;
+  Logic3 r = evaluator.CheckConditionResults (condition, 
+    node->values, trueVals, falseVals);
+
+  if (node->condition == Node::csCondUnknown)
+  {
+    switch (r.state)
+    {
+      case Logic3::Truth:
+        newCurrent.branches[0].Push (node);
+        break;
+      case Logic3::Lie:
+        newCurrent.branches[1].Push (node);
+        break;
+      case Logic3::Uncertain:
+        {
+          node->condition = condition;
+          for (int b = 0; b < 2; b++)
+          {
+            Node* nn = new Node (node);
+            nn->values = (b == 0) ? trueVals : falseVals;
+            node->branches[b] = nn;
+            if ((b == 0) && (r.state == Logic3::Lie)) continue;
+            if ((b == 1) && (r.state == Logic3::Truth)) continue;
+            newCurrent.branches[b].Push (nn);
+          }
+        }
+        break;
+    }
+  }
+  else
+  {
+    if (r.state != Logic3::Lie)
+      RecursiveAdd (condition, node->branches[0], newCurrent);
+    if (r.state != Logic3::Truth)
+      RecursiveAdd (condition, node->branches[1], newCurrent);
+  }
+}
+
+Logic3 csWrappedDocumentNode::ConditionTree::Descend (csConditionID condition)
+{
+  const NodeStackEntry& current = 
+    nodeStack[nodeStack.GetSize()-1];
+
+  NodeStackEntry newCurrent;
+
+  const csArray<Node*>& currentNodes = current.branches[currentBranch];
+  for (size_t i = 0; i < currentNodes.GetSize(); i++)
+  {
+    RecursiveAdd (condition, currentNodes[i], newCurrent);
+  }
+
+  nodeStack.Push (newCurrent);
+  branchStack.Push (currentBranch);
+  currentBranch = 0;
+
+  Logic3 r;
+  if (newCurrent.branches[0].IsEmpty()
+    && !newCurrent.branches[1].IsEmpty())
+    r.state = Logic3::Lie;
+  else if (!newCurrent.branches[0].IsEmpty()
+    && newCurrent.branches[1].IsEmpty())
+    r.state = Logic3::Truth;
+
+  return r;
+}
+
+void csWrappedDocumentNode::ConditionTree::SwitchBranch ()
+{
+  CS_ASSERT(currentBranch == 0);
+  currentBranch = 1;
+}
+
+void csWrappedDocumentNode::ConditionTree::Ascend (int num)
+{
+  CS_ASSERT_MSG("Either too many Ascend()s or too few Descend()s", 
+    nodeStack.GetSize() > 1);
+  while (num-- > 0)
+  {
+    nodeStack.Pop();
+    currentBranch = branchStack.Pop();
+  }
+}
+
+void csWrappedDocumentNode::ConditionTree::ToResolver (
+  iConditionResolver* resolver, Node* node, csConditionNode* parent)
+{
+  if (node->condition == Node::csCondUnknown) return;
+
+  csConditionNode* trueNode;
+  csConditionNode* falseNode;
+
+  resolver->AddNode (parent, node->condition, trueNode, falseNode);
+  if (node->branches[0] != 0)
+    ToResolver (resolver, node->branches[0], trueNode);
+  if (node->branches[1] != 0)
+    ToResolver (resolver, node->branches[1], falseNode);
+}
+
+void csWrappedDocumentNode::ConditionTree::ToResolver (
+  iConditionResolver* resolver)
+{
+  if (root->branches[0] != 0)
+  {
+    ToResolver (resolver, root, 0);
+  }
+}
 
 //---------------------------------------------------------------------------
-
 
 CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
 
 csWrappedDocumentNode::csWrappedDocumentNode (csWrappedDocumentNodeFactory* shared_fact,
 					      iDocumentNode* wrapped_node,
-					      iConditionResolver* res)
+					      iConditionResolver* res,
+                                              csConditionEvaluator& evaluator)
   : scfImplementationType (this), wrappedNode (wrapped_node), resolver (res),
-    objreg (shared_fact->objreg), shared (shared_fact)
+    objreg (shared_fact->plugin->objectreg), shared (shared_fact)
 {
   CS_ASSERT (resolver);
-  globalState.AttachNew (new GlobalProcessingState);
+  globalState.AttachNew (new GlobalProcessingState (evaluator));
 
   ProcessWrappedNode ();
+  globalState->condTree.ToResolver (resolver);
+
+  globalState = 0;
 }
 
 csWrappedDocumentNode::csWrappedDocumentNode (iDocumentNode* wrapped_node,
@@ -60,10 +179,12 @@ csWrappedDocumentNode::csWrappedDocumentNode (iDocumentNode* wrapped_node,
 					      csWrappedDocumentNodeFactory* shared_fact, 
 					      GlobalProcessingState* global_state)
   : scfImplementationType (this), wrappedNode (wrapped_node), 
-    resolver (parent->resolver), objreg (shared_fact->objreg), 
+    resolver (parent->resolver), objreg (shared_fact->plugin->objectreg), 
     shared (shared_fact), globalState (global_state)
 {
   ProcessWrappedNode ();
+
+  globalState = 0;
 }
 
 csWrappedDocumentNode::~csWrappedDocumentNode ()
@@ -108,14 +229,17 @@ static const char* ReplaceEntities (const char* str, csString& scratch)
 struct WrapperStackEntry
 {
   csWrappedDocumentNode::WrappedChild* child;
-  csConditionNode* condNodes[2]; // 0 - trueNode, 1 - falseNode
-  int currentCondNode;
+
+  bool skip;
+  int nestDepth;
+  Logic3 condResult;
 
   WrapperStackEntry ()
   {
     child = 0;
-    condNodes[0] = condNodes[1] = 0;
-    currentCondNode = 0;
+
+    skip = false;
+    nestDepth = 0;
   }
 };
 
@@ -163,7 +287,6 @@ void csWrappedDocumentNode::CreateElseWrapper (NodeProcessingState* state,
   state->currentWrapper = state->wrapperStack.Pop ();
   elseWrapper = oldCurrentWrapper;
   elseWrapper.child = new WrappedChild;
-  elseWrapper.currentCondNode = 1;
   elseWrapper.child->condition = oldCurrentWrapper.child->condition;
   elseWrapper.child->conditionValue = false;
 }
@@ -396,6 +519,8 @@ void csWrappedDocumentNode::ParseTemplateArguments (const char* str,
 void csWrappedDocumentNode::ProcessSingleWrappedNode (
   NodeProcessingState* state, iDocumentNode* node)
 {
+  CS_ASSERT(globalState);
+
   if (state->templActive)
   {
     ProcessTemplate (node, state);
@@ -456,14 +581,32 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	{
 	  case csWrappedDocumentNodeFactory::PITOKEN_IF:
 	    {
+              if (currentWrapper.skip)
+              {
+                currentWrapper.nestDepth++;
+                break;
+              }
+
 	      WrapperStackEntry newWrapper;
 	      ParseCondition (newWrapper, space + 1, valLen - cmdLen - 1, 
 		node);
           
-	      resolver->AddNode (
-		currentWrapper.condNodes[currentWrapper.currentCondNode], 
-		newWrapper.child->condition, newWrapper.condNodes[0], 
-		newWrapper.condNodes[1]);
+              const csConditionID condition = newWrapper.child->condition;
+              Logic3 r;
+              int descendNum = 0;
+              if (condition == csCondAlwaysTrue)
+                r.state = Logic3::Truth;
+              else if (condition == csCondAlwaysFalse)
+                r.state = Logic3::Lie;
+              else
+              {
+                r = globalState->condTree.Descend (condition);
+                descendNum = 1;
+              }
+              globalState->ascendStack.Push (descendNum);
+              newWrapper.condResult = r;
+              newWrapper.skip = (newWrapper.condResult.state == Logic3::Lie);
+              newWrapper.nestDepth = 1;
 
 	      currentWrapper.child->childrenWrappers.Push (newWrapper.child);
 	      wrapperStack.Push (currentWrapper);
@@ -486,7 +629,16 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		okay = false;
 	      }
 	      if (okay)
+              {
+                if (currentWrapper.skip)
+                {
+                  currentWrapper.nestDepth--;
+                  if (currentWrapper.nestDepth != 0) break;
+                }
+                const int ascendNum = globalState->ascendStack.Pop ();
+                globalState->condTree.Ascend (ascendNum);
 		currentWrapper = wrapperStack.Pop ();
+              }
 	    }
 	    break;
 	  case csWrappedDocumentNodeFactory::PITOKEN_ELSE:
@@ -504,7 +656,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		  "'else' without 'if' or 'elsif'");
 		okay = false;
 	      }
-	      if (okay && (currentWrapper.currentCondNode != 0))
+	      if (okay && (globalState->condTree.GetBranch() != 0))
 	      {
 		Report (syntaxErrorSeverity, node,
 		  "Double 'else'");
@@ -512,12 +664,17 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      }
 	      if (okay)
 	      {
+                if (currentWrapper.skip && currentWrapper.nestDepth > 1) break;
+
 		WrapperStackEntry newWrapper;
 		CreateElseWrapper (state, newWrapper);
 
 		currentWrapper.child->childrenWrappers.Push (newWrapper.child);
 		wrapperStack.Push (currentWrapper);
 		currentWrapper = newWrapper;
+                newWrapper.skip = (newWrapper.condResult.state == Logic3::Truth);
+
+                globalState->condTree.SwitchBranch ();
 	      }
 	    }
 	    break;
@@ -530,7 +687,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		  "'elsif' without 'if' or 'elsif'");
 		okay = false;
 	      }
-	      if (okay && (currentWrapper.currentCondNode != 0))
+	      if (okay && (globalState->condTree.GetBranch() != 0))
 	      {
 		Report (syntaxErrorSeverity, node,
 		  "Double 'else'");
@@ -538,6 +695,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      }
 	      if (okay)
 	      {
+                if (currentWrapper.skip && (currentWrapper.nestDepth > 1)) break;
+
 		WrapperStackEntry elseWrapper;
 		CreateElseWrapper (state, elseWrapper);
 
@@ -547,10 +706,21 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		ParseCondition (newWrapper, space + 1, valLen - cmdLen - 1,
 		  node);
           
-		resolver->AddNode (
-		  elseWrapper.condNodes[elseWrapper.currentCondNode], 
-		  newWrapper.child->condition, newWrapper.condNodes[0], 
-		  newWrapper.condNodes[1]);
+                globalState->condTree.SwitchBranch ();
+                const csConditionID condition = newWrapper.child->condition;
+                Logic3 r;
+                if (condition == csCondAlwaysTrue)
+                  r.state = Logic3::Truth;
+                else if (condition == csCondAlwaysFalse)
+                  r.state = Logic3::Lie;
+                else
+                {
+                  r = globalState->condTree.Descend (condition);
+                  globalState->ascendStack[globalState->ascendStack.GetSize()-1]++;
+                }
+                newWrapper.condResult = r;
+                newWrapper.skip = (newWrapper.condResult.state == Logic3::Lie);
+                newWrapper.nestDepth = 1;
 
 		elseWrapper.child->childrenWrappers.Push (newWrapper.child);
 		wrapperStack.Push (elseWrapper);
@@ -564,7 +734,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      csString filename;
 	      const char* space = strchr (valStart, ' ');
 	      /* The rightmost spaces were skipped and don't interest us
-		any more. */
+	       * any more. */
 	      if (space != 0)
 	      {
 		filename.Replace (space + 1, valLen - cmdLen - 1);
@@ -578,6 +748,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      }
 	      if (okay)
 	      {
+                if (currentWrapper.skip) break;
 		ProcessInclude (filename, state, node);
 	      }
 	    }
@@ -628,8 +799,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      }
 	      if (okay)
 	      {
-		//globalState->templates.PutUnique (templateName, newTempl);
-		//state->templ = globalState->templates.GetElementPointer (templateName);
+                if (currentWrapper.skip) break;
+
 		state->templateName = templateName;
 		state->templ = newTempl;
 		state->templActive = true;
@@ -639,12 +810,16 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	    break;
 	  case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE:
 	    {
+              if (currentWrapper.skip) break;
+
 	      Report (syntaxErrorSeverity, node,
 		"'endtemplate' without 'template'");
 	    }
 	    break;
 	  default:
 	    {
+              if (currentWrapper.skip) break;
+
 	      csArray<csString> params;
 	      if (space != 0)
 	      {
@@ -663,7 +838,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
       }
     }
   }
-  if (!handled)
+  if (!handled && !currentWrapper.skip)
   {
     WrappedChild* newWrapper = new WrappedChild;
     newWrapper->childNode.AttachNew (new csWrappedDocumentNode (node,
@@ -865,7 +1040,8 @@ void csWrappedDocumentNode::WrapperWalker::SeekNext()
       }
       else
       {
-	if (resolver->Evaluate (wrapper.condition) == wrapper.conditionValue)
+        if ((wrapper.condition == csCondAlwaysTrue)
+          || (resolver->Evaluate (wrapper.condition) == wrapper.conditionValue))
 	{
 	  currentPos = &posStack.GetExtend (posStack.Length ());
 	  currentPos->currentIndex = 0;
@@ -918,6 +1094,11 @@ void csTextNodeWrapper::SetData (iDocumentNode* realMe, const char* text)
 }
 
 //---------------------------------------------------------------------------
+
+// hack: work around problems caused by #defining 'new'
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
 
 SCF_IMPLEMENT_IBASE_POOLED(csWrappedDocumentNodeIterator)
   SCF_IMPLEMENTS_INTERFACE(iDocumentNodeIterator)
@@ -990,9 +1171,8 @@ csRef<iDocumentNode> csWrappedDocumentNodeIterator::Next ()
 //---------------------------------------------------------------------------
 
 csWrappedDocumentNodeFactory::csWrappedDocumentNodeFactory (
-  iObjectRegistry* objreg)
+  csXMLShaderCompiler* plugin) : plugin (plugin)
 {
-  csWrappedDocumentNodeFactory::objreg = objreg;
   InitTokenTable (pitokens);
 }
 
@@ -1009,8 +1189,12 @@ void csWrappedDocumentNodeFactory::DumpCondition (size_t id,
 }
 
 csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
-  iDocumentNode* wrappedNode, iConditionResolver* resolver, csString* dumpOut)
+  iDocumentNode* wrappedNode, iConditionResolver* resolver,
+  csConditionEvaluator& evaluator, csString* dumpOut)
 {
   currentOut = dumpOut;
-  return new csWrappedDocumentNode (this, wrappedNode, resolver);
+  return new csWrappedDocumentNode (this, wrappedNode, resolver, evaluator);
 }
+
+}
+CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)

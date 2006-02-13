@@ -34,6 +34,9 @@
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 
+CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+{
+
 class csReplacerDocumentNodeFactory;
 
 class Substitutions : public csHash<csString, csString>,
@@ -159,5 +162,8 @@ public:
   csRef<iDocumentNode> CreateWrapper (iDocumentNode* wrappedNode, 
     csReplacerDocumentNode* parent, const Substitutions& subst);
 };
+
+}
+CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
 
 #endif // __CS_DOCWRAP_REPLACER_H__

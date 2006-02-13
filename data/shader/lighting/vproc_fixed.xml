@@ -28,10 +28,10 @@
 	    <?! Generate position for directional light ?>
 	    <position type="expression">
 	      <!-- small subtlety: GL spec says light coordinates are in
-		-- object space, yet here they are world space - at the 
-		-- time lighting parameters will be set, the GL object 
-		-- space is CS world space actually. This is due the way
-		-- CS sets up transforms. -->
+		   object space, yet here they are world space - at the 
+		   time lighting parameters will be set, the GL object 
+		   space is CS world space actually. This is due the way
+		   CS sets up transforms. -->
 	      <sexp>
 		(* (make-vector 
 		     (elt1 "light $N$ direction world")
@@ -103,8 +103,8 @@
     <?endif?>
     -->
     <!-- @@@ FIXME: Support software specular
-      -- Unfortunately, the only way I see is to uglily use a 2nd pass
-      -- for the specular part... [res] -->
+         Unfortunately, the only way I see is to uglily use a 2nd pass
+         for the specular part... [res] -->
     <colormixmode>none</colormixmode>
     <finalfactor type="float">0.5</finalfactor>
     <lights>$N$</lights>
@@ -167,8 +167,8 @@
 	  </fp>
 	</pass>
       </technique>
+      <!-- Tech without separate specular -->
       <technique priority="$N$00" lights="$N$">
-	<!-- Tech without separate specular -->
 	<pass>
 	  <?if vars."tex diffuse".texture ?>
 	    <texture name="tex diffuse" destination="diffuse" />
@@ -203,11 +203,11 @@
     <?endif?>
   <?endtemplate?>
   
-  <?!GenerateLights 8 ?>
-  <?!GenerateLights 7 ?>
-  <?!GenerateLights 6 ?>
-  <?!GenerateLights 5 ?>
-  <?!GenerateLights 4 ?>
+  <?GenerateLights 8 ?>
+  <?GenerateLights 7 ?>
+  <?GenerateLights 6 ?>
+  <?GenerateLights 5 ?>
+  <?GenerateLights 4 ?>
   <?GenerateLights 3 ?>
   <?GenerateLights 2 ?>
   <?GenerateLights 1 ?>

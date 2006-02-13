@@ -23,6 +23,9 @@
 #include "csutil/array.h"
 #include "csutil/csstring.h"
 
+CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+{
+
 /**
  * Possible token types. Stored to simplify the parser's work.
  */
@@ -148,5 +151,8 @@ public:
     return Parse (tokens, result, 0, tokens.Length ());
   }
 };
+
+}
+CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
 
 #endif // __EXPPARSER_H__

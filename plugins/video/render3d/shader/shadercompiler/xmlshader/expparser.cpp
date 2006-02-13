@@ -23,6 +23,9 @@
 #include "expparser.h"
 #include "tokenhelper.h"
 
+CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+{
+
 const char* csExpressionToken::TypeDescription (csExpressionTokenType type)
 {
   switch (type)
@@ -475,3 +478,6 @@ const char* csExpressionParser::MatchBrace (
     return "Unbalanced number of braces";
   return 0;
 }
+
+}
+CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)

@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include <ctype.h>
 
-#include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "iutil/verbositymanager.h"
@@ -39,11 +38,14 @@
 
 #include "xmlshader.h"
 
+CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+{
+
 CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 CS_LEAKGUARD_IMPLEMENT (csXMLShader);
 CS_LEAKGUARD_IMPLEMENT (csXMLShaderCompiler);
-
-CS_IMPLEMENT_PLUGIN
 
 //---------------------------------------------------------------------------
 
@@ -833,16 +835,15 @@ void csXMLShaderTech::SetFailReason (const char* reason, ...)
 //---------------------------------------------------------------------------
 
 csShaderConditionResolver::csShaderConditionResolver (
-  csXMLShaderCompiler* compiler) : 
+  csXMLShaderCompiler* compiler) : rootNode (0), nextVariant (0),
   evaluator (compiler->strings, compiler->condConstants)
 {
-  rootNode = 0;
-  nextVariant = 0;
   SetEvalParams (0, 0);
 }
 
 csShaderConditionResolver::~csShaderConditionResolver ()
 {
+  delete rootNode;
 }
 
 const char* csShaderConditionResolver::SetLastError (const char* msg, ...)
@@ -887,92 +888,20 @@ bool csShaderConditionResolver::Evaluate (csConditionID condition)
     stacks ? *stacks : csShaderVarStack ());
 }
 
-csConditionNode* csShaderConditionResolver::NewNode ()
+csConditionNode* csShaderConditionResolver::NewNode (csConditionNode* parent)
 {
-  csConditionNode* newNode = new csConditionNode;
-  condNodes.Push (newNode);
+  csConditionNode* newNode = new csConditionNode (parent);
   return newNode;
 }
 
 csConditionNode* csShaderConditionResolver::GetRoot ()
 {
   if (rootNode == 0)
-    rootNode = NewNode ();
+    rootNode = NewNode (0);
   return rootNode;
 }
 
-void csShaderConditionResolver::AddToRealNode (csRealConditionNode* realNode, 
-					       csConditionID condition, 
-					       csConditionNode* trueNode, 
-					       csConditionNode* falseNode)
-{
-  if (realNode->variant != csArrayItemNotFound)
-  {
-    /* There's a variant assigned, (!= csArrayItemNotFound)
-       un-assign variant but assign condition */
-    csBitArray bits (evaluator.GetNumConditions ());
-    realNode->condition = condition;
-
-    csRef<csRealConditionNode> realTrueNode;
-    realTrueNode.AttachNew (new csRealConditionNode (realNode));
-    realNode->trueNode = realTrueNode;
-    trueNode = NewNode ();
-    realTrueNode->variant = GetVariant (realTrueNode); //nextVariant++;
-    trueNode->nodes.Push (realTrueNode);
-
-    csRef<csRealConditionNode> realFalseNode;
-    realFalseNode.AttachNew (new csRealConditionNode (realNode));
-    realNode->falseNode = realFalseNode;
-    realFalseNode->variant = realNode->variant;
-    falseNode = NewNode ();
-    falseNode->nodes.Push (realFalseNode);
-    realFalseNode->FillConditionArray (bits);
-    variantIDs.PutUnique (bits, realNode->variant);
-
-    realNode->variant = csArrayItemNotFound;
-  }
-  else
-  {
-    /* There's no variant assigned, recursively add condition
-      to T&F children */
-    if (realNode->condition == condition)
-    {
-      trueNode->nodes.Push (realNode->trueNode);
-      falseNode->nodes.Push (realNode->falseNode);
-      return;
-    }
-    if (CheckIndependency (realNode, condition))
-    {
-      if (evaluator.ConditionIndependent (realNode->condition, true, condition))
-	AddToRealNode (realNode->trueNode, condition, trueNode, falseNode);
-      if (evaluator.ConditionIndependent (realNode->condition, false, condition))
-	AddToRealNode (realNode->falseNode, condition, trueNode, falseNode);
-    }
-  }
-}
-  
-bool csShaderConditionResolver::CheckIndependency (csRealConditionNode* node, 
-						   csConditionID condition)
-{
-  if (node->parent == 0) return true;
-
-  if (node == node->parent->trueNode)
-  {
-    if (!evaluator.ConditionIndependent (node->parent->condition, true, 
-      condition))
-      return false;
-  }
-  else
-  {
-    if (!evaluator.ConditionIndependent (node->parent->condition, false, 
-      condition))
-      return false;
-  }
-
-  return CheckIndependency (node->parent, condition);
-}
-
-size_t csShaderConditionResolver::GetVariant (csRealConditionNode* node)
+size_t csShaderConditionResolver::GetVariant (csConditionNode* node)
 {
   csBitArray bits (evaluator.GetNumConditions ());
   node->FillConditionArray (bits);
@@ -997,39 +926,34 @@ void csShaderConditionResolver::AddNode (csConditionNode* parent,
     CS_ASSERT_MSG ("No root but parent? Weird.", parent == 0);
     parent = GetRoot ();
 
-    csRef<csRealConditionNode> realNode;
-    realNode.AttachNew (new csRealConditionNode (0));
-    realNode->condition = condition;
-    parent->nodes.Push (realNode);
+    parent->condition = condition;
 
-    csRef<csRealConditionNode> realTrueNode;
-    realTrueNode.AttachNew (new csRealConditionNode (realNode));
-    realNode->trueNode = realTrueNode;
-    realTrueNode->variant = GetVariant (realTrueNode);
-    trueNode = NewNode ();
-    trueNode->nodes.Push (realTrueNode);
+    parent->trueNode = trueNode = NewNode (parent);
+    trueNode->variant = GetVariant (trueNode);
 
-    csRef<csRealConditionNode> realFalseNode;
-    realFalseNode.AttachNew (new csRealConditionNode (realNode));
-    realNode->falseNode = realFalseNode;
-    realFalseNode->variant = GetVariant (realFalseNode);
-    falseNode = NewNode ();
-    falseNode->nodes.Push (realFalseNode);
+    parent->falseNode = falseNode = NewNode (parent);
+    falseNode->variant = GetVariant (falseNode);
   }
   else
   {
     if (parent == 0)
       parent = GetRoot ();
 
-    trueNode = NewNode ();
-    falseNode = NewNode ();
+    parent->trueNode = trueNode = NewNode (parent);
+    parent->falseNode = falseNode = NewNode (parent);
 
-    const size_t n = parent->nodes.Length ();
-    for (size_t i = 0; i < n; i++)
-    {
-      AddToRealNode (parent->nodes[i], condition, 
-	trueNode, falseNode);
-    }
+    CS_ASSERT(parent->variant != csArrayItemNotFound);
+    csBitArray bits (evaluator.GetNumConditions ());
+    parent->condition = condition;
+
+    trueNode->variant = GetVariant (trueNode);
+
+    falseNode->variant = parent->variant;
+    falseNode->FillConditionArray (bits);
+    variantIDs.PutUnique (bits, parent->variant);
+
+    parent->variant = csArrayItemNotFound;
+    //AddToRealNode (parent, condition, trueNode, falseNode);
   }
 }
 
@@ -1051,10 +975,8 @@ size_t csShaderConditionResolver::GetVariant ()
   }
   else
   {
-    CS_ASSERT (rootNode->nodes.Length () == 1);
-
-    csRealConditionNode* currentRoot = 0;
-    csRealConditionNode* nextRoot = rootNode->nodes[0];
+    csConditionNode* currentRoot = 0;
+    csConditionNode* nextRoot = rootNode;
 
     while (nextRoot != 0)
     {
@@ -1078,17 +1000,18 @@ void csShaderConditionResolver::DumpConditionTree (csString& out)
   if (rootNode == 0)
     return;
 
-  CS_ASSERT (rootNode->nodes.Length () == 1);
-  DumpConditionNode (out, rootNode->nodes[0], 0);
+  out += "\n";
+  DumpConditionNode (out, rootNode, 0);
 }
 
 static void Indent (csString& out, int n)
 {
-  out.PadRight (out.Length() + n, ' ');
+  while (n-- > 0)
+    out += "| ";
 }
 
 void csShaderConditionResolver::DumpConditionNode (csString& out,
-						   csRealConditionNode* node, 
+						   csConditionNode* node, 
 						   int level)
 {
   if (node == 0)
@@ -1098,7 +1021,6 @@ void csShaderConditionResolver::DumpConditionNode (csString& out,
   }
   else
   {
-    Indent (out, level);
     if (node->variant != csArrayItemNotFound)
     {
       out.AppendFmt ("variant: %zu\n", node->variant);
@@ -1151,7 +1073,7 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
 {
   objectreg = object_reg;
 
-  wrapperFact = new csWrappedDocumentNodeFactory (objectreg);
+  wrapperFact = new csWrappedDocumentNodeFactory (this);
 
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
       object_reg, iPluginManager);
@@ -1347,7 +1269,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   {
     csString tree;
     wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
-      resolver, &tree));
+      resolver, resolver->evaluator, &tree));
     resolver->DumpConditionTree (tree);
     csString filename;
     filename.Format ("/tmp/shader/cond_%s.txt", source->GetAttributeValue ("name"));
@@ -1355,7 +1277,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   }
   else
     wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
-      resolver, 0));
+    resolver, resolver->evaluator, 0));
   shaderSource = wrappedNode;
   vfsStartDir = csStrNew (compiler->vfs->GetCwd ());
 
@@ -1669,14 +1591,14 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename)
   {
     csString tree;
     programNode.AttachNew (compiler->wrapperFact->CreateWrapper (
-      programDoc->GetRoot (), resolver, &tree));
+      programDoc->GetRoot (), resolver, resolver->evaluator, &tree));
     resolver->DumpConditionTree (tree);
     compiler->vfs->WriteFile (csString().Format ("/tmp/shader/%s.txt",
       dumpFN.GetData()), tree.GetData(), tree.Length());
   }
   else
     programNode.AttachNew (compiler->wrapperFact->CreateWrapper (
-      programDoc->GetRoot (), resolver, 0));
+      programDoc->GetRoot (), resolver, resolver->evaluator, 0));
 
   if (compiler->doDumpXML)
   {
@@ -1689,3 +1611,6 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename)
   }
   return programNode;
 }
+
+}
+CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)

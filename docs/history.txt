@@ -11,6 +11,15 @@ chronological order.
 	- res tweaked the softrenderer & softshader to more appropriately use 
 	  "bool"s instead of "int"s for some template parameters.
 	- res fixed some VC8 warnings occuring with enabled memtracker.
+	- res added macros to reduce typing for plugin namespaces.
+	- res changed the way XMLshader detects redundant conditions. 
+	  Basically, for each possible outcome of some condition, the ranges
+	  of values a shader variable can take is stored, and a condition is
+	  checked whether it is definitely true or definitely false, based on
+	  the known possible range of values. If a definite result can be
+	  obtained, the condition will not be checked later when a variation
+	  is determined; less conditions to be checked mean less variations of
+	  a shader.
 11-Feb-2006
 	- Jorrit fixed a bug in setting a parent on a mesh that was already
 	  in a sector. The bug is fixed by automatically clearing the

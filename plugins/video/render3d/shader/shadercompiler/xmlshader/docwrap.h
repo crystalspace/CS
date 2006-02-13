@@ -35,15 +35,16 @@
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 
+#include "condeval.h"
 #include "docwrap_replacer.h"
+
+CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+{
+
+class csXMLShaderCompiler;
 
 class csWrappedDocumentNodeIterator;
 struct WrapperStackEntry;
-
-
-typedef size_t csConditionID;
-const csConditionID csCondAlwaysFalse = (csConditionID)~0;
-const csConditionID csCondAlwaysTrue = (csConditionID)~1;
 
 struct csConditionNode;
 class csWrappedDocumentNodeFactory;
@@ -149,9 +150,77 @@ class csWrappedDocumentNode :
     csRefArray<iDocumentNode> nodes;
     csArray<csString> paramMap;
   };
+  class ConditionTree
+  {
+    struct Node
+    {
+      static const csConditionID csCondUnknown = (csConditionID)~2;    
+      
+      Node* parent;
+
+      csConditionID condition;
+      Node* branches[2];
+      Variables values;
+
+      Node (Node* p) : parent (p), condition (csCondUnknown)
+      {
+        branches[0] = 0;
+        branches[1] = 0;
+      }
+      ~Node ()
+      {
+        delete branches[0];
+        delete branches[1];
+      }
+    };
+
+    Node* root;
+    int currentBranch;
+    struct NodeStackEntry
+    {
+      csArray<Node*> branches[2];
+    };
+
+    csArray<NodeStackEntry> nodeStack;
+    csArray<int> branchStack;
+
+    void RecursiveAdd (csConditionID condition, Node* node, 
+      NodeStackEntry& newCurrent);
+    void ToResolver (iConditionResolver* resolver, Node* node,
+      csConditionNode* parent);
+
+    csConditionEvaluator& evaluator;
+  public:
+    ConditionTree (csConditionEvaluator& evaluator) : evaluator (evaluator)
+    {
+      root = new Node (0);
+      currentBranch = 0;
+      NodeStackEntry newPair;
+      newPair.branches[0].Push (root);
+      nodeStack.Push (newPair);
+    }
+    ~ConditionTree ()
+    {
+      delete root;
+    }
+
+    Logic3 Descend (csConditionID condition);
+    // Switch the current branch from "true" to "false"
+    void SwitchBranch ();
+    void Ascend (int num);
+    int GetBranch() const { return currentBranch; }
+
+    void ToResolver (iConditionResolver* resolver);
+  };
   struct GlobalProcessingState : public csRefCount
   {
     csHash<Template, csString> templates;
+    csConditionEvaluator& evaluator;
+    ConditionTree condTree;
+    csArray<int> ascendStack;
+
+    GlobalProcessingState (csConditionEvaluator& evaluator) : 
+      evaluator (evaluator), condTree (evaluator) {}
   };
   csRef<GlobalProcessingState> globalState;
 
@@ -187,8 +256,8 @@ class csWrappedDocumentNode :
     csWrappedDocumentNodeFactory* shared, 
     GlobalProcessingState* globalState);
   csWrappedDocumentNode (csWrappedDocumentNodeFactory* shared,
-    iDocumentNode* wrappedNode,
-    iConditionResolver* resolver);
+    iDocumentNode* wrappedNode, iConditionResolver* resolver,
+    csConditionEvaluator& evaluator);
 public:
   CS_LEAKGUARD_DECLARE(csWrappedDocumentNode);
 
@@ -272,7 +341,7 @@ class csWrappedDocumentNodeFactory
   friend class csWrappedDocumentNode;
   friend class csWrappedDocumentNodeIterator;
 
-  iObjectRegistry* objreg;
+  csXMLShaderCompiler* plugin;
   csTextNodeWrapper::Pool textNodePool;
   csWrappedDocumentNodeIterator::Pool iterPool;
   csReplacerDocumentNodeFactory replacerFactory;
@@ -288,10 +357,14 @@ class csWrappedDocumentNodeFactory
   csString* currentOut;
   void DumpCondition (size_t id, const char* condStr, size_t condLen);
 public:
-  csWrappedDocumentNodeFactory (iObjectRegistry* objreg);
+  csWrappedDocumentNodeFactory (csXMLShaderCompiler* plugin);
 
   csWrappedDocumentNode* CreateWrapper (iDocumentNode* wrappedNode,
-    iConditionResolver* resolver, csString* dumpOut);
+    iConditionResolver* resolver, csConditionEvaluator& evaluator, 
+    csString* dumpOut);
 };
+
+}
+CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
 
 #endif // __DOCWRAP_H__
