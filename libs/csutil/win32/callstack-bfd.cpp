@@ -26,7 +26,7 @@
 #include "csutil/win32/DbgHelpAPI.h"
 #include "syminit.h"
 
-namespace CrystalSpace
+namespace CS
 {
   namespace Debug
   {
@@ -97,7 +97,7 @@ namespace CrystalSpace
       {
 	if (!function) return false;
 	csString tmp;
-	CrystalSpace::Debug::Demangle (function, tmp);
+	CS::Debug::Demangle (function, tmp);
 	sym.Format ("[%p] (%s)%s", addr, bfd->GetFileName(), 
 	  tmp.GetData());
 	return true;
@@ -141,4 +141,4 @@ namespace CrystalSpace
     }
 
   } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS

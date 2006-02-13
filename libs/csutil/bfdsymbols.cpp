@@ -21,7 +21,7 @@
 
 #include "bfdsymbols.h"
 
-namespace CrystalSpace
+namespace CS
 {
   namespace Debug
   {
@@ -82,4 +82,4 @@ namespace CrystalSpace
       return false;
     }
   } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS

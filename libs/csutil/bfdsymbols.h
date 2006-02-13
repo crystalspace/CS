@@ -24,7 +24,7 @@
 
 #include <bfd.h>
 
-namespace CrystalSpace
+namespace CS
 {
   namespace Debug
   {
@@ -64,6 +64,6 @@ namespace CrystalSpace
     };
     
   } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS
 
 #endif // __CS_LIBS_CSUTIL_BFDSYMBOLS_H__
