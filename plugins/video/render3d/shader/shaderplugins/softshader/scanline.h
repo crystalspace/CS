@@ -156,7 +156,7 @@ namespace SoftShader
 
   private:
     template <typename Source, typename Color, 
-      typename Zmode, int needColors, int doAlphaTest, typename Color2>
+      typename Zmode, bool needColors, bool doAlphaTest, typename Color2>
     struct ScanlineImpl
     {
       static void Scan (iScanlineRenderer* _This,
@@ -222,8 +222,8 @@ namespace SoftShader
 	} /* endwhile */
       }
     };
-    template<typename Source, typename Color, typename Zmode, int needColors, 
-      int doAlphaTest>
+    template<typename Source, typename Color, typename Zmode, 
+      bool needColors, bool doAlphaTest>
     iScanlineRenderer::ScanlineProc GetScanlineProcSCCnCA ()
     {
       if (colorSum)
@@ -233,22 +233,23 @@ namespace SoftShader
 	return ScanlineImpl<Source, Color, Zmode, needColors, doAlphaTest,
 	  Color2_None>::Scan;
     }
-    template<typename Source, typename Color, typename Zmode, int needColors>
+    template<typename Source, typename Color, typename Zmode, 
+      bool needColors>
     iScanlineRenderer::ScanlineProc GetScanlineProcSCCnC (bool doAlphaTest)
     {
       if (doAlphaTest)
-	return GetScanlineProcSCCnCA<Source, Color, Zmode, needColors, 1> ();
+	return GetScanlineProcSCCnCA<Source, Color, Zmode, needColors, true> ();
       else
-	return GetScanlineProcSCCnCA<Source, Color, Zmode, needColors, 0> ();
+	return GetScanlineProcSCCnCA<Source, Color, Zmode, needColors, false> ();
     }
     template<typename Source, typename Color, typename Zmode>
     iScanlineRenderer::ScanlineProc GetScanlineProcSCC (bool needColors,
 						        bool doAlphaTest)
     {
       if (needColors)
-	return GetScanlineProcSCCnC<Source, Color, Zmode, 1> (doAlphaTest);
+	return GetScanlineProcSCCnC<Source, Color, Zmode, true> (doAlphaTest);
       else
-	return GetScanlineProcSCCnC<Source, Color, Zmode, 0> (doAlphaTest);
+	return GetScanlineProcSCCnC<Source, Color, Zmode, false> (doAlphaTest);
     }
     template<typename Source, typename Color>
     iScanlineRenderer::ScanlineProc GetScanlineProcSC (csZBufMode zmode,

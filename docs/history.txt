@@ -8,6 +8,8 @@ chronological order.
 
 13-Feb-2006
 	- Marten started cleaning up the namespace mess. Not finished yet.
+	- res tweaked the softrenderer & softshader to more appropriately use 
+	  "bool"s instead of "int"s for some template parameters.
 11-Feb-2006
 	- Jorrit fixed a bug in setting a parent on a mesh that was already
 	  in a sector. The bug is fixed by automatically clearing the

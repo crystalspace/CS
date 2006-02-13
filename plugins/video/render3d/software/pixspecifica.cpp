@@ -44,8 +44,8 @@ namespace Soft3D
     typedef typename_qualifier Pix::PixType PixType;
     Pix pix;
 
-    template<typename SrcBlend, typename DstBlend, int alphaTest,
-      int constantAlpha>
+    template<typename SrcBlend, typename DstBlend, bool alphaTest,
+      bool constantAlpha>
     void Draw (const Pix& pix, iGraphics2D *G2D,
       uint32* bitmap, int sx, int sy, int sw, int sh, 
       int tx, int ty, int dx, int dy, int bw, int bh,
@@ -92,14 +92,14 @@ namespace Soft3D
 	  default:
 	  case csAlphaMode::alphaNone:
 	  case csAlphaMode::alphaSmooth:
-	    Draw<Factor_SrcAlpha<FactorColorSrc, 0>, 
-	      Factor_SrcAlpha<FactorColorDst, 1>, 0, 1> (
+	    Draw<Factor_SrcAlpha<FactorColorSrc, false>, 
+	      Factor_SrcAlpha<FactorColorDst, true>, false, true> (
 	      pix, G2D, bitmap, sx, sy, sw, sh, tx, ty, dx, dy, bw, bh,
 	      ~Alpha);
 	    break;
 	  case csAlphaMode::alphaBinary:
-	    Draw<Factor_SrcAlpha<FactorColorSrc, 0>, 
-	      Factor_SrcAlpha<FactorColorDst, 1>, 1, 1> (
+	    Draw<Factor_SrcAlpha<FactorColorSrc, false>, 
+	      Factor_SrcAlpha<FactorColorDst, true>, true, true> (
 	      pix, G2D, bitmap, sx, sy, sw, sh, tx, ty, dx, dy, bw, bh,
 	      ~Alpha);
 	    break;
@@ -111,18 +111,18 @@ namespace Soft3D
 	{
 	  default:
 	  case csAlphaMode::alphaNone:
-	    Draw<Factor_Zero<FactorColorSrc, 1>, 
-	      Factor_Zero<FactorColorDst, 0>, 0, 0> (
+	    Draw<Factor_Zero<FactorColorSrc, true>, 
+	      Factor_Zero<FactorColorDst, false>, false, false> (
 	      pix, G2D, bitmap, sx, sy, sw, sh, tx, ty, dx, dy, bw, bh);
 	    break;
 	  case csAlphaMode::alphaSmooth:
-	    Draw<Factor_SrcAlpha<FactorColorSrc, 0>, 
-	      Factor_SrcAlpha<FactorColorDst, 1>, 0, 0> (
+	    Draw<Factor_SrcAlpha<FactorColorSrc, false>, 
+	      Factor_SrcAlpha<FactorColorDst, true>, false, false> (
 	      pix, G2D, bitmap, sx, sy, sw, sh, tx, ty, dx, dy, bw, bh);
 	    break;
 	  case csAlphaMode::alphaBinary:
-	    Draw<Factor_SrcAlpha<FactorColorSrc, 0>, 
-	      Factor_SrcAlpha<FactorColorDst, 1>, 1, 0> (
+	    Draw<Factor_SrcAlpha<FactorColorSrc, false>, 
+	      Factor_SrcAlpha<FactorColorDst, true>, true, false> (
 	      pix, G2D, bitmap, sx, sy, sw, sh, tx, ty, dx, dy, bw, bh);
 	    break;
 	}

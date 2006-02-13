@@ -33,7 +33,7 @@ namespace Soft3D
     FactorColorDst = 1
   };
 
-  template<int Color, int Inv>
+  template<int Color, bool Inv>
   struct Factor_Zero
   {
     CS_FORCEINLINE
@@ -47,7 +47,7 @@ namespace Soft3D
     }
   };
 
-  template<int Color, int Inv>
+  template<int Color, bool Inv>
   struct Factor_Src
   {
     CS_FORCEINLINE
@@ -61,7 +61,7 @@ namespace Soft3D
     }
   };
 
-  template<int Color, int Inv>
+  template<int Color, bool Inv>
   struct Factor_SrcAlpha
   {
     CS_FORCEINLINE
@@ -75,7 +75,7 @@ namespace Soft3D
     }
   };
 
-  template<int Color, int Inv>
+  template<int Color, bool Inv>
   struct Factor_Dst
   {
     CS_FORCEINLINE
@@ -89,7 +89,7 @@ namespace Soft3D
     }
   };
 
-  template<int Color, int Inv>
+  template<int Color, bool Inv>
   struct Factor_DstAlpha
   {
     CS_FORCEINLINE
