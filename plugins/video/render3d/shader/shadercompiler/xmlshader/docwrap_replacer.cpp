@@ -31,7 +31,7 @@
 
 //---------------------------------------------------------------------------
 
-CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
 SCF_IMPLEMENT_IBASE_POOLED(csReplacerDocumentNode)
@@ -244,4 +244,4 @@ void csReplacerDocumentNodeFactory::Substitute (const char* in,
 }
 
 }
-CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
+CS_PLUGIN_NAMESPACE_END(XMLShader)

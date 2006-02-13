@@ -23,7 +23,7 @@
 #include "expparser.h"
 #include "tokenhelper.h"
 
-CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
 const char* csExpressionToken::TypeDescription (csExpressionTokenType type)
@@ -480,4 +480,4 @@ const char* csExpressionParser::MatchBrace (
 }
 
 }
-CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
+CS_PLUGIN_NAMESPACE_END(XMLShader)

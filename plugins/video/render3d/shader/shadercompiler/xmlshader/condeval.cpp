@@ -22,7 +22,7 @@
 #include "condeval.h"
 #include "tokenhelper.h"
 
-CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
 csConditionEvaluator::csConditionEvaluator (iStringSet* strings, 
@@ -1607,4 +1607,4 @@ EvaluatorShadervarValues::EvalResult EvaluatorShadervarValues::LogicOr (
 }
 
 }
-CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
+CS_PLUGIN_NAMESPACE_END(XMLShader)

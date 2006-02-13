@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2004 by Frank Richter
-	    (C) 2004 by Jorrit Tyberghein
+  Copyright (C) 2004-2006 by Frank Richter
+	    (C) 2004-2006 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,8 +17,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __DOCWRAP_H__
-#define __DOCWRAP_H__
+#ifndef __CS_DOCWRAP_H__
+#define __CS_DOCWRAP_H__
 
 #include "csutil/csstring.h"
 #include "csutil/documentcommon.h"
@@ -38,7 +38,7 @@
 #include "condeval.h"
 #include "docwrap_replacer.h"
 
-CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
 class csXMLShaderCompiler;
@@ -365,6 +365,6 @@ public:
 };
 
 }
-CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
+CS_PLUGIN_NAMESPACE_END(XMLShader)
 
-#endif // __DOCWRAP_H__
+#endif // __CS_DOCWRAP_H__

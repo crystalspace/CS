@@ -20,6 +20,9 @@ chronological order.
 	  obtained, the condition will not be checked later when a variation
 	  is determined; less conditions to be checked mean less variations of
 	  a shader.
+	- res renamed CS_PLUGIN_PRIVATE_NAMESPACE_* to CS_PLUGIN_NAMESPACE_*,
+	  suggested by Marten.
+	- res did a small bit of reorganization in xmlshader.
 11-Feb-2006
 	- Jorrit fixed a bug in setting a parent on a mesh that was already
 	  in a sector. The bug is fixed by automatically clearing the

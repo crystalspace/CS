@@ -21,7 +21,7 @@
 
 #include "condition.h"
 
-CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
 bool csConditionConstants::AddConstant (const char* name, float value)
@@ -61,4 +61,4 @@ bool csConditionConstants::AddConstant (const char* name, bool value)
 }
 
 }
-CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
+CS_PLUGIN_NAMESPACE_END(XMLShader)

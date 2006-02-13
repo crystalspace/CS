@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2005 by Frank Richter
-	    (C) 2005 by Jorrit Tyberghein
+  Copyright (C) 2005-2006 by Frank Richter
+	    (C) 2005-2006 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -34,7 +34,7 @@
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 
-CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
 class csReplacerDocumentNodeFactory;
@@ -164,6 +164,6 @@ public:
 };
 
 }
-CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
+CS_PLUGIN_NAMESPACE_END(XMLShader)
 
 #endif // __CS_DOCWRAP_REPLACER_H__

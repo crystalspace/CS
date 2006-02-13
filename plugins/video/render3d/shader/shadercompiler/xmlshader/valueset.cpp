@@ -22,7 +22,7 @@
 
 #include "valueset.h"
 
-CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
   bool operator< (const ValueSet::Interval::Side& a, 
@@ -231,4 +231,4 @@ CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
   }
 
 }
-CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
+CS_PLUGIN_NAMESPACE_END(XMLShader)

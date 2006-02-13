@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2004 by Frank Richter
-	    (C) 2004 by Jorrit Tyberghein
+  Copyright (C) 2004-2006 by Frank Richter
+	    (C) 2004-2006 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,8 +17,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CONDEVAL_H__
-#define __CONDEVAL_H__
+#ifndef __CS_CONDEVAL_H__
+#define __CS_CONDEVAL_H__
 
 #include "csutil/array.h"
 #include "csutil/bitarray.h"
@@ -33,7 +33,7 @@
 #include "logic3.h"
 #include "valueset.h"
 
-CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
 /// Container for shader expression constants
@@ -312,6 +312,6 @@ public:
 };
 
 }
-CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
+CS_PLUGIN_NAMESPACE_END(XMLShader)
 
-#endif // __CONDEVAL_H__
+#endif // __CS_CONDEVAL_H__

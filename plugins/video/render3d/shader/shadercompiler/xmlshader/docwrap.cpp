@@ -39,7 +39,7 @@
 #include "tokenhelper.h"
 #include "xmlshader.h"
 
-CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
 void csWrappedDocumentNode::ConditionTree::RecursiveAdd (
@@ -1197,4 +1197,4 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
 }
 
 }
-CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
+CS_PLUGIN_NAMESPACE_END(XMLShader)

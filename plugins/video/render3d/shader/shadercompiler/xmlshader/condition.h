@@ -22,7 +22,7 @@
 
 #include "csutil/strhash.h"
 
-CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
   /**
    * Possible operations for a node in the internal expression
@@ -116,9 +116,9 @@ CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
   };
 
 }
-CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
+CS_PLUGIN_NAMESPACE_END(XMLShader)
 
-#define NS_XMLSHADER  CS_PLUGIN_PRIVATE_NAMESPACE_NAME(XMLShader)
+#define NS_XMLSHADER  CS_PLUGIN_NAMESPACE_NAME(XMLShader)
 
 CS_SPECIALIZE_TEMPLATE
 class csHashComputer<NS_XMLSHADER::CondOperation>

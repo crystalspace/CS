@@ -915,10 +915,9 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
 /**
  * Plugin namespace helpers.
  * To avoid symbol conflicts when employing static linking, it is a good
- * idea to put everything into a namespace. The 
- * CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN and CS_PLUGIN_PRIVATE_NAMESPACE_END
- * help with that by putting the plugin namespace into a sub-namespace for
- * plugins.
+ * idea to put everything into a private namespace. The 
+ * CS_PLUGIN_NAMESPACE_BEGIN and CS_PLUGIN_NAMESPACE_END macros help with 
+ * that by putting the plugin namespace into a sub-namespace for plugins.
  *
  * Use like:
  * \code
@@ -926,22 +925,22 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
  *
  * CS_IMPLEMENT_PLUGIN
  *
- * CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(MyPlugin)
+ * CS_PLUGIN_NAMESPACE_BEGIN(MyPlugin)
  * {
  *   ...
  *   MyClass::MyClass (...) { ... }
  *   ...
  * }
- * CS_PLUGIN_PRIVATE_NAMESPACE_END(MyPlugin)
+ * CS_PLUGIN_NAMESPACE_END(MyPlugin)
  * \endcode
  * To refer to members of the namespace (e.g. for template specializations,
- * use CS_PLUGIN_PRIVATE_NAMESPACE_NAME.
+ * use CS_PLUGIN_NAMESPACE_NAME.
  */
-#define CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(name)                             \
+#define CS_PLUGIN_NAMESPACE_BEGIN(name)                                     \
   namespace CS_NAMESPACE_PACKAGE_NAME { namespace Plugin { namespace name
-#define CS_PLUGIN_PRIVATE_NAMESPACE_END(name)                               \
+#define CS_PLUGIN_NAMESPACE_END(name)                                       \
   } }
-#define CS_PLUGIN_PRIVATE_NAMESPACE_NAME(name)                              \
+#define CS_PLUGIN_NAMESPACE_NAME(name)                                      \
   CS_NAMESPACE_PACKAGE_NAME::Plugin::name
 //@}
 

@@ -20,7 +20,7 @@
 #ifndef __CS_LOGIC3_H__
 #define __CS_LOGIC3_H__
 
-CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
+CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
   /**
    * Three-state logic: False, True, Indeterminate.
@@ -101,6 +101,6 @@ CS_PLUGIN_PRIVATE_NAMESPACE_BEGIN(XMLShader)
   };
 
 }
-CS_PLUGIN_PRIVATE_NAMESPACE_END(XMLShader)
+CS_PLUGIN_NAMESPACE_END(XMLShader)
 
 #endif // __CS_LOGIC3_H__
