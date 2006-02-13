@@ -29,7 +29,7 @@ that is to inherit from @code{csObject} which implements @code{iObject}
 for you. Here is an example on how you can do this easily:
 
 @example
-class MyOwnData : public scfImplementationExt1<MyOwnData, csObject
+class MyOwnData : public scfImplementationExt1<MyOwnData, csObject,
 	scfFakeInterface<MyOwnData> >
 @{
 private:
