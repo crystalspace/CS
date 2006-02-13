@@ -613,7 +613,9 @@ Type &Class::getterFunc ()                                     \
 #endif
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
 extern void* operator new (size_t s, void* filename, int line);
+inline void operator delete (void* p, void*, int) { operator delete (p); }
 extern void* operator new[] (size_t s, void* filename, int line);
+inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
 #define CS_EXTENSIVE_MEMDEBUG_NEW new ((void*)__FILE__, __LINE__)
 #define new CS_EXTENSIVE_MEMDEBUG_NEW
 #endif

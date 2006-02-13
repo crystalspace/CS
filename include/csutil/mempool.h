@@ -116,27 +116,34 @@ public:
 
 /** @{ */
 /**
- * Convenience \c new operator which makes the allocation from a csMemoryPool
- * rather than from the system heap. For instance, if \c pool is a pointer or
- * reference to a csMemoryPool, and you want to allocate an object of type
- * FooBar from the csMemoryPool, then you can do this:
+ * Convenience \c new and delete operators which for allocations from a 
+ * csMemoryPool rather than from the system heap. For instance, if \c pool is 
+ * a pointer or reference to a csMemoryPool, and you want to allocate an 
+ * object of type FooBar from the csMemoryPool, then you can do this:
  * \code
  * FooBar* foobar = new (pool) FooBar;
  * \endcode
- * It is your responsibility to invoke the destructor of the objects you
- * allocate from the csMemoryPool before the csMemoryPool itself is destroyed
- * (since it knows nothing about the objects which you placed into it). For
- * instance, continuing the above example, before destroying \c pool, you
- * should invoke \c foobar's destructor as follows:
+ *
+ * It is your responsibility to delete the objects you allocate from the 
+ * csMemoryPool before the csMemoryPool itself is destroyed(since it knows 
+ * nothing about the objects which you placed into it). For instance, 
+ * continuing the above example, before destroying \c pool, you
+ * should delete \c foobar's destructor as follows:
  * \code
- * foobar->~FooBar();
+ * delete (pool) foobar;
  * // ... it is now safe to destroy `pool' ...
  * \endcode
+ * \remarks Actually, since you cannot reclaim memory from a csMemoryPool,
+ *  the delete operator is a no-op. However, even with a no-op delete,
+ *  the object's destructor will be called; hence, even objects allocated
+ *  from a csMemoryPool should be deleted to ensure a proper cleanup.
  */
 inline void* operator new(size_t n, csMemoryPool& p)
 { return p.Alloc(n); }
 inline void* operator new(size_t n, csMemoryPool* p)
 { return p->Alloc(n); }
+inline void operator delete(void* /*n*/, csMemoryPool& /*p*/) { }
+inline void operator delete(void* /*n*/, csMemoryPool* /*p*/) { }
 /** @} */
 
 /** @} */

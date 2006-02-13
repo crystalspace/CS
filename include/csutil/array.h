@@ -358,14 +358,14 @@ private:
     {
       root = MemoryAllocator::Alloc (n);
 #ifdef CS_MEMORY_TRACKER
-      UpdateMti (n, n);
+      UpdateMti (int (n), int (n));
 #endif
     }
     else
     {
       root = MemoryAllocator::Realloc (root, count, capacity, n);
 #ifdef CS_MEMORY_TRACKER
-      UpdateMti (n-capacity, n);
+      UpdateMti (int (n-capacity), int (n));
 #endif
     }
     capacity = n;
@@ -430,7 +430,7 @@ public:
     {
       root = MemoryAllocator::Alloc (capacity);
 #ifdef CS_MEMORY_TRACKER
-      UpdateMti (capacity, capacity);
+      UpdateMti (int (capacity), int (capacity));
 #endif
     }
     else
@@ -832,7 +832,7 @@ public:
         ElementHandler::Destroy (root + i);
       MemoryAllocator::Free (root);
 #     ifdef CS_MEMORY_TRACKER
-      UpdateMti (-capacity, 0);
+      UpdateMti (-int (capacity), 0);
 #     endif
       root = 0;
       capacity = count = 0;
@@ -922,7 +922,7 @@ public:
     {
       root = MemoryAllocator::Realloc (root, count, capacity, count);
 #ifdef CS_MEMORY_TRACKER
-      UpdateMti (count-capacity, count);
+      UpdateMti (int (count-capacity), int (count));
 #endif
       capacity = count;
     }
