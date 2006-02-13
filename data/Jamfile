@@ -13,7 +13,6 @@ InstallData
   : data ;
 
 maps =
-  flarge
   isomap
   parallaxtest
   particles
@@ -33,5 +32,6 @@ SubInclude TOP data aws ;
 SubInclude TOP data ceguitest ;
 SubInclude TOP data config ;
 SubInclude TOP data cube ;
+SubInclude TOP data flarge ;
 SubInclude TOP data shader ;
 SubInclude TOP data varia ;
