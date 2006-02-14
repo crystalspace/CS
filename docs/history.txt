@@ -10,6 +10,10 @@ chronological order.
 	- Jorrit fixed compile errors in simpleformer.
 	- res added a csFinite() function to wrap the platform-dependent
 	  way to check for the finiteness of a floating point value.
+	- res worked around an issue in xmlshader where the condition 
+	  result check failed to work (ultimatively leading to consumption of
+	  huge amounts of memory). The issue was caused by gcc apparently
+	  performing an unexpected cast.
 13-Feb-2006
 	- Marten started cleaning up the namespace mess. Not finished yet.
 	- res tweaked the softrenderer & softshader to more appropriately use 

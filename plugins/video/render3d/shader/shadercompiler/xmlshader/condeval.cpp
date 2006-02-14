@@ -903,8 +903,9 @@ typename_qualifier Evaluator::EvalResult csConditionEvaluator::Evaluate (
 	else if (OpTypesCompatible (op->left.type, operandBoolean) 
 	  && OpTypesCompatible (op->right.type, operandBoolean))
 	{
-	  result = eval.Boolean (op->left)
-	    == eval.Boolean (op->right);
+	  EvBool b1 (eval.Boolean (op->left));
+	  EvBool b2 (eval.Boolean (op->right));
+	  result = b1 == b2;
 	}
 	else
 	{
@@ -936,8 +937,9 @@ typename_qualifier Evaluator::EvalResult csConditionEvaluator::Evaluate (
 	else if (OpTypesCompatible (op->left.type, operandBoolean) 
 	  && OpTypesCompatible (op->right.type, operandBoolean))
 	{
-	  result = eval.Boolean (op->left)
-	    != eval.Boolean (op->right);
+	  EvBool b1 (eval.Boolean (op->left));
+	  EvBool b2 (eval.Boolean (op->right));
+	  result = b1 != b2;
 	}
 	else
 	{
