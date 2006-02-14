@@ -488,6 +488,8 @@ bool csSimpleFormer::SampleFloat (csStringID type, float x, float z,
     {
       if (floatmaps[i].type == type)
       {
+        size_t width = floatmaps[i].width;
+        size_t height = floatmaps[i].height;
         // Transform input coordinates to heightmap space.
         // See CachePositions for details
         x = ((x-offset.x)/scale.x+1)*(width/2);
@@ -532,6 +534,8 @@ bool csSimpleFormer::SampleInteger (csStringID type, float x, float z,
   {
     if (intmaps[i].type == type)
     {
+      size_t width = intmaps[i].width;
+      size_t height = intmaps[i].height;
       // Transform input coordinates to heightmap space.
       // See CachePositions for details
       x = ((x-offset.x)/scale.x+1)*(width/2);
