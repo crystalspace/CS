@@ -1999,6 +1999,7 @@ CS_SYS_PLUGIN_MAIN
 
 #------------------------------------------------------------------------------
 # Check for sizeof(long) to determine whether the platform is 32 or 64 bit.
+# Also needed by the PRIx99 macros provided by CS.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_LONG_BITS],
     [AC_CHECK_SIZEOF([long])
@@ -2008,6 +2009,7 @@ AC_DEFUN([CS_CHECK_LONG_BITS],
 CS_CHECK_LONG_BITS
 CS_HEADER_PROPERTY([CS_PROCESSOR_SIZE], [$cs_long_bits])
 CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSORSIZE], [$cs_long_bits])
+CS_HEADER_PROPERTY([CS_LONG_SIZE], [$ac_cv_sizeof_long])
 
 
 
@@ -2110,14 +2112,6 @@ CS_CHECK_BUILD([for PRIx99 macros], [cs_cv_c_format_macros],
 	]],
         [char const* s = "widget %" PRIu32 " toggled";])],
     [], [], [CS_HEADER_PROPERTY([CS_HAVE_C_FORMAT_MACROS])])
-
-
-
-#------------------------------------------------------------------------------
-# Check the size of long.  Needed by the PRIx99 macros provided by CS
-#------------------------------------------------------------------------------
-AC_CHECK_SIZEOF([long])
-CS_HEADER_PROPERTY([CS_LONG_SIZE], [$ac_cv_sizeof_long])
 
 
 
@@ -2387,6 +2381,27 @@ AC_DEFUN([CS_CHECK_QSQRT],
 CS_CHECK_QSQRT
 AS_IF([test $cs_cv_cxx_qsqrt_ok = no],
     [CS_HEADER_PROPERTY([CS_NO_QSQRT])])
+
+
+
+#------------------------------------------------------------------------------
+# Check how to determine whether a floating point value is finite.
+#------------------------------------------------------------------------------
+# CS_CHECK_FINITE(FUNCTION)
+AC_DEFUN([CS_CHECK_FINITE],
+    [CS_CHECK_BUILD([for $1], [cs_cv_func_$1],
+	[AC_LANG_PROGRAM(
+	    [[#if HAVE_MATH_H
+	    #include <math.h>
+	    #endif]],
+	    [float f; $1(f)])],
+	[], [], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_$1]))], [], [],
+	[$cs_cv_prog_cxx_enable_pedantic])])
+
+CS_CHECK_FINITE([isfinite])
+CS_CHECK_FINITE([finitef])
+CS_CHECK_FINITE([finite])
+CS_CHECK_FINITE([_finite])
 
 
 

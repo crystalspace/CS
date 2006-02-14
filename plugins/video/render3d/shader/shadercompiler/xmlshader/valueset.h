@@ -22,6 +22,7 @@
 
 #include <limits>
 #include "csutil/array.h"
+#include "csgeom/math.h"
 
 #include "logic3.h"
 
@@ -57,7 +58,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           inclusive (inclusive), value (v) {}
       
         void FlipInclusive()
-        { if (_finite (value)) inclusive = !inclusive; }
+        { if (csFinite (value)) inclusive = !inclusive; }
 
         friend bool operator== (const Side& a, const Side& b)
         {

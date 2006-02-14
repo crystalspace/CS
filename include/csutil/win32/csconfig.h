@@ -93,8 +93,10 @@
 #define PRIX64 "I64X"
 #endif
 
-//#define CS_REF_TRACKER
-//#define CS_MEMORY_TRACKER
+// MSVC has only _finite
+#if defined(CS_COMPILER_MSVC)
+#define CS_HAVE__FINITE
+#endif
 
 // --- Stuff that needs to go before *any* inclusion of VC standard headers:
 

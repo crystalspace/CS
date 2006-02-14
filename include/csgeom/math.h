@@ -86,6 +86,38 @@ T csSquare (const T& x)
   return x * x;
 }
 
+//@{
+/**
+ * Checks if a floating point value is finite.
+ */
+CS_FORCEINLINE bool csFinite (float f)
+{
+#if defined(CS_HAVE_ISFINITE)
+  return isfinite (f);
+#elif defined (CS_HAVE_FINITEF)
+  return finitef (f);
+#elif defined (CS_HAVE_FINITE)
+  return finite (f);
+#elif defined (CS_HAVE__FINITE)
+  return _finite (f);
+#else
+#error Your platform has no finite()-alike function!
+#endif
+}
+CS_FORCEINLINE bool csFinite (double d)
+{
+#if defined(CS_HAVE_ISFINITE)
+  return isfinite (d);
+#elif defined (CS_HAVE_FINITE)
+  return finite (d);
+#elif defined (CS_HAVE__FINITE)
+  return _finite (d);
+#else
+#error Your platform has no finite()-alike function!
+#endif
+}
+//@}
+
 /** @} */
 
 #endif //__CS_MATH_H__

@@ -117,7 +117,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       Interval::Side newR = borders[i+1];
       newR.FlipInclusive();
 
-      if (!((newL == newR) && (!_finite (newL.value))))
+      if (!((newL == newR) && (!csFinite (newL.value))))
         newSet.intervals.Push (Interval (newL, newR));
 
       i += 2;

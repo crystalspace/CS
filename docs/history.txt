@@ -8,6 +8,8 @@ chronological order.
 
 14-Feb-2006
 	- Jorrit fixed compile errors in simpleformer.
+	- res added a csFinite() function to wrap the platform-dependent
+	  way to check for the finiteness of a floating point value.
 13-Feb-2006
 	- Marten started cleaning up the namespace mess. Not finished yet.
 	- res tweaked the softrenderer & softshader to more appropriately use 
