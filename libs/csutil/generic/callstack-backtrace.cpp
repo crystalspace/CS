@@ -25,7 +25,7 @@
 
 #include <execinfo.h>
 
-namespace CrystalSpace
+namespace CS
 {
 namespace Debug
 {
@@ -65,7 +65,7 @@ bool CallStackNameResolverBacktrace::GetAddressSymbol (void* addr,
         csString tmp;
         sym.SubString (tmp, symStart, symEnd - symStart);
         // ...and replace with the demangled one
-        CrystalSpace::Debug::Demangle (tmp, tmp);
+        Demangle (tmp, tmp);
         sym.DeleteAt (symStart, symEnd - symStart);
         sym.Insert (symStart, tmp);
       }
@@ -94,5 +94,5 @@ bool CallStackNameResolverBacktrace::GetLineNumber (void*, csString&)
 }
 
 } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS
 

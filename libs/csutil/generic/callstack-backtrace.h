@@ -22,7 +22,7 @@
 
 #include "../callstack.h"
 
-namespace CrystalSpace
+namespace CS
 {
 namespace Debug
 {
@@ -45,6 +45,6 @@ class CallStackNameResolverBacktrace : public iCallStackNameResolver
 };
 
 } // namespace Debug
-} // namespace CrystalSpace
+} // namespace CS
 
 #endif // __CS_CSUTIL_GENERIC_CALLSTACK_BACKTRACE_H__
