@@ -1192,9 +1192,11 @@ struct JanusValueSet
     falseVals (&falseVals) {}
   JanusValueSet (float f);
 
+  // @@@ FIXME: probably cleaner to not (ab)use operators...
   friend Logic3 operator== (JanusValueSet& a, JanusValueSet& b)
   {
-    if (*a.startVals == *b.startVals)
+    if ((a.startVals->IsSingleValue() && b.startVals->IsSingleValue())
+      && (a.startVals->GetSingleValue() == b.startVals->GetSingleValue()))
     {
       *a.trueVals = *b.trueVals = *a.startVals;
       *a.falseVals = *b.falseVals = !*a.startVals;

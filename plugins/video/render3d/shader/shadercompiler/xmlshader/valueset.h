@@ -48,14 +48,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       {
       public:
         bool inclusive;
-	    float value;
+	float value;
       
-	    Side (bool negInf, bool inclusive) : 
-          inclusive (inclusive), 
+	Side (bool negInf, bool inclusive) : inclusive (inclusive), 
           value (negInf ? -std::numeric_limits<float>::infinity()
                         : std::numeric_limits<float>::infinity()) {}
-	    Side (float v, bool inclusive) : 
-          inclusive (inclusive), value (v) {}
+	Side (float v, bool inclusive) : inclusive (inclusive), value (v) {}
       
         void FlipInclusive()
         { if (csFinite (value)) inclusive = !inclusive; }
@@ -91,6 +89,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
       bool Overlaps (const Interval& other) const;
       bool IsEmpty() const;
+      bool IsSingleValue() const
+      {
+        return ((left == right) && csFinite (left.value));
+      }
 
       friend bool operator== (const Interval& a, const Interval& b)
       {
@@ -127,6 +129,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     Interval::Side GetMin() const;
     Interval::Side GetMax() const;
+
+    bool IsSingleValue() const
+    {
+      return ((intervals.GetSize() == 1)
+        && intervals[0].IsSingleValue());
+    }
+    float GetSingleValue() const
+    {
+      return intervals[0].left.value;
+    }
 
     ValueSet operator!() const;
     friend ValueSet operator& (const ValueSet& a, const ValueSet& b)

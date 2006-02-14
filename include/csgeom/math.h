@@ -99,7 +99,7 @@ CS_FORCEINLINE bool csFinite (float f)
 #elif defined (CS_HAVE_FINITE)
   return finite (f);
 #elif defined (CS_HAVE__FINITE)
-  return _finite (f);
+  return _finite (f) != 0;
 #else
 #error Your platform has no finite()-alike function!
 #endif
@@ -111,7 +111,7 @@ CS_FORCEINLINE bool csFinite (double d)
 #elif defined (CS_HAVE_FINITE)
   return finite (d);
 #elif defined (CS_HAVE__FINITE)
-  return _finite (d);
+  return _finite (d) != 0;
 #else
 #error Your platform has no finite()-alike function!
 #endif

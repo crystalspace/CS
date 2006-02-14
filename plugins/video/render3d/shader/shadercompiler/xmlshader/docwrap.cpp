@@ -823,7 +823,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      csArray<csString> params;
 	      if (space != 0)
 	      {
-		csString pStr (space + 1, valLen - cmdLen);
+		csString pStr (space + 1, valLen - cmdLen - 1);
 		ParseTemplateArguments (pStr, params);
 	      }
 	      if (!InvokeTemplate (tokenStr, node, state, params))

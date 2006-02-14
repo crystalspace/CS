@@ -16,6 +16,7 @@ chronological order.
 	  result check failed to work (ultimatively leading to consumption of
 	  huge amounts of memory). The issue was caused by gcc apparently
 	  performing an unexpected cast.
+	- res made a condition check in xmlshader sharper.
 13-Feb-2006
 	- Marten started cleaning up the namespace mess. Not finished yet.
 	- res tweaked the softrenderer & softshader to more appropriately use 
