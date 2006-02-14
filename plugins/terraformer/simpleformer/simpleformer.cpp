@@ -181,7 +181,6 @@ bool csSimpleFormer::SetIntegerMap (csStringID type, iImage* map,
 {
   // First check if we already have an intmap of this type.
   size_t intmap_idx = (size_t)~0;
-  size_t i = 0;
   for(size_t i = 0; i < intmaps.Length(); i++)
   {
     if (intmaps[i].type == type)
@@ -339,8 +338,8 @@ void csSimpleFormer::SetHeightmap (float* data, unsigned int width,
 
   csFloatMap& floatmap = floatmaps[heightmap_idx];
   floatmap.type = stringHeights;
-  csSimpleFormer::height = (unsigned int)floatmap.height = height;
-  csSimpleFormer::width = (unsigned int)floatmap.width = width;
+  csSimpleFormer::height = floatmap.height = height;
+  csSimpleFormer::width = floatmap.width = width;
 
   delete [] floatmap.data;
   floatmap.data = new float[width*height];
@@ -366,8 +365,8 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
 
   csFloatMap& floatmap = floatmaps[heightmap_idx];
   floatmap.type = stringHeights;
-  height = (unsigned int)floatmap.height = heightmap->GetHeight ();
-  width = (unsigned int)floatmap.width = heightmap->GetWidth ();
+  height = floatmap.height = heightmap->GetHeight ();
+  width = floatmap.width = heightmap->GetWidth ();
   
   // Allocate data
   delete[] floatmap.data;
