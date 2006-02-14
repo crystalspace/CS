@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-Feb-2006
+	- Piotr Obrzut fixes bugs he left after adding support for different 
+	  sized maps in simple terraformer.
 	- Jorrit fixed compile errors in simpleformer.
 	- res added a csFinite() function to wrap the platform-dependent
 	  way to check for the finiteness of a floating point value.
