@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Feb-2006
+	- Erroroman added support for 'checkelementcount' option in genmesh 
+	  factory loader (omits a warning when the element count of a 
+	  custom buffer does not match the vertex count)
 14-Feb-2006
 	- Piotr Obrzut fixes bugs he left after adding support for different 
 	  sized maps in simple terraformer.

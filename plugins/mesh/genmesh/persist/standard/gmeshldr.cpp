@@ -260,8 +260,19 @@ bool csGeneralFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
   csRef<iRenderBuffer> buf = synldr->ParseRenderBuffer (node);
   if (!buf.IsValid()) return false;
 
+  bool checkElementCount = true;
+  {
+    const char* check = node->GetAttributeValue("checkelementcount");
+    if (check && *check)
+    {
+      checkElementCount = ((strcmp (check, "no") != 0)
+			  && (strcmp (check, "false") != 0)
+			  && (strcmp (check, "off") != 0));
+    }
+  }
+
   size_t rbElem = buf->GetElementCount();
-  if ((size_t)state->GetVertexCount() != rbElem)
+  if (checkElementCount && ((size_t)state->GetVertexCount() != rbElem))
   {
     synldr->ReportError ("crystalspace.genmeshfactoryloader.parse",
       node, "Render buffer vertex count(%zu) different from "
