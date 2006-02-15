@@ -61,7 +61,7 @@ public:
   /**
    * Get the last generated ranks array.
    */
-  inline size_t* GetRanks() const
+  inline uint32* GetRanks() const
   {
     return ranks1;
   }
@@ -139,8 +139,8 @@ private:
   bool DoPass(size_t pass, T* data, size_t size, uint32* histogram);
 
   size_t currentSize;
-  size_t* ranks1;
-  size_t* ranks2;
+  uint32* ranks1;
+  uint32* ranks2;
 
   bool ranksValid;
 };

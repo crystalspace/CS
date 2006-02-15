@@ -163,7 +163,7 @@ void csRadixSorter::Sort (uint32* array, size_t size)
   //1024 entries in the histogram (4kb in total)
   uint32 histogram[256*4];
   //Link-table. Used to avoid one extra-level of indirection on offset calculation
-  size_t* links[256];
+  uint32* links[256];
 
   //Create histograms in a single pass over the data
   if(CreateHistogram(array, size, histogram))
@@ -239,7 +239,7 @@ void csRadixSorter::Sort (int32* array, size_t size)
   //1024 entries in the histogram (4kb in total)
   uint32 histogram[256*4];
   //Link-table. Used to avoid one extra-level of indirection on offset calculation
-  size_t* links[256];
+  uint32* links[256];
 
   //Create histograms in a single pass over the data
   if(CreateHistogram(array, size, histogram))
@@ -346,7 +346,7 @@ void csRadixSorter::Sort (float* array, size_t size)
   //1024 entries in the histogram (4kb in total)
   uint32 histogram[256*4];
   //Link-table. Used to avoid one extra-level of indirection on offset calculation
-  size_t* links[256];
+  uint32* links[256];
 
   //Create histograms in a single pass over the data
   if(CreateHistogram(array, size, histogram))

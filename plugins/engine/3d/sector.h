@@ -40,6 +40,7 @@
 #include "ivideo/shader/shader.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/meshobj.h"
+#include "plugins/engine/3d/meshgen.h"
 
 class csEngine;
 class csProgressPulse;
@@ -263,7 +264,7 @@ public:
   }
   iMeshGenerator* GetMeshGenerator (size_t idx)
   {
-    return (iMeshGenerator*)meshGenerators[idx];
+    return (iMeshGenerator*)(csMeshGenerator*)meshGenerators[idx];
   }
   iMeshGenerator* GetMeshGeneratorByName (const char* name);
   void RemoveMeshGenerator (size_t idx);

@@ -11,6 +11,10 @@ chronological order.
 	  factory loader (omits a warning when the element count of a 
 	  custom buffer does not match the vertex count).
 	- res fixed csFinite() compilation on MinGW with -ansi -pedantic.
+	- Jorrit fixed a bug in csSector and meshgen. It was casting
+	  csMeshGenerator to iMeshGenerator without even knowing the
+	  right inheritance structure. This caused meshgen's to not
+	  destruct properly (i.e. crash).
 14-Feb-2006
 	- Piotr Obrzut fixes bugs he left after adding support for different 
 	  sized maps in simple terraformer.
@@ -21,6 +25,7 @@ chronological order.
 	  result check failed to work (ultimatively leading to consumption of
 	  huge amounts of memory). The issue was caused by gcc apparently
 	  performing an unexpected cast.
+	- Jorrit fixed compilation of radixsort on 64-bit.
 	- res made a condition check in xmlshader sharper.
 	- iceeey moved the projection pass into snippets/projection-pass.inc.
 	- iceeey added projection support to parallax.
