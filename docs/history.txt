@@ -9,7 +9,8 @@ chronological order.
 15-Feb-2006
 	- Erroroman added support for 'checkelementcount' option in genmesh 
 	  factory loader (omits a warning when the element count of a 
-	  custom buffer does not match the vertex count)
+	  custom buffer does not match the vertex count).
+	- res fixed csFinite() compilation on MinGW with -ansi -pedantic.
 14-Feb-2006
 	- Piotr Obrzut fixes bugs he left after adding support for different 
 	  sized maps in simple terraformer.

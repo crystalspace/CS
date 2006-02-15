@@ -195,6 +195,7 @@ CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 #------------------------------------------------------------------------------
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([cmath], [CS_HEADER_PROPERTY([CS_HAVE_CMATH_H])])
+AC_CHECK_HEADERS([math.h], [CS_HEADER_PROPERTY([CS_HAVE_MATH_H])])
 AC_LANG_POP([C++])
 
 AC_DEFUN([CS_CHECK_COMMON_LIBS],
@@ -2391,13 +2392,27 @@ AS_IF([test $cs_cv_cxx_qsqrt_ok = no],
 AC_DEFUN([CS_CHECK_FINITE],
     [CS_CHECK_BUILD([for $1], [cs_cv_func_$1],
 	[AC_LANG_PROGRAM(
-	    [[#if HAVE_MATH_H
+	    [[#if HAVE_CMATH
+	    #include <cmath>
+	    #endif
+	    #if HAVE_MATH_H
 	    #include <math.h>
 	    #endif]],
 	    [float f; $1(f)])],
-	[], [], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_$1]))], [], [],
+	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_$1]))], [], [],
 	[$cs_cv_prog_cxx_enable_pedantic])])
 
+CS_CHECK_BUILD([for std::isfinite], [cs_cv_func_std__isfinite],
+    [AC_LANG_PROGRAM(
+	[[#if HAVE_CMATH
+	#include <cmath>
+	#endif
+	#if HAVE_MATH_H
+	#include <math.h>
+	#endif]],
+	[float f; std::isfinite(f)])],
+    [], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_STD__ISFINITE]))], [], [],
+    [$cs_cv_prog_cxx_enable_pedantic])
 CS_CHECK_FINITE([isfinite])
 CS_CHECK_FINITE([finitef])
 CS_CHECK_FINITE([finite])

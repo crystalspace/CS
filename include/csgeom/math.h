@@ -92,28 +92,32 @@ T csSquare (const T& x)
  */
 CS_FORCEINLINE bool csFinite (float f)
 {
-#if defined(CS_HAVE_ISFINITE)
-  return isfinite (f);
-#elif defined (CS_HAVE_FINITEF)
+#if defined (CS_HAVE_FINITEF)
   return finitef (f);
+#elif defined (CS_HAVE_STD__ISFINITE)
+  return std::isfinite (f);
+#elif defined(CS_HAVE_ISFINITE)
+  return isfinite (f);
 #elif defined (CS_HAVE_FINITE)
   return finite (f);
 #elif defined (CS_HAVE__FINITE)
   return _finite (f) != 0;
 #else
-#error Your platform has no finite()-alike function!
+#error Your platform has no isfinite()-alike function!
 #endif
 }
 CS_FORCEINLINE bool csFinite (double d)
 {
-#if defined(CS_HAVE_ISFINITE)
+#if defined (CS_HAVE_STD__ISFINITE)
+  return std::isfinite (d);
+#elif defined(CS_HAVE_ISFINITE)
   return isfinite (d);
 #elif defined (CS_HAVE_FINITE)
   return finite (d);
 #elif defined (CS_HAVE__FINITE)
   return _finite (d) != 0;
 #else
-#error Your platform has no finite()-alike function!
+#error Your platform has no isfinite()-alike function!
 #endif
 }
 //@}
