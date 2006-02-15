@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <shader type="xmlshader" name="parallax">
   <technique priority="150">
+    <?include /shader/snippets/projection-pass.inc ?>
     <pass>
       <mixmode>
-        <add />
+        <destalphaadd />
       </mixmode>
       <buffer source="normal" destination="normal" />
       <buffer source="tangent" destination="texture coordinate 1" />
