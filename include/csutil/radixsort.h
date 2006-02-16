@@ -70,7 +70,7 @@ public:
    * Reorder a list with the ranks in-place
    */
   template<class T>
-  void ReorderInplace(T* source, size_t size)
+  void ReorderInplace (T* source, size_t size)
   {
     if(size*sizeof(T) < 0x4000) //Max out to 16kb
     {
@@ -139,8 +139,8 @@ private:
   bool DoPass(size_t pass, T* data, size_t size, uint32* histogram);
 
   size_t currentSize;
-  uint32* ranks1;
-  uint32* ranks2;
+  size_t* ranks1;
+  size_t* ranks2;
 
   bool ranksValid;
 };

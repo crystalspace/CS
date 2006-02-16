@@ -98,7 +98,7 @@ bool csRadixSorter::CreateHistogram (T* data, size_t size, uint32* histogram)
   else
   {
     // Ranks are valid, use them as a starting-point
-    uint32* indices = ranks1;
+    size_t* indices = ranks1;
     T prevVal = data[*indices];
 
     while(d != dend)
@@ -163,7 +163,7 @@ void csRadixSorter::Sort (uint32* array, size_t size)
   //1024 entries in the histogram (4kb in total)
   uint32 histogram[256*4];
   //Link-table. Used to avoid one extra-level of indirection on offset calculation
-  uint32* links[256];
+  size_t* links[256];
 
   //Create histograms in a single pass over the data
   if(CreateHistogram(array, size, histogram))
@@ -181,7 +181,7 @@ void csRadixSorter::Sort (uint32* array, size_t size)
   // Radix-sort. 4 passes at most
   for(size_t pass = 0; pass < 4; pass++)
   {
-    if(DoPass(pass, array, size, histogram))
+    if (DoPass (pass, array, size, histogram))
     {
       // Only have to deal with positives here
       links[0] = ranks2;
@@ -208,16 +208,16 @@ void csRadixSorter::Sort (uint32* array, size_t size)
       }
       else
       {
-        uint32* indices = ranks1;
-        uint32* indicesEnd = ranks1+size;
+        size_t* indices = ranks1;
+        size_t* indicesEnd = ranks1+size;
         while(indices != indicesEnd)
         {
-          uint32 id = *indices++;
+          size_t id = *indices++;
           *links[inputBytes[id<<2]]++ = id;
         }
       }
       // Swap for next pass
-      uint32* t = ranks1; ranks1 = ranks2; ranks2 = t;
+      size_t* t = ranks1; ranks1 = ranks2; ranks2 = t;
     }
   }
 }
@@ -239,7 +239,7 @@ void csRadixSorter::Sort (int32* array, size_t size)
   //1024 entries in the histogram (4kb in total)
   uint32 histogram[256*4];
   //Link-table. Used to avoid one extra-level of indirection on offset calculation
-  uint32* links[256];
+  size_t* links[256];
 
   //Create histograms in a single pass over the data
   if(CreateHistogram(array, size, histogram))
@@ -346,7 +346,7 @@ void csRadixSorter::Sort (float* array, size_t size)
   //1024 entries in the histogram (4kb in total)
   uint32 histogram[256*4];
   //Link-table. Used to avoid one extra-level of indirection on offset calculation
-  uint32* links[256];
+  size_t* links[256];
 
   //Create histograms in a single pass over the data
   if(CreateHistogram(array, size, histogram))
