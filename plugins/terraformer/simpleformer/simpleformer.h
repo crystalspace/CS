@@ -22,6 +22,7 @@
 
 #include "csgeom/box.h"
 #include "csgeom/vector3.h"
+#include "csutil/scf_implementation.h"
 
 #include "iutil/comp.h"
 #include "ivaria/simpleformer.h"
@@ -29,12 +30,15 @@
 
 struct iObjectRegistry;
 
+CS_PLUGIN_NAMESPACE_BEGIN(Simpleformer)
+{
+
 class csSimpleSampler;
 
 struct csIntMap
 {
-  size_t width;
-  size_t height;
+  uint width;
+  uint height;
   csStringID type;
   int* data;
   csIntMap () : data (0) { }
@@ -43,8 +47,8 @@ struct csIntMap
 
 struct csFloatMap
 {
-  size_t width;
-  size_t height;
+  uint width;
+  uint height;
   csStringID type;
   float* data;
   csFloatMap () : data (0) { }
@@ -55,7 +59,11 @@ struct csFloatMap
  * This is a simple implementation of a terraformer plugin.
  * It only handles a single heightmap
  */
-class csSimpleFormer : public iTerraFormer
+class csSimpleFormer : 
+  public scfImplementation3<csSimpleFormer, 
+                            iTerraFormer, 
+                            iSimpleFormerState,
+                            iComponent>
 {
 private:
   /// Object registry pointer (not csRef to avoid cyclic references)
@@ -99,8 +107,6 @@ private:
   friend class csSimpleSampler;
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// csSimpleFormer constructor
   csSimpleFormer (iBase* parent);
 
@@ -124,39 +130,6 @@ public:
   bool SetIntegerMap (csStringID type, iImage* map, int scale, int offset);
   /// Set additional float map.
   bool SetFloatMap (csStringID type, iImage* map, float scale, float offset);
-
-  // Relays calls to the actual class
-  struct SimpleFormerState : public iSimpleFormerState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSimpleFormer);
-    virtual void SetHeightmap (iImage *heightmap)
-    {
-      scfParent->SetHeightmap (heightmap);
-    }
-    virtual void SetHeightmap (float* data, unsigned int width,
-			       unsigned int height)
-    {
-      scfParent->SetHeightmap (data, width, height);
-    }
-    virtual void SetScale (csVector3 scale)
-    {
-      scfParent->SetScale (scale);
-    }
-    virtual void SetOffset (csVector3 offset)
-    {
-      scfParent->SetOffset (offset);
-    }
-    virtual bool SetIntegerMap (csStringID type, iImage* map, int scale = 1,
-  	int offset = 0)
-    {
-      return scfParent->SetIntegerMap (type, map, scale, offset);
-    }
-    virtual bool SetFloatMap (csStringID type, iImage* map, float scale = 1.0,
-  	float offset = 0.0)
-    {
-      return scfParent->SetFloatMap (type, map, scale, offset);
-    }
-  } scfiSimpleFormerState;
 
 
   // ------------ iTerraFormer implementation ------------
@@ -200,23 +173,14 @@ public:
 
   /// Initializes this object
   bool Initialize (iObjectRegistry* objectRegistry);
-
-  // Relays initialize call to the actual class
-  struct Component : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSimpleFormer);
-    virtual bool Initialize (iObjectRegistry* objectRegistry)
-    {
-      return scfParent->Initialize (objectRegistry);
-    }
-  } scfiComponent;
 };
 
 /**
  * This is the accompanying sampler implementation, that pretty much just
  * returns data straight from the heightmap.
  */
-class csSimpleSampler : public iTerraSampler
+class csSimpleSampler : public scfImplementation1<csSimpleSampler, 
+                                                  iTerraSampler>
 {
 private:
   /// Pointer to the terraformer object
@@ -261,8 +225,6 @@ private:
   void CacheTexCoords ();
 
 public:
-  SCF_DECLARE_IBASE;
-
   // ------------ iTerraSampler implementation -----------
 
   /// csSimpleSampler constructor
@@ -316,5 +278,8 @@ public:
   /// Deletes all cached data
   virtual void Cleanup (); 
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Simpleformer)
 
 #endif // __CS_SIMPLEFORMER_H__

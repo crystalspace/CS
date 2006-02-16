@@ -30,14 +30,14 @@ struct iImage;
 
 class csVector3;
 
-SCF_VERSION (iSimpleFormerState, 0, 0, 2);
-
 /**
  * iSimpleFormerState exposes implementation specific methods
  * for the SimpleTerraformer plugin
  */
-struct iSimpleFormerState : public iBase
+struct iSimpleFormerState : public virtual iBase
 {
+  SCF_INTERFACE (iSimpleFormerState, 1, 0, 0);
+ 
   /**
    * Set a heightmap to be used. The heightmap will by default be
    * covering a region from -1..1 along X and Z, and areas outside

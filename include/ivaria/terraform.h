@@ -33,14 +33,14 @@ class csBox2;
 class csVector2;
 class csVector3;
 
-SCF_VERSION (iTerraFormer, 0, 0, 1);
-
 /**
  * TerraFormer objects are used to retrieve terrain data.
  * All data is retrieved in blocks, from sampler regions.
  */
-struct iTerraFormer : public iBase
+struct iTerraFormer : public virtual iBase
 {
+  SCF_INTERFACE (iTerraFormer, 1, 0, 0);
+
   /**
    * Get a sampler region from the terraformer. The sampler region will
    * be used for all actual data retrieval.
@@ -86,15 +86,15 @@ struct iTerraFormer : public iBase
 };
 
 
-SCF_VERSION (iTerraSampler, 0, 0, 1);
-
 /**
  * TerraSampler objects are used for the actual queries of terrain data
  * Sampler regions are requested from the iTerraFormer plugin, and sampled
  * for data via the Sample methods.
  */
-struct iTerraSampler : public iBase
+struct iTerraSampler : public virtual iBase
 {
+  SCF_INTERFACE (iTerraSampler, 1, 0, 0);
+
   /**
    * Sample float data of the specified from the region. Data is sampled in 
    * a grid (regular or irregular) with the square resolution specified when 

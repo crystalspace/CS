@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 
+#include "csgeom/math.h"
 #include "csgfx/rgbpixel.h"
 
 #include "igraphic/image.h"
@@ -29,22 +30,22 @@
 
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(Simpleformer)
+{
+
 //////////////////////////////////////////////////////////////////////////
 //                           Filtering helpers
 //////////////////////////////////////////////////////////////////////////
 
 // Looks up height with bilinear interpolation
-float BiLinearData (float* data, int width, int height, float x, float z)
+static float BiLinearData (float* data, uint width, uint height, float x, float z)
 {
-  // Calculate surrounding integer indices
-  int lowX = (int) floor (x), lowZ = (int) floor (z);
-  int highX = (int) ceil (x), highZ = (int) ceil (z);
-
-  // Clamp coordinates to heightmap size
-  lowX = MAX (MIN (lowX, width-1), 0);
-  highX = MAX (MIN (highX, width-1), 0);
-  lowZ = MAX (MIN (lowZ, height-1), 0);
-  highZ = MAX (MIN (highZ, height-1), 0);
+  // Calculate surrounding integer indices,
+  // clamp to heightmap size
+  uint lowX = csMin (uint (floor (csMax (x, 0.0f))), width-1);
+  uint lowZ = csMin (uint (floor (csMax (z, 0.0f))), width-1);
+  uint highX = csMin (uint (ceil (csMax (x, 0.0f))), height-1);
+  uint highZ = csMin (uint (ceil (csMax (z, 0.0f))), height-1);
 
   // Grab height data at the four points
   float height1 = 0, height2 = 0, height3 = 0, height4 = 0;
@@ -71,7 +72,7 @@ static float WeightFunction (float x)
 }
 
 // Looks up height with bicubic interpolation
-float BiCubicData (float* data, int width, int height, float x, float z)
+static float BiCubicData (float* data, int width, int height, float x, float z)
 {
   float result = 0;
 
@@ -138,42 +139,16 @@ float BiCubicData (float* data, int width, int height, float x, float z)
 //                             csSimpleFormer
 //////////////////////////////////////////////////////////////////////////
 
-SCF_IMPLEMENT_IBASE (csSimpleFormer)
-SCF_IMPLEMENTS_INTERFACE (iTerraFormer)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSimpleFormerState)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSimpleFormer::SimpleFormerState)
-SCF_IMPLEMENTS_INTERFACE (iSimpleFormerState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSimpleFormer::Component)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSimpleFormer)
 
-csSimpleFormer::csSimpleFormer (iBase* parent)
+csSimpleFormer::csSimpleFormer (iBase* parent) : 
+  scfImplementationType (this, parent), objectRegistry (0), scale (1),
+  offset (0)
 {
-  // Construct iBases
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSimpleFormerState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-
-  // Initialize members
-  objectRegistry = 0;
-
-  scale = csVector3 (1);
-  offset = csVector3 (0);
 }
 
 csSimpleFormer::~csSimpleFormer ()
 { 
-  // Destruct iBases
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSimpleFormerState);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csSimpleFormer::SetIntegerMap (csStringID type, iImage* map,
@@ -488,8 +463,8 @@ bool csSimpleFormer::SampleFloat (csStringID type, float x, float z,
     {
       if (floatmaps[i].type == type)
       {
-        size_t width = floatmaps[i].width;
-        size_t height = floatmaps[i].height;
+        uint width = floatmaps[i].width;
+        uint height = floatmaps[i].height;
         // Transform input coordinates to heightmap space.
         // See CachePositions for details
         x = ((x-offset.x)/scale.x+1)*(width/2);
@@ -553,14 +528,10 @@ bool csSimpleFormer::SampleInteger (csStringID type, float x, float z,
 //                            csSimpleSampler
 //////////////////////////////////////////////////////////////////////////
 
-SCF_IMPLEMENT_IBASE (csSimpleSampler)
-SCF_IMPLEMENTS_INTERFACE (iTerraSampler)
-SCF_IMPLEMENT_IBASE_END
-
 csSimpleSampler::csSimpleSampler (csSimpleFormer *terraFormer,
-                                  csBox2 region, unsigned int resolution)
+                                  csBox2 region, unsigned int resolution) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (terraFormer);
   // Initialize members
   csSimpleSampler::terraFormer = terraFormer;
   csSimpleSampler::region = region;
@@ -580,7 +551,6 @@ csSimpleSampler::~csSimpleSampler ()
 {
   // Do a cleanup
   Cleanup ();
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csSimpleSampler::CachePositions ()
@@ -912,3 +882,6 @@ void csSimpleSampler::Cleanup ()
   delete[] edgePositions;
   edgePositions = 0;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(Simpleformer)
