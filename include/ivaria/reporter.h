@@ -69,8 +69,6 @@ struct iReporter;
 #define CS_REPORTER_SEVERITY_DEBUG 4
 /** @} */
 
-SCF_VERSION (iReporterListener, 0, 0, 1);
-
 /**
  * Implement this interface if you're interested in hearing about
  * new messages on the reporter.
@@ -83,8 +81,10 @@ SCF_VERSION (iReporterListener, 0, 0, 1);
  * - iReporter
  *   
  */
-struct iReporterListener : public iBase
+struct iReporterListener : public virtual iBase
 {
+  SCF_INTERFACE (iReporterListener, 1, 0, 0);
+
   /**
    * Something has been reported. If this function returns true
    * then the report is considered handled and the reporter will not

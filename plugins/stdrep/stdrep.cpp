@@ -18,12 +18,14 @@
 
 #include "cssysdef.h"
 #include <string.h>
-#include "stdrep.h"
 #include "csver.h"
-#include "csutil/scf.h"
-#include "csutil/util.h"
-#include "csutil/sysfunc.h"
+
 #include "csutil/event.h"
+#include "csutil/scf.h"
+#include "csutil/stringarray.h"
+#include "csutil/sysfunc.h"
+#include "csutil/util.h"
+
 #include "iutil/cfgmgr.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
@@ -38,29 +40,16 @@
 #include "ivideo/fontserv.h"
 #include "ivideo/natwin.h"
 #include "ivaria/conout.h"
+
+#include "stdrep.h"
   
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(StdRep)
+{
+
 SCF_IMPLEMENT_FACTORY (csReporterListener)
 
-
-SCF_IMPLEMENT_IBASE (csReporterListener::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csReporterListener)
-  SCF_IMPLEMENTS_INTERFACE (iStandardReporterListener)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iReporterListener)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csReporterListener::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csReporterListener::ReporterListener)
-  SCF_IMPLEMENTS_INTERFACE (iReporterListener)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csString csReporterListener::DefaultDebugFilename()
 {
@@ -73,15 +62,12 @@ csString csReporterListener::DefaultDebugFilename()
   return s;
 }
 
-csReporterListener::csReporterListener (iBase *iParent)
+csReporterListener::csReporterListener (iBase *iParent) : 
+  scfImplementationType (this, iParent)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReporterListener);
   mutex = csMutex::Create (true);
   object_reg = 0;
   reporter = 0;
-  scfiEventHandler = 0;
   silent = false;
   append = false;
 
@@ -136,24 +122,19 @@ csReporterListener::~csReporterListener ()
   // DontUseMeAnymoreSincerelyYourReporterOfChoice () which is called by
   // iReporter destructor for all listeners still in the listenerqueue
   //  .. norman
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
   {
     if (rep == reporter)
-      reporter->RemoveReporterListener (&scfiReporterListener);
+      reporter->RemoveReporterListener (this);
   }
 
-  if (scfiEventHandler)
+  if (eventHandler)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      q->RemoveListener (eventHandler);
   }
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiReporterListener);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csReporterListener::Initialize (iObjectRegistry* r)
@@ -161,29 +142,30 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
   object_reg = r;
   SetDefaults ();
 
-  if (!scfiEventHandler)
+  PostProcess = csevPostProcess (object_reg);
+  if (!eventHandler)
   {
-    scfiEventHandler = new EventHandler (this);
+    eventHandler.AttachNew (new EventHandler (this));
   }
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
-    q->RegisterListener (scfiEventHandler, csevPostProcess(object_reg));
+    q->RegisterListener (eventHandler, PostProcess);
   
-  csRef<iConfigManager> cfg(CS_QUERY_REGISTRY (r, iConfigManager));
+  csRef<iConfigManager> cfg(csQueryRegistry<iConfigManager> (r));
   if ( cfg )
   {
     append = cfg->GetBool("Reporter.FileAppend", false );
   }
   
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
-    iCommandLineParser);
+  csRef<iCommandLineParser> cmdline = 
+    csQueryRegistry<iCommandLineParser> (object_reg);
   if (cmdline)
   {
     silent = cmdline->GetOption ("silent") != 0;
     append = cmdline->GetOption ("append") != 0;
   }
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
   {
     bool verbose = verbosemgr->Enabled ("stdrep");
@@ -219,8 +201,8 @@ static const char* consoleSuffix[5] =
   ""
 };
 
-bool csReporterListener::Report (iReporter*, int severity,
-	const char* msgID, const char* description)
+void csReporterListener::WriteLine (int severity, const char* msgID, 
+                                    const char* line)
 {
   bool repeatedID = false;
   if (lastID.Compare (msgID))
@@ -230,9 +212,9 @@ bool csReporterListener::Report (iReporter*, int severity,
 
   csString msg;
   if (show_msgid[severity])
-    msg.Format("%s:  %s\n", msgID, description);
+    msg.Format("%s:  %s\n", msgID, line);
   else
-    msg.Format("%s\n", description);
+    msg.Format("%s\n", line);
 
   if (dest_stdout[severity])
   {
@@ -242,9 +224,9 @@ bool csReporterListener::Report (iReporter*, int severity,
     }
     stdoutTmp << consolePrefix[severity];
     int offset = 0;
-    while (strlen(description+offset)>77)
+    while (strlen(line+offset)>77)
     {
-      csString str (description+offset);
+      csString str (line+offset);
       str.Truncate (77);
       int linebreak = strrchr (str.GetData (), ' ')-str.GetData ();
       if (linebreak>0)
@@ -261,7 +243,7 @@ bool csReporterListener::Report (iReporter*, int severity,
       }
     }
     //csPrintf ("  %s\n", description+offset);
-    stdoutTmp << "  " << description+offset << '\n';
+    stdoutTmp << "  " << line+offset << '\n';
     stdoutTmp << consoleSuffix[severity];
     csPrintf ("%s", stdoutTmp.GetData());
     stdoutTmp.Truncate (0);
@@ -278,7 +260,7 @@ bool csReporterListener::Report (iReporter*, int severity,
   {
     if (!debug_file.IsValid())
     {
-      csRef<iVFS> vfs (CS_QUERY_REGISTRY (object_reg, iVFS));
+      csRef<iVFS> vfs (csQueryRegistry<iVFS> (object_reg));
       if (vfs.IsValid())
       {  
         // If log does not exists then create a new one    
@@ -319,25 +301,34 @@ bool csReporterListener::Report (iReporter*, int severity,
           new csTimedMessage (popmsg.GetData ()));
         messages.Push (tm);
       }
-      popmsg.Format (" %s", description);
+      popmsg.Format (" %s", line);
       csRef<csTimedMessage> tm = csPtr<csTimedMessage> (
     	  new csTimedMessage (popmsg.GetData ()));
       messages.Push (tm);
     }
   }
+}
+
+bool csReporterListener::Report (iReporter*, int severity,
+	const char* msgID, const char* description)
+{
+  csStringArray lines;
+  size_t n = lines.SplitString (description, "\r\n", csStringArray::delimIgnoreDifferent);
+  for (size_t i = 0; i < n; i++)
+    WriteLine (severity, msgID, lines[i]);
   return msg_remove[severity];
 }
 
 bool csReporterListener::HandleEvent (iEvent& event)
 {
-  if (event.Name == csevPostProcess(object_reg))
+  if (event.Name == PostProcess)
   {
       csScopedMutexLock lock (mutex);
       size_t l = messages.Length ();
       if (l > 0)
       {
 	size_t i;
-        csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+        csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
 
         csRef<iGraphics2D> g2d = g3d->GetDriver2D ();
 	if (!fnt)
@@ -452,10 +443,9 @@ void csReporterListener::SetNativeWindowManager (iNativeWindowManager* wm)
 void csReporterListener::SetReporter (iReporter* reporter)
 {
   if (csReporterListener::reporter)
-    csReporterListener::reporter->RemoveReporterListener (
-    	&scfiReporterListener);
+    csReporterListener::reporter->RemoveReporterListener (this);
   csReporterListener::reporter = reporter;
-  if (reporter) reporter->AddReporterListener (&scfiReporterListener);
+  if (reporter) reporter->AddReporterListener (this);
 }
 
 void csReporterListener::SetDebugFile (const char* s, bool appendFile )
@@ -467,26 +457,26 @@ void csReporterListener::SetDebugFile (const char* s, bool appendFile )
 
 void csReporterListener::SetDefaults ()
 {
-  console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
+  console = csQueryRegistry<iConsoleOutput> (object_reg);
   nativewm = 0;
-  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
+  csRef<iGraphics3D> g3d (csQueryRegistry<iGraphics3D> (object_reg));
   if (g3d)
   {
     iGraphics2D* g2d = g3d->GetDriver2D ();
     if (g2d)
     {
-      nativewm = SCF_QUERY_INTERFACE (g2d, iNativeWindowManager);
+      nativewm = scfQueryInterface<iNativeWindowManager> (g2d);
     }
   }
   if (reporter)
   {
-    reporter->RemoveReporterListener (&scfiReporterListener);
+    reporter->RemoveReporterListener (this);
   }
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   reporter = rep;
   if (reporter)
   {
-    reporter->AddReporterListener (&scfiReporterListener);
+    reporter->AddReporterListener (this);
   }
   debug_file = 0;
   debug_filename = DefaultDebugFilename();
@@ -521,3 +511,6 @@ const char* csReporterListener::GetDebugFile ()
 {
   return debug_filename.GetData();
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(StdRep)

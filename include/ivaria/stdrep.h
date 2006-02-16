@@ -29,8 +29,6 @@ struct iConsoleOutput;
 struct iNativeWindowManager;
 struct iReporter;
 
-SCF_VERSION (iStandardReporterListener, 0, 0, 3);
-
 /**
  * Interface to control the settings of the reporter listener plugin.
  * 
@@ -40,8 +38,10 @@ SCF_VERSION (iStandardReporterListener, 0, 0, 3);
  * Main ways to get pointers to this interface:
  * - csQueryRegistry()
  */
-struct iStandardReporterListener : public iBase
+struct iStandardReporterListener : public virtual iBase
 {
+  SCF_INTERFACE (iStandardReporterListener, 1, 0, 0);
+
   /// Set the output console to use.
   virtual void SetOutputConsole (iConsoleOutput* console) = 0;
   /// Set the native window manager to use.

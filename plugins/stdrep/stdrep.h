@@ -36,6 +36,9 @@ struct iConsoleOutput;
 struct iFile;
 struct iNativeWindowManager;
 
+CS_PLUGIN_NAMESPACE_BEGIN(StdRep)
+{
+
 /**
  * Class to keep track of timed messages.
  */
@@ -64,7 +67,11 @@ protected:
  * and other output devices to show appropriate messages based on
  * what comes from the reporter plugin.
  */
-class csReporterListener : public iStandardReporterListener
+class csReporterListener : 
+  public scfImplementation3<csReporterListener, 
+                            iStandardReporterListener,
+                            iComponent,
+                            iReporterListener>
 {
 private:
   iObjectRegistry* object_reg;
@@ -89,10 +96,10 @@ private:
   bool append;  // If data should be appended to debug file instead of new    
   static csString DefaultDebugFilename();
   csString stdoutTmp;
+  csEventID PostProcess;
 
+  void WriteLine (int severity, const char* msgID, const char* line);
 public:
-  SCF_DECLARE_IBASE;
-
   csReporterListener (iBase *iParent);
   virtual ~csReporterListener ();
   virtual bool Initialize (iObjectRegistry *object_reg);
@@ -113,48 +120,33 @@ public:
   bool Report (iReporter* reporter, int severity, const char* msgId,
   	const char* description);
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csReporterListener);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize (p); }
-  } scfiComponent;
-
-  struct ReporterListener : public iReporterListener
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csReporterListener);
-    virtual bool Report (iReporter* reporter, int severity, const char* msgId,
-  	const char* description)
-    {
-      return scfParent->Report (reporter, severity, msgId, description);
-    }
-  } scfiReporterListener;
-
   // This is not an embedded interface in order to avoid
   // a circular reference between this registered event handler
   // and the parent object.
-  class EventHandler : public iEventHandler
+  class EventHandler : 
+    public scfImplementation1<EventHandler, 
+                              iEventHandler>
   {
   private:
-    csReporterListener* parent;
+    csWeakRef<csReporterListener> parent;
   public:
-    SCF_DECLARE_IBASE;
-    EventHandler (csReporterListener* parent)
+    EventHandler (csReporterListener* parent) : scfImplementationType (this)
     {
-      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
-    virtual ~EventHandler ()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
+    virtual ~EventHandler () { }
     virtual bool HandleEvent (iEvent& ev)
     {
-      return parent->HandleEvent (ev);
+      return parent ? parent->HandleEvent (ev) : false;
     }
     CS_EVENTHANDLER_NAMES("crystalspace.utilities.reporter")
     CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } *scfiEventHandler;
+  };
+  csRef<EventHandler> eventHandler;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(StdRep)
+
 
 #endif // __CS_STDREP_H__

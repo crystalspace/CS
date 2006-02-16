@@ -35,6 +35,10 @@ chronological order.
 	  and iNativeWindow methods that take wchar_t strings.
 	- res fixed VC8 warnings in simpleformer and converted it to new SCF.
 	- res fixed some VC8 warnings in csRadixSorter.
+	- res added a method to csStringArray to add multiple strings by
+	  splitting a given string at given delimiters.
+	- res fixed stdrep to properly handle newlines in messages to report.
+	- res converted stdrep to new SCF.
 15-Feb-2006
 	- Erroroman added support for 'checkelementcount' option in genmesh 
 	  factory loader (omits a warning when the element count of a 

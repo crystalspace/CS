@@ -197,6 +197,72 @@ public:
   {
     return case_sensitive ? Find(str) : FindCaseInsensitive(str);
   }
+
+  /**
+   * Mode how SplitString() treats consecutive occurance of delimiters.
+   */
+  enum ConsecutiveDelimiterMode
+  {
+    /// Split at each different delimiter.
+    delimSplitEach,
+    /**
+     * Ignore consecutive delimiters (except the first). In other words,
+     * any number of consecutive delimiters is treated like there was only
+     * one delimiter.
+     */
+    delimIgnore,
+    /**
+     * Only ignore consecutive delimiters if they're different.
+     */
+    delimIgnoreDifferent,
+  };
+  /**
+   * Add a number of strings to this array by splitting \a str at characters
+   * from \a delimiters.
+   */
+  size_t SplitString (const char* str, const char* delimiters, 
+    ConsecutiveDelimiterMode delimMode = delimSplitEach)
+  {
+    size_t num = 0;
+    csString currentString;
+    int lastDelim = -1;
+
+    const char* p = str;
+    while (*p != 0)
+    {
+      if (strchr (delimiters, *p))
+      {
+        bool newString = true;
+        switch (delimMode)
+        {
+          case delimSplitEach:
+            break;
+          case delimIgnore:
+            newString = lastDelim != -1;
+            break;
+          case delimIgnoreDifferent:
+            newString = lastDelim == *p;
+            break;
+        }
+        if (newString)
+        {
+          Push (currentString);
+          currentString.Empty();
+          num++;
+          lastDelim = *p;
+        }
+      }
+      else
+      {
+        currentString.Append (*p);
+        lastDelim = -1;
+      }
+      p++;
+    }
+
+    Push (currentString);
+    return num + 1;
+  }
 };
 
 #endif // __CS_STRINGARRAY_H__
