@@ -1,37 +1,59 @@
 <include>
-<?Cg_VariableMap_Surface ?>
-<?Cg_VariableMap_Lighting ?>
-<?Cg_VariableMap_Fog ?>
+<?! This inserts the variable maps required by the snippets. ?>
+<?InsertList VariableMaps ?>
 <program>
 
-<?Cg_Include_Surface?>
-<?Cg_Include_Lighting?>
-<?Cg_Include_Fog?>
+<?! The snippets themselves likely provide their functionality as Cg.
+    Include that code here. ?>
+<?InsertList Includes?>
 
-struct AppToVert 
+/* For a shader, information needs to flow from the application to the vertex
+   program, the application to the fragment program and the vertex program
+   to the fragment program:
+     +-----+       +------------------+
+     | App |------>|  Vertex Program  |
+     +-----+\      +------------------+
+	     \		    |
+	      \		    v
+	       \   +------------------+
+	        \->| Fragment Program |
+	           +------------------+
+  
+  Currently, the app->VP direction is realized via parameters passed to the
+  vertex program entry point (here VertexMain), VP->FP is realized with
+  a structure returned from the VP entry point (VertToFrag) and the app->FP
+  direction by global variables of the snippets (they are mapped invisibly
+  to the user).
+  [Remark: The app->FP way is the friendliest since it happens without
+   user intervention. The other ways are realized like they are for technical
+   reasons.]
+ */
+
+/* This structure contains the information passed from the VP to the FP.
+ */
+struct VertToFrag
 {
-	float4 Position : POSITION;
-	AppToVert_Surface surface;
-	AppToVert_Lighting lighting;
-	AppToVert_Fog fog;
+  // The projected vertex position.
+  float4 Hposition : POSITION;
+  
+  // Information the snippets pass around.
+  VertToFrag_Surface surface;
+  VertToFrag_Fog fog;
+  VertToFrag_Lighting lighting;
 };
 
-struct VertToFrag 
-{
-	float4 Hposition : POSITION;
-	VertToFrag_Surface surface;
-	VertToFrag_Lighting lighting;
-	VertToFrag_Fog fog;
-};
-
-struct AppToFrag
-{
-	AppToFrag_Surface surface;
-	AppToFrag_Lighting lighting;
-	AppToFrag_Fog fog;
-};
-
-VertToFrag VertexMain (AppToVert A2V,
+// The vertex program.
+VertToFrag VertexMain (float4 Position : POSITION,
+		       /* Information the snippets need from the application.
+			*
+			* The identifiers are *not* free to be chosen -
+			* they are referenced from the snippet pass setup
+			* code or variable mapping code and hence need to have
+			* specific names. (Usually the "class" in lowercase.)
+			*/
+		       AppToVert_Surface surface,
+		       AppToVert_Lighting lighting,
+		       AppToVert_Fog fog,
 		       /* The matrices are bound with the state.matrix.... semantics.
 			* For more info see the Cg and ARB_vertex_program docs.
 			*/
@@ -39,20 +61,42 @@ VertToFrag VertexMain (AppToVert A2V,
 {
   VertToFrag V2F;
 
-  V2F.Hposition = mul (ModelViewProj, A2V.Position);
-  V2F.surface.Compute (A2V.surface);
-  V2F.lighting.Compute (A2V.lighting);
-  V2F.fog.Compute (A2V.fog);
+  V2F.Hposition = mul (ModelViewProj, Position);
+  
+  /* Let the snippets set up the data needed in the fragment program. For all
+   * the snippet's vertex-to-fragment structures you need to call the Setup()
+   * method with the application-to-vertex data.
+   */
+  V2F.surface.Setup (surface);
+  V2F.lighting.Setup (lighting);
+  V2F.fog.Setup (fog);
 
   return V2F;
 }
 
-float4 FragmentMain (VertToFrag V2F,
-		     AppToFrag A2F) : COLOR
+// The fragment program.
+float4 FragmentMain (VertToFrag V2F) : COLOR
 {
-  float4 diffuse = A2F.surface.GetDiffuse (V2F.surface);
-  float4 color = A2F.lighting.GetLighting (V2F.lighting);
-  return A2F.fog.ApplyFog (V2F.fog, diffuse * color);
+  // The snippets fragment-related structures.
+  Frag_Surface surface;
+  Frag_Lighting lighting;
+  Frag_Fog fog;
+  
+  /* Let the snippets pull in the data they set up in the vertex program, so
+   * call the Setup() methods of the fragment-related structures with the
+   * vertex-to-fragment data. */
+  surface.Setup (V2F.surface);
+  lighting.Setup (V2F.lighting);
+  fog.Setup (V2F.fog);
+  
+  /* Up to now, everything was initialization goop. The "meat" of the fragment
+   * program is below.
+   */
+  /* Compute the illuminated fragment color. The "light" snippet will query
+   * all information (diffuse color etc.) from the surface structure. */
+  float4 color = lighting.Illuminate (surface);
+  // Apply any fog.
+  return fog.ApplyFog (color);
 }
 
 </program>

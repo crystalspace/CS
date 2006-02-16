@@ -28,6 +28,8 @@ chronological order.
 	- res fixed consoletest on Win32 to properly output non-ASCII again -
 	  apparently the recently added setlocale() call to do proper output
 	  on other platforms causes harm on Win32...
+	- res worked a bit on the snippet-based std_lighting. Also sprinkled
+	  some comments/explanation throughout the snippets.
 15-Feb-2006
 	- Erroroman added support for 'checkelementcount' option in genmesh 
 	  factory loader (omits a warning when the element count of a 

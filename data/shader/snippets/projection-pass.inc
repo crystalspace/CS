@@ -5,7 +5,7 @@
         <copy />
       </mixmode>
       <writemask r="false" g="false" b="false" a="true" />
-      <?if vars."light 0 type".int == 2 ?>
+      <?if vars."light 0 type".int == consts.CS_LIGHT_SPOTLIGHT ?>
         <vp plugin="glfixed">
           <fixedvp>
             <light num="0"/>
@@ -16,7 +16,7 @@
         <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
       <?endif?>
 
-      <?if vars."light 0 type".int == 2 ?>
+      <?if vars."light 0 type".int == consts.CS_LIGHT_SPOTLIGHT ?>
         <texture destination="unit 0" name="tex projection" />
       <?else?>
         <texture destination="unit 0" name="light 0 attenuationtex" />
@@ -29,7 +29,7 @@
             <alphasource num="0" source="texture" modifier="alpha" />
             <alphaoperation operation="replace" />
           </layer>
-        <?if vars."light 0 type".int == 2 ?>
+        <?if vars."light 0 type".int == consts.CS_LIGHT_SPOTLIGHT ?>
           <layer>
             <alphasource num="0" source="texture" modifier="alpha" />
             <alphasource num="1" source="previous layer" modifier="alpha" />

@@ -158,6 +158,9 @@
         <texture name="ugly_woman.jpg">
 	  <file>/lib/std/ugly_woman.jpg</file>
         </texture>
+        <texture name="oldbrick_h.png">
+            <file>oldbrick_h.png</file>
+        </texture>
     </textures>
     <variables>
         <variable name="Std Thing Angle" value="0.54321" />
@@ -249,6 +252,7 @@
         </material>
         <material name="oldbrick">
             <texture>oldbrick.gif</texture>
+	    <shadervar name="tex height" type="texture">oldbrick_h.png</shadervar>
             <!--color red="1" green="1" blue="1" /-->
         </material>
         <material name="window">
