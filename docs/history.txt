@@ -20,6 +20,11 @@ chronological order.
 	  mesh finding instead of one local to the sector alone with the
 	  result that if you had objects with same name in different sectors
 	  it would sometimes fail to place the objects on the right position.
+	- Jorrit changed the parser so that it no longer sets the world
+	  ambient as the default for sector dynamic ambient (as iceeey changed
+	  in his earlier commit). World ambient is ADDED to sector dynamic
+	  ambient already. So setting dynamic ambient to world ambient
+	  basically doubles ambient.
 15-Feb-2006
 	- Erroroman added support for 'checkelementcount' option in genmesh 
 	  factory loader (omits a warning when the element count of a 

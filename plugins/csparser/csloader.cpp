@@ -5077,11 +5077,6 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
     AddToRegion (ldr_context, sector->QueryObject ());
   }
   
-  // Set ambient light of the sector to the world ambient light
-  csColor c;
-  Engine->GetAmbientLight (c);
-  sector->SetDynamicAmbientLight (c);
-
   csRef<iDocumentNode> culler_params;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
