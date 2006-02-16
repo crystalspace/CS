@@ -16,6 +16,10 @@ chronological order.
 		  files. Just add <ambient red="1.0" green="1.0" blue="1.0"/>
 		  inside the <sector> tag.
 		- Modified most of the ambient shaders to use the shadervar.
+	- Jorrit fixed a bug in the parser for meshgen. It was doing a global
+	  mesh finding instead of one local to the sector alone with the
+	  result that if you had objects with same name in different sectors
+	  it would sometimes fail to place the objects on the right position.
 15-Feb-2006
 	- Erroroman added support for 'checkelementcount' option in genmesh 
 	  factory loader (omits a warning when the element count of a 

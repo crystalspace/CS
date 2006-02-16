@@ -3798,7 +3798,9 @@ bool csLoader::LoadMeshGen (iLoaderContext* ldr_context,
     case XMLTOKEN_MESHOBJ:
       {
         const char* meshname = child->GetContentsValue ();
-        iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
+	iMeshList* meshes = sector->GetMeshes ();
+        iMeshWrapper* mesh = meshes->FindByName (meshname);
+        //iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
         if (!mesh)
         {
           SyntaxService->ReportError (
