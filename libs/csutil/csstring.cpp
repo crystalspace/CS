@@ -300,6 +300,28 @@ csStringBase &csStringBase::Append (const char *iStr, size_t iCount)
   return *this;
 }
 
+csStringBase& csStringBase::Append (const wchar_t* Str, size_t Count)
+{
+  if (Str == 0 || Count == 0)
+    return *this;
+  if (Count == (size_t)-1)
+    Count = wcslen (Str);
+
+  utf8_char converted[CS_UC_MAX_UTF8_ENCODED+1];
+  const wchar_t* p = Str;
+  while (Count > 0)
+  {
+    utf32_char ch;
+    int n = csUnicodeTransform::Decode (p, Count, ch);
+    p += n; Count -= n;
+    
+    n = csUnicodeTransform::EncodeUTF8 (ch, converted, 
+      sizeof (converted) / sizeof (utf8_char));
+    Append ((char*)converted, n);
+  }
+  return *this;
+}
+
 csStringBase& csStringBase::Append (char c)
 { 
 	ExpandIfNeeded(Size+1);

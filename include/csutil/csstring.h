@@ -126,6 +126,16 @@ public:
   csStringBase& Append (const char* Str, size_t Count = (size_t)-1);
 
   /**
+   * Append a null-terminated wide string to this one.
+   * \param Str String which will be appended.
+   * \param Count Number of characters from Str to append; if -1 (the default),
+   *   then all characters from Str will be appended.
+   * \return Reference to itself.
+   * \remarks The string will be appended as UTF-8.
+   */
+  csStringBase& Append (const wchar_t* Str, size_t Count = (size_t)-1);
+
+  /**
    * Append a string to this one. 
    * \param Str String which will be appended.
    * \param Count Number of characters from Str to append; if -1 (the default),
@@ -210,12 +220,32 @@ public:
     GrowBy (DEFAULT_GROW_BY)
   { Append (src); }
 
-   /**
+  /**
+   * Create a csStringBase object from a null-terminated wide string.
+   * \remarks The newly constructed string will represent a null-pointer if and
+   *   only if the input argument is a null-pointer.
+   * \remarks The string will be stored as UTF-8.
+   */
+  csStringBase (const wchar_t* src) : Data (0), Size (0), MaxSize (0),
+    GrowBy (DEFAULT_GROW_BY)
+  { Append (src); }
+
+  /**
    * Create a csStringBase object from a C string, given the length.
    * \remarks The newly constructed string will represent a null-pointer if and
    *   only if the input argument is a null-pointer.
    */
   csStringBase (const char* src, size_t _length) : Data (0), Size (0),
+  	MaxSize (0), GrowBy (DEFAULT_GROW_BY)
+  { Append (src, _length); }
+
+  /**
+   * Create a csStringBase object from a wide string, given the length.
+   * \remarks The newly constructed string will represent a null-pointer if and
+   *   only if the input argument is a null-pointer.
+   * \remarks The string will be stored as UTF-8.
+   */
+  csStringBase (const wchar_t* src, size_t _length) : Data (0), Size (0),
   	MaxSize (0), GrowBy (DEFAULT_GROW_BY)
   { Append (src, _length); }
 

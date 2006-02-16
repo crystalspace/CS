@@ -613,11 +613,9 @@ csGLFontCache::TextJob& csGLFontCache::GetJob (int fg, int bg,
 }
 
 void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y, 
-				 int fg, int bg, const utf8_char* text,
-				 uint flags)
+				 int fg, int bg, const void* text,
+				 bool isWide, uint flags)
 {
-  if (!text || !*text) return;
-
   bool backgroundTransparent = false;
   int bgTrans;
   {
@@ -644,7 +642,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
   if (pen_y <= ClipY1) return;
   pen_y = G2D->vpHeight - pen_y/* - maxheight*/;
 
-  size_t textLen = strlen ((char*)text);
+  size_t textLen = isWide ? wcslen ((wchar_t*)text) : strlen ((char*)text);
 
   if (!backgroundTransparent)
   {
@@ -673,11 +671,22 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
   while (textLen > 0)
   {
     utf32_char glyph;
-    int skip = csUnicodeTransform::UTF8Decode (text, textLen, glyph, 0);
-    if (skip == 0) break;
+    if (isWide)
+    {
+      int skip = csUnicodeTransform::Decode ((wchar_t*)text, textLen, glyph, 0);
+      if (skip == 0) break;
 
-    text += skip;
-    textLen -= skip;
+      text = ((wchar_t*)text + skip);
+      textLen -= skip;
+    }
+    else
+    {
+      int skip = csUnicodeTransform::UTF8Decode ((utf8_char*)text, textLen, glyph, 0);
+      if (skip == 0) break;
+
+      text = ((utf8_char*)text + skip);
+      textLen -= skip;
+    }
 
     const GLGlyphCacheData* cacheData = 
       (GLGlyphCacheData*)GetCacheData (knownFont, glyph, flags);

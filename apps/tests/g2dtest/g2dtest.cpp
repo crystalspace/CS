@@ -932,9 +932,9 @@ void G2DTestSystemDriver::DrawAlphaTestScreen ()
   }
 
   myG2D->Write (font, 50, 140, myG2D->FindRGB (255, 255, 255, 100), -1,
-    "Here is some partially transparent text");
+    L"Here is some partially transparent text");
   myG2D->Write (font, 50, 150, myG2D->FindRGB (0, 0, 255, 150), -1,
-    "overlaying partially transparent boxes.");
+    L"overlaying partially transparent boxes.");
 
   csString str;
   int i;

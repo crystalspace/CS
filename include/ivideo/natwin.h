@@ -46,8 +46,9 @@
  */
 struct iNativeWindowManager : public virtual iBase
 {
-  SCF_INTERFACE (iNativeWindowManager, 2, 0, 0);
+  SCF_INTERFACE (iNativeWindowManager, 2, 0, 1);
   
+  //@{
   /**
    * Show an alert.
    * Type is one of CS_ALERT_???.
@@ -57,15 +58,21 @@ struct iNativeWindowManager : public virtual iBase
    */
   virtual void Alert (int type, const char* title, const char* okMsg,
   	const char* msg, ...) CS_GNUC_PRINTF (5, 6) = 0;
+  virtual void AlertV (int type, const char* title, const char* okMsg,
+  	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0) = 0;
+  //@}
+  //@{
   /**
    * Show an alert.
    * Type is one of CS_ALERT_???.
-   * \remarks All strings are expected to be UTF-8 encoded.
    * \sa #CS_ALERT_ERROR
    * \sa \ref FormatterNotes
    */
-  virtual void AlertV (int type, const char* title, const char* okMsg,
-  	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0) = 0;
+  virtual void Alert (int type, const wchar_t* title, const wchar_t* okMsg,
+  	const wchar_t* msg, ...) CS_GNUC_WPRINTF (5, 6) = 0;
+  virtual void AlertV (int type, const wchar_t* title, const wchar_t* okMsg,
+  	const wchar_t* msg, va_list arg) CS_GNUC_WPRINTF (5, 0) = 0;
+  //@}
 };
 
 /**
@@ -73,13 +80,17 @@ struct iNativeWindowManager : public virtual iBase
  */
 struct iNativeWindow : public virtual iBase
 {
-  SCF_INTERFACE (iNativeWindow, 2, 0, 0);
+  SCF_INTERFACE (iNativeWindow, 2, 0, 1);
   
   /**
    * Set the title for this window.
    * \remarks \p title is expected to be UTF-8 encoded.
    */
   virtual void SetTitle (const char* title) = 0;
+  /**
+   * Set the title for this window.
+   */
+  virtual void SetTitle (const wchar_t* title) = 0;
 };
 
 /** @} */

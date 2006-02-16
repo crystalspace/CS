@@ -244,11 +244,15 @@ public:
   }
   virtual void GetRGB (int color, int& r, int& g, int& b);
   virtual void GetRGB (int color, int& r, int& g, int& b, int& a);
+  //@{
   /// Write a text string into the back buffer
   virtual void Write (iFont *font , int x, int y, int fg, int bg,
     const char *text, uint flags = 0);
+  virtual void Write (iFont *font , int x, int y, int fg, int bg,
+    const wchar_t* text, uint flags = 0);
   virtual void WriteBaseline (iFont *font , int x, int y, int fg, int bg,
     const char *text);
+  //@}
   /// (*) Get address of video RAM at given x,y coordinates
   unsigned char* (*_GetPixelAt) (csGraphics2D *This, int x, int y);
   /// Same but exposed through iGraphics2D interface
@@ -428,6 +432,10 @@ protected:
     const char* msg, va_list args);
   virtual void Alert (int type, const char* title, const char* okMsg,
       const char* msg, ...);
+  virtual void AlertV (int type, const wchar_t* title, const wchar_t* okMsg,
+    const wchar_t* msg, va_list args);
+  virtual void Alert (int type, const wchar_t* title, const wchar_t* okMsg,
+      const wchar_t* msg, ...);
   /** @} */
 
   /**\name iNativeWindow implementation
@@ -435,6 +443,8 @@ protected:
   // Virtual SetTitle function so it can be overridden by subclasses
   // of csGraphics2D.
   virtual void SetTitle (const char* title);
+  virtual void SetTitle (const wchar_t* title)
+  { SetTitle (csString (title)); }
   /** @} */
 
   /**\name iPluginConfig implementation

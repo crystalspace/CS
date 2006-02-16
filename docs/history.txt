@@ -30,6 +30,9 @@ chronological order.
 	  on other platforms causes harm on Win32...
 	- res worked a bit on the snippet-based std_lighting. Also sprinkled
 	  some comments/explanation throughout the snippets.
+	- res added functions to csString to append wchar_t strings.
+	- res added overloads for iGraphics2D::Write(), iNativeWindowManager
+	  and iNativeWindow methods that take wchar_t strings.
 15-Feb-2006
 	- Erroroman added support for 'checkelementcount' option in genmesh 
 	  factory loader (omits a warning when the element count of a 

@@ -783,9 +783,16 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
      __attribute__((format (__printf__, format_idx, arg_idx)))
 #  define CS_GNUC_SCANF(format_idx, arg_idx) \
      __attribute__((format (__scanf__, format_idx, arg_idx)))
+// Unfortunately, gcc doesn't support format argument checking for wide strings
+#  define CS_GNUC_WPRINTF(format_idx, arg_idx) \
+     /*__attribute__((format (__wprintf__, format_idx, arg_idx)))*/
+#  define CS_GNUC_WSCANF(format_idx, arg_idx) \
+     /*__attribute__((format (__wscanf__, format_idx, arg_idx)))*/
 #else
 #  define CS_GNUC_PRINTF(format_idx, arg_idx)
 #  define CS_GNUC_SCANF(format_idx, arg_idx)
+#  define CS_GNUC_WPRINTF(format_idx, arg_idx)
+#  define CS_GNUC_WSCANF(format_idx, arg_idx)
 #endif
 
 // Remove __attribute__ on non GNUC compilers.

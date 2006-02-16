@@ -152,7 +152,7 @@ public:
    * Draw a string using OpenGL, where the baseline starts at x,y. 
    */
   virtual void WriteString (iFont *font, int pen_x, int pen_y, 
-    int fg, int bg, const utf8_char* text, uint flags);
+    int fg, int bg, const void* text, bool isWide, uint flags);
 
   /**
    * Flush the cached text vertices.

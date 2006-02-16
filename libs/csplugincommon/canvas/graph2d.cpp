@@ -826,7 +826,15 @@ void csGraphics2D::GetRGB (int color, int& r, int& g, int& b, int& a)
 void csGraphics2D::Write (iFont *font, int x, int y, int fg, int bg, 
 			  const char *text, uint flags) 
 { 
-  fontCache->WriteString (font, x, y, fg, bg, (utf8_char*)text, flags);
+  if (!text || !*text) return;
+  fontCache->WriteString (font, x, y, fg, bg, text, false, flags);
+}
+
+void csGraphics2D::Write (iFont *font, int x, int y, int fg, int bg, 
+			  const wchar_t*text, uint flags) 
+{ 
+  if (!text || !*text) return;
+  fontCache->WriteString (font, x, y, fg, bg, text, true, flags);
 }
 
 void csGraphics2D::WriteBaseline (iFont *font, int x, int y, int fg, int bg, 
@@ -971,6 +979,21 @@ void csGraphics2D::Alert (int type, const char* title, const char* okMsg,
   va_start (arg, msg);
   AlertV (type, title, okMsg, msg, arg);
   va_end (arg);
+}
+
+void csGraphics2D::Alert (int type, const wchar_t* title, const wchar_t* okMsg, 
+			  const wchar_t* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  AlertV (type, csString (title), csString (okMsg), csString (msg), arg);
+  va_end (arg);
+}
+
+void csGraphics2D::AlertV (int type, const wchar_t* title, const wchar_t* okMsg,
+    const wchar_t* msg, va_list arg)
+{
+  AlertV (type, csString (title), csString (okMsg), csString (msg), arg);
 }
 
 iNativeWindow* csGraphics2D::GetNativeWindow ()

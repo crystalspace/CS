@@ -33,11 +33,11 @@
 struct iGraphics2D;
 struct iImage;
 
-SCF_VERSION (iXWindow, 1, 0, 0);
-
 /// Document me! @@@
 struct iXWindow : public virtual iBase
 {
+  SCF_INTERFACE (iXWindow, 1, 0, 0);
+
   // These should be inherited from csNativeWindow
   virtual bool Open () = 0;
   virtual void Close () = 0;

@@ -76,7 +76,7 @@
 /**
  * Standard format string source for csPrintfFormatter.
  * \remarks Uses csUnicodeTransform::Decode(), so it supports
- *  utd8_char, utf16_char, utf32_char and wchar_t strings.
+ *  utf8_char, utf16_char, utf32_char and wchar_t strings.
  */
 template <class T>
 class csFmtDefaultReader
@@ -108,7 +108,7 @@ public:
 /**
  * Standard formatted string destination for csPrintfFormatter.
  * \remarks Uses csUnicodeTransform::Decode(), so it supports
- *  utd8_char, utf16_char, utf32_char and wchar_t strings.
+ *  utf8_char, utf16_char, utf32_char and wchar_t strings.
  */
 template <class T>
 class csFmtDefaultWriter

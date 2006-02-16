@@ -236,11 +236,13 @@ public:
     ClipX1 = x1; ClipY1 = y1; ClipX2 = x2; ClipY2 = y2; 
   }
 
+  //@{
   /**
    * Draw a string.
    */
   virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
-    const utf8_char* text, uint flags);
+    const void* text, bool isWide, uint flags);
+  //@}
 };
 
 /** @} */

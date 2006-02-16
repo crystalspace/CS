@@ -464,7 +464,7 @@ void csFontCache::UncacheGlyph (GlyphCacheData* cacheData)
 }
 
 void csFontCache::WriteString (iFont * /*font*/, int /*x*/, int /*y*/,
-  int /*fg*/, int /*bg*/, const utf8_char* /*text*/, uint /*flags*/)
+  int /*fg*/, int /*bg*/, const void* /*text*/, bool /*isWide*/, uint /*flags*/)
 {
 }
 

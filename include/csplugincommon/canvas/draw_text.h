@@ -43,8 +43,8 @@ class csG2DDrawText
 {
 public:
   static void DrawText (csSoftFontCache* cache, iFont* font, int pen_x, int pen_y,
-    Tpixel fg, uint8 alphaFG, Tpixel bg, uint8 alphaBG, const utf8_char *text, 
-    uint flags)
+    Tpixel fg, uint8 alphaFG, Tpixel bg, uint8 alphaBG, const void* text, 
+    bool isWide, uint flags)
   {
     csGraphics2D* G2D = cache->G2D;
     const int ClipX1 = cache->ClipX1, ClipY1 = cache->ClipY1, 
@@ -60,17 +60,28 @@ public:
     csSoftFontCache::KnownFont* knownFont = cache->GetCachedFont (font);
     if (knownFont == 0) knownFont = cache->CacheFont (font);
   
-    size_t textLen = strlen ((char*)text);
+    size_t textLen = isWide ? wcslen ((wchar_t*)text) : strlen ((char*)text);
     int charW, charH, advance = 0;
     bool firstchar = true;
     while (textLen > 0)
     {
       utf32_char glyph;
-      int skip = csUnicodeTransform::UTF8Decode (text, textLen, glyph, 0);
-      if (skip == 0) break;
+      if (isWide)
+      {
+	int skip = csUnicodeTransform::Decode ((wchar_t*)text, textLen, glyph, 0);
+	if (skip == 0) break;
   
-      text += skip;
-      textLen -= skip;
+	text = ((wchar_t*)text + skip);
+	textLen -= skip;
+      }
+      else
+      {
+	int skip = csUnicodeTransform::UTF8Decode ((utf8_char*)text, textLen, glyph, 0);
+	if (skip == 0) break;
+  
+	text = ((utf8_char*)text + skip);
+	textLen -= skip;
+      }
   
       csSoftFontCache::SoftGlyphCacheData* cacheData = 
 	(csSoftFontCache::SoftGlyphCacheData*)cache->CacheGlyph (knownFont, 

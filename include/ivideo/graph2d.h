@@ -172,7 +172,7 @@ struct iOffscreenCanvasCallback : public iBase
  */
 struct iGraphics2D : public virtual iBase
 {
-  SCF_INTERFACE (iGraphics2D, 3, 0, 0);
+  SCF_INTERFACE (iGraphics2D, 3, 0, 1);
   
   /// Open the device.
   virtual bool Open () = 0;
@@ -435,6 +435,17 @@ struct iGraphics2D : public virtual iBase
   virtual csPtr<iGraphics2D> CreateOffscreenCanvas (
   	void* memory, int width, int height, int depth,
 	iOffscreenCanvasCallback* ofscb) = 0;
+
+  /**
+   * Write a text string into the back buffer. A value of -1 for \p bg
+   * color will not draw the background.
+   * \remarks For transparent backgrounds, it is recommended to obtain a color
+   *  value from FindRGB() that has the same R, G, B components as the 
+   *  foreground color, but an alpha component of 0.
+   */
+  virtual void Write (iFont *font, int x, int y, int fg, int bg,
+    const wchar_t* str, uint flags = 0) = 0;
+
 };
 
 /** @} */

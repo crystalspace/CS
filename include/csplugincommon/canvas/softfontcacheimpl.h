@@ -40,15 +40,9 @@
 template <class Tpixel, class Tpixmixer>
 class csSoftFontCacheImpl : public csSoftFontCache
 {
-public:
-  csSoftFontCacheImpl (csGraphics2D* G2D) : csSoftFontCache (G2D)
+  void WriteString (iFont *font, int x, int y, int fg, int bg, 
+    const void* text, bool isWide, uint flags)
   {
-  }
-  virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
-    const utf8_char* text, uint flags)
-  {
-    if (!text || !*text) return;
-
     int realColorFG;
     uint8 alphaFG;
     SplitAlpha (fg, realColorFG, alphaFG);
@@ -65,13 +59,13 @@ public:
       {
 	csG2DDrawText<Tpixel, csPixMixerCopy<Tpixel>, csPixMixerNoop<Tpixel>, 
 	  Tpixmixer>::DrawText (this, font, x, y, realColorFG, alphaFG, 
-	  realColorBG, alphaBG, text, flags);
+	  realColorBG, alphaBG, text, isWide, flags);
       }
       else
       {
 	csG2DDrawText<Tpixel, Tpixmixer, csPixMixerNoop<Tpixel>, 
 	  Tpixmixer>::DrawText (this, font, x, y, realColorFG, alphaFG, 
-	  realColorBG, alphaBG, text, flags);
+	  realColorBG, alphaBG, text, isWide, flags);
       }
     }
     else if (alphaBG == 255)
@@ -80,19 +74,19 @@ public:
       {
 	csG2DDrawText<Tpixel, csPixMixerNoop<Tpixel>, csPixMixerCopy<Tpixel>, 
 	  Tpixmixer>::DrawText (this, font, x, y, realColorFG, alphaFG, 
-	  realColorBG, alphaBG, text, flags);
+	  realColorBG, alphaBG, text, isWide, flags);
       }
       else if (alphaFG == 255)
       {
 	csG2DDrawText<Tpixel, csPixMixerCopy<Tpixel>, csPixMixerCopy<Tpixel>, 
 	  Tpixmixer>::DrawText (this, font, x, y, realColorFG, alphaFG, 
-	  realColorBG, alphaBG, text, flags);
+	  realColorBG, alphaBG, text, isWide, flags);
       }
       else
       {
 	csG2DDrawText<Tpixel, Tpixmixer, csPixMixerCopy<Tpixel>, 
 	  Tpixmixer>::DrawText (this, font, x, y, realColorFG, alphaFG, 
-	  realColorBG, alphaBG, text, flags);
+	  realColorBG, alphaBG, text, isWide, flags);
       }
     }
     else
@@ -101,21 +95,39 @@ public:
       {
 	csG2DDrawText<Tpixel, csPixMixerNoop<Tpixel>, Tpixmixer, 
 	  Tpixmixer>::DrawText (this, font, x, y, realColorFG, alphaFG, 
-	  realColorBG, alphaBG, text, flags);
+	  realColorBG, alphaBG, text, isWide, flags);
       }
       else if (alphaFG == 255)
       {
 	csG2DDrawText<Tpixel, csPixMixerCopy<Tpixel>, Tpixmixer, 
 	  Tpixmixer>::DrawText (this, font, x, y, realColorFG, alphaFG, 
-	  realColorBG, alphaBG, text, flags);
+	  realColorBG, alphaBG, text, isWide, flags);
       }
       else
       {
 	csG2DDrawText<Tpixel, Tpixmixer, Tpixmixer, Tpixmixer>::DrawText (
 	  this, font, x, y, realColorFG, alphaFG, realColorBG, alphaBG, text, 
-	  flags);
+	  isWide, flags);
       }
     }
+  }
+public:
+  csSoftFontCacheImpl (csGraphics2D* G2D) : csSoftFontCache (G2D)
+  {
+  }
+  virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
+    const utf8_char* text, uint flags)
+  {
+    if (!text || !*text) return;
+    
+    WriteString (font, x, y, fg, bg, text, false, flags);
+  }
+  virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
+    const wchar_t* text, uint flags)
+  {
+    if (!text || !*text) return;
+    
+    WriteString (font, x, y, fg, bg, text, true, flags);
   }
 };
 
