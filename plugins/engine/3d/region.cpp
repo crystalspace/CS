@@ -77,7 +77,6 @@ void csRegion::DeleteAll ()
 #ifdef REGION_CHECK
     rc[i].weakb = b;
     rc[i].n = copy[i]->GetName ();
-    printf ("remove %s\n", copy[i]->GetName ()); fflush (stdout);
 #endif
     if (csEngine::currentEngine->RemoveObject (b))
     {
