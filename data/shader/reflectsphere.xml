@@ -1,7 +1,4 @@
 <shader compiler="xmlshader" name="reflectsphere">
-  <shadervars>
-      <shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">0.1, 0.1, 0.1</shadervar>
-  </shadervars>
   <technique priority="150">
     <pass>
       <!--<mixmode><copy/></mixmode>-->

@@ -1,7 +1,4 @@
 <shader compiler="xmlshader" name="water">
-  <shadervars>
-      <shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">1, 1, 1</shadervar>
-  </shadervars>
   <technique priority="50">
     <pass>
       <mixmode><copy/></mixmode>

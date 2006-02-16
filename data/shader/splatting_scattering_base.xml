@@ -1,6 +1,5 @@
 <shader compiler="xmlshader" name="splatting_scattering_base">
   <shadervars>
-    <shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">0.2, 0.2, 0.2</shadervar>
     <!-- beta1 = Rayleigh -->
     <!-- .2
     <shadervar name="beta' 1" type="vector3">8.3215e-06, 1.4072e-05, 2.9180e-05</shadervar>

@@ -5074,6 +5074,11 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
     sector = Engine->CreateSector (secname);
     AddToRegion (ldr_context, sector->QueryObject ());
   }
+  
+  // Set ambient light of the sector to the world ambient light
+  csColor c;
+  Engine->GetAmbientLight (c);
+  sector->SetDynamicAmbientLight (c);
 
   csRef<iDocumentNode> culler_params;
 
@@ -5118,6 +5123,14 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	  }
 	}
 	break;
+      case XMLTOKEN_AMBIENT:
+  {
+    csColor c;
+    if (!SyntaxService->ParseColor (child, c))
+      return false;
+    sector->SetDynamicAmbientLight (c);
+  }
+  break;
       case XMLTOKEN_MESHGEN:
 	if (!LoadMeshGen (ldr_context, child, sector))
 	  return 0;

@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Feb-2006
+	- iceeey made several changes related to ambient light:
+		- Added "light ambient" shadervar to generic renderstep that
+		  tracks the sector dynamic ambient light.
+		- Changed the default ambient value in engine.cfg to a dark
+		  value of 0.2, 0.2, 0.2.
+		- Added support for setting sector ambient light in world
+		  files. Just add <ambient red="1.0" green="1.0" blue="1.0"/>
+		  inside the <sector> tag.
+		- Modified most of the ambient shaders to use the shadervar.
 15-Feb-2006
 	- Erroroman added support for 'checkelementcount' option in genmesh 
 	  factory loader (omits a warning when the element count of a 

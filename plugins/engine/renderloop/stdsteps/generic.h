@@ -120,6 +120,7 @@ private:
   static csStringID fogmode_name;
   static csStringID string_object2world;
   static csStringID light_0_type;
+  static csStringID light_ambient;
 public:
   SCF_DECLARE_IBASE;
 
