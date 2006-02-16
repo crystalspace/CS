@@ -1,3 +1,21 @@
+<!--
+  Copyright (C) 2006 by Frank Richter
+	    (C) 2006 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
 <include>
 #ifndef __CS_SHADER_SURFACE_CLASSIC_CG__
 #define __CS_SHADER_SURFACE_CLASSIC_CG__
@@ -7,12 +25,12 @@
     about VFS, while with a custom include VFS paths are no problem. But more
     importantly, files included like this are parsed by the shader conditional
     code, so shader conditionals can be used here. ?>
-<?include /shader/snippets/cg-i-surface.cginc ?>
-<?include /shader/surface/cg-parallax.cginc ?>
+<?Include /shader/snippets/cg-i-surface.cginc ?>
+<?Include /shader/surface/cg-parallax.cginc ?>
 
 struct AppToVert_Surface_Classic
 {
-<?IfSurfaceNormalsNeeded?>
+<?ifSurfaceNormalsNeeded?>
   float3 normal;
 <?endif?>
 <?if vars."tex diffuse".texture ?>
@@ -23,7 +41,7 @@ struct AppToVert_Surface_Classic
 
 struct VertToFrag_Surface_Classic
 {
-<?IfSurfaceNormalsNeeded?>
+<?ifSurfaceNormalsNeeded?>
   float3 normal;
 <?endif?>
 <?if vars."tex diffuse".texture ?>
@@ -33,7 +51,7 @@ struct VertToFrag_Surface_Classic
 
   void Setup (AppToVert_Surface_Classic A2V)
   {
-  <?IfSurfaceNormalsNeeded?>
+  <?ifSurfaceNormalsNeeded?>
     normal = A2V.normal;
   <?endif?>
   <?if vars."tex diffuse".texture ?>
@@ -60,7 +78,7 @@ AppToFrag_Surface_Classic surfaceClassicA2F;
 
 struct Frag_Surface_Classic : iSurface
 {
-<?IfSurfaceNormalsNeeded?>
+<?ifSurfaceNormalsNeeded?>
   float3 normal;
 <?endif?>
 <?if vars."tex diffuse".texture || vars."tex glow".texture ?>
@@ -71,7 +89,7 @@ struct Frag_Surface_Classic : iSurface
 
   void Setup (VertToFrag_Surface_Classic V2F)
   {
-  <?IfSurfaceNormalsNeeded?>
+  <?ifSurfaceNormalsNeeded?>
     normal = V2F.normal;
   <?endif?>
   <?if vars."tex diffuse".texture || vars."tex glow".texture ?>
@@ -94,7 +112,7 @@ struct Frag_Surface_Classic : iSurface
   
   float3 GetNormal ()
   {
-  <?IfSurfaceNormalsNeeded?>
+  <?ifSurfaceNormalsNeeded?>
     return normal;
   <?else?>
     return float3 (0, 0, 0);

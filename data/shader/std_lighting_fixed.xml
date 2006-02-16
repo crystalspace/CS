@@ -26,13 +26,13 @@
 	<?else?>
 	  <buffer source="color" destination="color" />
 	<?endif?>
-	<?include snippets/fog-mappings.inc ?>
+	<?Include snippets/fog-mappings.inc ?>
 	<vp plugin="glfixed">
 	  <fixedvp>
 	    <?if !vars."tex diffuse".texture ?>
 	      <constantcolor layer="diffuse" type="shadervar">mat flatcolor</constantcolor>
 	    <?endif?>
-	    <?include snippets/fog-fvp.inc ?>
+	    <?Include snippets/fog-fvp.inc ?>
 	  </fixedvp>
 	</vp>
 	<fp plugin="glfixed">
@@ -63,7 +63,7 @@
 		<alphaoperation operation="replace" />
 	      </layer>
 	    <?endif?>
-	    <?include snippets/fog-ffp.inc ?>
+	    <?Include snippets/fog-ffp.inc ?>
 	  </fixedfp>
 	</fp>
       </pass>
@@ -104,6 +104,6 @@
 	  <texture name="tex lightmap" destination="unit 0" />
         </pass>
       <?endif?>
-      <?include snippets/fog-pass.inc ?>
+      <?Include snippets/fog-pass.inc ?>
     </technique>
 </shader>

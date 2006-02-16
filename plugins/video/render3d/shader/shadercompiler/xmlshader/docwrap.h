@@ -353,6 +353,12 @@ class csWrappedDocumentNodeFactory
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE
 #undef CS_TOKEN_LIST_TOKEN_PREFIX
+  enum
+  {
+    PITOKEN_TEMPLATE_NEW = 0xfeeb1e,
+    PITOKEN_ENDTEMPLATE_NEW,
+    PITOKEN_INCLUDE_NEW,
+  };
 
   csString* currentOut;
   void DumpCondition (size_t id, const char* condStr, size_t condLen);

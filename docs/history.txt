@@ -39,6 +39,11 @@ chronological order.
 	  splitting a given string at given delimiters.
 	- res fixed stdrep to properly handle newlines in messages to report.
 	- res converted stdrep to new SCF.
+	- res simplified the condition culling code in xmlshader.
+	- res changed the "template", "endtemplate" and "include" shader 
+	  processing instructions to "Template", "Endtemplate" and "Include".
+	  The idea is to distinguish them visually from "if" etc (which have
+	  somewhat different instructions).
 15-Feb-2006
 	- Erroroman added support for 'checkelementcount' option in genmesh 
 	  factory loader (omits a warning when the element count of a 

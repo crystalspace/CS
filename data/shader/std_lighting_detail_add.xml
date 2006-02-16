@@ -54,7 +54,7 @@
         </fixedfp>
       </fp>
     </pass>
-    <?include snippets/fog-pass.inc ?>
+    <?Include snippets/fog-pass.inc ?>
   </technique>
 
   <technique priority="150">
@@ -96,7 +96,7 @@
 	<texture name="standardtex white" destination="unit 0" />
       <?endif?>
     </pass>
-    <?include snippets/fog-pass.inc ?>
+    <?Include snippets/fog-pass.inc ?>
   </technique>
 
   <fallbackshader name="std_lighting" />

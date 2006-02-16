@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2004 by Frank Richter
-	    (C) 2004 by Jorrit Tyberghein
+  Copyright (C) 2004-2006 by Frank Richter
+	    (C) 2004-2006 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -47,8 +47,14 @@ void csWrappedDocumentNode::ConditionTree::RecursiveAdd (
 {
   Variables trueVals;
   Variables falseVals;
-  Logic3 r = evaluator.CheckConditionResults (condition, 
-    node->values, trueVals, falseVals);
+  Logic3 r;
+  if (condition == csCondAlwaysTrue)
+    r.state = Logic3::Truth;
+  else if (condition == csCondAlwaysFalse)
+    r.state = Logic3::Lie;
+  else
+    r = evaluator.CheckConditionResults (condition, 
+      node->values, trueVals, falseVals);
 
   if (node->condition == Node::csCondUnknown)
   {
@@ -230,17 +236,7 @@ struct WrapperStackEntry
 {
   csWrappedDocumentNode::WrappedChild* child;
 
-  bool skip;
-  int nestDepth;
-  Logic3 condResult;
-
-  WrapperStackEntry ()
-  {
-    child = 0;
-
-    skip = false;
-    nestDepth = 0;
-  }
+  WrapperStackEntry () : child (0) {}
 };
 
 struct csWrappedDocumentNode::NodeProcessingState
@@ -257,7 +253,7 @@ struct csWrappedDocumentNode::NodeProcessingState
   NodeProcessingState() : templActive(false) {}
 };
 
-static const int syntaxErrorSeverity = CS_REPORTER_SEVERITY_ERROR;
+static const int syntaxErrorSeverity = CS_REPORTER_SEVERITY_WARNING;
 
 void csWrappedDocumentNode::ParseCondition (WrapperStackEntry& newWrapper, 
 					    const char* cond,
@@ -379,11 +375,25 @@ void csWrappedDocumentNode::ProcessTemplate (iDocumentNode* templNode,
 	switch (tokenID)
 	{
 	  case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE:
+            if (shared->plugin->do_verbose)
+            {
+              Report (CS_REPORTER_SEVERITY_WARNING, node,
+                "Deprecated syntax, please use 'Endtemplate'");
+            }
+            // Fall through
+	  case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE_NEW:
 	    state->templNestCount--;
 	    if (state->templNestCount != 0)
 	      templNodes.Push (node);
 	    break;
 	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE:
+            if (shared->plugin->do_verbose)
+            {
+              Report (CS_REPORTER_SEVERITY_WARNING, node,
+                "Deprecated syntax, please use 'Template'");
+            }
+            // Fall through
+	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE_NEW:
 	    state->templNestCount++;
 	    // Fall through
 	  default:
@@ -467,7 +477,7 @@ void csWrappedDocumentNode::ValidateTemplateEnd (iDocumentNode* node,
   if ((state->templActive) && (state->templNestCount != 0))
   {
     Report (syntaxErrorSeverity, node,
-      "'template' without 'endtemplate'");
+      "'Template' without 'Endtemplate'");
   }
 }
 
@@ -581,32 +591,17 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	{
 	  case csWrappedDocumentNodeFactory::PITOKEN_IF:
 	    {
-              if (currentWrapper.skip)
-              {
-                currentWrapper.nestDepth++;
-                break;
-              }
-
 	      WrapperStackEntry newWrapper;
 	      ParseCondition (newWrapper, space + 1, valLen - cmdLen - 1, 
 		node);
           
               const csConditionID condition = newWrapper.child->condition;
-              Logic3 r;
-              int descendNum = 0;
-              if (condition == csCondAlwaysTrue)
-                r.state = Logic3::Truth;
-              else if (condition == csCondAlwaysFalse)
-                r.state = Logic3::Lie;
-              else
-              {
-                r = globalState->condTree.Descend (condition);
-                descendNum = 1;
-              }
-              globalState->ascendStack.Push (descendNum);
-              newWrapper.condResult = r;
-              newWrapper.skip = (newWrapper.condResult.state == Logic3::Lie);
-              newWrapper.nestDepth = 1;
+              Logic3 r = globalState->condTree.Descend (condition);
+              if (r.state == Logic3::Truth)
+                newWrapper.child->condition = csCondAlwaysTrue;
+              else if (r.state == Logic3::Lie)
+                newWrapper.child->condition = csCondAlwaysFalse;
+              globalState->ascendStack.Push (1);
 
 	      currentWrapper.child->childrenWrappers.Push (newWrapper.child);
 	      wrapperStack.Push (currentWrapper);
@@ -630,11 +625,6 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      }
 	      if (okay)
               {
-                if (currentWrapper.skip)
-                {
-                  currentWrapper.nestDepth--;
-                  if (currentWrapper.nestDepth != 0) break;
-                }
                 const int ascendNum = globalState->ascendStack.Pop ();
                 globalState->condTree.Ascend (ascendNum);
 		currentWrapper = wrapperStack.Pop ();
@@ -656,23 +646,20 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		  "'else' without 'if' or 'elsif'");
 		okay = false;
 	      }
-	      if (okay && (globalState->condTree.GetBranch() != 0))
+              if (globalState->condTree.GetBranch() != 0)
 	      {
-		Report (syntaxErrorSeverity, node,
-		  "Double 'else'");
-		okay = false;
+	        Report (syntaxErrorSeverity, node,
+	          "Double 'else'");
+	        okay = false;
 	      }
 	      if (okay)
 	      {
-                if (currentWrapper.skip && currentWrapper.nestDepth > 1) break;
-
 		WrapperStackEntry newWrapper;
 		CreateElseWrapper (state, newWrapper);
 
 		currentWrapper.child->childrenWrappers.Push (newWrapper.child);
 		wrapperStack.Push (currentWrapper);
 		currentWrapper = newWrapper;
-                newWrapper.skip = (newWrapper.condResult.state == Logic3::Truth);
 
                 globalState->condTree.SwitchBranch ();
 	      }
@@ -695,8 +682,6 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      }
 	      if (okay)
 	      {
-                if (currentWrapper.skip && (currentWrapper.nestDepth > 1)) break;
-
 		WrapperStackEntry elseWrapper;
 		CreateElseWrapper (state, elseWrapper);
 
@@ -708,19 +693,12 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
           
                 globalState->condTree.SwitchBranch ();
                 const csConditionID condition = newWrapper.child->condition;
-                Logic3 r;
-                if (condition == csCondAlwaysTrue)
-                  r.state = Logic3::Truth;
-                else if (condition == csCondAlwaysFalse)
-                  r.state = Logic3::Lie;
-                else
-                {
-                  r = globalState->condTree.Descend (condition);
-                  globalState->ascendStack[globalState->ascendStack.GetSize()-1]++;
-                }
-                newWrapper.condResult = r;
-                newWrapper.skip = (newWrapper.condResult.state == Logic3::Lie);
-                newWrapper.nestDepth = 1;
+                Logic3 r = globalState->condTree.Descend (condition);
+                globalState->ascendStack[globalState->ascendStack.GetSize()-1]++;
+                if (r.state == Logic3::Truth)
+                  newWrapper.child->condition = csCondAlwaysTrue;
+                else if (r.state == Logic3::Lie)
+                  newWrapper.child->condition = csCondAlwaysFalse;
 
 		elseWrapper.child->childrenWrappers.Push (newWrapper.child);
 		wrapperStack.Push (elseWrapper);
@@ -729,6 +707,13 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	    }
 	    break;
 	  case csWrappedDocumentNodeFactory::PITOKEN_INCLUDE:
+            if (shared->plugin->do_verbose)
+            {
+              Report (CS_REPORTER_SEVERITY_WARNING, node,
+                "Deprecated syntax, please use 'Include'");
+            }
+            // Fall through
+	  case csWrappedDocumentNodeFactory::PITOKEN_INCLUDE_NEW:
 	    {
 	      bool okay = true;
 	      csString filename;
@@ -748,12 +733,19 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      }
 	      if (okay)
 	      {
-                if (currentWrapper.skip) break;
+                //if (currentWrapper.skip) break;
 		ProcessInclude (filename, state, node);
 	      }
 	    }
 	    break;
 	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE:
+            if (shared->plugin->do_verbose)
+            {
+              Report (CS_REPORTER_SEVERITY_WARNING, node,
+                "Deprecated syntax, please use 'Template'");
+            }
+            // Fall through
+	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE_NEW:
 	    {
 	      bool okay = true;
 	      csString templateName;
@@ -799,8 +791,6 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      }
 	      if (okay)
 	      {
-                if (currentWrapper.skip) break;
-
 		state->templateName = templateName;
 		state->templ = newTempl;
 		state->templActive = true;
@@ -809,17 +799,20 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	    }
 	    break;
 	  case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE:
+            if (shared->plugin->do_verbose)
+            {
+              Report (CS_REPORTER_SEVERITY_WARNING, node,
+                "Deprecated syntax, please use 'Endtemplate'");
+            }
+            // Fall through
+	  case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE_NEW:
 	    {
-              if (currentWrapper.skip) break;
-
 	      Report (syntaxErrorSeverity, node,
-		"'endtemplate' without 'template'");
+		"'Endtemplate' without 'Template'");
 	    }
 	    break;
 	  default:
 	    {
-              if (currentWrapper.skip) break;
-
 	      csArray<csString> params;
 	      if (space != 0)
 	      {
@@ -838,7 +831,11 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
       }
     }
   }
-  if (!handled && !currentWrapper.skip)
+  if (!handled
+    && !(((currentWrapper.child->condition == csCondAlwaysFalse)
+        && (currentWrapper.child->conditionValue == true))
+      || ((currentWrapper.child->condition == csCondAlwaysTrue)
+        && (currentWrapper.child->conditionValue == false))))
   {
     WrappedChild* newWrapper = new WrappedChild;
     newWrapper->childNode.AttachNew (new csWrappedDocumentNode (node,
@@ -1174,6 +1171,9 @@ csWrappedDocumentNodeFactory::csWrappedDocumentNodeFactory (
   csXMLShaderCompiler* plugin) : plugin (plugin)
 {
   InitTokenTable (pitokens);
+  pitokens.Register ("Template", PITOKEN_TEMPLATE_NEW);
+  pitokens.Register ("Endtemplate", PITOKEN_ENDTEMPLATE_NEW);
+  pitokens.Register ("Include", PITOKEN_INCLUDE_NEW);
 }
 
 void csWrappedDocumentNodeFactory::DumpCondition (size_t id, 
