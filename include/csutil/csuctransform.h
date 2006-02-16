@@ -43,6 +43,17 @@
  * units.
  */
 #define CS_UC_MAX_UTF32_ENCODED		1
+#if (CS_WCHAR_T_SIZE == 1)
+#define CS_UC_MAX_WCHAR_T_ENCODED	CS_UC_MAX_UTF8_ENCODED
+#elif (CS_WCHAR_T_SIZE == 2)
+/**
+ * An Unicode code point as wchar_t is at maximum encoded to this number of 
+ * code units.
+ */
+#define CS_UC_MAX_WCHAR_T_ENCODED	CS_UC_MAX_UTF16_ENCODED
+#else
+#define CS_UC_MAX_WCHAR_T_ENCODED	CS_UC_MAX_UTF32_ENCODED
+#endif
 /**
  * A complex mapping (uppercase, lowercase, fold) for a Unicode code point 
  * expands to at maximum this number of code points 

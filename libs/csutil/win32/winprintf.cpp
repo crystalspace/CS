@@ -162,13 +162,13 @@ static int _cs_fputs (const char* string, FILE* stream)
       if (isTTY && (cp != CP_UTF8))
       {
 	/* We're writing to a console, the UTF-8 text has to be converted to the 
-	* output codepage. */
+	 * output codepage. */
 	rc = fputs (cswinCtoA (tmp, cp), stream);
       }
       else
       {
 	/* Not much to do - the text can be dumped to the stream,
-	* Windows will care about proper output. */
+	 * Windows will care about proper output. */
 	rc = fputs (tmp.GetDataSafe(), stream);
       }
 

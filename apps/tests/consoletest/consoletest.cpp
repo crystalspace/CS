@@ -77,8 +77,11 @@ static void TestMapping (const char* str)
  *---------------------------------------------------------------------*/
 int main (int /*argc*/, char* /*argv*/ [])
 {
+#ifndef CS_PLATFORM_WIN32
   // Required so non-Win32 csPrintf() picks up the right char set
   setlocale (LC_CTYPE, "");
+#endif
+  // On Win32 it actually seems harmful...
 
   {
     const char** qbf = quickBrownFox;

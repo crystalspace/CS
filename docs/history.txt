@@ -25,6 +25,9 @@ chronological order.
 	  in his earlier commit). World ambient is ADDED to sector dynamic
 	  ambient already. So setting dynamic ambient to world ambient
 	  basically doubles ambient.
+	- res fixed consoletest on Win32 to properly output non-ASCII again -
+	  apparently the recently added setlocale() call to do proper output
+	  on other platforms causes harm on Win32...
 15-Feb-2006
 	- Erroroman added support for 'checkelementcount' option in genmesh 
 	  factory loader (omits a warning when the element count of a 
