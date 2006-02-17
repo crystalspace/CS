@@ -79,6 +79,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         friend bool operator> (const Side& a, const Side& b);
         friend bool operator>= (const Side& a, const Side& b);
         //@}
+
+        friend int CompareLeftLeft (const Side& a, const Side& b)
+        {
+          if (a.value < b.value)
+            return -1;
+          else if (a.value > b.value)
+            return 1;
+          else
+          {
+            if (a.inclusive == b.inclusive)
+              return 0;
+            else if (a.inclusive && !b.inclusive)
+              return -1;
+            else
+              return 1;
+          }
+        }
+        friend int CompareRightRight (const Side& a, const Side& b)
+        {
+          if (a.value < b.value)
+            return -1;
+          else if (a.value > b.value)
+            return 1;
+          else
+          {
+            if (a.inclusive == b.inclusive)
+              return 0;
+            else if (a.inclusive && !b.inclusive)
+              return 1;
+            else
+              return -1;
+          }
+        }
       };
       Side left;
       Side right;

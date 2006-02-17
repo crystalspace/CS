@@ -135,16 +135,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       while (((i+1) < intervals.GetSize())
         && intervals[i].Overlaps (intervals[i+1]))
       {
+        const Interval::Side& l1 = intervals[i].left;
+        const Interval::Side& l2 = intervals[i+1].left;
+        const Interval::Side& r1 = intervals[i].right;
+        const Interval::Side& r2 = intervals[i+1].right;
         intervals[i] = Interval (
-          csMin (intervals[i].left, intervals[i+1].left),
-          csMax (intervals[i].right, intervals[i+1].right));
+          CompareLeftLeft (l1, l2) <= 0 ? l1 : l2,
+          CompareRightRight (r1, r2) >= 0 ? r1 : r2);
         intervals.DeleteIndex (i);
       }
       if (intervals[i].Overlaps (otherIntervals[j]))
       {
+        const Interval::Side& l1 = intervals[i].left;
+        const Interval::Side& l2 = otherIntervals[j].left;
+        const Interval::Side& r1 = intervals[i].right;
+        const Interval::Side& r2 = otherIntervals[j].right;
         intervals[i] = Interval (
-          csMin (intervals[i].left, otherIntervals[j].left),
-          csMax (intervals[i].right, otherIntervals[j].right));
+          CompareLeftLeft (l1, l2) <= 0 ? l1 : l2,
+          CompareRightRight (r1, r2) >= 0 ? r1 : r2);
         j++;
       }
       else
@@ -197,11 +205,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       }
       if (intervals[i].Overlaps (otherIntervals[j]))
       {
-        if (intervals[i].left < otherIntervals[j].left)
+        if (CompareLeftLeft (intervals[i].left,
+          otherIntervals[j].left) < 0)
         {
           intervals[i].left = otherIntervals[j].left;
         }
-        if (intervals[i].right > otherIntervals[j].right)
+        if (CompareRightRight (intervals[i].right,
+          otherIntervals[j].right) > 0)
         {
           Interval newInterval;
           newInterval.left = otherIntervals[j].right;
