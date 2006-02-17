@@ -39,12 +39,13 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_cgcommon.h"
 
 class csGLStateCache;
-struct iGLTextureCache;
+
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
+{
 
 class csShaderGLCGFP : public csShaderGLCGCommon
 {
 private:
-  iGLTextureCache* txtcache;
   csGLStateCache* statecache;
 
   csRef<iShaderProgram> pswrap;
@@ -76,5 +77,7 @@ public:
   virtual const char* GetProgramType() { return "fragment"; }
 };
 
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderCg)
 
 #endif //__GLSHADER_CGFP_H__

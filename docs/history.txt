@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Feb-2006
+	- res beautified some shader snippet code.
+	- res made the following changes to csDirtyAccessArray<>:
+	    - Add element handler template parameter.
+	    - Split contents reference counting into separate class,
+	      csDirtyAccessArrayRefCounted<>.
+	- res added support to the Cg shader plugin to specify Cg compiler
+	  arguments from the configuration.
+	- res enabled position invariance for Cg vertex programs.
 16-Feb-2006
 	- iceeey made several changes related to ambient light:
 		- Added "light ambient" shadervar to generic renderstep that

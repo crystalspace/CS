@@ -33,7 +33,7 @@
       <!-- See the glshader_fixed plugin source for a detailed explanation 
 	   of the formular below. -->
       <?if vars."fogplane".z &gt; 0 ?>
-	<variablemap destination="fog.fogPlaneS" type="expr">
+	<variablemap destination="fogSectorA2V.fogPlaneS" type="expr">
 	  <sexp>
 	  (make-vector 
 	    0 
@@ -42,7 +42,7 @@
 	    (- (min (max (* (elt4 fogplane) "fog density") -1) 0) (* 0.1 "fog density"))
 	  )</sexp>
 	</variablemap>
-	<variablemap destination="fog.fogPlaneT" type="expr">
+	<variablemap destination="fogSectorA2V.fogPlaneT" type="expr">
 	  <sexp>
 	  (make-vector
 	    (/ (* (elt1 fogplane) "fog density") (elt3 fogplane))
@@ -54,10 +54,10 @@
 	  </sexp>
 	</variablemap>
       <?else?>
-	<variablemap destination="fog.fogPlaneS" type="expr">
+	<variablemap destination="fogSectorA2V.fogPlaneS" type="expr">
 	  <sexp>(make-vector 0 0 "fog density" (* -0.1 "fog density"))</sexp>
 	</variablemap>
-	<variablemap destination="fog.fogPlaneT" type="vector4">0,0,0,1</variablemap>
+	<variablemap destination="fogSectorA2V.fogPlaneT" type="vector4">0,0,0,1</variablemap>
       <?endif?>
     <?endif?>
   <?Endtemplate?>

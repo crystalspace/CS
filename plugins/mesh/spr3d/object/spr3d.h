@@ -58,11 +58,7 @@
 struct iObjectRegistry;
 struct iEngine;
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Spr3d
+CS_PLUGIN_NAMESPACE_BEGIN(Spr3d)
 {
 
 /**
@@ -1579,8 +1575,7 @@ public:
   /** @} */
 };
 
-} // namespace Spr3d
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Spr3d)
 
 #endif // __CS_SPR3D_H__

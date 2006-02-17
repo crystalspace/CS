@@ -33,9 +33,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_cgfp.h"
 #include "glshader_cg.h"
 
-CS_LEAKGUARD_IMPLEMENT (csGLShader_CG);
-
 CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
+{
+
+CS_LEAKGUARD_IMPLEMENT (csGLShader_CG);
 
 SCF_IMPLEMENT_FACTORY (csGLShader_CG)
 
@@ -84,6 +87,57 @@ void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error,
 	"%s", listing);
     }
   }
+}
+
+static void SplitToArgs (const char* str, ArgumentArray& args)
+{
+  if ((str == 0) || (*str == 0)) return;
+
+  csString s;
+  const char* p = str;
+  bool quote = false;
+  while (*p)
+  {
+    switch (*p)
+    {
+      case '"':
+        quote = !quote;
+        break;
+      case '\\':
+        if (quote)
+        {
+          p++;
+          s.Append (*p);
+          break;
+        }
+        // else fall through
+      case ' ':
+        if (!quote)
+        {
+          if (!s.IsEmpty()) args.Push (str);
+          args.Empty();
+        }
+        // else fall through
+      default:
+        s.Append (*p);
+    }
+    p++;
+  }
+  if (!s.IsEmpty()) args.Push (s);
+}
+
+void csGLShader_CG::GetProfileCompilerArgs (const char* type, 
+                                            CGprofile profile, 
+                                            ArgumentArray& args)
+{
+  csConfigAccess cfg (object_reg);
+  csString key ("Video.OpenGL.Shader.Cg.CompilerOptions");
+  SplitToArgs (cfg->GetStr (key), args);
+  key << "." << type;
+  SplitToArgs (cfg->GetStr (key), args);
+  key << "." << cgGetProfileString (profile);
+  SplitToArgs (cfg->GetStr (key), args);
+  args.Push (0);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -253,3 +307,7 @@ bool csGLShader_CG::Initialize(iObjectRegistry* reg)
     doVerbose = false;
   return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderCg)
+

@@ -30,14 +30,16 @@
 
 struct AppToVert_Surface_Classic
 {
+  void _dummy_struct_non_empty() {}
 <?ifSurfaceNormalsNeeded?>
-  float3 normal;
+  varying float3 normal;
 <?endif?>
 <?if vars."tex diffuse".texture ?>
-  float2 texCoord;
+  varying float2 texCoord;
 <?endif?>
-  AppToVert_Parallax parallax;
 };
+
+AppToVert_Surface_Classic surfaceClassicA2V;
 
 struct VertToFrag_Surface_Classic
 {
@@ -49,15 +51,15 @@ struct VertToFrag_Surface_Classic
 <?endif?>
   VertToFrag_Parallax parallax;
 
-  void Setup (AppToVert_Surface_Classic A2V)
+  void Setup ()
   {
   <?ifSurfaceNormalsNeeded?>
-    normal = A2V.normal;
+    normal = surfaceClassicA2V.normal;
   <?endif?>
   <?if vars."tex diffuse".texture ?>
-    texCoord = A2V.texCoord;
+    texCoord = surfaceClassicA2V.texCoord;
   <?endif?>
-    parallax.Setup (A2V.parallax);
+    parallax.Setup ();
   }
 };
 
@@ -94,8 +96,7 @@ struct Frag_Surface_Classic : iSurface
   <?endif?>
   <?if vars."tex diffuse".texture || vars."tex glow".texture ?>
     tc = V2F.texCoord;
-    tcOffs = parallax.GetTCOffset (V2F.parallax, surfaceClassicA2F.parallax,
-      tc);
+    tcOffs = parallax.GetTCOffset (V2F.parallax, tc);
   <?endif?>
   }
   

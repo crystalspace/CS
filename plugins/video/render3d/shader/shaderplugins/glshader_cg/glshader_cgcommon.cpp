@@ -37,6 +37,9 @@
 #include "glshader_cg.h"
 #include "glshader_cgcommon.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
+{
+
 CS_LEAKGUARD_IMPLEMENT (csShaderGLCGCommon);
 
 csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug, 
@@ -311,10 +314,11 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
       description.GetData (), cgGetProfileString (profile), profile);
   }
 
+  ArgumentArray args;
+  shaderPlug->GetProfileCompilerArgs (GetProgramType(), profile, args);
   program = cgCreateProgram (shaderPlug->context, 
     compiled ? CG_OBJECT : CG_SOURCE, programStr, 
-    profile, entrypoint ? entrypoint : "main", 
-    GetProfileCompilerArgs (profile));
+    profile, entrypoint ? entrypoint : "main", args.GetArray());
 
   if (!program)
     return false;
@@ -490,3 +494,6 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver*,
 
   return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderCg)

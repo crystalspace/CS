@@ -20,10 +20,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __GLSHADER_CG_H__
 #define __GLSHADER_CG_H__
 
-#include "iutil/comp.h"
 #include "csplugincommon/shader/shaderplugin.h"
-#include "ivideo/shader/shader.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/leakguard.h"
+
+#include "iutil/comp.h"
+#include "ivideo/shader/shader.h"
 
 #include <Cg/cg.h>
 /* WIN32is used in an "#if" inside <cgGL.h>, however, it is sometimes defined
@@ -35,6 +37,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <Cg/cgGL.h>
 
 struct csGLExtensionManager;
+
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
+{
+
+typedef csDirtyAccessArray<const char*, csStringArrayElementHandler>
+  ArgumentArray;
 
 class csGLShader_CG : public scfImplementation2<csGLShader_CG, 
 						iShaderProgramPlugin,
@@ -75,6 +83,12 @@ public:
    * @{ */
   bool Initialize (iObjectRegistry* reg);
   /** @} */
+
+  void GetProfileCompilerArgs (const char* type, CGprofile profile, 
+    ArgumentArray& args);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderCg)
 
 #endif //__GLSHADER_CG_H__

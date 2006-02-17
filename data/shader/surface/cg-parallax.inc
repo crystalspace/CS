@@ -17,27 +17,22 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <include>
-  <?Template Pass_Lighting ?>
-    <?if vars."tex lightmap".texture ?>
-      <buffer source="texture coordinate lightmap" 
-	destination="lightingClassicA2V.texCoordLM" />
-      <texture name="tex lightmap" destination="lightingClassicA2F.lightmap" />
-    <?else?>
-      <buffer source="color" destination="lightingClassicA2V.color" />
+  <?! Parallax mapping.
+      This is no snippet in the sense of e.g. the "surface-classic" snippet, 
+      it's rather a component that can be used by other Cg. This also means 
+      that  calling the vertex-to-fragment setup method and invoking the
+      Pass_Parallax/VariableMap_Parallax templates needs to be done by the 
+      including snippet/shader as well.
+  ?>
+  <?Template Pass_Parallax ?>
+    <?if vars."tex height".texture ?>
+      <texture name="tex height" destination="parallaxA2F.heightTex" />
+      <buffer source="normal" destination="parallaxA2V.Normal" />
+      <buffer source="tangent" destination="parallaxA2V.Tangent" />
+      <buffer source="binormal" destination="parallaxA2V.BiNormal" />
     <?endif?>
   <?Endtemplate?>
-  <?AddToList Passes Pass_Lighting ?>
   
-  <?Template VariableMap_Lighting ?>
+  <?Template VariableMap_Parallax ?>
   <?Endtemplate?>
-  <?AddToList VariableMaps VariableMap_Lighting ?>
-  
-  <?Template Include_Lighting?>
-    <?Include /shader/lighting/cg-light-classic.cginc ?>
-  <?Endtemplate?>
-  <?AddToList Includes Include_Lighting ?>
-
-  <?Template ifSurfaceNormalsNeeded?>
-    <?if consts.false?>
-  <?Endtemplate ?>
 </include>

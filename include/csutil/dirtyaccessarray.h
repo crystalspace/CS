@@ -37,37 +37,21 @@
  * A templated array class.  The only difference with csArray is that this 
  * class allows you to get the address of the internal array. This is of 
  * course dangerous so use of this class should be restricted and avoided.
- * <p>
+ * 
  * The main use of this class is when you absolutely need access
  * to the internal array that is in this class. This can be useful
  * if you want to access some external module (like OpenGL).
  */
-template <class T>
-class csDirtyAccessArray : public csArray<T>
+template <class T, class ElementHandler = csArrayElementHandler<T> >
+class csDirtyAccessArray : public csArray<T, ElementHandler>
 {
-private:
-  int RefCount;
-
 public:
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csDirtyAccessArray (int ilimit = 0, int ithreshold = 0)
-  	: csArray<T> (ilimit, ithreshold)
-  {
-    RefCount = 0;
-  }
-
-  // Reference counting.
-  void IncRef () { RefCount++; }
-
-  // Reference counting. Delete array when reference reaches 0.
-  void DecRef ()
-  {
-    if (RefCount == 1) { this->DeleteAll (); } // see *1*
-    RefCount--;
-  }
+  	: csArray<T, ElementHandler> (ilimit, ithreshold) {}
 
   /// Get the pointer to the start of the array.
   T* GetArray ()
@@ -104,5 +88,34 @@ public:
       return 0;
   }
 };
+
+/**
+ * A variant of csDirtyAccessArray with reference-counted contents. That is,
+ * when the reference count of the array drops to 0, it's contents are deleted
+ * (however, not the array object itself).
+ */
+template <class T, class ElementHandler = csArrayElementHandler<T> >
+class csDirtyAccessArrayRefCounted : 
+  public csDirtyAccessArray<T, ElementHandler>
+{
+private:
+  int RefCount;
+public:
+  csDirtyAccessArrayRefCounted (int ilimit = 0, int ithreshold = 0) : 
+    csDirtyAccessArray<T, ElementHandler> (ilimit, ithreshold), RefCount (0)
+  { }
+
+  /// Reference counting.
+  void IncRef () { RefCount++; }
+
+  /// Reference counting. Delete array contents when reference reaches 0.
+  void DecRef ()
+  {
+    if (RefCount == 1) { this->DeleteAll (); } // see *1*
+    RefCount--;
+  }
+
+};
+
 
 #endif // __CS_DIRTYACCESSARRAY_H__

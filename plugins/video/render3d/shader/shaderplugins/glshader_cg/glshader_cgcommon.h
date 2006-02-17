@@ -36,6 +36,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif 
 #include <Cg/cgGL.h>
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
+{
+
 class csGLShader_CG;
 
 class csShaderGLCGCommon : public csShaderProgram
@@ -63,8 +66,6 @@ protected:
     bool compiled = false, bool doLoad = true);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
-  virtual const char ** GetProfileCompilerArgs (CGprofile /*profile*/) 
-  { return 0; }
   virtual const char* GetProgramType() = 0;
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
@@ -104,5 +105,7 @@ public:
   { return false; }
 };
 
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderCg)
 
 #endif //__GLSHADER_CGCOMMON_H__

@@ -38,6 +38,9 @@
 
 #include "glshader_cgcommon.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
+{
+
 class csShaderGLCGVP : public csShaderGLCGCommon
 {
 public:
@@ -54,5 +57,7 @@ public:
   virtual const char* GetProgramType() { return "vertex"; }
 };
 
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderCg)
 
 #endif //__GLSHADER_CGVP_H__

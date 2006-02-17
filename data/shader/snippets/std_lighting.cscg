@@ -37,14 +37,9 @@
 	        \->| Fragment Program |
 	           +------------------+
   
-  Currently, the app->VP direction is realized via parameters passed to the
-  vertex program entry point (here VertexMain), VP->FP is realized with
-  a structure returned from the VP entry point (VertToFrag) and the app->FP
-  direction by global variables of the snippets (they are mapped invisibly
-  to the user).
-  [Remark: The app->FP way is the friendliest since it happens without
-   user intervention. The other ways are realized like they are for technical
-   reasons.]
+  Currently, the VP->FP direction is realized with a structure returned from 
+  the VP entry point (VertToFrag) and the app->FP and app->VP directions by 
+  global variables of the snippets (they are mapped invisibly to the user).
  */
 
 /* This structure contains the information passed from the VP to the FP.
@@ -62,16 +57,6 @@ struct VertToFrag
 
 // The vertex program.
 VertToFrag VertexMain (float4 Position : POSITION,
-		       /* Information the snippets need from the application.
-			*
-			* The identifiers are *not* free to be chosen -
-			* they are referenced from the snippet pass setup
-			* code or variable mapping code and hence need to have
-			* specific names. (Usually the "class" in lowercase.)
-			*/
-		       AppToVert_Surface surface,
-		       AppToVert_Lighting lighting,
-		       AppToVert_Fog fog,
 		       /* The matrices are bound with the state.matrix.... semantics.
 			* For more info see the Cg and ARB_vertex_program docs.
 			*/
@@ -83,11 +68,11 @@ VertToFrag VertexMain (float4 Position : POSITION,
   
   /* Let the snippets set up the data needed in the fragment program. For all
    * the snippet's vertex-to-fragment structures you need to call the Setup()
-   * method with the application-to-vertex data.
+   * method.
    */
-  V2F.surface.Setup (surface);
-  V2F.lighting.Setup (lighting);
-  V2F.fog.Setup (fog);
+  V2F.surface.Setup ();
+  V2F.lighting.Setup ();
+  V2F.fog.Setup ();
 
   return V2F;
 }

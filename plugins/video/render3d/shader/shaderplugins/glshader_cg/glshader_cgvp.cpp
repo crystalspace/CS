@@ -36,6 +36,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_cgvp.h"
 #include "glshader_cg.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
+{
+
 CS_LEAKGUARD_IMPLEMENT (csShaderGLCGVP);
 
 bool csShaderGLCGVP::Compile ()
@@ -117,3 +120,6 @@ csVertexAttrib csShaderGLCGVP::ResolveBufferDestination (const char* binding)
 
   return dest;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderCg)

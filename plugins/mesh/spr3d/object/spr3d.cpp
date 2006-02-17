@@ -52,7 +52,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::Spr3d;
+CS_PLUGIN_NAMESPACE_BEGIN(Spr3d)
+{
 
 CS_IMPLEMENT_STATIC_CLASSVAR (csSprite3DMeshObject, mesh, GetLODMesh, csTriangleMesh, ())
 
@@ -687,16 +688,16 @@ csMeshedPolygon* csSprite3DMeshObjectFactory::PolyMesh::GetPolygons ()
 //=============================================================================
 
 /// Static vertex array.
-typedef csDirtyAccessArray<csVector3> spr3d_tr_verts;
+typedef csDirtyAccessArrayRefCounted<csVector3> spr3d_tr_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_tr_verts, spr3d_tr_verts, ())
 /// Static uv array.
-typedef csDirtyAccessArray<csVector2> spr3d_uv_verts;
+typedef csDirtyAccessArrayRefCounted<csVector2> spr3d_uv_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_uv_verts, spr3d_uv_verts, ())
 /// The list of object vertices.
-typedef csDirtyAccessArray<csVector3> spr3d_obj_verts;
+typedef csDirtyAccessArrayRefCounted<csVector3> spr3d_obj_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_obj_verts, spr3d_obj_verts, ())
 /// The list of tween vertices.
-typedef csDirtyAccessArray<csVector3> spr3d_tween_verts;
+typedef csDirtyAccessArrayRefCounted<csVector3> spr3d_tween_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_tween_verts, spr3d_tween_verts, ())
 
 spr3d_tr_verts *tr_verts = 0;
@@ -2229,3 +2230,5 @@ bool csSprite3DMeshObjectType::GetOptionDescription (int idx,
   return true;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(Spr3d)

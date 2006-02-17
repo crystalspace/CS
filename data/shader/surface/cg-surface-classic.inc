@@ -24,20 +24,16 @@
       the "ifSurfaceNormalsNeeded" template which specifies whether the
       lighting step needs a normal (if it doesn't, passing around the normal
       can be optimized away). ?>
+  
+  <?Include /shader/surface/cg-parallax.inc?>
 
   <?Template Pass_Surface ?>
     <?if vars."tex diffuse".texture ?>
-      <buffer source="texture coordinate" destination="surface.texCoord" />
+      <buffer source="texture coordinate" destination="surfaceClassicA2V.texCoord" />
       <texture name="tex diffuse" destination="surfaceClassicA2F.texture" />
-      <?if vars."tex height".texture ?>
-	<texture name="tex height" 
-	  destination="surfaceClassicA2F.parallax.heightTex" />
-	<buffer source="normal" destination="surface.parallax.Normal" />
-	<buffer source="tangent" destination="surface.parallax.Tangent" />
-	<buffer source="binormal" destination="surface.parallax.BiNormal" />
-      <?endif?>
+      <?Pass_Parallax?>
       <?ifSurfaceNormalsNeeded?>
-	<buffer source="normals" destination="surface.normal" />
+	<buffer source="normals" destination="surfaceClassicA2V.normal" />
       <?endif?>
     <?endif?>
   <?Endtemplate?>
@@ -47,6 +43,7 @@
     <?if !vars."tex diffuse".texture ?>
       <variablemap variable="mat flatcolor" destination="surfaceClassicA2F.flatcolor" />
     <?endif?>
+    <?VariableMap_Parallax?>
   <?Endtemplate?>
   <?AddToList VariableMaps VariableMap_Surface ?>
   

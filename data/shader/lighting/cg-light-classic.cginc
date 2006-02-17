@@ -24,11 +24,13 @@
 
 struct AppToVert_Lighting_Classic
 {
-  float4 color : COLOR;
+  varying float4 color : COLOR;
 <?if vars."tex lightmap".texture ?>
-  float2 texCoordLM;
+  varying float2 texCoordLM;
 <?endif?>
 };
+
+AppToVert_Lighting_Classic lightingClassicA2V;
 
 struct VertToFrag_Lighting_Classic
 {
@@ -37,11 +39,11 @@ struct VertToFrag_Lighting_Classic
   float2 texCoordLM;
 <?endif?>
 
-  void Setup (AppToVert_Lighting_Classic A2V)
+  void Setup ()
   {
-    color = A2V.color;
+    color = lightingClassicA2V.color;
   <?if vars."tex lightmap".texture ?>
-    texCoordLM = A2V.texCoordLM;
+    texCoordLM = lightingClassicA2V.texCoordLM;
   <?endif?>
   }
 };

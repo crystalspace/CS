@@ -1,3 +1,21 @@
+<!--
+  Copyright (C) 2006 by Frank Richter
+	    (C) 2006 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
 <include>
 #ifndef __CS_SHADER_SECTORFOG_CG__
 #define __CS_SHADER_SECTORFOG_CG__
@@ -9,9 +27,11 @@ struct AppToVert_Fog_Sector
   uniform float4 fogPlaneS;
   uniform float4 fogPlaneT;
   uniform float4x4 ModelView : state.matrix.modelview;
-  float4 Position : POSITION;
+  varying float4 Position : POSITION;
 <?endif?>
 };
+
+AppToVert_Fog_Sector fogSectorA2V;
 
 struct VertToFrag_Fog_Sector
 {
@@ -19,12 +39,12 @@ struct VertToFrag_Fog_Sector
   float2 fogTC;
 <?endif?>
 
-  void Setup (AppToVert_Fog_Sector A2V)
+  void Setup ()
   {
   <?if vars."fog density".float &gt; 0 ?>
-    float4 eyePos = mul (A2V.ModelView, A2V.Position);
-    fogTC.x = dot (eyePos, A2V.fogPlaneS);
-    fogTC.y = dot (eyePos, A2V.fogPlaneT);
+    float4 eyePos = mul (fogSectorA2V.ModelView, fogSectorA2V.Position);
+    fogTC.x = dot (eyePos, fogSectorA2V.fogPlaneS);
+    fogTC.y = dot (eyePos, fogSectorA2V.fogPlaneT);
   <?endif?>
   }
 };

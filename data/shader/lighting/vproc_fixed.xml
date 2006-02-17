@@ -85,11 +85,11 @@
     <?HandleLightFVP $N$ 0 ?>
     <?HandleLightFVP $N$ 1 ?>
     <?HandleLightFVP $N$ 2 ?>
-    <?!HandleLightFVP $N$ 3 ?>
-    <?!HandleLightFVP $N$ 4 ?>
-    <?!HandleLightFVP $N$ 5 ?>
-    <?!HandleLightFVP $N$ 6 ?>
-    <?!HandleLightFVP $N$ 7 ?>
+    <?HandleLightFVP $N$ 3 ?>
+    <?HandleLightFVP $N$ 4 ?>
+    <?HandleLightFVP $N$ 5 ?>
+    <?HandleLightFVP $N$ 6 ?>
+    <?HandleLightFVP $N$ 7 ?>
   <?endtemplate?>
   <?template VPROCcommon N ?>
     <lightmixmode>add</lightmixmode>
@@ -111,11 +111,11 @@
     <?HandleLightVProc $N$ 0 ?>
     <?HandleLightVProc $N$ 1 ?>
     <?HandleLightVProc $N$ 2 ?>
-    <?!HandleLightVProc $N$ 3 ?>
-    <?!HandleLightVProc $N$ 4 ?>
-    <?!HandleLightVProc $N$ 5 ?>
-    <?!HandleLightVProc $N$ 6 ?>
-    <?!HandleLightVProc $N$ 7 ?>
+    <?HandleLightVProc $N$ 3 ?>
+    <?HandleLightVProc $N$ 4 ?>
+    <?HandleLightVProc $N$ 5 ?>
+    <?HandleLightVProc $N$ 6 ?>
+    <?HandleLightVProc $N$ 7 ?>
   <?endtemplate?>
   <?template FFPcommon?>
     <layer name="diffuse">

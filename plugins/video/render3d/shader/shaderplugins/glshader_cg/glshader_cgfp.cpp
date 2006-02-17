@@ -32,6 +32,9 @@
 
 #include "glshader_cgfp.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
+{
+
 CS_LEAKGUARD_IMPLEMENT (csShaderGLCGFP);
 
 void csShaderGLCGFP::Activate()
@@ -166,3 +169,6 @@ int csShaderGLCGFP::ResolveTU (const char* binding)
 
   return newTU;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderCg)
