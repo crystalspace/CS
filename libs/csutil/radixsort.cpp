@@ -40,8 +40,8 @@ void csRadixSorter::Resize (size_t size)
     allocatedSize = (currentSize+31)&~31;
     delete[] ranks1;
     delete[] ranks2;
-    ranks1 = new uint32[allocatedSize];
-    ranks2 = new uint32[allocatedSize];
+    ranks1 = new size_t[allocatedSize];
+    ranks2 = new size_t[allocatedSize];
   }
 }
 
@@ -315,16 +315,16 @@ void csRadixSorter::Sort (int32* array, size_t size)
       }
       else
       {
-        uint32* indices = ranks1;
-        uint32* indicesEnd = ranks1+size;
+        size_t* indices = ranks1;
+        size_t* indicesEnd = ranks1+size;
         while(indices != indicesEnd)
         {
-          uint32 id = *indices++;
+          size_t id = *indices++;
           *links[inputBytes[id<<2]]++ = id;
         }
       }
       // Swap for next pass
-      uint32* t = ranks1; ranks1 = ranks2; ranks2 = t;
+      size_t* t = ranks1; ranks1 = ranks2; ranks2 = t;
     }
   }
 }
@@ -405,16 +405,16 @@ void csRadixSorter::Sort (float* array, size_t size)
       }
       else
       {
-        uint32* indices = ranks1;
-        uint32* indicesEnd = ranks1+size;
+        size_t* indices = ranks1;
+        size_t* indicesEnd = ranks1+size;
         while(indices != indicesEnd)
         {
-          uint32 id = *indices++;
+          size_t id = *indices++;
           *links[inputBytes[id<<2]]++ = id;
         }
       }
       // Swap for next pass
-      uint32* t = ranks1; ranks1 = ranks2; ranks2 = t;
+      size_t* t = ranks1; ranks1 = ranks2; ranks2 = t;
     }
   }
 
@@ -464,7 +464,7 @@ void csRadixSorter::Sort (float* array, size_t size)
       }
     }
     // Swap for next pass
-    uint32* t = ranks1; ranks1 = ranks2; ranks2 = t;
+    size_t* t = ranks1; ranks1 = ranks2; ranks2 = t;
   }
   else
   {
@@ -488,7 +488,7 @@ void csRadixSorter::Sort (float* array, size_t size)
         }
       }
       // Swap for next pass
-      uint32* t = ranks1; ranks1 = ranks2; ranks2 = t;
+      size_t* t = ranks1; ranks1 = ranks2; ranks2 = t;
     }
   }
 }

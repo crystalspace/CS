@@ -61,7 +61,7 @@ public:
   /**
    * Get the last generated ranks array.
    */
-  inline uint32* GetRanks() const
+  inline size_t* GetRanks() const
   {
     return ranks1;
   }

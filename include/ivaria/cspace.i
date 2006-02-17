@@ -99,6 +99,10 @@
 #define CS_GNUC_PRINTF(format_idx, arg_idx)
 #undef CS_GNUC_SCANF(format_idx, arg_idx)
 #define CS_GNUC_SCANF(format_idx, arg_idx)
+#undef CS_GNUC_WPRINTF(format_idx, arg_idx)
+#define CS_GNUC_WPRINTF(format_idx, arg_idx)
+#undef CS_GNUC_WSCANF(format_idx, arg_idx)
+#define CS_GNUC_WSCANF(format_idx, arg_idx)
 #undef CS_DECLARE_STATIC_CLASSVAR(a, b, c)
 #define CS_DECLARE_STATIC_CLASSVAR(a, b, c)
 #undef CS_SPECIALIZE_TEMPLATE template<>
