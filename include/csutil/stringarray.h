@@ -214,7 +214,7 @@ public:
     /**
      * Only ignore consecutive delimiters if they're different.
      */
-    delimIgnoreDifferent,
+    delimIgnoreDifferent
   };
   /**
    * Add a number of strings to this array by splitting \a str at characters
