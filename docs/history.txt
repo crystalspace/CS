@@ -44,6 +44,10 @@ chronological order.
 	  processing instructions to "Template", "Endtemplate" and "Include".
 	  The idea is to distinguish them visually from "if" etc (which have
 	  somewhat different instructions).
+	- res fixed radixsort for 64bit.
+	- res fixed cspace.i for CS_GNUC_WPRINTF macro(s).
+	- res fixed a bug in xmlshader where the overlap of two value sets
+	  was computed wrong.
 15-Feb-2006
 	- Erroroman added support for 'checkelementcount' option in genmesh 
 	  factory loader (omits a warning when the element count of a 

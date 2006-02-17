@@ -149,9 +149,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       }
       else
       {
-        const Interval::Side& il = intervals[i].left;
+        const Interval::Side& il = intervals[i].right;
         const Interval::Side& ol = otherIntervals[j].left;
-        if (il.value >= ol.value)
+        if (il >= ol)
         {
           intervals.Insert (i, otherIntervals[j]);
           j++;
@@ -214,9 +214,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       }
       else
       {
-        const Interval::Side& il = intervals[i].left;
+        const Interval::Side& il = intervals[i].right;
         const Interval::Side& ol = otherIntervals[j].left;
-        if (il.value >= ol.value)
+        if (il >= ol)
           j++;
         else
           intervals.DeleteIndex (i);
