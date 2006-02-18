@@ -10644,7 +10644,6 @@ package cspace::iGraphics2D;
 *SaveArea = *cspacec::iGraphics2D_SaveArea;
 *RestoreArea = *cspacec::iGraphics2D_RestoreArea;
 *FreeArea = *cspacec::iGraphics2D_FreeArea;
-*Write = *cspacec::iGraphics2D_Write;
 *WriteBaseline = *cspacec::iGraphics2D_WriteBaseline;
 *AllowResize = *cspacec::iGraphics2D_AllowResize;
 *Resize = *cspacec::iGraphics2D_Resize;
@@ -10660,6 +10659,7 @@ package cspace::iGraphics2D;
 *GetGamma = *cspacec::iGraphics2D_GetGamma;
 *GetName = *cspacec::iGraphics2D_GetName;
 *CreateOffscreenCanvas = *cspacec::iGraphics2D_CreateOffscreenCanvas;
+*Write = *cspacec::iGraphics2D_Write;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
