@@ -107,7 +107,7 @@ using the standard @sc{api} in the @samp{iEngine} interface.
 @subsubheading Using Directly From Code
 
 You can also create Mesh Objects directly from your application. The engine
-has a few conveniance functions you can use for that
+has a few convenience functions you can use for that
 (@code{iEngine::CreateMeshwrapper()} and @code{iEngine::CreateMeshFactory()}).
 But here we show you the full way to create meshes from code:
 
