@@ -14,12 +14,12 @@
 	  <texmatrix layer="0">
 	    <scale type="shadervar">texture scale</scale>
 	  </texmatrix>
-	  <?include snippets/fog-fvp.inc ?>
+	  <?Include snippets/fog-fvp.inc ?>
 	</fixedvp>
       </vp>
       <texture name="tex diffuse" destination="unit 0"/>
       <texture name="splat alpha map" destination="unit 1"/>
-      <?include snippets/fog-mappings.inc ?>
+      <?Include snippets/fog-mappings.inc ?>
       <fp plugin="glfixed">
         <fixedfp>
 	  <fog>
