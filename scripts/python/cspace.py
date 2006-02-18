@@ -9548,7 +9548,6 @@ class iGraphics2D(iBase):
     def SaveArea(*args): return _cspace.iGraphics2D_SaveArea(*args)
     def RestoreArea(*args): return _cspace.iGraphics2D_RestoreArea(*args)
     def FreeArea(*args): return _cspace.iGraphics2D_FreeArea(*args)
-    def Write(*args): return _cspace.iGraphics2D_Write(*args)
     def WriteBaseline(*args): return _cspace.iGraphics2D_WriteBaseline(*args)
     def AllowResize(*args): return _cspace.iGraphics2D_AllowResize(*args)
     def Resize(*args): return _cspace.iGraphics2D_Resize(*args)
@@ -9564,6 +9563,7 @@ class iGraphics2D(iBase):
     def GetGamma(*args): return _cspace.iGraphics2D_GetGamma(*args)
     def GetName(*args): return _cspace.iGraphics2D_GetName(*args)
     def CreateOffscreenCanvas(*args): return _cspace.iGraphics2D_CreateOffscreenCanvas(*args)
+    def Write(*args): return _cspace.iGraphics2D_Write(*args)
     def __del__(self, destroy=_cspace.delete_iGraphics2D):
         try:
             if self.thisown: destroy(self)
