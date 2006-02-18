@@ -226,16 +226,17 @@ void csShaderConditionResolver::DumpConditionNode (csString& out,
   {
     if (node->variant != csArrayItemNotFound)
     {
-      out.AppendFmt ("variant: %zu\n", node->variant);
+      out.AppendFmt ("variant: %zu", node->variant);
     }
     else
     {
-      out.AppendFmt ("condition: %zu\n", node->condition);
+      out.Append ("\n");
       Indent (out, level);
-      out.Append ("True node: ");
+      out.AppendFmt ("condition %zu = true: ", node->condition);
       DumpConditionNode (out, node->trueNode, level + 1);
+      out.Append ("\n");
       Indent (out, level);
-      out.Append ("False node: ");
+      out.AppendFmt ("condition %zu = false: ", node->condition);
       DumpConditionNode (out, node->falseNode, level + 1);
     }
   }

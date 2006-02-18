@@ -56,38 +56,32 @@ void csWrappedDocumentNode::ConditionTree::RecursiveAdd (
     r = evaluator.CheckConditionResults (condition, 
       node->values, trueVals, falseVals);
 
-  if (node->condition == Node::csCondUnknown)
+  switch (r.state)
   {
-    switch (r.state)
-    {
-      case Logic3::Truth:
-        newCurrent.branches[0].Push (node);
-        break;
-      case Logic3::Lie:
-        newCurrent.branches[1].Push (node);
-        break;
-      case Logic3::Uncertain:
+    case Logic3::Truth:
+      newCurrent.branches[0].Push (node);
+      break;
+    case Logic3::Lie:
+      newCurrent.branches[1].Push (node);
+      break;
+    case Logic3::Uncertain:
+      if (node->condition == Node::csCondUnknown)
+      {
+        node->condition = condition;
+        for (int b = 0; b < 2; b++)
         {
-          node->condition = condition;
-          for (int b = 0; b < 2; b++)
-          {
-            Node* nn = new Node (node);
-            nn->values = (b == 0) ? trueVals : falseVals;
-            node->branches[b] = nn;
-            if ((b == 0) && (r.state == Logic3::Lie)) continue;
-            if ((b == 1) && (r.state == Logic3::Truth)) continue;
-            newCurrent.branches[b].Push (nn);
-          }
+          Node* nn = new Node (node);
+          nn->values = (b == 0) ? trueVals : falseVals;
+          node->branches[b] = nn;
+          newCurrent.branches[b].Push (nn);
         }
-        break;
-    }
-  }
-  else
-  {
-    if (r.state != Logic3::Lie)
-      RecursiveAdd (condition, node->branches[0], newCurrent);
-    if (r.state != Logic3::Truth)
-      RecursiveAdd (condition, node->branches[1], newCurrent);
+      } 
+      else
+      {
+        RecursiveAdd (condition, node->branches[0], newCurrent);
+        RecursiveAdd (condition, node->branches[1], newCurrent);
+      }
+      break;
   }
 }
 

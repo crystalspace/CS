@@ -143,24 +143,6 @@ public:
   friend Variables operator& (const Variables& a, const Variables& b)
   {
     Variables newVars;
-    const size_t num = csMin (a.possibleValues.GetSize(),
-      b.possibleValues.GetSize());
-    for (size_t i = 0; i < num; i++)
-    {
-      const Values* va = a.possibleValues[i];
-      const Values* vb = b.possibleValues[i];
-      if ((va != 0) && (vb != 0))
-      {
-        Values*& v = newVars.possibleValues.GetExtend (i);
-        v = newVars.valAlloc.Alloc ();
-        *v = *va & *vb;
-      }
-    }
-    return newVars;
-  }
-  friend Variables operator| (const Variables& a, const Variables& b)
-  {
-    Variables newVars;
     const csArray<Values*>& pvA = a.possibleValues;
     const csArray<Values*>& pvB = b.possibleValues;
     const size_t num = csMax (pvA.GetSize(), pvB.GetSize());
@@ -186,8 +168,27 @@ public:
         {
           Values*& v = newVars.possibleValues.GetExtend (i);
           v = newVars.valAlloc.Alloc ();
-          *v = (*va | *vb);
+          *v = (*va & *vb);
         }
+      }
+    }
+    return newVars;
+  }
+  friend Variables operator| (const Variables& a, const Variables& b)
+  {
+    Variables newVars;
+    const csArray<Values*>& pvA = a.possibleValues;
+    const csArray<Values*>& pvB = b.possibleValues;
+    const size_t num = csMax (pvA.GetSize(), pvB.GetSize());
+    for (size_t i = 0; i < num; i++)
+    {
+      const Values* va = (i < pvA.GetSize()) ? pvA[i] : 0;
+      const Values* vb = (i < pvB.GetSize()) ? pvB[i] : 0;
+      if ((va != 0) && (vb != 0))
+      {
+        Values*& v = newVars.possibleValues.GetExtend (i);
+        v = newVars.valAlloc.Alloc ();
+        *v = (*va | *vb);
       }
     }
     return newVars;

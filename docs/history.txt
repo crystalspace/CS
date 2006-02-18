@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Feb-2006
+	- res fixed xmlshader so nested conditions and logic expressions
+	  actually work.
 17-Feb-2006
 	- res beautified some shader snippet code.
 	- res made the following changes to csDirtyAccessArray<>:

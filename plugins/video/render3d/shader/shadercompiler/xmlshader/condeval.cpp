@@ -594,10 +594,8 @@ const char* csConditionEvaluator::ProcessExpression (
     else if (TokenEquals (t.tokenStart, t.tokenLen, "&&"))
     {
       newOp.operation = opAnd;
+
       err = ResolveOperand (expression->expressionValue.left, newOp.left);
-      if (err)
-	return err;
-      err = ResolveOperand (expression->expressionValue.right, newOp.right);
       if (err)
 	return err;
       if (!OpTypesCompatible (newOp.left.type, operandBoolean))
@@ -606,20 +604,48 @@ const char* csConditionEvaluator::ProcessExpression (
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
 	  OperandTypeDescription (operandBoolean));
       }
+      if (newOp.left.type != operandOperation)
+      {
+        /* Convert to "(left eq true) and (right eq true)" to make the possible 
+         * value determination simpler. */
+        CondOperation newOpL;
+        newOpL.operation = opEqual;
+        newOpL.left = newOp.left;
+        newOpL.right.type = operandBoolean;
+        newOpL.right.boolVal = true;
+
+        newOp.left.type = operandOperation;
+        newOp.left.operation = FindOptimizedCondition (newOpL);
+      }
+
+      err = ResolveOperand (expression->expressionValue.right, newOp.right);
+      if (err)
+	return err;
       if (!OpTypesCompatible (newOp.right.type, operandBoolean))
       {
 	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.right.type),
 	  OperandTypeDescription (operandBoolean));
+      }
+      if (newOp.right.type != operandOperation)
+      {
+        /* Convert to "(left eq true) and (right eq true)" to make the possible 
+         * value determination simpler. */
+        CondOperation newOpR;
+        newOpR.operation = opEqual;
+        newOpR.left = newOp.right;
+        newOpR.right.type = operandBoolean;
+        newOpR.right.boolVal = true;
+
+        newOp.right.type = operandOperation;
+        newOp.right.operation = FindOptimizedCondition (newOpR);
       }
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "||"))
     {
       newOp.operation = opOr;
+
       err = ResolveOperand (expression->expressionValue.left, newOp.left);
-      if (err)
-	return err;
-      err = ResolveOperand (expression->expressionValue.right, newOp.right);
       if (err)
 	return err;
       if (!OpTypesCompatible (newOp.left.type, operandBoolean))
@@ -628,11 +654,41 @@ const char* csConditionEvaluator::ProcessExpression (
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
 	  OperandTypeDescription (operandBoolean));
       }
+      if (newOp.left.type != operandOperation)
+      {
+        /* Convert to "(left eq true) or (right eq true)" to make the possible 
+         * value determination simpler. */
+        CondOperation newOpL;
+        newOpL.operation = opEqual;
+        newOpL.left = newOp.left;
+        newOpL.right.type = operandBoolean;
+        newOpL.right.boolVal = true;
+
+        newOp.left.type = operandOperation;
+        newOp.left.operation = FindOptimizedCondition (newOpL);
+      }
+
+      err = ResolveOperand (expression->expressionValue.right, newOp.right);
+      if (err)
+	return err;
       if (!OpTypesCompatible (newOp.right.type, operandBoolean))
       {
 	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.right.type),
 	  OperandTypeDescription (operandBoolean));
+      }
+      if (newOp.right.type != operandOperation)
+      {
+        /* Convert to "(left eq true) or (right eq true)" to make the possible 
+         * value determination simpler. */
+        CondOperation newOpR;
+        newOpR.operation = opEqual;
+        newOpR.left = newOp.right;
+        newOpR.right.type = operandBoolean;
+        newOpR.right.boolVal = true;
+
+        newOp.right.type = operandOperation;
+        newOp.right.operation = FindOptimizedCondition (newOpR);
       }
     }
     else
@@ -697,6 +753,7 @@ csConditionEvaluator::EvaluatorShadervar::Boolean (
 	  return sv != 0;
 	}
       }
+      break;
     case operandSVValueTexture:
       {
 	if (stacks.Length() > operand.svName)
@@ -710,6 +767,7 @@ csConditionEvaluator::EvaluatorShadervar::Boolean (
 	  }
 	}
       }
+      break;
     case operandSVValueBuffer:
       //@@TODO: CHECK FOR DEFAULTBUFFERS
       {
@@ -724,6 +782,7 @@ csConditionEvaluator::EvaluatorShadervar::Boolean (
 	  }
 	}
       }
+      break;
     default:
       ;
   }
@@ -1516,47 +1575,47 @@ EvaluatorShadervarValues::EvalResult EvaluatorShadervarValues::LogicAnd (
   Logic3 rA;
   Variables trueVarsA; 
   Variables falseVarsA;
-  if (a.type == operandOperation)
-  {
-    rA = evaluator.CheckConditionResults (a.operation,
-      vars, trueVarsA, falseVarsA);
-  }
-  else
-  {
-    rA = Boolean (a);
-    trueVarsA = trueVars;
-    falseVarsA = falseVars;
-  }
+  CS_ASSERT (a.type == operandOperation);
+  rA = evaluator.CheckConditionResults (a.operation,
+    vars, trueVarsA, falseVarsA);
 
   Logic3 rB;
-  Variables trueVarsB; 
-  Variables falseVarsB;
-  if (b.type == operandOperation)
+  CS_ASSERT (b.type == operandOperation);
+  if (rA.state == Logic3::Truth)
   {
-    if (rA.state == Logic3::Truth)
-    {
-      rB = evaluator.CheckConditionResults (b.operation,
-        trueVarsA, trueVarsB, falseVarsB);
-    }
-    else if (rB.state == Logic3::Lie)
-    {
-      rB = evaluator.CheckConditionResults (b.operation,
-        falseVarsA, trueVarsB, falseVarsB);
-    }
-    else
-    {
-      rB = evaluator.CheckConditionResults (b.operation,
-        trueVarsA | falseVarsA, trueVarsB, falseVarsB);
-    }
+    rB = evaluator.CheckConditionResults (b.operation,
+      trueVarsA, trueVars, falseVars);
+  }
+  else if (rA.state == Logic3::Lie)
+  {
+    rB = evaluator.CheckConditionResults (b.operation,
+      falseVarsA, trueVars, falseVars);
   }
   else
   {
-    rB = Boolean (b);
-    trueVarsB = trueVars;
-    falseVarsB = falseVars;
+    Logic3 rB1;
+    Variables trueVarsB1;
+    Variables falseVarsB1;
+    Logic3 rB2;
+    Variables trueVarsB2;
+    Variables falseVarsB2;
+    rB1 = evaluator.CheckConditionResults (b.operation,
+      trueVarsA, trueVarsB1, falseVarsB1);
+    rB2 = evaluator.CheckConditionResults (b.operation,
+      falseVarsA, trueVarsB2, falseVarsB2);
+
+    trueVars = trueVarsB1 | trueVarsB2;
+    falseVars = (trueVarsB1 & falseVarsB2) 
+      | (falseVarsB1 & trueVarsB2) 
+      | (falseVarsB1 & falseVarsB2);
+
+    if ((rB1.state == Logic3::Truth) && (rB2.state == Logic3::Truth))
+      rB = Logic3::Truth;
+    else if ((rB1.state == Logic3::Lie) && (rB2.state == Logic3::Lie))
+      rB = Logic3::Lie;
+    else
+      rB = Logic3::Uncertain;
   }
-  trueVars = trueVarsA & trueVarsB;
-  falseVars = falseVarsA | falseVarsB;
   return rA && rB;
 }
 
@@ -1566,47 +1625,49 @@ EvaluatorShadervarValues::EvalResult EvaluatorShadervarValues::LogicOr (
   Logic3 rA;
   Variables trueVarsA; 
   Variables falseVarsA;
-  if (a.type == operandOperation)
-  {
-    rA = evaluator.CheckConditionResults (a.operation,
-      vars, trueVarsA, falseVarsA);
-  }
-  else
-  {
-    rA = Boolean (a);
-    trueVarsA = trueVars;
-    falseVarsA = falseVars;
-  }
+  CS_ASSERT (a.type == operandOperation);
+  rA = evaluator.CheckConditionResults (a.operation,
+    vars, trueVarsA, falseVarsA);
 
   Logic3 rB;
   Variables trueVarsB; 
   Variables falseVarsB;
-  if (b.type == operandOperation)
+  CS_ASSERT (b.type == operandOperation);
+  if (rA.state == Logic3::Truth)
   {
-    if (rA.state == Logic3::Truth)
-    {
-      rB = evaluator.CheckConditionResults (b.operation,
-        trueVarsA, trueVarsB, falseVarsB);
-    }
-    else if (rB.state == Logic3::Lie)
-    {
-      rB = evaluator.CheckConditionResults (b.operation,
-        falseVarsA, trueVarsB, falseVarsB);
-    }
-    else
-    {
-      rB = evaluator.CheckConditionResults (b.operation,
-        trueVarsA | falseVarsA, trueVarsB, falseVarsB);
-    }
+    rB = evaluator.CheckConditionResults (b.operation,
+      trueVarsA, trueVars, falseVars);
+  }
+  else if (rA.state == Logic3::Lie)
+  {
+    rB = evaluator.CheckConditionResults (b.operation,
+      falseVarsA, trueVars, falseVars);
   }
   else
   {
-    rB = Boolean (b);
-    trueVarsB = trueVars;
-    falseVarsB = falseVars;
+    Logic3 rB1;
+    Variables trueVarsB1;
+    Variables falseVarsB1;
+    Logic3 rB2;
+    Variables trueVarsB2;
+    Variables falseVarsB2;
+    rB1 = evaluator.CheckConditionResults (b.operation,
+      trueVarsA, trueVarsB1, falseVarsB1);
+    rB2 = evaluator.CheckConditionResults (b.operation,
+      falseVarsA, trueVarsB2, falseVarsB2);
+
+    trueVars = (trueVarsB1 | falseVarsB2) 
+      & (falseVarsB1 | trueVarsB2) 
+      & (falseVarsB1 | falseVarsB2);
+    falseVars = falseVarsB1 | falseVarsB2;
+
+    if ((rB1.state == Logic3::Truth) && (rB2.state == Logic3::Truth))
+      rB = Logic3::Truth;
+    else if ((rB1.state == Logic3::Lie) && (rB2.state == Logic3::Lie))
+      rB = Logic3::Lie;
+    else
+      rB = Logic3::Uncertain;
   }
-  trueVars = trueVarsA | trueVarsB;
-  falseVars = falseVarsA & falseVarsB;
   return rA || rB;
 }
 
