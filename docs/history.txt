@@ -9,6 +9,7 @@ chronological order.
 18-Feb-2006
 	- res fixed xmlshader so nested conditions and logic expressions
 	  actually work.
+	- res un-enabled the global Cg position invariance option.
 17-Feb-2006
 	- res beautified some shader snippet code.
 	- res made the following changes to csDirtyAccessArray<>:

@@ -97,7 +97,8 @@ bool csShaderGLCGFP::Compile ()
   if (shaderPlug->psplg)
   {
     program = cgCreateProgram (shaderPlug->context, CG_SOURCE,
-      programStr, shaderPlug->psProfile, entrypoint ? entrypoint : "main", 0);
+      programStr, shaderPlug->psProfile, 
+      !entrypoint.IsEmpty() ? entrypoint : "main", 0);
 
     if (!program)
       return false;

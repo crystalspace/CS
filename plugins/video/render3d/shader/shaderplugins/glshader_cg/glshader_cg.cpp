@@ -89,7 +89,7 @@ void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error,
   }
 }
 
-static void SplitToArgs (const char* str, ArgumentArray& args)
+void csGLShader_CG::SplitArgsString (const char* str, ArgumentArray& args)
 {
   if ((str == 0) || (*str == 0)) return;
 
@@ -132,12 +132,11 @@ void csGLShader_CG::GetProfileCompilerArgs (const char* type,
 {
   csConfigAccess cfg (object_reg);
   csString key ("Video.OpenGL.Shader.Cg.CompilerOptions");
-  SplitToArgs (cfg->GetStr (key), args);
+  SplitArgsString (cfg->GetStr (key), args);
   key << "." << type;
-  SplitToArgs (cfg->GetStr (key), args);
+  SplitArgsString (cfg->GetStr (key), args);
   key << "." << cgGetProfileString (profile);
-  SplitToArgs (cfg->GetStr (key), args);
-  args.Push (0);
+  SplitArgsString (cfg->GetStr (key), args);
 }
 
 ////////////////////////////////////////////////////////////////////

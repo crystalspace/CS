@@ -34,7 +34,6 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
-#include "glshader_cg.h"
 #include "glshader_cgcommon.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
@@ -49,9 +48,6 @@ csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug,
   validProgram = true;
   this->shaderPlug = shaderPlug;
   program = 0;
-  cg_profile = 0;
-  entrypoint = 0;
-  debugFN = 0;
 
   InitTokenTable (xmltokens);
 }
@@ -60,9 +56,6 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
 {
   if (program)
     cgDestroyProgram (program);
-  delete[] cg_profile;
-  delete[] entrypoint;
-  delete[] debugFN;
 }
 
 void csShaderGLCGCommon::Activate()
@@ -301,7 +294,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
 
   CGprofile profile = CG_PROFILE_UNKNOWN;
 
-  if (cg_profile != 0)
+  if (!cg_profile.IsEmpty())
     profile = cgGetProfile (cg_profile);
 
   if(profile == CG_PROFILE_UNKNOWN)
@@ -316,9 +309,13 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
 
   ArgumentArray args;
   shaderPlug->GetProfileCompilerArgs (GetProgramType(), profile, args);
+  for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
+    args.Push (compilerArgs[i]);
+  args.Push (0);
+ 
   program = cgCreateProgram (shaderPlug->context, 
     compiled ? CG_OBJECT : CG_SOURCE, programStr, 
-    profile, entrypoint ? entrypoint : "main", args.GetArray());
+    profile, !entrypoint.IsEmpty() ? entrypoint : "main", args.GetArray());
 
   if (!program)
     return false;
@@ -410,13 +407,13 @@ void csShaderGLCGCommon::DoDebugDump ()
   output << "\n";
 
   csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
-  if (!debugFN)
+  if (debugFN.IsEmpty())
   {
     static int programCounter = 0;
     csString filename;
     filename << shaderPlug->dumpDir << (programCounter++) << programType << 
       ".txt";
-    debugFN = csStrNew (filename);
+    debugFN = filename;
     vfs->DeleteFile (debugFN);
   }
 
@@ -425,14 +422,14 @@ void csShaderGLCGCommon::DoDebugDump ()
   {
     csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
       "crystalspace.graphics3d.shader.glcg",
-      "Could not write '%s'", debugFN);
+      "Could not write '%s'", debugFN.GetData());
   }
   else
   {
     debugFile->Write (output.GetData(), output.Length());
     csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, 
       "crystalspace.graphics3d.shader.glcg",
-      "Dumped Cg program info to '%s'", debugFN);
+      "Dumped Cg program info to '%s'", debugFN.GetData());
   }
 }
 
@@ -452,7 +449,7 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
   {
     csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
       "crystalspace.graphics3d.shader.glcg",
-      "Could not augment '%s'", debugFN);
+      "Could not augment '%s'", debugFN.GetData());
   }
 }
 
@@ -478,12 +475,14 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver*,
       switch(id)
       {
         case XMLTOKEN_PROFILE:
-	  delete[] cg_profile;
-          cg_profile = csStrNew (child->GetContentsValue ());
+          cg_profile = child->GetContentsValue ();
           break;
         case XMLTOKEN_ENTRY:
-	  delete[] entrypoint;
-          entrypoint = csStrNew (child->GetContentsValue ());
+          entrypoint = child->GetContentsValue ();
+          break;
+        case XMLTOKEN_COMPILERARGS:
+          shaderPlug->SplitArgsString (child->GetContentsValue (), 
+            compilerArgs);
           break;
         default:
 	  if (!ParseCommon (child))

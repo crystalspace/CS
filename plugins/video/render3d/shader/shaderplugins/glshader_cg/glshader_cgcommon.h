@@ -36,10 +36,10 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif 
 #include <Cg/cgGL.h>
 
+#include "glshader_cg.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
-
-class csGLShader_CG;
 
 class csShaderGLCGCommon : public csShaderProgram
 {
@@ -53,14 +53,15 @@ protected:
   csGLShader_CG* shaderPlug;
 
   CGprogram program;
-  char* cg_profile;
-  char* entrypoint;
+  csString cg_profile;
+  csString entrypoint;
 
   bool validProgram;
 
   const char* programType;
+  ArgumentArray compilerArgs;
 
-  char* debugFN;
+  csString debugFN;
 
   bool DefaultLoadProgram (const char* programStr, CGGLenum type, 
     bool compiled = false, bool doLoad = true);

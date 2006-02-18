@@ -55,16 +55,13 @@ bool csShaderGLCGVP::Compile ()
    * profiles - those require "manual" binding of state matrices via 
    * glTrackMatrixNV() which we don't support right now.
    */
-  if (cg_profile != 0)
+  if (!cg_profile.IsEmpty())
     progProf = cgGetProfile (cg_profile);
   
   if(progProf == CG_PROFILE_UNKNOWN)
     progProf = cgGLGetLatestProfile (CG_GL_VERTEX);
   if (progProf < CG_PROFILE_ARBVP1)
-  {
-    delete[] cg_profile;
-    cg_profile = csStrNew ("arbvp1");
-  }
+    cg_profile = "arbvp1";
   
   if (!DefaultLoadProgram (programStr, CG_GL_VERTEX, false, true))
     return false;

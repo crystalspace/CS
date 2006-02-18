@@ -17,6 +17,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <include>
+<!-- We want position invariance here -->
+<compilerargs>-posinv</compilerargs>
 <?! This inserts the variable maps required by the snippets. ?>
 <?InsertList VariableMaps ?>
 <program>

@@ -84,6 +84,7 @@ public:
   bool Initialize (iObjectRegistry* reg);
   /** @} */
 
+  void SplitArgsString (const char* str, ArgumentArray& args);
   void GetProfileCompilerArgs (const char* type, CGprofile profile, 
     ArgumentArray& args);
 };
