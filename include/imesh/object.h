@@ -275,7 +275,7 @@ struct iMeshObject : public virtual iBase
  * This object is a factory which can generate
  * mesh objects of a certain type. For example, if you want to have
  * multiple sets of sprites from the same sprite template then
- * you should have an instance of iMeshObjectFactory for evey sprite
+ * you should have an instance of iMeshObjectFactory for every sprite
  * template and an instance of iMeshObject for every sprite.
  * 
  * To use a mesh factory in the engine, you have to create a mesh factory
