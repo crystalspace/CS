@@ -44,7 +44,7 @@
 			CharacterSet="2"
 [% END %]
 [% MACRO global_app_release BLOCK -%]
-			WholeProgramOptimization="TRUE"
+			WholeProgramOptimization="1"
 [% END %]
 [% MACRO global_appcon GET global_app %]
 [% MACRO global_appcon_release GET global_app_release %]
@@ -63,11 +63,11 @@
 			ConfigurationType="2"
 [% END %]
 [% MACRO global_plugin_release BLOCK -%]
-			WholeProgramOptimization="TRUE"
+			WholeProgramOptimization="1"
 [% END %]
 
 [% MACRO compiler_release BLOCK -%]
-				Optimization="3"
+				Optimization="2"
 				StringPooling="TRUE"
 				EnableFunctionLevelLinking="TRUE"
 				RuntimeLibrary="2"

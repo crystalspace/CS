@@ -12,6 +12,8 @@ chronological order.
 	- res changed the image loaders to employ the CS_PLUGIN_NAMESPACE_*
 	  macros for namespaces.
 	- res converted imgplex to new SCF.
+	- res changed the VC templates to use /O2 instead of /Ox. Also fixed
+	  the whole program optimization setting to work in VC8. 
 18-Feb-2006
 	- res fixed xmlshader so nested conditions and logic expressions
 	  actually work.
