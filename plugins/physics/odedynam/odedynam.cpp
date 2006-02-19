@@ -857,10 +857,10 @@ void csODEDynamicSystem::EnableAutoDisable (bool enable)
 void csODEDynamicSystem::SetAutoDisableParams (float linear, float angular,
                                                int steps, float time)
 {
-  if(linear!=0.0f) dWorldSetAutoDisableLinearThreshold (worldID, linear);
-  if(angular!=0.0f) dWorldSetAutoDisableAngularThreshold (worldID, angular);
-  if(steps!=0.0f) dWorldSetAutoDisableSteps (worldID, steps);
-  if(time!=0.0f) dWorldSetAutoDisableTime (worldID, time);
+  dWorldSetAutoDisableLinearThreshold (worldID, linear);
+  dWorldSetAutoDisableAngularThreshold (worldID, angular);
+  dWorldSetAutoDisableSteps (worldID, steps);
+  dWorldSetAutoDisableTime (worldID, time);
 }
 
 void csODEDynamicSystem::SetContactMaxCorrectingVel (float v)

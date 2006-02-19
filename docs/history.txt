@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Feb-2006
+	- Piotr Obrzut removed unecesery and wrong conditions checks while 
+	  seting autodisable params in ode dynamics system.
 18-Feb-2006
 	- res fixed xmlshader so nested conditions and logic expressions
 	  actually work.
