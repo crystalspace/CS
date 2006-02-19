@@ -24,6 +24,8 @@
 #include "csutil/csendian.h"
 #include "dds.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace dds
 {
 
@@ -519,3 +521,5 @@ void Loader::CorrectPremult (csRGBpixel* buffer, size_t pixnum)
 }
   
 } // end of namespace dds
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)

@@ -4,11 +4,14 @@
 
 */
 
+#include "common.h"
 #include "fCodeBook.h"
 #include "CodeBook.h"
 #include <stdio.h>
 #include <math.h>
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace ImageLib
 {
 
@@ -98,3 +101,5 @@ long		i, Count;
 }
 
 } // end of namespace ImageLib
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)

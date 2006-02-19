@@ -24,6 +24,8 @@
 
 #include "csgfx/rgbpixel.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace dds
 {
 
@@ -157,6 +159,8 @@ private:
 };
 
 } // end of namespace dds
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)
 
 #endif
 

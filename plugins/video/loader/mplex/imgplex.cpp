@@ -33,40 +33,26 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE(csImageIOMultiplexer);
-  SCF_IMPLEMENTS_INTERFACE(iImageIO);
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csImageIOMultiplexer::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+CS_PLUGIN_NAMESPACE_BEGIN(ImgPlex)
+{
 
 SCF_IMPLEMENT_FACTORY(csImageIOMultiplexer)
 
-
-csImageIOMultiplexer::csImageIOMultiplexer (iBase *pParent)
+csImageIOMultiplexer::csImageIOMultiplexer (iBase *pParent) :
+  scfImplementationType (this, pParent), global_dither (0)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
-  global_dither = false;
 }
 
 csImageIOMultiplexer::~csImageIOMultiplexer ()
 {
   if (classlist) classlist->DeleteAll ();
-  classlist = 0;
-  plugin_mgr = 0;
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csImageIOMultiplexer::Initialize (iObjectRegistry *object_reg)
 {
   if (object_reg)
   {
-    plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
 
     // query registry for image plugins...
     classlist = csPtr<iStringArray> (
@@ -107,7 +93,7 @@ bool csImageIOMultiplexer::LoadNextPlugin ()
       classname = classlist->Get(0);
     } while (!strcasecmp (classname, IMGPLEX_CLASSNAME));
     
-    plugin = CS_LOAD_PLUGIN (plugin_mgr, classname, iImageIO);
+    plugin = csLoadPlugin<iImageIO> (plugin_mgr, classname);
     if (plugin)
     {
       plugin->SetDithering (global_dither);
@@ -230,3 +216,6 @@ csPtr<iDataBuffer> csImageIOMultiplexer::Save (iImage *image, const char *mime,
   } while (LoadNextPlugin());
   return 0;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(ImgPlex)

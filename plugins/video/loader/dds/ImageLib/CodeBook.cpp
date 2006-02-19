@@ -11,6 +11,8 @@
 #include <math.h>
 #include "Image.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace ImageLib
 {
 
@@ -574,3 +576,5 @@ cbVector	Diff;
 }
 
 } // end of namespace ImageLib
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)

@@ -9,6 +9,8 @@
 #include "fCodeBook.h"
 #include "DXTCGen.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace ImageLib
 {
 
@@ -1090,3 +1092,5 @@ void ImageDXTC::EmitMultiAlphaBlock6 (WORD *pDest, CodeBook &cb, Color *pSrc)
 }
 
 } // end of namespace ImageLib
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)

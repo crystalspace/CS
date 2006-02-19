@@ -35,6 +35,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace ImageLib
 {
 
@@ -262,5 +264,7 @@ int Index = Find(el);
 }
 
 } // end of namespace ImageLib
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)
 
 #endif

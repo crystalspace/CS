@@ -6,6 +6,8 @@
 
 #include "MedianCut.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace ImageLib
 {
 
@@ -347,3 +349,5 @@ long i;
 }
 
 } // end of namespace ImageLib
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)

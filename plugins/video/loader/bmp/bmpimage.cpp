@@ -28,10 +28,10 @@
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::BMPImageIO;
+CS_PLUGIN_NAMESPACE_BEGIN(BMPImageIO)
+{
 
 SCF_IMPLEMENT_FACTORY (csBMPImageIO)
-
 
 #define BMP_MIME "image/bmp"
 #define BMP_EXT	 "bmp"
@@ -484,3 +484,6 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, size_t iSize)
 
   return false;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(BMPImageIO)

@@ -10,6 +10,8 @@
 #include "cfVector.h"
 #include "Cclist.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace ImageLib 
 {
 
@@ -54,5 +56,7 @@ public:
 };
 
 } // end of namespace ImageLib
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)
 
 #endif

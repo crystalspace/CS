@@ -30,7 +30,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::DDSImageIO;
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 
 SCF_IMPLEMENT_FACTORY(csDDSImageIO)
 
@@ -451,3 +452,5 @@ void csDDSImageFile::Report (int severity, const char* msg, ...)
   va_end (argv);
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)

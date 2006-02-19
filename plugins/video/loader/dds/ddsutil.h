@@ -19,6 +19,9 @@
 
 #include "csutil/csendian.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
+
 static inline void CopyLEUI32s (void* dest, const void* source, size_t count)
 {
   uint32* d = (uint32*)dest; uint32* s = (uint32*)source;
@@ -28,3 +31,5 @@ static inline void CopyLEUI32s (void* dest, const void* source, size_t count)
   }
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)

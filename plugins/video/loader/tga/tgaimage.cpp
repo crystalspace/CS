@@ -39,7 +39,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::TGAImageIO;
+CS_PLUGIN_NAMESPACE_BEGIN(TGAImageIO)
+{
 
 SCF_IMPLEMENT_FACTORY (csTGAImageIO)
 
@@ -543,3 +544,5 @@ bool ImageTgaFile::TgaLoader::LoadData ()
   return true;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(TGAImageIO)

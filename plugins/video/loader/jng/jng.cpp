@@ -53,7 +53,8 @@ extern "C"
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::JNGImageIO;
+CS_PLUGIN_NAMESPACE_BEGIN(JNGImageIO)
+{
 
 SCF_IMPLEMENT_FACTORY (csJNGImageIO)
 
@@ -935,3 +936,5 @@ bool ImageJngFile::IsAnimated ()
    */
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(JNGImageIO)

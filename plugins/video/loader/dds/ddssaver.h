@@ -29,6 +29,9 @@
 
 struct iImage;
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
+
 class csDDSSaver
 {
   class Format
@@ -62,5 +65,8 @@ public:
   csPtr<iDataBuffer> Save (csRef<iImage> image, 
     const csImageLoaderOptionsParser& options);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)
 
 #endif // __CS_DDS_DDSSAVER_H__

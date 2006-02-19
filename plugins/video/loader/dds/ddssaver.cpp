@@ -27,6 +27,9 @@
 
 #include "ImageLib/Image.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
+
 bool csDDSSaver::FmtB8G8R8::Save (csMemFile& out, iImage* image)
 {
   size_t pixNum = image->GetWidth() * image->GetHeight() * image->GetDepth();
@@ -282,3 +285,6 @@ csPtr<iDataBuffer> csDDSSaver::Save (csRef<iImage> image,
   csRef<iDataBuffer> fileData (outFile.GetAllData());
   return csPtr<iDataBuffer> (fileData);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)

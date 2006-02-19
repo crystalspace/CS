@@ -11,6 +11,8 @@
 #include "MedianCut.h"
 #include <math.h>
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace ImageLib
 {
 
@@ -1477,3 +1479,5 @@ Color *pPix, *pPixStart, *pDest;
 }
 
 } // end of namespace ImageLib
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)

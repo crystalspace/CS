@@ -19,6 +19,8 @@
 #include <assert.h>
 #include <ctype.h>
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace ImageLib
 {
 
@@ -641,3 +643,5 @@ void ccHashList::Rename(ccHashNode *n, const char *NewName)
 }
 
 } // end of namespace ImageLib
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)

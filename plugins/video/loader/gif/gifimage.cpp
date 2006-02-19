@@ -25,7 +25,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::GIFImageIO;
+CS_PLUGIN_NAMESPACE_BEGIN(GIFImageIO)
+{
 
 SCF_IMPLEMENT_FACTORY (csGIFImageIO)
 
@@ -450,3 +451,5 @@ bool ImageGifFile::Load (uint8* iBuffer, size_t iSize)
   return (rc == 0);
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(GIFImageIO)

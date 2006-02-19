@@ -27,11 +27,7 @@
 #include "iutil/databuff.h"
 #include "csplugincommon/imageloader/commonimagefile.h"
 
-namespace CS
-{
-namespace Plugins
-{
-namespace PNGImageIO
+CS_PLUGIN_NAMESPACE_BEGIN(PNGImageIO)
 {
 
 /**
@@ -109,8 +105,7 @@ public:
   CS_LEAKGUARD_DECLARE (ImagePngFile);
 };
 
-} // namespace PNGImageIO
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(PNGImageIO)
 
 #endif // __CS_PNGIMAGE_H__

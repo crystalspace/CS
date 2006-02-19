@@ -25,13 +25,8 @@
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 
-namespace CS
+CS_PLUGIN_NAMESPACE_BEGIN(GIFImageIO)
 {
-namespace Plugins
-{
-namespace GIFImageIO
-{
-
 
 /**
  * The GIF image file format loader.
@@ -73,8 +68,7 @@ private:
   bool Load (uint8* iBuffer, size_t iSize);
 };
 
-} // namespace GIFImageIO
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(GIFImageIO)
 
 #endif // __CS_GIFIMAGE_H__

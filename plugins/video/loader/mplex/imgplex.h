@@ -26,13 +26,20 @@
 #include "iutil/plugin.h"
 #include "csutil/cfgacc.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/weakref.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(ImgPlex)
+{
 
 /**
  * Through this plugin you can load/save a set of different formats.
  * It works by loading other plzugins and transfers execution to them.
  */
-class csImageIOMultiplexer : public iImageIO
+class csImageIOMultiplexer : 
+  public scfImplementation2<csImageIOMultiplexer,
+                            iImageIO,
+                            iComponent>
 {
  protected:
   csRefArray<iImageIO> list;
@@ -50,8 +57,6 @@ class csImageIOMultiplexer : public iImageIO
   bool LoadNextPlugin ();
 
  public:
-  SCF_DECLARE_IBASE;
-
   csImageIOMultiplexer (iBase *pParent);
   virtual ~csImageIOMultiplexer ();
 
@@ -64,13 +69,9 @@ class csImageIOMultiplexer : public iImageIO
   virtual csPtr<iDataBuffer> Save (iImage *image,
   	iImageIO::FileFormatDescription *format = 0,
     	const char* extraoptions = 0);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csImageIOMultiplexer);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(ImgPlex)
 
 #endif // __CS_IMGMULTIPLEX_H__

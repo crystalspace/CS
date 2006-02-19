@@ -4,10 +4,13 @@
 
 */
 
+#include "common.h"
 #include "cfVector.h"
 #include <string.h>
 #include <math.h>
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace ImageLib
 {
 
@@ -167,3 +170,5 @@ float Val, Result = 0.0f;
 }
 
 } // end of namespace ImageLib
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)

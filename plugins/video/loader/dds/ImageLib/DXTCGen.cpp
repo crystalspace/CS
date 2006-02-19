@@ -7,6 +7,8 @@
 #include "common.h"
 #include "DXTCGen.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace ImageLib
 {
 
@@ -612,3 +614,5 @@ long Error, Start0, Start1, End0, End1;
 }
 
 } // end of namespace ImageLib
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)

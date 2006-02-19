@@ -4,9 +4,12 @@
 
 */
 
+#include "common.h"
 #include "ccDoubleHeap.h"
 #include <assert.h>
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace ImageLib
 {
 
@@ -105,3 +108,5 @@ void ccDoubleHeap::ExtractInsert(ccDoubleHeapNode *pNode)
 }
 
 } // end of namespace ImageLib
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)

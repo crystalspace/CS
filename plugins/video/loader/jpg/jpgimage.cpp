@@ -32,7 +32,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::JPGImageIO;
+CS_PLUGIN_NAMESPACE_BEGIN(JPGImageIO)
+{
 
 CS_LEAKGUARD_IMPLEMENT (ImageJpgFile);
 
@@ -612,3 +613,5 @@ csRef<iImageFileLoader> ImageJpgFile::InitLoader (csRef<iDataBuffer> source)
   return loader;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(JPGImageIO)

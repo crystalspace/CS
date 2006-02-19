@@ -39,7 +39,8 @@ extern "C"
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::PNGImageIO;
+CS_PLUGIN_NAMESPACE_BEGIN(PNGImageIO)
+{
 
 CS_LEAKGUARD_IMPLEMENT (ImagePngFile);
 
@@ -666,3 +667,5 @@ csRef<iImageFileLoader> ImagePngFile::InitLoader (csRef<iDataBuffer> source)
   return loader;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(PNGImageIO)

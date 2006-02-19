@@ -26,13 +26,8 @@
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 
-namespace CS
+CS_PLUGIN_NAMESPACE_BEGIN(BMPImageIO)
 {
-namespace Plugins
-{
-namespace BMPImageIO
-{
-
 
 /**
  * The BMP image file format loader.
@@ -80,8 +75,7 @@ private:
   bool Load (uint8* iBuffer, size_t iSize);
 };
 
-} // namespace BMPImageIO
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(BMPImageIO)
 
 #endif // __CS_BMPIMAGE_H__

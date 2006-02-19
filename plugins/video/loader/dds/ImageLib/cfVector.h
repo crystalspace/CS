@@ -7,6 +7,8 @@
 #ifndef CBVECTOR_H_
 #define CBVECTOR_H_
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace ImageLib 
 {
 
@@ -54,5 +56,7 @@ public:
 
 
 } // end of namespace ImageLib
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)
 
 #endif

@@ -28,11 +28,7 @@
 #include "iutil/virtclk.h"
 #include "csutil/memfile.h"
 
-namespace CS
-{
-namespace Plugins
-{
-namespace JNGImageIO
+CS_PLUGIN_NAMESPACE_BEGIN(JNGImageIO)
 {
 
 /**
@@ -130,8 +126,7 @@ public:
   virtual bool IsAnimated ();
 };
 
-} // namespace JNGImageIO
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(JNGImageIO)
 
 #endif // __CS_JNG_H__

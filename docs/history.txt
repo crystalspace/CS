@@ -9,6 +9,9 @@ chronological order.
 19-Feb-2006
 	- Piotr Obrzut removed unecesery and wrong conditions checks while 
 	  seting autodisable params in ode dynamics system.
+	- res changed the image loaders to employ the CS_PLUGIN_NAMESPACE_*
+	  macros for namespaces.
+	- res converted imgplex to new SCF.
 18-Feb-2006
 	- res fixed xmlshader so nested conditions and logic expressions
 	  actually work.

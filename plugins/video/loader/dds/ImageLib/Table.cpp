@@ -4,6 +4,7 @@
 
 */
 
+#include "common.h"
 #include "Table.h"
 #include <assert.h>
 #include <memory.h>
@@ -12,6 +13,8 @@
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
+CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
+{
 namespace ImageLib
 {
 
@@ -153,3 +156,5 @@ TableHeader *tb = *ppTabHdr;
 } 
 
 } // end of namespace ImageLib
+}
+CS_PLUGIN_NAMESPACE_END(DDSImageIO)
