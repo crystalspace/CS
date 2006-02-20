@@ -21,7 +21,7 @@
 
 #include "csutil/scf_implementation.h"
 #include "csgeom/transfrm.h"
-#include "csgeom/objmodel.h"
+#include "cstool/objmodel.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/csobject.h"
 #include "csutil/cscolor.h"

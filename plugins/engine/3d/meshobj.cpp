@@ -18,7 +18,7 @@
 #include "cssysdef.h"
 #include "csqsqrt.h"
 #include "csgeom/sphere.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "igeom/clip2d.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/meshobj.h"

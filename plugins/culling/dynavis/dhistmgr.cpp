@@ -23,7 +23,7 @@
 #include "csqsqrt.h"
 #include "csgeom/math3d.h"
 #include "csgeom/pmtools.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "igeom/polymesh.h"
 #include "dhistmgr.h"
 

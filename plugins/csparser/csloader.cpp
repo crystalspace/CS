@@ -79,7 +79,7 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/polymesh.h"
 #include "igeom/polymesh.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "ivaria/terraform.h"
 
 #include "loadtex.h"

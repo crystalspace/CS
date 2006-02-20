@@ -19,7 +19,7 @@
 #ifndef __CS_HAZE_H__
 #define __CS_HAZE_H__
 
-#include "csgeom/objmodel.h"
+#include "cstool/objmodel.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "cstool/rendermeshholder.h"

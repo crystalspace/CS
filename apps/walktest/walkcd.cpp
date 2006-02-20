@@ -29,7 +29,7 @@
 #include "iengine/camera.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "igeom/polymesh.h"
 #include "imesh/object.h"
 #include "imesh/thing.h"

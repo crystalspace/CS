@@ -29,7 +29,7 @@
 #include "csutil/set.h"
 #include "csutil/weakref.h"
 #include "csgeom/plane3.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "iengine/viscull.h"
 #include "iengine/movable.h"
 #include "iengine/shadcast.h"

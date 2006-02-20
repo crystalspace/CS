@@ -22,7 +22,7 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/transfrm.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/camera.h"

@@ -30,7 +30,7 @@
 #include "csutil/set.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "iengine/movable.h"
 #include "csgeom/plane3.h"
 #include "csgeom/tcovbuf.h"

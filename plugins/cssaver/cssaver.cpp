@@ -36,7 +36,7 @@
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
 #include "iengine/texture.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "igraphic/image.h"
 #include "imap/services.h"
 #include "imap/writer.h"

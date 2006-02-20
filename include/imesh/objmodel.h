@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_IGEOM_OBJMODEL_H__
-#define __CS_IGEOM_OBJMODEL_H__
+#ifndef __CS_IMESH_OBJMODEL_H__
+#define __CS_IMESH_OBJMODEL_H__
 
 /**\file
  * Mesh object models
@@ -180,5 +180,5 @@ struct iObjectModel : public virtual iBase
 
 /** @} */
 
-#endif // __CS_IGEOM_OBJMODEL_H__
+#endif // __CS_IMESH_OBJMODEL_H__
 

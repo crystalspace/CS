@@ -26,7 +26,7 @@
 
 #include "csextern.h"
 #include "csgeom/box.h"
-#include "csgeom/objmodel.h"
+#include "cstool/objmodel.h"
 #include "csgeom/vector3.h"
 #include "csgfx/shadervarcontext.h"
 #include "cstool/rendermeshholder.h"

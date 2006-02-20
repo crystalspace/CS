@@ -52,5 +52,6 @@
 #include "cstool/userrndbuf.h"
 #include "cstool/vertexcompress.h"
 #include "cstool/vfsdirchange.h"
+#include "cstool/objmodel.h"
 #endif /* __CSTOOL_H__ */
 

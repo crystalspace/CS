@@ -21,7 +21,7 @@
 
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
-#include "csgeom/objmodel.h"
+#include "cstool/objmodel.h"
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
 

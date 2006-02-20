@@ -49,5 +49,6 @@
 #include "imesh/stars.h"
 #include "imesh/terrain.h"
 #include "imesh/thing.h"
+#include "imesh/objmodel.h"
 #endif /* __IMESH_H__ */
 

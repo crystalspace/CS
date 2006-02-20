@@ -22,7 +22,7 @@
 #include "csgeom/box.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
-#include "csgeom/objmodel.h"
+#include "cstool/objmodel.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/trimeshlod.h"

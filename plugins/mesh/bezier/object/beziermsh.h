@@ -33,7 +33,7 @@
 #include "cstool/framedataholder.h"
 #include "csgfx/shadervarcontext.h"
 #include "igeom/polymesh.h"
-#include "csgeom/objmodel.h"
+#include "cstool/objmodel.h"
 #include "csgeom/pmtools.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"

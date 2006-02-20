@@ -20,7 +20,7 @@
 #define __CS_THING_H__
 
 #include "csgeom/csrect.h"
-#include "csgeom/objmodel.h"
+#include "cstool/objmodel.h"
 #include "csgeom/pmtools.h"
 #include "csgeom/subrec.h"
 #include "csgeom/transfrm.h"

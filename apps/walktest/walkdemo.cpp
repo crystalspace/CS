@@ -33,7 +33,7 @@
 #include "iengine/region.h"
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "igeom/polymesh.h"
 #include "imap/loader.h"
 #include "imesh/explode.h"

@@ -21,7 +21,7 @@
 
 #include "csgeom/box.h"
 #include "csutil/flags.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"
 

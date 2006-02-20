@@ -19,7 +19,7 @@
 #ifndef __CS_TERRFUNC_H__
 #define __CS_TERRFUNC_H__
 
-#include "csgeom/objmodel.h"
+#include "cstool/objmodel.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "cstool/rendermeshholder.h"
@@ -35,7 +35,7 @@
 #include "iengine/lightmgr.h"
 #include "iengine/mesh.h"
 #include "iengine/shadcast.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "imesh/terrain.h"

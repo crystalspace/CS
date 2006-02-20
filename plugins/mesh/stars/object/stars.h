@@ -21,7 +21,7 @@
 
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
-#include "csgeom/objmodel.h"
+#include "cstool/objmodel.h"
 #include "csutil/cscolor.h"
 #include "csutil/flags.h"
 #include "csutil/refarr.h"

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSGEOM_OBJMODEL_H__
-#define __CS_CSGEOM_OBJMODEL_H__
+#ifndef __CS_CSTOOL_OBJMODEL_H__
+#define __CS_CSTOOL_OBJMODEL_H__
 
 /**\file
  * Implementation of iObjectModel.
@@ -32,7 +32,7 @@
 
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "igeom/polymesh.h"
 
 
@@ -136,5 +136,5 @@ public:
 
 /** @} */
 
-#endif // __CS_CSGEOM_OBJMODEL_H__
+#endif // __CS_CSTOOL_OBJMODEL_H__
 

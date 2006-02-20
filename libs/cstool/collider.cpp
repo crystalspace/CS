@@ -37,7 +37,7 @@
 #include "iengine/viscull.h"
 #include "iengine/scenenode.h"
 
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "igeom/polymesh.h"
 #include "imesh/object.h"
 #include "ivaria/collider.h"

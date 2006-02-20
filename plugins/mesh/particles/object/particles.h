@@ -19,7 +19,7 @@
 #ifndef __CS_PARTICLES_H__
 #define __CS_PARTICLES_H__
 
-#include "csgeom/objmodel.h"
+#include "cstool/objmodel.h"
 #include "csgeom/transfrm.h"
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"

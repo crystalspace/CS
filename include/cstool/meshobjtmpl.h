@@ -26,7 +26,7 @@
 #include "csextern.h"
 
 #include "csgeom/box.h"
-#include "csgeom/objmodel.h"
+#include "cstool/objmodel.h"
 #include "csutil/flags.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"

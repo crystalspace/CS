@@ -33,7 +33,7 @@
 #include "iengine/rview.h"
 #include "iengine/sector.h"
 #include "igeom/clip2d.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "imesh/object.h"
 #include "iutil/document.h"
 #include "ivideo/graph3d.h"

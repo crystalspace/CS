@@ -900,7 +900,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "iaws/aws.h"
 
 %include "igeom/clip2d.h"
-%include "igeom/objmodel.h"
+%include "imesh/objmodel.h"
 %include "igeom/path.h"
 %include "igeom/polymesh.h"
 %include "csgeom/path.h"

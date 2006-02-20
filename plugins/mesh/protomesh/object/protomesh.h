@@ -20,11 +20,11 @@
 #define __CS_PROTOMESH_H__
 
 #include "csgeom/vector3.h"
-#include "csgeom/objmodel.h"
+#include "cstool/objmodel.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
 #include "cstool/rendermeshholder.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "iutil/comp.h"
 #include "imesh/protomesh.h"
 #include "imesh/object.h"

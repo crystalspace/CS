@@ -40,7 +40,7 @@
 #include "csgeom/kdtree.h"
 #include "csgeom/tcovbuf.h"
 #include "igeom/polymesh.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "igeom/clip2d.h"
 #include "csutil/flags.h"
 #include "iutil/objreg.h"
