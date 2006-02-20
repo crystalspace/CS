@@ -1066,9 +1066,6 @@ typename_qualifier Evaluator::EvalResult csConditionEvaluator::Evaluate (
       CS_ASSERT (false);
   }
 
-  //condChecked.Set (condition, true);
-  //condResult.Set (condition, result);
-
   return result;
 }
 

@@ -42,19 +42,94 @@
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
-void csWrappedDocumentNode::ConditionTree::RecursiveAdd (
-  csConditionID condition, Node* node, NodeStackEntry& newCurrent)
+class ConditionTree
+{
+  struct Node
+  {
+    static const csConditionID csCondUnknown = (csConditionID)~2;    
+    
+    Node* parent;
+
+    csConditionID condition;
+    Node* branches[2];
+    Variables values;
+
+    Node (Node* p) : parent (p), condition (csCondUnknown)
+    {
+      branches[0] = 0;
+      branches[1] = 0;
+    }
+    ~Node ()
+    {
+      delete branches[0];
+      delete branches[1];
+    }
+  };
+
+  Node* root;
+  int currentBranch;
+  struct NodeStackEntry
+  {
+    csArray<Node*> branches[2];
+  };
+
+  csArray<NodeStackEntry> nodeStack;
+  csArray<int> branchStack;
+
+  void RecursiveAdd (csConditionID condition, Node* node, 
+    NodeStackEntry& newCurrent);
+  void ToResolver (iConditionResolver* resolver, Node* node,
+    csConditionNode* parent);
+
+  csConditionEvaluator& evaluator;
+public:
+  ConditionTree (csConditionEvaluator& evaluator) : evaluator (evaluator)
+  {
+    root = new Node (0);
+    currentBranch = 0;
+    NodeStackEntry newPair;
+    newPair.branches[0].Push (root);
+    nodeStack.Push (newPair);
+  }
+  ~ConditionTree ()
+  {
+    delete root;
+  }
+
+  Logic3 Descend (csConditionID condition);
+  // Switch the current branch from "true" to "false"
+  void SwitchBranch ();
+  void Ascend (int num);
+  int GetBranch() const { return currentBranch; }
+
+  void ToResolver (iConditionResolver* resolver);
+};
+
+void ConditionTree::RecursiveAdd (csConditionID condition, Node* node, 
+                                  NodeStackEntry& newCurrent)
 {
   Variables trueVals;
   Variables falseVals;
   Logic3 r;
-  if (condition == csCondAlwaysTrue)
-    r.state = Logic3::Truth;
-  else if (condition == csCondAlwaysFalse)
-    r.state = Logic3::Lie;
+  if (node->parent && (node->parent->condition == condition))
+  {
+    /* This can happen with "complex" conditions (e.g. "a || b", where
+     * the true or false value ranges are such (e.g. in the case of "a || b"
+     * a can be 0 or 1, as well as b can be 0 or 1) do not suffice to tag
+     * the condition as "always true" or "always false". So use that
+     * shortcut here. */
+    r = node == node->parent->branches[0];
+  }
   else
-    r = evaluator.CheckConditionResults (condition, 
-      node->values, trueVals, falseVals);
+  {
+    if (condition == csCondAlwaysTrue)
+      r.state = Logic3::Truth;
+    else if (condition == csCondAlwaysFalse)
+      r.state = Logic3::Lie;
+    else
+      r = evaluator.CheckConditionResults (condition, 
+        node->values, trueVals, falseVals);
+  }
 
   switch (r.state)
   {
@@ -85,7 +160,7 @@ void csWrappedDocumentNode::ConditionTree::RecursiveAdd (
   }
 }
 
-Logic3 csWrappedDocumentNode::ConditionTree::Descend (csConditionID condition)
+Logic3 ConditionTree::Descend (csConditionID condition)
 {
   const NodeStackEntry& current = 
     nodeStack[nodeStack.GetSize()-1];
@@ -113,13 +188,13 @@ Logic3 csWrappedDocumentNode::ConditionTree::Descend (csConditionID condition)
   return r;
 }
 
-void csWrappedDocumentNode::ConditionTree::SwitchBranch ()
+void ConditionTree::SwitchBranch ()
 {
   CS_ASSERT(currentBranch == 0);
   currentBranch = 1;
 }
 
-void csWrappedDocumentNode::ConditionTree::Ascend (int num)
+void ConditionTree::Ascend (int num)
 {
   CS_ASSERT_MSG("Either too many Ascend()s or too few Descend()s", 
     nodeStack.GetSize() > 1);
@@ -130,8 +205,8 @@ void csWrappedDocumentNode::ConditionTree::Ascend (int num)
   }
 }
 
-void csWrappedDocumentNode::ConditionTree::ToResolver (
-  iConditionResolver* resolver, Node* node, csConditionNode* parent)
+void ConditionTree::ToResolver (iConditionResolver* resolver, 
+                                Node* node, csConditionNode* parent)
 {
   if (node->condition == Node::csCondUnknown) return;
 
@@ -145,8 +220,7 @@ void csWrappedDocumentNode::ConditionTree::ToResolver (
     ToResolver (resolver, node->branches[1], falseNode);
 }
 
-void csWrappedDocumentNode::ConditionTree::ToResolver (
-  iConditionResolver* resolver)
+void ConditionTree::ToResolver (iConditionResolver* resolver)
 {
   if (root->branches[0] != 0)
   {
@@ -158,32 +232,17 @@ void csWrappedDocumentNode::ConditionTree::ToResolver (
 
 CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
 
-csWrappedDocumentNode::csWrappedDocumentNode (csWrappedDocumentNodeFactory* shared_fact,
-					      iDocumentNode* wrapped_node,
+template<typename ConditionEval>
+csWrappedDocumentNode::csWrappedDocumentNode (ConditionEval& eval,
+                                              iDocumentNode* wrapped_node,
 					      iConditionResolver* res,
-                                              csConditionEvaluator& evaluator)
-  : scfImplementationType (this), wrappedNode (wrapped_node), resolver (res),
-    objreg (shared_fact->plugin->objectreg), shared (shared_fact)
-{
-  CS_ASSERT (resolver);
-  globalState.AttachNew (new GlobalProcessingState (evaluator));
-
-  ProcessWrappedNode ();
-  globalState->condTree.ToResolver (resolver);
-
-  globalState = 0;
-}
-
-csWrappedDocumentNode::csWrappedDocumentNode (iDocumentNode* wrapped_node,
-					      csWrappedDocumentNode* parent,
 					      csWrappedDocumentNodeFactory* shared_fact, 
 					      GlobalProcessingState* global_state)
   : scfImplementationType (this), wrappedNode (wrapped_node), 
-    resolver (parent->resolver), objreg (shared_fact->plugin->objectreg), 
+    resolver (res), objreg (shared_fact->plugin->objectreg), 
     shared (shared_fact), globalState (global_state)
 {
-  ProcessWrappedNode ();
-
+  ProcessWrappedNode (eval);
   globalState = 0;
 }
 
@@ -281,7 +340,9 @@ void csWrappedDocumentNode::CreateElseWrapper (NodeProcessingState* state,
   elseWrapper.child->conditionValue = false;
 }
 
-void csWrappedDocumentNode::ProcessInclude (const csString& filename, 
+template<typename ConditionEval>
+void csWrappedDocumentNode::ProcessInclude (ConditionEval& eval, 
+                                            const csString& filename,
 					    NodeProcessingState* state, 
 					    iDocumentNode* node)
 {
@@ -324,7 +385,7 @@ void csWrappedDocumentNode::ProcessInclude (const csString& filename,
       while (it->HasNext ())
       {
 	csRef<iDocumentNode> child = it->Next ();
-	ProcessSingleWrappedNode (state, child);
+	ProcessSingleWrappedNode (eval, state, child);
       }
     }
   }
@@ -443,8 +504,10 @@ bool csWrappedDocumentNode::InvokeTemplate (Template* templ,
   return true;
 }
 
-bool csWrappedDocumentNode::InvokeTemplate (const char* name, 
-					    iDocumentNode* node,
+template<typename ConditionEval>
+bool csWrappedDocumentNode::InvokeTemplate (ConditionEval& eval, 
+                                            const char* name, 
+                                            iDocumentNode* node,
 					    NodeProcessingState* state, 
 					    const csArray<csString>& params)
 {
@@ -459,7 +522,7 @@ bool csWrappedDocumentNode::InvokeTemplate (const char* name,
   size_t i;
   for (i = 0; i < nodes.Length(); i++)
   {
-    ProcessSingleWrappedNode (state, nodes[i]);
+    ProcessSingleWrappedNode (eval, state, nodes[i]);
   }
   ValidateTemplateEnd (node, state);
   return true;
@@ -520,8 +583,9 @@ void csWrappedDocumentNode::ParseTemplateArguments (const char* str,
   }
 }
 
+template<typename ConditionEval>
 void csWrappedDocumentNode::ProcessSingleWrappedNode (
-  NodeProcessingState* state, iDocumentNode* node)
+  ConditionEval& eval, NodeProcessingState* state, iDocumentNode* node)
 {
   CS_ASSERT(globalState);
 
@@ -590,7 +654,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		node);
           
               const csConditionID condition = newWrapper.child->condition;
-              Logic3 r = globalState->condTree.Descend (condition);
+              Logic3 r = eval.Descend (condition);
               if (r.state == Logic3::Truth)
                 newWrapper.child->condition = csCondAlwaysTrue;
               else if (r.state == Logic3::Lie)
@@ -620,7 +684,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      if (okay)
               {
                 const int ascendNum = globalState->ascendStack.Pop ();
-                globalState->condTree.Ascend (ascendNum);
+                eval.Ascend (ascendNum);
 		currentWrapper = wrapperStack.Pop ();
               }
 	    }
@@ -640,7 +704,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		  "'else' without 'if' or 'elsif'");
 		okay = false;
 	      }
-              if (globalState->condTree.GetBranch() != 0)
+              if (eval.GetBranch() != 0)
 	      {
 	        Report (syntaxErrorSeverity, node,
 	          "Double 'else'");
@@ -655,7 +719,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		wrapperStack.Push (currentWrapper);
 		currentWrapper = newWrapper;
 
-                globalState->condTree.SwitchBranch ();
+                eval.SwitchBranch ();
 	      }
 	    }
 	    break;
@@ -668,7 +732,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		  "'elsif' without 'if' or 'elsif'");
 		okay = false;
 	      }
-	      if (okay && (globalState->condTree.GetBranch() != 0))
+              if (okay && (eval.GetBranch() != 0))
 	      {
 		Report (syntaxErrorSeverity, node,
 		  "Double 'else'");
@@ -685,9 +749,9 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		ParseCondition (newWrapper, space + 1, valLen - cmdLen - 1,
 		  node);
           
-                globalState->condTree.SwitchBranch ();
+                eval.SwitchBranch ();
                 const csConditionID condition = newWrapper.child->condition;
-                Logic3 r = globalState->condTree.Descend (condition);
+                Logic3 r = eval.Descend (condition);
                 globalState->ascendStack[globalState->ascendStack.GetSize()-1]++;
                 if (r.state == Logic3::Truth)
                   newWrapper.child->condition = csCondAlwaysTrue;
@@ -727,8 +791,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      }
 	      if (okay)
 	      {
-                //if (currentWrapper.skip) break;
-		ProcessInclude (filename, state, node);
+		ProcessInclude (eval, filename, state, node);
 	      }
 	    }
 	    break;
@@ -813,7 +876,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		csString pStr (space + 1, valLen - cmdLen - 1);
 		ParseTemplateArguments (pStr, params);
 	      }
-	      if (!InvokeTemplate (tokenStr, node, state, params))
+	      if (!InvokeTemplate (eval, tokenStr, node, state, params))
 	      {
 		Report (syntaxErrorSeverity, node,
 		  "Unknown command '%s'", tokenStr.GetData());
@@ -832,34 +895,37 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
         && (currentWrapper.child->conditionValue == false))))
   {
     WrappedChild* newWrapper = new WrappedChild;
-    newWrapper->childNode.AttachNew (new csWrappedDocumentNode (node,
-      this, shared, globalState));
+    newWrapper->childNode.AttachNew (new csWrappedDocumentNode (eval, node,
+      resolver, shared, globalState));
     currentWrapper.child->childrenWrappers.Push (newWrapper);
   }
 }
 
-void csWrappedDocumentNode::ProcessWrappedNode (NodeProcessingState* state, 
+template<typename ConditionEval>
+void csWrappedDocumentNode::ProcessWrappedNode (ConditionEval& eval, 
+                                                NodeProcessingState* state, 
 						iDocumentNode* wrappedNode)
 {
   if ((wrappedNode->GetType() == CS_NODE_ELEMENT)
-    || (wrappedNode->GetType () == CS_NODE_DOCUMENT))
+    || (wrappedNode->GetType() == CS_NODE_DOCUMENT))
   {
     state->iter = wrappedNode->GetNodes ();
     while (state->iter->HasNext ())
     {
       csRef<iDocumentNode> node = state->iter->Next();
-      ProcessSingleWrappedNode (state, node);
+      ProcessSingleWrappedNode (eval, state, node);
     }
     ValidateTemplateEnd (wrappedNode, state);
   }
 }
 
-void csWrappedDocumentNode::ProcessWrappedNode ()
+template<typename T>
+void csWrappedDocumentNode::ProcessWrappedNode (T& eval)
 {
   NodeProcessingState state;
   state.currentWrapper.child = new WrappedChild;
   wrappedChildren.Push (state.currentWrapper.child);
-  ProcessWrappedNode (&state, wrappedNode);
+  ProcessWrappedNode (eval, &state, wrappedNode);
 }
 
 void csWrappedDocumentNode::Report (int severity, iDocumentNode* node, 
@@ -1182,12 +1248,70 @@ void csWrappedDocumentNodeFactory::DumpCondition (size_t id,
   }
 }
 
+struct EvalCondTree
+{
+  ConditionTree condTree;
+  EvalCondTree (csConditionEvaluator& evaluator) : condTree (evaluator) {}
+
+  Logic3 Descend (csConditionID condition)
+  { return condTree.Descend (condition); }
+  void SwitchBranch () { condTree.SwitchBranch (); }
+  void Ascend (int num) { condTree.Ascend (num); }
+  int GetBranch() const { return condTree.GetBranch(); }
+};
+
 csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
   iDocumentNode* wrappedNode, iConditionResolver* resolver,
   csConditionEvaluator& evaluator, csString* dumpOut)
 {
   currentOut = dumpOut;
-  return new csWrappedDocumentNode (this, wrappedNode, resolver, evaluator);
+
+  csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
+  globalState.AttachNew (new csWrappedDocumentNode::GlobalProcessingState ());
+  EvalCondTree eval (evaluator);
+  csWrappedDocumentNode* node = new csWrappedDocumentNode (eval, wrappedNode, 
+    resolver, this, globalState);
+  eval.condTree.ToResolver (resolver);
+  return node;
+}
+
+struct EvalStatic
+{
+  iConditionResolver* resolver;
+  int currentBranch;
+  csArray<int> branchStack;
+
+  EvalStatic (iConditionResolver* resolver) : resolver (resolver),
+    currentBranch(0) {}
+
+  Logic3 Descend (csConditionID condition)
+  { 
+    branchStack.Push (currentBranch);
+    return resolver->Evaluate (condition); 
+  }
+  void SwitchBranch ()
+  {
+    CS_ASSERT(currentBranch == 0);
+    currentBranch = 1;
+  }
+  void Ascend (int num) 
+  { 
+    while (num-- > 0)
+      branchStack.Pop ();
+  }
+  int GetBranch() const { return currentBranch; }
+};
+
+csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (
+  iDocumentNode* wrappedNode, iConditionResolver* resolver, csString* dumpOut)
+{
+  currentOut = dumpOut;
+
+  csRef<csWrappedDocumentNode::GlobalProcessingState> globalState;
+  globalState.AttachNew (new csWrappedDocumentNode::GlobalProcessingState ());
+  EvalStatic eval (resolver);
+  return new csWrappedDocumentNode (eval, wrappedNode, resolver, this, 
+    globalState);
 }
 
 }

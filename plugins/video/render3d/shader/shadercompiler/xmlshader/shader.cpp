@@ -156,7 +156,6 @@ void csShaderConditionResolver::AddNode (csConditionNode* parent,
     variantIDs.PutUnique (bits, parent->variant);
 
     parent->variant = csArrayItemNotFound;
-    //AddToRealNode (parent, condition, trueNode, falseNode);
   }
 }
 
@@ -587,15 +586,15 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename)
   if (compiler->doDumpConds)
   {
     csString tree;
-    programNode.AttachNew (compiler->wrapperFact->CreateWrapper (
-      programDoc->GetRoot (), resolver, resolver->evaluator, &tree));
+    programNode.AttachNew (compiler->wrapperFact->CreateWrapperStatic (
+      programDoc->GetRoot (), resolver, &tree));
     resolver->DumpConditionTree (tree);
     compiler->vfs->WriteFile (csString().Format ("/tmp/shader/%s.txt",
       dumpFN.GetData()), tree.GetData(), tree.Length());
   }
   else
-    programNode.AttachNew (compiler->wrapperFact->CreateWrapper (
-      programDoc->GetRoot (), resolver, resolver->evaluator, 0));
+    programNode.AttachNew (compiler->wrapperFact->CreateWrapperStatic (
+      programDoc->GetRoot (), resolver, 0));
 
   if (compiler->doDumpXML)
   {

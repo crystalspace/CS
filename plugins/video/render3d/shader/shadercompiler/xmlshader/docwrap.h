@@ -150,77 +150,10 @@ class csWrappedDocumentNode :
     csRefArray<iDocumentNode> nodes;
     csArray<csString> paramMap;
   };
-  class ConditionTree
-  {
-    struct Node
-    {
-      static const csConditionID csCondUnknown = (csConditionID)~2;    
-      
-      Node* parent;
-
-      csConditionID condition;
-      Node* branches[2];
-      Variables values;
-
-      Node (Node* p) : parent (p), condition (csCondUnknown)
-      {
-        branches[0] = 0;
-        branches[1] = 0;
-      }
-      ~Node ()
-      {
-        delete branches[0];
-        delete branches[1];
-      }
-    };
-
-    Node* root;
-    int currentBranch;
-    struct NodeStackEntry
-    {
-      csArray<Node*> branches[2];
-    };
-
-    csArray<NodeStackEntry> nodeStack;
-    csArray<int> branchStack;
-
-    void RecursiveAdd (csConditionID condition, Node* node, 
-      NodeStackEntry& newCurrent);
-    void ToResolver (iConditionResolver* resolver, Node* node,
-      csConditionNode* parent);
-
-    csConditionEvaluator& evaluator;
-  public:
-    ConditionTree (csConditionEvaluator& evaluator) : evaluator (evaluator)
-    {
-      root = new Node (0);
-      currentBranch = 0;
-      NodeStackEntry newPair;
-      newPair.branches[0].Push (root);
-      nodeStack.Push (newPair);
-    }
-    ~ConditionTree ()
-    {
-      delete root;
-    }
-
-    Logic3 Descend (csConditionID condition);
-    // Switch the current branch from "true" to "false"
-    void SwitchBranch ();
-    void Ascend (int num);
-    int GetBranch() const { return currentBranch; }
-
-    void ToResolver (iConditionResolver* resolver);
-  };
   struct GlobalProcessingState : public csRefCount
   {
     csHash<Template, csString> templates;
-    csConditionEvaluator& evaluator;
-    ConditionTree condTree;
     csArray<int> ascendStack;
-
-    GlobalProcessingState (csConditionEvaluator& evaluator) : 
-      evaluator (evaluator), condTree (evaluator) {}
   };
   csRef<GlobalProcessingState> globalState;
 
@@ -229,35 +162,40 @@ class csWrappedDocumentNode :
     size_t condLen, iDocumentNode* node);
   void CreateElseWrapper (NodeProcessingState* state, 
     WrapperStackEntry& elseWrapper);
-  void ProcessInclude (const csString& filename, NodeProcessingState* state, 
-    iDocumentNode* node);
+  template<typename ConditionEval>
+  void ProcessInclude (ConditionEval& eval, const csString& filename, 
+    NodeProcessingState* state, iDocumentNode* node);
   void ProcessTemplate (iDocumentNode* templNode, 
     NodeProcessingState* state);
   bool InvokeTemplate (Template* templ, const csArray<csString>& params,
     csRefArray<iDocumentNode>& templatedNodes);
-  bool InvokeTemplate (const char* name, iDocumentNode* node, 
-    NodeProcessingState* state, const csArray<csString>& params);
+  template<typename ConditionEval>
+  bool InvokeTemplate (ConditionEval& eval, const char* name, 
+    iDocumentNode* node, NodeProcessingState* state, 
+    const csArray<csString>& params);
   void ValidateTemplateEnd (iDocumentNode* node, 
     NodeProcessingState* state);
   void ParseTemplateArguments (const char* str, 
     csArray<csString>& strings);
 
-  void ProcessSingleWrappedNode (NodeProcessingState* state,
+  template<typename ConditionEval>
+  void ProcessSingleWrappedNode (ConditionEval& eval, 
+    NodeProcessingState* state, iDocumentNode* wrappedNode);
+  template<typename ConditionEval>
+  void ProcessWrappedNode (ConditionEval& eval, NodeProcessingState* state,
   	iDocumentNode* wrappedNode);
-  void ProcessWrappedNode (NodeProcessingState* state,
-  	iDocumentNode* wrappedNode);
-  void ProcessWrappedNode ();
+  template<typename ConditionEval>
+  void ProcessWrappedNode (ConditionEval& eval);
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
   
   static void AppendNodeText (WrapperWalker& walker, csString& text);
 
-  csWrappedDocumentNode (iDocumentNode* wrappedNode,
-    csWrappedDocumentNode* parent,
+  template<typename ConditionEval>
+  csWrappedDocumentNode (ConditionEval& eval,
+    iDocumentNode* wrappedNode,
+    iConditionResolver* resolver,
     csWrappedDocumentNodeFactory* shared, 
     GlobalProcessingState* globalState);
-  csWrappedDocumentNode (csWrappedDocumentNodeFactory* shared,
-    iDocumentNode* wrappedNode, iConditionResolver* resolver,
-    csConditionEvaluator& evaluator);
 public:
   CS_LEAKGUARD_DECLARE(csWrappedDocumentNode);
 
@@ -368,6 +306,8 @@ public:
   csWrappedDocumentNode* CreateWrapper (iDocumentNode* wrappedNode,
     iConditionResolver* resolver, csConditionEvaluator& evaluator, 
     csString* dumpOut);
+  csWrappedDocumentNode* CreateWrapperStatic (iDocumentNode* wrappedNode,
+    iConditionResolver* resolver, csString* dumpOut);
 };
 
 }
