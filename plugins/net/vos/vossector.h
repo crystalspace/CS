@@ -53,6 +53,9 @@ private:
   bool isLit;
   int waitingForChildren;
 
+  float gravity;
+  bool collisionDetection;
+
   virtual void notifyChildInserted (VOS::VobjectEvent &event);
   virtual void notifyChildRemoved (VOS::VobjectEvent &event);
   virtual void notifyChildReplaced (VOS::VobjectEvent &event);
@@ -80,6 +83,9 @@ public:
   virtual void CacheLightmaps();
 
   virtual void notifyPropertyChange(const VOS::PropertyEvent &event);
+
+  virtual float getGravity();
+  virtual bool getCollisionDetection();
 
   //void addLight (iVosLight *light);
   //void removeLight (iVosLight *light);

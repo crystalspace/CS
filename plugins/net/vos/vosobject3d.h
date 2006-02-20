@@ -131,6 +131,7 @@ public:
   virtual void moveTo(double x, double y, double z, double timestep);
 
   void doMoveTo(const csVector3& vec, float timestep);
+  void setupCollider();
   void setupCollider(bool coldet, double gravity);
 };
 

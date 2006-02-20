@@ -232,7 +232,7 @@ void ConstructObject3DTask::doTask()
                              mw->GetMeshObject(), iThingState);
     if (thingstate.IsValid()) thingstate->Unprepare();
 
-    obj->setupCollider(true, 6);
+    obj->setupCollider();
   }
 }
 
@@ -724,14 +724,14 @@ void csMetaObject3D::moveTo(double x, double y, double z, double timestep)
   }
 }
 
+void csMetaObject3D::setupCollider()
+{
+  setupCollider(sector->getGravity(), sector->getCollisionDetection());
+}
+
 void csMetaObject3D::setupCollider(bool coldet, double gravity)
 {
-  if(setupCA)
-  {
-    collider_actor.SetCD(coldet);
-    collider_actor.SetGravity(gravity);
-  }
-  else
+  if(!setupCA)
   {
     assert(csvobj3d->GetMeshWrapper());
     assert(csvobj3d->GetMeshWrapper()->GetMeshObject());
@@ -758,10 +758,12 @@ void csMetaObject3D::setupCollider(bool coldet, double gravity)
     csVector3 bbox = csvobj3d->GetMeshWrapper()->GetWorldBoundingBox().GetSize();
     collider_actor.InitializeColliders(csvobj3d->GetMeshWrapper(), csVector3(bbox.x, bbox.y/2, bbox.z),
                                        csVector3(bbox.x, bbox.y/2, bbox.z), csVector3(0, -bbox.y/2, 0));
-    collider_actor.SetGravity(gravity);
 
     setupCA = true;
   }
+
+  collider_actor.SetCD(coldet);
+  collider_actor.SetGravity(gravity);
 }
 
 

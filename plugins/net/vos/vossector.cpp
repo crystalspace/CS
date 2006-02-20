@@ -44,7 +44,7 @@ SCF_IMPLEMENT_IBASE (csVosSector)
 SCF_IMPLEMENT_IBASE_END
 
 
-/// Set ambient task ///
+/// Set ambient lighting task ///
 class SetAmbientTask : public Task
 {
 public:
@@ -68,7 +68,7 @@ void SetAmbientTask::doTask()
   engine->SetAmbientLight(csColor(.2, .2, .2));
 }
 
-
+/// Sets CS progress meter ///
 class ProgressTask : public VUtil::Task
 {
 private:
@@ -102,7 +102,7 @@ public:
     }
 };
 
-/// Task for calling back to the status bar///
+/// Simple class used to catch VOS progress events  ///
 class SimpleProgress : public VOS::ProgressMeterCallback
 {
 private:
@@ -399,6 +399,8 @@ csVosSector::csVosSector(iObjectRegistry *o, csVosA3DL* va, csMetaSector* sec)
   sector = engine->CreateSector(sec->getURLstr().c_str());
   isLit = false;
   waitingForChildren = 0;
+  gravity = 0;
+  collisionDetection = false;
 }
 
 csVosSector::~csVosSector()
@@ -563,13 +565,25 @@ void csVosSector::notifyPropertyChange(const VOS::PropertyEvent &event)
       vRef<ParentChildRelation> pcr = event.getProperty()->findParent (sectorvobj);
       LOG("vosobject3d", 5, "found parent");
 
-      if (pcr->getContextualName() == "a3dl:gravity"
-          || pcr->getContextualName() == "a3dl:collision-detection")
+      bool setActor = false;
+
+      if(pcr->getContextualName() == "a3dl:gravity")
+      {
+        gravity = sectorvobj->getGravity();
+        setActor = true;
+      }
+      else if(pcr->getContextualName() == "a3dl:collision-detection")
+      {
+        collisionDetection = sectorvobj->getCollisionDetection();
+        setActor = true;
+      }
+
+      if(setActor)
       {
         SetGravityAndColDetTask* t = new SetGravityAndColDetTask();
         t->sectorvobj = sectorvobj;
-        t->grav = sectorvobj->getGravity();
-        t->coldet = sectorvobj->getCollisionDetection();
+        t->grav = gravity;
+        t->coldet = collisionDetection;
 
         LOG("vossector", 1, "setting sectorvobj to " << sectorvobj
             << " and grav to " << t->grav
@@ -584,6 +598,16 @@ void csVosSector::notifyPropertyChange(const VOS::PropertyEvent &event)
         << event.getProperty()->getURLstr() << ": " << e.what());
   }
 
+}
+
+float csVosSector::getGravity()
+{
+  return gravity;
+}
+
+bool csVosSector::getCollisionDetection()
+{
+  return collisionDetection;
 }
 
 /// csMetaSector ///

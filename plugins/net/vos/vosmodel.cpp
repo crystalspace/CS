@@ -27,6 +27,7 @@
 #include "imesh/sprite3d.h"
 #include "imesh/object.h"
 #include "imap/loader.h"
+#include "imesh/objmodel.h"
 #include "csutil/databuf.h"
 #include "imesh/objmodel.h"
 #include "iutil/plugin.h"
