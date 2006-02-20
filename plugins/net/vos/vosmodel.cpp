@@ -28,7 +28,7 @@
 #include "imesh/object.h"
 #include "imap/loader.h"
 #include "csutil/databuf.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "iutil/plugin.h"
 #include "ivaria/dynamics.h"
 #include "imap/modelload.h"

@@ -233,19 +233,20 @@ public:
   virtual void PositionChild (iMeshObject* /*child*/,csTicks /*current_time*/) { }
 
   /**
-   * See igeom/objmodel.h for specification. The default implementation
+   * See imesh/objmodel.h for specification. The default implementation
    * returns an infinite bounding box.
    */
   virtual void GetObjectBoundingBox (csBox3& bbox);
 
   /**
-   * See igeom/objmodel.h for specification. Overrides the default bounding
+   * See imesh/objmodel.h for specification. Overrides the default 
+bounding
    * box.
    */
   virtual void SetObjectBoundingBox (const csBox3& bbox);
 
   /**
-   * See igeom/objmodel.h for specification. The default implementation
+   * See imesh/objmodel.h for specification. The default implementation
    * returns an infinite radius.
    */
   virtual void GetRadius (float& radius, csVector3& center);

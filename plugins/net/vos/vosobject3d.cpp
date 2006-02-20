@@ -30,7 +30,7 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/quaternion.h"
 #include "igeom/polymesh.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 
 #include "vosobject3d.h"
 #include <vos/metaobjects/a3dl/a3dl.hh>
