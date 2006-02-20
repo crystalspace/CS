@@ -328,10 +328,23 @@
       * 2006-02-04: Jorrit found point sprites to be miniscule on driver 
 		    version X4.3.0-8.19.10
       -->
-    <rule description="Broken ATI point sprites">
+    <rule description="Broken ATI point sprites (ATI)">
       <conditions fulfill="all">
 	<regexp string="vendor" pattern="^ATI" />
 	<regexp string="platform" pattern="Unix" />
+      </conditions>
+      <applicable>
+	<usecfg>noaps</usecfg>
+      </applicable>
+    </rule>
+    
+    <!-- 
+      * 2006-02-20: vknecht found point sprites to be miniscule.
+      -->
+    <rule description="Broken ATI point sprites (NV)">
+      <conditions fulfill="all">
+	<regexp string="vendor" pattern="^ATI" />
+	<regexp string="renderer" pattern="GeForce 6600" />
       </conditions>
       <applicable>
 	<usecfg>noaps</usecfg>

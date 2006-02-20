@@ -8,6 +8,8 @@ chronological order.
 
 20-Feb-2006
 	- res fixed xmlshader to not throw an assertion on external programs.
+	- Jorrit added GF 6600 to the driver database so that it doesn't
+	  use point sprites.
 19-Feb-2006
 	- Piotr Obrzut removed unecesery and wrong conditions checks while 
 	  seting autodisable params in ode dynamics system.
