@@ -22,7 +22,7 @@
 #include "csgeom/box.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
-#include "csgeom/objmodel.h"
+#include "cstool/objmodel.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
 #include "cstool/rendermeshholder.h"
@@ -88,7 +88,7 @@ struct csCal3DAnimation
   bool     lock;
 };
 
-/** This is a core mesh stored inside the factory. 
+/** This is a core mesh stored inside the factory.
   * These form the main list of available core meshes that can be attached
   * to a model.
   */
@@ -106,8 +106,8 @@ struct csCal3DMesh
  * A socket for specifying where sprites can plug into
  * other sprites.
  */
-class csSpriteCal3DSocket : 
-  public scfImplementation1<csSpriteCal3DSocket, 
+class csSpriteCal3DSocket :
+  public scfImplementation1<csSpriteCal3DSocket,
 			    iSpriteCal3DSocket>
 {
 private:
@@ -206,9 +206,9 @@ class csSpriteCal3DMeshObject;
  * done with frames.  This class represents a template from which a
  * csSpriteCal3D class can be made.
  */
-class csSpriteCal3DMeshObjectFactory : 
+class csSpriteCal3DMeshObjectFactory :
   public scfImplementationExt3<csSpriteCal3DMeshObjectFactory,
-			       csObjectModel,	
+			       csObjectModel,
 			       iMeshObjectFactory,
 			       iSpriteCal3DFactoryState,
 			       iLODControl>
@@ -218,7 +218,7 @@ private:
 
   /// Material handle as returned by iTextureManager.
   iMeshFactoryWrapper* logparent;
-  
+
   csSpriteCal3DMeshObjectType* sprcal3d_type;
 
   /// If true then this factory has been initialized.
@@ -254,9 +254,9 @@ public:
    * used for the isometric engine).
    */
   csWeakRef<iEngine> engine;
-  
+
   /// Create the sprite template.
-  csSpriteCal3DMeshObjectFactory (csSpriteCal3DMeshObjectType* pParent, 
+  csSpriteCal3DMeshObjectFactory (csSpriteCal3DMeshObjectType* pParent,
     iObjectRegistry* object_reg);
   /// Destroy the template.
   virtual ~csSpriteCal3DMeshObjectFactory ();
@@ -274,25 +274,25 @@ public:
   void CalculateAllBoneBoundingBoxes();
 
   bool LoadCoreSkeleton(iVFS *vfs,const char *filename);
-  
+
   int  LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,
     int type,float base_vel, float min_vel,float max_vel,int min_interval,
     int max_interval,int idle_pct, bool lock);
-  
+
   /** Load a core mesh for the factory.  Reads in the mesh details and stores
     * them in a list for use by models.
     * \param vfs  File system to load mesh from.
     * \param filename The VFS file path to load the mesh from.
     * \param name The name the mesh should be given inside the list.
     * \param attach True if this mesh should be attached to all new models.
-    *               false if it is hidden when a model is created. 
+    *               false if it is hidden when a model is created.
     * \param defmat The default material for this mesh.
-    * 
+    *
     * \return The id of the mesh that cal3d as assigned to it.
-    */ 
+    */
   int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,
     bool attach,iMaterialWrapper *defmat);
-    
+
   int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,const char *filename,
     const char *name);
   int AddMorphAnimation(const char *name);
@@ -309,8 +309,8 @@ public:
   int GetMorphAnimationCount() { return (int)morph_animation_names.Length(); }
   int GetMorphTargetCount(int mesh_id);
   const char *GetMeshName(int idx);
-  int  FindMeshName(const char *meshName);  
-  const char* GetDefaultMaterial( const char* meshName );  
+  int  FindMeshName(const char *meshName);
+  const char* GetDefaultMaterial( const char* meshName );
   const char *GetMorphAnimationName(int idx);
   int  FindMorphAnimationName(const char *meshName);
   bool IsMeshDefault(int idx);
@@ -344,7 +344,7 @@ public:
   { logparent = lp; }
   virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
   { return logparent; }
-  virtual iMeshObjectType* GetMeshObjectType () const 
+  virtual iMeshObjectType* GetMeshObjectType () const
   { return (iMeshObjectType*)sprcal3d_type; }
   /** @} */
 
@@ -385,7 +385,7 @@ public:
  * Animation is done with frames (a frame may be controlled by
  * a skeleton).
  */
-class csSpriteCal3DMeshObject : 
+class csSpriteCal3DMeshObject :
   public scfImplementationExt4<csSpriteCal3DMeshObject,
 			       csObjectModel,
 			       iMeshObject,
@@ -415,8 +415,8 @@ private:
   // Optimization: only update animation when true.
   int do_update;	// If 0 we update, else we decrease.
 
-  
-  // User defined position update things  
+
+  // User defined position update things
   csRef<iAnimTimeUpdateHandler> anim_time_handler;
 
   csFlags flags;
@@ -428,8 +428,8 @@ private:
   csPDelArray<csSpriteCal3DSocket> sockets;
 
   size_t FindMesh( int mesh_id );
-    
-  class MeshAccessor : 
+
+  class MeshAccessor :
     public scfImplementation1<MeshAccessor, iRenderBufferAccessor>
   {
   protected:
@@ -446,7 +446,7 @@ private:
   public:
     iMovable* movable;
 
-    MeshAccessor (csSpriteCal3DMeshObject* meshobj, int mesh) : 
+    MeshAccessor (csSpriteCal3DMeshObject* meshobj, int mesh) :
       scfImplementationType (this)
     {
       MeshAccessor::meshobj = meshobj;
@@ -460,12 +460,12 @@ private:
     {
       return meshobj->FindMesh (mesh);
     }
-    
-    virtual ~MeshAccessor() 
+
+    virtual ~MeshAccessor()
     {
     }
     virtual void PreGetBuffer (csRenderBufferHolder*, csRenderBufferName);
-    
+
   };
   friend class MeshAccessor;
 
@@ -473,8 +473,8 @@ private:
   /**
    * Default animation time update handler (simply invokes CalModel::update()).
    */
-  struct DefaultAnimTimeUpdateHandler : 
-    public scfImplementation1<DefaultAnimTimeUpdateHandler, 
+  struct DefaultAnimTimeUpdateHandler :
+    public scfImplementation1<DefaultAnimTimeUpdateHandler,
 			      iAnimTimeUpdateHandler>
   {
     DefaultAnimTimeUpdateHandler() : scfImplementationType (this) {}
@@ -490,10 +490,10 @@ private:
    * - A cal3d submesh has one material(* Although in some places CS allows
    *   only a material per mesh)
    * - Of the meshes, several can be 'attached' at a time - that is,
-   *   actually used and rendered. Every mesh cam at most be only attached 
+   *   actually used and rendered. Every mesh cam at most be only attached
    *   once.
    * For CS rendering, since we limit the material to one per mesh, we also
-   * use one rendermesh per cal mesh. 
+   * use one rendermesh per cal mesh.
    * The total number of RMs may vary with instances and their attached meshes.
    */
   uint meshVersion;
@@ -502,8 +502,8 @@ private:
   bool lighting_dirty;
 
   /** A mesh attached to the model.  These form the list of meshes that
-    * the current model has attached to it. 
-    */    
+    * the current model has attached to it.
+    */
   struct Mesh
   {
     /// Cal3d ID of the mesh
@@ -517,17 +517,17 @@ private:
 
     Mesh() : vertexVersion((uint)~0) {}
   };
-  
+
   /// List of attached meshes. It's important that the order matches that of cal3d.
   csArray<Mesh> meshes;
-  
+
   static int CompareMeshIndexKey (const Mesh& m, int const& id);
   static int CompareMeshMesh (const Mesh& m1, const Mesh& m2);
-  
+
   // Vertices are handled differently since they're also needed by HitBeam*().
   csRef<iRenderBuffer> GetVertexBufferIndex (size_t index, CalRenderer *pCalRenderer);
   csRef<iRenderBuffer> GetVertexBufferCal (int mesh_id, CalRenderer *pCalRenderer);
-  void GetVertexBufferCal (int mesh_id, CalRenderer *pCalRenderer, 
+  void GetVertexBufferCal (int mesh_id, CalRenderer *pCalRenderer,
     csRef<iRenderBuffer>* vertex_buffer);
   int ComputeVertexCount (int mesh);
 
@@ -541,7 +541,7 @@ private:
   void InitSubmeshLighting (int mesh, int submesh, CalRenderer *pCalRenderer,
     iMovable* movable, csColor* colors);
   void UpdateLightingSubmesh (const csArray<iLightSectorInfluence*>& lights,
-      iMovable*, CalRenderer*, int mesh, int submesh, float* have_normals, 
+      iMovable*, CalRenderer*, int mesh, int submesh, float* have_normals,
       csColor* colors);
 
 public:
@@ -640,7 +640,7 @@ public:
   virtual bool Advance (csTicks current_time);
 
   virtual void NextFrame (csTicks current_time, const csVector3& /*new_pos*/)
-  {   
+  {
     Advance (current_time);
   }
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -677,22 +677,22 @@ public:
   float GetTimeFactor();
 
   bool AttachCoreMesh(const char *meshname);
-  
+
   /** Attach a 'core' mesh to this model.
     * \param calCoreMeshID The Cal3D ID of the mesh to attach.
     * \param iMatWrapID The material to use for the attached mesh.
     *
-    * \return True if the attachment was successful. 
+    * \return True if the attachment was successful.
     */
   bool AttachCoreMesh(int calCoreMeshID,iMaterialWrapper* iMatWrapID);
-  
+
   bool DetachCoreMesh(const char *meshname);
-  
+
   /** Detach a 'core' mesh to this model.
     * \param calCoreMeshID The Cal3D ID of the mesh to attach.
     *
-    * \return True if the removal was successful. 
-    */  
+    * \return True if the removal was successful.
+    */
   bool DetachCoreMesh(int calCoreMeshID);
 
   bool BlendMorphTarget(int morph_animation_id, float weight, float delay);
@@ -767,7 +767,7 @@ public:
  * Sprite Cal3D type. This is the plugin you have to use to create instances
  * of csSpriteCal3DMeshObjectFactory.
  */
-class csSpriteCal3DMeshObjectType : 
+class csSpriteCal3DMeshObjectType :
   public scfImplementation2<csSpriteCal3DMeshObjectType,
 			    iMeshObjectType,
 			    iComponent>
