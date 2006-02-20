@@ -27,7 +27,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cstool/collider.h"
 #include "csutil/event.h"
 #include "iengine/engine.h"
-#include "igeom/objmodel.h"
+#include "imesh/objmodel.h"
 #include "igeom/polymesh.h"
 #include "imesh/object.h"
 #include "imesh/genmesh.h"
@@ -801,7 +801,7 @@ bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
 bool csODEDynamicSystem::AttachColliderSphere (float radius,
                                                const csVector3 &offset, float friction, float elasticity, float softness)
 {
-  if (radius > 0) //otherwise ODE will treat radius as a 'bad argument' 
+  if (radius > 0) //otherwise ODE will treat radius as a 'bad argument'
   {
     csODECollider *odec = new csODECollider ();
     odec->SetElasticity (elasticity);
@@ -947,7 +947,7 @@ void csODECollider::KillGeoms ()
 
     dGeomDestroy (transformID);
   }
-  if (geomID) dGeomDestroy (geomID); 
+  if (geomID) dGeomDestroy (geomID);
 
   geomID = transformID = 0;
 }
@@ -986,7 +986,7 @@ void csODECollider::Collision (iRigidBody* other)
 void csODECollider::ClearContents ()
 {
   KillGeoms ();
- 
+
   transformID = dCreateGeomTransform (0);
   dGeomTransformSetCleanup (transformID, 1);
   geom_type =  NO_GEOMETRY;
@@ -1060,7 +1060,7 @@ void csODECollider::AttachBody (dBodyID bodyID)
     }
   }
 }
-void csODECollider::SetDensity (float density) 
+void csODECollider::SetDensity (float density)
 {
   csODECollider::density = density;
   MassCorrection ();
@@ -1174,7 +1174,7 @@ bool csODECollider::CreatePlaneGeometry (const csPlane3& plane)
 }
 bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
 {
-  if (sphere.GetRadius () > 0) //otherwise ODE will treat radius as a 'bad argument' 
+  if (sphere.GetRadius () > 0) //otherwise ODE will treat radius as a 'bad argument'
   {
     dBodyID b = dGeomGetBody (transformID);
     ClearContents ();
@@ -1199,7 +1199,7 @@ bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
 
     return true;
   }
-  
+
   return false;
 }
 bool csODECollider::CreateBoxGeometry (const csVector3& size)
@@ -1226,18 +1226,18 @@ bool csODECollider::CreateBoxGeometry (const csVector3& size)
 }
 
 void csODECollider::CS2ODEMatrix (const csMatrix3& csmat, dMatrix3& odemat)
-{ 
+{
   CS2ODEMATRIX(csmat,odemat);
 }
 void csODECollider::ODE2CSMatrix (const dReal* odemat, csMatrix3& csmat)
-{  
+{
   ODE2CSMATRIX(odemat,csmat);
 }
 void csODECollider::SetTransform (const csOrthoTransform& transform)
 {
-  // can't set plane's transform b/c it causes non placeable geom run-time 
+  // can't set plane's transform b/c it causes non placeable geom run-time
   // error w/debug build of ode
-  if (!geomID || geom_type == PLANE_COLLIDER_GEOMETRY) 
+  if (!geomID || geom_type == PLANE_COLLIDER_GEOMETRY)
     return;
 
   csVector3 pos = transform.GetOrigin ();
@@ -1296,15 +1296,15 @@ void csODECollider::AddTransformToSpace (dSpaceID spaceID)
     dGeomTransformSetGeom (transformID, geomID);
   dSpaceID prev = dGeomGetSpace (transformID);
   if (prev)dSpaceRemove (prev, transformID);
-  if (geomID) dSpaceAdd (spaceID, transformID); 
+  if (geomID) dSpaceAdd (spaceID, transformID);
 }
-void csODECollider::AddToSpace (dSpaceID spaceID) 
+void csODECollider::AddToSpace (dSpaceID spaceID)
 {
   if (geomID)
   {
     dSpaceID prev = dGeomGetSpace (geomID);
     if (prev)dSpaceRemove (prev, geomID);
-    dSpaceAdd (spaceID, geomID); 
+    dSpaceAdd (spaceID, geomID);
   }
   csODECollider::spaceID = spaceID;
 }
@@ -1365,7 +1365,7 @@ void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmes
       csBox3 box (csVector3 (0));
       box.SetSize (csVector3 (size[0], size[1], size[2]));
       genmesh_fact->GenerateBox (box);
-      genmesh_fact->CalculateNormals (); 
+      genmesh_fact->CalculateNormals ();
     }
     break;
   case SPHERE_COLLIDER_GEOMETRY:
@@ -1373,7 +1373,7 @@ void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmes
       float r = dGeomSphereGetRadius (geomID);
       csEllipsoid sphere (csVector3 (0), csVector3 (r, r, r));
       genmesh_fact->GenerateSphere (sphere, 30);
-      genmesh_fact->CalculateNormals (); 
+      genmesh_fact->CalculateNormals ();
     }
   case PLANE_COLLIDER_GEOMETRY:
     {
@@ -1398,7 +1398,7 @@ void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmes
         vertices[i*3] = csVector3 (v0[0], v0[1], v0[2]);
         vertices[i*3+1] = csVector3 (v1[0], v1[1], v1[2]);
         vertices[i*3+2] = csVector3 (v2[0], v2[1], v2[2]);
-        triangles[i].c = i*3; triangles[i].b = i*3+1; triangles[i].a = i*3+2; 
+        triangles[i].c = i*3; triangles[i].b = i*3+1; triangles[i].a = i*3+2;
       }
       genmesh_fact->CalculateNormals ();
     }
@@ -1571,7 +1571,7 @@ bool csODERigidBody::AttachColliderSphere (float radius,
                                            float friction, float density,
 					   float elasticity, float softness)
 {
-  if (radius > 0) //otherwise ODE will treat radius as a 'bad argument' 
+  if (radius > 0) //otherwise ODE will treat radius as a 'bad argument'
   {
     csODECollider *odec = new csODECollider ();
     odec->SetElasticity (elasticity);
@@ -1593,7 +1593,7 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
                                           float friction, float density,
 					  float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider (); 
+  csODECollider *odec = new csODECollider ();
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -1601,7 +1601,7 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
   odec->CreatePlaneGeometry (plane);
   colliders.Push (odec);
   //causes non placeable geom run-time error w/debug build of ode.
-  //odec->AttachBody (bodyID);   
+  //odec->AttachBody (bodyID);
   odec->MakeDynamic ();
   odec->AddToSpace (dynsys->GetSpaceID());
 
@@ -1613,7 +1613,7 @@ void csODERigidBody::AttachCollider (iDynamicsSystemCollider* collider)
   dynsys->DestroyCollider (collider);
   if (collider->GetGeometryType () == PLANE_COLLIDER_GEOMETRY)
     ((csODECollider*) collider)->AddToSpace (dynsys->GetSpaceID());
-  else 
+  else
     ((csODECollider*) collider)->AddTransformToSpace (groupID);
 
   ((csODECollider*) collider)->AttachBody (bodyID);
@@ -2220,7 +2220,7 @@ ODEAMotorJoint::~ODEAMotorJoint ()
   dJointDestroy (jointID);
 }
 
-void ODEAMotorJoint::SetAMotorMode (ODEAMotorMode mode) 
+void ODEAMotorJoint::SetAMotorMode (ODEAMotorMode mode)
 {
   if ((mode <= CS_ODE_AMOTOR_MODE_UNKNOWN)
     || (mode >= CS_ODE_AMOTOR_MODE_LAST))
@@ -2232,8 +2232,8 @@ void ODEAMotorJoint::SetAMotorMode (ODEAMotorMode mode)
   dJointSetAMotorMode (jointID, ODEAMotorModeTodAMotor[mode]);
 }
 
-ODEAMotorMode ODEAMotorJoint::GetAMotorMode () 
-{ 
+ODEAMotorMode ODEAMotorJoint::GetAMotorMode ()
+{
   switch (dJointGetAMotorMode (jointID))
   {
   case dAMotorUser: return CS_ODE_AMOTOR_MODE_USER;
