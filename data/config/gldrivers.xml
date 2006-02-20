@@ -343,7 +343,6 @@
       -->
     <rule description="Broken ATI point sprites (NV)">
       <conditions fulfill="all">
-	<regexp string="vendor" pattern="^ATI" />
 	<regexp string="renderer" pattern="GeForce 6600" />
       </conditions>
       <applicable>
