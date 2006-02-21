@@ -77,6 +77,7 @@ public:
     rad = radius;
     cent.Set (0, 0, 0);	// @@@ FIXME!
   }
+  virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
 };
 
 /**

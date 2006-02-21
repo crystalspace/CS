@@ -528,6 +528,8 @@ public:
     {
       scfParent->GetRadius (rad, cent);
     }
+    virtual iTerraFormer* GetTerraFormerColldet ()
+    { return scfParent->terraformer; }
   } scfiObjectModel;
   friend class ObjectModel;
 
@@ -776,6 +778,8 @@ public:
     {
       //scfParent->GetRadius (rad, cent);
     }
+    virtual iTerraFormer* GetTerraFormerColldet ()
+    { return scfParent->terraformer; }
   } scfiObjectModel;
   friend class eiObjectModel;
 

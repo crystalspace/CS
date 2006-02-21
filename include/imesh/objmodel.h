@@ -32,6 +32,7 @@
 #include "csutil/ref.h"
 
 struct iPolygonMesh;
+struct iTerraFormer;
 struct iObjectModel;
 
 class csBox3;
@@ -83,6 +84,13 @@ struct iObjectModel : public virtual iBase
    * Can return 0 if this object model doesn't support that.
    */
   virtual iPolygonMesh* GetPolygonMeshColldet () = 0;
+
+  /**
+   * Get a terra former representing the geometry of the object.
+   * This class is useful for collision detection.
+   * Can return 0 if this object model doesn't support that.
+   */
+  virtual iTerraFormer* GetTerraFormerColldet () = 0;
 
   /**
    * Set a polygon mesh representing the geometry of the object.

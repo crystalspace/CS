@@ -333,6 +333,7 @@ public:
       rad = scfParent->GetRadius ();
       cent = scfParent->object_bbox.GetCenter ();
     }
+    virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
   } scfiObjectModel;
   friend class ObjectModel;
 

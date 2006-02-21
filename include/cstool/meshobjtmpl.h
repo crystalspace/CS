@@ -251,6 +251,12 @@ bounding
    */
   virtual void GetRadius (float& radius, csVector3& center);
 
+  /**
+   * See imesh/objmodel.h for specification. The default implementation
+   * returns 0.
+   */
+  virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+
 };
 
 /**

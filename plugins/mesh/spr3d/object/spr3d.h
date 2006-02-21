@@ -719,6 +719,9 @@ public:
     varm = lod_varm;
     vara = lod_vara;
   }
+  
+  iTerraFormer* GetTerraFormerColldet () { return 0; }
+
   /** @} */
 };
 

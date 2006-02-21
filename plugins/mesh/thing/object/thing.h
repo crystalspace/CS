@@ -578,6 +578,7 @@ public:
     const csArray<RepMaterial>& repMaterials, uint mixmode);
 
   virtual iObjectModel* GetObjectModel () { return (iObjectModel*)this; }
+  virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
 };
 
 /**

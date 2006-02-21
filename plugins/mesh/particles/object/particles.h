@@ -1038,6 +1038,8 @@ public:
     { scfParent->SetObjectBoundingBox (b); }
     virtual void GetRadius (float& r, csVector3& c)
     { scfParent->GetRadius (r, c); }
+    virtual iTerraFormer* GetTerraFormerColldet ()
+    { return 0; }
   } scfiObjectModel;
   friend struct eiObjectModel;
 

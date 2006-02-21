@@ -1034,6 +1034,8 @@ public:
       rad = scfParent->GetRadius ();
       cent.Set (0.0f);
     }
+    virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+
   } scfiObjectModel;
   friend class ObjectModel;
 
