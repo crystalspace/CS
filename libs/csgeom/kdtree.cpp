@@ -159,7 +159,7 @@ void csKDTree::Clear ()
     objects[i]->RemoveLeaf (this);
     // Remove this object if there are no more leafs refering to it.
     if (objects[i]->num_leafs == 0)
-      treealloc.tree_children->Free (objects[i]);
+      treealloc.tree_children.Free (objects[i]);
   }
   delete[] objects;
   objects = 0;
@@ -167,12 +167,12 @@ void csKDTree::Clear ()
   max_objects = 0;
   if (child1)
   {
-    treealloc.tree_nodes->Free (child1);
+    treealloc.tree_nodes.Free (child1);
     child1 = 0;
   }
   if (child2)
   {
-    treealloc.tree_nodes->Free (child2);
+    treealloc.tree_nodes.Free (child2);
     child2 = 0;
   }
   disallow_distribute = 0;
@@ -466,7 +466,7 @@ void csKDTree::AddObject (const csBox3& /*bbox*/, csKDTreeChild* obj)
 
 csKDTreeChild* csKDTree::AddObject (const csBox3& bbox, void* object)
 {
-  csKDTreeChild* obj = treealloc.tree_children->Alloc ();
+  csKDTreeChild* obj = treealloc.tree_children.Alloc ();
   obj->object = object;
   obj->bbox = bbox;
   AddObject (bbox, obj);
@@ -497,7 +497,7 @@ void csKDTree::UnlinkObject (csKDTreeChild* object)
 void csKDTree::RemoveObject (csKDTreeChild* object)
 {
   UnlinkObject (object);
-  treealloc.tree_children->Free (object);
+  treealloc.tree_children.Free (object);
 }
 
 void csKDTree::MoveObject (csKDTreeChild* object, const csBox3& new_bbox)
@@ -622,10 +622,10 @@ void csKDTree::Distribute ()
     }
     if (disallow_distribute == 0)
     {
-      child1 = treealloc.tree_nodes->Alloc ();
+      child1 = treealloc.tree_nodes.Alloc ();
       child1->SetParent (this);
       child1->SetObjectDescriptor (descriptor);
-      child2 = treealloc.tree_nodes->Alloc ();
+      child2 = treealloc.tree_nodes.Alloc ();
       child2->SetParent (this);
       child2->SetObjectDescriptor (descriptor);
       DistributeLeafObjects ();
@@ -737,8 +737,8 @@ void csKDTree::FlattenTo (csKDTree* node)
   c2->objects = 0;
   c2->num_objects = 0;
   c2->max_objects = 0;
-  treealloc.tree_nodes->Free (c1);
-  treealloc.tree_nodes->Free (c2);
+  treealloc.tree_nodes.Free (c1);
+  treealloc.tree_nodes.Free (c2);
   estimate_total_objects = num_objects;
 }
 

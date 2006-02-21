@@ -167,19 +167,17 @@ public:
 
   struct StaticContainer
   {
-      csBlockAllocator<csKDTree>* tree_nodes;
-      csBlockAllocator<csKDTreeChild>* tree_children;
+      csBlockAllocator<csKDTree> tree_nodes;
+      csBlockAllocator<csKDTreeChild> tree_children;
 
       StaticContainer()
           {
-              tree_children = new csBlockAllocator<csKDTreeChild>(1000);
-              tree_nodes = new csBlockAllocator<csKDTree>(1000);
           }
 
       ~StaticContainer()
           {
-              delete tree_nodes;
-              delete tree_children;
+              tree_nodes.Empty();
+              tree_children.Empty();
           }
   };
 
