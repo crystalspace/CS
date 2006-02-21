@@ -339,11 +339,12 @@
     </rule>
     
     <!-- 
-      * 2006-02-20: vknecht found point sprites to be miniscule.
+      * 2006-02-20: vknecht and dingobloo found point sprites to be miniscule.
       -->
     <rule description="Broken ATI point sprites (NV)">
-      <conditions fulfill="all">
+      <conditions fulfill="one">
 	<regexp string="renderer" pattern="GeForce 6600" />
+	<regexp string="renderer" pattern="GeForce 7800" />
       </conditions>
       <applicable>
 	<usecfg>noaps</usecfg>
