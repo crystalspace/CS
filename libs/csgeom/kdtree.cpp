@@ -67,7 +67,7 @@ void csKDTreeChild::RemoveLeaf (int idx)
 
   if (idx < num_leafs-1)
     memmove (&leafs[idx], &leafs[idx+1],
-    	sizeof (csKDTree*) * (num_leafs-idx-1));
+        sizeof (csKDTree*) * (num_leafs-idx-1));
   num_leafs--;
 }
 
@@ -102,7 +102,7 @@ void csKDTreeChild::ReplaceLeaf (csKDTree* old_leaf, csKDTree* new_leaf)
   // We shouldn't be able to come here.
   csPrintfErr ("Something bad happened in csKDTreeChild::ReplaceLeaf!\n");
   if (old_leaf) old_leaf->DumpObject (this,
-  	"  Trying to replace leaf for: %s!\n");
+        "  Trying to replace leaf for: %s!\n");
   old_leaf->DebugExit ();
 }
 
@@ -122,8 +122,7 @@ uint32 csKDTree::global_timestamp = 1;
 
 #define KDTREE_MAX 100000.
 
-csBlockAllocator<csKDTree> csKDTree::tree_nodes (1000);
-csBlockAllocator<csKDTreeChild> csKDTree::tree_children (1000);
+csKDTree::StaticContainer csKDTree::treealloc;
 
 csKDTree::csKDTree () : scfImplementationType(this)
 {
@@ -136,8 +135,8 @@ csKDTree::csKDTree () : scfImplementationType(this)
   split_axis = CS_KDTREE_AXISINVALID;
 
   node_bbox.Set (-KDTREE_MAX, -KDTREE_MAX,
-  	-KDTREE_MAX, KDTREE_MAX,
-	KDTREE_MAX, KDTREE_MAX);
+        -KDTREE_MAX, KDTREE_MAX,
+        KDTREE_MAX, KDTREE_MAX);
 
   estimate_total_objects = 0;
 }
@@ -160,7 +159,7 @@ void csKDTree::Clear ()
     objects[i]->RemoveLeaf (this);
     // Remove this object if there are no more leafs refering to it.
     if (objects[i]->num_leafs == 0)
-      tree_children.Free (objects[i]);
+      treealloc.tree_children->Free (objects[i]);
   }
   delete[] objects;
   objects = 0;
@@ -168,12 +167,12 @@ void csKDTree::Clear ()
   max_objects = 0;
   if (child1)
   {
-    tree_nodes.Free (child1);
+    treealloc.tree_nodes->Free (child1);
     child1 = 0;
   }
   if (child2)
   {
-    tree_nodes.Free (child2);
+    treealloc.tree_nodes->Free (child2);
     child2 = 0;
   }
   disallow_distribute = 0;
@@ -264,7 +263,7 @@ void csKDTree::RemoveObject (int idx)
 
   if (idx < num_objects-1)
     memmove (&objects[idx], &objects[idx+1],
-    	sizeof (csKDTreeChild*) * (num_objects-idx-1));
+        sizeof (csKDTreeChild*) * (num_objects-idx-1));
   num_objects--;
 }
 
@@ -291,26 +290,26 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
     const csBox3& bbox1 = objects[1]->bbox;
     float max0 = bbox0.Max (axis);
     float min1 = bbox1.Min (axis);
-    if (max0 < min1-.01)	// Small threshold to avoid bad split location.
+    if (max0 < min1-.01)        // Small threshold to avoid bad split location.
     {
       split_loc = max0 + (min1-max0) * 0.5;
       if (split_loc <= max0)
       {
-	fprintf (stderr,
-	  "FindBestSplitLocation failed: split_loc(%g) <= max0(%g)\n",
-	  split_loc, max0);
+        fprintf (stderr,
+          "FindBestSplitLocation failed: split_loc(%g) <= max0(%g)\n",
+          split_loc, max0);
         DumpNode ();
-	DebugExit ();
+        DebugExit ();
       }
       if (split_loc >= min1)
       {
-	fprintf (stderr,
-	  "FindBestSplitLocation failed: split_loc(%g) >= min1(%g)\n",
-	  split_loc, min1);
+        fprintf (stderr,
+          "FindBestSplitLocation failed: split_loc(%g) >= min1(%g)\n",
+          split_loc, min1);
         DumpNode ();
-	DebugExit ();
+        DebugExit ();
       }
-      return 10.0;	// Good quality split.
+      return 10.0;      // Good quality split.
     }
     float min0 = bbox0.Min (axis);
     float max1 = bbox1.Max (axis);
@@ -319,23 +318,23 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
       split_loc = max1 + (min0-max1) * 0.5;
       if (split_loc <= max1)
       {
-	fprintf (stderr,
-	  "FindBestSplitLocation failed: split_loc(%g) <= max1(%g)\n",
-	  split_loc, max1);
+        fprintf (stderr,
+          "FindBestSplitLocation failed: split_loc(%g) <= max1(%g)\n",
+          split_loc, max1);
         DumpNode ();
-	DebugExit ();
+        DebugExit ();
       }
       if (split_loc >= min0)
       {
-	fprintf (stderr,
-	  "FindBestSplitLocation failed: split_loc(%g) >= min0(%g)\n",
-	  split_loc, min0);
+        fprintf (stderr,
+          "FindBestSplitLocation failed: split_loc(%g) >= min0(%g)\n",
+          split_loc, min0);
         DumpNode ();
-	DebugExit ();
+        DebugExit ();
       }
-      return 10.0;	// Good quality split.
+      return 10.0;      // Good quality split.
     }
-    return -1.0;		// Very bad quality split.
+    return -1.0;                // Very bad quality split.
   }
 
   // Calculate minimum and maximum value along the axis.
@@ -407,8 +406,8 @@ void csKDTree::DistributeLeafObjects ()
   if (split_axis < CS_KDTREE_AXISX || split_axis > CS_KDTREE_AXISZ)
   {
     fprintf (stderr,
-	  "DistributeLeafObjects failed: split_axis=%d\n",
-	  split_axis);
+          "DistributeLeafObjects failed: split_axis=%d\n",
+          split_axis);
     DumpNode ();
     DebugExit ();
   }
@@ -433,7 +432,7 @@ void csKDTree::DistributeLeafObjects ()
       if (leaf_replaced)
       {
         // If we also added this object to child1
-	// we need to call AddLeaf() instead of ReplaceLeaf().
+        // we need to call AddLeaf() instead of ReplaceLeaf().
         objects[i]->AddLeaf (child2);
       }
       else
@@ -467,7 +466,7 @@ void csKDTree::AddObject (const csBox3& /*bbox*/, csKDTreeChild* obj)
 
 csKDTreeChild* csKDTree::AddObject (const csBox3& bbox, void* object)
 {
-  csKDTreeChild* obj = tree_children.Alloc ();
+  csKDTreeChild* obj = treealloc.tree_children->Alloc ();
   obj->object = object;
   obj->bbox = bbox;
   AddObject (bbox, obj);
@@ -490,7 +489,7 @@ void csKDTree::UnlinkObject (csKDTreeChild* object)
     }
     leaf->RemoveObject (idx);
     if (leaf->disallow_distribute > 0)
-      leaf->disallow_distribute--;	// Give distribute a new chance.
+      leaf->disallow_distribute--;      // Give distribute a new chance.
   }
   object->num_leafs = 0;
 }
@@ -498,7 +497,7 @@ void csKDTree::UnlinkObject (csKDTreeChild* object)
 void csKDTree::RemoveObject (csKDTreeChild* object)
 {
   UnlinkObject (object);
-  tree_children.Free (object);
+  treealloc.tree_children->Free (object);
 }
 
 void csKDTree::MoveObject (csKDTreeChild* object, const csBox3& new_bbox)
@@ -563,7 +562,7 @@ void csKDTree::MoveObject (csKDTreeChild* object, const csBox3& new_bbox)
       node->AddObject (new_bbox, object);
   }
 }
-  
+
 void csKDTree::Distribute ()
 {
   // Check if there are objects to distribute or if distribution
@@ -584,7 +583,7 @@ void csKDTree::Distribute ()
 
     // Update the bounding box of this node.
     estimate_total_objects = child1->GetEstimatedObjectCount ()
-    	+ child2->GetEstimatedObjectCount ();
+        + child2->GetEstimatedObjectCount ();
   }
   else
   {
@@ -623,17 +622,17 @@ void csKDTree::Distribute ()
     }
     if (disallow_distribute == 0)
     {
-      child1 = tree_nodes.Alloc ();
+      child1 = treealloc.tree_nodes->Alloc ();
       child1->SetParent (this);
       child1->SetObjectDescriptor (descriptor);
-      child2 = tree_nodes.Alloc ();
+      child2 = treealloc.tree_nodes->Alloc ();
       child2->SetParent (this);
       child2->SetObjectDescriptor (descriptor);
       DistributeLeafObjects ();
       if (num_objects != 0)
       {
-	DumpNode ("Distribute failed(2): distributing leaf objects!\n");
-	DebugExit ();
+        DumpNode ("Distribute failed(2): distributing leaf objects!\n");
+        DebugExit ();
       }
       // Update the bounding box of this node.
       child1->node_bbox = GetNodeBBox ();
@@ -641,7 +640,7 @@ void csKDTree::Distribute ()
       child2->node_bbox = GetNodeBBox ();
       child2->node_bbox.SetMin (split_axis, split_location);
       estimate_total_objects = child1->GetEstimatedObjectCount ()
-    	+ child2->GetEstimatedObjectCount ();
+        + child2->GetEstimatedObjectCount ();
     }
     else
     {
@@ -663,7 +662,7 @@ void csKDTree::FullDistribute ()
 
 void csKDTree::FlattenTo (csKDTree* node)
 {
-  if (!child1) return;	// Nothing to do.
+  if (!child1) return;  // Nothing to do.
 
   // First flatten the children.
   // @@@ Is this the most optimal solution?
@@ -683,8 +682,8 @@ void csKDTree::FlattenTo (csKDTree* node)
       {
         csPrintfErr ("FlattenTo failed(1)!\n");
         DumpObject (obj, "  Processing object: %s!\n");
-	DumpNode ();
-	DebugExit ();
+        DumpNode ();
+        DebugExit ();
       }
       obj->leafs[0] = node;
       node->AddObject (obj);
@@ -694,7 +693,7 @@ void csKDTree::FlattenTo (csKDTree* node)
       if (obj->FindLeaf (node) == -1)
       {
         obj->ReplaceLeaf (c1, node);
-	node->AddObject (obj);
+        node->AddObject (obj);
       }
       else
       {
@@ -711,8 +710,8 @@ void csKDTree::FlattenTo (csKDTree* node)
       {
         csPrintfErr ("FlattenTo failed(2)!\n");
         DumpObject (obj, "  Processing object: %s!\n");
-	DumpNode ();
-	DebugExit ();
+        DumpNode ();
+        DebugExit ();
       }
       obj->leafs[0] = node;
       node->AddObject (obj);
@@ -722,7 +721,7 @@ void csKDTree::FlattenTo (csKDTree* node)
       if (obj->FindLeaf (node) == -1)
       {
         obj->ReplaceLeaf (c2, node);
-	node->AddObject (obj);
+        node->AddObject (obj);
       }
       else
       {
@@ -738,14 +737,14 @@ void csKDTree::FlattenTo (csKDTree* node)
   c2->objects = 0;
   c2->num_objects = 0;
   c2->max_objects = 0;
-  tree_nodes.Free (c1);
-  tree_nodes.Free (c2);
+  treealloc.tree_nodes->Free (c1);
+  treealloc.tree_nodes->Free (c2);
   estimate_total_objects = num_objects;
 }
 
 void csKDTree::Flatten ()
 {
-  if (!child1) return;	// Nothing to do.
+  if (!child1) return;  // Nothing to do.
 
   disallow_distribute = 0;
 
@@ -754,7 +753,7 @@ void csKDTree::Flatten ()
 }
 
 void csKDTree::TraverseRandom (csKDTreeVisitFunc* func,
-  	void* userdata, uint32 cur_timestamp, uint32 frustum_mask)
+        void* userdata, uint32 cur_timestamp, uint32 frustum_mask)
 {
   CS_ASSERT (this != 0);
   if (!func (this, userdata, cur_timestamp, frustum_mask))
@@ -769,7 +768,7 @@ void csKDTree::TraverseRandom (csKDTreeVisitFunc* func,
 }
 
 void csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
-  	void* userdata, uint32 cur_timestamp, uint32 frustum_mask)
+        void* userdata, uint32 cur_timestamp, uint32 frustum_mask)
 {
   CS_ASSERT (this != 0);
   if (!func (this, userdata, cur_timestamp, frustum_mask))
@@ -823,14 +822,14 @@ uint32 csKDTree::NewTraversal ()
 }
 
 void csKDTree::TraverseRandom (csKDTreeVisitFunc* func,
-  	void* userdata, uint32 frustum_mask)
+        void* userdata, uint32 frustum_mask)
 {
   NewTraversal ();
   TraverseRandom (func, userdata, global_timestamp, frustum_mask);
 }
 
 void csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
-  	void* userdata, uint32 frustum_mask)
+        void* userdata, uint32 frustum_mask)
 {
   NewTraversal ();
   Front2Back (pos, func, userdata, global_timestamp, frustum_mask);
@@ -841,7 +840,7 @@ void csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
   { \
     csString ss; \
     ss.Format ("csKDTree failure (%d,%s): %s\n", int(__LINE__), \
-    	#msg, #test); \
+        #msg, #test); \
     str.Append (ss); \
     return rc; \
   }
@@ -851,7 +850,7 @@ void csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
   { \
     csString ss; \
     ss.Format ("csKDTree failure (%d,%s): %s\n", int(__LINE__), \
-    	#msg, #test); \
+        #msg, #test); \
     str.Append (ss); \
     return csPtr<iString> (rc); \
   }
@@ -869,16 +868,16 @@ bool csKDTree::Debug_CheckTree (csString& str)
     //-------
 
     KDT_ASSERT_BOOL (split_axis >= CS_KDTREE_AXISX && split_axis <= CS_KDTREE_AXISZ,
-    	"axis");
+        "axis");
     KDT_ASSERT_BOOL (GetNodeBBox ().Contains (child1->GetNodeBBox ()),
-    	"node_bbox mismatch");
+        "node_bbox mismatch");
     KDT_ASSERT_BOOL (GetNodeBBox ().Contains (child2->GetNodeBBox ()),
-    	"node_bbox mismatch");
+        "node_bbox mismatch");
 
     KDT_ASSERT_BOOL (split_location >= GetNodeBBox ().Min (split_axis),
-    	"split/node");
+        "split/node");
     KDT_ASSERT_BOOL (split_location <= GetNodeBBox ().Max (split_axis),
-    	"split/node");
+        "split/node");
 
     csBox3 new_node_bbox = child1->GetNodeBBox ();
     new_node_bbox += child2->GetNodeBBox ();
@@ -910,7 +909,7 @@ bool csKDTree::Debug_CheckTree (csString& str)
     {
       if (o->leafs[j] == this)
       {
-	parcnt++;
+        parcnt++;
         KDT_ASSERT_BOOL (parcnt <= 1, "parent occurs multiple times");
       }
     }
@@ -945,7 +944,7 @@ struct Debug_TraverseData
 };
 
 static bool Debug_TraverseFunc (csKDTree* treenode, void* userdata,
-	uint32 cur_timestamp, uint32&)
+        uint32 cur_timestamp, uint32&)
 {
   Debug_TraverseData* data = (Debug_TraverseData*)userdata;
 
@@ -1050,9 +1049,9 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
       if (remove_obj)
       {
         csBox3 bb = remove_obj->GetBBox ();
-	void* obj = remove_obj->GetObject ();
+        void* obj = remove_obj->GetObject ();
         RemoveObject (remove_obj);
-	AddObject (bb, obj);
+        AddObject (bb, obj);
       }
       remove_obj = new_obj;
     }
@@ -1133,7 +1132,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
     csVector3 start (rnd (100.0)-50.0, rnd (100.0)-50.0, rnd (100.0)-50.0);
     Front2Back (start, Debug_TraverseFunc, (void*)&data, 0);
     KDT_ASSERT (data.obj_counter == CS_UNITTEST_OBJECTS,
-  	"number of objects traversed doesn't match tree!");
+        "number of objects traversed doesn't match tree!");
 
     // Test 20 different end positions for Front2Back testing.
     for (j = 0 ; j < 20 ; j++)
@@ -1152,37 +1151,37 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
       {
         if (data.obj_bbox[i])
         {
-	  // Take bbox of object and intersect with current node
-	  // bbox. This is required because otherwise perfect
-	  // Front2Back for object/nodes is not guaranteed.
-	  csBox3 obox = *data.obj_bbox[i];
-	  obox = obox * *data.min_node_bbox[i];
+          // Take bbox of object and intersect with current node
+          // bbox. This is required because otherwise perfect
+          // Front2Back for object/nodes is not guaranteed.
+          csBox3 obox = *data.obj_bbox[i];
+          obox = obox * *data.min_node_bbox[i];
           if (csIntersect3::BoxSegment (obox, seg, isect) != -1)
           {
             float obj_sqdist = csSquaredDist::PointPoint (start, isect);
             if (obj_sqdist > max_minsqdist)
-	      max_minsqdist = obj_sqdist;
+              max_minsqdist = obj_sqdist;
           }
         }
         else
         {
           if (csIntersect3::BoxSegment (*data.min_node_bbox[i], seg, isect)
-	  	!= -1)
+                != -1)
           {
             float node_sqdist = csSquaredDist::PointPoint (start, isect);
-	    if (node_sqdist < 1000000.0)
-	    {
-	      KDT_ASSERT (node_sqdist >= (max_minsqdist-0.1),
-	    	  "bad front2back sorting!");
-	      if (!(node_sqdist >= (max_nodesqdist-0.1)))
-	      {
-	        csPrintf ("node_sqdist=%g max_nodesqdist=%g\n", node_sqdist,
-	          max_nodesqdist);
-	      }
-	      KDT_ASSERT (node_sqdist >= (max_nodesqdist-0.1),
-	    	  "bad front2back sorting!");
-	    }
-	    max_nodesqdist = node_sqdist;
+            if (node_sqdist < 1000000.0)
+            {
+              KDT_ASSERT (node_sqdist >= (max_minsqdist-0.1),
+                  "bad front2back sorting!");
+              if (!(node_sqdist >= (max_nodesqdist-0.1)))
+              {
+                csPrintf ("node_sqdist=%g max_nodesqdist=%g\n", node_sqdist,
+                  max_nodesqdist);
+              }
+              KDT_ASSERT (node_sqdist >= (max_nodesqdist-0.1),
+                  "bad front2back sorting!");
+            }
+            max_nodesqdist = node_sqdist;
           }
         }
       }
@@ -1199,7 +1198,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   data.num_bbox_pointers = 0;
   Front2Back (csVector3 (0, 0, 0), Debug_TraverseFunc, (void*)&data, 0);
   KDT_ASSERT (data.obj_counter == CS_UNITTEST_OBJECTS,
-  	"number of objects traversed doesn't match tree!");
+        "number of objects traversed doesn't match tree!");
   if (!Debug_CheckTree (str)) return rc;
   dbdump = Debug_Statistics ();
   csPrintf ("Traver: %s", dbdump->GetData ()); fflush (stdout);
@@ -1209,7 +1208,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
 }
 
 static bool Debug_TraverseFuncBenchmark (csKDTree* treenode, void*,
-	uint32 cur_timestamp, uint32&)
+        uint32 cur_timestamp, uint32&)
 {
   treenode->Distribute ();
 
@@ -1281,8 +1280,8 @@ csTicks csKDTree::Debug_Benchmark (int num_iterations)
 }
 
 void csKDTree::Debug_Statistics (int& tot_objects,
-	int& tot_nodes, int& tot_leaves, int depth, int& max_depth,
-	float& balance_quality)
+        int& tot_nodes, int& tot_leaves, int depth, int& max_depth,
+        float& balance_quality)
 {
   tot_objects += num_objects;
   if (child1) tot_nodes++;
@@ -1294,9 +1293,9 @@ void csKDTree::Debug_Statistics (int& tot_objects,
     int left = 0;
     int right = 0;
     child1->Debug_Statistics (left, tot_nodes,
-    	tot_leaves, depth, max_depth, balance_quality);
+        tot_leaves, depth, max_depth, balance_quality);
     child2->Debug_Statistics (right, tot_nodes,
-    	tot_leaves, depth, max_depth, balance_quality);
+        tot_leaves, depth, max_depth, balance_quality);
     tot_objects += left;
     tot_objects += right;
 
@@ -1318,10 +1317,10 @@ csPtr<iString> csKDTree::Debug_Statistics ()
   max_depth = 0;
   balance_quality = 0.0;
   Debug_Statistics (tot_objects, tot_nodes, tot_leaves, 0, max_depth,
-  	balance_quality);
+        balance_quality);
   str.Format ("#o=%d #n=%d #l=%d maxd=%d balqual=%g\n",
-  	tot_objects, tot_nodes, tot_leaves, max_depth,
-	balance_quality / float (tot_nodes));
+        tot_objects, tot_nodes, tot_leaves, max_depth,
+        balance_quality / float (tot_nodes));
 
   return csPtr<iString> ((iString*)rc);
 }
@@ -1343,20 +1342,20 @@ void csKDTree::Debug_Dump (csString& str, int indent)
   csString ss;
   csRef<iString> stats = Debug_Statistics ();
   ss.Format ("%s KDT disallow_dist=%d\n%s     node_bbox=(%g,%g,%g)-(%g,%g,%g)\n%s %s",
-  	spaces,
-	(int)disallow_distribute,
-  	spaces, GetNodeBBox ().MinX (), GetNodeBBox ().MinY (),
-	GetNodeBBox ().MinZ (), GetNodeBBox ().MaxX (),
-	GetNodeBBox ().MaxY (), GetNodeBBox ().MaxZ (),
-  	spaces, stats->GetData ());
+        spaces,
+        (int)disallow_distribute,
+        spaces, GetNodeBBox ().MinX (), GetNodeBBox ().MinY (),
+        GetNodeBBox ().MinZ (), GetNodeBBox ().MaxX (),
+        GetNodeBBox ().MaxY (), GetNodeBBox ().MaxZ (),
+        spaces, stats->GetData ());
   str.Append (ss);
   if (child1)
   {
     ss.Format ("%s   axis=%c loc=%g\n",
         spaces,
-    	split_axis == CS_KDTREE_AXISX ? 'x' :
-	split_axis == CS_KDTREE_AXISY ? 'y' : 'z',
-	split_location);
+        split_axis == CS_KDTREE_AXISX ? 'x' :
+        split_axis == CS_KDTREE_AXISY ? 'y' : 'z',
+        split_location);
     str.Append (ss);
     child1->Debug_Dump (str, indent+2);
     child2->Debug_Dump (str, indent+2);

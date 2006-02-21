@@ -77,7 +77,7 @@ struct iKDTreeObjectDescriptor : public virtual iBase
  * of this node.
  */
 typedef bool (csKDTreeVisitFunc)(csKDTree* treenode, void* userdata,
-	uint32 timestamp, uint32& frustum_mask);
+        uint32 timestamp, uint32& frustum_mask);
 
 /**
  * A child in the KD-tree (usually some object).
@@ -88,13 +88,13 @@ private:
   friend class csKDTree;
 
   csBox3 bbox;
-  void* object;			// Pointer back to the original object.
-  csKDTree** leafs;		// Leafs that contain this object.
+  void* object;                 // Pointer back to the original object.
+  csKDTree** leafs;             // Leafs that contain this object.
   int num_leafs;
   int max_leafs;
 
 public:
-  uint32 timestamp;		// Timestamp of last visit to this child.
+  uint32 timestamp;             // Timestamp of last visit to this child.
 
 public:
   csKDTreeChild ();
@@ -165,20 +165,37 @@ public:
   void DumpNode (const char* msg);
   void DebugExit ();
 
+  struct StaticContainer
+  {
+      csBlockAllocator<csKDTree>* tree_nodes;
+      csBlockAllocator<csKDTreeChild>* tree_children;
+
+      StaticContainer()
+          {
+              tree_children = new csBlockAllocator<csKDTreeChild>(1000);
+              tree_nodes = new csBlockAllocator<csKDTree>(1000);
+          }
+
+      ~StaticContainer()
+          {
+              delete tree_nodes;
+              delete tree_children;
+          }
+  };
+
 private:
-  static csBlockAllocator<csKDTree> tree_nodes;
-  static csBlockAllocator<csKDTreeChild> tree_children;
+  static StaticContainer treealloc;
 
-  csKDTree* child1;		// If child1 is not 0 then child2 will
-  csKDTree* child2;		// also be not 0.
-  csKDTree* parent;		// 0 if this is the root.
+  csKDTree* child1;             // If child1 is not 0 then child2 will
+  csKDTree* child2;             // also be not 0.
+  csKDTree* parent;             // 0 if this is the root.
 
-  csRef<iBase> userobject;	// An optional user object for this node.
+  csRef<iBase> userobject;      // An optional user object for this node.
 
-  csBox3 node_bbox;		// Bbox of the node itself.
+  csBox3 node_bbox;             // Bbox of the node itself.
 
-  int split_axis;		// One of CS_KDTREE_AXIS?
-  float split_location;		// Where is the split?
+  int split_axis;               // One of CS_KDTREE_AXIS?
+  float split_location;         // Where is the split?
 
   // Objects in this node. If this node also has children (child1
   // and child2) then the objects here have to be moved to these
@@ -243,7 +260,7 @@ private:
    * Front2Back will pass it to the tree nodes.
    */
   void Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
-  	void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
+        void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
 
   /**
    * Traverse the tree in undefined order. Every node of the
@@ -252,7 +269,7 @@ private:
    * Front2Back will pass it to the tree nodes.
    */
   void TraverseRandom (csKDTreeVisitFunc* func,
-  	void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
+        void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
 
   /**
    * Reset timestamps of all objects in this treenode.
@@ -343,7 +360,7 @@ public:
    * TraverseRandom will pass it to the tree nodes.
    */
   void TraverseRandom (csKDTreeVisitFunc* func,
-  	void* userdata, uint32 frustum_mask);
+        void* userdata, uint32 frustum_mask);
 
   /**
    * Traverse the tree from front to back. Every node of the
@@ -352,7 +369,7 @@ public:
    * Front2Back will pass it to the tree nodes.
    */
   void Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
-  	void* userdata, uint32 frustum_mask);
+        void* userdata, uint32 frustum_mask);
 
   /**
    * Start a new traversal. This will basically make a new
@@ -402,8 +419,8 @@ public:
   csPtr<iString> Debug_UnitTest ();
   void Debug_Dump (csString& str, int indent);
   void Debug_Statistics (int& tot_objects,
-	int& tot_nodes, int& tot_leaves, int depth, int& max_depth,
-	float& balance_quality);
+        int& tot_nodes, int& tot_leaves, int depth, int& max_depth,
+        float& balance_quality);
   csPtr<iString> Debug_Statistics ();
   csTicks Debug_Benchmark (int num_iterations);
 
