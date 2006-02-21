@@ -42,6 +42,7 @@
 #include "cstool/mapnode.h"
 #include "cstool/meshobjtmpl.h"
 #include "cstool/normalcalc.h"
+#include "cstool/objmodel.h"
 #include "cstool/pen.h"
 #include "cstool/primitives.h"
 #include "cstool/proctex.h"
@@ -52,6 +53,5 @@
 #include "cstool/userrndbuf.h"
 #include "cstool/vertexcompress.h"
 #include "cstool/vfsdirchange.h"
-#include "cstool/objmodel.h"
 #endif /* __CSTOOL_H__ */
 

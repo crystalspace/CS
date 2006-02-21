@@ -36,6 +36,7 @@
 #include "imesh/lighting.h"
 #include "imesh/nullmesh.h"
 #include "imesh/object.h"
+#include "imesh/objmodel.h"
 #include "imesh/particle.h"
 #include "imesh/particles.h"
 #include "imesh/partsys.h"
@@ -49,6 +50,5 @@
 #include "imesh/stars.h"
 #include "imesh/terrain.h"
 #include "imesh/thing.h"
-#include "imesh/objmodel.h"
 #endif /* __IMESH_H__ */
 
