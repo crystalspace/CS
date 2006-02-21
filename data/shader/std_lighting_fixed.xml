@@ -92,7 +92,7 @@
           <texture name="standardtex white" destination="unit 0" />
         <?else?>
           <texture name="tex diffuse" destination="unit 0" />
-	  <buffer source="texture coordinate 0" destination="texture coordinate diffuse" />
+	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
         <?endif?>
       </pass>
       <!-- @@@ Flat materials -->
