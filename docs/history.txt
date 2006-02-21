@@ -13,6 +13,10 @@ chronological order.
 	- Fossi moved iObjectModel from igeom to imesh and changed 
 	  includes accordingly to prepare for the terrain CD.
 	- Fossi missed some includes in the first try...
+	- Peter Amstutz fixed a longstanding (but elusive) bug in 
+	  csKDTree where the static allocators could sometimes 
+	  themselves be destructed in the wrong order, causing a 
+	  crash when the program exits.
 19-Feb-2006
 	- Piotr Obrzut removed unecesery and wrong conditions checks while 
 	  seting autodisable params in ode dynamics system.
