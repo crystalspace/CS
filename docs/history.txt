@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Feb-2006
+	- Jorrit added GF 7800 to the driver database so that it doesn't
+	  use point sprites.
 20-Feb-2006
 	- res fixed xmlshader to not throw an assertion on external programs.
 	- Jorrit added GF 6600 to the driver database so that it doesn't
