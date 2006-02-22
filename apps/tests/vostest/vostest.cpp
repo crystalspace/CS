@@ -39,8 +39,6 @@
 #include "iengine/material.h"
 #include "imesh/thing.h"
 #include "imesh/object.h"
-#include "imesh/crossbld.h"
-#include "imesh/mdlconv.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
