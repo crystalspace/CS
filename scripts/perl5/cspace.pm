@@ -3907,6 +3907,7 @@ package cspace::iObjectModel;
 *GetShapeNumber = *cspacec::iObjectModel_GetShapeNumber;
 *GetPolygonMeshBase = *cspacec::iObjectModel_GetPolygonMeshBase;
 *GetPolygonMeshColldet = *cspacec::iObjectModel_GetPolygonMeshColldet;
+*GetTerraFormerColldet = *cspacec::iObjectModel_GetTerraFormerColldet;
 *SetPolygonMeshColldet = *cspacec::iObjectModel_SetPolygonMeshColldet;
 *GetPolygonMeshViscull = *cspacec::iObjectModel_GetPolygonMeshViscull;
 *SetPolygonMeshViscull = *cspacec::iObjectModel_SetPolygonMeshViscull;
