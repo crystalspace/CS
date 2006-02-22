@@ -3433,6 +3433,7 @@ class iObjectModel(iBase):
     def GetShapeNumber(*args): return _cspace.iObjectModel_GetShapeNumber(*args)
     def GetPolygonMeshBase(*args): return _cspace.iObjectModel_GetPolygonMeshBase(*args)
     def GetPolygonMeshColldet(*args): return _cspace.iObjectModel_GetPolygonMeshColldet(*args)
+    def GetTerraFormerColldet(*args): return _cspace.iObjectModel_GetTerraFormerColldet(*args)
     def SetPolygonMeshColldet(*args): return _cspace.iObjectModel_SetPolygonMeshColldet(*args)
     def GetPolygonMeshViscull(*args): return _cspace.iObjectModel_GetPolygonMeshViscull(*args)
     def SetPolygonMeshViscull(*args): return _cspace.iObjectModel_SetPolygonMeshViscull(*args)
