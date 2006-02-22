@@ -402,9 +402,10 @@ public:
 
   virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
     const csVector3& pos, float radius, bool crossPortals = true );
-
   virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
     const csBox3& box, bool crossPortals = true );
+  virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
+    const csVector3& start, const csVector3& end, bool crossPortals = true );
 
   virtual iMeshList* GetMeshes ()
   { return &meshes; }
@@ -707,6 +708,13 @@ private:
    */
   void GetNearbyMeshList (iSector* sector,
     const csVector3& pos, float radius, csArray<iMeshWrapper*>& list,
+    csArray<iSector*>& visited_sectors, bool crossPortals = true);
+
+  /**
+   * Get a list of all meshes in the given beam.
+   */
+  void GetNearbyMeshList (iSector* sector,
+    const csVector3& start, const csVector3& end, csArray<iMeshWrapper*>& list,
     csArray<iSector*>& visited_sectors, bool crossPortals = true);
 
   /**

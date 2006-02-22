@@ -761,6 +761,7 @@ public:
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
+  virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
   /** @} */
 };
 

@@ -2435,6 +2435,80 @@ csPtr<iObjectIterator> csEngine::GetVisibleObjects (
 }
 
 void csEngine::GetNearbyMeshList (iSector* sector,
+    const csVector3& start, const csVector3& end,
+    csArray<iMeshWrapper*>& list,
+    csArray<iSector*>& visited_sectors, bool crossPortals)
+{
+  iVisibilityCuller* culler = sector->GetVisibilityCuller ();
+  csRef<iVisibilityObjectIterator> visit = culler->IntersectSegment (
+  	start, end, true);
+
+  //@@@@@@@@ TODO ALSO SUPPORT LIGHTS!
+  while (visit->HasNext ())
+  {
+    iVisibilityObject* vo = visit->Next ();
+    iMeshWrapper* imw = vo->GetMeshWrapper ();
+    if (imw)
+    {
+      list.Push (imw); 
+      if (crossPortals && imw->GetPortalContainer ())
+      {
+        iPortalContainer* portals = imw->GetPortalContainer ();
+        int pc = portals->GetPortalCount ();
+        int j;
+        for (j = 0 ; j < pc ; j++)
+        {
+          iPortal* portal = portals->GetPortal (j);
+          const csPlane3& wor_plane = portal->GetWorldPlane ();
+          // Can we see the portal?
+          if (wor_plane.Classify (start) < -0.001)
+          {
+              // Also handle objects in the destination sector unless
+              // it is a warping sector.
+              portal->CompleteSector (0);
+              if (sector != portal->GetSector () && portal->GetSector ())
+              {
+                size_t l;
+                bool already_visited = false;
+                for (l = 0 ; l < visited_sectors.Length () ; l++)
+                {
+                  if (visited_sectors[l] == portal->GetSector ())
+                  {
+                    already_visited = true;
+                    break;
+                  }
+                }
+                if (!already_visited)
+                {
+                  visited_sectors.Push (portal->GetSector ());
+		  if (portal->GetFlags ().Check (CS_PORTAL_WARP))
+		  {
+		    csReversibleTransform warp_wor;
+		    portal->ObjectToWorld (
+		    	imw->GetMovable ()->GetFullTransform (), warp_wor);
+		    csVector3 tstart = warp_wor.Other2This (start);
+		    csVector3 tend = warp_wor.Other2This (end);
+                    GetNearbyMeshList (portal->GetSector (), tstart, tend,
+		    	list, visited_sectors);
+		  }
+		  else
+		  {
+                    GetNearbyMeshList (portal->GetSector (), start, end,
+		    	list, visited_sectors);
+		  }
+		  // Uncommenting the below causes too many objects to be
+		  // returned in some cases.
+		  //visited_sectors.Pop ();
+                }
+              }
+          }
+	}
+      }
+    }
+  }
+}
+
+void csEngine::GetNearbyMeshList (iSector* sector,
     const csVector3& pos, float radius, csArray<iMeshWrapper*>& list,
     csArray<iSector*>& visited_sectors, bool crossPortals)
 {
@@ -2637,6 +2711,20 @@ csPtr<iMeshWrapperIterator> csEngine::GetNearbyMeshes (
   csArray<iSector*> visited_sectors;
   visited_sectors.Push (sector);
   GetNearbyMeshList (sector, box, *list, visited_sectors, crossPortals);
+  csMeshListIt *it = new csMeshListIt (list);
+  return csPtr<iMeshWrapperIterator> (it);
+}
+
+csPtr<iMeshWrapperIterator> csEngine::GetNearbyMeshes (
+  iSector *sector,
+  const csVector3& start,
+  const csVector3& end,
+  bool crossPortals)
+{
+  csArray<iMeshWrapper*>* list = new csArray<iMeshWrapper*>;
+  csArray<iSector*> visited_sectors;
+  visited_sectors.Push (sector);
+  GetNearbyMeshList (sector, start, end, *list, visited_sectors, crossPortals);
   csMeshListIt *it = new csMeshListIt (list);
   return csPtr<iMeshWrapperIterator> (it);
 }

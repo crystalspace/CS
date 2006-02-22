@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Feb-2006
+	- Jorrit added a version of iEngine->GetNearbyMeshes() that works
+	  with a beam (i.e. finds all meshes that intersect with the beam).
+	- Jorrit fixed sprcal3d so it compiles again after the changes
+	  with iObjectModel.
 21-Feb-2006
 	- Jorrit added GF 7800 to the driver database so that it doesn't
 	  use point sprites.

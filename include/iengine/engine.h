@@ -780,6 +780,17 @@ struct iEngine : public virtual iBase
   virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
     const csBox3& box, bool crossPortals = true ) = 0;
 
+  /**
+   * This routine returns an iterator to iterate over
+   * all meshes that intersect with a beam.
+   * If crossPortals is true it will search through
+   * portals. Otherwise it will limit the search to the sector passed in.
+   * Portal visibility is tested fromt the start of the beam.
+   */
+  virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
+    const csVector3& start, const csVector3& end,
+    bool crossPortals = true ) = 0;
+
   /// Get the list of meshes
   virtual iMeshList* GetMeshes () = 0;
 
