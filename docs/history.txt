@@ -11,6 +11,8 @@ chronological order.
 	  with a beam (i.e. finds all meshes that intersect with the beam).
 	- Jorrit fixed sprcal3d so it compiles again after the changes
 	  with iObjectModel.
+	- Jorrit removed 'Some' and 'may' from the iDocument->Parse()
+	  documentation which gives it a completely different meaning.
 21-Feb-2006
 	- Jorrit added GF 7800 to the driver database so that it doesn't
 	  use point sprites.
