@@ -314,7 +314,7 @@ struct iDocument : public virtual iBase
    * Parse document file from an iFile.
    * \param file The file to parse. It should contain data in whatever format
    *   is understood by the iDocument implementation receiving this invocation.
-   * \param collapse Some document format implementations may have the option
+   * \param collapse Document format implementations have the option
    *   of condensing extraneous whitespace in returned #CS_NODE_TEXT nodes.
    *   Set this to true to enable this option.  By default, whitepsace is
    *   preserved.
@@ -327,7 +327,7 @@ struct iDocument : public virtual iBase
    * Parse document file from an iDataBuffer.
    * \param buf The buffer to parse. It should contain data in whatever format
    *   is understood by the iDocument implementation receiving this invocation.
-   * \param collapse Some document format implementations may have the option
+   * \param collapse Document format implementations have the option
    *   of condensing extraneous whitespace in returned #CS_NODE_TEXT nodes.
    *   Set this to true to enable this option.  By default, whitepsace is
    *   preserved.
@@ -340,7 +340,7 @@ struct iDocument : public virtual iBase
    * Parse document file from an iString.
    * \param str The string to parse. It should contain data in whatever format
    *   is understood by the iDocument implementation receiving this invocation.
-   * \param collapse Some document format implementations may have the option
+   * \param collapse Document format implementations have the option
    *   of condensing extraneous whitespace in returned #CS_NODE_TEXT nodes.
    *   Set this to true to enable this option.  By default, whitepsace is
    *   preserved.
@@ -353,7 +353,7 @@ struct iDocument : public virtual iBase
    * Parse document file from a null-terminated C-string.
    * \param buf The buffer to parse. It should contain data in whatever format
    *   is understood by the iDocument implementation receiving this invocation.
-   * \param collapse Some document format implementations may have the option
+   * \param collapse Document format implementations have the option
    *   of condensing extraneous whitespace in returned #CS_NODE_TEXT nodes.
    *   Set this to true to enable this option.  By default, whitepsace is
    *   preserved.
