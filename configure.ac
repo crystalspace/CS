@@ -1677,7 +1677,7 @@ AS_IF([test $cs_cv_libmetaobject_a3dl = yes],
 	[], [C++], [], [],
 	[$cs_cv_libmetaobject_a3dl_cflags],
 	[$cs_cv_libmetaobject_a3dl_lflags],
-	[$cs_cv_libmetaobject_a3dl_libs],
+	[$cs_cv_libmetaobject_a3dl_libs -lircclient],
 	[libmetaobject_misc])],
     [cs_cv_libmetaobject_misc=no])
 
