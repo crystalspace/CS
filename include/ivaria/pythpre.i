@@ -326,6 +326,30 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   }
 %enddef
 
+%typemap(in) csEventID[]
+{
+  int cnt; 
+  if (!PyList_Check($input))
+  {
+    PyErr_SetString(PyExc_TypeError, "not a list");
+    return 0;
+  }
+  cnt = PyList_Size($input);
+  csEventID * ptr = new csEventID[cnt];
+  for (int i = 0; i < cnt; ++i)
+  {
+    PyObject * o = PyList_GetItem($input, i);
+    if (!PyNumber_Check(o))
+    {
+      PyErr_SetString(PyExc_TypeError, "list must contain numbers");
+      delete [] ptr;
+      return 0;
+    }
+    ptr[i] = (csEventID) PyInt_AsUnsignedLongMask(o);
+  }
+  $1 = ptr;
+}
+
 #ifndef CS_MINI_SWIG
 /*
  * Using the shadow feature allows us to define our own python code to replace

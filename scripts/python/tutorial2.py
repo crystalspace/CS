@@ -96,8 +96,7 @@ class MyCsApp:
         # create the 'room'  
         room = self.engine.CreateSector("room")
         walls = self.engine.CreateSectorWallsMesh(room,"walls")
-        thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState)
-        walls_state = thingstate.GetFactory()
+        walls_state = SCF_QUERY_INTERFACE(walls.GetMeshObject().GetFactory(), iThingFactoryState)
         walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
         walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
         walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);        
@@ -191,17 +190,14 @@ class MyCsApp:
 def EventHandler(ev):
     try:
         #print 'EventHandler called'
-        if ((ev.Type  == csevKeyboard ) and
-            (csKeyEventHelper.GetEventType(ev) == csKeyEventTypeDown) and
+        if ((ev.Name  == csevKeyboardDown(object_reg) ) and
             (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
             q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
             if q:
-                q.GetEventOutlet().Broadcast(cscmdQuit)
+                q.GetEventOutlet().Broadcast(csevQuit(object_reg))
                 return 1
-        elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdProcess:
+        elif ev.Name == csevFrame(object_reg):
             app.SetupFrame()
-            return 1
-        elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdFinalProcess:
             app.FinishFrame()
             return 1
     except:

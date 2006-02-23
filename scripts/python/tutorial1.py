@@ -45,8 +45,7 @@ def CreateRoom (matname):
     walls = engine.CreateSectorWallsMesh(room, "walls")
     if DEBUG: print 'walls=',walls
     material=engine.GetMaterialList().FindByName(matname)
-    thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState)
-    walls_state = thingstate.GetFactory()
+    walls_state = SCF_QUERY_INTERFACE(walls.GetMeshObject().GetFactory(), iThingFactoryState)
     walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
     walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
     walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
@@ -85,32 +84,25 @@ def FinishFrame ():
 
 def HandleEvent (ev):
     if DEBUG: print 'HandleEvent called'
-    if ((ev.Type  == csevKeyboard ) and
-        (csKeyEventHelper.GetEventType(ev) == csKeyEventTypeDown) and
+    if ((ev.Name  == csevKeyboardDown(object_reg) ) and
         (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
-        
         q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
         if q:
-            q.GetEventOutlet().Broadcast(cscmdQuit)
+            q.GetEventOutlet().Broadcast(csevQuit(object_reg))
             return 1
     return 0
 
 def EventHandler (ev):
     if DEBUG: print 'EventHandler called'
     if DEBUG: print '   ev=%s' % ev
-    if ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdProcess:
+    if ev.Name == csevFrame(object_reg):
         try:
             SetupFrame()
-        except:
-            traceback.print_exc()
-        return 1
-    elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdFinalProcess:
-        try:
             FinishFrame()
         except:
             traceback.print_exc()
         return 1
-    elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdCommandLineHelp:
+    elif ev.Name == csevCommandLineHelp(object_reg):
         print 'No help today...'
         return 1
     else:

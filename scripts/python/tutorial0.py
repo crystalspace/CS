@@ -53,12 +53,11 @@ def FatalError(msg="FatalError"):
 def EventHandler(ev):
     try:
         #print 'EventHandler called'
-        if ((ev.Type  == csevKeyboard ) and
-            (csKeyEventHelper.GetEventType(ev) == csKeyEventTypeDown) and
+        if ((ev.Name  == csevKeyboardDown(object_reg) ) and
             (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
             q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
             if q:
-                q.GetEventOutlet().Broadcast(cscmdQuit)
+                q.GetEventOutlet().Broadcast(csevQuit(object_reg))
                 return 1
     except: # the exception catcher
         traceback.print_exc()   # prints the usual error messages

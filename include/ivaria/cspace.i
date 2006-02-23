@@ -856,10 +856,12 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csInitializer::RequestPluginsV;
 %rename (_RequestPlugins) csInitializer::RequestPlugins(iObjectRegistry*,
   csArray<csPluginRequest> const&);
-%ignore csInitializer::SetupEventHandler(iObjectRegistry*, csEventHandlerFunc,
-  unsigned int);
-%rename(_SetupEventHandler) csInitializer::SetupEventHandler(iObjectRegistry*,
-  iEventHandler *, unsigned int);
+
+%ignore csInitializer::SetupEventHandler (iObjectRegistry*, csEventHandlerFunc,
+  const csEventID events[]);
+%ignore csInitializer::SetupEventHandler (iObjectRegistry*, csEventHandlerFunc);
+%rename (_SetupEventHandler) csInitializer::SetupEventHandler (iObjectRegistry*,
+  iEventHandler *, const csEventID[]);
 %typemap(default) const char * configName { $1 = 0; }
 // Swig 1.3.24 doesn't handle pointer default args well unless we tell it
 // to use an alternate way for that function

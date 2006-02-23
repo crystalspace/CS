@@ -149,17 +149,14 @@ class MyCsApp:
 def EventHandler(ev):
     try:
         #print 'EventHandler called'
-        if ((ev.Type  == csevKeyboard ) and
-            (csKeyEventHelper.GetEventType(ev) == csKeyEventTypeDown) and
+        if ((ev.Name  == csevKeyboardDown(object_reg) ) and
             (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
             q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
             if q:
-                q.GetEventOutlet().Broadcast(cscmdQuit)
+                q.GetEventOutlet().Broadcast(csevQuit(object_reg))
                 return 1
-        elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdProcess:
+        elif ev.Name == csevFrame(object_reg):
             app.SetupFrame()
-            return 1
-        elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdFinalProcess:
             app.FinishFrame()
             return 1
     except:
