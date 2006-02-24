@@ -2807,7 +2807,7 @@ package cspace::csInitializer;
 *_RequestPlugins = *cspacec::csInitializer__RequestPlugins;
 *OpenApplication = *cspacec::csInitializer_OpenApplication;
 *CloseApplication = *cspacec::csInitializer_CloseApplication;
-*SetupEventHandler = *cspacec::csInitializer_SetupEventHandler;
+*_SetupEventHandler = *cspacec::csInitializer__SetupEventHandler;
 *DestroyApplication = *cspacec::csInitializer_DestroyApplication;
 *GetDefaultAppID = *cspacec::csInitializer_GetDefaultAppID;
 sub new {
