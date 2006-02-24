@@ -645,7 +645,7 @@ public:
   inline float Area () const
   {
     float x = MaxX()-MinX();
-    float y = MaxZ()-MinY();
+    float y = MaxY()-MinY();
     float z = MaxZ()-MinZ();
     return 2.0f*(x*y + x*z + y*z);
   }
