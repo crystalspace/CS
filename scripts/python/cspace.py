@@ -2452,8 +2452,8 @@ class csInitializer(_object):
     if _newclass:OpenApplication = staticmethod(_cspace.csInitializer_OpenApplication)
     __swig_getmethods__["CloseApplication"] = lambda x: _cspace.csInitializer_CloseApplication
     if _newclass:CloseApplication = staticmethod(_cspace.csInitializer_CloseApplication)
-    __swig_getmethods__["SetupEventHandler"] = lambda x: _cspace.csInitializer_SetupEventHandler
-    if _newclass:SetupEventHandler = staticmethod(_cspace.csInitializer_SetupEventHandler)
+    __swig_getmethods__["_SetupEventHandler"] = lambda x: _cspace.csInitializer__SetupEventHandler
+    if _newclass:_SetupEventHandler = staticmethod(_cspace.csInitializer__SetupEventHandler)
     __swig_getmethods__["DestroyApplication"] = lambda x: _cspace.csInitializer_DestroyApplication
     if _newclass:DestroyApplication = staticmethod(_cspace.csInitializer_DestroyApplication)
     __swig_getmethods__["GetDefaultAppID"] = lambda x: _cspace.csInitializer_GetDefaultAppID
@@ -2506,7 +2506,7 @@ csInitializer_OpenApplication = _cspace.csInitializer_OpenApplication
 
 csInitializer_CloseApplication = _cspace.csInitializer_CloseApplication
 
-csInitializer_SetupEventHandler = _cspace.csInitializer_SetupEventHandler
+csInitializer__SetupEventHandler = _cspace.csInitializer__SetupEventHandler
 
 csInitializer_DestroyApplication = _cspace.csInitializer_DestroyApplication
 
@@ -12814,7 +12814,6 @@ class _csPyEventHandler(iEventHandler):
     __swig_getmethods__ = {}
     for _s in [iEventHandler]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, _csPyEventHandler, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ _csPyEventHandler instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     __swig_setmethods__["scfRefCount"] = _cspace._csPyEventHandler_scfRefCount_set
@@ -12833,12 +12832,21 @@ class _csPyEventHandler(iEventHandler):
     def AddRefOwner(*args): return _cspace._csPyEventHandler_AddRefOwner(*args)
     def RemoveRefOwner(*args): return _cspace._csPyEventHandler_RemoveRefOwner(*args)
     def QueryInterface(*args): return _cspace._csPyEventHandler_QueryInterface(*args)
+    def __init__(self, *args):
+        _swig_setattr(self, _csPyEventHandler, 'this', _cspace.new__csPyEventHandler(*args))
+        _swig_setattr(self, _csPyEventHandler, 'thisown', 1)
     def __del__(self, destroy=_cspace.delete__csPyEventHandler):
         try:
             if self.thisown: destroy(self)
         except: pass
 
     def HandleEvent(*args): return _cspace._csPyEventHandler_HandleEvent(*args)
+    def GenericName(*args): return _cspace._csPyEventHandler_GenericName(*args)
+    def GenericID(*args): return _cspace._csPyEventHandler_GenericID(*args)
+    def GenericPrec(*args): return _cspace._csPyEventHandler_GenericPrec(*args)
+    def GenericSucc(*args): return _cspace._csPyEventHandler_GenericSucc(*args)
+    def InstancePrec(*args): return _cspace._csPyEventHandler_InstancePrec(*args)
+    def InstanceSucc(*args): return _cspace._csPyEventHandler_InstanceSucc(*args)
 
 class _csPyEventHandlerPtr(_csPyEventHandler):
     def __init__(self, this):
@@ -12846,6 +12854,11 @@ class _csPyEventHandlerPtr(_csPyEventHandler):
         if not hasattr(self,"thisown"): _swig_setattr(self, _csPyEventHandler, 'thisown', 0)
         _swig_setattr(self, _csPyEventHandler,self.__class__,_csPyEventHandler)
 _cspace._csPyEventHandler_swigregister(_csPyEventHandlerPtr)
+
+def csevCommandLineHelp(reg):
+  csEventNameRegistry.GetID(reg, csString("crystalspace.application.commandlinehelp"))
+  
+CS_EVENTLIST_END = csInvalidStringID
 
 class csPyEventHandler (_csPyEventHandler):
   """Python version of iEventHandler implementation.
@@ -12875,8 +12888,8 @@ def _csInitializer_SetupEventHandler (reg, obj,
     # assume it is a iEventHandler
     hdlr = obj
   if eventids==None:
-    eventids=[csevFrame(reg), csevInput(reg), csevKeyboard(reg), \
-               csevMouse(reg), csevQuit(reg)]
+    eventids=[csevFrame(reg), csevInput(reg), csevKeyboardEvent(reg), \
+              csevMouseEvent(reg), csevQuit(reg), CS_EVENTLIST_END]
   return csInitializer._SetupEventHandler(reg, hdlr, eventids)
 
 csInitializer.SetupEventHandler = \
