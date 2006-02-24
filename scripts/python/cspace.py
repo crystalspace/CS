@@ -2151,6 +2151,7 @@ class csBox3(_object):
     def Min(*args): return _cspace.csBox3_Min(*args)
     def Max(*args): return _cspace.csBox3_Max(*args)
     def Volume(*args): return _cspace.csBox3_Volume(*args)
+    def Area(*args): return _cspace.csBox3_Area(*args)
     def GetCorner(*args): return _cspace.csBox3_GetCorner(*args)
     def GetEdgeInfo(*args): return _cspace.csBox3_GetEdgeInfo(*args)
     def GetFaceEdges(*args): return _cspace.csBox3_GetFaceEdges(*args)
