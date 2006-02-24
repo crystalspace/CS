@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Feb-2006
+	- Jorrit fixed bugplug so it no longer crashes if there is no
+	  engine.
+	- Jorrit disabled point sprites globally for now since it appears
+	  to work incorrectly on all cards found so far.
 23-Feb-2006
 	- caedes commited a patch he prepared with rhohr that fixes the python 
 	  SetupEventHandler, the python event handler itself and the python 

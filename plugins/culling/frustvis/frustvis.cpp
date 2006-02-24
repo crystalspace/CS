@@ -338,8 +338,8 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
       update_queue.Delete (visobj_wrap);
       visobj->GetMovable ()->RemoveListener (
 		  (iMovableListener*)visobj_wrap);
-      visobj->GetObjectModel ()->RemoveListener (
-		  (iObjectModelListener*)visobj_wrap);
+      iObjectModel* objmodel = visobj->GetObjectModel ();
+      objmodel->RemoveListener ((iObjectModelListener*)visobj_wrap);
       kdtree->RemoveObject (visobj_wrap->child);
       visobj->DecRef ();
 #ifdef CS_DEBUG

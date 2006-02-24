@@ -222,7 +222,8 @@ void csBugPlug::SetupPlugin ()
   if (!Engine)
   {
     Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-    Engine->AddEngineFrameCallback (catcher);
+    if (Engine)
+      Engine->AddEngineFrameCallback (catcher);
   }
 
   if (!G3D) G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
