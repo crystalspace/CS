@@ -53,7 +53,7 @@ def FatalError(msg="FatalError"):
 def EventHandler(ev):
     try:
         #print 'EventHandler called'
-        if ((ev.Name  == csevKeyboardDown(object_reg) ) and
+        if ((ev.Name  == KeyboardDown) and
             (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
             q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
             if q:
@@ -91,6 +91,9 @@ if not csInitializer.RequestPlugins(object_reg, plugin_requests):
 if not csInitializer.SetupEventHandler(object_reg, EventHandler):
     FatalError("Could not initialize event handler!")
   
+# Get some often used event IDs
+KeyboardDown = csevKeyboardDown(object_reg)
+
 if not csInitializer.OpenApplication(object_reg):
     FatalError("Could not open the application!")
 

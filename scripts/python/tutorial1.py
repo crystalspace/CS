@@ -84,7 +84,7 @@ def FinishFrame ():
 
 def HandleEvent (ev):
     if DEBUG: print 'HandleEvent called'
-    if ((ev.Name  == csevKeyboardDown(object_reg) ) and
+    if ((ev.Name  == KeyboardDown) and
         (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
         q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
         if q:
@@ -95,14 +95,14 @@ def HandleEvent (ev):
 def EventHandler (ev):
     if DEBUG: print 'EventHandler called'
     if DEBUG: print '   ev=%s' % ev
-    if ev.Name == csevFrame(object_reg):
+    if ev.Name == Frame:
         try:
             SetupFrame()
             FinishFrame()
         except:
             traceback.print_exc()
         return 1
-    elif ev.Name == csevCommandLineHelp(object_reg):
+    elif ev.Name == CommandLineHelp:
         print 'No help today...'
         return 1
     else:
@@ -136,6 +136,11 @@ if not csInitializer.SetupEventHandler(object_reg, EventHandler):
     Report(CS_REPORTER_SEVERITY_ERROR, "Could not initialize event handler!")
     sys.exit(1)
   
+# Get some often used event IDs
+KeyboardDown = csevKeyboardDown(object_reg)
+Frame = csevFrame(object_reg)
+CommandLineHelp = csevCommandLineHelp(object_reg)
+
 if DEBUG: print 'Checking if help is needed...'
 if csCommandLineHelper.CheckHelp(object_reg):
     csCommandLineHelper.Help(object_reg)

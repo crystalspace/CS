@@ -190,13 +190,13 @@ class MyCsApp:
 def EventHandler(ev):
     try:
         #print 'EventHandler called'
-        if ((ev.Name  == csevKeyboardDown(object_reg) ) and
+        if ((ev.Name  == KeyboardDown) and
             (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
             q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
             if q:
                 q.GetEventOutlet().Broadcast(csevQuit(object_reg))
                 return 1
-        elif ev.Name == csevFrame(object_reg):
+        elif ev.Name == Frame:
             app.SetupFrame()
             app.FinishFrame()
             return 1
@@ -235,6 +235,10 @@ if not csInitializer.RequestPlugins(object_reg, plugin_requests):
 if not csInitializer.SetupEventHandler(object_reg, EventHandler):
     FatalError("Could not initialize event handler!")
         
+# Get some often used event IDs
+KeyboardDown = csevKeyboardDown(object_reg)
+Frame = csevFrame(object_reg)
+
 app=MyCsApp()   # this is the one & only app
   
 app.Init()  # turn on the app
