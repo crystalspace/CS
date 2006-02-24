@@ -2480,6 +2480,7 @@ package cspace::csBox3;
 *Min = *cspacec::csBox3_Min;
 *Max = *cspacec::csBox3_Max;
 *Volume = *cspacec::csBox3_Volume;
+*Area = *cspacec::csBox3_Area;
 *GetCorner = *cspacec::csBox3_GetCorner;
 *GetEdgeInfo = *cspacec::csBox3_GetEdgeInfo;
 *GetFaceEdges = *cspacec::csBox3_GetFaceEdges;
