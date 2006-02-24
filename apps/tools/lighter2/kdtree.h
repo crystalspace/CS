@@ -25,6 +25,80 @@ namespace lighter
 {
   class RadPrimitive;
 
+
+  /// Single primitive in KD-tree. A single triangle
+  struct KDTreePrimitive
+  {
+    /// The three vertices
+    csVector3 vertices[3];
+
+    /// Normal
+    csVector3 normal;
+
+    /// The RadPrimitive we belong to
+    RadPrimitive *primPointer;
+  };
+
+  
+  /// Node in non-optimized KD-tree
+  struct KDTreeNode
+  {
+    // CS_AXIS_* 
+    uint splitDimension;
+
+    // Split plane location (world space)
+    float splitLocation;
+
+    // Left-right pointer
+    KDTreeNode *leftChild, *rightChild;
+
+    // Triangle indices into triangle lists
+    csArray<size_t> triangleIndices;
+
+    KDTreeNode()
+      : splitDimension(0), splitLocation(0.0f), leftChild(0), rightChild(0)
+    {}
+
+    ~KDTreeNode()
+    { 
+      delete leftChild;
+      delete rightChild;
+    }
+  };
+
+  /// KD-tree
+  struct KDTree
+  {
+    // Bounding box
+    csBox3 boundingBox;
+
+    // Root node
+    KDTreeNode *rootNode;
+
+    // All triangles in tree
+    csArray<KDTreePrimitive> allTriangles;
+
+    KDTree()
+      : rootNode (0)
+    {}
+  };
+
+
+  class KDTreeBuilder
+  {
+  public:
+    // Build a tree from all the objects returned by iterator
+    static KDTree* BuildTree (const RadObjectHash::GlobalIterator& objectIt);
+
+  protected:
+    static void Subdivide(KDTree *tree, KDTreeNode *node, 
+      const csBox3& currentAABB, unsigned int depth = 0, unsigned int lastAxis = ~0,
+      float lastPosition = 0);
+  };
+
+#if 0
+
+
   /// Single node in the KD tree
   struct KDTreeNode
   {
@@ -84,6 +158,7 @@ namespace lighter
   private:
     RadPrimitivePtrArray tempPrimitiveArray;
   };
+#endif
 
 }
 

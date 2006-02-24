@@ -23,249 +23,18 @@
 
 using namespace CS;
 
+static unsigned int buildDepth = 0;
+
 namespace lighter
 {
-  // Some helpers for the building.. 
-  struct SplitPositionFinder
-  {
-    SplitPositionFinder (size_t num)
-      : splitPoolDEL (0), splitPool (0), firstEntry (0)
-    {
-      //Alloc num entries
-      splitPoolDEL = splitPool = new SplitPosition[num*2+8];
-      for (uint i=0; i<(num*2+6); i++)
-      {
-        splitPool[i].next = &splitPool[i+1];
-      }
-      splitPool[num*2+7].next = 0;
-    }
-
-    ~SplitPositionFinder ()
-    {
-      delete[] splitPoolDEL;
-    }
-
-    // Prepare for a new node
-    void Reset () 
-    {
-      if (firstEntry)
-      {
-        SplitPosition *list = firstEntry;
-        while (list->next) list = list->next;
-        list->next = splitPool;
-        splitPool = firstEntry;
-      }
-      firstEntry = 0;
-    }
-
-    // Add a new possible splitpoint
-    void AddPosition (float pos)
-    {
-      SplitPosition* entry = splitPool;
-      splitPool = splitPool->next;
-
-      entry->next = 0;
-      entry->position = pos;
-      if (!firstEntry)
-        firstEntry = entry;
-      else
-      {
-        if (pos < firstEntry->position)
-        {
-          entry->next = firstEntry;
-          firstEntry = entry;
-        }
-        else if (pos == firstEntry->position)
-        {
-          //recycle, no need to store this position
-          entry->next = splitPool;
-          splitPool = entry;
-        }
-        else
-        {
-          SplitPosition *list = firstEntry;
-          while ((list->next) && (pos >= list->next->position))
-          {
-            if (pos == list->next->position)
-            {
-              //recycle, no need to store this position
-              entry->next = splitPool;
-              splitPool = entry;
-              return;
-            }
-            list = list->next;
-          }
-          entry->next = list->next;
-          list->next = entry;
-        }
-      }
-    }
-
-
-    // Holder for possible splitpoint
-    struct SplitPosition
-    {
-      float position;
-      SplitPosition* next;
-    };
-    SplitPosition  *splitPoolDEL, *splitPool, *firstEntry;
-  };
-  // The split position finder helper instance
-  SplitPositionFinder* splitPositionFinder;
-  
-  // Functor to collect all split-positions. Use the global helper, so
-  // make sure it is initiated
-  struct CollectSplitPositions
-  {
-    CollectSplitPositions (uint axis)
-      : axis (axis)
-    {}
-
-    void operator () (RadPrimitive *prim)
-    {
-      float a,b;
-      prim->GetExtent (axis,a,b);
-      splitPositionFinder->AddPosition (a);
-      splitPositionFinder->AddPosition (b);
-    }
-
-    uint axis;
-  };
-
-  // Functor to compute left/right count
-  struct CountLeftRight
-  {
-    CountLeftRight (uint splitDimension, float splitPos)
-      : splitPos (splitPos), splitDimension (splitDimension), 
-        left (0), right (0)
-    {}
-
-    void operator () (RadPrimitive* prim)
-    {
-      float minP, maxP;
-      prim->GetExtent (splitDimension, minP, maxP);
-      if (minP <= splitPos) left++;
-      if (maxP >= splitPos) right++;
-    }
-
-    float splitPos;
-    uint splitDimension, left, right;
-  };
-
-  // Functor to distribute left/right
-  struct DistributeLeftRight
-  {
-    DistributeLeftRight (uint splitDimension, float splitPos,
-      KDTreeNode *left, KDTreeNode *right)
-      : splitPos (splitPos), splitDimension (splitDimension), 
-        left (left), right (right)
-    {}
-
-    void operator () (RadPrimitive* prim)
-    {
-      float minP, maxP;
-      prim->GetExtent (splitDimension, minP, maxP);
-      if (minP <= splitPos) left->radPrimitives.Push (prim);
-      if (maxP >= splitPos) right->radPrimitives.Push (prim);
-    }
-
-    float splitPos;
-    uint splitDimension;
-    KDTreeNode *left, *right;
-  };
-
-  void KDTreeNode::Subdivide ()
-  {
-    // Work out split direction, might have different logic later?
-    csVector3 bbsize = boundingBox.GetSize ();
-    if ((bbsize.x >= bbsize.y) && (bbsize.x >= bbsize.z)) 
-      splitDimension = CS_AXIS_X;
-    else if ((bbsize.y >= bbsize.x) && (bbsize.y >= bbsize.z)) 
-      splitDimension = CS_AXIS_Y;
-    else
-      splitDimension = CS_AXIS_Z;
-
-    // Find all possible split-locations
-    splitPositionFinder->Reset ();
-    CollectSplitPositions csp (splitDimension);
-    ForEach (radPrimitives.GetIterator (), csp);
-
-    // Compute split-cost at each location using SAH
-    float SA_inv = 0.5f / (bbsize.x*bbsize.y + bbsize.x*bbsize.z + bbsize.y*bbsize.z);
-    float lowestCost = FLT_MAX;
-    float bestSplit = 0;
-
-    csBox3 leftBox = boundingBox;
-    csBox3 rightBox = boundingBox;
-
-    SplitPositionFinder::SplitPosition *splitPosList = 
-      splitPositionFinder->firstEntry;
-    while (splitPosList)
-    {
-      float splitPos = splitPosList->position;
-      leftBox.SetMax (splitDimension, splitPos);
-      rightBox.SetMin (splitDimension, splitPos);
-
-      //Count elements
-      CountLeftRight counter(splitDimension, splitPos);
-      ForEach (radPrimitives.GetIterator (), counter);
-      
-      // Compute the SAH-cost for children
-      csVector3 leftSize = leftBox.GetSize ();
-      csVector3 rightSize = rightBox.GetSize ();
-      
-      float SA_left = 2 * (leftSize.x*leftSize.y + leftSize.x*leftSize.z + 
-        leftSize.y*leftSize.z);
-      float SA_right = 2 * (rightSize.x*rightSize.y + rightSize.x*rightSize.z + 
-        rightSize.y*rightSize.z);
-      float splitCost = 0.2f + 1.0f * SA_inv * (SA_left*counter.left + 
-        SA_right*counter.right);
-
-      if (splitCost < lowestCost)
-      {
-        lowestCost = splitCost;
-        bestSplit = splitPos;
-      }
-      splitPosList = splitPosList->next;
-    }
-
-    // Ok, now we have a best split location for this node, see if it is good enough
-    if (lowestCost > radPrimitives.GetSize () * 1.0f)
-    {
-      return;
-    }
-
-    // Split it
-    splitLocation = bestSplit;
-    leftChild = new KDTreeNode;
-    rightChild = new KDTreeNode;
-
-    leftChild->boundingBox = boundingBox;
-    rightChild->boundingBox = boundingBox;
-
-    leftChild->boundingBox.SetMax (splitDimension, splitLocation);
-    rightChild->boundingBox.SetMin (splitDimension, splitLocation);
-
-    // Distribute nodes between children
-    DistributeLeftRight dlr (splitDimension, splitLocation, 
-      leftChild, rightChild);
-    ForEach (radPrimitives.GetIterator (), dlr);
-
-    //@TODO: Add a maxdepth check
-    leftChild->Subdivide ();
-    rightChild->Subdivide ();
-
-    // To save memory, clear our array
-    radPrimitives.DeleteAll ();
-  }
 
   // KDTree functors
   struct CollectPrimitives
   {
-    CollectPrimitives (KDTreeNode *root)
-      : root (root)
+    CollectPrimitives (KDTree *tree)
+      : tree (tree)
     {
-      root->boundingBox.StartBoundingBox (csVector3 (0,0,0));
+      tree->boundingBox.StartBoundingBox (csVector3 (0,0,0));
     }
 
     void operator() (RadObject* obj)
@@ -274,83 +43,245 @@ namespace lighter
       RadObjectVertexData &vdata = obj->GetVertexData ();
       for (unsigned int i = 0; i < primArray.GetSize (); i++)
       {
-        root->radPrimitives.Push (&primArray[i]);
-        const SizeTDArray & ia = primArray[i].GetIndexArray ();
+        //Push triangles
+        RadPrimitive& prim = primArray[i];
+        
+        //root->radPrimitives.Push (&primArray[i]);
+        const SizeTDArray & ia = prim.GetIndexArray ();
         //compute bb at same time
-        for (unsigned int j = 0; j < ia.GetSize (); j++)
+        unsigned int j = 0;
+        for (j = 0; j < ia.GetSize ()-2; j++)
         {
-          root->boundingBox.AddBoundingVertexSmart (vdata.vertexArray[ia[j]].position);
+          tree->boundingBox.AddBoundingVertexSmart (vdata.vertexArray[ia[j]].position);
+          KDTreePrimitive p;
+          p.primPointer = &prim;
+          p.vertices[0] = vdata.vertexArray[ia[j]].position;
+          p.vertices[1] = vdata.vertexArray[ia[j+1]].position;
+          p.vertices[2] = vdata.vertexArray[ia[j+2]].position;
+          p.normal = prim.GetPlane ().norm;
+          tree->allTriangles.Push (p);
+        }
+        for (; j < ia.GetSize (); j++)
+        {
+          tree->boundingBox.AddBoundingVertexSmart (vdata.vertexArray[ia[j]].position);
         }
       }
     }
 
-    KDTreeNode *root;
+    KDTree *tree;
   };
 
-  void KDTree::BuildTree (const RadObjectHash::GlobalIterator& objectIt)
+  struct CountLeftRight
   {
-    rootNode = new KDTreeNode;
+    CountLeftRight(KDTree* tree, size_t axis)
+      : tree (tree), axis (axis)
+    {
+    }
+
+    inline void Reset ()
+    {
+      countLeft = 0;
+      countRight = 0;
+    }
+
+    void operator() (size_t index, float position)
+    {
+      const KDTreePrimitive& prim = tree->allTriangles[index];
     
-    // Collect geometries
-    CollectPrimitives primitiveCollector (rootNode);
+      if((prim.vertices[0][axis] <= position) ||
+         (prim.vertices[1][axis] <= position) ||
+         (prim.vertices[2][axis] <= position))
+         countLeft++;
+
+      if((prim.vertices[0][axis] >= position) ||
+         (prim.vertices[1][axis] >= position) ||
+         (prim.vertices[2][axis] >= position))
+         countRight++;
+    }
+
+
+    KDTree* tree;
+    size_t axis;
+    size_t countLeft;
+    size_t countRight;
+  };
+
+
+  struct DistributeLeftRight
+  {
+    DistributeLeftRight(KDTree* tree, KDTreeNode* left, KDTreeNode* right,
+      size_t axis, float position)
+      : tree (tree), left (left), right (right), axis (axis), position (position)
+    {
+    }
+
+    void operator() (size_t index)
+    {
+      const KDTreePrimitive& prim = tree->allTriangles[index];
+    
+      if((prim.vertices[0][axis] <= position) ||
+         (prim.vertices[1][axis] <= position) ||
+         (prim.vertices[2][axis] <= position))
+         left->triangleIndices.Push (index);
+
+      if((prim.vertices[0][axis] >= position) ||
+         (prim.vertices[1][axis] >= position) ||
+         (prim.vertices[2][axis] >= position))
+         right->triangleIndices.Push (index);
+    }
+
+
+    KDTree* tree;
+    KDTreeNode* left;
+    KDTreeNode* right;
+    size_t axis;
+    float position;
+  };
+
+  KDTree* KDTreeBuilder::BuildTree(const csHash<csRef<RadObject>,csString>::GlobalIterator &objectIt)
+  {
+    KDTree *newTree = new KDTree;
+
+    //Collect the geometry
+    CollectPrimitives primitiveCollector (newTree);
     ForEach (objectIt, primitiveCollector);
 
-    //Setup the splitpointnode helper
-    splitPositionFinder = new SplitPositionFinder (rootNode->radPrimitives.GetSize ());
+    //Allocate first node
+    newTree->rootNode = new KDTreeNode;
 
-    // Build the kd
-    rootNode->Subdivide ();
+    //Add all triangles to it
+    for(size_t i = 0; i < newTree->allTriangles.GetSize (); i++)
+      newTree->rootNode->triangleIndices.Push (i);
 
-    delete splitPositionFinder; splitPositionFinder = 0;
+    // Start tree node subdivision
+    Subdivide (newTree, newTree->rootNode, newTree->boundingBox);
+
+    return newTree;
   }
 
-  RadPrimitivePtrArray& KDTree::GetPrimitives (const csPlane3 &plane)
+  void KDTreeBuilder::Subdivide (KDTree *tree, KDTreeNode *node, 
+    const csBox3& currentAABB, unsigned int depth,
+    unsigned int lastAxis, float lastPosition)
   {
-    tempPrimitiveArray.Empty ();
+    if(depth++ > 20) 
+      return;
 
-    // Setup for non-recursive traversal
-    csArray<KDTreeNode*> nodesToVisit;
-    csArray<KDTreeNode*> childNodesToTest;
+    // Work out split direction, might have different logic later?
+    csVector3 bbsize = currentAABB.GetSize ();
+    if ((bbsize.x >= bbsize.y) && (bbsize.x >= bbsize.z)) 
+      node->splitDimension = CS_AXIS_X;
+    else if ((bbsize.y >= bbsize.x) && (bbsize.y >= bbsize.z)) 
+      node->splitDimension = CS_AXIS_Y;
+    else
+      node->splitDimension = CS_AXIS_Z;
 
-    nodesToVisit.Push (rootNode);
-    while (nodesToVisit.GetSize () > 0)
+    if(lastAxis != node->splitDimension)
+      lastPosition = -FLT_MAX;
+    
+    //Collect candidates for split positions
+    csDirtyAccessArray<float> possiblePositions;
+    possiblePositions.SetCapacity (node->triangleIndices.GetSize ());
+
+    for (size_t i = 0; i < node->triangleIndices.GetSize (); i++)
     {
-      KDTreeNode *curNode = nodesToVisit.Pop ();
-      // Check side of node
-      const csVector3& m = curNode->boundingBox.GetCenter ();
-      const csVector3 d = curNode->boundingBox.Max ()-m;		// Half-diagonal.
-      float NP = (float)(d.x*fabs(plane.A ())+d.y*fabs(plane.B ())+d.z*fabs(plane.C ()));
-      float MP = plane.Classify (m);
-      if ((MP+NP) > 0.0f && (MP-NP) < 0.0f)
+      size_t idx = node->triangleIndices[i];
+      const KDTreePrimitive &prim = tree->allTriangles[idx];
+
+      possiblePositions.Push (prim.vertices[0][node->splitDimension]);
+      possiblePositions.Push (prim.vertices[1][node->splitDimension]);
+      possiblePositions.Push (prim.vertices[2][node->splitDimension]);
+    }
+
+    // Sort it to help pruning duplicate ones
+    csRadixSorter RS;
+    RS.Sort (possiblePositions.GetArray (), possiblePositions.GetSize ());
+
+    size_t* ranks = RS.GetRanks ();
+    // Iterate over positions
+    float oldPosition = possiblePositions[ranks[0]];
+    float bestPosition = 0;
+    float bestCost = FLT_MAX;
+
+    float SA_inv = 1.0/currentAABB.Area ();
+
+    csBox3 leftBox (currentAABB);
+    csBox3 rightBox (currentAABB);
+
+    CountLeftRight counter (tree, node->splitDimension); 
+    
+    for (size_t i = 0; i <= possiblePositions.GetSize (); i++)  //extra-iteration on purpose
+    {
+      float newPosition;
+
+      if(i != possiblePositions.GetSize ())
       {
-        //correct side
-        if (curNode->leftChild)
+        newPosition = possiblePositions[ranks[i]];
+      }
+      else
+      {
+        newPosition = FLT_MAX;
+      }
+
+      if(oldPosition != newPosition)
+      {
+        float value = oldPosition;
+        oldPosition = newPosition;
+
+        if(value == lastPosition) continue;
+        //Changed position, so it is a non-duplicate, try it
+
+        leftBox.SetMax (node->splitDimension, value);
+        rightBox.SetMin (node->splitDimension, value);
+
+        // Compute number of elements right vs left
+        counter.Reset ();
+
+        ForEach (node->triangleIndices.GetIterator (), counter, value);
+
+        size_t countL = counter.countLeft;
+        size_t countR = counter.countRight;
+
+        float currentCost = 0.3f + 1.0f* SA_inv * (leftBox.Area ()*countL + rightBox.Area ()*countR);
+
+        if(currentCost < bestCost)
         {
-          nodesToVisit.Push (curNode->leftChild);
-          nodesToVisit.Push (curNode->rightChild);
-        }
-        else
-        {
-          childNodesToTest.Push (curNode);
+          bestCost = currentCost;
+          bestPosition = value;
         }
       }
     }
-
-    // Go through and test nodes
-    while (childNodesToTest.GetSize () > 0)
+  
+    // check if any split is good enough
+    if (bestCost > node->triangleIndices.GetSize ())
     {
-      KDTreeNode *curNode = childNodesToTest.Pop ();
-      RadPrimitivePtrArray &primArray = curNode->radPrimitives;
-      for (unsigned int i = 0; i < primArray.GetSize (); i++)
-      {
-        if (primArray[i]->Classify (plane) != CS_POL_BACK)
-        {
-          tempPrimitiveArray.Push (primArray[i]);
-        }
-      }
+      return;
     }
 
-    // Now test primitives in our child-nodes
-    return tempPrimitiveArray;
+    // Split it
+    //node->splitLocation = bbsize[node->splitDimension]/2 + currentAABB.Min ()[node->splitDimension];
+    node->splitLocation = bestPosition;
+    node->leftChild = new KDTreeNode;
+    node->rightChild = new KDTreeNode;
+
+    // Distribute nodes
+    DistributeLeftRight distributor (tree, node->leftChild, node->rightChild, 
+      node->splitDimension, node->splitLocation);
+    ForEach (node->triangleIndices.GetIterator (), distributor);
+
+    // Subdivide 
+    leftBox.SetMax (node->splitDimension, node->splitLocation);
+    rightBox.SetMin (node->splitDimension, node->splitLocation);
+
+    // And remove from ourselves
+    node->triangleIndices.DeleteAll ();
+
+    if (node->leftChild->triangleIndices.GetSize () > 4)
+      Subdivide (tree, node->leftChild, leftBox, depth, node->splitDimension,
+      node->splitLocation);
+
+    if (node->rightChild->triangleIndices.GetSize () > 4)
+      Subdivide (tree, node->rightChild, rightBox, depth, node->splitDimension,
+      node->splitLocation);
   }
+
 }

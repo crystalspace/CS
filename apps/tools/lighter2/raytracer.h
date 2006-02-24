@@ -21,7 +21,7 @@
 
 namespace lighter
 {
-  class KDTree;
+  struct KDTree;
   struct KDTreeNode;
   class RadPrimitive;
 
@@ -157,6 +157,7 @@ namespace lighter
     bool IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
       HitPoint &hit, bool earlyExit = false);
 
+    bool TraceRecursive(const Ray &ray, HitPoint& hit, KDTreeNode* node, float tmin, float tmax);
 
     KDTree *tree;
   };

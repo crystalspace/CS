@@ -103,6 +103,9 @@ namespace lighter
     /// Classify with respect to another plane
     int Classify (const csPlane3 &plane) const;
 
+    /// Return triangles (triangulated version)
+    csArray<csTriangle> BuildTriangulated() const;
+
     // Data accessors
     /*
     inline Vector3DArray& GetVertices () { return vertices; }

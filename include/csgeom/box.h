@@ -641,6 +641,14 @@ public:
   /// Compute volume of box
   inline float Volume () const
   { return (MaxX()-MinX())*(MaxY()-MinY())*(MaxZ()-MinZ()); }
+  /// Compute area of box
+  inline float Area () const
+  {
+    float x = MaxX()-MinX();
+    float y = MaxZ()-MinY();
+    float z = MaxZ()-MinZ();
+    return 2.0f*(x*y + x*z + y*z);
+  }
 
   /**
    * Return every corner of this bounding box from 0

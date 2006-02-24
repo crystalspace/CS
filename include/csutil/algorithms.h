@@ -46,6 +46,20 @@ namespace CS
     return Func;
   }
 
+  /**
+   * Iterate over all elements in the iterator and perform operation
+   * given by Func.
+   */
+  template <class T, class Fn, class P>
+  inline Fn& ForEach (T it, Fn& Func, P& p)
+  {
+    while (it.HasNext ())
+    {
+      Func (it.Next (), p);
+    }
+    return Func;
+  }
+
   /// @@@ Document me
   template <class T1, class T2>
   struct ConditionAnd

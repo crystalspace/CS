@@ -64,9 +64,9 @@ namespace lighter
   
     // Set default settings
     RadSettings ()
-      : uTexelPerUnit (4/(1.0f)), vTexelPerUnit (4/(1.0f)),
+      : uTexelPerUnit (16/(1.0f)), vTexelPerUnit (16/(1.0f)),
       uPatchResolution (4), vPatchResolution (4),
-      maxLightmapU (256), maxLightmapV (256)
+      maxLightmapU (1024), maxLightmapV (1024)
     {
     }
   };

@@ -161,7 +161,9 @@ namespace lighter
 
     SizeTDArray &indexArray = prim.GetIndexArray ();
 
-    for (i = 0; i < indexArray.GetSize (); ++i)
+    size_t oldIndexSize = indexArray.GetSize ();
+
+    for (i = 0; i < oldIndexSize; ++i)
     {
       if (usedVerts[indexArray[i]])
       {
@@ -180,9 +182,10 @@ namespace lighter
 
       lightmapUV.x = position[selX] * uscale;
       lightmapUV.y = position[selY] * vscale;
+    
     }
-
     return true;
   }
 
 }
+

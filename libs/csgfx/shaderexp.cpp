@@ -2074,7 +2074,7 @@ void csShaderExpression::print_cons(const cons * head) const
 
 void csShaderExpression::print_ops(const oper_array & ops) const
 {
-  oper_array::Iterator iter = ops.GetIterator();
+  oper_array::ConstIterator iter = ops.GetIterator();
 
   while (iter.HasNext())
   {

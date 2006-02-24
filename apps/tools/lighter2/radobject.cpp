@@ -279,6 +279,7 @@ namespace lighter
 
     csTriangle *tris = genFact->GetTriangles ();
     csVector3 *verts = genFact->GetVertices ();
+    csVector2 *uv = genFact->GetTexels ();
     csVector3 *factNormals = genFact->GetNormals ();
 
     int i = 0;
@@ -291,6 +292,7 @@ namespace lighter
       RadObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
       vertex.position = verts[i];
       vertex.normal = factNormals[i];
+      vertex.textureUV = uv[i];
     }
 
     

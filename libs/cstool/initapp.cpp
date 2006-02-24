@@ -362,7 +362,7 @@ bool csInitializer::RequestPlugins (
 
   csPluginLoader* plugldr = new csPluginLoader (r);
 
-  csArray<csPluginRequest>::Iterator i(a.GetIterator());
+  csArray<csPluginRequest>::ConstIterator i(a.GetIterator());
   while (i.HasNext())
   {
     csPluginRequest const req(i.Next());

@@ -37,9 +37,8 @@ namespace lighter
     }
 
     // Build KD-tree
-    kdTree = new KDTree;
     objIt.Reset ();
-    kdTree->BuildTree (objIt);
+    kdTree = KDTreeBuilder::BuildTree (objIt);
   }
 
 

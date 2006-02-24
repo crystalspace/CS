@@ -233,10 +233,11 @@ namespace lighter
     while (lightIt.HasNext ())
     {
       csRef<Light> radLight = lightIt.Next ();
-      radLight->freeEnergy = radLight->color * 75.0f; //@scale
+      radLight->freeEnergy = radLight->color * 1000.0f; //@scale
 
+      /*
       // Generate and shoot rays
-      csArray<Ray> rays = rayGenerator (0xFFF, radLight->position);
+      csArray<Ray> rays = rayGenerator (0xFFFFF, radLight->position);
 
       typedef csSet<RadPrimitive*> RadPrimSet;
       RadPrimSet primsToLight;
@@ -257,6 +258,17 @@ namespace lighter
       {
         RadPrimitive *p = it.Next ();
         ShadeRadPrimitive (rayTracer, *p, radLight);
+      }*/
+      RadObjectHash::GlobalIterator it = sector->allObjects.GetIterator ();
+      while (it.HasNext ())
+      {
+        csRef<RadObject> o = it.Next ();
+        RadPrimitiveArray& a = o->GetPrimitives ();
+        RadPrimitiveArray::Iterator pit = a.GetIterator ();
+        while(pit.HasNext ())
+        {
+          ShadeRadPrimitive (rayTracer, pit.Next (), radLight);
+        }
       }
 
       radLight->freeEnergy.Clamp (0,0,0);
@@ -270,26 +282,26 @@ namespace lighter
     float vis = 1.0f;
 
     // Ec
-
-     //@@ THIS NEEDS INVESTIGATION. WHY -? .. 
+     
 #define RAYTEST(rayOrig, visDecr)\
     {\
-      const csVector3 o = (rayOrig) /*- prim.GetPlane().GetNormal ()*0.01f*/;\
-      const csVector3 dir = (oPoint-o);\
+      const csVector3 o = (rayOrig)/*+prim.GetPlane().norm * 0.001f*/;\
+      const csVector3 dir = -(oPoint-o);\
       Ray ray; HitPoint hit;\
-      ray.origin = o; ray.minLength = FLT_EPSILON*10; ray.maxLength = dir.Norm ();\
+      ray.origin = oPoint; ray.minLength = 0.0f; ray.maxLength = dir.Norm ();\
       ray.direction = dir / ray.maxLength; \
+      ray.maxLength -= 0.001f; \
       if (tracer.TraceAnyHit (ray, hit)) vis -= (visDecr);\
     }
 
     csVector3 halfU = prim.GetuFormVector () * 0.5f;
     csVector3 halfV = prim.GetvFormVector () * 0.5f;
 
-    RAYTEST(elCenter, 1.0f);
-    /*RAYTEST(elCenter + halfU + halfV, 0.2f);
+    RAYTEST(elCenter, 0.2f);
+    RAYTEST(elCenter + halfU + halfV, 0.2f);
     RAYTEST(elCenter - halfU + halfV, 0.2f);
     RAYTEST(elCenter + halfU - halfV, 0.2f);
-    RAYTEST(elCenter - halfU - halfV, 0.2f);*/
+    RAYTEST(elCenter - halfU - halfV, 0.2f);
 
 #undef RAYTEST
     return vis;
@@ -298,7 +310,7 @@ namespace lighter
   void Lighter::ShadeRadPrimitive (Raytracer &tracer, RadPrimitive &prim, Light* light)
   {    
     //@@HACK, assume visible
-    prim.PrepareNoPatches ();
+    //prim.PrepareNoPatches ();
 
     //const float primArea = prim.GetArea ();
     const float totalArea = (prim.GetuFormVector () % prim.GetvFormVector ()).Norm ();

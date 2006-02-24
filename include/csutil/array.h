@@ -1052,6 +1052,44 @@ public:
     { return currentelem < array.Length(); }
 
     /** Returns the next element in the array. */
+    T& Next()
+    { return array.Get(currentelem++); }
+
+    /** Returns the next element in the array. */
+    const T& Next() const
+    { return array.Get(currentelem++); }
+
+    /** Reset the array to the first element */
+    void Reset()
+    { currentelem = 0; }
+
+  protected:
+    Iterator(csArray<T, ElementHandler>& newarray)
+	: currentelem(0), array(newarray) {}
+    friend class csArray<T, ElementHandler>;
+
+  private:
+    size_t currentelem;
+    csArray<T, ElementHandler>& array;
+  };
+
+  /** Iterator for the Array<> class */
+  class ConstIterator
+  {
+  public:
+    /** Copy constructor. */
+    ConstIterator(ConstIterator const& r) :
+      currentelem(r.currentelem), array(r.array) {}
+
+    /** Assignment operator. */
+    ConstIterator& operator=(ConstIterator const& r)
+    { currentelem = r.currentelem; array = r.array; return *this; }
+
+    /** Returns true if the next Next() call will return an element */
+    bool HasNext()
+    { return currentelem < array.Length(); }
+
+    /** Returns the next element in the array. */
     const T& Next()
     { return array.Get(currentelem++); }
 
@@ -1060,8 +1098,8 @@ public:
     { currentelem = 0; }
 
   protected:
-    Iterator(const csArray<T, ElementHandler>& newarray)
-	: currentelem(0), array(newarray) {}
+    ConstIterator(const csArray<T, ElementHandler>& newarray)
+      : currentelem(0), array(newarray) {}
     friend class csArray<T, ElementHandler>;
 
   private:
@@ -1070,8 +1108,12 @@ public:
   };
 
   /** Returns an Iterator which traverses the array. */
-  Iterator GetIterator() const
+  Iterator GetIterator()
   { return Iterator(*this); }
+
+  /** Returns an Iterator which traverses the array. */
+  ConstIterator GetIterator() const
+  { return ConstIterator(*this); }
   
   /// Check if this array has the exact same contents as \a other.
   bool operator== (const csArray& other) const

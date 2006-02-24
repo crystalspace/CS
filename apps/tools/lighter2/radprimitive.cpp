@@ -47,6 +47,8 @@ namespace lighter
       size_t index = indexArray[i];
       csVector2 &uv = vertexData.vertexArray[index].lightmapUV;
       uv += move;
+      //uv.x = (int)(uv.x+0.5f);
+      //uv.y = (int)(uv.y+0.5f);
     }
   }
 
@@ -68,8 +70,7 @@ namespace lighter
     {
       centroid += vertexData.vertexArray[indexArray[i]].position;
     }
-    centroid / (float)indexArray.GetSize ();
-    return centroid;
+    return centroid / (float)indexArray.GetSize ();
   }
 
   float RadPrimitive::GetArea () const
@@ -497,10 +498,12 @@ namespace lighter
 
     // Create our splitplanes
     csPlane3 uCut (plane.Normal () % vFormVector);
+    uCut.Normalize ();
     csVector3 uCutOrigin = minCoord;
     uCut.SetOrigin (uCutOrigin);
     
     csPlane3 vCut (plane.Normal () % uFormVector);
+    vCut.Normalize ();
     csVector3 vCutOrigin = minCoord;
     vCut.SetOrigin (vCutOrigin);
 
@@ -682,6 +685,23 @@ namespace lighter
     }
 
     return poly;
+  }
+
+  csArray<csTriangle> RadPrimitive::BuildTriangulated() const
+  {
+    csArray<csTriangle> newArr;
+
+    //Triangulate as if it is convex 
+    for(uint i = 2; i < indexArray.GetSize (); ++i)
+    {
+      csTriangle t;
+      t.a = (int)indexArray[i-2];
+      t.b = (int)indexArray[i-1];
+      t.c = (int)indexArray[i];
+      newArr.Push (t);
+    }
+
+    return newArr;
   }
 
   int RadPrimitive::Classify (const csPlane3 &plane) const
