@@ -442,6 +442,10 @@ csString csInputDefinition::ToString (bool distinguishMods) const
   CS_ASSERT(containedName == csevKeyboardEvent(name_reg) ||
 	    containedName == csevMouseButton(name_reg, deviceNumber) ||
 	    containedName == csevMouseMove(name_reg, deviceNumber) ||
+	    containedName == csevMouseDown(name_reg, deviceNumber) ||
+	    containedName == csevMouseUp(name_reg, deviceNumber) ||
+	    containedName == csevMouseClick(name_reg, deviceNumber) ||
+	    containedName == csevMouseDoubleClick(name_reg, deviceNumber) ||
 	    containedName == csevJoystickButton(name_reg, deviceNumber) ||
 	    containedName == csevJoystickMove(name_reg, deviceNumber));
 
@@ -456,6 +460,26 @@ csString csInputDefinition::ToString (bool distinguishMods) const
 	  (keyboard.code, (utf8_char *) buf, sizeof (buf));
       str.Append (buf, size);
     }
+  }
+  else if (containedName == csevMouseDown(name_reg, deviceNumber))
+  {
+    str.Append ("MouseButton");
+    str.Append (mouseButton);
+  }
+  else if (containedName == csevMouseUp(name_reg, deviceNumber))
+  {
+    str.Append ("MouseButton");
+    str.Append (mouseButton);
+  }
+  else if (containedName == csevMouseClick(name_reg, deviceNumber))
+  {
+    str.Append ("MouseButton");
+    str.Append (mouseButton);
+  }
+  else if (containedName == csevMouseDoubleClick(name_reg, deviceNumber))
+  {
+    str.Append ("MouseButton");
+    str.Append (mouseButton);
   }
   else if (containedName == csevMouseButton(name_reg, deviceNumber))
   {
