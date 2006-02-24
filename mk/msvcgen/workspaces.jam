@@ -25,7 +25,7 @@
 # List of filters for "convenience projects" - that is, VC projects which are
 # generated but don't appear in any workspaces (since e.g. required libraries 
 # are relatively uncommon and/or not shipped with cs-win32libs).
-MSVC_CONVENIENCE_PROJECTS = vos ;
+MSVC_CONVENIENCE_PROJECTS = _cspace perl py vos ;
 
 # What the typical user will need. Presently, everything but wxWidgets.
 MsvcGenWorkspace typical : : 

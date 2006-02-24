@@ -16,10 +16,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <Python.h>
-#include <stdio.h>
+#if !defined(DEBUG_PYTHON) && defined(_DEBUG)
+#undef _DEBUG
+#endif
 
 #include "cssysdef.h"
+#include <Python.h>
+#include <stdio.h>
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 #include "csutil/csstring.h"
@@ -36,31 +39,16 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE(csPython)
-  SCF_IMPLEMENTS_INTERFACE(iScript)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPython::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPython::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+CS_PLUGIN_NAMESPACE_BEGIN(cspython)
+{
 
 SCF_IMPLEMENT_FACTORY(csPython)
 
-
 csPython* csPython::shared_instance = 0;
 
-csPython::csPython(iBase *iParent) :
+csPython::csPython(iBase *iParent) : scfImplementationType (this, iParent),
   object_reg(0), Mode(CS_REPORTER_SEVERITY_NOTIFY), use_debugger(false)
 {
-  SCF_CONSTRUCT_IBASE(iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   shared_instance = this;
 }
 
@@ -68,13 +56,10 @@ csPython::~csPython()
 {
   csRef<iEventQueue> queue = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (queue.IsValid())
-    queue->RemoveListener(&scfiEventHandler);
+    queue->RemoveListener (eventHandler);
   Mode = CS_REPORTER_SEVERITY_BUG;
   Py_Finalize();
   object_reg = 0;
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 extern "C"
@@ -133,9 +118,10 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   // Store the object registry pointer in 'cspace.object_reg'.
   Store("cspace.object_reg", object_reg, (void *) "iObjectRegistry *");
 
+  eventHandler.AttachNew (new EventHandler (this));
   csRef<iEventQueue> queue = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (queue.IsValid())
-    queue->RegisterListener(&scfiEventHandler, csevCommandLineHelp(object_reg));
+    queue->RegisterListener(eventHandler, csevCommandLineHelp(object_reg));
   return true;
 }
 
@@ -203,16 +189,9 @@ bool csPython::LoadModule(const char* name)
 
 void csPython::Print(bool Error, const char *msg)
 {
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
-  if (!rep)
-    csPrintf ("%s\n", msg);
-  else
-  {
-    if(Error)
-      rep->Report (CS_REPORTER_SEVERITY_ERROR, "crystalspace.script.python",
-      	"CrystalScript Error: %s", msg);
-    else
-      rep->Report (Mode, "crystalspace.script.python",
-      	"%s", msg);
-  }
+  csReport (object_reg, Error ? CS_REPORTER_SEVERITY_ERROR : Mode,
+    "crystalspace.script.python", "%s", msg);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(cspython)

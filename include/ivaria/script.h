@@ -189,8 +189,6 @@ struct iScriptObject : public iBase
 
 struct iObjectRegistry;
 
-SCF_VERSION (iScript, 0, 0, 2);
-
 /**
  * This provides the interface to a scripting language interpreter.
  * 
@@ -200,8 +198,10 @@ SCF_VERSION (iScript, 0, 0, 2);
  * The specifier "%p" signifies an iScriptObject. Remember to explicitly cast
  * your csRef's to plain pointers in the var arg list.
  */
-struct iScript : public iBase
+struct iScript : public virtual iBase
 {
+  SCF_INTERFACE (iScript, 1, 0, 0);
+
   /// This function is deprecated and should no longer be used.
   CS_DEPRECATED_METHOD virtual bool Initialize (iObjectRegistry *object_reg) = 0;
 

@@ -19,6 +19,12 @@
 
 #include <stdarg.h>
 
+CS_PLUGIN_NAMESPACE_BEGIN(cspython)
+{
+
 void InitPytocs();
 void PythonToCS_stderr(char *format, va_list va);
 void PythonToCS_stdout(char *format, va_list va);
+
+}
+CS_PLUGIN_NAMESPACE_END(cspython)

@@ -68,6 +68,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   LibDepends crystalspace_python : crystalspace ;
   ExternalLibs crystalspace_python : PYTHON ;
   CFlags crystalspace_python : $(CSPYTHON.CFLAGS) ;
+  MsvcDefine crystalspace_python : _CRT_SECURE_NO_DEPRECATE _CRT_NONSTDC_NO_DEPRECATE ;
 
   #--------
   # cspython -- Crystal Space plugin
@@ -84,35 +85,47 @@ if $(PYTHON.AVAILABLE) = "yes"
   # pythmod -- Pure Python module
   #--------
   local desc = "pure Python module" ;
-  Description pythmod : $(desc) ;
-  Help pythmod : "Build the $(desc)" ;
 
-  local pythmodsrc = [ DoSourceGrist pythmod.cpp ] ;
-  local pythmodobj = [ CompileObjects $(pythmodsrc) ] ;
-  local pythmod = _cspace ;
-  if $(PYTHON.MODULE_EXT)
+  if [ Property build : projgen ]
   {
-    pythmod = $(pythmod:S=$(PYTHON.MODULE_EXT)) ;
+    Description _cspace : $(desc) ;
+    MSVCGEN.PLUGIN_EXT._cspace = .pyd ;
+    Plugin _cspace : pythmod.cpp ;
+    LinkWith _cspace : crystalspace_python crystalspace ;
+    ExternalLibs _cspace : PYTHON ;
+    Depends _cspace : pythmod ;
   }
   else
   {
-    pythmod = [ ConstructPluginTarget $(pythmod) ] ;
+    Description pythmod : $(desc) ;
+    Help pythmod : "Build the $(desc)" ;
+    local pythmodsrc = [ DoSourceGrist pythmod.cpp ] ;
+    local pythmodobj = [ CompileObjects $(pythmodsrc) ] ;
+    local pythmod = _cspace ;
+    if $(PYTHON.MODULE_EXT)
+    {
+      pythmod = $(pythmod:S=$(PYTHON.MODULE_EXT)) ;
+    }
+    else
+    {
+      pythmod = [ ConstructPluginTarget $(pythmod) ] ;
+    }
+  
+    pythmod_TARGET = $(pythmod) ;
+    pythmod_SOURCES = $(pythmodsrc) ;
+    pythmod_OBJECTS = $(pythmodobj) ;
+    LinkWith pythmod : crystalspace_python crystalspace ;
+    ExternalLibs pythmod : PYTHON ;
+    CFlags pythmod : $(PLUGIN.CFLAGS) ;
+    LFlags pythmod : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
+    NotFile pythmod ;
+    Depends pythmod : $(cspacepy) ;
+    Depends pythmod : $(pythmod) ;
+    Depends plugins : pythmod ;
+    MakeLocate $(pythmod) : $(LOCATE.TARGETS) ;
+    Depends $(pythmod) : $(pythmodobj) ;
+    LinkPlugin $(pythmod) : $(pythmodobj) ;
   }
-
-  pythmod_TARGET = $(pythmod) ;
-  pythmod_SOURCES = $(pythmodsrc) ;
-  pythmod_OBJECTS = $(pythmodobj) ;
-  LinkWith pythmod : crystalspace_python crystalspace ;
-  ExternalLibs pythmod : PYTHON ;
-  CFlags pythmod : $(PLUGIN.CFLAGS) ;
-  LFlags pythmod : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
-  NotFile pythmod ;
-  Depends pythmod : $(cspacepy) ;
-  Depends pythmod : $(pythmod) ;
-  Depends plugins : pythmod ;
-  MakeLocate $(pythmod) : $(LOCATE.TARGETS) ;
-  Depends $(pythmod) : $(pythmodobj) ;
-  LinkPlugin $(pythmod) : $(pythmodobj) ;
 
   rule InstallPythmod
   {

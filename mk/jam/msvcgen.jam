@@ -1007,7 +1007,7 @@ rule Plugin
   metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;
   SEARCH on $(metafile) = $(SEARCH_SOURCE) ;
   $(<)_METAFILE = $(metafile) ;
-  MsvcProject $(<) : plugin : $(<:S=.dll) : $(>) ;
+  MsvcProject $(<) : plugin : $(<:S=$(MSVCGEN.PLUGIN_EXT.$(<):E=.dll)) : $(>) ;
   CompileGroups $(<) : all plugins ;
 
   STATICPLUGINS.SOURCES.$(<) += $(>:R=$(SEARCH_SOURCE)) ;

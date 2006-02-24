@@ -25,7 +25,12 @@
 #include "iutil/comp.h"
 #include "csutil/csinput.h"
 
-class csPython : public iScript
+CS_PLUGIN_NAMESPACE_BEGIN(cspython)
+{
+
+class csPython : public scfImplementation2<csPython, 
+                                           iScript,
+                                           iComponent> 
 {
 public:
   csPython(iBase *iParent);
@@ -92,24 +97,23 @@ public:
   void ShowError();
   void Print(bool Error, const char *msg);
 
-  SCF_DECLARE_IBASE;
-
-  // Implement iComponent interface.
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csPython);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
-
   // Implement iEventHandler interface.
-  struct eiEventHandler : public iEventHandler
+  struct EventHandler : public scfImplementation1<EventHandler, iEventHandler>
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csPython);
-    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+    csPython* parent;
+
+    EventHandler (csPython* parent) : scfImplementationType (this), 
+      parent (parent) {}
+    virtual ~EventHandler() {}
+    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+
     CS_EVENTHANDLER_NAMES("crystalspace.cspython")
     CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } scfiEventHandler;
+  };
+  csRef<EventHandler> eventHandler;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(cspython)
 
 #endif // __CS_CSPYTHON_H__

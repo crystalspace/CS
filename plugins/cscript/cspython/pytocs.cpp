@@ -17,10 +17,17 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <Python.h>
+#if !defined(DEBUG_PYTHON) && defined(_DEBUG)
+#undef _DEBUG
+#endif
+
 #include "cssysdef.h"
+#include <Python.h>
 #include "csutil/csstring.h"
 #include "cspython.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(cspython)
+{
 
 // The NextStep compiler does not allow C++ expressions in `extern "C"'
 // functions.  This thin cover function works around that limitation.
@@ -64,3 +71,6 @@ void InitPytocs()
   Py_InitModule("pytocs", PytocsMethods);
   SWIG_init_cspace();
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(cspython)
