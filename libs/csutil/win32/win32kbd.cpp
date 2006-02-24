@@ -459,19 +459,21 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
 	    #ifdef CS_KEY_DEBUG_ENABLE
 	      if (IsKeyboardDebugging()) csPrintf ("Shift quirk: ");
 	    #endif
-	      DoKey (CSKEY_SHIFT_LEFT, CSKEY_SHIFT, lshiftDown, autoRep, type);
+	      DoKey (CSKEY_SHIFT_LEFT, CSKEY_SHIFT, lshiftDown, 
+                autoRep & lshiftDown, type);
 	    }
 	    if ((rshiftState != rshiftDown) || rshiftDown)
 	    {
 	    #ifdef CS_KEY_DEBUG_ENABLE
 	      if (IsKeyboardDebugging()) csPrintf ("Shift quirk: ");
 	    #endif
-	      DoKey (CSKEY_SHIFT_RIGHT, CSKEY_SHIFT, rshiftDown, autoRep, type);
+	      DoKey (CSKEY_SHIFT_RIGHT, CSKEY_SHIFT, rshiftDown, 
+                autoRep & rshiftDown, type);
 	    }
 
 	    doDoKey = false;
 	  }
-  	  if (doDoKey) DoKey (raw, cooked, down, autoRep, type);
+  	  if (doDoKey) DoKey (raw, cooked, down, autoRep & down, type);
 	}
       }
       return !(wParam == VK_F4 && 

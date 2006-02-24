@@ -507,9 +507,9 @@ namespace Soft3D
 	  compNum++;
 	}
 	if (activebuffers[b] == 0) continue;
-	buffersMask |= 1 << b;
 	if ((b != CS_SOFT3D_VA_BUFINDEX(POSITION)) 
 	  && !(scanRenderInfoMesh.desiredBuffers & (1 << b))) continue;
+	buffersMask |= 1 << b;
   
 	iRenderBuffer* buf = activebuffers[b];
 	clipInBuf[b].data = (uint8*)buf->Lock (CS_BUF_LOCK_READ);

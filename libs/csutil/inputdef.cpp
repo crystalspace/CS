@@ -521,8 +521,8 @@ int csInputDefinition::Compare (const csInputDefinition &other) const
 {
   if (modifiersHonored || other.modifiersHonored)
     for (int type = 0; type < csKeyModifierTypeLast; type++)
-      if (! CSKEY_MODIFIER_COMPARE (modifiers.modifiers[type],
-				    other.modifiers.modifiers[type]))
+      if (!CSKEY_MODIFIER_COMPARE_MASK (modifiers.modifiers[type],
+				        other.modifiers.modifiers[type]))
       {
         return (int)modifiers.modifiers[type] 
           - (int)other.modifiers.modifiers[type];

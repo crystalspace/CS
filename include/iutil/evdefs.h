@@ -268,10 +268,20 @@ typedef struct _csKeyModifiers
   ((1 << CSKEY_MODIFIERTYPE_SHIFT) - 1))  
 
 /// Helper macro to determine if two modifier bitmasks can be considered equal.
-#define CSKEY_MODIFIER_COMPARE(bitmask1, bitmask2)			     \
+#define CSKEY_MODIFIER_COMPARE_MASK(bitmask1, bitmask2)			     \
   ((bitmask1) == (bitmask2)						     \
 || ((bitmask1) == (unsigned)(1 << csKeyModifierNumAny) && (bitmask2) != 0)   \
 || ((bitmask2) == (unsigned)(1 << csKeyModifierNumAny) && (bitmask1) != 0))
+/**
+ * Helper macro to determine if two modifier key codes can be considered
+ * equal.
+ * \remarks Only works right if CSKEY_IS_MODIFIER() is true for both key codes.
+ */
+#define CSKEY_MODIFIER_COMPARE_CODE(key1, key2)				     \
+  ((CSKEY_MODIFIER_TYPE (key1) == CSKEY_MODIFIER_TYPE (key2))		     \
+  && ((CSKEY_MODIFIER_NUM(key1) == csKeyModifierNumAny)			     \
+    || (CSKEY_MODIFIER_NUM(key2) == csKeyModifierNumAny)		     \
+    || (CSKEY_MODIFIER_NUM(key1) == CSKEY_MODIFIER_NUM(key1))))
 
 /// Construct a key code for the Shift modifier key number \a n.
 #define CSKEY_SHIFT_NUM(n)		CSKEY_MODIFIER(csKeyModifierTypeShift,n)
