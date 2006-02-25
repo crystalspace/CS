@@ -1,0 +1,11 @@
+SubDir TOP plugins terraformer pagingformer loader ;
+
+Description pagingformer : "paging terraformer loader" ;
+
+Plugin pagingformerldr
+	: [ Wildcard *.cpp *.h ]
+;
+Includes loader.h : $(SUBDIR)/loader.tok ;
+LinkWith pagingformerldr : crystalspace ;
+
+CompileGroups pagingformerldr :  meshes ;

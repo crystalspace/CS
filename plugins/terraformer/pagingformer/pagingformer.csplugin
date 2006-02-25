@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- pagingformer.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.terraformer.paging</name>
+        <implementation>csPagingFormer</implementation>
+        <description>Paging terrain formation generator</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

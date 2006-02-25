@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+25-Feb-2006
+	- Fossi added a first version of the pagingterrain. It's still
+	  under heavy development and no testlevel is provided yet.
 24-Feb-2006
 	- Jorrit fixed bugplug so it no longer crashes if there is no
 	  engine.

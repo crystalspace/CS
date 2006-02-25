@@ -1,0 +1,13 @@
+SubDir TOP plugins terraformer pagingformer ;
+
+Description pagingformer : "paging terraformer" ;
+
+Plugin pagingformer
+	: [ Wildcard *.cpp *.h ]
+;
+
+LinkWith pagingformer : crystalspace ;
+
+CompileGroups pagingformer :  meshes ;
+
+SubInclude TOP plugins terraformer pagingformer loader ;
