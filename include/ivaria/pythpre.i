@@ -149,8 +149,8 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   CS_ALLOC_STACK_ARRAY(char, type_name, strlen(wp.Type) + 3);
   strcat(strcpy(type_name, wp.Type), " *");
   PyObject *result = SWIG_NewPointerObj(ptr, SWIG_TypeQuery(type_name), 1);
-  PyObject * ibase_obj = SWIG_NewPointerObj(
-    (void *) ibase, SWIG_TypeQuery(type_name), 1);
+  PyObject * ibase_obj = SWIG_NewPointerObj (
+    ptr, SWIG_TypeQuery(type_name), 1);
   PyObject * res_obj = PyObject_CallMethod(ibase_obj, "IncRef", "()");
   if (!res_obj)
   {

@@ -19,21 +19,9 @@
 #ifndef __CS_PYSIMP_H__
 #define __CS_PYSIMP_H__
 
-#include <stdarg.h>
-#include "csgeom/math2d.h"
-#include "csgeom/math3d.h"
+#include <crystalspace.h>
 
-struct iView;
-struct iSector;
-struct iEngine;
-struct iLoader;
-struct iKeyboardDriver;
-struct iVirtualClock;
-struct iObjectRegistry;
-struct iGraphics3D;
-struct iEvent;
-
-class PySimple
+class PySimple : public csApplicationFramework, public csBaseEventHandler
 {
 public:
   csRef<iView> view;
@@ -43,22 +31,22 @@ public:
   csRef<iGraphics3D> myG3D;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
-  iObjectRegistry* object_reg;
+
   csEventID Process;
   csEventID FinalProcess;
   csEventID KeyboardDown;
 
 public:
   PySimple ();
-  virtual ~PySimple ();
+  ~PySimple ();
 
-  bool Initialize (int argc, const char* const argv[],
-    const char *iConfigName);
-  void SetupFrame ();
+  bool OnInitialize (int argc, char* argv[]);
+  bool Application ();
+  void OnCommandLineHelp ();
+
+  void ProcessFrame ();
   void FinishFrame ();
-  bool HandleEvent (iEvent &Event);
-
-  void Report (int severity, const char* msg, ...);
+  bool OnKeyboard (iEvent&);
 };
 
 #endif // __CS_PYSIMP_H__

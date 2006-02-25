@@ -81,6 +81,10 @@ void csApplicationFramework::OnExit ()
 {
 }
 
+void csApplicationFramework::OnCommandLineHelp ()
+{
+}
+
 void csApplicationFramework::Restart()
 {
   restartFlag = true;
@@ -120,7 +124,10 @@ int csApplicationFramework::Main (int argc, char* argv[])
   else if (0 == GetObjectRegistry ())
     iReturn = 1;
   else if (csCommandLineHelper::CheckHelp (GetObjectRegistry ()))
+  {
+    OnCommandLineHelp ();
     csCommandLineHelper::Help (GetObjectRegistry ());
+  }
   else if (!Start ())
     iReturn = 2;
   End ();

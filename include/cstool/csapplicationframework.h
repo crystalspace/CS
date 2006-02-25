@@ -247,6 +247,15 @@ protected:
   virtual void OnExit ();
 
   /**
+   * Print out command line help.
+   * This method is called in the event of the user requesting command line
+   * help via the '-help' argument. If the application supports command line
+   * options, it should override this method to print out a list of the
+   * supported options.
+   */
+  virtual void OnCommandLineHelp ();
+
+  /**
    * Setup the config manager.
    * This does exactly the same as csInitializer::SetupConfigManager(), with 
    * the difference that the \a ApplicationID parameter defaults to the value
