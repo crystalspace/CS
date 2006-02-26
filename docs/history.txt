@@ -8,6 +8,10 @@ chronological order.
 
 26-Feb-2006
 	- Jorrit enhanced eventtest to also show mouse move events.
+	- Jorrit fixed csInputDefinition::IsValid() so that it no longer
+	  crashes with an assert in case you pass an invalid key
+	  specification to ParseOther. That shouldn't crash but just
+	  return false so you can test for it in calling code.
 25-Feb-2006
 	- Fossi added a first version of the pagingterrain. It's still
 	  under heavy development and no testlevel is provided yet.

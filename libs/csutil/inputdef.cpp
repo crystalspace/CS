@@ -405,6 +405,8 @@ bool csInputDefinition::IsValid () const
 {
   if (containedName == csevKeyboardEvent(name_reg))
     return keyboard.code != 0;
+  else if (containedName == CS_EVENT_INVALID)
+    return false;
   else
     return (csEventNameRegistry::IsKindOf(name_reg, containedName,
     	csevInput(name_reg)));
