@@ -54,7 +54,7 @@ bool csRadixSorter::CreateHistogram (T* data, size_t size, uint32* histogram)
   uint8* dend = d + sizeof(T)*size;
 
   // The four histogram parts. Endian-specific for the negative sorting
-#if CS_BIG_ENDIAN
+#ifdef CS_BIG_ENDIAN
   //OSX etc
   uint32* H0 = histogram + 768;
   uint32* H1 = histogram + 512;
