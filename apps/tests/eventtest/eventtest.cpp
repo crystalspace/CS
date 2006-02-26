@@ -56,20 +56,19 @@ bool EventTest::HandleEvent (iEvent &ev)
   else if (CS_IS_MOUSE_EVENT (namereg, ev))
   {
     uint device = csMouseEventHelper::GetNumber (&ev);
-    if (ev.Name != csevMouseMove (namereg, device))
-    {
-      csMouseEventType type = csMouseEventHelper::GetEventType (&ev);
-      csKeyModifiers key_modifiers;
-      csKeyEventHelper::GetModifiers (&ev, key_modifiers);
-      uint32 modifiers = csMouseEventHelper::GetModifiers (&ev);
-      int x = csMouseEventHelper::GetX (&ev);
-      int y = csMouseEventHelper::GetY (&ev);
-      uint but = csMouseEventHelper::GetButton (&ev);
-      bool butstate = csMouseEventHelper::GetButtonState (&ev);
-      uint32 butmask = csMouseEventHelper::GetButtonMask (&ev);
-      csString str = csInputDefinition::GetOtherString (namereg,
+    csMouseEventType type = csMouseEventHelper::GetEventType (&ev);
+    csKeyModifiers key_modifiers;
+    csKeyEventHelper::GetModifiers (&ev, key_modifiers);
+    uint32 modifiers = csMouseEventHelper::GetModifiers (&ev);
+    int x = csMouseEventHelper::GetX (&ev);
+    int y = csMouseEventHelper::GetY (&ev);
+    uint but = csMouseEventHelper::GetButton (&ev);
+    bool butstate = csMouseEventHelper::GetButtonState (&ev);
+    uint32 butmask = csMouseEventHelper::GetButtonMask (&ev);
+    csString str = csInputDefinition::GetOtherString (namereg,
       	ev.Name, device, but, &key_modifiers, true);
-      printf ("Mouse %s: but=%d(state=%d,mask=%08u) device=%d x=%d y=%d mods=%08u desc='%s'\n",
+    printf ("Mouse %s: but=%d(state=%d,mask=%08u) device=%d x=%d y=%d mods=%08u desc='%s'\n",
+	type == csMouseEventTypeMove ? "MOVE" :
     	type == csMouseEventTypeUp ? "UP" :
 	type == csMouseEventTypeDown ? "DO" :
 	type == csMouseEventTypeClick ? "CLICK" :
@@ -77,8 +76,7 @@ bool EventTest::HandleEvent (iEvent &ev)
 	"?",
 	but, butstate, butmask, device, x, y,
 	modifiers, str.GetData ());
-      fflush (stdout);
-    }
+    fflush (stdout);
   }
 
   csBaseEventHandler::HandleEvent(ev);
