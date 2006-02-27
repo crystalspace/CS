@@ -166,6 +166,8 @@ chronological order.
 	- iceeey added projection support to parallax.
 13-Feb-2006
 	- Marten started cleaning up the namespace mess. Not finished yet.
+	- Eric Sunshine fixed 'jam install' so that it also installs the
+	  CS/data/flarge/factories directory.
 	- res tweaked the softrenderer & softshader to more appropriately use 
 	  "bool"s instead of "int"s for some template parameters.
 	- res fixed some VC8 warnings occuring with enabled memtracker.
