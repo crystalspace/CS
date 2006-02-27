@@ -59,10 +59,6 @@ csRef<iFile> csCommandProcessor::script;
 // Additional command handler
 csCommandProcessor::CmdHandler csCommandProcessor::ExtraHandler = 0;
 
-SCF_IMPLEMENT_IBASE (csCommandProcessor::PerformCallback)
-  SCF_IMPLEMENTS_INTERFACE (iConsoleExecCallback)
-SCF_IMPLEMENT_IBASE_END
-
 void csCommandProcessor::PerformCallback::Execute (const char* command)
 {
   csCommandProcessor::perform_line (command);

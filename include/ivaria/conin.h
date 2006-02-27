@@ -30,13 +30,13 @@ struct iEvent;
 struct iConsoleOutput;
 
 
-SCF_VERSION (iConsoleExecCallback, 0, 0, 1);
-
 /**
  * Command execution callback.
  */
-struct iConsoleExecCallback : public iBase
+struct iConsoleExecCallback : public virtual iBase
 {
+  SCF_INTERFACE (iConsoleExecCallback, 0, 0, 1);
+
   /// Execute.
   virtual void Execute (const char* cmd) = 0;
 };

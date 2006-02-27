@@ -20,6 +20,7 @@
 #define __COMMAND_H__
 
 #include "ivideo/graph3d.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/vfs.h"
 #include "iutil/plugin.h"
 #include "ivaria/conin.h"
@@ -64,11 +65,10 @@ public:
     iConsoleOutput* console, iObjectRegistry* objreg);
 
   /// This struct can be used as a console input callback
-  struct PerformCallback : public iConsoleExecCallback
+  struct PerformCallback : public scfImplementation1<PerformCallback,iConsoleExecCallback>
   {
-    SCF_DECLARE_IBASE;
-    PerformCallback () { SCF_CONSTRUCT_IBASE (0); }
-    virtual ~PerformCallback () { SCF_DESTRUCT_IBASE(); }
+    PerformCallback () : scfImplementationType (this) { }
+    virtual ~PerformCallback () { }
     virtual void Execute (const char* cmd);
   };
 

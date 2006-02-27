@@ -11,6 +11,7 @@ chronological order.
 	- Peter Amstutz fixed a bug in csInputDefinition::Compare where
 	  it didn't convert between cooked/uncooked keyboard codes
 	  correctly, which broke csInputBinder
+	- Jorrit converted iConsoleExecCallback to new SCF.
 26-Feb-2006
 	- Reed fixed typo in libs/csutil/radixsort.cpp that affected OSX
 	  (it was using #if instead of #ifdef to check a preprocessor symbol
