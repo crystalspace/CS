@@ -1,0 +1,3 @@
+SubDir TOP plugins mesh skeleton persist ;
+
+SubInclude TOP plugins mesh skeleton persist standard ;
