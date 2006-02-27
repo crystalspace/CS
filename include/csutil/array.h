@@ -1055,10 +1055,6 @@ public:
     T& Next()
     { return array.Get(currentelem++); }
 
-    /** Returns the next element in the array. */
-    const T& Next() const
-    { return array.Get(currentelem++); }
-
     /** Reset the array to the first element */
     void Reset()
     { currentelem = 0; }
