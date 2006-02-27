@@ -6,10 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Feb-2006
+	- Peter Amstutz fixed a bug in csInputDefinition::Compare where
+	  it didn't convert between cooked/uncooked keyboard codes
+	  correctly, which broke csInputBinder
 26-Feb-2006
-    - Reed fixed typo in libs/csutil/radixsort.cpp that affected OSX
-      (it was using #if instead of #ifdef to check a preprocessor symbol
-      definition)
+	- Reed fixed typo in libs/csutil/radixsort.cpp that affected OSX
+	  (it was using #if instead of #ifdef to check a preprocessor symbol
+	  definition)
 	- Jorrit enhanced eventtest to also show mouse move events.
 	- Jorrit fixed csInputDefinition::IsValid() so that it no longer
 	  crashes with an assert in case you pass an invalid key
