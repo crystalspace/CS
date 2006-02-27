@@ -544,6 +544,9 @@ int csInputDefinition::Compare (const csInputDefinition &other) const
   {
     if (keyboard.isCooked)
     {
+	// our keyboard code is cooked, so convert 'other'
+	// code to cooked if necessary
+
       if (other.keyboard.isCooked)
         return (int)keyboard.code - (int)other.keyboard.code;
       else
@@ -551,10 +554,13 @@ int csInputDefinition::Compare (const csInputDefinition &other) const
     }
     else
     {
+	// our keyboard code is not cooked, so convert this
+	// code to cooked if necessary
+
       if (other.keyboard.isCooked)
-        return (int)keyboard.code - (int)other.keyboard.code;
-      else
         return (int)RawToCooked (keyboard.code) - (int)other.keyboard.code;
+      else
+        return (int)keyboard.code - (int)other.keyboard.code;
     }
   }
   else
