@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 27-Feb-2006
+	- Erroroman added new iSkeleton interface (still not usable).
 	- Peter Amstutz fixed a bug in csInputDefinition::Compare where
 	  it didn't convert between cooked/uncooked keyboard codes
 	  correctly, which broke csInputBinder

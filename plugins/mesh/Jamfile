@@ -21,3 +21,4 @@ SubInclude TOP plugins mesh stars ;
 SubInclude TOP plugins mesh terrain ;
 SubInclude TOP plugins mesh thing ;
 SubInclude TOP plugins mesh protomesh ;
+SubInclude TOP plugins mesh skeleton ;
