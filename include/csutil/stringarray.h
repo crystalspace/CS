@@ -238,7 +238,7 @@ public:
           case delimSplitEach:
             break;
           case delimIgnore:
-            newString = lastDelim != -1;
+            newString = lastDelim == -1;
             break;
           case delimIgnoreDifferent:
             newString = lastDelim == *p;

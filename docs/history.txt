@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Feb-2006
+	- Jorrit fixed csStringArray::SplitString() with option delimIgnore
+	  so that it actually does what it is advertized to do.
 27-Feb-2006
 	- Erroroman added new iSkeleton interface (still not usable).
 	- Peter Amstutz fixed a bug in csInputDefinition::Compare where
