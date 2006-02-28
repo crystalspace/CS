@@ -42,6 +42,7 @@
 #include "imesh/partsys.h"
 #include "imesh/protomesh.h"
 #include "imesh/rain.h"
+#include "imesh/skeleton.h"
 #include "imesh/snow.h"
 #include "imesh/spiral.h"
 #include "imesh/sprite2d.h"
