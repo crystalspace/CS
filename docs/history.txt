@@ -9,6 +9,10 @@ chronological order.
 28-Feb-2006
 	- Jorrit fixed csStringArray::SplitString() with option delimIgnore
 	  so that it actually does what it is advertized to do.
+	- Jorrit commited the workarounds for CG related problems on some
+	  3d cards. This should fix disco effects on terrainf, incorrect
+	  point sprites and incorrect portals. Note that these are
+	  workarounds! We need real fixes.
         - Daniel Fryer committed fixes for Mac mouse events (using wrong
           constants for buttons) and for OSXGetDirs.cpp (missing a slash in
           path names).  Mouse fixes required moving mouse button enum from 

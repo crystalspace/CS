@@ -26,12 +26,14 @@
 	functions. ?>
     <vp plugin="glcg">
       <cgvp>
+	<profile>arbvp1</profile>
 	<entry>VertexMain</entry>
 	<?Include std_lighting.cscg ?>
       </cgvp>
     </vp>
     <fp plugin="glcg">
       <cgfp>
+	<profile>arbfp1</profile>
 	<entry>FragmentMain</entry>
 	<?Include std_lighting.cscg ?>
       </cgfp>
