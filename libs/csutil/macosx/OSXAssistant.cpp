@@ -246,7 +246,7 @@ void OSXAssistant::mouse_up(int b, int x, int y)
 { event_outlet->Mouse(b, false, x, y); }
 
 void OSXAssistant::mouse_moved(int x, int y)
-{ event_outlet->Mouse(0, false, x, y); }
+{ /* printf("OSX Assistant: mouse moved\n");*/ event_outlet->Mouse(csmbNone, false, x, y); }
 
 
 //-----------------------------------------------------------------------------

@@ -9,6 +9,10 @@ chronological order.
 28-Feb-2006
 	- Jorrit fixed csStringArray::SplitString() with option delimIgnore
 	  so that it actually does what it is advertized to do.
+        - Daniel Fryer committed fixes for Mac mouse events (using wrong
+          constants for buttons) and for OSXGetDirs.cpp (missing a slash in
+          path names).  Mouse fixes required moving mouse button enum from 
+          event.h to evdefs.h
 27-Feb-2006
 	- Erroroman added new iSkeleton interface (still not usable).
 	- Peter Amstutz fixed a bug in csInputDefinition::Compare where

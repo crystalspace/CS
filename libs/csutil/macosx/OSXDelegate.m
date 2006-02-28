@@ -20,8 +20,8 @@
 //-----------------------------------------------------------------------------
 #include "OSXDelegate.h"
 #include "OSXMenu.h"
-#include "iutil/evdefs.h"
 #include "csconfig.h"		// CS_PLATFORM_MACOSXS
+#include "iutil/evdefs.h"
 #include <stdio.h>
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSCursor.h>
@@ -34,6 +34,7 @@
 #import <Foundation/NSProcessInfo.h>
 #import <Foundation/NSString.h>
 #import <Foundation/NSUserDefaults.h>
+
 
 typedef void* OSXDelegateHandle;
 typedef void* OSXEventHandle;
@@ -505,23 +506,23 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
   { [self mouseMoved:p forView:v]; }
 
 - (void)mouseUp:(NSEvent*)p forView:(NSView*)v
-  { [self mouseUp:p forView:v button:1]; }
+  { [self mouseUp:p forView:v button:csmbLeft]; }
 
 - (void)mouseDown:(NSEvent*)p forView:(NSView*)v
-  { [self mouseDown:p forView:v button:1]; }
+  { [self mouseDown:p forView:v button:csmbLeft]; }
 
 - (void)rightMouseDragged:(NSEvent*)p forView:(NSView*)v
   { [self mouseMoved:p forView:v]; }
 
 - (void)rightMouseUp:(NSEvent*)p forView:(NSView*)v
-  { [self mouseUp:p forView:v button:2]; }
+  { [self mouseUp:p forView:v button:csmbRight]; }
 
 - (void)rightMouseDown:(NSEvent*)p forView:(NSView*)v
 {
   if (paused)
     [[v nextResponder] rightMouseDown:p]; // Allow main menu to pop up.
   else
-    [self mouseDown:p forView:v button:2];
+    [self mouseDown:p forView:v button:csmbRight];
 }
 
 - (void)dispatchEvent:(NSEvent*)e forView:(NSView*)v

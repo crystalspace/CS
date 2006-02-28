@@ -140,30 +140,6 @@ struct csKeyEventData
   csKeyCharType charType;
 };
 
-/**
- * Constants for mouse buttons.
- * Note: the possibly occuring values are not limited to those below, e.g.
- * maybe some day 6-button mice are available...
- */
-enum csMouseButton
-{
-  /// ID to designate the absence of an acting mouse button.
-  csmbNone = -1,
-  /// Left button
-  csmbLeft = 0,
-  /// Right button
-  csmbRight = 1,
-  /// Middle button
-  csmbMiddle = 2,
-  /// Wheel was scrolled up
-  csmbWheelUp = 3,
-  /// Wheel was scrolled up
-  csmbWheelDown = 4,
-  /// Thumb button 1 (e.g. on 5-button mice)
-  csmbExtra1 = 5,
-  /// Thumb button 2 (e.g. on 5-button mice)
-  csmbExtra2 = 6
-};
 
 /**
  * Structure that collects the data a mouse event carries.

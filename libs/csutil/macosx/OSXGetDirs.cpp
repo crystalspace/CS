@@ -117,7 +117,7 @@ csString csInstallationPathsHelper::GetResourceDir(char const* argv0)
   csString dir, name;
   bool is_gui;
   if (app_info(argv0, dir, name, is_gui) && is_gui)
-    dir << CS_PATH_SEPARATOR << name << OSX_RESOURCES_GRIST;
+    dir << CS_PATH_SEPARATOR << name << OSX_RESOURCES_GRIST << CS_PATH_SEPARATOR;
   return dir;
 }
 
@@ -128,6 +128,6 @@ csString csInstallationPathsHelper::GetResourceDir(char const* argv0)
 csString csInstallationPathsHelper::GetAppFilename(char const* basename)
 {
   csString filename;
-  return filename << basename << OSX_WRAPPER_GRIST << basename ;
+  return filename << basename << OSX_WRAPPER_GRIST << CS_PATH_SEPARATOR << basename ;
 }
 
