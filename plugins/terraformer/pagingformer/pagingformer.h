@@ -44,11 +44,11 @@ private:
   /// Object registry pointer (not csRef to avoid cyclic references)
   iObjectRegistry* objectRegistry;
 
-  /// Array to save or grid of SimpleFormers
-  csRefArray<iTerraFormer> former;
+  /// Array to save a grid of SimpleFormers
+  csRef<iTerraFormer>* former;
 
   /// Path to directory containing the heightmaps
-  const char* hmdir;
+  char* hmdir;
 
   /// Complete width of the heightmap data array
   unsigned int width;
@@ -84,6 +84,8 @@ private:
 
   // Allow csSimpleSampler to access the data of this class
   friend class csPagingSampler;
+
+  void LoadFormer(uint x, uint y);
 
 public:
   SCF_DECLARE_IBASE;
