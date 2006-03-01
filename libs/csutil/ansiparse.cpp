@@ -101,26 +101,26 @@ bool csAnsiParser::DecodeCommand (const char*& cmd, size_t& cmdLen,
 	command = cmdFormatAttrEnable;
 	commandParams.attrVal = attrItalics;
       }
-      else if (((param >= 0) && (param <= 9)) ||
-      	((param >= 20) && (param <= 29)))
+      else if (((param >= 0) && (param <= 9))
+	|| ((param >= 20) && (param <= 29)))
       {
 	command = (param >= 20) ? cmdFormatAttrDisable : cmdFormatAttrEnable;
 	switch (param % 20)
 	{
-	  case 2: commandParams.attrVal = attrDim;	      break;
-	  case 4: commandParams.attrVal = attrUnderline;      break;
-	  case 5: commandParams.attrVal = attrBlink;	      break;
-	  case 7: commandParams.attrVal = attrReverse;	      break;
-	  case 8: commandParams.attrVal = attrInvisible;      break;
-	  case 9: commandParams.attrVal = attrStrikethrough;  break;
+	  case 2: commandParams.attrVal = attrDim;		break;
+	  case 4: commandParams.attrVal = attrUnderline;	break;
+	  case 5: commandParams.attrVal = attrBlink;		break;
+	  case 7: commandParams.attrVal = attrReverse;		break;
+	  case 8: commandParams.attrVal = attrInvisible;	break;
+	  case 9: commandParams.attrVal = attrStrikethrough;	break;
 	}
       }
-      else if ((param >= 30) && (param <= 38))
+      else if ((param >= 30) && (param < 38))
       {
 	command = cmdFormatAttrForeground;
 	commandParams.colorVal = (FormatColor)(param - 30);
       }
-      else if ((param >= 40) && (param <= 48))
+      else if ((param >= 40) && (param < 48))
       {
 	command = cmdFormatAttrBackground;
 	commandParams.colorVal = (FormatColor)(param - 40);

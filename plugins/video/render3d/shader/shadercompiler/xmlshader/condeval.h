@@ -24,6 +24,7 @@
 #include "csutil/bitarray.h"
 #include "csutil/blockallocator.h"
 #include "csutil/hashr.h"
+#include "csutil/ptrwrap.h"
 #include "csgeom/math.h"
 #include "iutil/strset.h"
 #include "ivideo/shader/shader.h"
@@ -46,22 +47,36 @@ public:
   {
     // The variable "itself" (boolean for variables resp. constants)
     ValueSet var;
-    ValueSet vec[4];
+    struct ValueSetVector
+    {
+      ValueSet x;
+      ValueSet y;
+      ValueSet z;
+      ValueSet w;
+
+      ValueSetVector () {}
+      ValueSetVector (const ValueSetVector& other) : 
+	x (other.x), y (other.y), z (other.z), w (other.w) {}
+      ValueSetVector (const float f) : x (f), y (f), z (f), w (f) {}
+
+      ValueSet& operator[] (int i)
+      { return (i&2)?((i&1)?y:x):((i&1)?w:z); }
+      const ValueSet& operator[] (int i) const
+      { return (i&2)?((i&1)?y:x):((i&1)?w:z); }
+    } vec;
     ValueSet tex;
     ValueSet buf;
 
     Values () {}
-    Values (const float f) : var (f), tex (f), buf (f)
-    {
-      for (int i = 0; i < 4; i++)
-        vec[i] = ValueSet (f);
-    }
+    Values (const float f) : var (f), vec (f), tex (f), buf (f) { }
 
     Values& operator=(const Values& other)
     {
       var = other.var;
-      for (int i = 0; i < 4; i++)
-        vec[i] = other.vec[i];
+      vec.x = other.vec.x;
+      vec.y = other.vec.y;
+      vec.z = other.vec.z;
+      vec.w = other.vec.w;
       tex = other.tex;
       buf = other.buf;
       return *this;
@@ -70,8 +85,10 @@ public:
     {
       Values newValues;
       newValues.var = a.var & b.var;
-      for (int i = 0; i < 4; i++)
-        newValues.vec[i] = a.vec[i] & b.vec[i];
+      newValues.vec.x = a.vec.x & b.vec.x;
+      newValues.vec.y = a.vec.y & b.vec.y;
+      newValues.vec.z = a.vec.z & b.vec.z;
+      newValues.vec.w = a.vec.w & b.vec.w;
       newValues.tex = a.tex & b.tex;
       newValues.buf = a.buf & b.buf;
       return newValues;
@@ -80,8 +97,10 @@ public:
     {
       Values newValues;
       newValues.var = a.var | b.var;
-      for (int i = 0; i < 4; i++)
-        newValues.vec[i] = a.vec[i] | b.vec[i];
+      newValues.vec.x = a.vec.x | b.vec.x;
+      newValues.vec.y = a.vec.y | b.vec.y;
+      newValues.vec.z = a.vec.z | b.vec.z;
+      newValues.vec.w = a.vec.w | b.vec.w;
       newValues.tex = a.tex | b.tex;
       newValues.buf = a.buf | b.buf;
       return newValues;
@@ -94,11 +113,12 @@ public:
   };
 protected:
   Values def;
-  csArray<Values*> possibleValues;
+  csArray<csPtrWrap<Values> > possibleValues;
   csBlockAllocator<Values> valAlloc;
 
   void CopyValues (const Variables& other)
   {
+    possibleValues.SetSize (other.possibleValues.GetSize());
     for (size_t i = 0; i < other.possibleValues.GetSize(); i++)
     {
       const Values* v = other.possibleValues[i];
@@ -106,10 +126,8 @@ protected:
       {
         Values* newVals = valAlloc.Alloc ();
         *newVals = *v;
-        possibleValues.Push (newVals);
+        possibleValues[i] = newVals;
       }
-      else
-        possibleValues.Push (0);
     }
   }
 public:
@@ -143,8 +161,8 @@ public:
   friend Variables operator& (const Variables& a, const Variables& b)
   {
     Variables newVars;
-    const csArray<Values*>& pvA = a.possibleValues;
-    const csArray<Values*>& pvB = b.possibleValues;
+    const csArray<csPtrWrap<Values> >& pvA = a.possibleValues;
+    const csArray<csPtrWrap<Values> >& pvB = b.possibleValues;
     const size_t num = csMax (pvA.GetSize(), pvB.GetSize());
     for (size_t i = 0; i < num; i++)
     {
@@ -177,8 +195,8 @@ public:
   friend Variables operator| (const Variables& a, const Variables& b)
   {
     Variables newVars;
-    const csArray<Values*>& pvA = a.possibleValues;
-    const csArray<Values*>& pvB = b.possibleValues;
+    const csArray<csPtrWrap<Values> >& pvA = a.possibleValues;
+    const csArray<csPtrWrap<Values> >& pvB = b.possibleValues;
     const size_t num = csMax (pvA.GetSize(), pvB.GetSize());
     for (size_t i = 0; i < num; i++)
     {
@@ -224,10 +242,6 @@ class csConditionEvaluator
   static bool OpTypesCompatible (OperandType t1, OperandType t2);
   /// Get a name for an operand type, for error reporting purposes.
   static const char* OperandTypeDescription (OperandType t);
-  /**
-   * Get the ID for an operation, but also do some optimization of the 
-   * expression. */
-  csConditionID FindOptimizedCondition (const CondOperation& operation);
   const char* ResolveExpValue (const csExpressionToken& value,
     CondOperand& operand);
   const char* ResolveOperand (csExpression* expression, 
@@ -241,6 +255,8 @@ class csConditionEvaluator
   bool EvaluateOperandBConst (const CondOperand& operand, bool& result);
   bool EvaluateOperandIConst (const CondOperand& operand, int& result);
   bool EvaluateOperandFConst (const CondOperand& operand, float& result);
+
+  void GetUsedSVs2 (csConditionID condition, csBitArray& affectedSVs);
 
   struct EvaluatorShadervar
   {
@@ -310,6 +326,26 @@ public:
    */
   Logic3 CheckConditionResults (csConditionID condition,
     const Variables& vars, Variables& trueVars, Variables& falseVars);
+  Logic3 CheckConditionResults (csConditionID condition,
+    const Variables& vars);
+
+  const char* ProcessExpression (csExpression* expression, 
+    CondOperation& operation);
+  /**
+   * Get the ID for an operation, but also do some optimization of the 
+   * expression. 
+   */
+  csConditionID FindOptimizedCondition (const CondOperation& operation);
+
+  /**
+   * Test if \c condition is a sub-condition of \c containerCondition 
+   * (e.g. true if \c condition is AND-combined with some other condition).
+   */
+  bool IsConditionPartOf (csConditionID condition, 
+    csConditionID containerCondition);
+
+  /// Determine which SVs are used in some condition.
+  void GetUsedSVs (csConditionID condition, csBitArray& affectedSVs);
 };
 
 }

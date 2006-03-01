@@ -65,6 +65,8 @@ csShaderManager::csShaderManager(iBase* parent) :
   scfImplementationType (this, parent)
 {
   seqnumber = 0;
+  eventSucc[0] = CS_HANDLERLIST_END;
+  eventSucc[1] = CS_HANDLERLIST_END;
 }
 
 csShaderManager::~csShaderManager()
@@ -88,9 +90,6 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   vc = CS_QUERY_REGISTRY (objectreg, iVirtualClock);
   txtmgr = CS_QUERY_REGISTRY (objectreg, iTextureManager);
 
-  if (!scfiEventHandler)
-    scfiEventHandler.AttachNew (new EventHandler (this));
-
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (objectreg, iVerbosityManager));
   if (verbosemgr) 
@@ -102,12 +101,16 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   SystemOpen = csevSystemOpen(objectreg);
   SystemClose = csevSystemClose(objectreg);
 
+  csRef<iEventHandlerRegistry> handlerReg = 
+    csQueryRegistry<iEventHandlerRegistry> (objectreg);
+  eventSucc[0] = handlerReg->GetGenericID ("crystalspace.graphics3d");
+
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectreg, iEventQueue);
   if (q)
   {
     csEventID events[] = { PreProcess, SystemOpen, SystemClose, 
 			    CS_EVENTLIST_END };
-    q->RegisterListener (scfiEventHandler, events);
+    q->RegisterListener (this, events);
   }
 
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY  (objectreg,

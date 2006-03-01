@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Mar-2006
+	- res added a memory handler for csArray<> that keeps a local buffer.
+	  So if the array is small enough and fits into that buffer, a heap
+	  allocation is saved.
+	- res fixed the csAnsiParse color code checks.
+	- res added csPtrWrap, a wrapper to initialize pointers with 0.
+	- res took the Python-related plugins out of the MSVC static plugins
+	  library.
+	- res made some optimizations to xmlshader.
 28-Feb-2006
 	- Jorrit fixed csStringArray::SplitString() with option delimIgnore
 	  so that it actually does what it is advertized to do.

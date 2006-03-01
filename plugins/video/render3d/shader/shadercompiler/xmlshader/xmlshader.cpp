@@ -114,9 +114,12 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
   if (!ValidateTemplate (templ))
     return 0;
   
+  csTicks startTime, endTime;
   // Create a shader. The actual loading happens later.
   csRef<csXMLShader> shader;
+  if (do_verbose) startTime = csGetTicks();
   shader.AttachNew (new csXMLShader (this, templ, forcepriority));
+  if (do_verbose) endTime = csGetTicks();
   shader->SetName (templ->GetAttributeValue ("name"));
   shader->SetDescription (templ->GetAttributeValue ("description"));
   if (do_verbose)
@@ -124,7 +127,8 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
     csString str;
     shader->DumpStats (str);
     Report(CS_REPORTER_SEVERITY_NOTIFY, 
-      "Shader %s: %s", shader->GetName (), str.GetData ());
+      "Shader %s: %s, %u ms", shader->GetName (), str.GetData (),
+      endTime - startTime);
   }
 
   csRef<iDocumentNodeIterator> tagIt = templ->GetNodes ("key");

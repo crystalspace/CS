@@ -212,6 +212,73 @@ public:
 };
 
 /**
+ * A csArray allocator with a small local buffer.
+ * If the array data fits into the local buffer (which is set up to holds 
+ * \c N elements of type \c T), a memory allocation from the heap is saved.
+ * Thus, if you have lots of arrays with a relatively small, well known size
+ * you can gain some performance by using this allocator.
+ */
+template<typename T, int N>
+class csArrayLocalBufferAllocator
+{
+  static const size_t localSize = N * sizeof (T);
+  uint8 localBuf[localSize];
+public:
+  T* Alloc (size_t count)
+  {
+    const size_t allocSize = count * sizeof (T);
+    if (allocSize <= localSize)
+      return (T*)localBuf;
+    else
+      return (T*)malloc (allocSize);
+  }
+
+  void Free (T* mem)
+  {
+    if (mem != (T*)localBuf) free (mem);
+  }
+
+  // The 'relevantcount' parameter should be the number of items
+  // in the old array that are initialized.
+  T* Realloc (T* mem, size_t relevantcount, size_t oldcount,
+    size_t newcount)
+  {
+    const size_t oldAllocSize = oldcount * sizeof (T);
+    const size_t newAllocSize = newcount * sizeof (T);
+    if ((oldAllocSize <= localSize)
+      && (newAllocSize <= localSize))
+    {
+      CS_ASSERT (mem == (T*)localBuf);
+      return mem;
+    }
+    if (newAllocSize <= localSize)
+    {
+      const size_t relevantSize = relevantcount * sizeof (T);
+      memcpy (localBuf, mem, relevantSize);
+      free (mem);
+      return (T*)localBuf;
+    }
+    else if (oldAllocSize <= localSize)
+    {
+      const size_t relevantSize = relevantcount * sizeof (T);
+      mem = (T*)malloc (newAllocSize);
+      memcpy (mem, localBuf, relevantSize);
+      return mem;
+    }
+    else
+    {
+      return (T*)realloc (mem, newAllocSize);
+    }
+  }
+
+  // Move memory.
+  void MemMove (T* mem, size_t dest, size_t src, size_t count)
+  {
+    memmove (mem + dest, mem + src, count * sizeof(T));
+  }
+};
+
+/**
  * Special allocator for csArray that makes sure that when
  * the array is reallocated that the objects are properly constructed
  * and destructed at their new position. This is needed for objects
@@ -303,6 +370,7 @@ private:
   size_t capacity;
   size_t threshold;
   T* root;
+  MemoryAllocator memAlloc;
 #ifdef CS_MEMORY_TRACKER
   csMemTrackerInfo* mti;
   void UpdateMti (int dn, int curcapacity)
@@ -356,14 +424,14 @@ private:
   {
     if (root == 0)
     {
-      root = MemoryAllocator::Alloc (n);
+      root = memAlloc.Alloc (n);
 #ifdef CS_MEMORY_TRACKER
       UpdateMti (int (n), int (n));
 #endif
     }
     else
     {
-      root = MemoryAllocator::Realloc (root, count, capacity, n);
+      root = memAlloc.Realloc (root, count, capacity, n);
 #ifdef CS_MEMORY_TRACKER
       UpdateMti (int (n-capacity), int (n));
 #endif
@@ -428,7 +496,7 @@ public:
     threshold = (in_threshold > 0 ? in_threshold : 16);
     if (capacity != 0)
     {
-      root = MemoryAllocator::Alloc (capacity);
+      root = memAlloc.Alloc (capacity);
 #ifdef CS_MEMORY_TRACKER
       UpdateMti (int (capacity), int (capacity));
 #endif
@@ -458,7 +526,7 @@ public:
   }
 
   /// Assignment operator.
-  csArray<T,ElementHandler>& operator= (const csArray& other)
+  csArray<T,ElementHandler,MemoryAllocator>& operator= (const csArray& other)
   {
     CopyFrom (other);
     return *this;
@@ -695,7 +763,7 @@ public:
       SetSizeUnsafe (count + 1); // Increments 'count' as a side-effect.
       size_t const nmove = (count - n - 1);
       if (nmove > 0)
-	MemoryAllocator::MemMove (root, n+1, n, nmove);
+	memAlloc.MemMove (root, n+1, n, nmove);
       ElementHandler::Construct (root + n, item);
       return true;
     }
@@ -830,7 +898,7 @@ public:
       size_t i;
       for (i = 0 ; i < count ; i++)
         ElementHandler::Destroy (root + i);
-      MemoryAllocator::Free (root);
+      memAlloc.Free (root);
 #     ifdef CS_MEMORY_TRACKER
       UpdateMti (-int (capacity), 0);
 #     endif
@@ -920,7 +988,7 @@ public:
     }
     else if (count != capacity)
     {
-      root = MemoryAllocator::Realloc (root, count, capacity, count);
+      root = memAlloc.Realloc (root, count, capacity, count);
 #ifdef CS_MEMORY_TRACKER
       UpdateMti (int (count-capacity), int (count));
 #endif
@@ -944,7 +1012,7 @@ public:
       size_t const nmove = ncount - n;
       ElementHandler::Destroy (root + n);
       if (nmove > 0)
-	MemoryAllocator::MemMove (root, n, n+1, nmove);
+	memAlloc.MemMove (root, n, n+1, nmove);
       SetSizeUnsafe (ncount);
       return true;
     }
@@ -969,7 +1037,7 @@ public:
       size_t const nmove = ncount - n;
       ElementHandler::Destroy (root + n);
       if (nmove > 0)
-        MemoryAllocator::MemMove (root, n, ncount, 1);
+        memAlloc.MemMove (root, n, ncount, 1);
       SetSizeUnsafe (ncount);
       return true;
     }
@@ -997,7 +1065,7 @@ public:
     size_t const ncount = count - range_size;
     size_t const nmove = count - end - 1;
     if (nmove > 0)
-      MemoryAllocator::MemMove (root, start, start + range_size, nmove);
+      memAlloc.MemMove (root, start, start + range_size, nmove);
     SetSizeUnsafe (ncount);
   }
 

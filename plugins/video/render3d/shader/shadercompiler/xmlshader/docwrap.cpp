@@ -25,6 +25,7 @@
 #include <ctype.h>
 
 #include "csgeom/math.h"
+#include "csutil/bitarray.h"
 #include "csutil/set.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
@@ -53,6 +54,7 @@ class ConditionTree
     csConditionID condition;
     Node* branches[2];
     Variables values;
+    csBitArray conditionAffectedSVs;
 
     Node (Node* p) : parent (p), condition (csCondUnknown)
     {
@@ -81,6 +83,9 @@ class ConditionTree
   void ToResolver (iConditionResolver* resolver, Node* node,
     csConditionNode* parent);
 
+  bool HasContainingCondition (Node* node, csConditionID containedCondition,
+    csConditionID& condition);
+
   csConditionEvaluator& evaluator;
 public:
   ConditionTree (csConditionEvaluator& evaluator) : evaluator (evaluator)
@@ -108,27 +113,63 @@ public:
 void ConditionTree::RecursiveAdd (csConditionID condition, Node* node, 
                                   NodeStackEntry& newCurrent)
 {
+  /* Shortcut */
+  if (node->condition == condition)
+  {
+    newCurrent.branches[0].Push (node->branches[0]);
+    newCurrent.branches[1].Push (node->branches[1]);
+    return;
+  }
+
   Variables trueVals;
   Variables falseVals;
   Logic3 r;
-  if (node->parent && (node->parent->condition == condition))
-  {
-    /* This can happen with "complex" conditions (e.g. "a || b", where
-     * the true or false value ranges are such (e.g. in the case of "a || b"
-     * a can be 0 or 1, as well as b can be 0 or 1) do not suffice to tag
-     * the condition as "always true" or "always false". So use that
-     * shortcut here. */
-    r = node == node->parent->branches[0];
-  }
+  if (condition == csCondAlwaysTrue)
+    r.state = Logic3::Truth;
+  else if (condition == csCondAlwaysFalse)
+    r.state = Logic3::Lie;
   else
   {
-    if (condition == csCondAlwaysTrue)
-      r.state = Logic3::Truth;
-    else if (condition == csCondAlwaysFalse)
-      r.state = Logic3::Lie;
-    else
-      r = evaluator.CheckConditionResults (condition, 
-        node->values, trueVals, falseVals);
+    bool isLeaf = node->condition == Node::csCondUnknown;
+    bool doCheck = true;
+    if (!isLeaf && (node->parent != 0))
+    {
+      /* Do a check if a condition result check is worthwhile.
+       * For each node, the SVs which affect the node's and its
+       * parents conditions are recorded; if the intersection of
+       * that set with the set of SVs that affect the current
+       * condition is empty, we don't need to do a check.
+       *
+       * Though, if the node is a leaf, always check since the
+       * "true values" and "false values" are required.
+       */
+      csBitArray affectedSVs;
+      evaluator.GetUsedSVs (condition, affectedSVs);
+      if (affectedSVs.GetSize() 
+        == node->parent->conditionAffectedSVs.GetSize())
+      {
+        affectedSVs &= node->parent->conditionAffectedSVs;
+      }
+      else
+      {
+        csBitArray bits2 (node->parent->conditionAffectedSVs);
+        size_t newSize = csMax (affectedSVs.GetSize(),
+          node->parent->conditionAffectedSVs.GetSize());
+        affectedSVs.SetSize (newSize);
+        bits2.SetSize (newSize);
+        affectedSVs &= bits2;
+      }
+      doCheck = !affectedSVs.AllBitsFalse();
+    }
+    if (doCheck)
+    {
+      if (isLeaf)
+        r = evaluator.CheckConditionResults (condition, 
+          node->values, trueVals, falseVals);
+      else
+        r = evaluator.CheckConditionResults (condition, 
+          node->values);
+    }
   }
 
   switch (r.state)
@@ -142,11 +183,62 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
     case Logic3::Uncertain:
       if (node->condition == Node::csCondUnknown)
       {
+        csConditionID containerCondition;
+        bool hasContainer = HasContainingCondition (node, condition,
+          containerCondition);
+
         node->condition = condition;
+        evaluator.GetUsedSVs (condition, node->conditionAffectedSVs);
+        if (node->parent)
+        {
+          if (node->conditionAffectedSVs.GetSize() 
+            == node->parent->conditionAffectedSVs.GetSize())
+          {
+            node->conditionAffectedSVs |= node->parent->conditionAffectedSVs;
+          }
+          else
+          {
+            csBitArray bits1 (node->conditionAffectedSVs);
+            csBitArray bits2 (node->parent->conditionAffectedSVs);
+            size_t newSize = csMax (node->conditionAffectedSVs.GetSize(),
+              node->parent->conditionAffectedSVs.GetSize());
+            bits1.SetSize (newSize);
+            bits2.SetSize (newSize);
+            node->conditionAffectedSVs = bits1 | bits2;
+          }
+        }
         for (int b = 0; b < 2; b++)
         {
           Node* nn = new Node (node);
-          nn->values = (b == 0) ? trueVals : falseVals;
+          if (hasContainer)
+          {
+            /* If this condition is part of a "composite condition"
+             * (|| or &&) up above in the tree, use the possible values
+             * from running that containing condition with the possible
+             * values from the contained condition. That way, in cases
+             * like 'a' nested in 'a || b', a true 'a' will result in
+             * a set of possible values of only true for 'b', allowing
+             * the latter to be possibly folded away later.
+             */
+            Variables newTrueVals;
+            Variables newFalseVals;
+            if (b == 0)
+            {
+              evaluator.CheckConditionResults (containerCondition, 
+                trueVals, newTrueVals, newFalseVals);
+              nn->values = newTrueVals;
+            }
+            else
+            {
+              evaluator.CheckConditionResults (containerCondition, 
+                falseVals, newTrueVals, newFalseVals);
+              nn->values = newFalseVals;
+            }
+          }
+          else
+          {
+            nn->values = (b == 0) ? trueVals : falseVals;
+          }
           node->branches[b] = nn;
           newCurrent.branches[b].Push (nn);
         }
@@ -226,6 +318,18 @@ void ConditionTree::ToResolver (iConditionResolver* resolver)
   {
     ToResolver (resolver, root, 0);
   }
+}
+
+bool ConditionTree::HasContainingCondition (Node* node, 
+                                            csConditionID containedCondition,
+                                            csConditionID& condition)
+{
+  if (node->parent == 0) return false;
+  condition = node->parent->condition;
+  if (evaluator.IsConditionPartOf (containedCondition, condition)
+    && (containedCondition != condition))
+    return true;
+  return HasContainingCondition (node->parent, containedCondition, condition);
 }
 
 //---------------------------------------------------------------------------
@@ -358,7 +462,7 @@ void csWrappedDocumentNode::ProcessInclude (ConditionEval& eval,
   {
     csRef<iDocumentSystem> docsys (
       CS_QUERY_REGISTRY(objreg, iDocumentSystem));
-    if (docsys == 0)
+    if (!docsys.IsValid())
       docsys.AttachNew (new csTinyDocumentSystem ());
 
     csRef<iDocument> includeDoc = docsys->CreateDocument ();

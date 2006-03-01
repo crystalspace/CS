@@ -46,8 +46,9 @@
 #include "csgfx/shadervarcontext.h"
 
 
-class csShaderManager : public scfImplementation2<csShaderManager,
+class csShaderManager : public scfImplementation3<csShaderManager,
 						  iShaderManager,
+						  iEventHandler,
 						  iComponent>
 {
 private:
@@ -188,22 +189,21 @@ public:
    * @{ */
   bool HandleEvent (iEvent& Event);
 
-  struct EventHandler : public scfImplementation1<EventHandler, 
-						  iEventHandler>
-  {
-  private:
-    csWeakRef<csShaderManager> parent;
-  public:
-    EventHandler (csShaderManager* parent) : scfImplementationType (this),
-      parent (parent) { }
-    virtual ~EventHandler () { }
-    
-    virtual bool HandleEvent (iEvent& ev) 
-    { return parent->HandleEvent (ev); }
-    CS_EVENTHANDLER_NAMES("crystalspace.graphics3d.shadermgr")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  };
-  csRef<EventHandler> scfiEventHandler;
+  CS_EVENTHANDLER_NAMES("crystalspace.graphics3d.shadermgr")
+  
+  CS_CONST_METHOD virtual const csHandlerID * GenericPrec (
+    csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
+    csEventID e) const { return 0; }
+  
+  csHandlerID eventSucc[2];
+  CS_CONST_METHOD virtual const csHandlerID * GenericSucc (
+    csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
+    csEventID e) const 
+  { 
+    return 0;//eventSucc; 
+  }
+  
+  CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
   /** @} */
 };
 

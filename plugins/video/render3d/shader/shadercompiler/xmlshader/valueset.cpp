@@ -128,7 +128,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   ValueSet& ValueSet::Union (const ValueSet& other)
   {
     size_t i = 0, j = 0;
-    const csArray<Interval>& otherIntervals = other.intervals;
+    const IntervalArray& otherIntervals = other.intervals;
 
     while ((i < intervals.GetSize()) && (j < otherIntervals.GetSize()))
     {
@@ -194,7 +194,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   ValueSet& ValueSet::Intersection (const ValueSet& other)
   {
     size_t i = 0, j = 0;
-    const csArray<Interval>& otherIntervals = other.intervals;
+    const IntervalArray& otherIntervals = other.intervals;
 
     while ((i < intervals.GetSize()) && (j < otherIntervals.GetSize()))
     {

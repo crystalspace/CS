@@ -28,6 +28,24 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
+
+#if defined(CS_IEEE_DOUBLE_FORMAT)
+  namespace 
+  { 
+    struct UI32ToFloat
+    {
+      union
+      {
+	uint32 ui32;
+	float f;
+      };
+      UI32ToFloat (uint32 ui32) : ui32 (ui32) {}
+    };
+  }
+#define CS_INFINITY	  (UI32ToFloat (0x78000000).f)
+#else
+#define CS_INFINITY	  std::numeric_limits<float>::infinity()
+#endif
   
   /**
    * A set of values, stored as a number of interval.
@@ -51,8 +69,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	float value;
       
 	Side (bool negInf, bool inclusive) : inclusive (inclusive), 
-          value (negInf ? -std::numeric_limits<float>::infinity()
-                        : std::numeric_limits<float>::infinity()) {}
+          value (negInf ? -CS_INFINITY : CS_INFINITY) {}
 	Side (float v, bool inclusive) : inclusive (inclusive), value (v) {}
       
         void FlipInclusive()
@@ -137,8 +154,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       }
     };
   protected:
-    static const size_t arrayGrow = 1;
-    csArray<Interval> intervals;
+    static const size_t arrayGrow = 2;
+    typedef csArray<Interval, csArrayElementHandler<Interval>,
+      csArrayLocalBufferAllocator<Interval, 4> > IntervalArray;
+    IntervalArray intervals;
   public:
     ValueSet (bool empty = false) : 
       intervals (empty ? 0 : 1, arrayGrow)
@@ -206,6 +225,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         return Logic3::Uncertain;
     }
   };
+
+#undef CS_INFINITY
 
 }
 CS_PLUGIN_NAMESPACE_END(XMLShader)

@@ -99,6 +99,8 @@ public:
   virtual ~csShaderConditionResolver ();
 
   virtual const char* ParseCondition (const char* str, size_t len, 
+    CondOperation& operation);
+  virtual const char* ParseCondition (const char* str, size_t len, 
     csConditionID& result);
   virtual bool Evaluate (csConditionID condition);
   virtual void AddNode (csConditionNode* parent,

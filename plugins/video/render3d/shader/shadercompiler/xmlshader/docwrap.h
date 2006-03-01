@@ -74,6 +74,9 @@ struct iConditionResolver
   virtual void AddNode (csConditionNode* parent,
     csConditionID condition, csConditionNode*& trueNode, 
     csConditionNode*& falseNode) = 0;
+
+  virtual const char* ParseCondition (const char* str, size_t len, 
+    CondOperation& operation) = 0;
 };
 
 /**

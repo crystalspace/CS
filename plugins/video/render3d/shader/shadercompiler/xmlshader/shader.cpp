@@ -62,6 +62,17 @@ const char* csShaderConditionResolver::ParseCondition (const char* str,
 						       size_t len, 
 						       csConditionID& result)
 {
+  CondOperation op;
+  const char* err = ParseCondition (str, len, op);
+  if (err) return err;
+  result = evaluator.FindOptimizedCondition (op);
+  return 0;
+}
+
+const char* csShaderConditionResolver::ParseCondition (const char* str, 
+						       size_t len, 
+						       CondOperation& result)
+{
   csExpressionTokenList tokens;
   const char* err = tokenizer.Tokenize (str, len, tokens);
   if (err)
