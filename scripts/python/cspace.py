@@ -7934,14 +7934,6 @@ class csKeyEventDataPtr(csKeyEventData):
         _swig_setattr(self, csKeyEventData,self.__class__,csKeyEventData)
 _cspace.csKeyEventData_swigregister(csKeyEventDataPtr)
 
-csmbNone = _cspace.csmbNone
-csmbLeft = _cspace.csmbLeft
-csmbRight = _cspace.csmbRight
-csmbMiddle = _cspace.csmbMiddle
-csmbWheelUp = _cspace.csmbWheelUp
-csmbWheelDown = _cspace.csmbWheelDown
-csmbExtra1 = _cspace.csmbExtra1
-csmbExtra2 = _cspace.csmbExtra2
 class csMouseEventData(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csMouseEventData, name, value)
@@ -8483,6 +8475,14 @@ csMouseEventTypeUp = _cspace.csMouseEventTypeUp
 csMouseEventTypeDown = _cspace.csMouseEventTypeDown
 csMouseEventTypeClick = _cspace.csMouseEventTypeClick
 csMouseEventTypeDoubleClick = _cspace.csMouseEventTypeDoubleClick
+csmbNone = _cspace.csmbNone
+csmbLeft = _cspace.csmbLeft
+csmbRight = _cspace.csmbRight
+csmbMiddle = _cspace.csmbMiddle
+csmbWheelUp = _cspace.csmbWheelUp
+csmbWheelDown = _cspace.csmbWheelDown
+csmbExtra1 = _cspace.csmbExtra1
+csmbExtra2 = _cspace.csmbExtra2
 csKeyModifierTypeShift = _cspace.csKeyModifierTypeShift
 csKeyModifierTypeCtrl = _cspace.csKeyModifierTypeCtrl
 csKeyModifierTypeAlt = _cspace.csKeyModifierTypeAlt
