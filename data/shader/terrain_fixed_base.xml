@@ -156,4 +156,25 @@
       </fp>
     </pass>
   </technique>
+
+    <technique priority="50">
+      <pass>
+        <?if !vars."tex diffuse".texture ?>
+          <texture name="standardtex white" destination="unit 0" />
+        <?else?>
+          <texture name="tex diffuse" destination="unit 0" />
+          <buffer source="texture coordinate 0" destination="texture coordinate 0"/>
+        <?endif?>
+      </pass>
+      <!-- @@@ Flat materials -->
+      <?if vars."tex lightmap".texture ?>
+        <pass>
+          <mixmode><multiply2 /></mixmode><!-- @@@ probably not always desired -->
+          <zmode><zmesh2 /></zmode>
+          <buffer source="texture coordinate lightmap" destination="texture coordinate 0" />
+          <texture name="tex lightmap" destination="unit 0" />
+        </pass>
+      <?endif?>
+      <?Include snippets/fog-pass.inc ?>
+    </technique>
 </shader>
