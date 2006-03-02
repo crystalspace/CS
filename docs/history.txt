@@ -13,6 +13,8 @@ chronological order.
 	- Jorrit fixed iObjectRegistryIterator so that it doesn't skip the
 	  first element.
 	- Jorrit fixed keyboard autorepeat on linux.
+	- iceeey made parallax shader use add mixmode by default and
+	  destalphaadd only if using projection.
 1-Mar-2006
 	- res added a memory handler for csArray<> that keeps a local buffer.
 	  So if the array is small enough and fits into that buffer, a heap

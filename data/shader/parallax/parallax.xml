@@ -4,7 +4,11 @@
     <?include /shader/snippets/projection-pass.inc ?>
     <pass>
       <mixmode>
+      <?if vars."light 0 type".int == 2 ?>
         <destalphaadd />
+      <?else?>
+        <add />
+      <?endif?>
       </mixmode>
       <buffer source="normal" destination="normal" />
       <buffer source="tangent" destination="texture coordinate 1" />
