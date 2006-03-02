@@ -70,7 +70,8 @@ public:
   /// Put a previously created event into system event queue.
   virtual void Post (iEvent*);
   /// Put a keyboard event into event queue.
-  virtual void Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown);
+  virtual void Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown,
+      bool autorep = false);
   /// Put a mouse event into event queue (old interface)
   virtual void Mouse (int iButton, bool iDown, int x, int y);
   /// Put a mouse event into event queue (new interface)

@@ -75,13 +75,14 @@ void csEventOutlet::Post (iEvent *Event)
     Queue->Post (Event);
 }
 
-void csEventOutlet::Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown)
+void csEventOutlet::Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown,
+    bool autorep)
 {
   if (codeRaw || codeCooked)
   {
     iKeyboardDriver* k = GetKeyboardDriver();
     if (k != 0)
-      k->DoKey (codeRaw, codeCooked, iDown, false);
+      k->DoKey (codeRaw, codeCooked, iDown, autorep);
   }
 }
 

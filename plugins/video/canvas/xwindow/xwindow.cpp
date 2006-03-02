@@ -510,7 +510,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
   utf32_char csKeyRaw = 0, csKeyCooked = 0;
   int charcount;
   char charcode [8];
-  bool down;
+  bool prevdown, down;
   bool resize = false;
 
   if (Event.Name == csevCommandLineHelp(name_reg))
@@ -563,6 +563,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
         // Neat trick: look in event queue if we have KeyPress events ahead
 	// with same keycode. If this is the case, discard the KeyUp event
 	// in favour of KeyDown since this is most (sure?) an autorepeat
+        prevdown = (event.type == KeyPress);
         XCheckIfEvent (event.xkey.display, &event, CheckKeyPress,
 	  (XPointer)&event);
         down = (event.type == KeyPress);
@@ -717,7 +718,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
 #undef MAP_KEY
         }
         if (csKeyRaw || csKeyCooked)
-          EventOutlet->Key(csKeyRaw, csKeyCooked, down);
+          EventOutlet->Key(csKeyRaw, csKeyCooked, down, prevdown != down);
         break;
       case FocusIn:
 	{

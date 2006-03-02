@@ -474,7 +474,8 @@ struct iEventOutlet : public virtual iBase
    * Control/Shift/Alt for English characters. However, in general, it is
    * best if the entity posting the event can provide both codes.
    */
-  virtual void Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown) = 0;
+  virtual void Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown,
+      bool autorep = false) = 0;
 
   /**
    * Put a mouse event into event queue.<p>
