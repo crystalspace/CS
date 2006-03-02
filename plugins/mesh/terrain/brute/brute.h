@@ -288,6 +288,9 @@ private:
   csArray<csBitArray> globalMaterialsUsed;
   int materialMapW, materialMapH;
   float wm, hm;	// Scales to map between material map and object space.
+  
+  csString materialMapFile;
+  bool materialMapRaw;
 
   csDirtyAccessArray<csRenderMesh*>* returnMeshes;
   csRenderMeshHolder rmHolder;
@@ -591,6 +594,8 @@ public:
   bool SetMaterialMap (iImage* map);
   bool SetLODValue (const char* parameter, float value);
   float GetLODValue (const char* parameter);
+  void SetMaterialMapFile (const char* file, int width, int height, bool raw);
+  const char* GetMaterialMapFile (int& width, int& height, bool& raw);
 
   class eiTerrainObjectState : public iTerrainObjectState
   {
@@ -669,6 +674,18 @@ public:
     virtual bool GetCastShadows ()
     {
       return scfParent->castshadows;
+    }
+    
+    virtual void SetMaterialMapFile (const char* file, int width, int height,
+      bool raw)
+    {
+      scfParent->SetMaterialMapFile (file, width, height, raw);
+    }
+    
+    virtual const char* GetMaterialMapFile (int& width, int& height,
+      bool& raw)
+    {
+      return scfParent->GetMaterialMapFile (width, height, raw);
     }
 
   } scfiTerrainObjectState;

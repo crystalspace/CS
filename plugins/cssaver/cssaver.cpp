@@ -20,6 +20,7 @@
 
 #include "csgfx/rgbpixel.h"
 #include "cstool/proctex.h"
+#include "csutil/objiter.h"
 #include "csutil/scfstr.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
@@ -32,6 +33,7 @@
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
 #include "iengine/scenenode.h"
+#include "iengine/region.h"
 #include "iengine/renderloop.h"
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
@@ -86,6 +88,7 @@ csSaver::csSaver(iBase *p)
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   object_reg = 0;
+  curRegion = 0;
 }
 
 csSaver::~csSaver()
@@ -168,6 +171,10 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
   for (int i = 0; i < texList->GetCount(); i++)
   {
     iTextureWrapper *texWrap=texList->Get(i);
+    
+    if (curRegion && !curRegion->IsInRegion (texWrap->QueryObject ()))
+      continue;
+    
     iTextureHandle* texHand = texWrap->GetTextureHandle ();
     csRef<iDocumentNode>child = current->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     const char *name = texWrap->QueryObject()->GetName();
@@ -344,6 +351,10 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
   {
     iMaterialWrapper* matWrap = matList->Get(i);
     CS_ASSERT(matWrap);
+    
+    if (curRegion && !curRegion->IsInRegion (matWrap->QueryObject ()))
+      continue;
+    
     iMaterial* mat = matWrap->GetMaterial();
     CS_ASSERT(mat);
     csRef<iMaterialEngine>matEngine(SCF_QUERY_INTERFACE(mat,iMaterialEngine));
@@ -532,6 +543,10 @@ bool csSaver::SaveShaders (iDocumentNode *parent)
   for (i = 0 ; i < shaders.Length () ; i++)
   {
     iShader* shader = shaders[i];
+    
+    if (curRegion && !curRegion->IsInRegion (shader->QueryObject ()))
+      continue;
+    
     //const char* shadername = shader->QueryObject()->GetName();
     const char* shaderfile = shader->GetFileName();
     if (shaderfile && *shaderfile)
@@ -545,46 +560,6 @@ bool csSaver::SaveShaders (iDocumentNode *parent)
   return true;
 }
 
-
-bool csSaver::SaveRenderPriorities(iDocumentNode *parent)
-{
-  csRef<iDocumentNode> rpnode = CreateNode(parent, "renderpriorities");
-  int rpcount = engine->GetRenderPriorityCount();
-  for(int i = 0; i < rpcount; i++)
-  {
-    const char *rpname = engine->GetRenderPriorityName(i);
-    if(rpname)
-    {
-      csRef<iDocumentNode> prioritynode = CreateNode(rpnode, "priority");
-
-      prioritynode->SetAttribute("name", rpname);
-      csRef<iDocumentNode> levelnode = CreateNode(prioritynode, "level");
-      levelnode->CreateNodeBefore(CS_NODE_TEXT)->SetValueAsInt(i);
-
-      csRef<iDocumentNode> sortnode = CreateNode(prioritynode, "sort");
-      int sorttype = engine->GetRenderPrioritySorting(i);
-      switch(sorttype)
-      {
-        case CS_RENDPRI_SORT_NONE:
-          sortnode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("NONE");
-          break;
-        case CS_RENDPRI_SORT_BACK2FRONT:
-          sortnode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("BACK2FRONT");
-          break;
-        case CS_RENDPRI_SORT_FRONT2BACK:
-          sortnode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("FRONT2BACK");
-          break;
-/*      case CS_RENDPRI_MATERIAL:
-          sortnode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("MATERIAL");
-          break;*/
-      }
-    }
-  }
-
-  return true;
-}
-
-
 bool csSaver::SaveCameraPositions(iDocumentNode *parent)
 {
   csRef<iCameraPositionList> camlist = engine->GetCameraPositions();
@@ -593,6 +568,9 @@ bool csSaver::SaveCameraPositions(iDocumentNode *parent)
   {
     csRef<iCameraPosition> cam = camlist->Get(i);
 		
+    if (curRegion && !curRegion->IsInRegion (cam->QueryObject ()))
+      continue;
+    
     csRef<iDocumentNode> n = CreateNode(parent, "start");
     // Set the name attribute if cam pos has a name
     const char *camname = cam->QueryObject()->GetName();
@@ -639,6 +617,10 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
     csRef<iMeshFactoryWrapper> meshfactwrap = factList->Get(i);
     if (!parentfact && meshfactwrap->GetParentContainer ())
       continue;
+    
+    if (curRegion && !curRegion->IsInRegion (meshfactwrap->QueryObject ()))
+      continue;
+    
     csRef<iMeshObjectFactory>  meshfact = meshfactwrap->GetMeshObjectFactory();
 
     //Create the Tag for the MeshObj
@@ -660,14 +642,18 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
 
     csRef<iDocumentNode> pluginNode = CreateNode(factNode, "plugin");
 
+    // A special case for bruteblock
+    char basepluginname[128] = "";
+    csReplaceAll(basepluginname, pluginname, ".terrain.bruteblock", ".terrain", 128);
+    
     //Add the plugin tag
     char loadername[128] = "";
-    csReplaceAll(loadername, pluginname, ".object.", ".loader.factory.",128);
+    csReplaceAll(loadername, basepluginname, ".object.", ".loader.factory.",128);
 
     pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(GetPluginName (loadername, "Fact"));
 
     char savername[128] = "";
-    csReplaceAll(savername, pluginname, ".object.", ".saver.factory.", 128);
+    csReplaceAll(savername, basepluginname, ".object.", ".saver.factory.", 128);
 
     //Invoke the iSaverPlugin::WriteDown
     csRef<iSaverPlugin> saver = 
@@ -745,6 +731,10 @@ bool csSaver::SaveSectors(iDocumentNode *parent)
   for (int i=0; i<sectorList->GetCount(); i++)
   {
     iSector* sector = sectorList->Get(i);
+    
+    if (curRegion && !curRegion->IsInRegion (sector->QueryObject ()))
+      continue;
+    
     csRef<iDocumentNode> sectorNode = CreateNode(parent, "sector");
     const char* name = sector->QueryObject()->GetName();
     if (name && *name) sectorNode->SetAttribute("name", name);
@@ -758,6 +748,14 @@ bool csSaver::SaveSectors(iDocumentNode *parent)
           ->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(loopName);
     }
 
+    csColor ambient = sector->GetDynamicAmbientLight ();
+    csColor defaultAmbient;
+    engine->GetDefaultAmbientLight (defaultAmbient);
+    if (ambient != defaultAmbient)
+    {
+      synldr->WriteColor (CreateNode (sectorNode, "ambient"), &ambient);
+    }
+    
     // TBD: cullerp, polymesh, node
 
     if (sector->HasFog ())
@@ -783,6 +781,10 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
   for (int i=0; i<meshList->GetCount (); i++)
   {
     iMeshWrapper* meshwrapper = meshList->Get (i);
+    
+    if (curRegion && !curRegion->IsInRegion (meshwrapper->QueryObject ()))
+      continue;
+    
     //Check if it's a portal
     csRef<iPortalContainer> portal = 
       SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iPortalContainer);
@@ -825,14 +827,18 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
       {
         csRef<iDocumentNode> pluginNode = CreateNode(meshNode, "plugin");
 
+        // A special case for bruteblock
+        char basepluginname[128] = "";
+        csReplaceAll(basepluginname, pluginname, ".terrain.bruteblock", ".terrain", 128);
+        
         //Add the plugin tag
         char loadername[128] = "";
-        csReplaceAll(loadername, pluginname, ".object.", ".loader.", 128);
+        csReplaceAll(loadername, basepluginname, ".object.", ".loader.", 128);
 
         pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(GetPluginName (loadername, "Mesh"));
 
         char savername[128] = "";
-        csReplaceAll(savername, pluginname, ".object.", ".saver.", 128);
+        csReplaceAll(savername, basepluginname, ".object.", ".saver.", 128);
 
         //Invoke the iSaverPlugin::WriteDown
         csRef<iSaverPlugin> saver = 
@@ -851,7 +857,9 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
     csZBufMode zmode = meshwrapper->GetZBufMode ();
     synldr->WriteZMode (meshNode, &zmode, false);
 
-    //TBD: write <priority>
+    const char* pname = engine->GetRenderPriorityName (meshwrapper->GetRenderPriority ());
+    if (pname && *pname)
+      CreateNode (meshNode, "priority")->CreateNodeBefore (CS_NODE_TEXT)->SetValue (pname);
     //TBD: write other tags
 
     //Add the transformation tags
@@ -894,6 +902,10 @@ bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
   {
     iMeshWrapper* meshwrapper = meshList[i]->QueryMesh ();
     if (!meshwrapper) continue;
+    
+    if (curRegion && !curRegion->IsInRegion (meshwrapper->QueryObject ()))
+      continue;
+    
     //Check if it's a portal
     csRef<iPortalContainer> portal = 
       SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iPortalContainer);
@@ -935,15 +947,19 @@ bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
       if (pluginname && *pluginname)
       {
         csRef<iDocumentNode> pluginNode = CreateNode(meshNode, "plugin");
-
+        
+        // A special case for bruteblock
+        char basepluginname[128] = "";
+        csReplaceAll(basepluginname, pluginname, ".terrain.bruteblock", ".terrain", 128);
+        
         //Add the plugin tag
         char loadername[128] = "";
-        csReplaceAll(loadername, pluginname, ".object.", ".loader.", 128);
+        csReplaceAll(loadername, basepluginname, ".object.", ".loader.", 128);
 
         pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(GetPluginName (loadername, "Mesh"));
 
         char savername[128] = "";
-        csReplaceAll(savername, pluginname, ".object.", ".saver.", 128);
+        csReplaceAll(savername, basepluginname, ".object.", ".saver.", 128);
 
         //Invoke the iSaverPlugin::WriteDown
         csRef<iSaverPlugin> saver = 
@@ -1039,6 +1055,10 @@ bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
   for (int i=0; i<lightList->GetCount(); i++)
   {
     iLight* light = lightList->Get(i);
+    
+    if (curRegion && !curRegion->IsInRegion (light->QueryObject ()))
+      continue;
+    
     //Create the Tag for the Light
     csRef<iDocumentNode> lightNode = CreateNode(parent, "light");
 
@@ -1136,8 +1156,11 @@ bool csSaver::SaveVariables (iDocumentNode* node)
   iSharedVariableList* vars = engine->GetVariableList();
   for (int x=0; x<vars->GetCount(); x++)
   {
-    csRef<iDocumentNode> variableNode = CreateNode(variablesNode, "variable");
     iSharedVariable* var = vars->Get(x);
+    if (curRegion && !curRegion->IsInRegion (var->QueryObject ()))
+      continue;
+    
+    csRef<iDocumentNode> variableNode = CreateNode(variablesNode, "variable");
     variableNode->SetAttribute("name", var->GetName());
     switch (var->GetType())
     {
@@ -1172,7 +1195,7 @@ bool csSaver::SaveSettings (iDocumentNode* node)
   synldr->WriteBool(settingsNode,"clearzbuf",engine->GetClearZBuf (),
     engine->GetDefaultClearZBuf ());
   synldr->WriteBool(settingsNode,"clearscreen",engine->GetClearScreen (),
-    engine->GetDefaultClearScreen ());
+    engine->GetDefaultClearScreen ());  
 
   csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
     "crystalspace.mesh.object.thing", iMeshObjectType));
@@ -1219,6 +1242,10 @@ bool csSaver::SaveSequence(iDocumentNode* /*parent*/)
   for (int i = 0; i < eseqmgr->GetSequenceCount(); i++)
   {
     iSequenceWrapper* sequence = eseqmgr->GetSequence(i);
+    
+    if (curRegion && !curRegion->IsInRegion (sequence->QueryObject ()))
+      continue;
+    
     csRef<iDocumentNode> sequenceNode = CreateNode(sequencesNode, "sequence");
     const char* name = sequence->QueryObject()->GetName();
     sequenceNode->SetAttribute("name", name);
@@ -1259,6 +1286,10 @@ bool csSaver::SaveTriggers(iDocumentNode* /*parent*/)
   for (int i = 0; i < eseqmgr->GetTriggerCount(); i++)
   {
     iSequenceTrigger* trigger = eseqmgr->GetTrigger(i);
+    
+    if (curRegion && !curRegion->IsInRegion (trigger->QueryObject ()))
+      continue;
+    
     csRef<iDocumentNode> triggerNode = CreateNode(triggersNode, "trigger");
     const char* name = trigger->QueryObject()->GetName();
     triggerNode->SetAttribute("name", name);
@@ -1297,10 +1328,99 @@ bool csSaver::SaveKeys (iDocumentNode* node, iObject* object)
   while (it->HasNext ())
   {
     csRef<iObject> obj = it->Next ();
+    
+    if (curRegion && !curRegion->IsInRegion (obj))
+      continue;
+    
     csRef<iKeyValuePair> key = SCF_QUERY_INTERFACE (obj, iKeyValuePair);
     if (key.IsValid ())
     {
       synldr->WriteKey (CreateNode (node, "key"), key);
+    }
+  }
+  return true;
+}
+
+bool csSaver::SaveLibraryReferences (iDocumentNode* parent)
+{
+  if (!curRegion)
+    return false;
+  
+  csRef<iObjectIterator> it = curRegion->QueryObject ()->GetIterator ();
+  while (it->HasNext ())
+  {
+    csRef<iObject> obj = it->Next ();
+    
+    csRef<iLibraryReference> ref = scfQueryInterface <iLibraryReference> (obj);
+    if (ref.IsValid ())
+    {
+      csRef<iDocumentNode> node = CreateNode (parent, "library");
+      
+      synldr->WriteBool (node, "checkdupes", ref->GetCheckDupes (), false);
+      
+      if (ref->GetPath ())
+      {
+        node->SetAttribute ("file", ref->GetFile ());
+        node->SetAttribute ("path", ref->GetPath ());
+      }
+      else
+      {
+        node->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue (ref->GetFile ());
+      }
+    }
+  }
+  return true;
+}
+
+bool csSaver::SaveAddons (iDocumentNode* parent)
+{
+  csRef<iObjectRegistryIterator> it = object_reg->Get (
+      scfInterfaceTraits<iAddonReference>::GetID (),
+      scfInterfaceTraits<iAddonReference>::GetVersion ());
+  while (it->HasNext ())
+  {
+    iBase* obj = it->Next ();
+    
+    if (!obj)
+      continue;
+    
+    csRef<iAddonReference> addon = scfQueryInterface<iAddonReference> (obj);
+    
+    if (addon.IsValid ())
+    {
+      if (curRegion && !curRegion->IsInRegion (addon->QueryObject ()))
+        continue;
+
+      if (!addon->GetPlugin ())
+        continue;
+
+      csRef<iDocumentNode> node = CreateNode (parent, "addon");
+      
+      if (addon->GetParamsFile ())
+      {
+        CreateValueNode(node, "plugin", addon->GetPlugin ()); 
+        CreateValueNode(node, "paramsfile", addon->GetParamsFile ());
+      }
+      else if (addon->GetAddonObject ())
+      {
+        csRef<iDocumentNode> pluginNode = CreateValueNode(node, "plugin",
+          addon->GetPlugin ());
+
+        const char* pluginname = addon->GetPlugin ();
+        
+        char savername[128] = "";
+        csReplaceAll(savername, pluginname, ".loader", ".saver", 128);
+
+        //Invoke the iSaverPlugin::WriteDown
+        csRef<iSaverPlugin> saver = 
+          CS_QUERY_PLUGIN_CLASS(plugin_mgr, savername, iSaverPlugin);
+          
+        if (!saver) 
+          saver = CS_LOAD_PLUGIN(plugin_mgr, savername, iSaverPlugin);
+          
+        if (saver)
+          saver->WriteDown(addon->GetAddonObject (), node, 0/**ssource*/);
+      }
     }
   }
   return true;
@@ -1344,14 +1464,17 @@ bool csSaver::SaveMapFile(csRef<iDocumentNode> &root)
   csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   parent->SetValue("world");
 
+  curRegion = 0;
+  fileType = CS_SAVER_FILE_WORLD;
+  
   if (!SaveTextures(parent)) return false;
   if (!SaveVariables(parent)) return false;
   if (!SaveKeys (parent, engine->QueryObject ())) return false;
   if (!SaveShaders(parent)) return false;
   if (!SaveMaterials(parent)) return false;
   if (!SaveSettings(parent)) return false;
-  if (!SaveRenderPriorities(parent)) return false;
   if (!SaveCameraPositions (parent)) return false;
+  if (!SaveAddons(parent)) return false;
   if (!SaveMeshFactories(engine->GetMeshFactories(), parent)) return false;
   if (!SaveSectors(parent)) return false;
   if (!SaveSequence(parent)) return false;
@@ -1360,3 +1483,117 @@ bool csSaver::SaveMapFile(csRef<iDocumentNode> &root)
 
   return true;
 }
+
+bool csSaver::SaveAllRegions()
+{
+  // Get list of regions
+  iRegionList* regions = engine->GetRegions ();
+  for (int i = 0; i < regions->GetCount (); i++)
+  {
+    iRegion* region = regions->Get (i);
+    
+    // Get the attached iSaverFile
+    iObject* obj = region->QueryObject ()->GetChild (
+      scfInterfaceTraits<iSaverFile>::GetID (),
+      scfInterfaceTraits<iSaverFile>::GetVersion ());
+    csRef<iSaverFile> saverFile = scfQueryInterface<iSaverFile> (obj);
+    
+    SaveRegionFile (region, saverFile->GetFile (), saverFile->GetFileType ());
+  }
+  
+  return true;
+}
+
+csRef<iString> csSaver::SaveRegion(iRegion* region, int filetype)
+{
+  csRef<iDocumentSystem> xml = 
+    csPtr<iDocumentSystem>(new csTinyDocumentSystem());
+  csRef<iDocument> doc = xml->CreateDocument();
+  csRef<iDocumentNode> root = doc->CreateRoot();
+  
+  if (!SaveRegion (region, filetype, root))
+    return 0;
+
+  iString* str = new scfString();
+  if (doc->Write(str) != 0)
+  {
+    delete str;
+    return 0;
+  }
+
+  return csPtr<iString>(str);
+}
+
+bool csSaver::SaveRegion(iRegion* region, int type, csRef<iDocumentNode>& root)
+{
+  if (!region)
+    return false;
+  
+  plugins.DeleteAll (); // Clear plugin list
+  
+  curRegion = region;
+  fileType = type;
+  
+  // @@@: Support saving meshfact and params files
+  if (fileType == CS_SAVER_FILE_MESHFACT || fileType == CS_SAVER_FILE_PARAMS)
+    return false;
+  
+  const char* nodeName = 0;
+  switch (fileType)
+  {
+  case CS_SAVER_FILE_WORLD:
+    nodeName = "world";
+    break;
+  case CS_SAVER_FILE_LIBRARY:
+    nodeName = "library";
+    break;
+  case CS_SAVER_FILE_MESHFACT:
+    nodeName = "meshfact";
+    break;
+  case CS_SAVER_FILE_PARAMS:
+    nodeName = "params";
+    break;
+  default:
+    nodeName = "world";
+    break;
+  }
+  
+  csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  parent->SetValue(nodeName);
+  
+  if (!SaveTextures(parent)) return false;
+  if (!SaveVariables(parent)) return false;
+  if (!SaveKeys (parent, engine->QueryObject ())) return false;
+  if (!SaveShaders(parent)) return false;
+  if (!SaveMaterials(parent)) return false;
+  
+  if (fileType == CS_SAVER_FILE_WORLD)
+    if (!SaveSettings(parent)) return false;
+  
+  if (!SaveLibraryReferences(parent)) return false;
+  if (!SaveCameraPositions (parent)) return false;
+  if (!SaveAddons(parent)) return false;
+  if (!SaveMeshFactories(engine->GetMeshFactories(), parent)) return false;
+  
+  if (fileType == CS_SAVER_FILE_WORLD)
+    if (!SaveSectors(parent)) return false;
+  
+  if (!SaveSequence(parent)) return false;
+  if (!SaveTriggers(parent)) return false;
+  if (!SavePlugins(parent)) return false;
+  
+  return true;
+}
+
+bool csSaver::SaveRegionFile(iRegion* region, const char* file, int filetype)
+{
+  csRef<iVFS> vfs(CS_QUERY_REGISTRY(object_reg, iVFS));
+  CS_ASSERT(vfs.IsValid());
+  
+  csRef<iString> str(SaveRegion(region, filetype));
+  if (!str)
+    return 0;
+
+  return vfs->WriteFile(file, str->GetData(), str->Length());
+}
+

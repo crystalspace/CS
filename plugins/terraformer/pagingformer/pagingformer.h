@@ -22,7 +22,9 @@
 
 #include "csgeom/box.h"
 #include "csgeom/vector3.h"
+#include "csutil/csobject.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 
 #include "iutil/comp.h"
 #include "ivaria/terraform.h"
@@ -38,7 +40,12 @@ class csSimpleFormer;
  * This is a simple implementation of a terraformer plugin.
  * It only handles a single heightmap
  */
-class csPagingFormer : public iTerraFormer
+class csPagingFormer :
+  public scfImplementationExt3<csPagingFormer,
+                            csObject,
+                            iTerraFormer,
+                            iPagingFormerState,
+                            iComponent>
 {
 private:
   /// Object registry pointer (not csRef to avoid cyclic references)
@@ -177,7 +184,9 @@ public:
    */ 
   virtual bool SampleInteger (csStringID type, float x, float z, 
     int &value);
-
+  
+  virtual iObject *QueryObject () { return (csObject*)this; }
+  
 
   // ------------- iComponent implementation -------------
 
@@ -199,7 +208,8 @@ public:
  * This is the accompanying sampler implementation, that pretty much just
  * returns data straight from the heightmap.
  */
-class csPagingSampler : public iTerraSampler
+class csPagingSampler : public scfImplementation1<csPagingSampler, 
+                                                  iTerraSampler>
 {
 private:
   csPagingFormer* terraFormer;

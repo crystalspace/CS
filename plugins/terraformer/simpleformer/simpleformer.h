@@ -22,6 +22,7 @@
 
 #include "csgeom/box.h"
 #include "csgeom/vector3.h"
+#include "csutil/csobject.h"
 #include "csutil/scf_implementation.h"
 
 #include "iutil/comp.h"
@@ -60,8 +61,9 @@ struct csFloatMap
  * It only handles a single heightmap
  */
 class csSimpleFormer : 
-  public scfImplementation3<csSimpleFormer, 
-                            iTerraFormer, 
+  public scfImplementationExt3<csSimpleFormer,
+                            csObject,
+                            iTerraFormer,
                             iSimpleFormerState,
                             iComponent>
 {
@@ -168,7 +170,8 @@ public:
   virtual bool SampleInteger (csStringID type, float x, float z, 
     int &value);
 
-
+  virtual iObject *QueryObject () { return this; }
+  
   // ------------- iComponent implementation -------------
 
   /// Initializes this object

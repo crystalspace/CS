@@ -20,6 +20,8 @@
 #define __CS_CSSAVER_H__
 
 #include "imap/saver.h"
+#include "imap/saverfile.h"
+#include "imap/saverref.h"
 #include "csutil/ref.h"
 #include "iengine/engine.h"
 #include "iutil/comp.h"
@@ -38,6 +40,8 @@ class csSaver : public iSaver
   csRef<iPluginManager> plugin_mgr;
   csHash<csStrKey, csStrKey> plugins;
   csRef<iDocumentNode> before;
+  iRegion* curRegion;
+  int fileType;
 
 public:
   SCF_DECLARE_IBASE;
@@ -56,8 +60,9 @@ public:
   bool SavePlugins (iDocumentNode* parent);
 
   bool SaveCameraPositions(iDocumentNode *parent);
+  bool SaveLibraryReferences(iDocumentNode *parent);
+  bool SaveAddons(iDocumentNode *parent);
   bool SaveMaterials(iDocumentNode *parent);
-  bool SaveRenderPriorities(iDocumentNode* node);
   bool SaveSettings(iDocumentNode* node);
   bool SaveSectors(iDocumentNode *parent);
   bool SaveSequence(iDocumentNode *parent);
@@ -79,6 +84,12 @@ public:
   virtual csRef<iString> SaveMapFile();
   virtual bool SaveMapFile(const char *filename);
   virtual bool SaveMapFile(csRef<iDocumentNode> &root);
+  virtual bool SaveAllRegions();
+  virtual bool SaveRegionFile(iRegion* region, const char* filename,
+    int filetype);
+  virtual csRef<iString> SaveRegion(iRegion* region, int filetype);
+  virtual bool SaveRegion(iRegion* region, int filetype,
+    csRef<iDocumentNode>& root);
 
   struct eiComponent : public iComponent
   {

@@ -105,6 +105,7 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
       {
         const char *name = child->GetContentsValue ();
         objreg->Register (former, name);
+        former->QueryObject ()->SetName (name);
         break;
       }
       case XMLTOKEN_HEIGHTMAP: 

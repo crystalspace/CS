@@ -17,6 +17,40 @@ chronological order.
 	  destalphaadd only if using projection.
 	- iceeey again changed parallax shader mixmode to be srcalphaadd
 	  mixmode by default so it supports transparency.
+	- iceeey added autoRegions flag to the loader. This makes the loader
+	  create a new region for the contents of each library file it loads
+	  with the name of the filename. Set it using
+	  iLoader::SetAutoRegions(true).
+	- iceeey added iSaverFile which stores the filename and filetype
+	  (world, library, etc) of a file.
+	- iceeey added iSaver::SaveAllRegions() function to save all loaded
+	  regions to their respective files. It will look for the iSaverFile
+	  attached to each iRegion's iObject. If the saveable flag is set,
+	  these will be created automatically by the loader.
+	- iceeey implemented saving regions in cssaver. SaveRegionFile() will
+	  save the contents of a region to a file.
+	- iceeey removed saving renderpriorities from cssaver since they are no
+	  longer supported in world files.
+	- iceeey made cssaver save the priority for mesh objects and also save
+	  sector ambient.
+	- iceeey implemented terrain mesh factory and object savers.
+	- iceeey made terrain object store materialmap info for the saver.
+	  Alphamaps are not supported.
+	- iceeey added a special case in cssaver for saving bruteblock meshes
+	  to use the crystalspace...terrain.saver rather than the
+	  crystalspace...terrain.bruteblock.saver which does not exist.
+	- iceeey added iLibraryReference and iAddonReference interfaces.
+	  These store references to libraries (<library>somelibrary</library>)
+	  and addons respectively.
+	  Addons can now be saved if they implement the iSaverPlugin interface.
+	  The plugin name of the saver corresponds to the plugin name of the
+	  loader but instead of ending in .loader, ends in .saver
+	  (crystalspace.renderloop.loop.loader is saved with
+	  crystalspace.renderloop.loop.saver).
+	- iceeey made terraformers implement iObject. This is so the object
+	  name can be accessed easily and so they can be associated with
+	  iRegions for use in the saver.
+	- iceeey converted pagingformer to new SCF.
 1-Mar-2006
 	- res added a memory handler for csArray<> that keeps a local buffer.
 	  So if the array is small enough and fits into that buffer, a heap

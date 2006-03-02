@@ -38,7 +38,7 @@ struct iTerraFormer;
 class csBox2;
 class csTransform;
 
-SCF_VERSION (iTerrainObjectState, 0, 1, 0);
+SCF_VERSION (iTerrainObjectState, 0, 1, 1);
 
 /**
  * This will override the settings for material in the parent
@@ -130,6 +130,20 @@ struct iTerrainObjectState : public iBase
    * Retrieve whether shadow casting is enabled.
    */
   virtual bool GetCastShadows () = 0;
+  
+  /**
+   * Set the name of the materalmap file, the width, height, and if it is raw
+   * or a plain image file.
+   */
+  virtual void SetMaterialMapFile (const char* file, int width, int height,
+    bool raw = false) = 0;
+  
+  /**
+   * Get the name of the materalmap file, the width, height, and if it is raw
+   * or a plain image file.
+   */
+  virtual const char* GetMaterialMapFile (int& width, int& height,
+    bool& raw) = 0;
 };
 
 SCF_VERSION (iTerrainFactoryState, 0, 0, 1);

@@ -58,7 +58,7 @@ struct iLoaderStatus : public iBase
   virtual bool IsError () = 0;
 };
 
-SCF_VERSION (iLoader, 0, 0, 8);
+SCF_VERSION (iLoader, 0, 0, 9);
 
 /**
  * This interface represents the map loader.
@@ -467,6 +467,16 @@ struct iLoader : public iBase
    * Load a shader from a file.
    */
   virtual bool LoadShader (const char* filename) = 0;
+  
+  /**
+   * Set whether to load each file into a separate region.
+   */
+  virtual void SetAutoRegions (bool autoRegions) = 0;
+  
+  /**
+   * Get whether to load each file into a separate region.
+   */
+  virtual bool GetAutoRegions () = 0;
 };
 
 /** @} */

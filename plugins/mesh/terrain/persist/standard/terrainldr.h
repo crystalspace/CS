@@ -70,6 +70,7 @@ class csTerrainFactorySaver : public iSaverPlugin
 {
 private:
   iObjectRegistry* object_reg;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -141,6 +142,7 @@ class csTerrainObjectSaver : public iSaverPlugin
 {
 private:
   iObjectRegistry* object_reg;
+  csRef<iSyntaxService> synldr;
 
 public:
   SCF_DECLARE_IBASE;

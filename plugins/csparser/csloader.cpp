@@ -30,12 +30,15 @@
 #include "cstool/gentrtex.h"
 #include "cstool/keyval.h"
 #include "cstool/mapnode.h"
+#include "cstool/saverfile.h"
+#include "cstool/saverref.h"
 #include "cstool/vfsdirchange.h"
 #include "csloader.h"
 
 #include "iutil/databuff.h"
 #include "iutil/document.h"
 #include "imap/reader.h"
+#include "imap/saverfile.h"
 #include "imap/ldrctxt.h"
 #include "imap/modelload.h"
 #include "imesh/lighting.h"
@@ -742,6 +745,7 @@ bool csLoader::Load (const char* fname, iBase*& result, iRegion* region,
     	      "Could not open map file '%s' on VFS!", fname);
     return false;
   }
+  
   return Load (buf, fname, result, region, curRegOnly, checkDupes, ssource,
   	override_name);
 }
@@ -864,6 +868,14 @@ bool csLoader::LoadMapFile (const char* file, bool clearEngine,
         world_node, "Expected 'world' token!");
       return false;
     }
+    
+    if (Engine->GetSaveableFlag () && region)
+    {
+      csRef<iSaverFile> saverFile;
+      saverFile.AttachNew (new csSaverFile (file, CS_SAVER_FILE_WORLD));
+      region->QueryObject ()->ObjAdd (saverFile->QueryObject ());
+    }
+    
     return LoadMap (world_node, clearEngine, region, curRegOnly, checkdupes,
     	ssource);
   }
@@ -904,6 +916,18 @@ bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
 	      "crystalspace.maploader.parse.library",
     	      "Could not open library file '%s' on VFS!", fname);
     return false;
+  }
+  
+  if (autoRegions)
+  {
+    region = Engine->CreateRegion (fname);
+  }
+  
+  if (Engine->GetSaveableFlag () && region)
+  {
+    csRef<iSaverFile> saverFile;
+    saverFile.AttachNew (new csSaverFile (fname, CS_SAVER_FILE_LIBRARY));
+    region->QueryObject ()->ObjAdd (saverFile->QueryObject ());
   }
 
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
@@ -1104,6 +1128,7 @@ csLoader::csLoader (iBase *p)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   object_reg = 0;
   do_verbose = false;
+  autoRegions = false;
 }
 
 csLoader::~csLoader()
@@ -1384,6 +1409,7 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
     else
       dupes = false;
   }
+  
   const char* file = child->GetAttributeValue ("file");
   if (file)
   {
@@ -1393,6 +1419,14 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
       vfs->PushDir ();
       vfs->ChDir (path);
     }
+    
+    if (Engine->GetSaveableFlag ())
+    {
+      csRef<iLibraryReference> libraryRef;
+      libraryRef.AttachNew (new csLibraryReference (file, path, dupes));
+      AddToRegion (ldr_context, libraryRef->QueryObject ());
+    }
+    
     bool rc = LoadLibraryFile (file,
 	  	  ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
 		  dupes, ssource);
@@ -1405,6 +1439,14 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
   }
   else
   {
+    if (Engine->GetSaveableFlag ())
+    {
+      csRef<iLibraryReference> libraryRef;
+      libraryRef.AttachNew (new csLibraryReference (
+          child->GetContentsValue (), 0, dupes));
+      AddToRegion (ldr_context, libraryRef->QueryObject ());
+    }
+    
     if (!LoadLibraryFile (child->GetContentsValue (),
 	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
 		ldr_context->CheckDupes (), ssource))
@@ -1423,7 +1465,7 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode,
 	  libnode, "No engine present while in LoadLibrary!");
     return false;
   }
- 
+  
   csRef<iDocumentNode> sequences;
   csRef<iDocumentNode> triggers;
 
@@ -3886,6 +3928,15 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
     }
     csRef<iBase> rc = plug->Parse (node, ssource, ldr_context, context);
     if (!rc) return false;
+    
+    if (Engine->GetSaveableFlag ())
+    {
+      csRef<iAddonReference> addon;
+      addon.AttachNew (new csAddonReference (plugin_name, 0, rc));
+      object_reg->Register (addon);
+      AddToRegion (ldr_context, addon->QueryObject ());
+    }
+    
     return true;
   }
   else
@@ -3913,7 +3964,16 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	  {
 	    csRef<iBase> rc = plug->Parse (child, ssource, ldr_context,
 	    	context);
+      
 	    if (!rc) return false;
+      
+      if (Engine->GetSaveableFlag ())
+      {
+        csRef<iAddonReference> addon;
+        addon.AttachNew (new csAddonReference (plugin_name, 0, rc));
+        object_reg->Register (addon);
+        AddToRegion (ldr_context, addon->QueryObject ());
+      }
 	  }
           break;
 
@@ -3945,28 +4005,39 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	      return false;
 	    }
 	    bool rc;
+      csRef<iBase> ret;
 	    if (plug)
 	    {
-	      csRef<iBase> ret (LoadStructuredMap (ldr_context,
-	    	  plug, buf, 0, fname, ssource));
+	      ret = LoadStructuredMap (ldr_context,
+	    	  plug, buf, 0, fname, ssource);
 	      rc = (ret != 0);
 	    }
 	    else
 	    {
 	      csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
-	      csRef<iBase> ret = binplug->Parse (dbuf,
+	      ret = binplug->Parse (dbuf,
 	  	  ssource, ldr_context, 0);
 	      rc = (ret != 0);
 	    }
+      
 	    if (!rc)
 	      return false;
+      
+      if (Engine->GetSaveableFlag ())
+      {
+        csRef<iAddonReference> addon;
+        addon.AttachNew (new csAddonReference (plugin_name, fname, ret));
+        object_reg->Register (addon);
+        AddToRegion (ldr_context, addon->QueryObject ());
+      }
 	  }
           break;
 
         case XMLTOKEN_PLUGIN:
 	  {
 	    iDocumentNode* defaults = 0;
-	    if (!loaded_plugins.FindPlugin (child->GetContentsValue (),
+      plugin_name = child->GetContentsValue ();
+	    if (!loaded_plugins.FindPlugin (plugin_name,
 		  plug, binplug, defaults))
 	    {
 	      if (!is_meta)

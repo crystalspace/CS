@@ -27,8 +27,9 @@
 
 struct iDocumentNode;
 struct iString;
+struct iRegion;
 
-SCF_VERSION (iSaver, 0, 0, 3);
+SCF_VERSION (iSaver, 0, 0, 4);
 
 /**
  * This interface is used to serialize the engine
@@ -42,6 +43,23 @@ struct iSaver : public iBase
   virtual csRef<iString> SaveMapFile() = 0;
   /// Save map to DocumentNode
   virtual bool SaveMapFile(csRef<iDocumentNode> &root) = 0;
+  
+  /**
+   * Save all regions to their respective files.
+   * Regions that do not have any iSaverFile attached will not be saved.
+   */
+  virtual bool SaveAllRegions() = 0;
+  
+  /// Save a region to the file attached to it using iSaverFile.
+  virtual bool SaveRegionFile(iRegion* region, const char* filename,
+    int filetype) = 0;
+  
+  /// Return the region contents as a string.
+  virtual csRef<iString> SaveRegion(iRegion* region, int filetype) = 0;
+  
+  /// Save region to DocumentNode
+  virtual bool SaveRegion(iRegion* region, int filetype,
+    csRef<iDocumentNode>& root) = 0;
 };
 
 #endif // __CS_IMAP_SAVER_H__

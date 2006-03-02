@@ -1970,6 +1970,24 @@ bool csTerrainObject::SetMaterialMap (iImage* map)
   return SetMaterialMap (image_data, map->GetWidth(), map->GetHeight());
 }
 
+void csTerrainObject::SetMaterialMapFile (const char* file, int width,
+  int height, bool raw)
+{
+  materialMapFile = file;
+  materialMapW = width;
+  materialMapH = height;
+  materialMapRaw = raw;
+}
+
+const char* csTerrainObject::GetMaterialMapFile (int& width, int& height,
+  bool& raw)
+{
+  width = materialMapW;
+  height = materialMapH;
+  raw = materialMapRaw;
+  return materialMapFile;
+}
+
 bool csTerrainObject::SetLODValue (const char* parameter, float value)
 {
   if (strcmp (parameter, "splatting distance") == 0)

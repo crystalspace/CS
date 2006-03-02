@@ -38,7 +38,7 @@ SCF_VERSION (iPagingFormerState, 0, 0, 1);
  * iPagingFormerState exposes implementation specific methods
  * for the PagingTerraformer plugin
  */
-struct iPagingFormerState : public iBase
+struct iPagingFormerState : public virtual iBase
 {
   /**
    * Set a dir that contains only the heightmaps named x0y0 and so on.

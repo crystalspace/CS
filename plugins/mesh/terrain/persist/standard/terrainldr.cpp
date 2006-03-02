@@ -20,6 +20,7 @@
 
 #include "csutil/cscolor.h"
 #include "csutil/sysfunc.h"
+#include "csutil/stringarray.h"
 #include "csutil/refarr.h"
 
 #include "iengine/material.h"
@@ -31,6 +32,7 @@
 #include "imesh/terrain.h"
 #include "iutil/comp.h"
 #include "iutil/document.h"
+#include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
@@ -201,19 +203,56 @@ csTerrainFactorySaver::~csTerrainFactorySaver ()
 bool csTerrainFactorySaver::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-//TBD
-bool csTerrainFactorySaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
+
+bool csTerrainFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
 	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for terrain mesh");
-  paramsNode=0;
+  
+  if (obj)
+  {
+    csRef<iTerrainFactoryState> tfact = 
+      SCF_QUERY_INTERFACE (obj, iTerrainFactoryState);
+    csRef<iMeshObjectFactory> meshfact = 
+      SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+    if (!tfact) return false;
+    if (!meshfact) return false;
+    
+    // Write plugin
+    csRef<iDocumentNode> pluginNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    pluginNode->SetValue("plugin");
+    
+    csRef<iFactory> factory = 
+      SCF_QUERY_INTERFACE(meshfact->GetMeshObjectType(), iFactory);
+    const char* pluginname = factory->QueryClassID();
+    if (!(pluginname && *pluginname)) return false;
+    
+    pluginNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue (pluginname);
+    
+    // Write terraformer
+    csRef<iDocumentNode> terraFormerNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    terraFormerNode->SetValue("terraformer");
+    
+    const char* terraformer = tfact->GetTerraFormer ()->QueryObject ()->GetName ();
+    terraFormerNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue (terraformer);
+    
+    // Write sampleregion
+    csRef<iDocumentNode> sampleRegionNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    sampleRegionNode->SetValue("sampleregion");
+    
+    csBox2 box = tfact->GetSamplerRegion ();
+    csBox3 box3 (box.MinX(), box.MinY(), 0, box.MaxX(), box.MaxY(), 0);
+    synldr->WriteBox (sampleRegionNode, &box3);
+  }
   
   return true;
 }
@@ -373,6 +412,8 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
             return 0;
           }
           state->SetMaterialMap (map);
+          state->SetMaterialMapFile (imagefile, map->GetWidth (),
+            map->GetHeight ());
         }
         else if (arrayfile != 0 && width != 0 && height != 0) 
         {
@@ -391,6 +432,8 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
             file->Read (&array.GetExtend (index++), sizeof (char));
           }
           state->SetMaterialMap (array, width, height);
+          state->SetMaterialMapFile (arrayfile, width,
+            height, true);
         }
         else
         {
@@ -548,19 +591,141 @@ csTerrainObjectSaver::~csTerrainObjectSaver ()
 bool csTerrainObjectSaver::Initialize (iObjectRegistry *objreg)
 {
   object_reg = objreg;
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
   return true;
 }
-//TBD
-bool csTerrainObjectSaver::WriteDown (iBase* /*obj*/, iDocumentNode* parent,
+
+bool csTerrainObjectSaver::WriteDown (iBase* obj, iDocumentNode* parent,
 	iStreamSource*)
 {
   if (!parent) return false; //you never know...
   
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
-  paramsNode->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
-    ("iSaverPlugin not yet supported for terrain mesh");
-  paramsNode=0;
+  
+  if (obj)
+  {
+    csRef<iTerrainObjectState> tmesh = 
+      SCF_QUERY_INTERFACE (obj, iTerrainObjectState);
+    csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+    if (!tmesh) return false;
+    if (!mesh) return false;
+
+    //Writedown Factory tag
+    iMeshFactoryWrapper* fact = mesh->GetFactory()->GetMeshFactoryWrapper ();
+    if (fact)
+    {
+      const char* factname = fact->QueryObject()->GetName();
+      if (factname && *factname)
+      {
+        csRef<iDocumentNode> factNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        factNode->SetValue("factory");
+        factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
+      }    
+    }
+
+    //Writedown castshadow tag
+    if (!tmesh->GetCastShadows())
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("castshadows");
+
+    //Writedown staticlighting tag
+    if (!tmesh->GetStaticLighting())
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
+        ->SetValue("staticlighting");
+
+    //Writedown Color tag
+    csColor col;
+    if (mesh->GetColor(col))
+    {
+      csRef<iDocumentNode> colorNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      colorNode->SetValue("color");
+      synldr->WriteColor(colorNode, &col);
+    }
+
+    //Writedown Material tag
+    iMaterialWrapper* mat = mesh->GetMaterialWrapper();
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = 
+          matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }    
+    }
+    
+    // Write materialpalette
+    csArray<iMaterialWrapper*> matpalette = tmesh->GetMaterialPalette ();
+    csRef<iDocumentNode> matpaletteNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    matpaletteNode->SetValue ("materialpalette");
+    for (size_t i = 0; i < matpalette.GetSize(); i++)
+    {
+      if (matpalette[i])
+      {
+        const char* matname = matpalette[i]->QueryObject ()->GetName ();;
+        
+        csRef<iDocumentNode> matNode =
+          matpaletteNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = 
+          matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }
+    }
+    
+    // Write lodvalues
+    csStringArray lodparams;
+    lodparams.Push ("splatting distance");
+    lodparams.Push ("block resolution");
+    lodparams.Push ("block split distance");
+    lodparams.Push ("minimum block size");
+    lodparams.Push ("cd resolution");
+    lodparams.Push ("cd lod cost");
+    lodparams.Push ("lightmap resolution");
+    
+    for (size_t i = 0; i < lodparams.GetSize(); i++)
+    {
+      float value = tmesh->GetLODValue (lodparams[i]);
+      
+      csRef<iDocumentNode> lodvalueNode =
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      lodvalueNode->SetValue("lodvalue");
+      
+      lodvalueNode->SetAttribute ("name", lodparams[i]);
+      
+      csRef<iDocumentNode> lodvalueValueNode = 
+        lodvalueNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+      lodvalueValueNode->SetValueAsFloat(value);
+    }
+    
+    // Write materialmap
+    int matmapW, matmapH;
+    bool raw;
+    const char* matmapFile = tmesh->GetMaterialMapFile (matmapW, matmapH, raw);
+    if (matmapFile)
+    {
+      csRef<iDocumentNode> matmapNode =
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      matmapNode->SetValue("materialmap");
+      if (raw)
+      {
+        matmapNode->SetAttribute ("raw", matmapFile);
+        matmapNode->SetAttributeAsInt ("width", matmapW);
+        matmapNode->SetAttributeAsInt ("height", matmapH);
+      }
+      else
+      {
+        matmapNode->SetAttribute ("image", matmapFile);
+      }
+    }
+  }
   
   return true;
 }

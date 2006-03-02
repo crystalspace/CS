@@ -200,6 +200,9 @@ private:
   /// Pointer to built-in checkerboard texture loader.
   csRef<iLoaderPlugin> BuiltinCheckerTexLoader;
 
+  /// Auto regions flag
+  bool autoRegions;
+  
   //Returns in the 'meshesArray' array all the meshes encountered walking thru
   //the hierarchy of meshes starting from 'meshWrapper'.
   void CollectAllChildren (iMeshWrapper* meshWrapper, csRefArray<iMeshWrapper>&
@@ -620,6 +623,16 @@ public:
   	bool curRegOnly, bool checkDupes, iStreamSource* ssource,
 	const char* override_name);
 
+  virtual void SetAutoRegions (bool autoRegions)
+  {
+    csLoader::autoRegions = autoRegions;
+  }
+  
+  virtual bool GetAutoRegions ()
+  {
+    return autoRegions;
+  }
+  
   virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname,
   	iStreamSource* ssource);
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname,

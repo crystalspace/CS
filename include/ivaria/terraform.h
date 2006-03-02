@@ -26,6 +26,7 @@
 #include "csutil/scf.h"
 #include "csutil/strset.h"
 
+struct iObject;
 struct iMaterialWrapper;
 struct iTerraSampler;
 
@@ -39,7 +40,7 @@ class csVector3;
  */
 struct iTerraFormer : public virtual iBase
 {
-  SCF_INTERFACE (iTerraFormer, 1, 0, 0);
+  SCF_INTERFACE (iTerraFormer, 1, 0, 1);
 
   /**
    * Get a sampler region from the terraformer. The sampler region will
@@ -83,6 +84,11 @@ struct iTerraFormer : public virtual iBase
    */
   virtual bool SampleInteger (csStringID type, float x, float z, 
     int &value) = 0;
+  
+  /**
+   * Get the iObject for this interface.
+   */
+  virtual iObject* QueryObject () = 0;
 };
 
 

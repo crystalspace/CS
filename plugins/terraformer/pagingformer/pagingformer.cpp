@@ -35,31 +35,13 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csPagingFormer)
-  SCF_IMPLEMENTS_INTERFACE (iTerraFormer)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPagingFormerState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPagingFormer::PagingFormerState)
-  SCF_IMPLEMENTS_INTERFACE (iPagingFormerState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPagingFormer::Component)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csPagingFormer)
 
 #define PAGING_MAX_FORMERS 16
 
 csPagingFormer::csPagingFormer (iBase* parent)
+  : scfImplementationType (this, parent)
 {
-  // Construct iBases
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPagingFormerState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-
   // Initialize members
   objectRegistry = 0;
 
@@ -72,11 +54,6 @@ csPagingFormer::~csPagingFormer ()
 {
   // Delete allocated data
   former = 0;
-	
-  // Destruct iBases
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiPagingFormerState);
-  SCF_DESTRUCT_IBASE();
 }
 
 
@@ -406,15 +383,11 @@ float z,
 //////////////////////////////////////////////////////////////////////////
 
 
-SCF_IMPLEMENT_IBASE (csPagingSampler)
-  SCF_IMPLEMENTS_INTERFACE (iTerraSampler)
-SCF_IMPLEMENT_IBASE_END
-
 csPagingSampler::csPagingSampler (csPagingFormer* former,
  csRefArray<iTerraSampler> sampler, uint xcount, 
                                   csBox2 region, unsigned int resolution)
+ : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (former);
   // Initialize members
   csPagingSampler::terraFormer = former;
   csPagingSampler::sampler = sampler;
@@ -433,7 +406,6 @@ csPagingSampler::~csPagingSampler ()
 {
   // Do a cleanup
   Cleanup ();
-  SCF_DESTRUCT_IBASE ();
 }
 
 
