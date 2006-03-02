@@ -7,7 +7,7 @@
       <?if vars."light 0 type".int == 2 ?>
         <destalphaadd />
       <?else?>
-        <add />
+        <srcalphaadd />
       <?endif?>
       </mixmode>
       <buffer source="normal" destination="normal" />
