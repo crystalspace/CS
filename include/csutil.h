@@ -93,6 +93,7 @@
 #include "csutil/pooledscfclass.h"
 #include "csutil/prfxcfg.h"
 #include "csutil/profile.h"
+#include "csutil/ptrwrap.h"
 #include "csutil/radixsort.h"
 #include "csutil/randomgen.h"
 #include "csutil/redblacktree.h"
