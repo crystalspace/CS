@@ -10,6 +10,8 @@ chronological order.
 	- Fossi commited another backup of the paging terrain.
 	- Fossi copied priority 50 to terrain_fixed_base, so that terrain
 	  does at least show on old hardware.
+	- Jorrit fixed iObjectRegistryIterator so that it doesn't skip the
+	  first element.
 1-Mar-2006
 	- res added a memory handler for csArray<> that keeps a local buffer.
 	  So if the array is small enough and fits into that buffer, a heap

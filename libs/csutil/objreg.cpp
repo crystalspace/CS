@@ -91,8 +91,8 @@ bool csObjectRegistryIterator::HasNext ()
 iBase* csObjectRegistryIterator::Next ()
 {
   cur_idx++;
-  if (cur_idx >= objects.Length ()) return 0;
-  return objects[cur_idx];
+  if (cur_idx > objects.Length ()) return 0;
+  return objects[cur_idx-1];
 }
 
 void csObjectRegistryIterator::Add (iBase* obj, char const* tag)
