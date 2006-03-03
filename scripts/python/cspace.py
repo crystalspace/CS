@@ -6715,6 +6715,8 @@ class iTerrainObjectState(iBase):
     def GetStaticLighting(*args): return _cspace.iTerrainObjectState_GetStaticLighting(*args)
     def SetCastShadows(*args): return _cspace.iTerrainObjectState_SetCastShadows(*args)
     def GetCastShadows(*args): return _cspace.iTerrainObjectState_GetCastShadows(*args)
+    def SetMaterialMapFile(*args): return _cspace.iTerrainObjectState_SetMaterialMapFile(*args)
+    def GetMaterialMapFile(*args): return _cspace.iTerrainObjectState_GetMaterialMapFile(*args)
     def __del__(self, destroy=_cspace.delete_iTerrainObjectState):
         try:
             if self.thisown: destroy(self)
@@ -6814,6 +6816,8 @@ class iLoader(iBase):
     def LoadMeshObject(*args): return _cspace.iLoader_LoadMeshObject(*args)
     def Load(*args): return _cspace.iLoader_Load(*args)
     def LoadShader(*args): return _cspace.iLoader_LoadShader(*args)
+    def SetAutoRegions(*args): return _cspace.iLoader_SetAutoRegions(*args)
+    def GetAutoRegions(*args): return _cspace.iLoader_GetAutoRegions(*args)
     def __del__(self, destroy=_cspace.delete_iLoader):
         try:
             if self.thisown: destroy(self)
@@ -6898,6 +6902,9 @@ class iSaver(iBase):
     def __repr__(self):
         return "<%s.%s; proxy of C++ iSaver instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def SaveMapFile(*args): return _cspace.iSaver_SaveMapFile(*args)
+    def SaveAllRegions(*args): return _cspace.iSaver_SaveAllRegions(*args)
+    def SaveRegionFile(*args): return _cspace.iSaver_SaveRegionFile(*args)
+    def SaveRegion(*args): return _cspace.iSaver_SaveRegion(*args)
     def __del__(self, destroy=_cspace.delete_iSaver):
         try:
             if self.thisown: destroy(self)
@@ -12415,6 +12422,7 @@ class iTerraFormer(iBase):
     def SampleVector2(*args): return _cspace.iTerraFormer_SampleVector2(*args)
     def SampleVector3(*args): return _cspace.iTerraFormer_SampleVector3(*args)
     def SampleInteger(*args): return _cspace.iTerraFormer_SampleInteger(*args)
+    def QueryObject(*args): return _cspace.iTerraFormer_QueryObject(*args)
     def __del__(self, destroy=_cspace.delete_iTerraFormer):
         try:
             if self.thisown: destroy(self)
