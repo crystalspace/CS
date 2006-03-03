@@ -35,6 +35,9 @@
  */
 class awsManager2 : public iAws
 {
+  // Event ID's used
+  csEventID KeyboardDown;	
+	
   /** Contains all loaded preferences, skins, etc. */
   aws::preferences prefs;
 
@@ -94,10 +97,22 @@ public:
 
   /** Setup the drawing targets. */
   virtual void SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d);
-
+  
+  /** Get the 2D graphics context. */
+  csRef<iGraphics2D> G2D() { return g2d; }
+  
+  /** Get the 3D graphics context. */
+  csRef<iGraphics3D> G3D() { return g3d; } 
+ 
+public:
   //////////////////////// Definition Files ////////////////////////
 
   virtual bool Load(const scfString &_filename);
+  
+public:
+  //////////////////////// Definition Files ////////////////////////
+  
+  virtual iAwsScriptObject *CreateScriptObject(const char *name);
 
 public:
   //////////////////////// Event Handling ////////////////////////
@@ -138,5 +153,6 @@ public:
 
 };
 
+extern awsManager2 *AwsMgr();
 
 #endif

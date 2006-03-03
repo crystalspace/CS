@@ -56,6 +56,7 @@ void csPen::SetupMesh ()
   mesh.colors = colors.GetArray ();
   //mesh.colorCount = static_cast<uint>(colors.Length());  
 
+  //mesh.alphaType = alphaSmooth;
   mesh.mixmode = CS_FX_COPY | CS_FX_FLAT;  
 }
 
@@ -296,6 +297,13 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
    */
 void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool /*swap_colors*/, bool fill)
 {
+  // Check to make sure that the arc is not in a negative box.
+  if (x2<x1) { x2^=x1; x1^=x2; x2^=x1; }
+  if (y2<y1) { y2^=y1; y1^=y2; y2^=y1; }
+  
+  // If start angle and end_angle are too close, abort.
+  if (fabs(end_angle-start_angle) < 0.0001) return;
+	
   float width = x2-x1;
   float height = y2-y1;
 

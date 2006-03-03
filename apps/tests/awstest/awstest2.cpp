@@ -47,7 +47,6 @@
 #include "imesh/particle.h"
 #include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"
-#include "imesh/ball.h"
 #include "imesh/object.h"
 #include "imap/reader.h"
 #include "igraphic/imageio.h"
@@ -86,19 +85,21 @@ awsTest::~awsTest()
 
 static bool AwsEventHandler (iEvent& ev)
 {
-  if (ev.Name == csevProcess)
+  if (!System)
+    return false;
+  if (ev.Name == System->Process)
   {
     System->SetupFrame ();
     return true;
   }
-  else if (ev.Name == csevFinalProcess)
+  else if (ev.Name == System->FinalProcess)
   {
     System->FinishFrame ();
     return true;
   }
   else
   {
-    return System ? System->HandleEvent (ev) : false;
+    return System->HandleEvent (ev);
   }
 }
 
@@ -120,14 +121,17 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
     return false;
   }
 
-  csEventNameRegistry::Register(object_reg);
+  Process = csevProcess (object_reg);
+  FinalProcess = csevFinalProcess (object_reg);
+  KeyboardDown = csevKeyboardDown (object_reg);
+
   if (!csInitializer::SetupEventHandler (object_reg, AwsEventHandler))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not setup event handler!");
     return false;
   }
 
-  // Check for commandline help.
+   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
     csCommandLineHelper::Help (object_reg);
@@ -219,10 +223,9 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
   room = engine->CreateSector ("room");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> ws =
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
-  walls_state->AddInsideBox (csVector3 (-12, 0, -12), csVector3 (12, 11, 12));
+  csRef<iThingFactoryState> walls_state = 
+    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
+  walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 
@@ -267,12 +270,12 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   col_green = myG2D->FindRGB (0, 255, 0);
 
  // Setup AWS specific stuff here.
- aws->Initialize(object_reg);
+ //aws->Initialize(object_reg);
  aws->SetDrawTarget(myG2D, myG3D);
 
  // Load a definition file
- if (aws->Load("/aws/awstest.xml.def")==false)
-    Report(CS_REPORTER_SEVERITY_ERROR, "Unable to load the XML definition file '/aws/awstest.xml.def'");  
+ if (aws->Load("/aws/awstest.js.def")==false)
+    Report(CS_REPORTER_SEVERITY_ERROR, "Unable to load the definition file '/aws/awstest.js.def'");  
 
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Init done.");
 
@@ -328,12 +331,12 @@ awsTest::FinishFrame ()
 bool
 awsTest::HandleEvent (iEvent &Event)
 {
-  if ((Event.Name == csevKeyboardDown) &&
+   if ((Event.Name == KeyboardDown) && 
       (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      q->GetEventOutlet()->Broadcast (csevQuit);
+      q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
     return true;
   }
 

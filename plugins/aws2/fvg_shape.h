@@ -22,7 +22,6 @@
 #include "csgeom/triangulate.h"
 #include "csutil/cscolor.h"
 #include "cstool/pen.h"
-#include "registrar.h"
 
 /** file Flexible Vector Graphics shape definitions.
  */
@@ -50,10 +49,7 @@ namespace aws
 
       /** The scaling vector. */
       csVector2 scale;
-
-      /** The variable scope for this shape. */
-      csRef<autom::scope> sc;
-
+      
       /** True if this shape is stroked. */
       bool stroked;
 

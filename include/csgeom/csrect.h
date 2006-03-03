@@ -132,7 +132,13 @@ public:
 
   /// Set rectangle xmin,ymin position.
   inline void SetPos (int x, int y)
-  { xmin = x; ymin = y; }
+  { 
+	int w = Width(), h=Height(); 
+    
+	xmin = x; ymin = y; 
+	xmax = xmin+w;
+	ymax = ymin+h;
+   }
 
   /// Set rectangle size.
   inline void SetSize (int w, int h)

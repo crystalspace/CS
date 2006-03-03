@@ -7,6 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 3-Mar-2006
+	- Christopher fixed bugs in csRect and csPen.  Christopher also
+	  submitted a large change to AWS2.  He fixed awstest to be able
+	  to load AWS2 again, and added some test files to the data portion
+	  of the repository.  To see the new changes, uncomment the define in
+	  awstest_config.h
 	- res revamped the Win32 shared library Jam code to handle the 
 	  massive amount of object files libcrystalspace contains.
 	- res fixed some classes for proper DLL exporting.

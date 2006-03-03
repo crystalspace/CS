@@ -43,7 +43,7 @@ namespace aws
     pen->Translate(csVector3((bounds.Width()*0.5)+x, (bounds.Height()*0.5)+y,0));
   }
 
-  void frame::Draw(iPen *pen)
+  void frame::Prepare(iPen *pen)
   {
     float tx=0, ty=0;
 
@@ -52,7 +52,12 @@ namespace aws
     pen->PushTransform();
     pen->Translate(csVector3(tx, ty, 0));
 
-    OnDraw(pen);
+    //OnDraw(pen);
+  }
+  
+  void frame::Finish(iPen *pen)
+  {
+	pen->PopTransform();	  
   }
   
 }

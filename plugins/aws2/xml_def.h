@@ -19,11 +19,13 @@
 #ifndef __AWS_XML_DEF_PARSER_H__
 #define __AWS_XML_DEF_PARSER_H__
 
-#include "registrar.h"
+
 #include "csutil/xmltiny.h"
 #include "csutil/scfstr.h"
 
-using namespace aws;
+extern "C" {
+#include "js/jsapi.h"
+};
 
 namespace aws2
 {
@@ -31,14 +33,14 @@ namespace aws2
   class defFile
   {
     /** Worker function, parses a node.  Creates subnodes if necessary. */
-    void ParseNode (autom::scope *sc, csRef<iDocumentNodeIterator> &pos);
+    void ParseNode (JSObject *sc, csRef<iDocumentNodeIterator> &pos);
 
   public:
     defFile() {}
     virtual ~defFile() {}
 
     /** Parses the given text into the given scope. */
-    virtual bool Parse (const scfString &txt, autom::scope *sc);
+    virtual bool Parse (const scfString &txt, JSObject *sc);
   };
 
 } // end namespace

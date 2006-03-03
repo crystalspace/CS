@@ -2,8 +2,64 @@ SubDir TOP plugins aws2 ;
 
 if $(STL.AVAILABLE) = yes
 {
+
+#AWS2.JS = ;
+#SubInclude TOP plugins aws2 js ;
+
+
 Description aws2 : "Alternate Windowing System version 2 plugin" ;
-Plugin aws2 : [ Wildcard *.cpp *.h ] ;
+
+# For the javascript library
+switch $(TARGET.OS)
+{
+case WIN32 :				# Windows 
+ SUBDIRCCFLAGS += [ FDefines XP_WIN ] ;
+ SUBDIRC++FLAGS += [ FDefines XP_WIN ] ;
+case MACOS_X :				# MacOS/X
+ SUBDIRCCFLAGS += [ FDefines XP_MAC ] ;
+ SUBDIRC++FLAGS += [ FDefines XP_WIN ] ;
+case * :				# Posix, Unix, GNU/Linux, etc.
+ SUBDIRCCFLAGS += [ FDefines XP_UNIX ] ; 
+ SUBDIRC++FLAGS += [ FDefines XP_WIN ] ;
+}
+
+SUBDIRHDRS += [ FIncludes js ] ;
+
+AWSJSFILES = js/jsapi.c 
+ js/jsarena.c 
+ js/jsarray.c 
+ js/jsatom.c 
+ js/jsbool.c 
+ js/jscntxt.c 
+ js/jsdate.c
+ js/jsdbgapi.c
+ js/jsdhash.c
+ js/jsdtoa.c
+ js/jsemit.c
+ js/jsexn.c
+ js/jsfun.c
+ js/jsgc.c
+ js/jshash.c
+ js/jsinterp.c
+ js/jslock.c
+ js/jslog2.c
+ js/jslong.c
+ js/jsmath.c
+ js/jsnum.c
+ js/jsobj.c
+ js/jsopcode.c
+ js/jsparse.c
+ js/jsprf.c
+ js/jsregexp.c
+ js/jsscan.c
+ js/jsscope.c
+ js/jsscript.c
+ js/jsstr.c
+ js/jsutil.c
+ js/jsxdrapi.c
+ js/prmjtime.c ;
+ 
+Plugin aws2 : [ Wildcard *.cpp *.h ] $(AWSJSFILES) ;
 LinkWith aws2 : crystalspace ;
 ExternalLibs aws2 : STL ;
 }

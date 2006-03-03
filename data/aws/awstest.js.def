@@ -1,0 +1,67 @@
+// AWS Test skin definition file
+
+skin_NormalWindows = 
+{
+    Name    : "Normal Windows",
+	Texture : "/aws/texture.png",
+	
+    HighlightColor    : Color(0.9,  0.9,  0.9),
+    ShadowColor	      : Color(0.23, 0.23, 0.23),
+    FillColor		  : Color(0.78, 0.78, 0.78),
+    TextDisabledColor : Color(0.5,  0.5,  0),
+    TextForeColor	  : Color(0, 0, 0),
+    TextBackColor	  : Color(1, 1, 1),
+    ButtonTextColor	  : Color(0, 0, .75),
+    ChartBarColor	  : Color(1, 0, 0),
+    ActiveTitleBarColor1 : Color(0, 0, 0.5),
+    ActiveTitleBarColor2 : Color(0.78, 0.78, 1),
+    
+    OverlayTextureAlpha	 : 128,
+    ScrollBarHeight		 : 16,
+    ScrollBarWidth		 : 16,
+    
+    // The draw member can be a function or a filename.
+    // If a function is specified, it will be called to draw the item.
+    
+    WindowMin   : { x:36, y:5, w:14, h:14, draw:"/aws/minimize.png" },
+  	WindowZoom  : { x:22, y:5, w:14, h:14, draw:"/aws/zoom.png"     },
+  	WindowClose : { x:5,  y:5, w:14, h:14, draw:"/aws/close.png"    },  	
+    
+    // Any of the following can be either images, or functions.
+    // If a function is specified, it will be called to draw the item.
+    
+    CheckBoxUp  : "/aws/chkup.png",
+  	CheckBoxDn  : "/aws/chkdn.png",
+    CheckBoxOn  : "/aws/chkon.png",
+	CheckBoxOff : "/aws/chkoff.png",
+	RadioButtonUp  : "/aws/radup.png",
+	RadioButtonDn  : "/aws/raddn.png",
+	RadioButtonOn  : "/aws/radon.png",
+	RadioButtonOff : "/aws/radoff.png",
+	TreeCollapsed  : "/aws/treecol.png",
+	TreeExpanded   : "/aws/treeexp.png",
+	TreeVertLine   : "/aws/treevl.png",
+	TreeHorzLine   : "/aws/treehl.png",
+	TreeChkUnmarked : "/aws/treechke.png",
+	TreeChkMarked   : "/aws/treechkf.png",
+	TreeGrpUnmarked : "/aws/treegrpe.png",
+	TreeGrpMarked   : "/aws/treegrpf.png",
+	ScrollBarUp : "/aws/sbup.png",
+	ScrollBarDn : "/aws/sbdn.png",
+	ScrollBarRt : "/aws/sbrt.png",
+	ScrollBarLt : "/aws/sblt.png"
+	
+};
+  
+// Add it into the list of skins
+Skin.Add(skin_NormalWindows);
+
+// Set it as the default skin
+Skin.current = skin_NormalWindows;
+
+// Load the default style set
+Autom.Load("/aws/widgets/Styles.js");
+Autom.Load("/aws/widgets/Widgets.js");
+
+// This is a test file.
+Autom.Load("/aws/test.js");

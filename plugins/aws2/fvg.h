@@ -25,7 +25,6 @@
 #include "csutil/xmltiny.h"
 #include "csutil/scfstr.h"
 #include "fvg_shape.h"
-#include "registrar.h"
 #include <map>
 
 /** file Flexible Vector Graphics parser
@@ -45,16 +44,16 @@ namespace aws
       /** Adds a shape to the draw stack. */
       void AddShape(shape *shape)
       {
-	shapes.Push(shape);
+		shapes.Push(shape);
       }
 
       /** Draws out the fvg object to a pen. */
       void Draw(iPen *pen)
       {
-	for(size_t i=0; i<shapes.Length(); ++i)
-	{
-          shapes[i]->Draw(pen);
-	}
+		for(size_t i=0; i<shapes.Length(); ++i)
+		{
+	          shapes[i]->Draw(pen);
+		}
       }
     };
 
@@ -91,7 +90,7 @@ namespace aws
       virtual ~fvg_parser();
       
       /** Parses the given text into a vector representation of the fvg information. */
-      virtual bool Parse (const scfString &txt, autom::scope *sc);
+      virtual bool Parse (const scfString &txt /*, autom::scope *sc*/);
 
       /** Draws a shape. */
       virtual bool Draw(const csString &name, iPen *pen);

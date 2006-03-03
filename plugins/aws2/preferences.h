@@ -19,8 +19,8 @@
 #ifndef __AWS_PREFERENCES_MGR_2_H__
 #define __AWS_PREFERENCES_MGR_2_H__
 
-#include "registrar.h"
 #include "iutil/objreg.h"
+#include "csutil/scfstr.h"
 #include "cstool/pen.h"
 
 /**\file
@@ -56,20 +56,13 @@ namespace aws
   };
 
   /**
-   * This maintains a set of preferences.  Generally only one of these
+   * @brief This maintains a set of preferences.  Generally only one of these
    * exists at a time, but there's no reason why there couldn't be more.
    */
   class preferences
-  {
+  {    
     /**
-     * The root scope.  All important registries (i.e. for windows or
-     * skins) hang off this scope.  Note that this scope is root only
-     * for preferences and definitions, not the whole automation subsystem.
-     */
-    autom::scope root;
-
-    /**
-     * System colors.  These are automatically initialized with some nice
+     * @brief System colors.  These are automatically initialized with some nice
      * defaults, but in order for them to be what you want, a skin has to be
      * applied.
      */
@@ -79,28 +72,19 @@ namespace aws
     void init_default_colors();
 
   public:
-    preferences():root() { init_default_colors(); }
+    preferences() { init_default_colors(); }
     virtual ~preferences() {}
 
     /**
-     * Loads an xml-based definitions file into this preferences object.
-     * Multiple files may be loaded, one after the other.  The contents are
-     * essentially merged.
+     * @brief Loads a Javascript-based definitions file into this preferences object.
+     * Multiple files may be loaded, one after the other.  
+     *
+     *  @param objreg The iObjectRegistry to use
+     *  @param filename The filename to load.
      */
     bool load(iObjectRegistry* objreg, const scfString& filename);		
 
-    /** Clears all definitions for this preferences object. */
-    /*void clear() { root.clear(); }*/
-
-    /**
-     * Finds a registry in the given category. If the reference is invalid,
-     * then the given registry doesn't exist.
-     */
-    /*csRef<registry> findReg(const csString &category, const csString &name)
-    {
-      return root.findChild(category, name);			
-    }*/
-
+   
   /////////////////////////////////////////////
   /////// Global Color Palette ////////////////
   /////////////////////////////////////////////

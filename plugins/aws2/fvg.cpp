@@ -377,34 +377,34 @@ namespace aws
       } // end while more nodes left.
     }
 
-    bool fvg_parser::Parse (const scfString &txt, autom::scope *sc)
+    bool fvg_parser::Parse (const scfString &txt/*, autom::scope *sc*/)
     {
-      csRef<iDocumentSystem> xml;
-      xml.AttachNew (new csTinyDocumentSystem ());
-      csRef<iDocument> doc = xml->CreateDocument ();
+//       csRef<iDocumentSystem> xml;
+//       xml.AttachNew (new csTinyDocumentSystem ());
+//       csRef<iDocument> doc = xml->CreateDocument ();
 
-      doc->Parse(txt.GetData(), true);
+//       doc->Parse(txt.GetData(), true);
 
-      csRef< iDocumentNode > node = doc->GetRoot();
-      csRef< iDocumentNodeIterator> pos = node->GetNodes();
+//       csRef< iDocumentNode > node = doc->GetRoot();
+//       csRef< iDocumentNodeIterator> pos = node->GetNodes();
 
-      // If no attribute is given, create one.
-      
-      shape_attr *attr = new shape_attr;
+//       // If no attribute is given, create one.
+//       
+//       shape_attr *attr = new shape_attr;
 
-      attr->stroked=true;
-      attr->stroke_color = csColor4(0,0,0,1);
+//       attr->stroked=true;
+//       attr->stroke_color = csColor4(0,0,0,1);
 
-      attr->filled=false;
-      attr->rotated=false;
-      attr->translated=false;
-      attr->scaled=false;
+//       attr->filled=false;
+//       attr->rotated=false;
+//       attr->translated=false;
+//       attr->scaled=false;
 
-      attr->sc = sc;
+//       attr->sc = sc;
 
-      ParseNode(0, pos, attr);
+//       ParseNode(0, pos, attr);
 
-      return true;
+       return true;
     }
 
     bool fvg_parser::Draw(const csString &name, iPen *pen)

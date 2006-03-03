@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "xml_def.h"
-#include "registrar.h"
 
 #include "iutil/document.h"
 
@@ -26,7 +25,7 @@
 namespace aws2
 {
 
-void defFile::ParseNode(autom::scope *sc, csRef< iDocumentNodeIterator> &pos)
+void defFile::ParseNode(JSObject *sc, csRef< iDocumentNodeIterator> &pos)
 {
   // Walk through all of the nodes and
   while(pos->HasNext())
@@ -43,16 +42,16 @@ void defFile::ParseNode(autom::scope *sc, csRef< iDocumentNodeIterator> &pos)
     if ((name == "component") || (name == "window") || (name == "skin"))
     {
       csRef<iDocumentNodeIterator> new_pos = child->GetNodes();
-      autom::scope *child_sc = new autom::scope(sc);
+//       autom::scope *child_sc = new autom::scope(sc);
 
-      /* Add the child.  It has a name to distinguish it from other scopes in the parent. */
-      sc->addChild(child->GetAttributeValue("name"), child_sc);
+//       /* Add the child.  It has a name to distinguish it from other scopes in the parent. */
+//       sc->addChild(child->GetAttributeValue("name"), child_sc);
 
-      /* Give the type of the component to it automatically. */
-      child_sc->set("type", autom::keeper(new autom::string(name)));
-            
-      /* Parse all children nodes into this scope. */
-      ParseNode(child_sc, new_pos);
+//       /* Give the type of the component to it automatically. */
+//       child_sc->set("type", autom::keeper(new autom::string(name)));
+//             
+//       /* Parse all children nodes into this scope. */
+//       ParseNode(child_sc, new_pos);
     }
     else
     {			
@@ -62,46 +61,61 @@ void defFile::ParseNode(autom::scope *sc, csRef< iDocumentNodeIterator> &pos)
        * into the map. */
       while(attr_pos->HasNext())
       {
-	csRef<iDocumentAttribute > attr = attr_pos->Next();
-	      
-	scfString a_name(attr->GetName());
-	std::string a_value(attr->GetValue());
-
-	/* If the name of the attribute is value, then the name of the key is 
-	 * the same as the name of the element, otherwise we use 
-	 * element_name.attribute_name as the key name. */
-	if (a_name=="value")			
-	{
-	  sc->set(child->GetValue(), 
-	    autom::keeper(autom::Compile(a_value)));				
-	  had_value=true;
+		csRef<iDocumentAttribute > attr = attr_pos->Next();
+		      
+		scfString a_name(attr->GetName());
+		scfString a_value(attr->GetValue());
+	
+		/* If the name of the attribute is value, then the name of the key is 
+		 * the same as the name of the element, otherwise we use 
+		 * element_name.attribute_name as the key name. */
+		if (a_name=="value")			
+		{
+// 		  sc->set(child->GetValue(), 
+// 		    autom::keeper(autom::Compile(a_value)));				
+		  had_value=true;
+		}
+		// If it's a color value, parse that out.
+		else if (a_name=="color")
+		{			
+// 			jsval o;
+// 			
+// 			csString tmp = "new Color";
+// 			tmp+=child->GetValue();
+// 			
+// 			JS_EvaluateScript(ScriptMgr()->GetContext(), sc,
+// 							  tmp.GetDataSafe(), tmp.Length(),
+// 							  "preferences", 0, &o);
+// 							  
+// 			JS_SetProperty(ScriptMgr()->GetContext(), sc,
+// 						   a_name.GetData(), &o);
+		}
+		else
+		{
+		  csString tmp = name;
+	
+		  tmp+=".";
+		  tmp+=a_name;
+		  
+// 		  sc->set(tmp, 
+// 		    autom::keeper(autom::Compile(a_value)));				
+		}
+	   }
 	}
-	else
-	{
-	  csString tmp = name;
-
-	  tmp+=".";
-	  tmp+=a_name;
-	  
-	  sc->set(tmp, 
-	    autom::keeper(autom::Compile(a_value)));				
-	}
-      }
-    }
-
+	
     if (!had_value)
     {
-      const char *_txt = child->GetContentsValue();
+	  const char *_txt = child->GetContentsValue();
       if (_txt)
       {
-	std::string txt(_txt);		
-	sc->set(name, autom::Compile(txt));
+		//std::string txt(_txt);		
+// 		sc->set(name, autom::Compile(txt));
       }
     }
   }
 }
 
-bool defFile::Parse(const scfString &txt, autom::scope *sc)
+bool defFile::Parse(const scfString &txt, JSObject *sc)
 {
   /*csRef<iPluginManager> plugin_mgr =  CS_QUERY_REGISTRY (object_reg, 
     iPluginManager);	

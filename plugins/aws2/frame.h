@@ -21,8 +21,6 @@
 
 #include "cstool/pen.h"
 #include "csgeom/csrect.h"
-#include "registrar.h"
-
 
 
 namespace aws
@@ -40,23 +38,14 @@ namespace aws
  
     /// The parent bounding box.
     frame *parent;
-
-    /// The automation scope for this frame.
-    autom::scope sc;
-
+    
   public:
     frame();
     virtual ~frame();
 
     /// Accessor for the frame's bounds.
-    const csRect& Bounds() { return bounds; }
-
-    /// Sets the size of the frame.
-    void SetSize(int width, int height)
-    {
-      bounds.SetSize(width, height);
-    }
-
+    csRect& Bounds() { return bounds; }
+    
     /**
      * Gets the screen absolute x and y coordinates of this frame. The 'x'
      * and 'y' variables should be initialized to zero before the call.
@@ -67,7 +56,12 @@ namespace aws
      * This function prepares the coordinate system for drawing, then calls
      * the OnDraw method.
      */
-    void Draw(iPen *pen);
+    void Prepare(iPen *pen);
+    
+    /** 
+     * Finishes drawing this frame.
+     */
+     void Finish(iPen *pen);
 
     /**
      * Makes transforming a shape very easy.  It first rotates the object

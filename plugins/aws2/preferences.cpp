@@ -18,15 +18,18 @@
 
 #include "cssysdef.h"
 
-#include "preferences.h"
-#include "xml_def.h"
-
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "ivaria/reporter.h"
 #include "iutil/vfs.h"
 #include "iutil/databuff.h"
+#include "csutil/csstring.h"
+
+#include "preferences.h"
+#include "script_manager.h"
+#include "script_console.h"
+
 
 namespace aws
 {
@@ -73,14 +76,12 @@ void preferences::init_default_colors()
 }
 
 bool preferences::load(iObjectRegistry* objreg, const scfString& filename)
-{
-	csPrintf("aws: Loading definitions file \"%s\"...\n", filename.GetData());
-
+{	
 	csRef<iVFS> vfs (CS_QUERY_REGISTRY (objreg, iVFS));
 
 	if (!vfs)
 	{
-		csPrintf("aws: Unable to load VFS plugin.\n");
+		ScriptCon()->Message("error: Unable to load VFS plugin.");
 		return false;
 	}
 
@@ -88,19 +89,53 @@ bool preferences::load(iObjectRegistry* objreg, const scfString& filename)
 
 	if (!input)
 	{
-		csPrintf("aws: Unable to open file \"%s\".\n", filename.GetData());
+		csString msg = "error: Unable to open preferences file \"";
+		msg+=filename;
+		msg+="\".";
+		ScriptCon()->Message(msg);
 		return false;
 	}
 
 	// Read the whole file.
 	csRef<iDataBuffer> buf = input->GetAllData();
-
-	aws2::defFile df;
-
-	// Parse the definition file into the root registry object.
-	df.Parse(buf->GetData(), &root);
-
-    return true;
+	
+		
+	{
+	  jsval tmp;
+	  
+	  JSScript *sc;
+	  
+	  csString msg = "Loading preferences file: \"";
+	  msg+=filename;
+	  msg+="\"...";
+	  
+	  ScriptCon()->Message(msg);
+	  
+	  
+	  if((sc=JS_CompileScript(ScriptMgr()->GetContext(), ScriptMgr()->GetGlobalObject(),
+						buf->GetData(), buf->GetSize(),
+						filename.GetData(), 1))!=0)
+		{
+			if (JS_ExecuteScript(ScriptMgr()->GetContext(), ScriptMgr()->GetGlobalObject(), sc, &tmp)==JS_FALSE)
+			{						  					
+				
+				ScriptCon()->Message("error: executing the script failed.");
+			}	
+		    else
+		    {
+				ScriptCon()->Message("Preferences successfully loaded.");	  
+		    }				
+									 
+			JS_DestroyScript(ScriptMgr()->GetContext(), sc);
+		}
+		else
+		{
+			ScriptCon()->Message("error: Compiling failed.");			
+		}	  
+  					
+  	}
+	
+	return true;
 }
 
 }
