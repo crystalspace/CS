@@ -11,6 +11,8 @@ chronological order.
 	  massive amount of object files libcrystalspace contains.
 	- res fixed some classes for proper DLL exporting.
 	- res made shared libs install properly.
+	- Vincent applied res' fixes for undefined symbols with shared libs on
+	  GNU/Linux, gcc 3.4.4.
 2-Mar-2006
 	- Fossi commited another backup of the paging terrain.
 	- Fossi copied priority 50 to terrain_fixed_base, so that terrain

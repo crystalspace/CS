@@ -639,7 +639,7 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
     {
       namespace Debug
       {
-	extern void AssertMessage (const char* expr, const char* filename, 
+	extern void CS_CRYSTALSPACE_EXPORT AssertMessage (const char* expr, const char* filename, 
 	  int line, const char* msg = 0);
       } // namespace Debug
     } // namespace CS
