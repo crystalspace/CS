@@ -37,6 +37,8 @@ extern "C" {
 
 /** Creates an initializes the automation objects for a widget. */
 void Widget_SetupAutomation();
+
+enum { W_DOCK_NORTH, W_DOCK_SOUTH, W_DOCK_EAST,  W_DOCK_WEST };
  
 namespace aws
 {
@@ -59,12 +61,26 @@ namespace aws
      * any siblings, children, or parents. */    
     pen *wpen;
     
-  private:
-  
+    /** The parent widget, if any. */
+    widget *parent;
+    
+    /** The list of children that this widget has.
+     * Children draw *after* the parent. */
+    csArray<widget *> children;
+    
+    /** The list of <i>sibling</i> widgets that
+     * are docked to this widget.  Whenever a 
+     * sibling gets a move request, it updates 
+     * all of the widgets in it's docked list.
+     * That way they end up moving together. */
+    widget *docked[4];
+      
     /** The frame provided for this widget. */
     frame fr;
     	
-  	JSBool   dirty; /**< True if the widget has dirty state. */	
+    /** True if the widget has dirty state. */	
+  	JSBool   dirty; 
+  	
   	        
   public:
     /// Updates the skin preferences.
@@ -81,7 +97,11 @@ namespace aws
      JSContext *AutomContext() { return ctx; }
      
   public:
-  	 widget():wpen(0), dirty(JS_TRUE) {}
+  	 widget():wpen(0), parent(0), dirty(JS_TRUE) 
+  	 {
+	 	memset(docked, 0, sizeof(docked)); 	 
+	 }  	 
+  	 
   	 virtual ~widget() {}
   	 
   	 /** Sets the pen used for drawing this widget. */
@@ -101,6 +121,67 @@ namespace aws
   	 
   	 /** Gets a reference to the frame. */
   	 frame &Frame() { return fr; }
+  	 
+  	 /// Children ////
+  	 
+  	 /** @brief Adds a child widget into this widget. */
+  	 void AddChild(widget *w)
+  	 {
+	  	w->parent = this;
+	  	children.Push(w);	 
+  	 }
+  	 
+  	 /** @brief Removes a child widget from this widget. */
+  	 void RemoveChild(widget *w)
+  	 {
+	  	w->parent = 0;
+	  	children.Delete(w);	 
+  	 }
+  	 
+  	 /** @brief Adds a docking widget to this widget. */
+  	 void Dock(widget *w, int where)
+  	 {
+	  	if (where>=0 && where<4)
+	  	{ 
+		  	docked[where]=w;	  	 
+	  	 	MoveDocked(where);
+  	 	}	  	 		  	
+  	 }
+  	 
+  	 /** @brief Moves widgets docked to this widget. */
+  	 void MoveDocked(int which=-1)
+  	 {
+	  	 int start = (which==-1 ? 0 : which);
+	  	 int end   = (which==-1 ? 4 : which+1);
+	  	 
+	  	 for(int where=start; where<end; ++where)
+	  	 {	  	 	
+		  	widget *w = docked[where];
+		  	
+		  	if (w==0) continue; 
+		  	   	 
+		  	switch(where)
+		  	{
+			  	case W_DOCK_NORTH:		  		
+			  		w->Bounds().SetPos(Bounds().xmin, Bounds().ymin-w->Bounds().Height());
+			  		break;
+			  		
+			  	case W_DOCK_SOUTH:
+			  		w->Bounds().SetPos(Bounds().xmin, Bounds().ymax+1);
+			  		break;
+			  		
+			  	case W_DOCK_EAST:
+			  		w->Bounds().SetPos(Bounds().xmax+1, Bounds().ymin);
+			  		break;
+			  		
+			  	case W_DOCK_WEST:
+			  		w->Bounds().SetPos(Bounds().xmin-w->Bounds().Width(), Bounds().ymin);
+			  		break;
+		  	}		  	 
+	  	}
+  	 }  	 
+  	 
+  	 /// Drawing ////
        
      /** @brief Invalidates the widget so that it will be redrawn. */
      void Invalidate() { dirty = JS_TRUE; }

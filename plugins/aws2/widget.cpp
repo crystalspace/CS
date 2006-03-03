@@ -24,6 +24,74 @@
 /** @brief The prototype object for widgets. */
 static JSObject *widget_proto_object=0;
 
+enum { WIDGET_XMIN, WIDGET_YMIN, WIDGET_XMAX, WIDGET_YMAX, WIDGET_WIDTH, WIDGET_HEIGHT, WIDGET_DIRTY,
+
+		/* Static properties */
+       WIDGET_STATIC_START, WIDGET_DOCK_NORTH, WIDGET_DOCK_SOUTH, WIDGET_DOCK_EAST, WIDGET_DOCK_WEST
+	   };
+
+
+/** @brief Forwards a widget GetProperty call. */
+static JSBool
+widget_getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
+{
+	
+	aws::widget *wo = (aws::widget *)JS_GetPrivate(cx, obj);
+    
+	if (wo) wo->GetProperty(cx, obj, id, vp);		
+	
+    return JS_TRUE;
+}
+
+/** @brief Forwards a widget GetProperty call. */
+static JSBool
+widget_get_staticProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
+{
+	
+	// Try static properties first.  They can't be handled in the class because
+	// They're STATIC properties.
+	if (JSVAL_IS_INT(id)) 
+   	{			  
+	   	   	
+		   	
+		    switch (JSVAL_TO_INT(id)) 
+			{
+				case WIDGET_DOCK_NORTH: *vp =  INT_TO_JSVAL(W_DOCK_NORTH); break;					
+				case WIDGET_DOCK_SOUTH: *vp =  INT_TO_JSVAL(W_DOCK_SOUTH); break;
+				case WIDGET_DOCK_EAST:  *vp =  INT_TO_JSVAL(W_DOCK_EAST);  break;
+				case WIDGET_DOCK_WEST:  *vp =  INT_TO_JSVAL(W_DOCK_WEST);  break;
+				default:
+					return JS_FALSE;				
+			}
+			
+			return JS_TRUE;
+		
+	}	
+	
+    return JS_FALSE;
+}
+
+
+
+/** @brief Forwards a widget SetProperty call. */
+static JSBool     
+widget_setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
+{
+	aws::widget *wo = (aws::widget *)JS_GetPrivate(cx, obj);
+    
+	if (wo) wo->SetProperty(cx, obj, id, vp);		
+	
+    return JS_TRUE;
+}
+
+///// Widget JS Class //////////////////////////////////////////////////
+JSClass widget_object_class = {
+    "Widget", JSCLASS_HAS_PRIVATE,
+    JS_PropertyStub,JS_PropertyStub,
+    widget_getProperty,widget_setProperty,
+    JS_EnumerateStub,JS_ResolveStub,
+    JS_ConvertStub,JS_FinalizeStub 
+};
 
 /** @brief The constructor for widget objects. */
 static JSBool
@@ -57,6 +125,7 @@ Move(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	JS_ValueToInt32(cx,  argv[1], &y);
 	
 	wo->Bounds().Move(x, y);
+	wo->MoveDocked();
 	
 	return JS_TRUE;
 }
@@ -75,6 +144,7 @@ MoveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	JS_ValueToInt32(cx,  argv[1], &y);
 	
 	wo->Bounds().SetPos(x, y);
+	wo->MoveDocked();
 	
 	return JS_TRUE;
 }
@@ -95,6 +165,8 @@ Resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	wo->Bounds().xmax+=w;
 	wo->Bounds().ymax+=h;
 	
+	wo->MoveDocked();
+	
 	return JS_TRUE;
 }
 
@@ -112,6 +184,7 @@ ResizeTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	JS_ValueToInt32(cx,  argv[1], &h);
 	
 	wo->Bounds().SetSize(w, h);
+	wo->MoveDocked();
 	
 	return JS_TRUE;
 }
@@ -158,37 +231,74 @@ SetPen(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	return JS_TRUE;
 }
 
-/** @brief Forwards a widget GetProperty call. */
+/** @brief Adds a child object. */
 static JSBool
-widget_getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
-{
+AddChild(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{		
 	aws::widget *wo = (aws::widget *)JS_GetPrivate(cx, obj);
-    
-	if (wo) wo->GetProperty(cx, obj, id, vp);		
 	
-    return JS_TRUE;
+	JSObject *child_object = JSVAL_TO_OBJECT(argv[0]);
+	
+	if (JS_InstanceOf(cx, child_object, &widget_object_class, NULL) == JS_FALSE)
+	{
+		JS_ReportError(cx, "Trying to add an object that is not a Widget as a child is prohibited.");
+		return JS_FALSE;	
+	} 
+	
+	aws::widget *child_wo = (aws::widget *)JS_GetPrivate(cx, child_object);
+	
+	wo->AddChild(child_wo);
+	
+	// Remove from global widget set.
+	aws::widgets.Delete(child_wo);
+		
+	return JS_TRUE;
 }
 
-/** @brief Forwards a widget SetProperty call. */
-static JSBool     
-widget_setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
-{
+/** @brief Removes a child object. */
+static JSBool
+RemoveChild(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{		
 	aws::widget *wo = (aws::widget *)JS_GetPrivate(cx, obj);
-    
-	if (wo) wo->SetProperty(cx, obj, id, vp);		
 	
-    return JS_TRUE;
+	JSObject *child_object = JSVAL_TO_OBJECT(argv[0]);
+	
+	if (JS_InstanceOf(cx, child_object, &widget_object_class, NULL) == JS_FALSE)
+	{
+		JS_ReportError(cx, "Trying to remove an object that is not a Widget as a child is prohibited.");
+		return JS_FALSE;	
+	} 
+	
+	aws::widget *child_wo = (aws::widget *)JS_GetPrivate(cx, child_object);
+	
+	wo->RemoveChild(child_wo);
+		
+	return JS_TRUE;
 }
 
-JSClass widget_object_class = {
-    "Widget", JSCLASS_HAS_PRIVATE,
-    JS_PropertyStub,JS_PropertyStub,
-    widget_getProperty,widget_setProperty,
-    JS_EnumerateStub,JS_ResolveStub,
-    JS_ConvertStub,JS_FinalizeStub 
-};
+/** @brief Adds a child object. */
+static JSBool
+Dock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{	
+	int32 where;	
+	aws::widget *wo = (aws::widget *)JS_GetPrivate(cx, obj);
+	
+	JSObject *sib_object = JSVAL_TO_OBJECT(argv[0]);
+	JS_ValueToInt32(cx, argv[1], &where);
+	
+	if (JS_InstanceOf(cx, sib_object, &widget_object_class, NULL) == JS_FALSE)
+	{
+		JS_ReportError(cx, "Trying to dock an object that is not a Widget is prohibited.");
+		return JS_FALSE;	
+	} 
+	
+	aws::widget *sib_wo = (aws::widget *)JS_GetPrivate(cx, sib_object);
+	
+	wo->Dock(sib_wo, where);
+			
+	return JS_TRUE;
+}
 
-enum { WIDGET_XMIN, WIDGET_YMIN, WIDGET_XMAX, WIDGET_YMAX, WIDGET_WIDTH, WIDGET_HEIGHT, WIDGET_DIRTY };
 
 static JSPropertySpec widget_props[] =
 {
@@ -202,6 +312,17 @@ static JSPropertySpec widget_props[] =
         {0,0,0}
 };
 
+
+static JSPropertySpec widget_static_props[] =
+{
+        {"DOCK_NORTH",     WIDGET_DOCK_NORTH,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"DOCK_SOUTH",     WIDGET_DOCK_SOUTH,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"DOCK_EAST",      WIDGET_DOCK_EAST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"DOCK_WEST",      WIDGET_DOCK_WEST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        
+        {0,0,0}
+};
+
 static JSFunctionSpec widget_methods[] = {
     {"Move",		Move,		2, 0, 0},
     {"MoveTo",		MoveTo,		2, 0, 0},    
@@ -210,6 +331,12 @@ static JSFunctionSpec widget_methods[] = {
     {"Invalidate",	Invalidate,	0, 0, 0},    
     {"GetPen",		GetPen,		0, 0, 0}, 
     {"SetPen",		SetPen,		1, 0, 0},
+    
+    {"AddChild",	AddChild,	 1, 0, 0},
+    {"RemoveChild",	RemoveChild, 1, 0, 0},
+    {"Dock",		Dock, 		 2, 0, 0},
+    
+    
     {0,0,0,0,0}
 };    
     
@@ -232,7 +359,7 @@ Widget_SetupAutomation()
 		                            widget_props, widget_methods,
 		
 		                            /* class constructor (static) properties and methods */
-		                            NULL, NULL); 
+		                            widget_static_props, NULL); 
 		                            
 		 ScriptCon()->Message("Widget builtin-object initialized.");   
 	 }
@@ -303,8 +430,6 @@ widget::Draw(iPen *output_pen)
 		csString msg;
 		jsval argv[1], rval;
 		
-// 		ScriptCon()->Message("widget::Draw: prepare");
-		
 		// Prepare for the drawing.
 		fr.Prepare(output_pen);		
 		
@@ -315,9 +440,7 @@ widget::Draw(iPen *output_pen)
 		
 		
 		if (IsDirty())
-		{
-// 			ScriptCon()->Message("widget::Draw: dirty widget, call redraw.");
-			
+		{			
 			// Prepare the pen object
 			argv[0] = OBJECT_TO_JSVAL(wpen->PenObject());
 			
@@ -326,15 +449,16 @@ widget::Draw(iPen *output_pen)
 			
 			// Clear the dirty flag
 			dirty = JS_FALSE;
-		}
-		
-// 		ScriptCon()->Message("widget::Draw: draw to output.");
+		}		
+
 		
 		wpen->Draw(output_pen);	
-		
-// 		ScriptCon()->Message("widget::Draw: finish");
-		
-		
+	
+		// Draw all children.
+		for(size_t i=0; i<children.Length(); ++i)
+		{
+			children[i]->Draw(output_pen);						
+		}		
 
 		// Finish the drawing
 		fr.Finish(output_pen);
