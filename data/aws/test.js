@@ -1,8 +1,20 @@
 var p = new Pen;
 var w = new Widget;
 
+var w2 = new Widget;
+var p2 = new Pen;
+
+var w3 = new Widget;
+var p3 = new Pen;
+
 w.MoveTo(100,100);
-w.ResizeTo(100,100);
+w.ResizeTo(200,200);
+
+w2.MoveTo(50,50);
+w2.ResizeTo(50,50);
+
+// Just to give it some size.
+w3.ResizeTo(50,100);
 
 w.onDraw = function(pen)
 {	
@@ -31,5 +43,32 @@ w.onDraw = function(pen)
 	
 }
 
+// Setup Child.
+w2.onDraw = function(pen)
+{		
+	pen.Clear();
+	
+	pen.SetColor(0.5,0,0.5,0.5);
+	pen.DrawRoundedRect(0,0,this.width,this.height,0.25,true);	
+}
+
+// Setup Child.
+w3.onDraw = function(pen)
+{		
+	pen.Clear();
+	
+	pen.SetColor(0.25,0,0.25,0.5);
+	pen.DrawMiteredRect(0,0,this.width,this.height,0.25,true);	
+}
+
+
 w.SetPen(p);
+w2.SetPen(p2);
+w3.SetPen(p3);
+
+w.AddChild(w2);
+w.Dock(w3, Widget.DOCK_SOUTH);
+
 w.Invalidate();
+w2.Invalidate();
+w3.Invalidate();
