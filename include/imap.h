@@ -27,6 +27,8 @@
 #include "imap/modelload.h"
 #include "imap/reader.h"
 #include "imap/saver.h"
+#include "imap/saverfile.h"
+#include "imap/saverref.h"
 #include "imap/services.h"
 #include "imap/streamsource.h"
 #include "imap/writer.h"
