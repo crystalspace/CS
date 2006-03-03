@@ -236,21 +236,17 @@ rule LibraryShared
     deplibs += [ ConstructLibraryLinkTarget $(i) : $(options) ] ;
   }
   
-  if ! $(target:D)
-  {
-    MakeLocate $(target) : $(LOCATE.OBJECTS)/libs ;
-  }
-
   # Generate install rules
   if ! [ IsElem noinstall : $(options) ]
   {
-    if "$(RANLIB)"
+    if $(TARGET.OS) != WIN32
     {
-      Depends install_lib : [ DoInstall $(target) : $(libdir) : : Ranlib ] ;
+      Depends install_lib : [ DoInstall $(target) : $(libdir)  ] ;
     }
     else
     {
-      Depends install_lib : [ DoInstall $(target) : $(libdir)  ] ;
+      Depends install_lib : [ DoInstall $(target) : $(bindir)  ] ;
+      Depends install_lib : [ DoInstall $(linklib) : $(libdir)  ] ;
     }
     
     # Add to global library list
@@ -268,8 +264,8 @@ rule LibraryShared
   if $(linklib) != $(target)
   {
     Depends $(linklib) : $(target) ;
-    MakeLocate $(linklib) : $(LOCATE_TARGET) ;
-    SEARCH on $(linklib) = $(LOCATE_TARGET) ;
+    MakeLocate $(linklib) : $(LOCATE.OBJECTS)/libs ;
+    SEARCH on $(linklib) = $(LOCATE.OBJECTS)/libs ;
   }
   Depends $(target) : $(objects) ;
   Clean $(<)clean : $(linklib) $(target) ;

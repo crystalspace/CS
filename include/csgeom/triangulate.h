@@ -43,7 +43,7 @@
 typedef csDirtyAccessArray< csVector2 > csContour2;
 
 /** This triangulates a simple polygon.  It does not handle holes, but it is fast and efficient. */
-class csTriangulate2
+class CS_CRYSTALSPACE_EXPORT csTriangulate2
 {
 public:
   csTriangulate2() {}

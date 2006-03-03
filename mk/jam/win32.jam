@@ -366,15 +366,13 @@ rule PluginResourceWin32
   local versionrc, metarc ;
 
   versionrc = [ DoObjectGrist $(<)_versionrc.rc ] ;
-  LOCATE on $(versionrc) = $(LOCATE_TARGET) ;
-  SEARCH on $(versionrc) = $(LOCATE_TARGET) ;
+    MakeLocate $(versionrc) : $(LOCATE_TARGET) ;
   MakeVersionRc $(versionrc) : $(<) ;
   
   if $(EMBED_META) = "yes"
   {
     metarc = [ DoObjectGrist $(<)_metarc.rc ] ;
-    LOCATE on $(metarc) = $(LOCATE_TARGET) ;
-    SEARCH on $(metarc) = $(LOCATE_TARGET) ;
+    MakeLocate $(metarc) : $(LOCATE_TARGET) ;
     MakeMetadataRc $(metarc) : $(<) ;
   }
 
@@ -437,34 +435,96 @@ rule SystemLinkPlugin
   Clean $(<)clean : $(target) ;
 }
 
+rule MakeDllDefFile
+{
+  local def = $(<) ;
+  local objects = $(>) ;
+  
+  MakeLocate $(def) : $(LOCATE.OBJECTS)/libs ;
+  WriteDefHeader $(def) ;
+  for i in $(objects)
+  {
+    local drectve = $(i).drectve ;
+    MakeLocate $(drectve) : [ on $(i) GetVar LOCATE ] ;
+    Depends $(drectve) : $(i) ;
+    Depends $(def) : $(drectve) ;
+    ExtractDrectve $(drectve) : $(i) ;
+    DrectveToDef $(def) : $(drectve) ;
+    Clean clean : $(drectve) ;
+    Clean $(def)clean : $(drectve) ;
+  }
+}
+
 rule SystemLinkSharedLibrary
 {
   LFlags $(<) : $(LINKLIBS) ;
-  Depends $(<) : $(>) ;
-  LinkSharedLibrary $(<) : $(>) ;
-  MakeImportLib $(3) : $(<) ;
+  
+  # The "crystalspace" library is so massive that it blows Jam's command line
+  # length limit when all object files are passed in at once to some command.
+  # However, a DLL, like an executable, needs to be built with all objects at 
+  # once. 
+  # Problem is, since dllwrap etc. don't support response files, there is no 
+  # way to pass all objects at once to it. But, a static library can be built
+  # piecemeal, so we take the detour of creating a static library out of the
+  # DLL objects first.
+  # However, another bug hits us: on MinGW, symbols exported from objects in
+  # static libraries are not automatically exported from the DLL.
+  # We work this around by constructing a .DEF file with all exports of the 
+  # DLL. Conveniently (somewhat), all exported symbols are into a section
+  # ".drectve" of an object file by gcc. After extracting these sections and
+  # some postprocessing, we finally have all .DEF entries. Phew.
+  local lib = $(<).a ;
+  MakeLocate $(lib) $(lib)($(>:BS)) : $(LOCATE.OBJECTS)/libs ;
+  Depends $(lib) : $(lib)($(>:BS)) ;
+  local i ;
+  for i in $(>)
+  {
+    Depends $(lib)($(i:BS)) : $(i) ;
+  }
+  Archive $(lib) : $(>) ;
+  Ranlib $(lib) ;
+  #RmTemps $(lib) : $(>) ;
+  
+  Depends $(<) : $(lib) ;
+  
+  local def = $(<).def ;
+  MakeDllDefFile $(def) : $(>) ;
+  Depends $(<) : $(def) ;
+  Clean clean : $(def) ;
+  Clean $(<)clean : $(def) ;
+  Depends $(<)clean : $(def)clean ;
+  
+  EXPORTDEFS on $(<) = $(def) ;
+  IMPLIB on $(<) = $(3) ;
+  Depends $(3) : $(<) ;
+  LinkSharedLibrary $(<) : $(lib) ;
 
   Clean clean : $(target) ;
   Clean $(<)clean : $(target) ;
 }
 
-rule MakeImportLib
+actions ExtractDrectve
 {
-  local deffile = "$(<:B).def" ;
-  LOCATE on $(deffile) = $(LOCATE_TARGET) ;
-  SEARCH on $(deffile) = $(LOCATE_TARGET) ;
-  
-  Clean clean : $(deffile) ;
-  Clean $(<)clean : $(deffile) ;
-  Depends $(deffile) : $(>) ;
-  GenerateDef $(deffile) : $(>) ;
-  Depends $(<) : $(deffile) ;
-  GenerateImportLib $(<) : $(deffile) ;
+  $(CMD.OBJCOPY) -j .drectve -O binary $(>) $(<).tmp
+  echo >> $(<).tmp # Cheap trick to ensure there's always a .tmp file; 
+                   # the action should not break with no .drectve - no exports
+                   # is a valid scenario.
+  $(CMD.STRINGS) -n 1 $(<).tmp > $(<) # Run strings since the section data may be 
+                               # padded with zeroes, get rid of those.
+  rm $(<).tmp
 }
 
-actions GenerateDef 
+actions WriteDefHeader
 {
-  pexports $(>) > $(<)
+  echo "EXPORTS" > $(<)
+}
+
+actions piecemeal together DrectveToDef
+{
+  for d in $(>)
+  do
+    sed -e "s/ /\n/g" $d | sed -e "s/-export:\(.*\)/\1/g" | sed -e "s/,data/ DATA/g" >> $(<)
+  done
 }
 
 actions GenerateImportLib
@@ -492,8 +552,9 @@ else
   }
 }
 
-  #$(CMD.LINK) -o $(<) $(>) -mdll $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
-actions LinkSharedLibrary bind NEEDLIBS bind EXTRAOBJECTS
+actions LinkSharedLibrary bind NEEDLIBS bind EXTRAOBJECTS bind EXPORTDEFS bind IMPLIB
 {
-  $(CMD.LINK) -shared -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+  $(CMD.DLLWRAP) --driver-name=$(CMD.LINK) --dllname $(<:B).dll --def=$(EXPORTDEFS) --implib $(IMPLIB) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+  touch $(IMPLIB) # ensure the IMPLIB is always newer than the DLL, 
+                  # since the IMPLIB depends on the DLL.
 }

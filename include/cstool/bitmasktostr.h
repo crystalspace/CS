@@ -33,7 +33,7 @@
 /**
  * Small helper to get a "pretty" string for a combination of bit masks.
  */
-class csBitmaskToString
+class CS_CRYSTALSPACE_EXPORT csBitmaskToString
 {
 public:
   /// Structure containing a name for possible bit masks.

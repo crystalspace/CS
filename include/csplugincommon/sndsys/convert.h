@@ -98,7 +98,7 @@ namespace Sound
  * indistinguishable noise.  If you intend to speed up playback it's best to 
  * start with a higher sampling rate (44100 khz).
  */
-class PCMSampleConverter
+class CS_CRYSTALSPACE_EXPORT PCMSampleConverter
 {
 public:
   /// Create a PCMSampleConverter with initial source properties provided.

@@ -33,6 +33,9 @@
 
 struct iObjectRegistry;
 
+CS_PLUGIN_NAMESPACE_BEGIN(PagingFormer)
+{
+
 class csPagingSampler;
 class csSimpleFormer;
 
@@ -95,8 +98,6 @@ private:
   void LoadFormer(uint x, uint y);
 
 public:
-  SCF_DECLARE_IBASE;
-
   /// csSimpleFormer constructor
   csPagingFormer (iBase* parent);
 
@@ -118,36 +119,6 @@ public:
   bool SetIntegerMap (csStringID type, iImage* map, int scale, int offset);
   /// Set additional float map.
   bool SetFloatMap (csStringID type, iImage* map, float scale, float offset);
-
-  // Relays calls to the actual class
-  struct PagingFormerState : public iPagingFormerState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csPagingFormer);
-
-    virtual void SetHeightmapDir (const char *path)
-    {
-      scfParent->SetHeightmapDir(path);
-    }
-    virtual void SetScale (csVector3 scale)
-    {
-      scfParent->SetScale (scale);
-    }
-    virtual void SetOffset (csVector3 offset)
-    {
-      scfParent->SetOffset (offset);
-    }
-    virtual bool SetIntegerMap (csStringID type, iImage* map, int scale = 1,
-  	int offset = 0)
-    {
-      return scfParent->SetIntegerMap (type, map, scale, offset);
-    }
-    virtual bool SetFloatMap (csStringID type, iImage* map, float scale = 1.0,
-  	float offset = 0.0)
-    {
-      return scfParent->SetFloatMap (type, map, scale, offset);
-    }
-  } scfiPagingFormerState;
-
 
   // ------------ iTerraFormer implementation ------------
 
@@ -193,15 +164,6 @@ public:
   /// Initializes this object
   bool Initialize (iObjectRegistry* objectRegistry);
 
-  // Relays initialize call to the actual class
-  struct Component : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csPagingFormer);
-    virtual bool Initialize (iObjectRegistry* objectRegistry)
-    {
-      return scfParent->Initialize (objectRegistry);
-    }
-  } scfiComponent;
 };
 
 /**
@@ -248,8 +210,6 @@ private:
   void CacheTexCoords ();
 
 public:
-  SCF_DECLARE_IBASE;
-
   // ------------ iTerraSampler implementation -----------
 
   csPagingSampler (csPagingFormer*, csRefArray<iTerraSampler> sampler,
@@ -302,5 +262,8 @@ public:
   /// Deletes all cached data
   virtual void Cleanup (); 
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(PagingFormer)
 
 #endif // __CS_PAGINGFORMER_H__

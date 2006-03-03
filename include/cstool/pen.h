@@ -156,7 +156,7 @@ struct iPen
 };
 
 /** A pen specialized for CS. */
-class csPen : public iPen
+class CS_CRYSTALSPACE_EXPORT csPen : public iPen
 {
   /** The 3d context for drawing. */
   csRef<iGraphics3D> g3d;

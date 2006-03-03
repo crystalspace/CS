@@ -31,7 +31,7 @@ namespace Sound
 /** 
  * An implementation of a cyclic buffer oriented for sound functionality.
  */
-class SoundCyclicBuffer
+class CS_CRYSTALSPACE_EXPORT SoundCyclicBuffer
 {
 public:
   /// Construct the cycling buffer with a specific maximum storage size.

@@ -187,7 +187,7 @@ public:
    * concatenated with those on the right (of course with a CS_PATH_SEPARATOR 
    * ensured to be in between).
    */
-  friend csPathsList operator* (const csPathsList& left,
+  CS_CRYSTALSPACE_EXPORT friend csPathsList operator* (const csPathsList& left,
     const csPathsList& right);
   inline csPathsList operator*= (const csPathsList& right)
   { return (*this = *this * right); }

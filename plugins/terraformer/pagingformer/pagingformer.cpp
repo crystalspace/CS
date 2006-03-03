@@ -28,12 +28,15 @@
 
 #include "imap/loader.h"
 
-#include <cstool/debugimagewriter.h>
-#include <csgfx/memimage.h>
+#include "cstool/debugimagewriter.h"
+#include "csgfx/memimage.h"
 
 #include "pagingformer.h"
 
 CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_NAMESPACE_BEGIN(PagingFormer)
+{
 
 SCF_IMPLEMENT_FACTORY (csPagingFormer)
 
@@ -712,3 +715,6 @@ heightmap debug printer
 printf(fn);
 //}
 */
+
+}
+CS_PLUGIN_NAMESPACE_END(PagingFormer)

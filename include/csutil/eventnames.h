@@ -397,6 +397,7 @@ static inline CS_CONST_METHOD csEventID csevJoystickOp (
 
 struct iGraphics2D;
 
+CS_CRYSTALSPACE_EXPORT
 CS_CONST_METHOD csEventID csevCanvasOp (csRef<iEventNameRegistry>& reg, 
 					const iGraphics2D* g2d, 
 					const csString &y);
@@ -465,15 +466,15 @@ static inline CS_CONST_METHOD csEventID csevCanvasOp (
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-csEventID csevPreProcess(iObjectRegistry *reg);
-csEventID csevPreProcess(iEventNameRegistry *reg);
+CS_CRYSTALSPACE_EXPORT csEventID csevPreProcess(iObjectRegistry *reg);
+CS_CRYSTALSPACE_EXPORT csEventID csevPreProcess(iEventNameRegistry *reg);
 
 /**
  * Broadcasted every frame.
  * This event will go away soon, replaced by csevFrame.
  */
-csEventID csevProcess(iObjectRegistry *reg);
-csEventID csevProcess(iEventNameRegistry *reg);
+CS_CRYSTALSPACE_EXPORT csEventID csevProcess(iObjectRegistry *reg);
+CS_CRYSTALSPACE_EXPORT csEventID csevProcess(iEventNameRegistry *reg);
 
 /**
  * Broadcasted after csevProcess on every frame.
@@ -482,8 +483,8 @@ csEventID csevProcess(iEventNameRegistry *reg);
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-csEventID csevPostProcess(iObjectRegistry *reg);
-csEventID csevPostProcess(iEventNameRegistry *reg);
+CS_CRYSTALSPACE_EXPORT csEventID csevPostProcess(iObjectRegistry *reg);
+CS_CRYSTALSPACE_EXPORT csEventID csevPostProcess(iEventNameRegistry *reg);
 
 /**
  * Broadcasted after csevPostProcess on every frame.
@@ -492,8 +493,8 @@ csEventID csevPostProcess(iEventNameRegistry *reg);
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-csEventID csevFinalProcess(iObjectRegistry *reg);
-csEventID csevFinalProcess(iEventNameRegistry *reg);
+CS_CRYSTALSPACE_EXPORT csEventID csevFinalProcess(iObjectRegistry *reg);
+CS_CRYSTALSPACE_EXPORT csEventID csevFinalProcess(iEventNameRegistry *reg);
 
 /** @} */
 
