@@ -7632,6 +7632,8 @@ package cspace::iTerrainObjectState;
 *GetStaticLighting = *cspacec::iTerrainObjectState_GetStaticLighting;
 *SetCastShadows = *cspacec::iTerrainObjectState_SetCastShadows;
 *GetCastShadows = *cspacec::iTerrainObjectState_GetCastShadows;
+*SetMaterialMapFile = *cspacec::iTerrainObjectState_SetMaterialMapFile;
+*GetMaterialMapFile = *cspacec::iTerrainObjectState_GetMaterialMapFile;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -7746,6 +7748,8 @@ package cspace::iLoader;
 *LoadMeshObject = *cspacec::iLoader_LoadMeshObject;
 *Load = *cspacec::iLoader_Load;
 *LoadShader = *cspacec::iLoader_LoadShader;
+*SetAutoRegions = *cspacec::iLoader_SetAutoRegions;
+*GetAutoRegions = *cspacec::iLoader_GetAutoRegions;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -7842,6 +7846,9 @@ package cspace::iSaver;
 %OWNER = ();
 %ITERATORS = ();
 *SaveMapFile = *cspacec::iSaver_SaveMapFile;
+*SaveAllRegions = *cspacec::iSaver_SaveAllRegions;
+*SaveRegionFile = *cspacec::iSaver_SaveRegionFile;
+*SaveRegion = *cspacec::iSaver_SaveRegion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -13691,6 +13698,7 @@ package cspace::iTerraFormer;
 *SampleVector2 = *cspacec::iTerraFormer_SampleVector2;
 *SampleVector3 = *cspacec::iTerraFormer_SampleVector3;
 *SampleInteger = *cspacec::iTerraFormer_SampleInteger;
+*QueryObject = *cspacec::iTerraFormer_QueryObject;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
