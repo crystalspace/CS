@@ -612,9 +612,11 @@ Type &Class::getterFunc ()                                     \
 #  endif
 #endif
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-extern void* operator new (size_t s, void* filename, int line);
+extern void* CS_CRYSTALSPACE_EXPORT operator new (size_t s, 
+  void* filename, int line);
 inline void operator delete (void* p, void*, int) { operator delete (p); }
-extern void* operator new[] (size_t s, void* filename, int line);
+extern void* CS_CRYSTALSPACE_EXPORT operator new[] (size_t s, 
+  void* filename, int line);
 inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
 #define CS_EXTENSIVE_MEMDEBUG_NEW new ((void*)__FILE__, __LINE__)
 #define new CS_EXTENSIVE_MEMDEBUG_NEW
@@ -639,8 +641,8 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
     {
       namespace Debug
       {
-	extern void CS_CRYSTALSPACE_EXPORT AssertMessage (const char* expr, const char* filename, 
-	  int line, const char* msg = 0);
+	extern void CS_CRYSTALSPACE_EXPORT AssertMessage (const char* expr, 
+	  const char* filename, int line, const char* msg = 0);
       } // namespace Debug
     } // namespace CS
 #   define CS_ASSERT_MSG(msg,x) 					\

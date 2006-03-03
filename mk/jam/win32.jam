@@ -523,7 +523,8 @@ actions piecemeal together DrectveToDef
 {
   for d in $(>)
   do
-    sed -e "s/ /\n/g" $d | sed -e "s/-export:\(.*\)/\1/g" | sed -e "s/,data/ DATA/g" >> $(<)
+    sed -e "s/ /\\
+/g" $d | sed -e "s/-export:\(.*\)/\1/g" | sed -e "s/,data/ DATA/g" >> $(<)
   done
 }
 

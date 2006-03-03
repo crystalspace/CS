@@ -76,7 +76,7 @@ enum
 /**
  * Contains functions to convert between several UTF encodings.
  */
-class csUnicodeTransform
+class CS_CRYSTALSPACE_EXPORT csUnicodeTransform
 {
 public:
 #define FAIL(ret)				\

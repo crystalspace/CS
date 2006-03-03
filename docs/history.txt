@@ -13,6 +13,7 @@ chronological order.
 	- res made shared libs install properly.
 	- Vincent applied res' fixes for undefined symbols with shared libs on
 	  GNU/Linux, gcc 3.4.4.
+	- res fixed a couple of shared lib issues.
 2-Mar-2006
 	- Fossi commited another backup of the paging terrain.
 	- Fossi copied priority 50 to terrain_fixed_base, so that terrain

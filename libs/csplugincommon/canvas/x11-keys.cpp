@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "csplugincommon/canvas/scancode.h"
-#include "iutil/event.h"
 
 unsigned short ScanCodeToChar [128] =
 {
