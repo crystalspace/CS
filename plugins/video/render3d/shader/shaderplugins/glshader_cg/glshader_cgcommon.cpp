@@ -309,7 +309,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
 
   ArgumentArray args;
   shaderPlug->GetProfileCompilerArgs (GetProgramType(), profile, args);
-  for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
+  for (i = 0; i < compilerArgs.GetSize(); i++) 
     args.Push (compilerArgs[i]);
   args.Push (0);
  

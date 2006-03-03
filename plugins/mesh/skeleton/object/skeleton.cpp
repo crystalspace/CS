@@ -852,7 +852,7 @@ bool csSkeleton::UpdateAnimation (csTicks current)
   if (!last_update_time) 
   {
     last_update_time = current;
-  return false;
+    return false;
   }
 
 
@@ -861,13 +861,14 @@ bool csSkeleton::UpdateAnimation (csTicks current)
 
   if (elapsed)
   {
-    for (size_t i = 0; i < update_callbacks.Length(); i++)
+    size_t i;
+    for (i = 0; i < update_callbacks.Length(); i++)
     {
-        update_callbacks[i]->Execute(this, current);
+      update_callbacks[i]->Execute(this, current);
     }
 
     last_update_time = current;
-    size_t i = running_scripts.Length ();
+    i = running_scripts.Length ();
     while (i > 0)
     {
       i--;
@@ -883,23 +884,23 @@ bool csSkeleton::UpdateAnimation (csTicks current)
 
       if (stop)
       {
-    if (script_callback)
-    {
-      script_callback->OnFinish(running_scripts[i].GetScript());
-    }
+        if (script_callback)
+        {
+          script_callback->OnFinish(running_scripts[i].GetScript());
+        }
 
         running_scripts.DeleteIndexFast (i);
       }
     }
 
-  if (!running_scripts.Length() && pending_scripts.Length())
-  {
-    Execute(pending_scripts[0]);
-    pending_scripts.DeleteIndexFast(0);
-  }
+    if (!running_scripts.Length() && pending_scripts.Length())
+    {
+      Execute(pending_scripts[0]);
+      pending_scripts.DeleteIndexFast(0);
+    }
 
-  UpdateBones();
-  UpdateSockets();
+    UpdateBones();
+    UpdateSockets();
   }
 
   return true;
@@ -930,7 +931,8 @@ iSkeletonScript* csSkeleton::Execute (const char *scriptname)
 
 iSkeletonScript* csSkeleton::Append (const char *scriptname)
 {
-  csSkeletonScript* script = (csSkeletonScript*)(factory->FindScript (scriptname));
+  csSkeletonScript* script = (csSkeletonScript*)(
+  	factory->FindScript (scriptname));
   if (!script) 
   {
     return 0;
@@ -1214,10 +1216,10 @@ void csSkeletonFactory::UpdateParentBones ()
   for (size_t i = 0; i < bones.Length (); i++)
   {
     if (!bones[i]->GetParent ())
-  {
-    bones[i]->UpdateBones();
-      parent_bones.Push (i);
-  }
+    {
+      bones[i]->UpdateBones();
+        parent_bones.Push (i);
+    }
   }
 }
 
