@@ -21,6 +21,7 @@
 #include "script_manager.h"
 #include "script_console.h"
 #include "pen.h"
+#include "color.h"
 #include <string.h>
 
 /** @brief The prototype object for pens. */
@@ -59,13 +60,30 @@ SetColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	if (argc<2) return JS_FALSE;
 	
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
-	
-	jsdouble r=0.0,g=0.0,b=0.0,a=1.0;
 		
-	JS_ValueToNumber(cx,  argv[0], &r);
-	JS_ValueToNumber(cx,  argv[1], &g);
-	JS_ValueToNumber(cx,  argv[2], &b);
-	JS_ValueToNumber(cx,  argv[2], &a);
+	jsdouble r=0.0,g=0.0,b=0.0,a=1.0;
+	
+	if (JSVAL_IS_OBJECT(argv[0]))
+	{
+		JSObject *color_object = JSVAL_TO_OBJECT(argv[0]);
+		
+		if (IsColorObject(color_object))
+		{	
+			csColor4 *co = (csColor4 *)JS_GetPrivate(cx, color_object); 
+			
+			r=co->red;
+			g=co->green;
+			b=co->blue;
+			a=co->alpha;
+		}		
+	}
+	else
+	{		
+		JS_ValueToNumber(cx,  argv[0], &r);
+		JS_ValueToNumber(cx,  argv[1], &g);
+		JS_ValueToNumber(cx,  argv[2], &b);
+		JS_ValueToNumber(cx,  argv[3], &a);
+	}
 		
 	if (po) po->SetColor(r,g,b,a);	
 		

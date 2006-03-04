@@ -17,10 +17,11 @@
 */
 
 #include "cssysdef.h"
-#include "color.h"
 #include "csutil/cscolor.h"
 #include "script_manager.h"
 #include "script_console.h"
+#include "color.h"
+
 
 #define CHECK(objname, check) if (!(check)) { \
 	    msg.Format(objname ": failed on " #check " in\n   %s:%s:%d", __FILE__, __FUNCTION__, __LINE__); \
@@ -53,6 +54,7 @@ Color(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	
 	return JS_TRUE;
 }
+
 
 /** @brief Sets a color. Any or all parameters may be included. */
 static JSBool
@@ -169,6 +171,12 @@ static JSFunctionSpec color_methods[] = {
     {0,0,0,0,0}
 };    
 
+
+bool 
+IsColorObject(JSObject *obj)
+{
+	return JS_InstanceOf(ScriptMgr()->GetContext(), obj, &color_object_class, NULL) == JS_TRUE;
+}
 
 
 void 

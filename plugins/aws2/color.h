@@ -4,4 +4,7 @@
 /** Initializes and creates the builtin color object. */
 void Color_SetupAutomation();
 
+/** @brief Returns true if the object is a color. */
+bool IsColorObject(JSObject *obj);
+
 #endif
