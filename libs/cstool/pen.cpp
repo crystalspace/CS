@@ -57,7 +57,7 @@ void csPen::SetupMesh ()
   //mesh.colorCount = static_cast<uint>(colors.Length());  
 
   //mesh.alphaType = alphaSmooth;
-  mesh.mixmode = CS_FX_COPY | CS_FX_FLAT;  
+  mesh.mixmode = CS_FX_COPY | CS_FX_FLAT | CS_FX_ALPHA;  
 }
 
 void csPen::DrawMesh (csRenderMeshType mesh_type)
