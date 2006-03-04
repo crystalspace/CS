@@ -186,7 +186,24 @@ JS_XDRFindClassById(JSXDRState *xdr, uint32 id);
 #define JSXDR_MAGIC_SCRIPT_2        0xdead0002
 #define JSXDR_MAGIC_SCRIPT_3        0xdead0003
 #define JSXDR_MAGIC_SCRIPT_4        0xdead0004
-#define JSXDR_MAGIC_SCRIPT_CURRENT  JSXDR_MAGIC_SCRIPT_4
+#define JSXDR_MAGIC_SCRIPT_5        0xdead0005
+#define JSXDR_MAGIC_SCRIPT_CURRENT  JSXDR_MAGIC_SCRIPT_5
+
+/*
+ * Library-private functions.
+ */
+extern JSBool
+js_XDRAtom(JSXDRState *xdr, JSAtom **atomp);
+
+extern JSBool
+js_XDRStringAtom(JSXDRState *xdr, JSAtom **atomp);
+
+/*
+ * FIXME: This is non-unicode version of js_XDRStringAtom that performs lossy
+ * conversion. Do not use it in the new code! See bug 325202.
+ */
+extern JSBool
+js_XDRCStringAtom(JSXDRState *xdr, JSAtom **atomp);
 
 JS_END_EXTERN_C
 

@@ -56,9 +56,7 @@ Clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 /** @brief Move a pen by (x,y) */
 static JSBool
 SetColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
-{
-	if (argc<2) return JS_FALSE;
-	
+{	
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 		
 	jsdouble r=0.0,g=0.0,b=0.0,a=1.0;
@@ -94,7 +92,7 @@ SetColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 DrawLine(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
-	if (argc<2) return JS_FALSE;
+	if (argc<4) return JS_FALSE;
 	
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
@@ -114,7 +112,7 @@ DrawLine(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 DrawRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
-	if (argc<2) return JS_FALSE;
+	if (argc<4) return JS_FALSE;
 	
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
@@ -136,7 +134,7 @@ DrawRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 DrawMiteredRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
-	if (argc<2) return JS_FALSE;
+	if (argc<5) return JS_FALSE;
 	
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
@@ -160,7 +158,7 @@ DrawMiteredRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 static JSBool
 DrawRoundedRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
-	if (argc<2) return JS_FALSE;
+	if (argc<5) return JS_FALSE;
 	
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
@@ -184,7 +182,7 @@ DrawRoundedRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 static JSBool
 DrawArc(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
-	if (argc<2) return JS_FALSE;
+	if (argc<6) return JS_FALSE;
 	
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
@@ -209,7 +207,7 @@ DrawArc(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 DrawTriangle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
-	if (argc<2) return JS_FALSE;
+	if (argc<6) return JS_FALSE;
 	
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
@@ -254,7 +252,7 @@ Translate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 Rotate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
-	if (argc<2) return JS_FALSE;
+	if (argc<1) return JS_FALSE;
 	
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	

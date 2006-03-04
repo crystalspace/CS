@@ -64,11 +64,42 @@ JS_Assert(const char *s, const char *file, JSIntn ln);
 #endif /* defined(DEBUG) */
 
 /*
+ * Compile-time assert. "condition" must be a constant expression.
+ * The macro should be used only once per source line in places where
+ * a "typedef" declaration is allowed.
+ */
+#define JS_STATIC_ASSERT(condition)                                           \
+    JS_STATIC_ASSERT_IMPL(condition, __LINE__)
+#define JS_STATIC_ASSERT_IMPL(condition, line)                                \
+    JS_STATIC_ASSERT_IMPL2(condition, line)
+#define JS_STATIC_ASSERT_IMPL2(condition, line)                               \
+    typedef int js_static_assert_line_##line[(condition) ? 1 : -1]
+
+/*
 ** Abort the process in a non-graceful manner. This will cause a core file,
 ** call to the debugger or other moral equivalent as well as causing the
 ** entire process to stop.
 */
 extern JS_PUBLIC_API(void) JS_Abort(void);
+
+#ifdef XP_UNIX
+
+typedef struct JSCallsite JSCallsite;
+
+struct JSCallsite {
+    uint32      pc;
+    char        *name;
+    const char  *library;
+    int         offset;
+    JSCallsite  *parent;
+    JSCallsite  *siblings;
+    JSCallsite  *kids;
+    void        *handy;
+};
+
+extern JSCallsite *JS_Backtrace(int skip);
+
+#endif
 
 JS_END_EXTERN_C
 

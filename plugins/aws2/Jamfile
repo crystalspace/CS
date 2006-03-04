@@ -23,6 +23,8 @@ case * :				# Posix, Unix, GNU/Linux, etc.
  SUBDIRC++FLAGS += [ FDefines XP_WIN ] ;
 }
 
+SUBDIRCCFLAGS += [ FDefines JS_HAS_XML_SUPPORT ] ; 
+SUBDIRCCFLAGS += [ FDefines JS_HAS_REGEXPS ] ; 
 SUBDIRHDRS += [ FIncludes js ] ;
 
 AWSJSFILES = js/jsapi.c 
@@ -57,6 +59,7 @@ AWSJSFILES = js/jsapi.c
  js/jsstr.c
  js/jsutil.c
  js/jsxdrapi.c
+ js/jsxml.c
  js/prmjtime.c ;
  
 Plugin aws2 : [ Wildcard *.cpp *.h ] $(AWSJSFILES) ;

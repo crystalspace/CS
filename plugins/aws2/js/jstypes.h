@@ -208,6 +208,19 @@
 #define JS_BITMASK(n)   (JS_BIT(n) - 1)
 
 /***********************************************************************
+** MACROS:      JS_PTR_TO_INT32
+**              JS_PTR_TO_UINT32
+**              JS_INT32_TO_PTR
+**              JS_UINT32_TO_PTR
+** DESCRIPTION:
+** Integer to pointer and pointer to integer conversion macros.
+***********************************************************************/
+#define JS_PTR_TO_INT32(x)  ((jsint)((char *)(x) - (char *)0))
+#define JS_PTR_TO_UINT32(x) ((jsuint)((char *)(x) - (char *)0))
+#define JS_INT32_TO_PTR(x)  ((void *)((char *)0 + (jsint)(x)))
+#define JS_UINT32_TO_PTR(x) ((void *)((char *)0 + (jsuint)(x)))
+
+/***********************************************************************
 ** MACROS:      JS_HOWMANY
 **              JS_ROUNDUP
 **              JS_MIN
@@ -220,13 +233,13 @@
 #define JS_MIN(x,y)     ((x)<(y)?(x):(y))
 #define JS_MAX(x,y)     ((x)>(y)?(x):(y))
 
-#if (defined(XP_MAC) || defined(XP_WIN)) && !defined(CROSS_COMPILE)
+#if (defined(XP_WIN) && !defined(CROSS_COMPILE)) || defined (WINCE)
 #    include "jscpucfg.h"        /* Use standard Mac or Windows configuration */
 #elif defined(XP_UNIX) || defined(XP_BEOS) || defined(XP_OS2) || defined(CROSS_COMPILE)
 #    include "jsautocfg.h"       /* Use auto-detected configuration */
 #    include "jsosdep.h"         /* ...and platform-specific flags */
 #else
-#    error "Must define one of XP_BEOS, XP_MAC, XP_OS2, XP_WIN or XP_UNIX"
+#    error "Must define one of XP_BEOS, XP_OS2, XP_WIN or XP_UNIX"
 #endif
 
 JS_BEGIN_EXTERN_C
@@ -236,31 +249,47 @@ JS_BEGIN_EXTERN_C
 **              JSInt8
 ** DESCRIPTION:
 **  The int8 types are known to be 8 bits each. There is no type that
-**      is equivalent to a plain "char". 
+**      is equivalent to a plain "char".
 ************************************************************************/
-typedef uint8 JSUint8;
-typedef int8 JSInt8;
+#if JS_BYTES_PER_BYTE == 1
+typedef unsigned char JSUint8;
+typedef signed char JSInt8;
+#else
+#error No suitable type for JSInt8/JSUint8
+#endif
 
 /************************************************************************
 ** TYPES:       JSUint16
 **              JSInt16
 ** DESCRIPTION:
-**  The int16 types are known to be 16 bits each. 
+**  The int16 types are known to be 16 bits each.
 ************************************************************************/
-typedef uint16 JSUint16;
-typedef int16 JSInt16;
+#if JS_BYTES_PER_SHORT == 2
+typedef unsigned short JSUint16;
+typedef short JSInt16;
+#else
+#error No suitable type for JSInt16/JSUint16
+#endif
 
 /************************************************************************
 ** TYPES:       JSUint32
 **              JSInt32
 ** DESCRIPTION:
-**  The int32 types are known to be 32 bits each. 
+**  The int32 types are known to be 32 bits each.
 ************************************************************************/
-typedef uint32 JSUint32;
-typedef int32 JSInt32;
+#if JS_BYTES_PER_INT == 4
+typedef unsigned int JSUint32;
+typedef int JSInt32;
 #define JS_INT32(x)  x
 #define JS_UINT32(x) x ## U
-
+#elif JS_BYTES_PER_LONG == 4
+typedef unsigned long JSUint32;
+typedef long JSInt32;
+#define JS_INT32(x)  x ## L
+#define JS_UINT32(x) x ## UL
+#else
+#error No suitable type for JSInt32/JSUint32
+#endif
 
 /************************************************************************
 ** TYPES:       JSUint64
@@ -272,9 +301,30 @@ typedef int32 JSInt32;
 **      64 bit values. The only guaranteed portability requires the use of
 **      the JSLL_ macros (see jslong.h).
 ************************************************************************/
-typedef int64 JSInt64;
-typedef uint64 JSUint64;
-
+#ifdef JS_HAVE_LONG_LONG
+#if JS_BYTES_PER_LONG == 8
+typedef long JSInt64;
+typedef unsigned long JSUint64;
+#elif defined(WIN16)
+typedef __int64 JSInt64;
+typedef unsigned __int64 JSUint64;
+#elif defined(WIN32) && !defined(__GNUC__)
+typedef __int64  JSInt64;
+typedef unsigned __int64 JSUint64;
+#else
+typedef long long JSInt64;
+typedef unsigned long long JSUint64;
+#endif /* JS_BYTES_PER_LONG == 8 */
+#else  /* !JS_HAVE_LONG_LONG */
+typedef struct {
+#ifdef IS_LITTLE_ENDIAN
+    JSUint32 lo, hi;
+#else
+    JSUint32 hi, lo;
+#endif
+} JSInt64;
+typedef JSInt64 JSUint64;
+#endif /* !JS_HAVE_LONG_LONG */
 
 /************************************************************************
 ** TYPES:       JSUintn
@@ -283,23 +333,26 @@ typedef uint64 JSUint64;
 **  The JSIntn types are most appropriate for automatic variables. They are
 **      guaranteed to be at least 16 bits, though various architectures may
 **      define them to be wider (e.g., 32 or even 64 bits). These types are
-**      never valid for fields of a structure. 
+**      never valid for fields of a structure.
 ************************************************************************/
+#if JS_BYTES_PER_INT >= 2
 typedef int JSIntn;
 typedef unsigned int JSUintn;
+#else
+#error 'sizeof(int)' not sufficient for platform use
+#endif
 
 /************************************************************************
 ** TYPES:       JSFloat64
 ** DESCRIPTION:
-**  NSPR's floating point type is always 64 bits. 
+**  NSPR's floating point type is always 64 bits.
 ************************************************************************/
 typedef double          JSFloat64;
-typedef double			float64;
 
 /************************************************************************
 ** TYPES:       JSSize
 ** DESCRIPTION:
-**  A type for representing the size of objects. 
+**  A type for representing the size of objects.
 ************************************************************************/
 typedef size_t JSSize;
 
@@ -307,7 +360,7 @@ typedef size_t JSSize;
 ** TYPES:       JSPtrDiff
 ** DESCRIPTION:
 **  A type for pointer difference. Variables of this type are suitable
-**      for storing a pointer or pointer sutraction. 
+**      for storing a pointer or pointer sutraction.
 ************************************************************************/
 typedef ptrdiff_t JSPtrdiff;
 
@@ -315,9 +368,13 @@ typedef ptrdiff_t JSPtrdiff;
 ** TYPES:       JSUptrdiff
 ** DESCRIPTION:
 **  A type for pointer difference. Variables of this type are suitable
-**      for storing a pointer or pointer sutraction. 
+**      for storing a pointer or pointer sutraction.
 ************************************************************************/
+#if JS_BYTES_PER_WORD == 8 && JS_BYTES_PER_LONG != 8
+typedef JSUint64 JSUptrdiff;
+#else
 typedef unsigned long JSUptrdiff;
+#endif
 
 /************************************************************************
 ** TYPES:       JSBool
@@ -325,7 +382,7 @@ typedef unsigned long JSUptrdiff;
 **  Use JSBool for variables and parameter types. Use JS_FALSE and JS_TRUE
 **      for clarity of target type in assignments and actual arguments. Use
 **      'if (bool)', 'while (!bool)', '(bool) ? x : y' etc., to test booleans
-**      just as you would C int-valued conditions. 
+**      just as you would C int-valued conditions.
 ************************************************************************/
 typedef JSIntn JSBool;
 #define JS_TRUE (JSIntn)1
@@ -335,17 +392,46 @@ typedef JSIntn JSBool;
 ** TYPES:       JSPackedBool
 ** DESCRIPTION:
 **  Use JSPackedBool within structs where bitfields are not desireable
-**      but minimum and consistant overhead matters.
+**      but minimum and consistent overhead matters.
 ************************************************************************/
 typedef JSUint8 JSPackedBool;
 
 /*
 ** A JSWord is an integer that is the same size as a void*
 */
+#if JS_BYTES_PER_WORD == 8 && JS_BYTES_PER_LONG != 8
+typedef JSInt64 JSWord;
+typedef JSUint64 JSUword;
+#else
 typedef long JSWord;
 typedef unsigned long JSUword;
+#endif
 
 #include "jsotypes.h"
+
+/***********************************************************************
+** MACROS:      JS_LIKELY
+**              JS_UNLIKELY
+** DESCRIPTION:
+**      These macros allow you to give a hint to the compiler about branch
+**      probability so that it can better optimize.  Use them like this:
+**
+**      if (JS_LIKELY(v == 1)) {
+**          ... expected code path ...
+**      }
+**
+**      if (JS_UNLIKELY(v == 0)) {
+**          ... non-expected code path ...
+**      }
+**
+***********************************************************************/
+#if defined(__GNUC__) && (__GNUC__ > 2)
+#define JS_LIKELY(x)    (__builtin_expect((x), 1))
+#define JS_UNLIKELY(x)  (__builtin_expect((x), 0))
+#else
+#define JS_LIKELY(x)    (x)
+#define JS_UNLIKELY(x)  (x)
+#endif
 
 JS_END_EXTERN_C
 

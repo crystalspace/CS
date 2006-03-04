@@ -54,16 +54,21 @@ JS_BEGIN_EXTERN_C
 #define GCX_DOUBLE              2               /* jsdouble */
 #define GCX_MUTABLE_STRING      3               /* JSString that's mutable --
                                                    single-threaded only! */
-#define GCX_EXTERNAL_STRING     4               /* JSString w/ external chars */
-#define GCX_NTYPES_LOG2         3               /* type index bits */
+#define GCX_PRIVATE             4               /* private (unscanned) data */
+#define GCX_NAMESPACE           5               /* JSXMLNamespace */
+#define GCX_QNAME               6               /* JSXMLQName */
+#define GCX_XML                 7               /* JSXML */
+#define GCX_EXTERNAL_STRING     8               /* JSString w/ external chars */
+
+#define GCX_NTYPES_LOG2         4               /* type index bits */
 #define GCX_NTYPES              JS_BIT(GCX_NTYPES_LOG2)
 
 /* GC flag definitions, must fit in 8 bits (type index goes in the low bits). */
 #define GCF_TYPEMASK    JS_BITMASK(GCX_NTYPES_LOG2)
 #define GCF_MARK        JS_BIT(GCX_NTYPES_LOG2)
 #define GCF_FINAL       JS_BIT(GCX_NTYPES_LOG2 + 1)
-#define GCF_LOCKSHIFT   (GCX_NTYPES_LOG2 + 2)   /* lock bit shift and mask */
-#define GCF_LOCKMASK    (JS_BITMASK(8 - GCF_LOCKSHIFT) << GCF_LOCKSHIFT)
+#define GCF_SYSTEM      JS_BIT(GCX_NTYPES_LOG2 + 2)
+#define GCF_LOCKSHIFT   (GCX_NTYPES_LOG2 + 3)   /* lock bit shift */
 #define GCF_LOCK        JS_BIT(GCF_LOCKSHIFT)   /* lock request bit in API */
 
 /* Pseudo-flag that modifies GCX_STRING to make GCX_MUTABLE_STRING. */
@@ -119,8 +124,21 @@ js_AddRootRT(JSRuntime *rt, void *rp, const char *name);
 extern JSBool
 js_RemoveRoot(JSRuntime *rt, void *rp);
 
+/*
+ * The private JSGCThing struct, which describes a gcFreeList element.
+ */
+struct JSGCThing {
+    JSGCThing   *next;
+    uint8       *flagp;
+};
+
+#define GC_NBYTES_MAX           (10 * sizeof(JSGCThing))
+#define GC_NUM_FREELISTS        (GC_NBYTES_MAX / sizeof(JSGCThing))
+#define GC_FREELIST_NBYTES(i)   (((i) + 1) * sizeof(JSGCThing))
+#define GC_FREELIST_INDEX(n)    (((n) / sizeof(JSGCThing)) - 1)
+
 extern void *
-js_AllocGCThing(JSContext *cx, uintN flags);
+js_NewGCThing(JSContext *cx, uintN flags, size_t nbytes);
 
 extern JSBool
 js_LockGCThing(JSContext *cx, void *thing);
@@ -131,7 +149,7 @@ js_LockGCThingRT(JSRuntime *rt, void *thing);
 extern JSBool
 js_UnlockGCThingRT(JSRuntime *rt, void *thing);
 
-extern JSBool 
+extern JSBool
 js_IsAboutToBeFinalized(JSContext *cx, void *thing);
 
 extern void
@@ -179,7 +197,7 @@ struct GCMarkNode {
  * Flags to modify how a GC marks and sweeps:
  *   GC_KEEP_ATOMS      Don't sweep unmarked atoms, they may be in use by the
  *                      compiler, or by an API function that calls js_Atomize,
- *                      when the GC is called from js_AllocGCThing, due to a
+ *                      when the GC is called from js_NewGCThing, due to a
  *                      malloc failure or the runtime GC-thing limit.
  *   GC_LAST_CONTEXT    Called from js_DestroyContext for last JSContext in a
  *                      JSRuntime, when it is imperative that rt->gcPoke gets
@@ -197,21 +215,30 @@ js_ForceGC(JSContext *cx, uintN gcflags);
 extern void
 js_GC(JSContext *cx, uintN gcflags);
 
+#ifdef DEBUG_notme
+#define JS_GCMETER 1
+#endif
+
 #ifdef JS_GCMETER
 
 typedef struct JSGCStats {
     uint32  alloc;      /* number of allocation attempts */
-    uint32  freelen;    /* gcFreeList length */
-    uint32  recycle;    /* number of things recycled through gcFreeList */
     uint32  retry;      /* allocation attempt retries after running the GC */
+    uint32  retryhalt;  /* allocation retries halted by the branch callback */
     uint32  fail;       /* allocation failures */
     uint32  finalfail;  /* finalizer calls allocator failures */
+    uint32  lockborn;   /* things born locked */
     uint32  lock;       /* valid lock calls */
     uint32  unlock;     /* valid unlock calls */
-    uint32  stuck;      /* stuck reference counts seen by lock calls */
-    uint32  unstuck;    /* unlock calls that saw a stuck lock count */
-    uint32  depth;      /* mark recursion depth */
-    uint32  maxdepth;   /* maximum mark recursion depth */
+    uint32  depth;      /* mark tail recursion depth */
+    uint32  maxdepth;   /* maximum mark tail recursion depth */
+    uint32  cdepth;     /* mark recursion depth of C functions */
+    uint32  maxcdepth;  /* maximum mark recursion depth of C functions */
+    uint32  dswmark;    /* mark C stack overflows => Deutsch-Schorr-Waite */
+    uint32  dswdepth;   /* DSW mark depth */
+    uint32  maxdswdepth;/* maximum DSW mark depth */
+    uint32  dswup;      /* DSW moves up the mark spanning tree */
+    uint32  dswupstep;  /* steps in obj->slots to find DSW-reversed pointer */
     uint32  maxlevel;   /* maximum GC nesting (indirect recursion) level */
     uint32  poke;       /* number of potentially useful GC calls */
     uint32  nopoke;     /* useless GC calls where js_PokeGC was not set */
@@ -220,10 +247,43 @@ typedef struct JSGCStats {
     uint32  segslots;   /* total stack segment jsval slots scanned */
 } JSGCStats;
 
-extern void
+extern JS_FRIEND_API(void)
 js_DumpGCStats(JSRuntime *rt, FILE *fp);
 
 #endif /* JS_GCMETER */
+
+typedef struct JSGCArena JSGCArena;
+typedef struct JSGCArenaList JSGCArenaList;
+
+#ifdef JS_GCMETER
+typedef struct JSGCArenaStats JSGCArenaStats;
+
+struct JSGCArenaStats {
+    uint32  narenas;        /* number of arena in list */
+    uint32  maxarenas;      /* maximun number of allocated arenas */
+    uint32  nthings;        /* number of allocates JSGCThing */
+    uint32  maxthings;      /* maximum number number of allocates JSGCThing */
+    uint32  freelen;        /* freeList lengths */
+    uint32  recycle;        /* number of things recycled through freeList */
+};
+#endif
+
+struct JSGCArenaList {
+    JSGCArena   *last;      /* last allocated GC arena */
+    size_t      lastLimit;  /* end offset of allocated so far things in last */
+    JSGCThing   *freeList;
+#ifdef JS_GCMETER
+    JSGCArenaStats stats;
+#endif
+};
+
+#ifdef DEBUG_notme
+#define TOO_MUCH_GC 1
+#endif
+
+#ifdef WAY_TOO_MUCH_GC
+#define TOO_MUCH_GC 1
+#endif
 
 JS_END_EXTERN_C
 

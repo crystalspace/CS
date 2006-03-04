@@ -107,6 +107,9 @@ Widget(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
   	
   	// Save the widget.
   	aws::widgets.Push(wo);
+  	
+  	
+  	ScriptCon()->Message("Widget created.");
 	
 	return JS_TRUE;
 }

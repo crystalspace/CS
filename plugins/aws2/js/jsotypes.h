@@ -51,11 +51,12 @@
 #ifndef PROTYPES_H
 #define PROTYPES_H
 
+typedef JSFloat64 float64;
 
 /* Re: jsbit.h */
-#define TEST_BIT	JS_TEST_BIT
-#define SET_BIT		JS_SET_BIT
-#define CLEAR_BIT	JS_CLEAR_BIT
+#define TEST_BIT        JS_TEST_BIT
+#define SET_BIT         JS_SET_BIT
+#define CLEAR_BIT       JS_CLEAR_BIT
 
 /* Re: prarena.h->plarena.h */
 #define PRArena PLArena
@@ -134,14 +135,5 @@
 #define PR_HashString PL_HashString
 #define PR_CompareStrings PL_CompareStrings
 #define PR_CompareValues PL_CompareValues
-
-#ifdef XP_MAC
-#ifndef TRUE				/* Mac standard is lower case true */
-	#define TRUE 1
-#endif
-#ifndef FALSE				/* Mac standard is lower case false */
-	#define FALSE 0
-#endif
-#endif
 
 #endif /* !defined(PROTYPES_H) */

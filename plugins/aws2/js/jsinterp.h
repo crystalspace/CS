@@ -48,7 +48,9 @@
 JS_BEGIN_EXTERN_C
 
 /*
- * JS stack frame, allocated on the C stack.
+ * JS stack frame, may be allocated on the C stack by native callers.  Always
+ * allocated on cx->stackPool for calls from the interpreter to an interpreted
+ * function.
  */
 struct JSStackFrame {
     JSObject        *callobj;       /* lazily created Call object */
@@ -72,10 +74,12 @@ struct JSStackFrame {
     JSObject        *sharpArray;    /* scope for #n= initializer vars */
     uint32          flags;          /* frame flags -- see below */
     JSStackFrame    *dormantNext;   /* next dormant frame chain */
+    JSObject        *xmlNamespace;  /* null or default xml namespace in E4X */
 };
 
 typedef struct JSInlineFrame {
     JSStackFrame    frame;          /* base struct */
+    jsval           *rvp;           /* ptr to caller's return value slot */
     void            *mark;          /* mark before inline frame */
     void            *hookData;      /* debugger call hook data */
     JSVersion       callerVersion;  /* dynamic version of calling script */
@@ -93,7 +97,8 @@ typedef struct JSInlineFrame {
 #define JSFRAME_SPECIAL       0x30  /* special evaluation frame flags */
 #define JSFRAME_COMPILING     0x40  /* frame is being used by compiler */
 #define JSFRAME_COMPILE_N_GO  0x80  /* compiler-and-go mode, can optimize name
-                                       references based on scope chain */ 
+                                       references based on scope chain */
+#define JSFRAME_SCRIPT_OBJECT 0x100 /* compiling source for a Script object */
 
 #define JSFRAME_OVERRIDE_SHIFT 24   /* override bit-set params; see jsfun.c */
 #define JSFRAME_OVERRIDE_BITS  8
@@ -255,8 +260,19 @@ extern void         js_DumpCallTable(JSContext *cx);
 #endif
 
 /*
+ * Compute the 'this' parameter for a call with nominal 'this' given by thisp
+ * and arguments including argv[-1] (nominal 'this') and argv[-2] (callee).
+ * Activation objects ("Call" objects not created with "new Call()", i.e.,
+ * "Call" objects that have private data) may not be referred to by 'this',
+ * per ECMA-262, so js_ComputeThis censors them.
+ */
+extern JSObject *
+js_ComputeThis(JSContext *cx, JSObject *thisp, jsval *argv);
+
+/*
  * NB: js_Invoke requires that cx is currently running JS (i.e., that cx->fp
- * is non-null).
+ * is non-null), and that the callee, |this| parameter, and actual arguments
+ * are already pushed on the stack under cx->fp->sp.
  */
 extern JS_FRIEND_API(JSBool)
 js_Invoke(JSContext *cx, uintN argc, uintN flags);
@@ -295,7 +311,10 @@ js_CheckRedeclaration(JSContext *cx, JSObject *obj, jsid id, uintN attrs,
                       JSObject **objp, JSProperty **propp);
 
 extern JSBool
-js_Interpret(JSContext *cx, jsval *result);
+js_StrictlyEqual(jsval lval, jsval rval);
+
+extern JSBool
+js_Interpret(JSContext *cx, jsbytecode *pc, jsval *result);
 
 JS_END_EXTERN_C
 
