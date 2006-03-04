@@ -74,6 +74,10 @@ namespace aws
      * all of the widgets in it's docked list.
      * That way they end up moving together. */
     widget *docked[4];
+    
+    /** A set of bits that tell us what sides of our parent
+     * we want to stick to. */
+    uint8 sticky_frame_flags;
       
     /** The frame provided for this widget. */
     frame fr;
@@ -97,7 +101,7 @@ namespace aws
      JSContext *AutomContext() { return ctx; }
      
   public:
-  	 widget():wpen(0), parent(0), dirty(JS_TRUE) 
+  	 widget():wpen(0), parent(0), sticky_frame_flags(0), dirty(JS_TRUE) 
   	 {
 	 	memset(docked, 0, sizeof(docked)); 	 
 	 }  	 
@@ -183,7 +187,40 @@ namespace aws
 			  		break;
 		  	}		  	 
 	  	}
-  	 }  	 
+  	 }  
+  	 
+  	 /** @brief Adjusts all children when we've been resized. */
+  	 void AdjustChildrenForStickiness()
+  	 {
+	  	 for(size_t i=0; i<children.Length(); ++i)
+	  	 {
+		 	children[i]->AdjustForStickiness();	 
+	  	 }	  	 
+  	 }
+  	 
+  	 /** @brief Adjusts our frame to our parent's frame, accounting for the sticky bits. */
+  	 void AdjustForStickiness()
+  	 {
+	  	 // No parent, can't adjust for stickiness
+	  	 if (parent==0) return;
+	  	 
+	  	 if (sticky_frame_flags & (1<<W_DOCK_NORTH)) Bounds().ymin = 0; 
+	  	 if (sticky_frame_flags & (1<<W_DOCK_SOUTH)) Bounds().ymax = parent->Bounds().Height();
+	  	 if (sticky_frame_flags & (1<<W_DOCK_EAST))  Bounds().xmax = parent->Bounds().Width();
+	  	 if (sticky_frame_flags & (1<<W_DOCK_WEST))  Bounds().xmin = 0;	  	 
+  	 }	 
+  	 
+  	 /** @brief Sets a stick frame bit. */
+  	 void SetFrameAnchor(int32 bit)
+  	 {
+	  	sticky_frame_flags |= (bit<<1);	 
+  	 }
+  	 
+  	 /** @brief Clears a sticky frame bit. */
+  	 void ClearFrameAnchor(int32 bit)
+  	 {
+	  	sticky_frame_flags &= ~(bit<<1);	 
+  	 }
   	 
   	 /// Drawing ////
        

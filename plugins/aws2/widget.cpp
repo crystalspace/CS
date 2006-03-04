@@ -166,6 +166,7 @@ Resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	wo->Bounds().ymax+=h;
 	
 	wo->MoveDocked();
+	wo->AdjustChildrenForStickiness();
 	
 	return JS_TRUE;
 }
@@ -185,7 +186,8 @@ ResizeTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	
 	wo->Bounds().SetSize(w, h);
 	wo->MoveDocked();
-	
+	wo->AdjustChildrenForStickiness();
+		
 	return JS_TRUE;
 }
 
@@ -299,6 +301,35 @@ Dock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	return JS_TRUE;
 }
 
+/** @brief Adds a child object. */
+static JSBool
+SetFrameAnchor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{	
+	int32 where;	
+	aws::widget *wo = (aws::widget *)JS_GetPrivate(cx, obj);
+	
+	JS_ValueToInt32(cx, argv[0], &where);
+	
+	wo->SetFrameAnchor(where);
+	wo->AdjustForStickiness();
+			
+	return JS_TRUE;
+}
+
+/** @brief Adds a child object. */
+static JSBool
+ClearFrameAnchor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{	
+	int32 where;	
+	aws::widget *wo = (aws::widget *)JS_GetPrivate(cx, obj);
+	
+	JS_ValueToInt32(cx, argv[0], &where);
+	
+	wo->ClearFrameAnchor(where);
+			
+	return JS_TRUE;
+}
+
 
 static JSPropertySpec widget_props[] =
 {
@@ -320,6 +351,11 @@ static JSPropertySpec widget_static_props[] =
         {"DOCK_EAST",      WIDGET_DOCK_EAST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
         {"DOCK_WEST",      WIDGET_DOCK_WEST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
         
+        {"STICK_NORTH",     WIDGET_DOCK_NORTH,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"STICK_SOUTH",     WIDGET_DOCK_SOUTH,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"STICK_EAST",      WIDGET_DOCK_EAST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"STICK_WEST",      WIDGET_DOCK_WEST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        
         {0,0,0}
 };
 
@@ -335,6 +371,9 @@ static JSFunctionSpec widget_methods[] = {
     {"AddChild",	AddChild,	 1, 0, 0},
     {"RemoveChild",	RemoveChild, 1, 0, 0},
     {"Dock",		Dock, 		 2, 0, 0},
+    
+    {"SetFrameAnchor",		SetFrameAnchor,		 1, 0, 0},
+    {"ClearFrameAnchor",	ClearFrameAnchor,	 1, 0, 0},
     
     
     {0,0,0,0,0}
