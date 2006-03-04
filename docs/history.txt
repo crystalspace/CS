@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Mar-2006
+	- Jorrit added a feature to csColliderActor so that you can get
+	  the meshes that were hit with in the last call to Move().
 3-Mar-2006
 	- Christopher fixed bugs in csRect and csPen.  Christopher also
 	  submitted a large change to AWS2.  He fixed awstest to be able

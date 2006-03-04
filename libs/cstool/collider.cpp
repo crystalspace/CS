@@ -510,6 +510,7 @@ csColliderActor::csColliderActor ()
   camera = 0;
   movable = 0;
   revertCount = 0;
+  do_hit_meshes = false;
 
   // Only used in case a camera is used.
   rotation.Set (0, 0, 0);
@@ -765,6 +766,8 @@ int csColliderActor::CollisionDetect (
       if (reallycollided)
       {
         hits++;
+	if (do_hit_meshes)
+	  hit_meshes.Add (meshWrapper);
         if (cdsys->GetOneHitOnly ()) return 1;
       }
     }
@@ -1125,6 +1128,8 @@ bool csColliderActor::RotateV (float delta,
 bool csColliderActor::MoveV (float delta,
 	const csVector3& velBody)
 {
+  hit_meshes.Empty ();
+  
   if (velBody < SMALL_EPSILON && velWorld < SMALL_EPSILON
   	&& onground)
     return false;  // didn't move anywhere

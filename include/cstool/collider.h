@@ -30,6 +30,7 @@
 #include "csutil/leakguard.h"
 #include "csutil/array.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/set.h"
 
 #include "ivaria/collider.h"
 
@@ -340,6 +341,9 @@ private:
   iCollideSystem* cdsys;
   iEngine* engine;
   csVector3 velWorld;
+  /// Set of meshes we hit with last call to Move.
+  csSet<csPtrKey<iMeshWrapper> > hit_meshes;
+  bool do_hit_meshes;
 
   /// For rotation - Euler angles in radians
   csVector3 rotation;
@@ -483,7 +487,27 @@ public:
   bool CheckRevertMove () const { return revertMove; }
 
   /**
-   * Move the model.
+   * Enable remembering of the meshes we hit.
+   * By default this is disabled. If this is enabled you can call
+   * GetHitMeshes() after calling Move() to get a set of all meshes
+   * that were hit.
+   */
+  void EnableHitMeshes (bool hm) { do_hit_meshes = hm; }
+
+  /// Return true if we remember the meshes we hit.
+  bool CheckHitMeshes () const { return do_hit_meshes; }
+
+  /**
+   * Return the meshes that we hit in the last call to Move().
+   * Calling Move() again will clear this set and calculate it again.
+   * This works only if EnableHitMeshes(true) is called.
+   */
+  const csSet<csPtrKey<iMeshWrapper> >& GetHitMeshes ()
+  { return hit_meshes; }
+
+  /**
+   * Move the model. If EnableHitMeshes(true) is set then you can
+   * use GetHitMeshes() after this to detect the meshes that were hit.
    * \param delta is the number of seconds (floating point) elapsed
    * time. Typically this is the elapsed time from the virtual clock
    * divided by 1000.0f.
