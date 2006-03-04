@@ -1,24 +1,35 @@
 // AWS Test skin definition file
 
+// Load the default style set
+Autom.Load("/aws/widgets/Styles.js");
+Autom.Load("/aws/widgets/Widgets.js");
+
+
 skin_NormalWindows = 
 {
     Name    : "Normal Windows",
+    Style   : Style3D,
+    
+    
 	Texture : "/aws/texture.png",
 	
-    HighlightColor    : new Color(0.9,  0.9,  0.9),
-    ShadowColor	      : new Color(0.23, 0.23, 0.23),
-    FillColor		  : new Color(0.78, 0.78, 0.78),
-    TextDisabledColor : new Color(0.5,  0.5,  0),
-    TextForeColor	  : new Color(0, 0, 0),
-    TextBackColor	  : new Color(1, 1, 1),
-    ButtonTextColor	  : new Color(0, 0, .75),
-    ChartBarColor	  : new Color(1, 0, 0),
-    ActiveTitleBarColor1 : new Color(0, 0, 0.5),
-    ActiveTitleBarColor2 : new Color(0.78, 0.78, 1),
+    HighlightColor    : new Color(0.9,  0.9,  0.9, 1),
+    ShadowColor	      : new Color(0.23, 0.23, 0.23, 1),
+    FillColor		  : new Color(0.78, 0.78, 0.78, 0.75),
+    TextDisabledColor : new Color(0.5,  0.5,  0, 1),
+    TextForeColor	  : new Color(0, 0, 0, 1),
+    TextBackColor	  : new Color(1, 1, 1, 1),
+    ButtonTextColor	  : new Color(0, 0, .75, 1),
+    ChartBarColor	  : new Color(1, 0, 0, 1),
+    ActiveTitleBarColor1 : new Color(0, 0, 0.5, 1),
+    ActiveTitleBarColor2 : new Color(0.78, 0.78, 1, 1),
     
     OverlayTextureAlpha	 : 128,
     ScrollBarHeight		 : 16,
     ScrollBarWidth		 : 16,
+    
+    TitleBarHeight		 : 30,
+    TitleBarRoundness	 : 0.05,
     
     // The draw member can be a function or a filename.
     // If a function is specified, it will be called to draw the item.
@@ -59,9 +70,6 @@ Skin.Add(skin_NormalWindows);
 // Set it as the default skin
 Skin.current = skin_NormalWindows;
 
-// Load the default style set
-Autom.Load("/aws/widgets/Styles.js");
-Autom.Load("/aws/widgets/Widgets.js");
 
 // This is a test file.
 Autom.Load("/aws/test.js");

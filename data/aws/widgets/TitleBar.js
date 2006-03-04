@@ -13,20 +13,9 @@ function TitleBar(inittext)
 	_widget.hAlign = Pen.ALIGN_LEFT;
 	_widget.vAlign = Pen.ALIGN_CENTER;
 	
-	_widget.onDraw = function(pen)
-	{
-		var w = this.width, h = this.height;
-		
-		// Draw the frame.
-		pen.SetColor(Skin.current["FillColor"]);
-		pen.DrawArc(0,0,5,h, Math.PI, Math.PI*2, true);
-		pen.DrawRect(6,0,w,h, true);
-		
-		
-		pen.SetColor(Skin.current["HighlightColor"]);
-		pen.DrawArc(0,0,5,h, Math.PI, Math.PI*2, false);
-		
-	}
+	_widget.Resize(100, Skin.current.TitleBarHeight);
+	
+	_widget.onDraw = Skin.current.Style.TitleBar;
 	
 	return _widget;
 }

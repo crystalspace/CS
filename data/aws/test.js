@@ -75,6 +75,5 @@ w3.Invalidate();
 
 // Test titlebar
 tb = TitleBar();
-tb.Resize(0,40);
 w.Dock(tb, Widget.DOCK_NORTH);
 tb.Invalidate();
