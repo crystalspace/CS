@@ -1,5 +1,7 @@
 ///// Widgets /////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
-//// This she be loaded automatically by the skin definition file. ////
+//// This will be loaded automatically by the skin definition file. ///
 
+Autom.Load("/aws/widgets/Support.js");
 Autom.Load("/aws/widgets/TextBox.js");
+Autom.Load("/aws/widgets/TitleBar.js");
