@@ -13964,6 +13964,9 @@ sub new {
 *HasCD = *cspacec::csColliderActor_HasCD;
 *SetCD = *cspacec::csColliderActor_SetCD;
 *CheckRevertMove = *cspacec::csColliderActor_CheckRevertMove;
+*EnableHitMeshes = *cspacec::csColliderActor_EnableHitMeshes;
+*CheckHitMeshes = *cspacec::csColliderActor_CheckHitMeshes;
+*GetHitMeshes = *cspacec::csColliderActor_GetHitMeshes;
 *Move = *cspacec::csColliderActor_Move;
 *GetRotation = *cspacec::csColliderActor_GetRotation;
 *SetRotation = *cspacec::csColliderActor_SetRotation;
