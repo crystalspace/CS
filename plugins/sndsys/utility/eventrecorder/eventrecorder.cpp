@@ -115,8 +115,7 @@ bool csSndSysBasicEventRecorder::Initialize(iObjectRegistry *pObjectRegistry)
 
 
   // set event callback
-  if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
+  scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(m_pObjectRegistry, iEventQueue));
   m_evSystemOpen = csevSystemOpen(m_pObjectRegistry);
   m_evSystemClose = csevSystemClose(m_pObjectRegistry);
