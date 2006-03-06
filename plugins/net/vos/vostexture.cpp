@@ -178,7 +178,7 @@ void ConstructMozTextureTask::doTask()
   csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   csRef<iTextureManager> txtmgr = g3d->GetTextureManager();
   csRef<iMozilla> moz;
-  CS_QUERY_REGISTRY_PLUGIN(moz, object_reg, "crystalpsace.texture.type.mozilla", iMozilla);
+  CS_QUERY_REGISTRY_PLUGIN(moz, object_reg, "crystalspace.texture.type.mozilla", iMozilla);
 
   if(!moz) {
     LOG("ConstructMozTextureTask", 1, "Error: No iMozilla plugin; can't use HTML textures.");

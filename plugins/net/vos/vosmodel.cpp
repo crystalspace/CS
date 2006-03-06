@@ -169,8 +169,9 @@ void ConstructModelTask::doTask()
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   iBase* result;
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
-  if (!loader->Load (model->getDatabuf(), result))
+  csRef<iLoader> loader;
+  CS_QUERY_REGISTRY_PLUGIN(loader, object_reg, "crystalspace.level.loader", iLoader);
+  if (!loader || !loader->Load (model->getDatabuf(), result))
   {
     LOG("vosmodel", 2, "Was not able to load model " << model->getURLstr());
     return;

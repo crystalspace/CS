@@ -427,9 +427,9 @@ Task* csMetaObject3D::GetSetupTask(csVosA3DL* vosa3dl, csVosSector* sect)
             csVector3(x, y, z),                    // pos
             csMatrix3(q),                          // ori
             csVector3(xht, yht, zht),              // hardpos
-            csMatrix3(qht) * csMatrix3(sxht, 0, 0, // hardtrans
-                                       0, syht, 0,
-                                       0, 0, szht)));
+            csMatrix3(qht) * csMatrix3(1.0/sxht, 0, 0, // hardtrans
+                                       0, 1.0/syht, 0,
+                                       0, 0, 1.0/szht)));
 }
 
 void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
