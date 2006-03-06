@@ -1,0 +1,12 @@
+SubDir TOP plugins sndsys renderer software drivers alsa ;
+
+if $(ALSA.AVAILABLE) = "yes"
+{
+  Description sndsysalsa : "Linux ALSA driver for the software sound renderer for sndsys" ;
+  Plugin sndsysalsa : [ Wildcard *.cpp *.h ] ;
+  LinkWith sndsysalsa : crystalspace ;
+  ExternalLibs sndsysalsa : ALSA ;
+  CompileGroups sndsysalsa : sndsys ;
+}
+
+
