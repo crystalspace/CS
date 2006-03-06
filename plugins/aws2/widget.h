@@ -80,6 +80,10 @@ namespace aws
     /** A set of bits that tell us what sides of our parent
      * we want to stick to. */
     uint8 sticky_frame_flags;
+    
+    /** A set of spacer margins for the sticky and dock adjustments.
+     * This much space will be inserted between the edges for each adjustment. */
+    int32 margins[4];     
       
     /** The frame provided for this widget. */
     frame fr;
@@ -105,7 +109,8 @@ namespace aws
   public:
   	 widget():wpen(0), parent(0), sticky_frame_flags(0), dirty(JS_TRUE) 
   	 {
-	 	memset(docked, 0, sizeof(docked)); 	 
+	 	memset(docked, 0, sizeof(docked)); 
+	 	memset(margins, 0, sizeof(margins));	 
 	 }  	 
   	 
   	 virtual ~widget() {}
@@ -150,12 +155,12 @@ namespace aws
 	  	if (where>=0 && where<4)
 	  	{ 
 		  	docked[where]=w;	  	 
-	  	 	MoveDocked(where);
+	  	 	AdjustDocked(where);
   	 	}	  	 		  	
   	 }
   	 
-  	 /** @brief Moves widgets docked to this widget. */
-  	 void MoveDocked(int which=-1)
+  	 /** @brief Adjusts widgets docked to this widget. */
+  	 void AdjustDocked(int which=-1)
   	 {
 	  	 int start = (which==-1 ? 0 : which);
 	  	 int end   = (which==-1 ? 4 : which+1);
@@ -169,35 +174,37 @@ namespace aws
 		  	switch(where)
 		  	{
 			  	case W_DOCK_NORTH:		  		
-			  		w->Bounds().SetPos(Bounds().xmin, Bounds().ymin-w->Bounds().Height());
+			  		w->Bounds().SetPos(Bounds().xmin, Bounds().ymin-w->Bounds().Height()-margins[W_DOCK_SOUTH]);
 			  		w->Bounds().SetSize(Bounds().Width(), w->Bounds().Height());
 			  		w->Invalidate();
 			  		break;
 			  		
 			  	case W_DOCK_SOUTH:
-			  		w->Bounds().SetPos(Bounds().xmin, Bounds().ymax+1);
+			  		w->Bounds().SetPos(Bounds().xmin, Bounds().ymax+1+margins[W_DOCK_NORTH]);
 			  		w->Bounds().SetSize(Bounds().Width(), w->Bounds().Height());
 			  		w->Invalidate();
 			  		break;
 			  		
 			  	case W_DOCK_EAST:
-			  		w->Bounds().SetPos(Bounds().xmax+1, Bounds().ymin);
+			  		w->Bounds().SetPos(Bounds().xmax+1+margins[W_DOCK_WEST], Bounds().ymin);
 			  		w->Bounds().SetSize(w->Bounds().Width(), Bounds().Height());
 			  		w->Invalidate();
 			  		break;
 			  		
 			  	case W_DOCK_WEST:
-			  		w->Bounds().SetPos(Bounds().xmin-w->Bounds().Width(), Bounds().ymin);
+			  		w->Bounds().SetPos(Bounds().xmin-w->Bounds().Width()-margins[W_DOCK_EAST], Bounds().ymin);
 			  		w->Bounds().SetSize(w->Bounds().Width(), Bounds().Height());
 			  		w->Invalidate();		  		
 			  		break;			  	
 		  	}
 		  	
-		  	w->MoveDocked();
+		  	w->AdjustDocked();
 		  	w->AdjustChildrenForStickiness();
 		  			  	 
 	  	}
   	 }  
+  	 
+  	 
   	 
   	 /** @brief Adjusts all children when we've been resized. */
   	 void AdjustChildrenForStickiness()
@@ -205,7 +212,7 @@ namespace aws
 	  	 for(size_t i=0; i<children.Length(); ++i)
 	  	 {
 		 	children[i]->AdjustForStickiness();	 
-		 	children[i]->MoveDocked();
+		 	children[i]->AdjustDocked();
 		 	children[i]->Invalidate();
 	  	 }	  	 
   	 }
@@ -237,40 +244,40 @@ namespace aws
 		  	  // that edge.
 		  	  if (sticky_frame_flags & W_TRACK_NORTH)
 		  	  {			  	  
-			  	  Bounds().ymax = Bounds().Height();
+			  	  Bounds().ymax = Bounds().Height() + margins[W_DOCK_NORTH];
 		  	  }
 			  	  
-		  	  Bounds().ymin = 0; 		  	  
+		  	  Bounds().ymin = margins[W_DOCK_NORTH]; 		  	  
 	  	 }
 	  	 
 	  	 if (sticky_frame_flags & W_STICK_SOUTH)
 	  	 {		  	 
 		  	  if (sticky_frame_flags & W_TRACK_SOUTH)
 		  	  {			  	  
-			  	  Bounds().ymin = parent->Bounds().Height() - Bounds().Height();
+			  	  Bounds().ymin = parent->Bounds().Height() - Bounds().Height() - margins[W_DOCK_SOUTH];
 		  	  }
 		  	 
-		  	  Bounds().ymax = parent->Bounds().Height();
+		  	  Bounds().ymax = parent->Bounds().Height() - margins[W_DOCK_SOUTH];
 	  	 }
 	  	  
 	  	 if (sticky_frame_flags & W_STICK_EAST)
 	  	 {
 		  	 if (sticky_frame_flags & W_TRACK_EAST)
 		  	 {			  	  
-			  	  Bounds().xmin = parent->Bounds().Width() - Bounds().Width();
+			  	  Bounds().xmin = parent->Bounds().Width() - Bounds().Width() - margins[W_DOCK_EAST];
 		  	 }
 		  	 
-		  	 Bounds().xmax = parent->Bounds().Width();
+		  	 Bounds().xmax = parent->Bounds().Width()- margins[W_DOCK_EAST];
 	  	 }
 	  	 
 	  	 if (sticky_frame_flags & W_STICK_WEST)  
 	  	 {
 		  	 if (sticky_frame_flags & W_TRACK_WEST)
 		  	 {			  	  
-			  	  Bounds().xmax = Bounds().Width();
+			  	  Bounds().xmax = Bounds().Width() + margins[W_DOCK_WEST];
 		  	 }
 		  	 
-		  	 Bounds().xmin = 0;	  	 
+		  	 Bounds().xmin = margins[W_DOCK_WEST];	  	 
 	  	 }
   	 }	 
   	 
@@ -284,6 +291,12 @@ namespace aws
   	 void ClearFrameAnchor(int32 flags)
   	 {
 	  	sticky_frame_flags &= ~flags;	 
+  	 }
+  	 
+  	 /** @brief Sets the margin for the given side. */
+  	 void SetMargin(int32 size, int32 margin)
+  	 {
+	 	margins[margin] = size;	 
   	 }
   	 
   	 /// Drawing ////

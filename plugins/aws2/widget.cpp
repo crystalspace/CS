@@ -138,7 +138,7 @@ Move(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	JS_ValueToInt32(cx,  argv[1], &y);
 	
 	wo->Bounds().Move(x, y);
-	wo->MoveDocked();
+	wo->AdjustDocked();
 	
 	return JS_TRUE;
 }
@@ -157,7 +157,7 @@ MoveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	JS_ValueToInt32(cx,  argv[1], &y);
 	
 	wo->Bounds().SetPos(x, y);
-	wo->MoveDocked();
+	wo->AdjustDocked();
 	
 	return JS_TRUE;
 }
@@ -178,7 +178,7 @@ Resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	wo->Bounds().xmax+=w;
 	wo->Bounds().ymax+=h;
 	
-	wo->MoveDocked();
+	wo->AdjustDocked();
 	wo->AdjustChildrenForStickiness();
 	wo->Invalidate();
 	
@@ -199,7 +199,7 @@ ResizeTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	JS_ValueToInt32(cx,  argv[1], &h);
 	
 	wo->Bounds().SetSize(w, h);
-	wo->MoveDocked();
+	wo->AdjustDocked();
 	wo->AdjustChildrenForStickiness();
 	wo->Invalidate();
 		
@@ -317,7 +317,7 @@ Dock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	return JS_TRUE;
 }
 
-/** @brief Adds a child object. */
+/** @brief Sets the frame anchor flags for a widget. */
 static JSBool
 SetFrameAnchor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {	
@@ -332,7 +332,7 @@ SetFrameAnchor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 	return JS_TRUE;
 }
 
-/** @brief Adds a child object. */
+/** @brief Clears a frame anchor. */
 static JSBool
 ClearFrameAnchor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {	
@@ -345,6 +345,25 @@ ClearFrameAnchor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 			
 	return JS_TRUE;
 }
+
+/** @brief Sets the margin. */
+static JSBool
+SetMargin(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{	
+	int32 where, size;	
+	aws::widget *wo = (aws::widget *)JS_GetPrivate(cx, obj);
+	
+	JS_ValueToInt32(cx, argv[0], &size);
+	JS_ValueToInt32(cx, argv[1], &where);
+	
+	wo->SetMargin(size, where);
+	wo->AdjustDocked();
+	wo->AdjustForStickiness();
+			
+	return JS_TRUE;
+}
+
+
 
 
 static JSPropertySpec widget_props[] =
@@ -377,6 +396,12 @@ static JSPropertySpec widget_static_props[] =
         {"TRACK_EAST",      WIDGET_TRACK_EAST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
         {"TRACK_WEST",      WIDGET_TRACK_WEST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
         
+        {"MARGIN_NORTH",     WIDGET_DOCK_NORTH,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"MARGIN_SOUTH",     WIDGET_DOCK_SOUTH,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"MARGIN_EAST",      WIDGET_DOCK_EAST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"MARGIN_WEST",      WIDGET_DOCK_WEST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        
+        
         {0,0,0}
 };
 
@@ -395,6 +420,8 @@ static JSFunctionSpec widget_methods[] = {
     
     {"SetFrameAnchor",		SetFrameAnchor,		 1, 0, 0},
     {"ClearFrameAnchor",	ClearFrameAnchor,	 1, 0, 0},
+    {"SetMargin",			SetMargin,	 		 2, 0, 0},
+    
     
     
     {0,0,0,0,0}
