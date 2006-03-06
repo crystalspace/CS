@@ -35,7 +35,6 @@
 #include "isndsys/ss_stream.h"
 #include "isndsys/ss_listener.h"
 #include "isndsys/ss_renderer.h"
-#include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
 #include "iutil/cmdline.h"
@@ -64,9 +63,12 @@ SCF_IMPLEMENT_IBASE (csSndSysRendererSoftware::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
+// Run garbage collection at most 2x per second (it's also always run on shutdown)
+#define SNDSYS_RENDERER_SOFTWARE_GARBAGECOLLECTION_TICKS 500
+
 csSndSysRendererSoftware::csSndSysRendererSoftware(iBase* piBase) :
   object_reg(0), sample_buffer(0), sample_buffer_samples(0),
-  last_intensity_multiplier(0)
+  last_intensity_multiplier(0), LastGarbageCollectionTicks(0)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -96,9 +98,67 @@ csSndSysRendererSoftware::~csSndSysRendererSoftware()
   SCF_DESTRUCT_IBASE();
 }
 
+void csSndSysRendererSoftware::RecordEvent(SndSysEventCategory Category, SndSysEventLevel Severity, const char* msg, ...)
+{
+  if (!EventRecorder)
+    return;
+
+  va_list arg;
+  va_start (arg, msg);
+  EventRecorder->RecordEventV(Category, Severity, msg, arg);
+  va_end (arg);
+}
+
+void csSndSysRendererSoftware::RecordEvent(SndSysEventLevel Severity, const char* msg, ...)
+{
+  if (!EventRecorder)
+    return;
+
+  va_list arg;
+  va_start (arg, msg);
+  EventRecorder->RecordEventV(SSEC_RENDERER, Severity, msg, arg);
+  va_end (arg);
+}
+
+
 void csSndSysRendererSoftware::Report(int severity, const char* msg, ...)
 {
   va_list arg;
+
+  // Anything that goes to the reporter should automatically going to the recorder too
+  if (EventRecorder)
+  {
+    SndSysEventLevel Level;
+
+    switch (severity)
+    {
+      case CS_REPORTER_SEVERITY_DEBUG:
+        Level=SSEL_DEBUG;
+        break;
+      case CS_REPORTER_SEVERITY_ERROR:
+        Level=SSEL_ERROR;
+        break;
+      case CS_REPORTER_SEVERITY_NOTIFY:
+        Level=SSEL_CRITICAL;
+        break;
+      case CS_REPORTER_SEVERITY_BUG:
+        Level=SSEL_BUG;
+        break;
+      case CS_REPORTER_SEVERITY_WARNING:
+        Level=SSEL_WARNING;
+        break;
+      default:
+        Level=SSEL_CRITICAL;
+        break;
+    }
+
+    va_list arg;
+    va_start (arg, msg);
+    EventRecorder->RecordEventV(SSEC_RENDERER, Level, msg, arg);
+    va_end (arg);
+  }
+
+  // To the reporter (console)
   va_start (arg, msg);
   csReportV (object_reg, severity,
     "crystalspace.sndsys.renderer.software", msg, arg);
@@ -107,9 +167,19 @@ void csSndSysRendererSoftware::Report(int severity, const char* msg, ...)
 
 bool csSndSysRendererSoftware::HandleEvent (iEvent &e)
 {
-  if (e.Name == SystemOpen) {
+  if (e.Name == evFrame) 
+  {
+    if (e.Time >= (LastGarbageCollectionTicks+SNDSYS_RENDERER_SOFTWARE_GARBAGECOLLECTION_TICKS))
+    {
+      GarbageCollection();
+      LastGarbageCollectionTicks=e.Time;
+    }
+  }
+  else if (e.Name == evSystemOpen) 
+  {
     Open();
-  } else if (e.Name == SystemClose) {
+  } else if (e.Name == evSystemClose) 
+  {
     Close();
   }
   return false;
@@ -120,7 +190,11 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
   // copy the system pointer
   object_reg=obj_reg;
 
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Software Renderer Initializing..");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Software Renderer Initializing..");
+
+  // Get an interface for the plugin manager
+  csRef<iPluginManager> plugin_mgr (
+    CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
 
   // read the config file
@@ -141,17 +215,43 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
     drv = Config->GetStr ("SndSys.Driver", drv);
   }
 
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Configured for driver [%s]", drv);
+  // Override for explicit recorder plugin request
+  const char *eventrecorder = cmdline->GetOption ("soundeventrecorder");
+  if (!eventrecorder)
+  {
+    // Check config files
+    eventrecorder = Config->GetStr("SndSys.EventRecorder", eventrecorder);
+
+    // Finally, if an eventlog was specified we will presume 
+    //  "crystalspace.sndsys.utility.eventrecorder"
+    if (!eventrecorder)
+    {
+      if ((cmdline->GetOption("soundeventlog") != 0) ||
+          (Config->GetStr("SndSys.EventLog", 0) != 0))
+          eventrecorder = "crystalspace.sndsys.utility.eventrecorder";
+    }
+  }
+
+  // If we determined an eventrecorder plugin should be loaded, load it
+  if (eventrecorder != 0)
+  {
+    CS_QUERY_REGISTRY_PLUGIN(EventRecorder, object_reg, eventrecorder, iSndSysEventRecorder);
+    if (!EventRecorder)
+      Report (CS_REPORTER_SEVERITY_ERROR, "Event Recorder [%s] specified, but unable to load.", eventrecorder);
+    // There is no need to bail out, we'll handle this ok
+  }
+
+  RecordEvent(SSEL_DEBUG, "Event log started");
+
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Configured for driver [%s]", drv);
 
 
 
-  csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   SoundDriver = CS_LOAD_PLUGIN (plugin_mgr, drv, iSndSysSoftwareDriver);
   if (!SoundDriver)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
-      "Sound System: Failed to load driver [%s].", drv);
+      "Failed to load driver [%s].", drv);
     return false;
   }
 
@@ -159,10 +259,11 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
-  SystemOpen = csevSystemOpen(object_reg);
-  SystemClose = csevSystemClose(object_reg);
+  evSystemOpen = csevSystemOpen(object_reg);
+  evSystemClose = csevSystemClose(object_reg);
+  evFrame = csevFrame(object_reg);
   if (q != 0) {
-    csEventID subEvents[3] = { SystemOpen, SystemClose, CS_EVENTLIST_END };
+    csEventID subEvents[] = { evSystemOpen, evSystemClose, evFrame, CS_EVENTLIST_END };
     q->RegisterListener(scfiEventHandler, subEvents);
   }
 
@@ -179,7 +280,7 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
 //////////////////////////////////////////////////////////////////////////
 bool csSndSysRendererSoftware::Open ()
 {
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Open()");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Open()");
   CS_ASSERT (Config != 0);
 
   if (!SoundDriver) return false;
@@ -197,12 +298,12 @@ bool csSndSysRendererSoftware::Open ()
 
 
   Report (CS_REPORTER_SEVERITY_DEBUG,
-    "Sound System: Initializing driver with Freq=%d Channels=%d Bits=%d",
+    "Initializing driver with Freq=%d Channels=%d Bits=%d",
     render_format.Freq, render_format.Channels, render_format.Bits);
 
   if (!SoundDriver->Open(this, &render_format))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: SoundDriver->Open() failed!");
+    Report (CS_REPORTER_SEVERITY_ERROR, "SoundDriver->Open() failed!");
     return false;
   }
 
@@ -230,19 +331,81 @@ bool csSndSysRendererSoftware::Open ()
   if (Volume>1.0f) Volume = 1.0f;
   if (Volume<0.0f) Volume = 0.0f;
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Sound System:  Volume=%f", Volume);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Volume=%f", Volume);
 
   return SoundDriver->StartThread();
 }
 
 void csSndSysRendererSoftware::Close ()
 {
-  if (!SoundDriver) return;
-
-  SoundDriver->StopThread();
-  SoundDriver->Close();
+  // Halt the background thread
+  if (SoundDriver)
+  {
+    SoundDriver->StopThread();
+    SoundDriver->Close();
+  }
+  // Cleanup any active or pending-active sources
+  RemoveAllSources();
+  // Cleanup any active or pending-active streams
+  RemoveAllStreams();
+  // Cleanup any pending-clear sources and streams
+  GarbageCollection();
 }
 
+
+//      !!WARNING!!  DO NOT CALL THIS FROM THE BACKGROUND THREAD
+void csSndSysRendererSoftware::GarbageCollection()
+{
+  iSndSysSource *sourceptr;
+  iSndSysStream *streamptr;
+
+  // Make a pass through the clear queue of streams and cleanup 
+  while (streamptr=stream_clear_queue.DequeueEntry(false))
+    streamptr->DecRef();
+
+  // Make a pass through the clear queue of sources and cleanup 
+  while (sourceptr=source_clear_queue.DequeueEntry(false))
+    sourceptr->DecRef();
+}
+
+//      !!WARNING!!  DO NOT CALL THIS FROM THE BACKGROUND THREAD
+void csSndSysRendererSoftware::RemoveAllSources()
+{
+  iSndSysSourceSoftware *sourceptr;
+
+  // We will bypass the removal queue since this function is only called when the background thread is
+  //  not running
+  while (sourceptr=sources.Get(0))
+  {
+    sources.Delete(sourceptr);
+    sourceptr->DecRef();
+  }
+  // Process the addition queue
+  while (sourceptr=source_add_queue.DequeueEntry(false))
+    sourceptr->DecRef();
+
+  // The clear queue will be processed by GarbageCollection()
+
+}
+
+//      !!WARNING!!  DO NOT CALL THIS FROM THE BACKGROUND THREAD
+void csSndSysRendererSoftware::RemoveAllStreams()
+{
+  iSndSysStream *streamptr;
+
+  // We will bypass the removal queue since this function is only called when the background thread is
+  //  not running
+  while (streamptr=streams.Get(0))
+  {
+    streams.Delete(streamptr);
+    streamptr->DecRef();
+  }
+  // Process the addition queue
+  while (streamptr=stream_add_queue.DequeueEntry(false))
+    streamptr->DecRef();
+
+  // The clear queue will be processed by GarbageCollection()
+}
 
 void csSndSysRendererSoftware::SetVolume (float vol)
 {
@@ -274,7 +437,7 @@ csPtr<iSndSysStream> csSndSysRendererSoftware::CreateStream(iSndSysData* data, i
   // This is the reference that will belong to the render thread
   stream->IncRef();
 
-  //Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Queueing stream with addr %08x", stream);
+  //Report (CS_REPORTER_SEVERITY_DEBUG, "Queueing stream with addr %08x", stream);
 
   // Queue this source for the background thread to add to its list of existant sources
   stream_add_queue.QueueEntry(stream);
@@ -301,7 +464,7 @@ csPtr<iSndSysSource> csSndSysRendererSoftware::CreateSource(iSndSysStream* strea
   // This is the reference that will belong to the render thread
   source->IncRef();
 
-  //Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Queueing source with addr %08x", source);
+  //Report (CS_REPORTER_SEVERITY_DEBUG, "Queueing source with addr %08x", source);
   // Queue this source for the background thread to add to its list of existant sources
   source_add_queue.QueueEntry(source);
 
@@ -311,35 +474,16 @@ csPtr<iSndSysSource> csSndSysRendererSoftware::CreateSource(iSndSysStream* strea
 /// Remove a stream from the sound renderer's list of streams
 bool csSndSysRendererSoftware::RemoveStream(iSndSysStream* stream)
 {
-  iSndSysStream *streamptr=stream->GetPtr();
-
-  stream_remove_queue.QueueEntry(streamptr);
-  streamptr=stream_clear_queue.DequeueEntry(true);
-
-  if (!streamptr)
-    return false;
-
-  streamptr->DecRef();
-
+  stream_remove_queue.QueueEntry(stream);
   return true;
 }
 
 /// Remove a source from the sound renderer's list of sources
 bool csSndSysRendererSoftware::RemoveSource(iSndSysSource* source)
 {
-  iSndSysSource *sourceptr=source->GetPtr();
-
-  source_remove_queue.QueueEntry(sourceptr);
-  sourceptr=source_clear_queue.DequeueEntry(true);
-
-  if (!sourceptr)
-    return false;
-
-  sourceptr->DecRef();
-
+  source_remove_queue.QueueEntry(source);
   return true;
 }
-
 
 
 csRef<iSndSysListener> csSndSysRendererSoftware::GetListener()
@@ -407,7 +551,7 @@ size_t csSndSysRendererSoftware::FillDriverBuffer(void *buf1, size_t buf1_len,
   {
     size_t provided_samples;
     //Report (CS_REPORTER_SEVERITY_DEBUG,
-      //"Sound System: Requesting %d samples from source.", needed_samples);
+      //"Requesting %d samples from source.", needed_samples);
 
     // The return from this function is this number of samples actually available
     provided_samples = sources.Get(currentidx)->MergeIntoBuffer (sample_buffer,
@@ -415,7 +559,7 @@ size_t csSndSysRendererSoftware::FillDriverBuffer(void *buf1, size_t buf1_len,
 
     if (provided_samples==0)
     {
-      //Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Source failing to keep up, skipping audio.");
+      //Report (CS_REPORTER_SEVERITY_DEBUG, "Source failing to keep up, skipping audio.");
     }
     else
     {
@@ -436,7 +580,7 @@ size_t csSndSysRendererSoftware::FillDriverBuffer(void *buf1, size_t buf1_len,
   CopySampleBufferToDriverBuffer (buf1,buf1_len,buf2,buf2_len, needed_samples/2);
 
   //csTicks end_ticks=csGetTicks();
-//  Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Processing time: %u ticks.", end_ticks-current_ticks);
+//  Report (CS_REPORTER_SEVERITY_DEBUG, "Processing time: %u ticks.", end_ticks-current_ticks);
 
 
   return needed_samples * (render_format.Bits/8);
@@ -480,7 +624,7 @@ void csSndSysRendererSoftware::ProcessPendingSources()
 
   while ((src=source_add_queue.DequeueEntry()))
   {
-//    Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Found a queued source to add to the active list.");
+//    Report (CS_REPORTER_SEVERITY_DEBUG, "Found a queued source to add to the active list.");
     sources.Push(src);
   }
 
@@ -528,7 +672,7 @@ void csSndSysRendererSoftware::NormalizeSampleBuffer(size_t used_samples)
     if (abssamp > maxintensity) maxintensity=abssamp;
   }
 
-  //Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Maximum sample intensity is %d", maxintensity);
+  //Report (CS_REPORTER_SEVERITY_DEBUG, "Maximum sample intensity is %d", maxintensity);
 
   // Silence fills the buffer, also dividing by zero is bad
   if (maxintensity==0)
@@ -541,7 +685,7 @@ void csSndSysRendererSoftware::NormalizeSampleBuffer(size_t used_samples)
   if (maxintensity<low_threshold)
     maxintensity=low_threshold;
 
-  //Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Maximum sample intensity (clamped) is %d", maxintensity);
+  //Report (CS_REPORTER_SEVERITY_DEBUG, "Maximum sample intensity (clamped) is %d", maxintensity);
 
   multiplier=desiredintensity / maxintensity;
 
@@ -551,7 +695,7 @@ void csSndSysRendererSoftware::NormalizeSampleBuffer(size_t used_samples)
   {
     uint32 acceptable_range=last_intensity_multiplier/32;
 
-    //Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: last intensity multiplier is %u", last_intensity_multiplier);
+    //Report (CS_REPORTER_SEVERITY_DEBUG, "last intensity multiplier is %u", last_intensity_multiplier);
 
     if (multiplier > last_intensity_multiplier + acceptable_range)
       multiplier=last_intensity_multiplier+acceptable_range;
@@ -564,7 +708,7 @@ void csSndSysRendererSoftware::NormalizeSampleBuffer(size_t used_samples)
   }
   last_intensity_multiplier=multiplier;
 
-  //Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Multiplier is %u", multiplier);
+  //Report (CS_REPORTER_SEVERITY_DEBUG, "Multiplier is %u", multiplier);
 
   // Second scan, multiply the values to create 32 bit samples with a max near 0x7FFFFFFF
   for (sample_idx=0;sample_idx<used_samples;sample_idx++)

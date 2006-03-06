@@ -27,8 +27,9 @@
 
 #include "isndsys/ss_structs.h"
 #include "isndsys/ss_renderer.h"
+#include "isndsys/ss_eventrecorder.h"
 
-#include "queue.h"
+#include "../../utility/queue.h"
 
 
 //#include "csutil/scf.h"
@@ -117,11 +118,17 @@ public:
   virtual csRef<iSndSysListener> GetListener ();
 
 
+  /// Send a message to the console reporter
   void Report (int severity, const char* msg, ...);
 
   /// Called by the driver thread to request sound data
   virtual size_t FillDriverBuffer(void *buf1, size_t buf1_len,
     void *buf2, size_t buf2_len);
+
+  /// Send a message to the sound system event recorder
+  void RecordEvent(SndSysEventCategory Category, SndSysEventLevel Severity, const char* msg, ...);
+
+
 
   // The object registry
   iObjectRegistry *object_reg;
@@ -163,10 +170,37 @@ protected:
 
   uint32 last_intensity_multiplier;
 
-  csEventID SystemOpen;
-  csEventID SystemClose;
+  /// ID of the 'Open' event fired on system startup
+  csEventID evSystemOpen;
+
+  /// ID of the 'Close' event fired on system shutdown
+  csEventID evSystemClose;
+
+  /// ID of the 'Frame' event fired once each frame
+  csEventID evFrame;
+
+  /// The last time (in csTicks) that the source/stream garbage collection process was run
+  csTicks LastGarbageCollectionTicks;
+
+  /// The event recorder interface, if active
+  csRef<iSndSysEventRecorder> EventRecorder;
 
 protected:
+  /// Performs cleanup operations on removed sources and streams
+  //      !!WARNING!!  DO NOT CALL THIS FROM THE BACKGROUND THREAD
+  void GarbageCollection();
+
+  /// Shutdown procedure.  This removes all sources from the renderer's lists.
+  //      !!WARNING!!  DO NOT CALL THIS FROM THE BACKGROUND THREAD
+  void RemoveAllSources();
+
+  /// Shutdown procedure.  This removes all streams from the renderer's lists.
+  //      !!WARNING!!  DO NOT CALL THIS FROM THE BACKGROUND THREAD
+  void RemoveAllStreams();
+
+  /// Send a message to the sound system event recorder as the renderer
+  void RecordEvent(SndSysEventLevel Severity, const char* msg, ...);
+
   size_t CalculateMaxSamples(size_t bytes);
   void CalculateMaxBuffers(size_t samples, size_t *buf1_len, size_t *buf2_len);
   void ProcessPendingSources();
