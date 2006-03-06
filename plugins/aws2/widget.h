@@ -171,24 +171,28 @@ namespace aws
 			  	case W_DOCK_NORTH:		  		
 			  		w->Bounds().SetPos(Bounds().xmin, Bounds().ymin-w->Bounds().Height());
 			  		w->Bounds().SetSize(Bounds().Width(), w->Bounds().Height());
+			  		w->MoveDocked();
 			  		w->Invalidate();
 			  		break;
 			  		
 			  	case W_DOCK_SOUTH:
 			  		w->Bounds().SetPos(Bounds().xmin, Bounds().ymax+1);
 			  		w->Bounds().SetSize(Bounds().Width(), w->Bounds().Height());
+			  		w->MoveDocked();
 			  		w->Invalidate();
 			  		break;
 			  		
 			  	case W_DOCK_EAST:
 			  		w->Bounds().SetPos(Bounds().xmax+1, Bounds().ymin);
 			  		w->Bounds().SetSize(w->Bounds().Width(), Bounds().Height());
+			  		w->MoveDocked();
 			  		w->Invalidate();
 			  		break;
 			  		
 			  	case W_DOCK_WEST:
 			  		w->Bounds().SetPos(Bounds().xmin-w->Bounds().Width(), Bounds().ymin);
 			  		w->Bounds().SetSize(w->Bounds().Width(), Bounds().Height());
+			  		w->MoveDocked();
 			  		w->Invalidate();
 			  		break;
 		  	}		  	 
