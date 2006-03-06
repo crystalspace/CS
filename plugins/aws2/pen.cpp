@@ -22,6 +22,7 @@
 #include "script_console.h"
 #include "pen.h"
 #include "color.h"
+#include "font.h"
 #include <string.h>
 
 /** @brief The prototype object for pens. */
@@ -276,6 +277,38 @@ DrawTriangle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	return JS_TRUE;
 }
 
+/** @brief Draw a triangle from (x1,y1) to (x2,y2) to (x3, y3), with optional fill */
+static JSBool
+Write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{
+	//csString msg;
+	
+	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
+	
+	int32 x1,y1;	
+		
+	JSObject *fnt = JSVAL_TO_OBJECT(argv[0]);
+	
+	if (argv[0] == JSVAL_VOID || !IsFontObject(fnt))
+	{
+		ScriptCon()->Message("Pen: write: Object passed as parameter 0 is not a font object!");	
+		return JS_FALSE;
+	}
+		
+	csRef<iFont> *fo = (csRef<iFont> *)JS_GetPrivate(cx, fnt);
+		
+	JS_ValueToInt32(cx,  argv[1], &x1);
+	JS_ValueToInt32(cx,  argv[2], &y1);
+	JSString *text = JS_ValueToString(cx,  argv[3]);
+	
+// 	msg.Format("Pen: write %d, %d, %s, %p, font valid: %s", x1, y1, JS_GetStringBytes(text), (iFont *)(*fo), fo->IsValid() ? "yes" : "no");
+// 	ScriptCon()->Message(msg);
+// 		
+	if (po && fo->IsValid()) po->Write((iFont *)(*fo), x1,y1,JS_GetStringBytes(text));	
+		
+	return JS_TRUE;
+}
+
 /** Draw this pen into another pen. */
 static JSBool
 Draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
@@ -298,7 +331,6 @@ Draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 		
 	return JS_TRUE;
 }
-
 
 
 /** @brief Move a pen by (x,y) */
@@ -402,6 +434,9 @@ static JSFunctionSpec pen_methods[] = {
     {"DrawTriangle",	DrawTriangle,		7, 0, 0},
     
     {"Draw",		    Draw,				1, 0, 0},
+    
+    {"Write",		    Write,				4, 0, 0},    
+    
     
     //{"Invalidate",	Invalidate,	0, 0, 0},    
     {0,0,0,0,0}
@@ -689,7 +724,7 @@ void  pen::Draw(iPen *_pen)
 				buf->Read((char *)&font, sizeof(iFont *));
 				buf->Read((char *)&x1, sizeof(uint));
 				buf->Read((char *)&y1, sizeof(uint));				
-				buf->Read((char *)&len, sizeof(uint));									
+				buf->Read((char *)&len, sizeof(uint));						
 				
 				// Read the text right out of the buffer.
 				text = buf->GetData() + buf->GetPos();
@@ -975,7 +1010,7 @@ void pen::Write(iFont *font, uint x1, uint y1, char *text)
 	uint len = strlen(text);
 	
 	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)font, sizeof(iFont *));
+	buf->Write((const char *)&font, sizeof(iFont *));
 	buf->Write((const char *)&x1, sizeof(uint));
 	buf->Write((const char *)&y1, sizeof(uint));
 	buf->Write((const char *)&len, sizeof(uint));
@@ -993,7 +1028,7 @@ void pen::WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2,
 	uint len = strlen(text);
 	
 	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)font, sizeof(iFont *));
+	buf->Write((const char *)&font, sizeof(iFont *));
 	buf->Write((const char *)&x1, sizeof(uint));
 	buf->Write((const char *)&y1, sizeof(uint));
 	buf->Write((const char *)&x2, sizeof(uint));
