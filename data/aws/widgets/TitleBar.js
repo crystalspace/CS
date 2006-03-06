@@ -42,8 +42,13 @@ function TitleBar(inittext)
  	_widget.Close.MoveTo(0, 5);
  	
  	_widget.Close.SetFrameAnchor(Widget.TRACK_EAST);
+ 	_widget.Close.SetMargin(3, Widget.MARGIN_EAST);
+ 	
  	_widget.Close.Dock(_widget.Zoom, Widget.DOCK_WEST);
+ 	_widget.Zoom.SetMargin(2, Widget.MARGIN_EAST);
+ 	
  	_widget.Zoom.Dock(_widget.Min, Widget.DOCK_WEST);	
+ 	_widget.Min.SetMargin(2, Widget.MARGIN_EAST);
 	
 	return _widget;
 }

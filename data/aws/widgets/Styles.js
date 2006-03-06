@@ -276,7 +276,7 @@ Style3D =
 				
 		var w = this.width, h = this.height;
 		var aw = prefs.TitleBarHeight, cw=aw>>1;		
-		var tbw = prefs.WindowMin.w + prefs.WindowZoom.w + prefs.WindowClose.w + 6;
+		var tbw = prefs.WindowMin.w + prefs.WindowZoom.w + prefs.WindowClose.w + 10;
 		
 		pen.Clear();
 		
