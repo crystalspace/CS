@@ -10,6 +10,8 @@ chronological order.
 	- Rhad fixed an infinite loop in the ALSA sound driver that could
 	  occur if the call to retrieve the sound frames available for filling
 	  returned a negative number.
+	- Fossi updated the paging terrain former which now actually
+	  works for vertices
 5-Mar-2006
 	- Rhad cleaned up memory leaks in the sound system:
 	  - SndSysOggSoundData has been cleaned up to use local variables

@@ -55,7 +55,7 @@ csPagingFormer::csPagingFormer (iBase* parent)
 
 csPagingFormer::~csPagingFormer ()
 {
-  // Delete allocated data
+  //@@@ delete allocated data
   former = 0;
 }
 
@@ -116,11 +116,8 @@ bool csPagingFormer::Initialize (iObjectRegistry* objectRegistry)
             }
 printf("loaded %s\n",fn.GetData());
 
-
-          csVector3 applied = scale * csVector3(1.f/countx, 0.f, 1.f/county);
-printf("**newscale: %f %f %f\n", applied.x, applied.y, applied.z);
-          state->SetScale(applied);
-          state->SetOffset(offset + csVector3(x*map->GetWidth(),0,y*map->GetHeight()));
+            state->SetScale(csVector3(scale.x/countx, scale.y, scale.z/county));
+            state->SetOffset(offset + csVector3(x*map->GetWidth(),0,y*map->GetHeight()));
 
           } else { exit(2000); } // @@@
         } else { exit(1000); }
@@ -155,8 +152,6 @@ printf("**newscale: %f %f %f\n", applied.x, applied.y, applied.z);
     memset (former, 0, numx*numy);
 
     LoadFormer(0,0); // @@@ needed for width/height, set in mapfile?
-
-printf("final width:%i height:%i\n",width,height);
   }
 
 
@@ -165,20 +160,15 @@ printf("final width:%i height:%i\n",width,height);
   {
 printf("SetScale\n");
 
-
-    for (int i = 0; i < (countx*county); i++)
+    for (uint i = 0; i < (countx*county); i++)
     {
-printf("i: %i\n",i);
       if (former[i] != 0)
       {
-printf("former ok\n");
         csRef<iSimpleFormerState> state =       
           scfQueryInterface<iSimpleFormerState> (former[i]);
         if (state)
         {
-          csVector3 applied = newscale * csVector3(1.f/countx, 0.f, 1.f/county);
-printf("**newscale: %f %f %f\n", applied.x, applied.y, applied.z);
-          fflush(0);
+          csVector3 applied = csVector3(newscale.x/countx, newscale.y, newscale.z/county);
           state->SetScale(applied);
 
         }
@@ -192,9 +182,9 @@ printf("**newscale: %f %f %f\n", applied.x, applied.y, applied.z);
   /// Set an offset vector to be used in lookups
   void csPagingFormer::SetOffset (csVector3 offset)
   {
-printf("SetOffset\n");
+printf("!WARNING: SetOffset is still broken!\n");
 
-    for (int i = 0; i < (countx*county)-1; i++)
+    for (uint i = 0; i < (countx*county)-1; i++)
     {
       csRef<iSimpleFormerState> state =
         scfQueryInterface<iSimpleFormerState> (former[i]);
@@ -249,7 +239,7 @@ printf("Min: %f:%f Max: %f:%f\n", x1,z1,x2,z2);
     x2 = ((x2-offset.x)/scale.x+1)*(width/2);
     z2 = ((z2-offset.z)/scale.z+1)*(height/2);
 
-printf("Min: %f:%f Max: %f:%f\n", x1,z1,x2,z2);
+//printf("Min: %f:%f Max: %f:%f\n", x1,z1,x2,z2);
 
     //calculate the size of one formers terrain
     int sizex = (int)(width/countx + 0.5f);
@@ -273,51 +263,61 @@ printf("x:%i,y:%i\n",i,j);
         csBox2 formerregion = csBox2 (i*sizex, j*sizey,
                                      (i+1)*sizex, (j+1)*sizey );
 
-printf("Min: %f:%f Max: %f:%f\n", translated.MinX(),translated.MinY(),translated.MaxX(),translated.MaxY());
-printf("Min: %f:%f Max: %f:%f\n", formerregion.MinX(),formerregion.MinY(),formerregion.MaxX(),formerregion.MaxY());
+//printf("Min: %f:%f Max: %f:%f\n", translated.MinX(),translated.MinY(),translated.MaxX(),translated.MaxY());
+//printf("Min: %f:%f Max: %f:%f\n", formerregion.MinX(),formerregion.MinY(),formerregion.MaxX(),formerregion.MaxY());
 
-        // optimization for simplest cases
+      // optimization for simplest cases
         if (formerregion.Contains(translated))
         {
 printf("*contained\n");
-           return former[i * countx + j]->GetSampler(region, resolution);
+
+          // 0/0 is in the center of the region, so deduct former's scale
+          csBox2 samplerregion = csBox2(
+            ceil(translated.MinX() - scale.x/countx),
+            ceil(translated.MinY() - scale.z/county),
+            ceil(translated.MaxX() - scale.x/countx),
+            ceil(translated.MaxY() - scale.z/county)
+          );
+
+          return former[i * countx + j]->GetSampler(samplerregion, resolution);
         }
 
-        uint samplerresolution;
 
-        csBox2 intersect = formerregion * translated;
+      // the requested region is represented by multiple formers
+      // so we have to scale the resolution accordingly
 
-        // formers covers only a part, scale resolution accordingly
-          float formerdist = formerregion.MaxX() - formerregion.MinX();
-          float transdist = translated.MaxX() - translated.MinX();
+        float formerdist = formerregion.MaxX() - formerregion.MinX();
+        float transdist = translated.MaxX() - translated.MinX();
 
-          float perc = formerdist / transdist;
-          float res = resolution * perc;
-         
-          samplerresolution = ceil(res);
+        float perc = formerdist / transdist;
+        float res = resolution * perc;
+
+        // in case the requested resolution isn't a multiple of our formercount
+        // we need to sample a little too much data from each and overlap later
+        uint samplerresolution = (uint)(ceil(res)+0.5);
 
 
+/*
 printf("%f\n", formerdist);
 printf("%f\n", transdist);
 printf("%f\n", perc);
 printf("%f\n", res);
 printf("%i\n", samplerresolution);
-
-
 printf("res: %i->%i\n",resolution,samplerresolution);
+*/
 
-        //translate the needed region back into worldspace
-float s1 = (formerregion.MinX()/(width/2)-1)*scale.x+offset.x;
-float s2 = (formerregion.MinY()/(height/2)-1)*scale.z+offset.z;
-float s3 = (formerregion.MaxX()/(width/2)-1)*scale.x+offset.x;
-float s4 = (formerregion.MaxY()/(height/2)-1)*scale.z+offset.z;
-        csBox2 samplerregion = csBox2 (s1, s2, s3, s4);
 
-        if (perc < 1) samplerregion += region;
-printf("Min: %f:%f Max: %f:%f\n", samplerregion.MinX(),samplerregion.MinY(),samplerregion.MaxX(),samplerregion.MaxY());
+//@@@ check if the below is correct for smaller regions for example with 9 formers
+
+  csBox2 asdf = csBox2(
+            ceil(formerregion.MinX() - scale.x/countx),
+            ceil(formerregion.MinY() - scale.z/county),
+            ceil(formerregion.MaxX() - scale.x/countx),
+            ceil(formerregion.MaxY() - scale.z/county)
+          );
 
         sampler.Push (csRef<iTerraSampler>
-          (former[i * countx + j]->GetSampler(samplerregion, samplerresolution)));
+          (former[i * countx + j]->GetSampler(asdf, samplerresolution)));
 
       }
     }
@@ -361,8 +361,7 @@ printf("Min: %f:%f Max: %f:%f\n", samplerregion.MinX(),samplerregion.MinY(),samp
    * vertices
    */
   bool csPagingFormer::SampleVector3 (csStringID type, float x, 
-float z,
-    csVector3 &value)
+    float z, csVector3 &value)
   {
     printf("SampleVec3 Former\n");
     return false;
@@ -420,14 +419,12 @@ void csPagingSampler::CachePositions ()
   // get memory for our cache
   positions = new csVector3[resolution*resolution];
 
-bool smaller= false;
-
   // buffer for all the samplers maps
   uint num = sampler.GetSize();
   const csVector3 **maps = new const csVector3*[num];
 
   // first get the raw data from all the samplers
-  // @@@ excluded from loop below for profiling
+  // @@@ excluded from loop below for easier profiling
   uint k;
   for (k = 0; k < num; k++)
   {
@@ -441,10 +438,10 @@ bool smaller= false;
       uint partialresolution = sampler.Get(k)->GetResolution();
 
       uint fromx, fromy;  // array coordinates we copy from
-      uint tox, toy;  // array coordinates we copy to
-      uint copynum;  // number of elements we need to copy per step
-      uint fromstep; // number of elements we need to skip per step
-      uint tostep; // number of elements we need to skip per step
+      uint tox, toy;      // array coordinates we copy to
+      uint copynum;       // number of elements we need to copy per step
+      uint fromstep;      // number of elements we need to skip per step
+      uint tostep;        // number of elements we need to skip per step
       
         // calculate which part of the whole we deal with
         // and translate into heightmap coordinates
@@ -460,31 +457,30 @@ bool smaller= false;
 
         if (partialregion.Area() > region.Area())
         {
-//smaller = true;
 printf("!smaller\n");
           // the region is smaller so it's only part of this sampler's data
 
-        // translate the request's max coordinates because we need them later on
-        float partialregionmaxx = partialregion.MaxX();
-        float partialregionmaxy = partialregion.MaxY();
-        float partialregionminx = partialregion.MinX();
-        float partialregionminy = partialregion.MinY();
-          partialregionmaxx = ((partialregionmaxx-terraFormer->offset.x)/terraFormer->scale.x +1)
-            *(terraFormer->width/2);
-          partialregionmaxy = ((partialregionmaxy-terraFormer->offset.z)/terraFormer->scale.z +1)
-            *(terraFormer->height/2);
-          partialregionminx = ((partialregionminx-terraFormer->offset.x)/terraFormer->scale.x +1)
-            *(terraFormer->width/2);
-          partialregionminy = ((partialregionminy-terraFormer->offset.z)/terraFormer->scale.z +1)
-            *(terraFormer->height/2);
+          // translate the request's max coordinates because we need them later on
+          float partialregionmaxx = partialregion.MaxX();
+          float partialregionmaxy = partialregion.MaxY();
+          float partialregionminx = partialregion.MinX();
+          float partialregionminy = partialregion.MinY();
+            partialregionmaxx = ((partialregionmaxx-terraFormer->offset.x)/terraFormer->scale.x +1)
+              *(terraFormer->width/2);
+            partialregionmaxy = ((partialregionmaxy-terraFormer->offset.z)/terraFormer->scale.z +1)
+              *(terraFormer->height/2);
+            partialregionminx = ((partialregionminx-terraFormer->offset.x)/terraFormer->scale.x +1)
+              *(terraFormer->width/2);
+            partialregionminy = ((partialregionminy-terraFormer->offset.z)/terraFormer->scale.z +1)
+              *(terraFormer->height/2);
 
 //printf("res: %i part: %i\n", resolution, partialresolution);
 //printf("%f %f\n",intersectminx,partialregionmaxx);
 //printf("%f %f\n",intersectminy,partialregionmaxy);
 
           // copy from the intersection's relative coordinates
-          fromx = ceil(((intersectminx-partialregionminx)/(partialregionmaxx-partialregionminx)) *partialresolution);
-          fromy = ceil(((intersectminy-partialregionminy)/(partialregionmaxy-partialregionminy)) *partialresolution);
+          fromx = (uint)ceil(((intersectminx-partialregionminx)/(partialregionmaxx-partialregionminx)) *partialresolution);
+          fromy = (uint)ceil(((intersectminy-partialregionminy)/(partialregionmaxy-partialregionminy)) *partialresolution);
 
           tox = 0;
           toy = 0;
@@ -493,8 +489,11 @@ printf("!smaller\n");
           copynum = resolution;
           fromstep = partialresolution;
           tostep = resolution;
+
         } else {
+
 printf("!bigger\n");
+
           // the region is bigger, so this is only a part of it
 
           // we need to copy this sampler's whole data
@@ -505,10 +504,11 @@ printf("!bigger\n");
           tostep = resolution;
 
           // to this former's relative position to the whole request
-          tox = ceil( (k/xcount) * partialresolution); //can't replace by using scale+offset
-          toy = ceil( (k%xcount) * partialresolution); //because can't get sampler's former
+          tox = (uint)ceil( (k/xcount) * partialresolution);  // can't replace by using scale+offset
+          toy = (uint)ceil( (k%xcount) * partialresolution);  // because can't get sampler's former
         }
 
+/*
 printf("fx: %i\n",fromx);
 printf("fy: %i\n",fromy);
 printf("tx: %i\n",tox);
@@ -516,6 +516,8 @@ printf("ty: %i\n",toy);
 printf("cx: %i\n",copynum);
 printf("fs: %i\n",fromstep);
 printf("ts: %i\n",tostep);
+printf("%f, %f\n", k%xcount, k/xcount);
+*/
 
       // loop over the part we need to copy
       uint l;
@@ -526,10 +528,9 @@ printf("ts: %i\n",tostep);
         //when the requested region's size is not a multiple of their count
         //we do this by overwriting the neighboring former's last line
 
-        uint topos = (toy+l-(k/xcount))*tostep+tox-(k%xcount);
+        uint topos = (toy+l-(k%xcount))*tostep+tox-(k/xcount);
         uint frompos = (fromy+l)*fromstep+fromx;
 
-//printf("%f, %f\n", k%xcount, k/xcount);
 //printf("%i: %i -> %i\n", l, frompos, topos);
 
         memcpy(positions + topos,
