@@ -30,6 +30,7 @@
 
 #include "iutil/plugin.h"
 #include "iutil/cfgfile.h"
+#include "csutil/cfgacc.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
@@ -86,6 +87,9 @@ SndSysDriverALSA::~SndSysDriverALSA()
 
 bool SndSysDriverALSA::Initialize (iObjectRegistry *pObjectReg)
 {
+  /// Interface to the Configuration file
+  csConfigAccess Config;
+
   // Store the Object registry interface pointer, we'll need it later
   m_pObjectReg=pObjectReg;
 
@@ -95,12 +99,18 @@ bool SndSysDriverALSA::Initialize (iObjectRegistry *pObjectReg)
   // Critical because you really want to log this.  Trust me.  Really.
   RecordEvent(SSEL_CRITICAL, "ALSA driver for software sound renderer initialized.");
 
-  // read the config file
-//  Config.AddConfig(object_reg, "/config/sound.cfg");
+  // Make sure sound.cfg is available
+  Config.AddConfig(m_pObjectReg, "/config/sound.cfg");
 
+  // check for optional output device name from the commandline
+  csRef<iCommandLineParser> CMDLine (CS_QUERY_REGISTRY (m_pObjectReg,
+    iCommandLineParser));
+  const char *OutputDeviceName = CMDLine->GetOption ("alsadevice");
+  if (!OutputDeviceName)
+    OutputDeviceName = Config->GetStr("SndSys.Driver.ALSA.Device", "default");
 
-  // TODO: This should be configurable.
-  strcpy(m_OutputDeviceName, "default");
+  // Copy into the used buffer
+  strcpy(m_OutputDeviceName, OutputDeviceName);
  
   return true;
 }
@@ -392,10 +402,8 @@ void SndSysDriverALSA::Run()
 {
   int result;
   snd_pcm_state_t devicestate;
-  snd_pcm_sframes_t availableframes;
-  snd_pcm_uframes_t mmap_offset, mmap_frames;
- 	const snd_pcm_channel_area_t *mmap_areas;
-  unsigned int bytesperframe = m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8;
+
+  m_BytesPerFrame = m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8;
 
   csTicks last_write, current_ticks, tick_difference;
   csTicks last_error_time=0;
@@ -407,7 +415,7 @@ void SndSysDriverALSA::Run()
 
 
   // Clear the buffer and write one section ahead
-  ClearBuffer(tick_difference/1000 * m_PlaybackFormat.Freq * bytesperframe * 5);
+  ClearBuffer(tick_difference/1000 * m_PlaybackFormat.Freq * m_BytesPerFrame);
   //WriteBuffer(ALSA_buffer_bytes);
   
   snd_pcm_start(m_pPCMDevice);
@@ -417,51 +425,57 @@ void SndSysDriverALSA::Run()
     current_ticks=csGetTicks();
     if (last_write + tick_difference <= current_ticks)
     {
+      bool UnderRunRecovery=false;
+
       // Check for underrun
       devicestate = snd_pcm_state(m_pPCMDevice);
       if (devicestate == SND_PCM_STATE_XRUN)
       {
+        // Log an underbuffer error - only log once every 15 seconds
         if (last_error_time==0 || current_ticks-last_error_time > 15000)
         {
           RecordEvent(SSEL_WARNING, "Underbuffer detected on output device!");
           last_error_time=current_ticks;
-
         }
+
+        // Try to recover from the underbuffer by re-preparing the output device
+        result=snd_pcm_prepare(m_pPCMDevice);
+        if (result<0)
+        {
+          RecordEvent(SSEL_CRITICAL, "Failed to recover from underbuffer.  Error [%s]", snd_strerror(result));
+          break;
+        }
+
+        UnderRunRecovery=true;
       }
 
-      availableframes = snd_pcm_avail_update(m_pPCMDevice);
-      if (availableframes <= 0)
-        continue;
+      snd_pcm_sframes_t AvailableFrames;
+      snd_pcm_uframes_t MappedFrames, FilledFrames;
+      MappedFrames=0;
+      AvailableFrames=0;
+      FilledFrames=0;
 
-      //Report (CS_REPORTER_SEVERITY_DEBUG, "%d available frames in %d bytes", availableframes, availableframes * bytesperframe);
-
-
-      // Try to lock the mmap buffer for writing
-      mmap_frames=availableframes;
-      mmap_offset=0;
-      result = snd_pcm_mmap_begin(m_pPCMDevice, &mmap_areas, &mmap_offset, &mmap_frames);
-      if (result < 0)
+      // Continue mapping and filling buffers while:
+      // 1) There are no errors 
+      //   AND
+      // 2) All available frames were not mapped
+      //   AND
+      // 3) All mapped frames were filled
+      do 
       {
-        RecordEvent(SSEL_CRITICAL, "Error mmaping PCM buffer from sound device! Error [%s]", snd_strerror(result));
+        result=FillBuffer(AvailableFrames, MappedFrames, FilledFrames);
+        if (result>=0 && MappedFrames<(snd_pcm_uframes_t)AvailableFrames)
+          RecordEvent(SSEL_DEBUG, "Short mapping of %u frames [%d available]", MappedFrames, AvailableFrames);
+      } while(result>=0 && MappedFrames<(snd_pcm_uframes_t)AvailableFrames && FilledFrames==MappedFrames);
+
+      // If a mapping error occured, break
+      if (result<0)
         break;
-      }
 
-      RecordEvent(SSEL_DEBUG, "Mapped %u bytes", mmap_frames * bytesperframe);
+      // If an underrun occurred and we are recovering, we need to issue a 'start'
+      if (UnderRunRecovery)
+        snd_pcm_start(m_pPCMDevice);
 
-      //Report (CS_REPORTER_SEVERITY_DEBUG, "Channel 0: Offset %d Step %d", mmap_areas[0].first, mmap_areas[0].step);
-      //Report (CS_REPORTER_SEVERITY_DEBUG, "Channel 1: Offset %d Step %d", mmap_areas[1].first, mmap_areas[1].step);
-
-      uint32 bytes_used=m_pAttachedRenderer->FillDriverBuffer(((unsigned char *)mmap_areas[0].addr) + mmap_offset * mmap_areas[0].step/8 , mmap_frames * bytesperframe, 0, 0);
-
-      RecordEvent(SSEL_DEBUG, "FillDriverBuffer() filled %u bytes", bytes_used);
-      //Report (CS_REPORTER_SEVERITY_DEBUG, "Wrote %d  bytes", bytes_used);
-
-      result = snd_pcm_mmap_commit(m_pPCMDevice, mmap_offset, bytes_used / bytesperframe);
-      if (result < 0)
-      {
-        RecordEvent(SSEL_CRITICAL, "Error committing PCM buffer to sound device! Error [%s]", snd_strerror(result));
-        break;
-      }
       last_write=current_ticks;
     }
     // Sleep for at least a little bit
@@ -472,7 +486,7 @@ void SndSysDriverALSA::Run()
   snd_pcm_drop(m_pPCMDevice);
 }
 
-void SndSysDriverALSA::ClearBuffer(size_t Bytes)
+size_t SndSysDriverALSA::ClearBuffer(size_t Bytes)
 {
   if (m_pPCMDevice)
   {
@@ -482,10 +496,8 @@ void SndSysDriverALSA::ClearBuffer(size_t Bytes)
     int result;
 
     availableframes = snd_pcm_avail_update(m_pPCMDevice);
-
-    availableframes = snd_pcm_avail_update(m_pPCMDevice);
     if (availableframes <= 0)
-      return;
+      return 0;
 
 
     // Try to lock the mmap buffer for writing
@@ -494,19 +506,68 @@ void SndSysDriverALSA::ClearBuffer(size_t Bytes)
     if (result < 0)
     {
       RecordEvent(SSEL_CRITICAL, "Error mmaping PCM buffer from sound device! Error [%s]", snd_strerror(result));
-      return;
+      return 0;
     }
 
-    // Clear the buffer - this wont work on signed 8 bit output
-    memset(mmap_areas[0].addr, 0,  mmap_frames * m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8);
+    // Fill the buffer with silence
+    if (m_PlaybackFormat.Bits==8)
+    {
+      // For 8 bit samples, fill with 128
+      memset(((unsigned char *)mmap_areas[0].addr) + mmap_offset * mmap_areas[0].step/8, 128,  mmap_frames * m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8);
+    }
+    else
+    {
+      // For 16 bit samples, fill with 0
+      memset(((unsigned char *)mmap_areas[0].addr) + mmap_offset * mmap_areas[0].step/8, 0,  mmap_frames * m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8);
+    }
 
     result = snd_pcm_mmap_commit(m_pPCMDevice, mmap_offset, mmap_frames);
     if (result < 0)
     {
       RecordEvent(SSEL_CRITICAL, "Error committing PCM buffer to sound device! Error [%s]", snd_strerror(result));
-      return;
+      return 0;
     }
   }
+  return 0;
 }
 
+int SndSysDriverALSA::FillBuffer(snd_pcm_sframes_t& AvailableFrames, snd_pcm_uframes_t& MappedFrames, snd_pcm_uframes_t& FilledFrames)
+{
+  snd_pcm_uframes_t mmap_offset;
+  const snd_pcm_channel_area_t *mmap_areas;
+  int result;
+
+
+  AvailableFrames = snd_pcm_avail_update(m_pPCMDevice);
+  if (AvailableFrames <= 0)
+    return 0;
+
+  RecordEvent(SSEL_DEBUG, "%d available frames in %d bytes", AvailableFrames, AvailableFrames * m_BytesPerFrame);
+
+  // Try to lock the mmap buffer for writing
+  MappedFrames=AvailableFrames;
+  mmap_offset=0;
+  result = snd_pcm_mmap_begin(m_pPCMDevice, &mmap_areas, &mmap_offset, &MappedFrames);
+  if (result < 0)
+  {
+    RecordEvent(SSEL_CRITICAL, "Error mmaping PCM buffer from sound device! Error [%s]", snd_strerror(result));
+    return -1;
+  }
+
+  RecordEvent(SSEL_DEBUG, "Mapped %u bytes", MappedFrames * m_BytesPerFrame);
+
+  uint32 bytes_used=m_pAttachedRenderer->FillDriverBuffer(((unsigned char *)mmap_areas[0].addr) + mmap_offset * mmap_areas[0].step/8,
+                                                          MappedFrames * m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8, 0, 0);
+
+  RecordEvent(SSEL_DEBUG, "FillDriverBuffer() filled %u bytes", bytes_used);
+  FilledFrames = bytes_used / m_BytesPerFrame;
+
+  result = snd_pcm_mmap_commit(m_pPCMDevice, mmap_offset, FilledFrames);
+  if (result < 0)
+  {
+    RecordEvent(SSEL_CRITICAL, "Error committing PCM buffer to sound device! Error [%s]", snd_strerror(result));
+    return -1;
+  }
+  return 0;
+}
 

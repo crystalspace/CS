@@ -91,9 +91,6 @@ public:
   //    
   static iObjectRegistry *m_pObjectReg;
 
-  /// The event recorder interface, if active
-  csRef<iSndSysEventRecorder> m_EventRecorder;
-
 protected:
   /// The renderer that's using this sound driver
   csSndSysRendererSoftware *m_pAttachedRenderer;
@@ -118,8 +115,17 @@ protected:
   volatile bool m_Running;
   csRef<csThread> m_pBGThread;
 
+  /// The event recorder interface, if active
+  csRef<iSndSysEventRecorder> m_EventRecorder;
+
+  /// Number of bytes in a frame of audio
+  size_t m_BytesPerFrame;
 protected:
-  void ClearBuffer(size_t Bytes);
+  /// Write silence to the ALSA mmap buffer up to Bytes bytes
+  size_t ClearBuffer(size_t Bytes);
+
+  /// Fill the ALSA mmap buffer with data from the renderer up to Bytes bytes
+  int FillBuffer(snd_pcm_sframes_t& AvailableFrames, snd_pcm_uframes_t& MappedFrames, snd_pcm_uframes_t& FilledFrames);
   bool SetupHWParams();
   bool SetupSWParams();
 
