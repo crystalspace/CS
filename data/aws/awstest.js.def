@@ -25,8 +25,8 @@ skin_NormalWindows =
     ActiveTitleBarColor2 : new Color(0.78, 0.78, 1, 1),
     
     OverlayTextureAlpha	 : 128,
-    ScrollBarHeight		 : 25,
-    ScrollBarWidth		 : 25,
+    ScrollBarHeight		 : 24,
+    ScrollBarWidth		 : 24,
     
     TitleBarHeight		 : 30,
     TitleBarRoundness	 : 0.05,

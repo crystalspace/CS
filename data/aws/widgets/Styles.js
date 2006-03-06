@@ -321,8 +321,8 @@ Style3D =
 		var max  = this.max;
 		var btn_w = prefs.ScrollBarWidth;
 		var btn_h = prefs.ScrollBarHeight;		
-		var tri_qw = btn_w/4;
-		var tri_qh = btn_h/4;
+		var tri_qw = btn_w/3.0;
+		var tri_qh = btn_h/3.0;
 		
 		
 		pen.Clear();
@@ -347,16 +347,10 @@ Style3D =
 			frame.Outset(pen, 0,btn_h, w, btn_h*2);
 			
 			// Arrows
-			pen.SetColor(0,0,0,1);
+			pen.SetColor(0,0,0,1);			
+			pen.DrawTriangle(btn_w*0.5, tri_qh, btn_w-tri_qw, btn_h-tri_qh, tri_qw, btn_h-tri_qh, true);			
+			pen.DrawTriangle(btn_w*0.5, tri_qh*5, tri_qw, btn_h+tri_qh, btn_w-tri_qw, btn_h+tri_qh, true);
 			
-			pen.DrawTriangle(tri_qw*2, tri_qh, btn_w-tri_qw, btn_h/2, tri_qw, btn_h/2, true);
-			
-			pen.PushTransform();
-			pen.Translate(0, btn_h, 0);
-			pen.Rotate(Math.PI);
-			
-			pen.DrawTriangle(tri_qw*2, tri_qh, btn_w-tri_qw, btn_h/2, tri_qw, btn_h/2, true);
-			pen.PopTransform();
 			
 		}
 		else
@@ -372,6 +366,11 @@ Style3D =
 			// Buttons
 			frame.Outset(pen, 0,0, btn_w,h);
 			frame.Outset(pen, btn_w, 0, btn_w*2,h);
+			
+			// Arrows
+			pen.SetColor(0,0,0,1);			
+			pen.DrawTriangle(tri_qw, btn_h*0.5,  btn_w-tri_qw, tri_qh, btn_w-tri_qw, btn_h-tri_qh, true);			
+			pen.DrawTriangle(tri_qw*5, btn_h*0.5, btn_w+tri_qw, btn_h-tri_qh, btn_w+tri_qw, tri_qh, true);
 		}
 	}	
 	
