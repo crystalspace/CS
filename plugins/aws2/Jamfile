@@ -65,4 +65,5 @@ AWSJSFILES = js/jsapi.c
 Plugin aws2 : [ Wildcard *.cpp *.h ] $(AWSJSFILES) ;
 LinkWith aws2 : crystalspace ;
 ExternalLibs aws2 : STL ;
+MsvcDefine aws2 : XP_WIN ;
 }
