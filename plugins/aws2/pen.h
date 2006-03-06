@@ -188,6 +188,12 @@ namespace aws
 	    uint h_align, uint v_align, char *text);
   	       
   };  
+  
+  
 }
+
+/** Returns true if the object is a pen object. */
+  bool IsPenObject(JSObject *o);
+  
 
 #endif

@@ -53,7 +53,7 @@ Clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	return JS_TRUE;
 }
 
-/** @brief Move a pen by (x,y) */
+/** @brief Set the color. */
 static JSBool
 SetColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {			
@@ -95,6 +95,40 @@ SwapColors(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
 	if (po) po->SwapColors();		
+		
+	return JS_TRUE;
+}
+
+/** @brief Swaps the color of the pen with the alternate color. */
+static JSBool
+PushTransform(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{	
+	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
+	
+	if (po) po->PushTransform();		
+		
+	return JS_TRUE;
+}
+
+
+/** @brief Swaps the color of the pen with the alternate color. */
+static JSBool
+PopTransform(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{	
+	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
+	
+	if (po) po->PopTransform();		
+		
+	return JS_TRUE;
+}
+
+/** @brief Swaps the color of the pen with the alternate color. */
+static JSBool
+ClearTransform(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{	
+	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
+	
+	if (po) po->ClearTransform();		
 		
 	return JS_TRUE;
 }
@@ -242,6 +276,29 @@ DrawTriangle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	return JS_TRUE;
 }
 
+/** Draw this pen into another pen. */
+static JSBool
+Draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{			
+	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
+	
+	if (JSVAL_IS_OBJECT(argv[0]))
+	{
+		JSObject *pen_object = JSVAL_TO_OBJECT(argv[0]);
+				
+		if (IsPenObject(pen_object))
+		{	
+			aws::pen *other_pen = (aws::pen *)JS_GetPrivate(cx, pen_object); 					
+			
+			if (po) po->Draw(other_pen);	
+		}		
+	}
+			
+	
+		
+	return JS_TRUE;
+}
+
 
 
 /** @brief Move a pen by (x,y) */
@@ -329,8 +386,14 @@ static JSFunctionSpec pen_methods[] = {
 	{"Clear",		Clear,		0, 0, 0},
 	{"SetColor",	SetColor,	4, 0, 0},
 	{"SwapColors",  SwapColors, 0, 0, 0}, 
+	
+	{"PushTransform",  PushTransform,  0, 0, 0}, 
+	{"PopTransform",   PopTransform,   0, 0, 0}, 
+	{"ClearTransform", ClearTransform, 0, 0, 0}, 
+	
     {"Translate",	Translate,	3, 0, 0},
-    {"Rotate",		Rotate,		1, 0, 0},    
+    {"Rotate",		Rotate,		1, 0, 0},   
+     
     {"DrawLine",	DrawLine,	4, 0, 0},
     {"DrawRect",	DrawRect,	6, 0, 0},    
     {"DrawMiteredRect",	DrawMiteredRect,	7, 0, 0},
@@ -338,9 +401,17 @@ static JSFunctionSpec pen_methods[] = {
     {"DrawArc",			DrawArc,			8, 0, 0},
     {"DrawTriangle",	DrawTriangle,		7, 0, 0},
     
+    {"Draw",		    Draw,				1, 0, 0},
+    
     //{"Invalidate",	Invalidate,	0, 0, 0},    
     {0,0,0,0,0}
 };    
+
+bool 
+IsPenObject(JSObject *obj)
+{
+	return JS_InstanceOf(ScriptMgr()->GetContext(), obj, &pen_object_class, NULL) == JS_TRUE;
+}
     
 void 
 Pen_SetupAutomation()
