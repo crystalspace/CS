@@ -6,6 +6,32 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Mar-2006
+	- Rhad cleaned up memory leaks in the sound system:
+	  - SndSysOggSoundData has been cleaned up to use local variables
+	    where appropriate.  Member variables have been renamed to be more
+	    consistant.  Memory leak in IsOgg() corrected.
+	  - SndSysSourceSoftware3D should now clean up its filter chains on
+	    destruction.  This was causing rather large memory leaks due to
+	    the sizable sound buffers some filters use.
+	  - SndSysRendererSoftware will now properly cleanup stopped sources
+	    and streams within about 500ms of their release.  This fixes a
+	    memory leak that occurred when using AutoUnregister streams. As a
+	    side effect, RemoveSource() and RemoveStream() will no longer
+	    block waiting for the background thread to acknowledge.
+	- Rhad added a new interface: iSndSysEventRecorder.  This interface
+	  will allow for enhanced debugging of sound events without cluttering
+	  the console with reporter messages.
+	  - A new plugin - sndsyseventrecorder has been created at
+	    plugins/sndsys/utility/eventrecorder/  This plugin is not loaded
+	    by default.  To specify enhanced sound system event recording, add
+	    -soundeventlog=/this/sound.log (example) to the command line.
+	  - queue.h, the sound system's threadsafe queue implementation has
+	    been moved from renderer/software into utility/ .
+	  - Not all sound system components use the event log (yet).
+	- Rhad added an ALSA software sound driver.  This driver needs more
+	  adjustments, but seems to work well. Tested only on x86 Linux
+	  so far.
 4-Mar-2006
 	- Jorrit added a feature to csColliderActor so that you can get
 	  the meshes that were hit with in the last call to Move().
