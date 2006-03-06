@@ -76,6 +76,7 @@ SndSysSourceSoftwareBasic::~SndSysSourceSoftwareBasic()
   // Clear out filters
   //while (!filters.IsEmpty())
     //RemoveFilter(filters[0]);
+  int i;
 
   SCF_DESTRUCT_IBASE();
 }
@@ -373,6 +374,11 @@ SndSysSourceSoftware3D::SndSysSourceSoftware3D(csRef<iSndSysStream> stream, csSn
   active_parameters.volume=0.0f;
   queued_parameters.volume=1.0f;
 
+  // Initialize speaker filter chains to NULL
+  int i;
+  for (i=0;i<MAX_CHANNELS;i++)
+    speaker_filter_chains[i]=0;
+
 
   //const SndSysSoundFormat *fmt=stream->GetRenderedFormat();
   // Allocate the history buffer
@@ -390,6 +396,12 @@ SndSysSourceSoftware3D::~SndSysSourceSoftware3D()
   // Clear out filters
   //while (!filters.IsEmpty())
   //RemoveFilter(filters[0]);
+
+  // Cleanup speaker filter chains
+  int i;
+  for (i=0;i<MAX_CHANNELS;i++)
+    delete speaker_filter_chains[i];
+
   SCF_DESTRUCT_IBASE();
 }
 

@@ -24,8 +24,6 @@
 #include "isndsys/ss_filter.h"
 #include "isndsys/ss_source.h"
 
-#include "queue.h"
-
 #define MAX_CHANNELS 18
 
 #define SOURCE_INTEGER_VOLUME_MULTIPLE 1024
@@ -93,7 +91,10 @@ public:
   SCF_DECLARE_IBASE;
 
   SndSysSourceSoftwareFilter_Base() : next_filter(0) {};
-  virtual ~SndSysSourceSoftwareFilter_Base() {};
+  virtual ~SndSysSourceSoftwareFilter_Base() 
+  {
+    delete next_filter;
+  };
 
   virtual void Apply(iSndSysSoftwareFilter3DProperties &properties)
   {
@@ -264,6 +265,7 @@ public:
   virtual ~SndSysSourceSoftwareFilter_SplitPath() 
   {
     delete[] second_buffer;
+    delete second_filter;
   }
 
   void Apply(iSndSysSoftwareFilter3DProperties &properties)
