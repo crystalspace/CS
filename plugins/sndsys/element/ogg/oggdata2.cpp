@@ -99,98 +99,102 @@ cs_ov_callbacks *GetCallbacks()
   return &ogg_callbacks;
 }
 
-SndSysOggSoundData::SndSysOggSoundData (iBase *parent, iDataBuffer* data)
+SndSysOggSoundData::SndSysOggSoundData (iBase *pParent, iDataBuffer* pDataBuffer) :
+  // Create a new DataStore associated with the passed DataBuffer
+  m_DataStore(pDataBuffer)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-#ifdef CS_LITTLE_ENDIAN
-  endian = 0;
-#else
-  endian = 1;
-#endif
+  SCF_CONSTRUCT_IBASE (pParent);
 
-  ds = new OggDataStore (data);
-  fmt.Bits = 16;
-  fmt.Channels = 2;
-  data_ready = false;
+  // Set some default format information
+  m_SoundFormat.Bits = 16;
+  m_SoundFormat.Channels = 2;
+
+  // There is currently no data ready
+  m_DataReady = false;
 }
 
 SndSysOggSoundData::~SndSysOggSoundData ()
 {
-  delete ds;
   SCF_DESTRUCT_IBASE();
 }
 
 const csSndSysSoundFormat *SndSysOggSoundData::GetFormat()
 {
-  if (!data_ready)
+  if (!m_DataReady)
     Initialize();
-  return &fmt;
+  return &m_SoundFormat;
 }
 
 size_t SndSysOggSoundData::GetSampleCount()
 {
-  if (!data_ready)
+  if (!m_DataReady)
     Initialize();
-  return sample_count;
+  return m_SampleCount;
 }
 
 size_t SndSysOggSoundData::GetDataSize()
 {
-  return ds->length;
+  return m_DataStore.length;
 }
 
 iSndSysStream *SndSysOggSoundData::CreateStream (
-  csSndSysSoundFormat *renderformat, int mode3d)
+  csSndSysSoundFormat *pRenderFormat, int Mode3D)
 {
-  SndSysOggSoundStream *stream=new SndSysOggSoundStream(this, ds, renderformat, mode3d);
+  // Creating a stream from the data is a simple operation for Ogg
+  SndSysOggSoundStream *pStream=new SndSysOggSoundStream(this, &m_DataStore, pRenderFormat, Mode3D);
 
-  return (stream);
+  return (pStream);
 }
 
 void SndSysOggSoundData::Initialize()
 {
   ogg_int64_t pcm_count;
   vorbis_info *v_info;
-  OggStreamData *streamdata = new OggStreamData;
+  OggStreamData StreamData;
 
-  streamdata->datastore=ds;
-  streamdata->position=0;
+  // Setup a temporary OggStreamData so that we can open callbacks and get information about the audio
+  //  We'll tear this all down as soon as we've stored the information we want.
+  StreamData.datastore=&m_DataStore;
+  StreamData.position=0;
 
+  // ov_open_callbacks prepares the data for decoding, and allows us to retrieve properties of the ogg vorbis sound stream
   OggVorbis_File f;
   memset (&f, 0, sizeof(OggVorbis_File));
-  /*bool ok = */ov_open_callbacks(streamdata, &f, 0, 0, 
+  /*bool ok = */ov_open_callbacks(&StreamData, &f, 0, 0, 
     *(ov_callbacks*)GetCallbacks ()) /*== 0*/;
 
+  // The ogg vorbis functions can deal with 64 bit counts of samples, we only use 32 bit for now
   pcm_count=ov_pcm_total(&f, -1);
-  sample_count=(long)(pcm_count & 0x7FFFFFFF);
+  m_SampleCount=(long)(pcm_count & 0x7FFFFFFF);
 
-
+  // Retrieve and store the sound format information
   v_info=ov_info(&f,-1);
+  m_SoundFormat.Freq=v_info->rate;
+  m_SoundFormat.Bits=v_info->bitrate_nominal;
+  m_SoundFormat.Channels=v_info->channels;
 
-  fmt.Freq=v_info->rate;
-  fmt.Bits=v_info->bitrate_nominal;
-  fmt.Channels=v_info->channels;
-
+  // Cleanup
   ov_clear(&f);
-  delete streamdata;
- 
-  data_ready=true;
+
+  // No need to call this again
+  m_DataReady=true;
 }
+
 
 bool SndSysOggSoundData::IsOgg (iDataBuffer* Buffer)
 {
-  OggDataStore *dd = new OggDataStore (Buffer);
-  OggStreamData *streamdata = new OggStreamData;
+  // This is a static function, no member variables are used
+  OggDataStore datastore(Buffer);
+  OggStreamData streamdata;
 
-  streamdata->datastore=dd;
-  streamdata->position=0;
+  streamdata.datastore=&datastore;
+  streamdata.position=0;
 
   OggVorbis_File f;
   memset (&f, 0, sizeof(OggVorbis_File));
   bool ok = 
-    ov_test_callbacks(streamdata, &f, 0, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
+    ov_test_callbacks(&streamdata, &f, 0, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
   ov_clear (&f);
-  delete dd;
   return ok;
 }
 

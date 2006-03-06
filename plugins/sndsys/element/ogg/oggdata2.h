@@ -44,7 +44,7 @@
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
-
+/// This simple structure acts as an interface between an the Vorbis read/seek functions and data stored accessed through an iDataBuffer.
 struct OggDataStore
 {
   csRef<iDataBuffer> buf;
@@ -80,7 +80,8 @@ class SndSysOggSoundData : public iSndSysData
  public:
   SCF_DECLARE_IBASE;
 
-  SndSysOggSoundData (iBase *parent, iDataBuffer* data);
+  /// Construction requires passing an iDataBuffer which references encoded ogg vorbis audio
+  SndSysOggSoundData (iBase *pParent, iDataBuffer* pDataBuffer);
   virtual ~SndSysOggSoundData ();
 
 
@@ -104,20 +105,39 @@ class SndSysOggSoundData : public iSndSysData
    * Creates a stream associated with this sound data positioned at the
    * begining of the sound data and initially paused if possible.
    */
-  virtual iSndSysStream *CreateStream (csSndSysSoundFormat *renderformat, 
-    int mode3d);
+  virtual iSndSysStream *CreateStream (csSndSysSoundFormat *pRenderFormat, 
+    int Mode3D);
 
-  void Initialize();
-
+  /// Call to determine if the provided data can be decoded as ogg vorbis audio
   static bool IsOgg (iDataBuffer* Buffer);
 
- protected:
-  OggDataStore *ds;
-  int endian;
-  bool data_ready;
-  csSndSysSoundFormat fmt;
-  long sample_count;
+protected:
+  ////
+  //  Internal functions
+  ////
 
+  /// This is required to initialize the m_SampleCount and m_SoundFormat member variables. It is called internally.
+  //    This is only called the first time that SoundFormat or SampleCount data is requested.
+  void Initialize();
+
+
+ protected:
+   ////
+   //  Member variables
+   ////
+
+   /// An accessor structure for the underlying ogg vorbis sound data
+  OggDataStore m_DataStore;
+
+  /// Flag indicating whether Initialize() has been called yet
+  bool m_DataReady;
+
+  /// The format that we're decoding the Ogg stream to. 
+  //    Currently this is the default format that the ogg vorbis library returns for a given Ogg audio file.
+  csSndSysSoundFormat m_SoundFormat;
+
+  /// The number of samples in the decoded output
+  long m_SampleCount;
 };
 
 #endif // #ifndef SNDSYS_DATA_OGG_H
