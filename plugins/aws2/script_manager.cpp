@@ -38,8 +38,7 @@ aws_ErrorReporter(JSContext *cx, const char *message, JSErrorReport *report)
 	
 	if (report)
 	{
-		char tmp[128];
-		csString err;
+		csString err, tmp;
 		
 		if (report->filename)
 		{
@@ -48,7 +47,8 @@ aws_ErrorReporter(JSContext *cx, const char *message, JSErrorReport *report)
 		}
 				
 		err+="line ";
-		err+=itoa(report->lineno, tmp, 10);
+		tmp.Format("%d", report->lineno);
+		err+=tmp;
 		err+=" : ";
 		
 		if (report->linebuf)

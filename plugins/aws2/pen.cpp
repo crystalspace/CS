@@ -56,7 +56,7 @@ Clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 /** @brief Move a pen by (x,y) */
 static JSBool
 SetColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
-{	
+{			
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 		
 	jsdouble r=0.0,g=0.0,b=0.0,a=1.0;
@@ -64,7 +64,7 @@ SetColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	if (JSVAL_IS_OBJECT(argv[0]))
 	{
 		JSObject *color_object = JSVAL_TO_OBJECT(argv[0]);
-		
+				
 		if (IsColorObject(color_object))
 		{	
 			csColor4 *co = (csColor4 *)JS_GetPrivate(cx, color_object); 
@@ -72,7 +72,7 @@ SetColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 			r=co->red;
 			g=co->green;
 			b=co->blue;
-			a=co->alpha;
+			a=co->alpha;		
 		}		
 	}
 	else
@@ -84,6 +84,17 @@ SetColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	}
 		
 	if (po) po->SetColor(r,g,b,a);	
+		
+	return JS_TRUE;
+}
+
+/** @brief Swaps the color of the pen with the alternate color. */
+static JSBool
+SwapColors(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{	
+	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
+	
+	if (po) po->SwapColors();		
 		
 	return JS_TRUE;
 }
@@ -117,15 +128,16 @@ DrawRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
 	int32 x1,y1,x2,y2;
-	JSBool fill;
+	JSBool fill, swap_colors;
 		
 	JS_ValueToInt32(cx,  argv[0], &x1);
 	JS_ValueToInt32(cx,  argv[1], &y1);
 	JS_ValueToInt32(cx,  argv[2], &x2);
 	JS_ValueToInt32(cx,  argv[3], &y2);
 	JS_ValueToBoolean(cx, argv[4], &fill);
+	JS_ValueToBoolean(cx, argv[5], &swap_colors);
 		
-	if (po) po->DrawRect(x1,y1,x2,y2,false, fill==JS_TRUE);	
+	if (po) po->DrawRect(x1,y1,x2,y2,swap_colors==JS_TRUE, fill==JS_TRUE);	
 		
 	return JS_TRUE;
 }
@@ -140,7 +152,7 @@ DrawMiteredRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 	
 	int32 x1,y1,x2,y2;
 	jsdouble miter;
-	JSBool fill;
+	JSBool fill, swap_colors;
 		
 	JS_ValueToInt32(cx,  argv[0], &x1);
 	JS_ValueToInt32(cx,  argv[1], &y1);
@@ -148,8 +160,9 @@ DrawMiteredRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 	JS_ValueToInt32(cx,  argv[3], &y2);
 	JS_ValueToNumber(cx,  argv[4], &miter);
 	JS_ValueToBoolean(cx, argv[5], &fill);
+	JS_ValueToBoolean(cx, argv[6], &swap_colors);
 		
-	if (po) po->DrawMiteredRect(x1,y1,x2,y2,(float)miter, false, fill==JS_TRUE);	
+	if (po) po->DrawMiteredRect(x1,y1,x2,y2,(float)miter, swap_colors==JS_TRUE, fill==JS_TRUE);	
 		
 	return JS_TRUE;
 }
@@ -164,7 +177,7 @@ DrawRoundedRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 	
 	int32 x1,y1,x2,y2;
 	jsdouble roundness;
-	JSBool fill;
+	JSBool fill, swap_colors;
 		
 	JS_ValueToInt32(cx,  argv[0], &x1);
 	JS_ValueToInt32(cx,  argv[1], &y1);
@@ -172,8 +185,9 @@ DrawRoundedRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 	JS_ValueToInt32(cx,  argv[3], &y2);
 	JS_ValueToNumber(cx,  argv[4], &roundness);
 	JS_ValueToBoolean(cx, argv[5], &fill);
+	JS_ValueToBoolean(cx, argv[6], &swap_colors);
 		
-	if (po) po->DrawRoundedRect(x1,y1,x2,y2,(float)roundness, false, fill==JS_TRUE);	
+	if (po) po->DrawRoundedRect(x1,y1,x2,y2,(float)roundness, swap_colors==JS_TRUE, fill==JS_TRUE);	
 		
 	return JS_TRUE;
 }
@@ -188,7 +202,7 @@ DrawArc(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	
 	int32 x1,y1,x2,y2;
 	jsdouble start_angle, end_angle;
-	JSBool fill;
+	JSBool fill, swap_colors;
 		
 	JS_ValueToInt32(cx,  argv[0], &x1);
 	JS_ValueToInt32(cx,  argv[1], &y1);
@@ -197,8 +211,9 @@ DrawArc(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	JS_ValueToNumber(cx,  argv[4], &start_angle);
 	JS_ValueToNumber(cx,  argv[5], &end_angle);
 	JS_ValueToBoolean(cx, argv[6], &fill);
+	JS_ValueToBoolean(cx, argv[7], &swap_colors);
 		
-	if (po) po->DrawArc(x1,y1,x2,y2,(float)start_angle, (float)end_angle, false, fill==JS_TRUE);	
+	if (po) po->DrawArc(x1,y1,x2,y2,(float)start_angle, (float)end_angle, swap_colors==JS_TRUE, fill==JS_TRUE);	
 		
 	return JS_TRUE;
 }
@@ -313,13 +328,14 @@ JSClass pen_object_class = {
 static JSFunctionSpec pen_methods[] = {
 	{"Clear",		Clear,		0, 0, 0},
 	{"SetColor",	SetColor,	4, 0, 0},
+	{"SwapColors",  SwapColors, 0, 0, 0}, 
     {"Translate",	Translate,	3, 0, 0},
     {"Rotate",		Rotate,		1, 0, 0},    
     {"DrawLine",	DrawLine,	4, 0, 0},
-    {"DrawRect",	DrawRect,	5, 0, 0},    
-    {"DrawMiteredRect",	DrawMiteredRect,	6, 0, 0},
-    {"DrawRoundedRect",	DrawRoundedRect,	6, 0, 0},
-    {"DrawArc",			DrawArc,			7, 0, 0},
+    {"DrawRect",	DrawRect,	6, 0, 0},    
+    {"DrawMiteredRect",	DrawMiteredRect,	7, 0, 0},
+    {"DrawRoundedRect",	DrawRoundedRect,	7, 0, 0},
+    {"DrawArc",			DrawArc,			8, 0, 0},
     {"DrawTriangle",	DrawTriangle,		7, 0, 0},
     
     //{"Invalidate",	Invalidate,	0, 0, 0},    
@@ -866,7 +882,7 @@ void pen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle,
 */
 void pen::DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint y3, bool fill) 
 { 
-	uint8 op = PEN_OP_DRAWARC;
+	uint8 op = PEN_OP_DRAWTRIANGLE;
 	
 	buf->Write((const char *)&op, sizeof(uint8));
 	buf->Write((const char *)&x1, sizeof(uint));

@@ -39,6 +39,8 @@ extern "C" {
 void Widget_SetupAutomation();
 
 enum { W_DOCK_NORTH, W_DOCK_SOUTH, W_DOCK_EAST,  W_DOCK_WEST };
+enum { W_STICK_NORTH=1,  W_STICK_SOUTH=2,  W_STICK_EAST=4,  W_STICK_WEST=8, 
+       W_TRACK_NORTH=16, W_TRACK_SOUTH=32, W_TRACK_EAST=64, W_TRACK_WEST=128};
  
 namespace aws
 {
@@ -195,31 +197,84 @@ namespace aws
 	  	 for(size_t i=0; i<children.Length(); ++i)
 	  	 {
 		 	children[i]->AdjustForStickiness();	 
+		 	children[i]->Invalidate();
 	  	 }	  	 
   	 }
   	 
-  	 /** @brief Adjusts our frame to our parent's frame, accounting for the sticky bits. */
+  	 /** @brief Adjusts our frame to our parent's frame, accounting for the sticky bits. 
+  	  * There are two sets of sticky bits.  The first set indicates whether the sticky
+  	  * side is on or off.  If it's off, nothing happens.  If it's on, the default behavior
+  	  * is to stick that side of the frame the the same side of the parent frame.  This will
+  	  * generally cause that side to move in and out while the other side remains static.
+  	  * The net result is that the frame will stretch and shrink.  In many cases this is what
+  	  * you want.  In other cases you might want the frame to stick to one side of the parent
+  	  * frame, but retain it's shape.  In that case, the second set of sticky bits comes into
+  	  * play.  If the second set of bits (the no-stretch set) has the bit set, this function
+  	  * makes sure that the widget retains it's shape. */
   	 void AdjustForStickiness()
   	 {
 	  	 // No parent, can't adjust for stickiness
 	  	 if (parent==0) return;
 	  	 
-	  	 if (sticky_frame_flags & (1<<W_DOCK_NORTH)) Bounds().ymin = 0; 
-	  	 if (sticky_frame_flags & (1<<W_DOCK_SOUTH)) Bounds().ymax = parent->Bounds().Height();
-	  	 if (sticky_frame_flags & (1<<W_DOCK_EAST))  Bounds().xmax = parent->Bounds().Width();
-	  	 if (sticky_frame_flags & (1<<W_DOCK_WEST))  Bounds().xmin = 0;	  	 
+// 	  	 csString msg;
+// 	  	 
+// 	  	 msg.Format("Sticky flags: %x", (uint32)sticky_frame_flags);
+// 	  	 ScriptCon()->Message(msg);
+	  	 
+	  	 if (sticky_frame_flags & W_STICK_NORTH)
+	  	 {
+		  	  // If the no-resize flag is set, adjust the bottom too. This keeps
+		  	  // the frame the same size, while making sure it stays anchored to
+		  	  // that edge.
+		  	  if (sticky_frame_flags & W_TRACK_NORTH)
+		  	  {			  	  
+			  	  Bounds().ymax = Bounds().Height();
+		  	  }
+			  	  
+		  	  Bounds().ymin = 0; 		  	  
+	  	 }
+	  	 
+	  	 if (sticky_frame_flags & W_STICK_SOUTH)
+	  	 {		  	 
+		  	  if (sticky_frame_flags & W_TRACK_SOUTH)
+		  	  {			  	  
+			  	  Bounds().ymin = parent->Bounds().Height() - Bounds().Height();
+		  	  }
+		  	 
+		  	  Bounds().ymax = parent->Bounds().Height();
+	  	 }
+	  	  
+	  	 if (sticky_frame_flags & W_STICK_EAST)
+	  	 {
+		  	 if (sticky_frame_flags & W_TRACK_EAST)
+		  	 {			  	  
+			  	  Bounds().xmin = parent->Bounds().Width() - Bounds().Width();
+		  	 }
+		  	 
+		  	 Bounds().xmax = parent->Bounds().Width();
+	  	 }
+	  	 
+	  	 if (sticky_frame_flags & W_STICK_WEST)  
+	  	 {
+		  	 if (sticky_frame_flags & W_TRACK_WEST)
+		  	 {			  	  
+			  	  Bounds().xmax = Bounds().Width();
+		  	 }
+		  	 
+		  	 Bounds().xmin = 0;	  	 
+	  	 }
   	 }	 
   	 
   	 /** @brief Sets a stick frame bit. */
-  	 void SetFrameAnchor(int32 bit)
+  	 void SetFrameAnchor(int32 flags)
   	 {
-	  	sticky_frame_flags |= (bit<<1);	 
+	  	sticky_frame_flags |= flags;	 
   	 }
   	 
   	 /** @brief Clears a sticky frame bit. */
-  	 void ClearFrameAnchor(int32 bit)
+  	 void ClearFrameAnchor(int32 flags)
   	 {
-	  	sticky_frame_flags &= ~(bit<<1);	 
+	  	sticky_frame_flags &= ~flags;	 
   	 }
   	 
   	 /// Drawing ////

@@ -27,7 +27,10 @@ static JSObject *widget_proto_object=0;
 enum { WIDGET_XMIN, WIDGET_YMIN, WIDGET_XMAX, WIDGET_YMAX, WIDGET_WIDTH, WIDGET_HEIGHT, WIDGET_DIRTY,
 
 		/* Static properties */
-       WIDGET_STATIC_START, WIDGET_DOCK_NORTH, WIDGET_DOCK_SOUTH, WIDGET_DOCK_EAST, WIDGET_DOCK_WEST
+       WIDGET_STATIC_START, WIDGET_DOCK_NORTH, WIDGET_DOCK_SOUTH, WIDGET_DOCK_EAST, WIDGET_DOCK_WEST,
+       						WIDGET_STICK_NORTH, WIDGET_STICK_SOUTH, WIDGET_STICK_EAST, WIDGET_STICK_WEST,
+       						WIDGET_TRACK_NORTH, WIDGET_TRACK_SOUTH, WIDGET_TRACK_EAST, WIDGET_TRACK_WEST
+       
 	   };
 
 
@@ -51,8 +54,7 @@ widget_get_staticProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 	// Try static properties first.  They can't be handled in the class because
 	// They're STATIC properties.
 	if (JSVAL_IS_INT(id)) 
-   	{			  
-	   	   	
+   	{				   	   	
 		   	
 		    switch (JSVAL_TO_INT(id)) 
 			{
@@ -60,6 +62,17 @@ widget_get_staticProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 				case WIDGET_DOCK_SOUTH: *vp =  INT_TO_JSVAL(W_DOCK_SOUTH); break;
 				case WIDGET_DOCK_EAST:  *vp =  INT_TO_JSVAL(W_DOCK_EAST);  break;
 				case WIDGET_DOCK_WEST:  *vp =  INT_TO_JSVAL(W_DOCK_WEST);  break;
+				
+				case WIDGET_STICK_NORTH: *vp =  INT_TO_JSVAL(W_STICK_NORTH); break;					
+				case WIDGET_STICK_SOUTH: *vp =  INT_TO_JSVAL(W_STICK_SOUTH); break;
+				case WIDGET_STICK_EAST:  *vp =  INT_TO_JSVAL(W_STICK_EAST);  break;
+				case WIDGET_STICK_WEST:  *vp =  INT_TO_JSVAL(W_STICK_WEST);  break;
+				
+				case WIDGET_TRACK_NORTH: *vp =  INT_TO_JSVAL(W_TRACK_NORTH | W_STICK_NORTH); break;					
+				case WIDGET_TRACK_SOUTH: *vp =  INT_TO_JSVAL(W_TRACK_SOUTH | W_STICK_SOUTH); break;
+				case WIDGET_TRACK_EAST:  *vp =  INT_TO_JSVAL(W_TRACK_EAST  | W_STICK_EAST);  break;
+				case WIDGET_TRACK_WEST:  *vp =  INT_TO_JSVAL(W_TRACK_WEST  | W_STICK_WEST);  break;
+				
 				default:
 					return JS_FALSE;				
 			}
@@ -107,9 +120,6 @@ Widget(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
   	
   	// Save the widget.
   	aws::widgets.Push(wo);
-  	
-  	
-  	ScriptCon()->Message("Widget created.");
 	
 	return JS_TRUE;
 }
@@ -170,6 +180,7 @@ Resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	
 	wo->MoveDocked();
 	wo->AdjustChildrenForStickiness();
+	wo->Invalidate();
 	
 	return JS_TRUE;
 }
@@ -190,6 +201,7 @@ ResizeTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	wo->Bounds().SetSize(w, h);
 	wo->MoveDocked();
 	wo->AdjustChildrenForStickiness();
+	wo->Invalidate();
 		
 	return JS_TRUE;
 }
@@ -253,6 +265,7 @@ AddChild(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	aws::widget *child_wo = (aws::widget *)JS_GetPrivate(cx, child_object);
 	
 	wo->AddChild(child_wo);
+	child_wo->AdjustForStickiness();
 	
 	// Remove from global widget set.
 	aws::widgets.Delete(child_wo);
@@ -354,10 +367,15 @@ static JSPropertySpec widget_static_props[] =
         {"DOCK_EAST",      WIDGET_DOCK_EAST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
         {"DOCK_WEST",      WIDGET_DOCK_WEST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
         
-        {"STICK_NORTH",     WIDGET_DOCK_NORTH,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
-        {"STICK_SOUTH",     WIDGET_DOCK_SOUTH,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
-        {"STICK_EAST",      WIDGET_DOCK_EAST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
-        {"STICK_WEST",      WIDGET_DOCK_WEST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"STICK_NORTH",     WIDGET_STICK_NORTH,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"STICK_SOUTH",     WIDGET_STICK_SOUTH,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"STICK_EAST",      WIDGET_STICK_EAST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"STICK_WEST",      WIDGET_STICK_WEST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        
+        {"TRACK_NORTH",     WIDGET_TRACK_NORTH,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"TRACK_SOUTH",     WIDGET_TRACK_SOUTH,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"TRACK_EAST",      WIDGET_TRACK_EAST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
+        {"TRACK_WEST",      WIDGET_TRACK_WEST,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, widget_get_staticProperty},
         
         {0,0,0}
 };
@@ -475,7 +493,7 @@ widget::Draw(iPen *output_pen)
 		// Prepare for the drawing.
 		fr.Prepare(output_pen);		
 		
-		output_pen->SetColor(1,1,1,1);
+		output_pen->SetColor(1,1,1,0.25);
 		output_pen->DrawRect(0,0,Bounds().Width(),Bounds().Height());
 		//msg.Format("(%d,%d,%d,%d)", Bounds().xmin, Bounds().ymin, Bounds().Width(), Bounds().Height());
 		//output_pen->Write(0,-10, msg.GetData());
