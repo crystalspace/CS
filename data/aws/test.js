@@ -77,3 +77,12 @@ w3.Invalidate();
 tb = TitleBar();
 w.Dock(tb, Widget.DOCK_NORTH);
 tb.Invalidate();
+
+// Test scrollbar
+sb1 = ScrollBar(true);
+w.AddChild(sb1);
+sb1.Invalidate();
+
+sb2 = ScrollBar(false);
+w.AddChild(sb2);
+sb2.Invalidate();
