@@ -34,9 +34,9 @@ skin_NormalWindows =
     // The draw member can be a function or a filename.
     // If a function is specified, it will be called to draw the item.
     
-    WindowMin   : { x:36, y:5, w:14, h:14, draw:"/aws/minimize.png" },
-  	WindowZoom  : { x:22, y:5, w:14, h:14, draw:"/aws/zoom.png"     },
-  	WindowClose : { x:5,  y:5, w:14, h:14, draw:"/aws/close.png"    },  	
+    WindowMin   : { w:20, h:20, draw:"/aws/minimize.png" },
+  	WindowZoom  : { w:20, h:20, draw:"/aws/zoom.png"     },
+  	WindowClose : { w:20, h:20, draw:"/aws/close.png"    },  	
     
     // Any of the following can be either images, or functions.
     // If a function is specified, it will be called to draw the item.

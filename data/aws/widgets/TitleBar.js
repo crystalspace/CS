@@ -33,13 +33,13 @@ function TitleBar(inittext)
 	_widget.AddChild(_widget.Close);
 	
  	_widget.Min.ResizeTo(prefs.WindowMin.w, prefs.WindowMin.h);
- 	_widget.Min.MoveTo(prefs.WindowMin.x, prefs.WindowMin.y);
+ 	_widget.Min.MoveTo(0, 5);
  	
  	_widget.Zoom.ResizeTo(prefs.WindowZoom.w, prefs.WindowZoom.h);
- 	_widget.Zoom.MoveTo(prefs.WindowZoom.x, prefs.WindowZoom.y);
+ 	_widget.Zoom.MoveTo(0, 5);
  	
  	_widget.Close.ResizeTo(prefs.WindowClose.w, prefs.WindowClose.h);
- 	_widget.Close.MoveTo(prefs.WindowClose.x, prefs.WindowClose.y);
+ 	_widget.Close.MoveTo(0, 5);
  	
  	_widget.Close.SetFrameAnchor(Widget.TRACK_EAST);
  	_widget.Close.Dock(_widget.Zoom, Widget.DOCK_WEST);
