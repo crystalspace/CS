@@ -464,9 +464,12 @@ void SndSysDriverALSA::Run()
       do 
       {
         result=FillBuffer(AvailableFrames, MappedFrames, FilledFrames);
-        if (result>=0 && MappedFrames<(snd_pcm_uframes_t)AvailableFrames)
+
+        // Note that the comparison below fails horribly if you map over max signed int32 frames (~2 billion)
+        //  If you are mapping 2 billion frames, something is horribly wrong anyway.
+        if (result>=0 && (snd_pcm_sframes_t)MappedFrames<AvailableFrames)
           RecordEvent(SSEL_DEBUG, "Short mapping of %u frames [%d available]", MappedFrames, AvailableFrames);
-      } while(result>=0 && MappedFrames<(snd_pcm_uframes_t)AvailableFrames && FilledFrames==MappedFrames);
+      } while(result>=0 && (snd_pcm_sframes_t)MappedFrames<AvailableFrames && FilledFrames==MappedFrames);
 
       // If a mapping error occured, break
       if (result<0)

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Mar-2006
+	- Rhad fixed an infinite loop in the ALSA sound driver that could
+	  occur if the call to retrieve the sound frames available for filling
+	  returned a negative number.
 5-Mar-2006
 	- Rhad cleaned up memory leaks in the sound system:
 	  - SndSysOggSoundData has been cleaned up to use local variables
