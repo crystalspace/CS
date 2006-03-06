@@ -302,6 +302,7 @@ Style3D =
 		pen.DrawLine(cw,h,w,h);
 				
 		pen.DrawRect(cw+5,5, w-tbw, h-5, false, true);		
+		
 	},
 	
 	ScrollBar : function(pen)
@@ -367,7 +368,20 @@ Style3D =
 			pen.DrawTriangle(tri_qw, btn_h*0.5,  btn_w-tri_qw, tri_qh, btn_w-tri_qw, btn_h-tri_qh, true);			
 			pen.DrawTriangle(tri_qw*5, btn_h*0.5, btn_w+tri_qw, btn_h-tri_qh, btn_w+tri_qw, tri_qh, true);
 		}
-	}	
+	},
+	
+	Button : function(pen)
+	{
+		var w = this.width, h = this.height;
+		var frame = Frames3D;
+		
+		if (this.state) frame.Inset(pen,0,0,w,h);
+		else frame.Outset(pen,0,0,w,h);
+		
+		if (this.onDrawContent) this.onDrawContent(pen);			
+	}
+	
+	
 	
 	
 }; // end Style3D

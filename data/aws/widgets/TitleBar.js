@@ -2,6 +2,7 @@
 function TitleBar(inittext)
 {
 	var _widget = new Widget;
+	var prefs = Skin.current;
 	
 	// Give it a pen
 	_widget.SetPen(new Pen);
@@ -20,6 +21,29 @@ function TitleBar(inittext)
 	
 	// Set the drawing function to be whatever the current style dictates.
 	_widget.onDraw = Skin.current.Style.TitleBar;
+	
+	// Create the buttons.
+	_widget.Min = Button();
+	_widget.Zoom = Button();
+	_widget.Close = Button();
+	
+	// Add the children
+	_widget.AddChild(_widget.Min);	
+	_widget.AddChild(_widget.Zoom);
+	_widget.AddChild(_widget.Close);
+	
+ 	_widget.Min.ResizeTo(prefs.WindowMin.w, prefs.WindowMin.h);
+ 	_widget.Min.MoveTo(prefs.WindowMin.x, prefs.WindowMin.y);
+ 	
+ 	_widget.Zoom.ResizeTo(prefs.WindowZoom.w, prefs.WindowZoom.h);
+ 	_widget.Zoom.MoveTo(prefs.WindowZoom.x, prefs.WindowZoom.y);
+ 	
+ 	_widget.Close.ResizeTo(prefs.WindowClose.w, prefs.WindowClose.h);
+ 	_widget.Close.MoveTo(prefs.WindowClose.x, prefs.WindowClose.y);
+ 	
+ 	_widget.Close.SetFrameAnchor(Widget.TRACK_EAST);
+ 	_widget.Close.Dock(_widget.Zoom, Widget.DOCK_WEST);
+ 	_widget.Zoom.Dock(_widget.Min, Widget.DOCK_WEST);	
 	
 	return _widget;
 }
