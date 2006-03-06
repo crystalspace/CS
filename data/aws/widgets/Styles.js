@@ -334,7 +334,7 @@ Style3D =
 		
 		if (this.orientation_vertical)
 		{
-			var y = (pos*(h-frame.InsetAdjust-(btn_h*3))) / max;
+			var y = (pos*(h-frame.InsetAdjust-size-(btn_h*3))) / max;
 			
 			// Background
 			frame.Inset(pen,0,btn_h*2,w,h-btn_h);
@@ -355,7 +355,7 @@ Style3D =
 		}
 		else
 		{
-			var x = (pos*(w-frame.InsetAdjust-(btn_w*3))) / max;
+			var x = (pos*(w-frame.InsetAdjust-size-(btn_w*3))) / max;
 			
 			// Background 
 			frame.Inset(pen,btn_w*2,0, w-btn_w, h);

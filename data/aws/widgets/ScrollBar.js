@@ -11,10 +11,14 @@ function ScrollBar(orientation_vertical)
 	_widget.orientation_vertical = orientation_vertical;
 	
 	// Setup the scroll bar
+	_widget._value=0;
 	_widget.bar_size=50;
-	_widget.value=0;
 	_widget.max=100;
 	_widget.min=0;
+	
+	// Invalidate and fire onChange when the value property is set.
+	_widget.__defineSetter__("value", function(v) { this._value = v; this.Invalidate(); if (this.onChange) this.onChange(this); });	
+	_widget.__defineGetter__("value", function() { return this._value; });	
 		
 	//  Set initial size
 	if (orientation_vertical)
