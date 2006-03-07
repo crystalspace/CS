@@ -126,6 +126,8 @@ public:
     void *buf2, size_t buf2_len);
 
   /// Send a message to the sound system event recorder
+  //   This version may be called by other components that have a reference to the renderer
+  //   so that they dont need to hold a EventRecorder reference themselves (sources for example)
   void RecordEvent(SndSysEventCategory Category, SndSysEventLevel Severity, const char* msg, ...);
 
 
@@ -182,6 +184,11 @@ protected:
   /// The last time (in csTicks) that the source/stream garbage collection process was run
   csTicks LastGarbageCollectionTicks;
 
+#ifdef CS_DEBUG
+  /// The last time status information was reported
+  csTicks LastStatusReport;
+#endif
+
   /// The event recorder interface, if active
   csRef<iSndSysEventRecorder> EventRecorder;
 
@@ -200,6 +207,10 @@ protected:
 
   /// Send a message to the sound system event recorder as the renderer
   void RecordEvent(SndSysEventLevel Severity, const char* msg, ...);
+
+  /// Report current renderer status via RecordEvent
+  //   This function only has a body in debug mode
+  void StatusReport(csTicks CurrentTime);
 
   size_t CalculateMaxSamples(size_t bytes);
   void CalculateMaxBuffers(size_t samples, size_t *buf1_len, size_t *buf2_len);

@@ -77,6 +77,10 @@ csSndSysRendererSoftware::csSndSysRendererSoftware(iBase* piBase) :
   object_reg = 0;
   Volume=0.5;
 
+#ifdef CS_DEBUG
+  LastStatusReport=0;
+#endif
+
   int i;
   for (i=0;i<MAX_CHANNELS;i++)
     memset(&Speakers[i],0,sizeof(st_speaker_properties));
@@ -280,10 +284,16 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
 //////////////////////////////////////////////////////////////////////////
 bool csSndSysRendererSoftware::Open ()
 {
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Open()");
+  RecordEvent(SSEL_DEBUG, "Open() called.");
+
   CS_ASSERT (Config != 0);
 
-  if (!SoundDriver) return false;
+  if (!SoundDriver) 
+  {
+    // The sound driver probably failed to start for some reason
+    RecordEvent(SSEL_ERROR, "No sound driver loaded!");
+    return false;
+  }
 
   render_format.Freq = Config->GetInt("SndSys.Frequency", 44100);
   render_format.Bits = Config->GetInt("SndSys.Bits", 16);
@@ -297,13 +307,12 @@ bool csSndSysRendererSoftware::Open ()
 #endif
 
 
-  Report (CS_REPORTER_SEVERITY_DEBUG,
-    "Initializing driver with Freq=%d Channels=%d Bits=%d",
-    render_format.Freq, render_format.Channels, render_format.Bits);
+  RecordEvent(SSEL_DEBUG, "Calling SoundDriver->Open() with Freq=%dhz Channels=%d Bits per sample=%d",
+               render_format.Freq, render_format.Channels, render_format.Bits);
 
   if (!SoundDriver->Open(this, &render_format))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "SoundDriver->Open() failed!");
+    RecordEvent(SSEL_ERROR, "SoundDriver->Open() failed!");
     return false;
   }
 
@@ -361,11 +370,17 @@ void csSndSysRendererSoftware::GarbageCollection()
 
   // Make a pass through the clear queue of streams and cleanup 
   while (streamptr=stream_clear_queue.DequeueEntry(false))
+  {
+    RecordEvent(SSEL_DEBUG, "Decref'ing stream with refcount=%d", streamptr->GetRefCount());
     streamptr->DecRef();
+  }
 
   // Make a pass through the clear queue of sources and cleanup 
   while (sourceptr=source_clear_queue.DequeueEntry(false))
+  {
+    RecordEvent(SSEL_DEBUG, "Decref'ing source with refcount=%d", sourceptr->GetRefCount());
     sourceptr->DecRef();
+  }
 }
 
 //      !!WARNING!!  DO NOT CALL THIS FROM THE BACKGROUND THREAD
@@ -375,8 +390,9 @@ void csSndSysRendererSoftware::RemoveAllSources()
 
   // We will bypass the removal queue since this function is only called when the background thread is
   //  not running
-  while (sourceptr=sources.Get(0))
+  while (sources.GetSize())
   {
+    sourceptr=sources.Get(0);
     sources.Delete(sourceptr);
     sourceptr->DecRef();
   }
@@ -395,8 +411,9 @@ void csSndSysRendererSoftware::RemoveAllStreams()
 
   // We will bypass the removal queue since this function is only called when the background thread is
   //  not running
-  while (streamptr=streams.Get(0))
+  while (streams.GetSize())
   {
+    streamptr=streams.Get(0);
     streams.Delete(streamptr);
     streamptr->DecRef();
   }
@@ -437,7 +454,7 @@ csPtr<iSndSysStream> csSndSysRendererSoftware::CreateStream(iSndSysData* data, i
   // This is the reference that will belong to the render thread
   stream->IncRef();
 
-  //Report (CS_REPORTER_SEVERITY_DEBUG, "Queueing stream with addr %08x", stream);
+  RecordEvent(SSEL_DEBUG, "Queueing stream for add with addr %08x", stream);
 
   // Queue this source for the background thread to add to its list of existant sources
   stream_add_queue.QueueEntry(stream);
@@ -464,7 +481,8 @@ csPtr<iSndSysSource> csSndSysRendererSoftware::CreateSource(iSndSysStream* strea
   // This is the reference that will belong to the render thread
   source->IncRef();
 
-  //Report (CS_REPORTER_SEVERITY_DEBUG, "Queueing source with addr %08x", source);
+  RecordEvent(SSEL_DEBUG, "Queueing source for add with addr %08x", source);
+
   // Queue this source for the background thread to add to its list of existant sources
   source_add_queue.QueueEntry(source);
 
@@ -474,6 +492,8 @@ csPtr<iSndSysSource> csSndSysRendererSoftware::CreateSource(iSndSysStream* strea
 /// Remove a stream from the sound renderer's list of streams
 bool csSndSysRendererSoftware::RemoveStream(iSndSysStream* stream)
 {
+  RecordEvent(SSEL_DEBUG, "Queueing stream for remove with addr %08x", stream);
+
   stream_remove_queue.QueueEntry(stream);
   return true;
 }
@@ -481,6 +501,8 @@ bool csSndSysRendererSoftware::RemoveStream(iSndSysStream* stream)
 /// Remove a source from the sound renderer's list of sources
 bool csSndSysRendererSoftware::RemoveSource(iSndSysSource* source)
 {
+  RecordEvent(SSEL_DEBUG, "Queueing source for remove with addr %08x", source);
+
   source_remove_queue.QueueEntry(source);
   return true;
 }
@@ -506,14 +528,18 @@ size_t csSndSysRendererSoftware::FillDriverBuffer(void *buf1, size_t buf1_len,
   // Calculate the elapsed time since the last fill
   current_ticks=csGetTicks();
 
+  // Report some information about the current status of the renderer system
+  StatusReport(current_ticks);
+
   // Resize the samplebuffer if needed
   size_t needed_samples = CalculateMaxSamples (buf1_len+buf2_len);
 
   if ((sample_buffer==0) || (needed_samples > sample_buffer_samples))
   {
+    RecordEvent(SSEL_DEBUG, "Sample buffer too small. Have [%u] Need [%u]. Allocating.", sample_buffer_samples, needed_samples);
+
     delete[] sample_buffer;
     sample_buffer=new csSoundSample[needed_samples];
-    //Report(CS_REPORTER_SEVERITY_DEBUG, "Allocated a new sample buffer at %08x of %08x samples", sample_buffer, needed_samples);
     sample_buffer_samples = needed_samples;
   }
 
@@ -584,6 +610,26 @@ size_t csSndSysRendererSoftware::FillDriverBuffer(void *buf1, size_t buf1_len,
 
 
   return needed_samples * (render_format.Bits/8);
+}
+
+void csSndSysRendererSoftware::StatusReport(csTicks CurrentTime)
+{
+#ifdef CS_DEBUG
+  if (CurrentTime > LastStatusReport + 15000)
+  {
+    RecordEvent(SSEL_DEBUG,"---RENDERER STATUS REPORT---");
+    RecordEvent(SSEL_DEBUG,"Active streams [%d]", streams.GetSize());
+    RecordEvent(SSEL_DEBUG,"Active sources [%d]", sources.GetSize());
+    RecordEvent(SSEL_DEBUG,"Source add queue length [%d]", source_add_queue.Length());
+    RecordEvent(SSEL_DEBUG,"Stream add queue length [%d]", stream_add_queue.Length());
+    RecordEvent(SSEL_DEBUG,"Source remove queue length [%d]", source_remove_queue.Length());
+    RecordEvent(SSEL_DEBUG,"Stream remove queue length [%d]", stream_remove_queue.Length());
+    RecordEvent(SSEL_DEBUG,"Current time (csTicks) [%u]", CurrentTime);
+    RecordEvent(SSEL_DEBUG,"Last garbage collection time (csTicks) [%u]", LastGarbageCollectionTicks);
+
+    LastStatusReport=CurrentTime;
+  }
+#endif // #ifdef CS_DEBUG
 }
 
 
