@@ -304,7 +304,7 @@ Style3D =
 		pen.DrawRect(cw+5,5, w-tbw, h-5, false, true);	
 		
 		pen.SetColor(prefs.TitleBarTextColor);
-		pen.Write(prefs.Font, cw+8, 6, this.text);	
+		pen.WriteBoxed(prefs.Font, cw+10, 5, w-tbw-5, h-5, Pen.ALIGN_LEFT, Pen.ALIGN_CENTER, this.text);	
 		
 	},
 	
