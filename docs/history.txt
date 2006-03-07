@@ -7,6 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 7-Mar-2006
+	- Christopher added the basic event system to AWS2, and completed the
+	  required features for the Pen object.  Christopher also added a 
+	  clock widget and started to implement mouse events for widgets. He
+	  also corrected a silly bug in the widget::Contains function that
+	  would cause children to never be resolved as the mouse container.
 	- Jorrit changed walktest over to the standard output console
 	  as opposed to the simple console. The standard console has more
 	  features and it doesn't really make sense to support three
