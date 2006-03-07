@@ -75,7 +75,12 @@ struct iInputBinder : public virtual iBase
    * \param cmd The ID of the command to bind.
    * \param toggle If true, button status is only toggled on keydown events.
    * \remarks Note that cmd is used as an array index so the numbers you use
-   *   should be consecutive, starting with 0.
+   *   should be consecutive, starting with 0.  Also note that there must be
+   *   a 1:1 mapping between buttons and commands, that is, a button cannot
+   *   issue multiple commands, and the same command cannot be bound to multiple
+   *   buttons.  If you require this, you must handle it in your application.
+   *   Binding a button (or command) will remove any previous bindings
+   *   involving the button or command.
    */
   virtual void BindButton (csInputDefinition const& def, unsigned int cmd,
     bool toggle = false) = 0;
