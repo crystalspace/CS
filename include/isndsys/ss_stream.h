@@ -79,8 +79,8 @@ struct iSndSysStream : public iBase
    * Returns the current position of this sound in rendered samples. 
    * This should return a valid value even if GetSampleCount() returns
    * CS_SNDSYS_STREAM_UNKNOWN_LENGTH since an object implementing
-   * this interface should know its position relative to the begining of the
-   * data.  In the case where the begining may be ambiguous
+   * this interface should know its position relative to the beginning of the
+   * data.  In the case where the beginning may be ambiguous
    * it should be considered to be at the point where the stream first
    * started.  In other words, where there is doubt, the position
    * should start at 0 and advance as the position advances.
@@ -88,7 +88,7 @@ struct iSndSysStream : public iBase
   virtual size_t GetPosition() = 0;
 
   /**
-   * Resets the position of the stream to the begining if possible.
+   * Resets the position of the stream to the beginning if possible.
    * FALSE may be returned if a reset operation is not permitted or not
    * possible.
    */
