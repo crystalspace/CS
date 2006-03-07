@@ -481,9 +481,13 @@ void SndSysDriverALSA::Run()
 
       last_write=current_ticks;
     }
+
+    RecordEvent(SSEL_DEBUG, "Finished filling mmap buffers.  Going to sleep.");
+
     // Sleep for at least a little bit
-    csSleep(10);
+    csSleep(tick_difference);
   }
+  RecordEvent(SSEL_DEBUG, "Main run loop complete.  Shutting down.");
 
   // Stop playback and drop all queued frames
   snd_pcm_drop(m_pPCMDevice);
