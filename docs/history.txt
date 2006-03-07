@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 6-Mar-2006
+	- Christopher made numerous updates to AWS2, notably the Margins
+	  and Font object.  He also fixed csPen so that the text translation
+	  vector is properly stored and cleared with the rest of the transforms.
 	- Rhad fixed an infinite loop in the ALSA sound driver that could
 	  occur if the call to retrieve the sound frames available for filling
 	  returned a negative number.

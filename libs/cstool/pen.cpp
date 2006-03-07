@@ -94,11 +94,13 @@ void csPen::SwapColors()
 void csPen::ClearTransform()
 {
   mesh.object2world.Identity();
+  tt = csVector3(0,0,0);
 }
 
 void csPen::PushTransform()
 {
   transforms.Push(mesh.object2world);
+  translations.Push(tt);
 }
 
 void csPen::PopTransform()
@@ -107,6 +109,9 @@ void csPen::PopTransform()
 
   mesh.object2world*=transforms.Top();
   transforms.Pop();
+  
+  tt=translations.Top();
+  translations.Pop();
 }
 
 void csPen::SetOrigin(const csVector3 &o)

@@ -301,7 +301,10 @@ Style3D =
 		pen.DrawLine(w,0, w,h);
 		pen.DrawLine(cw,h,w,h);
 				
-		pen.DrawRect(cw+5,5, w-tbw, h-5, false, true);		
+		pen.DrawRect(cw+5,5, w-tbw, h-5, false, true);	
+		
+		pen.SetColor(prefs.TitleBarTextColor);
+		pen.Write(prefs.Font, cw+8, 6, this.text);	
 		
 	},
 	

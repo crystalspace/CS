@@ -187,6 +187,9 @@ class CS_CRYSTALSPACE_EXPORT csPen : public iPen
 
   /** The array that stores the transformation stack. */
   csArray<csReversibleTransform> transforms;
+  
+  /** The array that stores the translation stack for text. */
+  csArray<csVector3> translations;
 
 protected:
   /** 

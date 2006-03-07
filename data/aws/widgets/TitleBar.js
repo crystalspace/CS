@@ -8,7 +8,7 @@ function TitleBar(inittext)
 	_widget.SetPen(new Pen);
 	
 	// Initialize the text property.
-	_widget.text = new String(inittext);
+	_widget.text = inittext;
 		
 	// Initialize the alignment
 	_widget.hAlign = Pen.ALIGN_LEFT;

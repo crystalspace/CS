@@ -7,6 +7,8 @@ var p2 = new Pen;
 var w3 = new Widget;
 var p3 = new Pen;
 
+var fnt = new Font("VeraSans", 36);
+
 w.MoveTo(100,100);
 w.ResizeTo(200,200);
 
@@ -41,6 +43,9 @@ w.onDraw = function(pen)
 	pen.SetColor(1,0,1,0.5);
 	pen.DrawTriangle(hw, 0, this.width, this.height, 0, this.height, true);	
 	
+	pen.SetColor(1,1,1,1);
+	pen.Write(fnt, 0,0, "Test");
+	
 }
 
 // Setup Child.
@@ -74,7 +79,7 @@ w2.Invalidate();
 w3.Invalidate();
 
 // Test titlebar
-tb = TitleBar();
+tb = TitleBar("Test");
 w.Dock(tb, Widget.DOCK_NORTH);
 tb.Invalidate();
 
