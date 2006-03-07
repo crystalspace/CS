@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Mar-2006
+	- Jorrit changed walktest over to the standard output console
+	  as opposed to the simple console. The standard console has more
+	  features and it doesn't really make sense to support three
+	  different output consoles. So in the end the simple output
+	  console will be removed (once all needed features from it are
+	  transferred to standard console).
 6-Mar-2006
 	- Christopher made numerous updates to AWS2, notably the Margins
 	  and Font object.  He also fixed csPen so that the text translation

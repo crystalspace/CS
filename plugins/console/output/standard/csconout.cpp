@@ -112,6 +112,7 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
   csConfigAccess Config (object_reg, "/config/standardcon.cfg");
   const char* fontname = Config->GetStr ("StandardConsole.ConFont", "auto");
   int fontsize = Config->GetInt ("StandardConsole.ConFontSize", 10);
+  transparent = Config->GetBool ("StandardConsole.TranspBG", false);
 
   // Initialize the display rectangle to the entire display
   size.Set (0, 0, G2D->GetWidth () - 1, G2D->GetHeight () - 1);

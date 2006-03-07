@@ -1391,8 +1391,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     }
 
     // Set console to center of screen, if supported
-    int DeltaX = myG2D->GetWidth () / 10;
-    int DeltaY = myG2D->GetHeight () / 10;
+    int DeltaX = myG2D->GetWidth () / 18;
+    int DeltaY = myG2D->GetHeight () / 18;
     SmallConsole = myConsole->PerformExtension ("SetPos", DeltaX, DeltaY,
       myG2D->GetWidth () - DeltaX * 2, myG2D->GetHeight () - DeltaY * 2);
   }
