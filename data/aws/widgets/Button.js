@@ -22,5 +22,17 @@ function Button()
 	// Set the content drawing function.
 	_widget.onDrawContent = null;
 	
+	// If we get a mouse down, change the button's appearance.
+	_widget.onMouseDown = function(buttons, x, y)
+	{
+		this.state=true;		
+	}
+	
+	// If the mouse is up, stop the moving process
+	_widget.onMouseUp = function(buttons, x, y)
+	{
+		this.state=false;			
+	}
+	
 	return _widget;
 }

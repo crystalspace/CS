@@ -22,6 +22,35 @@ function TitleBar(inittext)
 	// Set the drawing function to be whatever the current style dictates.
 	_widget.onDraw = Skin.current.Style.TitleBar;
 	
+	// If we get a mouse down, start the moving process.
+	_widget.onMouseDown = function(buttons, x, y)
+	{
+		this.isMoving=true;	
+		this.last_x=x;
+		this.last_y=y;
+	}
+	
+	// If the mouse is up, stop the moving process
+	_widget.onMouseUp = function(buttons, x, y)
+	{
+		this.isMoving=false;	
+	}
+	
+	// If the mouse moves, we might be moving the widget
+	_widget.onMouseMove = function(buttons, x, y)
+	{
+		if (this.isMoving)
+		{
+			var dx = x-this.last_x,
+				dy = y-this.last_y;
+				
+			this.Move(dx, dy);
+			
+			this.last_x = x;
+			this.last_y = y;				
+		}			
+	}
+	
 	// Create the buttons.
 	_widget.Min = Button();
 	_widget.Zoom = Button();

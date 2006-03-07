@@ -80,7 +80,8 @@ w3.Invalidate();
 
 // Test titlebar
 tb = TitleBar("Test");
-w.Dock(tb, Widget.DOCK_NORTH);
+tb.Dock(w, Widget.DOCK_SOUTH);
+tb.ResizeTo(200,tb.height);
 tb.Invalidate();
 
 // Test scrollbar
@@ -91,3 +92,6 @@ sb1.Invalidate();
 sb2 = ScrollBar(false);
 w.AddChild(sb2);
 sb2.Invalidate();
+
+test_clock = Clock();
+test_clock.MoveTo(700,0);
