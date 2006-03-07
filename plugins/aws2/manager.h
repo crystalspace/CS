@@ -29,6 +29,8 @@
 
 #include "ivideo/fontserv.h"
 
+#include "widget.h"
+
 /**
  * The management object for AWS: creates windows, destroys windows, keeps
  * track of all the windows, etc.
@@ -37,10 +39,7 @@ class awsManager2 : public iAws
 {
   // Event ID's used
   csEventID KeyboardDown;	
-	
-  /** Contains all loaded preferences, skins, etc. */
-  aws::preferences prefs;
-
+ 
   /** Store the object registry so we can get at it later. */
   iObjectRegistry *object_reg;
 
@@ -52,33 +51,16 @@ class awsManager2 : public iAws
 
   /** Store a reference to the default font so that it's quick and easy. */  
   csRef<iFont> default_font;
-
-  /**
-   * This is the dirty region.  All clean/dirty code now utilizes the
-   * update region facility for non-contiguous rectangular spaces.  This
-   * buffer holds an infinite amount of optimal rectangular regions.
-   */
-  csRectRegion dirty;
-
-  /**
-   * This is the erase region.  All windows will call the Erase() function
-   * if the AlwaysEraseWindows flag is set.  That function will add a rect
-   * into this region which requires erasure.  Right before final redraw, all
-   * dirty regions will be excluded from the erasure region, and the erasure
-   * region will be painted with the transparent color.
-   */
-  csRectRegion erase;
-
-  /**
-   * This is the update store.  The update store contains all of the regions
-   * that actually contain anything useful, and thus the only regions that
-   * need to be thrown to the screen.  The store must be cleared and rethrown
-   * during window move operations.
-   */
-  csRectRegion updatestore;
-
-  /// True if the update store needs to be cleared and updated.
-  bool updatestore_dirty;
+  
+  /** Preferences... this is actually not really preferences anymore. */
+  aws::preferences prefs;
+  
+  /** The last widget to have the mouse focus. */
+  aws::widget *mouse_focus;
+  
+  /** The last widget to have keyboard focus. */
+  aws::widget *keyboard_focus;
+  
 
 public:
   /////////////////////// Accessors //////////////////////////////

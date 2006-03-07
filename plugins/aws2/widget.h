@@ -133,6 +133,11 @@ namespace aws
   	 /** Gets a reference to the frame. */
   	 frame &Frame() { return fr; }
   	 
+  	 /// Events ////
+  	 
+  	 /// Dispatches events fed to this widget.
+  	 virtual bool HandleEvent (iEvent &);
+  	 
   	 /// Children ////
   	 
   	 /** @brief Adds a child widget into this widget. */
@@ -215,6 +220,24 @@ namespace aws
 		 	children[i]->AdjustDocked();
 		 	children[i]->Invalidate();
 	  	 }	  	 
+  	 }
+  	 
+  	 /** @brief Returns a pointer to the widget that contains
+  	  * this point.  Either this widget or a child will be returned
+  	  * on success.  On failure, return null. 
+  	  * @param x The X coord
+  	  * @param y The Y coord */
+  	 widget *Contains(int x, int y)
+  	 {
+	  	 if (Bounds().Contains(x,y)==false) return 0;
+	  	 
+	  	 for(size_t i=0; i<children.Length(); ++i)
+	  	 {
+		 	widget *w = children[i]->Contains(x,y);
+		 	if (w) return w;	 		 	
+	  	 }	  	 
+	  	 
+	  	 return this;
   	 }
   	 
   	 /** @brief Adjusts our frame to our parent's frame, accounting for the sticky bits. 

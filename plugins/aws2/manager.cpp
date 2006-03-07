@@ -43,6 +43,21 @@
 #include "ivaria/reporter.h"
 #include "ivideo/txtmgr.h"
 
+/**** AWS Specific Events *******************************************/
+// The primary system mouse has entered a component
+#define awsMouseEnter(reg) (csEventNameRegistry::GetID((reg), "crystalspace.plugin.aws.mouse.enter"))
+// The primary system mouse has exited a component
+#define awsMouseExit(reg) (csEventNameRegistry::GetID((reg), "crystalspace.plugin.aws.mouse.exit"))
+// The component has lost keyboard focus
+#define awsLoseFocus(reg) (csEventNameRegistry::GetID((reg), "crystalspace.plugin.aws.focus.lost"))
+// The component has gained keyboard focus
+#define awsGainFocus(reg) (csEventNameRegistry::GetID((reg), "crystalspace.plugin.aws.focus.gained"))
+// A component in a group has been selected, everyone else should go to their off state.
+#define awsGroupOff(reg) (csEventNameRegistry::GetID((reg), "crystalspace.plugin.aws.group.off"))
+// The frame is about to start rendering
+#define awsFrameStart(reg) (csEventNameRegistry::GetID((reg), "crystalspace.plugin.aws.frame.start"))
+/********************************************************************/
+
 SCF_IMPLEMENT_FACTORY(awsManager2)
 
 SCF_IMPLEMENT_IBASE(awsManager2)
@@ -65,7 +80,7 @@ awsManager2::awsManager2(iBase *the_base)
   scfiEventHandler = 0;
   
   theMgr = this;
-  
+    
   CreateScriptManager();    
 }
 
@@ -90,8 +105,24 @@ bool
 awsManager2::Initialize (iObjectRegistry *_object_reg)
 {
   object_reg = _object_reg;
-  
+    
+  PreProcess = csevPreProcess (object_reg);
+  MouseDown = csevMouseDown (object_reg, 0);
+  MouseUp = csevMouseUp (object_reg, 0);
+  MouseClick = csevMouseClick (object_reg, 0);
+  MouseMove = csevMouseMove (object_reg, 0);
   KeyboardDown = csevKeyboardDown (object_reg);
+  KeyboardUp = csevKeyboardUp (object_reg);
+
+  MouseEnter = awsMouseEnter (object_reg);
+  MouseExit = awsMouseExit (object_reg);
+  LoseFocus = awsLoseFocus (object_reg);
+  GainFocus = awsGainFocus (object_reg);
+  GroupOff = awsGroupOff (object_reg);
+  FrameStart = awsFrameStart (object_reg);
+  
+  mouse_focus=0;
+  keyboard_focus=0;
   
   ScriptCon()->Initialize(object_reg);
   ScriptMgr()->Initialize(object_reg);
@@ -120,8 +151,27 @@ awsManager2::SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d)
  ********************************************************************/
 
 bool awsManager2::HandleEvent (iEvent &Event)
-{  
-  if (Event.Name == KeyboardDown)
+{ 
+  if (CS_IS_MOUSE_EVENT(object_reg, Event))
+  {
+	  aws::widget *new_mouse_focus;
+	  
+	  // Check all widgets for new focus.
+	  for(size_t i=0; i<aws::widgets.Length(); ++i)
+	  {
+	 	new_mouse_focus = aws::widgets[i]->Contains(csMouseEventHelper::GetX(&Event), csMouseEventHelper::GetY(&Event));		
+	 	if (new_mouse_focus!=0) break;
+	  }	  
+	  
+	  // Send a lost focus event.
+	  if (new_mouse_focus!=mouse_focus)
+	  {
+		  
+	  }  
+	  
+	   
+  }
+  else if (Event.Name == KeyboardDown)
   {
 	  csKeyEventData eventData;
       csKeyEventHelper::GetEventData (&Event, eventData);
@@ -153,68 +203,17 @@ bool awsManager2::HandleEvent (iEvent &Event)
 
 
 void awsManager2::Redraw()
-{
-  static float angle=0.0;
-  if (angle>6.28318531) angle=0;
-
-  csPen pen(g2d, g3d);
-  csVector3 tv(-250,-250,0);  
-  
-  angle+=0.001F;
-  
-  /*pen.Translate(tv);  
-  pen.SetOrigin(tv);
-  pen.Rotate(angle);  
-
-  tv.Set(350,350,0);
-  pen.Translate(tv);  */
-  
+{  
+  csPen pen(g2d, g3d);    
+   
   g2d->Write(default_font, 90, 90, g2d->FindRGB(128,128,128,128), -1, "AWS Redrawing");
   ScriptCon()->Redraw(g2d);
 
-  /*pen.SetColor(0.25,0.25,0.25,1);
-  pen.SwapColors();
-  pen.SetColor(0.75,0.75,0.75,1);
-
-  pen.DrawRoundedRect(0,0,500,500,0.5,false,true); */
-  
-  /*pen.SetColor(0.5,0.5,0.5,1);
-  pen.DrawRect(50,50,450,450,false,true);  
-  pen.SetColor(0.75,0.75,0.75,1);
-  pen.DrawMiteredRect(100,100,400,400,0.5,false,true);  
-  pen.SetColor(0.85f,0.85f,0.85f,1);
-  pen.DrawArc(150,150,350,350,0.14F,2.23F,false,true); */
-  
-//   pen.SetColor(1,1,1,1);
-
-//   pen.WriteBoxed(default_font, 0,0,500,500, CS_PEN_TA_CENTER, CS_PEN_TA_CENTER, "Test Boxed Text - Centered");
-//   pen.WriteBoxed(default_font, 0,0,500,500, CS_PEN_TA_RIGHT, CS_PEN_TA_TOP, "Test Boxed Text - Right, Top");
-//   pen.WriteBoxed(default_font, 0,0,500,500, CS_PEN_TA_LEFT, CS_PEN_TA_BOT, "Test Boxed Text - Left, Bot");
-  
-  /*pen.DrawPoint(0,0);
-  pen.DrawRoundedRect(0,0,500,500,0.5,true); 
-  pen.DrawRect(50,50,450,450,true);  
-  pen.DrawMiteredRect(100,100,400,400,0.5,true);  
-  pen.DrawArc(150,150,350,350,0.14F,2.23F,true); */
-
-//   aws::border b;
-//   
-//   
-//   b.Bounds().SetSize(200,200);
-//   b.SetBorderStyle(aws::AWS_BORDER_BEVELED);
-//   b.SetBorderShape(aws::AWS_BORDER_RECT);    
-//   b.Transform(&pen, angle, 300, 300);
-
-//   b.UpdateSkin(prefs);
-
-//   b.Prepare(&pen);  
-
-	// Draw all widgets (this is a hack for testing.)
-	for(size_t i=0; i<aws::widgets.Length(); ++i)
-	{
-		aws::widgets[i]->Draw(&pen);		
-	}
-
+  // Draw all widgets (this is a hack for testing.)
+  for(size_t i=0; i<aws::widgets.Length(); ++i)
+  {
+ 	aws::widgets[i]->Draw(&pen);		
+  }
 }
 
 /*********************************************************************

@@ -389,6 +389,25 @@ Translate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	return JS_TRUE;
 }
 
+/** @brief Move a pen by (x,y) */
+static JSBool
+SetOrigin(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{
+	if (argc<2) return JS_FALSE;
+	
+	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
+	
+	jsdouble x,y,z;
+		
+	JS_ValueToNumber(cx,  argv[0], &x);
+	JS_ValueToNumber(cx,  argv[1], &y);
+	JS_ValueToNumber(cx,  argv[2], &z);
+		
+	if (po) po->SetOrigin(csVector3 ((float)x, (float)y, (float)z));	
+		
+	return JS_TRUE;
+}
+
 /** @brief Rotate a pen by (a) */
 static JSBool
 Rotate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
@@ -500,6 +519,7 @@ static JSFunctionSpec pen_methods[] = {
 	{"PopTransform",   PopTransform,   0, 0, 0}, 
 	{"ClearTransform", ClearTransform, 0, 0, 0}, 
 	
+	{"SetOrigin",	SetOrigin,	3, 0, 0},
     {"Translate",	Translate,	3, 0, 0},
     {"Rotate",		Rotate,		1, 0, 0},   
      

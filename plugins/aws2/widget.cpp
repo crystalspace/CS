@@ -17,6 +17,12 @@
 */
 
 #include "cssysdef.h"
+#include "iutil/event.h"
+#include "csutil/event.h"
+#include "csutil/eventnames.h"
+#include "csutil/csevent.h"
+
+#include "manager.h"
 #include "script_manager.h"
 #include "script_console.h"
 #include "widget.h"
@@ -552,5 +558,118 @@ widget::Draw(iPen *output_pen)
 	}
 }
 
+
+bool widget::HandleEvent (iEvent &Event)
+{
+	jsval func_val, rv;	
+	
+	if (Event.Name == AwsMgr()->MouseMove)
+	{
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseMove", &func_val)==JS_TRUE)
+		{
+			jsval args[3];
+			
+			args[0] = INT_TO_JSVAL(csMouseEventHelper::GetButton(&Event));
+			args[1] = INT_TO_JSVAL(csMouseEventHelper::GetX(&Event));
+			args[2] = INT_TO_JSVAL(csMouseEventHelper::GetY(&Event));
+			
+			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 3, args, &rv);
+			
+			return true;			
+		}			
+	}
+	else if (Event.Name == AwsMgr()->MouseUp)
+	{
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseUp", &func_val)==JS_TRUE)
+		{
+			jsval args[3];
+			
+			args[0] = INT_TO_JSVAL(csMouseEventHelper::GetButton(&Event));
+			args[1] = INT_TO_JSVAL(csMouseEventHelper::GetX(&Event));
+			args[2] = INT_TO_JSVAL(csMouseEventHelper::GetY(&Event));
+			
+			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 3, args, &rv);
+			
+			return true;			
+		}			
+	}
+	else if (Event.Name == AwsMgr()->MouseDown)
+	{
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseDown", &func_val)==JS_TRUE)
+		{
+			jsval args[3];
+			
+			args[0] = INT_TO_JSVAL(csMouseEventHelper::GetButton(&Event));
+			args[1] = INT_TO_JSVAL(csMouseEventHelper::GetX(&Event));
+			args[2] = INT_TO_JSVAL(csMouseEventHelper::GetY(&Event));
+			
+			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 3, args, &rv);
+			
+			return true;			
+		}			
+	}
+	else if (Event.Name == AwsMgr()->MouseClick)
+	{
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseClick", &func_val)==JS_TRUE)
+		{
+			jsval args[3];
+			
+			args[0] = INT_TO_JSVAL(csMouseEventHelper::GetButton(&Event));
+			args[1] = INT_TO_JSVAL(csMouseEventHelper::GetX(&Event));
+			args[2] = INT_TO_JSVAL(csMouseEventHelper::GetY(&Event));
+			
+			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 3, args, &rv);
+			
+			return true;			
+		}			
+	}
+	else if (Event.Name == AwsMgr()->MouseEnter)
+	{
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseEnter", &func_val)==JS_TRUE)
+		{			
+			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 0, NULL, &rv);
+			
+			return true;			
+		}			
+	}
+	else if (Event.Name == AwsMgr()->MouseExit)
+	{
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseExit", &func_val)==JS_TRUE)
+		{			
+			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 0, NULL, &rv);
+			
+			return true;			
+		}			
+	}
+	else if (Event.Name == AwsMgr()->GainFocus)
+	{
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onGainFocus", &func_val)==JS_TRUE)
+		{			
+			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 0, NULL, &rv);
+			
+			return true;			
+		}			
+	}
+	else if (Event.Name == AwsMgr()->LoseFocus)
+	{
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onLoseFocus", &func_val)==JS_TRUE)
+		{			
+			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 0, NULL, &rv);
+			
+			return true;			
+		}			
+	}
+	else if (Event.Name == AwsMgr()->FrameStart)
+	{
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onFrameStart", &func_val)==JS_TRUE)
+		{			
+			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 0, NULL, &rv);
+			
+			return true;			
+		}			
+	}
+		
+	return false;
+}
 
 } // end of namespace
