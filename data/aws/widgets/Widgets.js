@@ -7,3 +7,4 @@ Autom.Load("/aws/widgets/TextBox.js");
 Autom.Load("/aws/widgets/TitleBar.js");
 Autom.Load("/aws/widgets/ScrollBar.js");
 Autom.Load("/aws/widgets/Button.js");
+Autom.Load("/aws/widgets/Clock.js");

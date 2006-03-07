@@ -382,6 +382,44 @@ Style3D =
 		else frame.Outset(pen,0,0,w,h);
 		
 		if (this.onDrawContent) this.onDrawContent(pen);			
+	},
+	
+	Clock : function(pen)
+	{
+		var angle, steps=Math.PI/6.0;
+		var w = this.width, h = this.height;
+		var cx = w/2, cy = h/2;
+		var r=w/2;
+		var d = new Date();
+		
+		pen.SetColor(0,0,0,1);		
+		pen.DrawArc(0,0,w,h,0,Math.PI*2.1,true);
+		
+		pen.SetColor(1,1,1,1);
+		for(angle=0.0; angle<Math.PI*2.0; angle+=steps)
+		{
+			var x = (Math.cos(angle)*r),
+				y = (Math.sin(angle)*r),
+				x2 = (Math.cos(angle)*(r-5)),
+				y2 = (Math.sin(angle)*(r-5));
+			
+			pen.DrawLine(cx+x,cy+y,cx+x2,cy+y2);
+		}		
+		
+		
+		// Draw hour hand.
+		angle = (d.getHours()-1) * steps;
+		angle -= Math.PI * 0.25;		
+		pen.SetColor(0,0,0.75,0.5);
+		pen.DrawArc(cx-r,cy-r,cx+r,cy+r,angle-(steps/2.0), angle+(steps/2.0), true);
+		
+		steps = Math.PI/30.0;
+		angle = (d.getMinutes()-1) * steps;		
+		angle -= Math.PI * 0.25;
+		pen.SetColor(0,0,0.75,0.5);
+		pen.DrawArc(0,0,w,h,angle-(steps/2.0), angle+(steps/2.0), true);
+		
+		
 	}
 	
 	
