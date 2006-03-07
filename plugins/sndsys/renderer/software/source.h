@@ -24,6 +24,7 @@
 #include "isndsys/ss_filter.h"
 #include "isndsys/ss_source.h"
 
+
 #define MAX_CHANNELS 18
 
 #define SOURCE_INTEGER_VOLUME_MULTIPLE 1024
@@ -85,15 +86,30 @@ public:
   csVector3 position, direction;
 };
 
+
+
+/// A base class for software source filters.
+//
+//  This is a work in progress.  Expect rough edges.
+//
+//  Filters are intended to be a series of modification operations performed on a sound stream.
+//  The theory is that filters might provide a more flexible way of defining both a series of 3d sound environments
+//   from the source to the listener and an opportunity to insert other, non-traditional effects if desired.
+//
+//  The filter interface is not fully fleshed out, and the filters currently used by the 3D source are experimental
+//
+//
 class SndSysSourceSoftwareFilter_Base : public iSndSysSoftwareFilter3D
 {
 public:
   SCF_DECLARE_IBASE;
 
-  SndSysSourceSoftwareFilter_Base() : next_filter(0) {};
+  SndSysSourceSoftwareFilter_Base() 
+  {
+    SCF_CONSTRUCT_IBASE(0);
+  };
   virtual ~SndSysSourceSoftwareFilter_Base() 
   {
-    delete next_filter;
   };
 
   virtual void Apply(iSndSysSoftwareFilter3DProperties &properties)
@@ -102,11 +118,16 @@ public:
       next_filter->Apply(properties);
   }
 
+  /// Add a filter after this filter in the chain.
+  //   The chain_idx parameter can be used to identify which sub-chain the filter
+  //   should be added to.  It's ignored for the base class, since we have only
+  //   one sub-chain.
   virtual bool AddSubFilter(iSndSysSoftwareFilter3D *filter, int /*chain_idx*/)
   {
     // Add the current next filter to the end of the passed filter chain
     if (next_filter)
     {
+      // Find the furthest filter down the chain.
       iSndSysSoftwareFilter3D *deepest_filter=filter;
       while (deepest_filter->GetSubFilter() != 0)
         deepest_filter=deepest_filter->GetSubFilter();
@@ -142,7 +163,7 @@ public:
   }
 
 protected:
-  iSndSysSoftwareFilter3D *next_filter;
+  csRef<iSndSysSoftwareFilter3D> next_filter;
 };
 
 // When used on an FIR floating average low pass filter, the number of
@@ -219,26 +240,6 @@ public:
       next_filter->Apply(properties);
   }
 
-  virtual bool AddSubFilter(iSndSysSoftwareFilter3D *filter, int /*chain_idx*/)
-  {
-    // Add the current next filter to the end of the passed filter chain
-    if (next_filter)
-    {
-      iSndSysSoftwareFilter3D *deepest_filter=filter;
-      while (deepest_filter->GetSubFilter() != 0)
-        deepest_filter=deepest_filter->GetSubFilter();
-
-      deepest_filter->AddSubFilter(next_filter);
-    }
-
-    next_filter=filter;
-    return true;
-  }
-
-  virtual iSndSysSoftwareFilter3D *GetSubFilter(int /*chain_idx*/)
-  {
-    return next_filter;
-  }
 
   virtual iSndSysSoftwareFilter3D *GetPtr() 
   {
@@ -259,13 +260,12 @@ class SndSysSourceSoftwareFilter_SplitPath :
 {
 public:
   SndSysSourceSoftwareFilter_SplitPath() : SndSysSourceSoftwareFilter_Base(), 
-    second_buffer(0), second_buffersize(0), second_filter(0)
+    second_buffer(0), second_buffersize(0)
   {
   }
   virtual ~SndSysSourceSoftwareFilter_SplitPath() 
   {
     delete[] second_buffer;
-    delete second_filter;
   }
 
   void Apply(iSndSysSoftwareFilter3DProperties &properties)
@@ -305,27 +305,28 @@ public:
     }
   }
 
-  bool AddSubFilterPtr(iSndSysSoftwareFilter3D *add,
-  	iSndSysSoftwareFilter3D **spot)
-  {
-    if (*spot)
-    {
-      iSndSysSoftwareFilter3D *deepest_filter=add;
-      while (deepest_filter->GetSubFilter() != 0)
-        deepest_filter=deepest_filter->GetSubFilter();
-
-      deepest_filter->AddSubFilter(*spot);
-    }
-    *spot=add;
-    return true;
-  }
-
   virtual bool AddSubFilter(iSndSysSoftwareFilter3D *filter, int chain_idx)
   {
     if (chain_idx==0)
-      return AddSubFilterPtr(filter,&next_filter);
+    {
+      iSndSysSoftwareFilter3D *deepest_filter=filter;
+      while (deepest_filter->GetSubFilter() != 0)
+        deepest_filter=deepest_filter->GetSubFilter();
+
+      deepest_filter->AddSubFilter(next_filter);
+      next_filter=filter;
+      return true;
+    }
     if (chain_idx==1)
-      return AddSubFilterPtr(filter,&second_filter);
+    {
+      iSndSysSoftwareFilter3D *deepest_filter=filter;
+      while (deepest_filter->GetSubFilter() != 0)
+        deepest_filter=deepest_filter->GetSubFilter();
+
+      deepest_filter->AddSubFilter(second_filter);
+      second_filter=filter;
+      return true;
+    }
     return false;
   }
 
@@ -341,7 +342,7 @@ public:
 protected:
   csSoundSample *second_buffer;
   size_t second_buffersize;
-  iSndSysSoftwareFilter3D *second_filter;
+  csRef<iSndSysSoftwareFilter3D> second_filter;
 };
 
 
@@ -355,6 +356,7 @@ public:
   }
   virtual ~SndSysSourceSoftwareFilter_ITDDelay()
   {
+    delete[] history_buffer;
   }
 
   bool SetupHistoryBuffer(int frequency)
@@ -444,6 +446,7 @@ public:
   }
   virtual ~SndSysSourceSoftwareFilter_Delay()
   {
+    delete[] history_buffer;
   }
 
   void SetDelayTime(float sec)
@@ -534,6 +537,7 @@ public:
   }
   virtual ~SndSysSourceSoftwareFilter_Reverb()
   {
+    delete[] history_buffer;
   }
 
   bool SetupHistoryBuffer(int frequency)
@@ -906,9 +910,8 @@ protected:
   /// The distance from the closest channel position to the source
   float closest_speaker;
   float speaker_distance[MAX_CHANNELS], speaker_direction_cos[MAX_CHANNELS];
-  iSndSysSoftwareFilter3D *speaker_filter_chains[MAX_CHANNELS];
+  csRef<iSndSysSoftwareFilter3D> speaker_filter_chains[MAX_CHANNELS];
   bool filters_setup;
-
 
   //int debug_cycle;
 

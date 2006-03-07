@@ -29,6 +29,7 @@
 #include "isndsys/ss_source.h"
 #include "isndsys/ss_listener.h"
 #include "isndsys/ss_renderer.h"
+#include "isndsys/ss_eventrecorder.h"
 
 #include "ivaria/reporter.h"
 
@@ -76,7 +77,8 @@ SndSysSourceSoftwareBasic::~SndSysSourceSoftwareBasic()
   // Clear out filters
   //while (!filters.IsEmpty())
     //RemoveFilter(filters[0]);
-  int i;
+
+  renderer->RecordEvent(SSEC_SOURCE, SSEL_DEBUG, "Basic sound source destructing");
 
   SCF_DESTRUCT_IBASE();
 }
@@ -380,6 +382,7 @@ SndSysSourceSoftware3D::SndSysSourceSoftware3D(csRef<iSndSysStream> stream, csSn
     speaker_filter_chains[i]=0;
 
 
+
   //const SndSysSoundFormat *fmt=stream->GetRenderedFormat();
   // Allocate the history buffer
  // historic_buffer_samples=(fmt->Freq * SOURCE_3D_BUFFER_TIME_MS) / 1000;
@@ -397,10 +400,10 @@ SndSysSourceSoftware3D::~SndSysSourceSoftware3D()
   //while (!filters.IsEmpty())
   //RemoveFilter(filters[0]);
 
-  // Cleanup speaker filter chains
-  int i;
-  for (i=0;i<MAX_CHANNELS;i++)
-    delete speaker_filter_chains[i];
+  renderer->RecordEvent(SSEC_SOURCE, SSEL_DEBUG, "3D sound source destructing");
+
+  delete[] working_buffer;
+  delete[] clean_buffer;
 
   SCF_DESTRUCT_IBASE();
 }
@@ -522,12 +525,13 @@ void SndSysSourceSoftware3D::SetupFilters()
     // Apply the ITD delay for the channel
     // Apply the IID intensity for the channel
 
+    delete speaker_filter_chains[i];
 
-    iSndSysSoftwareFilter3D *last_filt, *next_filt;
-    next_filt=new SndSysSourceSoftwareFilter_ITDDelay();
+    csRef<iSndSysSoftwareFilter3D> last_filt, next_filt;
+    next_filt=csPtr<iSndSysSoftwareFilter3D> (new SndSysSourceSoftwareFilter_ITDDelay());
     speaker_filter_chains[i]=next_filt;
     last_filt=next_filt;
-    next_filt=new SndSysSourceSoftwareFilter_IID();
+    next_filt=csPtr<iSndSysSoftwareFilter3D> (new SndSysSourceSoftwareFilter_IID());
     last_filt->AddSubFilter(next_filt);
     last_filt=next_filt;
 
@@ -540,17 +544,17 @@ void SndSysSourceSoftware3D::SetupFilters()
     */
 
     // Split the channel into two subchannels - we'll treat one as the direct and one as the reverb
-    next_filt=new SndSysSourceSoftwareFilter_SplitPath();
+    next_filt=csPtr<iSndSysSoftwareFilter3D> (new SndSysSourceSoftwareFilter_SplitPath());
     last_filt->AddSubFilter(next_filt);
     last_filt=next_filt;
 
     // Clip the direct path if it's blocked
-    iSndSysSoftwareFilter3D *clip_filt= new SndSysSourceSoftwareFilter_DirectFade();
+    csRef<iSndSysSoftwareFilter3D> clip_filt= csPtr<iSndSysSoftwareFilter3D> (new SndSysSourceSoftwareFilter_DirectFade());
     last_filt->AddSubFilter(clip_filt);
 
 
     // Second path is indirect - apply a low pass filter
-    next_filt=new SndSysSourceSoftwareFilter_LowPass();
+    next_filt=csPtr<iSndSysSoftwareFilter3D> (new SndSysSourceSoftwareFilter_LowPass());
     last_filt->AddSubFilter(next_filt,1);
     last_filt=next_filt;
 
@@ -564,7 +568,7 @@ void SndSysSourceSoftware3D::SetupFilters()
     */
 
     // Add some reverb to the indirect path too
-    next_filt= new SndSysSourceSoftwareFilter_Reverb();
+    next_filt= csPtr<iSndSysSoftwareFilter3D> (new SndSysSourceSoftwareFilter_Reverb());
     last_filt->AddSubFilter(next_filt);
   }
 
