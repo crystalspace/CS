@@ -61,6 +61,8 @@ class awsManager2 : public iAws
   /** The last widget to have keyboard focus. */
   aws::widget *keyboard_focus;
   
+  /** Set if the mouse is captured. */
+  bool mouse_captured;
 
 public:
   /////////////////////// Accessors //////////////////////////////
@@ -105,6 +107,12 @@ public:
   /// Redraws all the windows into the current graphics contexts.
   virtual void Redraw();
 
+  /// Captures the mouse.
+  void CaptureMouse(aws::widget *w);
+  
+  /// Releases the mouse from capture.
+  void ReleaseMouse();
+  
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(awsManager2);

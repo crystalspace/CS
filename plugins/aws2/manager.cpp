@@ -123,6 +123,7 @@ awsManager2::Initialize (iObjectRegistry *_object_reg)
   
   mouse_focus=0;
   keyboard_focus=0;
+  mouse_captured=false;
   
   ScriptCon()->Initialize(object_reg);
   ScriptMgr()->Initialize(object_reg);
@@ -149,12 +150,34 @@ awsManager2::SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d)
 /*********************************************************************
  ***************** Event Handling ************************************
  ********************************************************************/
+ 
+void awsManager2::CaptureMouse(aws::widget *w)
+{
+	if (w)
+	{
+		 mouse_focus=w;
+		 mouse_captured=true;
+	 }
+}
+  
+void awsManager2::ReleaseMouse()
+{
+	mouse_captured=false;	
+}
 
 bool awsManager2::HandleEvent (iEvent &Event)
 { 
   if (CS_IS_MOUSE_EVENT(object_reg, Event))
   {
 	  aws::widget *new_mouse_focus=0;
+	  
+	  if (mouse_captured)
+	  {
+		if (mouse_focus) 
+			mouse_focus->HandleEvent(Event);  
+		  
+		return true;	  
+	  }
 	  
 	  // Check all widgets for new focus.
 	  for(size_t i=0; i<aws::widgets.Length(); ++i)

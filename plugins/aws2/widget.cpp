@@ -370,6 +370,29 @@ SetMargin(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 }
 
 
+/** @brief Capture the mouse to this widget. */
+static JSBool
+CaptureMouse(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{		
+	aws::widget *wo = (aws::widget *)JS_GetPrivate(cx, obj);
+	
+	AwsMgr()->CaptureMouse(wo);
+	
+	return JS_TRUE;
+}
+
+/** @brief Release the mouse from this widget. */
+static JSBool
+ReleaseMouse(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{		
+	//aws::widget *wo = (aws::widget *)JS_GetPrivate(cx, obj);
+	
+	AwsMgr()->ReleaseMouse();
+	
+	return JS_TRUE;
+}
+
+
 
 
 static JSPropertySpec widget_props[] =
@@ -428,6 +451,8 @@ static JSFunctionSpec widget_methods[] = {
     {"ClearFrameAnchor",	ClearFrameAnchor,	 1, 0, 0},
     {"SetMargin",			SetMargin,	 		 2, 0, 0},
     
+    {"CaptureMouse",	CaptureMouse,	0, 0, 0},    
+    {"ReleaseMouse",	ReleaseMouse,	0, 0, 0},    
     
     
     {0,0,0,0,0}
