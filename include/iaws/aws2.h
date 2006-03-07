@@ -84,6 +84,22 @@ struct iAws  : public iBase
   
   /// Creates a new script object with the given name.
   virtual iAwsScriptObject *CreateScriptObject(const char *name)=0;
+  
+  /// Cached event names.  These should be set up in the ::Initialize method.
+  csEventID PreProcess;
+  csEventID MouseDown;
+  csEventID MouseUp;
+  csEventID MouseClick;
+  csEventID MouseMove;
+  csEventID KeyboardDown;
+  csEventID KeyboardUp;
+
+  csEventID MouseEnter;
+  csEventID MouseExit;
+  csEventID LoseFocus;
+  csEventID GainFocus;
+  csEventID GroupOff;
+  csEventID FrameStart;
 };
 
 
