@@ -24,6 +24,7 @@
 #include "cssysdef.h"
 #include "isndsys/ss_data.h"
 #include "isndsys/ss_driver.h"
+#include "isndsys/ss_eventrecorder.h"
 #include "isndsys/ss_filter.h"
 #include "isndsys/ss_listener.h"
 #include "isndsys/ss_loader.h"
