@@ -133,6 +133,15 @@ namespace aws
   	 /** Gets a reference to the frame. */
   	 frame &Frame() { return fr; }
   	 
+  	 /** Adjusts the coordinates from screen space to widget space. */
+  	 void ScreenToWidget(int &x, int &y)
+  	 {	  	 
+	  	 x-=Bounds().xmin;
+	  	 y-=Bounds().ymin;	  	 
+	  	 
+	  	 if (parent) parent->ScreenToWidget(x,y);
+  	 }
+  	 
   	 /// Events ////
   	 
   	 /// Dispatches events fed to this widget.

@@ -100,7 +100,7 @@ public:
 
 public:
   //////////////////////// Event Handling ////////////////////////
-
+    
   /// Dispatches events to the proper components.
   virtual bool HandleEvent (iEvent &);
 

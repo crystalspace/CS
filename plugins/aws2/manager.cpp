@@ -172,20 +172,20 @@ bool awsManager2::HandleEvent (iEvent &Event)
 	  aws::widget *new_mouse_focus=0;
 	  
 	  if (mouse_captured)
-	  {
+	  {	    		  
 		if (mouse_focus) 
 			mouse_focus->HandleEvent(Event);  
 		  
 		return true;	  
-	  }
+	  }  
 	  
 	  // Check all widgets for new focus.
 	  for(size_t i=0; i<aws::widgets.Length(); ++i)
 	  {
 	 	new_mouse_focus = aws::widgets[i]->Contains(csMouseEventHelper::GetX(&Event), csMouseEventHelper::GetY(&Event));		
 	 	if (new_mouse_focus!=0) break;
-	  }	  
-	  
+	  }
+	  	  
 	  // Did the move over a new widget?
 	  if (new_mouse_focus!=mouse_focus)
 	  {

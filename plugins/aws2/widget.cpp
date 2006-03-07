@@ -593,12 +593,20 @@ bool widget::HandleEvent (iEvent &Event)
 		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseMove", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{
 			jsval args[3];
+			int x = csMouseEventHelper::GetX(&Event),
+				y = csMouseEventHelper::GetY(&Event),
+				sx=x,
+				sy=y;
+				
+			ScreenToWidget(x,y);			
 			
 			args[0] = INT_TO_JSVAL(csMouseEventHelper::GetButton(&Event));
-			args[1] = INT_TO_JSVAL(csMouseEventHelper::GetX(&Event));
-			args[2] = INT_TO_JSVAL(csMouseEventHelper::GetY(&Event));
+			args[1] = INT_TO_JSVAL(x);
+			args[2] = INT_TO_JSVAL(y);
+			args[3] = INT_TO_JSVAL(sx);
+			args[4] = INT_TO_JSVAL(sy);
 			
-			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 3, args, &rv);
+			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 5, args, &rv);
 			
 			return true;			
 		}			
@@ -608,12 +616,20 @@ bool widget::HandleEvent (iEvent &Event)
 		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseUp", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{
 			jsval args[3];
+			int x = csMouseEventHelper::GetX(&Event),
+				y = csMouseEventHelper::GetY(&Event),
+				sx=x,
+				sy=y;
+				
+			ScreenToWidget(x,y);	
 			
 			args[0] = INT_TO_JSVAL(csMouseEventHelper::GetButton(&Event));
-			args[1] = INT_TO_JSVAL(csMouseEventHelper::GetX(&Event));
-			args[2] = INT_TO_JSVAL(csMouseEventHelper::GetY(&Event));
+			args[1] = INT_TO_JSVAL(x);
+			args[2] = INT_TO_JSVAL(y);
+			args[3] = INT_TO_JSVAL(sx);
+			args[4] = INT_TO_JSVAL(sy);
 			
-			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 3, args, &rv);
+			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 5, args, &rv);
 			
 			return true;			
 		}			
@@ -623,12 +639,20 @@ bool widget::HandleEvent (iEvent &Event)
 		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseDown", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{
 			jsval args[3];
+			int x = csMouseEventHelper::GetX(&Event),
+				y = csMouseEventHelper::GetY(&Event),
+				sx=x,
+				sy=y;
+				
+			ScreenToWidget(x,y);	
 			
 			args[0] = INT_TO_JSVAL(csMouseEventHelper::GetButton(&Event));
-			args[1] = INT_TO_JSVAL(csMouseEventHelper::GetX(&Event));
-			args[2] = INT_TO_JSVAL(csMouseEventHelper::GetY(&Event));
+			args[1] = INT_TO_JSVAL(x);
+			args[2] = INT_TO_JSVAL(y);
+			args[3] = INT_TO_JSVAL(sx);
+			args[4] = INT_TO_JSVAL(sy);
 			
-			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 3, args, &rv);
+			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 5, args, &rv);
 			
 			return true;			
 		}			
@@ -638,10 +662,14 @@ bool widget::HandleEvent (iEvent &Event)
 		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseClick", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{
 			jsval args[3];
+			int x = csMouseEventHelper::GetX(&Event),
+				y = csMouseEventHelper::GetY(&Event);
+				
+			ScreenToWidget(x,y);	
 			
 			args[0] = INT_TO_JSVAL(csMouseEventHelper::GetButton(&Event));
-			args[1] = INT_TO_JSVAL(csMouseEventHelper::GetX(&Event));
-			args[2] = INT_TO_JSVAL(csMouseEventHelper::GetY(&Event));
+			args[1] = INT_TO_JSVAL(x);
+			args[2] = INT_TO_JSVAL(y);
 			
 			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 3, args, &rv);
 			

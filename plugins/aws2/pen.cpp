@@ -500,11 +500,11 @@ JSClass pen_object_class = {
 
 static JSPropertySpec pen_static_props[] =
 {
-        {"TEXT_ALIGN_TOP",   CS_PEN_TA_TOP,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},       
-        {"TEXT_ALIGN_BOT",   CS_PEN_TA_BOT,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
-        {"TEXT_ALIGN_LEFT",     CS_PEN_TA_LEFT,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
-        {"TEXT_ALIGN_RIGHT",    CS_PEN_TA_RIGHT,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
-        {"TEXT_ALIGN_CENTER",   CS_PEN_TA_CENTER,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
+        {"ALIGN_TOP",   CS_PEN_TA_TOP,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},       
+        {"ALIGN_BOT",   CS_PEN_TA_BOT,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
+        {"ALIGN_LEFT",     CS_PEN_TA_LEFT,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
+        {"ALIGN_RIGHT",    CS_PEN_TA_RIGHT,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
+        {"ALIGN_CENTER",   CS_PEN_TA_CENTER,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
         
         
         {0,0,0}
