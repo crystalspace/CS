@@ -277,7 +277,7 @@ DrawTriangle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	return JS_TRUE;
 }
 
-/** @brief Draw a triangle from (x1,y1) to (x2,y2) to (x3, y3), with optional fill */
+/** @brief Writes text in the given font at the given position. */
 static JSBool
 Write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
@@ -305,6 +305,43 @@ Write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 // 	ScriptCon()->Message(msg);
 // 		
 	if (po && fo->IsValid()) po->Write((iFont *)(*fo), x1,y1,JS_GetStringBytes(text));	
+		
+	return JS_TRUE;
+}
+
+/** @brief Writes text in the given font aligned in the given box. */
+static JSBool
+WriteBoxed(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{
+	//csString msg;
+	
+	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
+	
+	int32 x1,y1,x2,y2,h_align,v_align;	
+		
+	JSObject *fnt = JSVAL_TO_OBJECT(argv[0]);
+	
+	if (argv[0] == JSVAL_VOID || !IsFontObject(fnt))
+	{
+		ScriptCon()->Message("Pen: write: Object passed as parameter 0 is not a font object!");	
+		return JS_FALSE;
+	}
+		
+	csRef<iFont> *fo = (csRef<iFont> *)JS_GetPrivate(cx, fnt);
+		
+	JS_ValueToInt32(cx,  argv[1], &x1);
+	JS_ValueToInt32(cx,  argv[2], &y1);
+	JS_ValueToInt32(cx,  argv[3], &x2);
+	JS_ValueToInt32(cx,  argv[4], &y2);
+	JS_ValueToInt32(cx,  argv[5], &h_align);
+	JS_ValueToInt32(cx,  argv[6], &v_align);
+	
+	JSString *text = JS_ValueToString(cx,  argv[7]);
+	
+// 	msg.Format("Pen: write %d, %d, %s, %p, font valid: %s", x1, y1, JS_GetStringBytes(text), (iFont *)(*fo), fo->IsValid() ? "yes" : "no");
+// 	ScriptCon()->Message(msg);
+// 		
+	if (po && fo->IsValid()) po->WriteBoxed((iFont *)(*fo), x1,y1,x2,y2,h_align,v_align,JS_GetStringBytes(text));	
 		
 	return JS_TRUE;
 }
@@ -392,6 +429,33 @@ pen_setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
     return JS_TRUE;
 }
 
+/** @brief Returns static properties */
+static JSBool
+pen_get_staticProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
+{	
+	// Try static properties first.  They can't be handled in the class because
+	// They're STATIC properties.
+	if (JSVAL_IS_INT(id)) 
+   	{				   	   	
+		   	
+		    switch (JSVAL_TO_INT(id)) 
+			{
+				case CS_PEN_TA_TOP: *vp =  INT_TO_JSVAL(CS_PEN_TA_TOP); break;					
+				case CS_PEN_TA_BOT: *vp =  INT_TO_JSVAL(CS_PEN_TA_BOT); break;					
+				case CS_PEN_TA_LEFT: *vp =  INT_TO_JSVAL(CS_PEN_TA_LEFT); break;					
+				case CS_PEN_TA_RIGHT: *vp =  INT_TO_JSVAL(CS_PEN_TA_RIGHT); break;					
+				case CS_PEN_TA_CENTER: *vp =  INT_TO_JSVAL(CS_PEN_TA_CENTER); break;									
+				
+				default:
+					return JS_FALSE;				
+			}
+			
+			return JS_TRUE;		
+	}	
+	
+    return JS_FALSE;
+}
+
 JSClass pen_object_class = {
     "Pen", JSCLASS_HAS_PRIVATE,
     JS_PropertyStub,JS_PropertyStub,
@@ -413,6 +477,19 @@ JSClass pen_object_class = {
 //         {"dirty",       WIDGET_DIRTY,   JSPROP_ENUMERATE | JSPROP_PERMANENT},
 //         {0,0,0}
 // };
+
+
+static JSPropertySpec pen_static_props[] =
+{
+        {"TEXT_ALIGN_TOP",   CS_PEN_TA_TOP,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},       
+        {"TEXT_ALIGN_BOT",   CS_PEN_TA_BOT,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
+        {"TEXT_ALIGN_LEFT",     CS_PEN_TA_LEFT,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
+        {"TEXT_ALIGN_RIGHT",    CS_PEN_TA_RIGHT,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
+        {"TEXT_ALIGN_CENTER",   CS_PEN_TA_CENTER,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
+        
+        
+        {0,0,0}
+};
 
 static JSFunctionSpec pen_methods[] = {
 	{"Clear",		Clear,		0, 0, 0},
@@ -436,6 +513,7 @@ static JSFunctionSpec pen_methods[] = {
     {"Draw",		    Draw,				1, 0, 0},
     
     {"Write",		    Write,				4, 0, 0},    
+    {"WriteBoxed",		WriteBoxed,			8, 0, 0},
     
     
     //{"Invalidate",	Invalidate,	0, 0, 0},    
@@ -467,7 +545,7 @@ Pen_SetupAutomation()
 		                            NULL /*pen_props*/, pen_methods,
 		
 		                            /* class constructor (static) properties and methods */
-		                            NULL, NULL); 
+		                            pen_static_props, NULL); 
 		                            
 		 ScriptCon()->Message("Pen builtin-object initialized.");   
 	 }
