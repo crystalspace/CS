@@ -13,6 +13,9 @@ chronological order.
 	  different output consoles. So in the end the simple output
 	  console will be removed (once all needed features from it are
 	  transferred to standard console).
+	- Rhad made some spelling fixes to isndsys/ss_stream.h and
+	  put in a test fix for a common underbuffering problem in the
+	  software sound renderer.
 6-Mar-2006
 	- Christopher made numerous updates to AWS2, notably the Margins
 	  and Font object.  He also fixed csPen so that the text translation
