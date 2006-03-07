@@ -116,7 +116,7 @@ void SndSysSourceSoftwareBasic::UpdateQueuedParameters()
 }
 
 size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer, 
-						  size_t buffer_samples)
+						  size_t original_buffer_samples)
 {
   float source_volume;
   void *buf1,*buf2;
@@ -124,8 +124,9 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
   int int_volume;
   size_t request_bytes;
   int bytes_per_sample;
-  //size_t original_buffer_samples=buffer_samples;
-  //bool fake_full_return=false;
+
+  // This is the working copy of buffer samples, it changes based on what we get back from the stream read
+  size_t buffer_samples=original_buffer_samples;
 
   UpdateQueuedParameters();
 
@@ -135,7 +136,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
   if (active_parameters.volume == 0.0f)
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Source is muted.");
-    return buffer_samples;
+    return original_buffer_samples;
   }
 
   // If the stream associated with the source is paused, the source generates no audio
@@ -143,7 +144,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
       (sound_stream->GetPosition() == stream_position))
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Stream is paused.");
-    return buffer_samples;
+    return original_buffer_samples;
   }
 
   // Translate samples into bytes for the stream
@@ -179,7 +180,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
   if (source_volume <0.00001f)
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Source volume below play threshold.");
-    return buffer_samples;
+    return original_buffer_samples;
   }
 
   //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Source merge beginning.");
@@ -352,7 +353,16 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
   }
   */
 
-  return buffer_samples;
+
+  if (buffer_samples<original_buffer_samples)
+    renderer->RecordEvent(SSEC_SOURCE, SSEL_DEBUG, "Source could not provide all requested samples.  Provided [%d] of [%d]",
+    buffer_samples,original_buffer_samples);
+
+  // TEST: Pretend like we always returned the number of requested samples.  This will cause a gap (scratch) in audio output
+  //       if we didn't really get enough samples, but if we consider the timing provided by the renderer as authoritative
+  //       and the source disagrees with this timing then a gap is inevitable.
+  //       This solves the issue where an end-of-stream condition causes a short read.
+  return original_buffer_samples;
 }
 
 
@@ -577,13 +587,16 @@ void SndSysSourceSoftware3D::SetupFilters()
 
 
 size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer, 
-						size_t buffer_samples)
+						size_t original_buffer_samples)
 {
   void *buf1,*buf2;
   size_t buf1_len,buf2_len;
   size_t request_bytes;
   int bytes_per_sample;
   size_t per_channel_samples;
+
+  // This is the working copy of buffer samples, it changes based on what we get back from the stream read
+  size_t buffer_samples=original_buffer_samples;
 
   // TODO: Can we calculate listener/source dependant delay and intensity here only if the source and/or listener properties have changed?
 
@@ -599,7 +612,7 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
   if (active_parameters.volume == 0.0f)
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Source is muted.");
-    return buffer_samples;
+    return original_buffer_samples;
   }
 
   // If the stream associated with the source is paused, the source generates no audio
@@ -607,7 +620,7 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
     (sound_stream->GetPosition() == stream_position))
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Stream is paused.");
-    return buffer_samples;
+    return original_buffer_samples;
   }
 
 
@@ -643,12 +656,12 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
   if (!PrepareBuffer(&working_buffer,&working_buffer_samples, per_channel_samples))
   {
     //renderer->Report(CS_REPORTER_SEVERITY_ERROR, "Sound System: Failed to allocate a working buffer.");
-    return buffer_samples;
+    return original_buffer_samples;
   }
   if (!PrepareBuffer(&clean_buffer,&clean_buffer_samples, per_channel_samples))
   {
     //renderer->Report(CS_REPORTER_SEVERITY_ERROR, "Sound System: Failed to allocate a clean buffer.");
-    return buffer_samples;
+    return original_buffer_samples;
   }
 
   // Convert the read samples into the clean buffer
@@ -820,8 +833,15 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
   }
   */
 
+  if (buffer_samples<original_buffer_samples)
+      renderer->RecordEvent(SSEC_SOURCE, SSEL_DEBUG, "Source could not provide all requested samples.  Provided [%d] of [%d]",
+                            buffer_samples,original_buffer_samples);
 
-  return buffer_samples;
+  // TEST: Pretend like we always returned the number of requested samples.  This will cause a gap (scratch) in audio output
+  //       if we didn't really get enough samples, but if we consider the timing provided by the renderer as authoritative
+  //       and the source disagrees with this timing then a gap is inevitable.
+  //       This solves the issue where an end-of-stream condition causes a short read.
+  return original_buffer_samples;
 }
 
 bool SndSysSourceSoftware3D::ProcessSoundChain(int channel, size_t buffer_samples)

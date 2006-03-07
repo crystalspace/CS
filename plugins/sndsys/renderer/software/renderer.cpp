@@ -562,9 +562,13 @@ size_t csSndSysRendererSoftware::FillDriverBuffer(void *buf1, size_t buf1_len,
       for (currentsource = 0; currentsource < maxsource; currentsource++)
       {
         if (sources.Get(currentsource)->GetStream() == str)
+        {
+          RecordEvent(SSEL_DEBUG, "Marked source index [%d] for removal due to AutoUnregistered stream.", currentsource);
           source_remove_queue.QueueEntry (sources.Get(currentsource));
+        }
       }
       stream_remove_queue.QueueEntry(str);
+      continue;
     }
     // Advance stream
     streams.Get(currentidx)->AdvancePosition(current_ticks);
@@ -585,11 +589,21 @@ size_t csSndSysRendererSoftware::FillDriverBuffer(void *buf1, size_t buf1_len,
 
     if (provided_samples==0)
     {
-      //Report (CS_REPORTER_SEVERITY_DEBUG, "Source failing to keep up, skipping audio.");
+      RecordEvent(SSEL_DEBUG, "Source index [%d] provided 0 samples.", currentidx);
     }
     else
     {
       CS_ASSERT (provided_samples <= needed_samples);
+
+      RecordEvent(SSEL_DEBUG, "Source index [%d] provided [%d] out of [%d] requested samples.", currentidx,
+        provided_samples, needed_samples);
+
+      // BUG: I think if a later source returns less samples than requested than we are throwing away samples from the earlier source
+      //      that we will never get back, aren't we?  - A.M.
+      //
+      // FIX: (maybe) We may need a way to shift the source play cursor backwards - after we find the minimum number of available samples from
+      //      all sources, if it's less than initially requested, then we iterate over the sources again, shifting the cursor back.
+
       // Reduce the number of samples we request from future sources, as well as the number we provide to the driver
       needed_samples=provided_samples;
     }
@@ -670,16 +684,22 @@ void csSndSysRendererSoftware::ProcessPendingSources()
 
   while ((src=source_add_queue.DequeueEntry()))
   {
-//    Report (CS_REPORTER_SEVERITY_DEBUG, "Found a queued source to add to the active list.");
+    RecordEvent(SSEL_DEBUG, "Found a queued source to add to the active list.");
     sources.Push(src);
   }
 
   while ((src=(iSndSysSourceSoftware *)source_remove_queue.DequeueEntry()))
   {
     if (sources.Delete(src))
+    {
+      RecordEvent(SSEL_DEBUG, "Processing remove request for source addr [%08x]", src);
       source_clear_queue.QueueEntry(src);
+    }
     else
+    {
+      RecordEvent(SSEL_WARNING, "Failed remove request for source addr [%08x]. Source not in active list.", src);
       source_clear_queue.QueueEntry(0);
+    }
   }
 }
 
@@ -687,13 +707,22 @@ void csSndSysRendererSoftware::ProcessPendingStreams()
 {
   iSndSysStream *stream;
   while ((stream=stream_add_queue.DequeueEntry()))
+  {
+    RecordEvent(SSEL_DEBUG, "Found a queued stream to add to the active list.");
     streams.Push(stream);
+  }
   while ((stream=stream_remove_queue.DequeueEntry()))
   {
     if (streams.Delete(stream))
+    {
+      RecordEvent(SSEL_DEBUG, "Processing remove request for stream addr [%08x]", stream);
       stream_clear_queue.QueueEntry(stream);
+    }
     else
+    {
+      RecordEvent(SSEL_WARNING, "Failed remove request for stream addr [%08x]. Stream not in active list.", stream);
       stream_clear_queue.QueueEntry(0);
+    }
   }
 }
 
@@ -718,7 +747,7 @@ void csSndSysRendererSoftware::NormalizeSampleBuffer(size_t used_samples)
     if (abssamp > maxintensity) maxintensity=abssamp;
   }
 
-  //Report (CS_REPORTER_SEVERITY_DEBUG, "Maximum sample intensity is %d", maxintensity);
+  RecordEvent(SSEL_DEBUG, "Maximum sample intensity is %d", maxintensity);
 
   // Silence fills the buffer, also dividing by zero is bad
   if (maxintensity==0)
@@ -731,7 +760,7 @@ void csSndSysRendererSoftware::NormalizeSampleBuffer(size_t used_samples)
   if (maxintensity<low_threshold)
     maxintensity=low_threshold;
 
-  //Report (CS_REPORTER_SEVERITY_DEBUG, "Maximum sample intensity (clamped) is %d", maxintensity);
+  RecordEvent(SSEL_DEBUG, "Maximum sample intensity (clamped) is %d", maxintensity);
 
   multiplier=desiredintensity / maxintensity;
 
