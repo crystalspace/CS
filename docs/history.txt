@@ -18,6 +18,9 @@ chronological order.
 	- Peter Amstutz improved the wxgl canvas so that it emits
 	  focus gained / focus lost events when the mouse enters or exits
 	  the window
+	- Rhad fixed the ginormous memory leaks in 3d sound sources for
+	  real this time.  Also added more debug messages to the software
+	  sound renderer and fixed a couple asserts on exit.
 5-Mar-2006
 	- Rhad cleaned up memory leaks in the sound system:
 	  - SndSysOggSoundData has been cleaned up to use local variables
