@@ -28,12 +28,16 @@ function TitleBar(inittext)
 		this.isMoving=true;	
 		this.last_x=x;
 		this.last_y=y;
+		
+		this.CaptureMouse();
 	}
 	
 	// If the mouse is up, stop the moving process
 	_widget.onMouseUp = function(buttons, x, y)
 	{
-		this.isMoving=false;	
+		this.isMoving=false;
+		
+		this.ReleaseMouse();	
 	}
 	
 	// If the mouse moves, we might be moving the widget

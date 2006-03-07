@@ -82,6 +82,7 @@ w3.Invalidate();
 tb = TitleBar("Test");
 tb.Dock(w, Widget.DOCK_SOUTH);
 tb.ResizeTo(200,tb.height);
+tb.MoveTo(400,300);
 tb.Invalidate();
 
 // Test scrollbar
