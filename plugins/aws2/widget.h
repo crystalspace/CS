@@ -233,7 +233,7 @@ namespace aws
 	  	 
 	  	 for(size_t i=0; i<children.Length(); ++i)
 	  	 {
-		 	widget *w = children[i]->Contains(x,y);
+		 	widget *w = children[i]->Contains(x-Bounds().xmin,y-Bounds().ymin);
 		 	if (w) return w;	 		 	
 	  	 }	  	 
 	  	 
