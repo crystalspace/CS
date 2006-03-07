@@ -565,7 +565,7 @@ bool widget::HandleEvent (iEvent &Event)
 	
 	if (Event.Name == AwsMgr()->MouseMove)
 	{
-		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseMove", &func_val)==JS_TRUE)
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseMove", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{
 			jsval args[3];
 			
@@ -580,7 +580,7 @@ bool widget::HandleEvent (iEvent &Event)
 	}
 	else if (Event.Name == AwsMgr()->MouseUp)
 	{
-		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseUp", &func_val)==JS_TRUE)
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseUp", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{
 			jsval args[3];
 			
@@ -595,7 +595,7 @@ bool widget::HandleEvent (iEvent &Event)
 	}
 	else if (Event.Name == AwsMgr()->MouseDown)
 	{
-		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseDown", &func_val)==JS_TRUE)
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseDown", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{
 			jsval args[3];
 			
@@ -610,7 +610,7 @@ bool widget::HandleEvent (iEvent &Event)
 	}
 	else if (Event.Name == AwsMgr()->MouseClick)
 	{
-		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseClick", &func_val)==JS_TRUE)
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseClick", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{
 			jsval args[3];
 			
@@ -625,7 +625,7 @@ bool widget::HandleEvent (iEvent &Event)
 	}
 	else if (Event.Name == AwsMgr()->MouseEnter)
 	{
-		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseEnter", &func_val)==JS_TRUE)
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseEnter", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{			
 			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 0, NULL, &rv);
 			
@@ -634,7 +634,7 @@ bool widget::HandleEvent (iEvent &Event)
 	}
 	else if (Event.Name == AwsMgr()->MouseExit)
 	{
-		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseExit", &func_val)==JS_TRUE)
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onMouseExit", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{			
 			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 0, NULL, &rv);
 			
@@ -643,7 +643,7 @@ bool widget::HandleEvent (iEvent &Event)
 	}
 	else if (Event.Name == AwsMgr()->GainFocus)
 	{
-		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onGainFocus", &func_val)==JS_TRUE)
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onGainFocus", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{			
 			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 0, NULL, &rv);
 			
@@ -652,7 +652,7 @@ bool widget::HandleEvent (iEvent &Event)
 	}
 	else if (Event.Name == AwsMgr()->LoseFocus)
 	{
-		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onLoseFocus", &func_val)==JS_TRUE)
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onLoseFocus", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{			
 			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 0, NULL, &rv);
 			
@@ -661,14 +661,18 @@ bool widget::HandleEvent (iEvent &Event)
 	}
 	else if (Event.Name == AwsMgr()->FrameStart)
 	{
-		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onFrameStart", &func_val)==JS_TRUE)
+		if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), "onFrameStart", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{			
 			JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 0, NULL, &rv);
 			
 			return true;			
 		}			
 	}
-		
+	
+	// If we didn't handle the event, have our parent go at it
+	if (parent) return parent->HandleEvent(Event);	
+	
+	// No parent, return false.
 	return false;
 }
 

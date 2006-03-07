@@ -154,7 +154,7 @@ bool awsManager2::HandleEvent (iEvent &Event)
 { 
   if (CS_IS_MOUSE_EVENT(object_reg, Event))
   {
-	  aws::widget *new_mouse_focus;
+	  aws::widget *new_mouse_focus=0;
 	  
 	  // Check all widgets for new focus.
 	  for(size_t i=0; i<aws::widgets.Length(); ++i)
@@ -163,11 +163,40 @@ bool awsManager2::HandleEvent (iEvent &Event)
 	 	if (new_mouse_focus!=0) break;
 	  }	  
 	  
-	  // Send a lost focus event.
+	  // Did the move over a new widget?
 	  if (new_mouse_focus!=mouse_focus)
 	  {
-		  
+	  	// Reusing this event, save the orignal type
+	  	csEventID et = Event.Name;
+		
+	  	// Tell this widget that it's losing mouse focus.  
+	    if (mouse_focus)
+	    {
+	      Event.Name = MouseExit;
+	      mouse_focus->HandleEvent (Event);
+	    }
+		    		   
+	    // Set the new focus widget
+		mouse_focus = new_mouse_focus;
+
+		// Tell the new widget that it's getting mouse focus.		    
+	    if (mouse_focus)
+	    {
+	      Event.Name = MouseEnter;
+	      mouse_focus->HandleEvent (Event);
+	    }
+	    
+		// Restore the event's name.    
+		Event.Name = et;		 		  
 	  }  
+	  
+	  //  If any widget has mouse focus then handle the event.
+	  // A child widget will pass the message up the line to it's parents
+	  // if it does not handle the event.
+	  if (mouse_focus)
+	  {
+		mouse_focus->HandleEvent(Event);	  
+	  }
 	  
 	   
   }
