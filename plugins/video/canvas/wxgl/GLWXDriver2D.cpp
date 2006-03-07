@@ -129,7 +129,7 @@ void* csGraphics2DWX::GetProcAddress (const char *funcname)
 
 csGraphics2DWX::~csGraphics2DWX ()
 {
-  Close ();  
+  Close ();
   // theCanvas is destroyed by wxWindows
 }
 
@@ -170,7 +170,7 @@ bool csGraphics2DWX::Open()
   if(myParent == 0)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Parent frame in wxGLCanvas not initialized!!");
-	return false;
+  return false;
   }
 
   /*
@@ -221,14 +221,14 @@ bool csGraphics2DWX::Open()
   {
     HDC hDC = (HDC)theCanvas->GetHDC();
     PIXELFORMATDESCRIPTOR pfd;
-    if (DescribePixelFormat (hDC, ::GetPixelFormat (hDC), 
+    if (DescribePixelFormat (hDC, ::GetPixelFormat (hDC),
       sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
     {
       DWORD error = GetLastError();
       char* msg = cswinGetErrorMessage (error);
       Report (CS_REPORTER_SEVERITY_ERROR,
-	"DescribePixelFormat failed: %s [%" PRId32 "]",
-	msg, error);
+  "DescribePixelFormat failed: %s [%" PRId32 "]",
+  msg, error);
       delete[] msg;
     }
     else
@@ -240,7 +240,7 @@ bool csGraphics2DWX::Open()
       currentFormat[glpfvAccumColorBits] = pfd.cAccumBits;
       currentFormat[glpfvAccumAlphaBits] = pfd.cAccumAlphaBits;
 
-      Depth = pfd.cColorBits; 
+      Depth = pfd.cColorBits;
     }
   }
 #elif defined(USE_GLX)
@@ -248,15 +248,15 @@ bool csGraphics2DWX::Open()
     Display* dpy = (Display*) wxGetDisplay ();
     GLXContext active_GLContext = glXGetCurrentContext();
     XVisualInfo *xvis = (XVisualInfo*)theCanvas->m_vi;
-    
+
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Video driver GL/X version %s",
-      glXIsDirect (dpy, active_GLContext) ? "(direct renderer)" : 
+      glXIsDirect (dpy, active_GLContext) ? "(direct renderer)" :
       "(indirect renderer)");
     if (!glXIsDirect (dpy, active_GLContext))
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
-	"Indirect rendering may indicate a flawed OpenGL setup if you run on "
-	"a local X server.");
+  "Indirect rendering may indicate a flawed OpenGL setup if you run on "
+  "a local X server.");
     }
 
     Depth = xvis->depth;
@@ -291,7 +291,7 @@ bool csGraphics2DWX::Open()
       color_bits += pfmt.BlueBits;
       glXGetConfig(dpy, xvis, GLX_ALPHA_SIZE, &alpha_bits);
       pfmt.AlphaBits = alpha_bits;
-        
+
       int bit;
       // Fun hack, xvis doesn't provide alpha mask
       bit=0; while (bit < alpha_bits) pfmt.AlphaMask |= (1<<(bit++));
@@ -302,7 +302,7 @@ bool csGraphics2DWX::Open()
       bit=0; while (!(pfmt.BlueMask & (1<<bit))) bit++; pfmt.BlueShift = bit;
       if (pfmt.AlphaMask)
       {
-	bit=0; while (!(pfmt.AlphaMask & (1<<bit))) bit++; pfmt.AlphaShift = bit;
+  bit=0; while (!(pfmt.AlphaMask & (1<<bit))) bit++; pfmt.AlphaShift = bit;
       }
     }
 
@@ -332,13 +332,13 @@ bool csGraphics2DWX::Open()
     {
       if (pfmt.RedMask > pfmt.BlueMask)
       {
-	Report (CS_REPORTER_SEVERITY_NOTIFY, "R%d:G%d:B%d:A%d, ",
-	  pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, alpha_bits);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "R%d:G%d:B%d:A%d, ",
+    pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, alpha_bits);
       }
       else
       {
-	Report (CS_REPORTER_SEVERITY_NOTIFY, "B%d:G%d:R%d:A%d, ",
-	  pfmt.BlueBits, pfmt.GreenBits, pfmt.RedBits, alpha_bits);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "B%d:G%d:R%d:A%d, ",
+    pfmt.BlueBits, pfmt.GreenBits, pfmt.RedBits, alpha_bits);
       }
     }
 
@@ -419,7 +419,7 @@ void csGraphics2DWX::SetFullScreen (bool yesno)
 
 void csGraphics2DWX::AllowResize (bool iAllow)
 {
-	AllowResizing = iAllow;
+  AllowResizing = iAllow;
 }
 
 BEGIN_EVENT_TABLE(csGLCanvas, wxGLCanvas)
@@ -429,6 +429,7 @@ BEGIN_EVENT_TABLE(csGLCanvas, wxGLCanvas)
   EVT_KEY_DOWN( csGLCanvas::OnKeyDown )
   EVT_KEY_UP( csGLCanvas::OnKeyUp )
   EVT_ENTER_WINDOW( csGLCanvas::OnEnterWindow )
+  EVT_LEAVE_WINDOW( csGLCanvas::OnLeaveWindow )
   EVT_MOUSE_EVENTS( csGLCanvas::OnMouseEvent )
 END_EVENT_TABLE()
 
@@ -437,7 +438,7 @@ csGLCanvas::csGLCanvas(csGraphics2DWX* g, wxWindow *parent,
                        const wxPoint& pos,
                        const wxSize& size, long style,
                        const wxString& name, int* attr)
-  : wxGLCanvas(parent, id, pos, size, style | wxWANTS_CHARS, name, attr), 
+  : wxGLCanvas(parent, id, pos, size, style | wxWANTS_CHARS, name, attr),
     g2d(g)
 {
   int w, h;
@@ -467,7 +468,14 @@ csGLCanvas::~csGLCanvas()
 
 void csGLCanvas::OnEnterWindow( wxMouseEvent& WXUNUSED(event) )
 {
-  SetFocus();
+  csRef<iEventNameRegistry> enr = CS_QUERY_REGISTRY (g2d->object_reg, iEventNameRegistry);
+  g2d->EventOutlet->Broadcast(csevFocusGained(enr));
+}
+
+void csGLCanvas::OnLeaveWindow( wxMouseEvent& WXUNUSED(event) )
+{
+  csRef<iEventNameRegistry> enr = CS_QUERY_REGISTRY (g2d->object_reg, iEventNameRegistry);
+  g2d->EventOutlet->Broadcast(csevFocusLost(enr));
 }
 
 void csGLCanvas::OnPaint( wxPaintEvent& WXUNUSED(event) )
@@ -536,7 +544,7 @@ static bool wxCodeToCSCode(int wxkey, utf32_char& raw, utf32_char& cooked)
     case WXK_ ## wx: { raw = CSKEY_ ## r; cooked = CSKEY_ ## c; return true; }
 #define MAPC(wx, r, c) \
     case WXK_ ## wx: { raw = CSKEY_ ## r; cooked = c; return true; }
-  switch(wxkey) 
+  switch(wxkey)
   {
     MAP (BACK,            BACKSPACE,    BACKSPACE)
     MAP (TAB,             TAB,          TAB)
@@ -630,7 +638,7 @@ void csGLCanvas::EmitKeyEvent(wxKeyEvent& event, bool down)
     cskey_cooked_new = event.GetKeyCode();
 #endif
   if (cskey_raw == 0)
-    csUnicodeTransform::MapToLower (cskey_cooked_new, &cskey_raw, 1, 
+    csUnicodeTransform::MapToLower (cskey_cooked_new, &cskey_raw, 1,
       csUcMapSimple);
   if (cskey_cooked == 0) cskey_cooked = cskey_cooked_new;
   if (cskey_raw != 0) g2d->EventOutlet->Key (cskey_raw, cskey_cooked, down);

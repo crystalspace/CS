@@ -27,10 +27,10 @@
 
 class csGLCanvas;
 
-class csGraphics2DWX : public scfImplementationExt2<csGraphics2DWX, 
-						      csGraphics2DGLCommon, 
-						      iWxWindow,
-						      iOpenGLInterface>
+class csGraphics2DWX : public scfImplementationExt2<csGraphics2DWX,
+                  csGraphics2DGLCommon,
+                  iWxWindow,
+                  iOpenGLInterface>
 {
   wxWindow* myParent;
   csGLCanvas* theCanvas;
@@ -106,6 +106,7 @@ public:
   void OnKeyUp(wxKeyEvent& event);
   void OnMouseEvent(wxMouseEvent& event);
   void OnEnterWindow(wxMouseEvent& event);
+  void OnLeaveWindow(wxMouseEvent& event);
 
   DECLARE_EVENT_TABLE();
 };
