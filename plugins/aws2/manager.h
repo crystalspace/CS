@@ -26,6 +26,7 @@
 
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
+#include "iutil/timer.h"
 
 #include "ivideo/fontserv.h"
 
@@ -51,6 +52,9 @@ class awsManager2 : public iAws
 
   /** Store a reference to the default font so that it's quick and easy. */  
   csRef<iFont> default_font;
+  
+  /** Store a reference to the standard system timer. */
+  csRef<iEventTimer> timer;
   
   /** Preferences... this is actually not really preferences anymore. */
   aws::preferences prefs;
@@ -87,6 +91,9 @@ public:
   
   /** Get the 3D graphics context. */
   csRef<iGraphics3D> G3D() { return g3d; } 
+  
+  /** Get the timer. */
+  csRef<iEventTimer> GetTimer() { return timer; }
  
 public:
   //////////////////////// Definition Files ////////////////////////

@@ -40,6 +40,7 @@
 #include "iutil/virtclk.h"
 #include "iutil/evdefs.h"
 #include "csutil/event.h"
+#include "csutil/timer.h"
 #include "ivaria/reporter.h"
 #include "ivideo/txtmgr.h"
 
@@ -120,6 +121,8 @@ awsManager2::Initialize (iObjectRegistry *_object_reg)
   GainFocus = awsGainFocus (object_reg);
   GroupOff = awsGroupOff (object_reg);
   FrameStart = awsFrameStart (object_reg);
+  
+  timer = csEventTimer::GetStandardTimer(object_reg);
   
   mouse_focus=0;
   keyboard_focus=0;

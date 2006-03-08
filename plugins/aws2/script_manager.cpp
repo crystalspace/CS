@@ -1,6 +1,8 @@
 #include "cssysdef.h"
 #include "script_manager.h"
 #include "script_console.h"
+#include "manager.h"
+#include "timer.h"
 
 #include <stdlib.h>
 
@@ -137,6 +139,20 @@ Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	
 	return JS_TRUE;
 } 
+
+/** @brief Creates timer events. */
+static JSBool
+CreateTimer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{
+	int32 ticks;
+		
+	aws::Timer *t = new aws::Timer(obj, argc, argv);
+	JS_ValueToInt32(cx, argv[0], &ticks);
+	
+	AwsMgr()->GetTimer()->AddTimerEvent(t, (csTicks)ticks);		
+	
+	return JS_TRUE;
+} 
  
 JSClass autom_class = {
     "Sys", 0,
@@ -153,7 +169,8 @@ static JSFunctionSpec autom_static_methods[] = {
     {"Load",		Exec,		1, 0, 0},   
     {"GarbageCollect", GarbageCollect, 0, 0, 0}, 
     {"GarbageCollectSmart", GarbageCollectSmart, 0, 0, 0},
-    {"Print",		Print, 		0, 0, 0}, 
+    {"Print",				Print, 				 0, 0, 0}, 
+    {"CreateTimer",			CreateTimer, 		 2, 0, 0},
     {0,0,0,0,0}
 };
 
