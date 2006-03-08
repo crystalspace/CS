@@ -139,7 +139,7 @@ Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 } 
  
 JSClass autom_class = {
-    "Autom", 0,
+    "Sys", 0,
     JS_PropertyStub,  JS_PropertyStub,
     JS_PropertyStub,  JS_PropertyStub,
     JS_EnumerateStub, JS_ResolveStub,
@@ -219,11 +219,11 @@ scriptManager::Initialize(iObjectRegistry *obj_reg)
 	{		
 		JSObject *autom;
 		
-		CHECK("Autom", autom = JS_DefineObject(cx, global, "Autom", &autom_class, NULL, 0));
+		CHECK("Sys", autom = JS_DefineObject(cx, global, "Sys", &autom_class, NULL, 0));
 		
 		if (autom)
 		{
-			CHECK("Autom", JS_DefineFunctions(cx, autom, autom_static_methods)==JS_TRUE);			
+			CHECK("Sys", JS_DefineFunctions(cx, autom, autom_static_methods)==JS_TRUE);			
 		}
 	}
 	
