@@ -270,6 +270,40 @@ StyleFlat =
 
 Style3D = 
 {
+	WindowMin : function(pen)
+	{
+		var prefs = Skin.current;
+		
+		pen.SetColor(1,1,1,1);
+		pen.DrawRect(5, this.height-10, 15, this.height-5, true);
+	},
+	
+	WindowZoom : function(pen)
+	{
+		var prefs = Skin.current;
+		var cx = this.width>>1, cy=this.height>>1;
+		var qw = this.width>>2, qh=this.height>>2;
+		
+		pen.SetColor(1,1,1,1);		
+		pen.DrawRect(cx-qw, cy-2, cx+qw, cy+2, true);
+		pen.DrawRect(cx-2, cy-qh, cx+2, cy+qh, true);
+	},
+	
+	WindowClose : function(pen)
+	{
+		var prefs = Skin.current;
+		var x=5, y;
+		pen.SetColor(1,1,1,1);
+		
+		// Left to right line
+		pen.DrawTriangle(6,4, this.width-4, this.height-6, 4, 6, true);
+		pen.DrawTriangle(4,6, this.width-4, this.height-6, this.width-6, this.height-4, true);
+		
+		// Right to left line
+		pen.DrawTriangle(this.width-6,4, 6, this.height-4, 4, this.height-6, true);
+		pen.DrawTriangle(this.width-6,4, this.width-4, 6, 6, this.height-4, true);
+	},
+	
 	TitleBar : function(pen)
 	{
 		var prefs = Skin.current;

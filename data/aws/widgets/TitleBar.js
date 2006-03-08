@@ -23,17 +23,17 @@ function TitleBar(inittext)
 	_widget.onDraw = Skin.current.Style.TitleBar;
 	
 	// If we get a mouse down, start the moving process.
-	_widget.onMouseDown = function(buttons, x, y)
+	_widget.onMouseDown = function(buttons, widget_x, widget_y, screen_x, screen_y)
 	{
 		this.isMoving=true;	
-		this.last_x=x;
-		this.last_y=y;
+		this.last_x=screen_x;
+		this.last_y=screen_y;
 		
 		this.CaptureMouse();
 	}
 	
 	// If the mouse is up, stop the moving process
-	_widget.onMouseUp = function(buttons, x, y)
+	_widget.onMouseUp = function(buttons)
 	{
 		this.isMoving=false;
 		
@@ -41,17 +41,17 @@ function TitleBar(inittext)
 	}
 	
 	// If the mouse moves, we might be moving the widget
-	_widget.onMouseMove = function(buttons, x, y)
+	_widget.onMouseMove = function(buttons, widget_x, widget_y, screen_x, screen_y)
 	{
 		if (this.isMoving)
 		{
-			var dx = x-this.last_x,
-				dy = y-this.last_y;
+			var dx = screen_x-this.last_x,
+				dy = screen_y-this.last_y;
 				
 			this.Move(dx, dy);
 			
-			this.last_x = x;
-			this.last_y = y;				
+			this.last_x = screen_x;
+			this.last_y = screen_y;				
 		}			
 	}
 	
@@ -82,6 +82,10 @@ function TitleBar(inittext)
  	
  	_widget.Zoom.Dock(_widget.Min, Widget.DOCK_WEST);	
  	_widget.Min.SetMargin(2, Widget.MARGIN_EAST);
+ 	
+ 	_widget.Min.onDrawContent = prefs.Style.WindowMin;
+ 	_widget.Zoom.onDrawContent = prefs.Style.WindowZoom; 	
+ 	_widget.Close.onDrawContent = prefs.Style.WindowClose;
 	
 	return _widget;
 }

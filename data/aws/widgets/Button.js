@@ -9,7 +9,7 @@ function Button()
 			
 	// Setup the scroll bar
 	_widget._state=false;
-	
+		
 	// Invalidate and fire onChange when the value property is set.
 	_widget.__defineSetter__("state", function(v) { this._state = v; this.Invalidate(); if (this.onChange) this.onChange(this); });	
 	_widget.__defineGetter__("state", function() { return this._state; });	
@@ -22,17 +22,21 @@ function Button()
 	// Set the content drawing function.
 	_widget.onDrawContent = null;
 	
-	// If we get a mouse down, change the button's appearance.
+	// If we get a mouse down, change the button's state.
 	_widget.onMouseDown = function(buttons, x, y)
 	{
-		this.state=true;		
+		this.state=true;
+		this._active=true;
+		this.CaptureMouse();		
 	}
 	
-	// If the mouse is up, stop the moving process
+	// If the mouse is up, change the state.
 	_widget.onMouseUp = function(buttons, x, y)
 	{
-		this.state=false;			
+		this.state=false;
+		this._active=false;	
+		this.ReleaseMouse();		
 	}
-	
+		
 	return _widget;
 }
