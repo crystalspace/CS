@@ -5,7 +5,13 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
-
+8-Mar-2006
+	- Christopher renamed the "Autom" object to "Sys" because he felt that
+	it made more sense.  He also added a "Print" function to the Sys object
+	so that scripts can send output to the console.  The ScrollBar is
+	essentially complete, the only thing lacking is proportional scrolling,
+	and handling correct redraw when the range is something other than
+	(min>0,max<infinity).   
 7-Mar-2006
 	- Christopher added the basic event system to AWS2, and completed the
 	  required features for the Pen object.  Christopher also added a 
