@@ -40,42 +40,75 @@ function ScrollBar(orientation_vertical)
 	
 	// Set the mouse down handler
 	_widget.onMouseDown = function(buttons, wx, wy, sx, sy)
-	{
-		_widget.mx = wx;
-		_widget.my = wy;
-		
+	{		
 		if (wx>=this.ButtonInc.x1 && wx<=this.ButtonInc.x2 &&
 		    wy>=this.ButtonInc.y1 && wy<=this.ButtonInc.y2)
 		    {
-				_widget.inc_button_down=true;  
-				_widget.Invalidate();  
+				this.inc_button_down=true;  
+				this.Invalidate();  
+				this.CaptureMouse();
 				return;
 		    }
 		
 		if (wx>=this.ButtonDec.x1 && wx<=this.ButtonDec.x2 &&
 		    	wy>=this.ButtonDec.y1 && wy<=this.ButtonDec.y2)
 		    {
-				_widget.dec_button_down=true;    
-				_widget.Invalidate();
+				this.dec_button_down=true;    
+				this.Invalidate();
+				this.CaptureMouse();
 				return;
 		    }			
 		    
 		if (wx>=this.ButtonScroll.x1 && wx<=this.ButtonScroll.x2 &&
 		    wy>=this.ButtonScroll.y1 && wy<=this.ButtonScroll.y2)
 		    {
-				_widget.scroll_button_down=true;    
-				_widget.Invalidate();
+				this.scroll_button_down=true;    
+				this.Invalidate();
+				this.CaptureMouse();			
+				
+				this.last_x = sx;
+				this.last_y = sy;
+				
 				return;
 		    }		
 	}
 	
 	_widget.onMouseUp = function(buttons)
 	{
-		_widget.inc_button_down=false;
-		_widget.dec_button_down=false;	
-		_widget.scroll_button_down=false;
-		_widget.Invalidate();
+		this.inc_button_down=false;
+		this.dec_button_down=false;				
+		this.scroll_button_down=false;			
+		
+		this.ReleaseMouse();
+		this.Invalidate();
 	}
+	
+	_widget.onMouseMove = function(buttons, wx, wy, sx, sy)
+	{
+		if (this.scroll_button_down)
+		{
+			if (this.orientation_vertical)
+			{
+				var dy = sy - this.last_y;
+				
+				this.value+=dy;				
+			}
+			else
+			{
+				var dx = sx - this.last_x;
+				
+				this.value+=dx;								
+			}	
+			
+			this.last_x = sx;
+			this.last_y = sy;
+			
+			if (this.value>this.max) this.value=this.max;
+			if (this.value<this.min) this.value=this.min;					
+		}
+	}
+	
+	
 	
 	return _widget;
 }
