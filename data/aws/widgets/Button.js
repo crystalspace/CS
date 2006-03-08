@@ -9,6 +9,7 @@ function Button()
 			
 	// Setup the scroll bar
 	_widget._state=false;
+	_widget.over=false;
 		
 	// Invalidate and fire onChange when the value property is set.
 	_widget.__defineSetter__("state", function(v) { this._state = v; this.Invalidate(); if (this.onChange) this.onChange(this); });	
@@ -36,6 +37,18 @@ function Button()
 		this.state=false;
 		this._active=false;	
 		this.ReleaseMouse();		
+	}
+	
+	_widget.onMouseEnter = function()
+	{
+		_widget.over=true;
+		this.Invalidate();	
+	}
+	
+	_widget.onMouseExit = function()
+	{
+		_widget.over=false;
+		this.Invalidate();	
 	}
 		
 	return _widget;

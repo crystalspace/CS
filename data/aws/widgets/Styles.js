@@ -274,7 +274,9 @@ Style3D =
 	{
 		var prefs = Skin.current;
 		
-		pen.SetColor(1,1,1,1);
+		if (this.over) pen.SetColor(0,0,1,1);
+		else pen.SetColor(1,1,1,1);
+		
 		pen.DrawRect(5, this.height-10, 15, this.height-5, true);
 	},
 	
@@ -284,7 +286,9 @@ Style3D =
 		var cx = this.width>>1, cy=this.height>>1;
 		var qw = this.width>>2, qh=this.height>>2;
 		
-		pen.SetColor(1,1,1,1);		
+		if (this.over) pen.SetColor(0,1,0,1);
+		else pen.SetColor(1,1,1,1);
+				
 		pen.DrawRect(cx-qw, cy-2, cx+qw, cy+2, true);
 		pen.DrawRect(cx-2, cy-qh, cx+2, cy+qh, true);
 	},
@@ -293,7 +297,9 @@ Style3D =
 	{
 		var prefs = Skin.current;
 		var x=5, y;
-		pen.SetColor(1,1,1,1);
+		
+		if (this.over) pen.SetColor(1,0,0,1);
+		else pen.SetColor(1,1,1,1);
 		
 		// Left to right line
 		pen.DrawTriangle(6,4, this.width-4, this.height-6, 4, 6, true);
@@ -412,10 +418,31 @@ Style3D =
 		var w = this.width, h = this.height;
 		var frame = Frames3D;
 		
-		if (this.state) frame.Inset(pen,0,0,w,h);
-		else frame.Outset(pen,0,0,w,h);
+		pen.Clear();
 		
-		if (this.onDrawContent) this.onDrawContent(pen);			
+		if (this.state) frame.Inset(pen,0,0,w,h);
+		else 
+		{
+			frame.Outset(pen,0,0,w,h);
+			if (this.over)
+			{	
+				pen.SetColor(1,1,1,0.25);			
+				pen.DrawRect(0,0,w,h,true);
+			}
+		}
+		
+		if (this.onDrawContent)
+		{
+			if (this.state)
+			{
+				pen.PushTransform();
+				pen.Translate(1,1,0);
+			}
+			
+			this.onDrawContent(pen);			
+			
+			if (this.state) pen.PopTransform();
+		}
 	},
 	
 	Clock : function(pen)
@@ -425,6 +452,8 @@ Style3D =
 		var cx = w/2, cy = h/2;
 		var r=w/2;
 		var d = new Date();
+		
+		pen.Clear();
 		
 		pen.SetColor(0,0,0,1);		
 		pen.DrawArc(0,0,w,h,0,Math.PI*2.1,true);
