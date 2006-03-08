@@ -1,8 +1,8 @@
 // AWS Test skin definition file
 
 // Load the default style set
-Autom.Load("/aws/widgets/Styles.js");
-Autom.Load("/aws/widgets/Widgets.js");
+Sys.Load("/aws/widgets/Styles.js");
+Sys.Load("/aws/widgets/Widgets.js");
 
 
 skin_NormalWindows = 
@@ -73,4 +73,4 @@ Skin.current = skin_NormalWindows;
 
 
 // This is a test file.
-Autom.Load("/aws/test.js");
+Sys.Load("/aws/test.js");

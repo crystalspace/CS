@@ -2,9 +2,9 @@
 ///////////////////////////////////////////////////////////////////////
 //// This will be loaded automatically by the skin definition file. ///
 
-Autom.Load("/aws/widgets/Support.js");
-Autom.Load("/aws/widgets/TextBox.js");
-Autom.Load("/aws/widgets/TitleBar.js");
-Autom.Load("/aws/widgets/ScrollBar.js");
-Autom.Load("/aws/widgets/Button.js");
-Autom.Load("/aws/widgets/Clock.js");
+Sys.Load("/aws/widgets/Support.js");
+Sys.Load("/aws/widgets/TextBox.js");
+Sys.Load("/aws/widgets/TitleBar.js");
+Sys.Load("/aws/widgets/ScrollBar.js");
+Sys.Load("/aws/widgets/Button.js");
+Sys.Load("/aws/widgets/Clock.js");
