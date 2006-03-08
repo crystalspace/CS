@@ -365,6 +365,49 @@ Style3D =
 		
 		
 		pen.Clear();
+		
+		function drawButtons(sb)
+		{
+			// Bar
+			if (sb.scroll_button_down)
+				frame.Inset(pen, sb.ButtonScroll.x1, sb.ButtonScroll.y1, 
+							 	  sb.ButtonScroll.x2, sb.ButtonScroll.y2);
+			else
+				frame.Outset(pen, sb.ButtonScroll.x1, sb.ButtonScroll.y1, 
+							 	  sb.ButtonScroll.x2, sb.ButtonScroll.y2);
+			
+			// Dec button
+			if (sb.dec_button_down) 
+				frame.Inset(pen, sb.ButtonDec.x1, sb.ButtonDec.y1, 
+							 	  sb.ButtonDec.x2, sb.ButtonDec.y2);
+			else
+				frame.Outset(pen, sb.ButtonDec.x1, sb.ButtonDec.y1, 
+							 	  sb.ButtonDec.x2, sb.ButtonDec.y2);
+			
+			// IncButton
+			if (sb.inc_button_down) 
+				frame.Inset(pen, sb.ButtonInc.x1, sb.ButtonInc.y1, 
+							 	  sb.ButtonInc.x2, sb.ButtonInc.y2);
+			else
+				frame.Outset(pen, sb.ButtonInc.x1, sb.ButtonInc.y1, 
+							 	  sb.ButtonInc.x2, sb.ButtonInc.y2);			
+				
+		}
+		
+		function arrowPre(flag)
+		{
+			if (flag) 
+			{
+				pen.PushTransform();
+				pen.Translate(1,1,0);	
+			}
+		}
+		
+		function arrowPost(flag)
+		{
+			if (flag)
+				pen.PopTransform();	
+		}
 			
 		
 		//  value      start_pos
@@ -375,41 +418,41 @@ Style3D =
 		{
 			var y = (pos*(h-frame.InsetAdjust-size-(btn_h*3))) / max;
 			
+			// Setup button areas for scrollbar controller.
+			this.ButtonDec = { x1:0, y1:0, x2:w, y2:btn_h };
+			this.ButtonInc  = { x1:0, y1:btn_h, x2:w, y2:btn_h*2 };
+			this.ButtonScroll = { x1:frame.InsetAdjust, y1:y+frame.InsetAdjust+btn_h*2, x2:w-frame.InsetAdjust, y2:y+frame.InsetAdjust+(btn_h*2)+size };
+						
 			// Background
 			frame.Inset(pen,0,btn_h*2,w,h-btn_h);
 			
-			// Bar
-			frame.Outset(pen, frame.InsetAdjust, y+frame.InsetAdjust+btn_h*2, w-frame.InsetAdjust, y+frame.InsetAdjust+(btn_h*2)+size);
-			
-			// Buttons
-			frame.Outset(pen, 0,0, w, btn_h);
-			frame.Outset(pen, 0,btn_h, w, btn_h*2);
+			drawButtons(this);
 			
 			// Arrows
-			pen.SetColor(0,0,0,1);			
-			pen.DrawTriangle(btn_w*0.5, tri_qh, btn_w-tri_qw, btn_h-tri_qh, tri_qw, btn_h-tri_qh, true);			
-			pen.DrawTriangle(btn_w*0.5, tri_qh*5, tri_qw, btn_h+tri_qh, btn_w-tri_qw, btn_h+tri_qh, true);
-			
+			pen.SetColor(0,0,0,1);							
+			arrowPre(this.dec_button_down); pen.DrawTriangle(btn_w*0.5, tri_qh, btn_w-tri_qw, btn_h-tri_qh, tri_qw, btn_h-tri_qh, true);   arrowPost(this.dec_button_down); 
+			arrowPre(this.inc_button_down); pen.DrawTriangle(btn_w*0.5, tri_qh*5, tri_qw, btn_h+tri_qh, btn_w-tri_qw, btn_h+tri_qh, true); arrowPost(this.inc_button_down); 			
 			
 		}
 		else
 		{
 			var x = (pos*(w-frame.InsetAdjust-size-(btn_w*3))) / max;
 			
+			// Setup button areas for scrollbar controller.
+			this.ButtonDec = { x1:0, y1:0, x2:btn_w, y2:h };
+			this.ButtonInc = { x1:btn_w, y1:0, x2:btn_w*2, y2:h };
+			this.ButtonScroll = { x1:x+frame.InsetAdjust+btn_w*2, y1:frame.InsetAdjust, x2:x+frame.InsetAdjust+(btn_w*2)+size, y2:h-frame.InsetAdjust };
+						
+			
 			// Background 
 			frame.Inset(pen,btn_w*2,0, w-btn_w, h);
 			
-			// Bar
-			frame.Outset(pen, x+frame.InsetAdjust+btn_w*2, frame.InsetAdjust, x+frame.InsetAdjust+(btn_w*2)+size, h-frame.InsetAdjust);
-			
-			// Buttons
-			frame.Outset(pen, 0,0, btn_w,h);
-			frame.Outset(pen, btn_w, 0, btn_w*2,h);
+			drawButtons(this);
 			
 			// Arrows
 			pen.SetColor(0,0,0,1);			
-			pen.DrawTriangle(tri_qw, btn_h*0.5,  btn_w-tri_qw, tri_qh, btn_w-tri_qw, btn_h-tri_qh, true);			
-			pen.DrawTriangle(tri_qw*5, btn_h*0.5, btn_w+tri_qw, btn_h-tri_qh, btn_w+tri_qw, tri_qh, true);
+			arrowPre(this.dec_button_down); pen.DrawTriangle(tri_qw, btn_h*0.5,  btn_w-tri_qw, tri_qh, btn_w-tri_qw, btn_h-tri_qh, true);	arrowPost(this.dec_button_down); 		
+			arrowPre(this.inc_button_down); pen.DrawTriangle(tri_qw*5, btn_h*0.5, btn_w+tri_qw, btn_h-tri_qh, btn_w+tri_qw, tri_qh, true);  arrowPost(this.inc_button_down); 
 		}
 	},
 	

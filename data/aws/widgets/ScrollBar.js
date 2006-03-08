@@ -15,6 +15,9 @@ function ScrollBar(orientation_vertical)
 	_widget.bar_size=50;
 	_widget.max=100;
 	_widget.min=0;
+	_widget.inc_button_down=false;
+	_widget.dec_button_down=false;
+	_widget.scroll_bar_down=false;
 	
 	// Invalidate and fire onChange when the value property is set.
 	_widget.__defineSetter__("value", function(v) { this._value = v; this.Invalidate(); if (this.onChange) this.onChange(this); });	
@@ -34,6 +37,45 @@ function ScrollBar(orientation_vertical)
 	
 	// Set the drawing function to be whatever the current style dictates.
 	_widget.onDraw = Skin.current.Style.ScrollBar;
+	
+	// Set the mouse down handler
+	_widget.onMouseDown = function(buttons, wx, wy, sx, sy)
+	{
+		_widget.mx = wx;
+		_widget.my = wy;
+		
+		if (wx>=this.ButtonInc.x1 && wx<=this.ButtonInc.x2 &&
+		    wy>=this.ButtonInc.y1 && wy<=this.ButtonInc.y2)
+		    {
+				_widget.inc_button_down=true;  
+				_widget.Invalidate();  
+				return;
+		    }
+		
+		if (wx>=this.ButtonDec.x1 && wx<=this.ButtonDec.x2 &&
+		    	wy>=this.ButtonDec.y1 && wy<=this.ButtonDec.y2)
+		    {
+				_widget.dec_button_down=true;    
+				_widget.Invalidate();
+				return;
+		    }			
+		    
+		if (wx>=this.ButtonScroll.x1 && wx<=this.ButtonScroll.x2 &&
+		    wy>=this.ButtonScroll.y1 && wy<=this.ButtonScroll.y2)
+		    {
+				_widget.scroll_button_down=true;    
+				_widget.Invalidate();
+				return;
+		    }		
+	}
+	
+	_widget.onMouseUp = function(buttons)
+	{
+		_widget.inc_button_down=false;
+		_widget.dec_button_down=false;	
+		_widget.scroll_button_down=false;
+		_widget.Invalidate();
+	}
 	
 	return _widget;
 }
