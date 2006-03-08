@@ -514,24 +514,24 @@ Style3D =
 		
 		
 		// Draw hour hand.
-		angle = (d.getHours()-1) * steps;
-		angle -= Math.PI * 0.25;		
+		angle = (d.getHours()) * steps;
+		angle -= Math.PI * 0.5;		
 		pen.SetColor(0,0,0.75,0.5);
 		pen.DrawArc(cx-r,cy-r,cx+r,cy+r,angle-(steps/2.0), angle+(steps/2.0), true);
 		
 		steps = Math.PI/30.0;
-		angle = (d.getMinutes()-1) * steps;		
-		angle -= Math.PI * 0.25;
+		angle = (d.getMinutes()) * steps;		
+		angle -= Math.PI * 0.5;
 		pen.SetColor(0.75,0,0,0.5);
 		pen.DrawArc(0,0,w,h,angle-(steps/2.0), angle+(steps/2.0), true);
 					
-		angle = (d.getSeconds()-1) * steps;		
-		angle -= Math.PI * 0.25;
+		angle = (d.getSeconds()) * steps;		
+		angle -= Math.PI * 0.5;
 		pen.SetColor(0.75,0.75,0,0.5);
 		pen.DrawArc(0,0,w,h,angle-(steps/2.0), angle+(steps/2.0), true);
 		
 		pen.SetColor(1,1,1,1);
-		//pen.WriteBoxed(0,0,w,h,Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, d);
+		pen.WriteBoxed(Skin.current.Font, 0,0,w,h,Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, d.toLocaleTimeString());
 		
 	}
 	
