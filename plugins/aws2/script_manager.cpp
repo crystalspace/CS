@@ -118,6 +118,25 @@ GarbageCollectSmart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
 		
 	return JS_TRUE;
 } 
+
+/** @brief Calls the garbage collector, but only collects garbage if memory is at 75% of the threshold. */
+static JSBool
+Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{
+	csString msg;
+	
+	for(uintN i=0; i<argc; ++i)	
+	{
+		JSString *str = JS_ValueToString(cx, argv[i]);
+		csString tmp(JS_GetStringBytes(str));
+		
+		msg+=tmp;	
+	}	
+	
+	ScriptCon()->Message(msg);
+	
+	return JS_TRUE;
+} 
  
 JSClass autom_class = {
     "Autom", 0,
@@ -133,7 +152,8 @@ static JSFunctionSpec autom_static_methods[] = {
     {"Exec",		Exec,		1, 0, 0},    
     {"Load",		Exec,		1, 0, 0},   
     {"GarbageCollect", GarbageCollect, 0, 0, 0}, 
-    {"GarbageCollectSmart", GarbageCollectSmart, 0, 0, 0}, 
+    {"GarbageCollectSmart", GarbageCollectSmart, 0, 0, 0},
+    {"Print",		Print, 		0, 0, 0}, 
     {0,0,0,0,0}
 };
 

@@ -646,6 +646,10 @@ bool widget::HandleEvent (iEvent &Event)
 				
 			ScreenToWidget(x,y);	
 			
+// 			csString msg;
+// 			msg.Format("MouseDown: wx=%d, wy=%d, sx=%d, sy=%d", x, y, sx, sy);
+// 			ScriptCon()->Message(msg);
+			
 			args[0] = INT_TO_JSVAL(csMouseEventHelper::GetButton(&Event));
 			args[1] = INT_TO_JSVAL(x);
 			args[2] = INT_TO_JSVAL(y);
