@@ -65,6 +65,11 @@ struct iPen
    * Swaps the current color and the alternate color. 
    */
   virtual void SwapColors() = 0;
+  
+  /**
+   * Sets the width of the pen for line drawing. 
+   */
+  virtual void SetPenWidth(float width)=0;
 
   /**    
    * Clears the current transform, resets to identity.
@@ -190,17 +195,39 @@ class CS_CRYSTALSPACE_EXPORT csPen : public iPen
   
   /** The array that stores the translation stack for text. */
   csArray<csVector3> translations;
+  
+  /** The width of the pen for non-filled shapes. */
+  float pen_width;
+  
+  /** True if we're filling a shape. */
+  bool filling_shape;
+    
+  /** The type of a point. */  
+  struct point
+  {
+	  float x,y;
+  };
+  
+  /** Used to keep track of points when drawing thick lines. */
+  csArray<point> line_points; 
+  
+  /** The last two calculated points. */
+  point last[2]; 
 
 protected:
   /** 
    * Initializes our working objects. 
    */
-  void Start();
+  void Start(bool fill);
 
   /** 
    * Adds a vertex. 
+   * @param x X coord
+   * @param y Y coord
+   * @param force_add Forces the coordinate to be added as a vertex, instead
+   *  of trying to be smart and make it a thick vertex.
    */
-  void AddVertex(float x, float y);
+  void AddVertex(float x, float y, bool force_add=false);
 
   /** 
    * Worker, sets up the mesh with the vertices, color, and other information. 
@@ -211,6 +238,13 @@ protected:
    * Worker, draws the mesh. 
    */
   void DrawMesh(csRenderMeshType mesh_type);
+  
+  /**
+   *  Worker, adds thick line points.  A thick point is created when the
+   * pen width is greater than 1.  It uses polygons to simulate thick
+   * lines.
+   */
+  void AddThickPoints(float x1, float y1, float x2, float y2);
 
 public:
   csPen(iGraphics2D *_g2d, iGraphics3D *_g3d);
@@ -230,7 +264,12 @@ public:
    * Swaps the current color and the alternate color. 
    */
   virtual void SwapColors();
-
+  
+  /** 
+   * Sets the current pen width 
+   */
+  virtual void SetPenWidth(float width);
+  
   /**    
    * Clears the current transform, resets to identity.
    */
@@ -266,6 +305,11 @@ public:
    * Draws a single line. 
    */
   virtual void DrawLine (uint x1, uint y1, uint x2, uint y2);
+  
+  /**
+   * Draws a thick line.
+   */
+  void DrawThickLine(uint x1, uint y2, uint x2, uint y2);
 
   /** 
    * Draws a single point. 

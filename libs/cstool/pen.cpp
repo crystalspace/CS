@@ -21,8 +21,10 @@
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 
+#define MESH_TYPE(a) (filling_shape ? a : pen_width>1 ? CS_MESHTYPE_QUADS : CS_MESHTYPE_LINESTRIP)
 
-csPen::csPen (iGraphics2D *_g2d, iGraphics3D *_g3d) : g3d (_g3d), g2d(_g2d)
+
+csPen::csPen (iGraphics2D *_g2d, iGraphics3D *_g3d) : g3d (_g3d), g2d(_g2d), pen_width(1.0)
 {
   mesh.object2world.Identity();
 }
@@ -32,17 +34,33 @@ csPen::~csPen ()
 
 }
 
-void csPen::Start ()
+void csPen::Start (bool fill)
 {
   poly.MakeEmpty();
   poly_idx.MakeEmpty();
   colors.SetLength (0);  
+  line_points.SetLength(0);
+  filling_shape=fill;
 }
 
-void csPen::AddVertex (float x, float y)
+void csPen::AddVertex (float x, float y, bool force_add)
 {
-  poly_idx.AddVertex((int)poly.AddVertex(x,y,0));
-  colors.Push(color);
+  if (force_add || filling_shape || !(pen_width>1))
+  {
+  	poly_idx.AddVertex((int)poly.AddVertex(x,y,0));
+  	colors.Push(color);
+  }
+  else
+  {
+	point p = {x,y};			
+	  
+	if (line_points.Length())
+	{
+		AddThickPoints(line_points.Top().x, line_points.Top().y, x, y);
+	}	  
+	
+	line_points.Push(p);	
+  }
 }
 
 void csPen::SetupMesh ()
@@ -64,6 +82,35 @@ void csPen::DrawMesh (csRenderMeshType mesh_type)
 {
   mesh.meshtype = mesh_type;
   g3d->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
+}
+
+void csPen::AddThickPoints(float fx1, float fy1, float fx2, float fy2)
+{		
+	float angle = atan2(fy2-fy1, fx2-fx1);
+	
+	float a1 = angle - (M_PI/2.0);	
+	float ca1 = cos(a1)*pen_width, sa1 = sin(a1)*pen_width;
+	bool first = line_points.Length()<2;
+	
+// 	AddVertex(fx1+ca1, fy1+sa1, true);		
+// 	AddVertex(fx2+ca1, fy2+sa1, true);
+// 		
+// 	AddVertex(fx2-ca1, fy2-sa1, true);	
+// 	AddVertex(fx1-ca1, fy1-sa1, true);
+// 	
+	
+	if (first) AddVertex(fx1+ca1, fy1+sa1, true);
+	else	   AddVertex(last[0].x, last[0].y, true);
+		
+	AddVertex(fx2+ca1, fy2+sa1, true);		
+	AddVertex(fx2-ca1, fy2-sa1, true);	
+	
+	if (first) AddVertex(fx1-ca1, fy1-sa1, true);
+	else	   AddVertex(last[1].x, last[1].y, true);	
+	
+	
+	last[0].x=fx2+ca1; last[0].y=fy2+sa1;		
+	last[1].x=fx2-ca1; last[1].y=fy2-sa1;
 }
 
 void csPen::SetColor (float r, float g, float b, float a)
@@ -89,6 +136,11 @@ void csPen::SwapColors()
   tmp=color;
   color=alt_color;
   alt_color=tmp;
+}
+
+void csPen::SetPenWidth(float width)
+{
+	pen_width=width;	
 }
 
 void csPen::ClearTransform()
@@ -138,11 +190,23 @@ csPen::Rotate(const float &a)
   mesh.object2world*=tr;
 }
 
+void csPen::DrawThickLine(uint x1, uint y1, uint x2, uint y2)
+{	
+		
+	Start(false);
+	
+	AddThickPoints(x1,y1,x2,y2);
+	
+	SetupMesh();
+	DrawMesh(CS_MESHTYPE_QUADS);
+}
 
 /** Draws a single line. */
 void csPen::DrawLine (uint x1, uint y1, uint x2, uint y2)
-{
-  Start ();
+{	
+  if (pen_width>1) { DrawThickLine(x1,y1,x2,y2); return; }	
+	
+  Start (false);
   AddVertex (x1,y1);
   AddVertex (x2,y2);
 
@@ -153,7 +217,8 @@ void csPen::DrawLine (uint x1, uint y1, uint x2, uint y2)
 /** Draws a single point. */
 void csPen::DrawPoint (uint x1, uint y1)
 {
-  Start ();
+	
+  Start (false);
   AddVertex (x1,y1);
   
   SetupMesh (); 
@@ -162,8 +227,8 @@ void csPen::DrawPoint (uint x1, uint y1)
 
 /** Draws a rectangle. */
 void csPen::DrawRect (uint x1, uint y1, uint x2, uint y2, bool swap_colors, bool fill)
-{
-  Start ();
+{  	
+  Start (fill);
 
   AddVertex (x1, y1);
   AddVertex (x2, y1);
@@ -175,19 +240,17 @@ void csPen::DrawRect (uint x1, uint y1, uint x2, uint y2, bool swap_colors, bool
 
   if (swap_colors) SwapColors();
 
-  if (!fill) AddVertex (x1, y1);
-
-  
+  if (!fill) AddVertex (x1, y1);  
 
   SetupMesh ();
-  DrawMesh (fill ? CS_MESHTYPE_QUADS : CS_MESHTYPE_LINESTRIP);
+  DrawMesh (MESH_TYPE(CS_MESHTYPE_QUADS));
 }
 
 /** Draws a mitered rectangle. The miter value should be between 0.0 and 1.0, and determines how
 * much of the corner is mitered off and beveled. */    
 void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2, 
                              float miter, bool swap_colors, bool fill)
-{
+{  	
   if (miter == 0.0f) 
   { 
     DrawRect (x1,y1,x2,y2,fill); 
@@ -203,7 +266,7 @@ void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
   float y_miter = (height*miter)*0.5;
   float x_miter = (width*miter)*0.5;
   		
-  Start ();
+  Start (fill);
 
   if (fill)AddVertex(center_x, center_y);
 
@@ -223,14 +286,14 @@ void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
   if (swap_colors) SwapColors();
 
   SetupMesh ();
-  DrawMesh (fill ? CS_MESHTYPE_TRIANGLEFAN: CS_MESHTYPE_LINESTRIP);
+  DrawMesh (MESH_TYPE(CS_MESHTYPE_TRIANGLEFAN));  
 }
 
 /** Draws a rounded rectangle. The roundness value should be between 0.0 and 1.0, and determines how
   * much of the corner is rounded off. */
 void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
                              float roundness, bool swap_colors, bool fill)
-{
+{		
   if (roundness == 0.0f) 
   { 
     DrawRect (x1,y1,x2,y2,fill); 
@@ -248,7 +311,7 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
   float   steps = roundness * 12;
   float   delta = (PI/4.0)/steps;
 
-  Start();
+  Start(fill);
 
   float angle;
 
@@ -291,7 +354,7 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
   if (swap_colors) SwapColors();
 
   SetupMesh ();
-  DrawMesh (fill ? CS_MESHTYPE_TRIANGLEFAN : CS_MESHTYPE_LINESTRIP);
+  DrawMesh (MESH_TYPE(CS_MESHTYPE_TRIANGLEFAN));
 }
 
 /** 
@@ -301,7 +364,7 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
    * angle.
    */
 void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool /*swap_colors*/, bool fill)
-{
+{		
   // Check to make sure that the arc is not in a negative box.
   if (x2<x1) { x2^=x1; x1^=x2; x2^=x1; }
   if (y2<y1) { y2^=y1; y1^=y2; y2^=y1; }
@@ -329,7 +392,7 @@ void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float
   float delta = (end_angle-start_angle) / steps;
   float angle;
 
-  Start();
+  Start(fill);
   
   if (fill) AddVertex(center_x, center_y);
 
@@ -339,19 +402,19 @@ void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float
   }
 
   SetupMesh ();
-  DrawMesh (fill ? CS_MESHTYPE_TRIANGLEFAN : CS_MESHTYPE_LINESTRIP);
+  DrawMesh (MESH_TYPE(CS_MESHTYPE_TRIANGLEFAN));
 }
 
 void csPen::DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint y3, bool fill)
-{
-  Start();
+{	
+  Start(fill);
 
   AddVertex(x1, y1);
   AddVertex(x2, y2);
   AddVertex(x3, y3);
 
   SetupMesh ();
-  DrawMesh (fill ? CS_MESHTYPE_TRIANGLES : CS_MESHTYPE_LINESTRIP);
+  DrawMesh (MESH_TYPE(CS_MESHTYPE_TRIANGLES));
 }
 
 void 
