@@ -8,7 +8,7 @@ function Clock()
 	_widget.SetPen(new Pen);
 	
 	//  Set initial size.  
-	_widget.Resize(100, 100);
+	_widget.ResizeTo(200, 200);
 	
 	// Set the drawing function to be whatever the current style dictates.
 	_widget.onDraw = Skin.current.Style.Clock;	

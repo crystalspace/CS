@@ -498,27 +498,57 @@ Style3D =
 		
 		
 		pen.Clear();
-		
-		pen.SetColor(0,0,0,1);		
+		pen.SetColor(0,0,0,1);
+		pen.SwapColors();		
+		pen.SetColor(1,1,1,1);				
 		pen.DrawArc(0,0,w,h,0,Math.PI*2.1,true);
-		
-		pen.SetColor(1,1,1,1);
+		pen.SwapColors();
 		pen.DrawArc(0,0,w,h,0,Math.PI*2.1,false);
-		
+		pen.SwapColors();
+		pen.SetColor(0.5,0.5,0.5,1);				
+		pen.DrawArc(5,5,w-5,h-5,0,Math.PI*2.1,true);		
+		pen.SwapColors();
+		pen.DrawArc(5,5,w-5,h-5,0,Math.PI*2.1,false);
+		pen.SwapColors();
 		pen.SetColor(1,1,1,1);
+		pen.DrawArc(15,15,w-15,h-15,0,Math.PI*2.1,true);
+		pen.SwapColors();
+		pen.DrawArc(17,17,w-17,h-17,0,Math.PI*2.1,false);
+		
 		for(angle=Math.PI*1.5; num>0; angle-=steps, --num)
 		{
-			var x = (Math.cos(angle)*r),
-				y = (Math.sin(angle)*r),
-				x2 = (Math.cos(angle)*(r-10)),
-				y2 = (Math.sin(angle)*(r-10));
+			var ca = Math.cos(angle),
+				sa = Math.sin(angle);
 			
-			//pen.DrawLine(cx+x,cy+y,cx+x2,cy+y2);
+			var lx1 = ca*(r-15),
+				ly1 = sa*(r-15),
+				lx2 = ca*(r-20),
+				ly2 = sa*(r-20),
+				x2 = ca*(r-30),
+				y2 = sa*(r-30);
+			
+			pen.DrawLine(cx+lx1,cy+ly1,cx+lx2,cy+ly2);
 			pen.WriteBoxed(Skin.current.ClockFont, cx+x2-5, cy+y2-5, cx+x2+5, cy+y2+5, Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, num); 
-		}		
+		}
 		
 		
+		steps=Math.PI/30.0;
+		for(angle=0; angle<Math.PI*2.0; angle+=steps)
+		{
+			var ca = Math.cos(angle),
+				sa = Math.sin(angle);
+			
+			var lx1 = ca*(r-40),
+				ly1 = sa*(r-40),
+				lx2 = ca*(r-45),
+				ly2 = sa*(r-45);
+			
+			pen.DrawLine(cx+lx1,cy+ly1,cx+lx2,cy+ly2);
+		}				
+		
+				
 		// Draw hour hand.
+		steps=Math.PI/6.0;
 		angle = (d.getHours()) * steps;
 		angle -= Math.PI * 0.5;		
 		pen.SetColor(0,0,0.75,0.5);
@@ -535,7 +565,8 @@ Style3D =
 		pen.SetColor(0.75,0.75,0,0.5);
 		pen.DrawArc(0,0,w,h,angle-(steps/2.0), angle+(steps/2.0), true);
 		
-		pen.SetColor(1,1,1,1);
+				
+		pen.SetColor(0,0,0,1);
 		pen.WriteBoxed(Skin.current.ClockFont, 0,0,w,h,Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, d.toLocaleTimeString());
 		
 	}

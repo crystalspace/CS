@@ -95,4 +95,4 @@ w.AddChild(sb2);
 sb2.Invalidate();
 
 test_clock = Clock();
-test_clock.MoveTo(700,0);
+test_clock.MoveTo(600,0);
