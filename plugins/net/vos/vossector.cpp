@@ -47,17 +47,18 @@ SCF_IMPLEMENT_IBASE_END
 /// Set ambient lighting task ///
 class SetAmbientTask : public Task
 {
+  csColor color;
 public:
   csVosA3DL* vosa3dl;
   csRef<csVosSector> sector;
 
-  SetAmbientTask(csVosA3DL* va, csVosSector* vs);
+  SetAmbientTask(csVosA3DL* va, csVosSector* vs, csColor c);
   virtual ~SetAmbientTask() { }
   virtual void doTask();
 };
 
-SetAmbientTask::SetAmbientTask(csVosA3DL* va, csVosSector* vs)
-  : vosa3dl(va), sector(vs)
+SetAmbientTask::SetAmbientTask(csVosA3DL* va, csVosSector* vs, csColor c)
+  : color(c), vosa3dl(va), sector(vs)
 {
 }
 
@@ -65,7 +66,10 @@ void SetAmbientTask::doTask()
 {
   iObjectRegistry *objreg = vosa3dl->GetObjectRegistry();
   csRef<iEngine> engine = CS_QUERY_REGISTRY(objreg, iEngine);
-  engine->SetAmbientLight(csColor(.2, .2, .2));
+  engine->SetAmbientLight(color);
+  // XXX bug must relight static Things. simply calling
+  // vosa3dl->incrementRelightCounter() does nothing. Do we
+  // need to add a RilghtTask to the main thread task list? 
 }
 
 /// Sets CS progress meter ///
@@ -332,6 +336,8 @@ void LoadSectorTask::doTask()
   LOG("csVosSector", 2, "Starting search");
 
 
+  // TODO: augment sector rule to also listen to properties with cname
+  // begininnig with a3dl.  ALso allow application to add rules?
   rs->search(sector->GetVobject(), "sector", 0,
                        "rule sector\n"
                        "do acquire and parent-listen and children-listen to this object\n"
@@ -440,8 +446,10 @@ void csVosSector::notifyChildInserted (VobjectEvent &event)
   LOG("csVosSector", 3, "notifyChildInserted");
   try
   {
-    if (event.getContextualName() == "a3dl:gravity"
-        || event.getContextualName() == "a3dl:collision-detection")
+    if (   event.getContextualName() == "a3dl:gravity"
+        || event.getContextualName() == "a3dl:collision-detection"
+        || event.getContextualName() == "a3dl:ambient-light"
+       )
     {
       vRef<Property> p = meta_cast<Property> (event.getChild());
       if(p.isValid())
@@ -576,6 +584,12 @@ void csVosSector::notifyPropertyChange(const VOS::PropertyEvent &event)
       {
         collisionDetection = sectorvobj->getCollisionDetection();
         setActor = true;
+      }
+      else if(pcr->getContextualName() == "a3dl:ambient-light")
+      {
+          float r, g, b;
+          sectorvobj->getAmbientLightColor(r, g, b);
+          vosa3dl->mainThreadTasks.push(new SetAmbientTask(vosa3dl, this, csColor(r, g, b)));
       }
 
       if(setActor)
