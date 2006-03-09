@@ -318,8 +318,7 @@ void csBulletRigidBody::ResetShape ()
 {
   if (pc->GetCollisionShape ()->GetShapeType () != EMPTY_SHAPE_PROXYTYPE)
   {
-    /* @@@ FIXME
-    BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->m_broadphaseHandle;
+    BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->GetRigidBody ()->m_broadphaseHandle;
     bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
     ds->GetBulletSys ()->GetBroadphase()->CleanProxyFromPairs(bpproxy);
 
@@ -327,7 +326,6 @@ void csBulletRigidBody::ResetShape ()
     pc->GetRigidBody()->GetCollisionShape()->CalculateLocalInertia(mass,newinertia);
     pc->GetRigidBody()->setMassProps(mass,newinertia);
     pc->GetRigidBody()->updateInertiaTensor();
-    */
   }
 }
 
@@ -678,8 +676,8 @@ csBulletCollider::~csBulletCollider ()
 }
 void csBulletCollider::ResetShape ()
 {
-  /* @@@ FIXME
-  BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->m_broadphaseHandle;
+
+  BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->GetRigidBody ()->m_broadphaseHandle;
   bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
   ds->GetBulletSys ()->GetBroadphase()->CleanProxyFromPairs(bpproxy);
 
@@ -687,7 +685,6 @@ void csBulletCollider::ResetShape ()
   pc->GetRigidBody()->GetCollisionShape()->CalculateLocalInertia(0,newinertia);
   pc->GetRigidBody()->setMassProps(0,newinertia);
   pc->GetRigidBody()->updateInertiaTensor();
-  */
 }
 
 bool csBulletCollider::CreateSphereGeometry (const csSphere& sphere)
