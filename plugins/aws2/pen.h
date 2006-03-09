@@ -22,9 +22,7 @@
 #include "cstool/pen.h"
 #include "csutil/memfile.h"
 
-extern "C" {
-#include "js/jsapi.h"
-}
+#include "javascript.h"
 
 /** @file Defines the pen object
  * 

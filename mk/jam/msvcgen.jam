@@ -1327,14 +1327,25 @@ rule _ExternalLibsHelperMsvc
   local rulename = $(3) ;
   local attrib = $(4) ;
 
-  if $($(lib).$(attrib).DEBUG)
+  if $($(lib).$(attrib).DEBUG.$(MSVC_VERSION))
   {
-    $(rulename) $(target) : $($(lib).$(attrib)) : release ;
+    $(rulename) $(target) : $($(lib).$(attrib).DEBUG.$(MSVC_VERSION)) : debug ;
+  }
+  else if $($(lib).$(attrib).DEBUG)
+  {
     $(rulename) $(target) : $($(lib).$(attrib).DEBUG) : debug ;
   }
   else
   {
-    $(rulename) $(target) : $($(lib).$(attrib)) ;
+    $(rulename) $(target) : $($(lib).$(attrib)) : debug ;
+  }
+  if $($(lib).$(attrib).$(MSVC_VERSION))
+  {
+    $(rulename) $(target) : $($(lib).$(attrib).$(MSVC_VERSION)) : release ;
+  }
+  else
+  {
+    $(rulename) $(target) : $($(lib).$(attrib)) : release ;
   }
 }
 

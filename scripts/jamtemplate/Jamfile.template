@@ -33,6 +33,7 @@ Help distclean : "Remove built targets and configuration" ;
 Help maintainerclean :
     "Remove built targets, configuration, and generated files." ;
 
+MsvcGenSubDir TOP msvc : common ;
 MsvcGenSubDir TOP msvc 7 : 7 ;
 MsvcGenSubDir TOP msvc 71 : 71 ;
 MsvcGenSubDir TOP msvc 8 : 8 ;
@@ -93,7 +94,8 @@ if $(CEL.DESIRED) = yes
 #MsvcCFlags : "/I \"my\\debuginc\\path\"" : debug ;
 #MsvcLFlags : "/libpath:\"my\\lib\\path\"" : release ;
 #MsvcLFlags : "/libpath:\"my\\debuglib\\path\"" : debug ;
-#MsvcGenConfig MSVC.LIBRARY : supercool.lib ;
-#MsvcGenConfig MSVC.LIBRARY_DEBUG : supercooldebug.lib ;
+#MsvcGenConfig SUPERCOOL.AVAILABLE : yes ;
+#MsvcGenConfig SUPERCOOL.LIBS : supercool.lib ;
+#MsvcGenConfig SUPERCOOL.LIBS.DEBUG : supercooldebug.lib ;
 
 SubInclude TOP src ;

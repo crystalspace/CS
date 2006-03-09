@@ -3,9 +3,7 @@
 #include "script_console.h"
 #include "csutil/csuctransform.h"
 
-extern "C" {
-#include "js/jsapi.h"
-}
+#include "javascript.h"
 
 static scriptConsole _con_;
 

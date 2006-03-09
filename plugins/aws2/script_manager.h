@@ -1,9 +1,7 @@
 #ifndef __AWS2_SCRIPT_H__
 #define __AWS2_SCRIPT_H__
 
-extern "C" {
-#include "js/jsapi.h"
-}
+#include "javascript.h"
 
 #include "ivaria/reporter.h"
 #include "iutil/vfs.h"

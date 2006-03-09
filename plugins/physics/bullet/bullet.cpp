@@ -30,7 +30,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <Dynamics/RigidBody.h>
 #include <CcdPhysics/CcdPhysicsEnvironment.h>
 #include <ConstraintSolver/SimpleConstraintSolver.h>
-#include <CollisionDispatch/ToiContactDispatcher.h>
 #include <BroadphaseCollision/SimpleBroadphase.h>
 #include <CollisionShapes/BoxShape.h>
 #include <CollisionShapes/EmptyShape.h>
@@ -40,6 +39,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <SimdTransform.h>
 #include <SimdMatrix3x3.h>
 #include <Dynamics/MassProps.h>
+#include <CollisionDispatch/CollisionDispatcher.h>
 
 #include "bullet.h"
 
@@ -108,7 +108,7 @@ csBulletDynamicsSystem::csBulletDynamicsSystem ()
 :  scfImplementationType (this)
 {
   ConstraintSolver* solver = new SimpleConstraintSolver;
-  ToiContactDispatcher* dispatcher = new	ToiContactDispatcher(solver);
+  CollisionDispatcher* dispatcher = new CollisionDispatcher ();
   BroadphaseInterface* broadphase = new SimpleBroadphase();
 
   bullet_sys = new CcdPhysicsEnvironment(dispatcher,broadphase);
@@ -267,7 +267,6 @@ csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynsys)
 
   ccdObjectCi.m_collisionShape = new EmptyShape ();
   ccdObjectCi.m_collisionShape->SetMargin (1);
-  ccdObjectCi.m_broadphaseHandle = 0;
   ccdObjectCi.m_gravity = SimdVector3(0,0,0);
   ccdObjectCi.m_localInertiaTensor = SimdVector3(0,0,0);
   mass = ccdObjectCi.m_mass = 1;
@@ -319,6 +318,7 @@ void csBulletRigidBody::ResetShape ()
 {
   if (pc->GetCollisionShape ()->GetShapeType () != EMPTY_SHAPE_PROXYTYPE)
   {
+    /* @@@ FIXME
     BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->m_broadphaseHandle;
     bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
     ds->GetBulletSys ()->GetBroadphase()->CleanProxyFromPairs(bpproxy);
@@ -327,6 +327,7 @@ void csBulletRigidBody::ResetShape ()
     pc->GetRigidBody()->GetCollisionShape()->CalculateLocalInertia(mass,newinertia);
     pc->GetRigidBody()->setMassProps(mass,newinertia);
     pc->GetRigidBody()->updateInertiaTensor();
+    */
   }
 }
 
@@ -662,7 +663,6 @@ csBulletCollider::csBulletCollider (csBulletDynamicsSystem* dynsys)
 
   ccdObjectCi.m_collisionShape = new EmptyShape ();
   ccdObjectCi.m_collisionShape->SetMargin (1.f);
-  ccdObjectCi.m_broadphaseHandle = 0;
   ccdObjectCi.m_gravity = SimdVector3(0,0,0);
   ccdObjectCi.m_localInertiaTensor = SimdVector3(0,0,0);
   ccdObjectCi.m_mass = 0; //collider need 0 mass
@@ -678,6 +678,7 @@ csBulletCollider::~csBulletCollider ()
 }
 void csBulletCollider::ResetShape ()
 {
+  /* @@@ FIXME
   BroadphaseProxy* bpproxy = (BroadphaseProxy*)pc->m_broadphaseHandle;
   bpproxy->SetClientObjectType(pc->GetRigidBody()->GetCollisionShape()->GetShapeType());
   ds->GetBulletSys ()->GetBroadphase()->CleanProxyFromPairs(bpproxy);
@@ -686,6 +687,7 @@ void csBulletCollider::ResetShape ()
   pc->GetRigidBody()->GetCollisionShape()->CalculateLocalInertia(0,newinertia);
   pc->GetRigidBody()->setMassProps(0,newinertia);
   pc->GetRigidBody()->updateInertiaTensor();
+  */
 }
 
 bool csBulletCollider::CreateSphereGeometry (const csSphere& sphere)
