@@ -18,6 +18,8 @@ chronological order.
 	      dependency now.
 	    - Fixed the bullet plugin to compile.
 	- Piotr Obrzut did fixes after update to newer bullet version
+	- Christopher added SetPenWidth to csPen, and also changed the
+	stepping metric to be a simple constant of two degrees.
 8-Mar-2006
 	- Reed make the VOS/A3DL plugin actually set the ambient light color
 	  from the a3dl:ambient-light property, rather than a constant color :)

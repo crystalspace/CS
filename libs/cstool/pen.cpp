@@ -307,9 +307,8 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
   float center_y = y1+(height/2);
 
   float y_round = (height*roundness)*0.5;
-  float x_round = (width*roundness)*0.5;
-  float   steps = roundness * 12;
-  float   delta = (PI/4.0)/steps;
+  float x_round = (width*roundness)*0.5;  
+  float delta = 0.0384; 
 
   Start(fill);
 
@@ -383,15 +382,10 @@ void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float
   float center_x = x1+(x_radius);
   float center_y = y1+(y_radius);
   
-  // This is a totally made-up metric.  The idea is to make the circle or arc smoother as it gets larger by increasing the number of steps to take.  
-  float steps = (width*height) * 0.01;
-
-  // Make sure that the number of steps we take is never below 1. (This will cause an inversion and the number of steps we take will grow vastly.)
-  while(steps<1) steps*=10;
-
-  float delta = (end_angle-start_angle) / steps;
+  // Set the delta to be two degrees.  
+  float delta = 0.0384; 
   float angle;
-
+    
   Start(fill);
   
   if (fill) AddVertex(center_x, center_y);
