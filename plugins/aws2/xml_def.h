@@ -23,9 +23,7 @@
 #include "csutil/xmltiny.h"
 #include "csutil/scfstr.h"
 
-extern "C" {
-#include "js/jsapi.h"
-};
+#include "javascript.h"
 
 namespace aws2
 {
