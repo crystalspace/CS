@@ -493,8 +493,9 @@ Style3D =
 		var angle, steps=Math.PI/6.0;
 		var w = this.width, h = this.height;
 		var cx = w/2, cy = h/2;
-		var r=w/2;
+		var r=w/2, num=12;
 		var d = new Date();
+		
 		
 		pen.Clear();
 		
@@ -502,14 +503,18 @@ Style3D =
 		pen.DrawArc(0,0,w,h,0,Math.PI*2.1,true);
 		
 		pen.SetColor(1,1,1,1);
-		for(angle=0.0; angle<Math.PI*2.0; angle+=steps)
+		pen.DrawArc(0,0,w,h,0,Math.PI*2.1,false);
+		
+		pen.SetColor(1,1,1,1);
+		for(angle=Math.PI*1.5; num>0; angle-=steps, --num)
 		{
 			var x = (Math.cos(angle)*r),
 				y = (Math.sin(angle)*r),
-				x2 = (Math.cos(angle)*(r-5)),
-				y2 = (Math.sin(angle)*(r-5));
+				x2 = (Math.cos(angle)*(r-10)),
+				y2 = (Math.sin(angle)*(r-10));
 			
-			pen.DrawLine(cx+x,cy+y,cx+x2,cy+y2);
+			//pen.DrawLine(cx+x,cy+y,cx+x2,cy+y2);
+			pen.WriteBoxed(Skin.current.ClockFont, cx+x2-5, cy+y2-5, cx+x2+5, cy+y2+5, Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, num); 
 		}		
 		
 		
@@ -531,7 +536,7 @@ Style3D =
 		pen.DrawArc(0,0,w,h,angle-(steps/2.0), angle+(steps/2.0), true);
 		
 		pen.SetColor(1,1,1,1);
-		pen.WriteBoxed(Skin.current.Font, 0,0,w,h,Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, d.toLocaleTimeString());
+		pen.WriteBoxed(Skin.current.ClockFont, 0,0,w,h,Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, d.toLocaleTimeString());
 		
 	}
 	

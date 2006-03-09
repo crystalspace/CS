@@ -38,6 +38,8 @@ skin_NormalWindows =
     WindowMin   : { w:20, h:20 },
   	WindowZoom  : { w:20, h:20 },
   	WindowClose : { w:20, h:20 },  	
+  	
+  	ClockFont   : new Font("VeraSerif", 10),
     
     // Any of the following can be either images, or functions.
     // If a function is specified, it will be called to draw the item.
