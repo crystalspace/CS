@@ -76,7 +76,9 @@ namespace aws
   	  {
 	 	if (buf) delete buf;
 	 	buf = new csMemFile();
-	 	buf->SetPos(0);	 
+	 	buf->SetPos(0);	
+	 	
+	 	SetPenWidth(1.0); 
   	  }
   	 
   	  /** Draws the cached contents of this buffer into the pen. */
@@ -96,6 +98,11 @@ namespace aws
 	   * Swaps the current color and the alternate color. 
 	   */
 	  virtual void SwapColors();
+	  
+	  /**
+   	   * Sets the width of the pen for line drawing. 
+   	   */
+  	  virtual void SetPenWidth(float width);
 	
 	  /**    
 	   * Clears the current transform, resets to identity.

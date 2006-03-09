@@ -49,7 +49,7 @@ Clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {	
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
-	if (po) po->Clear();		
+	if (po) { po->Clear(); }
 		
 	return JS_TRUE;
 }
@@ -96,6 +96,21 @@ SwapColors(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
 	if (po) po->SwapColors();		
+		
+	return JS_TRUE;
+}
+
+/** @brief Sets width of the pen. */
+static JSBool
+SetWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{			
+	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
+		
+	jsdouble width=0.0;
+				
+	JS_ValueToNumber(cx,  argv[0], &width);
+		
+	if (po) po->SetPenWidth(width);	
 		
 	return JS_TRUE;
 }
@@ -514,6 +529,7 @@ static JSFunctionSpec pen_methods[] = {
 	{"Clear",		Clear,		0, 0, 0},
 	{"SetColor",	SetColor,	4, 0, 0},
 	{"SwapColors",  SwapColors, 0, 0, 0}, 
+	{"SetWidth",    SetWidth,   1, 0, 0}, 
 	
 	{"PushTransform",  PushTransform,  0, 0, 0}, 
 	{"PopTransform",   PopTransform,   0, 0, 0}, 
@@ -625,7 +641,7 @@ bool pen::GetProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
    return true;
 }
 
-enum { PEN_OP_NOP = 0, PEN_OP_SETCOLOR, PEN_OP_SWAPCOLORS, PEN_OP_CLEARTRANSFORM, PEN_OP_PUSHTRANSFORM, PEN_OP_POPTRANSFORM,
+enum { PEN_OP_NOP = 0, PEN_OP_SETCOLOR, PEN_OP_SWAPCOLORS, PEN_OP_SETWIDTH, PEN_OP_CLEARTRANSFORM, PEN_OP_PUSHTRANSFORM, PEN_OP_POPTRANSFORM,
        PEN_OP_SETORIGIN, PEN_OP_TRANSLATE, PEN_OP_ROTATE, PEN_OP_DRAWLINE, PEN_OP_DRAWPOINT,
        PEN_OP_DRAWRECT, PEN_OP_DRAWMITEREDRECT, PEN_OP_DRAWROUNDRECT,
        PEN_OP_DRAWARC, PEN_OP_DRAWTRIANGLE, PEN_OP_WRITE, PEN_OP_WRITEBOXED };
@@ -667,6 +683,14 @@ void  pen::Draw(iPen *_pen)
 			case PEN_OP_SWAPCOLORS:
 				_pen->SwapColors();
 				break;
+				
+			case PEN_OP_SETWIDTH:
+			{
+				float w;
+				
+				buf->Read((char *)&w, sizeof(float));				
+				_pen->SetPenWidth(w);
+			}	break;
 				
 			case PEN_OP_CLEARTRANSFORM:
 				_pen->ClearTransform();
@@ -904,6 +928,18 @@ void pen::SwapColors()
 	
 	buf->Write((const char *)&op, sizeof(uint8));	
 }
+
+/**
+* Sets the width of the pen for line drawing. 
+*/
+void pen::SetPenWidth(float width)
+{
+	uint8 op = PEN_OP_SETWIDTH;
+		
+	buf->Write((const char *)&op, sizeof(uint8));	
+	buf->Write((const char *)&width, sizeof(float));	
+}
+
 
 /**    
 * Clears the current transform, resets to identity.
