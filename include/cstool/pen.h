@@ -309,7 +309,7 @@ public:
   /**
    * Draws a thick line.
    */
-  void DrawThickLine(uint x1, uint y2, uint x2, uint y2);
+  void DrawThickLine(uint x1, uint y1, uint x2, uint y2);
 
   /** 
    * Draws a single point. 

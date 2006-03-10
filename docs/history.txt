@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Mar-2006
+	- Dan changed M_PI to PI in pen.cpp since it msvc 7.0 didn't like
+	  it. Also fixed a typo in pen.h in a function declaration, and 
+	  fixed a truncation warning from double to float.
+
 9-Mar-2006
 	- Jorrit made the alsa sound driver default on linux because it
 	  is a LOT better.

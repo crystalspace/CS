@@ -88,7 +88,7 @@ void csPen::AddThickPoints(float fx1, float fy1, float fx2, float fy2)
 {		
 	float angle = atan2(fy2-fy1, fx2-fx1);
 	
-	float a1 = angle - (M_PI/2.0);	
+	float a1 = angle - (PI/2.0);	
 	float ca1 = cos(a1)*pen_width, sa1 = sin(a1)*pen_width;
 	bool first = line_points.Length()<2;
 	
@@ -308,7 +308,7 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
 
   float y_round = (height*roundness)*0.5;
   float x_round = (width*roundness)*0.5;  
-  float delta = 0.0384; 
+  float delta = 0.0384f; 
 
   Start(fill);
 
@@ -383,7 +383,7 @@ void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float
   float center_y = y1+(y_radius);
   
   // Set the delta to be two degrees.  
-  float delta = 0.0384; 
+  float delta = 0.0384f; 
   float angle;
     
   Start(fill);
