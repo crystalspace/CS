@@ -67,7 +67,7 @@ class awsManager2 : public iAws
   
   /** Set if the mouse is captured. */
   bool mouse_captured;
-
+  
 public:
   /////////////////////// Accessors //////////////////////////////
 
@@ -94,7 +94,7 @@ public:
   
   /** Get the timer. */
   csRef<iEventTimer> GetTimer() { return timer; }
- 
+     
 public:
   //////////////////////// Definition Files ////////////////////////
 

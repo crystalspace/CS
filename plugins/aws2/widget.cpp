@@ -143,8 +143,7 @@ Move(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	JS_ValueToInt32(cx,  argv[0], &x);
 	JS_ValueToInt32(cx,  argv[1], &y);
 	
-	wo->Bounds().Move(x, y);
-	wo->AdjustDocked();
+	wo->ReflectMove(x,y);
 	
 	return JS_TRUE;
 }
@@ -162,8 +161,7 @@ MoveTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	JS_ValueToInt32(cx,  argv[0], &x);
 	JS_ValueToInt32(cx,  argv[1], &y);
 	
-	wo->Bounds().SetPos(x, y);
-	wo->AdjustDocked();
+	wo->ReflectMove(x - wo->Bounds().xmin, y - wo->Bounds().ymin);
 	
 	return JS_TRUE;
 }
@@ -181,12 +179,7 @@ Resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	JS_ValueToInt32(cx,  argv[0], &w);
 	JS_ValueToInt32(cx,  argv[1], &h);
 	
-	wo->Bounds().xmax+=w;
-	wo->Bounds().ymax+=h;
-	
-	wo->AdjustDocked();
-	wo->AdjustChildrenForStickiness();
-	wo->Invalidate();
+	wo->ReflectResize(w,h);
 	
 	return JS_TRUE;
 }
@@ -204,10 +197,7 @@ ResizeTo(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	JS_ValueToInt32(cx,  argv[0], &w);
 	JS_ValueToInt32(cx,  argv[1], &h);
 	
-	wo->Bounds().SetSize(w, h);
-	wo->AdjustDocked();
-	wo->AdjustChildrenForStickiness();
-	wo->Invalidate();
+	wo->ReflectResize(w - wo->Bounds().Width(), h - wo->Bounds().Height());	
 		
 	return JS_TRUE;
 }
@@ -551,8 +541,8 @@ widget::Draw(iPen *output_pen)
 		// Prepare for the drawing.
 		fr.Prepare(output_pen);		
 		
-		output_pen->SetColor(1,1,1,0.25);
-		output_pen->DrawRect(0,0,Bounds().Width(),Bounds().Height());
+		//output_pen->SetColor(1,1,1,0.25);
+		//output_pen->DrawRect(0,0,Bounds().Width(),Bounds().Height());
 		//msg.Format("(%d,%d,%d,%d)", Bounds().xmin, Bounds().ymin, Bounds().Width(), Bounds().Height());
 		//output_pen->Write(0,-10, msg.GetData());
 		

@@ -72,10 +72,16 @@ namespace aws
     
     /** The list of <i>sibling</i> widgets that
      * are docked to this widget.  Whenever a 
-     * sibling gets a move request, it updates 
+     * sibling gets a move or resize request, it updates 
      * all of the widgets in it's docked list.
-     * That way they end up moving together. */
+     * That way they end up moving/resizing together. */
     widget *docked[4];
+    
+    /** The list of <i>sibling</i> widgets that
+     * this widget is docked to.  If this widget
+     * receives a move or resize request, the resize or move will
+     * be reflected to the appropriate widget. */
+    widget *docked_to[4];
     
     /** A set of bits that tell us what sides of our parent
      * we want to stick to. */
@@ -110,6 +116,7 @@ namespace aws
   	 widget():wpen(0), parent(0), sticky_frame_flags(0), dirty(JS_TRUE) 
   	 {
 	 	memset(docked, 0, sizeof(docked)); 
+	 	memset(docked_to, 0, sizeof(docked_to)); 
 	 	memset(margins, 0, sizeof(margins));	 
 	 }  	 
   	 
@@ -166,11 +173,36 @@ namespace aws
   	 /** @brief Adds a docking widget to this widget. */
   	 void Dock(widget *w, int where)
   	 {
-	  	if (where>=0 && where<4)
-	  	{ 
-		  	docked[where]=w;	  	 
-	  	 	AdjustDocked(where);
-  	 	}	  	 		  	
+	  	 switch(where)
+	  	 {
+		  	 case W_DOCK_NORTH:
+		  	 	docked[W_DOCK_NORTH] = w;
+		  	 	w->docked_to[W_DOCK_SOUTH] = this;
+		  	 	AdjustDocked(W_DOCK_NORTH);
+		  	 	break;
+		  	 	
+		  	 case W_DOCK_SOUTH:
+		  	 	docked[W_DOCK_SOUTH] = w;
+		  	 	w->docked_to[W_DOCK_NORTH] = this;
+		  	 	AdjustDocked(W_DOCK_SOUTH);
+		  	 	break;
+		  	 	
+		  	 case W_DOCK_EAST:
+		  	 	docked[W_DOCK_EAST] = w;
+		  	 	w->docked_to[W_DOCK_WEST] = this;
+		  	 	AdjustDocked(W_DOCK_EAST);
+		  	 	break;
+		  	 	
+		  	 case W_DOCK_WEST:
+		  	 	docked[W_DOCK_WEST] = w;
+		  	 	w->docked_to[W_DOCK_EAST] = this;
+		  	 	AdjustDocked(W_DOCK_WEST);
+		  	 	break;
+		  	 	
+		  	 default:
+		  	 	return;
+	  	 };		  	 
+	  		  	 		  	
   	 }
   	 
   	 /** @brief Adjusts widgets docked to this widget. */
@@ -217,8 +249,58 @@ namespace aws
 		  			  	 
 	  	}
   	 }  
+  	   	
+  	 /** @brief Reflects the movement to the appropriate widget. */
+  	 void ReflectMove(int32 dx, int32 dy)
+  	 {
+	  	 for(int where=0; where<4; ++where)
+	  	 {
+		  	 if (docked_to[where]) 
+		  	 {
+			  	 docked_to[where]->ReflectMove(dx, dy);		  	 
+			  	 return;
+		  	 }
+	  	 }	 		 
+	  	 
+	  	 Bounds().Move(dx, dy);
+		 AdjustDocked();	  	 
+  	 }
   	 
-  	 
+  	 /** Reflects the resize to the appropriate widget. */
+  	 void ReflectResize(int32 dw, int32 dh)
+  	 {
+	  	if (dw!=0 && docked_to[W_DOCK_NORTH])
+	  	{
+		 	docked_to[W_DOCK_NORTH]->ReflectResize(dw, 0);
+		 	dw=0; 	
+	  	}
+	  	else if (dw!=0 && docked_to[W_DOCK_SOUTH])
+	  	{
+		 	docked_to[W_DOCK_SOUTH]->ReflectResize(dw, 0);
+		 	dw=0; 	
+	  	}
+	  	
+	  	if (dw!=0 && docked_to[W_DOCK_EAST])
+	  	{
+		 	docked_to[W_DOCK_EAST]->ReflectResize(0, dh);
+		 	dh=0; 	
+	  	}
+	  	else if (dw!=0 && docked_to[W_DOCK_WEST])
+	  	{
+		 	docked_to[W_DOCK_WEST]->ReflectResize(0, dh);
+		 	dh=0; 	
+	  	}	  
+	  	
+	  	if (dw!=0 || dh!=0)
+	    {
+		 Bounds().xmax+=dw;
+		 Bounds().ymax+=dh;
+	
+		 AdjustDocked();
+		 AdjustChildrenForStickiness();
+		 Invalidate();   
+	    }	  	  		
+  	 }
   	 
   	 /** @brief Adjusts all children when we've been resized. */
   	 void AdjustChildrenForStickiness()
