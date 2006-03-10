@@ -9,12 +9,13 @@ function Window(title)
 		
 	// Setup a titlebar
 	_widget.TitleBar = TitleBar(title);
-	_widget.TitleBar.Dock(this, Widget.DOCK_SOUTH);
+	_widget.TitleBar.Dock(_widget, Widget.DOCK_SOUTH);
 	
 	// Setup the statusbar
 	_widget.StatusBar = StatusBar();
 	_widget.Dock(_widget.StatusBar, Widget.DOCK_SOUTH);
-			
+	
+	_widget.onDraw = prefs.Style.Window;	
 	
 	return _widget;
 }

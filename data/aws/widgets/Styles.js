@@ -588,6 +588,18 @@ Style3D =
 			pen.WriteBoxed(prefs.Font, frame.OutsetAdjust,frame.OutsetAdjust,w-frame.OutsetAdjust,h-frame.OutsetAdjust,
 						   Pen.ALIGN_LEFT, Pen.ALIGN_CENTER, this.text);
 		}		
+	},
+	
+	Window : function(pen)
+	{
+		var w = this.width, h = this.height;
+				
+		var prefs = Skin.current;
+		var frame = Frames3D;
+		
+		pen.Clear();
+		
+		frame.Ridge(pen, 0,0,w,h);						
 	}
 	
 	

@@ -32,6 +32,8 @@ skin_NormalWindows =
     TitleBarRoundness	 : 0.05,
     TitleBarTextColor	 : new Color(1,1,1,1),
     
+    StatusBarHeight		 : 30,
+    
     // The draw member can be a function or a filename.
     // If a function is specified, it will be called to draw the item.
     
