@@ -93,3 +93,8 @@ win.StatusBar.text = "Test complete.";
 // Test a tool tip
 tt = ToolTip("ToolTip", "A tooltip is designed to show\nshort, useful information.");
 tt.SetFocusPoint(test_clock.xmin + (test_clock.width>>1), test_clock.ymax);
+
+// Test a checkbox
+chk = CheckBox("Enable some setting", Pen.ALIGN_LEFT);
+win.AddChild(chk);
+chk.MoveTo(5,5);

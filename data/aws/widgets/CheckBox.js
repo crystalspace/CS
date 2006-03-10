@@ -1,0 +1,61 @@
+/** CheckBox factory. */
+function CheckBox(text, align)
+{
+	var _widget = new Widget;
+	var prefs = Skin.current;
+	
+	// Give it a pen
+	_widget.SetPen(new Pen);
+			
+	// Setup the scroll bar
+	_widget._state=false;
+	_widget.over=false;
+			
+	// Invalidate and fire onChange when the value property is set.
+	_widget.__defineSetter__("state", function(v) { this._state = v; this.Invalidate(); if (this.onChange) this.onChange(this); });	
+	_widget.__defineGetter__("state", function() { return this._state; });	
+	
+	// Invalidate when the text changes.
+	_widget.__defineSetter__("text", function(v) { this._text = v; this.Invalidate();} );	
+	_widget.__defineGetter__("text", function() { return this._text; });	
+	
+	_widget.text = text;
+	_widget.align = align;
+	
+	// Set the size	
+	var dim = prefs.Font.GetDimensions(text);
+    _widget.Resize(prefs.CheckBox.w + 5 + dim.width, dim.height);
+			
+	// Set the drawing function to be whatever the current style dictates.
+	_widget.onDraw = Skin.current.Style.CheckBox;
+			
+	// If we get a mouse down, change the button's state.
+	_widget.onMouseDown = function(buttons)
+	{
+		this.state=~this.state;		
+		this._active=true;
+		this.CaptureMouse();		
+	}
+	
+	// If the mouse is up, change the state.
+	_widget.onMouseUp = function(buttons)
+	{		
+		this._active=false;	
+		this.ReleaseMouse();
+		this.Invalidate();		
+	}
+	
+	_widget.onMouseEnter = function()
+	{
+		_widget.over=true;
+		this.Invalidate();	
+	}
+	
+	_widget.onMouseExit = function()
+	{
+		_widget.over=false;
+		this.Invalidate();	
+	}
+		
+	return _widget;
+}

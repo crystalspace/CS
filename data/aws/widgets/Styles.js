@@ -754,6 +754,44 @@ Style3D =
 			
 			ty+=prefs.Font.GetTextHeight();
 		}		
+	},
+	
+	CheckBox : function(pen)
+	{
+		
+		var w  = this.width, h = this.height;
+						
+		var prefs = Skin.current;
+						
+		pen.Clear();
+		
+		if (this.over) pen.SetColor(prefs.CheckBox.OverColor);
+		else 		   pen.SetColor(prefs.TextBackColor);
+		pen.DrawRect(2,1,prefs.CheckBox.w-1, prefs.CheckBox.h-2, true);		
+		
+		if (!this._active)
+		{
+			pen.SetColor(prefs.HighlightColor);
+			pen.SwapColors();
+			pen.SetColor(prefs.ShadowColor);
+			
+			pen.DrawRect(1,1,prefs.CheckBox.w-1, prefs.CheckBox.h-1, false, true);
+				
+			pen.SetColor(0,0,0,1);
+			pen.DrawRect(0,0,prefs.CheckBox.w, prefs.CheckBox.h, false);					
+		}
+
+		pen.SetColor(0,0,0,1);
+		
+		if (this.state)
+		{			
+			pen.SetWidth(2.0);
+			
+			pen.DrawLine(4, 4, prefs.CheckBox.w-4, prefs.CheckBox.h-4); 
+			pen.DrawLine(prefs.CheckBox.w-4, 4, 4, prefs.CheckBox.h-4);
+		}
+						
+		pen.WriteBoxed(prefs.Font, prefs.CheckBox.w+5, 0, w, h, Pen.ALIGN_LEFT, Pen.ALIGN_CENTER, this.text);
 	}	
 	
 	

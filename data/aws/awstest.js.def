@@ -44,30 +44,10 @@ skin_NormalWindows =
   	WindowClose : { w:20, h:20 },  	
   	
   	ClockFont   : new Font("VeraSerif", 10),
-    
-    // Any of the following can be either images, or functions.
-    // If a function is specified, it will be called to draw the item.
-    
-    CheckBoxUp  : "/aws/chkup.png",
-  	CheckBoxDn  : "/aws/chkdn.png",
-    CheckBoxOn  : "/aws/chkon.png",
-	CheckBoxOff : "/aws/chkoff.png",
-	RadioButtonUp  : "/aws/radup.png",
-	RadioButtonDn  : "/aws/raddn.png",
-	RadioButtonOn  : "/aws/radon.png",
-	RadioButtonOff : "/aws/radoff.png",
-	TreeCollapsed  : "/aws/treecol.png",
-	TreeExpanded   : "/aws/treeexp.png",
-	TreeVertLine   : "/aws/treevl.png",
-	TreeHorzLine   : "/aws/treehl.png",
-	TreeChkUnmarked : "/aws/treechke.png",
-	TreeChkMarked   : "/aws/treechkf.png",
-	TreeGrpUnmarked : "/aws/treegrpe.png",
-	TreeGrpMarked   : "/aws/treegrpf.png",
-	ScrollBarUp : "/aws/sbup.png",
-	ScrollBarDn : "/aws/sbdn.png",
-	ScrollBarRt : "/aws/sbrt.png",
-	ScrollBarLt : "/aws/sblt.png"
+  	
+  	CheckBox    : { w:15, h:15, OverColor:new Color(0.35,0.35,0.35,0.75) },
+  	RadioButton : { w:15, h:15 },
+        
 	
 };
   
