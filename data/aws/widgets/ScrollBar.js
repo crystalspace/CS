@@ -47,6 +47,8 @@ function ScrollBar(orientation_vertical)
 				this.inc_button_down=true;  
 				this.Invalidate();  
 				this.CaptureMouse();
+				
+				++this.value;
 				return;
 		    }
 		
@@ -56,6 +58,8 @@ function ScrollBar(orientation_vertical)
 				this.dec_button_down=true;    
 				this.Invalidate();
 				this.CaptureMouse();
+				
+				--this.value;
 				return;
 		    }			
 		    

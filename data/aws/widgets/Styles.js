@@ -569,6 +569,25 @@ Style3D =
 		pen.SetColor(0,0,0,1);
 		pen.WriteBoxed(Skin.current.ClockFont, 0,0,w,h,Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, d.toLocaleTimeString());
 		
+	},
+	
+	StatusBar : function(pen)
+	{
+		var w = this.width, h = this.height;
+				
+		var prefs = Skin.current;
+		var frame = Frames3D;
+		
+		pen.Clear();
+		
+		frame.Outset(pen, 0,0,w,h);
+		
+		if (this.text!=null)
+		{
+			pen.SetColor(prefs.TextForeColor);
+			pen.WriteBoxed(prefs.Font, frame.OutsetAdjust,frame.OutsetAdjust,w-frame.OutsetAdjust,h-frame.OutsetAdjust,
+						   Pen.ALIGN_LEFT, Pen.ALIGN_CENTER, this.text);
+		}		
 	}
 	
 	
