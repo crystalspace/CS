@@ -91,5 +91,5 @@ win.ResizeTo(300,300);
 win.StatusBar.text = "Test complete.";
 
 // Test a tool tip
-tt = ToolTip("ToolTip", "A tooltip is designed to show\nshort, useful information.")
-tt.MoveTo(500,100);
+tt = ToolTip("ToolTip", "A tooltip is designed to show\nshort, useful information.");
+tt.SetFocusPoint(test_clock.xmin + (test_clock.width>>1), test_clock.ymax);

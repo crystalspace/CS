@@ -689,26 +689,31 @@ Style3D =
 				
 		pen.Clear();
 		
+		var start_y, arrow_x=this.fx;
+		
 		// If we are below the item we are highlighting...
-		var start_y = 10, arrow_x=30;
-		
-		pen.SetColor(prefs.TextBackColor);
-		pen.DrawRect(0,start_y, w, h, true);
-		pen.DrawTriangle(arrow_x, 0, arrow_x+10, start_y, arrow_x-10, start_y, true);
-		
-		pen.SetColor(prefs.ActiveTitleBarColor1);
-		pen.DrawRect(3,start_y+3, 8, h-3, true);
-				
-		pen.SetWidth(2);
-		pen.SetColor(prefs.TextForeColor);		
-		pen.DrawLine(0,start_y, arrow_x-10, start_y);
-		pen.DrawLine(arrow_x-10, start_y, arrow_x, 0);
-		pen.DrawLine(arrow_x, 0, arrow_x+10, start_y);
-		pen.DrawLine(arrow_x+10, start_y, w, start_y);
-		pen.DrawLine(w, start_y, w,h);
-		pen.DrawLine(w, h, 0,h);
-		pen.DrawLine(0,h,0,start_y);
-				
+		if (!this.over)
+		{		
+			start_y=10;
+			
+			pen.SetColor(prefs.TextBackColor);
+			pen.DrawRect(0,start_y, w, h, true);
+			pen.DrawTriangle(arrow_x, 0, arrow_x+10, start_y, arrow_x-10, start_y, true);
+			
+			pen.SetColor(prefs.ActiveTitleBarColor1);
+			pen.DrawRect(3,start_y+3, 8, h-3, true);
+					
+			pen.SetWidth(2);
+			pen.SetColor(prefs.TextForeColor);		
+			pen.DrawLine(0,start_y, arrow_x-10, start_y);
+			pen.DrawLine(arrow_x-10, start_y, arrow_x, 0);
+			pen.DrawLine(arrow_x, 0, arrow_x+10, start_y);
+			pen.DrawLine(arrow_x+10, start_y, w, start_y);
+			pen.DrawLine(w, start_y, w,h);
+			pen.DrawLine(w, h, 0,h);
+			pen.DrawLine(0,h,0,start_y);
+		}
+					
 		pen.Write(prefs.TitleFont, 10, start_y+5, this.title);
 		
 		// Setup for the information.

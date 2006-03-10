@@ -10,6 +10,13 @@ function ToolTip(title, text)
 	// Invalidate and fire onChange when the value property is set.
 	_widget.__defineSetter__("text", function(t) { this._text = t; this.AdjustSizeForText(); this.Invalidate(); if (this.onChange) this.onChange(this); });	
 	_widget.__defineGetter__("text", function() { return this._text; });			
+	
+	// Whether we are over the focus point, or under it.
+	_widget.over=false;
+	
+	// The place to point to.
+	_widget.fx = 30;
+	_widget.fy = 0;
 		
 	// Set the drawing function to be whatever the current style dictates.
 	_widget.onDraw = prefs.Style.ToolTip;
@@ -21,7 +28,36 @@ function ToolTip(title, text)
 	// to place itself.
 	_widget.SetFocusPoint = function(x,y)
 	{
+		// We want the arrow to point to x,y.  So we need to make sure that our 
+		// width and height aren't going to cause us to be offscreen.
+		
+		// We assume that our xmin and ymin properties represent screen coordinates,
+		// which they will so long as we aren't a child of anyone.
+		
+		this.MoveTo(x-30, y);
+		this.over=false;
+		
+		// First make sure we're not off screen already.
+		
+		if (this.xmax > Sys.GetWidth())
+			this.Move(Sys.GetWidth() - this.xmax, 0);
+			
+		if (this.xmin < 0)
+			this.Move(-this.xmin, 0);
+		
+		if (this.ymin < 0)
+			this.Move(0,  -this.ymin);
+			
+		if (this.ymax > Sys.GetHeight())
+		{
+			over=true;
+			this.Move(0, -this.height);	
+		}		
+		
 				
+		this.fx = x - this.xmin;
+		this.fy = y;
+		
 	}
 	
 	//Adjust's the size of the tooltip
@@ -44,7 +80,9 @@ function ToolTip(title, text)
 		this.title_size = Skin.current.TitleFont.GetDimensions(this.title);
 		th+=this.title_size.height;
 						
-		this.ResizeTo(mw+20, th+20);		
+		this.ResizeTo(mw+20, th+20);
+		
+		this.SetFocusPoint(this.fx, this.fy);		
 	}
 	
 	
