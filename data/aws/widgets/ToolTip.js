@@ -50,14 +50,15 @@ function ToolTip(title, text)
 			
 		if (this.ymax > Sys.GetHeight())
 		{
-			over=true;
-			this.Move(0, -this.height);	
+			this.over=true;
+			this.MoveTo(this.xmin, y-this.height);	
 		}		
 		
 				
 		this.fx = x - this.xmin;
 		this.fy = y;
 		
+		this.Invalidate();
 	}
 	
 	//Adjust's the size of the tooltip

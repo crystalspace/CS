@@ -696,14 +696,17 @@ Style3D =
 		{		
 			start_y=10;
 			
+			// Fill
 			pen.SetColor(prefs.TextBackColor);
 			pen.DrawRect(0,start_y, w, h, true);
 			pen.DrawTriangle(arrow_x, 0, arrow_x+10, start_y, arrow_x-10, start_y, true);
 			
+			// Decoration
 			pen.SetColor(prefs.ActiveTitleBarColor1);
 			pen.DrawRect(3,start_y+3, 8, h-3, true);
 					
-			pen.SetWidth(2);
+			// Border
+			pen.SetWidth(1.5);
 			pen.SetColor(prefs.TextForeColor);		
 			pen.DrawLine(0,start_y, arrow_x-10, start_y);
 			pen.DrawLine(arrow_x-10, start_y, arrow_x, 0);
@@ -712,6 +715,32 @@ Style3D =
 			pen.DrawLine(w, start_y, w,h);
 			pen.DrawLine(w, h, 0,h);
 			pen.DrawLine(0,h,0,start_y);
+		}
+		else
+		{
+			start_y=h-10;
+				
+			// Fill
+			pen.SetColor(prefs.TextBackColor);
+			pen.DrawRect(0,0, w, start_y, true);
+			pen.DrawTriangle(arrow_x, h, arrow_x-10, start_y, arrow_x+10, start_y, true);
+			
+			// Decoration
+			pen.SetColor(prefs.ActiveTitleBarColor1);
+			pen.DrawRect(3, 3, 8, start_y-3, true);
+					
+			// Border
+			pen.SetWidth(1.5);
+			pen.SetColor(prefs.TextForeColor);		
+			pen.DrawLine(0,0, w, 0);
+			pen.DrawLine(w, 0, w, start_y);
+			pen.DrawLine(w, start_y, arrow_x+10, start_y);
+			pen.DrawLine(arrow_x+10, start_y, arrow_x, h);
+			pen.DrawLine(arrow_x, h, arrow_x-10,start_y);
+			pen.DrawLine(arrow_x-10,start_y, 0,start_y);
+			pen.DrawLine(0,start_y,0,0);
+			
+			start_y=0;
 		}
 					
 		pen.Write(prefs.TitleFont, 10, start_y+5, this.title);
