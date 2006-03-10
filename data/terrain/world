@@ -51,12 +51,22 @@
   <materials>
     <material name="ScatterSky">
       <color red="0" green="0" blue="0" /> 
+
+      <shadervar type='vector3' name="sky base color">0.0,0.1,0.2</shadervar>
+      <shadervar type='vector3' name="sky sun-glow color">0.9,0.3,0.01</shadervar>
+      <shadervar type='float' name="sky sun size">0.004</shadervar>
+
       <shader type="ambient">sky_scattering</shader>
     </material>
     <material name="Base">
       <texture>basemap</texture>
       <shadervar name="tex normal" type="texture">base_normalmap</shadervar>
-      <shadervar type='vector4' name="scatter color">0.50,0.38,0.28,0.02</shadervar>
+
+      <shadervar type='vector4' name="scatter sun color">0.90,0.10,0.10,0.01</shadervar>
+      <shadervar type='vector3' name="scatter color">0.06,0.05,0.04</shadervar>
+      <shadervar type='vector3' name="scatter ground glow">0.04,0.03,0.01</shadervar>
+      <shadervar type='vector3' name="scatter world color">0.7,0.3,0.30</shadervar>
+
       <shader type="ambient">splatting_scattering_base</shader>
     </material>
     <material name="Marble">
@@ -103,7 +113,7 @@
   <meshfact name="skydome">
     <plugin>genmeshFactory</plugin>
     <params>
-      <sphere rimvertices="8" reversed="true">
+      <sphere rimvertices="64" reversed="true">
 	<radius x="500000" y="500000" z="500000" />
       </sphere>
     </params>

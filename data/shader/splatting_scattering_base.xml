@@ -10,10 +10,10 @@
     <?if vars."scatter sun color".w &gt; 0 ?>
       <shadervar name="beta' 1" type="expression">
 	  <sexp>
-	    (make-vector 
-		(* 0.64 (elt4 "scatter sun color") (elt1 "scatter color"))
-		(* 0.64 (elt4 "scatter sun color") (elt2 "scatter color"))
-		(* 0.64 (elt4 "scatter sun color") (elt3 "scatter color"))
+(make-vector 
+(* 0.64 (elt4 "scatter sun color") (elt1 "scatter color")) 
+(* 0.64 (elt4 "scatter sun color") (elt2 "scatter color")) 
+(* 0.64 (elt4 "scatter sun color") (elt3 "scatter color")) 
 		0)
 	  </sexp>
       </shadervar> 
