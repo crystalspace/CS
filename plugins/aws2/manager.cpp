@@ -264,13 +264,13 @@ void awsManager2::Redraw()
   g2d->Write(default_font, 90, 90, g2d->FindRGB(128,128,128,128), -1, "AWS Redrawing");
   ScriptCon()->Redraw(g2d);
   
-  float angle;
-  
-  pen.SetColor(1,1,1,1);
-  for(angle=0; angle<M_PI*2.0; angle+=M_PI/8.0)
-  {
-  	pen.DrawThickLine(100,100,(uint)(100+(cos(angle)*100)),(uint)(100+(sin(angle)*100)));
-  }
+//   float angle;
+//   
+//   pen.SetColor(1,1,1,1);
+//   for(angle=0; angle<M_PI*2.0; angle+=M_PI/8.0)
+//   {
+//   	pen.DrawThickLine(100,100,(uint)(100+(cos(angle)*100)),(uint)(100+(sin(angle)*100)));
+//   }
 
   // Draw all widgets (this is a hack for testing.)
   for(size_t i=0; i<aws::widgets.Length(); ++i)
