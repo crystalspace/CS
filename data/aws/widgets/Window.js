@@ -15,6 +15,11 @@ function Window(title)
 	_widget.StatusBar = StatusBar();
 	_widget.Dock(_widget.StatusBar, Widget.DOCK_SOUTH);
 	
+	// Setup the resize knob
+	_widget.ResizeKnob = ResizeKnob();
+	_widget.AddChild(_widget.ResizeKnob);
+	_widget.ResizeKnob.target = _widget;
+		
 	_widget.onDraw = prefs.Style.Window;	
 	
 	return _widget;

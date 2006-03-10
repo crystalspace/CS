@@ -70,14 +70,16 @@ tb.Invalidate();
 stb = StatusBar();
 w.Dock(stb, Widget.DOCK_SOUTH);
 
+// Test resize knob
+rk = ResizeKnob();
+w.AddChild(rk);
+
 // Test scrollbar
 sb1 = ScrollBar(true);
 w.AddChild(sb1);
-sb1.Invalidate();
 
 sb2 = ScrollBar(false);
 w.AddChild(sb2);
-sb2.Invalidate();
 
 test_clock = Clock();
 test_clock.MoveTo(580,20);

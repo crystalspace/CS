@@ -116,6 +116,25 @@ Frames3D =
 				// Bump
 				pen.DrawRect(x+1,y+1, x2-1,y2-1, false, true);
 			},		
+			
+	FlatAdjust : 2,		
+	Flat : function(pen, x, y, x2, y2)
+			{				
+				var prefs = Skin.current;
+				
+				// Back of panel
+				pen.SetColor(prefs.FillColor);
+				pen.DrawRect(x+2,y+1, x2-1,y2-2, true);
+				
+				// Darken back a little
+				pen.SetColor(0,0,0,0.25);
+				pen.DrawRect(x+2,y+1, x2-1,y2-2, true);
+				
+				// Black border
+				pen.SetColor(0,0,0,1);
+				pen.DrawRect(x,y, x2,y2, false);				
+			},
+	
 }
 
 // At small sizes, these don't look good.  Widths and heights 
@@ -230,7 +249,25 @@ MiteredFrames3D =
 						
 				// Bump
 				pen.DrawMiteredRect(x+1,y+1, x2-1,y2-1, 0.10,false, true);
-			},		
+			},	
+			
+	FlatAdjust : 2,		
+	Flat : function(pen, x, y, x2, y2)
+			{				
+				var prefs = Skin.current;
+				
+				// Back of panel
+				pen.SetColor(prefs.FillColor);
+				pen.DrawMiteredRect(x+2,y+2, x2-1,y2-1, 0.10,true);
+				
+				// Darken back a little
+				pen.SetColor(0,0,0,0.25);
+				pen.DrawMiteredRect(x+2,y+2, x2-1,y2-1, 0.10,true);
+				
+				// Black border
+				pen.SetColor(0,0,0,1);
+				pen.DrawMiteredRect(x,y, x2,y2, 0.10,false);				
+			},	
 }
 
 
@@ -588,6 +625,46 @@ Style3D =
 			pen.WriteBoxed(prefs.Font, frame.OutsetAdjust,frame.OutsetAdjust,w-frame.OutsetAdjust,h-frame.OutsetAdjust,
 						   Pen.ALIGN_LEFT, Pen.ALIGN_CENTER, this.text);
 		}		
+	},
+	
+	ResizeKnob : function(pen)
+	{
+		var w = this.width, h = this.height;
+				
+		var prefs = Skin.current;
+		var frame = Frames3D;
+		var adjust, offset;
+		var drawfr1, drawfr2;
+		
+		if (this.is_dragging)
+		{
+		  offset = 2;
+		  adjust = frame.InsetAdjust+2;		
+		  drawfr1 = frame.Inset;
+		  drawfr2 = frame.Outset;			
+		}
+		else
+		{
+		  offset = 0;
+		  adjust = frame.ValleyAdjust;		
+		  drawfr1 = frame.Valley;
+		  drawfr2 = frame.Outset;
+	 	}
+	 	
+		pen.Clear();
+		
+		drawfr1(pen, 0,0,w,h);
+		
+		var x,y;
+		
+		for(x=adjust; x<w-adjust; x+=8)
+		{
+			for(y=adjust; y<h-adjust; y+=8)
+			{
+				drawfr2(pen, x+offset,y+offset,x+6+offset,y+6+offset);
+			}
+		}				
+		
 	},
 	
 	Window : function(pen)
