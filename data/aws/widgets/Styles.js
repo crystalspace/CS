@@ -498,22 +498,23 @@ Style3D =
 		
 		
 		pen.Clear();
+		pen.SetWidth(2.5);
 		pen.SetColor(0,0,0,1);
-		pen.SwapColors();		
-		pen.SetColor(1,1,1,1);				
-		pen.DrawArc(0,0,w,h,0,Math.PI*2.1,true);
-		pen.SwapColors();
 		pen.DrawArc(0,0,w,h,0,Math.PI*2.1,false);
-		pen.SwapColors();
-		pen.SetColor(0.5,0.5,0.5,1);				
-		pen.DrawArc(5,5,w-5,h-5,0,Math.PI*2.1,true);		
-		pen.SwapColors();
-		pen.DrawArc(5,5,w-5,h-5,0,Math.PI*2.1,false);
-		pen.SwapColors();
+		
+		pen.SwapColors();		
 		pen.SetColor(1,1,1,1);
-		pen.DrawArc(15,15,w-15,h-15,0,Math.PI*2.1,true);
+		pen.SetWidth(5);						
+		pen.DrawArc(2,2,w-2,h-2,0,Math.PI*2.1,false);				
+		pen.SetColor(0.5,0.5,0.5,1);				
+		pen.DrawArc(5,5,w-5,h-5,0,Math.PI*2.1,false);				
+		pen.SetColor(1,1,1,1);
+		pen.DrawArc(10,10,w-10,h-10,0,Math.PI*2.1,true);
+		pen.SetWidth(2);
 		pen.SwapColors();
-		pen.DrawArc(17,17,w-17,h-17,0,Math.PI*2.1,false);
+		pen.DrawArc(15,15,w-15,h-15,0,Math.PI*2.1,false);
+		
+		pen.SetWidth(1.0);
 		
 		for(angle=Math.PI*1.5; num>0; angle-=steps, --num)
 		{
@@ -530,7 +531,6 @@ Style3D =
 			pen.DrawLine(cx+lx1,cy+ly1,cx+lx2,cy+ly2);
 			pen.WriteBoxed(Skin.current.ClockFont, cx+x2-5, cy+y2-5, cx+x2+5, cy+y2+5, Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, num); 
 		}
-		
 		
 		steps=Math.PI/30.0;
 		for(angle=0; angle<Math.PI*2.0; angle+=steps)
