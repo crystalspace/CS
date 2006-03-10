@@ -381,7 +381,7 @@ Style3D =
 		pen.DrawRect(cw+5,5, w-tbw, h-5, false, true);	
 		
 		pen.SetColor(prefs.TitleBarTextColor);
-		pen.WriteBoxed(prefs.Font, cw+10, 5, w-tbw-5, h-5, Pen.ALIGN_LEFT, Pen.ALIGN_CENTER, this.text);	
+		pen.WriteBoxed(prefs.TitleFont, cw+10, 5, w-tbw-5, h-5, Pen.ALIGN_LEFT, Pen.ALIGN_CENTER, this.text);	
 		
 	},
 	
@@ -634,21 +634,19 @@ Style3D =
 		var prefs = Skin.current;
 		var frame = Frames3D;
 		var adjust, offset;
-		var drawfr1, drawfr2;
+		var drawfr1;
 		
 		if (this.is_dragging)
 		{
-		  offset = 2;
-		  adjust = frame.InsetAdjust+2;		
-		  drawfr1 = frame.Inset;
-		  drawfr2 = frame.Outset;			
+		  offset = 1;
+		  adjust = frame.InsetAdjust+3;		
+		  drawfr1 = frame.Inset;		  
 		}
 		else
 		{
 		  offset = 0;
 		  adjust = frame.ValleyAdjust;		
-		  drawfr1 = frame.Valley;
-		  drawfr2 = frame.Outset;
+		  drawfr1 = frame.Valley;		  
 	 	}
 	 	
 		pen.Clear();
@@ -657,11 +655,15 @@ Style3D =
 		
 		var x,y;
 		
-		for(x=adjust; x<w-adjust; x+=8)
+		pen.SetColor(0.35,0.35,0.35,1);
+		pen.SwapColors();
+		pen.SetColor(0.85,0.85,0.85,1);
+		
+		for(x=adjust; x<w-adjust; x+=3)
 		{
-			for(y=adjust; y<h-adjust; y+=8)
-			{
-				drawfr2(pen, x+offset,y+offset,x+6+offset,y+6+offset);
+			for(y=adjust; y<h-adjust; y+=3)
+			{								
+				pen.DrawRect(x+offset,y+offset,x+1+offset,y+1+offset, false, true);
 			}
 		}				
 		
@@ -677,8 +679,48 @@ Style3D =
 		pen.Clear();
 		
 		frame.Ridge(pen, 0,0,w,h);						
-	}
+	},
 	
+	ToolTip : function(pen)
+	{
+		var w  = this.width, h = this.height;
+						
+		var prefs = Skin.current;
+				
+		pen.Clear();
+		
+		// If we are below the item we are highlighting...
+		var start_y = 10, arrow_x=30;
+		
+		pen.SetColor(prefs.TextBackColor);
+		pen.DrawRect(0,start_y, w, h, true);
+		pen.DrawTriangle(arrow_x, 0, arrow_x+10, start_y, arrow_x-10, start_y, true);
+		
+		pen.SetColor(prefs.ActiveTitleBarColor1);
+		pen.DrawRect(3,start_y+3, 8, h-3, true);
+				
+		pen.SetWidth(2);
+		pen.SetColor(prefs.TextForeColor);		
+		pen.DrawLine(0,start_y, arrow_x-10, start_y);
+		pen.DrawLine(arrow_x-10, start_y, arrow_x, 0);
+		pen.DrawLine(arrow_x, 0, arrow_x+10, start_y);
+		pen.DrawLine(arrow_x+10, start_y, w, start_y);
+		pen.DrawLine(w, start_y, w,h);
+		pen.DrawLine(w, h, 0,h);
+		pen.DrawLine(0,h,0,start_y);
+				
+		pen.Write(prefs.TitleFont, 10, start_y+5, this.title);
+		
+		// Setup for the information.
+		var ty=start_y+5+this.title_size.height;
+		
+		for (var line in this.info)
+		{						
+			pen.Write(prefs.Font, 15, ty+5, this.info[line]);
+			
+			ty+=prefs.Font.GetTextHeight();
+		}		
+	}	
 	
 	
 	

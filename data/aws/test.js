@@ -73,6 +73,7 @@ w.Dock(stb, Widget.DOCK_SOUTH);
 // Test resize knob
 rk = ResizeKnob();
 w.AddChild(rk);
+rk.target=w;
 
 // Test scrollbar
 sb1 = ScrollBar(true);
@@ -88,3 +89,7 @@ test_clock.MoveTo(580,20);
 win = Window("Test Window");
 win.ResizeTo(300,300);
 win.StatusBar.text = "Test complete.";
+
+// Test a tool tip
+tt = ToolTip("ToolTip", "A tooltip is designed to show\nshort, useful information.")
+tt.MoveTo(500,100);

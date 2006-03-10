@@ -8,6 +8,7 @@ Sys.Load("/aws/widgets/TitleBar.js");
 Sys.Load("/aws/widgets/StatusBar.js");
 Sys.Load("/aws/widgets/ScrollBar.js");
 Sys.Load("/aws/widgets/ResizeKnob.js");
+Sys.Load("/aws/widgets/ToolTip.js");
 Sys.Load("/aws/widgets/Button.js");
 Sys.Load("/aws/widgets/Clock.js");
 Sys.Load("/aws/widgets/Window.js");
