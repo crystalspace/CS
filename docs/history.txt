@@ -11,8 +11,8 @@ chronological order.
 	  it. Also fixed a typo in pen.h in a function declaration, and 
 	  fixed a truncation warning from double to float.
 	- Christopher added the parent property and Broadcast function 
-	  to Widgets, and the CheckBox, RadioButton, Window, and ToolTip
-	  widgets.
+	  to Widgets, and the CheckBox, RadioButton, Window, ResizeKnob,
+	  StatusBar, and ToolTip widgets.
 
 9-Mar-2006
 	- Jorrit made the alsa sound driver default on linux because it
