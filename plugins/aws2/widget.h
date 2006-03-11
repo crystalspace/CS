@@ -154,6 +154,11 @@ namespace aws
   	 /// Dispatches events fed to this widget.
   	 virtual bool HandleEvent (iEvent &);
   	 
+  	 /** Broadcasts an event (by triggering a given function) to all children 
+  	  * of this widget. */
+  	 void Broadcast(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);  
+  	 
+  	 
   	 /// Children ////
   	 
   	 /** @brief Adds a child widget into this widget. */

@@ -153,6 +153,24 @@ CreateTimer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	
 	return JS_TRUE;
 } 
+
+/** @brief Get the rendering buffer width. */
+static JSBool
+GetWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{			
+	*rval = INT_TO_JSVAL(AwsMgr()->G2D()->GetWidth());
+	
+	return JS_TRUE;
+} 
+
+/** @brief Get the rendering buffer height. */
+static JSBool
+GetHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{
+	*rval = INT_TO_JSVAL(AwsMgr()->G2D()->GetHeight());
+	
+	return JS_TRUE;
+}
  
 JSClass autom_class = {
     "Sys", 0,
@@ -171,6 +189,8 @@ static JSFunctionSpec autom_static_methods[] = {
     {"GarbageCollectSmart", GarbageCollectSmart, 0, 0, 0},
     {"Print",				Print, 				 0, 0, 0}, 
     {"CreateTimer",			CreateTimer, 		 2, 0, 0},
+    {"GetWidth",			GetWidth, 		 	 0, 0, 0},
+    {"GetHeight",			GetHeight, 		 	 0, 0, 0},    
     {0,0,0,0,0}
 };
 

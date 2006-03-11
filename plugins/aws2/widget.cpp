@@ -31,6 +31,7 @@
 static JSObject *widget_proto_object=0;
 
 enum { WIDGET_XMIN, WIDGET_YMIN, WIDGET_XMAX, WIDGET_YMAX, WIDGET_WIDTH, WIDGET_HEIGHT, WIDGET_DIRTY,
+       WIDGET_PARENT,
 
 		/* Static properties */
        WIDGET_STATIC_START, WIDGET_DOCK_NORTH, WIDGET_DOCK_SOUTH, WIDGET_DOCK_EAST, WIDGET_DOCK_WEST,
@@ -382,6 +383,17 @@ ReleaseMouse(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	return JS_TRUE;
 }
 
+/** @brief Broadcast an event to all children (by calling the given function). */
+static JSBool
+Broadcast(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{		
+	aws::widget *wo = (aws::widget *)JS_GetPrivate(cx, obj);
+	
+	wo->Broadcast(cx,obj,argc,argv,rval);
+	
+	return JS_TRUE;
+}
+
 
 
 
@@ -394,6 +406,7 @@ static JSPropertySpec widget_props[] =
         {"width",       WIDGET_WIDTH,   JSPROP_ENUMERATE | JSPROP_PERMANENT},
         {"height",      WIDGET_HEIGHT,  JSPROP_ENUMERATE | JSPROP_PERMANENT},
         {"dirty",       WIDGET_DIRTY,   JSPROP_ENUMERATE | JSPROP_PERMANENT},
+        {"parent",	    WIDGET_PARENT,  JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY },
         {0,0,0}
 };
 
@@ -436,6 +449,7 @@ static JSFunctionSpec widget_methods[] = {
     {"AddChild",	AddChild,	 1, 0, 0},
     {"RemoveChild",	RemoveChild, 1, 0, 0},
     {"Dock",		Dock, 		 2, 0, 0},
+    {"Broadcast",	Broadcast, 	 1, 0, 0},
     
     {"SetFrameAnchor",		SetFrameAnchor,		 1, 0, 0},
     {"ClearFrameAnchor",	ClearFrameAnchor,	 1, 0, 0},
@@ -521,6 +535,7 @@ bool widget::GetProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
       case WIDGET_WIDTH:  *vp = INT_TO_JSVAL(Bounds().Width());  break;
       case WIDGET_HEIGHT: *vp = INT_TO_JSVAL(Bounds().Height()); break;
       case WIDGET_DIRTY:  *vp = (dirty ? JSVAL_TRUE : JSVAL_FALSE);  break; 
+      case WIDGET_PARENT: *vp = (parent ? OBJECT_TO_JSVAL(parent->WidgetObject()) : JSVAL_NULL); break;
       default: return false;
     }  
     
@@ -721,6 +736,31 @@ bool widget::HandleEvent (iEvent &Event)
 	
 	// No parent, return false.
 	return false;
+}
+
+void widget::Broadcast(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+	if (argc==0) return;
+	
+	// Get the name of the function to fire.
+	JSString *func_name_str = JS_ValueToString(cx, argv[0]);
+	char *func_name = JS_GetStringBytes(func_name_str);
+	
+	// Now fire it in all children.
+	for(size_t i=0; i<children.Length(); ++i)
+	{
+		jsval func_val, rv;
+		
+		if (JS_GetProperty(cx, children[i]->WidgetObject(), func_name, &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
+		{			
+			JS_CallFunctionValue(cx, children[i]->WidgetObject(), func_val, argc-1, &argv[1], &rv);
+			
+			return;			
+		}		
+		
+		
+	}
+	
 }
 
 } // end of namespace
