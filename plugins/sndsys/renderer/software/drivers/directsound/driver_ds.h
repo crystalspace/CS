@@ -29,6 +29,9 @@
 #include <dsound.h>
 
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysDIRECTSOUND)
+{
+
 class SndSysDriverDirectSound;
 
 class SndSysDriverRunnable : public csRunnable
@@ -142,5 +145,8 @@ public:
   } scfiComponent;
 
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(SndSysDIRECTSOUND)
 
 #endif // #ifndef SNDSYS_SOFTWARE_DRIVER_DIRECTSOUND_H

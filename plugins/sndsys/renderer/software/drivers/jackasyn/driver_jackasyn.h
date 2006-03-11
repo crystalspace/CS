@@ -32,6 +32,9 @@
 struct iConfigFile;
 struct iReporter;
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysJACKASYN)
+{
+
 class SndSysDriverJackasyn;
 
 class SndSysDriverRunnable : public csRunnable
@@ -129,6 +132,9 @@ public:
   } scfiComponent;
 
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(SndSysJACKASYN)
 
 #endif // #ifndef SNDSYS_SOFTWARE_DRIVER_Jackasyn_H
 

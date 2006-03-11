@@ -32,6 +32,9 @@
 struct iConfigFile;
 struct iReporter;
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysOSS)
+{
+
 class SndSysDriverOSS;
 
 class SndSysDriverRunnable : public csRunnable
@@ -129,6 +132,9 @@ public:
   } scfiComponent;
 
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(SndSysOSS)
 
 #endif // #ifndef SNDSYS_SOFTWARE_DRIVER_OSS_H
 

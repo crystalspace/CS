@@ -48,6 +48,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysOSS)
+{
+
 SCF_IMPLEMENT_FACTORY (SndSysDriverOSS)
 
 
@@ -294,4 +297,7 @@ void SndSysDriverOSS::WriteBuffer(size_t bytes)
 {
   write(output_fd, oss_buffer, bytes);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(SndSysOSS)
 

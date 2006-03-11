@@ -48,6 +48,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysJACKASYN)
+{
+
 SCF_IMPLEMENT_FACTORY (SndSysDriverJackasyn)
 
 
@@ -281,4 +284,7 @@ void SndSysDriverJackasyn::WriteBuffer(size_t bytes)
 {
   jackoss_write(output_fd, oss_buffer, bytes);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(SndSysJACKASYN)
 

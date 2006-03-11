@@ -35,6 +35,9 @@
 struct iConfigFile;
 struct iReporter;
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysALSA)
+{
+
 class SndSysDriverALSA;
 
 class SndSysDriverRunnable : public csRunnable
@@ -151,6 +154,9 @@ public:
   } scfiComponent;
 
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(SndSysALSA)
 
 #endif // #ifndef SNDSYS_SOFTWARE_DRIVER_ALSA_H
 

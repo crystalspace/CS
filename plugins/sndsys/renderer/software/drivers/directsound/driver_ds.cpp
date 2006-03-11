@@ -43,6 +43,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysDIRECTSOUND)
+{
+
 SCF_IMPLEMENT_FACTORY (SndSysDriverDirectSound)
 
 
@@ -397,3 +400,7 @@ void SndSysDriverDirectSound::AdvanceWriteBuffer (size_t bytes)
   if (ds_buffer_writecursor >= ds_buffer_bytes)
     ds_buffer_writecursor-=ds_buffer_bytes;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(SndSysDIRECTSOUND)
+

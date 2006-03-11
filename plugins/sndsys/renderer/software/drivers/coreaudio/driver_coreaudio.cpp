@@ -40,6 +40,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysCOREAUDIO)
+{
+
 SCF_IMPLEMENT_FACTORY (csSndSysDriverCoreAudio)
 
 SCF_IMPLEMENT_IBASE(csSndSysDriverCoreAudio)
@@ -270,3 +273,7 @@ OSStatus csSndSysDriverCoreAudio::AudioProc(AudioDeviceID inDevice,
     outOutputData->mBuffers[0].mDataByteSize,0, 0);
   return 0;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(SndSysCOREAUDIO)
+

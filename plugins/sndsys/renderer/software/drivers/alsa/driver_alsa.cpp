@@ -49,6 +49,9 @@
 
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysALSA)
+{
+
 SCF_IMPLEMENT_FACTORY (SndSysDriverALSA)
 
 
@@ -577,4 +580,7 @@ int SndSysDriverALSA::FillBuffer(snd_pcm_sframes_t& AvailableFrames, snd_pcm_ufr
   }
   return 0;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(SndSysALSA)
 

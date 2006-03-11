@@ -54,6 +54,9 @@
 
 struct iReporter;
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysCOREAUDIO)
+{
+
 class csSndSysDriverCoreAudio : public iSndSysSoftwareDriver
 {
 public:
@@ -106,5 +109,8 @@ public:
     { return scfParent->Initialize(p); }
   } scfiComponent;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(SndSysCOREAUDIO)
 
 #endif // #ifndef SNDSYS_SOFTWARE_DRIVER_COREAUDIO_H
