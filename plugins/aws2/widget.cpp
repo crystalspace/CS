@@ -753,12 +753,8 @@ void widget::Broadcast(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
 		
 		if (JS_GetProperty(cx, children[i]->WidgetObject(), func_name, &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
 		{			
-			JS_CallFunctionValue(cx, children[i]->WidgetObject(), func_val, argc-1, &argv[1], &rv);
-			
-			return;			
-		}		
-		
-		
+			JS_CallFunctionValue(cx, children[i]->WidgetObject(), func_val, argc-1, &argv[1], &rv);			
+		}				
 	}
 	
 }
