@@ -10,6 +10,9 @@ chronological order.
 	- Dan changed M_PI to PI in pen.cpp since it msvc 7.0 didn't like
 	  it. Also fixed a typo in pen.h in a function declaration, and 
 	  fixed a truncation warning from double to float.
+	- Christopher added the parent property and Broadcast function 
+	  to Widgets, and the CheckBox, RadioButton, Window, and ToolTip
+	  widgets.
 
 9-Mar-2006
 	- Jorrit made the alsa sound driver default on linux because it
