@@ -8,6 +8,8 @@ chronological order.
 
 11-Mar-2006
 	- Vincent changed sound drivers to use namespaces.
+	- Piotr Obrzut added float4x4 maping with 4 csVector4's in cg 
+          shader plugin
 10-Mar-2006
 	- Dan changed M_PI to PI in pen.cpp since it msvc 7.0 didn't like
 	  it. Also fixed a typo in pen.h in a function declaration, and 
