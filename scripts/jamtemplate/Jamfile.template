@@ -49,19 +49,18 @@ MsvcGenConfig CRYSTAL.LIBS : "libcrystalspace.lib" ;
 MsvcGenConfig CRYSTAL.LIBS.DEBUG : "libcrystalspace_d.lib" ;
 MsvcGenConfig CRYSTAL.INCDIRS :
   [ ConcatDirs .. .. .. CS include ]
+  [ ConcatDirs .. .. .. CS include csutil win32 ]
   [ ConcatDirs "$(hash)(CRYSTAL)" include ]
-  [ ConcatDirs "$(hash)(CRYSTAL)" include crystalspace ] ;
+  [ ConcatDirs "$(hash)(CRYSTAL)" include csutil win32 ] ;
 MsvcGenConfig CRYSTAL.LIBDIRS :
   [ ConcatDirs .. .. .. CS out release$(MSVC_VERSION) libs ]
   [ ConcatDirs .. .. .. CS libs csutil win32 libs ]
   [ ConcatDirs "$(hash)(CRYSTAL)" out release$(MSVC_VERSION) libs ]
-  [ ConcatDirs "$(hash)(CRYSTAL)" libs ]
   [ ConcatDirs "$(hash)(CRYSTAL)" libs csutil win32 libs ] ;
 MsvcGenConfig CRYSTAL.LIBDIRS.DEBUG :
   [ ConcatDirs .. .. .. CS out debug$(MSVC_VERSION) libs ]
   [ ConcatDirs .. .. .. CS libs csutil win32 libs ]
   [ ConcatDirs "$(hash)(CRYSTAL)" out debug$(MSVC_VERSION) libs ]
-  [ ConcatDirs "$(hash)(CRYSTAL)" libs ]
   [ ConcatDirs "$(hash)(CRYSTAL)" libs csutil win32 libs ] ;
 
 if $(CEL.DESIRED) = yes
