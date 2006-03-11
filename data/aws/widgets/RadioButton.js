@@ -1,5 +1,5 @@
-/** CheckBox factory. */
-function CheckBox(text, align)
+/** RadioButton factory. */
+function RadioButton(text, align)
 {
 	var _widget = new Widget;
 	var prefs = Skin.current;
@@ -24,22 +24,24 @@ function CheckBox(text, align)
 	
 	// Set the size	
 	var dim = prefs.Font.GetDimensions(text);
-    _widget.Resize(prefs.CheckBox.w + 5 + dim.width, dim.height);
+    _widget.Resize(prefs.RadioButton.w + 5 + dim.width, dim.height);
 			
 	// Set the drawing function to be whatever the current style dictates.
-	_widget.onDraw = Skin.current.Style.CheckBox;
+	_widget.onDraw = Skin.current.Style.RadioButton;
 			
 	// If we get a mouse down, change the button's state.
 	_widget.onMouseDown = function(buttons)
 	{
-		this.state=~this.state;		
+		this.parent.Broadcast("onRadioGroupChange");
+		
+		this.state=true;	
 		this._active=true;
 		this.CaptureMouse();		
 	}
 	
 	// If the mouse is up, change the state.
 	_widget.onMouseUp = function(buttons)
-	{		
+	{						
 		this._active=false;	
 		this.ReleaseMouse();
 		this.Invalidate();		
@@ -55,6 +57,11 @@ function CheckBox(text, align)
 	{
 		this.over=false;
 		this.Invalidate();	
+	}
+	
+	_widget.onRadioGroupChange = function()
+	{		
+		this.state=false;	
 	}
 		
 	return _widget;

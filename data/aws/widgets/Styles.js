@@ -792,7 +792,44 @@ Style3D =
 		}
 						
 		pen.WriteBoxed(prefs.Font, prefs.CheckBox.w+5, 0, w, h, Pen.ALIGN_LEFT, Pen.ALIGN_CENTER, this.text);
-	}	
+	},
+	
+	RadioButton : function(pen)
+	{
+		
+		var w  = this.width, h = this.height;
+						
+		var prefs = Skin.current;
+						
+		pen.Clear();
+		
+		if (this.over) pen.SetColor(prefs.CheckBox.OverColor);
+		else 		   pen.SetColor(prefs.TextBackColor);
+		pen.DrawMiteredRect(2,1,prefs.CheckBox.w-1, prefs.CheckBox.h-2,0.5, true);		
+		
+		if (!this._active)
+		{
+			pen.SetColor(prefs.HighlightColor);
+			pen.SwapColors();
+			pen.SetColor(prefs.ShadowColor);
+			
+			pen.DrawMiteredRect(1,1,prefs.CheckBox.w-1, prefs.CheckBox.h-1, 0.5,false, true);
+				
+			pen.SetColor(0,0,0,1);
+			pen.DrawMiteredRect(0,0,prefs.CheckBox.w, prefs.CheckBox.h, 0.5,false);					
+		}
+
+		pen.SetColor(0,0,0,1);
+		
+		if (this.state)
+		{			
+			pen.SetWidth(2.0);
+			
+			pen.DrawMiteredRect(4, 4, prefs.CheckBox.w-4, prefs.CheckBox.h-4, 0.5,true); 			
+		}
+						
+		pen.WriteBoxed(prefs.Font, prefs.CheckBox.w+5, 0, w, h, Pen.ALIGN_LEFT, Pen.ALIGN_CENTER, this.text);
+	}		
 	
 	
 	
