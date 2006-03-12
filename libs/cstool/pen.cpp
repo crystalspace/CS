@@ -249,7 +249,7 @@ void csPen::DrawRect (uint x1, uint y1, uint x2, uint y2, bool swap_colors, bool
 /** Draws a mitered rectangle. The miter value should be between 0.0 and 1.0, and determines how
 * much of the corner is mitered off and beveled. */    
 void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2, 
-                             float miter, bool swap_colors, bool fill)
+                             uint miter, bool swap_colors, bool fill)
 {  	
   if (miter == 0.0f) 
   { 
@@ -257,14 +257,14 @@ void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
     return; 
   }
 			
-  float width = x2-x1;
-  float height = y2-y1;
+  uint width = x2-x1;
+  uint height = y2-y1;
 
-  float center_x = x1+(width/2);
-  float center_y = y1+(height/2);
+  uint center_x = x1+(width>>1);
+  uint center_y = y1+(height>>1);
 
-  float y_miter = (height*miter)*0.5;
-  float x_miter = (width*miter)*0.5;
+  uint y_miter = miter;
+  uint x_miter = miter;
   		
   Start (fill);
 
@@ -292,7 +292,7 @@ void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
 /** Draws a rounded rectangle. The roundness value should be between 0.0 and 1.0, and determines how
   * much of the corner is rounded off. */
 void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
-                             float roundness, bool swap_colors, bool fill)
+                             uint roundness, bool swap_colors, bool fill)
 {		
   if (roundness == 0.0f) 
   { 
@@ -306,8 +306,9 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
   float center_x = x1+(width/2);
   float center_y = y1+(height/2);
 
-  float y_round = (height*roundness)*0.5;
-  float x_round = (width*roundness)*0.5;  
+
+  float y_round = roundness;
+  float x_round = roundness;  
   float delta = 0.0384f; 
 
   Start(fill);
