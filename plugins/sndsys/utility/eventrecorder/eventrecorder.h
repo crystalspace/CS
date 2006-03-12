@@ -53,9 +53,13 @@ protected:
       ~SndSysEventEntry() {};
 
     public:
-      csTicks Time; // Temporary, until we can get a platform independent higher resolution timer
+      /// The time of this event, currently in microseconds since program start (approx)
+      int64 Time; 
+      /// The Category of this event - see SSEC_* enumeration members in ss_eventrecorder.h
       SndSysEventCategory Category;
+      /// The Severity Level of this event - see SSEC_* enumeration members in ss_eventrecorder.h
       SndSysEventLevel Level;
+      /// The event message itself
       csStringBase Message;
   };
 

@@ -177,7 +177,7 @@ int csSndSysBasicEventRecorder::ProcessEventQueue()
   {
     if (m_Active && m_pLogFile)
     {
-      LogString.Format("[%08d] [%s] [%s] %s\n", pEntry->Time, GetEventLevelString(pEntry->Level),
+      LogString.Format("[%012llu] [%s] [%s] %s\n", pEntry->Time, GetEventLevelString(pEntry->Level),
                        GetEventCategoryString(pEntry->Category), pEntry->Message.GetData());
       m_pLogFile->Write(LogString.GetData(), LogString.Length());
     }
@@ -218,7 +218,7 @@ void csSndSysBasicEventRecorder::RecordEventV(SndSysEventCategory Category, SndS
 csSndSysBasicEventRecorder::SndSysEventEntry::SndSysEventEntry(SndSysEventCategory Cat, SndSysEventLevel Lev, const char* Desc, va_list Args) :
   Category(Cat), Level(Lev)
 {
-  Time=csGetTicks();
+  Time=csGetMicroTicks();
   Message.AppendFmtV(Desc, Args);
 }
 
