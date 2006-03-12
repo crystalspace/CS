@@ -10,6 +10,9 @@ chronological order.
 	- Vincent changed sound drivers to use namespaces.
 	- Piotr Obrzut added float4x4 maping with 4 csVector4's in cg 
           shader plugin
+	- Peter Amstutz changed the way the VOS plugin synchronized
+	  network updates to object in the CS engine.  This should fix some
+	  race conditions.
 10-Mar-2006
 	- Dan changed M_PI to PI in pen.cpp since it msvc 7.0 didn't like
 	  it. Also fixed a typo in pen.h in a function declaration, and 
