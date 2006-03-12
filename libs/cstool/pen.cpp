@@ -251,7 +251,7 @@ void csPen::DrawRect (uint x1, uint y1, uint x2, uint y2, bool swap_colors, bool
 void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2, 
                              uint miter, bool swap_colors, bool fill)
 {  	
-  if (miter == 0.0f) 
+  if (miter == 0) 
   { 
     DrawRect (x1,y1,x2,y2,fill); 
     return; 
@@ -294,7 +294,7 @@ void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
 void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
                              uint roundness, bool swap_colors, bool fill)
 {		
-  if (roundness == 0.0f) 
+  if (roundness == 0) 
   { 
     DrawRect (x1,y1,x2,y2,fill); 
     return; 
