@@ -270,41 +270,6 @@ MiteredFrames3D =
 			},	
 }
 
-
-
-StyleFlat = 
-{
-	TitleBar : function(pen)
-	{
-		prefs = Skin.current;
-		
-		var w = this.width, h = this.height;
-		var cw = w * prefs.TitleBarRoundness, aw=cw*2.0;		
-		
-		pen.Clear();
-		
-		// Draw the frame.
-		pen.SetColor(prefs.FillColor);		
-		pen.DrawArc(0,0,aw,h, Math.PI, Math.PI*1.6, true);
-		pen.DrawArc(w-aw,0,w,h, Math.PI*1.5, Math.PI*2.1, true);
-		pen.DrawRect(cw,0,w-cw,h, true);
-		pen.DrawRect(0,h>>1, cw,h, true);
-		pen.DrawRect(w-cw,h>>1, w,h, true);		
-		
-		
-		pen.SetColor(0,0,0,1);
-		pen.DrawArc(0,0,aw,h, Math.PI, Math.PI*1.6, false);
-		pen.DrawLine(0,h>>1,0,h);
-		pen.DrawLine(cw,0,w-cw,0);
-		
-		pen.DrawArc(w-aw,0,w,h, Math.PI*1.5, Math.PI*2.1, false);
-		pen.DrawLine(w,h>>1,w,h);
-		pen.DrawLine(0,h,w,h);		
-	}		  
-	
-};  // End StyleFlat
-
-
 Style3D = 
 {
 	WindowMin : function(pen)
@@ -350,38 +315,45 @@ Style3D =
 	TitleBar : function(pen)
 	{
 		var prefs = Skin.current;
+		var tb = prefs.TitleBar;
 				
 		var w = this.width, h = this.height;
-		var aw = prefs.TitleBarHeight, cw=aw>>1;		
 		var tbw = prefs.WindowMin.w + prefs.WindowZoom.w + prefs.WindowClose.w + 10;
 		
 		pen.Clear();
 		
-		// Draw the frame.
-		pen.SetColor(prefs.FillColor);		
-		pen.DrawArc(0,0,aw,h, Math.PI*0.5, Math.PI*1.5, true);
-		pen.DrawRect(cw,0,w,h, true);
+		// Draw the background.
+		pen.SetColor(tb.Base)
+		pen.DrawMiteredRect(0,0,w,h,5,true);
 		
-		// Background color
-		pen.SetColor(prefs.ActiveTitleBarColor1);
-		pen.DrawRect(cw+5,5, w-tbw, h-5, true);
-		
-		// Setup pen
-		pen.SetColor(prefs.ShadowColor);
-		pen.SwapColors();
-		pen.SetColor(prefs.HighlightColor);
-		
-		// Make the highlights
-		pen.DrawArc(0,0,aw,h, Math.PI*0.5, Math.PI*1.5, false);
-		pen.DrawLine(cw,0, w,0);
-		pen.SwapColors();
-		pen.DrawLine(w,0, w,h);
-		pen.DrawLine(cw,h,w,h);
+		pen.SetColor(0,0,0,0.4)
+		pen.DrawMiteredRect(0,0,w,h,5,false);
+		pen.SetColor(0,0,0,0.3)
+		pen.DrawMiteredRect(1,1,w-1,h-1,5,false);
 				
-		pen.DrawRect(cw+5,5, w-tbw, h-5, false, true);	
+		dim = prefs.TitleFont.GetDimensions(this.text);
 		
-		pen.SetColor(prefs.TitleBarTextColor);
-		pen.WriteBoxed(prefs.TitleFont, cw+10, 5, w-tbw-5, h-5, Pen.ALIGN_LEFT, Pen.ALIGN_CENTER, this.text);	
+		var cx = (w-tbw-5)>>1;
+		var thw = dim.width>>1;
+		
+		pen.SetColor(tb.Active);
+		pen.DrawMiteredRect(cx-thw-5, 0, cx+thw+15, dim.height+2, 5, true);
+		pen.DrawRect(cx-thw-5, 0, cx+thw+15, 5, true);
+		
+		
+		// Glassy shine
+		for(var i=2, a=0.9; i<9; ++i, a-=0.1)
+		{
+			var adjust=6-i;
+			if (adjust<3) adjust=3;
+			
+			pen.SetColor(1,1,1,a);
+			pen.DrawLine(adjust,i,w-adjust,i);
+		}
+		
+		// Draw the text.		
+		pen.SetColor(tb.Text);
+		pen.WriteBoxed(prefs.TitleFont, 5, 5, w-tbw-5, h-5, Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, this.text);	
 		
 	},
 	

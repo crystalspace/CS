@@ -17,10 +17,10 @@ function TitleBar(inittext)
 	//  Set initial size.  When you dock this bar, or stick it
 	// in the top of a window as a child, it will resize. (Assuming
 	// you use anchors if it's a child.)
-	_widget.Resize(100, Skin.current.TitleBarHeight);
+	_widget.Resize(100, prefs.TitleBar.h);
 	
 	// Set the drawing function to be whatever the current style dictates.
-	_widget.onDraw = Skin.current.Style.TitleBar;
+	_widget.onDraw = prefs.Style.TitleBar;
 	
 	// If we get a mouse down, start the moving process.
 	_widget.onMouseDown = function(buttons, widget_x, widget_y, screen_x, screen_y)
