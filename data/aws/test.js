@@ -26,10 +26,10 @@ w.onDraw = function(pen)
 	pen.DrawRect(0,0,hw,hh,false);
 	
 	pen.SetColor(0,1,0,0.5);
-	pen.DrawMiteredRect(hw,hh,this.width,this.height,0.5,true);
+	pen.DrawMiteredRect(hw,hh,this.width,this.height,10,true);
 	
 	pen.SetColor(0,0,1,0.5);
-	pen.DrawRoundedRect(hw,0,this.width,hh,0.5,true);
+	pen.DrawRoundedRect(hw,0,this.width,hh,10,true);
 	
 	pen.SetColor(1,1,0,0.5);
 	pen.DrawArc(0, hh, hw, this.height, 0.14,2.23, true);
@@ -48,7 +48,7 @@ w2.onDraw = function(pen)
 	pen.Clear();
 	
 	pen.SetColor(0.5,0,0.5,0.5);
-	pen.DrawRoundedRect(0,0,this.width,this.height,0.25,true);	
+	pen.DrawRoundedRect(0,0,this.width,this.height,10,true);	
 }
 
 w.SetPen(p);
@@ -98,3 +98,27 @@ tt.SetFocusPoint(test_clock.xmin + (test_clock.width>>1), test_clock.ymax);
 chk = CheckBox("Enable some setting", Pen.ALIGN_LEFT);
 win.AddChild(chk);
 chk.MoveTo(5,5);
+
+// Test the radio buttons
+rb1 = RadioButton("This", Pen.ALIGN_LEFT);
+rb2 = RadioButton("That", Pen.ALIGN_LEFT);
+rb3 = RadioButton("The other thing.", Pen.ALIGN_LEFT);
+win.AddChild(rb1);
+win.AddChild(rb2);
+win.AddChild(rb3);
+
+rb1.MoveTo(5,30);
+rb2.MoveTo(5,55);
+rb3.MoveTo(5,80)
+
+// Test the normal buttons
+nb = Button();
+win.AddChild(nb);
+
+nb.ResizeTo(100,25);
+nb.MoveTo(5,110);
+nb.onDrawContent = function(pen) 
+{ 
+	pen.SetColor(0,0,0,1); 
+	pen.WriteBoxed(Skin.current.Font, 0,0,this.width, this.height, Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, "Press Me"); 
+}

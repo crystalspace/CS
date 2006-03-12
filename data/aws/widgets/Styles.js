@@ -312,7 +312,7 @@ Style3D =
 		var prefs = Skin.current;
 		
 		if (this.over) pen.SetColor(0,0,1,1);
-		else pen.SetColor(1,1,1,1);
+		else pen.SetColor(0,0,0,1);
 		
 		pen.DrawRect(5, this.height-10, 15, this.height-5, true);
 	},
@@ -324,7 +324,7 @@ Style3D =
 		var qw = this.width>>2, qh=this.height>>2;
 		
 		if (this.over) pen.SetColor(0,1,0,1);
-		else pen.SetColor(1,1,1,1);
+		else pen.SetColor(0,0,0,1);
 				
 		pen.DrawRect(cx-qw, cy-2, cx+qw, cy+2, true);
 		pen.DrawRect(cx-2, cy-qh, cx+2, cy+qh, true);
@@ -336,7 +336,7 @@ Style3D =
 		var x=5, y;
 		
 		if (this.over) pen.SetColor(1,0,0,1);
-		else pen.SetColor(1,1,1,1);
+		else pen.SetColor(0,0,0,1);
 		
 		// Left to right line
 		pen.DrawTriangle(6,4, this.width-4, this.height-6, 4, 6, true);
@@ -496,33 +496,68 @@ Style3D =
 	Button : function(pen)
 	{
 		var w = this.width, h = this.height;
-		var frame = Frames3D;
+		var prefs = Skin.current;
+		var b = prefs.Button;
 		
 		pen.Clear();
 		
-		if (this.state) frame.Inset(pen,0,0,w,h);
-		else 
+// 		if (this.state)
+// 		{
+// 			pen.PushTransform();
+// 			pen.Translate(1,1,0);
+// 		}
+							
+		pen.SetColor(b.Base);
+		pen.DrawMiteredRect(1,0,w,h-1,2,true);
+		
+		if(!this.state)
 		{
-			frame.Outset(pen,0,0,w,h);
-			if (this.over)
-			{	
-				pen.SetColor(1,1,1,0.25);			
-				pen.DrawRect(0,0,w,h,true);
-			}
+			//pen.SetWidth(2);
+			for(var i=1, a=0.40; i<8; ++i, a-=0.08)
+			{
+				pen.SetColor(0,0,0,a);
+				pen.DrawLine(i, i, w-i,i);	
+				pen.DrawLine(i, h-i, w-i,h-i);
+				pen.DrawLine(i, i-1, i,h-i-1);
+				pen.DrawLine(w-i, i-1, w-i,h-i);
+			}		
+			//pen.SetWidth(1);
 		}
+		
+		for(var i=2, a=1; i<9; ++i, a-=0.1)
+		{
+			var adjust=6-i;
+			if (adjust<3) adjust=3;
+			
+			pen.SetColor(1,1,1,a);
+			pen.DrawLine(adjust,i,w-adjust,i);
+		}
+				
+		if (this.over)
+		{	
+			pen.SetColor(1,1,1,0.25);			
+			pen.DrawMiteredRect(0,0,w,h,2,true);
+		}
+		
+		if (!this.state)
+		{
+			pen.SetColor(0,0,0,0.25);
+			pen.DrawLine(2,h,w,h);
+			pen.DrawLine(w,3,w,h);			
+			pen.SetWidth(1);
+		}	
 		
 		if (this.onDrawContent)
 		{
-			if (this.state)
-			{
-				pen.PushTransform();
-				pen.Translate(1,1,0);
-			}
-			
+					
 			this.onDrawContent(pen);			
-			
-			if (this.state) pen.PopTransform();
+				
 		}
+		
+		pen.SetColor(b.Border);
+ 		pen.DrawMiteredRect(0,0,w,h,2,false);
+		
+// 		if (this.state) pen.PopTransform();
 	},
 	
 	Clock : function(pen)
@@ -765,32 +800,42 @@ Style3D =
 						
 		pen.Clear();
 		
-		if (this.over) pen.SetColor(prefs.CheckBox.OverColor);
-		else 		   pen.SetColor(prefs.TextBackColor);
-		pen.DrawRect(2,1,prefs.CheckBox.w-1, prefs.CheckBox.h-2, true);		
+		var w  = this.width, h = this.height;
+						
+		var prefs = Skin.current;
+		var cb = prefs.RadioButton;
+						
+		pen.Clear();
+						
+		// Border
+		pen.SetColor(cb.Border);
+		pen.DrawRect(0,0,cb.w,cb.h,false);		
 		
-		if (!this._active)
-		{
-			pen.SetColor(prefs.HighlightColor);
-			pen.SwapColors();
-			pen.SetColor(prefs.ShadowColor);
-			
-			pen.DrawRect(1,1,prefs.CheckBox.w-1, prefs.CheckBox.h-1, false, true);
-				
-			pen.SetColor(0,0,0,1);
-			pen.DrawRect(0,0,prefs.CheckBox.w, prefs.CheckBox.h, false);					
-		}
-
+		// Filling		
+		pen.SetColor(prefs.TextBackColor);		
+		pen.DrawRect(2,1,cb.w-1, cb.h-2, true);	
+						
 		pen.SetColor(0,0,0,1);
-		
+
 		if (this.state)
 		{			
-			pen.SetWidth(2.0);
+			var hh = cb.h>>1;			
+			pen.SetWidth(1.25);
+			pen.DrawLine(cb.w-3, 3, 8, cb.h-4); 			
+			pen.SetWidth(1);
+			pen.DrawLine(8, cb.h-4, 4, cb.h-9);
+		}		
 			
-			pen.DrawLine(4, 4, prefs.CheckBox.w-4, prefs.CheckBox.h-4); 
-			pen.DrawLine(prefs.CheckBox.w-4, 4, 4, prefs.CheckBox.h-4);
+		if (this.over)
+		{
+			for(i=0; i<5; ++i)
+			{
+				pen.SetColor(1.0,1.0,0.74,(5-i)/10)
+				pen.DrawRect(i,i,cb.w-i,cb.h-i,false);	
+			}	
 		}
 						
+		pen.SetColor(prefs.TextForeColor);				
 		pen.WriteBoxed(prefs.Font, prefs.CheckBox.w+5, 0, w, h, Pen.ALIGN_LEFT, Pen.ALIGN_CENTER, this.text);
 	},
 	
@@ -800,34 +845,44 @@ Style3D =
 		var w  = this.width, h = this.height;
 						
 		var prefs = Skin.current;
+		var rb = prefs.RadioButton;
 						
 		pen.Clear();
+						
 		
-		if (this.over) pen.SetColor(prefs.CheckBox.OverColor);
-		else 		   pen.SetColor(prefs.TextBackColor);
-		pen.DrawMiteredRect(2,1,prefs.CheckBox.w-1, prefs.CheckBox.h-2,0.5, true);		
-		
-		if (!this._active)
-		{
-			pen.SetColor(prefs.HighlightColor);
-			pen.SwapColors();
-			pen.SetColor(prefs.ShadowColor);
-			
-			pen.DrawMiteredRect(1,1,prefs.CheckBox.w-1, prefs.CheckBox.h-1, 0.5,false, true);
-				
-			pen.SetColor(0,0,0,1);
-			pen.DrawMiteredRect(0,0,prefs.CheckBox.w, prefs.CheckBox.h, 0.5,false);					
-		}
-
-		pen.SetColor(0,0,0,1);
+		// Border
+		pen.SetColor(rb.Border);
+		pen.DrawRect(0,0,rb.w,rb.h,false);		
 		
 		if (this.state)
 		{			
-			pen.SetWidth(2.0);
+			var hh = rb.h>>1;
 			
-			pen.DrawMiteredRect(4, 4, prefs.CheckBox.w-4, prefs.CheckBox.h-4, 0.5,true); 			
+			pen.SetColor(rb.Base);
+			pen.DrawRect(2, 1, rb.w-1, rb.h-2, true); 			
+			pen.SetColor(1,1,1,0.5);
+			pen.DrawRect(2, 1, rb.w-1, hh-2, true);
+			pen.DrawArc(3, hh+2, rb.w-3, rb.h-2, Math.PI, Math.PI*2, true);
+			pen.SetColor(0,0,0,0.25);
+			pen.DrawLine(2, hh, rb.w-1, hh);
 		}
-						
+		else
+		{
+			// Filling		
+			pen.SetColor(prefs.TextBackColor);		
+			pen.DrawRect(2,1,rb.w-1, rb.h-2, true);			
+		}
+		
+		if (this.over)
+		{
+			for(i=0; i<5; ++i)
+			{
+				pen.SetColor(1.0,1.0,0.74,(5-i)/10)
+				pen.DrawRect(i,i,rb.w-i,rb.h-i,false);	
+			}	
+		}
+		
+		pen.SetColor(prefs.TextForeColor);				
 		pen.WriteBoxed(prefs.Font, prefs.CheckBox.w+5, 0, w, h, Pen.ALIGN_LEFT, Pen.ALIGN_CENTER, this.text);
 	}		
 	
