@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2003 by Frank Richter
+              (C) 2006 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/math.h"
 #include "csutil/ansiparse.h"
 #include "csutil/csstring.h"
 #include "csutil/csunicode.h"
@@ -79,10 +81,11 @@ static int _cs_fputs (const char* string, FILE* stream)
     ret += textLen;
     tmp.Replace (string + ansiCommandLen, textLen);
     
-    if (isTTY && (cmdClass == csAnsiParser::classFormat))
+    if (isTTY && (cmdClass != csAnsiParser::classNone && 
+                  cmdClass != csAnsiParser::classUnknown))
     {
       ret += ansiCommandLen;
-      // Apply ANSI format
+      // Apply ANSI string
       const char* cmd = string;
       size_t cmdLen = ansiCommandLen;
       csAnsiParser::Command command;
@@ -145,6 +148,83 @@ static int _cs_fputs (const char* string, FILE* stream)
 	    textAttr = (textAttr & ~backgroundMask) 
 	      | (ansiToWindows[commandParams.colorVal] << 4);
 	    break;
+          case csAnsiParser::cmdClearScreen:
+            {
+              CONSOLE_SCREEN_BUFFER_INFO csbi;
+              COORD homeCoord = {0, 0};
+
+              GetConsoleScreenBufferInfo (hCon, &csbi);
+              DWORD conSize = csbi.dwSize.X * csbi.dwSize.Y;
+              DWORD charsWritten;
+              //Fill with blanks
+              FillConsoleOutputCharacter (hCon, ' ', conSize, homeCoord, 
+                &charsWritten);
+
+              //Fill attributes
+              FillConsoleOutputAttribute (hCon, csbi.wAttributes, conSize,
+                homeCoord, &charsWritten);
+
+              //Put cursor at 0,0
+              SetConsoleCursorPosition (hCon, homeCoord);
+            }
+            break;
+          case csAnsiParser::cmdClearLine:
+            {
+              CONSOLE_SCREEN_BUFFER_INFO csbi;
+              COORD homeCoord;
+
+              GetConsoleScreenBufferInfo (hCon, &csbi);
+              
+              homeCoord = csbi.dwCursorPosition;
+
+              DWORD conSize = csbi.dwSize.X - csbi.dwCursorPosition.X;
+              DWORD charsWritten;
+              //Fill with blanks
+              FillConsoleOutputCharacter (hCon, ' ', conSize, homeCoord, 
+                &charsWritten);
+
+              //Fill attributes
+              FillConsoleOutputAttribute (hCon, csbi.wAttributes, conSize,
+                homeCoord, &charsWritten);
+
+              //Put cursor at starting position
+              SetConsoleCursorPosition (hCon, homeCoord);
+            }
+            break;
+          case csAnsiParser::cmdCursorSetPosition:
+            {
+              //Limit to screen
+              CONSOLE_SCREEN_BUFFER_INFO csbi;
+              COORD coord;
+
+              GetConsoleScreenBufferInfo (hCon, &csbi);
+
+              coord.X = csClamp<int> (commandParams.cursorVal.x, csbi.dwSize.X, 0);
+              coord.Y = csClamp<int> (commandParams.cursorVal.y, csbi.dwSize.Y, 0);
+
+              //Set position
+              SetConsoleCursorPosition (hCon, coord);
+            }
+            break;
+          case csAnsiParser::cmdCursorMoveRelative:
+            {
+              //Limit to screen
+              CONSOLE_SCREEN_BUFFER_INFO csbi;
+              COORD coord;
+
+              GetConsoleScreenBufferInfo (hCon, &csbi);
+
+
+              coord.X = csClamp<int> (csbi.dwCursorPosition.X + commandParams.cursorVal.x, 
+                csbi.dwSize.X, 0);
+
+              coord.Y = csClamp<int> (csbi.dwCursorPosition.Y + commandParams.cursorVal.y, 
+                csbi.dwSize.Y, 0);
+
+              //Set position
+              SetConsoleCursorPosition (hCon, coord);
+            }
+            break;
 	  default:
 	    break;
 	}

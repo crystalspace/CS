@@ -18,7 +18,6 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/ansicolor.h"
 #include "csutil/callstack.h"
 #include "csutil/sysfunc.h"
 

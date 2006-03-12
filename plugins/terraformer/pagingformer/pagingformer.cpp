@@ -504,8 +504,8 @@ printf("!bigger\n");
           tostep = resolution;
 
           // to this former's relative position to the whole request
-          tox = (uint)ceil( (k/xcount) * partialresolution);  // can't replace by using scale+offset
-          toy = (uint)ceil( (k%xcount) * partialresolution);  // because can't get sampler's former
+          tox = (uint)ceilf( (k/xcount) * partialresolution);  // can't replace by using scale+offset
+          toy = (uint)ceilf( (k%xcount) * partialresolution);  // because can't get sampler's former
         }
 
 /*

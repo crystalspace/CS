@@ -23,7 +23,7 @@
  */
 #include "cssysdef.h"
 #include "csutil/algorithms.h"
-#include "csutil/ansicolor.h"
+#include "csutil/ansicommand.h"
 #include "csutil/ansiparse.h"
 #include "csutil/array.h"
 #include "csutil/binder.h"

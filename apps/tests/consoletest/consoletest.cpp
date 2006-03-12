@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 #include <locale.h>
-#include "csutil/ansicolor.h"
+#include "csutil/ansicommand.h"
 #include "csutil/csuctransform.h"
 #include "csutil/sysfunc.h"
 
@@ -104,9 +104,9 @@ int main (int /*argc*/, char* /*argv*/ [])
   }
   csPrintf ("\n");
   csPrintf ("Adding some " 
-    CS_ANSI_FI CS_ANSI_FC "c" CS_ANSI_FY "o" CS_ANSI_FM "l" CS_ANSI_FY "o" 
-    CS_ANSI_FW "r" CS_ANSI_RST 
-    " for " CS_ANSI_BW CS_ANSI_FR "f" CS_ANSI_FG "u" CS_ANSI_FB "n" 
+    CS_ANSI_TEXT_BOLD_ON CS_ANSI_COLOR_FC "c" CS_ANSI_COLOR_FY "o" CS_ANSI_COLOR_FM "l" CS_ANSI_COLOR_FY "o" 
+    CS_ANSI_COLOR_FW "r" CS_ANSI_RST 
+    " for " CS_ANSI_COLOR_BW CS_ANSI_COLOR_FR "f" CS_ANSI_COLOR_FG "u" CS_ANSI_COLOR_FB "n" 
     CS_ANSI_RST "\n");
   printf ("For change, a printf()\n");
   csPrintfErr ("csPrintfErr()\n");

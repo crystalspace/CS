@@ -185,9 +185,9 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
 
 static const char* consolePrefix[5] = 
 {
-  CS_ANSI_BK CS_ANSI_FM CS_ANSI_FI,
-  CS_ANSI_BK CS_ANSI_FR CS_ANSI_FI,
-  CS_ANSI_BK CS_ANSI_FY CS_ANSI_FI,
+  CS_ANSI_COLOR_BK CS_ANSI_COLOR_FM CS_ANSI_TEXT_BOLD_ON,
+  CS_ANSI_COLOR_BK CS_ANSI_COLOR_FR CS_ANSI_TEXT_BOLD_ON,
+  CS_ANSI_COLOR_BK CS_ANSI_COLOR_FY CS_ANSI_TEXT_BOLD_ON,
   "",
   ""
 };

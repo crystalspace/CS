@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2005 by Jorrit Tyberghein
 	      (C) 2005 by Frank Richter
+              (C) 2006 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -31,10 +32,24 @@ bool csAnsiParser::ParseAnsi (const char* str, size_t& ansiCommandLen,
   {
     ansiCommandLen = strcspn (str, 
       "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz");
-    if ((str[1] == '[') && (str[ansiCommandLen] == 'm'))
-      cmdClass = classFormat;
+    if (str[1] == '[')
+    {
+      if (str[ansiCommandLen] == 'm')
+        cmdClass = classFormat;
+      else if (str[ansiCommandLen] == 'J' ||
+               str[ansiCommandLen] == 'K')
+        cmdClass = classClear;
+      else if (str[ansiCommandLen] == 'H' ||
+               str[ansiCommandLen] == 'f' ||
+               str[ansiCommandLen] == 'A' ||
+               str[ansiCommandLen] == 'B' ||
+               str[ansiCommandLen] == 'C' ||
+               str[ansiCommandLen] == 'D')
+        cmdClass = classCursor;
+    }
     else
       cmdClass = classUnknown;
+
     if (str[ansiCommandLen] != 0) ansiCommandLen++;
   }
   else
@@ -130,8 +145,88 @@ bool csAnsiParser::DecodeCommand (const char*& cmd, size_t& cmdLen,
     cmdLen -= paramLen + 1;
     return true;
   }
+  else if (cmd[cmdLen-1] == 'J')
+  {
+    command = cmdClearScreen;
+    cmd += 1;
+    cmdLen -= 1;
+    return true;
+  }
+  else if (cmd[cmdLen-1] == 'K')
+  {
+    command = cmdClearLine;
+    cmd += 1;
+    cmdLen -= 1;
+    return true;
+  }
+  else if (cmd[cmdLen-1] == 'H' || cmd[cmdLen-1] == 'j')
+  {
+    int pl, pc;
+    if (sscanf (cmd, "%d;%d", &pl, &pc) == 2)
+    {
+      command = cmdCursorSetPosition;
+      commandParams.cursorVal.x = pc;
+      commandParams.cursorVal.y = pl;
+    }
+
+    cmd += cmdLen;
+    cmdLen = 0;
+    return true;
+  }
+  else if (cmd[cmdLen-1] == 'A')
+  {
+    int pl;
+    if (sscanf (cmd, "%d", &pl) == 1)
+    {
+      command = cmdCursorMoveRelative;
+      commandParams.cursorVal.x = 0;
+      commandParams.cursorVal.y = -pl;
+    }
+    cmd += cmdLen;
+    cmdLen = 0;
+    return true;
+  }
+  else if (cmd[cmdLen-1] == 'B')
+  {
+    int pl;
+    if (sscanf (cmd, "%d", &pl) == 1)
+    {
+      command = cmdCursorMoveRelative;
+      commandParams.cursorVal.x = 0;
+      commandParams.cursorVal.y = pl;
+    }
+    cmd += cmdLen;
+    cmdLen = 0;
+    return true;
+  }
+  else if (cmd[cmdLen-1] == 'C')
+  {
+    int pc;
+    if (sscanf (cmd, "%d", &pc) == 1)
+    {
+      command = cmdCursorMoveRelative;
+      commandParams.cursorVal.x = pc;
+      commandParams.cursorVal.y = 0;
+    }
+    cmd += cmdLen;
+    cmdLen = 0;
+    return true;
+  }
+  else if (cmd[cmdLen-1] == 'D')
+  {
+    int pc;
+    if (sscanf (cmd, "%d", &pc) == 1)
+    {
+      command = cmdCursorMoveRelative;
+      commandParams.cursorVal.x = -pc;
+      commandParams.cursorVal.y = 0;
+    }
+    cmd += cmdLen;
+    cmdLen = 0;
+    return true;
+  }
   else
   {
     return false;
   }
-}
+} 

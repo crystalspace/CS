@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "cstool/initapp.h"
+#include "csutil/ansicommand.h"
 #include "csutil/cfgacc.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
@@ -260,7 +261,7 @@ iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
       /* NB: loading the plugin should have already resulted in a message 
        * having been printed. */
       static const char highlight[] = 
-	" " CS_ANSI_FI "%s" CS_ANSI_RST " ";
+	" " CS_ANSI_TEXT_BOLD_ON "%s" CS_ANSI_RST " ";
       csFPrintf (stderr, highlight, 
 	"* This likely means that the plugins could not be found.");
       csFPrintf (stderr, "\n");

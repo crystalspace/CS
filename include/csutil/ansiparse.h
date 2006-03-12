@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2005 by Jorrit Tyberghein
 	      (C) 2005 by Frank Richter
+              (C) 2006 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,6 +20,7 @@
 
 #ifndef __CS_CSUTIL_ANSIPARSE_H__
 #define __CS_CSUTIL_ANSIPARSE_H__
+
 
 /**\file
  * Helper to parse a string for ANSI codes.
@@ -45,7 +47,15 @@ public:
     /// 'Set foreground color'
     cmdFormatAttrForeground,
     /// 'Set background color'
-    cmdFormatAttrBackground
+    cmdFormatAttrBackground,
+    /// 'Clear screen'
+    cmdClearScreen,
+    /// 'Clear end of line'
+    cmdClearLine,
+    /// 'Set cursor position'
+    cmdCursorSetPosition,
+    /// Move cursor specified number of lines and columns relative to current position
+    cmdCursorMoveRelative
   };
   /// Classification of the command sequence
   enum CommandClass
@@ -55,7 +65,11 @@ public:
     /// An ANSI sequence was found, but not recognized.
     classUnknown,
     /// A formatting sequence was found.
-    classFormat
+    classFormat,
+    /// A screen clear sequence was found.
+    classClear,
+    /// A cursor movement sequence was found.
+    classCursor
   };
   /**
    * Types of attributes in the cmdFormatAttrEnable/cmdFormatAttrBackground 
@@ -102,6 +116,14 @@ public:
     /// White
     colWhite
   };
+  struct CursorParams
+  {
+    /// Column
+    int x;
+
+    /// Line
+    int y;
+  };
   /// Parameters to ANSI command
   struct CommandParams
   {
@@ -111,6 +133,8 @@ public:
       FormatColor colorVal;
       /// Attribute for cmdFormatAttrEnable and cmdFormatAttrDisable commands
       FormatAttr attrVal;
+      /// Attribute for cmdCursor*
+      CursorParams cursorVal;
     };
   };
   /**

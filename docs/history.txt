@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Mar-2006
+	- Marten added support for some more ANSI control sequences in
+	  csPrintf on windows (where they are emulated).
+	- Marten fixed an ambiguous function call in pagingformer.
 11-Mar-2006
 	- Vincent changed sound drivers to use namespaces.
 	- Piotr Obrzut added float4x4 maping with 4 csVector4's in cg 
