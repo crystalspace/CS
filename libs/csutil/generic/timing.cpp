@@ -33,3 +33,11 @@ csTicks csGetTicks ()
   ftime (&tp);
   return tp.time * 1000 + tp.millitm;
 }
+
+// This function is here for compatibility reasons. It's not at all accurate.
+//  If you end up in this function, your platform needs specific support added
+//  to CS.
+int64 csGetMicroTicks ()
+{
+  return (csGetTicks() * 1000);
+}

@@ -35,7 +35,6 @@ public:
 // Constructor called before main() is invoke
 csInitGetTicks initGetTicks;
 
-
 //-----------------------------------------------------------------------------
 // csGetTicks
 //	Implement OSX-specific clock function.  Returns milliseconds since
@@ -45,19 +44,32 @@ csInitGetTicks initGetTicks;
 //-----------------------------------------------------------------------------
 csTicks csGetTicks()
 {
-  struct timezone z = { 0, 0 };
-  struct timeval r;
-  gettimeofday(&r, &z);
-  static long base = 0;
-  if (base != 0)
-    return (r.tv_sec - base) * 1000 + r.tv_usec / 1000;
-  else
-  {
-    base = r.tv_sec;
-    return 0;
-  }
+  return (csGetMicroTicks() / 1000);
 }
 
+// This function should return microseconds since first invocation
+// time. When this, or csGetTicks() is called once in a single thread
+// this function is MT safe. 
+int64 csGetMicroTicks ()
+{
+  // Storage for the initial invocation call
+  static struct timeval FirstCount;
+
+  // Flag indicating wether timing has been initialized
+  static int TimingInitialized = 0;
+
+  // Start counting from first time this function is called. 
+  if (!TimingInitialized)
+  {
+    gettimeofday (&FirstCount, 0);    
+    TimingInitialized=1;
+  }
+
+  struct timeval now;
+  gettimeofday (&now, 0);
+  return ((int64)(now.tv_sec  - FirstCount.tv_sec )) * 1000000 + 
+    (now.tv_usec - FirstCount.tv_usec);
+}
 
 //-----------------------------------------------------------------------------
 // csSleep

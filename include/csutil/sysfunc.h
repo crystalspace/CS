@@ -136,6 +136,19 @@ CS_CRYSTALSPACE_EXPORT int csPrintfErr (const char* str, ...) CS_GNUC_PRINTF (1,
  */
 CS_CRYSTALSPACE_EXPORT csTicks csGetTicks ();
 
+
+/**
+ * Get the current elapsed time in microseconds (us). Warning! Do NOT use this 
+ * function for controlling game logic speed. To do that you should use the virtual
+ * clock (iVirtualClock) which you can get from the object registry. By
+ * using the virtual clock it will be possible to control the speed of your
+ * game and also to pause it if needed.
+ *
+ * The first call to this or csGetTicks() must complete before multiple 
+ * threads may call this function.
+*/
+CS_CRYSTALSPACE_EXPORT int64 csGetMicroTicks ();
+
 /**
  * This function will freeze your application for given number of 1/1000
  * seconds. The function is very inaccurate, so don't use it for accurate

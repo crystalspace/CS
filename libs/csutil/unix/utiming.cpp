@@ -44,13 +44,29 @@ csInitGetTicks initGetTicks;
 // function is MT safe. 
 csTicks csGetTicks ()
 {
-  static struct timeval now, FirstCount;
+  return (csGetMicroTicks() / 1000);
+}
+
+// This function should return microseconds since first invocation
+// time. When this, or csGetTicks() is called once in a single thread
+// this function is MT safe. 
+int64 csGetMicroTicks ()
+{
+  // Storage for the initial invocation call
+  static struct timeval FirstCount;
+
+  // Flag indicating wether timing has been initialized
+  static int TimingInitialized = 0;
 
   // Start counting from first time this function is called. 
-  if (FirstCount.tv_sec == 0)
+  if (!TimingInitialized)
+  {
     gettimeofday (&FirstCount, 0);    
+    TimingInitialized=1;
+  }
 
+  struct timeval now;
   gettimeofday (&now, 0);
-  return (now.tv_sec  - FirstCount.tv_sec ) * 1000 + 
-         (now.tv_usec - FirstCount.tv_usec) / 1000;
+  return ((int64)(now.tv_sec  - FirstCount.tv_sec )) * 1000000 + 
+    (now.tv_usec - FirstCount.tv_usec);
 }
