@@ -232,8 +232,9 @@ iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
       void* interf = b->QueryInterface (id, version);
       if (!interf)
       {
-        csPrintf (CS_ANSI_COLOR_FY CS_ANSI_TEXT_BOLD_ON "WARNING! Suspicious: object with "
-	  "tag '%s' does not implement interface '%s'!\n" CS_ANSI_RST, t, 
+        csPrintf (CS_ANSI_FY CS_ANSI_TEXT_BOLD_ON 
+	  "WARNING! Suspicious: object with tag '%s' does not implement "
+	  "interface '%s'!\n" CS_ANSI_RST, t, 
 	  iSCF::SCF->GetInterfaceName(id));
 	fflush (stdout);
 	return 0;

@@ -628,8 +628,8 @@ int main (int argc, char *argv [])
   while (!ShutDown)
   {
     char command [999];
-    csPrintf (CS_ANSI_TEXT_BOLD_ON CS_ANSI_COLOR_FM "%s " CS_ANSI_TEXT_BOLD_OFF 
-      CS_ANSI_COLOR_FG "#" CS_ANSI_RST " ", VFS->GetCwd ());
+    csPrintf (CS_ANSI_TEXT_BOLD_ON CS_ANSI_FM "%s " CS_ANSI_TEXT_BOLD_OFF 
+      CS_ANSI_FG "#" CS_ANSI_RST " ", VFS->GetCwd ());
     fflush (stdout);
     if (!fgets (command, sizeof(command), stdin))
     {

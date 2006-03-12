@@ -10,6 +10,8 @@ chronological order.
 	- Marten added support for some more ANSI control sequences in
 	  csPrintf on windows (where they are emulated).
 	- Marten fixed an ambiguous function call in pagingformer.
+	- res changed the CS_ANSI_COLOR_ defines back to their old CS_ANSI_
+	  names.
 11-Mar-2006
 	- Vincent changed sound drivers to use namespaces.
 	- Piotr Obrzut added float4x4 maping with 4 csVector4's in cg 
@@ -28,7 +30,6 @@ chronological order.
 	- Christopher added the parent property and Broadcast function 
 	  to Widgets, and the CheckBox, RadioButton, Window, ResizeKnob,
 	  StatusBar, and ToolTip widgets.
-
 9-Mar-2006
 	- Jorrit made the alsa sound driver default on linux because it
 	  is a LOT better.

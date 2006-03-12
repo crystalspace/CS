@@ -31,21 +31,21 @@
 /**\name Foreground colors
  * @{ */
 /// Black
-#define	CS_ANSI_COLOR_FK		"\033[30m"
+#define	CS_ANSI_FK		"\033[30m"
 /// Red
-#define	CS_ANSI_COLOR_FR		"\033[31m"
+#define	CS_ANSI_FR		"\033[31m"
 /// Green
-#define	CS_ANSI_COLOR_FG		"\033[32m"
+#define	CS_ANSI_FG		"\033[32m"
 /// Yellow
-#define	CS_ANSI_COLOR_FY		"\033[33m"
+#define	CS_ANSI_FY		"\033[33m"
 /// Blue
-#define	CS_ANSI_COLOR_FB		"\033[34m"
+#define	CS_ANSI_FB		"\033[34m"
 /// Magenta
-#define	CS_ANSI_COLOR_FM		"\033[35m"
+#define	CS_ANSI_FM		"\033[35m"
 /// Cyan
-#define	CS_ANSI_COLOR_FC		"\033[36m"
+#define	CS_ANSI_FC		"\033[36m"
 /// White
-#define	CS_ANSI_COLOR_FW		"\033[37m"
+#define	CS_ANSI_FW		"\033[37m"
 /** @} */
 
 /// Bold or intense foreground text on
@@ -56,21 +56,21 @@
 /**\name Background colors
  * @{ */
 /// Black
-#define	CS_ANSI_COLOR_BK		"\033[40m"
+#define	CS_ANSI_BK		"\033[40m"
 /// Red
-#define	CS_ANSI_COLOR_BR		"\033[41m"
+#define	CS_ANSI_BR		"\033[41m"
 /// Green
-#define	CS_ANSI_COLOR_BG		"\033[42m"
+#define	CS_ANSI_BG		"\033[42m"
 /// Yellow
-#define	CS_ANSI_COLOR_BY		"\033[43m"
+#define	CS_ANSI_BY		"\033[43m"
 /// Blue
-#define	CS_ANSI_COLOR_BB		"\033[44m"
+#define	CS_ANSI_BB		"\033[44m"
 /// Magenta
-#define	CS_ANSI_COLOR_BM		"\033[45m"
+#define	CS_ANSI_BM		"\033[45m"
 /// Cyan
-#define	CS_ANSI_COLOR_BC		"\033[46m"
+#define	CS_ANSI_BC		"\033[46m"
 /// White
-#define	CS_ANSI_COLOR_BW		"\033[47m"
+#define	CS_ANSI_BW		"\033[47m"
 /** @} */
 
 /**\name Clear commands

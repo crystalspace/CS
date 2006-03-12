@@ -344,21 +344,21 @@ inline void csReporterHelper::ReportV(iObjectRegistry* reg, int severity,
     switch (severity)
     {
       case CS_REPORTER_SEVERITY_BUG:
-	csPrintf(CS_ANSI_COLOR_BK CS_ANSI_COLOR_FM CS_ANSI_TEXT_BOLD_ON "BUG: " CS_ANSI_RST);
+	csPrintf (CS_ANSI_FM CS_ANSI_TEXT_BOLD_ON "BUG: " CS_ANSI_RST);
 	break;
       case CS_REPORTER_SEVERITY_ERROR:
         if (csStrNCaseCmp (description, "error", 5) != 0)
-	  csPrintf(CS_ANSI_COLOR_BK CS_ANSI_COLOR_FR CS_ANSI_TEXT_BOLD_ON "ERROR: " CS_ANSI_RST);
+	  csPrintf (CS_ANSI_FR CS_ANSI_TEXT_BOLD_ON "ERROR: " CS_ANSI_RST);
 	break;
       case CS_REPORTER_SEVERITY_WARNING:
         if (csStrNCaseCmp (description, "warning", 7) != 0)
-	  csPrintf(CS_ANSI_COLOR_BK CS_ANSI_COLOR_FY CS_ANSI_TEXT_BOLD_ON "WARNING: " CS_ANSI_RST);
+	  csPrintf (CS_ANSI_FY CS_ANSI_TEXT_BOLD_ON "WARNING: " CS_ANSI_RST);
 	break;
       case CS_REPORTER_SEVERITY_NOTIFY:
 	csPrintf ("NOTIFY: ");
 	break;
       case CS_REPORTER_SEVERITY_DEBUG:
-	csPrintf(CS_ANSI_COLOR_BK CS_ANSI_COLOR_FW CS_ANSI_TEXT_BOLD_ON "DEBUG: " CS_ANSI_RST);
+	csPrintf (CS_ANSI_FW CS_ANSI_TEXT_BOLD_ON "DEBUG: " CS_ANSI_RST);
 	break;
     }
     csPrintfV(description, args);
