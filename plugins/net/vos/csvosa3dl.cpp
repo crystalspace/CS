@@ -203,7 +203,7 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
   objreg = o;
 
   csMetaMaterial::object_reg = objreg;
-  
+
   Process = csevProcess(objreg);
 
   eventq = CS_QUERY_REGISTRY (objreg, iEventQueue);
@@ -285,11 +285,18 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
 
     start = getRealTime();
 
-    for(unsigned int n = mainThreadTasks.size(); n > 0 && getRealTime() < (start+.2); n--)
+    //for(unsigned int n = mainThreadTasks.size(); n > 0 && getRealTime() < (start+.2); n--)
+    while(mainThreadTasks.size() > 0 && getRealTime() < (start+.5))
     {
       LOG("csVosA3DL", 3, "starting main thread task");
       Task* t = mainThreadTasks.pop();
-      t->doTask();
+      try {
+        t->doTask();
+      } catch(std::runtime_error e) {
+        LOG("csVosA3DL", 2, "An exception was raised by a task: " << e.what());
+      } catch(...) {
+        LOG("csVosA3DL", 2, "An unknown exception was raised by a task");
+      }
       delete t;
       LOG("csVosA3DL", 3, "completed main thread task");
     }

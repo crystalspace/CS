@@ -83,6 +83,7 @@ protected:
   bool htvalid;
   csColliderActor collider_actor;
   bool setupCA;
+  bool wasZero;
 
 public:
   csMetaObject3D(VOS::VobjectBase* superobject);
@@ -111,10 +112,11 @@ public:
   // Property listener and callbacks for object property events
   virtual void notifyPropertyChange(const VOS::PropertyEvent &event);
 
-  // Call these from CS run loop.  Derived objects can override if they
-  // do not correctly use movable interface
-  virtual void changePosition (const csVector3 &pos, bool setCollider);
-  virtual void changeOrientation (const csMatrix3 &ori, bool setCollider);
+  // Reads the position property and sets the CS object
+  virtual void syncPosition (bool setCollider);
+
+  // Reads the orientation property and sets the CS object
+  virtual void syncOrientation (bool setCollider);
 
   virtual void changeMaterial (iMaterialWrapper* mat);
 

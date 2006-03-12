@@ -35,6 +35,7 @@
 #include "vosobject3d.h"
 #include <vos/metaobjects/a3dl/a3dl.hh>
 #include <vos/vos/remoteproperty.hh>
+#include <vos/vos/localproperty.hh>
 
 using namespace VUtil;
 using namespace VOS;
@@ -238,34 +239,32 @@ void ConstructObject3DTask::doTask()
 
 // Set position task
 
-class PositionTask : public Task
+class PositionUpdateTask : public Task
 {
   vRef<csMetaObject3D> obj;
-  csVector3 pos;
   bool setCollider;
 
 public:
-  PositionTask (csMetaObject3D *o, const csVector3 &p, bool c = false)
-    : obj(o, true), pos(p), setCollider(c) {}
-  ~PositionTask () {}
+  PositionUpdateTask (csMetaObject3D *o, bool c = false)
+    : obj(o, true), setCollider(c) {}
+  ~PositionUpdateTask () {}
 
-  void doTask() { obj->changePosition(pos, setCollider); }
+  void doTask() { obj->syncPosition(setCollider); }
 };
 
 // Set orientation task
 
-class OrientateTask : public Task
+class OrientationUpdateTask : public Task
 {
   vRef<csMetaObject3D> obj;
-  csMatrix3 ori;
   bool setCollider;
 
 public:
-  OrientateTask (csMetaObject3D *o, const csMatrix3 &m, bool c = false)
-    : obj(o, true), ori(m), setCollider(c) {}
-  ~OrientateTask () {}
+  OrientationUpdateTask (csMetaObject3D *o, bool c = false)
+    : obj(o, true), setCollider(c) {}
+  ~OrientationUpdateTask () {}
 
-  void doTask() { obj->changeOrientation (ori, setCollider); }
+  void doTask() { obj->syncOrientation (setCollider); }
 };
 
 // Set material task
@@ -335,7 +334,8 @@ csMetaObject3D::csMetaObject3D(VobjectBase* superobject)
     : A3DL::Object3D(superobject),
       alreadyLoaded(false),
       htvalid(false),
-      setupCA(false)
+      setupCA(false),
+      wasZero(false)
 {
   csvobj3d = new csVosObject3D(this, superobject);
   csvobj3d->IncRef();
@@ -469,6 +469,11 @@ void csMetaObject3D::notifyChildInserted (VobjectEvent &event)
         {
           rp->enableAsyncReplace (true);
         }
+        vRef<LocalProperty> lp = meta_cast<LocalProperty> (event.getChild());
+        if(lp.isValid())
+        {
+          lp->setAsynchronousEvents (false);
+        }
       }
     }
     catch (...)
@@ -530,17 +535,26 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
 
       if (pcr->getContextualName() == "a3dl:position")
       {
-        double x = 0.0, y = 0.0, z = 0.0;
-        getPosition (x,y,z);
-        LOG("vosobject3d", 3, getURLstr() << " event value is \"" << event.getValue()
-            << "\", prop read is \""
-            << event.getProperty()->read() << "\" and getPos() gave us "
-            << x << " " << y << " " << z);
+          double x = 0.0, y = 0.0, z = 0.0;
+          getPosition (x,y,z);
+          LOG("vosobject3d", 3, getURLstr() << " event value is \"" << event.getValue()
+              << "\", prop read is \""
+              << event.getProperty()->read() << "\" and getPosition() gave us "
+              << x << " " << y << " " << z);
 
-        vosa3dl->mainThreadTasks.push (new PositionTask(this,csVector3((float)x,
-                                                                       (float)y,
-                                                                       (float)z),
-                                                        isLocal() || event.getInitiator()->isRemote()));
+          /*
+          if (x == 0 && y == 0 && z == 0) {
+            wasZero = true;
+          }
+          else {
+            if (wasZero) {
+              raise(SIGINT);
+              wasZero = false;
+            }
+          }
+          */
+
+          vosa3dl->mainThreadTasks.push (new PositionUpdateTask(this, isLocal() || event.getInitiator()->isRemote()));
       }
       else if (pcr->getContextualName() == "a3dl:orientation")
       {
@@ -549,13 +563,10 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
 
         LOG("vosobject3d", 3, getURLstr() << " event value is \"" << event.getValue()
             << "\", prop read is \""
-            << event.getProperty()->read() << "\" and getPos() gave us "
+            << event.getProperty()->read() << "\" and getOrientation() gave us "
             << x << " " << y << " " << z << " " << angle);
 
-        csQuaternion q;
-        q.SetWithAxisAngle (csVector3((float)x, (float)y, (float)z), angle * M_PI/180.0);
-        vosa3dl->mainThreadTasks.push (new OrientateTask(this,csMatrix3(q),
-                                                         isLocal() || event.getInitiator()->isRemote()));
+        vosa3dl->mainThreadTasks.push (new OrientationUpdateTask(this, isLocal() || event.getInitiator()->isRemote()));
       }
     }
   }
@@ -563,9 +574,15 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
   {}
 }
 
-void csMetaObject3D::changePosition (const csVector3 &pos, bool setCollider)
+void csMetaObject3D::syncPosition (bool setCollider)
 {
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
+
+  double x, y, z;
+
+  getPosition(x, y, z);
+
+  csVector3 pos((float)x, (float)y, (float)z);
 
   LOG("vosobject3d", 3, "changePosition: " << getURLstr() <<
       " to " << pos.x << " " << pos.y << " " << pos.z);
@@ -586,8 +603,16 @@ void csMetaObject3D::changePosition (const csVector3 &pos, bool setCollider)
   }
 }
 
-void csMetaObject3D::changeOrientation (const csMatrix3 &ori, bool setCollider)
+void csMetaObject3D::syncOrientation (bool setCollider)
 {
+  double x, y, z, angle;
+
+  getOrientation(x, y, z, angle);
+
+  csQuaternion q;
+  q.SetWithAxisAngle (csVector3((float)x, (float)y, (float)z), angle * M_PI/180.0);
+  csMatrix3 ori(q);
+
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
 
   if (mw.IsValid())
@@ -694,21 +719,24 @@ void csMetaObject3D::getAngularVelocity(double& x, double& y, double& z)
 class MoveToTask : public Task
 {
   vRef<csMetaObject3D> obj;
-  csVector3 pos;
+  csVector3 vec;
   float timestep;
 
 public:
-  MoveToTask (csMetaObject3D *o, const csVector3 &p, float _timestep)
-    : obj(o, true), pos(p), timestep(_timestep) {}
+  MoveToTask (csMetaObject3D *o, const csVector3 &v, float _timestep)
+    : obj(o, true), vec(v), timestep(_timestep) {}
   ~MoveToTask () {}
 
-  void doTask() { obj->doMoveTo(pos, timestep); }
+  void doTask() { obj->doMoveTo(vec, timestep); }
 };
 
 void csMetaObject3D::doMoveTo(const csVector3& vec, float timestep)
 {
+  syncPosition(false);
+
   collider_actor.Move(timestep, 1.0, vec, csVector3());
   csVector3 pos = csvobj3d->GetMeshWrapper()->GetMovable()->GetPosition();
+
   setPosition(pos.x, pos.y, pos.z);
 }
 
@@ -716,11 +744,11 @@ void csMetaObject3D::moveTo(double x, double y, double z, double timestep)
 {
   if (setupCA) {
     //LOG("object3d", 1, "vec is " << x << " " << y << " " << z << " ts is " << timestep);
-    vosa3dl->mainThreadTasks.push (new MoveToTask(this,
-                                                  csVector3((float)x,
-                                                            (float)y,
-                                                            (float)z),
-                                                  timestep));
+
+    double px, py, pz;
+    getPosition(px, py, pz);
+
+    vosa3dl->mainThreadTasks.push (new MoveToTask(this, csVector3((float)x, (float)y, (float)z), timestep));
   }
 }
 

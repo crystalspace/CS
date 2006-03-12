@@ -207,6 +207,9 @@ void ConstructMaterialTask::doTask()
     MaterialUpdateTask* mut = new MaterialUpdateTask;
     mut->mm = metamaterial;
     mut->needListener = needListener;
+
+    // Everything handled by this task is still involved in background loading,
+    // so it goes into the thread pool
     TaskQueue::defaultTQ().addTask(mut);
   }
 }

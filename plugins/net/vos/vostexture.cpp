@@ -142,6 +142,9 @@ void ConstructTextureTask::doTask()
   TextureUpdateTask* tut = new TextureUpdateTask;
   tut->metatxt = metatxt;
   tut->needListener = needListener;
+
+  // Background task tells parent objects that use this texture that
+  // they need to update
   TaskQueue::defaultTQ().addTask(tut);
 }
 

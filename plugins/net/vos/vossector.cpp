@@ -69,7 +69,7 @@ void SetAmbientTask::doTask()
   engine->SetAmbientLight(color);
   // XXX bug must relight static Things. simply calling
   // vosa3dl->incrementRelightCounter() does nothing. Do we
-  // need to add a RilghtTask to the main thread task list? 
+  // need to add a RilghtTask to the main thread task list?
 }
 
 /// Sets CS progress meter ///
@@ -237,6 +237,9 @@ void LoadObjectTask::doTask()
           LOG("NEIL-LOG", 1, "Uh oh");
 
       sector->addObject3D (obj3d->GetCSinterface());
+
+    // Everything handled by this task is still involved in background loading,
+    // so it goes into the thread pool
       TaskQueue::defaultTQ().addTask(new SetupObjectTask(vosa3dl, obj3d, sector));
     }
   }
@@ -405,8 +408,8 @@ csVosSector::csVosSector(iObjectRegistry *o, csVosA3DL* va, csMetaSector* sec)
   sector = engine->CreateSector(sec->getURLstr().c_str());
   isLit = false;
   waitingForChildren = 0;
-  gravity = 0;
-  collisionDetection = false;
+  gravity = 9;
+  collisionDetection = true;
 }
 
 csVosSector::~csVosSector()
@@ -437,6 +440,8 @@ void csVosSector::Load(iProgressMeter* progress)
   if(! didLoad) {
     didLoad = true;
     waitingForChildren = sectorvobj->numChildren();
+
+    // Download stuff in the background
     TaskQueue::defaultTQ().addTask(new LoadSectorTask(vosa3dl, this, progress));
   }
 }
