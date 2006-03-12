@@ -156,14 +156,14 @@ namespace aws
 	   * and determines how much of the corner is mitered off and beveled. 
 	   */
 	  virtual void DrawMiteredRect (uint x1, uint y1, uint x2, uint y2, 
-	    float miter, bool swap_colors = false, bool fill = false);
+	    uint miter, bool swap_colors = false, bool fill = false);
 	
 	  /** 
 	   * Draws a rounded rectangle. The roundness value should be between
 	   * 0.0 and 1.0, and determines how much of the corner is rounded off. 
 	   */
 	  virtual void DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
-	    float roundness, bool swap_colors = false, bool fill = false); 
+	    uint roundness, bool swap_colors = false, bool fill = false); 
 	
 	  /** 
 	   * Draws an elliptical arc from start angle to end angle.  Angle must be

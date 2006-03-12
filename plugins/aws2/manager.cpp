@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "manager.h"
 #include "frame.h"
-#include "border.h"
 #include "script_manager.h"
 #include "script_console.h"
 #include "script_object.h"

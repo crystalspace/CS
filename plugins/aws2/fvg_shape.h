@@ -114,11 +114,11 @@ namespace aws
 	  break;
 
 	  case RECT_ROUNDED:
-	    pen->DrawRoundedRect((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, roundness, false, fill);
+	    pen->DrawRoundedRect((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, 0, false, fill);
 	  break;
 
 	  case RECT_MITERED:
-	    pen->DrawMiteredRect((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, roundness, false, fill);
+	    pen->DrawMiteredRect((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, 0, false, fill);
 	  break;
 	}
       }

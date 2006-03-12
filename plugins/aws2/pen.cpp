@@ -201,18 +201,18 @@ DrawMiteredRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
 	int32 x1,y1,x2,y2;
-	jsdouble miter;
+	int32 miter;
 	JSBool fill, swap_colors;
 		
 	JS_ValueToInt32(cx,  argv[0], &x1);
 	JS_ValueToInt32(cx,  argv[1], &y1);
 	JS_ValueToInt32(cx,  argv[2], &x2);
 	JS_ValueToInt32(cx,  argv[3], &y2);
-	JS_ValueToNumber(cx,  argv[4], &miter);
+	JS_ValueToInt32(cx,  argv[4], &miter);
 	JS_ValueToBoolean(cx, argv[5], &fill);
 	JS_ValueToBoolean(cx, argv[6], &swap_colors);
 		
-	if (po) po->DrawMiteredRect(x1,y1,x2,y2,(float)miter, swap_colors==JS_TRUE, fill==JS_TRUE);	
+	if (po) po->DrawMiteredRect(x1,y1,x2,y2,miter, swap_colors==JS_TRUE, fill==JS_TRUE);	
 		
 	return JS_TRUE;
 }
@@ -226,18 +226,18 @@ DrawRoundedRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
 	int32 x1,y1,x2,y2;
-	jsdouble roundness;
+	int32 roundness;
 	JSBool fill, swap_colors;
 		
 	JS_ValueToInt32(cx,  argv[0], &x1);
 	JS_ValueToInt32(cx,  argv[1], &y1);
 	JS_ValueToInt32(cx,  argv[2], &x2);
 	JS_ValueToInt32(cx,  argv[3], &y2);
-	JS_ValueToNumber(cx,  argv[4], &roundness);
+	JS_ValueToInt32(cx,  argv[4], &roundness);
 	JS_ValueToBoolean(cx, argv[5], &fill);
 	JS_ValueToBoolean(cx, argv[6], &swap_colors);
 		
-	if (po) po->DrawRoundedRect(x1,y1,x2,y2,(float)roundness, swap_colors==JS_TRUE, fill==JS_TRUE);	
+	if (po) po->DrawRoundedRect(x1,y1,x2,y2,roundness, swap_colors==JS_TRUE, fill==JS_TRUE);	
 		
 	return JS_TRUE;
 }
@@ -768,14 +768,14 @@ void  pen::Draw(iPen *_pen)
 		    case PEN_OP_DRAWMITEREDRECT:
 			{
 				uint x1, y1, x2, y2;
-				float miter;
+				uint miter;
 				bool swap_colors, fill;
 	
 				buf->Read((char *)&x1, sizeof(uint));
 				buf->Read((char *)&y1, sizeof(uint));
 				buf->Read((char *)&x2, sizeof(uint));
 				buf->Read((char *)&y2, sizeof(uint));	
-				buf->Read((char *)&miter, sizeof(float));
+				buf->Read((char *)&miter, sizeof(uint));
 				
 				buf->Read((char *)&swap_colors, sizeof(bool));	
 				buf->Read((char *)&fill, sizeof(bool));	
@@ -786,14 +786,14 @@ void  pen::Draw(iPen *_pen)
 		    case PEN_OP_DRAWROUNDRECT:
 			{
 				uint x1, y1, x2, y2;
-				float roundness;
+				uint roundness;
 				bool swap_colors, fill;
 	
 				buf->Read((char *)&x1, sizeof(uint));
 				buf->Read((char *)&y1, sizeof(uint));
 				buf->Read((char *)&x2, sizeof(uint));
 				buf->Read((char *)&y2, sizeof(uint));	
-				buf->Read((char *)&roundness, sizeof(float));
+				buf->Read((char *)&roundness, sizeof(uint));
 				
 				buf->Read((char *)&swap_colors, sizeof(bool));	
 				buf->Read((char *)&fill, sizeof(bool));	
@@ -1058,7 +1058,7 @@ void pen::DrawRect (uint x1, uint y1, uint x2, uint y2,
 * and determines how much of the corner is mitered off and beveled. 
 */
 void pen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2, 
-	float miter, bool swap_colors, bool fill)
+	uint miter, bool swap_colors, bool fill)
 {
 	uint8 op = PEN_OP_DRAWMITEREDRECT;
 	
@@ -1067,7 +1067,7 @@ void pen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
 	buf->Write((const char *)&y1, sizeof(uint));
 	buf->Write((const char *)&x2, sizeof(uint));
 	buf->Write((const char *)&y2, sizeof(uint));
-	buf->Write((const char *)&miter, sizeof(float));
+	buf->Write((const char *)&miter, sizeof(uint));
 	
 	buf->Write((const char *)&swap_colors, sizeof(bool));	
 	buf->Write((const char *)&fill, sizeof(bool)); 
@@ -1078,7 +1078,7 @@ void pen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
 * 0.0 and 1.0, and determines how much of the corner is rounded off. 
 */
 void pen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
-	float roundness, bool swap_colors, bool fill) 
+	uint roundness, bool swap_colors, bool fill) 
 { 
 	uint8 op = PEN_OP_DRAWROUNDRECT;
 	
@@ -1087,7 +1087,7 @@ void pen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
 	buf->Write((const char *)&y1, sizeof(uint));
 	buf->Write((const char *)&x2, sizeof(uint));
 	buf->Write((const char *)&y2, sizeof(uint));
-	buf->Write((const char *)&roundness, sizeof(float));
+	buf->Write((const char *)&roundness, sizeof(uint));
 	
 	buf->Write((const char *)&swap_colors, sizeof(bool));	
 	buf->Write((const char *)&fill, sizeof(bool));	
