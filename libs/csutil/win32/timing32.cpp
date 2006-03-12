@@ -32,7 +32,7 @@ public:
   csInitGetTicks()
   {
     csGetTicks();
-  }    
+  }
 };
 // Constructor called before main is invoke
 csInitGetTicks initGetTicks;
@@ -59,30 +59,30 @@ int64 csGetMicroTicks()
   // Storage for the performance timer frequency
   static int64 Freq      = 0;
 
-	//Freq was set to -1, if the current Hardware does not support
-	//high resolution timers. We will use GetTickCount instead then.
-	if (Freq < 0)
-		return GetTickCount() * 1000;
+  //Freq was set to -1, if the current Hardware does not support
+  //high resolution timers. We will use GetTickCount instead then.
+  if (Freq < 0)
+    return GetTickCount() * 1000;
 
-	//Freq is 0, the first time this function is being called.
-	if (Freq == 0)
-	{
-		//try to determine the frequency of the high resulution timer
-		if (!QueryPerformanceFrequency((LARGE_INTEGER*)&Freq))
-		{
-			//There is no such timer....
-			Freq=-1;
-			return GetTickCount() * 1000;
-		}
-		// Start counting from first time this function is called.
-		QueryPerformanceCounter((LARGE_INTEGER*)&FirstCount);
-	}
+  //Freq is 0, the first time this function is being called.
+  if (Freq == 0)
+  {
+    //try to determine the frequency of the high resulution timer
+    if (!QueryPerformanceFrequency((LARGE_INTEGER*)&Freq))
+    {
+      //There is no such timer....
+      Freq=-1;
+      return GetTickCount() * 1000;
+    }
+    // Start counting from first time this function is called.
+    QueryPerformanceCounter((LARGE_INTEGER*)&FirstCount);
+  }
 
-	//retrieve current count
-	int64 Count = 0;
-	QueryPerformanceCounter((LARGE_INTEGER*)&Count);
+  //retrieve current count
+  int64 Count = 0;
+  QueryPerformanceCounter((LARGE_INTEGER*)&Count);
 
-	return 1000000*(Count-FirstCount)/Freq;
+  return 1000000*(Count-FirstCount)/Freq;
 }
 
 void csSleep (int SleepTime)
