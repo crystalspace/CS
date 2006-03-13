@@ -1,3 +1,4 @@
 SubDir TOP data aws ;
 
-InstallData [ Wildcard *.def ] : data aws ;
+InstallData [ Wildcard *.def *.js ] : data aws ;
+InstallData [ Wildcard widgets : *.js ] : data aws widgets ;

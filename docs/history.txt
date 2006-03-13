@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Mar-2006
+	- Vincent fixed 'jam install' so that it also installs terrainf *.lib,
+	  AWS2 *.js files and CS/data/aws/widgets/ directory.	  
 12-Mar-2006
 	- Marten added support for some more ANSI control sequences in
 	  csPrintf on windows (where they are emulated).

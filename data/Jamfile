@@ -24,7 +24,7 @@ maps =
 for map in $(maps)
 {
   local files =
-    [ Wildcard $(map) : *.jpg *.png *.map *.tga *.dds *.spr world ] ;
+    [ Wildcard $(map) : *.lib *.jpg *.png *.map *.tga *.dds *.spr world ] ;
   InstallData $(files) : data maps $(map) ;
 }
 
