@@ -242,6 +242,7 @@
   INTERFACE_APPLY(iReporter)
   INTERFACE_APPLY(iReporterIterator)
   INTERFACE_APPLY(iReporterListener)
+  INTERFACE_APPLY(iSceneNode)
   INTERFACE_APPLY(iSCF)
   INTERFACE_APPLY(iScript)
   INTERFACE_APPLY(iScriptObject)
@@ -922,6 +923,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "iengine/campos.h"
 %include "iengine/texture.h"
 %include "iengine/material.h"
+%include "iengine/scenenode.h"
 
 // Swig 1.3.24 doesn't handle pointer default args well unless we tell it
 // to use an alternate way for that function
