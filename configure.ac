@@ -35,12 +35,10 @@ AC_CANONICAL_HOST
 #------------------------------------------------------------------------------
 CS_PROG_CC
 CS_PROG_CXX
+CS_PROG_LINK
 
 AC_PROG_CXXCPP
 CS_EMIT_BUILD_PROPERTY([CMD.C++CPP], [$CXXCPP])
-
-# C++ compiler is used as linker.
-CS_EMIT_BUILD_PROPERTY([CMD.LINK], [AS_ESCAPE([$(CMD.C++)])])
 
 AS_IF([test $ac_compiler_gnu = yes],
     [cs_compiler_name=GCC CS_HEADER_PROPERTY([CS_COMPILER_GCC])],
@@ -195,7 +193,15 @@ CS_CHECK_HOST
 AS_IF([test "x$cs_host_macosx" = "xyes"],
     [# We assume that we always have CoreAudio available on MacOS/X.
     CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
-    CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS], [-framework CoreAudio])])
+    CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS], [-framework CoreAudio])
+    CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])],
+    [case $cs_host_family in
+	windows)
+	    CS_HEADER_PROPERTY([CS_PLATFORM_WIN32])
+	    ;;
+	unix)
+	    CS_HEADER_PROPERTY([CS_PLATFORM_UNIX])
+    esac])
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
@@ -517,40 +523,6 @@ CS_CHECK_VTABLE_THUNKS
 
 
 #------------------------------------------------------------------------------
-# Check if compiler recognizes -pipe directive.
-#------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([if -pipe is accepted], [cs_cv_prog_cxx_pipe],
-   [CS_CREATE_TUPLE([-pipe])], [C++], [COMPILER.CFLAGS], [+])
-
-
-
-#------------------------------------------------------------------------------
-# Check if compiler/linker recognizes -shared directive which is needed for
-# linking plugin modules.  Unfortunately, the Apple compiler (and possibly
-# others) requires extra effort.  Even though the compiler does not recognize
-# the -shared option, it nevertheless returns a "success" result after emitting
-# the warning "unrecognized option `-shared'".  Worse, even -Werror fails to
-# promote the warning to an error, so we must instead scan the compiler's
-# output for an appropriate diagnostic.
-#------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([if -shared is accepted], [cs_cv_prog_link_shared],
-    [CS_CREATE_TUPLE([-shared])], [C++],
-    [CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS], [-shared], [+])], [],
-    [$cs_cv_prog_cxx_enable_errors], [], [], [shared])
-
-
-
-#------------------------------------------------------------------------------
-# Check if linker recognizes -soname which is used to assign a name internally
-# to plugin modules.
-#------------------------------------------------------------------------------
-CS_CHECK_BUILD([if -soname is accepted], [cs_cv_prog_link_soname], [],
-    [CS_CREATE_TUPLE([],[-Wl,-soname,foobar])], [C++],
-    [CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS.USE_SONAME], [yes])])
-
-
-
-#------------------------------------------------------------------------------
 # Check how to ask the linker to export all dynamic symbols in debug mode to
 # allow the backtrace() callstack creation code to obtain symbols in all cases.
 #------------------------------------------------------------------------------
@@ -568,16 +540,6 @@ CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
 CS_CHECK_BUILD([if --kill-at is accepted], [cs_cv_prog_link_kill_at], [],
     [CS_CREATE_TUPLE([],[-Wl,--kill-at])], [C++],
     [CS_EMIT_BUILD_PROPERTY([CSJAVA.LFLAGS], [-Wl,--kill-at])])
-
-
-
-#------------------------------------------------------------------------------
-# Check if compiler can be instructed to produce position-independent-code
-# (PIC).  This feature is required by some platforms when building plugin
-# modules and shared libraries.
-#------------------------------------------------------------------------------
-CS_COMPILER_PIC([C++], [cs_cv_prog_cxx_pic],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.PIC], [$cs_cv_prog_cxx_pic])])
 
 
 

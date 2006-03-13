@@ -35,7 +35,7 @@
 #       variables in Jamconfig
 # CS_PROG_LINK
 #	Tries to determine a linker.  This is done by checking if a C++ or
-#       Objecctive-C++ compiler is availbale in which case it is used for
+#       Objecctive-C++ compiler is available in which case it is used for
 #       linking; otherwise the C or Objective-C compiler is used.  This also
 #       sets the CMD.LINK and COMPILER.LFLAGS variables in Jamconfig and
 #       respects the LDFLAGS environment variable.  Finally, checks if linker
@@ -43,23 +43,29 @@
 #	recognizes -soname and sets PLUGIN.LFLAGS.USE_SONAME to "yes".
 #-----------------------------------------------------------------------------
 AC_DEFUN([CS_PROG_CC],[
+    CFLAGS="$CFLAGS" # Filter undesired flags
     AC_PROG_CC
     AS_IF([test -n "$CC"],[
 	CS_EMIT_BUILD_PROPERTY([CMD.CC], [$CC])
-
-	CFLAGS=`echo "$CFLAGS" | sed 's/\-O.//g;s/\-g.//g'`
 	CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$CPPFLAGS $CFLAGS], [+])
+	
+	# Check if compiler recognizes -pipe directive.
+	CS_EMIT_BUILD_FLAGS([if $CC accepts -pipe], [cs_cv_prog_cc_pipe],
+	  [CS_CREATE_TUPLE([-pipe])], [C], [COMPILER.CFLAGS], [+])
     ])
 ])
 
 AC_DEFUN([CS_PROG_CXX],[
+    CXXFLAGS="$CXXFLAGS" # Filter undesired flags
     AC_PROG_CXX
     AS_IF([test -n "$CXX"],[
 	CS_EMIT_BUILD_PROPERTY([CMD.C++], [$CXX])
 
-        CXXFLAGS=`echo "$CXXFLAGS" | sed 's/\-O.//g;s/-g.//g'`
 	CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [$CPPFLAGS $CXXFLAGS], [+])
 
+        # Check if compiler can be instructed to produce position-independent-code
+        # (PIC).  This feature is required by some platforms when building plugin
+        # modules and shared libraries.
 	CS_COMPILER_PIC([C++], [cs_cv_prog_cxx_pic],
 	    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.PIC],
 		[$cs_cv_prog_cxx_pic])])
@@ -73,11 +79,20 @@ AC_DEFUN([CS_PROG_LINK],[
 
     CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 
+    # Check if compiler/linker recognizes -shared directive which is needed for
+    # linking plugin modules.  Unfortunately, the Apple compiler (and possibly
+    # others) requires extra effort.  Even though the compiler does not recognize
+    # the -shared option, it nevertheless returns a "success" result after emitting
+    # the warning "unrecognized option `-shared'".  Worse, even -Werror fails to
+    # promote the warning to an error, so we must instead scan the compiler's
+    # output for an appropriate diagnostic.
     CS_CHECK_BUILD_FLAGS([if -shared is accepted], [cs_cv_prog_link_shared],
 	[CS_CREATE_TUPLE([-shared])], [C++],
 	[CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS], [-shared], [+])], [],
 	[], [], [], [shared])
 
+    # Check if linker recognizes -soname which is used to assign a name internally
+    # to plugin modules.
     CS_CHECK_BUILD([if -soname is accepted], [cs_cv_prog_link_soname], [],
 	[CS_CREATE_TUPLE([-Wl,-soname,foobar])], [C++],
 	[CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS.USE_SONAME], [yes])])

@@ -19,51 +19,6 @@
 AC_PREREQ([2.56])
 
 #------------------------------------------------------------------------------
-# _CS_PROG_CLIENT_PATH(CLIENT-PATH)
-#	Given a client-supplied replacement for PATH, augment the list by
-#	appending the locations mentioned in cs_bin_paths_default.
-#------------------------------------------------------------------------------
-AC_DEFUN([_CS_PROG_CLIENT_PATH],
-    [AS_REQUIRE([_AS_PATH_SEPARATOR_PREPARE])dnl
-    $1[]m4_foreach([cs_bin_path], [cs_bin_paths_default],
-	[$PATH_SEPARATOR[]cs_bin_path])])
-
-
-#------------------------------------------------------------------------------
-# CS_PROG_CC
-#	Checks for a C compiler, and emits the result in the CMD.CC build
-#       property.
-#
-# IMPLEMENTATION NOTES
-#
-# Note that AC_PROG_CC and AC_PROC_CXX insist upon adding both optimization
-# (-O2) and debug (-g) flags to CFLAGS and CXXFLAGS if these variables have not
-# been set explicitly. Unfortunately, this is not suitable for Crystal Space's
-# build system which makes a distinction between `optimize' and `debug' builds.
-# To work around this problem, we ensure that both of these variables are set
-# (either with empty values or with a user-supplied values) in order to
-# override Autoconf's undesirable behavior.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_PROG_CC],
-    [CFLAGS="$CFLAGS" # See above note.
-    AC_PROG_CC
-    CS_EMIT_BUILD_PROPERTY([CMD.CC], [$CC])])
-
-
-#------------------------------------------------------------------------------
-# CS_PROG_CXX
-#	Checks for a C++ compiler, and emits the result in the CMD.C++ build
-#       property.
-#
-# Same IMPLEMENTATION NOTES as for CS_CHECK_PROG_CC apply.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_PROG_CXX],
-    [CFLAGS="$CXXFLAGS" # See above note.
-    AC_PROG_CXX
-    CS_EMIT_BUILD_PROPERTY([CMD.C++], [$CXX])])
-
-
-#------------------------------------------------------------------------------
 # CS_CHECK_COMMON_TOOLS_LINK
 #	Checks for common tools related to linking.
 #------------------------------------------------------------------------------
