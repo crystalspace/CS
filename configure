@@ -313,7 +313,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CXXCPP RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES STRINGS ac_ct_STRINGS FLEX BISON DOXYGEN TEXI2DVI TEXI2PDF DVIPS DVIPDF MAKEINFO HHC ac_ct_HHC INSTALL SWIG LIBTOOL_TEST ac_ct_LIBTOOL_TEST LIBTOOL_PATH LIBTOOL ac_ct_LIBTOOL CS_LT_APPLE APPLE_LIBTOOL MKDIR MKDIRS DOT ac_ct_DOT JAM MAKE CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG EGREP PERL PYTHON JAVA JAVAC ANT CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS PKG_CONFIG ac_ct_PKG_CONFIG CONFIG_XXF86VM ac_ct_CONFIG_XXF86VM CONFIG_XAW ac_ct_CONFIG_XAW CONFIG_Z ac_ct_CONFIG_Z CONFIG_ZLIB ac_ct_CONFIG_ZLIB CONFIG_PNG ac_ct_CONFIG_PNG CONFIG_LIBPNG ac_ct_CONFIG_LIBPNG CONFIG_JPEG ac_ct_CONFIG_JPEG CONFIG_LIBJPEG ac_ct_CONFIG_LIBJPEG CONFIG_LCMS ac_ct_CONFIG_LCMS CONFIG_MNG ac_ct_CONFIG_MNG CONFIG_LIBMNG ac_ct_CONFIG_LIBMNG CONFIG_MIKMOD ac_ct_CONFIG_MIKMOD CONFIG_OGG ac_ct_CONFIG_OGG CONFIG_VORBIS ac_ct_CONFIG_VORBIS CONFIG_VORBISFILE ac_ct_CONFIG_VORBISFILE CONFIG_3DS ac_ct_CONFIG_3DS CONFIG_LIB3DS ac_ct_CONFIG_LIB3DS CONFIG_LIB3DS_120 ac_ct_CONFIG_LIB3DS_120 CONFIG_ODE ac_ct_CONFIG_ODE CONFIG_BULLET ac_ct_CONFIG_BULLET CONFIG_FREETYPE2 ac_ct_CONFIG_FREETYPE2 CONFIG_FREETYPE ac_ct_CONFIG_FREETYPE CONFIG_CAL3D ac_ct_CONFIG_CAL3D CONFIG_SDL ac_ct_CONFIG_SDL CONFIG_METAOBJECT_A3DL ac_ct_CONFIG_METAOBJECT_A3DL CONFIG_LIBMETAOBJECT_A3DL ac_ct_CONFIG_LIBMETAOBJECT_A3DL CONFIG_METAOBJECT_MISC ac_ct_CONFIG_METAOBJECT_MISC CONFIG_LIBMETAOBJECT_MISC ac_ct_CONFIG_LIBMETAOBJECT_MISC CONFIG_WX ac_ct_CONFIG_WX CONFIG_CEGUI ac_ct_CONFIG_CEGUI CONFIG_CEGUIBASE ac_ct_CONFIG_CEGUIBASE CONFIG_CG ac_ct_CONFIG_CG CONFIG_CGGL ac_ct_CONFIG_CGGL CONFIG_JACKASYN ac_ct_CONFIG_JACKASYN CONFIG_ASOUND ac_ct_CONFIG_ASOUND CONFIG_CACA ac_ct_CONFIG_CACA CONFIG_LIBCACA ac_ct_CONFIG_LIBCACA CONFIG_JS ac_ct_CONFIG_JS TTREE CONFIG_CPPUNIT ac_ct_CONFIG_CPPUNIT OBJCOPY ac_ct_OBJCOPY CONFIG_BFD ac_ct_CONFIG_BFD LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CXXCPP RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES STRINGS ac_ct_STRINGS LIBTOOL_TEST ac_ct_LIBTOOL_TEST LIBTOOL_PATH LIBTOOL ac_ct_LIBTOOL CS_LT_APPLE APPLE_LIBTOOL MKDIR MKDIRS INSTALL TEXI2DVI TEXI2PDF DVIPS DVIPDF MAKEINFO DOXYGEN DOT ac_ct_DOT FLEX BISON HHC ac_ct_HHC SWIG JAM MAKE CSLIBS_CONFIG ac_ct_CSLIBS_CONFIG EGREP PERL PYTHON JAVA JAVAC ANT CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS PKG_CONFIG ac_ct_PKG_CONFIG CONFIG_XXF86VM ac_ct_CONFIG_XXF86VM CONFIG_XAW ac_ct_CONFIG_XAW CONFIG_Z ac_ct_CONFIG_Z CONFIG_ZLIB ac_ct_CONFIG_ZLIB CONFIG_PNG ac_ct_CONFIG_PNG CONFIG_LIBPNG ac_ct_CONFIG_LIBPNG CONFIG_JPEG ac_ct_CONFIG_JPEG CONFIG_LIBJPEG ac_ct_CONFIG_LIBJPEG CONFIG_LCMS ac_ct_CONFIG_LCMS CONFIG_MNG ac_ct_CONFIG_MNG CONFIG_LIBMNG ac_ct_CONFIG_LIBMNG CONFIG_MIKMOD ac_ct_CONFIG_MIKMOD CONFIG_OGG ac_ct_CONFIG_OGG CONFIG_VORBIS ac_ct_CONFIG_VORBIS CONFIG_VORBISFILE ac_ct_CONFIG_VORBISFILE CONFIG_3DS ac_ct_CONFIG_3DS CONFIG_LIB3DS ac_ct_CONFIG_LIB3DS CONFIG_LIB3DS_120 ac_ct_CONFIG_LIB3DS_120 CONFIG_ODE ac_ct_CONFIG_ODE CONFIG_BULLET ac_ct_CONFIG_BULLET CONFIG_FREETYPE2 ac_ct_CONFIG_FREETYPE2 CONFIG_FREETYPE ac_ct_CONFIG_FREETYPE CONFIG_CAL3D ac_ct_CONFIG_CAL3D CONFIG_SDL ac_ct_CONFIG_SDL CONFIG_METAOBJECT_A3DL ac_ct_CONFIG_METAOBJECT_A3DL CONFIG_LIBMETAOBJECT_A3DL ac_ct_CONFIG_LIBMETAOBJECT_A3DL CONFIG_METAOBJECT_MISC ac_ct_CONFIG_METAOBJECT_MISC CONFIG_LIBMETAOBJECT_MISC ac_ct_CONFIG_LIBMETAOBJECT_MISC CONFIG_WX ac_ct_CONFIG_WX CONFIG_CEGUI ac_ct_CONFIG_CEGUI CONFIG_CEGUIBASE ac_ct_CONFIG_CEGUIBASE CONFIG_CG ac_ct_CONFIG_CG CONFIG_CGGL ac_ct_CONFIG_CGGL CONFIG_JACKASYN ac_ct_CONFIG_JACKASYN CONFIG_ASOUND ac_ct_CONFIG_ASOUND CONFIG_CACA ac_ct_CONFIG_CACA CONFIG_LIBCACA ac_ct_CONFIG_LIBCACA CONFIG_JS ac_ct_CONFIG_JS TTREE CONFIG_CPPUNIT ac_ct_CONFIG_CPPUNIT OBJCOPY ac_ct_OBJCOPY CONFIG_BFD ac_ct_CONFIG_BFD LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -723,13 +723,13 @@ echo X"$0" |
   	  /^X\(\/\).*/{ s//\1/; q; }
   	  s/.*/./; q'`
   srcdir=$ac_confdir
-  if test ! -r $srcdir/$ac_unique_file; then
+  if test ! -r "$srcdir/$ac_unique_file"; then
     srcdir=..
   fi
 else
   ac_srcdir_defaulted=no
 fi
-if test ! -r $srcdir/$ac_unique_file; then
+if test ! -r "$srcdir/$ac_unique_file"; then
   if test "$ac_srcdir_defaulted" = yes; then
     { echo "$as_me: error: cannot find sources ($ac_unique_file) in $ac_confdir or .." >&2
    { (exit 1); exit 1; }; }
@@ -738,7 +738,7 @@ if test ! -r $srcdir/$ac_unique_file; then
    { (exit 1); exit 1; }; }
   fi
 fi
-(cd $srcdir && test -r ./$ac_unique_file) 2>/dev/null ||
+(cd $srcdir && test -r "./$ac_unique_file") 2>/dev/null ||
   { echo "$as_me: error: sources are in $srcdir, but \`cd $srcdir' does not work" >&2
    { (exit 1); exit 1; }; }
 srcdir=`echo "$srcdir" | sed 's%\([^\\/]\)[\\/]*$%\1%'`
@@ -868,198 +868,147 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-cpu-specific-optimizations=level
                           enable CPU-specific optimizations; recognized levels
-                          are `no',
- `minimum' or `min', `maximum' or `max'
-                          (default MINIMUM); the `minimum'
- option selects
+                          are `no', `minimum' or `min', `maximum' or `max'
+                          (default MINIMUM); the `minimum' option selects
                           optimizations which are likely to be supported by
                           reasonably modern hardware, thus making the
-                          resulting executables
- fairly portable; use the
-                          `maximum' option with caution since code for
- one
+                          resulting executables fairly portable; use the
+                          `maximum' option with caution since code for one
                           processor will not work with earlier processors (for
-                          example, Intel
- 686-specific code will not work with
+                          example, Intel 686-specific code will not work with
                           a 586)
   --enable-meta-info-embedding
                           store plugin meta-information directly inside plugin
-                          modules if
- supported by platform; if disabled,
-                          meta-information is stored in
- stand-alone .csplugin
+                          modules if supported by platform; if disabled,
+                          meta-information is stored in stand-alone .csplugin
                           files; this option is enabled by default for
                           non-Unix platforms and on Unix platforms with
-                          ELF-format object
- files; it is disabled by default
-                          on Unix platforms if ELF is not
- available and the
-                          project uses a non-GPL-compatible license (such
- as
+                          ELF-format object files; it is disabled by default
+                          on Unix platforms if ELF is not available and the
+                          project uses a non-GPL-compatible license (such as
                           LGPL) since the non-ELF Unix embedding technology
-                          requires the
- GPL-licensed libbfd library; if ELF is
-                          not available, enable this
- option on Unix only if
-                          you are certain you want a GPL-licensed
- library
+                          requires the GPL-licensed libbfd library; if ELF is
+                          not available, enable this option on Unix only if
+                          you are certain you want a GPL-licensed library
                           infecting your project
-  --enable-optimize       build with optimizations enabled (default YES);
-                          same as --enable-mode=optimize
-  --enable-debug          build with debugging information (default NO);
- same
+  --enable-optimize       build with optimizations enabled (default YES); same
+                          as --enable-mode=optimize
+  --enable-debug          build with debugging information (default NO); same
                           as --enable-mode=debug
-  --enable-profile        build with profiling information (default NO);
- same
+  --enable-profile        build with profiling information (default NO); same
                           as --enable-mode=profile
   --enable-mode=mode      set build mode; recognized modes are `optimize',
-                          `debug', `profile'
- (default OPTIMIZE)
+                          `debug', `profile' (default OPTIMIZE)
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
-                          common memory
- management mistakes (default NO)
+                          common memory management mistakes (default NO)
   --enable-memory-tracker enable the memory tracker which checks memory usage
-                          per
- source file (default NO)
+                          per source file (default NO)
   --enable-ref-tracker    enable the reference tracker which dumps information
-                          
- about leaked references (default NO)
+                          about leaked references (default NO)
   --enable-leak-guard     enable the leak guard protection which warns about
-                          objects not freed
- at program exit (default NO)
+                          objects not freed at program exit (default NO)
   --enable-shared         enable creation of shared libraries
                           (_EXPERIMENTAL_!) (default NO)
   --enable-make-emulation enable emulation layer allowing project to be built
-                          with `make', in
- addition to `jam' (default YES)
+                          with `make', in addition to `jam' (default YES)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-perl             use Perl5 scripting interface (default NO)
-  --without-python        do not use
- Python scripting interface
+  --without-python        do not use Python scripting interface
   --with-java             use Java scripting interface (default YES)
   --with-x                use the X Window System
   --with-Xxf86vm=dir      specify location of libXxf86vm if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-Xaw=dir          specify location of libXaw if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-mesa             use Mesa OpenGL library if available (default YES)
   --with-z=dir            specify location of libz if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-png=dir          specify location of libpng if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-jpeg=dir         specify location of libjpeg if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-lcms=dir         specify location of liblcms if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-mng=dir          specify location of libmng if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-mikmod=dir       specify location of libmikmod if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-ogg=dir          specify location of libogg if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-vorbis=dir       specify location of libvorbis if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-vorbisfile=dir   specify location of libvorbisfile if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-3ds=dir          specify location of lib3ds if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-ode=dir          specify location of libode if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-bullet=dir       specify location of libbullet if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-freetype2=dir    specify location of libfreetype2 if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-cal3d=dir        specify location of libcal3d if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-sdl=dir          specify location of libsdl if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-metaobject_a3dl=dir
                           specify location of libmetaobject_a3dl if not
-                          detected automatically; searches
- dir/include,
+                          detected automatically; searches dir/include,
                           dir/lib, and dir
   --with-metaobject_misc=dir
                           specify location of libmetaobject_misc if not
-                          detected automatically; searches
- dir/include,
+                          detected automatically; searches dir/include,
                           dir/lib, and dir
   --with-wx=dir           specify location of libwx if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-CEGUI=dir        specify location of libCEGUI if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-Cg=dir           specify location of libCg if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-CgGL=dir         specify location of libCgGL if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-jackasyn=dir     specify location of libjackasyn if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-asound=dir       specify location of libasound if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-caca=dir         specify location of libcaca if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-js=dir           specify location of libjs if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-cppunit=dir      specify location of libcppunit if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-bfd=dir          specify location of libbfd if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
 
 Some influential environment variables:
@@ -1612,20 +1561,9 @@ host_os=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 
 #------------------------------------------------------------------------------
 # Check for compilers and linker.
-#
-# IMPLEMENTATION NOTES
-#
-# Note that AC_PROG_CC and AC_PROC_CXX insist upon adding both optimization
-# (-O2) and debug (-g) flags to CFLAGS and CXXFLAGS if these variables have not
-# been set explicitly. Unfortunately, this is not suitable for Crystal Space's
-# build system which makes a distinction between `optimize' and `debug' builds.
-# To work around this problem, we ensure that both of these variables are set
-# (either with empty values or with a user-supplied values) in order to
-# override Autoconf's undesirable behavior.
 #------------------------------------------------------------------------------
 
-CFLAGS="$CFLAGS" # See above note.
-ac_ext=c
+    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
@@ -2555,7 +2493,9 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-cs_build_prop_val="$CC"
+    if test -n "$CC"; then
+
+	cs_build_prop_val="$CC"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.CC ?= \"$cs_build_prop_val\" ;
@@ -2563,8 +2503,21 @@ cs_build_prop_val="$CC"
 fi
 
 
-CXXFLAGS="$CXXFLAGS" # See above note.
-ac_ext=cc
+	CFLAGS=`echo "$CFLAGS" | sed 's/\-O.//g;s/\-g.//g'`
+	cs_build_prop_val="$CPPFLAGS $CFLAGS"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+"
+fi
+
+
+fi
+
+
+
+
+    ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
@@ -2919,12 +2872,354 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-cs_build_prop_val="$CXX"
+    if test -n "$CXX"; then
+
+	cs_build_prop_val="$CXX"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.C++ ?= \"$cs_build_prop_val\" ;
 "
 fi
+
+
+        CXXFLAGS=`echo "$CXXFLAGS" | sed 's/\-O.//g;s/-g.//g'`
+	cs_build_prop_val="$CPPFLAGS $CXXFLAGS"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += \"$cs_build_prop_val\" ;
+"
+fi
+
+
+	echo "$as_me:$LINENO: checking how to treat C++ warnings as errors" >&5
+echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6
+if test "${cs_cv_prog_cxx_pic_werror_ok+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @-Werror@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_pic_werror=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_pic_werror_ok="$cs_cv_prog_cxx_pic_werror"
+else
+  cs_cv_prog_cxx_pic_werror=''
+	    cs_cv_prog_cxx_pic_werror_ok=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_pic_werror_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_pic_werror_ok" >&6
+
+    echo "$as_me:$LINENO: checking how to enable C++ PIC generation" >&5
+echo $ECHO_N "checking how to enable C++ PIC generation... $ECHO_C" >&6
+if test "${cs_cv_prog_cxx_pic_ok+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @-fPIC@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_pic_werror $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  if { ac_try='grep "fPIC" conftest.err >/dev/null 2>&1'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=no
+else
+  cs_build_ok=yes
+fi
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+     rm -f conftest.err
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_pic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_pic_ok="$cs_cv_prog_cxx_pic"
+else
+  cs_cv_prog_cxx_pic=''
+	    cs_cv_prog_cxx_pic_ok=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_pic_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_pic_ok" >&6
+    if test "$cs_cv_prog_cxx_pic_ok" != no; then
+  cs_build_prop_val="$cs_cv_prog_cxx_pic"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.PIC ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
+
+fi
+
+
 
 ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -3196,10 +3491,10 @@ cs_header_text="${cs_header_text}#define CS_COMPILER_NAME \"$cs_compiler_name\"
 # Check for common tools.
 #------------------------------------------------------------------------------
 
-# The default RANLIB in Jambase is wrong on some platforms, and is also
-# unsuitable during cross-compilation, so we set the value unconditionally
-# (sixth argument of CS_EMIT_BUILD_PROPERTY).
-if test -n "$ac_tool_prefix"; then
+    # The default RANLIB in Jambase is wrong on some platforms, and is also
+    # unsuitable during cross-compilation, so we set the value unconditionally
+    # (sixth argument of CS_EMIT_BUILD_PROPERTY).
+    if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}ranlib", so it can be a program name with args.
 set dummy ${ac_tool_prefix}ranlib; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -3279,7 +3574,7 @@ else
   RANLIB="$ac_cv_prog_RANLIB"
 fi
 
-cs_build_prop_val="$RANLIB"
+    cs_build_prop_val="$RANLIB"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}RANLIB = \"$cs_build_prop_val\" ;
@@ -3380,7 +3675,7 @@ done
   DLLTOOL=$ac_ct_DLLTOOL
 fi
 
-cs_build_prop_val="$DLLTOOL"
+    cs_build_prop_val="$DLLTOOL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.DLLTOOL ?= \"$cs_build_prop_val\" ;
@@ -3481,7 +3776,7 @@ done
   DLLWRAP=$ac_ct_DLLWRAP
 fi
 
-cs_build_prop_val="$DLLWRAP"
+    cs_build_prop_val="$DLLWRAP"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.DLLWRAP ?= \"$cs_build_prop_val\" ;
@@ -3582,7 +3877,7 @@ done
   WINDRES=$ac_ct_WINDRES
 fi
 
-cs_build_prop_val="$WINDRES"
+    cs_build_prop_val="$WINDRES"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.WINDRES ?= \"$cs_build_prop_val\" ;
@@ -3683,7 +3978,7 @@ done
   STRINGS=$ac_ct_STRINGS
 fi
 
-cs_build_prop_val="$STRINGS"
+    cs_build_prop_val="$STRINGS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.STRINGS ?= \"$cs_build_prop_val\" ;
@@ -3698,514 +3993,18 @@ fi
 	export PATH
 fi
 
-    for ac_prog in flex
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_FLEX+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$FLEX"; then
-  ac_cv_prog_FLEX="$FLEX" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_FLEX="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-FLEX=$ac_cv_prog_FLEX
-if test -n "$FLEX"; then
-  echo "$as_me:$LINENO: result: $FLEX" >&5
-echo "${ECHO_T}$FLEX" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$FLEX" && break
-done
-
-cs_build_prop_val="$FLEX"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.FLEX ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
-	export PATH
-fi
-
-    for ac_prog in bison
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_BISON+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$BISON"; then
-  ac_cv_prog_BISON="$BISON" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_BISON="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-BISON=$ac_cv_prog_BISON
-if test -n "$BISON"; then
-  echo "$as_me:$LINENO: result: $BISON" >&5
-echo "${ECHO_T}$BISON" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$BISON" && break
-done
-
-if test -n "$BISON"; then
-  echo "$as_me:$LINENO: checking if bison version >= 1.35" >&5
-echo $ECHO_N "checking if bison version >= 1.35... $ECHO_C" >&6
-if test "${cs_cv_prog_bison_version_ok_annotated+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cs_prog_bison_is_version=
-cs_prog_bison_min_version=
-cs_prog_bison_is_suffix=
-cs_prog_bison_min_suffix=
-cs_prog_bison_is_suffix_done=
-cs_prog_bison_min_suffix_done=
-
-
-
-test -z $cs_prog_bison_is_version && cs_prog_bison_is_version=`$BISON --version | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
-test -n "$cs_prog_bison_is_version" && test -z $cs_prog_bison_is_suffix_done  && { cs_prog_bison_is_suffix_done=yes ; cs_prog_bison_is_suffix= ; }
-
-
-
-
-
-test -z $cs_prog_bison_min_version && cs_prog_bison_min_version=`echo 1.35 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
-test -n "$cs_prog_bison_min_version" && test -z $cs_prog_bison_min_suffix_done  && { cs_prog_bison_min_suffix_done=yes ; cs_prog_bison_min_suffix= ; }
-
-
-cs_prog_bison_is_ver_1=`echo ${cs_prog_bison_is_version}${cs_prog_bison_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_bison_is_ver_2=`echo ${cs_prog_bison_is_version}${cs_prog_bison_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-
-cs_prog_bison_min_ver_1=`echo $cs_prog_bison_min_version${cs_prog_bison_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_bison_min_ver_2=`echo $cs_prog_bison_min_version${cs_prog_bison_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-
-cs_cv_prog_bison_version_ok=''
-test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_is_ver_1" ">=" "$cs_prog_bison_min_ver_1" >/dev/null || cs_cv_prog_bison_version_ok=no ; }
-test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_min_ver_1" ">=" "$cs_prog_bison_is_ver_1" >/dev/null || cs_cv_prog_bison_version_ok=yes ; }
-test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_is_ver_2" ">=" "$cs_prog_bison_min_ver_2" >/dev/null || cs_cv_prog_bison_version_ok=no ; }
-test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_min_ver_2" ">=" "$cs_prog_bison_is_ver_2" >/dev/null || cs_cv_prog_bison_version_ok=yes ; }
-
-if test -z "$cs_cv_prog_bison_version_ok"; then
-  cs_cv_prog_bison_version_ok=yes
-fi
-
-cs_cv_prog_bison_version_ok_annotated="$cs_cv_prog_bison_version_ok"
-if test -n "$cs_prog_bison_is_version"; then
-  cs_cv_prog_bison_version_ok_annotated="$cs_cv_prog_bison_version_ok_annotated (version $cs_prog_bison_is_version)"
-fi
-
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_bison_version_ok_annotated" >&5
-echo "${ECHO_T}$cs_cv_prog_bison_version_ok_annotated" >&6
-if test "$cs_cv_prog_bison_version_ok" = yes; then
-  cs_build_prop_val="$BISON"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.BISON ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-fi
-
-fi
-
-
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
-	export PATH
-fi
-
-    for ac_prog in doxygen
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_DOXYGEN+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$DOXYGEN"; then
-  ac_cv_prog_DOXYGEN="$DOXYGEN" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_DOXYGEN="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-DOXYGEN=$ac_cv_prog_DOXYGEN
-if test -n "$DOXYGEN"; then
-  echo "$as_me:$LINENO: result: $DOXYGEN" >&5
-echo "${ECHO_T}$DOXYGEN" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$DOXYGEN" && break
-done
-
-cs_build_prop_val="$DOXYGEN"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.DOXYGEN ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
-	export PATH
-fi
-
-    for ac_prog in texi2dvi
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_TEXI2DVI+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$TEXI2DVI"; then
-  ac_cv_prog_TEXI2DVI="$TEXI2DVI" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_TEXI2DVI="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-TEXI2DVI=$ac_cv_prog_TEXI2DVI
-if test -n "$TEXI2DVI"; then
-  echo "$as_me:$LINENO: result: $TEXI2DVI" >&5
-echo "${ECHO_T}$TEXI2DVI" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$TEXI2DVI" && break
-done
-
-cs_build_prop_val="$TEXI2DVI"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2DVI ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
-	export PATH
-fi
-
-    for ac_prog in texi2pdf
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_TEXI2PDF+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$TEXI2PDF"; then
-  ac_cv_prog_TEXI2PDF="$TEXI2PDF" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_TEXI2PDF="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-TEXI2PDF=$ac_cv_prog_TEXI2PDF
-if test -n "$TEXI2PDF"; then
-  echo "$as_me:$LINENO: result: $TEXI2PDF" >&5
-echo "${ECHO_T}$TEXI2PDF" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$TEXI2PDF" && break
-done
-
-cs_build_prop_val="$TEXI2PDF"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2PDF ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
-	export PATH
-fi
-
-    for ac_prog in dvips
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_DVIPS+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$DVIPS"; then
-  ac_cv_prog_DVIPS="$DVIPS" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_DVIPS="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-DVIPS=$ac_cv_prog_DVIPS
-if test -n "$DVIPS"; then
-  echo "$as_me:$LINENO: result: $DVIPS" >&5
-echo "${ECHO_T}$DVIPS" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$DVIPS" && break
-done
-
-cs_build_prop_val="$DVIPS"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.DVIPS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
-	export PATH
-fi
-
-    for ac_prog in dvipdf
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_DVIPDF+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$DVIPDF"; then
-  ac_cv_prog_DVIPDF="$DVIPDF" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_DVIPDF="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-DVIPDF=$ac_cv_prog_DVIPDF
-if test -n "$DVIPDF"; then
-  echo "$as_me:$LINENO: result: $DVIPDF" >&5
-echo "${ECHO_T}$DVIPDF" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$DVIPDF" && break
-done
-
-cs_build_prop_val="$DVIPDF"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.DVIPDF ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
-	export PATH
-fi
-
-    for ac_prog in makeinfo
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_MAKEINFO+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$MAKEINFO"; then
-  ac_cv_prog_MAKEINFO="$MAKEINFO" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_MAKEINFO="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-MAKEINFO=$ac_cv_prog_MAKEINFO
-if test -n "$MAKEINFO"; then
-  echo "$as_me:$LINENO: result: $MAKEINFO" >&5
-echo "${ECHO_T}$MAKEINFO" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$MAKEINFO" && break
-done
-
-cs_build_prop_val="$MAKEINFO"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.MAKEINFO ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
-	export PATH
-fi
-
     if test -n "$ac_tool_prefix"; then
-  for ac_prog in hhc
+  for ac_prog in objcopy
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
 set dummy $ac_tool_prefix$ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_HHC+set}" = set; then
+if test "${ac_cv_prog_STRINGS+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$HHC"; then
-  ac_cv_prog_HHC="$HHC" # Let the user override the test.
+  if test -n "$STRINGS"; then
+  ac_cv_prog_STRINGS="$STRINGS" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
@@ -4214,7 +4013,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_HHC="$ac_tool_prefix$ac_prog"
+    ac_cv_prog_STRINGS="$ac_tool_prefix$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -4223,31 +4022,31 @@ done
 
 fi
 fi
-HHC=$ac_cv_prog_HHC
-if test -n "$HHC"; then
-  echo "$as_me:$LINENO: result: $HHC" >&5
-echo "${ECHO_T}$HHC" >&6
+STRINGS=$ac_cv_prog_STRINGS
+if test -n "$STRINGS"; then
+  echo "$as_me:$LINENO: result: $STRINGS" >&5
+echo "${ECHO_T}$STRINGS" >&6
 else
   echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
-    test -n "$HHC" && break
+    test -n "$STRINGS" && break
   done
 fi
-if test -z "$HHC"; then
-  ac_ct_HHC=$HHC
-  for ac_prog in hhc
+if test -z "$STRINGS"; then
+  ac_ct_STRINGS=$STRINGS
+  for ac_prog in objcopy
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_ac_ct_HHC+set}" = set; then
+if test "${ac_cv_prog_ac_ct_STRINGS+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$ac_ct_HHC"; then
-  ac_cv_prog_ac_ct_HHC="$ac_ct_HHC" # Let the user override the test.
+  if test -n "$ac_ct_STRINGS"; then
+  ac_cv_prog_ac_ct_STRINGS="$ac_ct_STRINGS" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
@@ -4256,7 +4055,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_ac_ct_HHC="$ac_prog"
+    ac_cv_prog_ac_ct_STRINGS="$ac_prog"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -4265,208 +4064,30 @@ done
 
 fi
 fi
-ac_ct_HHC=$ac_cv_prog_ac_ct_HHC
-if test -n "$ac_ct_HHC"; then
-  echo "$as_me:$LINENO: result: $ac_ct_HHC" >&5
-echo "${ECHO_T}$ac_ct_HHC" >&6
+ac_ct_STRINGS=$ac_cv_prog_ac_ct_STRINGS
+if test -n "$ac_ct_STRINGS"; then
+  echo "$as_me:$LINENO: result: $ac_ct_STRINGS" >&5
+echo "${ECHO_T}$ac_ct_STRINGS" >&6
 else
   echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$ac_ct_HHC" && break
+  test -n "$ac_ct_STRINGS" && break
 done
 
-  HHC=$ac_ct_HHC
+  STRINGS=$ac_ct_STRINGS
 fi
 
-cs_build_prop_val="$HHC"
+    cs_build_prop_val="$OBJCOPY"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.HHC ?= \"$cs_build_prop_val\" ;
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJCOPY ?= \"$cs_build_prop_val\" ;
 "
 fi
 
 
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
-	export PATH
-fi
-
-    for ac_prog in install
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_INSTALL+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$INSTALL"; then
-  ac_cv_prog_INSTALL="$INSTALL" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_INSTALL="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-INSTALL=$ac_cv_prog_INSTALL
-if test -n "$INSTALL"; then
-  echo "$as_me:$LINENO: result: $INSTALL" >&5
-echo "${ECHO_T}$INSTALL" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$INSTALL" && break
-done
-
-cs_build_prop_val="$INSTALL"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}INSTALL ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-
-
-    if test "$cs_prog_path_prepared" != yes; then
-  cs_prog_path_prepared=yes
-	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
-	export PATH
-fi
-
-    for ac_prog in swig
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_SWIG+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$SWIG"; then
-  ac_cv_prog_SWIG="$SWIG" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_SWIG="$ac_prog"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-SWIG=$ac_cv_prog_SWIG
-if test -n "$SWIG"; then
-  echo "$as_me:$LINENO: result: $SWIG" >&5
-echo "${ECHO_T}$SWIG" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$SWIG" && break
-done
-
-if test -n "$SWIG"; then
-  echo "$as_me:$LINENO: checking if swig version >= 1.3.21" >&5
-echo $ECHO_N "checking if swig version >= 1.3.21... $ECHO_C" >&6
-if test "${cs_cv_prog_swig_version_ok_annotated+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cs_prog_swig_is_version=
-cs_prog_swig_min_version=
-cs_prog_swig_is_suffix=
-cs_prog_swig_min_suffix=
-cs_prog_swig_is_suffix_done=
-cs_prog_swig_min_suffix_done=
-
-
-
-
-test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$SWIG -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
-test -n "$cs_prog_swig_is_version" && test -z $cs_prog_swig_is_suffix_done  && { cs_prog_swig_is_suffix_done=yes ; cs_prog_swig_is_suffix= ; }
-
-test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$SWIG -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
-test -n "$cs_prog_swig_is_version" && test -z $cs_prog_swig_is_suffix_done  && { cs_prog_swig_is_suffix_done=yes ; cs_prog_swig_is_suffix=.0 ; }
-
-
-
-
-
-
-test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.21 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
-test -n "$cs_prog_swig_min_version" && test -z $cs_prog_swig_min_suffix_done  && { cs_prog_swig_min_suffix_done=yes ; cs_prog_swig_min_suffix= ; }
-
-test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.21 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
-test -n "$cs_prog_swig_min_version" && test -z $cs_prog_swig_min_suffix_done  && { cs_prog_swig_min_suffix_done=yes ; cs_prog_swig_min_suffix=.0 ; }
-
-
-cs_prog_swig_is_ver_1=`echo ${cs_prog_swig_is_version}${cs_prog_swig_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_swig_is_ver_2=`echo ${cs_prog_swig_is_version}${cs_prog_swig_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_swig_is_ver_3=`echo ${cs_prog_swig_is_version}${cs_prog_swig_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-
-cs_prog_swig_min_ver_1=`echo $cs_prog_swig_min_version${cs_prog_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_swig_min_ver_2=`echo $cs_prog_swig_min_version${cs_prog_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_swig_min_ver_3=`echo $cs_prog_swig_min_version${cs_prog_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-
-cs_cv_prog_swig_version_ok=''
-test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_is_ver_1" ">=" "$cs_prog_swig_min_ver_1" >/dev/null || cs_cv_prog_swig_version_ok=no ; }
-test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_min_ver_1" ">=" "$cs_prog_swig_is_ver_1" >/dev/null || cs_cv_prog_swig_version_ok=yes ; }
-test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_is_ver_2" ">=" "$cs_prog_swig_min_ver_2" >/dev/null || cs_cv_prog_swig_version_ok=no ; }
-test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_min_ver_2" ">=" "$cs_prog_swig_is_ver_2" >/dev/null || cs_cv_prog_swig_version_ok=yes ; }
-test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_is_ver_3" ">=" "$cs_prog_swig_min_ver_3" >/dev/null || cs_cv_prog_swig_version_ok=no ; }
-test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_min_ver_3" ">=" "$cs_prog_swig_is_ver_3" >/dev/null || cs_cv_prog_swig_version_ok=yes ; }
-
-if test -z "$cs_cv_prog_swig_version_ok"; then
-  cs_cv_prog_swig_version_ok=yes
-fi
-
-cs_cv_prog_swig_version_ok_annotated="$cs_cv_prog_swig_version_ok"
-if test -n "$cs_prog_swig_is_version"; then
-  cs_cv_prog_swig_version_ok_annotated="$cs_cv_prog_swig_version_ok_annotated (version $cs_prog_swig_is_version)"
-fi
-
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_swig_version_ok_annotated" >&5
-echo "${ECHO_T}$cs_cv_prog_swig_version_ok_annotated" >&6
-if test "$cs_cv_prog_swig_version_ok" = yes; then
-  cs_build_prop_val="$SWIG"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-fi
-
-fi
-
-
-# GNU: Search for libtool before glibtool since Fink version is likely newer.
+    # GNU: Search for libtool before glibtool since Fink version is likely newer.
 
 if test -z "$LIBTOOL"; then
 
@@ -4801,14 +4422,14 @@ fi
 fi
 
 
-cs_build_prop_val="$LIBTOOL"
+    cs_build_prop_val="$LIBTOOL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}LIBTOOL ?= \"$cs_build_prop_val\" ;
 "
 fi
 
-cs_build_prop_val="$APPLE_LIBTOOL"
+    cs_build_prop_val="$APPLE_LIBTOOL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}APPLE_LIBTOOL ?= \"$cs_build_prop_val\" ;
@@ -4905,17 +4526,400 @@ echo "$as_me: error: do not know how to create a directory tree" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-cs_build_prop_val="$MKDIR"
+    cs_build_prop_val="$MKDIR"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIR ?= \"$cs_build_prop_val\" ;
 "
 fi
 
-cs_build_prop_val="$MKDIRS"
+    cs_build_prop_val="$MKDIRS"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.MKDIRS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in install
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_INSTALL+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$INSTALL"; then
+  ac_cv_prog_INSTALL="$INSTALL" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_INSTALL="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+INSTALL=$ac_cv_prog_INSTALL
+if test -n "$INSTALL"; then
+  echo "$as_me:$LINENO: result: $INSTALL" >&5
+echo "${ECHO_T}$INSTALL" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$INSTALL" && break
+done
+
+    cs_build_prop_val="$INSTALL"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}INSTALL ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in texi2dvi
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_TEXI2DVI+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$TEXI2DVI"; then
+  ac_cv_prog_TEXI2DVI="$TEXI2DVI" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_TEXI2DVI="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+TEXI2DVI=$ac_cv_prog_TEXI2DVI
+if test -n "$TEXI2DVI"; then
+  echo "$as_me:$LINENO: result: $TEXI2DVI" >&5
+echo "${ECHO_T}$TEXI2DVI" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$TEXI2DVI" && break
+done
+
+    cs_build_prop_val="$TEXI2DVI"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2DVI ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in texi2pdf
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_TEXI2PDF+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$TEXI2PDF"; then
+  ac_cv_prog_TEXI2PDF="$TEXI2PDF" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_TEXI2PDF="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+TEXI2PDF=$ac_cv_prog_TEXI2PDF
+if test -n "$TEXI2PDF"; then
+  echo "$as_me:$LINENO: result: $TEXI2PDF" >&5
+echo "${ECHO_T}$TEXI2PDF" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$TEXI2PDF" && break
+done
+
+    cs_build_prop_val="$TEXI2PDF"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.TEXI2PDF ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in dvips
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_DVIPS+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$DVIPS"; then
+  ac_cv_prog_DVIPS="$DVIPS" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_DVIPS="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+DVIPS=$ac_cv_prog_DVIPS
+if test -n "$DVIPS"; then
+  echo "$as_me:$LINENO: result: $DVIPS" >&5
+echo "${ECHO_T}$DVIPS" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$DVIPS" && break
+done
+
+    cs_build_prop_val="$DVIPS"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.DVIPS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in dvipdf
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_DVIPDF+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$DVIPDF"; then
+  ac_cv_prog_DVIPDF="$DVIPDF" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_DVIPDF="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+DVIPDF=$ac_cv_prog_DVIPDF
+if test -n "$DVIPDF"; then
+  echo "$as_me:$LINENO: result: $DVIPDF" >&5
+echo "${ECHO_T}$DVIPDF" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$DVIPDF" && break
+done
+
+    cs_build_prop_val="$DVIPDF"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.DVIPDF ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in makeinfo
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_MAKEINFO+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$MAKEINFO"; then
+  ac_cv_prog_MAKEINFO="$MAKEINFO" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_MAKEINFO="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+MAKEINFO=$ac_cv_prog_MAKEINFO
+if test -n "$MAKEINFO"; then
+  echo "$as_me:$LINENO: result: $MAKEINFO" >&5
+echo "${ECHO_T}$MAKEINFO" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$MAKEINFO" && break
+done
+
+    cs_build_prop_val="$MAKEINFO"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.MAKEINFO ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in doxygen
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_DOXYGEN+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$DOXYGEN"; then
+  ac_cv_prog_DOXYGEN="$DOXYGEN" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_DOXYGEN="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+DOXYGEN=$ac_cv_prog_DOXYGEN
+if test -n "$DOXYGEN"; then
+  echo "$as_me:$LINENO: result: $DOXYGEN" >&5
+echo "${ECHO_T}$DOXYGEN" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$DOXYGEN" && break
+done
+
+    cs_build_prop_val="$DOXYGEN"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.DOXYGEN ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -5013,11 +5017,401 @@ done
   DOT=$ac_ct_DOT
 fi
 
-cs_build_prop_val="$DOT"
+    cs_build_prop_val="$DOT"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.DOT ?= \"$cs_build_prop_val\" ;
 "
+fi
+
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in flex
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_FLEX+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$FLEX"; then
+  ac_cv_prog_FLEX="$FLEX" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_FLEX="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+FLEX=$ac_cv_prog_FLEX
+if test -n "$FLEX"; then
+  echo "$as_me:$LINENO: result: $FLEX" >&5
+echo "${ECHO_T}$FLEX" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$FLEX" && break
+done
+
+cs_build_prop_val="$FLEX"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.FLEX ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in bison
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_BISON+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$BISON"; then
+  ac_cv_prog_BISON="$BISON" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_BISON="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+BISON=$ac_cv_prog_BISON
+if test -n "$BISON"; then
+  echo "$as_me:$LINENO: result: $BISON" >&5
+echo "${ECHO_T}$BISON" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$BISON" && break
+done
+
+if test -n "$BISON"; then
+  echo "$as_me:$LINENO: checking if bison version >= 1.35" >&5
+echo $ECHO_N "checking if bison version >= 1.35... $ECHO_C" >&6
+if test "${cs_cv_prog_bison_version_ok_annotated+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cs_prog_bison_is_version=
+cs_prog_bison_min_version=
+cs_prog_bison_is_suffix=
+cs_prog_bison_min_suffix=
+cs_prog_bison_is_suffix_done=
+cs_prog_bison_min_suffix_done=
+
+
+
+test -z $cs_prog_bison_is_version && cs_prog_bison_is_version=`$BISON --version | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_bison_is_version" && test -z $cs_prog_bison_is_suffix_done  && { cs_prog_bison_is_suffix_done=yes ; cs_prog_bison_is_suffix= ; }
+
+
+
+
+
+test -z $cs_prog_bison_min_version && cs_prog_bison_min_version=`echo 1.35 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_bison_min_version" && test -z $cs_prog_bison_min_suffix_done  && { cs_prog_bison_min_suffix_done=yes ; cs_prog_bison_min_suffix= ; }
+
+
+cs_prog_bison_is_ver_1=`echo ${cs_prog_bison_is_version}${cs_prog_bison_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_bison_is_ver_2=`echo ${cs_prog_bison_is_version}${cs_prog_bison_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+
+cs_prog_bison_min_ver_1=`echo $cs_prog_bison_min_version${cs_prog_bison_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_bison_min_ver_2=`echo $cs_prog_bison_min_version${cs_prog_bison_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+
+cs_cv_prog_bison_version_ok=''
+test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_is_ver_1" ">=" "$cs_prog_bison_min_ver_1" >/dev/null || cs_cv_prog_bison_version_ok=no ; }
+test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_min_ver_1" ">=" "$cs_prog_bison_is_ver_1" >/dev/null || cs_cv_prog_bison_version_ok=yes ; }
+test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_is_ver_2" ">=" "$cs_prog_bison_min_ver_2" >/dev/null || cs_cv_prog_bison_version_ok=no ; }
+test -z "$cs_cv_prog_bison_version_ok" && { expr "$cs_prog_bison_min_ver_2" ">=" "$cs_prog_bison_is_ver_2" >/dev/null || cs_cv_prog_bison_version_ok=yes ; }
+
+if test -z "$cs_cv_prog_bison_version_ok"; then
+  cs_cv_prog_bison_version_ok=yes
+fi
+
+cs_cv_prog_bison_version_ok_annotated="$cs_cv_prog_bison_version_ok"
+if test -n "$cs_prog_bison_is_version"; then
+  cs_cv_prog_bison_version_ok_annotated="$cs_cv_prog_bison_version_ok_annotated (version $cs_prog_bison_is_version)"
+fi
+
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_bison_version_ok_annotated" >&5
+echo "${ECHO_T}$cs_cv_prog_bison_version_ok_annotated" >&6
+if test "$cs_cv_prog_bison_version_ok" = yes; then
+  cs_build_prop_val="$BISON"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.BISON ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
+fi
+
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
+  for ac_prog in hhc
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_HHC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$HHC"; then
+  ac_cv_prog_HHC="$HHC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_HHC="$ac_tool_prefix$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+HHC=$ac_cv_prog_HHC
+if test -n "$HHC"; then
+  echo "$as_me:$LINENO: result: $HHC" >&5
+echo "${ECHO_T}$HHC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+    test -n "$HHC" && break
+  done
+fi
+if test -z "$HHC"; then
+  ac_ct_HHC=$HHC
+  for ac_prog in hhc
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_HHC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_HHC"; then
+  ac_cv_prog_ac_ct_HHC="$ac_ct_HHC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_HHC="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+ac_ct_HHC=$ac_cv_prog_ac_ct_HHC
+if test -n "$ac_ct_HHC"; then
+  echo "$as_me:$LINENO: result: $ac_ct_HHC" >&5
+echo "${ECHO_T}$ac_ct_HHC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$ac_ct_HHC" && break
+done
+
+  HHC=$ac_ct_HHC
+fi
+
+cs_build_prop_val="$HHC"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.HHC ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in swig
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_SWIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$SWIG"; then
+  ac_cv_prog_SWIG="$SWIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_SWIG="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+SWIG=$ac_cv_prog_SWIG
+if test -n "$SWIG"; then
+  echo "$as_me:$LINENO: result: $SWIG" >&5
+echo "${ECHO_T}$SWIG" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$SWIG" && break
+done
+
+if test -n "$SWIG"; then
+  echo "$as_me:$LINENO: checking if swig version >= 1.3.21" >&5
+echo $ECHO_N "checking if swig version >= 1.3.21... $ECHO_C" >&6
+if test "${cs_cv_prog_swig_version_ok_annotated+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cs_prog_swig_is_version=
+cs_prog_swig_min_version=
+cs_prog_swig_is_suffix=
+cs_prog_swig_min_suffix=
+cs_prog_swig_is_suffix_done=
+cs_prog_swig_min_suffix_done=
+
+
+
+
+test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$SWIG -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_swig_is_version" && test -z $cs_prog_swig_is_suffix_done  && { cs_prog_swig_is_suffix_done=yes ; cs_prog_swig_is_suffix= ; }
+
+test -z $cs_prog_swig_is_version && cs_prog_swig_is_version=`$SWIG -version 2>&1 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_swig_is_version" && test -z $cs_prog_swig_is_suffix_done  && { cs_prog_swig_is_suffix_done=yes ; cs_prog_swig_is_suffix=.0 ; }
+
+
+
+
+
+
+test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.21 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_swig_min_version" && test -z $cs_prog_swig_min_suffix_done  && { cs_prog_swig_min_suffix_done=yes ; cs_prog_swig_min_suffix= ; }
+
+test -z $cs_prog_swig_min_version && cs_prog_swig_min_version=`echo 1.3.21 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_swig_min_version" && test -z $cs_prog_swig_min_suffix_done  && { cs_prog_swig_min_suffix_done=yes ; cs_prog_swig_min_suffix=.0 ; }
+
+
+cs_prog_swig_is_ver_1=`echo ${cs_prog_swig_is_version}${cs_prog_swig_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_swig_is_ver_2=`echo ${cs_prog_swig_is_version}${cs_prog_swig_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_swig_is_ver_3=`echo ${cs_prog_swig_is_version}${cs_prog_swig_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+
+cs_prog_swig_min_ver_1=`echo $cs_prog_swig_min_version${cs_prog_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_swig_min_ver_2=`echo $cs_prog_swig_min_version${cs_prog_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_swig_min_ver_3=`echo $cs_prog_swig_min_version${cs_prog_swig_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+
+cs_cv_prog_swig_version_ok=''
+test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_is_ver_1" ">=" "$cs_prog_swig_min_ver_1" >/dev/null || cs_cv_prog_swig_version_ok=no ; }
+test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_min_ver_1" ">=" "$cs_prog_swig_is_ver_1" >/dev/null || cs_cv_prog_swig_version_ok=yes ; }
+test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_is_ver_2" ">=" "$cs_prog_swig_min_ver_2" >/dev/null || cs_cv_prog_swig_version_ok=no ; }
+test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_min_ver_2" ">=" "$cs_prog_swig_is_ver_2" >/dev/null || cs_cv_prog_swig_version_ok=yes ; }
+test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_is_ver_3" ">=" "$cs_prog_swig_min_ver_3" >/dev/null || cs_cv_prog_swig_version_ok=no ; }
+test -z "$cs_cv_prog_swig_version_ok" && { expr "$cs_prog_swig_min_ver_3" ">=" "$cs_prog_swig_is_ver_3" >/dev/null || cs_cv_prog_swig_version_ok=yes ; }
+
+if test -z "$cs_cv_prog_swig_version_ok"; then
+  cs_cv_prog_swig_version_ok=yes
+fi
+
+cs_cv_prog_swig_version_ok_annotated="$cs_cv_prog_swig_version_ok"
+if test -n "$cs_prog_swig_is_version"; then
+  cs_cv_prog_swig_version_ok_annotated="$cs_cv_prog_swig_version_ok_annotated (version $cs_prog_swig_is_version)"
+fi
+
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_swig_version_ok_annotated" >&5
+echo "${ECHO_T}$cs_cv_prog_swig_version_ok_annotated" >&6
+if test "$cs_cv_prog_swig_version_ok" = yes; then
+  cs_build_prop_val="$SWIG"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.SWIG ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
 fi
 
 
@@ -5415,7 +5809,6 @@ ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
 
 
 echo "$as_me:$LINENO: checking for egrep" >&5
@@ -5978,8 +6371,6 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
 
 
 
@@ -7276,16 +7667,21 @@ fi
 #------------------------------------------------------------------------------
 
 
-
-
+    case $host_cpu in
+        [Ii][3-9]86*|[Xx]86*) cs_host_cpu=x86 ;;
+        *) cs_host_cpu=$host_cpu ;;
+    esac
+    cs_host_cpu_normalized="`echo "$cs_host_cpu" | $as_tr_cpp`"
+    cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= \"$cs_host_cpu_normalized\" ;
+"
 
     cs_host_os_normalized=''
     case $host_os in
-	mingw*|cygwin*)
-	    cs_host_target=win32gcc
-	    cs_host_family=windows
-	    ;;
-	darwin*)
+        mingw*|cygwin*)
+            cs_host_target=win32gcc
+            cs_host_family=windows
+            ;;
+        darwin*)
 
 
 
@@ -7393,23 +7789,9 @@ fi
 	cs_host_family=unix
 	cs_host_os_normalized='MacOS/X'
 
-	cs_header_text="${cs_header_text}#define CS_PLATFORM_MACOSX
-"
-
-	# We assume that we always have CoreAudio available on MacOS/X.
-	cs_build_prop_val="yes"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.AVAILABLE ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val="-framework CoreAudio"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.LFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
+cat >>confdefs.h <<\_ACEOF
+#define CS_PLATFORM_MACOSX
+_ACEOF
 
 
 	echo "$as_me:$LINENO: checking for Objective-C compiler" >&5
@@ -7421,13 +7803,8 @@ else
 fi
 echo "$as_me:$LINENO: result: $cs_cv_prog_objc" >&5
 echo "${ECHO_T}$cs_cv_prog_objc" >&6
-	cs_build_prop_val="$cs_cv_prog_objc"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC ?= \"$cs_build_prop_val\" ;
+	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC ?= \"$cs_cv_prog_objc\" ;
 "
-fi
-
 	echo "$as_me:$LINENO: checking for Objective-C++ compiler" >&5
 echo $ECHO_N "checking for Objective-C++ compiler... $ECHO_C" >&6
 if test "${cs_cv_prog_objcxx+set}" = set; then
@@ -7437,58 +7814,68 @@ else
 fi
 echo "$as_me:$LINENO: result: $cs_cv_prog_objcxx" >&5
 echo "${ECHO_T}$cs_cv_prog_objcxx" >&6
-	cs_build_prop_val="$cs_cv_prog_objcxx"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC++ ?= \"$cs_build_prop_val\" ;
+	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC++ ?= \"$cs_cv_prog_objcxx\" ;
 "
-fi
-
 else
   cs_host_target=unix
 	cs_host_family=unix
 fi
 
-	    ;;
-	*)
-	    # Everything else is assumed to be Unix or Unix-like.
-	    cs_host_target=unix
-	    cs_host_family=unix
+            ;;
+        *)
+            # Everything else is assumed to be Unix or Unix-like.
+            cs_host_target=unix
+            cs_host_family=unix
 	    ;;
     esac
 
-case $cs_host_family in
-    windows)
-	cs_header_text="${cs_header_text}#define CS_PLATFORM_WIN32
-"
-	if test -z "$cs_host_os_normalized"; then
+    case $cs_host_family in
+	windows)
+
+cat >>confdefs.h <<\_ACEOF
+#define CS_PLATFORM_WIN32
+_ACEOF
+
+	    if test -z "$cs_host_os_normalized"; then
   cs_host_os_normalized='Win32'
 fi
 
-	;;
-    unix)
-	cs_header_text="${cs_header_text}#define CS_PLATFORM_UNIX
-"
-	if test -z "$cs_host_os_normalized"; then
+	    ;;
+	unix)
+
+cat >>confdefs.h <<\_ACEOF
+#define CS_PLATFORM_UNIX
+_ACEOF
+
+	    if test -z "$cs_host_os_normalized"; then
   cs_host_os_normalized='Unix'
 fi
 
-	;;
-esac
+	    ;;
+    esac
 
-cs_host_os_normalized_uc="`echo "$cs_host_os_normalized" | $as_tr_cpp`"
-cs_build_prop_val="$cs_host_os_normalized_uc"
+    cs_host_os_normalized_uc="`echo "$cs_host_os_normalized" | $as_tr_cpp`"
+    cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS ?= \"$cs_host_os_normalized_uc\" ;
+"
+    cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS.NORMALIZED ?= \"$cs_host_os_normalized\" ;
+"
+
+if test "x$cs_host_macosx" = "xyes"; then
+  # We assume that we always have CoreAudio available on MacOS/X.
+    cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS ?= \"$cs_build_prop_val\" ;
+  cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.AVAILABLE ?= \"$cs_build_prop_val\" ;
 "
 fi
 
-cs_build_prop_val="$cs_host_os_normalized"
+    cs_build_prop_val="-framework CoreAudio"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS.NORMALIZED ?= \"$cs_build_prop_val\" ;
+  cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.LFLAGS ?= \"$cs_build_prop_val\" ;
 "
+fi
+
 fi
 
 cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \"$cs_host_os_normalized\"
@@ -22725,41 +23112,9 @@ fi
 #
 # IMPLEMENTATION NOTES
 #
-# Some Mesa installations require pthread, so pthread flags are employed if
-# available.
-#
-# The check for opengl32 needs to precede other checks because Cygwin users
-# often have Mesa installed, and Mesa's OpenGL library is compiled without the
-# __stdcall flags which results in link errors, whereas Microsoft's native
-# opengl32 works fine.  Conversely, some Unix implementations have Wine
-# installed (Windows emulation layer) which includes an opengl32.so library.
-# We need to avoid detection of this library on Unix since it would cause an
-# undesirable dependence upon Wine.
-#
-# Many OpenGL libraries on Unix already contain GLX, so there is no separate
-# GLX library, thus we first check for GLX using the discovered OpenGL library
-# before attempting to locate a separate GLX-specific library.
-#
-# On MacOS/X, some users have XFree86 installed which creates a link from
-# /usr/include/GL to /usr/X11R6/include/GL.  We want to ignore this directory
-# and instead check for Apple's OpenGL.framework, if we are not cross-building
-# for Darwin.  We accomplish this by placing the OpenGL.framework test ahead of
-# the other tests.
-#
-# At least one user (Jorrit) has a strange installation in which inclusion of
-# <windows.h> fails if an int32 is not present, thus we must take this into
-# account.
-#
 # GLU is not required or used by CrystalSpace itself, but certain 3rd party
 # libraries may depend on it (notably Cg).
 #------------------------------------------------------------------------------
-
-
-
-
-# CS_GL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
-
-
 
 
 
@@ -22893,31 +23248,31 @@ fi
 done
 
 
-# Apply plaform-specific flags if necessary.
-cs_gl_plat_cflags=''
-cs_gl_plat_lflags=''
-cs_gl_plat_libs=''
-if test -n "$cs_cv_libm_cflags$cs_cv_libm_lflags$cs_cv_libm_libs"; then
+    # Apply plaform-specific flags if necessary.
+    cs_gl_plat_cflags=''
+    cs_gl_plat_lflags=''
+    cs_gl_plat_libs=''
+    if test -n "$cs_cv_libm_cflags$cs_cv_libm_lflags$cs_cv_libm_libs"; then
   cs_gl_plat_cflags="$cs_cv_libm_cflags $cs_gl_plat_cflags"
-    cs_gl_plat_lflags="$cs_cv_libm_lflags $cs_gl_plat_lflags"
-    cs_gl_plat_libs="$cs_cv_libm_libs $cs_gl_plat_libs"
+	cs_gl_plat_lflags="$cs_cv_libm_lflags $cs_gl_plat_lflags"
+	cs_gl_plat_libs="$cs_cv_libm_libs $cs_gl_plat_libs"
 fi
 
-if test $cs_cv_sys_pthread = yes; then
+    if test $cs_cv_sys_pthread = yes; then
   cs_gl_plat_cflags="$cs_cv_sys_pthread_cflags $cs_gl_plat_cflags"
-    cs_gl_plat_lflags="$cs_cv_sys_pthread_lflags $cs_gl_plat_lflags"
-    cs_gl_plat_libs="$cs_cv_sys_pthread_libs $cs_gl_plat_libs"
+	cs_gl_plat_lflags="$cs_cv_sys_pthread_lflags $cs_gl_plat_lflags"
+	cs_gl_plat_libs="$cs_cv_sys_pthread_libs $cs_gl_plat_libs"
 fi
 
-if test "$no_x" != yes; then
+    if test "$no_x" != yes; then
   cs_gl_plat_cflags="$X_CFLAGS $cs_gl_plat_cflags"
-    cs_gl_plat_lflags="$cs_gl_plat_lflags"
-    cs_gl_plat_libs="
-	$X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS $cs_gl_plat_libs"
+	cs_gl_plat_lflags="$cs_gl_plat_lflags"
+	cs_gl_plat_libs="
+	    $X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS $cs_gl_plat_libs"
 fi
 
 
-# Mesa requested?
+    # Mesa requested?
 
 # Check whether --with-mesa or --without-mesa was given.
 if test "${with_mesa+set}" = set; then
@@ -22927,29 +23282,25 @@ else
   with_mesa=yes
 fi;
 
-if test $with_mesa != no; then
+    if test $with_mesa != no; then
   cs_mesa_gl=`echo @@@-lMesaGL | sed 'y% %#%'`
-    cs_mesa_glu=`echo @@@-lMesaGLU | sed 'y% %#%'`
-    cs_mesa_glx=`echo @@@-lMesaGLX | sed 'y% %#%'`
 fi
 
 
-# MacOS/X or Darwin?
-if test "x$cs_host_macosx" = "xyes"; then
+    # MacOS/X or Darwin?
+    if test "x$cs_host_macosx" = "xyes"; then
   cs_osx_gl=`echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'`
-    cs_osx_glu=`echo @-DCS_GLU_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'`
 fi
 
 
-# Windows?
-if test $cs_host_family = windows; then
+    # Windows?
+    if test $cs_host_family = windows; then
   cs_win32_gl=`echo @@@-lopengl32 | sed 'y% %#%'`
-    cs_win32_glu=`echo @@@-lglu32 | sed 'y% %#%'`
 fi
 
 
-# Check for OpenGL.
-if test "" != yes; then
+    # Check for OpenGL.
+    if test "" != yes; then
   echo "$as_me:$LINENO: checking for OpenGL" >&5
 echo $ECHO_N "checking for OpenGL... $ECHO_C" >&6
 if test "${cs_cv_libgl+set}" = set; then
@@ -22968,10 +23319,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     for cs_build_item in $cs_win32_gl \
-    $cs_osx_gl \
-    `echo @@@-lGL | sed 'y% %#%'` \
-    `echo @@@-lgl | sed 'y% %#%'` \
-    $cs_mesa_gl
+	$cs_osx_gl \
+	`echo @@@-lGL | sed 'y% %#%'` \
+	`echo @@@-lgl | sed 'y% %#%'` \
+	$cs_mesa_gl
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -23036,8 +23387,7 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-
-    #if HAVE_WINDOWS_H
+#if HAVE_WINDOWS_H
     #if !HAVE_TYPE_INT32
     typedef long int32;
     #endif
@@ -23138,10 +23488,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     for cs_build_item in $cs_win32_gl \
-    $cs_osx_gl \
-    `echo @@@-lGL | sed 'y% %#%'` \
-    `echo @@@-lgl | sed 'y% %#%'` \
-    $cs_mesa_gl
+	$cs_osx_gl \
+	`echo @@@-lGL | sed 'y% %#%'` \
+	`echo @@@-lgl | sed 'y% %#%'` \
+	$cs_mesa_gl
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -23206,8 +23556,7 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-
-    #if HAVE_WINDOWS_H
+#if HAVE_WINDOWS_H
     #if !HAVE_TYPE_INT32
     typedef long int32;
     #endif
@@ -23325,387 +23674,6 @@ else
 
 fi
 
-
-# Check for GLU.
-if test "" != yes; then
-  echo "$as_me:$LINENO: checking for GLU" >&5
-echo $ECHO_N "checking for GLU... $ECHO_C" >&6
-if test "${cs_cv_libglu+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-
-    for cs_build_item in $cs_osx_glu \
-    `echo @@@ | sed 'y% %#%'` \
-    $cs_win32_glu \
-    `echo @@@-lGLU | sed 'y% %#%'` \
-    `echo @@@-lglu | sed 'y% %#%'` \
-    $cs_mesa_glu
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-    #if HAVE_WINDOWS_H
-    #if !HAVE_TYPE_INT32
-    typedef long int32;
-    #endif
-    #include <windows.h>
-    #endif
-    #ifndef CS_HEADER_GLOBAL
-    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
-    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
-    #endif
-    #ifdef CS_GLU_PATH
-    #include CS_HEADER_GLOBAL(CS_GLU_PATH,glu.h)
-    #else
-    #include <GL/glu.h>
-    #endif
-int
-main ()
-{
-gluNewQuadric()
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-	if test $cs_build_ok = yes; then
-  break
-fi
-
-    done
-
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libglu=yes
-		cs_cv_libglu_cflags=$cs_build_cflags
-		cs_cv_libglu_lflags=$cs_build_lflags
-		cs_cv_libglu_libs=$cs_build_libs
-else
-  cs_cv_libglu=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_libglu" >&5
-echo "${ECHO_T}$cs_cv_libglu" >&6
-else
-  echo "$as_me:$LINENO: checking for GLU" >&5
-echo $ECHO_N "checking for GLU... $ECHO_C" >&6
-	    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-
-    for cs_build_item in $cs_osx_glu \
-    `echo @@@ | sed 'y% %#%'` \
-    $cs_win32_glu \
-    `echo @@@-lGLU | sed 'y% %#%'` \
-    `echo @@@-lglu | sed 'y% %#%'` \
-    $cs_mesa_glu
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-    #if HAVE_WINDOWS_H
-    #if !HAVE_TYPE_INT32
-    typedef long int32;
-    #endif
-    #include <windows.h>
-    #endif
-    #ifndef CS_HEADER_GLOBAL
-    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
-    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
-    #endif
-    #ifdef CS_GLU_PATH
-    #include CS_HEADER_GLOBAL(CS_GLU_PATH,glu.h)
-    #else
-    #include <GL/glu.h>
-    #endif
-int
-main ()
-{
-gluNewQuadric()
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-	if test $cs_build_ok = yes; then
-  break
-fi
-
-    done
-
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libglu=yes
-		cs_cv_libglu_cflags=$cs_build_cflags
-		cs_cv_libglu_lflags=$cs_build_lflags
-		cs_cv_libglu_libs=$cs_build_libs
-else
-  cs_cv_libglu=no
-fi
-
-	    echo "$as_me:$LINENO: result: $cs_cv_libglu" >&5
-echo "${ECHO_T}$cs_cv_libglu" >&6
-fi
-
-    if test $cs_cv_libglu = yes; then
-  if test "$cs_cv_libglu" = yes; then
-  cs_build_prop_val="yes"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLU.AVAILABLE ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val="$cs_cv_libglu_cflags"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLU.CFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val="$cs_cv_libglu_lflags $cs_cv_libglu_libs"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}GLU.LFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-fi
-
-else
-  cs_cv_libglu_cflags=''
-	cs_cv_libglu_lflags=''
-	cs_cv_libglu_libs=''
-
-fi
-
-
 if test $cs_cv_libgl = yes; then
   # Check for GLhandleARB.
     if test "" != yes; then
@@ -23791,22 +23759,7 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-
-    #if HAVE_WINDOWS_H
-    #if !HAVE_TYPE_INT32
-    typedef long int32;
-    #endif
-    #include <windows.h>
-    #endif
-    #ifndef CS_HEADER_GLOBAL
-    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
-    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
-    #endif
-    #ifdef CS_OPENGL_PATH
-    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
-    #else
-    #include <GL/gl.h>
-    #endif
+CS_GL_INCLUDE(CS_OPENGL_PATH,GL,gl.h)
 int
 main ()
 {
@@ -23957,22 +23910,7 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-
-    #if HAVE_WINDOWS_H
-    #if !HAVE_TYPE_INT32
-    typedef long int32;
-    #endif
-    #include <windows.h>
-    #endif
-    #ifndef CS_HEADER_GLOBAL
-    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
-    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
-    #endif
-    #ifdef CS_OPENGL_PATH
-    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
-    #else
-    #include <GL/gl.h>
-    #endif
+CS_GL_INCLUDE(CS_OPENGL_PATH,GL,gl.h)
 int
 main ()
 {
@@ -24054,9 +23992,17 @@ else
 
 fi
 
+fi
 
-    # Check for GLX.
-    if test "$no_x" != yes; then
+
+    if test $cs_cv_libgl = yes; then
+  if test $with_mesa != no; then
+  cs_mesa_glx=`echo @@@-lMesaGLX | sed 'y% %#%'`
+fi
+
+
+        # Check for GLX.
+	if test "$no_x" != yes; then
   if test "" != yes; then
   echo "$as_me:$LINENO: checking for GLX" >&5
 echo $ECHO_N "checking for GLX... $ECHO_C" >&6
@@ -24076,9 +24022,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-	    `echo @@@-lGLX | sed 'y% %#%'` \
-	    `echo @@@-lglx | sed 'y% %#%'` \
-	    $cs_mesa_glx
+		`echo @@@-lGLX | sed 'y% %#%'` \
+		`echo @@@-lglx | sed 'y% %#%'` \
+		$cs_mesa_glx
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -24230,9 +24176,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-	    `echo @@@-lGLX | sed 'y% %#%'` \
-	    `echo @@@-lglx | sed 'y% %#%'` \
-	    $cs_mesa_glx
+		`echo @@@-lGLX | sed 'y% %#%'` \
+		`echo @@@-lglx | sed 'y% %#%'` \
+		$cs_mesa_glx
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -24401,11 +24347,16 @@ else
 
 fi
 
+fi
 
-	# Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
-	# present.
-	if test $cs_cv_libglx = yes; then
-  if test "" != yes; then
+fi
+
+# Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
+# present.
+
+    if test x$cs_cv_libglx = "xyes"; then
+  # Check for GLX extensions.
+	if test "" != yes; then
   echo "$as_me:$LINENO: checking for GLX extensions" >&5
 echo $ECHO_N "checking for GLX extensions... $ECHO_C" >&6
 if test "${cs_cv_libglx_extensions+set}" = set; then
@@ -24489,7 +24440,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #define GLX_GLXEXT_PROTOTYPES
-		    #include <GL/glx.h>
+		#include <GL/glx.h>
 int
 main ()
 {
@@ -24641,7 +24592,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #define GLX_GLXEXT_PROTOTYPES
-		    #include <GL/glx.h>
+		#include <GL/glx.h>
 int
 main ()
 {
@@ -24724,11 +24675,6 @@ else
 fi
 
 fi
-
-fi
-
-fi
-
 
 
 
@@ -63408,12 +63354,6 @@ done
 
 
 
-
-
-
-
-
-
 for ac_header in unistd.h \
     sys/types.h \
     sys/socket.h \
@@ -68796,11 +68736,9 @@ if diff $cache_file confcache >/dev/null 2>&1; then :; else
   fi
 fi
 rm -f confcache
-    { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval;
- use
+    { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval; use
     \`optimize', \`debug', or \`profile'" >&5
-echo "$as_me: error: unrecognized mode --enable-mode=$enableval;
- use
+echo "$as_me: error: unrecognized mode --enable-mode=$enableval; use
     \`optimize', \`debug', or \`profile'" >&2;}
    { (exit 1); exit 1; }; } ;;
     esac
@@ -70389,10 +70327,9 @@ for ac_i in : $LIBOBJS; do test "x$ac_i" = x: && continue
   # 1. Remove the extension, and $U if already installed.
   ac_i=`echo "$ac_i" |
 	 sed 's/\$U\././;s/\.o$//;s/\.obj$//'`
-  # 2. Prepend LIBOBJDIR.  When used with automake>=1.10 LIBOBJDIR
-  #    will be set to the directory where LIBOBJS objects are built.
-  ac_libobjs="$ac_libobjs \${LIBOBJDIR}$ac_i\$U.$ac_objext"
-  ac_ltlibobjs="$ac_ltlibobjs \${LIBOBJDIR}$ac_i"'$U.lo'
+  # 2. Add them.
+  ac_libobjs="$ac_libobjs $ac_i\$U.$ac_objext"
+  ac_ltlibobjs="$ac_ltlibobjs $ac_i"'$U.lo'
 done
 LIBOBJS=$ac_libobjs
 
@@ -71038,18 +70975,6 @@ s,@WINDRES@,$WINDRES,;t t
 s,@ac_ct_WINDRES@,$ac_ct_WINDRES,;t t
 s,@STRINGS@,$STRINGS,;t t
 s,@ac_ct_STRINGS@,$ac_ct_STRINGS,;t t
-s,@FLEX@,$FLEX,;t t
-s,@BISON@,$BISON,;t t
-s,@DOXYGEN@,$DOXYGEN,;t t
-s,@TEXI2DVI@,$TEXI2DVI,;t t
-s,@TEXI2PDF@,$TEXI2PDF,;t t
-s,@DVIPS@,$DVIPS,;t t
-s,@DVIPDF@,$DVIPDF,;t t
-s,@MAKEINFO@,$MAKEINFO,;t t
-s,@HHC@,$HHC,;t t
-s,@ac_ct_HHC@,$ac_ct_HHC,;t t
-s,@INSTALL@,$INSTALL,;t t
-s,@SWIG@,$SWIG,;t t
 s,@LIBTOOL_TEST@,$LIBTOOL_TEST,;t t
 s,@ac_ct_LIBTOOL_TEST@,$ac_ct_LIBTOOL_TEST,;t t
 s,@LIBTOOL_PATH@,$LIBTOOL_PATH,;t t
@@ -71059,8 +70984,20 @@ s,@CS_LT_APPLE@,$CS_LT_APPLE,;t t
 s,@APPLE_LIBTOOL@,$APPLE_LIBTOOL,;t t
 s,@MKDIR@,$MKDIR,;t t
 s,@MKDIRS@,$MKDIRS,;t t
+s,@INSTALL@,$INSTALL,;t t
+s,@TEXI2DVI@,$TEXI2DVI,;t t
+s,@TEXI2PDF@,$TEXI2PDF,;t t
+s,@DVIPS@,$DVIPS,;t t
+s,@DVIPDF@,$DVIPDF,;t t
+s,@MAKEINFO@,$MAKEINFO,;t t
+s,@DOXYGEN@,$DOXYGEN,;t t
 s,@DOT@,$DOT,;t t
 s,@ac_ct_DOT@,$ac_ct_DOT,;t t
+s,@FLEX@,$FLEX,;t t
+s,@BISON@,$BISON,;t t
+s,@HHC@,$HHC,;t t
+s,@ac_ct_HHC@,$ac_ct_HHC,;t t
+s,@SWIG@,$SWIG,;t t
 s,@JAM@,$JAM,;t t
 s,@MAKE@,$MAKE,;t t
 s,@CSLIBS_CONFIG@,$CSLIBS_CONFIG,;t t

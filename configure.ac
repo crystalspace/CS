@@ -1,6 +1,6 @@
 # configure.ac                                                 -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003-2005 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2006 by Eric Sunshine <sunshine@sunshineco.com>
 #
 # Autoconf input script for Crystal Space.  Process this file with
 # CS/bin/autogen.sh to produce a configure script.
@@ -32,25 +32,10 @@ AC_CANONICAL_HOST
 
 #------------------------------------------------------------------------------
 # Check for compilers and linker.
-#
-# IMPLEMENTATION NOTES
-#
-# Note that AC_PROG_CC and AC_PROC_CXX insist upon adding both optimization
-# (-O2) and debug (-g) flags to CFLAGS and CXXFLAGS if these variables have not
-# been set explicitly. Unfortunately, this is not suitable for Crystal Space's
-# build system which makes a distinction between `optimize' and `debug' builds.
-# To work around this problem, we ensure that both of these variables are set
-# (either with empty values or with a user-supplied values) in order to
-# override Autoconf's undesirable behavior.
 #------------------------------------------------------------------------------
+CS_PROG_CC
+CS_PROG_CXX
 
-CFLAGS="$CFLAGS" # See above note.
-AC_PROG_CC
-CS_EMIT_BUILD_PROPERTY([CMD.CC], [$CC])
-
-CXXFLAGS="$CXXFLAGS" # See above note.
-AC_PROG_CXX
-CS_EMIT_BUILD_PROPERTY([CMD.C++], [$CXX])
 AC_PROG_CXXCPP
 CS_EMIT_BUILD_PROPERTY([CMD.C++CPP], [$CXXCPP])
 
@@ -69,24 +54,10 @@ CS_HEADER_PROPERTY([CS_COMPILER_NAME],
 #------------------------------------------------------------------------------
 # Check for common tools.
 #------------------------------------------------------------------------------
-
-# The default RANLIB in Jambase is wrong on some platforms, and is also
-# unsuitable during cross-compilation, so we set the value unconditionally
-# (sixth argument of CS_EMIT_BUILD_PROPERTY).
-AC_PROG_RANLIB
-CS_EMIT_BUILD_PROPERTY([RANLIB], [$RANLIB], [], [], [], [Y])
-
-CS_CHECK_TOOLS([DLLTOOL], [dlltool])
-CS_EMIT_BUILD_PROPERTY([CMD.DLLTOOL], [$DLLTOOL])
-
-CS_CHECK_TOOLS([DLLWRAP], [dllwrap])
-CS_EMIT_BUILD_PROPERTY([CMD.DLLWRAP], [$DLLWRAP])
-
-CS_CHECK_TOOLS([WINDRES], [windres])
-CS_EMIT_BUILD_PROPERTY([CMD.WINDRES], [$WINDRES])
-
-CS_CHECK_TOOLS([STRINGS], [strings])
-CS_EMIT_BUILD_PROPERTY([CMD.STRINGS], [$STRINGS])
+CS_CHECK_COMMON_TOOLS_LINK
+CS_CHECK_COMMON_TOOLS_BASIC
+CS_CHECK_COMMON_TOOLS_DOC_TEXINFO
+CS_CHECK_COMMON_TOOLS_DOC_DOXYGEN
 
 CS_CHECK_PROGS([FLEX], [flex])
 CS_EMIT_BUILD_PROPERTY([CMD.FLEX], [$FLEX])
@@ -96,45 +67,13 @@ AS_IF([test -n "$BISON"],
     [CS_CHECK_PROG_VERSION([bison], [$BISON --version], [1.35], [9.9],
 	[CS_EMIT_BUILD_PROPERTY([CMD.BISON], [$BISON])])])
 
-CS_CHECK_PROGS([DOXYGEN], [doxygen])
-CS_EMIT_BUILD_PROPERTY([CMD.DOXYGEN], [$DOXYGEN])
-
-CS_CHECK_PROGS([TEXI2DVI], [texi2dvi])
-CS_EMIT_BUILD_PROPERTY([CMD.TEXI2DVI], [$TEXI2DVI])
-
-CS_CHECK_PROGS([TEXI2PDF], [texi2pdf])
-CS_EMIT_BUILD_PROPERTY([CMD.TEXI2PDF], [$TEXI2PDF])
-
-CS_CHECK_PROGS([DVIPS], [dvips])
-CS_EMIT_BUILD_PROPERTY([CMD.DVIPS], [$DVIPS])
-
-CS_CHECK_PROGS([DVIPDF], [dvipdf])
-CS_EMIT_BUILD_PROPERTY([CMD.DVIPDF], [$DVIPDF])
-
-CS_CHECK_PROGS([MAKEINFO], [makeinfo])
-CS_EMIT_BUILD_PROPERTY([CMD.MAKEINFO], [$MAKEINFO])
-
 CS_CHECK_TOOLS([HHC], [hhc])
 CS_EMIT_BUILD_PROPERTY([CMD.HHC], [$HHC])
-
-CS_CHECK_PROGS([INSTALL], [install])
-CS_EMIT_BUILD_PROPERTY([INSTALL], [$INSTALL])
 
 CS_CHECK_PROGS([SWIG], [swig])
 AS_IF([test -n "$SWIG"],
     [CS_CHECK_PROG_VERSION([swig], [$SWIG -version 2>&1], [1.3.21],
 	[9.9|.9], [CS_EMIT_BUILD_PROPERTY([CMD.SWIG], [$SWIG])])])
-
-CS_CHECK_LIBTOOL
-CS_EMIT_BUILD_PROPERTY([LIBTOOL], [$LIBTOOL])
-CS_EMIT_BUILD_PROPERTY([APPLE_LIBTOOL], [$APPLE_LIBTOOL])
-
-CS_CHECK_MKDIR
-CS_EMIT_BUILD_PROPERTY([CMD.MKDIR], [$MKDIR])
-CS_EMIT_BUILD_PROPERTY([CMD.MKDIRS], [$MKDIRS])
-
-CS_CHECK_TOOLS([DOT], [dot])
-CS_EMIT_BUILD_PROPERTY([CMD.DOT], [$DOT])
 
 
 
@@ -201,15 +140,6 @@ AC_CHECK_HEADERS([cmath], [CS_HEADER_PROPERTY([CS_HAVE_CMATH_H])])
 AC_CHECK_HEADERS([math.h], [CS_HEADER_PROPERTY([CS_HAVE_MATH_H])])
 AC_LANG_POP([C++])
 
-AC_DEFUN([CS_CHECK_COMMON_LIBS],
-    [AC_LANG_PUSH([C])
-    AC_CHECK_LIB([m], [pow], [cs_cv_libm_libs=-lm], [cs_cv_libm_libs=])
-    AC_CHECK_LIB([m], [cosf], [cs_cv_libm_libs=-lm])
-    AC_CHECK_LIB([mx], [cosf])
-    AC_CHECK_LIB([dl], [dlopen], [cs_cv_libdl_libs=-ldl], [cs_cv_libdl_libs=])
-    AC_CHECK_LIB([nsl], [gethostbyname])
-    AC_LANG_POP([C])])
-
 CS_CHECK_COMMON_LIBS
 
 AS_IF([test $ac_cv_lib_m_pow = yes || test $ac_cv_lib_m_cosf = yes],
@@ -261,102 +191,11 @@ CS_CHECK_RTLD
 #	code can use these variables to emit appropriate Jam variables and
 #	CS_PLATFORM_FOO header define.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_HOST],
-    [AC_REQUIRE([AC_CANONICAL_HOST])
-    cs_host_os_normalized=''
-    case $host_os in
-	mingw*|cygwin*)
-	    cs_host_target=win32gcc
-	    cs_host_family=windows
-	    ;;
-	darwin*)
-	    _CS_CHECK_HOST_DARWIN
-	    ;;
-	*)
-	    # Everything else is assumed to be Unix or Unix-like.
-	    cs_host_target=unix
-	    cs_host_family=unix
-	    ;;
-    esac])
-
-AC_DEFUN([_CS_CHECK_HOST_DARWIN],
-    [AC_REQUIRE([AC_PROG_CC])
-    AC_REQUIRE([AC_PROG_CXX])
-
-    # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
-    # a way to distinguish between the two.  If Carbon.h is present, then
-    # assume MacOX/S; if not, assume Darwin.  If --with-x=yes was invoked, and
-    # Carbon.h is present, then assume that user wants to cross-build for
-    # Darwin even though build host is MacOS/X.
-    # IMPLEMENTATION NOTE *1*
-    # The QuickTime 7.0 installer removes <CarbonSound/CarbonSound.h>, which
-    # causes #include <Carbon/Carbon.h> to fail unconditionally. Re-installing
-    # the QuickTime SDK should restore the header, however not all developers
-    # know to do this, so we work around the problem of the missing
-    # CarbonSound.h by #defining __CARBONSOUND__ in the test in order to
-    # prevent Carbon.h from attempting to #include the missing header.
-    # IMPLEMENTATION NOTE *2*
-    # At least one MacOS/X user switches between gcc 2.95 and gcc 3.3 with a
-    # script which toggles the values of CC, CXX, and CPP.  Unfortunately, CPP
-    # was being set to run the preprocessor directly ("cpp", for instance)
-    # rather than running it via the compiler ("gcc -E", for instance).  The
-    # problem with running the preprocessor directly is that __APPLE__ and
-    # __GNUC__ are not defined, which causes the Carbon.h check to fail.  We
-    # avoid this problem by supplying a non-empty fourth argument to
-    # AC_CHECK_HEADER(), which causes it to test compile the header only (which
-    # is a more robust test), rather than also testing it via the preprocessor.
-
-    AC_DEFINE([__CARBONSOUND__], [],
-	[Avoid problem caused by missing <Carbon/CarbonSound.h>])
-    AC_CHECK_HEADER([Carbon/Carbon.h],
-	[cs_host_macosx=yes], [cs_host_macosx=no], [/* force compile */])
-
-    AS_IF([test $cs_host_macosx = yes],
-	[AC_MSG_CHECKING([for --with-x])
-	AS_IF([test "${with_x+set}" = set && test "$with_x" = "yes"],
-	    [AC_MSG_RESULT([yes (assume Darwin)])
-	    cs_host_macosx=no],
-	    [AC_MSG_RESULT([no])])])
-
-    AS_IF([test $cs_host_macosx = yes],
-	[cs_host_target=macosx
-	cs_host_family=unix
-	cs_host_os_normalized='MacOS/X'
-
-	CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])
-
-	# We assume that we always have CoreAudio available on MacOS/X.
-	CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
-	CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS], [-framework CoreAudio])
-
-	AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
-	    [cs_cv_prog_objc="$CC"])
-	CS_EMIT_BUILD_PROPERTY([CMD.OBJC], [$cs_cv_prog_objc])
-	AC_CACHE_CHECK([for Objective-C++ compiler], [cs_cv_prog_objcxx],
-	    [cs_cv_prog_objcxx="$CXX"])
-	CS_EMIT_BUILD_PROPERTY([CMD.OBJC++], [$cs_cv_prog_objcxx])],
-
-	[cs_host_target=unix
-	cs_host_family=unix])])
-
 CS_CHECK_HOST
-
-case $cs_host_family in
-    windows)
-	CS_HEADER_PROPERTY([CS_PLATFORM_WIN32])
-	AS_IF([test -z "$cs_host_os_normalized"],
-	    [cs_host_os_normalized='Win32'])
-	;;
-    unix)
-	CS_HEADER_PROPERTY([CS_PLATFORM_UNIX])
-	AS_IF([test -z "$cs_host_os_normalized"],
-	    [cs_host_os_normalized='Unix'])
-	;;
-esac
-
-cs_host_os_normalized_uc="AS_TR_CPP([$cs_host_os_normalized])"
-CS_EMIT_BUILD_PROPERTY([TARGET.OS], [$cs_host_os_normalized_uc])
-CS_EMIT_BUILD_PROPERTY([TARGET.OS.NORMALIZED], [$cs_host_os_normalized])
+AS_IF([test "x$cs_host_macosx" = "xyes"],
+    [# We assume that we always have CoreAudio available on MacOS/X.
+    CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
+    CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS], [-framework CoreAudio])])
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
@@ -1128,133 +967,10 @@ AS_IF([test "$no_x" != yes],
 #
 # IMPLEMENTATION NOTES
 #
-# Some Mesa installations require pthread, so pthread flags are employed if
-# available.
-#
-# The check for opengl32 needs to precede other checks because Cygwin users
-# often have Mesa installed, and Mesa's OpenGL library is compiled without the
-# __stdcall flags which results in link errors, whereas Microsoft's native
-# opengl32 works fine.  Conversely, some Unix implementations have Wine
-# installed (Windows emulation layer) which includes an opengl32.so library.
-# We need to avoid detection of this library on Unix since it would cause an
-# undesirable dependence upon Wine.
-#
-# Many OpenGL libraries on Unix already contain GLX, so there is no separate
-# GLX library, thus we first check for GLX using the discovered OpenGL library
-# before attempting to locate a separate GLX-specific library.  
-#
-# On MacOS/X, some users have XFree86 installed which creates a link from
-# /usr/include/GL to /usr/X11R6/include/GL.  We want to ignore this directory
-# and instead check for Apple's OpenGL.framework, if we are not cross-building
-# for Darwin.  We accomplish this by placing the OpenGL.framework test ahead of
-# the other tests.
-#
-# At least one user (Jorrit) has a strange installation in which inclusion of
-# <windows.h> fails if an int32 is not present, thus we must take this into
-# account.
-#
 # GLU is not required or used by CrystalSpace itself, but certain 3rd party
 # libraries may depend on it (notably Cg).
 #------------------------------------------------------------------------------
-m4_define([cs_define_int32],
-    [[#if !HAVE_TYPE_INT32
-    typedef long int32;
-    #endif
-    ]])
-
-AC_DEFUN([CS_CHECK_GL_PREPARE],
-    [AC_REQUIRE([CS_CHECK_HOST])
-    AC_REQUIRE([CS_CHECK_COMMON_LIBS])
-    AC_REQUIRE([CS_CHECK_PTHREAD])
-    AC_REQUIRE([AC_PATH_X])
-    AC_REQUIRE([AC_PATH_XTRA])
-    AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
-    AC_CHECK_HEADERS([windows.h], [], [], [cs_define_int32])])
-
-# CS_GL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
-AC_DEFUN([CS_GL_INCLUDE],
-    [AC_REQUIRE([CS_CHECK_GL_PREPARE])
-    [#if HAVE_WINDOWS_H
-    #if !HAVE_TYPE_INT32
-    typedef long int32;
-    #endif
-    #include <windows.h>
-    #endif
-    #ifndef CS_HEADER_GLOBAL
-    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
-    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
-    #endif
-    #ifdef $1
-    #include CS_HEADER_GLOBAL($1,$3)
-    #else
-    #include <$2/$3>
-    #endif]])
-
-CS_CHECK_GL_PREPARE
-
-# Apply plaform-specific flags if necessary.
-cs_gl_plat_cflags=''
-cs_gl_plat_lflags=''
-cs_gl_plat_libs=''
-AS_IF([test -n "$cs_cv_libm_cflags$cs_cv_libm_lflags$cs_cv_libm_libs"],
-    [cs_gl_plat_cflags="$cs_cv_libm_cflags $cs_gl_plat_cflags"
-    cs_gl_plat_lflags="$cs_cv_libm_lflags $cs_gl_plat_lflags"
-    cs_gl_plat_libs="$cs_cv_libm_libs $cs_gl_plat_libs"])
-AS_IF([test $cs_cv_sys_pthread = yes],
-    [cs_gl_plat_cflags="$cs_cv_sys_pthread_cflags $cs_gl_plat_cflags"
-    cs_gl_plat_lflags="$cs_cv_sys_pthread_lflags $cs_gl_plat_lflags"
-    cs_gl_plat_libs="$cs_cv_sys_pthread_libs $cs_gl_plat_libs"])
-AS_IF([test "$no_x" != yes],
-    [cs_gl_plat_cflags="$X_CFLAGS $cs_gl_plat_cflags"
-    cs_gl_plat_lflags="$cs_gl_plat_lflags"
-    cs_gl_plat_libs="
-	$X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS $cs_gl_plat_libs"])
-
-# Mesa requested?
-AC_ARG_WITH([mesa], [AC_HELP_STRING([--with-mesa],
-	[use Mesa OpenGL library if available (default YES)])],
-	[], [with_mesa=yes])
-
-AS_IF([test $with_mesa != no],
-    [cs_mesa_gl=CS_CREATE_TUPLE([],[],[-lMesaGL])
-    cs_mesa_glu=CS_CREATE_TUPLE([],[],[-lMesaGLU])
-    cs_mesa_glx=CS_CREATE_TUPLE([],[],[-lMesaGLX])])
-
-# MacOS/X or Darwin?
-AS_IF([test "x$cs_host_macosx" = "xyes"],
-    [cs_osx_gl=CS_CREATE_TUPLE([-DCS_OPENGL_PATH=OpenGL],[],
-	[-framework OpenGL])
-    cs_osx_glu=CS_CREATE_TUPLE([-DCS_GLU_PATH=OpenGL],[],[-framework OpenGL])])
-
-# Windows?
-AS_IF([test $cs_host_family = windows],
-    [cs_win32_gl=CS_CREATE_TUPLE([],[],[-lopengl32])
-    cs_win32_glu=CS_CREATE_TUPLE([],[],[-lglu32])])
-
-# Check for OpenGL.
-CS_CHECK_BUILD([for OpenGL], [cs_cv_libgl],
-    [AC_LANG_PROGRAM([CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],[glEnd()])],
-    [$cs_win32_gl \
-    $cs_osx_gl \
-    CS_CREATE_TUPLE([],[],[-lGL]) \
-    CS_CREATE_TUPLE([],[],[-lgl]) \
-    $cs_mesa_gl], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libgl], [GL])], [], [],
-    [$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
-
-# Check for GLU.
-CS_CHECK_BUILD([for GLU], [cs_cv_libglu],
-    [AC_LANG_PROGRAM(
-        [CS_GL_INCLUDE([CS_GLU_PATH],[GL],[glu.h])], [gluNewQuadric()])],
-    [$cs_osx_glu \
-    CS_CREATE_TUPLE() \
-    $cs_win32_glu \
-    CS_CREATE_TUPLE([],[],[-lGLU]) \
-    CS_CREATE_TUPLE([],[],[-lglu]) \
-    $cs_mesa_glu], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libglu], [GLU])], [], [],
-    [$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
-
+CS_CHECK_OPENGL
 AS_IF([test $cs_cv_libgl = yes],
     [# Check for GLhandleARB.
     CS_CHECK_BUILD([for GLhandleARB], [cs_cv_libgl_glhandlearb],
@@ -1262,33 +978,11 @@ AS_IF([test $cs_cv_libgl = yes],
 	    [CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],
 	    [GLhandleARB x; (void)x;])],
 	[], [],	[CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])], [], [],
-	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
-
-    # Check for GLX.
-    AS_IF([test "$no_x" != yes],
-	[CS_CHECK_BUILD([for GLX], [cs_cv_libglx],
-	    [AC_LANG_PROGRAM([[#include <GL/glx.h>]], [glXWaitGL()])],
-	    [CS_CREATE_TUPLE() \
-	    CS_CREATE_TUPLE([],[],[-lGLX]) \
-	    CS_CREATE_TUPLE([],[],[-lglx]) \
-	    $cs_mesa_glx], [],
-	    [CS_EMIT_BUILD_RESULT([cs_cv_libglx], [GLX])], [], [],
-	    [$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
-    
-	# Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
-	# present.
-	AS_IF([test $cs_cv_libglx = yes],
-	    [CS_CHECK_BUILD([for GLX extensions], [cs_cv_libglx_extensions],
-		[AC_LANG_PROGRAM(
-		    [[#define GLX_GLXEXT_PROTOTYPES
-		    #include <GL/glx.h>]],
-		    [glXGetProcAddressARB(0)])],
-		[CS_CREATE_TUPLE(
-		    [$cs_cv_libglx_cflags],
-		    [$cs_cv_libglx_lflags],
-		    [$cs_cv_libglx_libs])],
-		[],[], [CS_HEADER_PROPERTY([CSGL_EXT_STATIC_ASSERTION])])])])])
-
+	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])])
+CS_CHECK_GLX
+# Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
+# present.
+CS_CHECK_GLXEXT([], [CS_HEADER_PROPERTY([CSGL_EXT_STATIC_ASSERTION])])
 
 
 #------------------------------------------------------------------------------

@@ -88,8 +88,8 @@ AC_DEFUN([CS_CHECK_HOST],
 ])
 
 AC_DEFUN([_CS_CHECK_HOST_DARWIN],
-    [AC_REQUIRE([AC_PROG_CC])
-    AC_REQUIRE([AC_PROG_CXX])
+    [AC_REQUIRE([CS_PROG_CC])
+    AC_REQUIRE([CS_PROG_CXX])
 
     # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
     # a way to distinguish between the two.  If Carbon.h is present, then
