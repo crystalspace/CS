@@ -9,7 +9,7 @@ chronological order.
 14-Mar-2006
 	- Jorrit added a GetFlags() method to iMeshFactoryWrapper. In that
 	  method you can add defaults for flags for all the meshes created
-	  from that factory. This only works for meshes created from
+	  from that factory. This only works for meshes created from
 	  factories either through iMeshFactoryWrapper->CreateMeshWrapper()
 	  or the loader will also do it if you create meshobjects
 	  from factories from XML.
