@@ -68,6 +68,7 @@ package cspace;
 *csFPrintf = *cspacec::csFPrintf;
 *csPrintfErr = *cspacec::csPrintfErr;
 *csGetTicks = *cspacec::csGetTicks;
+*csGetMicroTicks = *cspacec::csGetMicroTicks;
 *csSleep = *cspacec::csSleep;
 *csGetUsername = *cspacec::csGetUsername;
 *csGetPlatformConfigPath = *cspacec::csGetPlatformConfigPath;
@@ -5491,6 +5492,44 @@ sub DESTROY {
     }
 }
 
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSceneNode ##############
+
+package cspace::iSceneNode;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*GetMovable = *cspacec::iSceneNode_GetMovable;
+*QueryMesh = *cspacec::iSceneNode_QueryMesh;
+*QueryLight = *cspacec::iSceneNode_QueryLight;
+*QueryCamera = *cspacec::iSceneNode_QueryCamera;
+*SetParent = *cspacec::iSceneNode_SetParent;
+*GetParent = *cspacec::iSceneNode_GetParent;
+*GetChildren = *cspacec::iSceneNode_GetChildren;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSceneNode($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iSceneNode_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
