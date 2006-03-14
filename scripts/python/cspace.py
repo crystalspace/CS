@@ -2379,6 +2379,8 @@ csPrintfErr = _cspace.csPrintfErr
 
 csGetTicks = _cspace.csGetTicks
 
+csGetMicroTicks = _cspace.csGetMicroTicks
+
 csSleep = _cspace.csSleep
 
 csGetUsername = _cspace.csGetUsername
@@ -4822,6 +4824,40 @@ class iMaterialListPtr(iMaterialList):
         if not hasattr(self,"thisown"): _swig_setattr(self, iMaterialList, 'thisown', 0)
         _swig_setattr(self, iMaterialList,self.__class__,iMaterialList)
 _cspace.iMaterialList_swigregister(iMaterialListPtr)
+
+class iSceneNode(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSceneNode, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSceneNode, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSceneNode instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def GetMovable(*args): return _cspace.iSceneNode_GetMovable(*args)
+    def QueryMesh(*args): return _cspace.iSceneNode_QueryMesh(*args)
+    def QueryLight(*args): return _cspace.iSceneNode_QueryLight(*args)
+    def QueryCamera(*args): return _cspace.iSceneNode_QueryCamera(*args)
+    def SetParent(*args): return _cspace.iSceneNode_SetParent(*args)
+    def GetParent(*args): return _cspace.iSceneNode_GetParent(*args)
+    def GetChildren(*args): return _cspace.iSceneNode_GetChildren(*args)
+    def __del__(self, destroy=_cspace.delete_iSceneNode):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSceneNode_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSceneNode_scfGetVersion)
+
+class iSceneNodePtr(iSceneNode):
+    def __init__(self, this):
+        _swig_setattr(self, iSceneNode, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSceneNode, 'thisown', 0)
+        _swig_setattr(self, iSceneNode,self.__class__,iSceneNode)
+_cspace.iSceneNode_swigregister(iSceneNodePtr)
+
+iSceneNode_scfGetVersion = _cspace.iSceneNode_scfGetVersion
 
 CS_ENTITY_DETAIL = _cspace.CS_ENTITY_DETAIL
 CS_ENTITY_CAMERA = _cspace.CS_ENTITY_CAMERA
