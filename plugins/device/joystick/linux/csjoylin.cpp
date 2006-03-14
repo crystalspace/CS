@@ -150,7 +150,7 @@ bool csLinuxJoystick::Init ()
       /* check devids for a dup st.st_dev */
       for (csArray<dev_t>::Iterator i = devids.GetIterator(); i.HasNext(); )
       {
-	if (i.Next() == st.st_dev)
+	if (i.Next() == st.st_rdev)
 	{
 	  close(fd);
 	  fd = -1;
@@ -164,7 +164,7 @@ bool csLinuxJoystick::Init ()
       {
 	nJoy++;
 	fds.Push((const int) fd);
-	devids.Push(st.st_dev);
+	devids.Push(st.st_rdev);
       }
     }
     else if (verbose || errno != ENOENT)

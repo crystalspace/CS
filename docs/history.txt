@@ -12,6 +12,8 @@ chronological order.
 	- caedes added iSceneNode to cspace.i.
 	- res wrapped some often-used configure command sequences into their
 	  own commands.
+	- Adam fixed a bug in csjoylin that prevented multiple joysticks from
+	  being detected correctly.
 12-Mar-2006
 	- Marten added support for some more ANSI control sequences in
 	  csPrintf on windows (where they are emulated).
