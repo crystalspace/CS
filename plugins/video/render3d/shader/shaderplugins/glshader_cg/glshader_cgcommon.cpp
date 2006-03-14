@@ -285,6 +285,33 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* /*mesh*/,
                   }
                   cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
                 }
+                else if (var->GetType () == csShaderVariable::ARRAY)
+                {
+
+                  for (uint idx = 0; idx < numElements; idx++)
+                  {
+                    csShaderVariable *element =
+                      var->GetArrayElement (idx);
+                    if (element->GetArraySize () < 4 || 
+                      element->GetType () != csShaderVariable::ARRAY)
+                      continue;
+                    for (uint idrow = 0; idrow < 4; idrow++)
+                    {
+                      csShaderVariable *mat_el =
+                        element->GetArrayElement (idx);
+                      csVector4 v;
+                      float matrix[16];
+                      if (element != 0 && mat_el->GetValue (v))
+                      {
+                        tmpArr[16*idx + idrow] = v[0]; 
+                        tmpArr[16*idx + idrow + 4] = v[1];
+                        tmpArr[16*idx + idrow + 8] = v[2];
+                        tmpArr[16*idx + idrow + 12] = v[3];
+                      }
+                    }
+                  }
+                  cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
+                }
                 else
                 {
                   CS_ASSERT_MSG("Can't convert all SV contents to FLOAT4x4 (yet)", false);
