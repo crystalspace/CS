@@ -156,10 +156,10 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* /*mesh*/,
                 var->GetArrayElement (idx);
               if (element != 0 && element->GetValue (v))
               {
-                matrix[4*idx] = v[0]; 
-                matrix[4*idx + 1] = v[1];
-                matrix[4*idx + 2] = v[2];
-                matrix[4*idx + 3] = v[3];
+                matrix[idx] = v[0]; 
+                matrix[idx + 4] = v[1];
+                matrix[idx + 8] = v[2];
+                matrix[idx + 12] = v[3];
               }
             }
              cgGLSetMatrixParameterfc (param, matrix);
