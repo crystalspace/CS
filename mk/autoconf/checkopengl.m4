@@ -79,7 +79,8 @@ AC_DEFUN([CS_CHECK_OPENGL],
     AC_REQUIRE([CS_CHECK_PTHREAD])
     AC_REQUIRE([AC_PATH_X])
     AC_REQUIRE([AC_PATH_XTRA])
-    AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
+    AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32], [], 
+	[Whether the int32 type is available])], [])
     AC_CHECK_HEADERS([windows.h], [], [], [cs_define_int32])
     
     # Apply plaform-specific flags if necessary.
@@ -221,7 +222,7 @@ AC_DEFUN([CS_CHECK_GLUT],
 	# Check for GLUT.
 	CS_CHECK_BUILD([for GLUT], [cs_cv_libglut],
 	    [AC_LANG_PROGRAM(
-		[CS_GL_INCLUDE([CS_GLUT_PATH],[GL],[glut.h])], [glutSwapBuffers()])],
+		[_CS_GL_INCLUDE([CS_GLUT_PATH],[GL],[glut.h])], [glutSwapBuffers()])],
 	    [$cs_osx_glut \
 	    CS_CREATE_TUPLE() \
 	    $cs_win32_glut \
