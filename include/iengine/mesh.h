@@ -768,6 +768,27 @@ struct iMeshFactoryWrapper : public virtual iBase
   virtual iMeshWrapper* CreateMeshWrapper () = 0;
 
   /**
+   * Get default flags for all meshes created from this factory.
+   * The following flags are supported:
+   * - #CS_ENTITY_DETAIL: this is a detail object. Again this is a hint
+   *   for the engine to render this object differently. Currently not used.
+   * - #CS_ENTITY_CAMERA: entity will always be centered around the camera.
+   * - #CS_ENTITY_INVISIBLEMESH: entity is not rendered. 
+   * - #CS_ENTITY_NOHITBEAM: this entity will not be considered by HitBeam() 
+   *   calls.
+   * - #CS_ENTITY_INVISIBLE: means that either CS_ENTITY_INVISIBLEMESH and 
+   *   CS_ENTITY_NOHITBEAM are set.
+   * - #CS_ENTITY_NOSHADOWS: cast no shadows.
+   * - #CS_ENTITY_NOLIGHTING: do not light this object.
+   * - #CS_ENTITY_NOCLIP: do not clip this object.
+   *
+   * \remarks Despite the name, this method does not only provide read access
+   *   to the mesh flags, as the returned reference to a csFlags object also 
+   *   provides write access.
+   */
+  virtual csFlags& GetFlags () = 0;
+
+  /**
    * Get the parent of this factory. This will be 0 if this factory
    * has no parent.
    */

@@ -1344,6 +1344,7 @@ iMeshWrapper *csMeshFactoryWrapper::CreateMeshWrapper ()
   mesh->SetFactory (this);
   mesh->SetRenderPriority (render_priority);
   mesh->SetZBufMode (zbufMode);
+  mesh->GetFlags ().Set (flags.Get (), flags.Get ());
 
   if (static_lod)
   {

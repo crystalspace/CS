@@ -774,6 +774,8 @@ private:
 
   csShaderVariableContext svcontext;
 
+  csFlags flags;
+
 public:
   /// Constructor.
   csMeshFactoryWrapper (iMeshObjectFactory* meshFact);
@@ -791,6 +793,11 @@ public:
   iMeshObjectFactory* GetMeshObjectFactory () const
   {
     return meshFact;
+  }
+
+  virtual csFlags& GetFlags ()
+  {
+    return flags;
   }
 
   /**

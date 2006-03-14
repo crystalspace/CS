@@ -2564,6 +2564,28 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  svc->AddVariable (var);
 	}
 	break;
+      case XMLTOKEN_NOLIGHTING:
+        stemp->GetFlags ().Set (CS_ENTITY_NOLIGHTING, CS_ENTITY_NOLIGHTING);
+        break;
+      case XMLTOKEN_NOSHADOWS:
+        stemp->GetFlags ().Set (CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
+        break;
+      case XMLTOKEN_NOCLIP:
+        stemp->GetFlags ().Set (CS_ENTITY_NOCLIP, CS_ENTITY_NOCLIP);
+        break;
+      case XMLTOKEN_NOHITBEAM:
+        stemp->GetFlags ().Set (CS_ENTITY_NOHITBEAM, CS_ENTITY_NOHITBEAM);
+        break;
+      case XMLTOKEN_INVISIBLEMESH:
+        stemp->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH,
+		  CS_ENTITY_INVISIBLEMESH);
+        break;
+      case XMLTOKEN_INVISIBLE:
+        stemp->GetFlags ().Set (CS_ENTITY_INVISIBLE, CS_ENTITY_INVISIBLE);
+        break;
+      case XMLTOKEN_DETAIL:
+        stemp->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
+        break;
       default:
 	SyntaxService->ReportBadToken (child);
         return false;
@@ -3312,6 +3334,8 @@ bool csLoader::HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
       mesh->SetFactory (mfw);
       if (!keepZbuf) mesh->SetZBufMode (mfw->GetZBufMode ());
       if (!keepPrio) mesh->SetRenderPriority (mfw->GetRenderPriority ());
+      mesh->GetFlags ().Set (mfw->GetFlags ().Get (),
+      	mfw->GetFlags ().Get ());
     }
   }
   return true;
