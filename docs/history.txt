@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Mar-2006
+	- Piotr Obrzut added float4x4 array maping with arrays of csVector4 
+	  arrays to cg shader plugin.
 14-Mar-2006
 	- Jorrit added a GetFlags() method to iMeshFactoryWrapper. In that
 	  method you can add defaults for flags for all the meshes created
