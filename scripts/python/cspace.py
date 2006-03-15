@@ -5057,6 +5057,7 @@ class iMeshFactoryWrapper(iBase):
     def SetMeshObjectFactory(*args): return _cspace.iMeshFactoryWrapper_SetMeshObjectFactory(*args)
     def HardTransform(*args): return _cspace.iMeshFactoryWrapper_HardTransform(*args)
     def CreateMeshWrapper(*args): return _cspace.iMeshFactoryWrapper_CreateMeshWrapper(*args)
+    def GetFlags(*args): return _cspace.iMeshFactoryWrapper_GetFlags(*args)
     def GetParentContainer(*args): return _cspace.iMeshFactoryWrapper_GetParentContainer(*args)
     def SetParentContainer(*args): return _cspace.iMeshFactoryWrapper_SetParentContainer(*args)
     def GetChildren(*args): return _cspace.iMeshFactoryWrapper_GetChildren(*args)
