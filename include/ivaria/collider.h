@@ -29,6 +29,7 @@
 #include "csutil/array.h"
 
 struct iPolygonMesh;
+struct iTerraFormer;
 struct iMeshObject;
 class csReversibleTransform;
 
@@ -104,6 +105,11 @@ struct iCollideSystem : public iBase
    * \return a reference to a collider that you have to store.
    */
   virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh) = 0;
+
+  /** Create a Collider from a terrain.
+   * @@@ write something more suitable
+   */
+  virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh) = 0;
   
   /**
    * Test collision between two colliders.

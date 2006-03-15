@@ -86,6 +86,10 @@ public:
   csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
   	iPolygonMesh* mesh);
 
+  /// Create a collider based on a terrain.
+  csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
+  	iTerraFormer* terrain);
+
   /**
    * Create a collider based on a collider. Note that it is legal to pass
    * in a 0 collider. In that case it indicates that this object has no

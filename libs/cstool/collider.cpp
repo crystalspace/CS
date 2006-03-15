@@ -59,13 +59,24 @@ csColliderWrapper::csColliderWrapper (csObject& parent,
 }
 
 csColliderWrapper::csColliderWrapper (iObject* parent,
-	iCollideSystem* collide_system,
-	iPolygonMesh* mesh)
+        iCollideSystem* collide_system,
+        iPolygonMesh* mesh)
   : scfImplementationType (this)
 {
   parent->ObjAdd (this);
   csColliderWrapper::collide_system = collide_system;
   collider = collide_system->CreateCollider (mesh);
+}
+
+
+csColliderWrapper::csColliderWrapper (iObject* parent,
+	iCollideSystem* collide_system,
+	iTerraFormer* terrain)
+  : scfImplementationType (this)
+{
+  parent->ObjAdd (this);
+  csColliderWrapper::collide_system = collide_system;
+  collider = collide_system->CreateCollider (terrain);
 }
 
 csColliderWrapper::csColliderWrapper (iObject* parent,

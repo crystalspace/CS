@@ -70,6 +70,7 @@ public:
   void CopyCollisionPairs (csOPCODECollider* col1, csOPCODECollider* col2);
 
   virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
+  virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh);
 
   /**
    * Test collision between two colliders.

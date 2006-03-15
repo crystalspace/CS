@@ -118,6 +118,12 @@ csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iPolygonMesh* mesh)
   return csPtr<iCollider> (col);
 }
 
+csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iTerraFormer* mesh)
+{
+  //@@@ Implement me!
+  return 0;
+}
+
 bool csOPCODECollideSystem::Collide (
   iCollider* collider1, const csReversibleTransform* trans1,
   iCollider* collider2, const csReversibleTransform* trans2)
