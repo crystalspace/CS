@@ -5756,6 +5756,7 @@ package cspace::iMeshFactoryWrapper;
 *SetMeshObjectFactory = *cspacec::iMeshFactoryWrapper_SetMeshObjectFactory;
 *HardTransform = *cspacec::iMeshFactoryWrapper_HardTransform;
 *CreateMeshWrapper = *cspacec::iMeshFactoryWrapper_CreateMeshWrapper;
+*GetFlags = *cspacec::iMeshFactoryWrapper_GetFlags;
 *GetParentContainer = *cspacec::iMeshFactoryWrapper_GetParentContainer;
 *SetParentContainer = *cspacec::iMeshFactoryWrapper_SetParentContainer;
 *GetChildren = *cspacec::iMeshFactoryWrapper_GetChildren;
