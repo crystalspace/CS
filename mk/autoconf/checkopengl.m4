@@ -56,7 +56,7 @@ m4_define([cs_define_int32],
     ]])
 
 # CS_GL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
-AC_DEFUN([_CS_GL_INCLUDE],
+AC_DEFUN([CS_GL_INCLUDE],
     [[#if HAVE_WINDOWS_H
     #if !HAVE_TYPE_INT32
     typedef long int32;
@@ -119,7 +119,7 @@ AC_DEFUN([CS_CHECK_OPENGL],
     
     # Check for OpenGL.
     CS_CHECK_BUILD([for OpenGL], [cs_cv_libgl],
-	[AC_LANG_PROGRAM([_CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],[glEnd()])],
+	[AC_LANG_PROGRAM([CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],[glEnd()])],
 	[$cs_win32_gl \
 	$cs_osx_gl \
 	CS_CREATE_TUPLE([],[],[-lGL]) \
@@ -150,7 +150,7 @@ AC_DEFUN([CS_CHECK_GLU],
 	# Check for GLU.
 	CS_CHECK_BUILD([for GLU], [cs_cv_libglu],
 	    [AC_LANG_PROGRAM(
-		[_CS_GL_INCLUDE([CS_GLU_PATH],[GL],[glu.h])], [gluNewQuadric()])],
+		[CS_GL_INCLUDE([CS_GLU_PATH],[GL],[glu.h])], [gluNewQuadric()])],
 	    [$cs_osx_glu \
 	    CS_CREATE_TUPLE() \
 	    $cs_win32_glu \
@@ -222,7 +222,7 @@ AC_DEFUN([CS_CHECK_GLUT],
 	# Check for GLUT.
 	CS_CHECK_BUILD([for GLUT], [cs_cv_libglut],
 	    [AC_LANG_PROGRAM(
-		[_CS_GL_INCLUDE([CS_GLUT_PATH],[GL],[glut.h])], [glutSwapBuffers()])],
+		[CS_GL_INCLUDE([CS_GLUT_PATH],[GL],[glut.h])], [glutSwapBuffers()])],
 	    [$cs_osx_glut \
 	    CS_CREATE_TUPLE() \
 	    $cs_win32_glut \
