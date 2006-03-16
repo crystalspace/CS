@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Mar-2006
+	- Fossi added support for non-square regions to terrain formers.
+	  This required changing of the iTerraFormer interface.
+	- Fossi also uploaded a newer version of the paging terrain.
 15-Mar-2006
 	- Piotr Obrzut added float4x4 array maping with arrays of csVector4 
 	  arrays to cg shader plugin.

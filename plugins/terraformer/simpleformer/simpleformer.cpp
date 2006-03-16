@@ -434,10 +434,10 @@ bool csSimpleFormer::Initialize (iObjectRegistry* objectRegistry)
 }
 
 csPtr<iTerraSampler> csSimpleFormer::GetSampler (csBox2 region, 
-                                                 unsigned int resolution)
+                                     unsigned int resx, uint resy)
 {
   // Create a new sampler and return it
-  return new csSimpleSampler (this, region, resolution);
+  return new csSimpleSampler (this, region, resx, resy);
 }
 
 bool csSimpleFormer::SampleFloat (csStringID type, float x, float z, 
@@ -528,14 +528,15 @@ bool csSimpleFormer::SampleInteger (csStringID type, float x, float z,
 //                            csSimpleSampler
 //////////////////////////////////////////////////////////////////////////
 
-csSimpleSampler::csSimpleSampler (csSimpleFormer *terraFormer,
-                                  csBox2 region, unsigned int resolution) :
-  scfImplementationType (this)
+csSimpleSampler::csSimpleSampler (csSimpleFormer *terraFormer, csBox2 region,
+                                  uint resx, uint resz) : 
+                                  scfImplementationType (this)
 {
   // Initialize members
   csSimpleSampler::terraFormer = terraFormer;
   csSimpleSampler::region = region;
-  csSimpleSampler::resolution = resolution;
+  csSimpleSampler::resx = resx;
+  csSimpleSampler::resz = (resz==0)?resx:resz;
 
   positions = 0;
   normals = 0;
@@ -562,15 +563,16 @@ void csSimpleSampler::CachePositions ()
   // Allocate new data
   // We will sample 1 too much in both x and z, for correct normal
   // calculations at region edges
-  positions = new csVector3[resolution*resolution];
-  edgePositions = new csVector3 [resolution*4];
+  positions = new csVector3[resx*resz];
+  edgePositions = new csVector3 [resx*4+resz*2];
 
   // Compute region corners
   minCorner = csVector3 (region.MinX (), 0, region.MinY ());
   maxCorner = csVector3 (region.MaxX (), 0, region.MaxY ());
 
   // Compute distance between sample points
-  sampleDistanceReal = (maxCorner-minCorner)/(float)(resolution-1);
+  sampleDistanceReal = (maxCorner.x-minCorner.x)/(float)(resx-1);
+  sampleDistanceReal = (maxCorner.z-minCorner.z)/(float)(resz-1);
 
   // We wanna compute our region in heightmap space
   // Heightmap -> real space is computed by:
@@ -603,7 +605,8 @@ void csSimpleSampler::CachePositions ()
   maxCorner.z *= (float)terraFormer->height/2;
 
   // Compute distance between sample points in heightmap space
-  sampleDistanceHeight = (maxCorner-minCorner)/(float)(resolution-1);
+  sampleDistanceHeight.x = (maxCorner.x-minCorner.x)/(float)(resx-1);
+  sampleDistanceHeight.z = (maxCorner.z-minCorner.z)/(float)(resz-1);
 
   // Keep index counters to avoid uneccessary x+y*w calculations
   int posIdx = 0, edgeIdx = 0;
@@ -611,19 +614,19 @@ void csSimpleSampler::CachePositions ()
   // Iterate through the samplepoints in the region
   float zr = region.MinY ()-sampleDistanceReal.z;
   float zh = minCorner.z-sampleDistanceHeight.z;
-  for (unsigned int i=0; i<resolution+2; ++i)
+  for (unsigned int i=0; i<resz+2; ++i)
   {
     float xr = region.MinX ()-sampleDistanceReal.x;
     float xh = minCorner.x-sampleDistanceHeight.x;
-    for (unsigned int j=0; j<resolution+2; ++j)
+    for (unsigned int j=0; j<resx+2; ++j)
     {
       // If we're at the corners, we'll just move along
-      if ((i>0 || j>0) && (i>0 || j<resolution+1) &&
-        (i<resolution+1 || j>0) && (i<resolution+1 || j<resolution+1))
+      if ((i>0 || j>0) && (i>0 || j<resx+1) &&
+        (i<resz+1 || j>0) && (i<resz+1 || j<resx+1))
       {
         // If we're not on the extra edge, store the position in
         // our output buffer, and if we are, store it in the edge buffer
-        if (i>0 && i<resolution+1 && j>0 && j<resolution+1)
+        if (i>0 && i<resz+1 && j>0 && j<resx+1)
         {
           positions[posIdx++] = 
             csVector3 (xr,
@@ -663,7 +666,7 @@ void csSimpleSampler::CacheNormals ()
     return;
 
   // Allocate new data
-  normals = new csVector3[resolution*resolution];
+  normals = new csVector3[resx*resz];
 
   // Make sure we've got some position data to base the normals on
   CachePositions ();
@@ -676,21 +679,21 @@ void csSimpleSampler::CacheNormals ()
   csVector3 v1, v2;
 
   // Iterate through the samplepoints in the region
-  for (unsigned int i = 0; i<resolution; ++i)
+  for (unsigned int i = 0; i<resz; ++i)
   {
-    for (unsigned int j = 0; j<resolution; ++j)
+    for (unsigned int j = 0; j<resx; ++j)
     {
       // Calculate two gradient vectors
       // Conditionals check wheter to fetch from edge data
-      v1 = j==resolution-1?
-        edgePositions[1+resolution+i*2]:positions[posIdx+1];
+      v1 = j==resx-1?
+        edgePositions[1+resx+i*2]:positions[posIdx+1];
       v1 -= j==0?
-        edgePositions[resolution+i*2]:positions[posIdx-1];
+        edgePositions[resx+i*2]:positions[posIdx-1];
 
-      v2 = i==resolution-1?
-        edgePositions[resolution*3+j]:positions[posIdx+resolution];
+      v2 = i==resz-1?
+        edgePositions[resx*3+j]:positions[posIdx+resx];
       v2 -= i==0?
-        edgePositions[j]:positions[posIdx-resolution];
+        edgePositions[j]:positions[posIdx-resx];
 
       // Cross them and normalize to get a normal
       normals[normIdx++] = (v2%v1).Unit ();
@@ -710,7 +713,7 @@ void csSimpleSampler::CacheHeights ()
     return;
 
   // Allocate new data
-  heights = new float[resolution*resolution];
+  heights = new float[resx*resz];
 
   // Make sure we've got some position data to base the normals on
   CachePositions ();
@@ -719,9 +722,9 @@ void csSimpleSampler::CacheHeights ()
   int idx = 0;
 
   // Iterate through the samplepoints in the region
-  for (unsigned int i = 0; i<resolution; ++i)
+  for (unsigned int i = 0; i<resz; ++i)
   {
-    for (unsigned int j = 0; j<resolution; ++j)
+    for (unsigned int j = 0; j<resx; ++j)
     {
       heights[idx] = positions[idx].y;
       idx++;
@@ -736,7 +739,7 @@ void csSimpleSampler::CacheTexCoords ()
     return;
 
   // Allocate new data
-  texCoords = new csVector2[resolution*resolution];
+  texCoords = new csVector2[resx*resz];
 
   // The positions aren't really needed, but CachePositions
   // calculates some other useful stuff too, so we just assume
@@ -754,10 +757,10 @@ void csSimpleSampler::CacheTexCoords ()
   const csVector2 tcStep (
     sampleDistanceHeight.x / (float)(terraFormer->width), 
     sampleDistanceHeight.z / (float)(terraFormer->height));
-  for (unsigned int i = 0; i<resolution; ++i)
+  for (unsigned int i = 0; i<resz; ++i)
   {
     texCoord.x = startx; 
-    for (unsigned int j = 0; j<resolution; ++j)
+    for (unsigned int j = 0; j<resx; ++j)
     {
       // Just assign the texture coordinate
       texCoords[idx++].Set (texCoord.x, 1.0f-texCoord.y); //= texCoord;
@@ -852,10 +855,10 @@ const csBox2 &csSimpleSampler::GetRegion () const
   return region;
 }
 
-unsigned int csSimpleSampler::GetResolution () const
+void csSimpleSampler::GetResolution (uint &resx, uint &resz) const
 {
-  // Just return the resolution
-  return resolution;
+  resx = csSimpleSampler::resx;
+  resz = csSimpleSampler::resz;
 }
 
 unsigned int csSimpleSampler::GetVersion () const

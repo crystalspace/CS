@@ -40,14 +40,14 @@ class csVector3;
  */
 struct iTerraFormer : public virtual iBase
 {
-  SCF_INTERFACE (iTerraFormer, 1, 0, 1);
+  SCF_INTERFACE (iTerraFormer, 2, 0, 0);
 
   /**
    * Get a sampler region from the terraformer. The sampler region will
    * be used for all actual data retrieval.
    */
   virtual csPtr<iTerraSampler> GetSampler (csBox2 region, 
-    unsigned int resolution) = 0;
+    unsigned int resx, unsigned int resy = 0) = 0;
 
   /**
    * Sample float data at a given spot on the terrain.
@@ -99,7 +99,7 @@ struct iTerraFormer : public virtual iBase
  */
 struct iTerraSampler : public virtual iBase
 {
-  SCF_INTERFACE (iTerraSampler, 1, 0, 0);
+  SCF_INTERFACE (iTerraSampler, 2, 0, 0);
 
   /**
    * Sample float data of the specified from the region. Data is sampled in 
@@ -142,8 +142,8 @@ struct iTerraSampler : public virtual iBase
   /// Retrieve the sample region specified when the sampler was created
   virtual const csBox2 &GetRegion () const = 0;
 
-  /// Retrieve the sampling resolution specified when the sampler was created
-  virtual unsigned int GetResolution () const = 0;
+  /// Retrieve both sampling resolutions specified when the sampler was created
+  virtual void GetResolution (uint &resx, uint &resz) const = 0;
   
   /**
    * Retrieve the version number of this sampler. This will be increased

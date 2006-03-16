@@ -138,7 +138,7 @@ public:
 
   /// Creates and returns a sampler. See interface for details
   virtual csPtr<iTerraSampler> GetSampler (csBox2 region, 
-                                           unsigned int resolution);
+                                           uint resx, uint resz = 0);
 
   /**
    * Sample float data.
@@ -193,7 +193,8 @@ private:
   csBox2 region;
 
   /// The resolution to use for sampling
-  unsigned int resolution;
+  unsigned int resx;
+  unsigned int resz;
 
   /// Cached float data
   float *heights;
@@ -232,7 +233,8 @@ public:
 
   /// csSimpleSampler constructor
   csSimpleSampler (csSimpleFormer* terraFormer,
-                   csBox2 region, unsigned int resolution);
+                   csBox2 region, unsigned int resx, unsigned int resy 
+= 0);
 
   /// csSimpleSampler destructor
   virtual ~csSimpleSampler ();
@@ -272,8 +274,8 @@ public:
   /// Returns the sample region
   virtual const csBox2 &GetRegion () const;
 
-  /// Returns the sampling resolution
-  virtual unsigned int GetResolution () const;
+  /// Returns the sampling resolutions
+  virtual void GetResolution (uint &resx, uint &resz) const;
 
   /// Returns 0, since changes aren't allowed in this simple terraformer
   virtual unsigned int GetVersion () const;
