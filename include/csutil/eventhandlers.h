@@ -25,6 +25,7 @@
 #include "iutil/eventnames.h"
 #include "iutil/eventhandlers.h"
 #include "iutil/objreg.h"
+#include "iutil/eventh.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/hash.h"
 #include "csutil/strset.h"
@@ -172,5 +173,288 @@ public:
 };
 
 /* @} */
+
+
+
+
+
+struct iFrameEventSignpost : public iEventHandler 
+{
+ public:
+  iFrameEventSignpost () { }
+  virtual ~iFrameEventSignpost () { }
+  CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
+  virtual bool HandleEvent (iEvent&) 
+  { 
+    return false;
+  }
+};
+
+
+class FrameSignpost_Logic3D
+: public scfImplementation2<FrameSignpost_Logic3D, 
+  iFrameEventSignpost, 
+  scfFakeInterface<iEventHandler> > 
+{
+ private:
+  FrameSignpost_Logic3D () : scfImplementationType (this) { }
+ public:
+  CS_EVENTHANDLER_NAMES("crystalspace.signpost.logic3d")
+  CS_CONST_METHOD virtual const csHandlerID * GenericPrec
+    (csRef<iEventHandlerRegistry> &,
+     csRef<iEventNameRegistry> &,
+     csEventID) const;
+  CS_CONST_METHOD virtual const csHandlerID * GenericSucc
+    (csRef<iEventHandlerRegistry> &r1,
+     csRef<iEventNameRegistry> &r2,
+     csEventID e) const;
+};
+
+class FrameSignpost_3D2D
+: public scfImplementation2<FrameSignpost_3D2D, 
+  iFrameEventSignpost, 
+  scfFakeInterface<iEventHandler> > 
+{
+ private:
+  FrameSignpost_3D2D () : scfImplementationType (this) { }
+ public:
+  CS_EVENTHANDLER_NAMES("crystalspace.signpost.3d2d")
+  CS_CONST_METHOD virtual const csHandlerID * GenericPrec
+    (csRef<iEventHandlerRegistry> &,
+     csRef<iEventNameRegistry> &,
+     csEventID) const;
+  CS_CONST_METHOD virtual const csHandlerID * GenericSucc
+    (csRef<iEventHandlerRegistry> &r1,
+     csRef<iEventNameRegistry> &r2,
+     csEventID e) const;
+};
+
+class FrameSignpost_2DConsole
+: public scfImplementation2<FrameSignpost_2DConsole, 
+  iFrameEventSignpost, 
+  scfFakeInterface<iEventHandler> > 
+{
+ private:
+  FrameSignpost_2DConsole () : scfImplementationType (this) { }
+ public:
+  CS_EVENTHANDLER_NAMES("crystalspace.signpost.2dconsole")
+  CS_CONST_METHOD virtual const csHandlerID * GenericPrec
+    (csRef<iEventHandlerRegistry> &,
+     csRef<iEventNameRegistry> &,
+     csEventID) const;
+  CS_CONST_METHOD virtual const csHandlerID * GenericSucc
+    (csRef<iEventHandlerRegistry> &r1,
+     csRef<iEventNameRegistry> &r2,
+     csEventID e) const;
+};
+
+class FrameSignpost_ConsoleDebug
+: public scfImplementation2<FrameSignpost_ConsoleDebug, 
+  iFrameEventSignpost, 
+  scfFakeInterface<iEventHandler> > 
+{
+ private:
+  FrameSignpost_ConsoleDebug () : scfImplementationType (this) { }
+ public:
+  CS_EVENTHANDLER_NAMES("crystalspace.signpost.consoledebug")
+  CS_CONST_METHOD virtual const csHandlerID * GenericPrec
+    (csRef<iEventHandlerRegistry> &,
+     csRef<iEventNameRegistry> &,
+     csEventID) const;
+  CS_CONST_METHOD virtual const csHandlerID * GenericSucc
+    (csRef<iEventHandlerRegistry> &r1,
+     csRef<iEventNameRegistry> &r2,
+     csEventID e) const;
+};
+
+class FrameSignpost_DebugFrame
+: public scfImplementation2<FrameSignpost_DebugFrame, 
+  iFrameEventSignpost, 
+  scfFakeInterface<iEventHandler> > 
+{
+ private:
+  FrameSignpost_DebugFrame () : scfImplementationType (this) { }
+ public:
+  CS_EVENTHANDLER_NAMES("crystalspace.signpost.debugframe")
+  CS_CONST_METHOD virtual const csHandlerID * GenericPrec
+    (csRef<iEventHandlerRegistry> &,
+     csRef<iEventNameRegistry> &,
+     csEventID) const;
+  CS_CONST_METHOD virtual const csHandlerID * GenericSucc
+    (csRef<iEventHandlerRegistry> &r1,
+     csRef<iEventNameRegistry> &r2,
+     csEventID e) const;
+};
+
+
+/**
+ * Use this macro to declare your event handler as wanting to
+ * handle the csevFrame event in the "logic" phase (i.e.,
+ * before any handlers in the "3D" phase).
+ */
+#define CS_EVENTHANDLER_PHASE_LOGIC(x)					\
+CS_EVENTHANDLER_NAMES(x)						\
+CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
+CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+ csEventID) const {							\
+  return 0;								\
+}									\
+CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+ csEventID event) const {						\
+  static csHandlerID succConstraint[2];					\
+  if (event != csevFrame(r2))						\
+    return 0;								\
+  succConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);		\
+  succConstraint[1] = CS_HANDLERLIST_END;				\
+  return succConstraint;						\
+}
+
+/**
+ * Use this macro to declare your event handler as wanting to
+ * handle the csevFrame event in the "3D" phase (i.e.,
+ * after any handlers in the "logic" phase and before any
+ * handlers in the "2D" phase).
+ */
+#define CS_EVENTHANDLER_PHASE_3D(x)					\
+CS_EVENTHANDLER_NAMES(x)						\
+CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
+CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+ csEventID event) const {						\
+  static csHandlerID precConstraint[2];					\
+  if (event != csevFrame(r2))						\
+    return 0;								\
+  precConstraint[0] = FrameSignpost_Logic3D::StaticID(r1);		\
+  precConstraint[1] = CS_HANDLERLIST_END;				\
+  return precConstraint;						\
+}									\
+CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+ csEventID event) const {						\
+  static csHandlerID succConstraint[2];					\
+  if (event != csevFrame(r2))						\
+    return 0;								\
+  succConstraint[0] = FrameSignpost_3D2D::StaticID(r1);			\
+  succConstraint[1] = CS_HANDLERLIST_END;				\
+  return succConstraint;						\
+}
+
+/**
+ * Use this macro to declare your event handler as wanting to
+ * handle the csevFrame event in the "2D" phase (i.e.,
+ * after any handlers in the "3D" phase and before any
+ * handlers in the "console" phase).
+ */
+#define CS_EVENTHANDLER_PHASE_2D(x)					\
+CS_EVENTHANDLER_NAMES(x)						\
+CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
+CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+ csEventID event) const {						\
+  static csHandlerID precConstraint[2];					\
+  if (event != csevFrame(r2))						\
+    return 0;								\
+  precConstraint[0] = FrameSignpost_3D2D::StaticID(r1);			\
+  precConstraint[1] = CS_HANDLERLIST_END;				\
+  return precConstraint;						\
+}									\
+CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+ csEventID event) const {						\
+  static csHandlerID succConstraint[2];					\
+  if (event != csevFrame(r2))						\
+    return 0;								\
+  succConstraint[0] = FrameSignpost_2DConsole::StaticID(r1);		\
+  succConstraint[1] = CS_HANDLERLIST_END;				\
+  return succConstraint;						\
+}
+
+/**
+ * Use this macro to declare your event handler as wanting to
+ * handle the csevFrame event in the "Console" phase (i.e.,
+ * after any handlers in the "2D" phase and before any
+ * handlers in the "debug" phase).
+ */
+#define CS_EVENTHANDLER_PHASE_CONSOLE(x)				\
+CS_EVENTHANDLER_NAMES(x)						\
+CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
+CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+ csEventID event) const {						\
+  static csHandlerID precConstraint[2];					\
+  if (event != csevFrame(r2))						\
+    return 0;								\
+  precConstraint[0] = FrameSignpost_2DConsole::StaticID(r1);		\
+  precConstraint[1] = CS_HANDLERLIST_END;				\
+  return precConstraint;						\
+}									\
+CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+ csEventID event) const {						\
+  static csHandlerID succConstraint[2];					\
+  if (event != csevFrame(r2))						\
+    return 0;								\
+  succConstraint[0] = FrameSignpost_ConsoleDebug::StaticID(r1);		\
+  succConstraint[1] = CS_HANDLERLIST_END;				\
+  return succConstraint;						\
+}
+
+/**
+ * Use this macro to declare your event handler as wanting to
+ * handle the csevFrame event in the "Debug" phase (i.e.,
+ * after any handlers in the "Console" phase and before any
+ * handlers in the "Frame" phase).
+ */
+#define CS_EVENTHANDLER_PHASE_DEBUG(x)					\
+CS_EVENTHANDLER_NAMES(x)						\
+CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
+CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+ csEventID event) const {						\
+  static csHandlerID precConstraint[2];					\
+  if (event != csevFrame(r2))						\
+    return 0;								\
+  precConstraint[0] = FrameSignpost_ConsoleDebug::StaticID(r1);		\
+  precConstraint[1] = CS_HANDLERLIST_END;				\
+  return precConstraint;						\
+}									\
+CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+ csEventID event) const {						\
+  static csHandlerID succConstraint[2];					\
+  if (event != csevFrame(r2))						\
+    return 0;								\
+  succConstraint[0] = FrameSignpost_DebugFrame::StaticID(r1);		\
+  succConstraint[1] = CS_HANDLERLIST_END;				\
+  return succConstraint;						\
+}
+
+/**
+ * Use this macro to declare your event handler as wanting to
+ * handle the csevFrame event in the "Debug" phase (i.e.,
+ * after any handlers in the "Console" phase and before any
+ * handlers in the "Frame" phase).
+ */
+#define CS_EVENTHANDLER_PHASE_FRAME(x)					\
+CS_EVENTHANDLER_NAMES(x)						\
+CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
+CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+ csEventID event) const {						\
+  static csHandlerID precConstraint[2];					\
+  if (event != csevFrame(r2))						\
+    return 0;								\
+  precConstraint[0] = FrameSignpost_DebugFrame::StaticID(r1);		\
+  precConstraint[1] = CS_HANDLERLIST_END;				\
+  return precConstraint;						\
+}									\
+CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
+(csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
+ csEventID event) const {						\
+  return 0;								\
+}
+
 
 #endif // __CS_UTIL_EVENTHNAMES_H__

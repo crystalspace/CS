@@ -274,27 +274,7 @@ public:
       iTypedFrameEventDispatcher::parent = parent;
       sendEvent = parent->PreProcess;
     }
-    CS_EVENTHANDLER_NAMES("crystalspace.frame.preprocess")
-    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
-    	csRef<iEventHandlerRegistry> &,
-	csRef<iEventNameRegistry> &,
-	csEventID) const
-    {
-      return 0;
-    }
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
-    	csRef<iEventHandlerRegistry> &r1,
-	csRef<iEventNameRegistry> &r2,
-	csEventID e) const 
-    {
-      static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
-      if (e == csevFrame(r2))
-      {
-	constraint[0] = ProcessFrameEventDispatcher::StaticID (r1);
-	return constraint;
-      }
-      return 0;
-    }
+    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.frame.preprocess")
   };
   
   class ProcessFrameEventDispatcher 
@@ -309,27 +289,7 @@ public:
       iTypedFrameEventDispatcher::parent = parent;
       sendEvent = parent->ProcessEvent;
     }
-    CS_EVENTHANDLER_NAMES("crystalspace.frame.process")
-    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
-    	csRef<iEventHandlerRegistry> &,
-	csRef<iEventNameRegistry> &,
-	csEventID) const
-    {
-      return 0;
-    }
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
-    	csRef<iEventHandlerRegistry> &r1,
-	csRef<iEventNameRegistry> &r2,
-	csEventID e) const 
-    {
-      static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
-      if (e == csevFrame(r2))
-      {
-	constraint[0] = PostProcessFrameEventDispatcher::StaticID (r1);
-	return constraint;
-      }
-      return 0;
-    }
+    CS_EVENTHANDLER_PHASE_3D("crystalspace.frame.process")
   };
 
   class PostProcessFrameEventDispatcher 
@@ -344,27 +304,7 @@ public:
       iTypedFrameEventDispatcher::parent = parent;
       sendEvent = parent->PostProcess;
     }
-    CS_EVENTHANDLER_NAMES("crystalspace.frame.postprocess")
-    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
-    	csRef<iEventHandlerRegistry> &,
-	csRef<iEventNameRegistry> &,
-	csEventID) const 
-    {
-      return 0;
-    }
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
-    	csRef<iEventHandlerRegistry> &r1,
-	csRef<iEventNameRegistry> &r2,
-	csEventID e) const 
-    {
-      static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
-      if (e == csevFrame(r2))
-      {
-	constraint[0] = FinalProcessFrameEventDispatcher::StaticID (r1);
-	return constraint;
-      }
-      return 0;
-    }
+    CS_EVENTHANDLER_PHASE_2D("crystalspace.frame.postprocess")
   };
   
   class FinalProcessFrameEventDispatcher 
@@ -379,21 +319,7 @@ public:
       iTypedFrameEventDispatcher::parent = parent;
       sendEvent = parent->FinalProcess;
     }
-    CS_EVENTHANDLER_NAMES("crystalspace.frame.finalprocess")
-    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
-    	csRef<iEventHandlerRegistry> &,
-	csRef<iEventNameRegistry> &,
-	csEventID) const
-    {
-      return 0;
-    }
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
-    	csRef<iEventHandlerRegistry> &,
-	csRef<iEventNameRegistry> &,
-	csEventID) const
-    {
-      return 0;
-    }
+    CS_EVENTHANDLER_PHASE_FRAME("crystalspace.frame.finalprocess")
   };
 };
 

@@ -22,9 +22,10 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 
+#include "csutil/scf.h"
 #include "csutil/hash.h"
 #include "csutil/eventhandlers.h"
-#include "csutil/scf.h"
+#include "csutil/eventnames.h"
 
 #include <string.h>
 
@@ -41,9 +42,6 @@ csEventHandlerRegistry::csEventHandlerRegistry(iObjectRegistry *r) :
 csEventHandlerRegistry::~csEventHandlerRegistry()
 {
 }
-
-CS_SPECIALIZE_TEMPLATE
-class csHashComputer<iEventHandler*> : public csHashComputerIntegral<void *> {};
 
 csHandlerID csEventHandlerRegistry::GetGenericID (const csString &name)
 {
@@ -161,3 +159,122 @@ csRef<iEventHandlerRegistry> csEventHandlerRegistry::GetRegistry (
   CS_ASSERT (handler_reg != 0);
   return handler_reg;
 }
+
+
+
+
+
+CS_CONST_METHOD const csHandlerID * 
+FrameSignpost_Logic3D::GenericPrec(csRef<iEventHandlerRegistry> &r1,
+				   csRef<iEventNameRegistry> &r2,
+				   csEventID e) const
+{
+  return 0;
+}
+
+CS_CONST_METHOD const csHandlerID * 
+FrameSignpost_Logic3D::GenericSucc(csRef<iEventHandlerRegistry> &r1,
+	    csRef<iEventNameRegistry> &r2,
+	    csEventID e) const 
+{
+  static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
+  if (e == csevFrame(r2))
+  {
+    constraint[0] = FrameSignpost_3D2D::StaticID (r1);
+    return constraint;
+  }
+  return 0;
+}
+
+
+
+CS_CONST_METHOD const csHandlerID * 
+FrameSignpost_3D2D::GenericPrec(csRef<iEventHandlerRegistry> &r1,
+				csRef<iEventNameRegistry> &r2,
+				csEventID e) const
+{
+  return 0;
+}
+
+CS_CONST_METHOD const csHandlerID * 
+FrameSignpost_3D2D::GenericSucc(csRef<iEventHandlerRegistry> &r1,
+				csRef<iEventNameRegistry> &r2,
+				csEventID e) const 
+{
+  static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
+  if (e == csevFrame(r2))
+  {
+    constraint[0] = FrameSignpost_2DConsole::StaticID (r1);
+    return constraint;
+  }
+  return 0;
+}
+
+
+
+CS_CONST_METHOD const csHandlerID * 
+FrameSignpost_2DConsole::GenericPrec(csRef<iEventHandlerRegistry> &r1,
+				   csRef<iEventNameRegistry> &r2,
+				   csEventID e) const
+{
+  return 0;
+}
+
+CS_CONST_METHOD const csHandlerID * 
+FrameSignpost_2DConsole::GenericSucc(csRef<iEventHandlerRegistry> &r1,
+				   csRef<iEventNameRegistry> &r2,
+				   csEventID e) const 
+{
+  static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
+  if (e == csevFrame(r2))
+  {
+    constraint[0] = FrameSignpost_ConsoleDebug::StaticID (r1);
+    return constraint;
+  }
+  return 0;
+}
+
+
+
+CS_CONST_METHOD const csHandlerID * 
+FrameSignpost_ConsoleDebug::GenericPrec(csRef<iEventHandlerRegistry> &r1,
+					csRef<iEventNameRegistry> &r2,
+					csEventID e) const
+{
+  return 0;
+}
+
+CS_CONST_METHOD const csHandlerID * 
+FrameSignpost_ConsoleDebug::GenericSucc(csRef<iEventHandlerRegistry> &r1,
+					csRef<iEventNameRegistry> &r2,
+					csEventID e) const 
+{
+  static csHandlerID constraint[2] = { 0, CS_HANDLERLIST_END };
+  if (e == csevFrame(r2))
+  {
+    constraint[0] = FrameSignpost_ConsoleDebug::StaticID (r1);
+    return constraint;
+  }
+  return 0;
+}
+
+
+
+CS_CONST_METHOD const csHandlerID * 
+FrameSignpost_DebugFrame::GenericPrec(csRef<iEventHandlerRegistry> &r1,
+				      csRef<iEventNameRegistry> &r2,
+				      csEventID e) const
+{
+  return 0;
+}
+
+CS_CONST_METHOD const csHandlerID * 
+FrameSignpost_DebugFrame::GenericSucc(csRef<iEventHandlerRegistry> &r1,
+				      csRef<iEventNameRegistry> &r2,
+				      csEventID e) const 
+{
+  return 0;
+}
+
+
+

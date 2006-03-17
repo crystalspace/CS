@@ -10,6 +10,9 @@ chronological order.
 	- Fossi added support for non-square regions to terrain formers.
 	  This required changing of the iTerraFormer interface.
 	- Fossi also uploaded a newer version of the paging terrain.
+	- Adam checked in the new "signpost" event handlers and helper
+	  macros, and migrated the four ProcessFrameEventDispatcher flavors
+	  to schedule themselves around the signposts instead of each other.
 15-Mar-2006
 	- Piotr Obrzut added float4x4 array maping with arrays of csVector4 
 	  arrays to cg shader plugin.
