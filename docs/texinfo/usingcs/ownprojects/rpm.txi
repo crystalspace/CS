@@ -8,7 +8,7 @@
 @noindent
 @emph{Written by Vincent Knecht @email{vknecht@@club-internet.fr}.}
 @noindent
-@emph{Last updated 17 October 2005.}
+@emph{Last updated 19 March 2006.}
 
 @subsubheading Creating Crystal Space @sc{rpm} Packages
 
