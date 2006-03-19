@@ -99,7 +99,7 @@ csCEGUIRenderer::~csCEGUIRenderer ()
   destroyAllTextures();
   clearRenderList();
   delete CEGUI::System::getSingletonPtr();
-  if (scriptModule) delete scriptModule;
+  delete scriptModule;
   delete events;
 }
 
