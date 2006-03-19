@@ -1,6 +1,6 @@
 %define name     crystalspace
 %define version  0.99
-%define release  0.cvs20051016.1
+%define release  0.cvs20060319.1
 %define prefix   /usr
 %define csprefix crystalspace
 
@@ -16,6 +16,10 @@
 %define with_PERL 0
 %{?_without_perl: %{expand: %%global with_PERL 0}}
 %{?_with_perl: %{expand: %%global with_PERL 1}}
+
+%define with_SHARED 0
+%{?_without_shared: %{expand: %%global with_SHARED 0}}
+%{?_with_shared: %{expand: %%global with_SHARED 1}}
 
 Group: Development/C++
 Source: http://www.crystalspace3d.org/cvs-snapshots/bzip2/cs-current-snapshot.tar.bz2
@@ -84,6 +88,9 @@ sh  configure \
 %if %{with_PERL}
  --with-perl \
 %endif
+%if %{with_SHARED}
+  --enable-shared \
+%endif
  --prefix=%{prefix} \
  --libdir=%{prefix}/lib \
  --datadir=%{prefix}/share \
@@ -116,6 +123,11 @@ for map in flarge partsys terrain terrainf ; \
 %exclude %{_sysconfdir}/%{csprefix}/startme.cfg
 %exclude %{_sysconfdir}/%{csprefix}/walktest.cfg
 %exclude %{_sysconfdir}/%{csprefix}/waterdemo.cfg
+# (vk) exclude .debug libraries generated on, eg. CentOS
+%exclude %{_libdir}/debug*
+%if %{with_SHARED}
+%{_libdir}/*.so.*
+%endif
 %{_libdir}/%{csprefix}/*
 %{_datadir}/%{csprefix}/data/*
 %exclude %{_datadir}/%{csprefix}/data/startme.zip
@@ -171,7 +183,10 @@ for map in flarge partsys terrain terrainf ; \
 %defattr(-,root,root)
 
 %{_bindir}/cs-config
+%if %{with_SHARED}
+%else
 %{_libdir}/*.a
+%endif
 # (vk) Scripting related files are here for now
 %{_bindir}/*.cex
 %{_datadir}/%{csprefix}/bindings/*
@@ -179,6 +194,10 @@ for map in flarge partsys terrain terrainf ; \
 %{_includedir}/%{csprefix}/*
 
 %changelog
+* Sun Mar 19 2006 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-0.cvs20060319.1
+- Added shared lib option. Note that this option makes the package unusable as
+  a SDK for now.
+
 * Mon Oct 17 2005 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-0.cvs20051016.1
 - Added demos subpackage, no stripping for debug build and SMP friendly macros
   for make.

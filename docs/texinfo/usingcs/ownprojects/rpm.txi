@@ -77,6 +77,8 @@ values are supported:
 @command{--with perl} to build with Perl support.
 @item
 @command{--with debug} to build with debugging support.
+@item
+@command{--with shared} to build with shared libraries.
 @end itemize
 
 So, to build all packages, with Perl support, use:
