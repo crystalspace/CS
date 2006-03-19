@@ -34,6 +34,7 @@ SCF_IMPLEMENT_FACTORY (csCEGUIRenderer)
 csCEGUIRenderer::csCEGUIRenderer (iBase *parent) :
   scfImplementationType (this, parent),
   obj_reg(0),
+  events(0),
   resourceProvider(0),
   scriptModule(0),
   newQuadAdded(false),
@@ -73,12 +74,14 @@ bool csCEGUIRenderer::Initialize (iScript* script)
   if (!g2d)
     return false;
 
+  #if CEGUI_VERSION_MINOR < 5
   if (script)
   {
     scriptModule = new csCEGUIScriptModule (script, obj_reg);
     new CEGUI::System (this, scriptModule);
   }
   else
+  #endif
   {
     new CEGUI::System (this);
   }
@@ -96,7 +99,7 @@ csCEGUIRenderer::~csCEGUIRenderer ()
   destroyAllTextures();
   clearRenderList();
   delete CEGUI::System::getSingletonPtr();
-  delete scriptModule;
+  if (scriptModule) delete scriptModule;
   delete events;
 }
 
