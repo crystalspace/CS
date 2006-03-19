@@ -140,6 +140,9 @@ public:
   const csReversibleTransform& GetWorldToCamera () { return w2c; }
   void DrawSimpleMesh (const csSimpleRenderMesh& /*mesh*/, uint /*flags*/ = 0) { }
 
+  bool PerformExtension (char const* command, ...) { return false; }
+  bool PerformExtensionV (char const* command, va_list args) { return false; }
+
 private:
   iObjectRegistry* object_reg;
   csRef<iGraphics2D> G2D;
