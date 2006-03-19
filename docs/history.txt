@@ -9,6 +9,8 @@ chronological order.
 19-Mar-2006
 	- Vincent added 'shared' option to cs.spec for RPM using shared lib.
 	- Vincent added missing 'partsys' parameter to startme.cfg.
+	- Anders added PerformExtension support for 3d renderers, and 
+	  backface culling control to shaders.
 16-Mar-2006
 	- Fossi added support for non-square regions to terrain formers.
 	  This required changing of the iTerraFormer interface.

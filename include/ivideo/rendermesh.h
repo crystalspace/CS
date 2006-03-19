@@ -49,6 +49,7 @@ struct csRenderMeshModes
   {
     z_buf_mode = CS_ZBUF_NONE;
     mixmode = CS_FX_COPY;
+    flipCulling = false;
     alphaType = csAlphaMode::alphaNone;
   }
 
@@ -59,6 +60,9 @@ struct csRenderMeshModes
 
   /// mixmode to use
   uint mixmode;
+
+  /// Backface flipping mode
+  bool flipCulling;
 
   /// Alpha mode this mesh is drawn.
   csAlphaMode::AlphaType alphaType;

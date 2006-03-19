@@ -201,6 +201,13 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
       }
     }
 
+    csRef<iDocumentNode> nodeFlipCulling = node->GetNode ("flipculling");
+    if (nodeFlipCulling)
+    {
+      synldr->ParseBool(nodeFlipCulling, pass->flipCulling, false);
+    }
+
+
     pass->wmRed = true;
     pass->wmGreen = true;
     pass->wmBlue = true;
@@ -786,6 +793,8 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   // Override mixmode, if requested
   if ((thispass->mixMode & CS_MIXMODE_TYPE_MASK) != CS_FX_MESH)
     modes.mixmode = thispass->mixMode;
+
+  modes.flipCulling = thispass->flipCulling;
 
   if(thispass->vp) thispass->vp->SetupState (mesh, modes, stacks);
   if(thispass->fp) thispass->fp->SetupState (mesh, modes, stacks);

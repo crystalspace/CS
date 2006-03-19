@@ -44,11 +44,13 @@ private:
     csAlphaMode alphaMode;
     csZBufMode zMode;
     bool overrideZmode;
+    bool flipCulling;
 
     shaderPass () 
     { 
       mixMode = CS_FX_MESH;
       overrideZmode = false;
+      flipCulling = false;
       //setup default mappings
       for (unsigned int i=0; i < STREAMMAX; i++)
         defaultMappings[i] = CS_BUFFER_NONE;

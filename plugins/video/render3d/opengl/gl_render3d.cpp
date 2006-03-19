@@ -1733,6 +1733,10 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   else
     mirrorflag = mymesh->do_mirror;
 
+  // Flip culling if shader wants it
+  if (modes.flipCulling)
+    mirrorflag = !mirrorflag;
+
   // Flip face culling if we do mirroring
   GLenum cullFace;
   statecache->GetCullFace (cullFace);
@@ -3085,6 +3089,25 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   }
 
   SetZMode (old_zbufmode);
+}
+
+bool csGLGraphics3D::PerformExtensionV (char const* command, va_list args)
+{
+  if (!strcasecmp (command, "applybufferchanges"))
+  {
+    ApplyBufferChanges ();
+    return true;
+  }
+  return false;
+}
+
+bool csGLGraphics3D::PerformExtension (char const* command, ...)
+{
+  va_list args;
+  va_start (args, command);
+  bool rc = PerformExtensionV(command, args);
+  va_end (args);
+  return rc;
 }
 
 SCF_IMPLEMENT_IBASE (csOpenGLHalo)

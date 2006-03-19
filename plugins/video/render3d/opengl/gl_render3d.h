@@ -709,6 +709,9 @@ public:
   virtual float GetZBuffValue (int, int);
 
   virtual void RemoveFromCache (iRendererLightmap*) { }  
+
+  virtual bool PerformExtension (char const* command, ...);
+  virtual bool PerformExtensionV (char const* command, va_list args);
   //=========================================================================
 
 

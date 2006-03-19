@@ -609,6 +609,9 @@ public:
     const csArray<csShaderVariable*> &stacks);
   void DrawSimpleMesh (const csSimpleRenderMesh &mesh, uint flags = 0);
 
+  bool PerformExtension (char const* command, ...) { return false; }
+  bool PerformExtensionV (char const* command, va_list args) { return false; }
+
   /// Controls shadow drawing
   virtual void SetShadowState (int /*state*/)
   {

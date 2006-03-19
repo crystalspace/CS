@@ -977,6 +977,22 @@ struct iGraphics3D : public virtual iBase
    * \remarks 'this' space is world space, 'other' space is camera space
    */
   virtual void SetWorldToCamera (const csReversibleTransform& w2c) = 0;
+
+  /**
+   * Perform a system specific exension.<p>
+   * The command is a string; any arguments may follow.
+   * There is no way to guarantee the uniquiness of
+   * commands, so please try to use descriptive command names rather
+   * than "a", "b" and so on...
+   */
+  virtual bool PerformExtension (char const* command, ...) = 0;
+
+  /**
+   * Perform a system specific exension.<p>
+   * Just like PerformExtension() except that the command arguments are passed
+   * as a `va_list'.
+   */
+  virtual bool PerformExtensionV (char const* command, va_list) = 0;
   
   /**
    * Get the current world to camera transform.
