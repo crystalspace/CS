@@ -1647,7 +1647,7 @@ struct ODEHinge2Joint : public csStrictODEJoint, iODEHinge2Joint
 
   void SetHingeAnchor (const csVector3 &pos)
   {
-    dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
+    dJointSetHinge2Anchor (jointID, pos.x, pos.y, pos.z);
   }
   void SetHingeAxis1 (const csVector3 &axis)
   {
