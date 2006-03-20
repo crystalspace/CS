@@ -12,6 +12,7 @@ chronological order.
 	  lightdir from the frag to the vertex shader."
 	- Adam updated apimod100.txi to include a quick primer on attaching
 	  event handlers to the six csevFrame phases.
+	- Jorrit fixed a crash bug in the particles mesh.
 19-Mar-2006
 	- Vincent added 'shared' option to cs.spec for RPM using shared lib.
 	- Vincent added missing 'partsys' parameter to startme.cfg.

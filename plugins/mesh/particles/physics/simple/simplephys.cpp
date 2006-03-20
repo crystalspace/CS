@@ -278,6 +278,8 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
     point.mass = mass + (rng.Get() * massvar);
   }
 
+  if (part->new_particles <= 0) return;
+
   float time_increment = true_elapsed_time / part->new_particles;
 
   dead_offset += (int)part->new_particles;
