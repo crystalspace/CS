@@ -9952,6 +9952,8 @@ class iGraphics3D(iBase):
     def CreateHalo(*args): return _cspace.iGraphics3D_CreateHalo(*args)
     def RemoveFromCache(*args): return _cspace.iGraphics3D_RemoveFromCache(*args)
     def SetWorldToCamera(*args): return _cspace.iGraphics3D_SetWorldToCamera(*args)
+    def PerformExtension(*args): return _cspace.iGraphics3D_PerformExtension(*args)
+    def PerformExtensionV(*args): return _cspace.iGraphics3D_PerformExtensionV(*args)
     def GetWorldToCamera(*args): return _cspace.iGraphics3D_GetWorldToCamera(*args)
     def __del__(self, destroy=_cspace.delete_iGraphics3D):
         try:
