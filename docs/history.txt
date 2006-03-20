@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Mar-2006
+	- iceeey committed small optimization to parallax shader from
+	  sueastside: "move the 2 normalize() functions for eyevec and
+	  lightdir from the frag to the vertex shader."
 19-Mar-2006
 	- Vincent added 'shared' option to cs.spec for RPM using shared lib.
 	- Vincent added missing 'partsys' parameter to startme.cfg.

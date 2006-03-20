@@ -9,6 +9,8 @@ struct vertex2fragment {
 	float2 TexCoord : TEXCOORD0;
 	float4 LightDir : TEXCOORD1;
 	float4 EyeVec : TEXCOORD2;
+        float3 normEye : NORMAL ;
+        float3 normLight : NORMAL ;
 };
 
 
@@ -22,8 +24,8 @@ float4 main (vertex2fragment IN,
 <?endif?>
 			uniform sampler2D TexHeight) : COLOR
 {
-	float3 normEye = normalize(IN.EyeVec.xyz);
-	float3 normLight = normalize(IN.LightDir.xyz);
+	float3 normEye = IN.normEye;
+	float3 normLight = IN.normLight;
 
 	float selfOcclusion = saturate(normLight.z*5);
 	

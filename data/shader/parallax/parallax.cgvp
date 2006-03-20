@@ -17,6 +17,8 @@ struct vertex2fragment {
 	float2 TexCoord : TEXCOORD0;
 	float3 oLightDir : TEXCOORD1;
 	float3 oEyeVec : TEXCOORD2;
+        float3 normEye : NORMAL ;
+        float3 normLight : NORMAL ;
 };
 
 vertex2fragment main (app2vertex IN,
@@ -50,6 +52,8 @@ vertex2fragment main (app2vertex IN,
 	OUT.TexCoord = IN.TexCoord;
 	OUT.oLightDir = tangLight;
 	OUT.oEyeVec = tangEyeVec;
+        OUT.normEye = normalize(tangEyeVec.xyz);
+        OUT.normLight = normalize(tangLight.xyz);
 	
 	return OUT;
 }
