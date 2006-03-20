@@ -10948,6 +10948,8 @@ package cspace::iGraphics3D;
 *CreateHalo = *cspacec::iGraphics3D_CreateHalo;
 *RemoveFromCache = *cspacec::iGraphics3D_RemoveFromCache;
 *SetWorldToCamera = *cspacec::iGraphics3D_SetWorldToCamera;
+*PerformExtension = *cspacec::iGraphics3D_PerformExtension;
+*PerformExtensionV = *cspacec::iGraphics3D_PerformExtensionV;
 *GetWorldToCamera = *cspacec::iGraphics3D_GetWorldToCamera;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
