@@ -53,9 +53,9 @@
       return res;
     }
 
-  const static char * StaticHandlerName() {return("crystalspace.cspython");};
-  CS_CONST_METHOD const static csHandlerID StaticID(csRef<iEventHandlerRegistry> &reg) 
-  {return reg->GetGenericID(StaticHandlerName()); }			;
+  static const char * StaticHandlerName() {return "crystalspace.cspython";};
+  CS_CONST_METHOD static const csHandlerID StaticID(csRef<iEventHandlerRegistry> &reg) 
+  { return reg->GetGenericID(StaticHandlerName()); }			;
   CS_CONST_METHOD virtual const char * GenericName() const		
   { return StaticHandlerName(); }					;
   CS_CONST_METHOD virtual csHandlerID GenericID(csRef<iEventHandlerRegistry> &reg) const 

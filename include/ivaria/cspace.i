@@ -125,6 +125,8 @@
 #define CS_PURE_METHOD
 #undef CS_CONST_METHOD
 #define CS_CONST_METHOD
+#undef CS_COMPILE_ASSERT
+#define CS_COMPILE_ASSERT(x)
 
 // Compatibility macros.
 #define typename_qualifier typename

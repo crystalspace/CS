@@ -13,6 +13,7 @@ chronological order.
 	- Adam updated apimod100.txi to include a quick primer on attaching
 	  event handlers to the six csevFrame phases.
 	- Jorrit fixed a crash bug in the particles mesh.
+	- res fixed cspace.i to define an empty CS_COMPILE_ASSERT macro.
 19-Mar-2006
 	- Vincent added 'shared' option to cs.spec for RPM using shared lib.
 	- Vincent added missing 'partsys' parameter to startme.cfg.
