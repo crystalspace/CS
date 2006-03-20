@@ -44,8 +44,9 @@ than describing particular command events with a combination of the
 property, each of the old command codes now has its own event name.  
 For example, @samp{cscmdQuit} is now @samp{crystalspace.application.quit}, and 
 the @samp{cscmdPreProcess}/@samp{cscmdProcess}/@samp{cscmdPostProcess}/
-@samp{cscmdFinalProcess} series will be replaced with a single 
-@samp{csevFrame} event (see below).
+@samp{cscmdFinalProcess} events have been deprecated in favor of the new 
+single @samp{csevFrame} event and six frame ``phases'' within which it can
+be received (see below).
 
 Event names are translated into an efficient internal representation, the 
 @samp{csEventID}, using a singleton event name registry object 
@@ -58,7 +59,7 @@ These @samp{csEventID}s are then used in calls to subscribe to event queues
 and in comparisons to determine the type of an event.  Many common event 
 types' @samp{csEventID}s can be accessed using macros defined in 
 @file{include/csutil/eventnames.h}, e.g., @samp{crystalspace.application.quit} 
-is @samp{csevQuit()}, which must be called upon either an 
+is @samp{csevQuit()}, which must be called with an argument of either an 
 @samp{iObjectRegistry} pointer or a @samp{iEventNameRegistry} reference.  
 Since referencing an event ID via one of these macros will consume several 
 cycles, performance-sensitive code should cache the results; see, for example, 
@@ -117,7 +118,7 @@ test:
 
 @subsubheading Event Scheduling
 
-The more interesting change to the event system is the introduction of a 
+An even more interesting change to the event system is the introduction of a 
 schedulable event subscription system.  In the old system, event handlers 
 subscribed to event types on a first-come, first-served basis.  This begot an 
 increasing number of event types to represent different points in the frame 
@@ -176,12 +177,13 @@ In many simple cases, you will want to use default implementations of these
 functions provided by the @code{CS_EVENTHANDLER_NAMES()} and 
 @code{CS_EVENTHANDLER_NIL_CONSTRAINTS} macros, like so:
 @example
- struct eiEventHandler : public iEventHandler
+ struct myEventHandler : public iEventHandler
  @{
-   SCF_DECLARE_EMBEDDED_IBASE (csWrapperClass);
    virtual bool HandleEvent (iEvent &Event)
    @{
-     return scfParent->HandleEvent (Event);
+     foo();
+     bar();
+     return baz();
    @}
    CS_EVENTHANDLER_NAMES("crystalspace.module.name")
    CS_EVENTHANDLER_NIL_CONSTRAINTS
@@ -196,7 +198,7 @@ into a @samp{csHandlerID} by calling
 The @samp{csHandlerID} of an instance of an event handler class can be 
 retrieved by passing a pointer to that class to 
 @code{csHandlerRegistry::GetID()}, e.g., 
-@code{csHandlerRegistry::GetID(new myHandlerClass)}.
+@code{csHandlerRegistry::GetID(new myHandlerClass())}.
 
 
 @subsubheading Event Subscription
@@ -205,7 +207,7 @@ The event scheduling system is invoked by calling the
 @code{csEventQueue::RegisterListener()} or @code{csEventQueue::Subscribe()} 
 methods (or, if you are inheriting from @code{csBaseEventHandler}, 
 @code{csBaseEventHandler::RegisterQueue}).  For each of these, the arguments 
-of interest to use are the @code{csEventID} and @code{csEventID[]} parameters.  
+of interest are the @code{csEventID} and @code{csEventID[]} parameters.  
 (Note that the @samp{RegisterListener} form with no @samp{csEventID} argument 
 does not subscribe the listener to anything, and must be followed by a call to 
 @code{Subscribe()} if you ever want the handler to receive any events.)  
@@ -220,15 +222,15 @@ and @samp{crystalspace.input.mouse} but a different set for
 @samp{crystalspace.input} and have the Prec/Succ functions return different 
 values for each of @samp{.keyboard}, @samp{.mouse}, and @samp{.joystick}; 
 rather, you should subscribe to each of those three event names individually.  
-This restriction helps us avoid the introduction of subtly contradictory or 
+This restriction helps us avoid the introduction of hard-to-detect 
 circular ordering rules.
 
 Also note that you should use the @code{Subscribe()} and @code{Unsubscribe()} 
 methods to add and remove events from the set an event handler wishes to 
-receive.  Note that you should only @code{Unsubscribe()} from the particular 
-events to which you have @code{Subscribe()}d; the behavior is undefined if 
-you (e.g.) subscribe to @samp{crystalspace.input} and subsequently 
-unsubscribe from @samp{crystalspace.input.joystick}.
+receive.  You should only @code{Unsubscribe()} from the particular 
+events to which you have @code{Subscribe()}d; the behavior is undefined 
+otherwise (e.g., if you subscribe to @samp{crystalspace.input} and 
+subsequently unsubscribe from @samp{crystalspace.input.joystick}).
 
 
 @subsubheading Other porting Issues
@@ -241,18 +243,52 @@ the @samp{RegisterQueue(...)} methods.
 
 @subsubheading The @code{csevFrame} Transition
 
-At present, a lot of code depends upon subscription to the PreProcess, Process, 
-PostProcess, and FinalProcess events.  We intend to remove these events 
-shortly; in their place, all event handlers interested in being called 
-per-frame should subscribe to the @samp{csevFrame} event and specify 
-appropriate ordering constraints.  (If a handler needs to be called several 
-times per frame, then it should create several embedded event handlers each 
-with its own ordering constraints.)  Unfortunately, there aren't any really 
-good ways to make this change-over gracefully, so expect for a zero day to be 
-announced in the near future when Pre/Process/Post/Final will all go away.  
-In the meantime, the @samp{csevPreProcess}, @samp{csevProcess}, 
-@samp{csevPostProcess}, and @samp{csevFinalProcess} events are each dispatched 
-by a handler of the @samp{csevFrame} event.
+Under the old static event model, CrystalSpace would render each frame by
+dispatching four events in sequence: PreProcess, Process, PostProcess, and
+FinalProcess.  The new event handler scheduling mechanisms enable a more
+flexible and extensible paradigm in which there is only a single event, 
+@samp{csevFrame}, and each handler orders its handling of that event with 
+respect to other handler types and handlers.
+
+However, since it is difficult to plan for (or even imagine) the set of all
+handler types that may appear in a CrystalSpace application, handlers of
+@samp{csevFrame} can use simple helper macros to classify themselves as 
+belonging to any of six ``phases'' of frame creation.
+@itemize @bullet
+@item 
+@emph{Logic} - game logic to be performed before any rendering is done.
+Use the @samp{CS_EVENTHANDLER_PHASE_LOGIC(x)} macro.
+@item 
+@emph{3D} - rendering of the 3D view.
+Use the @samp{CS_EVENTHANDLER_PHASE_3D(x)} macro.
+@item 
+@emph{2D} - rendering of 2D overlays.
+See the @samp{CS_EVENTHANDLER_PHASE_LOGIC(x)} macro.
+@item 
+@emph{Console} - used by CEL.
+See the @samp{CS_EVENTHANDLER_PHASE_LOGIC(x)} macro.
+@item 
+@emph{Debug} - used by bugplug.
+See the @samp{CS_EVENTHANDLER_PHASE_LOGIC(x)} macro.
+@item 
+@emph{Frame} - final rendering to the screen.
+See the @samp{CS_EVENTHANDLER_PHASE_LOGIC(x)} macro.
+@end itemize
+
+These macros, included in the declaration of an event handler class, 
+provide all of the naming and constraint methods to make instances of
+that handler class schedule their subscriptions to @samp{csevFrame}
+within the appropriate phase.  (You will not be able to use these macros
+if you need to subscribe the handler to events besides @samp{csevFrame}
+and apply ordering constraints for those events.)
+
+The old PreProcess event corresponded with the Logic phase, 
+Process with the 3D phase, PostProcess with the 2D, Console, and
+Debug phases, and FinalProcess with the Frame phase.  You should 
+update your event handlers which used to subscribe to the old
+Process events to instead subscribe to the @samp{csevFrame} event
+either using the event phase macros listed above or explicitly
+calling out your own subscription ordering constraints.
 
 
 @subsubheading A Few Common Idioms to Change

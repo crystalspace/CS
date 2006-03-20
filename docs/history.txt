@@ -10,6 +10,8 @@ chronological order.
 	- iceeey committed small optimization to parallax shader from
 	  sueastside: "move the 2 normalize() functions for eyevec and
 	  lightdir from the frag to the vertex shader."
+	- Adam updated apimod100.txi to include a quick primer on attaching
+	  event handlers to the six csevFrame phases.
 19-Mar-2006
 	- Vincent added 'shared' option to cs.spec for RPM using shared lib.
 	- Vincent added missing 'partsys' parameter to startme.cfg.
