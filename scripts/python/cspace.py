@@ -12892,6 +12892,10 @@ class _csPyEventHandler(iEventHandler):
         except: pass
 
     def HandleEvent(*args): return _cspace._csPyEventHandler_HandleEvent(*args)
+    __swig_getmethods__["StaticHandlerName"] = lambda x: _cspace._csPyEventHandler_StaticHandlerName
+    if _newclass:StaticHandlerName = staticmethod(_cspace._csPyEventHandler_StaticHandlerName)
+    __swig_getmethods__["StaticID"] = lambda x: _cspace._csPyEventHandler_StaticID
+    if _newclass:StaticID = staticmethod(_cspace._csPyEventHandler_StaticID)
     def GenericName(*args): return _cspace._csPyEventHandler_GenericName(*args)
     def GenericID(*args): return _cspace._csPyEventHandler_GenericID(*args)
     def GenericPrec(*args): return _cspace._csPyEventHandler_GenericPrec(*args)
@@ -12905,6 +12909,10 @@ class _csPyEventHandlerPtr(_csPyEventHandler):
         if not hasattr(self,"thisown"): _swig_setattr(self, _csPyEventHandler, 'thisown', 0)
         _swig_setattr(self, _csPyEventHandler,self.__class__,_csPyEventHandler)
 _cspace._csPyEventHandler_swigregister(_csPyEventHandlerPtr)
+
+_csPyEventHandler_StaticHandlerName = _cspace._csPyEventHandler_StaticHandlerName
+
+_csPyEventHandler_StaticID = _cspace._csPyEventHandler_StaticID
 
 def csevCommandLineHelp(reg):
   csEventNameRegistry.GetID(reg, csString("crystalspace.application.commandlinehelp"))
