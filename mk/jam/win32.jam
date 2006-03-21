@@ -93,10 +93,7 @@ actions GenerateWin32ManifestRc
 {
     cat > $(<) << __EOF__
 // This file is generated automatically.
-
-#if !defined(CS_PROJECTGEN_VERSION) || (CS_PROJECTGEN_VERSION != 8)
 1 24 "$(MANIFEST_NAME)"
-#endif
 __EOF__
 }
 
@@ -316,6 +313,8 @@ rule MakeMetadataRc
 
 rule AppResourceWin32
 {
+  local options = $(2) ;
+
   local versionrc = [ DoObjectGrist _versionrc.rc ] ;
   LOCATE on $(versionrc) = $(LOCATE_TARGET) ;
   SEARCH on $(versionrc) = $(LOCATE_TARGET) ;
@@ -325,14 +324,17 @@ rule AppResourceWin32
   Clean clean : $(versionrc) ;
   Win32Resource $(<) : $(versionrc) ;
 
-  local manifestrc = [ DoObjectGrist _manifestrc.rc ] ;
-  LOCATE on $(manifestrc) = $(LOCATE_TARGET) ;
-  SEARCH on $(manifestrc) = $(LOCATE_TARGET) ;
+  if ! [ IsElem nomanifest : $(options) ]
+  {
+    local manifestrc = [ DoObjectGrist _manifestrc.rc ] ;
+    LOCATE on $(manifestrc) = $(LOCATE_TARGET) ;
+    SEARCH on $(manifestrc) = $(LOCATE_TARGET) ;
   
-  MakeManifestRc $(manifestrc) : $(<) ;
-  Clean $(<)clean : $(manifestrc) ;
-  Clean clean : $(manifestrc) ;
-  Win32Resource $(<) : $(manifestrc) ;
+    MakeManifestRc $(manifestrc) : $(<) ;
+    Clean $(<)clean : $(manifestrc) ;
+    Clean clean : $(manifestrc) ;
+    Win32Resource $(<) : $(manifestrc) ;
+  }
 
   local icon = [ ApplicationIcon win32 : $(<) ] ;
   if ! $(icon)

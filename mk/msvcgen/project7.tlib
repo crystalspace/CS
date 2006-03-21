@@ -102,7 +102,7 @@ END -%]
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="[% composedefs([glue (['CS_PROJECTGEN_VERSION', my.doc.msvcversion.0], '=')]) %]"
+				PreprocessorDefinitions="[% composedefs([glue (['PROJECTGEN_VERSION', my.doc.msvcversion.0], '=')]) %]"
 				AdditionalIncludeDirectories="[% composedirs('incdirs', ['.']) %]"
 				Culture="1033"/>
 			<Tool

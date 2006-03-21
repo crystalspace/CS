@@ -549,6 +549,17 @@ rule MsvcAddPrefix
 #----------------------------------------------------------------------------
 # Override some rules
 
+actions GenerateWin32ManifestRc
+{
+    cat > $(<) << __EOF__
+// This file is generated automatically.
+
+#if !defined(PROJECTGEN_VERSION) || (PROJECTGEN_VERSION != 8)
+1 24 "$(MANIFEST_NAME)"
+#endif
+__EOF__
+}
+
 ## MsvcGenConfig variable [ : value ]
 ##   (See documentation above.)
 rule MsvcGenConfig1
@@ -646,7 +657,7 @@ rule MsvcGenName1
   MSVC.NAME_OVERRIDE.$(<) = $(>) ;
 }
 
-## MsvcProject target : type : target-with-ext : sources
+## MsvcProject target : type : target-with-ext : sources : options
 ##   Create a project file for 'target', which is the project's raw name.
 ##   'sources' is a list of files comprising the target.
 rule MsvcProject
@@ -655,6 +666,7 @@ rule MsvcProject
   local type = $(2) ;
   local decorated = $(3) ;
   local sources = $(4) ;
+  local options = $(5) ;
   local relpath = [ Property msvcgen : relpath$(MSVC_VERSION) ] ;
   local outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
   local outdircommon = [ Property msvcgen : outdircommon ] ;
@@ -770,29 +782,32 @@ rule MsvcProject
 
     if [ IsElem $(type) : appgui appcon ]
     {
-      local manifest = $(msvcname:S=.manifest) ; 
-      MakeLocate $(manifest) : $(outdircommon) ;
-      MakeManifestFile $(manifest) : $(rawname) ;
-      Depends $(manifest) : $(TOP)/Jamconfig ;
-      Depends $(manifest) : $(SUBDIR)/Jamfile ;
-      Depends msvcgen : $(manifest) ;
-      
-      local manifestrc = $(resource:S=.mfrctmp) ;
-      MakeLocate $(manifestrc) : $(workdircommon) ;
-      MANIFEST_NAME on $(manifestrc) = $(manifest) ;
-      GenerateWin32ManifestRc $(manifestrc) ;
-      Depends $(manifestrc) : $(manifest) ;
-      if $(MSVC_VERSION) = 8
+      if ! [ IsElem nomanifest : $(options) ]
       {
-        # VC8: Manifest appears in project along other files, a special build
-        # tool cares about the embedding into a resource. (The resource goop
-        # still has to be generated since it is shared with other VCs.)
-	ResponseFile $(respfile) : "file|$(manifest:R=$(outdircommon))" : notfile :
-	  $(respdir) ;
-      }
+        local manifest = $(msvcname:S=.manifest) ; 
+        MakeLocate $(manifest) : $(outdircommon) ;
+        MakeManifestFile $(manifest) : $(rawname) ;
+        Depends $(manifest) : $(TOP)/Jamconfig ;
+        Depends $(manifest) : $(SUBDIR)/Jamfile ;
+        Depends msvcgen : $(manifest) ;
       
-      Win32Resource $(rawname) : $(manifestrc) ;
-      MsvcRmTemps $(resource) : $(manifestrc) ;
+        local manifestrc = $(resource:S=.mfrctmp) ;
+        MakeLocate $(manifestrc) : $(workdircommon) ;
+        MANIFEST_NAME on $(manifestrc) = $(manifest) ;
+        GenerateWin32ManifestRc $(manifestrc) ;
+        Depends $(manifestrc) : $(manifest) ;
+        if $(MSVC_VERSION) = 8
+        {
+          # VC8: Manifest appears in project along other files, a special build
+          # tool cares about the embedding into a resource. (The resource goop
+          # still has to be generated since it is shared with other VCs.)
+	  ResponseFile $(respfile) : "file|$(manifest:R=$(outdircommon))" : notfile :
+	    $(respdir) ;
+        }
+      
+        Win32Resource $(rawname) : $(manifestrc) ;
+        MsvcRmTemps $(resource) : $(manifestrc) ;
+      }
       
       local icon = [ ApplicationIcon win32 : $(rawname) ] ;
       if ! $(icon)
@@ -874,13 +889,20 @@ rule MsvcProject
 # theses pseudo-groups at the top-level, registration would occur before the
 # client has had a chance to invoke MsvcGenWorkspace, thus these pseudo-groups
 # would not inhabit any workspaces.
-rule RegisterWellKnownCompileGroups
+rule RegisterWellKnownCompileGroup1
 {
-  if $(MSVCGEN.WELL_KNOWN_GROUPS_REGISTERED) != yes
+  local group = $(1) ;
+  if $(MSVCGEN.WELL_KNOWN_GROUP_REGISTERED.$(group)) != yes
   {
-    MSVCGEN.WELL_KNOWN_GROUPS_REGISTERED = yes ;
-    RegisterCompileGroups all apps plugins libs ;
+    MSVCGEN.WELL_KNOWN_GROUP_REGISTERED.$(group) = yes ;
+    RegisterCompileGroups $(group) ;
   }
+}
+
+rule RegisterWellKnownCompileGroup
+{
+  RegisterWellKnownCompileGroup1 all ;
+  RegisterWellKnownCompileGroup1 $(1) ;
 }
 
 rule LinkStaticPlugins
@@ -988,7 +1010,7 @@ rule LinkStaticPlugins
 
 rule Application
 {
-  RegisterWellKnownCompileGroups ;
+  RegisterWellKnownCompileGroup apps ;
 
   local projtype ;
   if [ IsElem console : $(3) ]
@@ -999,14 +1021,14 @@ rule Application
   {
     projtype = appgui ;
   }
-  MsvcProject $(<) : $(projtype) : $(<:S=.exe) : $(>) ;
+  MsvcProject $(<) : $(projtype) : $(<:S=.exe) : $(>) : $(3) ;
   
   CompileGroups $(<) : all apps ;
 }
 
 rule Plugin
 {
-  RegisterWellKnownCompileGroups ;
+  RegisterWellKnownCompileGroup plugins ;
 
   $(<)_TYPE = plugin ;
   
@@ -1033,7 +1055,7 @@ rule Plugin
 
 rule Library
 {
-  RegisterWellKnownCompileGroups ;
+  RegisterWellKnownCompileGroup libs ;
   $(<)_TYPE = library ;
   MsvcProject $(<) : library : $(<:S=.lib) : $(>) ;
   CompileGroups $(<) : all libs ;

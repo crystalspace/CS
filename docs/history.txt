@@ -13,6 +13,11 @@ chronological order.
 	  project templates into the template customization code.
 	- Fossi moved the material and alphamap handling from bruteblock 
 	  into the formers. 
+	- res added a "nomanifest" option for applications to inhibit
+	  manifest generation on Win32/for VC projects.
+	- res changed the msvcgen well-known compile group setup to only
+	  add groups as needed, e.g. the "plugins" group is only added
+	  if there is at least one plugin.
 20-Mar-2006
 	- iceeey committed small optimization to parallax shader from
 	  sueastside: "move the 2 normalize() functions for eyevec and
