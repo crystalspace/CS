@@ -11,6 +11,8 @@ chronological order.
 	  generated VC projects.
 	- res moved the CS-specific defines for VC projects out of the
 	  project templates into the template customization code.
+	- Fossi moved the material and alphamap handling from bruteblock 
+	  into the formers. 
 20-Mar-2006
 	- iceeey committed small optimization to parallax shader from
 	  sueastside: "move the 2 normalize() functions for eyevec and

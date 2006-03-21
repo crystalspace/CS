@@ -27,6 +27,8 @@
 #include "ivaria/reporter.h"
 
 #include "simpleformer.h"
+#include "cstool/debugimagewriter.h"
+#include "csgfx/memimage.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -188,11 +190,11 @@ bool csSimpleFormer::SetIntegerMap (csStringID type, iImage* map,
   {
     // It's a paletted image, so we grab data & palette
     unsigned char *data = (unsigned char*)map->GetImageData ();
-    const csRGBpixel *palette = map->GetPalette ();
+    //const csRGBpixel *palette = map->GetPalette ();
 
     // Keep an index to avoid uneccesary x+y*w calculations
     // Start at last line, since we're gonna want it reversed in Y later
-    // (negative Y in heightmap image goes to positive Z in terrain)
+    // (negative Y in image goes to positive Z in terrain)
     //int idx = (height-1)*width;
 
     unsigned int x, y;
@@ -201,14 +203,22 @@ bool csSimpleFormer::SetIntegerMap (csStringID type, iImage* map,
     {
       for (x = 0; x < width; ++x)
       {
-        // Grab the intensity as height
-        // We're reversing Y to later get negative Y in heightmap image 
-        // to positive Z in terrain
-        intmap.data[x+(height-y-1)*width] = 
-          int (palette[data[x+y*width]].Intensity ()) * scale + offset;
+        intmap.data[x+y*width] = 
+          int (data[x+y*width]) * scale + offset;
       }
     }
   }
+
+/*@@@
+  csDebugImageWriter a = csDebugImageWriter();
+  csString fn = csString();
+  fn += "SetI";
+  fn += "-";
+  fn += rand();
+  fn += ".png";
+  a.DebugImageWrite(map,fn);
+printf("%s\n",fn.GetData());
+*/
 
   return true;
 }
@@ -216,6 +226,10 @@ bool csSimpleFormer::SetIntegerMap (csStringID type, iImage* map,
 bool csSimpleFormer::SetFloatMap (csStringID type, iImage* map,
                                   float scale, float offset)
 {
+
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    objectRegistry, "crystalspace.shared.stringset", iStringSet);
+
   // First check if we already have an floatmap of this type.
   size_t floatmap_idx = (size_t)~0;
 
@@ -830,10 +844,60 @@ const csVector3 *csSimpleSampler::SampleVector3 (csStringID type)
 
 const int *csSimpleSampler::SampleInteger (csStringID type)
 {
+  // Get the shared string repository
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    terraFormer->objectRegistry, "crystalspace.shared.stringset", 
+    iStringSet);
+
+  csString typestring = csString(strings->Request(type));
+
   // Check what we're supposed to return
   if (type == terraFormer->stringMaterialIndices)
   {
     // This isn't implemented yet. We just return 0
+    return 0;
+  }
+  else if (typestring.Find("alphamap") == 0)
+  {
+    for (uint i = 0; i < terraFormer->intmaps.Length(); i++)
+    {
+      if (terraFormer->intmaps[i].type == type)
+        return terraFormer->intmaps[i].data;
+    }
+    return 0;
+  }
+  else if (type == strings->Request("materialmap"))
+  {
+    for (uint i = 0; i < terraFormer->intmaps.Length(); i++)
+    {
+      if (terraFormer->intmaps[i].type == type)
+      {
+
+/*@@@
+  int* tests = terraFormer->intmaps[i].data;
+
+  csImageMemory pic = csImageMemory(512,512);
+  csRGBpixel* dat = (csRGBpixel*)pic.GetImagePtr();
+  for (uint asdf=0; asdf < 512*512; asdf++)
+  {
+    dat[asdf].red = tests[asdf]*50;
+    dat[asdf].green = tests[asdf]*50;
+    dat[asdf].blue = tests[asdf]*50;
+  }
+printf("\n");
+  
+csDebugImageWriter a = csDebugImageWriter();
+  csString fn = csString();
+  fn += "ReqI";
+  fn += "-";
+  fn += rand();
+  fn += ".png";
+  a.DebugImageWrite(&pic,fn);
+printf("%s\n",fn.GetData());
+*/
+        return terraFormer->intmaps[i].data;
+      }
+    }
     return 0;
   }
   else

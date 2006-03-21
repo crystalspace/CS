@@ -55,6 +55,7 @@
 #include "ivideo/txtmgr.h"
 
 #include "brute.h"
+#include "cstool/debugimagewriter.h"
 
 
 CS_LEAKGUARD_IMPLEMENT (csTerrBlock);
@@ -178,6 +179,13 @@ void csTerrBlock::Detach ()
 
 void csTerrBlock::SetupMesh ()
 {
+
+//@@@ have a method to set this from world
+float cullsize = terr->block_maxsize;
+
+if (size < cullsize )
+{
+
   res = terr->GetBlockResolution () + 1;
 
   delete[] vertex_data;
@@ -202,20 +210,74 @@ void csTerrBlock::SetupMesh ()
     res * res * sizeof (csVector3));
   memcpy (texcoord_data, terrasampler->SampleVector2 (terr->texcoords_name),
     res * res * sizeof (csVector2));
+
   terrasampler->Cleanup ();
 
   bbox.Empty ();
-  int i;
+
   int totres = res * res;
   bbox.StartBoundingBox (vertex_data[0]);
   color_data[0].Set (0.5, 0.5, 0.5);
-  for (i = 1 ; i < totres ; i++)
+  for (int i = 1 ; i < totres ; i++)
   {
     bbox.AddBoundingVertexSmart (vertex_data[i]);
     color_data[i].Set (0.5, 0.5, 0.5);
   }
   built = true;
   last_colorVersion = (uint)~0;
+}
+else
+{
+  bbox = csBox3(center.x - size / 2.0, center.y - size / 2.0, center.z - size / 2.0, 
+                center.x + size / 2.0, center.y + size / 2.0, center.z + size / 2.0);
+
+  if (size <= cullsize * 1.5 + 0.5) //only for the smallest culled
+  {
+    res = (int)(size / (terr->block_maxsize /
+                  terr->block_minsize)) * terr->GetBlockResolution();
+  
+    csRef<iTerraSampler> mapsampler = terr->terraformer->GetSampler (
+      csBox2 (center.x - size / 2.0, center.z - size / 2.0, 
+      center.x + size / 2.0, center.z + size / 2.0), res);
+
+    csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+      terr->object_reg, "crystalspace.shared.stringset", iStringSet);
+  
+    if (terr->materialAlphaMaps)
+    {
+      csArray< csArray<char> > alphamaps = csArray< csArray<char> >();
+      for (int i = 0; i < (int)terr->palette.Length() - 1; i++)
+      {
+        csString alphaname = csString("alphamap ");
+        alphaname += i;
+
+        alphamaps.Push(csArray<char>());
+        const int* alphadata =  
+          mapsampler->SampleInteger(strings->Request(alphaname));
+        for (int j = 0; j < res*res; j++)
+        {
+          alphamaps[i].Push(alphadata[j]);
+        }
+      }
+      terr->SetMaterialAlphaMaps(alphamaps,res,res);
+
+    } else {
+
+      csArray<char> materialmap = csArray<char>();
+
+      const int* materialdata =  
+          mapsampler->SampleInteger(strings->Request("materialmap"));
+      for (int j = 0; j < res*res; j++)
+      {
+        materialmap.Push(materialdata[j]);
+      }
+      terr->SetMaterialMap(materialmap,res,res);
+    }
+  }
+
+}
+
+
 }
 
 void FillEdge (bool halfres, int res, uint16* indices, int &indexcount,
@@ -501,10 +563,6 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
                             csReversibleTransform &transform,
                             iMovable *movable)
 {
-  if (!built)
-    return;
-
-  int res = terr->GetBlockResolution ();
 
   if (!IsLeaf () && children[0]->built &&
                     children[1]->built &&
@@ -517,6 +575,11 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     children[3]->DrawTest (g3d, rview, frustum_mask, transform, movable);
     return;
   }
+
+  if (!built)
+    return;
+
+  int res = terr->GetBlockResolution ();
 
   if (!mesh_vertices)
   {
@@ -572,7 +635,8 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
   csBox3 cambox (bbox.Min ()-cam, bbox.Max ()-cam);
   bool baseonly = cambox.SquaredOriginDist () > 
                   terr->lod_distance*terr->lod_distance;
-
+//@@@
+  //baseonly = true;
   int idx = ((neighbours[0] && neighbours[0]->size>size)?1:0)+
             (((neighbours[1] && neighbours[1]->size>size)?1:0)<<1)+
             (((neighbours[2] && neighbours[2]->size>size)?1:0)<<2)+
@@ -586,7 +650,8 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
 
   for (int i=0; i<=(baseonly?0:(int)terr->palette.Length ()); ++i)
   {
-    if ((i > 0) && !IsMaterialUsed (i - 1)) continue;
+//@@@ fix
+    //if ((i > 0) && !IsMaterialUsed (i - 1)) continue;
 
     bool meshCreated;
     csRenderMesh*& rm = terr->rmHolder.GetUnusedMesh (meshCreated,
@@ -681,6 +746,7 @@ bool csTerrBlock::IsMaterialUsed (int index)
 }
 
 // ---------------------------------------------------------------
+
 
 class csTriangleLODAlgoHM : public csTriangleLODAlgo
 {
@@ -1293,11 +1359,21 @@ void csTerrainObject::SetupObject ()
       }
     }
 
+    csRef<iStringSet> strings =
+      CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+      "crystalspace.shared.stringset", iStringSet);
+
+    int a;
+    
+    materialAlphaMaps = 
+      !terraformer->SampleInteger(strings->Request("materialmap"), 
+        0,0,a);
+
     rootblock.AttachNew (new csTerrBlock (this));
     rootblock->material = matwrap;
     csVector2 center = (region.Max()+region.Min())*0.5;
     rootblock->center = csVector3 (center.x, 0, center.y);
-    rootblock->size = block_maxsize;
+    rootblock->size = block_maxsize;   
     rootblock->SetupMesh ();
     global_bbox = rootblock->bbox;
   }
@@ -1809,6 +1885,17 @@ bool csTerrainObject::SetMaterialAlphaMaps (
       }
     globalMaterialsUsed.Push (matused);
 
+/*@@@
+  csDebugImageWriter a = csDebugImageWriter();
+  csString fn = csString();
+  fn += "alpha";
+  fn += "-";
+  fn += rand();
+  fn += ".png";
+  a.DebugImageWrite(alpha,fn);
+printf("%s\n",fn.GetData());
+*/
+
     csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
       CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
     csRef<csShaderVariable> var = 
@@ -1829,6 +1916,7 @@ bool csTerrainObject::SetMaterialAlphaMaps (
 	  "crystalspace.mesh.bruteblock",
 	  "There were %d overflows in the alpha maps!", count_overflow);
   }
+  materialAlphaMaps = true;
   return true;
 }
 
@@ -1929,6 +2017,17 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
 	idx++;
       }
 
+/*@@@
+  csDebugImageWriter a = csDebugImageWriter();
+  csString fn = csString();
+  fn += "material";
+  fn += "-";
+  fn += rand();
+  fn += ".png";
+  a.DebugImageWrite(alpha,fn);
+printf("%s\n",fn.GetData());
+*/
+
     csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
       CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
     csRef<csShaderVariable> var = 
@@ -1943,6 +2042,8 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
     lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
     paletteContexts[i]->AddVariable (lod_var);
   }
+  materialAlphaMaps = false;
+
   return true;
 }
 
@@ -2367,6 +2468,7 @@ bool csTerrainObject::HitBeam (csTerrBlock* block,
 	const csSegment3& seg,
 	csVector3& isect, float* pr)
 {
+printf("hit!beam!\n");
   if (csIntersect3::BoxSegment (block->bbox, seg, isect) == -1)
   {
     return false;

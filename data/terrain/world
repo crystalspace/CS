@@ -127,6 +127,7 @@
       <heightmap>/lev/terrain/heightmap.png</heightmap>
       <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
       <scale x="256" y="30" z="256" />
+      <materialmap image="/lev/terrain/materialmap.png" />
     </params>
   </addon>
 
@@ -174,11 +175,10 @@
 	  <material>Marble</material>
 	  <material>Stone</material>
 	</materialpalette>
-	<lodvalue name="splatting distance">200</lodvalue>
-  <lodvalue name="block resolution">16</lodvalue>
-  <lodvalue name="block split distance">8</lodvalue>
-  <lodvalue name="minimum block size">32</lodvalue>
-	<materialmap image="/lev/terrain/materialmap.png" />
+        <lodvalue name="splatting distance">200</lodvalue>
+        <lodvalue name="block resolution">16</lodvalue>
+        <lodvalue name="block split distance">8</lodvalue>
+        <lodvalue name="minimum block size">32</lodvalue>
       </params>
       <move> 
         <v x="0" y="0" z="0" /> 

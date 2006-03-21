@@ -92,6 +92,10 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
   csRef<iSimpleFormerState> state = SCF_QUERY_INTERFACE (former, 
         iSimpleFormerState);
 
+  uint alphamapcount = 0;
+  bool material_map_set = false;
+  bool one_material_map_used = false;
+
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -237,11 +241,112 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
         state->SetOffset (v);
         break;
       }
+      case XMLTOKEN_MATERIALMAP:
+      {
+//@@@
+/*
+        if (!palette_set)
+        {
+          synldr->ReportError ("crystalspace.terrain.factory.loader",
+              child, "First set a material palette before <materialmap>!");
+          return 0;
+        }
+*/
+        material_map_set = true;
+        one_material_map_used = true;
+        const char* imagefile = child->GetAttributeValue ("image");
+        const char *arrayfile = child->GetAttributeValue ("raw");
+        int width = child->GetAttributeValueAsInt ("width");
+        int height = child->GetAttributeValueAsInt ("height");
+        if (imagefile != 0)
+        {
+          csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+          csRef<iImage> map = loader->LoadImage(imagefile,CS_IMGFMT_PALETTED8);
+          if (map == 0)
+          {
+            synldr->ReportError ("crystalspace.terrain.factory.loader",
+              child, "Error reading in image file for heightmap '%s'",
+              imagefile);
+            return 0;
+          }
+
+          csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+            objreg, "crystalspace.shared.stringset", iStringSet);
+
+          state->SetIntegerMap(strings->Request("materialmap"), map);
+//          state->SetMaterialMapFile (imagefile, map->GetWidth (),
+//          map->GetHeight ());
+        }
+        else if (arrayfile != 0 && width != 0 && height != 0)
+        {
+//@@@ fixme or remove
+        synldr->ReportError ("crystalspace.terrain.factory.loader",
+              child, "Using raw files is broken! Complain to Fossi.");
+        return 0;
+          csRef<iVFS> vfs = CS_QUERY_REGISTRY (objreg, iVFS);
+          csRef<iFile> file = vfs->Open (arrayfile, VFS_FILE_READ);
+          if (file == 0)
+          {
+
+            synldr->ReportError ("crystalspace.terrain.factory.loader",
+              child, "Error reading in raw file for heightmap '%s'",
+              arrayfile);
+            return 0;
+          }
+          csArray<char> array;
+          int index = 0;
+          while (!file->AtEOF())
+          {
+            file->Read (&array.GetExtend (index++), sizeof (char));
+          }
+//          state->SetIntegerMap (array, width, height);
+//          state->SetMaterialMapFile (arrayfile, width,
+//          height, true);
+        }
+        else
+        {
+          synldr->ReportError ("crystalpace.terrain.object.loader",
+            child, "No image or raw file specified for material map");
+          return 0;
+        }
+        break;
+      }
+      case XMLTOKEN_MATERIALALPHAMAP:
+      {
+        const char* imagefile = child->GetAttributeValue ("image");
+        if (imagefile != 0)
+        {
+          csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+          csRef<iImage> map = loader->LoadImage(imagefile,CS_IMGFMT_PALETTED8);
+          if (map == 0)
+          {
+            synldr->ReportError ("crystalspace.terraformer.simple.loader",
+              child, "Error reading in image file for heightmap '%s'",
+              imagefile);
+            return 0;
+          }
+          csString id = csString("alphamap ");
+          id += alphamapcount++;
+
+          csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+            objreg, "crystalspace.shared.stringset", iStringSet);
+
+          state->SetIntegerMap(strings->Request(id), map);
+        }
+        else
+        {
+          synldr->ReportError ("crystalspace.terraformer.simple.loader",
+            child, "No image file specified for materialraw  p");
+          return 0;
+        }
+        break;
+      }
       default:
         synldr->ReportError ("crystalspace.terraformer.simple.loader",
           child, "Unknown token!");
     }
   }
+
   return csPtr<iBase> (former);
 }
 

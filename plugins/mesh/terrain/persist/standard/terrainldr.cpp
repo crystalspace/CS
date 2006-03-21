@@ -305,10 +305,6 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
   csRef<iTerrainObjectState> state;
   bool palette_set = false;
   bool material_map_set = false;
-  bool one_material_map_used = false;
-
-  csRefArray<iImage> alphamaps_ref;
-  csArray<iImage*> alphamaps;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -382,107 +378,21 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
       }
       case XMLTOKEN_MATERIALMAP:
       {
-        if (!palette_set)
-	{
-          synldr->ReportError ("crystalspace.terrain.factory.loader",
-              child, "First set a material palette before <materialmap>!");
-          return 0;
-	}
-	if (alphamaps.Length () > 0)
-	{
-          synldr->ReportError ("crystalspace.terrain.factory.loader",
-              child, "You can't combine material alhpamaps with materialmap!");
-          return 0;
-	}
-	material_map_set = true;
-	one_material_map_used = true;
-        const char* imagefile = child->GetAttributeValue ("image");
-        const char *arrayfile = child->GetAttributeValue ("raw");
-        int width = child->GetAttributeValueAsInt ("width");
-        int height = child->GetAttributeValueAsInt ("height");
-        if (imagefile != 0)
-        {
-	  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-          csRef<iImage> map = loader->LoadImage(imagefile,CS_IMGFMT_PALETTED8);
-          if (map == 0) 
-          {
-            synldr->ReportError ("crystalspace.terrain.factory.loader",
-              child, "Error reading in image file for heightmap '%s'", 
-              imagefile);
-            return 0;
-          }
-          state->SetMaterialMap (map);
-          state->SetMaterialMapFile (imagefile, map->GetWidth (),
-            map->GetHeight ());
-        }
-        else if (arrayfile != 0 && width != 0 && height != 0) 
-        {
-          csRef<iFile> file = vfs->Open (arrayfile, VFS_FILE_READ);
-          if (file == 0) 
-          {
-            synldr->ReportError ("crystalspace.terrain.factory.loader",
-              child, "Error reading in raw file for heightmap '%s'", 
-              arrayfile);
-            return 0;
-          }
-          csArray<char> array;
-          int index = 0;
-          while (!file->AtEOF())
-          {
-            file->Read (&array.GetExtend (index++), sizeof (char));
-          }
-          state->SetMaterialMap (array, width, height);
-          state->SetMaterialMapFile (arrayfile, width,
-            height, true);
-        }
-        else
-        {
-          synldr->ReportError ("crystalpace.terrain.object.loader",
-            child, "No image or raw file specified for material map");
-          return 0;
-        }
+        synldr->ReportError ("crystalspace.terrain.factory.loader",
+            child, "Materialmaps are now handled by the Formers!");
+        return 0;
         break;
       }
       case XMLTOKEN_MATERIALALPHAMAP:
       {
-        if (!palette_set)
-	{
-          synldr->ReportError ("crystalspace.terrain.factory.loader",
-              child, "First set a material palette before <materialmap>!");
-          return 0;
-	}
-	if (one_material_map_used)
-	{
-          synldr->ReportError ("crystalspace.terrain.factory.loader",
-              child, "You are already using materialmap. Can't add alpha maps now!");
-          return 0;
-	}
-	material_map_set = true;
-        const char* imagefile = child->GetAttributeValue ("image");
-        if (imagefile != 0)
-        {
-	  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-          csRef<iImage> map = loader->LoadImage(imagefile,CS_IMGFMT_PALETTED8);
-          if (map == 0) 
-          {
-            synldr->ReportError ("crystalspace.terrain.factory.loader",
-              child, "Error reading in image file for heightmap '%s'", 
-              imagefile);
-            return 0;
-          }
-	  alphamaps_ref.Push (map);
-	  alphamaps.Push (map);
-        }
-        else
-        {
-          synldr->ReportError ("crystalpace.terrain.object.loader",
-            child, "No image file specified for materialraw  p");
-          return 0;
-        }
+        synldr->ReportError ("crystalspace.terrain.factory.loader",
+            child, "Alphamaps are now handled by the Formers!");
+        return 0;
         break;
       }
       case XMLTOKEN_LODVALUE:
       {
+//@@@
         if (material_map_set)
 	{
           synldr->ReportError ("crystalspace.terrain.factory.loader",
@@ -520,11 +430,6 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
         synldr->ReportError ("crystalspace.terrain.object.loader",
           child, "Unknown token");
     }
-  }
-
-  if (alphamaps.Length () > 0)
-  {
-    state->SetMaterialAlphaMaps (alphamaps);
   }
 
   return csPtr<iBase>(mesh);

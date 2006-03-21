@@ -117,6 +117,8 @@
       <heightmap>/lev/terrain/heightmap_257x257.png</heightmap>
       <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
       <scale x="256" y="32" z="256" />
+      <materialalphamap image="/lev/terraina/alpha_marble.png" />
+      <materialalphamap image="/lev/terraina/alpha_stone.png" />
   </addon>
 
   <meshfact name="TerrainFact">
@@ -210,9 +212,6 @@
   	<lodvalue name="block split distance">8</lodvalue>
   	<lodvalue name="minimum block size">32</lodvalue>
   	<lodvalue name="cd resolution">256</lodvalue>
-	<!--<materialmap image="/lev/terrain/materialmap.png" />-->
-	<materialalphamap image="/lev/terraina/alpha_marble.png" />
-	<materialalphamap image="/lev/terraina/alpha_stone.png" />
 	<staticlighting>yes</staticlighting>
 	<castshadows>yes</castshadows>
       </params>

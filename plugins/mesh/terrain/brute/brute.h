@@ -261,6 +261,7 @@ private:
   csRefArray<iImage> alphas;
   csRef<iShaderVariableContext> baseContext;
   csRefArray<iShaderVariableContext> paletteContexts;
+  bool materialAlphaMaps;
 
   float error_tolerance;
   float lod_distance;
