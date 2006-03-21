@@ -36,7 +36,7 @@ if [ Property build : projgen ] = msvc
 }
 
 # We need to customize the list of build configurations.
-MsvcGenVariable customize : custom.cslib ;
+MsvcGenVariable customize : custom.cslib custom2.cslib ;
 
 # Set up the workspaces we want msvcgen to synthesize.
 include [ ConcatDirs $(SUBDIR) workspaces.jam ] ;

@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Mar-2006
+	- res added the MsvcIncDirs rule to specify include dirs for
+	  generated VC projects.
+	- res moved the CS-specific defines for VC projects out of the
+	  project templates into the template customization code.
 20-Mar-2006
 	- iceeey committed small optimization to parallax shader from
 	  sueastside: "move the 2 normalize() functions for eyevec and

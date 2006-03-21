@@ -169,7 +169,14 @@ rule MsvcExternalLibrary1 { }
 rule MsvcDefine { MsvcDefine1 $(1) : $(2) : $(3) : $(4) ; }
 rule MsvcDefine1 { }
 
-## MsvcCFLags target [ : cflags [ : mode ]]
+## MsvcIncDirs target : directories [ : mode ]
+##   Invoke this rule to define an MSVC-specific additional include directories.
+##   'mode' should be "release" or "debug". If 'mode' is omitted, then 
+##   'directories' is used for release and debug.
+rule MsvcIncDirs { MsvcIncDirs1 $(1) : $(2) : $(3) ; }
+rule MsvcIncDirs1 { }
+
+## MsvcCFlags target [ : cflags [ : mode ]]
 ##   Invoke this rule to set additional MSVC-specific compiler flags for
 ##   'target'.  'mode' should be "release" or "debug". If 'mode' is omitted,
 ##   then 'cflags' is used for release and debug.
@@ -1277,6 +1284,13 @@ rule MsvcDefine1
     _MsvcRespEmit $(target) : $(def) : define : $(mode) ;
     STATICPLUGINS.MSVC_DEFINES += $(def) ;
   }
+}
+
+# MsvcIncDirs target : directory [ : mode ]
+#   (See documentation above.)
+rule MsvcIncDirs1 
+{ 
+  _MsvcIncDirs $(1) : $(2) : $(3) ;
 }
 
 # _MsvcDefine target : tuples [ : mode ]

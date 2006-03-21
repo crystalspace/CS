@@ -122,7 +122,7 @@ builds = [
   {
     tag => 'debug',
     name => 'Debug',
-    defines => ['_DEBUG','CS_DEBUG'],
+    defines => ['_DEBUG'],
     defineskey => 'definedebug',
     cflagskey => 'cflagsdebug',
     incdirskey => 'includedebug',

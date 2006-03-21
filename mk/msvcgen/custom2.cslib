@@ -20,7 +20,8 @@
 #==============================================================================
 
 #------------------------------------------------------------------------------
-# Search the default 'debug' build configuration to add the CS_DEBUG define
+# Search the default 'debug' build configuration since the RefTracker and 
+# MemoryTracker configurations are based on the 'debug' one.
 #------------------------------------------------------------------------------
 builddebug = {};
 FOREACH build IN builds;
@@ -29,15 +30,29 @@ FOREACH build IN builds;
     BREAK;
   END;
 END;
-# Add CS_DEBUG define
-builddebug.import({defines => builddebug.defines.merge(['CS_DEBUG'])});
 
 #------------------------------------------------------------------------------
-# Go over all configurations and add CS-specific defines needed by all
-# configurations.
+# Crystal Space adds additional build configurations to the default set
+# provided by the generic, project-agnostic builds[] array (control.tlib).
 #------------------------------------------------------------------------------
-FOREACH build IN builds;
-  build.defines = build.defines.merge(['CS_WIN32_CSCONFIG','__CRYSTAL_SPACE__']);
-END;
+# Build MemoryTracker config by copying the default debug config and changing
+# some fields.
+buildmemtrack = {};
+buildmemtrack.import(builddebug);
+buildmemtrack.import({
+    name => 'MemoryTracker',
+    defines => builddebug.defines.merge(['CS_MEMORY_TRACKER']),
+    priority => 400
+  });
+# Likewise for RefTracker.
+buildreftrack = {};
+buildreftrack.import(builddebug);
+buildreftrack.import({
+    name => 'RefTracker',
+    defines => builddebug.defines.merge(['CS_REF_TRACKER']),
+    priority => 500
+  });
+# Merge into the builds array
+builds = builds.merge([buildmemtrack, buildreftrack]);
 
 END %]

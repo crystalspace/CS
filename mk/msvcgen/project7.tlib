@@ -56,7 +56,7 @@ END -%]
 				Name="VCCLCompilerTool"
 [% interpolate('compiler') -%]
 				PreprocessorDefinitions="
-[%- composedefs(['WIN32','CS_WIN32_CSCONFIG','__CRYSTAL_SPACE__']) %]"
+[%- composedefs(['WIN32']) %]"
 				OptimizeForProcessor="1"
 				AdditionalOptions="[% flags(compose('cflags', [], ' ')) | html %] [% flags(compose('cflags7', [], ' ')) | html %]"
 				AdditionalIncludeDirectories="[% composedirs('incdirs', ['.']) %]"
