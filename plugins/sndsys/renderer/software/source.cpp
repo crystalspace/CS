@@ -35,21 +35,9 @@
 
 #include "renderer.h"
 #include "listener.h"
+#include "filters.h"
 
 #include "source.h"
-
-
-SCF_IMPLEMENT_IBASE(SndSysSourceSoftwareBasic)
-	SCF_IMPLEMENTS_INTERFACE(iSndSysSourceSoftware)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE(SndSysSourceSoftware3D)
-  SCF_IMPLEMENTS_INTERFACE(iSndSysSourceSoftware3D)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE(SndSysSourceSoftwareFilter_Base)
-  SCF_IMPLEMENTS_INTERFACE(SndSysSourceSoftwareFilter_Base)
-SCF_IMPLEMENT_IBASE_END
 
 
 
@@ -61,10 +49,8 @@ SCF_IMPLEMENT_IBASE_END
 //////////////////////////////////////////////////////////////////////////
 SndSysSourceSoftwareBasic::SndSysSourceSoftwareBasic(
   csRef<iSndSysStream> stream, csSndSysRendererSoftware *rend) : 
-  renderer(rend), sound_stream(stream)
+  scfImplementationType(this), renderer(rend), sound_stream(stream)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   active_parameters.volume=0.0f;
   queued_parameters.volume=1.0f;
 
@@ -79,8 +65,6 @@ SndSysSourceSoftwareBasic::~SndSysSourceSoftwareBasic()
     //RemoveFilter(filters[0]);
 
   renderer->RecordEvent(SSEC_SOURCE, SSEL_DEBUG, "Basic sound source destructing");
-
-  SCF_DESTRUCT_IBASE();
 }
 
 
@@ -115,18 +99,59 @@ void SndSysSourceSoftwareBasic::UpdateQueuedParameters()
   }
 }
 
-size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer, 
-						  size_t original_buffer_samples)
+
+bool SndSysSourceSoftwareBasic::AddOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter)
+{
+  switch (Location)
+  {
+    case SS_FILTER_LOC_SOURCEIN:
+      if (!pFilter->FormatNotify(&renderer->m_PlaybackFormat))
+        return false;
+      return m_SourceInFilterQueue.AddFilter(pFilter);
+    case SS_FILTER_LOC_SOURCEOUT:
+      if (!pFilter->FormatNotify(&renderer->m_PlaybackFormat))
+        return false;
+      return m_SourceOutFilterQueue.AddFilter(pFilter);
+    default:
+      return false;
+  }
+  return false;
+}
+
+bool SndSysSourceSoftwareBasic::RemoveOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter)
+{
+  switch (Location)
+  {
+    case SS_FILTER_LOC_SOURCEIN:
+      return m_SourceInFilterQueue.RemoveFilter(pFilter);
+    case SS_FILTER_LOC_SOURCEOUT:
+      return m_SourceOutFilterQueue.RemoveFilter(pFilter);
+    default:
+      return false;
+  }
+  return false;
+}
+
+
+void SndSysSourceSoftwareBasic::ProcessOutputFilters()
+{
+  m_SourceInFilterQueue.DispatchSampleBuffers();
+  m_SourceOutFilterQueue.DispatchSampleBuffers();
+}
+
+
+size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
+              size_t frame_count)
 {
   float source_volume;
   void *buf1,*buf2;
   size_t buf1_len, buf2_len;
   int int_volume;
   size_t request_bytes;
-  int bytes_per_sample;
+  int bytes_per_frame;
 
-  // This is the working copy of buffer samples, it changes based on what we get back from the stream read
-  size_t buffer_samples=original_buffer_samples;
+  // Make a copy of the frame count
+  size_t original_frame_count=frame_count;
 
   UpdateQueuedParameters();
 
@@ -136,7 +161,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
   if (active_parameters.volume == 0.0f)
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Source is muted.");
-    return original_buffer_samples;
+    return original_frame_count;
   }
 
   // If the stream associated with the source is paused, the source generates no audio
@@ -144,12 +169,12 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
       (sound_stream->GetPosition() == stream_position))
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Stream is paused.");
-    return original_buffer_samples;
+    return original_frame_count;
   }
 
-  // Translate samples into bytes for the stream
-  bytes_per_sample=renderer->render_format.Bits/8;
-  request_bytes=buffer_samples * bytes_per_sample;
+  // Translate frames into bytes for the stream
+  bytes_per_frame=renderer->m_PlaybackFormat.Bits * renderer->m_PlaybackFormat.Channels/8;
+  request_bytes=frame_count * bytes_per_frame;
   buf1_len=0;
   buf2_len=0;
 
@@ -166,9 +191,9 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
     //buf1_len + buf2_len, sound_stream->GetSampleCount());
 
   // Update the number of samples to those actually used
-  buffer_samples=(buf1_len+buf2_len)/bytes_per_sample;
+  frame_count=(buf1_len+buf2_len)/bytes_per_frame;
 
-  if (buffer_samples == 0)
+  if (frame_count == 0)
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Stream reports 0 length buffers.");
     return 0;
@@ -180,7 +205,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
   if (source_volume <0.00001f)
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Source volume below play threshold.");
-    return original_buffer_samples;
+    return original_frame_count;
   }
 
   //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Source merge beginning.");
@@ -200,7 +225,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
   }
   */
 
-  /* renderer->render_format contains the output render format, which is
+  /* renderer->m_PlaybackFormat contains the output render format, which is
    *  also the format that the stream must present data in.
    * Here we convert from 8 or 16 bit stream data into channelized 16 bit 
    *  signed buffers stored in signed 32 bit accumulators
@@ -212,13 +237,13 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
    *
    * The stream also stores samples this way.  
   */
-  if (renderer->render_format.Bits==8)
+  if (renderer->m_PlaybackFormat.Bits==8)
   {
     size_t i;
     int buffer_idx;
     csSoundSample mix;
     unsigned char *src_ptr;
-    size_t second_half_offset=buffer_samples/2;
+    size_t second_half_offset=frame_count;
 
     buffer_idx=0;
 
@@ -247,7 +272,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
         mix=(mix * int_volume) / SOURCE_INTEGER_VOLUME_MULTIPLE;
         // Add into the destination sample buffer
         channel_buffer[second_half_offset+buffer_idx]+=mix;
-        CS_ASSERT(second_half_offset+buffer_idx < buffer_samples);
+        //CS_ASSERT(second_half_offset+buffer_idx < buffer_samples);
       }
     }
     if (buf2_len)
@@ -272,7 +297,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
         mix=(mix * int_volume) / SOURCE_INTEGER_VOLUME_MULTIPLE;
         // Add into the destination sample buffer
         channel_buffer[second_half_offset+buffer_idx]+=mix;
-        CS_ASSERT(second_half_offset+buffer_idx < buffer_samples);
+        //CS_ASSERT(second_half_offset+buffer_idx < buffer_samples);
       }
     }
   }
@@ -283,7 +308,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
     int buffer_idx;
     csSoundSample mix;
     short *src_ptr;
-    size_t second_half_offset=buffer_samples/2;
+    size_t second_half_offset=frame_count;
 
     buffer_idx=0;
 
@@ -310,7 +335,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
         mix=(mix * int_volume) / SOURCE_INTEGER_VOLUME_MULTIPLE;
         // Add into the destination sample buffer
         channel_buffer[second_half_offset+buffer_idx]+=mix;
-        CS_ASSERT(second_half_offset+buffer_idx < buffer_samples);
+        //CS_ASSERT(second_half_offset+buffer_idx < buffer_samples);
       }
     }
     if (buf2_len)
@@ -331,10 +356,14 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
         mix=(mix * int_volume) / SOURCE_INTEGER_VOLUME_MULTIPLE;
         // Add into the destination sample buffer
         channel_buffer[second_half_offset+buffer_idx]+=mix;
-        CS_ASSERT(second_half_offset+buffer_idx < buffer_samples);
+        //CS_ASSERT(second_half_offset+buffer_idx < buffer_samples);
       }
     }
   }
+
+  // If there are any SS_FILTER_LOC_SOURCEIN filters attached to this source, give them the requested data
+  if (m_SourceInFilterQueue.GetOutputFilterCount()>0)
+    m_SourceInFilterQueue.QueueSampleBuffer(channel_buffer, frame_count, renderer->m_PlaybackFormat.Channels);
 
   /*
   if (HaveFilters())
@@ -344,7 +373,7 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
     filter_max=filters.Length();
     for (filter=0;filter<filter_max;filter++)
     {
-      filters[filter]->Apply(source_mix_buffer, buffer, buffer_samples, &(renderer->render_format));
+      filters[filter]->Apply(source_mix_buffer, buffer, buffer_samples, &(renderer->m_PlaybackFormat));
     }
 
     // Add the post-filter mixed buffer into the renderer buffer
@@ -353,16 +382,20 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
   }
   */
 
+  if (frame_count<original_frame_count)
+    renderer->RecordEvent(SSEC_SOURCE, SSEL_DEBUG, "Source could not provide all requested frames.  Provided [%d] of [%d]",
+    frame_count,original_frame_count);
 
-  if (buffer_samples<original_buffer_samples)
-    renderer->RecordEvent(SSEC_SOURCE, SSEL_DEBUG, "Source could not provide all requested samples.  Provided [%d] of [%d]",
-    buffer_samples,original_buffer_samples);
+  // If there are any SS_FILTER_LOC_SOURCEOUT filters attached to this source, give them the requested data
+  if (m_SourceOutFilterQueue.GetOutputFilterCount()>0)
+    m_SourceOutFilterQueue.QueueSampleBuffer(channel_buffer, frame_count, renderer->m_PlaybackFormat.Channels);
 
-  // TEST: Pretend like we always returned the number of requested samples.  This will cause a gap (scratch) in audio output
-  //       if we didn't really get enough samples, but if we consider the timing provided by the renderer as authoritative
+
+  // TEST: Pretend like we always returned the number of requested frames.  This will cause a gap (scratch) in audio output
+  //       if we didn't really get enough frames, but if we consider the timing provided by the renderer as authoritative
   //       and the source disagrees with this timing then a gap is inevitable.
   //       This solves the issue where an end-of-stream condition causes a short read.
-  return original_buffer_samples;
+  return original_frame_count;
 }
 
 
@@ -374,10 +407,9 @@ size_t SndSysSourceSoftwareBasic::MergeIntoBuffer(csSoundSample *channel_buffer,
 //
 //////////////////////////////////////////////////////////////////////////
 SndSysSourceSoftware3D::SndSysSourceSoftware3D(csRef<iSndSysStream> stream, csSndSysRendererSoftware *rend)
-: renderer(rend), sound_stream(stream), clean_buffer(0), clean_buffer_samples(0), working_buffer(0), working_buffer_samples(0),
-  filters_setup(false)
+: scfImplementationType(this), renderer(rend), sound_stream(stream), clean_buffer(0), 
+  clean_buffer_samples(0), working_buffer(0), working_buffer_samples(0), filters_setup(false)
 {
-  SCF_CONSTRUCT_IBASE(0);
 
   active_parameters.maximum_distance=CS_SNDSYS_SOURCE_DISTANCE_INFINITE;
   active_parameters.minimum_distance=1.0;
@@ -414,8 +446,6 @@ SndSysSourceSoftware3D::~SndSysSourceSoftware3D()
 
   delete[] working_buffer;
   delete[] clean_buffer;
-
-  SCF_DESTRUCT_IBASE();
 }
 
 
@@ -585,18 +615,57 @@ void SndSysSourceSoftware3D::SetupFilters()
   filters_setup=true;
 }
 
+bool SndSysSourceSoftware3D::AddOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter)
+{
+  switch (Location)
+  {
+  case SS_FILTER_LOC_SOURCEIN:
+    if (!pFilter->FormatNotify(&renderer->m_PlaybackFormat))
+      return false;
+    return m_SourceInFilterQueue.AddFilter(pFilter);
+  case SS_FILTER_LOC_SOURCEOUT:
+    if (!pFilter->FormatNotify(&renderer->m_PlaybackFormat))
+      return false;
+    return m_SourceOutFilterQueue.AddFilter(pFilter);
+  default:
+    return false;
+  }
+  return false;
+}
+
+bool SndSysSourceSoftware3D::RemoveOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter)
+{
+  switch (Location)
+  {
+  case SS_FILTER_LOC_SOURCEIN:
+    return m_SourceInFilterQueue.RemoveFilter(pFilter);
+  case SS_FILTER_LOC_SOURCEOUT:
+    return m_SourceOutFilterQueue.RemoveFilter(pFilter);
+  default:
+    return false;
+  }
+  return false;
+}
+
+
+void SndSysSourceSoftware3D::ProcessOutputFilters()
+{
+  m_SourceInFilterQueue.DispatchSampleBuffers();
+  m_SourceOutFilterQueue.DispatchSampleBuffers();
+}
+
+
 
 size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer, 
-						size_t original_buffer_samples)
+						size_t frame_count)
 {
   void *buf1,*buf2;
   size_t buf1_len,buf2_len;
   size_t request_bytes;
-  int bytes_per_sample;
-  size_t per_channel_samples;
+  int bytes_per_frame;
 
   // This is the working copy of buffer samples, it changes based on what we get back from the stream read
-  size_t buffer_samples=original_buffer_samples;
+  size_t original_frame_count=frame_count;
 
   // TODO: Can we calculate listener/source dependant delay and intensity here only if the source and/or listener properties have changed?
 
@@ -612,7 +681,7 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
   if (active_parameters.volume == 0.0f)
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Source is muted.");
-    return original_buffer_samples;
+    return original_frame_count;
   }
 
   // If the stream associated with the source is paused, the source generates no audio
@@ -620,13 +689,9 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
     (sound_stream->GetPosition() == stream_position))
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Stream is paused.");
-    return original_buffer_samples;
+    return original_frame_count;
   }
 
-
-  // The samples count given by the renderer is the samples for all channels combined.
-  //  Translate into the samples for each channel
-  per_channel_samples = buffer_samples / renderer->render_format.Channels;
 
 
   //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Stream position is %u.", stream_position);
@@ -634,8 +699,9 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
 
 
   // Translate samples into bytes for the stream
-  bytes_per_sample=renderer->render_format.Bits/8;
-  request_bytes=per_channel_samples * bytes_per_sample;
+  //  Since this is a 3d source, the stream will be providing only a single channel
+  bytes_per_frame=renderer->m_PlaybackFormat.Bits/8;
+  request_bytes=frame_count * bytes_per_frame;
   sound_stream->GetDataPointers (&stream_position,
     request_bytes, &buf1, &buf1_len, &buf2, &buf2_len);
 
@@ -643,29 +709,29 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
   //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Read %d bytes from stream of length %d samples.", buf1_len + buf2_len, sound_stream->GetSampleCount());
 
   // Update the number of samples to those actually used
-  per_channel_samples=(buf1_len+buf2_len)/bytes_per_sample;
-  buffer_samples = per_channel_samples * renderer->render_format.Channels;
+  frame_count=(buf1_len+buf2_len)/bytes_per_frame;
 
-  if (buffer_samples == 0)
+  if (frame_count == 0)
   {
     //renderer->Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Stream reports 0 length buffers.");
     return 0;
   }
 
+
   // Prepare buffers
-  if (!PrepareBuffer(&working_buffer,&working_buffer_samples, per_channel_samples))
+  if (!PrepareBuffer(&working_buffer,&working_buffer_samples, frame_count))
   {
     //renderer->Report(CS_REPORTER_SEVERITY_ERROR, "Sound System: Failed to allocate a working buffer.");
-    return original_buffer_samples;
+    return original_frame_count;
   }
-  if (!PrepareBuffer(&clean_buffer,&clean_buffer_samples, per_channel_samples))
+  if (!PrepareBuffer(&clean_buffer,&clean_buffer_samples, frame_count))
   {
     //renderer->Report(CS_REPORTER_SEVERITY_ERROR, "Sound System: Failed to allocate a clean buffer.");
-    return original_buffer_samples;
+    return original_frame_count;
   }
 
   // Convert the read samples into the clean buffer
-  if (renderer->render_format.Bits==8)
+  if (renderer->m_PlaybackFormat.Bits==8)
   {
     size_t i;
     int buffer_idx;
@@ -734,9 +800,15 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
     }
   }
 
+  // If there are any SS_FILTER_LOC_SOURCEIN filters attached to this source, give them the requested data
+  //  Streams attached to 3D sources are always mono, so channels = 1
+  if (m_SourceInFilterQueue.GetOutputFilterCount()>0)
+    m_SourceInFilterQueue.QueueSampleBuffer(clean_buffer, frame_count, 1);
+
+
 
   int channel,total_channels;
-  total_channels=renderer->render_format.Channels;
+  total_channels=renderer->m_PlaybackFormat.Channels;
   csVector3 listener_to_source;
   
   if (sound_stream->Get3dMode() == CS_SND3D_RELATIVE)
@@ -744,7 +816,7 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
   else
   {
     // Translate absolute coordinates into relative listener coordinates
-    listener_to_source=renderer->Listener->active_properties.world_to_listener.Other2This(active_parameters.position);
+    listener_to_source=renderer->m_pListener->active_properties.world_to_listener.Other2This(active_parameters.position);
   }
 
   /*
@@ -762,7 +834,7 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
   closest_speaker=-1.0f;
   for (channel=0;channel<total_channels;channel++)
   {
-    csVector3 speaker_to_source = listener_to_source - renderer->Speakers[channel].RelativePosition;
+    csVector3 speaker_to_source = listener_to_source - renderer->m_Speakers[channel].RelativePosition;
     // Calculate the distance between the listener and the source
     float distance=speaker_to_source.Norm();
 
@@ -780,7 +852,7 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
     // Translate speaker position from starting coordinate system to directional coordinate system
     speaker_to_source.Normalize();
 
-    speaker_direction_cos[channel]=(renderer->Speakers[channel].Direction * speaker_to_source);
+    speaker_direction_cos[channel]=(renderer->m_Speakers[channel].Direction * speaker_to_source);
     /*
     // Approximate the effect of direction as a 40 percent variance in volume
     speaker_scale[channel] = 0.40f * (listener_to_source * speaker_to_source);
@@ -789,18 +861,38 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
     speaker_scale[channel]+=0.60f;
     */
   }
+  
+  SndSysOutputFilterQueue::SampleBuffer *pFilterSampleBuffer=0;
+  if (m_SourceOutFilterQueue.GetOutputFilterCount()>0)
+    pFilterSampleBuffer=new SndSysOutputFilterQueue::SampleBuffer(frame_count, total_channels);
 
   // For each output channel, calculate the sound
   for (channel=0;channel<total_channels;channel++)
   {
-    if (ProcessSoundChain(channel, per_channel_samples))
+    if (ProcessSoundChain(channel, frame_count))
     {
       // If ProcessSoundChain returns true, merge the samples into the renderer buffer
-      csSoundSample *channel_base=&(channel_buffer[channel * per_channel_samples]);
-      for (size_t i=0;i<per_channel_samples;i++)
+      csSoundSample *channel_base=&(channel_buffer[channel * frame_count]);
+      // If there's at least one output filter, queue samples for it
+      if (pFilterSampleBuffer)
+        pFilterSampleBuffer->AddSamples(working_buffer, frame_count);
+      for (size_t i=0;i<frame_count;i++)
         channel_base[i]+=working_buffer[i];
     }
+    else
+    {
+      if (pFilterSampleBuffer)
+        pFilterSampleBuffer->AddSamples(working_buffer, frame_count);
+    }
   }
+
+  // If there are any SS_FILTER_LOC_SOURCEOUT filters attached to this source, give them the requested data
+  if (pFilterSampleBuffer)
+  {
+    if (!m_SourceOutFilterQueue.QueueSampleBuffer(pFilterSampleBuffer))
+      delete pFilterSampleBuffer;
+  }
+
 
 
   // Update the historic buffer
@@ -824,7 +916,7 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
   filter_max=filters.Length();
   for (filter=0;filter<filter_max;filter++)
   {
-  filters[filter]->Apply(source_mix_buffer, buffer, buffer_samples, &(renderer->render_format));
+  filters[filter]->Apply(source_mix_buffer, buffer, buffer_samples, &(renderer->m_PlaybackFormat));
   }
 
   // Add the post-filter mixed buffer into the renderer buffer
@@ -833,15 +925,17 @@ size_t SndSysSourceSoftware3D::MergeIntoBuffer (csSoundSample *channel_buffer,
   }
   */
 
-  if (buffer_samples<original_buffer_samples)
-      renderer->RecordEvent(SSEC_SOURCE, SSEL_DEBUG, "Source could not provide all requested samples.  Provided [%d] of [%d]",
-                            buffer_samples,original_buffer_samples);
+
+  if (frame_count<original_frame_count)
+      renderer->RecordEvent(SSEC_SOURCE, SSEL_DEBUG, "Source could not provide all requested frames.  Provided [%d] of [%d]",
+                            frame_count,original_frame_count);
+
 
   // TEST: Pretend like we always returned the number of requested samples.  This will cause a gap (scratch) in audio output
   //       if we didn't really get enough samples, but if we consider the timing provided by the renderer as authoritative
   //       and the source disagrees with this timing then a gap is inevitable.
   //       This solves the issue where an end-of-stream condition causes a short read.
-  return original_buffer_samples;
+  return original_frame_count;
 }
 
 bool SndSysSourceSoftware3D::ProcessSoundChain(int channel, size_t buffer_samples)
@@ -865,7 +959,7 @@ bool SndSysSourceSoftware3D::ProcessSoundChain(int channel, size_t buffer_sample
   if (iid_distance < 1.0f) iid_distance=1.0f;
 
   // The rolloff factor is applied as a factor to the natural rolloff power   - 2.0?
-  float rollofffactor=renderer->Listener->active_properties.rolloff_factor * 1.0f;
+  float rollofffactor=renderer->m_pListener->active_properties.rolloff_factor * 1.0f;
 
   // Calculate the intensity for this channel using listener channel direction
   vol = speaker_scale[channel] * active_parameters.volume;
@@ -883,7 +977,7 @@ bool SndSysSourceSoftware3D::ProcessSoundChain(int channel, size_t buffer_sample
   // Calculate the delay for this channel, this is based off difference in distance between the closest channel and this channel
   float delay_dist=speaker_distance[channel]-closest_speaker;
   float time=delay_dist / 331.4f;
-  float fsamples=time * renderer->render_format.Freq;
+  float fsamples=time * renderer->m_PlaybackFormat.Freq;
   size_t samples = fsamples;
 
   if (samples<1)
@@ -916,8 +1010,8 @@ bool SndSysSourceSoftware3D::ProcessSoundChain(int channel, size_t buffer_sample
   filter_props.channel=channel;
   filter_props.clean_buffer=clean_buffer;
   filter_props.closest_speaker_distance=closest_speaker;
-  filter_props.listener_parameters=&(renderer->Listener->active_properties);
-  filter_props.sound_format=&(renderer->render_format);
+  filter_props.listener_parameters=&(renderer->m_pListener->active_properties);
+  filter_props.sound_format=&(renderer->m_PlaybackFormat);
   filter_props.source_parameters=&(active_parameters);
   filter_props.work_buffer=working_buffer;
   filter_props.speaker_distance=speaker_distance;

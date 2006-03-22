@@ -25,15 +25,11 @@
 
 
 
-SCF_IMPLEMENT_IBASE(SndSysListenerSoftware)
-	SCF_IMPLEMENTS_INTERFACE(iSndSysListener)
-SCF_IMPLEMENT_IBASE_END
 
 
-SndSysListenerSoftware::SndSysListenerSoftware()
+SndSysListenerSoftware::SndSysListenerSoftware() :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   active_properties.front.Set(0,0,1.0f);
   active_properties.top.Set(0.0f,1.0f,0.0f);
   active_properties.position.Set(0.0f,0.0f,0.0f);
@@ -47,7 +43,6 @@ SndSysListenerSoftware::SndSysListenerSoftware()
 
 SndSysListenerSoftware::~SndSysListenerSoftware()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void SndSysListenerSoftware::SetDirection(const csVector3 &Front, const csVector3 &Top)

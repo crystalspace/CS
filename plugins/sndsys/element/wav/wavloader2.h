@@ -20,38 +20,59 @@
 #ifndef SNDSYS_LOADER_WAV_H
 #define SNDSYS_LOADER_WAV_H
 
+#include "isndsys/ss_loader.h"
+#include "csutil/scf_implementation.h"
 
 
-// Waveform audio loader
-
-class SndSysWavLoader : public iSndSysLoader
+/// iSndSysLoader interface for PCM Waveform audio data
+//
+//  This also implements the iComponent interface for the entire sndsyswav plugin.
+//  This interface was chosen because only one instance of the loader needs exist.
+//  In contrast to the data and stream classes, which will have many object instances
+//   in existence at once (usually).
+class SndSysWavLoader : 
+  public scfImplementation2<SndSysWavLoader, iSndSysLoader, iComponent>
 {
 public:
-  SCF_DECLARE_IBASE;
-
-  struct eiComponent : public iComponent
+  SndSysWavLoader (iBase *parent) : 
+      scfImplementationType(this, parent)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (SndSysWavLoader);
-    virtual bool Initialize (iObjectRegistry *){return true;}
-  } scfiComponent;
-
-  SndSysWavLoader (iBase *parent)
-  {
-    SCF_CONSTRUCT_IBASE (parent);
-    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   }
 
   virtual ~SndSysWavLoader ()
   {
-    SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-    SCF_DESTRUCT_IBASE();
   }
 
-  virtual csPtr<iSndSysData> LoadSound (iDataBuffer* Buffer)
+
+  ////
+  // Interface implementation
+  ////
+
+  //------------------------
+  // iComponent
+  //------------------------
+public:
+  /// Initialize this component.  Not much to do here.
+  virtual bool Initialize (iObjectRegistry *){return true;}
+
+
+  /// This function provides the caller with an iSndSysData interface with which
+  //   they may access the PCM audio provided in the Buffer parameter.
+  //
+  //  \param pDescription This parameter is an optional description which will be attached
+  //         to the newly created data element.  A filename is a good choice. This value 
+  //         may be NULL (0).
+  virtual csPtr<iSndSysData> LoadSound (iDataBuffer* Buffer, const char *pDescription)
   {
     SndSysWavSoundData *sd=0;
+    // Verify the audio is indeed PCM Waveform that we can understand
     if (SndSysWavSoundData::IsWav (Buffer))
+    {
+      // Create the data object
       sd = new SndSysWavSoundData ((iBase*)this, Buffer);
+      // Set the Data object desctiption to the passed value (may be NULL)
+      sd->SetDescription(pDescription);
+    }
 				      
     return csPtr<iSndSysData> (sd);
   }

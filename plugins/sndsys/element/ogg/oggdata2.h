@@ -29,6 +29,8 @@
 #include "isndsys/ss_structs.h"
 #include "isndsys/ss_data.h"
 
+#include "csutil/scf_implementation.h"
+
 
 
 // This hack works around a build problem with some installations of Ogg/Vorbis
@@ -58,13 +60,15 @@ struct OggDataStore
   }
 };
 
-
+/// A simple structure used by the stream to store both position
+//  and a reference to the data
 struct OggStreamData
 {
   OggDataStore *datastore;
   size_t position;
 };
 
+/// A structure describing the list of callbacks used for various ogg functionality
 struct cs_ov_callbacks
 {
   cs_ov_callbacks ();
@@ -75,21 +79,38 @@ struct cs_ov_callbacks
 };
 
 
-class SndSysOggSoundData : public iSndSysData
+/// The implementation of iSndSysData for Ogg Vorbis audio
+class SndSysOggSoundData : 
+  public scfImplementation1<SndSysOggSoundData, iSndSysData>
 {
- public:
-  SCF_DECLARE_IBASE;
-
+public:
   /// Construction requires passing an iDataBuffer which references encoded ogg vorbis audio
   SndSysOggSoundData (iBase *pParent, iDataBuffer* pDataBuffer);
   virtual ~SndSysOggSoundData ();
 
+  ////
+  // Internal functions
+  ////
+protected:
 
+  /// This is required to initialize the m_SampleCount and m_SoundFormat member variables. It is called internally.
+  //    This is only called the first time that SoundFormat or SampleCount data is requested.
+  void Initialize();
+
+
+  ////
+  // Interface implementation
+  ////
+
+  //------------------------
+  // iSndSysData
+  //------------------------
+public:
   /// Get the format of the sound data.
   virtual const csSndSysSoundFormat *GetFormat();
 
-  /// Get size of this sound in samples.
-  virtual size_t GetSampleCount();
+  /// Get size of this sound in frames.
+  virtual size_t GetFrameCount();
 
   /**
    * Return the size of the data stored in bytes.  This is informational only
@@ -111,20 +132,19 @@ class SndSysOggSoundData : public iSndSysData
   /// Call to determine if the provided data can be decoded as ogg vorbis audio
   static bool IsOgg (iDataBuffer* Buffer);
 
-protected:
-  ////
-  //  Internal functions
-  ////
+  /// Set an optional description to be associated with this sound data
+  //   A filename isn't a bad idea!
+  virtual void SetDescription(const char *pDescription);
 
-  /// This is required to initialize the m_SampleCount and m_SoundFormat member variables. It is called internally.
-  //    This is only called the first time that SoundFormat or SampleCount data is requested.
-  void Initialize();
+  /// Retrieve the description associated with this sound data
+  //   This may return 0 if no description is set.
+  virtual const char *GetDescription() { return m_pDescription; }
 
 
- protected:
    ////
    //  Member variables
    ////
+protected:
 
    /// An accessor structure for the underlying ogg vorbis sound data
   OggDataStore m_DataStore;
@@ -136,8 +156,11 @@ protected:
   //    Currently this is the default format that the ogg vorbis library returns for a given Ogg audio file.
   csSndSysSoundFormat m_SoundFormat;
 
-  /// The number of samples in the decoded output
-  long m_SampleCount;
+  /// The number of frames in the decoded output
+  long m_FrameCount;
+
+  /// An optional brief description of the sound data
+  char *m_pDescription;
 };
 
 #endif // #ifndef SNDSYS_DATA_OGG_H

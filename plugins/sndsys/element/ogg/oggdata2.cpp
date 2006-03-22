@@ -25,9 +25,6 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (SndSysOggSoundData)
-  SCF_IMPLEMENTS_INTERFACE (iSndSysData)
-SCF_IMPLEMENT_IBASE_END
 
 // As of 2004/10/05 the specs to which these functions (should) adhere is located at
 // http://www.xiph.org/ogg/vorbis/doc/vorbisfile/callbacks.html
@@ -100,11 +97,10 @@ cs_ov_callbacks *GetCallbacks()
 }
 
 SndSysOggSoundData::SndSysOggSoundData (iBase *pParent, iDataBuffer* pDataBuffer) :
+  scfImplementationType(this, pParent),
   // Create a new DataStore associated with the passed DataBuffer
-  m_DataStore(pDataBuffer)
+  m_DataStore(pDataBuffer), m_pDescription(0)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-
   // Set some default format information
   m_SoundFormat.Bits = 16;
   m_SoundFormat.Channels = 2;
@@ -115,7 +111,7 @@ SndSysOggSoundData::SndSysOggSoundData (iBase *pParent, iDataBuffer* pDataBuffer
 
 SndSysOggSoundData::~SndSysOggSoundData ()
 {
-  SCF_DESTRUCT_IBASE();
+  delete[] m_pDescription;
 }
 
 const csSndSysSoundFormat *SndSysOggSoundData::GetFormat()
@@ -125,11 +121,11 @@ const csSndSysSoundFormat *SndSysOggSoundData::GetFormat()
   return &m_SoundFormat;
 }
 
-size_t SndSysOggSoundData::GetSampleCount()
+size_t SndSysOggSoundData::GetFrameCount()
 {
   if (!m_DataReady)
     Initialize();
-  return m_SampleCount;
+  return m_FrameCount;
 }
 
 size_t SndSysOggSoundData::GetDataSize()
@@ -145,6 +141,19 @@ iSndSysStream *SndSysOggSoundData::CreateStream (
 
   return (pStream);
 }
+
+void SndSysOggSoundData::SetDescription(const char *pDescription)
+{
+  delete[] m_pDescription;
+  m_pDescription=0;
+
+  if (!pDescription)
+    return;
+
+  m_pDescription=new char[strlen(pDescription)+1];
+  strcpy(m_pDescription, pDescription);
+}
+
 
 void SndSysOggSoundData::Initialize()
 {
@@ -165,13 +174,14 @@ void SndSysOggSoundData::Initialize()
 
   // The ogg vorbis functions can deal with 64 bit counts of samples, we only use 32 bit for now
   pcm_count=ov_pcm_total(&f, -1);
-  m_SampleCount=(long)(pcm_count & 0x7FFFFFFF);
 
   // Retrieve and store the sound format information
   v_info=ov_info(&f,-1);
   m_SoundFormat.Freq=v_info->rate;
   m_SoundFormat.Bits=v_info->bitrate_nominal;
   m_SoundFormat.Channels=v_info->channels;
+
+  m_FrameCount=(long)((pcm_count / v_info->channels) & 0x7FFFFFFF);
 
   // Cleanup
   ov_clear(&f);

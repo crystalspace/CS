@@ -25,19 +25,18 @@
 #include "iutil/comp.h"
 #include "csgeom/vector3.h"
 
+#include "csutil/array.h"
+
 #include "isndsys/ss_structs.h"
 #include "isndsys/ss_renderer.h"
 #include "isndsys/ss_eventrecorder.h"
 
 #include "../../utility/queue.h"
 
+#include "filterqueue.h"
 
-//#include "csutil/scf.h"
-//#include "csutil/array.h"
-//#include "csutil/cfgacc.h"
-//#include "csutil/thread.h"
-//#include "iSndSys/data2.h"
-//#include "iSndSys/renderer2.h"
+#include "compressor.h"
+
 
 #define MAX_CHANNELS 18
 
@@ -77,49 +76,12 @@ class SndSysSourceSoftware;
 struct iSndSysSourceSoftware;
 struct iReporter;
 
-class csSndSysRendererSoftware : public iSndSysRenderer
+class csSndSysRendererSoftware : 
+  public scfImplementation4<csSndSysRendererSoftware, iComponent, iEventHandler,  iSndSysRenderer, iSndSysRendererSoftware>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   csSndSysRendererSoftware(iBase *piBase);
   virtual ~csSndSysRendererSoftware();
-
-  // Called when the renderer plugin is opened
-  bool Open ();
-
-  // Called when the renderer plugin is closed
-  void Close ();
-
-
-  /// Set Volume (range from 0.0 to 1.0)
-  virtual void SetVolume (float vol);
-
-  /// Get Volume (range from 0.0 to 1.0)
-  virtual float GetVolume ();
-
-
-  /**
-   * Uses the provided iSndSysData to create a sound stream with the given
-   * 3D rendering mode
-   */
-  virtual csPtr<iSndSysStream> CreateStream(iSndSysData* data, int mode3d);
-
-  /// Creates a source when provided with a Sound Stream
-  virtual csPtr<iSndSysSource> CreateSource(iSndSysStream* stream);
-
-  /// Remove a stream from the sound renderer's list of streams
-  virtual bool RemoveStream(iSndSysStream* stream);
-
-  /// Remove a source from the sound renderer's list of sources
-  virtual bool RemoveSource(iSndSysSource* source);
-
-  /// Get the global Listener object
-  virtual csRef<iSndSysListener> GetListener ();
-
-
-  /// Send a message to the console reporter
-  void Report (int severity, const char* msg, ...);
 
   /// Called by the driver thread to request sound data
   virtual size_t FillDriverBuffer(void *buf1, size_t buf1_len,
@@ -127,72 +89,156 @@ public:
 
   /// Send a message to the sound system event recorder
   //   This version may be called by other components that have a reference to the renderer
-  //   so that they dont need to hold a EventRecorder reference themselves (sources for example)
+  //   so that they dont need to hold an EventRecorder reference themselves (sources for example)
   void RecordEvent(SndSysEventCategory Category, SndSysEventLevel Severity, const char* msg, ...);
 
 
+  /// Local copy of the pointer to the object registry interface
+  iObjectRegistry *m_pObjectRegistry;
 
-  // The object registry
-  iObjectRegistry *object_reg;
+  /// The global listener object which controls how sound is perceived
+  csRef<SndSysListenerSoftware> m_pListener;
 
-  // the global listener object
-  csRef<SndSysListenerSoftware> Listener;
-
-  /// The sample format used by the software renderer
-  csSndSysSoundFormat render_format;
-
-  /// Set to true if the driver expects little endian data
-  bool driver_little_endian;
+  /// The sample format used by the software renderer for audio output
+  csSndSysSoundFormat m_PlaybackFormat;
 
   // TODO: Move to listener
-  struct st_speaker_properties Speakers[MAX_CHANNELS];
+  struct st_speaker_properties m_Speakers[MAX_CHANNELS];
 
 protected:
   /// Interface to the Configuration file
-  csConfigAccess Config;
+  csConfigAccess m_Config;
 
   /// Interface to the low level sound driver
-  csRef<iSndSysSoftwareDriver> SoundDriver;
+  csRef<iSndSysSoftwareDriver> m_pSoundDriver;
 
   /// Global volume setting
-  float Volume;
+  float m_GlobalVolume;
 
-  Queue<iSndSysSourceSoftware> source_add_queue;
-  Queue<iSndSysSource> source_remove_queue,source_clear_queue;
-  csArray<iSndSysSourceSoftware *> sources;
-  Queue<iSndSysStream> stream_add_queue,stream_remove_queue,stream_clear_queue;
-  csArray<iSndSysStream *> streams;
+  /** The thread safe queue containing pointers to sources which should be added 
+   *    to the active list.
+   *
+   *  Entries are added to this queue only in the CreateSource() interface function
+   *   and we know (really!) that the sources are all of type iSndSysSourceSoftware.
+   *  Entries in this queue are removed and processed by ProcessPendingSources()
+  */
+  Queue<iSndSysSourceSoftware> m_SourceAddQueue;
 
-  csTicks last_ticks;
+  /** The thread safe queue containing pointers to sources which should be removed 
+   *    from the active list.
+   *
+   *  Entries are added to this queue in RemoveSource() or AdvanceStreams().
+   *  Entries in this queue are removed and processed by ProcessPendingSources()
+  */
+  Queue<iSndSysSource> m_SourceRemoveQueue;
 
-  // Pointer to a buffer of sound samples used to mix data prior to
-  // sending to the driver
-  csSoundSample *sample_buffer;
-  size_t sample_buffer_samples;
+  /** The thread safe queue containing pointers to sources which have been removed 
+   *    from the active list and should be cleaned up.
+   *
+   *  Entries are added to this queue in ProcessPendingSources() after being removed
+   *    from the Remove queue.
+   *  Entries in this queue are removed and decref'd by the GarbageCollection()
+   *    function.
+  */
+  Queue<iSndSysSource> m_SourceClearQueue;
 
-  uint32 last_intensity_multiplier;
+  /// The list of active sources.  
+  //  Active sources do not necessarily always produce audible output.
+  //  
+  //  Do not change this to a reference counted array.  Reference counting is not thread safe.
+  csArray<iSndSysSourceSoftware *> m_ActiveSources;
+
+  /// This is the list of active sources as held by the foreground thread for the purpose of filter dispatching.
+  //
+  //  Do not access this member from the background thread.  
+  //
+  csRefArray<iSndSysSourceSoftware> m_FilterSources;
+
+
+  /** The thread safe queue containing pointers to streams which should be added 
+  *    to the active list.
+  *
+  *  Entries are added to this queue in the CreateStream() interface function.
+  *  Entries in this queue are removed and processed by ProcessPendingStreams()
+  */
+  Queue<iSndSysStream> m_StreamAddQueue;
+
+  /** The thread safe queue containing pointers to streams which should be removed 
+  *    from the active list.
+  *
+  *  Entries are added to this queue in RemoveStream() or AdvanceStreams().
+  *  Entries in this queue are removed and processed by ProcessPendingStreams()
+  */
+  Queue<iSndSysStream> m_StreamRemoveQueue;
+
+  /** The thread safe queue containing pointers to streams which have been removed 
+  *    from the active list and should be cleaned up.
+  *
+  *  Entries are added to this queue in ProcessPendingStreams() after being removed
+  *    from the Remove queue.
+  *  Entries in this queue are removed and decref'd by the GarbageCollection()
+  *    function.
+  */
+  Queue<iSndSysStream> m_StreamClearQueue;
+
+  /// The list of active streams.  
+  //  Active streams do not necessarily always produce audible output.
+  //  
+  //  Do not change this to a reference counted array.  Reference counting is not thread safe.
+  csArray<iSndSysStream *> m_ActiveStreams;
+
+
+  /// Pointer to a buffer of sound samples used to mix data prior to sending to the driver
+  csSoundSample *m_pSampleBuffer;
+
+  /// Size of the sample buffer in frames of audio
+  size_t m_SampleBufferFrames;
 
   /// ID of the 'Open' event fired on system startup
   csEventID evSystemOpen;
-
   /// ID of the 'Close' event fired on system shutdown
   csEventID evSystemClose;
-
   /// ID of the 'Frame' event fired once each frame
   csEventID evFrame;
 
   /// The last time (in csTicks) that the source/stream garbage collection process was run
-  csTicks LastGarbageCollectionTicks;
+  csTicks m_LastGarbageCollectionTicks;
+
+  /// Set to true if the driver expects little endian data
+  bool m_bDriverLittleEndian;
+
+  /// TODO: This should probably be combined into a buffer normalization class
+  //     along with the Normalize routine
+  uint32 m_LastIntensityMultiplier;
+
+  /// Testing normalization interface
+  csSoundCompressor *m_pSoundCompressor;
 
 #ifdef CS_DEBUG
   /// The last time status information was reported
-  csTicks LastStatusReport;
+  csTicks m_LastStatusReport;
 #endif
 
   /// The event recorder interface, if active
-  csRef<iSndSysEventRecorder> EventRecorder;
+  csRef<iSndSysEventRecorder> m_pEventRecorder;
+
+  /// The output filter queue.
+  //  This stores any attached filters as well as the buffers queued for delivery to the filters
+  SndSysOutputFilterQueue m_OutputFilterQueue;
+
+  /// Stores the list of components that have registered for callback notification
+  csRefArray<iSndSysRendererSoftwareCallback> m_CallbackList;
 
 protected:
+  // Called when the renderer plugin is opened from the HandleEvent function
+  bool Open();
+
+  // Called when the renderer plugin is closed from the HandleEvent function
+  void Close();
+
+  /// Send a message to the console reporter
+  void Report (int severity, const char* msg, ...);
+
   /// Performs cleanup operations on removed sources and streams
   //      !!WARNING!!  DO NOT CALL THIS FROM THE BACKGROUND THREAD
   void GarbageCollection();
@@ -210,12 +256,43 @@ protected:
 
   /// Report current renderer status via RecordEvent
   //   This function only has a body in debug mode
-  void StatusReport(csTicks CurrentTime);
+  void StatusReport();
 
-  size_t CalculateMaxSamples(size_t bytes);
-  void CalculateMaxBuffers(size_t samples, size_t *buf1_len, size_t *buf2_len);
+  /// Called when a source is added to the sound renderer
+  void SourceAdded(iSndSysSource *pSource);
+  /// Called when a source is removed from the sound renderer
+  void SourceRemoved(iSndSysSource *pSource);
+  /// Called when a stream is added to the sound renderer
+  void StreamAdded(iSndSysStream *pStream);
+  /// Called when a stream is removed from the sound renderer
+  void StreamRemoved(iSndSysStream *pStream);
+
+  /// Advance active streams in time equal to the provided renderer audio frame count
+  //   This function also handles auto-unregister streams which have completed playback
+  //   by moving them to a cleanup queue.
+  void AdvanceStreams(size_t Frames);
+
+  /// Process the addition and removal queues for sources. 
+  //  This should only be called from the background thread. 
+  //
+  //  This function processes requests (usually from the application running in 
+  //   the main thread) to add sources to the system or remove active sources 
+  //   from the system.
   void ProcessPendingSources();
+
+  /// Process the addition and removal queues for streams. 
+  //  This should only be called from the background thread. 
+  //
+  //  This function processes requests (usually from the application running in 
+  //   the main thread) to add streams to the system or remove active streams 
+  //   from the system.
   void ProcessPendingStreams();
+
+  /// Called to dequeue output sound buffers and send them to the output filters
+  void ProcessOutputFilters();
+
+  void ClearOutputFilters();
+
   void NormalizeSampleBuffer(size_t used_samples);
   void CopySampleBufferToDriverBuffer(void *drvbuf1,size_t drvbuf1_len,
     void *drvbuf2, size_t drvbuf2_len, size_t samples_per_channel);
@@ -223,46 +300,80 @@ protected:
   csSoundSample *CopySampleBufferToDriverBuffer(void *drvbuf, 
     size_t drvbuf_len, csSoundSample *src, size_t samples_per_channel);
   
-public:
+
   ////
-  //
   // Interface implementation
-  //
   ////
 
+  //------------------------
   // iComponent
+  //------------------------
+public:
   virtual bool Initialize (iObjectRegistry *obj_reg);
 
+  //------------------------
   // iEventHandler
+  //------------------------
+public:
   virtual bool HandleEvent (iEvent &e);
+  CS_EVENTHANDLER_NAMES("crystalspace.sndsys.renderer")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csSndSysRendererSoftware);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
+  //--------------------------
+  // iSndSysRendererSoftware
+  //--------------------------
+
+  /// Add an output filter at the specified location.
+  //  Output filters can only receive sound data and cannot modify it.  They will receive data
+  //   from the same thread that the CS event handler executes in, once per frame.
+  //
+  //  Valid Locations:  SS_FILTER_LOC_RENDEROUT
+  //  
+  //  Returns FALSE if the filter could not be added.
+  virtual bool AddOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter);
+
+  /// Remove an output filter from the registered list
+  //
+  //  Valid Locations:  SS_FILTER_LOC_RENDEROUT
+  //
+  // Returns FALSE if the filter is not in the list at the time of the call.
+  virtual bool RemoveOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter);
+
+  /// Register a component to receive notification of renderer events
+  virtual bool RegisterCallback(iSndSysRendererSoftwareCallback *pCallback);
+
+  /// Unregister a previously registered callback component 
+  virtual bool UnregisterCallback(iSndSysRendererSoftwareCallback *pCallback);
+
+  //------------------------
+  // iSndSysRenderer
+  //------------------------
+public:
+  /// Set m_GlobalVolume (range from 0.0 to 1.0)
+  virtual void SetVolume (float vol);
+
+  /// Get m_GlobalVolume (range from 0.0 to 1.0)
+  virtual float GetVolume ();
+
+  /**
+  * Uses the provided iSndSysData to create a sound stream with the given
+  * 3D rendering mode
+  */
+  virtual csPtr<iSndSysStream> CreateStream(iSndSysData* data, int mode3d);
+
+  /// Creates a source when provided with a Sound Stream
+  virtual csPtr<iSndSysSource> CreateSource(iSndSysStream* stream);
+
+  /// Remove a stream from the sound renderer's list of streams
+  virtual bool RemoveStream(iSndSysStream* stream);
+
+  /// Remove a source from the sound renderer's list of sources
+  virtual bool RemoveSource(iSndSysSource* source);
+
+  /// Get the global listener object
+  virtual csRef<iSndSysListener> GetListener ();
 
 
-  struct EventHandler : public iEventHandler
-  {
-  private:
-    csSndSysRendererSoftware* parent;
-  public:
-    SCF_DECLARE_IBASE;
-    EventHandler (csSndSysRendererSoftware* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      EventHandler::parent = parent;
-    }
-    virtual ~EventHandler ()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
-    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
-    CS_EVENTHANDLER_NAMES("crystalspace.sndsys.renderer")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } * scfiEventHandler;
 };
 
 #endif // #ifndef SNDSYS_RENDERER_SOFTWARE_RENDERER_H

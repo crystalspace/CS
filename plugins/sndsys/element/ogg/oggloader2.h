@@ -20,38 +20,66 @@
 #ifndef SNDSYS_LOADER_OGG_H
 #define SNDSYS_LOADER_OGG_H
 
+#include "isndsys/ss_loader.h"
+
+#include "csutil/scf_implementation.h"
 
 
-// ogg loader
-
-class SndSysOggLoader : public iSndSysLoader
+/// iSndSysLoader interface for Ogg Vorbis audio data
+//
+//  This also implements the iComponent interface for the entire sndsysogg plugin.
+//  This interface was chosen because only one instance of the loader needs exist.
+//  In contrast to the data and stream classes, which will have many object instances
+//   in existence at once (usually).
+class SndSysOggLoader : public 
+  scfImplementation2<SndSysOggLoader, iSndSysLoader, iComponent>
 {
 public:
-  SCF_DECLARE_IBASE;
-
-  struct eiComponent : public iComponent
+  /// A very un-busy constructor
+  SndSysOggLoader (iBase *parent) :
+      scfImplementationType(this, parent)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (SndSysOggLoader);
-    virtual bool Initialize (iObjectRegistry *){return true;}
-  } scfiComponent;
-
-  SndSysOggLoader (iBase *parent)
-  {
-    SCF_CONSTRUCT_IBASE (parent);
-    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   }
 
+  // Sim
   virtual ~SndSysOggLoader ()
   {
-    SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-    SCF_DESTRUCT_IBASE();
   }
 
-  virtual csPtr<iSndSysData> LoadSound (iDataBuffer* Buffer)
+  ////
+  // Interface implementation
+  ////
+
+  //------------------------
+  // iComponent
+  //------------------------
+public:
+  /// Initialize this component. Not much to do here.
+  virtual bool Initialize (iObjectRegistry *){return true;}
+
+  //------------------------
+  // iSndSysLoader
+  //------------------------
+public:
+
+  /// This function provides the caller with an iSndSysData interface with which
+  //   they may access the Ogg Vorbis audio provided in the Buffer parameter.
+  //
+  //  \param pDescription This parameter is an optional description which will be attached
+  //         to the newly created data element.  A filename is a good choice. This value 
+  //         may be NULL (0).
+  virtual csPtr<iSndSysData> LoadSound (iDataBuffer* Buffer, const char *pDescription)
   {
     SndSysOggSoundData *sd=0;
+
+    // If the passed data is not Ogg Vorbis data, then we cannot use it
     if (SndSysOggSoundData::IsOgg (Buffer))
+    {
+      // Create the Data object.
       sd = new SndSysOggSoundData ((iBase*)this, Buffer);
+      // Set the Data object desctiption to the passed value (may be NULL)
+      sd->SetDescription(pDescription);
+    }
 
     return csPtr<iSndSysData> (sd);
   }

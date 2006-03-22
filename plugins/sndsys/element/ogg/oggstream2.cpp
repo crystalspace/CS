@@ -39,164 +39,162 @@
  */
 #define OGG_DECODE_BUFFER_SIZE 4096
 
-SCF_IMPLEMENT_IBASE (SndSysOggSoundStream)
-  SCF_IMPLEMENTS_INTERFACE (iSndSysStream)
-SCF_IMPLEMENT_IBASE_END
-
 extern cs_ov_callbacks *GetCallbacks();
 
 const size_t positionInvalid = (size_t)~0;
 
 SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data, 
-					    OggDataStore *datastore, 
-					    csSndSysSoundFormat *renderformat, 
-					    int mode3d)
+					    OggDataStore *datastore, csSndSysSoundFormat *renderformat, 
+              int mode3d) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   // Copy render format information
-  memcpy(&render_format,renderformat,sizeof(csSndSysSoundFormat));
+  memcpy(&m_RenderFormat,renderformat,sizeof(csSndSysSoundFormat));
 
   // Initialize the stream data
-  stream_data.datastore=datastore;
-  stream_data.position=0;
+  m_StreamData.datastore=datastore;
+  m_StreamData.position=0;
 
-  sound_data=data;
+  m_SoundData=data;
 
   // Allocate an advance buffer
-  p_cyclicbuffer = new CS::Sound::SoundCyclicBuffer (
-    (render_format.Bits/8 * render_format.Channels) * 
-      (render_format.Freq * OGG_BUFFER_LENGTH_MULTIPLIER / 
+  m_pCyclicBuffer = new CS::Sound::SoundCyclicBuffer (
+    (m_RenderFormat.Bits/8 * m_RenderFormat.Channels) * 
+      (m_RenderFormat.Freq * OGG_BUFFER_LENGTH_MULTIPLIER / 
 	OGG_BUFFER_LENGTH_DIVISOR));
-  CS_ASSERT(p_cyclicbuffer!=0);
+  CS_ASSERT(m_pCyclicBuffer!=0);
 
   // Initialize ogg file
-  memset(&vorbis_file,0,sizeof(OggVorbis_File));
-  ov_open_callbacks (&stream_data,&vorbis_file,0,0,
+  memset(&m_VorbisFile,0,sizeof(OggVorbis_File));
+  ov_open_callbacks (&m_StreamData,&m_VorbisFile,0,0,
     *(ov_callbacks*)GetCallbacks());
 
   // Start the most advanced read pointer at offset 0
-  most_advanced_read_pointer=0;
+  m_MostAdvancedReadPointer=0;
 
-  // Set stream to paused, at the beginning, and not looping
-  paused=true;
-  last_time=0;
-  looping=false;
+  // Set stream to m_bPaused, at the beginning, and not m_bLooping
+  m_bPaused=true;
+  m_bLooping=false;
 
   // A prepared data buffer will be allocated when we know the size needed
-  prepared_data_buffer=0;
-  prepared_data_buffer_length=0;
-  prepared_buffer_start=0;
+  m_pPreparedDataBuffer=0;
+  m_PreparedDataBufferSize=0;
+  m_PreparedDataBufferStart=0;
 
   // Set the render sample size
-  render_sample_size=(renderformat->Bits/8) * renderformat->Channels;
+  m_RenderFrameSize=(renderformat->Bits/8) * renderformat->Channels;
 
   // No extra data left in the decode buffer since last call
-  prepared_buffer_usage=0;
+  m_PreparedDataBufferUsage=0;
 
   // Playback rate is initially 100% (normal)
-  playback_percent=100;
+  m_PlaybackPercent=100;
 
   /* Forces the output buffer to be resized and the converter to be created on 
    * the first pass */
-  output_frequency=0;
+  m_OutputFrequency=0;
 
   // Output frequency is initially the same as the render frequency
-  new_output_frequency=renderformat->Freq;
+  m_NewOutputFrequency=renderformat->Freq;
 
   // Set to not a valid stream
-  current_ogg_stream=-1;
+  m_CurrentOggStream=-1;
 
   // Let the pcm converter get created on the first pass
-  pcm_convert=0;
+  m_pPCMConverter=0;
 
   // No new position 
-  new_position = positionInvalid;
+  m_NewPosition = positionInvalid;
 
   // Store the 3d mode
-  mode_3d=mode3d;
+  m_3DMode=mode3d;
 
-  // Auto unregister not requested
-  auto_unregister=false;
+  // Auto m_bAutoUnregisterReady not requested
+  m_bAutoUnregisterRequested=false;
 
   // Not ready to be unregistered
-  unregister=false;
+  m_bAutoUnregisterReady=false;
 
   // Playback not complete
-  playback_read_complete=false;
+  m_bPlaybackReadComplete=false;
 }
 
 SndSysOggSoundStream::~SndSysOggSoundStream ()
 {
-  delete p_cyclicbuffer;
-  delete pcm_convert;
-  delete[] prepared_data_buffer;
-
-  SCF_DESTRUCT_IBASE();
+  delete m_pCyclicBuffer;
+  delete m_pPCMConverter;
+  delete[] m_pPreparedDataBuffer;
 }
+
+const char *SndSysOggSoundStream::GetDescription()
+{
+  // Try to retrieve the description from the underlying data component.
+  const char *pDesc=m_SoundData->GetDescription();
+
+  // If the data component has no description, return a default description.
+  if (!pDesc)
+    return "Ogg Stream";
+  return pDesc;
+}
+
 
 const csSndSysSoundFormat *SndSysOggSoundStream::GetRenderedFormat()
 {
-  return &render_format;
+  return &m_RenderFormat;
 }
 
 int SndSysOggSoundStream::Get3dMode()
 {
-  return mode_3d;
+  return m_3DMode;
 }
 
 
-size_t SndSysOggSoundStream::GetSampleCount()
+size_t SndSysOggSoundStream::GetFrameCount()
 {
-  const csSndSysSoundFormat *data_format=sound_data->GetFormat();
+  const csSndSysSoundFormat *data_format=m_SoundData->GetFormat();
 
-  uint64 samplecount=sound_data->GetSampleCount();
-  samplecount*=(render_format.Channels * render_format.Freq);
-  samplecount/=(data_format->Channels * data_format->Freq);
+  uint64 framecount=m_SoundData->GetFrameCount();
+  framecount*=m_RenderFormat.Freq;
+  framecount/=data_format->Freq;
 
-  return samplecount;
+  return framecount;
 }
 
 
 size_t SndSysOggSoundStream::GetPosition()
 {
-  return most_advanced_read_pointer;
+  return m_MostAdvancedReadPointer;
 
 }
 
 bool SndSysOggSoundStream::ResetPosition()
 {
-  new_position=0;
-//  p_cyclicbuffer->Clear();
-//  most_advanced_read_pointer=0;
-  playback_read_complete=false;
+  m_NewPosition=0;
   return true;
 }
 
 bool SndSysOggSoundStream::SetPosition (size_t newposition)
 {
-  new_position=newposition;
-  //p_cyclicbuffer->Clear(newposition);
-  playback_read_complete=false;
+  m_NewPosition=newposition;
   return true;
 }
 
 bool SndSysOggSoundStream::Pause()
 {
-  paused=true;
+  m_bPaused=true;
   return true;
 }
 
 
 bool SndSysOggSoundStream::Unpause()
 {
-  paused=false;
+  m_bPaused=false;
   return true;
 }
 
 int SndSysOggSoundStream::GetPauseState()
 {
-  if (paused)
+  if (m_bPaused)
     return CS_SNDSYS_STREAM_PAUSED;
   return CS_SNDSYS_STREAM_UNPAUSED;
 }
@@ -206,10 +204,10 @@ bool SndSysOggSoundStream::SetLoopState(int loopstate)
   switch (loopstate)
   {
     case CS_SNDSYS_STREAM_DONTLOOP:
-      looping=false;
+      m_bLooping=false;
       break;
     case CS_SNDSYS_STREAM_LOOP:
-      looping=true;
+      m_bLooping=true;
       break;
     default:
       return false; // Looping mode not supported
@@ -223,20 +221,20 @@ bool SndSysOggSoundStream::SetLoopState(int loopstate)
  */
 int SndSysOggSoundStream::GetLoopState()
 {
-  if (looping)
+  if (m_bLooping)
     return CS_SNDSYS_STREAM_LOOP;
   return CS_SNDSYS_STREAM_DONTLOOP;
 }
 
 void SndSysOggSoundStream::SetPlayRatePercent(int percent)
 {
-  playback_percent=percent;
-  new_output_frequency = (render_format.Freq * 100) / playback_percent;
+  m_PlaybackPercent=percent;
+  m_NewOutputFrequency = (m_RenderFormat.Freq * 100) / m_PlaybackPercent;
 }
 
 int SndSysOggSoundStream::GetPlayRatePercent()
 {
-  return playback_percent;
+  return m_PlaybackPercent;
 }
 
 /** 
@@ -245,114 +243,98 @@ int SndSysOggSoundStream::GetPlayRatePercent()
  */
 void SndSysOggSoundStream::SetAutoUnregister(bool autounreg)
 {
-  auto_unregister=autounreg;
+  m_bAutoUnregisterRequested=autounreg;
 }
 
 /** 
- * If AutoUnregister is set, when the stream is paused it, and all sources 
+ * If AutoUnregister is set, when the stream is m_bPaused it, and all sources 
  * attached to it are removed from the sound engine
  */
 bool SndSysOggSoundStream::GetAutoUnregister()
 {
-  return auto_unregister;
+  return m_bAutoUnregisterRequested;
 }
 
 /// Used by the sound renderer to determine if this stream needs to be unregistered
 bool SndSysOggSoundStream::GetAutoUnregisterRequested()
 {
-  return unregister;
+  return m_bAutoUnregisterReady;
 }
 
 
-void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
+void SndSysOggSoundStream::AdvancePosition(size_t frame_delta)
 {
-  if (new_position != positionInvalid)
+  size_t needed_bytes=0;
+  if (m_NewPosition != positionInvalid)
   {
     // Signal a full cyclic buffer flush
-    last_time=0;
+    needed_bytes=m_pCyclicBuffer->GetLength();
 
     // Flush the prepared samples too
-    prepared_buffer_usage=0;
-    prepared_buffer_start=0;
+    m_PreparedDataBufferUsage=0;
+    m_PreparedDataBufferStart=0;
 
     // Seek the ogg stream to the requested position
-    ov_raw_seek(&vorbis_file,new_position);
+    ov_raw_seek(&m_VorbisFile,m_NewPosition);
 
-    new_position = positionInvalid;
-    playback_read_complete=false;
+    m_NewPosition = positionInvalid;
+    m_bPlaybackReadComplete=false;
   }
-  if (paused || playback_read_complete)
-  {
-    last_time=current_time;
+  if (m_bPaused || m_bPlaybackReadComplete || frame_delta==0)
     return;
-  }
 
  
   long bytes_read=0;
-  size_t needed_bytes;
-  long elapsed_ms;
   
-  if (last_time==0)
-  {
-    needed_bytes=p_cyclicbuffer->GetLength();
-  }
-  else
-  {
-    elapsed_ms=current_time - last_time;
 
-    if (elapsed_ms==0)
-      return;
+  // Figure out how many bytes we need to fill for this advancement
+  if (needed_bytes==0)
+    needed_bytes=frame_delta * (m_RenderFormat.Bits/8) * m_RenderFormat.Channels ;
 
-    // Figure out how many bytes we need to fill for this advancement
-    needed_bytes=((elapsed_ms * render_format.Freq) / 1000) * 
-      (render_format.Bits/8) * render_format.Channels ;
+  /* If we need more space than is available in the whole cyclic buffer, 
+   * then we already underbuffered, reduce to just 1 cycle full
+   */
+  if ((size_t)needed_bytes > m_pCyclicBuffer->GetLength())
+    needed_bytes=(long)(m_pCyclicBuffer->GetLength() & 0x7FFFFFFF);
 
-    /* If we need more space than is available in the whole cyclic buffer, 
-     * then we already underbuffered, reduce to just 1 cycle full
-     */
-    if ((size_t)needed_bytes > p_cyclicbuffer->GetLength())
-      needed_bytes=(long)(p_cyclicbuffer->GetLength() & 0x7FFFFFFF);
-  }
   // Free space in the cyclic buffer if necessary
-  if (needed_bytes > p_cyclicbuffer->GetFreeBytes())
-    p_cyclicbuffer->AdvanceStartValue (needed_bytes - 
-      p_cyclicbuffer->GetFreeBytes());
+  if (needed_bytes > m_pCyclicBuffer->GetFreeBytes())
+    m_pCyclicBuffer->AdvanceStartValue (needed_bytes - 
+      m_pCyclicBuffer->GetFreeBytes());
 
   // Fill in leftover decoded data if needed
-  if (prepared_buffer_usage > 0)
+  if (m_PreparedDataBufferUsage > 0)
     needed_bytes -= CopyBufferBytes (needed_bytes);
-
-  last_time=current_time;
 
   while (needed_bytes > 0)
   {
-    int last_ogg_stream=current_ogg_stream;
+    int last_ogg_stream=m_CurrentOggStream;
     char ogg_decode_buffer[OGG_DECODE_BUFFER_SIZE];
 
     bytes_read=0;
 
     while (bytes_read==0)
     {
-      bytes_read = ov_read (&vorbis_file, ogg_decode_buffer,
+      bytes_read = ov_read (&m_VorbisFile, ogg_decode_buffer,
 	OGG_DECODE_BUFFER_SIZE, OGG_ENDIAN,
-	(render_format.Bits==8)?1:2, (render_format.Bits==8)?0:1,
-	&current_ogg_stream);
+	(m_RenderFormat.Bits==8)?1:2, (m_RenderFormat.Bits==8)?0:1,
+	&m_CurrentOggStream);
    
       // Assert on error
       CS_ASSERT(bytes_read >=0);
 
       if (bytes_read <= 0)
       {
-        if (!looping)
+        if (!m_bLooping)
         {
           // Seek back to the beginning for a restart.  Pause on the next call
-          playback_read_complete=true;
-          ov_raw_seek(&vorbis_file,0);
+          m_bPlaybackReadComplete=true;
+          ov_raw_seek(&m_VorbisFile,0);
           return;
         }
 
         // Loop by resetting the position to the beginning and continuing
-        ov_raw_seek(&vorbis_file,0);
+        ov_raw_seek(&m_VorbisFile,0);
       }
     }
 
@@ -360,54 +342,54 @@ void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
     
 
     // If streams changed, the format may have changed as well
-    if ((new_output_frequency != output_frequency) 
-      || (last_ogg_stream != current_ogg_stream))
+    if ((m_NewOutputFrequency != m_OutputFrequency) 
+      || (last_ogg_stream != m_CurrentOggStream))
     {
       int needed_buffer,source_sample_size;
 
-      output_frequency=new_output_frequency;
+      m_OutputFrequency=m_NewOutputFrequency;
 
-      current_ogg_format_info=ov_info(&vorbis_file,current_ogg_stream);
+      m_pCurrentOggFormatInfo=ov_info(&m_VorbisFile,m_CurrentOggStream);
 
       // Create the pcm sample converter if it's not yet created
-      if (pcm_convert == 0)
-        pcm_convert = new CS::Sound::PCMSampleConverter (
-	  current_ogg_format_info->channels, render_format.Bits,
-	  current_ogg_format_info->rate);
+      if (m_pPCMConverter == 0)
+        m_pPCMConverter = new CS::Sound::PCMSampleConverter (
+	  m_pCurrentOggFormatInfo->channels, m_RenderFormat.Bits,
+	  m_pCurrentOggFormatInfo->rate);
 
       // Calculate the size of one source sample
-      source_sample_size=current_ogg_format_info->channels * render_format.Bits;
+      source_sample_size=m_pCurrentOggFormatInfo->channels * m_RenderFormat.Bits;
 
       // Calculate the needed buffer size for this conversion
-      needed_buffer = (pcm_convert->GetRequiredOutputBufferMultiple (
-	render_format.Channels,render_format.Bits,output_frequency) * 
+      needed_buffer = (m_pPCMConverter->GetRequiredOutputBufferMultiple (
+	m_RenderFormat.Channels,m_RenderFormat.Bits,m_OutputFrequency) * 
 	  (OGG_DECODE_BUFFER_SIZE + source_sample_size))/1024;
 
       // Allocate a new buffer if needed - this will only happen if the source rate changes
-      if (prepared_data_buffer_length < needed_buffer)
+      if (m_PreparedDataBufferSize < needed_buffer)
       {
-        delete[] prepared_data_buffer;
-        prepared_data_buffer = new char[needed_buffer];
-        prepared_data_buffer_length=needed_buffer;
+        delete[] m_pPreparedDataBuffer;
+        m_pPreparedDataBuffer = new char[needed_buffer];
+        m_PreparedDataBufferSize=needed_buffer;
       }
     }
 
     // If no conversion is necessary 
-    if ((current_ogg_format_info->rate == output_frequency) &&
-        (current_ogg_format_info->channels == render_format.Channels))
+    if ((m_pCurrentOggFormatInfo->rate == m_OutputFrequency) &&
+        (m_pCurrentOggFormatInfo->channels == m_RenderFormat.Channels))
     {
-      CS_ASSERT(bytes_read <= prepared_data_buffer_length);
-      memcpy(prepared_data_buffer,ogg_decode_buffer,bytes_read);
-      prepared_buffer_usage=bytes_read;
+      CS_ASSERT(bytes_read <= m_PreparedDataBufferSize);
+      memcpy(m_pPreparedDataBuffer,ogg_decode_buffer,bytes_read);
+      m_PreparedDataBufferUsage=bytes_read;
     }
     else
     {
-      prepared_buffer_usage = pcm_convert->ConvertBuffer (ogg_decode_buffer,
-	bytes_read, prepared_data_buffer, render_format.Channels,
-	render_format.Bits,output_frequency);
+      m_PreparedDataBufferUsage = m_pPCMConverter->ConvertBuffer (ogg_decode_buffer,
+	bytes_read, m_pPreparedDataBuffer, m_RenderFormat.Channels,
+	m_RenderFormat.Bits,m_OutputFrequency);
     }
 
-    if (prepared_buffer_usage > 0)
+    if (m_PreparedDataBufferUsage > 0)
       needed_bytes -= CopyBufferBytes (needed_bytes);
 
   }
@@ -417,21 +399,25 @@ void SndSysOggSoundStream::AdvancePosition(csTicks current_time)
 
 size_t SndSysOggSoundStream::CopyBufferBytes(size_t max_dest_bytes)
 {
-  if (max_dest_bytes >= prepared_buffer_usage)
+  // If the entire prepared buffer can fit into the cyclic buffer, copy it
+  //  there and reset the prepared buffer so we can use to it from the
+  //  beginning again.
+  if (max_dest_bytes >= m_PreparedDataBufferUsage)
   {
-    max_dest_bytes=prepared_buffer_usage;
-    p_cyclicbuffer->AddBytes (&(prepared_data_buffer[prepared_buffer_start]),
+    max_dest_bytes=m_PreparedDataBufferUsage;
+    m_pCyclicBuffer->AddBytes (&(m_pPreparedDataBuffer[m_PreparedDataBufferStart]),
       max_dest_bytes);
-    prepared_buffer_usage=0;
-    prepared_buffer_start=0;
+    m_PreparedDataBufferUsage=0;
+    m_PreparedDataBufferStart=0;
     return max_dest_bytes;
   }
 
-
-  p_cyclicbuffer->AddBytes (&(prepared_data_buffer[prepared_buffer_start]),
+  // Otherwise copy what will fit and update the position and remaining byte
+  //  indicators appropriately.
+  m_pCyclicBuffer->AddBytes (&(m_pPreparedDataBuffer[m_PreparedDataBufferStart]),
     max_dest_bytes);
-  prepared_buffer_usage-=max_dest_bytes;
-  prepared_buffer_start+=max_dest_bytes;
+  m_PreparedDataBufferUsage-=max_dest_bytes;
+  m_PreparedDataBufferStart+=max_dest_bytes;
   return max_dest_bytes;
 }
 
@@ -445,23 +431,23 @@ void SndSysOggSoundStream::GetDataPointers (size_t* position_marker,
 					    void **buffer2,
 					    size_t *buffer2_length)
 {
-  p_cyclicbuffer->GetDataPointersFromPosition (position_marker,
+  m_pCyclicBuffer->GetDataPointersFromPosition (position_marker,
     max_requested_length, (uint8 **)buffer1, buffer1_length, 
     (uint8 **)buffer2,buffer2_length);
 
   /* If read is finished and we've underbuffered here, then we can mark the 
    * stream as paused so no further advancement takes place */
-  if ((!paused) && (playback_read_complete) 
+  if ((!m_bPaused) && (m_bPlaybackReadComplete) 
       && ((*buffer1_length + *buffer2_length) < max_requested_length))
   {
-    paused=true;
-    if (auto_unregister)
-      unregister=true;
-    playback_read_complete=false;
+    m_bPaused=true;
+    if (m_bAutoUnregisterRequested)
+      m_bAutoUnregisterReady=true;
+    m_bPlaybackReadComplete=false;
   }
 
-  if (*position_marker > most_advanced_read_pointer)
-    most_advanced_read_pointer=*position_marker;
+  if (*position_marker > m_MostAdvancedReadPointer)
+    m_MostAdvancedReadPointer=*position_marker;
 }
 
 
@@ -469,5 +455,5 @@ void SndSysOggSoundStream::GetDataPointers (size_t* position_marker,
 void SndSysOggSoundStream::InitializeSourcePositionMarker (
   size_t *position_marker)
 {
-  *position_marker=most_advanced_read_pointer;
+  *position_marker=m_MostAdvancedReadPointer;
 }

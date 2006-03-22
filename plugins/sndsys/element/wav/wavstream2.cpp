@@ -34,158 +34,161 @@
 #define WAV_DECODE_BUFFER_SIZE 4096
 
 
-SCF_IMPLEMENT_IBASE (SndSysWavSoundStream)
-  SCF_IMPLEMENTS_INTERFACE (iSndSysStream)
-SCF_IMPLEMENT_IBASE_END
-
 static const size_t positionInvalid = (size_t)~0;
 
 SndSysWavSoundStream::SndSysWavSoundStream (csRef<SndSysWavSoundData> data, 
-  char *WavData, size_t WavDataLen, csSndSysSoundFormat *renderformat, 
-  int mode3d)
+        char *WavData, size_t WavDataLen, csSndSysSoundFormat *renderformat, 
+        int mode3d) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   // Copy render format information
-  memcpy(&render_format,renderformat,sizeof(csSndSysSoundFormat));
+  memcpy(&m_RenderFormat,renderformat,sizeof(csSndSysSoundFormat));
 
   // Copy the wav data buffer start and length
-  wav_data_start=WavData;
-  wav_bytes_total=WavDataLen;
+  m_pWavDataBase=WavData;
+  m_WavDataLength=WavDataLen;
 
   // Current position is at the beginning
-  wav_data=wav_data_start;
-  wav_bytes_left=wav_bytes_total;
+  m_pWavCurrentPointer=m_pWavDataBase;
+  m_WavBytesLeft=m_WavDataLength;
 
 
-  sound_data=data;
+  m_SoundData=data;
 
   // Allocate an advance buffer
-  p_cyclicbuffer = new CS::Sound::SoundCyclicBuffer (
-    (render_format.Bits/8 * render_format.Channels) * 
-    (render_format.Freq * WAV_BUFFER_LENGTH_MULTIPLIER / 
+  m_pCyclicBuffer = new CS::Sound::SoundCyclicBuffer (
+    (m_RenderFormat.Bits/8 * m_RenderFormat.Channels) * 
+    (m_RenderFormat.Freq * WAV_BUFFER_LENGTH_MULTIPLIER / 
       WAV_BUFFER_LENGTH_DIVISOR));
-  CS_ASSERT(p_cyclicbuffer!=0);
+  CS_ASSERT(m_pCyclicBuffer!=0);
 
   // Start the most advanced read pointer at offset 0
-  most_advanced_read_pointer=0;
+  m_MostAdvancedReadPointer=0;
 
-  // Set stream to paused, at the beginning, and not looping
-  paused=true;
-  last_time=0;
-  looping=false;
+  // Set stream to m_bPaused, at the beginning, and not m_bLooping
+  m_bPaused=true;
+  m_bLooping=false;
 
   // Set the render sample size
-  render_sample_size=(renderformat->Bits/8) * renderformat->Channels;
+  m_RenderFrameSize=(renderformat->Bits/8) * renderformat->Channels;
 
 
   // The prepared data buffer will be initialized on first use
-  prepared_data_buffer=0;
-  prepared_data_buffer_length=0;
-  prepared_buffer_start=0;
+  m_pPreparedDataBuffer=0;
+  m_PreparedDataBufferSize=0;
+  m_PreparedDataBufferStart=0;
 
   // No extra data left in the decode buffer since last call
-  prepared_buffer_usage=0;
+  m_PreparedDataBufferUsage=0;
 
   // Playback rate is initially 100% (normal)
-  playback_percent=100;
+  m_PlaybackPercent=100;
 
   /* Forces the output buffer to be resized and the converter to be created on 
    * the first pass */
-  output_frequency=0;
+  m_OutputFrequency=0;
 
   // Output frequency is initially the same as the render frequency
-  new_output_frequency=renderformat->Freq;
+  m_NewOutputFrequency=renderformat->Freq;
 
   // Let the pcm converter get created on the first pass
-  pcm_convert=0;
+  m_pPCMConverter=0;
 
   // No new position 
-  new_position = positionInvalid;
+  m_NewPosition = positionInvalid;
 
   // Store the 3d mode
-  mode_3d=mode3d;
+  m_3DMode=mode3d;
 
-  // Auto unregister not requested
-  auto_unregister=false;
+  // Auto m_bAutoUnregisterReady not requested
+  m_bAutoUnregisterRequested=false;
 
   // Not ready to be unregistered
-  unregister=false;
+  m_bAutoUnregisterReady=false;
 
   // Playback isn't complete
-  playback_read_complete=false;
+  m_bPlaybackReadComplete=false;
 }
 
 SndSysWavSoundStream::~SndSysWavSoundStream ()
 {
-  delete p_cyclicbuffer;
-  delete pcm_convert;
-  delete[] prepared_data_buffer;
-
-  SCF_DESTRUCT_IBASE();
+  delete m_pCyclicBuffer;
+  delete m_pPCMConverter;
+  delete[] m_pPreparedDataBuffer;
 }
+
+const char *SndSysWavSoundStream::GetDescription()
+{
+  const char *pDesc=m_SoundData->GetDescription();
+  if (!pDesc)
+    return "Wav Stream";
+  return pDesc;
+}
+
 
 const csSndSysSoundFormat *SndSysWavSoundStream::GetRenderedFormat()
 {
-  return &render_format;
+  return &m_RenderFormat;
 }
 
 int SndSysWavSoundStream::Get3dMode()
 {
-  return mode_3d;
+  return m_3DMode;
 }
 
 
-size_t SndSysWavSoundStream::GetSampleCount()
+size_t SndSysWavSoundStream::GetFrameCount()
 {
-  const csSndSysSoundFormat *data_format=sound_data->GetFormat();
+  // The Frame count is the modified by the relative frequencies of
+  //  the data and the renderer
+  const csSndSysSoundFormat *data_format=m_SoundData->GetFormat();
+ 
+  uint64 framecount=m_SoundData->GetFrameCount();
+  framecount*=m_RenderFormat.Freq;
+  framecount/=data_format->Freq;
 
-  uint64 samplecount=sound_data->GetSampleCount();
-  samplecount*=(render_format.Channels * render_format.Freq);
-  samplecount/=(data_format->Channels * data_format->Freq);
-
-  return (size_t)(samplecount & 0x7FFFFFFF);
+  return (size_t)(framecount & 0x7FFFFFFF);
 }
 
 
 size_t SndSysWavSoundStream::GetPosition()
 {
-  return most_advanced_read_pointer;
+  return m_MostAdvancedReadPointer;
 }
 
 bool SndSysWavSoundStream::ResetPosition()
 {
-  new_position=0;
-//  p_cyclicbuffer->Clear();
-//  most_advanced_read_pointer=0;
-  playback_read_complete=false;
+  m_NewPosition=0;
+//  m_pCyclicBuffer->Clear();
+//  m_MostAdvancedReadPointer=0;
+  m_bPlaybackReadComplete=false;
   return true;
 }
 
 bool SndSysWavSoundStream::SetPosition (size_t newposition)
 {
-  new_position=newposition;
-//  p_cyclicbuffer->Clear(newposition);
-  playback_read_complete=false;
+  m_NewPosition=newposition;
+//  m_pCyclicBuffer->Clear(newposition);
+  m_bPlaybackReadComplete=false;
   return true;
 }
 
 bool SndSysWavSoundStream::Pause()
 {
-  paused=true;
+  m_bPaused=true;
   return true;
 }
 
 
 bool SndSysWavSoundStream::Unpause()
 {
-  paused=false;
+  m_bPaused=false;
   return true;
 }
 
 int SndSysWavSoundStream::GetPauseState()
 {
-  if (paused)
+  if (m_bPaused)
     return CS_SNDSYS_STREAM_PAUSED;
   return CS_SNDSYS_STREAM_UNPAUSED;
 }
@@ -195,10 +198,10 @@ bool SndSysWavSoundStream::SetLoopState(int loopstate)
   switch (loopstate)
   {
     case CS_SNDSYS_STREAM_DONTLOOP:
-      looping=false;
+      m_bLooping=false;
       break;
     case CS_SNDSYS_STREAM_LOOP:
-      looping=true;
+      m_bLooping=true;
       break;
     default:
       return false; // Looping mode not supported
@@ -212,39 +215,39 @@ bool SndSysWavSoundStream::SetLoopState(int loopstate)
  */
 int SndSysWavSoundStream::GetLoopState()
 {
-  if (looping)
+  if (m_bLooping)
     return CS_SNDSYS_STREAM_LOOP;
   return CS_SNDSYS_STREAM_DONTLOOP;
 }
 
 void SndSysWavSoundStream::SetPlayRatePercent(int percent)
 {
-  playback_percent=percent;
-  new_output_frequency = (render_format.Freq * 100) / playback_percent;
+  m_PlaybackPercent=percent;
+  m_NewOutputFrequency = (m_RenderFormat.Freq * 100) / m_PlaybackPercent;
 }
 
 int SndSysWavSoundStream::GetPlayRatePercent()
 {
-  return playback_percent;
+  return m_PlaybackPercent;
 }
 
 
 /**
- * If AutoUnregister is set, when the stream is paused it, and all sources 
+ * If AutoUnregister is set, when the stream is m_bPaused it, and all sources 
  * attached to it are removed from the sound engine.
  */
 void SndSysWavSoundStream::SetAutoUnregister(bool autounreg)
 {
-  auto_unregister=autounreg;
+  m_bAutoUnregisterRequested=autounreg;
 }
 
 /**
- * If AutoUnregister is set, when the stream is paused it, and all sources 
+ * If AutoUnregister is set, when the stream is m_bPaused it, and all sources 
  * attached to it are removed from the sound engine. 
  */
 bool SndSysWavSoundStream::GetAutoUnregister()
 {
-  return auto_unregister;
+  return m_bAutoUnregisterRequested;
 }
 
 /** 
@@ -253,71 +256,56 @@ bool SndSysWavSoundStream::GetAutoUnregister()
  */
 bool SndSysWavSoundStream::GetAutoUnregisterRequested()
 {
-  return unregister;
+  return m_bAutoUnregisterReady;
 }
 
 
-void SndSysWavSoundStream::AdvancePosition(csTicks current_time)
+void SndSysWavSoundStream::AdvancePosition(size_t frame_delta)
 {
+  size_t needed_bytes=0;
 
-  if (new_position != positionInvalid)
+  // If a new position has been requested via the SetPosition function,
+  //  handle that first.
+  if (m_NewPosition != positionInvalid)
   {
     // Signal a full cyclic buffer flush
-    last_time=0;
+    needed_bytes=m_pCyclicBuffer->GetLength();
 
     // Flush the prepared samples too
-    prepared_buffer_usage=0;
-    prepared_buffer_start=0;
+    m_PreparedDataBufferUsage=0;
+    m_PreparedDataBufferStart=0;
 
     // Move the wav read position to the requested position
-    if (new_position >= wav_bytes_total)
-      new_position=wav_bytes_total-1;
-    wav_data=wav_data_start+new_position;
-    wav_bytes_left=wav_bytes_total-new_position;
+    if (m_NewPosition >= m_WavDataLength)
+      m_NewPosition=m_WavDataLength-1;
+    m_pWavCurrentPointer=m_pWavDataBase+m_NewPosition;
+    m_WavBytesLeft=m_WavDataLength-m_NewPosition;
 
-    new_position = positionInvalid;
-    playback_read_complete=false;
+    m_NewPosition = positionInvalid;
+    m_bPlaybackReadComplete=false;
   }
-  if (paused || playback_read_complete)
-  {
-    last_time=current_time;
+  if (m_bPaused || m_bPlaybackReadComplete || frame_delta==0)
     return;
-  }
 
 
-  size_t needed_bytes;
-  size_t elapsed_ms;
   
-  if (last_time==0)
-  {
 
-    needed_bytes=p_cyclicbuffer->GetLength();
-  }
-  else
-  {
-    elapsed_ms=current_time - last_time;
 
-    if (elapsed_ms==0)
-      return;
+  // Figure out how many bytes we need to fill for this advancement
+  if (needed_bytes==0)
+    needed_bytes=frame_delta  * (m_RenderFormat.Bits/8) * m_RenderFormat.Channels;
 
-    // Figure out how many bytes we need to fill for this advancement
-    needed_bytes=((elapsed_ms * render_format.Freq) / 1000) * (render_format.Bits/8) * render_format.Channels ;
-
-    // If we need more space than is available in the whole cyclic buffer, then we already underbuffered, reduce to just 1 cycle full
-    if ((size_t)needed_bytes > p_cyclicbuffer->GetLength())
-      needed_bytes=(size_t)(p_cyclicbuffer->GetLength() & 0x7FFFFFFF);
-
-  }
+  // If we need more space than is available in the whole cyclic buffer, then we already underbuffered, reduce to just 1 cycle full
+  if ((size_t)needed_bytes > m_pCyclicBuffer->GetLength())
+    needed_bytes=(size_t)(m_pCyclicBuffer->GetLength() & 0x7FFFFFFF);
 
   // Free space in the cyclic buffer if necessary
-  if ((size_t)needed_bytes > p_cyclicbuffer->GetFreeBytes())
-    p_cyclicbuffer->AdvanceStartValue(needed_bytes - (size_t)(p_cyclicbuffer->GetFreeBytes() & 0x7FFFFFFF));
+  if ((size_t)needed_bytes > m_pCyclicBuffer->GetFreeBytes())
+    m_pCyclicBuffer->AdvanceStartValue(needed_bytes - (size_t)(m_pCyclicBuffer->GetFreeBytes() & 0x7FFFFFFF));
 
   // Fill in leftover decoded data if needed
-  if (prepared_buffer_usage > 0)
+  if (m_PreparedDataBufferUsage > 0)
     needed_bytes-=CopyBufferBytes(needed_bytes);
-
-  last_time=current_time;
 
 
   while (needed_bytes>0)
@@ -327,32 +315,32 @@ void SndSysWavSoundStream::AdvancePosition(csTicks current_time)
 //    if (available_bytes > WAV_DECODE_BUFFER_SIZE)
 //      available_bytes=WAV_DECODE_BUFFER_SIZE;
 
-    if (available_bytes > wav_bytes_left)
-      available_bytes=wav_bytes_left;
+    if (available_bytes > m_WavBytesLeft)
+      available_bytes=m_WavBytesLeft;
 
 
     // If the output frequency has changed, a new converter is necessary
-    if (new_output_frequency != output_frequency)
+    if (m_NewOutputFrequency != m_OutputFrequency)
     {
       int needed_buffer,source_sample_size;
-      const csSndSysSoundFormat *data_format=sound_data->GetFormat();
+      const csSndSysSoundFormat *data_format=m_SoundData->GetFormat();
 
-      output_frequency=new_output_frequency;
+      m_OutputFrequency=m_NewOutputFrequency;
 
       // Create the pcm sample converter if it's not yet created
-      if (pcm_convert == 0)
+      if (m_pPCMConverter == 0)
       {
 #ifdef CS_LITTLE_ENDIAN
-        pcm_convert = new CS::Sound::PCMSampleConverter (
+        m_pPCMConverter = new CS::Sound::PCMSampleConverter (
 	  data_format->Channels,data_format->Bits,data_format->Freq);
 #else
         // If we're running on a big endian system and the data is using 
 	// 16 bit samples, endian conversion is necessary
         if (data_format->Bits>8)
-          pcm_convert = new CS::Sound::PCMSampleConverter(
+          m_pPCMConverter = new CS::Sound::PCMSampleConverter(
 	    data_format->Channels,data_format->Bits,data_format->Freq, true);
         else
-          pcm_convert = new CS::Sound::PCMSampleConverter (
+          m_pPCMConverter = new CS::Sound::PCMSampleConverter (
 	    data_format->Channels,data_format->Bits,data_format->Freq);
 #endif
       }
@@ -361,94 +349,92 @@ void SndSysWavSoundStream::AdvancePosition(csTicks current_time)
       source_sample_size=data_format->Channels * data_format->Bits;
 
       // Calculate the needed buffer size for this conversion
-      needed_buffer=(pcm_convert->GetRequiredOutputBufferMultiple (
-	render_format.Channels,render_format.Bits,output_frequency) * 
+      needed_buffer=(m_pPCMConverter->GetRequiredOutputBufferMultiple (
+	m_RenderFormat.Channels,m_RenderFormat.Bits,m_OutputFrequency) * 
 	(WAV_DECODE_BUFFER_SIZE + source_sample_size))/1024;
 
       // Allocate a new buffer if needed - this will only happen if the source rate changes
-      if (prepared_data_buffer_length < needed_buffer)
+      if (m_PreparedDataBufferSize < needed_buffer)
       {
-        delete[] prepared_data_buffer;
-        prepared_data_buffer = new char[needed_buffer];
-        prepared_data_buffer_length=needed_buffer;
+        delete[] m_pPreparedDataBuffer;
+        m_pPreparedDataBuffer = new char[needed_buffer];
+        m_PreparedDataBufferSize=needed_buffer;
       }
 
       
-      if ((data_format->Bits == render_format.Bits) &&
-          (data_format->Channels == render_format.Channels) &&
-          (data_format->Freq == render_format.Freq))
+      if ((data_format->Bits == m_RenderFormat.Bits) &&
+          (data_format->Channels == m_RenderFormat.Channels) &&
+          (data_format->Freq == m_RenderFormat.Freq))
       {
-          conversion_needed=false;
+          m_bConversionNeeded=false;
       }
       else
-        conversion_needed=true;
+        m_bConversionNeeded=true;
 
 #ifdef CS_BIG_ENDIAN
       // WAV data is always stored in little endian format.  If we're running 
       // on a big endian system and we're reading 16 bit samples, then we need 
       // a converter
       if (data_format->Bits >8)
-        conversion_needed=true;
+        m_bConversionNeeded=true;
 #endif
 
     }
 
     // If no conversion is necessary 
-    if (!conversion_needed)
+    if (!m_bConversionNeeded)
     {
-      memcpy(prepared_data_buffer,wav_data,available_bytes);
-      prepared_buffer_usage=available_bytes;
+      memcpy(m_pPreparedDataBuffer,m_pWavCurrentPointer,available_bytes);
+      m_PreparedDataBufferUsage=available_bytes;
     }
     else
-      prepared_buffer_usage = pcm_convert->ConvertBuffer (
-	wav_data,available_bytes,prepared_data_buffer,render_format.Channels,
-      render_format.Bits,output_frequency);
+      m_PreparedDataBufferUsage = m_pPCMConverter->ConvertBuffer (
+	m_pWavCurrentPointer,available_bytes,m_pPreparedDataBuffer,m_RenderFormat.Channels,
+      m_RenderFormat.Bits,m_OutputFrequency);
 
     // Decrease the available bytes and move the buffer pointer ahead
-    wav_data+=available_bytes;
-    wav_bytes_left-=available_bytes;
+    m_pWavCurrentPointer+=available_bytes;
+    m_WavBytesLeft-=available_bytes;
 
     // Copy the data available into the destination buffer as requested
-    if (prepared_buffer_usage > 0)
+    if (m_PreparedDataBufferUsage > 0)
       needed_bytes-=CopyBufferBytes(needed_bytes);
 
     // At the end of the stream, do we loop or stop?
-    if (wav_bytes_left<=0)
+    if (m_WavBytesLeft<=0)
     {
-      if (!looping)
+      if (!m_bLooping)
       {
-        playback_read_complete=true;
-        wav_data=wav_data_start;
-        wav_bytes_left=wav_bytes_total;
+        m_bPlaybackReadComplete=true;
+        m_pWavCurrentPointer=m_pWavDataBase;
+        m_WavBytesLeft=m_WavDataLength;
         break;
       }
 
       // Loop by resetting the position to the beginning and continuing
-      wav_data=wav_data_start;
-      wav_bytes_left=wav_bytes_total;
+      m_pWavCurrentPointer=m_pWavDataBase;
+      m_WavBytesLeft=m_WavDataLength;
     }
   }
-
-
       
 }
 
 
 size_t SndSysWavSoundStream::CopyBufferBytes (size_t max_dest_bytes)
 {
-  if (max_dest_bytes >= prepared_buffer_usage)
+  if (max_dest_bytes >= m_PreparedDataBufferUsage)
   {
-    max_dest_bytes=prepared_buffer_usage;
-    p_cyclicbuffer->AddBytes(&(prepared_data_buffer[prepared_buffer_start]),max_dest_bytes);
-    prepared_buffer_usage=0;
-    prepared_buffer_start=0;
+    max_dest_bytes=m_PreparedDataBufferUsage;
+    m_pCyclicBuffer->AddBytes(&(m_pPreparedDataBuffer[m_PreparedDataBufferStart]),max_dest_bytes);
+    m_PreparedDataBufferUsage=0;
+    m_PreparedDataBufferStart=0;
     return max_dest_bytes;
   }
 
 
-  p_cyclicbuffer->AddBytes(&(prepared_data_buffer[prepared_buffer_start]),max_dest_bytes);
-  prepared_buffer_usage-=max_dest_bytes;
-  prepared_buffer_start+=max_dest_bytes;
+  m_pCyclicBuffer->AddBytes(&(m_pPreparedDataBuffer[m_PreparedDataBufferStart]),max_dest_bytes);
+  m_PreparedDataBufferUsage-=max_dest_bytes;
+  m_PreparedDataBufferStart+=max_dest_bytes;
   return max_dest_bytes;
 }
 
@@ -462,27 +448,27 @@ void SndSysWavSoundStream::GetDataPointers (size_t* position_marker,
 					    void **buffer2,
 					    size_t *buffer2_length)
 {
-  p_cyclicbuffer->GetDataPointersFromPosition (position_marker,
+  m_pCyclicBuffer->GetDataPointersFromPosition (position_marker,
     max_requested_length, (uint8 **)buffer1, buffer1_length, 
     (uint8 **)buffer2, buffer2_length);
 
   /* If read is finished and we've underbuffered here, then we can mark the 
-   * stream as paused so no further advancement takes place */
-  if ((!paused) && (playback_read_complete) 
+   * stream as m_bPaused so no further advancement takes place */
+  if ((!m_bPaused) && (m_bPlaybackReadComplete) 
     && ((*buffer1_length + *buffer2_length) < max_requested_length))
   {
-    paused=true;
-    if (auto_unregister)
-      unregister=true;
-    playback_read_complete=false;
+    m_bPaused=true;
+    if (m_bAutoUnregisterRequested)
+      m_bAutoUnregisterReady=true;
+    m_bPlaybackReadComplete=false;
   }
 
-  if (*position_marker > most_advanced_read_pointer)
-    most_advanced_read_pointer=*position_marker;
+  if (*position_marker > m_MostAdvancedReadPointer)
+    m_MostAdvancedReadPointer=*position_marker;
 }
 
 void SndSysWavSoundStream::InitializeSourcePositionMarker (
   size_t* position_marker)
 {
-  *position_marker=most_advanced_read_pointer;
+  *position_marker=m_MostAdvancedReadPointer;
 }

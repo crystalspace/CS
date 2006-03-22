@@ -25,10 +25,6 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (SndSysWavSoundData)
-  SCF_IMPLEMENTS_INTERFACE (iSndSysData)
-SCF_IMPLEMENT_IBASE_END
-
 
 // Microsoft Wav file loader
 // support 8 and 16 bits PCM (RIFF)
@@ -58,7 +54,7 @@ SCF_IMPLEMENT_IBASE_END
 
   struct
   {
-    char  id[4];   // identifier, e.g. "fmt " or "data"
+    char  id[4];   // identifier, e.g. "m_SoundFormat " or "data"
     DWORD len;     // remaining chunk length after this header
   } chunk_hdr;
 
@@ -73,7 +69,7 @@ SCF_IMPLEMENT_IBASE_END
 
   struct _FMTchk
   {
-    char chunk_id[4];  // for the format-chunk of wav-files always "fmt "
+    char chunk_id[4];  // for the format-chunk of wav-files always "m_SoundFormat "
     unsigned long len; // length of this chunk after this 8 bytes of header
     unsigned short fmt_tag; // format category of file. 0x0001 = Microsoft PCM
     unsigned short channel; // number of channels (1 = mono, 2 = stereo)
@@ -131,63 +127,76 @@ static inline void csByteSwap32bitBuffer (uint32* ptr, size_t count)
 }
 
 
-SndSysWavSoundData::SndSysWavSoundData (iBase *parent, iDataBuffer* data)
+SndSysWavSoundData::SndSysWavSoundData (iBase *parent, iDataBuffer* data) :
+  scfImplementationType(this, parent),
+  m_pDescription(0)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-
-  ds = new WavDataStore (data);
-  fmt.Bits = 16;
-  fmt.Channels = 2;
-  data_ready = false;
+  m_pDataStore = new WavDataStore (data);
+  m_SoundFormat.Bits = 16;
+  m_SoundFormat.Channels = 2;
+  m_bInfoReady = false;
 }
 
 SndSysWavSoundData::~SndSysWavSoundData ()
 {
-  delete ds;
-  SCF_DESTRUCT_IBASE();
+  delete m_pDataStore;
 }
 
 const csSndSysSoundFormat *SndSysWavSoundData::GetFormat()
 {
-  if (!data_ready)
+  if (!m_bInfoReady)
     Initialize();
-  return &fmt;
+  return &m_SoundFormat;
 }
 
-size_t SndSysWavSoundData::GetSampleCount()
+size_t SndSysWavSoundData::GetFrameCount()
 {
-  if (!data_ready)
+  if (!m_bInfoReady)
     Initialize();
-  return sample_count;
+  return m_FrameCount;
 }
 
 size_t SndSysWavSoundData::GetDataSize()
 {
-  return wavedata_len;
+  return m_PCMDataLength;
 }
 
 iSndSysStream *SndSysWavSoundData::CreateStream (
   csSndSysSoundFormat *renderformat, int mode3d)
 {
-  if (!data_ready)
+  if (!m_bInfoReady)
     Initialize();
 
   SndSysWavSoundStream *stream=new SndSysWavSoundStream(this, 
-    (char *)wavedata, wavedata_len, renderformat, mode3d);
+    (char *)m_pPCMData, m_PCMDataLength, renderformat, mode3d);
 
   return (stream);
+}
+
+void SndSysWavSoundData::SetDescription(const char *pDescription)
+{
+  delete[] m_pDescription;
+  m_pDescription=0;
+
+  if (!pDescription)
+    return;
+
+  m_pDescription=new char[strlen(pDescription)+1];
+  strcpy(m_pDescription, pDescription);
 }
 
 void SndSysWavSoundData::Initialize()
 {
 
-  if (ReadHeaders(ds->data,ds->length,&riffhdr,&fmthdr,&wavhdr,&wavedata,&wavedata_len))
+  if (ReadHeaders(m_pDataStore->data,m_pDataStore->length,&m_RIFFHeader,&m_FMTHeader,&m_WAVHeader,&m_pPCMData,&m_PCMDataLength))
   {
-    sample_count=wavedata_len/ (fmthdr.bits_per_sample/8);
-    fmt.Freq=fmthdr.samples_per_sec;
-    fmt.Bits=fmthdr.bits_per_sample;
-    fmt.Channels=fmthdr.channel;
-    data_ready=true;
+    // The number of frames of audio is equal to the length of the audio data 
+    //  divided by the length of each frame.
+    m_FrameCount=m_PCMDataLength/ (m_FMTHeader.channel * m_FMTHeader.bits_per_sample/8);
+    m_SoundFormat.Freq=m_FMTHeader.samples_per_sec;
+    m_SoundFormat.Bits=m_FMTHeader.bits_per_sample;
+    m_SoundFormat.Channels=m_FMTHeader.channel;
+    m_bInfoReady=true;
   }
 }
 
@@ -233,7 +242,7 @@ bool SndSysWavSoundData::ReadHeaders(void *Buffer, size_t len, _RIFFchk *p_riffc
   {
     memcpy(&fmtchk, &buf[index], sizeof (fmtchk));
 
-    if (memcmp(fmtchk.chunk_id, "fmt ", 4) == 0)
+    if (memcmp(fmtchk.chunk_id, "m_SoundFormat ", 4) == 0)
       found = true;
 
     // correct length of chunk on big endian system

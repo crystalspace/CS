@@ -22,6 +22,9 @@
 
 #include "csgeom/transfrm.h"
 
+#include "isndsys/ss_listener.h"
+#include "csutil/scf_implementation.h"
+
 class csListenerProperties
 {
 public:
@@ -54,14 +57,17 @@ public:
   csTransform world_to_listener;
 };
 
-class SndSysListenerSoftware : public iSndSysListener
+class SndSysListenerSoftware : 
+  public scfImplementation1<SndSysListenerSoftware, iSndSysListener>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   SndSysListenerSoftware();
   virtual ~SndSysListenerSoftware();
 
+  //------------------------
+  // iSndSysListener
+  //------------------------
+public:
   /// Set direction of listener (front and top 3d vectors)
   virtual void SetDirection (const csVector3 &Front, const csVector3 &Top);
   /// Set position of listener
@@ -85,12 +91,18 @@ public:
   /// Get type of environment where 'live' listener
   //virtual csSoundEnvironment GetEnvironment ();
 
+  
+  //----------------------------
+  // Non-Interface Functionality
+  //----------------------------
+
   /// Migrate any queued changes to the active set
   void UpdateQueuedProperties();
 
 public:
   csListenerProperties active_properties,queued_properties;
   bool queued_update;
+
 };
 
 
