@@ -29,15 +29,16 @@
 /**\addtogroup sndsys
  * @{ */
 
-SCF_VERSION (iSndSysListener, 0, 0, 1);
-
 /**
  * The sound listener is a unique object created by the sound renderer. It
  * can be used to setup 'yourself' (the player) for 3d sound: position,
  * orientation, speed and environment effects.
  */
-struct iSndSysListener : public iBase
+struct iSndSysListener : public virtual iBase
 {
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE (iSndSysListener, 0, 0, 2);
+
   /// Set direction of listener (front and top 3d vectors)
   virtual void SetDirection (const csVector3 &Front, const csVector3 &Top) = 0;
   /// Set position of listener

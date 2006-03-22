@@ -32,8 +32,6 @@
 class csSndSysRendererSoftware; 
 struct csSndSysSoundFormat;
 
-SCF_VERSION (iSndSysSoftwareDriver, 0, 1, 0);
-
 /* TODO:  Define a csSoundDevice structure that can be used to return 
  *        information about playback devices available for use by this driver.
  *        Add interface functionality for enumerating and selecting particular 
@@ -45,8 +43,11 @@ SCF_VERSION (iSndSysSoftwareDriver, 0, 1, 0);
  * that is used by the software sound renderer. The sound driver is
  * responsible for playing a single stream of samples.
  */
-struct iSndSysSoftwareDriver : public iBase
+struct iSndSysSoftwareDriver : public virtual iBase
 {
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysSoftwareDriver,0,2,0);
+
   /**
    * Initialize the sound driver.
    *

@@ -32,15 +32,20 @@
 struct iDataBuffer;
 struct iSndSysData;
 
-SCF_VERSION (iSndSysLoader, 0, 2, 0);
-
 /**
  * The sound loader is used to load sound files given a raw input data stream.
  */
-struct iSndSysLoader : public iBase
+struct iSndSysLoader : public virtual iBase
 {
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysLoader,0,3,0);
+
   /// Create a sound object from raw input data.
-  virtual csPtr<iSndSysData> LoadSound (iDataBuffer* buffer) = 0;
+  //
+  //  Optional pDescription may point to a brief description that will follow this data
+  //   through any streams or sources created from it, and may be useful for display or
+  //   diagnostic purposes.
+  virtual csPtr<iSndSysData> LoadSound (iDataBuffer* buffer, const char *pDescription=0) = 0;
 };
 
 /** @} */

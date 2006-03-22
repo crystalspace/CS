@@ -33,6 +33,7 @@ class csSourceParameters3D;
 class csListenerProperties;
 struct iReporter;
 
+
 struct iSndSysSoftwareFilter3DProperties
 {
   csSoundSample *clean_buffer;
@@ -48,14 +49,16 @@ struct iSndSysSoftwareFilter3DProperties
   size_t channel;
 };
 
-SCF_VERSION (iSndSysSoftwareFilter3D, 0, 1, 0);
 
 /**
  * A sound filter is an interface to an object that modifies sequences of
  * sound samples.
  */
-struct iSndSysSoftwareFilter3D : public iBase
+struct iSndSysSoftwareFilter3D : public virtual iBase
 {
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysSoftwareFilter3D,0,1,0);
+
   /**
    * Apply this filter to the mutable buffer passed.  The unmutable main
    * buffer is also passed, although this is not likely to be
@@ -79,35 +82,40 @@ struct iSndSysSoftwareFilter3D : public iBase
   virtual iSndSysSoftwareFilter3D *GetPtr() = 0;
 };
 
-SCF_VERSION (iSndSysSoftwareFilterOutput, 0, 1, 0);
 
-/**
- * An output sound filter receives 
- */
-struct iSndSysSoftwareFilterOutput : public iBase
+
+/// Temporary filter interface definition.
+//
+//  This will be used by the renderer after all mixing is complete.
+//  This filter interface allows the renderer to hand off a copy of the
+//   completed sound data to an application processing function as it 
+//   is delivered to the lower level.
+struct iSndSysSoftwareOutputFilter : public virtual iBase
 {
-  /**
-   * Apply this filter to the mutable buffer passed.  The unmutable main
-   * buffer is also passed, although this is not likely to be
-   * very useful, since the main buffer has an unknown number of sources
-   * previously mixed in (possibly none).
-   * The sample_count is the number of samples available in both the mutable
-   * buffer and the main buffer.
-   * The format is the format of the audio.
-   */
-  virtual void Apply(iSndSysSoftwareFilter3DProperties &properties) = 0;
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysSoftwareOutputFilter,0,1,0);
 
-  virtual bool AddSubFilter(iSndSysSoftwareFilter3D *filter,
-  	int chain_idx=0) = 0;
+  /// Return TRUE to acknowledge that the format is supported and the filter
+  //   should stay.  Return FALSE if the filter should not be used.
+  virtual bool FormatNotify(const csSndSysSoundFormat *pSoundFormat) = 0;
 
-  virtual iSndSysSoftwareFilter3D *GetSubFilter(int chain_idx=0) = 0;
-
-  /**
-   * Retrieve the base pointer for this filter.  Used internally by the
-   * sound system.
-   */
-  virtual iSndSysSoftwareFilter3D *GetPtr() = 0;
+  /// Called to deliver data to the filter
+  virtual void DeliverData(const csSoundSample *SampleBuffer, size_t Frames) = 0;
 };
+
+
+/// Possible locations at which filters may be installed into the sound system
+typedef enum 
+{
+  // Render Output location - This is the final mix buffer before it goes to the driver
+  SS_FILTER_LOC_RENDEROUT=0,
+  // Source Output location - This is the final output from a source after all mutation filters
+  SS_FILTER_LOC_SOURCEOUT,
+  // Source Input location - This is the data the source receives from the stream before any mutation filters are applied
+  SS_FILTER_LOC_SOURCEIN
+} SndSysFilterLocation;
+
+
 
 /** @} */
 

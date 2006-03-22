@@ -51,13 +51,22 @@ enum
   CS_SND3D_ABSOLUTE
 };
 
-SCF_VERSION (iSndSysStream, 0, 1, 0);
-
-/**
- * @@@ Document me!
- */
-struct iSndSysStream : public iBase
+/// The primary interface for a sound stream used by the audio system.
+//
+//  All audio is presented to the sound system in the form of a stream.
+//  This interface is the minimal interface that all audio providing 
+//  objects must implement in order to produce sound.
+//
+struct iSndSysStream : public virtual iBase
 {
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysStream,0,2,0);
+
+  /// Retrieve a description of this stream.  
+  //  This is not guaranteed to be useful for any particular purpose, different,
+  //  or even accurate.  This is mainly for diagnostic purposes.
+  virtual const char *GetDescription() = 0;
+
   /**
    * Get the format of the rendered sound data.  This is for informational
    * purposes only.
@@ -68,16 +77,16 @@ struct iSndSysStream : public iBase
   virtual int Get3dMode() = 0;
 
   /**
-   * Get length of this stream in rendered samples.
+   * Get length of this stream in rendered frames.
    * May return CS_SNDSYS_STREAM_UNKNOWN_LENGTH if the stream is of unknown 
    * length. For example, sound data being streamed from a remote host may not 
    * have a pre-determinable length.
    */
-  virtual size_t GetSampleCount() = 0;
+  virtual size_t GetFrameCount() = 0;
 
   /**
-   * Returns the current position of this sound in rendered samples. 
-   * This should return a valid value even if GetSampleCount() returns
+   * Returns the current position of this sound in rendered frames. 
+   * This should return a valid value even if GetFrameCount() returns
    * CS_SNDSYS_STREAM_UNKNOWN_LENGTH since an object implementing
    * this interface should know its position relative to the beginning of the
    * data.  In the case where the beginning may be ambiguous
@@ -95,7 +104,7 @@ struct iSndSysStream : public iBase
   virtual bool ResetPosition() = 0;
 
   /**
-   * Sets the position of the stream to a particular sample.
+   * Sets the position of the stream to a particular frame.
    * FALSE may be returned if a set position operation is not permitted or
    * not possible.
    */
@@ -175,18 +184,19 @@ struct iSndSysStream : public iBase
 
   /**
    * NOT AN APPLICATION CALLABLE FUNCTION!   This function advances the stream
-   * position based on the provided time value which is considered as a
-   * "current time".
-   * A Sound Element will usually store the last advance time internally.
-   * When this function is called it will compare the last time with the
-   * time presented and retrieve more data from the associated iSound2Data
+   * position based on the provided frame count value which is considered as an
+   * elapsed frame count.
+   *
+   * A Sound Element will usually store the last advance frame internally.
+   * When this function is called it will compare the last frame with the
+   * frame presented and retrieve more data from the associated iSndSysData
    * container as needed.  It will then update its internal last advance
-   * time value.
+   * frame value.
    *  
    * This function is not necessarily thread safe and must be called ONLY
    * from the Sound System's main processing thread.
    */
-  virtual void AdvancePosition(csTicks current_time) = 0;
+  virtual void AdvancePosition(size_t frame_delta) = 0;
 
   /**
    * Used to retrieve pointers to properly formatted sound data.  
@@ -203,40 +213,37 @@ struct iSndSysStream : public iBase
    * calls AdvancePosition() - specifically the Sound System main processing
    * thread.
    *
-   * \param position_marker Should point to a long initially filled by the
+   * \param position_marker Should point to a size_t initially filled by the
    *        Sound System internally when a Source is created - through a call
    *        to InitializeSourcePositionMarker().
-   * \param max_requested_length Should contain the maximum number of bytes
+   * \param max_requested_frames Should contain the maximum number of frames
    *        the calling source is interested in receiving.  On return,
    *        *buffer1_length + *buffer2_length must not exceed this value.
    * \param buffer1 should point to a (void *) that will be filled with a
    *        pointer to the first chunk of data on return or NULL (0) if no
    *        data is available
-   * \param buffer1_length should point to a long that will be filled with the
-   *        length of valid data in the buffer pointed to by *buffer1 on return.
+   * \param buffer1_frames should point to a long that will be filled with the
+   *        length, in frames, of valid data in the buffer pointed to by 
+   *        *buffer1 on return.
    * \param buffer2 should point to a (void *) that will be filled with a
    *        pointer to the second chunk of data on return, or NULL (0) if no
    *        second chunk is needed.
-   * \param buffer2_length should point to a long that will be filled with the
-   *        length of valid data in the buffer pointed to by *buffer1 on return.
+   * \param buffer2_frames should point to a long that will be filled with the
+   *        length, in frames, of valid data in the buffer pointed to by 
+   *        *buffer1 on return.
    *
    * \remarks Not intended to be called by an application.
    */
-  virtual void GetDataPointers(size_t* position_marker,
-	size_t max_requested_length,
-  	void **buffer1, size_t *buffer1_length,
-	void **buffer2,	size_t *buffer2_length) = 0;
+  virtual void GetDataPointers(size_t* position_marker, size_t max_requested_frames,
+  	void **buffer1, size_t *buffer1_frames, void **buffer2,	size_t *buffer2_frames) = 0;
 
   /**
-   * Fill a long value that will be used to track a Source's position through 
+   * Fill a size_t value that will be used to track a Source's position through 
    * calls to GetDataPointers().
    *
    * \remarks Not intended to be called by an application.
    */
   virtual void InitializeSourcePositionMarker (size_t* position_marker) = 0;
-
-  /// Retrieve a direct pointer to this object
-  virtual iSndSysStream *GetPtr() = 0;
 };
 
 /** @} */

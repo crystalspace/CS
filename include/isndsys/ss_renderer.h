@@ -25,6 +25,7 @@
  */
 
 #include "csutil/scf.h"
+#include "isndsys/ss_filter.h"
 
 /**\addtogroup sndsys
  * @{ */
@@ -34,8 +35,6 @@ struct iSndSysData;
 struct iSndSysStream;
 struct iSndSysSource;
 struct iSndSysListener;
-
-SCF_VERSION (iSndSysRenderer, 0, 1, 0);
 
 #ifndef CS_SNDSYS_SOURCE_DISTANCE_INFINITE
 #define CS_SNDSYS_SOURCE_DISTANCE_INFINITE -1.0f
@@ -51,8 +50,11 @@ SCF_VERSION (iSndSysRenderer, 0, 1, 0);
  *   Should Sound Streams get processing time even if no Sound Sources are 
  *   attached?
  */
-struct iSndSysRenderer : public iBase
+struct iSndSysRenderer : public virtual iBase
 {
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysRenderer,0,2,0);
+
   /// Set Volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
   virtual void SetVolume (float vol) = 0;
 
@@ -78,6 +80,63 @@ struct iSndSysRenderer : public iBase
   /// Get the global Listener object
   virtual csRef<iSndSysListener> GetListener () = 0;
 };
+
+/// Software renderer specific interface for callback notification
+//
+//  A component wishing to receive notification of Software Sound Renderer events
+//  should implement this interface, and call iSndSysRendererSoftware::RegisterCallback()
+//  to register with the renderer.
+//
+struct iSndSysRendererSoftwareCallback : public virtual iBase
+{
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysRendererSoftwareCallback,0,1,0);
+
+  /// Called whenever a stream is added to the system
+  virtual void StreamAddNotification(iSndSysStream *pStream) = 0;
+
+  /// Called whenever a stream is removed from the system
+  virtual void StreamRemoveNotification(iSndSysStream *pStream) = 0;
+
+  /// Called whenever a source is added to the system
+  virtual void SourceAddNotification(iSndSysSource *pSource) = 0;
+
+  /// Called whenever a source is removed to the system
+  virtual void SourceRemoveNotification(iSndSysSource *pSource) = 0;
+};
+
+
+
+/// Software renderer specific interface extensions
+struct iSndSysRendererSoftware : public virtual iBase
+{
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysRendererSoftware,0,1,0);
+
+  /// Add an output filter at the specified location.
+  //  Output filters can only receive sound data and cannot modify it.  They will receive data
+  //   from the same thread that the CS event handler executes in, once per frame.
+  //
+  //  Valid Locations:  SS_FILTER_LOC_RENDEROUT
+  //  
+  //  Returns FALSE if the filter could not be added.
+  virtual bool AddOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter) = 0;
+
+  /// Remove an output filter from the registered list
+  //
+  //  Valid Locations:  SS_FILTER_LOC_RENDEROUT
+  //
+  // Returns FALSE if the filter is not in the list at the time of the call.
+  virtual bool RemoveOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter) = 0;
+
+  /// Register a component to receive notification of renderer events
+  virtual bool RegisterCallback(iSndSysRendererSoftwareCallback *pCallback) = 0;
+
+  /// Unregister a previously registered callback component 
+  virtual bool UnregisterCallback(iSndSysRendererSoftwareCallback *pCallback) = 0;
+};
+
+
 
 /** @} */
 

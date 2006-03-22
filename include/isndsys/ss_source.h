@@ -27,13 +27,11 @@
 #include "csutil/scf.h"
 #include "csgeom/vector3.h"
 #include "isndsys/ss_structs.h"
+#include "isndsys/ss_filter.h"
 
 /**\addtogroup sndsys
  * @{ */
 
-SCF_VERSION (iSndSysSource, 0, 1, 0);
-SCF_VERSION (iSndSysSourceSoftware, 0, 1, 0);
-SCF_VERSION (iSndSysSourceSoftware3D, 0, 1, 0);
 
 struct iSndSysFilter;
 struct iSndSysStream;
@@ -45,8 +43,11 @@ struct iSndSysStream;
 /**
  * @@@ Document me.
  */
-struct iSndSysSource : public iBase
+struct iSndSysSource : public virtual iBase
 {
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysSource,0,2,0);
+
   /// Set volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
   virtual void SetVolume (float volume) = 0;
   /// Get volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
@@ -55,28 +56,60 @@ struct iSndSysSource : public iBase
   /// Retrieve the iSoundStream attached to this source
   virtual csRef<iSndSysStream> GetStream() = 0;
 
+  /// Add an output filter at the specified location.
+  //  Output filters can only receive sound data and cannot modify it.  They will receive data
+  //   from the same thread that the CS event handler executes in, once per frame.
+  //
+  //  Valid Locations:  SS_FILTER_LOC_SOURCEOUT, SS_FILTER_LOC_SOURCEIN
+  //  
+  //  Returns FALSE if the filter could not be added.
+  virtual bool AddOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter) = 0;
+
+  /// Remove an output filter from the registered list
+  //
+  //  Valid Locations:  SS_FILTER_LOC_SOURCEOUT, SS_FILTER_LOC_SOURCEIN
+  //
+  // Returns FALSE if the filter is not in the list at the time of the call.
+  virtual bool RemoveOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter) = 0;
+
   /// Retrieve a direct pointer to this object
   virtual iSndSysSource *GetPtr() = 0;
 };
 
-/**
+/** 
  * @@@ Document me.
  */
-struct iSndSysSourceSoftware : public iSndSysSource
+struct iSndSysSourceSoftware : public virtual iSndSysSource
 {
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysSourceSoftware,0,1,0);
+
   /**
    * Renderer convenience interface - requests the source to fill the
    * supplied buffers
-   */
-  virtual size_t MergeIntoBuffer(csSoundSample *channel_buffer,
-  	size_t buffer_samples) = 0;
+   *
+   * @param frame_buffer - A pointer to an array of csSoundSample sample buffers
+   *                       to be filled with sound sample data
+   * @param frame_count  - The size of the buffer pointed to by frame_buffer in
+   *                       frames.
+   * @return - The number of frames that were actually filled.
+   */                       
+  virtual size_t MergeIntoBuffer(csSoundSample *frame_buffer, size_t frame_count) = 0;
+
+
+  /// Renderer convenience interface - Called to provide processing of output filters
+  virtual void ProcessOutputFilters() = 0;
+
 };
 
 /**
  * @@@ Document me.
  */
-struct iSndSysSourceSoftware3D : public iSndSysSourceSoftware
+struct iSndSysSourceSoftware3D : public virtual iSndSysSourceSoftware
 {
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysSourceSoftware3D,0,1,0);
+
   /// set position of this source
   virtual void SetPosition(csVector3 pos) = 0;
   /// get position of this source

@@ -31,32 +31,33 @@
 struct csSndSysSoundFormat;
 struct iSndSysStream;
 
-SCF_VERSION (iSndSysData, 0, 1, 0);
-
 #define CS_SNDSYS_DATA_UNKNOWN_SIZE -1
 
 /**
  * The sound data is an interface to the container object controlling raw
  * sound data.
- * After obtaining an iSound2Data interface (most likely by loading a sound
- * file) at least one iSound2Stream must be obtained.
+ * After obtaining an iSndSysData interface (most likely by loading a sound
+ * file) at least one iSndSysStream must be obtained.
  *
  * This interface is implemented at least once per Sound Element.
  */
-struct iSndSysData : public iBase
+struct iSndSysData : public virtual iBase
 {
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysData,0,2,0);
+
   /// Get the format of the sound data.
   virtual const csSndSysSoundFormat *GetFormat() = 0;
 
-  /// Get size of this sound in samples.
-  virtual size_t GetSampleCount() = 0;
+  /// Get size of this sound in frames.
+  virtual size_t GetFrameCount() = 0;
 
   /**
    * Return the size of the data stored in bytes.  This is informational only
    * and is not guaranteed to be a number usable for sound calculations.
    * For example, an audio file compressed with variable rate compression may
    * result in a situation where FILE_SIZE is not equal to
-   * SAMPLE_COUNT * SAMPLE_SIZE since SAMPLE_SIZE may vary throughout the
+   * FRAME_COUNT * FRAME_SIZE since FRAME_SIZE may vary throughout the
    * audio data.
    */
   virtual size_t GetDataSize() = 0;
@@ -72,6 +73,13 @@ struct iSndSysData : public iBase
   virtual iSndSysStream *CreateStream (csSndSysSoundFormat *renderformat,
   	int mode3d) = 0;
 
+  /// Set an optional description to be associated with this sound data
+  //   A filename isn't a bad idea!
+  virtual void SetDescription(const char *pDescription) = 0;
+
+  /// Retrieve the description associated with this sound data
+  //   This may return 0 if no description is set.
+  virtual const char *GetDescription() = 0;
 };
 
 /** @} */
