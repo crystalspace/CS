@@ -19,43 +19,59 @@
 #ifndef SNDSYS_GENLOADER_H
 #define SNDSYS_GENLOADER_H
 
+#include "isndsys/ss_loader.h"
+#include "csutil/scf_implementation.h"
 
 
-// generic loader
-
-class SndSysLoader : public iSndSysLoader
+/// A format-neutral 'loader' for sound files
+class SndSysLoader : public 
+  scfImplementation2<SndSysLoader,iSndSysLoader, iComponent>
 {
 public:
-  SCF_DECLARE_IBASE;
 
-  struct eiComponent : public iComponent
+  SndSysLoader (iBase *parent) :
+      scfImplementationType(this, parent)
   {
-    SCF_DECLARE_EMBEDDED_IBASE (SndSysLoader);
-    virtual bool Initialize (iObjectRegistry *reg)
-    {
-      return scfParent->Initialize(reg);
-    }
-  } scfiComponent;
-
-  SndSysLoader (iBase *parent)
-  {
-    SCF_CONSTRUCT_IBASE (parent);
-    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   }
 
   virtual ~SndSysLoader ()
   {
-    SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-    SCF_DESTRUCT_IBASE();
   }
 
+  ////
+  // Interface implementation
+  ////
 
+  //------------------------
+  // iComponent
+  //------------------------
+public:
+
+  /// Initialize this component.
+  //
+  //  We obtain interfaces for the various sound-type specific 
+  //   loaders here.
   virtual bool Initialize (iObjectRegistry *reg);
-  virtual csPtr<iSndSysData> LoadSound (iDataBuffer* Buffer);
+
+  //------------------------
+  // iSndSysLoader
+  //------------------------
+public:
+
+  /// This function provides the caller with an iSndSysData interface with which
+  //   they may access the audio provided in the Buffer parameter.
+  //
+  //  \param pDescription This parameter is an optional description which will be attached
+  //         to the newly created data element.  A filename is a good choice. This value 
+  //         may be NULL (0).
+  virtual csPtr<iSndSysData> LoadSound (iDataBuffer* buffer, const char *pDescription);
 
 protected:
-  csRef<iSndSysLoader> wavloader;
-  csRef<iSndSysLoader> oggloader;
+  /// PCM Waveform audio loader interface
+  csRef<iSndSysLoader> m_pWavLoader;
+
+  /// Ogg Vorbis audio loader interface
+  csRef<iSndSysLoader> m_pOggLoader;
 };
 
 #endif // #ifndef SNDSYS_GENLOADER_H

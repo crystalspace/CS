@@ -31,31 +31,22 @@
 CS_IMPLEMENT_PLUGIN
 
 
-SCF_IMPLEMENT_IBASE (SndSysLoader)
-  SCF_IMPLEMENTS_INTERFACE (iSndSysLoader)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (SndSysLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (SndSysLoader)
 
 
 
-csPtr<iSndSysData> SndSysLoader::LoadSound (iDataBuffer* Buffer)
+csPtr<iSndSysData> SndSysLoader::LoadSound (iDataBuffer* Buffer, const char *pDescription)
 {
   csRef<iSndSysData> data;
-  if (wavloader)
+  if (m_pWavLoader)
   {
-    data=wavloader->LoadSound(Buffer);
+    data=m_pWavLoader->LoadSound(Buffer, pDescription);
     if (data.IsValid())
       return csPtr<iSndSysData> (data);
   }
-  if (oggloader)
+  if (m_pOggLoader)
   {
-    data=oggloader->LoadSound(Buffer);
+    data=m_pOggLoader->LoadSound(Buffer, pDescription);
     if (data.IsValid())
       return csPtr<iSndSysData> (data);
   }
@@ -66,8 +57,8 @@ csPtr<iSndSysData> SndSysLoader::LoadSound (iDataBuffer* Buffer)
 bool SndSysLoader::Initialize (iObjectRegistry *reg)
 {
   csRef<iPluginManager> mgr=CS_QUERY_REGISTRY(reg, iPluginManager);
-  wavloader=CS_LOAD_PLUGIN(mgr, "crystalspace.sndsys.element.wav", iSndSysLoader);
-  oggloader=CS_LOAD_PLUGIN(mgr, "crystalspace.sndsys.element.ogg", iSndSysLoader);
+  m_pWavLoader=CS_LOAD_PLUGIN(mgr, "crystalspace.sndsys.element.wav", iSndSysLoader);
+  m_pOggLoader=CS_LOAD_PLUGIN(mgr, "crystalspace.sndsys.element.ogg", iSndSysLoader);
   return true;
 }
 
