@@ -36,7 +36,6 @@
 #include "csplugincommon/directx/error.h"
 
 #include "../../renderer.h"
-#include "isndsys/ss_driver.h"
 #include "isndsys/ss_renderer.h"
 #include "driver_ds.h"
 
@@ -59,16 +58,16 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (SndSysDriverDirectSound::eiComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SndSysDriverDirectSound::SndSysDriverDirectSound(iBase* piBase) :
- ds_device(0), ds_buffer(0), ds_buffer_writecursor(0), running(false)
+ m_pDirectSoundDevice(0), m_pDirectSoundBuffer(0), m_bRunning(false)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
 //  scfiEventHandler = 0;
-  object_reg = 0;
+  m_pObjectRegistry = 0;
 
-  ds_device=0;
-  ds_buffer=0;
+  m_pDirectSoundDevice=0;
+  m_pDirectSoundBuffer=0;
 }
 
 
@@ -78,147 +77,189 @@ SndSysDriverDirectSound::~SndSysDriverDirectSound()
   SCF_DESTRUCT_IBASE();
 }
 
-void SndSysDriverDirectSound::Report(int severity, const char* msg, ...)
-{
-  va_list arg;
-  va_start (arg, msg);
-  csReportV (object_reg, severity, 
-    "crystalspace.sndsys.driver.software.directsound", msg, arg);
-  va_end (arg);
-}
 
 bool SndSysDriverDirectSound::Initialize (iObjectRegistry *obj_reg)
 {
-  // copy the system pointer
-  object_reg=obj_reg;
+  /// Interface to the Configuration file
+  csConfigAccess Config;
 
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: Direct sound driver for software sound renderer initialized.");
+  // copy the system pointer
+  m_pObjectRegistry=obj_reg;
+
+  // Get an interface for event recorder (if present)
+  m_EventRecorder = csQueryRegistry<iSndSysEventRecorder> (m_pObjectRegistry);
+
+  // Critical because you really want to log this.  Trust me.  Really.
+  RecordEvent(SSEL_CRITICAL, "Direct sound driver for software sound renderer initialized.");
 
   // read the config file
-//  Config.AddConfig(object_reg, "/config/sound.cfg");
+  Config.AddConfig(m_pObjectRegistry, "/config/sound.cfg");
 
-  win32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
-  if (!win32Assistant)
+  // check for optional output buffer length from the command line and config
+  csRef<iCommandLineParser> CMDLine (CS_QUERY_REGISTRY (m_pObjectRegistry,
+    iCommandLineParser));
+
+  m_BufferLengthms=0;
+  if (CMDLine)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: Direct sound driver: Could not locate iWin32Assistant object in CS registry.");
-    return false;
+    const char *BufferLengthStr = CMDLine->GetOption("soundbufferms");
+    if (BufferLengthStr) m_BufferLengthms=atoi(BufferLengthStr);
   }
+
+  // Check for sound config file option. Default to 200 ms if no option is found.
+  if (m_BufferLengthms<=0)
+    m_BufferLengthms = Config->GetInt("SndSys.Driver.Win.SoundBufferms", 200);
+
+  // The number of underbuffer events before the buffer size is automatically increased
+  m_UnderBuffersAllowed=5;
  
   return true;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// 
-//  
-//
-//
-//
-//
-//////////////////////////////////////////////////////////////////////////
+void SndSysDriverDirectSound::RecordEvent(SndSysEventLevel Severity, const char* msg, ...)
+{
+  if (!m_EventRecorder)
+    return;
+
+  va_list arg;
+  va_start (arg, msg);
+  m_EventRecorder->RecordEventV(SSEC_DRIVER, Severity, msg, arg);
+  va_end (arg);
+}
+
+
 bool SndSysDriverDirectSound::Open (csSndSysRendererSoftware *renderer,
   csSndSysSoundFormat *requested_format)
 {
-  HRESULT hr;
+  HRESULT DirectSoundResult;
 
-  Report (CS_REPORTER_SEVERITY_DEBUG, 
+  RecordEvent(SSEL_DEBUG, 
     "Sound System: Direct Sound Driver: Open()");
 //  CS_ASSERT (Config != 0);
 
-  attached_renderer=renderer;
-  memcpy (&playback_format, requested_format, sizeof(csSndSysSoundFormat));
+  m_pAttachedRenderer=renderer;
+  memcpy (&m_PlaybackFormat, requested_format, sizeof(csSndSysSoundFormat));
 
 
-  hr = DirectSoundCreate8(0, &ds_device, 0);
-  if (FAILED(hr))
+  DirectSoundResult = DirectSoundCreate8(0, &m_pDirectSoundDevice, 0);
+  if (FAILED(DirectSoundResult))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
-      "Sound System: Direct Sound Driver: DirectSoundCreate8 failed.");
+    RecordEvent(SSEL_ERROR, "DirectSoundCreate8 failed.");
     return false;
   }
 
-  csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (object_reg);
+  csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (m_pObjectRegistry);
   if (!g2d.IsValid())
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
-      "A canvas is required");
+    RecordEvent(SSEL_ERROR, 
+      "Could not obtain an iGraphics2D canvas (required for Driver)");
     return false;
   }
   csRef<iWin32Canvas> canvas = scfQueryInterface<iWin32Canvas> (g2d);
   CS_ASSERT (canvas.IsValid());
 
-  hr = ds_device->SetCooperativeLevel (canvas->GetWindowHandle(),
+  DirectSoundResult = m_pDirectSoundDevice->SetCooperativeLevel (canvas->GetWindowHandle(),
     DSSCL_PRIORITY);
-  if (FAILED(hr))
+  if (FAILED(DirectSoundResult))
   {
-    Report(CS_REPORTER_SEVERITY_ERROR, 
-      "Sound System: Direct Sound Driver: Failed to set cooperative level to "
+    RecordEvent(SSEL_ERROR, "Failed to set cooperative level to "
       "DSSCL_PRIORITY: %s (%s)", 
-      csDirectXError::GetErrorDescription (hr),
-      csDirectXError::GetErrorSymbol (hr));
+      csDirectXError::GetErrorDescription (DirectSoundResult),
+      csDirectXError::GetErrorSymbol (DirectSoundResult));
     return false;
   }
 
-  ds_buffer_bytes=40000;
-  ds_buffer_minimum_fill_bytes=ds_buffer_bytes/10;
+  // Store the number of bytes per audio frame
+  m_BytesPerFrame=m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8;
 
-  DSBUFFERDESC ds_bufferdesc;
-  WAVEFORMATEX ds_wavformat;
-  
-  memset(&ds_wavformat, 0 ,sizeof(WAVEFORMATEX));
-  ds_wavformat.wFormatTag=WAVE_FORMAT_PCM;
-  ds_wavformat.nChannels=requested_format->Channels;
-  ds_wavformat.nSamplesPerSec=requested_format->Freq;
-  ds_wavformat.wBitsPerSample=requested_format->Bits;
-  ds_wavformat.nBlockAlign = 
-    (requested_format->Channels * requested_format->Bits) / 8;
-  ds_wavformat.nAvgBytesPerSec = 
-    requested_format->Freq * ds_wavformat.nBlockAlign;
-  ds_wavformat.cbSize=0;
-
-
-
-
-  memset(&ds_bufferdesc, 0, sizeof(DSBUFFERDESC));
-  ds_bufferdesc.dwSize=sizeof(DSBUFFERDESC);
-  ds_bufferdesc.dwFlags=DSBCAPS_CTRLPAN | DSBCAPS_GETCURRENTPOSITION2 
-    | DSBCAPS_GLOBALFOCUS | DSBCAPS_LOCDEFER  ;
-  ds_bufferdesc.dwBufferBytes=ds_buffer_bytes;
-  ds_bufferdesc.lpwfxFormat=&ds_wavformat;
-  ds_bufferdesc.guid3DAlgorithm=GUID_NULL;
-  
-  hr = ds_device->CreateSoundBuffer(&ds_bufferdesc,&ds_buffer,0);
-  if (FAILED(hr))
+  // Create the DirectSound buffer
+  if (!CreateBuffer())
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
-      "Sound System: Direct Sound Driver: Failed to create sound buffer.");
+    m_pDirectSoundDevice->Release();
+    m_pDirectSoundDevice=0;
     return false;
   }
-
-
-
-
-
-
 
   return true;
 }
 
 void SndSysDriverDirectSound::Close ()
 {
-  if (ds_buffer) ds_buffer->Release();
-  if (ds_device) ds_device->Release();
+  if (m_pDirectSoundBuffer) m_pDirectSoundBuffer->Release();
+  if (m_pDirectSoundDevice) m_pDirectSoundDevice->Release();
+  m_pDirectSoundBuffer=0;
+  m_pDirectSoundDevice=0;
+}
+
+bool SndSysDriverDirectSound::CreateBuffer()
+{
+  HRESULT DirectSoundResult;
+
+  // Update the Frames, Bytes and Minimum Fill Frames values from the current millisecond length
+  m_DirectSoundBufferFrames=m_PlaybackFormat.Freq * m_BufferLengthms / 1000;
+  m_DirectSoundBufferBytes=(DWORD)(m_BytesPerFrame * m_DirectSoundBufferFrames);
+  // If there's more than 1/4 of the total buffer space free, try to fill it
+  m_DirectSoundBufferMinimumFillFrames=m_DirectSoundBufferFrames/4;
+
+  RecordEvent(SSEL_DEBUG, "Creating new sound buffer.  Freq [%d] Chan [%d] Bits [%d] Length [%d ms]",
+    m_PlaybackFormat.Freq, m_PlaybackFormat.Channels, m_PlaybackFormat.Bits, m_BufferLengthms);
+
+
+  DSBUFFERDESC m_pDirectSoundBufferdesc;
+  WAVEFORMATEX ds_wavformat;
+
+  memset(&ds_wavformat, 0 ,sizeof(WAVEFORMATEX));
+  ds_wavformat.wFormatTag=WAVE_FORMAT_PCM;
+  ds_wavformat.nChannels=m_PlaybackFormat.Channels;
+  ds_wavformat.nSamplesPerSec=m_PlaybackFormat.Freq;
+  ds_wavformat.wBitsPerSample=m_PlaybackFormat.Bits;
+  ds_wavformat.nBlockAlign = (DWORD)m_BytesPerFrame;
+  ds_wavformat.nAvgBytesPerSec = (DWORD)(m_PlaybackFormat.Freq * m_BytesPerFrame);
+  ds_wavformat.cbSize=0;
+
+
+  memset(&m_pDirectSoundBufferdesc, 0, sizeof(DSBUFFERDESC));
+  m_pDirectSoundBufferdesc.dwSize=sizeof(DSBUFFERDESC);
+  m_pDirectSoundBufferdesc.dwFlags=DSBCAPS_CTRLPAN | DSBCAPS_GETCURRENTPOSITION2 
+    | DSBCAPS_GLOBALFOCUS | DSBCAPS_LOCDEFER  ;
+  m_pDirectSoundBufferdesc.dwBufferBytes=m_DirectSoundBufferBytes;
+  m_pDirectSoundBufferdesc.lpwfxFormat=&ds_wavformat;
+  m_pDirectSoundBufferdesc.guid3DAlgorithm=GUID_NULL;
+
+  DirectSoundResult = m_pDirectSoundDevice->CreateSoundBuffer(&m_pDirectSoundBufferdesc,&m_pDirectSoundBuffer,0);
+  if (FAILED(DirectSoundResult))
+  {
+    RecordEvent(SSEL_ERROR, "Failed to create sound buffer.  Freq [%d] Chan [%d] Bits [%d] Length [%d ms]",
+      m_PlaybackFormat.Freq, m_PlaybackFormat.Channels, m_PlaybackFormat.Bits, m_BufferLengthms);
+    return false;
+  }
+  return true;
+}
+
+bool SndSysDriverDirectSound::DestroyBuffer()
+{
+  RecordEvent(SSEL_DEBUG, "Destroying current sound buffer.");
+
+  if (m_pDirectSoundBuffer)
+  {
+    m_pDirectSoundBuffer->Stop();
+    m_pDirectSoundBuffer->Release();
+  }
+  m_pDirectSoundBuffer=0;
+
+  return true;
 }
 
 bool SndSysDriverDirectSound::StartThread()
 {
-  if (running) return false;
+  if (m_bRunning) return false;
 
-  running=true;
+  m_bRunning=true;
   SndSysDriverRunnable* runnable = new SndSysDriverRunnable (this);
-  bgthread = csThread::Create(runnable);
+  m_pBackgroundThread = csThread::Create(runnable);
   runnable->DecRef ();
 
-  bgthread->Start();
+  m_pBackgroundThread->Start();
   
   return true;
 }
@@ -226,7 +267,7 @@ bool SndSysDriverDirectSound::StartThread()
 
 void SndSysDriverDirectSound::StopThread()
 {
-  running=false;
+  m_bRunning=false;
   csSleep(100);
 }
 
@@ -237,114 +278,171 @@ void SndSysDriverRunnable::Run ()
 
 void SndSysDriverDirectSound::Run()
 {
-  HRESULT hr;
-  uint32 playcursor, writecursor;
+  HRESULT DirectSoundResult;
+  int UnderBufferCount=0;
+
+  // To detect underbuffer conditions, we will use both the cursors provided by
+  //  DirectSound and the system clock
+  csTicks LastBufferFillTime, CurrentTime;
 
   //Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Direct Sound Driver: Clearing buffer in preparation for playback.");
   ClearBuffer();
 
   //Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Direct Sound Driver: Beginning playback of empty buffer.");
-  hr=ds_buffer->Play(0, 0, DSBPLAY_LOOPING);
-  if (FAILED(hr))
+  DirectSoundResult=m_pDirectSoundBuffer->Play(0, 0, DSBPLAY_LOOPING);
+  if (FAILED(DirectSoundResult))
   {
-    //Report(CS_REPORTER_SEVERITY_ERROR, "Sound System: Direct Sound Driver: Failed to begin playback! Error %08x :'%s'", hr, GetDSError(hr));
+    RecordEvent(SSEL_ERROR, "Failed to begin playback! Error [%s]",
+      csDirectXError::GetErrorDescription(DirectSoundResult));
     return;
   }
 
-  // Start 1/10th of a second from the end of the buffer
-  uint32 bytes_per_sec=(playback_format.Freq * playback_format.Channels * playback_format.Bits/8);
-  if (ds_buffer_bytes < (bytes_per_sec/10))
-    ds_buffer_writecursor=0;
-  else
-    ds_buffer_writecursor=ds_buffer_bytes - (bytes_per_sec/10);
+  // Start the clock
+  LastBufferFillTime=csGetTicks();
 
-
-  while (running)
+  // We need to track our own write cursor, because DirectSound's write cursor doesn't
+  //  indicate the position at which data should be written next, but instead indicates
+  //  the earliest position which has not yet been committed to the systems below DirectSound
+  // This difference means that using DirectSound's writecursor will cause us to constantly
+  //  overwrite a little bit of our last buffer commit.
+  int RealWriteCursor=-1;
+  while (m_bRunning)
   {
 
-    // Retrive the current play and write cursor for the buffer.
-    // The write cursor is mostly ignored, unless it's beyond where we think the cursor is,
-    //  which means we've skipped
-    hr = ds_buffer->GetCurrentPosition((LPDWORD)&playcursor, (LPDWORD)&writecursor);
-    if (SUCCEEDED(hr))
+    // Retrieve the current play and write cursor for the buffer.
+    //  These values are used to determine how much space is available in the buffer
+    //  and whether a write is worthwhile
+    DWORD playcursor=0, writecursor=0;
+    DirectSoundResult = m_pDirectSoundBuffer->GetCurrentPosition(&playcursor, &writecursor);
+    if (!SUCCEEDED(DirectSoundResult))
     {
-      uint32 writablebytes;
-      int writegap;
+      RecordEvent(SSEL_ERROR, "Failed to retrieve current position from DirectSound buffer. Error [%s]", 
+        csDirectXError::GetErrorDescription(DirectSoundResult));
 
-      // Retrieve the gap between the end of the DS locked buffer and our tracked write cursor
-      writegap=GetWriteGap(playcursor,writecursor);
+      // TODO: Can we recover from this?
+    }
+    else
+    {
+      if (RealWriteCursor<0)
+        RealWriteCursor=writecursor;
 
-      if (writegap < (long)(bytes_per_sec/20))
-      {
-        //Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: Direct Sound Driver: Skip of %d bytes detected.", -writegap);
-        ds_buffer_writecursor=playcursor;
-        if (ds_buffer_writecursor < (bytes_per_sec/10))
-          ds_buffer_writecursor+=ds_buffer_bytes;
-        ds_buffer_writecursor-=bytes_per_sec/10;
-      }
-
-      // Retrieve the gap between our tracked write cursor and the DS play cursor
-      writablebytes=GetWritableBytes(playcursor);
-
-      /*
-      if (writegap<0)
-      {
-        LPVOID buf1,buf2;
-        uint32 buf1_len,buf2_len;
-
-        // Since we underbuffered, we have to use a different method of locking the buffer here
-        Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System 2: Direct Sound Driver: Skip of %d bytes detected.", -writegap);
-
-        // Lock the buffer from the writecursor - offset is ignored
-        hr=ds_buffer->Lock(0, writablebytes,&buf1,&buf1_len,&buf2,&buf2_len,DSBLOCK_FROMWRITECURSOR);
-        if (FAILED(hr))
-        {
-          Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System 2: Direct Sound Driver: Failed to lock %d bytes for write.", writablebytes);
-          continue;
-        }
-
-        // Re-read the write cursor after the lock, we'll sync the write cursor up to this
-        hr = ds_buffer->GetCurrentPosition(&playcursor, &writecursor);
-        ds_buffer_writecursor=writecursor;
+      RecordEvent(SSEL_DEBUG, "Write cursor is [%u]  Our write cursor is [%d]", writecursor, RealWriteCursor);  
 
 
-        attached_renderer->FillDriverBuffer(buf1, buf1_len, buf2, buf2_len);
-
-        // Advance the write buffer
-        AdvanceWriteBuffer(writablebytes);
-
-        writablebytes=0;
-      }
-      */
-
-
-      // Don't write data to the buffer if there's not enough to be worth writing
-      if (writablebytes >= ds_buffer_minimum_fill_bytes)
+      // Determine if it's worth filling the buffer.  Calculate the number of frames available in the buffer
+      int bytesfree=(int)(playcursor-RealWriteCursor);
+      if (bytesfree<0)
+        bytesfree += m_DirectSoundBufferBytes;
+      int framesfree=(int)(bytesfree / m_BytesPerFrame);
+      if (framesfree >= (int)m_DirectSoundBufferMinimumFillFrames)
       {
         LPVOID buf1,buf2;
         DWORD buf1_len,buf2_len;
-        size_t bytes_used;
+        size_t frames_used;
 
-        hr=ds_buffer->Lock (ds_buffer_writecursor, writablebytes,
-	  &buf1, &buf1_len, &buf2, &buf2_len, 0);
-        if (FAILED(hr))
+        RecordEvent(SSEL_DEBUG, "Locking %d bytes %d frames in DirectSound buffer.", bytesfree, framesfree);  
+
+        DirectSoundResult=m_pDirectSoundBuffer->Lock (RealWriteCursor, bytesfree,
+          &buf1, &buf1_len, &buf2, &buf2_len, 0);
+        if (FAILED(DirectSoundResult))
         {
-          //Report(CS_REPORTER_SEVERITY_DEBUG, 
-	    //"Sound System: Direct Sound Driver: Failed to lock %d bytes for write.", 
-	    //writablebytes);
+          RecordEvent(SSEL_ERROR, "Failed to lock DirectSound buffer. Error [%s]",  
+            csDirectXError::GetErrorDescription(DirectSoundResult));
+
+          // TODO: Can we recover from this?
+
           continue;
         }
 
-        bytes_used = attached_renderer->FillDriverBuffer (buf1, buf1_len, buf2, buf2_len);
+        RecordEvent(SSEL_DEBUG, "Locked buffer %d bytes in first, %d bytes in second.", buf1_len, buf2_len);  
+
+        // Tell the renderer 
+        frames_used = m_pAttachedRenderer->FillDriverBuffer (buf1, buf1_len/m_BytesPerFrame, buf2, buf2_len/m_BytesPerFrame);
 
         // Unlock the buffer
-        ds_buffer->Unlock(buf1,buf1_len,buf2,buf2_len);
+        if (frames_used * m_BytesPerFrame <= buf1_len)
+        {
+          buf1_len=(DWORD)(frames_used * m_BytesPerFrame);
+          buf2_len=0;
+        }
+        else
+          buf2_len=(DWORD)((frames_used * m_BytesPerFrame) - buf1_len);
 
-        // Advance the write buffer
-        AdvanceWriteBuffer(bytes_used);
-      }
-    }
-    csSleep(0);
+        RecordEvent(SSEL_DEBUG, "Unlocking buffer %d bytes in first, %d bytes in second.", buf1_len, buf2_len);  
+
+        m_pDirectSoundBuffer->Unlock(buf1,buf1_len,buf2,buf2_len);
+        if (FAILED(DirectSoundResult))
+        {
+          RecordEvent(SSEL_ERROR, "Failed to unlock DirectSound buffer. Error [%s]",  
+            csDirectXError::GetErrorDescription(DirectSoundResult));
+
+          // TODO: Can we recover from this?
+
+          continue;
+        }
+
+        // Advance and wrap our real write cursor
+        RealWriteCursor+=buf1_len+buf2_len;
+        RealWriteCursor%=m_DirectSoundBufferBytes;
+
+
+        CurrentTime=csGetTicks();
+        // Detect an underbuffer.  This occurs when the time between the last fill
+        //  and now exceeds the entire buffer length.
+        if (CurrentTime - LastBufferFillTime >= m_BufferLengthms)
+        {
+          UnderBufferCount++;
+
+          RecordEvent(SSEL_WARNING, "Underbuffer condition detected.  Buffer length [%u] Time since last fill [%u] Count [%d]", 
+            m_BufferLengthms, CurrentTime - LastBufferFillTime, UnderBufferCount);
+
+          if (UnderBufferCount >  m_UnderBuffersAllowed)
+          {
+            // Reset the counter
+            UnderBufferCount=0;
+
+            // Take corrective action - but do not expand the buffer beyond 1 second
+            if (m_BufferLengthms < 1000)
+            {
+              RecordEvent(SSEL_WARNING, "Corrective underbuffering protection doubling buffer size.");
+              m_BufferLengthms*=2;
+              if (m_BufferLengthms > 1000)
+                m_BufferLengthms=1000;
+
+              DestroyBuffer();
+
+              if (CreateBuffer())
+              {
+                // Clear the buffer to silence
+                ClearBuffer();
+
+                // Start the buffer playing
+                DirectSoundResult=m_pDirectSoundBuffer->Play(0, 0, DSBPLAY_LOOPING);
+                if (FAILED(DirectSoundResult))
+                {
+                  RecordEvent(SSEL_ERROR, "Failed to begin playback! Error [%s]",
+                    csDirectXError::GetErrorDescription(DirectSoundResult));
+                  break;
+                }
+
+                // Reset the clock
+                LastBufferFillTime=csGetTicks();
+
+                // Restart our write cursor
+                RealWriteCursor=-1;
+              }
+              else
+                break;
+            } // if (m_BufferLengthms < 1000) {...}
+          } // if (UnderBufferCount >  m_UnderBuffersAllowed) {...}
+        } // if (CurrentTime - LastBufferFillTime >= m_BufferLengthms) {...}  
+
+        // Update the last fill time
+        LastBufferFillTime=CurrentTime;
+      } // if (framesfree >= (int)m_DirectSoundBufferMinimumFillFrames) {...}
+    } // if (!SUCCEEDED(DirectSoundResult)) {...} else {...}
+
+    csSleep(m_BufferLengthms/4);
   }
 }
 
@@ -352,54 +450,32 @@ void SndSysDriverDirectSound::ClearBuffer()
 {
   LPVOID buf1,buf2;
   uint32 buf1_len,buf2_len;
-  HRESULT hr;
+  HRESULT DirectSoundResult;
 
-  hr=ds_buffer->Lock(0,0,&buf1,(LPDWORD)&buf1_len,&buf2,(LPDWORD)&buf2_len,DSBLOCK_FROMWRITECURSOR  | DSBLOCK_ENTIREBUFFER);
-  if (FAILED(hr))
+  // Here we fill the entire buffer with silence values.  This is intended as an initialization procedure
+  //  so that random noise isn't in the buffer when playback is first started.
+  DirectSoundResult=m_pDirectSoundBuffer->Lock(0,0,&buf1,(LPDWORD)&buf1_len,&buf2,(LPDWORD)&buf2_len,DSBLOCK_FROMWRITECURSOR  | DSBLOCK_ENTIREBUFFER);
+  if (FAILED(DirectSoundResult))
   {
-    //Report(CS_REPORTER_SEVERITY_NOTIFY, "Sound System: Direct Sound Driver: Failed to lock buffer for clear. Error: %s", GetDSError(hr));
+    RecordEvent(SSEL_ERROR, "Failed to lock buffer for clear. Error: %s", csDirectXError::GetErrorDescription(DirectSoundResult));
     return;
   }
 
+  // 16 bit samples use 0 as the value for silence
+  int clearval=0;
+  // 8 bit samples use 128 as the value for silence
+  if (m_PlaybackFormat.Bits == 8)
+    clearval=128;
+
   if (buf1)
-    memset(buf1,0,buf1_len);
+    memset(buf1,clearval,buf1_len);
   if (buf2)
-    memset(buf2,0,buf2_len);
+    memset(buf2,clearval,buf2_len);
 
-  ds_buffer->Unlock(buf1,buf1_len,buf2,buf2_len);
+  m_pDirectSoundBuffer->Unlock(buf1,buf1_len,buf2,buf2_len);
 }
 
 
-int SndSysDriverDirectSound::GetWriteGap(uint32 real_play_cursor, uint32 real_write_cursor)
-{
-  uint32 write_cursor = ds_buffer_writecursor;
-  int gap;
-
-  // Write cursor is always ahead of the play cursor
-  if (real_write_cursor<=real_play_cursor)
-    real_write_cursor+=ds_buffer_bytes;
-  if (write_cursor<=real_play_cursor)
-    write_cursor+=ds_buffer_bytes;
-
-  gap=write_cursor-real_write_cursor;
-
-  return gap;
-}
-
-uint32 SndSysDriverDirectSound::GetWritableBytes(uint32 real_play_cursor)
-{
-  if (real_play_cursor<ds_buffer_writecursor)
-    real_play_cursor+=ds_buffer_bytes;
-
-  return (real_play_cursor-ds_buffer_writecursor);
-}
-
-void SndSysDriverDirectSound::AdvanceWriteBuffer (size_t bytes)
-{
-  ds_buffer_writecursor += (DWORD)bytes;
-  if (ds_buffer_writecursor >= ds_buffer_bytes)
-    ds_buffer_writecursor-=ds_buffer_bytes;
-}
 
 }
 CS_PLUGIN_NAMESPACE_END(SndSysDIRECTSOUND)

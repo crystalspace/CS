@@ -23,8 +23,11 @@
 #include "csutil/cfgacc.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+
 #include "csutil/win32/win32.h"
 #include "isndsys/ss_structs.h"
+#include "isndsys/ss_driver.h"
+#include "isndsys/ss_eventrecorder.h"
 
 #include <dsound.h>
 
@@ -86,45 +89,59 @@ public:
   /// The thread runnable procedure
   void Run ();
 
-  // The system driver.
-  iObjectRegistry *object_reg;
-
-  void Report (int severity, const char* msg, ...);
-
-  /*
-  csSoundFormat render_format;
-
-  // TODO: Move to listener
-  struct st_speaker_properties Speakers[MAX_CHANNELS];
-  */
+  /// Access interface to the object registry
+  iObjectRegistry *m_pObjectRegistry;
 
 protected:
-  csSndSysRendererSoftware *attached_renderer;
-  csSndSysSoundFormat playback_format;
+  /// Pointer to the owning SndSysRendererSoftware
+  csSndSysRendererSoftware *m_pAttachedRenderer;
+  /// Local copy of the audio format parameters
+  csSndSysSoundFormat m_PlaybackFormat;
 
-  LPDIRECTSOUND8 ds_device;
-  LPDIRECTSOUNDBUFFER ds_buffer;
-  DWORD ds_buffer_bytes;
-  DWORD ds_buffer_minimum_fill_bytes;
-  DWORD ds_buffer_writecursor;
-
-  csRef<iWin32Assistant> win32Assistant;
+  /// The DirectSound audio device interface
+  LPDIRECTSOUND8 m_pDirectSoundDevice;
+  /// The DirectSound audio buffer interface
+  LPDIRECTSOUNDBUFFER m_pDirectSoundBuffer;
+  
+  /// Number of bytes in a single frame
+  size_t m_BytesPerFrame;
+  /// The size of the DirectSound allocated buffer, in bytes
+  DWORD m_DirectSoundBufferBytes;
+  /// The size of the DirectSound allocated buffer, in frames
+  DWORD m_DirectSoundBufferFrames;
+  /// The length of the DirectSound allocated buffer, in milliseconds
+  csTicks m_BufferLengthms;
+  /** The minimum number of empty frames that need to be available
+   *    before a write is considered worthwhile.
+   */
+  DWORD m_DirectSoundBufferMinimumFillFrames;
+  /// The number of underbuffer conditions that must occur before
+  //   we take major corrective action
+  int m_UnderBuffersAllowed;
 
   /// A flag used to shut down the running background thread.
   // We don't really need to synchronize access to this since a delay in
   // recognizing a change isn't a big deal.
-  volatile bool running;
-  csRef<csThread> bgthread;
+  volatile bool m_bRunning;
+
+  /// Handle to the csThread object that controls execution of our background thread
+  csRef<csThread> m_pBackgroundThread;
+
+  /// The event recorder interface, if active
+  csRef<iSndSysEventRecorder> m_EventRecorder;
 
 protected:
-  // Helper function to determine if the Direct Sound 'write' cursor has
-  // passed where we've written
-  int GetWriteGap(uint32 real_play_cursor, uint32 real_write_cursor);
-  uint32 GetWritableBytes(uint32 real_play_cursor);
-  void AdvanceWriteBuffer (size_t bytes);
+  /// Creates a new DirectSoundBuffer object using the current parameters
+  bool CreateBuffer();
 
+  /// Destroys the current DirectSoundBuffer object
+  bool DestroyBuffer();
+
+  /// Lock the entire buffer and fill it with silence
   void ClearBuffer();
 
+  /// Send a message to the sound system event recorder as the driver
+  void RecordEvent(SndSysEventLevel Severity, const char* msg, ...);
 
 public:
   ////
