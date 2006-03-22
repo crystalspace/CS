@@ -242,7 +242,7 @@ bool SndSysWavSoundData::ReadHeaders(void *Buffer, size_t len, _RIFFchk *p_riffc
   {
     memcpy(&fmtchk, &buf[index], sizeof (fmtchk));
 
-    if (memcmp(fmtchk.chunk_id, "m_SoundFormat ", 4) == 0)
+    if (memcmp(fmtchk.chunk_id, "fmt ", 4) == 0)
       found = true;
 
     // correct length of chunk on big endian system
