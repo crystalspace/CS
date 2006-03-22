@@ -564,13 +564,12 @@ int SndSysDriverALSA::FillBuffer(snd_pcm_sframes_t& AvailableFrames, snd_pcm_ufr
     return -1;
   }
 
-  RecordEvent(SSEL_DEBUG, "Mapped %u bytes", MappedFrames * m_BytesPerFrame);
+  RecordEvent(SSEL_DEBUG, "Mapped %u frames", MappedFrames);
 
-  uint32 bytes_used=m_pAttachedRenderer->FillDriverBuffer(((unsigned char *)mmap_areas[0].addr) + mmap_offset * mmap_areas[0].step/8,
-                                                          MappedFrames * m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8, 0, 0);
+  FilledFrames = m_pAttachedRenderer->FillDriverBuffer(((unsigned char *)mmap_areas[0].addr) + mmap_offset * mmap_areas[0].step/8,
+                                                          MappedFrames , 0, 0);
 
-  RecordEvent(SSEL_DEBUG, "FillDriverBuffer() filled %u bytes", bytes_used);
-  FilledFrames = bytes_used / m_BytesPerFrame;
+  RecordEvent(SSEL_DEBUG, "FillDriverBuffer() filled %u frames", FilledFrames);
 
   result = snd_pcm_mmap_commit(m_pPCMDevice, mmap_offset, FilledFrames);
   if (result < 0)
