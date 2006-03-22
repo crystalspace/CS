@@ -6,6 +6,19 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Mar-2006
+	- Rhad performed numerous sound system enhancements:
+	  - Changed all sound system components over to the new SCF format.
+	  - Added iSndSysSoftwareOutputFilter interface and sound system
+	    calls to attach implementing objects.
+	  - The windows (directsound) driver should now behave much better.
+	  - Cleaned up member variable naming conventions on most components
+	    and added more comments.
+	  - The sound system now 'keeps time' internally in frame count
+	    instead of milliseconds.  This should simplify the flow and 
+	    reduce/eliminate drift.
+	  - Added a 'compressor' class (unused for now) to ultimately
+	    contain the logic for sound buffer normalization.
 21-Mar-2006
 	- res added the MsvcIncDirs rule to specify include dirs for
 	  generated VC projects.
