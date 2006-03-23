@@ -43,36 +43,50 @@ class SndSysDriverALSA;
 class SndSysDriverRunnable : public csRunnable
 {
 private:
-  SndSysDriverALSA* parent;
-  int ref_count;
+  SndSysDriverALSA* m_pParent;
+  int m_RefCount;
 
 public:
-  SndSysDriverRunnable (SndSysDriverALSA* parent) :
-  	parent (parent), ref_count (1) { }
+  SndSysDriverRunnable (SndSysDriverALSA* pParent) :
+  	m_pParent (pParent), m_RefCount (1) { }
   virtual ~SndSysDriverRunnable () { }
 
   virtual void Run ();
-  virtual void IncRef() { ++ref_count; }
+  virtual void IncRef() { ++m_RefCount; }
   /// Decrement reference count.
   virtual void DecRef()
   {
-    --ref_count;
-    if (ref_count <= 0)
+    --m_RefCount;
+    if (m_RefCount <= 0)
       delete this;
   }
 
   /// Get reference count.
-  virtual int GetRefCount() { return ref_count; }
+  virtual int GetRefCount() { return m_RefCount; }
 };
 
-
-class SndSysDriverALSA : public iSndSysSoftwareDriver
+// ALSA implementation of the iSndSysSoftwareDriver interface
+class SndSysDriverALSA : 
+  public scfImplementation2<SndSysDriverALSA, iComponent, iSndSysSoftwareDriver>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   SndSysDriverALSA(iBase *piBase);
   virtual ~SndSysDriverALSA();
+
+  ////
+  // Interface implementation
+  ////
+
+  //------------------------
+  // iComponent
+  //------------------------
+public:
+  virtual bool Initialize (iObjectRegistry *obj_reg);
+
+  //------------------------
+  // iSndSysSoftwareDriver
+  //------------------------
+public:
 
   /// Called to initialize the driver
   bool Open (csSndSysRendererSoftware* pRenderer,
@@ -87,14 +101,37 @@ public:
   /// Stop the background thread
   void StopThread();
 
+
+  ////
+  // Member Functions
+  ////
+public:
   /// The thread runnable procedure
   void Run ();
 
-  /// Interface to the global object registry
-  //    
-  static iObjectRegistry *m_pObjectReg;
-
 protected:
+  /// Fill the ALSA mmap buffer with data from the renderer up to Bytes bytes
+  snd_pcm_sframes_t FillBuffer(snd_pcm_sframes_t AvailableFrames);
+
+  /// Setup ALSA 'hwparams'
+  bool SetupHWParams();
+
+  /// Setup ALSA 'swparams'
+  bool SetupSWParams();
+
+  /// Send a message to the sound system event recorder as the driver
+  void RecordEvent(SndSysEventLevel Severity, const char* msg, ...);
+
+  /// Returns true if a buffer underrun condition has been detected
+  bool CheckUnderrun();
+
+  ////
+  // Member Variables
+  ////
+protected:
+  /// Interface to the global object registry
+  iObjectRegistry *m_pObjectReg;
+
   /// The renderer that's using this sound driver
   csSndSysRendererSoftware *m_pAttachedRenderer;
 
@@ -109,13 +146,25 @@ protected:
   //    I don't think the layout of this structure is meant to be dependable
   snd_pcm_t *m_pPCMDevice;
 
-  /// Stores the size of the ALSA layer sound buffer in bytes
-  snd_pcm_uframes_t m_HWBufferBytes;
+  /// The length of the ALSA sound buffer in milliseconds
+  //   This must be set before calling SetupHWParams()
+  csTicks m_BufferLengthms;
+
+  /// Stores the size of the ALSA layer sound buffer in audio frames
+  //   This is overwritten during the call to SetupHWParams()
+  snd_pcm_uframes_t m_HWBufferFrames;
+
+  /// The number of frames of the HWBuffer that we will not use
+  //  Since ALSA in some cases seems to allocate excessive buffers,
+  //    we will compensate by refusing to fill most of the buffer.
+  snd_pcm_sframes_t m_HWUnusableFrames;
 
   /// A flag used to shut down the running background thread.
   // We don't really need to synchronize access to this since a delay in
   // recognizing a change isn't a big deal.
-  volatile bool m_Running;
+  volatile bool m_bRunning;
+
+  /// A reference to the CS interface for our background thread
   csRef<csThread> m_pBGThread;
 
   /// The event recorder interface, if active
@@ -123,35 +172,15 @@ protected:
 
   /// Number of bytes in a frame of audio
   size_t m_BytesPerFrame;
-protected:
-  /// Write silence to the ALSA mmap buffer up to Bytes bytes
-  size_t ClearBuffer(size_t Bytes);
 
-  /// Fill the ALSA mmap buffer with data from the renderer up to Bytes bytes
-  int FillBuffer(snd_pcm_sframes_t& AvailableFrames, snd_pcm_uframes_t& MappedFrames, snd_pcm_uframes_t& FilledFrames);
-  bool SetupHWParams();
-  bool SetupSWParams();
+  /// The number of underbuffer conditions that must occur before
+  //   we take major corrective action
+  int m_UnderBuffersAllowed;
 
-  /// Send a message to the sound system event recorder as the driver
-  void RecordEvent(SndSysEventLevel Severity, const char* msg, ...);
-
-public:
-  ////
-  //
-  // Interface implementation
-  //
-  ////
-
-  // iComponent
-  virtual bool Initialize (iObjectRegistry *obj_reg);
-
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(SndSysDriverALSA);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
+  /** The minimum number of empty frames that need to be available
+  *    before a write is considered worthwhile.
+  */
+  snd_pcm_sframes_t m_SoundBufferMinimumFillFrames;
 
 };
 

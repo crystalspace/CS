@@ -55,36 +55,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(SndSysALSA)
 SCF_IMPLEMENT_FACTORY (SndSysDriverALSA)
 
 
-SCF_IMPLEMENT_IBASE(SndSysDriverALSA)
-SCF_IMPLEMENTS_INTERFACE(iSndSysSoftwareDriver)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END;
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (SndSysDriverALSA::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-// The system driver.
-iObjectRegistry *SndSysDriverALSA::m_pObjectReg=0;
-
-SndSysDriverALSA::SndSysDriverALSA(iBase* piBase) :
-  m_Running(false)
+SndSysDriverALSA::SndSysDriverALSA(iBase* pParent) :
+  scfImplementationType(this, pParent),
+  m_pObjectReg(0), m_pPCMDevice(0), m_bRunning(false)
 {
-  SCF_CONSTRUCT_IBASE(piBase);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
-  m_pPCMDevice = 0;
-
-//  scfiEventHandler = 0;
-  m_pObjectReg = 0;
 }
 
 
 SndSysDriverALSA::~SndSysDriverALSA()
 {
-
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 
@@ -114,7 +93,22 @@ bool SndSysDriverALSA::Initialize (iObjectRegistry *pObjectReg)
 
   // Copy into the used buffer
   strcpy(m_OutputDeviceName, OutputDeviceName);
- 
+
+
+  m_BufferLengthms=0;
+  if (CMDLine)
+  {
+    const char *BufferLengthStr = CMDLine->GetOption("soundbufferms");
+    if (BufferLengthStr) m_BufferLengthms=atoi(BufferLengthStr);
+  }
+
+  // Check for sound config file option. Default to 20 ms if no option is found.
+  if (m_BufferLengthms<=0)
+    m_BufferLengthms = Config->GetInt("SndSys.Driver.ALSA.SoundBufferms", 20);
+
+  // The number of underbuffer events before the buffer size is automatically increased
+  m_UnderBuffersAllowed=5;
+
   return true;
 }
 
@@ -215,39 +209,67 @@ bool SndSysDriverALSA::SetupHWParams()
       m_PlaybackFormat.Freq, freq);
   }
 
-  // Setup the buffer for 1/5th of a second (us)
-  unsigned int buffertime=200000; 
+  // The number of frames we want in the buffer
+  snd_pcm_uframes_t WantedFrames = (m_BufferLengthms * freq / 1000);
+
+  // Setup the buffer for the requested time length (us)
+  unsigned int buffertime=m_BufferLengthms * 1000; 
   result = snd_pcm_hw_params_set_buffer_time_near(m_pPCMDevice, pHWParams, &buffertime, 0);
   if (result < 0) 
   {
-    RecordEvent(SSEL_ERROR, "Failed to set sound device buffer duration to 1/10s (or anything near).  Error [%s]", 
-            snd_strerror(result));
+    RecordEvent(SSEL_ERROR, "Failed to set sound device buffer duration to %d ms (or anything near).  Error [%s]", 
+            m_BufferLengthms, snd_strerror(result));
     return false;
   }
   
-  result = snd_pcm_hw_params_get_buffer_size(pHWParams, &m_HWBufferBytes);
+  result = snd_pcm_hw_params_get_buffer_size(pHWParams, &m_HWBufferFrames);
   if (result < 0) 
   {
     RecordEvent(SSEL_ERROR, "Failed to retrieve sound device buffer size.  Error [%s]", 
       snd_strerror(result));
     return false;
   }
-  // Translate from frames to bytes
-  m_HWBufferBytes *= m_PlaybackFormat.Bits/8 * m_PlaybackFormat.Channels;
-  RecordEvent(SSEL_DEBUG, "Sound device buffer duration set to %fs (%u bytes)",
-    ((float)buffertime) / 1000000.0f, m_HWBufferBytes);
+  RecordEvent(SSEL_DEBUG, "Sound device buffer duration set to %d ms (%u frames).  Requested %d ms.",
+    buffertime / 1000, m_HWBufferFrames, m_BufferLengthms);
 
-  // Set the period time near 1/10th of a second.  This sounds like it determines the amount of data that
+  // Calculate how many frames we wont use in the ALSA buffer so
+  //   that we have an acceptably low latency
+  m_HWUnusableFrames=0;
+  if (m_HWBufferFrames > WantedFrames)
+  {
+    m_HWUnusableFrames=m_HWBufferFrames - WantedFrames;
+    RecordEvent(SSEL_DEBUG, "Received excess frame space in requested buffer. Not using %d frames.",
+      m_HWUnusableFrames);
+  }
+
+  // Set the period time to about 1/4 of the buffer.  This sounds like it determines the amount of data that
   //  is sent to the underlying hardware in each operation.  The smaller this value the more overhead
   //  but the finer granularity on sample status.  This should be at largest 1/4 the size of the total sample
   //  buffer, since anything larger may result in under buffering.
-  unsigned int periodtime=50000;
+  unsigned int periodtime=m_BufferLengthms * 1000 / 4;
   result = snd_pcm_hw_params_set_period_time_near(m_pPCMDevice, pHWParams, &periodtime, 0);
   if (result < 0) 
   {
-    RecordEvent(SSEL_ERROR, "Failed to set sound device period time to .01s.  Error [%s]", 
-      snd_strerror(result));
+    RecordEvent(SSEL_ERROR, "Failed to set sound device period time to %d ms.  Error [%s]", 
+      m_BufferLengthms, snd_strerror(result));
     return false;
+  }
+
+  // The effective period time may require us to reduce our unused frame count
+  if (periodtime > (m_BufferLengthms * 1000 / 4))
+  {
+    // Calculate our actual buffer time to 4x the period time
+    m_BufferLengthms = 4 * periodtime / 1000;
+
+    // If that ends up being the same size as our buffer, or larger, then just use the whole buffer
+    if (m_HWBufferFrames <= (m_BufferLengthms * freq / 1000))
+      m_HWUnusableFrames=0;
+    else
+      m_HWUnusableFrames = m_HWBufferFrames - (m_BufferLengthms * freq / 1000);
+
+    // Log it
+    RecordEvent(SSEL_DEBUG, "Received larger than desired period time of %d ms. Updated unused frames to %d.",
+      periodtime / 1000, m_HWUnusableFrames);
   }
 
   // Send the parameters to the device
@@ -258,6 +280,17 @@ bool SndSysDriverALSA::SetupHWParams()
       snd_strerror(result));
     return false;
   }
+
+  // Log a message indicating the latency we end up with
+  RecordEvent(SSEL_DEBUG, "Final maximum driver latency of %d ms (%d frames).",
+    m_BufferLengthms, (m_HWBufferFrames - m_HWUnusableFrames));
+
+  // Store the actual frequency back into our format data
+  m_PlaybackFormat.Freq = freq;
+
+  // Set the minimum number of frames it's worthwhile to fill to 1/4 of the buffer size
+  m_SoundBufferMinimumFillFrames=(m_HWBufferFrames - m_HWUnusableFrames)/4;
+
   return true;
 }
 
@@ -316,14 +349,7 @@ bool SndSysDriverALSA::SetupSWParams()
   return true;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// 
-//  
-//
-//
-//
-//
-//////////////////////////////////////////////////////////////////////////
+
 bool SndSysDriverALSA::Open (csSndSysRendererSoftware* pRenderer,
 			     csSndSysSoundFormat *pRequestedFormat)
 {
@@ -362,7 +388,10 @@ bool SndSysDriverALSA::Open (csSndSysRendererSoftware* pRenderer,
  
   // Copy any changes back into the caller's buffer
   memcpy(pRequestedFormat, &m_PlaybackFormat, sizeof(csSndSysSoundFormat));
- 
+
+  // Store the bytes per frame for later output calculations
+  m_BytesPerFrame = m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8;
+
   return true;
 }
 
@@ -377,9 +406,9 @@ void SndSysDriverALSA::Close ()
 
 bool SndSysDriverALSA::StartThread()
 {
-  if (m_Running) return false;
+  if (m_bRunning) return false;
 
-  m_Running=true;
+  m_bRunning=true;
   SndSysDriverRunnable* runnable = new SndSysDriverRunnable (this);
   m_pBGThread = csThread::Create(runnable);
   runnable->DecRef ();
@@ -392,53 +421,86 @@ bool SndSysDriverALSA::StartThread()
 
 void SndSysDriverALSA::StopThread()
 {
-  m_Running=false;
+  m_bRunning=false;
   csSleep(100);
 }
 
 void SndSysDriverRunnable::Run ()
 {
-  parent->Run ();
+  m_pParent->Run ();
 }
 
 void SndSysDriverALSA::Run()
 {
+  snd_pcm_sframes_t AvailableFrames;
   int result;
-  snd_pcm_state_t devicestate;
+  int UnderBufferCount=0;
 
-  m_BytesPerFrame = m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8;
+  // Fill the buffer initially.  This will pull silence from the renderer
+  AvailableFrames = snd_pcm_avail_update(m_pPCMDevice);
+  result=FillBuffer(AvailableFrames - m_HWUnusableFrames);
+  if (result<0)
+  {
+    RecordEvent(SSEL_CRITICAL, "Failed to fill initial sound buffer.  Error [%s].  Aborting runloop.", snd_strerror(result));
 
-  csTicks last_write, current_ticks, tick_difference;
-  csTicks last_error_time=0;
+    // Stop playback and drop all queued frames
+    snd_pcm_drop(m_pPCMDevice);
 
-  // Write at about 20 times per second
-  tick_difference=50;
+    m_bRunning=false;
+    return;
+  }
 
-  last_write=csGetTicks();
-
-
-  // Clear the buffer and write one section ahead
-  ClearBuffer(tick_difference/1000 * m_PlaybackFormat.Freq * m_BytesPerFrame);
-  //WriteBuffer(ALSA_buffer_bytes);
-  
+  // Start the sound output device
   snd_pcm_start(m_pPCMDevice);
 
-  while (m_Running)
+  // The main loop of the background thread
+  while (m_bRunning)
   {
-    current_ticks=csGetTicks();
-    if (last_write + tick_difference <= current_ticks)
+    // Retrieve the number of available frames, and only update if there's enough
+    //  to make it worthwhile
+    AvailableFrames = snd_pcm_avail_update(m_pPCMDevice);
+    if ((AvailableFrames - m_HWUnusableFrames) >= m_SoundBufferMinimumFillFrames)
     {
+      // Presume that underbuffer recovery is not needed in this cycle - for now
       bool UnderRunRecovery=false;
 
-      // Check for underrun
-      devicestate = snd_pcm_state(m_pPCMDevice);
-      if (devicestate == SND_PCM_STATE_XRUN)
+      // Log our fill
+      RecordEvent(SSEL_DEBUG, "Filling %d available frames for %d total bytes", 
+        (AvailableFrames - m_HWUnusableFrames), (AvailableFrames - m_HWUnusableFrames) * m_BytesPerFrame);
+
+      if (CheckUnderrun())
       {
-        // Log an underbuffer error - only log once every 15 seconds
-        if (last_error_time==0 || current_ticks-last_error_time > 15000)
+        // Add one to our under buffer counter
+        UnderBufferCount++;
+
+        RecordEvent(SSEL_ERROR, "Buffer underrun detected. %d of %d allowed.", UnderBufferCount, m_UnderBuffersAllowed); 
+
+        if (UnderBufferCount > m_UnderBuffersAllowed)
         {
-          RecordEvent(SSEL_WARNING, "Underbuffer detected on output device!");
-          last_error_time=current_ticks;
+          RecordEvent(SSEL_ERROR, "Enlarging sound buffer.  Current [%d ms]  New [%d ms].", 
+            m_BufferLengthms, m_BufferLengthms*2);
+
+          // We have exceeded the threshold, time to enlarge our underlying buffer
+          m_BufferLengthms *= 2;
+
+          // If our buffer is already too big, we can just reduce the unusable frame count
+          //  such that the effective buffer size is doubled
+
+          // We need the same amount of frames as we're already using in the buffer
+          //  in order to double it.
+          snd_pcm_sframes_t NeededFrameGrowth=m_HWBufferFrames - m_HWUnusableFrames;
+          if (m_HWUnusableFrames >= NeededFrameGrowth)
+          {
+            RecordEvent(SSEL_DEBUG, "Reducing unusable frames from %d to %d.", m_HWUnusableFrames, m_HWUnusableFrames-NeededFrameGrowth);
+            m_HWUnusableFrames-=NeededFrameGrowth;
+          }
+          else
+          {
+            // Otherwise, fall back and enlarge the real buffer
+            if (!SetupHWParams())
+              RecordEvent(SSEL_ERROR, "Failed to enlarge sound buffer to %d ms.", m_BufferLengthms);
+          }
+          UnderBufferCount=0;
         }
 
         // Try to recover from the underbuffer by re-preparing the output device
@@ -449,46 +511,43 @@ void SndSysDriverALSA::Run()
           break;
         }
 
+        // Re-request the available frame count
+        AvailableFrames = snd_pcm_avail_update(m_pPCMDevice);
+
+        // We need under run recovery at the end of this cycle now
         UnderRunRecovery=true;
       }
-
-      snd_pcm_sframes_t AvailableFrames;
-      snd_pcm_uframes_t MappedFrames, FilledFrames;
-      MappedFrames=0;
-      AvailableFrames=0;
-      FilledFrames=0;
 
       // Continue mapping and filling buffers while:
       // 1) There are no errors 
       //   AND
-      // 2) All available frames were not mapped
-      //   AND
-      // 3) All mapped frames were filled
-      do 
+      // 2) There are at least enough available frames to be worth filling
+      do
       {
-        result=FillBuffer(AvailableFrames, MappedFrames, FilledFrames);
+        result=FillBuffer(AvailableFrames - m_HWUnusableFrames);
 
-        // Note that the comparison below fails horribly if you map over max signed int32 frames (~2 billion)
-        //  If you are mapping 2 billion frames, something is horribly wrong anyway.
-        if (result>=0 && (snd_pcm_sframes_t)MappedFrames<AvailableFrames)
-          RecordEvent(SSEL_DEBUG, "Short mapping of %u frames [%d available]", MappedFrames, AvailableFrames);
-      } while(result>=0 && (snd_pcm_sframes_t)MappedFrames<AvailableFrames && FilledFrames==MappedFrames);
+        // If no error occurred, re-read the number of available frames
+        if (result>0)
+          AvailableFrames = snd_pcm_avail_update(m_pPCMDevice);
+      } while(result>0 && ((AvailableFrames - m_HWUnusableFrames) >= m_SoundBufferMinimumFillFrames));
 
-      // If a mapping error occured, break
+      // If a mapping error occurred, break
       if (result<0)
         break;
 
-      // If an underrun occurred and we are recovering, we need to issue a 'start'
+      // If an under run occurred and we are recovering, we need to issue a 'start'
       if (UnderRunRecovery)
         snd_pcm_start(m_pPCMDevice);
+    }
+    else
+    {
+      RecordEvent(SSEL_DEBUG, "%d of %d required minimum frames ready for fill. Going to sleep for %d ms.",
+        (AvailableFrames - m_HWUnusableFrames), m_SoundBufferMinimumFillFrames, m_BufferLengthms/4);
 
-      last_write=current_ticks;
+      // Sleep for a little bit
+      csSleep(m_BufferLengthms/4);
     }
 
-    RecordEvent(SSEL_DEBUG, "Finished filling mmap buffers.  Going to sleep.");
-
-    // Sleep for at least a little bit
-    csSleep(tick_difference);
   }
   RecordEvent(SSEL_DEBUG, "Main run loop complete.  Shutting down.");
 
@@ -496,65 +555,19 @@ void SndSysDriverALSA::Run()
   snd_pcm_drop(m_pPCMDevice);
 }
 
-size_t SndSysDriverALSA::ClearBuffer(size_t Bytes)
+
+snd_pcm_sframes_t SndSysDriverALSA::FillBuffer(snd_pcm_sframes_t AvailableFrames)
 {
-  if (m_pPCMDevice)
-  {
-    snd_pcm_sframes_t availableframes;
-    snd_pcm_uframes_t mmap_offset, mmap_frames;
-    const snd_pcm_channel_area_t *mmap_areas;
-    int result;
-
-    availableframes = snd_pcm_avail_update(m_pPCMDevice);
-    if (availableframes <= 0)
-      return 0;
-
-
-    // Try to lock the mmap buffer for writing
-    mmap_frames=availableframes;
-    result = snd_pcm_mmap_begin(m_pPCMDevice, &mmap_areas, &mmap_offset, &mmap_frames);
-    if (result < 0)
-    {
-      RecordEvent(SSEL_CRITICAL, "Error mmaping PCM buffer from sound device! Error [%s]", snd_strerror(result));
-      return 0;
-    }
-
-    // Fill the buffer with silence
-    if (m_PlaybackFormat.Bits==8)
-    {
-      // For 8 bit samples, fill with 128
-      memset(((unsigned char *)mmap_areas[0].addr) + mmap_offset * mmap_areas[0].step/8, 128,  mmap_frames * m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8);
-    }
-    else
-    {
-      // For 16 bit samples, fill with 0
-      memset(((unsigned char *)mmap_areas[0].addr) + mmap_offset * mmap_areas[0].step/8, 0,  mmap_frames * m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8);
-    }
-
-    result = snd_pcm_mmap_commit(m_pPCMDevice, mmap_offset, mmap_frames);
-    if (result < 0)
-    {
-      RecordEvent(SSEL_CRITICAL, "Error committing PCM buffer to sound device! Error [%s]", snd_strerror(result));
-      return 0;
-    }
-  }
-  return 0;
-}
-
-int SndSysDriverALSA::FillBuffer(snd_pcm_sframes_t& AvailableFrames, snd_pcm_uframes_t& MappedFrames, snd_pcm_uframes_t& FilledFrames)
-{
+  snd_pcm_uframes_t MappedFrames, FilledFrames;
   snd_pcm_uframes_t mmap_offset;
   const snd_pcm_channel_area_t *mmap_areas;
   int result;
 
+  // Initialize these values
+  MappedFrames=0;
+  FilledFrames=0;
 
-  AvailableFrames = snd_pcm_avail_update(m_pPCMDevice);
-  if (AvailableFrames <= 0)
-    return 0;
-
-  RecordEvent(SSEL_DEBUG, "%d available frames in %d bytes", AvailableFrames, AvailableFrames * m_BytesPerFrame);
-
-  // Try to lock the mmap buffer for writing
+  // Try to lock all available frames in the mmap buffer for writing
   MappedFrames=AvailableFrames;
   mmap_offset=0;
   result = snd_pcm_mmap_begin(m_pPCMDevice, &mmap_areas, &mmap_offset, &MappedFrames);
@@ -564,21 +577,40 @@ int SndSysDriverALSA::FillBuffer(snd_pcm_sframes_t& AvailableFrames, snd_pcm_ufr
     return -1;
   }
 
+  // Log the number of frames we did map
   RecordEvent(SSEL_DEBUG, "Mapped %u frames", MappedFrames);
 
+  // Call the renderer to fill in the frame data
+  //  This is somewhat of a hack.  I think technically the mmaped areas can have
+  //  a different stride than we presume here.  In reality it probably never happens.
   FilledFrames = m_pAttachedRenderer->FillDriverBuffer(((unsigned char *)mmap_areas[0].addr) + mmap_offset * mmap_areas[0].step/8,
                                                           MappedFrames , 0, 0);
 
+  // Log the number of frames the renderer filled (should be all of them)
   RecordEvent(SSEL_DEBUG, "FillDriverBuffer() filled %u frames", FilledFrames);
 
+  // Commit the written frames to the ALSA layer
   result = snd_pcm_mmap_commit(m_pPCMDevice, mmap_offset, FilledFrames);
   if (result < 0)
   {
     RecordEvent(SSEL_CRITICAL, "Error committing PCM buffer to sound device! Error [%s]", snd_strerror(result));
     return -1;
   }
-  return 0;
+  return FilledFrames;
 }
+
+bool SndSysDriverALSA::CheckUnderrun()
+{
+  snd_pcm_state_t devicestate = snd_pcm_state(m_pPCMDevice);
+  if (devicestate == SND_PCM_STATE_XRUN)
+  {
+    // Log an underbuffer error
+    RecordEvent(SSEL_WARNING, "Underbuffer detected on output device!");
+    return true;
+  }
+  return false;
+}
+
 
 }
 CS_PLUGIN_NAMESPACE_END(SndSysALSA)
