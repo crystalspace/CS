@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Mar-2006
+	- Rhad cleaned up the Windows (directsound) driver and changed it to
+	  use the new template based SCF.
+	- Rhad changed the ALSA driver to use the new template based SCF and
+	  changed the logic to more aggressively seek to lower latency while
+	  accounting for under buffer conditions.
 22-Mar-2006
 	- Rhad performed numerous sound system enhancements:
 	  - Changed all sound system components over to the new SCF format.
