@@ -7920,9 +7920,11 @@ package cspace::iSndSysData;
 %OWNER = ();
 %ITERATORS = ();
 *GetFormat = *cspacec::iSndSysData_GetFormat;
-*GetSampleCount = *cspacec::iSndSysData_GetSampleCount;
+*GetFrameCount = *cspacec::iSndSysData_GetFrameCount;
 *GetDataSize = *cspacec::iSndSysData_GetDataSize;
 *CreateStream = *cspacec::iSndSysData_CreateStream;
+*SetDescription = *cspacec::iSndSysData_SetDescription;
+*GetDescription = *cspacec::iSndSysData_GetDescription;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -8039,28 +8041,25 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSndSysSoftwareFilterOutput ##############
+############# Class : cspace::iSndSysSoftwareOutputFilter ##############
 
-package cspace::iSndSysSoftwareFilterOutput;
+package cspace::iSndSysSoftwareOutputFilter;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
-*Apply = *cspacec::iSndSysSoftwareFilterOutput_Apply;
-*AddSubFilter = *cspacec::iSndSysSoftwareFilterOutput_AddSubFilter;
-*GetSubFilter = *cspacec::iSndSysSoftwareFilterOutput_GetSubFilter;
-*GetPtr = *cspacec::iSndSysSoftwareFilterOutput_GetPtr;
+*FormatNotify = *cspacec::iSndSysSoftwareOutputFilter_FormatNotify;
+*DeliverData = *cspacec::iSndSysSoftwareOutputFilter_DeliverData;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iSndSysSoftwareFilterOutput($self);
+        cspacec::delete_iSndSysSoftwareOutputFilter($self);
         delete $OWNER{$self};
     }
 }
 
-*scfGetVersion = *cspacec::iSndSysSoftwareFilterOutput_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -8225,6 +8224,8 @@ package cspace::iSndSysSource;
 *SetVolume = *cspacec::iSndSysSource_SetVolume;
 *GetVolume = *cspacec::iSndSysSource_GetVolume;
 *GetStream = *cspacec::iSndSysSource_GetStream;
+*AddOutputFilter = *cspacec::iSndSysSource_AddOutputFilter;
+*RemoveOutputFilter = *cspacec::iSndSysSource_RemoveOutputFilter;
 *GetPtr = *cspacec::iSndSysSource_GetPtr;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -8258,6 +8259,7 @@ package cspace::iSndSysSourceSoftware;
 %OWNER = ();
 %ITERATORS = ();
 *MergeIntoBuffer = *cspacec::iSndSysSourceSoftware_MergeIntoBuffer;
+*ProcessOutputFilters = *cspacec::iSndSysSourceSoftware_ProcessOutputFilters;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -8372,9 +8374,10 @@ package cspace::iSndSysStream;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
+*GetDescription = *cspacec::iSndSysStream_GetDescription;
 *GetRenderedFormat = *cspacec::iSndSysStream_GetRenderedFormat;
 *Get3dMode = *cspacec::iSndSysStream_Get3dMode;
-*GetSampleCount = *cspacec::iSndSysStream_GetSampleCount;
+*GetFrameCount = *cspacec::iSndSysStream_GetFrameCount;
 *GetPosition = *cspacec::iSndSysStream_GetPosition;
 *ResetPosition = *cspacec::iSndSysStream_ResetPosition;
 *SetPosition = *cspacec::iSndSysStream_SetPosition;
@@ -8391,7 +8394,6 @@ package cspace::iSndSysStream;
 *AdvancePosition = *cspacec::iSndSysStream_AdvancePosition;
 *GetDataPointers = *cspacec::iSndSysStream_GetDataPointers;
 *InitializeSourcePositionMarker = *cspacec::iSndSysStream_InitializeSourcePositionMarker;
-*GetPtr = *cspacec::iSndSysStream_GetPtr;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -8442,6 +8444,74 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iSndSysRenderer_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysRendererSoftwareCallback ##############
+
+package cspace::iSndSysRendererSoftwareCallback;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*StreamAddNotification = *cspacec::iSndSysRendererSoftwareCallback_StreamAddNotification;
+*StreamRemoveNotification = *cspacec::iSndSysRendererSoftwareCallback_StreamRemoveNotification;
+*SourceAddNotification = *cspacec::iSndSysRendererSoftwareCallback_SourceAddNotification;
+*SourceRemoveNotification = *cspacec::iSndSysRendererSoftwareCallback_SourceRemoveNotification;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysRendererSoftwareCallback($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysRendererSoftware ##############
+
+package cspace::iSndSysRendererSoftware;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*AddOutputFilter = *cspacec::iSndSysRendererSoftware_AddOutputFilter;
+*RemoveOutputFilter = *cspacec::iSndSysRendererSoftware_RemoveOutputFilter;
+*RegisterCallback = *cspacec::iSndSysRendererSoftware_RegisterCallback;
+*UnregisterCallback = *cspacec::iSndSysRendererSoftware_UnregisterCallback;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysRendererSoftware($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -14298,6 +14368,9 @@ sub CS_THING_NOCOMPRESS () { $cspacec::CS_THING_NOCOMPRESS }
 sub CS_THING_MOVE_NEVER () { $cspacec::CS_THING_MOVE_NEVER }
 sub CS_THING_MOVE_OCCASIONAL () { $cspacec::CS_THING_MOVE_OCCASIONAL }
 sub CS_SNDSYS_DATA_UNKNOWN_SIZE () { $cspacec::CS_SNDSYS_DATA_UNKNOWN_SIZE }
+sub SS_FILTER_LOC_RENDEROUT () { $cspacec::SS_FILTER_LOC_RENDEROUT }
+sub SS_FILTER_LOC_SOURCEOUT () { $cspacec::SS_FILTER_LOC_SOURCEOUT }
+sub SS_FILTER_LOC_SOURCEIN () { $cspacec::SS_FILTER_LOC_SOURCEIN }
 sub CS_SNDSYS_SOURCE_DISTANCE_INFINITE () { $cspacec::CS_SNDSYS_SOURCE_DISTANCE_INFINITE }
 sub CSSNDSYS_SAMPLE_LITTLE_ENDIAN () { $cspacec::CSSNDSYS_SAMPLE_LITTLE_ENDIAN }
 sub CSSNDSYS_SAMPLE_BIG_ENDIAN () { $cspacec::CSSNDSYS_SAMPLE_BIG_ENDIAN }
