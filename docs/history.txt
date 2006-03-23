@@ -12,6 +12,7 @@ chronological order.
 	- Rhad changed the ALSA driver to use the new template based SCF and
 	  changed the logic to more aggressively seek to lower latency while
 	  accounting for under buffer conditions.
+	- Piotr Obrzut added terra former collider collision queries handling
 22-Mar-2006
 	- Rhad performed numerous sound system enhancements:
 	  - Changed all sound system components over to the new SCF format.
