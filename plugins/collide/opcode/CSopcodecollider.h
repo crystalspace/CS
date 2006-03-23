@@ -70,6 +70,8 @@ public:
   /// Destroy the RAPID collider object
   virtual ~csOPCODECollider ();
 
+  csColliderType GetColliderType () {return CS_MESH_COLLIDER;}
+
   /**
    * Check if this collider collides with pOtherCollider.
    * Returns true if collision detected and adds the pair to the collisions

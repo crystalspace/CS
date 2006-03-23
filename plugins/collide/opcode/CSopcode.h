@@ -36,6 +36,7 @@
 #include "ivaria/collider.h"
 #include "csgeom/transfrm.h"
 #include "CSopcodecollider.h"
+#include "csTerraFormerCollider.h"
 #include "Opcode.h"
 
 struct iObjectRegistry;
@@ -45,6 +46,13 @@ struct iObjectRegistry;
  */
 class csOPCODECollideSystem : public iCollideSystem
 {
+
+  bool Collide (csOPCODECollider* collider1, const csReversibleTransform* trans1,
+    csTerraFormerCollider* terraformer);
+  
+  bool TestTriangleTerraFormer (csVector3 triangle[3], csTerraFormerCollider* c,
+    csCollisionPair* pair);
+
 public:
   CS::Plugins::Opcode::Opcode::AABBTreeCollider TreeCollider;
   CS::Plugins::Opcode::Opcode::RayCollider RayCol;

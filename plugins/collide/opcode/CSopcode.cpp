@@ -118,10 +118,69 @@ csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iPolygonMesh* mesh)
   return csPtr<iCollider> (col);
 }
 
-csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iTerraFormer* mesh)
+csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iTerraFormer* terraformer)
 {
-  //@@@ Implement me!
-  return 0;
+  csTerraFormerCollider* col = new csTerraFormerCollider (terraformer, object_reg);
+  return csPtr<iCollider> (col);
+}
+bool csOPCODECollideSystem::TestTriangleTerraFormer (csVector3 triangle[3], 
+                                                   csTerraFormerCollider* c,
+                                                   csCollisionPair* pair)
+{
+  float height[3];
+  height[0] = c->SampleFloat (triangle[0].x, triangle[0].z);
+  height[1] = c->SampleFloat (triangle[1].x, triangle[1].z);
+  height[2] = c->SampleFloat (triangle[2].x, triangle[2].z);
+  for (int i = 0; i < 3; i++)
+  {
+    if (height[i] > triangle[i].y)
+    {
+      pair->a1 = triangle[2];
+      pair->b1 = triangle[1];
+      pair->c1 = triangle[0];
+
+      pair->a2 = csVector3 (triangle[2].x, height[2], triangle[2].z);
+      pair->b2 = csVector3 (triangle[1].x, height[1], triangle[1].z);
+      pair->c2 = csVector3 (triangle[0].x, height[0], triangle[0].z);
+
+      return true;
+    }
+  }
+ return false;
+}
+bool csOPCODECollideSystem::Collide (
+  csOPCODECollider* collider1, const csReversibleTransform* trans1,
+  csTerraFormerCollider* terraformer)
+{
+  bool collision_status = false;
+
+  csVector3 tmp_tri[3];
+  int tri_cnt = collider1->m_pCollisionModel->GetMeshInterface ()->GetNbTriangles ();
+  for (int i = 0; i < tri_cnt; i++)
+  {
+    VertexPointers triangle;
+    collider1->m_pCollisionModel->GetMeshInterface ()->GetTriangle (triangle, i);
+
+    tmp_tri[0] = csVector3 (
+      triangle.Vertex[0]->x, triangle.Vertex[0]->y, triangle.Vertex[0]->z); 
+    tmp_tri[1] = csVector3 (
+      triangle.Vertex[1]->x, triangle.Vertex[1]->y, triangle.Vertex[1]->z); 
+    tmp_tri[2] = csVector3 (
+      triangle.Vertex[2]->x, triangle.Vertex[2]->y, triangle.Vertex[2]->z); 
+
+    tmp_tri[0] = trans1->This2Other (tmp_tri[0]);
+    tmp_tri[1] = trans1->This2Other (tmp_tri[1]);
+    tmp_tri[2] = trans1->This2Other (tmp_tri[2]);
+
+    csCollisionPair pair;
+    if (TestTriangleTerraFormer (tmp_tri, terraformer, &pair))
+    {
+      collision_status = true;
+      pairs.Push (pair);
+    }
+  }
+
+  return collision_status;
 }
 
 bool csOPCODECollideSystem::Collide (
@@ -129,6 +188,14 @@ bool csOPCODECollideSystem::Collide (
   iCollider* collider2, const csReversibleTransform* trans2)
 {
   // csPrintf( " we are in Collide \n");
+  if (collider1->GetColliderType () == CS_TERRAFORMER_COLLIDER && 
+    collider2->GetColliderType () == CS_MESH_COLLIDER)
+    return Collide ((csOPCODECollider*)collider2, trans2, (csTerraFormerCollider*)collider1);
+    
+  if (collider2->GetColliderType () == CS_TERRAFORMER_COLLIDER && 
+    collider1->GetColliderType () == CS_MESH_COLLIDER)
+    return Collide ((csOPCODECollider*)collider1, trans1, (csTerraFormerCollider*)collider2);
+
   csOPCODECollider* col1 = (csOPCODECollider*) collider1;
   csOPCODECollider* col2 = (csOPCODECollider*) collider2;
   if (col1 == col2) return false;

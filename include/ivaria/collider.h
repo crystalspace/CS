@@ -57,7 +57,13 @@ struct csIntersectingTriangle
   csVector3 a, b, c;
 };
 
-SCF_VERSION (iCollider, 0, 2, 0);
+
+
+enum csColliderType
+{
+  CS_MESH_COLLIDER = 0,
+  CS_TERRAFORMER_COLLIDER
+};
 
 /**
  * A mesh collider.
@@ -71,8 +77,10 @@ SCF_VERSION (iCollider, 0, 2, 0);
  * Main users of this interface:
  * - csColliderWrapper
  */
-struct iCollider : public iBase
+struct iCollider : public virtual iBase
 {
+  SCF_INTERFACE (iCollider, 0, 2, 0);
+  virtual csColliderType GetColliderType () = 0;
 };
 
 SCF_VERSION (iCollideSystem, 0, 0, 4);
