@@ -48,22 +48,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(SndSysDIRECTSOUND)
 SCF_IMPLEMENT_FACTORY (SndSysDriverDirectSound)
 
 
-SCF_IMPLEMENT_IBASE(SndSysDriverDirectSound)
-  SCF_IMPLEMENTS_INTERFACE(iSndSysSoftwareDriver)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (SndSysDriverDirectSound::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SndSysDriverDirectSound::SndSysDriverDirectSound(iBase* piBase) :
- m_pDirectSoundDevice(0), m_pDirectSoundBuffer(0), m_bRunning(false)
+SndSysDriverDirectSound::SndSysDriverDirectSound(iBase* pParent) :
+  scfImplementationType(this, pParent),
+  m_pDirectSoundDevice(0), m_pDirectSoundBuffer(0), m_bRunning(false)
 {
-  SCF_CONSTRUCT_IBASE(piBase);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
-//  scfiEventHandler = 0;
   m_pObjectRegistry = 0;
 
   m_pDirectSoundDevice=0;
@@ -73,8 +61,6 @@ SndSysDriverDirectSound::SndSysDriverDirectSound(iBase* piBase) :
 
 SndSysDriverDirectSound::~SndSysDriverDirectSound()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 
@@ -106,9 +92,9 @@ bool SndSysDriverDirectSound::Initialize (iObjectRegistry *obj_reg)
     if (BufferLengthStr) m_BufferLengthms=atoi(BufferLengthStr);
   }
 
-  // Check for sound config file option. Default to 200 ms if no option is found.
+  // Check for sound config file option. Default to 20 ms if no option is found.
   if (m_BufferLengthms<=0)
-    m_BufferLengthms = Config->GetInt("SndSys.Driver.Win.SoundBufferms", 200);
+    m_BufferLengthms = Config->GetInt("SndSys.Driver.Win.SoundBufferms", 20);
 
   // The number of underbuffer events before the buffer size is automatically increased
   m_UnderBuffersAllowed=5;

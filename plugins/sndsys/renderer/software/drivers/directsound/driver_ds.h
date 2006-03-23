@@ -65,14 +65,29 @@ public:
 struct iConfigFile;
 struct iReporter;
 
-class SndSysDriverDirectSound : public iSndSysSoftwareDriver
+class SndSysDriverDirectSound : 
+  public scfImplementation2<SndSysDriverDirectSound, iComponent, iSndSysSoftwareDriver>
 {
 public:
-  SCF_DECLARE_IBASE;
-
-  SndSysDriverDirectSound(iBase *piBase);
+  SndSysDriverDirectSound(iBase *pParent);
   virtual ~SndSysDriverDirectSound();
 
+
+  ////
+  // Interface implementation
+  ////
+
+  //------------------------
+  // iComponent
+  //------------------------
+public:
+  // iComponent
+  virtual bool Initialize (iObjectRegistry *obj_reg);
+
+  //------------------------
+  // iSndSysSoftwareDriver
+  //------------------------
+public:
   /// Called to initialize the driver
   bool Open (csSndSysRendererSoftware *renderer, 
     csSndSysSoundFormat *requested_format);
@@ -86,49 +101,12 @@ public:
   /// Stop the background thread
   void StopThread();
 
+  ////
+  // Member Functions
+  ////
+public:
   /// The thread runnable procedure
   void Run ();
-
-  /// Access interface to the object registry
-  iObjectRegistry *m_pObjectRegistry;
-
-protected:
-  /// Pointer to the owning SndSysRendererSoftware
-  csSndSysRendererSoftware *m_pAttachedRenderer;
-  /// Local copy of the audio format parameters
-  csSndSysSoundFormat m_PlaybackFormat;
-
-  /// The DirectSound audio device interface
-  LPDIRECTSOUND8 m_pDirectSoundDevice;
-  /// The DirectSound audio buffer interface
-  LPDIRECTSOUNDBUFFER m_pDirectSoundBuffer;
-  
-  /// Number of bytes in a single frame
-  size_t m_BytesPerFrame;
-  /// The size of the DirectSound allocated buffer, in bytes
-  DWORD m_DirectSoundBufferBytes;
-  /// The size of the DirectSound allocated buffer, in frames
-  DWORD m_DirectSoundBufferFrames;
-  /// The length of the DirectSound allocated buffer, in milliseconds
-  csTicks m_BufferLengthms;
-  /** The minimum number of empty frames that need to be available
-   *    before a write is considered worthwhile.
-   */
-  DWORD m_DirectSoundBufferMinimumFillFrames;
-  /// The number of underbuffer conditions that must occur before
-  //   we take major corrective action
-  int m_UnderBuffersAllowed;
-
-  /// A flag used to shut down the running background thread.
-  // We don't really need to synchronize access to this since a delay in
-  // recognizing a change isn't a big deal.
-  volatile bool m_bRunning;
-
-  /// Handle to the csThread object that controls execution of our background thread
-  csRef<csThread> m_pBackgroundThread;
-
-  /// The event recorder interface, if active
-  csRef<iSndSysEventRecorder> m_EventRecorder;
 
 protected:
   /// Creates a new DirectSoundBuffer object using the current parameters
@@ -143,24 +121,57 @@ protected:
   /// Send a message to the sound system event recorder as the driver
   void RecordEvent(SndSysEventLevel Severity, const char* msg, ...);
 
-public:
+
   ////
-  //
-  // Interface implementation
-  //
+  // Member Variables
   ////
+protected:
+  /// Access interface to the object registry
+  iObjectRegistry *m_pObjectRegistry;
 
-  // iComponent
-  virtual bool Initialize (iObjectRegistry *obj_reg);
+  /// Pointer to the owning SndSysRendererSoftware
+  csSndSysRendererSoftware *m_pAttachedRenderer;
 
+  /// Local copy of the audio format parameters
+  csSndSysSoundFormat m_PlaybackFormat;
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(SndSysDriverDirectSound);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
+  /// The DirectSound audio device interface
+  LPDIRECTSOUND8 m_pDirectSoundDevice;
 
+  /// The DirectSound audio buffer interface
+  LPDIRECTSOUNDBUFFER m_pDirectSoundBuffer;
+  
+  /// Number of bytes in a single frame
+  size_t m_BytesPerFrame;
+
+  /// The size of the DirectSound allocated buffer, in bytes
+  DWORD m_DirectSoundBufferBytes;
+
+  /// The size of the DirectSound allocated buffer, in frames
+  DWORD m_DirectSoundBufferFrames;
+
+  /// The length of the DirectSound allocated buffer, in milliseconds
+  csTicks m_BufferLengthms;
+
+  /** The minimum number of empty frames that need to be available
+   *    before a write is considered worthwhile.
+   */
+  DWORD m_DirectSoundBufferMinimumFillFrames;
+
+  /// The number of underbuffer conditions that must occur before
+  //   we take major corrective action
+  int m_UnderBuffersAllowed;
+
+  /// A flag used to shut down the running background thread.
+  // We don't really need to synchronize access to this since a delay in
+  // recognizing a change isn't a big deal.
+  volatile bool m_bRunning;
+
+  /// Handle to the csThread object that controls execution of our background thread
+  csRef<csThread> m_pBackgroundThread;
+
+  /// The event recorder interface, if active
+  csRef<iSndSysEventRecorder> m_EventRecorder;
 };
 
 }
