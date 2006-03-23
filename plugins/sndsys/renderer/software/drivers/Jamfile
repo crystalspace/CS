@@ -5,4 +5,5 @@ SubInclude TOP plugins sndsys renderer software drivers directsound ;
 SubInclude TOP plugins sndsys renderer software drivers oss ;
 SubInclude TOP plugins sndsys renderer software drivers jackasyn ;
 SubInclude TOP plugins sndsys renderer software drivers alsa ;
+SubInclude TOP plugins sndsys renderer software drivers null ;
 
