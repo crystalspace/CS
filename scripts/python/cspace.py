@@ -11145,6 +11145,8 @@ class csIntersectingTrianglePtr(csIntersectingTriangle):
         _swig_setattr(self, csIntersectingTriangle,self.__class__,csIntersectingTriangle)
 _cspace.csIntersectingTriangle_swigregister(csIntersectingTrianglePtr)
 
+CS_MESH_COLLIDER = _cspace.CS_MESH_COLLIDER
+CS_TERRAFORMER_COLLIDER = _cspace.CS_TERRAFORMER_COLLIDER
 class iCollider(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -11155,6 +11157,7 @@ class iCollider(iBase):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<%s.%s; proxy of C++ iCollider instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def GetColliderType(*args): return _cspace.iCollider_GetColliderType(*args)
     def __del__(self, destroy=_cspace.delete_iCollider):
         try:
             if self.thisown: destroy(self)
