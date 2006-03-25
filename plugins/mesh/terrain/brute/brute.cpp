@@ -177,15 +177,8 @@ void csTerrBlock::Detach ()
   }
 }
 
-void csTerrBlock::SetupMesh ()
+void csTerrBlock::LoadData ()
 {
-
-//@@@ have a method to set this from world
-float cullsize = terr->block_maxsize;
-
-if (size < cullsize )
-{
-
   res = terr->GetBlockResolution () + 1;
 
   delete[] vertex_data;
@@ -212,6 +205,20 @@ if (size < cullsize )
     res * res * sizeof (csVector2));
 
   terrasampler->Cleanup ();
+}
+
+void csTerrBlock::SetupMesh ()
+{
+
+//@@@ have a method to set this from world
+float cullsize = terr->block_maxsize;
+
+if (size < cullsize )
+{
+
+  res = terr->GetBlockResolution () + 1;
+
+  LoadData ();
 
   bbox.Empty ();
 
@@ -2406,6 +2413,7 @@ bool csTerrainObject::HitBeamVertical (csTerrBlock* block,
   if (block->IsLeaf ())
   {
     // Check the triangles.
+    if (block->built == false) block->LoadData();
     csVector3* vt = block->vertex_data;
     int res = block->res;
     int x, y;
@@ -2478,6 +2486,7 @@ printf("hit!beam!\n");
   if (block->IsLeaf ())
   {
     // Check the triangles.
+    if (block->built == false) block->LoadData();
     csVector3* vt = block->vertex_data;
     int res = block->res;
     int x, y;

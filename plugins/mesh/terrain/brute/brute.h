@@ -109,6 +109,9 @@ public:
   csTerrBlock (csTerrainObject *terr);
   ~csTerrBlock ();
 
+  /// Load data from Former
+  void LoadData ();
+
   /// Generate mesh
   void SetupMesh ();
 
