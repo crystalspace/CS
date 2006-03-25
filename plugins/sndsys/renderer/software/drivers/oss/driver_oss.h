@@ -26,11 +26,9 @@
 
 #include "isndsys/ss_structs.h"
 #include "isndsys/ss_driver.h"
+#include "isndsys/ss_eventrecorder.h"
 
 
-
-struct iConfigFile;
-struct iReporter;
 
 CS_PLUGIN_NAMESPACE_BEGIN(SndSysOSS)
 {
@@ -63,17 +61,30 @@ public:
 };
 
 
-class SndSysDriverOSS : public iSndSysSoftwareDriver
+class SndSysDriverOSS : 
+  public scfImplementation2<SndSysDriverOSS, iComponent, iSndSysSoftwareDriver>
 {
 public:
-  SCF_DECLARE_IBASE;
-
-  SndSysDriverOSS(iBase *piBase);
+  SndSysDriverOSS(iBase *pParent);
   virtual ~SndSysDriverOSS();
 
+  ////
+  // Interface implementation
+  ////
+
+  //------------------------
+  // iComponent
+  //------------------------
+public:
+  // iComponent
+  virtual bool Initialize (iObjectRegistry *obj_reg);
+
+  //------------------------
+  // iSndSysSoftwareDriver
+  //------------------------
+public:
   /// Called to initialize the driver
-  bool Open (csSndSysRendererSoftware*renderer,
-    csSndSysSoundFormat *requested_format);
+  bool Open (csSndSysRendererSoftware*renderer, csSndSysSoundFormat *requested_format);
 
   /// Called to shutdown the driver
   void Close ();
@@ -84,53 +95,71 @@ public:
   /// Stop the background thread
   void StopThread();
 
+  ////
+  // Member Functions
+  ////
+public:
   /// The thread runnable procedure
   void Run ();
 
-  // The system driver.
-  static iObjectRegistry *object_reg;
-
-  void Report (int severity, const char* msg, ...);
-
 
 protected:
-  uint8 *oss_buffer;
-  csSndSysRendererSoftware *attached_renderer;
-  csSndSysSoundFormat playback_format;
+  /// Destroy any existing sound buffer and setup a new one using the current parameters.
+  //    Uses m_BufferLengthms and m_PlaybackFormat to determine the size
+  bool ResizeBuffer();
 
-  char output_device[128];
-  int output_fd;
-  uint32 oss_buffer_bytes;
-
-  /// A flag used to shut down the running background thread.
-  // We don't really need to synchronize access to this since a delay in
-  // recognizing a change isn't a big deal.
-  volatile bool running;
-  csRef<csThread> bgthread;
-
-protected:
+  /// Clear the entire sound buffer
   void ClearBuffer();
+
+  /// Write sound data to the output device
   void WriteBuffer(size_t bytes);
 
+  /// Send a message to the sound system event recorder as the driver
+  void RecordEvent(SndSysEventLevel Severity, const char* msg, ...);
 
-public:
+
   ////
-  //
-  // Interface implementation
-  //
+  // Member Variables
   ////
+protected:
+  /// Access interface to the object registry
+  iObjectRegistry *m_pObjectRegistry;
 
-  // iComponent
-  virtual bool Initialize (iObjectRegistry *obj_reg);
+  /// Pointer to the buffer we'll fill with sound for delivery to the 
+  uint8 *m_pSoundBuffer;
 
+  /// The size of the sound buffer in bytes
+  uint32 m_SoundBufferSize;
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(SndSysDriverOSS);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
+  /// Pointer to the owning SndSysRendererSoftware
+  csSndSysRendererSoftware *m_pAttachedRenderer;
 
+  /// Local copy of the audio format parameters
+  csSndSysSoundFormat m_PlaybackFormat;
+
+  /// Name of the output device file (i.e. /dev/dsp)
+  char m_OutputDeviceName[128];
+
+  /// The file descriptor of the output device
+  int m_OutputFileDescriptor;
+
+  /// The maximum length audio we will send to OSS in advance, in milliseconds
+  csTicks m_BufferLengthms;
+
+  /// The number of underbuffer conditions that must occur before
+  //   we take major corrective action
+  int m_UnderBuffersAllowed;
+
+  /// A flag used to shut down the m_bRunning background thread.
+  // We don't really need to synchronize access to this since a delay in
+  // recognizing a change isn't a big deal.
+  volatile bool m_bRunning;
+
+  /// Handle to the csThread object that controls execution of our background thread
+  csRef<csThread> m_pBackgroundThread;
+
+  /// The event recorder interface, if active
+  csRef<iSndSysEventRecorder> m_EventRecorder;
 };
 
 }

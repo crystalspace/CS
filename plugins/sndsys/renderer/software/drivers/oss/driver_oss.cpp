@@ -54,100 +54,94 @@ CS_PLUGIN_NAMESPACE_BEGIN(SndSysOSS)
 SCF_IMPLEMENT_FACTORY (SndSysDriverOSS)
 
 
-SCF_IMPLEMENT_IBASE(SndSysDriverOSS)
-SCF_IMPLEMENTS_INTERFACE(iSndSysSoftwareDriver)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END;
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (SndSysDriverOSS::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-// The system driver.
-iObjectRegistry *SndSysDriverOSS::object_reg=0;
-
-SndSysDriverOSS::SndSysDriverOSS(iBase* piBase) :
- oss_buffer(0), output_fd(-1), running(false)
+SndSysDriverOSS::SndSysDriverOSS(iBase* pParent) :
+ scfImplementationType(this, pParent),
+ m_pSoundBuffer(0), m_OutputFileDescriptor(-1), m_bRunning(false)
 {
-  SCF_CONSTRUCT_IBASE(piBase);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
-//  scfiEventHandler = 0;
-  object_reg = 0;
+  m_pObjectRegistry = 0;
 }
 
 
 SndSysDriverOSS::~SndSysDriverOSS()
 {
-  if (output_fd>=0)
-    close(output_fd);
-  output_fd=-1;
+  if (m_OutputFileDescriptor>=0)
+    close(m_OutputFileDescriptor);
+  m_OutputFileDescriptor=-1;
 
-  delete[] oss_buffer;
-
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
+  delete[] m_pSoundBuffer;
 }
 
-void SndSysDriverOSS::Report(int severity, const char* msg, ...)
+void SndSysDriverOSS::RecordEvent(SndSysEventLevel Severity, const char* msg, ...)
 {
+  if (!m_EventRecorder)
+    return;
+
   va_list arg;
   va_start (arg, msg);
-
-  csRef<iReporter> reporter = CS_QUERY_REGISTRY(object_reg, iReporter);
-
-  if (reporter)
-    reporter->ReportV (severity, "crystalspace.SndSys.driver.software.oss", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  m_EventRecorder->RecordEventV(SSEC_DRIVER, Severity, msg, arg);
   va_end (arg);
 }
 
-
-
 bool SndSysDriverOSS::Initialize (iObjectRegistry *obj_reg)
 {
-  // copy the system pointer
-  object_reg=obj_reg;
+  /// Interface to the Configuration file
+  csConfigAccess Config;
 
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: OSS driver for software sound renderer initialized.");
+  // copy the system pointer
+  m_pObjectRegistry=obj_reg;
+
+  // Get an interface for event recorder (if present)
+  m_EventRecorder = csQueryRegistry<iSndSysEventRecorder> (m_pObjectRegistry);
+
+  // Critical because you really want to log this.  Trust me.  Really.
+  RecordEvent(SSEL_CRITICAL, "OSS sound driver for software sound renderer initialized.");
 
   // read the config file
-//  Config.AddConfig(object_reg, "/config/sound.cfg");
+  Config.AddConfig(m_pObjectRegistry, "/config/sound.cfg");
+
+  // check for optional output device name from the commandline
+  csRef<iCommandLineParser> CMDLine (CS_QUERY_REGISTRY (m_pObjectRegistry,
+    iCommandLineParser));
+  const char *OutputDeviceName = CMDLine->GetOption ("ossdevice");
+  if (!OutputDeviceName)
+    OutputDeviceName = Config->GetStr("SndSys.Driver.OSS.Device", "/dev/dsp");
+
+  strcpy(m_OutputDeviceName, OutputDeviceName);
 
 
-  strcpy(output_device, "/dev/dsp");
- 
+  // The 'buffer length' here is not a real buffer allocation, but
+  //  is instead the maximum amount of data we will send ahead to OSS.
+  m_BufferLengthms=0;
+  if (CMDLine)
+  {
+    const char *BufferLengthStr = CMDLine->GetOption("soundbufferms");
+    if (BufferLengthStr) m_BufferLengthms=atoi(BufferLengthStr);
+  }
+
+  // Check for sound config file option. Default to 20 ms if no option is found.
+  if (m_BufferLengthms<=0)
+    m_BufferLengthms = Config->GetInt("SndSys.Driver.OSS.SoundBufferms", 20);
+
+  // The number of underbuffer events before the buffer size is automatically increased
+  m_UnderBuffersAllowed=5;
+
   return true;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// 
-//  
-//
-//
-//
-//
-//////////////////////////////////////////////////////////////////////////
+
 bool SndSysDriverOSS::Open (csSndSysRendererSoftware*renderer,
 			     csSndSysSoundFormat *requested_format)
 {
   int result, param;
 
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Sound System: OSS Driver: Open()");
-//  CS_ASSERT (Config != 0);
+  RecordEvent(SSEL_DEBUG, "OSS Driver: Open()");
 
-  attached_renderer=renderer;
+  m_pAttachedRenderer=renderer;
 
-  output_fd=open(output_device, O_WRONLY, 0);
-  if (output_fd==-1)
+  m_OutputFileDescriptor=open(m_OutputDeviceName, O_WRONLY, 0);
+  if (m_OutputFileDescriptor==-1)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, 
-      "Sound System: OSS Driver: Failed to open output device [%s].", 
-      output_device);
+    RecordEvent(SSEL_ERROR, "Failed to open output device [%s].", m_OutputDeviceName);
     return false;
   }
 
@@ -164,7 +158,7 @@ bool SndSysDriverOSS::Open (csSndSysRendererSoftware*renderer,
         param=AFMT_S16_LE;
     break;
     default:
-      Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: OSS Driver: Unhandled output bits %d. Forcing to 16 bit.", requested_format->Bits);
+      RecordEvent(SSEL_WARNING, "Unhandled output bits %d. Forcing to 16 bit.", requested_format->Bits);
       requested_format->Bits=16;
       if ((requested_format->Flags & CSSNDSYS_SAMPLE_ENDIAN_MASK) == CSSNDSYS_SAMPLE_BIG_ENDIAN)
         param=AFMT_S16_BE;
@@ -172,7 +166,7 @@ bool SndSysDriverOSS::Open (csSndSysRendererSoftware*renderer,
         param=AFMT_S16_LE;
     break;
   }
-  result=ioctl(output_fd, SNDCTL_DSP_SETFMT, &param);
+  result=ioctl(m_OutputFileDescriptor, SNDCTL_DSP_SETFMT, &param);
   if (result==-1)
   {
     const char *endian_string;
@@ -182,66 +176,80 @@ bool SndSysDriverOSS::Open (csSndSysRendererSoftware*renderer,
     else
       endian_string="Little Endian";
     
-    Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: OSS Driver: Failed to set output format to %d bit (%s).", requested_format->Bits, endian_string);
-    close(output_fd);
-    output_fd=-1;
+    RecordEvent(SSEL_ERROR, "Failed to set output format to %d bit (%s).", requested_format->Bits, endian_string);
+    close(m_OutputFileDescriptor);
+    m_OutputFileDescriptor=-1;
     return false;
   }
 
   // Set channels
   param=requested_format->Channels;
-  result=ioctl(output_fd, SNDCTL_DSP_CHANNELS, &param);
+  result=ioctl(m_OutputFileDescriptor, SNDCTL_DSP_CHANNELS, &param);
   if (result==-1)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: OSS Driver: Failed to set output format to %d channels.", requested_format->Channels);
-    close(output_fd);
-    output_fd=-1;
+    RecordEvent(SSEL_ERROR, "Failed to set output format to %d channels.", requested_format->Channels);
+    close(m_OutputFileDescriptor);
+    m_OutputFileDescriptor=-1;
     return false;
   }
 
   // Set sample frequency
   param=requested_format->Freq;
-  result=ioctl(output_fd, SNDCTL_DSP_SPEED, &param);
+  result=ioctl(m_OutputFileDescriptor, SNDCTL_DSP_SPEED, &param);
   if (result==-1)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Sound System: OSS Driver: Failed to set output bitrate to %d bits per channel per second.", requested_format->Freq);
-    close(output_fd);
-    output_fd=-1;
+    RecordEvent(SSEL_ERROR, "Failed to set output bitrate to %d bits per channel per second.", requested_format->Freq);
+    close(m_OutputFileDescriptor);
+    m_OutputFileDescriptor=-1;
     return false;
   }
 
   // Copy the final format into local storage
-  memcpy(&playback_format, requested_format, sizeof(csSndSysSoundFormat));
+  memcpy(&m_PlaybackFormat, requested_format, sizeof(csSndSysSoundFormat));
 
+  // Setup our initial sound buffer
+  if (!ResizeBuffer())
+    return false;
 
-  // Setup a playback buffer
+  return true;
+}
 
-  // 1/10th of a second
-  oss_buffer_bytes=playback_format.Channels * (playback_format.Bits/8) * playback_format.Freq / 10;
-  oss_buffer=new uint8[oss_buffer_bytes];
+bool SndSysDriverOSS::ResizeBuffer()
+{
+  // Setup a buffer which will be used to move sound from the renderer to
+  //  OSS.  This is set as the full size of the maximum latency time of the 
+  //  OSS output.
+  delete[] m_pSoundBuffer;
 
+  m_SoundBufferSize=m_BufferLengthms * m_PlaybackFormat.Freq * m_PlaybackFormat.Bits/8 * m_PlaybackFormat.Channels / 1000;
+  m_pSoundBuffer = new uint8[m_SoundBufferSize];
+
+  RecordEvent(SSEL_DEBUG, "Resizing buffer to %d ms (%d frames)", m_BufferLengthms, m_BufferLengthms * m_PlaybackFormat.Freq / 1000);
+
+  if (!m_pSoundBuffer)
+    return false;
   return true;
 }
 
 void SndSysDriverOSS::Close ()
 {
-  if (output_fd)
+  if (m_OutputFileDescriptor)
   {
-    close(output_fd);
-    output_fd=-1;
+    close(m_OutputFileDescriptor);
+    m_OutputFileDescriptor=-1;
   }
 }
 
 bool SndSysDriverOSS::StartThread()
 {
-  if (running) return false;
+  if (m_bRunning) return false;
 
-  running=true;
+  m_bRunning=true;
   SndSysDriverRunnable* runnable = new SndSysDriverRunnable (this);
-  bgthread = csThread::Create(runnable);
+  m_pBackgroundThread = csThread::Create(runnable);
   runnable->DecRef ();
 
-  bgthread->Start();
+  m_pBackgroundThread->Start();
   
   return true;
 }
@@ -249,7 +257,7 @@ bool SndSysDriverOSS::StartThread()
 
 void SndSysDriverOSS::StopThread()
 {
-  running=false;
+  m_bRunning=false;
   csSleep(100);
 }
 
@@ -260,42 +268,82 @@ void SndSysDriverRunnable::Run ()
 
 void SndSysDriverOSS::Run()
 {
-  csTicks last_write, current_ticks, tick_difference;
+  csTicks last_write, current_ticks;
+  int UnderBufferCount=0;
 
-  // Write at about 20 times per second
-  tick_difference=1000/20;
-
-  last_write=csGetTicks();
-  // Clear the buffer and write one section ahead
+  // Clear the buffer and write the full buffer size ahead
   ClearBuffer();
-  WriteBuffer(oss_buffer_bytes);
+  WriteBuffer(m_SoundBufferSize);
+  // Mark the current time, OSS provides no timing information, so we
+  //  rely entirely on the system clock
+  last_write=csGetTicks();
   
 
-  while (running)
+  while (m_bRunning)
   {
+    // Get the current time
     current_ticks=csGetTicks();
-    if (last_write + tick_difference <= current_ticks)
+    
+    // Determine if a write is worthwhile.  We will fill if at least 1/4 of the
+    //  full buffer time has elapsed
+    if ((current_ticks - last_write) > m_BufferLengthms/4)
     {
-      uint32 bytes_used=attached_renderer->FillDriverBuffer(oss_buffer, oss_buffer_bytes, 0, 0);
-      if (bytes_used > 0)
+      // The number of frames needed to refill the OSS buffer
+      size_t NeededFrames=(current_ticks - last_write) * m_PlaybackFormat.Freq / 1000;
+
+      // Check for underbuffer - if the elapsed time has exceeded the total buffer time
+      if ((current_ticks - last_write) >= m_BufferLengthms)
       {
-        WriteBuffer(bytes_used);
+        UnderBufferCount++;
+        RecordEvent(SSEL_WARNING, "Underbuffer condition detected. Buffer length [%d ms] elapsed cycle [%d ms] Underbuffer count [%d] allowed [%d]",
+          m_BufferLengthms, current_ticks - last_write, UnderBufferCount, m_UnderBuffersAllowed);
+
+        // Maximum allowed underbuffer count exceeded, expand our buffer to compensate
+        if (UnderBufferCount > m_UnderBuffersAllowed)
+        {
+          // Double our buffer length
+          m_BufferLengthms*=2;
+
+          if (!ResizeBuffer())
+          {
+            RecordEvent(SSEL_ERROR, "Failed to resize buffer!  Aborting main loop.");
+            break;
+          }
+
+          // Reset the count to 0
+          UnderBufferCount=0;
+
+          // We'll need to adjust the number of frames so that we fill the entire buffer here
+          NeededFrames=m_BufferLengthms * m_PlaybackFormat.Freq / 1000;
+        }
       }
+
+      // Fill the buffer with the required number of frames
+      m_pAttachedRenderer->FillDriverBuffer(m_pSoundBuffer, NeededFrames, 0, 0);
+
+      // Write the data to OSS
+      WriteBuffer(NeededFrames);
+
+      // Update our last write time
       last_write=current_ticks;
     }
-    csSleep(0);
+    else
+    {
+      // Otherwise, sleep about 1/4 of the buffer length
+      csSleep(m_BufferLengthms/4);
+    }
   }
 }
 
 void SndSysDriverOSS::ClearBuffer()
 {
-  if (oss_buffer)
-    memset(oss_buffer, 0, sizeof(uint8) * oss_buffer_bytes);
+  if (m_pSoundBuffer)
+    memset(m_pSoundBuffer, 0, sizeof(uint8) * m_SoundBufferSize);
 }
 
-void SndSysDriverOSS::WriteBuffer(size_t bytes)
+void SndSysDriverOSS::WriteBuffer(size_t Frames)
 {
-  write(output_fd, oss_buffer, bytes);
+  write(m_OutputFileDescriptor, m_pSoundBuffer, Frames * m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8);
 }
 
 }
