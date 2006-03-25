@@ -18,32 +18,12 @@
 
 #include "cssysdef.h"
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <sys/time.h>
-
 #include "csutil/sysfunc.h"
-#include "csutil/event.h"
-
-#include "iutil/plugin.h"
-#include "iutil/cfgfile.h"
-#include "csutil/cfgacc.h"
-#include "iutil/event.h"
-#include "iutil/eventh.h"
-#include "iutil/eventq.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/objreg.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "iutil/virtclk.h"
 #include "iutil/cmdline.h"
-#include "ivaria/reporter.h"
 
 #include "../../renderer.h"
-#include "isndsys/ss_driver.h"
-#include "isndsys/ss_renderer.h"
 #include "driver_null.h"
 
 

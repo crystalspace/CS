@@ -20,7 +20,6 @@
 #ifndef SNDSYS_SOFTWARE_DRIVER_NULL_H
 #define SNDSYS_SOFTWARE_DRIVER_NULL_H
 
-#include "csutil/cfgacc.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
@@ -28,9 +27,6 @@
 #include "isndsys/ss_driver.h"
 #include "isndsys/ss_eventrecorder.h"
 
-
-struct iConfigFile;
-struct iReporter;
 
 CS_PLUGIN_NAMESPACE_BEGIN(SndSysNull)
 {
