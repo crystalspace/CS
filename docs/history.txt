@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Mar-2006
+	- Rhad cleaned up and updated the OSS sound driver to use the new
+	  template based SCF and better buffering logic.
 23-Mar-2006
 	- Rhad cleaned up the Windows (directsound) driver and changed it to
 	  use the new template based SCF.
