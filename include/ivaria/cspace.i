@@ -237,6 +237,10 @@
   INTERFACE_APPLY(iObjectModelListener)
   INTERFACE_APPLY(iObjectRegistry)
   INTERFACE_APPLY(iPath)
+  INTERFACE_APPLY(iParticlesFactoryState)
+  INTERFACE_APPLY(iParticlesObjectState)
+  INTERFACE_APPLY(iParticlesPhysics)
+  INTERFACE_APPLY(iParticlesStateBase)
   INTERFACE_APPLY(iPluginManager)
   INTERFACE_APPLY(iPolygonMesh)
   INTERFACE_APPLY(iPortal)
@@ -257,7 +261,6 @@
   INTERFACE_APPLY(iSndSysManager)
   INTERFACE_APPLY(iSndSysSoftwareDriver)
   INTERFACE_APPLY(iSndSysSoftwareFilter3D)
-  INTERFACE_APPLY(iSndSysSoftwareFilterOutput)
   INTERFACE_APPLY(iSndSysListener)
   INTERFACE_APPLY(iSndSysLoader)
   INTERFACE_APPLY(iSndSysSource)
@@ -674,6 +677,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "csutil/csstring.h"
 
 #ifndef CS_MINI_SWIG
+%include "csutil/refcount.h"
 %ignore csVector2::operator+ (const csVector2 &, const csVector2 &);
 %ignore csVector2::operator- (const csVector2 &, const csVector2 &);
 %ignore csVector2::operator* (const csVector2 &, const csVector2 &);
@@ -847,6 +851,7 @@ TYPEMAP_OUT_csWrapPtr
 
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"
+%include "csgfx/shadervar.h"
 #endif // CS_MINI_SWIG
 
 %ignore csGetPlatformConfig;
@@ -973,6 +978,8 @@ TYPEMAP_OUT_csWrapPtr
 %include "imesh/object.h"
 %include "imesh/thing.h"
 %include "imesh/terrain.h"
+
+%include "imesh/particles.h"
 
 %include "imap/loader.h"
 %include "imap/reader.h"

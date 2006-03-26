@@ -9,6 +9,10 @@ chronological order.
 26-Mar-2006
 	- Piotr Obrzut makes his changes to cs cd system silent. He also 
           adds code for real fix of the problem (not yet finished).
+	- caedes made the following changes to cspace.i:
+	  - Added includes to be able to access shader variables.
+	  - Added particles mesh related interfaces and includes.
+	  - Removed old iSndSysSoftwareFilterOutput interface from binding.
 25-Mar-2006
 	- Fossi fixed hitbeam with distance culled bruteblock
 24-Mar-2006
