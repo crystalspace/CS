@@ -5,7 +5,10 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
-
+ 
+26-Mar-2006
+	- Piotr Obrzut makes his changes to cs cd system silent. He also 
+          adds code for real fix of the problem (not yet finished).
 25-Mar-2006
 	- Fossi fixed hitbeam with distance culled bruteblock
 24-Mar-2006

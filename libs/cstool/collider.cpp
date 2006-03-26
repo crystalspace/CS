@@ -147,7 +147,7 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
 {
   iObjectModel* obj_objmodel = mesh->GetMeshObject ()->GetObjectModel ();
   iPolygonMesh* obj_polymesh = obj_objmodel->GetPolygonMeshColldet ();
-  iTerraFormer* obj_terraformer = obj_objmodel->GetTerraFormerColldet ();
+  iTerraFormer* obj_terraformer = 0;//obj_objmodel->GetTerraFormerColldet ();
 
   iMeshFactoryWrapper* factory = mesh->GetFactory ();
   csColliderWrapper* cw = 0;
@@ -159,7 +159,7 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
     {
       if (fact_objmodel->GetTerraFormerColldet ())
       {
-        iTerraFormer* fact_terraformer = fact_objmodel->GetTerraFormerColldet ();
+        iTerraFormer* fact_terraformer = 0;//fact_objmodel->GetTerraFormerColldet ();
         if (fact_terraformer && (fact_terraformer == obj_terraformer || !obj_terraformer))
         {
           // First check if the parent factory has a collider wrapper.
@@ -768,9 +768,9 @@ int csColliderActor::CollisionDetect (
         bool mirror=false;
 
         // Move the triangles from object space into world space
-        temppair.a1 = CD_contact[j].a1;
-        temppair.b1 = CD_contact[j].b1;
-        temppair.c1 = CD_contact[j].c1;
+        temppair.a1 = transform->This2Other (CD_contact[j].a1);
+        temppair.b1 = transform->This2Other (CD_contact[j].b1);
+        temppair.c1 = transform->This2Other (CD_contact[j].c1);
         if (meshWrapper->GetMovable()->IsFullTransformIdentity())
         {
           temppair.a2 = CD_contact[j].a2;

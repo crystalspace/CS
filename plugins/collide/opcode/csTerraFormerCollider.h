@@ -23,21 +23,41 @@
 #include "ivaria/collider.h"
 #include "ivaria/terraform.h"
 #include "csutil/scf_implementation.h"
+#include "csgeom/tri.h"
+#include "csutil/dirtyaccessarray.h"
+#include "Opcode.h"
+
+struct csTriangle;
 
 class csTerraFormerCollider : public scfImplementation1<csTerraFormerCollider, iCollider>
 {
   csRef<iTerraFormer> former;
   csStringID stringHeights;
+  csStringID stringVertices;
   iObjectRegistry *object_reg;
+
+  CS::Plugins::Opcode::Opcode::MeshInterface opcMeshInt;
+
+  void InitOPCODEModel ();
+  void UpdateOPCODEModel ();
 
 public:
 
+  csDirtyAccessArray<csTriangle> triangles;
+  csDirtyAccessArray<CS::Plugins::Opcode::Point> vertices;
+
+  CS::Plugins::Opcode::IceMaths::Matrix4x4 transform;
+  CS::Plugins::Opcode::Opcode::Model* opcode_model;
+
   csTerraFormerCollider (iTerraFormer* terraformer, iObjectRegistry* object_reg);
-
   float SampleFloat (float x, float z);
-
   csColliderType GetColliderType () {return CS_TERRAFORMER_COLLIDER;}
-  virtual ~csTerraFormerCollider (){;}
+  virtual ~csTerraFormerCollider ();
+
+  static void MeshCallback (CS::Plugins::Opcode::udword triangle_index, 
+    CS::Plugins::Opcode::Opcode::VertexPointers& triangle, void* user_data);
+
+  CS::Plugins::Opcode::Opcode::Model* GetOPCODEModel ();
 
 };
 

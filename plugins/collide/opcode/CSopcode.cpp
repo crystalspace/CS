@@ -148,39 +148,92 @@ bool csOPCODECollideSystem::TestTriangleTerraFormer (csVector3 triangle[3],
   }
  return false;
 }
+void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
+                                                csTerraFormerCollider* terraformer)
+{
+  int size = (int) (udword(TreeCollider.GetNbPairs ()));
+  if (size == 0) return;
+  int N_pairs = size;
+  const Pair* colPairs=TreeCollider.GetPairs ();
+  Point* vertholder0 = col1->vertholder;
+  if (!vertholder0) return;
+  Point* vertholder1 = terraformer->vertices.GetArray ();
+  if (!vertholder1) return;
+  udword* indexholder0 = col1->indexholder;
+  if (!indexholder0) return;
+
+  
+  Point* current;
+  int i, j;
+
+  size_t oldlen = pairs.Length ();
+  pairs.SetLength (oldlen + N_pairs);
+
+  for (i = 0 ; i < N_pairs ; i++)
+  {
+    j = 3 * colPairs[i].id0;
+    current = &vertholder0[indexholder0[j]];		
+    pairs[oldlen].a1 = csVector3 (current->x, current->y, current->z);
+    current = &vertholder0[indexholder0[j + 1]];		
+    pairs[oldlen].b1 = csVector3 (current->x, current->y, current->z);
+    current = &vertholder0[indexholder0[j + 2]];		
+    pairs[oldlen].c1 = csVector3 (current->x, current->y, current->z);
+
+    current = &vertholder1[terraformer->triangles[i].a];		
+    pairs[oldlen].a2 = csVector3 (current->x, current->y, current->z);
+    current = &vertholder1[terraformer->triangles[i].b];		
+    pairs[oldlen].b2 = csVector3 (current->x, current->y, current->z);
+    current = &vertholder1[terraformer->triangles[i].c];		
+    pairs[oldlen].c2 = csVector3 (current->x, current->y, current->z);
+
+    oldlen++;
+  }
+}
 bool csOPCODECollideSystem::Collide (
-  csOPCODECollider* collider1, const csReversibleTransform* trans1,
+  csOPCODECollider* col1, const csReversibleTransform* trans1,
   csTerraFormerCollider* terraformer)
 {
-  bool collision_status = false;
+  ColCache.Model0 = col1->m_pCollisionModel;
+  ColCache.Model1 = terraformer->opcode_model;
 
-  csVector3 tmp_tri[3];
-  int tri_cnt = collider1->m_pCollisionModel->GetMeshInterface ()->GetNbTriangles ();
-  for (int i = 0; i < tri_cnt; i++)
+  csMatrix3 m1;
+  if (trans1) m1 = trans1->GetT2O ();
+  csVector3 u;
+
+  u = m1.Row1 ();
+  col1->transform.m[0][0] = u.x;
+  col1->transform.m[1][0] = u.y;
+  col1->transform.m[2][0] = u.z;
+  u = m1.Row2 ();
+  col1->transform.m[0][1] = u.x;
+  col1->transform.m[1][1] = u.y;
+  col1->transform.m[2][1] = u.z;
+  u = m1.Row3 ();
+  col1->transform.m[0][2] = u.x;
+  col1->transform.m[1][2] = u.y;
+  col1->transform.m[2][2] = u.z;
+
+  if (trans1) u = trans1->GetO2TTranslation ();
+  else u.Set (0, 0, 0);
+  col1->transform.m[3][0] = u.x;
+  col1->transform.m[3][1] = u.y;
+  col1->transform.m[3][2] = u.z;
+
+  bool isOk = TreeCollider.Collide (ColCache, &col1->transform,
+  	&terraformer->transform);
+  if (isOk)
   {
-    VertexPointers triangle;
-    collider1->m_pCollisionModel->GetMeshInterface ()->GetTriangle (triangle, i);
-
-    tmp_tri[0] = csVector3 (
-      triangle.Vertex[0]->x, triangle.Vertex[0]->y, triangle.Vertex[0]->z); 
-    tmp_tri[1] = csVector3 (
-      triangle.Vertex[1]->x, triangle.Vertex[1]->y, triangle.Vertex[1]->z); 
-    tmp_tri[2] = csVector3 (
-      triangle.Vertex[2]->x, triangle.Vertex[2]->y, triangle.Vertex[2]->z); 
-
-    tmp_tri[0] = trans1->This2Other (tmp_tri[0]);
-    tmp_tri[1] = trans1->This2Other (tmp_tri[1]);
-    tmp_tri[2] = trans1->This2Other (tmp_tri[2]);
-
-    csCollisionPair pair;
-    if (TestTriangleTerraFormer (tmp_tri, terraformer, &pair))
+    bool status = (TreeCollider.GetContactStatus () != FALSE);
+    if (status)
     {
-      collision_status = true;
-      pairs.Push (pair);
+      CopyCollisionPairs (col1, terraformer);
     }
+    return status;
   }
-
-  return collision_status;
+  else
+  {
+    return false;
+  }
 }
 
 bool csOPCODECollideSystem::Collide (
@@ -277,6 +330,7 @@ bool csOPCODECollideSystem::CollideRaySegment (
 	const csVector3& start, const csVector3& end, bool use_ray)
 {
   if (!collider) return false;
+  if (collider->GetColliderType () != CS_MESH_COLLIDER) return false;
   
   csOPCODECollider* col = (csOPCODECollider*) collider;
   ColCache.Model0 = col->m_pCollisionModel;

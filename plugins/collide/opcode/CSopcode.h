@@ -77,6 +77,8 @@ public:
   // to 'pairs'.
   void CopyCollisionPairs (csOPCODECollider* col1, csOPCODECollider* col2);
 
+  void CopyCollisionPairs (csOPCODECollider* col2, csTerraFormerCollider* terraformer);
+
   virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
   virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh);
 
