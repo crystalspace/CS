@@ -470,6 +470,27 @@ class csStringPtr(csString):
         _swig_setattr(self, csString,self.__class__,csString)
 _cspace.csString_swigregister(csStringPtr)
 
+class csRefCount(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csRefCount, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csRefCount, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csRefCount instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __init__(self, *args):
+        _swig_setattr(self, csRefCount, 'this', _cspace.new_csRefCount(*args))
+        _swig_setattr(self, csRefCount, 'thisown', 1)
+    def IncRef(*args): return _cspace.csRefCount_IncRef(*args)
+    def DecRef(*args): return _cspace.csRefCount_DecRef(*args)
+    def GetRefCount(*args): return _cspace.csRefCount_GetRefCount(*args)
+
+class csRefCountPtr(csRefCount):
+    def __init__(self, this):
+        _swig_setattr(self, csRefCount, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csRefCount, 'thisown', 0)
+        _swig_setattr(self, csRefCount,self.__class__,csRefCount)
+_cspace.csRefCount_swigregister(csRefCountPtr)
+
 class csVector2(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csVector2, name, value)
@@ -2364,6 +2385,78 @@ B_COEF = _cspace.B_COEF
 R_COEF_SQ = _cspace.R_COEF_SQ
 G_COEF_SQ = _cspace.G_COEF_SQ
 B_COEF_SQ = _cspace.B_COEF_SQ
+class iShaderVariableAccessor(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderVariableAccessor, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iShaderVariableAccessor, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iShaderVariableAccessor instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def PreGetValue(*args): return _cspace.iShaderVariableAccessor_PreGetValue(*args)
+    def __del__(self, destroy=_cspace.delete_iShaderVariableAccessor):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iShaderVariableAccessorPtr(iShaderVariableAccessor):
+    def __init__(self, this):
+        _swig_setattr(self, iShaderVariableAccessor, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iShaderVariableAccessor, 'thisown', 0)
+        _swig_setattr(self, iShaderVariableAccessor,self.__class__,iShaderVariableAccessor)
+_cspace.iShaderVariableAccessor_swigregister(iShaderVariableAccessorPtr)
+
+class csShaderVariable(csRefCount):
+    __swig_setmethods__ = {}
+    for _s in [csRefCount]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csShaderVariable, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csRefCount]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariable, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csShaderVariable instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    INT = _cspace.csShaderVariable_INT
+    FLOAT = _cspace.csShaderVariable_FLOAT
+    COLOR = _cspace.csShaderVariable_COLOR
+    TEXTURE = _cspace.csShaderVariable_TEXTURE
+    RENDERBUFFER = _cspace.csShaderVariable_RENDERBUFFER
+    VECTOR2 = _cspace.csShaderVariable_VECTOR2
+    VECTOR3 = _cspace.csShaderVariable_VECTOR3
+    VECTOR4 = _cspace.csShaderVariable_VECTOR4
+    MATRIX = _cspace.csShaderVariable_MATRIX
+    TRANSFORM = _cspace.csShaderVariable_TRANSFORM
+    ARRAY = _cspace.csShaderVariable_ARRAY
+    def __init__(self, *args):
+        _swig_setattr(self, csShaderVariable, 'this', _cspace.new_csShaderVariable(*args))
+        _swig_setattr(self, csShaderVariable, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csShaderVariable):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    def assign(*args): return _cspace.csShaderVariable_assign(*args)
+    def GetType(*args): return _cspace.csShaderVariable_GetType(*args)
+    def SetType(*args): return _cspace.csShaderVariable_SetType(*args)
+    def SetAccessor(*args): return _cspace.csShaderVariable_SetAccessor(*args)
+    def SetName(*args): return _cspace.csShaderVariable_SetName(*args)
+    def GetName(*args): return _cspace.csShaderVariable_GetName(*args)
+    def GetValue(*args): return _cspace.csShaderVariable_GetValue(*args)
+    def SetValue(*args): return _cspace.csShaderVariable_SetValue(*args)
+    def SetArraySize(*args): return _cspace.csShaderVariable_SetArraySize(*args)
+    def GetArraySize(*args): return _cspace.csShaderVariable_GetArraySize(*args)
+    def GetArrayElement(*args): return _cspace.csShaderVariable_GetArrayElement(*args)
+    def SetArrayElement(*args): return _cspace.csShaderVariable_SetArrayElement(*args)
+
+class csShaderVariablePtr(csShaderVariable):
+    def __init__(self, this):
+        _swig_setattr(self, csShaderVariable, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csShaderVariable, 'thisown', 0)
+        _swig_setattr(self, csShaderVariable,self.__class__,csShaderVariable)
+_cspace.csShaderVariable_swigregister(csShaderVariablePtr)
+
 
 csDefaultRunLoop = _cspace.csDefaultRunLoop
 
@@ -6803,6 +6896,271 @@ class iTerrainFactoryStatePtr(iTerrainFactoryState):
 _cspace.iTerrainFactoryState_swigregister(iTerrainFactoryStatePtr)
 
 iTerrainFactoryState_scfGetVersion = _cspace.iTerrainFactoryState_scfGetVersion
+
+CS_PART_FALLOFF_CONSTANT = _cspace.CS_PART_FALLOFF_CONSTANT
+CS_PART_FALLOFF_LINEAR = _cspace.CS_PART_FALLOFF_LINEAR
+CS_PART_FALLOFF_PARABOLIC = _cspace.CS_PART_FALLOFF_PARABOLIC
+CS_PART_COLOR_CONSTANT = _cspace.CS_PART_COLOR_CONSTANT
+CS_PART_COLOR_LINEAR = _cspace.CS_PART_COLOR_LINEAR
+CS_PART_COLOR_LOOPING = _cspace.CS_PART_COLOR_LOOPING
+CS_PART_COLOR_HEAT = _cspace.CS_PART_COLOR_HEAT
+CS_PART_COLOR_CALLBACK = _cspace.CS_PART_COLOR_CALLBACK
+CS_PART_EMIT_SPHERE = _cspace.CS_PART_EMIT_SPHERE
+CS_PART_EMIT_PLANE = _cspace.CS_PART_EMIT_PLANE
+CS_PART_EMIT_BOX = _cspace.CS_PART_EMIT_BOX
+CS_PART_EMIT_CYLINDER = _cspace.CS_PART_EMIT_CYLINDER
+CS_PART_FORCE_RADIAL = _cspace.CS_PART_FORCE_RADIAL
+CS_PART_FORCE_LINEAR = _cspace.CS_PART_FORCE_LINEAR
+CS_PART_FORCE_CONE = _cspace.CS_PART_FORCE_CONE
+class csParticlesData(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csParticlesData, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csParticlesData, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csParticlesData instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    __swig_setmethods__["position"] = _cspace.csParticlesData_position_set
+    __swig_getmethods__["position"] = _cspace.csParticlesData_position_get
+    if _newclass:position = property(_cspace.csParticlesData_position_get, _cspace.csParticlesData_position_set)
+    __swig_setmethods__["color"] = _cspace.csParticlesData_color_set
+    __swig_getmethods__["color"] = _cspace.csParticlesData_color_get
+    if _newclass:color = property(_cspace.csParticlesData_color_get, _cspace.csParticlesData_color_set)
+    __swig_setmethods__["velocity"] = _cspace.csParticlesData_velocity_set
+    __swig_getmethods__["velocity"] = _cspace.csParticlesData_velocity_get
+    if _newclass:velocity = property(_cspace.csParticlesData_velocity_get, _cspace.csParticlesData_velocity_set)
+    __swig_setmethods__["mass"] = _cspace.csParticlesData_mass_set
+    __swig_getmethods__["mass"] = _cspace.csParticlesData_mass_get
+    if _newclass:mass = property(_cspace.csParticlesData_mass_get, _cspace.csParticlesData_mass_set)
+    __swig_setmethods__["time_to_live"] = _cspace.csParticlesData_time_to_live_set
+    __swig_getmethods__["time_to_live"] = _cspace.csParticlesData_time_to_live_get
+    if _newclass:time_to_live = property(_cspace.csParticlesData_time_to_live_get, _cspace.csParticlesData_time_to_live_set)
+    __swig_setmethods__["sort"] = _cspace.csParticlesData_sort_set
+    __swig_getmethods__["sort"] = _cspace.csParticlesData_sort_get
+    if _newclass:sort = property(_cspace.csParticlesData_sort_get, _cspace.csParticlesData_sort_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csParticlesData, 'this', _cspace.new_csParticlesData(*args))
+        _swig_setattr(self, csParticlesData, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csParticlesData):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csParticlesDataPtr(csParticlesData):
+    def __init__(self, this):
+        _swig_setattr(self, csParticlesData, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csParticlesData, 'thisown', 0)
+        _swig_setattr(self, csParticlesData,self.__class__,csParticlesData)
+_cspace.csParticlesData_swigregister(csParticlesDataPtr)
+
+class iParticlesColorCallback(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticlesColorCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iParticlesColorCallback, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iParticlesColorCallback instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def GetColor(*args): return _cspace.iParticlesColorCallback_GetColor(*args)
+    def __del__(self, destroy=_cspace.delete_iParticlesColorCallback):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iParticlesColorCallbackPtr(iParticlesColorCallback):
+    def __init__(self, this):
+        _swig_setattr(self, iParticlesColorCallback, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iParticlesColorCallback, 'thisown', 0)
+        _swig_setattr(self, iParticlesColorCallback,self.__class__,iParticlesColorCallback)
+_cspace.iParticlesColorCallback_swigregister(iParticlesColorCallbackPtr)
+
+class iParticlesStateBase(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticlesStateBase, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iParticlesStateBase, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iParticlesStateBase instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetParticlesPerSecond(*args): return _cspace.iParticlesStateBase_SetParticlesPerSecond(*args)
+    def GetParticlesPerSecond(*args): return _cspace.iParticlesStateBase_GetParticlesPerSecond(*args)
+    def SetInitialParticleCount(*args): return _cspace.iParticlesStateBase_SetInitialParticleCount(*args)
+    def GetInitialParticleCount(*args): return _cspace.iParticlesStateBase_GetInitialParticleCount(*args)
+    def SetPointEmitType(*args): return _cspace.iParticlesStateBase_SetPointEmitType(*args)
+    def SetSphereEmitType(*args): return _cspace.iParticlesStateBase_SetSphereEmitType(*args)
+    def SetPlaneEmitType(*args): return _cspace.iParticlesStateBase_SetPlaneEmitType(*args)
+    def SetBoxEmitType(*args): return _cspace.iParticlesStateBase_SetBoxEmitType(*args)
+    def SetCylinderEmitType(*args): return _cspace.iParticlesStateBase_SetCylinderEmitType(*args)
+    def GetSphereEmitInnerRadius(*args): return _cspace.iParticlesStateBase_GetSphereEmitInnerRadius(*args)
+    def GetSphereEmitOuterRadius(*args): return _cspace.iParticlesStateBase_GetSphereEmitOuterRadius(*args)
+    def GetEmitXSize(*args): return _cspace.iParticlesStateBase_GetEmitXSize(*args)
+    def GetEmitYSize(*args): return _cspace.iParticlesStateBase_GetEmitYSize(*args)
+    def GetEmitZSize(*args): return _cspace.iParticlesStateBase_GetEmitZSize(*args)
+    def GetEmitType(*args): return _cspace.iParticlesStateBase_GetEmitType(*args)
+    def SetRadialForceType(*args): return _cspace.iParticlesStateBase_SetRadialForceType(*args)
+    def SetLinearForceType(*args): return _cspace.iParticlesStateBase_SetLinearForceType(*args)
+    def SetConeForceType(*args): return _cspace.iParticlesStateBase_SetConeForceType(*args)
+    def GetForceType(*args): return _cspace.iParticlesStateBase_GetForceType(*args)
+    def GetForceRange(*args): return _cspace.iParticlesStateBase_GetForceRange(*args)
+    def GetFalloffType(*args): return _cspace.iParticlesStateBase_GetFalloffType(*args)
+    def GetForceDirection(*args): return _cspace.iParticlesStateBase_GetForceDirection(*args)
+    def GetForceDirectionVariation(*args): return _cspace.iParticlesStateBase_GetForceDirectionVariation(*args)
+    def GetForceConeRadius(*args): return _cspace.iParticlesStateBase_GetForceConeRadius(*args)
+    def SetForce(*args): return _cspace.iParticlesStateBase_SetForce(*args)
+    def GetForce(*args): return _cspace.iParticlesStateBase_GetForce(*args)
+    def SetDiffusion(*args): return _cspace.iParticlesStateBase_SetDiffusion(*args)
+    def GetDiffusion(*args): return _cspace.iParticlesStateBase_GetDiffusion(*args)
+    def SetGravity(*args): return _cspace.iParticlesStateBase_SetGravity(*args)
+    def GetGravity(*args): return _cspace.iParticlesStateBase_GetGravity(*args)
+    def SetEmitTime(*args): return _cspace.iParticlesStateBase_SetEmitTime(*args)
+    def GetEmitTime(*args): return _cspace.iParticlesStateBase_GetEmitTime(*args)
+    def SetTimeToLive(*args): return _cspace.iParticlesStateBase_SetTimeToLive(*args)
+    def GetTimeToLive(*args): return _cspace.iParticlesStateBase_GetTimeToLive(*args)
+    def SetTimeVariation(*args): return _cspace.iParticlesStateBase_SetTimeVariation(*args)
+    def GetTimeVariation(*args): return _cspace.iParticlesStateBase_GetTimeVariation(*args)
+    def SetConstantColorMethod(*args): return _cspace.iParticlesStateBase_SetConstantColorMethod(*args)
+    def SetLinearColorMethod(*args): return _cspace.iParticlesStateBase_SetLinearColorMethod(*args)
+    def SetLoopingColorMethod(*args): return _cspace.iParticlesStateBase_SetLoopingColorMethod(*args)
+    def SetHeatColorMethod(*args): return _cspace.iParticlesStateBase_SetHeatColorMethod(*args)
+    def SetColorCallback(*args): return _cspace.iParticlesStateBase_SetColorCallback(*args)
+    def GetColorCallback(*args): return _cspace.iParticlesStateBase_GetColorCallback(*args)
+    def AddColor(*args): return _cspace.iParticlesStateBase_AddColor(*args)
+    def ClearColors(*args): return _cspace.iParticlesStateBase_ClearColors(*args)
+    def GetParticleColorMethod(*args): return _cspace.iParticlesStateBase_GetParticleColorMethod(*args)
+    def GetConstantColor(*args): return _cspace.iParticlesStateBase_GetConstantColor(*args)
+    def GetGradient(*args): return _cspace.iParticlesStateBase_GetGradient(*args)
+    def GetColorLoopTime(*args): return _cspace.iParticlesStateBase_GetColorLoopTime(*args)
+    def GetBaseHeat(*args): return _cspace.iParticlesStateBase_GetBaseHeat(*args)
+    def SetParticleRadius(*args): return _cspace.iParticlesStateBase_SetParticleRadius(*args)
+    def GetParticleRadius(*args): return _cspace.iParticlesStateBase_GetParticleRadius(*args)
+    def SetDampener(*args): return _cspace.iParticlesStateBase_SetDampener(*args)
+    def GetDampener(*args): return _cspace.iParticlesStateBase_GetDampener(*args)
+    def SetMass(*args): return _cspace.iParticlesStateBase_SetMass(*args)
+    def SetMassVariation(*args): return _cspace.iParticlesStateBase_SetMassVariation(*args)
+    def GetMass(*args): return _cspace.iParticlesStateBase_GetMass(*args)
+    def GetMassVariation(*args): return _cspace.iParticlesStateBase_GetMassVariation(*args)
+    def SetTransformMode(*args): return _cspace.iParticlesStateBase_SetTransformMode(*args)
+    def GetTransformMode(*args): return _cspace.iParticlesStateBase_GetTransformMode(*args)
+    def SetMixMode(*args): return _cspace.iParticlesStateBase_SetMixMode(*args)
+    def GetMixMode(*args): return _cspace.iParticlesStateBase_GetMixMode(*args)
+    def EnableZSort(*args): return _cspace.iParticlesStateBase_EnableZSort(*args)
+    def IsZSortEnabled(*args): return _cspace.iParticlesStateBase_IsZSortEnabled(*args)
+    def __del__(self, destroy=_cspace.delete_iParticlesStateBase):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticlesStateBase_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticlesStateBase_scfGetVersion)
+
+class iParticlesStateBasePtr(iParticlesStateBase):
+    def __init__(self, this):
+        _swig_setattr(self, iParticlesStateBase, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iParticlesStateBase, 'thisown', 0)
+        _swig_setattr(self, iParticlesStateBase,self.__class__,iParticlesStateBase)
+_cspace.iParticlesStateBase_swigregister(iParticlesStateBasePtr)
+
+iParticlesStateBase_scfGetVersion = _cspace.iParticlesStateBase_scfGetVersion
+
+class iParticlesObjectState(iParticlesStateBase):
+    __swig_setmethods__ = {}
+    for _s in [iParticlesStateBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticlesObjectState, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iParticlesStateBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iParticlesObjectState, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iParticlesObjectState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def GetEmitPosition(*args): return _cspace.iParticlesObjectState_GetEmitPosition(*args)
+    def GetRotation(*args): return _cspace.iParticlesObjectState_GetRotation(*args)
+    def GetObjectToCamera(*args): return _cspace.iParticlesObjectState_GetObjectToCamera(*args)
+    def ChangePhysicsPlugin(*args): return _cspace.iParticlesObjectState_ChangePhysicsPlugin(*args)
+    def Start(*args): return _cspace.iParticlesObjectState_Start(*args)
+    def Stop(*args): return _cspace.iParticlesObjectState_Stop(*args)
+    def IsRunning(*args): return _cspace.iParticlesObjectState_IsRunning(*args)
+    def __del__(self, destroy=_cspace.delete_iParticlesObjectState):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticlesObjectState_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticlesObjectState_scfGetVersion)
+
+class iParticlesObjectStatePtr(iParticlesObjectState):
+    def __init__(self, this):
+        _swig_setattr(self, iParticlesObjectState, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iParticlesObjectState, 'thisown', 0)
+        _swig_setattr(self, iParticlesObjectState,self.__class__,iParticlesObjectState)
+_cspace.iParticlesObjectState_swigregister(iParticlesObjectStatePtr)
+
+iParticlesObjectState_scfGetVersion = _cspace.iParticlesObjectState_scfGetVersion
+
+class iParticlesFactoryState(iParticlesStateBase):
+    __swig_setmethods__ = {}
+    for _s in [iParticlesStateBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticlesFactoryState, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iParticlesStateBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iParticlesFactoryState, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iParticlesFactoryState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def SetMaterial(*args): return _cspace.iParticlesFactoryState_SetMaterial(*args)
+    def SetAutoStart(*args): return _cspace.iParticlesFactoryState_SetAutoStart(*args)
+    def SetPhysicsPlugin(*args): return _cspace.iParticlesFactoryState_SetPhysicsPlugin(*args)
+    def __del__(self, destroy=_cspace.delete_iParticlesFactoryState):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticlesFactoryState_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticlesFactoryState_scfGetVersion)
+
+class iParticlesFactoryStatePtr(iParticlesFactoryState):
+    def __init__(self, this):
+        _swig_setattr(self, iParticlesFactoryState, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iParticlesFactoryState, 'thisown', 0)
+        _swig_setattr(self, iParticlesFactoryState,self.__class__,iParticlesFactoryState)
+_cspace.iParticlesFactoryState_swigregister(iParticlesFactoryStatePtr)
+
+iParticlesFactoryState_scfGetVersion = _cspace.iParticlesFactoryState_scfGetVersion
+
+class iParticlesPhysics(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticlesPhysics, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iParticlesPhysics, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iParticlesPhysics instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def RegisterParticles(*args): return _cspace.iParticlesPhysics_RegisterParticles(*args)
+    def RemoveParticles(*args): return _cspace.iParticlesPhysics_RemoveParticles(*args)
+    def Start(*args): return _cspace.iParticlesPhysics_Start(*args)
+    def Stop(*args): return _cspace.iParticlesPhysics_Stop(*args)
+    def __del__(self, destroy=_cspace.delete_iParticlesPhysics):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticlesPhysics_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iParticlesPhysics_scfGetVersion)
+
+class iParticlesPhysicsPtr(iParticlesPhysics):
+    def __init__(self, this):
+        _swig_setattr(self, iParticlesPhysics, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iParticlesPhysics, 'thisown', 0)
+        _swig_setattr(self, iParticlesPhysics,self.__class__,iParticlesPhysics)
+_cspace.iParticlesPhysics_swigregister(iParticlesPhysicsPtr)
+
+iParticlesPhysics_scfGetVersion = _cspace.iParticlesPhysics_scfGetVersion
 
 class iLoaderStatus(iBase):
     __swig_setmethods__ = {}
