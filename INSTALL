@@ -43,12 +43,9 @@ using.
 MSVC / Visual-C++
 -----------------
 
-For MSVC7, open the CS\mk\msvc\wkstypical.sln solution file.  From the "Build"
-menu, invoke "Build Solution".
-
-For MSVC6, open the CS\mk\msvc\wkstypical.dsw workspace. Make `grpall-typical'
-the active project. This is done by right clicking on `grpall-typical' and then
-clicking "Set as Active Project". From the "Build" menu invoke "Rebuild All".
+Navigate to one of the directories CS\mk\msvc7, CS\mk\msvc71, or CS\mk\msvc8,
+depending upon your version of MSVC, and open the `wkstypical.sln' solution
+file.  From the "Build" menu, invoke "Build Solution".
 
 
 MinGW and Cygwin

@@ -6,13 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
  
+27-Mar-2006
+	- Eric Sunshine fixed outdated information in CS/INSTALL document.
 26-Mar-2006
 	- Piotr Obrzut makes his changes to cs cd system silent. He also 
           adds code for real fix of the problem (not yet finished).
 	- caedes made the following changes to cspace.i:
-	  - Added includes to be able to access shader variables.
-	  - Added particles mesh related interfaces and includes.
-	  - Removed old iSndSysSoftwareFilterOutput interface from binding.
+	    - Added includes to be able to access shader variables.
+	    - Added particles mesh related interfaces and includes.
+	    - Removed old iSndSysSoftwareFilterOutput interface from binding.
 25-Mar-2006
 	- Fossi fixed hitbeam with distance culled bruteblock
 24-Mar-2006
@@ -27,17 +29,17 @@ chronological order.
 	- Piotr Obrzut added terra former collider collision queries handling
 22-Mar-2006
 	- Rhad performed numerous sound system enhancements:
-	  - Changed all sound system components over to the new SCF format.
-	  - Added iSndSysSoftwareOutputFilter interface and sound system
-	    calls to attach implementing objects.
-	  - The windows (directsound) driver should now behave much better.
-	  - Cleaned up member variable naming conventions on most components
-	    and added more comments.
-	  - The sound system now 'keeps time' internally in frame count
-	    instead of milliseconds.  This should simplify the flow and 
-	    reduce/eliminate drift.
-	  - Added a 'compressor' class (unused for now) to ultimately
-	    contain the logic for sound buffer normalization.
+	    - Changed all sound system components over to the new SCF format.
+	    - Added iSndSysSoftwareOutputFilter interface and sound system
+	      calls to attach implementing objects.
+	    - The windows (directsound) driver should now behave much better.
+	    - Cleaned up member variable naming conventions on most components
+	      and added more comments.
+	    - The sound system now 'keeps time' internally in frame count
+	      instead of milliseconds.  This should simplify the flow and 
+	      reduce/eliminate drift.
+	    - Added a 'compressor' class (unused for now) to ultimately
+	      contain the logic for sound buffer normalization.
 21-Mar-2006
 	- res added the MsvcIncDirs rule to specify include dirs for
 	  generated VC projects.
@@ -156,9 +158,9 @@ chronological order.
 	  put in a test fix for a common underbuffering problem in the
 	  software sound renderer.
 6-Mar-2006
-	- Christopher made numerous updates to AWS2, notably the Margins
-	  and Font object.  He also fixed csPen so that the text translation
-	  vector is properly stored and cleared with the rest of the transforms.
+	- Christopher made numerous updates to AWS2, notably the Margins and
+	  Font object.  He also fixed csPen so that the text translation vector
+	  is properly stored and cleared with the rest of the transforms.
 	- Rhad fixed an infinite loop in the ALSA sound driver that could
 	  occur if the call to retrieve the sound frames available for filling
 	  returned a negative number.
@@ -172,27 +174,27 @@ chronological order.
 	  sound renderer and fixed a couple asserts on exit.
 5-Mar-2006
 	- Rhad cleaned up memory leaks in the sound system:
-	  - SndSysOggSoundData has been cleaned up to use local variables
-	    where appropriate.  Member variables have been renamed to be more
-	    consistant.  Memory leak in IsOgg() corrected.
-	  - SndSysSourceSoftware3D should now clean up its filter chains on
-	    destruction.  This was causing rather large memory leaks due to
-	    the sizable sound buffers some filters use.
-	  - SndSysRendererSoftware will now properly cleanup stopped sources
-	    and streams within about 500ms of their release.  This fixes a
-	    memory leak that occurred when using AutoUnregister streams. As a
-	    side effect, RemoveSource() and RemoveStream() will no longer
-	    block waiting for the background thread to acknowledge.
+	    - SndSysOggSoundData has been cleaned up to use local variables
+	      where appropriate.  Member variables have been renamed to be more
+	      consistant.  Memory leak in IsOgg() corrected.
+	    - SndSysSourceSoftware3D should now clean up its filter chains on
+	      destruction.  This was causing rather large memory leaks due to
+	      the sizable sound buffers some filters use.
+	    - SndSysRendererSoftware will now properly cleanup stopped sources
+	      and streams within about 500ms of their release.  This fixes a
+	      memory leak that occurred when using AutoUnregister streams. As a
+	      side effect, RemoveSource() and RemoveStream() will no longer
+	      block waiting for the background thread to acknowledge.
 	- Rhad added a new interface: iSndSysEventRecorder.  This interface
 	  will allow for enhanced debugging of sound events without cluttering
 	  the console with reporter messages.
-	  - A new plugin - sndsyseventrecorder has been created at
-	    plugins/sndsys/utility/eventrecorder/  This plugin is not loaded
-	    by default.  To specify enhanced sound system event recording, add
-	    -soundeventlog=/this/sound.log (example) to the command line.
-	  - queue.h, the sound system's threadsafe queue implementation has
-	    been moved from renderer/software into utility/ .
-	  - Not all sound system components use the event log (yet).
+	    - A new plugin - sndsyseventrecorder has been created at
+	      plugins/sndsys/utility/eventrecorder/ This plugin is not loaded
+	      by default.  To specify enhanced sound system event recording,
+	      add -soundeventlog=/this/sound.log (example) to the command line.
+	    - queue.h, the sound system's threadsafe queue implementation has
+	      been moved from renderer/software into utility/ .
+	    - Not all sound system components use the event log (yet).
 	- Rhad added an ALSA software sound driver.  This driver needs more
 	  adjustments, but seems to work well. Tested only on x86 Linux
 	  so far.
@@ -378,14 +380,14 @@ chronological order.
 	- res enabled position invariance for Cg vertex programs.
 16-Feb-2006
 	- iceeey made several changes related to ambient light:
-		- Added "light ambient" shadervar to generic renderstep that
-		  tracks the sector dynamic ambient light.
-		- Changed the default ambient value in engine.cfg to a dark
-		  value of 0.2, 0.2, 0.2.
-		- Added support for setting sector ambient light in world
-		  files. Just add <ambient red="1.0" green="1.0" blue="1.0"/>
-		  inside the <sector> tag.
-		- Modified most of the ambient shaders to use the shadervar.
+	    - Added "light ambient" shadervar to generic renderstep that tracks
+	      the sector dynamic ambient light.
+	    - Changed the default ambient value in engine.cfg to a dark value
+	      of 0.2, 0.2, 0.2.
+	    - Added support for setting sector ambient light in world files.
+	      Just add <ambient red="1.0" green="1.0" blue="1.0"/> inside the
+	      <sector> tag.
+	    - Modified most of the ambient shaders to use the shadervar.
 	- Jorrit fixed a bug in the parser for meshgen. It was doing a global
 	  mesh finding instead of one local to the sector alone with the
 	  result that if you had objects with same name in different sectors
@@ -668,11 +670,11 @@ chronological order.
 	- Jorrit changed phystut to use genmesh instead of ball mesh.
 	- Jorrit removed the ball mesh. It is now obsolete.
 	- Jorrit added a new 'zsort' option to the particles mesh. Previously
-	  the particles mesh always sorted particles from back to front. But this
-	  is slow and only needed if you use alpha. For add and multiply you
-	  don't need this. So by default zsorting is now disabled which gives a
-	  great boost on performance. This no-sorting option is implemented in
-	  the simple and the ode particle physics plugins.
+	  the particles mesh always sorted particles from back to front. But
+	  this is slow and only needed if you use alpha. For add and multiply
+	  you don't need this. So by default zsorting is now disabled which
+	  gives a great boost on performance. This no-sorting option is
+	  implemented in the simple and the ode particle physics plugins.
 	- Jorrit did some optimizations to the simple physics plugin for the
 	  particles mesh.
 	- Jorrit fixed instmesh and instmeshldr so they work again. In addition
@@ -728,7 +730,7 @@ chronological order.
 	  is no longer tied to 3D sprites.
 	- Jorrit added a new feature to 'meshfact' in world files so that
 	  you can now do:
-	  	<meshfact name="bla" file="/lib/data/model.md2" />
+	    <meshfact name="bla" file="/lib/data/model.md2" />
 	  That way you can now create mesh factories easily from meshfact
 	  files. This works for md2, 3ds, and normal CS XML files like
 	  mesh factories and libraries.
@@ -803,10 +805,10 @@ chronological order.
 	- Jorrit removed iMaterialWrapper->Clone().
 	- mdmkolbe removed the following functions from iParticleState as they
 	  conflict with functions in iMeshObject:
-	  - SetColor(),
-	  - GetColor(),
-	  - SetMaterialWrapper() and
-	  - GetMaterialWrapper().
+	    - SetColor(),
+	    - GetColor(),
+	    - SetMaterialWrapper() and
+	    - GetMaterialWrapper().
         - mdmkolbe converted some classes in CS/libs to the new SCF.
 	- mdmkolbe fixed some copy constructor issues in scfImplementation.
 	- Rhad added basic thread priority adjustment to the csThread interface
@@ -844,9 +846,9 @@ chronological order.
 	- Jorrit added support for scfImplementationExt6.
 	- Jorrit added a new iSelfDestruct interface. This will be used
 	  by engine->RemoveObject() so that it will become:
-	      - Faster (only one scfQueryInterface).
-	      - Cleaner (no dependencies on non-engine stuff).
-	      - Extensible (everyone can implement iSelfDestruct).
+	    - Faster (only one scfQueryInterface).
+	    - Cleaner (no dependencies on non-engine stuff).
+	    - Extensible (everyone can implement iSelfDestruct).
 	- Jorrit implemented iSelfDestruct in csMeshWrapper.
 	- Jorrit clarified the render priority documentation with regards
 	  to alpha and keycolor.
@@ -910,11 +912,11 @@ chronological order.
 	  easier to create a mesh factory from a model file. Currently
 	  this is implemented by the new gmesh3ds and spr3md2 plugins.
 	  Loading a model is now as simple as:
-		csRef<iPluginManager> plugin_mgr = csQueryRegistry<
-			iPluginManager> (object_reg);
-		csRef<iModelLoader> l = csLoadPlugin<iModelLoader> (plugin_mgr,
-			"crystalspace.mesh.loader.factory.genmesh.3ds");
-		iMeshFactoryWrapper* ff = l->Load ("model", "/lib/model.3ds");
+	    csRef<iPluginManager> plugin_mgr = csQueryRegistry<
+		    iPluginManager> (object_reg);
+	    csRef<iModelLoader> l = csLoadPlugin<iModelLoader> (plugin_mgr,
+		    "crystalspace.mesh.loader.factory.genmesh.3ds");
+	    iMeshFactoryWrapper* ff = l->Load ("model", "/lib/model.3ds");
 	- Jorrit updated the documentation to document the new way to load
 	  models.
 	- res changed some code to use csLittleEndian::Convert() for endian
