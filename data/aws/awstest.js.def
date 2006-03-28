@@ -1,6 +1,7 @@
 // AWS Test skin definition file
 
 // Load the default style set
+Sys.Load("/aws/widgets/Frames.js");
 Sys.Load("/aws/widgets/Styles.js");
 Sys.Load("/aws/widgets/Widgets.js");
 
@@ -30,9 +31,14 @@ skin_NormalWindows =
     ScrollBarHeight		 : 24,
     ScrollBarWidth		 : 24,
     
-    TitleBarHeight		 : 30,
-    TitleBarRoundness	 : 0.05,
-    TitleBarTextColor	 : new Color(1,1,1,1),
+    TitleBar			 :
+    {
+    	h:30,
+    	Text : new Color(1,1,1,1),
+    	Base : new Color(0.6,0.6,0.6,0.85),
+    	Active : new Color(0.3,0.3,0.3, 1.0),
+    	Inactive : new Color(0.5,0.5,0.5, 0.5)
+    },
     
     StatusBarHeight		 : 20,
     

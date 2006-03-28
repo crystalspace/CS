@@ -1,285 +1,16 @@
-/******* Frame Styles *********
- *
- *  This file is automatically included
- * so that widgets can use these "predefined"
- * styles. 
- */
- 
-Frames3D =
-{
-	RidgeAdjust : 5,
-	Ridge : function(pen, x, y, x2, y2)
-			{		
-				var prefs = Skin.current;
-						
-				// Back of panel
-				pen.SetColor(prefs.FillColor);
-				pen.DrawRect(x+2,y+2, x2-2,y2-2, true);
-				
-				// Darken back a little
-				pen.SetColor(0,0,0,0.25);
-				pen.DrawRect(x+4,y+4, x2-4,y2-4, true);
-				
-				// Black border
-				pen.SetColor(0,0,0,1);
-				pen.DrawRect(x,y, x2,y2, false);		
-				
-				// Setup pen
-				pen.SetColor(prefs.ShadowColor);
-				pen.SwapColors();
-				pen.SetColor(prefs.HighlightColor);
-						
-				// Ridge outer
-				pen.DrawRect(x+1,y+1, x2-1,y2-1, false, true);
-				
-				pen.SwapColors();
-				
-				// Ridge inner
-				pen.DrawRect(x+3,y+3, x2-3,y2-3, false, true);				
-			},	
 
-	ValleyAdjust : 5,			
-	Valley : function(pen, x, y, x2, y2)
-			{				
-				var prefs = Skin.current;
-				
-				// Back of panel
-				pen.SetColor(prefs.FillColor);
-				pen.DrawRect(x+2,y+2, x2-2,y2-2, true);
-				
-				// Darken valley a little
-				pen.SetColor(0,0,0,0.25);
-				pen.DrawRect(x+2,y+2, x2-2,y2-2, false);
-				
-				// Black border
-				pen.SetColor(0,0,0,1);
-				pen.DrawRect(x,y, x2,y2, false);		
-				
-				// Setup pen
-				pen.SetColor(prefs.HighlightColor);
-				pen.SwapColors();
-				pen.SetColor(prefs.ShadowColor);
-										
-				// Ridge outer
-				pen.DrawRect(x+1,y+1, x2-1,y2-1, false, true);
-				
-				pen.SwapColors();
-				
-				// Ridge inner
-				pen.DrawRect(x+3,y+3, x2-3,y2-3, false, true);				
-			},
-	
-	InsetAdjust : 2,		
-	Inset : function(pen, x, y, x2, y2)
-			{				
-				var prefs = Skin.current;
-				
-				// Back of panel
-				pen.SetColor(prefs.FillColor);
-				pen.DrawRect(x+2,y+1, x2-1,y2-2, true);
-				
-				// Darken back a little
-				pen.SetColor(0,0,0,0.25);
-				pen.DrawRect(x+2,y+1, x2-1,y2-2, true);
-				
-				// Black border
-				pen.SetColor(0,0,0,1);
-				pen.DrawRect(x,y, x2,y2, false);		
-				
-				// Setup pen
-				pen.SetColor(prefs.HighlightColor);
-				pen.SwapColors();				
-				pen.SetColor(prefs.ShadowColor);
-						
-				// Dip
-				pen.DrawRect(x+1,y+1, x2-1,y2-1, false, true);
-			},
-			
-	OutsetAdjust : 2,		
-	Outset : function(pen, x, y, x2, y2)
-			{				
-				var prefs = Skin.current;
-				
-				// Back of panel
-				pen.SetColor(prefs.FillColor);
-				pen.DrawRect(x+2,y+1, x2-1,y2-2, true);
-						
-				// Black border
-				pen.SetColor(0,0,0,1);
-				pen.DrawRect(x,y, x2,y2, false);		
-				
-				// Setup pen
-				pen.SetColor(prefs.ShadowColor);
-				pen.SwapColors();
-				pen.SetColor(prefs.HighlightColor);
-						
-				// Bump
-				pen.DrawRect(x+1,y+1, x2-1,y2-1, false, true);
-			},		
-			
-	FlatAdjust : 2,		
-	Flat : function(pen, x, y, x2, y2)
-			{				
-				var prefs = Skin.current;
-				
-				// Back of panel
-				pen.SetColor(prefs.FillColor);
-				pen.DrawRect(x+2,y+1, x2-1,y2-2, true);
-				
-				// Darken back a little
-				pen.SetColor(0,0,0,0.25);
-				pen.DrawRect(x+2,y+1, x2-1,y2-2, true);
-				
-				// Black border
-				pen.SetColor(0,0,0,1);
-				pen.DrawRect(x,y, x2,y2, false);				
-			},
-	
-}
-
-// At small sizes, these don't look good.  Widths and heights 
-// of at least 50 pixels are recommended.
-MiteredFrames3D =
-{
-	RidgeAdjust : 5,
-	Ridge : function(pen, x, y, x2, y2)
-			{				
-				var prefs = Skin.current;
-				
-				// Back of panel
-				pen.SetColor(prefs.FillColor);
-				pen.DrawMiteredRect(x+2,y+2, x2-2,y2-2, 0.10,true);
-				
-				// Darken back a little
-				pen.SetColor(0,0,0,0.25);
-				pen.DrawMiteredRect(x+4,y+4, x2-4,y2-4, 0.10,true);
-				
-				// Black border
-				pen.SetColor(0,0,0,1);
-				pen.DrawMiteredRect(x,y, x2,y2, 0.10,false);		
-				
-				// Setup pen
-				pen.SetColor(prefs.ShadowColor);
-				pen.SwapColors();
-				pen.SetColor(prefs.HighlightColor);
-						
-				// Ridge outer
-				pen.DrawMiteredRect(x+1,y+1, x2-1,y2-1, 0.10,false, true);
-				
-				pen.SwapColors();
-				
-				// Ridge inner
-				pen.DrawMiteredRect(x+3,y+3, x2-3,y2-3, 0.10,false, true);				
-			},	
-
-	ValleyAdjust : 5,			
-	Valley : function(pen, x, y, x2, y2)
-			{				
-				var prefs = Skin.current;
-				
-				// Back of panel
-				pen.SetColor(prefs.FillColor);
-				pen.DrawMiteredRect(x+2,y+2, x2-2,y2-2, 0.10, true);
-				
-				// Darken valley a little
-				pen.SetColor(0,0,0,0.25);
-				pen.DrawMiteredRect(x+2,y+2, x2-2,y2-2, 0.10, false);
-				
-				// Black border
-				pen.SetColor(0,0,0,1);
-				pen.DrawMiteredRect(x,y, x2,y2, 0.10, false);		
-				
-				// Setup pen
-				pen.SetColor(prefs.HighlightColor);
-				pen.SwapColors();
-				pen.SetColor(prefs.ShadowColor);
-										
-				// Ridge outer
-				pen.DrawMiteredRect(x+1,y+1, x2-1,y2-1, 0.10, false, true);
-				
-				pen.SwapColors();
-				
-				// Ridge inner
-				pen.DrawMiteredRect(x+3,y+3, x2-3,y2-3, 0.10, false, true);				
-			},
-	
-	InsetAdjust : 2,		
-	Inset : function(pen, x, y, x2, y2)
-			{				
-				var prefs = Skin.current;
-				
-				// Back of panel
-				pen.SetColor(prefs.FillColor);
-				pen.DrawMiteredRect(x+2,y+2, x2-1,y2-1, 0.10,true);
-				
-				// Darken back a little
-				pen.SetColor(0,0,0,0.25);
-				pen.DrawMiteredRect(x+2,y+2, x2-1,y2-1, 0.10,true);
-				
-				// Black border
-				pen.SetColor(0,0,0,1);
-				pen.DrawMiteredRect(x,y, x2,y2, 0.10,false);		
-				
-				// Setup pen
-				pen.SetColor(prefs.HighlightColor);
-				pen.SwapColors();				
-				pen.SetColor(prefs.ShadowColor);
-						
-				// Dip
-				pen.DrawMiteredRect(x+1,y+1, x2-1,y2-1, 0.10,false, true);
-			},
-
-	OutsetAdjust : 2,			
-	Outset : function(pen, x, y, x2, y2)
-			{
-				var prefs = Skin.current;
-								
-				// Back of panel
-				pen.SetColor(prefs.FillColor);
-				pen.DrawMiteredRect(x+2,y+2, x2-2,y2-2,0.10, true);
-						
-				// Black border
-				pen.SetColor(0,0,0,1);
-				pen.DrawMiteredRect(x,y, x2,y2, 0.10,false);		
-				
-				// Setup pen
-				pen.SetColor(prefs.ShadowColor);
-				pen.SwapColors();
-				pen.SetColor(prefs.HighlightColor);
-						
-				// Bump
-				pen.DrawMiteredRect(x+1,y+1, x2-1,y2-1, 0.10,false, true);
-			},	
-			
-	FlatAdjust : 2,		
-	Flat : function(pen, x, y, x2, y2)
-			{				
-				var prefs = Skin.current;
-				
-				// Back of panel
-				pen.SetColor(prefs.FillColor);
-				pen.DrawMiteredRect(x+2,y+2, x2-1,y2-1, 0.10,true);
-				
-				// Darken back a little
-				pen.SetColor(0,0,0,0.25);
-				pen.DrawMiteredRect(x+2,y+2, x2-1,y2-1, 0.10,true);
-				
-				// Black border
-				pen.SetColor(0,0,0,1);
-				pen.DrawMiteredRect(x,y, x2,y2, 0.10,false);				
-			},	
-}
 
 Style3D = 
 {
 	WindowMin : function(pen)
 	{
 		var prefs = Skin.current;
-		
+			
 		if (this.over) pen.SetColor(0,0,1,1);
 		else pen.SetColor(0,0,0,1);
 		
-		pen.DrawRect(5, this.height-10, 15, this.height-5, true);
+		pen.SetFlag(Pen.FLAG_FILL);
+		pen.DrawRect(5, this.height-10, 15, this.height-5);
 	},
 	
 	WindowZoom : function(pen)
@@ -291,8 +22,9 @@ Style3D =
 		if (this.over) pen.SetColor(0,1,0,1);
 		else pen.SetColor(0,0,0,1);
 				
-		pen.DrawRect(cx-qw, cy-2, cx+qw, cy+2, true);
-		pen.DrawRect(cx-2, cy-qh, cx+2, cy+qh, true);
+		pen.SetFlag(pen.FLAG_FILL);
+		pen.DrawRect(cx-qw, cy-2, cx+qw, cy+2);
+		pen.DrawRect(cx-2, cy-qh, cx+2, cy+qh);
 	},
 	
 	WindowClose : function(pen)
@@ -303,13 +35,15 @@ Style3D =
 		if (this.over) pen.SetColor(1,0,0,1);
 		else pen.SetColor(0,0,0,1);
 		
+		pen.SetFlag(Pen.FLAG_FILL);
+		
 		// Left to right line
-		pen.DrawTriangle(6,4, this.width-4, this.height-6, 4, 6, true);
-		pen.DrawTriangle(4,6, this.width-4, this.height-6, this.width-6, this.height-4, true);
+		pen.DrawTriangle(6,4, this.width-4, this.height-6, 4, 6);
+		pen.DrawTriangle(4,6, this.width-4, this.height-6, this.width-6, this.height-4);
 		
 		// Right to left line
-		pen.DrawTriangle(this.width-6,4, 6, this.height-4, 4, this.height-6, true);
-		pen.DrawTriangle(this.width-6,4, this.width-4, 6, 6, this.height-4, true);
+		pen.DrawTriangle(this.width-6,4, 6, this.height-4, 4, this.height-6);
+		pen.DrawTriangle(this.width-6,4, this.width-4, 6, 6, this.height-4);
 	},
 	
 	TitleBar : function(pen)
@@ -324,12 +58,14 @@ Style3D =
 		
 		// Draw the background.
 		pen.SetColor(tb.Base)
-		pen.DrawMiteredRect(0,0,w,h,5,true);
+		pen.SetFlag(Pen.FLAG_FILL);
+		pen.DrawMiteredRect(0,0,w,h,5);
 		
 		pen.SetColor(0,0,0,0.4)
-		pen.DrawMiteredRect(0,0,w,h,5,false);
+		pen.ClearFlag(Pen.FLAG_FILL);
+		pen.DrawMiteredRect(0,0,w,h,5);
 		pen.SetColor(0,0,0,0.3)
-		pen.DrawMiteredRect(1,1,w-1,h-1,5,false);
+		pen.DrawMiteredRect(1,1,w-1,h-1,5);
 				
 		dim = prefs.TitleFont.GetDimensions(this.text);
 		
@@ -337,8 +73,9 @@ Style3D =
 		var thw = dim.width>>1;
 		
 		pen.SetColor(tb.Active);
-		pen.DrawMiteredRect(cx-thw-5, 0, cx+thw+15, dim.height+2, 5, true);
-		pen.DrawRect(cx-thw-5, 0, cx+thw+15, 5, true);
+		pen.SetFlag(Pen.FLAG_FILL);
+		pen.DrawMiteredRect(cx-thw-5, 0, cx+thw+15, dim.height+2, 5);
+		pen.DrawRect(cx-thw-5, 0, cx+thw+15, 5);
 		
 		
 		// Glassy shine
@@ -438,9 +175,10 @@ Style3D =
 			drawButtons(this);
 			
 			// Arrows
-			pen.SetColor(0,0,0,1);							
-			arrowPre(this.dec_button_down); pen.DrawTriangle(btn_w*0.5, tri_qh, btn_w-tri_qw, btn_h-tri_qh, tri_qw, btn_h-tri_qh, true);   arrowPost(this.dec_button_down); 
-			arrowPre(this.inc_button_down); pen.DrawTriangle(btn_w*0.5, tri_qh*5, tri_qw, btn_h+tri_qh, btn_w-tri_qw, btn_h+tri_qh, true); arrowPost(this.inc_button_down); 			
+			pen.SetColor(0,0,0,1);	
+			pen.SetFlag(Pen.FLAG_FILL);						
+			arrowPre(this.dec_button_down); pen.DrawTriangle(btn_w*0.5, tri_qh, btn_w-tri_qw, btn_h-tri_qh, tri_qw, btn_h-tri_qh);   arrowPost(this.dec_button_down); 
+			arrowPre(this.inc_button_down); pen.DrawTriangle(btn_w*0.5, tri_qh*5, tri_qw, btn_h+tri_qh, btn_w-tri_qw, btn_h+tri_qh); arrowPost(this.inc_button_down); 			
 			
 		}
 		else
@@ -460,8 +198,9 @@ Style3D =
 			
 			// Arrows
 			pen.SetColor(0,0,0,1);			
-			arrowPre(this.dec_button_down); pen.DrawTriangle(tri_qw, btn_h*0.5,  btn_w-tri_qw, tri_qh, btn_w-tri_qw, btn_h-tri_qh, true);	arrowPost(this.dec_button_down); 		
-			arrowPre(this.inc_button_down); pen.DrawTriangle(tri_qw*5, btn_h*0.5, btn_w+tri_qw, btn_h-tri_qh, btn_w+tri_qw, tri_qh, true);  arrowPost(this.inc_button_down); 
+			pen.SetFlag(Pen.FLAG_FILL);
+			arrowPre(this.dec_button_down); pen.DrawTriangle(tri_qw, btn_h*0.5,  btn_w-tri_qw, tri_qh, btn_w-tri_qw, btn_h-tri_qh);	arrowPost(this.dec_button_down); 		
+			arrowPre(this.inc_button_down); pen.DrawTriangle(tri_qw*5, btn_h*0.5, btn_w+tri_qw, btn_h-tri_qh, btn_w+tri_qw, tri_qh);  arrowPost(this.inc_button_down); 
 		}
 	},
 	
@@ -480,7 +219,8 @@ Style3D =
 // 		}
 							
 		pen.SetColor(b.Base);
-		pen.DrawMiteredRect(1,0,w,h-1,2,true);
+		pen.SetFlag(Pen.FLAG_FILL);
+		pen.DrawMiteredRect(1,0,w,h-1,2);
 		
 		if(!this.state)
 		{
@@ -508,7 +248,7 @@ Style3D =
 		if (this.over)
 		{	
 			pen.SetColor(1,1,1,0.25);			
-			pen.DrawMiteredRect(0,0,w,h,2,true);
+			pen.DrawMiteredRect(0,0,w,h,2);
 		}
 		
 		if (!this.state)
@@ -527,6 +267,7 @@ Style3D =
 		}
 		
 		pen.SetColor(b.Border);
+		pen.ClearFlag(Pen.FLAG_FILL);
  		pen.DrawMiteredRect(0,0,w,h,2,false);
 		
 // 		if (this.state) pen.PopTransform();
@@ -544,19 +285,22 @@ Style3D =
 		pen.Clear();
 		pen.SetWidth(2.5);
 		pen.SetColor(0,0,0,1);
-		pen.DrawArc(0,0,w,h,0,Math.PI*2.1,false);
+		pen.ClearFlag(Pen.FLAG_FILL);
+		pen.DrawArc(0,0,w,h,0,Math.PI*2.1);
 		
 		pen.SwapColors();		
 		pen.SetColor(1,1,1,1);
 		pen.SetWidth(5);						
-		pen.DrawArc(2,2,w-2,h-2,0,Math.PI*2.1,false);				
+		pen.DrawArc(2,2,w-2,h-2,0,Math.PI*2.1);				
 		pen.SetColor(0.5,0.5,0.5,1);				
-		pen.DrawArc(5,5,w-5,h-5,0,Math.PI*2.1,false);				
+		pen.DrawArc(5,5,w-5,h-5,0,Math.PI*2.1);				
 		pen.SetColor(1,1,1,1);
-		pen.DrawArc(10,10,w-10,h-10,0,Math.PI*2.1,true);
+		pen.SetFlag(Pen.FLAG_FILL);
+		pen.DrawArc(10,10,w-10,h-10,0,Math.PI*2.1);
 		pen.SetWidth(2);
 		pen.SwapColors();
-		pen.DrawArc(15,15,w-15,h-15,0,Math.PI*2.1,false);
+		pen.ClearFlag(Pen.FLAG_FILL);
+		pen.DrawArc(15,15,w-15,h-15,0,Math.PI*2.1);
 		
 		pen.SetWidth(1.0);
 		
@@ -596,18 +340,19 @@ Style3D =
 		angle = (d.getHours()) * steps;
 		angle -= Math.PI * 0.5;		
 		pen.SetColor(0,0,0.75,0.5);
-		pen.DrawArc(cx-r,cy-r,cx+r,cy+r,angle-(steps/2.0), angle+(steps/2.0), true);
+		pen.SetFlag(Pen.FLAG_FILL);
+		pen.DrawArc(cx-r,cy-r,cx+r,cy+r,angle-(steps/2.0), angle+(steps/2.0));
 		
 		steps = Math.PI/30.0;
 		angle = (d.getMinutes()) * steps;		
 		angle -= Math.PI * 0.5;
 		pen.SetColor(0.75,0,0,0.5);
-		pen.DrawArc(0,0,w,h,angle-(steps/2.0), angle+(steps/2.0), true);
+		pen.DrawArc(0,0,w,h,angle-(steps/2.0), angle+(steps/2.0));
 					
 		angle = (d.getSeconds()) * steps;		
 		angle -= Math.PI * 0.5;
 		pen.SetColor(0.75,0.75,0,0.5);
-		pen.DrawArc(0,0,w,h,angle-(steps/2.0), angle+(steps/2.0), true);
+		pen.DrawArc(0,0,w,h,angle-(steps/2.0), angle+(steps/2.0));
 		
 				
 		pen.SetColor(0,0,0,1);
@@ -665,12 +410,14 @@ Style3D =
 		pen.SetColor(0.35,0.35,0.35,1);
 		pen.SwapColors();
 		pen.SetColor(0.85,0.85,0.85,1);
+		pen.ClearFlag(Pen.FLAG_FILL);
+		pen.SetFlag(Pen.FLAG_SWAPCOLORS);
 		
 		for(x=adjust; x<w-adjust; x+=3)
 		{
 			for(y=adjust; y<h-adjust; y+=3)
 			{								
-				pen.DrawRect(x+offset,y+offset,x+1+offset,y+1+offset, false, true);
+				pen.DrawRect(x+offset,y+offset,x+1+offset,y+1+offset);
 			}
 		}				
 		
@@ -704,13 +451,14 @@ Style3D =
 			start_y=10;
 			
 			// Fill
+			pen.SetFlag(Pen.FLAG_FILL);
 			pen.SetColor(prefs.TextBackColor);
-			pen.DrawRect(0,start_y, w, h, true);
-			pen.DrawTriangle(arrow_x, 0, arrow_x+10, start_y, arrow_x-10, start_y, true);
+			pen.DrawRect(0,start_y, w, h);
+			pen.DrawTriangle(arrow_x, 0, arrow_x+10, start_y, arrow_x-10, start_y);
 			
 			// Decoration
 			pen.SetColor(prefs.ActiveTitleBarColor1);
-			pen.DrawRect(3,start_y+3, 8, h-3, true);
+			pen.DrawRect(3,start_y+3, 8, h-3);
 					
 			// Border
 			pen.SetWidth(1.5);
@@ -729,12 +477,13 @@ Style3D =
 				
 			// Fill
 			pen.SetColor(prefs.TextBackColor);
-			pen.DrawRect(0,0, w, start_y, true);
-			pen.DrawTriangle(arrow_x, h, arrow_x-10, start_y, arrow_x+10, start_y, true);
+			pen.SetFlag(Pen.FLAG_FILL);
+			pen.DrawRect(0,0, w, start_y);
+			pen.DrawTriangle(arrow_x, h, arrow_x-10, start_y, arrow_x+10, start_y);
 			
 			// Decoration
 			pen.SetColor(prefs.ActiveTitleBarColor1);
-			pen.DrawRect(3, 3, 8, start_y-3, true);
+			pen.DrawRect(3, 3, 8, start_y-3);
 					
 			// Border
 			pen.SetWidth(1.5);
@@ -781,11 +530,12 @@ Style3D =
 						
 		// Border
 		pen.SetColor(cb.Border);
-		pen.DrawRect(0,0,cb.w,cb.h,false);		
+		pen.DrawRect(0,0,cb.w,cb.h);		
 		
 		// Filling		
 		pen.SetColor(prefs.TextBackColor);		
-		pen.DrawRect(2,1,cb.w-1, cb.h-2, true);	
+		pen.SetFlag(Pen.FLAG_FILL);
+		pen.DrawRect(2,1,cb.w-1, cb.h-2);	
 						
 		pen.SetColor(0,0,0,1);
 
@@ -800,10 +550,12 @@ Style3D =
 			
 		if (this.over)
 		{
+			pen.ClearFlag(Pen.FLAG_FILL);
+			
 			for(i=0; i<5; ++i)
 			{
 				pen.SetColor(1.0,1.0,0.74,(5-i)/10)
-				pen.DrawRect(i,i,cb.w-i,cb.h-i,false);	
+				pen.DrawRect(i,i,cb.w-i,cb.h-i);	
 			}	
 		}
 						
@@ -824,17 +576,19 @@ Style3D =
 		
 		// Border
 		pen.SetColor(rb.Border);
-		pen.DrawRect(0,0,rb.w,rb.h,false);		
+		pen.ClearFlag(Pen.FLAG_FILL);
+		pen.DrawRect(0,0,rb.w,rb.h);		
 		
 		if (this.state)
 		{			
 			var hh = rb.h>>1;
 			
 			pen.SetColor(rb.Base);
-			pen.DrawRect(2, 1, rb.w-1, rb.h-2, true); 			
+			pen.SetFlag(Pen.FLAG_FILL);
+			pen.DrawRect(2, 1, rb.w-1, rb.h-2); 			
 			pen.SetColor(1,1,1,0.5);
-			pen.DrawRect(2, 1, rb.w-1, hh-2, true);
-			pen.DrawArc(3, hh+2, rb.w-3, rb.h-2, Math.PI, Math.PI*2, true);
+			pen.DrawRect(2, 1, rb.w-1, hh-2);
+			pen.DrawArc(3, hh+2, rb.w-3, rb.h-2, Math.PI, Math.PI*2);
 			pen.SetColor(0,0,0,0.25);
 			pen.DrawLine(2, hh, rb.w-1, hh);
 		}
@@ -842,15 +596,17 @@ Style3D =
 		{
 			// Filling		
 			pen.SetColor(prefs.TextBackColor);		
-			pen.DrawRect(2,1,rb.w-1, rb.h-2, true);			
+			pen.SetFlag(Pen.FLAG_FILL);
+			pen.DrawRect(2,1,rb.w-1, rb.h-2);			
 		}
 		
 		if (this.over)
 		{
+			pen.ClearFlag(Pen.FLAG_FILL);
 			for(i=0; i<5; ++i)
 			{
 				pen.SetColor(1.0,1.0,0.74,(5-i)/10)
-				pen.DrawRect(i,i,rb.w-i,rb.h-i,false);	
+				pen.DrawRect(i,i,rb.w-i,rb.h-i);	
 			}	
 		}
 		

@@ -21,10 +21,10 @@
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 
-#define MESH_TYPE(a) (filling_shape ? a : pen_width>1 ? CS_MESHTYPE_QUADS : CS_MESHTYPE_LINESTRIP)
+#define MESH_TYPE(a) ((flags & CS_PEN_FILL) ? a : pen_width>1 ? CS_MESHTYPE_QUADS : CS_MESHTYPE_LINESTRIP)
 
 
-csPen::csPen (iGraphics2D *_g2d, iGraphics3D *_g3d) : g3d (_g3d), g2d(_g2d), pen_width(1.0)
+csPen::csPen (iGraphics2D *_g2d, iGraphics3D *_g3d) : g3d (_g3d), g2d(_g2d), pen_width(1.0), flags(0), gen_tex_coords(false)
 {
   mesh.object2world.Identity();
 }
@@ -34,21 +34,28 @@ csPen::~csPen ()
 
 }
 
-void csPen::Start (bool fill)
+void csPen::Start ()
 {
   poly.MakeEmpty();
   poly_idx.MakeEmpty();
   colors.SetLength (0);  
-  line_points.SetLength(0);
-  filling_shape=fill;
+  texcoords.SetLength(0);
+  line_points.SetLength(0);  
+  gen_tex_coords=false;
 }
 
 void csPen::AddVertex (float x, float y, bool force_add)
 {
-  if (force_add || filling_shape || !(pen_width>1))
+  if (force_add || (flags & CS_PEN_FILL) || !(pen_width>1))
   {
   	poly_idx.AddVertex((int)poly.AddVertex(x,y,0));
   	colors.Push(color);
+  	
+  	// Generate texture coordinates.
+  	if (gen_tex_coords && (flags & CS_PEN_TEXTURE))
+  	{
+		AddTexCoord(x / sh_w, y / sh_h); 	
+  	}
   }
   else
   {
@@ -63,6 +70,11 @@ void csPen::AddVertex (float x, float y, bool force_add)
   }
 }
 
+void csPen::AddTexCoord(float x, float y)
+{
+	texcoords.Push(csVector2(x,y));
+}
+
 void csPen::SetupMesh ()
 {
   mesh.vertices = poly.GetVertices ();
@@ -72,16 +84,23 @@ void csPen::SetupMesh ()
   mesh.indexCount = (uint)poly_idx.GetVertexCount ();
 
   mesh.colors = colors.GetArray ();
-  //mesh.colorCount = static_cast<uint>(colors.Length());  
-
+  mesh.texcoords = texcoords.GetArray();
+  
   //mesh.alphaType = alphaSmooth;
-  mesh.mixmode = CS_FX_COPY | CS_FX_FLAT | CS_FX_ALPHA;  
+  mesh.mixmode = CS_FX_COPY | CS_FX_ALPHA; // CS_FX_FLAT  
 }
 
 void csPen::DrawMesh (csRenderMeshType mesh_type)
 {
   mesh.meshtype = mesh_type;
   g3d->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
+}
+
+void csPen::SetAutoTexture(float w, float h)
+{
+	sh_w = w;
+	sh_h = h;
+	gen_tex_coords=true;	
 }
 
 void csPen::AddThickPoints(float fx1, float fy1, float fx2, float fy2)
@@ -113,6 +132,17 @@ void csPen::AddThickPoints(float fx1, float fy1, float fx2, float fy2)
 	last[1].x=fx2-ca1; last[1].y=fy2-sa1;
 }
 
+void csPen::SetFlag(uint flag)
+{
+	flags |= flag;	  
+}	
+  
+
+void csPen::ClearFlag(uint flag)
+{
+	flags &= (~flag);	  
+}
+
 void csPen::SetColor (float r, float g, float b, float a)
 {
   color.x=r;
@@ -127,6 +157,11 @@ void csPen::SetColor(const csColor4 &c)
   color.y=c.green;
   color.z=c.blue;
   color.w=c.alpha;
+}
+
+void csPen::SetTexture(csRef<iTextureHandle> _tex)
+{
+	tex=_tex;
 }
 
 void csPen::SwapColors()
@@ -193,7 +228,7 @@ csPen::Rotate(const float &a)
 void csPen::DrawThickLine(uint x1, uint y1, uint x2, uint y2)
 {	
 		
-	Start(false);
+	Start();
 	
 	AddThickPoints(x1,y1,x2,y2);
 	
@@ -206,7 +241,7 @@ void csPen::DrawLine (uint x1, uint y1, uint x2, uint y2)
 {	
   if (pen_width>1) { DrawThickLine(x1,y1,x2,y2); return; }	
 	
-  Start (false);
+  Start ();
   AddVertex (x1,y1);
   AddVertex (x2,y2);
 
@@ -218,7 +253,7 @@ void csPen::DrawLine (uint x1, uint y1, uint x2, uint y2)
 void csPen::DrawPoint (uint x1, uint y1)
 {
 	
-  Start (false);
+  Start ();
   AddVertex (x1,y1);
   
   SetupMesh (); 
@@ -226,21 +261,22 @@ void csPen::DrawPoint (uint x1, uint y1)
 }
 
 /** Draws a rectangle. */
-void csPen::DrawRect (uint x1, uint y1, uint x2, uint y2, bool swap_colors, bool fill)
+void csPen::DrawRect (uint x1, uint y1, uint x2, uint y2)
 {  	
-  Start (fill);
+  Start ();
+  SetAutoTexture(x2-x1, y2-y1);
+  
+  AddVertex (x1, y1); 
+  AddVertex (x2, y1); 
 
-  AddVertex (x1, y1);
-  AddVertex (x2, y1);
+  if (flags & CS_PEN_SWAPCOLORS) SwapColors();
 
-  if (swap_colors) SwapColors();
+  AddVertex (x2, y2); 
+  AddVertex (x1, y2); 
 
-  AddVertex (x2, y2);
-  AddVertex (x1, y2);
+  if (flags & CS_PEN_SWAPCOLORS) SwapColors();
 
-  if (swap_colors) SwapColors();
-
-  if (!fill) AddVertex (x1, y1);  
+  if (!(flags & CS_PEN_FILL)) AddVertex (x1, y1);  
 
   SetupMesh ();
   DrawMesh (MESH_TYPE(CS_MESHTYPE_QUADS));
@@ -249,13 +285,14 @@ void csPen::DrawRect (uint x1, uint y1, uint x2, uint y2, bool swap_colors, bool
 /** Draws a mitered rectangle. The miter value should be between 0.0 and 1.0, and determines how
 * much of the corner is mitered off and beveled. */    
 void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2, 
-                             uint miter, bool swap_colors, bool fill)
+                             uint miter)
 {  	
   if (miter == 0) 
   { 
-    DrawRect (x1,y1,x2,y2,fill); 
+    DrawRect (x1,y1,x2,y2); 
     return; 
   }
+   
 			
   uint width = x2-x1;
   uint height = y2-y1;
@@ -265,25 +302,31 @@ void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
 
   uint y_miter = miter;
   uint x_miter = miter;
+  
+  float ym_1 = y1 + y_miter;
+  float ym_2 = y2 - y_miter;
+  float xm_1 = x1 + x_miter;
+  float xm_2 = x2 - x_miter;
   		
-  Start (fill);
+  Start ();
+  SetAutoTexture(x2-x1, y2-y1);
 
-  if (fill)AddVertex(center_x, center_y);
+  if (flags & CS_PEN_FILL)AddVertex(center_x, center_y);
 
-  AddVertex (x1, y2-y_miter);
-  AddVertex (x1, y1+y_miter);  
-  AddVertex (x1+x_miter, y1);
-  AddVertex (x2-x_miter, y1);  
-  AddVertex (x2, y1+y_miter);
+  AddVertex (x1, ym_2); 
+  AddVertex (x1, ym_1); 
+  AddVertex (xm_1, y1);
+  AddVertex (xm_2, y1);  
+  AddVertex (x2, ym_1);
 
-  if (swap_colors) SwapColors();
+  if (flags & CS_PEN_SWAPCOLORS) SwapColors();
 
   AddVertex (x2, y2-y_miter);
   AddVertex (x2-x_miter, y2);
   AddVertex (x1+x_miter, y2);
   AddVertex (x1, y2-y_miter);
 
-  if (swap_colors) SwapColors();
+  if (flags & CS_PEN_SWAPCOLORS) SwapColors();
 
   SetupMesh ();
   DrawMesh (MESH_TYPE(CS_MESHTYPE_TRIANGLEFAN));  
@@ -292,11 +335,11 @@ void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
 /** Draws a rounded rectangle. The roundness value should be between 0.0 and 1.0, and determines how
   * much of the corner is rounded off. */
 void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
-                             uint roundness, bool swap_colors, bool fill)
+                             uint roundness)
 {		
   if (roundness == 0) 
   { 
-    DrawRect (x1,y1,x2,y2,fill); 
+    DrawRect (x1,y1,x2,y2); 
     return; 
   }
 			
@@ -311,11 +354,12 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
   float x_round = roundness;  
   float delta = 0.0384f; 
 
-  Start(fill);
+  Start();
+  SetAutoTexture(width, height);
 
   float angle;
 
-  if (fill)AddVertex(center_x, center_y);
+  if ((flags & CS_PEN_FILL))AddVertex(center_x, center_y);
   			
   for(angle=(HALF_PI)*3.0f; angle>PI; angle-=delta)
   {
@@ -333,7 +377,7 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
   AddVertex (x1+x_round, y1);
   AddVertex (x2-x_round, y1);
 
-  if (swap_colors) SwapColors();
+  if (flags & CS_PEN_SWAPCOLORS) SwapColors();
   
   for(angle=HALF_PI; angle>0; angle-=delta)
   {
@@ -351,7 +395,7 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
   AddVertex (x2-x_round, y2);
   AddVertex (x1+x_round, y2);		
 
-  if (swap_colors) SwapColors();
+  if (flags & CS_PEN_SWAPCOLORS) SwapColors();
 
   SetupMesh ();
   DrawMesh (MESH_TYPE(CS_MESHTYPE_TRIANGLEFAN));
@@ -363,7 +407,7 @@ void csPen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
    * a square.  If you want a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
    * angle.
    */
-void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle, bool /*swap_colors*/, bool fill)
+void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float end_angle)
 {		
   // Check to make sure that the arc is not in a negative box.
   if (x2<x1) { x2^=x1; x1^=x2; x2^=x1; }
@@ -387,9 +431,10 @@ void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float
   float delta = 0.0384f; 
   float angle;
     
-  Start(fill);
+  Start();
+  SetAutoTexture(width, height);
   
-  if (fill) AddVertex(center_x, center_y);
+  if ((flags & CS_PEN_FILL)) AddVertex(center_x, center_y);
 
   for(angle=start_angle; angle<=end_angle; angle+=delta)
   {
@@ -400,13 +445,13 @@ void csPen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle, float
   DrawMesh (MESH_TYPE(CS_MESHTYPE_TRIANGLEFAN));
 }
 
-void csPen::DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint y3, bool fill)
+void csPen::DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint y3)
 {	
-  Start(fill);
+  Start();
 
-  AddVertex(x1, y1);
-  AddVertex(x2, y2);
-  AddVertex(x3, y3);
+  AddVertex(x1, y1); AddTexCoord(0,0);
+  AddVertex(x2, y2); AddTexCoord(0,1);
+  AddVertex(x3, y3); AddTexCoord(1,1);
 
   SetupMesh ();
   DrawMesh (MESH_TYPE(CS_MESHTYPE_TRIANGLES));
