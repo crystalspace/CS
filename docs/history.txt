@@ -6,6 +6,24 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
  
+28-Mar-2006
+	- Christopher Nelson made *major* changes to the csPen object.  He
+	removed the fill and swap_colors parameters, and added the ClearFlag and
+	SetFlag functions, along with SetTexture.  The two previous functions allow
+	the user to turn swap colors and fill on and off, along with other flags
+	like texturing.  He also turned off CS_FX_FLAT so now per-vertex colors
+	are possible, which lets the user make very simple linear gradients by
+	setting the current and alternate colors.
+	  csPen now has the ability to texture map a given shape.  Texture coordinates
+	are automatically generated for all shapes.  There is currently no way to
+	specify custom texture coordinates.  Textures mapped to a triangle shape
+	will probably not look right.
+	  He also added csMemoryPen, which is the AWS2 caching layer for drawing.
+	AWS2 now subclasses from this pen.  
+	  The current skin was updated for the changes to the drawing layer.  
+	  A Gradient object was added to AWS2, but it's currently not much use.  
+	Eventually the gradient object will be used to create a texture which 
+	can be mapped to a shape for more complex gradients.
 27-Mar-2006
 	- Eric Sunshine fixed outdated information in CS/INSTALL document.
 26-Mar-2006
