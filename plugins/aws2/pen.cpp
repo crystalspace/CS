@@ -54,6 +54,42 @@ Clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	return JS_TRUE;
 }
 
+/** @brief Clears out the contents of the pen. */
+static JSBool
+SetFlag(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{	
+	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
+	
+	if (po) 
+	{ 
+		int32 flag;		
+		
+		JS_ValueToInt32(cx,  argv[0], &flag);
+		
+		po->SetFlag((uint)flag); 
+	}
+		
+	return JS_TRUE;
+}
+
+/** @brief Clears out the contents of the pen. */
+static JSBool
+ClearFlag(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{	
+	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
+	
+	if (po) 
+	{ 
+		int32 flag;		
+		
+		JS_ValueToInt32(cx,  argv[0], &flag);
+		
+		po->ClearFlag((uint)flag); 
+	}
+		
+	return JS_TRUE;
+}
+
 /** @brief Set the color. */
 static JSBool
 SetColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
@@ -178,16 +214,16 @@ DrawRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
 	int32 x1,y1,x2,y2;
-	JSBool fill, swap_colors;
+	//JSBool fill, swap_colors;
 		
 	JS_ValueToInt32(cx,  argv[0], &x1);
 	JS_ValueToInt32(cx,  argv[1], &y1);
 	JS_ValueToInt32(cx,  argv[2], &x2);
 	JS_ValueToInt32(cx,  argv[3], &y2);
-	JS_ValueToBoolean(cx, argv[4], &fill);
-	JS_ValueToBoolean(cx, argv[5], &swap_colors);
+	//JS_ValueToBoolean(cx, argv[4], &fill);
+	//JS_ValueToBoolean(cx, argv[5], &swap_colors);
 		
-	if (po) po->DrawRect(x1,y1,x2,y2,swap_colors==JS_TRUE, fill==JS_TRUE);	
+	if (po) po->DrawRect(x1,y1,x2,y2);	
 		
 	return JS_TRUE;
 }
@@ -202,17 +238,17 @@ DrawMiteredRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 	
 	int32 x1,y1,x2,y2;
 	int32 miter;
-	JSBool fill, swap_colors;
+	//JSBool fill, swap_colors;
 		
 	JS_ValueToInt32(cx,  argv[0], &x1);
 	JS_ValueToInt32(cx,  argv[1], &y1);
 	JS_ValueToInt32(cx,  argv[2], &x2);
 	JS_ValueToInt32(cx,  argv[3], &y2);
 	JS_ValueToInt32(cx,  argv[4], &miter);
-	JS_ValueToBoolean(cx, argv[5], &fill);
-	JS_ValueToBoolean(cx, argv[6], &swap_colors);
+// 	JS_ValueToBoolean(cx, argv[5], &fill);
+// 	JS_ValueToBoolean(cx, argv[6], &swap_colors);
 		
-	if (po) po->DrawMiteredRect(x1,y1,x2,y2,miter, swap_colors==JS_TRUE, fill==JS_TRUE);	
+	if (po) po->DrawMiteredRect(x1,y1,x2,y2,miter);	
 		
 	return JS_TRUE;
 }
@@ -227,17 +263,17 @@ DrawRoundedRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 	
 	int32 x1,y1,x2,y2;
 	int32 roundness;
-	JSBool fill, swap_colors;
+	//JSBool fill, swap_colors;
 		
 	JS_ValueToInt32(cx,  argv[0], &x1);
 	JS_ValueToInt32(cx,  argv[1], &y1);
 	JS_ValueToInt32(cx,  argv[2], &x2);
 	JS_ValueToInt32(cx,  argv[3], &y2);
 	JS_ValueToInt32(cx,  argv[4], &roundness);
-	JS_ValueToBoolean(cx, argv[5], &fill);
-	JS_ValueToBoolean(cx, argv[6], &swap_colors);
+// 	JS_ValueToBoolean(cx, argv[5], &fill);
+// 	JS_ValueToBoolean(cx, argv[6], &swap_colors);
 		
-	if (po) po->DrawRoundedRect(x1,y1,x2,y2,roundness, swap_colors==JS_TRUE, fill==JS_TRUE);	
+	if (po) po->DrawRoundedRect(x1,y1,x2,y2,roundness);	
 		
 	return JS_TRUE;
 }
@@ -252,7 +288,7 @@ DrawArc(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	
 	int32 x1,y1,x2,y2;
 	jsdouble start_angle, end_angle;
-	JSBool fill, swap_colors;
+	//JSBool fill, swap_colors;
 		
 	JS_ValueToInt32(cx,  argv[0], &x1);
 	JS_ValueToInt32(cx,  argv[1], &y1);
@@ -260,10 +296,10 @@ DrawArc(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	JS_ValueToInt32(cx,  argv[3], &y2);
 	JS_ValueToNumber(cx,  argv[4], &start_angle);
 	JS_ValueToNumber(cx,  argv[5], &end_angle);
-	JS_ValueToBoolean(cx, argv[6], &fill);
-	JS_ValueToBoolean(cx, argv[7], &swap_colors);
+// 	JS_ValueToBoolean(cx, argv[6], &fill);
+// 	JS_ValueToBoolean(cx, argv[7], &swap_colors);
 		
-	if (po) po->DrawArc(x1,y1,x2,y2,(float)start_angle, (float)end_angle, swap_colors==JS_TRUE, fill==JS_TRUE);	
+	if (po) po->DrawArc(x1,y1,x2,y2,(float)start_angle, (float)end_angle);	
 		
 	return JS_TRUE;
 }
@@ -277,7 +313,7 @@ DrawTriangle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
 	
 	int32 x1,y1,x2,y2,x3,y3;
-	JSBool fill;
+	//JSBool fill;
 		
 	JS_ValueToInt32(cx,  argv[0], &x1);
 	JS_ValueToInt32(cx,  argv[1], &y1);
@@ -285,9 +321,9 @@ DrawTriangle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	JS_ValueToInt32(cx,  argv[3], &y2);
 	JS_ValueToInt32(cx,  argv[4], &x3);
 	JS_ValueToInt32(cx,  argv[5], &y3);	
-	JS_ValueToBoolean(cx, argv[6], &fill);
+	//JS_ValueToBoolean(cx, argv[6], &fill);
 		
-	if (po) po->DrawTriangle(x1,y1,x2,y2,x3,y3, fill==JS_TRUE);	
+	if (po) po->DrawTriangle(x1,y1,x2,y2,x3,y3);	
 		
 	return JS_TRUE;
 }
@@ -478,8 +514,32 @@ pen_get_staticProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 				case CS_PEN_TA_BOT: *vp =  INT_TO_JSVAL(CS_PEN_TA_BOT); break;					
 				case CS_PEN_TA_LEFT: *vp =  INT_TO_JSVAL(CS_PEN_TA_LEFT); break;					
 				case CS_PEN_TA_RIGHT: *vp =  INT_TO_JSVAL(CS_PEN_TA_RIGHT); break;					
-				case CS_PEN_TA_CENTER: *vp =  INT_TO_JSVAL(CS_PEN_TA_CENTER); break;									
+				case CS_PEN_TA_CENTER: *vp =  INT_TO_JSVAL(CS_PEN_TA_CENTER); break;													
 				
+				default:
+					return JS_FALSE;				
+			}
+			
+			return JS_TRUE;		
+	}	
+	
+    return JS_FALSE;
+}
+
+/** @brief Returns static properties */
+static JSBool
+pen_get_staticFlagsProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
+{	
+	// Try static properties first.  They can't be handled in the class because
+	// They're STATIC properties.
+	if (JSVAL_IS_INT(id)) 
+   	{				   	   	
+		   	
+		    switch (JSVAL_TO_INT(id)) 
+			{				
+				case CS_PEN_FILL:       *vp = INT_TO_JSVAL(CS_PEN_FILL); break;
+				case CS_PEN_SWAPCOLORS: *vp = INT_TO_JSVAL(CS_PEN_SWAPCOLORS); break;
+				case CS_PEN_TEXTURE:    *vp = INT_TO_JSVAL(CS_PEN_TEXTURE); break;
 				default:
 					return JS_FALSE;				
 			}
@@ -521,12 +581,18 @@ static JSPropertySpec pen_static_props[] =
         {"ALIGN_RIGHT",    CS_PEN_TA_RIGHT,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
         {"ALIGN_CENTER",   CS_PEN_TA_CENTER,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticProperty},
         
+        {"FLAG_FILL",   	CS_PEN_FILL,        JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticFlagsProperty},
+        {"FLAG_SWAPCOLORS", CS_PEN_SWAPCOLORS,  JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticFlagsProperty},
+        {"FLAG_TEXTURE",    CS_PEN_TEXTURE,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticFlagsProperty},
+        
         
         {0,0,0}
 };
 
 static JSFunctionSpec pen_methods[] = {
 	{"Clear",		Clear,		0, 0, 0},
+	{"SetFlag",		SetFlag,	1, 0, 0},
+	{"ClearFlag",	ClearFlag,	1, 0, 0},
 	{"SetColor",	SetColor,	4, 0, 0},
 	{"SwapColors",  SwapColors, 0, 0, 0}, 
 	{"SetWidth",    SetWidth,   1, 0, 0}, 
@@ -641,537 +707,6 @@ bool pen::GetProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
    return true;
 }
 
-enum { PEN_OP_NOP = 0, PEN_OP_SETCOLOR, PEN_OP_SWAPCOLORS, PEN_OP_SETWIDTH, PEN_OP_CLEARTRANSFORM, PEN_OP_PUSHTRANSFORM, PEN_OP_POPTRANSFORM,
-       PEN_OP_SETORIGIN, PEN_OP_TRANSLATE, PEN_OP_ROTATE, PEN_OP_DRAWLINE, PEN_OP_DRAWPOINT,
-       PEN_OP_DRAWRECT, PEN_OP_DRAWMITEREDRECT, PEN_OP_DRAWROUNDRECT,
-       PEN_OP_DRAWARC, PEN_OP_DRAWTRIANGLE, PEN_OP_WRITE, PEN_OP_WRITEBOXED };
-
-
-void  pen::Draw(iPen *_pen) 
-{
-// 	csString msg;
-	
-	buf->SetPos(0);
-	
-// 	msg.Format("pen::Draw(): enter: buf=%p, size=%d", buf, (buf ? buf->GetSize() : 0));
-// 	ScriptCon()->Message(msg);
-	
-	while(!(buf->AtEOF()))
-	{
-		uint8 op;
-		
-		buf->Read((char *)&op, sizeof(uint8));
-		
-		switch(op)
-		{
-			case PEN_OP_NOP:
-				ScriptCon()->Message("Pen NOP (pen buffer error!)");
-			break;
-			
-			case PEN_OP_SETCOLOR:
-			{
-				float r,g,b,a;
-				
-				buf->Read((char *)&r, sizeof(float));
-				buf->Read((char *)&g, sizeof(float));	
-				buf->Read((char *)&b, sizeof(float));	
-				buf->Read((char *)&a, sizeof(float));
-				
-				_pen->SetColor(r,g,b,a);				
-			} break;
-			
-			case PEN_OP_SWAPCOLORS:
-				_pen->SwapColors();
-				break;
-				
-			case PEN_OP_SETWIDTH:
-			{
-				float w;
-				
-				buf->Read((char *)&w, sizeof(float));				
-				_pen->SetPenWidth(w);
-			}	break;
-				
-			case PEN_OP_CLEARTRANSFORM:
-				_pen->ClearTransform();
-				break;
-				
-			case PEN_OP_PUSHTRANSFORM:
-				_pen->PushTransform();
-				break;
-				
-			case PEN_OP_POPTRANSFORM:
-				_pen->PopTransform();
-				break;
-				
-			case PEN_OP_SETORIGIN:
-			{
-				float x,y,z;
-				
-				buf->Read((char *)&x, sizeof(float));
-				buf->Read((char *)&y, sizeof(float));	
-				buf->Read((char *)&z, sizeof(float));	
-				
-				_pen->SetOrigin(csVector3(x,y,z));				
-			} break;
-			
-			case PEN_OP_TRANSLATE:
-			{
-				float x,y,z;
-				
-				buf->Read((char *)&x, sizeof(float));
-				buf->Read((char *)&y, sizeof(float));	
-				buf->Read((char *)&z, sizeof(float));	
-				
-				_pen->Translate(csVector3(x,y,z));				
-			} break;
-			
-			case PEN_OP_ROTATE:
-			{
-				float a;
-				
-				buf->Read((char *)&a, sizeof(float));
-				
-				_pen->Rotate(a);				
-			} break;
-			
-			case PEN_OP_DRAWLINE:
-			{
-				uint x1, y1, x2, y2;
-						
-	
-				buf->Read((char *)&x1, sizeof(uint));
-				buf->Read((char *)&y1, sizeof(uint));
-				buf->Read((char *)&x2, sizeof(uint));
-				buf->Read((char *)&y2, sizeof(uint));
-								
-								
-				_pen->DrawLine(x1,y1,x2,y2);					
-		    } break;
-		    
-		    case PEN_OP_DRAWRECT:
-			{
-				uint x1, y1, x2, y2;
-				bool swap_colors, fill;
-	
-				buf->Read((char *)&x1, sizeof(uint));
-				buf->Read((char *)&y1, sizeof(uint));
-				buf->Read((char *)&x2, sizeof(uint));
-				buf->Read((char *)&y2, sizeof(uint));	
-				
-				buf->Read((char *)&swap_colors, sizeof(bool));	
-				buf->Read((char *)&fill, sizeof(bool));	
-				
-				_pen->DrawRect(x1,y1,x2,y2,swap_colors,fill);
-		    } break;
-		    
-		    case PEN_OP_DRAWMITEREDRECT:
-			{
-				uint x1, y1, x2, y2;
-				uint miter;
-				bool swap_colors, fill;
-	
-				buf->Read((char *)&x1, sizeof(uint));
-				buf->Read((char *)&y1, sizeof(uint));
-				buf->Read((char *)&x2, sizeof(uint));
-				buf->Read((char *)&y2, sizeof(uint));	
-				buf->Read((char *)&miter, sizeof(uint));
-				
-				buf->Read((char *)&swap_colors, sizeof(bool));	
-				buf->Read((char *)&fill, sizeof(bool));	
-				
-				_pen->DrawMiteredRect(x1,y1,x2,y2,miter,swap_colors,fill);
-		    } break;
-		    
-		    case PEN_OP_DRAWROUNDRECT:
-			{
-				uint x1, y1, x2, y2;
-				uint roundness;
-				bool swap_colors, fill;
-	
-				buf->Read((char *)&x1, sizeof(uint));
-				buf->Read((char *)&y1, sizeof(uint));
-				buf->Read((char *)&x2, sizeof(uint));
-				buf->Read((char *)&y2, sizeof(uint));	
-				buf->Read((char *)&roundness, sizeof(uint));
-				
-				buf->Read((char *)&swap_colors, sizeof(bool));	
-				buf->Read((char *)&fill, sizeof(bool));	
-				
-				_pen->DrawRoundedRect(x1,y1,x2,y2,roundness,swap_colors,fill);
-		    } break;
-		    
-		    case PEN_OP_DRAWARC:
-			{
-				uint x1, y1, x2, y2;
-				float start_angle, end_angle;
-				bool swap_colors, fill;
-	
-				buf->Read((char *)&x1, sizeof(uint));
-				buf->Read((char *)&y1, sizeof(uint));
-				buf->Read((char *)&x2, sizeof(uint));
-				buf->Read((char *)&y2, sizeof(uint));	
-				buf->Read((char *)&start_angle, sizeof(float));
-				buf->Read((char *)&end_angle, sizeof(float));
-				
-				buf->Read((char *)&swap_colors, sizeof(bool));	
-				buf->Read((char *)&fill, sizeof(bool));	
-				
-				_pen->DrawArc(x1,y1,x2,y2,start_angle,end_angle,swap_colors,fill);
-		    } break;
-		    
-		    case PEN_OP_DRAWTRIANGLE:
-			{
-				uint x1, y1, x2, y2, x3, y3;
-				bool fill;
-	
-				buf->Read((char *)&x1, sizeof(uint));
-				buf->Read((char *)&y1, sizeof(uint));
-				buf->Read((char *)&x2, sizeof(uint));
-				buf->Read((char *)&y2, sizeof(uint));	
-				buf->Read((char *)&x3, sizeof(uint));
-				buf->Read((char *)&y3, sizeof(uint));									
-				
-				buf->Read((char *)&fill, sizeof(bool));	
-				
-				_pen->DrawTriangle(x1,y1,x2,y2,x3,y3,fill);
-		    } break;
-		    
-		    case PEN_OP_WRITE:
-			{
-				uint x1, y1, len;
-				iFont *font;				
-				const char *text;
-	
-				buf->Read((char *)&font, sizeof(iFont *));
-				buf->Read((char *)&x1, sizeof(uint));
-				buf->Read((char *)&y1, sizeof(uint));				
-				buf->Read((char *)&len, sizeof(uint));						
-				
-				// Read the text right out of the buffer.
-				text = buf->GetData() + buf->GetPos();
-				
-				// Seek forward, skipping the null.
-				buf->SetPos(buf->GetPos()+len+1);
-				
-				_pen->Write(font,x1,y1,(char *)text);
-		    } break;
-		    
-		    case PEN_OP_WRITEBOXED:
-			{
-				uint x1, y1, x2, y2, h_align, v_align, len;
-				iFont *font;				
-				const char *text;
-	
-				buf->Read((char *)&font, sizeof(iFont *));
-				buf->Read((char *)&x1, sizeof(uint));
-				buf->Read((char *)&y1, sizeof(uint));				
-				buf->Read((char *)&x2, sizeof(uint));
-				buf->Read((char *)&y2, sizeof(uint));				
-				buf->Read((char *)&h_align, sizeof(uint));									
-				buf->Read((char *)&v_align, sizeof(uint));				
-				buf->Read((char *)&len, sizeof(uint));									
-				
-				// Read the text right out of the buffer.
-				text = buf->GetData() + buf->GetPos();
-				
-				// Seek forward, skipping the null.
-				buf->SetPos(buf->GetPos()+len+1);
-				
-				_pen->WriteBoxed(font,x1,y1,x2,y2,h_align, v_align,(char *)text);
-		    } break;
-		    
-		    default:
-		    	// An unrecognized op is bad, so abort.
-		    	return;
-		    				
-		} // end switch op		
-		
-	} // end while not eof.	
-}
-
-
-/** 
-* Sets the current color. 
-*/
-void pen::SetColor (float r, float g, float b, float a) 
-{ 
-	uint8 op = PEN_OP_SETCOLOR;
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&r, sizeof(float));
-	buf->Write((const char *)&g, sizeof(float));	
-	buf->Write((const char *)&b, sizeof(float));	
-	buf->Write((const char *)&a, sizeof(float));	
-}
-
-/** 
-* Sets the current color. 
-*/
-void pen::SetColor(const csColor4 &color)
-{ 
-	uint8 op = PEN_OP_SETCOLOR;
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&color.red, sizeof(float));	
-	buf->Write((const char *)&color.green, sizeof(float));	
-	buf->Write((const char *)&color.blue, sizeof(float));	
-	buf->Write((const char *)&color.alpha, sizeof(float));		
-}
-
-/**
-* Swaps the current color and the alternate color. 
-*/
-void pen::SwapColors() 
-{ 
-	uint8 op = PEN_OP_SWAPCOLORS;
-	
-	buf->Write((const char *)&op, sizeof(uint8));	
-}
-
-/**
-* Sets the width of the pen for line drawing. 
-*/
-void pen::SetPenWidth(float width)
-{
-	uint8 op = PEN_OP_SETWIDTH;
-		
-	buf->Write((const char *)&op, sizeof(uint8));	
-	buf->Write((const char *)&width, sizeof(float));	
-}
-
-
-/**    
-* Clears the current transform, resets to identity.
-*/
-void pen::ClearTransform() 
-{ 
-	uint8 op = PEN_OP_CLEARTRANSFORM;
-	
-	buf->Write((const char *)&op, sizeof(uint8));		
-}
-
-/** 
-* Pushes the current transform onto the stack. *
-*/
-void pen::PushTransform() 
-{ 
-	uint8 op = PEN_OP_PUSHTRANSFORM;
-	
-	buf->Write((const char *)&op, sizeof(uint8));	
-}
-
-/**
-* Pops the transform stack. The top of the stack becomes the current
-* transform. 
-*/
-void pen::PopTransform() 
-{ 
-	uint8 op = PEN_OP_POPTRANSFORM;
-	
-	buf->Write((const char *)&op, sizeof(uint8));	
-}
-
-/** 
-* Sets the origin of the coordinate system. 
-*/
-void pen::SetOrigin(const csVector3 &o) 
-{ 
-	uint8 op = PEN_OP_SETORIGIN;
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&o.x, sizeof(float));	
-	buf->Write((const char *)&o.y, sizeof(float));	
-	buf->Write((const char *)&o.z, sizeof(float));		
-}
-
-/** 
-* Translates by the given vector
-*/
-void pen::Translate(const csVector3 &t) 
-{ 
-	uint8 op = PEN_OP_TRANSLATE;
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&t.x, sizeof(float));	
-	buf->Write((const char *)&t.y, sizeof(float));	
-	buf->Write((const char *)&t.z, sizeof(float));	
-}
-
-/**
-* Rotates by the given angle.
-*/
-void pen::Rotate(const float &a) 
-{ 
-	uint8 op = PEN_OP_ROTATE;
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&a, sizeof(float));		
-}
-
-/** 
-* Draws a single line. 
-*/
-void pen::DrawLine (uint x1, uint y1, uint x2, uint y2) 
-{ 
-	uint8 op = PEN_OP_DRAWLINE;
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&x1, sizeof(uint));
-	buf->Write((const char *)&y1, sizeof(uint));
-	buf->Write((const char *)&x2, sizeof(uint));
-	buf->Write((const char *)&y2, sizeof(uint));		
-}
-
-/** 
-* Draws a single point. 
-*/
-void pen::DrawPoint (uint x1, uint y2)
-{
-	uint8 op = PEN_OP_DRAWPOINT;
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&x1, sizeof(uint));
-	buf->Write((const char *)&y1, sizeof(uint));		
-}
-
-/** 
-* Draws a rectangle. 
-*/
-void pen::DrawRect (uint x1, uint y1, uint x2, uint y2,
-	bool swap_colors, bool fill) 
-{ 
-	uint8 op = PEN_OP_DRAWRECT;
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&x1, sizeof(uint));
-	buf->Write((const char *)&y1, sizeof(uint));
-	buf->Write((const char *)&x2, sizeof(uint));
-	buf->Write((const char *)&y2, sizeof(uint));
-	
-	buf->Write((const char *)&swap_colors, sizeof(bool));	
-	buf->Write((const char *)&fill, sizeof(bool));
-}
-
-/** 
-* Draws a mitered rectangle. The miter value should be between 0.0 and 1.0, 
-* and determines how much of the corner is mitered off and beveled. 
-*/
-void pen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2, 
-	uint miter, bool swap_colors, bool fill)
-{
-	uint8 op = PEN_OP_DRAWMITEREDRECT;
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&x1, sizeof(uint));
-	buf->Write((const char *)&y1, sizeof(uint));
-	buf->Write((const char *)&x2, sizeof(uint));
-	buf->Write((const char *)&y2, sizeof(uint));
-	buf->Write((const char *)&miter, sizeof(uint));
-	
-	buf->Write((const char *)&swap_colors, sizeof(bool));	
-	buf->Write((const char *)&fill, sizeof(bool)); 
-}
-
-/** 
-* Draws a rounded rectangle. The roundness value should be between
-* 0.0 and 1.0, and determines how much of the corner is rounded off. 
-*/
-void pen::DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
-	uint roundness, bool swap_colors, bool fill) 
-{ 
-	uint8 op = PEN_OP_DRAWROUNDRECT;
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&x1, sizeof(uint));
-	buf->Write((const char *)&y1, sizeof(uint));
-	buf->Write((const char *)&x2, sizeof(uint));
-	buf->Write((const char *)&y2, sizeof(uint));
-	buf->Write((const char *)&roundness, sizeof(uint));
-	
-	buf->Write((const char *)&swap_colors, sizeof(bool));	
-	buf->Write((const char *)&fill, sizeof(bool));	
-} 
-
-/** 
-* Draws an elliptical arc from start angle to end angle.  Angle must be
-* specified in radians. The arc will be made to fit in the given box.
-* If you want a circular arc, make sure the box is a square.  If you want
-* a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
-* angle.
-*/
-void pen::DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle,
-	float end_angle, bool swap_colors, bool fill) 	
-{ 
-	uint8 op = PEN_OP_DRAWARC;
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&x1, sizeof(uint));
-	buf->Write((const char *)&y1, sizeof(uint));
-	buf->Write((const char *)&x2, sizeof(uint));
-	buf->Write((const char *)&y2, sizeof(uint));
-	buf->Write((const char *)&start_angle, sizeof(float));
-	buf->Write((const char *)&end_angle, sizeof(float));
-	
-	buf->Write((const char *)&swap_colors, sizeof(bool));	
-	buf->Write((const char *)&fill, sizeof(bool));
-}
-
-/**
-* Draws a triangle around the given vertices. 
-*/
-void pen::DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint y3, bool fill) 
-{ 
-	uint8 op = PEN_OP_DRAWTRIANGLE;
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&x1, sizeof(uint));
-	buf->Write((const char *)&y1, sizeof(uint));
-	buf->Write((const char *)&x2, sizeof(uint));
-	buf->Write((const char *)&y2, sizeof(uint));
-	buf->Write((const char *)&x3, sizeof(uint));
-	buf->Write((const char *)&y3, sizeof(uint));	
-	
-	buf->Write((const char *)&fill, sizeof(bool));	
-}
-
-/**
-* Writes text in the given font at the given location.
-*/
-void pen::Write(iFont *font, uint x1, uint y1, char *text) 
-{ 
-	uint8 op = PEN_OP_WRITE;
-	uint len = strlen(text);
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&font, sizeof(iFont *));
-	buf->Write((const char *)&x1, sizeof(uint));
-	buf->Write((const char *)&y1, sizeof(uint));
-	buf->Write((const char *)&len, sizeof(uint));
-	buf->Write((const char *)text, len+1); // include the zero terminator
-}
-
-/**
-* Writes text in the given font, in the given box.  The alignment
-* specified in h_align and v_align determine how it should be aligned.  
-*/
-void pen::WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, 
-	uint h_align, uint v_align, char *text) 
-{ 
-	uint8 op = PEN_OP_WRITEBOXED;
-	uint len = strlen(text);
-	
-	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)&font, sizeof(iFont *));
-	buf->Write((const char *)&x1, sizeof(uint));
-	buf->Write((const char *)&y1, sizeof(uint));
-	buf->Write((const char *)&x2, sizeof(uint));
-	buf->Write((const char *)&y2, sizeof(uint));
-	buf->Write((const char *)&h_align, sizeof(uint));
-	buf->Write((const char *)&v_align, sizeof(uint));
-	buf->Write((const char *)&len, sizeof(uint));
-	buf->Write((const char *)text, len+1); // include the zero terminator
-}
 
 
 

@@ -24,6 +24,7 @@
 #include "script_object.h"
 #include "widget.h"
 #include "color.h"
+#include "gradient.h"
 #include "font.h"
 #include "skin.h"
 
@@ -131,6 +132,7 @@ awsManager2::Initialize (iObjectRegistry *_object_reg)
   ScriptMgr()->Initialize(object_reg);
   
   Color_SetupAutomation();
+  Gradient_SetupAutomation();
   Skin_SetupAutomation();
   Pen_SetupAutomation();
   Font_SetupAutomation();

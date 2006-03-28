@@ -110,18 +110,18 @@ namespace aws
 	switch(rect_style)
 	{
 	  case RECT_NORMAL:
-	    pen->DrawRect((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, false, fill);
+	    pen->DrawRect((int)tl.x, (int)tl.y, (int)br.x, (int)br.y);
 	  break;
 
 	  case RECT_ROUNDED:
-	    pen->DrawRoundedRect((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, 0, false, fill);
+	    pen->DrawRoundedRect((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, 0);
 	  break;
 
 	  case RECT_MITERED:
-	    pen->DrawMiteredRect((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, 0, false, fill);
+	    pen->DrawMiteredRect((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, 0);
 	  break;
 	}
-      }
+    }
 
     public:
       rect(RECT_STYLE _rect_style, shape_attr *_attr, 
@@ -176,13 +176,13 @@ namespace aws
         if (attr->filled)
 	{
 	  pen->SetColor(attr->fill_color);
-	  pen->DrawArc((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, sa, ea, false, true);
+	  pen->DrawArc((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, sa, ea);
 	}
 
 	if (attr->stroked)
 	{
 	   pen->SetColor(attr->stroke_color);
-	   pen->DrawArc((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, sa, ea, false, false);
+	   pen->DrawArc((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, sa, ea);
 	}
       }
     };
@@ -267,8 +267,7 @@ namespace aws
 	    csTriangle &tri = tri_mesh.GetTriangle((int)i);
 	    pen->DrawTriangle((int)tri_verts[tri.a].x, (int)tri_verts[tri.a].y,
 			      (int)tri_verts[tri.b].x, (int)tri_verts[tri.b].y,
-			      (int)tri_verts[tri.c].x, (int)tri_verts[tri.c].y,
-			      true);
+			      (int)tri_verts[tri.c].x, (int)tri_verts[tri.c].y);
 	  }
 	}
 

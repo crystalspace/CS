@@ -42,7 +42,7 @@ namespace aws
    * It makes good sense to keep all the properties in the automation engine,
    * and provide native methods to access them, considering that most of the
    * manipulation of those properties will be done from scripts. */
-  class pen : public iPen
+  class pen : public csMemoryPen
   {    
 	/** The pen object. */
     JSObject  *p_object;   
@@ -66,132 +66,7 @@ namespace aws
   	 bool SetProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);
   	 
   	 /** Used by the callback to get the value of a property. */
-  	 bool GetProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);  
-  	 
-  	   	 
-  	 //////////////// Drawing ///////////////////////////////////////////
-  	 
-  	  /** Clears the draw buffer out. */
-  	  virtual void Clear() 
-  	  {
-	 	if (buf) delete buf;
-	 	buf = new csMemFile();
-	 	buf->SetPos(0);	
-	 	
-	 	SetPenWidth(1.0); 
-  	  }
-  	 
-  	  /** Draws the cached contents of this buffer into the pen. */
-  	  void Draw(iPen *_pen_);
-  	 
-  	  /** 
-	   * Sets the current color. 
-	   */
-	  virtual void SetColor (float r, float g, float b, float a);
-	
-	  /** 
-	   * Sets the current color. 
-	   */
-	  virtual void SetColor(const csColor4 &color);
-	
-	  /**
-	   * Swaps the current color and the alternate color. 
-	   */
-	  virtual void SwapColors();
-	  
-	  /**
-   	   * Sets the width of the pen for line drawing. 
-   	   */
-  	  virtual void SetPenWidth(float width);
-	
-	  /**    
-	   * Clears the current transform, resets to identity.
-	   */
-	  virtual void ClearTransform();
-	
-	  /** 
-	   * Pushes the current transform onto the stack. *
-	   */
-	  virtual void PushTransform();
-	
-	  /**
-	   * Pops the transform stack. The top of the stack becomes the current
-	   * transform. 
-	   */
-	  virtual void PopTransform();
-	
-	  /** 
-	   * Sets the origin of the coordinate system. 
-	   */
-	  virtual void SetOrigin(const csVector3 &o);
-	
-	  /** 
-	   * Translates by the given vector
-	   */
-	  virtual void Translate(const csVector3 &t);
-	
-	  /**
-	   * Rotates by the given angle.
-	   */
-	  virtual void Rotate(const float &a);
-	
-	  /** 
-	   * Draws a single line. 
-	   */
-	  virtual void DrawLine (uint x1, uint y1, uint x2, uint y2);
-	
-	  /** 
-	   * Draws a single point. 
-	   */
-	  virtual void DrawPoint (uint x1, uint y2);
-	
-	  /** 
-	   * Draws a rectangle. 
-	   */
-	  virtual void DrawRect (uint x1, uint y1, uint x2, uint y2,
-	  	bool swap_colors = false, bool fill = false);
-	  
-	  /** 
-	   * Draws a mitered rectangle. The miter value should be between 0.0 and 1.0, 
-	   * and determines how much of the corner is mitered off and beveled. 
-	   */
-	  virtual void DrawMiteredRect (uint x1, uint y1, uint x2, uint y2, 
-	    uint miter, bool swap_colors = false, bool fill = false);
-	
-	  /** 
-	   * Draws a rounded rectangle. The roundness value should be between
-	   * 0.0 and 1.0, and determines how much of the corner is rounded off. 
-	   */
-	  virtual void DrawRoundedRect (uint x1, uint y1, uint x2, uint y2, 
-	    uint roundness, bool swap_colors = false, bool fill = false); 
-	
-	  /** 
-	   * Draws an elliptical arc from start angle to end angle.  Angle must be
-	   * specified in radians. The arc will be made to fit in the given box.
-	   * If you want a circular arc, make sure the box is a square.  If you want
-	   * a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
-	   * angle.
-	   */
-	  virtual void DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle,
-	  	float end_angle, bool swap_colors = false, bool fill=false);
-	
-	  /**
-	   * Draws a triangle around the given vertices. 
-	   */
-	  virtual void DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint y3, bool fill=false);
-	
-	  /**
-	   * Writes text in the given font at the given location.
-	   */
-	  virtual void Write(iFont *font, uint x1, uint y1, char *text);
-	
-	  /**
-	   * Writes text in the given font, in the given box.  The alignment
-	   * specified in h_align and v_align determine how it should be aligned.  
-	   */
-	  virtual void WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, 
-	    uint h_align, uint v_align, char *text);
-  	       
+  	 bool GetProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);    	       
   };  
   
   
