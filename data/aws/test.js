@@ -23,19 +23,20 @@ w.onDraw = function(pen)
 	pen.DrawLine(0,0,this.width,this.height);
 	
 	pen.SetColor(1,0,0,0.5);
-	pen.DrawRect(0,0,hw,hh,false);
+	pen.DrawRect(0,0,hw,hh);
 	
 	pen.SetColor(0,1,0,0.5);
-	pen.DrawMiteredRect(hw,hh,this.width,this.height,10,true);
+	pen.SetFlag(Pen.FLAG_FILL);
+	pen.DrawMiteredRect(hw,hh,this.width,this.height,10);
 	
 	pen.SetColor(0,0,1,0.5);
-	pen.DrawRoundedRect(hw,0,this.width,hh,10,true);
+	pen.DrawRoundedRect(hw,0,this.width,hh,10);
 	
 	pen.SetColor(1,1,0,0.5);
-	pen.DrawArc(0, hh, hw, this.height, 0.14,2.23, true);
+	pen.DrawArc(0, hh, hw, this.height, 0.14,2.23);
 	
 	pen.SetColor(1,0,1,0.5);
-	pen.DrawTriangle(hw, 0, this.width, this.height, 0, this.height, true);	
+	pen.DrawTriangle(hw, 0, this.width, this.height, 0, this.height);	
 	
 	pen.SetColor(1,1,1,1);
 	pen.Write(fnt, 0,0, "Test");
@@ -48,7 +49,8 @@ w2.onDraw = function(pen)
 	pen.Clear();
 	
 	pen.SetColor(0.5,0,0.5,0.5);
-	pen.DrawRoundedRect(0,0,this.width,this.height,10,true);	
+	pen.SetFlag(Pen.FLAG_FILL);
+	pen.DrawRoundedRect(0,0,this.width,this.height,10);	
 }
 
 w.SetPen(p);

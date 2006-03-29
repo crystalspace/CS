@@ -27,6 +27,7 @@
 csPen::csPen (iGraphics2D *_g2d, iGraphics3D *_g3d) : g3d (_g3d), g2d(_g2d), pen_width(1.0), flags(0), gen_tex_coords(false)
 {
   mesh.object2world.Identity();
+  tt.Set(0,0,0);
 }
 
 csPen::~csPen ()
@@ -243,6 +244,9 @@ void csPen::DrawLine (uint x1, uint y1, uint x2, uint y2)
 	
   Start ();
   AddVertex (x1,y1);
+  
+  if (flags & CS_PEN_SWAPCOLORS) SwapColors();  
+  
   AddVertex (x2,y2);
 
   SetupMesh ();
@@ -310,10 +314,14 @@ void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
   		
   Start ();
   SetAutoTexture(x2-x1, y2-y1);
-
+    
+  if (flags & CS_PEN_SWAPCOLORS) SwapColors(); 
   if (flags & CS_PEN_FILL)AddVertex(center_x, center_y);
-
+   
   AddVertex (x1, ym_2); 
+
+  if (flags & CS_PEN_SWAPCOLORS) SwapColors(); 
+  
   AddVertex (x1, ym_1); 
   AddVertex (xm_1, y1);
   AddVertex (xm_2, y1);  
@@ -321,13 +329,11 @@ void csPen::DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
 
   if (flags & CS_PEN_SWAPCOLORS) SwapColors();
 
-  AddVertex (x2, y2-y_miter);
-  AddVertex (x2-x_miter, y2);
-  AddVertex (x1+x_miter, y2);
-  AddVertex (x1, y2-y_miter);
-
-  if (flags & CS_PEN_SWAPCOLORS) SwapColors();
-
+  AddVertex (x2, ym_2);
+  AddVertex (xm_2, y2);
+  AddVertex (xm_1, y2);
+  AddVertex (x1, ym_2);
+  
   SetupMesh ();
   DrawMesh (MESH_TYPE(CS_MESHTYPE_TRIANGLEFAN));  
 }

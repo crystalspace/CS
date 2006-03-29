@@ -77,21 +77,18 @@ Style3D =
 		pen.DrawMiteredRect(cx-thw-5, 0, cx+thw+15, dim.height+2, 5);
 		pen.DrawRect(cx-thw-5, 0, cx+thw+15, 5);
 		
-		
 		// Glassy shine
-		for(var i=2, a=0.9; i<9; ++i, a-=0.1)
-		{
-			var adjust=6-i;
-			if (adjust<3) adjust=3;
-			
-			pen.SetColor(1,1,1,a);
-			pen.DrawLine(adjust,i,w-adjust,i);
-		}
+		pen.SetFlag(Pen.FLAG_FILL | Pen.FLAG_SWAPCOLORS);
+		pen.SetColor(1,1,1,0.1);
+		pen.SwapColors();
+		pen.SetColor(1,1,1,0.9);
+		pen.DrawRect(7, 2, w-7, 10);
 		
 		// Draw the text.		
 		pen.SetColor(tb.Text);
 		pen.WriteBoxed(prefs.TitleFont, 5, 5, w-tbw-5, h-5, Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, this.text);	
 		
+		pen.ClearFlag(Pen.FLAG_FILL | Pen.FLAG_SWAPCOLORS);		
 	},
 	
 	ScrollBar : function(pen)
