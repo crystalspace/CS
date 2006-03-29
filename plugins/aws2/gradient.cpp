@@ -18,10 +18,12 @@
 
 #include "cssysdef.h"
 #include "csgfx/gradient.h"
+#include "ivideo/texture.h"
 #include "script_manager.h"
 #include "script_console.h"
 #include "color.h"
 #include "gradient.h"
+#include "texture.h"
 
 
 #define CHECK(objname, check) if (!(check)) { \
@@ -77,6 +79,64 @@ AddColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	return JS_TRUE;
 }
 
+/** @brief Sets a gradient. Any or all parameters may be included. */
+static JSBool
+RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{
+	csGradient *go = (csGradient *)JS_GetPrivate(cx, obj);
+			
+	if (JS_TypeOfValue(cx, argv[0])!=JSTYPE_VOID)
+	{
+		JSObject *o = JSVAL_TO_OBJECT(argv[0]);		
+		int style = JSVAL_TO_INT(argv[1]);
+		
+		if (IsTextureObject(o))
+		{
+			csRef<iTextureHandle> *to = (csRef<iTextureHandle> *)JS_GetPrivate(cx, o);	
+			
+			int w, h;
+			int alpha=255;
+			
+			// Find out how big the texture is.
+			(*to)->GetOriginalDimensions(w,h);
+			
+			switch(style)
+			{				
+				case 0: { // Horizontal linear
+					csRGBcolor *cbuf = new csRGBcolor[w];
+					csRGBpixel *pbuf = new csRGBpixel[w];
+					
+					// Create the gradient
+					go->Render(cbuf, w);
+					
+					// Translate to the alpha-based class.
+					for(int i=0; i<w; ++i)
+					{
+						pbuf[i].Set(cbuf[i].red, cbuf[i].green, cbuf[i].blue, alpha);
+					}						
+					
+					// Free the color buffer.
+					delete cbuf;
+					
+					// Blit it to the texture.
+					for(int i=0; i<h; ++i)
+					{
+						(*to)->Blit(0,i,w,1, (const unsigned char *)pbuf);							
+					}					
+				}
+				
+			} // end switch style			
+		}
+		else
+		{
+			return JS_FALSE;	
+		}
+	}
+	
+	return JS_TRUE;
+}
+
+
 
 JSClass gradient_object_class = {
     "Gradient", JSCLASS_HAS_PRIVATE,
@@ -89,7 +149,8 @@ JSClass gradient_object_class = {
 
 
 static JSFunctionSpec gradient_methods[] = {
-    {"AddColor",		AddColor,		2, 0, 0},    
+    {"AddColor",	AddColor,			2, 0, 0},    
+    {"Render",		RenderToTexture,	2, 0, 0},
     {0,0,0,0,0}
 };    
 
