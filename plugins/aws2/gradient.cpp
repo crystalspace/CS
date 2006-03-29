@@ -122,8 +122,37 @@ RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 					for(int i=0; i<h; ++i)
 					{
 						(*to)->Blit(0,i,w,1, (const unsigned char *)pbuf);							
-					}					
-				}
+					}				
+					
+					// Free pixel buffer
+					delete pbuf;	
+				} break;
+				
+				case 1: { // Vertical linear
+					csRGBcolor *cbuf = new csRGBcolor[h];
+					csRGBpixel *pbuf = new csRGBpixel[h];
+					
+					// Create the gradient
+					go->Render(cbuf, h);
+					
+					// Translate to the alpha-based class.
+					for(int i=0; i<h; ++i)
+					{
+						pbuf[i].Set(cbuf[i].red, cbuf[i].green, cbuf[i].blue, alpha);
+					}						
+					
+					// Free the color buffer.
+					delete cbuf;
+					
+					// Blit it to the texture.
+					for(int i=0; i<h; ++i)
+					{
+						(*to)->Blit(i,0,1,h, (const unsigned char *)pbuf);							
+					}
+									
+					// Free the pixel buffer
+					delete pbuf;
+				} break;
 				
 			} // end switch style			
 		}
