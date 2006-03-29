@@ -1820,14 +1820,15 @@ csArray<iMaterialWrapper*> csTerrainObject::GetMaterialPalette ()
   return palette;
 }
 
-bool csTerrainObject::SetMaterialAlphaMaps (
+
+CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialAlphaMaps (
 	const csArray<csArray<char> >& data, int w, int h)
 {
   csRef<iSimpleFormerState> state = 
     scfQueryInterface<iSimpleFormerState> (terraformer);
   if (!state)
   {
-    csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, 
+    csReport(object_reg, CS_REPORTER_SEVERITY_BUG, 
              "crystalspace.terraformer.paging",
              "SetMaterialAlphaMaps can only be used with SimpleFormers."
              " Use adequate method in the formers for others.");
@@ -1968,8 +1969,22 @@ printf("%s\n",fn.GetData());
   return true;
 }
 
-bool csTerrainObject::SetMaterialAlphaMaps (const csArray<iImage*>& maps)
+CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialAlphaMaps (const 
+csArray<iImage*>& maps)
 {
+  csRef<iSimpleFormerState> state = 
+    scfQueryInterface<iSimpleFormerState> (terraformer);
+  if (!state)
+  {
+    csReport(object_reg, CS_REPORTER_SEVERITY_BUG, 
+             "crystalspace.terraformer.paging",
+             "SetMaterialAlphaMaps can only be used with SimpleFormers."
+             " Use adequate method in the formers for others.");
+    return false;
+  }
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.shared.stringset", iStringSet);
+
   if (maps.Length () != palette.Length ()-1)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -2019,11 +2034,21 @@ bool csTerrainObject::SetMaterialAlphaMaps (const csArray<iImage*>& maps)
     }
     image_datas.Push (image_data);
   }
-  return SetMaterialAlphaMaps (image_datas, w, h);
+
+  for (uint a = 0; a < maps.GetSize(); a++)
+  {
+    csString id = csString("alphamap ");
+    id += a;
+
+    state->SetIntegerMap(strings->Request(id), maps[a]);
+  }  
+
+  return SetCurrentMaterialAlphaMaps (image_datas, w, h);
 }
 
 
-bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
+CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialMap (const 
+csArray<char>& data, int w, int h)
 {
   csRef<iSimpleFormerState> state = 
     scfQueryInterface<iSimpleFormerState> (terraformer);
@@ -2129,8 +2154,21 @@ printf("%s\n",fn.GetData());
   return true;
 }
 
-bool csTerrainObject::SetMaterialMap (iImage* map)
+CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialMap (iImage* map)
 {
+  csRef<iSimpleFormerState> state = 
+    scfQueryInterface<iSimpleFormerState> (terraformer);
+  if (!state)
+  {
+    csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, 
+             "crystalspace.terraformer.paging",
+             "SetMaterialMap can only be used with SimpleFormers."
+             " Use adequate method in the formers for others.");
+    return false;
+  }
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.shared.stringset", iStringSet);
+
   const size_t mapSize = map->GetWidth() * map->GetHeight();
   csArray<char> image_data;
   image_data.SetLength (mapSize);
@@ -2150,7 +2188,9 @@ bool csTerrainObject::SetMaterialMap (iImage* map)
       image_data[i] = data[i].Intensity();
     }
   }
-  return SetMaterialMap (image_data, map->GetWidth(), map->GetHeight());
+
+  state->SetIntegerMap(strings->Request("materialmap"), map);
+  return SetCurrentMaterialMap (image_data, map->GetWidth(), map->GetHeight());
 }
 
 void csTerrainObject::SetMaterialMapFile (const char* file, int width,

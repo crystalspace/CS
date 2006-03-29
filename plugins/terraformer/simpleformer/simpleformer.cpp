@@ -857,24 +857,29 @@ const int *csSimpleSampler::SampleInteger (csStringID type)
     // This isn't implemented yet. We just return 0
     return 0;
   }
-  else if (typestring.Find("alphamap") == 0)
-  {
-    for (uint i = 0; i < terraFormer->intmaps.Length(); i++)
-    {
-      if (terraFormer->intmaps[i].type == type)
-        return terraFormer->intmaps[i].data;
-    }
-    return 0;
-  }
-  else if (type == strings->Request("materialmap"))
+  else if (typestring.Find("alphamap") == 0 ||
+           type == strings->Request("materialmap"))
   {
     for (uint i = 0; i < terraFormer->intmaps.Length(); i++)
     {
       if (terraFormer->intmaps[i].type == type)
       {
+        int* original = terraFormer->intmaps[i].data;
+        int* map = new int[resx*resz];
+        uint to = 0;
+        float stepx = terraFormer->intmaps[i].width / resx;
+        float stepz = (terraFormer->intmaps[i].height / resz)
+                         * terraFormer->intmaps[i].height;
 
-/*@@@
-  int* tests = terraFormer->intmaps[i].data;
+        for (uint a = 0; a < resz; a++)
+        {
+          for (uint b = 0; b < resx; b++)
+          {
+            map[to] = original[(uint)(a*stepz + b*stepx + 0.5)];
+            to ++;
+          }
+        }
+  int* tests = map;
 
   csImageMemory pic = csImageMemory(512,512);
   csRGBpixel* dat = (csRGBpixel*)pic.GetImagePtr();
@@ -894,8 +899,8 @@ csDebugImageWriter a = csDebugImageWriter();
   fn += ".png";
   a.DebugImageWrite(&pic,fn);
 printf("%s\n",fn.GetData());
-*/
-        return terraFormer->intmaps[i].data;
+
+        return map;
       }
     }
     return 0;
