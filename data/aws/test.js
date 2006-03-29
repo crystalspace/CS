@@ -4,8 +4,18 @@ var w = new Widget;
 var w2 = new Widget;
 var p2 = new Pen;
 
-var fnt = new Font("VeraSans", 36);
-var tx = new Texture("/lib/stdtex/parket.jpg");
+var fnt   = new Font("VeraSans", 36);
+var tx    = new Texture("/lib/stdtex/parket.jpg");
+var gr_tx = new Texture(100,1);
+var gr_tx2 = new Texture(1,30);
+var gr    = new Gradient();
+
+gr.AddColor(new Color(1,1,1,1),0.0);
+gr.AddColor(new Color(0,0,1,0.5), 0.5);
+gr.AddColor(new Color(0,0,0,0),1.0);
+gr.Render(gr_tx, 0);
+gr.Render(gr_tx2, 1);
+
 
 w.MoveTo(100,100);
 w.ResizeTo(200,200);
@@ -39,9 +49,16 @@ w.onDraw = function(pen)
 	pen.SetColor(1,0,1,0.5);
 	pen.DrawTriangle(hw, 0, this.width, this.height, 0, this.height);	
 	
+	pen.SetColor(1,1,1,0.5);
 	pen.SetFlag(Pen.FLAG_TEXTURE);	
 	pen.SetTexture(tx);
-	pen.DrawRect(hw>>1, hh>>1, hw+hw>>1, hh+hh>>1);
+	pen.DrawRect(hw>>2, hh>>2, hw, hh);
+	
+	pen.SetTexture(gr_tx);
+	pen.DrawMiteredRect(0,hh,hw>>1, this.height,5);
+	
+	pen.SetTexture(gr_tx2);
+	pen.DrawMiteredRect(hw>>1,hh,hw, this.height,5);
 	
 	pen.ClearFlag(Pen.FLAG_TEXTURE);
 	pen.SetColor(1,1,1,1);
