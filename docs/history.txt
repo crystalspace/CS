@@ -15,6 +15,9 @@ chronological order.
 	  windows not having filled shapes.
 	- Fossi made the samplers actually return the right resolution for
 	  requested integermaps and made some documentation fixes.
+  	- Christopher Nelson added a texture object to AWS2, and turned the
+	  texturing option on in csPen.  He also fixed some texture-related
+	  bugs.  Now any shape that csPen can draw can also be textured.
 28-Mar-2006
 	- Christopher Nelson made *major* changes to the csPen object.  He
 	  removed the fill and swap_colors parameters, and added the
