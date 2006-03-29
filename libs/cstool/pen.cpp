@@ -86,6 +86,10 @@ void csPen::SetupMesh ()
 
   mesh.colors = colors.GetArray ();
   mesh.texcoords = texcoords.GetArray();
+  if (flags & CS_PEN_TEXTURE)
+  {
+	mesh.texture=tex;
+  }
   
   //mesh.alphaType = alphaSmooth;
   mesh.mixmode = CS_FX_COPY | CS_FX_ALPHA; // CS_FX_FLAT  

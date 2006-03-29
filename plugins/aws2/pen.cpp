@@ -23,6 +23,8 @@
 #include "pen.h"
 #include "color.h"
 #include "font.h"
+#include "texture.h"
+
 #include <string.h>
 
 /** @brief The prototype object for pens. */
@@ -123,6 +125,30 @@ SetColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	if (po) po->SetColor(r,g,b,a);	
 		
 	return JS_TRUE;
+}
+
+/** @brief Set the texture. */
+static JSBool
+SetTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{			
+	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
+		
+	if (JSVAL_IS_OBJECT(argv[0]))
+	{
+		JSObject *tex_object = JSVAL_TO_OBJECT(argv[0]);
+				
+		if (IsTextureObject(tex_object))
+		{		
+			csRef<iTextureHandle> *to = (csRef<iTextureHandle> *)JS_GetPrivate(cx, tex_object);	 						
+			iTextureHandle *th = *to;
+						
+			if (po) po->SetTexture(th);	
+			
+			return JS_TRUE;
+		}		
+	}			
+			
+	return JS_FALSE;
 }
 
 /** @brief Swaps the color of the pen with the alternate color. */
@@ -594,6 +620,7 @@ static JSFunctionSpec pen_methods[] = {
 	{"SetFlag",		SetFlag,	1, 0, 0},
 	{"ClearFlag",	ClearFlag,	1, 0, 0},
 	{"SetColor",	SetColor,	4, 0, 0},
+	{"SetTexture",	SetTexture,	1, 0, 0},
 	{"SwapColors",  SwapColors, 0, 0, 0}, 
 	{"SetWidth",    SetWidth,   1, 0, 0}, 
 	

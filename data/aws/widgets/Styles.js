@@ -22,7 +22,7 @@ Style3D =
 		if (this.over) pen.SetColor(0,1,0,1);
 		else pen.SetColor(0,0,0,1);
 				
-		pen.SetFlag(pen.FLAG_FILL);
+		pen.SetFlag(Pen.FLAG_FILL);
 		pen.DrawRect(cx-qw, cy-2, cx+qw, cy+2);
 		pen.DrawRect(cx-2, cy-qh, cx+2, cy+qh);
 	},

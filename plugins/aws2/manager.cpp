@@ -26,6 +26,7 @@
 #include "color.h"
 #include "gradient.h"
 #include "font.h"
+#include "texture.h"
 #include "skin.h"
 
 
@@ -136,6 +137,7 @@ awsManager2::Initialize (iObjectRegistry *_object_reg)
   Skin_SetupAutomation();
   Pen_SetupAutomation();
   Font_SetupAutomation();
+  Texture_SetupAutomation();
   Widget_SetupAutomation();	
       
   return true;

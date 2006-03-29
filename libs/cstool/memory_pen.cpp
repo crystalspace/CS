@@ -332,7 +332,7 @@ void csMemoryPen::SetTexture(csRef<iTextureHandle> _tex)
 	textures.Push(csRef<iTextureHandle>(th));
 	
 	buf->Write((const char *)&op, sizeof(uint8));
-	buf->Write((const char *)th, sizeof(iTextureHandle *));
+	buf->Write((const char *)&th, sizeof(iTextureHandle *));
 }
 
 /**

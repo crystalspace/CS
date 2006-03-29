@@ -5,6 +5,7 @@ var w2 = new Widget;
 var p2 = new Pen;
 
 var fnt = new Font("VeraSans", 36);
+var tx = new Texture("/lib/stdtex/parket.jpg");
 
 w.MoveTo(100,100);
 w.ResizeTo(200,200);
@@ -38,9 +39,13 @@ w.onDraw = function(pen)
 	pen.SetColor(1,0,1,0.5);
 	pen.DrawTriangle(hw, 0, this.width, this.height, 0, this.height);	
 	
-	pen.SetColor(1,1,1,1);
-	pen.Write(fnt, 0,0, "Test");
+	pen.SetFlag(Pen.FLAG_TEXTURE);	
+	pen.SetTexture(tx);
+	pen.DrawRect(hw>>1, hh>>1, hw+hw>>1, hh+hh>>1);
 	
+	pen.ClearFlag(Pen.FLAG_TEXTURE);
+	pen.SetColor(1,1,1,1);
+	pen.Write(fnt, 0,0, "Test");	
 }
 
 // Setup Child.
