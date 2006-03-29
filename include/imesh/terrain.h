@@ -59,6 +59,8 @@ struct iTerrainObjectState : public iBase
    * equal to the heightmap the materialmap will scale accordingly.  If they
    * are equal than the material map will map a single material to a single
    * high level quad in the final terrain.
+   * This will only work for SimpleFormers. Directories for paging terrain
+   * should be set via the respective former state.
    * Note x and y must be 2^n and usually they must be equal
    */
   virtual bool SetMaterialMap (const csArray<char>& data, int x, int y) = 0;
@@ -77,6 +79,8 @@ struct iTerrainObjectState : public iBase
    * an alpha map so this array should have one element less compared to the
    * palette. The alpha map for the last palette entry will be calculated so
    * that the alpha values add up to 100%.
+   * This will only work for SimpleFormers. Directories for paging terrain
+   * should be set via the respective former state.
    */
   virtual bool SetMaterialAlphaMaps (const csArray<csArray<char> >& data,
   	int x, int y) = 0;

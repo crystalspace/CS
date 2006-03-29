@@ -54,8 +54,11 @@
 #include "ivideo/rndbuf.h"
 #include "ivideo/txtmgr.h"
 
+#include "ivaria/simpleformer.h"
+
 #include "brute.h"
-#include "cstool/debugimagewriter.h"
+
+/*#include "cstool/debugimagewriter.h"*/
 
 
 CS_LEAKGUARD_IMPLEMENT (csTerrBlock);
@@ -266,7 +269,7 @@ else
           alphamaps[i].Push(alphadata[j]);
         }
       }
-      terr->SetMaterialAlphaMaps(alphamaps,res,res);
+      terr->SetCurrentMaterialAlphaMaps(alphamaps, res, res);
 
     } else {
 
@@ -278,7 +281,7 @@ else
       {
         materialmap.Push(materialdata[j]);
       }
-      terr->SetMaterialMap(materialmap,res,res);
+      terr->SetCurrentMaterialMap(materialmap, res, res);
     }
   }
 
@@ -1820,6 +1823,44 @@ csArray<iMaterialWrapper*> csTerrainObject::GetMaterialPalette ()
 bool csTerrainObject::SetMaterialAlphaMaps (
 	const csArray<csArray<char> >& data, int w, int h)
 {
+  csRef<iSimpleFormerState> state = 
+    scfQueryInterface<iSimpleFormerState> (terraformer);
+  if (!state)
+  {
+    csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, 
+             "crystalspace.terraformer.paging",
+             "SetMaterialAlphaMaps can only be used with SimpleFormers."
+             " Use adequate method in the formers for others.");
+    return false;
+  }
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.shared.stringset", iStringSet);
+
+  for (uint a = 0; a < data.GetSize(); a++)
+  {
+    csString id = csString("alphamap ");
+    id += a;
+
+    csRef<iImage> alpha = csPtr<iImage> (new csImageMemory (w, h,
+      CS_IMGFMT_PALETTED8));
+
+    csRGBpixel *map = (csRGBpixel *)alpha->GetImageData ();
+    
+    for (uint b = 0; b < data[a].GetSize(); b++)
+    {
+      int v = data[a][b];
+      map[b].Set(v,v,v,v);
+    }
+
+    state->SetIntegerMap(strings->Request(id), alpha);
+  }  
+  
+  return SetCurrentMaterialAlphaMaps(data, w, h);
+}
+
+bool csTerrainObject::SetCurrentMaterialAlphaMaps (
+	const csArray<csArray<char> >& data, int w, int h)
+{
   if (data.Length () != palette.Length ()-1)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -1981,7 +2022,41 @@ bool csTerrainObject::SetMaterialAlphaMaps (const csArray<iImage*>& maps)
   return SetMaterialAlphaMaps (image_datas, w, h);
 }
 
+
 bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
+{
+  csRef<iSimpleFormerState> state = 
+    scfQueryInterface<iSimpleFormerState> (terraformer);
+  if (!state)
+  {
+    csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, 
+             "crystalspace.terraformer.paging",
+             "SetMaterialMap can only be used with SimpleFormers."
+             " Use adequate method in the formers for others.");
+    return false;
+  }
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.shared.stringset", iStringSet);
+
+  csRef<iImage> material = csPtr<iImage> (new csImageMemory (w, h,
+    CS_IMGFMT_PALETTED8));
+
+  csRGBpixel *map = (csRGBpixel *)material->GetImageData ();
+  
+  for (uint a = 0; a < data.GetSize(); a++)
+  {
+    int v = data[a];
+    map->Set(v,v,v,v);
+  }
+
+  state->SetIntegerMap(strings->Request("materialmap"), material);
+
+  return SetCurrentMaterialMap(data, w, h);
+}
+
+
+bool csTerrainObject::SetCurrentMaterialMap (const csArray<char>& data, 
+                                             int w, int h)
 {
   //use_singlemap = true;
   //materialMaps.Push (data);

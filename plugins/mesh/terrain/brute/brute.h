@@ -419,6 +419,10 @@ public:
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
 
+  bool SetCurrentMaterialAlphaMaps (const csArray<csArray<char> >& data, 
+                                    int w, int h);
+  bool SetCurrentMaterialMap (const csArray<char>& data, int x, int y);
+
   SCF_DECLARE_IBASE;
   ///--------------------- iMeshObject implementation ---------------------
 

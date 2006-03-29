@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
  
+29-Mar-2006
+	- Fossi fixed bruteblock's SetMaterial(Alpha)Map to work as 
+	  previously. But since handling of materials is done in the
+	  Formers now, their methods should be preferred over bruteblocks.
 28-Mar-2006
 	- Christopher Nelson made *major* changes to the csPen object.  He
 	  removed the fill and swap_colors parameters, and added the
