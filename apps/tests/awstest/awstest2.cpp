@@ -275,7 +275,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
  // Load a definition file
  if (aws->Load("/aws/awstest.js.def")==false)
-    Report(CS_REPORTER_SEVERITY_ERROR, "Unable to load the definition file '/aws/awstest.js.def'");  
+   Report(CS_REPORTER_SEVERITY_ERROR, "Unable to load the definition file '/aws/awstest.js.def'");  
 
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Init done.");
 
