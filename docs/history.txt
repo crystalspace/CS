@@ -10,6 +10,9 @@ chronological order.
 	- Fossi fixed bruteblock's SetMaterial(Alpha)Map to work as 
 	  previously. But since handling of materials is done in the
 	  Formers now, their methods should be preferred over bruteblocks.
+	- Christopher Nelson fixed the bug where text was appearing in the 
+	  wrong place.  He also fixed the problem with one of the test
+	  windows not having filled shapes.
 28-Mar-2006
 	- Christopher Nelson made *major* changes to the csPen object.  He
 	  removed the fill and swap_colors parameters, and added the
