@@ -38,11 +38,13 @@ class csTerraFormerCollider : public scfImplementation1<csTerraFormerCollider, i
 
   CS::Plugins::Opcode::Opcode::MeshInterface opcMeshInt;
 
+  CS::Plugins::Opcode::Opcode::OPCODECREATE OPCC;
+
   void InitOPCODEModel ();
-  void UpdateOPCODEModel ();
 
 public:
 
+  void UpdateOPCODEModel (const csVector3 &other_pos);
   csDirtyAccessArray<csTriangle> triangles;
   csDirtyAccessArray<CS::Plugins::Opcode::Point> vertices;
 

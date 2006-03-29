@@ -8,6 +8,9 @@
 using namespace CS::Plugins::Opcode;
 using namespace CS::Plugins::Opcode::Opcode;
 
+#define RESOLUTION 300
+#define BOX_SIZE 30
+
 csTerraFormerCollider::csTerraFormerCollider (iTerraFormer* terraformer, 
                                               iObjectRegistry* object_reg)
 : scfImplementationType(this, object_reg)
@@ -45,55 +48,55 @@ csTerraFormerCollider::csTerraFormerCollider (iTerraFormer* terraformer,
   InitOPCODEModel ();
 }
 
-void csTerraFormerCollider::InitOPCODEModel ()
+void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &other_pos)
 {
-  int res = 10;
-  triangles.SetLength (2 * (res-1) * (res-1));
-  vertices.SetLength (res*res);
-  csRef<iTerraSampler> sampler = former->GetSampler (csBox2 (0, 0, 256, 256), res , res);
+  csRef<iTerraSampler> sampler = former->GetSampler (
+    csBox2 (other_pos.x - BOX_SIZE, other_pos.y - BOX_SIZE,
+    other_pos.x + BOX_SIZE, other_pos.y + BOX_SIZE), RESOLUTION , RESOLUTION);
+
   const csVector3 *v = sampler->SampleVector3 (stringVertices);
-  
-  for (int y = 0 ; y < res ; y++)
+
+  for (int y = 0 ; y < RESOLUTION ; y++)
   {
-    for (int x = 0 ; x < res ; x++)
+    for (int x = 0 ; x < RESOLUTION ; x++)
     {
-      int index = y*res + x;
+      int index = y*RESOLUTION + x;
       vertices[index].Set (v[index].x,v[index].y,v[index].z);
     }
   }
   int i = 0;
-  for (int y = 0 ; y < res-1 ; y++)
+  for (int y = 0 ; y < RESOLUTION-1 ; y++)
   {
-    int yr = y * res;
-    for (int x = 0 ; x < res-1 ; x++)
+    int yr = y * RESOLUTION;
+    for (int x = 0 ; x < RESOLUTION-1 ; x++)
     {
-      triangles[i++].Set (yr + x, yr+res + x, yr + x+1);
-      triangles[i++].Set (yr + x+1, yr+res + x, yr+res + x+1);
+      triangles[i++].Set (yr + x, yr+RESOLUTION + x, yr + x+1);
+      triangles[i++].Set (yr + x+1, yr+RESOLUTION + x, yr+RESOLUTION + x+1);
     }
   }
 
-  OPCODECREATE OPCC;
-  if (triangles.GetSize () >= 1)
-  {
-    opcode_model = new CS::Plugins::Opcode::Opcode::Model;
+  opcode_model->Build (OPCC);
+}
 
-    opcMeshInt.SetNbTriangles (triangles.GetSize ());
-    opcMeshInt.SetNbVertices (vertices.GetSize ());
+void csTerraFormerCollider::InitOPCODEModel ()
+{
+  triangles.SetLength (2 * (RESOLUTION-1) * (RESOLUTION-1));
+  vertices.SetLength (RESOLUTION*RESOLUTION);
 
-    // Mesh data
-    OPCC.mIMesh = &opcMeshInt;
-    OPCC.mSettings.mRules = SPLIT_SPLATTER_POINTS | SPLIT_GEOM_CENTER;
-    OPCC.mNoLeaf = true;
-    OPCC.mQuantized = true;
-    OPCC.mKeepOriginal = false;
-    OPCC.mCanRemap = false;
-  }
-  else
-    return;
+  opcode_model = new CS::Plugins::Opcode::Opcode::Model;
 
-  bool status = opcode_model->Build (OPCC);  // this should create the OPCODE model
-  if (!status) { return; };
-  
+  opcMeshInt.SetNbTriangles (triangles.GetSize ());
+  opcMeshInt.SetNbVertices (vertices.GetSize ());
+
+  // Mesh data
+  OPCC.mIMesh = &opcMeshInt;
+  OPCC.mSettings.mRules = SPLIT_SPLATTER_POINTS | SPLIT_GEOM_CENTER;
+  OPCC.mNoLeaf = true;
+  OPCC.mQuantized = true;
+  OPCC.mKeepOriginal = false;
+  OPCC.mCanRemap = false;
+
+  UpdateOPCODEModel (csVector3 (0));
 }
 csTerraFormerCollider::~csTerraFormerCollider ()
 {
