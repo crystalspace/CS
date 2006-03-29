@@ -45,7 +45,7 @@ class csTerraFormerCollider : public scfImplementation1<csTerraFormerCollider, i
 public:
 
   void UpdateOPCODEModel (const csVector3 &other_pos);
-  csDirtyAccessArray<csTriangle> triangles;
+  unsigned int* indexholder;
   csDirtyAccessArray<CS::Plugins::Opcode::Point> vertices;
 
   CS::Plugins::Opcode::IceMaths::Matrix4x4 transform;

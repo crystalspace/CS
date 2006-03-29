@@ -161,8 +161,8 @@ void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
   if (!vertholder1) return;
   udword* indexholder0 = col1->indexholder;
   if (!indexholder0) return;
-
-  
+    udword* indexholder1 = terraformer->indexholder;
+  if (!indexholder1) return;
   Point* current;
   int i, j;
 
@@ -179,12 +179,14 @@ void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
     current = &vertholder0[indexholder0[j + 2]];		
     pairs[oldlen].c1 = csVector3 (current->x, current->y, current->z);
 
-    current = &vertholder1[terraformer->triangles[i].a];		
+    j = 3 * colPairs[i].id1;
+    current = &vertholder1[indexholder1[j]];		
     pairs[oldlen].a2 = csVector3 (current->x, current->y, current->z);
-    current = &vertholder1[terraformer->triangles[i].b];		
+    current = &vertholder1[indexholder1[j + 1 ]];		
     pairs[oldlen].b2 = csVector3 (current->x, current->y, current->z);
-    current = &vertholder1[terraformer->triangles[i].c];		
+    current = &vertholder1[indexholder1[j + 2 ]];		
     pairs[oldlen].c2 = csVector3 (current->x, current->y, current->z);
+
 
     oldlen++;
   }
@@ -194,7 +196,7 @@ bool csOPCODECollideSystem::Collide (
   csTerraFormerCollider* terraformer)
 {
   ColCache.Model0 = col1->m_pCollisionModel;
-  //terraformer->UpdateOPCODEModel (trans1->GetOrigin ());
+  terraformer->UpdateOPCODEModel (trans1->GetOrigin ());
   ColCache.Model1 = terraformer->opcode_model;
 
   csMatrix3 m1;

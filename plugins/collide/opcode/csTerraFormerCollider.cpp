@@ -8,8 +8,7 @@
 using namespace CS::Plugins::Opcode;
 using namespace CS::Plugins::Opcode::Opcode;
 
-#define RESOLUTION 300
-#define BOX_SIZE 30
+#define RESOLUTION 16
 
 csTerraFormerCollider::csTerraFormerCollider (iTerraFormer* terraformer, 
                                               iObjectRegistry* object_reg)
@@ -47,12 +46,22 @@ csTerraFormerCollider::csTerraFormerCollider (iTerraFormer* terraformer,
 
   InitOPCODEModel ();
 }
+csTerraFormerCollider::~csTerraFormerCollider ()
+{
+  if (opcode_model)
+  {
+    delete opcode_model;
+    opcode_model = 0;
+  }
+
+  delete[] indexholder;
+}
 
 void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &other_pos)
 {
   csRef<iTerraSampler> sampler = former->GetSampler (
-    csBox2 (other_pos.x - BOX_SIZE, other_pos.y - BOX_SIZE,
-    other_pos.x + BOX_SIZE, other_pos.y + BOX_SIZE), RESOLUTION , RESOLUTION);
+    csBox2 (other_pos.x - RESOLUTION, other_pos.z - RESOLUTION,
+    RESOLUTION, RESOLUTION), RESOLUTION , RESOLUTION);
 
   const csVector3 *v = sampler->SampleVector3 (stringVertices);
 
@@ -64,14 +73,19 @@ void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &other_pos)
       vertices[index].Set (v[index].x,v[index].y,v[index].z);
     }
   }
+  
   int i = 0;
   for (int y = 0 ; y < RESOLUTION-1 ; y++)
   {
     int yr = y * RESOLUTION;
     for (int x = 0 ; x < RESOLUTION-1 ; x++)
     {
-      triangles[i++].Set (yr + x, yr+RESOLUTION + x, yr + x+1);
-      triangles[i++].Set (yr + x+1, yr+RESOLUTION + x, yr+RESOLUTION + x+1);
+      indexholder[i++] = yr + x;
+      indexholder[i++] = yr+RESOLUTION + x;
+      indexholder[i++] = yr + x+1;
+      indexholder[i++] = yr + x+1;
+      indexholder[i++] = yr+RESOLUTION + x;
+      indexholder[i++] = yr+RESOLUTION + x+1;
     }
   }
 
@@ -80,12 +94,12 @@ void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &other_pos)
 
 void csTerraFormerCollider::InitOPCODEModel ()
 {
-  triangles.SetLength (2 * (RESOLUTION-1) * (RESOLUTION-1));
+  indexholder = new unsigned int[3* 2 * (RESOLUTION-1) * (RESOLUTION-1)];
   vertices.SetLength (RESOLUTION*RESOLUTION);
 
   opcode_model = new CS::Plugins::Opcode::Opcode::Model;
 
-  opcMeshInt.SetNbTriangles (triangles.GetSize ());
+  opcMeshInt.SetNbTriangles (2 * (RESOLUTION-1) * (RESOLUTION-1));
   opcMeshInt.SetNbVertices (vertices.GetSize ());
 
   // Mesh data
@@ -98,22 +112,17 @@ void csTerraFormerCollider::InitOPCODEModel ()
 
   UpdateOPCODEModel (csVector3 (0));
 }
-csTerraFormerCollider::~csTerraFormerCollider ()
-{
-  if (opcode_model)
-  {
-    delete opcode_model;
-    opcode_model = 0;
-  }
-}
+
 void csTerraFormerCollider::MeshCallback (CS::Plugins::Opcode::udword triangle_index, 
                           CS::Plugins::Opcode::Opcode::VertexPointers& triangle, void* user_data)
 {
   csTerraFormerCollider* collider = (csTerraFormerCollider*)user_data;
-  csTriangle tri = collider->triangles[triangle_index];
-  triangle.Vertex[0] = &collider->vertices [tri.a];
-  triangle.Vertex[1] = &collider->vertices [tri.b];
-  triangle.Vertex[2] = &collider->vertices [tri.c];
+  udword *tri_array = collider->indexholder;
+  Point *vertholder = collider->vertices.GetArray ();
+  int index = 3 * triangle_index;
+  triangle.Vertex[0] = &vertholder [tri_array[index]] ;
+  triangle.Vertex[1] = &vertholder [tri_array[index + 1]];
+  triangle.Vertex[2] = &vertholder [tri_array[index + 2]];
 }
 
 float csTerraFormerCollider::SampleFloat (float x, float z)

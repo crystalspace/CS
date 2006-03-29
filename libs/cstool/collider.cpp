@@ -142,12 +142,17 @@ csColliderWrapper* csColliderWrapper::GetColliderWrapper (iObject* object)
 //----------------------------------------------------------------------
 
 
+
 csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
 	iCollideSystem* colsys, iMeshWrapper* mesh)
 {
   iObjectModel* obj_objmodel = mesh->GetMeshObject ()->GetObjectModel ();
   iPolygonMesh* obj_polymesh = obj_objmodel->GetPolygonMeshColldet ();
-  iTerraFormer* obj_terraformer = 0;//obj_objmodel->GetTerraFormerColldet ();
+#if defined CS_TERRAIN_CD_TEST
+  iTerraFormer* obj_terraformer = obj_objmodel->GetTerraFormerColldet ();
+#else 
+  iTerraFormer* obj_terraformer = 0;
+#endif
 
   iMeshFactoryWrapper* factory = mesh->GetFactory ();
   csColliderWrapper* cw = 0;
@@ -159,7 +164,11 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
     {
       if (fact_objmodel->GetTerraFormerColldet ())
       {
-        iTerraFormer* fact_terraformer = 0;//fact_objmodel->GetTerraFormerColldet ();
+#if defined CS_TERRAIN_CD_TEST
+        iTerraFormer* fact_terraformer = fact_objmodel->GetTerraFormerColldet ();
+#else
+        iTerraFormer* fact_terraformer = 0;
+#endif
         if (fact_terraformer && (fact_terraformer == obj_terraformer || !obj_terraformer))
         {
           // First check if the parent factory has a collider wrapper.
