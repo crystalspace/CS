@@ -53,7 +53,7 @@ void csPen::AddVertex (float x, float y, bool force_add)
   	colors.Push(color);
   	
   	// Generate texture coordinates.
-  	if (gen_tex_coords && (flags & CS_PEN_TEXTURE))
+  	if (gen_tex_coords && (flags & CS_PEN_TEXTURE_ONLY))
   	{
 		AddTexCoord(x / sh_w, y / sh_h); 	
   	}
@@ -86,9 +86,13 @@ void csPen::SetupMesh ()
 
   mesh.colors = colors.GetArray ();
   mesh.texcoords = texcoords.GetArray();
-  if (flags & CS_PEN_TEXTURE)
+  if (flags & CS_PEN_TEXTURE_ONLY)
   {
 	mesh.texture=tex;
+  }
+  else
+  {
+	mesh.texture=0;	  
   }
   
   //mesh.alphaType = alphaSmooth;
