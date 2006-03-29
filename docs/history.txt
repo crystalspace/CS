@@ -5,10 +5,7 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
-
-30-Mar-2006 
-        - Piotr Obrzut updated terrain formers cd test (works but it is very 
-          slow) - not active by default 
+        
 29-Mar-2006
 	- Fossi fixed bruteblock's SetMaterial(Alpha)Map to work as 
 	  previously. But since handling of materials is done in the
@@ -21,6 +18,9 @@ chronological order.
   	- Christopher Nelson added a texture object to AWS2, and turned the
 	  texturing option on in csPen.  He also fixed some texture-related
 	  bugs.  Now any shape that csPen can draw can also be textured.
+    - Piotr Obrzut updated terrain formers cd test (works but it is very 
+          slow) - not active by default 
+    - Christopher Nelson made linear gradients render into a texture.
 28-Mar-2006
 	- Christopher Nelson made *major* changes to the csPen object.  He
 	  removed the fill and swap_colors parameters, and added the
