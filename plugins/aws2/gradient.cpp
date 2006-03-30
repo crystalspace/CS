@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "csgfx/gradient.h"
+#include "csgfx/gradient4.h"
 #include "ivideo/texture.h"
 #include "script_manager.h"
 #include "script_console.h"
@@ -41,7 +41,7 @@ static JSBool
 Gradient(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
 	csString msg;
-	csGradient *go = new csGradient();
+	csGradient4 *go = new csGradient4();
 		
 	// Store this widget object with the new widget instance.
   	CHECK("Gradient", JS_SetPrivate(cx, obj, (void *)go)==JS_TRUE);
@@ -55,7 +55,7 @@ Gradient(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 AddColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
-	csGradient *go = (csGradient *)JS_GetPrivate(cx, obj);
+	csGradient4 *go = (csGradient4 *)JS_GetPrivate(cx, obj);
 			
 	if (JS_TypeOfValue(cx, argv[0])!=JSTYPE_VOID)
 	{
@@ -68,7 +68,7 @@ AddColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 			
 			JS_ValueToNumber(cx, argv[1], &pos);			
 			
-			go->AddShade(csGradientShade(*co, (float)pos)); 
+			go->AddShade(csGradientShade4(*co, (float)pos)); 
 		}
 		else
 		{
@@ -83,7 +83,7 @@ AddColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
-	csGradient *go = (csGradient *)JS_GetPrivate(cx, obj);
+	csGradient4 *go = (csGradient4 *)JS_GetPrivate(cx, obj);
 			
 	if (JS_TypeOfValue(cx, argv[0])!=JSTYPE_VOID)
 	{
@@ -95,28 +95,18 @@ RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 			csRef<iTextureHandle> *to = (csRef<iTextureHandle> *)JS_GetPrivate(cx, o);	
 			
 			int w, h;
-			int alpha=255;
-			
+						
 			// Find out how big the texture is.
 			(*to)->GetOriginalDimensions(w,h);
 			
 			switch(style)
 			{				
-				case 0: { // Horizontal linear
-					csRGBcolor *cbuf = new csRGBcolor[w];
+				case 0: { // Horizontal linear					
 					csRGBpixel *pbuf = new csRGBpixel[w];
 					
 					// Create the gradient
-					go->Render(cbuf, w);
-					
-					// Translate to the alpha-based class.
-					for(int i=0; i<w; ++i)
-					{
-						pbuf[i].Set(cbuf[i].red, cbuf[i].green, cbuf[i].blue, alpha);
-					}						
-					
-					// Free the color buffer.
-					delete cbuf;
+					go->Render(pbuf, w);
+												
 					
 					// Blit it to the texture.
 					for(int i=0; i<h; ++i)
@@ -128,21 +118,11 @@ RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 					delete pbuf;	
 				} break;
 				
-				case 1: { // Vertical linear
-					csRGBcolor *cbuf = new csRGBcolor[h];
+				case 1: { // Vertical linear				
 					csRGBpixel *pbuf = new csRGBpixel[h];
 					
 					// Create the gradient
-					go->Render(cbuf, h);
-					
-					// Translate to the alpha-based class.
-					for(int i=0; i<h; ++i)
-					{
-						pbuf[i].Set(cbuf[i].red, cbuf[i].green, cbuf[i].blue, alpha);
-					}						
-					
-					// Free the color buffer.
-					delete cbuf;
+					go->Render(pbuf, h);					
 					
 					// Blit it to the texture.
 					for(int i=0; i<h; ++i)
