@@ -24,6 +24,7 @@
 #include "cssysdef.h"
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/gradient.h"
+#include "csgfx/gradient4.h"
 #include "csgfx/imagebase.h"
 #include "csgfx/imagecubemapmaker.h"
 #include "csgfx/imagemanipulate.h"
