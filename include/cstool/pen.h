@@ -53,6 +53,7 @@ enum CS_PEN_FLAGS
 {
 	CS_PEN_FILL = 1,
 	CS_PEN_SWAPCOLORS= 2,	
+	CS_PEN_TEXTURE_ONLY=4,
 	CS_PEN_TEXTURE = 5 /* fill | 4 */	
 };
 
