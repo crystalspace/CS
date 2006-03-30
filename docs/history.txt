@@ -21,6 +21,9 @@ chronological order.
     - Piotr Obrzut updated terrain formers cd test (works but it is very 
           slow) - not active by default 
     - Christopher Nelson made linear gradients render into a texture.
+    - Christopher Nelson added csGradient4, which handles alphas and csColor4's
+      and renders into csRGBpixel.  He also made AWS2 use this for it's Gradient
+      object, instead of csGradient.
 28-Mar-2006
 	- Christopher Nelson made *major* changes to the csPen object.  He
 	  removed the fill and swap_colors parameters, and added the
