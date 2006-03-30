@@ -6,15 +6,18 @@ var p2 = new Pen;
 
 var fnt   = new Font("VeraSans", 36);
 var tx    = new Texture("/lib/stdtex/parket.jpg");
-var gr_tx = new Texture(100,1);
-var gr_tx2 = new Texture(1,30);
+var gr_tx = new Texture(128,1);
+var gr_tx2 = new Texture(1,32);
+var gr_tx3 = new Texture(32,32);
 var gr    = new Gradient();
 
-gr.AddColor(new Color(1,1,1,1),0.0);
-gr.AddColor(new Color(0,0,1,0.5), 0.5);
-gr.AddColor(new Color(0,0,0,0),1.0);
-gr.Render(gr_tx, 0);
-gr.Render(gr_tx2, 1);
+gr.AddColor(new Color(0,0,0,1),0.0);
+gr.AddColor(new Color(0,0,1,1), 0.5);
+gr.AddColor(new Color(1,1,1,1),1.0);
+
+gr.Render(gr_tx, Gradient.HORIZONTAL);
+gr.Render(gr_tx2, Gradient.VERTICAL);
+gr.Render(gr_tx3, Gradient.RADIAL);
 
 
 w.MoveTo(100,100);
@@ -59,6 +62,9 @@ w.onDraw = function(pen)
 	
 	pen.SetTexture(gr_tx2);
 	pen.DrawMiteredRect(hw>>1,hh,hw, this.height,5);
+	
+	pen.SetTexture(gr_tx3);
+	pen.DrawRect(0,0,hw>>1, hh>>1);     
 	
 	pen.ClearFlag(Pen.FLAG_TEXTURE);
 	pen.SetColor(1,1,1,1);
