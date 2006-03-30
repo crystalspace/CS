@@ -31,10 +31,11 @@
 		ScriptCon()->Message(msg); \
 	}
 
-
+enum { GRAD_HORZ = 0, GRAD_VERT };
+	
+	
 /** @brief The prototype object for gradients. */
 static JSObject *gradient_proto_object=0;
-
 
 /** @brief The constructor for gradient objects. */
 static JSBool
@@ -101,7 +102,7 @@ RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 			
 			switch(style)
 			{				
-				case 0: { // Horizontal linear					
+				case GRAD_HORZ: { // Horizontal linear					
 					csRGBpixel *pbuf = new csRGBpixel[w];
 					
 					// Create the gradient
@@ -118,7 +119,7 @@ RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 					delete pbuf;	
 				} break;
 				
-				case 1: { // Vertical linear				
+				case GRAD_VERT: { // Vertical linear				
 					csRGBpixel *pbuf = new csRGBpixel[h];
 					
 					// Create the gradient
@@ -145,6 +146,28 @@ RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 	return JS_TRUE;
 }
 
+/** @brief Returns static properties */
+static JSBool
+gradient_get_staticProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
+{	
+	// Try static properties first.  They can't be handled in the class because
+	// They're STATIC properties.
+	if (JSVAL_IS_INT(id)) 
+   	{				   	   	
+		   	
+		    switch (JSVAL_TO_INT(id)) 
+			{
+				case GRAD_HORZ: *vp =  INT_TO_JSVAL(GRAD_HORZ); break;					
+				case GRAD_VERT: *vp =  INT_TO_JSVAL(GRAD_VERT); break;									
+				default:
+					return JS_FALSE;				
+			}
+			
+			return JS_TRUE;		
+	}	
+	
+    return JS_FALSE;
+}
 
 
 JSClass gradient_object_class = {
@@ -162,6 +185,14 @@ static JSFunctionSpec gradient_methods[] = {
     {"Render",		RenderToTexture,	2, 0, 0},
     {0,0,0,0,0}
 };    
+
+static JSPropertySpec gradient_static_props[] =
+{
+        {"HORIZONTAL",   GRAD_HORZ,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, gradient_get_staticProperty},       
+        {"VERTICAL",     GRAD_VERT,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, gradient_get_staticProperty},       
+                
+        {0,0,0}
+};
 
 
 bool 
@@ -192,7 +223,7 @@ Gradient_SetupAutomation()
 		                            NULL, gradient_methods,
 		
 		                            /* class constructor (static) properties and methods */
-		                            NULL, NULL));    
+		                            gradient_static_props, NULL));    
 		                            
 		                            
 		 ScriptCon()->Message("Gradient builtin-object initialized.");
