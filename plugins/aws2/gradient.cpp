@@ -25,13 +25,14 @@
 #include "gradient.h"
 #include "texture.h"
 
+#include <math.h>
 
 #define CHECK(objname, check) if (!(check)) { \
 	    msg.Format(objname ": failed on " #check " in\n   %s:%s:%d", __FILE__, __FUNCTION__, __LINE__); \
 		ScriptCon()->Message(msg); \
 	}
 
-enum { GRAD_HORZ = 0, GRAD_VERT };
+enum { GRAD_HORZ = 0, GRAD_VERT, GRAD_RADIAL };
 	
 	
 /** @brief The prototype object for gradients. */
@@ -135,6 +136,40 @@ RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 					delete pbuf;
 				} break;
 				
+				case GRAD_RADIAL: { // Radial				
+					int mw=w>>1, mh=h>>1;
+					int rl = ((mw+mh)>>1)+1;
+					csRGBpixel *pbuf = new csRGBpixel[rl+1];
+					
+					// Create the gradient
+					go->Render(pbuf, rl+1);					
+					
+					// Temporary buffer for rendering the gradient.
+					csRGBpixel *tmp = new csRGBpixel[w*h];
+					
+					// Render the gradient.  
+					for(int x=0; x<w; ++x)
+					{
+						for(int y=0; y<h; ++y)
+						{
+							int dx = mw - x,
+								dy = mh - y;
+								
+							int dist = (int)sqrt((dx*dx) + (dy*dy));
+							
+							if (dist>rl) dist=rl;
+							
+							tmp[x+(y*w)] = pbuf[dist];
+						}
+					}
+					
+					(*to)->Blit(0,0,w,h, (const unsigned char *)tmp);
+									
+					// Free the pixel buffer
+					delete pbuf;
+					delete tmp;
+				} break;
+				
 			} // end switch style			
 		}
 		else
@@ -159,6 +194,7 @@ gradient_get_staticProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 			{
 				case GRAD_HORZ: *vp =  INT_TO_JSVAL(GRAD_HORZ); break;					
 				case GRAD_VERT: *vp =  INT_TO_JSVAL(GRAD_VERT); break;									
+				case GRAD_RADIAL: *vp =  INT_TO_JSVAL(GRAD_RADIAL); break;
 				default:
 					return JS_FALSE;				
 			}
@@ -190,6 +226,7 @@ static JSPropertySpec gradient_static_props[] =
 {
         {"HORIZONTAL",   GRAD_HORZ,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, gradient_get_staticProperty},       
         {"VERTICAL",     GRAD_VERT,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, gradient_get_staticProperty},       
+        {"RADIAL",       GRAD_RADIAL,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, gradient_get_staticProperty},       
                 
         {0,0,0}
 };
