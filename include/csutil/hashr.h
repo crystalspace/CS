@@ -63,6 +63,16 @@ public:
   }
 
   /**
+    * Add an element to the hash and to the reverse table.
+    * @remarks 
+    */
+  void PutUnique (const K& key, const T &value)
+  {
+    csHash<T, K>::PutUnique (key, value);
+    reverse.PutUnique (value, key);
+  }
+
+  /**
    * Get a pointer to the first key matching the given value, 
    * or 0 if there is none.
    */

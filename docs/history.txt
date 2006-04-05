@@ -9,6 +9,9 @@ chronological order.
 5-Apr-2006      
 	- Piotr Obrzut changed terrain collider to be more optimized for smaller 
           'other' colliders. Terrain colliders are now on.
+    - Luca added the csHashReversible::PutUnique method, so that the 
+      reverse hash table is updated also on that method.: in fact this method
+      ovverrides the one in the csHash class.
 29-Mar-2006
 	- Fossi fixed bruteblock's SetMaterial(Alpha)Map to work as 
 	  previously. But since handling of materials is done in the
