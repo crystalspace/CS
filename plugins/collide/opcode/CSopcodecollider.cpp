@@ -86,10 +86,15 @@ void csOPCODECollider::GeometryInitialize (iPolygonMesh* mesh)
     vertholder = new Point [vertcount];
     indexholder = new unsigned int[3*tri_count];
 
+    csBox3 tmp;
+    tmp.StartBoundingBox ();
     for (i = 0; i < vertcount; i++)
     {
+      tmp.AddBoundingVertex (vertices[i]);
       vertholder[i].Set (vertices[i].x , vertices[i].y , vertices[i].z);
     }
+
+    radius = max3 (tmp.MaxX ()- tmp.MinX (), tmp.MaxY ()- tmp.MinY (), tmp.MaxZ ()- tmp.MinZ ());
     
     int index = 0;
     for (i = 0 ; i < tri_count ; i++)

@@ -58,6 +58,8 @@ public:
 
   CS::Plugins::Opcode::Opcode::MeshInterface opcMeshInt;
 
+  float radius;
+
 private:
   void GeometryInitialize (iPolygonMesh *mesh);
 
@@ -90,7 +92,7 @@ public:
   static void SetFirstHit (bool fh);
   static bool GetFirstHit ();
   static int Report (csOPCODECollider **id1, csOPCODECollider **id2);
-  const csVector3 &GetRadius () const;
+  float GetRadius () {return radius;};
 
   SCF_DECLARE_IBASE;
 };

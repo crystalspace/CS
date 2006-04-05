@@ -36,6 +36,8 @@ class csTerraFormerCollider : public scfImplementation1<csTerraFormerCollider, i
   csStringID stringVertices;
   iObjectRegistry *object_reg;
 
+  unsigned int resolution;
+
   CS::Plugins::Opcode::Opcode::MeshInterface opcMeshInt;
 
   CS::Plugins::Opcode::Opcode::OPCODECREATE OPCC;
@@ -44,7 +46,7 @@ class csTerraFormerCollider : public scfImplementation1<csTerraFormerCollider, i
 
 public:
 
-  void UpdateOPCODEModel (const csVector3 &other_pos);
+  void UpdateOPCODEModel (const csVector3 &other_pos, float resolution);
   unsigned int* indexholder;
   csDirtyAccessArray<CS::Plugins::Opcode::Point> vertices;
 

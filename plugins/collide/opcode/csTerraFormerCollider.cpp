@@ -8,8 +8,6 @@
 using namespace CS::Plugins::Opcode;
 using namespace CS::Plugins::Opcode::Opcode;
 
-#define RESOLUTION 16
-
 csTerraFormerCollider::csTerraFormerCollider (iTerraFormer* terraformer, 
                                               iObjectRegistry* object_reg)
 : scfImplementationType(this, object_reg)
@@ -44,7 +42,13 @@ csTerraFormerCollider::csTerraFormerCollider (iTerraFormer* terraformer,
   transform.m[2][3] = 0;
   transform.m[3][3] = 1; 
 
+  resolution = 4;
+  indexholder = 0;
+
+  opcode_model = 0;
+
   InitOPCODEModel ();
+  UpdateOPCODEModel (csVector3 (0), 4);
 }
 csTerraFormerCollider::~csTerraFormerCollider ()
 {
@@ -57,49 +61,57 @@ csTerraFormerCollider::~csTerraFormerCollider ()
   delete[] indexholder;
 }
 
-void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &other_pos)
+void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &other_pos, float res)
 {
+  if (ceil (res) > resolution)
+  {
+    resolution = ceil (res);
+    InitOPCODEModel ();
+  }
   csRef<iTerraSampler> sampler = former->GetSampler (
-    csBox2 (other_pos.x - RESOLUTION, other_pos.z - RESOLUTION,
-    RESOLUTION, RESOLUTION), RESOLUTION , RESOLUTION);
+    csBox2 (other_pos.x - resolution, other_pos.z - resolution,
+    other_pos.x + resolution, other_pos.z + resolution), resolution , resolution);
 
   const csVector3 *v = sampler->SampleVector3 (stringVertices);
 
-  for (int y = 0 ; y < RESOLUTION ; y++)
+  for (int y = 0 ; y < resolution ; y++)
   {
-    for (int x = 0 ; x < RESOLUTION ; x++)
+    for (int x = 0 ; x < resolution ; x++)
     {
-      int index = y*RESOLUTION + x;
+      int index = y*resolution + x;
       vertices[index].Set (v[index].x,v[index].y,v[index].z);
     }
   }
   
   int i = 0;
-  for (int y = 0 ; y < RESOLUTION-1 ; y++)
+  for (int y = 0 ; y < resolution-1 ; y++)
   {
-    int yr = y * RESOLUTION;
-    for (int x = 0 ; x < RESOLUTION-1 ; x++)
+    int yr = y * resolution;
+    for (int x = 0 ; x < resolution-1 ; x++)
     {
       indexholder[i++] = yr + x;
-      indexholder[i++] = yr+RESOLUTION + x;
+      indexholder[i++] = yr+resolution + x;
       indexholder[i++] = yr + x+1;
       indexholder[i++] = yr + x+1;
-      indexholder[i++] = yr+RESOLUTION + x;
-      indexholder[i++] = yr+RESOLUTION + x+1;
+      indexholder[i++] = yr+resolution + x;
+      indexholder[i++] = yr+resolution + x+1;
     }
   }
-
   opcode_model->Build (OPCC);
 }
 
 void csTerraFormerCollider::InitOPCODEModel ()
 {
-  indexholder = new unsigned int[3* 2 * (RESOLUTION-1) * (RESOLUTION-1)];
-  vertices.SetLength (RESOLUTION*RESOLUTION);
+  if (indexholder)
+    delete indexholder;
+  if (opcode_model)
+    delete opcode_model;
+  indexholder = new unsigned int[3* 2 * (resolution-1) * (resolution-1)];
+  vertices.SetLength (resolution*resolution);
 
   opcode_model = new CS::Plugins::Opcode::Opcode::Model;
 
-  opcMeshInt.SetNbTriangles (2 * (RESOLUTION-1) * (RESOLUTION-1));
+  opcMeshInt.SetNbTriangles (2 * (resolution-1) * (resolution-1));
   opcMeshInt.SetNbVertices (vertices.GetSize ());
 
   // Mesh data
@@ -108,9 +120,7 @@ void csTerraFormerCollider::InitOPCODEModel ()
   OPCC.mNoLeaf = true;
   OPCC.mQuantized = true;
   OPCC.mKeepOriginal = false;
-  OPCC.mCanRemap = false;
-
-  UpdateOPCODEModel (csVector3 (0));
+  OPCC.mCanRemap = true;
 }
 
 void csTerraFormerCollider::MeshCallback (CS::Plugins::Opcode::udword triangle_index, 
