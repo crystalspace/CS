@@ -52,18 +52,18 @@ configure-stamp:
 	# @@@ FIXME: This does not handle plugins protected by ifeq/ifneq.
 #	perl -pi -e "s/^#PLUGINS/PLUGINS/" $(CURDIR)/CS/mk/user.mak
 	# Temp remove of render3d renderers
-	#perl -pi -e "s/^PLUGINS(.*render3.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
-##	perl -pi -e "s/^PLUGINS(.*glshader_cg$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+	#perl -pi -e "s/^PLUGINS(.*render3.*$$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+##	perl -pi -e "s/^PLUGINS(.*glshader_cg$$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	# Temp? remove of cslua
-	#perl -pi -e "s/^PLUGINS(.*cslua.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+	#perl -pi -e "s/^PLUGINS(.*cslua.*$$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	# Temp? remove of openal
-	#perl -pi -e "s/^PLUGINS(.*openal.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+	#perl -pi -e "s/^PLUGINS(.*openal.*$$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 	# Remove broken support of python because of swig or g++ on s390 and powerpc
 ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), s390))
-	perl -pi -e "s/^PLUGINS(.*cspython.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+	perl -pi -e "s/^PLUGINS(.*cspython.*$$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 endif
 ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), powerpc))
-	perl -pi -e "s/^PLUGINS(.*cspython.*$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
+	perl -pi -e "s/^PLUGINS(.*cspython.*$$)/#PLUGINS\1/" $(CURDIR)/CS/mk/user.mak
 endif
 	find $(CURDIR)/CS -name .cvsignore | xargs rm -f
 	# --disable-qsqrt was added for a gcc3.2 bug

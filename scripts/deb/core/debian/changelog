@@ -1,3 +1,10 @@
+crystalspace (0.99-20060125-2) unstable; urgency=low
+
+  * added build-depends on libalut-dev (Closes: #359292) 
+  * Applied patch FTBFS: Unmatched in regex (Closes: #359255)
+
+ -- Christian Bayle <bayle@debian.org>  Wed,  5 Apr 2006 23:26:39 +0200
+
 crystalspace (0.99-20060125-1) unstable; urgency=low
 
   * change build-deps to xlibmesa-gl-dev | libgl-dev (Closes: #331573)
