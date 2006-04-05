@@ -196,7 +196,6 @@ bool csOPCODECollideSystem::Collide (
   csTerraFormerCollider* terraformer)
 {
   ColCache.Model0 = col1->m_pCollisionModel;
-  csVector3 size = col1->GetRadius ();
   terraformer->UpdateOPCODEModel (trans1->GetOrigin (), col1->GetRadius ());
   ColCache.Model1 = terraformer->opcode_model;
 

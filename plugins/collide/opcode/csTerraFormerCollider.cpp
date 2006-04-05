@@ -102,10 +102,8 @@ void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &other_pos, float
 
 void csTerraFormerCollider::InitOPCODEModel ()
 {
-  if (indexholder)
-    delete indexholder;
-  if (opcode_model)
-    delete opcode_model;
+  delete indexholder;
+  delete opcode_model;
   indexholder = new unsigned int[3* 2 * (resolution-1) * (resolution-1)];
   vertices.SetLength (resolution*resolution);
 
