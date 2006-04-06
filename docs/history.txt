@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
   
 6-Apr-2006
+    - acraig updated sprcal3d for changes in Cal3d that fixes orientation
+      issues when loading a model.  Also updated the configure.ac file for
+      the more recent check on cal3d.
 	- Daniel Fryer fixed the sndsyscoreaudio to work with the new
 	  sound renderer.  There are likely to still be issues.  Also modified
 	  configure.ac to add "-framework AudioToolbox" when linking with Core
