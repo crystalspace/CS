@@ -5,13 +5,27 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
-  
 5-Apr-2006      
 	- Piotr Obrzut changed terrain collider to be more optimized for smaller 
           'other' colliders. Terrain colliders are now on.
     - Luca added the csHashReversible::PutUnique method, so that the 
       reverse hash table is updated also on that method.: in fact this method
       ovverrides the one in the csHash class.
+    - Christopher removed csGradient4, and added all the stuff into
+	  csGradient.  That class now supports both csColor and csColor4,
+	  csRGBcolor, and csRGBpixel.  csColor4 is now the native type,
+	  so it will be somewhat more efficient (no translation layer.)
+	  He also changed a lot of the visual functionality of the default
+	  widgets so that they are more attractive and faster.
+	- Christopher added GaugeLevel, an analog gauge that can serve
+	  a variety of purposes.  He also added several functions into
+	  widget and the window manager, fixed drawing and input so that
+	  they occur in order.  Added a simple FPS counter to watch
+	  performance.  Added functionality to the dock so that certain
+	  events are forwarded to widgets in certain dock locations.
+	- Christopher made pens able to render into a texture for AWS2.
+	  He also added a Level widget, which currently has some 
+	  problems due to the procedural texture bug.
 29-Mar-2006
 	- Fossi fixed bruteblock's SetMaterial(Alpha)Map to work as 
 	  previously. But since handling of materials is done in the
