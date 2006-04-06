@@ -10,6 +10,7 @@ function RadioButton(text, align)
 	// Setup the scroll bar
 	_widget._state=false;
 	_widget.over=false;
+	_widget.draw_init=false;
 			
 	// Invalidate and fire onChange when the value property is set.
 	_widget.__defineSetter__("state", function(v) { this._state = v; this.Invalidate(); if (this.onChange) this.onChange(this); });	

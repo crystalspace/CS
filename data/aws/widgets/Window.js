@@ -4,6 +4,8 @@ function Window(title)
 	var _widget = new Widget;
 	var prefs = Skin.current;
 	
+	_widget.is_active=false;
+	
 	// Give it a pen
 	_widget.SetPen(new Pen);
 		
@@ -22,5 +24,9 @@ function Window(title)
 		
 	_widget.onDraw = prefs.Style.Window;	
 	
+	// Override some functions to make it behave as you'd expect.
+	_widget.Show = function() { this.TitleBar.Show(); }
+	_widget.Hide = function() { this.TitleBar.Hide(); }
+		
 	return _widget;
 }

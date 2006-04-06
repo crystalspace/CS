@@ -13,30 +13,27 @@ skin_NormalWindows =
     
     TitleFont : new Font("VeraSans", 14),
     Font 	  : new Font("VeraSans", 10),
+    GaugeFont : new Font("VeraSans", 6),
+    ClockFont : new Font("VeraSerif", 10),
     
-	Texture   : "/aws/texture.png",
+	Texture   : new Texture("/aws/texture.png"),
 	
-    HighlightColor    : new Color(0.9,  0.9,  0.9, 1),
-    ShadowColor	      : new Color(0.23, 0.23, 0.23, 1),
-    FillColor		  : new Color(0.78, 0.78, 0.78, 0.75),
+    HighlightColor    : new Color(0.76, 0.96, 1, 1.0),
+    ShadowColor	      : new Color(0.26, 0.56, 0.64, 1.0),
+    FillColor		  : new Color(0.56, 0.86, 0.94, 1.0),
     TextDisabledColor : new Color(0.5,  0.5,  0, 1),
     TextForeColor	  : new Color(0, 0, 0, 1),
-    TextBackColor	  : new Color(1, 1, 1, 1),
-    ButtonTextColor	  : new Color(0, 0, .75, 1),
-    ChartBarColor	  : new Color(1, 0, 0, 1),
-    ActiveTitleBarColor1 : new Color(0, 0, 0.5, 1),
-    ActiveTitleBarColor2 : new Color(0.78, 0.78, 1, 1),
+    TextBackColor	  : new Color(1, 1, 1, 1),            
     
-    OverlayTextureAlpha	 : 128,
     ScrollBarHeight		 : 24,
     ScrollBarWidth		 : 24,
     
     TitleBar			 :
     {
     	h:30,
-    	Text : new Color(1,1,1,1),
-    	Base : new Color(0.6,0.6,0.6,0.85),
-    	Active : new Color(0.3,0.3,0.3, 1.0),
+    	Text  : new Color(1,1,1,1),
+    	Base  : new Color(0.56, 0.86, 0.94, 1.0),    	
+    	Active : new Color(0.16, 0.46, 0.54, 1.0),
     	Inactive : new Color(0.5,0.5,0.5, 0.5)
     },
     
@@ -49,7 +46,7 @@ skin_NormalWindows =
   	WindowZoom  : { w:20, h:20 },
   	WindowClose : { w:20, h:20 },  	
   	
-  	ClockFont   : new Font("VeraSerif", 10),
+  	
   	
   	
   	CheckBox    : 
@@ -64,14 +61,23 @@ skin_NormalWindows =
   		w:15, h:15, 
   		Base	: new Color(0.56, 0.86, 0.94, 1.0), 
   		Border	: new Color(0.85, 0.85, 0.85, 1.0),
-  		Over	: new Color(0.35,0.35,0.35,0.75, 1.0) 
+  		Over	: new Color(0.94, 0.86, 0.56, 1.0) 
   	},
   	
   	Button : 
   	{   		
   		Base	: new Color(0.56, 0.86, 0.94, 1.0), 
   		Border	: new Color(0,    0,    0,    1.0),
-  		Over	: new Color(0.35,0.35,0.35,0.75, 1.0) 
+  		Over	: new Color(0.94, 0.86, 0.56, 1.0) 
+  	},
+  	
+  	Slider : 
+  	{   		
+  		Base	: new Color(0.26, 0.56, 0.64, 1.0), 
+  		Border	: new Color(0,    0,    0,    1.0),
+  		Over	: new Color(0.94, 0.86, 0.56, 1.0),  		
+  		Thickness : 15,
+  		TickThickness : 5,
   	},
         
 	

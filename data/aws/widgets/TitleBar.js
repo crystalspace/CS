@@ -9,10 +9,13 @@ function TitleBar(inittext)
 	
 	// Initialize the text property.
 	_widget.text = inittext;
+	_widget.is_active=false;
 		
 	// Initialize the alignment
 	_widget.hAlign = Pen.ALIGN_LEFT;
 	_widget.vAlign = Pen.ALIGN_CENTER;
+	
+	_widget.draw_init = false;
 	
 	//  Set initial size.  When you dock this bar, or stick it
 	// in the top of a window as a child, it will resize. (Assuming
@@ -21,6 +24,10 @@ function TitleBar(inittext)
 	
 	// Set the drawing function to be whatever the current style dictates.
 	_widget.onDraw = prefs.Style.TitleBar;
+	
+	_widget.onActivated = function() { this.is_active=true; this.Invalidate(); }
+	_widget.onDeactivated = function() { this.is_active=false; this.Invalidate(); }
+	
 	
 	// If we get a mouse down, start the moving process.
 	_widget.onMouseDown = function(buttons, widget_x, widget_y, screen_x, screen_y)

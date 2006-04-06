@@ -7,15 +7,16 @@ function Button()
 	// Give it a pen
 	_widget.SetPen(new Pen);
 			
-	// Setup the scroll bar
+	// Setup the button
 	_widget._state=false;
 	_widget.over=false;
+	_widget.draw_init=false;
 		
 	// Invalidate and fire onChange when the value property is set.
 	_widget.__defineSetter__("state", function(v) { this._state = v; this.Invalidate(); if (this.onChange) this.onChange(this); });	
 	_widget.__defineGetter__("state", function() { return this._state; });	
 	
-	_widget.Resize(40, 20);
+	_widget.Resize(40, 20);	
 			
 	// Set the drawing function to be whatever the current style dictates.
 	_widget.onDraw = Skin.current.Style.Button;
