@@ -401,8 +401,8 @@ public:
   { return attenuationConstants; }
 
   /**
-  * Get the the maximum distance at which the light is guranteed to shine. 
-  * Can be seen as the distance at which we turn the light of.
+  * Get the the maximum distance at which the light is guaranteed to shine.
+  * Can be seen as the distance at which we turn the light off.
   * Used for culling and selection of meshes to light, but not
   * for the lighting itself.
   */
@@ -410,8 +410,8 @@ public:
   { return cutoffDistance; }
 
   /**
-  * Set the the maximum distance at which the light is guranteed to shine. 
-  * Can be seen as the distance at which we turn the light of.
+  * Set the the maximum distance at which the light is guaranteed to shine. 
+  * Can be seen as the distance at which we turn the light off.
   * Used for culling and selection of meshes to light, but not
   * for the lighting itself.
   */

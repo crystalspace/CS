@@ -117,11 +117,7 @@ void* csGraphics2DWX::GetProcAddress (const char *funcname)
 #ifdef WIN32
   return (void*)wglGetProcAddress (funcname);
 #elif defined(USE_GLX)
-  #if defined(GLX_VERSION_1_4)
-    return (void*) glXGetProcAddressARB ((const GLubyte*) funcname);
-  #else
-    return (void*) glXGetProcAddress ((const GLubyte*) funcname);
-  #endif
+    return (void*)glXGetProcAddressARB ((const GLubyte*) funcname);
 #else
   return 0;
 #endif
