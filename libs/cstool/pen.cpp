@@ -466,6 +466,8 @@ void csPen::DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint y3)
   AddVertex(x1, y1); AddTexCoord(0,0);
   AddVertex(x2, y2); AddTexCoord(0,1);
   AddVertex(x3, y3); AddTexCoord(1,1);
+  
+  if (!(flags & CS_PEN_FILL)) AddVertex(x1, y1);
 
   SetupMesh ();
   DrawMesh (MESH_TYPE(CS_MESHTYPE_TRIANGLES));

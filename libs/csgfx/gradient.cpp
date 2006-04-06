@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
               (C) 2003 by Frank Richter
+              (C) 2006 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -27,22 +28,38 @@ csGradientShade::csGradientShade() :
 {
 }
 
-csGradientShade::csGradientShade (csColor left_color, csColor right_color, 
+csGradientShade::csGradientShade (csColor4 left_color, csColor4 right_color, 
 				  float pos) :
   left (left_color), right (right_color), position (pos)
 {
 }
 
-csGradientShade::csGradientShade (csColor color, float pos) :
+csGradientShade::csGradientShade (csColor left_color, csColor right_color, 
+				  float pos) :
+  position (pos)
+{
+	left.Set(left_color.red, left_color.green, left_color.blue, 255);
+	right.Set(right_color.red, right_color.green, right_color.blue, 255);	
+}
+
+csGradientShade::csGradientShade (csColor4 color, float pos) :
   left (color), right (color), position (pos)
 {
 }
+
+csGradientShade::csGradientShade (csColor color, float pos):position(pos)
+{
+	left.Set(color.red, color.green, color.blue);
+	right.Set(color.red, color.green, color.blue);	
+}
+
+/////////////////////// csGradient //////////////////////////
 
 csGradient::csGradient()
 {
 }
 
-csGradient::csGradient (csColor first, csColor last)
+csGradient::csGradient (csColor4 first, csColor4 last)
 {
   AddShade (csGradientShade (first, 0.0f));
   AddShade (csGradientShade (last, 1.0f));
@@ -74,12 +91,33 @@ void csGradient::Clear ()
 bool csGradient::Render (csRGBcolor* pal, size_t count,
 			 float begin, float end) const
 {
+
+	csRGBpixel *tmp = new csRGBpixel[count];
+	
+	bool result = Render(tmp, count, begin, end);	
+	
+	if (result)
+	{
+		for(size_t i=0; i<count; ++i)
+		{
+			pal[i].Set(tmp[i].red, tmp[i].green, tmp[i].blue);			
+		}	
+	}	
+	
+	delete [] tmp;
+	
+	return result;
+}
+
+bool csGradient::Render (csRGBpixel* pal, size_t count,
+			 float begin, float end) const
+{
   if (shades.Length() == 0) return false;
 
   // current color
-  csColor color = shades[0].left;
+  csColor4 color = shades[0].left;
   // delta per palette item
-  csColor delta (0, 0, 0);
+  csColor4 delta (0, 0, 0);
   // step in the gradient per pal item
   float step = (end - begin) / (float)count;
   float gradpos = begin;
@@ -116,6 +154,7 @@ bool csGradient::Render (csRGBcolor* pal, size_t count,
     pal[i].red = csQint (CLAMP (color.red) * 255.99f);
     pal[i].green = csQint (CLAMP (color.green) * 255.99f);
     pal[i].blue = csQint (CLAMP (color.blue) * 255.99f);
+    pal[i].alpha = csQint (CLAMP (color.alpha) * 255.99f);
 
     color += delta;
     gradpos += step;

@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
               (C) 2003 by Frank Richter
+              (C) 2006 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -38,21 +39,31 @@ class csGradient;
 struct CS_CRYSTALSPACE_EXPORT csGradientShade 
 {
   /// Color of the left side
-  csColor left;
+  csColor4 left;
   /// Color of the right side
-  csColor right;
+  csColor4 right;
   /// Position in the gradient
   float position;
   
   /// Construct with all values set to 0
   csGradientShade ();
   /// Construct supplying all values
-  csGradientShade (csColor left_color, csColor right_color, float pos);
+  csGradientShade (csColor4 left_color, csColor4 right_color, float pos);
+  
+  /// Construct supplying all values
+  explicit csGradientShade (csColor left_color, csColor right_color, float pos);
   /**
    * Construct using a color and position. Both left and right will have the 
    * value of color.
    */
-  csGradientShade (csColor color, float pos);
+  csGradientShade (csColor4 color, float pos);
+  
+  /**
+   * Construct using a color and position. Both left and right will have the 
+   * value of color.
+   */
+  explicit csGradientShade (csColor color, float pos);
+  
 };
 
 /**
@@ -73,23 +84,23 @@ struct CS_CRYSTALSPACE_EXPORT csGradientShade
  * \code
  * csGradient grad;
  * // Rainbow-ish
- * grad.AddShade (csGradientShade (csColor (1.0f, 0.0f, 0.0f), 0.0f)));
- * grad.AddShade (csGradientShade (csColor (1.0f, 1.0f, 0.0f), 0.2f)));
- * grad.AddShade (csGradientShade (csColor (0.0f, 1.0f, 0.0f), 0.4f)));
- * grad.AddShade (csGradientShade (csColor (0.0f, 1.0f, 1.0f), 0.6f)));
- * grad.AddShade (csGradientShade (csColor (0.0f, 0.0f, 1.0f), 0.8f)));
- * grad.AddShade (csGradientShade (csColor (1.0f, 0.0f, 1.0f), 1.0f)));
+ * grad.AddShade (csGradientShade (csColor4 (1.0f, 0.0f, 0.0f, 1.0f), 0.0f)));
+ * grad.AddShade (csGradientShade (csColor4 (1.0f, 1.0f, 0.0f, 1.0f), 0.2f)));
+ * grad.AddShade (csGradientShade (csColor4 (0.0f, 1.0f, 0.0f, 1.0f), 0.4f)));
+ * grad.AddShade (csGradientShade (csColor4 (0.0f, 1.0f, 1.0f, 1.0f), 0.6f)));
+ * grad.AddShade (csGradientShade (csColor4 (0.0f, 0.0f, 1.0f, 1.0f), 0.8f)));
+ * grad.AddShade (csGradientShade (csColor4 (1.0f, 0.0f, 1.0f, 1.0f), 1.0f)));
  *
  * // German flag
  * grad.Clear ();
- * grad.AddShade (csGradientShade (csColor (0.0f, 0.0f, 0.0f), 0.0f)));
- * grad.AddShade (csGradientShade (csColor (0.0f, 0.0f, 0.0f), 
- *  csGradientShade (csColor (1.0f, 0.0f, 0.0f)
+ * grad.AddShade (csGradientShade (csColor4 (0.0f, 0.0f, 0.0f, 1.0f), 0.0f)));
+ * grad.AddShade (csGradientShade (csColor4 (0.0f, 0.0f, 0.0f, 1.0f), 
+ *  csGradientShade (csColor4 (1.0f, 0.0f, 0.0f, 1.0f)
  *  0.33f)));
- * grad.AddShade (csGradientShade (csColor (1.0f, 0.0f, 0.0f), 
- *  csGradientShade (csColor (1.0f, 1.0f, 0.0f)
+ * grad.AddShade (csGradientShade (csColor4 (1.0f, 0.0f, 0.0f, 1.0f), 
+ *  csGradientShade (csColor4 (1.0f, 1.0f, 0.0f, 1.0f)
  *  0.66f)));
- * grad.AddShade (csGradientShade (csColor (1.0f, 1.0f, 0.0f), 1.0f)));
+ * grad.AddShade (csGradientShade (csColor4 (1.0f, 1.0f, 0.0f, 1.0f), 1.0f)));
  * \endcode
  * \todo More shade management (e.g. getting, deleting of single shades.)
  */
@@ -102,7 +113,7 @@ public:
   /// Construct an empty gradient.
   csGradient ();
   /// Construct with \p first at position 0 and \p last at 1.
-  csGradient (csColor first, csColor last);
+  csGradient (csColor4 first, csColor4 last);
   
   /// Add a shade
   void AddShade (csGradientShade shade);
@@ -127,6 +138,25 @@ public:
    *  shade's position.)
    */
   bool Render (csRGBcolor* pal, size_t count, float begin = 0.0f, 
+    float end = 1.0f) const;
+  
+  /**
+   * Interpolate the colors over a part of the gradient.
+   * \param pal Array of csRGBpixel the gradient should be rendered to.
+   * \param count Number of \p palette entries to render.
+   * \param begin Start position. Can be anywhere in the gradient.
+   * \param end End position. Can be anywhere in the gradient.
+   *
+   * \remark At least 1 shade has to be present in the gradient to
+   *  have this function succeed.
+   * \remark Makes heavy use of floating point calculations, so you
+   *  might want to use this function in a precalc phase.
+   * \remark \p begin doesn't have to be smaller than \p end.
+   * \remark \p begin and \p end can both lie completely 'outside'
+   *  the gradient (i.e. both smaller/large than the first resp. last
+   *  shade's position.)
+   */  
+  bool Render (csRGBpixel* pal, size_t count, float begin = 0.0f, 
     float end = 1.0f) const;
 
   /// Get the array of shades
