@@ -97,6 +97,11 @@ namespace aws
     /** True if the widget has dirty state. */	
   	JSBool   dirty; 
   	
+  	/** The widget above this one. */
+  	widget *above;
+  	
+  	/** The widget below this one. */
+  	widget *below;
   	        
   public:
     /// Updates the skin preferences.
@@ -113,7 +118,7 @@ namespace aws
      JSContext *AutomContext() { return ctx; }
      
   public:
-  	 widget():wpen(0), parent(0), sticky_frame_flags(0), dirty(JS_TRUE) 
+  	 widget():wpen(0), parent(0), sticky_frame_flags(0), dirty(JS_TRUE), above(0), below(0)
   	 {
 	 	memset(docked, 0, sizeof(docked)); 
 	 	memset(docked_to, 0, sizeof(docked_to)); 
@@ -140,6 +145,45 @@ namespace aws
   	 /** Gets a reference to the frame. */
   	 frame &Frame() { return fr; }
   	 
+  	 /** Gets the widget above this one. */
+  	 widget *Above() { return above; }
+  	 
+  	 /** Gets the widget below this one. */
+  	 widget *Below() { return below; }
+  	 
+  	 /** Gets the top parent. */
+  	 widget *TopParent() { if (parent) return parent->TopParent(); else return this; }
+  	 
+  	 /** Gets the Northernmost widget. */
+  	 widget *NorthMost() { if (docked_to[W_DOCK_NORTH]) return docked_to[W_DOCK_NORTH]->NorthMost(); else return this; }
+  	 
+  	 /** Slides this window to the top. */
+  	 void Raise(widget *top);
+  	   	   	 
+  	 /** Removes a widget from the input and drawing chain. */
+  	 void Unlink();
+  	 
+  	 /** Removes all docked widgets from the view/input chain. */
+  	 void UnlinkDocked();
+  	 
+  	 /** Links above the given widget.   */
+  	 void Link(widget *w);
+  	 
+  	 /** Adds all docked widgets into the view/input chain. */
+  	 void LinkDocked(widget *w);  	 
+  	 
+  	 /** Returns true if the widget is a child of this widget. */
+  	 bool HasChild(widget *w)
+  	 {
+	  	 for(size_t i=0; i<children.Length(); ++i)
+	  	 {
+		   if (children[i] == w) return true;	   		   
+		   if (children[i]->HasChild(w)) return true;
+	  	 }	  	 
+	  	 
+	  	 return false;
+  	 }
+  	 
   	 /** Adjusts the coordinates from screen space to widget space. */
   	 void ScreenToWidget(int &x, int &y)
   	 {	  	 
@@ -157,6 +201,10 @@ namespace aws
   	 /** Broadcasts an event (by triggering a given function) to all children 
   	  * of this widget. */
   	 void Broadcast(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);  
+  	 
+  	 /** Sends a "signal", which is really just calling a given function for this object.
+  	  * A simple generic signal has no arguments. */
+  	 void Signal(const char *func_name);
   	 
   	 
   	 /// Children ////

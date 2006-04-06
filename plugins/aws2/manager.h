@@ -65,8 +65,12 @@ class awsManager2 : public iAws
   /** The last widget to have keyboard focus. */
   aws::widget *keyboard_focus;
   
+  /** The top widget. */
+  aws::widget *top;
+  
   /** Set if the mouse is captured. */
   bool mouse_captured;
+    
   
 public:
   /////////////////////// Accessors //////////////////////////////
@@ -104,6 +108,14 @@ public:
   //////////////////////// Definition Files ////////////////////////
   
   virtual iAwsScriptObject *CreateScriptObject(const char *name);
+  
+public:
+ // Adds a widget to the input and drawing chain.
+ void AddWidget(aws::widget *w);
+ 
+ // Removes a widget from the input and drawing chain.
+ void RemoveWidget(aws::widget *w);
+ 
 
 public:
   //////////////////////// Event Handling ////////////////////////

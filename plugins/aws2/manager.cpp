@@ -45,6 +45,8 @@
 #include "ivaria/reporter.h"
 #include "ivideo/txtmgr.h"
 
+#include <time.h>
+
 /**** AWS Specific Events *******************************************/
 // The primary system mouse has entered a component
 #define awsMouseEnter(reg) (csEventNameRegistry::GetID((reg), "crystalspace.plugin.aws.mouse.enter"))
@@ -127,6 +129,7 @@ awsManager2::Initialize (iObjectRegistry *_object_reg)
   
   mouse_focus=0;
   keyboard_focus=0;
+  top=0;
   mouse_captured=false;
   
   ScriptCon()->Initialize(object_reg);
@@ -151,6 +154,33 @@ awsManager2::SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d)
 
   default_font = g2d->GetFontServer()->LoadFont (CSFONT_LARGE);
   ScriptCon()->SetFont(default_font);
+}
+
+/*********************************************************************
+ ***************** Widget Control ************************************
+ ********************************************************************/
+
+
+void awsManager2::AddWidget(aws::widget *w)
+{
+	w=w->TopParent();
+		
+	w->Link(top);		
+	top=w;		
+	
+	w->LinkDocked(top);
+} 
+ 
+void awsManager2::RemoveWidget(aws::widget *w)
+{
+	w=w->TopParent();
+	
+	if (top==w) top=top->Below();
+	if (mouse_focus==w || w->HasChild(mouse_focus)) mouse_focus=top;
+	if (keyboard_focus==w || w->HasChild(keyboard_focus))  keyboard_focus=top;
+	
+	w->Unlink();	
+	w->UnlinkDocked();
 }
 
 /*********************************************************************
@@ -185,10 +215,10 @@ bool awsManager2::HandleEvent (iEvent &Event)
 		return true;	  
 	  }  
 	  
-	  // Check all widgets for new focus.
-	  for(size_t i=0; i<aws::widgets.Length(); ++i)
+	  // Check all widgets for new focus.	  
+	  for(aws::widget *w=top; w!=0; w=w->Below())
 	  {
-	 	new_mouse_focus = aws::widgets[i]->Contains(csMouseEventHelper::GetX(&Event), csMouseEventHelper::GetY(&Event));		
+	 	new_mouse_focus = w->Contains(csMouseEventHelper::GetX(&Event), csMouseEventHelper::GetY(&Event));		
 	 	if (new_mouse_focus!=0) break;
 	  }
 	  	  
@@ -216,7 +246,23 @@ bool awsManager2::HandleEvent (iEvent &Event)
 	    }
 	    
 		// Restore the event's name.    
-		Event.Name = et;		 		  
+		Event.Name = et;
+		
+		// Make the widget go to the top.		
+		if (mouse_focus)
+		{
+			aws::widget *new_top = mouse_focus->TopParent()->NorthMost();
+			
+			if (top!=new_top)
+			{
+				top->Signal("onDeactivated");
+				
+				new_top->Raise(top);
+				top=new_top;
+				
+				new_top->Signal("onActivated");
+			}
+		}
 	  }  
 	  
 	  //  If any widget has mouse focus then handle the event.
@@ -263,7 +309,13 @@ bool awsManager2::HandleEvent (iEvent &Event)
 void awsManager2::Redraw()
 {  
   csPen pen(g2d, g3d);    
-   
+  csString msg;
+  static int frames=0;
+  static int fps=0;
+  static time_t start = time(NULL);
+  
+  ++frames;
+    
   g2d->Write(default_font, 90, 90, g2d->FindRGB(128,128,128,128), -1, "AWS Redrawing");
   ScriptCon()->Redraw(g2d);
   
@@ -276,10 +328,37 @@ void awsManager2::Redraw()
 //   }
 
   // Draw all widgets (this is a hack for testing.)
-  for(size_t i=0; i<aws::widgets.Length(); ++i)
-  {
- 	aws::widgets[i]->Draw(&pen);		
-  }
+//   for(size_t i=0; i<aws::widgets.Length(); ++i)
+//   {
+//  	aws::widgets[i]->Draw(&pen);		
+//   }
+
+	// Draw widgets
+	if (top)
+	{
+		aws::widget *start = top;
+		
+		// Get bottom widget.
+		while(start->Below()) { start=start->Below(); }
+		
+		// Draw widgets from bottom up.
+		for(aws::widget *w=start; w!=0; w=w->Above())
+		{
+			w->Draw(&pen);	
+		}
+	}
+  
+  time_t end = time(NULL);
+  
+  if (end-start > 0)
+  {	  
+  	  fps = frames;
+  	  frames = 0;
+  	  start=end;
+  }	  
+  
+  msg.Format("%d fps", fps);
+  g2d->Write(default_font, 150, 5, g2d->FindRGB(128,128,128,255), -1, msg.GetDataSafe());  
 }
 
 /*********************************************************************

@@ -383,6 +383,28 @@ ReleaseMouse(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	return JS_TRUE;
 }
 
+/** @brief Capture the mouse to this widget. */
+static JSBool
+Show(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{		
+	aws::widget *wo = (aws::widget *)JS_GetPrivate(cx, obj);
+	
+	AwsMgr()->AddWidget(wo);
+	
+	return JS_TRUE;
+}
+
+/** @brief Release the mouse from this widget. */
+static JSBool
+Hide(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{		
+	aws::widget *wo = (aws::widget *)JS_GetPrivate(cx, obj);
+	
+	AwsMgr()->RemoveWidget(wo);
+	
+	return JS_TRUE;
+}
+
 /** @brief Broadcast an event to all children (by calling the given function). */
 static JSBool
 Broadcast(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
@@ -457,6 +479,9 @@ static JSFunctionSpec widget_methods[] = {
     
     {"CaptureMouse",	CaptureMouse,	0, 0, 0},    
     {"ReleaseMouse",	ReleaseMouse,	0, 0, 0},    
+    
+    {"Show",	Show,	0, 0, 0},    
+    {"Hide",	Hide,	0, 0, 0},    
     
     
     {0,0,0,0,0}
@@ -758,5 +783,97 @@ void widget::Broadcast(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
 	}
 	
 }
+
+void widget::Signal(const char *func_name)
+{
+	jsval func_val, rv;
+	
+	if (JS_GetProperty(ScriptMgr()->GetContext(), WidgetObject(), func_name, &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
+	{
+		JS_CallFunctionValue(ScriptMgr()->GetContext(), WidgetObject(), func_val, 0, NULL, &rv);			
+	}
+}
+
+/** Slides this window to the top. */
+ void widget::Raise(widget *top)
+ {
+	if (parent) parent->Raise(top);	
+	else
+	{	
+		if (docked[W_DOCK_SOUTH])
+		{
+			docked[W_DOCK_SOUTH]->Raise(top);
+			top = docked[W_DOCK_SOUTH];	
+		}
+			
+	 	if (above) above->below = below;
+	 	if (below) below->above = above;
+	 
+	 	if (top) top->above = this;
+	 	
+	 	below = top;
+	 	above = 0;	
+	 	
+	}	 
+ }  	 
+ 
+ void widget::UnlinkDocked()
+ {
+	 if (parent) parent->UnlinkDocked();
+	 else
+	 {
+		for(int i=0; i<4; ++i)
+	 	{
+			if (docked[i]) 
+			{
+				AwsMgr()->RemoveWidget(docked[i]); 				
+			}
+	 	}		 
+	 }	 
+ }
+   	   	 
+ void widget::Unlink()
+ {
+	if (parent) parent->Unlink();
+	else
+	{		  	
+	 	if (above) above->below = below;
+	 	if (below) below->above = above;
+	 	
+	 	above=0;
+	 	below=0; 		 	
+	}
+ } 	 
+ 
+ void widget::LinkDocked(widget *w)
+ {
+	 if (parent) parent->LinkDocked(w);	 
+	 else
+	 {
+	 	 for(int i=0; i<4; ++i)
+	 	 {
+			if (docked[i]) 
+			{				
+				AwsMgr()->AddWidget(docked[i]); 	
+			}
+	 	 }		 
+	 }
+ }
+
+ 
+ void widget::Link(widget *w)
+ {
+	 if (parent) parent->Link(w);	 
+	 else
+	 {	  	 		 
+	  	 if (w)
+	  	 {
+		   above = w->above;
+		   w->above=this;		  	 		  	 
+	  	 }
+	  	 
+	  	 below = w;	  	 	  	 
+	 }	  		 
+ }  	 
 
 } // end of namespace

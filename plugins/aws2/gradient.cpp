@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "csgfx/gradient4.h"
+#include "csgfx/gradient.h"
 #include "ivideo/texture.h"
 #include "script_manager.h"
 #include "script_console.h"
@@ -32,7 +32,7 @@
 		ScriptCon()->Message(msg); \
 	}
 
-enum { GRAD_HORZ = 0, GRAD_VERT, GRAD_RADIAL };
+enum { GRAD_HORZ = 0, GRAD_VERT, GRAD_RADIAL, GRAD_LDIAG, GRAD_RDIAG };
 	
 	
 /** @brief The prototype object for gradients. */
@@ -43,7 +43,7 @@ static JSBool
 Gradient(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
 	csString msg;
-	csGradient4 *go = new csGradient4();
+	csGradient *go = new csGradient();
 		
 	// Store this widget object with the new widget instance.
   	CHECK("Gradient", JS_SetPrivate(cx, obj, (void *)go)==JS_TRUE);
@@ -57,7 +57,7 @@ Gradient(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 AddColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
-	csGradient4 *go = (csGradient4 *)JS_GetPrivate(cx, obj);
+	csGradient *go = (csGradient *)JS_GetPrivate(cx, obj);
 			
 	if (JS_TypeOfValue(cx, argv[0])!=JSTYPE_VOID)
 	{
@@ -70,7 +70,7 @@ AddColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 			
 			JS_ValueToNumber(cx, argv[1], &pos);			
 			
-			go->AddShade(csGradientShade4(*co, (float)pos)); 
+			go->AddShade(csGradientShade(*co, (float)pos)); 
 		}
 		else
 		{
@@ -85,7 +85,7 @@ AddColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
 {
-	csGradient4 *go = (csGradient4 *)JS_GetPrivate(cx, obj);
+	csGradient *go = (csGradient *)JS_GetPrivate(cx, obj);
 			
 	if (JS_TypeOfValue(cx, argv[0])!=JSTYPE_VOID)
 	{
@@ -117,7 +117,7 @@ RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 					}				
 					
 					// Free pixel buffer
-					delete pbuf;	
+					delete [] pbuf;	
 				} break;
 				
 				case GRAD_VERT: { // Vertical linear				
@@ -133,7 +133,7 @@ RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 					}
 									
 					// Free the pixel buffer
-					delete pbuf;
+					delete [] pbuf;
 				} break;
 				
 				case GRAD_RADIAL: { // Radial				
@@ -166,8 +166,76 @@ RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 					(*to)->Blit(0,0,w,h, (const unsigned char *)tmp);
 									
 					// Free the pixel buffer
-					delete pbuf;
-					delete tmp;
+					delete [] pbuf;
+					delete [] tmp;
+				} break;
+				
+				case GRAD_LDIAG: { // Diagonal upper left to lower right.					
+					csRGBpixel *pbuf = new csRGBpixel[w+1];
+					float fw = w;
+					
+					// Create the gradient
+					go->Render(pbuf, w+1);					
+					
+					// Temporary buffer for rendering the gradient.
+					csRGBpixel *tmp = new csRGBpixel[w*h];
+					
+					// Render the gradient.  
+					for(int x=0; x<w; ++x)
+					{
+						float xr = (1.0 - ((float)x / (float)w)) * 0.5f;
+						
+						for(int y=0; y<h; ++y)
+						{
+							float yr = ((float)y / (float)h) * 0.5f;							
+							float pos = (yr + xr);
+							
+							if (pos>1.0) pos=1.0;
+							if (pos<0.0) pos=0.0;
+							
+							tmp[x+(y*w)] = pbuf[(int)(pos*fw)];
+						}
+					}
+					
+					(*to)->Blit(0,0,w,h, (const unsigned char *)tmp);
+									
+					// Free the pixel buffer
+					delete [] pbuf;
+					delete [] tmp;
+				} break;
+				
+				case GRAD_RDIAG: { // Diagonal upper right to lower left.					
+					csRGBpixel *pbuf = new csRGBpixel[w+1];
+					float fw = w;
+					
+					// Create the gradient
+					go->Render(pbuf, w+1);					
+					
+					// Temporary buffer for rendering the gradient.
+					csRGBpixel *tmp = new csRGBpixel[w*h];
+					
+					// Render the gradient.  
+					for(int x=0; x<w; ++x)
+					{
+						float xr = ((float)x / (float)w) * 0.5f;
+						
+						for(int y=0; y<h; ++y)
+						{
+							float yr = ((float)y / (float)h) * 0.5f;							
+							float pos = 1.0 - (yr + xr);
+							
+							if (pos>1.0) pos=1.0;
+							if (pos<0.0) pos=0.0;
+							
+							tmp[x+(y*w)] = pbuf[(int)(pos*fw)];
+						}
+					}
+					
+					(*to)->Blit(0,0,w,h, (const unsigned char *)tmp);
+									
+					// Free the pixel buffer
+					delete [] pbuf;
+					delete [] tmp;
 				} break;
 				
 			} // end switch style			
@@ -195,6 +263,8 @@ gradient_get_staticProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 				case GRAD_HORZ: *vp =  INT_TO_JSVAL(GRAD_HORZ); break;					
 				case GRAD_VERT: *vp =  INT_TO_JSVAL(GRAD_VERT); break;									
 				case GRAD_RADIAL: *vp =  INT_TO_JSVAL(GRAD_RADIAL); break;
+				case GRAD_LDIAG: *vp =  INT_TO_JSVAL(GRAD_LDIAG); break;
+				case GRAD_RDIAG: *vp =  INT_TO_JSVAL(GRAD_RDIAG); break;
 				default:
 					return JS_FALSE;				
 			}
@@ -224,9 +294,11 @@ static JSFunctionSpec gradient_methods[] = {
 
 static JSPropertySpec gradient_static_props[] =
 {
-        {"HORIZONTAL",   GRAD_HORZ,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, gradient_get_staticProperty},       
-        {"VERTICAL",     GRAD_VERT,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, gradient_get_staticProperty},       
-        {"RADIAL",       GRAD_RADIAL,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, gradient_get_staticProperty},       
+        {"HORIZONTAL",   GRAD_HORZ,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, gradient_get_staticProperty},       
+        {"VERTICAL",     GRAD_VERT,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, gradient_get_staticProperty},       
+        {"RADIAL",       GRAD_RADIAL,  JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, gradient_get_staticProperty},       
+        {"LDIAG",         GRAD_LDIAG,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, gradient_get_staticProperty},  
+        {"RDIAG",         GRAD_RDIAG,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, gradient_get_staticProperty},  
                 
         {0,0,0}
 };

@@ -59,12 +59,12 @@ Texture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	  		CHECK("Texture", JS_SetPrivate(cx, obj, (void *)fo)==JS_TRUE);  	
   		}
 	}
-	else if (JSVAL_IS_INT(argv[0]))
+	else if (JSVAL_IS_NUMBER(argv[0]))
 	{
-		int w, h;
+		int32 w, h;
 		
-		w = JSVAL_TO_INT(argv[0]);
-		h = JSVAL_TO_INT(argv[1]);
+		JS_ValueToInt32(cx, argv[0], &w);
+		JS_ValueToInt32(cx, argv[1], &h);
 				
 		csImageMemory *img = new csImageMemory(w,h, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
 		

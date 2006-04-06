@@ -502,6 +502,34 @@ Rotate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 	return JS_TRUE;
 }
 
+/** @brief Rotate a pen by (a) */
+static JSBool
+Render(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)	
+{
+	if (argc<1) return JS_FALSE;
+	
+	aws::pen *po = (aws::pen *)JS_GetPrivate(cx, obj);
+	
+	if (po && JS_TypeOfValue(cx, argv[0])!=JSTYPE_VOID)
+	{
+		JSObject *o = JSVAL_TO_OBJECT(argv[0]);		
+				
+		if (IsTextureObject(o))
+		{
+			csRef<iTextureHandle> *to = (csRef<iTextureHandle> *)JS_GetPrivate(cx, o);	
+						
+			csPen pen(AwsMgr()->G2D(), AwsMgr()->G3D()); 
+			
+			AwsMgr()->G3D()->SetRenderTarget(*to, false);
+			AwsMgr()->G3D()->BeginDraw(CSDRAW_2DGRAPHICS);
+			po->Draw(&pen);			
+			AwsMgr()->G3D()->FinishDraw();			
+		}	
+	}
+		
+	return JS_FALSE;
+}
+
 
 /** @brief Forewards a pen GetProperty call. */
 static JSBool
@@ -640,6 +668,7 @@ static JSFunctionSpec pen_methods[] = {
     {"DrawTriangle",	DrawTriangle,		7, 0, 0},
     
     {"Draw",		    Draw,				1, 0, 0},
+    {"Render",			Render,				1, 0, 0},
     
     {"Write",		    Write,				4, 0, 0},    
     {"WriteBoxed",		WriteBoxed,			8, 0, 0},
