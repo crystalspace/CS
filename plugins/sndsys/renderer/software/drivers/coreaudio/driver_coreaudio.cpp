@@ -64,8 +64,10 @@ static OSStatus StaticAudioProc(AudioDeviceID inDevice,
 				void *inClientData)
 {
   csSndSysDriverCoreAudio *p_audio=(csSndSysDriverCoreAudio *)inClientData;
+  
   return p_audio->AudioProc(inDevice, inNow, inInputData, inInputTime,
 			    outOutputData, inOutputTime);
+
 }
 
 csSndSysDriverCoreAudio::csSndSysDriverCoreAudio(iBase* piBase) :
@@ -73,12 +75,14 @@ csSndSysDriverCoreAudio::csSndSysDriverCoreAudio(iBase* piBase) :
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  convert_buffer = 0;
 }
 
 csSndSysDriverCoreAudio::~csSndSysDriverCoreAudio()
 {
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_DESTRUCT_IBASE();
+  free(convert_buffer);
 }
 
 void csSndSysDriverCoreAudio::Report(int severity, const char* msg, ...)
@@ -114,8 +118,11 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
 {
   uint32 propertysize, buffersize;
   AudioStreamBasicDescription outStreamDesc;
+  //description of the data that CS will be providing
+  AudioStreamBasicDescription inStreamDesc;
+ 
   OSStatus status;
-
+  
   Report(CS_REPORTER_SEVERITY_DEBUG, "Sound System: CoreAudio Driver: Open()");
 
   attached_renderer = renderer;
@@ -140,11 +147,15 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
     return false;
   }
 
-  // Set buffer size - attempting to use signed 16 bit samples here using
-  // 1/20th of a second buffer size
+  // Set buffer size - 1/10th of a second buffer of floats
   propertysize = sizeof(buffersize);
-  buffersize = requested_format->Freq * (requested_format->Bits/8) *
-    requested_format->Channels / 20;
+  buffersize = requested_format->Freq * sizeof(float) *
+    requested_format->Channels / 10;
+	
+  convert_size = requested_format->Freq / 10;
+	
+  convert_buffer = malloc(convert_size * requested_format->Channels * requested_format->Bits/8);
+	
   status = AudioDeviceSetProperty(outputDeviceID, 0, 0, false,
     kAudioDevicePropertyBufferSize, propertysize, &buffersize);
   if (status)
@@ -152,9 +163,10 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
     Report(CS_REPORTER_SEVERITY_ERROR,
 	   "Failed to set buffersize to %d bytes for CoreAudio output device. "
 	   "Return of %d.", buffersize, (int)status);
+	free(convert_buffer);
     return false;
   }
-
+  
   // Get stream information
   propertysize = sizeof(outStreamDesc);
   status = AudioDeviceGetProperty(outputDeviceID, 0, false,
@@ -166,47 +178,74 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
 	   "output device.  Return of %d.", (int)status);
     return false;
   }
-
-  // Modify stream information to our desired format
-  outStreamDesc.mSampleRate=requested_format->Freq;
-  outStreamDesc.mFormatID=kAudioFormatLinearPCM;
-  // This is where we set the output to signed integer output (not float),
-  outStreamDesc.mFormatFlags =
-    kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
-
-  // Set the byte order of the format to the renderer requested byte order, which is
-  //  probably machine byte order.
+  //get another copy to create the input format spec
+  status = AudioDeviceGetProperty(outputDeviceID, 0, false,
+    kAudioDevicePropertyStreamFormat, (UInt32*)&propertysize, &inStreamDesc);
+	   
+  // Set up source stream description for an AudioConverter to do its thang
+ 
+  inStreamDesc.mSampleRate = requested_format->Freq;
+  inStreamDesc.mFormatID = kAudioFormatLinearPCM;
+  inStreamDesc.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked ;
   if ((requested_format->Flags & CSSNDSYS_SAMPLE_ENDIAN_MASK) == CSSNDSYS_SAMPLE_BIG_ENDIAN)
-    outStreamDesc.mFormatFlags |= kAudioFormatFlagIsBigEndian;
-
-  outStreamDesc.mChannelsPerFrame=requested_format->Channels;
-  outStreamDesc.mBitsPerChannel=requested_format->Bits;
-  // Frames per packet are the number of full sets of sound samples (one for
-  // each channel) encoded in a single logical unit of the source data.  In
-  // compressed formats there may be many frames encoded in each logical
-  // packet.  In uncompressed formats (like linear PCM) this is always 1.
-  outStreamDesc.mFramesPerPacket=1;
-  // The bytes per frame of a packed data stream will be channels * bits per
-  // sample / 8
-  outStreamDesc.mBytesPerFrame = 
-    requested_format->Channels * requested_format->Bits/8;
+    inStreamDesc.mFormatFlags |= kAudioFormatFlagIsBigEndian;
+  inStreamDesc.mChannelsPerFrame = requested_format->Channels;
+  inStreamDesc.mBitsPerChannel = requested_format->Bits;
+  inStreamDesc.mFramesPerPacket = 1;
+  inStreamDesc.mBytesPerFrame = requested_format->Channels * requested_format->Bits / 8;
+  // The bytes per packet is purely a product of bytes per frame and frames per
+  // packet since we don't have any padding in a packet here
+  inStreamDesc.mBytesPerPacket =
+    inStreamDesc.mFramesPerPacket * inStreamDesc.mBytesPerFrame;
+/*
+   inStreamDesc.mSampleRate = 44100.00;
+  inStreamDesc.mFormatID = kAudioFormatLinearPCM;
+  inStreamDesc.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked ;
+  inStreamDesc.mChannelsPerFrame = 2;
+  inStreamDesc.mBitsPerChannel = 16;
+  inStreamDesc.mFramesPerPacket = 1;
+  inStreamDesc.mBytesPerFrame = 4;
+  // The bytes per packet is purely a product of bytes per frame and frames per
+  // packet since we don't have any padding in a packet here
+  inStreamDesc.mBytesPerPacket = 4;
+*/	
+	Report(CS_REPORTER_SEVERITY_WARNING,"Read in hardware properties of to Freq=%f Channels=%d Bits=%d FormatID=%s Flags=%x", outStreamDesc.mSampleRate,
+	   outStreamDesc.mChannelsPerFrame, outStreamDesc.mBitsPerChannel, &outStreamDesc.mFormatID, outStreamDesc.mFormatFlags );
+  // Set up destination stream parameters
+  outStreamDesc.mSampleRate = 44100.00;
+  outStreamDesc.mFormatID=kAudioFormatLinearPCM;
+  outStreamDesc.mFormatFlags = kAudioFormatFlagIsFloat | kAudioFormatFlagIsPacked | kAudioFormatFlagIsBigEndian;
+  outStreamDesc.mChannelsPerFrame= 2;
+  outStreamDesc.mBitsPerChannel= 32;
+//  outStreamDesc.mFramesPerPacket= 1;
+  // At this level, Core Audio demands 32 bit floats 
+  outStreamDesc.mBytesPerFrame = requested_format->Channels * sizeof(float);
   // The bytes per packet is purely a product of bytes per frame and frames per
   // packet since we don't have any padding in a packet here
   outStreamDesc.mBytesPerPacket =
     outStreamDesc.mFramesPerPacket * outStreamDesc.mBytesPerFrame;
 
+  //Make sure our HAL likes the output format?
   propertysize = sizeof(outStreamDesc);
   status = AudioDeviceSetProperty(outputDeviceID, 0, 0, false,
     kAudioDevicePropertyStreamFormat, propertysize, &outStreamDesc);
   if (status != 0)
   {
     Report(CS_REPORTER_SEVERITY_ERROR,
-	   "Failed to set output stream properties to Freq=%d Channels=%d "
-	   "Bits=%d .  Return of %d.", requested_format->Freq,
-	   requested_format->Channels, requested_format->Bits, (int)status);
-    return false;
+	   "Failed to set output stream properties to  Freq=%f Channels=%d Bits=%d FormatID=%s Flags=%x. Return of %s", outStreamDesc.mSampleRate,
+	   outStreamDesc.mChannelsPerFrame, outStreamDesc.mBitsPerChannel, &outStreamDesc.mFormatID, outStreamDesc.mFormatFlags, &status);
+    //return false;
   }
-
+  
+  //Create a converter to do the translation for us
+  status = AudioConverterNew(&inStreamDesc, &outStreamDesc, &converter);
+  if (status != 0)
+  {
+    Report(CS_REPORTER_SEVERITY_ERROR,
+	   "Failed to create converter with error %s", &status);
+    //return false;
+  }
+ 
   // Copy the final format into local storage
   memcpy(&playback_format, requested_format, sizeof(csSndSysSoundFormat));
 
@@ -218,7 +257,8 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
 	   "Failed to add audio device IO proc.  Return of %d.", (int)status);
     return false;
   }
-
+ 
+  
   return true;
 }
 
@@ -226,6 +266,8 @@ void csSndSysDriverCoreAudio::Close ()
 {
   StopThread();
   AudioDeviceRemoveIOProc(outputDeviceID, StaticAudioProc);
+  free(convert_buffer);
+  convert_buffer = 0;
 }
 
 bool csSndSysDriverCoreAudio::StartThread()
@@ -234,6 +276,7 @@ bool csSndSysDriverCoreAudio::StartThread()
   // Since the Core Audio API is callback driven, we don't actually start a
   // thread here ourselves.  Instead we start the audio device pulling from the
   // audio procedure.  This runs in its own thread that we don't see.
+  Report(CS_REPORTER_SEVERITY_ERROR, "Getting our thread on!");
   status = AudioDeviceStart(outputDeviceID, StaticAudioProc);
   if (status != 0)
   {
@@ -267,11 +310,18 @@ OSStatus csSndSysDriverCoreAudio::AudioProc(AudioDeviceID inDevice,
   }
 
   // Fill the provided buffer with as many samples as possible and return the
-  // number of bytes provided
-  outOutputData->mBuffers[0].mDataByteSize=attached_renderer->FillDriverBuffer(
-    outOutputData->mBuffers[0].mData,
-    outOutputData->mBuffers[0].mDataByteSize,0, 0);
-  return 0;
+  // number of frames provided
+    int q = 0; 
+    OSStatus stat = 0;
+	int x = 0; //lame attempt to null-terminate OSStatus for string interpretation
+    size_t framesFilled = attached_renderer->FillDriverBuffer( convert_buffer, convert_size, 0, 0);
+	size_t bytesWritten = outOutputData->mBuffers[0].mDataByteSize;
+    stat = AudioConverterConvertBuffer(converter, framesFilled * playback_format.Bits/8 * playback_format.Channels, convert_buffer, &bytesWritten, outOutputData->mBuffers[0].mData); 
+    if(stat){
+	  //attached_renderer->RecordEvent(SSEC_DRIVER,SSEL_DEBUG, "Audio convert error %s",&stat);
+	}
+	//attached_renderer->RecordEvent(SSEC_DRIVER,SSEL_DEBUG, "CA requested %d bytes, we wrote %d.",outOutputData->mBuffers[0].mDataByteSize,bytesWritten);
+  return stat;
 }
 
 }

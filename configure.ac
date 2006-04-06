@@ -193,7 +193,7 @@ CS_CHECK_HOST
 AS_IF([test "x$cs_host_macosx" = "xyes"],
     [# We assume that we always have CoreAudio available on MacOS/X.
     CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
-    CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS], [-framework CoreAudio])
+    CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS], [-framework CoreAudio -framework AudioToolbox])
     CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])],
     [case $cs_host_family in
 	windows)

@@ -45,6 +45,7 @@
 #define SNDSYS_SOFTWARE_DRIVER_COREAUDIO_H
 
 #include <CoreAudio/CoreAudio.h>
+#include <AudioToolbox/AudioToolbox.h>
 
 #include "csutil/cfgacc.h"
 #include "iutil/eventh.h"
@@ -92,6 +93,10 @@ protected:
   iObjectRegistry* object_reg;
   csSndSysRendererSoftware *attached_renderer;
   csSndSysSoundFormat playback_format;
+  AudioConverterRef converter;
+  //Our buffer of pre-conversion data from CS
+  void * convert_buffer;
+  size_t convert_size;
   bool running;
 
   // The output device

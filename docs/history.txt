@@ -5,6 +5,13 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
+  
+6-Apr-2006
+        -Daniel Fryer fixed the sndsyscoreaudio to work with the new
+         sound renderer.  There are likely to still be issues.  Also modified 
+         configure.ac to add "-framework AudioToolbox" when linking with Core
+         Audio. 
+
 5-Apr-2006      
 	- Piotr Obrzut changed terrain collider to be more optimized for smaller 
           'other' colliders. Terrain colliders are now on.
