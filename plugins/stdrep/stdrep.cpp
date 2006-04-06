@@ -228,7 +228,12 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
     {
       csString str (line+offset);
       str.Truncate (77);
-      int linebreak = strrchr (str.GetData (), ' ')-str.GetData ();
+      int linebreak = 0;
+      char * space = strrchr (str.GetData (), ' ');
+      if (space)
+      {
+          linebreak = space-str.GetData ();
+      }
       if (linebreak>0)
       {
         str.Truncate (linebreak);
@@ -379,7 +384,12 @@ bool csReporterListener::HandleEvent (iEvent& event)
               {
                 str.Truncate (chars);
                 g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
-                int linebreak = strrchr (str.GetData (), ' ')-str.GetData ();
+                int linebreak = 0;
+                char * space = strrchr (str.GetData (), ' ');
+                if (space)
+                {
+                    linebreak = space-str.GetData ();
+                }
                 if (linebreak > 1) // >1 accounts for two leading spaces in str
                 {
                   str.Truncate (linebreak);

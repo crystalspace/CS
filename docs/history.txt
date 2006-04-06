@@ -11,14 +11,17 @@ chronological order.
          sound renderer.  There are likely to still be issues.  Also modified 
          configure.ac to add "-framework AudioToolbox" when linking with Core
          Audio. 
+        -Magodra fixed a crash where csReporterListener::WriteLine crashed
+         because int length = strrchr(str,' ')-str; could case invalid positive
+         length if str is located in uper 1/2 of memory.
 
 5-Apr-2006      
 	- Piotr Obrzut changed terrain collider to be more optimized for smaller 
           'other' colliders. Terrain colliders are now on.
-    - Luca added the csHashReversible::PutUnique method, so that the 
-      reverse hash table is updated also on that method.: in fact this method
-      ovverrides the one in the csHash class.
-    - Christopher removed csGradient4, and added all the stuff into
+        - Luca added the csHashReversible::PutUnique method, so that the 
+          reverse hash table is updated also on that method.: in fact this method
+          ovverrides the one in the csHash class.
+        - Christopher removed csGradient4, and added all the stuff into
 	  csGradient.  That class now supports both csColor and csColor4,
 	  csRGBcolor, and csRGBpixel.  csColor4 is now the native type,
 	  so it will be somewhat more efficient (no translation layer.)

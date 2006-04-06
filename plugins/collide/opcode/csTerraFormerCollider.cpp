@@ -65,7 +65,7 @@ void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &other_pos, float
 {
   if (ceil (res) > resolution)
   {
-    resolution = ceil (res);
+    resolution = (unsigned int)ceil (res);
     InitOPCODEModel ();
   }
   csRef<iTerraSampler> sampler = former->GetSampler (
@@ -74,9 +74,9 @@ void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &other_pos, float
 
   const csVector3 *v = sampler->SampleVector3 (stringVertices);
 
-  for (int y = 0 ; y < resolution ; y++)
+  for (unsigned int y = 0 ; y < resolution ; y++)
   {
-    for (int x = 0 ; x < resolution ; x++)
+    for (unsigned int x = 0 ; x < resolution ; x++)
     {
       int index = y*resolution + x;
       vertices[index].Set (v[index].x,v[index].y,v[index].z);
@@ -84,10 +84,10 @@ void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &other_pos, float
   }
   
   int i = 0;
-  for (int y = 0 ; y < resolution-1 ; y++)
+  for (unsigned int y = 0 ; y < resolution-1 ; y++)
   {
     int yr = y * resolution;
-    for (int x = 0 ; x < resolution-1 ; x++)
+    for (unsigned int x = 0 ; x < resolution-1 ; x++)
     {
       indexholder[i++] = yr + x;
       indexholder[i++] = yr+resolution + x;
@@ -139,3 +139,4 @@ float csTerraFormerCollider::SampleFloat (float x, float z)
   former->SampleFloat (stringHeights, x, z, y);
   return y;
 }
+
