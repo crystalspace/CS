@@ -23448,7 +23448,21 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-CS_GL_INCLUDE(CS_OPENGL_PATH,GL,gl.h)
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
 int
 main ()
 {
@@ -23599,7 +23613,21 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-CS_GL_INCLUDE(CS_OPENGL_PATH,GL,gl.h)
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
 int
 main ()
 {
@@ -40922,7 +40950,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CalCoreAnimation* p = 0; unsigned int n = p->getTrackCount();
+int x = LOADER_FLIP_WINDING;
   ;
   return 0;
 }
@@ -41073,7 +41101,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CalCoreAnimation* p = 0; unsigned int n = p->getTrackCount();
+int x = LOADER_FLIP_WINDING;
   ;
   return 0;
 }

@@ -7,9 +7,6 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
   
 6-Apr-2006
-    - acraig updated sprcal3d for changes in Cal3d that fixes orientation
-      issues when loading a model.  Also updated the configure.ac file for
-      the more recent check on cal3d.
 	- Daniel Fryer fixed the sndsyscoreaudio to work with the new
 	  sound renderer.  There are likely to still be issues.  Also modified
 	  configure.ac to add "-framework AudioToolbox" when linking with Core
@@ -22,6 +19,9 @@ chronological order.
 	  glXGetProcAddress(). This corrects his previous bad fix from
 	  11-Dec-2005, as well as unknown symbol runtime error with nvidia
 	  driver.
+	- acraig updated sprcal3d for changes in Cal3d that fixes orientation
+	  issues when loading a model.  Also updated the configure.ac file for
+	  the more recent check on cal3d.
 5-Apr-2006      
 	- Piotr Obrzut changed terrain collider to be more optimized for
 	  smaller 'other' colliders. Terrain colliders are now on.
@@ -58,9 +58,9 @@ chronological order.
         - Piotr Obrzut updated terrain formers cd test (works but it is very 
           slow) - not active by default 
         - Christopher Nelson made linear gradients render into a texture.
-        - Christopher Nelson added csGradient4, which handles alphas and csColor4's
-          and renders into csRGBpixel.  He also made AWS2 use this for it's Gradient
-          object, instead of csGradient.
+        - Christopher Nelson added csGradient4, which handles alphas and
+	  csColor4's and renders into csRGBpixel.  He also made AWS2 use this
+	  for it's Gradient object, instead of csGradient.
 28-Mar-2006
 	- Christopher Nelson made *major* changes to the csPen object.  He
 	  removed the fill and swap_colors parameters, and added the
