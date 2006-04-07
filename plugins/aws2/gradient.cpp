@@ -155,7 +155,7 @@ RenderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 							int dx = mw - x,
 								dy = mh - y;
 								
-							int dist = (int)sqrt((dx*dx) + (dy*dy));
+							int dist = (int)sqrtf((dx*dx) + (dy*dy));
 							
 							if (dist>rl) dist=rl;
 							
