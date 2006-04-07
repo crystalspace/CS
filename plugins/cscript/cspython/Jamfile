@@ -85,6 +85,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   # pythmod -- Pure Python module
   #--------
   local desc = "pure Python module" ;
+  local pythmod = _cspace ;
 
   if [ Property build : projgen ]
   {
@@ -101,7 +102,6 @@ if $(PYTHON.AVAILABLE) = "yes"
     Help pythmod : "Build the $(desc)" ;
     local pythmodsrc = [ DoSourceGrist pythmod.cpp ] ;
     local pythmodobj = [ CompileObjects $(pythmodsrc) ] ;
-    local pythmod = _cspace ;
     if $(PYTHON.MODULE_EXT)
     {
       pythmod = $(pythmod:S=$(PYTHON.MODULE_EXT)) ;

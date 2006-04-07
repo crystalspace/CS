@@ -10,6 +10,8 @@ chronological order.
 	- caedes fixed a bug in cs-config generation scripts that would
 	  prevent it from finding optional libraries if cs is installed and
 	  CRYSTAL variable is not set.
+	- caedes fixed a bug in cspython Jamfile that would make it not install
+	  the _cspace.so file.
 6-Apr-2006
 	- Daniel Fryer fixed the sndsyscoreaudio to work with the new
 	  sound renderer.  There are likely to still be issues.  Also modified
