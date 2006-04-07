@@ -12,6 +12,9 @@ chronological order.
 	  CRYSTAL variable is not set.
 	- caedes fixed a bug in cspython Jamfile that would make it not install
 	  the _cspace.so file.
+	- Fossi fixed some minor bugs in bruteblock and added material
+	  (alpha)map support and raw heightmap loader to paging former
+	- Fossi removed the polymesh from bruteblock that was used for old CD
 6-Apr-2006
 	- Daniel Fryer fixed the sndsyscoreaudio to work with the new
 	  sound renderer.  There are likely to still be issues.  Also modified
