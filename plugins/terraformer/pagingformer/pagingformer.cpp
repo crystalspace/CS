@@ -28,6 +28,11 @@
 
 #include "imap/loader.h"
 
+//@@@ raw heightmaps
+#include "csutil/csendian.h"
+#include "csutil/dirtyaccessarray.h"
+
+//@@@ debugging
 #include "cstool/debugimagewriter.h"
 #include "csgfx/memimage.h"
 
@@ -86,67 +91,173 @@ bool csPagingFormer::Initialize (iObjectRegistry* objectRegistry)
 }
 
 
+// @@@ raw heightmap file loaders. move to csImage and Loader ---------
+
+template<typename Endianness>
+struct GetterFloat
+{
+  static inline void Get (char*& buf, float&f)
+  {
+    f = csIEEEfloat::ToNative (Endianness::Convert 
+(csGetFromAddress::UInt32 (buf))); 
+    buf += sizeof(uint32);
+  }
+  static inline size_t ItemSize()
+  { return sizeof(uint32); }
+};
+
+template<typename Endianness>
+struct GetterUint16
+{
+  static inline void Get (char*& buf, float&f)
+  {
+    uint16 v = Endianness::Convert (csGetFromAddress::UInt16 (buf));
+    buf += sizeof (uint16);
+    f = float(v) / 65535.0f;
+  }
+  static inline size_t ItemSize()
+  { return sizeof(uint16); }
+};
+
+template<typename Endianness>
+struct GetterUint32
+{
+  static inline void Get (char*& buf, float&f)
+  {
+    uint32 v = Endianness::Convert (csGetFromAddress::UInt32 (buf));
+    buf += sizeof (uint32);
+    f = float(v) / 4294967295.0f;
+  }
+  static inline size_t ItemSize()
+  { return sizeof(uint32); }
+};
+
+  template<typename Tgetter>
+  csDirtyAccessArray<float> ReadData (char* buf, uint w, uint h)
+  {
+    const size_t num = w * h;
+    csDirtyAccessArray<float> fdata;
+    fdata.SetLength (num);
+    for (size_t i = 0; i < num; i++)
+    {
+      Tgetter::Get (buf, fdata[i]);
+    }
+    return fdata;
+  }
+
+// --------------------------------------------------------------------
+
+
   void csPagingFormer::LoadFormer (uint x, uint y)
   {
     csRef<iLoader> loader = csQueryRegistry<iLoader> (objectRegistry);
     csRef<iPluginManager> plugin_mgr = 
       csQueryRegistry<iPluginManager> (objectRegistry);
 
-
-    csRef<iTerraFormer> a = csLoadPlugin<iTerraFormer> (plugin_mgr, "crystalspace.terraformer.simple"); 
+    csRef<iTerraFormer> simpleFormer = 
+      csLoadPlugin<iTerraFormer> (plugin_mgr, "crystalspace.terraformer.simple"); 
 
     csRef<iSimpleFormerState> state = 
-      scfQueryInterface<iSimpleFormerState> (a);
+      scfQueryInterface<iSimpleFormerState> (simpleFormer);
         if (state)
         {
-          csString fn = csString(hmdir);
-          fn += "x";
-          fn += x;
-          fn += "y";
-          fn += y;
-          fn += ".png";
-          csRef<iImage> map = loader->LoadImage (fn, CS_IMGFMT_ANY);
-          if (map)
-          {
-            state->SetHeightmap(map);
-            if (width==0)
-            {
-              width = countx * map->GetWidth();
-              height = county * map->GetHeight();
-            }
-printf("loaded %s\n",fn.GetData());
+          csString ending = csString();
 
-            state->SetScale(csVector3(scale.x/countx, scale.y, scale.z/county));
-            state->SetOffset(offset + csVector3(
-              (2*x*(scale.x/countx)-scale.x)+scale.x/countx,
-              0,
-              (2*y*(scale.z/county)-scale.z)+scale.z/county
-            ));
-printf("%f %f\n",2*x*(scale.x/countx)-scale.x,2*y*(scale.z/county)-scale.z);
-          } else { exit(2000); } // @@@
+          ending += "x";
+          ending += x;
+          ending += "y";
+          ending += y;
+
+          if (heightmapformat == PAGINGHEIGHT_RAWFLOATLE)
+          {
+            csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectRegistry, iVFS);
+            csRef<iDataBuffer> buf = 
+              vfs->ReadFile(heightmapdir+ending+".raw", false);
+
+            csDirtyAccessArray<float> mapdata =
+              ReadData<GetterFloat<csLittleEndian> >
+                (buf->GetData(), 512, 512);
+            state->SetHeightmap(mapdata.GetArray(), 512, 512);
+
+            width = countx * 512;
+            height = county * 512;
+          }
+          else
+          {
+            csRef<iImage> map = 
+              loader->LoadImage (heightmapdir+ending+".png", 
+                                 CS_IMGFMT_ANY);
+            if (map)
+            {
+              state->SetHeightmap(map);
+              if (width==0)
+              {
+                width = countx * map->GetWidth();
+                height = county * map->GetHeight();
+              }
+
+            } else { exit(2000); } // @@@
+          } // heightmap format
+
+          state->SetScale(csVector3(scale.x/countx, scale.y, 
+scale.z/county));
+          state->SetOffset(offset + csVector3(
+            (2*x*(scale.x/countx)-scale.x)+scale.x/countx,
+            0,
+            (2*y*(scale.z/county)-scale.z)+scale.z/county
+          ));
+
+          csHash<csString, csStringID>::GlobalIterator it = 
+            intmapdir.GetIterator();
+          while (it.HasNext())
+          {
+            csStringID thistype;
+            const char* path = it.Next(thistype);
+            csRef<iImage> map = 
+              loader->LoadImage (path+ending+".png", 
+                                 CS_IMGFMT_ANY);
+
+            state->SetIntegerMap(thistype, map, 1, 0);
+          }
+
+          it = floatmapdir.GetIterator();
+          while (it.HasNext())
+          {
+            csStringID thistype;
+            const char* path = it.Next(thistype);
+            csRef<iImage> map = 
+              loader->LoadImage (path+ending+".png", 
+                                 CS_IMGFMT_ANY);
+            state->SetFloatMap(thistype, map, 1, 0);
+          }
+
         } else { exit(1000); }
 
-        former[x * county + y] = a;
+        former[x * county + y] = simpleFormer;
   }
 
 
-  void csPagingFormer::SetHeightmapDir (const char* path)
+  void csPagingFormer::SetHeightmapDir (const char* path, const char *type)
   {
-    hmdir = csStrNew(path);
+    if (strcmp(type, "floatle") == 0) 
+      heightmapformat = PAGINGHEIGHT_RAWFLOATLE;
+    else heightmapformat = PAGINGHEIGHT_IMAGE;
+
+    heightmapdir = csStrNew(path);
 
     csRef<iVFS> VFS = csQueryRegistry<iVFS> (objectRegistry);
-    csRef<iStringArray> heightmapnames = VFS->FindFiles(hmdir);
+    csRef<iStringArray> heightmapnames = VFS->FindFiles(heightmapdir);
     
     heightmapnames->Sort();
     csString lastname = csString(heightmapnames->Get(heightmapnames->GetSize()-1));
     size_t ypos = lastname.FindLast('y');
     lastname = lastname.Slice(ypos+1,(lastname.FindLast('.')-ypos)-1);
   
-    int numy;
+    uint numy;
     sscanf(lastname.GetData(),"%d",&numy);
     numy++;
 
-    int numx = heightmapnames->GetSize() / numy;
+    uint numx = heightmapnames->GetSize() / numy;
     countx = numx;
     county = numy;
 
@@ -156,6 +267,55 @@ printf("%f %f\n",2*x*(scale.x/countx)-scale.x,2*y*(scale.z/county)-scale.z);
     memset (former, 0, numx*numy);
 
     LoadFormer(0,0); // @@@ needed for width/height, set in mapfile?
+    former[0] = 0;
+  }
+
+
+  void csPagingFormer::SetIntmapDir (csStringID type, const char* path)
+  {
+    csRef<iVFS> VFS = csQueryRegistry<iVFS> (objectRegistry);
+    csRef<iStringArray> heightmapnames = VFS->FindFiles(heightmapdir);
+    
+    heightmapnames->Sort();
+    csString lastname = csString(heightmapnames->Get(heightmapnames->GetSize()-1));
+    size_t ypos = lastname.FindLast('y');
+    lastname = lastname.Slice(ypos+1,(lastname.FindLast('.')-ypos)-1);
+  
+    uint numy;
+    sscanf(lastname.GetData(),"%d",&numy);
+    numy++;
+
+    uint numx = heightmapnames->GetSize() / numy;
+
+    if (numx == countx && numy == county)
+    {
+      intmapdir.Put(type, path);
+    }
+    else printf("heightmap and intmap numbers differ\n"); //@@@
+  }
+
+
+  void csPagingFormer::SetFloatmapDir (csStringID type, const char* path)
+  {
+    csRef<iVFS> VFS = csQueryRegistry<iVFS> (objectRegistry);
+    csRef<iStringArray> heightmapnames = VFS->FindFiles(heightmapdir);
+    
+    heightmapnames->Sort();
+    csString lastname = csString(heightmapnames->Get(heightmapnames->GetSize()-1));
+    size_t ypos = lastname.FindLast('y');
+    lastname = lastname.Slice(ypos+1,(lastname.FindLast('.')-ypos)-1);
+  
+    uint numy;
+    sscanf(lastname.GetData(),"%d",&numy);
+    numy++;
+
+    uint numx = heightmapnames->GetSize() / numy;
+
+    if (numx == countx && numy == county)
+    {
+      floatmapdir.Put(type, path);
+    }
+    else printf("heightmap and floatmap numbers differ\n"); //@@@
   }
 
 
@@ -174,7 +334,9 @@ printf("SetScale\n");
           scfQueryInterface<iSimpleFormerState> (former[i]);
         if (state)
         {
-          csVector3 applied = csVector3(newscale.x/countx, newscale.y, newscale.z/county);
+          csVector3 applied = csVector3(newscale.x/countx, 
+newscale.y, 
+newscale.z/county);
           state->SetScale(applied);
           state->SetOffset(offset + csVector3(
             (2*(i%countx)*(scale.x/countx)-scale.x)+scale.x/countx,
@@ -262,12 +424,22 @@ printf("Min: %f:%f Max: %f:%f\n", x1,z1,x2,z2);
     int sizex = (int)(width/countx + 0.5f);
     int sizey = (int)(height/county + 0.5f);
 
-    int i,j;
+    uint i,j;
     // go through the formers we need
     // and calculate the intersecting regions.
-    for (i = (int)x1/(sizex); i < ceil(x2/sizex); i++)
+    uint maxformerx = ((int)x2 % sizex == 0)
+                    ? (uint)ceilf((x2+1)/sizex)
+                    : (uint)ceilf(x2/sizex);
+    uint maxformerz = ((int)z2 % sizey == 0)
+                    ? (uint)ceilf((z2+1)/sizey)
+                    : (uint)ceilf(z2/sizey);
+    if (maxformerx > countx) maxformerx = countx;
+    if (maxformerz > county) maxformerz = county;
+
+printf("max x:%i y:%i\n",maxformerx,maxformerz);
+    for (i = (uint)x1/(sizex); i < maxformerx; i++)
     {
-      for (j = (int)z1/(sizey); j < ceil(z2/sizey); j++)
+      for (j = (uint)z1/(sizey); j < maxformerz; j++)
       {
 printf("-------------------------\n");
         if (former[i * countx + j] == 0)
@@ -285,7 +457,7 @@ printf("Min: %f:%f Max: %f:%f\n", translated.MinX(),translated.MinY(),translated
 printf("Min: %f:%f Max: %f:%f\n", formerregion.MinX(),formerregion.MinY(),formerregion.MaxX(),formerregion.MaxY());
 
       // optimization for simplest cases
-        if (formerregion.Contains(translated))
+        if (false) //formerregion.Contains(translated))
         {
 printf("*contained\n");
 
@@ -322,8 +494,11 @@ printf("Min: %f:%f Max: %f:%f\n", samplerregion.MinX(),samplerregion.MinY(),samp
 
         // in case the requested resolution isn't a multiple of our formercount
         // we need to sample a little too much data from each and overlap later
-        uint samplerresolutionx = (uint)(ceil(samplerresx)+0.5);
-        uint samplerresolutiony = (uint)(ceil(samplerresz)+0.5);
+        uint samplerresolutionx = (uint)(ceilf(samplerresx)+0.5);
+        uint samplerresolutiony = (uint)(ceilf(samplerresz)+0.5);
+
+if (samplerresolutionx == 0) samplerresolutionx = 1;
+if (samplerresolutiony == 0) samplerresolutiony = 1;
 
 printf("%f %f\n", formerdistx, formerdistz);
 printf("%f %f\n", transdistx, transdistz);
@@ -343,10 +518,10 @@ printf("res: %i->%i\n",resz,samplerresolutiony);
 printf("Min: %f:%f Max: %f:%f\n", samplerregionminx,samplerregionminy,samplerregionmaxx,samplerregionmaxy);
 
   csBox2 asdf = csBox2(
-            ceil(samplerregionminx),
-            ceil(samplerregionminy),
-            ceil(samplerregionmaxx),
-            ceil(samplerregionmaxy)
+            samplerregionminx,
+            samplerregionminy,
+            samplerregionmaxx,
+            samplerregionmaxy
           );
 
 printf("x: %f:%i y: %f:%i\n", scale.x, countx, scale.z,county);
@@ -359,7 +534,6 @@ sampler.Push (csRef<iTerraSampler>
       tests = sampler.Get(sampler.GetSize()-1)->SampleVector3(stringVertices);
       csBox2 testregion = asdf;
 
-//if (smaller) {
   csImageMemory pic = csImageMemory(samplerresolutionx, samplerresolutiony);
   csRGBpixel* dat = (csRGBpixel*)pic.GetImagePtr();
   for (int asdf=0; asdf < samplerresolutionx*samplerresolutiony; asdf++) 
@@ -384,13 +558,16 @@ sampler.Push (csRef<iTerraSampler>
   a.DebugImageWrite(&pic,fn);
 printf(fn);
 printf("\n\n");
-//}
+
       }
     }
 
     // devide length of requested region by formersize
     // to get number of formers in x direction
-    uint formercountx = ceilf(z2/sizey)-floorf(z1/sizey);
+    uint formercountx = maxformerx-floorf(z1/sizey);
+printf("?formercountx %i: %i-%f\n", 
+formercountx,maxformerx,floorf(z1/sizey));
+    if (formercountx == 0) formercountx = 1;
     return new csPagingSampler(this, sampler, formercountx, 
       region, resx, resz);
 
@@ -401,18 +578,19 @@ printf("\n\n");
    * Sample float data.
    * Allowed types:
    * heights
+   * Will not return any actual value, just if the map is present.
    */
   bool csPagingFormer::SampleFloat (csStringID type, float x, 
     float z, float &value)
   {
     printf("SampleFloat Former\n");
-    return false;
+    return floatmapdir.Contains(type);
   }
 
 
   /**
    * Sample csVector2 data.
-   * No allowed types (will return false)
+   * Will return false.
    */
   bool csPagingFormer::SampleVector2 (csStringID type, float x, float z,
     csVector2 &value)
@@ -437,13 +615,13 @@ printf("\n\n");
 
   /**
    * Sample integer data.
-   * No allowed types (will return false)
+   * Will not return any actual value, just if the map is present.
    */
   bool csPagingFormer::SampleInteger (csStringID type, float x, float z,
     int &value)
   {
     printf("SampleInt Former\n");
-    return false;
+    return intmapdir.Contains(type);
   }
 
 
@@ -503,6 +681,12 @@ void csPagingSampler::CachePositions ()
   for (k = 0; k < num; k++)
   {
       csBox2 partialregion = sampler.Get(k)->GetRegion();
+      partialregion = csBox2(
+        partialregion.MinX(),
+        partialregion.MinY(),
+        partialregion.MaxX(),
+        partialregion.MaxY()
+      );
       uint partialresolutionx, partialresolutionz;
       sampler.Get(k)->GetResolution(partialresolutionx,partialresolutionz);
 
@@ -524,54 +708,6 @@ printf("Min: %f:%f Max: %f:%f\n", intersect.MinX(),intersect.MinY(),intersect.Ma
 
         float intersectminx = intersect.MinX();
         float intersectminy = intersect.MinY();
-//          intersectminx = ((intersectminx-terraFormer->offset.x)/terraFormer->scale.x +1)
-//            *(terraFormer->width/2);
-//          intersectminy = ((intersectminy-terraFormer->offset.z)/terraFormer->scale.z +1)
-//            *(terraFormer->height/2);
-
-/*
-        if (!region.Contains(partialregion))
-        {
-printf("!smaller\n");
-          // the region is smaller so it's only part of this sampler's data
-
-          // translate the request's max coordinates because we need them later on
-
-//@@@ local translations!
-
-          float partialregionmaxx = partialregion.MaxX();
-          float partialregionmaxy = partialregion.MaxY();
-          float partialregionminx = partialregion.MinX();
-          float partialregionminy = partialregion.MinY();
-            partialregionmaxx = ((partialregionmaxx-terraFormer->offset.x)/terraFormer->scale.x +1)
-              *(terraFormer->width/2);
-            partialregionmaxy = ((partialregionmaxy-terraFormer->offset.z)/terraFormer->scale.z +1)
-              *(terraFormer->height/2);
-            partialregionminx = ((partialregionminx-terraFormer->offset.x)/terraFormer->scale.x +1)
-              *(terraFormer->width/2);
-            partialregionminy = ((partialregionminy-terraFormer->offset.z)/terraFormer->scale.z +1)
-              *(terraFormer->height/2);
-
-printf("res: %i part: %i\n", resolution, partialresolution);
-printf("%f %f\n",intersectminx,partialregionminx);
-printf("%f %f\n",intersectminy,partialregionminy);
-
-          // copy from the intersection's relative coordinates
-          fromx = (uint)ceil(((intersectminx-partialregionminx)/(partialregionmaxx-partialregionminx)) *partialresolution);
-          fromy = (uint)ceil(((intersectminy-partialregionminy)/(partialregionmaxy-partialregionminy)) *partialresolution);
-
-          tox = (k/xcount) * partialresolution;
-          toy = (k%xcount) * partialresolution;
-
-          // we just need to copy a part of this sampler's data
-          copynum = partialresolution;
-          fromstep = partialresolution;
-          tostep = resolution;
-
-        } else {
-
-printf("!bigger\n");
-*/
 
           // this whole sampler is completely in the region, so
           // we need to copy this sampler's whole data
@@ -583,8 +719,10 @@ printf("!bigger\n");
           tostep = resx;
 //@@@
           // to this former's relative position to the whole request
-          tox = (uint)ceil(((intersectminx-region.MinX())/(region.MaxX()-region.MinX())) *resx);
-          toy = (uint)ceil(((intersectminy-region.MinY())/(region.MaxY()-region.MinY())) *resz); 
+          tox = (uint)ceilf(((intersectminx-region.MinX())/(region.MaxX()-region.MinX()))) *resx ; 
+          toy = (uint)ceilf(((intersectminy-region.MinY())/(region.MaxY()-region.MinY())))*resz; 
+          if (tox > resx) tox = resx;
+          if (toy > resz) toy = resz;
 
 printf("fx: %i\n",fromx);
 printf("fy: %i\n",fromy);
@@ -596,9 +734,9 @@ printf("fs: %i\n",fromstep);
 printf("ts: %i\n",tostep);
 printf("%i, %i\n", k, xcount);
 printf("%i, %i\n", k%xcount, k/xcount);
-      uint ycount = sampler.GetSize() / xcount;
-printf("%i, %i\n", k%(sampler.GetSize()/xcount), 
-k/(sampler.GetSize()/xcount));
+uint ycount = (uint)(num/xcount+0.5);
+if (ycount > xcount) xcount = ycount;
+printf("%i, %i\n", k%ycount, k/ycount);
 
       // loop over the part we need to copy
       uint l;
@@ -614,9 +752,25 @@ k/(sampler.GetSize()/xcount));
 
 printf("%i: %i -> %i\n", l, frompos, topos);
 
+for (uint h = 0; h < copyx; h++)
+{
+/*
+  assert (maps[k][frompos+h].x >= region.MinX());
+  assert (maps[k][frompos+h].x <= region.MaxX());
+  assert (maps[k][frompos+h].z >= region.MinY());
+  assert (maps[k][frompos+h].z <= region.MaxY());
+*/
+
+  positions[topos+h].x = maps[k][frompos+h].x;
+  positions[topos+h].y = maps[k][frompos+h].y;
+  positions[topos+h].z = maps[k][frompos+h].z;
+}
+
+/*
         memcpy(positions + topos,
           maps[k] + frompos,
           copyx*sizeof(csVector3));
+*/
       }
     }
 }
@@ -658,12 +812,14 @@ void csPagingSampler::CacheNormals ()
         positions[posIdx]:positions[posIdx+resx];
       v2 -= i==0?
         positions[posIdx]:positions[posIdx-resx];
+
 /*
 printf("%i %i %i\n",j,i,posIdx);
 printf("%i %i\n",resx,resz);
 printf("%f %f %f\n",v1.x,v1.y,v1.z);
 printf("%f %f %f\n",v2.x,v2.y,v2.z);
 */
+
       // Cross them and normalize to get a normal
       normals[normIdx++] = (v2%v1).Unit ();
       posIdx++;
@@ -821,6 +977,86 @@ printf("SampleMaterial Sampler\n");
   {
     // This isn't implemented yet. We just return 0
     return 0;
+  }
+  else if (terraFormer->intmapdir.Contains(type))
+  {
+printf("rocking...\n");
+
+  // get memory for our cache
+  int *map = new int[resx*resz];
+
+  // buffer for all the samplers maps
+  uint num = sampler.GetSize();
+  const int **maps = new const int*[num];
+
+  // first get the raw data from all the samplers
+  // @@@ excluded from loop below for easier profiling
+  uint k;
+  for (k = 0; k < num; k++)
+  {
+      maps[k] = 
+        sampler.Get(k)->SampleInteger(type);
+      assert(maps[k] != 0);
+  }
+
+  // then loop about all samplers again to copy needed data
+  for (k = 0; k < num; k++)
+  {
+      csBox2 partialregion = sampler.Get(k)->GetRegion();
+      uint partialresolutionx, partialresolutionz;
+      
+      sampler.Get(k)->GetResolution(partialresolutionx,partialresolutionz);
+
+      uint fromx, fromy;  // array coordinates we copy from
+      uint tox, toy;      // array coordinates we copy to
+      uint copyx;       // number of elements we need to copy per step
+      uint copyy;       // number of elements we need to copy per step
+      uint fromstep;      // number of elements we need to skip per step
+      uint tostep;        // number of elements we need to skip per step
+
+
+        // calculate which part of the whole we deal with
+        // and translate into heightmap coordinates
+        csBox2 intersect = partialregion * region;
+
+        float intersectminx = intersect.MinX();
+        float intersectminy = intersect.MinY();
+
+          // this whole sampler is completely in the region, so
+          // we need to copy this sampler's whole data
+          fromx = 0;
+          fromy = 0;
+          copyx = partialresolutionx;
+          copyy = partialresolutionz;
+          fromstep = partialresolutionx;
+          tostep = resx;
+//@@@
+          // to this former's relative position to the whole request
+          tox = 
+(uint)ceil(((intersectminx-region.MinX())/(region.MaxX()-region.MinX())) 
+*resx);
+          toy = 
+(uint)ceil(((intersectminy-region.MinY())/(region.MaxY()-region.MinY())) 
+*resz); 
+
+      // loop over the part we need to copy
+      uint l;
+      for (l = 0; l < copyy ; l++ )
+      {
+        //in case of several formers the copied data needs to overlap
+        //since we sample a little too much data for each
+        //when the requested region's size is not a multiple of their count
+        //we do this by overwriting the neighboring former's last line
+
+        uint topos = (toy+l-(k%xcount))*tostep+tox-(k/xcount);
+        uint frompos = (fromy+l)*fromstep+fromx;
+
+        memcpy(map + topos,
+          maps[k] + frompos,
+          copyx*sizeof(int));
+      }
+    }
+    return map;
   }
   else
   {

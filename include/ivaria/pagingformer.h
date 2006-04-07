@@ -32,7 +32,7 @@ struct iImage;
 class csVector3;
 class csSimpleFormer;
 
-SCF_VERSION (iPagingFormerState, 0, 0, 1);
+SCF_VERSION (iPagingFormerState, 0, 0, 3);
 
 /**
  * iPagingFormerState exposes implementation specific methods
@@ -42,8 +42,20 @@ struct iPagingFormerState : public virtual iBase
 {
   /**
    * Set a dir that contains only the heightmaps named x0y0 and so on.
+   * The optional second parameter can indicate raw heightmaps.
    */
-  virtual void SetHeightmapDir (const char *path) = 0;
+  virtual void SetHeightmapDir (const char *path, 
+                                const char *type = "image") = 0;
+
+  /**
+   * Set a dir that contains only intmaps named x0y0 and so on.
+   */
+  virtual void SetIntmapDir (csStringID type, const char *path) = 0;
+
+  /**
+   * Set a dir that contains only floatmaps named x0y0 and so on.
+   */
+  virtual void SetFloatmapDir (csStringID type, const char *path) = 0;
 
   /**
    * Set a scaling factor to be applied to the heightmap region (X, Z)

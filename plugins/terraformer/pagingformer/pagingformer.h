@@ -36,6 +36,12 @@ struct iObjectRegistry;
 CS_PLUGIN_NAMESPACE_BEGIN(PagingFormer)
 {
 
+enum HeightmapFormat
+{
+  PAGINGHEIGHT_IMAGE = 1,
+  PAGINGHEIGHT_RAWFLOATLE
+};
+
 class csPagingSampler;
 class csSimpleFormer;
 
@@ -58,7 +64,14 @@ private:
   csRef<iTerraFormer>* former;
 
   /// Path to directory containing the heightmaps
-  char* hmdir;
+  char* heightmapdir;
+  HeightmapFormat heightmapformat;  
+
+  /// Array of paths to directories containing the intmaps
+  csHash<csString, csStringID> intmapdir;
+
+  /// Array of paths to directories containing the floatmaps
+  csHash<csString, csStringID> floatmapdir;
 
   /// Complete width of the heightmap data array
   unsigned int width;
@@ -107,7 +120,8 @@ public:
   // --------- iPagingFormerState implementation ---------
 
   /// Set the directory containing the heightmaps
-  void csPagingFormer::SetHeightmapDir (const char* path);
+  void SetHeightmapDir (const char *path,
+                        const char *type = "image");
 
   /// Set a scaling factor to be used in lookups
   void SetScale (csVector3 scale);
@@ -119,6 +133,12 @@ public:
   bool SetIntegerMap (csStringID type, iImage* map, int scale, int offset);
   /// Set additional float map.
   bool SetFloatMap (csStringID type, iImage* map, float scale, float offset);
+
+  /// Set the directory containing the heightmaps
+  void SetIntmapDir (const csStringID type, const char* path);
+
+  /// Set the directory containing the heightmaps
+  void SetFloatmapDir (const csStringID type, const char* path);
 
   // ------------ iTerraFormer implementation ------------
 

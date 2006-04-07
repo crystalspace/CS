@@ -881,9 +881,9 @@ const int *csSimpleSampler::SampleInteger (csStringID type)
         }
   int* tests = map;
 
-  csImageMemory pic = csImageMemory(512,512);
+  csImageMemory pic = csImageMemory(resx,resz);
   csRGBpixel* dat = (csRGBpixel*)pic.GetImagePtr();
-  for (uint asdf=0; asdf < 512*512; asdf++)
+  for (uint asdf=0; asdf < resx*resz; asdf++)
   {
     dat[asdf].red = tests[asdf]*50;
     dat[asdf].green = tests[asdf]*50;

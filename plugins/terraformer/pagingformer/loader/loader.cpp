@@ -109,8 +109,27 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
       }
       case XMLTOKEN_HEIGHTMAPDIR:
       {
+        const char* typestring = child->GetAttributeValue ("type");
         const char *dir = child->GetContentsValue ();
-        state->SetHeightmapDir (dir);
+        state->SetHeightmapDir (dir, typestring);
+        break;
+      }
+      case XMLTOKEN_INTMAPDIR:
+      {
+        const char* typestring = child->GetAttributeValue ("type");
+        const char *dir = child->GetContentsValue ();
+        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+          objreg, "crystalspace.shared.stringset", iStringSet);
+        state->SetIntmapDir (strings->Request(typestring),dir);
+        break;
+      }
+      case XMLTOKEN_FLOATMAPDIR:
+      {
+        const char* typestring = child->GetAttributeValue ("type");
+        const char *dir = child->GetContentsValue ();
+        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+          objreg, "crystalspace.shared.stringset", iStringSet);
+        state->SetFloatmapDir (strings->Request(typestring),dir);
         break;
       }
       case XMLTOKEN_SCALE:
@@ -135,6 +154,46 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
           return 0;
         }
         state->SetOffset (v);
+        break;
+      }
+      case XMLTOKEN_INTMAP:
+      {
+        const char *image = child->GetContentsValue ();
+        csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+        csRef<iImage> map = loader->LoadImage (image);
+        if (map == 0)
+        {
+          synldr->ReportError ("crystalspace.terraformer.simple.loader",
+            child, "Error reading in image file for intmap '%s'", image);
+          return 0;
+        }
+        int scale = child->GetAttributeValueAsInt ("scale");
+        int offset = child->GetAttributeValueAsInt ("offset");
+        const char* typestring = child->GetAttributeValue ("type");
+        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+          objreg, "crystalspace.shared.stringset", iStringSet);
+        csStringID type = strings->Request (typestring);
+        state->SetIntegerMap (type, map, scale, offset);
+        break;
+      }
+      case XMLTOKEN_FLOATMAP:
+      {
+        const char *image = child->GetContentsValue ();
+        csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+        csRef<iImage> map = loader->LoadImage (image);
+        if (map == 0)
+        {
+          synldr->ReportError ("crystalspace.terraformer.simple.loader",
+            child, "Error reading in image file for floatmap '%s'", image);
+          return 0;
+        }
+        float scale = child->GetAttributeValueAsFloat ("scale");
+        float offset = child->GetAttributeValueAsFloat ("offset");
+        const char* typestring = child->GetAttributeValue ("type");
+        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+          objreg, "crystalspace.shared.stringset", iStringSet);
+        csStringID type = strings->Request (typestring);
+        state->SetFloatMap (type, map, scale, offset);
         break;
       }
       default:

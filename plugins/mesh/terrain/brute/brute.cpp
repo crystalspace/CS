@@ -58,7 +58,7 @@
 
 #include "brute.h"
 
-/*#include "cstool/debugimagewriter.h"*/
+/* #include "cstool/debugimagewriter.h" */
 
 
 CS_LEAKGUARD_IMPLEMENT (csTerrBlock);
@@ -243,8 +243,12 @@ else
 
   if (size <= cullsize * 1.5 + 0.5) //only for the smallest culled
   {
-    res = (int)(size / (terr->block_maxsize /
-                  terr->block_minsize)) * terr->GetBlockResolution();
+//printf("culled %f\n",size);
+
+      res = 512;
+//@@@
+//    res = (int)(size / (terr->block_maxsize /
+//                  terr->block_minsize)) * terr->GetBlockResolution();
   
     csRef<iTerraSampler> mapsampler = terr->terraformer->GetSampler (
       csBox2 (center.x - size / 2.0, center.z - size / 2.0, 
@@ -264,6 +268,7 @@ else
         alphamaps.Push(csArray<char>());
         const int* alphadata =  
           mapsampler->SampleInteger(strings->Request(alphaname));
+        assert(alphadata != 0);
         for (int j = 0; j < res*res; j++)
         {
           alphamaps[i].Push(alphadata[j]);
@@ -277,6 +282,7 @@ else
 
       const int* materialdata =  
           mapsampler->SampleInteger(strings->Request("materialmap"));
+      assert(materialdata != 0);
       for (int j = 0; j < res*res; j++)
       {
         materialmap.Push(materialdata[j]);
@@ -1374,10 +1380,8 @@ void csTerrainObject::SetupObject ()
       "crystalspace.shared.stringset", iStringSet);
 
     int a;
-    
-    materialAlphaMaps = 
-      !terraformer->SampleInteger(strings->Request("materialmap"), 
-        0,0,a);
+    materialAlphaMaps = !terraformer->SampleInteger(
+      strings->Request("materialmap"),0,0,a);
 
     rootblock.AttachNew (new csTerrBlock (this));
     rootblock->material = matwrap;
@@ -1934,7 +1938,8 @@ bool csTerrainObject::SetCurrentMaterialAlphaMaps (
       }
     globalMaterialsUsed.Push (matused);
 
-/*@@@
+//@@@
+
   csDebugImageWriter a = csDebugImageWriter();
   csString fn = csString();
   fn += "alpha";
@@ -1943,7 +1948,7 @@ bool csTerrainObject::SetCurrentMaterialAlphaMaps (
   fn += ".png";
   a.DebugImageWrite(alpha,fn);
 printf("%s\n",fn.GetData());
-*/
+
 
     csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
       CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
@@ -2124,7 +2129,8 @@ bool csTerrainObject::SetCurrentMaterialMap (const csArray<char>& data,
 	idx++;
       }
 
-/*@@@
+//@@@
+
   csDebugImageWriter a = csDebugImageWriter();
   csString fn = csString();
   fn += "material";
@@ -2133,7 +2139,7 @@ bool csTerrainObject::SetCurrentMaterialMap (const csArray<char>& data,
   fn += ".png";
   a.DebugImageWrite(alpha,fn);
 printf("%s\n",fn.GetData());
-*/
+
 
     csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
       CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
@@ -2591,7 +2597,6 @@ bool csTerrainObject::HitBeam (csTerrBlock* block,
 	const csSegment3& seg,
 	csVector3& isect, float* pr)
 {
-printf("hit!beam!\n");
   if (csIntersect3::BoxSegment (block->bbox, seg, isect) == -1)
   {
     return false;
