@@ -20,8 +20,8 @@ else
 	    lflags="-L$libdir"
 	    break
 	elif test -z "$libdir" && test -r "${p}/lib/libcrystalspace.a"; then
-	    libdir="${exec_prefix}/lib"
-	    lflags="-L${exec_prefix}/lib"
+	    libdir="${p}/lib"
+	    lflags="-L$libdir"
 	    break
 	fi
     done
