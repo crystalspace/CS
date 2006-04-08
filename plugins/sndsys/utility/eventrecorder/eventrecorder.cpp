@@ -159,6 +159,9 @@ bool csSndSysBasicEventRecorder::Open()
 
 bool csSndSysBasicEventRecorder::Close()
 {
+  // Lock out the queue so no more entries may be added
+  m_EventQueue.SetClosed(true);
+
   // Close the logfile
   m_pLogFile = 0;
   m_Active = false;
@@ -177,7 +180,7 @@ int csSndSysBasicEventRecorder::ProcessEventQueue()
   {
     if (m_Active && m_pLogFile)
     {
-      LogString.Format("[%012llu] [%s] [%s] %s\n", pEntry->Time, GetEventLevelString(pEntry->Level),
+      LogString.Format("[%012" PRIu64 "] [%s] [%s] %s\n", pEntry->Time, GetEventLevelString(pEntry->Level),
                        GetEventCategoryString(pEntry->Category), pEntry->Message.GetData());
       m_pLogFile->Write(LogString.GetData(), LogString.Length());
     }
