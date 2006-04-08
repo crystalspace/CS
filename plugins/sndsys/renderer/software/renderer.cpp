@@ -60,7 +60,7 @@ SCF_IMPLEMENT_FACTORY (csSndSysRendererSoftware)
 csSndSysRendererSoftware::csSndSysRendererSoftware(iBase* pParent) :
   scfImplementationType(this, pParent),
   m_pObjectRegistry(0), m_pSampleBuffer(0), m_SampleBufferFrames(0),
-  m_LastIntensityMultiplier(0), m_LastGarbageCollectionTicks(0)
+  m_LastGarbageCollectionTicks(0), m_LastIntensityMultiplier(0)
 {
   m_pObjectRegistry = 0;
   m_GlobalVolume=0.5;
@@ -587,7 +587,7 @@ void csSndSysRendererSoftware::GarbageCollection()
   iSndSysStream *streamptr;
 
   // Make a pass through the clear queue of streams and cleanup 
-  while (streamptr=m_StreamClearQueue.DequeueEntry(false))
+  while ((streamptr=m_StreamClearQueue.DequeueEntry(false)) != 0)
   {
     // Notify any callbacks of the removal
     StreamRemoved(streamptr);
@@ -599,7 +599,7 @@ void csSndSysRendererSoftware::GarbageCollection()
   }
 
   // Make a pass through the clear queue of sources and cleanup 
-  while (sourceptr=m_SourceClearQueue.DequeueEntry(false))
+  while ((sourceptr=m_SourceClearQueue.DequeueEntry(false)) != 0)
   {
     // Notify any callbacks of the removal
     SourceRemoved(sourceptr);
@@ -635,7 +635,7 @@ void csSndSysRendererSoftware::RemoveAllSources()
     m_DispatchSources.DeleteIndex(0);
 
   // Process the addition queue
-  while (sourceptr=m_SourceAddQueue.DequeueEntry(false))
+  while ((sourceptr=m_SourceAddQueue.DequeueEntry(false)) != 0)
   {
     // Notify any callbacks of the removal
     // Although these sources never entered the renderer's background list, notification of
@@ -673,7 +673,7 @@ void csSndSysRendererSoftware::RemoveAllStreams()
     m_DispatchStreams.DeleteIndex(0);
 
   // Process the addition queue
-  while (streamptr=m_StreamAddQueue.DequeueEntry(false))
+  while ((streamptr=m_StreamAddQueue.DequeueEntry(false)) != 0)
   {
     // Notify any callbacks of the removal
     // Although these streams never entered the renderer's background list, notification of
