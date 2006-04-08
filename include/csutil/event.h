@@ -139,7 +139,7 @@ public:
     return csKeyEventHelper::GetModifiersBits(modifiers); 
   }
   /// Retrieve event data
-  CS_PURE_METHOD static bool GetEventData (const iEvent* event, 
+  static bool GetEventData (const iEvent* event, 
     csMouseEventData& data);
 };
 

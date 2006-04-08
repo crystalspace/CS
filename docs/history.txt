@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
   
+8-Apr-2006
+	- Rhad removed erroneous CS_PURE_METHOD specifier on 
+	  csMouseEventHelper::GetEventData.
 7-Apr-2006
 	- caedes fixed a bug in cs-config generation scripts that would
 	  prevent it from finding optional libraries if cs is installed and
