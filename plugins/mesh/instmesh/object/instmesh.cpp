@@ -283,7 +283,23 @@ void csInstmeshMeshObject::RemoveAllInstances ()
   instances.Empty ();
   initialized = false;
 }
+void csInstmeshMeshObject::UpdateInstanceGeometry (size_t instance_idx)
+{
+  if (initialized)
+  {
+    csVector3* fact_vertices = factory->fact_vertices.GetArray ();
+    size_t fact_vt_len = factory->fact_vertices.Length ();
+    size_t v0_id = instance_idx * fact_vt_len;
 
+    for (size_t i = 0; i <  fact_vt_len; i++)
+    {
+      mesh_vertices[v0_id + i] = 
+        instances[instance_idx].transform.This2Other (fact_vertices[i]);
+      mesh_normals[v0_id + i] = 
+        instances[instance_idx].transform.This2OtherRelative (fact_vertices[i]);;
+    }
+  }
+}
 void csInstmeshMeshObject::MoveInstance (size_t id,
     const csReversibleTransform& trans)
 {
@@ -293,8 +309,9 @@ void csInstmeshMeshObject::MoveInstance (size_t id,
     if (instances[i].id == id)
     {
       instances[i].transform = trans;
+      UpdateInstanceGeometry (i);
       // @@@ Do in a more optimal way! Don't set everything dirty!
-      initialized = false;
+      //initialized = false;
       return;
     }
 }

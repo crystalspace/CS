@@ -122,6 +122,7 @@ private:
   csArray<csInstance> instances;
   static size_t max_instance_id;
   void CalculateInstanceArrays ();
+  void UpdateInstanceGeometry (size_t id);
 
   iMovable* lighting_movable;
 
