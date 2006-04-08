@@ -1,5 +1,5 @@
 Crystal Space detailed change log.
-http://www.crystalspace3d.org/
+http://www.crystalspace3d.org/ 
 
 The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
@@ -34,6 +34,8 @@ chronological order.
 	  collidertype for heightmaps is added.
 	- Fossi added backup of paging former. Should work, but with 
           severe artifacts. No test level yet.
+	- Piotr Obrzut changed instmesh vertices transforms to look right.
+	- Piotr Obrzut optimized moving instances for instmesh.
 7-Apr-2006
 	- caedes fixed a bug in cs-config generation scripts that would
 	  prevent it from finding optional libraries if cs is installed and
