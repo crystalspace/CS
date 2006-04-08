@@ -97,36 +97,19 @@ cs_ov_callbacks *GetCallbacks()
 }
 
 SndSysOggSoundData::SndSysOggSoundData (iBase *pParent, iDataBuffer* pDataBuffer) :
-  scfImplementationType(this, pParent),
+  SndSysBasicData(pParent),
   // Create a new DataStore associated with the passed DataBuffer
-  m_DataStore(pDataBuffer), m_pDescription(0)
+  m_DataStore(pDataBuffer)
 {
   // Set some default format information
   m_SoundFormat.Bits = 16;
   m_SoundFormat.Channels = 2;
-
-  // There is currently no data ready
-  m_DataReady = false;
 }
 
 SndSysOggSoundData::~SndSysOggSoundData ()
 {
-  delete[] m_pDescription;
 }
 
-const csSndSysSoundFormat *SndSysOggSoundData::GetFormat()
-{
-  if (!m_DataReady)
-    Initialize();
-  return &m_SoundFormat;
-}
-
-size_t SndSysOggSoundData::GetFrameCount()
-{
-  if (!m_DataReady)
-    Initialize();
-  return m_FrameCount;
-}
 
 size_t SndSysOggSoundData::GetDataSize()
 {
@@ -140,18 +123,6 @@ iSndSysStream *SndSysOggSoundData::CreateStream (
   SndSysOggSoundStream *pStream=new SndSysOggSoundStream(this, &m_DataStore, pRenderFormat, Mode3D);
 
   return (pStream);
-}
-
-void SndSysOggSoundData::SetDescription(const char *pDescription)
-{
-  delete[] m_pDescription;
-  m_pDescription=0;
-
-  if (!pDescription)
-    return;
-
-  m_pDescription=new char[strlen(pDescription)+1];
-  strcpy(m_pDescription, pDescription);
 }
 
 
@@ -187,7 +158,7 @@ void SndSysOggSoundData::Initialize()
   ov_clear(&f);
 
   // No need to call this again
-  m_DataReady=true;
+  m_bInfoReady=true;
 }
 
 

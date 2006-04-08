@@ -25,11 +25,8 @@
  */
 
 #include "iutil/databuff.h"
+#include "csplugincommon/sndsys/snddata.h"
 
-#include "isndsys/ss_structs.h"
-#include "isndsys/ss_data.h"
-
-#include "csutil/scf_implementation.h"
 
 
 
@@ -80,8 +77,7 @@ struct cs_ov_callbacks
 
 
 /// The implementation of iSndSysData for Ogg Vorbis audio
-class SndSysOggSoundData : 
-  public scfImplementation1<SndSysOggSoundData, iSndSysData>
+class SndSysOggSoundData : public SndSysBasicData
 {
 public:
   /// Construction requires passing an iDataBuffer which references encoded ogg vorbis audio
@@ -97,6 +93,10 @@ protected:
   //    This is only called the first time that SoundFormat or SampleCount data is requested.
   void Initialize();
 
+public:
+  /// Call to determine if the provided data can be decoded as ogg vorbis audio
+  static bool IsOgg (iDataBuffer* Buffer);
+
 
   ////
   // Interface implementation
@@ -106,11 +106,6 @@ protected:
   // iSndSysData
   //------------------------
 public:
-  /// Get the format of the sound data.
-  virtual const csSndSysSoundFormat *GetFormat();
-
-  /// Get size of this sound in frames.
-  virtual size_t GetFrameCount();
 
   /**
    * Return the size of the data stored in bytes.  This is informational only
@@ -129,18 +124,6 @@ public:
   virtual iSndSysStream *CreateStream (csSndSysSoundFormat *pRenderFormat, 
     int Mode3D);
 
-  /// Call to determine if the provided data can be decoded as ogg vorbis audio
-  static bool IsOgg (iDataBuffer* Buffer);
-
-  /// Set an optional description to be associated with this sound data
-  //   A filename isn't a bad idea!
-  virtual void SetDescription(const char *pDescription);
-
-  /// Retrieve the description associated with this sound data
-  //   This may return 0 if no description is set.
-  virtual const char *GetDescription() { return m_pDescription; }
-
-
    ////
    //  Member variables
    ////
@@ -148,19 +131,6 @@ protected:
 
    /// An accessor structure for the underlying ogg vorbis sound data
   OggDataStore m_DataStore;
-
-  /// Flag indicating whether Initialize() has been called yet
-  bool m_DataReady;
-
-  /// The format that we're decoding the Ogg stream to. 
-  //    Currently this is the default format that the ogg vorbis library returns for a given Ogg audio file.
-  csSndSysSoundFormat m_SoundFormat;
-
-  /// The number of frames in the decoded output
-  long m_FrameCount;
-
-  /// An optional brief description of the sound data
-  char *m_pDescription;
 };
 
 #endif // #ifndef SNDSYS_DATA_OGG_H

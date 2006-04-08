@@ -20,8 +20,6 @@
 #include "cssysdef.h"
 #include "iutil/comp.h"
 #include "isndsys/ss_stream.h"
-#include "csplugincommon/sndsys/convert.h"
-#include "csplugincommon/sndsys/cyclicbuf.h"
 #include "oggdata2.h"
 #include "oggstream2.h"
 
@@ -41,21 +39,16 @@
 
 extern cs_ov_callbacks *GetCallbacks();
 
-const size_t positionInvalid = (size_t)~0;
-
-SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data, 
-					    OggDataStore *datastore, csSndSysSoundFormat *renderformat, 
-              int mode3d) :
-  scfImplementationType(this)
+SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> pData, 
+					    OggDataStore *pDataStore, csSndSysSoundFormat *pRenderFormat, 
+              int Mode3D) :
+  SndSysBasicStream(pRenderFormat, Mode3D)
 {
-  // Copy render format information
-  memcpy(&m_RenderFormat,renderformat,sizeof(csSndSysSoundFormat));
-
   // Initialize the stream data
-  m_StreamData.datastore=datastore;
+  m_StreamData.datastore=pDataStore;
   m_StreamData.position=0;
 
-  m_SoundData=data;
+  m_pSoundData=pData;
 
   // Allocate an advance buffer
   m_pCyclicBuffer = new CS::Sound::SoundCyclicBuffer (
@@ -69,67 +62,18 @@ SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> data,
   ov_open_callbacks (&m_StreamData,&m_VorbisFile,0,0,
     *(ov_callbacks*)GetCallbacks());
 
-  // Start the most advanced read pointer at offset 0
-  m_MostAdvancedReadPointer=0;
-
-  // Set stream to m_bPaused, at the beginning, and not m_bLooping
-  m_bPaused=true;
-  m_bLooping=false;
-
-  // A prepared data buffer will be allocated when we know the size needed
-  m_pPreparedDataBuffer=0;
-  m_PreparedDataBufferSize=0;
-  m_PreparedDataBufferStart=0;
-
-  // Set the render sample size
-  m_RenderFrameSize=(renderformat->Bits/8) * renderformat->Channels;
-
-  // No extra data left in the decode buffer since last call
-  m_PreparedDataBufferUsage=0;
-
-  // Playback rate is initially 100% (normal)
-  m_PlaybackPercent=100;
-
-  /* Forces the output buffer to be resized and the converter to be created on 
-   * the first pass */
-  m_OutputFrequency=0;
-
-  // Output frequency is initially the same as the render frequency
-  m_NewOutputFrequency=renderformat->Freq;
-
   // Set to not a valid stream
   m_CurrentOggStream=-1;
-
-  // Let the pcm converter get created on the first pass
-  m_pPCMConverter=0;
-
-  // No new position 
-  m_NewPosition = positionInvalid;
-
-  // Store the 3d mode
-  m_3DMode=mode3d;
-
-  // Auto m_bAutoUnregisterReady not requested
-  m_bAutoUnregisterRequested=false;
-
-  // Not ready to be unregistered
-  m_bAutoUnregisterReady=false;
-
-  // Playback not complete
-  m_bPlaybackReadComplete=false;
 }
 
 SndSysOggSoundStream::~SndSysOggSoundStream ()
 {
-  delete m_pCyclicBuffer;
-  delete m_pPCMConverter;
-  delete[] m_pPreparedDataBuffer;
 }
 
 const char *SndSysOggSoundStream::GetDescription()
 {
   // Try to retrieve the description from the underlying data component.
-  const char *pDesc=m_SoundData->GetDescription();
+  const char *pDesc=m_pSoundData->GetDescription();
 
   // If the data component has no description, return a default description.
   if (!pDesc)
@@ -137,135 +81,21 @@ const char *SndSysOggSoundStream::GetDescription()
   return pDesc;
 }
 
-
-const csSndSysSoundFormat *SndSysOggSoundStream::GetRenderedFormat()
-{
-  return &m_RenderFormat;
-}
-
-int SndSysOggSoundStream::Get3dMode()
-{
-  return m_3DMode;
-}
-
-
 size_t SndSysOggSoundStream::GetFrameCount()
 {
-  const csSndSysSoundFormat *data_format=m_SoundData->GetFormat();
+  const csSndSysSoundFormat *data_format=m_pSoundData->GetFormat();
 
-  uint64 framecount=m_SoundData->GetFrameCount();
+  uint64 framecount=m_pSoundData->GetFrameCount();
   framecount*=m_RenderFormat.Freq;
   framecount/=data_format->Freq;
 
   return framecount;
 }
 
-
-size_t SndSysOggSoundStream::GetPosition()
-{
-  return m_MostAdvancedReadPointer;
-
-}
-
-bool SndSysOggSoundStream::ResetPosition()
-{
-  m_NewPosition=0;
-  return true;
-}
-
-bool SndSysOggSoundStream::SetPosition (size_t newposition)
-{
-  m_NewPosition=newposition;
-  return true;
-}
-
-bool SndSysOggSoundStream::Pause()
-{
-  m_bPaused=true;
-  return true;
-}
-
-
-bool SndSysOggSoundStream::Unpause()
-{
-  m_bPaused=false;
-  return true;
-}
-
-int SndSysOggSoundStream::GetPauseState()
-{
-  if (m_bPaused)
-    return CS_SNDSYS_STREAM_PAUSED;
-  return CS_SNDSYS_STREAM_UNPAUSED;
-}
-
-bool SndSysOggSoundStream::SetLoopState(int loopstate)
-{
-  switch (loopstate)
-  {
-    case CS_SNDSYS_STREAM_DONTLOOP:
-      m_bLooping=false;
-      break;
-    case CS_SNDSYS_STREAM_LOOP:
-      m_bLooping=true;
-      break;
-    default:
-      return false; // Looping mode not supported
-  }
-  return true;
-}
-
-/** 
- * Retrieves the loop state of the stream.  Current possible returns are 
- * CS_SNDSYS_STREAM_DONTLOOP and CS_SNDSYS_STREAM_LOOP
- */
-int SndSysOggSoundStream::GetLoopState()
-{
-  if (m_bLooping)
-    return CS_SNDSYS_STREAM_LOOP;
-  return CS_SNDSYS_STREAM_DONTLOOP;
-}
-
-void SndSysOggSoundStream::SetPlayRatePercent(int percent)
-{
-  m_PlaybackPercent=percent;
-  m_NewOutputFrequency = (m_RenderFormat.Freq * 100) / m_PlaybackPercent;
-}
-
-int SndSysOggSoundStream::GetPlayRatePercent()
-{
-  return m_PlaybackPercent;
-}
-
-/** 
- * If AutoUnregister is set, when the stream is paused it, and all sources 
- * attached to it are removed from the sound engine
- */
-void SndSysOggSoundStream::SetAutoUnregister(bool autounreg)
-{
-  m_bAutoUnregisterRequested=autounreg;
-}
-
-/** 
- * If AutoUnregister is set, when the stream is m_bPaused it, and all sources 
- * attached to it are removed from the sound engine
- */
-bool SndSysOggSoundStream::GetAutoUnregister()
-{
-  return m_bAutoUnregisterRequested;
-}
-
-/// Used by the sound renderer to determine if this stream needs to be unregistered
-bool SndSysOggSoundStream::GetAutoUnregisterRequested()
-{
-  return m_bAutoUnregisterReady;
-}
-
-
 void SndSysOggSoundStream::AdvancePosition(size_t frame_delta)
 {
   size_t needed_bytes=0;
-  if (m_NewPosition != positionInvalid)
+  if (m_NewPosition != InvalidPosition)
   {
     // Signal a full cyclic buffer flush
     needed_bytes=m_pCyclicBuffer->GetLength();
@@ -277,7 +107,7 @@ void SndSysOggSoundStream::AdvancePosition(size_t frame_delta)
     // Seek the ogg stream to the requested position
     ov_raw_seek(&m_VorbisFile,m_NewPosition);
 
-    m_NewPosition = positionInvalid;
+    m_NewPosition = InvalidPosition;
     m_bPlaybackReadComplete=false;
   }
   if (m_bPaused || m_bPlaybackReadComplete || frame_delta==0)
@@ -396,64 +226,3 @@ void SndSysOggSoundStream::AdvancePosition(size_t frame_delta)
       
 }
 
-
-size_t SndSysOggSoundStream::CopyBufferBytes(size_t max_dest_bytes)
-{
-  // If the entire prepared buffer can fit into the cyclic buffer, copy it
-  //  there and reset the prepared buffer so we can use to it from the
-  //  beginning again.
-  if (max_dest_bytes >= m_PreparedDataBufferUsage)
-  {
-    max_dest_bytes=m_PreparedDataBufferUsage;
-    m_pCyclicBuffer->AddBytes (&(m_pPreparedDataBuffer[m_PreparedDataBufferStart]),
-      max_dest_bytes);
-    m_PreparedDataBufferUsage=0;
-    m_PreparedDataBufferStart=0;
-    return max_dest_bytes;
-  }
-
-  // Otherwise copy what will fit and update the position and remaining byte
-  //  indicators appropriately.
-  m_pCyclicBuffer->AddBytes (&(m_pPreparedDataBuffer[m_PreparedDataBufferStart]),
-    max_dest_bytes);
-  m_PreparedDataBufferUsage-=max_dest_bytes;
-  m_PreparedDataBufferStart+=max_dest_bytes;
-  return max_dest_bytes;
-}
-
-
-
-
-void SndSysOggSoundStream::GetDataPointers (size_t* position_marker, 
-					    size_t max_requested_length,
-					    void **buffer1, 
-					    size_t *buffer1_length,
-					    void **buffer2,
-					    size_t *buffer2_length)
-{
-  m_pCyclicBuffer->GetDataPointersFromPosition (position_marker,
-    max_requested_length, (uint8 **)buffer1, buffer1_length, 
-    (uint8 **)buffer2,buffer2_length);
-
-  /* If read is finished and we've underbuffered here, then we can mark the 
-   * stream as paused so no further advancement takes place */
-  if ((!m_bPaused) && (m_bPlaybackReadComplete) 
-      && ((*buffer1_length + *buffer2_length) < max_requested_length))
-  {
-    m_bPaused=true;
-    if (m_bAutoUnregisterRequested)
-      m_bAutoUnregisterReady=true;
-    m_bPlaybackReadComplete=false;
-  }
-
-  if (*position_marker > m_MostAdvancedReadPointer)
-    m_MostAdvancedReadPointer=*position_marker;
-}
-
-
-
-void SndSysOggSoundStream::InitializeSourcePositionMarker (
-  size_t *position_marker)
-{
-  *position_marker=m_MostAdvancedReadPointer;
-}
