@@ -31,6 +31,7 @@
 
 struct csSndSysSoundFormat;
 struct iSndSysData;
+struct iSndSysStreamCallback;
 
 const size_t CS_SNDSYS_STREAM_UNKNOWN_LENGTH = (size_t)-1;
 
@@ -60,7 +61,7 @@ enum
 struct iSndSysStream : public virtual iBase
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
-  SCF_INTERFACE(iSndSysStream,0,2,0);
+  SCF_INTERFACE(iSndSysStream,0,2,1);
 
   /// Retrieve a description of this stream.  
   //  This is not guaranteed to be useful for any particular purpose, different,
@@ -244,7 +245,52 @@ struct iSndSysStream : public virtual iBase
    * \remarks Not intended to be called by an application.
    */
   virtual void InitializeSourcePositionMarker (size_t* position_marker) = 0;
+
+  /** Called by the sound system to allow a stream time to process pending notifications.
+  * 
+  * \remarks Not intended to be called by an application.  This is called from the
+  *          main application thread.
+  */
+  virtual void ProcessNotifications() = 0;
+
+  /// Register a component to receive notification of stream events
+  virtual bool RegisterCallback(iSndSysStreamCallback *pCallback) = 0;
+
+  /// Unregister a previously registered callback component 
+  virtual bool UnregisterCallback(iSndSysStreamCallback *pCallback) = 0;
+
+  /// Register a particular frame number which will trigger a callback notification when
+  //   it's crossed.
+  virtual bool RegisterFrameNotification(size_t frame_number) = 0;
 };
+
+/// Sound System stream interface for callback notification
+//
+//  A component wishing to receive notification of Sound Stream events
+//  should implement this interface, and call iSndSysStream::RegisterCallback()
+//  to register with the stream of interest.
+//
+struct iSndSysStreamCallback : public virtual iBase
+{
+  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
+  SCF_INTERFACE(iSndSysStreamCallback,0,1,0);
+
+  /// Called when this stream loops
+  virtual void StreamLoopNotification() = 0;
+
+  /// Called when this stream transitions from playing to paused state
+  virtual void StreamPauseNotification() = 0;
+
+  /// Called when this stream transitions from paused to playing state
+  virtual void StreamUnpauseNotification() = 0;
+
+  /// Called when this stream passes a frame previously registered for notification
+  virtual void StreamFrameNotification(size_t frame_number) = 0;
+};
+
+
+
+
 
 /** @} */
 
