@@ -2,17 +2,14 @@
 <!-- http://projects.blender.org/projects/blend2cs -->
 <library>
   <plugins>
-    <plugin name="genmeshfact">
-      <id>crystalspace.mesh.loader.factory.genmesh</id>
-      <defaults>
-        <staticshape/>
-      </defaults>
-    </plugin>
+    <plugin name="instFact">crystalspace.mesh.loader.factory.instmesh</plugin>
   </plugins>
   <textures>
     <texture name="grass.dds">
       <file>grass.dds</file>
-      <alpha><binary/></alpha>
+      <alpha>
+        <binary/>
+      </alpha>
     </texture>
   </textures>
   <materials>
@@ -21,10 +18,9 @@
     </material>
   </materials>
   <meshfact name="Grass">
-    <plugin>genmeshfact</plugin>
+    <plugin>instFact</plugin>
     <params>
       <material>grass.dds</material>
-      <numvt>56</numvt>
       <v x="0.671523" y="-0.309876" z="-0.938604" u="0.941406" v="0.0585938"/>
       <v x="0.653956" y="-0.309876" z="-0.952052" u="0.941406" v="0.0703125"/>
       <v x="0.669129" y="1.40564" z="-0.950564" u="0.00390625" v="0.0585938"/>
@@ -81,7 +77,6 @@
       <v x="-0.143586" y="1.40564" z="-1.15345" u="0.984375" v="0.0820313"/>
       <v x="-0.153736" y="-0.309876" z="-1.16021" u="0.980469" v="0.453125"/>
       <v x="0.137518" y="-0.309876" z="1.03285" u="0.0273438" v="0.453125"/>
-      <numtri>24</numtri>
       <t v1="0" v2="1" v3="2"/>
       <t v1="3" v2="4" v3="5"/>
       <t v1="6" v2="7" v3="8"/>
@@ -110,16 +105,15 @@
       <defaultcolor red="1" green="1" blue="1" />
     </params>
     <hardmove>
-        <matrix>
-	    <scale all=".5" />
-	</matrix>
+      <matrix>
+        <scale all=".5" />
+      </matrix>
     </hardmove>
   </meshfact>
   <meshfact name="GrassLow">
-    <plugin>genmeshfact</plugin>
+    <plugin>instFact</plugin>
     <params>
       <material>grass.dds</material>
-      <numvt>28</numvt>
       <v x="1.10132" y="-0.309876" z="-0.204816" u="0.984375" v="0.0625"/>
       <v x="1.0984" y="-0.309876" z="-0.226747" u="0.984375" v="0.078125"/>
       <v x="1.10808" y="1.40564" z="-0.214966" u="0" v="0.0585938"/>
@@ -148,7 +142,6 @@
       <v x="-0.143586" y="1.40564" z="-1.15345" u="0.984375" v="0.0820313"/>
       <v x="-0.153736" y="-0.309876" z="-1.16021" u="0.980469" v="0.453125"/>
       <v x="0.137518" y="-0.309876" z="1.03285" u="0.0273438" v="0.453125"/>
-      <numtri>12</numtri>
       <t v1="0" v2="1" v3="2"/>
       <t v1="3" v2="4" v3="5"/>
       <t v1="6" v2="7" v3="8"/>
@@ -165,9 +158,9 @@
       <defaultcolor red="1" green="1" blue="1" />
     </params>
     <hardmove>
-        <matrix>
-	    <scale all=".5" />
-	</matrix>
+      <matrix>
+        <scale all=".5" />
+      </matrix>
     </hardmove>
   </meshfact>
 
@@ -175,10 +168,9 @@
 
 
   <meshfact name="TallGrass">
-    <plugin>genmeshfact</plugin>
+    <plugin>instFact</plugin>
     <params>
       <material>grass.dds</material>
-      <numvt>56</numvt>
       <v x="0.671523" y="-0.309876" z="-0.938604" u="0.941406" v="0.0585938"/>
       <v x="0.653956" y="-0.309876" z="-0.952052" u="0.941406" v="0.0703125"/>
       <v x="0.669129" y="1.40564" z="-0.950564" u="0.00390625" v="0.0585938"/>
@@ -235,7 +227,6 @@
       <v x="-0.143586" y="1.40564" z="-1.15345" u="0.984375" v="0.0820313"/>
       <v x="-0.153736" y="-0.309876" z="-1.16021" u="0.980469" v="0.453125"/>
       <v x="0.137518" y="-0.309876" z="1.03285" u="0.0273438" v="0.453125"/>
-      <numtri>24</numtri>
       <t v1="0" v2="1" v3="2"/>
       <t v1="3" v2="4" v3="5"/>
       <t v1="6" v2="7" v3="8"/>
@@ -264,16 +255,15 @@
       <defaultcolor red="1" green="1" blue="1" />
     </params>
     <hardmove>
-        <matrix>
-	    <scale x=".5" y=".8" z=".5" />
-	</matrix>
+      <matrix>
+        <scale x=".5" y=".8" z=".5" />
+      </matrix>
     </hardmove>
   </meshfact>
   <meshfact name="TallGrassLow">
-    <plugin>genmeshfact</plugin>
+    <plugin>instFact</plugin>
     <params>
       <material>grass.dds</material>
-      <numvt>28</numvt>
       <v x="1.10132" y="-0.309876" z="-0.204816" u="0.984375" v="0.0625"/>
       <v x="1.0984" y="-0.309876" z="-0.226747" u="0.984375" v="0.078125"/>
       <v x="1.10808" y="1.40564" z="-0.214966" u="0" v="0.0585938"/>
@@ -302,7 +292,6 @@
       <v x="-0.143586" y="1.40564" z="-1.15345" u="0.984375" v="0.0820313"/>
       <v x="-0.153736" y="-0.309876" z="-1.16021" u="0.980469" v="0.453125"/>
       <v x="0.137518" y="-0.309876" z="1.03285" u="0.0273438" v="0.453125"/>
-      <numtri>12</numtri>
       <t v1="0" v2="1" v3="2"/>
       <t v1="3" v2="4" v3="5"/>
       <t v1="6" v2="7" v3="8"/>
@@ -319,9 +308,9 @@
       <defaultcolor red="1" green="1" blue="1" />
     </params>
     <hardmove>
-        <matrix>
-	    <scale x=".5" y=".8" z=".5" />
-	</matrix>
+      <matrix>
+        <scale x=".5" y=".8" z=".5" />
+      </matrix>
     </hardmove>
   </meshfact>
 </library>
