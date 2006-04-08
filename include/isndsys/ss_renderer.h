@@ -35,6 +35,7 @@ struct iSndSysData;
 struct iSndSysStream;
 struct iSndSysSource;
 struct iSndSysListener;
+struct iSndSysRendererCallback;
 
 #ifndef CS_SNDSYS_SOURCE_DISTANCE_INFINITE
 #define CS_SNDSYS_SOURCE_DISTANCE_INFINITE -1.0f
@@ -53,7 +54,7 @@ struct iSndSysListener;
 struct iSndSysRenderer : public virtual iBase
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
-  SCF_INTERFACE(iSndSysRenderer,0,2,0);
+  SCF_INTERFACE(iSndSysRenderer,0,2,1);
 
   /// Set Volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
   virtual void SetVolume (float vol) = 0;
@@ -79,18 +80,24 @@ struct iSndSysRenderer : public virtual iBase
 
   /// Get the global Listener object
   virtual csRef<iSndSysListener> GetListener () = 0;
+
+  /// Register a component to receive notification of renderer events
+  virtual bool RegisterCallback(iSndSysRendererCallback *pCallback) = 0;
+
+  /// Unregister a previously registered callback component 
+  virtual bool UnregisterCallback(iSndSysRendererCallback *pCallback) = 0;
 };
 
-/// Software renderer specific interface for callback notification
+/// Sound System renderer interface for callback notification
 //
-//  A component wishing to receive notification of Software Sound Renderer events
-//  should implement this interface, and call iSndSysRendererSoftware::RegisterCallback()
+//  A component wishing to receive notification of Sound Renderer events
+//  should implement this interface, and call iSndSysRenderer::RegisterCallback()
 //  to register with the renderer.
 //
-struct iSndSysRendererSoftwareCallback : public virtual iBase
+struct iSndSysRendererCallback : public virtual iBase
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
-  SCF_INTERFACE(iSndSysRendererSoftwareCallback,0,1,0);
+  SCF_INTERFACE(iSndSysRendererCallback,0,1,0);
 
   /// Called whenever a stream is added to the system
   virtual void StreamAddNotification(iSndSysStream *pStream) = 0;
@@ -111,7 +118,7 @@ struct iSndSysRendererSoftwareCallback : public virtual iBase
 struct iSndSysRendererSoftware : public virtual iBase
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
-  SCF_INTERFACE(iSndSysRendererSoftware,0,1,0);
+  SCF_INTERFACE(iSndSysRendererSoftware,0,1,1);
 
   /// Add an output filter at the specified location.
   //  Output filters can only receive sound data and cannot modify it.  They will receive data
@@ -128,12 +135,6 @@ struct iSndSysRendererSoftware : public virtual iBase
   //
   // Returns FALSE if the filter is not in the list at the time of the call.
   virtual bool RemoveOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter) = 0;
-
-  /// Register a component to receive notification of renderer events
-  virtual bool RegisterCallback(iSndSysRendererSoftwareCallback *pCallback) = 0;
-
-  /// Unregister a previously registered callback component 
-  virtual bool UnregisterCallback(iSndSysRendererSoftwareCallback *pCallback) = 0;
 };
 
 
