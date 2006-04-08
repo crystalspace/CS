@@ -32,6 +32,8 @@ chronological order.
 	- Fossi reverted the remove of polymesh from brute because it is
 	  still used by ODE. So this will need to wait until a new 
 	  collidertype for heightmaps is added.
+	- Fossi added backup of paging former. Should work, but with 
+          severe artifacts. No test level yet.
 7-Apr-2006
 	- caedes fixed a bug in cs-config generation scripts that would
 	  prevent it from finding optional libraries if cs is installed and

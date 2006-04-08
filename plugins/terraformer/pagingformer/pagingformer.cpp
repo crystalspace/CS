@@ -271,7 +271,8 @@ scale.z/county));
   }
 
 
-  void csPagingFormer::SetIntmapDir (csStringID type, const char* path)
+  void csPagingFormer::SetIntmapDir (const csStringID type, 
+                                     const char* path)
   {
     csRef<iVFS> VFS = csQueryRegistry<iVFS> (objectRegistry);
     csRef<iStringArray> heightmapnames = VFS->FindFiles(heightmapdir);
@@ -295,7 +296,8 @@ scale.z/county));
   }
 
 
-  void csPagingFormer::SetFloatmapDir (csStringID type, const char* path)
+  void csPagingFormer::SetFloatmapDir (const csStringID type, 
+                                       const char* path)
   {
     csRef<iVFS> VFS = csQueryRegistry<iVFS> (objectRegistry);
     csRef<iStringArray> heightmapnames = VFS->FindFiles(heightmapdir);
@@ -475,7 +477,7 @@ printf("Min: %f:%f Max: %f:%f\n", samplerregion.MinX(),samplerregion.MinY(),samp
                                                     resx, resz);
         }
 
-          formerregion *= translated;
+        formerregion *= translated;
 
       // the requested region is represented by multiple formers
       // so we have to scale the resolution accordingly
@@ -497,8 +499,16 @@ printf("Min: %f:%f Max: %f:%f\n", samplerregion.MinX(),samplerregion.MinY(),samp
         uint samplerresolutionx = (uint)(ceilf(samplerresx)+0.5);
         uint samplerresolutiony = (uint)(ceilf(samplerresz)+0.5);
 
-if (samplerresolutionx == 0) samplerresolutionx = 1;
-if (samplerresolutiony == 0) samplerresolutiony = 1;
+if ((int)x1/sizex != i && fabs((int)formerregion.MinX()%sizex) < EPSILON)
+{
+printf("x+1");
+ samplerresolutionx += 1;
+}
+if ((int)z1/sizey != j && fabs((int)formerregion.MinY()%sizey) < EPSILON)
+{
+printf("y+1");
+ samplerresolutiony += 1;
+}
 
 printf("%f %f\n", formerdistx, formerdistz);
 printf("%f %f\n", transdistx, transdistz);
@@ -564,9 +574,9 @@ printf("\n\n");
 
     // devide length of requested region by formersize
     // to get number of formers in x direction
-    uint formercountx = maxformerx-floorf(z1/sizey);
+    uint formercountx = maxformerx-floorf(x1/sizex);
 printf("?formercountx %i: %i-%f\n", 
-formercountx,maxformerx,floorf(z1/sizey));
+formercountx,maxformerx,floorf(x1/sizex));
     if (formercountx == 0) formercountx = 1;
     return new csPagingSampler(this, sampler, formercountx, 
       region, resx, resz);
@@ -719,8 +729,10 @@ printf("Min: %f:%f Max: %f:%f\n", intersect.MinX(),intersect.MinY(),intersect.Ma
           tostep = resx;
 //@@@
           // to this former's relative position to the whole request
-          tox = (uint)ceilf(((intersectminx-region.MinX())/(region.MaxX()-region.MinX()))) *resx ; 
-          toy = (uint)ceilf(((intersectminy-region.MinY())/(region.MaxY()-region.MinY())))*resz; 
+          tox = (uint)ceilf(((intersectminx-region.MinX())/
+(region.MaxX()-region.MinX())) *resx); 
+          toy = (uint)ceilf(((intersectminy-region.MinY())/
+(region.MaxY()-region.MinY()))*resz); 
           if (tox > resx) tox = resx;
           if (toy > resz) toy = resz;
 
@@ -735,8 +747,15 @@ printf("ts: %i\n",tostep);
 printf("%i, %i\n", k, xcount);
 printf("%i, %i\n", k%xcount, k/xcount);
 uint ycount = (uint)(num/xcount+0.5);
-if (ycount > xcount) xcount = ycount;
 printf("%i, %i\n", k%ycount, k/ycount);
+uint xoverwrite = k/xcount;
+uint yoverwrite = k%xcount;
+if (ycount > xcount)
+{
+  xoverwrite = k/ycount;
+  yoverwrite = k%ycount;
+}
+printf("%i, %i\n", xoverwrite,yoverwrite);
 
       // loop over the part we need to copy
       uint l;
@@ -747,30 +766,30 @@ printf("%i, %i\n", k%ycount, k/ycount);
         //when the requested region's size is not a multiple of their count
         //we do this by overwriting the neighboring former's last line
 
-        uint topos = (toy+l-(k%xcount))*tostep+tox-(k/xcount);
+        uint topos = (toy+l-(yoverwrite))*tostep+tox-(xoverwrite);
         uint frompos = (fromy+l)*fromstep+fromx;
 
 printf("%i: %i -> %i\n", l, frompos, topos);
 
+/*
 for (uint h = 0; h < copyx; h++)
 {
-/*
+
   assert (maps[k][frompos+h].x >= region.MinX());
   assert (maps[k][frompos+h].x <= region.MaxX());
   assert (maps[k][frompos+h].z >= region.MinY());
   assert (maps[k][frompos+h].z <= region.MaxY());
-*/
 
   positions[topos+h].x = maps[k][frompos+h].x;
   positions[topos+h].y = maps[k][frompos+h].y;
   positions[topos+h].z = maps[k][frompos+h].z;
 }
+*/
 
-/*
         memcpy(positions + topos,
           maps[k] + frompos,
           copyx*sizeof(csVector3));
-*/
+
       }
     }
 }
@@ -1033,11 +1052,11 @@ printf("rocking...\n");
 //@@@
           // to this former's relative position to the whole request
           tox = 
-(uint)ceil(((intersectminx-region.MinX())/(region.MaxX()-region.MinX())) 
-*resx);
+(uint)((intersectminx-region.MinX())/(region.MaxX()-region.MinX())) 
+*resx;
           toy = 
-(uint)ceil(((intersectminy-region.MinY())/(region.MaxY()-region.MinY())) 
-*resz); 
+(uint)((intersectminy-region.MinY())/(region.MaxY()-region.MinY())) 
+*resz; 
 
       // loop over the part we need to copy
       uint l;
