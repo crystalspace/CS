@@ -237,13 +237,13 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
       if (linebreak>0)
       {
         str.Truncate (linebreak);
-	stdoutTmp << "  " << str << '\n';
+        stdoutTmp << "  " << str << '\n';
         offset += linebreak+1;
       }
       else
       {
         //csPrintf ("  %0.77s\n", str.GetData ());
-	stdoutTmp << "  " << str << '\n';
+        stdoutTmp << "  " << str << '\n';
         offset += 77;
       }
     }
@@ -328,113 +328,113 @@ bool csReporterListener::HandleEvent (iEvent& event)
 {
   if (event.Name == PostProcess)
   {
-      csScopedMutexLock lock (mutex);
-      size_t l = messages.Length ();
-      if (l > 0)
+    csScopedMutexLock lock (mutex);
+    size_t l = messages.Length ();
+    if (l > 0)
+    {
+      size_t i;
+      csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
+
+      csRef<iGraphics2D> g2d = g3d->GetDriver2D ();
+      if (!fnt)
       {
-	size_t i;
-        csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
-
-        csRef<iGraphics2D> g2d = g3d->GetDriver2D ();
-	if (!fnt)
-	{
-	  iFontServer* fntsvr = g2d->GetFontServer ();
-	  if (fntsvr)
-	  {
-	    fnt = fntsvr->LoadFont (CSFONT_LARGE);
-	  }
-	}
-	if (fnt)
-	{
-          g3d->BeginDraw (CSDRAW_2DGRAPHICS);
-	  int sw = g2d->GetWidth ();
-	  int sh = g2d->GetHeight ();
-	  int fw, fh;
-	  fnt->GetMaxSize (fw, fh);
-	  int fg = g2d->FindRGB (0, 0, 0);
-          int bg[2] = {g2d->FindRGB (255, 255, 180),
-                        g2d->FindRGB (int (255*0.9), int (255*0.9),
-			      int (180*0.9))};
-          int sep = g2d->FindRGB (int (255*0.7), int (255*0.7),
-	      int (180*0.7));
-
-	  size_t max_l = (sh-4-6-4-6) / (fh+6);
-	  if (l > max_l) l = max_l;
-          int h = 0;
-          int c = 0;
-	  for (i = 0 ; i < l ; i++)
-	  {
-	    csTimedMessage* tm = messages[i];
-            if (tm->msg[0] != ' ')
-            {
-              c = 1-c;
-              // Assume that the ID fits
-              g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
-              g2d->DrawLine (4, 4+h*(fh+6), 4+sw-8-1, 4+h*(fh+6), sep);
-              g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], tm->msg);
-            }
-	    else
-	    {
-              csString msg (tm->msg+1);
-              int chars;
-              csString str;
-              str.Format ("  %s", msg.GetData ());
-              while ((chars = fnt->GetLength (str.GetData (), sw-20)) - 2 <
-                (int) msg.Length ())
-              {
-                str.Truncate (chars);
-                g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
-                int linebreak = 0;
-                const char * space = strrchr (str.GetData (), ' ');
-                if (space)
-                {
-                    linebreak = space-str.GetData ();
-                }
-                if (linebreak > 1) // >1 accounts for two leading spaces in str
-                {
-                  str.Truncate (linebreak);
-                  g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], 
-                    str.GetData ());
-                  msg = msg.GetData ()+linebreak-1;
-                }
-		else
-		{
-                  g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], 
-                    str.GetData ());
-                  msg = msg.GetData ()+chars-2;
-                }
-                str.Format ("  %s", msg.GetData ());
-                h++;
-                if (l > 0) l--;
-              }
-              str.Format ("  %s", msg.GetData ());
-              g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
-              g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], str.GetData ());
-            }
-            h++;
-	    // Set the time the first time we could actually display it.
-	    if (tm->time == 0) tm->time = csGetTicks () + 5000;
-	  }
-	  csTicks t = csGetTicks ();
-	  i = 0;
-	  // We only time out the messages we could actually display.
-	  // That way the messages that didn't have a chance to display
-	  // will be displayed later.
-	  while (i < l)
-	  {
-	    csTimedMessage* tm = messages[i];
-	    if (tm->time != 0 && t > tm->time)
-	    {
-	      messages.DeleteIndex (i);
-	      l--;
-	    }
-	    else
-	    {
-	      i++;
-	    }
-	  }
+        iFontServer* fntsvr = g2d->GetFontServer ();
+        if (fntsvr)
+        {
+          fnt = fntsvr->LoadFont (CSFONT_LARGE);
         }
       }
+      if (fnt)
+      {
+        g3d->BeginDraw (CSDRAW_2DGRAPHICS);
+        int sw = g2d->GetWidth ();
+        int sh = g2d->GetHeight ();
+        int fw, fh;
+        fnt->GetMaxSize (fw, fh);
+        int fg = g2d->FindRGB (0, 0, 0);
+        int bg[2] = {g2d->FindRGB (255, 255, 180),
+          g2d->FindRGB (int (255*0.9), int (255*0.9),
+          int (180*0.9))};
+        int sep = g2d->FindRGB (int (255*0.7), int (255*0.7),
+          int (180*0.7));
+
+        size_t max_l = (sh-4-6-4-6) / (fh+6);
+        if (l > max_l) l = max_l;
+        int h = 0;
+        int c = 0;
+        for (i = 0 ; i < l ; i++)
+        {
+          csTimedMessage* tm = messages[i];
+          if (tm->msg[0] != ' ')
+          {
+            c = 1-c;
+            // Assume that the ID fits
+            g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
+            g2d->DrawLine (4, 4+h*(fh+6), 4+sw-8-1, 4+h*(fh+6), sep);
+            g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], tm->msg);
+          }
+          else
+          {
+            csString msg (tm->msg+1);
+            int chars;
+            csString str;
+            str.Format ("  %s", msg.GetData ());
+            while ((chars = fnt->GetLength (str.GetData (), sw-20)) - 2 <
+              (int) msg.Length ())
+            {
+              str.Truncate (chars);
+              g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
+              int linebreak = 0;
+              const char * space = strrchr (str.GetData (), ' ');
+              if (space)
+              {
+                linebreak = space-str.GetData ();
+              }
+              if (linebreak > 1) // >1 accounts for two leading spaces in str
+              {
+                str.Truncate (linebreak);
+                g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], 
+                  str.GetData ());
+                msg = msg.GetData ()+linebreak-1;
+              }
+              else
+              {
+                g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], 
+                  str.GetData ());
+                msg = msg.GetData ()+chars-2;
+              }
+              str.Format ("  %s", msg.GetData ());
+              h++;
+              if (l > 0) l--;
+            }
+            str.Format ("  %s", msg.GetData ());
+            g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
+            g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], str.GetData ());
+          }
+          h++;
+          // Set the time the first time we could actually display it.
+          if (tm->time == 0) tm->time = csGetTicks () + 5000;
+        }
+        csTicks t = csGetTicks ();
+        i = 0;
+        // We only time out the messages we could actually display.
+        // That way the messages that didn't have a chance to display
+        // will be displayed later.
+        while (i < l)
+        {
+          csTimedMessage* tm = messages[i];
+          if (tm->time != 0 && t > tm->time)
+          {
+            messages.DeleteIndex (i);
+            l--;
+          }
+          else
+          {
+            i++;
+          }
+        }
+      }
+    }
   }
 
   return false;
