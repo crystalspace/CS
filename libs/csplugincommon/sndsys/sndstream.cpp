@@ -307,7 +307,7 @@ void SndSysBasicStream::ProcessNotifications()
   size_t CallbackCount=m_CallbackList.Length();
 
   // Empty the queue of notification events
-  while (pEvent=m_NotificationQueue.DequeueEntry())
+  while ((pEvent=m_NotificationQueue.DequeueEntry()) != 0)
   {
     for (size_t CallbackIDX=0;CallbackIDX<CallbackCount;CallbackIDX++)
     {
@@ -332,3 +332,5 @@ void SndSysBasicStream::ProcessNotifications()
     delete pEvent;
   }
 }
+
+
