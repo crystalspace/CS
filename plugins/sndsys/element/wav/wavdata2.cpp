@@ -127,33 +127,16 @@ static inline void csByteSwap32bitBuffer (uint32* ptr, size_t count)
 }
 
 
-SndSysWavSoundData::SndSysWavSoundData (iBase *parent, iDataBuffer* data) :
-  scfImplementationType(this, parent),
-  m_pDescription(0)
+SndSysWavSoundData::SndSysWavSoundData (iBase *pParent, iDataBuffer* pData) :
+  SndSysBasicData(pParent),
+  m_DataStore(pData)
 {
-  m_pDataStore = new WavDataStore (data);
   m_SoundFormat.Bits = 16;
   m_SoundFormat.Channels = 2;
-  m_bInfoReady = false;
 }
 
 SndSysWavSoundData::~SndSysWavSoundData ()
 {
-  delete m_pDataStore;
-}
-
-const csSndSysSoundFormat *SndSysWavSoundData::GetFormat()
-{
-  if (!m_bInfoReady)
-    Initialize();
-  return &m_SoundFormat;
-}
-
-size_t SndSysWavSoundData::GetFrameCount()
-{
-  if (!m_bInfoReady)
-    Initialize();
-  return m_FrameCount;
 }
 
 size_t SndSysWavSoundData::GetDataSize()
@@ -173,22 +156,10 @@ iSndSysStream *SndSysWavSoundData::CreateStream (
   return (stream);
 }
 
-void SndSysWavSoundData::SetDescription(const char *pDescription)
-{
-  delete[] m_pDescription;
-  m_pDescription=0;
-
-  if (!pDescription)
-    return;
-
-  m_pDescription=new char[strlen(pDescription)+1];
-  strcpy(m_pDescription, pDescription);
-}
-
 void SndSysWavSoundData::Initialize()
 {
 
-  if (ReadHeaders(m_pDataStore->data,m_pDataStore->length,&m_RIFFHeader,&m_FMTHeader,&m_WAVHeader,&m_pPCMData,&m_PCMDataLength))
+  if (ReadHeaders(m_DataStore.data,m_DataStore.length,&m_RIFFHeader,&m_FMTHeader,&m_WAVHeader,&m_pPCMData,&m_PCMDataLength))
   {
     // The number of frames of audio is equal to the length of the audio data 
     //  divided by the length of each frame.

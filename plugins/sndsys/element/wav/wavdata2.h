@@ -25,10 +25,7 @@
  */
 
 #include "iutil/databuff.h"
-#include "isndsys/ss_structs.h"
-#include "isndsys/ss_data.h"
-
-#include "csutil/scf_implementation.h"
+#include "csplugincommon/sndsys/snddata.h"
 
 
 // header of the RIFF-chunk
@@ -86,8 +83,7 @@ struct WavStreamData
 };
 
 /// The implementation of iSndSysData for PCM Waveform audio
-class SndSysWavSoundData : 
-  public scfImplementation1<SndSysWavSoundData, iSndSysData>
+class SndSysWavSoundData : public SndSysBasicData
 {
 public:
   /// Construct this object from an iDataBuffer containing wav format PCM audio
@@ -103,11 +99,6 @@ public:
   // iSndSysData
   //------------------------
 public:
-  /// Get the format of the sound data.
-  virtual const csSndSysSoundFormat *GetFormat();
-
-  /// Get size of this sound in frames.
-  virtual size_t GetFrameCount();
 
   /** 
    * Return the size of the data stored in bytes.  This is informational only 
@@ -126,26 +117,27 @@ public:
   virtual iSndSysStream *CreateStream(csSndSysSoundFormat *renderformat,
   	int mode3d);
 
+
+
+  ////
+  // Internal functions
+  ////
+protected:
+
+
   /// Initializes member variables that must be calculated.
   //  This is called when information that must be calculated
   //  is requested for the first time 
   void Initialize();
-
-  /// Determine if the passed data is of wav audio format
-  static bool IsWav (iDataBuffer* Buffer);
 
   /// Read and verify the RIFF wav headers from the provided buffer
   static bool ReadHeaders(void *Buffer, size_t len, _RIFFchk *p_riffchk, 
     _FMTchk *p_fmtchk, _WAVchk *p_wavchk, void **data_start, 
     size_t *data_len);
 
-  /// Set an optional description to be associated with this sound data
-  //   A filename isn't a bad idea!
-  virtual void SetDescription(const char *pDescription);
-
-  /// Retrieve the description associated with this sound data
-  //   This may return 0 if no description is set.
-  virtual const char *GetDescription() { return m_pDescription; }
+public:
+  /// Determine if the passed data is of wav audio format
+  static bool IsWav (iDataBuffer* Buffer);
 
 
   ////
@@ -153,16 +145,7 @@ public:
   ////
 protected:
   /// Storage of the wav audio data
-  WavDataStore *m_pDataStore;
-
-  /// Have the format and frame count been initialized?
-  bool m_bInfoReady;
-
-  /// The format of the wav audio data we represent
-  csSndSysSoundFormat m_SoundFormat;
-
-  /// The number of frames in the wav audio data
-  size_t m_FrameCount;
+  WavDataStore m_DataStore;
 
   // Stored headers related to the sound format.
 
@@ -180,9 +163,6 @@ protected:
 
   /// Length of the samples in bytes
   size_t m_PCMDataLength;
-
-  /// An optional brief description of the sound data
-  char *m_pDescription;
 };
 
 #endif // #ifndef SNDSYS_DATA_WAV_H
