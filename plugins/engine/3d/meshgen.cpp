@@ -538,8 +538,6 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
       float z = random.Get (box.MinY (), box.MaxY ());
       float map_factor;
       geometries[g]->GetDensityMapFactor (x, z, map_factor);
-      if (map_factor > 0)
-        map_factor = 1;
       if (!((map_factor < 0.0001) ||
         (map_factor < 0.9999 && random.Get () > map_factor)))
       {
