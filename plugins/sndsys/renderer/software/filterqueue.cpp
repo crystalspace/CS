@@ -40,7 +40,7 @@ void SndSysOutputFilterQueue::DispatchSampleBuffers()
   SampleBuffer *pBuffer;
 
   // Grab each SampleBuffer and pass it to the filters for processing
-  while (pBuffer=m_OutputSampleBufferQueue.DequeueEntry())
+  while ((pBuffer=m_OutputSampleBufferQueue.DequeueEntry()) != 0)
   {
     size_t MaxIDX=m_OutputFilterList.GetSize();
     size_t FilterIDX;
@@ -57,7 +57,7 @@ void SndSysOutputFilterQueue::ClearSampleBuffers()
   SampleBuffer *pBuffer;
 
   // Grab each SampleBuffer and delete it
-  while (pBuffer=m_OutputSampleBufferQueue.DequeueEntry())
+  while ((pBuffer=m_OutputSampleBufferQueue.DequeueEntry()) != 0)
     delete pBuffer;
 }
 
