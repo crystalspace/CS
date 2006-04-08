@@ -31,7 +31,7 @@
 #include "isndsys/ss_renderer.h"
 #include "isndsys/ss_eventrecorder.h"
 
-#include "../../utility/queue.h"
+#include "csplugincommon/sndsys/queue.h"
 
 #include "filterqueue.h"
 
@@ -152,7 +152,14 @@ protected:
   //
   //  Do not access this member from the background thread.  
   //
-  csRefArray<iSndSysSourceSoftware> m_FilterSources;
+  csRefArray<iSndSysSourceSoftware> m_DispatchSources;
+
+  /// This is the list of active streams as held by the foreground thread for the purpose of notification dispatching.
+  //
+  //  Do not access this member from the background thread.  
+  //
+  csRefArray<iSndSysStream> m_DispatchStreams;
+
 
 
   /** The thread safe queue containing pointers to streams which should be added 
@@ -227,7 +234,7 @@ protected:
   SndSysOutputFilterQueue m_OutputFilterQueue;
 
   /// Stores the list of components that have registered for callback notification
-  csRefArray<iSndSysRendererSoftwareCallback> m_CallbackList;
+  csRefArray<iSndSysRendererCallback> m_CallbackList;
 
 protected:
   // Called when the renderer plugin is opened from the HandleEvent function
@@ -293,6 +300,10 @@ protected:
 
   void ClearOutputFilters();
 
+  /// Called to provide processing time from the main application thread for streams
+  //    which have pending notification events
+  void ProcessStreamDispatch();
+
   void NormalizeSampleBuffer(size_t used_samples);
   void CopySampleBufferToDriverBuffer(void *drvbuf1,size_t drvbuf1_len,
     void *drvbuf2, size_t drvbuf2_len, size_t samples_per_channel);
@@ -339,12 +350,6 @@ public:
   // Returns FALSE if the filter is not in the list at the time of the call.
   virtual bool RemoveOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter);
 
-  /// Register a component to receive notification of renderer events
-  virtual bool RegisterCallback(iSndSysRendererSoftwareCallback *pCallback);
-
-  /// Unregister a previously registered callback component 
-  virtual bool UnregisterCallback(iSndSysRendererSoftwareCallback *pCallback);
-
   //------------------------
   // iSndSysRenderer
   //------------------------
@@ -373,7 +378,11 @@ public:
   /// Get the global listener object
   virtual csRef<iSndSysListener> GetListener ();
 
+  /// Register a component to receive notification of renderer events
+  virtual bool RegisterCallback(iSndSysRendererCallback *pCallback);
 
+  /// Unregister a previously registered callback component 
+  virtual bool UnregisterCallback(iSndSysRendererCallback *pCallback);
 };
 
 #endif // #ifndef SNDSYS_RENDERER_SOFTWARE_RENDERER_H

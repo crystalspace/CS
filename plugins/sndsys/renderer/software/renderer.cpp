@@ -86,6 +86,8 @@ csSndSysRendererSoftware::csSndSysRendererSoftware(iBase* pParent) :
 
 csSndSysRendererSoftware::~csSndSysRendererSoftware()
 {
+  RecordEvent(SSEL_DEBUG, "Sound system destructing.");
+
   delete[] m_pSampleBuffer;
   delete m_pSoundCompressor;
 }
@@ -131,6 +133,9 @@ csPtr<iSndSysStream> csSndSysRendererSoftware::CreateStream(iSndSysData* data, i
   // Queue this stream for the background thread to add to its list of existent streams
   m_StreamAddQueue.QueueEntry(stream);
 
+  // Add this stream to the foreground list of streams that require notification dispatching
+  m_DispatchStreams.Push(stream);
+
   return stream;
 }
 
@@ -160,7 +165,7 @@ csPtr<iSndSysSource> csSndSysRendererSoftware::CreateSource(iSndSysStream* strea
   m_SourceAddQueue.QueueEntry(source);
 
   // Add this source to the foreground list of sources that may have filters
-  m_FilterSources.Push(source);
+  m_DispatchSources.Push(source);
 
   return source;
 }
@@ -168,7 +173,10 @@ csPtr<iSndSysSource> csSndSysRendererSoftware::CreateSource(iSndSysStream* strea
 /// Remove a stream from the sound renderer's list of streams
 bool csSndSysRendererSoftware::RemoveStream(iSndSysStream* stream)
 {
-  RecordEvent(SSEL_DEBUG, "Queueing stream for remove with addr %08x", stream);
+  if (!stream)
+    return false;
+
+  RecordEvent(SSEL_DEBUG, "Queueing stream [%s] for remove with addr %08x", stream->GetDescription(), stream);
 
   m_StreamRemoveQueue.QueueEntry(stream);
   return true;
@@ -177,7 +185,10 @@ bool csSndSysRendererSoftware::RemoveStream(iSndSysStream* stream)
 /// Remove a source from the sound renderer's list of sources
 bool csSndSysRendererSoftware::RemoveSource(iSndSysSource* source)
 {
-  RecordEvent(SSEL_DEBUG, "Queueing source for remove with addr %08x", source);
+  if (!source)
+    return false;
+
+  RecordEvent(SSEL_DEBUG, "Queueing source [%s] for remove with addr %08x", source->GetStream()->GetDescription(), source);
 
   m_SourceRemoveQueue.QueueEntry(source);
   return true;
@@ -206,6 +217,9 @@ bool csSndSysRendererSoftware::HandleEvent (iEvent &e)
 
     // Process any output filters
     ProcessOutputFilters();
+
+    // Process any stream notifications
+    ProcessStreamDispatch();
   }
   else if (e.Name == evSystemOpen) 
   {
@@ -219,9 +233,10 @@ bool csSndSysRendererSoftware::HandleEvent (iEvent &e)
 
 bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
 {
-  // copy the system pointer
+  // Keep a pointer to the object registry interface
   m_pObjectRegistry=obj_reg;
 
+  // Use report here since the eventrecorder isn't ready yet
   Report (CS_REPORTER_SEVERITY_DEBUG, "Software Renderer Initializing..");
 
   // Get an interface for the plugin manager
@@ -242,7 +257,7 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
 #ifdef CS_SNDSYS_DRIVER
     drv = CS_SNDSYS_DRIVER;   // "crystalspace.sndsys.software.driver.xxx"
 #else
-    drv = "crystalspace.sndsys.driver.null";
+    drv = "crystalspace.sndsys.software.driver.null";
 #endif
     drv = m_Config->GetStr ("SndSys.Driver", drv);
   }
@@ -275,17 +290,33 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
 
   RecordEvent(SSEL_DEBUG, "Event log started");
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Configured for driver [%s]", drv);
 
 
+  csStringBase DriverFullName;
 
-  m_pSoundDriver = CS_LOAD_PLUGIN (plugin_mgr, drv, iSndSysSoftwareDriver);
+  // Try to load the specified driver exactly as specified
+  DriverFullName=drv;
+  RecordEvent(SSEL_DEBUG, "Attempting to load driver plugin [%s]", DriverFullName.GetData());
+  m_pSoundDriver = CS_LOAD_PLUGIN (plugin_mgr, DriverFullName.GetData(), iSndSysSoftwareDriver);
+
+  // Try to load the driver with "crystalspace.sndsys.software.driver." prepended
+  if (!m_pSoundDriver)
+  {
+    DriverFullName.Format("crystalspace.sndsys.software.driver.%s", drv);
+    RecordEvent(SSEL_DEBUG, "Attempting to load driver plugin [%s]", DriverFullName.GetData());
+    m_pSoundDriver = CS_LOAD_PLUGIN (plugin_mgr, DriverFullName.GetData(), iSndSysSoftwareDriver);
+  }
+
+  // If we still failed, report an error
   if (!m_pSoundDriver)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
-      "Failed to load driver [%s].", drv);
+      "Failed to load driver as [%s] or [%s].", drv, DriverFullName.GetData());
     return false;
   }
+  // Success
+  RecordEvent(SSEL_DEBUG, "Loaded driver plugin [%s]", DriverFullName.GetData());
+
 
   // set event callback
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(m_pObjectRegistry, iEventQueue));
@@ -373,17 +404,25 @@ bool csSndSysRendererSoftware::Open ()
 
 void csSndSysRendererSoftware::Close ()
 {
+  RecordEvent(SSEL_DEBUG, "Close() called.");
+
   // Halt the background thread
   if (m_pSoundDriver)
   {
+    RecordEvent(SSEL_DEBUG, "Halting driver.");
     m_pSoundDriver->StopThread();
     m_pSoundDriver->Close();
   }
+
+  // Clear out all filters
+  m_OutputFilterQueue.ClearFilterList();
+
   // Cleanup any active or pending-active sources
   RemoveAllSources();
   // Cleanup any active or pending-active streams
   RemoveAllStreams();
   // Cleanup any pending-clear sources and streams
+  RecordEvent(SSEL_DEBUG, "Garbage collecting.");
   GarbageCollection();
 }
 
@@ -420,10 +459,18 @@ void csSndSysRendererSoftware::ProcessOutputFilters()
   m_OutputFilterQueue.DispatchSampleBuffers();
 
   // Call each source's output filter dispatcher
-  size_t MaxIDX=m_FilterSources.GetSize();
+  size_t MaxIDX=m_DispatchSources.GetSize();
   size_t CurIDX;
   for (CurIDX=0;CurIDX<MaxIDX;CurIDX++)
-    m_FilterSources[CurIDX]->ProcessOutputFilters();
+    m_DispatchSources[CurIDX]->ProcessOutputFilters();
+}
+
+void csSndSysRendererSoftware::ProcessStreamDispatch()
+{
+  size_t MaxIDX=m_DispatchStreams.GetSize();
+  size_t CurIDX;
+  for (CurIDX=0;CurIDX<MaxIDX;CurIDX++)
+    m_DispatchStreams[CurIDX]->ProcessNotifications();
 }
 
 //----------------------
@@ -431,7 +478,7 @@ void csSndSysRendererSoftware::ProcessOutputFilters()
 //----------------------
 
 /// Register a component to receive notification of renderer events
-bool csSndSysRendererSoftware::RegisterCallback(iSndSysRendererSoftwareCallback *pCallback)
+bool csSndSysRendererSoftware::RegisterCallback(iSndSysRendererCallback *pCallback)
 {
   // Simply add this interface pointer to the list of callbacks
   m_CallbackList.Push(pCallback);
@@ -439,7 +486,7 @@ bool csSndSysRendererSoftware::RegisterCallback(iSndSysRendererSoftwareCallback 
 }
 
 /// Unregister a previously registered callback component 
-bool csSndSysRendererSoftware::UnregisterCallback(iSndSysRendererSoftwareCallback *pCallback)
+bool csSndSysRendererSoftware::UnregisterCallback(iSndSysRendererCallback *pCallback)
 {
   // Try to remove the passed interface pointer from the list.  If this fails we return false.
   return m_CallbackList.Delete(pCallback);
@@ -449,7 +496,10 @@ void csSndSysRendererSoftware::SourceAdded(iSndSysSource *pSource)
 {
   size_t IDX, Len;
 
-  RecordEvent(SSEL_DEBUG, "Queueing source for add with addr %08x", pSource);
+  if (!pSource)
+    return;
+
+  RecordEvent(SSEL_DEBUG, "Queueing source [%s] for add with addr %08x", pSource->GetStream()->GetDescription(), pSource);
 
   // Call each registered callback with notification
   Len=m_CallbackList.GetSize();
@@ -461,7 +511,10 @@ void csSndSysRendererSoftware::SourceRemoved(iSndSysSource *pSource)
 {
   size_t IDX, Len;
 
-  RecordEvent(SSEL_DEBUG, "Removing source with refcount=%d", pSource->GetRefCount());
+  if (!pSource)
+    return;
+
+  RecordEvent(SSEL_DEBUG, "Removing source [%s] with refcount=%d", pSource->GetStream()->GetDescription(), pSource->GetRefCount());
 
   // Call each registered callback with notification
   Len=m_CallbackList.GetSize();
@@ -473,7 +526,10 @@ void csSndSysRendererSoftware::StreamAdded(iSndSysStream *pStream)
 {
   size_t IDX, Len;
 
-  RecordEvent(SSEL_DEBUG, "Queueing stream for add with addr %08x", pStream);
+  if (!pStream)
+    return;
+
+  RecordEvent(SSEL_DEBUG, "Queueing stream [%s] for add with addr %08x", pStream->GetDescription(), pStream);
 
   // Call each registered callback with notification
   Len=m_CallbackList.GetSize();
@@ -485,7 +541,10 @@ void csSndSysRendererSoftware::StreamRemoved(iSndSysStream *pStream)
 {
   size_t IDX, Len;
 
-  RecordEvent(SSEL_DEBUG, "Removing stream with refcount=%d",pStream->GetRefCount());
+  if (!pStream)
+    return;
+
+  RecordEvent(SSEL_DEBUG, "Removing stream [%s] with refcount=%d",pStream->GetDescription(), pStream->GetRefCount());
 
   // Call each registered callback with notification
   Len=m_CallbackList.GetSize();
@@ -533,6 +592,9 @@ void csSndSysRendererSoftware::GarbageCollection()
     // Notify any callbacks of the removal
     StreamRemoved(streamptr);
 
+    // Remove this stream from the dispatch list as well
+    m_DispatchStreams.Delete(streamptr);
+
     streamptr->DecRef();
   }
 
@@ -543,7 +605,7 @@ void csSndSysRendererSoftware::GarbageCollection()
     SourceRemoved(sourceptr);
 
     // Remove this source from the Filter list as well
-    m_FilterSources.Delete(dynamic_cast<iSndSysSourceSoftware *>(sourceptr));
+    m_DispatchSources.Delete(dynamic_cast<iSndSysSourceSoftware *>(sourceptr));
 
     sourceptr->DecRef();
   }
@@ -553,6 +615,8 @@ void csSndSysRendererSoftware::GarbageCollection()
 void csSndSysRendererSoftware::RemoveAllSources()
 {
   iSndSysSourceSoftware *sourceptr;
+
+  RecordEvent(SSEL_DEBUG, "Clearing all sources.");
 
   // We will bypass the removal queue since this function is only called when the background thread is
   //  not running
@@ -567,8 +631,8 @@ void csSndSysRendererSoftware::RemoveAllSources()
     sourceptr->DecRef();
   }
   // Clear out the filter sources list as well
-  while (m_FilterSources.GetSize())
-    m_FilterSources.DeleteIndex(0);
+  while (m_DispatchSources.GetSize())
+    m_DispatchSources.DeleteIndex(0);
 
   // Process the addition queue
   while (sourceptr=m_SourceAddQueue.DequeueEntry(false))
@@ -590,6 +654,8 @@ void csSndSysRendererSoftware::RemoveAllStreams()
 {
   iSndSysStream *streamptr;
 
+  RecordEvent(SSEL_DEBUG, "Clearing all streams.");
+
   // We will bypass the removal queue since this function is only called when the background thread is
   //  not running
   while (m_ActiveStreams.GetSize())
@@ -602,6 +668,10 @@ void csSndSysRendererSoftware::RemoveAllStreams()
     m_ActiveStreams.DeleteIndex(0);
     streamptr->DecRef();
   }
+  // Clear out the dispatch list as well
+  while (m_DispatchStreams.GetSize())
+    m_DispatchStreams.DeleteIndex(0);
+
   // Process the addition queue
   while (streamptr=m_StreamAddQueue.DequeueEntry(false))
   {
