@@ -229,7 +229,7 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
       csString str (line+offset);
       str.Truncate (77);
       int linebreak = 0;
-      char * space = strrchr (str.GetData (), ' ');
+      const char * space = strrchr (str.GetData (), ' ');
       if (space)
       {
           linebreak = space-str.GetData ();
@@ -385,7 +385,7 @@ bool csReporterListener::HandleEvent (iEvent& event)
                 str.Truncate (chars);
                 g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
                 int linebreak = 0;
-                char * space = strrchr (str.GetData (), ' ');
+                const char * space = strrchr (str.GetData (), ' ');
                 if (space)
                 {
                     linebreak = space-str.GetData ();
