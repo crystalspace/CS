@@ -238,9 +238,9 @@ void csInstmeshMeshObject::CalculateInstanceArrays ()
     const csReversibleTransform& tr = instances[i].transform;
     for (idx = 0 ; idx < fact_vt_len ; idx++)
     {
-      mesh_vertices.Push (tr.Other2This (fact_vertices[idx]));
+      mesh_vertices.Push (tr.This2Other (fact_vertices[idx]));
       mesh_texels.Push (fact_texels[idx]);
-      mesh_normals.Push (tr.Other2ThisRelative (fact_normals[idx]));
+      mesh_normals.Push (tr.This2OtherRelative (fact_normals[idx]));
       mesh_colors.Push (fact_colors[idx]);
     }
     int mult = (int)(i * fact_vt_len);
@@ -1048,64 +1048,70 @@ csRenderMesh** csInstmeshMeshObject::GetRenderMeshes (
   CheckLitColors ();
   SetupObject ();
 
+
   n = 0;
 
-  iCamera* camera = rview->GetCamera ();
+  if (mesh_triangles.Length () > 0)
+  {
+    iCamera* camera = rview->GetCamera ();
 
-  int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+    int clip_portal, clip_plane, clip_z_plane;
+    rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
       clip_z_plane);
 
-  lighting_movable = movable;
+    lighting_movable = movable;
 
-  if (!do_manual_colors && !do_shadow_rec && factory->light_mgr)
-  {
-    // Remember relevant lights for later.
-    relevant_lights = factory->light_mgr->GetRelevantLights (
-    	logparent, -1, false);
-  }
-
-  const csReversibleTransform o2wt = movable->GetFullTransform ();
-  const csVector3& wo = o2wt.GetOrigin ();
-
-  // Array still needed?@@@
-  {
-    renderMeshes.SetLength (1);
-
-    iMaterialWrapper* mater = material;
-    if (!mater) mater = factory->GetMaterialWrapper ();
-    if (!mater)
+    if (!do_manual_colors && !do_shadow_rec && factory->light_mgr)
     {
-      csPrintf ("INTERNAL ERROR: mesh used without material!\n");
-      return 0;
+      // Remember relevant lights for later.
+      relevant_lights = factory->light_mgr->GetRelevantLights (
+        logparent, -1, false);
     }
 
-    if (mater->IsVisitRequired ()) mater->Visit ();
+    const csReversibleTransform o2wt = movable->GetFullTransform ();
+    const csVector3& wo = o2wt.GetOrigin ();
 
-    bool rmCreated;
-    csRenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
-      rview->GetCurrentFrameNumber ());
+    // Array still needed?@@@
+    {
+      renderMeshes.SetLength (1);
 
-    meshPtr->mixmode = MixMode;
-    meshPtr->clip_portal = clip_portal;
-    meshPtr->clip_plane = clip_plane;
-    meshPtr->clip_z_plane = clip_z_plane;
-    meshPtr->do_mirror = camera->IsMirrored ();
-    meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
-    meshPtr->indexstart = 0;
-    meshPtr->indexend = (unsigned int)(mesh_triangles.Length () * 3);
-    meshPtr->material = mater;
-    CS_ASSERT (mater != 0);
-    meshPtr->worldspace_origin = wo;
-    meshPtr->buffers = bufferHolder;
-    meshPtr->geometryInstance = (void*)factory;
-    meshPtr->object2world = o2wt;
+      iMaterialWrapper* mater = material;
+      if (!mater) mater = factory->GetMaterialWrapper ();
+      if (!mater)
+      {
+        csPrintf ("INTERNAL ERROR: mesh used without material!\n");
+        return 0;
+      }
 
-    renderMeshes[0] = meshPtr;
+      if (mater->IsVisitRequired ()) mater->Visit ();
+
+      bool rmCreated;
+      csRenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
+        rview->GetCurrentFrameNumber ());
+
+      meshPtr->mixmode = MixMode;
+      meshPtr->clip_portal = clip_portal;
+      meshPtr->clip_plane = clip_plane;
+      meshPtr->clip_z_plane = clip_z_plane;
+      meshPtr->do_mirror = camera->IsMirrored ();
+      meshPtr->meshtype = CS_MESHTYPE_TRIANGLES;
+      meshPtr->indexstart = 0;
+      meshPtr->indexend = (unsigned int)(mesh_triangles.Length () * 3);
+      meshPtr->material = mater;
+      CS_ASSERT (mater != 0);
+      meshPtr->worldspace_origin = wo;
+      meshPtr->buffers = bufferHolder;
+      meshPtr->geometryInstance = (void*)factory;
+      meshPtr->object2world = o2wt;
+
+      renderMeshes[0] = meshPtr;
+    }
+
+    n = (int)renderMeshes.Length ();
+    return renderMeshes.GetArray ();
   }
-
-  n = (int)renderMeshes.Length ();
-  return renderMeshes.GetArray ();
+  else 
+    return 0;
 }
 
 void csInstmeshMeshObject::GetRadius (float& rad, csVector3& cent)
