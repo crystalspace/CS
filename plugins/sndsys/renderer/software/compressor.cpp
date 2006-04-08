@@ -57,7 +57,7 @@ void csSoundCompressor::SetCompressionThreshold(csSoundSample MaxIntensity)
 
 void csSoundCompressor::SetCompressionRatio(float CompressionRatio)
 {
-  m_CompressionRatioX1024=(CompressionRatio*1024.0f);
+  m_CompressionRatioX1024=(int)(CompressionRatio*1024.0f);
   m_CompressionAttackStepX1024=m_CompressionRatioX1024 / m_CompressionAttackSamples;
   m_CompressionReleaseStepX1024=m_CompressionRatioX1024 / m_CompressionReleaseSamples;
 }
@@ -93,7 +93,7 @@ void csSoundCompressor::ApplyCompression(csSoundSample *pSampleBuffer, size_t Sa
     m_HistorySum+=CurrentSample;
 
     // Determine whether the average is above the threshold
-    if (m_HistorySum > (m_CompressionThreshold * m_HistorySamples))
+    if ((size_t)(ABS(m_HistorySum)) > (m_CompressionThreshold * m_HistorySamples))
     {
       // Increase the compression factor unless we're already capped
       if (m_CurrentCompressionX1024 < m_CompressionRatioX1024)
@@ -145,3 +145,5 @@ void csSoundCompressor::ApplyCompression(csSoundSample *pSampleBuffer, size_t Sa
   }
 
 }
+
+
