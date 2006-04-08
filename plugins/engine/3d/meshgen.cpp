@@ -176,7 +176,7 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
     csMGGeomInstMesh& geominst = geom.instmeshes[cidx];
     csVector3 meshpos = mesh->GetMovable ()->GetFullPosition ();
     csVector3 pos = position - meshpos;
-    printf ("position=%g,%g,%g    meshpos=%g,%g,%g  ->  pos=%g,%g,%g\n", position.x, position.y, position.z, meshpos.x, meshpos.y, meshpos.z, pos.x, pos.y, pos.z); fflush (stdout);
+    //printf ("position=%g,%g,%g    meshpos=%g,%g,%g  ->  pos=%g,%g,%g\n", position.x, position.y, position.z, meshpos.x, meshpos.y, meshpos.z, pos.x, pos.y, pos.z); fflush (stdout);
     csReversibleTransform tr (matrix, pos);
     geominst.instmesh_state->MoveInstance (instance_id, tr);
   }
@@ -538,6 +538,8 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
       float z = random.Get (box.MinY (), box.MaxY ());
       float map_factor;
       geometries[g]->GetDensityMapFactor (x, z, map_factor);
+      if (map_factor > 0)
+        map_factor = 1;
       if (!((map_factor < 0.0001) ||
         (map_factor < 0.9999 && random.Get () > map_factor)))
       {
