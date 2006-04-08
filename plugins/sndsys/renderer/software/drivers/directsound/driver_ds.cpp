@@ -134,6 +134,9 @@ bool SndSysDriverDirectSound::Open (csSndSysRendererSoftware *renderer,
     return false;
   }
 
+  // We need a handle to the iGraphics2D interface on Windows so that we can
+  //  retrieve the iWin32Canvas handle which exposes the Window handle
+  //  which is needed to set the cooperative level of the sound device.
   csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (m_pObjectRegistry);
   if (!g2d.IsValid())
   {
