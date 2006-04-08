@@ -100,6 +100,10 @@ bool SndSysOutputFilterQueue::RemoveFilter(iSndSysSoftwareOutputFilter *pFilter)
   return false;
 }
 
+void SndSysOutputFilterQueue::ClearFilterList()
+{
+  m_OutputFilterList.DeleteAll();
+}
 
 
 

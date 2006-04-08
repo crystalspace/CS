@@ -25,7 +25,7 @@
 #include "isndsys/ss_structs.h"
 #include "isndsys/ss_filter.h"
 
-#include "../../utility/queue.h"
+#include "csplugincommon/sndsys/queue.h"
 
 
 /// 
@@ -98,6 +98,9 @@ public:
 
   /// Clear the queued sample buffers
   void ClearSampleBuffers();
+
+  /// Remove all filters from the list
+  void ClearFilterList();
 
 protected:
   /// Queue of sample buffers to be passed to the output filter
