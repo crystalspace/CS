@@ -25,7 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/vfs.h"
 #include "cstypes.h"
 
-#include "../queue.h"
+#include "csplugincommon/sndsys/queue.h"
 #include "isndsys/ss_eventrecorder.h"
 
 

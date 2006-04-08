@@ -176,7 +176,7 @@ int csSndSysBasicEventRecorder::ProcessEventQueue()
   csStringBase LogString((size_t)1024);
 
   // Empty the queue
-  while (pEntry=m_EventQueue.DequeueEntry(false))
+  while ((pEntry=m_EventQueue.DequeueEntry(false)) != 0)
   {
     if (m_Active && m_pLogFile)
     {
