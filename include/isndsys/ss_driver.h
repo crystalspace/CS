@@ -67,35 +67,6 @@ struct iSndSysSoftwareDriver : public virtual iBase
 
   /// Stop the background thread
   virtual void StopThread() = 0;
-
-
-  /// Candidate functions 
-
-  // virtual vool DriverProvidesThread() = 0;
-  //  The Sound System always needs its own background thread, but in some
-  //  instances the low level interface to the OS based sound system
-  //   can provide more accurate buffer fill requests through callbacks or
-  //   some other mechanism.  Since only the driver code knows about this,
-  //   and since we would like to use the most accurate method possible, 
-
-
-  /// Functions below this point are likely to be removed due to redesign
-
-
-  /// Lock and Get Sound Memory Buffer
-  //virtual void LockMemory (void **mem, int *memsize) = 0;
-  /// Unlock Sound Memory Buffer
-  //virtual void UnlockMemory () = 0;
-  /// Must the driver be updated manually or does it run in background?
-  //virtual bool IsBackground () = 0;
-
-  /**
-   * Is the sound driver able to create silence without locking and
-   * writing to the sound memory?
-   */
-  //virtual bool IsHandleVoidSound () = 0;
-  // @@@ temporary
-  //virtual bool ThreadAware (){ return false; }
 };
 
 /** @} */
