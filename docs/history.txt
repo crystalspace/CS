@@ -29,6 +29,9 @@ chronological order.
 	  - Converted Ogg and Wav elements to make use of the streamd and
 	    data base classes.
 	  - Fixed gcc4.1 reported warnings in the sound system.
+	- Fossi reverted the remove of polymesh from brute because it is
+	  still used by ODE. So this will need to wait until a new 
+	  collidertype for heightmaps is added.
 7-Apr-2006
 	- caedes fixed a bug in cs-config generation scripts that would
 	  prevent it from finding optional libraries if cs is installed and

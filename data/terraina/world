@@ -211,6 +211,7 @@
   	<lodvalue name="block resolution">16</lodvalue>
   	<lodvalue name="block split distance">8</lodvalue>
   	<lodvalue name="minimum block size">32</lodvalue>
+  	<lodvalue name="cd resolution">256</lodvalue>
 	<staticlighting>yes</staticlighting>
 	<castshadows>yes</castshadows>
       </params>

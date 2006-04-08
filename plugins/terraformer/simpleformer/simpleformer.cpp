@@ -27,8 +27,11 @@
 #include "ivaria/reporter.h"
 
 #include "simpleformer.h"
+
+/* @@@ debug:
 #include "cstool/debugimagewriter.h"
 #include "csgfx/memimage.h"
+*/
 
 CS_IMPLEMENT_PLUGIN
 
@@ -879,6 +882,8 @@ const int *csSimpleSampler::SampleInteger (csStringID type)
             to ++;
           }
         }
+//@@@
+/*  
   int* tests = map;
 
   csImageMemory pic = csImageMemory(resx,resz);
@@ -890,7 +895,7 @@ const int *csSimpleSampler::SampleInteger (csStringID type)
     dat[asdf].blue = tests[asdf]*50;
   }
 printf("\n");
-  
+
 csDebugImageWriter a = csDebugImageWriter();
   csString fn = csString();
   fn += "ReqI";
@@ -899,6 +904,7 @@ csDebugImageWriter a = csDebugImageWriter();
   fn += ".png";
   a.DebugImageWrite(&pic,fn);
 printf("%s\n",fn.GetData());
+*/
 
         return map;
       }

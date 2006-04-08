@@ -311,6 +311,20 @@ private:
   bool staticlighting;
   bool castshadows;
 
+  // Data for the colldet polygon mesh.
+  bool polymesh_valid;
+  csVector3* polymesh_vertices;
+  int polymesh_vertex_count;
+  csTriangle* polymesh_triangles;
+  int polymesh_tri_count;
+  csMeshedPolygon* polymesh_polygons;
+  bool ReadCDLODFromCache ();
+  void WriteCDLODToCache ();
+  void SetupPolyMeshData ();
+  void CleanPolyMeshData ();
+  int cd_resolution;
+  float cd_lod_cost;
+
   /**
   * Do the setup of the entire terrain. This will compute the base
   * mesh, the LOD meshes, normals, ...
@@ -473,6 +487,41 @@ public:
   void DisconnectAllLights ();
   char* GenerateCacheName ();
   void SetStaticLighting (bool enable);
+
+  //------------------ iPolygonMesh interface implementation ----------------//
+  struct PolyMesh : public iPolygonMesh
+  {
+  private:
+    csTerrainObject* terrain;
+    csFlags flags;
+  public:
+    SCF_DECLARE_IBASE;
+
+    void SetTerrain (csTerrainObject* t)
+    {
+      terrain = t;
+      flags.SetAll (CS_POLYMESH_TRIANGLEMESH);
+    }
+    void Cleanup ();
+
+    virtual int GetVertexCount ();
+    virtual csVector3* GetVertices ();
+    virtual int GetPolygonCount ();
+    virtual csMeshedPolygon* GetPolygons ();
+    virtual int GetTriangleCount ();
+    virtual csTriangle* GetTriangles ();
+    virtual void Lock () { }
+    virtual void Unlock () { }
+
+    virtual csFlags& GetFlags () { return flags;  }
+    virtual uint32 GetChangeNumber() const { return 0; }
+
+    PolyMesh ()
+    { SCF_CONSTRUCT_IBASE (0); }
+    virtual ~PolyMesh ()
+    { SCF_DESTRUCT_IBASE (); }
+  } scfiPolygonMesh;
+  friend struct PolyMesh;
 
   //------------------------- iObjectModel implementation ----------------
   class eiObjectModel : public csObjectModel

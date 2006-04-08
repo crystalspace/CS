@@ -79,6 +79,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObject::eiObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_IBASE (csTerrainObject::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
+
 SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObject::eiTerrainObjectState)
   SCF_IMPLEMENTS_INTERFACE (iTerrainObjectState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
@@ -759,6 +763,430 @@ bool csTerrBlock::IsMaterialUsed (int index)
 
 // ---------------------------------------------------------------
 
+
+class csTriangleLODAlgoHM : public csTriangleLODAlgo
+{
+public:
+  csVector3* normals;
+  // Per vertex: -1 for corner, 0 for center, 1, 2, 3, 4 for specific edge.
+  int* edgedata;
+  float min_max_cost;	// 1-max_cost
+  csTriangleMesh* mesh;
+
+public:
+  virtual ~csTriangleLODAlgoHM () { }
+
+  virtual void CalculateCost (csTriangleVerticesCost* vertices,
+  	csTriangleVertexCost* vertex)
+  {
+    size_t i, j;
+    vertex->to_vertex = -1;
+    if (vertex->deleted)
+    {
+      // If the vertex is deleted we have a very high cost.
+      // The cost is higher than the maximum cost you can get for
+      // a non-deleted vertex. This is to make sure that we get
+      // the last non-deleted vertex at the end of the LOD algorithm.
+      vertex->cost = 1000000.0;
+      return;
+    }
+    int idx = vertex->idx;
+    int edge = edgedata[idx];
+    if (edge == -1)
+    {
+      // If we are on a corner then we can't collapse this vertex
+      // at all. Very high cost.
+      vertex->cost = 1000000.0;
+      return;
+    }
+
+    // Calculate the minimum cos(angle) for all normals adjacent to this
+    // vertex. That's the worst value for cos(angle) and so that will be
+    // the cost of removing this vertex.
+    const csVector3& n = normals[idx];
+    const csVector3& this_pos = vertex->pos;
+    float min_cosa = 1000.0;
+    float min_sq_dist = 1000000.;
+    for (i = 0 ; i < vertex->con_vertices.Length () ; i++)
+    {
+      int connected_i = vertex->con_vertices[i];
+      float cur_cosa = n * normals[connected_i];
+      if (cur_cosa < min_cosa)
+      {
+        if (cur_cosa < min_max_cost)
+	{
+	  // We can already stop here. We are too bad.
+          vertex->cost = 1000000.0;
+          return;
+	}
+        min_cosa = cur_cosa;
+      }
+
+      // Check if we can collapse this edge. We can collapse this
+      // edge if this vertex is a center vertex or if it is on the same edge
+      // as the other vertex.
+      if (edge == 0 || edge == edgedata[connected_i])
+      {
+	const csVector3& other_pos = vertices->GetVertex (connected_i).pos;
+	csTriangle* tris = mesh->GetTriangles ();
+
+        // We will not collapse an edge if it means that the
+	// 'y' orientation of the triangle changes (i.e. the
+	// normals of the adjacent triangles no longer point
+	// upwards). We test this by checking all connected triangles
+	// that are not empty, then it projects them to 2D (with x
+	// and z) and it will see if their direction changes.
+	bool bad = false;
+	csVector3 v3[3];
+	csVector2 v[3];
+	for (j = 0 ; j < vertex->con_triangles.Length () ; j++)
+	{
+	  csTriangle& tri = tris[vertex->con_triangles[j]];
+	  v3[0] = vertices->GetVertex (tri.a).pos; v[0].Set (v3[0].x, v3[0].z);
+	  v3[1] = vertices->GetVertex (tri.b).pos; v[1].Set (v3[1].x, v3[1].z);
+	  v3[2] = vertices->GetVertex (tri.c).pos; v[2].Set (v3[2].x, v3[2].z);
+	  int sameidx;
+	  if (tri.a == idx) sameidx = 0;
+	  else if (tri.b == idx) sameidx = 1;
+	  else sameidx = 2;
+	  float dir_before = csMath2::Area2 (v[0], v[1], v[2]);
+	  v[sameidx].Set (other_pos.x, other_pos.z);
+	  float dir_after = csMath2::Area2 (v[0], v[1], v[2]);
+	  bad = (dir_before < -.0001 && dir_after > .0001) ||
+	    	(dir_before > .0001 && dir_after < -.0001);
+	  if (bad) break;
+	}
+
+	if (!bad)
+	{
+          // We prefer collapsing along the shortest edge.
+          float sq_dist = csSquaredDist::PointPoint (this_pos, other_pos);
+	  if (sq_dist < min_sq_dist)
+	  {
+            min_sq_dist = sq_dist;
+            vertex->to_vertex = connected_i;
+          }
+        }
+      }
+    }
+
+    // If we found no edge to collapse then we can't collapse and we
+    // pick a high cost.
+    if (vertex->to_vertex == -1)
+    {
+      vertex->cost = 1000000.0;
+      return;
+    }
+
+    vertex->cost = 1 - min_cosa;
+  }
+};
+
+#define CDLODMAGIC	    "CD01" // must be 4 chars!
+
+bool csTerrainObject::ReadCDLODFromCache ()
+{
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
+  	object_reg, iCommandLineParser);
+  if (cmdline->GetOption ("recalc"))
+  {
+    static bool reportit = true;
+    if (reportit)
+    {
+      reportit = false;
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+	  "Forced recalculation of terrain LOD!");
+    }
+    return false;
+  }
+
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  if (!engine) return false;
+  iCacheManager* cache_mgr = engine->GetCacheManager ();
+
+  char* cachename = GenerateCacheName ();
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("bruteblock_lod",
+      	cachename, 0);
+  delete[] cachename;
+  if (!db) return false;
+
+  csRef<csMemFile> cf;
+  cf.AttachNew (new csMemFile ((char*)db->GetData (), db->GetSize (),
+  	    csMemFile::DISPOSITION_IGNORE));
+
+  char header[5];
+  cf->Read (header, 4);
+  header[4] = 0;
+  if (strcmp (header, CDLODMAGIC))
+  {
+    if (verbose)
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+    	  "Forced recalculation of terrain LOD: magic number mismatch!");
+    return false;	// Mismatch.
+  }
+
+  uint32 cache_cd_res;
+  cf->Read ((char*)&cache_cd_res, 4);
+  cache_cd_res = csLittleEndian::Convert (cache_cd_res);
+  if ((int)cache_cd_res != cd_resolution)
+  {
+    if (verbose)
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+    	  "Forced recalculation of terrain LOD: resolution mismatch!");
+    return false;	// Mismatch.
+  }
+
+  uint32 ptc;
+  cf->Read ((char*)&ptc, 4);
+  polymesh_tri_count = (int)csLittleEndian::Convert (ptc);
+  polymesh_triangles = new csTriangle [polymesh_tri_count];
+
+  for (int i = 0 ; i < polymesh_tri_count ; i++)
+  {
+    uint32 a, b, c;
+    cf->Read ((char*)&a, 4); a = csLittleEndian::Convert (a);
+    cf->Read ((char*)&b, 4); b = csLittleEndian::Convert (b);
+    cf->Read ((char*)&c, 4); c = csLittleEndian::Convert (c);
+    polymesh_triangles[i].a = a;
+    polymesh_triangles[i].b = b;
+    polymesh_triangles[i].c = c;
+  }
+  return true;
+}
+
+void csTerrainObject::WriteCDLODToCache ()
+{
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  if (!engine) return;
+  iCacheManager* cache_mgr = engine->GetCacheManager ();
+  if (!cache_mgr) return;
+
+  char* cachename = GenerateCacheName ();
+
+  csMemFile m;
+  csRef<iFile> mf = SCF_QUERY_INTERFACE ((&m), iFile);
+
+  char header[5];
+  strcpy (header, CDLODMAGIC);
+  mf->Write ((char const*) header, 4);
+
+  uint32 cd_res = (uint32)cd_resolution;
+  cd_res = csLittleEndian::Convert (cd_res);
+  mf->Write ((char const*) &cd_res, 4);
+
+  uint32 tri_count = (uint32)polymesh_tri_count;
+  tri_count = csLittleEndian::Convert (tri_count);
+  mf->Write ((char const*) &tri_count, 4);
+
+  int i;
+  for (i = 0 ; i < polymesh_tri_count ; i++)
+  {
+    uint32 a, b, c;
+    a = (uint32)polymesh_triangles[i].a; a = csLittleEndian::Convert (a);
+    b = (uint32)polymesh_triangles[i].b; b = csLittleEndian::Convert (b);
+    c = (uint32)polymesh_triangles[i].c; c = csLittleEndian::Convert (c);
+    mf->Write ((char const*) &a, 4);
+    mf->Write ((char const*) &b, 4);
+    mf->Write ((char const*) &c, 4);
+  }
+
+  cache_mgr->CacheData ((void*)(m.GetData ()), m.GetSize (),
+  	  "bruteblock_lod", cachename, 0);
+  delete[] cachename;
+  cache_mgr->Flush ();
+}
+
+void csTerrainObject::SetupPolyMeshData ()
+{
+  if (polymesh_valid) return;
+  SetupObject ();
+  polymesh_valid = true;
+  delete[] polymesh_vertices;
+  delete[] polymesh_triangles;
+  delete[] polymesh_polygons; polymesh_polygons = 0;
+
+  int res = cd_resolution;
+  csRef<iTerraSampler> terrasampler = terraformer->GetSampler (
+      csBox2 (rootblock->center.x - rootblock->size / 2.0,
+      	      rootblock->center.z - rootblock->size / 2.0, 
+	      rootblock->center.x + rootblock->size / 2.0,
+	      rootblock->center.z + rootblock->size / 2.0), res);
+
+  // We get the vertices and normals from the sampler. We will
+  // use the normals for Level of Detail reduction on the collision
+  // detection mesh.
+  polymesh_vertices = new csVector3 [res * res];
+  polymesh_vertex_count = res * res;
+  memcpy (polymesh_vertices, terrasampler->SampleVector3 (vertices_name),
+    res * res * sizeof (csVector3));
+
+  if (cd_lod_cost > 0.00001)
+  {
+    // We use LOD. First see if we can get it from the cache.
+    if (ReadCDLODFromCache ())
+      return;
+  }
+
+  // First we make the base triangle mesh with highest detail.
+  polymesh_tri_count = 2 * (res-1) * (res-1);
+  polymesh_triangles = new csTriangle [polymesh_tri_count];
+  int x, y;
+  csTriangle* tri = polymesh_triangles;
+  for (y = 0 ; y < res-1 ; y++)
+  {
+    int yr = y * res;
+    for (x = 0 ; x < res-1 ; x++)
+    {
+      (tri++)->Set (yr + x, yr+res + x, yr + x+1);
+      (tri++)->Set (yr + x+1, yr+res + x, yr+res + x+1);
+    }
+  }
+
+  if (cd_lod_cost <= 0.00001)
+  {
+    // We do no lod on the CD mesh.
+    return;
+  }
+
+  csVector3* normals = new csVector3[res * res];
+  memcpy (normals, terrasampler->SampleVector3 (normals_name),
+    res * res * sizeof (csVector3));
+
+  if (verbose)
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+    	  "Optimizing CD Mesh for Terrain: tris %d ...",
+    	  polymesh_tri_count);
+
+  // Set up the base mesh which will be used in the LOD
+  // reduction algorithm. After setting up this mesh we
+  // can discard our triangle array since a copy is made.
+  csTriangleMesh mesh;
+  mesh.SetTriangles (polymesh_triangles, polymesh_tri_count);
+  delete[] polymesh_triangles;	// SetTriangles() makes a copy.
+
+  // Set up the LOD algorithm that we will use.
+  // This is basically the cost calculation function.
+  csTriangleLODAlgoHM lodalgo;
+  lodalgo.normals = normals;
+  lodalgo.edgedata = new int[res*res];	//@@@ Delete in csTriangleLODAlgoHM?
+  lodalgo.min_max_cost = 1.0 - cd_lod_cost;
+  lodalgo.mesh = &mesh;
+
+  // Set up edge data. We have to be careful when collapsing
+  // vertices that are on a border. For example, a vertex on a left
+  // border can only be collapsed to another vertex on the left
+  // border. To detect that quickly in our lod algorithm we fill
+  // the edgedata table with the relevant information here.
+  int i = 0;
+  for (y = 0 ; y < res ; y++)
+  {
+    bool u = y == 0;
+    bool d = y == res-1;
+    for (x = 0 ; x < res ; x++)
+    {
+      bool l = x == 0;
+      bool r = x == res-1;
+      lodalgo.edgedata[i] =
+        ((l && u) || (l && d) || (r && u) || (r && d)) ? -1 :
+      	l ? 1 : u ? 2 : r ? 3 : d ? 4 : 0;
+      i++;
+    }
+  }
+
+  // This class will maintain the cost of all vertices.
+  // It is used by CalculateLODFast() below.
+  csTriangleVerticesCost mesh_verts (&mesh, polymesh_vertices,
+      polymesh_vertex_count);
+
+  // Do the triangle reduction.
+  polymesh_tri_count = 0;
+  polymesh_triangles = csTriangleMeshLOD::CalculateLODFast (&mesh,
+  	&mesh_verts, cd_lod_cost, polymesh_tri_count,
+	&lodalgo);
+
+  if (verbose)
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+    	  "Optimizing done: result %d", polymesh_tri_count);
+
+  WriteCDLODToCache ();
+
+  delete[] lodalgo.edgedata;
+  delete[] normals;
+  terrasampler->Cleanup ();
+}
+
+void csTerrainObject::CleanPolyMeshData ()
+{
+  delete[] polymesh_vertices;
+  polymesh_vertices = 0;
+  delete[] polymesh_triangles;
+  polymesh_triangles = 0;
+  delete[] polymesh_polygons;
+  polymesh_polygons = 0;
+}
+
+void csTerrainObject::PolyMesh::Cleanup ()
+{
+  terrain->CleanPolyMeshData ();
+}
+
+csMeshedPolygon* csTerrainObject::PolyMesh::GetPolygons ()
+{
+  terrain->SetupPolyMeshData ();
+  if (!terrain->polymesh_polygons)
+  {
+    int pcnt = terrain->polymesh_tri_count;
+    terrain->polymesh_polygons = new csMeshedPolygon [pcnt];
+    csTriangle* tris = terrain->polymesh_triangles;
+    int i;
+    for (i = 0 ; i < pcnt ; i++)
+    {
+      terrain->polymesh_polygons[i].num_vertices = 3;
+      terrain->polymesh_polygons[i].vertices = &tris[i].a;
+    }
+  }
+
+  return terrain->polymesh_polygons;
+}
+
+int csTerrainObject::PolyMesh::GetVertexCount ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_vertex_count;
+}
+
+csVector3* csTerrainObject::PolyMesh::GetVertices ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_vertices;
+}
+
+int csTerrainObject::PolyMesh::GetPolygonCount ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_tri_count;
+}
+
+int csTerrainObject::PolyMesh::GetTriangleCount ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_tri_count;
+}
+
+csTriangle* csTerrainObject::PolyMesh::GetTriangles ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_triangles;
+}
+
+//----------------------------------------------------------------------
+
+
 csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
                                     csTerrainFactory *pFactory)
 {
@@ -770,6 +1198,19 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   csTerrainObject::object_reg = object_reg;
   csTerrainObject::pFactory = pFactory;
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+
+  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
+  scfiObjectModel.SetPolygonMeshViscull (0);
+  scfiObjectModel.SetPolygonMeshShadows (0);
+  scfiPolygonMesh.SetTerrain (this);
+
+  polymesh_valid = false;
+  polymesh_vertices = 0;
+  polymesh_triangles = 0;
+  polymesh_polygons = 0;
+  cd_resolution = 256;
+  cd_lod_cost = -1; //0.02;
 
   logparent = 0;
   initialized = false;
@@ -821,6 +1262,8 @@ csTerrainObject::~csTerrainObject ()
 {
   //builder->Stop ();
   if (vis_cb) vis_cb->DecRef ();
+  delete[] polymesh_vertices;
+  delete[] polymesh_triangles;
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiTerrainObjectState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
@@ -1800,17 +2243,13 @@ bool csTerrainObject::SetLODValue (const char* parameter, float value)
   }
   else if (strcmp (parameter, "cd resolution") == 0)
   {
-    csReport(object_reg, CS_REPORTER_SEVERITY_BUG,
-             "crystalspace.terraformer.paging",
-             "CD for terrain is now handled dynamically in opcode.");
-    return false;
+    cd_resolution = int (value);
+    return true;
   }
   else if (strcmp (parameter, "cd lod cost") == 0)
   {
-    csReport(object_reg, CS_REPORTER_SEVERITY_BUG,
-             "crystalspace.terraformer.paging",
-             "CD for terrain is now handled dynamically in opcode.");
-    return false;
+    cd_lod_cost = value;
+    return true;
   }
   else if (strcmp (parameter, "lightmap resolution") == 0)
   {
@@ -1842,17 +2281,11 @@ float csTerrainObject::GetLODValue (const char* parameter)
   }
   else if (strcmp (parameter, "cd resolution") == 0)
   {
-    csReport(object_reg, CS_REPORTER_SEVERITY_BUG,
-             "crystalspace.terraformer.paging",
-             "CD for terrain is now handled dynamically in opcode.");
-    return 0;
+    return float (cd_resolution);
   }
   else if (strcmp (parameter, "cd lod cost") == 0)
   {
-    csReport(object_reg, CS_REPORTER_SEVERITY_BUG,
-             "crystalspace.terraformer.paging",
-             "CD for terrain is now handled dynamically in opcode.");
-    return 0;
+    return cd_lod_cost;
   }
   else if (strcmp (parameter, "lightmap resolution") == 0)
   {
