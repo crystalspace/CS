@@ -9,6 +9,26 @@ chronological order.
 8-Apr-2006
 	- Rhad removed erroneous CS_PURE_METHOD specifier on 
 	  csMouseEventHelper::GetEventData.
+	- Rhad made more updates to the sound system:
+	  - Cleaned up excess useless comments in iSndSysSoftwareDriver
+	  - Promoted RegisterCallback() and UnregisterCallback() interface
+	    functions from iSndSysRendererSoftware to iSndSysRenderer.
+	  - iSndSysSoftwareRendererCallback renamed to
+	    iSndSysRendererCallback.
+	  - Bumped version on iSndSysRenderer due to interface change.
+	  - Changed %llu format specifier to PRIu64 in event recorder.
+	  - Moved threadsafe queue implimentation from plugins path to
+	    libs/csplugincommon/sndsys/queue.h
+	  - Added ClearFilterList() function to SndSysOutputFilterQueue.
+	  - Added iSndSysStreamCallback.  This interface will allow for
+	    callback notification of interesting sound stream events.
+	  - Bumped the version of iSndSysStream.
+	  - Added libs/csplugincommon/sndsys/ snddata.cpp and sndstream.cpp
+	    Simple sound system stream and data classes can build off of
+	    the base classes defined here.
+	  - Converted Ogg and Wav elements to make use of the streamd and
+	    data base classes.
+	  - Fixed gcc4.1 reported warnings in the sound system.
 7-Apr-2006
 	- caedes fixed a bug in cs-config generation scripts that would
 	  prevent it from finding optional libraries if cs is installed and
