@@ -21,6 +21,7 @@
 
 #include "csplugincommon/sndsys/sndstream.h"
 
+using namespace CS::SndSys;
 
 SndSysBasicStream::SndSysBasicStream(csSndSysSoundFormat *pRenderFormat, int Mode3D) : 
  scfImplementationType(this),

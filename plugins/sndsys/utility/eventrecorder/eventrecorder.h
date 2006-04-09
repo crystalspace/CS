@@ -28,6 +28,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csplugincommon/sndsys/queue.h"
 #include "isndsys/ss_eventrecorder.h"
 
+using namespace CS::SndSys;
 
 class csSndSysBasicEventRecorder : public iSndSysEventRecorder
 {

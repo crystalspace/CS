@@ -19,10 +19,7 @@
 #include "cssysdef.h"
 #include "csplugincommon/sndsys/convert.h"
 
-namespace CS
-{
-namespace Sound
-{
+using namespace CS::SndSys;
 
 #define SWAP16(x) ((x)<<8 | (x)>>8)
 
@@ -426,5 +423,3 @@ void PCMSampleConverter::SetSourceProperties(int source_channels,
   src_frequency=source_frequency;
 }
 
-} // namespace Sound
-} // namespace CS

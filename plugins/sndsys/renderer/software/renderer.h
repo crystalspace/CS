@@ -38,6 +38,9 @@
 #include "compressor.h"
 
 
+using namespace CS::SndSys;
+
+
 #define MAX_CHANNELS 18
 
 // see http://www.microsoft.com/whdc/device/audio/multichaud.mspx
@@ -75,6 +78,8 @@ class SndSysListenerSoftware;
 class SndSysSourceSoftware;
 struct iSndSysSourceSoftware;
 struct iReporter;
+
+using namespace CS::SndSys;
 
 class csSndSysRendererSoftware : 
   public scfImplementation4<csSndSysRendererSoftware, iComponent, iEventHandler,  iSndSysRenderer, iSndSysRendererSoftware>

@@ -25,6 +25,7 @@
 #include "isndsys/ss_listener.h"
 #include "csutil/scf_implementation.h"
 
+
 class csListenerProperties
 {
 public:

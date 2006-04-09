@@ -49,7 +49,7 @@ SndSysWavSoundStream::SndSysWavSoundStream (csRef<SndSysWavSoundData> pData,
   m_pSoundData=pData;
 
   // Allocate an advance buffer
-  m_pCyclicBuffer = new CS::Sound::SoundCyclicBuffer (
+  m_pCyclicBuffer = new SoundCyclicBuffer (
     (m_RenderFormat.Bits/8 * m_RenderFormat.Channels) * 
     (m_RenderFormat.Freq * WAV_BUFFER_LENGTH_MULTIPLIER / 
       WAV_BUFFER_LENGTH_DIVISOR));
@@ -152,17 +152,17 @@ void SndSysWavSoundStream::AdvancePosition(size_t frame_delta)
       if (m_pPCMConverter == 0)
       {
 #ifdef CS_LITTLE_ENDIAN
-        m_pPCMConverter = new CS::Sound::PCMSampleConverter (
-	  data_format->Channels,data_format->Bits,data_format->Freq);
+        m_pPCMConverter = new PCMSampleConverter (
+          data_format->Channels,data_format->Bits,data_format->Freq);
 #else
         // If we're running on a big endian system and the data is using 
-	// 16 bit samples, endian conversion is necessary
+        // 16 bit samples, endian conversion is necessary
         if (data_format->Bits>8)
-          m_pPCMConverter = new CS::Sound::PCMSampleConverter(
-	    data_format->Channels,data_format->Bits,data_format->Freq, true);
+          m_pPCMConverter = new PCMSampleConverter(
+          data_format->Channels,data_format->Bits,data_format->Freq, true);
         else
-          m_pPCMConverter = new CS::Sound::PCMSampleConverter (
-	    data_format->Channels,data_format->Bits,data_format->Freq);
+          m_pPCMConverter = new PCMSampleConverter (
+          data_format->Channels,data_format->Bits,data_format->Freq);
 #endif
       }
 
@@ -171,8 +171,8 @@ void SndSysWavSoundStream::AdvancePosition(size_t frame_delta)
 
       // Calculate the needed buffer size for this conversion
       needed_buffer=(m_pPCMConverter->GetRequiredOutputBufferMultiple (
-	m_RenderFormat.Channels,m_RenderFormat.Bits,m_OutputFrequency) * 
-	(WAV_DECODE_BUFFER_SIZE + source_sample_size))/1024;
+        m_RenderFormat.Channels,m_RenderFormat.Bits,m_OutputFrequency) * 
+        (WAV_DECODE_BUFFER_SIZE + source_sample_size))/1024;
 
       // Allocate a new buffer if needed - this will only happen if the source rate changes
       if (m_PreparedDataBufferSize < needed_buffer)
@@ -210,8 +210,8 @@ void SndSysWavSoundStream::AdvancePosition(size_t frame_delta)
     }
     else
       m_PreparedDataBufferUsage = m_pPCMConverter->ConvertBuffer (
-	m_pWavCurrentPointer,available_bytes,m_pPreparedDataBuffer,m_RenderFormat.Channels,
-      m_RenderFormat.Bits,m_OutputFrequency);
+        m_pWavCurrentPointer,available_bytes,m_pPreparedDataBuffer,m_RenderFormat.Channels,
+        m_RenderFormat.Bits,m_OutputFrequency);
 
     // Decrease the available bytes and move the buffer pointer ahead
     m_pWavCurrentPointer+=available_bytes;

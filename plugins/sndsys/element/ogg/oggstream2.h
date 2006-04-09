@@ -24,6 +24,7 @@
 #include "csplugincommon/sndsys/sndstream.h"
 #include "oggdata2.h"
 
+using namespace CS::SndSys;
 
 // This hack works around a build problem with some installations of Ogg/Vorbis
 // on Cygwin where it attempts to #include the non-existent <_G_config.h>.  We

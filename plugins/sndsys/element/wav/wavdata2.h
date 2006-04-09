@@ -27,6 +27,7 @@
 #include "iutil/databuff.h"
 #include "csplugincommon/sndsys/snddata.h"
 
+using namespace CS::SndSys;
 
 // header of the RIFF-chunk
 struct _RIFFchk

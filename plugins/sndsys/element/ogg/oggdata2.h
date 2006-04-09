@@ -28,6 +28,8 @@
 #include "csplugincommon/sndsys/snddata.h"
 
 
+using namespace CS::SndSys;
+
 
 
 // This hack works around a build problem with some installations of Ogg/Vorbis

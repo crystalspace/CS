@@ -27,6 +27,8 @@
 
 #include "filterqueue.h"
 
+using namespace CS::SndSys;
+
 
 #define MAX_CHANNELS 18
 

@@ -27,6 +27,7 @@
 
 #include "csplugincommon/sndsys/queue.h"
 
+using namespace CS::SndSys;
 
 /// 
 class SndSysOutputFilterQueue

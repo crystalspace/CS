@@ -25,7 +25,7 @@
  
 namespace CS
 {
-namespace Sound
+namespace SndSys
 {
 
 /** 
@@ -102,7 +102,7 @@ private:
   //@}
 };
 
-} // namespace Sound
+} // namespace SndSys
 } // namespace CS
 
 #endif // __CS_SNDSYS_CYCLICBUF_H__

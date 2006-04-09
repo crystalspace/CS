@@ -57,7 +57,7 @@
 
 namespace CS
 {
-namespace Sound
+namespace SndSys
 {
 /**
  * A PCMSampleConverter object converts PCM data from one format to another.
@@ -173,7 +173,7 @@ protected:
   bool swap_16;
 };
 
-} // namespace Sound
+} // namespace SndSys
 } // namespace CS
 
 #endif // __CS_SNDSYS_CONVERT_H__

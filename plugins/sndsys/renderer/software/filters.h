@@ -34,6 +34,8 @@
 #include "source.h"
 #include "listener.h"
 
+using namespace CS::SndSys;
+
 
 /// A base class for software source filters.
 //

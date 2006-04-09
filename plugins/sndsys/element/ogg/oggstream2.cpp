@@ -51,7 +51,7 @@ SndSysOggSoundStream::SndSysOggSoundStream (csRef<SndSysOggSoundData> pData,
   m_pSoundData=pData;
 
   // Allocate an advance buffer
-  m_pCyclicBuffer = new CS::Sound::SoundCyclicBuffer (
+  m_pCyclicBuffer = new SoundCyclicBuffer (
     (m_RenderFormat.Bits/8 * m_RenderFormat.Channels) * 
       (m_RenderFormat.Freq * OGG_BUFFER_LENGTH_MULTIPLIER / 
 	OGG_BUFFER_LENGTH_DIVISOR));
@@ -146,9 +146,9 @@ void SndSysOggSoundStream::AdvancePosition(size_t frame_delta)
     while (bytes_read==0)
     {
       bytes_read = ov_read (&m_VorbisFile, ogg_decode_buffer,
-	OGG_DECODE_BUFFER_SIZE, OGG_ENDIAN,
-	(m_RenderFormat.Bits==8)?1:2, (m_RenderFormat.Bits==8)?0:1,
-	&m_CurrentOggStream);
+        OGG_DECODE_BUFFER_SIZE, OGG_ENDIAN,
+        (m_RenderFormat.Bits==8)?1:2, (m_RenderFormat.Bits==8)?0:1,
+        &m_CurrentOggStream);
    
       // Assert on error
       CS_ASSERT(bytes_read >=0);
@@ -183,17 +183,17 @@ void SndSysOggSoundStream::AdvancePosition(size_t frame_delta)
 
       // Create the pcm sample converter if it's not yet created
       if (m_pPCMConverter == 0)
-        m_pPCMConverter = new CS::Sound::PCMSampleConverter (
-	  m_pCurrentOggFormatInfo->channels, m_RenderFormat.Bits,
-	  m_pCurrentOggFormatInfo->rate);
+        m_pPCMConverter = new PCMSampleConverter (
+          m_pCurrentOggFormatInfo->channels, m_RenderFormat.Bits,
+          m_pCurrentOggFormatInfo->rate);
 
       // Calculate the size of one source sample
       source_sample_size=m_pCurrentOggFormatInfo->channels * m_RenderFormat.Bits;
 
       // Calculate the needed buffer size for this conversion
       needed_buffer = (m_pPCMConverter->GetRequiredOutputBufferMultiple (
-	m_RenderFormat.Channels,m_RenderFormat.Bits,m_OutputFrequency) * 
-	  (OGG_DECODE_BUFFER_SIZE + source_sample_size))/1024;
+        m_RenderFormat.Channels,m_RenderFormat.Bits,m_OutputFrequency) * 
+        (OGG_DECODE_BUFFER_SIZE + source_sample_size))/1024;
 
       // Allocate a new buffer if needed - this will only happen if the source rate changes
       if (m_PreparedDataBufferSize < needed_buffer)
@@ -215,8 +215,8 @@ void SndSysOggSoundStream::AdvancePosition(size_t frame_delta)
     else
     {
       m_PreparedDataBufferUsage = m_pPCMConverter->ConvertBuffer (ogg_decode_buffer,
-	bytes_read, m_pPreparedDataBuffer, m_RenderFormat.Channels,
-	m_RenderFormat.Bits,m_OutputFrequency);
+        bytes_read, m_pPreparedDataBuffer, m_RenderFormat.Channels,
+        m_RenderFormat.Bits,m_OutputFrequency);
     }
 
     if (m_PreparedDataBufferUsage > 0)

@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include "csplugincommon/sndsys/snddata.h"
 
+using namespace CS::SndSys;
 
 SndSysBasicData::SndSysBasicData(iBase *pParent) :
   scfImplementationType(this, pParent),

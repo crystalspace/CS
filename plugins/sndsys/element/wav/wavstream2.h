@@ -24,6 +24,7 @@
 #include "csplugincommon/sndsys/sndstream.h"
 #include "wavdata2.h"
 
+using namespace CS::SndSys;
 
 class SndSysWavSoundStream : public SndSysBasicStream
 {
