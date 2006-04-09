@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
   
+9-Apr-2006
+	- Rhad renamed CS::Sound namespace to CS::SndSys for all SndSys
+	  sound system components. This naming is consistant with the
+	  rest of the newer sound system and distinguishes components of
+	  the new system from the old system.
+	- Rhad added the components in csplugincommon/sndsys/ to the 
+	  CS::SndSys namespace.
+	- Rhad commented and cleaned up the CS::SndSys::Queue class.
 8-Apr-2006
 	- Rhad removed erroneous CS_PURE_METHOD specifier on 
 	  csMouseEventHelper::GetEventData.
