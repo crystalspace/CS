@@ -7752,6 +7752,10 @@ class iSndSysStream(iBase):
     def AdvancePosition(*args): return _cspace.iSndSysStream_AdvancePosition(*args)
     def GetDataPointers(*args): return _cspace.iSndSysStream_GetDataPointers(*args)
     def InitializeSourcePositionMarker(*args): return _cspace.iSndSysStream_InitializeSourcePositionMarker(*args)
+    def ProcessNotifications(*args): return _cspace.iSndSysStream_ProcessNotifications(*args)
+    def RegisterCallback(*args): return _cspace.iSndSysStream_RegisterCallback(*args)
+    def UnregisterCallback(*args): return _cspace.iSndSysStream_UnregisterCallback(*args)
+    def RegisterFrameNotification(*args): return _cspace.iSndSysStream_RegisterFrameNotification(*args)
     def __del__(self, destroy=_cspace.delete_iSndSysStream):
         try:
             if self.thisown: destroy(self)
@@ -7769,6 +7773,33 @@ _cspace.iSndSysStream_swigregister(iSndSysStreamPtr)
 CS_SNDSYS_STREAM_UNKNOWN_LENGTH = cvar.CS_SNDSYS_STREAM_UNKNOWN_LENGTH
 
 iSndSysStream_scfGetVersion = _cspace.iSndSysStream_scfGetVersion
+
+class iSndSysStreamCallback(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysStreamCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysStreamCallback, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ iSndSysStreamCallback instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def StreamLoopNotification(*args): return _cspace.iSndSysStreamCallback_StreamLoopNotification(*args)
+    def StreamPauseNotification(*args): return _cspace.iSndSysStreamCallback_StreamPauseNotification(*args)
+    def StreamUnpauseNotification(*args): return _cspace.iSndSysStreamCallback_StreamUnpauseNotification(*args)
+    def StreamFrameNotification(*args): return _cspace.iSndSysStreamCallback_StreamFrameNotification(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysStreamCallback):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class iSndSysStreamCallbackPtr(iSndSysStreamCallback):
+    def __init__(self, this):
+        _swig_setattr(self, iSndSysStreamCallback, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysStreamCallback, 'thisown', 0)
+        _swig_setattr(self, iSndSysStreamCallback,self.__class__,iSndSysStreamCallback)
+_cspace.iSndSysStreamCallback_swigregister(iSndSysStreamCallbackPtr)
 
 CS_SNDSYS_SOURCE_STOPPED = _cspace.CS_SNDSYS_SOURCE_STOPPED
 CS_SNDSYS_SOURCE_PLAYING = _cspace.CS_SNDSYS_SOURCE_PLAYING
@@ -7789,6 +7820,8 @@ class iSndSysRenderer(iBase):
     def RemoveStream(*args): return _cspace.iSndSysRenderer_RemoveStream(*args)
     def RemoveSource(*args): return _cspace.iSndSysRenderer_RemoveSource(*args)
     def GetListener(*args): return _cspace.iSndSysRenderer_GetListener(*args)
+    def RegisterCallback(*args): return _cspace.iSndSysRenderer_RegisterCallback(*args)
+    def UnregisterCallback(*args): return _cspace.iSndSysRenderer_UnregisterCallback(*args)
     def __del__(self, destroy=_cspace.delete_iSndSysRenderer):
         try:
             if self.thisown: destroy(self)
@@ -7806,32 +7839,32 @@ _cspace.iSndSysRenderer_swigregister(iSndSysRendererPtr)
 
 iSndSysRenderer_scfGetVersion = _cspace.iSndSysRenderer_scfGetVersion
 
-class iSndSysRendererSoftwareCallback(iBase):
+class iSndSysRendererCallback(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysRendererSoftwareCallback, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysRendererCallback, name, value)
     __swig_getmethods__ = {}
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysRendererSoftwareCallback, name)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysRendererCallback, name)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
-        return "<%s.%s; proxy of C++ iSndSysRendererSoftwareCallback instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
-    def StreamAddNotification(*args): return _cspace.iSndSysRendererSoftwareCallback_StreamAddNotification(*args)
-    def StreamRemoveNotification(*args): return _cspace.iSndSysRendererSoftwareCallback_StreamRemoveNotification(*args)
-    def SourceAddNotification(*args): return _cspace.iSndSysRendererSoftwareCallback_SourceAddNotification(*args)
-    def SourceRemoveNotification(*args): return _cspace.iSndSysRendererSoftwareCallback_SourceRemoveNotification(*args)
-    def __del__(self, destroy=_cspace.delete_iSndSysRendererSoftwareCallback):
+        return "<%s.%s; proxy of C++ iSndSysRendererCallback instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def StreamAddNotification(*args): return _cspace.iSndSysRendererCallback_StreamAddNotification(*args)
+    def StreamRemoveNotification(*args): return _cspace.iSndSysRendererCallback_StreamRemoveNotification(*args)
+    def SourceAddNotification(*args): return _cspace.iSndSysRendererCallback_SourceAddNotification(*args)
+    def SourceRemoveNotification(*args): return _cspace.iSndSysRendererCallback_SourceRemoveNotification(*args)
+    def __del__(self, destroy=_cspace.delete_iSndSysRendererCallback):
         try:
             if self.thisown: destroy(self)
         except: pass
 
 
-class iSndSysRendererSoftwareCallbackPtr(iSndSysRendererSoftwareCallback):
+class iSndSysRendererCallbackPtr(iSndSysRendererCallback):
     def __init__(self, this):
-        _swig_setattr(self, iSndSysRendererSoftwareCallback, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysRendererSoftwareCallback, 'thisown', 0)
-        _swig_setattr(self, iSndSysRendererSoftwareCallback,self.__class__,iSndSysRendererSoftwareCallback)
-_cspace.iSndSysRendererSoftwareCallback_swigregister(iSndSysRendererSoftwareCallbackPtr)
+        _swig_setattr(self, iSndSysRendererCallback, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iSndSysRendererCallback, 'thisown', 0)
+        _swig_setattr(self, iSndSysRendererCallback,self.__class__,iSndSysRendererCallback)
+_cspace.iSndSysRendererCallback_swigregister(iSndSysRendererCallbackPtr)
 
 class iSndSysRendererSoftware(iBase):
     __swig_setmethods__ = {}
@@ -7845,8 +7878,6 @@ class iSndSysRendererSoftware(iBase):
         return "<%s.%s; proxy of C++ iSndSysRendererSoftware instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def AddOutputFilter(*args): return _cspace.iSndSysRendererSoftware_AddOutputFilter(*args)
     def RemoveOutputFilter(*args): return _cspace.iSndSysRendererSoftware_RemoveOutputFilter(*args)
-    def RegisterCallback(*args): return _cspace.iSndSysRendererSoftware_RegisterCallback(*args)
-    def UnregisterCallback(*args): return _cspace.iSndSysRendererSoftware_UnregisterCallback(*args)
     def __del__(self, destroy=_cspace.delete_iSndSysRendererSoftware):
         try:
             if self.thisown: destroy(self)
