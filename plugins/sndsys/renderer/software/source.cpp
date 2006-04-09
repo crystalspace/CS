@@ -620,9 +620,16 @@ bool SndSysSourceSoftware3D::AddOutputFilter(SndSysFilterLocation Location, iSnd
   switch (Location)
   {
   case SS_FILTER_LOC_SOURCEIN:
-    if (!pFilter->FormatNotify(&renderer->m_PlaybackFormat))
+  {
+    // As a positional source, our input is always mono.
+    csSndSysSoundFormat InputFormat;
+    memcpy(&InputFormat, &renderer->m_PlaybackFormat, sizeof(csSndSysSoundFormat));
+    InputFormat.Channels=1;
+
+    if (!pFilter->FormatNotify(&InputFormat))
       return false;
     return m_SourceInFilterQueue.AddFilter(pFilter);
+  }
   case SS_FILTER_LOC_SOURCEOUT:
     if (!pFilter->FormatNotify(&renderer->m_PlaybackFormat))
       return false;
