@@ -8791,6 +8791,10 @@ package cspace::iSndSysStream;
 *AdvancePosition = *cspacec::iSndSysStream_AdvancePosition;
 *GetDataPointers = *cspacec::iSndSysStream_GetDataPointers;
 *InitializeSourcePositionMarker = *cspacec::iSndSysStream_InitializeSourcePositionMarker;
+*ProcessNotifications = *cspacec::iSndSysStream_ProcessNotifications;
+*RegisterCallback = *cspacec::iSndSysStream_RegisterCallback;
+*UnregisterCallback = *cspacec::iSndSysStream_UnregisterCallback;
+*RegisterFrameNotification = *cspacec::iSndSysStream_RegisterFrameNotification;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -8803,6 +8807,40 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iSndSysStream_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysStreamCallback ##############
+
+package cspace::iSndSysStreamCallback;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*StreamLoopNotification = *cspacec::iSndSysStreamCallback_StreamLoopNotification;
+*StreamPauseNotification = *cspacec::iSndSysStreamCallback_StreamPauseNotification;
+*StreamUnpauseNotification = *cspacec::iSndSysStreamCallback_StreamUnpauseNotification;
+*StreamFrameNotification = *cspacec::iSndSysStreamCallback_StreamFrameNotification;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysStreamCallback($self);
+        delete $OWNER{$self};
+    }
+}
+
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -8829,6 +8867,8 @@ package cspace::iSndSysRenderer;
 *RemoveStream = *cspacec::iSndSysRenderer_RemoveStream;
 *RemoveSource = *cspacec::iSndSysRenderer_RemoveSource;
 *GetListener = *cspacec::iSndSysRenderer_GetListener;
+*RegisterCallback = *cspacec::iSndSysRenderer_RegisterCallback;
+*UnregisterCallback = *cspacec::iSndSysRenderer_UnregisterCallback;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -8854,23 +8894,23 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSndSysRendererSoftwareCallback ##############
+############# Class : cspace::iSndSysRendererCallback ##############
 
-package cspace::iSndSysRendererSoftwareCallback;
+package cspace::iSndSysRendererCallback;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
-*StreamAddNotification = *cspacec::iSndSysRendererSoftwareCallback_StreamAddNotification;
-*StreamRemoveNotification = *cspacec::iSndSysRendererSoftwareCallback_StreamRemoveNotification;
-*SourceAddNotification = *cspacec::iSndSysRendererSoftwareCallback_SourceAddNotification;
-*SourceRemoveNotification = *cspacec::iSndSysRendererSoftwareCallback_SourceRemoveNotification;
+*StreamAddNotification = *cspacec::iSndSysRendererCallback_StreamAddNotification;
+*StreamRemoveNotification = *cspacec::iSndSysRendererCallback_StreamRemoveNotification;
+*SourceAddNotification = *cspacec::iSndSysRendererCallback_SourceAddNotification;
+*SourceRemoveNotification = *cspacec::iSndSysRendererCallback_SourceRemoveNotification;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iSndSysRendererSoftwareCallback($self);
+        cspacec::delete_iSndSysRendererCallback($self);
         delete $OWNER{$self};
     }
 }
@@ -8896,8 +8936,6 @@ package cspace::iSndSysRendererSoftware;
 %ITERATORS = ();
 *AddOutputFilter = *cspacec::iSndSysRendererSoftware_AddOutputFilter;
 *RemoveOutputFilter = *cspacec::iSndSysRendererSoftware_RemoveOutputFilter;
-*RegisterCallback = *cspacec::iSndSysRendererSoftware_RegisterCallback;
-*UnregisterCallback = *cspacec::iSndSysRendererSoftware_UnregisterCallback;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
