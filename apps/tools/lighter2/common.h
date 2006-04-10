@@ -50,29 +50,11 @@ namespace lighter
   // Constants
   static const float LITEPSILON = 1.0e-5f;
 
-  // Settings structure
-  struct RadSettings
-  {
-    // Density in u and v direction. u = uTexelPerUnit*x etc.. 
-    float uTexelPerUnit, vTexelPerUnit;
-    
-    // Element/patch densities
-    uint uPatchResolution, vPatchResolution;
-
-    // Max lightmap sizes
-    uint maxLightmapU, maxLightmapV;
-  
-    // Set default settings
-    RadSettings ()
-      : uTexelPerUnit (16/(1.0f)), vTexelPerUnit (16/(1.0f)),
-      uPatchResolution (4), vPatchResolution (4),
-      maxLightmapU (1024), maxLightmapV (1024)
-    {
-    }
-  };
+ 
+  class Configuration;
 
   //The global settings
-  extern RadSettings globalSettings;
+  extern Configuration globalConfig;
 
 }
 

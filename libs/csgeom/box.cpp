@@ -491,9 +491,9 @@ csVector3 csBox3::GetCorner (int corner) const
 
 void csBox3::SetCenter (const csVector3 &c)
 {
-  csVector3 move = c - GetCenter ();
-  minbox += move;
-  maxbox += move;
+  csVector3 size = GetSize ();
+  minbox = c - size * 0.5f;
+  maxbox = c + size * 0.5f;
 }
 
 void csBox3::SetSize (const csVector3 &s)

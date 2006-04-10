@@ -25,6 +25,7 @@
 #include "lightmap.h"
 #include "lightmapuv.h"
 #include "radobject.h"
+#include "config.h"
 
 namespace lighter
 {
@@ -124,7 +125,8 @@ namespace lighter
       prim.ComputePlane ();
       prim.ComputeUVTransform ();
       prim.SetRadObject (this);
-      prim.Prepare (globalSettings.uPatchResolution, globalSettings.vPatchResolution);
+      prim.Prepare (globalConfig.GetRadProperties ().uPatchResolution, 
+        globalConfig.GetRadProperties ().vPatchResolution);
     }
 
     // Create and init lightmaps
@@ -189,7 +191,7 @@ namespace lighter
     
     // Un-antialis
     uint i;
-    for (i = 0; i < lightmaps.GetSize (); i++)
+ /*   for (i = 0; i < lightmaps.GetSize (); i++)
     {
       csColor* lmData = lightmaps[i]->GetData ().GetArray ();
       float* mmData = masks[i].maskData.GetArray ();
@@ -201,7 +203,7 @@ namespace lighter
 
         *lmData *= (totalArea / *mmData);
       }
-    }
+    }*/
 
     // Do the filtering
     for (i = 0; i < lightmaps.GetSize (); i++)

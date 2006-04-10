@@ -19,25 +19,24 @@
 #include "crystalspace.h"
 
 #include "common.h"
+#include "config.h"
 #include "lighter.h"
-#include "scene.h"
 #include "lightmapuv.h"
-#include "raytracer.h"
-#include "raygenerator.h"
 #include "radprimitive.h"
-
+#include "raygenerator.h"
+#include "raytracer.h"
+#include "scene.h"
+#include "statistics.h"
+#include "tui.h"
+#include "directlight.h"
 
 CS_IMPLEMENT_APPLICATION
 
-// used below
-CS_SPECIALIZE_TEMPLATE
-class csHashComputer<lighter::RadPrimitive*> : 
-  public csHashComputerIntegral<lighter::RadPrimitive*> {};
 
 namespace lighter
 {
-  RadSettings globalSettings;
   Lighter* globalLighter;
+  Statistics globalStats;
 
   Lighter::Lighter (iObjectRegistry *objectRegistry)
     : objectRegistry (objectRegistry), scene (new Scene)
@@ -55,36 +54,33 @@ namespace lighter
     if (!csInitializer::SetupConfigManager (objectRegistry,0))
       return Report ("Cannot setup config manager!");
 
+    // Initialize the TUI
+    globalTUI.Redraw ();
+
+    // Setup reporter
+    {
+      pluginManager = csQueryRegistry<iPluginManager> (objectRegistry);
+      if (!pluginManager) return Report ("No iPluginManager!");
+
+      csRef<iReporter> rep;
+      CS_QUERY_REGISTRY_PLUGIN(rep, objectRegistry, 
+        "crystalspace.utilities.reporter", iReporter);
+
+      // Set ourselves up as a reporterlistener
+      rep->AddReporterListener (&globalTUI);
+    }
+    
     // Get plugins
     if (!csInitializer::RequestPlugins (objectRegistry,
             CS_REQUEST_ENGINE,
             CS_REQUEST_IMAGELOADER,
             CS_REQUEST_LEVELLOADER,
-            CS_REQUEST_NULL3D,
-            CS_REQUEST_REPORTER,
-            CS_REQUEST_REPORTERLISTENER,
+            CS_REQUEST_NULL3D,            
             CS_REQUEST_VFS,
             CS_REQUEST_END))
       return Report ("Cannot load plugins!");
 
-    csRef<iStandardReporterListener> repl =
-  	csQueryRegistry<iStandardReporterListener> (objectRegistry);
-    if (repl)
-    {
-      // tune the reporter to be a bit more chatty
-      repl->SetMessageDestination (
-  	    CS_REPORTER_SEVERITY_BUG, false, true, true, true, true);
-      repl->SetMessageDestination (
-  	    CS_REPORTER_SEVERITY_ERROR, false, true, true, true, true);
-      repl->SetMessageDestination (
-  	    CS_REPORTER_SEVERITY_WARNING, true, false, true, false, true);
-      repl->SetMessageDestination (
-  	    CS_REPORTER_SEVERITY_NOTIFY, true, false, true, false, true);
-      repl->SetMessageDestination (
-  	    CS_REPORTER_SEVERITY_DEBUG, true, false, true, false, true);
-      repl->ShowMessageID (CS_REPORTER_SEVERITY_WARNING, true);
-      repl->ShowMessageID (CS_REPORTER_SEVERITY_NOTIFY, true);
-    }
+    lighter::globalStats.SetTaskProgress ("Starting up", 60);
 
     // Check for commandline help.
     if (csCommandLineHelper::CheckHelp (objectRegistry))
@@ -106,8 +102,7 @@ namespace lighter
     loader = csQueryRegistry<iLoader> (objectRegistry);
     if (!loader) return Report ("No iLoader!");
 
-    pluginManager = csQueryRegistry<iPluginManager> (objectRegistry);
-    if (!pluginManager) return Report ("No iPluginManager!");
+    
 
     vfs = csQueryRegistry<iVFS> (objectRegistry);
     if (!vfs) return Report ("No iVFS!");
@@ -119,15 +114,23 @@ namespace lighter
     // For now, force the use of TinyXML to be able to write
     docSystem.AttachNew (new csTinyDocumentSystem);
 
+    globalStats.SetTaskProgress ("Starting up", 100);
+    globalStats.SetTotalProgress (5);
     return true;
   }
 
   bool Lighter::LightEmUp ()
   {
     // Have to load to have anything to light
-    if (!LoadFiles ()) return false;
-    if (!scene->ParseEngine ()) return false;
+    if (!LoadFiles ()) 
+      return false;
+    globalStats.SetTotalProgress (8);
 
+    if (!scene->ParseEngine ()) 
+      return false;
+    globalStats.SetTotalProgress (10);
+
+    unsigned int taskI = 0;
     // Calculate lightmapping coordinates
     LightmapUVLayouter *uvLayout = new SimpleUVLayouter;
 
@@ -135,9 +138,13 @@ namespace lighter
       scene->GetFactories ().GetIterator ();
     while (factIt.HasNext ())
     {
+      globalStats.SetTaskProgress ("Lightmap layout", (100.0f * taskI) / 
+        scene->GetFactories ().GetSize ());
       csRef<RadObjectFactory> fact = factIt.Next ();
       fact->ComputeLightmapUV (uvLayout);
+      taskI++;
     }
+
 
     // Initialize all objects
     SectorHash::GlobalIterator sectIt = 
@@ -148,13 +155,30 @@ namespace lighter
       sect->Initialize ();
     }
 
+    globalStats.SetTotalProgress (20);
+
+    // Progress 20
+
     // Shoot direct lighting
-    sectIt.Reset ();
-    while (sectIt.HasNext ())
+    if (globalConfig.GetLighterProperties ().doDirectLight)
     {
-      csRef<Sector> sect = sectIt.Next ();
-      ShootDirectLighting (sect);
+      globalStats.SetTaskProgress ("Direct lighting", 0);
+      sectIt.Reset ();
+      while (sectIt.HasNext ())
+      {
+        csRef<Sector> sect = sectIt.Next ();
+        DirectLighting::ShootDirectLighting (sect, 100.0f / scene->GetSectors ().GetSize ());
+      }
     }
+    
+    globalStats.SetTotalProgress (40);
+
+    if (globalConfig.GetLighterProperties ().doRadiosity)
+    {
+
+    }
+
+    globalStats.SetTotalProgress (80);
 
     //@@ DO OTHER LIGHTING
 
@@ -171,9 +195,11 @@ namespace lighter
       }
     }
 
+    globalStats.SetTotalProgress (90);
     //Save the result
     if (!scene->SaveFiles ()) return false;
-    
+    globalStats.SetTotalProgress (100);
+
     return true;  
   }
 
@@ -221,156 +247,14 @@ namespace lighter
     return scene->LoadFiles ();
   }
 
-  void Lighter::ShootDirectLighting (Sector* sector)
-  {
-    RandomRayListGenerator<PseudoRandomRaygenerator> rayGenerator;
-
-    // Need a raytracer
-    Raytracer rayTracer (sector->kdTree);
-
-    // Iterate all lights
-    LightRefArray::Iterator lightIt = sector->allLights.GetIterator ();
-    while (lightIt.HasNext ())
-    {
-      csRef<Light> radLight = lightIt.Next ();
-      radLight->freeEnergy = radLight->color * 1000.0f; //@scale
-
-      /*
-      // Generate and shoot rays
-      csArray<Ray> rays = rayGenerator (0xFFFFF, radLight->position);
-
-      typedef csSet<RadPrimitive*> RadPrimSet;
-      RadPrimSet primsToLight;
-      for (unsigned int rayIdx = 0; rayIdx < rays.GetSize (); rayIdx++)
-      {
-        const Ray& ray = rays[rayIdx];
-        HitPoint hit;
-        if (rayTracer.TraceClosestHit (ray, hit))
-        {
-          // YAY! do something with it..
-          //printf("HAVE HIT! %s\n", hit.hitPoint.Description ().GetData ());
-          primsToLight.Add (hit.primitive);
-        }
-      }
-      
-      RadPrimSet::GlobalIterator it = primsToLight.GetIterator ();;
-      while (it.HasNext ())
-      {
-        RadPrimitive *p = it.Next ();
-        ShadeRadPrimitive (rayTracer, *p, radLight);
-      }*/
-      RadObjectHash::GlobalIterator it = sector->allObjects.GetIterator ();
-      while (it.HasNext ())
-      {
-        csRef<RadObject> o = it.Next ();
-        RadPrimitiveArray& a = o->GetPrimitives ();
-        RadPrimitiveArray::Iterator pit = a.GetIterator ();
-        while(pit.HasNext ())
-        {
-          ShadeRadPrimitive (rayTracer, pit.Next (), radLight);
-        }
-      }
-
-      radLight->freeEnergy.Clamp (0,0,0);
-    }
-  }
-
-  float Do5RayVistest (Raytracer &tracer, RadPrimitive &prim, csVector3 elCenter, csVector3 oPoint)
-  {
-    //Radtest midpoint and midpoint +- 0.5*u/vXformfacctor
-
-    float vis = 1.0f;
-
-    // Ec
-     
-#define RAYTEST(rayOrig, visDecr)\
-    {\
-      const csVector3 o = (rayOrig)/*+prim.GetPlane().norm * 0.001f*/;\
-      const csVector3 dir = -(oPoint-o);\
-      Ray ray; HitPoint hit;\
-      ray.origin = oPoint; ray.minLength = 0.0f; ray.maxLength = dir.Norm ();\
-      ray.direction = dir / ray.maxLength; \
-      ray.maxLength -= 0.001f; \
-      if (tracer.TraceAnyHit (ray, hit)) vis -= (visDecr);\
-    }
-
-    csVector3 halfU = prim.GetuFormVector () * 0.5f;
-    csVector3 halfV = prim.GetvFormVector () * 0.5f;
-
-    RAYTEST(elCenter, 0.2f);
-    RAYTEST(elCenter + halfU + halfV, 0.2f);
-    RAYTEST(elCenter - halfU + halfV, 0.2f);
-    RAYTEST(elCenter + halfU - halfV, 0.2f);
-    RAYTEST(elCenter - halfU - halfV, 0.2f);
-
-#undef RAYTEST
-    return vis;
-  }
-
-  void Lighter::ShadeRadPrimitive (Raytracer &tracer, RadPrimitive &prim, Light* light)
-  {    
-    //@@HACK, assume visible
-    //prim.PrepareNoPatches ();
-
-    //const float primArea = prim.GetArea ();
-    const float totalArea = (prim.GetuFormVector () % prim.GetvFormVector ()).Norm ();
-
-    csVector3 elementCenter = prim.GetMinCoord () + prim.GetuFormVector () * 0.5f + prim.GetvFormVector () * 0.5f;
-
-    int minU, minV, maxU, maxV;
-    prim.ComputeMinMaxUV (minU, maxU, minV, maxV);
-    
-    uint findex = 0;
-
-    for (int v = minV; v <= maxV; v++)
-    {
-      csVector3 ec = elementCenter;
-      for (int u = minU; u <= maxU; u++, findex++, ec += prim.GetuFormVector ())
-      {
-        const float elemArea = prim.GetElementAreas ()[findex];
-        if (elemArea <= 0.0f) continue; //need an area
-
-        csVector3 jiVec = light->position - ec;
-
-        float distSq = jiVec.SquaredNorm ();
-        jiVec.Normalize ();
-
-        float cosTheta_j = - (prim.GetPlane ().GetNormal () * jiVec);
-        
-        if (cosTheta_j <= 0.0f) continue; //backface culling
-
-        // Do a 5 ray visibility test
-        float visFact = Do5RayVistest (tracer, prim, ec, light->position);
-
-        //
-        float Hij = elemArea / totalArea;
-        float dAj = totalArea;
-        float Fij = cosTheta_j / distSq * Hij * dAj;
-
-        // energy
-        csColor energy = light->freeEnergy * Fij * visFact;
-        csColor reflected = energy * prim.GetOriginalPrimitive ()->GetReflectanceColor();
-        //blah
-        //store stats
-
-        Lightmap * lm = prim.GetRadObject ()->GetLightmaps ()[prim.GetLightmapID ()];
-        lm->GetData ()[v*lm->GetWidth ()+u] += reflected;
-        //lm->GetData ()[v*lm->GetWidth ()+u] = csColor(1.0f, 1.0f, 1.0f);
-
-        uint patchIndex = (v-minV)/globalSettings.vPatchResolution * prim.GetuPatches ()+(u-minU)/globalSettings.uPatchResolution;
-        RadPatch &patch = prim.GetPatches ()[patchIndex];
-        patch.energy += reflected;
-
-      }
-      elementCenter += prim.GetvFormVector ();
-    }
-  }
 }
 
 int main (int argc, char* argv[])
 {
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return 1;
+
+  lighter::globalStats.SetTaskProgress ("Starting up", 20);
 
   // Load up the global object
   csRef<lighter::Lighter> localLighter;
@@ -387,6 +271,7 @@ int main (int argc, char* argv[])
 
   // Remove it
   csInitializer::DestroyApplication (object_reg);
+  csPrintf (CS_ANSI_CLEAR_SCREEN);
 
   return 0;
 }

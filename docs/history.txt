@@ -14,6 +14,9 @@ chronological order.
 	- Rhad added the components in csplugincommon/sndsys/ to the 
 	  CS::SndSys namespace.
 	- Rhad commented and cleaned up the CS::SndSys::Queue class.
+	- Marten did some more work on the lighter.
+	- Marten fixed a few do-not-compile-on-vc8 bugs.
+	- Marten made some improvements to csBox3 and csString.
 8-Apr-2006
 	- Rhad removed erroneous CS_PURE_METHOD specifier on 
 	  csMouseEventHelper::GetEventData.

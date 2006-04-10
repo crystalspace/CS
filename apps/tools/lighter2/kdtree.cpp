@@ -284,4 +284,65 @@ namespace lighter
       node->splitLocation);
   }
 
+
+
+  bool KDTreeHelper::CollectPrimitives(const KDTree *tree, 
+    RadPrimitivePtrArray &primArray, const csBox3 &overlapAABB)
+  {
+    // Walk and get all primitives within overlapAABB
+    if (!tree->boundingBox.TestIntersect (overlapAABB))
+      return false; //No intersection at all
+
+    RadPrimitivePtrSet collectedPrimitives;
+   
+    CollectPrimitives (tree, tree->rootNode, tree->boundingBox, collectedPrimitives,
+      overlapAABB);
+
+    // Copy result to array
+    RadPrimitivePtrSet::GlobalIterator si (collectedPrimitives.GetIterator ());
+    while (si.HasNext ())
+    {
+      primArray.Push (si.Next ());
+    }
+
+    return collectedPrimitives.GetSize () > 0;
+  }
+
+  void KDTreeHelper::CollectPrimitives(const KDTree* tree, const KDTreeNode *node, 
+    csBox3 currentBox, RadPrimitivePtrSet& outPrims, const csBox3 &overlapAABB)
+  {
+    if (node->leftChild)
+    {
+      // Internal node
+      csBox3 childBox = currentBox;
+
+      // Left
+      childBox.SetMax (node->splitDimension, node->splitLocation);
+      if (childBox.TestIntersect (overlapAABB))
+      {
+        CollectPrimitives (tree, node->leftChild, childBox, outPrims, overlapAABB);
+      }
+
+      // Right
+      childBox = currentBox;
+      childBox.SetMin (node->splitDimension, node->splitLocation);
+      if (childBox.TestIntersect (overlapAABB))
+      {
+        CollectPrimitives (tree, node->rightChild, childBox, outPrims, overlapAABB);
+      }
+
+    }
+    else
+    {
+      // Leaf node
+      const csArray<size_t>& triIndices = node->triangleIndices;
+      const csArray<KDTreePrimitive>& allTriangles = tree->allTriangles;
+
+      for (unsigned int i = 0; i < triIndices.GetSize (); i++)
+      {
+        const KDTreePrimitive& prim = allTriangles[triIndices[i]];
+        outPrims.Add (prim.primPointer);
+      }
+    }
+  }
 }

@@ -59,7 +59,6 @@ namespace lighter
       pixelData[i].red = (uint) (c.red * 255.0f);
       pixelData[i].green = (uint) (c.green * 255.0f);
       pixelData[i].blue = (uint) (c.blue * 255.0f);
-      pixelData[i].alpha = 255;
     }
 
     // make an image

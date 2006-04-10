@@ -32,7 +32,7 @@ namespace lighter
   };
 
 
-  bool Raytracer::TraceRecursive(const Ray &ray, HitPoint& hit, KDTreeNode* node, float tmin, float tmax)
+  bool Raytracer::TraceRecursive(const Ray &ray, HitPoint& hit, KDTreeNode* node, float tmin, float tmax) const
   {
     if(node->leftChild)
     {
@@ -82,16 +82,18 @@ namespace lighter
     return false;
   }
 
-  bool Raytracer::TraceAnyHit (const Ray &ray, HitPoint& hit)
+  bool Raytracer::TraceAnyHit (const Ray &ray, HitPoint& hit) const
   {
     if (!tree || !tree->rootNode) return false;
+
+    RaytraceProfiler prof(1);
 
     //Copy and clip the ray
     Ray myRay = ray;
     if (!myRay.Clip (tree->boundingBox))
       return false;
 
-    float tmin (myRay.minLength), tmax (myRay.maxLength), t;
+    float tmin (myRay.minLength), tmax (myRay.maxLength);
 
     //return TraceRecursive (myRay, hit, tree->rootNode, tmin, tmax);
 
@@ -151,55 +153,9 @@ namespace lighter
 
     return true;
 
-/*
-    while (true)
-    {
-      // traverse until we hit a leaf
-      while (node->leftChild)
-      {
-        uint splitDim = node->splitDimension;
-        
-        t = (node->splitLocation - ray.origin[splitDim]) / ray.direction[splitDim];
-
-        if (t <= minT)
-        {
-          // t <= minLength <= maxLength, cull left traverse right
-          node = node->rightChild;
-        }
-        else if (t >= maxT)
-        {
-          // minLength <= maxLength <= t, cull right traverse left
-          node = node->leftChild;
-        }
-        else
-        {
-          // minLength < t < maxLength, traverse both
-          kdstack.Push (kdTraversalS (node->rightChild, t, maxT));
-          node = node->leftChild;
-          maxT = t;
-        }
-      }
-
-      // Ok, down to leaf.. process it
-      if (IntersectPrimitives (node, myRay, hitPoint, true))
-        return true;
-
-      if (kdstack.GetSize () == 0)
-      {
-        // no more nodes, and no hit.. return
-        return false;
-      }
-
-      kdTraversalS s = kdstack.Pop ();
-      node = s.node;
-      minT = s.tnear;
-      maxT = s.tfar;
-    }
-
-    return false;*/
   }
 
-  bool Raytracer::TraceClosestHit (const Ray &ray, HitPoint &hit)
+  bool Raytracer::TraceClosestHit (const Ray &ray, HitPoint &hit) const
   {
     return false;
     /*if (!tree || !tree->rootNode) return false;
@@ -284,33 +240,6 @@ namespace lighter
   bool IntersectPrimitiveRay (const KDTreePrimitive &primitive, const Ray &ray,
     HitPoint &hit)
   {
-    csSegment3 seg (ray.origin + ray.direction*ray.minLength, 
-                    ray.origin + ray.direction*ray.maxLength);
-
-    //quick backface culling
-    //if (ray.direction * primitive.normal < 0) return false;
-/*
-    csVector3 isect;
-    //bool haveHit = csIntersect3::SegmentPolygon (seg, *primitive, primitive->GetPlane (), isect);
-    //TODO: REWORK, ugly, and slow, slow, slow..
-    //bool haveHit = csIntersect3::SegmentPolygon (seg, primitive->BuildPoly3D (), 
-    //  primitive->GetPlane (), isect);
-    bool haveHit = csIntersect3::SegmentTriangle (seg, primitive.vertices[0], 
-      primitive.vertices[1], primitive.vertices[2], isect);
-
-    if (haveHit)
-    {
-      hit.hitPoint = isect;
-      hit.distance = (isect - ray.origin) * ray.direction;
-      hit.primitive = primitive.primPointer;
-    }
-
-    return haveHit;
-
-
-    if(haveHit)
-      int a = 0;
-*/
     float nom = - (primitive.normal * (ray.origin - primitive.vertices[0]));
     float den = primitive.normal * ray.direction;
 
@@ -359,7 +288,7 @@ namespace lighter
   }
 
   bool Raytracer::IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
-    HitPoint &hit, bool earlyExit /* = false */)
+    HitPoint &hit, bool earlyExit /* = false */) const
   {
     size_t nIdx, nMax;
     nMax = node->triangleIndices.GetSize ();

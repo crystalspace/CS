@@ -21,6 +21,7 @@
 #include "common.h"
 #include "lightmapuv.h"
 #include "radobject.h"
+#include "config.h"
 
 namespace lighter
 {
@@ -57,14 +58,14 @@ namespace lighter
 
 
         ProjectPrimitive (prim, vused,
-                          globalSettings.uTexelPerUnit / (1<<its), 
-                          globalSettings.vTexelPerUnit / (1<<its));
+                          globalConfig.GetLMProperties ().uTexelPerUnit / (1<<its), 
+                          globalConfig.GetLMProperties ().vTexelPerUnit / (1<<its));
 
         // Compute uv-size  
         prim.ComputeMinMaxUV (minuv, maxuv);
         uvSize = (maxuv-minuv)+csVector2(2.0f,2.0f);
-        if (uvSize.x < globalSettings.maxLightmapU &&
-            uvSize.y < globalSettings.maxLightmapV)
+        if (uvSize.x < globalConfig.GetLMProperties ().maxLightmapU &&
+            uvSize.y < globalConfig.GetLMProperties ().maxLightmapV)
         {
           lmCoordsGood = true;
         }
@@ -121,8 +122,8 @@ namespace lighter
     }
 
     // Still here, need a new lightmap
-    Lightmap *newL = new Lightmap (globalSettings.maxLightmapU,
-                                   globalSettings.maxLightmapV);
+    Lightmap *newL = new Lightmap (globalConfig.GetLMProperties ().maxLightmapU,
+                                   globalConfig.GetLMProperties ().maxLightmapV);
     lightmaps.Push (newL);
 
     rect = newL->GetAllocator ().Alloc (u,v,lightmapArea);

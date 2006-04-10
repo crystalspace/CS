@@ -21,6 +21,7 @@
 #include "scene.h"
 #include "lighter.h"
 #include "kdtree.h"
+#include "statistics.h"
 
 using namespace CS;
 
@@ -69,6 +70,9 @@ namespace lighter
     if (sceneFiles.GetSize () == 0) 
       return globalLighter->Report ("No files to load!");
 
+    globalStats.SetTaskProgress ("Loading files", 5);
+
+    const float div = 90.0f / sceneFiles.GetSize ();
 
     for (unsigned int i = 0; i < sceneFiles.GetSize (); i++)
     {
@@ -98,9 +102,12 @@ namespace lighter
       // Pass it to the loader
       iBase *res;
       if (!globalLighter->loader->Load (sceneFiles[i].rootNode, res))
-        return globalLighter->Report ("Error loading file 'world'!"); 
+        return globalLighter->Report ("Error loading file 'world'!");
+
+      globalStats.SetTaskProgress ("Loading files", 5+(unsigned int)(div*(i+1)));
     }
 
+    globalStats.SetTaskProgress ("Loading files", 100);
     return true;
   }
 
@@ -174,6 +181,12 @@ namespace lighter
       csRef<Light> radLight; radLight.AttachNew (new Light);
       radLight->position = light->GetMovable ()->GetFullPosition ();
       radLight->color = light->GetColor ();
+
+      // Only point-lights for now
+      float r = light->GetCutoffDistance ();
+      radLight->boundingBox.SetSize (csVector3 (r));
+      radLight->boundingBox.SetCenter (radLight->position);
+     
       //add more
       radSector->allLights.Push (radLight);
     }

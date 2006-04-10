@@ -27,18 +27,22 @@ namespace lighter
   struct KDTree;
 
   // A lightsource
-  struct Light : public csRefCount
+  class Light : public csRefCount
   {
+  public:
     csVector3 position;
     csColor color;
 
-    csColor  freeEnergy;
+    csColor freeEnergy;
+
+    csBox3 boundingBox;
   };
   typedef csRefArray<Light> LightRefArray;
 
   // Representation of sector in our local setup
-  struct Sector : public csRefCount
+  class Sector : public csRefCount
   {
+  public:
     Sector ()
       : kdTree (0)
     {}

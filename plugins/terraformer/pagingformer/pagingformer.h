@@ -135,10 +135,10 @@ public:
   bool SetFloatMap (csStringID type, iImage* map, float scale, float offset);
 
   /// Set the directory containing the heightmaps
-  void SetIntmapDir (const csStringID type, const char* path);
+  void SetIntmapDir (csStringID type, const char* path);
 
   /// Set the directory containing the heightmaps
-  void SetFloatmapDir (const csStringID type, const char* path);
+  void SetFloatmapDir (csStringID type, const char* path);
 
   // ------------ iTerraFormer implementation ------------
 

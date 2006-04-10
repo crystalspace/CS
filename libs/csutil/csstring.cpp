@@ -338,7 +338,7 @@ csStringBase& csStringBase::Append (char c)
 
 void csStringBase::SubString (csStringBase& sub, size_t x, size_t len) const
 {
-  CS_ASSERT(sub.GetData() != GetData()); // Check for same string
+  CS_ASSERT(&sub != this); // Check for same string
   sub.Truncate(0);
   if (len == (size_t)-1) len = Length() - x;
   // XXX Matze: we should rather assert or throw an exception in case the x and

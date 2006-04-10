@@ -21,6 +21,8 @@
 
 #include "common.h"
 #include "radpatch.h"
+#include "csutil/set.h"
+
 
 
 namespace lighter
@@ -201,6 +203,10 @@ namespace lighter
 
   typedef csArray<RadPrimitive> RadPrimitiveArray;
   typedef csArray<RadPrimitive*> RadPrimitivePtrArray;
+  typedef csSet<RadPrimitive*> RadPrimitivePtrSet;
 }
+
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<lighter::RadPrimitive*> : public csHashComputerIntegral<lighter::RadPrimitive*> {};
 
 #endif

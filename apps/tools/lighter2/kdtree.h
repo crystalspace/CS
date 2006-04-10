@@ -96,69 +96,23 @@ namespace lighter
       float lastPosition = 0);
   };
 
-#if 0
-
-
-  /// Single node in the KD tree
-  struct KDTreeNode
-  {
-    // CS_AXIS_* 
-    uint splitDimension;
-
-    // Splitplane location (worldspace)
-    float splitLocation;
-
-    // Left-right pointer
-    KDTreeNode *leftChild, *rightChild;
-
-    // BBox
-    csBox3 boundingBox;
-
-    // All our primitives (or well, pointers to them)
-    RadPrimitivePtrArray radPrimitives;
-
-    KDTreeNode ()
-      : splitDimension ((uint)CS_AXIS_NONE), splitLocation (0.0f),
-      leftChild (0), rightChild (0)
-    {}
-
-    ~KDTreeNode ()
-    {
-      delete leftChild;
-      delete rightChild;
-    }
-
-    // Subdivide node
-    void Subdivide ();
-  };
-
-
-  class KDTree
+  // Helper to do operations on a kd-tree
+  class KDTreeHelper
   {
   public:
-    KDTree () 
-      : rootNode (0)
-    {
-    }
 
-    ~KDTree ()
-    {
-      delete rootNode;
-    }
-
-    // Build a tree from all the objects returned by iterator
-    void BuildTree (const RadObjectHash::GlobalIterator& objectIt);
-
-    /* Return all primitives on positive side of plane. The returned array is only
-    valid at most until next call to GetPrimitives */
-    RadPrimitivePtrArray& GetPrimitives (const csPlane3 &plane);
-
-    // Root node of the tree
-    KDTreeNode *rootNode;
+    // Collect all primitives within given AABB
+    static bool CollectPrimitives (const KDTree *tree, RadPrimitivePtrArray& primArray,
+      const csBox3& overlapAABB);
+  
   private:
-    RadPrimitivePtrArray tempPrimitiveArray;
+    KDTreeHelper ();
+    KDTreeHelper (const KDTreeHelper& o);
+
+    // Traverse a node, collect any prims within AABB
+    static void CollectPrimitives (const KDTree *tree, const KDTreeNode* node, 
+      csBox3 currentBox, RadPrimitivePtrSet& outPrims, const csBox3& overlapAABB);
   };
-#endif
 
 }
 

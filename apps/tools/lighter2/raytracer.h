@@ -19,6 +19,8 @@
 #ifndef __RAYTRACER_H__
 #define __RAYTRACER_H__
 
+#include "statistics.h"
+
 namespace lighter
 {
   struct KDTree;
@@ -145,21 +147,89 @@ namespace lighter
      * This might not be the closest hit so it is faster but not suitable
      * for all kind of calculations.
      */
-    bool TraceAnyHit (const Ray &ray, HitPoint &hit);
+    bool TraceAnyHit (const Ray &ray, HitPoint &hit) const;
 
     /**
      * Raytrace for closest hit. 
      */
-    bool TraceClosestHit (const Ray &ray, HitPoint &hit);
+    bool TraceClosestHit (const Ray &ray, HitPoint &hit) const;    
 
   protected:
     /// Traverse all primitives in a given node and do intersection against them
     bool IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
-      HitPoint &hit, bool earlyExit = false);
+      HitPoint &hit, bool earlyExit = false) const;
 
-    bool TraceRecursive(const Ray &ray, HitPoint& hit, KDTreeNode* node, float tmin, float tmax);
+    bool TraceRecursive(const Ray &ray, HitPoint& hit, KDTreeNode* node, float tmin, float tmax) const;
 
     KDTree *tree;
+  };
+
+  /// Helper to profile raytracing
+  class RaytraceProfiler
+  {
+  public:
+
+    RaytraceProfiler (uint numRays)
+    {
+      startTime = csGetMicroTicks ();
+      globalStats.raytracer.numRays += numRays;
+    }
+
+    ~RaytraceProfiler ()
+    {
+      int64 endTime = csGetMicroTicks ();
+      int64 diffTime = endTime-startTime;
+      if(diffTime > 0)
+      {
+        globalStats.raytracer.usRaytracing += diffTime;
+      }
+    }
+
+  private:
+    int64 startTime;
+  };
+
+  /// Helper for often-used ray tracing operations
+  class RaytraceFunctions
+  {
+  public:
+    // Vistest rayhelpers
+
+    static inline float Vistest5 (const Raytracer& rt, const csVector3& viscenter,
+      const csVector3& visu, const csVector3& visv, const csVector3& endp)
+    {
+      // Perform a 5 point vistest
+      float visibility = 1.0f;
+
+      const csVector3 halfu = visu * 0.5f;
+      const csVector3 halfv = visv * 0.5f;
+
+      const csVector3 rayStarts[] = {
+        viscenter, 
+        viscenter + halfu + halfv,
+        viscenter + halfu - halfv,
+        viscenter - halfu + halfv,
+        viscenter - halfu - halfv
+      };
+
+      for (unsigned int i = 0; i < 5; i++)
+      {
+        const csVector3& primP = rayStarts[i];
+        const csVector3 dir = primP - endp;
+
+        Ray ray;
+        HitPoint hit;
+        ray.minLength = 0;
+        ray.maxLength = dir.Norm ();
+        ray.origin = endp;
+        ray.direction = dir / ray.maxLength;
+        ray.maxLength -= 0.001f;
+        if (rt.TraceAnyHit (ray, hit))
+          visibility -= 0.2f;
+      }
+
+      return visibility;
+    }
   };
 }
 

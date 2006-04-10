@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+Copyright (C) 2001 by Jorrit Tyberghein
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -42,7 +42,7 @@
 #include "ivaria/conout.h"
 
 #include "stdrep.h"
-  
+
 CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(StdRep)
@@ -63,7 +63,7 @@ csString csReporterListener::DefaultDebugFilename()
 }
 
 csReporterListener::csReporterListener (iBase *iParent) : 
-  scfImplementationType (this, iParent)
+scfImplementationType (this, iParent)
 {
   mutex = csMutex::Create (true);
   object_reg = 0;
@@ -74,26 +74,26 @@ csReporterListener::csReporterListener (iBase *iParent) :
   debug_filename = DefaultDebugFilename ();
 #ifdef CS_DEBUG
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_BUG, false, true, true, true, true, false);
+    CS_REPORTER_SEVERITY_BUG, false, true, true, true, true, false);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_ERROR, false, true, true, true, true, false);
+    CS_REPORTER_SEVERITY_ERROR, false, true, true, true, true, false);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_WARNING, true, false, true, false, true, true);
+    CS_REPORTER_SEVERITY_WARNING, true, false, true, false, true, true);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_NOTIFY, true, false, true, false, true, false);
+    CS_REPORTER_SEVERITY_NOTIFY, true, false, true, false, true, false);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_DEBUG, true, false, true, false, true, false);
+    CS_REPORTER_SEVERITY_DEBUG, true, false, true, false, true, false);
 #else
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_BUG, false, true, true, true, true, false);
+    CS_REPORTER_SEVERITY_BUG, false, true, true, true, true, false);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_ERROR, false, true, true, true, true, false);
+    CS_REPORTER_SEVERITY_ERROR, false, true, true, true, true, false);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_WARNING, true, false, true, false, false, true);
+    CS_REPORTER_SEVERITY_WARNING, true, false, true, false, false, true);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_NOTIFY, false, false, true, false, false, false);
+    CS_REPORTER_SEVERITY_NOTIFY, false, false, true, false, false, false);
   SetMessageDestination (
-  	CS_REPORTER_SEVERITY_DEBUG, false, false, false, false, true, false);
+    CS_REPORTER_SEVERITY_DEBUG, false, false, false, false, true, false);
 #endif
   RemoveMessages (CS_REPORTER_SEVERITY_BUG, true);
   RemoveMessages (CS_REPORTER_SEVERITY_ERROR, true);
@@ -150,13 +150,13 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
     q->RegisterListener (eventHandler, PostProcess);
-  
+
   csRef<iConfigManager> cfg(csQueryRegistry<iConfigManager> (r));
   if ( cfg )
   {
     append = cfg->GetBool("Reporter.FileAppend", false );
   }
-  
+
   csRef<iCommandLineParser> cmdline = 
     csQueryRegistry<iCommandLineParser> (object_reg);
   if (cmdline)
@@ -202,7 +202,7 @@ static const char* consoleSuffix[5] =
 };
 
 void csReporterListener::WriteLine (int severity, const char* msgID, 
-                                    const char* line)
+  const char* line)
 {
   bool repeatedID = false;
   if (lastID.Compare (msgID))
@@ -232,7 +232,7 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
       const char * space = strrchr (str.GetData (), ' ');
       if (space)
       {
-          linebreak = space-str.GetData ();
+        linebreak = space-str.GetData ();
       }
       if (linebreak>0)
       {
@@ -253,14 +253,18 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
     csPrintf ("%s", stdoutTmp.GetData());
     stdoutTmp.Truncate (0);
   }
+
   if (dest_stderr[severity])
     csPrintfErr ("%s%s%s", consolePrefix[severity], msg.GetData(), 
-      consoleSuffix[severity]);
+    consoleSuffix[severity]);
+
   if (dest_console[severity] && console)
     console->PutText ("%s", msg.GetData());
+
   if (dest_alert[severity] && nativewm)
     nativewm->Alert (CS_ALERT_ERROR, "Fatal Error!", "Ok", "%s",
-      msg.GetData());
+    msg.GetData());
+
   if (dest_debug[severity] && !debug_filename.IsEmpty())
   {
     if (!debug_file.IsValid())
@@ -271,7 +275,7 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
         // If log does not exists then create a new one    
         if ( !(vfs->Exists(debug_filename)) )
         {
-            debug_file = vfs->Open (debug_filename, VFS_FILE_WRITE);
+          debug_file = vfs->Open (debug_filename, VFS_FILE_WRITE);
         } 
         else               
         {
@@ -293,6 +297,7 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
       debug_file->Flush ();
     }
   }
+
   if (dest_popup[severity])
   {
     if (!silent)
@@ -308,14 +313,14 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
       }
       popmsg.Format (" %s", line);
       csRef<csTimedMessage> tm = csPtr<csTimedMessage> (
-    	  new csTimedMessage (popmsg.GetData ()));
+        new csTimedMessage (popmsg.GetData ()));
       messages.Push (tm);
     }
   }
 }
 
 bool csReporterListener::Report (iReporter*, int severity,
-	const char* msgID, const char* description)
+  const char* msgID, const char* description)
 {
   csStringArray lines;
   size_t n = lines.SplitString (description, "\r\n", csStringArray::delimIgnoreDifferent);
@@ -493,8 +498,8 @@ void csReporterListener::SetDefaults ()
 }
 
 void csReporterListener::SetMessageDestination (int severity,
-  	bool do_stdout, bool do_stderr, bool do_console,
-	bool do_alert, bool do_debug, bool do_popup)
+  bool do_stdout, bool do_stderr, bool do_console,
+  bool do_alert, bool do_debug, bool do_popup)
 {
   CS_ASSERT (severity >= 0 && severity <= 4);
   dest_stdout[severity] = do_stdout;
