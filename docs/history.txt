@@ -9,6 +9,8 @@ chronological order.
 12-Apr-2006
 	- Piotr Obrzut changed instmesh mixmode to alpha test (should be done 
           from xml somehow).
+	- Peter Amstutz updated the VOS plugin to take out a useless scaling check
+	  in voscube, and changed vospolygonmesh to load vertex normals from a3dl
 11-Apr-2006 
         - Piotr Obrzut fixed meshgen to delete instmeshes instances 
           when needed.
