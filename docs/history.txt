@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
   
+11-Apr-2006 
+        - Piotr Obrzut fixed meshgen to delete instmeshes instances 
+          when needed.
 9-Apr-2006
 	- Rhad renamed CS::Sound namespace to CS::SndSys for all SndSys
 	  sound system components. This naming is consistant with the
