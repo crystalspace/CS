@@ -43,7 +43,6 @@ public:
   std::string name;
   csRef<iSector> sector;
   csRef<iDynamicSystem> dynsys;
-  csVector3 size;
 
   ConstructCubeTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat,
                       csMetaCube* c, std::string n, iSector *s);
@@ -139,15 +138,6 @@ void csMetaCube::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
                                     mat, this, getURLstr(), sect->GetSector());
 
   t->dynsys = sect->GetDynSys();
-  double x = 1, y = 1, z = 1;
-  try
-  {
-    getScaling (x, y, z);
-  }
-  catch (NoSuchObjectError)
-  {
-  }
-  t->size = csVector3 (x,y,z);
 
   vosa3dl->mainThreadTasks.push(t);
   LOG("csMetaCube", 3, "calling csMetaObject3D::setup");

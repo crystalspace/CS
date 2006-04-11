@@ -68,6 +68,7 @@ public:
   LightmapCache* lmc;
 
   std::vector<A3DL::PolygonMesh::Vertex> verts;
+  std::vector<A3DL::PolygonMesh::Vertex> normals;
   std::vector<A3DL::PolygonMesh::Polygon> polys;
   std::vector<A3DL::PolygonMesh::Texel> texels;
   std::vector<A3DL::PolygonMesh::TextureSpace> texsp;
@@ -105,6 +106,8 @@ void ConstructPolygonMeshTask::doStatic(iEngine* engine)
       "crystalspace.mesh.object.thing", "polygonmesh_factory");
     csRef<iThingFactoryState> thingfac = SCF_QUERY_INTERFACE(
       factory->GetMeshObjectFactory(), iThingFactoryState);
+
+    thingfac->SetSmoothingFlag(true);
 
     for(size_t i = 0; i < verts.size(); i++)
     {
@@ -163,7 +166,18 @@ void ConstructPolygonMeshTask::doStatic(iEngine* engine)
 
     doTexturing(polymap, thingfac);
 
-    thingfac->SetSmoothingFlag(true);
+    /*if(normals.size() == verts.size())
+    {
+      csVector3* norms = thingfac->GetNormals();
+      for(int i = 0; i < normals.size(); i++)
+      {
+        norms[i].x = normals[i].x;
+        norms[i].y = normals[i].y;
+        norms[i].z = normals[i].z;
+      }
+      }*/
+
+    thingfac->CompressVertices();
 
     LOG("ConstructPolygonMeshTask", 3, "creating mesh wrapper for "
         << name << " in sector " << sector);
@@ -219,6 +233,8 @@ void ConstructPolygonMeshTask::doGenmesh(iEngine* engine)
     csRef<iGeneralFactoryState> genmesh = SCF_QUERY_INTERFACE(
                         factory->GetMeshObjectFactory(), iGeneralFactoryState);
 
+    LOG("ConstructPolygonMeshTask", 4, "Constructing " << name);
+
     // Load vertices
     genmesh->SetVertexCount(verts.size());
     csVector3* vertices = genmesh->GetVertices();
@@ -271,8 +287,22 @@ void ConstructPolygonMeshTask::doGenmesh(iEngine* engine)
       gmtexels[i].y = texels[i].y;
     }
 
+    if(normals.size() == verts.size())
+    {
+      csVector3* norms = genmesh->GetNormals();
+      for(int i = 0; i < normals.size(); i++)
+      {
+        norms[i].x = normals[i].x;
+        norms[i].y = normals[i].y;
+        norms[i].z = normals[i].z;
+      }
+    }
+    else
+    {
+      genmesh->CalculateNormals(false);
+    }
+
     genmesh->Invalidate();
-    genmesh->CalculateNormals();
 
     csRef<iGeneralMeshState> gm = SCF_QUERY_INTERFACE(
                             meshwrapper->GetMeshObject(), iGeneralMeshState);
@@ -648,6 +678,14 @@ void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 
     getVertices(cpmt->verts);
     getPolygons(cpmt->polys);
+
+    try
+    {
+      getNormals(cpmt->normals);
+    }
+    catch(NoSuchObjectError&)
+    {
+    }
 
     try
     {
