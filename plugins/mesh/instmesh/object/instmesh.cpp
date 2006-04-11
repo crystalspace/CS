@@ -1106,7 +1106,7 @@ csRenderMesh** csInstmeshMeshObject::GetRenderMeshes (
       csRenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
         rview->GetCurrentFrameNumber ());
 
-      meshPtr->mixmode = MixMode;
+      meshPtr->mixmode = CS_MIXMODE_ALPHATEST_ENABLE;
       meshPtr->clip_portal = clip_portal;
       meshPtr->clip_plane = clip_plane;
       meshPtr->clip_z_plane = clip_z_plane;
