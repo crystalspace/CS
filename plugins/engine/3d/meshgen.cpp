@@ -189,7 +189,7 @@ void csMeshGeneratorGeometry::SetAsideMesh (int cidx, iMeshWrapper* mesh,
   if (geom.instmeshes.Length () > 0)
   {
     csMGGeomInstMesh& geominst = geom.instmeshes[cidx];
-    geominst.inst_setaside.Push (cidx);
+    geominst.inst_setaside.Push (instance_id);
     geom.instmesh_setaside.Add (&geominst);
   }
   else
