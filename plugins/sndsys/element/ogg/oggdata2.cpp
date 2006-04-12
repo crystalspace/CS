@@ -152,7 +152,7 @@ void SndSysOggSoundData::Initialize()
   m_SoundFormat.Bits=v_info->bitrate_nominal;
   m_SoundFormat.Channels=v_info->channels;
 
-  m_FrameCount=(long)((pcm_count / v_info->channels) & 0x7FFFFFFF);
+  m_FrameCount=(long)(pcm_count & 0x7FFFFFFF);
 
   // Cleanup
   ov_clear(&f);
