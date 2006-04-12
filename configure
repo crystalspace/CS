@@ -723,13 +723,13 @@ echo X"$0" |
   	  /^X\(\/\).*/{ s//\1/; q; }
   	  s/.*/./; q'`
   srcdir=$ac_confdir
-  if test ! -r $srcdir/$ac_unique_file; then
+  if test ! -r "$srcdir/$ac_unique_file"; then
     srcdir=..
   fi
 else
   ac_srcdir_defaulted=no
 fi
-if test ! -r $srcdir/$ac_unique_file; then
+if test ! -r "$srcdir/$ac_unique_file"; then
   if test "$ac_srcdir_defaulted" = yes; then
     { echo "$as_me: error: cannot find sources ($ac_unique_file) in $ac_confdir or .." >&2
    { (exit 1); exit 1; }; }
@@ -738,7 +738,7 @@ if test ! -r $srcdir/$ac_unique_file; then
    { (exit 1); exit 1; }; }
   fi
 fi
-(cd $srcdir && test -r ./$ac_unique_file) 2>/dev/null ||
+(cd $srcdir && test -r "./$ac_unique_file") 2>/dev/null ||
   { echo "$as_me: error: sources are in $srcdir, but \`cd $srcdir' does not work" >&2
    { (exit 1); exit 1; }; }
 srcdir=`echo "$srcdir" | sed 's%\([^\\/]\)[\\/]*$%\1%'`
@@ -52074,13 +52074,13 @@ echo $ECHO_N "checking for libCgGL... $ECHO_C" >&6
 if test "${cs_cv_libCgGL+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+  ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    cs_cflags_save="$CFLAGS"
+    cs_cflags_save="$CXXFLAGS"
     cs_lflags_save="$LDFLAGS"
     cs_libs_save="$LIBS"
     cs_build_ok=no
@@ -52142,7 +52142,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
@@ -52170,7 +52170,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
+	 { ac_try='test -z "$ac_cxx_werror_flag"
 			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
@@ -52198,7 +52198,7 @@ fi
     done
 
 
-    CFLAGS=$cs_cflags_save
+    CXXFLAGS=$cs_cflags_save
     LDFLAGS=$cs_lflags_save
     LIBS=$cs_libs_save
     ac_ext=c
@@ -52226,13 +52226,13 @@ echo "${ECHO_T}$cs_cv_libCgGL" >&6
 else
   echo "$as_me:$LINENO: checking for libCgGL" >&5
 echo $ECHO_N "checking for libCgGL... $ECHO_C" >&6
-	    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+	    ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    cs_cflags_save="$CFLAGS"
+    cs_cflags_save="$CXXFLAGS"
     cs_lflags_save="$LDFLAGS"
     cs_libs_save="$LIBS"
     cs_build_ok=no
@@ -52294,7 +52294,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
@@ -52322,7 +52322,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   cat conftest.err >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
+	 { ac_try='test -z "$ac_cxx_werror_flag"
 			 || test ! -s conftest.err'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
@@ -52350,7 +52350,7 @@ fi
     done
 
 
-    CFLAGS=$cs_cflags_save
+    CXXFLAGS=$cs_cflags_save
     LDFLAGS=$cs_lflags_save
     LIBS=$cs_libs_save
     ac_ext=c

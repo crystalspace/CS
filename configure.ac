@@ -1496,7 +1496,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
 		[[#include <Cg/cg.h>
 		#include <Cg/cgGL.h>]],
 		[CGprogram p; cgGLBindProgram(p)])],
-	    [], [],
+	    [], [C++],
 	    [CS_EMIT_BUILD_RESULT([cs_cv_libCgGL], [CG])], [],
 	    [$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
 	    [$cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags],
