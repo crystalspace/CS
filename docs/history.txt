@@ -11,6 +11,8 @@ chronological order.
           from xml somehow).
 	- Peter Amstutz updated the VOS plugin to take out a useless scaling check
 	  in voscube, and changed vospolygonmesh to load vertex normals from a3dl
+	- Rhad fixed the Ogg Vorbis sndsys element to correctly calculate the
+	  number of frames in the source data.
 11-Apr-2006 
         - Piotr Obrzut fixed meshgen to delete instmeshes instances 
           when needed.
