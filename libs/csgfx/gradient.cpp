@@ -24,7 +24,7 @@
 #include "csgfx/gradient.h"
 
 csGradientShade::csGradientShade() :
-  left (0, 0, 0), right (0, 0, 0), position (0)
+  left (0, 0, 0, 1.0f), right (0, 0, 0, 1.0f), position (0)
 {
 }
 
@@ -38,8 +38,8 @@ csGradientShade::csGradientShade (csColor left_color, csColor right_color,
 				  float pos) :
   position (pos)
 {
-	left.Set(left_color.red, left_color.green, left_color.blue, 255);
-	right.Set(right_color.red, right_color.green, right_color.blue, 255);	
+	left.Set(left_color.red, left_color.green, left_color.blue, 1.0f);
+	right.Set(right_color.red, right_color.green, right_color.blue, 1.0f);	
 }
 
 csGradientShade::csGradientShade (csColor4 color, float pos) :
