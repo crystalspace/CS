@@ -517,11 +517,16 @@ Render(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 		if (IsTextureObject(o))
 		{
 			csRef<iTextureHandle> *to = (csRef<iTextureHandle> *)JS_GetPrivate(cx, o);	
+			int w,h,d;		
+				
+			(*to)->GetOriginalDimensions(w,h,d);
 						
 			csPen pen(AwsMgr()->G2D(), AwsMgr()->G3D()); 
 			
 			AwsMgr()->G3D()->SetRenderTarget(*to, false);
 			AwsMgr()->G3D()->BeginDraw(CSDRAW_2DGRAPHICS);
+			// Clear it out to make sure that we get good, clean backgroundess.
+			AwsMgr()->G2D()->Clear(AwsMgr()->G2D()->FindRGB(0,0,0,0));
 			po->Draw(&pen);			
 			AwsMgr()->G3D()->FinishDraw();			
 		}	
