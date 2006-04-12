@@ -708,6 +708,7 @@ void csInstmeshMeshObject::SetupObject ()
       size_t i;
       for (i = 0 ; i <  num_lit_fact_colors; i++)
         lit_fact_colors[i].Set (0, 0, 0);
+      lighting_dirty = true;
       static_fact_colors = new csColor4 [num_lit_fact_colors];
       for (i = 0 ; i <  num_lit_fact_colors; i++)
         //static_fact_colors[i] = base_color;	// Initialize to base color.
@@ -1284,6 +1285,7 @@ void csInstmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
         mesh_colors_dirty_flag = false;
         const csColor4* fact_colors = 0;
         fact_colors = lit_fact_colors;
+        
         color_buffer->CopyInto (fact_colors, num_lit_fact_colors);
       }
       else
