@@ -17,6 +17,9 @@ chronological order.
 	- Jorrit fixed the configure check for GLCg so that it uses C++
 	  to run the test program. That way CG can again be compiled on
 	  linux.
+	- Christopher fixed csGradient as per res, and also fixed procedural
+	  textures in AWS2 to work as intended.  He discovered the cause of the
+	  rolling texture on the slider, and fixed that too.
 11-Apr-2006 
         - Piotr Obrzut fixed meshgen to delete instmeshes instances 
           when needed.
