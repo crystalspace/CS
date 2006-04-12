@@ -194,3 +194,5 @@ sl.onChange = function()
 	gl.value = this.value;
 	gb.value = this.value;	
 }
+
+sl.value=50;

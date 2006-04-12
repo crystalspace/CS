@@ -955,9 +955,7 @@ Style3D =
 			Sys.Print("Slider: created texture: ", tw, "x", th);
 									
 			// Draw the knob
-			tx_pen.SetFlag(Pen.FLAG_FILL);
-			tx_pen.SetColor(0,0,0,1);			
-			tx_pen.DrawRect(0,0,tw,th);
+			tx_pen.SetFlag(Pen.FLAG_FILL);			
 			tx_pen.SetColor(prefs.FillColor);			
 			tx_pen.DrawRect(ButtonScroll.x1+5, ButtonScroll.y1,
 						 ButtonScroll.x2-10, ButtonScroll.y2);
@@ -1016,7 +1014,8 @@ Style3D =
 				this.gr.AddColor(new Color(0.3, 0.3, 0.3, 0.5), 1.0);
 							
 				
-				createTextures(this);			
+				createTextures(this);	
+				this.Invalidate();		
 			}	
 			
 			
@@ -1033,15 +1032,19 @@ Style3D =
 				pen.DrawLine(w-slb.TickThickness, ty, w, ty);									
 			}		
 			
-			pen.SetColor(1,1,1,1);
-			pen.DrawRect(this.ButtonScroll.x1, this.ButtonScroll.y1,
-						 this.ButtonScroll.x2, this.ButtonScroll.y2);
+			pen.PushTransform();
+			pen.Translate(0, this.ButtonScroll.y1, 0);
 			
+ 			pen.SetColor(1,1,1,1);
+// 			pen.DrawRect(0,0,this.ButtonScroll.x2-this.ButtonScroll.x1, 
+// 							 this.ButtonScroll.y2-this.ButtonScroll.y1);				
 			
 			pen.SetFlag(Pen.FLAG_TEXTURE);			
 			pen.SetTexture(this.tx_knob);
-			pen.DrawRect(this.ButtonScroll.x1, this.ButtonScroll.y1,
-						 this.ButtonScroll.x2, this.ButtonScroll.y2);
+			
+			pen.DrawRect(0,0,this.ButtonScroll.x2-this.ButtonScroll.x1, 
+							 this.ButtonScroll.y2-this.ButtonScroll.y1);
+			pen.PopTransform();
 			pen.ClearFlag(Pen.FLAG_TEXTURE);			 
 			
 						

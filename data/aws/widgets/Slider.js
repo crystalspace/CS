@@ -19,7 +19,7 @@ function Slider(orientation_vertical, tick_step, tick_lock)
 	_widget.tick_lock = tick_lock;
 	_widget.slide_button_down=false;
 	_widget.init_draw=false;
-	
+		
 	// Invalidate and fire onChange when the value property is set.
 	_widget.__defineSetter__("value", function(v) { this._value = v; this.Invalidate(); if (this.onChange) this.onChange(this); });	
 	_widget.__defineGetter__("value", function() { return this._value; });	
