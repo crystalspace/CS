@@ -21,6 +21,9 @@ chronological order.
 	  textures in AWS2 to work as intended.  He discovered the cause of the
 	  rolling texture on the slider, and fixed that too.
 	- Piotr Obrzut fixed bug with instmesh ligtning.
+	- Marten did some general warning fixes and formating cleanup. Please
+	  people, remember the CS code guidelines. Thhere's more to be done 
+	  later, be sure of that.
 11-Apr-2006 
         - Piotr Obrzut fixed meshgen to delete instmeshes instances 
           when needed.

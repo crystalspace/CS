@@ -13,75 +13,87 @@
 #include "csutil/array.h"
 #include "csutil/csstring.h"
 
-/** @brief Provides for debug output, and eventually
- * input and maybe a debugger for the scripting system. */
+/** 
+ * Provides for debug output, and eventually input and maybe a debugger 
+ * for the scripting system. 
+ */
+
 class scriptConsole
 {
-  /** A reference to the font that we'll use here. */  
+  /// A reference to the font that we'll use here.  
   csRef<iFont> font;
-  
+
   /// The key composer.
   csRef<iKeyComposer> composer;
-  
-  /** The array on console items. */
+
+  /// The array on console items.
   csArray<csString> msgs;
-  
-  /** The array on console items. */
+
+  /// The array on console items.
   csArray<csString> cmds;
-  
-  /** The command-line for the shell. */
+
+  /// The command-line for the shell.
   csString cmd;
-  
-  /** The amount of history that should be kept. */
+
+  /// The amount of history that should be kept.
   uint32 history_size;
-  
-  /** The current command history pointer. */
+
+  /// The current command history pointer.
   size_t cmd_ptr;
-  
-  /** The current cursor position. */
+
+  /// The current cursor position.
   size_t cursor_pos;
-  
-  /** Set to true if the console is active.
-   * It will accept keystrokes when active,
-   * and it's appearance is different. */
+
+  /** 
+   * Set to true if the console is active.
+   * It will accept keystrokes when active, and it's appearance is different.
+   */
   bool active;
-    
+
 public:
-	scriptConsole():history_size(500),  cmd_ptr(0), cursor_pos(0), active(false) {}
-	~scriptConsole() {}
-	
-	void Initialize(iObjectRegistry *obj_reg);
-	
-	void OnKeypress(csKeyEventData &data);
-	
-	/** @brief Returns true if the console is active. */
-	bool Active() { return active; }
-	
-	/** @brief Flips the active state of the console (turns it on or off.) */
-	void FlipActiveState() 
-	{ 
-		active = (active ? false : true); 
-		if (active==true && cmds.Length()==0)
-		{
-			cmd.Clear();	
-		}
-	}
-	
-	void SetFont(csRef<iFont> _font)
-	{
-		font = _font;	
-	}
-	
-	/** @brief Write a message to the console. 
-	 *  @param txt The message to write. */
-	void Message(const csString &txt);
-	
-	/** @brief Redraws the console
-	 *  @param g2d The graphics device to draw it to. */
-	void Redraw(iGraphics2D * g2d);
-	
+  scriptConsole ()
+    : history_size (500), cmd_ptr (0), cursor_pos (0), active (false) 
+  {}
+
+  ~scriptConsole() 
+  {}
+
+  void Initialize (iObjectRegistry *obj_reg);
+
+  void OnKeypress (csKeyEventData &data);
+
+  /// Returns true if the console is active.
+  bool Active () { return active; }
+
+  /// Flips the active state of the console (turns it on or off.)
+  void FlipActiveState () 
+  { 
+    active = (active ? false : true); 
+    if (active==true && cmds.Length ()==0)
+    {
+      cmd.Clear ();	
+    }
+  }
+
+  void SetFont (csRef<iFont> _font)
+  {
+    font = _font;	
+  }
+
+  /**
+   * Write a message to the console. 
+   * \param txt The message to write.
+   */
+  void Message (const csString &txt);
+
+  /** 
+   * Redraws the console
+   * \param g2d The graphics device to draw it to.
+   */
+  void Redraw (iGraphics2D * g2d);
+
 };
 
-extern scriptConsole *ScriptCon();
+extern scriptConsole *ScriptCon ();
 
 #endif

@@ -27,17 +27,19 @@
 
 namespace aws2
 {
-  /** Parses a definition file. */
+  /** 
+   * Parses a definition file. 
+   */
   class defFile
   {
-    /** Worker function, parses a node.  Creates subnodes if necessary. */
+    /// Worker function, parses a node.  Creates subnodes if necessary.
     void ParseNode (JSObject *sc, csRef<iDocumentNodeIterator> &pos);
 
   public:
-    defFile() {}
-    virtual ~defFile() {}
+    defFile () {}
+    virtual ~defFile () {}
 
-    /** Parses the given text into the given scope. */
+    /// Parses the given text into the given scope.
     virtual bool Parse (const scfString &txt, JSObject *sc);
   };
 

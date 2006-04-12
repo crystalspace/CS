@@ -98,14 +98,14 @@ CS_IMPLEMENT_PLUGIN
 
 // helper functions
 /// Byte swap 32 bit data.
-static inline uint32 csByteSwap32bit( const uint32 value )
+static inline uint32 csByteSwap32bit ( const uint32 value )
 {
   return ((value >> 24 ) & 0x000000FF ) | ((value >> 8) & 0x0000FF00)
     | ((value << 8) & 0x00FF0000) | (( value << 24) & 0xFF000000);
 }
 
 /// Byte swap 16 bit data.
-static inline uint16 csByteSwap16bit( const uint16 value )
+static inline uint16 csByteSwap16bit ( const uint16 value )
 {
   return (( value >> 8 ) & 0x000000FF ) | (( value << 8 ) & 0x0000FF00 );
 }
@@ -159,15 +159,16 @@ iSndSysStream *SndSysWavSoundData::CreateStream (
 void SndSysWavSoundData::Initialize()
 {
 
-  if (ReadHeaders(m_DataStore.data,m_DataStore.length,&m_RIFFHeader,&m_FMTHeader,&m_WAVHeader,&m_pPCMData,&m_PCMDataLength))
+  if (ReadHeaders (m_DataStore.data,m_DataStore.length,&m_RIFFHeader,&m_FMTHeader,
+                  &m_WAVHeader,&m_pPCMData,&m_PCMDataLength))
   {
     // The number of frames of audio is equal to the length of the audio data 
     //  divided by the length of each frame.
-    m_FrameCount=m_PCMDataLength/ (m_FMTHeader.channel * m_FMTHeader.bits_per_sample/8);
-    m_SoundFormat.Freq=m_FMTHeader.samples_per_sec;
-    m_SoundFormat.Bits=m_FMTHeader.bits_per_sample;
-    m_SoundFormat.Channels=m_FMTHeader.channel;
-    m_bInfoReady=true;
+    m_FrameCount = m_PCMDataLength / (m_FMTHeader.channel * m_FMTHeader.bits_per_sample/8);
+    m_SoundFormat.Freq = m_FMTHeader.samples_per_sec;
+    m_SoundFormat.Bits = m_FMTHeader.bits_per_sample;
+    m_SoundFormat.Channels = m_FMTHeader.channel;
+    m_bInfoReady = true;
   }
 }
 

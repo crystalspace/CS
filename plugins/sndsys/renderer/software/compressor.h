@@ -37,13 +37,13 @@ public:
   ~csSoundCompressor();
 
   /// Reset the Average sample intensity 
-  void Reset();
-  void ApplyCompression(csSoundSample *pSampleBuffer, size_t Samples);
+  void Reset ();
+  void ApplyCompression (csSoundSample *pSampleBuffer, size_t Samples);
 
-  void SetCompressionThreshold(csSoundSample MaxIntensity);
-  void SetCompressionRatio(float CompressionRatio);
-  void SetCompressionAttackSamples(size_t Samples);
-  void SetCompressionReleaseSamples(size_t Samples);
+  void SetCompressionThreshold (csSoundSample MaxIntensity);
+  void SetCompressionRatio (float CompressionRatio);
+  void SetCompressionAttackSamples (size_t Samples);
+  void SetCompressionReleaseSamples (size_t Samples);
 
 
 protected:

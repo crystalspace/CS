@@ -99,7 +99,7 @@ namespace CS
     csSndSysSoundFormat m_SoundFormat;
 
     /// The number of frames in the decoded output
-    long m_FrameCount;
+    size_t m_FrameCount;
 
     /// An optional brief description of the sound data
     char *m_pDescription;

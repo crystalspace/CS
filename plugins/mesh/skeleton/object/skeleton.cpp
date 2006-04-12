@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2006 by Hristo Hristov
+Copyright (C) 2006 by Hristo Hristov
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -35,58 +35,58 @@
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csSkeletonGraveyard)
-  SCF_IMPLEMENTS_INTERFACE (iSkeletonGraveyard)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+SCF_IMPLEMENTS_INTERFACE (iSkeletonGraveyard)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSkeletonGraveyard)
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSkeletonGraveyard::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSkeletonGraveyard::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSkeletonBone)
-  SCF_IMPLEMENTS_INTERFACE (iSkeletonBone)
+SCF_IMPLEMENTS_INTERFACE (iSkeletonBone)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSkeletonSocket)
-  SCF_IMPLEMENTS_INTERFACE (iSkeletonSocket)
+SCF_IMPLEMENTS_INTERFACE (iSkeletonSocket)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSkeletonBoneFactory)
-  SCF_IMPLEMENTS_INTERFACE (iSkeletonBoneFactory)
+SCF_IMPLEMENTS_INTERFACE (iSkeletonBoneFactory)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSkeletonScript)
-  SCF_IMPLEMENTS_INTERFACE (iSkeletonScript)
+SCF_IMPLEMENTS_INTERFACE (iSkeletonScript)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSkeleton)
-  SCF_IMPLEMENTS_INTERFACE (iSkeleton)
+SCF_IMPLEMENTS_INTERFACE (iSkeleton)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSkeletonSocketFactory)
-  SCF_IMPLEMENTS_INTERFACE (iSkeletonSocketFactory)
+SCF_IMPLEMENTS_INTERFACE (iSkeletonSocketFactory)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSkeletonFactory)
-  SCF_IMPLEMENTS_INTERFACE (iSkeletonFactory)
+SCF_IMPLEMENTS_INTERFACE (iSkeletonFactory)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSkeletonScriptKeyFrame)
-  SCF_IMPLEMENTS_INTERFACE (iSkeletonScriptKeyFrame)
+SCF_IMPLEMENTS_INTERFACE (iSkeletonScriptKeyFrame)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSkeletonBoneDefaultUpdateCallback)
-  SCF_IMPLEMENTS_INTERFACE (iSkeletonBoneUpdateCallback)
+SCF_IMPLEMENTS_INTERFACE (iSkeletonBoneUpdateCallback)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSkeletonBoneRagdollInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSkeletonBoneRagdollInfo)
+SCF_IMPLEMENTS_INTERFACE (iSkeletonBoneRagdollInfo)
 SCF_IMPLEMENT_IBASE_END
 
 //-------------------------------iSkeletonBone------------------------------------------
@@ -117,7 +117,7 @@ void csSkeletonBone::SetParent (iSkeletonBone *par)
 {
   if (parent && (par != parent))
   {
-    int child_index = parent->FindChildIndex((iSkeletonBone *)this);
+    size_t child_index = parent->FindChildIndex((iSkeletonBone *)this);
     if (child_index > -1)
     {
       parent->GetBones().DeleteIndexFast(child_index);
@@ -142,7 +142,7 @@ iSkeletonBone *csSkeletonBone::FindChild (const char *name)
   return 0;
 }
 
-int csSkeletonBone::FindChildIndex (iSkeletonBone *child)
+size_t csSkeletonBone::FindChildIndex (iSkeletonBone *child)
 {
   for (size_t i = 0; i < bones.Length () ; i++)
   {
@@ -168,7 +168,7 @@ void csSkeletonBone::UpdateTransform ()
     {
       rot_quat = b_tr->quat;
       next_transform.SetO2T (csMatrix3 (rot_quat));
-    next_transform.SetOrigin(b_tr->pos);
+      next_transform.SetOrigin(b_tr->pos);
     }
   }
   else
@@ -185,7 +185,7 @@ void csSkeletonBone::UpdateTransform ()
       bone_transform_data *b_tr = transforms.Get (factory_bone, 0);
       if (b_tr && (script.GetFactor () > 0))
       {
-    final_pos += b_tr->pos*script.GetFactor ();
+        final_pos += b_tr->pos*script.GetFactor ();
         script_factors_total += script.GetFactor ();
         if (slerp)
         {
@@ -217,7 +217,7 @@ void csSkeletonBone::UpdateTransform ()
       rot_quat = q;
       if (script_factors_total)
       {
-         final_pos /= script_factors_total;
+        final_pos /= script_factors_total;
       }
       next_transform.SetO2T (csMatrix3 (rot_quat));
       next_transform.SetOrigin (final_pos);
@@ -229,8 +229,8 @@ void csSkeletonBone::UpdateBones ()
 {
   if (!parent) 
   {
-  switch (transform_mode)
-  {
+    switch (transform_mode)
+    {
     case CS_BTT_NONE:
     case CS_BTT_SCRIPT:
       full_transform = transform;
@@ -238,33 +238,33 @@ void csSkeletonBone::UpdateBones ()
     case CS_BTT_RIGID_BODY:
       full_transform = transform;
       break;
-  }
+    }
   }
 
   csArray<csSkeletonBone *>::Iterator it = bones.GetIterator ();
   while (it.HasNext ())
   {
     csSkeletonBone *bone = it.Next ();
-  switch (transform_mode)
-  {
+    switch (transform_mode)
+    {
     case CS_BTT_NONE:
     case CS_BTT_SCRIPT:
       bone->GetFullTransform () = bone->GetTransform ()*full_transform;
       break;
     case CS_BTT_RIGID_BODY:
       /*
-       if (bone->GetRigidBody())
-       {
-        bone->GetFullTransform () = 
-          bone->GetRigidBody()->GetTransform ()/skeleton->GetBone(0)->GetRigidBody()->GetTransform();
-       }
+      if (bone->GetRigidBody())
+      {
+      bone->GetFullTransform () = 
+      bone->GetRigidBody()->GetTransform ()/skeleton->GetBone(0)->GetRigidBody()->GetTransform();
+      }
       else
       {
-        bone->GetFullTransform () = bone->GetTransform ()*full_transform;
+      bone->GetFullTransform () = bone->GetTransform ()*full_transform;
       }
       */
       break;
-  }
+    }
     bone->UpdateBones ();
   }
 }
@@ -303,7 +303,7 @@ iSkeletonBoneFactory *csSkeletonBoneFactory::FindChild (const char *name)
   return 0;
 }
 
-int csSkeletonBoneFactory::FindChildIndex (iSkeletonBoneFactory *child)
+size_t csSkeletonBoneFactory::FindChildIndex (iSkeletonBoneFactory *child)
 {
   for (size_t i = 0; i < bones.Length () ; i++)
   {
@@ -319,7 +319,7 @@ void csSkeletonBoneFactory::SetParent (iSkeletonBoneFactory *par)
 {
   if (parent && (par != parent))
   {
-    int child_index = parent->FindChildIndex((iSkeletonBoneFactory *)this);
+    size_t child_index = parent->FindChildIndex((iSkeletonBoneFactory *)this);
     if (child_index > -1)
     {
       parent->GetBones().DeleteIndexFast(child_index);
@@ -358,8 +358,8 @@ csSkeletonBoneRagdollInfo::csSkeletonBoneRagdollInfo (csSkeletonBoneFactory *bon
   dimensions.Set(0, 0, 0);
   friction = 1000;
   elasticity = 0;
-  softness = 0.01;
-  slip = 0.07;
+  softness = 0.01f;
+  slip = 0.07f;
   mass = 1;
   gravmode = 1;
   min_rot_constrints.Set(0, 0, 0);
@@ -379,13 +379,13 @@ void csSkeletonBoneRagdollInfo::SetAttachToParent(bool attach)
   /*
   if (skel_bone_fact->GetParent())
   {
-    iSkeletonBoneRagdollInfo *parent_ragdoll_info = 
-        skel_bone_fact->GetParent()->GetRagdollInfo();
-    if (parent_ragdoll_info)
-    {
-       csVector3 parent_geom_dim = parent_ragdoll_info->GetGeomDimensions();
-       csVector3 tr_parent_geom_dim = skel_bone_fact->GetTransform().This2Other(parent_geom_dim);
-    }
+  iSkeletonBoneRagdollInfo *parent_ragdoll_info = 
+  skel_bone_fact->GetParent()->GetRagdollInfo();
+  if (parent_ragdoll_info)
+  {
+  csVector3 parent_geom_dim = parent_ragdoll_info->GetGeomDimensions();
+  csVector3 tr_parent_geom_dim = skel_bone_fact->GetTransform().This2Other(parent_geom_dim);
+  }
   }
   */
   //enabled = false;
@@ -480,7 +480,7 @@ csSkeletonRunnable::csSkeletonRunnable (csSkeletonScript* script, csSkeleton *sk
   loop_times = script->GetLoopTimes ();
   if (!script->GetLoop())
   {
-  loop_times = 1;
+    loop_times = 1;
   }
 
   /*
@@ -488,19 +488,19 @@ csSkeletonRunnable::csSkeletonRunnable (csSkeletonScript* script, csSkeleton *sk
 
   if (script->GetLoop ())
   {
-    loop_times = script->GetLoopTimes ();
+  loop_times = script->GetLoopTimes ();
   }
   else
   {
-     loop_times = 1;
+  loop_times = 1;
   }
 
   for (size_t i = 0; i < script->GetFrames ().Length (); i++)
   {
-     runnable_frame rf;
-     rf.active = script->GetFrames ().Get (i).active;
-     rf.repeat_times = script->GetFrames ().Get (i).repeat_times;
-     runnable_frames.Push (rf);
+  runnable_frame rf;
+  rf.active = script->GetFrames ().Get (i).active;
+  rf.repeat_times = script->GetFrames ().Get (i).repeat_times;
+  runnable_frames.Push (rf);
   }
 
   csTicks forced_duration = script->GetForcedDuration ();
@@ -518,52 +518,52 @@ csSkeletonRunnable::~csSkeletonRunnable ()
 
 void csSkeletonRunnable::ParseFrame(csSkeletonScriptKeyFrame *frame)
 {
-  for (int i = 0; i < frame->GetTransformsCount() ; i++)
+  for (size_t i = 0; i < frame->GetTransformsCount() ; i++)
   {
-  csReversibleTransform & transform = frame->GetTransform(i);
-  bone_transform_data *bone_transform = GetBoneTransform ((csSkeletonBoneFactory *)frame->GetBone(i));
-  if (!frame->GetDuration())
-  {
-    //TODO
-  }
-  else
-  {
-    sac_transform_execution m;
-    //m.bone = frame->GetBone(i);
-    m.bone_transform = bone_transform;
-    m.elapsed_ticks = 0;
-    m.curr_quat = m.bone_transform->quat;
-    m.position = bone_transform->pos;
-    m.type = 1;
-    //m.quat = csQuaternion (transform.GetT2O());
-    m.quat = csQuaternion (transform.GetT2O());
-    csVector3 delta;
-
-
-    //if (current_frame == 0)
+    csReversibleTransform & transform = frame->GetTransform(i);
+    bone_transform_data *bone_transform = GetBoneTransform ((csSkeletonBoneFactory *)frame->GetBone(i));
+    if (!frame->GetDuration())
     {
-      //m.final_position = bone_transform->pos;
-      //m.quat = bone_transform->quat;
-    }
-    //else
-    {
-      m.final_position = transform.GetOrigin();
-    }
-
-    //if (i == 0 && current_frame > 0)
-    if (i == 0)
-    {
-      m.type = 2;
-      delta = m.final_position;
+      //TODO
     }
     else
     {
-      delta = m.final_position - m.position;
-    }
+      sac_transform_execution m;
+      //m.bone = frame->GetBone(i);
+      m.bone_transform = bone_transform;
+      m.elapsed_ticks = 0;
+      m.curr_quat = m.bone_transform->quat;
+      m.position = bone_transform->pos;
+      m.type = 1;
+      //m.quat = csQuaternion (transform.GetT2O());
+      m.quat = csQuaternion (transform.GetT2O());
+      csVector3 delta;
 
-    m.delta_per_tick = delta/ (float) (delay.final);
-    runnable_transforms.Push (m);
-  }
+
+      //if (current_frame == 0)
+      {
+        //m.final_position = bone_transform->pos;
+        //m.quat = bone_transform->quat;
+      }
+      //else
+      {
+        m.final_position = transform.GetOrigin();
+      }
+
+      //if (i == 0 && current_frame > 0)
+      if (i == 0)
+      {
+        m.type = 2;
+        delta = m.final_position;
+      }
+      else
+      {
+        delta = m.final_position - m.position;
+      }
+
+      m.delta_per_tick = delta/ (float) (delay.final);
+      runnable_transforms.Push (m);
+    }
   }
 }
 
@@ -590,7 +590,7 @@ csSkeletonScriptKeyFrame *csSkeletonRunnable::NextFrame()
 
   if (skeleton->GetScriptCallback())
   {
-   skeleton->GetScriptCallback()->Execute(script, current_frame);
+    skeleton->GetScriptCallback()->Execute(script, current_frame);
   }
 
   return (csSkeletonScriptKeyFrame *)script->GetFrame(current_frame);
@@ -616,7 +616,7 @@ bool csSkeletonRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
     ParseFrame (frame);
     parse_key_frame = false;
   }
-  
+
 
   if (!loop_times)
   {
@@ -642,72 +642,72 @@ bool csSkeletonRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
     i--;
     sac_transform_execution& m = runnable_transforms[i];
     if (m.type == 1)
-  {
-    if (delay.current < delay.final)
     {
-      csVector3 current_pos = 
-        m.final_position - ( (float) (delay.final - delay.current))*m.delta_per_tick;
-      m.bone_transform->pos = current_pos;
+      if (delay.current < delay.final)
+      {
+        csVector3 current_pos = 
+          m.final_position - ( (float) (delay.final - delay.current))*m.delta_per_tick;
+        m.bone_transform->pos = current_pos;
 
-      float slerp = 
-        (float)delay.current/ (float)delay.final;
-      m.bone_transform->quat = m.curr_quat.Slerp (m.quat, slerp);
+        float slerp = 
+          (float)delay.current/ (float)delay.final;
+        m.bone_transform->quat = m.curr_quat.Slerp (m.quat, slerp);
+      }
+      else
+      {
+        m.bone_transform->pos = m.final_position;
+        m.bone_transform->quat = m.quat;
+        runnable_transforms.DeleteIndexFast (i);
+      }
     }
     else
     {
-      m.bone_transform->pos = m.final_position;
-      m.bone_transform->quat = m.quat;
-      runnable_transforms.DeleteIndexFast (i);
+      if (delay.current < delay.final)
+      {
+        csVector3 current_pos = 
+          (float) (delay.current - m.elapsed_ticks)*m.delta_per_tick;
+
+        //m.bone_transform->pos = current_pos;
+        m.bone_transform->pos += current_pos;
+        float slerp = 
+          ( (float) (delay.current - m.elapsed_ticks)/ (float)delay.final);
+        csQuaternion zero_quat;
+        zero_quat.SetWithEuler(csVector3(0));
+
+        //m.bone_transform->quat = zero_quat.Slerp (m.quat, slerp);
+        m.curr_quat = zero_quat.Slerp (m.quat, slerp);
+        m.bone_transform->quat = m.curr_quat*m.bone_transform->quat;
+        m.elapsed_ticks = delay.current;
+        //printf("m.curr_quat %.3f %.3f %.3f %.3f\n", m.curr_quat.x, m.curr_quat.y, m.curr_quat.z, m.curr_quat.r);
+        //printf("m.bone_transform->quat %.3f %.3f %.3f %.3f\n", m.bone_transform->quat.x, m.bone_transform->quat.y, m.bone_transform->quat.z, m.bone_transform->quat.r);
+        //printf("-------------------------\n");
+      }
+      else
+      {
+        csVector3 current_pos = 
+          (float) (delay.final - m.elapsed_ticks)*m.delta_per_tick;
+        //m.bone_transform->pos = current_pos;
+        m.bone_transform->pos += current_pos;
+        float slerp = 
+          ( (float) (delay.final - m.elapsed_ticks)/ (float)delay.final);
+        csQuaternion zero_quat;
+        zero_quat.SetWithEuler(csVector3(0));
+
+        //m.bone_transform->quat = zero_quat.Slerp (m.quat, slerp);
+        m.curr_quat = zero_quat.Slerp (m.quat, slerp);
+        m.bone_transform->quat = m.curr_quat*m.bone_transform->quat;
+
+        //printf("m.quat %.3f %.3f %.3f %.3f\n", m.quat.x, m.quat.y, m.quat.z, m.quat.r);
+        //printf("zero_quat %.3f %.3f %.3f %.3f\n", zero_quat.x, zero_quat.y, zero_quat.z, zero_quat.r);
+        //printf("m.curr_quat %.3f %.3f %.3f %.3f\n", m.curr_quat.x, m.curr_quat.y, m.curr_quat.z, m.curr_quat.r);
+        //printf("m.bone_transform->quat %.3f %.3f %.3f %.3f\n", m.bone_transform->quat.x, m.bone_transform->quat.y, m.bone_transform->quat.z, m.bone_transform->quat.r);
+        //printf("-------------------------\n");
+        runnable_transforms.DeleteIndexFast (i);
+      }
     }
-  }
-  else
-  {
-    if (delay.current < delay.final)
-    {
-      csVector3 current_pos = 
-        (float) (delay.current - m.elapsed_ticks)*m.delta_per_tick;
-
-      //m.bone_transform->pos = current_pos;
-      m.bone_transform->pos += current_pos;
-      float slerp = 
-        ( (float) (delay.current - m.elapsed_ticks)/ (float)delay.final);
-      csQuaternion zero_quat;
-      zero_quat.SetWithEuler(csVector3(0));
-
-      //m.bone_transform->quat = zero_quat.Slerp (m.quat, slerp);
-      m.curr_quat = zero_quat.Slerp (m.quat, slerp);
-      m.bone_transform->quat = m.curr_quat*m.bone_transform->quat;
-      m.elapsed_ticks = delay.current;
-      //printf("m.curr_quat %.3f %.3f %.3f %.3f\n", m.curr_quat.x, m.curr_quat.y, m.curr_quat.z, m.curr_quat.r);
-      //printf("m.bone_transform->quat %.3f %.3f %.3f %.3f\n", m.bone_transform->quat.x, m.bone_transform->quat.y, m.bone_transform->quat.z, m.bone_transform->quat.r);
-      //printf("-------------------------\n");
-    }
-    else
-    {
-      csVector3 current_pos = 
-        (float) (delay.final - m.elapsed_ticks)*m.delta_per_tick;
-      //m.bone_transform->pos = current_pos;
-      m.bone_transform->pos += current_pos;
-      float slerp = 
-        ( (float) (delay.final - m.elapsed_ticks)/ (float)delay.final);
-      csQuaternion zero_quat;
-      zero_quat.SetWithEuler(csVector3(0));
-
-      //m.bone_transform->quat = zero_quat.Slerp (m.quat, slerp);
-      m.curr_quat = zero_quat.Slerp (m.quat, slerp);
-      m.bone_transform->quat = m.curr_quat*m.bone_transform->quat;
-
-      //printf("m.quat %.3f %.3f %.3f %.3f\n", m.quat.x, m.quat.y, m.quat.z, m.quat.r);
-      //printf("zero_quat %.3f %.3f %.3f %.3f\n", zero_quat.x, zero_quat.y, zero_quat.z, zero_quat.r);
-      //printf("m.curr_quat %.3f %.3f %.3f %.3f\n", m.curr_quat.x, m.curr_quat.y, m.curr_quat.z, m.curr_quat.r);
-      //printf("m.bone_transform->quat %.3f %.3f %.3f %.3f\n", m.bone_transform->quat.x, m.bone_transform->quat.y, m.bone_transform->quat.z, m.bone_transform->quat.r);
-      //printf("-------------------------\n");
-      runnable_transforms.DeleteIndexFast (i);
-    }
-  }
     mod = true;
   }
- return mod;
+  return mod;
 }
 
 bone_transform_data *csSkeletonRunnable::GetBoneTransform(csSkeletonBoneFactory *bone_fact)
@@ -715,10 +715,10 @@ bone_transform_data *csSkeletonRunnable::GetBoneTransform(csSkeletonBoneFactory 
   bone_transform_data *b_tr = transforms.Get (bone_fact, 0);
   if (!b_tr) 
   {
-  int index = ((csSkeletonFactory *)skeleton->GetFactory())->FindBoneIndex(bone_fact);
+    size_t index = ((csSkeletonFactory *)skeleton->GetFactory())->FindBoneIndex(bone_fact);
     b_tr = new bone_transform_data ();
     b_tr->quat = ((csSkeletonBone *)skeleton->GetBone(index))->GetQuaternion ();
-  b_tr->pos = ((csSkeletonBone *)skeleton->GetBone(index))->GetTransform ().GetOrigin ();
+    b_tr->pos = ((csSkeletonBone *)skeleton->GetBone(index))->GetTransform ().GetOrigin ();
     transforms.Put (bone_fact, b_tr);
   }
   return b_tr;
@@ -747,11 +747,11 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact)
     iSkeletonBoneFactory *fact_parent_bone = bones[i]->GetFactory()->GetParent();
     if (fact_parent_bone)
     {
-    int index = fact->FindBoneIndex((csSkeletonBoneFactory *)fact_parent_bone);
-    if (index > -1)
-    {
-      bones[i]->SetParent(bones[index]);
-    }
+      size_t index = fact->FindBoneIndex((csSkeletonBoneFactory *)fact_parent_bone);
+      if (index > -1)
+      {
+        bones[i]->SetParent(bones[index]);
+      }
     }
   }
 
@@ -761,7 +761,7 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact)
     csRef<csSkeletonSocket> socket = 
       (csPtr<csSkeletonSocket>)(new csSkeletonSocket (this, fact_sockets[i]));
 
-    int index = fact->FindBoneIndex((csSkeletonBoneFactory *)fact_sockets[i]->GetBone());
+    size_t index = fact->FindBoneIndex((csSkeletonBoneFactory *)fact_sockets[i]->GetBone());
     if (index > -1)
     {
       socket->SetBone(bones[index]);
@@ -788,7 +788,7 @@ csSkeleton::~csSkeleton ()
   SCF_DESTRUCT_IBASE ();
   if (script_callback)
   {
-  delete script_callback;
+    delete script_callback;
   }
 }
 
@@ -797,28 +797,28 @@ void csSkeleton::UpdateBones ()
   size_t i;
   for (i = 0 ; i < bones.Length () ; i++)
   {
-  bones[i]->UpdateTransform ();
+    bones[i]->UpdateTransform ();
   }
 
   for (i = 0 ; i < parent_bones.Length () ; i++)
   {
     csRef<csSkeletonBone> parent_bone = bones[parent_bones[i]];
     {
-        parent_bone->UpdateBones ();
+      parent_bone->UpdateBones ();
       //break;
       //case BM_PHYSICS:
-    /*
-        if (parent_bone->GetRigidBody ())
-        {
-          parent_bone->UpdateBones (parent_bone);
-          force_bone_update = true;
-        }
-        else
-        {
-          parent_bone->UpdateBones ();
-        }
+      /*
+      if (parent_bone->GetRigidBody ())
+      {
+      parent_bone->UpdateBones (parent_bone);
+      force_bone_update = true;
+      }
+      else
+      {
+      parent_bone->UpdateBones ();
+      }
       break;
-    */
+      */
     }
   }
 
@@ -932,7 +932,7 @@ iSkeletonScript* csSkeleton::Execute (const char *scriptname)
 iSkeletonScript* csSkeleton::Append (const char *scriptname)
 {
   csSkeletonScript* script = (csSkeletonScript*)(
-  	factory->FindScript (scriptname));
+    factory->FindScript (scriptname));
   if (!script) 
   {
     return 0;
@@ -989,7 +989,7 @@ iSkeletonScript* csSkeleton::GetScript (size_t i)
   return 0;
 }
 
-int csSkeleton::FindBoneIndex (const char* bonename)
+size_t csSkeleton::FindBoneIndex (const char* bonename)
 {
   size_t i;
   for (i = 0 ; i < bones.Length () ; i++)
@@ -1003,151 +1003,151 @@ int csSkeleton::FindBoneIndex (const char* bonename)
 /*
 void csSkeleton::CreateRagdoll(iODEDynamicSystem *dyn_sys, csReversibleTransform & transform)
 {
-  dynamic_system = dyn_sys;
-  for (size_t i = 0; i < bones.Length(); i++)
-  {
-    //printf("\n");
-    iSkeletonBoneRagdollInfo *ragdoll_info = bones[i]->GetFactory()->GetRagdollInfo();
-    if (!ragdoll_info->GetEnabled())
-    {
-      continue;
-    }
-    csReversibleTransform full_body_transform = bones[i]->GetFactory()->GetFullTransform()*transform;
-    csBox3 skin_box = bones[i]->GetSkinBox();
-    csVector3 skin_size = 
-      csVector3(skin_box.GetSize().x < 0.2f ? 0.2f : skin_box.GetSize().x,
-            skin_box.GetSize().y < 0.2f ? 0.2f : skin_box.GetSize().y,
-            skin_box.GetSize().z < 0.2f ? 0.2f : skin_box.GetSize().z);
-    csRef<iODEGeom> geom;
-    if (i)
-    {
-      geom = dyn_sys->CreateGeom();
-      geom->QueryObject()->SetName(ragdoll_info->GetGeomName());
-      csReversibleTransform center;
-      center.SetOrigin(skin_box.GetCenter());
-      geom->SetBox(skin_size, center);
-      geom->SetFriction(ragdoll_info->GetFriction());
-      geom->SetElasticy(ragdoll_info->GetElasticity());
-      geom->SetSoftness(ragdoll_info->GetSoftness());
-      geom->SetSlip(ragdoll_info->GetSlip());
+dynamic_system = dyn_sys;
+for (size_t i = 0; i < bones.Length(); i++)
+{
+//printf("\n");
+iSkeletonBoneRagdollInfo *ragdoll_info = bones[i]->GetFactory()->GetRagdollInfo();
+if (!ragdoll_info->GetEnabled())
+{
+continue;
+}
+csReversibleTransform full_body_transform = bones[i]->GetFactory()->GetFullTransform()*transform;
+csBox3 skin_box = bones[i]->GetSkinBox();
+csVector3 skin_size = 
+csVector3(skin_box.GetSize().x < 0.2f ? 0.2f : skin_box.GetSize().x,
+skin_box.GetSize().y < 0.2f ? 0.2f : skin_box.GetSize().y,
+skin_box.GetSize().z < 0.2f ? 0.2f : skin_box.GetSize().z);
+csRef<iODEGeom> geom;
+if (i)
+{
+geom = dyn_sys->CreateGeom();
+geom->QueryObject()->SetName(ragdoll_info->GetGeomName());
+csReversibleTransform center;
+center.SetOrigin(skin_box.GetCenter());
+geom->SetBox(skin_size, center);
+geom->SetFriction(ragdoll_info->GetFriction());
+geom->SetElasticy(ragdoll_info->GetElasticity());
+geom->SetSoftness(ragdoll_info->GetSoftness());
+geom->SetSlip(ragdoll_info->GetSlip());
 
-      if ((i == 0) || (i == 1))
-      //if ((i == 1))
-      {
-        geom->SetCollideBits(COLLIDE_GEOM_LACK);
-      }
-      else
-      {
-        geom->SetCollideBits(COLLIDE_GEOM_NORMAL);
-      }
-      geom->SetCategoryBits(1);
-      //geom->SetGroupID(1);
-    }
+if ((i == 0) || (i == 1))
+//if ((i == 1))
+{
+geom->SetCollideBits(COLLIDE_GEOM_LACK);
+}
+else
+{
+geom->SetCollideBits(COLLIDE_GEOM_NORMAL);
+}
+geom->SetCategoryBits(1);
+//geom->SetGroupID(1);
+}
 
-    //printf("creating geom %s for bone %s\n", ragdoll_info->GetGeomName(), bones[i]->GetName());
-    csRef<iODERigidBody> rigid_body = dyn_sys->CreateBody();
-    rigid_body->QueryObject()->SetName(ragdoll_info->GetBodyName());
-    csOrthoTransform tr;
-    if (i)
-    {
-      rigid_body->SetGeom(geom, tr);
-    }
-    rigid_body->SetProperties(ragdoll_info->GetBodyMass(), csVector3(0), csMatrix3());
-    rigid_body->SetTransform(full_body_transform);
-    bones[i]->SetRigidBody(rigid_body, tr);
-    //printf("creating body %s for bone %s\n", ragdoll_info->GetBodyName(), bones[i]->GetName());
-    if (!bones[i]->GetParent())
-    {
-      continue;
-    }
-    
-    iSkeletonBone *parent_bone = bones[i]->GetParent();
+//printf("creating geom %s for bone %s\n", ragdoll_info->GetGeomName(), bones[i]->GetName());
+csRef<iODERigidBody> rigid_body = dyn_sys->CreateBody();
+rigid_body->QueryObject()->SetName(ragdoll_info->GetBodyName());
+csOrthoTransform tr;
+if (i)
+{
+rigid_body->SetGeom(geom, tr);
+}
+rigid_body->SetProperties(ragdoll_info->GetBodyMass(), csVector3(0), csMatrix3());
+rigid_body->SetTransform(full_body_transform);
+bones[i]->SetRigidBody(rigid_body, tr);
+//printf("creating body %s for bone %s\n", ragdoll_info->GetBodyName(), bones[i]->GetName());
+if (!bones[i]->GetParent())
+{
+continue;
+}
 
-    csRef<iODEJoint> joint = dyn_sys->CreateJoint();
-    joint->QueryObject()->SetName(ragdoll_info->GetJointName());
-    
-    //joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
-    csReversibleTransform joint_tr = parent_bone->GetRigidBody()->GetTransform();
-    joint_tr.SetOrigin(full_body_transform.GetOrigin());
-    full_body_transform.SetO2T(joint_tr.GetO2T());
-    joint->SetTransform(full_body_transform);
-    //bones[i]->GetRigidBody()->SetTransform(joint_tr);
+iSkeletonBone *parent_bone = bones[i]->GetParent();
 
-    csVector3 & min_rot_constr = ragdoll_info->GetJointMinRotContraints();
-    csVector3 & max_rot_constr = ragdoll_info->GetJointMaxRotContraints();
-    csVector3 & min_tr_constr = ragdoll_info->GetJointMinTransContraints();
-    csVector3 & max_tr_constr = ragdoll_info->GetJointMaxTransContraints();
+csRef<iODEJoint> joint = dyn_sys->CreateJoint();
+joint->QueryObject()->SetName(ragdoll_info->GetJointName());
 
-    //printf("Min Rot Contraints: %.3f %.3f %.3f\n", min_rot_constr.x, min_rot_constr.y, min_rot_constr.z);
-    //printf("Max Rot Contraints: %.3f %.3f %.3f\n", max_rot_constr.x, max_rot_constr.y, max_rot_constr.z);
+//joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
+csReversibleTransform joint_tr = parent_bone->GetRigidBody()->GetTransform();
+joint_tr.SetOrigin(full_body_transform.GetOrigin());
+full_body_transform.SetO2T(joint_tr.GetO2T());
+joint->SetTransform(full_body_transform);
+//bones[i]->GetRigidBody()->SetTransform(joint_tr);
 
-    bool trans_constr_x = !(min_tr_constr.x || max_tr_constr.x);
-    bool trans_constr_y = !(min_tr_constr.y || max_tr_constr.y);
-    bool trans_constr_z = !(min_tr_constr.z || max_tr_constr.z);
-    bool rot_constr_x = !(min_rot_constr.x || max_rot_constr.x);
-    bool rot_constr_y = !(min_rot_constr.y || max_rot_constr.y);
-    bool rot_constr_z = !(min_rot_constr.z || max_rot_constr.z);
-    if (trans_constr_x && trans_constr_y && trans_constr_z && 
-        rot_constr_x && rot_constr_y && rot_constr_z)
-    {
-      joint->SetTransConstraints(trans_constr_x, trans_constr_y, trans_constr_z);
-      joint->SetMinimumDistance(min_tr_constr);
-      joint->SetMaximumDistance(max_tr_constr);
-      joint->SetRotConstraints(rot_constr_x, rot_constr_y, rot_constr_z);
-      joint->SetMinimumAngle(min_rot_constr);
-      joint->SetMaximumAngle(max_rot_constr);
-      //joint->SetMinimumAngle(csVector3(0, -0.01, 0));
-      //joint->SetMaximumAngle(csVector3(0, 0.01, 0));
-      joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
-      joint->SetFixed();
-      //printf("creating fixed joint %s for bones (%s -> %s)\n", ragdoll_info->GetJointName(), parent_bone->GetName(), bones[i]->GetName());
-    }
-    else
-    {
-      joint->SetTransConstraints(trans_constr_x, trans_constr_y, trans_constr_y);
-      joint->SetMinimumDistance(min_tr_constr);
-      joint->SetMaximumDistance(max_tr_constr);
-      //joint->SetRotConstraints(true, false, true);
-      //joint->SetMinimumAngle(csVector3(0, -1.5, 0));
-      //joint->SetMaximumAngle(csVector3(0, 0, 0));
-      joint->SetRotConstraints(rot_constr_x, rot_constr_y, rot_constr_z);
-      joint->SetMinimumAngle(min_rot_constr);
-      joint->SetMaximumAngle(max_rot_constr);
-      //joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
-      joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
-      //joint->SetFixed();
-      //printf("creating joint %s for bones (%s -> %s)\n", ragdoll_info->GetJointName(), parent_bone->GetName(), bones[i]->GetName());
-    }
-    //bones[i]->GetRigidBody()->SetTransform(full_body_transform);
-    bones[i]->SetJoint(joint);
-    bones[i]->SetTransformMode(CS_BTT_RIGID_BODY);
-  }
+csVector3 & min_rot_constr = ragdoll_info->GetJointMinRotContraints();
+csVector3 & max_rot_constr = ragdoll_info->GetJointMaxRotContraints();
+csVector3 & min_tr_constr = ragdoll_info->GetJointMinTransContraints();
+csVector3 & max_tr_constr = ragdoll_info->GetJointMaxTransContraints();
+
+//printf("Min Rot Contraints: %.3f %.3f %.3f\n", min_rot_constr.x, min_rot_constr.y, min_rot_constr.z);
+//printf("Max Rot Contraints: %.3f %.3f %.3f\n", max_rot_constr.x, max_rot_constr.y, max_rot_constr.z);
+
+bool trans_constr_x = !(min_tr_constr.x || max_tr_constr.x);
+bool trans_constr_y = !(min_tr_constr.y || max_tr_constr.y);
+bool trans_constr_z = !(min_tr_constr.z || max_tr_constr.z);
+bool rot_constr_x = !(min_rot_constr.x || max_rot_constr.x);
+bool rot_constr_y = !(min_rot_constr.y || max_rot_constr.y);
+bool rot_constr_z = !(min_rot_constr.z || max_rot_constr.z);
+if (trans_constr_x && trans_constr_y && trans_constr_z && 
+rot_constr_x && rot_constr_y && rot_constr_z)
+{
+joint->SetTransConstraints(trans_constr_x, trans_constr_y, trans_constr_z);
+joint->SetMinimumDistance(min_tr_constr);
+joint->SetMaximumDistance(max_tr_constr);
+joint->SetRotConstraints(rot_constr_x, rot_constr_y, rot_constr_z);
+joint->SetMinimumAngle(min_rot_constr);
+joint->SetMaximumAngle(max_rot_constr);
+//joint->SetMinimumAngle(csVector3(0, -0.01, 0));
+//joint->SetMaximumAngle(csVector3(0, 0.01, 0));
+joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
+joint->SetFixed();
+//printf("creating fixed joint %s for bones (%s -> %s)\n", ragdoll_info->GetJointName(), parent_bone->GetName(), bones[i]->GetName());
+}
+else
+{
+joint->SetTransConstraints(trans_constr_x, trans_constr_y, trans_constr_y);
+joint->SetMinimumDistance(min_tr_constr);
+joint->SetMaximumDistance(max_tr_constr);
+//joint->SetRotConstraints(true, false, true);
+//joint->SetMinimumAngle(csVector3(0, -1.5, 0));
+//joint->SetMaximumAngle(csVector3(0, 0, 0));
+joint->SetRotConstraints(rot_constr_x, rot_constr_y, rot_constr_z);
+joint->SetMinimumAngle(min_rot_constr);
+joint->SetMaximumAngle(max_rot_constr);
+//joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
+joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
+//joint->SetFixed();
+//printf("creating joint %s for bones (%s -> %s)\n", ragdoll_info->GetJointName(), parent_bone->GetName(), bones[i]->GetName());
+}
+//bones[i]->GetRigidBody()->SetTransform(full_body_transform);
+bones[i]->SetJoint(joint);
+bones[i]->SetTransformMode(CS_BTT_RIGID_BODY);
+}
 }
 
 void csSkeleton::DestroyRagdoll()
 {
-  if (dynamic_system)
-  {
-    for (size_t i = 0; i < bones.Length(); i++)
-    {
-      if (bones[i]->GetJoint())
-      {
-        dynamic_system->RemoveJoint(bones[i]->GetJoint());
-      }
-      if (bones[i]->GetRigidBody())
-      {
-        dynamic_system->RemoveBody(bones[i]->GetRigidBody());
-        bones[i]->SetTransformMode(CS_BTT_SCRIPT);
-      }
-    }
-  }
+if (dynamic_system)
+{
+for (size_t i = 0; i < bones.Length(); i++)
+{
+if (bones[i]->GetJoint())
+{
+dynamic_system->RemoveJoint(bones[i]->GetJoint());
+}
+if (bones[i]->GetRigidBody())
+{
+dynamic_system->RemoveBody(bones[i]->GetRigidBody());
+bones[i]->SetTransformMode(CS_BTT_SCRIPT);
+}
+}
+}
 }
 */
 
 //---------------------- iSkeletonFactory ---------------------------------------
 
 csSkeletonFactory::csSkeletonFactory (csSkeletonGraveyard* graveyard, 
-    iObjectRegistry* object_reg)
+                                      iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE (graveyard); 
   csSkeletonFactory::graveyard = graveyard;
@@ -1174,9 +1174,9 @@ iSkeletonScript* csSkeletonFactory::FindScript (const char* scriptname)
   for (i = 0 ; i < scripts.Length () ; i++)
   {
     if (strcmp (scripts[i]->GetName (), scriptname) == 0)
-  {
+    {
       return scripts[i];
-  }
+    }
   }
   return 0;
 }
@@ -1190,7 +1190,7 @@ iSkeletonBoneFactory* csSkeletonFactory::FindBone (const char* name)
   return 0;
 }
 
-int csSkeletonFactory::FindBoneIndex (const char* bonename)
+size_t csSkeletonFactory::FindBoneIndex (const char* bonename)
 {
   size_t i;
   for (i = 0 ; i < bones.Length () ; i++)
@@ -1201,7 +1201,7 @@ int csSkeletonFactory::FindBoneIndex (const char* bonename)
   return -1;
 }
 
-int csSkeletonFactory::FindBoneIndex (csSkeletonBoneFactory *bone) const
+size_t csSkeletonFactory::FindBoneIndex (csSkeletonBoneFactory *bone) const
 {
   size_t i;
   for (i = 0 ; i < bones.Length () ; i++)
@@ -1218,7 +1218,7 @@ void csSkeletonFactory::UpdateParentBones ()
     if (!bones[i]->GetParent ())
     {
       bones[i]->UpdateBones();
-        parent_bones.Push (i);
+      parent_bones.Push (i);
     }
   }
 }
@@ -1258,7 +1258,7 @@ void csSkeletonFactory::RemoveSocket (int i)
   //TODO
 }
 
-int csSkeletonFactory::GetSocketsCount()
+size_t csSkeletonFactory::GetSocketsCount()
 {
   return sockets.Length ();
 }
@@ -1315,10 +1315,10 @@ bool csSkeletonGraveyard::HandleEvent (iEvent& ev)
 {
   if (ev.Name == PreProcess)
   {
-  for (size_t i = 0; i < skeletons.Length() ; i++)
-  {
-    skeletons[i]->UpdateAnimation(vc->GetCurrentTicks ());
-  }
+    for (size_t i = 0; i < skeletons.Length() ; i++)
+    {
+      skeletons[i]->UpdateAnimation(vc->GetCurrentTicks ());
+    }
     return true;
   }
   return false;

@@ -542,7 +542,7 @@ void csMemoryPen::DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint
 void csMemoryPen::Write(iFont *font, uint x1, uint y1, char *text) 
 { 
 	uint8 op = PEN_OP_WRITE;
-	uint len = strlen(text);
+	size_t len = strlen(text);
 	
 	buf->Write((const char *)&op, sizeof(uint8));
 	buf->Write((const char *)&font, sizeof(iFont *));
@@ -560,7 +560,7 @@ void csMemoryPen::WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2,
 	uint h_align, uint v_align, char *text) 
 { 
 	uint8 op = PEN_OP_WRITEBOXED;
-	uint len = strlen(text);
+	size_t len = strlen(text);
 	
 	buf->Write((const char *)&op, sizeof(uint8));
 	buf->Write((const char *)&font, sizeof(iFont *));

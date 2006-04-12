@@ -77,7 +77,7 @@ static awsManager2 *theMgr=0;
 
 awsManager2 *AwsMgr() { return theMgr; }
 
-awsManager2::awsManager2(iBase *the_base)
+awsManager2::awsManager2 (iBase *the_base)
 {
   SCF_CONSTRUCT_IBASE (the_base);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
@@ -85,10 +85,10 @@ awsManager2::awsManager2(iBase *the_base)
   
   theMgr = this;
     
-  CreateScriptManager();    
+  CreateScriptManager ();    
 }
 
-awsManager2::~awsManager2()
+awsManager2::~awsManager2 ()
 {
   if (scfiEventHandler)
   {
@@ -99,14 +99,13 @@ awsManager2::~awsManager2()
     scfiEventHandler->DecRef ();
   }
   
-  DestroyScriptManager();
+  DestroyScriptManager ();
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_DESTRUCT_IBASE ();
 }
 
-bool 
-awsManager2::Initialize (iObjectRegistry *_object_reg)
+bool awsManager2::Initialize (iObjectRegistry *_object_reg)
 {
   object_reg = _object_reg;
     
@@ -125,35 +124,34 @@ awsManager2::Initialize (iObjectRegistry *_object_reg)
   GroupOff = awsGroupOff (object_reg);
   FrameStart = awsFrameStart (object_reg);
   
-  timer = csEventTimer::GetStandardTimer(object_reg);
+  timer = csEventTimer::GetStandardTimer (object_reg);
   
   mouse_focus=0;
   keyboard_focus=0;
   top=0;
   mouse_captured=false;
   
-  ScriptCon()->Initialize(object_reg);
-  ScriptMgr()->Initialize(object_reg);
+  ScriptCon ()->Initialize (object_reg);
+  ScriptMgr ()->Initialize (object_reg);
   
-  Color_SetupAutomation();
-  Gradient_SetupAutomation();
-  Skin_SetupAutomation();
-  Pen_SetupAutomation();
-  Font_SetupAutomation();
-  Texture_SetupAutomation();
-  Widget_SetupAutomation();	
+  Color_SetupAutomation ();
+  Gradient_SetupAutomation ();
+  Skin_SetupAutomation ();
+  Pen_SetupAutomation ();
+  Font_SetupAutomation ();
+  Texture_SetupAutomation ();
+  Widget_SetupAutomation ();	
       
   return true;
 }
 
-void 
-awsManager2::SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d)
+void awsManager2::SetDrawTarget (iGraphics2D *_g2d, iGraphics3D *_g3d)
 {
   g2d = _g2d;
   g3d = _g3d;
 
-  default_font = g2d->GetFontServer()->LoadFont (CSFONT_LARGE);
-  ScriptCon()->SetFont(default_font);
+  default_font = g2d->GetFontServer ()->LoadFont (CSFONT_LARGE);
+  ScriptCon ()->SetFont (default_font);
 }
 
 /*********************************************************************
@@ -161,223 +159,226 @@ awsManager2::SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d)
  ********************************************************************/
 
 
-void awsManager2::AddWidget(aws::widget *w)
+void awsManager2::AddWidget (aws::widget *w)
 {
-	w=w->TopParent();
-		
-	w->Link(top);		
-	top=w;		
-	
-	w->LinkDocked(top);
+  w=w->TopParent ();
+
+  w->Link (top);		
+  top=w;		
+
+  w->LinkDocked (top);
 } 
- 
-void awsManager2::RemoveWidget(aws::widget *w)
+
+void awsManager2::RemoveWidget (aws::widget *w)
 {
-	w=w->TopParent();
-	
-	if (top==w) top=top->Below();
-	if (mouse_focus==w || w->HasChild(mouse_focus)) mouse_focus=top;
-	if (keyboard_focus==w || w->HasChild(keyboard_focus))  keyboard_focus=top;
-	
-	w->Unlink();	
-	w->UnlinkDocked();
+  w=w->TopParent ();
+
+  if (top==w) top=top->Below ();
+  if (mouse_focus==w || w->HasChild (mouse_focus)) mouse_focus=top;
+  if (keyboard_focus==w || w->HasChild (keyboard_focus))  keyboard_focus=top;
+
+  w->Unlink ();	
+  w->UnlinkDocked ();
 }
 
 /*********************************************************************
  ***************** Event Handling ************************************
  ********************************************************************/
- 
-void awsManager2::CaptureMouse(aws::widget *w)
+
+void awsManager2::CaptureMouse (aws::widget *w)
 {
-	if (w)
-	{
-		 mouse_focus=w;
-		 mouse_captured=true;
-	 }
+  if (w)
+  {
+    mouse_focus=w;
+    mouse_captured=true;
+  }
 }
-  
-void awsManager2::ReleaseMouse()
+
+void awsManager2::ReleaseMouse ()
 {
-	mouse_captured=false;	
+  mouse_captured=false;	
 }
 
 bool awsManager2::HandleEvent (iEvent &Event)
 { 
   if (CS_IS_MOUSE_EVENT(object_reg, Event))
   {
-	  aws::widget *new_mouse_focus=0;
-	  
-	  if (mouse_captured)
-	  {	    		  
-		if (mouse_focus) 
-			mouse_focus->HandleEvent(Event);  
-		  
-		return true;	  
-	  }  
-	  
-	  // Check all widgets for new focus.	  
-	  for(aws::widget *w=top; w!=0; w=w->Below())
-	  {
-	 	new_mouse_focus = w->Contains(csMouseEventHelper::GetX(&Event), csMouseEventHelper::GetY(&Event));		
-	 	if (new_mouse_focus!=0) break;
-	  }
-	  	  
-	  // Did the move over a new widget?
-	  if (new_mouse_focus!=mouse_focus)
-	  {
-	  	// Reusing this event, save the orignal type
-	  	csEventID et = Event.Name;
-		
-	  	// Tell this widget that it's losing mouse focus.  
-	    if (mouse_focus)
-	    {
-	      Event.Name = MouseExit;
-	      mouse_focus->HandleEvent (Event);
-	    }
-		    		   
-	    // Set the new focus widget
-		mouse_focus = new_mouse_focus;
+    aws::widget *new_mouse_focus=0;
 
-		// Tell the new widget that it's getting mouse focus.		    
-	    if (mouse_focus)
-	    {
-	      Event.Name = MouseEnter;
-	      mouse_focus->HandleEvent (Event);
-	    }
-	    
-		// Restore the event's name.    
-		Event.Name = et;
-		
-		// Make the widget go to the top.		
-		if (mouse_focus)
-		{
-			aws::widget *new_top = mouse_focus->TopParent()->NorthMost();
-			
-			if (top!=new_top)
-			{
-				top->Signal("onDeactivated");
-				
-				new_top->Raise(top);
-				top=new_top;
-				
-				new_top->Signal("onActivated");
-			}
-		}
-	  }  
-	  
-	  //  If any widget has mouse focus then handle the event.
-	  // A child widget will pass the message up the line to it's parents
-	  // if it does not handle the event.
-	  if (mouse_focus)
-	  {
-		mouse_focus->HandleEvent(Event);	  
-	  }
-	  
-	   
+    if (mouse_captured)
+    {	    		  
+      if (mouse_focus) 
+        mouse_focus->HandleEvent (Event);  
+
+      return true;	  
+    }  
+
+    // Check all widgets for new focus.	  
+    for(aws::widget *w=top; w!=0; w=w->Below ())
+    {
+      new_mouse_focus = w->Contains (csMouseEventHelper::GetX (&Event), 
+                                     csMouseEventHelper::GetY (&Event));		
+      if (new_mouse_focus!=0) break;
+    }
+
+    // Did the move over a new widget?
+    if (new_mouse_focus!=mouse_focus)
+    {
+      // Reusing this event, save the orignal type
+      csEventID et = Event.Name;
+
+      // Tell this widget that it's losing mouse focus.  
+      if (mouse_focus)
+      {
+        Event.Name = MouseExit;
+        mouse_focus->HandleEvent (Event);
+      }
+
+      // Set the new focus widget
+      mouse_focus = new_mouse_focus;
+
+      // Tell the new widget that it's getting mouse focus.		    
+      if (mouse_focus)
+      {
+        Event.Name = MouseEnter;
+        mouse_focus->HandleEvent (Event);
+      }
+
+      // Restore the event's name.    
+      Event.Name = et;
+
+      // Make the widget go to the top.		
+      if (mouse_focus)
+      {
+        aws::widget *new_top = mouse_focus->TopParent ()->NorthMost ();
+
+        if (top!=new_top)
+        {
+          top->Signal ("onDeactivated");
+
+          new_top->Raise (top);
+          top=new_top;
+
+          new_top->Signal ("onActivated");
+        }
+      }
+    }  
+
+    // If any widget has mouse focus then handle the event.
+    // A child widget will pass the message up the line to it's parents
+    // if it does not handle the event.
+    if (mouse_focus)
+    {
+      mouse_focus->HandleEvent (Event);	  
+    }
+
+
   }
   else if (Event.Name == KeyboardDown)
   {
-	  csKeyEventData eventData;
-      csKeyEventHelper::GetEventData (&Event, eventData);
-	  
-	  switch(eventData.codeCooked)
-	  {
-		case CSKEY_F1:
-			if (csKeyEventHelper::GetModifiersBits(&Event) & (CSMASK_CTRL | CSMASK_ALT))
-			{
-				ScriptCon()->FlipActiveState();					
-			}
-			break;
-									
-		default:	
-			if (ScriptCon()->Active())			
-				ScriptCon()->OnKeypress(eventData);
-				
-			break;  
-	  } // end switch code
-	  return true;
+    csKeyEventData eventData;
+    csKeyEventHelper::GetEventData (&Event, eventData);
+
+    switch(eventData.codeCooked)
+    {
+    case CSKEY_F1:
+      if (csKeyEventHelper::GetModifiersBits (&Event) & (CSMASK_CTRL | CSMASK_ALT))
+      {
+        ScriptCon ()->FlipActiveState ();					
+      }
+      break;
+
+    default:	
+      if (ScriptCon ()->Active ())			
+        ScriptCon ()->OnKeypress (eventData);
+
+      break;  
+    } // end switch code
+    return true;
   } // end if event is keyboard
-	
+
   return false;
 }
 
 /*********************************************************************
- ***************** Redrawing *****************************************
- ********************************************************************/
+***************** Redrawing *****************************************
+********************************************************************/
 
 
-void awsManager2::Redraw()
+void awsManager2::Redraw ()
 {  
   csPen pen(g2d, g3d);    
   csString msg;
   static int frames=0;
   static int fps=0;
   static time_t start = time(NULL);
-  
+
   ++frames;
-    
-  g2d->Write(default_font, 90, 90, g2d->FindRGB(128,128,128,128), -1, "AWS Redrawing");
-  ScriptCon()->Redraw(g2d);
-  
-//   float angle;
-//   
-//   pen.SetColor(1,1,1,1);
-//   for(angle=0; angle<M_PI*2.0; angle+=M_PI/8.0)
-//   {
-//   	pen.DrawThickLine(100,100,(uint)(100+(cos(angle)*100)),(uint)(100+(sin(angle)*100)));
-//   }
+
+  g2d->Write (default_font, 90, 90, g2d->FindRGB (128,128,128,128), -1, 
+    "AWS Redrawing");
+  ScriptCon ()->Redraw (g2d);
+
+  //   float angle;
+  //   
+  //   pen.SetColor(1,1,1,1);
+  //   for(angle=0; angle<M_PI*2.0; angle+=M_PI/8.0)
+  //   {
+  //   	pen.DrawThickLine(100,100,(uint)(100+(cos(angle)*100)),(uint)(100+(sin(angle)*100)));
+  //   }
 
   // Draw all widgets (this is a hack for testing.)
-//   for(size_t i=0; i<aws::widgets.Length(); ++i)
-//   {
-//  	aws::widgets[i]->Draw(&pen);		
-//   }
+  //   for(size_t i=0; i<aws::widgets.Length(); ++i)
+  //   {
+  //  	aws::widgets[i]->Draw(&pen);		
+  //   }
 
-	// Draw widgets
-	if (top)
-	{
-		aws::widget *start = top;
-		
-		// Get bottom widget.
-		while(start->Below()) { start=start->Below(); }
-		
-		// Draw widgets from bottom up.
-		for(aws::widget *w=start; w!=0; w=w->Above())
-		{
-			w->Draw(&pen);	
-		}
-	}
-  
-  time_t end = time(NULL);
-  
+  // Draw widgets
+  if (top)
+  {
+    aws::widget *start = top;
+
+    // Get bottom widget.
+    while(start->Below ()) { start=start->Below (); }
+
+    // Draw widgets from bottom up.
+    for(aws::widget *w=start; w!=0; w=w->Above ())
+    {
+      w->Draw (&pen);	
+    }
+  }
+
+  time_t end = time (NULL);
+
   if (end-start > 0)
   {	  
-  	  fps = frames;
-  	  frames = 0;
-  	  start=end;
+    fps = frames;
+    frames = 0;
+    start=end;
   }	  
-  
-  msg.Format("%d fps", fps);
-  g2d->Write(default_font, 150, 5, g2d->FindRGB(128,128,128,255), -1, msg.GetDataSafe());  
+
+  msg.Format ("%d fps", fps);
+  g2d->Write (default_font, 150, 5, g2d->FindRGB (128,128,128,255), -1, 
+    msg.GetDataSafe ());  
 }
 
 /*********************************************************************
- ***************** Definition Files **********************************
- ********************************************************************/
+***************** Definition Files **********************************
+********************************************************************/
 
-bool awsManager2::Load(const scfString &_filename)
+bool awsManager2::Load (const scfString &_filename)
 {
-  return prefs.load(object_reg, _filename);
+  return prefs.load (object_reg, _filename);
 }
 
 
 /*********************************************************************
- ***************** Scripting *****************************************
- ********************************************************************/
+***************** Scripting *****************************************
+********************************************************************/
 
-iAwsScriptObject *awsManager2::CreateScriptObject(const char *name)
+iAwsScriptObject *awsManager2::CreateScriptObject (const char *name)
 {
-	return new scriptObject(name);	
+  return new scriptObject (name);	
 }
 
 // newline

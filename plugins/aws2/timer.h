@@ -7,33 +7,34 @@
 namespace aws
 {
 
-class Timer : public iTimerEvent
-{
-	/** @brief the object to use. */
-	JSObject *obj;
-	
-	/** @brief the function to call. */
-	jsval	  func;
-		
-public:	
-	SCF_DECLARE_IBASE;
+  class Timer : public iTimerEvent
+  {
+    /// the object to use.
+    JSObject *obj;
 
-	Timer(JSObject *_obj, uintN argc, jsval *argv):obj(_obj)
-	{
-		// Store the function.
-		func = argv[1];
-	}
+    /// the function to call.
+    jsval func;
 
-	// Fire the timer.
-	virtual bool Perform(iTimerEvent *ev)
-	{	
-		jsval rv;
-		
-		JS_CallFunctionValue(ScriptMgr()->GetContext(), obj, func, 0, NULL, &rv);
-		
-		return (rv==JSVAL_TRUE);
-	}	
-};
+  public:	
+    SCF_DECLARE_IBASE;
+
+    Timer (JSObject *_obj, uintN argc, jsval *argv)
+      : obj (_obj)
+    {
+      // Store the function.
+      func = argv[1];
+    }
+
+    // Fire the timer.
+    virtual bool Perform (iTimerEvent *ev)
+    {	
+      jsval rv;
+
+      JS_CallFunctionValue (ScriptMgr ()->GetContext (), obj, func, 0, NULL, &rv);
+
+      return (rv==JSVAL_TRUE);
+    }	
+  };
 
 
 } // end namespace

@@ -66,9 +66,9 @@ struct iSkeletonBone : public virtual iBase
   virtual  void SetParent (iSkeletonBone *parent) = 0;
   virtual iSkeletonBone *GetParent () = 0;
   virtual int GetChildrenCount () = 0;
-  virtual iSkeletonBone *GetChild (int i) = 0;
+  virtual iSkeletonBone *GetChild (size_t i) = 0;
   virtual iSkeletonBone *FindChild (const char *name) = 0;
-  virtual int FindChildIndex (iSkeletonBone *child) = 0;
+  virtual size_t FindChildIndex (iSkeletonBone *child) = 0;
   virtual void SetSkinBox (csBox3 & box) = 0;
   virtual csBox3 & GetSkinBox () = 0;
   virtual void SetUpdateCallback (iSkeletonBoneUpdateCallback *callback) = 0;
@@ -94,17 +94,17 @@ struct iSkeletonScriptKeyFrame : public virtual iBase
   SCF_INTERFACE (iSkeletonScriptKeyFrame, 1, 0, 0);
   virtual const char* GetName () const = 0;
   virtual void SetName (const char* name) = 0;
-  virtual size_t GetDuration () = 0;
-  virtual void SetDuration (size_t time) = 0;
-  virtual int GetTransformsCount() = 0;
+  virtual csTicks GetDuration () = 0;
+  virtual void SetDuration (csTicks time) = 0;
+  virtual size_t GetTransformsCount() = 0;
   virtual void AddTransform(iSkeletonBoneFactory *bone, 
 	  csReversibleTransform &transform) = 0;
   virtual csReversibleTransform & GetTransform(iSkeletonBoneFactory *bone) = 0;
   virtual void SetTransform(iSkeletonBoneFactory *bone, 
 	  csReversibleTransform &transform) = 0;
 
-  virtual csReversibleTransform & GetTransform(int i) = 0;
-  virtual iSkeletonBoneFactory *GetBone(int i) = 0;
+  virtual csReversibleTransform & GetTransform(size_t i) = 0;
+  virtual iSkeletonBoneFactory *GetBone(size_t i) = 0;
 };
 
 struct iSkeletonScript : public virtual iBase
@@ -113,8 +113,8 @@ struct iSkeletonScript : public virtual iBase
 
   virtual const char* GetName () const = 0;
   virtual void SetName (const char* name) = 0;
-  virtual size_t GetTime () = 0;
-  virtual void SetTime (size_t time) = 0;
+  virtual csTicks GetTime () = 0;
+  virtual void SetTime (csTicks time) = 0;
   virtual float GetSpeed () = 0;
   virtual void SetSpeed (float speed) = 0;
   virtual void SetFactor (float factor) = 0;
@@ -123,10 +123,10 @@ struct iSkeletonScript : public virtual iBase
   virtual bool GetLoop () = 0;
 
   virtual iSkeletonScriptKeyFrame *CreateFrame(const char* name) = 0;
-  virtual int GetFramesCount() = 0;
-  virtual iSkeletonScriptKeyFrame *GetFrame(int i) = 0;
-  virtual int FindFrameIndex(const char *name) = 0;
-  virtual void RemoveFrame(int i) = 0;
+  virtual size_t GetFramesCount() = 0;
+  virtual iSkeletonScriptKeyFrame *GetFrame(size_t i) = 0;
+  virtual size_t FindFrameIndex(const char *name) = 0;
+  virtual void RemoveFrame(size_t i) = 0;
 };
 
 struct iSkeletonScriptCallback : public virtual iBase
@@ -148,10 +148,10 @@ struct iSkeleton : public virtual iBase
 
   virtual const char* GetName () const = 0;
   virtual void SetName (const char* name) = 0;
-  virtual int GetBonesCount () = 0;
-  virtual iSkeletonBone *GetBone (int i) = 0;
+  virtual size_t GetBonesCount () = 0;
+  virtual iSkeletonBone *GetBone (size_t i) = 0;
   virtual iSkeletonBone *FindBone (const char *name) = 0;
-  virtual int FindBoneIndex (const char *name) = 0;
+  virtual size_t FindBoneIndex (const char *name) = 0;
   virtual iSkeletonScript* Execute (const char *scriptname) = 0;
   virtual iSkeletonScript* Append (const char *scriptname) = 0;
   virtual void ClearPendingScripts () = 0;
@@ -242,9 +242,9 @@ struct iSkeletonBoneFactory : public virtual iBase
   virtual  void SetParent (iSkeletonBoneFactory *parent) = 0;
   virtual iSkeletonBoneFactory *GetParent () = 0;
   virtual int GetChildrenCount () = 0;
-  virtual iSkeletonBoneFactory *GetChild (int i) = 0;
+  virtual iSkeletonBoneFactory *GetChild (size_t i) = 0;
   virtual iSkeletonBoneFactory *FindChild (const char *name) = 0;
-  virtual int FindChildIndex (iSkeletonBoneFactory *child) = 0;
+  virtual size_t FindChildIndex (iSkeletonBoneFactory *child) = 0;
   virtual void SetSkinBox (csBox3 & box) = 0;
   virtual csBox3 & GetSkinBox () = 0;
   virtual iSkeletonBoneRagdollInfo *GetRagdollInfo() = 0;
@@ -271,14 +271,14 @@ struct iSkeletonFactory : public virtual iBase
   virtual iSkeletonScript *CreateScript(const char *name) = 0;
   virtual iSkeletonScript *FindScript(const char *name) = 0;
   virtual iSkeletonBoneFactory *FindBone (const char *name) = 0;
-  virtual int FindBoneIndex (const char *name) = 0;
+  virtual size_t FindBoneIndex (const char *name) = 0;
   virtual iSkeletonGraveyard *GetGraveyard  () = 0;
 
   virtual iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone) = 0;
   virtual iSkeletonSocketFactory *FindSocket(const char *name) = 0;
   virtual iSkeletonSocketFactory *GetSocket (int i) = 0;
   virtual void RemoveSocket (int i) = 0;
-  virtual int GetSocketsCount() = 0;
+  virtual size_t GetSocketsCount() = 0;
 };
 
 struct iSkeletonGraveyard : public virtual iBase

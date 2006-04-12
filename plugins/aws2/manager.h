@@ -41,34 +41,34 @@ class awsManager2 : public iAws
   // Event ID's used
   csEventID KeyboardDown;	
  
-  /** Store the object registry so we can get at it later. */
+  /// Store the object registry so we can get at it later.
   iObjectRegistry *object_reg;
 
-  /** The 2D graphics context. */
+  /// The 2D graphics context.
   csRef<iGraphics2D> g2d;
 
-  /** The 3D graphics context. */
+  /// The 3D graphics context.
   csRef<iGraphics3D> g3d;
 
-  /** Store a reference to the default font so that it's quick and easy. */  
+  /// Store a reference to the default font so that it's quick and easy.  
   csRef<iFont> default_font;
   
-  /** Store a reference to the standard system timer. */
+  /// Store a reference to the standard system timer.
   csRef<iEventTimer> timer;
   
-  /** Preferences... this is actually not really preferences anymore. */
+  /// Preferences... this is actually not really preferences anymore.
   aws::preferences prefs;
   
-  /** The last widget to have the mouse focus. */
+  /// The last widget to have the mouse focus.
   aws::widget *mouse_focus;
   
-  /** The last widget to have keyboard focus. */
+  /// The last widget to have keyboard focus.
   aws::widget *keyboard_focus;
   
-  /** The top widget. */
+  /// The top widget.
   aws::widget *top;
   
-  /** Set if the mouse is captured. */
+  /// Set if the mouse is captured.
   bool mouse_captured;
     
   
@@ -81,56 +81,52 @@ public:
 public:
   SCF_DECLARE_IBASE;
 
-  awsManager2(iBase *the_base);
-  virtual ~awsManager2();
+  awsManager2 (iBase *the_base);
+  virtual ~awsManager2 ();
 
-  /** Initializes the manager. Must be called before anything else. */
+  /// Initializes the manager. Must be called before anything else.
   virtual bool Initialize (iObjectRegistry *_object_reg);
 
-  /** Setup the drawing targets. */
-  virtual void SetDrawTarget(iGraphics2D *_g2d, iGraphics3D *_g3d);
+  /// Setup the drawing targets.
+  virtual void SetDrawTarget (iGraphics2D *_g2d, iGraphics3D *_g3d);
   
-  /** Get the 2D graphics context. */
-  csRef<iGraphics2D> G2D() { return g2d; }
+  /// Get the 2D graphics context.
+  csRef<iGraphics2D> G2D () { return g2d; }
   
-  /** Get the 3D graphics context. */
-  csRef<iGraphics3D> G3D() { return g3d; } 
+  /// Get the 3D graphics context.
+  csRef<iGraphics3D> G3D () { return g3d; } 
   
-  /** Get the timer. */
-  csRef<iEventTimer> GetTimer() { return timer; }
+  /// Get the timer.
+  csRef<iEventTimer> GetTimer () { return timer; }
      
-public:
   //////////////////////// Definition Files ////////////////////////
 
-  virtual bool Load(const scfString &_filename);
+  virtual bool Load (const scfString &_filename);
   
-public:
   //////////////////////// Definition Files ////////////////////////
   
-  virtual iAwsScriptObject *CreateScriptObject(const char *name);
-  
-public:
- // Adds a widget to the input and drawing chain.
- void AddWidget(aws::widget *w);
+  virtual iAwsScriptObject *CreateScriptObject (const char *name);
+
+  // Adds a widget to the input and drawing chain.
+ void AddWidget (aws::widget *w);
  
  // Removes a widget from the input and drawing chain.
- void RemoveWidget(aws::widget *w);
+ void RemoveWidget (aws::widget *w);
  
 
-public:
   //////////////////////// Event Handling ////////////////////////
     
   /// Dispatches events to the proper components.
   virtual bool HandleEvent (iEvent &);
 
   /// Redraws all the windows into the current graphics contexts.
-  virtual void Redraw();
+  virtual void Redraw ();
 
   /// Captures the mouse.
-  void CaptureMouse(aws::widget *w);
+  void CaptureMouse (aws::widget *w);
   
   /// Releases the mouse from capture.
-  void ReleaseMouse();
+  void ReleaseMouse ();
   
   struct eiComponent : public iComponent
   {
@@ -162,6 +158,6 @@ public:
 
 };
 
-extern awsManager2 *AwsMgr();
+extern awsManager2 *AwsMgr ();
 
 #endif

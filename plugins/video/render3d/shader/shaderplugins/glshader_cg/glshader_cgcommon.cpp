@@ -300,7 +300,7 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* /*mesh*/,
                       csShaderVariable *mat_el =
                         element->GetArrayElement (idx);
                       csVector4 v;
-                      float matrix[16];
+
                       if (element != 0 && mat_el->GetValue (v))
                       {
                         tmpArr[16*idx + idrow] = v[0]; 

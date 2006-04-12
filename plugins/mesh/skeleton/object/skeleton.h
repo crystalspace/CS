@@ -101,7 +101,7 @@ public:
   virtual void SetParent (iSkeletonBone* par);
   virtual iSkeletonBone* GetParent () { return parent; }
   virtual int GetChildrenCount () { return (int)bones.Length () ;}
-  virtual iSkeletonBone *GetChild (int i) { return bones[i]; }
+  virtual iSkeletonBone *GetChild (size_t i) { return bones[i]; }
   virtual iSkeletonBone *FindChild (const char *name);
   virtual void SetUpdateCallback (iSkeletonBoneUpdateCallback *callback) 
     { cb = callback; }
@@ -109,7 +109,7 @@ public:
     { return cb; };
   virtual iSkeletonBoneFactory *GetFactory() 
     { return (iSkeletonBoneFactory *)factory_bone; }
-  virtual int FindChildIndex (iSkeletonBone *child);
+  virtual size_t FindChildIndex (iSkeletonBone *child);
   virtual void SetSkinBox (csBox3 & box) { skin_box = box; }
   virtual csBox3 & GetSkinBox () { return skin_box; }
   /*
@@ -225,9 +225,9 @@ public:
   virtual  void SetParent (iSkeletonBoneFactory *par);
   virtual iSkeletonBoneFactory* GetParent () { return parent; }
   virtual int GetChildrenCount () { return (int)bones.Length (); }
-  virtual iSkeletonBoneFactory *GetChild (int i) { return bones[i]; }
+  virtual iSkeletonBoneFactory *GetChild (size_t i) { return bones[i]; }
   virtual iSkeletonBoneFactory *FindChild (const char *name);
-  virtual int FindChildIndex (iSkeletonBoneFactory *child);
+  virtual size_t FindChildIndex (iSkeletonBoneFactory *child);
   virtual void SetSkinBox (csBox3 & box) { skin_box = box; }
   virtual csBox3 & GetSkinBox () { return skin_box; }
     virtual iSkeletonBoneRagdollInfo *GetRagdollInfo()
@@ -353,9 +353,9 @@ class csSkeletonScriptKeyFrame: public iSkeletonScriptKeyFrame
     virtual const char* GetName () const { return name; }
     virtual void SetName (const char* name)
       { csSkeletonScriptKeyFrame::name = name; }
-    virtual size_t GetDuration () { return duration; }
-    virtual void SetDuration (size_t time) { duration = time; }
-    virtual int GetTransformsCount() 
+    virtual csTicks GetDuration () { return duration; }
+    virtual void SetDuration (csTicks time) { duration = time; }
+    virtual size_t GetTransformsCount() 
       { return bones_frame_transforms.Length(); }
 
     virtual void AddTransform(iSkeletonBoneFactory *bone, 
@@ -391,9 +391,9 @@ class csSkeletonScriptKeyFrame: public iSkeletonScriptKeyFrame
       }
     }
 
-    virtual csReversibleTransform & GetTransform(int i)
+    virtual csReversibleTransform & GetTransform(size_t i)
     { return bones_frame_transforms[i].transform; }
-    virtual iSkeletonBoneFactory *GetBone(int i)
+    virtual iSkeletonBoneFactory *GetBone(size_t i)
     { return bones_frame_transforms[i].bone; }
 };
 
@@ -427,8 +427,8 @@ public:
 
   virtual const char* GetName () const { return name; }
   virtual void SetName (const char* name){ csSkeletonScript::name = name; }
-  virtual size_t GetTime () { return time; }
-  virtual void SetTime (size_t time)  { csSkeletonScript::time = time; }
+  virtual csTicks GetTime () { return time; }
+  virtual void SetTime (csTicks time)  { csSkeletonScript::time = time; }
   virtual float GetSpeed () { return time; }
   virtual void SetSpeed (float speed)  {  }
   virtual void SetFactor (float factor) {}
@@ -440,10 +440,10 @@ public:
 
 
   virtual iSkeletonScriptKeyFrame *CreateFrame(const char* name);
-  virtual int GetFramesCount()  { return key_frames.Length(); }
-  virtual iSkeletonScriptKeyFrame *GetFrame(int i)  { return key_frames[i]; }
-  virtual int FindFrameIndex(const char *name)  { return 0; }
-  virtual void RemoveFrame(int i) 
+  virtual size_t GetFramesCount()  { return key_frames.Length(); }
+  virtual iSkeletonScriptKeyFrame *GetFrame(size_t i)  { return key_frames[i]; }
+  virtual size_t FindFrameIndex(const char *name)  { return 0; }
+  virtual void RemoveFrame(size_t i) 
     { key_frames.DeleteIndexFast(i); }
 };
 
@@ -525,8 +525,8 @@ public:
   void SetName (const char* name) { return script->SetName (name); }
   float GetFactor () { return script->GetFactor (); }
   void SetFactor (float factor) { script->SetFactor (factor); }
-  size_t GetTime () { return script->GetTime (); }
-  void SetTime (size_t time) { script->SetTime (time); }
+  csTicks GetTime () { return script->GetTime (); }
+  void SetTime (csTicks time) { script->SetTime (time); }
   float GetSpeed () { return script->GetSpeed (); }
   void SetSpeed (float speed) { return script->SetSpeed (speed); }
 };
@@ -586,8 +586,8 @@ public:
   virtual const char* GetName () const { return name; }
   virtual void SetName (const char* name) 
     { csSkeleton::name = name; }
-  virtual int GetBonesCount () { return (int)bones.Length (); }
-  virtual iSkeletonBone *GetBone (int i) { return bones[i]; }
+  virtual size_t GetBonesCount () { return bones.Length (); }
+  virtual iSkeletonBone *GetBone (size_t i) { return bones[i]; }
   virtual iSkeletonBone *FindBone (const char *name);
 
   virtual iSkeletonScript* Execute (const char *scriptname);
@@ -600,7 +600,7 @@ public:
   virtual void StopAll ();
   virtual void Stop (const char* scriptname);
   virtual void Stop (iSkeletonScript *script);
-  virtual int FindBoneIndex (const char* bonename);
+  virtual size_t FindBoneIndex (const char* bonename);
   virtual iSkeletonFactory *GetFactory() 
   { return (iSkeletonFactory *)(csSkeletonFactory*)factory; }
     virtual void SetScriptCallback(iSkeletonScriptCallback *cb)
@@ -644,7 +644,7 @@ public:
   virtual const char* GetName () const { return name; }
   virtual void SetName (const char* name) 
     { csSkeletonFactory::name = name; }
-  int FindBoneIndex (csSkeletonBoneFactory *bone) const;
+  size_t FindBoneIndex (csSkeletonBoneFactory *bone) const;
 
   void UpdateParentBones ();
 
@@ -655,13 +655,13 @@ public:
   virtual iSkeletonScript *FindScript(const char *name);
   virtual iSkeletonBoneFactory *FindBone (const char *name);
   virtual iSkeletonGraveyard *GetGraveyard  () { return (iSkeletonGraveyard *)graveyard; }
-  virtual int FindBoneIndex (const char* bonename);
+  virtual size_t FindBoneIndex (const char* bonename);
 
   virtual iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone);
   virtual iSkeletonSocketFactory *FindSocket(const char *name);
   virtual iSkeletonSocketFactory *GetSocket (int i);
   virtual void RemoveSocket (int i);
-  virtual int GetSocketsCount();
+  virtual size_t GetSocketsCount();
 };
 
 class csSkeletonSocketFactory : public iSkeletonSocketFactory

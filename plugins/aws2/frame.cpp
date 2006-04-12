@@ -21,43 +21,48 @@
 
 namespace aws
 {
-  frame::frame():parent(0) {}
-  frame::~frame() {}
+  frame::frame ()
+    : parent (0) 
+  {}
 
-  void frame::GetScreenPos(float &x, float &y)
+  frame::~frame() 
+  {}
+
+  void frame::GetScreenPos (float &x, float &y)
   {
-    if (parent) parent->GetScreenPos(x,y);
+    if (parent) parent->GetScreenPos (x,y);
 
-    x+=bounds.xmin;
-    y+=bounds.ymin;
+    x += bounds.xmin;
+    y += bounds.ymin;
   }
 
-  void frame::Transform(iPen *pen, float angle, float x, float y)
+  void frame::Transform (iPen *pen, float angle, float x, float y)
   {
-    pen->ClearTransform();
-    pen->SetOrigin(csVector3(bounds.Width()*-0.5, bounds.Height()*-0.5, 0));
-    pen->Rotate(angle);
+    pen->ClearTransform ();
+    pen->SetOrigin (csVector3 (bounds.Width ()*-0.5, bounds.Height ()*-0.5, 0));
+    pen->Rotate (angle);
 
     // Adjust the translation x and y to get the absolute translation.
-    GetScreenPos(x,y);
-    pen->Translate(csVector3((bounds.Width()*0.5)+x, (bounds.Height()*0.5)+y,0));
+    GetScreenPos (x,y);
+    pen->Translate (csVector3 ((bounds.Width ()*0.5)+x, 
+                               (bounds.Height ()*0.5)+y,0));
   }
 
-  void frame::Prepare(iPen *pen)
+  void frame::Prepare (iPen *pen)
   {
     float tx=0, ty=0;
 
-    GetScreenPos(tx,ty);
+    GetScreenPos (tx,ty);
 
-    pen->PushTransform();
-    pen->Translate(csVector3(tx, ty, 0));
+    pen->PushTransform ();
+    pen->Translate (csVector3 (tx, ty, 0));
 
     //OnDraw(pen);
   }
   
-  void frame::Finish(iPen *pen)
+  void frame::Finish (iPen *pen)
   {
-	pen->PopTransform();	  
+    pen->PopTransform ();	  
   }
   
 }

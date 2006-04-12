@@ -50,32 +50,32 @@ void csSoundCompressor::Reset()
   m_CurrentCompressionX1024=0;
 }
 
-void csSoundCompressor::SetCompressionThreshold(csSoundSample MaxIntensity)
+void csSoundCompressor::SetCompressionThreshold (csSoundSample MaxIntensity)
 {
-  m_CompressionThreshold=abs(MaxIntensity);
+  m_CompressionThreshold = abs (MaxIntensity);
 }
 
-void csSoundCompressor::SetCompressionRatio(float CompressionRatio)
+void csSoundCompressor::SetCompressionRatio (float CompressionRatio)
 {
-  m_CompressionRatioX1024=(int)(CompressionRatio*1024.0f);
-  m_CompressionAttackStepX1024=m_CompressionRatioX1024 / m_CompressionAttackSamples;
-  m_CompressionReleaseStepX1024=m_CompressionRatioX1024 / m_CompressionReleaseSamples;
+  m_CompressionRatioX1024 = (int)(CompressionRatio*1024.0f);
+  m_CompressionAttackStepX1024 = m_CompressionRatioX1024 / (int)m_CompressionAttackSamples;
+  m_CompressionReleaseStepX1024 = m_CompressionRatioX1024 / (int)m_CompressionReleaseSamples;
 }
 
-void csSoundCompressor::SetCompressionAttackSamples(size_t Samples)
+void csSoundCompressor::SetCompressionAttackSamples (size_t Samples)
 {
-  m_CompressionAttackSamples=Samples;
-  m_CompressionAttackStepX1024=m_CompressionRatioX1024 / Samples;
+  m_CompressionAttackSamples = Samples;
+  m_CompressionAttackStepX1024 = m_CompressionRatioX1024 / (int)Samples;
 }
 
-void csSoundCompressor::SetCompressionReleaseSamples(size_t Samples)
+void csSoundCompressor::SetCompressionReleaseSamples (size_t Samples)
 {
-  m_CompressionReleaseSamples=Samples;
-  m_CompressionReleaseStepX1024=m_CompressionRatioX1024 / Samples;
+  m_CompressionReleaseSamples = Samples;
+  m_CompressionReleaseStepX1024 = m_CompressionRatioX1024 / (int)Samples;
 }
 
 
-void csSoundCompressor::ApplyCompression(csSoundSample *pSampleBuffer, size_t Samples)
+void csSoundCompressor::ApplyCompression (csSoundSample *pSampleBuffer, size_t Samples)
 {
   size_t SampleIDX;
   csSoundSample CurrentSample;
