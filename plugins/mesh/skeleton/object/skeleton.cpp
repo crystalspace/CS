@@ -1,19 +1,19 @@
 /*
-Copyright (C) 2006 by Hristo Hristov
+  Copyright (C) 2006 by Hristo Hristov
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free
-Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -255,12 +255,12 @@ void csSkeletonBone::UpdateBones ()
       /*
       if (bone->GetRigidBody())
       {
-      bone->GetFullTransform () = 
-      bone->GetRigidBody()->GetTransform ()/skeleton->GetBone(0)->GetRigidBody()->GetTransform();
+        bone->GetFullTransform () = 
+        bone->GetRigidBody()->GetTransform ()/skeleton->GetBone(0)->GetRigidBody()->GetTransform();
       }
       else
       {
-      bone->GetFullTransform () = bone->GetTransform ()*full_transform;
+        bone->GetFullTransform () = bone->GetTransform ()*full_transform;
       }
       */
       break;
@@ -379,13 +379,14 @@ void csSkeletonBoneRagdollInfo::SetAttachToParent(bool attach)
   /*
   if (skel_bone_fact->GetParent())
   {
-  iSkeletonBoneRagdollInfo *parent_ragdoll_info = 
-  skel_bone_fact->GetParent()->GetRagdollInfo();
-  if (parent_ragdoll_info)
-  {
-  csVector3 parent_geom_dim = parent_ragdoll_info->GetGeomDimensions();
-  csVector3 tr_parent_geom_dim = skel_bone_fact->GetTransform().This2Other(parent_geom_dim);
-  }
+    iSkeletonBoneRagdollInfo *parent_ragdoll_info = 
+      skel_bone_fact->GetParent()->GetRagdollInfo();
+    if (parent_ragdoll_info)
+    {
+      csVector3 parent_geom_dim = parent_ragdoll_info->GetGeomDimensions();
+      csVector3 tr_parent_geom_dim = skel_bone_fact->GetTransform().This2Other
+        (parent_geom_dim);
+    }
   }
   */
   //enabled = false;
@@ -488,25 +489,25 @@ csSkeletonRunnable::csSkeletonRunnable (csSkeletonScript* script, csSkeleton *sk
 
   if (script->GetLoop ())
   {
-  loop_times = script->GetLoopTimes ();
+    loop_times = script->GetLoopTimes ();
   }
   else
   {
-  loop_times = 1;
+    loop_times = 1;
   }
 
   for (size_t i = 0; i < script->GetFrames ().Length (); i++)
   {
-  runnable_frame rf;
-  rf.active = script->GetFrames ().Get (i).active;
-  rf.repeat_times = script->GetFrames ().Get (i).repeat_times;
-  runnable_frames.Push (rf);
+    runnable_frame rf;
+    rf.active = script->GetFrames ().Get (i).active;
+    rf.repeat_times = script->GetFrames ().Get (i).repeat_times;
+    runnable_frames.Push (rf);
   }
 
   csTicks forced_duration = script->GetForcedDuration ();
   if (forced_duration)
   {
-  SetTime (forced_duration);
+    SetTime (forced_duration);
   }
   */
 }
@@ -1003,144 +1004,144 @@ size_t csSkeleton::FindBoneIndex (const char* bonename)
 /*
 void csSkeleton::CreateRagdoll(iODEDynamicSystem *dyn_sys, csReversibleTransform & transform)
 {
-dynamic_system = dyn_sys;
-for (size_t i = 0; i < bones.Length(); i++)
-{
-//printf("\n");
-iSkeletonBoneRagdollInfo *ragdoll_info = bones[i]->GetFactory()->GetRagdollInfo();
-if (!ragdoll_info->GetEnabled())
-{
-continue;
-}
-csReversibleTransform full_body_transform = bones[i]->GetFactory()->GetFullTransform()*transform;
-csBox3 skin_box = bones[i]->GetSkinBox();
-csVector3 skin_size = 
-csVector3(skin_box.GetSize().x < 0.2f ? 0.2f : skin_box.GetSize().x,
-skin_box.GetSize().y < 0.2f ? 0.2f : skin_box.GetSize().y,
-skin_box.GetSize().z < 0.2f ? 0.2f : skin_box.GetSize().z);
-csRef<iODEGeom> geom;
-if (i)
-{
-geom = dyn_sys->CreateGeom();
-geom->QueryObject()->SetName(ragdoll_info->GetGeomName());
-csReversibleTransform center;
-center.SetOrigin(skin_box.GetCenter());
-geom->SetBox(skin_size, center);
-geom->SetFriction(ragdoll_info->GetFriction());
-geom->SetElasticy(ragdoll_info->GetElasticity());
-geom->SetSoftness(ragdoll_info->GetSoftness());
-geom->SetSlip(ragdoll_info->GetSlip());
+  dynamic_system = dyn_sys;
+  for (size_t i = 0; i < bones.Length(); i++)
+  {
+    //printf("\n");
+    iSkeletonBoneRagdollInfo *ragdoll_info = bones[i]->GetFactory()->GetRagdollInfo();
+    if (!ragdoll_info->GetEnabled())
+    {
+      continue;
+    }
+    csReversibleTransform full_body_transform = bones[i]->GetFactory()->GetFullTransform()*transform;
+    csBox3 skin_box = bones[i]->GetSkinBox();
+    csVector3 skin_size = 
+      csVector3(skin_box.GetSize().x < 0.2f ? 0.2f : skin_box.GetSize().x,
+      skin_box.GetSize().y < 0.2f ? 0.2f : skin_box.GetSize().y,
+      skin_box.GetSize().z < 0.2f ? 0.2f : skin_box.GetSize().z);
+    csRef<iODEGeom> geom;
+    if (i)
+    {
+      geom = dyn_sys->CreateGeom();
+      geom->QueryObject()->SetName(ragdoll_info->GetGeomName());
+      csReversibleTransform center;
+      center.SetOrigin(skin_box.GetCenter());
+      geom->SetBox(skin_size, center);
+      geom->SetFriction(ragdoll_info->GetFriction());
+      geom->SetElasticy(ragdoll_info->GetElasticity());
+      geom->SetSoftness(ragdoll_info->GetSoftness());
+      geom->SetSlip(ragdoll_info->GetSlip());
 
-if ((i == 0) || (i == 1))
-//if ((i == 1))
-{
-geom->SetCollideBits(COLLIDE_GEOM_LACK);
-}
-else
-{
-geom->SetCollideBits(COLLIDE_GEOM_NORMAL);
-}
-geom->SetCategoryBits(1);
-//geom->SetGroupID(1);
-}
+      if ((i == 0) || (i == 1))
+        //if ((i == 1))
+      {
+        geom->SetCollideBits(COLLIDE_GEOM_LACK);
+      }
+      else
+      {
+        geom->SetCollideBits(COLLIDE_GEOM_NORMAL);
+      }
+      geom->SetCategoryBits(1);
+      //geom->SetGroupID(1);
+    }
 
-//printf("creating geom %s for bone %s\n", ragdoll_info->GetGeomName(), bones[i]->GetName());
-csRef<iODERigidBody> rigid_body = dyn_sys->CreateBody();
-rigid_body->QueryObject()->SetName(ragdoll_info->GetBodyName());
-csOrthoTransform tr;
-if (i)
-{
-rigid_body->SetGeom(geom, tr);
-}
-rigid_body->SetProperties(ragdoll_info->GetBodyMass(), csVector3(0), csMatrix3());
-rigid_body->SetTransform(full_body_transform);
-bones[i]->SetRigidBody(rigid_body, tr);
-//printf("creating body %s for bone %s\n", ragdoll_info->GetBodyName(), bones[i]->GetName());
-if (!bones[i]->GetParent())
-{
-continue;
-}
+    //printf("creating geom %s for bone %s\n", ragdoll_info->GetGeomName(), bones[i]->GetName());
+    csRef<iODERigidBody> rigid_body = dyn_sys->CreateBody();
+    rigid_body->QueryObject()->SetName(ragdoll_info->GetBodyName());
+    csOrthoTransform tr;
+    if (i)
+    {
+      rigid_body->SetGeom(geom, tr);
+    }
+    rigid_body->SetProperties(ragdoll_info->GetBodyMass(), csVector3(0), csMatrix3());
+    rigid_body->SetTransform(full_body_transform);
+    bones[i]->SetRigidBody(rigid_body, tr);
+    //printf("creating body %s for bone %s\n", ragdoll_info->GetBodyName(), bones[i]->GetName());
+    if (!bones[i]->GetParent())
+    {
+      continue;
+    }
 
-iSkeletonBone *parent_bone = bones[i]->GetParent();
+    iSkeletonBone *parent_bone = bones[i]->GetParent();
 
-csRef<iODEJoint> joint = dyn_sys->CreateJoint();
-joint->QueryObject()->SetName(ragdoll_info->GetJointName());
+    csRef<iODEJoint> joint = dyn_sys->CreateJoint();
+    joint->QueryObject()->SetName(ragdoll_info->GetJointName());
 
-//joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
-csReversibleTransform joint_tr = parent_bone->GetRigidBody()->GetTransform();
-joint_tr.SetOrigin(full_body_transform.GetOrigin());
-full_body_transform.SetO2T(joint_tr.GetO2T());
-joint->SetTransform(full_body_transform);
-//bones[i]->GetRigidBody()->SetTransform(joint_tr);
+    //joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
+    csReversibleTransform joint_tr = parent_bone->GetRigidBody()->GetTransform();
+    joint_tr.SetOrigin(full_body_transform.GetOrigin());
+    full_body_transform.SetO2T(joint_tr.GetO2T());
+    joint->SetTransform(full_body_transform);
+    //bones[i]->GetRigidBody()->SetTransform(joint_tr);
 
-csVector3 & min_rot_constr = ragdoll_info->GetJointMinRotContraints();
-csVector3 & max_rot_constr = ragdoll_info->GetJointMaxRotContraints();
-csVector3 & min_tr_constr = ragdoll_info->GetJointMinTransContraints();
-csVector3 & max_tr_constr = ragdoll_info->GetJointMaxTransContraints();
+    csVector3 & min_rot_constr = ragdoll_info->GetJointMinRotContraints();
+    csVector3 & max_rot_constr = ragdoll_info->GetJointMaxRotContraints();
+    csVector3 & min_tr_constr = ragdoll_info->GetJointMinTransContraints();
+    csVector3 & max_tr_constr = ragdoll_info->GetJointMaxTransContraints();
 
-//printf("Min Rot Contraints: %.3f %.3f %.3f\n", min_rot_constr.x, min_rot_constr.y, min_rot_constr.z);
-//printf("Max Rot Contraints: %.3f %.3f %.3f\n", max_rot_constr.x, max_rot_constr.y, max_rot_constr.z);
+    //printf("Min Rot Contraints: %.3f %.3f %.3f\n", min_rot_constr.x, min_rot_constr.y, min_rot_constr.z);
+    //printf("Max Rot Contraints: %.3f %.3f %.3f\n", max_rot_constr.x, max_rot_constr.y, max_rot_constr.z);
 
-bool trans_constr_x = !(min_tr_constr.x || max_tr_constr.x);
-bool trans_constr_y = !(min_tr_constr.y || max_tr_constr.y);
-bool trans_constr_z = !(min_tr_constr.z || max_tr_constr.z);
-bool rot_constr_x = !(min_rot_constr.x || max_rot_constr.x);
-bool rot_constr_y = !(min_rot_constr.y || max_rot_constr.y);
-bool rot_constr_z = !(min_rot_constr.z || max_rot_constr.z);
-if (trans_constr_x && trans_constr_y && trans_constr_z && 
-rot_constr_x && rot_constr_y && rot_constr_z)
-{
-joint->SetTransConstraints(trans_constr_x, trans_constr_y, trans_constr_z);
-joint->SetMinimumDistance(min_tr_constr);
-joint->SetMaximumDistance(max_tr_constr);
-joint->SetRotConstraints(rot_constr_x, rot_constr_y, rot_constr_z);
-joint->SetMinimumAngle(min_rot_constr);
-joint->SetMaximumAngle(max_rot_constr);
-//joint->SetMinimumAngle(csVector3(0, -0.01, 0));
-//joint->SetMaximumAngle(csVector3(0, 0.01, 0));
-joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
-joint->SetFixed();
-//printf("creating fixed joint %s for bones (%s -> %s)\n", ragdoll_info->GetJointName(), parent_bone->GetName(), bones[i]->GetName());
-}
-else
-{
-joint->SetTransConstraints(trans_constr_x, trans_constr_y, trans_constr_y);
-joint->SetMinimumDistance(min_tr_constr);
-joint->SetMaximumDistance(max_tr_constr);
-//joint->SetRotConstraints(true, false, true);
-//joint->SetMinimumAngle(csVector3(0, -1.5, 0));
-//joint->SetMaximumAngle(csVector3(0, 0, 0));
-joint->SetRotConstraints(rot_constr_x, rot_constr_y, rot_constr_z);
-joint->SetMinimumAngle(min_rot_constr);
-joint->SetMaximumAngle(max_rot_constr);
-//joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
-joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
-//joint->SetFixed();
-//printf("creating joint %s for bones (%s -> %s)\n", ragdoll_info->GetJointName(), parent_bone->GetName(), bones[i]->GetName());
-}
-//bones[i]->GetRigidBody()->SetTransform(full_body_transform);
-bones[i]->SetJoint(joint);
-bones[i]->SetTransformMode(CS_BTT_RIGID_BODY);
-}
+    bool trans_constr_x = !(min_tr_constr.x || max_tr_constr.x);
+    bool trans_constr_y = !(min_tr_constr.y || max_tr_constr.y);
+    bool trans_constr_z = !(min_tr_constr.z || max_tr_constr.z);
+    bool rot_constr_x = !(min_rot_constr.x || max_rot_constr.x);
+    bool rot_constr_y = !(min_rot_constr.y || max_rot_constr.y);
+    bool rot_constr_z = !(min_rot_constr.z || max_rot_constr.z);
+    if (trans_constr_x && trans_constr_y && trans_constr_z && 
+      rot_constr_x && rot_constr_y && rot_constr_z)
+    {
+      joint->SetTransConstraints(trans_constr_x, trans_constr_y, trans_constr_z);
+      joint->SetMinimumDistance(min_tr_constr);
+      joint->SetMaximumDistance(max_tr_constr);
+      joint->SetRotConstraints(rot_constr_x, rot_constr_y, rot_constr_z);
+      joint->SetMinimumAngle(min_rot_constr);
+      joint->SetMaximumAngle(max_rot_constr);
+      //joint->SetMinimumAngle(csVector3(0, -0.01, 0));
+      //joint->SetMaximumAngle(csVector3(0, 0.01, 0));
+      joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
+      joint->SetFixed();
+      //printf("creating fixed joint %s for bones (%s -> %s)\n", ragdoll_info->GetJointName(), parent_bone->GetName(), bones[i]->GetName());
+    }
+    else
+    {
+      joint->SetTransConstraints(trans_constr_x, trans_constr_y, trans_constr_y);
+      joint->SetMinimumDistance(min_tr_constr);
+      joint->SetMaximumDistance(max_tr_constr);
+      //joint->SetRotConstraints(true, false, true);
+      //joint->SetMinimumAngle(csVector3(0, -1.5, 0));
+      //joint->SetMaximumAngle(csVector3(0, 0, 0));
+      joint->SetRotConstraints(rot_constr_x, rot_constr_y, rot_constr_z);
+      joint->SetMinimumAngle(min_rot_constr);
+      joint->SetMaximumAngle(max_rot_constr);
+      //joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
+      joint->Attach(parent_bone->GetRigidBody(), bones[i]->GetRigidBody());
+      //joint->SetFixed();
+      //printf("creating joint %s for bones (%s -> %s)\n", ragdoll_info->GetJointName(), parent_bone->GetName(), bones[i]->GetName());
+    }
+    //bones[i]->GetRigidBody()->SetTransform(full_body_transform);
+    bones[i]->SetJoint(joint);
+    bones[i]->SetTransformMode(CS_BTT_RIGID_BODY);
+  }
 }
 
 void csSkeleton::DestroyRagdoll()
 {
-if (dynamic_system)
-{
-for (size_t i = 0; i < bones.Length(); i++)
-{
-if (bones[i]->GetJoint())
-{
-dynamic_system->RemoveJoint(bones[i]->GetJoint());
-}
-if (bones[i]->GetRigidBody())
-{
-dynamic_system->RemoveBody(bones[i]->GetRigidBody());
-bones[i]->SetTransformMode(CS_BTT_SCRIPT);
-}
-}
-}
+  if (dynamic_system)
+  {
+    for (size_t i = 0; i < bones.Length(); i++)
+    {
+      if (bones[i]->GetJoint())
+      {
+        dynamic_system->RemoveJoint(bones[i]->GetJoint());
+      }
+      if (bones[i]->GetRigidBody())
+      {
+        dynamic_system->RemoveBody(bones[i]->GetRigidBody());
+        bones[i]->SetTransformMode(CS_BTT_SCRIPT);
+      }
+    }
+  }
 }
 */
 
