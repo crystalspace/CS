@@ -127,6 +127,11 @@ struct iMeshGeneratorGeometry : public virtual iBase
    * Get the density.
    */
   virtual float GetDensity () const = 0;
+
+  /**
+   * Add position for placing mesh (only material factor will influence it).
+   */
+  virtual void AddPosition (const csVector2 &pos) = 0;
 };
 
 /**

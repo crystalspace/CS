@@ -114,6 +114,8 @@ private:
 
   csMeshGenerator* generator;
 
+  csArray<csVector2> positions;
+
 public:
   csMeshGeneratorGeometry (csMeshGenerator* generator);
   virtual ~csMeshGeneratorGeometry ();
@@ -153,6 +155,11 @@ public:
   {
     default_material_factor = factor;
   }
+
+  void AddPosition (const csVector2 &pos) {positions.Push (pos);}
+
+  size_t GetManualPositionCount () {return positions.GetSize ();}
+  const csVector2 &GetManualPosition (size_t i){return positions[i];}
 
   /**
    * Allocate a new mesh for the given distance. Possibly from the

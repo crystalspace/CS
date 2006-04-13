@@ -91,6 +91,7 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   }
 
   if (maxdist > total_max_dist) total_max_dist = maxdist;
+  
 }
 
 void csMeshGeneratorGeometry::RemoveFactory (size_t idx)
@@ -525,8 +526,12 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
   {
     csMGPosition pos;
     pos.geom_type = g;
+    size_t mpos_count = geometries[g]->GetManualPositionCount ();
+
     float density = geometries[g]->GetDensity ();
-    size_t count = size_t (density * box_area);
+
+    size_t count = (mpos_count > 0)? mpos_count : size_t (density * box_area);
+
     const csArray<csMGDensityMaterialFactor>& mftable
       = geometries[g]->GetDensityMaterialFactors ();
     float default_material_factor
@@ -534,12 +539,28 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
     bool do_material = mftable.Length () > 0;
     for (j = 0 ; j < count ; j++)
     {
-      float x = random.Get (box.MinX (), box.MaxX ());
-      float z = random.Get (box.MinY (), box.MaxY ());
-      float map_factor;
-      geometries[g]->GetDensityMapFactor (x, z, map_factor);
-      if (!((map_factor < 0.0001) ||
-        (map_factor < 0.9999 && random.Get () > map_factor)))
+      float pos_factor;
+      float x;
+      float z;
+      if (mpos_count <= 0)
+      {
+        geometries[g]->GetDensityMapFactor (x, z, pos_factor);
+        x = random.Get (box.MinX (), box.MaxX ());
+        z = random.Get (box.MinY (), box.MaxY ());
+      }else
+      {
+        csVector2 mpos = geometries[g]->GetManualPosition (j);
+        if (box.In (mpos))
+        {
+          x = mpos.x; 
+          z = mpos.y;
+          pos_factor = 1.0f;
+        }
+        else pos_factor = 0.0f;
+      }
+      
+      if (!((pos_factor < 0.0001) ||
+        (pos_factor < 0.9999 && random.Get () > pos_factor)))
       {
         csVector3 start (x, samplebox.MaxY (), z);
         csVector3 end = start;
@@ -774,7 +795,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
           factor = (alpha_maxdist-correct_dist - dist) * alpha_scale;
         }
         //printf (" -> factor=%g\n", factor); fflush (stdout);
-        SetFade (p, factor);
+        //SetFade (p, factor);
       }
     }
     else
