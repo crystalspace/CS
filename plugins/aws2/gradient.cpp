@@ -21,6 +21,7 @@
 #include "ivideo/texture.h"
 #include "script_manager.h"
 #include "script_console.h"
+#include "manager.h"
 #include "color.h"
 #include "gradient.h"
 #include "texture.h"
@@ -94,11 +95,14 @@ static JSBool RenderToTexture (JSContext *cx, JSObject *obj, uintN argc,
                                jsval *argv, jsval *rval)	
 {
   csGradient *go = (csGradient *)JS_GetPrivate (cx, obj);
+  
 
   if (JS_TypeOfValue(cx, argv[0])!=JSTYPE_VOID)
   {
     JSObject *o = JSVAL_TO_OBJECT(argv[0]);		
     int style = JSVAL_TO_INT(argv[1]);
+    bool apply = true; //(argv[2] == JSVAL_TRUE);
+       
 
     if (IsTextureObject (o))
     {
@@ -119,12 +123,38 @@ static JSBool RenderToTexture (JSContext *cx, JSObject *obj, uintN argc,
           // Create the gradient
           go->Render (pbuf, w);
 
-
-          // Blit it to the texture.
-          for(int i=0; i<h; ++i)
+		  if (apply == false)
+		  {
+	          // Blit it to the texture.
+	          for(int i=0; i<h; ++i)
+	          {
+	            (*to)->Blit (0,i,w,1, (const unsigned char *)pbuf);							
+	          }				
+          }
+          else
           {
-            (*to)->Blit (0,i,w,1, (const unsigned char *)pbuf);							
-          }				
+	       	// Composite it to the texture.   
+	       	AwsMgr ()->G3D ()->SetRenderTarget (*to, true);
+      		AwsMgr ()->G3D ()->BeginDraw (CSDRAW_2DGRAPHICS);
+      		
+      		iGraphics2D *g2d = AwsMgr()->G2D();
+      		
+      		for(int y=0; y<h; ++y)
+      		{	      		
+	      		uint8 r,g,b,a;		
+	      		for(int x=0; x<w; ++x)
+	      		{
+		      		g2d->GetPixel(x,y,r,g,b,a);
+		      		
+		      		if (a)
+		      		{
+			      		g2d->DrawPixel(x,y, g2d->FindRGB(pbuf[x].red, pbuf[x].green, pbuf[x].blue, pbuf[x].alpha));
+		      		}	
+	      		}
+      		}	
+      		
+      		AwsMgr ()->G3D ()->FinishDraw ();
+          }
 
           // Free pixel buffer
           delete [] pbuf;                
@@ -139,11 +169,43 @@ static JSBool RenderToTexture (JSContext *cx, JSObject *obj, uintN argc,
           // Create the gradient
           go->Render (pbuf, h);					
 
-          // Blit it to the texture.
-          for(int i=0; i<h; ++i)
+          if (apply==false)
           {
-            (*to)->Blit (i,0,1,h, (const unsigned char *)pbuf);							
-          }
+	          ScriptCon()->Message("gradient: filling texture");
+	          
+	          // Blit it to the texture.
+	          for(int i=0; i<h; ++i)
+	          {
+	            (*to)->Blit (i,0,1,h, (const unsigned char *)pbuf);							
+	          }
+      	  }
+      	  else
+      	  {
+	      	  ScriptCon()->Message("gradient: compositing texture");
+	      	  
+	      	  // Composite it to the texture.   
+	       	AwsMgr ()->G3D ()->SetRenderTarget (*to, true);
+      		AwsMgr ()->G3D ()->BeginDraw (CSDRAW_2DGRAPHICS);
+      		
+      		iGraphics2D *g2d = AwsMgr()->G2D();
+      		
+      		for(int x=0; x<w; ++x)
+      		{	      		
+	      		uint8 r,g,b,a;		
+	      		for(int y=0; y<h; ++y)
+	      		{
+		      		g2d->GetPixel(x,y,r,g,b,a);
+		      		
+		      		if (a)
+		      		{
+			      		g2d->DrawPixel(x,y, g2d->FindRGB(pbuf[y].red, pbuf[y].green, pbuf[y].blue, pbuf[y].alpha));
+		      		}	
+	      		}
+      		}	
+      		
+      		AwsMgr ()->G3D ()->FinishDraw ();	      	  
+	      	  
+      	  }
 
           // Free the pixel buffer
           delete [] pbuf;              

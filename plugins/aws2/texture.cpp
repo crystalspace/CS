@@ -70,6 +70,10 @@ static JSBool Texture (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 
     csImageMemory *img = new csImageMemory (w,h, 
       CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
+      
+    csRGBpixel cc(0,0,0,0);
+    
+    img->Clear(cc);
 
     csRef<iTextureHandle> *to = 
       new csRef<iTextureHandle>(AwsMgr ()->G3D ()->GetTextureManager ()->
@@ -205,6 +209,7 @@ static JSBool GetDimensions (JSContext *cx, JSObject *obj, uintN argc,
 
   return JS_TRUE;
 }
+
 
 /// Loads a texture object from disk.
 static JSBool Load (JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
