@@ -5,7 +5,10 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
-  
+   
+13-Apr-2006
+	- Piotr Obrzut added method for direct adding position for meshgen 
+	  geometry.
 12-Apr-2006
 	- Piotr Obrzut changed instmesh mixmode to alpha test (should be done 
           from xml somehow).
