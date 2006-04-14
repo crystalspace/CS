@@ -3781,6 +3781,37 @@ bool csLoader::LoadMeshGenGeometry (iLoaderContext* ldr_context,
         geom->AddFactory (fact, maxdist);
       }
       break;
+    case XMLTOKEN_POSITIONMAP:
+      {
+        const char* map_name = child->GetAttributeValue ("mapname");
+        csRef<iTerraFormer> map = csQueryRegistryTagInterface<iTerraFormer> 
+          (object_reg, map_name);
+        if (!map)
+        {
+          SyntaxService->ReportError (
+            "crystalspace.maploader.parse.meshgen",
+            child, "Can't find map position map terraformer '%s'!", map_name);
+          return false;
+        }
+        
+        csVector2 min, max;
+        csRef<iDocumentNode> region_node = child->GetNode ("region");
+
+        SyntaxService->ParseVector (region_node->GetNode ("min"), min);
+        SyntaxService->ParseVector (region_node->GetNode ("max"), max);
+
+        float value = child->GetAttributeValueAsFloat ("value");
+
+        uint resx = child->GetAttributeValueAsInt ("resx");
+        uint resy = child->GetAttributeValueAsInt ("resy");
+        
+        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+          object_reg, "crystalspace.shared.stringset", iStringSet);
+
+        geom->AddPositionsFromMap (map, csBox2 (min.x, min.y, max.x, max.y), 
+          resx, resy, value, strings->Request ("heights"));
+      }
+      break;
     case XMLTOKEN_DENSITYMAP:
       {
         const char* map_name = child->GetContentsValue ();

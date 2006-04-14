@@ -151,6 +151,8 @@ public:
   	float factor);
   virtual void SetDensityMap (iTerraFormer* map, float factor, 
     const csStringID & type);
+  virtual void AddPositionsFromMap (iTerraFormer* map, const csBox2 &region,
+    uint resx, uint resy, float value, const csStringID & type);
   virtual void SetDefaultDensityMaterialFactor (float factor)
   {
     default_material_factor = factor;

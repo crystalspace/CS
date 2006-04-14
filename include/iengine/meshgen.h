@@ -132,6 +132,9 @@ struct iMeshGeneratorGeometry : public virtual iBase
    * Add position for placing mesh (only material factor will influence it).
    */
   virtual void AddPosition (const csVector2 &pos) = 0;
+
+  virtual void AddPositionsFromMap (iTerraFormer* map, const csBox2 &region,
+    uint resx, uint resy, float value, const csStringID & type) = 0;
 };
 
 /**

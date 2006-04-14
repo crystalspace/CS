@@ -14,6 +14,8 @@ chronological order.
 	- caedes fixed an error at std_lighting.cscg where state.point.size
 	  was incorrectly assigned to a variable.
 	- Piotr Obrzut added quad to cs primitives and instmesh.
+	- Piotr Obrzut added feature to add positions from map in meshgenerator 
+	  (still there are some problems with resolution probably).
 13-Apr-2006
 	- Piotr Obrzut added method for direct adding position for meshgen 
 	  geometry.

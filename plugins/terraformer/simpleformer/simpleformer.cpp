@@ -482,12 +482,16 @@ bool csSimpleFormer::SampleFloat (csStringID type, float x, float z,
       {
         uint width = floatmaps[i].width;
         uint height = floatmaps[i].height;
+        if (x < -100)
+          int t = 0;
         // Transform input coordinates to heightmap space.
         // See CachePositions for details
         x = ((x-offset.x)/scale.x+1)*(width/2);
         z = ((z-offset.z)/scale.z+1)*(height/2);
 
         // Calculate height and return it
+
+
 
         value = (type == stringHeights)? 
           BiLinearData (floatmaps[i].data, width, height, x, z) * scale.y + offset.y 

@@ -54,7 +54,28 @@ void csMeshGeneratorGeometry::SetDensityMap (iTerraFormer* map, float factor,
   density_map_factor = factor;
   density_map_type = type;
 }
+void csMeshGeneratorGeometry::AddPositionsFromMap (iTerraFormer* map, const csBox2 &region,
+    uint resx, uint resy, float value, const csStringID & type)
+{
+  csRef<iTerraSampler> sampler = map->GetSampler (region, resx, resy);
+  float stepx = (region.MaxX () - region.MinX ())/resx;
+  float stepy = (region.MaxY () - region.MinY ())/resy;
 
+  const float* map_values = sampler->SampleFloat (type);
+  float curx = region.MinX (), cury = region.MinY ();
+  for (uint i = 0; i < resx; i++)
+  {
+    for (uint j = 0; j < resy; j++)
+    {
+      if (map_values[i*resx + j] == value)
+      {
+        AddPosition (csVector2 (curx, cury));
+      }
+      curx += stepx;
+    }
+    cury += stepy;
+  }
+}
 void csMeshGeneratorGeometry::AddDensityMaterialFactor (
   iMaterialWrapper* material, float factor)
 {
