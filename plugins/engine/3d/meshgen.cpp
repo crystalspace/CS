@@ -73,6 +73,7 @@ void csMeshGeneratorGeometry::AddPositionsFromMap (iTerraFormer* map, const csBo
       }
       curx += stepx;
     }
+    curx = region.MinX ();
     cury += stepy;
   }
 }

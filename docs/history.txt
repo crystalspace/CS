@@ -5,7 +5,10 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
-   
+
+
+15-Apr-2006
+	- Piotr Obrzut fixed small bug in adding positions from map in meshgen.   
 14-Apr-2006
 	- caedes changed comment formatting on some shaders to be more parser
 	  friendly (specially some <?! !> to <!-- --> in std_lighting.xml).
