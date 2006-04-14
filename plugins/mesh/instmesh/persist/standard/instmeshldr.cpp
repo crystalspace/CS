@@ -52,6 +52,7 @@ CS_IMPLEMENT_PLUGIN
 enum
 {
   XMLTOKEN_BOX = 1,
+  XMLTOKEN_QUAD,
   XMLTOKEN_SPHERE,
   XMLTOKEN_LIGHTING,
   XMLTOKEN_DEFAULTCOLOR,
@@ -132,6 +133,7 @@ bool csInstFactoryLoader::Initialize (iObjectRegistry* object_reg)
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
   xmltokens.Register ("box", XMLTOKEN_BOX);
+  xmltokens.Register ("quad", XMLTOKEN_QUAD);
   xmltokens.Register ("sphere", XMLTOKEN_SPHERE);
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
@@ -254,51 +256,77 @@ csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_BOX:
         {
-	  csBox3 box;
-	  if (!synldr->ParseBox (child, box))
-	    return 0;
-	  state->GenerateBox (box);
-	}
+          csBox3 box;
+          if (!synldr->ParseBox (child, box))
+            return 0;
+          state->GenerateBox (box);
+        }
+        break;
+      case XMLTOKEN_QUAD:
+        {
+          csVector3 v1, v2, v3, v4;
+          csRef<iDocumentNode> c = child->GetNode ("v1");
+          if (c)
+            if (!synldr->ParseVector (c, v1))
+              return 0;
+
+          c = child->GetNode ("v2");
+          if (c)
+            if (!synldr->ParseVector (c, v2))
+              return 0;
+
+          c = child->GetNode ("v3");
+          if (c)
+            if (!synldr->ParseVector (c, v3))
+              return 0;
+
+          c = child->GetNode ("v4");
+          if (c)
+            if (!synldr->ParseVector (c, v4))
+              return 0;
+
+          state->GenerateQuad (v1, v2, v3, v4);
+        }
         break;
       case XMLTOKEN_SPHERE:
         {
-	  csVector3 center (0, 0, 0);
-	  int rim_vertices = 8;
-	  csEllipsoid ellips;
-	  csRef<iDocumentAttribute> attr;
-	  csRef<iDocumentNode> c = child->GetNode ("center");
-	  if (c)
-	    if (!synldr->ParseVector (c, ellips.GetCenter ()))
-	      return 0;
-	  c = child->GetNode ("radius");
-	  if (c)
-	  {
-	    if (!synldr->ParseVector (c, ellips.GetRadius ()))
-	      return 0;
-	  }
-	  else
-	  {
-	    attr = child->GetAttribute ("radius");
-	    float radius;
-	    if (attr) radius = attr->GetValueAsFloat ();
-	    else radius = 1.0f;
-	    ellips.SetRadius (csVector3 (radius, radius, radius));
-	  }
-	  attr = child->GetAttribute ("rimvertices");
-	  if (attr) rim_vertices = attr->GetValueAsInt ();
-	  bool cylmapping, toponly, reversed;
-	  if (!synldr->ParseBoolAttribute (child, "cylindrical", cylmapping,
-	  	false, false))
-  	    return 0;
-	  if (!synldr->ParseBoolAttribute (child, "toponly", toponly,
-	  	false, false))
-  	    return 0;
-	  if (!synldr->ParseBoolAttribute (child, "reversed", reversed,
-	  	false, false))
-  	    return 0;
-	  state->GenerateSphere (ellips, rim_vertices,
-	      cylmapping, toponly, reversed);
-	}
+          csVector3 center (0, 0, 0);
+          int rim_vertices = 8;
+          csEllipsoid ellips;
+          csRef<iDocumentAttribute> attr;
+          csRef<iDocumentNode> c = child->GetNode ("center");
+          if (c)
+            if (!synldr->ParseVector (c, ellips.GetCenter ()))
+              return 0;
+          c = child->GetNode ("radius");
+          if (c)
+          {
+            if (!synldr->ParseVector (c, ellips.GetRadius ()))
+              return 0;
+          }
+          else
+          {
+            attr = child->GetAttribute ("radius");
+            float radius;
+            if (attr) radius = attr->GetValueAsFloat ();
+            else radius = 1.0f;
+            ellips.SetRadius (csVector3 (radius, radius, radius));
+          }
+          attr = child->GetAttribute ("rimvertices");
+          if (attr) rim_vertices = attr->GetValueAsInt ();
+          bool cylmapping, toponly, reversed;
+          if (!synldr->ParseBoolAttribute (child, "cylindrical", cylmapping,
+            false, false))
+            return 0;
+          if (!synldr->ParseBoolAttribute (child, "toponly", toponly,
+            false, false))
+            return 0;
+          if (!synldr->ParseBoolAttribute (child, "reversed", reversed,
+            false, false))
+            return 0;
+          state->GenerateSphere (ellips, rim_vertices,
+            cylmapping, toponly, reversed);
+        }
         break;
       case XMLTOKEN_AUTONORMALS:
         if (!synldr->ParseBool (child, auto_normals, true))

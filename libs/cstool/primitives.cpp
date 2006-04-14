@@ -155,6 +155,39 @@ void csPrimitives::GenerateBox (
   normals[23].Set(box.MinX(),box.MinY(),box.MinZ()); normals[23].Normalize();
 }
 
+void csPrimitives::GenerateQuad (const csVector3 &v1, const csVector3 &v2,
+                          const csVector3 &v3, const csVector3 &v4,
+                          csDirtyAccessArray<csVector3>& mesh_vertices,
+                          csDirtyAccessArray<csVector2>& mesh_texels,
+                          csDirtyAccessArray<csVector3>& mesh_normals,
+                          csDirtyAccessArray<csTriangle>& mesh_triangles)
+{
+  mesh_vertices.SetLength (4);
+  mesh_texels.SetLength (4);
+  mesh_normals.SetLength (4);
+  mesh_triangles.SetLength (4);
+
+  mesh_normals[0] = mesh_vertices[0] = v1;
+  mesh_normals[1] = mesh_vertices[1] = v2;
+  mesh_normals[2] = mesh_vertices[2] = v3;
+  mesh_normals[3] = mesh_vertices[3] = v4;
+
+  mesh_normals[0].Normalize ();
+  mesh_normals[1].Normalize ();
+  mesh_normals[2].Normalize ();
+  mesh_normals[3].Normalize ();
+
+  mesh_texels[0] = csVector2 (0,0);
+  mesh_texels[1] = csVector2 (0,1);
+  mesh_texels[2] = csVector2 (1,1);
+  mesh_texels[3] = csVector2 (1,0);
+
+  mesh_triangles[0].a = 3; mesh_triangles[0].b = 0; mesh_triangles[0].c = 1;
+  mesh_triangles[1].a = 0; mesh_triangles[1].b = 1; mesh_triangles[1].c = 2;
+  mesh_triangles[2].a = 1; mesh_triangles[2].b = 2; mesh_triangles[2].c = 3;
+  mesh_triangles[3].a = 2; mesh_triangles[3].b = 3; mesh_triangles[3].c = 0;
+}
+
 void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
       csDirtyAccessArray<csVector3>& mesh_vertices,
       csDirtyAccessArray<csVector2>& mesh_texels,

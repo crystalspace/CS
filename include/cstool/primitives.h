@@ -53,6 +53,17 @@ public:
       csDirtyAccessArray<csTriangle>& mesh_triangles);
 
   /**
+   * Generate quad.
+   */
+  static void GenerateQuad (
+      const csVector3 &v1, const csVector3 &v2,
+      const csVector3 &v3, const csVector3 &v4,
+      csDirtyAccessArray<csVector3>& mesh_vertices,
+      csDirtyAccessArray<csVector2>& mesh_texels,
+      csDirtyAccessArray<csVector3>& mesh_normals,
+      csDirtyAccessArray<csTriangle>& mesh_triangles);
+
+  /**
    * Generate a sphere with 'num' vertices on the rim.
    * \param ellips Properties of the ellipsoid to create.
    * \param num Number of vertices in the generated  mesh.

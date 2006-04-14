@@ -615,6 +615,8 @@ public:
   void CalculateNormals (bool compress);
   void Compress ();
   void GenerateBox (const csBox3& box);
+  void GenerateQuad (const csVector3& v1, const csVector3& v2, 
+    const csVector3& v3, const csVector3& v4);
   void GenerateSphere (const csEllipsoid& sphere, int rim_vertices,
       	bool cyl_mapping = false, bool toponly = false,
 	bool reversed = false);
@@ -803,6 +805,11 @@ public:
     virtual void GenerateBox (const csBox3& box)
     {
       scfParent->GenerateBox (box);
+    }
+    virtual void GenerateQuad (const csVector3& v1, const csVector3& v2, 
+      const csVector3& v3, const csVector3& v4)
+    {
+      scfParent->GenerateQuad (v1, v2, v3, v4);
     }
     virtual void GenerateSphere (const csEllipsoid& sphere, int rim_vertices,
 		bool cyl_mapping = false, bool toponly = false,

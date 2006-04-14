@@ -219,6 +219,12 @@ struct iInstancingFactoryState : public iInstancingMeshCommonState
   virtual void Compress () = 0;
 
   /**
+   * Automatically generate a qad. 
+   */
+  virtual void GenerateQuad (const csVector3& v1, const csVector3& v2, 
+    const csVector3& v3, const csVector3& v4) = 0;
+
+  /**
    * Automatically generate a box. This will set the number of vertices
    * to eight and generate vertices, texels, and triangles. The colors
    * and normals are not initialized here.

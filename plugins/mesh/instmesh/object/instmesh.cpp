@@ -1534,7 +1534,14 @@ void csInstmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& sphere,
   memset (fact_colors.GetArray (), 0, sizeof (csColor4)*fact_vertices.Length ());
   CalculateBoundingVolumes ();
 }
-
+void csInstmeshMeshObjectFactory::GenerateQuad (const csVector3& v1, const csVector3& v2, 
+                  const csVector3& v3, const csVector3& v4)
+{
+  csPrimitives::GenerateQuad (v1, v2, v3, v4, fact_vertices, fact_texels,
+      fact_normals, fact_triangles);
+  fact_colors.SetLength (fact_vertices.Length ());
+  memset (fact_colors.GetArray (), 0, sizeof (csColor4)*fact_vertices.Length ());
+}
 void csInstmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 {
   csPrimitives::GenerateBox (box, fact_vertices, fact_texels,
