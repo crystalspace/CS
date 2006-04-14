@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
    
+14-Apr-2006
+	- caedes changed comment formatting on some shaders to be more parser
+	  friendly (specially some <?! !> to <!-- --> in std_lighting.xml).
+	- caedes changed <? include ?> to <? Include ?> at parallax.xml as 
+	  the first seems deprecated.
+	- caedes fixed an error at std_lighting.cscg where state.point.size
+	  was incorrectly assigned to a variable.
 13-Apr-2006
 	- Piotr Obrzut added method for direct adding position for meshgen 
 	  geometry.

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <shader type="xmlshader" name="parallax">
   <technique priority="150">
-    <?include /shader/snippets/projection-pass.inc ?>
+    <?Include /shader/snippets/projection-pass.inc ?>
     <pass>
       <mixmode>
       <?if vars."light 0 type".int == 2 ?>
@@ -23,7 +23,7 @@
       <?endif?>
       <fp plugin="glcg">
         <cgfp>
-          <?include parallax.cgfp ?>
+          <?Include parallax.cgfp ?>
         </cgfp>
       </fp>
     </pass>

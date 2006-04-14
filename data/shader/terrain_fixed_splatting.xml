@@ -96,10 +96,10 @@
       </fp>
     </pass>
     <!-- NOTE: technically, this is wrong in case the sector fog starts
-      -- closer than splatting distance (the closer the sector fog starts the
-      -- worse). But practically, "it looks okay", and I don't see how a 
-      -- 100% correct appearance could be achieved without a 3rdTU (which we 
-      -- don't have if we use this tech). -->
+       closer than splatting distance (the closer the sector fog starts the
+       worse). But practically, "it looks okay", and I don't see how a 
+       100% correct appearance could be achieved without a 3rdTU (which we 
+       don't have if we use this tech). -->
   </technique>
   
   <!-- Some HW doesn't even handle the linear fog correctly at all. 

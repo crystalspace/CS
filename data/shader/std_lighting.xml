@@ -7,19 +7,19 @@
     support eyecandy very much and uses software lighting or lightmaps.
   -->
 
-  <?! Some basic stuff. ?>
+  <!-- Some basic stuff. -->
   <?Include /shader/snippets/cg-base.inc ?>
   
-  <?! Include a couple of snippets. See snippets for explanation. 
+  <!-- Include a couple of snippets. See snippets for explanation. 
       Note: the order is relevant. Some snippets may require that other 
-      snippets are included before them for some reason. ?>
+      snippets are included before them for some reason. -->
   <?Include /shader/lighting/cg-light-classic.inc ?>
   <?Include /shader/surface/cg-surface-classic.inc ?>
   <?Include /shader/fog/cg-sectorfog.inc ?>
   
   <technique priority="150">
-    <?! The include file below contains a pass with a VP and FP using the
-	a surface, lighting and fog snippet. ?>
+    <!-- The include file below contains a pass with a VP and FP using the
+	a surface, lighting and fog snippet. -->
     <?Include /shader/snippets/std_lighting-pass.inc ?>
   </technique>
 
