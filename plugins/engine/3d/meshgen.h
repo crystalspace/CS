@@ -114,7 +114,8 @@ private:
 
   csMeshGenerator* generator;
 
-  csArray<csVector2> positions;
+  csArray<csVector2> *positions;
+  int celldim;
 
 public:
   csMeshGeneratorGeometry (csMeshGenerator* generator);
@@ -131,6 +132,8 @@ public:
   {
     return default_material_factor;
   }
+
+  void ResetManualPositions (int new_celldim);
 
   virtual void AddFactory (iMeshFactoryWrapper* factory, float maxdist);
   virtual size_t GetFactoryCount () const { return factories.Length (); }
@@ -158,10 +161,10 @@ public:
     default_material_factor = factor;
   }
 
-  void AddPosition (const csVector2 &pos) {positions.Push (pos);}
+  void AddPosition (const csVector2 &pos);
 
-  size_t GetManualPositionCount () {return positions.GetSize ();}
-  const csVector2 &GetManualPosition (size_t i){return positions[i];}
+  size_t GetManualPositionCount (size_t cidx) {return positions[cidx].GetSize ();}
+  const csVector2 &GetManualPosition (size_t cidx, size_t i){return positions[cidx][i];}
 
   /**
    * Allocate a new mesh for the given distance. Possibly from the
@@ -455,6 +458,8 @@ public:
   virtual int GetCellCount () const { return cell_dim; }
   virtual void SetBlockCount (int number);
   virtual int GetBlockCount () const { return max_blocks; }
+
+  int GetCellId (const csVector2& pos);
 
   virtual iMeshGeneratorGeometry* CreateGeometry ();
   virtual size_t GetGeometryCount () const { return geometries.Length (); }

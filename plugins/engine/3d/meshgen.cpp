@@ -32,6 +32,8 @@ csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   density = 1.0f;
   total_max_dist = 0.0f;
   default_material_factor = 0.0f;
+  celldim = 0;
+  positions = 0;
 }
 csMeshGeneratorGeometry::~csMeshGeneratorGeometry ()
 {
@@ -76,6 +78,36 @@ void csMeshGeneratorGeometry::AddPositionsFromMap (iTerraFormer* map, const csBo
     curx = region.MinX ();
     cury += stepy;
   }
+}
+void csMeshGeneratorGeometry::ResetManualPositions (int new_celldim)
+{
+  if (celldim == new_celldim)
+    return;
+
+  csArray<csVector2> tmp_pos;
+  int cellcnt = celldim*celldim;
+  for (int i = 0; i < celldim; i++)
+  {
+    for (size_t j = 0; j < positions[i].GetSize (); j++)
+    {
+      tmp_pos.Push (positions[i][j]);
+    }
+  }
+
+  if (positions) delete positions;
+
+  celldim = new_celldim;
+  positions = new csArray<csVector2> [celldim*celldim];
+
+  for (size_t i = 0; i < tmp_pos.GetSize (); i++)
+  {
+    AddPosition (tmp_pos[i]);
+  }
+}
+void csMeshGeneratorGeometry::AddPosition (const csVector2 &pos)
+{
+  ResetManualPositions (generator->GetCellCount ());
+  positions[generator->GetCellId (pos)].Push (pos);
 }
 void csMeshGeneratorGeometry::AddDensityMaterialFactor (
   iMaterialWrapper* material, float factor)
@@ -477,6 +509,15 @@ void csMeshGenerator::SetupSampleBox ()
       idx++;
     }
   }
+  for (size_t g = 0 ; g < geometries.Length () ; g++)
+    geometries[g]->ResetManualPositions (cell_dim);
+}
+
+int csMeshGenerator::GetCellId (const csVector2& pos)
+{
+  int cellx = GetCellX (pos.x);
+  int cellz = GetCellZ (pos.y);
+  return cellx*cellz;
 }
 
 size_t csMeshGenerator::CountPositions (int cidx, csMGCell& cell)
@@ -510,6 +551,7 @@ size_t csMeshGenerator::CountPositions (int cidx, csMGCell& cell)
           break;
         }
       }
+      
       if (hit)
       {
         counter++;
@@ -548,7 +590,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
   {
     csMGPosition pos;
     pos.geom_type = g;
-    size_t mpos_count = geometries[g]->GetManualPositionCount ();
+    size_t mpos_count = geometries[g]->GetManualPositionCount (cidx);
 
     float density = geometries[g]->GetDensity ();
 
@@ -571,14 +613,10 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
         z = random.Get (box.MinY (), box.MaxY ());
       }else
       {
-        csVector2 mpos = geometries[g]->GetManualPosition (j);
-        if (box.In (mpos))
-        {
-          x = mpos.x; 
-          z = mpos.y;
-          pos_factor = 1.0f;
-        }
-        else pos_factor = 0.0f;
+        csVector2 mpos = geometries[g]->GetManualPosition (cidx,j);
+        x = mpos.x; 
+        z = mpos.y;
+        pos_factor = 1.0f;
       }
       
       if (!((pos_factor < 0.0001) ||
