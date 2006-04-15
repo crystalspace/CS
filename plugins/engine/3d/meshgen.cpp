@@ -94,7 +94,7 @@ void csMeshGeneratorGeometry::ResetManualPositions (int new_celldim)
     }
   }
 
-  if (positions) delete positions;
+  delete[] positions;
 
   celldim = new_celldim;
   positions = new csArray<csVector2> [celldim*celldim];
