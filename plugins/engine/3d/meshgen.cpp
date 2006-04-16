@@ -515,9 +515,10 @@ void csMeshGenerator::SetupSampleBox ()
 
 int csMeshGenerator::GetCellId (const csVector2& pos)
 {
+  SetupSampleBox ();
   int cellx = GetCellX (pos.x);
   int cellz = GetCellZ (pos.y);
-  return cellx*cellz;
+  return cellz*cell_dim + cellx;
 }
 
 size_t csMeshGenerator::CountPositions (int cidx, csMGCell& cell)
