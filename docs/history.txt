@@ -10,6 +10,7 @@ chronological order.
 15-Apr-2006
 	- Piotr Obrzut fixed small bug in adding positions from map in meshgen.   
 	- Piotr Obrzut did some optimizations to meshgen.
+	- Adam added missing newlines (silences a gcc warning).
 14-Apr-2006
 	- caedes changed comment formatting on some shaders to be more parser
 	  friendly (specially some <?! !> to <!-- --> in std_lighting.xml).
