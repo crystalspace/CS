@@ -198,28 +198,34 @@ void LoadObjectTask::doTask()
   csRef<iMeshWrapper> wrapper = obj3d->GetCSinterface()->GetMeshWrapper();
   if (wrapper)
   {
+    LOG("LoadObjectTask", 3, "object " << obj3d->getURLstr()
+        << " already has a mesh wrapper");
+
     if (toRemove)
     {
-      LOG("LoadObjectTask", 3, "Removing object from sector");
+      LOG("LoadObjectTask", 3, "Removing object " << obj3d->getURLstr()
+          << " from sector");
       sector->removeObject3D (obj3d->GetCSinterface());
       sector->GetSector()->GetMeshes()->Remove (wrapper);
-      //wrapper->GetMovable()->GetSectors()->Remove (sector->GetSector());
-      //wrapper->GetMovable()->UpdateMove();
+      wrapper->GetMovable()->GetSectors()->Remove (sector->GetSector());
+      wrapper->GetMovable()->UpdateMove();
     }
     else
     {
+      LOG("LoadObjectTask", 3, "Adding object " << obj3d->getURLstr() << " to sector");
+
       sector->addObject3D (obj3d->GetCSinterface());
-      if (wrapper->GetMovable()->GetSectors()->Find (sector->GetSector()))
+      if (wrapper->GetMovable()->GetSectors()->Find (sector->GetSector()) == csArrayItemNotFound)
       {
-        LOG("LoadObjectTask", 3, "Object already setup and in sector");
-      }
-      else
-      {
-        LOG("LoadObjectTask", 3, "Object already setup, setting sector");
+        LOG("LoadObjectTask", 3, "Setting sector");
         if (wrapper->GetMovable()->GetSectors()->Find(sector->GetSector()) < 0) {
           wrapper->GetMovable()->GetSectors()->Add(sector->GetSector());
           wrapper->GetMovable()->UpdateMove();
         }
+      }
+      else
+      {
+        LOG("LoadObjectTask", 3, "Object already in sector");
       }
     }
   }
@@ -471,9 +477,9 @@ void csVosSector::notifyChildInserted (VobjectEvent &event)
 
         if(obj3d.isValid())
         {
-          //obj3d->Setup(vosa3dl, this);
-          vosa3dl->mainThreadTasks.push(new LoadObjectTask( vosa3dl, obj3d, this,
-                                                            false, meter));
+          vosa3dl->mainThreadTasks.push(new LoadObjectTask( vosa3dl, obj3d,
+                                                            this, false,
+                                                            meter ));
           if (obj3d->getTypes().hasItem ("a3dl:object3D.polygonmesh")
               && obj3d->getTypes().hasItem ("a3dl:static"))
           {

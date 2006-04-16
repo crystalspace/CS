@@ -251,11 +251,11 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
         n > 0 && getRealTime() < (start+.5);
         n--)
     {
-      LOG("csVosA3DL", 3, "starting main thread task");
+      LOG("csVosA3DL", 4, "starting main thread task");
       Task* t = mainThreadTasks.pop();
       t->doTask();
       delete t;
-      LOG("csVosA3DL", 3, "completed main thread task");
+      LOG("csVosA3DL", 4, "completed main thread task");
     }
 
     if (dynamics) {
