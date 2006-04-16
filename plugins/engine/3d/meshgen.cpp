@@ -231,7 +231,7 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
     csMGGeomInstMesh& geominst = geom.instmeshes[cidx];
     csVector3 meshpos = mesh->GetMovable ()->GetFullPosition ();
     csVector3 pos = position - meshpos;
-    //printf ("position=%g,%g,%g    meshpos=%g,%g,%g  ->  pos=%g,%g,%g\n", position.x, position.y, position.z, meshpos.x, meshpos.y, meshpos.z, pos.x, pos.y, pos.z); fflush (stdout);
+    ////printf ("position=%g,%g,%g    meshpos=%g,%g,%g  ->  pos=%g,%g,%g\n", position.x, position.y, position.z, meshpos.x, meshpos.y, meshpos.z, pos.x, pos.y, pos.z); fflush (stdout);
     csReversibleTransform tr (matrix, pos);
     geominst.instmesh_state->MoveInstance (instance_id, tr);
   }
@@ -314,6 +314,8 @@ csMeshGenerator::csMeshGenerator() : scfImplementationType (this)
   cell_dim = 50;
   use_density_scaling = false;
   use_alpha_scaling = false;
+
+  last_pos = csVector2 (0,0);
 
   sector = 0;
 
@@ -873,6 +875,11 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
 
 void csMeshGenerator::AllocateBlocks (const csVector3& pos)
 {
+  if (setup_cells)
+    if (pos.x == last_pos.x && pos.z == last_pos.y)
+      return;
+  last_pos.x = pos.x;
+  last_pos.y = pos.z;
   SetupSampleBox ();
   //printf ("positions=%d\n", CountAllPositions ()); fflush (stdout);
 

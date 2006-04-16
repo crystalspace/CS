@@ -350,6 +350,8 @@ private:
   float alpha_mindist, sq_alpha_mindist, alpha_maxdist;
   float alpha_scale;
 
+  csVector2 last_pos;
+
   /**
    * If true the cells are correctly set up. This is cleared by
    * changing the sample box.
