@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+17-Apr-2006
+	- res removed the now-obsolete sounddrivers and soundrenderers compile
+	  groups.
 15-Apr-2006
 	- Piotr Obrzut fixed small bug in adding positions from map in meshgen.   
 	- Piotr Obrzut did some optimizations to meshgen.

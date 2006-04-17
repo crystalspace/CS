@@ -43,8 +43,6 @@ BuildDepend dep ;
 SubInclude TOP mk ;
 
 # Define our compile groups
-Description sounddrivers   : "sound drivers" ;
-Description soundloaders   : "sound loaders" ;
 Description sndsys         : "sound system" ;
 Description imageloaders   : "image loaders" ;
 Description fontservers    : "font servers" ;
