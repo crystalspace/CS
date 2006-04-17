@@ -34,83 +34,152 @@
 #include "comparator.h"
 #include "hash.h"
 
+#if defined(CS_COMPILER_MSVC) && (CS_PROCESSOR_SIZE == 64)
+/* long is 32 bit even on 64-bit MSVC, so use uint64 to utilize a storage in
+ * 64 bit units.
+ */
+typedef uint64 csBitArrayStorageType;
+#else
+/// Storage type utilized by csBitArray to store the bits.
+typedef unsigned long csBitArrayStorageType;
+#endif
+const size_t csBitArrayDefaultInlineBits = 
+  sizeof (csBitArrayStorageType) * 8;
 
-class csBitArray;
-CS_SPECIALIZE_TEMPLATE class csComparator<csBitArray, csBitArray>;
-CS_SPECIALIZE_TEMPLATE class csHashComputer<csBitArray>;
+class csBitArrayAllocatorHeap
+{
+public:
+  static void* Alloc (const size_t n)
+  {
+#ifdef CS_MEMORY_TRACKER
+    static const char mtiInfo[] = "csBitArrayAllocatorHeap";
+    uintptr_t* ptr = (uintptr_t*)malloc (n + sizeof (uintptr_t)*2);
+    *ptr++ = (uintptr_t)mtiRegisterAlloc (n, (void*)&mtiInfo);
+    *ptr++ = n;
+    return ptr;
+#else
+    return malloc (n);
+#endif
+  }
+  static void Free (void* p)
+  {
+#ifdef CS_MEMORY_TRACKER
+    uintptr_t* ptr = ((uintptr_t*)p)-2;
+    mtiRegisterFree ((csMemTrackerInfo*)*ptr, (size_t)ptr[1]);
+    free (ptr);
+#else
+    free (p);
+#endif
+  }
+};
 
 /**
  * A one-dimensional array of bits, similar to STL bitset.
+ * The amount of bits is dynamic at runtime.
+ *
+ * Internally, bits are stored in multiple values of the type 
+ * csBitArrayStorageType. If the number of bits is below a certain threshold,
+ * the bits are stored in a field inside the class for more performance, 
+ * above that threshold, the data is stored on the heap.
+ *
+ * This threshold can be tweaked by changing the \a InlinedBits template
+ * parameter. At least \a InlinedBits bits will be stored inlined in the
+ * class (the actual amount is the next bigger multiple of the number of bits
+ * fitting into one csBitArrayStorageType). In scenarios where you can
+ * anticipate that the common number of stored bits is larger than the 
+ * default number, you can tweak InlinedBits to gain more performance.
+ *
+ * The \a Allocator template allocator allows you to override the logic
+ * to allocate bits from the heap.
  */
-class CS_CRYSTALSPACE_EXPORT csBitArray
+template<int InlinedBits = csBitArrayDefaultInlineBits,
+  typename Allocator = csBitArrayAllocatorHeap>
+class csBitArrayTweakable
 {
-public:
-  typedef unsigned long store_type;
-
 private:
-  friend class csComparator<csBitArray, csBitArray>;
-  friend class csHashComputer<csBitArray>;
+  template<typename BitArray> friend class csComparatorBitArray;
+  template<typename BitArray> friend class csBitArrayHashComputer;
+
   enum
   {
-    bits_per_byte = 8,
-    cell_size     = sizeof(store_type) * bits_per_byte
+    cellSize    = csBitArrayDefaultInlineBits,
+    cellCount   = (InlinedBits + (cellSize-1)) / cellSize
   };
 
-  store_type* mpStore;
-  store_type  mSingleWord; // Use this buffer when mLength is 1
-  size_t mLength;          // Length of mpStore in units of store_type
+  struct Storage : public Allocator
+  {
+    union
+    {
+      csBitArrayStorageType* heapStore;
+      csBitArrayStorageType inlineStore[cellCount];
+    };
+    Storage()
+    {
+      memset (&inlineStore, 0, 
+        MAX(sizeof (heapStore), sizeof (inlineStore)));
+    }
+  };
+  Storage storage;
+  /// Length of heapStore/inlineStore in units of csBitArrayStorageType
+  size_t mLength;          
   size_t mNumBits;
 
   /// Get the GetStore()[] index for a given bit number.
   static size_t GetIndex (size_t bit_num)
   {
-    return bit_num / cell_size;
+    return bit_num / cellSize;
   }
 
   /// Get the offset within GetStore()[GetIndex()] for a given bit number.
   static size_t GetOffset (size_t bit_num)
   {
-    return bit_num % cell_size;
+    return bit_num % cellSize;
+  }
+
+  /// Return whether the inline or heap store is used
+  bool UseInlineStore () const
+  {
+    return mLength <= cellCount;
   }
 
   /**
    * Get a constant pointer to bit store, which may be internal mSingleWord or
    * heap-allocated mpStore.
    */
-  store_type const* GetStore() const
+  csBitArrayStorageType const* GetStore() const
   {
-    return mLength <= 1 ? &mSingleWord : mpStore;
+    return UseInlineStore () ? storage.inlineStore : storage.heapStore;
   }
 
   /**
    * Get a non-constant pointer to bit store, which may be internal mSingleWord
    * or heap-allocated mpStore.
    */
-  store_type* GetStore()
+  csBitArrayStorageType* GetStore()
   {
-    return mLength <= 1 ? &mSingleWord : mpStore;
+    return UseInlineStore () ? storage.inlineStore : storage.heapStore;
   }
 
   /// Force overhang bits at the end to 0.
   void Trim()
   {
-    size_t extra_bits = mNumBits % cell_size;
+    size_t extra_bits = mNumBits % cellSize;
     if (mLength > 0 && extra_bits != 0)
-      GetStore()[mLength - 1] &= ~((~(store_type)0) << extra_bits);
+      GetStore()[mLength - 1] &= ~((~(csBitArrayStorageType)0) << extra_bits);
   }
 
 public:
   /**
    * \internal Bit proxy (for csBitArray::operator[])
    */
-  class CS_CRYSTALSPACE_EXPORT BitProxy
+  class BitProxy
   {
   private:
-    csBitArray &mArray;
+    csBitArrayTweakable& mArray;
     size_t mPos;
   public:
     /// Constructor.
-    BitProxy(csBitArray &array, size_t pos): mArray(array), mPos(pos)
+    BitProxy (csBitArrayTweakable& array, size_t pos): mArray(array), mPos(pos)
     {}
 
     /// Boolean assignment.
@@ -148,7 +217,7 @@ public:
   /**
    * Default constructor.
    */
-  csBitArray () : mpStore(0), mSingleWord(0), mLength(0), mNumBits(0)
+  csBitArrayTweakable () : mLength(0), mNumBits(0)
   {
     SetSize (0);
   }
@@ -156,8 +225,7 @@ public:
   /**
    * Construct with a size of \a size bits.
    */
-  explicit csBitArray(size_t size) :
-    mpStore(0), mSingleWord(0), mLength(0), mNumBits(0)
+  explicit csBitArrayTweakable (size_t size) : mLength(0), mNumBits(0)
   {
     SetSize (size);
   }
@@ -165,17 +233,16 @@ public:
   /**
    * Construct as duplicate of \a that (copy constructor).
    */
-  csBitArray (const csBitArray &that) :
-    mpStore(0), mSingleWord(0), mLength(0), mNumBits(0)
+  csBitArrayTweakable (const csBitArrayTweakable& that) : mLength(0), mNumBits(0)
   {
     *this = that; // Invokes this->operator=().
   }
 
   /// Destructor.
-  ~csBitArray()
+  ~csBitArrayTweakable()
   {
-    if (mpStore != 0)
-      delete[] mpStore;
+    if (!UseInlineStore ())
+      storage.Free (storage.heapStore);
   }
 
   /// Return the number of stored bits.
@@ -218,35 +285,34 @@ public:
     if (newLength != mLength)
     {
       // Avoid allocation if length is 1 (common case)
-      store_type* newStore;
-      if (newLength <= 1)
-	newStore = &mSingleWord;
+      csBitArrayStorageType* newStore;
+      if (newLength <= cellCount)
+        newStore = storage.inlineStore;
       else
-	newStore = new store_type[newLength];
+	newStore = (csBitArrayStorageType*)storage.Alloc (
+          newLength * sizeof (csBitArrayStorageType));
 
       if (newLength > 0)
       {
 	if (mLength > 0)
 	{
-	  store_type const* oldStore = GetStore();
+	  csBitArrayStorageType* oldStore = GetStore();
 	  if (newStore != oldStore)
 	  {
 	    memcpy (newStore, oldStore, 
-	      (MIN (mLength, newLength)) * sizeof (store_type));
+	      (MIN (mLength, newLength)) * sizeof (csBitArrayStorageType));
 	    if (newLength > mLength)
 	      memset(newStore + mLength, 0,
-		     (newLength - mLength) * sizeof (store_type));
+		     (newLength - mLength) * sizeof (csBitArrayStorageType));
+            if (!UseInlineStore ())
+              storage.Free (oldStore);
 	  }
 	}
 	else
-	  memset (newStore, 0, newLength * sizeof (store_type));
+	  memset (newStore, 0, newLength * sizeof (csBitArrayStorageType));
       }
-
-      if (mpStore != 0)
-	delete[] mpStore;
-
-      mpStore = newLength > 1 ? newStore : 0;
       mLength = newLength;
+      if (!UseInlineStore()) storage.heapStore = newStore;
     }
 
     mNumBits = newSize;
@@ -258,12 +324,13 @@ public:
   //
 
   /// Copy from other array.
-  csBitArray &operator=(const csBitArray &that)
+  csBitArrayTweakable& operator=(const csBitArrayTweakable& that)
   {
     if (this != &that)
     {
       SetSize (that.mNumBits);
-      memcpy (GetStore(), that.GetStore(), mLength * sizeof(store_type));
+      memcpy (GetStore(), that.GetStore(), 
+        mLength * sizeof (csBitArrayStorageType));
     }
     return *this;
   }
@@ -282,13 +349,13 @@ public:
   }
 
   /// Equal to other array?
-  bool operator==(const csBitArray &that) const
+  bool operator==(const csBitArrayTweakable& that) const
   {
     if (mNumBits != that.mNumBits)
       return false;
 
-    store_type const* p0 = GetStore();
-    store_type const* p1 = that.GetStore();
+    csBitArrayStorageType const* p0 = GetStore();
+    csBitArrayStorageType const* p1 = that.GetStore();
     for (unsigned i = 0; i < mLength; i++)
       if (p0[i] != p1[i])
         return false;
@@ -296,66 +363,69 @@ public:
   }
 
   /// Not equal to other array?
-  bool operator != (const csBitArray &that) const
+  bool operator != (const csBitArrayTweakable& that) const
   {
     return !(*this == that);
   }
 
   /// Bit-wise `and'. The arrays must be the same length.
-  csBitArray& operator &= (const csBitArray &that)
+  csBitArrayTweakable& operator &= (const csBitArrayTweakable &that)
   {
     CS_ASSERT (mNumBits == that.mNumBits);
-    store_type* p0 = GetStore();
-    store_type const* p1 = that.GetStore();
+    csBitArrayStorageType* p0 = GetStore();
+    csBitArrayStorageType const* p1 = that.GetStore();
     for (size_t i = 0; i < mLength; i++)
       p0[i] &= p1[i];
     return *this;
   }
 
   /// Bit-wise `or'. The arrays must be the same length.
-  csBitArray operator |= (const csBitArray &that)
+  csBitArrayTweakable operator |= (const csBitArrayTweakable& that)
   {
     CS_ASSERT (mNumBits == that.mNumBits);
-    store_type* p0 = GetStore();
-    store_type const* p1 = that.GetStore();
+    csBitArrayStorageType* p0 = GetStore();
+    csBitArrayStorageType const* p1 = that.GetStore();
     for (size_t i = 0; i < mLength; i++)
       p0[i] |= p1[i];
     return *this;
   }
 
   /// Bit-wise `xor'. The arrays must be the same length.
-  csBitArray operator ^= (const csBitArray &that)
+  csBitArrayTweakable operator ^= (const csBitArrayTweakable& that)
   {
     CS_ASSERT (mNumBits == that.mNumBits);
-    store_type* p0 = GetStore();
-    store_type const* p1 = that.GetStore();
+    csBitArrayStorageType* p0 = GetStore();
+    csBitArrayStorageType const* p1 = that.GetStore();
     for (size_t i = 0; i < mLength; i++)
       p0[i] ^= p1[i];
     return *this;
   }
 
   /// Return complement bit array in which all bits are flipped from this one.
-  csBitArray operator~() const
+  csBitArrayTweakable operator~() const
   {
-    return csBitArray(*this).FlipAllBits();
+    return csBitArrayTweakable(*this).FlipAllBits();
   }
 
   /// Bit-wise `and'. The arrays must be the same length.
-  friend csBitArray operator& (const csBitArray &a1, const csBitArray &a2)
+  friend csBitArrayTweakable operator& (const csBitArrayTweakable& a1, 
+    const csBitArrayTweakable& a2)
   {
-    return csBitArray(a1) &= a2;
+    return csBitArrayTweakable (a1) &= a2;
   }
 
   /// Bit-wise `or'. The arrays must be the same length.
-  friend csBitArray operator | (const csBitArray &a1, const csBitArray &a2)
+  friend csBitArrayTweakable operator | (const csBitArrayTweakable& a1, 
+    const csBitArrayTweakable& a2)
   {
-    return csBitArray(a1) |= a2;
+    return csBitArrayTweakable (a1) |= a2;
   }
 
   /// Bit-wise `xor'. The arrays must be the same length.
-  friend csBitArray operator ^ (const csBitArray &a1, const csBitArray &a2)
+  friend csBitArrayTweakable operator ^ (const csBitArrayTweakable& a1, 
+    const csBitArrayTweakable& a2)
   {
-    return csBitArray(a1) ^= a2;
+    return csBitArrayTweakable (a1) ^= a2;
   }
 
   //
@@ -365,28 +435,28 @@ public:
   /// Set all bits to false.
   void Clear()
   {
-    memset (GetStore(), 0, mLength * sizeof(store_type));
+    memset (GetStore(), 0, mLength * sizeof(csBitArrayStorageType));
   }
 
   /// Set the bit at position pos to true.
   void SetBit (size_t pos)
   {
     CS_ASSERT (pos < mNumBits);
-    GetStore()[GetIndex(pos)] |= ((store_type)1) << GetOffset(pos);
+    GetStore()[GetIndex(pos)] |= ((csBitArrayStorageType)1) << GetOffset(pos);
   }
 
   /// Set the bit at position pos to false.
   void ClearBit (size_t pos)
   {
     CS_ASSERT (pos < mNumBits);
-    GetStore()[GetIndex(pos)] &= ~(((store_type)1) << GetOffset(pos));
+    GetStore()[GetIndex(pos)] &= ~(((csBitArrayStorageType)1) << GetOffset(pos));
   }
 
   /// Toggle the bit at position pos.
   void FlipBit (size_t pos)
   {
     CS_ASSERT (pos < mNumBits);
-    GetStore()[GetIndex(pos)] ^= ((store_type)1) << GetOffset(pos);
+    GetStore()[GetIndex(pos)] ^= ((csBitArrayStorageType)1) << GetOffset(pos);
   }
 
   /// Set the bit at position \a pos to the given value.
@@ -402,22 +472,23 @@ public:
   bool IsBitSet (size_t pos) const
   {
     CS_ASSERT (pos < mNumBits);
-    return (GetStore()[GetIndex(pos)] & (((store_type)1) << GetOffset(pos)))
-      != 0;
+    return (GetStore()[GetIndex(pos)] 
+      & (((csBitArrayStorageType)1) << GetOffset(pos))) != 0;
   }
 
   /// Checks whether at least one of \a count bits is set starting at \a pos.
   bool AreSomeBitsSet (size_t pos, size_t count) const
   {
     CS_ASSERT (pos + count <= mNumBits);
-    store_type const* p = GetStore();
+    csBitArrayStorageType const* p = GetStore();
     while (count > 0)
     {
       size_t index = GetIndex (pos);
       size_t offset = GetOffset (pos);
-      size_t checkCount = MIN(count, cell_size - offset);
-      store_type mask = ((checkCount == cell_size) ? ~(store_type)0 :
-			 ((((store_type)1) << checkCount) - 1)) << offset;
+      size_t checkCount = MIN(count, cellSize - offset);
+      csBitArrayStorageType mask = ((checkCount == cellSize) 
+        ? ~(csBitArrayStorageType)0 
+        : ((((csBitArrayStorageType)1) << checkCount) - 1)) << offset;
       if (p[index] & mask)
 	return true;
       pos += checkCount;
@@ -429,7 +500,7 @@ public:
   /// Returns true if all bits are false.
   bool AllBitsFalse() const
   {
-    store_type const* p = GetStore();
+    csBitArrayStorageType const* p = GetStore();
     for (size_t i = 0; i < mLength; i++)
       if (p[i] != 0)
         return false;
@@ -437,9 +508,9 @@ public:
   }
 
   /// Change value of all bits
-  csBitArray &FlipAllBits()
+  csBitArrayTweakable& FlipAllBits()
   {
-    store_type* p = GetStore();
+    csBitArrayStorageType* p = GetStore();
     for (size_t i = 0; i < mLength; i++)
       p[i] = ~p[i];
     Trim();
@@ -468,10 +539,10 @@ public:
    * Return a new bit array containing a slice \a count bits in length from
    * this array starting at \a pos. Does not modify this array.
    */
-  csBitArray Slice(size_t pos, size_t count) const
+  csBitArrayTweakable Slice(size_t pos, size_t count) const
   {
     CS_ASSERT(pos + count <= mNumBits);
-    csBitArray a(count);
+    csBitArrayTweakable a (count);
     for (size_t i = pos, o = 0; i < pos + count; i++)
       if (IsBitSet(i))
 	a.SetBit(o++);
@@ -479,44 +550,36 @@ public:
   }
 
   /// Return the full backing-store.
-  store_type* GetArrayBits()
+  csBitArrayStorageType* GetArrayBits()
   {
     return GetStore();
-  }
-
-  /**
-   * Gets quick access to the single-word (only useful when the bit
-   * array <= the word size of the machine.)
-   */
-  store_type GetSingleWord()
-  {
-    CS_ASSERT(mpStore == 0);
-    return mSingleWord;
-  }
-
-  /**
-   * Sets the single-word very simply (only useful when the bit array <=
-   * the word size of the machine.)
-   */
-  void SetSingleWord (store_type sw)
-  {
-    CS_ASSERT(mpStore == 0);
-    mSingleWord = sw;
   }
 };
 
 /**
- * csComparator<> specialization for csBitArray to allow its use as 
- * e.g. hash key type.
+ * A one-dimensional array of bits, similar to STL bitset.
+ * The amount of bits is dynamic at runtime.
  */
-CS_SPECIALIZE_TEMPLATE
-class csComparator<csBitArray, csBitArray>
+class csBitArray : public csBitArrayTweakable<>
 {
 public:
-  static int Compare (csBitArray const& key1, csBitArray const& key2)
+  /// Default constructor.
+  csBitArray () { }
+  /// Construct with a size of \a size bits.
+  explicit csBitArray (size_t size) : csBitArrayTweakable<> (size) { }
+  /// Construct as duplicate of \a that (copy constructor).
+  csBitArray (const csBitArray& that) : csBitArrayTweakable<> (that) { }
+};
+
+/// Base comparator for bit arrays
+template<typename BitArray>
+class csComparatorBitArray
+{
+public:
+  static int Compare (BitArray const& key1, BitArray const& key2)
   {
-    csBitArray::store_type const* p0 = key1.GetStore();
-    csBitArray::store_type const* p1 = key2.GetStore();
+    csBitArrayStorageType const* p0 = key1.GetStore();
+    csBitArrayStorageType const* p1 = key2.GetStore();
     size_t compareNum = MIN (key1.mLength, key2.mLength);
     size_t i = 0;
     for (; i < compareNum; i++)
@@ -539,19 +602,24 @@ public:
 };
 
 /**
- * csHashComputer<> specialization for csBitArray to allow its use as 
- * hash key type.
+ * csComparator<> specialization for csBitArray to allow its use as 
+ * e.g. hash key type.
  */
 CS_SPECIALIZE_TEMPLATE
-class csHashComputer<csBitArray>
+class csComparator<csBitArray, csBitArray> : 
+  public csComparatorBitArray<csBitArray> { };
+
+/// Base hash computer for bit arrays
+template<typename BitArray>
+class csBitArrayHashComputer
 {
 public:
-  static uint ComputeHash (csBitArray const& key)
+  static uint ComputeHash (BitArray const& key)
   {
-    const size_t uintCount = sizeof (csBitArray::store_type) / sizeof (uint);
+    const size_t uintCount = sizeof (csBitArrayStorageType) / sizeof (uint);
     uint ui[uintCount];
     uint hash = 0;
-    csBitArray::store_type const* p = key.GetStore();
+    csBitArrayStorageType const* p = key.GetStore();
     // @@@ Not very good. Find a better hash function; however, it should
     // return the same hash for two bit arrays that are the same except for
     // the amount of trailing zeros. (e.g. f(10010110) == f(100101100000...))
@@ -564,6 +632,14 @@ public:
     return hash;
   }
 };
+
+/**
+ * csHashComputer<> specialization for csBitArray to allow its use as 
+ * hash key type.
+ */
+CS_SPECIALIZE_TEMPLATE
+class csHashComputer<csBitArray> : 
+  public csBitArrayHashComputer<csBitArray> { };
 
 
 #endif // __CS_BITARRAY_H__
