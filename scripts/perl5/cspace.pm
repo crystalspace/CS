@@ -199,6 +199,43 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csArrayThresholdVariable ##############
+
+package cspace::csArrayThresholdVariable;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csArrayThresholdVariable(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*GetThreshold = *cspacec::csArrayThresholdVariable_GetThreshold;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csArrayThresholdVariable($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iBase ##############
 
 package cspace::iBase;
