@@ -76,7 +76,7 @@ csGLFontCache::~csGLFontCache ()
   for (tex = 0; tex < textures.Length (); tex++)
   {
     glDeleteTextures (1, &textures[tex].handle);
-    if (!(multiTexText || intensityBlendText))
+    if (!(afpText || multiTexText || intensityBlendText))
       glDeleteTextures (1, &textures[tex].mirrorHandle);
   }
   glDeleteTextures (1, &texWhite);
@@ -286,12 +286,12 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
     textures[tex].glyphRects->Alloc (1, 1, texRect);
 
     glTexImage2D (GL_TEXTURE_2D, 0, 
-      (multiTexText || intensityBlendText) ? GL_INTENSITY : GL_ALPHA, 
+      (afpText || multiTexText || intensityBlendText) ? GL_INTENSITY : GL_ALPHA, 
       texSize, texSize, 0, 
-      (multiTexText || intensityBlendText) ? GL_LUMINANCE : GL_ALPHA, 
+      (afpText || multiTexText || intensityBlendText) ? GL_LUMINANCE : GL_ALPHA, 
       GL_UNSIGNED_BYTE, texImage);
     
-    if (!(multiTexText || intensityBlendText))
+    if (!(afpText || multiTexText || intensityBlendText))
     {
       glGenTextures (1, &textures[tex].mirrorHandle);
       statecache->SetTexture (GL_TEXTURE_2D, textures[tex].mirrorHandle);
@@ -459,9 +459,9 @@ void csGLFontCache::CopyGlyphData (iFont* /*font*/, utf32_char /*glyph*/, size_t
 
     glTexSubImage2D (GL_TEXTURE_2D, 0, texRect.xmin, texRect.ymin, 
       texRect.Width (), texRect.Height (), 
-      (multiTexText || intensityBlendText) ? GL_LUMINANCE : GL_ALPHA, 
+      (afpText || multiTexText || intensityBlendText) ? GL_LUMINANCE : GL_ALPHA, 
       GL_UNSIGNED_BYTE, intData);
-    if (!(multiTexText || intensityBlendText))
+    if (!(afpText || multiTexText || intensityBlendText))
     {
       int n = texRect.Width () * texRect.Height ();
       uint8* p = intData;
@@ -541,7 +541,7 @@ void csGLFontCache::FlushArrays ()
     const bool doBG = (job.bgVertCount != 0);
     if (doFG || doBG)
     {
-      if (multiTexText || intensityBlendText)
+      if (afpText || multiTexText || intensityBlendText)
       {
         statecache->SetTexture (GL_TEXTURE_2D, job.texture);
         if (envColor != job.bg)
