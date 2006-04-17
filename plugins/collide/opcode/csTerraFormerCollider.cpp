@@ -110,7 +110,7 @@ void csTerraFormerCollider::InitOPCODEModel ()
   opcode_model = new CS::Plugins::Opcode::Opcode::Model;
 
   opcMeshInt.SetNbTriangles (2 * (resolution-1) * (resolution-1));
-  opcMeshInt.SetNbVertices (vertices.GetSize ());
+  opcMeshInt.SetNbVertices((udword)vertices.GetSize());
 
   // Mesh data
   OPCC.mIMesh = &opcMeshInt;

@@ -8,6 +8,8 @@ chronological order.
 
 
 17-Apr-2006
+        - Arianna fixed some warnings founded compiling with MSVC 7.1 in 64-bits 
+          mode.
 	- res removed the now-obsolete sounddrivers and soundrenderers compile
 	  groups.
 	- res changed the doxygen configs to expand the 

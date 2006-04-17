@@ -257,7 +257,7 @@ void csPagingFormer::SetHeightmapDir (const char* path, const char *type)
   sscanf(lastname.GetData(),"%d",&numy);
   numy++;
 
-  uint numx = heightmapnames->GetSize() / numy;
+  uint numx = (uint)heightmapnames->GetSize() / numy;
   countx = numx;
   county = numy;
 
@@ -286,7 +286,7 @@ void csPagingFormer::SetIntmapDir (const csStringID type,
   sscanf(lastname.GetData(),"%d",&numy);
   numy++;
 
-  uint numx = heightmapnames->GetSize() / numy;
+  uint numx = (uint)heightmapnames->GetSize() / numy;
 
   if (numx == countx && numy == county)
   {
@@ -311,7 +311,7 @@ void csPagingFormer::SetFloatmapDir (const csStringID type,
   sscanf(lastname.GetData(),"%d",&numy);
   numy++;
 
-  uint numx = heightmapnames->GetSize() / numy;
+  uint numx = (uint)heightmapnames->GetSize() / numy;
 
   if (numx == countx && numy == county)
   {
@@ -546,7 +546,7 @@ csPtr<iTerraSampler> csPagingFormer::GetSampler (csBox2 region,
 
       csImageMemory pic = csImageMemory(samplerresolutionx, samplerresolutiony);
       csRGBpixel* dat = (csRGBpixel*)pic.GetImagePtr();
-      for (int asdf=0; asdf < samplerresolutionx*samplerresolutiony; asdf++) 
+      for (size_t asdf=0; asdf < samplerresolutionx*samplerresolutiony; asdf++) 
       {
         dat[asdf].red = tests[asdf].y;
         dat[asdf].green = tests[asdf].y;
@@ -676,7 +676,7 @@ void csPagingSampler::CachePositions ()
   positions = new csVector3[resx*resz];
 
   // buffer for all the samplers maps
-  uint num = sampler.GetSize();
+  uint num = (uint)sampler.GetSize();
   const csVector3 **maps = new const csVector3*[num];
 
   // first get the raw data from all the samplers
@@ -1005,7 +1005,7 @@ const int *csPagingSampler::SampleInteger (csStringID type)
     int *map = new int[resx*resz];
 
     // buffer for all the samplers maps
-    uint num = sampler.GetSize();
+    uint num = (uint)sampler.GetSize();
     const int **maps = new const int*[num];
 
     // first get the raw data from all the samplers
