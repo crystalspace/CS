@@ -190,6 +190,13 @@ rule MsvcCFlags1 { }
 rule MsvcLFlags { MsvcLFlags1 $(1) : $(2) : $(3) ; }
 rule MsvcLFlags1 { }
 
+## MsvcExtraFile target : files
+##   Use this rule to add extra file resources to the "Resource files" 
+##   filter of the generated project. Commonly, those files are auxiliary
+##   files not specified in the source file list, e.g. ".inc" files.
+rule MsvcExtraFile { MsvcExtraFile1 $(1) : $(2) ; }
+rule MsvcExtraFile1 { }
+
 ## MsvcGenName target : name
 ##   Assign an MSVC project name to 'target'.  Normally, the project name is
 ##   'target' with a prefix of "app", "grp", "lib", "plg", or "wks", depending
@@ -1072,10 +1079,11 @@ rule StaticPluginLibrary
   {
     targets = [ Filter $(targets) : $(rejects) ] ;
   }
-  local sources ;
+  local sources extlibs ;
   for t in $(targets)
   {
     sources += $(STATICPLUGINS.SOURCES.$(t)) ;
+    extlibs += $($(t).EXTERNALLIBS) ;
   }
 
   $(name)_STATIC = "yes" ;
@@ -1083,6 +1091,7 @@ rule StaticPluginLibrary
   Library $(name) : $(sources) ;
   MsvcDefine $(name) : CS_STATIC_LINKED ;
   _MsvcDefine $(name) : $(STATICPLUGINS.MSVC_DEFINES) ;
+  ExternalLibs $(name) : [ RemoveDups $(extlibs) ] ;
 
   # Write out needed CFLAGS, LFLAGS
   local outdir = [ Property msvcgen : outdircommon ] ;
@@ -1337,6 +1346,20 @@ rule MsvcLFlags1
   local modes = [ MsvcClassifyMode $(3) ] ;
   $(target).LFLAGS.$(modes) += $(2) ;
   _MsvcRespEmit $(1) : $(2) : lflags : $(3) ;
+}
+
+# MsvcLFlags target : files
+#   (See documentation above.)
+rule MsvcExtraFile1 
+{
+  local rawname = $(1) ;
+  local files = $(2) ;
+
+  local respfile = $($(rawname)_PRJ_RESPFILE) ;
+  local respdir = $($(rawname)_PRJ_RESPDIR) ;
+  
+  ResponseFile $(respfile) : "file|$(files)" : notfile :
+    $(respdir) ;
 }
 
 # _MsvcIncDirs target : incdirs [ : mode ]

@@ -475,6 +475,48 @@ bool csTextSyntaxService::WriteColor (iDocumentNode* node, csColor4* col)
   return true;
 }
 
+static bool StringToBlendFactor (const char* str, uint& blendFactor)
+{
+  if (!str) return false;
+
+  struct BlendFactorStr
+  {
+    const char* str;
+    uint blendFactor;
+  };
+  static const BlendFactorStr blendFactors[] =
+  {
+    "dstalpha",     CS_MIXMODE_FACT_DSTALPHA,
+    "dstalpha_inv", CS_MIXMODE_FACT_DSTALPHA_INV,
+    "dstcolor",     CS_MIXMODE_FACT_DSTCOLOR,
+    "dstcolor_inv", CS_MIXMODE_FACT_DSTCOLOR_INV,
+    "one",          CS_MIXMODE_FACT_ONE,
+    "srcalpha",     CS_MIXMODE_FACT_SRCALPHA,
+    "srcalpha_inv", CS_MIXMODE_FACT_SRCALPHA_INV,
+    "srccolor",     CS_MIXMODE_FACT_SRCCOLOR,
+    "srccolor_inv", CS_MIXMODE_FACT_SRCCOLOR_INV,
+    "zero",         CS_MIXMODE_FACT_ZERO
+  };
+
+  size_t l = 0, 
+    r = sizeof (blendFactors) / sizeof (BlendFactorStr);
+  while (l < r)
+  {
+    size_t m = (l+r) / 2;
+    int i = strcmp (blendFactors[m].str, str);
+    if (i == 0) 
+    {
+      blendFactor = blendFactors[m].blendFactor;
+      return true;
+    }
+    if (i < 0)
+      l = m + 1;
+    else
+      r = m;
+  }
+  return false;
+}
+
 bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
 					bool allowFxMesh)
 {
@@ -491,7 +533,8 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
       warned = true;					\
     }							\
     break;						\
-  }
+  }                                                     \
+  mixmodeSpecified = true;
 
   bool warned = false;
   bool mixmodeSpecified = false;
@@ -506,33 +549,77 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
     switch (id)
     {
       case XMLTOKEN_COPY: 
-	MIXMODE_EXCLUSIVE mixmode |= CS_FX_COPY; break;
+	MIXMODE_EXCLUSIVE mixmode = CS_FX_COPY; break;
       case XMLTOKEN_MULTIPLY: 
-	MIXMODE_EXCLUSIVE mixmode |= CS_FX_MULTIPLY; break;
+	MIXMODE_EXCLUSIVE mixmode = CS_FX_MULTIPLY; break;
       case XMLTOKEN_MULTIPLY2: 
-	MIXMODE_EXCLUSIVE mixmode |= CS_FX_MULTIPLY2; break;
+	MIXMODE_EXCLUSIVE mixmode = CS_FX_MULTIPLY2; break;
       case XMLTOKEN_ADD: 
-	MIXMODE_EXCLUSIVE mixmode |= CS_FX_ADD; break;
+	MIXMODE_EXCLUSIVE mixmode = CS_FX_ADD; break;
       case XMLTOKEN_DESTALPHAADD:
-	MIXMODE_EXCLUSIVE mixmode |= CS_FX_DESTALPHAADD; break;
+	MIXMODE_EXCLUSIVE mixmode = CS_FX_DESTALPHAADD; break;
       case XMLTOKEN_SRCALPHAADD:
-	MIXMODE_EXCLUSIVE mixmode |= CS_FX_SRCALPHAADD; break;
+	MIXMODE_EXCLUSIVE mixmode = CS_FX_SRCALPHAADD; break;
       case XMLTOKEN_PREMULTALPHA:
-	MIXMODE_EXCLUSIVE mixmode |= CS_FX_PREMULTALPHA; break;
+	MIXMODE_EXCLUSIVE mixmode = CS_FX_PREMULTALPHA; break;
       case XMLTOKEN_ALPHA:
-        MIXMODE_EXCLUSIVE {
+        {
 	  mixmode &= ~CS_FX_MASK_ALPHA;
 	  float alpha = child->GetContentsValueAsFloat ();
-	  mixmode |= CS_FX_SETALPHA (alpha);
+          if (mixmodeSpecified)
+            mixmode |= uint (alpha * CS_FX_MASK_ALPHA);
+          else
+	    mixmode = CS_FX_SETALPHA (alpha);
 	}
 	break;
-      case XMLTOKEN_TRANSPARENT: mixmode |= CS_FX_TRANSPARENT; break;
+      case XMLTOKEN_TRANSPARENT: mixmode = CS_FX_TRANSPARENT; break;
       case XMLTOKEN_MESH:
 	if (allowFxMesh)
 	{
-	  MIXMODE_EXCLUSIVE mixmode |= CS_FX_SRCALPHAADD; 
+	  MIXMODE_EXCLUSIVE mixmode = CS_MIXMODE_TYPE_MESH; 
 	  break;
 	}
+      case XMLTOKEN_ALPHATEST:
+        {
+          mixmodeSpecified = true;
+          mixmode &= ~CS_MIXMODE_ALPHATEST_MASK;
+          const char* mode = child->GetContentsValue();
+          if (strcmp (mode, "auto") == 0)
+            mixmode |= CS_MIXMODE_ALPHATEST_AUTO;
+          else if (strcmp (mode, "enable") == 0)
+            mixmode |= CS_MIXMODE_ALPHATEST_ENABLE;
+          else if (strcmp (mode, "disable") == 0)
+            mixmode |= CS_MIXMODE_ALPHATEST_DISABLE;
+          else
+          {
+            Report ("crystalspace.syntax.mixmode",
+              CS_REPORTER_SEVERITY_WARNING,
+	      child, "Invalid alphatest mode %s", mode);
+          }
+        }
+        break;
+      case XMLTOKEN_BLENDOP:
+        {
+          mixmodeSpecified = true;
+          const char* srcFactorStr = child->GetAttributeValue ("src");
+          const char* dstFactorStr = child->GetAttributeValue ("dst");
+          uint srcFactor = 0, dstFactor = 0;
+          if (!StringToBlendFactor (srcFactorStr, srcFactor))
+          {
+            Report ("crystalspace.syntax.mixmode",
+              CS_REPORTER_SEVERITY_WARNING,
+	      child, "Invalid blend factor %s", srcFactorStr);
+          }
+          if (!StringToBlendFactor (dstFactorStr, dstFactor))
+          {
+            Report ("crystalspace.syntax.mixmode",
+              CS_REPORTER_SEVERITY_WARNING,
+	      child, "Invalid blend factor %s", srcFactorStr);
+          }
+          mixmode &= ~((CS_MIXMODE_FACT_MASK << 20) | (CS_MIXMODE_FACT_MASK << 16));
+          mixmode |= ((srcFactor << 20) | (dstFactor << 16));
+        }
+        break;
       default:
         ReportBadToken (child);
         return false;
@@ -543,46 +630,96 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
 #undef MIXMODE_EXCLUSIVE
 }
 
+static const char* BlendFactorToString (uint factor)
+{
+  if (factor >= CS_MIXMODE_FACT_COUNT) return 0;
+
+  static const char* factorStrings[CS_MIXMODE_FACT_COUNT] =
+  {
+    "zero", "one", 
+    "srccolor", "srccolor_inv", "dstcolor", "dstcolor_inv", 
+    "srcalpha", "srcalpha_inv", "dstalpha", "dstalpha_inv"
+  };
+
+  return factorStrings[factor];
+}
+
 bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
 					bool /*allowFxMesh*/)
 {
-  switch ( mixmode & CS_FX_MASK_MIXMODE )
+  if ((mixmode & CS_MIXMODE_TYPE_MASK) == CS_MIXMODE_TYPE_AUTO)
+    node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("copy");
+  else if ((mixmode & CS_MIXMODE_TYPE_MASK) == CS_MIXMODE_TYPE_MESH)
+    node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("mesh");
+  else
   {
-    case CS_FX_TRANSPARENT:
-      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("transparent");
-    case CS_FX_COPY: 
-      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("copy");
-      break;
-    case CS_FX_MULTIPLY: 
-      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("multiply");
-      break;
-    case CS_FX_MULTIPLY2: 
-      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("multipy2");
-      break;
-    case CS_FX_ADD: 
-      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("add");
-      break;
-    case CS_FX_DESTALPHAADD:
-      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("destalphaadd");
-      break;
-    case CS_FX_SRCALPHAADD:
-      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("destalphaadd");
-      break;
-    case CS_FX_PREMULTALPHA:
-      node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue("premultalpha");
-      break;
-    case CS_FX_ALPHA:
-      {
-        csRef<iDocumentNode> alpha = node->CreateNodeBefore(CS_NODE_ELEMENT);
-        alpha->SetValue ("alpha");
-        alpha->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat (
-          (float) ((mixmode & CS_FX_MASK_ALPHA) / 255.0f));
-      }
-      break;
-    default:
-      break;
-  }        
+    // mixmode type is "blendop"
+    switch (mixmode & CS_FX_MASK_MIXMODE)
+    {
+      case CS_FX_TRANSPARENT:
+        node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("transparent");
+      case CS_FX_MULTIPLY: 
+        node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("multiply");
+        break;
+      case CS_FX_MULTIPLY2: 
+        node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("multipy2");
+        break;
+      case CS_FX_ADD: 
+        node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("add");
+        break;
+      case CS_FX_DESTALPHAADD:
+        node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("destalphaadd");
+        break;
+      case CS_FX_SRCALPHAADD:
+        node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("destalphaadd");
+        break;
+      case CS_FX_PREMULTALPHA:
+        node->CreateNodeBefore(CS_NODE_ELEMENT)->SetValue ("premultalpha");
+        break;
+      case CS_FX_ALPHA:
+        {
+          csRef<iDocumentNode> alpha = node->CreateNodeBefore(CS_NODE_ELEMENT);
+          alpha->SetValue ("alpha");
+          alpha->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat (
+            (float) ((mixmode & CS_FX_MASK_ALPHA) / 255.0f));
+        }
+        break;
+      default:
+        {
+          csRef<iDocumentNode> blendOp = node->CreateNodeBefore(CS_NODE_ELEMENT);
+          blendOp->SetValue ("blendop");
+          blendOp->SetAttribute ("src", 
+            BlendFactorToString (CS_MIXMODE_BLENDOP_SRC (mixmode)));
+          blendOp->SetAttribute ("dst", 
+            BlendFactorToString (CS_MIXMODE_BLENDOP_DST (mixmode)));
+        }
+    }        
+  }
 
+  // Write out alphatest flag
+  if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) == CS_MIXMODE_ALPHATEST_ENABLE)
+  {
+    csRef<iDocumentNode> alphatest = node->CreateNodeBefore(CS_NODE_ELEMENT);
+    alphatest->SetValue ("alphatest");
+    alphatest->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue ("enable");
+  }
+  else if ((mixmode & CS_MIXMODE_ALPHATEST_MASK) == CS_MIXMODE_ALPHATEST_DISABLE)
+  {
+    csRef<iDocumentNode> alphatest = node->CreateNodeBefore(CS_NODE_ELEMENT);
+    alphatest->SetValue ("alphatest");
+    alphatest->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue ("disable");
+  }
+
+  // Write out alpha value, but only if not written above
+  if (((mixmode & CS_FX_MASK_ALPHA) != 0)
+    && ((mixmode & CS_FX_MASK_MIXMODE) != CS_FX_ALPHA)
+    && ((mixmode & CS_MIXMODE_TYPE_MASK) == CS_MIXMODE_TYPE_BLENDOP))
+  {
+    csRef<iDocumentNode> alpha = node->CreateNodeBefore(CS_NODE_ELEMENT);
+    alpha->SetValue ("alpha");
+    alpha->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsFloat (
+      (float) ((mixmode & CS_FX_MASK_ALPHA) / 255.0f));
+  }
   return true;
 }
 

@@ -32,6 +32,12 @@ chronological order.
 	- res corrected some statements in glfontcache.cpp.
 	- res changed the static class variable macros to not require the 
 	  member to be public.
+	- res added a MsvcExtraFile jamfile statement. Useful for e.g. adding
+	  .tok files to VC projects.
+	- res fixed the static plugin lib generation to properly include
+	  defines and cflags from dependencies.
+	- res augmented the syntax services to parse/write the upgraded mix
+	  modes (with blend ops and alpha test flags).
 15-Apr-2006
 	- Piotr Obrzut fixed small bug in adding positions from map in meshgen.   
 	- Piotr Obrzut did some optimizations to meshgen.

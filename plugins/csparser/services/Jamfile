@@ -6,5 +6,6 @@ Plugin cssynldr
 	: [ Wildcard *.cpp *.h ]
 ;
 Includes syntxldr.h : $(SUBDIR)/syntxldr.tok ;
+MsvcExtraFile cssynldr : $(SUBDIR)/syntxldr.tok ;
 LinkWith cssynldr : crystalspace ;
 
