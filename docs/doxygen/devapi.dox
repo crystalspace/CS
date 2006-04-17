@@ -685,7 +685,8 @@ PREDEFINED             = DOXYGEN_RUN \
 # The macro definition that is found in the sources will be used. 
 # Use the PREDEFINED tag if you want to use a different macro definition. 
 
-EXPAND_AS_DEFINED      =  csAPIENTRY
+EXPAND_AS_DEFINED      =  csAPIENTRY \
+			  CS_EVENTHANDLER_NIL_CONSTRAINTS
 
 
 #---------------------------------------------------------------------------
