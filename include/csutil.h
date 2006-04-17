@@ -38,6 +38,7 @@
 #include "csutil/cmdline.h"
 #include "csutil/comparator.h"
 #include "csutil/compileassert.h"
+#include "csutil/cowwrapper.h"
 #include "csutil/csbaseeventh.h"
 #include "csutil/cscolor.h"
 #include "csutil/csendian.h"
