@@ -28,6 +28,7 @@ chronological order.
 	- res added a simple template "copy-on-write" variables.
 	- res changed the way the csHash<> internal arrays are declared a bit.
 	- res simplified SndSysBasicData::SetDescription().
+	- res tweaked the "VFS not found" message for OS/X.
 15-Apr-2006
 	- Piotr Obrzut fixed small bug in adding positions from map in meshgen.   
 	- Piotr Obrzut did some optimizations to meshgen.

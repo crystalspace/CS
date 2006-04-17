@@ -268,8 +268,13 @@ iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
       csFPrintf (stderr, highlight, "If you're a user:");
       csFPrintf (stderr, "Check the working directory the application starts "
 	"from -\n");
+#if defined(CS_PLATFORM_MACOSX)
+      csFPrintf (stderr, "  on MaxOS/X, it should be the directory containing the\n"
+	"  '<application>.app' subdirectory, *not* '<application>.app/Contents/MacOS'.\n");
+#else
       csFPrintf (stderr, "  usually, it is the same as the directory with the "
 	"executable.\n");
+#endif
       csFPrintf (stderr, "  If in doubt, contact the vendor.\n");
       csFPrintf (stderr, highlight, "If you're a developer:");
       csFPrintf (stderr, "Check if the CRYSTAL environment var points to the\n");
