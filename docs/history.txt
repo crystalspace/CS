@@ -15,6 +15,10 @@ chronological order.
 	- res fixed missing GUID_NULL symbols with Win32 shared library 
 	  builds.
 	- res fixed csjoywin issues with Win32 shared library builds.
+	- res fixed csArray to allow the compiler to not reserve dummy memory
+	  for empty allocator classes.
+	- res changed csArray so that the threshold logic is templated as 
+	  well.
 15-Apr-2006
 	- Piotr Obrzut fixed small bug in adding positions from map in meshgen.   
 	- Piotr Obrzut did some optimizations to meshgen.

@@ -217,6 +217,8 @@ public:
  * \c N elements of type \c T), a memory allocation from the heap is saved.
  * Thus, if you have lots of arrays with a relatively small, well known size
  * you can gain some performance by using this allocator.
+ * \remarks If you nest an array with that allocator into another array,
+ *  you MUST use csSafeCopyArrayMemoryAllocator for the nesting array!
  */
 template<typename T, int N>
 class csArrayLocalBufferAllocator
@@ -347,6 +349,84 @@ public:
 };
 
 /**
+ * csArray variable threshold for capacity handlers.
+ * The threshold is variable at run-time object construction.
+ */
+class csArrayThresholdVariable
+{
+  size_t threshold;
+public:
+  /// Construct with given threshold
+  csArrayThresholdVariable (size_t in_threshold = 0)
+  { threshold = (in_threshold > 0 ? in_threshold : 16); }
+  /// Return the threshold.
+  size_t GetThreshold() const { return threshold; }
+};
+
+/**
+ * csArray fixed threshold for capacity handlers.
+ * The threshold is specified at compile time, hence fixed at runtime.
+ */
+template<int N>
+class csArrayThresholdFixed
+{
+public:
+  /// Construct. \a x is ignored.
+  csArrayThresholdFixed (size_t x = 0)
+  { (void)x; }
+  /// Return the threshold.
+  size_t GetThreshold() const { return N; }
+};
+
+/**
+ * csArray capacity handler.
+ * Different capacity handlers allow to realize different csArray internal
+ * growth behaviours, if needed. This default "linear" handler will
+ * result in array capacity growth to multiples of \a Threshold and works
+ * well enough in most cases.
+ */
+template<typename Threshold = csArrayThresholdVariable>
+class csArrayCapacityLinear : Threshold
+{
+public:
+  //@{
+  /// Construct capacity handler
+  csArrayCapacityLinear () : Threshold () {}
+  csArrayCapacityLinear (const Threshold& threshold) : Threshold (threshold)
+  {}
+  //@}
+  /**
+   * Construct capacity handler with a given size_t parameter for the 
+   * \a Threshold object. The exact meaning of \a x depends on the \a Threshold
+   * implementation.
+   * \remarks Mostly for compatibility with existing code.
+   */
+  csArrayCapacityLinear (const size_t x) : Threshold (x)
+  {}
+
+  /**
+   * Returns "true" if the given capacity is too large for the given count,
+   * that is, if GetCapacity() would return a value for \a count smaller than 
+   * \a capacity.
+   */
+  bool IsCapacityExcessive (size_t capacity, size_t count) const
+  {
+    return (capacity > this->GetThreshold() 
+      && count < capacity - this->GetThreshold());
+  }
+  /**
+   * Compute the capacity for a given number of items. The capacity will 
+   * commonly be larger than the actual \a count to reduce the number of
+   * memory allocations when pushing items onto an array.
+   */
+  size_t GetCapacity (size_t count) const
+  {
+    return ((count + this->GetThreshold() - 1) / this->GetThreshold()) * 
+      this->GetThreshold();
+  }
+};
+
+/**
  * This value is returned whenever an array item could not be located or does
  * not exist.
  */
@@ -362,15 +442,41 @@ const size_t csArrayItemNotFound = (size_t)-1;
  */
 template <class T,
 	class ElementHandler = csArrayElementHandler<T>,
-	class MemoryAllocator = csArrayMemoryAllocator<T> >
+	class MemoryAllocator = csArrayMemoryAllocator<T>,
+        class CapacityHandler = csArrayCapacityLinear<csArrayThresholdVariable> >
 class csArray
 {
 private:
   size_t count;
-  size_t capacity;
-  size_t threshold;
-  T* root;
-  MemoryAllocator memAlloc;
+  /**
+   * Class to eliminate overhead from possibly empty CapacityHandler.
+   * See http://www.cantrip.org/emptyopt.html for details.
+   */
+  struct ArrayCapacity : public CapacityHandler
+  {
+    size_t c;
+    ArrayCapacity (size_t in_capacity)
+    { c = (in_capacity > 0 ? in_capacity : 0); }
+    ArrayCapacity (size_t in_capacity, const CapacityHandler& ch) : 
+      CapacityHandler (ch) 
+    { c = (in_capacity > 0 ? in_capacity : 0); }
+    void CopyFrom (const CapacityHandler& source)
+    {
+      CapacityHandler::operator= (source);
+    }
+  };
+  ArrayCapacity capacity;
+  /**
+   * Class to eliminate overhead from possibly empty MemoryAllocator.
+   * See http://www.cantrip.org/emptyopt.html for details.
+   */
+  struct RootWrapper : public MemoryAllocator
+  {
+    T* p;
+    RootWrapper () {}
+    RootWrapper (T* const p) : p(p) {}
+  };
+  RootWrapper root;
 #ifdef CS_MEMORY_TRACKER
   csMemTrackerInfo* mti;
   void UpdateMti (int dn, int curcapacity)
@@ -378,13 +484,7 @@ private:
     if (!mti)
     {
       if (!curcapacity) return;
-      char buf[1024];
-      strcpy (buf, "csArray<");
-      size_t l = strlen (typeid (T).name ());
-      if (l > 1000) l = 1000;
-      strncat (buf, typeid (T).name (), l);
-      strcat (buf, ">");
-      mti = mtiRegisterAlloc (1 * sizeof (T), buf);
+      mti = mtiRegisterAlloc (1 * sizeof (T), (void*)typeid (*this).name());
       if (!mti) return;
       curcapacity--;
       if (curcapacity)
@@ -402,41 +502,37 @@ protected:
    */
   void InitRegion (size_t start, size_t count)
   {
-    ElementHandler::InitRegion (root+start, count);
+    ElementHandler::InitRegion (root.p+start, count);
   }
 
 private:
   /// Copy from one array to this one, properly constructing the copied items.
   void CopyFrom (const csArray& source)
   {
-    if (&source != this)
-    {
-      DeleteAll ();
-      threshold = source.threshold;
-      SetSizeUnsafe (source.Length ());
-      for (size_t i=0 ; i<source.Length() ; i++)
-        ElementHandler::Construct (root + i, source[i]);
-    }
+    capacity.CopyFrom (source.capacity);
+    SetSizeUnsafe (source.Length ());
+    for (size_t i=0 ; i<source.Length() ; i++)
+      ElementHandler::Construct (root.p + i, source[i]);
   }
 
   /// Set the capacity of the array precisely to \c n elements.
   void InternalSetCapacity (size_t n)
   {
-    if (root == 0)
+    if (root.p == 0)
     {
-      root = memAlloc.Alloc (n);
+      root.p = root.Alloc (n);
 #ifdef CS_MEMORY_TRACKER
       UpdateMti (int (n), int (n));
 #endif
     }
     else
     {
-      root = memAlloc.Realloc (root, count, capacity, n);
+      root.p = root.Realloc (root.p, count, capacity.c, n);
 #ifdef CS_MEMORY_TRACKER
-      UpdateMti (int (n-capacity), int (n));
+      UpdateMti (int (n-capacity.c), int (n));
 #endif
     }
-    capacity = n;
+    capacity.c = n;
   }
 
   /**
@@ -445,9 +541,9 @@ private:
    */
   void AdjustCapacity (size_t n)
   {
-    if (n > capacity || (capacity > threshold && n < capacity - threshold))
+    if (n > capacity.c || capacity.IsCapacityExcessive (capacity.c, n))
     {
-      InternalSetCapacity (((n + threshold - 1) / threshold ) * threshold);
+      InternalSetCapacity (capacity.GetCapacity (n));
     }
   }
 
@@ -459,7 +555,7 @@ private:
    */
   void SetSizeUnsafe (size_t n)
   {
-    if (n > capacity)
+    if (n > capacity.c)
       AdjustCapacity (n);
     count = n;
   }
@@ -486,24 +582,23 @@ public:
    * to increase storage by \c in_threshold each time the upper bound is
    * exceeded.
    */
-  csArray (size_t in_capacity = 0, size_t in_threshold = 0)
+  csArray (size_t in_capacity = 0, 
+    const CapacityHandler& ch = CapacityHandler()) : count (0), 
+    capacity (in_capacity, ch)
   {
 #ifdef CS_MEMORY_TRACKER
     mti = 0;
 #endif
-    count = 0;
-    capacity = (in_capacity > 0 ? in_capacity : 0);
-    threshold = (in_threshold > 0 ? in_threshold : 16);
-    if (capacity != 0)
+    if (capacity.c != 0)
     {
-      root = memAlloc.Alloc (capacity);
+      root.p = root.Alloc (capacity.c);
 #ifdef CS_MEMORY_TRACKER
-      UpdateMti (int (capacity), int (capacity));
+      UpdateMti (int (capacity.c), int (capacity.c));
 #endif
     }
     else
     {
-      root = 0;
+      root.p = 0;
     }
   }
 
@@ -514,21 +609,23 @@ public:
   }
 
   /// Copy constructor.
-  csArray (const csArray& source)
+  csArray (const csArray& source) : count (0), capacity (0), root (0)
   {
 #ifdef CS_MEMORY_TRACKER
     mti = 0;
 #endif
-    root = 0;
-    capacity = 0;
-    count = 0;
     CopyFrom (source);
   }
 
   /// Assignment operator.
-  csArray<T,ElementHandler,MemoryAllocator>& operator= (const csArray& other)
+  csArray<T,ElementHandler,MemoryAllocator,CapacityHandler>& operator= (
+    const csArray& other)
   {
-    CopyFrom (other);
+    if (&other != this)
+    {
+      DeleteAll ();
+      CopyFrom (other);
+    }
     return *this;
   }
 
@@ -550,7 +647,7 @@ public:
   /// Query vector capacity.  Note that you should rarely need to do this.
   size_t Capacity () const
   {
-    return capacity;
+    return capacity.c;
   }
 
   /**
@@ -567,13 +664,12 @@ public:
       destination.root = root;
       destination.count = count;
       destination.capacity = capacity;
-      destination.threshold = threshold;
 #ifdef CS_MEMORY_TRACKER
       destination.mti = mti;
       mti = 0;
 #endif
       root = 0;
-      capacity = count = 0;
+      capacity.c = count = 0;
     }
   }
 
@@ -597,7 +693,7 @@ public:
       size_t old_len = Length ();
       SetSizeUnsafe (n);
       for (size_t i = old_len ; i < n ; i++)
-        ElementHandler::Construct (root + i, what);
+        ElementHandler::Construct (root.p + i, what);
     }
   }
 
@@ -618,7 +714,7 @@ public:
     {
       size_t old_len = Length ();
       SetSizeUnsafe (n);
-      ElementHandler::InitRegion (root + old_len, n-old_len);
+      ElementHandler::InitRegion (root.p + old_len, n-old_len);
     }
   }
 
@@ -635,14 +731,14 @@ public:
   T& Get (size_t n)
   {
     CS_ASSERT (n < count);
-    return root[n];
+    return root.p[n];
   }
 
   /// Get an element (const).
   T const& Get (size_t n) const
   {
     CS_ASSERT (n < count);
-    return root[n];
+    return root.p[n];
   }
 
   /**
@@ -654,7 +750,7 @@ public:
   {
     if (n >= count)
       SetSize (n+1);
-    return root[n];
+    return root.p[n];
   }
 
   /// Get an element (non-const).
@@ -674,8 +770,8 @@ public:
   {
     if (n >= count)
       SetSize (n+1);
-    ElementHandler::Destroy (root + n);
-    ElementHandler::Construct (root + n, what);
+    ElementHandler::Destroy (root.p + n);
+    ElementHandler::Construct (root.p + n, what);
   }
 
   /**
@@ -689,7 +785,7 @@ public:
   size_t FindKey (csArrayCmpDecl(T,K) comparekey) const
   {
     for (size_t i = 0 ; i < Length () ; i++)
-      if (csArrayCmpInvoke(comparekey, root[i]) == 0)
+      if (csArrayCmpInvoke(comparekey, root.p[i]) == 0)
         return i;
     return csArrayItemNotFound;
   }
@@ -700,8 +796,8 @@ public:
    */
   size_t Push (T const& what)
   {
-    if (((&what >= root) && (&what < root + Length())) &&
-      (capacity < count + 1))
+    if (((&what >= root.p) && (&what < root.p + Length())) &&
+      (capacity.c < count + 1))
     {
       /*
         Special case: An element from this very array is pushed, and a
@@ -709,14 +805,14 @@ public:
 	element to be pushed to be read from deleted memory. Work
 	around this.
        */
-      size_t whatIndex = &what - root;
+      size_t whatIndex = &what - root.p;
       SetSizeUnsafe (count + 1);
-      ElementHandler::Construct (root + count - 1, root[whatIndex]);
+      ElementHandler::Construct (root.p + count - 1, root.p[whatIndex]);
     }
     else
     {
       SetSizeUnsafe (count + 1);
-      ElementHandler::Construct (root + count - 1, what);
+      ElementHandler::Construct (root.p + count - 1, what);
     }
     return count - 1;
   }
@@ -735,8 +831,8 @@ public:
   T Pop ()
   {
     CS_ASSERT (count > 0);
-    T ret(root [count - 1]);
-    ElementHandler::Destroy (root + count - 1);
+    T ret(root.p [count - 1]);
+    ElementHandler::Destroy (root.p + count - 1);
     SetSizeUnsafe (count - 1);
     return ret;
   }
@@ -745,14 +841,14 @@ public:
   T const& Top () const
   {
     CS_ASSERT (count > 0);
-    return root [count - 1];
+    return root.p [count - 1];
   }
 
   /// Return the top element but do not remove it. (non-const)
   T& Top ()
   {
     CS_ASSERT (count > 0);
-    return root [count - 1];
+    return root.p [count - 1];
   }
 
   /// Insert element \c item before element \c n.
@@ -763,8 +859,8 @@ public:
       SetSizeUnsafe (count + 1); // Increments 'count' as a side-effect.
       size_t const nmove = (count - n - 1);
       if (nmove > 0)
-	memAlloc.MemMove (root, n+1, n, nmove);
-      ElementHandler::Construct (root + n, item);
+	root.MemMove (root.p, n+1, n, nmove);
+      ElementHandler::Construct (root.p + n, item);
       return true;
     }
     else
@@ -778,7 +874,7 @@ public:
   {
     CS_ASSERT (high < count && high >= low);
     csArray<T> sect (high - low + 1);
-    for (size_t i = low; i <= high; i++) sect.Push (root[i]);
+    for (size_t i = low; i <= high; i++) sect.Push (root.p[i]);
     return sect;
   }
 
@@ -795,7 +891,7 @@ public:
     while (l < r)
     {
       m = (l + r) / 2;
-      int cmp = csArrayCmpInvoke(comparekey, root[m]);
+      int cmp = csArrayCmpInvoke(comparekey, root.p[m]);
       if (cmp == 0)
       {
         if (candidate) *candidate = csArrayItemNotFound;
@@ -806,6 +902,8 @@ public:
       else
         r = m;
     }
+    if ((m + 1) == r)
+      m++;
     if (candidate) *candidate = m;
     return csArrayItemNotFound;
   }
@@ -828,7 +926,7 @@ public:
     while (l < r)
     {
       m = (l + r) / 2;
-      int cmp = compare (root [m], item);
+      int cmp = compare (root.p [m], item);
 
       if (cmp == 0)
       {
@@ -857,7 +955,7 @@ public:
   size_t Find (T const& which) const
   {
     for (size_t i = 0 ; i < Length () ; i++)
-      if (root[i] == which)
+      if (root.p[i] == which)
         return i;
     return csArrayItemNotFound;
   }
@@ -874,9 +972,9 @@ public:
    */
   size_t GetIndex (const T* which) const
   {
-    CS_ASSERT (which >= root);
-    CS_ASSERT (which < (root + count));
-    return which-root;
+    CS_ASSERT (which >= root.p);
+    CS_ASSERT (which < (root.p + count));
+    return which-root.p;
   }
 
   /**
@@ -884,7 +982,7 @@ public:
    */
   void Sort (int (*compare)(T const&, T const&) = DefaultCompare)
   {
-    qsort (root, Length(), sizeof(T),
+    qsort (root.p, Length(), sizeof(T),
       (int (*)(void const*, void const*))compare);
   }
 
@@ -893,17 +991,17 @@ public:
    */
   void DeleteAll ()
   {
-    if (root)
+    if (root.p)
     {
       size_t i;
       for (i = 0 ; i < count ; i++)
-        ElementHandler::Destroy (root + i);
-      memAlloc.Free (root);
+        ElementHandler::Destroy (root.p + i);
+      root.Free (root.p);
 #     ifdef CS_MEMORY_TRACKER
-      UpdateMti (-int (capacity), 0);
+      UpdateMti (-int (capacity.c), 0);
 #     endif
-      root = 0;
-      capacity = count = 0;
+      root.p = 0;
+      capacity.c = count = 0;
     }
   }
 
@@ -924,7 +1022,7 @@ public:
     if (n < count)
     {
       for (size_t i = n; i < count; i++)
-        ElementHandler::Destroy (root + i);
+        ElementHandler::Destroy (root.p + i);
       SetSizeUnsafe(n);
     }
   }
@@ -986,13 +1084,13 @@ public:
     {
       DeleteAll ();
     }
-    else if (count != capacity)
+    else if (count != capacity.c)
     {
-      root = memAlloc.Realloc (root, count, capacity, count);
+      root.p = root.Realloc (root.p, count, capacity.c, count);
 #ifdef CS_MEMORY_TRACKER
-      UpdateMti (int (count-capacity), int (count));
+      UpdateMti (int (count-capacity.c), int (count));
 #endif
-      capacity = count;
+      capacity.c = count;
     }
   }
 
@@ -1010,9 +1108,9 @@ public:
     {
       size_t const ncount = count - 1;
       size_t const nmove = ncount - n;
-      ElementHandler::Destroy (root + n);
+      ElementHandler::Destroy (root.p + n);
       if (nmove > 0)
-	memAlloc.MemMove (root, n, n+1, nmove);
+	root.MemMove (root.p, n, n+1, nmove);
       SetSizeUnsafe (ncount);
       return true;
     }
@@ -1035,9 +1133,9 @@ public:
     {
       size_t const ncount = count - 1;
       size_t const nmove = ncount - n;
-      ElementHandler::Destroy (root + n);
+      ElementHandler::Destroy (root.p + n);
       if (nmove > 0)
-        memAlloc.MemMove (root, n, ncount, 1);
+        root.MemMove (root.p, n, ncount, 1);
       SetSizeUnsafe (ncount);
       return true;
     }
@@ -1059,13 +1157,13 @@ public:
     if (end >= count) end = count - 1;
     size_t i;
     for (i = start ; i <= end ; i++)
-      ElementHandler::Destroy (root + i);
+      ElementHandler::Destroy (root.p + i);
 
     size_t const range_size = end - start + 1;
     size_t const ncount = count - range_size;
     size_t const nmove = count - end - 1;
     if (nmove > 0)
-      memAlloc.MemMove (root, start, start + range_size, nmove);
+      root.MemMove (root.p, start, start + range_size, nmove);
     SetSizeUnsafe (ncount);
   }
 
