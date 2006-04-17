@@ -23,7 +23,14 @@
 // Must appear first after cssysdef.h
 
 #include "csextern_dx.h"
+// Hack to export GUID_NULL from crystalspace_directx, too
+#ifdef CS_BUILD_SHARED_LIBS
+#define GUID_NULL	_DEFAULT_GUID_NULL
+#endif
 #include <windows.h>
+#ifdef CS_BUILD_SHARED_LIBS
+#undef GUID_NULL
+#endif
 
 #ifdef CS_BUILD_SHARED_LIBS
 // Modify DEFINE_GUID macro to do DLL importing
@@ -36,6 +43,8 @@
 #else
 #define DEFINE_GUID(n,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) GUID_EXT const GUID n
 #endif
+
+GUID_EXT const GUID GUID_NULL;
 
 #endif // CS_BUILD_SHARED_LIBS
 

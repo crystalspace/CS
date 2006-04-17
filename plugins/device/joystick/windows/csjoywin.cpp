@@ -17,6 +17,8 @@
 */
 
 #include "cssysdef.h"
+#include "csplugincommon/directx/guids.h"
+
 #include "csutil/csstring.h"
 #include "csutil/event.h"
 #include "csutil/util.h"
@@ -25,8 +27,6 @@
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
 
-#define INITGUID
-#include <windows.h>
 // using DirectInput -- included from csjoywin.h
 #include "csjoywin.h"
 
@@ -36,9 +36,10 @@
 // #define CS_WINDOWS_JOYSTICK_CFG "/config/joystick.cfg"
 // #define CS_WINDOWS_JOYSTICK_KEY "Device.Joystick." CS_PLATFORM_NAME "."
 
-CS_IMPLEMENT_PLUGIN;
+CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::JoystickWin;
+CS_PLUGIN_NAMESPACE_BEGIN(JoystickWin)
+{
 
 SCF_IMPLEMENT_FACTORY (csWindowsJoystick);
 
@@ -299,3 +300,5 @@ void csWindowsJoystick::ReportDXError (HRESULT hr, const char* msg, ...)
   va_end (arg);
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(JoystickWin)

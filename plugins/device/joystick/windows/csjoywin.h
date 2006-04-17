@@ -30,17 +30,10 @@
 #define DIRECTINPUT_VERSION 0x0500
 // @@@ Should be able build on older SDKs as well
 #include <dinput.h>
-#ifdef CS_COMPILER_BCC
 #include "dinputdefs.h"
-#endif
 
-namespace CS
+CS_PLUGIN_NAMESPACE_BEGIN(JoystickWin)
 {
-namespace Plugins
-{
-namespace JoystickWin
-{
-
 
 /**
  * This plugin puts joystick events in the CS eventqueue.
@@ -115,8 +108,7 @@ private:
   /** @} */
 };
 
-} // namespace JoystickWin
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(JoystickWin)
 
 #endif // __CS_CSJOYWIN_H__

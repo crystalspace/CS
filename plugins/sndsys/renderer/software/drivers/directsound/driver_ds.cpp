@@ -17,6 +17,8 @@
 */
 
 #include "cssysdef.h"
+#include "csplugincommon/directx/guids.h"
+
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
 
