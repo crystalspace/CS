@@ -74,6 +74,8 @@ struct iConditionResolver
   virtual void AddNode (csConditionNode* parent,
     csConditionID condition, csConditionNode*& trueNode, 
     csConditionNode*& falseNode) = 0;
+  /// Finish adding of nodes. Frees up some tempoarily used resources.
+  virtual void FinishAdding () = 0;
 
   virtual const char* ParseCondition (const char* str, size_t len, 
     CondOperation& operation) = 0;
@@ -168,7 +170,8 @@ class csWrappedDocumentNode :
   template<typename ConditionEval>
   void ProcessInclude (ConditionEval& eval, const csString& filename, 
     NodeProcessingState* state, iDocumentNode* node);
-  void ProcessTemplate (iDocumentNode* templNode, 
+  template<typename ConditionEval>
+  void ProcessTemplate (ConditionEval& eval, iDocumentNode* templNode, 
     NodeProcessingState* state);
   bool InvokeTemplate (Template* templ, const csArray<csString>& params,
     csRefArray<iDocumentNode>& templatedNodes);
@@ -177,6 +180,8 @@ class csWrappedDocumentNode :
     iDocumentNode* node, NodeProcessingState* state, 
     const csArray<csString>& params);
   void ValidateTemplateEnd (iDocumentNode* node, 
+    NodeProcessingState* state);
+  void ValidateGenerateEnd (iDocumentNode* node, 
     NodeProcessingState* state);
   void ParseTemplateArguments (const char* str, 
     csArray<csString>& strings);
@@ -226,20 +231,15 @@ public:
     bool defaultvalue = false);
 };
 
-class csTextNodeWrapper : public scfImplementationExt0<csTextNodeWrapper, 
-                                                       csDocumentNodeReadOnly>
+class csTextNodeWrapper : 
+  public scfImplementationPooled<scfImplementationExt0<csTextNodeWrapper, 
+                                                       csDocumentNodeReadOnly> >
 {
   char* nodeText;
   csRef<iDocumentNode> realMe;
 public:
-  //SCF_DECLARE_IBASE_POOLED(csTextNodeWrapper); //@@TODO: Make pooled again
-  class Pool
-  {
-  };
-
-  csTextNodeWrapper (Pool* pool);
+  csTextNodeWrapper (iDocumentNode* realMe, const char* text);
   virtual ~csTextNodeWrapper ();
-  void SetData (iDocumentNode* realMe, const char* text);
 
   virtual csDocumentNodeType GetType ()
   { return CS_NODE_TEXT; }
@@ -256,9 +256,12 @@ public:
   { return 0; }
 };
 
-class csWrappedDocumentNodeIterator : public iDocumentNodeIterator
+class csWrappedDocumentNodeIterator : 
+  public scfImplementationPooled<
+    scfImplementation1<csWrappedDocumentNodeIterator, 
+                       iDocumentNodeIterator> >
 {
-  char* filter;
+  csString filter;
 
   csWrappedDocumentNode* parentNode;
   csWrappedDocumentNode::WrapperWalker walker;
@@ -266,12 +269,9 @@ class csWrappedDocumentNodeIterator : public iDocumentNodeIterator
   void SeekNext();
 public:
   CS_LEAKGUARD_DECLARE(csWrappedDocumentNodeIterator);
-  SCF_DECLARE_IBASE_POOLED(csWrappedDocumentNodeIterator);
 
-  csWrappedDocumentNodeIterator (Pool* pool);
+  csWrappedDocumentNodeIterator (csWrappedDocumentNode* node, const char* filter);
   virtual ~csWrappedDocumentNodeIterator ();
-
-  void SetData (csWrappedDocumentNode* node, const char* filter);
 
   virtual bool HasNext ();
   virtual csRef<iDocumentNode> Next ();
@@ -299,6 +299,8 @@ class csWrappedDocumentNodeFactory
     PITOKEN_TEMPLATE_NEW = 0xfeeb1e,
     PITOKEN_ENDTEMPLATE_NEW,
     PITOKEN_INCLUDE_NEW,
+    PITOKEN_GENERATE,
+    PITOKEN_ENDGENERATE
   };
 
   csString* currentOut;

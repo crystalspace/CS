@@ -23,6 +23,7 @@
 #include "csutil/array.h"
 #include "csutil/bitarray.h"
 #include "csutil/blockallocator.h"
+#include "csutil/cowwrapper.h"
 #include "csutil/hashr.h"
 #include "csutil/ptrwrap.h"
 #include "csgeom/math.h"
@@ -33,6 +34,7 @@
 #include "expparser.h"
 #include "logic3.h"
 #include "valueset.h"
+#include "mybitarray.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
@@ -40,174 +42,409 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 /// Container for shader expression constants
 class csConditionEvaluator;
 
+/**
+ * Class for an optimization: Some compilers use a 'vector ctor' even if the
+ * array has just a size of 1, so specialize 1-elemented arrays that they 
+ * aren't arrays at all.
+ */
+template<int N>
+struct ValueSetArray
+{
+  ValueSet x[N];
+
+  ValueSet& operator[] (size_t index) 
+  {
+    CS_ASSERT(index < N);
+    return x[index];
+  }
+  const ValueSet& operator[] (size_t index) const
+  {
+    CS_ASSERT(index < N);
+    return x[index];
+  }
+};
+
+CS_SPECIALIZE_TEMPLATE
+struct ValueSetArray<1>
+{
+  ValueSet x;
+
+  ValueSet& operator[] (size_t index) 
+  {
+    CS_ASSERT(index == 0);
+    (void)index;
+    return x;
+  }
+  const ValueSet& operator[] (size_t index) const
+  {
+    CS_ASSERT(index == 0);
+    (void)index;
+    return x;
+  }
+};
+
 class Variables
 {
 public:
   struct Values
   {
-    // The variable "itself" (boolean for variables resp. constants)
-    ValueSet var;
-    struct ValueSetVector
+    void IncRef () { refcount++; }
+    static size_t deallocCount;
+    void DecRef () 
+    { 
+      refcount--; 
+      if (refcount == 0) 
+      {
+        Variables::ValAlloc().Free (this);
+        deallocCount++;
+        if (deallocCount > 65536)
+        {
+          Variables::ValAlloc().Compact();
+          deallocCount = 0;
+        }
+      }
+    }
+    int GetRefCount () const { return refcount; }
+
+  private:
+    int refcount;
+    CS_DECLARE_STATIC_CLASSVAR_REF (def, Def, ValueSet);
+
+    enum
     {
-      ValueSet x;
-      ValueSet y;
-      ValueSet z;
-      ValueSet w;
+      valueVar = 0,
+      valueVec0,
+      valueVec1,
+      valueVec2,
+      valueVec3,
+      valueTex,
+      valueBuf,
 
-      ValueSetVector () {}
-      ValueSetVector (const ValueSetVector& other) : 
-	x (other.x), y (other.y), z (other.z), w (other.w) {}
-      ValueSetVector (const float f) : x (f), y (f), z (f), w (f) {}
+      valueFirst = valueVar,
+      valueLast = valueBuf,
 
-      ValueSet& operator[] (int i)
-      { return (i&2)?((i&1)?y:x):((i&1)?w:z); }
-      const ValueSet& operator[] (int i) const
-      { return (i&2)?((i&1)?y:x):((i&1)?w:z); }
-    } vec;
-    ValueSet tex;
-    ValueSet buf;
+      // Bits needed to store one of the value* values above
+      valueBits = 3,
+      valueIndexOffs = valueLast + 1
+    };
+    uint valueFlags;
+    void SetValueIndex (uint value, uint index)
+    {
+      static const uint valueMask = (1 << valueBits) - 1;
+      uint shift = valueIndexOffs + value * valueBits;
+      valueFlags &= ~(valueMask << shift);
+      valueFlags |= index << shift;
+    }
+    uint GetValueIndex (uint value) const
+    {
+      static const uint valueMask = (1 << valueBits) - 1;
+      uint shift = valueIndexOffs + value * valueBits;
+      return (valueFlags >> shift) & valueMask;
+    }
 
-    Values () {}
-    Values (const float f) : var (f), vec (f), tex (f), buf (f) { }
+    /* It works like this:
+     * - the first inlinedSets value sets are inlined
+     * - all sets above that stored in multiValues
+     * - since the references may not move, use a linked list for the
+     *   non-inlined sets.
+     */
+    const static uint inlinedSets = 1;
+    ValueSetArray<inlinedSets> inlineValues;
+    struct ValueSetChain
+    {
+      ValueSet vs;
+      ValueSetChain* nextPlease;
+
+      ValueSetChain() : nextPlease (0) {}
+      ValueSetChain (const ValueSetChain& other) : vs (other.vs), 
+        nextPlease (0) {}
+      ~ValueSetChain() { delete nextPlease; }
+      // @@@ TODO: probably should use a blockalloc here as well
+    };
+    ValueSetChain* multiValues;
+
+    ValueSet& GetMultiValue (uint num);
+    const ValueSet& GetMultiValue (uint num) const;
+
+    ValueSet& GetValue (int type);
+    const ValueSet& GetValue (int type) const;
+
+    uint ValueCount (uint flags) const
+    {
+      uint n = 0;
+      for (uint v = valueFirst; v <= valueLast; v++)
+        if (flags & (1 << v)) n++;
+      return n;
+    }
+    
+  public:
+    ValueSet& GetVar() { return GetValue (valueVar); }
+    const ValueSet& GetVar() const { return GetValue (valueVar); }
+    ValueSet& GetVec (int n) 
+    { 
+      CS_ASSERT((n >= 0) && (n < 4));
+      return GetValue (valueVec0 + n);
+    }
+    const ValueSet& GetVec (int n) const
+    { 
+      CS_ASSERT((n >= 0) && (n < 4));
+      return GetValue (valueVec0 + n);
+    }
+    ValueSet& GetTex() { return GetValue (valueTex); }
+    const ValueSet& GetTex() const { return GetValue (valueTex); }
+    ValueSet& GetBuf() { return GetValue (valueBuf); }
+    const ValueSet& GetBuf() const { return GetValue (valueBuf); }
+
+    Values () : refcount (1), valueFlags (0), multiValues (0) { }
+    Values (const Values& other) : refcount (1), valueFlags (other.valueFlags), 
+      multiValues (0)
+    {
+      for (uint n = 0; n < inlinedSets; n++)
+      {
+        inlineValues[n] = other.inlineValues[n];
+      }
+
+      ValueSetChain* s = other.multiValues;
+      ValueSetChain** d = &multiValues;
+      while (s != 0)
+      {
+        ValueSetChain* p = new ValueSetChain (*s);
+        *d = p;
+        d = &p->nextPlease;
+        s = s->nextPlease;
+      }
+    }
+    ~Values()
+    {
+      delete multiValues;
+    }
 
     Values& operator=(const Values& other)
     {
-      var = other.var;
-      vec.x = other.vec.x;
-      vec.y = other.vec.y;
-      vec.z = other.vec.z;
-      vec.w = other.vec.w;
-      tex = other.tex;
-      buf = other.buf;
+      valueFlags = other.valueFlags;
+
+      for (uint n = 0; n < inlinedSets; n++)
+      {
+        inlineValues[n] = other.inlineValues[n];
+      }
+
+      delete multiValues; multiValues = 0;
+      ValueSetChain* s = other.multiValues;
+      ValueSetChain** d = &multiValues;
+      while (s != 0)
+      {
+        ValueSetChain* p = new ValueSetChain (*s);
+        *d = p;
+        d = &p->nextPlease;
+        s = s->nextPlease;
+      }
       return *this;
     }
     friend Values operator& (const Values& a, const Values& b)
     {
       Values newValues;
-      newValues.var = a.var & b.var;
-      newValues.vec.x = a.vec.x & b.vec.x;
-      newValues.vec.y = a.vec.y & b.vec.y;
-      newValues.vec.z = a.vec.z & b.vec.z;
-      newValues.vec.w = a.vec.w & b.vec.w;
-      newValues.tex = a.tex & b.tex;
-      newValues.buf = a.buf & b.buf;
+      for (int v = valueFirst; v <= valueLast; v++)
+      {
+        const bool aHas = (a.valueFlags & (1 << v)) != 0;
+        const bool bHas = (b.valueFlags & (1 << v)) != 0;
+        if (aHas && bHas)
+          newValues.GetValue (v) = a.GetValue (v) & b.GetValue (v);
+        else if (aHas && !bHas)
+          newValues.GetValue (v) = a.GetValue (v);
+        else if (!aHas && bHas)
+          newValues.GetValue (v) = b.GetValue (v);
+      }
       return newValues;
+    }
+    Values& operator&= (const Values& other)
+    {
+      for (int v = valueFirst; v <= valueLast; v++)
+      {
+        if (other.valueFlags & (1 << v))
+          GetValue (v) &= other.GetValue (v);
+      }
+      return *this;
     }
     friend Values operator| (const Values& a, const Values& b)
     {
       Values newValues;
-      newValues.var = a.var | b.var;
-      newValues.vec.x = a.vec.x | b.vec.x;
-      newValues.vec.y = a.vec.y | b.vec.y;
-      newValues.vec.z = a.vec.z | b.vec.z;
-      newValues.vec.w = a.vec.w | b.vec.w;
-      newValues.tex = a.tex | b.tex;
-      newValues.buf = a.buf | b.buf;
+      for (int v = valueFirst; v <= valueLast; v++)
+      {
+        const bool aHas = (a.valueFlags & (1 << v)) != 0;
+        const bool bHas = (b.valueFlags & (1 << v)) != 0;
+        if (aHas && bHas)
+          newValues.GetValue (v) = a.GetValue (v) | b.GetValue (v);
+      }
       return newValues;
+    }
+    Values& operator|= (const Values& other)
+    {
+      for (int v = valueFirst; v <= valueLast; v++)
+      {
+        if (valueFlags & (1 << v))
+          GetValue (v) |= other.GetValue (v);
+      }
+      return *this;
     }
     friend Logic3 operator== (const Values& a, const Values& b);
     friend Logic3 operator!= (const Values& a, const Values& b);
 
     friend Logic3 operator< (const Values& a, const Values& b);
     friend Logic3 operator<= (const Values& a, const Values& b);
+
+    static void CompactAllocator()
+    {
+      ValAlloc().Compact();
+      CowBlockAllocator::CompactAllocator();
+    }
   };
 protected:
-  Values def;
-  csArray<csPtrWrap<Values> > possibleValues;
-  csBlockAllocator<Values> valAlloc;
+  CS_DECLARE_STATIC_CLASSVAR_REF (valAlloc,
+    ValAlloc, csBlockAllocator<Values>);
+  static size_t valDeAllocCount;
+  CS_DECLARE_STATIC_CLASSVAR (def,
+    Def, Values);
 
-  void CopyValues (const Variables& other)
+  class ValuesWrapper
   {
-    possibleValues.SetSize (other.possibleValues.GetSize());
-    for (size_t i = 0; i < other.possibleValues.GetSize(); i++)
-    {
-      const Values* v = other.possibleValues[i];
-      if (v != 0)
-      {
-        Values* newVals = valAlloc.Alloc ();
-        *newVals = *v;
-        possibleValues[i] = newVals;
-      }
+    csRef<Values> values;
+  public:
+    operator const Values* () const 
+    { 
+      return values; 
     }
-  }
+    operator csRef<Values>& () 
+    { 
+      if (values.IsValid() && (values->GetRefCount() > 1))
+      {
+        Values* newVals = ValAlloc().Alloc ();
+        *newVals = *values;
+        values.AttachNew (newVals);
+      }
+      return values; 
+    }
+  };
+
+  struct ValuesArray
+  {
+    struct Entry
+    {
+      csStringID n;
+      ValuesWrapper v;
+
+      inline operator csStringID() const { return n; }
+    };
+    typedef csArray<Entry, csArrayElementHandler<Entry>,
+      csArrayMemoryAllocator<Entry>,
+      csArrayCapacityLinear<csArrayThresholdFixed<4> > > ArrayType;
+
+    ArrayType _array;
+    inline operator ArrayType& ()
+    {
+      return _array;
+    }
+    inline ValuesWrapper& GetExtend (csStringID n) 
+    { 
+      size_t candidate;
+      size_t index = _array.FindSortedKey (csArrayCmp<Entry, csStringID> (n),
+        &candidate);
+      if (index != csArrayItemNotFound) return _array[index].v;
+      Entry newEntry;
+      newEntry.n = n;
+      _array.Insert (candidate, newEntry);
+      return _array[candidate].v;
+    }
+    inline size_t GetSize () const { return _array.GetSize (); }
+    inline ValuesWrapper& GetIndex (size_t n) { return _array.Get (n).v; }
+    inline const ValuesWrapper& Get (csStringID n) const 
+    { 
+      size_t index = _array.FindSortedKey (csArrayCmp<Entry, csStringID> (n));
+      return _array[index].v;
+    }
+    inline bool Has (csStringID n) const
+    { 
+      size_t index = _array.FindSortedKey (csArrayCmp<Entry, csStringID> (n));
+      return index != csArrayItemNotFound;
+    }
+    inline const Entry& operator[] (size_t n) const { return _array[n]; }
+    inline void Delete (csStringID n)
+    {
+      size_t index = _array.FindSortedKey (csArrayCmp<Entry, csStringID> (n));
+      _array.DeleteIndex (index);
+    }
+    inline void DeleteIndex (size_t index) { _array.DeleteIndex (index); }
+  };
+  class CowBlockAllocator;
+  typedef CS::CowWrapper<ValuesArray, CowBlockAllocator> ValuesArrayWrapper;
+  class CowBlockAllocator
+  {
+  public:
+    typedef csBlockAllocator<uint8[ValuesArrayWrapper::allocSize]> BlockAlloc;
+  private:
+    CS_DECLARE_STATIC_CLASSVAR_REF (allocator,
+      Allocator, BlockAlloc);
+  public:
+    static void* Alloc (size_t n)
+    {
+      CS_ASSERT(n == ValuesArrayWrapper::allocSize);
+      return Allocator().AllocUninit ();
+    }
+    static void Free (void* p)
+    {
+      Allocator().Free ((uint8(*)[ValuesArrayWrapper::allocSize])p, false);
+    }
+    static void CompactAllocator()
+    {
+      Allocator().Compact();
+    }
+  };
+  ValuesArrayWrapper possibleValues;
 public:
-  Variables () {}
-  Variables (const Variables& other)
-  { CopyValues (other); }
+  Variables () : possibleValues (ValuesArray ()) {}
+  Variables (const Variables& other) : possibleValues (other.possibleValues)
+  { }
   Variables& operator= (const Variables& other)
   {
-    valAlloc.Empty();
-    possibleValues.Empty();
-    CopyValues (other);
+    possibleValues = other.possibleValues;
     return *this;
+  }
+  ~Variables () 
+  {
   }
 
   Values* GetValues (csStringID variable)
   {
-    Values*& vals = possibleValues.GetExtend (variable);
-    if (!vals) vals = valAlloc.Alloc();
+    csRef<Values>& vals = possibleValues->GetExtend (variable);
+    if (!vals) vals.AttachNew (ValAlloc().Alloc());
     return vals;
   }
   const Values* GetValues (csStringID variable) const
   {
     const Values* vals = 0;
-    if (possibleValues.GetSize () > variable)
-      vals = possibleValues[variable];
+    if (possibleValues->Has (variable))
+      vals = possibleValues->Get (variable);
     if (vals != 0)
       return vals;
     else
-      return &def;
-  }
-  friend Variables operator& (const Variables& a, const Variables& b)
-  {
-    Variables newVars;
-    const csArray<csPtrWrap<Values> >& pvA = a.possibleValues;
-    const csArray<csPtrWrap<Values> >& pvB = b.possibleValues;
-    const size_t num = csMax (pvA.GetSize(), pvB.GetSize());
-    for (size_t i = 0; i < num; i++)
-    {
-      const Values* va = (i < pvA.GetSize()) ? pvA[i] : 0;
-      const Values* vb = (i < pvB.GetSize()) ? pvB[i] : 0;
-      if ((va != 0) || (vb != 0))
-      {
-        if (va == 0)
-        {
-          Values*& v = newVars.possibleValues.GetExtend (i);
-          v = newVars.valAlloc.Alloc ();
-          *v = *vb;
-        }
-        else if (vb == 0)
-        {
-          Values*& v = newVars.possibleValues.GetExtend (i);
-          v = newVars.valAlloc.Alloc ();
-          *v = *va;
-        }
-        else
-        {
-          Values*& v = newVars.possibleValues.GetExtend (i);
-          v = newVars.valAlloc.Alloc ();
-          *v = (*va & *vb);
-        }
-      }
-    }
-    return newVars;
+      return Def();
   }
   friend Variables operator| (const Variables& a, const Variables& b)
   {
-    Variables newVars;
-    const csArray<csPtrWrap<Values> >& pvA = a.possibleValues;
-    const csArray<csPtrWrap<Values> >& pvB = b.possibleValues;
-    const size_t num = csMax (pvA.GetSize(), pvB.GetSize());
-    for (size_t i = 0; i < num; i++)
+    Variables newVars (a);
+    ValuesArray& nva = *newVars.possibleValues;
+    const ValuesArray& pvB = *b.possibleValues;
+    for (size_t n = 0; n < nva.GetSize(); )
     {
-      const Values* va = (i < pvA.GetSize()) ? pvA[i] : 0;
-      const Values* vb = (i < pvB.GetSize()) ? pvB[i] : 0;
-      if ((va != 0) && (vb != 0))
+      csStringID name = nva[n].n;
+      if (pvB.Has (name))
       {
-        Values*& v = newVars.possibleValues.GetExtend (i);
-        v = newVars.valAlloc.Alloc ();
-        *v = (*va | *vb);
+        const Values* entry = pvB.Get (name);
+        csRef<Values>& vw = nva.GetIndex (n);
+        *vw &= *entry;
+        n++;
       }
+      else
+        nva.DeleteIndex (n);
     }
     return newVars;
   }
@@ -226,8 +463,8 @@ class csConditionEvaluator
   csHashReversible<csConditionID, CondOperation> conditions;
 
   // Evaluation cache
-  csBitArray condChecked;
-  csBitArray condResult;
+  MyBitArray condChecked;
+  MyBitArray condResult;
 
   // Constants
   const csConditionConstants& constants;
@@ -256,7 +493,7 @@ class csConditionEvaluator
   bool EvaluateOperandIConst (const CondOperand& operand, int& result);
   bool EvaluateOperandFConst (const CondOperand& operand, float& result);
 
-  void GetUsedSVs2 (csConditionID condition, csBitArray& affectedSVs);
+  void GetUsedSVs2 (csConditionID condition, MyBitArray& affectedSVs);
 
   struct EvaluatorShadervar
   {
@@ -345,7 +582,10 @@ public:
     csConditionID containerCondition);
 
   /// Determine which SVs are used in some condition.
-  void GetUsedSVs (csConditionID condition, csBitArray& affectedSVs);
+  void GetUsedSVs (csConditionID condition, MyBitArray& affectedSVs);
+
+  /// Try to release unused temporary memory
+  static void CompactMemory ();
 };
 
 }

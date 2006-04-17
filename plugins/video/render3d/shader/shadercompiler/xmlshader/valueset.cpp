@@ -30,7 +30,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   {
     if (a.value == b.value)
     {
-      return !a.inclusive || !b.inclusive;
+      return !a.GetInclusive() || !b.GetInclusive();
     }
     else
       return a.value < b.value;
@@ -117,7 +117,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       Interval::Side newR = borders[i+1];
       newR.FlipInclusive();
 
-      if (!((newL == newR) && (!csFinite (newL.value))))
+      if (!((newL == newR) && (!csFinite (newL.GetValue()))))
         newSet.intervals.Push (Interval (newL, newR));
 
       i += 2;
@@ -132,36 +132,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     while ((i < intervals.GetSize()) && (j < otherIntervals.GetSize()))
     {
+      Interval& intv = intervals[i];
       while (((i+1) < intervals.GetSize())
-        && intervals[i].Overlaps (intervals[i+1]))
+        && intv.Overlaps (intervals[i+1]))
       {
-        const Interval::Side& l1 = intervals[i].left;
-        const Interval::Side& l2 = intervals[i+1].left;
-        const Interval::Side& r1 = intervals[i].right;
-        const Interval::Side& r2 = intervals[i+1].right;
-        intervals[i] = Interval (
+        Interval& intvNext = intervals[i+1];
+        const Interval::Side& l1 = intv.left;
+        const Interval::Side& l2 = intvNext.left;
+        const Interval::Side& r1 = intv.right;
+        const Interval::Side& r2 = intvNext.right;
+        intv = Interval (
           CompareLeftLeft (l1, l2) <= 0 ? l1 : l2,
           CompareRightRight (r1, r2) >= 0 ? r1 : r2);
         intervals.DeleteIndex (i);
       }
-      if (intervals[i].Overlaps (otherIntervals[j]))
+      const Interval& intvOther = otherIntervals[j];
+      if (intv.Overlaps (intvOther))
       {
-        const Interval::Side& l1 = intervals[i].left;
-        const Interval::Side& l2 = otherIntervals[j].left;
-        const Interval::Side& r1 = intervals[i].right;
-        const Interval::Side& r2 = otherIntervals[j].right;
-        intervals[i] = Interval (
+        const Interval::Side& l1 = intv.left;
+        const Interval::Side& l2 = intvOther.left;
+        const Interval::Side& r1 = intv.right;
+        const Interval::Side& r2 = intvOther.right;
+        intv = Interval (
           CompareLeftLeft (l1, l2) <= 0 ? l1 : l2,
           CompareRightRight (r1, r2) >= 0 ? r1 : r2);
         j++;
       }
       else
       {
-        const Interval::Side& il = intervals[i].right;
-        const Interval::Side& ol = otherIntervals[j].left;
+        const Interval::Side& il = intv.right;
+        const Interval::Side& ol = intvOther.left;
         if (il >= ol)
         {
-          intervals.Insert (i, otherIntervals[j]);
+          intervals.Insert (i, intvOther);
           j++;
         }
         else
@@ -178,10 +181,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     i = 0;
     while (i+1 < intervals.GetSize())
     {
-      if ((intervals[i].right.value == intervals[i+1].left.value)
-        && (intervals[i].right.inclusive != intervals[i+1].left.inclusive))
+      Interval::Side& intvRight = intervals[i].right;
+      const Interval::Side& intvNextLeft = intervals[i+1].left;
+      if ((intvRight.GetValue() == intvNextLeft.GetValue())
+        && (intvRight.GetInclusive() != intvNextLeft.GetInclusive()))
       {
-        intervals[i].right = intervals[i+1].right;
+        intvRight = intervals[i+1].right;
         intervals.DeleteIndex (i+1);
       }
       else

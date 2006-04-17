@@ -25,6 +25,106 @@
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
+using namespace CS;
+
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(Variables::Values, def,
+  Def, ValueSet, ());
+
+ValueSet& Variables::Values::GetMultiValue (uint num)
+{
+  ValueSetChain* p = multiValues;
+  while (num > 0) p = p->nextPlease;
+  return p->vs;
+}
+
+const ValueSet& Variables::Values::GetMultiValue (uint num) const
+{
+  ValueSetChain* p = multiValues;
+  while (num > 0) p = p->nextPlease;
+  return p->vs;
+}
+
+ValueSet& Variables::Values::GetValue (int type)
+{
+  CS_ASSERT ((type >= valueFirst) && (type <= valueLast));
+
+  const uint flag = 1 << type;
+
+  if (!(valueFlags & flag))
+  {
+    uint count = ValueCount (valueFlags);
+    SetValueIndex (type, count);
+    valueFlags |= flag;
+    if (count >= inlinedSets)
+    {
+      ValueSetChain** d = &multiValues;
+      while (*d != 0)
+      {
+        d = &(*d)->nextPlease;
+      }
+      *d = new ValueSetChain ();
+      return (*d)->vs;
+    }
+  }
+
+  uint index = GetValueIndex (type);
+  if (index < inlinedSets)
+    return inlineValues[index];
+  else
+    return GetMultiValue (index - inlinedSets);
+}
+
+const ValueSet& Variables::Values::GetValue (int type) const
+{
+  CS_ASSERT ((type >= valueFirst) && (type <= valueLast));
+  if (valueFlags & (1 << type))
+  {
+    uint index = GetValueIndex (type);
+    if (index < inlinedSets)
+      return inlineValues[index];
+    else
+      return GetMultiValue (index - inlinedSets);
+  }
+  else
+    return Def();
+}
+
+//---------------------------------------------------------------------------
+
+struct BlockAllocatorSlicePolicy
+{
+  static const size_t valueSetsPerSlice = 32;
+  static const size_t sliceSize = valueSetsPerSlice * sizeof (ValueSet);
+  typedef uint8 SliceType[sliceSize];
+
+  CS_DECLARE_STATIC_CLASSVAR_REF (sliceAlloc, SliceAlloc, 
+    csBlockAllocator<SliceType>);
+
+  static inline uint8* AllocBlock(size_t blocksize) 
+  {
+    CS_ASSERT(blocksize == sliceSize);
+    return (uint8*)SliceAlloc().AllocUninit();
+  }
+  static inline void FreeBlock(uint8* p)
+  {
+    SliceAlloc().Free ((SliceType*)p);
+  }
+  static void CompactAllocator()
+  {
+    SliceAlloc().Compact();
+  }
+};
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(BlockAllocatorSlicePolicy, sliceAlloc,
+  SliceAlloc, csBlockAllocator<BlockAllocatorSlicePolicy::SliceType>, (32));
+
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(Variables, valAlloc,
+  ValAlloc, csBlockAllocator<Variables::Values>, (1024));
+size_t Variables::Values::deallocCount = 0;
+CS_IMPLEMENT_STATIC_CLASSVAR(Variables, def,
+  Def, Variables::Values, ());
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(Variables::CowBlockAllocator, 
+  allocator, Allocator, Variables::CowBlockAllocator::BlockAlloc, (256));
+
 csConditionEvaluator::csConditionEvaluator (iStringSet* strings, 
     const csConditionConstants& constants) :
     strings(strings), nextConditionID(0), constants(constants)
@@ -1258,7 +1358,7 @@ bool csConditionEvaluator::EvaluateOperandFConst (const CondOperand& operand,
 }
 
 void csConditionEvaluator::GetUsedSVs2 (csConditionID condition, 
-                                        csBitArray& affectedSVs)
+                                        MyBitArray& affectedSVs)
 {
   const CondOperation* op = conditions.GetKeyPointer (condition);
   CS_ASSERT (op != 0);
@@ -1283,10 +1383,19 @@ void csConditionEvaluator::GetUsedSVs2 (csConditionID condition,
 }
 
 void csConditionEvaluator::GetUsedSVs (csConditionID condition, 
-                                       csBitArray& affectedSVs)
+                                       MyBitArray& affectedSVs)
 {
   affectedSVs.Clear();
+  if ((condition == csCondAlwaysFalse) || (condition == csCondAlwaysTrue))
+    return;
   GetUsedSVs2 (condition, affectedSVs);
+}
+
+void csConditionEvaluator::CompactMemory ()
+{
+  Variables::Values::CompactAllocator();
+  BlockAllocatorSlicePolicy::CompactAllocator();
+  MyBitArrayAllocator::CompactAllocators();
 }
 
 struct ValueSetWrapper
@@ -1402,7 +1511,8 @@ struct EvaluatorShadervarValuesSimple
 
   EvaluatorShadervarValuesSimple (csConditionEvaluator& evaluator, 
     const Variables& vars) : evaluator (evaluator), vars (vars), 
-    boolMask (ValueSet (0.0f) | ValueSet (1.0f)) {}
+    boolMask (ValueSet (0.0f) | ValueSet (1.0f)),
+    createdValues (BlockAllocatorSlicePolicy::valueSetsPerSlice) {}
 
   BoolType Boolean (const CondOperand& operand);
   IntType Int (const CondOperand& operand)
@@ -1411,8 +1521,9 @@ struct EvaluatorShadervarValuesSimple
 
   EvalResult LogicAnd (const CondOperand& a, const CondOperand& b);
   EvalResult LogicOr (const CondOperand& a, const CondOperand& b);
+
+  csBlockAllocator<ValueSet/*, BlockAllocatorSlicePolicy*/> createdValues;
 protected:
-  csBlockAllocator<ValueSet> createdValues;
   ValueSet& CreateValue ()
   {
     ValueSet* vs = createdValues.Alloc();
@@ -1430,7 +1541,7 @@ Logic3 csConditionEvaluator::CheckConditionResults (
   csConditionID condition, const Variables& vars)
 {
   EvaluatorShadervarValuesSimple eval (*this, vars);
-  return Evaluate<EvaluatorShadervarValuesSimple> (eval, condition);
+  return Evaluate (eval, condition);
 }
 
 EvaluatorShadervarValuesSimple::BoolType EvaluatorShadervarValuesSimple::Boolean (
@@ -1448,14 +1559,14 @@ EvaluatorShadervarValuesSimple::BoolType EvaluatorShadervarValuesSimple::Boolean
       {
         const Variables::Values* startValues = vars.GetValues (operand.svName);
         ValueSet& vs = CreateValue();
-        vs = startValues->var & boolMask;
+        vs = startValues->GetVar() & boolMask;
         return ValueSetWrapper (vs);
       }
     case operandSVValueTexture:
       {
         const Variables::Values* startValues = vars.GetValues (operand.svName);
         ValueSet& vs = CreateValue();
-        vs = startValues->tex & boolMask;
+        vs = startValues->GetTex() & boolMask;
         return ValueSetWrapper (vs);
       }
     case operandSVValueBuffer:
@@ -1463,7 +1574,7 @@ EvaluatorShadervarValuesSimple::BoolType EvaluatorShadervarValuesSimple::Boolean
       {
         const Variables::Values* startValues = vars.GetValues (operand.svName);
         ValueSet& vs = CreateValue();
-        vs = startValues->buf & boolMask;
+        vs = startValues->GetBuf() & boolMask;
         return ValueSetWrapper (vs);
       }
     default:
@@ -1496,7 +1607,7 @@ EvaluatorShadervarValuesSimple::FloatType EvaluatorShadervarValuesSimple::Float 
     case operandSVValueInt:
       {
         const Variables::Values* startValues = vars.GetValues (operand.svName);
-        return ValueSetWrapper (startValues->vec[0]);
+        return ValueSetWrapper (startValues->GetVec (0));
       }
     case operandSVValueX:
     case operandSVValueY:
@@ -1505,7 +1616,7 @@ EvaluatorShadervarValuesSimple::FloatType EvaluatorShadervarValuesSimple::Float 
       {
         const Variables::Values* startValues = vars.GetValues (operand.svName);
 	int c = operand.type - operandSVValueX;
-        return ValueSetWrapper (startValues->vec[c]);
+        return ValueSetWrapper (startValues->GetVec (c));
       }
       break;
     default:
@@ -1645,11 +1756,11 @@ struct JanusValueSet
       }
 
       ValueSet::Interval intvA (
-        ValueSet::Interval::Side (aMin.value, false),
+        ValueSet::Interval::Side (aMin.GetValue(), false),
         ValueSet::Interval::Side (false, false));
       ValueSet::Interval intvB (
         ValueSet::Interval::Side (true, false),
-        ValueSet::Interval::Side (bMax.value, false));
+        ValueSet::Interval::Side (bMax.GetValue(), false));
 
       ValueSet setA (intvA);
       ValueSet setB (intvB);
@@ -1688,11 +1799,11 @@ struct JanusValueSet
     else
     {
       ValueSet::Interval intvA (
-        ValueSet::Interval::Side (a.startVals->GetMin ().value, true),
+        ValueSet::Interval::Side (a.startVals->GetMin ().GetValue(), true),
         ValueSet::Interval::Side (false, true));
       ValueSet::Interval intvB (
         ValueSet::Interval::Side (true, true),
-        ValueSet::Interval::Side (b.startVals->GetMax ().value, true));
+        ValueSet::Interval::Side (b.startVals->GetMax ().GetValue(), true));
 
       ValueSet setA (intvA);
       ValueSet setB (intvB);
@@ -1742,7 +1853,8 @@ struct EvaluatorShadervarValues
   EvaluatorShadervarValues (csConditionEvaluator& evaluator, const Variables& vars,
     Variables& trueVars, Variables& falseVars) : evaluator (evaluator), 
     vars (vars), trueVars (trueVars), falseVars (falseVars),
-    boolMask (ValueSet (0.0f) | ValueSet (1.0f)) {}
+    boolMask (ValueSet (0.0f) | ValueSet (1.0f)),
+    createdValues (BlockAllocatorSlicePolicy::valueSetsPerSlice) {}
 
   BoolType Boolean (const CondOperand& operand);
   IntType Int (const CondOperand& operand)
@@ -1751,8 +1863,9 @@ struct EvaluatorShadervarValues
 
   EvalResult LogicAnd (const CondOperand& a, const CondOperand& b);
   EvalResult LogicOr (const CondOperand& a, const CondOperand& b);
+
+  csBlockAllocator<ValueSet/*, BlockAllocatorSlicePolicy*/> createdValues;
 protected:
-  csBlockAllocator<ValueSet> createdValues;
   ValueSet& CreateValue ()
   {
     ValueSet* vs = createdValues.Alloc();
@@ -1772,7 +1885,7 @@ Logic3 csConditionEvaluator::CheckConditionResults (
 {
   trueVars = falseVars = vars;
   EvaluatorShadervarValues eval (*this, vars, trueVars, falseVars);
-  return Evaluate<EvaluatorShadervarValues> (eval, condition);
+  return Evaluate (eval, condition);
 }
 
 EvaluatorShadervarValues::BoolType EvaluatorShadervarValues::Boolean (
@@ -1792,29 +1905,29 @@ EvaluatorShadervarValues::BoolType EvaluatorShadervarValues::Boolean (
       {
         const Variables::Values* startValues = vars.GetValues (operand.svName);
         ValueSet& vs = CreateValue();
-        vs = startValues->var & boolMask;
+        vs = startValues->GetVar() & boolMask;
         Variables::Values* valuesTrue = trueVars.GetValues (operand.svName);
         Variables::Values* valuesFalse = falseVars.GetValues (operand.svName);
-        return JanusValueSet (vs, valuesTrue->var, valuesFalse->var);
+        return JanusValueSet (vs, valuesTrue->GetVar(), valuesFalse->GetVar());
       }
     case operandSVValueTexture:
       {
         const Variables::Values* startValues = vars.GetValues (operand.svName);
         ValueSet& vs = CreateValue();
-        vs = startValues->tex & boolMask;
+        vs = startValues->GetTex() & boolMask;
         Variables::Values* valuesTrue = trueVars.GetValues (operand.svName);
         Variables::Values* valuesFalse = falseVars.GetValues (operand.svName);
-        return JanusValueSet (vs, valuesTrue->tex, valuesFalse->tex);
+        return JanusValueSet (vs, valuesTrue->GetTex(), valuesFalse->GetTex());
       }
     case operandSVValueBuffer:
       //@@TODO: CHECK FOR DEFAULTBUFFERS
       {
         const Variables::Values* startValues = vars.GetValues (operand.svName);
         ValueSet& vs = CreateValue();
-        vs = startValues->buf & boolMask;
+        vs = startValues->GetBuf() & boolMask;
         Variables::Values* valuesTrue = trueVars.GetValues (operand.svName);
         Variables::Values* valuesFalse = falseVars.GetValues (operand.svName);
-        return JanusValueSet (vs, valuesTrue->buf, valuesFalse->buf);
+        return JanusValueSet (vs, valuesTrue->GetBuf(), valuesFalse->GetBuf());
       }
     default:
       {
@@ -1858,7 +1971,7 @@ EvaluatorShadervarValues::FloatType EvaluatorShadervarValues::Float (
         const Variables::Values* startValues = vars.GetValues (operand.svName);
         Variables::Values* valuesTrue = trueVars.GetValues (operand.svName);
         Variables::Values* valuesFalse = falseVars.GetValues (operand.svName);
-        return JanusValueSet (startValues->vec[0], valuesTrue->vec[0], valuesFalse->vec[0]);
+        return JanusValueSet (startValues->GetVec (0), valuesTrue->GetVec (0), valuesFalse->GetVec (0));
       }
     case operandSVValueX:
     case operandSVValueY:
@@ -1869,7 +1982,7 @@ EvaluatorShadervarValues::FloatType EvaluatorShadervarValues::Float (
         Variables::Values* valuesTrue = trueVars.GetValues (operand.svName);
         Variables::Values* valuesFalse = falseVars.GetValues (operand.svName);
 	int c = operand.type - operandSVValueX;
-        return JanusValueSet (startValues->vec[c], valuesTrue->vec[c], valuesFalse->vec[c]);
+        return JanusValueSet (startValues->GetVec (c), valuesTrue->GetVec (c), valuesFalse->GetVec (c));
       }
       break;
     default:

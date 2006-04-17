@@ -51,9 +51,8 @@ protected:
       csParasiticDataBufferBase::size = MIN(size, parRemaining);
   }
 
-  csParasiticDataBufferBase (iDataBuffer* parent, size_t offs,
-    size_t size = (size_t)~0)
-    : scfImplementationType (this)
+  csParasiticDataBufferBase (iDataBuffer* parent, size_t offs, 
+    size_t size = (size_t)~0) : scfImplementationType (this)
   {
     SetContents (parent, offs, size);
   }
@@ -79,7 +78,7 @@ public:
 /**
  * A databuffer pointing into another databuffer.
  */
-class CS_CRYSTALSPACE_EXPORT csParasiticDataBuffer
+class csParasiticDataBuffer
   : public scfImplementationExt0<csParasiticDataBuffer,
   	csParasiticDataBufferBase>
 {
@@ -110,39 +109,27 @@ public:
  *  csParasiticDataBufferPooled::Pool bufferPool;
  *  ...
  *  csRef<iDataBuffer> buf;
- *  {
- *    csParasiticDataBufferPooled* bufPtr = bufferPool.Alloc ();
- *    bufPtr->SetContents (someOtherBuffer, Offset);
- *    buf.AttachNew (bufPtr);
- *  }
+ *   buf.AttachNew (new (bufferPool) 
+ *     csParasiticDataBufferPooled (someOtherBuffer, Offset));
  *  \endcode
  */
-class CS_CRYSTALSPACE_EXPORT csParasiticDataBufferPooled : 
-  public csParasiticDataBufferBase
+class csParasiticDataBufferPooled : 
+  public scfImplementationPooled<
+    scfImplementationExt0<csParasiticDataBufferPooled, 
+                          csParasiticDataBufferBase> >
 {
 public:
-  SCF_DECLARE_IBASE_POOLED_EXTERN(CS_CRYSTALSPACE_EXPORT, 
-    csParasiticDataBufferPooled);
-
-  virtual ~csParasiticDataBufferPooled ()
-  {
-    SCF_DESTRUCT_IBASE();
-  }
-
   /**
-   * Set contents of this data buffer.
-   * Warning: Only call if you did not pass this buffer around yet!
+   * Construct this data buffer. 
+   * \param parent The buffer to point into.
+   * \param offs Offset into the buffer of the data to return.
+   * \param size Data size to return. Can not be larger than the parent's size
+   *   minus the offset. This maximum possible size is also taken when 
+   *   \a size == ~0.
    */
-  void SetContents (iDataBuffer* parent, size_t offs, 
-    size_t size = (size_t)~0)
-  {
-    csParasiticDataBufferBase::SetContents (parent, offs, size);
-  }
-protected:
-  csParasiticDataBufferPooled (Pool* pool) : csParasiticDataBufferBase()
-  {
-    SCF_CONSTRUCT_IBASE_POOLED (pool);
-  }
+  csParasiticDataBufferPooled (iDataBuffer* parent, size_t offs,
+    size_t size = (size_t)~0) : scfPooledImplementationType (this, parent,
+    offs, size) { }
 };
 
 #endif // __CS_CSUTIL_PARASITICDATABUFFER_H__

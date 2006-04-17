@@ -48,7 +48,9 @@ public:
 /**
  * Wrapper around a document node, supporting conditionals.
  */
-class csReplacerDocumentNode : public csDocumentNodeReadOnly
+class csReplacerDocumentNode : 
+  public scfImplementationPooled<
+    scfImplementationExt0<csReplacerDocumentNode, csDocumentNodeReadOnly> >
 {
   friend class csReplacerDocumentNodeIterator;
   friend class csReplacerDocumentAttributeIterator;
@@ -66,12 +68,10 @@ class csReplacerDocumentNode : public csDocumentNodeReadOnly
   csRef<Substitutions> subst;
 public:
   CS_LEAKGUARD_DECLARE(csReplacerDocumentNode);
-  SCF_DECLARE_IBASE_POOLED(csReplacerDocumentNode);
 
-  csReplacerDocumentNode (Pool* pool);
-  virtual ~csReplacerDocumentNode ();
-  void Set (iDocumentNode* wrappedNode, csReplacerDocumentNode* parent, 
+  csReplacerDocumentNode (iDocumentNode* wrappedNode, csReplacerDocumentNode* parent, 
     csReplacerDocumentNodeFactory* shared, Substitutions* subst);
+  virtual ~csReplacerDocumentNode ();
 
   virtual csDocumentNodeType GetType ()
   { return wrappedNode->GetType(); }
@@ -88,52 +88,56 @@ public:
   virtual csRef<iDocumentAttribute> GetAttribute (const char* name);
 };
 
-class csReplacerDocumentNodeIterator : public iDocumentNodeIterator
+class csReplacerDocumentNodeIterator :
+  public scfImplementationPooled<
+    scfImplementation1<csReplacerDocumentNodeIterator, 
+                       iDocumentNodeIterator> >
 {
   csReplacerDocumentNode* node;
   csRef<iDocumentNodeIterator> wrappedIter;
 public:
   CS_LEAKGUARD_DECLARE(csReplacerDocumentNodeIterator);
-  SCF_DECLARE_IBASE_POOLED(csReplacerDocumentNodeIterator);
 
-  csReplacerDocumentNodeIterator (Pool* pool);
+  csReplacerDocumentNodeIterator (csReplacerDocumentNode* node);
   virtual ~csReplacerDocumentNodeIterator ();
-
-  void SetData (csReplacerDocumentNode* node);
 
   virtual bool HasNext ();
   virtual csRef<iDocumentNode> Next ();
 };
 
-class csReplacerDocumentAttributeIterator : public iDocumentAttributeIterator
+class csReplacerDocumentAttributeIterator :
+  public scfImplementationPooled<
+    scfImplementation1<csReplacerDocumentAttributeIterator, 
+                       iDocumentAttributeIterator> >
 {
   csReplacerDocumentNode* node;
   csRef<iDocumentAttributeIterator> wrappedIter;
 public:
   CS_LEAKGUARD_DECLARE(csReplacerDocumentAttributeIterator );
-  SCF_DECLARE_IBASE_POOLED(csReplacerDocumentAttributeIterator );
 
-  csReplacerDocumentAttributeIterator (Pool* pool);
+  csReplacerDocumentAttributeIterator (csReplacerDocumentNode* node);
   virtual ~csReplacerDocumentAttributeIterator ();
-
-  void SetData (csReplacerDocumentNode* node);
 
   virtual bool HasNext ();
   virtual csRef<iDocumentAttribute> Next ();
 };
 
-class csReplacerDocumentAttribute : public csDocumentAttributeCommon
+class csReplacerDocumentAttribute :
+  public scfImplementationExt0<csReplacerDocumentAttribute, 
+                               csDocumentAttributeCommon>
 {
   csString name;
   csString val;
 public:
   CS_LEAKGUARD_DECLARE(csReplacerDocumentAttribute);
-  SCF_DECLARE_IBASE_POOLED(csReplacerDocumentAttribute);
 
-  csReplacerDocumentAttribute (Pool* pool);
+  virtual void DecRef();
+
+  csReplacerDocumentAttribute (/*csReplacerDocumentNode* node, 
+    iDocumentAttribute* wrappedAttr*/);
   virtual ~csReplacerDocumentAttribute ();
-
-  void Set (csReplacerDocumentNode* node, iDocumentAttribute* wrappedAttr);
+  void SetData (csReplacerDocumentNode* node, 
+    iDocumentAttribute* wrappedAttr);
 
   virtual const char* GetName () { return name; }
   virtual const char* GetValue () { return val; }
@@ -150,7 +154,7 @@ class csReplacerDocumentNodeFactory
   friend class csReplacerDocumentAttribute;
 
   csReplacerDocumentNode::Pool nodePool;
-  csReplacerDocumentAttribute::Pool attrPool;
+  //csReplacerDocumentAttribute::Pool attrPool;
   csReplacerDocumentNodeIterator::Pool iterPool;
   csReplacerDocumentAttributeIterator::Pool attrIterPool;
 
@@ -160,7 +164,7 @@ public:
   csReplacerDocumentNodeFactory ();
 
   csRef<iDocumentNode> CreateWrapper (iDocumentNode* wrappedNode, 
-    csReplacerDocumentNode* parent, const Substitutions& subst);
+    csReplacerDocumentNode* parent, Substitutions* subst);
 };
 
 }

@@ -117,7 +117,7 @@ csConditionNode* csShaderConditionResolver::GetRoot ()
 
 size_t csShaderConditionResolver::GetVariant (csConditionNode* node)
 {
-  csBitArray bits (evaluator.GetNumConditions ());
+  MyBitArray bits (evaluator.GetNumConditions ());
   node->FillConditionArray (bits);
   size_t* var = variantIDs.GetElementPointer (bits);
   if (var)
@@ -157,7 +157,7 @@ void csShaderConditionResolver::AddNode (csConditionNode* parent,
     parent->falseNode = falseNode = NewNode (parent);
 
     CS_ASSERT(parent->variant != csArrayItemNotFound);
-    csBitArray bits (evaluator.GetNumConditions ());
+    MyBitArray bits (evaluator.GetNumConditions ());
     parent->condition = condition;
 
     trueNode->variant = GetVariant (trueNode);
@@ -168,6 +168,11 @@ void csShaderConditionResolver::AddNode (csConditionNode* parent,
 
     parent->variant = csArrayItemNotFound;
   }
+}
+
+void csShaderConditionResolver::FinishAdding ()
+{
+  variantIDs.Empty();
 }
 
 void csShaderConditionResolver::SetEvalParams (const csRenderMeshModes* modes,
@@ -275,6 +280,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   if (compiler->doDumpConds)
   {
     csString tree;
+    tree.SetGrowsBy (0);
     wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
       resolver, resolver->evaluator, &tree));
     resolver->DumpConditionTree (tree);

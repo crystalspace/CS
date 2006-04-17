@@ -30,6 +30,7 @@
 #include "condition.h"
 #include "docwrap.h"
 #include "shadertech.h"
+#include "mybitarray.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
@@ -60,7 +61,7 @@ struct csConditionNode
     delete trueNode;
     delete falseNode;
   }
-  void FillConditionArray (csBitArray& array)
+  void FillConditionArray (MyBitArray& array)
   {
     if (!parent) return;
     const csConditionID cond = parent->condition;
@@ -80,7 +81,7 @@ class csShaderConditionResolver : public iConditionResolver
   
   csConditionNode* rootNode;
   size_t nextVariant;
-  csHash<size_t, csBitArray> variantIDs;
+  csHash<size_t, MyBitArray> variantIDs;
 
   const csRenderMeshModes* modes;
   const csShaderVarStack* stacks;
@@ -102,10 +103,14 @@ public:
     CondOperation& operation);
   virtual const char* ParseCondition (const char* str, size_t len, 
     csConditionID& result);
+
   virtual bool Evaluate (csConditionID condition);
+
   virtual void AddNode (csConditionNode* parent,
     csConditionID condition, csConditionNode*& trueNode, 
     csConditionNode*& falseNode);
+  virtual void FinishAdding ();
+
   void ResetEvaluationCache() { evaluator.ResetEvaluationCache(); }
 
   void SetEvalParams (const csRenderMeshModes* modes,

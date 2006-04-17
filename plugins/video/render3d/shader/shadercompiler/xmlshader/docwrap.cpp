@@ -43,6 +43,12 @@
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
+// Hack: Work around problems caused by #defining 'new'.
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 class ConditionTree
 {
   struct Node
@@ -50,24 +56,27 @@ class ConditionTree
     static const csConditionID csCondUnknown = (csConditionID)~2;    
     
     Node* parent;
+    ConditionTree* owner;
 
     csConditionID condition;
     Node* branches[2];
     Variables values;
-    csBitArray conditionAffectedSVs;
+    MyBitArray conditionAffectedSVs;
 
-    Node (Node* p) : parent (p), condition (csCondUnknown)
+    Node (Node* p, ConditionTree* owner) : parent (p), owner (owner),
+      condition (csCondUnknown)
     {
       branches[0] = 0;
       branches[1] = 0;
     }
     ~Node ()
     {
-      delete branches[0];
-      delete branches[1];
+      owner->nodeAlloc.Free (branches[0]);
+      owner->nodeAlloc.Free (branches[1]);
     }
   };
 
+  csBlockAllocator<Node> nodeAlloc;
   Node* root;
   int currentBranch;
   struct NodeStackEntry
@@ -79,7 +88,7 @@ class ConditionTree
   csArray<int> branchStack;
 
   void RecursiveAdd (csConditionID condition, Node* node, 
-    NodeStackEntry& newCurrent);
+    NodeStackEntry& newCurrent, MyBitArray& affectedSVs);
   void ToResolver (iConditionResolver* resolver, Node* node,
     csConditionNode* parent);
 
@@ -88,9 +97,10 @@ class ConditionTree
 
   csConditionEvaluator& evaluator;
 public:
-  ConditionTree (csConditionEvaluator& evaluator) : evaluator (evaluator)
+  ConditionTree (csConditionEvaluator& evaluator) : nodeAlloc (256), evaluator (evaluator)
   {
-    root = new Node (0);
+    root = (Node*)nodeAlloc.AllocUninit();
+    new (root) Node (0, this);
     currentBranch = 0;
     NodeStackEntry newPair;
     newPair.branches[0].Push (root);
@@ -98,7 +108,7 @@ public:
   }
   ~ConditionTree ()
   {
-    delete root;
+    nodeAlloc.Free (root);
   }
 
   Logic3 Descend (csConditionID condition);
@@ -111,7 +121,8 @@ public:
 };
 
 void ConditionTree::RecursiveAdd (csConditionID condition, Node* node, 
-                                  NodeStackEntry& newCurrent)
+                                  NodeStackEntry& newCurrent, 
+                                  MyBitArray& affectedSVs)
 {
   /* Shortcut */
   if (node->condition == condition)
@@ -143,23 +154,15 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
        * Though, if the node is a leaf, always check since the
        * "true values" and "false values" are required.
        */
-      csBitArray affectedSVs;
-      evaluator.GetUsedSVs (condition, affectedSVs);
-      if (affectedSVs.GetSize() 
-        == node->parent->conditionAffectedSVs.GetSize())
+      MyBitArray& nodeAffectedSVs = node->parent->conditionAffectedSVs;
+      if (affectedSVs.GetSize() != nodeAffectedSVs.GetSize())
       {
-        affectedSVs &= node->parent->conditionAffectedSVs;
-      }
-      else
-      {
-        csBitArray bits2 (node->parent->conditionAffectedSVs);
         size_t newSize = csMax (affectedSVs.GetSize(),
-          node->parent->conditionAffectedSVs.GetSize());
+          nodeAffectedSVs.GetSize());
         affectedSVs.SetSize (newSize);
-        bits2.SetSize (newSize);
-        affectedSVs &= bits2;
+        nodeAffectedSVs.SetSize (newSize);
       }
-      doCheck = !affectedSVs.AllBitsFalse();
+      doCheck = !(affectedSVs & nodeAffectedSVs).AllBitsFalse();
     }
     if (doCheck)
     {
@@ -188,28 +191,24 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
           containerCondition);
 
         node->condition = condition;
-        evaluator.GetUsedSVs (condition, node->conditionAffectedSVs);
+        node->conditionAffectedSVs = affectedSVs;
         if (node->parent)
         {
-          if (node->conditionAffectedSVs.GetSize() 
-            == node->parent->conditionAffectedSVs.GetSize())
+          MyBitArray& nodeAffectedSVs = node->conditionAffectedSVs;
+          MyBitArray& parentAffectedSVs = node->parent->conditionAffectedSVs;
+          if (nodeAffectedSVs.GetSize() != parentAffectedSVs.GetSize())
           {
-            node->conditionAffectedSVs |= node->parent->conditionAffectedSVs;
+            size_t newSize = csMax (nodeAffectedSVs.GetSize(),
+              parentAffectedSVs.GetSize());
+            nodeAffectedSVs.SetSize (newSize);
+            parentAffectedSVs.SetSize (newSize);
           }
-          else
-          {
-            csBitArray bits1 (node->conditionAffectedSVs);
-            csBitArray bits2 (node->parent->conditionAffectedSVs);
-            size_t newSize = csMax (node->conditionAffectedSVs.GetSize(),
-              node->parent->conditionAffectedSVs.GetSize());
-            bits1.SetSize (newSize);
-            bits2.SetSize (newSize);
-            node->conditionAffectedSVs = bits1 | bits2;
-          }
+          nodeAffectedSVs |= parentAffectedSVs;
         }
         for (int b = 0; b < 2; b++)
         {
-          Node* nn = new Node (node);
+          Node* nn = (Node*)nodeAlloc.AllocUninit();
+          new (nn) Node (node, this);
           if (hasContainer)
           {
             /* If this condition is part of a "composite condition"
@@ -245,12 +244,16 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
       } 
       else
       {
-        RecursiveAdd (condition, node->branches[0], newCurrent);
-        RecursiveAdd (condition, node->branches[1], newCurrent);
+        RecursiveAdd (condition, node->branches[0], newCurrent, affectedSVs);
+        RecursiveAdd (condition, node->branches[1], newCurrent, affectedSVs);
       }
       break;
   }
 }
+
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
 
 Logic3 ConditionTree::Descend (csConditionID condition)
 {
@@ -259,10 +262,12 @@ Logic3 ConditionTree::Descend (csConditionID condition)
 
   NodeStackEntry newCurrent;
 
+  MyBitArray affectedSVs;
+  evaluator.GetUsedSVs (condition, affectedSVs);
   const csArray<Node*>& currentNodes = current.branches[currentBranch];
   for (size_t i = 0; i < currentNodes.GetSize(); i++)
   {
-    RecursiveAdd (condition, currentNodes[i], newCurrent);
+    RecursiveAdd (condition, currentNodes[i], newCurrent, affectedSVs);
   }
 
   nodeStack.Push (newCurrent);
@@ -317,6 +322,7 @@ void ConditionTree::ToResolver (iConditionResolver* resolver)
   if (root->branches[0] != 0)
   {
     ToResolver (resolver, root, 0);
+    resolver->FinishAdding();
   }
 }
 
@@ -407,7 +413,16 @@ struct csWrappedDocumentNode::NodeProcessingState
   uint templNestCount;
   csString templateName;
 
-  NodeProcessingState() : templActive(false) {}
+  bool generateActive;
+  bool generateValid;
+  uint generateNestCount;
+  csString generateVar;
+  int generateStart;
+  int generateEnd;
+  int generateStep;
+
+  NodeProcessingState() : templActive (false), generateActive (false),
+    generateValid (false) {}
 };
 
 static const int syntaxErrorSeverity = CS_REPORTER_SEVERITY_WARNING;
@@ -495,7 +510,9 @@ void csWrappedDocumentNode::ProcessInclude (ConditionEval& eval,
   }
 }
 
-void csWrappedDocumentNode::ProcessTemplate (iDocumentNode* templNode, 
+template<typename ConditionEval>
+void csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval, 
+                                             iDocumentNode* templNode, 
 					     NodeProcessingState* state)
 {
   csRefArray<iDocumentNode>& templNodes = state->templ.nodes;
@@ -541,9 +558,14 @@ void csWrappedDocumentNode::ProcessTemplate (iDocumentNode* templNode,
             }
             // Fall through
 	  case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE_NEW:
-	    state->templNestCount--;
-	    if (state->templNestCount != 0)
-	      templNodes.Push (node);
+            if (!state->generateActive)
+            {
+	      state->templNestCount--;
+	      if (state->templNestCount != 0)
+	        templNodes.Push (node);
+            }
+            else
+              templNodes.Push (node);
 	    break;
 	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE:
             if (shared->plugin->do_verbose)
@@ -553,12 +575,14 @@ void csWrappedDocumentNode::ProcessTemplate (iDocumentNode* templNode,
             }
             // Fall through
 	  case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE_NEW:
-	    state->templNestCount++;
+            if (!state->generateActive)
+	      state->templNestCount++;
 	    // Fall through
 	  default:
 	    {
 	      Template* templ;
-	      if ((state->templNestCount == 1)
+	      if ((!state->generateActive)
+                && (state->templNestCount == 1)
 		&& (templ = globalState->templates.GetElementPointer (tokenStr)))
 	      {
 		csArray<csString> templArgs;
@@ -571,6 +595,23 @@ void csWrappedDocumentNode::ProcessTemplate (iDocumentNode* templNode,
 		templNodes.Push (node);
 	    }
 	    break;
+	  case csWrappedDocumentNodeFactory::PITOKEN_GENERATE:
+            if (state->generateActive)
+	      state->generateNestCount++;
+	    templNodes.Push (node);
+            break;
+          case csWrappedDocumentNodeFactory::PITOKEN_ENDGENERATE:
+            {
+              if (state->generateActive)
+              {
+	        state->generateNestCount--;
+	        if (state->generateNestCount != 0)
+	          templNodes.Push (node);
+              }
+              else
+                templNodes.Push (node);
+            }
+            break;
 	}
       }
     }
@@ -578,10 +619,54 @@ void csWrappedDocumentNode::ProcessTemplate (iDocumentNode* templNode,
   else
     templNodes.Push (node);
 
-  if (state->templNestCount == 0)
+  if (state->generateActive)
   {
-    globalState->templates.PutUnique (state->templateName, state->templ);
-    state->templActive = false;
+    if (state->generateNestCount == 0)
+    {
+      state->generateActive = false;
+      int start = state->generateStart;
+      int end = state->generateEnd;
+      int step = state->generateStep;
+
+      Template generateTempl (state->templ);
+      generateTempl.paramMap.Push (state->generateVar);
+      if (state->generateValid)
+      {
+        int v = start;
+        while (true)
+        {
+          if (state->generateStep >= 0)
+          {
+            if (v > end) break;
+          }
+          else
+          {
+            if (v < end) break;
+          }
+
+          csRefArray<iDocumentNode> templatedNodes;
+          csArray<csString> params;
+          csString s; s << v;
+          params.Push (s);
+          InvokeTemplate (&generateTempl, params, templatedNodes);
+          size_t i;
+          for (i = 0; i < templatedNodes.Length(); i++)
+          {
+            ProcessSingleWrappedNode (eval, state, templatedNodes[i]);
+          }
+
+          v += step;
+        }
+      }
+    }
+  }
+  else
+  {
+    if (state->templNestCount == 0)
+    {
+      globalState->templates.PutUnique (state->templateName, state->templ);
+      state->templActive = false;
+    }
   }
 }
 
@@ -591,18 +676,21 @@ bool csWrappedDocumentNode::InvokeTemplate (Template* templ,
 {
   if (!templ) return false;
 
-  size_t i;
-  Substitutions paramSubst;
-  for (i = 0; i < csMin (params.Length(), templ->paramMap.Length()); i++)
+  csRef<Substitutions> newSubst;
   {
-    paramSubst.Put (templ->paramMap[i], params[i]);
+    Substitutions paramSubst;
+    for (size_t i = 0; i < csMin (params.Length(), templ->paramMap.Length()); i++)
+    {
+      paramSubst.Put (templ->paramMap[i], params[i]);
+    }
+    newSubst.AttachNew (new Substitutions (paramSubst));
   }
 
-  for (i = 0; i < templ->nodes.Length(); i++)
+  for (size_t i = 0; i < templ->nodes.Length(); i++)
   {
     csRef<iDocumentNode> newNode = 
       shared->replacerFactory.CreateWrapper (templ->nodes.Get (i), 0,
-      paramSubst);
+      newSubst);
     templatedNodes.Push (newNode);
   }
   return true;
@@ -629,6 +717,7 @@ bool csWrappedDocumentNode::InvokeTemplate (ConditionEval& eval,
     ProcessSingleWrappedNode (eval, state, nodes[i]);
   }
   ValidateTemplateEnd (node, state);
+  ValidateGenerateEnd (node, state);
   return true;
 }
 
@@ -639,6 +728,16 @@ void csWrappedDocumentNode::ValidateTemplateEnd (iDocumentNode* node,
   {
     Report (syntaxErrorSeverity, node,
       "'Template' without 'Endtemplate'");
+  }
+}
+
+void csWrappedDocumentNode::ValidateGenerateEnd (iDocumentNode* node, 
+						 NodeProcessingState* state)
+{
+  if ((state->generateActive) && (state->generateNestCount != 0))
+  {
+    Report (syntaxErrorSeverity, node,
+      "'Generate' without 'Endgenerate'");
   }
 }
 
@@ -693,9 +792,9 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 {
   CS_ASSERT(globalState);
 
-  if (state->templActive)
+  if (state->templActive || state->generateActive)
   {
-    ProcessTemplate (node, state);
+    ProcessTemplate (eval, node, state);
     return;
   }
 
@@ -972,6 +1071,84 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		"'Endtemplate' without 'Template'");
 	    }
 	    break;
+          case csWrappedDocumentNodeFactory::PITOKEN_GENERATE:
+            {
+	      bool okay = true;
+              csArray<csString> args;
+	      if (space != 0)
+	      {
+		csString pStr (space + 1, valLen - cmdLen - 1);
+		ParseTemplateArguments (pStr, args);
+	      }
+              if ((args.GetSize() < 3) || (args.GetSize() > 4))
+              {
+                okay = false;
+	        Report (syntaxErrorSeverity, node,
+		  "'Generate' expects 3 or 4 arguments, got %zu", args.GetSize());
+              }
+              if (okay)
+              {
+                state->generateVar = args[0];
+
+                int start, end, step;
+                char dummy;
+                if (sscanf (args[1], "%d%c", &start, &dummy) != 1)
+                {
+	          Report (syntaxErrorSeverity, node,
+		    "Argument '%s' is not an integer", args[1].GetData());
+                  okay = false;
+                }
+                if (okay && sscanf (args[2], "%d%c", &end, &dummy) != 1)
+                {
+	          Report (syntaxErrorSeverity, node,
+		    "Argument '%s' is not an integer", args[2].GetData());
+                  okay = false;
+                }
+                if (okay)
+                {
+                  if (args.GetSize() == 4)
+                  {
+                    if (sscanf (args[3], "%d%c", &step, &dummy) != 1)
+                    {
+	              Report (syntaxErrorSeverity, node,
+		        "Argument '%s' is not an integer", args[3].GetData());
+                      okay = false;
+                    }
+                  }
+                  else
+                  {
+                    step = (end < start) ? -1 : 1;
+                  }
+                }
+                if (okay)
+                {
+                  state->generateActive = true;
+		  state->generateNestCount = 1;
+                  if (((start > end) && (step >= 0))
+                    || (end >= start) && (step <= 0))
+                  {
+	            Report (syntaxErrorSeverity, node,
+		      "Can't reach end value %d starting from %d with step %d", 
+                      end, start, step);
+                    state->generateValid = false;
+                  }
+                  else
+                  {
+                    state->generateValid = true;
+                    state->generateStart = start;
+                    state->generateEnd = end;
+                    state->generateStep = step;
+                  }
+                }
+              }
+            }
+            break;
+	  case csWrappedDocumentNodeFactory::PITOKEN_ENDGENERATE:
+	    {
+	      Report (syntaxErrorSeverity, node,
+		"'Endgenerate' without 'Generate'");
+	    }
+	    break;
 	  default:
 	    {
 	      csArray<csString> params;
@@ -1020,6 +1197,7 @@ void csWrappedDocumentNode::ProcessWrappedNode (ConditionEval& eval,
       ProcessSingleWrappedNode (eval, state, node);
     }
     ValidateTemplateEnd (wrappedNode, state);
+    ValidateGenerateEnd (wrappedNode, state);
   }
 }
 
@@ -1081,20 +1259,30 @@ const char* csWrappedDocumentNode::GetValue ()
   return wrappedNode->GetValue();
 }
 
+// Hack: Work around problems caused by #defining 'new'.
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 csRef<iDocumentNodeIterator> csWrappedDocumentNode::GetNodes ()
 {
-  csWrappedDocumentNodeIterator* iter = shared->iterPool.Alloc ();
-  iter->SetData (this, 0);
+  csWrappedDocumentNodeIterator* iter = 
+    new (shared->iterPool) csWrappedDocumentNodeIterator (this, 0);
   return csPtr<iDocumentNodeIterator> (iter);
 }
 
 csRef<iDocumentNodeIterator> csWrappedDocumentNode::GetNodes (
   const char* value)
 {
-  csWrappedDocumentNodeIterator* iter = shared->iterPool.Alloc ();
-  iter->SetData (this, value);
+  csWrappedDocumentNodeIterator* iter = 
+    new (shared->iterPool) csWrappedDocumentNodeIterator (this, value);
   return csPtr<iDocumentNodeIterator> (iter);
 }
+
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
 
 csRef<iDocumentNode> csWrappedDocumentNode::GetNode (const char* value)
 {
@@ -1238,20 +1426,16 @@ iDocumentNode* csWrappedDocumentNode::WrapperWalker::Next ()
 
 //---------------------------------------------------------------------------
 
-csTextNodeWrapper::csTextNodeWrapper (Pool* /*pool*/)
-  : scfImplementationType (this)
+csTextNodeWrapper::csTextNodeWrapper (iDocumentNode* realMe, 
+                                      const char* text) : 
+  scfPooledImplementationType (this), realMe (realMe)
 {  
+  nodeText = csStrNew (text);
 }
 
 csTextNodeWrapper::~csTextNodeWrapper ()
 {
   delete[] nodeText;
-}
-
-void csTextNodeWrapper::SetData (iDocumentNode* realMe, const char* text)
-{
-  csTextNodeWrapper::realMe = realMe;
-  nodeText = csStrNew (text);
 }
 
 //---------------------------------------------------------------------------
@@ -1261,35 +1445,19 @@ void csTextNodeWrapper::SetData (iDocumentNode* realMe, const char* text)
 # undef new
 #endif
 
-SCF_IMPLEMENT_IBASE_POOLED(csWrappedDocumentNodeIterator)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentNodeIterator)
-SCF_IMPLEMENT_IBASE_END
-
 CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNodeIterator);
 
-csWrappedDocumentNodeIterator::csWrappedDocumentNodeIterator (Pool* pool)
+csWrappedDocumentNodeIterator::csWrappedDocumentNodeIterator (
+  csWrappedDocumentNode* node, const char* filter) : 
+  scfPooledImplementationType (this), filter (filter), parentNode (node)
 {
-  SCF_CONSTRUCT_IBASE_POOLED(pool);
+  walker.SetData (parentNode->wrappedChildren, parentNode->resolver);
 
-  filter = 0;
+  SeekNext();
 }
 
 csWrappedDocumentNodeIterator::~csWrappedDocumentNodeIterator ()
 {
-  delete[] filter; 
-  SCF_DESTRUCT_IBASE();
-}
-
-void csWrappedDocumentNodeIterator::SetData (csWrappedDocumentNode* node, 
-					     const char* filter)
-{
-  delete[] csWrappedDocumentNodeIterator::filter;
-  csWrappedDocumentNodeIterator::filter = csStrNew (filter);
-  parentNode = node;
-
-  walker.SetData (parentNode->wrappedChildren, parentNode->resolver);
-
-  SeekNext();
 }
 
 void csWrappedDocumentNodeIterator::SeekNext()
@@ -1299,7 +1467,7 @@ void csWrappedDocumentNodeIterator::SeekNext()
   while (walker.HasNext ())
   {
     node = walker.Next ();
-    if ((filter == 0) || (strcmp (node->GetValue (), filter) == 0))
+    if ((filter.GetData() == 0) || (strcmp (node->GetValue (), filter) == 0))
     {
       next = node;
       break;
@@ -1310,9 +1478,8 @@ void csWrappedDocumentNodeIterator::SeekNext()
     csString str;
     str.Append (next->GetValue ());
     csWrappedDocumentNode::AppendNodeText (walker, str);
-    //csTextNodeWrapper* textNode = parentNode->shared->textNodePool.Alloc (); //@@FIX
-    csTextNodeWrapper *textNode = new csTextNodeWrapper (0);
-    textNode->SetData (next, str);
+    csTextNodeWrapper* textNode = 
+      new (parentNode->shared->textNodePool) csTextNodeWrapper (next, str);
     next.AttachNew (textNode);
   }
 }
@@ -1338,6 +1505,8 @@ csWrappedDocumentNodeFactory::csWrappedDocumentNodeFactory (
   pitokens.Register ("Template", PITOKEN_TEMPLATE_NEW);
   pitokens.Register ("Endtemplate", PITOKEN_ENDTEMPLATE_NEW);
   pitokens.Register ("Include", PITOKEN_INCLUDE_NEW);
+  pitokens.Register ("Generate", PITOKEN_GENERATE);
+  pitokens.Register ("Endgenerate", PITOKEN_ENDGENERATE);
 }
 
 void csWrappedDocumentNodeFactory::DumpCondition (size_t id, 
@@ -1376,6 +1545,7 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
   csWrappedDocumentNode* node = new csWrappedDocumentNode (eval, wrappedNode, 
     resolver, this, globalState);
   eval.condTree.ToResolver (resolver);
+  evaluator.CompactMemory();
   return node;
 }
 

@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/blockallocator.h"
 #include "csutil/set.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
@@ -34,30 +35,16 @@
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
-SCF_IMPLEMENT_IBASE_POOLED(csReplacerDocumentNode)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentNode)
-SCF_IMPLEMENT_IBASE_END
-
-csReplacerDocumentNode::csReplacerDocumentNode (Pool* pool)
+csReplacerDocumentNode::csReplacerDocumentNode (iDocumentNode* wrappedNode,
+  csReplacerDocumentNode* parent, csReplacerDocumentNodeFactory* shared, 
+  Substitutions* subst) : scfPooledImplementationType (this), 
+  wrappedNode (wrappedNode), parent (parent), shared (shared), subst (subst)
 {
-  SCF_CONSTRUCT_IBASE_POOLED (pool);
+  shared->Substitute (wrappedNode->GetValue(), value, *this->subst);
 }
 
 csReplacerDocumentNode::~csReplacerDocumentNode ()
 {
-}
-
-void csReplacerDocumentNode::Set (iDocumentNode* wrappedNode, 
-				  csReplacerDocumentNode* parent, 
-				  csReplacerDocumentNodeFactory* shared, 
-				  Substitutions* subst)
-{
-  this->wrappedNode = wrappedNode;
-  this->parent = parent;
-  this->shared = shared;
-  this->subst = subst;
-
-  shared->Substitute (wrappedNode->GetValue(), value, *this->subst);
 }
 
 bool csReplacerDocumentNode::Equals (iDocumentNode* other)
@@ -67,8 +54,8 @@ bool csReplacerDocumentNode::Equals (iDocumentNode* other)
 
 csRef<iDocumentNodeIterator> csReplacerDocumentNode::GetNodes ()
 {
-  csReplacerDocumentNodeIterator* iter = shared->iterPool.Alloc();
-  iter->SetData (this);
+  csReplacerDocumentNodeIterator* iter = 
+    new (shared->iterPool) csReplacerDocumentNodeIterator (this);
   return csPtr<iDocumentNodeIterator> (iter);
 }
 
@@ -77,17 +64,19 @@ csRef<iDocumentNode> csReplacerDocumentNode::GetNode (
 {
   csRef<iDocumentNode> retNode = wrappedNode->GetNode (value);
   if (!retNode.IsValid()) return 0;
-  return shared->CreateWrapper (retNode, this, *subst);
+  return shared->CreateWrapper (retNode, this, subst);
 }
 
 csRef<iDocumentAttributeIterator> 
 csReplacerDocumentNode::GetAttributes ()
 {
   csReplacerDocumentAttributeIterator* iter = 
-    shared->attrIterPool.Alloc();
-  iter->SetData (this);
+    new (shared->attrIterPool) csReplacerDocumentAttributeIterator (this);
   return csPtr<iDocumentAttributeIterator> (iter);
 }
+
+CS_IMPLEMENT_STATIC_VAR (ReplacerAttrAlloc, 
+                         csBlockAllocator<csReplacerDocumentAttribute>, ())
 
 csRef<iDocumentAttribute> csReplacerDocumentNode::GetAttribute (
   const char* name)
@@ -97,8 +86,10 @@ csRef<iDocumentAttribute> csReplacerDocumentNode::GetAttribute (
 
   wrappedAttr = wrappedNode->GetAttribute (name);
   if (!wrappedAttr.IsValid()) return 0;
-  csReplacerDocumentAttribute* attr = shared->attrPool.Alloc();
-  attr->Set (this, wrappedAttr);
+  //csReplacerDocumentAttribute* attr = 
+    //new (shared->attrPool) csReplacerDocumentAttribute (this, wrappedAttr);
+  csReplacerDocumentAttribute* attr = ReplacerAttrAlloc()->Alloc ();
+  attr->SetData (this, wrappedAttr);
   wrappedAttr.AttachNew (attr);
   attrCache.Put (name, wrappedAttr);
   return wrappedAttr;
@@ -106,23 +97,15 @@ csRef<iDocumentAttribute> csReplacerDocumentNode::GetAttribute (
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_POOLED(csReplacerDocumentNodeIterator)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentNodeIterator)
-SCF_IMPLEMENT_IBASE_END
-
-csReplacerDocumentNodeIterator::csReplacerDocumentNodeIterator (Pool* pool)
+csReplacerDocumentNodeIterator::csReplacerDocumentNodeIterator (
+  csReplacerDocumentNode* node) : scfPooledImplementationType (this), 
+  node (node)
 {
-  SCF_CONSTRUCT_IBASE_POOLED (pool);
+  wrappedIter = node->wrappedNode->GetNodes();
 }
 
 csReplacerDocumentNodeIterator::~csReplacerDocumentNodeIterator ()
 {
-}
-
-void csReplacerDocumentNodeIterator::SetData (csReplacerDocumentNode* node)
-{
-  this->node = node;
-  wrappedIter = node->wrappedNode->GetNodes();
 }
 
 bool csReplacerDocumentNodeIterator::HasNext ()
@@ -135,29 +118,20 @@ csRef<iDocumentNode> csReplacerDocumentNodeIterator::Next ()
 {
   csRef<iDocumentNode> wrappedNode = wrappedIter->Next();
   if (!wrappedNode.IsValid()) return 0;
-  return node->shared->CreateWrapper (wrappedNode, node, *node->subst);
+  return node->shared->CreateWrapper (wrappedNode, node, node->subst);
 }
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_POOLED(csReplacerDocumentAttributeIterator)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentAttributeIterator)
-SCF_IMPLEMENT_IBASE_END
-
 csReplacerDocumentAttributeIterator::csReplacerDocumentAttributeIterator (
-  Pool* pool)
+  csReplacerDocumentNode* node) : scfPooledImplementationType (this), 
+  node (node)
 {
-  SCF_CONSTRUCT_IBASE_POOLED (pool);
+  wrappedIter = node->wrappedNode->GetAttributes();
 }
 
 csReplacerDocumentAttributeIterator::~csReplacerDocumentAttributeIterator ()
 {
-}
-
-void csReplacerDocumentAttributeIterator::SetData (csReplacerDocumentNode* node)
-{
-  this->node = node;
-  wrappedIter = node->wrappedNode->GetAttributes();
 }
 
 bool csReplacerDocumentAttributeIterator::HasNext ()
@@ -170,31 +144,47 @@ csRef<iDocumentAttribute> csReplacerDocumentAttributeIterator::Next ()
 {
   csRef<iDocumentAttribute> wrappedAttr = wrappedIter->Next();
   if (!wrappedAttr.IsValid()) return 0;
-  csReplacerDocumentAttribute* attr = node->shared->attrPool.Alloc();
-  attr->Set (node, wrappedAttr);
+  /*csReplacerDocumentAttribute* attr = 
+    new (node->shared->attrPool) csReplacerDocumentAttribute (
+    node, wrappedAttr);*/
+  csReplacerDocumentAttribute* attr = ReplacerAttrAlloc()->Alloc ();
+  attr->SetData (node, wrappedAttr);
   return csPtr<iDocumentAttribute> (attr);
 }
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_POOLED(csReplacerDocumentAttribute)
-  SCF_IMPLEMENTS_INTERFACE(iDocumentAttribute)
-SCF_IMPLEMENT_IBASE_END
-
-csReplacerDocumentAttribute::csReplacerDocumentAttribute (Pool* pool)
+csReplacerDocumentAttribute::csReplacerDocumentAttribute (
+  /*csReplacerDocumentNode* node, iDocumentAttribute* wrappedAttr*/) : 
+  /*scfPooledImplementationType (this)*/scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE_POOLED (pool);
+  /*node->shared->Substitute (wrappedAttr->GetName(), name, *node->subst);
+  node->shared->Substitute (wrappedAttr->GetValue(), val, *node->subst);*/
+}
+
+void csReplacerDocumentAttribute::DecRef ()
+{
+  CS_ASSERT_MSG("Refcount decremented for destroyed object", 
+    scfRefCount != 0);
+  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
+  scfRefCount--;
+  if (scfRefCount == 0)
+  {
+    scfRemoveRefOwners ();
+    if (scfParent) scfParent->DecRef();
+    ReplacerAttrAlloc()->Free (this);
+  }
+}
+
+void csReplacerDocumentAttribute::SetData (csReplacerDocumentNode* node, 
+                                           iDocumentAttribute* wrappedAttr)
+{
+  node->shared->Substitute (wrappedAttr->GetName(), name, *node->subst);
+  node->shared->Substitute (wrappedAttr->GetValue(), val, *node->subst);
 }
 
 csReplacerDocumentAttribute::~csReplacerDocumentAttribute ()
 {
-}
-
-void csReplacerDocumentAttribute::Set (csReplacerDocumentNode* node, 
-				       iDocumentAttribute* wrappedAttr)
-{
-  node->shared->Substitute (wrappedAttr->GetName(), name, *node->subst);
-  node->shared->Substitute (wrappedAttr->GetValue(), val, *node->subst);
 }
 
 //---------------------------------------------------------------------------
@@ -205,12 +195,10 @@ csReplacerDocumentNodeFactory::csReplacerDocumentNodeFactory ()
 
 csRef<iDocumentNode> csReplacerDocumentNodeFactory::CreateWrapper (
   iDocumentNode* wrappedNode, csReplacerDocumentNode* parent, 
-  const Substitutions& subst)
+  Substitutions* subst)
 {
-  csReplacerDocumentNode* newNode = nodePool.Alloc ();
-  csRef<Substitutions> newSubst;
-  newSubst.AttachNew (new Substitutions (subst));
-  newNode->Set (wrappedNode, parent, this, newSubst);
+  csReplacerDocumentNode* newNode = 
+    new (nodePool) csReplacerDocumentNode (wrappedNode, parent, this, subst);
   return csPtr<iDocumentNode> (newNode);
 }
 

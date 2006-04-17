@@ -36,181 +36,165 @@
 #endif
 #include <new>
 
-#define SCF_DECLARE_IBASE_POOLED_DECL(Class, parentClass)\
-  Class Pool                                            \
-  {                                                     \
-    struct PoolEntry;                                   \
-    PoolEntry* pool;                                    \
-    PoolEntry* allocedEntries;                          \
-  public:                                               \
-    Pool ();                                            \
-    ~Pool ();                                           \
-    parentClass* Alloc ();                              \
-    void Recycle (parentClass* instance);               \
-  };                                                    \
-  friend class Pool;                                    \
-  Pool* scfPool;                                        \
-  SCF_DECLARE_IBASE
-
 /**
- * Embed this macro instead of #SCF_DECLARE_IBASE into an SCF class that is to
- * be pooled.
- * \remarks To obtain an instance of \a Class, create an instance of
- *  \a Class::Pool and use it's Alloc() method, e.g.:
- *  \code
- *  csFoo::Pool fooPool;
- *  ...
- *  csRef<csFoo> foo; foo.AttachNew (fooPool.Alloc ());
- *  \endcode
- * \remarks A pooled class \a Class must implement a constructor with the
- *  following prototype:
- *  \code
- *   Class (Pool* pool);
- *  \endcode
- * \remarks Inside the constructor, #SCF_CONSTRUCT_IBASE_POOLED needs to be
- *  called.
- * \remarks If you need to set instance-specific data, you need to provide a
- *  custom method for that.
+ * Derive an SCF implementation from this class to have it pooled.
+ * - The \a Super template argument is the scfImplementation...<> class
+ *   you would normally use.
+ * \code
+ * class csFoo : 
+ *   public scfImplementationPooled<scfImplementation1<csFoo,
+ *                                                     iFoo> >
+ * {
+ *   ...
+ * };
+ * \endcode
+ * - A pooled class must needs to have the scfPooledImplementationType
+ *   class in its initializer list:
+ * \code
+ *   csFoo () : scfPooledImplementationType (this) { ... }
+ * \endcode
+ * - To obtain an instance of \a Class, use new with the pool object as
+ *   the placement argument:
+ * \code
+ *   csFoo::Pool fooPool;
+ *   ...
+ *   csRef<csFoo> foo; foo.AttachNew (new (fooPool) csFoo);
+ * \endcode
  */
-#define SCF_DECLARE_IBASE_POOLED(parentClass) \
-  SCF_DECLARE_IBASE_POOLED_DECL(class, parentClass)
+template<typename Super>
+class scfImplementationPooled : public Super
+{
+  typedef typename Super::scfClassType scfClassType;
+public:
+  typedef scfImplementationPooled<Super> scfPooledImplementationType;
 
-/**
- * Same as SCF_DECLARE_IBASE_POOLED, use for external classes.
- */
-#define SCF_DECLARE_IBASE_POOLED_EXTERN(Extern, parentClass) \
-  SCF_DECLARE_IBASE_POOLED_DECL(class Extern, parentClass)
-
-/**
- * Has to be invoked inside the class constructor instead of
- * #SCF_CONSTRUCT_IBASE.
- */
-#define SCF_CONSTRUCT_IBASE_POOLED(Pool)                \
-  SCF_CONSTRUCT_IBASE(0);                               \
-  scfPool = (Pool)
-
-#define SCF_IMPLEMENT_IBASE_POOL_HELPERS(parentClass)   \
-  struct parentClass::Pool::PoolEntry                   \
-  {                                                     \
-    parentClass instance;                               \
-    PoolEntry* next;                                    \
+  class Pool
+  {
+    friend class scfImplementationPooled<Super>;
+    struct Entry
+    {
+      Entry* next;
+    };
+    Entry* pool;
+    size_t allocedEntries;
+  #ifdef CS_MEMORY_TRACKER
+    csMemTrackerInfo* mti;
+  #endif
+  public:
+    Pool () : pool (0), allocedEntries (0) 
+    {
+  #ifdef CS_MEMORY_TRACKER
+      mti = 0;
+  #endif
+    }
+    ~Pool () 
+    {
+      while (pool != 0)
+      {
+	Entry* n = pool->next;
+	free (pool);
+      #ifdef CS_MEMORY_TRACKER
+        mtiUpdateAmount (mti, -1, 
+          -int(sizeof (scfClassType) + sizeof (Entry)));
+      #endif
+	pool = n;
+      }
+      CS_ASSERT_MSG ("not all SCF-pooled instances released",
+	allocedEntries == 0);
+    }
   };
+protected:
+  /// Pointer to the pool this instance is from.
+  Pool* scfPool;
+public:
+  /// Allocate a new instance of a pooled SCF class.
+  inline void* operator new (size_t n, Pool& p)
+  { 
+    typedef typename Pool::Entry PoolEntry;
+    CS_ASSERT_MSG ("Alloc size mismatches class size expected for pooled "
+      "allocation", n == sizeof (scfClassType));
+    PoolEntry* newEntry;
+    if (p.pool != 0)
+    {
+      newEntry = p.pool;
+      p.pool = p.pool->next;
+    }
+    else
+    {
+      newEntry = (PoolEntry*)malloc (sizeof (PoolEntry) + n);
+    #ifdef CS_MEMORY_TRACKER
+      if (p.mti == 0)
+      {
+        p.mti = mtiRegisterAlloc (sizeof (PoolEntry) + n, 
+          (void*)typeid (Pool).name());
+      }
+      else
+        mtiUpdateAmount (p.mti, 1, int (sizeof (PoolEntry) + n));
+    #endif
+    }
+    p.allocedEntries++;
+    scfClassType* newInst = 
+      (scfClassType*)((uint8*)newEntry + sizeof (PoolEntry));
+    /* A bit nasty: set scfPool member of the (still unconstructed!) 
+     * instance... */
+    ((scfPooledImplementationType*)newInst)->scfPool = &p;
+    return newInst;
+  }
 
-/**
- * Implement the constructor for the pool manager of \a Class.
- */
-#define SCF_IMPLEMENT_IBASE_POOL_CTOR(Class)            \
-Class::Pool::Pool ()                                    \
-{                                                       \
-  pool = 0;                                             \
-  allocedEntries = 0;                                   \
-}
+  //@{
+  /// Recycle a new instance of a pooled SCF class.
+  inline void operator delete (void* instance, Pool& p) 
+  {
+    typedef typename Pool::Entry PoolEntry;
+    // Go from instance to pool entry pointer
+    PoolEntry* entry = (PoolEntry*)((uint8*)instance - sizeof (PoolEntry));
+    entry->next = p.pool;
+    p.pool = entry;
+    p.allocedEntries--;
+  }
+  inline void operator delete (void* instance) 
+  {
+    scfClassType* object = (scfClassType*)instance;
+    Pool& p = *(((scfImplementationPooled*)object)->scfPool);
+    scfImplementationPooled::operator delete (object, p);
+  }
+  //@}
 
-/**
- * Implement the destructor for the pool manager of \a Class.
- */
-#define SCF_IMPLEMENT_IBASE_POOL_DTOR(Class)            \
-Class::Pool::~Pool ()                                   \
-{                                                       \
-  while (pool != 0)                                     \
-  {                                                     \
-    PoolEntry* n = pool->next;                          \
-    free (pool);                                        \
-    pool = n;                                           \
-  }                                                     \
-  CS_ASSERT_MSG ("not all SCF-pooled instances released",\
-    allocedEntries == 0);                               \
-}
+  /// DecRef() implementation that returns the object to the pool.
+  void DecRef ()
+  {
+    if (this->scfRefCount == 1)
+    {
+      //this->operator delete (this->scfObject, *scfPool);
+      delete this->scfObject;
+      return;
+    }
+    this->scfRefCount--;
+  }
 
-/**
- * Implement \a Alloc() for the pool manager of \a Class.
- */
-#define SCF_IMPLEMENT_IBASE_POOL_ALLOC(Class)           \
-Class* Class::Pool::Alloc ()                            \
-{                                                       \
-  PoolEntry* newEntry;                                  \
-  if (pool != 0)                                        \
-  {                                                     \
-    newEntry = pool;                                    \
-    pool = pool->next;                                  \
-  }                                                     \
-  else                                                  \
-  {                                                     \
-    newEntry = (PoolEntry*)malloc (sizeof (PoolEntry)); \
-  }                                                     \
-  Class* newInst = &newEntry->instance;                 \
-  new (newInst) Class (this);                           \
-  newEntry->next = allocedEntries;                      \
-  allocedEntries = newEntry;                            \
-  return newInst;                                       \
-}
-
-/**
- * Implement \a Recycle() for the pool manager of \a Class.
- */
-#define SCF_IMPLEMENT_IBASE_POOL_RECYCLE(Class)         \
-void Class::Pool::Recycle (Class* instance)             \
-{                                                       \
-  PoolEntry* prev = 0;                                  \
-  PoolEntry* entry = allocedEntries;                    \
-  while (&entry->instance != instance)                  \
-  {                                                     \
-    prev = entry;                                       \
-    entry = entry->next;                                \
-  }                                                     \
-  if (prev != 0)                                        \
-    prev->next = entry->next;                           \
-  else                                                  \
-    allocedEntries = entry->next;                       \
-  instance->~Class();                                   \
-  entry->next = pool;                                   \
-  pool = entry;                                         \
-}
-
-/**
- * Implement pool manager for \a Class.
- */
-#define SCF_IMPLEMENT_IBASE_POOL(Class)                 \
-  SCF_IMPLEMENT_IBASE_POOL_CTOR(Class)                  \
-  SCF_IMPLEMENT_IBASE_POOL_DTOR(Class)                  \
-  SCF_IMPLEMENT_IBASE_POOL_ALLOC(Class)                 \
-  SCF_IMPLEMENT_IBASE_POOL_RECYCLE(Class)
-
-/**
- * Implement IncRef() for a pooled class.
- */
-#define SCF_IMPLEMENT_IBASE_INCREF_POOLED(Class)        \
-void Class::IncRef ()                                   \
-{                                                       \
-  scfRefCount++;                                        \
-}
-
-/**
- * Implement DecRef() for a pooled class.
- */
-#define SCF_IMPLEMENT_IBASE_DECREF_POOLED(Class)        \
-void Class::DecRef ()                                   \
-{                                                       \
-  if (scfRefCount == 1)                                 \
-  {                                                     \
-    scfPool->Recycle (this);                            \
-    return;                                             \
-  }                                                     \
-  scfRefCount--;                                        \
-}
-
-/**
- * Use this in the source module instead of #SCF_IMPLEMENT_IBASE.
- */
-#define SCF_IMPLEMENT_IBASE_POOLED(Class)               \
-  SCF_IMPLEMENT_IBASE_POOL_HELPERS(Class)               \
-  SCF_IMPLEMENT_IBASE_POOL(Class)                       \
-  SCF_IMPLEMENT_IBASE_INCREF_POOLED(Class)              \
-  SCF_IMPLEMENT_IBASE_DECREF_POOLED(Class)              \
-  SCF_IMPLEMENT_IBASE_GETREFCOUNT(Class)                \
-  SCF_IMPLEMENT_IBASE_REFOWNER(Class)                   \
-  SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS(Class)          \
-  SCF_IMPLEMENT_IBASE_QUERY(Class)
+  //@{
+  /**
+   * Constructor. Call from the derived class with 'this' as first argument.
+   */
+  scfImplementationPooled (scfClassType* object) : 
+    Super (object) {}
+  template<typename A>
+  scfImplementationPooled (scfClassType* object, A a) : 
+    Super (object, a) {}
+  template<typename A, typename B>
+  scfImplementationPooled (scfClassType* object, A a, B b) : 
+    Super (object, a, b) {}
+  template<typename A, typename B, typename C>
+  scfImplementationPooled (scfClassType* object, A a, B b, C c) : 
+    Super (object, a, b, c) {}
+  template<typename A, typename B, typename C, typename D>
+  scfImplementationPooled (scfClassType* object, A a, B b, C c, D d) : 
+    Super (object, a, b, c, d) {}
+  template<typename A, typename B, typename C, typename D, typename E>
+  scfImplementationPooled (scfClassType* object, A a, B b, C c, D d, E e) : 
+    Super (object, a, b, c, d, e) {}
+  //@}
+};
 
 /** @} */
 

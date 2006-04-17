@@ -26,6 +26,12 @@
 
 #include "logic3.h"
 
+// Hack: Work around problems caused by #defining 'new'.
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
@@ -64,20 +70,47 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
        */
       class Side
       {
-      public:
-        bool inclusive;
+        enum { Inclusive = 1, Finite = 2, FiniteDirty = 4 };
+        mutable uint flags;
 	float value;
+      public:
       
-	Side (bool negInf, bool inclusive) : inclusive (inclusive), 
+	Side (bool negInf, bool inclusive) : flags (inclusive ? Inclusive : 0),
           value (negInf ? -CS_INFINITY : CS_INFINITY) {}
-	Side (float v, bool inclusive) : inclusive (inclusive), value (v) {}
+	Side (float v, bool inclusive) : 
+          flags (Finite | (inclusive ? Inclusive : 0)), value (v) {}
       
-        void FlipInclusive()
-        { if (csFinite (value)) inclusive = !inclusive; }
+        inline bool GetInclusive () const { return flags & Inclusive; }
+        inline void SetInclusive (bool inclusive)
+        { if (inclusive) flags |= Inclusive; else flags &= ~Inclusive; }
+        inline void FlipInclusive()
+        { 
+          if (IsFinite ()) flags = flags ^ Inclusive;
+        }
+        inline bool IsFinite() const
+        {
+          if (flags & FiniteDirty)
+          {
+            if (csFinite (value))
+            {
+              flags = (flags & ~FiniteDirty) | Finite;
+              return true;
+            }
+            else
+            {
+              flags &= ~(FiniteDirty | Finite);
+              return false;
+            }
+          }
+          else
+            return (flags & Finite) != 0;
+        }
+        inline float& GetValue() { return value; }
+        inline float GetValue() const { return value; }
 
         friend bool operator== (const Side& a, const Side& b)
         {
-          return (a.inclusive == b.inclusive) && 
+          return (a.GetInclusive() == b.GetInclusive()) && 
             (a.value == b.value)
             /*(fabsf (a.value - b.value) < SMALL_EPSILON)*/;
         }
@@ -105,9 +138,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
             return 1;
           else
           {
-            if (a.inclusive == b.inclusive)
+            if (a.GetInclusive() == b.GetInclusive())
               return 0;
-            else if (a.inclusive && !b.inclusive)
+            else if (a.GetInclusive() && !b.GetInclusive())
               return -1;
             else
               return 1;
@@ -121,9 +154,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
             return 1;
           else
           {
-            if (a.inclusive == b.inclusive)
+            if (a.GetInclusive() == b.GetInclusive())
               return 0;
-            else if (a.inclusive && !b.inclusive)
+            else if (a.GetInclusive() && !b.GetInclusive())
               return 1;
             else
               return -1;
@@ -141,7 +174,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       bool IsEmpty() const;
       bool IsSingleValue() const
       {
-        return ((left == right) && csFinite (left.value));
+        return ((left == right) && csFinite (left.GetValue()));
       }
 
       friend bool operator== (const Interval& a, const Interval& b)
@@ -155,14 +188,41 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     };
   protected:
     static const size_t arrayGrow = 2;
-    typedef csArray<Interval, csArrayElementHandler<Interval>,
-      csArrayLocalBufferAllocator<Interval, 4> > IntervalArray;
+    class IntervalElementHandler
+    {
+    public:
+      CS_FORCEINLINE
+      static void Construct (Interval* address)
+      {
+        new (CS_STATIC_CAST(void*,address)) Interval();
+      }
+
+      CS_FORCEINLINE
+      static void Construct (Interval* address, Interval const& src)
+      {
+        memcpy (address, &src, sizeof (Interval));
+      }
+
+      CS_FORCEINLINE
+      static void Destroy (Interval* /*address*/)
+      {
+      }
+
+      static void InitRegion (Interval* address, size_t count)
+      {
+        for (size_t i = 0 ; i < count ; i++)
+          Construct (address + i);
+      }
+    };
+    typedef csArray<Interval, IntervalElementHandler,
+      csArrayLocalBufferAllocator<Interval, arrayGrow>,
+      csArrayCapacityLinear<csArrayThresholdFixed<arrayGrow> > > IntervalArray;
     IntervalArray intervals;
   public:
     ValueSet (bool empty = false) : 
       intervals (empty ? 0 : 1, arrayGrow)
     {
-      if (!empty) intervals.Push (Interval ());
+      if (!empty) intervals.SetSize (1);
     }
     ValueSet (const float f) : intervals (1, arrayGrow)
     {
@@ -189,7 +249,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     }
     float GetSingleValue() const
     {
-      return intervals[0].left.value;
+      return intervals[0].left.GetValue();
     }
 
     ValueSet operator!() const;
@@ -199,11 +259,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       result.Intersection (b);
       return result;
     }
+    ValueSet& operator&= (const ValueSet& other)
+    {
+      Intersection (other);
+      return *this;
+    }
     friend ValueSet operator| (const ValueSet& a, const ValueSet& b)
     {
       ValueSet result (a);
       result.Union (b);
       return result;
+    }
+    ValueSet& operator|= (const ValueSet& other)
+    {
+      Union (other);
+      return *this;
     }
     friend bool operator== (const ValueSet& a, const ValueSet& b)
     {
@@ -230,5 +300,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
 }
 CS_PLUGIN_NAMESPACE_END(XMLShader)
+
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
 
 #endif // __CS_VALUESET_H__

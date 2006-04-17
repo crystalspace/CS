@@ -234,6 +234,7 @@ protected:
   }
 
   typedef SCF_IMPL_NAME<Class SCF_IMPL_ARGS> scfImplementationType;
+  typedef Class scfClassType; 
 
 private:
   template<typename I>
