@@ -257,7 +257,8 @@ protected:
     Element (const K& key0, const T &value0) : key (key0), value (value0) {}
     Element (const Element &other) : key (other.key), value (other.value) {}
   };
-  csArray< csArray<Element> > Elements;
+  typedef csArray<Element> ElementArray;
+  csArray<ElementArray> Elements;
 
   size_t Modulo;
 
@@ -285,16 +286,16 @@ private:
     Modulo = *p;
     CS_ASSERT (Modulo);
 
-    Elements.SetLength(Modulo, csArray<Element>(0, MIN(Modulo / GrowRate, 8)));
+    Elements.SetLength(Modulo, ElementArray (0, MIN(Modulo / GrowRate, 4)));
 
     for (size_t i = 0; i < elen; i++)
     {
-      csArray<Element>& src = Elements[i];
+      ElementArray& src = Elements[i];
       size_t slen = src.Length ();
       for (size_t j = slen; j > 0; j--)
       {
         const Element& srcElem = src[j - 1];
-        csArray<Element>& dst = 
+        ElementArray& dst = 
 	  Elements.Get (csHashComputer<K>::ComputeHash (srcElem.key) % Modulo);
         if (&src != &dst)
         {
@@ -309,22 +310,22 @@ public:
   /**
    * Construct a hash table with an array of the given size,
    * which for optimisation reasons should be a prime number.
-   * <p>
-   * Grow_rate is the rate at which the hash table grows:
-   * Size doubles once there are size/grow_rate collisions.
-   * It will not grow after it reaches max_size.
-   * <p>
+   * 
+   * \a grow_rate is the rate at which the hash table grows:
+   * \a size doubles once there are \a size/\a grow_rate collisions.
+   * It will not grow after it reaches \a max_size.
+   * 
    * Here are a few primes: 7, 11, 19, 29, 59, 79, 101, 127, 151, 199, 251,
    * 307, 401, 503, 809, 1009, 1499, 2003, 3001, 5003, 12263, 25247, 36923,
    * 50119, 70951, 90313, 104707.
-   * <p>
+   * 
    * For a bigger list go to http://www.utm.edu/research/primes/
    */
   csHash (size_t size = 23, size_t grow_rate = 5, size_t max_size = 20000)
     : Elements (size), Modulo (size), InitModulo (size),
       GrowRate (MIN (grow_rate, size)), MaxSize (max_size), Size (0)
   {
-    Elements.SetLength (size, csArray<Element> (0, MIN (size / GrowRate, 8)));
+    Elements.SetLength (size, ElementArray (0, MIN (size / GrowRate, 4)));
   }
 
   /// Copy constructor.
@@ -341,7 +342,7 @@ public:
    */
   void Put (const K& key, const T &value)
   {
-    csArray<Element> &values = 
+    ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     values.Push (Element (key, value));
     Size++;
@@ -350,11 +351,12 @@ public:
   }
 
   /// Get all the elements with the given key, or empty if there are none.
-  csArray<T> GetAll (const K& key) const
+  template<typename H, typename M>
+  csArray<T, H, M> GetAll (const K& key) const
   {
-    const csArray<Element> &values = 
+    const ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
-    csArray<T> ret (values.Length () / 2);
+    csArray<T, H, M> ret (values.Length () / 2);
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
     {
@@ -368,7 +370,7 @@ public:
   /// Add an element to the hash table, overwriting if the key already exists.
   void PutUnique (const K& key, const T &value)
   {
-    csArray<Element> &values = 
+    ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
@@ -399,7 +401,7 @@ public:
   /// Returns whether at least one element matches the given key.
   bool Contains (const K& key) const
   {
-    const csArray<Element> &values = 
+    const ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
@@ -422,7 +424,7 @@ public:
    */
   const T* GetElementPointer (const K& key) const
   {
-    const csArray<Element> &values = 
+    const ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
@@ -441,7 +443,7 @@ public:
    */
   T* GetElementPointer (const K& key)
   {
-    csArray<Element> &values = 
+    ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
@@ -460,7 +462,7 @@ public:
    */
   const T& Get (const K& key, const T& fallback) const
   {
-    const csArray<Element> &values = 
+    const ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
@@ -479,7 +481,7 @@ public:
    */
   T& Get (const K& key, T& fallback)
   {
-    csArray<Element> &values = 
+    ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     const size_t len = values.Length ();
     for (size_t i = 0; i < len; ++i)
@@ -509,7 +511,7 @@ public:
   bool DeleteAll (const K& key)
   {
     bool ret = false;
-    csArray<Element> &values = 
+    ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     for (size_t i = values.Length (); i > 0; i--)
     {
@@ -528,7 +530,7 @@ public:
   bool Delete (const K& key, const T &value)
   {
     bool ret = false;
-    csArray<Element> &values = 
+    ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
     for (size_t i = values.Length (); i > 0; i--)
     {
