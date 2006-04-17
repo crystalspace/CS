@@ -100,7 +100,7 @@ bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry,
 
 bool csBaseEventHandler::HandleEvent (iEvent &event)
 {
-  CS_ASSERT_MSG("You need to call Initialize() with valid object registry "
+  CS_ASSERT_MSG("You need to call Initialize() with a valid object registry "
     "before you can use csBaseEventHandler", object_registry != 0);
   if (event.Name == FrameEvent)
   {
