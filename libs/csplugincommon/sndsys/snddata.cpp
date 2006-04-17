@@ -54,13 +54,7 @@ size_t SndSysBasicData::GetFrameCount()
 void SndSysBasicData::SetDescription(const char *pDescription)
 {
   delete[] m_pDescription;
-  m_pDescription=0;
-
-  if (!pDescription)
-    return;
-
-  m_pDescription=new char[strlen(pDescription)+1];
-  strcpy(m_pDescription, pDescription);
+  m_pDescription = csStrNew (pDescription);
 }
 
 

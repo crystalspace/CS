@@ -80,7 +80,7 @@ namespace CS
 
     /// Set an optional description to be associated with this sound data
     //   A filename isn't a bad idea!
-    virtual void SetDescription(const char *pDescription);
+    virtual void SetDescription (const char *pDescription);
 
     /// Retrieve the description associated with this sound data
     //   This may return 0 if no description is set.
