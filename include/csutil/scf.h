@@ -98,7 +98,7 @@ class csPathsList;
  */
 #define SCF_DECLARE_IBASE						\
   int scfRefCount;		/* Reference counter */			\
-  csArray<iBase**>* scfWeakRefOwners;					\
+  csArray<void**>* scfWeakRefOwners;					\
   void scfRemoveRefOwners ();						\
   SCF_DECLARE_EMBEDDED_IBASE (iBase)
 
@@ -112,8 +112,8 @@ public:									\
   virtual void IncRef ();						\
   virtual void DecRef ();						\
   virtual int GetRefCount ();						\
-  virtual void AddRefOwner (iBase** ref_owner);				\
-  virtual void RemoveRefOwner (iBase** ref_owner);			\
+  virtual void AddRefOwner (void** ref_owner);				\
+  virtual void RemoveRefOwner (void** ref_owner);			\
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 
 /**
@@ -214,7 +214,7 @@ void Class::scfRemoveRefOwners ()					\
   if (!scfWeakRefOwners) return;					\
   for (size_t i = 0 ; i < scfWeakRefOwners->Length () ; i++)		\
   {									\
-    iBase** p = (*scfWeakRefOwners)[i];					\
+    void** p = (*scfWeakRefOwners)[i];					\
     *p = 0;								\
   }									\
   delete scfWeakRefOwners;						\
@@ -226,18 +226,18 @@ void Class::scfRemoveRefOwners ()					\
  * and RemoveRefOwner() for a weak reference.
  */
 #define SCF_IMPLEMENT_IBASE_REFOWNER(Class)				\
-void Class::AddRefOwner (iBase** ref_owner)				\
+void Class::AddRefOwner (void** ref_owner)				\
 {									\
   if (!scfWeakRefOwners)						\
-    scfWeakRefOwners = new csArray<iBase**> (0, 4);			\
+    scfWeakRefOwners = new csArray<void**> (0, 4);			\
   scfWeakRefOwners->InsertSorted (ref_owner);				\
 }									\
-void Class::RemoveRefOwner (iBase** ref_owner)				\
+void Class::RemoveRefOwner (void** ref_owner)				\
 {									\
   if (!scfWeakRefOwners)						\
     return;								\
   size_t index = scfWeakRefOwners->FindSortedKey (			\
-    csArrayCmp<iBase**, iBase**> (ref_owner)); 				\
+    csArrayCmp<void**, void**> (ref_owner)); 				\
   if (index != csArrayItemNotFound) scfWeakRefOwners->DeleteIndex (	\
     index); 								\
 }
@@ -338,11 +338,11 @@ int Class::GetRefCount ()						\
  * AddRefOwner() and RemoveRefOwner() for a weak reference.
  */
 #define SCF_IMPLEMENT_EMBEDDED_IBASE_REFOWNER(Class)			\
-void Class::AddRefOwner (iBase** ref_owner)				\
+void Class::AddRefOwner (void** ref_owner)				\
 {									\
   scfParent->AddRefOwner (ref_owner);					\
 }									\
-void Class::RemoveRefOwner (iBase** ref_owner)				\
+void Class::RemoveRefOwner (void** ref_owner)				\
 {									\
   scfParent->RemoveRefOwner (ref_owner);				\
 }
@@ -432,8 +432,8 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
   virtual void IncRef ();						\
   virtual void DecRef ();						\
   virtual int GetRefCount ();						\
-  virtual void AddRefOwner (iBase** ref_owner);				\
-  virtual void RemoveRefOwner (iBase** ref_owner);			\
+  virtual void AddRefOwner (void** ref_owner);				\
+  virtual void RemoveRefOwner (void** ref_owner);			\
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 
 /**
@@ -477,11 +477,11 @@ int Class::GetRefCount ()						\
  * AddRefOwner() and RemoveRefOwner() for a weak reference.
  */
 #define SCF_IMPLEMENT_IBASE_EXT_REFOWNER(Class)			\
-void Class::AddRefOwner (iBase** ref_owner)				\
+void Class::AddRefOwner (void** ref_owner)				\
 {									\
   __scf_superclass::AddRefOwner (ref_owner);				\
 }									\
-void Class::RemoveRefOwner (iBase** ref_owner)				\
+void Class::RemoveRefOwner (void** ref_owner)				\
 {									\
   __scf_superclass::RemoveRefOwner (ref_owner);				\
 }

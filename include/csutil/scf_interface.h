@@ -132,9 +132,9 @@ public:
    */
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion) = 0;
   /// For weak references: add a reference owner.
-  virtual void AddRefOwner (iBase** ref_owner) = 0;
+  virtual void AddRefOwner (void** ref_owner) = 0;
   /// For weak references: remove a reference owner.
-  virtual void RemoveRefOwner (iBase** ref_owner) = 0;
+  virtual void RemoveRefOwner (void** ref_owner) = 0;
 };
 
 /// Type of factory function which creates an instance of an SCF class.

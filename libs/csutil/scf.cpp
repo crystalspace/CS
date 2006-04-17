@@ -455,19 +455,19 @@ void scfFactory::DecRef ()
   }
 }
 
-void scfFactory::AddRefOwner (iBase** ref_owner)
+void scfFactory::AddRefOwner (void** ref_owner)
 {
   if (!scfWeakRefOwners)						
-    scfWeakRefOwners = new csArray<iBase**> (0, 4);			
+    scfWeakRefOwners = new csArray<void**> (0, 4);			
   scfWeakRefOwners->InsertSorted (ref_owner);				
 }
 
-void scfFactory::RemoveRefOwner (iBase** ref_owner)
+void scfFactory::RemoveRefOwner (void** ref_owner)
 {
   if (!scfWeakRefOwners)						
     return;
   size_t index = scfWeakRefOwners->FindSortedKey (			
-    csArrayCmp<iBase**, iBase**> (ref_owner)); 				
+    csArrayCmp<void**, void**> (ref_owner)); 				
   if (index != csArrayItemNotFound) scfWeakRefOwners->DeleteIndex (	
     index); 								
 }

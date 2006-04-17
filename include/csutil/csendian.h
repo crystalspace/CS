@@ -75,21 +75,18 @@ public:
   {
   #if defined(CS_COMPILER_MSVC) && (_MSC_VER >= 1300)
     return _byteswap_uint64 (l);
-  #elif defined(CS_HAVE_BYTESWAP_H)
+  #elif defined(CS_HAVE_BYTESWAP_H) && !defined(__STRICT_ANSI__)
     return bswap_64 (l);
   #else
-    uint64 r;
-    Swap8 *p1 = (Swap8 *)&l;
-    Swap8 *p2 = (Swap8 *)&r;
-    p2->b1 = p1->b8;
-    p2->b2 = p1->b7;
-    p2->b3 = p1->b6;
-    p2->b4 = p1->b5;
-    p2->b5 = p1->b4;
-    p2->b6 = p1->b3;
-    p2->b7 = p1->b2;
-    p2->b8 = p1->b1;
-    return r;
+    union
+    {
+      uint64 ui64;
+      uint32 ui32[2];
+    } u1, u2;
+    u1.ui64 = l;
+    u2.ui32[0] = Swap (u1.ui32[1]);
+    u2.ui32[1] = Swap (u1.ui32[0]);
+    return u2.ui64;
   #endif
   }
   static CS_FORCEINLINE int64  Swap (int64 l)
@@ -174,13 +171,31 @@ public:
  */
 struct csIEEEfloat
 {
+  /* @@@ FIXME It would be even better if we also check for sizeof (float)
+   * in configure or so. */
 #ifdef CS_IEEE_DOUBLE_FORMAT
   /// Convert native to IEEE
   static CS_FORCEINLINE uint32 FromNative (float f)
-  { return *(uint32*)&f; }
+  { 
+    union
+    {
+      float f;
+      uint32 ui32;
+    } u;
+    u.f = f;
+    return u.ui32; 
+  }
   /// Convert IEEE to native
   static CS_FORCEINLINE float ToNative (uint32 f)
-  { return *(float*)&f; }
+  { 
+    union
+    {
+      float f;
+      uint32 ui32;
+    } u;
+    u.ui32 = f;
+    return u.f; 
+  }
 #else
   #error Do not know how to convert to IEEE floats
 #endif

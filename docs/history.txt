@@ -8,8 +8,6 @@ chronological order.
 
 
 17-Apr-2006
-        - Arianna fixed some warnings found compiling with MSVC 7.1 in 64-bits 
-          mode.
 	- res removed the now-obsolete sounddrivers and soundrenderers compile
 	  groups.
 	- res changed the doxygen configs to expand the 
@@ -47,6 +45,9 @@ chronological order.
 	- res moved the "pooled SCF class" support over to a templated, 
 	  new SCF style implementation.
 	- res made various optimizations in xmlshader.
+        - Arianna fixed some warnings found compiling with MSVC 7.1 in 64-bits 
+          mode.
+	- res attempted to fix some gcc4.1 warnings.
 15-Apr-2006
 	- Piotr Obrzut fixed small bug in adding positions from map in meshgen.   
 	- Piotr Obrzut did some optimizations to meshgen.

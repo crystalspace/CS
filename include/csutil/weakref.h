@@ -46,7 +46,11 @@ template <class T>
 class csWeakRef
 {
 private:
-  T* obj;
+  union
+  {
+    T* obj;
+    void* obj_void;
+  };
 
   /**
    * Unlink the object pointed to by this weak reference so that
@@ -55,7 +59,7 @@ private:
    */
   void Unlink ()
   {
-    if (obj) obj->RemoveRefOwner ((iBase**)&obj);
+    if (obj) obj->RemoveRefOwner (&obj_void);
   }
 
   /**
@@ -63,7 +67,7 @@ private:
    */
   void Link ()
   {
-    if (obj) obj->AddRefOwner ((iBase**)&obj);
+    if (obj) obj->AddRefOwner (&obj_void);
   }
 
 public:

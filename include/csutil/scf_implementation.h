@@ -197,20 +197,20 @@ public:
     return scfRefCount;
   }
 
-  virtual void AddRefOwner (iBase** ref_owner)
+  virtual void AddRefOwner (void** ref_owner)
   {
     if (!this->scfWeakRefOwners)
-      scfWeakRefOwners = new csArray<iBase**> (0, 4);
+      scfWeakRefOwners = new WeakRefOwnerArray (0);
     scfWeakRefOwners->InsertSorted (ref_owner);
   }
 
-  virtual void RemoveRefOwner (iBase** ref_owner)
+  virtual void RemoveRefOwner (void** ref_owner)
   {
     if (!scfWeakRefOwners)
       return;
 
     size_t index = scfWeakRefOwners->FindSortedKey (
-      csArrayCmp<iBase**, iBase**>(ref_owner));
+      csArrayCmp<void**, void**>(ref_owner));
 
     if (index != csArrayItemNotFound)
       scfWeakRefOwners->DeleteIndex (index);
@@ -221,7 +221,11 @@ protected:
 
   int scfRefCount;
   iBase *scfParent;
-  csArray<iBase**>* scfWeakRefOwners;
+  typedef csArray<void**,
+    csArrayElementHandler<void**>,
+    csArrayMemoryAllocator<void**>,
+    csArrayCapacityLinear<csArrayThresholdFixed<4> > > WeakRefOwnerArray;
+  WeakRefOwnerArray* scfWeakRefOwners;
 
   void scfRemoveRefOwners ()
   {
@@ -230,7 +234,7 @@ protected:
 
     for (size_t i = 0; i < scfWeakRefOwners->Length (); i++)
     {
-      iBase** p = (*scfWeakRefOwners)[i];
+      void** p = (*scfWeakRefOwners)[i];
       *p = 0;
     }
     delete scfWeakRefOwners;
