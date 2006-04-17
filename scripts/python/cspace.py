@@ -68,6 +68,30 @@ class csWrapPtrPtr(csWrapPtr):
         _swig_setattr(self, csWrapPtr,self.__class__,csWrapPtr)
 _cspace.csWrapPtr_swigregister(csWrapPtrPtr)
 
+class csArrayThresholdVariable(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csArrayThresholdVariable, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csArrayThresholdVariable, name)
+    def __repr__(self):
+        return "<%s.%s; proxy of C++ csArrayThresholdVariable instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
+    def __init__(self, *args):
+        _swig_setattr(self, csArrayThresholdVariable, 'this', _cspace.new_csArrayThresholdVariable(*args))
+        _swig_setattr(self, csArrayThresholdVariable, 'thisown', 1)
+    def GetThreshold(*args): return _cspace.csArrayThresholdVariable_GetThreshold(*args)
+    def __del__(self, destroy=_cspace.delete_csArrayThresholdVariable):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+
+class csArrayThresholdVariablePtr(csArrayThresholdVariable):
+    def __init__(self, this):
+        _swig_setattr(self, csArrayThresholdVariable, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csArrayThresholdVariable, 'thisown', 0)
+        _swig_setattr(self, csArrayThresholdVariable,self.__class__,csArrayThresholdVariable)
+_cspace.csArrayThresholdVariable_swigregister(csArrayThresholdVariablePtr)
+
 
 scfCompatibleVersion = _cspace.scfCompatibleVersion
 class iBase(_object):
