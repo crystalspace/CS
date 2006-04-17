@@ -6,9 +6,4 @@ if $(ODE.AVAILABLE) = "yes"
   Plugin odedynam : [ Wildcard *.cpp *.h ] ;
   LinkWith odedynam : crystalspace ;
   ExternalLibs odedynam : ODE ;
-  if $(ODE.EXTERN_C) = "yes"
-  {
-    CFlags odedynam : [ FDefines CS_USE_ODE_EXTERN_C ] ;
-  }
-  MsvcDefine odedynam : CS_USE_ODE_EXTERN_C ;
 }

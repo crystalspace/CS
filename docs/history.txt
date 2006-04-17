@@ -38,6 +38,7 @@ chronological order.
 	  defines and cflags from dependencies.
 	- res augmented the syntax services to parse/write the upgraded mix
 	  modes (with blend ops and alpha test flags).
+	- res removed superfluous definitions of CS_USE_ODE_EXTERN_C.
 15-Apr-2006
 	- Piotr Obrzut fixed small bug in adding positions from map in meshgen.   
 	- Piotr Obrzut did some optimizations to meshgen.
