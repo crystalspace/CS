@@ -19,6 +19,12 @@ chronological order.
 	  for empty allocator classes.
 	- res changed csArray so that the threshold logic is templated as 
 	  well.
+	- res made csBitArray more tweakable (csBitArray now inherits from a
+	  templated class csBitArrayTweakable that essentially contains the 
+	  logic).
+	- res added some methods to csBlockAllocator to allocate an object but
+	  don't construct it, free an object without destructing it, and a 
+	  free method that does not assert on memory not from the allocator.
 15-Apr-2006
 	- Piotr Obrzut fixed small bug in adding positions from map in meshgen.   
 	- Piotr Obrzut did some optimizations to meshgen.

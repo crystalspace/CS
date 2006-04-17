@@ -37,6 +37,7 @@
 #ifdef CS_MEMORY_TRACKER
 #include "csutil/memdebug.h"
 #include <typeinfo>
+#include "csstring.h"
 #endif
 
 /**
@@ -94,8 +95,8 @@ public:
 #ifdef CS_MEMORY_TRACKER
 /**
  * This class implements block allocating policy for memory-tracking builds
- * (when CS_MEMORY_TRACKER is defined).  It has a per-block overhead of eight
- * bytes.
+ * (when CS_MEMORY_TRACKER is defined).  It has a per-block overhead of 
+ * 2*sizeof(uintptr_t) bytes.
  */
 template <class T>
 class csBlockAllocatorMTBlockPolicy
@@ -106,10 +107,10 @@ public:
    */
   static inline uint8* AllocBlock (size_t blocksize)
   {
-    char buf[255];
-    sprintf (buf, "csBlockAllocator<%s>", typeid (T).name());
+    csString buf;
+    buf.AppendFmt ("csBlockAllocator<%s >", typeid (T).name());
     uintptr_t* ptr = (uintptr_t*)malloc (blocksize + sizeof (uintptr_t)*2);
-    *ptr++ = (uintptr_t)mtiRegisterAlloc (blocksize, buf);
+    *ptr++ = (uintptr_t)mtiRegisterAlloc (blocksize, (void*)buf.GetData());
     *ptr++ = blocksize;
     return (uint8*)ptr;
   }
@@ -167,17 +168,24 @@ protected: // 'protected' allows access by test-suite.
     BlockKey(uint8 const* p, size_t n) : addr(p), blocksize(n) {}
   };
 
-  csArray<uint8*> blocks;       // List of allocated blocks; sorted by address.
-  size_t size;                  // Number of elements per block.
-  size_t elsize;                // Element size; >= sizeof(void*).
-  size_t blocksize;             // Size in bytes per block.
-  FreeNode* freenode;           // Head of the chain of free nodes.
-  bool pedantic;                // Warn about nodes not explicitly freed.
-  bool insideDisposeAll;        // Flag to ignore calls to Compact() and
-                                //  Free() if they're called recursively
-                                //  while disposing the entire allocation set.
-                                //  Recursive calls to Alloc() will signal an
-                                //  assertion failure.
+  /// List of allocated blocks; sorted by address.
+  csArray<uint8*> blocks;
+  /// Number of elements per block.
+  size_t size;
+  /// Element size; >= sizeof(void*).
+  size_t elsize;
+  /// Size in bytes per block.
+  size_t blocksize;
+  /// Head of the chain of free nodes.
+  FreeNode* freenode;
+  /// Warn about nodes not explicitly freed.
+  bool pedantic;
+  /** 
+   * Flag to ignore calls to Compact() and Free() if they're called recursively
+   * while disposing the entire allocation set. Recursive calls to Alloc() will
+   * signal an assertion failure.
+   */
+  bool insideDisposeAll;
 
   /**
    * Comparison function for FindBlock() which does a "fuzzy" search given an
@@ -232,9 +240,9 @@ protected: // 'protected' allows access by test-suite.
   /**
    * Destroy an object, optionally warning if pedanticism is desired.
    */
-  void DestroyObject(T* p, bool warn = false) const
+  void DestroyObject (T* p, bool warn, bool invokeDtor = true) const
   {
-    p->~T();
+    if (invokeDtor) p->~T();
     if (warn)
     {
 #ifdef CS_DEBUG
@@ -287,6 +295,26 @@ protected: // 'protected' allows access by test-suite.
     insideDisposeAll = false;
   }
 
+  /// Find and allocate a block
+  void* AllocCommon ()
+  {
+    if (insideDisposeAll)
+    {
+      csPrintfErr("ERROR: csBlockAllocator(%p) tried to allocate memory "
+	"while inside DisposeAll()", (void*)this);
+      CS_ASSERT(false);
+    }
+
+    if (freenode == 0)
+    {
+      uint8* p = AllocBlock();
+      blocks.InsertSorted(p);
+      freenode = (FreeNode*)p;
+    }
+    void* const node = freenode;
+    freenode = freenode->next;
+    return node;
+  }
 public:
   /**
    * Construct a new block allocator.
@@ -299,7 +327,7 @@ public:
    *   only add 3 elements to the pool, then the space for the remaining 47
    *   elements, though allocated, will remain unused (until you add more
    *   elements).
-   * <p>
+   *
    * \remarks If use use csBlockAllocator as a convenient and lightweight
    *   garbage collection facility (for which it is well-suited), and expect it
    *   to dispose of allocated objects when the pool itself is destroyed, then
@@ -382,40 +410,60 @@ public:
   }
 
   /**
-   * Allocate a new object. Its default (no-argument) constructor is invoked.
+   * Allocate a new object. 
+   * The default (no-argument) constructor of \a T is invoked. 
    */
-  T* Alloc()
+  T* Alloc ()
   {
-    if (insideDisposeAll)
-    {
-      csPrintfErr("ERROR: csBlockAllocator(%p) tried to allocate memory while inside DisposeAll()", (void*)this);
-      CS_ASSERT(false);
-    }
+    return new (AllocCommon()) T;
+  }
 
-    if (freenode == 0)
-    {
-      uint8* p = AllocBlock();
-      blocks.InsertSorted(p);
-      freenode = (FreeNode*)p;
-    }
-    void* const node = freenode;
-    freenode = freenode->next;
-    return new (node) T;
+  /**
+   * Allocate a new object. 
+   * Only the allocated memory is returned, no construction (as done by 
+   * Alloc()) is done. This is mostly useful for custom \c new implementations.
+   * \remarks Since by default all still-allocated objects are properly 
+   *   destructed upon destruction of the allocator, you should never leave an 
+   *   allocated object unconstructed!
+   */
+  void* AllocUninit ()
+  {
+    return AllocCommon();
   }
 
   /**
    * Deallocate an object. It is safe to provide a null pointer.
+   * \param invokeCtor If true, the destructor of \a T is invoked. If false, 
+   *   the memory is only freed. This is mostly useful for custom 
+   *   \c delete implementations.
    */
-  void Free(T* p)
+  void Free (T* p, bool invokeDtor = true)
   {
     if (p != 0 && !insideDisposeAll)
     {
       CS_ASSERT(FindBlock(p) != csArrayItemNotFound);
-      DestroyObject(p, false);
+      DestroyObject(p, false, invokeDtor);
       FreeNode* f = (FreeNode*)p;
       f->next = freenode;
       freenode = f;
     }
+  }
+  /**
+   * Try to delete an object. Usage is the same as Free(), the difference
+   * being that \c false is returned if the deallocation failed (the reason
+   * is most likely that the memory was not allocated by the allocator).
+   */
+  bool TryFree (T* p, bool invokeDtor = true)
+  {
+    if (p != 0 && !insideDisposeAll)
+    {
+      if (FindBlock(p) == csArrayItemNotFound) return false;
+      DestroyObject(p, false, invokeDtor);
+      FreeNode* f = (FreeNode*)p;
+      f->next = freenode;
+      freenode = f;
+    }
+    return true;
   }
   /// Query number of elements per block.
   size_t GetBlockElements() const { return size; }
