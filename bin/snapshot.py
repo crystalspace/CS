@@ -112,7 +112,7 @@ copyright = "Copyright (C) 2000-2005 by " + author_info
 #        destination package name.
 #------------------------------------------------------------------------------
 
-cvsroot = ":pserver:anonymous@cvs.crystalspace3d.org:/cvsroot/crystal"
+cvsroot = ":ext:crystal-manage@cvs.crystalspace3d.org:/cvsroot/crystal"
 fixcvsroot = ":pserver:anonymous@cvs.crystalspace3d.org:/cvsroot/crystal"
 cvsmodule = "CS"
 moduledir = "CS"
