@@ -24,6 +24,9 @@
 #include "csplugincommon/sndsys/sndstream.h"
 #include "wavdata2.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysWav)
+{
+
 using namespace CS::SndSys;
 
 class SndSysWavSoundStream : public SndSysBasicStream
@@ -94,6 +97,7 @@ protected:
   bool m_bConversionNeeded;
 };
 
+}
+CS_PLUGIN_NAMESPACE_END(SndSysWav)
+
 #endif // #ifndef SNDSYS_STREAM_WAV_H
-
-

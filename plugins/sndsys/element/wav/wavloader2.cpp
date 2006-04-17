@@ -24,9 +24,10 @@
 
 #include "wavloader2.h"
 
-
-
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysWav)
+{
 
 SCF_IMPLEMENT_FACTORY (SndSysWavLoader)
 
-
+}
+CS_PLUGIN_NAMESPACE_END(SndSysWav)

@@ -22,6 +22,9 @@
 #include "wavdata2.h"
 #include "wavstream2.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysWav)
+{
+
 // Keep these as integer values or the stream may feed portions of a sample to the higher layer which may cause problems
 // 1 , 1 will decode 1/1 or 1 second of audio in advance
 #define WAV_BUFFER_LENGTH_MULTIPLIER  1
@@ -240,3 +243,5 @@ void SndSysWavSoundStream::AdvancePosition(size_t frame_delta)
       
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(SndSysWav)

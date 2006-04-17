@@ -27,6 +27,9 @@
 #include "iutil/databuff.h"
 #include "csplugincommon/sndsys/snddata.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysWav)
+{
+
 using namespace CS::SndSys;
 
 // header of the RIFF-chunk
@@ -165,6 +168,9 @@ protected:
   /// Length of the samples in bytes
   size_t m_PCMDataLength;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(SndSysWav)
 
 #endif // #ifndef SNDSYS_DATA_WAV_H
 

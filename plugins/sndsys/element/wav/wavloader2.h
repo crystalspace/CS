@@ -23,6 +23,8 @@
 #include "isndsys/ss_loader.h"
 #include "csutil/scf_implementation.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysWav)
+{
 
 /// iSndSysLoader interface for PCM Waveform audio data
 //
@@ -78,6 +80,7 @@ public:
   }
 };
 
+}
+CS_PLUGIN_NAMESPACE_END(SndSysWav)
+
 #endif // #ifndef SNDSYS_LOADER_WAV_H
-
-

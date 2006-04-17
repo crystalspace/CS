@@ -18,13 +18,19 @@
 */
 
 #include "cssysdef.h"
+
 #include "iutil/comp.h"
 #include "isndsys/ss_loader.h"
+
+#include "csutil/csendian.h"
+
 #include "wavstream2.h"
 #include "wavdata2.h"
 
 CS_IMPLEMENT_PLUGIN
 
+CS_PLUGIN_NAMESPACE_BEGIN(SndSysWav)
+{
 
 // Microsoft Wav file loader
 // support 8 and 16 bits PCM (RIFF)
@@ -96,25 +102,11 @@ CS_IMPLEMENT_PLUGIN
 
 
 
-// helper functions
-/// Byte swap 32 bit data.
-static inline uint32 csByteSwap32bit ( const uint32 value )
-{
-  return ((value >> 24 ) & 0x000000FF ) | ((value >> 8) & 0x0000FF00)
-    | ((value << 8) & 0x00FF0000) | (( value << 24) & 0xFF000000);
-}
-
-/// Byte swap 16 bit data.
-static inline uint16 csByteSwap16bit ( const uint16 value )
-{
-  return (( value >> 8 ) & 0x000000FF ) | (( value << 8 ) & 0x0000FF00 );
-}
-
 static inline void csByteSwap16bitBuffer (uint16* ptr, size_t count)
 {
   for (; count > 0; --count, ++ptr)
   {
-    *ptr = csByteSwap16bit (*ptr);
+    *ptr = csSwapBytes::UInt16 (*ptr);
   }
 }
 
@@ -122,7 +114,7 @@ static inline void csByteSwap32bitBuffer (uint32* ptr, size_t count)
 {
   for (; count > 0; --count, ++ptr)
   {
-    *ptr = csByteSwap32bit (*ptr);
+    *ptr = csSwapBytes::UInt32 (*ptr);
   }
 }
 
@@ -159,8 +151,8 @@ iSndSysStream *SndSysWavSoundData::CreateStream (
 void SndSysWavSoundData::Initialize()
 {
 
-  if (ReadHeaders (m_DataStore.data,m_DataStore.length,&m_RIFFHeader,&m_FMTHeader,
-                  &m_WAVHeader,&m_pPCMData,&m_PCMDataLength))
+  if (ReadHeaders (m_DataStore.data, m_DataStore.length, &m_RIFFHeader,
+    &m_FMTHeader, &m_WAVHeader, &m_pPCMData, &m_PCMDataLength))
   {
     // The number of frames of audio is equal to the length of the audio data 
     //  divided by the length of each frame.
@@ -172,7 +164,10 @@ void SndSysWavSoundData::Initialize()
   }
 }
 
-bool SndSysWavSoundData::ReadHeaders(void *Buffer, size_t len, _RIFFchk *p_riffchk, _FMTchk *p_fmtchk, _WAVchk *p_wavchk, void **data_start, size_t *data_len)
+bool SndSysWavSoundData::ReadHeaders(void *Buffer, size_t len, 
+                                     _RIFFchk *p_riffchk, _FMTchk *p_fmtchk, 
+                                     _WAVchk *p_wavchk, void **data_start, 
+                                     size_t *data_len)
 {
   if (!Buffer)
     return false;
@@ -218,9 +213,7 @@ bool SndSysWavSoundData::ReadHeaders(void *Buffer, size_t len, _RIFFchk *p_riffc
       found = true;
 
     // correct length of chunk on big endian system
-#ifdef CS_BIG_ENDIAN
-    fmtchk.len = csByteSwap32bit (fmtchk.len);
-#endif
+    fmtchk.len = csLittleEndian::Convert (fmtchk.len);
   }
 
   // no format-chunk found -> no valid file
@@ -228,14 +221,12 @@ bool SndSysWavSoundData::ReadHeaders(void *Buffer, size_t len, _RIFFchk *p_riffc
     return false;
 
   // correct the chunk, if under big-endian system
-#ifdef CS_BIG_ENDIAN // @@@ is this correct?
-  fmtchk.fmt_tag = csByteSwap16bit (fmtchk.fmt_tag);
-  fmtchk.channel = csByteSwap16bit (fmtchk.channel);
-  fmtchk.samples_per_sec = csByteSwap32bit (fmtchk.samples_per_sec);
-  fmtchk.avg_bytes_per_sec = csByteSwap32bit (fmtchk.avg_bytes_per_sec);
-  fmtchk.blk_align = csByteSwap16bit (fmtchk.blk_align);
-  fmtchk.bits_per_sample = csByteSwap16bit (fmtchk.bits_per_sample);
-#endif // CS_BIG_ENDIAN
+  fmtchk.fmt_tag = csLittleEndian::Convert (fmtchk.fmt_tag);
+  fmtchk.channel = csLittleEndian::Convert (fmtchk.channel);
+  fmtchk.samples_per_sec = csLittleEndian::Convert (fmtchk.samples_per_sec);
+  fmtchk.avg_bytes_per_sec = csLittleEndian::Convert (fmtchk.avg_bytes_per_sec);
+  fmtchk.blk_align = csLittleEndian::Convert (fmtchk.blk_align);
+  fmtchk.bits_per_sample = csLittleEndian::Convert (fmtchk.bits_per_sample);
 
   // check format of file
 
@@ -264,9 +255,7 @@ bool SndSysWavSoundData::ReadHeaders(void *Buffer, size_t len, _RIFFchk *p_riffc
     }
 
     // correct length of chunk on big endian systems
-#ifdef CS_BIG_ENDIAN
-    wavchk.len = csByteSwap32bit (wavchk.len);
-#endif
+    wavchk.len = csLittleEndian::Convert (wavchk.len);
   }
 
   // no wav-data-chunk found -> no valid file
@@ -301,3 +290,6 @@ bool SndSysWavSoundData::IsWav (iDataBuffer* Buffer)
 {
   return ReadHeaders (Buffer->GetData(), Buffer->GetSize(), 0, 0, 0, 0, 0);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(SndSysWav)
