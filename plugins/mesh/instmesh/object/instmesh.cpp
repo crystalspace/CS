@@ -299,6 +299,8 @@ void csInstmeshMeshObject::UpdateInstanceGeometry (size_t instance_idx)
         instances[instance_idx].transform.This2OtherRelative (fact_vertices[i]);;
     }
   }
+  mesh_vertices_dirty_flag = true;
+  mesh_normals_dirty_flag = true;
 }
 void csInstmeshMeshObject::MoveInstance (size_t id,
     const csReversibleTransform& trans)
@@ -310,8 +312,6 @@ void csInstmeshMeshObject::MoveInstance (size_t id,
     {
       instances[i].transform = trans;
       UpdateInstanceGeometry (i);
-      // @@@ Do in a more optimal way! Don't set everything dirty!
-      //initialized = false;
       return;
     }
 }
