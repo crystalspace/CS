@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<shader type="xmlshader" name="parallax">
+<shader compiler="xmlshader" name="parallax">
   <technique priority="150">
     <?Include /shader/snippets/projection-pass.inc ?>
     <pass>
