@@ -48,7 +48,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       UI32ToFloat (uint32 ui32) : ui32 (ui32) {}
     };
   }
-#define CS_INFINITY	  (UI32ToFloat (0x78000000).f)
+#define CS_INFINITY	  (UI32ToFloat (0x7f800000).f)
 #else
 #define CS_INFINITY	  std::numeric_limits<float>::infinity()
 #endif

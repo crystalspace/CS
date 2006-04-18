@@ -11,6 +11,10 @@ chronological order.
 	  it to a very bright value some time ago.
 	- Piotr Obrzut reverts his changes to instmeshes since they are bad 
 	  when someone deletes instances.
+	- res fixed res' inability to count bits as well as res' lack of cut-
+	  and-paste skill. Also reinstantiated caedes' fix for the point size
+	  in std_lighting.cscg since the rendering issues where due now-fixed 
+	  xmlshader bugs.
 17-Apr-2006
 	- res removed the now-obsolete sounddrivers and soundrenderers compile
 	  groups.

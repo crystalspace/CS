@@ -440,7 +440,7 @@ public:
       {
         const Values* entry = pvB.Get (name);
         csRef<Values>& vw = nva.GetIndex (n);
-        *vw &= *entry;
+        *vw |= *entry;
         n++;
       }
       else
