@@ -6,7 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-
+18-Apr-2006
+	- Jorrit restored the ambient to a dark value after iceeey changed
+	  it to a very bright value some time ago.
 17-Apr-2006
 	- res removed the now-obsolete sounddrivers and soundrenderers compile
 	  groups.
