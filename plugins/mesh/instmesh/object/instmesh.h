@@ -84,6 +84,7 @@ public:
 struct csInstance
 {
   csReversibleTransform transform;
+  size_t id;
 };
 
 /**

@@ -259,15 +259,23 @@ size_t csInstmeshMeshObject::AddInstance (const csReversibleTransform& trans)
 {
   csInstance inst;
   inst.transform = trans;
+  ++max_instance_id;
+  inst.id = max_instance_id;
   instances.Push (inst);
   initialized = false;
-  return instances.GetSize ()-1;
+  return max_instance_id;
 }
 
 void csInstmeshMeshObject::RemoveInstance (size_t id)
 {
-  instances.DeleteIndexFast (id);
-  initialized = false;
+  size_t i;
+  for (i = 0 ; i < instances.Length () ; i++)
+    if (instances[i].id == id)
+    {
+      instances.DeleteIndexFast (i);
+      initialized = false;
+      return;
+    }
 }
 
 void csInstmeshMeshObject::RemoveAllInstances ()
@@ -295,19 +303,27 @@ void csInstmeshMeshObject::UpdateInstanceGeometry (size_t instance_idx)
 void csInstmeshMeshObject::MoveInstance (size_t id,
     const csReversibleTransform& trans)
 {
-  instances[id].transform = trans;
-  UpdateInstanceGeometry (id);
-  // @@@ Do in a more optimal way! Don't set everything dirty!
-  //initialized = false;
-  return;
+  // @@@ Not fast? Avoid loop somehow?
+  size_t i;
+  for (i = 0 ; i < instances.Length () ; i++)
+    if (instances[i].id == id)
+    {
+      instances[i].transform = trans;
+      UpdateInstanceGeometry (i);
+      // @@@ Do in a more optimal way! Don't set everything dirty!
+      //initialized = false;
+      return;
+    }
 }
 
 const csReversibleTransform& csInstmeshMeshObject::GetInstanceTransform (
     size_t id)
 {
-  if (id < instances.GetSize ())
-    return instances[id].transform;
-
+  // @@@ Not fast? Avoid loop somehow?
+  size_t i;
+  for (i = 0 ; i < instances.Length () ; i++)
+    if (instances[i].id == id)
+      return instances[i].transform;
   static csReversibleTransform dummy;
   return dummy;
 }
