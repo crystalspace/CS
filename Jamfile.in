@@ -57,7 +57,7 @@ Description renderall      : "modules related to rendering" ;
 Description shaders        : "shaders and related modules" ;
 Description softrenderer   : "software renderer and related plugins" ;
 Description openglrenderer : "OpenGL renderer and related plugins" ;
-RegisterCompileGroups sounddrivers soundloaders sndsys imageloaders fontservers
+RegisterCompileGroups sndsys imageloaders fontservers
 		      canvases renderers meshes meshimpexp walkall
                       openglcanvas softcanvas proctexes renderall shaders 
                       softrenderer openglrenderer ;
