@@ -9,6 +9,9 @@ chronological order.
 19-Apr-2006
 	- Piotr Obrzut fixed moving instances in instmesh.
 	- res fixed some more gcc 4.1 warnings.
+	- Jorrit again reverted the change to std_lighting.cscg because
+	  it breaks lightmapped polygons on mingw. Even after recompiling
+	  xmlshader.
 18-Apr-2006
 	- Jorrit restored the ambient to a dark value after iceeey changed
 	  it to a very bright value some time ago.
