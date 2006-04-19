@@ -11,8 +11,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::IceMaths;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace IceMaths;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -285,3 +287,6 @@ void Triangle::Inflate(float fat_coeff, bool constant_border)
 		mVerts[i] += v * fat_coeff;
 	}
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

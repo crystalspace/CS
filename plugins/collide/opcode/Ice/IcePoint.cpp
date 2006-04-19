@@ -48,8 +48,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::IceMaths;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace IceMaths;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -192,3 +194,6 @@ Point& Point::InvTransform(const Point& r, const Matrix3x3& rotpos, const Point&
 	z = sx * rotpos.m[0][2] + sy * rotpos.m[1][2] + sz * rotpos.m[2][2];
 	return *this;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

@@ -114,8 +114,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace Opcode;
 
 #include "OPC_RayAABBOverlap.h"
 #include "OPC_RayTriOverlap.h"
@@ -762,3 +764,6 @@ void RayCollider::_RayStab(const AABBTreeNode* node, Container& box_indices)
 		_RayStab(node->GetNeg(), box_indices);
 	}
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

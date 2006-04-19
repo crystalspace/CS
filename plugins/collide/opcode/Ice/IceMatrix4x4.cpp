@@ -38,8 +38,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::IceMaths;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace IceMaths;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -134,3 +136,5 @@ Matrix4x4& Matrix4x4::Invert()
 	return	*this;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

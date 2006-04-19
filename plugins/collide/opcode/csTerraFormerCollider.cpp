@@ -5,8 +5,10 @@
 #include "csTerraFormerCollider.h"
 #include "OPC_TreeBuilders.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace Opcode;
 
 csTerraFormerCollider::csTerraFormerCollider (iTerraFormer* terraformer, 
                                               iObjectRegistry* object_reg)
@@ -107,7 +109,7 @@ void csTerraFormerCollider::InitOPCODEModel ()
   indexholder = new unsigned int[3* 2 * (resolution-1) * (resolution-1)];
   vertices.SetLength (resolution*resolution);
 
-  opcode_model = new CS::Plugins::Opcode::Opcode::Model;
+  opcode_model = new Opcode::Model;
 
   opcMeshInt.SetNbTriangles (2 * (resolution-1) * (resolution-1));
   opcMeshInt.SetNbVertices((udword)vertices.GetSize());
@@ -121,8 +123,8 @@ void csTerraFormerCollider::InitOPCODEModel ()
   OPCC.mCanRemap = true;
 }
 
-void csTerraFormerCollider::MeshCallback (CS::Plugins::Opcode::udword triangle_index, 
-                          CS::Plugins::Opcode::Opcode::VertexPointers& triangle, void* user_data)
+void csTerraFormerCollider::MeshCallback (udword triangle_index, 
+                          Opcode::VertexPointers& triangle, void* user_data)
 {
   csTerraFormerCollider* collider = (csTerraFormerCollider*)user_data;
   udword *tri_array = collider->indexholder;
@@ -140,3 +142,6 @@ float csTerraFormerCollider::SampleFloat (float x, float z)
   return y;
 }
 
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

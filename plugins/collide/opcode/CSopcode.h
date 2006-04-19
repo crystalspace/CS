@@ -41,6 +41,9 @@
 
 struct iObjectRegistry;
 
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
 /**
  * Opcode implementation of the collision detection system.
  */
@@ -54,9 +57,9 @@ class csOPCODECollideSystem : public iCollideSystem
     csCollisionPair* pair);
 
 public:
-  CS::Plugins::Opcode::Opcode::AABBTreeCollider TreeCollider;
-  CS::Plugins::Opcode::Opcode::RayCollider RayCol;
-  CS::Plugins::Opcode::Opcode::BVTCache ColCache;
+  Opcode::AABBTreeCollider TreeCollider;
+  Opcode::RayCollider RayCol;
+  Opcode::BVTCache ColCache;
 
   csDirtyAccessArray<csCollisionPair> pairs;
   csArray<int> collision_faces;
@@ -149,5 +152,8 @@ public:
     }
   } scfiComponent;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)
 
 #endif // __CS_OPCODE_PLUGIN_H__

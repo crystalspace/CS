@@ -39,11 +39,6 @@
  */
 struct csSwapBytes
 {
-private:
-  struct Swap8
-  {
-    uint8 b1, b2, b3, b4, b5, b6, b7, b8;
-  };
 public:
   //@{
   /// Swap byte order
@@ -314,9 +309,14 @@ CS_DEPRECATED_METHOD static inline uint16 csBigEndianShort (uint16 s)
 /// Convert a big-endian floating-point number to machine format
 CS_DEPRECATED_METHOD static inline float csBigEndianFloat (float f)
 { 
-  uint32 u = *((uint32*)&f);
-  u = csBigEndian::Convert (u); 
-  return *((float*)&u);
+  union
+  {
+    float f;
+    uint32 ui32;
+  } u;
+  u.f = f;
+  u.ui32 = csBigEndian::Convert (u.ui32); 
+  return u.f;
 }
 
 /// Convert a longlong from little-endian to machine format
@@ -334,9 +334,14 @@ CS_DEPRECATED_METHOD static inline uint16 csLittleEndianShort (uint16 s)
 /// Convert a little-endian floating-point number to machine format
 CS_DEPRECATED_METHOD static inline float csLittleEndianFloat (float f)
 { 
-  uint32 u = *((uint32*)&f);
-  u = csLittleEndian::Convert (u); 
-  return *((float*)&u);
+  union
+  {
+    float f;
+    uint32 ui32;
+  } u;
+  u.f = f;
+  u.ui32 = csLittleEndian::Convert (u.ui32); 
+  return u.f;
 }
 
 /*
@@ -483,9 +488,14 @@ CS_DEPRECATED_METHOD static inline uint16 csConvertEndian (uint16 s)
 /// Convert bytes in a float value from host byte order to little-endian.
 CS_DEPRECATED_METHOD static inline float csConvertEndian (float f)
 { 
-  uint32 u = *((uint32*)&f);
-  u = csLittleEndian::Convert (u); 
-  return *((float*)&u);
+  union
+  {
+    float f;
+    uint32 ui32;
+  } u;
+  u.f = f;
+  u.ui32 = csLittleEndian::Convert (u.ui32); 
+  return u.f;
 }
 
 /// Read a little-endian short from address

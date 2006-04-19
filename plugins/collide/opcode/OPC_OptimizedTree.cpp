@@ -68,8 +68,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace Opcode;
 
 //! Compilation flag:
 //! - true to fix quantized boxes (i.e. make sure they enclose the original ones)
@@ -395,7 +397,7 @@ bool AABBNoLeafTree::Refit(const MeshInterface* mesh_interface)
 		if(Current.HasPosLeaf())
 		{
 			mesh_interface->GetTriangle(VP, Current.GetPosPrimitive());
-			::ComputeMinMax(Min, Max, VP);
+			ComputeMinMax(Min, Max, VP);
 		}
 		else
 		{
@@ -407,7 +409,7 @@ bool AABBNoLeafTree::Refit(const MeshInterface* mesh_interface)
 		if(Current.HasNegLeaf())
 		{
 			mesh_interface->GetTriangle(VP, Current.GetNegPrimitive());
-			::ComputeMinMax(Min_, Max_, VP);
+			ComputeMinMax(Min_, Max_, VP);
 		}
 		else
 		{
@@ -783,3 +785,6 @@ bool AABBQuantizedNoLeafTree::Walk(GenericWalkingCallback callback, void* user_d
 	Local::_Walk(mNodes, callback, user_data);
 	return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

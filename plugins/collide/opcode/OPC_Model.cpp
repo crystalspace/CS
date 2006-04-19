@@ -92,8 +92,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace Opcode;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -221,3 +223,6 @@ udword Model::GetUsedBytes() const
 	if(!mTree)	return 0;
 	return mTree->GetUsedBytes();
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

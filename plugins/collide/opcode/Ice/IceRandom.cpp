@@ -11,8 +11,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::IceCore;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace IceCore;
 
 void IceCore::	SRand(udword seed)
 {
@@ -34,3 +36,6 @@ udword IceCore::GetRandomIndex(udword max_index)
 	return Index % max_index;
 }
 
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

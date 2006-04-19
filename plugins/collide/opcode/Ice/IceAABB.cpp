@@ -20,8 +20,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::IceMaths;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace IceMaths;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -405,3 +407,6 @@ float AABB::ComputeBoxArea(const Point& eye, const Matrix4x4& mat, float width, 
 
 	return Sum * 0.5f;	//return computed value corrected by 0.5
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

@@ -296,8 +296,11 @@ void csImageMemory::ConvertFromRGBA (csRGBpixel *iImage)
 
         quant.Count (iImage, pixels);
         quant.Palette (Palette, maxcolors);
+        uint8* img8 = (uint8*)Image; /* RemapDither() wants an uint8*&, casting
+                                      * Image to that breaks strict-aliasing */
         quant.RemapDither (iImage, pixels, Width, Palette, maxcolors,
-          (uint8 *&)Image, has_keycolour ? &keycolour : 0);
+          img8, has_keycolour ? &keycolour : 0);
+	Image = img8;
 
         quant.End ();
       }

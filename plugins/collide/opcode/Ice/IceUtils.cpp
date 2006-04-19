@@ -11,8 +11,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::IceCore;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace IceCore;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -38,3 +40,6 @@ udword IceCore::Alignment(udword address)
 	// Here all bits are null, except the highest one (else the address would be null)
 	return Align;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

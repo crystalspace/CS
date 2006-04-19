@@ -23,11 +23,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Preprocessor
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Opcode
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
 {
 
 
@@ -72,8 +68,7 @@ namespace Opcode
 		FUNCTION OPCODE_API bool CloseOpcode();
 	}
 
-} // namespace Opcode
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)
 	
 #endif // __OPCODE_H__

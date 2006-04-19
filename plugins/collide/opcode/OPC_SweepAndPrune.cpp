@@ -19,8 +19,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace Opcode;
 
 inline_ void Sort(udword& id0, udword& id1)
 {
@@ -665,3 +667,6 @@ bool SweepAndPrune::UpdateObject(udword i, const AABB& box)
 
 	return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

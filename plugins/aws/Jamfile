@@ -67,6 +67,8 @@ Description aws : "Alternate Windowing System plugin" ;
 Plugin aws : $(FILES) ;
 LinkWith aws : crystalspace ;
 ExternalLibs aws : STL ;
+# Be lazy: AWS is to be removed, so don't care to fix strict aliasing issues
+CFlags aws : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
 
 if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
 {

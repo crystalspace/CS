@@ -11,8 +11,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::IceMaths;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace IceMaths;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -547,3 +549,6 @@ bool IndexedTriangle::Equal(const IndexedTriangle& tri) const
 			HasVertex(tri.mVRef[1]) &&
 			HasVertex(tri.mVRef[2]));
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

@@ -29,6 +29,9 @@
 
 struct csTriangle;
 
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
 class csTerraFormerCollider : public scfImplementation1<csTerraFormerCollider, iCollider>
 {
   csRef<iTerraFormer> former;
@@ -38,9 +41,9 @@ class csTerraFormerCollider : public scfImplementation1<csTerraFormerCollider, i
 
   unsigned int resolution;
 
-  CS::Plugins::Opcode::Opcode::MeshInterface opcMeshInt;
+  Opcode::MeshInterface opcMeshInt;
 
-  CS::Plugins::Opcode::Opcode::OPCODECREATE OPCC;
+  Opcode::OPCODECREATE OPCC;
 
   void InitOPCODEModel ();
 
@@ -48,22 +51,24 @@ public:
 
   void UpdateOPCODEModel (const csVector3 &other_pos, float resolution);
   unsigned int* indexholder;
-  csDirtyAccessArray<CS::Plugins::Opcode::Point> vertices;
+  csDirtyAccessArray<Point> vertices;
 
-  CS::Plugins::Opcode::IceMaths::Matrix4x4 transform;
-  CS::Plugins::Opcode::Opcode::Model* opcode_model;
+  IceMaths::Matrix4x4 transform;
+  Opcode::Model* opcode_model;
 
   csTerraFormerCollider (iTerraFormer* terraformer, iObjectRegistry* object_reg);
   float SampleFloat (float x, float z);
   csColliderType GetColliderType () {return CS_TERRAFORMER_COLLIDER;}
   virtual ~csTerraFormerCollider ();
 
-  static void MeshCallback (CS::Plugins::Opcode::udword triangle_index, 
-    CS::Plugins::Opcode::Opcode::VertexPointers& triangle, void* user_data);
+  static void MeshCallback (udword triangle_index, 
+    Opcode::VertexPointers& triangle, void* user_data);
 
-  CS::Plugins::Opcode::Opcode::Model* GetOPCODEModel ();
+  Opcode::Model* GetOPCODEModel ();
 
 };
 
-#endif // __CS_TERRAFORMER_COLLIDER_H__
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)
 
+#endif // __CS_TERRAFORMER_COLLIDER_H__

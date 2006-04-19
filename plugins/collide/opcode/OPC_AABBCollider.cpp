@@ -30,8 +30,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace Opcode;
 
 #include "OPC_BoxBoxOverlap.h"
 #include "OPC_TriBoxOverlap.h"
@@ -695,3 +697,6 @@ bool HybridAABBCollider::Collide(AABBCache& cache, const CollisionAABB& box, con
 
 	return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

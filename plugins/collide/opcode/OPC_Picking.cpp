@@ -19,8 +19,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace Opcode;
 
 #ifdef OPC_RAYHIT_CALLBACK
 
@@ -181,3 +183,6 @@ float min_dist, float max_dist, const Point& view_point, CullModeCallback callba
 }
 
 #endif
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

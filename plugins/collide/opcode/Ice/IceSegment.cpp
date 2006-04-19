@@ -24,8 +24,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::IceMaths;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace IceMaths;
 
 float Segment::SquareDistance(const Point& point, float* t)	const
 {
@@ -56,3 +58,6 @@ float Segment::SquareDistance(const Point& point, float* t)	const
 
 	return Diff.SquareMagnitude();
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

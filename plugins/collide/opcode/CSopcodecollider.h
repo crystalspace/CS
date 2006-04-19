@@ -46,25 +46,28 @@ struct csCollisionPair;
 struct iPolygonMesh;
 class PathPolygonMesh;
 
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
 /// Low level collision detection using Opcode library.
 class csOPCODECollider : public iCollider
 {
 public:
   /// The internal model object.
-  CS::Plugins::Opcode::Opcode::Model* m_pCollisionModel;
-  CS::Plugins::Opcode::IceMaths::Matrix4x4 transform;
+  Opcode::Model* m_pCollisionModel;
+  IceMaths::Matrix4x4 transform;
   unsigned int* indexholder;
-  CS::Plugins::Opcode::Point *vertholder;
+  Point *vertholder;
 
-  CS::Plugins::Opcode::Opcode::MeshInterface opcMeshInt;
+  Opcode::MeshInterface opcMeshInt;
 
   float radius;
 
 private:
   void GeometryInitialize (iPolygonMesh *mesh);
 
-  static void MeshCallback (CS::Plugins::Opcode::udword triangle_index, 
-    CS::Plugins::Opcode::Opcode::VertexPointers& triangle, void* user_data);
+  static void MeshCallback (udword triangle_index, 
+    Opcode::VertexPointers& triangle, void* user_data);
 public:
   /// Create a collider based on geometry.
   csOPCODECollider (iPolygonMesh* mesh);
@@ -96,5 +99,8 @@ public:
 
   SCF_DECLARE_IBASE;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)
 
 #endif // __CS_OPCODECOL_H__

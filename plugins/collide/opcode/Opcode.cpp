@@ -35,7 +35,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-bool CS::Plugins::Opcode::Opcode::InitOpcode()
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+bool Opcode::InitOpcode()
 {
 	Log("// Initializing OPCODE\n\n");
 //	LogAPIInfo();
@@ -43,7 +46,7 @@ bool CS::Plugins::Opcode::Opcode::InitOpcode()
 }
 
 void ReleasePruningSorters();
-bool CS::Plugins::Opcode::Opcode::CloseOpcode()
+bool Opcode::CloseOpcode()
 {
 	Log("// Closing OPCODE\n\n");
 
@@ -63,3 +66,6 @@ void ModuleDetach()
 }
 
 #endif
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

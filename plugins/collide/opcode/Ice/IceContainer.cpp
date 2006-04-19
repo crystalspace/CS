@@ -24,8 +24,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::IceCore;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace IceCore;
 
 // Static members
 #ifdef CONTAINER_STATS
@@ -344,3 +346,6 @@ void Container::operator=(const Container& object)
 	CopyMemory(mEntries, object.GetEntries(), mMaxNbEntries*sizeof(udword));
 	mCurNbEntries = mMaxNbEntries;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

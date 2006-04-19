@@ -30,8 +30,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace Opcode;
 
 #include "OPC_PlanesAABBOverlap.h"
 #include "OPC_PlanesTriOverlap.h"
@@ -652,3 +654,6 @@ bool HybridPlanesCollider::Collide(PlanesCache& cache, const Plane* planes, udwo
 
 	return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

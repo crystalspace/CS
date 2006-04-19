@@ -406,6 +406,21 @@ CS_COMPILER_IGNORE_LONG_DOUBLE([C++], [cs_cv_prog_cxx_ignore_long_double],
 
 
 #------------------------------------------------------------------------------
+# Check for option to disable strict-aliasing (enabled by gcc on higher 
+# optimization levels). This is needed for some code we don't have
+# control over (e.g. SWIG-generated code) that breaks strict-aliasing rules.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD_FLAGS([for flag to disable string-aliasing],
+    [cs_cv_prog_cxx_no_strict_aliasing],
+    [CS_CREATE_TUPLE([-fno-strict-aliasing])], [C++])
+
+AS_IF([test $cs_cv_prog_cxx_no_strict_aliasing != no],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.STRICTALIASING.DISABLE],
+	[$cs_cv_prog_cxx_no_strict_aliasing], [+])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if C++ exceptions can be enabled and disabled.
 #------------------------------------------------------------------------------
 CS_EMIT_BUILD_FLAGS([how to enable C++ exceptions],

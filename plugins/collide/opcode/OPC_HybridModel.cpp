@@ -84,8 +84,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace Opcode;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -380,7 +382,7 @@ bool HybridModel::Refit()
 				while(NbTris--)
 				{
 					mIMesh->GetTriangle(VP, *T++);
-					::ComputeMinMax(TmpMin, TmpMax, VP);
+					ComputeMinMax(TmpMin, TmpMax, VP);
 					Min.Min(TmpMin);
 					Max.Max(TmpMax);
 				}
@@ -393,7 +395,7 @@ bool HybridModel::Refit()
 				while(NbTris--)
 				{
 					mIMesh->GetTriangle(VP, BaseIndex++);
-					::ComputeMinMax(TmpMin, TmpMax, VP);
+					ComputeMinMax(TmpMin, TmpMax, VP);
 					Min.Min(TmpMin);
 					Max.Max(TmpMax);
 				}
@@ -425,7 +427,7 @@ bool HybridModel::Refit()
 				while(NbTris--)
 				{
 					mIMesh->GetTriangle(VP, *T++);
-					::ComputeMinMax(TmpMin, TmpMax, VP);
+					ComputeMinMax(TmpMin, TmpMax, VP);
 					Min_.Min(TmpMin);
 					Max_.Max(TmpMax);
 				}
@@ -438,7 +440,7 @@ bool HybridModel::Refit()
 				while(NbTris--)
 				{
 					mIMesh->GetTriangle(VP, BaseIndex++);
-					::ComputeMinMax(TmpMin, TmpMax, VP);
+					ComputeMinMax(TmpMin, TmpMax, VP);
 					Min_.Min(TmpMin);
 					Max_.Max(TmpMax);
 				}
@@ -465,3 +467,6 @@ bool HybridModel::Refit()
 	}
 	return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

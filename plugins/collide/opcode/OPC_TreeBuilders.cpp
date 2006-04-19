@@ -52,8 +52,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace Opcode;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -254,3 +256,6 @@ float AABBTreeOfVerticesBuilder::GetSplittingValue(const udword* primitives, udw
 	}
 	else return AABBTreeBuilder::GetSplittingValue(primitives, nb_prims, global_box, axis);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

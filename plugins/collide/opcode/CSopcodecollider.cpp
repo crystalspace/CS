@@ -39,8 +39,10 @@
 
 #include "OPC_TreeBuilders.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace Opcode;
 
 SCF_IMPLEMENT_IBASE (csOPCODECollider)
   SCF_IMPLEMENTS_INTERFACE (iCollider)
@@ -79,7 +81,7 @@ void csOPCODECollider::GeometryInitialize (iPolygonMesh* mesh)
   
   if (tri_count>=1)
   {
-    m_pCollisionModel = new CS::Plugins::Opcode::Opcode::Model;
+    m_pCollisionModel = new Opcode::Model;
     if (!m_pCollisionModel)
       return;
 
@@ -148,3 +150,6 @@ void csOPCODECollider::MeshCallback (udword triangle_index,
   triangle.Vertex[1] = &vertholder [tri_array[index + 1]];
   triangle.Vertex[2] = &vertholder [tri_array[index + 2]];
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

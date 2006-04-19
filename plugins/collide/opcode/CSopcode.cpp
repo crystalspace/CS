@@ -40,6 +40,9 @@ CS_IMPLEMENT_PLUGIN
 
 //----------------------------------------------------------------------
 
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
 SCF_IMPLEMENT_IBASE (csOPCODECollideSystem)
   SCF_IMPLEMENTS_INTERFACE (iCollideSystem)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
@@ -51,10 +54,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csOPCODECollideSystem)
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+using namespace Opcode;
 
-void CS::Plugins::Opcode::Opcode_Log (const char* msg, ...)
+void Opcode_Log (const char* msg, ...)
 {
   va_list args;
   va_start (args, msg);
@@ -63,7 +65,7 @@ void CS::Plugins::Opcode::Opcode_Log (const char* msg, ...)
   va_end (args);
 }
 
-bool CS::Plugins::Opcode::Opcode_Err (const char* msg, ...)
+bool Opcode_Err (const char* msg, ...)
 {
   va_list args;
   va_start (args, msg);
@@ -502,3 +504,6 @@ bool csOPCODECollideSystem::GetOneHitOnly ()
 {
   return (TreeCollider.FirstContactEnabled () != FALSE);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

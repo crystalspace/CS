@@ -46,8 +46,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace Opcode;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -573,3 +575,6 @@ bool AABBTree::IsComplete() const
 {
 	return (GetNbNodes()==GetNbPrimitives()*2-1);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

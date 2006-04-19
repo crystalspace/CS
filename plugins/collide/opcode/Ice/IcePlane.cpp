@@ -20,8 +20,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::IceMaths;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace IceMaths;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -44,3 +46,6 @@ Plane& Plane::Set(const Point& p0, const Point& p1, const Point& p2)
 
 	return	*this;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

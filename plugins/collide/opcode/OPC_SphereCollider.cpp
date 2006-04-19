@@ -34,8 +34,10 @@
 // Precompiled Header
 #include "Stdafx.h"
 
-using namespace CS::Plugins::Opcode;
-using namespace CS::Plugins::Opcode::Opcode;
+CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
+{
+
+using namespace Opcode;
 
 #include "OPC_SphereAABBOverlap.h"
 #include "OPC_SphereTriOverlap.h"
@@ -725,3 +727,6 @@ bool HybridSphereCollider::Collide(SphereCache& cache, const Sphere& sphere, con
 
 	return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(csOpcode)

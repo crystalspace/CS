@@ -54,8 +54,13 @@ public:
     unsigned int const b = 1664525;
     unsigned int const c = 1013904223;
     seed = b * seed + c;
-    uint32 temp = 0x3f800000 | (0x007fffff & seed);
-    return (*(float*)&temp) - 1.0;
+    union
+    {
+      uint32 jabi;
+      float tastic;
+    } pun;
+    pun.jabi = 0x3f800000 | (0x007fffff & seed);
+    return pun.tastic - 1.0;
   }
 
   /// Get a floating point random number in range 0 <= num < \c max.
