@@ -56,7 +56,7 @@ static JSBool Clear (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
   return JS_TRUE;
 }
 
-/// Clears out the contents of the pen.
+/// Sets a flag
 static JSBool SetFlag (JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
                        jsval *rval)	
 {	
@@ -74,7 +74,7 @@ static JSBool SetFlag (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
   return JS_TRUE;
 }
 
-/// Clears out the contents of the pen.
+/// Clears a flag
 static JSBool ClearFlag (JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
                          jsval *rval)	
 {	
@@ -87,6 +87,24 @@ static JSBool ClearFlag (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     JS_ValueToInt32 (cx,  argv[0], &flag);
 
     po->ClearFlag ((uint)flag); 
+  }
+
+  return JS_TRUE;
+}
+
+/// Sets the mix (blending) mode
+static JSBool SetMixMode (JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
+                       jsval *rval)	
+{	
+  aws::pen *po = (aws::pen *)JS_GetPrivate (cx, obj);
+
+  if (po) 
+  { 
+    int32 mode;		
+
+    JS_ValueToInt32 (cx,  argv[0], &mode);
+
+    po->SetMixMode ((uint)mode); 
   }
 
   return JS_TRUE;
@@ -541,6 +559,8 @@ static JSBool Render (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
       
       return JS_TRUE;
     }	
+    
+    // @todo Throw a JS error here so they know that the object isn't a texture!    
   }
 
   return JS_FALSE;
@@ -620,6 +640,43 @@ static JSBool pen_get_staticFlagsProperty (JSContext *cx, JSObject *obj,
   return JS_FALSE;
 }
 
+/// Returns static properties
+static JSBool pen_get_staticMixProperty (JSContext *cx, JSObject *obj, 
+                                           jsval id, jsval *vp)
+{	
+  // Try static properties first.  They can't be handled in the class because
+  // They're STATIC properties.
+  if (JSVAL_IS_INT(id)) 
+  {				   	   	
+
+    switch (JSVAL_TO_INT(id)) 
+    {				
+    case 1:       *vp = INT_TO_JSVAL(CS_FX_ADD); break;
+    case 2:       *vp = INT_TO_JSVAL(CS_FX_ALPHA); break;
+    case 3:       *vp = INT_TO_JSVAL(CS_FX_COPY); break;
+    case 4:       *vp = INT_TO_JSVAL(CS_FX_DESTALPHAADD); break;
+    case 5:       *vp = INT_TO_JSVAL(CS_FX_FLAT); break;
+    case 6:       *vp = INT_TO_JSVAL(CS_FX_MASK_ALPHA); break;
+    case 7:       *vp = INT_TO_JSVAL(CS_FX_MASK_MIXMODE); break;
+    case 8:       *vp = INT_TO_JSVAL(CS_FX_MULTIPLY); break;
+    case 9:       *vp = INT_TO_JSVAL(CS_FX_MULTIPLY2); break;
+    case 10:      *vp = INT_TO_JSVAL(CS_FX_PREMULTALPHA); break;
+    case 11:      *vp = INT_TO_JSVAL(CS_FX_SRCALPHAADD); break;
+    case 12:      *vp = INT_TO_JSVAL(CS_FX_TRANSPARENT); break;    
+    case 13:	  *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(ZERO, ONE) | CS_MIXMODE_ALPHATEST_ENABLE); break;    
+    case 14:	  *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(DSTALPHA, ZERO) | CS_MIXMODE_ALPHATEST_MASK); break;    
+    case 15:	  *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(DSTALPHA_INV, ZERO)); break;  
+   
+    default:
+      return JS_FALSE;				
+    }
+
+    return JS_TRUE;		
+  }	
+
+  return JS_FALSE;
+}
+
 JSClass pen_object_class = {
   "Pen", 
   JSCLASS_HAS_PRIVATE,
@@ -659,7 +716,22 @@ static JSPropertySpec pen_static_props[] =
   {"FLAG_FILL",       CS_PEN_FILL,        JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticFlagsProperty},
   {"FLAG_SWAPCOLORS", CS_PEN_SWAPCOLORS,  JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticFlagsProperty},
   {"FLAG_TEXTURE",    CS_PEN_TEXTURE,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticFlagsProperty},
-
+  
+  {"MIX_ADD",         1,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_ALPHA",       2,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_COPY",        3,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},  
+  {"MIX_DEST_ALPHA_ADD", 4,  JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_FLAT",         5,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_MASK_ALPHA",   6,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_MASK_MIXMODE", 7,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_MULTIPLY",     8,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_MULTIPLY2",    9,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_PRE_MULT_ALPHA", 10, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_SRC_ALPHA_ADD",  11, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_TRANSPARENT",    12, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_TRANSPARENT2",   13, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_DST_ALPHA",      14, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_DST_MULT_ALPHA",  15, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
 
   {0,0,0}
 };
@@ -668,6 +740,7 @@ static JSFunctionSpec pen_methods[] = {
   {"Clear",           Clear,            0, 0, 0},
   {"SetFlag",         SetFlag,          1, 0, 0},
   {"ClearFlag",       ClearFlag,        1, 0, 0},
+  {"SetMixMode",      SetMixMode,       1, 0, 0},
   {"SetColor",        SetColor,         4, 0, 0},
   {"SetTexture",      SetTexture,       1, 0, 0},
   {"SwapColors",      SwapColors,       0, 0, 0}, 
