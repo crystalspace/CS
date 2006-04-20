@@ -81,7 +81,9 @@ VertToFrag VertexMain (float4 Position : POSITION,
 }
 
 // The fragment program.
-float4 FragmentMain (VertToFrag V2F) : COLOR
+float4 FragmentMain (VertToFrag V2F, 
+		     uniform float psize : state.point.size
+		     ) : COLOR
 {
   // The snippets fragment-related structures.
   Frag_Surface surface;
@@ -101,7 +103,7 @@ float4 FragmentMain (VertToFrag V2F) : COLOR
   /* Compute the illuminated fragment color. The "light" snippet will query
    * all information (diffuse color etc.) from the surface structure. */
   float4 color = lighting.Illuminate (surface);
-  V2F.pointSize = state.point.size;
+  V2F.pointSize = psize;
   // Apply any fog.
   return fog.ApplyFog (color);
 }

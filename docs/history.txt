@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Apr-2006
+	- Jorrit added a patch from Frank which fixes the issue with an
+	  CG program failing but the technique using that CG program was
+	  still succeeding. This caused rendering errors in some
+	  situations.
 19-Apr-2006
 	- Piotr Obrzut fixed moving instances in instmesh.
 	- res fixed some more gcc 4.1 warnings.

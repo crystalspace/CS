@@ -371,7 +371,11 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
   if (shaderPlug->debugDump)
     DoDebugDump();
 
-  if (doLoad) cgGLLoadProgram (program);
+  if (doLoad)
+  {
+    cgGLLoadProgram (program);
+    if (!cgGLIsProgramLoaded (program)) return false;
+  }
 
   i = 0;
   while (i < variablemap.Length ())
