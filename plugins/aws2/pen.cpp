@@ -664,8 +664,8 @@ static JSBool pen_get_staticMixProperty (JSContext *cx, JSObject *obj,
     case 11:      *vp = INT_TO_JSVAL(CS_FX_SRCALPHAADD); break;
     case 12:      *vp = INT_TO_JSVAL(CS_FX_TRANSPARENT); break;    
     case 13:	  *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(ZERO, ONE) | CS_MIXMODE_ALPHATEST_ENABLE); break;    
-    case 14:	  *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(DSTALPHA, ZERO) | CS_MIXMODE_ALPHATEST_MASK); break;    
-    case 15:	  *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(DSTALPHA_INV, ZERO)); break;  
+    case 14:	  *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(DSTALPHA, ZERO) | CS_MIXMODE_ALPHATEST_ENABLE); break;    
+    case 15:	  *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(DSTALPHA, ONE)  | CS_MIXMODE_ALPHATEST_ENABLE); break;  
    
     default:
       return JS_FALSE;				
@@ -720,7 +720,7 @@ static JSPropertySpec pen_static_props[] =
   {"MIX_ADD",         1,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
   {"MIX_ALPHA",       2,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
   {"MIX_COPY",        3,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},  
-  {"MIX_DEST_ALPHA_ADD", 4,  JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_DST_ALPHA_ADD", 4,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
   {"MIX_FLAT",         5,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
   {"MIX_MASK_ALPHA",   6,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
   {"MIX_MASK_MIXMODE", 7,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
@@ -729,9 +729,9 @@ static JSPropertySpec pen_static_props[] =
   {"MIX_PRE_MULT_ALPHA", 10, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
   {"MIX_SRC_ALPHA_ADD",  11, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
   {"MIX_TRANSPARENT",    12, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_TRANSPARENT2",   13, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_DST_ALPHA",      14, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_DST_MULT_ALPHA",  15, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_TRANSPARENT_TEST",    13, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_DST_ALPHA_TEST",      14, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_DST_ALPHA_ADD_TEST",  15, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
 
   {0,0,0}
 };
