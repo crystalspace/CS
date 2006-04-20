@@ -155,7 +155,7 @@ win.AddChild(rb3);
 
 rb1.MoveTo(5,30);
 rb2.MoveTo(5,55);
-rb3.MoveTo(5,80)
+rb3.MoveTo(5,80);
 
 // Test the normal buttons
 nb = Button();

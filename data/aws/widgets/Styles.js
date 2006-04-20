@@ -937,7 +937,7 @@ Style3D =
 		
 		function createTextures(widget)
 		{			
-			var tx_pen = new Pen();
+			var tx_pen = new Pen();			
 			var w = widget.ButtonScroll.x2-widget.ButtonScroll.x1;
 			var h = widget.ButtonScroll.y2-widget.ButtonScroll.y1;
 			var cy = size>>1;
@@ -951,6 +951,8 @@ Style3D =
 			var ButtonScroll = { x1:1, y1:1, x2:tw-slb.TickThickness, y2:th };
 			
 			widget.tx_knob = new Texture(tw, th);
+			widget.gr_tex  = new Texture(tw, th);
+			widget.gr.Render(widget.gr_tex, Gradient.LDIAG);
 			
 			Sys.Print("Slider: created texture: ", tw, "x", th);
 									
@@ -986,9 +988,14 @@ Style3D =
 						 
 			tx_pen.DrawLine(ButtonScroll.x2-10, ButtonScroll.y2,
 						 ButtonScroll.x2, cy);
-						 
-			tx_pen.Render(widget.tx_knob);
-			widget.gr.Render(widget.tx_knob, Gradient.VERTICAL);						
+												 
+			tx_pen.SetMixMode(Pen.MIX_DST_ALPHA_ADD);
+ 			tx_pen.SetFlag(Pen.FLAG_TEXTURE);
+ 			tx_pen.SetTexture(widget.gr_tex);
+ 			tx_pen.SetColor(1,1,1,1);
+ 			tx_pen.DrawRect(0,0,tw,th);	
+ 			
+			tx_pen.Render(widget.tx_knob);			
 		}
 								
 		
@@ -1009,13 +1016,11 @@ Style3D =
 				this.init_draw = true;
 				this.gr = new Gradient();
 							
-				this.gr.AddColor(new Color(1,1,1,0.5), 0);	
-				this.gr.AddColor(new Color(0.5,0.5,0.5,0.5), 0.5);					
-				this.gr.AddColor(new Color(0.3, 0.3, 0.3, 0.5), 1.0);
-							
+				this.gr.AddColor(new Color(1,1,1,1), 1.0);	
+				this.gr.AddColor(new Color(0.5,0.5,0.5,1), 0.5);					
+				this.gr.AddColor(new Color(0, 0, 0, 1), 0.0);							
 				
-				createTextures(this);	
-				this.Invalidate();		
+				createTextures(this);					
 			}	
 			
 			
@@ -1042,8 +1047,8 @@ Style3D =
 			pen.SetFlag(Pen.FLAG_TEXTURE);			
 			pen.SetTexture(this.tx_knob);
 			
-			pen.DrawRect(0,0,this.ButtonScroll.x2-this.ButtonScroll.x1, 
-							 this.ButtonScroll.y2-this.ButtonScroll.y1);
+			pen.DrawRect(0,0,w, //this.ButtonScroll.x2-this.ButtonScroll.x1, 
+							 1+this.ButtonScroll.y2-this.ButtonScroll.y1);
 			pen.PopTransform();
 			pen.ClearFlag(Pen.FLAG_TEXTURE);			 
 			
