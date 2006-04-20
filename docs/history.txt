@@ -11,6 +11,9 @@ chronological order.
 	  CG program failing but the technique using that CG program was
 	  still succeeding. This caused rendering errors in some
 	  situations.
+	- Christopher added SetMixMode to csPen and csMemoryPen.  He also added
+	  SetMixMode to Pen in AWS2, and added several mixmodes as constants.  This
+	  basically makes up the compositing functions in AWS2.
 19-Apr-2006
 	- Piotr Obrzut fixed moving instances in instmesh.
 	- res fixed some more gcc 4.1 warnings.
