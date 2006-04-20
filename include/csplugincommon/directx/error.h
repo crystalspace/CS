@@ -51,4 +51,6 @@ public:
   static const char* GetErrorDescription (HRESULT hr);
 };
 
+/** @} */
+
 #endif // __CS_CSPLUGINCOMMON_DIRECTX_ERROR_H__

@@ -433,7 +433,8 @@ public:
 
   /**
    * Deallocate an object. It is safe to provide a null pointer.
-   * \param invokeCtor If true, the destructor of \a T is invoked. If false, 
+   * \param p Pointer to deallocate.
+   * \param invokeDtor If true, the destructor of \a T is invoked. If false, 
    *   the memory is only freed. This is mostly useful for custom 
    *   \c delete implementations.
    */

@@ -282,8 +282,8 @@ protected:
   void AddVertex(float x, float y, bool force_add=false);
   
   /** Adds a texture coordinate. 
-   * @param tx The texture's x coord.
-   * @param ty The texture's y coord.
+   * @param x The texture's x coord.
+   * @param y The texture's y coord.
    */
   inline void AddTexCoord(float x, float y);
 

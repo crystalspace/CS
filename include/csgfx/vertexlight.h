@@ -384,10 +384,13 @@ public:
   /**
    * Compute lighting, overwrite the destination colors.
    * \param light Properties of the light to compute.
+   * \param eyePos Position of the eye, in object space.
+   * \param shininess Specular exponent.
    * \param numvert Number of vertices and normals.
    * \param vb Vertices. Buffer should contain (at least) 3 component vectors.
    * \param nb Normals. Buffer should contain (at least) 3 component vectors.
-   * \param litColor Destination colors.
+   * \param litColor Destination buffer for diffuse colors.
+   * \param specColor Destination buffer for specular colors.
    */
   virtual void CalculateLighting (const csLightProperties& light,
     const csVector3& eyePos, float shininess,

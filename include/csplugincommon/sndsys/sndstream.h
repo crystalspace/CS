@@ -36,7 +36,7 @@ namespace CS
   namespace SndSys
   {
 
-  class SndSysBasicStream :
+  class CS_CRYSTALSPACE_EXPORT SndSysBasicStream :
     public scfImplementation1<SndSysBasicStream, iSndSysStream>
   {
   public:
@@ -232,20 +232,20 @@ namespace CS
     * \param position_marker Should point to a size_t initially filled by the
     *        Sound System internally when a Source is created - through a call
     *        to InitializeSourcePositionMarker().
-    * \param max_requested_frames Should contain the maximum number of frames
+    * \param max_requested_length Should contain the maximum number of bytes
     *        the calling source is interested in receiving.  On return,
-    *        *buffer1_length + *buffer2_length must not exceed this value.
-    * \param buffer1 should point to a (void *) that will be filled with a
+    *        *buffer1_bytes + *buffer1_bytes must not exceed this value.
+    * \param buffer1 Should point to a (void *) that will be filled with a
     *        pointer to the first chunk of data on return or NULL (0) if no
     *        data is available
-    * \param buffer1_frames should point to a long that will be filled with the
-    *        length, in frames, of valid data in the buffer pointed to by 
+    * \param buffer1_bytes Should point to a long that will be filled with the
+    *        length, in bytes, of valid data in the buffer pointed to by 
     *        *buffer1 on return.
-    * \param buffer2 should point to a (void *) that will be filled with a
+    * \param buffer2 Should point to a (void *) that will be filled with a
     *        pointer to the second chunk of data on return, or NULL (0) if no
     *        second chunk is needed.
-    * \param buffer2_frames should point to a long that will be filled with the
-    *        length, in frames, of valid data in the buffer pointed to by 
+    * \param buffer2_bytes Should point to a long that will be filled with the
+    *        length, in bytes, of valid data in the buffer pointed to by 
     *        *buffer1 on return.
     *
     * \remarks Not intended to be called by an application.

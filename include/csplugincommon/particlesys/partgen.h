@@ -329,8 +329,14 @@ public:
   virtual bool HitBeamOutline (const csVector3&, const csVector3&,
         csVector3&, float*)
   { return false; }
-  virtual bool HitBeamObject (const csVector3&, const csVector3&,
-  	csVector3&, float*, int* = 0, iMaterialWrapper** = 0) { return false; }
+  virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
+    csVector3& isect, float* pr, int* polygon_idx = 0, 
+    iMaterialWrapper** material = 0) 
+  { 
+    (void)start; (void)end; (void)isect; (void)pr; (void)polygon_idx;
+    (void)material;
+    return false; 
+  }
   virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 

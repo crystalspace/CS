@@ -31,7 +31,7 @@ namespace CS
   {
 
 
-  class SndSysBasicData :
+  class CS_CRYSTALSPACE_EXPORT SndSysBasicData :
     public scfImplementation1<SndSysBasicData, iSndSysData>
   {
   public:
