@@ -27,6 +27,7 @@
 csPen::csPen (iGraphics2D *_g2d, iGraphics3D *_g3d) : g3d (_g3d), g2d(_g2d), pen_width(1.0), flags(0), gen_tex_coords(false)
 {
   mesh.object2world.Identity();
+  mesh.mixmode = CS_FX_ALPHA;
   tt.Set(0,0,0);
 }
 
@@ -96,13 +97,18 @@ void csPen::SetupMesh ()
   }
   
   //mesh.alphaType = alphaSmooth;
-  mesh.mixmode = CS_FX_COPY | CS_FX_ALPHA; // CS_FX_FLAT  
+  //mesh.mixmode = CS_FX_COPY | CS_FX_ALPHA; // CS_FX_FLAT  
 }
 
 void csPen::DrawMesh (csRenderMeshType mesh_type)
 {
   mesh.meshtype = mesh_type;
   g3d->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
+}
+
+void csPen::SetMixMode(uint mode)
+{
+  mesh.mixmode = mode;	
 }
 
 void csPen::SetAutoTexture(float w, float h)

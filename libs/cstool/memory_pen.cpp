@@ -2,7 +2,7 @@
 #include "cstool/pen.h"
 
 
-enum { PEN_OP_NOP = 0, PEN_OP_SETFLAG, PEN_OP_CLEARFLAG,
+enum { PEN_OP_NOP = 0, PEN_OP_SETFLAG, PEN_OP_CLEARFLAG, PEN_OP_SETMIXMODE,
 	   PEN_OP_SETCOLOR, PEN_OP_SETTEXTURE, PEN_OP_SWAPCOLORS, PEN_OP_SETWIDTH, 
 	   PEN_OP_CLEARTRANSFORM, PEN_OP_PUSHTRANSFORM, PEN_OP_POPTRANSFORM,
        PEN_OP_SETORIGIN, PEN_OP_TRANSLATE, PEN_OP_ROTATE, PEN_OP_DRAWLINE, PEN_OP_DRAWPOINT,
@@ -21,6 +21,7 @@ void csMemoryPen::Clear()
 	
 	SetPenWidth(1.0); 
 	ClearFlag(0xffffffff);
+	SetMixMode(CS_FX_ALPHA);
 }
 
 
@@ -57,6 +58,15 @@ void  csMemoryPen::Draw(iPen *_pen)
 				buf->Read((char *)&f, sizeof(uint));
 				
 				_pen->ClearFlag(f);
+			} break;
+			
+			case PEN_OP_SETMIXMODE:
+			{
+				uint mode;
+				
+				buf->Read((char *)&mode, sizeof(uint));
+				
+				_pen->SetMixMode(mode);
 			} break;
 			
 			case PEN_OP_SETCOLOR:
@@ -294,6 +304,17 @@ void csMemoryPen::ClearFlag(uint flag)
 	buf->Write((const char *)&flag, sizeof(uint));	
 }
 
+
+/** Sets the given mix (blending) mode.
+ * @param mode The mixmode to set.
+ */
+void csMemoryPen::SetMixMode(uint mode)
+{
+	uint8 op = PEN_OP_SETMIXMODE;
+	
+	buf->Write((const char *)&op, sizeof(uint8));	
+	buf->Write((const char *)&mode, sizeof(uint));			
+}
 
 /** 
 * Sets the current color. 

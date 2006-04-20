@@ -74,6 +74,11 @@ struct iPen
    * @param flag The flag to clear. 
    */
   virtual void ClearFlag(uint flag) = 0;		
+  
+  /** Sets the given mix (blending) mode.
+   * @param mode The mixmode to set.
+   */
+  virtual void SetMixMode(uint mode) = 0;
 	
   /** 
    * Sets the current color.
@@ -319,6 +324,12 @@ public:
    * @param flag The flag to clear. 
    */
   virtual void ClearFlag(uint flag);
+  
+  
+  /** Sets the given mix (blending) mode.
+   * @param mode The mixmode to set.
+   */
+  virtual void SetMixMode(uint mode);
 
   /** 
    * Sets the current color. 
@@ -475,6 +486,12 @@ public:
    * @param flag The flag to clear. 
    */
   virtual void ClearFlag(uint flag);	
+  
+  
+  /** Sets the given mix (blending) mode.
+   * @param mode The mixmode to set.
+   */
+  virtual void SetMixMode(uint mode);
 	 
 	  /** 
    * Sets the current color. 
