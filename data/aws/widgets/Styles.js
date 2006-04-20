@@ -957,15 +957,14 @@ Style3D =
 			Sys.Print("Slider: created texture: ", tw, "x", th);
 									
 			// Draw the knob
-			tx_pen.SetFlag(Pen.FLAG_FILL);			
+ 			tx_pen.SetFlag(Pen.FLAG_FILL);			
 			tx_pen.SetColor(prefs.FillColor);			
 			tx_pen.DrawRect(ButtonScroll.x1+5, ButtonScroll.y1,
 						 ButtonScroll.x2-10, ButtonScroll.y2);
 						 
 			tx_pen.DrawTriangle(ButtonScroll.x2-10, ButtonScroll.y1,
 							 ButtonScroll.x2, cy,
-							 ButtonScroll.x2-10, ButtonScroll.y2);
-							 			
+							 ButtonScroll.x2-10, ButtonScroll.y2);							 			
 			
 			tx_pen.SetColor(slb.Base);			 
 			tx_pen.DrawArc(ButtonScroll.x1, ButtonScroll.y1,
@@ -988,13 +987,14 @@ Style3D =
 						 
 			tx_pen.DrawLine(ButtonScroll.x2-10, ButtonScroll.y2,
 						 ButtonScroll.x2, cy);
-												 
-			tx_pen.SetMixMode(Pen.MIX_DST_ALPHA_ADD);
- 			tx_pen.SetFlag(Pen.FLAG_TEXTURE);
- 			tx_pen.SetTexture(widget.gr_tex);
- 			tx_pen.SetColor(1,1,1,1);
- 			tx_pen.DrawRect(0,0,tw,th);	
+								 
  			
+ 			tx_pen.SetFlag(Pen.FLAG_TEXTURE);
+  			tx_pen.SetTexture(widget.gr_tex); 			
+   			tx_pen.SetColor(1,1,1,1.0);
+   			tx_pen.SetMixMode(Pen.MIX_DST_ALPHA_ADD);
+   			tx_pen.DrawRect(0,0,tw,th);	
+  			
 			tx_pen.Render(widget.tx_knob);			
 		}
 								
@@ -1016,9 +1016,9 @@ Style3D =
 				this.init_draw = true;
 				this.gr = new Gradient();
 							
-				this.gr.AddColor(new Color(1,1,1,1), 1.0);	
-				this.gr.AddColor(new Color(0.5,0.5,0.5,1), 0.5);					
-				this.gr.AddColor(new Color(0, 0, 0, 1), 0.0);							
+				this.gr.AddColor(new Color(1,1,1,0.7), 1.0);	
+				this.gr.AddColor(new Color(0.5,0.5,0.5,0.7), 0.5);					
+				this.gr.AddColor(new Color(0, 0, 0, 0.7), 0.0);							
 				
 				createTextures(this);					
 			}	
