@@ -486,16 +486,16 @@ static bool StringToBlendFactor (const char* str, uint& blendFactor)
   };
   static const BlendFactorStr blendFactors[] =
   {
-    "dstalpha",     CS_MIXMODE_FACT_DSTALPHA,
-    "dstalpha_inv", CS_MIXMODE_FACT_DSTALPHA_INV,
-    "dstcolor",     CS_MIXMODE_FACT_DSTCOLOR,
-    "dstcolor_inv", CS_MIXMODE_FACT_DSTCOLOR_INV,
-    "one",          CS_MIXMODE_FACT_ONE,
-    "srcalpha",     CS_MIXMODE_FACT_SRCALPHA,
-    "srcalpha_inv", CS_MIXMODE_FACT_SRCALPHA_INV,
-    "srccolor",     CS_MIXMODE_FACT_SRCCOLOR,
-    "srccolor_inv", CS_MIXMODE_FACT_SRCCOLOR_INV,
-    "zero",         CS_MIXMODE_FACT_ZERO
+    {"dstalpha",     CS_MIXMODE_FACT_DSTALPHA},
+    {"dstalpha_inv", CS_MIXMODE_FACT_DSTALPHA_INV},
+    {"dstcolor",     CS_MIXMODE_FACT_DSTCOLOR},
+    {"dstcolor_inv", CS_MIXMODE_FACT_DSTCOLOR_INV},
+    {"one",          CS_MIXMODE_FACT_ONE},
+    {"srcalpha",     CS_MIXMODE_FACT_SRCALPHA},
+    {"srcalpha_inv", CS_MIXMODE_FACT_SRCALPHA_INV},
+    {"srccolor",     CS_MIXMODE_FACT_SRCCOLOR},
+    {"srccolor_inv", CS_MIXMODE_FACT_SRCCOLOR_INV},
+    {"zero",         CS_MIXMODE_FACT_ZERO}
   };
 
   size_t l = 0, 

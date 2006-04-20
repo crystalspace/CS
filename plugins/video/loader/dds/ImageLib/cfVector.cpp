@@ -73,14 +73,22 @@ cfVector &cfVector::operator=(float f)
 
 int cfVector::operator==(cfVector &Vect)
 {
-long *p1, *p2;
+float *p1, *p2;
 
-	p1 = (long *)pData;
-	p2 = (long *)Vect.pData;
+	p1 = pData;
+	p2 = Vect.pData;
 
 	for(int i=0; i<fCodeSize; i++)
-		if(p1[i] != p2[i])
+	{
+		union
+		{
+		  float f;
+		  uint32 u;
+		} u1, u2;
+		u1.f = p1[i]; u2.f = p2[i];
+		if(u1.u != u2.u)
 			return 0;
+	}
 
 	return 1;
 }

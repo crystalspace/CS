@@ -114,7 +114,7 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
   if (!ValidateTemplate (templ))
     return 0;
   
-  csTicks startTime, endTime;
+  csTicks startTime = 0, endTime = 0;
   // Create a shader. The actual loading happens later.
   csRef<csXMLShader> shader;
   if (do_verbose) startTime = csGetTicks();

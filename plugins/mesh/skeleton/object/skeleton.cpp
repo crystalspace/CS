@@ -118,7 +118,7 @@ void csSkeletonBone::SetParent (iSkeletonBone *par)
   if (parent && (par != parent))
   {
     size_t child_index = parent->FindChildIndex((iSkeletonBone *)this);
-    if (child_index > -1)
+    if (child_index != csArrayItemNotFound)
     {
       parent->GetBones().DeleteIndexFast(child_index);
     }
@@ -320,7 +320,7 @@ void csSkeletonBoneFactory::SetParent (iSkeletonBoneFactory *par)
   if (parent && (par != parent))
   {
     size_t child_index = parent->FindChildIndex((iSkeletonBoneFactory *)this);
-    if (child_index > -1)
+    if (child_index != csArrayItemNotFound)
     {
       parent->GetBones().DeleteIndexFast(child_index);
     }
@@ -749,7 +749,7 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact)
     if (fact_parent_bone)
     {
       size_t index = fact->FindBoneIndex((csSkeletonBoneFactory *)fact_parent_bone);
-      if (index > -1)
+      if (index != csArrayItemNotFound)
       {
         bones[i]->SetParent(bones[index]);
       }
@@ -763,7 +763,7 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact)
       (csPtr<csSkeletonSocket>)(new csSkeletonSocket (this, fact_sockets[i]));
 
     size_t index = fact->FindBoneIndex((csSkeletonBoneFactory *)fact_sockets[i]->GetBone());
-    if (index > -1)
+    if (index != csArrayItemNotFound)
     {
       socket->SetBone(bones[index]);
     }

@@ -11,8 +11,6 @@
 #include <string.h>
 //#include <Crtdbg.h>
 
-#define MIN(a,b) ((a)<(b)?(a):(b))
-
 CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
 {
 namespace ImageLib
@@ -42,7 +40,7 @@ static bool Resize(TableHeader **ppTabHdr, int num, int elsize)
     if(tmp == 0) return false;
 
     memset(tmp, 0, sizeof(TableHeader) + elsize*num);
-    memcpy(tmp, *ppTabHdr, sizeof(TableHeader) + elsize*(MIN((*ppTabHdr)->nalloc, num)));
+    memcpy(tmp, *ppTabHdr, sizeof(TableHeader) + elsize*(__min((*ppTabHdr)->nalloc, num)));
 
     delete [] (char *)(*ppTabHdr);
     *ppTabHdr = tmp;
@@ -59,7 +57,7 @@ long TableMakeSize(TableHeader **ppTabHdr, int num, int elsize)
   if(tb)
   {
     tb->nalloc = num;
-    tb->count = MIN(tb->count, tb->nalloc);
+    tb->count = __min(tb->count, tb->nalloc);
   }
   return(1);
 }

@@ -371,7 +371,7 @@ class csSkeletonScriptKeyFrame: public iSkeletonScriptKeyFrame
     {
       for (size_t i = 0; i < bones_frame_transforms.Length() ; i++ )
       {
-        if (bones_frame_transforms[i].bone = bone)
+        if (bones_frame_transforms[i].bone == bone)
         {
           return bones_frame_transforms[i].transform;
         }
@@ -384,7 +384,7 @@ class csSkeletonScriptKeyFrame: public iSkeletonScriptKeyFrame
     {
       for (size_t i = 0; i < bones_frame_transforms.Length() ; i++ )
       {
-        if (bones_frame_transforms[i].bone = bone)
+        if (bones_frame_transforms[i].bone == bone)
         {
           bones_frame_transforms[i].transform = transform;
         }

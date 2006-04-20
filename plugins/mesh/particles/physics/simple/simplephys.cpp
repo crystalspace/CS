@@ -206,7 +206,8 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
   part->particles->GetEmitPosition (emitter);
 
   csParticleEmitType emit_type = part->particles->GetEmitType ();
-  float inner_radius, outer_radius, emitx_size, emity_size, emitz_size;
+  float inner_radius = 0.0f, outer_radius = 0.0f;
+  float emitx_size = 0.0f, emity_size = 0.0f, emitz_size = 0.0f;
   float ttl = part->particles->GetTimeToLive ();
   float timevar = part->particles->GetTimeVariation ();
   float mass = part->particles->GetMass ();

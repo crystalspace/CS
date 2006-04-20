@@ -85,7 +85,6 @@ void csMeshGeneratorGeometry::ResetManualPositions (int new_celldim)
     return;
 
   csArray<csVector2> tmp_pos;
-  int cellcnt = celldim*celldim;
   for (int i = 0; i < celldim; i++)
   {
     for (size_t j = 0; j < positions[i].GetSize (); j++)
@@ -609,12 +608,13 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
       float pos_factor;
       float x;
       float z;
-      if (mpos_count <= 0)
+      if (mpos_count == 0)
       {
-        geometries[g]->GetDensityMapFactor (x, z, pos_factor);
         x = random.Get (box.MinX (), box.MaxX ());
         z = random.Get (box.MinY (), box.MaxY ());
-      }else
+        geometries[g]->GetDensityMapFactor (x, z, pos_factor);
+      }
+      else
       {
         csVector2 mpos = geometries[g]->GetManualPosition (cidx,j);
         x = mpos.x; 

@@ -60,11 +60,9 @@ void TableSetCount(TableHeader **ppTabHdr,int n, int elsize);
 // 100 is an arbitrary number - these aren't alloc'd normally
 // but used for casting instead
 
-template <class Type> class TableHead
+template <class Type> class TableHead : public TableHeader
 {
 public:
-  long count;
-  long nalloc;
   Type data[100];
   TableHead() { count = nalloc = 0; }
 };
@@ -95,7 +93,12 @@ public:
   int Nalloc() const { return(th ? th->nalloc:0); }
 
   void ZeroCount() { if (th) th->count = 0; }
-  void SetCount(int n) { TableSetCount((TableHeader **)&th, n, sizeof(Type)); }
+  void SetCount(int n) 
+  { 
+    TableHeader* th = this->th;
+    TableSetCount(&th, n, sizeof(Type)); 
+    this->th = (TableHead<Type>*)th;
+  }
 
   Type& operator[](const int i) const;  // Array operator
   Type* Addr(const int i) const;      // Address of the ith entry
@@ -183,8 +186,11 @@ int Table<Type>::Insert(int at, int num, Type *el)
 template <class Type>
 int Table<Type>::Append(Type &el, int allocExtra)
 {
-  return(TableInsertAt((TableHeader **)&th, th ? th->count:0, 1,
-    	(void *)&el, sizeof(Type), allocExtra));
+  TableHeader* th = this->th;
+  int r = TableInsertAt((TableHeader **)&th, th ? th->count:0, 1,
+    	(void *)&el, sizeof(Type), allocExtra);
+  this->th = (TableHead<Type>*)th;
+  return r;
 }
 
 // Append "num" elements position on end of array
@@ -207,7 +213,10 @@ int Table<Type>::Delete(int start,int num)
 template <class Type>
 int Table<Type>::Resize(int num)
 {
-  return(TableMakeSize((TableHeader **)&th, num, sizeof(Type)));
+  TableHeader* th = this->th;
+  int r = TableMakeSize((TableHeader **)&th, num, sizeof(Type));
+  this->th = (TableHead<Type>*)th;
+  return r;
 }
 
 // Reallocate so there is no wasted space (nalloc = count)

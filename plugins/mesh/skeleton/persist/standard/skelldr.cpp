@@ -607,7 +607,7 @@ csPtr<iBase> csSkeletonFactoryLoader::Parse (iDocumentNode* node,
 
   const char* fact_name = skelfact_node->GetAttributeValue ("name");
   //printf("node value %s\n", skelfact_node->GetValue ());
-  iSkeletonFactory *skel_fact = graveyard->CreateFactory("test");
+  iSkeletonFactory *skel_fact = graveyard->CreateFactory (fact_name);
 
   csRef<iDocumentNodeIterator> it = skelfact_node->GetNodes ();
   while (it->HasNext ())
@@ -631,6 +631,6 @@ csPtr<iBase> csSkeletonFactoryLoader::Parse (iDocumentNode* node,
   }
   }
 
-  printf("skel_fact %s\n", skel_fact->GetName());
+  //printf("skel_fact %s\n", skel_fact->GetName());
   return csPtr<iBase> (skel_fact);
 }

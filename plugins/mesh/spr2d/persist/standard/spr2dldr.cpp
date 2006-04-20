@@ -651,8 +651,10 @@ bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     const char* animname = anim->GetName();
     uvaniNode->SetAttribute("name", animname);
     synldr->WriteBool(uvaniNode,"loop",loop,false);
-    csRef<iDocumentNode> styleNode = styleNode->GetNode ("style");
-    styleNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(style);
+    
+    csRef<iDocumentNode> styleNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    styleNode->SetValue ("style");
+    styleNode->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsInt(style);
   }
 
   //Writedown Mixmode tag

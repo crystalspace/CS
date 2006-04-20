@@ -210,9 +210,9 @@ namespace Soft3D
       // Do backface culling. Note that this depends on the
       // mirroring of the current view.
       //-----
-      const csVector2& pa = *(csVector2*)&outPersp[trivert[0]];
-      const csVector2& pb = *(csVector2*)&outPersp[trivert[1]];
-      const csVector2& pc = *(csVector2*)&outPersp[trivert[2]];
+      const csVector2 pa (outPersp[trivert[0]][0], outPersp[trivert[0]][1]);
+      const csVector2 pb (outPersp[trivert[1]][0], outPersp[trivert[1]][1]);
+      const csVector2 pc (outPersp[trivert[2]][0], outPersp[trivert[2]][1]);
       float area = csMath2::Area2 (pa, pb, pc);
       if (!area) return 0;
       if (do_mirror)
