@@ -948,17 +948,17 @@ Style3D =
 			tw = Math.pow(2,(tw+1));			
 			th = Math.pow(2,(th+1));
 			
-			var ButtonScroll = { x1:1, y1:1, x2:tw-slb.TickThickness, y2:th };
+			var ButtonScroll = { x1:1, y1:0, x2:tw-slb.TickThickness, y2:th-1 };
 			
 			widget.tx_knob = new Texture(tw, th);
-			widget.gr_tex  = new Texture(tw, th);
-			widget.gr.Render(widget.gr_tex, Gradient.LDIAG);
+			widget.gr_tex  = new Texture(1, th);
+			widget.gr.Render(widget.gr_tex, Gradient.VERTICAL);
 			
 			Sys.Print("Slider: created texture: ", tw, "x", th);
 									
 			// Draw the knob
  			tx_pen.SetFlag(Pen.FLAG_FILL);			
-			tx_pen.SetColor(prefs.FillColor);			
+			tx_pen.SetColor(prefs.FillColor);			  			
 			tx_pen.DrawRect(ButtonScroll.x1+5, ButtonScroll.y1,
 						 ButtonScroll.x2-10, ButtonScroll.y2);
 						 
@@ -976,8 +976,8 @@ Style3D =
 			tx_pen.DrawRect(ButtonScroll.x1, ButtonScroll.y1+5,
 						 ButtonScroll.x1+5, ButtonScroll.y2-5);
 						
-			tx_pen.DrawLine(ButtonScroll.x1+5, ButtonScroll.y1+1,
-						 ButtonScroll.x2-10, ButtonScroll.y1+1);						 
+			tx_pen.DrawLine(ButtonScroll.x1+5, ButtonScroll.y1,
+						 ButtonScroll.x2-10, ButtonScroll.y1);						 
 						 
 			tx_pen.DrawLine(ButtonScroll.x1+5, ButtonScroll.y2,
 						 ButtonScroll.x2-10, ButtonScroll.y2);						 
@@ -991,9 +991,15 @@ Style3D =
  			
  			tx_pen.SetFlag(Pen.FLAG_TEXTURE);
   			tx_pen.SetTexture(widget.gr_tex); 			
-   			tx_pen.SetColor(1,1,1,1.0);
+   			tx_pen.SetColor(0.25,0.25,0.25,0.75);
    			tx_pen.SetMixMode(Pen.MIX_DST_ALPHA_ADD);
    			tx_pen.DrawRect(0,0,tw,th);	
+   			tx_pen.ClearFlag(Pen.FLAG_TEXTURE);
+   			
+   			tx_pen.SetFlag(Pen.FLAG_FILL);			   			
+			tx_pen.SetColor(0.1, 0.1, 0.1, 0.05);		
+			tx_pen.DrawRect(0,0,tw,th>>1);	
+			
   			
 			tx_pen.Render(widget.tx_knob);			
 		}
@@ -1016,9 +1022,10 @@ Style3D =
 				this.init_draw = true;
 				this.gr = new Gradient();
 							
-				this.gr.AddColor(new Color(1,1,1,0.7), 1.0);	
-				this.gr.AddColor(new Color(0.5,0.5,0.5,0.7), 0.5);					
-				this.gr.AddColor(new Color(0, 0, 0, 0.7), 0.0);							
+				this.gr.AddColor(new Color(1,1,1,1), 0.0);	
+				this.gr.AddColor(new Color(0.5,0.5,0.5,1), 0.35);					
+				this.gr.AddColor(new Color(0, 0, 0, 1), 0.75);							
+				this.gr.AddColor(new Color(0, 0, 0, 1), 1.0);
 				
 				createTextures(this);					
 			}	
