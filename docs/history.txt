@@ -19,6 +19,10 @@ chronological order.
 	  vertex programs in verbose mode. Otherwise you would get a huge
 	  (two page long) error on top of the display when starting terrain
 	  on some systems.
+	- Christopher fixed a bug in AWS2 compositing, with help from res. He
+	  also committed a small change to the opengl screenshot mechanism that
+	  inlcudes alpha values.  I'm sure this doesn't affect most situations
+	  where screenshot is used, but it's VERY handy for procedural textures.
 20-Apr-2006
 	- Jorrit added a patch from Frank which fixes the issue with an
 	  CG program failing but the technique using that CG program was
