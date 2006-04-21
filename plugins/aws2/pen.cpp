@@ -17,6 +17,8 @@
 */
 
 #include "cssysdef.h"
+#include <cstool/debugimagewriter.h>
+#include <igraphic/image.h>
 #include "manager.h"
 #include "script_manager.h"
 #include "script_console.h"
@@ -26,6 +28,11 @@
 #include "texture.h"
 
 #include <string.h>
+
+enum { MIX_ADD, MIX_ALPHA, MIX_COPY, MIX_DSTALPHAADD, MIX_FLAT, MIX_MASK_ALPHA, MIX_MASK_MIXMODE, 
+	   MIX_MULTIPLY, MIX_MULTIPLY2, MIX_PREMULTALPHA, MIX_SRCALPHAADD, MIX_TRANSPARENT, MIX_TRANSPARENTTEST,
+	   MIX_DSTALPHA, MIX_DSTALPHAADDTEST };
+
 
 /// The prototype object for pens.
 static JSObject *pen_proto_object=0;
@@ -100,11 +107,34 @@ static JSBool SetMixMode (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 
   if (po) 
   { 
-    int32 mode;		
+    uint32 mode;
+    uint rm;
 
-    JS_ValueToInt32 (cx,  argv[0], &mode);
+    JS_ValueToECMAUint32(cx,  argv[0], &mode);
+  	   	   			  
+    switch (mode) 
+    {				
+	    case MIX_ADD:       	rm = CS_FX_ADD; break;
+	    case MIX_ALPHA:       	rm = CS_FX_ALPHA; break;
+	    case MIX_COPY:       	rm = CS_FX_COPY; break;
+	    case MIX_DSTALPHAADD:   rm = CS_FX_DESTALPHAADD; break;
+	    case MIX_FLAT:       	  rm = CS_FX_FLAT; break;
+	    case MIX_MASK_ALPHA:      rm = CS_FX_MASK_ALPHA; break;
+	    case MIX_MASK_MIXMODE:    rm = CS_FX_MASK_MIXMODE; break;
+	    case MIX_MULTIPLY:        rm = CS_FX_MULTIPLY; break;
+	    case MIX_MULTIPLY2:       rm = CS_FX_MULTIPLY2; break;
+	    case MIX_PREMULTALPHA:    rm = CS_FX_PREMULTALPHA; break;
+	    case MIX_SRCALPHAADD:     rm = CS_FX_SRCALPHAADD; break;
+	    case MIX_TRANSPARENT:     rm = CS_FX_TRANSPARENT; break;    
+	    case MIX_TRANSPARENTTEST: rm = CS_MIXMODE_BLEND(ZERO, ONE) | CS_MIXMODE_ALPHATEST_ENABLE; break;    
+	    case MIX_DSTALPHA:	  	  rm = CS_MIXMODE_BLEND(DSTALPHA, ZERO) | CS_MIXMODE_ALPHATEST_DISABLE; break;    
+	    case MIX_DSTALPHAADDTEST: rm = CS_MIXMODE_BLEND(DSTALPHA, ONE)  | CS_MIXMODE_ALPHATEST_ENABLE; break;  
+	   
+	    default:
+	      return JS_FALSE;				
+    }    
 
-    po->SetMixMode ((uint)mode); 
+    po->SetMixMode (rm); 
   }
 
   return JS_TRUE;
@@ -554,7 +584,15 @@ static JSBool Render (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
       AwsMgr ()->G3D ()->BeginDraw (CSDRAW_2DGRAPHICS);
       // Clear it out to make sure that we get good, clean backgroundess.
       AwsMgr ()->G2D ()->Clear (AwsMgr ()->G2D ()->FindRGB (0,0,0,0));
+      
+      csRef<iImage> shot = AwsMgr ()->G2D ()->ScreenShot();
+	  csDebugImageWriter::DebugImageWrite(shot, "post-clear.png");      
+            
       po->Draw (&pen);			
+      
+      shot = AwsMgr ()->G2D ()->ScreenShot();
+      csDebugImageWriter::DebugImageWrite(shot, "post-draw.png");
+            
       AwsMgr ()->G3D ()->FinishDraw ();			
       
       return JS_TRUE;
@@ -640,6 +678,7 @@ static JSBool pen_get_staticFlagsProperty (JSContext *cx, JSObject *obj,
   return JS_FALSE;
 }
 
+
 /// Returns static properties
 static JSBool pen_get_staticMixProperty (JSContext *cx, JSObject *obj, 
                                            jsval id, jsval *vp)
@@ -647,29 +686,31 @@ static JSBool pen_get_staticMixProperty (JSContext *cx, JSObject *obj,
   // Try static properties first.  They can't be handled in the class because
   // They're STATIC properties.
   if (JSVAL_IS_INT(id)) 
-  {				   	   	
-
-    switch (JSVAL_TO_INT(id)) 
-    {				
-    case 1:       *vp = INT_TO_JSVAL(CS_FX_ADD); break;
-    case 2:       *vp = INT_TO_JSVAL(CS_FX_ALPHA); break;
-    case 3:       *vp = INT_TO_JSVAL(CS_FX_COPY); break;
-    case 4:       *vp = INT_TO_JSVAL(CS_FX_DESTALPHAADD); break;
-    case 5:       *vp = INT_TO_JSVAL(CS_FX_FLAT); break;
-    case 6:       *vp = INT_TO_JSVAL(CS_FX_MASK_ALPHA); break;
-    case 7:       *vp = INT_TO_JSVAL(CS_FX_MASK_MIXMODE); break;
-    case 8:       *vp = INT_TO_JSVAL(CS_FX_MULTIPLY); break;
-    case 9:       *vp = INT_TO_JSVAL(CS_FX_MULTIPLY2); break;
-    case 10:      *vp = INT_TO_JSVAL(CS_FX_PREMULTALPHA); break;
-    case 11:      *vp = INT_TO_JSVAL(CS_FX_SRCALPHAADD); break;
-    case 12:      *vp = INT_TO_JSVAL(CS_FX_TRANSPARENT); break;    
-    case 13:	  *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(ZERO, ONE) | CS_MIXMODE_ALPHATEST_ENABLE); break;    
-    case 14:	  *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(DSTALPHA, ZERO) | CS_MIXMODE_ALPHATEST_ENABLE); break;    
-    case 15:	  *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(DSTALPHA, ONE)  | CS_MIXMODE_ALPHATEST_ENABLE); break;  
-   
-    default:
-      return JS_FALSE;				
-    }
+  {			
+	  
+	*vp = id;  
+	  	   	   			  
+//     switch (JSVAL_TO_INT(id)) 
+//     {				
+//     case MIX_ADD:       	*vp = INT_TO_JSVAL(CS_FX_ADD); break;
+//     case MIX_ALPHA:       	*vp = INT_TO_JSVAL(CS_FX_ALPHA); break;
+//     case MIX_COPY:       	*vp = INT_TO_JSVAL(CS_FX_COPY); break;
+//     case MIX_DSTALPHAADD:   *vp = INT_TO_JSVAL(CS_FX_DESTALPHAADD); break;
+//     case MIX_FLAT:       	  *vp = INT_TO_JSVAL(CS_FX_FLAT); break;
+//     case MIX_MASK_ALPHA:      *vp = INT_TO_JSVAL(CS_FX_MASK_ALPHA); break;
+//     case MIX_MASK_MIXMODE:    *vp = INT_TO_JSVAL(CS_FX_MASK_MIXMODE); break;
+//     case MIX_MULTIPLY:        *vp = INT_TO_JSVAL(CS_FX_MULTIPLY); break;
+//     case MIX_MULTIPLY2:       *vp = INT_TO_JSVAL(CS_FX_MULTIPLY2); break;
+//     case MIX_PREMULTALPHA:    *vp = INT_TO_JSVAL(CS_FX_PREMULTALPHA); break;
+//     case MIX_SRCALPHAADD:     *vp = INT_TO_JSVAL(CS_FX_SRCALPHAADD); break;
+//     case MIX_TRANSPARENT:     *vp = INT_TO_JSVAL(CS_FX_TRANSPARENT); break;    
+//     case MIX_TRANSPARENTTEST: *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(ZERO, ONE) | CS_MIXMODE_ALPHATEST_ENABLE); break;    
+//     case MIX_DSTALPHATEST:	  *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(DSTALPHA, ZERO) | CS_MIXMODE_ALPHATEST_ENABLE); break;    
+//     case MIX_DSTALPHAADDTEST: *vp = INT_TO_JSVAL(CS_MIXMODE_BLEND(DSTALPHA, ONE)  | CS_MIXMODE_ALPHATEST_ENABLE); break;  
+//    
+//     default:
+//       return JS_FALSE;				
+//     }
 
     return JS_TRUE;		
   }	
@@ -717,21 +758,21 @@ static JSPropertySpec pen_static_props[] =
   {"FLAG_SWAPCOLORS", CS_PEN_SWAPCOLORS,  JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticFlagsProperty},
   {"FLAG_TEXTURE",    CS_PEN_TEXTURE,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticFlagsProperty},
   
-  {"MIX_ADD",         1,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_ALPHA",       2,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_COPY",        3,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},  
-  {"MIX_DST_ALPHA_ADD", 4,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_FLAT",         5,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_MASK_ALPHA",   6,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_MASK_MIXMODE", 7,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_MULTIPLY",     8,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_MULTIPLY2",    9,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_PRE_MULT_ALPHA", 10, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_SRC_ALPHA_ADD",  11, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_TRANSPARENT",    12, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_TRANSPARENT_TEST",    13, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_DST_ALPHA_TEST",      14, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
-  {"MIX_DST_ALPHA_ADD_TEST",  15, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_ADD",         MIX_ADD,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_ALPHA",       MIX_ALPHA,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_COPY",        MIX_COPY,     JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},  
+  {"MIX_DST_ALPHA_ADD",  MIX_DSTALPHAADD,   JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_FLAT",           MIX_FLAT,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_MASK_ALPHA",     MIX_MASK_ALPHA,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_MASK_MIXMODE",   MIX_MASK_MIXMODE,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_MULTIPLY",       MIX_MULTIPLY,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_MULTIPLY2",      MIX_MULTIPLY2,    JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_PRE_MULT_ALPHA", MIX_PREMULTALPHA, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_SRC_ALPHA_ADD",  MIX_SRCALPHAADD, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_TRANSPARENT",    MIX_TRANSPARENT, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_TRANSPARENT_TEST",    MIX_TRANSPARENTTEST, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_DST_ALPHA",      	  MIX_DSTALPHA, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
+  {"MIX_DST_ALPHA_ADD_TEST",  MIX_DSTALPHAADDTEST, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY, pen_get_staticMixProperty},
 
   {0,0,0}
 };
