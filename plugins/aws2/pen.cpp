@@ -585,13 +585,13 @@ static JSBool Render (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
       // Clear it out to make sure that we get good, clean backgroundess.
       AwsMgr ()->G2D ()->Clear (AwsMgr ()->G2D ()->FindRGB (0,0,0,0));
       
-      csRef<iImage> shot = AwsMgr ()->G2D ()->ScreenShot();
-	  csDebugImageWriter::DebugImageWrite(shot, "post-clear.png");      
+//    csRef<iImage> shot = AwsMgr ()->G2D ()->ScreenShot();
+// 	  csDebugImageWriter::DebugImageWrite(shot, "post-clear.png");      
             
       po->Draw (&pen);			
       
-      shot = AwsMgr ()->G2D ()->ScreenShot();
-      csDebugImageWriter::DebugImageWrite(shot, "post-draw.png");
+//       shot = AwsMgr ()->G2D ()->ScreenShot();
+//       csDebugImageWriter::DebugImageWrite(shot, "post-draw.png");
             
       AwsMgr ()->G3D ()->FinishDraw ();			
       
