@@ -8,13 +8,17 @@ chronological order.
 
 21-Apr-2006
 	- Jorrit fixed a typo in the fat renderloop.
-	- Jorrit added a lit of supported shader variables to the (otherwise empty)
-	  shader documentation.
+	- Jorrit added a lit of supported shader variables to the (otherwise
+	  empty) shader documentation.
 	- Jorrit added a new technique to light_bumpmap.xml with priority 220
 	  (thanks to Marten to help with this). This technique is similar to
 	  the priority 250 technique except that it only requires 2 texture
 	  units instead of 3. It does this by calculating the binormal
 	  in the vertex program as a product of the normal and the tangent.
+	- Jorrit fixed the arb shader plugin to only produce errors about
+	  vertex programs in verbose mode. Otherwise you would get a huge
+	  (two page long) error on top of the display when starting terrain
+	  on some systems.
 20-Apr-2006
 	- Jorrit added a patch from Frank which fixes the issue with an
 	  CG program failing but the technique using that CG program was

@@ -283,11 +283,14 @@ bool csShaderGLAVP::LoadProgramStringToGL ()
     if (end)
       *(end-1) = 0;
 
-    Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Couldn't load vertex program \"%s\"", description.GetDataSafe ());
-    Report (CS_REPORTER_SEVERITY_WARNING, "Program error at: \"%s\"", start);
-    Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
-      programErrorString);
+    if (doVerbose)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+        "Couldn't load vertex program \"%s\"", description.GetDataSafe ());
+      Report (CS_REPORTER_SEVERITY_WARNING, "Program error at: \"%s\"", start);
+      Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
+        programErrorString);
+    }
     return false;
   }
   else
