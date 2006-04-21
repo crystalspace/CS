@@ -23,6 +23,12 @@ chronological order.
 	  also committed a small change to the opengl screenshot mechanism that
 	  inlcudes alpha values.  I'm sure this doesn't affect most situations
 	  where screenshot is used, but it's VERY handy for procedural textures.
+	- Christopher added a new tool, partedit2.  Since he volunteered to fix this
+	  app for AWS2, and since he wants to make sure that AWS2 works well with
+	  complicated applications needing sophisticated GUI support, he has 
+	  decided to start building this application now.  This will let him
+	  make sure that he's making something that will be useful and reasonably
+	  simple to use.  This app compiles but currently does nothing at all useful.
 20-Apr-2006
 	- Jorrit added a patch from Frank which fixes the issue with an
 	  CG program failing but the technique using that CG program was

@@ -165,7 +165,7 @@ nb.ResizeTo(100,25);
 nb.MoveTo(5,110);
 nb.onDrawContent = function(pen) 
 { 
-	pen.SetColor(0,0,0,1); 
+	pen.SetColor(1,1,1,1); 
 	pen.WriteBoxed(Skin.current.Font, 0,0,this.width, this.height, Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, "Press Me"); 
 }
 

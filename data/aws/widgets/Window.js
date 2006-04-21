@@ -5,6 +5,7 @@ function Window(title)
 	var prefs = Skin.current;
 	
 	_widget.is_active=false;
+	_widget.draw_init=false;
 	
 	// Give it a pen
 	_widget.SetPen(new Pen);

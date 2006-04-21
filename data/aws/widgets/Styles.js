@@ -1,4 +1,14 @@
 
+// Calculates the nearest power of two larger than 'value', returns an integer.
+function NearestPow2(value)
+{
+  var rv = Math.floor(Math.LOG2E * Math.log(value));						
+	  rv = Math.pow(2,(rv+1));	
+	  
+  return rv;
+}
+
+
 
 Style3D = 
 {
@@ -62,41 +72,34 @@ Style3D =
 			//  The texture height needs to be the power of 2 greater than
 			// or equal to the height of the button.
 			
-			var tw = 1;
-			var th = Math.floor(Math.LOG2E * Math.log(h));
-						
-			th = Math.pow(2,(th+1));
+			var tw = NearestPow2(w);
+			var th = NearestPow2(h);
 			
 			widget.gr_tex = new Texture(tw, th);
-			widget.gr.Render(widget.gr_tex, Gradient.VERTICAL);					
+			widget.gr.Render(widget.gr_tex, Gradient.LDIAG);					
 		}
 
 		// Initializes the gradient and texture 
 		if (this.draw_init == false)
 		{
 			this.draw_init = true;
-			this.gr = new Gradient();
-						
-			this.gr.AddColor(new Color(1, 1, 1, 1), 0);
-			this.gr.AddColor(tbw.Base, 0.5);			
-			this.gr.AddColor(new Color(0.4, 0.4, 0.4, 1.0), 1);			
+			this.gr = tb.BkgGrad;
 						
 			rebuildTextures(this);
 		}
-		
+				
 		// Draw the background.
-		pen.SetColor(tb.Base)
+		pen.SetColor(tb.Base)		
 		pen.SetFlag(Pen.FLAG_TEXTURE);
 		pen.SetTexture(this.gr_tex);
 		pen.DrawMiteredRect(0,0,w,h,2);
 		pen.ClearFlag(Pen.FLAG_TEXTURE);
 		
-		pen.SetColor(0,0,0,0.4)
+		pen.SetColor(tb.Border)		
 		pen.ClearFlag(Pen.FLAG_FILL);
 		pen.DrawMiteredRect(0,0,w,h,2);
-		pen.SetColor(0,0,0,0.3)
-		pen.DrawMiteredRect(1,1,w-1,h-1,2);
-				
+		
+		// Draw Frame for text.
 		dim = prefs.TitleFont.GetDimensions(this.text);
 		
 		var cx = (w-tbw-5)>>1;
@@ -105,20 +108,28 @@ Style3D =
 		if (this.is_active) pen.SetColor(tb.Active);
 		else				pen.SetColor(tb.Inactive);
 		
-		pen.SetFlag(Pen.FLAG_FILL);
-		pen.DrawMiteredRect(cx-thw-5, 0, cx+thw+15, dim.height+2, 5);
-		pen.DrawRect(cx-thw-5, 0, cx+thw+15, 5);
+		pen.SetFlag(Pen.FLAG_FILL);		
+		pen.DrawMiteredRect(cx-thw-5, 0, cx+thw+10, dim.height+2, 5);		
+		pen.DrawRect(cx-thw-5, 0, cx+thw+10, 5);
+		pen.SetColor(tb.Border);
+		pen.DrawLine(cx-thw-5, 0, cx-thw-5, dim.height-2);
+		pen.DrawLine(cx-thw-5, dim.height-2, cx-thw, dim.height+2);
+		pen.DrawLine(cx+thw+10, 0, cx+thw+10, dim.height-2);
+		pen.DrawLine(cx+thw+10, dim.height-2, cx+thw+5, dim.height+2);
+		pen.DrawLine(cx-thw, dim.height+2, cx+thw+5, dim.height+2);
 		
-		// Glassy shine
-		pen.SetFlag(Pen.FLAG_FILL | Pen.FLAG_SWAPCOLORS);
-		pen.SetColor(1,1,1,0.1);
-		pen.SwapColors();
-		pen.SetColor(1,1,1,0.9);
-		pen.DrawRect(4, 2, w-3, 10);
+		
+		
+// 		// Glassy shine
+// 		pen.SetFlag(Pen.FLAG_FILL | Pen.FLAG_SWAPCOLORS);
+// 		pen.SetColor(1,1,1,0.1);
+// 		pen.SwapColors();
+// 		pen.SetColor(1,1,1,0.9);
+// 		pen.DrawRect(4, 2, w-3, 10);
 		
 		// Draw the text.		
 		pen.SetColor(tb.Text);
-		pen.WriteBoxed(prefs.TitleFont, 5, 5, w-tbw-5, h-5, Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, this.text);			
+		pen.WriteBoxed(prefs.TitleFont, 5, 5, w-tbw-10, h-10, Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, this.text);			
 	},
 	
 	ScrollBar : function(pen)
@@ -252,15 +263,10 @@ Style3D =
 			// or equal to the height of the button.
 			
 			var tw = 1;
-			var th = Math.floor(Math.LOG2E * Math.log(h));
-						
-			th = Math.pow(2,(th+1));
+			var th = NearestPow2(h);
 			
 			widget.gr_tex = new Texture(tw, th);
 			widget.gr.Render(widget.gr_tex, Gradient.VERTICAL);			
-			
-			widget.gr_tex_over = new Texture(tw, th);	
-			widget.gr_over.Render(widget.gr_tex_over, Gradient.VERTICAL);			
 			
 			//td = widget.gr_tex.GetDimensions();
 			//Sys.Print("Button: created texture: ", td.width, "x", td.height, " ", tw, "x", th);		
@@ -270,66 +276,52 @@ Style3D =
 		if (this.draw_init == false)
 		{
 			this.draw_init = true;
-			this.gr = new Gradient();
-			this.gr_over = new Gradient();
-			
-			this.gr.AddColor(new Color(1, 1, 1, 1), 0);
-			this.gr.AddColor(b.Base, 0.5);			
-			this.gr.AddColor(new Color(0.4, 0.4, 0.4, 1.0), 1);
-			
-			this.gr_over.AddColor(new Color(1, 1, 1, 1), 0);
-			this.gr_over.AddColor(b.Over, 0.5);			
-			this.gr_over.AddColor(new Color(0.4, 0.4, 0.4, 1.0), 1);
-						
+			this.gr = prefs.OverlayGradient;
+			this.gr_over = new Gradient();			
+
 			rebuildTextures(this);
 		}
 		
 		// Make's sure that the texture hasn't gotten too small.
 		td = this.gr_tex.GetDimensions();
 		if (h > td.height) rebuildTextures(this);
-							
-		if (this.over==true && this.state==false)
-		{
-			pen.SetColor(b.Over);
-			pen.SetTexture(this.gr_tex_over);
-			pen.SetFlag(Pen.FLAG_TEXTURE);
-		}
-		else if (this.over==false && this.state==false)
-		{
-			pen.SetColor(b.Base);
-			pen.SetTexture(this.gr_tex);
-			pen.SetFlag(Pen.FLAG_TEXTURE);
-		}
-		else
-		{
-			pen.SetColor(b.Base);
-			pen.SetFlag(Pen.FLAG_FILL);
-		}
 		
-		// Draw background
+		
+ 		//pen.SetFlag(Pen.FLAG_FILL);
+ 		//pen.DrawMiteredRect(0,0,w,h,2);
+ 		
+ 		// Draw background
+ 		pen.SetColor(b.Base);				
+		pen.SetMixMode(Pen.MIX_ALPHA);
+		pen.SetFlag(Pen.FLAG_TEXTURE);					
+		pen.SetTexture(this.gr_tex);
 		pen.DrawMiteredRect(0,0,w,h,2);
 		pen.ClearFlag(Pen.FLAG_TEXTURE);
-				
-		// Draw glass highlight.
-		if (!this.state)
+ 							
+		if (this.over==true && this.state==false)
 		{
-			pen.SetColor(1,1,1,0);
-			pen.SwapColors();
-			pen.SetColor(1,1,1,1);		
-			
-			pen.SetFlag(Pen.FLAG_FILL | Pen.FLAG_SWAPCOLORS);
-			pen.DrawRect(3,2,w-2,h>>1);
-			pen.ClearFlag(Pen.FLAG_FILL | Pen.FLAG_SWAPCOLORS);						
+			pen.SetColor(b.Over);			
+			pen.SetMixMode(Pen.MIX_ALPHA);
+			pen.SetFlag(Pen.FLAG_FILL);
+ 			pen.DrawMiteredRect(0,0,w,h,2);
+
 		}
+ 		else if (this.over==true && this.state==true)
+ 		{
+	 		pen.SetColor(b.Down);			
+			pen.SetMixMode(Pen.MIX_ALPHA);
+			pen.SetFlag(Pen.FLAG_FILL);
+ 			pen.DrawMiteredRect(0,0,w,h,2);
+ 		}				
 		
 		if (this.onDrawContent)
 		{					
 			this.onDrawContent(pen);				
 		}
 		
-		pen.SetColor(b.Border);
-		pen.ClearFlag(Pen.FLAG_FILL);
- 		pen.DrawMiteredRect(0,0,w,h,2,false);
+ 		pen.SetColor(b.Border);
+ 		pen.ClearFlag(Pen.FLAG_FILL);
+	  	pen.DrawMiteredRect(0,0,w,h,2,false);
 		
 // 		if (this.state) pen.PopTransform();
 	},
@@ -426,16 +418,46 @@ Style3D =
 		var w = this.width, h = this.height;
 				
 		var prefs = Skin.current;
-		var frame = Frames3D;
+		var sb = prefs.StatusBar;
+				
+		// Rebuilds the gradient texture we use for the button.
+		function rebuildTextures(widget)
+		{
+			//  The texture height needs to be the power of 2 greater than
+			// or equal to the height of the button.
+			
+			var tw = NearestPow2(w);;
+			var th = NearestPow2(h);
+			
+			widget.gr_tex = new Texture(tw, th);
+			widget.gr.Render(widget.gr_tex, Gradient.RDIAG);					
+		}
+
+		// Initializes the gradient and texture 
+		if (this.draw_init == false)
+		{
+			this.draw_init = true;
+			this.gr = sb.BkgGrad;
+			
+			rebuildTextures(this);
+		}
 		
-		pen.Clear();
+		pen.Clear();		
+
+		// Draw the background.
+		pen.SetColor(1.0,1.0,1.0,1.0)
+		pen.SetFlag(Pen.FLAG_TEXTURE);
+		pen.SetTexture(this.gr_tex);
+		pen.DrawRect(0,0,w,h);
+		pen.ClearFlag(Pen.FLAG_TEXTURE);
 		
-		frame.Outset(pen, 0,0,w,h);
+		pen.SetColor(sb.Border)				
+		pen.DrawRect(0,0,w,h);		
 		
 		if (this.text!=null)
 		{
 			pen.SetColor(prefs.TextForeColor);
-			pen.WriteBoxed(prefs.Font, frame.OutsetAdjust,frame.OutsetAdjust,w-frame.OutsetAdjust,h-frame.OutsetAdjust,
+			pen.WriteBoxed(prefs.Font, 2,2,w-2,h-2,
 						   Pen.ALIGN_LEFT, Pen.ALIGN_CENTER, this.text);
 		}		
 	},
@@ -490,10 +512,10 @@ Style3D =
 				
 		var prefs = Skin.current;
 		var frame = Frames3D;
-		
+			
 		pen.Clear();
 		
-		frame.Ridge(pen, 0,0,w,h);						
+		frame.Ridge(pen, 0,0,w,h);							
 	},
 	
 	ToolTip : function(pen)
@@ -671,26 +693,16 @@ Style3D =
 			th = Math.pow(2,(th+1));
 			
 			widget.gr_tex = new Texture(tw, th);
-			widget.gr.Render(widget.gr_tex, Gradient.VERTICAL);			
+			widget.gr.Render(widget.gr_tex, Gradient.VERTICAL);						
 			
-			widget.gr_tex_over = new Texture(tw, th);	
-			widget.gr_over.Render(widget.gr_tex_over, Gradient.VERTICAL);			
 		}
 		
 		// Initializes the gradient and texture 
 		if (this.draw_init == false)
 		{
 			this.draw_init = true;
-			this.gr = new Gradient();
-			this.gr_over = new Gradient();
-							
-			this.gr.AddColor(new Color(1, 1, 1, 1), 0);					
-			this.gr.AddColor(rb.Base, 0.7);	
-			this.gr.AddColor(new Color(0.4, 0.4, 0.4, 1.0), 1.0);			
-						
-			this.gr_over.AddColor(new Color(1, 1, 1, 1), 0);			
-			this.gr_over.AddColor(rb.Over, 0.70);			
-			this.gr_over.AddColor(new Color(0.4, 0.4, 0.4, 1.0), 1.0);			
+			this.gr = rb.BkgGrad;
+			this.gr_over = rb.BkgGrad;					
 						
 			rebuildTextures(this);
 		}				
@@ -707,7 +719,7 @@ Style3D =
 			if (this.over)
 			{
 				pen.SetColor(rb.Over);
-				pen.SetTexture(this.gr_tex_over);					
+				pen.SetTexture(this.gr_tex);					
 			}
 			else
 			{
@@ -989,18 +1001,14 @@ Style3D =
 						 ButtonScroll.x2, cy);
 								 
  			
+			// Gradient
  			tx_pen.SetFlag(Pen.FLAG_TEXTURE);
   			tx_pen.SetTexture(widget.gr_tex); 			
-   			tx_pen.SetColor(0.25,0.25,0.25,0.75);
+   			tx_pen.SetColor(0.25,0.25,0.25,1.0);
    			tx_pen.SetMixMode(Pen.MIX_DST_ALPHA_ADD);
    			tx_pen.DrawRect(0,0,tw,th);	
    			tx_pen.ClearFlag(Pen.FLAG_TEXTURE);
-   			
-   			tx_pen.SetFlag(Pen.FLAG_FILL);			   			
-			tx_pen.SetColor(0.1, 0.1, 0.1, 0.05);		
-			tx_pen.DrawRect(0,0,tw,th>>1);	
-			
-  			
+   									 			
 			tx_pen.Render(widget.tx_knob);			
 		}
 								
@@ -1020,12 +1028,7 @@ Style3D =
 			if (this.init_draw == false)
 			{
 				this.init_draw = true;
-				this.gr = new Gradient();
-							
-				this.gr.AddColor(new Color(1,1,1,1), 0.0);	
-				this.gr.AddColor(new Color(0.5,0.5,0.5,1), 0.35);					
-				this.gr.AddColor(new Color(0, 0, 0, 1), 0.75);							
-				this.gr.AddColor(new Color(0, 0, 0, 1), 1.0);
+				this.gr = prefs.OverlayGradient;
 				
 				createTextures(this);					
 			}	
