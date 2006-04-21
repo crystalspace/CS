@@ -17,6 +17,8 @@ chronological order.
 	  AWS2.
 	- res fixed some doxygen comments.
 	- res fixed missing DLL exporting for some SndSys classes.
+        - dfryer added a patch from Simon Mihevc (G0thic) to enable mouse 
+          wheel events in the wxgl canvas
 19-Apr-2006
 	- Piotr Obrzut fixed moving instances in instmesh.
 	- res fixed some more gcc 4.1 warnings.

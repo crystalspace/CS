@@ -532,6 +532,17 @@ void csGLCanvas::OnMouseEvent( wxMouseEvent& event )
   {
     g2d->EventOutlet->Mouse(csmbRight, false, event.GetX(), event.GetY());
   }
+  else if(event.GetEventType() == wxEVT_MOUSEWHEEL)
+  {
+   if (event.GetWheelRotation() > 0)
+   {
+    g2d->EventOutlet->Mouse(csmbWheelUp, true, event.GetX(), event.GetY());
+   }
+   else
+   {
+     g2d->EventOutlet->Mouse(csmbWheelDown, true, event.GetX(), event.GetY());
+   }
+  }
 }
 
 static bool wxCodeToCSCode(int wxkey, utf32_char& raw, utf32_char& cooked)
