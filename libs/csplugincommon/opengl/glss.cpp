@@ -52,7 +52,7 @@ csGLScreenShot::csGLScreenShot (csGraphics2DGLCommon* G2D)
 
   poolNext = 0;
   csGLScreenShot::G2D = G2D;
-  Format = CS_IMGFMT_TRUECOLOR;
+  Format = CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
   Data = 0;
   dataSize = 0;
 }
