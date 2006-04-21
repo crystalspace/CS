@@ -227,7 +227,7 @@ csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
   fogplane_name = strings->Request ("fogplane");
   fogdensity_name = strings->Request ("fog density");
   fogcolor_name = strings->Request ("fog color");
-  fogcolor_name = strings->Request ("camera transform");
+  //fogcolor_name = strings->Request ("camera transform");
 
   lsvCache.SetStrings (strings);
 }

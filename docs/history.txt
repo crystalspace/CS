@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Apr-2006
+	- Jorrit fixed a typo in the fat renderloop.
+	- Jorrit added a lit of supported shader variables to the (otherwise empty)
+	  shader documentation.
 20-Apr-2006
 	- Jorrit added a patch from Frank which fixes the issue with an
 	  CG program failing but the technique using that CG program was
