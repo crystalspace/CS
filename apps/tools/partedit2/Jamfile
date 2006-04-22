@@ -1,0 +1,8 @@
+SubDir TOP apps tools partedit2 ;
+
+Description partedit : "particle system editor 2" ;
+
+Application partedit2
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith partedit2 : crystalspace  ;
