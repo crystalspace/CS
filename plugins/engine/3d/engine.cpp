@@ -1679,7 +1679,7 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/, csRenderView &rview)
   rview.SetFrustum (leftx, rightx, topy, boty);
 }
 
-void csEngine::Draw (iCamera *c, iClipper2D *view)
+void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
 {
   if (bugplug)
     bugplug->ResetCounter ("Sector Count");
@@ -1701,7 +1701,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   {
     iRenderLoop* rl = s->GetRenderLoop ();
     if (!rl) rl = defaultRenderLoop;
-    rl->Draw (&rview, s);
+    rl->Draw (&rview, s, mesh);
   }
 
   // draw all halos on the screen

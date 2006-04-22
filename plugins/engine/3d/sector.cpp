@@ -131,6 +131,7 @@ csSector::csSector (csEngine *engine) :
   currentVisibilityNumber = 0;
   renderloop = 0;
   use_lightculling = false;
+  single_mesh = 0;
 }
 
 csSector::~csSector ()
@@ -528,7 +529,11 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
       //use this slot
       entry.meshList->Empty ();
       GetVisMeshCb ()->Setup (entry.meshList, rview, (iSector*)this);
-      GetVisibilityCuller()->VisTest (rview, GetVisMeshCb ());
+
+      if (single_mesh)
+	GetVisMeshCb ()->ObjectVisible ((csMeshWrapper*)single_mesh, ~0);
+      else
+        GetVisibilityCuller()->VisTest (rview, GetVisMeshCb ());
 
       entry.cachedFrameNumber = cur_framenr;
       entry.cached_context_id = cur_context_id;
@@ -543,7 +548,10 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   holder.meshList = new csRenderMeshList (engine);
   usedMeshLists.Push (holder.meshList);
   GetVisMeshCb ()->Setup (holder.meshList, rview, (iSector*)this);
-  GetVisibilityCuller()->VisTest (rview, GetVisMeshCb ());
+  if (single_mesh)
+    GetVisMeshCb ()->ObjectVisible ((csMeshWrapper*)single_mesh, ~0);
+  else
+    GetVisibilityCuller()->VisTest (rview, GetVisMeshCb ());
   visibleMeshCache.Push (holder);
   return holder.meshList;
 }

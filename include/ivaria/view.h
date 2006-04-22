@@ -30,6 +30,7 @@ struct iCamera;
 struct iEngine;
 struct iGraphics3D;
 struct iClipper2D;
+struct iMeshWrapper;
 
 /**
  * The iView class encapsulates the top-level Crystal Space
@@ -81,8 +82,13 @@ struct iView : public virtual iBase
   virtual void UpdateClipper () = 0;
   /// Return the current clipper. This function may call UpdateClipper ().
   virtual iClipper2D* GetClipper () = 0;
-  /// Draw 3D world as seen from the camera.
-  virtual void Draw () = 0;
+  /**
+   * Draw 3D world as seen from the camera.
+   * If a mesh is given then only that single mesh is rendered.
+   * Note that in that case the mesh will only be rendered if it
+   * is in the same sector as the camera!
+   */
+  virtual void Draw (iMeshWrapper* mesh = 0) = 0;
   
   /**
    * Enable / Disable automatic resizing. When this

@@ -102,7 +102,7 @@ public:
   /// Return the clipper.
   virtual iClipper2D* GetClipper ();
   /// Draw 3D world as seen from the camera.
-  virtual void Draw ();
+  virtual void Draw (iMeshWrapper* mesh = 0);
 };
 
 #endif // __CS_CSVIEW_H__

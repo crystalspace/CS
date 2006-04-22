@@ -498,7 +498,7 @@ public:
   { return (iRenderView*)topLevelClipper; }
 
   virtual void PrecacheDraw (iRegion* region = 0);
-  virtual void Draw (iCamera* c, iClipper2D* clipper);
+  virtual void Draw (iCamera* c, iClipper2D* clipper, iMeshWrapper* mesh = 0);
 
   virtual void SetContext (iTextureHandle* ctxt);
   virtual iTextureHandle *GetContext () const;

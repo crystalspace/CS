@@ -57,7 +57,7 @@ public:
   csRenderLoop (csEngine* engine);
   virtual ~csRenderLoop();
 
-  virtual void Draw (iRenderView *rview, iSector *s);
+  virtual void Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh = 0);
 
   virtual size_t AddStep (iRenderStep* step);
   virtual bool DeleteStep (iRenderStep* step);

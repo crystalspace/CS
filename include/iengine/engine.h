@@ -1078,8 +1078,13 @@ struct iEngine : public virtual iBase
    * all textures must have been registered to that driver (using
    * Prepare()). Note that you need to call Prepare() again if
    * you switch to another 3D driver.
+   * <p>
+   * If a mesh is given then only that single mesh is rendered.
+   * Note that in that case the mesh will only be rendered if it
+   * is in the same sector as the camera!
    */
-  virtual void Draw (iCamera* c, iClipper2D* clipper) = 0;
+  virtual void Draw (iCamera* c, iClipper2D* clipper,
+      iMeshWrapper* mesh = 0) = 0;
 
   /**
    * Set the drawing context. This is a texture handle that is used

@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Apr-2006
+	- Jorrit added an optional mesh parameter to iView->Draw and
+	  iEngine->Draw. If this mesh is given then this is the only
+	  mesh that will be rendered. Otherwise rendering occurs
+	  as usual.
 21-Apr-2006
 	- Jorrit fixed a typo in the fat renderloop.
 	- Jorrit added a lit of supported shader variables to the (otherwise

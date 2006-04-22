@@ -119,6 +119,12 @@ public:
    */
   csSector (csEngine*);
 
+  /**
+   * Set single mesh. This is used to render only a single mesh out
+   * of the sector. Set to 0 to go back to default behaviour of drawing
+   * all visible meshes.
+   */
+  void SetSingleMesh (iMeshWrapper* mesh) { single_mesh = mesh; }
 
   //-- iSector 
   
@@ -470,6 +476,12 @@ private:
    * use.
    */
   int drawBusy;
+
+  /**
+   * If this is not 0 then we're drawing only a specific mesh and
+   * not all meshes.
+   */
+  iMeshWrapper* single_mesh;
 };
 
 /// List of 3D engine sectors.

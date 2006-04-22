@@ -56,7 +56,7 @@ void csRenderLoop::SelfDestruct ()
   engine->GetRenderLoopManager ()->Unregister ((iRenderLoop*)this);
 }
 
-void csRenderLoop::Draw (iRenderView *rview, iSector *s)
+void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
 {
   if (!shadermanager)
     shadermanager = CS_QUERY_REGISTRY (engine->objectRegistry, iShaderManager);
@@ -73,6 +73,8 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
 
     s->IncRecLevel ();
     s->PrepareDraw (rview);
+    csSector* cs = (csSector*)s;
+    cs->SetSingleMesh (mesh);
 
     size_t i;
     for (i = 0; i < steps.Length(); i++)
@@ -80,6 +82,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
       steps[i]->Perform (rview, s, varStack);
     }
     s->DecRecLevel ();
+    cs->SetSingleMesh (0);
 
     rview->GetGraphics3D()->SetClipper (oldClipper, oldClipType);
 

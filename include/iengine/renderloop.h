@@ -38,6 +38,7 @@ struct iClipper2D;
 struct iSector;
 struct iRenderStep;
 struct iRenderView;
+struct iMeshWrapper;
 
 /**
  * Name of the default render loop created by the engine.
@@ -52,7 +53,7 @@ struct iRenderView;
 struct iRenderLoop : public iRenderStepContainer
 {
   SCF_INTERFACE(iRenderLoop, 2,0,0);
-  virtual void Draw (iRenderView *rview, iSector *s) = 0;
+  virtual void Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh = 0) = 0;
 };
 
 
