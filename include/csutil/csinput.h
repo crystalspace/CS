@@ -94,7 +94,7 @@ public:
 #endif
 
 /**
- * Generic Keyboard Driver.<p>
+ * Generic Keyboard Driver.
  * Keyboard driver should generate events and put them into
  * an event queue. Also it tracks the current state of all keys.
  */
@@ -195,7 +195,7 @@ public:
 };
 
 /**
- * Generic Mouse Driver.<p>
+ * Generic Mouse Driver.
  * Mouse driver should generate events and put them into the event queue.  Also
  * it is responsible for generating double-click events. Mouse button numbers
  * are 0-based.
@@ -291,8 +291,10 @@ public:
 
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
- * Generic Joystick driver.<p>
+ * Generic Joystick driver.
  * The joystick driver is responsible for tracking current
  * joystick state and also for generating joystick events.
  * Joystick numbers and button numbers are 0-based.
@@ -361,5 +363,7 @@ public:
   virtual void GainFocus() { }
 
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_CSINPUT_H__

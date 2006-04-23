@@ -30,6 +30,8 @@
 
 class csEngine;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * A camera positioned in the 3D world.
  */
@@ -409,5 +411,7 @@ public:
   virtual iCamera* QueryCamera () { return this; }
 
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_CAMERA_H__

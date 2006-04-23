@@ -30,6 +30,8 @@
 #include "csutil/scf_implementation.h"
 #include "iutil/string.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /// This is a thin SCF wrapper around csString
 class CS_CRYSTALSPACE_EXPORT scfString : 
   public scfImplementation1<scfString, iString>
@@ -259,5 +261,7 @@ public:
   /// Convert string to uppercase.
   virtual void Upcase();
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_SCFSTR_H__

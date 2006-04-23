@@ -190,6 +190,8 @@ struct LSIAndDist
   float influence;
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * The holder class for all implementations of iMeshObject.
  */
@@ -738,6 +740,8 @@ public:
     return var_max_render_dist;
   }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * The holder class for all implementations of iMeshObjectFactory.

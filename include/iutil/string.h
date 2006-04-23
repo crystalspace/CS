@@ -94,7 +94,8 @@ struct iString : public virtual iBase
    *   completely.
    * \deprecated Use ShrinkBestFit() instead.
    */
-  CS_DEPRECATED_METHOD virtual void Reclaim () = 0;
+  CS_DEPRECATED_METHOD_MSG("Use ShrinkBestFit() instead")
+  virtual void Reclaim () = 0;
 
   /**
    * Clear the string (so that it contains only a null terminator).

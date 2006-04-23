@@ -573,7 +573,9 @@ struct iMeshWrapper : public virtual iBase
    * if the movable changes.
    * \deprecated Use GetWorldBoundingBox that returns a csBox3 instead.
    */
-  CS_DEPRECATED_METHOD virtual void GetWorldBoundingBox (csBox3& cbox) = 0;
+  CS_DEPRECATED_METHOD_MSG("Use GetWorldBoundingBox that returns a csBox3 "
+                           "instead")
+  virtual void GetWorldBoundingBox (csBox3& cbox) = 0;
 
   /**
    * Get the bounding box of this object after applying a transformation to it.
@@ -581,8 +583,10 @@ struct iMeshWrapper : public virtual iBase
    * box of the object in object space and then transform this bounding box.
    * \deprecated Use GetTransformedBoundingBox that returns a csBox3 instead.
    */
-  CS_DEPRECATED_METHOD virtual void GetTransformedBoundingBox (
-  	const csReversibleTransform& trans, csBox3& cbox) = 0;
+  CS_DEPRECATED_METHOD_MSG("Use GetTransformedBoundingBox that returns a "
+                           "csBox3 instead")
+  virtual void GetTransformedBoundingBox (const csReversibleTransform& trans, 
+    csBox3& cbox) = 0;
 
   /**
    * Get a very inaccurate bounding box of the object in screen space.
@@ -591,8 +595,10 @@ struct iMeshWrapper : public virtual iBase
    * \deprecated Use GetScreenBoundingBox() that returns a csScreenBoxResult
    * instead.
    */
-  CS_DEPRECATED_METHOD virtual float GetScreenBoundingBox (iCamera* camera,
-  	csBox2& sbox, csBox3& cbox) = 0;
+  CS_DEPRECATED_METHOD_MSG("Use GetScreenBoundingBox() that returns a "
+                           "csScreenBoxResult instead")
+  virtual float GetScreenBoundingBox (iCamera* camera, csBox2& sbox, 
+    csBox3& cbox) = 0;
 
   /**
    * Get the bounding box of this object in world space.
@@ -620,8 +626,8 @@ struct iMeshWrapper : public virtual iBase
    * Get the radius of this mesh and all its children.
    * \deprecated Use GetRadius() that returns csEllipsoid.
    */
-  CS_DEPRECATED_METHOD virtual void GetRadius (float& rad,
-  	csVector3& cent) const = 0;
+  CS_DEPRECATED_METHOD_MSG("Use GetRadius() that returns csEllipsoid")
+  virtual void GetRadius (float& rad, csVector3& cent) const = 0;
   /// Get the radius of this mesh and all its children.
   virtual csSphere GetRadius () const = 0;
 

@@ -661,7 +661,7 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
  * as well as a call stack is printed to <tt>stderr</tt> and a debug break is
  * performed
  * \remarks Breaking execution can be avoided at runtime by setting the 
- *   environment variable "<tt>CS_ASSERT_IGNORE</tt>" to a value other than 0.
+ *   environment variable <tt>"CS_ASSERT_IGNORE"</tt> to a value other than 0.
  */
 /**\def CS_ASSERT_MSG(msg, expr)
  * Same as #CS_ASSERT(expr), but additionally prints \a msg to <tt>stderr</tt>.
@@ -680,12 +680,26 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
  */
 #if !defined(CS_DEPRECATED_METHOD) || defined(DOXYGEN_RUN)
 #  if defined(CS_COMPILER_MSVC)
-#    define CS_DEPRECATED_METHOD		/*__declspec(deprecated)*/
-      /* Disabled: Unfortunately, MSVC is overzealous with warnings; 
-	 it even emits one when a deprecated method is overridden, e.g. when 
-	 implementing an interface method. */
+#    define CS_DEPRECATED_METHOD	__declspec(deprecated)
+      /* Unfortunately, MSVC is overzealous with warnings; it even emits one 
+	 when a deprecated method is overridden, e.g. when implementing an 
+	 interface method. 
+	 To work around this, use msvc_deprecated_warn_off.h/
+	 msvc_deprecated_warn_on.h. */
 #  else
 #    define CS_DEPRECATED_METHOD
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_METHOD_MSG
+ * A variant of #CS_DEPRECATED_METHOD that also emits the message \a msg
+ * on compilers that support it.
+ */
+#if !defined(CS_DEPRECATED_METHOD_MSG) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC)
+#    define CS_DEPRECATED_METHOD_MSG(msg) __declspec(deprecated(msg))
+#  else
+#    define CS_DEPRECATED_METHOD_MSG(msg) CS_DEPRECATED_METHOD
 #  endif
 #endif
 
@@ -704,6 +718,14 @@ inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
 #  else
 #    define CS_DEPRECATED_TYPE
 #  endif
+#endif
+
+/**\def CS_DEPRECATED_TYPE_MSG
+ * A variant of CS_DEPRECATED_TYPE that also emits the message \a msg
+ * on compilers that support it.
+ */
+#if !defined(CS_DEPRECATED_TYPE_MSG) || defined(DOXYGEN_RUN)
+#  define CS_DEPRECATED_TYPE_MSG(msg) CS_DEPRECATED_TYPE
 #endif
 
 /**\def CS_CONST_METHOD

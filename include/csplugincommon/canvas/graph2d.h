@@ -50,6 +50,8 @@ struct iPluginManager;
 
 class csFontCache;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * This is the base class for 2D canvases. Plugins should derive their 
  * own class from this one and implement required (marked with an 
@@ -465,6 +467,8 @@ protected:
   virtual void Dump (iGraphics3D* /*g3d*/)  { }
   /** @} */
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /** @} */
 

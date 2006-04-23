@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2005 by Jorrit Tyberghein
-	                  Frank Richter
+    Copyright (C) 2006 by Jorrit Tyberghein
+	      (C) 2006 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,17 +17,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
+/**\file
+ * Disable MSVC deprecated warnings.
+ * Unfortunately, MSVC is overzealous with deprecated warnings; it even emits 
+ * one when a deprecated method is overridden, e.g. when implementing an 
+ * interface method. To work around this, this file is intended to be
+ * included from headers before code that causes such "false deprecation" 
+ * warnings (C4996), as this header will disable it. After such code the
+ * file msvc_deprecated_warn_on.h should be included to re-enable the
+ * warning.
+ */
 
-#define INITGUID
-#include "csplugincommon/directx/guids.h"
-
-#include <ddraw.h>
-#include <d3d.h>
-#include <dsound.h>
-#ifndef DIRECTINPUT_VERSION
-#define DIRECTINPUT_VERSION 0x0500
+#if defined(CS_COMPILER_MSVC)
+#pragma warning(push)
+#pragma warning(disable:4996)
 #endif
-#include <dinput.h>
-
-DEFINE_GUID(GUID_NULL,0,0,0,0,0,0,0,0,0,0,0);

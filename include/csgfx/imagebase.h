@@ -35,6 +35,7 @@
 
 #include "igraphic/image.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * Base class for iImage implementations. Cannot be instantiated itself.
@@ -91,6 +92,8 @@ public:
   virtual csRef<iImage> GetSubImage (uint num) 
   { return (num == 0) ? this : 0; }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /** @} */
 
