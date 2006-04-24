@@ -32,6 +32,7 @@
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
+#include "iengine/engine.h"
 #include "igeom/clip2d.h"
 #include "imesh/objmodel.h"
 #include "imesh/object.h"
@@ -453,7 +454,10 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   }
 
   sv = shadervars.Top ().GetVariableAdd (light_ambient);
-  sv->SetValue (sector->GetDynamicAmbientLight());
+  iEngine* engine = rview->GetEngine ();
+  csColor ambient;
+  engine->GetAmbientLight (ambient);
+  sv->SetValue (ambient + sector->GetDynamicAmbientLight());
 
   if (sector->HasFog())
   {
