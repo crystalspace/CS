@@ -141,6 +141,8 @@
 #include "csutil/win32/callstack.h"
 #include "csutil/win32/DbgHelpAPI.h"
 #include "csutil/win32/minidump.h"
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 #include "csutil/win32/registrycfg.h"
 #include "csutil/win32/win32.h"
 #include "csutil/win32/wintools.h"
