@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Apr-2006
+	- Eric Sunshine added msvc_deprecated_warn_{on,off}.h to
+	  CS_MASTER_HEADER_REJECTS.
 23-Apr-2006
 	- res worked around the overzealous emission of deprecation warnings
 	  by MSVC.

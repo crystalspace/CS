@@ -29,6 +29,8 @@ CS_MASTER_HEADER_REJECTS =
   [ ConcatDirs csutil   scf_impl.h   ]
   [ ConcatDirs csutil   scf_implgen.h ]
   [ ConcatDirs csutil   win32 mmap.h ]
+  [ ConcatDirs csutil   win32 msvc_deprecated_warn_off.h ]
+  [ ConcatDirs csutil   win32 msvc_deprecated_warn_on.h ]
   [ ConcatDirs csutil   win32 psdk-compat.h ]
   [ ConcatDirs csutil   zip.h        ]
   [ ConcatDirs iaws     aws2.h       ]
