@@ -101,6 +101,11 @@ void csRenderView::SetEngine (csEngine *engine)
   csRenderView::engine = engine;
 }
 
+iEngine* csRenderView::GetEngine ()
+{
+  return (iEngine*)(csEngine*)engine;
+}
+
 void csRenderView::UpdateFrustum ()
 {
   size_t i;

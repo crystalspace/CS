@@ -235,7 +235,7 @@ public:
   virtual csRenderContext* GetRenderContext () { return ctxt; }
 
   /// Get the engine.
-  virtual iEngine* GetEngine () { return (iEngine*)engine; }
+  virtual iEngine* GetEngine ();
   /// Get the 2D graphics subsystem.
   virtual iGraphics2D* GetGraphics2D () { return g2d; }
   /// Get the 3D graphics subsystem.
