@@ -34,7 +34,7 @@ public:
 
 private:
   csRef<iEngine> engine;
-  csRef<iAws> aws;
+  csRef<iAws2> aws;
 
   //csRef<iAwsCanvas> awsCanvas;
   iSector* room;

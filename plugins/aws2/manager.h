@@ -36,7 +36,7 @@
  * The management object for AWS: creates windows, destroys windows, keeps
  * track of all the windows, etc.
  */
-class awsManager2 : public iAws
+class awsManager2 : public iAws2
 {
   // Event ID's used
   csEventID KeyboardDown;	
@@ -105,7 +105,7 @@ public:
   
   //////////////////////// Definition Files ////////////////////////
   
-  virtual iAwsScriptObject *CreateScriptObject (const char *name);
+  virtual iAws2ScriptObject *CreateScriptObject (const char *name);
 
   // Adds a widget to the input and drawing chain.
  void AddWidget (aws::widget *w);

@@ -65,7 +65,7 @@
 SCF_IMPLEMENT_FACTORY(awsManager2)
 
 SCF_IMPLEMENT_IBASE(awsManager2)
-  SCF_IMPLEMENTS_INTERFACE(iAws)
+  SCF_IMPLEMENTS_INTERFACE(iAws2)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END
 
@@ -376,7 +376,7 @@ bool awsManager2::Load (const scfString &_filename)
 ***************** Scripting *****************************************
 ********************************************************************/
 
-iAwsScriptObject *awsManager2::CreateScriptObject (const char *name)
+iAws2ScriptObject *awsManager2::CreateScriptObject (const char *name)
 {
   return new scriptObject (name);	
 }

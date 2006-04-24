@@ -33,6 +33,7 @@
 #include "csutil.h"
 #include "csver.h"
 #include "iaws.h"
+#include "iaws2.h"
 #include "iengine.h"
 #include "igeom.h"
 #include "igraphic.h"

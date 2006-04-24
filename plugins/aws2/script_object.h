@@ -9,7 +9,7 @@
  * It's used to allow external clients to interact with the scripting system 
  * as event sinks.  
  */
-class scriptObject : public iAwsScriptObject
+class scriptObject : public iAws2ScriptObject
 {
   /// The script object.
   JSObject  *so;
@@ -21,7 +21,7 @@ class scriptObject : public iAwsScriptObject
   JSFunction *js_fun;
 
   /// The native callback function for this object.
-  AwsScriptObjectFunc *func;       
+  Aws2ScriptObjectFunc *func;       
 
   /** 
    * The activation record keeps track of all the important stuff that happens 
@@ -45,7 +45,7 @@ public:
   virtual ~scriptObject ();
 
   /// Sets the notification function.
-  virtual void SetNotification (AwsScriptObjectFunc *_func) { func=_func; }
+  virtual void SetNotification (Aws2ScriptObjectFunc *_func) { func=_func; }
 
   /// Returns the number of arguments sent.
   virtual uint32 NumArgs () { return ar.argc; }

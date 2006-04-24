@@ -165,7 +165,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   // Load AWS
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading AWS 2.0 ...");
   aws = CS_LOAD_PLUGIN(plugin_mgr,
-  	"crystalspace.window.alternatemanager2", iAws);
+  	"crystalspace.window.alternatemanager2", iAws2);
 
   if (!aws)
   {

@@ -19,12 +19,8 @@
 #ifndef __AWS_INTERFACE_20_H__
 #define __AWS_INTERFACE_20_H__
 
-#ifdef __AWS_INTERFACE_10_H__
-# error "aws.h included before aws2.h.  You cannot mix and match the two versions!"
-#endif
-
 /**\file 
- * Advanced Windowing System
+ * Advanced Windowing System 2
  */
 
 #include "csutil/scf.h"
@@ -39,33 +35,23 @@
 #include "ivideo/graph3d.h"
 
 struct iObjectRegistry;
+struct iAws2ScriptObject;
 
-
-struct iAwsScriptObject;
-
-typedef void AwsScriptObjectFunc(iAwsScriptObject *);
+typedef void Aws2ScriptObjectFunc(iAws2ScriptObject *);
 	
-SCF_VERSION(iAwsScriptObject, 1, 0, 1);
-struct iAwsScriptObject
+SCF_VERSION(iAws2ScriptObject, 2, 0, 0);
+struct iAws2ScriptObject
 {			
 	/** Sets the notification function. */
-	virtual void SetNotification(AwsScriptObjectFunc *_func)=0;
+	virtual void SetNotification(Aws2ScriptObjectFunc *_func)=0;
 	
 	/** Returns the number of arguments in the notification. */
 	virtual uint32 NumArgs()=0;		
 };
-	
-
-SCF_VERSION(iAwsWindow, 1, 0, 1);
-struct iAwsWindow : public iBase
-{
-  int empty;
-
-};
 
 
-SCF_VERSION(iAws, 1, 0, 1);
-struct iAws  : public iBase
+SCF_VERSION(iAws2, 2, 0, 0);
+struct iAws2  : public iBase
 {
   /// Must be called before anything else.
   virtual bool Initialize (iObjectRegistry *_object_reg)=0;
@@ -83,7 +69,7 @@ struct iAws  : public iBase
   virtual void Redraw()=0;
   
   /// Creates a new script object with the given name.
-  virtual iAwsScriptObject *CreateScriptObject(const char *name)=0;
+  virtual iAws2ScriptObject *CreateScriptObject(const char *name)=0;
   
   /// Cached event names.  These should be set up in the ::Initialize method.
   csEventID PreProcess;
