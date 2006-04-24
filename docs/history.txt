@@ -18,6 +18,7 @@ chronological order.
 	  generic renderloop so that it also returns the static ambient
 	  from the engine (in addition to dynamic ambient from the
 	  sector).
+	- res fixed cspace.i to also ignore the _MSG deprecation macros.
 23-Apr-2006
 	- res worked around the overzealous emission of deprecation warnings
 	  by MSVC.
