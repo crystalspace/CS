@@ -8,6 +8,11 @@ chronological order.
 
 24-Apr-2006
 	- Eric Sunshine added msvc_deprecated_warn_{on,off}.h to
+	- Jorrit modified sprcal3d.cfg and made the default animation
+	  LOD distances a bit larger to reduce the appearance of 'choppy'
+	  animation (but at the cost of some performance).
+	- Jorrit added a new csMeshOnTexture class. This class makes it
+	  easier to render a mesh on a texture.
 	  CS_MASTER_HEADER_REJECTS.
 23-Apr-2006
 	- res worked around the overzealous emission of deprecation warnings
