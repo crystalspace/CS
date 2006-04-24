@@ -23,6 +23,9 @@ chronological order.
 	  This fixed (among other possible problems) bogus ambient values
 	  from the engine in the generic renderstep plugin.
 	- res fixed cspace.i to also ignore the _MSG deprecation macros.
+	- Christopher renamed iAws to iAws2 for AWS2 interfaces.  This fixes 
+	  a problem where the <crystalspace.h> include would die when including
+	  both sets of interfaces.
 23-Apr-2006
 	- res worked around the overzealous emission of deprecation warnings
 	  by MSVC.
