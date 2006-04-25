@@ -289,6 +289,16 @@ static JSBool AddChild (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 
   // Remove from global widget set.
   aws::widgets.Delete (child_wo);
+  
+  // Fire event.
+  {
+  	jsval func_val, rv;
+  	
+  	if (JS_GetProperty (cx, obj, "onAddChild", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
+      {        
+        JS_CallFunctionValue (cx, obj, func_val, argc, argv, &rv);   
+      }	  	
+  }
 
   return JS_TRUE;
 }
@@ -311,6 +321,16 @@ static JSBool RemoveChild (JSContext *cx, JSObject *obj, uintN argc,
   aws::widget *child_wo = (aws::widget *)JS_GetPrivate (cx, child_object);
 
   wo->RemoveChild (child_wo);
+  
+  // Fire event.
+  {
+  	jsval func_val, rv;
+  	
+  	if (JS_GetProperty (cx, obj, "onRemoveChild", &func_val)==JS_TRUE && func_val!=JSVAL_VOID)
+      {        
+        JS_CallFunctionValue (cx, obj, func_val, argc, argv, &rv);   
+      }	  	
+  }
 
   return JS_TRUE;
 }

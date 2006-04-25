@@ -10,6 +10,8 @@ chronological order.
 	- Jorrit committed a patch from Adam to implement the signpost
 	  changes in simple1 tutorial. Note that this is not perfect yet
 	  as it breaks bugplug fps printing.
+	- Christopher made partedit2 use csApplicationFramework, and removed
+	  the iaws2.h file.
 24-Apr-2006
 	- Eric Sunshine added msvc_deprecated_warn_{on,off}.h to
 	  CS_MASTER_HEADER_REJECTS.

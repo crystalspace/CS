@@ -595,6 +595,25 @@ Style3D =
 		}		
 	},
 	
+	Label : function(pen)
+	{
+		var w  = this.width, h = this.height;
+						
+		var prefs = Skin.current;
+				
+		pen.Clear();		
+		
+		// Setup for the information.
+		var ty=0;
+		
+		for (var line in this.info)
+		{						
+			pen.Write(prefs.Font, 15, ty+5, this.info[line]);
+			
+			ty+=prefs.Font.GetTextHeight();
+		}		
+	},
+	
 	CheckBox : function(pen)
 	{					
 		pen.Clear();

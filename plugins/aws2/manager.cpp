@@ -254,7 +254,7 @@ bool awsManager2::HandleEvent (iEvent &Event)
 
         if (top!=new_top)
         {
-          top->Signal ("onDeactivated");
+          if (top) top->Signal ("onDeactivated");
 
           new_top->Raise (top);
           top=new_top;
