@@ -12,6 +12,9 @@ chronological order.
 	  as it breaks bugplug fps printing.
 	- Christopher made partedit2 use csApplicationFramework, and removed
 	  the iaws2.h file.
+	- Christopher add two layouts: Horizontal and Vertical to the AWS2
+        kit.  He also fixed a bug in the widget drawing code where widgets
+ 	  with no pen would not draw children.
 24-Apr-2006
 	- Eric Sunshine added msvc_deprecated_warn_{on,off}.h to
 	  CS_MASTER_HEADER_REJECTS.
