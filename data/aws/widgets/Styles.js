@@ -602,16 +602,26 @@ Style3D =
 		var prefs = Skin.current;
 				
 		pen.Clear();		
+// 		pen.SetColor(prefs.TextForeColor);
+// 		pen.DrawRect(0,0,w,h);
 		
 		// Setup for the information.
-		var ty=0;
+		var ty = (this.height - this.text_height) / 2.0;
 		
 		for (var line in this.info)
 		{						
-			pen.Write(prefs.Font, 15, ty+5, this.info[line]);
+			pen.Write(prefs.Font, 0, ty, this.info[line]);
 			
 			ty+=prefs.Font.GetTextHeight();
 		}		
+		
+		
+	},
+	
+	EmptyLayout : function(pen)
+	{
+		// empty
+		return;	
 	},
 	
 	CheckBox : function(pen)
