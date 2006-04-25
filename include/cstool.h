@@ -45,6 +45,7 @@
 #include "cstool/objmodel.h"
 #include "cstool/pen.h"
 #include "cstool/primitives.h"
+#include "cstool/procmesh.h"
 #include "cstool/proctex.h"
 #include "cstool/proctxtanim.h"
 #include "cstool/rbuflock.h"
