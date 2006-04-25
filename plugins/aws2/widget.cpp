@@ -630,21 +630,23 @@ namespace aws
   }
 
   void widget::Draw (iPen *output_pen)
-  {
-    if (wpen!=0)
-    {
-      csString msg;
-      jsval argv[1], rval;
-
-      // Prepare for the drawing.
-      fr.Prepare (output_pen);		
-
-      //output_pen->SetColor(1,1,1,0.25);
-      //output_pen->DrawRect(0,0,Bounds().Width(),Bounds().Height());
-      //msg.Format("(%d,%d,%d,%d)", Bounds().xmin, Bounds().ymin, Bounds().Width(), Bounds().Height());
-      //output_pen->Write(0,-10, msg.GetData());
-
-
+  {    
+	// Don't bother if we have no pen and no children.
+	if (wpen==0 && children.Length()==0) return;
+	  
+	csString msg;
+	jsval argv[1], rval;
+	
+	// Prepare for the drawing.
+	fr.Prepare (output_pen);		
+	
+	//output_pen->SetColor(1,1,1,0.25);
+	//output_pen->DrawRect(0,0,Bounds().Width(),Bounds().Height());
+	//msg.Format("(%d,%d,%d,%d)", Bounds().xmin, Bounds().ymin, Bounds().Width(), Bounds().Height());
+	//output_pen->Write(0,-10, msg.GetData());
+      
+	if (wpen!=0)
+    {	
       if (IsDirty ())
       {			
         // Prepare the pen object
@@ -660,16 +662,16 @@ namespace aws
 
 
       wpen->Draw (output_pen);	
-
-      // Draw all children.
-      for(size_t i=0; i<children.Length (); ++i)
-      {
-        children[i]->Draw (output_pen);						
-      }		
-
-      // Finish the drawing
-      fr.Finish (output_pen);
     }
+
+	// Draw all children.
+	for(size_t i=0; i<children.Length (); ++i)
+	{
+	children[i]->Draw (output_pen);						
+	}		
+	
+	// Finish the drawing
+	fr.Finish (output_pen);	
   }
 
 
