@@ -58,6 +58,10 @@ class Simple : public csApplicationFramework, public csBaseEventHandler
   /// Current orientation of the camera.
   float rotX, rotY;
 
+  /// Event handlers to draw and print the 3D canvas on each frame
+  csRef<FrameBegin3DDraw> drawer;
+  csRef<FramePrinter> printer;
+
  public:
   bool SetupModules ();
 
@@ -70,20 +74,16 @@ class Simple : public csApplicationFramework, public csBaseEventHandler
   
   /**
    * Setup everything that needs to be rendered on screen. This routine
-   * is called from the event handler in response to a csevProcess
-   * broadcast message.
+   * is called from the event handler in response to a csevFrame
+   * message, and is called in the "logic" phase (meaning that all
+   * event handlers for 3D, 2D, Console, Debug, and Frame phases
+   * will be called after this one).
    */
-  void ProcessFrame ();
+  void Frame ();
   
   /// Here we will create our little, simple world.
   void CreateRoom ();
     
-  /**
-   * Finally render the screen. This routine is called from the event
-   * handler in response to a csevFinalProcess broadcast message.
-   */
-  void FinishFrame ();
-
   /// Construct our game. This will just set the application ID for now.
   Simple ();
 
@@ -111,12 +111,11 @@ class Simple : public csApplicationFramework, public csBaseEventHandler
    */
   bool Application ();
   
-  // Declare the name of this event handler.
-  CS_EVENTHANDLER_NAMES("application.simple1")
-      
-  /* Declare that we're not terribly interested in having events
-     delivered to us before or after other modules, plugins, etc. */
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  /* Declare the name by which this class is identified to the event scheduler.
+   * Declare that we want to receive the frame event in the "LOGIC" phase,
+   * and that we're not terribly interested in having other events
+   * delivered to us before or after other modules, plugins, etc. */
+  CS_EVENTHANDLER_PHASE_LOGIC("application.simple1")
 };
 
 #endif // __SIMPLE1_H__

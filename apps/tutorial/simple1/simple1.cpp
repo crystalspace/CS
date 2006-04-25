@@ -31,7 +31,7 @@ Simple::~Simple ()
 {
 }
 
-void Simple::ProcessFrame ()
+void Simple::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -85,20 +85,6 @@ void Simple::ProcessFrame ()
   csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
   csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
   c->SetTransform (ot);
-
-  // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
-    return;
-
-  // Tell the camera to render into the frame buffer.
-  view->Draw ();
-}
-
-void Simple::FinishFrame ()
-{
-  // Just tell the 3D renderer that everything has been rendered.
-  g3d->FinishDraw ();
-  g3d->Print (0);
 }
 
 bool Simple::OnKeyboard(iEvent& ev)
@@ -150,14 +136,25 @@ bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
   // Now we need to register the event handler for our application.
   // Crystal Space is fully event-driven. Everything (except for this
   // initialization) happens in an event.
-  if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
+  // Rather than simply handling all events, we subscribe to the
+  // particular events we're interested in.
+  csEventID events[] = {
+    csevFrame (GetObjectRegistry()),
+    csevKeyboardEvent (GetObjectRegistry()),
+    CS_EVENTLIST_END
+  };
+  if (!RegisterQueue(GetObjectRegistry(), events))
     return ReportError("Failed to set up event handler!");
 
+  // Report success
   return true;
 }
 
 void Simple::OnExit()
 {
+  // Shut down the event handlers we spawned earlier.
+  drawer.Invalidate();
+  printer.Invalidate();
 }
 
 bool Simple::Application()
@@ -219,6 +216,12 @@ bool Simple::SetupModules ()
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+
+  // We use some other "helper" event handlers to handle 
+  // pushing our work into the 3D engine and rendering it
+  // to the screen.
+  drawer.AttachNew(new FrameBegin3DDraw (GetObjectRegistry (), view));
+  printer.AttachNew(new FramePrinter (GetObjectRegistry ()));
 
   return true;
 }

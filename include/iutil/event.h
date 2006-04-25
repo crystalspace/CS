@@ -20,6 +20,8 @@
 #ifndef __CS_IUTIL_EVENT_H__
 #define __CS_IUTIL_EVENT_H__
 
+#include "cssysdef.h"
+
 #include "csutil/scf.h"
 #include "csutil/csunicode.h"
 #include "csutil/strset.h"

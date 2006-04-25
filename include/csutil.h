@@ -36,6 +36,7 @@
 #include "csutil/cfgmgr.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/cmdline.h"
+#include "csutil/common_handlers.h"
 #include "csutil/comparator.h"
 #include "csutil/compileassert.h"
 #include "csutil/cowwrapper.h"
