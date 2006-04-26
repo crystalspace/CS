@@ -3,14 +3,26 @@ function ParseXMLInterface(node, parent_widget)
 {	
 	var widget;		
 			
-	//Sys.Print("xml: ", node.@type);
+	Sys.Print("xml: ", node.@type);
 			
 	widget = eval(node.@type + "(node)");
+	
+	// Create the widget name, if it needs one.
+	if (!(node.@id==undefined))
+	{
+		eval(node.@id + "=widget;");	
+	}
+	
+	// Perform whatever setup is necessary.
+	if (!(node.setup==undefined))
+	{
+		eval(node.setup.toString());	
+	}
 	
 	// Parse event handlers
 	for each (var ev in node.event)
 	{						
-		if (ev.@name==null || ev.@action==null)
+		if (ev.@name==undefined || ev.@action==undefined)
 		{
 			Sys.Print("error: in parsing XML interface spec at section:");
 			Sys.Print(ev);
@@ -41,7 +53,7 @@ function ParseXMLInterface(node, parent_widget)
 	{						
 		ParseXMLInterface(cn, widget);								
 	}
-	
+			
 	// Add it to the parent, if there is one.
 	if (parent_widget!=null) parent_widget.AddChild(widget);
 	

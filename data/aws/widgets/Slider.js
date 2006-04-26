@@ -1,5 +1,5 @@
 /** Slider factory. */
-function Slider(orientation_vertical, tick_step, tick_lock)
+function Slider(settings)
 {
 	var _widget = new Widget;
 	var prefs = Skin.current;
@@ -8,15 +8,15 @@ function Slider(orientation_vertical, tick_step, tick_lock)
 	_widget.SetPen(new Pen);
 		
 	// Set the orientation of the Slider
-	_widget.orientation_vertical = orientation_vertical;
+	_widget.orientation_vertical = settings.vertical;
 	
 	// Setup the slider
-	_widget._value=0;
+	_widget._value=new Number(settings.min);
 	_widget.bar_size=50;
-	_widget.max=100;
-	_widget.min=0;	
-	_widget.tick_step = tick_step;
-	_widget.tick_lock = tick_lock;
+	_widget.max=new Number(settings.max); 
+	_widget.min=new Number(settings.min);	
+	_widget.tick_step = new Number(settings.step);
+	_widget.tick_lock = new Boolean(settings.lock);
 	_widget.slide_button_down=false;
 	_widget.init_draw=false;
 		
@@ -25,7 +25,7 @@ function Slider(orientation_vertical, tick_step, tick_lock)
 	_widget.__defineGetter__("value", function() { return this._value; });	
 		
 	//  Set initial size
-	if (orientation_vertical)
+	if (settings.vertical)
 	{	// vertical		
 		_widget.Resize(10, 20);		
 	}

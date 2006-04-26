@@ -1,5 +1,5 @@
 /** Window factory. */
-function Window(title)
+function Window(settings)
 {
 	var _widget = new Widget;
 	var prefs = Skin.current;
@@ -11,7 +11,7 @@ function Window(title)
 	_widget.SetPen(new Pen);
 		
 	// Setup a titlebar
-	_widget.TitleBar = TitleBar(title);
+	_widget.TitleBar = TitleBar(settings);
 	_widget.TitleBar.Dock(_widget, Widget.DOCK_SOUTH);
 	
 	// Setup the statusbar

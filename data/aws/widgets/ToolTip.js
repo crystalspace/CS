@@ -1,5 +1,5 @@
 /** ToolTip factory. */
-function ToolTip(title, text)
+function ToolTip(settings)
 {
 	var _widget = new Widget;
 	var prefs = Skin.current;
@@ -88,8 +88,8 @@ function ToolTip(title, text)
 	
 	
 	// Setup needed info
-	_widget.title=title;
-	_widget.text=text;
+	_widget.title=settings.title;
+	_widget.text=settings.text;
 		
 	return _widget;
 }

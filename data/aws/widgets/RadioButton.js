@@ -1,5 +1,5 @@
 /** RadioButton factory. */
-function RadioButton(text, align)
+function RadioButton(settings)
 {
 	var _widget = new Widget;
 	var prefs = Skin.current;
@@ -20,8 +20,8 @@ function RadioButton(text, align)
 	_widget.__defineSetter__("text", function(v) { this._text = v; this.Invalidate();} );	
 	_widget.__defineGetter__("text", function() { return this._text; });	
 	
-	_widget.text = text;
-	_widget.align = align;
+	_widget.text = settings.text;
+	_widget.align = settings.align;
 	
 	// Set the size	
 	var dim = prefs.Font.GetDimensions(text);

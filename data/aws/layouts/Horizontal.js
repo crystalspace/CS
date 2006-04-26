@@ -5,7 +5,7 @@ function Horizontal(settings)
 	l._current_width = 0;
 	l._current_height = 0;
 	
-	l.padding = settings.padding;
+	l.padding = new Number(settings.padding);
 	l.kids = new Array();
 	
 	l.onDraw = Skin.current.Style.EmptyLayout;

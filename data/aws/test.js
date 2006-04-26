@@ -100,7 +100,7 @@ w.Invalidate();
 w2.Invalidate();
 
 // Test titlebar
-tb = TitleBar("Test");
+tb = TitleBar({title:"Test"});
 tb.Dock(w, Widget.DOCK_SOUTH);
 tb.ResizeTo(200,tb.height);
 tb.MoveTo(400,300);
@@ -130,25 +130,25 @@ test_clock.MoveTo(580,20);
 test_clock.Show();
 
 // Test the Window
-win = Window("Test Window");
+win = Window({title:"Test Window"});
 win.ResizeTo(300,300);
 win.StatusBar.text = "Test complete.";
 win.Show();
 
 // Test a tool tip
-tt = ToolTip("ToolTip", "A tooltip is designed to show\nshort, useful information.");
+tt = ToolTip({title:"ToolTip", text:"A tooltip is designed to show\nshort, useful information."});
 tt.SetFocusPoint(test_clock.xmin + (test_clock.width>>1), test_clock.ymax);
 tt.Show();
 
 // Test a checkbox
-chk = CheckBox("Enable some setting", Pen.ALIGN_LEFT);
+chk = CheckBox({text:"Enable some setting", align:Pen.ALIGN_LEFT});
 win.AddChild(chk);
 chk.MoveTo(5,5);
 
 // Test the radio buttons
-rb1 = RadioButton("This", Pen.ALIGN_LEFT);
-rb2 = RadioButton("That", Pen.ALIGN_LEFT);
-rb3 = RadioButton("The other thing.", Pen.ALIGN_LEFT);
+rb1 = RadioButton({text:"This", align:Pen.ALIGN_LEFT});
+rb2 = RadioButton({text:"That", align:Pen.ALIGN_LEFT});
+rb3 = RadioButton({text:"The other thing.", align:Pen.ALIGN_LEFT});
 win.AddChild(rb1);
 win.AddChild(rb2);
 win.AddChild(rb3);
@@ -170,13 +170,13 @@ nb.onDrawContent = function(pen)
 }
 
 // GaugeLevel
-gl = Gauge("Level", Skin.current.Style.GaugeLevel, 0, 100, 20);
+gl = Gauge({title:"Level", type:Skin.current.Style.GaugeLevel, min:0, max:100, step:20});
 win.AddChild(gl);
 
 gl.MoveTo(5,140);
 
 // GaugeBar
-gb = Gauge("Bar", Skin.current.Style.GaugeHorzBar, 0, 100, 20);
+gb = Gauge({title:"Bar", type:Skin.current.Style.GaugeHorzBar, min:0, max:100, step:20});
 win.AddChild(gb);
 gb.ResizeTo(100,20);
 gb.MoveTo(5,200);
@@ -185,7 +185,7 @@ gl.value = 15;
 gb.value = 75;
 
 // Slider
-sl = Slider(true, 25, false);
+sl = Slider({vertical:true, step:25, lock:false, min:0, max:100});
 win.AddChild(sl);
 sl.ResizeTo(30,50);
 sl.MoveTo(5,230);

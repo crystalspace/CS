@@ -1,5 +1,5 @@
 /** TitleBar factory. */
-function TitleBar(inittext)
+function TitleBar(settings)
 {
 	var _widget = new Widget;
 	var prefs = Skin.current;
@@ -8,7 +8,7 @@ function TitleBar(inittext)
 	_widget.SetPen(new Pen);
 	
 	// Initialize the text property.
-	_widget.text = inittext;
+	_widget.text = settings.title;
 	_widget.is_active=false;
 		
 	// Initialize the alignment

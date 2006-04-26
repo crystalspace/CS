@@ -1,5 +1,5 @@
 /** Gauge factory. */
-function Gauge(title, gauge_type, min, max, step)
+function Gauge(settings)
 {
 	var _widget = new Widget;
 	var prefs = Skin.current;
@@ -8,11 +8,11 @@ function Gauge(title, gauge_type, min, max, step)
 	_widget.SetPen(new Pen);
 			
 	// Setup the gauge
-	_widget._value=min;	
-	_widget.min = min;
-	_widget.max = max;
-	_widget.step = step;
-	_widget.title = title;
+	_widget._value=new Number(settings.min);	
+	_widget.min =  new Number(settings.min);
+	_widget.max =  new Number(settings.max);
+	_widget.step = new Number(settings.step);
+	_widget.title = settings.title;
 	_widget.draw_init=false;
 		
 	// Invalidate and fire onChange when the value property is set.
@@ -32,7 +32,7 @@ function Gauge(title, gauge_type, min, max, step)
 	_widget.Resize(100, 50);	
 			
 	// Set the drawing function to be whatever the current style dictates.
-	_widget.onDraw = gauge_type;
+	_widget.onDraw = settings.type;
 				
 	return _widget;
 }
