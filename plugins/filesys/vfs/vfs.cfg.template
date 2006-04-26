@@ -50,6 +50,9 @@ VFS.Mount.lib/startme  = $(CS_DATADIR)$/startme.zip
 ; Mount for AWS
 VFS.Mount.aws = $(CS_DATADIR)$/awsdef.zip, $(CS_DATADIR)$/aws$/
 
+; Mount for Partedit2
+VFS.Mount.partedit2 = $(CS_DATADIR)$/partedit2$/
+
 ; CEgui test
 VFS.Mount.ceguitest  = $(CS_DATADIR)$/ceguitest$/
 
