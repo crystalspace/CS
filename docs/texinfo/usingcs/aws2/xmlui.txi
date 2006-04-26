@@ -74,6 +74,32 @@ similar happens, it's just defined a little differently.
 Each child node of the layout node looks just like an associative array entry after being parsed.  So any items that
 you would have put in the array object can just be broken out into child nodes, as the example above shows.
 
+@subsubsection Widget Identifiers
+
+On occasion you may need to name a widget, in order to identify it for some future operation.  Consider the example below.
+
+@example
+<layout type="page">
+	<widget type="Gauge" id="myGauge">
+		<type>{Skin.current.Style.GaugeLevel}</type>
+		<title>My Gauge</title>
+		<min>0</min>
+		<max>100</max>	
+	</widget>
+	<widget type="Slider" id="mySlider">
+		<vertical>{true}</vertical>
+		<step>25</step>
+		<lock>{false}</lock>
+		
+		<event name="onChange" action="function() { myGauge.value = mySlider.value; }" />
+	</widget>
+</layout>
+@end example
+
+By using the "id" attribute, you can given a widget a name that is referenceable later.  Note that the names need to be globally
+unique, since they are created in the global namespace.
+
+
 @subsubsection Widget Events
 
 Some widgets have events.  Most, in fact, do.  These events are simply calls to functions indicated by their correct
