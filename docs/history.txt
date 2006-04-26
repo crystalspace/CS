@@ -8,7 +8,10 @@ chronological order.
 
 26-Apr-2006
 	- Jorrit fixed a small bug in the csMeshOnTexture class.
-	- Jorrit fixed another small bug in the csMeshOnTexture class.
+	- Jorrit fixed another small bug in the csMeshOnTexture class.	
+	- Christopher began adding documentation for Aws2.  He also added
+	the XML to Widget conversion function so that you can make interfaces
+	in XML.  Also, he added the partedit2 data resources for Aws2.
 25-Apr-2006
 	- Jorrit committed a patch from Adam to implement the signpost
 	  changes in simple1 tutorial. Note that this is not perfect yet
