@@ -68,6 +68,9 @@ bool csMeshOnTexture::Render (iMeshWrapper* mesh, iTextureHandle* handle,
   g3d->SetRenderTarget (handle, persistent);
   iTextureHandle *oldContext = engine->GetContext ();
   engine->SetContext (handle);
+  int w, h;
+  handle->GetRendererDimensions (w, h);
+  view->SetRectangle (0, 0, w, h);
 
   // Draw the engine view.
   g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags () 
