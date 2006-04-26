@@ -1,0 +1,74 @@
+@c -*-texinfo-*-
+@node AWS Quick Start, AWS2 Native Objects, AWS2, AWS2
+@subsection Quick Start
+
+In order to startup and use @sc{aws2}, the following tasks must be performed.
+
+@enumerate
+@item
+Initialize the Crystal Space facilities in the normal fashion.
+(@pxref{Tutorial Simple}).  In particular,
+@code{csInitializer::OpenApplication()} must be invoked before any of the
+following tasks are performed.  Initializing an @sc{aws2} application also
+involves loading the @sc{aws2} plugin.  You can do this via the normal
+@code{csInitializer::RequestPlugins()} invocation (the common approach), or you
+can load it separately, if desired:
+
+@example
+csRef<iAws2> aws = csLoadPlugin<iAws2> (plugin_mgr,
+  "crystalspace.window.alternatemanager2");
+@end example
+
+@noindent
+If you know ahead of time that your application will be using @sc{aws2}, then
+loading the plugin via @code{csInitializer::OpenApplication()} is more
+convenient and less error-prone.
+
+@item
+Setup the @sc{aws2} canvas.
+
+@example
+awsCanvas = aws->SetupCanvas (0, myG2D, myG3D);
+@end example
+
+@noindent
+Where @code{myG2D} and @code{myG3D} are your @code{iGraphics2D} and 
+@code{iGraphics3D} cavas objects, respectively.
+
+@item
+Load Javascript files
+
+@example
+aws->Load("/partedit2/startup.js");
+@end example
+
+@noindent
+Substitute the @sc{vfs} path of your own definition file in place of the path
+shown in the example.
+
+@item 
+You will also want to make sure that @sc{aws2} gets events.  So in your HandleEvent function you
+will want to put something like this:
+
+@example
+return aws->HandleEvent(Event);
+@end example
+
+@item
+Finally, you have to make sure it actually renders to the display.
+So, in your program's main drawing loop you might use code similar to this:
+
+@example
+// Start drawing 2D graphics.
+if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS))
+  return;
+// Make sure invalidated areas get a chance to
+// redraw themselves.
+aws->Redraw ();
+@end example
+@end enumerate
+
+That's all there is to it.  @sc{aws2} is designed to be easy to use.  Of course,
+this brief examination does not illustrate how to get user input from
+components in the windows, nor does it illustrate how to do anything other than
+display any widgets that your Javascript files have setup.

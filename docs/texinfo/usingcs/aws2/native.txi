@@ -1,0 +1,95 @@
+@c -*-texinfo-*-
+@node AWS2 Native Objects, AWS2 Quick Start, AWS2
+@subsection Native @sc{aws2} Objects
+
+Much like the DOM in your browser, @sc{aws2} has certain native language objects that help you get the job done.  These are
+the lowest level objects in the system.  Some of them you may use directly, but generally you will not use them unless you
+are writing a new Widget, or skinning an existing widget
+
+
+@menu
+* AWS2 Widget:: Widget object
+* AWS2 Pen:: Pen object
+* AWS2 Texture:: Texture object
+* AWS2 Font:: Font object
+* AWS2 Gradient:: Gradient object
+@end menu
+
+@node AWS2 Widget, AWS2 Pen, AWS2 Native Objects, AWS2 Native Objects
+@subsubsection Widget object
+
+The Widget object is the base for any widget that will be displayed on the screen,
+or used as a container for other displayable widgets.  It has a number of methods
+and properties, and is very likely the most complex object in the system.
+
+Widgets that are not children, and that are not docked are top-level widgets.  
+This means that they exist in a linked list that indicates their drawing level.  Currently
+@sc{aws2} uses a focus-follows-mouse for widget activation/deactivation.
+
+The following table summarizes all of the methods that are available for a widget.
+
+@table @code
+@item Move(x,y)
+Move the widget @strong{relative} to x,y.
+
+@item MoveTo(x,y)
+Move the widget to @strong(absolute) position x,y.
+
+@item Resize(width,height)
+Resize the widget @strong{relative} to width,height.
+
+@item ResizeTo(width,height)
+Resize the widget to @strong(absolute) size width,height.
+
+@item Invalidate()
+Indicates the the state of this widget has changed, and on the next redraw it's @code{onRedraw} function will be called.
+
+@item GetPen()
+Gets the Pen object, if any, associated with this widget.
+
+@item SetPen(pen)
+Sets the Pen object to be associated with this widget.
+
+@item AddChild(child, ...additional parms...)
+Adds a widget as a child to this widget.  If any additional parameters are specified, they will be passed to the
+onAddChild event that gets fired before this method completes.
+
+@item RemoveChild(child, ...additional parms...)
+Removes a widget as a child to this widget.  If any additional parameters are specified, they will be passed to the
+onRemoveChild event that gets fired before this method completes.
+
+@item Dock(sibling, position)
+Docks a widget to the given position.  The position may be one of the DOCK_XXXX properties listed below.  Only
+@strong{one} widget should be docked to any given position.  The sibling widget's frame will be resized and/or
+moved in accordance with the frame that is being docked to.  Docking occurs in peer relationships, not parent/child.
+
+@item Broadcast(signal_name)
+This essential calls the function named by signal_name on all of the children of the given widget.  It does
+@strong{not} propagate to grandchildren and below.
+
+@item SetFrameAnchor(anchor_flags)
+When a child widget sets this flag to any of the STICK_XXXX flags, the frame of the child will 
+be resized and/or moved relative to the frame of the parent. You may bitwise-or the flags together to specify more than one.
+
+@item ClearFrameAnchor(anchor_flags)
+Clears the given STICK_XXXX flags.  You may bitwise-or the flags together to specify more than one.
+
+@item SetMargin(size, where)
+Creates a spacer, or margin, for docked or anchored widgets.  @code{size} pixels will be inserted between
+the borders of the two widgets on the side indicated by @code{where}.
+
+@item CaptureMouse()
+Indicates that this widget wants all mouse events to come to it, irregardless of whether the mouse is over the
+widget or not.  This is useful for dragging pieces of a widget around (like the slider and scrollbars knobs).
+
+@item ReleaseMouse()
+If the mouse has been captured, release it.
+
+@item Show()
+If a widget is invisible, make it visible.
+
+@item Hide
+If a widget is visible, make it invisible.
+
+@end table
+
