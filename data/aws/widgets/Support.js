@@ -46,3 +46,4 @@ Function.method('assimilate', function (parent) {
     }
     return this;
 });
+

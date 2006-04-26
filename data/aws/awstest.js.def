@@ -1,9 +1,7 @@
 // AWS Test skin definition file
 
-// Load the default style set
-Sys.Load("/aws/widgets/Frames.js");
-Sys.Load("/aws/widgets/Styles.js");
-Sys.Load("/aws/widgets/Widgets.js");
+// Load the AWS2 default widgets and styles.
+Sys.Load("/aws/Aws2Default.js");
 
 
 // Used as a place to store functions that return somewhat complex objects, or the code to create them.

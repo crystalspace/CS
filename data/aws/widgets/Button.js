@@ -54,3 +54,14 @@ function Button()
 		
 	return _widget;
 }
+
+function buttonDrawText(text_item)
+{	
+	function doDraw(pen) 
+	{ 
+		pen.SetColor(1,1,1,1); 
+		pen.WriteBoxed(Skin.current.Font, 0,0,this.width, this.height, Pen.ALIGN_CENTER, Pen.ALIGN_CENTER, text_item); 		
+	}				 			
+				
+	return doDraw;
+}

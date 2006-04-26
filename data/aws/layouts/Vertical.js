@@ -1,11 +1,11 @@
-function Horizontal(padding)
+function Vertical(settings)
 {
 	l = new Widget;
 	
 	l._current_width = 0;
 	l._current_height = 0;
 	
-	l.padding = padding;
+	l.padding = settings.padding;
 	l.kids = new Array();
 	
 	l.onDraw = Skin.current.Style.EmptyLayout;
