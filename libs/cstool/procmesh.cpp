@@ -24,6 +24,7 @@
 
 #include "iutil/objreg.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
 #include "ivideo/texture.h"
 #include "iengine/engine.h"
 #include "iengine/movable.h"
@@ -57,7 +58,7 @@ void csMeshOnTexture::ScaleCamera (iMeshWrapper* mesh, float distance)
 
   camera->GetTransform ().LookAt (mesh_pos-cam_pos, csVector3 (0, 1, 0));
 
-  csVector3 new_cam_pos = cam_pos + distance * (mesh_pos-cam_pos);
+  csVector3 new_cam_pos = cam_pos + distance * (mesh_pos-cam_pos).Unit ();
   camera->GetTransform ().SetOrigin (new_cam_pos);
 }
 

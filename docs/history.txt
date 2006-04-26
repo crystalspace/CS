@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Apr-2006
+	- Jorrit fixed a small bug in the csMeshOnTexture class.
 25-Apr-2006
 	- Jorrit committed a patch from Adam to implement the signpost
 	  changes in simple1 tutorial. Note that this is not perfect yet
@@ -13,7 +15,7 @@ chronological order.
 	- Christopher made partedit2 use csApplicationFramework, and removed
 	  the iaws2.h file.
 	- Christopher add two layouts: Horizontal and Vertical to the AWS2
-        kit.  He also fixed a bug in the widget drawing code where widgets
+          kit.  He also fixed a bug in the widget drawing code where widgets
  	  with no pen would not draw children.
 24-Apr-2006
 	- Eric Sunshine added msvc_deprecated_warn_{on,off}.h to
