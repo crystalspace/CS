@@ -11,6 +11,7 @@ are writing a new Widget, or skinning an existing widget
 * AWS2 Widget:: Widget object
 * AWS2 Pen:: Pen object
 * AWS2 Texture:: Texture object
+* AWS2 Color:: Color object
 * AWS2 Font:: Font object
 * AWS2 Gradient:: Gradient object
 @end menu
@@ -406,5 +407,204 @@ Write the text in the given font at coordinate x,y.
 @item WriteBoxed(font, xmin, ymin, xmax, ymax, horizontal_alignment, vertical_alignment, text)
 Write the text in the given font inside the box (xmin,ymin) - (xmax,ymax).  The text will
 be aligned to the box using the Pen.ALIGN_XXXX constants.
+
+@end table
+
+@node AWS2 Texture, AWS2 Color, AWS2 Pen, AWS2 Native Objects
+@subsection Texture object
+
+The texture objects holds a @sc{cs} iTextureHandle.  The only things you can do with a Texture object are
+Create and Load.  The system takes care of destroying them.  You may use a Pen to draw on them, or a Gradient
+to render to them but that is outside the scope of the texture object itself.
+
+The following static methods are available with Texture.
+
+@table @code
+
+@item Create(width,height)
+Create a new, blank texture widthxheight pixels in area.
+
+@item Load(filename)
+Load any image that @sc{cs} supports as a texture.  The filename must
+include the @sc{vfs} path of course.
+
+@end table
+
+To create a procedural texture:
+
+@example
+my_tex = Texture.Create(10,10);
+@end example
+
+To load an image as a texture:
+
+@example
+my_tex = Texture.Load("/path/to/image.png");
+@end example
+
+You may also retrieve the size of texture object by using the @code{GetDimensions} method.
+
+@table @code
+
+@item GetDimensions()
+Returns a TextureDimensions object containing the width and height of the texture.
+
+@end table
+
+@example
+dim = my_tex.GetDimensions()
+
+Sys.Print("Texture width: ", dim.width, " Texture height: ", dim.height);
+@end example
+
+@node AWS2 Color, AWS2 Font, AWS2 Texture, AWS2 Native Objects
+@subsection Color object
+
+Allows you to create an encapsulation of a color. Color components may range from 0.0 to 1.0, where
+the 0 is no intensity and 1 is full intensity of that component.
+
+@table @code
+
+@item constructor: new Color(r,g,b,a)
+Set the color components and return a new Color object.
+
+@item Set(r,g,b,a)
+Set the color components.
+
+@end table
+
+An example of creating a new Color object:
+
+@example
+my_color = new Color(1,0.5,1,0.5);
+@end example
+
+You can also access the components of a Color object through it's properties.
+
+@table @code
+
+@item r
+Return the red component.
+
+@item g
+Return the green component.
+
+@item b
+Return the blue component.
+
+@item alpha
+Return the alpha component.
+
+@end table
+
+@node AWS2 Font, AWS2 Gradient, AWS2 Color, AWS2 Native Objects
+@subsection Font object
+
+The Font object is used for representing a font to the drawing system.  You may Load fonts, and query them
+for specific information such as their height, the height and width of a given piece of text in that font, 
+and more.
+
+The following static functions are available:
+
+@table @code
+
+@item Load(font_path, size)
+This returns a new font object.  You must specify the path to the font, as well as the size of
+the font you wish to load.  If the font cannot be found, the function will fail.
+
+@end table
+
+@example
+my_font = new Font("VeraSans", 24);
+another_font = Font.Load("VeraSerif", 10);
+@end example
+
+Once you have a font object, you may use it in drawing text with a pen, or you may also query it for
+various bits of information.
+
+@table @code
+
+@item GetTextHeight()
+Returns the line to line height for a font.  This is useful for determining how far to increment the
+@code{y} coordinate for drawing text.
+
+@item GetLength(text, max_width)
+Returns an integer that is an index into text, indicating the last character that should be 
+displayed to make sure that the text is no more than @code{max_width} pixels wide.
+
+@item GetDimensions(text)
+Returns a TextDimensions object indicating the width, maximum height, and descender of the 
+given text.
+
+@end table
+
+@example
+dim = my_font.GetDimensions("my text");
+
+Sys.Print("Dimensions of text: ", dim.width, dim.height, dim.descender);
+@end example
+
+@node AWS2 Gradient, AWS2 Native Objects, AWS2 Font, AWS2 Native Objects
+@subsection Gradient object
+
+The Gradient object lets you make some fairly sophisticated gradients.  These can then 
+be used to texture a widget, or a part of a widget using masking.  There are currently
+only five different kinds of gradients supported.  Also, it should be realized that 
+using a gradient is more of an art than a science.  Things can get complex in a hurry.
+
+The basic pattern behind using a gradient is to create a new Gradient object, and then
+add colors to it.
+
+@example
+gr = new Gradient();
+    			
+gr.AddColor(new Color(1,1,1,1), 0.0);	
+gr.AddColor(new Color(1,1,1,1), 0.1);	
+gr.AddColor(new Color(0.6,0.6,0.6,1), 0.5);					
+gr.AddColor(new Color(0.4,0.4,0.4,1), 0.51);				
+gr.AddColor(new Color(0.7, 0.7, 0.7, 1), 0.9);
+gr.AddColor(new Color(0.0, 0.0, 0.0, 1), 1.0);
+@end example
+
+Once you are done creating your gradient, it has to be rendered into a texture to actually be useful.
+
+@example
+gr.Render(tex, Gradient.VERTICAL);
+@end example
+
+For horizontal and vertical gradients, it's best to create a texture that is 1 pixel wide and N pixels high, or vice versa, and then using
+that to texture your shape.  Other gradients require you to create a full width and height texture.
+
+The following table lists all possible gradient types:
+
+@table @code
+
+@item HORIZONTAL
+The gradient starts at the left and runs to the right.
+
+@item VERTICAL
+The gradient starts at the top and runs to the bottom.
+
+@item RADIAL
+The gradient starts in the center and runs to the edges in all directions.
+
+@item LDIAG
+The gradient starts in the upper left corner and runs to the bottom right corner.
+
+@item RDIAG
+The gradient starts in the upper right corner and runs to the bottom left corner.
+
+@end table
+
+The following methods are supported:
+
+@table @code
+
+@item AddColor(color_object, position)
+Adds the given color at the given position.  The position must be between 0.0 and 1.0.  Colors
+will be sorted automatically, so they don't have to be added in order.
+
+@item Render(texture, gradient_constant)
+Renders the gradient to the given Texture object.  Whatever was in the texture is overwritten.
 
 @end table
