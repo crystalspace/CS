@@ -16,7 +16,7 @@ are writing a new Widget, or skinning an existing widget
 @end menu
 
 @node AWS2 Widget, AWS2 Pen, AWS2 Native Objects, AWS2 Native Objects
-@subsubsection Widget object
+@subsection Widget object
 
 The Widget object is the base for any widget that will be displayed on the screen,
 or used as a container for other displayable widgets.  It has a number of methods
@@ -93,3 +93,224 @@ If a widget is visible, make it invisible.
 
 @end table
 
+@node AWS2 Pen, AWS2 Texture, AWS2 Widget, AWS2 Native Objects
+@subsection Pen object
+
+The Pen object is used to draw.  It is vector based, so all drawing with the pen may be subject to transformations like scaling, translation, and rotation.
+
+This object has a number of states that affect the output of the drawing.  These include the blending mode, the vertex color, the fill state, and the pen width.
+Shapes are always specified using boxes (except for the triangle.)  The box is specified using: (xmin,ymin) - (xmax,ymax)
+
+When drawing inside of a widget, (xmin,ymin) will always be equal to (0,0) and this (xmax,ymax) will be equal to (width,height).  You will see this paradigm
+used over and over again in the default @sc{aws2} widget set.
+
+@subsubsection Filling and Stroking
+
+By default, all shapes are stroked.  In order to change this you must set the fill flag.
+
+@example
+pen.SetFlag(Pen.FLAG_FILL);
+@end example
+
+To reset the mode back to stroked mode, simply clear that flag.
+
+@example
+pen.ClearFlag(Pen.FLAG_FILL);
+@end example
+
+@subsubsection Texturing
+
+Texturing is off by default.  In order to texture a shape you have to turn it on, and also set a texture.
+
+@example
+pen.SetFlag(Pen.FLAG_TEXTURE);
+pen.SetTexture(my_tex);
+@end example
+
+To turn it back off, simply clear the flag.
+
+@example
+pen.ClearFlag(Pen.FLAG_TEXTURE);
+@end example
+
+What about texture coordinates?  All shapes are automatically textured.  The one exception is the triangle shape.  The Pen
+object currently does not have a good way to specify texture coordinates for it.  This is likely to be corrected in the future.
+
+For any given shape, the texture coordinates will be (0,0) at (xmin, ymin) and (1,1) at (xmax,ymax).  It is important to realize that 
+this works great for texturing an entire widget.  However, if you which to texture sub-shapes within a widget, you must modify the 
+transformation matrix so that texture coordinates will be properly generated.
+
+Imagine that you have a widget that is 50 x 50 pixels.  Assume that you have a small knob, that is 10 x 10 pixels, and you wish to
+texture it differently than the rest of the widget.  Note that it may also move around inside the widget.  The easiest way to do that
+is by:
+
+@example
+
+pen.PushTransform();
+pen.Translate(knob_x, knob_y, 0);
+
+pen.SetFlag(Pen.FLAG_TEXTURE);
+pen.SetTexture(my_tex);
+
+pen.DrawRect(0,0,10,10);
+
+pen.PopTransform();
+
+This will normalize the coordinates of your shape and allow the pen to create correct texture coordinates for it.
+
+@subsubsection Blending
+
+There are two parts of blending to consider.  The first is the simplest, and involves alpha values in your color.  
+
+@example
+pen.SetColor(1,1,1,1);
+@end example
+
+This statement would set the color to a completely opaque white.
+
+@example
+pen.SetColor(1,1,1,0.5);
+@end example
+
+Whereas this one would set the color to a shade that is 50% transparent.  It is easy to see how this works, in that the transparency is a 
+number from 0 to 1, where 0 is completely transparent, and 1 is completely opaque.
+
+There is a more sophisticated sort of blending that Pen can also perform.  This is referred to more generally as @emph{compositing}.
+
+@table @code
+
+@item SetMixMode(mixmode_constant)
+Set the blending mode used for further drawing to one of the Pen.MIX_XXX constants.  
+
+@item SetMixMode(mixmode_object)
+Set the blending mode used for further drawing by generating it from a Mixmode object
+that allows you to specify any of the source and destination blending operations CS
+supports.
+
+@end table
+
+The constants that can be used for blending are as follows:
+
+@table @code
+
+@item MIX_ADD
+The source color and destination colors are added together.
+
+@item MIX_ALPHA 
+The source and destination colors are blended using the alpha value.
+
+@item MIX_COPY
+The destination color is overwritten by the source color. (No blending).
+
+@item MIX_DST_ALPHA_ADD
+The source color is multiplied by the alpha component of the destination color
+and the result is added together.
+
+@item MIX_FLAT
+No shading is implemented for vertex colors.
+
+@item MIX_MULTIPLY
+To do
+
+@item MIX_MULTIPLY2
+To do
+
+@item MIX_PRE_MULT_ALPHA
+To do
+
+@item MIX_SRC_ALPHA_ADD
+To do
+
+@item MIX_TRANSPARENT
+To do
+ 
+@item MIX_TRANSPARENT_TEST
+To do
+  
+@item MIX_DST_ALPHA
+Like MIX_DST_ALPHA_ADD, but the results are blended not added.
+
+@item MIX_DST_ALPHA_MASK
+To do
+
+@end table
+
+In order to do masking, for example, you might set the pen state like this:
+
+@example
+pen.SetMixMode(Pen.MIX_COPY);
+pen.SetColor(1,1,1,1);
+pen.DrawTriangle(5,0,10,10,0,10);
+
+pen.SetMixMode(Pen.MIX_DST_ALPHA_ADD);
+pen.SetFlag(Pen.FLAG_TEXTURE);
+pen.SetTexture(my_tex);
+pen.DrawRect(0,0,20,20);
+@end example
+
+The texture will only be drawn where the triangle was drawn.  The area around the triangle will be left clean.
+
+Blending allows you to do a number of interesting special effects, including highlighting and complex texturing.  For an example of the use of blending 
+see @file{data/aws/widgets/slider.js}
+
+@subsubsection Pen methods
+
+The following table summarizes all of the drawing functions available via Pen.
+
+@table @code
+
+@item Clear()
+Clears a pen.  All previous drawing functions are removed.
+
+@item SetFlag(flag_const)
+Sets one or more Pen.FLAG_XXXX constants.
+
+@item ClearFlag(flag_const)
+Clears one or more Pen.FLAG_XXXX constants.
+
+@item SetMixMode(mixmod_const)
+Sets the blending mode to the given Pen.MIX_XXXX constant.
+
+@item SetMixMode(mixmod_object)
+Sets the blending mode to the given blending object.
+
+@item SetColor(r,g,b,a)
+Sets the color of the pen to the value specified by r,g,b,a
+
+@item SetColor(color_object)
+Sets the color of the pen to the value specified by the Color object.
+
+@item SetTexture(tex)
+Sets the current texture to tex.
+
+@item SwapColors()
+Swaps the current color with the alternate color.  SetColor sets the current
+color, and drawing is always done in the current color.  However, sometimes
+you want to swap between two colors frequently, and this provides an optimized
+way to do so.
+
+  {"SetWidth",        SetWidth,         1, 0, 0}, 
+
+  {"PushTransform",   PushTransform,    0, 0, 0}, 
+  {"PopTransform",    PopTransform,     0, 0, 0}, 
+  {"ClearTransform",  ClearTransform,   0, 0, 0}, 
+
+  {"SetOrigin",       SetOrigin,        3, 0, 0},
+  {"Translate",       Translate,        3, 0, 0},
+  {"Rotate",          Rotate,           1, 0, 0},   
+
+  {"DrawLine",        DrawLine,         4, 0, 0},
+  {"DrawRect",        DrawRect,         6, 0, 0},    
+  {"DrawMiteredRect", DrawMiteredRect,  7, 0, 0},
+  {"DrawRoundedRect", DrawRoundedRect,  7, 0, 0},
+  {"DrawArc",         DrawArc,          8, 0, 0},
+  {"DrawTriangle",    DrawTriangle,     7, 0, 0},
+
+  {"Draw",            Draw,             1, 0, 0},
+  {"Render",          Render,           1, 0, 0},
+
+  {"Write",           Write,            4, 0, 0},    
+  {"WriteBoxed",      WriteBoxed,       8, 0, 0},
+
+
+@end table

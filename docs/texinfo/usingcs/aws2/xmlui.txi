@@ -99,6 +99,31 @@ On occasion you may need to name a widget, in order to identify it for some futu
 By using the "id" attribute, you can given a widget a name that is referenceable later.  Note that the names need to be globally
 unique, since they are created in the global namespace.
 
+@subsubsection Widget Setup Nodes
+
+Some widgets may need a little more complex setup than is common.  To accomodate this situation, widgets also have an optional
+setup node that can be used to provide custom widget initialization.
+
+@example
+<widget type="Label" id="pauseDescLabel">
+	<setup>
+			<![CDATA[
+				
+				Sys.Print("Setting up label...");
+				pauseDescLabel.text = "Pause the particle fountain.";
+			
+			]]>
+    </setup>
+</widget>
+@end example
+
+The body of the setup node is executed in place.  You can do anything you want inside of it.  
+
+Notice that we used a CDATA construct.  While this isn't necessary, it may make your life easier
+if you are doing relational operations.  
+
+@strong{Note:} It is not necessary to give the widget an id in order to use setup.  Instead, you may use the
+variable "widget" to refer to the widget.  This is only available in the setup node.
 
 @subsubsection Widget Events
 
@@ -126,20 +151,8 @@ It is very common to just want to draw text on a button.  Therefore, the button 
 function that draws the given label on a button.  In the example above, the function buttonDrawText() is called, which returns a
 closure containing a drawing function that knows what label to draw on the button.
 
-Other events may require more complex settings that have to be added to the widget.  In order to accomodate that, there are two
-ways to specify additional settings for the event.
-
-The first one is to use the "settings" attribute.
-
-@example
-<widget type="ComplexWidget">
-	<event name="onMyEvent" action="doSomething()" settings="{ mysetting: 1, othersetting: 2}" />
-</widget>
-@end example
-
-The settings attribute specifies an associate array that contains the settings.  
-
-Another, similar way, is by using child nodes:
+Other events may require more complex settings that have to be added to the widget.  In order to accomodate that, there 
+is a way to specify additional settings for the event by using child nodes:
 
 @example
 <widget type="ComplexWidget">
@@ -150,10 +163,9 @@ Another, similar way, is by using child nodes:
 </widget>
 @end example
 
-Functionally, they are equivalent.
 
-Regardless of which method you use to define them, in the action function, the settings may be
-referred to using the "this" variable.  For example:
+
+The settings may be referred to using the "this" variable in your action function.  For example:
 
 @example
 function doSomething()
