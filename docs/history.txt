@@ -13,6 +13,8 @@ chronological order.
 	  This method will first look for an interface in the object registry.
 	  If it is not there it will try to load the plugin and register
 	  that to the object registry.
+	- Jorrit fixed the distance calculation in csMeshOnTexture.
+	  Started work on the auto-fit version of ScaleCamera() too.
 26-Apr-2006
 	- Jorrit fixed a small bug in the csMeshOnTexture class.
 	- Jorrit fixed another small bug in the csMeshOnTexture class.	

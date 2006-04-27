@@ -43,6 +43,9 @@ private:
 
   // We will view the object through this view.
   csRef<csView> view;
+  int cur_w, cur_h;
+
+  void UpdateView (int w, int h);
 
 public:
   /**
@@ -68,7 +71,7 @@ public:
    * close as possible so that as much of the object is
    * visible at the same time in the given texture resolution.
    */
-  void ScaleCamera (iMeshWrapper* mesh, int txtx, int txty);
+  void ScaleCamera (iMeshWrapper* mesh, int txtw, int txth);
 
   /**
    * Look at a given mesh at a given distance. The relative orientation
