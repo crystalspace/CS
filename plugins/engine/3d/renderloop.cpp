@@ -37,6 +37,7 @@
 #include "csgfx/rgbpixel.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/rview.h"
+#include "plugins/engine/3d/sector.h"
 #include "csutil/xmltiny.h"
 
 //---------------------------------------------------------------------------

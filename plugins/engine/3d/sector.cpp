@@ -45,6 +45,7 @@
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/meshgen.h"
+#include "plugins/engine/3d/meshobj.h"
 
 //---------------------------------------------------------------------------
 csSectorLightList::csSectorLightList ()

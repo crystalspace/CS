@@ -71,10 +71,12 @@ bool csMeshOnTexture::Render (iMeshWrapper* mesh, iTextureHandle* handle,
   int w, h;
   handle->GetRendererDimensions (w, h);
   view->SetRectangle (0, 0, w, h);
+  view->GetCamera ()->SetPerspectiveCenter (w/2, h/2);
+  view->GetCamera ()->SetFOV (h, w);
 
   // Draw the engine view.
   g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags () 
-    | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
+    | CSDRAW_CLEARZBUFFER | (persistent ? 0 : CSDRAW_CLEARSCREEN));
   //g3d->GetDriver2D()->Clear (g3d->GetDriver2D()->FindRGB (0, 255, 0));
   view->Draw (mesh);
   g3d->FinishDraw ();
