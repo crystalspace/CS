@@ -9,6 +9,10 @@ chronological order.
 27-Apr-2006
 	- Jorrit did a few more fixes to csMeshOnTexture. It finally starts
 	  to work now.
+	- Jorrit added a new conveniance method: csQueryRegistryOrLoad().
+	  This method will first look for an interface in the object registry.
+	  If it is not there it will try to load the plugin and register
+	  that to the object registry.
 26-Apr-2006
 	- Jorrit fixed a small bug in the csMeshOnTexture class.
 	- Jorrit fixed another small bug in the csMeshOnTexture class.	

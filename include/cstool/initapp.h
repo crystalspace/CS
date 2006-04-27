@@ -39,6 +39,8 @@
 #include "imap/saver.h"
 #include "iutil/evdefs.h"
 #include "iutil/vfs.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
 #include "ivaria/conout.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
@@ -115,6 +117,25 @@ struct iVerbosityManager;
  */
 typedef bool (*csEventHandlerFunc) (iEvent&);
 
+/**
+ * Query an interface from the registry. If the interface cannot be found
+ * then it will try to load the plugin with the given class id. If that
+ * is successful it will register that plugin on the object registry.
+ */
+template<class Interface>
+inline csPtr<Interface> csQueryRegistryOrLoad (iObjectRegistry *Reg,
+	const char* classID)
+{
+  csRef<Interface> i = csQueryRegistry<Interface> (Reg);
+  if (i) return (csPtr<Interface>)i;
+  csRef<iPluginManager> plugmgr = csQueryRegistry<iPluginManager> (Reg);
+  i = csLoadPlugin<Interface> (plugmgr, classID);
+  if (!i) return 0;
+  if (!Reg->Register (i, scfInterfaceTraits<Interface>::GetName ()))
+    return 0;
+  return (csPtr<Interface>)i;
+}  
+  
 
 /**
  * This class represents a single plugin request for
