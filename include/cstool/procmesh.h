@@ -27,6 +27,7 @@
 
 #include "csutil/ref.h"
 #include "csutil/scf_implementation.h"
+#include "iutil/objreg.h"
 #include "cstool/csview.h"
 
 struct iTextureHandle;
