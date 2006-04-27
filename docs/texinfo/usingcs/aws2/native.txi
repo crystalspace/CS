@@ -133,6 +133,10 @@ To turn it back off, simply clear the flag.
 pen.ClearFlag(Pen.FLAG_TEXTURE);
 @end example
 
+It is very important to realize that the current color set will affect the texture.  For example, if you set the current color
+to a bright white, the texture will be brighter than if you set it to black or a grey.  Setting the color to red will cause
+the texture to have a reddish cast.  Setting the alpha component will make the texture more or less translucent.
+
 What about texture coordinates?  All shapes are automatically textured.  The one exception is the triangle shape.  The Pen
 object currently does not have a good way to specify texture coordinates for it.  This is likely to be corrected in the future.
 
@@ -253,7 +257,50 @@ The texture will only be drawn where the triangle was drawn.  The area around th
 Blending allows you to do a number of interesting special effects, including highlighting and complex texturing.  For an example of the use of blending 
 see @file{data/aws/widgets/slider.js}
 
+@subsubsection Pen Flags
+
+@table @code
+  
+@item FLAG_FILL
+Turns on shape filling.  When this is off, all shapes are stroked.
+  
+@item FLAG_SWAPCOLORS
+Most shapes support color swapping.  This can be used to make simple gradients, or to draw a simple "3d" box look.
+
+@item FLAG_TEXTURE
+Turns on texturing.  You must also specify a texture using @code{SetTexture} in order for this flag to have effect.
+
+@end table
+
+@subsubsection Pen Text Drawing and Alignment
+
+The pen is capable of aligning text inside of a box, without the user having to do all sorts of complex operations.  This makes text positioning
+much easier to perform.
+
+The following constants may be used to align text.
+
+@table @code
+
+@item ALIGN_TOP
+Align text vertically to the top of the box.  The top of the text will touch the top of the box.
+
+@item ALIGN_BOT
+Align text vertically to the bottom of the box.  The bottom of the text will touch the bottom of the box.
+
+@item ALIGN_LEFT
+Align text horizontally to the left-hand side of the box.  The left edge of the text will touch the left side of the box.
+
+@item ALIGN_RIGHT
+Align text horizontally to the right-hand side of the box.  The right edge of the text will touch the right side of the box.
+
+@item ALIGN_CENTER
+Align text horizontally or vertically to the center of the box.  The center of the text
+will be in the center of the box.
+
+@end table
+
 @subsubsection Pen methods
+
 
 The following table summarizes all of the drawing functions available via Pen.
 
@@ -289,28 +336,75 @@ color, and drawing is always done in the current color.  However, sometimes
 you want to swap between two colors frequently, and this provides an optimized
 way to do so.
 
-  {"SetWidth",        SetWidth,         1, 0, 0}, 
+@item SetWidth(pen_width)
+Sets the width of the stroke when drawing a stroked shape.  This number is in pixels
+and may be fractional.
 
-  {"PushTransform",   PushTransform,    0, 0, 0}, 
-  {"PopTransform",    PopTransform,     0, 0, 0}, 
-  {"ClearTransform",  ClearTransform,   0, 0, 0}, 
+@item PushTransform()
+Pushes the current transformation onto the stack.
 
-  {"SetOrigin",       SetOrigin,        3, 0, 0},
-  {"Translate",       Translate,        3, 0, 0},
-  {"Rotate",          Rotate,           1, 0, 0},   
+@item PopTransform()
+Pops the last saved transformation from the stack and makes it the current one.
 
-  {"DrawLine",        DrawLine,         4, 0, 0},
-  {"DrawRect",        DrawRect,         6, 0, 0},    
-  {"DrawMiteredRect", DrawMiteredRect,  7, 0, 0},
-  {"DrawRoundedRect", DrawRoundedRect,  7, 0, 0},
-  {"DrawArc",         DrawArc,          8, 0, 0},
-  {"DrawTriangle",    DrawTriangle,     7, 0, 0},
+@item ClearTransform()
+Clear all transformations.  Sets the transformation matrix to the identity.
 
-  {"Draw",            Draw,             1, 0, 0},
-  {"Render",          Render,           1, 0, 0},
+@item SetOrigin(x,y,z)
+Sets the origin for the transformation matrix.  This helps with rotating objects
+around a certain point.
 
-  {"Write",           Write,            4, 0, 0},    
-  {"WriteBoxed",      WriteBoxed,       8, 0, 0},
+@item Translate(x,y,z)
+Translate the transformation matrix by x,y,z.
 
+@item Rotate(radians)
+Rotate the transformation matrix by radians.
+
+@item DrawLine(xmin, ymin, xmax, ymax)
+Draw a line from (xmin,ymin) to (xmax,ymax)
+
+@item DrawRect(xmin, ymin, xmax, ymax)
+Draw a rectangle from (xmin,ymin) to (xmax,ymax)
+
+
+@item DrawMiteredRect(xmin, ymin, xmax, ymax, miter_in_pixels)
+Draw a rectangle from (xmin,ymin) to (xmax,ymax), beveling the edges
+by miter_in_pixels.  That is, the corners will be cut off at 
+miter_in_pixels from @emph{each} edge.
+
+@item DrawRoundedRect(xmin, ymin, xmax, ymax, roundness_in_pixels)
+Draw a rectangle from (xmin,ymin) to (xmax,ymax), rounding the edges
+by roundness_in_pixels.  That is, the corners will be cut off at 
+roundness_in_pixels from @emph{each} edge, and an arc will be drawn
+instead.
+
+@item DrawArc(xmin, ymin, xmax, ymax, start_angle, end_angle)
+Draw an arc that fills the box specified the rectangle 
+(xmin,ymin) to (xmax,ymax).  The left and right edges will touch
+xmin and xmax, while the top and bottom edges will touch ymin and
+ymax.  The arc will be drawn from start_angle to end_angle.  To
+draw a circle, start_angle should be 0, and end angle should be
+slightly over PI*2.
+
+@item DrawTriangle(x1, y2, x2, y2, x3, y3)
+Draw a triangle connecting those points.  The points must be given in
+clockwise order if you want the triangle filled.
+
+@item Draw(pen)
+Appends all of the draw operations performed on this pen, to the given
+pen.
+
+@item Render(texture)
+Renders the pen to a texture.  In this way you can essentially create
+procedural textures.  If the texture has any contents, they will be
+cleared by this operation.  If you want to draw multiple objects onto
+a texture, use the same pen, concatenate multiple pens into one pen,
+or use compositing.
+
+@item Write(font, x, y, text)
+Write the text in the given font at coordinate x,y.
+
+@item WriteBoxed(font, xmin, ymin, xmax, ymax, horizontal_alignment, vertical_alignment, text)
+Write the text in the given font inside the box (xmin,ymin) - (xmax,ymax).  The text will
+be aligned to the box using the Pen.ALIGN_XXXX constants.
 
 @end table
