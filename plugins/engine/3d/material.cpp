@@ -245,7 +245,8 @@ iTextureHandle *csMaterial::GetTexture ()
 {
   iTextureWrapper* tex;
   GetVar (nameDiffuseTexture)->GetValue (tex);
-  return tex->GetTextureHandle ();
+  if (tex) return tex->GetTextureHandle ();
+  else return 0;
 }
 
 iTextureHandle* csMaterial::GetTexture (csStringID name)

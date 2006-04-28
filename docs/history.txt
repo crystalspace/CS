@@ -25,6 +25,8 @@ chronological order.
 	- Jorrit fixed csMeshOnTexture::ScaleTexture() so that it more
 	  accurately matches the object box. It now fits the mesh nicely
 	  on the texture.
+	- Jorrit fixed a bug in iMaterial->GetTexture(). It would crash
+	  in case the material had no texture instead of returning 0.
 27-Apr-2006
 	- Jorrit did a few more fixes to csMeshOnTexture. It finally starts
 	  to work now.
