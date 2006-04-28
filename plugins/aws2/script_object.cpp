@@ -49,4 +49,101 @@ scriptObject::~scriptObject ()
 
 }
 
+int32 scriptObject::GetIntArg(uint arg)
+{
+	int32 val;
+	
+	JS_ValueToInt32 (ar.cx, ar.argv[arg], &val);	
+	
+	return val;
+}
+	 
+double scriptObject::GetDoubleArg(uint arg)
+{
+  jsdouble val=0.0;
+
+  JS_ValueToNumber (ar.cx,  ar.argv[arg], &val);
+  
+  return (double)val;
+}
+	 
+scfString scriptObject::GetStringArg(uint arg)
+{
+	JSString *val = JS_ValueToString (ar.cx, ar.argv[arg]);
+
+    return scfString(JS_GetStringBytes (val));	
+}
+
+
+int32 scriptObject::GetIntProp(const scfString &name)
+{	
+	jsval sval;
+	
+	if (JS_GetProperty (ar.cx, ar.obj, name.GetData(), &sval)==JS_TRUE && sval!=JSVAL_VOID)
+	{
+		int32 val;
+	
+		JS_ValueToInt32 (ar.cx, sval, &val);	
+	
+		return val;		
+	}	
+	
+	return 0;
+}	
+
+double scriptObject::GetDoubleProp(const scfString &name)		
+{	
+	jsval sval;
+	
+	if (JS_GetProperty (ar.cx, ar.obj, name.GetData(), &sval)==JS_TRUE && sval!=JSVAL_VOID)
+	{
+		 jsdouble val=0.0;
+
+  		JS_ValueToNumber (ar.cx, sval, &val);
+  
+  		return (double)val;
+	}	
+	
+	return 0.0f;
+}	
+
+scfString scriptObject::GetStringProp(const scfString &name)
+{	
+	jsval sval;
+	
+	if (JS_GetProperty (ar.cx, ar.obj, name.GetData(), &sval)==JS_TRUE && sval!=JSVAL_VOID)
+	{
+		JSString *val = JS_ValueToString (ar.cx, sval);
+
+    	return scfString(JS_GetStringBytes (val));	
+	}	
+	
+	return scfString();	
+}
+
+
+void scriptObject::SetIntProp(const scfString &name, int32 val)
+{
+	jsval sval = INT_TO_JSVAL(val);
+	
+	JS_SetProperty (ar.cx, ar.obj, name.GetData(), &sval);
+}	
+
+void scriptObject::SetDoubleProp(const scfString &name, double val)
+{
+	jsdouble tmp=(jsdouble)val;
+	jsval sval = DOUBLE_TO_JSVAL(tmp);
+	
+	JS_SetProperty (ar.cx, ar.obj, name.GetData(), &sval);	
+}	
+
+void scriptObject::SetStringProp(const scfString &name, const scfString val)
+{
+	JSString *str = JS_NewString(ar.cx, (char *)name.GetData(), name.Length());
+	jsval sval = STRING_TO_JSVAL(str);
+			
+	JS_SetProperty (ar.cx, ar.obj, name.GetData(), &sval);	
+}
+
+
 // newline

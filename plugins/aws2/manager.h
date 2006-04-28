@@ -105,7 +105,7 @@ public:
   
   //////////////////////// Definition Files ////////////////////////
   
-  virtual iAws2ScriptObject *CreateScriptObject (const char *name);
+  virtual iAws2ScriptObject *CreateScriptObject (const char *name, Aws2ScriptObjectFunc *_func=0);
 
   // Adds a widget to the input and drawing chain.
  void AddWidget (aws::widget *w);

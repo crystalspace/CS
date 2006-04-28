@@ -379,9 +379,13 @@ bool awsManager2::Load (const scfString &_filename)
 ***************** Scripting *****************************************
 ********************************************************************/
 
-iAws2ScriptObject *awsManager2::CreateScriptObject (const char *name)
+iAws2ScriptObject *awsManager2::CreateScriptObject (const char *name, Aws2ScriptObjectFunc *_func)
 {
-  return new scriptObject (name);	
+  iAws2ScriptObject *so =  new scriptObject (name);	
+  
+  if (_func) so->SetNotification(_func);
+  
+  return so;
 }
 
 // newline

@@ -3,6 +3,7 @@
 
 #include "iaws/aws2.h"
 #include "script_manager.h"
+#include "csutil/scfstr.h"
 
 /** 
  * This class is a proxy between the JavaScript shtuff and the windowing system.  
@@ -49,6 +50,33 @@ public:
 
   /// Returns the number of arguments sent.
   virtual uint32 NumArgs () { return ar.argc; }
+  
+  /** Returns the argument in position arg as an integer. */
+  virtual int32 GetIntArg(uint arg);		
+	
+  /** Returns the argument in position arg as a double. */
+  virtual double GetDoubleArg(uint arg);		
+	
+  /** Returns the argument in position arg as a string. */
+  virtual scfString GetStringArg(uint arg);	
+  
+  /** Returns the argument in position arg as an integer. */
+  virtual int32 GetIntProp(const scfString &name);		
+	
+  /** Returns the argument in position arg as a double. */
+  virtual double GetDoubleProp(const scfString &name);		
+	
+  /** Returns the argument in position arg as a string. */
+  virtual scfString GetStringProp(const scfString &name);	
+  
+  /** Returns the argument in position arg as an integer. */
+  virtual void SetIntProp(const scfString &name, int32 val);		
+	
+  /** Returns the argument in position arg as a double. */
+  virtual void SetDoubleProp(const scfString &name, double val);		
+	
+  /** Returns the argument in position arg as a string. */
+  virtual void SetStringProp(const scfString &name, const scfString val);		
 
   /** 
    * Sets up the activation record for the notification, and then

@@ -884,6 +884,8 @@ namespace aws
     if (parent) parent->Raise (top);	
     else
     {	
+	  if (top==this) return;	
+
 	  // Raise widgets docked to this one so that they also come up
       if (docked[W_DOCK_SOUTH] && top!=docked[W_DOCK_SOUTH])
       {
@@ -891,17 +893,16 @@ namespace aws
         top = docked[W_DOCK_SOUTH];	
       }
 
-      if (above) above->below = below;
+	  Unlink();
+	  Link(top);
+
+     /* if (above) above->below = below;
       if (below) below->above = above;
 
-      if (top!=this)
-	  {
-		  top->above = this;
-		  below = top;
-	  }
-
-      above = 0;	
-	  
+      top->above = this;
+	  below = top;
+	
+      above = 0;	*/	  
     }	 
   }  	 
 
