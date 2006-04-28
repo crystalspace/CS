@@ -27,6 +27,14 @@ chronological order.
 	  on the texture.
 	- Jorrit fixed a bug in iMaterial->GetTexture(). It would crash
 	  in case the material had no texture instead of returning 0.
+	- Jorrit fixed xmlread and tinyxml parser so that they no longer
+	  accept attributes without quotes. Attributes without quotes are
+	  not valid XML and both tinyxml and xmlread actually caused
+	  memory corruption when those attributes where used (in the case
+	  of xmlread it was pretty hard to avoid). Note that there is
+	  still a problem in case the multiplexer is used. For some reason
+	  the error on load is ignored then and the map file continues
+	  to load properly.
 27-Apr-2006
 	- Jorrit did a few more fixes to csMeshOnTexture. It finally starts
 	  to work now.

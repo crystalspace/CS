@@ -460,6 +460,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
         {
           p = node->Parse( document, p );
           LinkEndChild( node );
+	  if (!p) return 0;
         }        
         else
         {
@@ -580,15 +581,8 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
   }
   else
   {
-    // All attribute values should be in single or double quotes.
-    // But this is such a common error that the parser will try
-    // its best, even without them.
-    while (    p && *p                    // existence
-        && !isspace( *p ) && *p != '/' && *p != '>' )            // tag end
-    {
-      buf.AddChar (*p);
-      ++p;
-    }
+    document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+    return 0;
   }
   value = buf.GetNewCopy ();
   return p;

@@ -433,6 +433,7 @@ char* TrXmlElement::ReadValue( TrDocument* document, char* p )
         {
           p = node->Parse( document, p );
           lastChild = LinkEndChild( lastChild, node );
+	  if (!p) return 0;
         }        
         else
         {
@@ -529,7 +530,7 @@ char* TrDocumentAttribute::Parse( TrDocument* document, char* p )
     document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
     return 0;
   }
-  
+ 
   const char* end;
 
   char* buf;
@@ -548,17 +549,8 @@ char* TrDocumentAttribute::Parse( TrDocument* document, char* p )
   }
   else
   {
-    // All attribute values should be in single or double quotes.
-    // But this is such a common error that the parser will try
-    // its best, even without them.
-    buf = p;
-    char* out = buf;
-    while (    p && *p                    // existence
-        && !isspace( *p ) && *p != '/' && *p != '>' )            // tag end
-    {
-      *out++ = *p++;
-    }
-    buflen = out-buf;
+    document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+    return 0;
   }
   value = buf;
   vallen = buflen;
