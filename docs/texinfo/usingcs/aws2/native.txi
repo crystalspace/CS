@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node AWS2 Native Objects, AWS2 Quick Start, AWS2
+@node AWS2 Native Objects, AWS2 Widget, AWS Quick Start, AWS
 @subsection Native @sc{aws2} Objects
 
 Much like the DOM in your browser, @sc{aws2} has certain native language objects that help you get the job done.  These are
@@ -8,15 +8,9 @@ are writing a new Widget, or skinning an existing widget
 
 
 @menu
-* AWS2 Widget:: Widget object
-* AWS2 Pen:: Pen object
-* AWS2 Texture:: Texture object
-* AWS2 Color:: Color object
-* AWS2 Font:: Font object
-* AWS2 Gradient:: Gradient object
 @end menu
 
-@node AWS2 Widget, AWS2 Pen, AWS2 Native Objects, AWS2 Native Objects
+@node AWS2 Widget, AWS2 Pen, AWS2 Native Objects, AWS
 @subsection Widget object
 
 The Widget object is the base for any widget that will be displayed on the screen,
@@ -94,7 +88,7 @@ If a widget is visible, make it invisible.
 
 @end table
 
-@node AWS2 Pen, AWS2 Texture, AWS2 Widget, AWS2 Native Objects
+@node AWS2 Pen, AWS2 Texture, AWS2 Widget, AWS
 @subsection Pen object
 
 The Pen object is used to draw.  It is vector based, so all drawing with the pen may be subject to transformations like scaling, translation, and rotation.
@@ -410,7 +404,7 @@ be aligned to the box using the Pen.ALIGN_XXXX constants.
 
 @end table
 
-@node AWS2 Texture, AWS2 Color, AWS2 Pen, AWS2 Native Objects
+@node AWS2 Texture, AWS2 Color, AWS2 Pen, AWS
 @subsection Texture object
 
 The texture objects holds a @sc{cs} iTextureHandle.  The only things you can do with a Texture object are
@@ -457,7 +451,7 @@ dim = my_tex.GetDimensions()
 Sys.Print("Texture width: ", dim.width, " Texture height: ", dim.height);
 @end example
 
-@node AWS2 Color, AWS2 Font, AWS2 Texture, AWS2 Native Objects
+@node AWS2 Color, AWS2 Font, AWS2 Texture, AWS
 @subsection Color object
 
 Allows you to create an encapsulation of a color. Color components may range from 0.0 to 1.0, where
@@ -497,7 +491,7 @@ Return the alpha component.
 
 @end table
 
-@node AWS2 Font, AWS2 Gradient, AWS2 Color, AWS2 Native Objects
+@node AWS2 Font, AWS2 Gradient, AWS2 Color, AWS
 @subsection Font object
 
 The Font object is used for representing a font to the drawing system.  You may Load fonts, and query them
@@ -544,7 +538,7 @@ dim = my_font.GetDimensions("my text");
 Sys.Print("Dimensions of text: ", dim.width, dim.height, dim.descender);
 @end example
 
-@node AWS2 Gradient, AWS2 Native Objects, AWS2 Font, AWS2 Native Objects
+@node AWS2 Gradient, AWS2 XML Interface Reference, AWS2 Font, AWS
 @subsection Gradient object
 
 The Gradient object lets you make some fairly sophisticated gradients.  These can then 

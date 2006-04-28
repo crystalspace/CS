@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node AWS2 XML Interface Reference, AWS2, AWS2
+@node AWS2 XML Interface Reference, , AWS2 Gradient, AWS
 @subsection XML @sc{aws2} Interface Objects
 
 @sc{aws2} uses a sophisticated and flexible means to define user interfaces in XML.

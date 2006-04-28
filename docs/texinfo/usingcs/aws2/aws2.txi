@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node AWS, CEGUI, Scripting Languages, Using Crystal Space
+@node AWS, CEGUI, AWS, Using Crystal Space
 @section Alternate Windowing System 2 (@sc{aws2})
 @cindex @sc{aws2}
 @cindex Alternate Windowing System 2
@@ -21,17 +21,20 @@ caching layer so that per-frame redraws are very optimal.
 For example code, see @file{CS/apps/tools/partedit2} and @file{CS/apps/tests/awstest}.
 
 @menu
-* AWS2 Quick Start:: Quick Start
-* AWS2 Native Objects:: Native Code @sc{aws2} Object Reference
-* AWS2 Widgets:: Creating Custom @sc{aws2} Widgets
-* AWS2 Widget Reference:: @sc{aws2} Widget Settings Reference
-* AWS2 XML Interface Reference:: Using XML to Define @sc{aws2} Interfaces
-* AWS2 Architecture:: In-Depth Explanation of @sc{aws2} Architecture
+* AWS Quick Start:: Quick Start
+* AWS2 Native Objects:: Native @sc{aws2} Objects
+* AWS2 Widget:: Widget object
+* AWS2 Pen:: Pen object
+* AWS2 Texture:: Texture object
+* AWS2 Color:: Color object
+* AWS2 Font:: Font object
+* AWS2 Gradient:: Gradient object
+* AWS2 XML Interface Reference:: XML @sc{aws2} Interface Objects
 @end menu
 
 @importss{usingcs,aws2,quick.txi}
 @importss{usingcs,aws2,native.txi}
-@importss{usingcs,aws2,ownwidgets.txi}
-@importss{usingcs,aws2,widgetref.txi}
+@c @importss{usingcs,aws2,ownwidgets.txi}
+@c @importss{usingcs,aws2,widgetref.txi}
 @importss{usingcs,aws2,xmlui.txi}
-@importss{usingcs,aws2,arch.txi}
+@c @importss{usingcs,aws2,arch.txi}
