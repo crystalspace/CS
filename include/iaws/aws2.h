@@ -46,7 +46,34 @@ struct iAws2ScriptObject
 	virtual void SetNotification(Aws2ScriptObjectFunc *_func)=0;
 	
 	/** Returns the number of arguments in the notification. */
-	virtual uint32 NumArgs()=0;		
+	virtual uint32 NumArgs()=0;
+	
+	/** Returns the argument in position arg as an integer. */
+	virtual int32 GetIntArg(uint arg)=0;		
+	
+	/** Returns the argument in position arg as a double. */
+	virtual double GetDoubleArg(uint arg)=0;		
+	
+	/** Returns the argument in position arg as a string. */
+	virtual scfString GetStringArg(uint arg)=0;		
+	
+	/** Returns the named property as an integer, or zero if it doesn't exist. */
+    virtual int32 GetIntProp(const scfString &name)=0;		
+	
+  	/** Returns the named property as a double, or zero if it doesn't exist. */
+    virtual double GetDoubleProp(const scfString &name)=0;		
+	
+  	/** Returns the named property as a string, or an empty string if it doesn't exist. */
+  	virtual scfString GetStringProp(const scfString &name)=0;		
+  	
+  	/** Sets the named property to the integer val. */
+    virtual void SetIntProp(const scfString &name, int32 val)=0;		
+	
+    /** Sets the named property to the double val. */
+    virtual void SetDoubleProp(const scfString &name, double val)=0;		
+		
+    /** Sets the named property to the string val. */
+    virtual void SetStringProp(const scfString &name, const scfString val)=0;			
 };
 
 
@@ -68,8 +95,8 @@ struct iAws2  : public iBase
   /// Redraws all the windows into the current graphics contexts.
   virtual void Redraw()=0;
   
-  /// Creates a new script object with the given name.
-  virtual iAws2ScriptObject *CreateScriptObject(const char *name)=0;
+  /// Creates a new script object with the given name. notification_func may be null, otherwise it should be the function to call.
+  virtual iAws2ScriptObject *CreateScriptObject(const char *name, Aws2ScriptObjectFunc *notification_func=0)=0;
   
   /// Cached event names.  These should be set up in the ::Initialize method.
   csEventID PreProcess;

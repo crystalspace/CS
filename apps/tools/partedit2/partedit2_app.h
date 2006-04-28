@@ -120,4 +120,6 @@ class PartEdit2 : public csApplicationFramework, public csBaseEventHandler
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
+PartEdit2 *pe2App();
+
 #endif // __PARTEDIT2_APP_H__

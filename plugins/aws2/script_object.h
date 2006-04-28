@@ -60,22 +60,22 @@ public:
   /** Returns the argument in position arg as a string. */
   virtual scfString GetStringArg(uint arg);	
   
-  /** Returns the argument in position arg as an integer. */
+  /** Returns the named property as an integer, or zero if it doesn't exist. */
   virtual int32 GetIntProp(const scfString &name);		
 	
-  /** Returns the argument in position arg as a double. */
+ /** Returns the named property as a double, or zero if it doesn't exist. */
   virtual double GetDoubleProp(const scfString &name);		
 	
-  /** Returns the argument in position arg as a string. */
+  /** Returns the named property as a string, or an empty string if it doesn't exist. */
   virtual scfString GetStringProp(const scfString &name);	
   
-  /** Returns the argument in position arg as an integer. */
+  /** Sets the named property to the integer val. */
   virtual void SetIntProp(const scfString &name, int32 val);		
 	
-  /** Returns the argument in position arg as a double. */
+  /** Sets the named property to the double val. */
   virtual void SetDoubleProp(const scfString &name, double val);		
 	
-  /** Returns the argument in position arg as a string. */
+  /** Sets the named property to the string val. */
   virtual void SetStringProp(const scfString &name, const scfString val);		
 
   /** 

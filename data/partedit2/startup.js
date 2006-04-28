@@ -1,3 +1,16 @@
+// Setup some helpers for the particleFountain object.
+particleFountain.Stop = function()
+{
+	var stopCmd = 0;
+	particleFountain.onEvent(stopCmd);	
+}
+
+particleFountain.Start = function()
+{
+	var startCmd = 1;
+	particleFountain.onEvent(startCmd);	
+}
+
 function PartEdit2()
 {
 	_o = new Object;
@@ -18,7 +31,8 @@ function PartEdit2()
 		 		<event name="onDrawContent" action="buttonDrawText('Reset')" />			 		
 		 	</widget>
 		 	<widget type="Label">
-		 		<text>Reset all particle fountain variables</text>		 		
+		 		<text>Reset all particle fountain variables</text>
+		 		<border>{false}</border>		 		
 		 	</widget>		 	
 		 	
 		 </layout>
@@ -29,12 +43,14 @@ function PartEdit2()
 		 	<widget type="Button">
 		 		<setup>widget.Resize(10,0);</setup>
 		 		<event name="onDrawContent" action="buttonDrawText('Pause')" />
+		 		<event name="onMouseClick" action="particleFountain.Stop;" />
 		 	</widget>
 		 	<widget type="Label" id="pauseDescLabel">
 		 		<setup>
 		 			<![CDATA[
 		 						 				
 		 				pauseDescLabel.text = "Pause the particle fountain.";
+		 				pauseDescLabel.border = false;
 		 			
 		 			]]>
 		 		</setup>

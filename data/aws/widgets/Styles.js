@@ -602,8 +602,8 @@ Style3D =
 		var prefs = Skin.current;
 				
 		pen.Clear();		
-// 		pen.SetColor(prefs.TextForeColor);
-// 		pen.DrawRect(0,0,w,h);
+		pen.SetColor(prefs.TextForeColor);
+		if (this.border==true) pen.DrawRect(0,0,w,h);
 		
 		// Setup for the information.
 		var ty = (this.height - this.text_height) / 2.0;

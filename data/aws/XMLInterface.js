@@ -3,7 +3,7 @@ function ParseXMLInterface(node, parent_widget)
 {	
 	var widget;		
 			
-	Sys.Print("xml: ", node.@type);
+	//Sys.Print("xml: ", node.@type);
 			
 	widget = eval(node.@type + "(node)");
 	

@@ -33,6 +33,8 @@ chronological order.
 	  memory corruption when those attributes where used (in the case
 	  of xmlread it was pretty hard to avoid).
 	- Jorrit increased speed of mouselook in walktest.
+	- Christopher made a lot of updates in AWS2, including expanding the
+	  Native/Script interface.
 27-Apr-2006
 	- Jorrit did a few more fixes to csMeshOnTexture. It finally starts
 	  to work now.

@@ -17,18 +17,29 @@
 */
 
 #include "partedit2_app.h"
+#include "partedit2_events.h"
 
 CS_IMPLEMENT_APPLICATION
+
+static PartEdit2 *__app__=0;
+
+PartEdit2 *pe2App()
+{
+	return __app__;
+}
 
 //---------------------------------------------------------------------------
 
 PartEdit2::PartEdit2 ()
 {
   SetApplicationName ("CrystalSpace.Partedit2");
+  
+  __app__ = this;
 }
 
 PartEdit2::~PartEdit2 ()
 {
+  __app__ = 0;	
 }
 
 void PartEdit2::ProcessFrame ()
@@ -133,7 +144,7 @@ bool PartEdit2::OnKeyboard(iEvent& ev)
 bool
 PartEdit2::HandleEvent (iEvent &Event)
 { 
-  if (csBaseEventHandler::HandleEvent(Event)) return true;
+  csBaseEventHandler::HandleEvent(Event); //) return true;
 	
   if (aws) return aws->HandleEvent(Event);
   return false;
@@ -247,15 +258,18 @@ bool PartEdit2::SetupModules ()
   // Setup AWS specific stuff here.
   //aws->Initialize(object_reg);
   aws->SetDrawTarget(g2d, g3d);
+  
+  // Initialize the scripting events.
+ initializeScriptEvents(aws);
 
  // Load a definition file
  if (aws->Load("/partedit2/skin.js")==false)
-   ReportError("Unable to load the definition file '/partedit2/skin.js'");  
-   
+   ReportError("Unable to load the definition file '/partedit2/skin.js'");     
+      
  // Load a definition file
  if (aws->Load("/partedit2/startup.js")==false)
    ReportError("Unable to load the definition file '/partedit2/startup.js'");  
-
+ 
   return true;
 }
 
