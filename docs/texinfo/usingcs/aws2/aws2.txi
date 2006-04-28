@@ -8,17 +8,25 @@
 @noindent
 @emph{Written by Christopher Nelson, @email{nadiasvertex@@gmail.com}.}
 
-The Alternate Windowing System 2 is a plugin designed to replace
-the older Alternate Windowing System (@sc{aws}). 
+The Alternate Windowing System 2 is a plugin designed to replace the older
+Alternate Windowing System (@sc{aws}).
 
-It uses a vector pen instead of the older bitmap graphics-centric idea, but also
-allows shapes to be texture mapped so that scalable bitmaps can in fact be used.
+It uses a vector pen instead of the older bitmap graphics-centric idea, but
+also allows shapes to be texture mapped so that scalable bitmaps can in fact be
+used.
 
-The vast majority of AWS2 is written in Javascript, but a native-code drawing
-and event layer makes sure that the system is not too slow.  It also uses a
-caching layer so that per-frame redraws are very optimal.
+The vast majority of @sc{aws2} is written in JavaScript, but a native-code
+drawing and event layer makes sure that the system is not too slow.  It also
+uses a caching layer so that per-frame redraws are very optimal.
 
-For example code, see @file{CS/apps/tools/partedit2} and @file{CS/apps/tests/awstest}.
+For example code, examine projects which utilize @sc{aws2}:
+
+@itemize @bullet
+@item
+@code{CS/apps/tools/partedit2}
+@item
+@code{CS/apps/tests/awstest}
+@end itemize
 
 @menu
 * AWS2 Quick Start:: Quick Start
