@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node AWS Quick Start, AWS2 Native Objects, AWS, AWS
+@node AWS2 Quick Start, AWS2 Native Objects, AWS2, AWS2
 @subsection Quick Start
 
 In order to startup and use @sc{aws2}, the following tasks must be performed.

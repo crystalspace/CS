@@ -1,7 +1,7 @@
 @c -*-texinfo-*-
 @node Shaders, Alpha Textures, Materials, Materials
 @subsection Shaders
-@cindex shader
+@cindex Shader
 @cindex @code{iShader}
 
 A shader is a piece of code that is typically run on
@@ -10,7 +10,7 @@ the surface attributes using the material data. A material and a shader
 work closely together.
 
 @subsubheading Shader Variables
-@cindex{shader variables}
+@cindex Shader variables
 
 Shaders need to use shader variables to be able to access the resources they need
 to do what they have to do. This includes things like the texture, the ambient

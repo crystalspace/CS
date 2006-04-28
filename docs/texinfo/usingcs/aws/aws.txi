@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node AWS, CEGUI, AWS, Using Crystal Space
+@node AWS, AWS2, Scripting Languages, Using Crystal Space
 @section Alternate Windowing System (@sc{aws})
 @cindex @sc{aws}
 @cindex Alternate Windowing System

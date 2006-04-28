@@ -25,7 +25,7 @@ own 3D applications.
 * Sound System::
 * Scripting Languages::
 * AWS:: Alternate Windowing System (@sc{aws})
-* AWS:: Alternate Windowing System 2 (@sc{aws2})
+* AWS2:: Alternate Windowing System 2 (@sc{aws2})
 * CEGUI:: CEGUI Introduction
 * Making Own Projects:: Making Projects Using Crystal Space
 * HOWTO::

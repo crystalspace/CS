@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node AWS2 Native Objects, AWS2 Widget, AWS Quick Start, AWS
+@node AWS2 Native Objects, AWS2 Widget, AWS2 Quick Start, AWS2
 @subsection Native @sc{aws2} Objects
 
 Much like the DOM in your browser, @sc{aws2} has certain native language objects that help you get the job done.  These are
@@ -10,7 +10,7 @@ are writing a new Widget, or skinning an existing widget
 @menu
 @end menu
 
-@node AWS2 Widget, AWS2 Pen, AWS2 Native Objects, AWS
+@node AWS2 Widget, AWS2 Pen, AWS2 Native Objects, AWS2
 @subsection Widget object
 
 The Widget object is the base for any widget that will be displayed on the screen,
@@ -28,13 +28,13 @@ The following table summarizes all of the methods that are available for a widge
 Move the widget @strong{relative} to x,y.
 
 @item MoveTo(x,y)
-Move the widget to @strong(absolute) position x,y.
+Move the widget to @strong{absolute} position x,y.
 
 @item Resize(width,height)
 Resize the widget @strong{relative} to width,height.
 
 @item ResizeTo(width,height)
-Resize the widget to @strong(absolute) size width,height.
+Resize the widget to @strong{absolute} size width,height.
 
 @item Invalidate()
 Indicates the the state of this widget has changed, and on the next redraw it's @code{onRedraw} function will be called.
@@ -88,7 +88,7 @@ If a widget is visible, make it invisible.
 
 @end table
 
-@node AWS2 Pen, AWS2 Texture, AWS2 Widget, AWS
+@node AWS2 Pen, AWS2 Texture, AWS2 Widget, AWS2
 @subsection Pen object
 
 The Pen object is used to draw.  It is vector based, so all drawing with the pen may be subject to transformations like scaling, translation, and rotation.
@@ -154,6 +154,7 @@ pen.SetTexture(my_tex);
 pen.DrawRect(0,0,10,10);
 
 pen.PopTransform();
+@end example
 
 This will normalize the coordinates of your shape and allow the pen to create correct texture coordinates for it.
 
@@ -404,7 +405,7 @@ be aligned to the box using the Pen.ALIGN_XXXX constants.
 
 @end table
 
-@node AWS2 Texture, AWS2 Color, AWS2 Pen, AWS
+@node AWS2 Texture, AWS2 Color, AWS2 Pen, AWS2
 @subsection Texture object
 
 The texture objects holds a @sc{cs} iTextureHandle.  The only things you can do with a Texture object are
@@ -451,7 +452,7 @@ dim = my_tex.GetDimensions()
 Sys.Print("Texture width: ", dim.width, " Texture height: ", dim.height);
 @end example
 
-@node AWS2 Color, AWS2 Font, AWS2 Texture, AWS
+@node AWS2 Color, AWS2 Font, AWS2 Texture, AWS2
 @subsection Color object
 
 Allows you to create an encapsulation of a color. Color components may range from 0.0 to 1.0, where
@@ -491,7 +492,7 @@ Return the alpha component.
 
 @end table
 
-@node AWS2 Font, AWS2 Gradient, AWS2 Color, AWS
+@node AWS2 Font, AWS2 Gradient, AWS2 Color, AWS2
 @subsection Font object
 
 The Font object is used for representing a font to the drawing system.  You may Load fonts, and query them
@@ -538,7 +539,7 @@ dim = my_font.GetDimensions("my text");
 Sys.Print("Dimensions of text: ", dim.width, dim.height, dim.descender);
 @end example
 
-@node AWS2 Gradient, AWS2 XML Interface Reference, AWS2 Font, AWS
+@node AWS2 Gradient, AWS2 XML Interface Reference, AWS2 Font, AWS2
 @subsection Gradient object
 
 The Gradient object lets you make some fairly sophisticated gradients.  These can then 

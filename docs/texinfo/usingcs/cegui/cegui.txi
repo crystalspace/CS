@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node CEGUI, Making Own Projects, AWS, Using Crystal Space
+@node CEGUI, Making Own Projects, AWS2, Using Crystal Space
 @section CEGUI Introduction
 @noindent
 @emph{Written by Seth Yastrov, @email{syastrov@@users.sourceforge.net} and

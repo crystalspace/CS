@@ -1,12 +1,12 @@
 @c -*-texinfo-*-
-@node AWS, CEGUI, AWS, Using Crystal Space
+@node AWS2, CEGUI, AWS, Using Crystal Space
 @section Alternate Windowing System 2 (@sc{aws2})
 @cindex @sc{aws2}
 @cindex Alternate Windowing System 2
 @cindex @code{iAWS2}
 
 @noindent
-@emph{Written by Christopher Nelson, @email{nadiasvertex@@gmail.com}.
+@emph{Written by Christopher Nelson, @email{nadiasvertex@@gmail.com}.}
 
 The Alternate Windowing System 2 is a plugin designed to replace
 the older Alternate Windowing System (@sc{aws}). 
@@ -21,7 +21,7 @@ caching layer so that per-frame redraws are very optimal.
 For example code, see @file{CS/apps/tools/partedit2} and @file{CS/apps/tests/awstest}.
 
 @menu
-* AWS Quick Start:: Quick Start
+* AWS2 Quick Start:: Quick Start
 * AWS2 Native Objects:: Native @sc{aws2} Objects
 * AWS2 Widget:: Widget object
 * AWS2 Pen:: Pen object

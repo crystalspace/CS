@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node AWS2 XML Interface Reference, , AWS2 Gradient, AWS
+@node AWS2 XML Interface Reference, , AWS2 Gradient, AWS2
 @subsection XML @sc{aws2} Interface Objects
 
 @sc{aws2} uses a sophisticated and flexible means to define user interfaces in XML.
@@ -59,10 +59,10 @@ some_widget = ParseXMLInterface(contents, null);
 If you were to create a horizontal layout widget using code, it would look something like this:
 
 @example
-hl = Horizontal({padding: 5});
+hl = Horizontal(@{padding: 5@});
 @end example
 
-The settings are passed through the associative array (indicated by the {}'s).  When using XML, something
+The settings are passed through the associative array (indicated by the @{@}'s).  When using XML, something
 similar happens, it's just defined a little differently.
 
 @example
@@ -81,17 +81,17 @@ On occasion you may need to name a widget, in order to identify it for some futu
 @example
 <layout type="page">
 	<widget type="Gauge" id="myGauge">
-		<type>{Skin.current.Style.GaugeLevel}</type>
+		<type>@{Skin.current.Style.GaugeLevel@}</type>
 		<title>My Gauge</title>
 		<min>0</min>
 		<max>100</max>	
 	</widget>
 	<widget type="Slider" id="mySlider">
-		<vertical>{true}</vertical>
+		<vertical>@{true@}</vertical>
 		<step>25</step>
-		<lock>{false}</lock>
+		<lock>@{false@}</lock>
 		
-		<event name="onChange" action="function() { myGauge.value = mySlider.value; }" />
+		<event name="onChange" action="function() @{ myGauge.value = mySlider.value; @}" />
 	</widget>
 </layout>
 @end example
@@ -122,7 +122,7 @@ The body of the setup node is executed in place.  You can do anything you want i
 Notice that we used a CDATA construct.  While this isn't necessary, it may make your life easier
 if you are doing relational operations.  
 
-@strong{Note:} It is not necessary to give the widget an id in order to use setup.  Instead, you may use the
+@strong{Note}: It is not necessary to give the widget an id in order to use setup.  Instead, you may use the
 variable "widget" to refer to the widget.  This is only available in the setup node.
 
 @subsubsection Widget Events
@@ -133,7 +133,7 @@ content by defining an event handler for an event called "onDrawContent".
 
 @example
 <widget type="Button">
-	<event name="onDrawContent" action="function myDraw(pen) { pen.SetColor(0,0,0,1); pen.DrawRect(0,0,this.width,this.height);}" />
+	<event name="onDrawContent" action="function myDraw(pen) @{ pen.SetColor(0,0,0,1); pen.DrawRect(0,0,this.width,this.height);@}" />
 </widget>
 @end example
 
@@ -169,10 +169,8 @@ The settings may be referred to using the "this" variable in your action functio
 
 @example
 function doSomething()
-{
+@{
 	var a = this.mysetting + this.othersetting;
-	
 	return;
-}
+@}
 @end example
-
