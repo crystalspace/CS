@@ -670,13 +670,16 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
 	  int last_x, last_y;
 	  last_x = csMouseEventHelper::GetX(&Event);
 	  last_y = csMouseEventHelper::GetY(&Event);
+	  float speed = 6.0f;
   	
 	  myG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
 	  if (!first_time)
 	  {
 	    RotateCam (
-		      -((float)(last_y - (FRAME_HEIGHT / 2) )) / (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse),
-		      ((float)(last_x - (FRAME_WIDTH / 2) )) / (FRAME_WIDTH*2));
+		      speed * (-((float)(last_y - (FRAME_HEIGHT / 2) ))
+		      		/ (FRAME_HEIGHT*2)*(1-2*(int)inverse_mouse)),
+		      speed * (((float)(last_x - (FRAME_WIDTH / 2) ))
+		      		/ (FRAME_WIDTH*2)));
 	  }
 	  else
 	    first_time = false;
