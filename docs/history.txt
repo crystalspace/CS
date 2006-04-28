@@ -22,6 +22,9 @@ chronological order.
 	- Jorrit fixed several cases in CS where the above functions
 	  are used but where in case of error there was no check (i.e.
 	  a crash would result).
+	- Jorrit fixed csMeshOnTexture::ScaleTexture() so that it more
+	  accurately matches the object box. It now fits the mesh nicely
+	  on the texture.
 27-Apr-2006
 	- Jorrit did a few more fixes to csMeshOnTexture. It finally starts
 	  to work now.

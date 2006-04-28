@@ -60,15 +60,23 @@ void csMeshOnTexture::ScaleCamera (iMeshWrapper* mesh, int txtw, int txth)
   {
     csVector3 corner = mesh_box.GetCorner (i) - mesh_center;
     float z = (corner.x * aspect) / (1.0f - shift_x);
+    if (z < 0) z = (corner.x * aspect) / (float (txtw) - shift_x);
+    z += corner.z;
     if (z > maxz) maxz = z;
+
     z = (corner.y * aspect) / (1.0f - shift_y);
+    if (z < 0) z = (corner.y * aspect) / (float (txth) - shift_y);
+    z += corner.z;
     if (z > maxz) maxz = z;
   }
 
   csVector3 cam_pos = mesh_center;
-  //maxz += maxz;
-  printf ("cam_pos=%g,%g,%g maxz=%g\n", cam_pos.x, cam_pos.y, cam_pos.z, maxz); fflush (stdout);
   cam_pos.z -= maxz;
+  for (i = 0 ; i < 8 ; i++)
+  {
+    csVector3 corner = mesh_box.GetCorner (i) - cam_pos;
+    csVector2 p = camera->Perspective (corner);
+  }
 
   camera->GetTransform ().Identity ();
   camera->GetTransform ().SetOrigin (cam_pos);
