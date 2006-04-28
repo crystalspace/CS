@@ -31,10 +31,7 @@ chronological order.
 	  accept attributes without quotes. Attributes without quotes are
 	  not valid XML and both tinyxml and xmlread actually caused
 	  memory corruption when those attributes where used (in the case
-	  of xmlread it was pretty hard to avoid). Note that there is
-	  still a problem in case the multiplexer is used. For some reason
-	  the error on load is ignored then and the map file continues
-	  to load properly.
+	  of xmlread it was pretty hard to avoid).
 27-Apr-2006
 	- Jorrit did a few more fixes to csMeshOnTexture. It finally starts
 	  to work now.
