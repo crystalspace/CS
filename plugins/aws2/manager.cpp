@@ -339,7 +339,10 @@ void awsManager2::Redraw ()
     aws::widget *start = top;
 
     // Get bottom widget.
-    while(start->Below ()) { start=start->Below (); }
+    while(start->Below ()) 
+	{ 
+		start=start->Below (); 
+	}
 
     // Draw widgets from bottom up.
     for(aws::widget *w=start; w!=0; w=w->Above ())
